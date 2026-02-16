@@ -1,0 +1,30 @@
+name: Link Check
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  check-links:
+    # Skip draft PRs
+    if: github.event.pull_request.draft != true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check links
+        uses: lycheeverse/lychee-action@v2.7.0
+        with:
+          args: >-
+            --accept 200,201,202,204,301,302,307,429,403
+            --timeout 20
+            'docs/**/*.md'
+            '*.md'
+          fail: true

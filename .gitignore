@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.venv/
+*.egg
+
+# Obsidian - per-user state and downloaded plugins
+docs/.obsidian/workspace.json
+docs/.obsidian/workspace-mobile.json
+docs/.obsidian/plugins/
+docs/.obsidian/themes/
+docs/.obsidian/hotkeys.json
+docs/.obsidian/core-plugins-migration.json
+docs/.obsidian/graph.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/

@@ -1,0 +1,7 @@
+# Domains to ignore during link checking
+# One URL pattern (regex) per line
+# https://lychee.cli.rs/usage/config/
+
+# LinkedIn - requires authentication
+https://www\.linkedin\.com
+https://linkedin\.com

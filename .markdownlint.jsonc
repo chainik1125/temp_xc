@@ -1,0 +1,33 @@
+{
+    "default": true,
+    "MD003": {
+        // heading-style: ATX only (## not underlines)
+        "style": "atx"
+    },
+    "MD004": {
+        // ul-style: dashes only
+        "style": "dash"
+    },
+    "MD013": false, // line-length: disabled
+    "MD041": {
+        // first-line-heading: must be H2 (Obsidian shows filename as title)
+        "allow_preamble": true,
+        "level": 2
+    },
+    "MD046": {
+        // code-block-style: fenced
+        "style": "fenced"
+    },
+    "MD048": {
+        // code-fence-style: backticks
+        "style": "backtick"
+    },
+    "MD049": {
+        // emphasis-style: asterisks
+        "style": "asterisk"
+    },
+    "MD050": {
+        // strong-style: asterisks
+        "style": "asterisk"
+    }
+}

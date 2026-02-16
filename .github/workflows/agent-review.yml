@@ -1,0 +1,87 @@
+name: Agent Review
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'docs/**/*.md'
+      - 'src/**/*.py'
+      - 'tests/**/*.py'
+
+permissions:
+  contents: read
+  pull-requests: write
+  id-token: write
+
+jobs:
+  agent-review:
+    # Disabled by default. To enable: change to github.event.pull_request.draft == false
+    if: false
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get changed files
+        id: changed
+        run: |
+          FILES=$(gh pr diff ${{ github.event.pull_request.number }} --name-only || true)
+          MD_FILES=$(echo "$FILES" | grep '^docs/.*\.md$' || true)
+          PY_FILES=$(echo "$FILES" | grep '\.py$' || true)
+          CONFIG_FILES=$(echo "$FILES" | grep -E '\.(yml|yaml|json|toml)$' || true)
+          if [ -z "$MD_FILES" ] && [ -z "$PY_FILES" ] && [ -z "$CONFIG_FILES" ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Requires ANTHROPIC_API_KEY in repo Settings > Secrets and variables > Actions
+      - name: Run agent review
+        if: steps.changed.outputs.skip == 'false'
+        uses: anthropics/claude-code-action@beta
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          direct_prompt: |
+            Review the files changed in this PR.
+
+            Read CLAUDE.md for project rules and conventions.
+            Read docs/Tags.md for the tag taxonomy.
+
+            Determine which review types apply:
+            - If docs/**/*.md files changed: run documentation review (structure, cross-refs, frontmatter, clarity, formatting per review-doc.md dimensions)
+            - If any changed .md files contain mathematical content (LaTeX, equations, proofs): also run mathematical review (notation, proof logic, equation correctness per review-math.md dimensions)
+            - If src/**/*.py or tests/**/*.py files changed: run code review (correctness, tests, design, error handling per review-code.md dimensions)
+            - If experiment configs or results documents changed: run experiment review (methodology, reproducibility, metrics per review-experiment.md dimensions)
+            - If data files or data configs changed: run data review (schema, completeness, pipeline correctness per review-data.md dimensions)
+
+            For each applicable review type, evaluate all dimensions.
+
+            Classify each finding as:
+            - CRITICAL: must fix before merge
+            - SUGGESTION: recommended improvement
+            - STYLE: minor preference
+
+            Present a unified report:
+
+            ## Documentation Review (if applicable)
+            [findings]
+
+            ## Mathematical Review (if applicable)
+            [findings]
+
+            ## Code Review (if applicable)
+            [findings]
+
+            ## Experiment Review (if applicable)
+            [findings]
+
+            ## Data Review (if applicable)
+            [findings]
+
+            ## Overall Summary
+            [assessment with counts: X critical, Y suggestions, Z style]
