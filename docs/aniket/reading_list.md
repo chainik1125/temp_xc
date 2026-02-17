@@ -6,6 +6,12 @@ tags:
   - in-progress
 ---
 
+## synthetic data
+
+- [ ] manning-coe (2025). synthetic data experiment setup. *(link tbd — not yet in references)*
+- [ ] lindsey et al. (2025). [arXiv:2508.16560](https://arxiv.org/abs/2508.16560)
+- [ ] chanin (2025). "temporal crosscoders on synthetic data." [colab notebook](https://colab.research.google.com/drive/1lLTvn6ksjjVZOJtF4va_mkDGFf8TsZ7B?usp=sharing)
+
 ## foundational
 
 - [ ] elhage et al. (2022). "toy models of superposition." [transformer circuits thread](https://transformer-circuits.pub/2022/toy_model/index.html)
@@ -21,8 +27,3 @@ tags:
 
 - [ ] venhoff et al. (2025). "base models know how to reason, thinking models learn when." [arXiv:2510.07364](https://arxiv.org/abs/2510.07364)
 - [ ] ward et al. (2025). "reasoning-finetuning repurposes latent representations in base models." icml 2025 workshop on actionable interpretability. [arXiv:2507.12638](https://arxiv.org/abs/2507.12638)
-
-## synthetic benchmarks
-
-- [ ] chanin (2025). "temporal crosscoders on synthetic data." [colab notebook](https://colab.research.google.com/drive/1lLTvn6ksjjVZOJtF4va_mkDGFf8TsZ7B?usp=sharing)
-- [ ] lindsey et al. (2025). [arXiv:2508.16560](https://arxiv.org/abs/2508.16560)
