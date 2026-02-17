@@ -1,4 +1,6 @@
 {
   "baseFontSize": 16,
-  "theme": "system"
+  "theme": "system",
+  "cssTheme": "Minimal",
+  "accentColor": "#7c6f64"
 }
