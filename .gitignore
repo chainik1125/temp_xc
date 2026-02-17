@@ -21,5 +21,6 @@ docs/.obsidian/graph.json
 Thumbs.db
 
 # IDE
-.vscode/
+.vscode/*
+!.vscode/extensions.json
 .idea/
