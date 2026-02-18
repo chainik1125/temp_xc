@@ -8,7 +8,7 @@ tags:
 
 ## synthetic data
 
-- [ ] manning-coe (2025). synthetic data experiment setup. *(link tbd — not yet in references)*
+- [ ] manning-coe (2025). synthetic data experiment setup.
 - [ ] lindsey et al. (2025). [arXiv:2508.16560](https://arxiv.org/abs/2508.16560)
 - [ ] chanin (2025). "temporal crosscoders on synthetic data." [colab notebook](https://colab.research.google.com/drive/1lLTvn6ksjjVZOJtF4va_mkDGFf8TsZ7B?usp=sharing)
 

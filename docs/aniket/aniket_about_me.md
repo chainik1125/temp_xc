@@ -1,14 +1,9 @@
 ---
-title: Aniket About Me
 author: Aniket Deshpande
 date: 2026-02-16
-type: document
+tags:
+  - reference
 ---
-
-# About me
-
-Author: Aniket Deshpande
-Date: 2026-02-16
 
 ## Working time
 
