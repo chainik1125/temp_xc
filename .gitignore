@@ -8,13 +8,21 @@ build/
 *.egg
 
 # Obsidian - per-user state and downloaded plugins
-docs/.obsidian/workspace.json
 docs/.obsidian/workspace-mobile.json
 docs/.obsidian/plugins/
 docs/.obsidian/themes/
 docs/.obsidian/hotkeys.json
+docs/.obsidian/core-plugins.json
 docs/.obsidian/core-plugins-migration.json
+docs/.obsidian/workspace.json
 docs/.obsidian/graph.json
+
+# HTML output files
+*.html
+
+# Local-only directories
+papers/
+docs/han/agent_onboarding/
 
 # OS
 .DS_Store
