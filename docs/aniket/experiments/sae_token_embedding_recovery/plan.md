@@ -73,7 +73,8 @@ For each trained SAE, compute:
 
 ## Code Location
 
-Notebook: `notebooks/sae_token_embeddings.ipynb`
+- Original notebook: `notebooks/sae_token_embeddings.ipynb`
+- Experiment script: `src/v1_token_embedding_recovery/sae_token_embeddings.py`
 
 ## Key Takeaway
 

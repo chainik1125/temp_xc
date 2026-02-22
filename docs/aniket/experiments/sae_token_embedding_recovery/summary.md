@@ -8,7 +8,7 @@ tags:
 
 ## SAE Token Embedding Feature Recovery: Results
 
-Reproduction and extension of `notebooks/sae_token_embeddings.ipynb`. Code: `src/v2_crosscoder_comparison/sae_token_embeddings.py`.
+Reproduction and extension of `notebooks/sae_token_embeddings.ipynb`. Code: `src/v1_token_embedding_recovery/sae_token_embeddings.py`.
 
 ## Question
 
