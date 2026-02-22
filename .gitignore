@@ -16,8 +16,6 @@ docs/.obsidian/hotkeys.json
 docs/.obsidian/core-plugins-migration.json
 docs/.obsidian/graph.json
 
-# Experiment outputs
-results/
 
 # OS
 .DS_Store
