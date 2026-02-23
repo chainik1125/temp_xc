@@ -39,7 +39,7 @@ FIRING_PROB = 11 / 50  # ~0.22, gives avg 11 features firing
 FIRING_MAG_MEAN = 1.0
 FIRING_MAG_STD = 0.15
 TARGET_COS_SIM = 0.0
-TOPK_K = 2
+TOPK_K = 22
 SEED = 42
 
 # Project-root-relative results directory
