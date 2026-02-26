@@ -18,7 +18,7 @@ class ExperimentConfig:
 
     # Autocorrelation
     max_lag: int = 10
-    min_activations_for_autocorr: int = 20
+    min_activations_for_autocorr: int = 2
 
     # Output
     output_dir: Path = Path("results")

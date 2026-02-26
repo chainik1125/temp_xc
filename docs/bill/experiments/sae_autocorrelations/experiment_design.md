@@ -41,7 +41,7 @@ $$\rho(k) = \frac{\sum_{t=1}^{T-k} (x_t - \bar{x})(x_{t+k} - \bar{x})}{\sum_{t=1
 
 We compute this on the raw signal (including zeros at inactive positions). This captures both support persistence (does the feature stay active?) and magnitude persistence (does the activation strength stay similar?). See [[gating_correlation_math]] for the decomposition of these two channels.
 
-Features with fewer than 20 non-zero positions in a sequence are skipped for that sequence to avoid noisy estimates.
+Features with fewer than 2 non-zero positions in a sequence are skipped for that sequence (at least 2 activations are needed for non-degenerate variance). We use a low threshold to avoid selection bias — requiring many activations would cherry-pick sequences where the feature is already persistently active, inflating autocorrelation estimates. With 4,096 sequences, noise from individual low-activation estimates averages out.
 
 ## Significance Testing
 
