@@ -11,14 +11,14 @@ tags:
 
 Earlier, we discussed ideas behind toy model setup here: [[toy_model_ideas.md]]. 
 
-At a high level, the toy model imposes temporal-induced correlations between token features. Ideally, a crosscoder would be able to exploit the correlation/persistence of features through time in order to extract features efficiently and potentially separate "slow-moving" v.s. "fast-moving" features (as mentioned in 'bhalla et al.pdf'). 
+At a high level, the toy model imposes temporal-induced correlations between token features. Ideally, a crosscoder would be able to exploit the correlation/persistence of features through time in order to extract features efficiently and potentially separate "slow-moving" v.s. "fast-moving" features (as mentioned in Bhalla et. al (https://arxiv.org/pdf/2511.05541)). 
 
 ## Different ways to enforce temporal correlation
 There are (broadly) two ways to "enforce" temporal correlation, and any correlation can be decomposed into a mixture of each two: correlations between activation magnitudes, and correlations between activation probabilities. "Intuitively" (dangerous word!), it makes sense for activation probabilities to be correlated in natural text as opposed to activation magnitudes, since concepts/features are sparse and probably cluster closely together across tokens in text.
 
 I let Claude write a brief writeup comparing the two here, the math is correct: [[gating_correlation_math.md]].
 
-It seems that, for sparse regimes, it would make sense to control correlation between activation probabilities as opposed to activatoin magnitudes.
+It seems that, for sparse regimes, it would make sense to control correlation between activation probabilities as opposed to activation magnitudes.
 
 
 
