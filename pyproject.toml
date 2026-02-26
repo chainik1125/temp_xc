@@ -2,6 +2,26 @@
 name = "temp-xc"
 version = "0.1.0"
 requires-python = ">=3.12"
+dependencies = [
+    "torch>=2.1",
+    "transformer-lens>=2.0",
+    "sae-lens>=4.0",
+    "datasets>=3.0",
+    "numpy>=1.26",
+    "matplotlib>=3.8",
+    "seaborn>=0.13",
+    "tqdm>=4.66",
+    "jupyter>=1.0",
+    "scipy>=1.12",
+    "statsmodels>=0.14",
+]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
 
 [dependency-groups]
 dev = [
