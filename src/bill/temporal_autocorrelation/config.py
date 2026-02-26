@@ -21,7 +21,7 @@ class ExperimentConfig:
     min_activations_for_autocorr: int = 20
 
     # Output
-    output_dir: Path = Path("results/temporal_autocorrelation")
+    output_dir: Path = Path("results")
 
     def __post_init__(self):
         self.output_dir = Path(self.output_dir)
