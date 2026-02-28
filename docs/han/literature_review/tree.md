@@ -1,3 +1,10 @@
+---
+author: Han Xuanyuan
+date: 2026-02-28
+tags:
+  - reference
+---
+
 - **sae**
   - Time aware SAEs
     - [[references#bhalla2025tsae|Bhalla et al — Temporal Sparse Autoencoders (T-SAEs) (2025)]]
