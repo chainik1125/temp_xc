@@ -1,0 +1,11 @@
+---
+title: "Andre About Me"
+author: Andre Shportko
+date: 2026-02-26
+type: log
+---
+
+## wk 1
+
+- replicated notebooks\sae_token_embeddings.ipynb
+- Decided to trust Anikets results and focus on adaptation of the notebook to the txcdr. Revisiting ideas in slack for toy models

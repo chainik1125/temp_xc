@@ -5,7 +5,7 @@ date: 2026-02-26
 type: document
 ---
 
-# About me
+## About me
 
 Author: Andre Shportko
 Date: 2026-02-26

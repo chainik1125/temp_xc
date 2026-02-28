@@ -1,0 +1,14 @@
+Shuffled
+
+Sequence 1,   pick t=3  →  one token
+Sequence 2,   pick t=7  →  one token
+Sequence 3,   pick t=1  →  one token
+...
+Sequence 1024, pick t=5 →  one token
+
+Sequential
+
+Sequence 1:  t=0, t=1, t=2, t=3, t=4, t=5, t=6, t=7   →  8 tokens
+Sequence 2:  t=0, t=1, t=2, t=3, t=4, t=5, t=6, t=7   →  8 tokens
+...
+Sequence 128: t=0, t=1, t=2, t=3, t=4, t=5, t=6, t=7  →  8 tokens
