@@ -1,0 +1,24 @@
+2026-03-04 00:14:01,706 INFO    MainThread:1980373 [wandb_setup.py:_flush():81] Current SDK version is 0.24.2
+2026-03-04 00:14:01,706 INFO    MainThread:1980373 [wandb_setup.py:_flush():81] Configure stats pid to 1980373
+2026-03-04 00:14:01,706 INFO    MainThread:1980373 [wandb_setup.py:_flush():81] Loading settings from environment variables
+2026-03-04 00:14:01,707 INFO    MainThread:1980373 [wandb_init.py:setup_run_log_directory():717] Logging user logs to /home/cs29824/andre/temp_xc/temporal_crosscoders/wandb/run-20260304_001401-ekwpn4f4/logs/debug.log
+2026-03-04 00:14:01,707 INFO    MainThread:1980373 [wandb_init.py:setup_run_log_directory():718] Logging internal logs to /home/cs29824/andre/temp_xc/temporal_crosscoders/wandb/run-20260304_001401-ekwpn4f4/logs/debug-internal.log
+2026-03-04 00:14:01,707 INFO    MainThread:1980373 [wandb_init.py:init():844] calling init triggers
+2026-03-04 00:14:01,707 INFO    MainThread:1980373 [wandb_init.py:init():849] wandb.init called with sweep_config: {}
+config: {'model_type': 'sae', 'dataset': 'iid', 'k': 1, 'T': 1, 'effective_k': 1, 'd_sae': 100, 'num_feats': 100, 'hidden_dim': 300, 'feat_prob': 0.05, 'feat_mean': 1.0, 'feat_std': 0.15, 'train_steps': 200000, 'log_interval': 1000, 'batch_size': 64, 'lr': 0.0003, 'grad_clip': 1.0, 'seed': 42, 'markov_alpha': 0.95, 'markov_beta': 0.03, 'experiment_tag': 'v1', '_wandb': {}}
+2026-03-04 00:14:01,707 INFO    MainThread:1980373 [wandb_init.py:init():892] starting backend
+2026-03-04 00:14:01,957 INFO    MainThread:1980373 [wandb_init.py:init():895] sending inform_init request
+2026-03-04 00:14:01,960 INFO    MainThread:1980373 [wandb_init.py:init():903] backend started and connected
+2026-03-04 00:14:01,974 INFO    MainThread:1980373 [wandb_init.py:init():973] updated telemetry
+2026-03-04 00:14:01,978 INFO    MainThread:1980373 [wandb_init.py:init():997] communicating run to backend with 90.0 second timeout
+2026-03-04 00:14:02,436 INFO    MainThread:1980373 [wandb_init.py:init():1042] starting run threads in backend
+2026-03-04 00:14:02,595 INFO    MainThread:1980373 [wandb_run.py:_console_start():2529] atexit reg
+2026-03-04 00:14:02,595 INFO    MainThread:1980373 [wandb_run.py:_redirect():2377] redirect: wrap_raw
+2026-03-04 00:14:02,595 INFO    MainThread:1980373 [wandb_run.py:_redirect():2446] Wrapping output streams.
+2026-03-04 00:14:02,595 INFO    MainThread:1980373 [wandb_run.py:_redirect():2469] Redirects installed.
+2026-03-04 00:14:02,598 INFO    MainThread:1980373 [wandb_init.py:init():1082] run started, returning control to user process
+2026-03-04 00:21:18,538 INFO    MainThread:1980373 [wandb_run.py:_finish():2295] finishing run standartikom-northwestern-university/temporal-crosscoders-sweep/ekwpn4f4
+2026-03-04 00:21:18,539 INFO    MainThread:1980373 [wandb_run.py:_atexit_cleanup():2494] got exitcode: 0
+2026-03-04 00:21:18,539 INFO    MainThread:1980373 [wandb_run.py:_restore():2476] restore
+2026-03-04 00:21:18,539 INFO    MainThread:1980373 [wandb_run.py:_restore():2482] restore done
+2026-03-04 00:21:19,003 INFO    MainThread:1980373 [wandb_run.py:_footer_sync_info():3871] logging synced files
