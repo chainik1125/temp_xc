@@ -9,3 +9,7 @@ type: log
 
 - replicated notebooks\sae_token_embeddings.ipynb
 - Decided to trust Anikets results and focus on adaptation of the notebook to the txcdr. Revisiting ideas in slack for toy models
+
+## wk 2
+
+First null results: current TXCDR architecture [doesn't outperform](./tx_v_sae.md) SAEs. 
