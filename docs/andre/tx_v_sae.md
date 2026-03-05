@@ -18,6 +18,55 @@ Refer to ```temporal_crosscoders``` root folder for the code.
 
 6. **Convergence curves confirm the crosscoder is not undertrained** — both models plateau by 40–60k steps; the TXCDR deficit is architectural ![convergence iid][conv-iid] ![convergence markov][conv-mkv]
 
+### Hyperparams
+
+```
+# ─── Toy model geometry ─────────────────────────────────────────────────────────
+NUM_FEATS = 50      # number of ground-truth features (also d_sae)
+HIDDEN_DIM = 100      # representation dimension d
+FEAT_PROB = 0.05     # Bernoulli activation probability
+FEAT_MEAN = 1.0       # magnitude mean
+FEAT_STD = 0.15       # magnitude std
+
+# ─── Data generation schemes ────────────────────────────────────────────────────
+# Only iid and markov (Scheme C) per user request
+DATASETS = ["markov", "iid"]
+#DATASETS = ['markov']  # for quick testing; comment out to restore full sweep
+
+# Markov chain parameters (Scheme C)
+MARKOV_ALPHA = 0.95   # stay-on probability
+MARKOV_BETA = 0.03    # turn-on probability
+
+# ─── Training ───────────────────────────────────────────────────────────────────
+TRAIN_STEPS = 80_000 # 1m steps for convergence
+LOG_INTERVAL = 1_500      # log metrics every N steps
+EVAL_BATCH = 128         # larger batch for stable eval
+BATCH_SIZE = 1          # training batch size (both SAE and TXCDR)
+LEARNING_RATE = 3e-4
+ADAM_BETAS = (0.9, 0.999)
+GRAD_CLIP = 1.0
+SEED = 42
+
+# ─── Sweep grid ─────────────────────────────────────────────────────────────────
+SWEEP_K = [2, 5, 10, 25][::-1]  # base active latents per token-position
+SWEEP_T = [2, 5][::-1]       # window lengths
+
+def should_skip(k: int, T: int) -> bool:
+    """Skip configurations where k*T >= NUM_FEATS (underdetermined)."""
+    return txcdr_effective_k(k, T) > NUM_FEATS
+
+# ─── Model sizing ───────────────────────────────────────────────────────────────
+D_SAE = NUM_FEATS     # SAE / crosscoder latent dimension = number of true features
+
+def sae_effective_k(k: int) -> int:
+    """Active latents for the SAE.  k = per-token budget."""
+    return k
+
+def txcdr_effective_k(k: int, T: int) -> int:
+    """Active latents for the crosscoder.  k per position × T positions."""
+    return k
+```
+
 ## Next Steps 
 
 While I didn't test it, the issue might be the dead neurons. We likely will need to update the loss function such that each token contributes equally to the distribution of TopK activations over the latent vector. 
