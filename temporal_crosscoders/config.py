@@ -9,8 +9,8 @@ import os
 import torch
 
 # ─── Experiment identity ────────────────────────────────────────────────────────
-PROJECT_NAME = "temporal-crosscoders-sweep"
-EXPERIMENT_TAG = "v1"  # bump when changing setup
+PROJECT_NAME = "temporal-crosscoders-sweep-final"
+EXPERIMENT_TAG = "v7"  # bump when changing setup
 
 # ─── Wandb ──────────────────────────────────────────────────────────────────────
 WANDB_PROJECT = PROJECT_NAME
@@ -23,37 +23,38 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 NUM_WORKERS = int(os.environ.get("NUM_WORKERS", 0))
 
 # ─── Toy model geometry ─────────────────────────────────────────────────────────
-NUM_FEATS = 100       # number of ground-truth features (also d_sae)
-HIDDEN_DIM = 300      # representation dimension d
-FEAT_PROB = 0.05      # Bernoulli activation probability
+NUM_FEATS = 50      # number of ground-truth features (also d_sae)
+HIDDEN_DIM = 100      # representation dimension d
+FEAT_PROB = 0.05     # Bernoulli activation probability
 FEAT_MEAN = 1.0       # magnitude mean
 FEAT_STD = 0.15       # magnitude std
 
 # ─── Data generation schemes ────────────────────────────────────────────────────
 # Only iid and markov (Scheme C) per user request
-DATASETS = ["iid", "markov"]
+DATASETS = ["markov", "iid"]
+#DATASETS = ['markov']  # for quick testing; comment out to restore full sweep
 
 # Markov chain parameters (Scheme C)
 MARKOV_ALPHA = 0.95   # stay-on probability
 MARKOV_BETA = 0.03    # turn-on probability
 
 # ─── Training ───────────────────────────────────────────────────────────────────
-TRAIN_STEPS = 200_000   # 1M steps for convergence
-LOG_INTERVAL = 1_000      # log metrics every N steps
-EVAL_BATCH = 2048         # larger batch for stable eval
-BATCH_SIZE = 64           # training batch size (both SAE and TXCDR)
+TRAIN_STEPS = 80_000 # 1m steps for convergence
+LOG_INTERVAL = 1_500      # log metrics every N steps
+EVAL_BATCH = 128         # larger batch for stable eval
+BATCH_SIZE = 1          # training batch size (both SAE and TXCDR)
 LEARNING_RATE = 3e-4
 ADAM_BETAS = (0.9, 0.999)
 GRAD_CLIP = 1.0
 SEED = 42
 
 # ─── Sweep grid ─────────────────────────────────────────────────────────────────
-SWEEP_K = [1, 2, 4, 8]           # base active latents per token-position
-SWEEP_T = [1, 4, 8, 10]       # window lengths
+SWEEP_K = [2, 5, 10, 25][::-1]  # base active latents per token-position
+SWEEP_T = [2, 5][::-1]       # window lengths
 
 def should_skip(k: int, T: int) -> bool:
     """Skip configurations where k*T >= NUM_FEATS (underdetermined)."""
-    return k * T >= NUM_FEATS
+    return txcdr_effective_k(k, T) > NUM_FEATS
 
 # ─── Model sizing ───────────────────────────────────────────────────────────────
 D_SAE = NUM_FEATS     # SAE / crosscoder latent dimension = number of true features
@@ -64,11 +65,19 @@ def sae_effective_k(k: int) -> int:
 
 def txcdr_effective_k(k: int, T: int) -> int:
     """Active latents for the crosscoder.  k per position × T positions."""
-    return k * T
+    return k # k*T
+
+# ─── Data cache ─────────────────────────────────────────────────────────────────
+# Pre-generate long chains; serve sliding windows from them.
+# This ensures all T values see the same underlying process and the markov
+# chain has time to express deep temporal structure.
+NUM_CHAINS = 256           # number of independent long chains
+CHAIN_LENGTH = 2048        # steps per chain (>> max T)
+CACHE_REFRESH_INTERVAL = 50_000  # regenerate chains every N training steps (0 = never)
 
 # ─── Paths ──────────────────────────────────────────────────────────────────────
 LOG_DIR = os.environ.get("LOG_DIR", "logs")
-VIZ_DIR = os.environ.get("VIZ_DIR", "viz_outputs")
+VIZ_DIR = os.environ.get("VIZ_DIR", "viz_outputs_kT")
 CHECKPOINT_DIR = os.environ.get("CKPT_DIR", "checkpoints")
 
 # ─── Convenience: full wandb config dict (logged at run start) ──────────────────

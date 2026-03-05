@@ -25,7 +25,7 @@ from config import (
 )
 from models import TopKSAE, TemporalCrosscoder
 from data import (
-    ToyModel, ShuffledDataIterator, SequentialWindowIterator, get_seq_gen_fn,
+    ToyModel, CachedDataSource, CachedSingleTokenIterator, CachedWindowIterator,
 )
 from metrics import feature_recovery_score
 
@@ -62,23 +62,23 @@ def train_sae(
     T: int,
     toy_model: ToyModel,
     true_features: torch.Tensor,
+    cache: CachedDataSource,
     *,
     n_steps: int = TRAIN_STEPS,
 ) -> tuple:
     """
     Train a TopK SAE.
 
-    SAE is T-independent (sees single tokens), but we still need T for the
-    data generator window.  We use shuffled sampling to get i.i.d. marginals.
+    SAE is T-independent (sees single tokens).  Samples random positions
+    from the shared cached long chains.
 
     Returns (model, history).
     """
     run_name = f"sae__{dataset}__k{k}__T{T}"
     wb_run = _init_wandb("sae", dataset, k, T, run_name)
 
-    seq_gen_fn = get_seq_gen_fn(dataset)
     eff_k = sae_effective_k(k)
-    iterator = ShuffledDataIterator(toy_model, seq_gen_fn, BATCH_SIZE, T=max(T, 2))
+    iterator = CachedSingleTokenIterator(cache, BATCH_SIZE)
 
     sae = TopKSAE(d_in=HIDDEN_DIM, d_sae=D_SAE, k=eff_k).to(DEVICE)
     optimizer = torch.optim.Adam(sae.parameters(), lr=LEARNING_RATE, betas=ADAM_BETAS)
@@ -136,20 +136,22 @@ def train_txcdr(
     T: int,
     toy_model: ToyModel,
     true_features: torch.Tensor,
+    cache: CachedDataSource,
     *,
     n_steps: int = TRAIN_STEPS,
 ) -> tuple:
     """
     Train a Temporal Crosscoder.
 
+    Samples sliding windows of length T from the shared cached long chains.
+
     Returns (model, history).
     """
     run_name = f"txcdr__{dataset}__k{k}__T{T}"
     wb_run = _init_wandb("txcdr", dataset, k, T, run_name)
 
-    seq_gen_fn = get_seq_gen_fn(dataset)
     eff_k = txcdr_effective_k(k, T)
-    iterator = SequentialWindowIterator(toy_model, seq_gen_fn, BATCH_SIZE, T=T)
+    iterator = CachedWindowIterator(cache, BATCH_SIZE, T=T)
 
     cc = TemporalCrosscoder(d_in=HIDDEN_DIM, d_sae=D_SAE, T=T, k=eff_k).to(DEVICE)
     optimizer = torch.optim.Adam(cc.parameters(), lr=LEARNING_RATE, betas=ADAM_BETAS)

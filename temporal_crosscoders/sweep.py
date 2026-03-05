@@ -33,7 +33,7 @@ from config import (
     DATASETS, SWEEP_K, SWEEP_T, TRAIN_STEPS, LOG_DIR,
     DEVICE, SEED, should_skip, NUM_FEATS,
 )
-from data import build_toy_model, get_true_features
+from data import build_toy_model, get_true_features, CachedDataSource
 from train import train_sae, train_txcdr
 
 
@@ -124,6 +124,14 @@ def main():
     true_features = get_true_features(toy_model)
     print(f"  True features shape: {true_features.shape}")
 
+    # Build one CachedDataSource per dataset (shared across all k, T runs)
+    datasets_in_sweep = sorted(set(j["dataset"] for j in jobs))
+    caches: dict[str, CachedDataSource] = {}
+    for ds in datasets_in_sweep:
+        print(f"  Generating cached long chains for '{ds}'...")
+        caches[ds] = CachedDataSource(ds, toy_model)
+        print(f"    {caches[ds].act_chains.shape} activations cached on {DEVICE}")
+
     os.makedirs(LOG_DIR, exist_ok=True)
 
     # Summary collector
@@ -144,11 +152,13 @@ def main():
 
         if model_type == "sae":
             model, history = train_sae(
-                dataset, k, T, toy_model, true_features, n_steps=n_steps
+                dataset, k, T, toy_model, true_features,
+                cache=caches[dataset], n_steps=n_steps,
             )
         else:
             model, history = train_txcdr(
-                dataset, k, T, toy_model, true_features, n_steps=n_steps
+                dataset, k, T, toy_model, true_features,
+                cache=caches[dataset], n_steps=n_steps,
             )
 
         elapsed = time.time() - t0

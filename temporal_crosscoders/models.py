@@ -1,11 +1,22 @@
 """
-models.py — TopK SAE and Temporal Crosscoder architectures.
+models.py — Three architectures for the temporal crosscoder sweep.
+
+1. TopKSAE              — single-token baseline
+2. TemporalCrosscoder   — standard shared-latent crosscoder (ckkissane-style)
+3. TemporalCrosscoderPP — per-position latents with full-window encoder context
+
+All three expose the same interface:
+    forward(x) → (recon_loss, x_hat, u)
+    decoder_directions(pos=0) → (d, h)
+    _normalize_decoder()
 """
 
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+
+# ─── 1. Standard TopK SAE ───────────────────────────────────────────────────────
 
 class TopKSAE(nn.Module):
     """
@@ -60,11 +71,23 @@ class TopKSAE(nn.Module):
         return self.W_dec
 
 
+# ─── 2. Standard Temporal Crosscoder (shared latent) ────────────────────────────
+
 class TemporalCrosscoder(nn.Module):
     """
-    Temporal crosscoder with TopK activation.
-    Encoder:  W_enc ∈ R^{h × (T*d_in)}
-    Decoders: W_dec ∈ R^{T × d_in × h}  — one decoder slice per position
+    Standard crosscoder with shared latent vector across all positions.
+    Matches ckkissane/crosscoder-model-diff-replication.
+
+    Architecture:
+        W_enc: (T, d, h) — per-position encoder projections
+        W_dec: (h, T, d) — per-position decoder projections
+        b_enc: (h,)       — shared encoder bias
+        b_dec: (T, d)     — per-position decoder bias
+
+    Encode: z = TopK(einsum("btd,tds->bs", x, W_enc) + b_enc)   → (B, h)
+    Decode: x_hat = einsum("bs,std->btd", z, W_dec) + b_dec     → (B, T, d)
+
+    One shared latent of size h with k non-zeros must explain all T positions.
     """
 
     def __init__(self, d_in: int, d_sae: int, T: int, k: int):
@@ -74,43 +97,42 @@ class TemporalCrosscoder(nn.Module):
         self.T = T
         self.k = k
 
-        self.b_dec = nn.Parameter(torch.zeros(T, d_in))
-        self.W_enc = nn.Parameter(torch.empty(d_sae, T * d_in))
+        self.W_enc = nn.Parameter(
+            torch.randn(T, d_in, d_sae) * (1.0 / d_in ** 0.5)
+        )
+        self.W_dec = nn.Parameter(
+            torch.randn(d_sae, T, d_in) * (1.0 / d_sae ** 0.5)
+        )
         self.b_enc = nn.Parameter(torch.zeros(d_sae))
-        self.W_dec = nn.Parameter(torch.empty(T, d_in, d_sae))
-
-        nn.init.kaiming_uniform_(self.W_enc)
-        nn.init.kaiming_uniform_(self.W_dec)
-        with torch.no_grad():
-            self._normalize_decoder()
+        self.b_dec = nn.Parameter(torch.zeros(T, d_in))
 
     @torch.no_grad()
     def _normalize_decoder(self):
-        norms = self.W_dec.norm(dim=1, keepdim=True).clamp(min=1e-8)
+        # W_dec: (h, T, d) — normalize each feature across all positions
+        norms = self.W_dec.norm(dim=(1, 2), keepdim=True).clamp(min=1e-8)
         self.W_dec.data = self.W_dec.data / norms
 
     def encode(self, x: torch.Tensor) -> torch.Tensor:
-        """x: (B, T, d) → u: (B, h) with exactly k non-zero entries."""
-        x_centered = x - self.b_dec.unsqueeze(0)
-        x_flat = x_centered.reshape(x.shape[0], -1)
-        pre = x_flat @ self.W_enc.T + self.b_enc
+        """x: (B, T, d) → z: (B, h) with k non-zeros."""
+        pre = torch.einsum("btd,tds->bs", x, self.W_enc) + self.b_enc
         topk_vals, topk_idx = pre.topk(self.k, dim=-1)
-        u = torch.zeros_like(pre)
-        u.scatter_(-1, topk_idx, F.relu(topk_vals))
-        return u
+        z = torch.zeros_like(pre)
+        z.scatter_(1, topk_idx, F.relu(topk_vals))
+        return z
 
-    def decode(self, u: torch.Tensor) -> torch.Tensor:
-        """u: (B, h) → x_hat: (B, T, d)"""
-        return torch.einsum("tdh,bh->btd", self.W_dec, u) + self.b_dec.unsqueeze(0)
+    def decode(self, z: torch.Tensor) -> torch.Tensor:
+        """z: (B, h) → x_hat: (B, T, d)."""
+        return torch.einsum("bs,std->btd", z, self.W_dec) + self.b_dec
 
     def forward(self, x: torch.Tensor):
-        """x: (B, T, d) → (recon_loss, x_hat, u)"""
-        u = self.encode(x)
-        x_hat = self.decode(u)
+        """x: (B, T, d) → (recon_loss, x_hat, z)"""
+        z = self.encode(x)
+        x_hat = self.decode(z)
         recon_loss = (x_hat - x).pow(2).sum(dim=-1).mean()
-        return recon_loss, x_hat, u
+        return recon_loss, x_hat, z
 
     @torch.no_grad()
     def decoder_directions(self, pos: int = 0) -> torch.Tensor:
-        """(d, h) decoder columns for position pos."""
-        return self.W_dec[pos]
+        """(d, h) decoder columns for a given position.
+        W_dec is (h, T, d) → slice [:, pos, :] gives (h, d) → transpose to (d, h)."""
+        return self.W_dec[:, pos, :].T

@@ -125,47 +125,125 @@ def get_seq_gen_fn(dataset_name: str) -> Callable:
     return DATASET_GENERATORS[dataset_name]
 
 
-# ─── Data iterators ─────────────────────────────────────────────────────────────
+# ─── Cached data source ─────────────────────────────────────────────────────────
+#
+# Pre-generates NUM_CHAINS long chains of length CHAIN_LENGTH, maps them
+# through the toy model ONCE, and caches the activations on GPU.
+#
+# Both SAE and TXCDR iterators sample sliding windows from this same cache,
+# so every T value sees the exact same underlying process.  The markov chain
+# has hundreds of steps to compound its structure before any window is drawn.
+#
 
-class ShuffledDataIterator:
-    """Randomly sample ONE position from each sequence → marginal i.i.d."""
+from config import NUM_CHAINS, CHAIN_LENGTH, CACHE_REFRESH_INTERVAL
 
-    def __init__(self, model: ToyModel, seq_gen_fn: Callable, batch_size: int, T: int):
-        self.model = model
-        self.seq_gen_fn = seq_gen_fn
-        self.batch_size = batch_size
-        self.T = T
+
+class CachedDataSource:
+    """
+    Pre-generate long feature chains → toy model activations.
+    Stored as:
+        feat_chains: (NUM_CHAINS, CHAIN_LENGTH, NUM_FEATS)  — raw features
+        act_chains:  (NUM_CHAINS, CHAIN_LENGTH, HIDDEN_DIM) — activations
+    """
+
+    def __init__(
+        self,
+        dataset: str,
+        toy_model: ToyModel,
+        num_chains: int = NUM_CHAINS,
+        chain_length: int = CHAIN_LENGTH,
+        device: torch.device = DEVICE,
+    ):
+        self.dataset = dataset
+        self.toy_model = toy_model
+        self.num_chains = num_chains
+        self.chain_length = chain_length
+        self.device = device
+        self.seq_gen_fn = get_seq_gen_fn(dataset)
+
+        self._generate()
 
     @torch.no_grad()
-    def next_batch(self) -> torch.Tensor:
-        feat_seqs = self.seq_gen_fn(self.batch_size, self.T)
-        t_idx = torch.randint(0, self.T, (self.batch_size,))
-        feats = feat_seqs[torch.arange(self.batch_size), t_idx]
-        return self.model(feats)
+    def _generate(self):
+        """Generate long chains and cache activations."""
+        # Generate feature sequences: (num_chains, chain_length, num_feats)
+        self.feat_chains = self.seq_gen_fn(self.num_chains, self.chain_length)
+
+        # Map through toy model in chunks to avoid OOM
+        chunk_size = 32
+        act_chunks = []
+        for i in range(0, self.num_chains, chunk_size):
+            chunk = self.feat_chains[i : i + chunk_size].to(self.device)
+            act_chunks.append(self.toy_model(chunk))
+        self.act_chains = torch.cat(act_chunks, dim=0)  # (N, L, d)
+
+    def refresh(self):
+        """Regenerate all chains (call periodically to avoid overfitting)."""
+        self._generate()
+
+    def sample_single_tokens(self, batch_size: int) -> torch.Tensor:
+        """
+        Sample random single positions → (B, d) for the SAE.
+        Uniform over all (chain, position) pairs.
+        """
+        chain_idx = torch.randint(0, self.num_chains, (batch_size,))
+        pos_idx = torch.randint(0, self.chain_length, (batch_size,))
+        return self.act_chains[chain_idx, pos_idx]  # (B, d)
+
+    def sample_windows(self, batch_size: int, T: int) -> torch.Tensor:
+        """
+        Sample random sliding windows → (B, T, d) for the crosscoder.
+        Each window is a contiguous slice from one chain.
+        """
+        max_start = self.chain_length - T
+        chain_idx = torch.randint(0, self.num_chains, (batch_size,))
+        start_idx = torch.randint(0, max_start + 1, (batch_size,))
+
+        # Gather windows: index [chain_idx[b], start_idx[b]:start_idx[b]+T, :]
+        # Use advanced indexing with an offset matrix
+        offsets = torch.arange(T, device=self.device).unsqueeze(0)  # (1, T)
+        pos_idx = start_idx.to(self.device).unsqueeze(1) + offsets   # (B, T)
+        chain_idx_dev = chain_idx.to(self.device)
+
+        # Expand chain_idx to (B, T)
+        chain_exp = chain_idx_dev.unsqueeze(1).expand(-1, T)
+        return self.act_chains[chain_exp, pos_idx]  # (B, T, d)
+
+
+# ─── Iterators backed by cache ──────────────────────────────────────────────────
+
+class CachedSingleTokenIterator:
+    """Yields (B, d) single-token batches from a CachedDataSource."""
+
+    def __init__(self, cache: CachedDataSource, batch_size: int):
+        self.cache = cache
+        self.batch_size = batch_size
+        self.step = 0
 
     def __iter__(self):
         return self
 
-    def __next__(self):
-        return self.next_batch()
+    def __next__(self) -> torch.Tensor:
+        self.step += 1
+        if CACHE_REFRESH_INTERVAL > 0 and self.step % CACHE_REFRESH_INTERVAL == 0:
+            self.cache.refresh()
+        return self.cache.sample_single_tokens(self.batch_size)
 
 
-class SequentialWindowIterator:
-    """Emit (B, T, d) activation windows for the crosscoder."""
+class CachedWindowIterator:
+    """Yields (B, T, d) window batches from a CachedDataSource."""
 
-    def __init__(self, model: ToyModel, seq_gen_fn: Callable, batch_size: int, T: int):
-        self.model = model
-        self.seq_gen_fn = seq_gen_fn
+    def __init__(self, cache: CachedDataSource, batch_size: int, T: int):
+        self.cache = cache
         self.batch_size = batch_size
         self.T = T
-
-    @torch.no_grad()
-    def next_batch(self) -> torch.Tensor:
-        feat_seqs = self.seq_gen_fn(self.batch_size, self.T)
-        return self.model(feat_seqs)
+        self.step = 0
 
     def __iter__(self):
         return self
 
-    def __next__(self):
-        return self.next_batch()
+    def __next__(self) -> torch.Tensor:
+        self.step += 1
+        if CACHE_REFRESH_INTERVAL > 0 and self.step % CACHE_REFRESH_INTERVAL == 0:
+            self.cache.refresh()
+        return self.cache.sample_windows(self.batch_size, self.T)
