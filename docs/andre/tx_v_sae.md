@@ -2,6 +2,12 @@
 
 Refer to ```temporal_crosscoders``` root folder for the code. 
 
+To replicate:
+1. go to ```temporal_crosscoders```
+2. change ```config.py``` 
+3. run ```python sweep.py``` -- records to wandb 
+4. run ```python viz.py``` -- visualize 
+
 **Setup**: TopK SAE vs shared-latent Temporal Crosscoder (ckkissane-style), 80k steps, d=200, h=100, FEAT_PROB=0.05, k∈{2,5,10,25}, T∈{2,5}, iid + markov data, `effective_k = k` for both models.
 
 ## Key Findings
