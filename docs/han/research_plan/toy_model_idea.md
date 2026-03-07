@@ -157,6 +157,63 @@ so the persistence lengthscale is directly controlled by $\alpha_i - \beta_i \in
 
 Magnitudes are again sampled i.i.d. to isolate the support effect. This scheme is the simplest to implement and reason about analytically, and we recommend it as the default for initial experiments.
 
+### Simple case of a 2-state HMM
+
+Define the transition matrix for feature $j$'s support variable $z_t \in \{0, 1\}$:
+
+$$P = \begin{pmatrix} 1 - p_{01} & p_{01} \\ p_{10} & 1 - p_{10} \end{pmatrix}$$
+
+where rows are "from" and columns are "to." The two free parameters are $p_{01} = P(z_t = 1 \mid z_{t-1} = 0)$ and $p_{10} = P(z_t = 0 \mid z_{t-1} = 1)$.
+
+#### Stationary distribution
+
+Setting $\boldsymbol{\pi} P = \boldsymbol{\pi}$ and solving:
+
+$$\pi_1 \equiv P(z = 1) = \frac{p_{01}}{p_{01} + p_{10}}, \qquad \pi_0 = \frac{p_{10}}{p_{01} + p_{10}}$$
+
+So the marginal activation probability is controlled by the *ratio* $p_{01} / p_{10}$.
+
+#### Lag-1 autocorrelation
+
+Since $z_t$ is binary with mean $\pi_1$ and variance $\pi_1(1 - \pi_1)$:
+
+$$\rho(1) = \frac{\mathbb{E}[z_t z_{t+1}] - \pi_1^2}{\pi_1(1 - \pi_1)}$$
+
+We need $\mathbb{E}[z_t z_{t+1}] = P(z_t = 1, z_{t+1} = 1) = \pi_1 (1 - p_{10})$. Substituting and simplifying the numerator:
+
+$$\pi_1(1 - p_{10}) - \pi_1^2 = \pi_1\bigl[(1 - p_{10}) - \pi_1\bigr] = \pi_1 \cdot \frac{p_{10}(1 - p_{01} - p_{10})}{p_{01} + p_{10}}$$
+
+where I've substituted $\pi_1 = p_{01}/(p_{01} + p_{10})$. Dividing by $\text{Var}(z_t) = \pi_1 \pi_0 = p_{01} p_{10} / (p_{01} + p_{10})^2$, everything cancels and you get:
+
+$$\boxed{\rho = 1 - p_{01} - p_{10}}$$
+
+This is clean. The autocorrelation depends only on the *sum* $p_{01} + p_{10}$.
+
+#### The reparametrization you want
+
+Since $\pi_1$ depends on the ratio and $\rho$ depends on the sum, you can invert directly. Given target activation probability $\pi_1$ and target autocorrelation $\rho$:
+
+$$p_{01} = \pi_1(1 - \rho), \qquad p_{10} = (1 - \pi_1)(1 - \rho)$$
+
+You can verify: $p_{01} + p_{10} = 1 - \rho$ ✓ and $p_{01}/(p_{01} + p_{10}) = \pi_1$ ✓.
+
+#### Useful properties and boundary cases
+
+The lag-$k$ autocorrelation decays geometrically: $\rho(k) = \rho^k = (1 - p_{01} - p_{10})^k$, so the correlation time is $\tau = -1/\ln|\rho|$.
+
+Some regimes worth noting for your experiments:
+
+**$\rho = 0$ (independent draws):** $p_{01} = \pi_1$, $p_{10} = 1 - \pi_1$. Each time step is drawn fresh from the marginal — this is your null model / baseline. A standard SAE should do fine here since there's no temporal structure to exploit.
+
+**$\rho \to 1$ (highly persistent):** Both $p_{01}$ and $p_{10} \to 0$. Features rarely switch on or off. Long runs of consecutive 1s or 0s. This is where temporal information provides the most leverage.
+
+**$\rho < 0$ (anti-correlated / alternating):** $p_{01} + p_{10} > 1$. Features tend to flip every step. This is an interesting edge case to test — a temporal model that assumes persistence would actually be *hurt* here.
+
+#### Constraints
+
+You need $p_{01}, p_{10} \in [0, 1]$, which requires $\rho \in [-(1-\pi_1)/\pi_1 \wedge -\pi_1/(1-\pi_1),\; 1)$ roughly. For the practical case of sparse features ($\pi_1 \ll 1$), the binding constraint is $p_{01} = \pi_1(1 - \rho) \leq 1$, which is always satisfied when $\pi_1$ is small. The constraint $p_{10} = (1 - \pi_1)(1 - \rho) \leq 1$ requires $\rho \geq -\pi_1/(1-\pi_1)$, which for small $\pi_1$ means $\rho \gtrsim 0$ approximately — you can't make very sparse features highly anti-correlated, which makes intuitive sense.
+
+This parametrization gives you orthogonal control over the two things you care about: sparsity ($\pi_1$) and temporal persistence ($\rho$). For the toy model experiments, I'd suggest sweeping $\rho \in \{0, 0.3, 0.6, 0.9\}$ at fixed $\pi_1$ and separately sweeping $\pi_1 \in \{0.01, 0.05, 0.1, 0.2\}$ at fixed $\rho$ to disentangle their effects.
 
 
 

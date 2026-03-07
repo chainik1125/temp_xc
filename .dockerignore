@@ -1,0 +1,5 @@
+.git
+__pycache__
+*.pyc
+src/v1_temporal/results
+src/v2_temporal_schemeC/results

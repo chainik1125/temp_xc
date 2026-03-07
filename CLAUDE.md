@@ -29,6 +29,12 @@ Use the **`torchgpu`** conda environment. Activate it before running any code:
 conda activate torchgpu
 ```
 
+or if you are in a docker container, do
+```bash
+source /opt/conda/etc/profile.d/conda.sh
+conda activate torchgpu
+```
+
 The environment has the following key packages:
 
 | Package | Version |
