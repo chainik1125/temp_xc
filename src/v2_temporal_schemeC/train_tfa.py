@@ -40,6 +40,7 @@ def create_tfa(
     n_attn_layers: int = 1,
     bottleneck_factor: int = 1,
     tied_weights: bool = True,
+    use_pos_encoding: bool = False,
     device: torch.device = DEFAULT_DEVICE,
 ) -> TemporalSAE:
     """Create a TemporalSAE configured for TopK sparsity."""
@@ -52,6 +53,7 @@ def create_tfa(
         tied_weights=tied_weights,
         n_attn_layers=n_attn_layers,
         bottleneck_factor=bottleneck_factor,
+        use_pos_encoding=use_pos_encoding,
     )
     return tfa.to(device)
 

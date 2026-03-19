@@ -86,6 +86,17 @@ This keeps logs clean and avoids flooding output with progress bar updates.
 
 Save all figures as both `.png` and `.html` (for interactive plotly figures) to a `results/` directory within the relevant experiment folder. Use descriptive filenames that include the experiment name and key parameters, e.g. `toy_model_l0_sweep_corr0.4.png`.
 
+**Use `save_figure()` from `src/utils/plot.py`** instead of calling `fig.savefig()` directly. This saves both a high-res PNG (150 DPI) and a low-res thumbnail (`.thumb.png`, ≤288px wide, 48 DPI):
+
+```python
+from src.utils.plot import save_figure
+save_figure(fig, os.path.join(results_dir, "my_plot.png"))
+# → my_plot.png       (high-res, for docs)
+# → my_plot.thumb.png (thumbnail, for agent inspection)
+```
+
+**AI agent rule:** When you need to inspect a plot, **always read the `.thumb.png`** file, never the full-res `.png`. Full-res images can be many megabytes and will blow up the context window. Markdown docs should link to the full-res `.png` for human readers.
+
 ## Rules and conventions
 
 1. **Disable tqdm.** Always set `TQDM_DISABLE=1` before running any Python code.

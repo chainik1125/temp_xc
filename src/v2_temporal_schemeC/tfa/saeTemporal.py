@@ -8,8 +8,8 @@ from src.v2_temporal_schemeC.tfa.utils import ManualAttention
 
 class TemporalSAE(torch.nn.Module):
     def __init__(self, dimin=2, width=5, n_heads=8, sae_diff_type='relu', kval_topk=None, tied_weights=True,
-        n_attn_layers=1, bottleneck_factor=64, inference_mode_batchtopk=False, 
-        min_act_regularizer_batchtopk=0.999):
+        n_attn_layers=1, bottleneck_factor=64, inference_mode_batchtopk=False,
+        min_act_regularizer_batchtopk=0.999, use_pos_encoding=False, max_seq_len=512):
         """
         dimin: (int)
             input dimension
@@ -35,14 +35,16 @@ class TemporalSAE(torch.nn.Module):
         self.eps = 1e-6
         self.lam = 1 / (4 * dimin)
         self.tied_weights = tied_weights
+        self.use_pos_encoding = use_pos_encoding
 
         ## Attention parameters
         self.n_attn_layers = n_attn_layers
         self.attn_layers = nn.ModuleList([
-            ManualAttention(dimin=width, 
-                            n_heads=n_heads, 
-                            bottleneck_factor=bottleneck_factor, 
-                            bias_k=True, bias_q=True, bias_v=True, bias_o=True)
+            ManualAttention(dimin=width,
+                            n_heads=n_heads,
+                            bottleneck_factor=bottleneck_factor,
+                            bias_k=True, bias_q=True, bias_v=True, bias_o=True,
+                            use_pos_encoding=use_pos_encoding, max_seq_len=max_seq_len)
             for _ in range(n_attn_layers)
             ])
 

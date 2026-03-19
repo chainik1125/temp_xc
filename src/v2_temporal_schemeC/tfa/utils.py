@@ -4,7 +4,21 @@ import torch.nn.functional as F
 import math
 
 ######################## Temporal SAE Utils ########################
-### Attention operations              
+
+def sinusoidal_positional_encoding(max_len: int, d_model: int) -> torch.Tensor:
+    """Standard sinusoidal positional encoding (Vaswani et al. 2017)."""
+    pe = torch.zeros(max_len, d_model)
+    position = torch.arange(0, max_len, dtype=torch.float).unsqueeze(1)
+    div_term = torch.exp(torch.arange(0, d_model, 2).float() * (-math.log(10000.0) / d_model))
+    pe[:, 0::2] = torch.sin(position * div_term)
+    if d_model % 2 == 0:
+        pe[:, 1::2] = torch.cos(position * div_term)
+    else:
+        pe[:, 1::2] = torch.cos(position * div_term[:d_model // 2])
+    return pe
+
+
+### Attention operations
 def get_attention(query, key) -> torch.Tensor:
     L, S = query.size(-2), key.size(-2)
     scale_factor = 1 / math.sqrt(query.size(-1))
@@ -25,7 +39,8 @@ class ManualAttention(nn.Module):
     Manual implementation to allow tinkering with the attention mechanism.
     """
 
-    def __init__(self, dimin, n_heads=4, bottleneck_factor=64, bias_k=True, bias_q=True, bias_v=True, bias_o=True):
+    def __init__(self, dimin, n_heads=4, bottleneck_factor=64, bias_k=True, bias_q=True, bias_v=True, bias_o=True,
+                 use_pos_encoding=False, max_seq_len=512):
         super().__init__()
         assert dimin % (bottleneck_factor * n_heads) == 0
 
@@ -54,16 +69,32 @@ class ManualAttention(nn.Module):
             scaling = 1 / math.sqrt(self.dimin)
             self.c_proj.weight.copy_(scaling * self.c_proj.weight / (1e-6 + torch.linalg.norm(self.c_proj.weight, dim=1, keepdim=True)))
 
+        # Positional encoding (non-learnable buffer)
+        if use_pos_encoding:
+            self.register_buffer('pos_enc', sinusoidal_positional_encoding(max_seq_len, dimin))
+        else:
+            self.pos_enc = None
+
     def forward(self, x_ctx, x_target, get_attn_map=False):
         """
-        Compute projective attention output 
+        Compute projective attention output
         """
+        # Add positional encoding to Q/K inputs (not V) if enabled
+        if self.pos_enc is not None:
+            T = x_ctx.size(1)
+            pe = self.pos_enc[:T, :]
+            x_ctx_qk = x_ctx + pe.unsqueeze(0)
+            x_target_qk = x_target + pe.unsqueeze(0)
+        else:
+            x_ctx_qk = x_ctx
+            x_target_qk = x_target
+
         # Compute key and value projections from context representations
-        k = self.k_ctx(x_ctx)
-        v = self.v_ctx(x_ctx)
+        k = self.k_ctx(x_ctx_qk)
+        v = self.v_ctx(x_ctx)  # V uses original (no positional info)
 
         # Compute query projection from target representations
-        q = self.q_target(x_target)
+        q = self.q_target(x_target_qk)
 
         # Split into heads
         B, T, _ = x_ctx.size()
