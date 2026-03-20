@@ -13,3 +13,7 @@ type: log
 ## wk 2
 
 First null results: current TXCDR architecture [doesn't outperform](./tx_v_sae.md) SAEs. 
+
+## wk 3-4
+
+Changed to stacked_SAEs and included loss values to my comparison. [See here](v2_tx_v_sae.md).
