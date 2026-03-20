@@ -8,7 +8,9 @@ Produces:
   3. Advantage vs correlation: how TXCDR advantage grows with rho
   4. Convergence curves: AUC over training steps
   5. IID vs Markov comparison panel
-  6. Summary table
+  6. Delta loss heatmaps: reconstruction loss difference per (k, T) at each rho
+  7. k analysis: how k affects AUC and loss for each model/rho
+  8. Summary table
 
 Usage:
     python viz.py                     # read from logs/
@@ -111,7 +113,7 @@ def plot_tradeoff_scatter(results: dict, viz_dir: str):
         ax.grid(True, alpha=0.3)
 
     fig.suptitle("3-Way Trade-off: Sparsity vs Loss (color = AUC)", fontsize=13, y=1.02)
-    plt.colorbar(sc, ax=axes.ravel().tolist(), label="AUC", shrink=0.8)
+    cbar = plt.colorbar(sc, ax=axes.ravel().tolist(), label="AUC", shrink=0.8, pad=0.04)
     plt.tight_layout()
     path = os.path.join(viz_dir, "tradeoff_scatter.png")
     fig.savefig(path, dpi=150, bbox_inches="tight")
@@ -169,9 +171,9 @@ def plot_advantage_heatmaps(results: dict, viz_dir: str):
         rho_label = "IID" if rho == 0.0 else f"Markov ρ={rho}"
         ax.set_title(f"ΔAUC — {rho_label}")
 
-    plt.colorbar(im, ax=axes.ravel().tolist(), label="ΔAUC (TXCDR − Stacked SAE)", shrink=0.8)
+    cbar = fig.colorbar(im, ax=axes.ravel().tolist(), label="ΔAUC (TXCDR − Stacked SAE)",
+                        shrink=0.8, pad=0.08)
     fig.suptitle("TXCDR Advantage over Stacked SAE (positive = TXCDR wins)", fontsize=12, y=1.02)
-    plt.tight_layout()
     path = os.path.join(viz_dir, "advantage_heatmaps.png")
     fig.savefig(path, dpi=150, bbox_inches="tight")
     plt.close(fig)
@@ -314,16 +316,143 @@ def plot_iid_vs_markov(results: dict, viz_dir: str):
             ax.set_ylabel("k")
             ax.set_title(f"{model_name} — {rho_name}")
 
-    plt.colorbar(im, ax=axes.ravel().tolist(), label="AUC", shrink=0.6)
+    cbar = fig.colorbar(im, ax=axes.ravel().tolist(), label="AUC", shrink=0.6, pad=0.08)
     fig.suptitle("IID vs Markov: Feature Recovery (AUC)", fontsize=13, y=1.01)
-    plt.tight_layout()
     path = os.path.join(viz_dir, "iid_vs_markov.png")
     fig.savefig(path, dpi=150, bbox_inches="tight")
     plt.close(fig)
     print(f"  Saved: {path}")
 
 
-# ─── 6. Summary table ───────────────────────────────────────────────────────────
+# ─── 6. Delta loss heatmaps ───────────────────────────────────────────────────
+
+def plot_delta_loss_heatmaps(results: dict, viz_dir: str):
+    """
+    For each rho: k×T heatmap of Loss(TXCDR) - Loss(StackedSAE).
+    Negative means TXCDR achieves lower reconstruction loss.
+    """
+    rhos = sorted(set(r for _, r, _, _ in results.keys()))
+    ks = sorted(set(k for _, _, k, _ in results.keys()))
+    Ts = sorted(set(T for _, _, _, T in results.keys()))
+
+    n_rho = len(rhos)
+    fig, axes = plt.subplots(1, n_rho, figsize=(5 * n_rho, 4), squeeze=False)
+
+    for col, rho in enumerate(rhos):
+        ax = axes[0, col]
+        mat = np.full((len(ks), len(Ts)), np.nan)
+        for i, k in enumerate(ks):
+            for j, T in enumerate(Ts):
+                txcdr_key = ("txcdr", rho, k, T)
+                sae_key = ("stacked_sae", rho, k, T)
+                if txcdr_key in results and sae_key in results:
+                    diff = get_final(results[txcdr_key], "loss") - get_final(results[sae_key], "loss")
+                    mat[i, j] = diff
+
+        vabs = max(abs(np.nanmin(mat)) if not np.all(np.isnan(mat)) else 0.01,
+                   abs(np.nanmax(mat)) if not np.all(np.isnan(mat)) else 0.01,
+                   0.01)
+        norm = TwoSlopeNorm(vmin=-vabs, vcenter=0, vmax=vabs)
+        im = ax.imshow(mat, cmap="RdBu", norm=norm, aspect="auto", origin="lower")
+
+        for i in range(len(ks)):
+            for j in range(len(Ts)):
+                val = mat[i, j]
+                if not np.isnan(val):
+                    color = "white" if abs(val) > vabs * 0.6 else "black"
+                    ax.text(j, i, f"{val:+.2f}", ha="center", va="center",
+                            fontsize=9, fontweight="bold", color=color)
+                else:
+                    ax.text(j, i, "skip", ha="center", va="center",
+                            fontsize=8, color="gray")
+
+        ax.set_xticks(range(len(Ts)))
+        ax.set_xticklabels([str(t) for t in Ts])
+        ax.set_yticks(range(len(ks)))
+        ax.set_yticklabels([str(k) for k in ks])
+        ax.set_xlabel("T")
+        ax.set_ylabel("k")
+        rho_label = "IID" if rho == 0.0 else f"Markov ρ={rho}"
+        ax.set_title(f"ΔLoss — {rho_label}")
+
+    cbar = fig.colorbar(im, ax=axes.ravel().tolist(),
+                        label="ΔLoss (TXCDR − Stacked SAE)", shrink=0.8, pad=0.08)
+    fig.suptitle("Reconstruction Loss Difference (negative = TXCDR lower loss)", fontsize=12, y=1.02)
+    path = os.path.join(viz_dir, "delta_loss_heatmaps.png")
+    fig.savefig(path, dpi=150, bbox_inches="tight")
+    plt.close(fig)
+    print(f"  Saved: {path}")
+
+
+# ─── 7. k analysis ──────────────────────────────────────────────────────────────
+
+def plot_k_analysis(results: dict, viz_dir: str):
+    """
+    How k affects AUC and Loss for each model type.
+    Two rows: AUC (top), Loss (bottom). One column per rho.
+    Lines for each (model, T) combination.
+    """
+    rhos = sorted(set(r for _, r, _, _ in results.keys()))
+    ks = sorted(set(k for _, _, k, _ in results.keys()))
+    Ts = sorted(set(T for _, _, _, T in results.keys()))
+
+    n_rho = len(rhos)
+    fig, axes = plt.subplots(2, n_rho, figsize=(5 * n_rho, 8), squeeze=False)
+
+    style_map = {
+        "stacked_sae": {"color_base": "steelblue", "ls": "--", "name": "StackedSAE"},
+        "txcdr": {"color_base": "firebrick", "ls": "-", "name": "TXCDR"},
+    }
+
+    for col, rho in enumerate(rhos):
+        ax_auc = axes[0, col]
+        ax_loss = axes[1, col]
+
+        for model_type, style in style_map.items():
+            for t_idx, T in enumerate(Ts):
+                auc_vals, loss_vals, valid_ks = [], [], []
+                for k in ks:
+                    key = (model_type, rho, k, T)
+                    if key in results:
+                        auc_vals.append(get_final(results[key], "auc"))
+                        loss_vals.append(get_final(results[key], "loss"))
+                        valid_ks.append(k)
+                if not valid_ks:
+                    continue
+                alpha = 0.5 + 0.5 * (t_idx / max(len(Ts) - 1, 1))
+                label = f"{style['name']} T={T}"
+                ax_auc.plot(valid_ks, auc_vals, f"o{style['ls']}", color=style["color_base"],
+                            alpha=alpha, lw=1.5, ms=5, label=label)
+                ax_loss.plot(valid_ks, loss_vals, f"o{style['ls']}", color=style["color_base"],
+                             alpha=alpha, lw=1.5, ms=5, label=label)
+
+        rho_label = "IID" if rho == 0.0 else f"Markov ρ={rho}"
+        ax_auc.set_title(f"{rho_label}")
+        ax_auc.set_ylabel("AUC")
+        ax_auc.set_ylim(0, 1.05)
+        ax_auc.set_xscale("log", base=2)
+        ax_auc.set_xticks(ks)
+        ax_auc.set_xticklabels([str(k) for k in ks])
+        ax_auc.legend(fontsize=6, loc="lower right")
+        ax_auc.grid(True, alpha=0.3)
+
+        ax_loss.set_xlabel("k (dictionary size multiplier)")
+        ax_loss.set_ylabel("Reconstruction Loss")
+        ax_loss.set_xscale("log", base=2)
+        ax_loss.set_xticks(ks)
+        ax_loss.set_xticklabels([str(k) for k in ks])
+        ax_loss.legend(fontsize=6, loc="upper right")
+        ax_loss.grid(True, alpha=0.3)
+
+    fig.suptitle("Effect of k on AUC and Reconstruction Loss", fontsize=13, y=1.01)
+    plt.tight_layout()
+    path = os.path.join(viz_dir, "k_analysis.png")
+    fig.savefig(path, dpi=150, bbox_inches="tight")
+    plt.close(fig)
+    print(f"  Saved: {path}")
+
+
+# ─── 8. Summary table ───────────────────────────────────────────────────────────
 
 def print_summary_table(results: dict, viz_dir: str):
     """Print and save a text summary table."""
@@ -408,6 +537,8 @@ def main():
     plot_advantage_vs_rho(results, args.viz_dir)
     plot_convergence_curves(results, args.viz_dir)
     plot_iid_vs_markov(results, args.viz_dir)
+    plot_delta_loss_heatmaps(results, args.viz_dir)
+    plot_k_analysis(results, args.viz_dir)
     print()
     print_summary_table(results, args.viz_dir)
 

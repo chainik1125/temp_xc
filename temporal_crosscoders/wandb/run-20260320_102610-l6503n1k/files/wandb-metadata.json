@@ -1,0 +1,40 @@
+{
+  "os": "Linux-5.15.0-105-generic-x86_64-with-glibc2.35",
+  "python": "CPython 3.13.12",
+  "startedAt": "2026-03-20T10:26:10.351437Z",
+  "program": "/root/temp_xc/temporal_crosscoders/sweep.py",
+  "codePath": "temporal_crosscoders/sweep.py",
+  "codePathLocal": "sweep.py",
+  "git": {
+    "remote": "https://github.com/chainik1125/temp_xc.git",
+    "commit": "f96cd8b40ae7fb0504afee03ed410cf7c03d50b9"
+  },
+  "email": "standartikom@gmail.com",
+  "root": "/root/temp_xc/temporal_crosscoders",
+  "host": "3aa90e9ac853",
+  "executable": "/root/miniconda3/bin/python",
+  "cpu_count": 48,
+  "cpu_count_logical": 96,
+  "gpu": "NVIDIA A40",
+  "gpu_count": 1,
+  "disk": {
+    "/": {
+      "total": "21474836480",
+      "used": "13699760128"
+    }
+  },
+  "memory": {
+    "total": "540649164800"
+  },
+  "gpu_nvidia": [
+    {
+      "name": "NVIDIA A40",
+      "memoryTotal": "48305799168",
+      "cudaCores": 10752,
+      "architecture": "Ampere",
+      "uuid": "GPU-4ba00ff4-fae3-7748-6807-1391c4c81d74"
+    }
+  ],
+  "cudaVersion": "12.8",
+  "writerId": "98nwpvlq7ctx5t66e19cgdgpa14b07v4"
+}

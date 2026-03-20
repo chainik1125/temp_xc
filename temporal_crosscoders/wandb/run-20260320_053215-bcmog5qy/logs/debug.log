@@ -17,3 +17,8 @@ config: {'model_type': 'stacked_sae', 'rho': 0.0, 'k': 25, 'T': 5, 'd_sae': 128,
 2026-03-20 05:32:16,885 INFO    MainThread:35405 [wandb_run.py:_redirect():2442] Wrapping output streams.
 2026-03-20 05:32:16,885 INFO    MainThread:35405 [wandb_run.py:_redirect():2465] Redirects installed.
 2026-03-20 05:32:16,887 INFO    MainThread:35405 [wandb_init.py:init():1082] run started, returning control to user process
+2026-03-20 05:46:57,942 INFO    MainThread:35405 [wandb_run.py:_finish():2291] finishing run standartikom-northwestern-university/temporal-crosscoders-sweep-stacked/bcmog5qy
+2026-03-20 05:46:57,943 INFO    MainThread:35405 [wandb_run.py:_atexit_cleanup():2490] got exitcode: 0
+2026-03-20 05:46:57,944 INFO    MainThread:35405 [wandb_run.py:_restore():2472] restore
+2026-03-20 05:46:57,944 INFO    MainThread:35405 [wandb_run.py:_restore():2478] restore done
+2026-03-20 05:46:59,066 INFO    MainThread:35405 [wandb_run.py:_footer_sync_info():3868] logging synced files
