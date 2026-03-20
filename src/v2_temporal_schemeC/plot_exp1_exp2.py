@@ -1,14 +1,6 @@
-"""Regenerate Experiment 1 and 2 plots with all models including TXCDR T=2 and T=5.
+"""Generate Experiment 1 and 2 plots from reproduction results.
 
-Reads data from:
-  - results/auc_and_crosscoder/results.json   (SAE, TFA, TFA-shuf, TXCDR T=2 — TopK + L1)
-  - results/txcdr_T5/results.json             (TXCDR T=5 — TopK + L1)
-
-Saves to:
-  - results/auc_and_crosscoder/exp1_topk_auc.{png,pdf}
-  - results/auc_and_crosscoder/exp1_topk_auc.thumb.png
-  - results/auc_and_crosscoder/exp2_pareto_auc.{png,pdf}
-  - results/auc_and_crosscoder/exp2_pareto_auc.thumb.png
+Reads ONLY from results/reproduction/*.json (unified schema).
 
 Usage:
   TQDM_DISABLE=1 python src/v2_temporal_schemeC/plot_exp1_exp2.py
@@ -20,20 +12,34 @@ import os
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-import numpy as np
 
 from src.utils.plot import save_figure
 
-RESULTS_DIR = os.path.join(os.path.dirname(__file__), "results", "auc_and_crosscoder")
+BASE = os.path.dirname(__file__)
+REPRO_DIR = os.path.join(BASE, "results", "reproduction")
+OUT_DIR = os.path.join(BASE, "results", "auc_and_crosscoder")
+
+# Model display config: (json_filename, display_name, color, marker, linestyle)
+MODELS = [
+    ("SAE",           "SAE",           "tab:blue",   "o", "-"),
+    ("TFA",           "TFA",           "tab:orange", "s", "-"),
+    ("TFA-shuf",      "TFA-shuf",      "tab:red",    "^", "--"),
+    ("TFA-pos",       "TFA-pos",       "tab:brown",  "X", "-"),
+    ("TFA-pos-shuf",  "TFA-pos-shuf",  "tab:pink",   "v", "--"),
+    ("TXCDR-T2",      "TXCDR T=2",     "tab:purple", "D", "-."),
+    ("TXCDR-T5",      "TXCDR T=5",     "tab:green",  "P", ":"),
+]
 
 
-def load_json(path):
+def load_model(filename):
+    path = os.path.join(REPRO_DIR, f"{filename}.json")
+    if not os.path.exists(path):
+        return None
     with open(path) as f:
         return json.load(f)
 
 
 def pareto_min(xs, ys):
-    """Lower-envelope Pareto frontier (minimize y)."""
     pts = sorted(zip(xs, ys))
     fx, fy = [], []
     best = float("inf")
@@ -44,7 +50,6 @@ def pareto_min(xs, ys):
 
 
 def pareto_max(xs, ys):
-    """Upper-envelope Pareto frontier (maximize y)."""
     pts = sorted(zip(xs, ys))
     fx, fy = [], []
     best = -float("inf")
@@ -55,93 +60,47 @@ def pareto_max(xs, ys):
 
 
 def main():
-    base = os.path.dirname(__file__)
+    os.makedirs(OUT_DIR, exist_ok=True)
 
-    # ── Load data ─────────────────────────────────────────────────────
-    main_data = load_json(os.path.join(base, "results", "auc_and_crosscoder", "results.json"))
-    # v2 has TXCDR T=2 L1 sweep data that the original doesn't
-    v2_path = os.path.join(base, "results", "auc_and_crosscoder_v2", "results.json")
-    v2_data = load_json(v2_path) if os.path.exists(v2_path) else {}
-    t5_path = os.path.join(base, "results", "txcdr_T5", "results.json")
-    t5_data = load_json(t5_path) if os.path.exists(t5_path) else None
-
-    exp1 = main_data["exp1"]  # keys: sae, tfa, tfa_shuf, txcdr
-    exp2_sae = main_data.get("exp2_sae", [])
-    exp2_tfa = main_data.get("exp2_tfa", [])
-    exp2_txcdr_t2 = v2_data.get("exp2_txcdr", main_data.get("exp2_txcdr", []))
-
-    # T=5 TopK and L1
-    t5_topk = t5_data["topk"] if t5_data else []
-    t5_l1 = t5_data["l1"] if t5_data else []
-
-    # TFA-pos data
-    pos_path = os.path.join(base, "results", "tfa_pos", "results.json")
-    pos_data = load_json(pos_path) if os.path.exists(pos_path) else {}
-    exp1_pos = pos_data.get("exp1_tfa_pos", [])
-    exp1_pos_shuf = pos_data.get("exp1_tfa_pos_shuf", [])
-    exp2_pos = pos_data.get("exp2_tfa_pos", [])
+    # Load all models
+    data = {}
+    for filename, display, c, m, ls in MODELS:
+        d = load_model(filename)
+        if d:
+            data[filename] = d
+            print(f"  Loaded {filename}: {len(d['topk'])} topk, {len(d['l1'])} l1")
+        else:
+            print(f"  MISSING: {filename}")
 
     # ══════════════════════════════════════════════════════════════════
-    # EXPERIMENT 1: TopK sweep — NMSE, AUC, NMSE-vs-AUC
+    # EXPERIMENT 1: TopK sweep
     # ══════════════════════════════════════════════════════════════════
-
-    series = [
-        ("SAE",         exp1["sae"],      "tab:blue",   "o", "-"),
-        ("TFA",         exp1["tfa"],      "tab:orange", "s", "-"),
-        ("TFA-shuf",    exp1["tfa_shuf"], "tab:red",    "^", "--"),
-        ("TXCDR T=2",   exp1["txcdr"],    "tab:purple", "D", "-."),
-    ]
-    if t5_topk:
-        series.append(("TXCDR T=5", t5_topk, "tab:green", "P", ":"))
-    if exp1_pos:
-        series.append(("TFA-pos", exp1_pos, "tab:brown", "X", "-"))
-    if exp1_pos_shuf:
-        series.append(("TFA-pos-shuf", exp1_pos_shuf, "tab:pink", "v", "--"))
 
     fig, axes = plt.subplots(1, 3, figsize=(18, 6))
 
-    # NMSE vs k
-    ax = axes[0]
-    for label, data, c, m, ls in series:
-        ks = [r.get("k", r.get("novel_l0", 0)) for r in data]
-        nmse = [r["nmse"] for r in data]
-        ax.plot(ks, nmse, marker=m, linestyle=ls, color=c, lw=2, ms=7, label=label)
-    ax.set_xlabel("k")
-    ax.set_ylabel("NMSE")
-    ax.set_title("NMSE vs k")
-    ax.legend(fontsize=9)
-    ax.grid(True, alpha=0.3)
-    ax.set_yscale("log")
+    for filename, display, c, m, ls in MODELS:
+        if filename not in data:
+            continue
+        topk = data[filename]["topk"]
+        ks = [r["k"] for r in topk]
+        nmse = [r["nmse"] for r in topk]
+        auc = [r["auc"] for r in topk]
 
-    # AUC vs k
-    ax = axes[1]
-    for label, data, c, m, ls in series:
-        ks = [r.get("k", r.get("novel_l0", 0)) for r in data]
-        auc = [r["auc"] for r in data]
-        ax.plot(ks, auc, marker=m, linestyle=ls, color=c, lw=2, ms=7, label=label)
-    ax.set_xlabel("k")
-    ax.set_ylabel("AUC")
-    ax.set_title("Feature Recovery AUC vs k")
-    ax.legend(fontsize=9)
-    ax.grid(True, alpha=0.3)
+        axes[0].plot(ks, nmse, marker=m, linestyle=ls, color=c, lw=2, ms=7, label=display)
+        axes[1].plot(ks, auc, marker=m, linestyle=ls, color=c, lw=2, ms=7, label=display)
+        axes[2].plot(nmse, auc, marker=m, linestyle=ls, color=c, lw=2, ms=7, label=display)
 
-    # NMSE vs AUC
-    ax = axes[2]
-    for label, data, c, m, ls in series:
-        nmse = [r["nmse"] for r in data]
-        auc = [r["auc"] for r in data]
-        ax.plot(nmse, auc, marker=m, linestyle=ls, color=c, lw=2, ms=7, label=label)
-    ax.set_xlabel("NMSE")
-    ax.set_ylabel("AUC")
-    ax.set_title("NMSE vs AUC")
-    ax.legend(fontsize=9)
-    ax.grid(True, alpha=0.3)
-    ax.set_xscale("log")
+    axes[0].set(xlabel="k", ylabel="NMSE", title="NMSE vs k", yscale="log")
+    axes[1].set(xlabel="k", ylabel="AUC", title="Feature Recovery AUC vs k")
+    axes[2].set(xlabel="NMSE", ylabel="AUC", title="NMSE vs AUC", xscale="log")
+    for ax in axes:
+        ax.legend(fontsize=8)
+        ax.grid(True, alpha=0.3)
 
-    plt.suptitle("Experiment 1: TopK sweep — NMSE and Feature Recovery AUC", fontsize=14, y=1.02)
+    plt.suptitle("Experiment 1: TopK sweep", fontsize=14, y=1.02)
     plt.tight_layout()
     for ext in ["png", "pdf"]:
-        path = os.path.join(RESULTS_DIR, f"exp1_topk_auc.{ext}")
+        path = os.path.join(OUT_DIR, f"exp1_topk_auc.{ext}")
         if ext == "png":
             save_figure(fig, path)
         else:
@@ -150,98 +109,61 @@ def main():
     print("Experiment 1 plots saved.")
 
     # ══════════════════════════════════════════════════════════════════
-    # EXPERIMENT 2: ReLU+L1 Pareto — L0 vs NMSE, L0 vs AUC, NMSE vs AUC
+    # EXPERIMENT 2: ReLU+L1 Pareto
     # ══════════════════════════════════════════════════════════════════
 
-    l1_series = [
-        ("ReLU SAE", exp2_sae, "l0", "tab:blue", "o"),
-        ("TFA (novel L0)", exp2_tfa, "novel_l0", "tab:orange", "s"),
-    ]
-    if exp2_txcdr_t2:
-        l1_series.append(("TXCDR T=2", exp2_txcdr_t2, "l0", "tab:purple", "D"))
-    if t5_l1:
-        l1_series.append(("TXCDR T=5", t5_l1, "l0", "tab:green", "P"))
-    if exp2_pos:
-        l1_series.append(("TFA-pos (novel L0)", exp2_pos, "novel_l0", "tab:brown", "X"))
-
-    # Total L0 curves (dashed) — TFA and TFA-pos from dedicated run
-    total_l0_series = []
-    tl0_path = os.path.join(base, "results", "tfa_l1_total_l0", "results.json")
-    if os.path.exists(tl0_path):
-        tl0_data = load_json(tl0_path)
-        if tl0_data.get("tfa"):
-            total_l0_series.append(("TFA (total L0)", tl0_data["tfa"], "total_l0", "tab:red", "s"))
-        if tl0_data.get("tfa_pos"):
-            total_l0_series.append(("TFA-pos (total L0)", tl0_data["tfa_pos"], "total_l0", "tab:pink", "X"))
+    # Models with L1 data (exclude shuffled variants)
+    l1_models = [(f, d, c, m, ls) for f, d, c, m, ls in MODELS
+                 if f in data and len(data[f]["l1"]) > 0]
 
     fig, axes = plt.subplots(1, 3, figsize=(18, 6))
 
-    # L0 vs NMSE
-    ax = axes[0]
-    for label, data, l0_key, c, m in l1_series:
-        l0s = [r[l0_key] for r in data]
-        nmse = [r["nmse"] for r in data]
-        ax.scatter(l0s, nmse, color=c, alpha=0.3, s=30)
-        fx, fy = pareto_min(l0s, nmse)
-        ax.plot(fx, fy, f"{m}-", color=c, lw=2, ms=7, label=label)
-    for label, data, l0_key, c, m in total_l0_series:
-        l0s = [r[l0_key] for r in data]
-        nmse = [r["nmse"] for r in data]
-        fx, fy = pareto_min(l0s, nmse)
-        ax.plot(fx, fy, f"{m}--", color=c, lw=1.5, ms=5, alpha=0.7, label=label)
-    ax.set_xlabel("L0")
-    ax.set_ylabel("NMSE")
-    ax.set_title("L0 vs NMSE Pareto")
-    ax.legend(fontsize=8)
-    ax.grid(True, alpha=0.3)
-    ax.set_yscale("log")
+    for filename, display, c, m, ls in l1_models:
+        l1_data = data[filename]["l1"]
+        novel_l0 = [r["novel_l0"] for r in l1_data]
+        total_l0 = [r["total_l0"] for r in l1_data]
+        nmse = [r["nmse"] for r in l1_data]
+        auc = [r["auc"] for r in l1_data]
 
-    # L0 vs AUC
-    ax = axes[1]
-    for label, data, l0_key, c, m in l1_series:
-        l0s = [r[l0_key] for r in data]
-        auc = [r["auc"] for r in data]
-        ax.scatter(l0s, auc, color=c, alpha=0.3, s=30)
-        fx, fy = pareto_max(l0s, auc)
-        ax.plot(fx, fy, f"{m}-", color=c, lw=2, ms=7, label=label)
-    for label, data, l0_key, c, m in total_l0_series:
-        if "auc" not in data[0]:
-            continue
-        l0s = [r[l0_key] for r in data]
-        auc = [r["auc"] for r in data]
-        fx, fy = pareto_max(l0s, auc)
-        ax.plot(fx, fy, f"{m}--", color=c, lw=1.5, ms=5, alpha=0.7, label=label)
-    ax.set_xlabel("L0")
-    ax.set_ylabel("AUC")
-    ax.set_title("L0 vs AUC Pareto")
-    ax.legend(fontsize=8)
-    ax.grid(True, alpha=0.3)
+        # Novel L0 (solid)
+        ax = axes[0]
+        ax.scatter(novel_l0, nmse, color=c, alpha=0.3, s=30)
+        fx, fy = pareto_min(novel_l0, nmse)
+        ax.plot(fx, fy, marker=m, linestyle="-", color=c, lw=2, ms=7, label=f"{display} (novel)")
 
-    # NMSE vs AUC — connect points along L1 sweep (sorted by NMSE)
-    ax = axes[2]
-    for label, data, _, c, m in l1_series:
-        pts = sorted(zip([r["nmse"] for r in data], [r["auc"] for r in data]))
-        nmse_s, auc_s = zip(*pts) if pts else ([], [])
-        ax.plot(nmse_s, auc_s, marker=m, linestyle="-", color=c, lw=1.5, ms=6,
-                alpha=0.8, label=label)
-    for label, data, _, c, m in total_l0_series:
-        if "auc" not in data[0]:
-            continue
-        pts = sorted(zip([r["nmse"] for r in data], [r["auc"] for r in data]))
-        nmse_s, auc_s = zip(*pts) if pts else ([], [])
-        ax.plot(nmse_s, auc_s, marker=m, linestyle="--", color=c, lw=1.5, ms=5,
-                alpha=0.7, label=label)
-    ax.set_xlabel("NMSE")
-    ax.set_ylabel("AUC")
-    ax.set_title("NMSE vs AUC")
-    ax.legend(fontsize=8)
-    ax.grid(True, alpha=0.3)
-    ax.set_xscale("log")
+        # Total L0 (dashed) — only for TFA variants that have pred_l0 > 0
+        if any(r["pred_l0"] > 0 for r in l1_data):
+            fx, fy = pareto_min(total_l0, nmse)
+            ax.plot(fx, fy, marker=m, linestyle="--", color=c, lw=1.5, ms=5, alpha=0.7,
+                    label=f"{display} (total)")
 
-    plt.suptitle("Experiment 2: ReLU+L1 Pareto with AUC", fontsize=14, y=1.02)
+        # L0 vs AUC
+        ax = axes[1]
+        ax.scatter(novel_l0, auc, color=c, alpha=0.3, s=30)
+        fx, fy = pareto_max(novel_l0, auc)
+        ax.plot(fx, fy, marker=m, linestyle="-", color=c, lw=2, ms=7, label=f"{display} (novel)")
+        if any(r["pred_l0"] > 0 for r in l1_data):
+            fx, fy = pareto_max(total_l0, auc)
+            ax.plot(fx, fy, marker=m, linestyle="--", color=c, lw=1.5, ms=5, alpha=0.7,
+                    label=f"{display} (total)")
+
+        # NMSE vs AUC
+        ax = axes[2]
+        pts = sorted(zip(nmse, auc))
+        ax.plot([p[0] for p in pts], [p[1] for p in pts],
+                marker=m, linestyle="-", color=c, lw=1.5, ms=6, alpha=0.8, label=display)
+
+    axes[0].set(xlabel="L0", ylabel="NMSE", title="L0 vs NMSE Pareto", yscale="log")
+    axes[1].set(xlabel="L0", ylabel="AUC", title="L0 vs AUC Pareto")
+    axes[2].set(xlabel="NMSE", ylabel="AUC", title="NMSE vs AUC", xscale="log")
+    for ax in axes:
+        ax.legend(fontsize=7)
+        ax.grid(True, alpha=0.3)
+
+    plt.suptitle("Experiment 2: ReLU+L1 Pareto", fontsize=14, y=1.02)
     plt.tight_layout()
     for ext in ["png", "pdf"]:
-        path = os.path.join(RESULTS_DIR, f"exp2_pareto_auc.{ext}")
+        path = os.path.join(OUT_DIR, f"exp2_pareto_auc.{ext}")
         if ext == "png":
             save_figure(fig, path)
         else:
