@@ -25,7 +25,7 @@ def feature_recovery_score(
     sims = cos_sims(decoder_directions, true_features).abs()  # (h, k)
     max_per_true = sims.max(dim=0).values                     # (k,)
     curve = np.array([(max_per_true.cpu().numpy() >= t).mean() for t in THRESHOLDS])
-    auc_val = float(np.trapz(curve, THRESHOLDS) / (THRESHOLDS[-1] - THRESHOLDS[0]))
+    auc_val = float(np.trapezoid(curve, THRESHOLDS) / (THRESHOLDS[-1] - THRESHOLDS[0]))
     return {
         "mean_max_cos_sim": max_per_true.mean().item(),
         "frac_recovered_90": (max_per_true >= 0.9).float().mean().item(),

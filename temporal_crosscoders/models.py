@@ -1,13 +1,14 @@
 """
 models.py — Three architectures for the temporal crosscoder sweep.
 
-1. TopKSAE              — single-token baseline
-2. TemporalCrosscoder   — standard shared-latent crosscoder (ckkissane-style)
-3. TemporalCrosscoderPP — per-position latents with full-window encoder context
+1. TopKSAE              — single-token SAE (building block for StackedSAE)
+2. StackedSAE           — SAE(k) applied independently to each of T positions
+3. TemporalCrosscoder   — shared-latent crosscoder across T positions
 
-All three expose the same interface:
-    forward(x) → (recon_loss, x_hat, u)
-    decoder_directions(pos=0) → (d, h)
+StackedSAE and TemporalCrosscoder both take (B, T, d) input.
+Both expose:
+    forward(x) → (recon_loss, x_hat, activations)
+    decoder_directions → (d, h)
     _normalize_decoder()
 """
 
@@ -71,12 +72,64 @@ class TopKSAE(nn.Module):
         return self.W_dec
 
 
-# ─── 2. Standard Temporal Crosscoder (shared latent) ────────────────────────────
+# ─── 2. Stacked SAE — independent SAE(k) per position ───────────────────────────
+
+class StackedSAE(nn.Module):
+    """
+    stacked_SAE(k, T) = T independent SAE(k), one per position.
+
+    Each position has its own TopKSAE with independent weights.
+    Each position gets k active latents, so window-level L0 = k * T.
+
+    Input:  x ∈ R^{B × T × d}
+    Output: x_hat ∈ R^{B × T × d}
+    """
+
+    def __init__(self, d_in: int, d_sae: int, T: int, k: int):
+        super().__init__()
+        self.d_in = d_in
+        self.d_sae = d_sae
+        self.T = T
+        self.k = k
+        self.saes = nn.ModuleList([TopKSAE(d_in, d_sae, k) for _ in range(T)])
+
+    @torch.no_grad()
+    def _normalize_decoder(self):
+        for sae in self.saes:
+            sae._normalize_decoder()
+
+    def forward(self, x: torch.Tensor):
+        """x: (B, T, d) → (recon_loss, x_hat, u)
+
+        u: (B, T, h) — per-position activations.
+        """
+        losses, x_hats, us = [], [], []
+        for t, sae in enumerate(self.saes):
+            loss_t, x_hat_t, u_t = sae(x[:, t, :])  # (B, d)
+            losses.append(loss_t)
+            x_hats.append(x_hat_t)
+            us.append(u_t)
+
+        x_hat = torch.stack(x_hats, dim=1)  # (B, T, d)
+        u = torch.stack(us, dim=1)           # (B, T, h)
+        loss = torch.stack(losses).mean()
+        return loss, x_hat, u
+
+    def decoder_directions_at(self, pos: int = 0) -> torch.Tensor:
+        """(d, h) decoder columns for a specific position's SAE."""
+        return self.saes[pos].decoder_directions
+
+    @property
+    def decoder_directions(self) -> torch.Tensor:
+        """(d, h) decoder columns averaged across all T SAEs."""
+        return torch.stack([sae.decoder_directions for sae in self.saes]).mean(dim=0)
+
+
+# ─── 3. Temporal Crosscoder (shared latent) ──────────────────────────────────────
 
 class TemporalCrosscoder(nn.Module):
     """
     Standard crosscoder with shared latent vector across all positions.
-    Matches ckkissane/crosscoder-model-diff-replication.
 
     Architecture:
         W_enc: (T, d, h) — per-position encoder projections
@@ -87,7 +140,8 @@ class TemporalCrosscoder(nn.Module):
     Encode: z = TopK(einsum("btd,tds->bs", x, W_enc) + b_enc)   → (B, h)
     Decode: x_hat = einsum("bs,std->btd", z, W_dec) + b_dec     → (B, T, d)
 
-    One shared latent of size h with k non-zeros must explain all T positions.
+    The shared latent uses k*T active latents, matching the stacked SAE's
+    total window-level L0 = k*T for a fair comparison.
     """
 
     def __init__(self, d_in: int, d_sae: int, T: int, k: int):
@@ -95,7 +149,7 @@ class TemporalCrosscoder(nn.Module):
         self.d_in = d_in
         self.d_sae = d_sae
         self.T = T
-        self.k = k
+        self.k = k * T  # match stacked SAE's total L0
 
         self.W_enc = nn.Parameter(
             torch.randn(T, d_in, d_sae) * (1.0 / d_in ** 0.5)
@@ -108,7 +162,6 @@ class TemporalCrosscoder(nn.Module):
 
     @torch.no_grad()
     def _normalize_decoder(self):
-        # W_dec: (h, T, d) — normalize each feature across all positions
         norms = self.W_dec.norm(dim=(1, 2), keepdim=True).clamp(min=1e-8)
         self.W_dec.data = self.W_dec.data / norms
 
@@ -132,7 +185,13 @@ class TemporalCrosscoder(nn.Module):
         return recon_loss, x_hat, z
 
     @torch.no_grad()
-    def decoder_directions(self, pos: int = 0) -> torch.Tensor:
+    def decoder_directions_at(self, pos: int = 0) -> torch.Tensor:
         """(d, h) decoder columns for a given position.
         W_dec is (h, T, d) → slice [:, pos, :] gives (h, d) → transpose to (d, h)."""
         return self.W_dec[:, pos, :].T
+
+    @property
+    def decoder_directions(self) -> torch.Tensor:
+        """(d, h) decoder columns averaged across positions."""
+        # Average decoder across T positions: (h, T, d) → mean over T → (h, d) → transpose
+        return self.W_dec.mean(dim=1).T

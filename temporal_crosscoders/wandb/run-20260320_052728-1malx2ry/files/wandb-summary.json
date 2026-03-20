@@ -1,0 +1,1 @@
+{"_runtime":4.146207203,"_timestamp":1.773984453698782e+09,"l0":12,"_wandb":{"runtime":4},"_step":999,"loss":7.6766862869262695,"step":999,"auc":0.1932209645669291,"window_l0":12,"mean_max_cos_sim":0.1929810643196106,"recovery_90":0,"recovery_80":0}

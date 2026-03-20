@@ -1,0 +1,96 @@
+_wandb:
+    value:
+        cli_version: 0.25.1
+        e:
+            acriu8qz3zbbmc6ea7ix0v7uqycd3e3x:
+                args:
+                    - --steps
+                    - "1000"
+                codePath: temporal_crosscoders/sweep.py
+                codePathLocal: sweep.py
+                cpu_count: 48
+                cpu_count_logical: 96
+                cudaVersion: "12.8"
+                disk:
+                    /:
+                        total: "21474836480"
+                        used: "13685694464"
+                email: standartikom@gmail.com
+                executable: /root/miniconda3/bin/python
+                git:
+                    commit: 84a25b7df6e346946b12e4c968b44251a61c8399
+                    remote: https://github.com/chainik1125/temp_xc.git
+                gpu: NVIDIA A40
+                gpu_count: 1
+                gpu_nvidia:
+                    - architecture: Ampere
+                      cudaCores: 10752
+                      memoryTotal: "48305799168"
+                      name: NVIDIA A40
+                      uuid: GPU-4ba00ff4-fae3-7748-6807-1391c4c81d74
+                host: 3aa90e9ac853
+                memory:
+                    total: "540649164800"
+                os: Linux-5.15.0-105-generic-x86_64-with-glibc2.35
+                program: /root/temp_xc/temporal_crosscoders/sweep.py
+                python: CPython 3.13.12
+                root: /root/temp_xc/temporal_crosscoders
+                startedAt: "2026-03-20T05:30:51.632247Z"
+                writerId: acriu8qz3zbbmc6ea7ix0v7uqycd3e3x
+        m: []
+        python_version: 3.13.12
+        t:
+            "1":
+                - 1
+            "2":
+                - 1
+            "3":
+                - 2
+                - 13
+                - 15
+                - 16
+                - 61
+            "4": 3.13.12
+            "5": 0.25.1
+            "10":
+                - 20
+            "12": 0.25.1
+            "13": linux-x86_64
+T:
+    value: 2
+batch_size:
+    value: 1
+d_sae:
+    value: 128
+experiment_tag:
+    value: v8
+feat_mean:
+    value: 1
+feat_prob:
+    value: 0.05
+feat_std:
+    value: 0.15
+grad_clip:
+    value: 1
+hidden_dim:
+    value: 256
+k:
+    value: 10
+log_interval:
+    value: 1500
+lr:
+    value: 0.0003
+markov_alpha:
+    value: 0.62
+markov_beta:
+    value: 0.020000000000000004
+model_type:
+    value: stacked_sae
+num_feats:
+    value: 128
+rho:
+    value: 0.6
+seed:
+    value: 42
+train_steps:
+    value: 80000

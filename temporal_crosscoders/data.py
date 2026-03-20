@@ -1,16 +1,20 @@
 """
 data.py — Toy model, synthetic data generators, and data iterators.
+
+Data generation is parametrized by rho (lag-1 autocorrelation):
+  rho = 0  → IID (no temporal structure)
+  rho > 0  → 2-state Markov chain with temporal persistence
 """
 
 import torch
 import torch.nn as nn
 import numpy as np
 from tqdm.auto import tqdm
-from typing import Any, Callable
+from typing import Any
 
 from config import (
     NUM_FEATS, HIDDEN_DIM, FEAT_PROB, FEAT_MEAN, FEAT_STD,
-    MARKOV_ALPHA, MARKOV_BETA, DEVICE,
+    DEVICE, markov_params,
 )
 
 
@@ -65,75 +69,51 @@ def get_true_features(toy_model: ToyModel) -> torch.Tensor:
     return toy_model.embed.weight.detach()
 
 
-# ─── Data generators ────────────────────────────────────────────────────────────
+# ─── Unified sequence generator ─────────────────────────────────────────────────
 
-def generate_iid_sequences(
+def generate_sequences(
     num_seqs: int,
     T: int,
-    p: float = FEAT_PROB,
+    rho: float,
+    p_stat: float = FEAT_PROB,
     mu: float = FEAT_MEAN,
     sigma: float = FEAT_STD,
     num_feats: int = NUM_FEATS,
     device: torch.device = DEVICE,
 ) -> torch.Tensor:
-    """(num_seqs, T, num_feats) — all i.i.d."""
-    s = torch.bernoulli(torch.full((num_seqs, T, num_feats), p, device=device))
-    m = (torch.randn(num_seqs, T, num_feats, device=device) * sigma + mu).abs()
-    return s * m
+    """
+    Generate (num_seqs, T, num_feats) feature sequences.
 
+    rho = 0:   IID Bernoulli support (no temporal structure).
+    rho > 0:   2-state Markov chain support with lag-1 autocorrelation = rho.
 
-def generate_markov_sequences(
-    num_seqs: int,
-    T: int,
-    alpha: float = MARKOV_ALPHA,
-    beta: float = MARKOV_BETA,
-    mu: float = FEAT_MEAN,
-    sigma: float = FEAT_STD,
-    num_feats: int = NUM_FEATS,
-    device: torch.device = DEVICE,
-) -> torch.Tensor:
-    """Scheme C: 2-state Markov chain support. (num_seqs, T, num_feats)"""
-    p_stat = beta / (1 - alpha + beta)
+    The stationary firing probability is always p_stat regardless of rho.
+    """
+    alpha, beta = markov_params(rho, p_stat)
+
+    # First timestep: draw from stationary distribution
     s = torch.bernoulli(torch.full((num_seqs, num_feats), p_stat, device=device))
     support_list = [s.clone()]
 
     for _ in range(T - 1):
-        p_next = torch.where(
-            s == 1,
-            torch.full_like(s, alpha),
-            torch.full_like(s, beta),
-        )
-        s = torch.bernoulli(p_next)
+        if rho == 0.0:
+            # Pure IID — no dependence on previous state
+            s = torch.bernoulli(torch.full_like(s, p_stat))
+        else:
+            p_next = torch.where(
+                s == 1,
+                torch.full_like(s, alpha),
+                torch.full_like(s, beta),
+            )
+            s = torch.bernoulli(p_next)
         support_list.append(s.clone())
 
-    support = torch.stack(support_list, dim=1)
+    support = torch.stack(support_list, dim=1)  # (N, T, F)
     magnitudes = (torch.randn(num_seqs, T, num_feats, device=device) * sigma + mu).abs()
     return support * magnitudes
 
 
-# Registry for easy lookup
-DATASET_GENERATORS: dict[str, Callable] = {
-    "iid": generate_iid_sequences,
-    "markov": generate_markov_sequences,
-}
-
-
-def get_seq_gen_fn(dataset_name: str) -> Callable:
-    """Return the sequence generator for a named dataset."""
-    if dataset_name not in DATASET_GENERATORS:
-        raise ValueError(f"Unknown dataset: {dataset_name}. Choose from {list(DATASET_GENERATORS)}")
-    return DATASET_GENERATORS[dataset_name]
-
-
 # ─── Cached data source ─────────────────────────────────────────────────────────
-#
-# Pre-generates NUM_CHAINS long chains of length CHAIN_LENGTH, maps them
-# through the toy model ONCE, and caches the activations on GPU.
-#
-# Both SAE and TXCDR iterators sample sliding windows from this same cache,
-# so every T value sees the exact same underlying process.  The markov chain
-# has hundreds of steps to compound its structure before any window is drawn.
-#
 
 from config import NUM_CHAINS, CHAIN_LENGTH, CACHE_REFRESH_INTERVAL
 
@@ -141,35 +121,36 @@ from config import NUM_CHAINS, CHAIN_LENGTH, CACHE_REFRESH_INTERVAL
 class CachedDataSource:
     """
     Pre-generate long feature chains → toy model activations.
+    Parametrized by rho (correlation level).
+
     Stored as:
-        feat_chains: (NUM_CHAINS, CHAIN_LENGTH, NUM_FEATS)  — raw features
-        act_chains:  (NUM_CHAINS, CHAIN_LENGTH, HIDDEN_DIM) — activations
+        feat_chains: (NUM_CHAINS, CHAIN_LENGTH, NUM_FEATS)
+        act_chains:  (NUM_CHAINS, CHAIN_LENGTH, HIDDEN_DIM)
     """
 
     def __init__(
         self,
-        dataset: str,
+        rho: float,
         toy_model: ToyModel,
         num_chains: int = NUM_CHAINS,
         chain_length: int = CHAIN_LENGTH,
         device: torch.device = DEVICE,
     ):
-        self.dataset = dataset
+        self.rho = rho
         self.toy_model = toy_model
         self.num_chains = num_chains
         self.chain_length = chain_length
         self.device = device
-        self.seq_gen_fn = get_seq_gen_fn(dataset)
 
         self._generate()
 
     @torch.no_grad()
     def _generate(self):
         """Generate long chains and cache activations."""
-        # Generate feature sequences: (num_chains, chain_length, num_feats)
-        self.feat_chains = self.seq_gen_fn(self.num_chains, self.chain_length)
+        self.feat_chains = generate_sequences(
+            self.num_chains, self.chain_length, self.rho,
+        )
 
-        # Map through toy model in chunks to avoid OOM
         chunk_size = 32
         act_chunks = []
         for i in range(0, self.num_chains, chunk_size):
@@ -178,57 +159,23 @@ class CachedDataSource:
         self.act_chains = torch.cat(act_chunks, dim=0)  # (N, L, d)
 
     def refresh(self):
-        """Regenerate all chains (call periodically to avoid overfitting)."""
+        """Regenerate all chains."""
         self._generate()
 
-    def sample_single_tokens(self, batch_size: int) -> torch.Tensor:
-        """
-        Sample random single positions → (B, d) for the SAE.
-        Uniform over all (chain, position) pairs.
-        """
-        chain_idx = torch.randint(0, self.num_chains, (batch_size,))
-        pos_idx = torch.randint(0, self.chain_length, (batch_size,))
-        return self.act_chains[chain_idx, pos_idx]  # (B, d)
-
     def sample_windows(self, batch_size: int, T: int) -> torch.Tensor:
-        """
-        Sample random sliding windows → (B, T, d) for the crosscoder.
-        Each window is a contiguous slice from one chain.
-        """
+        """Sample random sliding windows → (B, T, d)."""
         max_start = self.chain_length - T
         chain_idx = torch.randint(0, self.num_chains, (batch_size,))
         start_idx = torch.randint(0, max_start + 1, (batch_size,))
 
-        # Gather windows: index [chain_idx[b], start_idx[b]:start_idx[b]+T, :]
-        # Use advanced indexing with an offset matrix
         offsets = torch.arange(T, device=self.device).unsqueeze(0)  # (1, T)
         pos_idx = start_idx.to(self.device).unsqueeze(1) + offsets   # (B, T)
         chain_idx_dev = chain_idx.to(self.device)
-
-        # Expand chain_idx to (B, T)
         chain_exp = chain_idx_dev.unsqueeze(1).expand(-1, T)
         return self.act_chains[chain_exp, pos_idx]  # (B, T, d)
 
 
-# ─── Iterators backed by cache ──────────────────────────────────────────────────
-
-class CachedSingleTokenIterator:
-    """Yields (B, d) single-token batches from a CachedDataSource."""
-
-    def __init__(self, cache: CachedDataSource, batch_size: int):
-        self.cache = cache
-        self.batch_size = batch_size
-        self.step = 0
-
-    def __iter__(self):
-        return self
-
-    def __next__(self) -> torch.Tensor:
-        self.step += 1
-        if CACHE_REFRESH_INTERVAL > 0 and self.step % CACHE_REFRESH_INTERVAL == 0:
-            self.cache.refresh()
-        return self.cache.sample_single_tokens(self.batch_size)
-
+# ─── Iterator backed by cache ───────────────────────────────────────────────────
 
 class CachedWindowIterator:
     """Yields (B, T, d) window batches from a CachedDataSource."""

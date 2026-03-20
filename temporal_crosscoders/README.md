@@ -20,7 +20,9 @@ The temporal crosscoder sees a window of T positions simultaneously, pooling evi
 - The advantage heatmap shows no systematic k-dependent pattern.
 
 **NUANCED outcomes:**
-- If the conjecture holds for markov but **not** for iid, that confirms the mechanism is temporal correlation, not just architectural capacity.
+- If the conjecture holds for markov but **not** for iid, that confirms the mechanism is temporal correlation, not
+
+ just architectural capacity.
 - If TXCDR optimal k grows with T, that's even stronger evidence: longer windows provide more temporal context, enabling more latents to be productively activated.
 
 ## Project Structure

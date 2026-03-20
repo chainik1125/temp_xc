@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 """
-viz.py — Post-sweep visualization and statistical analysis.
+viz.py — Post-sweep visualization for v8 (stacked SAE baseline).
 
-Reads logs/ directory and produces:
-  1. AUC heatmap per dataset:  TXCDR AUC(k,T) - best_SAE_AUC(dataset)
-  2. Convergence curves:       AUC over training steps for each (dataset, k, T)
-  3. Optimal-k analysis:       optimal_k(TXCDR) vs optimal_k(SAE) — tests the conjecture
-  4. Summary table:            LaTeX-ready comparison table
-  5. Statistical tests:        paired differences with confidence intervals
+Produces:
+  1. 3-way trade-off scatter: L0 vs Reconstruction Loss, colored by AUC
+  2. TXCDR advantage heatmap: AUC(TXCDR) - AUC(StackedSAE) per (k, T) at each rho
+  3. Advantage vs correlation: how TXCDR advantage grows with rho
+  4. Convergence curves: AUC over training steps
+  5. IID vs Markov comparison panel
+  6. Summary table
 
 Usage:
     python viz.py                     # read from logs/
@@ -18,15 +19,14 @@ import argparse
 import glob
 import json
 import os
+import re
 import sys
 
 import numpy as np
 
-# Use Agg backend for headless servers (tmux / SSH)
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-import matplotlib.ticker as ticker
 from matplotlib.colors import TwoSlopeNorm
 
 
@@ -35,91 +35,120 @@ def load_all_logs(log_dir: str) -> dict:
     Load all JSON logs into a structured dict.
 
     Returns:
-        {
-            (model, dataset, k, T): [{"step": ..., "auc": ..., "loss": ...}, ...]
-        }
+        {(model, rho, k, T): [{"step": ..., "auc": ..., "loss": ..., "window_l0": ...}, ...]}
     """
     results = {}
     for path in sorted(glob.glob(os.path.join(log_dir, "*.json"))):
         basename = os.path.basename(path).replace(".json", "")
         if basename == "sweep_summary":
             continue
-        # Naming: {model}__{dataset}__k{k}__T{T}
+        # Naming: {model}__{rho_label}__k{k}__T{T}
         parts = basename.split("__")
         if len(parts) != 4:
             continue
         model = parts[0]
-        dataset = parts[1]
+        # Parse rho from e.g. "rho0p9"
+        rho_match = re.match(r"rho(\d+)p(\d+)", parts[1])
+        if not rho_match:
+            continue
+        rho = float(f"{rho_match.group(1)}.{rho_match.group(2)}")
         k = int(parts[2].replace("k", ""))
         T = int(parts[3].replace("T", ""))
 
         with open(path) as f:
             history = json.load(f)
-        results[(model, dataset, k, T)] = history
+        results[(model, rho, k, T)] = history
     return results
 
 
-def load_sweep_summary(log_dir: str) -> list[dict]:
-    path = os.path.join(log_dir, "sweep_summary.json")
-    if not os.path.exists(path):
-        return []
-    with open(path) as f:
-        return json.load(f)
-
-
-def get_final_auc(history: list[dict]) -> float:
-    """Last AUC value from a training history."""
+def get_final(history: list[dict], key: str, default=0.0):
+    """Last value of a metric from a training history."""
     if not history:
-        return 0.0
-    return history[-1].get("auc", 0.0)
+        return default
+    return history[-1].get(key, default)
 
 
-# ─── 1. Main heatmap: TXCDR advantage over best SAE ─────────────────────────────
+# ─── 1. 3-way trade-off scatter ─────────────────────────────────────────────────
 
-def plot_txcdr_advantage_heatmap(results: dict, viz_dir: str):
+def plot_tradeoff_scatter(results: dict, viz_dir: str):
     """
-    For each dataset, create a k×T heatmap where each cell =
-    AUC_TXCDR(k, T) - max_k'(AUC_SAE(dataset, k')).
-
-    This directly addresses the conjecture: if TXCDR advantage grows with k
-    while SAE is flat/declining, optimal_k(TXCDR) >> optimal_k(SAE).
+    Scatter: Window L0 (x) vs Reconstruction Loss (y), color = AUC.
+    One panel per rho, markers distinguish model type.
     """
-    datasets = sorted(set(ds for _, ds, _, _ in results.keys()))
+    rhos = sorted(set(r for _, r, _, _ in results.keys()))
+    n_rho = len(rhos)
+    fig, axes = plt.subplots(1, n_rho, figsize=(5 * n_rho, 5), squeeze=False)
+
+    for col, rho in enumerate(rhos):
+        ax = axes[0, col]
+        for model_type, marker, label in [
+            ("stacked_sae", "s", "Stacked SAE"),
+            ("txcdr", "^", "TXCDR"),
+        ]:
+            l0s, losses, aucs, ks_plot = [], [], [], []
+            for (m, r, k, T), hist in results.items():
+                if m != model_type or r != rho:
+                    continue
+                l0s.append(get_final(hist, "window_l0"))
+                losses.append(get_final(hist, "loss"))
+                aucs.append(get_final(hist, "auc"))
+                ks_plot.append(k)
+
+            if not l0s:
+                continue
+            sc = ax.scatter(l0s, losses, c=aucs, marker=marker, s=80,
+                           cmap="viridis", vmin=0, vmax=1, edgecolors="k",
+                           linewidths=0.5, label=label, zorder=5)
+            for x, y, k_val in zip(l0s, losses, ks_plot):
+                ax.annotate(f"k={k_val}", (x, y), fontsize=6,
+                           textcoords="offset points", xytext=(4, 4))
+
+        ax.set_xlabel("Window L0 (total active latents)")
+        ax.set_ylabel("Reconstruction Loss")
+        rho_label = "IID" if rho == 0.0 else f"Markov ρ={rho}"
+        ax.set_title(f"{rho_label}")
+        ax.legend(fontsize=8)
+        ax.grid(True, alpha=0.3)
+
+    fig.suptitle("3-Way Trade-off: Sparsity vs Loss (color = AUC)", fontsize=13, y=1.02)
+    plt.colorbar(sc, ax=axes.ravel().tolist(), label="AUC", shrink=0.8)
+    plt.tight_layout()
+    path = os.path.join(viz_dir, "tradeoff_scatter.png")
+    fig.savefig(path, dpi=150, bbox_inches="tight")
+    plt.close(fig)
+    print(f"  Saved: {path}")
+
+
+# ─── 2. Advantage heatmap per rho ───────────────────────────────────────────────
+
+def plot_advantage_heatmaps(results: dict, viz_dir: str):
+    """
+    For each rho: k×T heatmap of AUC(TXCDR) - AUC(StackedSAE).
+    """
+    rhos = sorted(set(r for _, r, _, _ in results.keys()))
     ks = sorted(set(k for _, _, k, _ in results.keys()))
     Ts = sorted(set(T for _, _, _, T in results.keys()))
 
-    for dataset in datasets:
-        # Find best SAE AUC across all k for this dataset
-        sae_aucs = {}
-        for k in ks:
-            for T in Ts:
-                key = ("sae", dataset, k, T)
-                if key in results:
-                    sae_aucs[k] = get_final_auc(results[key])
-                    break  # SAE is T-independent, just need one
+    n_rho = len(rhos)
+    fig, axes = plt.subplots(1, n_rho, figsize=(5 * n_rho, 4), squeeze=False)
 
-        if not sae_aucs:
-            continue
-        best_sae_auc = max(sae_aucs.values())
-        best_sae_k = max(sae_aucs, key=sae_aucs.get)
-
-        # Build heatmap matrix
+    for col, rho in enumerate(rhos):
+        ax = axes[0, col]
         mat = np.full((len(ks), len(Ts)), np.nan)
         for i, k in enumerate(ks):
             for j, T in enumerate(Ts):
-                key = ("txcdr", dataset, k, T)
-                if key in results:
-                    txcdr_auc = get_final_auc(results[key])
-                    mat[i, j] = txcdr_auc - best_sae_auc
+                txcdr_key = ("txcdr", rho, k, T)
+                sae_key = ("stacked_sae", rho, k, T)
+                if txcdr_key in results and sae_key in results:
+                    diff = get_final(results[txcdr_key], "auc") - get_final(results[sae_key], "auc")
+                    mat[i, j] = diff
 
-        fig, ax = plt.subplots(figsize=(8, 5))
-
-        # Diverging colormap centered at 0
-        vabs = max(abs(np.nanmin(mat)), abs(np.nanmax(mat)), 0.01)
+        vabs = max(abs(np.nanmin(mat)) if not np.all(np.isnan(mat)) else 0.01,
+                   abs(np.nanmax(mat)) if not np.all(np.isnan(mat)) else 0.01,
+                   0.01)
         norm = TwoSlopeNorm(vmin=-vabs, vcenter=0, vmax=vabs)
         im = ax.imshow(mat, cmap="RdBu_r", norm=norm, aspect="auto", origin="lower")
 
-        # Annotate cells
         for i in range(len(ks)):
             for j in range(len(Ts)):
                 val = mat[i, j]
@@ -135,51 +164,140 @@ def plot_txcdr_advantage_heatmap(results: dict, viz_dir: str):
         ax.set_xticklabels([str(t) for t in Ts])
         ax.set_yticks(range(len(ks)))
         ax.set_yticklabels([str(k) for k in ks])
-        ax.set_xlabel("T (window length)", fontsize=12)
-        ax.set_ylabel("k (active latents per position)", fontsize=12)
-        ax.set_title(
-            f"TXCDR advantage over best SAE — {dataset}\n"
-            f"Cell = AUC_TXCDR(k,T) − AUC_SAE*(={best_sae_auc:.3f} at k={best_sae_k})",
-            fontsize=11,
-        )
-        plt.colorbar(im, ax=ax, label="ΔAUC (positive = TXCDR wins)")
+        ax.set_xlabel("T")
+        ax.set_ylabel("k")
+        rho_label = "IID" if rho == 0.0 else f"Markov ρ={rho}"
+        ax.set_title(f"ΔAUC — {rho_label}")
+
+    plt.colorbar(im, ax=axes.ravel().tolist(), label="ΔAUC (TXCDR − Stacked SAE)", shrink=0.8)
+    fig.suptitle("TXCDR Advantage over Stacked SAE (positive = TXCDR wins)", fontsize=12, y=1.02)
+    plt.tight_layout()
+    path = os.path.join(viz_dir, "advantage_heatmaps.png")
+    fig.savefig(path, dpi=150, bbox_inches="tight")
+    plt.close(fig)
+    print(f"  Saved: {path}")
+
+
+# ─── 3. Advantage vs correlation level ──────────────────────────────────────────
+
+def plot_advantage_vs_rho(results: dict, viz_dir: str):
+    """
+    Line plot: mean TXCDR advantage (AUC) vs rho, one line per (k, T).
+    Shows how temporal correlation benefits the crosscoder.
+    """
+    rhos = sorted(set(r for _, r, _, _ in results.keys()))
+    ks = sorted(set(k for _, _, k, _ in results.keys()))
+    Ts = sorted(set(T for _, _, _, T in results.keys()))
+
+    fig, ax = plt.subplots(figsize=(8, 5))
+
+    colors = plt.cm.tab10(np.linspace(0, 1, len(ks) * len(Ts)))
+    idx = 0
+    for T in Ts:
+        for k in ks:
+            advantages = []
+            valid_rhos = []
+            for rho in rhos:
+                txcdr_key = ("txcdr", rho, k, T)
+                sae_key = ("stacked_sae", rho, k, T)
+                if txcdr_key in results and sae_key in results:
+                    diff = get_final(results[txcdr_key], "auc") - get_final(results[sae_key], "auc")
+                    advantages.append(diff)
+                    valid_rhos.append(rho)
+            if valid_rhos:
+                ax.plot(valid_rhos, advantages, "o-", color=colors[idx],
+                       label=f"k={k}, T={T}", lw=1.5, ms=5)
+            idx += 1
+
+    ax.axhline(0, color="gray", ls="--", lw=1)
+    ax.set_xlabel("ρ (lag-1 autocorrelation)", fontsize=12)
+    ax.set_ylabel("ΔAUC (TXCDR − Stacked SAE)", fontsize=12)
+    ax.set_title("TXCDR advantage vs temporal correlation", fontsize=13)
+    ax.legend(fontsize=7, ncol=2, loc="upper left")
+    ax.grid(True, alpha=0.3)
+    plt.tight_layout()
+    path = os.path.join(viz_dir, "advantage_vs_rho.png")
+    fig.savefig(path, dpi=150, bbox_inches="tight")
+    plt.close(fig)
+    print(f"  Saved: {path}")
+
+
+# ─── 4. Convergence curves ──────────────────────────────────────────────────────
+
+def plot_convergence_curves(results: dict, viz_dir: str):
+    """AUC convergence for each (rho, k) with Stacked SAE vs TXCDR(T) overlaid."""
+    rhos = sorted(set(r for _, r, _, _ in results.keys()))
+    ks = sorted(set(k for _, _, k, _ in results.keys()))
+    Ts = sorted(set(T for _, _, _, T in results.keys()))
+
+    colors_model = {"stacked_sae": "steelblue", "txcdr": "firebrick"}
+
+    for rho in rhos:
+        rho_label = "iid" if rho == 0.0 else f"rho{rho}"
+        fig, axes = plt.subplots(1, len(ks), figsize=(5 * len(ks), 4), squeeze=False)
+        for col, k in enumerate(ks):
+            ax = axes[0, col]
+            for T in Ts:
+                for model_type in ["stacked_sae", "txcdr"]:
+                    key = (model_type, rho, k, T)
+                    if key not in results:
+                        continue
+                    hist = results[key]
+                    steps = [h["step"] for h in hist]
+                    aucs = [h["auc"] for h in hist]
+                    ls = "--" if model_type == "stacked_sae" else "-"
+                    label_name = "StackedSAE" if model_type == "stacked_sae" else "TXCDR"
+                    ax.plot(steps, aucs, color=colors_model[model_type],
+                           lw=1.5, ls=ls, alpha=0.5 + 0.5 * (T / max(Ts)),
+                           label=f"{label_name} T={T}")
+
+            ax.set_title(f"k={k}")
+            ax.set_xlabel("Step")
+            if col == 0:
+                ax.set_ylabel("AUC")
+            ax.set_ylim(0, 1.05)
+            ax.legend(fontsize=6, loc="lower right")
+            ax.grid(True, alpha=0.3)
+
+        title_label = "IID (ρ=0)" if rho == 0.0 else f"Markov (ρ={rho})"
+        fig.suptitle(f"Convergence — {title_label}", fontsize=12)
         plt.tight_layout()
-        path = os.path.join(viz_dir, f"heatmap_advantage_{dataset}.png")
+        path = os.path.join(viz_dir, f"convergence_{rho_label}.png")
         fig.savefig(path, dpi=150, bbox_inches="tight")
         plt.close(fig)
         print(f"  Saved: {path}")
 
 
-# ─── 2. Raw AUC heatmaps (SAE and TXCDR side by side) ───────────────────────────
+# ─── 5. IID vs Markov comparison panel ──────────────────────────────────────────
 
-def plot_raw_auc_heatmaps(results: dict, viz_dir: str):
-    """Side-by-side AUC heatmaps for SAE and TXCDR per dataset."""
-    datasets = sorted(set(ds for _, ds, _, _ in results.keys()))
+def plot_iid_vs_markov(results: dict, viz_dir: str):
+    """
+    Side-by-side comparison: IID (rho=0) vs highest rho.
+    Shows raw AUC heatmaps for both models.
+    """
+    rhos = sorted(set(r for _, r, _, _ in results.keys()))
     ks = sorted(set(k for _, _, k, _ in results.keys()))
     Ts = sorted(set(T for _, _, _, T in results.keys()))
 
-    for dataset in datasets:
-        fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+    if 0.0 not in rhos or len(rhos) < 2:
+        return
 
-        for ax, model_type, title in zip(
-            axes, ["sae", "txcdr"], ["SAE (TopK)", "Temporal Crosscoder"]
-        ):
+    rho_iid = 0.0
+    rho_markov = max(r for r in rhos if r > 0)
+
+    fig, axes = plt.subplots(2, 2, figsize=(12, 10))
+
+    for row, (rho, rho_name) in enumerate([(rho_iid, "IID (ρ=0)"), (rho_markov, f"Markov (ρ={rho_markov})")]):
+        for col_idx, (model_type, model_name) in enumerate([("stacked_sae", "Stacked SAE"), ("txcdr", "TXCDR")]):
+            ax = axes[row, col_idx]
             mat = np.full((len(ks), len(Ts)), np.nan)
             for i, k in enumerate(ks):
                 for j, T in enumerate(Ts):
-                    key = (model_type, dataset, k, T)
+                    key = (model_type, rho, k, T)
                     if key in results:
-                        mat[i, j] = get_final_auc(results[key])
-                    elif model_type == "sae":
-                        # SAE is T-independent; fill from any T
-                        for T2 in Ts:
-                            key2 = ("sae", dataset, k, T2)
-                            if key2 in results:
-                                mat[i, j] = get_final_auc(results[key2])
-                                break
+                        mat[i, j] = get_final(results[key], "auc")
 
-            im = ax.imshow(mat, cmap="viridis", aspect="auto", origin="lower",
-                           vmin=0, vmax=1)
+            im = ax.imshow(mat, cmap="viridis", aspect="auto", origin="lower", vmin=0, vmax=1)
             for i in range(len(ks)):
                 for j in range(len(Ts)):
                     val = mat[i, j]
@@ -194,262 +312,66 @@ def plot_raw_auc_heatmaps(results: dict, viz_dir: str):
             ax.set_yticklabels([str(k) for k in ks])
             ax.set_xlabel("T")
             ax.set_ylabel("k")
-            ax.set_title(f"{title} — {dataset}")
+            ax.set_title(f"{model_name} — {rho_name}")
 
-        plt.colorbar(im, ax=axes, label="AUC", shrink=0.8)
-        plt.tight_layout()
-        path = os.path.join(viz_dir, f"heatmap_raw_auc_{dataset}.png")
-        fig.savefig(path, dpi=150, bbox_inches="tight")
-        plt.close(fig)
-        print(f"  Saved: {path}")
-
-
-# ─── 3. Optimal-k analysis — the conjecture test ────────────────────────────────
-
-def plot_optimal_k_analysis(results: dict, viz_dir: str):
-    """
-    Conjecture: optimal_k(TXCDR) >> optimal_k(SAE).
-
-    For each dataset and T, find the k that maximizes AUC for each model.
-    Plot optimal_k vs T for both models.
-    """
-    datasets = sorted(set(ds for _, ds, _, _ in results.keys()))
-    ks = sorted(set(k for _, _, k, _ in results.keys()))
-    Ts = sorted(set(T for _, _, _, T in results.keys()))
-
-    fig, axes = plt.subplots(1, len(datasets), figsize=(6 * len(datasets), 5),
-                             squeeze=False)
-
-    for col, dataset in enumerate(datasets):
-        ax = axes[0, col]
-
-        # SAE optimal k (T-independent, same for all T)
-        sae_auc_by_k = {}
-        for k in ks:
-            for T in Ts:
-                key = ("sae", dataset, k, T)
-                if key in results:
-                    sae_auc_by_k[k] = get_final_auc(results[key])
-                    break
-        sae_optimal_k = max(sae_auc_by_k, key=sae_auc_by_k.get) if sae_auc_by_k else None
-        sae_optimal_auc = sae_auc_by_k.get(sae_optimal_k, 0)
-
-        # TXCDR optimal k per T
-        txcdr_optimal_k_per_T = {}
-        txcdr_optimal_auc_per_T = {}
-        for T in Ts:
-            best_k, best_auc = None, -1
-            for k in ks:
-                key = ("txcdr", dataset, k, T)
-                if key in results:
-                    auc = get_final_auc(results[key])
-                    if auc > best_auc:
-                        best_auc = auc
-                        best_k = k
-            if best_k is not None:
-                txcdr_optimal_k_per_T[T] = best_k
-                txcdr_optimal_auc_per_T[T] = best_auc
-
-        # Plot
-        if sae_optimal_k is not None:
-            ax.axhline(sae_optimal_k, color="steelblue", ls="--", lw=2,
-                       label=f"SAE optimal k={sae_optimal_k} (AUC={sae_optimal_auc:.3f})")
-
-        if txcdr_optimal_k_per_T:
-            t_vals = sorted(txcdr_optimal_k_per_T.keys())
-            k_vals = [txcdr_optimal_k_per_T[t] for t in t_vals]
-            auc_vals = [txcdr_optimal_auc_per_T[t] for t in t_vals]
-            ax.plot(t_vals, k_vals, "o-", color="firebrick", lw=2, ms=8,
-                    label="TXCDR optimal k")
-            # Annotate with AUC
-            for t, kv, av in zip(t_vals, k_vals, auc_vals):
-                ax.annotate(f"AUC={av:.3f}", (t, kv), textcoords="offset points",
-                            xytext=(5, 10), fontsize=7, color="firebrick")
-
-        ax.set_xlabel("T (window length)")
-        ax.set_ylabel("Optimal k")
-        ax.set_title(f"{dataset}")
-        ax.set_xticks(Ts)
-        ax.set_yticks(ks)
-        ax.legend(fontsize=8)
-        ax.grid(True, alpha=0.3)
-
-    fig.suptitle(
-        "Conjecture test: optimal_k(TXCDR) vs optimal_k(SAE)\n"
-        "If TXCDR points consistently above the SAE line → conjecture supported",
-        fontsize=11, y=1.02,
-    )
+    plt.colorbar(im, ax=axes.ravel().tolist(), label="AUC", shrink=0.6)
+    fig.suptitle("IID vs Markov: Feature Recovery (AUC)", fontsize=13, y=1.01)
     plt.tight_layout()
-    path = os.path.join(viz_dir, "optimal_k_analysis.png")
+    path = os.path.join(viz_dir, "iid_vs_markov.png")
     fig.savefig(path, dpi=150, bbox_inches="tight")
     plt.close(fig)
     print(f"  Saved: {path}")
 
 
-# ─── 4. Convergence curves ──────────────────────────────────────────────────────
-
-def plot_convergence_curves(results: dict, viz_dir: str):
-    """AUC convergence for each (dataset, k) with SAE vs TXCDR(T) overlaid."""
-    datasets = sorted(set(ds for _, ds, _, _ in results.keys()))
-    ks = sorted(set(k for _, _, k, _ in results.keys()))
-
-    colors_T = {1: "#1f77b4", 2: "#ff7f0e", 4: "#2ca02c", 8: "#d62728", 10: "#9467bd"}
-
-    for dataset in datasets:
-        fig, axes = plt.subplots(1, len(ks), figsize=(5 * len(ks), 4), squeeze=False)
-        for col, k in enumerate(ks):
-            ax = axes[0, col]
-
-            # SAE baseline
-            for T_cand in sorted(set(T for _, _, _, T in results.keys())):
-                key = ("sae", dataset, k, T_cand)
-                if key in results:
-                    hist = results[key]
-                    steps = [h["step"] for h in hist]
-                    aucs = [h["auc"] for h in hist]
-                    ax.plot(steps, aucs, color="gray", lw=2, ls="--",
-                            label="SAE", zorder=10)
-                    break
-
-            # TXCDR for each T
-            for T in sorted(set(T for _, _, _, T in results.keys())):
-                key = ("txcdr", dataset, k, T)
-                if key in results:
-                    hist = results[key]
-                    steps = [h["step"] for h in hist]
-                    aucs = [h["auc"] for h in hist]
-                    ax.plot(steps, aucs, color=colors_T.get(T, "black"),
-                            lw=1.5, label=f"TXCDR T={T}")
-
-            ax.set_title(f"k={k}")
-            ax.set_xlabel("Step")
-            if col == 0:
-                ax.set_ylabel("AUC")
-            ax.set_ylim(0, 1.05)
-            ax.legend(fontsize=7, loc="lower right")
-            ax.grid(True, alpha=0.3)
-
-        fig.suptitle(f"Convergence — {dataset}", fontsize=12)
-        plt.tight_layout()
-        path = os.path.join(viz_dir, f"convergence_{dataset}.png")
-        fig.savefig(path, dpi=150, bbox_inches="tight")
-        plt.close(fig)
-        print(f"  Saved: {path}")
-
-
-# ─── 5. AUC vs k curves (SAE vs TXCDR at each T) ───────────────────────────────
-
-def plot_auc_vs_k(results: dict, viz_dir: str):
-    """For each dataset: AUC vs k, one line per (model, T)."""
-    datasets = sorted(set(ds for _, ds, _, _ in results.keys()))
-    ks = sorted(set(k for _, _, k, _ in results.keys()))
-    Ts = sorted(set(T for _, _, _, T in results.keys()))
-
-    for dataset in datasets:
-        fig, ax = plt.subplots(figsize=(8, 5))
-
-        # SAE
-        sae_aucs = []
-        for k in ks:
-            found = False
-            for T in Ts:
-                key = ("sae", dataset, k, T)
-                if key in results:
-                    sae_aucs.append(get_final_auc(results[key]))
-                    found = True
-                    break
-            if not found:
-                sae_aucs.append(np.nan)
-        ax.plot(ks, sae_aucs, "s--", color="gray", lw=2, ms=8, label="SAE", zorder=10)
-
-        # TXCDR per T
-        colors = plt.cm.Reds(np.linspace(0.3, 0.9, len(Ts)))
-        for T, c in zip(Ts, colors):
-            aucs = []
-            for k in ks:
-                key = ("txcdr", dataset, k, T)
-                if key in results:
-                    aucs.append(get_final_auc(results[key]))
-                else:
-                    aucs.append(np.nan)
-            ax.plot(ks, aucs, "o-", color=c, lw=1.5, ms=6, label=f"TXCDR T={T}")
-
-        ax.set_xlabel("k (active latents per position)", fontsize=12)
-        ax.set_ylabel("Final AUC", fontsize=12)
-        ax.set_title(f"AUC vs k — {dataset}", fontsize=13)
-        ax.set_xticks(ks)
-        ax.legend(fontsize=9)
-        ax.grid(True, alpha=0.3)
-        ax.set_ylim(0, 1.05)
-        plt.tight_layout()
-        path = os.path.join(viz_dir, f"auc_vs_k_{dataset}.png")
-        fig.savefig(path, dpi=150, bbox_inches="tight")
-        plt.close(fig)
-        print(f"  Saved: {path}")
-
-
-# ─── 6. Summary statistics table ─────────────────────────────────────────────────
+# ─── 6. Summary table ───────────────────────────────────────────────────────────
 
 def print_summary_table(results: dict, viz_dir: str):
     """Print and save a text summary table."""
-    datasets = sorted(set(ds for _, ds, _, _ in results.keys()))
+    rhos = sorted(set(r for _, r, _, _ in results.keys()))
     ks = sorted(set(k for _, _, k, _ in results.keys()))
     Ts = sorted(set(T for _, _, _, T in results.keys()))
 
     lines = []
-    header = f"{'Dataset':<10} {'Model':<8} {'k':>3} {'T':>3} {'AUC':>8} {'Loss':>8} {'R@0.9':>6}"
+    header = f"{'Rho':>5} {'Model':<12} {'k':>3} {'T':>3} {'L0':>5} {'AUC':>8} {'Loss':>8} {'R@0.9':>6}"
     lines.append("=" * len(header))
     lines.append(header)
     lines.append("-" * len(header))
 
-    for dataset in datasets:
+    for rho in rhos:
         for k in ks:
             for T in Ts:
-                for model in ["sae", "txcdr"]:
-                    key = (model, dataset, k, T)
+                for model in ["stacked_sae", "txcdr"]:
+                    key = (model, rho, k, T)
                     if key not in results:
                         continue
                     h = results[key][-1] if results[key] else {}
                     lines.append(
-                        f"{dataset:<10} {model:<8} {k:>3} {T:>3} "
+                        f"{rho:>5.1f} {model:<12} {k:>3} {T:>3} "
+                        f"{h.get('window_l0', 0):>5.0f} "
                         f"{h.get('auc', 0):>8.4f} {h.get('loss', 0):>8.4f} "
                         f"{h.get('recovery_90', 0):>6.2f}"
                     )
 
     lines.append("=" * len(header))
 
-    # Conjecture verdict
-    lines.append("\n── CONJECTURE: optimal_k(TXCDR) >> optimal_k(SAE) ──")
-    for dataset in datasets:
-        sae_auc_by_k = {}
+    # IID vs Markov summary
+    lines.append("\n── TXCDR ADVANTAGE SUMMARY ──")
+    for rho in rhos:
+        advantages = []
         for k in ks:
             for T in Ts:
-                key = ("sae", dataset, k, T)
-                if key in results:
-                    sae_auc_by_k[k] = get_final_auc(results[key])
-                    break
-
-        txcdr_best_overall = {}
-        for k in ks:
-            for T in Ts:
-                key = ("txcdr", dataset, k, T)
-                if key in results:
-                    auc = get_final_auc(results[key])
-                    if k not in txcdr_best_overall or auc > txcdr_best_overall[k]:
-                        txcdr_best_overall[k] = auc
-
-        if sae_auc_by_k:
-            sae_opt = max(sae_auc_by_k, key=sae_auc_by_k.get)
-            lines.append(f"  [{dataset}] SAE optimal k = {sae_opt} (AUC={sae_auc_by_k[sae_opt]:.4f})")
-        if txcdr_best_overall:
-            txcdr_opt = max(txcdr_best_overall, key=txcdr_best_overall.get)
-            lines.append(f"  [{dataset}] TXCDR optimal k = {txcdr_opt} (AUC={txcdr_best_overall[txcdr_opt]:.4f})")
-            if sae_auc_by_k:
-                ratio = txcdr_opt / sae_opt if sae_opt > 0 else float("inf")
-                verdict = "SUPPORTED" if txcdr_opt > sae_opt else (
-                    "REFUTED" if txcdr_opt < sae_opt else "INCONCLUSIVE"
-                )
-                lines.append(f"  [{dataset}] Ratio = {ratio:.1f}x → {verdict}")
+                txcdr_key = ("txcdr", rho, k, T)
+                sae_key = ("stacked_sae", rho, k, T)
+                if txcdr_key in results and sae_key in results:
+                    diff = get_final(results[txcdr_key], "auc") - get_final(results[sae_key], "auc")
+                    advantages.append(diff)
+        if advantages:
+            rho_name = "IID" if rho == 0.0 else f"ρ={rho}"
+            mean_adv = np.mean(advantages)
+            max_adv = max(advantages)
+            min_adv = min(advantages)
+            lines.append(f"  [{rho_name}] mean ΔAUC={mean_adv:+.4f}  "
+                         f"range=[{min_adv:+.4f}, {max_adv:+.4f}]")
 
     text = "\n".join(lines)
     print(text)
@@ -463,10 +385,10 @@ def print_summary_table(results: dict, viz_dir: str):
 # ─── Main ────────────────────────────────────────────────────────────────────────
 
 def main():
-    parser = argparse.ArgumentParser(description="Post-sweep visualization")
+    parser = argparse.ArgumentParser(description="Post-sweep visualization (v8)")
     parser.add_argument("--log-dir", type=str, default="logs",
                         help="Directory containing JSON logs")
-    parser.add_argument("--viz-dir", type=str, default="viz_outputs",
+    parser.add_argument("--viz-dir", type=str, default="viz_outputs_v8",
                         help="Output directory for plots")
     args = parser.parse_args()
 
@@ -481,11 +403,11 @@ def main():
     print(f"  Loaded {len(results)} run histories\n")
 
     print("── Generating visualizations ──")
-    plot_txcdr_advantage_heatmap(results, args.viz_dir)
-    plot_raw_auc_heatmaps(results, args.viz_dir)
-    plot_optimal_k_analysis(results, args.viz_dir)
+    plot_tradeoff_scatter(results, args.viz_dir)
+    plot_advantage_heatmaps(results, args.viz_dir)
+    plot_advantage_vs_rho(results, args.viz_dir)
     plot_convergence_curves(results, args.viz_dir)
-    plot_auc_vs_k(results, args.viz_dir)
+    plot_iid_vs_markov(results, args.viz_dir)
     print()
     print_summary_table(results, args.viz_dir)
 
