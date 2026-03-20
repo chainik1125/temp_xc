@@ -125,13 +125,12 @@ def main():
     ax.legend(fontsize=9)
     ax.grid(True, alpha=0.3)
 
-    # NMSE vs AUC scatter
+    # NMSE vs AUC
     ax = axes[2]
-    for label, data, c, m, _ in series:
+    for label, data, c, m, ls in series:
         nmse = [r["nmse"] for r in data]
         auc = [r["auc"] for r in data]
-        ax.scatter(nmse, auc, color=c, marker=m, s=60, label=label, zorder=3)
-        ax.plot(nmse, auc, color=c, alpha=0.3, lw=1)
+        ax.plot(nmse, auc, marker=m, linestyle=ls, color=c, lw=2, ms=7, label=label)
     ax.set_xlabel("NMSE")
     ax.set_ylabel("AUC")
     ax.set_title("NMSE vs AUC")

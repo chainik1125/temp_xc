@@ -56,31 +56,31 @@ Data sanity check: all marginal rates within 0.002 of $\pi = 0.5$, all lag-1 aut
 - **TXCDR** ($T$=2): Temporal crosscoder with shared latent. Same $k$ as SAE. Sees 2 consecutive tokens per window.
 - **TXCDR** ($T$=5): Same architecture with 5-token window.
 
-SAE/TFA/TFA-shuffled trained 30K steps; TXCDR trained 80K steps.[^1]
+SAE/TFA/TFA-shuffled trained 30K steps; TXCDR trained 80K steps.
 
 **NMSE results:**
 
 | $k$ | TopK SAE | TFA | TFA-shuf | TFA-pos | pos-shuf | TXCDR ($T$=2) | TXCDR ($T$=5) |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | 0.388 | 0.091 | 0.115 | 0.175 | 0.198 | 0.426 | 0.443 |
-| 3 | 0.220 | 0.074 | 0.090 | 0.090 | 0.119 | 0.285 | 0.349 |
-| 5 | 0.143 | 0.041 | 0.053 | 0.050 | 0.071 | 0.215 | 0.311 |
-| 8 | 0.068 | 0.014 | 0.018 | **0.007** | 0.023 | 0.136 | 0.266 |
-| 10 | 0.032 | 0.005 | 0.006 | **0.001** | 0.007 | 0.099 | 0.242 |
-| 15 | 9.4e-5 | 0.001 | 0.001 | 3.9e-4 | 0.002 | 0.042 | 0.197 |
-| 20 | 2.1e-6 | 3.7e-6 | 3.7e-6 | 6.6e-7 | 2.2e-4 | 0.009 | 0.170 |
+| 1 | 0.388 | 0.091 | 0.115 | 0.175 | 0.198 | 0.428 | 0.443 |
+| 3 | 0.220 | 0.074 | 0.090 | 0.090 | 0.119 | 0.287 | 0.349 |
+| 5 | 0.143 | 0.041 | 0.053 | 0.050 | 0.071 | 0.219 | 0.311 |
+| 8 | 0.068 | 0.014 | 0.018 | **0.007** | 0.023 | 0.140 | 0.266 |
+| 10 | 0.032 | 0.005 | 0.006 | **0.002** | 0.007 | 0.100 | 0.242 |
+| 15 | 9.4e-5 | 0.001 | 0.001 | 3.9e-4 | 0.002 | 0.043 | 0.197 |
+| 20 | 2.1e-6 | 3.7e-6 | 3.7e-6 | 1.0e-6 | 2.2e-4 | 0.010 | 0.170 |
 
 **Feature recovery AUC:**
 
 | $k$ | TopK SAE | TFA | TFA-shuf | TFA-pos | pos-shuf | TXCDR ($T$=2) | TXCDR ($T$=5) |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | 0.389 | 0.511 | 0.497 | 0.520 | 0.464 | 0.398 | 0.410 |
-| 3 | 0.352 | 0.538 | 0.529 | 0.635 | 0.527 | 0.436 | 0.495 |
-| 5 | 0.374 | 0.634 | 0.611 | 0.755 | 0.591 | 0.583 | 0.625 |
-| 8 | 0.639 | 0.720 | 0.747 | **0.910** | 0.739 | 0.758 | 0.754 |
-| 10 | 0.688 | 0.807 | 0.780 | **0.918** | 0.731 | **0.902** | 0.872 |
-| 15 | 0.863 | 0.714 | 0.713 | 0.777 | 0.592 | **0.944** | 0.924 |
-| 20 | 0.595 | 0.568 | 0.533 | 0.638 | 0.528 | **0.916** | **0.943** |
+| 1 | 0.389 | 0.511 | 0.497 | 0.520 | 0.464 | 0.388 | 0.410 |
+| 3 | 0.352 | 0.538 | 0.529 | 0.635 | 0.527 | 0.503 | 0.495 |
+| 5 | 0.374 | 0.634 | 0.611 | 0.755 | 0.591 | 0.606 | 0.625 |
+| 8 | 0.639 | 0.720 | 0.747 | **0.910** | 0.739 | **0.818** | 0.754 |
+| 10 | 0.688 | 0.807 | 0.780 | **0.918** | 0.731 | **0.919** | 0.872 |
+| 15 | 0.863 | 0.714 | 0.713 | 0.777 | 0.592 | **0.959** | 0.925 |
+| 20 | 0.595 | 0.568 | 0.533 | 0.638 | 0.528 | **0.941** | **0.943** |
 
 ![NMSE and AUC vs k](../../../src/v2_temporal_schemeC/results/auc_and_crosscoder/exp1_topk_auc.png)
 
@@ -88,26 +88,26 @@ Left: NMSE vs $k$. Centre: feature recovery AUC vs $k$. Right: NMSE vs AUC scatt
 
 **Findings.**
 
-1. **NMSE: TFA wins in binding regime, TXCDR loses everywhere.** TFA achieves 3--7$\times$ lower NMSE than SAE for $k \leq 10$. The crosscoder's shared-latent bottleneck ($k$ features explaining $T \times d$ values) makes it strictly worse than the per-token SAE at every $k$. Larger windows worsen the bottleneck: TXCDR $T$=5 is worse than $T$=2 at every $k$ (e.g., at $k = 8$: 0.266 vs 0.136). The SAE wins decisively once $k > \mathbb{E}[L_0]$.
+1. **NMSE: TFA wins in binding regime, TXCDR loses everywhere.** TFA achieves 3--7$\times$ lower NMSE than SAE for $k \leq 10$. The crosscoder's shared-latent bottleneck ($k$ features explaining $T \times d$ values) makes it strictly worse than the per-token SAE at every $k$. Larger windows worsen the bottleneck: TXCDR $T$=5 is worse than $T$=2 at every $k$ (e.g., at $k = 8$: 0.266 vs 0.140). The SAE wins decisively once $k > \mathbb{E}[L_0]$.
 
-2. **AUC: TXCDR $T$=2 dominates at $k \geq 10$ despite worst NMSE.** At $k = 10$, TXCDR $T$=2 achieves AUC = 0.90 while SAE gets 0.69 and TFA gets 0.81 --- yet TXCDR's NMSE (0.099) is 3$\times$ worse than SAE's (0.032). The crosscoder learns the true feature directions better than SAE or TFA, even though its reconstructions are worse. At $k = 15$, TXCDR $T$=2 reaches AUC = 0.94 (near-perfect feature recovery) with NMSE = 0.042, while SAE has AUC = 0.86 with NMSE = 0.0001. TXCDR $T$=5 has lower AUC than $T$=2 at matched $k$ (e.g., 0.754 vs 0.758 at $k = 8$), suggesting the smaller window provides a better-conditioned learning signal for feature recovery.
+2. **AUC: TXCDR $T$=2 dominates at $k \geq 8$ despite worst NMSE.** At $k = 10$, TXCDR $T$=2 achieves AUC = 0.92 while SAE gets 0.69 and TFA gets 0.81 --- yet TXCDR's NMSE (0.100) is 3$\times$ worse than SAE's (0.032). The crosscoder learns the true feature directions better than SAE or TFA, even though its reconstructions are worse. At $k = 15$, TXCDR $T$=2 reaches AUC = 0.96 (near-perfect feature recovery) with NMSE = 0.043, while SAE has AUC = 0.86 with NMSE = 0.0001. TXCDR $T$=5 has lower AUC than $T$=2 at matched $k$ (e.g., 0.754 vs 0.818 at $k = 8$), suggesting the smaller window provides a better-conditioned learning signal for feature recovery.
 
-3. **NMSE--AUC dissociation.** Good reconstruction does not imply good feature recovery. The SAE achieves near-perfect NMSE at $k = 20$ but its AUC drops to 0.59 (R@0.9 = 0.00) --- it reconstructs perfectly via superposition without recovering the true feature directions. The TXCDR achieves poor NMSE but near-perfect AUC --- its decoder columns align with the true features even though the shared-latent bottleneck prevents good reconstruction.
+3. **NMSE--AUC dissociation.** Good reconstruction does not imply good feature recovery. The SAE achieves near-perfect NMSE at $k = 20$ but its AUC drops to 0.60 (R@0.9 = 0.00) --- it reconstructs perfectly via superposition without recovering the true feature directions. The TXCDR achieves poor NMSE but near-perfect AUC --- its decoder columns align with the true features even though the shared-latent bottleneck prevents good reconstruction.
 
 4. **TFA's AUC peaks at $k = 10$ then declines.** TFA's feature recovery is best at AUC = 0.81 ($k = 10$), then drops to 0.71 at $k = 15$ and 0.57 at $k = 20$. Like the SAE, excess capacity degrades feature recovery. TFA-shuffled tracks TFA closely on AUC, consistent with the temporal fraction being small.
 
-5. **TFA-pos beats TFA at $k \geq 8$ and has a larger temporal fraction.** With positional encoding, TFA-pos achieves NMSE = 0.007 at $k = 8$ (vs TFA's 0.014 --- 2$\times$ better) and NMSE = 0.001 at $k = 10$ (vs TFA's 0.005 --- 3$\times$ better). The temporal decomposition shows that positional encoding roughly doubles the temporal fraction:
+5. **TFA-pos beats TFA at $k \geq 8$ and has a larger temporal fraction.** With positional encoding, TFA-pos achieves NMSE = 0.007 at $k = 8$ (vs TFA's 0.014 --- 2$\times$ better) and NMSE = 0.002 at $k = 10$ (vs TFA's 0.005 --- 3$\times$ better). The temporal decomposition shows that positional encoding roughly doubles the temporal fraction:
 
 | $k$ | TFA gap | TFA arch | TFA temp | TFA-pos gap | TFA-pos arch | TFA-pos temp |
 | --- | --- | --- | --- | --- | --- | --- |
 | 3 | 0.146 | 89% | 11% | 0.130 | 78% | 22% |
-| 5 | 0.102 | 88% | 12% | 0.092 | 77% | 23% |
+| 5 | 0.102 | 88% | 12% | 0.093 | 77% | 23% |
 | 8 | 0.054 | 92% | 8% | 0.061 | 74% | **26%** |
 | 10 | 0.027 | 97% | 3% | 0.030 | 83% | **17%** |
 
 Architecture % $= (\text{NMSE}_{\text{SAE}} - \text{NMSE}_{\text{shuf}}) / (\text{NMSE}_{\text{SAE}} - \text{NMSE}_{\text{model}})$. TFA-pos achieves 17--26% temporal fraction (vs TFA's 3--12%), confirming that positional encoding enables the attention to exploit temporal correlations. Without positional info, TFA's attention can only do content matching; with it, the attention can also learn "attend more to recent tokens" which are more likely to share the current token's features (due to Markov correlations).
 
-6. **TFA-pos has higher AUC than TFA across the binding regime.** At $k = 8$, TFA-pos AUC = 0.91 vs TFA AUC = 0.72 --- a 19% absolute improvement. TFA-pos-shuf AUC (0.74) is close to TFA-shuf (0.75), showing the AUC improvement is primarily from temporal structure, not from the positional encoding itself.
+6. **TFA-pos has higher AUC than TFA across the binding regime.** At $k = 8$, TFA-pos AUC = 0.91 vs TFA AUC = 0.72 --- a 26% absolute improvement. TFA-pos-shuf AUC (0.74) is close to TFA-shuf (0.75), showing the AUC improvement is primarily from temporal structure, not from the positional encoding itself.
 
 7. **TFA without positional encoding: 88--97% architectural capacity, 3--12% temporal.** TFA-shuffled captures most of TFA's advantage over the TopK SAE. The Wide TopK SAE (8,140 params, matching TFA's parameter count) performs comparably to or worse than the standard TopK SAE at $k \geq 8$, ruling out raw parameter count as the explanation. At $k = 15$, TFA-shuffled slightly outperforms TFA (ratio 0.91), suggesting the temporal prediction mechanism becomes counterproductive when the sparsity budget is sufficient.
 
@@ -144,7 +144,7 @@ Left: L0 vs NMSE Pareto. Centre: L0 vs AUC Pareto. Right: NMSE vs AUC scatter. *
 Run: `TQDM_DISABLE=1 python src/v2_temporal_schemeC/run_temporal_decomposition_v2.py`.
 
 **Method.** Using the ground-truth Markov chain state, we classify each (feature $i$, position $t > 1$) event into four types based on the transition from $t-1$ to $t$:
-
+ 
 - **Continuation** (on $\to$ on): feature was active at $t-1$ and remains active at $t$ (37% of events)
 - **Onset** (off $\to$ on): feature was inactive at $t-1$ and becomes active at $t$ (13%)
 - **Offset** (on $\to$ off): feature was active at $t-1$ and becomes inactive at $t$ (13%)
@@ -169,7 +169,7 @@ All four event types: continuation $\approx$ onset and offset $\approx$ absent a
 **Findings.**
 
 1. **Continuations $\approx$ onsets.** At every $k$ and $\rho$, prediction projections are virtually identical for continuing vs newly appearing features (e.g., at $k = 8$, $\rho = 0.9$: 4.10 vs 4.04). The predictable component does not detect whether a feature was previously active.
-
+ 
 2. **High false-positive rate.** The predictable component projects strongly onto feature directions even when the feature is OFF. This is because TFA's projection-scale mechanism ($\text{proj\_scale} = \langle D z_{\text{pred}}, x \rangle / \|D z_{\text{pred}}\|^2$) uses the current token, so the output adapts to the input regardless of temporal context.
 
 3. **No monotonic relationship with $\rho$.** If TFA exploited temporal persistence, high-$\rho$ features should show higher prediction projections. Instead, projections vary erratically (at $k = 8$: $\rho\!=\!0.3 \to 5.85$, $\rho\!=\!0.5 \to 1.40$, $\rho\!=\!0.9 \to 4.10$). Routing appears driven by training dynamics, not temporal structure.
@@ -300,11 +300,11 @@ Long continuation $\approx$ sudden onset for **all** conditions — temporal, sh
 
 2. **Most of this advantage is architectural capacity, not temporal structure** (Experiment 1, finding 5). TFA-shuffled — trained on data with all temporal correlations destroyed — captures most of TFA's advantage over the TopK SAE (2.4--5.7x improvement vs the TopK SAE's baseline). TFA improves only 1.2--1.3x beyond TFA-shuffled. Our linear decomposition attributes roughly 88--97% of the total NMSE gap to architecture and 3--12% to temporal structure, though these estimates are from a single seed and the decomposition does not account for possible architecture-temporal interactions.
 
-3. **Temporal structure provides a small benefit without positional encoding, and a substantial benefit with it** (Experiment 1, findings 5--8). Without positional encoding, TFA's temporal fraction is 3--12%. With positional encoding (TFA-pos), the fraction rises to 17--26%. At $k = 8$, TFA-pos achieves 2$\times$ lower NMSE than TFA and 19% higher AUC. This shows that the attention mechanism *can* exploit temporal correlations when given positional information, but cannot do so from content alone in our toy model.
+3. **Temporal structure provides a small benefit without positional encoding, and a substantial benefit with it** (Experiment 1, findings 5--8). Without positional encoding, TFA's temporal fraction is 3--12%. With positional encoding (TFA-pos), the fraction rises to 17--26%. At $k = 8$, TFA-pos achieves 2$\times$ lower NMSE than TFA and 26% higher AUC. This shows that the attention mechanism *can* exploit temporal correlations when given positional information, but cannot do so from content alone in our toy model.
 
 4. **TFA's predictable component does not distinguish temporal transitions** (Experiments 3, 3b): continuation and onset projections are virtually identical, and prediction strength shows no monotonic relationship with temporal persistence $\rho$. The predictable component does partially distinguish ON from OFF features (with high false-positive rates), but this discrimination does not depend on temporal history. This result is robust to stronger tests: conditioning on 5-position run-length history (long continuation $1\!1\!1\!1\!1$ vs sudden onset $0\!0\!0\!0\!1$) gives ratios of 0.98--1.02, and quadrupling the sequence length to $T = 256$ moves the ratio even closer to 1.0 (Experiment 3b). The likely explanation is that content-based matching dominates: with $\pi = 0.5$ and 20 features, any two tokens share ~5 features by chance, so the attention finds broadly similar context tokens regardless of whether the specific feature under test was active in context (see "Why content-based matching dominates" below).
 
-5. **NMSE and feature recovery (AUC) are dissociated** (Experiments 1, 2). Good reconstruction does not imply good feature recovery. The SAE at $k = 20$ achieves near-perfect NMSE ($2 \times 10^{-6}$) but AUC = 0.59 --- it reconstructs via superposition without recovering the true feature directions. Conversely, the temporal crosscoder (TXCDR, $T = 2$) at $k = 15$ achieves AUC = 0.94 (near-perfect feature recovery) but NMSE = 0.042 --- its shared-latent bottleneck prevents good reconstruction while its per-position decoder columns align well with the true features. TFA sits between the two: AUC peaks at 0.81 ($k = 10$) then declines, mirroring the SAE's pattern. This dissociation is consistent with the "Sparse but Wrong" thesis (Chanin et al., 2025): reconstruction-optimized models may learn superposed representations that do not correspond to the true features.
+5. **NMSE and feature recovery (AUC) are dissociated** (Experiments 1, 2). Good reconstruction does not imply good feature recovery. The SAE at $k = 20$ achieves near-perfect NMSE ($2 \times 10^{-6}$) but AUC = 0.60 --- it reconstructs via superposition without recovering the true feature directions. Conversely, the temporal crosscoder (TXCDR, $T = 2$) at $k = 15$ achieves AUC = 0.96 (near-perfect feature recovery) but NMSE = 0.043 --- its shared-latent bottleneck prevents good reconstruction while its per-position decoder columns align well with the true features. TFA sits between the two: AUC peaks at 0.81 ($k = 10$) then declines, mirroring the SAE's pattern. This dissociation is consistent with the "Sparse but Wrong" thesis (Chanin et al., 2025): reconstruction-optimized models may learn superposed representations that do not correspond to the true features.
 
 ### Why the attention mechanism helps without temporal structure
 
@@ -390,5 +390,3 @@ TQDM_DISABLE=1 python src/v2_temporal_schemeC/plot_exp1_exp2.py
 ```
 
 Results: `src/v2_temporal_schemeC/results/{b1_topk_sweep, b1_b2_pareto, temporal_decomposition_v2, temporal_decomposition_v3, attention_direction_analysis, shuffle_diagnostic, auc_and_crosscoder, txcdr_T5, tfa_pos}/`.
-
-[^1]: All TXCDR numbers in this document are from the unified reproduction framework trained for 80K steps (the correct training budget per original specification). The original document's TXCDR values were from a 30K-step run; the 80K-step values shown here are the authoritative reproduction.
