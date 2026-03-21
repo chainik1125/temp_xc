@@ -81,10 +81,10 @@ MODEL_DEFS = {
                      {"total_steps": 30_000, "batch_size": 64, "lr": 1e-3},
                      None),
     "TXCDR-T2": (TXCDRModelSpec(T=2), "window_2",
-                 {"total_steps": 80_000, "batch_size": 2048, "lr": 3e-4},
+                 {"total_steps": 30_000, "batch_size": 2048, "lr": 3e-4},
                  L1_COEFFS_TXCDR),
     "TXCDR-T5": (TXCDRModelSpec(T=5), "window_5",
-                 {"total_steps": 80_000, "batch_size": 2048, "lr": 3e-4},
+                 {"total_steps": 30_000, "batch_size": 2048, "lr": 3e-4},
                  L1_COEFFS_TXCDR),
 }
 
