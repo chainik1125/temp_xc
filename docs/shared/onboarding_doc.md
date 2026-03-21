@@ -56,6 +56,6 @@ Key reading:
     - [[references#kissane2025txc]]
 
 5. Empirical work on why temporal features might be useful
-    - [[reference#venhoff2025reasoning]]
-    - [[reference#ward2025reasoning]]
+    - [[references#venhoff2025reasoning]]
+    - [[references#ward2025reasoning]]
 

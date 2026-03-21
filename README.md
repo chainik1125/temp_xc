@@ -4,6 +4,7 @@
 
 ```bash
 uv sync
+git config core.hooksPath .githooks
 ```
 
 ## Documentation

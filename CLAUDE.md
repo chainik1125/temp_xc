@@ -69,7 +69,7 @@ Tags must be `kebab-case` and listed in `docs/Tags.md`. Nested tags are valid if
 ## Python
 
 - Python 3.12+, managed with `uv`
-- Setup: `uv sync`
+- Setup: `uv sync && git config core.hooksPath .githooks`
 - Run tests with `uv run pytest`
 - Source code in `src/`, tests in `tests/`
 

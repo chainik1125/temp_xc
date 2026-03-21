@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Reject commits containing any single file larger than 1MB
+MAX_SIZE=$((1 * 1024 * 1024))  # 1MB in bytes
+
+ERRORS=0
+
+while IFS= read -r -d '' file; do
+    size=$(wc -c < "$file" | tr -d ' ')
+    if [[ "$size" -gt "$MAX_SIZE" ]]; then
+        echo "ERROR: $file is $(( size / 1024 ))KB (limit is 1MB)"
+        ((ERRORS++))
+    fi
+done < <(git diff --cached --name-only --diff-filter=ACM -z)
+
+if [[ "$ERRORS" -gt 0 ]]; then
+    echo ""
+    echo "Commit rejected: $ERRORS file(s) exceed the 1MB size limit."
+    echo "Consider using Git LFS for large files, or exclude them from the commit."
+    exit 1
+fi
