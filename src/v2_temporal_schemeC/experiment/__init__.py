@@ -2,6 +2,7 @@
 
 from src.v2_temporal_schemeC.experiment.data_pipeline import (
     DataConfig,
+    EventConfig,
     DataPipeline,
     build_data_pipeline,
 )
