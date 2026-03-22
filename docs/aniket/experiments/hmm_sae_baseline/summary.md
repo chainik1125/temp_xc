@@ -1,6 +1,6 @@
 ---
 author: aniket
-date: 2026-03-19
+date: 2026-03-22
 tags:
   - results
   - complete
@@ -32,86 +32,71 @@ state. The HMM decouples marginal sparsity ($\mu$), autocorrelation decay rate
 | Sequences ($n_{\text{seq}}$) | 200 |
 | Magnitudes | $\|N(0,1)\|$ (half-normal) |
 | SAE latents | 64 |
-| SAE TopK | 5 |
-| SAE epochs | 50 |
+| SAE TopK | 1 |
+| SAE epochs | 300 |
 | SAE learning rate | $10^{-4}$ |
 | Seed | 42 |
 
 ## Results
 
-### Sub-experiment A: Amplitude Sweep
+### Gamma sweep at fixed $\mu = 0.05$
 
-Fixed $q = 0.5$, $\mu = 0.05$, swept $(p_A, p_B)$ pairs at each $\lambda$.
+Swept $\gamma \in \{0, 0.053, 0.211, 0.474, 1.0\}$ by varying $(q, p_A, p_B)$, crossed
+with $\lambda \in \{0, 0.1, 0.3, 0.5, 0.7, 0.9, 1.0\}$. All 35 configurations share
+$\mu = 0.05$.
 
-**Validation**: empirical marginal sparsity matched theoretical $\mu = 0.05$ within
-0.2% for all configurations. Empirical autocorrelation matched the theoretical
-$\rho^{\tau} \cdot \gamma$ curves. The gamma=0 case ($p_A = p_B = 0.05$) produces
-identically zero autocorrelation regardless of $\lambda$, confirming the emission noise
-fully masks the hidden temporal structure.
+**Validation**: marginal sparsity matched theory within 0.1% for all configs with
+$\lambda \geq 0.1$. At $\lambda = 0$, the high-$q$ configs ($q = 0.1, 0.2, 0.5$) show
+larger deviations because the frozen-state initial draw dominates finite samples. The
+pooled autocorrelation estimator matches theory at all $\lambda$ values including
+$\lambda = 0$; the per-chain estimator correctly shows near-zero at $\lambda = 0$ because
+each chain conditions on its (frozen) hidden state, making within-chain emissions i.i.d.
 
-**SAE performance**: Feature recovery AUC (threshold-sweep, matching Andre's
-`feature_recovery_score` implementation) ranged from 0.78 to 0.81 across all
-configurations. The `mean_max_cos_sim` metric tracks closely but AUC provides a
-richer picture via the survival curve. No features reached the 0.9 recovery threshold
-(`frac_recovered_90 = 0` in most runs), indicating uniform partial recovery rather
-than bimodal all-or-nothing recovery.
+**SAE performance**: with 300 epochs of training, the SAE fully converges. All 35
+configurations achieve AUC = 0.944, mean\_max\_cos\_sim $\approx$ 0.998, and
+frac\_recovered\_90 = 1.0. The SAE perfectly recovers all 10 ground-truth features
+regardless of $\lambda$ or $\gamma$.
 
-Performance is essentially flat across $\lambda$ values — the standard SAE sees each
-position independently, so temporal correlation does not affect its reconstruction
-ability. The slight upward trend with higher gamma (0.80-0.81 vs 0.78) likely
-reflects that higher $|p_B - p_A|$ makes the emission distribution more bimodal,
-marginally easier for the SAE to decompose.
+Convergence curves show all configs plateau by epoch ~150. Earlier runs with 50 epochs
+showed under-training artifacts (AUC variation from 0.84 to 0.94 across configs);
+300 epochs eliminates this.
 
-Reconstruction loss was uniformly low ($\sim 3 \times 10^{-5}$), confirming the SAE
-converges well in this toy setting.
-
-### Sub-experiment B: MC Sanity Check
-
-$q = 0.05$, $p_A = 0$, $p_B = 1$ ($\gamma = 1$), same lambda sweep.
-
-**Autocorrelation validation**: empirical autocorrelation matched the theoretical
-$(1 - \lambda)^{\tau}$ curves exactly, confirming the HMM reduces to the MC case when
-$p_A = 0, p_B = 1$.
-
-**Edge case at $\lambda = 0$**: the frozen-state case shows lower AUC (0.73) and
-near-zero reconstruction loss. This is expected — at $\lambda = 0$, only ~5% of
-features are ever active (those that started in state B), producing a very different
-data distribution. For $\lambda \geq 0.1$, AUC is in the 0.77-0.80 range, consistent
-with sub-experiment A.
-
-## Sanity Check Summary
+## Sanity check summary
 
 | Check | Status |
 |-------|--------|
-| Empirical $\mu$ matches theory within 1% | Pass |
-| Empirical autocorrelation matches theory | Pass |
-| $p_A = p_B$ gives zero autocorrelation | Pass |
-| $p_A = 0, p_B = 1$ recovers MC case | Pass |
+| Empirical $\mu$ matches theory ($\lambda \geq 0.1$) | Pass |
+| Pooled autocorrelation matches theory (all $\lambda$) | Pass |
+| Per-chain autocorrelation matches theory ($\lambda \geq 0.3$) | Pass |
+| $\gamma = 0$ gives zero autocorrelation | Pass |
+| $\gamma = 1$ recovers MC case | Pass |
 | SAE trains without NaN/Inf | Pass |
-| Feature AUC > 0.75 for moderate $\lambda$ | Pass |
-| All plots saved and readable | Pass |
+| AUC = 0.944 for all 35 configs | Pass |
 
 ## Interpretation
 
-The amplitude prefactor $\gamma$ does not meaningfully affect standard SAE training
-because the SAE processes each position independently — it cannot exploit temporal
-correlations. This is exactly the baseline we need: the standard SAE's performance is
-invariant to temporal structure, establishing the floor against which a crosscoder
-(which *can* use temporal context) will be compared.
+A converged single-position SAE with TopK $k = 1$ achieves perfect feature recovery
+(AUC = 0.944, r90 = 100%) uniformly across all $(\lambda, \gamma)$ conditions. The SAE
+is blind to temporal structure: it sees one position at a time, so neither the decay rate
+($\lambda$) nor the amplitude ($\gamma$) can help or hurt it. This flat baseline is
+exactly what we need for the crosscoder comparison — any deviation from this line in the
+crosscoder's results must come from exploiting (or failing to exploit) temporal structure.
 
-The fact that $\gamma$ has minimal impact on the SAE confirms that the HMM's temporal
-parameters ($\lambda$, $\gamma$) are orthogonal to the reconstruction task as seen by
-a single-position model.
+## Pipeline upstreaming
 
-## Next Steps
+The HMM emission step has been upstreamed into `src/data_generation/`:
 
-1. Train a temporal crosscoder on the same data grid and compare feature AUC against
-   these baselines
-2. The crosscoder should show improved AUC when both $\lambda$ is small (slow decay)
-   AND $\gamma$ is large (high amplitude) — these are the conditions where temporal
-   context carries useful information
-3. Upstream the HMM data generation to `src/data_generation/` once the crosscoder
-   comparison validates the pipeline end-to-end
+- `EmissionConfig(p_A, p_B)` added to `src/data_generation/configs.py`
+- `apply_emission` and updated `generate_support` in `src/data_generation/support.py`
+- `hmm_marginal_sparsity`, `hmm_autocorrelation_amplitude`,
+  `hmm_theoretical_autocorrelation` added to `src/data_generation/transition.py`
+- Per-feature heterogeneity via `generate_support_per_feature` and
+  `per_feature_from_pi_rho` in `src/shared/temporal_support.py`
+- HMM emission support added to `temporal_crosscoders/data.py` via `p_A`/`p_B`
+  parameters on `generate_sequences` and `CachedDataSource`
+
+All changes are backwards-compatible: default emission config ($p_A = 0, p_B = 1$)
+recovers the original MC behavior.
 
 ## Code
 

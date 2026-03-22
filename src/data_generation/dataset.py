@@ -23,7 +23,8 @@ def generate_dataset(
     Returns:
         Dict containing:
             features: (k, d) ground-truth feature directions
-            support: (n_sequences, k, T) binary support
+            hidden_states: (n_sequences, k, T) hidden Markov chain states
+            support: (n_sequences, k, T) observed (emitted) binary support
             magnitudes: (n_sequences, k, T) magnitude values
             activations: (n_sequences, k, T) activation coefficients
             x: (n_sequences, T, d) activation vectors
@@ -55,21 +56,23 @@ def generate_dataset(
     log("data", "generated feature directions", k=k, d=d)
 
     # Generate support, magnitudes, activations for each sequence
+    all_hidden = torch.zeros(n_seq, k, T)
     all_support = torch.zeros(n_seq, k, T)
     all_magnitudes = torch.zeros(n_seq, k, T)
     all_activations = torch.zeros(n_seq, k, T)
     all_x = torch.zeros(n_seq, T, d)
 
     for seq_idx in range(n_seq):
-        support = generate_support(k, T, config.transition, rng)
+        hidden_states, support = generate_support(
+            k, T, config.transition, config.emission, rng
+        )
         magnitudes = sample_magnitudes(k, T, config.magnitude, rng)
         activations = generate_activations(support, magnitudes)
 
         # x_t = sum_i a_{i,t} * f_i  =>  x = activations.T @ features
-        # activations: (k, T), features: (k, d)
-        # x: (T, d) = activations.T @ features
         x = activations.T @ features  # (T, d)
 
+        all_hidden[seq_idx] = hidden_states
         all_support[seq_idx] = support
         all_magnitudes[seq_idx] = magnitudes
         all_activations[seq_idx] = activations
@@ -79,6 +82,7 @@ def generate_dataset(
 
     return {
         "features": features,
+        "hidden_states": all_hidden,
         "support": all_support,
         "magnitudes": all_magnitudes,
         "activations": all_activations,
