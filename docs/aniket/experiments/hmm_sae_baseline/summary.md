@@ -48,18 +48,25 @@ $\mu = 0.05$.
 **Validation**: marginal sparsity matched theory within 0.1% for all configs with
 $\lambda \geq 0.1$. At $\lambda = 0$, the high-$q$ configs ($q = 0.1, 0.2, 0.5$) show
 larger deviations because the frozen-state initial draw dominates finite samples. The
-pooled autocorrelation estimator matches theory at all $\lambda$ values including
-$\lambda = 0$; the per-chain estimator correctly shows near-zero at $\lambda = 0$ because
-each chain conditions on its (frozen) hidden state, making within-chain emissions i.i.d.
+pooled autocorrelation estimator (green) matches theory (red) at all $\lambda$ values
+including $\lambda = 0$; the per-chain estimator (blue) correctly shows near-zero at
+$\lambda = 0$ because each chain conditions on its (frozen) hidden state, making
+within-chain emissions i.i.d.
+
+![Empirical vs theoretical autocorrelation](../../../results/v5_hmm_sae_baseline/validation_autocorrelation.png)
 
 **SAE performance**: with 300 epochs of training, the SAE fully converges. All 35
 configurations achieve AUC = 0.944, mean\_max\_cos\_sim $\approx$ 0.998, and
 frac\_recovered\_90 = 1.0. The SAE perfectly recovers all 10 ground-truth features
 regardless of $\lambda$ or $\gamma$.
 
+![Trade-off curves](../../../results/v5_hmm_sae_baseline/tradeoff_curves.png)
+
 Convergence curves show all configs plateau by epoch ~150. Earlier runs with 50 epochs
 showed under-training artifacts (AUC variation from 0.84 to 0.94 across configs);
 300 epochs eliminates this.
+
+![Convergence curves](../../../results/v5_hmm_sae_baseline/convergence.png)
 
 ## Sanity check summary
 
