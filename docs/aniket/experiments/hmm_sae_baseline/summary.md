@@ -53,20 +53,20 @@ including $\lambda = 0$; the per-chain estimator (blue) correctly shows near-zer
 $\lambda = 0$ because each chain conditions on its (frozen) hidden state, making
 within-chain emissions i.i.d.
 
-![Empirical vs theoretical autocorrelation](../../../results/v5_hmm_sae_baseline/validation_autocorrelation.png)
+![Empirical vs theoretical autocorrelation](../../../../results/v5_hmm_sae_baseline/validation_autocorrelation.png)
 
 **SAE performance**: with 300 epochs of training, the SAE fully converges. All 35
 configurations achieve AUC = 0.944, mean\_max\_cos\_sim $\approx$ 0.998, and
 frac\_recovered\_90 = 1.0. The SAE perfectly recovers all 10 ground-truth features
 regardless of $\lambda$ or $\gamma$.
 
-![Trade-off curves](../../../results/v5_hmm_sae_baseline/tradeoff_curves.png)
+![Trade-off curves](../../../../results/v5_hmm_sae_baseline/tradeoff_curves.png)
 
 Convergence curves show all configs plateau by epoch ~150. Earlier runs with 50 epochs
 showed under-training artifacts (AUC variation from 0.84 to 0.94 across configs);
 300 epochs eliminates this.
 
-![Convergence curves](../../../results/v5_hmm_sae_baseline/convergence.png)
+![Convergence curves](../../../../results/v5_hmm_sae_baseline/convergence.png)
 
 ## Sanity check summary
 
