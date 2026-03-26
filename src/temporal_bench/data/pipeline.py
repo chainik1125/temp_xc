@@ -82,15 +82,17 @@ class DataPipeline:
         cache = self._get_cache(rho)
         n_chains, chain_len, _ = cache.shape
 
-        # Sample random chain indices and start positions
+        # Sample random chain indices and start positions (CPU generator, then move)
         chain_idx = torch.randint(n_chains, (batch_size,), generator=self._gen)
         start_idx = torch.randint(chain_len - T, (batch_size,), generator=self._gen)
 
-        # Vectorized window gathering using unfold
-        # Reshape cache into (n_chains * chain_len, d) then use advanced indexing
-        d = cache.shape[2]
+        # Move indices to cache device for advanced indexing
+        dev = cache.device
+        chain_idx = chain_idx.to(dev)
+        start_idx = start_idx.to(dev)
+
         # Build flat indices: for each sample, indices [start, start+1, ..., start+T-1]
-        offsets = torch.arange(T, device=cache.device).unsqueeze(0)  # (1, T)
+        offsets = torch.arange(T, device=dev).unsqueeze(0)  # (1, T)
         flat_pos = start_idx.unsqueeze(1) + offsets  # (B, T)
         windows = cache[chain_idx.unsqueeze(1).expand_as(flat_pos), flat_pos]  # (B, T, d)
         return windows
