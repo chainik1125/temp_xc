@@ -86,10 +86,13 @@ class DataPipeline:
         chain_idx = torch.randint(n_chains, (batch_size,), generator=self._gen)
         start_idx = torch.randint(chain_len - T, (batch_size,), generator=self._gen)
 
-        # Gather windows
-        windows = torch.stack([
-            cache[c, s : s + T] for c, s in zip(chain_idx, start_idx)
-        ])
+        # Vectorized window gathering using unfold
+        # Reshape cache into (n_chains * chain_len, d) then use advanced indexing
+        d = cache.shape[2]
+        # Build flat indices: for each sample, indices [start, start+1, ..., start+T-1]
+        offsets = torch.arange(T, device=cache.device).unsqueeze(0)  # (1, T)
+        flat_pos = start_idx.unsqueeze(1) + offsets  # (B, T)
+        windows = cache[chain_idx.unsqueeze(1).expand_as(flat_pos), flat_pos]  # (B, T, d)
         return windows
 
     def eval_data(

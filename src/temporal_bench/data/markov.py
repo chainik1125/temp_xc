@@ -56,18 +56,17 @@ def generate_markov_support(
     alpha, beta = pi_rho_to_transition(pi, rho)
     support = torch.zeros(n_sequences, n_features, T)
 
-    # Initialize from stationary distribution
-    support[:, :, 0] = (
-        torch.rand(n_sequences, n_features, generator=generator) < pi
-    ).float()
+    # Pre-generate all random numbers at once (avoids per-step torch.rand overhead)
+    all_u = torch.rand(n_sequences, n_features, T, generator=generator)
 
-    # Generate transitions
+    # Initialize from stationary distribution
+    support[:, :, 0] = (all_u[:, :, 0] < pi).float()
+
+    # Generate transitions (loop is unavoidable due to Markov dependency,
+    # but each step is a single vectorized op over all sequences and features)
     for t in range(1, T):
-        u = torch.rand(n_sequences, n_features, generator=generator)
         was_on = support[:, :, t - 1]
-        # P(on at t | on at t-1) = alpha
-        # P(on at t | off at t-1) = beta
         threshold = was_on * alpha + (1.0 - was_on) * beta
-        support[:, :, t] = (u < threshold).float()
+        support[:, :, t] = (all_u[:, :, t] < threshold).float()
 
     return support
