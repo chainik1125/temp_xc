@@ -58,6 +58,9 @@ class ToyModel:
 
         activations = support * magnitudes  # (n_seq, k, T)
 
+        # Move to same device as features
+        activations = activations.to(self.features.device)
+
         # x_t = sum_k a_{t,k} * f_k
         # activations: (n_seq, k, T), features: (k, d)
         x = torch.einsum("nkt,kd->ntd", activations, self.features)
