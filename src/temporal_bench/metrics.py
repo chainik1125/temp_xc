@@ -67,9 +67,9 @@ def feature_recovery(
     Returns:
         Dict with keys: auc, r_at_90, r_at_80, mean_max_cos.
     """
-    # Normalize
-    D = F.normalize(decoder_dirs, dim=0)  # (d, m) unit-norm columns
-    F_true = F.normalize(true_features, dim=1)  # (n_features, d) unit-norm rows
+    # Move to CPU for metric computation
+    D = F.normalize(decoder_dirs.cpu(), dim=0)  # (d, m) unit-norm columns
+    F_true = F.normalize(true_features.cpu(), dim=1)  # (n_features, d) unit-norm rows
 
     # Cosine similarity: (n_features, m)
     cos_sim = (F_true @ D).abs()
@@ -84,12 +84,12 @@ def feature_recovery(
     r_at_90 = (max_cos >= 0.9).float().mean().item()
     r_at_80 = (max_cos >= 0.8).float().mean().item()
 
-    # AUC: integrate fraction recovered across thresholds
-    thresholds = torch.linspace(0.0, 1.0, n_thresholds + 1, device=max_cos.device)
+    # AUC: integrate fraction recovered across thresholds (all on CPU for simplicity)
+    max_cos_cpu = max_cos.cpu()
+    thresholds = torch.linspace(0.0, 1.0, n_thresholds + 1)
     fracs = torch.tensor(
-        [(max_cos >= tau).float().mean().item() for tau in thresholds]
+        [(max_cos_cpu >= tau).float().mean().item() for tau in thresholds]
     )
-    # Trapezoidal integration
     auc = torch.trapezoid(fracs, thresholds).item()
 
     return {
