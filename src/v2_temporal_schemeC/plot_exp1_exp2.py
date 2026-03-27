@@ -21,7 +21,7 @@ OUT_DIR = os.path.join(BASE, "results", "auc_and_crosscoder")
 
 # Model display config: (json_filename, display_name, color, marker, linestyle)
 MODELS = [
-    ("SAE",           "SAE",           "tab:blue",   "o", "-"),
+    ("SAE",           "Shared SAE",    "tab:blue",   "o", "-"),
     ("TFA",           "TFA",           "tab:orange", "s", "-"),
     ("TFA-shuf",      "TFA-shuf",      "tab:red",    "^", "--"),
     ("TFA-pos",       "TFA-pos",       "tab:brown",  "X", "-"),

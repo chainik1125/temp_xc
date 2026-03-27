@@ -139,19 +139,24 @@ def _eval_window(spec, model, eval_data, device, acc: EvalOutput, seq_len: int):
 
 
 def _compute_auc(spec, model, true_features, device) -> tuple[float, float]:
-    """Compute feature recovery AUC, handling per-position decoders for TXCDR."""
+    """Compute feature recovery AUC.
+
+    For single-decoder models (SAE, TFA): use the decoder directly.
+    For per-position models (TXCDR, Stacked SAE): average decoder matrices
+    across positions first, then compute AUC on the averaged decoder.
+    This follows Andre Shportko's approach and measures cross-position
+    interpretability — whether the same latent means the same thing at
+    every position.
+    """
     tf = true_features.T.to(device)
 
     if spec.n_decoder_positions is None:
         dd = spec.decoder_directions(model).to(device)
-        result = feature_recovery_score(dd, tf)
-        return result["auc"], result["frac_recovered_90"]
     else:
-        aucs = []
-        r90s = []
-        for pos in range(spec.n_decoder_positions):
-            dd = spec.decoder_directions(model, pos=pos).to(device)
-            result = feature_recovery_score(dd, tf)
-            aucs.append(result["auc"])
-            r90s.append(result["frac_recovered_90"])
-        return float(np.mean(aucs)), float(np.mean(r90s))
+        # Average decoder columns across positions
+        dds = [spec.decoder_directions(model, pos=pos).to(device)
+               for pos in range(spec.n_decoder_positions)]
+        dd = torch.stack(dds).mean(dim=0)  # (d, h)
+
+    result = feature_recovery_score(dd, tf)
+    return result["auc"], result["frac_recovered_90"]

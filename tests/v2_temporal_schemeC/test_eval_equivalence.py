@@ -268,14 +268,12 @@ class TestTXCDREvalEquivalence:
     def test_auc_matches(self, eval_hidden, trained_txcdr):
         hidden, model = eval_hidden
         true_feats = model.feature_directions
-        # Old: average AUC across positions
-        import numpy as np
-        aucs = []
+        # Decoder-averaging approach: average decoder matrices, then compute AUC
         tf = true_feats.T.to(DEVICE)
-        for pos in range(2):
-            dd = trained_txcdr.decoder_directions(pos).to(DEVICE)
-            aucs.append(feature_recovery_score(dd, tf)["auc"])
-        old_auc = np.mean(aucs)
+        dd0 = trained_txcdr.decoder_directions(0).to(DEVICE)
+        dd1 = trained_txcdr.decoder_directions(1).to(DEVICE)
+        avg_dd = (dd0 + dd1) / 2
+        expected_auc = feature_recovery_score(avg_dd, tf)["auc"]
         new = evaluate_model(TXCDRModelSpec(T=2), trained_txcdr, hidden, DEVICE,
                              true_features=true_feats, seq_len=SEQ_LEN)
-        assert abs(old_auc - new.auc) < 1e-10
+        assert abs(expected_auc - new.auc) < 1e-10
