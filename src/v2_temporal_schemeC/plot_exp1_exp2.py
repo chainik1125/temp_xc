@@ -30,6 +30,8 @@ MODELS = [
     ("Stacked-T5",    "Stacked T=5",   "darkturquoise", "H", ":"),
     ("TXCDR-T2",      "TXCDR T=2",     "tab:purple", "D", "-."),
     ("TXCDR-T5",      "TXCDR T=5",     "tab:green",  "P", ":"),
+    ("TXCDRv2-T2",    "TXCDRv2 T=2",   "indigo",     "d", "-"),
+    ("TXCDRv2-T5",    "TXCDRv2 T=5",   "limegreen",  "p", "-"),
 ]
 
 

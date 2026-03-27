@@ -213,6 +213,24 @@ class TXCDRModelSpec:
         return model.decoder_directions(pos)  # (d_in, d_sae)
 
 
+class TXCDRv2ModelSpec(TXCDRModelSpec):
+    """TXCDR with k*T active latents (matching Stacked SAE total L0).
+
+    In the original TXCDRModelSpec, the crosscoder gets k active latents
+    while the Stacked SAE gets k per position (k*T total). This variant
+    gives TXCDR k*T active latents for a fair sparsity comparison.
+    """
+
+    def __init__(self, T: int):
+        super().__init__(T)
+        self.name = f"TXCDRv2 T={T}"
+
+    def create(self, d_in: int, d_sae: int, k: int | None,
+               device: torch.device, **kwargs) -> TemporalCrosscoder:
+        k_effective = k * self.T if k is not None else None
+        return TemporalCrosscoder(d_in, d_sae, self.T, k=k_effective).to(device)
+
+
 # ── Stacked SAE ──────────────────────────────────────────────────────
 
 

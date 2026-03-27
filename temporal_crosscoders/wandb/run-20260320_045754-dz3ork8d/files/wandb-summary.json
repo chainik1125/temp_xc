@@ -1,0 +1,1 @@
+{"auc":0.26979591836734695,"_timestamp":1.7739826833039606e+09,"loss":0.5934769511222839,"step":999,"recovery_80":0,"_step":999,"window_l0":22,"recovery_90":0,"_wandb":{"runtime":7},"_runtime":7.3906228,"mean_max_cos_sim":0.2697507441043854,"l0":11}
