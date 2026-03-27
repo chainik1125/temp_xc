@@ -26,6 +26,8 @@ MODELS = [
     ("TFA-shuf",      "TFA-shuf",      "tab:red",    "^", "--"),
     ("TFA-pos",       "TFA-pos",       "tab:brown",  "X", "-"),
     ("TFA-pos-shuf",  "TFA-pos-shuf",  "tab:pink",   "v", "--"),
+    ("Stacked-T2",    "Stacked T=2",   "tab:cyan",   "h", "-"),
+    ("Stacked-T5",    "Stacked T=5",   "darkturquoise", "H", ":"),
     ("TXCDR-T2",      "TXCDR T=2",     "tab:purple", "D", "-."),
     ("TXCDR-T5",      "TXCDR T=5",     "tab:green",  "P", ":"),
 ]

@@ -10,6 +10,7 @@ from src.v2_temporal_schemeC.experiment.model_specs import (
     SAEModelSpec,
     TFAModelSpec,
     TXCDRModelSpec,
+    StackedSAEModelSpec,
     ModelEntry,
     EvalOutput,
 )

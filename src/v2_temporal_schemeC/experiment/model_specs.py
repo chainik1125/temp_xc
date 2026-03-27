@@ -20,6 +20,9 @@ from src.v2_temporal_schemeC.train_tfa import (
 from src.v2_temporal_schemeC.temporal_crosscoder import (
     TemporalCrosscoder, CrosscoderTrainingConfig, train_crosscoder,
 )
+from src.v2_temporal_schemeC.stacked_sae import (
+    StackedSAE, StackedSAETrainingConfig, train_stacked_sae,
+)
 
 
 @dataclass
@@ -204,6 +207,57 @@ class TXCDRModelSpec:
         )
 
     def decoder_directions(self, model: TemporalCrosscoder,
+                           pos: int | None = None) -> torch.Tensor:
+        if pos is None:
+            pos = 0
+        return model.decoder_directions(pos)  # (d_in, d_sae)
+
+
+# ── Stacked SAE ──────────────────────────────────────────────────────
+
+
+class StackedSAEModelSpec:
+    data_format: str = "window"
+
+    def __init__(self, T: int):
+        self.T = T
+        self.name = f"Stacked SAE T={T}"
+        self.n_decoder_positions = T
+
+    def create(self, d_in: int, d_sae: int, k: int | None,
+               device: torch.device, **kwargs) -> StackedSAE:
+        return StackedSAE(d_in, d_sae, self.T, k=k).to(device)
+
+    def make_train_config(self, total_steps: int, batch_size: int, lr: float,
+                          l1_coeff: float = 0.0, log_every: int | None = None,
+                          **kwargs) -> StackedSAETrainingConfig:
+        return StackedSAETrainingConfig(
+            total_steps=total_steps,
+            batch_size=batch_size,
+            lr=lr,
+            l1_coeff=l1_coeff,
+            log_every=log_every or total_steps,
+        )
+
+    def train(self, model: StackedSAE, gen_fn: Callable,
+              config: StackedSAETrainingConfig,
+              device: torch.device) -> tuple[StackedSAE, dict]:
+        return train_stacked_sae(model, gen_fn, config, device)
+
+    def eval_forward(self, model: StackedSAE,
+                     x: torch.Tensor) -> EvalOutput:
+        loss, x_hat, z = model(x)
+        se = (x_hat - x).pow(2).sum().item()
+        signal = x.pow(2).sum().item()
+        l0 = (z > 0).float().sum(dim=-1).mean(dim=1).sum().item()  # mean over T, sum over B
+        n = x.shape[0]
+        return EvalOutput(
+            sum_se=se, sum_signal=signal,
+            sum_novel_l0=l0, sum_pred_l0=0.0, sum_total_l0=l0,
+            n_tokens=n,
+        )
+
+    def decoder_directions(self, model: StackedSAE,
                            pos: int | None = None) -> torch.Tensor:
         if pos is None:
             pos = 0

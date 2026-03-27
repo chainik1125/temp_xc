@@ -31,14 +31,14 @@ def _get_generator(pipeline: DataPipeline, gen_key: str):
 def _get_training_params(spec, overrides: dict) -> dict:
     """Get training params with defaults based on model type, then apply overrides."""
     from src.v2_temporal_schemeC.experiment.model_specs import (
-        SAEModelSpec, TFAModelSpec, TXCDRModelSpec,
+        SAEModelSpec, TFAModelSpec, TXCDRModelSpec, StackedSAEModelSpec,
     )
     if isinstance(spec, SAEModelSpec):
         defaults = {"total_steps": 30_000, "batch_size": 4096, "lr": 3e-4}
     elif isinstance(spec, TFAModelSpec):
         defaults = {"total_steps": 30_000, "batch_size": 64, "lr": 1e-3}
-    elif isinstance(spec, TXCDRModelSpec):
-        defaults = {"total_steps": 80_000, "batch_size": 2048, "lr": 3e-4}
+    elif isinstance(spec, (TXCDRModelSpec, StackedSAEModelSpec)):
+        defaults = {"total_steps": 30_000, "batch_size": 2048, "lr": 3e-4}
     else:
         defaults = {"total_steps": 30_000, "batch_size": 64, "lr": 3e-4}
     defaults.update(overrides)
