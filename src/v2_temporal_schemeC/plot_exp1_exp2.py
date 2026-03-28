@@ -20,18 +20,23 @@ REPRO_DIR = os.path.join(BASE, "results", "reproduction")
 OUT_DIR = os.path.join(BASE, "results", "auc_and_crosscoder")
 
 # Model display config: (json_filename, display_name, color, marker, linestyle)
+# Convention: same method = same color, T=2 = solid/circle, T=5 = dashed/triangle
 MODELS = [
-    ("SAE",           "Shared SAE",    "tab:blue",   "o", "-"),
-    ("TFA",           "TFA",           "tab:orange", "s", "-"),
-    ("TFA-shuf",      "TFA-shuf",      "tab:red",    "^", "--"),
-    ("TFA-pos",       "TFA-pos",       "tab:brown",  "X", "-"),
-    ("TFA-pos-shuf",  "TFA-pos-shuf",  "tab:pink",   "v", "--"),
-    ("Stacked-T2",    "Stacked T=2",   "tab:cyan",   "h", "-"),
-    ("Stacked-T5",    "Stacked T=5",   "darkturquoise", "H", ":"),
-    ("TXCDR-T2",      "TXCDR T=2",     "tab:purple", "D", "-."),
-    ("TXCDR-T5",      "TXCDR T=5",     "tab:green",  "P", ":"),
-    ("TXCDRv2-T2",    "TXCDRv2 T=2",   "indigo",     "d", "-"),
-    ("TXCDRv2-T5",    "TXCDRv2 T=5",   "limegreen",  "p", "-"),
+    # Per-token models (no window)
+    ("SAE",           "Shared SAE",    "#1f77b4", "o", "-"),    # blue
+    ("TFA",           "TFA",           "#ff7f0e", "s", "-"),    # orange
+    ("TFA-shuf",      "TFA-shuf",      "#ff7f0e", "s", "--"),   # orange dashed
+    ("TFA-pos",       "TFA-pos",       "#2ca02c", "X", "-"),    # green
+    ("TFA-pos-shuf",  "TFA-pos-shuf",  "#2ca02c", "X", "--"),   # green dashed
+    # Stacked SAE (same color, different marker/style per T)
+    ("Stacked-T2",    "Stacked T=2",   "#9467bd", "o", "-"),    # purple solid
+    ("Stacked-T5",    "Stacked T=5",   "#9467bd", "^", "--"),   # purple dashed
+    # TXCDR original (same color, different marker/style per T)
+    ("TXCDR-T2",      "TXCDR T=2",     "#d62728", "o", "-"),    # red solid
+    ("TXCDR-T5",      "TXCDR T=5",     "#d62728", "^", "--"),   # red dashed
+    # TXCDRv2 fair (same color, different marker/style per T)
+    ("TXCDRv2-T2",    "TXCDRv2 T=2",   "#e377c2", "o", "-"),   # pink solid
+    ("TXCDRv2-T5",    "TXCDRv2 T=5",   "#e377c2", "^", "--"),  # pink dashed
 ]
 
 
