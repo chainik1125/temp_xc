@@ -1,4 +1,10 @@
-"""Transition matrix construction, validation, and analysis utilities."""
+"""Transition matrix construction, validation, and analysis utilities.
+
+Includes HMM-specific helpers for computing marginal sparsity, autocorrelation
+amplitude, and theoretical autocorrelation when stochastic emissions are used.
+"""
+
+from __future__ import annotations
 
 import torch
 
@@ -82,6 +88,78 @@ def theoretical_autocorrelation(P: torch.Tensor, max_lag: int) -> torch.Tensor:
     beta = P[0, 1].item()
     eigenvalue = alpha - beta
     return torch.tensor([eigenvalue**tau for tau in range(max_lag + 1)])
+
+
+def hmm_marginal_sparsity(
+    P: torch.Tensor, p_A: float, p_B: float
+) -> float:
+    """Compute marginal firing probability for an HMM.
+
+    mu = pi_A * p_A + pi_B * p_B
+
+    Args:
+        P: 2x2 row-stochastic transition matrix.
+        p_A: Emission probability in state A (off/0).
+        p_B: Emission probability in state B (on/1).
+
+    Returns:
+        Marginal probability that the observed support is 1.
+    """
+    pi = stationary_distribution(P)
+    return pi[0].item() * p_A + pi[1].item() * p_B
+
+
+def hmm_autocorrelation_amplitude(
+    P: torch.Tensor, p_A: float, p_B: float
+) -> float:
+    """Compute the autocorrelation amplitude prefactor gamma.
+
+    gamma = pi_A * pi_B * (p_B - p_A)^2 / [mu * (1 - mu)]
+
+    This is 1 for the MC case (p_A=0, p_B=1) and 0 when p_A=p_B.
+
+    Args:
+        P: 2x2 row-stochastic transition matrix.
+        p_A: Emission probability in state A.
+        p_B: Emission probability in state B.
+
+    Returns:
+        Amplitude prefactor in [0, 1].
+    """
+    pi = stationary_distribution(P)
+    pi_A, pi_B = pi[0].item(), pi[1].item()
+    mu = pi_A * p_A + pi_B * p_B
+    if mu < 1e-12 or (1 - mu) < 1e-12:
+        return 0.0
+    return pi_A * pi_B * (p_B - p_A) ** 2 / (mu * (1 - mu))
+
+
+def hmm_theoretical_autocorrelation(
+    P: torch.Tensor, p_A: float, p_B: float, max_lag: int
+) -> torch.Tensor:
+    """Compute theoretical autocorrelation of HMM observations at each lag.
+
+    Corr(s_t, s_{t+tau}) = rho^|tau| * gamma  for tau > 0
+    Corr(s_t, s_t) = 1  (by definition)
+
+    where rho = alpha - beta is the second eigenvalue of P and gamma is the
+    amplitude prefactor.
+
+    Args:
+        P: 2x2 row-stochastic transition matrix.
+        p_A: Emission probability in state A.
+        p_B: Emission probability in state B.
+        max_lag: Maximum lag to compute.
+
+    Returns:
+        Tensor of shape (max_lag + 1,) with autocorrelation at each lag.
+    """
+    alpha = P[1, 1].item()
+    beta = P[0, 1].item()
+    rho = alpha - beta
+    gamma = hmm_autocorrelation_amplitude(P, p_A, p_B)
+    autocorr = [1.0] + [gamma * rho ** tau for tau in range(1, max_lag + 1)]
+    return torch.tensor(autocorr)
 
 
 def expected_holding_times(P: torch.Tensor) -> dict[str, float]:

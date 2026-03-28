@@ -42,6 +42,22 @@ class TransitionConfig:
 
 
 @dataclass
+class EmissionConfig:
+    """HMM emission probabilities for the two hidden states.
+
+    Controls stochastic emissions from the hidden Markov chain:
+        s_t | z_t = A ~ Bernoulli(p_A)
+        s_t | z_t = B ~ Bernoulli(p_B)
+
+    With defaults (p_A=0, p_B=1), the observation equals the hidden state
+    (deterministic emission), recovering the original MC behavior.
+    """
+
+    p_A: float = 0.0
+    p_B: float = 1.0
+
+
+@dataclass
 class MagnitudeConfig:
     """Configuration for magnitude sampling."""
 
@@ -73,6 +89,7 @@ class DataGenerationConfig:
     """Top-level configuration combining all pipeline parameters."""
 
     transition: TransitionConfig = field(default_factory=TransitionConfig)
+    emission: EmissionConfig = field(default_factory=EmissionConfig)
     magnitude: MagnitudeConfig = field(default_factory=MagnitudeConfig)
     features: FeatureConfig = field(default_factory=FeatureConfig)
     sequence: SequenceConfig = field(default_factory=SequenceConfig)
