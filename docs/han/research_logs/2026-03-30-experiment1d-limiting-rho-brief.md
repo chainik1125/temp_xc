@@ -80,20 +80,17 @@ Check `src/v2_temporal_schemeC/markov_data_generation.py` — if magnitudes are 
 
 **If magnitudes are unit:** Consider using variable magnitudes for this experiment only (like Andre's setup with FEAT_MEAN=1.0, FEAT_STD=0.15), or accept that ρ=1.0 is trivially solved and focus the analysis on **AUC** (feature recovery) rather than NMSE.
 
-## Models (6 total)
+## Models (5 total)
 
 | Model | Spec class | gen_key | Training |
 |-------|-----------|---------|----------|
 | TFA-pos | `TFAModelSpec(use_pos_encoding=True)` | seq | 30K steps, batch 64, lr 1e-3 |
-| TFA-pos-shuf | `TFAModelSpec(use_pos_encoding=True)` | seq_shuffled | same |
 | Stacked T=2 | `StackedSAEModelSpec(T=2)` | window_2 | 30K steps, batch 2048, lr 3e-4 |
 | Stacked T=5 | `StackedSAEModelSpec(T=5)` | window_5 | same |
 | TXCDRv2 T=2 | `TXCDRv2ModelSpec(T=2)` | window_2 | same |
 | TXCDRv2 T=5 | `TXCDRv2ModelSpec(T=5)` | window_5 | same |
 
 **TXCDRv2** uses k×T active latents (not k), matching Stacked SAE total L0. This is Andre's v2 design. TXCDRv2 T=5 hits k×T > d_sae=40 at k≥9, so skip those k values.
-
-**Note on TFA-pos-shuf:** At ρ=0.0, shuffling has no effect (data is already i.i.d.), so TFA-pos ≈ TFA-pos-shuf. At ρ=1.0, shuffling destroys the temporal order — but since all tokens are identical (same features active), shuffling also has no effect. So TFA-pos-shuf is mainly a sanity check at these limiting cases.
 
 ## k values
 
@@ -127,8 +124,6 @@ cfg = DataConfig(
 
 models = [
     ModelEntry("TFA-pos", TFAModelSpec(use_pos_encoding=True), "seq",
-               training_overrides={"total_steps": 30_000, "batch_size": 64, "lr": 1e-3}),
-    ModelEntry("TFA-pos-shuf", TFAModelSpec(use_pos_encoding=True), "seq_shuffled",
                training_overrides={"total_steps": 30_000, "batch_size": 64, "lr": 1e-3}),
     ModelEntry("Stacked-T2", StackedSAEModelSpec(T=2), "window_2",
                training_overrides={"total_steps": 30_000, "batch_size": 2048, "lr": 3e-4}),
@@ -197,9 +192,6 @@ GPU: RTX 5090 (32GB). Run 2-3 models in parallel safely (~1.8GB each).
 - All models should perform similarly on NMSE — no temporal signal to exploit
 - TXCDRv2 might have slightly worse NMSE than Stacked SAE (shared-latent constraint without temporal benefit)
 - AUC: TXCDRv2 should still have better decoder-averaged AUC than Stacked SAE (shared latent enforces cross-position consistency even without temporal signal)
-- TFA-pos ≈ TFA-pos-shuf (shuffling i.i.d. data has no effect)
-
 **ρ=1.0 (frozen):**
 - NMSE: likely near-zero for all models if magnitudes are unit (all tokens identical). With variable magnitudes, TXCDRv2 may have an advantage (can average across positions)
 - AUC: interesting test — do models learn better feature directions when features are perfectly persistent? The data is extremely regular (same features every position), which might help or hurt depending on how the optimizer handles the redundancy
-- TFA-pos-shuf should equal TFA-pos (shuffling identical tokens has no effect)
