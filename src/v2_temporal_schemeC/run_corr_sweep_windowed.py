@@ -38,6 +38,9 @@ for rho in RHO_VALUES:
     gen_fn = pipeline.gen_windows[T]
     results = []
     for k in K_VALUES:
+        if hasattr(spec, 'T') and k * spec.T > 40:
+            print(f"  rho={rho} k={k}: SKIP (k*T={k*spec.T} > d_sae=40)", flush=True)
+            continue
         set_seed(42); t0 = time.time()
         model = spec.create(d_in=40, d_sae=40, k=k, device=DEVICE)
         config = spec.make_train_config(total_steps=30000, batch_size=2048, lr=3e-4, log_every=30000)
