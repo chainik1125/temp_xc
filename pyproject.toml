@@ -7,6 +7,7 @@ dependencies = [
     "numpy>=1.26",
     "tqdm",
     "scikit-learn>=1.4",
+    "matplotlib>=3.10.8",
 ]
 
 [dependency-groups]
