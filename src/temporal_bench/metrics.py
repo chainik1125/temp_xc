@@ -120,7 +120,7 @@ def evaluate(
     out = model(eval_data)
 
     nmse = compute_nmse(eval_data, out.x_hat)
-    l0 = compute_l0(out.latents)
+    l0 = compute_l0(model.latents_for_metrics(out))
 
     decoder_dirs = model.decoder_directions()
     recovery = feature_recovery(decoder_dirs, true_features)

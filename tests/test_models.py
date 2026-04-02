@@ -4,6 +4,7 @@ import torch
 import pytest
 
 from temporal_bench.models.base import ModelOutput, TemporalAE
+from temporal_bench.models.baum_welch_factorial import BaumWelchFactorialAE
 from temporal_bench.models.topk_sae import TopKSAE
 from temporal_bench.models.temporal_crosscoder import TemporalCrosscoder
 from temporal_bench.models.per_feature_temporal import PerFeatureTemporalAE
@@ -19,6 +20,7 @@ def _get_models():
         ("txcdr", TemporalCrosscoder(d_in=d, d_sae=m, T=T, k_per_pos=k)),
         ("per_feature_temporal", PerFeatureTemporalAE(d_in=d, d_sae=m, T=T, k=k)),
         ("per_feature_temporal_causal", PerFeatureTemporalAE(d_in=d, d_sae=m, T=T, k=k, causal=True)),
+        ("bw_factorial", BaumWelchFactorialAE(d_in=d, d_sae=m, T=T, k=k)),
     ]
 
 
@@ -130,3 +132,33 @@ class TestPerFeatureTemporalAE:
         out = model(x)
         assert "pre_mix_l0" in out.metrics
         assert "l0" in out.metrics
+
+
+class TestBaumWelchFactorialAE:
+    def test_support_posteriors_are_probabilities(self):
+        model = BaumWelchFactorialAE(d_in=d, d_sae=m, T=T, k=k)
+        x = torch.randn(B, T, d)
+        out = model(x)
+        state_posteriors = out.aux["state_posteriors"]
+        assert state_posteriors.shape == (B, T, m, 2)
+        assert (state_posteriors >= 0).all()
+        assert (state_posteriors <= 1).all()
+        assert torch.allclose(
+            state_posteriors.sum(dim=-1),
+            torch.ones(B, T, m),
+            atol=1e-5,
+        )
+
+    def test_metric_latents_are_binary_support(self):
+        model = BaumWelchFactorialAE(d_in=d, d_sae=m, T=T, k=k)
+        x = torch.randn(B, T, d)
+        out = model(x)
+        metric_latents = model.latents_for_metrics(out)
+        assert metric_latents.shape == (B, T, m)
+        assert ((metric_latents == 0) | (metric_latents == 1)).all()
+
+    def test_topk_l0_equals_k(self):
+        model = BaumWelchFactorialAE(d_in=d, d_sae=m, T=T, k=k)
+        x = torch.randn(B, T, d)
+        out = model(x)
+        assert abs(out.metrics["l0"] - k) < 0.01

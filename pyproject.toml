@@ -3,9 +3,10 @@ name = "temp-xc"
 version = "0.1.0"
 requires-python = ">=3.12"
 dependencies = [
-    "torch>=2.2",
+    "torch>=2.2,<2.11",
     "numpy>=1.26",
     "tqdm",
+    "scikit-learn>=1.4",
 ]
 
 [dependency-groups]

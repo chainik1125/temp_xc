@@ -24,3 +24,6 @@ Thumbs.db
 .vscode/*
 !.vscode/extensions.json
 .idea/
+
+# Local Codex session exports
+docs/dmitry/codex_sessions/*.jsonl

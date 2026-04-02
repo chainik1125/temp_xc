@@ -36,6 +36,8 @@ def _create_model(
         model = cls(d_in=d_in, d_sae=d_sae, T=T, k_per_pos=k)
     elif model_name_lower == "per_feature_temporal":
         model = cls(d_in=d_in, d_sae=d_sae, T=T, k=k)
+    elif model_name_lower == "bw_factorial":
+        model = cls(d_in=d_in, d_sae=d_sae, T=T, k=k)
     else:
         raise ValueError(f"Unknown model: {model_name}")
 
