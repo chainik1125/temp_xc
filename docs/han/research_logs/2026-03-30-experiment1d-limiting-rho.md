@@ -26,7 +26,7 @@ At ρ=1 with unit magnitudes, all tokens in a sequence are **identical** (same a
 
 #### ρ=0 (i.i.d.)
 
-![[exp1d_rho0_nmse_auc.png]]
+![ρ=0 NMSE and AUC vs k](../../../src/v2_temporal_schemeC/results/experiment1d_limiting_rho/exp1d_rho0_nmse_auc.png)
 
 **NMSE observations:**
 - TFA-pos has the lowest NMSE at low k (0.225 at k=1 vs 0.40 for Stacked SAEs). Its attention mechanism provides a useful inductive bias even without temporal structure.
@@ -40,7 +40,7 @@ At ρ=1 with unit magnitudes, all tokens in a sequence are **identical** (same a
 
 #### ρ=1 (frozen)
 
-![[exp1d_rho1_nmse_auc.png]]
+![ρ=1 NMSE and AUC vs k](../../../src/v2_temporal_schemeC/results/experiment1d_limiting_rho/exp1d_rho1_nmse_auc.png)
 
 **NMSE observations:**
 - **TFA-pos has dramatically lower NMSE across all k values** (0.007 at k=1 vs 0.40 for Stacked SAEs). With frozen features, every token is identical, so attention can average over 64 positions to reconstruct with only k=1 novel latent.
@@ -56,7 +56,7 @@ At ρ=1 with unit magnitudes, all tokens in a sequence are **identical** (same a
 
 ### Comparison across ρ regimes
 
-![[exp1d_comparison.png]]
+![Comparison across ρ regimes](../../../src/v2_temporal_schemeC/results/experiment1d_limiting_rho/exp1d_comparison.png)
 
 Selected models compared across ρ=0 (this experiment), mixed-ρ (Experiment 1 reproduction), and ρ=1 (this experiment):
 
