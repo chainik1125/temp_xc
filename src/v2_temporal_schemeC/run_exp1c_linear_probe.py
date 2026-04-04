@@ -288,13 +288,18 @@ def main():
 
     # ── Plots ──
 
+    import matplotlib.cm as _cm
+    _cmap = _cm.get_cmap("RdPu", len(TXCDR_T_VALUES) + 2)
+    _markers = ["o", "s", "D", "^", "v", "<", "p", ">", "h", "H", "*"]
     STYLE = {
-        "TFA-pos":     {"color": "#2ca02c", "marker": "X", "ls": "-"},
-        "Stacked-T2":  {"color": "#9467bd", "marker": "o", "ls": "-"},
-        "Stacked-T5":  {"color": "#9467bd", "marker": "^", "ls": "--"},
-        "TXCDRv2-T2":  {"color": "#e377c2", "marker": "o", "ls": "-"},
-        "TXCDRv2-T5":  {"color": "#e377c2", "marker": "^", "ls": "--"},
+        "TFA-pos":    {"color": "#2ca02c", "marker": "X", "ls": "-"},
+        "Stacked-T2": {"color": "#9467bd", "marker": "o", "ls": "-"},
+        "Stacked-T5": {"color": "#9467bd", "marker": "^", "ls": "--"},
     }
+    for _i, _T in enumerate(TXCDR_T_VALUES):
+        STYLE[f"TXCDRv2-T{_T}"] = {
+            "color": _cmap(_i + 2), "marker": _markers[_i % len(_markers)], "ls": "-",
+        }
 
     # Plot 1: R² vs k (local and global)
     fig, axes = plt.subplots(1, 3, figsize=(18, 6))
