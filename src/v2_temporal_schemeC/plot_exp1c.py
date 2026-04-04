@@ -301,8 +301,8 @@ def plot_scatter(models_data, probe_data):
     ax.set(xlabel="Local corr (vs noisy obs)",
            ylabel="Global corr (vs hidden state)",
            title="Single-latent correlation")
-    ax.set_xlim(-0.02, 0.6)
-    ax.set_ylim(-0.02, 0.5)
+    ax.set_xlim(-0.02, None)
+    ax.set_ylim(-0.02, None)
     ax.legend(fontsize=8)
     ax.grid(True, alpha=0.3)
 
@@ -322,8 +322,9 @@ def plot_scatter(models_data, probe_data):
     ax.set(xlabel=r"Local $R^2$ ($z \to s_i$)",
            ylabel=r"Global $R^2$ ($z \to h_i$)",
            title="Linear probe")
-    ax.set_xlim(-0.02, 0.55)
-    ax.set_ylim(-0.02, 0.25)
+    # Auto-scale to show all data points (high-T models have small R²)
+    ax.set_xlim(-0.02, None)
+    ax.set_ylim(-0.02, None)
     ax.legend(fontsize=8)
     ax.grid(True, alpha=0.3)
 
