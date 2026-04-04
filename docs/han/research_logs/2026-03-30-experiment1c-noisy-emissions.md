@@ -40,11 +40,24 @@ TXCDRv2 uses $k \times T$ active latents (Andre's v2 design for fair sparsity co
 
 **Metrics**: NMSE, decoder-averaged AUC, and a new **global feature recovery** metric:
 
-For each true feature $i$, find the best-matching latent $j$. Compute:
-- **Local correlation**: $\text{Pearson}(z_j, s_i)$ --- does the latent track the noisy observation?
-- **Global correlation**: $\text{Pearson}(z_j, h_i)$ --- does the latent track the true hidden state?
+For each true feature $i$:
+
+1. **Match**: find the best-matching latent $j$ by cosine similarity between the model's decoder columns and the true feature direction: $j = \arg\max_j |\cos(d_j, f_i)|$. This matching is done in weight space (decoder directions) and does not touch activation statistics. All models have the same dictionary width ($d_{\text{sae}} = 40$), so the matching is equally constrained regardless of how many latents are active.
+2. **Correlate**: compute two Pearson correlations across all eval tokens:
+   - **Local**: $\text{Pearson}(z_j, s_i)$ --- does latent $j$'s activation track the noisy observation of feature $i$?
+   - **Global**: $\text{Pearson}(z_j, h_i)$ --- does latent $j$'s activation track the true hidden state of feature $i$?
+
+   Each correlation is between two scalar time series of length $N = 128\text{K}$ tokens. Other active features at each token do not directly enter the computation --- we only ask whether latent $j$ covaries with feature $i$'s state. (Imperfect feature separation would dilute the correlation, not bias it.)
+
+3. **Aggregate**: repeat for all 20 true features, then report the mean global/local ratio across features.
 
 If global $>$ local, the model **denoises**.
+
+**Latent extraction for windowed models.** TFA-pos produces one latent vector per token directly. Windowed models (Stacked SAE, TXCDRv2) produce latents per window, and each token position appears in up to $T$ overlapping windows (at different position indices within the window). To obtain a single latent per token, we **average** the latent vectors across all overlapping windows containing that position, then compute correlations on the averaged latents.
+
+This averaging is the natural choice from an interpretability standpoint --- we need one set of latents per token position, and this is the most information-preserving reduction. However, it introduces a subtlety: the averaged latent for position $t$ effectively depends on a wider context than any single window. For TXCDRv2-$T$, a mid-sequence token's averaged latent aggregates information from up to $2T - 1$ positions (not $T$). This could inflate the denoising ratio beyond what a single window pass achieves.
+
+**Control**: the Stacked SAE receives the same window-averaging treatment but its ratio remains exactly 0.50 (the per-token floor). This is because each position's latent in a Stacked SAE depends only on $x_t$ (processed by whichever per-position SAE corresponds to its index in the window), so averaging across windows is still a function of $x_t$ alone --- no cross-position information leaks in. This confirms that the averaging procedure alone does not cause denoising; it requires the model to have cross-position information flow (as TXCDRv2's shared encoder does). Nevertheless, the *magnitude* of TXCDRv2's denoising ratio likely overstates what a single window pass would achieve.
 
 ### Results
 
@@ -118,7 +131,14 @@ TFA-pos peaks at AUC $\approx 0.975$ near $k = 6$--$8$ then declines from superp
 
 ### Linear probe analysis
 
-The single-latent correlation approach above uses only the best-matching latent for each feature. A **linear probe** uses all latents: for each feature $i$, train a Ridge regression $z \to s_i$ (local) and $z \to h_i$ (global), then report $R^2$ on a held-out test set.
+The single-latent correlation approach above uses only the best-matching latent $j$ for each feature $i$. A **linear probe** is more comprehensive: it uses **all** latents simultaneously to predict each feature's state, capturing information that may be distributed across multiple latents rather than concentrated in one.
+
+For each true feature $i$, train two Ridge regressions ($\alpha = 1.0$) on an 80/20 train/test split of the eval data:
+
+- **Local probe**: input $z \in \mathbb{R}^{d_{\text{sae}}}$ (full latent vector at each token), target $s_i \in \{0, 1\}$ (noisy observed firing). Reports $R^2$ on held-out test set.
+- **Global probe**: same input $z$, target $h_i \in \{0, 1\}$ (true hidden state). Reports $R^2$ on held-out test set.
+
+The input $z$ is the model's complete latent representation at each token position (obtained via the same window-averaging procedure as the single-latent analysis for windowed models). The probes are per-feature: 20 local probes and 20 global probes, each a linear map from $\mathbb{R}^{40} \to \mathbb{R}$. The reported ratio is $\text{mean global } R^2 / \text{mean local } R^2$, averaged across all 20 features.
 
 **Baselines**:
 
