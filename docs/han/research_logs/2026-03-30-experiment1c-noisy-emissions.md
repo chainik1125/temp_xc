@@ -38,9 +38,15 @@ Two questions:
 
 TXCDRv2 uses $k \times T$ active latents (Andre's v2 design for fair sparsity comparison). TXCDRv2 T=5 skipped for $k \geq 9$ since $k \times 5 > d_{\text{sae}} = 40$.
 
-**Metrics**: NMSE, decoder-averaged AUC, and a new **global feature recovery** metric:
+### Metrics
 
-For each true feature $i$:
+#### NMSE and AUC
+
+Standard metrics from Experiment 1: NMSE measures reconstruction quality of the noisy observations; decoder-averaged AUC measures how well the model's dictionary recovers the true feature directions.
+
+#### Denoising: single-latent correlation
+
+A new metric for this experiment. For each of the 20 true features $i$:
 
 1. **Match**: find the best-matching latent $j$ by cosine similarity between the model's decoder columns and the true feature direction: $j = \arg\max_j |\cos(d_j, f_i)|$. This matching is done in weight space (decoder directions) and does not touch activation statistics. All models have the same dictionary width ($d_{\text{sae}} = 40$), so the matching is equally constrained regardless of how many latents are active.
 2. **Correlate**: compute two Pearson correlations across all eval tokens:
@@ -49,15 +55,28 @@ For each true feature $i$:
 
    Each correlation is between two scalar time series of length $N = 128\text{K}$ tokens. Other active features at each token do not directly enter the computation --- we only ask whether latent $j$ covaries with feature $i$'s state. (Imperfect feature separation would dilute the correlation, not bias it.)
 
-3. **Aggregate**: repeat for all 20 true features, then report the mean global/local ratio across features.
+3. **Aggregate**: repeat for all 20 true features. Report the ratio $\bar{r}_{\text{global}} / \bar{r}_{\text{local}}$, where $\bar{r}$ denotes the mean Pearson correlation across the 20 features.
 
-If global $>$ local, the model **denoises**.
+If global $>$ local, the model **denoises**. The per-token baseline ratio is 0.50 (equivalently $\text{Corr}(s, h) = 0.50$ with our emission parameters). Any model that processes tokens independently cannot exceed this ratio.
 
-**Latent extraction for windowed models.** TFA-pos produces one latent vector per token directly. Windowed models (Stacked SAE, TXCDRv2) produce latents per window, and each token position appears in up to $T$ overlapping windows (at different position indices within the window). To obtain a single latent per token, we **average** the latent vectors across all overlapping windows containing that position, then compute correlations on the averaged latents.
+#### Denoising: linear probe
 
-This averaging is the natural choice from an interpretability standpoint --- we need one set of latents per token position, and this is the most information-preserving reduction. However, it introduces a subtlety: the averaged latent for position $t$ effectively depends on a wider context than any single window. For TXCDRv2-$T$, a mid-sequence token's averaged latent aggregates information from up to $2T - 1$ positions (not $T$). This could inflate the denoising ratio beyond what a single window pass achieves.
+The single-latent correlation uses only the best-matching latent $j$ for each feature $i$. A **linear probe** is more comprehensive: it uses **all** latents simultaneously to predict each feature's state, capturing information that may be distributed across multiple latents.
 
-**Control**: the Stacked SAE receives the same window-averaging treatment but its ratio remains exactly 0.50 (the per-token floor). This is because each position's latent in a Stacked SAE depends only on $x_t$ (processed by whichever per-position SAE corresponds to its index in the window), so averaging across windows is still a function of $x_t$ alone --- no cross-position information leaks in. This confirms that the averaging procedure alone does not cause denoising; it requires the model to have cross-position information flow (as TXCDRv2's shared encoder does). Nevertheless, the *magnitude* of TXCDRv2's denoising ratio likely overstates what a single window pass would achieve.
+For each true feature $i$, train two Ridge regressions ($\alpha = 1.0$) on an 80/20 train/test split of the eval data:
+
+- **Local probe**: input $z \in \mathbb{R}^{d_{\text{sae}}}$ (full latent vector at each token), target $s_i \in \{0, 1\}$ (noisy observed firing). Reports $R^2$ on held-out test set.
+- **Global probe**: same input $z$, target $h_i \in \{0, 1\}$ (true hidden state). Reports $R^2$ on held-out test set.
+
+The probes are per-feature: 20 local probes and 20 global probes, each a linear map from $\mathbb{R}^{40} \to \mathbb{R}$. The reported ratio is $\text{mean global } R^2 / \text{mean local } R^2$, averaged across all 20 features. The per-token $R^2$ floor is 0.25 ($= \text{Corr}(s, h)^2 = 0.50^2$).
+
+#### Latent extraction for windowed models
+
+TFA-pos produces one latent vector per token directly. Windowed models (Stacked SAE, TXCDRv2) produce latents per window, and each token position appears in up to $T$ overlapping windows (at different position indices within the window). To obtain a single latent per token, we **average** the latent vectors across all overlapping windows containing that position, then compute correlations on the averaged latents. Both the single-latent correlation and the linear probe use this same averaging procedure.
+
+This averaging is the natural choice from an interpretability standpoint --- we need one set of latents per token position, and this is the most information-preserving reduction. However, it introduces a subtlety: the averaged latent for position $t$ effectively depends on a wider context than any single window. For TXCDRv2-$T$, a mid-sequence token's averaged latent aggregates information from up to $2T - 1$ positions (not $T$). This could inflate the denoising ratio beyond what a single window pass would achieve.
+
+**Control**: the Stacked SAE receives the same window-averaging treatment but its ratio remains exactly at the per-token floor (0.50 for single-latent, 0.25 for linear probe). This is because each position's latent in a Stacked SAE depends only on $x_t$ (processed by whichever per-position SAE corresponds to its index in the window), so averaging across windows is still a function of $x_t$ alone --- no cross-position information leaks in. This confirms that the averaging procedure alone does not cause denoising; it requires the model to have cross-position information flow (as TXCDRv2's shared encoder does). Nevertheless, the *magnitude* of TXCDRv2's denoising ratio likely overstates what a single window pass would achieve.
 
 ### Results
 
@@ -93,7 +112,7 @@ TXCDRv2 T=2 achieves near-perfect feature recovery (AUC $\geq 0.98$) from $k = 3
 
 TFA-pos peaks at AUC $\approx 0.975$ near $k = 6$--$8$ then declines from superposition, mirroring Experiment 1. Stacked SAEs plateau at AUC $\approx 0.7$ (T=2) and $\approx 0.55$ (T=5).
 
-#### Denoising: global/local correlation ratio
+#### Denoising: single-latent correlation ratio
 
 | $k$ | TFA-pos | Stacked T=2 | Stacked T=5 | TXCDRv2 T=2 | TXCDRv2 T=5 |
 |-----|---------|-------------|-------------|-------------|-------------|
@@ -103,42 +122,13 @@ TFA-pos peaks at AUC $\approx 0.975$ near $k = 6$--$8$ then declines from superp
 | 6 | 0.50 | 0.50 | 0.50 | 0.74 | **1.00** |
 | 8 | 0.50 | 0.50 | 0.50 | 0.73 | **1.01** |
 
-**No model achieves strong denoising** (global $\gg$ local). However, clear separation exists:
+Three tiers of denoising:
 
-- **TFA-pos, Stacked T=2, Stacked T=5**: ratio $\approx 0.50$ everywhere. Global correlation is exactly half of local. These models have zero denoising capability --- their latents track the noisy observation, not the hidden state.
+- **TFA-pos, Stacked T=2, Stacked T=5**: ratio $\approx 0.50$ (per-token floor). These models have zero denoising capability --- their latents track the noisy observation, not the hidden state.
 - **TXCDRv2 T=2**: ratio $\approx 0.72$--$0.74$. Partial denoising: the shared-latent encoder aggregates two noisy observations, recovering some hidden-state information.
 - **TXCDRv2 T=5**: ratio $\approx 0.95$--$1.01$. Near-complete denoising at $k = 6$--$8$ (ratio $\geq 1$), meaning the latent tracks the hidden state at least as well as it tracks the noisy observation. However, this comes at catastrophic NMSE cost ($\sim 0.38$) because $k \times 5$ exceeds dictionary size.
 
-### Findings
-
-**Finding 1: TFA-pos NMSE advantage persists under noisy emissions.** TFA-pos achieves 2--5$\times$ lower NMSE than Stacked SAEs and TXCDRv2 T=2 at matched $k$ ($k = 1$--$8$), consistent with Experiment 1. The architectural capacity advantage from the attention mechanism is robust to emission noise.
-
-**Finding 2: TXCDRv2 T=2 dominates feature recovery.** TXCDRv2 T=2 achieves AUC $\geq 0.98$ for $k = 3$--$12$, far exceeding TFA-pos ($\leq 0.97$) and Stacked SAEs ($\leq 0.73$). The shared-latent crosscoder architecture, combined with decoder-averaging, produces the most faithful feature directions.
-
-**Finding 3: The global/local ratio of 0.50 is the per-token baseline, not a sign of failure.** With our emission parameters, $\text{Corr}(s, h) = 0.50$ (equivalently $R^2 = 0.25$). A model that *perfectly* tracks the per-token observation $s_i$ will achieve exactly this ratio. TFA-pos and Stacked SAEs sit precisely at this baseline, meaning they are excellent per-token encoders that extract all available information from $x_t$ --- but they do not leverage temporal context to recover the hidden state beyond what a single observation provides.
-
-**Finding 4: TXCDRv2 partially denoises by aggregating across positions.** TXCDRv2 T=2's ratio of $\approx 0.73$ exceeds the 0.50 floor, meaning its shared encoder extracts more hidden-state information than a single noisy observation provides. TXCDRv2 T=5 pushes this further to $\approx 1.0$, achieving near-perfect denoising, but at the cost of broken reconstruction (NMSE $\sim 0.38$).
-
-**Finding 5: TFA-pos does not denoise despite having temporal attention.** TFA-pos's ratio is exactly 0.50 across all $k$ values --- identical to Stacked SAEs. Despite having an attention mechanism that can attend to other positions, TFA-pos does not leverage temporal context to recover the hidden state beyond what a single observation provides. This is consistent with the Experiment 1/3 finding that TFA's attention is dominated by content-based matching, not temporal prediction. Importantly, this does not mean TFA-pos is performing poorly --- it is a near-perfect per-token encoder (Finding 7) --- it simply does not denoise.
-
-### Implications
-
-1. **NMSE and denoising are orthogonal.** TFA-pos has the best NMSE but zero denoising. TXCDRv2 T=5 has the best denoising but terrible NMSE. This suggests denoising requires architectural commitment to cross-position aggregation that conflicts with per-token reconstruction.
-
-2. **The shared-latent bottleneck in TXCDRv2 forces denoising.** By encoding a window of $T$ noisy observations into a single shared latent, TXCDRv2 *must* aggregate, which naturally averages out emission noise. Per-token models (TFA-pos, Stacked) have no such pressure.
-
-3. **$\gamma = 0.25$ is moderate noise.** Even at this noise level, TFA-pos shows zero denoising. Stronger noise ($\gamma \to 0$) would likely not change this qualitative result, as the mechanism (content-based attention vs temporal aggregation) is the same.
-
-### Linear probe analysis
-
-The single-latent correlation approach above uses only the best-matching latent $j$ for each feature $i$. A **linear probe** is more comprehensive: it uses **all** latents simultaneously to predict each feature's state, capturing information that may be distributed across multiple latents rather than concentrated in one.
-
-For each true feature $i$, train two Ridge regressions ($\alpha = 1.0$) on an 80/20 train/test split of the eval data:
-
-- **Local probe**: input $z \in \mathbb{R}^{d_{\text{sae}}}$ (full latent vector at each token), target $s_i \in \{0, 1\}$ (noisy observed firing). Reports $R^2$ on held-out test set.
-- **Global probe**: same input $z$, target $h_i \in \{0, 1\}$ (true hidden state). Reports $R^2$ on held-out test set.
-
-The input $z$ is the model's complete latent representation at each token position (obtained via the same window-averaging procedure as the single-latent analysis for windowed models). The probes are per-feature: 20 local probes and 20 global probes, each a linear map from $\mathbb{R}^{40} \to \mathbb{R}$. The reported ratio is $\text{mean global } R^2 / \text{mean local } R^2$, averaged across all 20 features.
+#### Denoising: linear probe
 
 **Baselines**:
 
@@ -148,8 +138,6 @@ The input $z$ is the model's complete latent representation at each token positi
 | $s \to h$ (fitted Ridge) | --- | 0.252 | --- |
 | $\text{corr}(s, h)^2$ | --- | --- | 0.251 |
 | Random $z$ | -0.001 | --- | --- |
-
-The per-token $R^2$ floor is 0.25 (= $\text{corr}(s, h)^2 = 0.50^2$). Any model that processes tokens independently cannot exceed this ratio.
 
 **Results** (mean $R^2$ across 20 features):
 
@@ -163,9 +151,31 @@ The per-token $R^2$ floor is 0.25 (= $\text{corr}(s, h)^2 = 0.50^2$). Any model 
 
 Stacked SAEs (not shown) match TFA-pos exactly at ratio $\approx 0.25$.
 
-**Finding 6: Linear probes confirm the denoising hierarchy.** The ratio is 0.25 (the per-token floor) for TFA-pos and Stacked SAEs, $\approx 0.53$ for TXCDRv2 T=2, and $\approx 0.93$--$1.02$ for TXCDRv2 T=5. This matches the single-latent correlation results (where the floor is 0.50 in correlation space = 0.25 in $R^2$ space) and confirms that the finding is robust to method choice.
+The linear probe results corroborate the single-latent correlation analysis in a different metric space. The per-token floor is 0.25 in $R^2$ space ($= 0.50^2$ in correlation space). TFA-pos and Stacked SAEs sit at this floor, TXCDRv2 T=2 rises to $\approx 0.53$, and TXCDRv2 T=5 reaches $\approx 0.93$--$1.02$.
 
-**Finding 7: TFA-pos saturates the per-token oracle.** At $k = 20$, TFA-pos achieves local $R^2 = 0.481$, essentially matching the oracle ceiling of 0.467 (raw $x_t$ input). This means TFA-pos's latent representation captures nearly all per-token information about the noisy observation --- it is a near-perfect per-token encoder. The global $R^2$ ratio of 0.251 matches the oracle ratio of 0.251, confirming the model adds no temporal information.
+### Findings
+
+**Finding 1: TFA-pos NMSE advantage persists under noisy emissions.** TFA-pos achieves 2--5$\times$ lower NMSE than Stacked SAEs and TXCDRv2 T=2 at matched $k$ ($k = 1$--$8$), consistent with Experiment 1. The architectural capacity advantage from the attention mechanism is robust to emission noise.
+
+**Finding 2: TXCDRv2 T=2 dominates feature recovery.** TXCDRv2 T=2 achieves AUC $\geq 0.98$ for $k = 3$--$12$, far exceeding TFA-pos ($\leq 0.97$) and Stacked SAEs ($\leq 0.73$). The shared-latent crosscoder architecture, combined with decoder-averaging, produces the most faithful feature directions.
+
+**Finding 3: The per-token floor separates denoisers from non-denoisers.** With our emission parameters, $\text{Corr}(s, h) = 0.50$ ($R^2 = 0.25$). A model that *perfectly* tracks the per-token observation $s_i$ will achieve exactly this ratio. TFA-pos and Stacked SAEs sit precisely at this baseline --- excellent per-token encoders that do not leverage temporal context to recover the hidden state. TXCDRv2 exceeds it.
+
+**Finding 4: TXCDRv2 partially denoises by aggregating across positions.** TXCDRv2 T=2's single-latent ratio of $\approx 0.73$ (linear probe: $\approx 0.53$) exceeds the per-token floor, meaning its shared encoder extracts more hidden-state information than a single noisy observation provides. TXCDRv2 T=5 pushes further to $\approx 1.0$ (linear probe: $\approx 0.97$), achieving near-complete denoising but at catastrophic NMSE cost ($\sim 0.38$).
+
+**Finding 5: TFA-pos does not denoise despite having temporal attention.** TFA-pos's ratio is exactly at the per-token floor across all $k$ values --- identical to Stacked SAEs. Despite having an attention mechanism that can attend to other positions, TFA-pos does not leverage temporal context to recover the hidden state. This is consistent with the Experiment 1/3 finding that TFA's attention is dominated by content-based matching, not temporal prediction.
+
+**Finding 6: Both denoising methods agree.** The single-latent correlation and linear probe produce consistent denoising hierarchies: Stacked/TFA-pos (floor) $<$ TXCDRv2 T=2 (partial) $<$ TXCDRv2 T=5 (near-complete). This robustness to method choice strengthens the conclusion.
+
+**Finding 7: TFA-pos saturates the per-token oracle.** At $k = 20$, TFA-pos achieves local $R^2 = 0.481$, essentially matching the oracle ceiling of 0.467 (raw $x_t$ input). TFA-pos is a near-perfect per-token encoder. Its global $R^2$ ratio of 0.251 matches the oracle ratio, confirming it adds no temporal information.
+
+### Implications
+
+1. **NMSE and denoising are orthogonal.** TFA-pos has the best NMSE but zero denoising. TXCDRv2 T=5 has the best denoising but terrible NMSE. This suggests denoising requires architectural commitment to cross-position aggregation that conflicts with per-token reconstruction.
+
+2. **The shared-latent bottleneck in TXCDRv2 forces denoising.** By encoding a window of $T$ noisy observations into a single shared latent, TXCDRv2 *must* aggregate, which naturally averages out emission noise. Per-token models (TFA-pos, Stacked) have no such pressure.
+
+3. **$\gamma = 0.25$ is moderate noise.** Even at this noise level, TFA-pos shows zero denoising. Stronger noise ($\gamma \to 0$) would likely not change this qualitative result, as the mechanism (content-based attention vs temporal aggregation) is the same.
 
 ### Plots
 
