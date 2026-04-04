@@ -5,9 +5,11 @@ import pytest
 
 from temporal_bench.models.base import ModelOutput, TemporalAE
 from temporal_bench.models.baum_welch_factorial import BaumWelchFactorialAE
+from temporal_bench.models.batchtopk_sae import BatchTopKSAE
 from temporal_bench.models.topk_sae import TopKSAE
 from temporal_bench.models.temporal_crosscoder import TemporalCrosscoder
 from temporal_bench.models.per_feature_temporal import PerFeatureTemporalAE
+from temporal_bench.models.tfa import TemporalFeatureAutoencoder
 
 
 B, T, d, m, k = 4, 5, 40, 20, 3
@@ -17,6 +19,8 @@ def _get_models():
     """Return instances of all model types."""
     return [
         ("sae", TopKSAE(d_in=d, d_sae=m, k=k)),
+        ("batchtopk_sae", BatchTopKSAE(d_in=d, d_sae=m, k=k)),
+        ("tfa", TemporalFeatureAutoencoder(d_in=d, d_sae=m, k=k, n_heads=4)),
         ("txcdr", TemporalCrosscoder(d_in=d, d_sae=m, T=T, k_per_pos=k)),
         ("per_feature_temporal", PerFeatureTemporalAE(d_in=d, d_sae=m, T=T, k=k)),
         ("per_feature_temporal_causal", PerFeatureTemporalAE(d_in=d, d_sae=m, T=T, k=k, causal=True)),
@@ -90,6 +94,37 @@ class TestTopKSAE:
         out2 = model(x2)
         # Position 0 should be identical
         assert torch.allclose(out1.x_hat[0, 0], out2.x_hat[0, 0])
+
+
+class TestBatchTopKSAE:
+    def test_training_uses_exact_batch_topk_budget(self):
+        model = BatchTopKSAE(d_in=d, d_sae=m, k=k)
+        with torch.no_grad():
+            model.W_enc.fill_(1.0)
+            model.b_enc.fill_(1.0)
+        x = torch.rand(B, T, d)
+        out = model(x)
+        assert (out.latents > 0).sum().item() == B * T * k
+
+    def test_eval_uses_thresholded_inference(self):
+        model = BatchTopKSAE(d_in=d, d_sae=m, k=k)
+        with torch.no_grad():
+            model.expected_min_act.fill_(0.5)
+        model.eval()
+        x = torch.ones(B, T, d)
+        out = model(x)
+        assert (out.latents >= 0).all()
+
+
+class TestTFA:
+    def test_aux_contains_temporal_codes(self):
+        model = TemporalFeatureAutoencoder(d_in=d, d_sae=m, k=k, n_heads=4)
+        x = torch.randn(B, T, d)
+        out = model(x)
+        assert "pred_codes" in out.aux
+        assert "novel_codes" in out.aux
+        assert "pred_recons" in out.aux
+        assert "novel_recons" in out.aux
 
 
 class TestTemporalCrosscoder:

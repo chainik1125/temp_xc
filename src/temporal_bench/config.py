@@ -24,8 +24,18 @@ class TrainConfig:
     n_steps: int = 30_000
     batch_size: int = 64
     lr: float = 3e-4
+    min_lr: float | None = None
     grad_clip: float = 1.0
+    normalize_decoder_every: int = 1
+    log_every: int = 0
     eval_every: int = 5_000
+    optimizer: str = "adam"
+    weight_decay: float = 0.0
+    beta1: float = 0.9
+    beta2: float = 0.999
+    warmup_steps: int = 0
+    lr_schedule: str = "constant"
+    grouped_weight_decay: bool = False
     seed: int = 42
 
 

@@ -48,6 +48,12 @@ class TemporalAE(ABC, nn.Module):
     Even independent SAEs receive (B, T, d) and reshape internally.
     """
 
+    def __init__(self):
+        super().__init__()
+        # Training can disable eager metric extraction to avoid per-step
+        # host/device synchronization on small models.
+        self.collect_metrics = True
+
     @abstractmethod
     def forward(self, x: torch.Tensor) -> ModelOutput:
         """Full forward pass.
@@ -87,6 +93,10 @@ class TemporalAE(ABC, nn.Module):
     def normalize_decoder(self) -> None:
         """Optional: project decoder columns to unit norm. Override if needed."""
         pass
+
+    def reconstruction_bias(self, pos: int | None = None) -> torch.Tensor | None:
+        """Optional: return the decoder bias at a position for analysis code."""
+        return None
 
     @property
     def n_positions(self) -> int | None:

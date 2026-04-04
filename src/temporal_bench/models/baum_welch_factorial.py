@@ -229,33 +229,37 @@ class BaumWelchFactorialAE(TemporalAE):
         loss = loss + self.sparsity_weight * sparsity_loss
         loss = loss + self.amplitude_weight * amplitude_loss
 
-        l0 = metric_latents.sum(dim=-1).mean().item()
-
         transition, initial = self._transition_probs()
-
-        return ModelOutput(
-            x_hat=x_hat,
-            latents=latents,
-            loss=loss,
-            metric_latents=metric_latents,
-            metrics={
+        metrics = {}
+        if self.collect_metrics:
+            metrics = {
                 "recon_loss": recon_loss.item(),
-                "l0": l0,
+                "l0": metric_latents.sum(dim=-1).mean().item(),
                 "mean_on_prob": on_prob.mean().item(),
                 "sparsity_loss": sparsity_loss.item(),
                 "amplitude_loss": amplitude_loss.item(),
                 "alpha_mean": transition[:, 1, 1].mean().item(),
                 "beta_mean": transition[:, 0, 1].mean().item(),
                 "initial_on_mean": initial[:, 1].mean().item(),
-            },
-            aux={
+            }
+        aux = {}
+        if self.collect_metrics:
+            aux = {
                 "observations": observations,
                 "local_scores": local_scores,
                 "amplitudes": amplitude,
                 "dense_latents": dense_latents,
                 "state_posteriors": state_posteriors,
                 "pairwise_posteriors": pairwise_posteriors,
-            },
+            }
+
+        return ModelOutput(
+            x_hat=x_hat,
+            latents=latents,
+            loss=loss,
+            metric_latents=metric_latents,
+            metrics=metrics,
+            aux=aux,
         )
 
     def decoder_directions(self, pos: int | None = None) -> torch.Tensor:

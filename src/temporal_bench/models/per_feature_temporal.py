@@ -87,10 +87,9 @@ class PerFeatureTemporalAE(TemporalAE):
         B, T, d = x.shape
         x_flat = x.reshape(B * T, d)
         pre = F.relu((x_flat - self.b_dec) @ self.W_enc + self.b_enc)
-        _, topk_idx = pre.topk(self.k, dim=-1)
-        mask = torch.zeros_like(pre)
-        mask.scatter_(-1, topk_idx, 1.0)
-        a = pre * mask
+        topk_vals, topk_idx = pre.topk(self.k, dim=-1)
+        a = torch.zeros_like(pre)
+        a.scatter_(-1, topk_idx, topk_vals)
         return a.reshape(B, T, self.d_sae)
 
     def temporal_mix(self, a: torch.Tensor) -> torch.Tensor:
@@ -118,19 +117,20 @@ class PerFeatureTemporalAE(TemporalAE):
         x_hat = self.decode(a_tilde)
 
         recon_loss = (x - x_hat).pow(2).sum(dim=-1).mean()
-        pre_mix_l0 = (a != 0).float().sum(dim=-1).mean().item()
-        post_mix_l0 = (a_tilde != 0).float().sum(dim=-1).mean().item()
+        metrics = {}
+        if self.collect_metrics:
+            metrics = {
+                "recon_loss": recon_loss.item(),
+                "l0": (a_tilde != 0).float().sum(dim=-1).mean().item(),
+                "pre_mix_l0": (a != 0).float().sum(dim=-1).mean().item(),
+                "kernel_norm": self.K.norm().item(),
+            }
 
         return ModelOutput(
             x_hat=x_hat,
             latents=a_tilde,
             loss=recon_loss,
-            metrics={
-                "recon_loss": recon_loss.item(),
-                "l0": post_mix_l0,
-                "pre_mix_l0": pre_mix_l0,
-                "kernel_norm": self.K.norm().item(),
-            },
+            metrics=metrics,
         )
 
     def decoder_directions(self, pos: int | None = None) -> torch.Tensor:

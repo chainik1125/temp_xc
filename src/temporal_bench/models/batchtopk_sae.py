@@ -1,7 +1,8 @@
-"""Independent TopK SAE baseline.
+"""BatchTopK SAE baseline.
 
-Processes each position independently. Receives (B, T, d) and reshapes
-to (B*T, d) internally.
+Training keeps the top k activations per token across the flattened token
+batch. Evaluation switches to a learned threshold so the model can encode
+tokens independently.
 """
 
 from __future__ import annotations
@@ -15,24 +16,28 @@ import torch.nn.functional as F
 from .base import ModelOutput, TemporalAE
 
 
-class TopKSAE(TemporalAE):
-    """Standard TopK sparse autoencoder (position-independent baseline).
+class BatchTopKSAE(TemporalAE):
+    """Tokenwise BatchTopK sparse autoencoder."""
 
-    Architecture:
-        z = TopK(ReLU(W_enc @ (x - b_dec) + b_enc), k)
-        x_hat = W_dec @ z + b_dec
-    """
-
-    def __init__(self, d_in: int, d_sae: int, k: int):
+    def __init__(
+        self,
+        d_in: int,
+        d_sae: int,
+        k: int,
+        *,
+        min_act_ema: float = 0.999,
+    ):
         super().__init__()
         self.d_in = d_in
         self.d_sae = d_sae
         self.k = k
+        self.min_act_ema = min_act_ema
 
         self.W_enc = nn.Parameter(torch.empty(d_in, d_sae))
         self.b_enc = nn.Parameter(torch.zeros(d_sae))
         self.W_dec = nn.Parameter(torch.empty(d_sae, d_in))
         self.b_dec = nn.Parameter(torch.zeros(d_in))
+        self.register_buffer("expected_min_act", torch.zeros(1))
 
         nn.init.kaiming_uniform_(self.W_enc, a=math.sqrt(5))
         with torch.no_grad():
@@ -44,12 +49,28 @@ class TopKSAE(TemporalAE):
         self.W_dec.data.div_(norms)
 
     def _encode_flat(self, x_flat: torch.Tensor) -> torch.Tensor:
-        """Encode a flat (N, d) tensor to sparse (N, m) codes."""
         pre = F.relu((x_flat - self.b_dec) @ self.W_enc + self.b_enc)
-        topk_vals, topk_idx = pre.topk(self.k, dim=-1)
-        z = torch.zeros_like(pre)
-        z.scatter_(-1, topk_idx, topk_vals)
-        return z
+
+        if self.training:
+            total_k = min(self.k * x_flat.shape[0], pre.numel())
+            flat_pre = pre.flatten()
+            topk_vals, topk_idx = flat_pre.topk(total_k, dim=-1)
+            sparse = torch.zeros_like(flat_pre)
+            sparse.scatter_(0, topk_idx, topk_vals)
+
+            with torch.no_grad():
+                min_activation = (
+                    topk_vals.min()
+                    if topk_vals.numel() > 0
+                    else torch.tensor(0.0, device=pre.device, dtype=pre.dtype)
+                )
+                self.expected_min_act.mul_(self.min_act_ema).add_(
+                    (1.0 - self.min_act_ema) * min_activation
+                )
+
+            return sparse.view_as(pre)
+
+        return pre * (pre > self.expected_min_act)
 
     def forward(self, x: torch.Tensor) -> ModelOutput:
         B, T, d = x.shape
@@ -57,13 +78,12 @@ class TopKSAE(TemporalAE):
 
         z = self._encode_flat(x_flat)
         x_hat_flat = z @ self.W_dec + self.b_dec
-
         recon_loss = (x_flat - x_hat_flat).pow(2).sum(dim=-1).mean()
         metrics = {}
         if self.collect_metrics:
             metrics = {
                 "recon_loss": recon_loss.item(),
-                "l0": (z != 0).float().sum(dim=-1).mean().item(),
+                "l0": (z > 0).float().sum(dim=-1).mean().item(),
             }
 
         return ModelOutput(
@@ -74,7 +94,7 @@ class TopKSAE(TemporalAE):
         )
 
     def decoder_directions(self, pos: int | None = None) -> torch.Tensor:
-        return self.W_dec.T  # (d, m)
+        return self.W_dec.T
 
     @torch.no_grad()
     def normalize_decoder(self) -> None:

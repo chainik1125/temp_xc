@@ -64,23 +64,27 @@ class TemporalCrosscoder(TemporalAE):
         pre = F.relu(pre)
 
         # TopK on shared latent
-        _, topk_idx = pre.topk(self.k_total, dim=-1)
-        mask = torch.zeros_like(pre)
-        mask.scatter_(-1, topk_idx, 1.0)
-        z = pre * mask  # (B, m)
+        topk_vals, topk_idx = pre.topk(self.k_total, dim=-1)
+        z = torch.zeros_like(pre)
+        z.scatter_(-1, topk_idx, topk_vals)
 
         # Decode per-position
         # z: (B, m), W_dec: (T, m, d) -> (B, T, d)
         x_hat = torch.einsum("bm,tmd->btd", z, self.W_dec) + self.b_dec
 
         recon_loss = (x - x_hat).pow(2).sum(dim=-1).mean()
-        l0 = (z != 0).float().sum(dim=-1).mean().item()
+        metrics = {}
+        if self.collect_metrics:
+            metrics = {
+                "recon_loss": recon_loss.item(),
+                "l0": (z != 0).float().sum(dim=-1).mean().item(),
+            }
 
         return ModelOutput(
             x_hat=x_hat,
             latents=z.unsqueeze(1).expand(B, T, self.d_sae),
             loss=recon_loss,
-            metrics={"recon_loss": recon_loss.item(), "l0": l0},
+            metrics=metrics,
         )
 
     def decoder_directions(self, pos: int | None = None) -> torch.Tensor:
@@ -92,6 +96,11 @@ class TemporalCrosscoder(TemporalAE):
     @torch.no_grad()
     def normalize_decoder(self) -> None:
         self._normalize_decoder()
+
+    def reconstruction_bias(self, pos: int | None = None) -> torch.Tensor:
+        if pos is None:
+            return self.b_dec.mean(dim=0)
+        return self.b_dec[pos]
 
     @property
     def n_positions(self) -> int:
