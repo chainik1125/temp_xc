@@ -65,13 +65,17 @@ BASE = os.path.dirname(__file__)
 CACHE_DIR = os.path.join(BASE, "model_cache", "exp1c")
 RESULTS_DIR = os.path.join(BASE, "results", "experiment1c_noisy")
 
+# TXCDRv2 window sizes (must match run_experiment1c_noisy.py)
+TXCDR_T_VALUES = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+
 # Model configs: (name, type, spec_factory, extra_kwargs)
 MODELS = [
     ("TFA-pos", "tfa", lambda: TFAModelSpec(use_pos_encoding=True), {}),
     ("Stacked-T2", "stacked", lambda: StackedSAEModelSpec(T=2), {"T": 2}),
     ("Stacked-T5", "stacked", lambda: StackedSAEModelSpec(T=5), {"T": 5}),
-    ("TXCDRv2-T2", "txcdrv2", lambda: TXCDRv2ModelSpec(T=2), {"T": 2}),
-    ("TXCDRv2-T5", "txcdrv2", lambda: TXCDRv2ModelSpec(T=5), {"T": 5}),
+] + [
+    (f"TXCDRv2-T{T}", "txcdrv2", lambda T=T: TXCDRv2ModelSpec(T=T), {"T": T})
+    for T in TXCDR_T_VALUES
 ]
 
 

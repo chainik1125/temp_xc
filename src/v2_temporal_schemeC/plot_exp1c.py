@@ -32,20 +32,36 @@ OUT_DIR = EXP1C_DIR
 
 # ── Style definitions ──
 
-MODELS = [
+# TXCDRv2 T values — color gradient from light pink (T=2) to dark red (T=12)
+import matplotlib.cm as cm
+import numpy as np
+
+TXCDR_T_VALUES = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+_txcdr_cmap = cm.get_cmap("RdPu", len(TXCDR_T_VALUES) + 2)
+_txcdr_colors = {T: _txcdr_cmap(i + 2) for i, T in enumerate(TXCDR_T_VALUES)}
+_txcdr_markers = {2: "o", 3: "s", 4: "D", 5: "^", 6: "v", 7: "<", 8: "p",
+                  9: ">", 10: "h", 11: "H", 12: "*"}
+
+# Non-TXCDRv2 models (fixed styles)
+BASE_MODELS = [
     ("TFA-pos",     "TFA-pos",       "#2ca02c", "X", "-"),
     ("Stacked-T2",  "Stacked T=2",   "#9467bd", "o", "-"),
     ("Stacked-T5",  "Stacked T=5",   "#9467bd", "^", "--"),
-    ("TXCDRv2-T2",  "TXCDRv2 T=2",   "#e377c2", "o", "-"),
-    ("TXCDRv2-T5",  "TXCDRv2 T=5",   "#e377c2", "^", "--"),
 ]
 
+# All models: base + TXCDRv2 at each T
+MODELS = BASE_MODELS + [
+    (f"TXCDRv2-T{T}", f"TXCDRv2 T={T}", _txcdr_colors[T], _txcdr_markers[T], "-")
+    for T in TXCDR_T_VALUES
+]
+
+# γ=1 overlay (only models that exist in Experiment 1 reproduction)
 EXP1_OVERLAY = [
     ("TFA-pos",     "#2ca02c", "X"),
     ("Stacked-T2",  "#9467bd", "o"),
     ("Stacked-T5",  "#9467bd", "^"),
-    ("TXCDRv2-T2",  "#e377c2", "o"),
-    ("TXCDRv2-T5",  "#e377c2", "^"),
+    ("TXCDRv2-T2",  _txcdr_colors[2], "o"),
+    ("TXCDRv2-T5",  _txcdr_colors[5], "^"),
 ]
 
 SUPTITLE_PREFIX = r"Experiment 1c ($\gamma = 0.25$)"
@@ -319,6 +335,57 @@ def plot_scatter(models_data, probe_data):
     print("  exp1c_probe_scatter")
 
 
+# ── Plot 6: Denoising ratio vs T at fixed k (TXCDRv2 T-sweep) ──
+
+def plot_denoising_vs_T(models_data):
+    """Plot denoising ratio vs window size T for TXCDRv2 at fixed k values."""
+    k_values = [1, 3, 5]
+    fig, axes = plt.subplots(1, len(k_values), figsize=(6 * len(k_values), 6),
+                             sharey=True)
+
+    for ki, k in enumerate(k_values):
+        ax = axes[ki]
+        Ts, ratios, nmses, aucs = [], [], [], []
+
+        for T in TXCDR_T_VALUES:
+            key = f"TXCDRv2-T{T}"
+            if key not in models_data or not models_data[key]:
+                continue
+            # Find result at this k
+            for r in models_data[key]:
+                if r["k"] == k:
+                    loc = r["mean_local_corr"]
+                    glob = r["mean_global_corr"]
+                    if loc > 0.01:
+                        Ts.append(T)
+                        ratios.append(glob / loc)
+                        nmses.append(r["nmse"])
+                        aucs.append(r["auc"])
+                    break
+
+        if Ts:
+            ax.plot(Ts, ratios, "o-", color="#d62728", lw=2, ms=8, label="Denoising ratio")
+            ax.axhline(0.5, color="gray", ls=":", alpha=0.4, lw=1,
+                       label="Per-token floor (0.50)")
+            ax.axhline(1.0, color="gray", ls="--", alpha=0.5, lw=1,
+                       label="Full denoising (1.0)")
+
+        ax.set_xlabel("Window size T")
+        if ki == 0:
+            ax.set_ylabel("Global / Local correlation ratio")
+        ax.set_title(f"k = {k}")
+        ax.set_xticks(TXCDR_T_VALUES)
+        ax.legend(fontsize=8)
+        ax.grid(True, alpha=0.3)
+
+    plt.suptitle(f"{SUPTITLE_PREFIX}: TXCDRv2 denoising ratio vs window size",
+                 fontsize=14, y=1.02)
+    plt.tight_layout()
+    _save(fig, "exp1c_denoising_vs_T")
+    plt.close(fig)
+    print("  exp1c_denoising_vs_T")
+
+
 # ── Main ──
 
 def main():
@@ -340,6 +407,7 @@ def main():
     if probe_data is not None:
         plot_linear_probe(probe_data)
     plot_scatter(models_data, probe_data)
+    plot_denoising_vs_T(models_data)
     print(f"Done. All plots in {OUT_DIR}/")
 
 

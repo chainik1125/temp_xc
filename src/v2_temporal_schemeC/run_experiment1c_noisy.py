@@ -78,6 +78,10 @@ CACHE_DIR = os.path.join(BASE, "model_cache", "exp1c")
 EXP1_RESULTS_DIR = os.path.join(BASE, "results", "reproduction")
 
 # ── Model configs ──
+# TXCDRv2 window sizes to sweep (T=2,5 are the originals; others added to
+# test whether denoising improves monotonically with window size)
+TXCDR_T_VALUES = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+
 # Each entry: (name, type, kwargs, training_config)
 MODELS = [
     {
@@ -102,20 +106,15 @@ MODELS = [
         "spec": StackedSAEModelSpec(T=5),
         "steps": 30_000, "batch": 2048, "lr": 3e-4,
     },
+] + [
     {
-        "name": "TXCDRv2-T2",
+        "name": f"TXCDRv2-T{T}",
         "type": "txcdrv2",
-        "T": 2,
-        "spec": TXCDRv2ModelSpec(T=2),
+        "T": T,
+        "spec": TXCDRv2ModelSpec(T=T),
         "steps": 30_000, "batch": 2048, "lr": 3e-4,
-    },
-    {
-        "name": "TXCDRv2-T5",
-        "type": "txcdrv2",
-        "T": 5,
-        "spec": TXCDRv2ModelSpec(T=5),
-        "steps": 30_000, "batch": 2048, "lr": 3e-4,
-    },
+    }
+    for T in TXCDR_T_VALUES
 ]
 
 
@@ -401,13 +400,18 @@ def load_exp1_results():
 
 # ── Plotting ──
 
+import matplotlib.cm as _cm
+_cmap = _cm.get_cmap("RdPu", len(TXCDR_T_VALUES) + 2)
+_markers = ["o", "s", "D", "^", "v", "<", "p", ">", "h", "H", "*"]
 STYLE = {
-    "TFA-pos":      {"color": "tab:brown",  "marker": "X",  "ls": "-"},
-    "Stacked-T2":   {"color": "tab:green",  "marker": "o",  "ls": "-"},
-    "Stacked-T5":   {"color": "tab:green",  "marker": "^",  "ls": "--"},
-    "TXCDRv2-T2":   {"color": "tab:purple", "marker": "o",  "ls": "-"},
-    "TXCDRv2-T5":   {"color": "tab:purple", "marker": "^",  "ls": "--"},
+    "TFA-pos":    {"color": "tab:brown", "marker": "X", "ls": "-"},
+    "Stacked-T2": {"color": "tab:green", "marker": "o", "ls": "-"},
+    "Stacked-T5": {"color": "tab:green", "marker": "^", "ls": "--"},
 }
+for _i, _T in enumerate(TXCDR_T_VALUES):
+    STYLE[f"TXCDRv2-T{_T}"] = {
+        "color": _cmap(_i + 2), "marker": _markers[_i % len(_markers)], "ls": "-",
+    }
 
 
 def plot_nmse_auc(all_results, exp1_results):
@@ -538,12 +542,10 @@ def main():
     mu_obs = flat.abs().gt(0.01).float().mean().item()
     print(f"  observed marginal density: {mu_obs:.3f}", flush=True)
 
-    # Build generators
-    gen_fns = {
-        "seq": make_seq_gen(train_x, shuffle=False),
-        "window_2": make_window_gen(train_x, T=2),
-        "window_5": make_window_gen(train_x, T=5),
-    }
+    # Build generators (one per unique T value used by any model)
+    gen_fns = {"seq": make_seq_gen(train_x, shuffle=False)}
+    for T in sorted(set(m["T"] for m in MODELS if "T" in m)):
+        gen_fns[f"window_{T}"] = make_window_gen(train_x, T=T)
 
     # Load Experiment 1 results for overlay
     exp1_results = load_exp1_results()
