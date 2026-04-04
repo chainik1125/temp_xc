@@ -86,7 +86,13 @@ class SequenceConfig:
 
 @dataclass
 class DataGenerationConfig:
-    """Top-level configuration combining all pipeline parameters."""
+    """Top-level configuration combining all pipeline parameters.
+
+    For per-feature temporal persistence, set ``per_feature_pi`` and
+    ``per_feature_rho`` (each a list of length k).  When these are set,
+    the ``transition`` config is ignored for hidden-state generation
+    and each feature gets its own Markov chain parameters.
+    """
 
     transition: TransitionConfig = field(default_factory=TransitionConfig)
     emission: EmissionConfig = field(default_factory=EmissionConfig)
@@ -94,3 +100,5 @@ class DataGenerationConfig:
     features: FeatureConfig = field(default_factory=FeatureConfig)
     sequence: SequenceConfig = field(default_factory=SequenceConfig)
     seed: int = 42
+    per_feature_pi: list[float] | None = None
+    per_feature_rho: list[float] | None = None

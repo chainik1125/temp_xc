@@ -62,9 +62,14 @@ def generate_dataset(
     all_activations = torch.zeros(n_seq, k, T)
     all_x = torch.zeros(n_seq, T, d)
 
+    # Per-feature Markov parameters (if provided)
+    pf_pi = torch.tensor(config.per_feature_pi) if config.per_feature_pi else None
+    pf_rho = torch.tensor(config.per_feature_rho) if config.per_feature_rho else None
+
     for seq_idx in range(n_seq):
         hidden_states, support = generate_support(
-            k, T, config.transition, config.emission, rng
+            k, T, config.transition, config.emission, rng,
+            pi=pf_pi, rho=pf_rho,
         )
         magnitudes = sample_magnitudes(k, T, config.magnitude, rng)
         activations = generate_activations(support, magnitudes)

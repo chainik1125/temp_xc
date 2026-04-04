@@ -3,7 +3,11 @@
 import torch
 
 from src.data_generation.configs import EmissionConfig, TransitionConfig
-from src.shared.temporal_support import generate_support_markov
+from src.shared.temporal_support import (
+    generate_support_markov,
+    generate_support_per_feature,
+    per_feature_from_pi_rho,
+)
 
 
 def generate_hidden_states(
@@ -11,18 +15,29 @@ def generate_hidden_states(
     T: int,
     config: TransitionConfig,
     rng: torch.Generator,
+    pi: torch.Tensor | None = None,
+    rho: torch.Tensor | None = None,
 ) -> torch.Tensor:
     """Generate hidden state sequences from a transition config.
 
     Args:
         k: Number of independent features (chains).
         T: Sequence length (number of timesteps).
-        config: Transition matrix configuration.
+        config: Transition matrix configuration (used when pi/rho are None).
         rng: Torch random number generator for reproducibility.
+        pi: Per-feature marginal activation probability, shape (k,).
+            When set (together with rho), overrides config.
+        rho: Per-feature lag-1 autocorrelation, shape (k,).
 
     Returns:
         Binary tensor of shape (k, T) where 1 = state B, 0 = state A.
     """
+    if pi is not None and rho is not None:
+        alpha, beta = per_feature_from_pi_rho(pi, rho)
+        return generate_support_per_feature(
+            k=k, T=T, alpha=alpha, beta=beta,
+            stationary_on_prob=pi, rng=rng,
+        )
     return generate_support_markov(
         k=k,
         T=T,
@@ -71,6 +86,8 @@ def generate_support(
     transition_config: TransitionConfig,
     emission_config: EmissionConfig,
     rng: torch.Generator,
+    pi: torch.Tensor | None = None,
+    rho: torch.Tensor | None = None,
 ) -> tuple[torch.Tensor, torch.Tensor]:
     """Generate hidden states and observed support.
 
@@ -80,12 +97,16 @@ def generate_support(
         transition_config: Transition matrix configuration.
         emission_config: Emission probabilities.
         rng: Torch random number generator for reproducibility.
+        pi: Per-feature marginal activation probability, shape (k,).
+            When set (together with rho), overrides transition_config.
+        rho: Per-feature lag-1 autocorrelation, shape (k,).
 
     Returns:
         Tuple of (hidden_states, support), each shape (k, T).
         hidden_states: the raw Markov chain states.
         support: the observed (emitted) binary support.
     """
-    hidden_states = generate_hidden_states(k, T, transition_config, rng)
+    hidden_states = generate_hidden_states(k, T, transition_config, rng,
+                                           pi=pi, rho=rho)
     support = apply_emission(hidden_states, emission_config, rng)
     return hidden_states, support
