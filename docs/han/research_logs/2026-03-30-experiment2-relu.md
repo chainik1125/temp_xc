@@ -1,3 +1,9 @@
+---
+author: Claude
+date: 2026-03-30
+tags:
+  - results
+---
 
 ## Experiment 2: ReLU + L1 Pareto frontier
 
@@ -11,7 +17,7 @@ Left: L0 vs NMSE Pareto. Centre: L0 vs AUC Pareto. Right: NMSE vs AUC scatter. *
 
 1. **TFA's novel-L0 frontier lies below the ReLU SAE's in the binding regime** (1.3--2.2x advantage at L0 = 7--12), consistent with Experiment 1. On total L0, TFA's frontier is strictly *above* the ReLU SAE's — TFA uses 20--32 total active codes for NMSE that the ReLU SAE achieves with fewer purely sparse codes. This confirms that TFA's NMSE advantage at matched novel L0 comes at the cost of a dense channel that inflates total representation complexity.
 
-2. **TXCDR and TXCDRv2 achieve the best feature recovery** (decoder-averaged AUC). TXCDR $T$=2 peaks at AUC = 0.94 and TXCDRv2 $T$=2 reaches AUC = 0.94, both at low L1. However, their NMSE floor (~0.003 for TXCDR, ~0.005 for TXCDRv2) is an order of magnitude worse than the ReLU SAE's best ($7 \times 10^{-6}$). The crosscoders learn interpretable feature directions but the shared-latent bottleneck limits reconstruction quality.
+2. **TXCDR and TXCDRv2 achieve the best feature recovery** (decoder-averaged AUC). TXCDR $T$=2 peaks at AUC = 0.99 and TXCDRv2 $T$=2 reaches AUC = 0.99, both at low L1. (In L1 mode with $k = $ None, TXCDR and TXCDRv2 are identical — the $k \times T$ distinction only applies under TopK.) Their NMSE floor (~0.003) is an order of magnitude worse than the ReLU SAE's best ($7 \times 10^{-6}$). The crosscoders learn interpretable feature directions but the shared-latent bottleneck limits reconstruction quality.
 
 3. **Stacked SAE has low decoder-averaged AUC** despite good per-position reconstruction. At matched L0, the Stacked SAE's decoder-averaged AUC (0.4--0.7) is substantially lower than TXCDR's (0.8--0.94), confirming that independent per-position decoders do not learn aligned feature representations.
 

@@ -83,18 +83,18 @@ All models trained 30K steps.[^1]
 
 | $k$ | Shared SAE | TFA | TFA-shuf | TFA-pos | pos-shuf | Stacked ($T$=2) | Stacked ($T$=5) | TXCDR ($T$=2) | TXCDR ($T$=5) | TXCDRv2 ($T$=2) | TXCDRv2 ($T$=5) |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | 0.389 | 0.511 | 0.497 | 0.520 | 0.464 | 0.387 | 0.398 | 0.395 | 0.420 | 0.398 | 0.643 |
-| 2 | 0.339 | 0.511 | 0.526 | 0.542 | 0.489 | 0.377 | 0.358 | 0.416 | 0.463 | 0.564 | 0.873 |
-| 3 | 0.352 | 0.538 | 0.529 | 0.635 | 0.527 | 0.407 | 0.383 | 0.502 | 0.563 | 0.746 | **0.925** |
-| 4 | 0.356 | 0.583 | 0.563 | 0.676 | 0.539 | 0.410 | 0.389 | 0.552 | 0.571 | 0.818 | **0.942** |
-| 5 | 0.374 | 0.634 | 0.611 | 0.755 | 0.591 | 0.461 | 0.436 | 0.584 | 0.634 | **0.919** | **0.959** |
-| 6 | 0.644 | 0.633 | 0.718 | **0.800** | 0.631 | 0.646 | 0.526 | 0.744 | 0.650 | **0.925** | **0.960** |
-| 8 | 0.639 | 0.720 | 0.747 | **0.910** | 0.739 | 0.683 | 0.553 | 0.808 | 0.722 | **0.927** | 0.532 |
-| 10 | 0.688 | 0.807 | 0.780 | **0.918** | 0.731 | 0.651 | 0.584 | **0.943** | 0.886 | **0.941** | --- |
-| 12 | 0.873 | 0.745 | 0.702 | **0.899** | 0.684 | 0.727 | 0.568 | 0.912 | **0.928** | **0.977** | --- |
-| 15 | 0.863 | 0.714 | 0.713 | 0.777 | 0.592 | 0.735 | 0.600 | **0.941** | **0.940** | 0.869 | --- |
-| 17 | 0.787 | 0.602 | 0.631 | 0.720 | 0.523 | 0.688 | 0.587 | **0.979** | 0.906 | 0.694 | --- |
-| 20 | 0.595 | 0.568 | 0.533 | 0.638 | 0.528 | 0.601 | 0.529 | **0.989** | **0.954** | 0.539 | --- |
+| 1 | 0.389 | 0.511 | 0.497 | 0.520 | 0.464 | 0.387 | 0.398 | 0.395 | 0.420 | 0.416 | 0.643 |
+| 2 | 0.339 | 0.511 | 0.526 | 0.542 | 0.489 | 0.377 | 0.358 | 0.416 | 0.463 | 0.552 | 0.873 |
+| 3 | 0.352 | 0.538 | 0.529 | 0.635 | 0.527 | 0.407 | 0.383 | 0.502 | 0.563 | 0.744 | **0.925** |
+| 4 | 0.356 | 0.583 | 0.563 | 0.676 | 0.539 | 0.410 | 0.389 | 0.552 | 0.571 | 0.808 | **0.942** |
+| 5 | 0.374 | 0.634 | 0.611 | 0.755 | 0.591 | 0.461 | 0.436 | 0.584 | 0.634 | **0.943** | **0.959** |
+| 6 | 0.644 | 0.633 | 0.718 | **0.800** | 0.631 | 0.646 | 0.526 | 0.744 | 0.650 | **0.912** | **0.960** |
+| 8 | 0.639 | 0.720 | 0.747 | **0.910** | 0.739 | 0.683 | 0.553 | 0.808 | 0.722 | **0.942** | 0.532 |
+| 10 | 0.688 | 0.807 | 0.780 | **0.918** | 0.731 | 0.651 | 0.584 | **0.943** | 0.886 | **0.989** | --- |
+| 12 | 0.873 | 0.745 | 0.702 | **0.899** | 0.684 | 0.727 | 0.568 | 0.912 | **0.928** | **0.985** | --- |
+| 15 | 0.863 | 0.714 | 0.713 | 0.777 | 0.592 | 0.735 | 0.600 | **0.941** | **0.940** | 0.885 | --- |
+| 17 | 0.787 | 0.602 | 0.631 | 0.720 | 0.523 | 0.688 | 0.587 | **0.979** | 0.906 | 0.711 | --- |
+| 20 | 0.595 | 0.568 | 0.533 | 0.638 | 0.528 | 0.601 | 0.529 | **0.989** | **0.954** | 0.530 | --- |
 
 ![NMSE and AUC vs k](../../../src/v2_temporal_schemeC/results/auc_and_crosscoder/exp1_topk_auc.png)
 
@@ -108,7 +108,7 @@ Windowed models only: Stacked SAE, TXCDR, and TXCDRv2 at $T$=2 and $T$=5. AUC is
 
 1. **NMSE: TFA wins in binding regime; TXCDRv2 is competitive at matched L0.** TFA achieves 3--7$\times$ lower NMSE than the Shared SAE for $k \leq 10$. TXCDRv2 (with $k \times T$ active latents, matching Stacked SAE total L0) closes the gap: at $k = 5$, TXCDRv2 $T$=2 NMSE = 0.100 vs Shared SAE 0.143.
 
-2. **TXCDRv2 achieves the best AUC in the binding regime.** With fair sparsity, TXCDRv2 $T$=5 achieves AUC = 0.959 at $k = 5$ and 0.960 at $k = 6$, far surpassing all other models at these $k$ values. TXCDRv2 $T$=2 peaks at AUC = 0.977 at $k = 12$. The shared latent forces each decoder column to represent the same feature across positions, yielding excellent cross-position interpretability. AUC degrades when $k \times T$ approaches the dictionary width (40), e.g., TXCDRv2 $T$=5 drops to 0.532 at $k = 8$ ($k \times T = 40$).
+2. **TXCDRv2 achieves the best AUC in the binding regime.** With fair sparsity, TXCDRv2 $T$=5 achieves AUC = 0.959 at $k = 5$ and 0.960 at $k = 6$, far surpassing all other models at these $k$ values. TXCDRv2 $T$=2 peaks at AUC = 0.989 at $k = 10$. The shared latent forces each decoder column to represent the same feature across positions, yielding excellent cross-position interpretability. AUC degrades when $k \times T$ approaches the dictionary width (40), e.g., TXCDRv2 $T$=5 drops to 0.532 at $k = 8$ ($k \times T = 40$).
 
 3. **Stacked SAE has low decoder-averaged AUC.** Despite achieving similar NMSE to the Shared SAE, Stacked SAE's decoder-averaged AUC is substantially lower (0.651 vs 0.688 at $k = 10$ for $T$=2). Each position's independent SAE recovers features with differently-indexed decoder columns --- averaging the decoder matrices across positions destroys alignment. This confirms the Stacked SAE does not learn cross-position feature consistency, unlike TXCDRv2 whose shared latent enforces it.
 

@@ -118,6 +118,43 @@ def main():
     print("Experiment 1 plots saved.")
 
     # ══════════════════════════════════════════════════════════════════
+    # EXPERIMENT 1 WINDOWED-ONLY: Stacked SAE vs TXCDR vs TXCDRv2
+    # ══════════════════════════════════════════════════════════════════
+
+    windowed = [m for m in MODELS if m[0].startswith(("Stacked", "TXCDR"))]
+    fig, axes = plt.subplots(1, 3, figsize=(18, 6))
+
+    for filename, display, c, m, ls in windowed:
+        if filename not in data:
+            continue
+        topk = data[filename]["topk"]
+        ks = [r["k"] for r in topk]
+        nmse = [r["nmse"] for r in topk]
+        auc = [r["auc"] for r in topk]
+
+        axes[0].plot(ks, nmse, marker=m, linestyle=ls, color=c, lw=2, ms=7, label=display)
+        axes[1].plot(ks, auc, marker=m, linestyle=ls, color=c, lw=2, ms=7, label=display)
+        axes[2].plot(nmse, auc, marker=m, linestyle=ls, color=c, lw=2, ms=7, label=display)
+
+    axes[0].set(xlabel="k", ylabel="NMSE", title="NMSE vs k", yscale="log")
+    axes[1].set(xlabel="k", ylabel="AUC", title="Feature Recovery AUC vs k")
+    axes[2].set(xlabel="NMSE", ylabel="AUC", title="NMSE vs AUC", xscale="log")
+    for ax in axes:
+        ax.legend(fontsize=8)
+        ax.grid(True, alpha=0.3)
+
+    plt.suptitle("Experiment 1: Windowed models (decoder-averaged AUC)", fontsize=14, y=1.02)
+    plt.tight_layout()
+    for ext in ["png", "pdf"]:
+        path = os.path.join(OUT_DIR, f"exp1_windowed_only.{ext}")
+        if ext == "png":
+            save_figure(fig, path)
+        else:
+            fig.savefig(path, bbox_inches="tight")
+    plt.close(fig)
+    print("Experiment 1 windowed-only plots saved.")
+
+    # ══════════════════════════════════════════════════════════════════
     # EXPERIMENT 2: ReLU+L1 Pareto
     # ══════════════════════════════════════════════════════════════════
 

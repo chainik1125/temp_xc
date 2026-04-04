@@ -228,6 +228,11 @@ class TXCDRv2ModelSpec(TXCDRModelSpec):
     def create(self, d_in: int, d_sae: int, k: int | None,
                device: torch.device, **kwargs) -> TemporalCrosscoder:
         k_effective = k * self.T if k is not None else None
+        if k_effective is not None and k_effective > d_sae:
+            raise ValueError(
+                f"TXCDRv2: k*T={k_effective} exceeds d_sae={d_sae}. "
+                f"Maximum k for T={self.T} is {d_sae // self.T}."
+            )
         return TemporalCrosscoder(d_in, d_sae, self.T, k=k_effective).to(device)
 
 

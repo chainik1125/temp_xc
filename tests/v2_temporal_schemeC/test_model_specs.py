@@ -13,6 +13,7 @@ from src.v2_temporal_schemeC.experiment.model_specs import (
     SAEModelSpec,
     TFAModelSpec,
     TXCDRModelSpec,
+    TXCDRv2ModelSpec,
     EvalOutput,
 )
 
@@ -143,3 +144,21 @@ class TestTXCDRModelSpec:
         assert isinstance(out, EvalOutput)
         assert out.n_tokens == 4  # 4 windows
         assert out.sum_pred_l0 == 0  # TXCDR has no pred component
+
+
+class TestTXCDRv2ModelSpec:
+    def test_k_times_T_effective(self):
+        spec = TXCDRv2ModelSpec(T=2)
+        model = spec.create(d_in=8, d_sae=8, k=3, device=DEVICE)
+        # k_effective = 3 * 2 = 6, model.k should be 6
+        assert model.k == 6
+
+    def test_k_times_T_exceeds_d_sae_raises(self):
+        spec = TXCDRv2ModelSpec(T=5)
+        with pytest.raises(ValueError, match="k\\*T=45 exceeds d_sae=8"):
+            spec.create(d_in=8, d_sae=8, k=9, device=DEVICE)
+
+    def test_k_times_T_at_limit_succeeds(self):
+        spec = TXCDRv2ModelSpec(T=5)
+        model = spec.create(d_in=8, d_sae=40, k=8, device=DEVICE)
+        assert model.k == 40

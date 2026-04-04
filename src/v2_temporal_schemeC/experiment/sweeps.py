@@ -23,6 +23,7 @@ def _cache_key(model_name: str, k, data_config: DataConfig, params: dict) -> str
         f"seed={data_config.seed}",
         f"n={data_config.num_features}",
         f"d={data_config.hidden_dim}",
+        f"h={data_config.dict_width}",
         f"pi={'_'.join(f'{p:.2f}' for p in data_config.pi[:3])}",
         f"rho={'_'.join(f'{r:.2f}' for r in data_config.rho[:3])}",
         f"steps={params.get('total_steps', 0)}",
