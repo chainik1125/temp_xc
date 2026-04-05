@@ -68,6 +68,15 @@ python -m src.bench.sweep --models topk_sae crosscoder --steps 5000
 
 # Custom grid:
 python -m src.bench.sweep --k 2 5 10 --rho 0.0 0.9 --T 2 5
+
+# Multi-seed for error bars:
+python -m src.bench.sweep --seeds 42 43 44 --steps 30000
+
+# Leaky reset:
+python -m src.bench.sweep --delta 0.5 --rho 0.6 --k 2 5 10
+
+# Coupled features (dual-AUC: local + global):
+python -m src.bench.sweep --coupled --K-hidden 10 --M-emission 20 --n-parents 2
 ```
 
 **Use programmatically:**
