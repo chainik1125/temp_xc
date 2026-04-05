@@ -28,12 +28,12 @@ if [ ! -d "$ENV_DIR" ]; then
 fi
 source "$ENV_DIR/bin/activate"
 
-# Install deps — skip sae-lens and transformer-lens (not needed for bench)
+# Install only what bench needs — skip sae-lens/transformer-lens
 pip install --upgrade pip
 pip install torch numpy scipy matplotlib tqdm pytest
 
-# Install project in editable mode (only src/)
-pip install -e .
+# Install project without pulling all deps (sae-lens breaks on Trillium)
+pip install --no-deps -e .
 
 echo ""
 echo "=== Setup complete ==="
