@@ -95,115 +95,123 @@ def run_sweep(
         if entry.gen_key.startswith("window_"):
             window_sizes.add(int(entry.gen_key.split("_")[1]))
 
-    for rho in sweep_config.rho_values:
-        # Build a pipeline for this rho value
-        rho_config = DataConfig(
-            toy_model=data_config.toy_model,
-            markov=MarkovConfig(
-                pi=data_config.markov.pi,
-                rho=rho,
-                delta=data_config.markov.delta,
-            ),
-            coupling=data_config.coupling,
-            seq_len=data_config.seq_len,
-            d_sae=data_config.d_sae,
-            seed=data_config.seed,
-            eval_n_seq=data_config.eval_n_seq,
-        )
+    for seed in sweep_config.seeds:
+        for rho in sweep_config.rho_values:
+            # Build a pipeline for this (rho, seed) combination
+            rho_config = DataConfig(
+                toy_model=data_config.toy_model,
+                markov=MarkovConfig(
+                    pi=data_config.markov.pi,
+                    rho=rho,
+                    delta=data_config.markov.delta,
+                ),
+                coupling=data_config.coupling,
+                seq_len=data_config.seq_len,
+                d_sae=data_config.d_sae,
+                seed=seed,
+                eval_n_seq=data_config.eval_n_seq,
+            )
 
-        mode_str = ""
-        if is_coupled:
-            c = data_config.coupling
-            mode_str = f" [coupled K={c.K_hidden} M={c.M_emission}]"
-        if data_config.markov.delta > 0:
-            mode_str += f" [delta={data_config.markov.delta}]"
+            mode_str = ""
+            if is_coupled:
+                c = data_config.coupling
+                mode_str = f" [coupled K={c.K_hidden} M={c.M_emission}]"
+            if data_config.markov.delta > 0:
+                mode_str += f" [delta={data_config.markov.delta}]"
+            seed_str = f" [seed={seed}]" if len(sweep_config.seeds) > 1 else ""
 
-        if verbose:
-            print(f"\n{'=' * 60}")
-            print(f"  rho = {rho}{mode_str}")
-            print(f"{'=' * 60}")
-
-        pipeline = build_data_pipeline(
-            rho_config, device, window_sizes=list(window_sizes) or None
-        )
-
-        for k in sweep_config.k_values:
             if verbose:
-                print(f"\n  k = {k}:")
+                print(f"\n{'=' * 60}")
+                print(f"  rho = {rho}{mode_str}{seed_str}")
+                print(f"{'=' * 60}")
 
-            for entry in models:
-                t0 = time.time()
+            pipeline = build_data_pipeline(
+                rho_config, device, window_sizes=list(window_sizes) or None
+            )
 
-                # Resolve training params (apply overrides)
-                batch_size = entry.training_overrides.get(
-                    "batch_size", train_config.batch_size
-                )
-                lr = entry.training_overrides.get("lr", train_config.lr)
-                total_steps = entry.training_overrides.get(
-                    "total_steps", train_config.total_steps
-                )
-
-                # Create and train
-                model = entry.spec.create(
-                    d_in=data_config.toy_model.hidden_dim,
-                    d_sae=data_config.d_sae,
-                    k=k,
-                    device=device,
-                )
-                gen_fn = _get_generator(pipeline, entry.gen_key)
-                train_log = entry.spec.train(
-                    model,
-                    gen_fn,
-                    total_steps=total_steps,
-                    batch_size=batch_size,
-                    lr=lr,
-                    device=device,
-                    log_every=train_config.log_every,
-                    grad_clip=train_config.grad_clip,
-                )
-
-                # Evaluate with both local and global features
-                result = evaluate_model(
-                    entry.spec,
-                    model,
-                    pipeline.eval_hidden,
-                    device,
-                    true_features=pipeline.true_features,
-                    global_features=pipeline.global_features,
-                    seq_len=data_config.seq_len,
-                )
-
-                elapsed = time.time() - t0
-                row = {
-                    "model": entry.name,
-                    "rho": rho,
-                    "k": k,
-                    **result.to_dict(),
-                    "elapsed_sec": round(elapsed, 1),
-                }
-                if data_config.markov.delta > 0:
-                    row["delta"] = data_config.markov.delta
-                all_results.append(row)
-
+            for k in sweep_config.k_values:
                 if verbose:
-                    auc_str = f"AUC={result.auc:.4f}" if result.auc is not None else ""
-                    global_str = ""
-                    if result.global_auc is not None:
-                        global_str = f" | gAUC={result.global_auc:.4f}"
-                    print(
-                        f"    {entry.name:20s} | NMSE={result.nmse:.6f} | "
-                        f"L0={result.l0:.2f} | {auc_str}{global_str} | {elapsed:.0f}s"
+                    print(f"\n  k = {k}:")
+
+                for entry in models:
+                    # Seed training for reproducibility
+                    torch.manual_seed(seed)
+                    t0 = time.time()
+
+                    # Resolve training params (apply overrides)
+                    batch_size = entry.training_overrides.get(
+                        "batch_size", train_config.batch_size
+                    )
+                    lr = entry.training_overrides.get("lr", train_config.lr)
+                    total_steps = entry.training_overrides.get(
+                        "total_steps", train_config.total_steps
                     )
 
-                del model
-                if torch.cuda.is_available():
-                    torch.cuda.empty_cache()
+                    # Create and train
+                    model = entry.spec.create(
+                        d_in=data_config.toy_model.hidden_dim,
+                        d_sae=data_config.d_sae,
+                        k=k,
+                        device=device,
+                    )
+                    gen_fn = _get_generator(pipeline, entry.gen_key)
+                    train_log = entry.spec.train(
+                        model,
+                        gen_fn,
+                        total_steps=total_steps,
+                        batch_size=batch_size,
+                        lr=lr,
+                        device=device,
+                        log_every=train_config.log_every,
+                        grad_clip=train_config.grad_clip,
+                    )
 
-        # Save per-rho results
-        rho_path = os.path.join(results_dir, f"results_rho{rho:.1f}.json")
-        rho_results = [r for r in all_results if r["rho"] == rho]
-        with open(rho_path, "w") as f:
-            json.dump(rho_results, f, indent=2)
+                    # Evaluate with both local and global features
+                    result = evaluate_model(
+                        entry.spec,
+                        model,
+                        pipeline.eval_hidden,
+                        device,
+                        true_features=pipeline.true_features,
+                        global_features=pipeline.global_features,
+                        seq_len=data_config.seq_len,
+                    )
+
+                    elapsed = time.time() - t0
+                    row = {
+                        "model": entry.name,
+                        "rho": rho,
+                        "k": k,
+                        "seed": seed,
+                        **result.to_dict(),
+                        "elapsed_sec": round(elapsed, 1),
+                    }
+                    if data_config.markov.delta > 0:
+                        row["delta"] = data_config.markov.delta
+                    all_results.append(row)
+
+                    if verbose:
+                        auc_str = f"AUC={result.auc:.4f}" if result.auc is not None else ""
+                        global_str = ""
+                        if result.global_auc is not None:
+                            global_str = f" | gAUC={result.global_auc:.4f}"
+                        print(
+                            f"    {entry.name:20s} | NMSE={result.nmse:.6f} | "
+                            f"L0={result.l0:.2f} | {auc_str}{global_str} | {elapsed:.0f}s"
+                        )
+
+                    del model
+                    if torch.cuda.is_available():
+                        torch.cuda.empty_cache()
+
+            # Save per-(rho, seed) results
+            tag = f"rho{rho:.1f}_seed{seed}"
+            rho_path = os.path.join(results_dir, f"results_{tag}.json")
+            rho_results = [
+                r for r in all_results if r["rho"] == rho and r["seed"] == seed
+            ]
+            with open(rho_path, "w") as f:
+                json.dump(rho_results, f, indent=2)
 
     # Save full summary
     summary_path = os.path.join(results_dir, "sweep_summary.json")
@@ -233,6 +241,8 @@ def main():
                         help="Filter to specific model names")
     parser.add_argument("--steps", type=int, default=None,
                         help="Override training steps")
+    parser.add_argument("--seeds", type=int, nargs="+", default=None,
+                        help="Seeds to sweep (default: [42])")
     parser.add_argument("--results-dir", type=str, default="results/bench",
                         help="Output directory for results")
     parser.add_argument("--dry-run", action="store_true",
@@ -258,6 +268,7 @@ def main():
         k_values=args.k or [2, 5, 10, 25],
         rho_values=args.rho or [0.0, 0.6, 0.9],
         T_values=args.T or [2, 5],
+        seeds=args.seeds or [42],
     )
     train_config = TrainConfig(
         total_steps=args.steps or 30_000,
@@ -287,7 +298,7 @@ def main():
 
     # Build job list for display
     jobs = list(itertools.product(
-        sweep_config.rho_values, sweep_config.k_values, models
+        sweep_config.seeds, sweep_config.rho_values, sweep_config.k_values, models
     ))
 
     mode_info = "standard"
@@ -301,6 +312,7 @@ def main():
     print(f"  Device: {device}")
     print(f"  Mode: {mode_info}")
     print(f"  Steps: {train_config.total_steps:,}")
+    print(f"  Seeds: {sweep_config.seeds}")
     print(f"  Rho: {sweep_config.rho_values}")
     print(f"  K: {sweep_config.k_values}")
     print(f"  T: {sweep_config.T_values}")
@@ -309,8 +321,9 @@ def main():
     print(f"{'=' * 60}")
 
     if args.dry_run:
-        for i, (rho, k, entry) in enumerate(jobs, 1):
-            print(f"  [{i:3d}/{len(jobs)}]  {entry.name:20s}  rho={rho}  k={k}")
+        for i, (seed, rho, k, entry) in enumerate(jobs, 1):
+            seed_str = f"  seed={seed}" if len(sweep_config.seeds) > 1 else ""
+            print(f"  [{i:3d}/{len(jobs)}]  {entry.name:20s}  rho={rho}  k={k}{seed_str}")
         print("\n  (dry run — no training)")
         return
 
