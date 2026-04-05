@@ -9,7 +9,8 @@ cd "$SCRATCH/temp_xc"
 
 export PYTHONUNBUFFERED=1
 # Use only one GPU (the sweep is single-GPU, Trillium requires 4 per node)
-# Single GPU job — no need to restrict CUDA_VISIBLE_DEVICES
+# Trillium requires 4 GPUs per node but we only need one
+export CUDA_VISIBLE_DEVICES=0
 
 echo "=== Bench Sweep ==="
 echo "Host: $(hostname)"

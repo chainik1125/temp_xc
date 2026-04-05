@@ -18,7 +18,7 @@ git pull origin aniket
 
 sbatch \
   --partition="${PARTITION}" \
-  --gpus-per-node=1 \
+  --gpus-per-node=4 \
   --cpus-per-task=4 \
   --time="${TIME}" \
   --account="${ACCOUNT}" \
