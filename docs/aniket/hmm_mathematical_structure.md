@@ -84,7 +84,7 @@ directions (unit norm, near-zero pairwise cosine similarity).
 ### Parameterization equivalences
 
 Our pipeline uses $(\lambda, q)$. Han uses $(\pi, \rho)$. Andre uses
-$(\text{rho}, \text{p\_stat})$. All describe the same 2-state Markov chain:
+`(rho, p_stat)`. All describe the same 2-state Markov chain:
 
 | Our notation | Han's notation | Andre's notation | Meaning |
 |---|---|---|---|
