@@ -28,6 +28,10 @@ echo ""
 python3 src/data_generation/test.py
 
 echo ""
+echo "=== Coupled Features Validation Plots ==="
+python3 -m src.data_generation.plot_coupled --output-dir results/coupled_validation
+
+echo ""
 echo "=== Bench Module Tests ==="
 python3 -m pytest tests/bench/ -v
 
