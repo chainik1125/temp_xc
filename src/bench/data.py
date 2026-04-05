@@ -1,14 +1,23 @@
 """Unified data pipeline for architecture comparison experiments.
 
-Builds a toy model, data generators, and evaluation data from a DataConfig.
-Adapted from Han's data_pipeline.py pattern, using the shared orthogonalize
-and Markov chain utilities.
+Supports two data generation modes:
+
+1. **Standard** (coupling=None): K independent Markov chains, each controlling
+   one feature. Supports leaky reset via MarkovConfig.delta.
+
+2. **Coupled** (coupling=CouplingConfig): K hidden Markov chains produce M > K
+   emission features through a coupling matrix. The pipeline provides both
+   emission_features (local ground truth) and hidden_features (global ground truth)
+   for dual-AUC evaluation.
 
 Usage:
+    # Standard mode
     pipeline = build_data_pipeline(config, device, window_sizes=[2, 5])
-    gen_flat = pipeline.gen_flat      # for TopKSAE
-    gen_seq = pipeline.gen_seq        # for TFA
-    gen_win = pipeline.gen_windows[2] # for Stacked/Crosscoder with T=2
+
+    # Coupled mode
+    config = DataConfig(coupling=CouplingConfig(K_hidden=10, M_emission=20))
+    pipeline = build_data_pipeline(config, device, window_sizes=[2, 5])
+    pipeline.global_features  # (hidden_dim, K) -- for global AUC
 """
 
 import math
@@ -18,7 +27,12 @@ from typing import Callable
 import torch
 import torch.nn as nn
 
-from src.bench.config import DataConfig
+from src.bench.config import CouplingConfig, DataConfig
+from src.data_generation.coupling import (
+    apply_coupling,
+    compute_hidden_features,
+    generate_coupling_matrix,
+)
 from src.shared.orthogonalize import orthogonalize
 
 
@@ -39,18 +53,9 @@ class ToyModel(nn.Module):
             vector_len=hidden_dim,
             target_cos_sim=target_cos_sim,
         )
-        # Store as buffer (not parameter) — we don't train this
         self.register_buffer("W", embeddings)  # (num_features, hidden_dim)
 
     def forward(self, activations: torch.Tensor) -> torch.Tensor:
-        """Map activations to hidden space.
-
-        Args:
-            activations: (..., num_features) sparse activation coefficients.
-
-        Returns:
-            (..., hidden_dim) dense hidden representations.
-        """
         return activations @ self.W
 
     @property
@@ -59,23 +64,23 @@ class ToyModel(nn.Module):
         return self.W.T
 
 
-def _generate_markov_activations(
+def _generate_markov_support(
     n_seq: int,
     seq_len: int,
     num_features: int,
     pi: float,
-    rho: float,
+    rho_eff: float,
     device: torch.device,
 ) -> torch.Tensor:
-    """Generate binary support via independent 2-state Markov chains + magnitudes.
+    """Generate binary support via independent 2-state Markov chains.
 
-    Returns activations of shape (n_seq, seq_len, num_features).
+    Uses rho_eff (effective autocorrelation, already accounting for any leak).
+
+    Returns binary tensor of shape (n_seq, seq_len, num_features).
     """
-    # Markov transition probabilities
-    p01 = pi * (1.0 - rho)  # off -> on
-    p10 = (1.0 - pi) * (1.0 - rho)  # on -> off
+    p01 = pi * (1.0 - rho_eff)  # off -> on
+    p10 = (1.0 - pi) * (1.0 - rho_eff)  # on -> off
 
-    # Initialize from stationary distribution
     support = torch.zeros(n_seq, seq_len, num_features, device=device)
     support[:, 0, :] = (torch.rand(n_seq, num_features, device=device) < pi).float()
 
@@ -86,45 +91,103 @@ def _generate_markov_activations(
         stay_on = (prev == 1) & (u >= p10)
         support[:, t, :] = (turn_on | stay_on).float()
 
-    # Magnitudes: half-normal (|N(0,1)|)
+    return support
+
+
+def _generate_activations(
+    n_seq: int,
+    seq_len: int,
+    num_features: int,
+    pi: float,
+    rho_eff: float,
+    device: torch.device,
+) -> torch.Tensor:
+    """Generate support * magnitudes for standard (non-coupled) mode.
+
+    Returns activations of shape (n_seq, seq_len, num_features).
+    """
+    support = _generate_markov_support(n_seq, seq_len, num_features, pi, rho_eff, device)
     magnitudes = torch.randn(n_seq, seq_len, num_features, device=device).abs()
     return support * magnitudes
 
 
+def _generate_coupled_activations(
+    n_seq: int,
+    seq_len: int,
+    coupling_cfg: CouplingConfig,
+    coupling_matrix: torch.Tensor,
+    pi: float,
+    rho_eff: float,
+    device: torch.device,
+) -> torch.Tensor:
+    """Generate activations for coupled-feature mode.
+
+    K hidden chains -> coupling matrix -> M emission support -> magnitudes.
+
+    Returns activations of shape (n_seq, seq_len, M_emission).
+    """
+    K = coupling_cfg.K_hidden
+    M = coupling_cfg.M_emission
+
+    # Generate K hidden chains: (n_seq, seq_len, K)
+    hidden_support = _generate_markov_support(n_seq, seq_len, K, pi, rho_eff, device)
+
+    # Map to M emissions via coupling: need (n_seq, K, seq_len) for apply_coupling
+    hidden_kT = hidden_support.permute(0, 2, 1)  # (n_seq, K, seq_len)
+    C = coupling_matrix.to(device)
+
+    if coupling_cfg.emission_mode == "or":
+        emission_support_kT = apply_coupling(hidden_kT, C, mode="or")
+    else:
+        rng = torch.Generator(device=device) if device.type != "cpu" else torch.Generator()
+        emission_support_kT = apply_coupling(
+            hidden_kT, C, mode="sigmoid",
+            alpha=coupling_cfg.sigmoid_alpha,
+            beta=coupling_cfg.sigmoid_beta,
+            rng=rng,
+        )
+
+    # (n_seq, M, seq_len) -> (n_seq, seq_len, M)
+    emission_support = emission_support_kT.permute(0, 2, 1)
+
+    magnitudes = torch.randn(n_seq, seq_len, M, device=device).abs()
+    return emission_support * magnitudes
+
+
 @dataclass
 class DataPipeline:
-    """Pre-built data generators and eval data. Created once, shared across models."""
+    """Pre-built data generators and eval data. Created once, shared across models.
+
+    For coupled-feature mode, global_features provides the K hidden-state-level
+    ground truth directions for computing global AUC separately from local AUC.
+    """
 
     toy_model: ToyModel
     scaling_factor: float
-    true_features: torch.Tensor  # (hidden_dim, num_features)
+    true_features: torch.Tensor  # (hidden_dim, num_features) -- local/emission features
     eval_hidden: torch.Tensor  # (n_seq, seq_len, hidden_dim)
     gen_flat: Callable[[int], torch.Tensor]
     gen_seq: Callable[[int], torch.Tensor]
     gen_windows: dict[int, Callable[[int], torch.Tensor]] = field(
         default_factory=dict
     )
+    global_features: torch.Tensor | None = None  # (hidden_dim, K) -- coupled mode only
 
 
 def _compute_scaling_factor(
     toy_model: ToyModel,
-    config: DataConfig,
+    gen_activations: Callable,
+    hidden_dim: int,
     device: torch.device,
     n_samples: int = 10_000,
+    seq_len: int = 64,
 ) -> float:
     """Compute scaling factor: sqrt(hidden_dim) / mean(||hidden||)."""
     with torch.no_grad():
-        acts = _generate_markov_activations(
-            n_samples,
-            config.seq_len,
-            config.toy_model.num_features,
-            config.markov.pi,
-            config.markov.rho,
-            device,
-        )
+        acts = gen_activations(n_samples, seq_len)
         hidden = toy_model(acts)
-        mean_norm = hidden.reshape(-1, config.toy_model.hidden_dim).norm(dim=-1).mean().item()
-        return math.sqrt(config.toy_model.hidden_dim) / mean_norm
+        mean_norm = hidden.reshape(-1, hidden_dim).norm(dim=-1).mean().item()
+        return math.sqrt(hidden_dim) / mean_norm
 
 
 def build_data_pipeline(
@@ -133,6 +196,9 @@ def build_data_pipeline(
     window_sizes: list[int] | None = None,
 ) -> DataPipeline:
     """Build all data generators and eval data from a DataConfig.
+
+    Supports both standard (independent features) and coupled (K hidden -> M emission)
+    data generation modes, including leaky reset via MarkovConfig.delta.
 
     Args:
         config: Data configuration.
@@ -143,29 +209,70 @@ def build_data_pipeline(
         Fully constructed DataPipeline ready for sweep use.
     """
     torch.manual_seed(config.seed)
-    toy_model = ToyModel(
-        num_features=config.toy_model.num_features,
-        hidden_dim=config.toy_model.hidden_dim,
-        target_cos_sim=config.toy_model.target_cos_sim,
-    ).to(device)
-    toy_model.eval()
 
-    true_features = toy_model.feature_directions  # (hidden_dim, num_features)
-    sf = _compute_scaling_factor(toy_model, config, device)
-
-    num_f = config.toy_model.num_features
+    is_coupled = config.coupling is not None
+    pi = config.markov.pi
+    rho_eff = config.markov.rho_eff
     hidden_dim = config.toy_model.hidden_dim
     seq_len = config.seq_len
-    pi = config.markov.pi
-    rho = config.markov.rho
+
+    if is_coupled:
+        coupling_cfg = config.coupling
+        M = coupling_cfg.M_emission
+        K = coupling_cfg.K_hidden
+        num_obs_features = M  # SAE sees M emission features
+
+        # Build toy model with M emission features
+        toy_model = ToyModel(
+            num_features=M,
+            hidden_dim=hidden_dim,
+            target_cos_sim=config.toy_model.target_cos_sim,
+        ).to(device)
+        toy_model.eval()
+
+        # Generate coupling matrix (deterministic given seed)
+        rng = torch.Generator().manual_seed(config.seed + 200)
+        coupling_matrix = generate_coupling_matrix(K, M, coupling_cfg.n_parents, rng)
+
+        # Global features: (K, hidden_dim) -> transpose to (hidden_dim, K)
+        emission_features_kd = toy_model.W  # (M, hidden_dim)
+        hidden_features_kd = compute_hidden_features(emission_features_kd, coupling_matrix)
+        global_features = hidden_features_kd.T.to(device)  # (hidden_dim, K)
+
+        true_features = toy_model.feature_directions  # (hidden_dim, M)
+
+        def _gen_acts(n_seq, sl):
+            return _generate_coupled_activations(
+                n_seq, sl, coupling_cfg, coupling_matrix, pi, rho_eff, device,
+            )
+
+    else:
+        num_obs_features = config.toy_model.num_features
+        global_features = None
+
+        toy_model = ToyModel(
+            num_features=num_obs_features,
+            hidden_dim=hidden_dim,
+            target_cos_sim=config.toy_model.target_cos_sim,
+        ).to(device)
+        toy_model.eval()
+
+        true_features = toy_model.feature_directions
+
+        def _gen_acts(n_seq, sl):
+            return _generate_activations(n_seq, sl, num_obs_features, pi, rho_eff, device)
+
+    # Compute scaling factor
+    sf = _compute_scaling_factor(toy_model, _gen_acts, hidden_dim, device,
+                                 seq_len=seq_len)
 
     def gen_flat(batch_size: int) -> torch.Tensor:
         n_seq = max(1, batch_size // seq_len)
-        acts = _generate_markov_activations(n_seq, seq_len, num_f, pi, rho, device)
+        acts = _gen_acts(n_seq, seq_len)
         return (toy_model(acts) * sf).reshape(-1, hidden_dim)[:batch_size]
 
     def gen_seq(n_seq: int) -> torch.Tensor:
-        acts = _generate_markov_activations(n_seq, seq_len, num_f, pi, rho, device)
+        acts = _gen_acts(n_seq, seq_len)
         return toy_model(acts) * sf
 
     gen_windows: dict[int, Callable[[int], torch.Tensor]] = {}
@@ -173,9 +280,7 @@ def build_data_pipeline(
         def _make_window_gen(T_: int) -> Callable[[int], torch.Tensor]:
             def gen(batch_size: int) -> torch.Tensor:
                 n_seq = max(1, batch_size // (seq_len - T_ + 1)) + 1
-                acts = _generate_markov_activations(
-                    n_seq, seq_len, num_f, pi, rho, device
-                )
+                acts = _gen_acts(n_seq, seq_len)
                 hidden = toy_model(acts) * sf
                 windows = []
                 for t in range(seq_len - T_ + 1):
@@ -188,9 +293,7 @@ def build_data_pipeline(
 
     # Build eval data
     torch.manual_seed(config.seed + 100)
-    eval_acts = _generate_markov_activations(
-        config.eval_n_seq, seq_len, num_f, pi, rho, device
-    )
+    eval_acts = _gen_acts(config.eval_n_seq, seq_len)
     eval_hidden = toy_model(eval_acts) * sf
 
     return DataPipeline(
@@ -201,4 +304,5 @@ def build_data_pipeline(
         gen_flat=gen_flat,
         gen_seq=gen_seq,
         gen_windows=gen_windows,
+        global_features=global_features,
     )

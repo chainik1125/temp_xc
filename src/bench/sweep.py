@@ -15,6 +15,12 @@ Usage:
     # Quick test:
     python -m src.bench.sweep --steps 100
 
+    # Leaky reset:
+    python -m src.bench.sweep --delta 0.5
+
+    # Coupled features (K=10 hidden, M=20 emissions):
+    python -m src.bench.sweep --coupled --K-hidden 10 --M-emission 20 --n-parents 2
+
     # Dry run:
     python -m src.bench.sweep --dry-run
 """
@@ -30,7 +36,13 @@ from dataclasses import asdict
 import torch
 
 from src.bench.architectures import get_default_models, ModelEntry
-from src.bench.config import DataConfig, TrainConfig, SweepConfig, MarkovConfig
+from src.bench.config import (
+    CouplingConfig,
+    DataConfig,
+    MarkovConfig,
+    TrainConfig,
+    SweepConfig,
+)
 from src.bench.data import build_data_pipeline, DataPipeline
 from src.bench.eval import evaluate_model, EvalResult
 
@@ -66,7 +78,8 @@ def run_sweep(
     """Run a full architecture comparison sweep.
 
     For each (rho, k) combination, trains and evaluates every model in
-    the models list, then saves results.
+    the models list, then saves results. Supports both standard and
+    coupled-feature data generation modes.
 
     Args:
         models: List of ModelEntry specs to compare.
@@ -82,6 +95,7 @@ def run_sweep(
     """
     os.makedirs(results_dir, exist_ok=True)
     all_results = []
+    is_coupled = data_config.coupling is not None
 
     # Collect window sizes needed across all models
     window_sizes = set()
@@ -93,15 +107,28 @@ def run_sweep(
         # Build a pipeline for this rho value
         rho_config = DataConfig(
             toy_model=data_config.toy_model,
-            markov=MarkovConfig(pi=data_config.markov.pi, rho=rho),
+            markov=MarkovConfig(
+                pi=data_config.markov.pi,
+                rho=rho,
+                delta=data_config.markov.delta,
+            ),
+            coupling=data_config.coupling,
             seq_len=data_config.seq_len,
             d_sae=data_config.d_sae,
             seed=data_config.seed,
             eval_n_seq=data_config.eval_n_seq,
         )
+
+        mode_str = ""
+        if is_coupled:
+            c = data_config.coupling
+            mode_str = f" [coupled K={c.K_hidden} M={c.M_emission}]"
+        if data_config.markov.delta > 0:
+            mode_str += f" [delta={data_config.markov.delta}]"
+
         if verbose:
             print(f"\n{'=' * 60}")
-            print(f"  rho = {rho}")
+            print(f"  rho = {rho}{mode_str}")
             print(f"{'=' * 60}")
 
         pipeline = build_data_pipeline(
@@ -143,13 +170,14 @@ def run_sweep(
                     grad_clip=train_config.grad_clip,
                 )
 
-                # Evaluate
+                # Evaluate with both local and global features
                 result = evaluate_model(
                     entry.spec,
                     model,
                     pipeline.eval_hidden,
                     device,
                     true_features=pipeline.true_features,
+                    global_features=pipeline.global_features,
                     seq_len=data_config.seq_len,
                 )
 
@@ -161,13 +189,18 @@ def run_sweep(
                     **result.to_dict(),
                     "elapsed_sec": round(elapsed, 1),
                 }
+                if data_config.markov.delta > 0:
+                    row["delta"] = data_config.markov.delta
                 all_results.append(row)
 
                 if verbose:
                     auc_str = f"AUC={result.auc:.4f}" if result.auc is not None else ""
+                    global_str = ""
+                    if result.global_auc is not None:
+                        global_str = f" | gAUC={result.global_auc:.4f}"
                     print(
                         f"    {entry.name:20s} | NMSE={result.nmse:.6f} | "
-                        f"L0={result.l0:.2f} | {auc_str} | {elapsed:.0f}s"
+                        f"L0={result.l0:.2f} | {auc_str}{global_str} | {elapsed:.0f}s"
                     )
 
                 del model
@@ -212,6 +245,19 @@ def main():
                         help="Output directory for results")
     parser.add_argument("--dry-run", action="store_true",
                         help="Print sweep plan without training")
+
+    # HMM extensions
+    parser.add_argument("--delta", type=float, default=0.0,
+                        help="Leaky reset parameter (0 = standard)")
+    parser.add_argument("--coupled", action="store_true",
+                        help="Enable coupled-feature mode")
+    parser.add_argument("--K-hidden", type=int, default=10,
+                        help="Number of hidden states (coupled mode)")
+    parser.add_argument("--M-emission", type=int, default=20,
+                        help="Number of emission features (coupled mode)")
+    parser.add_argument("--n-parents", type=int, default=2,
+                        help="Parents per emission (coupled mode)")
+
     args = parser.parse_args()
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -224,7 +270,20 @@ def main():
     train_config = TrainConfig(
         total_steps=args.steps or 30_000,
     )
-    data_config = DataConfig()
+
+    coupling = None
+    if args.coupled:
+        coupling = CouplingConfig(
+            K_hidden=args.K_hidden,
+            M_emission=args.M_emission,
+            n_parents=args.n_parents,
+        )
+
+    data_config = DataConfig(
+        markov=MarkovConfig(delta=args.delta),
+        coupling=coupling,
+        d_sae=args.M_emission if args.coupled else 128,
+    )
 
     models = get_default_models(sweep_config.T_values)
 
@@ -239,9 +298,16 @@ def main():
         sweep_config.rho_values, sweep_config.k_values, models
     ))
 
+    mode_info = "standard"
+    if args.coupled:
+        mode_info = f"coupled (K={args.K_hidden}, M={args.M_emission}, n_parents={args.n_parents})"
+    if args.delta > 0:
+        mode_info += f", delta={args.delta}"
+
     print(f"{'=' * 60}")
     print(f"  ARCHITECTURE COMPARISON SWEEP")
     print(f"  Device: {device}")
+    print(f"  Mode: {mode_info}")
     print(f"  Steps: {train_config.total_steps:,}")
     print(f"  Rho: {sweep_config.rho_values}")
     print(f"  K: {sweep_config.k_values}")

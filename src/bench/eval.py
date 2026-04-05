@@ -4,6 +4,10 @@ A single evaluate_model() dispatches based on ArchSpec.data_format and
 returns a consistent EvalResult. Feature recovery AUC is computed by
 matching decoder columns to true feature directions via cosine similarity.
 
+For coupled-feature data, computes dual AUC:
+  - local AUC: decoder vs emission features (M directions)
+  - global AUC: decoder vs hidden features (K directions)
+
 Adapted from Han's eval_unified.py and temporal_crosscoders/metrics.py.
 """
 
@@ -17,13 +21,21 @@ from src.bench.architectures.base import ArchSpec, EvalOutput
 
 @dataclass
 class EvalResult:
-    """Canonical evaluation result — every model returns all these fields."""
+    """Canonical evaluation result — every model returns all these fields.
+
+    For coupled-feature data, auc/r90/mean_max_cos measure local (emission)
+    recovery, while global_auc/global_r90/global_mean_max_cos measure
+    hidden-state-level recovery.
+    """
 
     nmse: float
     l0: float
     auc: float | None = None
     r90: float | None = None
     mean_max_cos: float | None = None
+    global_auc: float | None = None
+    global_r90: float | None = None
+    global_mean_max_cos: float | None = None
 
     def to_dict(self) -> dict:
         return asdict(self)
@@ -75,6 +87,7 @@ def evaluate_model(
     eval_data: torch.Tensor,
     device: torch.device,
     true_features: torch.Tensor | None = None,
+    global_features: torch.Tensor | None = None,
     seq_len: int = 64,
 ) -> EvalResult:
     """Evaluate a model on eval_data and return unified metrics.
@@ -84,7 +97,8 @@ def evaluate_model(
         model: Trained model.
         eval_data: (n_seq, seq_len, d) full-sequence eval data.
         device: Torch device.
-        true_features: (d_in, n_features) for AUC. None to skip.
+        true_features: (d_in, n_features) for local AUC. None to skip.
+        global_features: (d_in, K) for global AUC (coupled mode). None to skip.
         seq_len: Sequence length (for windowing).
 
     Returns:
@@ -106,18 +120,30 @@ def evaluate_model(
     nmse = acc.sum_se / max(acc.sum_signal, 1e-12)
     l0 = acc.sum_l0 / max(acc.n_tokens, 1)
 
-    auc = None
-    r90 = None
-    mean_max_cos = None
+    # Local AUC (emission features)
+    auc = r90 = mean_max_cos = None
     if true_features is not None:
         dd = _get_decoder_averaged(spec, model, device)
-        tf = true_features.to(device)
-        recovery = feature_recovery_auc(dd, tf)
+        recovery = feature_recovery_auc(dd, true_features.to(device))
         auc = recovery["auc"]
         r90 = recovery["frac_recovered_90"]
         mean_max_cos = recovery["mean_max_cos"]
 
-    return EvalResult(nmse=nmse, l0=l0, auc=auc, r90=r90, mean_max_cos=mean_max_cos)
+    # Global AUC (hidden features, coupled mode only)
+    global_auc = global_r90 = global_mean_max_cos = None
+    if global_features is not None:
+        dd = _get_decoder_averaged(spec, model, device)
+        global_recovery = feature_recovery_auc(dd, global_features.to(device))
+        global_auc = global_recovery["auc"]
+        global_r90 = global_recovery["frac_recovered_90"]
+        global_mean_max_cos = global_recovery["mean_max_cos"]
+
+    return EvalResult(
+        nmse=nmse, l0=l0,
+        auc=auc, r90=r90, mean_max_cos=mean_max_cos,
+        global_auc=global_auc, global_r90=global_r90,
+        global_mean_max_cos=global_mean_max_cos,
+    )
 
 
 def _get_decoder_averaged(
