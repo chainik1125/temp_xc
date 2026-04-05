@@ -1,32 +1,14 @@
 #!/bin/bash
-# trillium_sweep.sh — Submit the bench sweep as a SLURM job on Trillium.
-# Run from the Trillium login node: bash scripts/trillium_sweep.sh
+# trillium_sweep.sh — Pull latest code and submit the sweep job.
+# Run from Trillium login node: bash scripts/trillium_sweep.sh
 set -euo pipefail
 
-PARTITION="compute_full_node"
-ACCOUNT="rrg-aspuru"
-JOB_NAME="bench-sweep"
-TIME="08:00:00"
-REPO_DIR="$SCRATCH/temp_xc"
-LOG_DIR="$REPO_DIR/logs/slurm"
-
-mkdir -p "$LOG_DIR"
-
-# Pull latest code
-cd "$REPO_DIR"
+cd "$SCRATCH/temp_xc"
 git pull origin aniket
+mkdir -p logs/slurm
 
-sbatch \
-  --partition="${PARTITION}" \
-  --gpus-per-node=4 \
-  --cpus-per-task=4 \
-  --time="08:00:00" \
-  --account="${ACCOUNT}" \
-  --job-name="${JOB_NAME}" \
-  --output="${LOG_DIR}/${JOB_NAME}_%j.out" \
-  --error="${LOG_DIR}/${JOB_NAME}_%j.err" \
-  scripts/trillium_run_sweep.sh
+sbatch scripts/trillium_run_sweep.sh
 
 echo ""
 echo "Submitted. Monitor with: squeue -u \$USER"
-echo "Logs: ${LOG_DIR}/"
+echo "Logs: logs/slurm/"

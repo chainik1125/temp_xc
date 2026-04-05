@@ -1,6 +1,15 @@
 #!/bin/bash
-# trillium_run_sweep.sh — The actual SLURM job script.
-# Submitted by trillium_sweep.sh — do not run directly.
+#SBATCH --partition=compute_full_node
+#SBATCH --gpus-per-node=4
+#SBATCH --cpus-per-task=4
+#SBATCH --time=08:00:00
+#SBATCH --account=rrg-aspuru
+#SBATCH --job-name=bench-sweep
+#SBATCH --output=logs/slurm/bench-sweep_%j.out
+#SBATCH --error=logs/slurm/bench-sweep_%j.err
+
+# trillium_run_sweep.sh — SLURM job script for the full bench sweep.
+# Submit with: sbatch scripts/trillium_run_sweep.sh
 set -euo pipefail
 
 module load StdEnv/2023 python/3.11 cuda/12.2 scipy-stack/2024a
