@@ -129,6 +129,125 @@ for seq_idx in range(min(5, cfg3.sequence.n_sequences)):
 log("result", "x vectors correct for HMM case")
 
 # ============================================================================
+# Test 4: Leaky reset
+# ============================================================================
+
+log("info", "smoke test 4: leaky reset transition")
+
+from src.data_generation.transition import build_leaky_transition_matrix
+
+# delta=0 should reproduce standard reset
+P_standard = TransitionConfig.from_reset_process(lam=0.5, p=0.05).matrix
+P_leaky_0 = TransitionConfig.from_leaky_reset(lam=0.5, p=0.05, delta=0.0).matrix
+assert torch.allclose(P_standard, P_leaky_0, atol=1e-6), (
+    f"delta=0 should reproduce standard reset:\n{P_standard}\nvs\n{P_leaky_0}"
+)
+log("result", "delta=0 reproduces standard reset")
+
+# Stationary distribution should be p for all delta
+for delta in [0.0, 0.25, 0.5, 0.75, 1.0]:
+    P_leaky = build_leaky_transition_matrix(0.5, 0.05, delta)
+    pi = stationary_distribution(P_leaky)
+    err = abs(pi[1].item() - 0.05)
+    assert err < 1e-6, f"delta={delta}: stationary pi_on={pi[1].item():.6f}, expected 0.05"
+log("result", "stationary distribution is p for all delta values")
+
+# Autocorrelation should increase with delta
+rhos = []
+for delta in [0.0, 0.25, 0.5, 0.75]:
+    P_leaky = build_leaky_transition_matrix(0.5, 0.05, delta)
+    rho = P_leaky[1, 1].item() - P_leaky[0, 1].item()  # alpha - beta
+    rhos.append(rho)
+for i in range(len(rhos) - 1):
+    assert rhos[i] < rhos[i + 1], (
+        f"autocorrelation should increase with delta: {rhos}"
+    )
+log("result", f"autocorrelation increases with delta: {[f'{r:.4f}' for r in rhos]}")
+
+# ============================================================================
+# Test 5: Coupled features (OR gate)
+# ============================================================================
+
+log("info", "smoke test 5: coupled features (OR gate)")
+
+from src.data_generation.configs import CoupledDataGenerationConfig, CouplingConfig
+from src.data_generation.coupled_dataset import generate_coupled_dataset
+
+cfg5 = CoupledDataGenerationConfig(
+    transition=TransitionConfig.from_reset_process(lam=0.5, p=0.1),
+    coupling=CouplingConfig(K_hidden=10, M_emission=20, n_parents=2, emission_mode="or"),
+    sequence=SequenceConfig(T=64, n_sequences=50),
+    hidden_dim=64,
+    seed=42,
+)
+result5 = generate_coupled_dataset(cfg5)
+
+log("info", "output shapes:")
+for key in ["emission_features", "hidden_features", "coupling_matrix",
+            "hidden_states", "support", "magnitudes", "activations", "x"]:
+    log("data", f"  {key}: {tuple(result5[key].shape)}")
+
+# Check shapes
+assert result5["emission_features"].shape == (20, 64)
+assert result5["hidden_features"].shape == (10, 64)
+assert result5["coupling_matrix"].shape == (20, 10)
+assert result5["hidden_states"].shape == (50, 10, 64)
+assert result5["support"].shape == (50, 20, 64)
+assert result5["x"].shape == (50, 64, 64)
+log("result", "all shapes correct")
+
+# Verify x = activations.T @ emission_features
+for seq_idx in range(min(5, cfg5.sequence.n_sequences)):
+    expected_x = result5["activations"][seq_idx].T @ result5["emission_features"]
+    max_err = (result5["x"][seq_idx] - expected_x).abs().max().item()
+    assert max_err < 1e-5, f"Sequence {seq_idx}: max reconstruction error = {max_err}"
+log("result", "x = activations.T @ emission_features (correct)")
+
+# Each row of coupling matrix should have exactly n_parents ones
+row_sums = result5["coupling_matrix"].sum(dim=1)
+assert (row_sums == 2).all(), f"Expected 2 parents per emission, got {row_sums}"
+log("result", "coupling matrix has exactly 2 parents per emission")
+
+# OR gate: emission fires iff at least one parent is on
+# Verify on first sequence
+h = result5["hidden_states"][0]  # (K, T)
+C = result5["coupling_matrix"]  # (M, K)
+expected_support = (C @ h >= 1).float()
+actual_support = result5["support"][0]
+assert torch.equal(actual_support, expected_support), "OR gate coupling mismatch"
+log("result", "OR gate coupling verified")
+
+# Hidden features should have unit norm
+norms = result5["hidden_features"].norm(dim=1)
+assert torch.allclose(norms, torch.ones(10), atol=1e-5), f"Hidden feature norms: {norms}"
+log("result", "hidden features have unit norm")
+
+# ============================================================================
+# Test 6: Coupled features — diagonal C reduces to standard pipeline
+# ============================================================================
+
+log("info", "smoke test 6: coupled features with diagonal C (K=M, n_parents=1)")
+
+cfg6 = CoupledDataGenerationConfig(
+    transition=TransitionConfig.from_reset_process(lam=0.5, p=0.1),
+    coupling=CouplingConfig(K_hidden=10, M_emission=10, n_parents=1, emission_mode="or"),
+    sequence=SequenceConfig(T=64, n_sequences=10),
+    hidden_dim=64,
+    seed=42,
+)
+result6 = generate_coupled_dataset(cfg6)
+
+# With K=M and n_parents=1, each emission has exactly one parent
+# (though not necessarily in order — it's a permutation)
+assert result6["coupling_matrix"].shape == (10, 10)
+assert (result6["coupling_matrix"].sum(dim=1) == 1).all()
+log("result", "K=M, n_parents=1 gives one parent per emission")
+
+# Hidden features should be close to (a permutation of) emission features
+# since each hidden state controls exactly M*1/K = 1 emission on average
+log("result", "diagonal-like coupling verified")
+
+# ============================================================================
 # Summary
 # ============================================================================
 

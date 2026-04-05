@@ -31,6 +31,40 @@ def build_transition_matrix(lam: float, p: float) -> torch.Tensor:
     ])
 
 
+def build_leaky_transition_matrix(
+    lam: float, p: float, delta: float
+) -> torch.Tensor:
+    """Construct a leaky reset transition matrix.
+
+    Like the standard reset, but "reset" events are biased toward the current
+    state by a leak parameter delta.
+
+    With probability lambda, resample h ~ Bernoulli((1-delta)*p + delta*h_prev).
+    With probability 1-lambda, persist.
+
+    Transition probabilities:
+        P(1|1) = 1 - lam*(1-delta)*(1-p)
+        P(1|0) = lam*(1-delta)*p
+
+    delta=0 recovers the standard reset. delta=1 gives an absorbing chain.
+    Stationary distribution is p for all delta.
+
+    Args:
+        lam: Mixing parameter in [0, 1].
+        p: Stationary firing probability.
+        delta: Leak parameter in [0, 1].
+
+    Returns:
+        2x2 row-stochastic transition matrix.
+    """
+    alpha = 1 - lam * (1 - delta) * (1 - p)  # P(on -> on)
+    beta = lam * (1 - delta) * p  # P(off -> on)
+    return torch.tensor([
+        [1 - beta, beta],
+        [1 - alpha, alpha],
+    ])
+
+
 def validate_transition_matrix(P: torch.Tensor) -> None:
     """Validate that P is a valid 2x2 row-stochastic transition matrix.
 

@@ -206,6 +206,61 @@ where $R_S$ has every row equal to $[1-q, q]$.
 | `x` | `(n_seq, T, d)` | Activation vectors (what the SAE sees) |
 | `config` | `DataGenerationConfig` | Config used for generation |
 
+### I want leaky reset (softer transition boundaries)
+
+Instead of the binary persist-or-resample, the leaky reset biases "reset" events
+toward the current state. Parameter $\delta \in [0,1]$ controls the leak:
+
+```python
+cfg = DataGenerationConfig(
+    transition=TransitionConfig.from_leaky_reset(lam=0.5, p=0.05, delta=0.5),
+    features=FeatureConfig(k=10, d=64),
+    sequence=SequenceConfig(T=128, n_sequences=100),
+)
+result = generate_dataset(cfg)
+```
+
+$\delta = 0$ recovers the standard reset. Higher $\delta$ = stickier states.
+Stationary distribution stays at $p$ for all $\delta$.
+
+### I want coupled features (many-to-many hidden-to-emission mapping)
+
+K hidden states drive M > K emission features through a coupling matrix. This
+creates a genuine separation between local (emission-level) and global
+(hidden-state-level) structure.
+
+```python
+from src.data_generation import (
+    CoupledDataGenerationConfig,
+    CouplingConfig,
+    generate_coupled_dataset,
+)
+from src.data_generation.configs import TransitionConfig, SequenceConfig
+
+cfg = CoupledDataGenerationConfig(
+    transition=TransitionConfig.from_reset_process(lam=0.5, p=0.1),
+    coupling=CouplingConfig(
+        K_hidden=10,       # global latent dimensionality
+        M_emission=20,     # local emission dimensionality
+        n_parents=2,       # parents per emission
+        emission_mode="or",  # OR gate: fires if any parent is on
+    ),
+    sequence=SequenceConfig(T=64, n_sequences=100),
+    hidden_dim=64,
+)
+result = generate_coupled_dataset(cfg)
+
+# Two sets of ground truth:
+result["emission_features"]  # (20, 64) — local ground truth
+result["hidden_features"]    # (10, 64) — global ground truth
+result["coupling_matrix"]    # (20, 10) — which hidden states control which emissions
+```
+
+For evaluation, compute AUC against both `emission_features` (local) and
+`hidden_features` (global) separately. The phase transition hypothesis:
+at low k, models recover emission features; at high k, TXCDRv2 transitions
+to recovering hidden-state features.
+
 ## Configuration
 
 ### `TransitionConfig`
@@ -213,6 +268,7 @@ where $R_S$ has every row equal to $[1-q, q]$.
 - `matrix`: 2x2 row-stochastic torch tensor
 - `stationary_on_prob`: probability of being in state B (ON) at stationarity
 - `from_reset_process(lam, p)`: convenience constructor
+- `from_leaky_reset(lam, p, delta)`: leaky reset constructor
 
 ### `EmissionConfig`
 
@@ -236,3 +292,22 @@ where $R_S$ has every row equal to $[1-q, q]$.
 
 - `T`: sequence length (default 128)
 - `n_sequences`: number of sequences (default 1)
+
+### `CouplingConfig`
+
+- `K_hidden`: number of hidden states (default 10)
+- `M_emission`: number of emission features (default 20)
+- `n_parents`: parent hidden states per emission (default 2)
+- `emission_mode`: `"or"` (deterministic) or `"sigmoid"` (soft)
+- `sigmoid_alpha`: sharpness for sigmoid mode (default 5.0)
+- `sigmoid_beta`: bias for sigmoid mode (default -2.0)
+
+### `CoupledDataGenerationConfig`
+
+- `transition`: TransitionConfig for the K hidden chains
+- `coupling`: CouplingConfig
+- `magnitude`: MagnitudeConfig
+- `sequence`: SequenceConfig
+- `hidden_dim`: observation space dimension d (default 64)
+- `target_cos_sim`: pairwise cosine sim for emission features (default 0.0)
+- `seed`: random seed (default 42)
