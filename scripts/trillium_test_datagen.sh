@@ -5,8 +5,8 @@
 set -euo pipefail
 
 #SBATCH --partition=compute_full_node
-#SBATCH --gpus-per-node=4
-#SBATCH --cpus-per-task=8
+#SBATCH --gpus-per-node=1
+#SBATCH --cpus-per-task=4
 #SBATCH --time=00:30:00
 #SBATCH --account=rrg-aspuru
 #SBATCH --job-name=test-datagen
