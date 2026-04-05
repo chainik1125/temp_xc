@@ -15,7 +15,7 @@ This document summarizes two infrastructure deliverables from the April 4 meetin
 2. **Richer HMM extensions** -- leaky reset and coupled features in the data generation
    pipeline, enabling the "figure 2" robustness experiments Dmitry identified as essential.
 
-Both are tested and validated on Trillium (H100) and RunPod (A40).
+Both are tested and validated on GPU.
 
 ## Part 1: Architecture Comparison Bench (`src/bench/`)
 
@@ -110,32 +110,16 @@ class MyArchSpec(ArchSpec):
 2. Register in `src/bench/architectures/__init__.py`
 3. It's automatically included in sweeps via `get_default_models()`
 
-**Run on Trillium HPC:**
-
-```bash
-# One-time setup:
-bash scripts/trillium_setup.sh
-
-# Submit tests:
-sbatch scripts/trillium_test_datagen.sh
-
-# Submit full sweep (8h wall time):
-bash scripts/trillium_sweep.sh
-
-# Fetch results locally:
-bash scripts/trillium_fetch.sh
-```
-
 ### Test results
 
-19/19 tests passing on Trillium (H100) and RunPod (A40):
+19/19 tests passing (`uv run pytest tests/bench/ -v`):
 
 | Test suite | Tests | Status |
 |------------|-------|--------|
 | `tests/bench/test_architectures.py` | 11 | Pass |
 | `tests/bench/test_data_and_eval.py` | 8 | Pass |
 
-Smoke sweep (100 steps, rho=0.0, k=2, T=2) completed in 9s on A40:
+Smoke sweep (100 steps, rho=0.0, k=2, T=2):
 
 | Model | NMSE | L0 | AUC |
 |-------|------|----|-----|
@@ -179,7 +163,7 @@ Transition probabilities:
 Stationary distribution remains $\mu$ for all $\delta < 1$. Effective autocorrelation
 $\rho_{\text{eff}} = 1 - \lambda(1-\delta)$ increases monotonically with $\delta$.
 
-Verified on Trillium: $\delta = 0$ reproduces standard reset; autocorrelation increases
+Verified: $\delta = 0$ reproduces standard reset; autocorrelation increases
 as `[0.500, 0.625, 0.750, 0.875]` for $\delta \in [0, 0.25, 0.5, 0.75]$.
 
 ### Extension 2: Coupled features
@@ -210,7 +194,7 @@ result["coupling_matrix"]     # (20, 10) -- binary mapping
 
 ### Validation plots
 
-Generated with `python -m src.data_generation.plot_coupled` on Trillium.
+Generated with `python -m src.data_generation.plot_coupled`.
 Config: $K=10$, $M=20$, $n_{\text{parents}}=2$, $\rho=0.6$, OR-gate coupling.
 
 **Coupling matrix**: each emission has exactly 2 parent hidden states, spread evenly
@@ -246,7 +230,7 @@ $n_{\text{parents}}=2$.
 
 ### Smoke test summary
 
-All 6 data generation tests pass on Trillium:
+All 6 data generation tests pass (`python src/data_generation/test.py`):
 
 | Test | Status |
 |------|--------|
@@ -289,5 +273,4 @@ directions.
 - **Leaky reset**: `src/data_generation/transition.py` (`build_leaky_transition_matrix`)
 - **Validation plots**: `src/data_generation/plot_coupled.py`
 - **Results**: `results/coupled_validation/`
-- **Trillium scripts**: `scripts/trillium_*.sh`
 - **Plan doc**: [[coupled_features_plan]]

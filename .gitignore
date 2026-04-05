@@ -28,3 +28,6 @@ Thumbs.db
 
 # Local guides
 .trillium-guide.md
+
+# Trillium HPC scripts (personal cluster config)
+scripts/trillium_*
