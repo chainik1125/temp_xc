@@ -257,13 +257,43 @@ The phase transition hypothesis: at low $k$, models recover emission features
 (high local AUC). At high $k$, TXCDRv2 transitions to recovering hidden-state
 features (global AUC rises). This is the "figure 2" result for the paper.
 
-### For bench integration
+### Bench integration (done)
 
-The `src/bench/data.py` pipeline currently uses simple independent-feature Markov chains.
-To run coupled-feature sweeps, extend `DataConfig` with an optional `CouplingConfig` and
-modify `build_data_pipeline()` to call `generate_coupled_dataset()` when coupling is
-specified. The evaluation module already supports computing AUC against arbitrary feature
-directions.
+The `src/bench/` module fully supports both HMM extensions:
+
+**Leaky reset** -- set `MarkovConfig(delta=0.5)` or use `--delta 0.5` on the CLI:
+
+```bash
+python -m src.bench.sweep --delta 0.5 --rho 0.6 --k 2 5 10 --steps 100
+```
+
+**Coupled features** -- set `CouplingConfig` on `DataConfig` or use `--coupled` on the CLI:
+
+```bash
+python -m src.bench.sweep --coupled --K-hidden 10 --M-emission 20 --n-parents 2 \
+  --k 2 5 10 --rho 0.0 0.9 --steps 100
+```
+
+In coupled mode, results include both `AUC` (local, vs emission features) and
+`gAUC` (global, vs hidden-state features). The `DataPipeline.global_features`
+tensor provides the K hidden-state ground truth directions.
+
+**Programmatic example:**
+
+```python
+from src.bench.config import CouplingConfig, DataConfig, MarkovConfig
+from src.bench.data import build_data_pipeline
+
+config = DataConfig(
+    markov=MarkovConfig(pi=0.1, rho=0.6, delta=0.3),
+    coupling=CouplingConfig(K_hidden=10, M_emission=20, n_parents=2),
+    d_sae=20,
+)
+pipeline = build_data_pipeline(config, device, window_sizes=[2, 5])
+
+pipeline.true_features    # (hidden_dim, 20) -- emission features (local)
+pipeline.global_features  # (hidden_dim, 10) -- hidden features (global)
+```
 
 ## Code
 

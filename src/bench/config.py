@@ -6,6 +6,8 @@ Import these everywhere; never hardcode constants elsewhere.
 
 from dataclasses import dataclass, field
 
+from src.data_generation.configs import CouplingConfig
+
 
 @dataclass
 class ToyModelConfig:
@@ -55,24 +57,6 @@ class MarkovConfig:
     @property
     def beta(self) -> float:
         return self.pi * (1.0 - self.rho_eff)
-
-
-@dataclass
-class CouplingConfig:
-    """Configuration for coupled features (many-to-many hidden->emission).
-
-    K hidden states produce M > K emission features through a binary
-    coupling matrix. Each emission has exactly n_parents parent hidden states.
-
-    When set on DataConfig, switches to coupled-feature data generation.
-    """
-
-    K_hidden: int = 10
-    M_emission: int = 20
-    n_parents: int = 2
-    emission_mode: str = "or"  # "or" (deterministic) or "sigmoid"
-    sigmoid_alpha: float = 5.0
-    sigmoid_beta: float = -2.0
 
 
 @dataclass

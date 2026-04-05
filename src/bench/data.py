@@ -139,7 +139,9 @@ def _generate_coupled_activations(
     if coupling_cfg.emission_mode == "or":
         emission_support_kT = apply_coupling(hidden_kT, C, mode="or")
     else:
-        rng = torch.Generator(device=device) if device.type != "cpu" else torch.Generator()
+        # torch.Generator only supports CPU; for CUDA tensors, apply_coupling
+        # falls back to unseeded torch.rand_like
+        rng = torch.Generator()
         emission_support_kT = apply_coupling(
             hidden_kT, C, mode="sigmoid",
             alpha=coupling_cfg.sigmoid_alpha,

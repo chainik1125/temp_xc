@@ -120,23 +120,24 @@ def evaluate_model(
     nmse = acc.sum_se / max(acc.sum_signal, 1e-12)
     l0 = acc.sum_l0 / max(acc.n_tokens, 1)
 
-    # Local AUC (emission features)
+    # Compute decoder directions once (reused for local and global AUC)
     auc = r90 = mean_max_cos = None
-    if true_features is not None:
-        dd = _get_decoder_averaged(spec, model, device)
-        recovery = feature_recovery_auc(dd, true_features.to(device))
-        auc = recovery["auc"]
-        r90 = recovery["frac_recovered_90"]
-        mean_max_cos = recovery["mean_max_cos"]
-
-    # Global AUC (hidden features, coupled mode only)
     global_auc = global_r90 = global_mean_max_cos = None
-    if global_features is not None:
+
+    if true_features is not None or global_features is not None:
         dd = _get_decoder_averaged(spec, model, device)
-        global_recovery = feature_recovery_auc(dd, global_features.to(device))
-        global_auc = global_recovery["auc"]
-        global_r90 = global_recovery["frac_recovered_90"]
-        global_mean_max_cos = global_recovery["mean_max_cos"]
+
+        if true_features is not None:
+            recovery = feature_recovery_auc(dd, true_features.to(device))
+            auc = recovery["auc"]
+            r90 = recovery["frac_recovered_90"]
+            mean_max_cos = recovery["mean_max_cos"]
+
+        if global_features is not None:
+            global_recovery = feature_recovery_auc(dd, global_features.to(device))
+            global_auc = global_recovery["auc"]
+            global_r90 = global_recovery["frac_recovered_90"]
+            global_mean_max_cos = global_recovery["mean_max_cos"]
 
     return EvalResult(
         nmse=nmse, l0=l0,

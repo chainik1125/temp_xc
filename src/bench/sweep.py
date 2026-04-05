@@ -26,12 +26,10 @@ Usage:
 """
 
 import argparse
-import hashlib
 import itertools
 import json
 import os
 import time
-from dataclasses import asdict
 
 import torch
 
@@ -45,12 +43,6 @@ from src.bench.config import (
 )
 from src.bench.data import build_data_pipeline, DataPipeline
 from src.bench.eval import evaluate_model, EvalResult
-
-
-def _cache_key(model_name: str, k: int, rho: float, config: TrainConfig) -> str:
-    """Deterministic cache key for a trained model."""
-    raw = f"{model_name}|k={k}|rho={rho}|steps={config.total_steps}|lr={config.lr}"
-    return hashlib.md5(raw.encode()).hexdigest()[:12]
 
 
 def _get_generator(pipeline: DataPipeline, gen_key: str):

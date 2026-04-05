@@ -3,7 +3,7 @@ author: Aniket
 date: 2026-04-04
 tags:
   - design
-  - in-progress
+  - complete
 ---
 
 ## Richer HMM Extensions: Leaky Reset & Coupled Features
