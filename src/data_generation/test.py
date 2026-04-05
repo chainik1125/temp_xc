@@ -144,13 +144,14 @@ assert torch.allclose(P_standard, P_leaky_0, atol=1e-6), (
 )
 log("result", "delta=0 reproduces standard reset")
 
-# Stationary distribution should be p for all delta
-for delta in [0.0, 0.25, 0.5, 0.75, 1.0]:
+# Stationary distribution should be p for delta < 1
+# (delta=1 is absorbing — no well-defined stationary distribution)
+for delta in [0.0, 0.25, 0.5, 0.75]:
     P_leaky = build_leaky_transition_matrix(0.5, 0.05, delta)
     pi = stationary_distribution(P_leaky)
     err = abs(pi[1].item() - 0.05)
     assert err < 1e-6, f"delta={delta}: stationary pi_on={pi[1].item():.6f}, expected 0.05"
-log("result", "stationary distribution is p for all delta values")
+log("result", "stationary distribution is p for all delta < 1")
 
 # Autocorrelation should increase with delta
 rhos = []
