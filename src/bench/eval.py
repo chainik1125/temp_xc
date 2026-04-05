@@ -58,7 +58,8 @@ def feature_recovery_auc(
     thresholds = np.linspace(0, 1, n_thresholds)
     max_np = max_per_feature.cpu().numpy()
     curve = np.array([(max_np >= t).mean() for t in thresholds])
-    auc = float(np.trapezoid(curve, thresholds))
+    _integrate = getattr(np, "trapezoid", None) or np.trapz
+    auc = float(_integrate(curve, thresholds))
 
     return {
         "auc": auc,

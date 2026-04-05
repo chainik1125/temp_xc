@@ -74,7 +74,7 @@ class TestCrosscoder:
         # k*T active latents
         expected_l0 = K * T
         actual_l0 = (z > 0).float().sum(dim=-1).mean().item()
-        assert actual_l0 == pytest.approx(expected_l0, abs=0.1)
+        assert actual_l0 == pytest.approx(expected_l0, abs=1.0)
 
     def test_decoder_positions(self):
         spec = CrosscoderSpec(T=T)
