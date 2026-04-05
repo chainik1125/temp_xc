@@ -50,6 +50,7 @@ from src.v2_temporal_schemeC.temporal_crosscoder import (
 from src.v2_temporal_schemeC.stacked_sae import (
     StackedSAE, StackedSAETrainingConfig, train_stacked_sae,
 )
+from src.v2_temporal_schemeC.experiment.denoising import compute_global_recovery
 from src.v2_temporal_schemeC.feature_recovery import feature_recovery_score, cos_sims
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -181,131 +182,6 @@ def make_window_gen(train_x, T):
         sel = torch.randperm(all_w.shape[0], device=DEVICE)[:batch_size]
         return all_w[sel]
     return gen
-
-
-# ── Global feature recovery metric ──
-
-@torch.no_grad()
-def compute_global_recovery(spec, model, eval_x, true_features, eval_support,
-                            eval_hidden):
-    """Compute local and global feature recovery correlations.
-
-    For each true feature i, find the best-matching latent j (highest
-    |cos(decoder_j, f_i)|). Then compute:
-      - local_corr:  Pearson(z_j activations, s_i)  (noisy observation)
-      - global_corr: Pearson(z_j activations, h_i)  (true hidden state)
-
-    Returns dict with per-feature and mean correlations.
-    """
-    model.eval()
-    n_eval = eval_x.shape[0]
-
-    # Get decoder directions and match to true features
-    if spec.n_decoder_positions is None:
-        dd = spec.decoder_directions(model).to(DEVICE)  # (d, d_sae)
-    else:
-        dds = [spec.decoder_directions(model, pos=p).to(DEVICE)
-               for p in range(spec.n_decoder_positions)]
-        dd = torch.stack(dds).mean(dim=0)
-
-    tf = true_features.T.to(DEVICE)  # (d, k)
-    sims = cos_sims(dd, tf).abs()    # (d_sae, k)
-    best_latent = sims.argmax(dim=0)  # (k,) — best latent for each feature
-
-    # Get latent activations
-    if spec.data_format == "seq":
-        # TFA: process full sequences
-        all_z = []
-        for s in range(0, n_eval, 256):
-            x_batch = eval_x[s:min(s + 256, n_eval)]
-            recons, inter = model(x_batch)
-            # Use novel + pred codes as total activation
-            z = inter["novel_codes"] + inter["pred_codes"]  # (B, T, d_sae)
-            all_z.append(z.cpu())
-        all_z = torch.cat(all_z, dim=0)  # (n_eval, T, d_sae)
-
-        # Compute per-feature correlations
-        # support/hidden: (n_eval, k, T) → transpose to (n_eval, T, k)
-        sup = eval_support.permute(0, 2, 1).float()  # (n_eval, T, k)
-        hid = eval_hidden.permute(0, 2, 1).float()   # (n_eval, T, k)
-
-        local_corrs, global_corrs = [], []
-        for feat_i in range(NUM_FEATURES):
-            j = best_latent[feat_i].item()
-            z_j = all_z[:, :, j].reshape(-1)         # (n_eval * T,)
-            s_i = sup[:, :, feat_i].reshape(-1)       # (n_eval * T,)
-            h_i = hid[:, :, feat_i].reshape(-1)       # (n_eval * T,)
-            local_corrs.append(_pearson(z_j, s_i))
-            global_corrs.append(_pearson(z_j, h_i))
-
-    elif spec.data_format == "window":
-        T_win = spec.n_decoder_positions
-        # Accumulate per-position latent activations from overlapping windows
-        all_z_per_pos = torch.zeros(n_eval, SEQ_LEN, DICT_WIDTH)
-        counts = torch.zeros(n_eval, SEQ_LEN)
-
-        for t_start in range(SEQ_LEN - T_win + 1):
-            windows = eval_x[:, t_start:t_start + T_win, :]
-            for s in range(0, n_eval, 256):
-                w = windows[s:min(s + 256, n_eval)]
-                bs = w.shape[0]
-                # Get latent codes directly from model
-                if hasattr(model, 'encode'):
-                    z = model.encode(w).cpu()  # TXCDR: (B, d_sae)
-                    for t_off in range(T_win):
-                        pos = t_start + t_off
-                        all_z_per_pos[s:s + bs, pos] += z
-                        counts[s:s + bs, pos] += 1
-                else:
-                    _, _, z = model(w)  # Stacked: (B, T_win, d_sae)
-                    z = z.cpu()
-                    for t_off in range(T_win):
-                        pos = t_start + t_off
-                        all_z_per_pos[s:s + bs, pos] += z[:, t_off]
-                        counts[s:s + bs, pos] += 1
-
-        # Average across overlapping windows
-        counts_expanded = counts.unsqueeze(-1).clamp(min=1)
-        all_z_per_pos = all_z_per_pos / counts_expanded
-
-        sup = eval_support.permute(0, 2, 1).float()  # (n_eval, T, k)
-        hid = eval_hidden.permute(0, 2, 1).float()
-
-        local_corrs, global_corrs = [], []
-        for feat_i in range(NUM_FEATURES):
-            j = best_latent[feat_i].item()
-            z_j = all_z_per_pos[:, :, j].reshape(-1)
-            s_i = sup[:, :, feat_i].reshape(-1)
-            h_i = hid[:, :, feat_i].reshape(-1)
-            local_corrs.append(_pearson(z_j, s_i))
-            global_corrs.append(_pearson(z_j, h_i))
-
-    else:
-        raise ValueError(f"Unknown data_format: {spec.data_format}")
-
-    local_corrs = np.array(local_corrs)
-    global_corrs = np.array(global_corrs)
-
-    return {
-        "local_corrs": local_corrs.tolist(),
-        "global_corrs": global_corrs.tolist(),
-        "mean_local": float(np.mean(local_corrs)),
-        "mean_global": float(np.mean(global_corrs)),
-        "denoising_frac": float(np.mean(global_corrs > local_corrs)),
-    }
-
-
-def _pearson(x, y):
-    """Pearson correlation between two 1-D tensors."""
-    x = x.float()
-    y = y.float()
-    xm = x - x.mean()
-    ym = y - y.mean()
-    num = (xm * ym).sum()
-    den = (xm.pow(2).sum() * ym.pow(2).sum()).sqrt()
-    if den < 1e-12:
-        return 0.0
-    return (num / den).item()
 
 
 # ── Model caching ──
@@ -588,6 +464,8 @@ def main():
             # Global feature recovery
             rec = compute_global_recovery(
                 spec, model, eval_x, true_feats, eval_support, eval_hidden,
+                num_features=NUM_FEATURES, seq_len=SEQ_LEN,
+                dict_width=DICT_WIDTH, device=DEVICE,
             )
 
             result_dict = r.to_dict() | {"k": k} | {
