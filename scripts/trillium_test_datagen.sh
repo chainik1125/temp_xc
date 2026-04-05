@@ -7,7 +7,7 @@ set -euo pipefail
 #SBATCH --partition=compute_full_node
 #SBATCH --gpus-per-node=4
 #SBATCH --cpus-per-task=4
-#SBATCH --time=00:30:00
+#SBATCH --time=01:00:00
 #SBATCH --account=rrg-aspuru
 #SBATCH --job-name=test-datagen
 #SBATCH --output=logs/slurm/test-datagen_%j.out

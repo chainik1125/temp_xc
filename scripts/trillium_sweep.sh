@@ -6,7 +6,7 @@ set -euo pipefail
 PARTITION="compute_full_node"
 ACCOUNT="rrg-aspuru"
 JOB_NAME="bench-sweep"
-TIME="04:00:00"
+TIME="08:00:00"
 REPO_DIR="$SCRATCH/temp_xc"
 LOG_DIR="$REPO_DIR/logs/slurm"
 
@@ -20,7 +20,7 @@ sbatch \
   --partition="${PARTITION}" \
   --gpus-per-node=4 \
   --cpus-per-task=4 \
-  --time="${TIME}" \
+  --time="08:00:00" \
   --account="${ACCOUNT}" \
   --job-name="${JOB_NAME}" \
   --output="${LOG_DIR}/${JOB_NAME}_%j.out" \
