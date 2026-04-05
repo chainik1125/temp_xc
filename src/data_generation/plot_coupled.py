@@ -16,7 +16,6 @@ import os
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
-import seaborn as sns
 import torch
 
 matplotlib.use("Agg")
@@ -39,20 +38,15 @@ def plot_coupling_matrix(C: torch.Tensor, save_path: str) -> None:
     """Heatmap of the binary coupling matrix C (M x K)."""
     M, K = C.shape
     fig, ax = plt.subplots(figsize=(max(4, K * 0.5), max(4, M * 0.35)))
-    sns.heatmap(
-        C.numpy(),
-        cmap="Blues",
-        vmin=0, vmax=1,
-        xticklabels=[f"h{i}" for i in range(K)],
-        yticklabels=[f"e{j}" for j in range(M)],
-        linewidths=0.5,
-        linecolor="gray",
-        ax=ax,
-        cbar_kws={"label": "Connected"},
-    )
+    im = ax.imshow(C.numpy(), cmap="Blues", vmin=0, vmax=1, aspect="auto")
+    ax.set_xticks(range(K))
+    ax.set_xticklabels([f"h{i}" for i in range(K)], fontsize=7)
+    ax.set_yticks(range(M))
+    ax.set_yticklabels([f"e{j}" for j in range(M)], fontsize=7)
     ax.set_xlabel("Hidden states")
     ax.set_ylabel("Emission features")
     ax.set_title(f"Coupling matrix ({M} emissions, {K} hidden, {int(C.sum(1).mean())} parents/emission)")
+    fig.colorbar(im, ax=ax, label="Connected")
     fig.savefig(save_path, dpi=150, bbox_inches="tight")
     plt.close(fig)
 
@@ -69,15 +63,13 @@ def plot_emission_cooccurrence(support: torch.Tensor, save_path: str) -> None:
 
     M = support.shape[1]
     fig, ax = plt.subplots(figsize=(max(6, M * 0.35), max(5, M * 0.35)))
-    sns.heatmap(
-        corr,
-        cmap="RdBu_r",
-        vmin=-1, vmax=1, center=0,
-        xticklabels=[f"e{j}" for j in range(M)],
-        yticklabels=[f"e{j}" for j in range(M)],
-        ax=ax,
-    )
+    im = ax.imshow(corr, cmap="RdBu_r", vmin=-1, vmax=1, aspect="auto")
+    ax.set_xticks(range(M))
+    ax.set_xticklabels([f"e{j}" for j in range(M)], fontsize=6, rotation=90)
+    ax.set_yticks(range(M))
+    ax.set_yticklabels([f"e{j}" for j in range(M)], fontsize=6)
     ax.set_title("Emission co-occurrence (Pearson correlation)")
+    fig.colorbar(im, ax=ax)
     fig.savefig(save_path, dpi=150, bbox_inches="tight")
     plt.close(fig)
 
@@ -102,14 +94,12 @@ def plot_hidden_emission_cosine(
 
     K, M = cos_sim.shape
     fig, ax = plt.subplots(figsize=(max(6, M * 0.4), max(4, K * 0.5)))
-    sns.heatmap(
-        cos_sim,
-        cmap="RdBu_r",
-        vmin=-1, vmax=1, center=0,
-        xticklabels=[f"e{j}" for j in range(M)],
-        yticklabels=[f"h{i}" for i in range(K)],
-        ax=ax,
-    )
+    im = ax.imshow(cos_sim, cmap="RdBu_r", vmin=-1, vmax=1, aspect="auto")
+    ax.set_xticks(range(M))
+    ax.set_xticklabels([f"e{j}" for j in range(M)], fontsize=6, rotation=90)
+    ax.set_yticks(range(K))
+    ax.set_yticklabels([f"h{i}" for i in range(K)], fontsize=7)
+    fig.colorbar(im, ax=ax)
     # Mark coupled pairs with dots
     for j in range(M):
         for i in range(K):
