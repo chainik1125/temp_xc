@@ -1,11 +1,13 @@
 """Denoising metrics for HMM experiments (Exp 1c family).
 
-Reusable functions for computing single-latent correlation and extracting
-per-position latent activations from windowed models.
+Reusable functions for computing single-latent correlation, linear probes,
+and extracting per-position latent activations from windowed models.
 """
 
 import numpy as np
 import torch
+from sklearn.linear_model import Ridge
+from sklearn.metrics import r2_score
 
 from src.v2_temporal_schemeC.feature_recovery import cos_sims
 
@@ -148,4 +150,106 @@ def compute_global_recovery(
         "mean_local": float(np.mean(local_corrs)),
         "mean_global": float(np.mean(global_corrs)),
         "denoising_frac": float(np.mean(global_corrs > local_corrs)),
+    }
+
+
+# ── Latent extraction ──
+
+@torch.no_grad()
+def extract_latents_tfa(
+    model, eval_x: torch.Tensor, dict_width: int, batch_size: int = 256,
+) -> np.ndarray:
+    """Extract per-token latent activations from TFA. Returns (n_tokens, d_sae)."""
+    all_z = []
+    for s in range(0, eval_x.shape[0], batch_size):
+        x = eval_x[s:s + batch_size]
+        _, inter = model(x)
+        z = inter["novel_codes"] + inter["pred_codes"]
+        all_z.append(z.cpu())
+    return torch.cat(all_z, dim=0).reshape(-1, dict_width).numpy()
+
+
+@torch.no_grad()
+def extract_latents_windowed(
+    model, eval_x: torch.Tensor, T_win: int, dict_width: int,
+    seq_len: int, is_crosscoder: bool, batch_size: int = 256,
+) -> np.ndarray:
+    """Extract per-position latent activations from windowed models.
+
+    Averages z across overlapping windows for each position.
+    Returns (n_tokens, d_sae).
+    """
+    n_eval = eval_x.shape[0]
+    z_sum = torch.zeros(n_eval, seq_len, dict_width)
+    counts = torch.zeros(n_eval, seq_len)
+
+    for t_start in range(seq_len - T_win + 1):
+        windows = eval_x[:, t_start:t_start + T_win, :]
+        for s in range(0, n_eval, batch_size):
+            w = windows[s:s + batch_size]
+            bs = w.shape[0]
+            if is_crosscoder:
+                z = model.encode(w).cpu()
+                for t_off in range(T_win):
+                    z_sum[s:s + bs, t_start + t_off] += z
+                    counts[s:s + bs, t_start + t_off] += 1
+            else:
+                _, _, z = model(w)
+                z = z.cpu()
+                for t_off in range(T_win):
+                    z_sum[s:s + bs, t_start + t_off] += z[:, t_off]
+                    counts[s:s + bs, t_start + t_off] += 1
+
+    z_sum /= counts.unsqueeze(-1).clamp(min=1)
+    return z_sum.reshape(-1, dict_width).numpy()
+
+
+# ── Linear probe ──
+
+def run_linear_probes(
+    z: np.ndarray,
+    support: torch.Tensor,
+    hidden_states: torch.Tensor,
+    num_features: int,
+    alpha: float = 1.0,
+) -> dict:
+    """Train Ridge probes z->s_i and z->h_i for each feature.
+
+    Args:
+        z: (n_tokens, d_sae) latent activations.
+        support: (n_eval, k, T) observed binary support.
+        hidden_states: (n_eval, k, T) true hidden states.
+        num_features: Number of ground truth features (k).
+        alpha: Ridge regularization.
+
+    Returns:
+        Dict with per-feature and mean R² for local and global probes.
+    """
+    sup = support.permute(0, 2, 1).reshape(-1, num_features).numpy()
+    hid = hidden_states.permute(0, 2, 1).reshape(-1, num_features).numpy()
+
+    n = z.shape[0]
+    split = int(0.8 * n)
+    z_train, z_test = z[:split], z[split:]
+    sup_train, sup_test = sup[:split], sup[split:]
+    hid_train, hid_test = hid[:split], hid[split:]
+
+    local_r2s, global_r2s = [], []
+    for feat_i in range(num_features):
+        probe_local = Ridge(alpha=alpha)
+        probe_local.fit(z_train, sup_train[:, feat_i])
+        local_r2s.append(r2_score(sup_test[:, feat_i],
+                                   probe_local.predict(z_test)))
+
+        probe_global = Ridge(alpha=alpha)
+        probe_global.fit(z_train, hid_train[:, feat_i])
+        global_r2s.append(r2_score(hid_test[:, feat_i],
+                                    probe_global.predict(z_test)))
+
+    return {
+        "local_r2": local_r2s,
+        "global_r2": global_r2s,
+        "mean_local_r2": float(np.mean(local_r2s)),
+        "mean_global_r2": float(np.mean(global_r2s)),
+        "ratio": float(np.mean(global_r2s)) / max(float(np.mean(local_r2s)), 1e-12),
     }

@@ -114,16 +114,13 @@ For $k \in \{2, 5, 10\}$, advantage increases monotonically with $\rho$, with th
 
 We use the stochastic HMM emission model (\cref{eq:emission}) with $p_A = 0$, $p_B = 0.625$ (emission amplitude $\gamma \approx 0.59$) to test whether TXCDR can recover the \emph{hidden state} $h_i(t)$ rather than merely tracking the noisy observation $s_i(t)$.  This uses a complementary data setup: 40 features in $d = 80$, $d_{\text{sae}} = 80$, $\pi = 0.15$, with heterogeneous persistence $\rho \in \{0.1, 0.4, 0.7, 0.95\}$ (10 features each).
 
-For each ground-truth feature $i$, we identify the best-matching latent $j$ (by decoder cosine similarity), then compute two Pearson correlations across all evaluation tokens:
-\begin{itemize}
-  \item \textbf{Local}: $\mathrm{corr}(z_j, s_i)$---does the latent track the noisy per-token observation?
-  \item \textbf{Global}: $\mathrm{corr}(z_j, h_i)$---does the latent track the true hidden state?
-\end{itemize}
-A model that processes tokens independently achieves $\text{global}/\text{local} \leq 0.77$ (the per-token floor, set by $\mathrm{corr}(s, h)$ under these emission parameters). A ratio $> 1$ means the latent tracks the hidden state \emph{better} than the noisy observation---the model denoises.
+We measure denoising with two complementary methods. \textbf{Single-latent correlation}: for each ground-truth feature $i$, identify the best-matching latent $j$ (by decoder cosine similarity), then compute Pearson correlations $\mathrm{corr}(z_j, s_i)$ (local) and $\mathrm{corr}(z_j, h_i)$ (global) across all evaluation tokens. \textbf{Linear probe}: for each feature $i$, train Ridge regressions from the \emph{full} latent vector $z \in \mathbb{R}^{d_{\text{sae}}}$ to $s_i$ (local $R^2$) and to $h_i$ (global $R^2$), with 80/20 train/test split. The linear probe captures information distributed across multiple latents, not just the single best match.
 
-\cref{fig:global_local} shows the result for TXCDR at $T \in \{2, \ldots, 12\}$ and Stacked SAE (control).  Stacked SAE points cluster tightly along the per-token floor line (ratio $= 0.77$), confirming zero denoising. TXCDR points rise above the floor, with larger $T$ climbing further.  \cref{fig:ratio_T} shows the ratio increasing monotonically with $T$, crossing the full-denoising threshold (ratio $= 1$) at $T \approx 5$ across all tested $k$ values.
+A model that processes tokens independently achieves a per-token floor of $\text{global}/\text{local} \leq 0.77$ in correlation space ($\leq 0.59$ in $R^2$ space). A ratio $> 1$ means the latent representation tracks the hidden state \emph{better} than the noisy observation---the model denoises.
 
-Per-$\rho$-group analysis reveals that \textbf{denoising is selective}: at $T = 5$, $k = 3$, features with $\rho = 0.95$ achieve ratio $= 1.13$ while features with $\rho = 0.1$ remain at $0.82$.  The shared encoder preferentially recovers features whose temporal persistence provides sufficient averaging signal, without smoothing fast-switching features.
+\cref{fig:global_local} shows the single-latent result for TXCDR at $T \in \{2, \ldots, 12\}$ and Stacked SAE (control). Stacked SAE points cluster along the per-token floor line, confirming zero denoising. TXCDR points rise above the floor, with larger $T$ climbing further. Linear probes confirm the same hierarchy: at $k = 3$, the $R^2$ ratio rises from $0.82$ (TXCDR $T\!=\!2$) to $1.32$ (TXCDR $T\!=\!12$), while Stacked SAE remains at $0.58$. \cref{fig:ratio_T} shows the single-latent ratio increasing monotonically with $T$, crossing the full-denoising threshold at $T \approx 5$.
+
+Per-$\rho$-group analysis reveals that \textbf{denoising is selective}: at $T = 5$, $k = 3$, features with $\rho = 0.95$ achieve a linear-probe ratio of $1.29$ while features with $\rho = 0.1$ remain at $0.66$. The shared encoder preferentially recovers features whose temporal persistence provides sufficient averaging signal, without smoothing fast-switching features.
 
 These results confirm the prediction in \cref{sec:coupled}: the temporal crosscoder's shared latent aggregates information across positions to discover structure beyond what single-token observations reveal.
 
