@@ -141,6 +141,6 @@ def compute_hidden_features(
         (K, d) hidden feature directions (unit norm).
     """
     # C.T: (K, M), emission_features: (M, d) -> (K, d)
-    hidden_dirs = coupling_matrix.T @ emission_features
+    hidden_dirs = coupling_matrix.T.to(emission_features.device) @ emission_features
     norms = hidden_dirs.norm(dim=1, keepdim=True).clamp(min=1e-8)
     return hidden_dirs / norms
