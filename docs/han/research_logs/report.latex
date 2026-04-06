@@ -1,0 +1,212 @@
+
+\documentclass[midterm]{sparreport}
+
+\title{Temporal Crosscoders Outperform Stacked SAEs Under Temporal Correlation}
+
+\author{
+  \textbf{Andre Shportko}\\
+  \texttt{andre.s@u.northwestern.edu}
+  \and
+  \textbf{Aniket Deshpande}\\
+  \texttt{aniket4@illinois.edu}
+  \and
+  \textbf{Han Xuanyuan}\\
+  \texttt{han@example.edu}
+}
+
+\sparround{Spring 2026}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Sparse autoencoders (SAEs) applied independently to each position in a sequence window cannot exploit temporal structure in feature activations. We introduce a controlled synthetic benchmark comparing \emph{Temporal Crosscoders} (TXCDR)---which share latent representations across positions---against \emph{Stacked SAEs} under varying levels of temporal correlation. Sweeping over lag-1 autocorrelation $\rho \in \{0, 0.6, 0.9\}$, sparsity $k \in \{2, 5, 10, 25\}$, and window length $T \in \{2, 5\}$, we find that TXCDR achieves up to $+0.50$ AUC improvement and near-perfect feature recovery when temporal correlation is present and sparsity is moderate. The advantage vanishes under IID activations or high $k$ which confirms that the crosscoder's shared latent acts as a structural prior for temporal coherence. We further extend the data generation pipeline to support stochastic HMM emissions, leaky reset dynamics, and coupled multi-emission features, enabling experiments that separate local per-token structure from global temporal structure.
+\end{abstract}
+
+\keywords{sparse autoencoders \and crosscoders \and mechanistic interpretability \and temporal structure}
+
+\section{Introduction}
+
+Sparse autoencoders have become a core tool for extracting interpretable features from neural network activations~\cite{cunningham2023sparse, bricken2023monosemantic}. Crosscoders extend this idea by sharing a latent dictionary across multiple activation sites---originally across model layers~\cite{templeton2024crosscoders}---enabling the discovery of features that span different positions. \emph{Temporal crosscoders} apply this sharing across sequential time steps, hypothesizing that features with temporal persistence are better captured by a shared representation than by independent per-position SAEs~\cite{dunefsky2025txc, kissane2025txc}.
+
+However, it remains unclear \emph{when} temporal crosscoders actually outperform simpler stacked baselines. Prior synthetic evaluations~\cite{chanin2025synthetic} used a single-SAE baseline with mismatched sparsity budgets, confounding architectural advantage with capacity differences. We address this by constructing a fair comparison: a Stacked SAE baseline with matched total $L_0 = k \times T$ and independent per-position weights, sweeping over temporal correlation strength $\rho$, sparsity $k$, and window length $T$. Our goal is to map the precise conditions under which temporal crosscoders provide genuine benefit for feature recovery.
+
+A further limitation of prior synthetic setups is that each emission feature is driven by exactly one hidden state, so local per-token structure and global temporal structure are indistinguishable. We extend the generative process with stochastic HMM emissions~\cite{rabiner1989tutorial}, a leaky reset mechanism that stretches temporal correlations without changing the stationary distribution, and a coupled-feature model where $K$ hidden Markov chains drive $M > K$ emission features through a binary coupling matrix. The coupled setting creates a genuine separation between local and global feature recovery, enabling a critical test: whether temporal architectures can discover latent hidden-state structure rather than merely denoising per-token emissions.
+
+\section{Methodology}
+
+\subsection{Synthetic Data}
+
+We generate data from a toy superposition model~\cite{elhage2022toy} with 128 ground-truth features embedded in a 256-dimensional space via an orthogonalized linear map. Each feature's binary activation follows an independent 2-state Markov chain parametrized by lag-1 autocorrelation $\rho$ and stationary probability $p = 0.05$. When $\rho = 0$, activations are IID Bernoulli; when $\rho > 0$, active features tend to persist across consecutive positions. Active features fire with magnitude drawn from $\mathcal{N}(1.0, 0.15^2)$.
+
+The transition matrix for each feature is constructed via a \emph{reset process}~\cite{rabiner1989tutorial}:
+\begin{equation}
+P(\lambda) = (1 - \lambda)\, I + \lambda\, R_S
+\label{eq:reset}
+\end{equation}
+where $R_S$ has every row equal to $[1-\mu, \mu]$, $\lambda = 1 - \rho$ is the mixing rate, and $\mu = p$ is the stationary ON probability. This yields transition probabilities $\alpha = P(1 \!\to\! 1) = 1 - \lambda(1-\mu)$ and $\beta = P(0 \!\to\! 1) = \lambda\mu$, with second eigenvalue $\rho = \alpha - \beta$ equal to the lag-1 autocorrelation.
+
+\subsubsection{Stochastic HMM Emissions}
+
+The base model treats feature activations as deterministic functions of the hidden state: $s_i(t) = h_i(t)$. We generalize this to a Hidden Markov Model by introducing stochastic emission probabilities:
+\begin{equation}
+s_i(t) \mid h_i(t) = 0 \sim \mathrm{Bernoulli}(p_A), \quad s_i(t) \mid h_i(t) = 1 \sim \mathrm{Bernoulli}(p_B)
+\label{eq:emission}
+\end{equation}
+With $p_A = 0$, $p_B = 1$ the emission is deterministic and the model reduces to the Markov chain case. Setting $p_A > 0$ introduces false positives; $p_B < 1$ introduces false negatives. The observed autocorrelation becomes $\mathrm{Corr}(s_i(t), s_i(t+\tau)) = \gamma \cdot \rho^{|\tau|}$, where the amplitude prefactor $\gamma = \mu(1-\mu)(p_B - p_A)^2 / [\mu_{\mathrm{obs}}(1 - \mu_{\mathrm{obs}})]$ quantifies how much temporal signal survives the emission noise. This is 1 for deterministic emissions and 0 when $p_A = p_B$.
+
+\subsubsection{Leaky Reset}
+
+The standard reset process transitions abruptly between memory (persist) and resample (reset to stationary). We introduce a \emph{leak parameter} $\delta \in [0, 1)$ that biases reset events toward the current state: with probability $\lambda$, resample $h_i(t) \sim \mathrm{Bernoulli}((1-\delta)\mu + \delta\, h_i(t-1))$; with probability $1-\lambda$, persist. This gives transition probabilities:
+\begin{align}
+P(h\!=\!1 \mid h\!=\!1) &= 1 - \lambda(1-\delta)(1-\mu) \label{eq:leaky11}\\
+P(h\!=\!1 \mid h\!=\!0) &= \lambda(1-\delta)\mu \label{eq:leaky10}
+\end{align}
+The stationary distribution remains $\mu$ for all $\delta < 1$, so the marginal sparsity is unchanged. The effective autocorrelation becomes $\rho_{\mathrm{eff}} = 1 - \lambda(1-\delta)$, which increases monotonically with $\delta$. This provides a second control axis---adjusting temporal persistence without changing feature density---that is useful for probing how sensitive each architecture is to correlation strength. Setting $\delta = 0$ recovers the standard reset.
+
+\subsubsection{Coupled Features}
+\label{sec:coupled}
+
+The preceding extensions maintain a one-to-one mapping between hidden states and observed features, so local and global structure are indistinguishable. To separate these, we introduce a \emph{coupled-feature} model with $K$ hidden states and $M > K$ emission features connected through a binary coupling matrix $C \in \{0,1\}^{M \times K}$, where each emission $j$ has exactly $n_{\mathrm{parents}}$ parent hidden states.
+
+Each hidden state $h_i(t)$ follows an independent 2-state Markov chain (standard or leaky reset). The emission support is determined by an OR gate:
+\begin{equation}
+s_j(t) = \mathbf{1}\!\left[\sum_{i=1}^{K} C_{ji}\, h_i(t) \geq 1\right]
+\label{eq:or_gate}
+\end{equation}
+so emission $j$ fires whenever \emph{any} of its parent hidden states is active. At stationarity with independent hidden chains, the marginal emission probability is $P(s_j = 1) = 1 - (1-\mu)^{n_{\mathrm{parents}}}$. For $\mu = 0.1$ and $n_{\mathrm{parents}} = 2$ this gives $P(s_j = 1) \approx 0.19$, confirmed empirically (\cref{fig:sparsity}).
+
+The observation model is $\mathbf{x}(t) = \sum_{j=1}^{M} s_j(t)\, m_j(t)\, \mathbf{f}_j$, where $m_j(t) \sim |\mathcal{N}(0,\sigma^2)|$ and $\{\mathbf{f}_j\}_{j=1}^M$ are orthogonalized emission directions. This produces two natural sets of ground truth for evaluation:
+\begin{itemize}
+  \item \textbf{Local (emission) features}: the $M$ emission directions $\{\mathbf{f}_j\}$, recoverable from single-position observations.
+  \item \textbf{Global (hidden) features}: for each hidden state $i$, the normalized mean of the emission directions it controls, $\mathbf{g}_i = \sum_{j: C_{ji}=1} \mathbf{f}_j / \|\sum_{j: C_{ji}=1} \mathbf{f}_j\|$. These are only discoverable by aggregating information across positions.
+\end{itemize}
+When hidden states share emission children, their global directions have non-zero cosine similarity, making the global recovery problem genuinely harder than the local one.
+
+\subsection{Models}
+
+Both models use $d_{\text{sae}} = 128$ latent dimensions.
+
+\textbf{Stacked SAE}: $T$ independent TopK SAE modules, each selecting $k$ active latents per position. Total window sparsity: $L_0 = k \times T$.
+
+\textbf{Temporal Crosscoder (TXCDR)}: Shared latent dictionary with per-position encoders and decoders. Selects $k \times T$ total active latents across the window, matching the Stacked SAE's total $L_0$.
+
+\subsection{Sweep Configuration}
+
+We sweep $\rho \in \{0.0, 0.6, 0.9\}$, $k \in \{2, 5, 10, 25\}$, $T \in \{2, 5\}$ for 48 total runs (skipping configs where $k \times T \geq 128$). Each run trains for 65k steps with $\text{lr} = 3 \times 10^{-4}$ and gradient clipping at 1.0. The primary metric is \textbf{feature recovery AUC}: cosine similarity between decoder directions and true features, integrated over thresholds $[0, 1]$.
+
+\section{Preliminary Results}
+
+\subsection{TXCDR Advantage Grows with Temporal Correlation}
+
+At \textbf{IID} ($\rho = 0$), TXCDR shows only marginal advantage (mean $\Delta\text{AUC} = +0.069$) and \emph{hurts} at high $k$ ($-0.18$ at $k\!=\!25$, $T\!=\!5$). The shared-latent bottleneck costs more than it gains without temporal structure.
+
+At \textbf{$\rho = 0.6$}, TXCDR wins across nearly the entire grid. The best cell is $k\!=\!5$, $T\!=\!5$ with $\Delta\text{AUC} = +0.48$ (TXCDR~0.955 vs Stacked~0.473). Mean $\Delta\text{AUC} = +0.255$.
+
+At \textbf{$\rho = 0.9$}, the pattern intensifies at low $k$: TXCDR achieves 0.978~AUC vs Stacked's~0.475 at $k\!=\!2$, $T\!=\!5$---a $+0.50$ gap. Mean $\Delta\text{AUC} = +0.241$. Feature recovery at the R@0.9 threshold reaches 0.80--0.98 for TXCDR in the moderate-$k$ regime, while Stacked SAE barely exceeds 0.02.
+
+\subsection{The Role of Sparsity $k$}
+
+For $k \in \{2, 5, 10\}$, advantage increases monotonically with $\rho$, with the steepest gains at small $k$ and large $T$---exactly where shared latents can exploit correlated activity. At $k = 25$, advantage remains near zero or negative regardless of $\rho$, suggesting the model is over-parameterized relative to the true feature count and the shared prior stops helping. Reconstruction loss tells a complementary story: TXCDR often trades higher loss for better feature identification, except at high $\rho$ where its shared representation becomes most efficient.
+
+\subsection{Global Feature Recovery Under Noisy Emissions}
+
+We use the stochastic HMM emission model (\cref{eq:emission}) with $p_A = 0$, $p_B = 0.625$ (emission amplitude $\gamma \approx 0.59$) to test whether TXCDR can recover the \emph{hidden state} $h_i(t)$ rather than merely tracking the noisy observation $s_i(t)$.  This uses a complementary data setup: 40 features in $d = 80$, $d_{\text{sae}} = 80$, $\pi = 0.15$, with heterogeneous persistence $\rho \in \{0.1, 0.4, 0.7, 0.95\}$ (10 features each).
+
+For each ground-truth feature $i$, we identify the best-matching latent $j$ (by decoder cosine similarity), then compute two Pearson correlations across all evaluation tokens:
+\begin{itemize}
+  \item \textbf{Local}: $\mathrm{corr}(z_j, s_i)$---does the latent track the noisy per-token observation?
+  \item \textbf{Global}: $\mathrm{corr}(z_j, h_i)$---does the latent track the true hidden state?
+\end{itemize}
+A model that processes tokens independently achieves $\text{global}/\text{local} \leq 0.77$ (the per-token floor, set by $\mathrm{corr}(s, h)$ under these emission parameters). A ratio $> 1$ means the latent tracks the hidden state \emph{better} than the noisy observation---the model denoises.
+
+\cref{fig:global_local} shows the result for TXCDR at $T \in \{2, \ldots, 12\}$ and Stacked SAE (control).  Stacked SAE points cluster tightly along the per-token floor line (ratio $= 0.77$), confirming zero denoising. TXCDR points rise above the floor, with larger $T$ climbing further.  \cref{fig:ratio_T} shows the ratio increasing monotonically with $T$, crossing the full-denoising threshold (ratio $= 1$) at $T \approx 5$ across all tested $k$ values.
+
+Per-$\rho$-group analysis reveals that \textbf{denoising is selective}: at $T = 5$, $k = 3$, features with $\rho = 0.95$ achieve ratio $= 1.13$ while features with $\rho = 0.1$ remain at $0.82$.  The shared encoder preferentially recovers features whose temporal persistence provides sufficient averaging signal, without smoothing fast-switching features.
+
+These results confirm the prediction in \cref{sec:coupled}: the temporal crosscoder's shared latent aggregates information across positions to discover structure beyond what single-token observations reveal.
+
+\section{Challenges \& Open Questions}
+
+The current benchmark uses orthogonal features. Real neural networks exhibit superposition~\cite{elhage2022toy}, so extending to non-orthogonal, overcomplete dictionaries is a key next step. The crosscoder's advantage at high $k$ is weak or negative---understanding whether this is fundamental or an artifact of the TopK activation function matters for scaling. We also have not yet tested on real model activations, where the distribution of temporal correlation across features is unknown.
+
+\section{Next Steps}
+
+\textbf{Coupled-feature sweeps.} The coupled-feature pipeline (\cref{sec:coupled}) is ready for sweep experiments. The key prediction is a \emph{phase transition}: at low dictionary size $k$, all models are capacity-constrained and recover the $M$ emission directions (high local AUC, low global AUC). At high $k$, the temporal crosscoder's shared encoder should aggregate information across positions and discover that certain emission features co-occur in temporally coherent patterns because they share hidden-state parents. This would manifest as rising global AUC for the crosscoder while other architectures plateau. Demonstrating this transition would confirm that temporal crosscoders can discover latent causal structure, not just denoise per-token emissions.
+
+\textbf{Leaky reset robustness.} The leaky reset parameter $\delta$ provides a continuous knob for temporal correlation strength without changing feature density. Sweeping $\delta$ at fixed $\rho$ tests how sensitive each architecture's advantage is to the shape of the autocorrelation function, not just its magnitude.
+
+\textbf{Additional baselines.} We have implemented a standardized comparison framework supporting TopK SAE, Stacked SAE, Temporal Crosscoder, and Temporal Feature Analysis~\cite{kissane2025txc} through a shared interface. Extending to JumpReLU or attention-based variants requires a single new file.
+
+\bibliographystyle{plain}
+\bibliography{references}
+
+%% --- Figures on separate pages ---
+
+\clearpage
+
+\begin{figure}[p]
+  \centering
+  \includegraphics[width=\textwidth]{figures/advantage_heatmaps.png}
+  \caption{TXCDR advantage ($\Delta$AUC = TXCDR $-$ Stacked SAE) across the sweep grid. Left to right: $\rho = 0$ (IID), $\rho = 0.6$, $\rho = 0.9$. Green cells indicate TXCDR wins; red cells indicate Stacked SAE wins. The advantage is concentrated in the moderate-$k$, high-$\rho$ regime.}
+  \label{fig:advantage}
+\end{figure}
+
+\begin{figure}[p]
+  \centering
+  \includegraphics[width=\textwidth]{figures/advantage_vs_rho.png}
+  \caption{TXCDR advantage vs temporal correlation $\rho$, broken down by $k$ and $T$. For $k \leq 10$, advantage increases monotonically with $\rho$. The slope is steepest for small $k$ with large $T$.}
+  \label{fig:rho}
+\end{figure}
+
+\begin{figure}[p]
+  \centering
+  \includegraphics[width=\textwidth]{figures/k_analysis.png}
+  \caption{AUC and reconstruction loss as a function of $k$ for both models across correlation regimes. TXCDR AUC peaks at $k\!=\!5$ then degrades, while Stacked SAE AUC is approximately flat. TXCDR generally trades higher reconstruction loss for improved feature recovery.}
+  \label{fig:kanalysis}
+\end{figure}
+
+\begin{figure}[p]
+  \centering
+  \includegraphics[width=0.55\textwidth]{figures/coupling_matrix.png}
+  \caption{Coupling matrix $C \in \{0,1\}^{20 \times 10}$ for the default coupled-feature configuration ($K\!=\!10$ hidden states, $M\!=\!20$ emissions, $n_{\mathrm{parents}}\!=\!2$). Each emission has exactly 2 parent hidden states. The many-to-many structure ensures that local emission features and global hidden-state features are genuinely distinct.}
+  \label{fig:coupling}
+\end{figure}
+
+\begin{figure}[p]
+  \centering
+  \includegraphics[width=0.6\textwidth]{figures/emission_cooccurrence.png}
+  \caption{Emission co-occurrence matrix. Emissions sharing a parent hidden state show positive correlation (warm off-diagonal blocks). This temporal co-activation pattern is the signal a temporal crosscoder should learn to exploit---emissions that co-fire across time share a hidden cause.}
+  \label{fig:cooccurrence}
+\end{figure}
+
+\begin{figure}[p]
+  \centering
+  \includegraphics[width=\textwidth]{figures/temporal_traces.png}
+  \caption{Temporal traces for two example hidden states. Blue shading marks the ON period of the hidden state; colored dots show when each child emission fires. Multiple emissions co-activate during the same plateau, producing the correlated temporal structure that distinguishes the coupled model from independent features.}
+  \label{fig:traces}
+\end{figure}
+
+\begin{figure}[p]
+  \centering
+  \includegraphics[width=0.9\textwidth]{figures/sparsity_summary.png}
+  \caption{Empirical sparsity validation. Hidden states fire at $\sim$0.098 (close to the configured $\mu = 0.1$). Emissions fire at $\sim$0.187, matching the OR-gate prediction $P(s_j\!=\!1) = 1 - (1-\mu)^{n_{\mathrm{parents}}} \approx 0.19$ for $\mu = 0.1$, $n_{\mathrm{parents}} = 2$.}
+  \label{fig:sparsity}
+\end{figure}
+
+\begin{figure}[p]
+  \centering
+  \includegraphics[width=0.75\textwidth]{figures/global_vs_local_scatter.pdf}
+  \caption{Global vs.\ local feature recovery under noisy HMM emissions ($p_B = 0.625$, $\pi = 0.15$, heterogeneous~$\rho$). Each point is one model at one $k$ value. Stacked SAEs (purple) cluster along the per-token floor (dashed line, ratio~$= 0.77$). TXCDR points (warm colors) rise above the floor, with larger window sizes $T$ further above---indicating recovery of hidden-state information beyond what single-token observations provide.}
+  \label{fig:global_local}
+\end{figure}
+
+\begin{figure}[p]
+  \centering
+  \includegraphics[width=0.6\textwidth]{figures/denoising_ratio_vs_T.pdf}
+  \caption{Denoising ratio (global/local correlation) vs.\ window size $T$ for TXCDR at $k \in \{1, 3, 5\}$. The ratio increases monotonically, crossing the full-denoising threshold (ratio~$= 1$) at $T \approx 5$. The per-token floor (0.77) is the maximum achievable by any model that processes tokens independently.}
+  \label{fig:ratio_T}
+\end{figure}
+
+\end{document}
