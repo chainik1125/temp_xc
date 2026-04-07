@@ -134,6 +134,15 @@ def run_sweep(
                     print(f"\n  k = {k}:")
 
                 for entry in models:
+                    # Skip crosscoders where k*T > d_sae
+                    if hasattr(entry.spec, 'T') and entry.spec.T is not None:
+                        k_eff = k * entry.spec.T
+                        if k_eff > data_config.d_sae:
+                            if verbose:
+                                print(f"    {entry.name:<20s} | SKIPPED "
+                                      f"(k*T={k_eff} > d_sae={data_config.d_sae})")
+                            continue
+
                     # Seed training for reproducibility
                     torch.manual_seed(seed)
                     t0 = time.time()
