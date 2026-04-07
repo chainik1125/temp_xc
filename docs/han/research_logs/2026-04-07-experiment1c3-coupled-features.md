@@ -95,9 +95,11 @@ This creates two sets of ground truth:
 
 ### Plots
 
-![Local vs global AUC vs k](../../../src/v2_temporal_schemeC/results/experiment1c3_coupled/exp1c3_auc_vs_k.png)
+![NMSE, local AUC, global AUC vs k](../../../src/v2_temporal_schemeC/results/experiment1c3_coupled/exp1c3_topk_auc.png)
 
 ![Global vs local AUC scatter](../../../src/v2_temporal_schemeC/results/experiment1c3_coupled/exp1c3_scatter.png)
+
+![TXCDR global AUC vs window size](../../../src/v2_temporal_schemeC/results/experiment1c3_coupled/exp1c3_gauc_vs_T.png)
 
 ![TXCDR global AUC advantage](../../../src/v2_temporal_schemeC/results/experiment1c3_coupled/exp1c3_gauc_gap.png)
 

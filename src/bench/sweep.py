@@ -268,6 +268,8 @@ def main():
                         help="Number of emission features (coupled mode)")
     parser.add_argument("--n-parents", type=int, default=2,
                         help="Parents per emission (coupled mode)")
+    parser.add_argument("--d-sae", type=int, default=None,
+                        help="Dictionary width (default: M_emission if coupled, else 128)")
 
     args = parser.parse_args()
 
@@ -294,7 +296,7 @@ def main():
     data_config = DataConfig(
         markov=MarkovConfig(delta=args.delta),
         coupling=coupling,
-        d_sae=args.M_emission if args.coupled else 128,
+        d_sae=args.d_sae or (args.M_emission if args.coupled else 128),
     )
 
     models = get_default_models(sweep_config.T_values)
