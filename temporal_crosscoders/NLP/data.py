@@ -1,7 +1,8 @@
 """
 data.py — Data loading utilities for NLP temporal crosscoder experiments.
 
-Loads cached activations from disk and serves sliding windows of shape (B, T, d).
+Loads cached activations from disk into GPU memory, then serves sliding
+windows of shape (B, T, d) via fast torch indexing (no Python loops).
 """
 
 import os
@@ -12,10 +13,10 @@ from config import CACHE_DIR, DEVICE, LAYER_SPECS
 
 class CachedActivationSource:
     """
-    Load cached activations from a memory-mapped .npy file.
+    Load cached activations into GPU memory for fast random-access windowing.
 
-    Stored as: (NUM_CHAINS, SEQ_LENGTH, d_act)
-    Serves sliding windows of length T from random chains.
+    Stored on disk as: (NUM_CHAINS, SEQ_LENGTH, d_act) float32 mmap.
+    On init, loads into a contiguous GPU tensor for zero-copy sampling.
     """
 
     def __init__(
@@ -36,17 +37,26 @@ class CachedActivationSource:
                 f"Run cache_activations.py first."
             )
 
-        # Memory-map for constant RAM usage
-        self.data = np.load(path, mmap_mode="r")  # (N, L, d)
-        self.num_chains = self.data.shape[0]
-        self.seq_length = self.data.shape[1]
-        print(f"  Loaded {layer_key}: {self.data.shape} from {path}")
+        # Load entire array into GPU for fast sampling
+        print(f"  Loading {layer_key} into {device} memory...")
+        mmap = np.load(path, mmap_mode="r")
+        self.num_chains = mmap.shape[0]
+        self.seq_length = mmap.shape[1]
+        # Load in chunks to avoid OOM during the numpy→torch copy
+        chunk = 500
+        parts = []
+        for i in range(0, self.num_chains, chunk):
+            end = min(i + chunk, self.num_chains)
+            parts.append(torch.from_numpy(mmap[i:end].copy()).to(device))
+        self.data = torch.cat(parts, dim=0)  # (N, L, d) on GPU
+        del parts, mmap
+        import gc; gc.collect()
+        torch.cuda.empty_cache()
+        print(f"  Loaded {layer_key}: {self.data.shape} on {device} "
+              f"({self.data.element_size() * self.data.nelement() / 1e9:.2f} GB)")
 
     def sample_windows(self, batch_size: int, T: int) -> torch.Tensor:
-        """Sample random sliding windows → (B, T, d).
-
-        Picks random chains and random starting positions within each chain.
-        """
+        """Sample random sliding windows → (B, T, d) via vectorized indexing."""
         max_start = self.seq_length - T
         if max_start < 1:
             raise ValueError(
@@ -54,16 +64,15 @@ class CachedActivationSource:
                 f"Reduce T or increase SEQ_LENGTH in config."
             )
 
-        chain_idx = np.random.randint(0, self.num_chains, size=batch_size)
-        start_idx = np.random.randint(0, max_start + 1, size=batch_size)
+        chain_idx = torch.randint(0, self.num_chains, (batch_size,), device=self.device)
+        start_idx = torch.randint(0, max_start + 1, (batch_size,), device=self.device)
 
-        # Gather windows from mmap
-        windows = np.stack([
-            self.data[c, s : s + T, :]
-            for c, s in zip(chain_idx, start_idx)
-        ])  # (B, T, d)
+        # (B, T) position indices
+        offsets = torch.arange(T, device=self.device).unsqueeze(0)  # (1, T)
+        pos_idx = start_idx.unsqueeze(1) + offsets                   # (B, T)
+        chain_exp = chain_idx.unsqueeze(1).expand(-1, T)             # (B, T)
 
-        return torch.from_numpy(windows.copy()).float().to(self.device)
+        return self.data[chain_exp, pos_idx]  # (B, T, d)
 
 
 class WindowIterator:

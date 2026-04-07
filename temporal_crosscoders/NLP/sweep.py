@@ -207,68 +207,95 @@ def main():
     print(f"  Total jobs: {total}")
     print("=" * 80)
 
-    # Load cached activations for each layer needed
-    layers_needed = sorted(set(j["layer"] for j in jobs))
-    sources: dict[str, CachedActivationSource] = {}
-    for layer_key in layers_needed:
-        print(f"  Loading cached activations for {layer_key}...")
-        sources[layer_key] = CachedActivationSource(layer_key)
-
     os.makedirs(LOG_DIR, exist_ok=True)
     os.makedirs(CHECKPOINT_DIR, exist_ok=True)
 
+    # Group jobs by layer so we load one dataset at a time, train all
+    # (k, T, arch) combos, then free GPU memory before the next layer.
+    import gc
+    from collections import OrderedDict
+
+    layers_ordered = list(OrderedDict.fromkeys(j["layer"] for j in jobs))
+    jobs_by_layer: dict[str, list[dict]] = {l: [] for l in layers_ordered}
+    for job in jobs:
+        jobs_by_layer[job["layer"]].append(job)
+
     summary_rows: list[dict] = []
     t_sweep_start = time.time()
+    job_counter = 0
 
-    for i, job in enumerate(jobs, 1):
-        model_type = job["model"]
-        layer = job["layer"]
-        k = job["k"]
-        T = job["T"]
+    for layer_key in layers_ordered:
+        layer_jobs = jobs_by_layer[layer_key]
 
-        print(f"\n{'─' * 80}")
-        print(f"  [{i}/{total}]  {model_type.upper()}  layer={layer}  k={k}  T={T}")
-        print(f"{'─' * 80}")
+        print(f"\n{'=' * 80}")
+        print(f"  Loading activations for layer: {layer_key} "
+              f"({len(layer_jobs)} jobs)")
+        print(f"{'=' * 80}")
 
-        t0 = time.time()
+        source = CachedActivationSource(layer_key)
 
-        if model_type == "stacked_sae":
-            model, history = train_stacked_sae(
-                layer, k, T, sources[layer],
-                n_steps=n_steps, save_checkpoint=save_ckpt,
+        for job in layer_jobs:
+            job_counter += 1
+            model_type = job["model"]
+            k = job["k"]
+            T = job["T"]
+            if k*T > 1024:
+                print(f"  Skipping k={k}, T={T} (k*T={k*T} > 512)")
+                continue
+
+            print(f"\n{'─' * 80}")
+            print(f"  [{job_counter}/{total}]  {model_type.upper()}  "
+                  f"layer={layer_key}  k={k}  T={T}")
+            print(f"{'─' * 80}")
+
+            t0 = time.time()
+
+            if model_type == "stacked_sae":
+                model, history = train_stacked_sae(
+                    layer_key, k, T, source,
+                    n_steps=n_steps, save_checkpoint=save_ckpt,
+                )
+            else:
+                model, history = train_txcdr(
+                    layer_key, k, T, source,
+                    n_steps=n_steps, save_checkpoint=save_ckpt,
+                )
+
+            elapsed = time.time() - t0
+            final = history[-1] if history else {}
+
+            row = {
+                "model": model_type,
+                "layer": layer_key,
+                "k": k,
+                "T": T,
+                "final_loss": final.get("loss", 0),
+                "final_l0": final.get("window_l0", 0),
+                "final_fvu": final.get("fvu", 0),
+                "final_entropy": final.get("entropy", 0),
+                "elapsed_sec": round(elapsed, 1),
+            }
+            summary_rows.append(row)
+
+            print(
+                f"  Done in {elapsed:.0f}s | loss={row['final_loss']:.4f} "
+                f"| L0={row['final_l0']:.0f} | FVU={row['final_fvu']:.4f} "
+                f"| H={row['final_entropy']:.3f}"
             )
-        else:
-            model, history = train_txcdr(
-                layer, k, T, sources[layer],
-                n_steps=n_steps, save_checkpoint=save_ckpt,
-            )
 
-        elapsed = time.time() - t0
-        final = history[-1] if history else {}
+            # Free trained model
+            del model
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
 
-        row = {
-            "model": model_type,
-            "layer": layer,
-            "k": k,
-            "T": T,
-            "final_loss": final.get("loss", 0),
-            "final_l0": final.get("window_l0", 0),
-            "final_fvu": final.get("fvu", 0),
-            "final_entropy": final.get("entropy", 0),
-            "elapsed_sec": round(elapsed, 1),
-        }
-        summary_rows.append(row)
-
-        print(
-            f"  Done in {elapsed:.0f}s | loss={row['final_loss']:.4f} "
-            f"| L0={row['final_l0']:.0f} | FVU={row['final_fvu']:.4f} "
-            f"| H={row['final_entropy']:.3f}"
-        )
-
-        # Free GPU memory between runs
-        del model
+        # ── Free this layer's activations before loading the next ──
+        print(f"\n  Releasing {layer_key} activations from GPU...")
+        source.data = None
+        del source
+        gc.collect()
         if torch.cuda.is_available():
             torch.cuda.empty_cache()
+            torch.cuda.synchronize()
 
     # Save sweep summary (append to existing if present)
     summary_path = os.path.join(LOG_DIR, "sweep_summary.json")

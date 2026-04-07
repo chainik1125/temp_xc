@@ -9,7 +9,7 @@ import os
 import torch
 
 # ─── Experiment identity ────────────────────────────────────────────────────────
-PROJECT_NAME = "temporal-crosscoders-nlp-gemma2"
+PROJECT_NAME = "temporal-crosscoders-nlp-gemma2-it"
 EXPERIMENT_TAG = "nlp-v1"
 
 # ─── Wandb ──────────────────────────────────────────────────────────────────────
@@ -22,7 +22,7 @@ WANDB_TAGS: list[str] = [EXPERIMENT_TAG, "nlp-sweep", "gemma2-2b"]
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # ─── Model ──────────────────────────────────────────────────────────────────────
-MODEL_NAME = "google/gemma-2-2b"
+MODEL_NAME = "google/gemma-2-2b-it"
 D_MODEL = 2304           # Gemma 2 2B hidden dimension
 NUM_LAYERS = 26           # total transformer layers (0-indexed: 0..25)
 
@@ -66,23 +66,34 @@ D_SAE = D_MODEL * EXPANSION_FACTOR  # 2304 * 8 = 18432
 
 # ─── Sweep grid ────────────────────────────────────────────────────────────────
 SWEEP_LAYERS: list[str] = list(LAYER_SPECS.keys())
-SWEEP_K: list[int] = [25, 50, 100, 200]
-SWEEP_T: list[int] = [5, 10, 25]
+SWEEP_K: list[int] = [50, 100]
+SWEEP_T: list[int] = [2, 5][::-1]
 SWEEP_ARCHITECTURES: list[str] = ["stacked_sae", "txcdr"]
 
 # ─── Training ──────────────────────────────────────────────────────────────────
-TRAIN_STEPS = 50_000
-LOG_INTERVAL = 500
-BATCH_SIZE = 32
-LEARNING_RATE = 5e-5
+TRAIN_STEPS = 10_000
+LOG_INTERVAL = 200
+BATCH_SIZE = 1024             # default; overridden per-run by batch_size_for_T()
+LEARNING_RATE = 3e-4
 ADAM_BETAS = (0.9, 0.999)
 GRAD_CLIP = 1.0
 SEED = 42
 
+
+def batch_size_for_T(T: int) -> int:
+    """Scale batch size based on T to stay within 48GB GPU memory.
+
+    Model params scale linearly with T (one SAE per position).
+    T=5: ~5GB model+optim, plenty of room → B=1024
+    T=10: ~10GB model+optim → B=512
+    T=25: ~25GB model+optim → B=64
+    """
+    return 256
+
 # ─── Activation caching ───────────────────────────────────────────────────────
-NUM_CHAINS = 40_000           # number of sequences to cache
-SEQ_LENGTH = 128              # tokens per sequence
-CACHE_BATCH_SIZE = 16         # batch size for model forward pass during caching
+NUM_CHAINS = 24_000           # number of sequences to cache
+SEQ_LENGTH = 32              # tokens per sequence
+CACHE_BATCH_SIZE = 512         # batch size for model forward pass during caching
 DATASET_NAME = "HuggingFaceFW/fineweb"
 DATASET_SUBSET = "sample-10BT"
 DATASET_SPLIT = "train"

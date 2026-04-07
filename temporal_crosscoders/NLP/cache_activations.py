@@ -39,7 +39,6 @@ def load_model_and_tokenizer() -> tuple:
         MODEL_NAME,
         torch_dtype=torch.bfloat16,
         device_map=DEVICE,
-        attn_implementation="eager",  # avoid sdpa issues with hooks
     )
     model.eval()
     for p in model.parameters():
@@ -146,66 +145,58 @@ def cache_activations(
     for _, spec in specs_to_cache:
         layer_indices_needed.add(spec["layer"])
 
+    # Storage for hook outputs (reused across batches)
+    captured: dict[str, torch.Tensor] = {}
+
+    # Register hooks once before the loop
+    hooks = []
+    for layer_key, spec in specs_to_cache:
+        layer_idx = spec["layer"]
+        component = spec["component"]
+
+        if component == "resid":
+            target_module = model.model.layers[layer_idx]
+        elif component == "attn":
+            target_module = model.model.layers[layer_idx].self_attn
+
+        def make_hook(k: str) -> callable:
+            def hook_fn(module, input, output):
+                if isinstance(output, tuple):
+                    acts = output[0]
+                else:
+                    acts = output
+                if acts.dim() == 4:
+                    acts = acts.reshape(acts.shape[0], acts.shape[1], -1)
+                captured[k] = acts.detach().float().cpu()
+            return hook_fn
+
+        h = target_module.register_forward_hook(make_hook(layer_key))
+        hooks.append(h)
+
     # Process batches
     for start in tqdm(range(0, num_chains, batch_size), desc="Caching activations"):
         end = min(start + batch_size, num_chains)
         batch_tokens = token_ids[start:end].to(DEVICE)
 
-        # Storage for hook outputs
-        captured: dict[str, torch.Tensor] = {}
-
-        # Register hooks
-        hooks = []
-        for layer_key, spec in specs_to_cache:
-            layer_idx = spec["layer"]
-            component = spec["component"]
-
-            if component == "resid":
-                # Hook the output of the full transformer block
-                target_module = model.model.layers[layer_idx]
-            elif component == "attn":
-                # Hook the output of the self_attn sublayer (o_proj output)
-                target_module = model.model.layers[layer_idx].self_attn
-
-            key = layer_key  # capture in closure
-
-            def make_hook(k: str) -> callable:
-                def hook_fn(module, input, output):
-                    # Transformer block output is a tuple: (hidden_states, ...)
-                    if isinstance(output, tuple):
-                        acts = output[0]
-                    else:
-                        acts = output
-                    # If attention with head dim: (B, S, n_heads, d_head) → flatten
-                    if acts.dim() == 4:
-                        acts = acts.reshape(acts.shape[0], acts.shape[1], -1)
-                    captured[k] = acts.detach().float().cpu()
-                return hook_fn
-
-            h = target_module.register_forward_hook(make_hook(key))
-            hooks.append(h)
+        captured.clear()
 
         # Forward pass
         with torch.no_grad():
             model(batch_tokens)
 
-        # Remove hooks
-        for h in hooks:
-            h.remove()
-
         # Write to mmaps
         for layer_key, spec in specs_to_cache:
             acts = captured[layer_key]  # (B, S, d)
             d_act = spec["d_act"]
-            # Handle dimension mismatch
             if acts.shape[-1] != d_act:
                 acts = acts[..., :d_act]
             mmaps[layer_key][start:end] = acts.numpy()
 
-        # Free memory
-        del captured
-        if DEVICE.type == "cuda":
-            torch.cuda.empty_cache()
+        del batch_tokens
+
+    # Remove hooks
+    for h in hooks:
+        h.remove()
 
     # Flush all mmaps
     for layer_key in mmaps:
