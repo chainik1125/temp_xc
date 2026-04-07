@@ -17,7 +17,7 @@ import json
 import os
 import sys
 
-from config import CHECKPOINT_DIR, LOG_DIR
+from config import CHECKPOINT_DIR, LOG_DIR, D_MODEL, D_SAE, EXPANSION_FACTOR
 
 
 def find_checkpoints(checkpoint_dir: str) -> list[str]:
@@ -83,7 +83,7 @@ on Gemma 2 2B activations extracted from FineWeb.
 ## Architecture
 
 - **Base model**: google/gemma-2-2b
-- **Dictionary size**: 16384 (16k, ~7.1x expansion)
+- **Dictionary size**: {D_SAE} ({D_MODEL} x {EXPANSION_FACTOR}, expansion factor {EXPANSION_FACTOR})
 - **Sparsity**: TopK activation
 - **Loss**: MSE reconstruction (no L1 penalty)
 
@@ -99,7 +99,7 @@ from temporal_crosscoders.models import StackedSAE, TemporalCrosscoder
 
 # Load a checkpoint
 state = torch.load("stacked_sae__mid_res__k50__T10.pt", weights_only=True)
-model = StackedSAE(d_in=2304, d_sae=16384, T=10, k=50)
+model = StackedSAE(d_in={D_MODEL}, d_sae={D_SAE}, T=10, k=50)
 model.load_state_dict(state)
 ```
 """
