@@ -2,6 +2,19 @@
 name = "temp-xc"
 version = "0.1.0"
 requires-python = ">=3.12"
+dependencies = [
+    "torch",
+    "numpy",
+    "scipy",
+    "matplotlib",
+    "tqdm",
+    "wandb",
+    "transformer-lens",
+    "transformers",
+    "datasets",
+    "anthropic",
+    "huggingface-hub",
+]
 
 [dependency-groups]
 dev = [

@@ -1,0 +1,10 @@
+# NLP Pipeline Dependencies (on top of temporal_crosscoders/requirements.txt)
+torch
+numpy
+scipy
+matplotlib
+tqdm
+wandb
+transformers
+datasets
+anthropic
