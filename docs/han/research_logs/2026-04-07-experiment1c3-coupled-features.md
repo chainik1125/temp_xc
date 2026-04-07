@@ -93,6 +93,14 @@ This creates two sets of ground truth:
 
 3. **The coupled-feature setting genuinely separates local from global.** Unlike the 1c/1c2 experiments (one-to-one hidden→emission), the coupled model creates a real distinction between emission-level and hidden-state-level structure. TXCDR's advantage in this setting is evidence of genuine structural inference, not just denoising.
 
+### Plots
+
+![Local vs global AUC vs k](../../../src/v2_temporal_schemeC/results/experiment1c3_coupled/exp1c3_auc_vs_k.png)
+
+![Global vs local AUC scatter](../../../src/v2_temporal_schemeC/results/experiment1c3_coupled/exp1c3_scatter.png)
+
+![TXCDR global AUC advantage](../../../src/v2_temporal_schemeC/results/experiment1c3_coupled/exp1c3_gauc_gap.png)
+
 ### Reproduction
 
 ```bash
