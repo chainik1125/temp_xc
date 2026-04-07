@@ -143,8 +143,10 @@ def plot_fvu_comparison(results: dict, viz_dir: str) -> None:
 
         for ki, k in enumerate(ks):
             offset = (ki - len(ks) / 2 + 0.5) * width / len(ks) * 2
-            sae_fvus = [get_final(results.get(("stacked_sae", l, k, T), []), "fvu") for l in layers]
-            tx_fvus = [get_final(results.get(("txcdr", l, k, T), []), "fvu") for l in layers]
+            sae_fvus = [get_final(results[("stacked_sae", l, k, T)], "fvu")
+                        if ("stacked_sae", l, k, T) in results else np.nan for l in layers]
+            tx_fvus = [get_final(results[("txcdr", l, k, T)], "fvu")
+                       if ("txcdr", l, k, T) in results else np.nan for l in layers]
 
             ax.bar(x + offset - width / 4, sae_fvus, width / len(ks),
                    label=f"SAE k={k}", alpha=0.7)
@@ -269,14 +271,18 @@ def plot_entropy_comparison(results: dict, viz_dir: str) -> None:
 
     for col, layer in enumerate(layers):
         ax = axes[0, col]
-        combos = [(k, T) for k in ks for T in Ts]
+        # Only include combos where at least one architecture has results
+        combos = [(k, T) for k in ks for T in Ts
+                  if ("stacked_sae", layer, k, T) in results or ("txcdr", layer, k, T) in results]
         x = np.arange(len(combos))
 
         sae_entropies = []
         tx_entropies = []
         for k, T in combos:
-            sae_entropies.append(get_final(results.get(("stacked_sae", layer, k, T), []), "entropy"))
-            tx_entropies.append(get_final(results.get(("txcdr", layer, k, T), []), "entropy"))
+            sae_entropies.append(get_final(results[("stacked_sae", layer, k, T)], "entropy")
+                                 if ("stacked_sae", layer, k, T) in results else np.nan)
+            tx_entropies.append(get_final(results[("txcdr", layer, k, T)], "entropy")
+                                if ("txcdr", layer, k, T) in results else np.nan)
 
         width = 0.35
         ax.bar(x - width / 2, sae_entropies, width, label="StackedSAE", color="steelblue", alpha=0.8)
@@ -301,8 +307,12 @@ def plot_entropy_comparison(results: dict, viz_dir: str) -> None:
     for layer in layers:
         for k in ks:
             for T in Ts:
-                sae_h = get_final(results.get(("stacked_sae", layer, k, T), []), "entropy")
-                tx_h = get_final(results.get(("txcdr", layer, k, T), []), "entropy")
+                sae_key = ("stacked_sae", layer, k, T)
+                tx_key = ("txcdr", layer, k, T)
+                if sae_key not in results and tx_key not in results:
+                    continue
+                sae_h = get_final(results.get(sae_key, []), "entropy")
+                tx_h = get_final(results.get(tx_key, []), "entropy")
                 diff = sae_h - tx_h
                 lines.append(f"  {layer:14s} k={k:>3d} T={T:>2d}  SAE={sae_h:.4f}  TXCDR={tx_h:.4f}  delta={diff:+.4f}")
     text = "\n".join(lines)
