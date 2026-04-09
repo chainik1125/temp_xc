@@ -64,6 +64,41 @@ python autointerp.py
 python autointerp.py --top-features 20
 ```
 
+### 5. Sentence-level feature visualization (`sentence.py`)
+
+Visualizes top-N feature activations across the tokens of a single sequence,
+side-by-side for StackedSAE vs TXCDR. Loads autointerp explanations as a
+right-side legend if they exist.
+
+```bash
+# Random chain, default exclusive selection (one feature per token position)
+python sentence.py
+
+# Specific chain
+python sentence.py --chain 42
+
+# Specific model + checkpoint
+python sentence.py --layer mid_res --k 100 --T 5 --chain 42
+
+# Top-N by magnitude instead of one-per-position
+python sentence.py --select magnitude --n-features 32
+
+# Custom output dir + colormaps
+python sentence.py --chain 42 \
+  --output-dir viz_outputs/sentences/ \
+  --cmap-sae viridis --cmap-tx magma
+```
+
+Selection modes:
+
+- `exclusive` (default) — for each of the `seq_len` token positions, pick the
+  feature whose total activation mass is most concentrated at that position.
+  Greedy assignment, no feature reused. Should produce a clear diagonal pattern.
+- `magnitude` — pick the top-N features per model by total activation magnitude
+  across the sequence (use `--n-features N`).
+
+Output: `sentence_{layer}_k{k}_T{T}_chain{N}_{select}.png` and matching `_stats.txt`.
+
 ## Current sweep grid
 
 | Parameter | Values |

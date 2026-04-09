@@ -106,7 +106,7 @@ VIZ_DIR = os.environ.get("NLP_VIZ_DIR", os.path.join(NLP_DIR, "viz_outputs"))
 CHECKPOINT_DIR = os.environ.get("NLP_CKPT_DIR", os.path.join(NLP_DIR, "checkpoints"))
 
 # ─── Autointerp ───────────────────────────────────────────────────────────────
-AUTOINTERP_MODEL = "claude-haiku-4-5-20251001"
+AUTOINTERP_MODEL = "google/gemma-2-2b-it"    # local model; use "claude-haiku-4-5-20251001" for API
 AUTOINTERP_MAX_EXAMPLES = 20     # max activating examples per feature
 AUTOINTERP_TOP_FEATURES = 50     # number of top features to interpret
 AUTOINTERP_BATCH_SIZE = 10       # features per API batch
