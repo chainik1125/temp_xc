@@ -9,115 +9,104 @@ tags:
 
 ### Goal
 
-Test whether the temporal crosscoder can discover **global** (hidden-state) feature structure that is invisible to per-token models, using Aniket's coupled-feature data generation pipeline. This is the "figure 2" experiment predicted in the midterm report: a phase transition where TXCDR's shared latent discovers that co-firing emissions share hidden-state parents.
+Test whether TXCDR can discover **global** (hidden-state) structure that per-token models cannot, using Aniket's coupled-feature data generation pipeline. Three metrics are evaluated: (i) decoder AUC, (ii) single-latent correlation, (iii) linear probe R².
 
 ### Background: coupled features
 
 $K = 10$ hidden Markov chains drive $M = 20$ emission features through a binary coupling matrix $C \in \{0,1\}^{20 \times 10}$, where each emission has $n_{\text{parents}} = 2$ parent hidden states. Emission $j$ fires when ANY parent is active (OR gate): $s_j(t) = \mathbf{1}[\sum_i C_{ji} h_i(t) \geq 1]$.
 
-This creates two sets of ground truth:
+Two sets of ground truth:
 
 - **Local (emission)**: 20 orthogonal directions $\{f_j\}$ in $\mathbb{R}^{256}$, recoverable from single tokens.
-- **Global (hidden)**: 10 directions $\{g_i\}$, each the normalized mean of its child emission directions. Only discoverable by aggregating across positions to identify temporally coherent co-activation patterns.
+- **Global (hidden)**: 10 directions $\{g_i\}$, each the normalized mean of its child emission directions. These are a proxy for the hidden states --- the hidden states themselves are binary time series, not directions. The purest measure of global recovery is how well latent activations predict the hidden state time series (correlation and probe metrics below).
 
 ### Setup
 
-- $K = 10$, $M = 20$, $n_{\text{parents}} = 2$, hidden dim $= 256$, $d_{\text{sae}} = 20$
-- $\pi = 0.05$ (hidden state ON prob), $\rho \in \{0.0, 0.7, 0.9\}$
-- Magnitudes: $\mathcal{N}(1.0, 0.15^2)$
-- $k \in \{2, 5, 10, 15, 20, 25\}$, $T \in \{2, 5\}$
-- 30K training steps per model
-- Models: Stacked SAE ($T = 2, 5$), TXCDR ($T = 2, 5$)
-- Evaluation: **dual AUC** --- local AUC (vs emission features) and global AUC (gAUC, vs hidden features)
+- $K = 10$, $M = 20$, $n_{\text{parents}} = 2$, $d = 256$, $d_{\text{sae}} = 40$
+- $\pi = 0.05$ (hidden state ON prob), $\rho = 0.7$
+- Magnitudes: folded normal $\mathcal{N}(1.0, 0.15^2)$
+- $T = 64$, seed 42, 2500 sequences (2000 eval, 500 train)
+- $k \in \{1, 2, 3, 4, 5, 6, 8, 10, 12, 15, 17, 20\}$
+- Models: Stacked SAE ($T = 2, 5$), TXCDRv2 ($T \in \{2, 3, 4, 5, 6, 8, 10, 12\}$)
 
-**Constraint**: $d_{\text{sae}} = 20$ (= $M$), so $k \times T \leq 20$. This limits valid configs: T=2 runs at $k \leq 10$; T=5 only at $k = 2$.
+### Metrics
+
+#### (i) Decoder AUC
+
+Cosine similarity between decoder columns and ground truth directions. Computed separately against emission features (local AUC) and hidden features (global AUC = gAUC). Measures whether the **dictionary directions** align with the ground truth.
+
+#### (ii) Single-latent correlation
+
+For each ground truth target (emission $j$ or hidden state $i$), find the best-matching latent by decoder cosine similarity with the corresponding direction. Compute $\text{Pearson}(z_j, \text{target})$ across all eval tokens. Report mean across targets. The correlation ratio (hidden/emission) measures whether latent **activations** track hidden states better than emissions.
+
+#### (iii) Linear probe R²
+
+Train Ridge regression from the full latent vector $z \in \mathbb{R}^{d_{\text{sae}}}$ to each target (emission support $s_j$ or hidden state $h_i$). Report mean R² across targets. The probe ratio (hidden/emission) captures information distributed across all latents, not just the best match.
+
+Note: for windowed models, latent activations are averaged across overlapping windows (same procedure as Experiment 1c --- see caveats there).
 
 ### Results
 
-#### $\rho = 0.0$ (IID, no temporal structure)
+#### Selected results at $k = 2$ and $k = 5$
 
-| $k$ | Model | NMSE | AUC (local) | gAUC (global) |
-|-----|-------|------|-------------|---------------|
-| 2 | Stacked T=2 | **0.186** | 0.597 | 0.786 |
-| 2 | TXCDR T=2 | 0.229 | 0.611 | **0.971** |
-| 2 | Stacked T=5 | **0.198** | 0.507 | 0.694 |
-| 2 | TXCDR T=5 | 0.492 | 0.449 | **0.755** |
-| 5 | Stacked T=2 | **0.027** | **0.713** | 0.618 |
-| 5 | TXCDR T=2 | 0.190 | 0.527 | **0.890** |
-| 10 | Stacked T=2 | **0.001** | **0.704** | 0.551 |
-| 10 | TXCDR T=2 | 0.189 | 0.463 | **0.653** |
+| $k$ | Model | eAUC | gAUC | corr ratio | probe ratio |
+|-----|-------|------|------|------------|-------------|
+| 2 | Stacked T=2 | 0.588 | 0.755 | 2.56 | 0.98 |
+| 2 | TXCDRv2 T=2 | 0.651 | **0.990** | 1.72 | 0.99 |
+| 2 | TXCDRv2 T=5 | 0.548 | **0.971** | 1.31 | 0.99 |
+| 2 | TXCDRv2 T=12 | 0.552 | **0.949** | 1.03 | 0.91 |
+| 5 | Stacked T=2 | **0.611** | 0.718 | 1.96 | 0.98 |
+| 5 | TXCDRv2 T=2 | **0.750** | **0.953** | 1.36 | 0.98 |
+| 5 | TXCDRv2 T=5 | 0.565 | **0.959** | 1.06 | 0.99 |
+| 5 | TXCDRv2 T=8 | 0.505 | 0.773 | 0.91 | 0.99 |
 
-#### $\rho = 0.7$ (moderate temporal correlation)
+#### Comparison at $k = 10$ and $k = 20$
 
-| $k$ | Model | NMSE | AUC (local) | gAUC (global) |
-|-----|-------|------|-------------|---------------|
-| 2 | Stacked T=2 | **0.195** | 0.602 | 0.786 |
-| 2 | TXCDR T=2 | 0.243 | 0.610 | **0.980** |
-| 2 | Stacked T=5 | **0.201** | 0.543 | 0.714 |
-| 2 | TXCDR T=5 | 0.390 | 0.544 | **0.929** |
-| 5 | Stacked T=2 | **0.028** | **0.712** | 0.590 |
-| 5 | TXCDR T=2 | 0.194 | 0.541 | **0.922** |
-| 10 | Stacked T=2 | **0.001** | **0.704** | 0.518 |
-| 10 | TXCDR T=2 | 0.189 | 0.509 | **0.737** |
-
-#### $\rho = 0.9$ (strong temporal correlation)
-
-| $k$ | Model | NMSE | AUC (local) | gAUC (global) |
-|-----|-------|------|-------------|---------------|
-| 2 | Stacked T=2 | **0.178** | 0.644 | 0.727 |
-| 2 | TXCDR T=2 | 0.238 | **0.754** | **0.953** |
-| 2 | Stacked T=5 | **0.192** | 0.528 | 0.692 |
-| 2 | TXCDR T=5 | 0.333 | 0.555 | **0.941** |
-| 5 | Stacked T=2 | **0.019** | **0.702** | 0.627 |
-| 5 | TXCDR T=2 | 0.195 | 0.645 | **0.882** |
-| 10 | Stacked T=2 | **0.001** | **0.704** | 0.551 |
-| 10 | TXCDR T=2 | 0.188 | 0.492 | **0.720** |
+| $k$ | Model | eAUC | gAUC | corr ratio | probe ratio |
+|-----|-------|------|------|------------|-------------|
+| 10 | Stacked T=2 | **0.654** | 0.582 | 1.13 | 0.97 |
+| 10 | TXCDRv2 T=2 | **0.869** | **0.773** | 0.95 | 0.97 |
+| 20 | Stacked T=2 | 0.620 | 0.541 | 0.86 | 0.97 |
+| 20 | TXCDRv2 T=2 | 0.527 | **0.629** | 1.17 | 0.97 |
 
 ### Findings
 
-**Finding 1: TXCDR dominates global feature recovery across all regimes.** At $k = 2$, TXCDR T=2 achieves gAUC $= 0.97$--$0.98$ across all $\rho$ values, vs Stacked T=2's $0.73$--$0.79$. The shared latent discovers the 10 hidden-state directions even at $\rho = 0.0$ (no temporal signal). This is surprising --- it suggests the shared encoder exploits the co-occurrence structure of emissions (which share parents) even without temporal persistence.
+**Finding 1: gAUC shows clear TXCDR advantage, but other metrics are more nuanced.** TXCDR T=2 achieves gAUC $\geq 0.95$ at $k \leq 5$, far exceeding Stacked SAE. But the correlation ratio and probe ratio tell a different story --- Stacked SAE also has high correlation ratios (1.3--2.6) at low k, sometimes exceeding TXCDR. This is because the gAUC measures dictionary direction alignment, while the correlation and probe measure activation-level tracking.
 
-**Finding 2: Stacked SAE wins NMSE and local AUC but loses global AUC.** Stacked T=2 achieves much lower NMSE (0.001 vs 0.189 at $k = 10$) and higher local AUC (0.704 vs 0.463--0.509). It is an excellent per-token reconstructor that faithfully recovers the 20 emission directions. But it cannot discover the 10 hidden-state directions --- its gAUC declines with $k$ (0.786 at $k = 2$ → 0.551 at $k = 10$).
+**Finding 2: The correlation ratio is high for ALL models at low k.** At $k = 1$--$2$, both Stacked and TXCDR have correlation ratios well above 1.0, meaning all models' latents track hidden states better than emissions at very low k. This makes sense: with only $k = 1$--$2$ active latents and $\sim 4$ active emissions per token, the model is forced to learn composite features that aggregate emissions --- which naturally aligns with hidden state directions. The correlation ratio thus does not cleanly separate architectures at low k.
 
-**Finding 3: gAUC declines with $k$ for both models, but TXCDR declines slower.** As $k$ increases beyond $K = 10$ hidden states, both models overfit to emission-level structure. But TXCDR retains much more global information: at $k = 10$, $\rho = 0.7$, TXCDR gAUC = 0.737 vs Stacked gAUC = 0.518. The shared-latent bottleneck provides a structural prior that resists splitting global features into emission-level fragments.
+**Finding 3: At moderate $k$ ($5$--$10$), the metrics diverge.** As $k$ increases, Stacked SAE's gAUC drops (0.718 → 0.582) while TXCDR T=2's stays high (0.953 → 0.773). The correlation ratio for Stacked also drops below TXCDR's. This is the regime where the architectural difference matters most: Stacked SAE has enough capacity to learn individual emission features and stops aggregating, while TXCDR's shared bottleneck maintains global structure.
 
-**Finding 4: The gAUC advantage holds even at $\rho = 0$.** This was unexpected. At $\rho = 0.0$, features are IID --- there is no temporal signal to exploit. Yet TXCDR T=2 still achieves gAUC = 0.971 at $k = 2$ (vs Stacked's 0.786). The shared encoder aggregates two positions where the same hidden state drives correlated emissions, even without temporal persistence. The **spatial** co-occurrence within each window is sufficient.
+**Finding 4: The probe ratio is $\approx 1$ for all models.** The linear probe can predict hidden states about as well as emissions for both architectures, across all $k$ values. This means the latent representations contain hidden-state information whether or not the model explicitly learns hidden directions. The information is there --- the question is whether it's accessible via single latent inspection (correlation) or requires a linear combination (probe).
 
-**Finding 5: The $d_{\text{sae}} = M$ constraint severely limits the sweep.** With $d_{\text{sae}} = 20$, T=5 is only valid at $k = 2$, and T=2 is capped at $k = 10$. The phase transition predicted in the report (gAUC rising at high $k$) cannot be fully observed because the dictionary is too small for high-$k$ crosscoders. A follow-up with $d_{\text{sae}} > M$ (e.g., $d_{\text{sae}} = 40$ or $64$) would allow sweeping $k$ up to $20$+ at T=2 and reveal the full transition curve.
-
-### Implications
-
-1. **TXCDR discovers latent causal structure, not just temporal patterns.** The gAUC advantage at $\rho = 0$ proves that the shared encoder exploits co-occurrence (which emissions co-fire because they share parents), not just temporal persistence. This is the "figure 2" result predicted in the report.
-
-2. **Local and global feature recovery are in tension.** Stacked SAE's high local AUC (0.70+) comes at the cost of low gAUC (0.55). TXCDR's high gAUC (0.90+) comes at the cost of lower local AUC (0.50--0.61) and much higher NMSE. The two architectures optimize for different aspects of the ground truth.
-
-3. **The coupled-feature setting genuinely separates local from global.** Unlike the 1c/1c2 experiments (one-to-one hidden→emission), the coupled model creates a real distinction between emission-level and hidden-state-level structure. TXCDR's advantage in this setting is evidence of genuine structural inference, not just denoising.
+**Finding 5: gAUC is the most discriminative metric for this setting.** The correlation ratio is noisy and confounded by the low-k composite effect. The probe ratio is near 1 for everyone. The gAUC cleanly separates TXCDR (0.95+) from Stacked SAE (0.75) across the relevant $k$ range. This is because gAUC directly measures whether the learned dictionary captures hidden-state directions as interpretable, axis-aligned features --- which is the interpretability-relevant question.
 
 ### Plots
 
-![NMSE, local AUC, global AUC vs k](../../../src/v2_temporal_schemeC/results/experiment1c3_coupled/exp1c3_topk_auc.png)
+![Decoder AUC: emission vs hidden](../../../src/v2_temporal_schemeC/results/experiment1c3_coupled/exp1c3_auc.png)
 
-![Global vs local AUC scatter](../../../src/v2_temporal_schemeC/results/experiment1c3_coupled/exp1c3_scatter.png)
+![Single-latent correlation](../../../src/v2_temporal_schemeC/results/experiment1c3_coupled/exp1c3_corr.png)
 
-![TXCDR global AUC vs window size](../../../src/v2_temporal_schemeC/results/experiment1c3_coupled/exp1c3_gauc_vs_T.png)
+![Linear probe R²](../../../src/v2_temporal_schemeC/results/experiment1c3_coupled/exp1c3_probe.png)
 
-![TXCDR global AUC advantage](../../../src/v2_temporal_schemeC/results/experiment1c3_coupled/exp1c3_gauc_gap.png)
+![All three ratios vs k](../../../src/v2_temporal_schemeC/results/experiment1c3_coupled/exp1c3_ratios.png)
+
+![Scatter: hidden vs emission (3 metrics)](../../../src/v2_temporal_schemeC/results/experiment1c3_coupled/exp1c3_scatter.png)
+
+![Global AUC vs window size T](../../../src/v2_temporal_schemeC/results/experiment1c3_coupled/exp1c3_gauc_vs_T.png)
 
 ### Reproduction
 
 ```bash
+# Train models + compute all 3 metrics (~68 min):
 TQDM_DISABLE=1 PYTHONUNBUFFERED=1 PYTHONPATH=/home/elysium/temp_xc \
-  /home/elysium/miniforge3/envs/torchgpu/bin/python -m src.bench.sweep \
-  --coupled --K-hidden 10 --M-emission 20 --n-parents 2 \
-  --k 2 5 10 15 20 25 --rho 0.0 0.7 0.9 --T 2 5 \
-  --steps 30000 --models Stacked TXCDR \
-  --results-dir src/v2_temporal_schemeC/results/experiment1c3_coupled
+  /home/elysium/miniforge3/envs/torchgpu/bin/python -u \
+  src/v2_temporal_schemeC/run_exp1c3_denoising.py
+
+# Re-plot only:
+PYTHONPATH=/home/elysium/temp_xc python src/v2_temporal_schemeC/plot_exp1c3.py
 ```
 
-Results: `src/v2_temporal_schemeC/results/experiment1c3_coupled/sweep_summary.json`
+Results: `src/v2_temporal_schemeC/results/experiment1c3_coupled/`
 
-### Next steps
-
-- Increase $d_{\text{sae}}$ to 40 or 64 to allow higher $k$ and reveal the full phase transition
-- Add TFA-pos and TopK SAE baselines
-- Sweep $n_{\text{parents}} \in \{1, 2, 3, 4\}$ to test how entanglement affects the gAUC gap
+Runtime: ~68 minutes on RTX 5090.

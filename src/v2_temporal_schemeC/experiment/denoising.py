@@ -253,3 +253,94 @@ def run_linear_probes(
         "mean_global_r2": float(np.mean(global_r2s)),
         "ratio": float(np.mean(global_r2s)) / max(float(np.mean(local_r2s)), 1e-12),
     }
+
+
+# ── Single-target correlation (for coupled features) ──
+
+def compute_correlation_against_targets(
+    latent_activations: np.ndarray,
+    target_sequences: torch.Tensor,
+    decoder_directions: torch.Tensor,
+    target_features: torch.Tensor,
+    device: torch.device,
+) -> dict:
+    """Compute per-feature Pearson correlation between latents and targets.
+
+    Matches each target feature to the best decoder column, then computes
+    Pearson(z_j, target_i) for each matched pair.
+
+    Args:
+        latent_activations: (n_tokens, d_sae) from extract_latents_*.
+        target_sequences: (n_eval, n_targets, T) binary target sequences.
+        decoder_directions: (d, d_sae) decoder weight matrix.
+        target_features: (n_targets, d) ground truth directions to match against.
+        device: torch device for cosine similarity.
+
+    Returns:
+        Dict with per-feature correlations and mean.
+    """
+    dd = decoder_directions.to(device)
+    tf = target_features.T.to(device)  # (d, n_targets)
+    sims = cos_sims(dd, tf).abs()      # (d_sae, n_targets)
+    best_latent = sims.argmax(dim=0)   # (n_targets,)
+
+    n_targets = target_sequences.shape[1]
+    targets = target_sequences.permute(0, 2, 1).reshape(-1, n_targets).float().numpy()
+
+    corrs = []
+    for i in range(n_targets):
+        j = best_latent[i].item()
+        z_j = latent_activations[:, j]
+        t_i = targets[:, i]
+        corrs.append(_np_pearson(z_j, t_i))
+
+    corrs = np.array(corrs)
+    return {
+        "corrs": corrs.tolist(),
+        "mean": float(np.mean(corrs)),
+    }
+
+
+def _np_pearson(x: np.ndarray, y: np.ndarray) -> float:
+    xm = x - x.mean()
+    ym = y - y.mean()
+    num = (xm * ym).sum()
+    den = np.sqrt((xm**2).sum() * (ym**2).sum())
+    if den < 1e-12:
+        return 0.0
+    return float(num / den)
+
+
+def run_linear_probes_general(
+    z: np.ndarray,
+    targets: torch.Tensor,
+    num_targets: int,
+    alpha: float = 1.0,
+) -> dict:
+    """Train Ridge probes z -> target_i for each target.
+
+    Args:
+        z: (n_tokens, d_sae) latent activations.
+        targets: (n_eval, n_targets, T) target sequences.
+        num_targets: number of targets.
+        alpha: Ridge regularization.
+
+    Returns:
+        Dict with per-target R² and mean.
+    """
+    t = targets.permute(0, 2, 1).reshape(-1, num_targets).numpy()
+    n = z.shape[0]
+    split = int(0.8 * n)
+    z_train, z_test = z[:split], z[split:]
+    t_train, t_test = t[:split], t[split:]
+
+    r2s = []
+    for i in range(num_targets):
+        probe = Ridge(alpha=alpha)
+        probe.fit(z_train, t_train[:, i])
+        r2s.append(r2_score(t_test[:, i], probe.predict(z_test)))
+
+    return {
+        "r2": r2s,
+        "mean_r2": float(np.mean(r2s)),
+    }
