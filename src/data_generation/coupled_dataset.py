@@ -11,6 +11,7 @@ import torch
 
 from src.data_generation.activations import generate_activations
 from src.data_generation.configs import CoupledDataGenerationConfig
+from src.data_generation.support import apply_emission
 from src.data_generation.coupling import (
     apply_coupling,
     compute_hidden_features,
@@ -42,7 +43,8 @@ def generate_coupled_dataset(
             hidden_features: (K, d) global ground truth directions
             coupling_matrix: (M, K) binary coupling matrix
             hidden_states: (n_seq, K, T) binary hidden chains
-            support: (n_seq, M, T) binary emission support
+            coupled_support: (n_seq, M, T) pre-noise coupled support (OR gate output)
+            support: (n_seq, M, T) observed emission support (after noise if any)
             magnitudes: (n_seq, M, T)
             activations: (n_seq, M, T)
             x: (n_seq, T, d) observation vectors
@@ -79,17 +81,20 @@ def generate_coupled_dataset(
 
     # Generate hidden states and coupled emissions
     all_hidden = torch.zeros(n_seq, K, T)
+    all_coupled = torch.zeros(n_seq, M, T)
     all_support = torch.zeros(n_seq, M, T)
     all_magnitudes = torch.zeros(n_seq, M, T)
     all_activations = torch.zeros(n_seq, M, T)
     all_x = torch.zeros(n_seq, T, d)
 
+    has_emission_noise = not (config.emission.p_A == 0.0 and config.emission.p_B == 1.0)
+
     for seq_idx in range(n_seq):
         # K independent hidden chains
         hidden_states = generate_hidden_states(K, T, config.transition, rng)
 
-        # Map hidden states to M emission features via coupling
-        support = apply_coupling(
+        # Map hidden states to M emission features via coupling (deterministic)
+        coupled_support = apply_coupling(
             hidden_states,
             coupling_matrix,
             mode=config.coupling.emission_mode,
@@ -97,6 +102,12 @@ def generate_coupled_dataset(
             beta=config.coupling.sigmoid_beta,
             rng=rng,
         )
+
+        # Optionally apply stochastic emission noise on top of coupling
+        if has_emission_noise:
+            support = apply_emission(coupled_support, config.emission, rng)
+        else:
+            support = coupled_support
 
         # Sample magnitudes for M emissions
         magnitudes = sample_magnitudes(M, T, config.magnitude, rng)
@@ -106,18 +117,21 @@ def generate_coupled_dataset(
         x = activations.T @ emission_features  # (T, d)
 
         all_hidden[seq_idx] = hidden_states
+        all_coupled[seq_idx] = coupled_support
         all_support[seq_idx] = support
         all_magnitudes[seq_idx] = magnitudes
         all_activations[seq_idx] = activations
         all_x[seq_idx] = x
 
-    log("data", "generated coupled dataset", n_sequences=n_seq, T=T)
+    log("data", "generated coupled dataset", n_sequences=n_seq, T=T,
+        emission_noise=has_emission_noise)
 
     return {
         "emission_features": emission_features,
         "hidden_features": hidden_features,
         "coupling_matrix": coupling_matrix,
         "hidden_states": all_hidden,
+        "coupled_support": all_coupled,
         "support": all_support,
         "magnitudes": all_magnitudes,
         "activations": all_activations,

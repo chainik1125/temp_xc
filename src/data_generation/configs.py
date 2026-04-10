@@ -145,10 +145,16 @@ class CoupledDataGenerationConfig:
 
     Uses K hidden states mapped to M emission features via a coupling matrix.
     The transition config applies to each of the K hidden chains independently.
+
+    When ``emission`` is set with p_B < 1, stochastic noise is applied AFTER
+    the coupling (OR gate), creating noisy observations of the coupled support.
+    This separates local from global at the activation level, not just at the
+    direction level.
     """
 
     transition: TransitionConfig = field(default_factory=TransitionConfig)
     coupling: CouplingConfig = field(default_factory=CouplingConfig)
+    emission: EmissionConfig = field(default_factory=EmissionConfig)
     magnitude: MagnitudeConfig = field(default_factory=MagnitudeConfig)
     sequence: SequenceConfig = field(default_factory=SequenceConfig)
     hidden_dim: int = 64  # d, dimensionality of observation space
