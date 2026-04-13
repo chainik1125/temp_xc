@@ -61,20 +61,48 @@ class MarkovConfig:
 
 @dataclass
 class DataConfig:
-    """Complete specification of the synthetic data setup.
+    """Complete specification of a benchmarking data source.
 
-    When `coupling` is None (default), uses simple independent-feature
-    Markov chains with num_features features. When `coupling` is set,
-    uses K hidden states mapped to M emission features via a coupling matrix.
+    Two top-level data sources, selected by `dataset_type`:
+
+    - `markov`  (default): synthetic Markov chain toy model, as originally
+                designed. Parametrized by `toy_model`, `markov`, `coupling`.
+                Used for controlled architecture comparison on known ground
+                truth features.
+
+    - `cached_activations`: load pre-cached real-LM activations produced by
+                `temporal_crosscoders/NLP/cache_activations.py`. Specify the
+                `model_name` (routes through `src.bench.model_registry`), the
+                `cached_dataset` (e.g. "fineweb", "gsm8k", "coding"), and the
+                `cached_layer_key` (e.g. "resid_L12"). Used for the sprint's
+                real-LM comparison track.
+
+    `shuffle_within_sequence` is the critical temporal-control knob: when
+    True, the sequence axis of every emitted activation window is randomly
+    permuted. A temporal architecture's advantage over a standard SAE should
+    *disappear* under shuffling if the advantage is genuinely temporal; if it
+    survives, it's exploiting some non-temporal structure (the TFA "free
+    dense channel" confound).
     """
 
+    # Synthetic-toy fields (used when dataset_type == "markov") -------------
     toy_model: ToyModelConfig = field(default_factory=ToyModelConfig)
     markov: MarkovConfig = field(default_factory=MarkovConfig)
     coupling: CouplingConfig | None = None
     seq_len: int = 64
-    d_sae: int = 128  # dictionary width (often = num_features or M_emission)
+    d_sae: int = 128
     seed: int = 42
     eval_n_seq: int = 2000
+
+    # Real-LM fields (used when dataset_type == "cached_activations") -------
+    dataset_type: str = "markov"          # "markov" | "cached_activations"
+    model_name: str = "deepseek-r1-distill-llama-8b"
+    cached_dataset: str = "fineweb"       # subdir under data/cached_activations/<model>/
+    cached_layer_key: str = "resid_L12"   # which <key>.npy to load
+    cached_root: str | None = None        # override default path; None = use config default
+
+    # Common ----------------------------------------------------------------
+    shuffle_within_sequence: bool = False  # temporal shuffled control
 
 
 @dataclass

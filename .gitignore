@@ -31,3 +31,12 @@ Thumbs.db
 
 # Trillium HPC scripts (personal cluster config)
 scripts/trillium_*
+exploration.md
+
+# Real-LM cached activations and model checkpoints (too large for git)
+data/cached_activations/
+reports/
+results/bench/
+
+# Vendored external repos (Venhoff thinking-llms-interp, etc.)
+external/

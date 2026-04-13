@@ -26,6 +26,10 @@ class EvalResult:
     For coupled-feature data, auc/r90/mean_max_cos measure local (emission)
     recovery, while global_auc/global_r90/global_mean_max_cos measure
     hidden-state-level recovery.
+
+    `temporal_mi`, `span_stats`, and `cluster` are populated on real-LM
+    cached-activation runs (see src.shared.temporal_metrics). They stay None
+    on toy Markov data where they're not informative.
     """
 
     nmse: float
@@ -36,6 +40,10 @@ class EvalResult:
     global_auc: float | None = None
     global_r90: float | None = None
     global_mean_max_cos: float | None = None
+    # Real-LM temporal metrics (None on toy data)
+    temporal_mi: dict | None = None
+    span_stats: dict | None = None
+    cluster: dict | None = None
 
     def to_dict(self) -> dict:
         return asdict(self)
@@ -139,12 +147,87 @@ def evaluate_model(
             global_r90 = global_recovery["frac_recovered_90"]
             global_mean_max_cos = global_recovery["mean_max_cos"]
 
+    # Optional: real-LM temporal metrics. Only run if we have a proper
+    # (n_seq, seq_len, d) tensor and the architecture exposes an encode.
+    temporal_mi_d: dict | None = None
+    span_d: dict | None = None
+    cluster_d: dict | None = None
+    if _want_temporal_metrics(spec, eval_data):
+        feats = _encode_for_metrics(spec, model, eval_data, device, seq_len)
+        if feats is not None:
+            from src.shared.temporal_metrics import (
+                temporal_mi as _temporal_mi,
+                activation_span_stats,
+                cluster_features,
+            )
+            try:
+                temporal_mi_d = _temporal_mi(feats).to_dict()
+            except Exception as e:
+                temporal_mi_d = {"error": str(e)}
+            try:
+                span_d = activation_span_stats(feats).to_dict()
+            except Exception as e:
+                span_d = {"error": str(e)}
+            try:
+                dd = _get_decoder_averaged(spec, model, device)
+                cluster_d = cluster_features(dd).to_dict()
+            except Exception as e:
+                cluster_d = {"error": str(e)}
+
     return EvalResult(
         nmse=nmse, l0=l0,
         auc=auc, r90=r90, mean_max_cos=mean_max_cos,
         global_auc=global_auc, global_r90=global_r90,
         global_mean_max_cos=global_mean_max_cos,
+        temporal_mi=temporal_mi_d,
+        span_stats=span_d,
+        cluster=cluster_d,
     )
+
+
+def _want_temporal_metrics(spec: ArchSpec, eval_data: torch.Tensor) -> bool:
+    """Only compute temporal metrics on real-LM data (3D and no ground truth)."""
+    return eval_data.dim() == 3 and eval_data.shape[1] > 1
+
+
+def _encode_for_metrics(
+    spec: ArchSpec,
+    model: torch.nn.Module,
+    eval_data: torch.Tensor,
+    device: torch.device,
+    seq_len: int,
+    max_seqs: int = 512,
+) -> torch.Tensor | None:
+    """Best-effort feature extraction for temporal metrics.
+
+    Runs the model on a slice of eval_data and tries to return activations of
+    shape (B, T, F). Falls back to None if the architecture doesn't expose a
+    hookable encode path.
+    """
+    n = min(eval_data.shape[0], max_seqs)
+    x = eval_data[:n].to(device)
+    encode = getattr(spec, "encode", None) or getattr(model, "encode", None)
+    if encode is None:
+        return None
+    try:
+        with torch.no_grad():
+            feats = encode(x) if callable(encode) else None
+    except TypeError:
+        try:
+            with torch.no_grad():
+                feats = encode(model, x)
+        except Exception:
+            return None
+    except Exception:
+        return None
+    if feats is None:
+        return None
+    if feats.dim() == 2:
+        # flat path — reshape to (B, T, F)
+        feats = feats.reshape(n, -1, feats.shape[-1])
+    if feats.dim() != 3:
+        return None
+    return feats.detach().float().cpu()
 
 
 def _get_decoder_averaged(
