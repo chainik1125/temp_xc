@@ -17,3 +17,7 @@ First null results: current TXCDR architecture [doesn't outperform](./tx_v_sae.m
 ## wk 3-4
 
 Changed to stacked_SAEs and included loss values to my comparison. [See here](v2_tx_v_sae.md).
+
+## wk 5-7
+
+testing on natural language models. [gemma2_summary](nlp_gemma2_summary.md) and [UMAP](nlp_feature_map.md)
