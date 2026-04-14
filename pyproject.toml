@@ -15,6 +15,10 @@ dependencies = [
     "anthropic",
     "huggingface-hub",
     "accelerate>=1.13.0",
+    "umap-learn>=0.5.12",
+    "plotly>=6.7.0",
+    "scikit-learn>=1.8.0",
+    "pandas>=3.0.2",
 ]
 
 [dependency-groups]

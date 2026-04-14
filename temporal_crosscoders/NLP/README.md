@@ -89,6 +89,23 @@ python sentence.py --chain 42 \
   --cmap-sae viridis --cmap-tx magma
 ```
 
+cd /home/cs29824/andre/temp_xc/temporal_crosscoders/NLP
+
+# Default: stacked_sae mid_res k100 T5, 20 clusters, gemma labels
+python feature_map.py
+
+# Specific model
+python feature_map.py --model txcdr --layer mid_res --k 100 --T 5
+
+# More clusters, include unlabeled features too
+python feature_map.py --n-clusters 30 --include-unlabeled
+
+# Fast mode — skip gemma cluster labeling
+python feature_map.py --skip-llm-labels
+
+# Tune UMAP topology
+python feature_map.py --n-neighbors 30 --min-dist 0.05
+
 Selection modes:
 
 - `exclusive` (default) — for each of the `seq_len` token positions, pick the

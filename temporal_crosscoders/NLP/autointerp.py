@@ -358,13 +358,21 @@ class LocalGemmaBackend:
         messages = [
             {"role": "user", "content": f"{system}\n\n{user}"},
         ]
-        input_ids = self.tokenizer.apply_chat_template(
+        chat_out = self.tokenizer.apply_chat_template(
             messages, return_tensors="pt", add_generation_prompt=True,
-        ).to(self.model.device)
+        )
+        # Newer transformers may return a BatchEncoding instead of a tensor
+        if isinstance(chat_out, torch.Tensor):
+            input_ids = chat_out.to(self.model.device)
+            gen_kwargs = {"input_ids": input_ids}
+        else:
+            gen_kwargs = {k: v.to(self.model.device) for k, v in chat_out.items()}
+            input_ids = gen_kwargs["input_ids"]
+        prompt_len = input_ids.shape[1]
 
         with torch.no_grad():
             output_ids = self.model.generate(
-                input_ids,
+                **gen_kwargs,
                 max_new_tokens=self.max_tokens,
                 do_sample=False,
                 temperature=None,
@@ -372,7 +380,7 @@ class LocalGemmaBackend:
             )
 
         # Decode only the generated tokens
-        new_tokens = output_ids[0, input_ids.shape[1]:]
+        new_tokens = output_ids[0, prompt_len:]
         response = self.tokenizer.decode(new_tokens, skip_special_tokens=True)
         self.n_calls += 1
         return response
