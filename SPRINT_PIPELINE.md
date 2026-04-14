@@ -123,82 +123,115 @@ The metrics only fire if the architecture exposes an `encode()` method returning
 
 ## 5. Running an experiment (cheat sheet)
 
-### On Trillium (primary compute)
+All commands below assume you have a single GPU box (RunPod, local workstation, whatever your group uses) with CUDA set up. The pipeline is deliberately portable — nothing below depends on a specific cluster or scheduler.
 
-All commands live under `scripts/trillium_*`. Each wraps the underlying Python with the right `srun` / `sbatch` invocation.
-
-```bash
-# One-time setup
-bash scripts/trillium_setup.sh           # install deps, create venv
-nano ~/.txc_secrets.env                   # HF_TOKEN, WANDB_API_KEY, ANTHROPIC_API_KEY
-bash scripts/trillium_setup.sh           # re-run, smoke test
-bash scripts/trillium_download_models.sh # pull registry models + datasets
-bash scripts/trillium_bootstrap.sh       # all of the above + verify GPU + smoke cache
-
-# Cache activations from a subject model
-MODE=smoke bash scripts/trillium_cache_reasoning.sh                               # 100 seqs, interactive
-MODE=full bash scripts/trillium_cache_reasoning.sh                                # 1000 seqs, sbatch
-MODE=full MODEL=gemma-2-2b DATASET=fineweb bash scripts/trillium_cache_reasoning.sh
-
-# Run a real-LM architecture sweep
-bash scripts/trillium_sweep_nlp.sh                                                # defaults
-SHUFFLE=1 bash scripts/trillium_sweep_nlp.sh                                      # temporal control
-MODEL=gemma-2-2b DATASET=fineweb LAYER=resid_L13 bash scripts/trillium_sweep_nlp.sh
-ARCHS="topk_sae stacked_sae crosscoder tfa" bash scripts/trillium_sweep_nlp.sh    # add TFA
-
-# Aggregate + report
-bash scripts/trillium_aggregate.sh results/nlp reports/day1-gsm8k
-
-# Spot-check
-bash scripts/trillium_spotcheck_acts.sh deepseek-r1-distill-llama-8b gsm8k resid_L12
-bash scripts/trillium_sanity_pipeline.sh
-```
-
-Env vars all scripts respect: `MODEL`, `DATASET`, `LAYER`, `MODE`, `SHUFFLE`, `ARCHS`, `K`, `T`, `STEPS`, `WALL`. Override on the command line — never edit the scripts.
-
-### On your laptop
+### One-time setup
 
 ```bash
-# Pull reports, per-run JSONs, and SLURM logs from Trillium
-bash scripts/fetch_from_trillium.sh                    # all three
-bash scripts/fetch_from_trillium.sh reports            # just reports, for Slack
-bash scripts/fetch_from_trillium.sh --dry-run          # preview
+# 1. Clone and install
+git clone <repo-url>
+cd temp_xc
+git checkout aniket
+python -m venv .venv && source .venv/bin/activate
+pip install -U pip wheel
+pip install torch --index-url https://download.pytorch.org/whl/cu121
+pip install transformers datasets huggingface_hub accelerate safetensors sentencepiece \
+            numpy scipy einops tqdm pyyaml \
+            wandb matplotlib seaborn plotly pandas \
+            scikit-learn umap-learn hdbscan numba \
+            anthropic pydantic
+pip install --no-deps -e .
 
-# Re-aggregate locally from pulled JSONs
-python scripts/aggregate_results.py --root results/nlp --out reports/local
-```
+# 2. HuggingFace + wandb tokens
+export HF_TOKEN="hf_..."
+export HUGGING_FACE_HUB_TOKEN="$HF_TOKEN"
+export WANDB_API_KEY="..."
+# Accept licenses on HuggingFace for: DeepSeek-R1-Distill-Llama-8B, Llama-3.1-8B,
+# google/gemma-2-2b, google/gemma-2-2b-it — gated models will 401 otherwise.
 
-**Cached activations (~30 GB per run) and model weights (~40 GB) stay pinned on Trillium.** Do not rsync them locally.
-
-### On other compute (RunPod, your own GPU)
-
-The `scripts/trillium_*` wrappers are Trillium-specific (SLURM, `$SCRATCH`, Compute Canada wheel pins). Everything else is portable:
-
-```bash
-pip install -r requirements.txt   # roll your own requirements — no trillium_sprint_requirements.txt
-export HF_TOKEN=...
+# 3. Download model weights + small datasets (~45 GB)
 bash scripts/download_models.sh
+
+# 4. GPU sanity check
 python scripts/verify_gpu_fit.py --model deepseek-r1-distill-llama-8b
-python -m temporal_crosscoders.NLP.cache_activations --model ... --dataset ...
-python -m src.bench.sweep --dataset-type cached_activations --model-name ... ...
-python scripts/aggregate_results.py --root results/nlp --out reports/latest
+# Expect peak ≈ 16–18 GB on an 80 GB H100, comfortable headroom on A100 40 GB.
 ```
+
+### Stage 1 — cache activations
+
+```bash
+# Reasoning traces from a thinking model (DeepSeek on GSM8K)
+python scripts/cache_reasoning_traces.py \
+    --model deepseek-r1-distill-llama-8b \
+    --dataset gsm8k --num-sequences 1000 \
+    --gen_max_new_tokens 1024 --layer_indices 12 24
+
+# Forward pass on non-reasoning data (Gemma on FineWeb, coding corpora)
+python -m temporal_crosscoders.NLP.cache_activations \
+    --model gemma-2-2b --dataset fineweb --mode forward \
+    --num-sequences 24000 --seq-length 32 --layer_indices 13 25
+```
+
+Output lands at `data/cached_activations/<model>/<dataset>/`. Safe to delete between runs; re-running the same command is idempotent (existing layers are skipped).
+
+### Stage 2 — run an architecture sweep
+
+```bash
+# Default comparison: topk_sae + stacked_sae + crosscoder (TXCDRv2)
+python -m src.bench.sweep \
+    --dataset-type cached_activations \
+    --model-name deepseek-r1-distill-llama-8b \
+    --cached-dataset gsm8k --cached-layer-key resid_L12 \
+    --models topk_sae stacked_sae crosscoder \
+    --k 50 --T 5 --steps 10000 \
+    --results-dir results/nlp/day1-gsm8k
+
+# Shuffled control — re-run everything with temporal order destroyed.
+# Every real experiment runs twice. This is non-negotiable for any claim
+# about "temporal" features (see the TFA free-dense-channel confound).
+python -m src.bench.sweep \
+    --dataset-type cached_activations \
+    --model-name deepseek-r1-distill-llama-8b \
+    --cached-dataset gsm8k --cached-layer-key resid_L12 \
+    --models topk_sae stacked_sae crosscoder \
+    --k 50 --T 5 --steps 10000 \
+    --shuffle-within-sequence \
+    --results-dir results/nlp/day1-gsm8k-shuffled
+```
+
+### Stage 3 — aggregate + post to Slack
+
+```bash
+python scripts/aggregate_results.py --root results/nlp --out reports/day1-gsm8k
+# Emits report.md + nmse_l0.png + max_cos_hist.png + temporal_mi.png + span_hist.png
+# Drag the whole reports/day1-gsm8k/ dir into Slack — PNGs render inline.
+```
+
+### Working with cached data across sessions
+
+- `data/cached_activations/` can be tens of GB per run — keep it on local/scratch disk, never commit it (already gitignored).
+- `results/nlp/` is KB per run — fine to sync anywhere.
+- `reports/` is what you paste into Slack.
+
+### Note on the `scripts/trillium_*` scripts
+
+Those are Aniket's cluster-specific wrappers (SLURM, Compute Canada wheel pins). **Ignore them.** Nothing in the portable workflow above depends on them, and the underlying Python commands they wrap are the same ones in sections 1–3 of this cheat sheet. If you're curious about a specific one, read it — they're short — but you shouldn't have to.
 
 ## 6. Adding things
 
 ### Add a new subject model
 
 1. Append a `ModelConfig(...)` entry to `src/bench/model_registry.py::MODEL_REGISTRY`.
-2. Add `HF_PATH` to `scripts/download_models.sh::MODELS`.
-3. Run `bash scripts/trillium_download_models.sh` (or its portable equivalent).
+2. Add the HF path to `scripts/download_models.sh::MODELS`.
+3. `bash scripts/download_models.sh`
 4. Accept the license on HuggingFace for that repo if gated.
 5. `python scripts/verify_gpu_fit.py --model <new-key>` to confirm it loads.
 
-That's it. Every downstream script now accepts `--model <new-key>` or `MODEL=<new-key>`.
+That's it. Every downstream script now accepts `--model <new-key>`.
 
 ### Add a new dataset
 
-1. Add a branch to `_load_text_stream()` in `temporal_crosscoders/NLP/cache_activations.py`. Set `stream=False` for small curated datasets (Trillium compute nodes are offline).
+1. Add a branch to `_load_text_stream()` in `temporal_crosscoders/NLP/cache_activations.py`. Prefer `stream=False` for small curated datasets — it makes runs robust in offline / disconnected environments.
 2. If it's a small curated dataset, pre-cache it in `scripts/download_models.sh::datasets` section.
 3. Run `cache_activations` with `--dataset <new-key>`.
 
@@ -213,7 +246,7 @@ That's it. Every downstream script now accepts `--model <new-key>` or `MODEL=<ne
     - `data_format` in `{"flat", "seq", "window"}`
     - `gen_key` matching `data_format` (e.g. `"window_5"`)
 2. Register it in `src/bench/architectures/__init__.py::get_default_models`.
-3. Run with `ARCHS="... <name>" bash scripts/trillium_sweep_nlp.sh`.
+3. Run with `--models ... <name>` (or the env var on your own runner script).
 
 ### Add a new metric
 
@@ -247,29 +280,27 @@ temporal_crosscoders/
     fast_models.py             # FastTemporalCrosscoder / FastStackedSAE (d_in-parameterized)
     autointerp.py              # TopKFinder + Claude-Haiku explainer
 scripts/
-  download_models.sh           # pull all registry models + small datasets
+  download_models.sh           # pull all registry models + small datasets (portable)
   verify_gpu_fit.py            # memory sanity check for any registry model
   cache_reasoning_traces.py    # wrapper for GSM8K/MATH500 in generate mode
   aggregate_results.py         # Pareto / MI / span plots + markdown report
-  fetch_from_trillium.sh       # (laptop) pull reports + results JSON + SLURM logs
-  trillium_*                   # Trillium-specific wrappers (SLURM, Compute Canada)
+  trillium_*                   # Aniket's cluster-specific wrappers — ignore
 data/
   cached_activations/          # .gitignored — Stage 1 outputs, ~30 GB/run
 results/nlp/                   # .gitignored — Stage 2 outputs, KB/run
 reports/                       # .gitignored — Stage 3 outputs, few MB/run
-exploration.md                 # .gitignored — live sprint planning doc (Aniket's)
 ```
 
 ## 8. Sprint reporting cadence
 
-Target: **2–3 Slack reports per week**, each one = 1 PNG + 1 paragraph + 1 open question. Generated from `bash scripts/trillium_aggregate.sh` output. Fetch locally with `bash scripts/fetch_from_trillium.sh reports` and paste.
+Target: **2–3 Slack reports per week**, each = 1 PNG + 1 paragraph + 1 open question. Generated from `python scripts/aggregate_results.py` output. Drag the report dir into Slack; PNGs render inline.
 
 The one-line north star: *does the temporal crosscoder's MI-per-lag curve sit measurably above the SAE baseline on unshuffled data, and does it collapse to the SAE baseline under shuffling?* If yes, the paper's thesis holds. If no, we need a different cut.
 
 ## 9. Known gaps / things we're waiting on
 
-- **TFA NLP port (Han)** — `src/bench/architectures/tfa.py` works on toy Markov data but hasn't been validated on real-LM activations. Don't add it to the default `ARCHS` until confirmed.
+- **TFA NLP port (Han)** — `src/bench/architectures/tfa.py` works on toy Markov data but hasn't been validated on real-LM activations. Don't add it to the default `--models` list until confirmed.
 - **Feature steering harness** — Han is owning this. Coordinate before touching `src/bench/steering.py` (doesn't exist yet).
 - **`encode()` on every ArchSpec** — some architectures may not expose an encode method, in which case temporal metrics silently return None. If you notice empty plots in the temporal MI / span / cluster sections of a report, that's why.
-- **Large-dataset login-node prefetching** — `fineweb` and `coding` are streamed from HuggingFace and Trillium compute nodes have no outbound internet. We'd need a login-node prefetcher to cache a slice before a compute job can read them. Not a blocker yet, GSM8K / MATH500 are small enough to cache fully.
-- **`src/bench/data.py` eval_hidden load** — currently `.float()` copies the entire cached tensor into RAM up front. For a 1000×1024×4096 float32 tensor that's 16 GB — fine for now, but if we scale the cache this'll need to become truly lazy (mmap tensor passed straight to model).
+- **Large-dataset streaming in offline contexts** — `fineweb` and `coding` are streamed from HuggingFace. If your compute box doesn't have outbound network, you'll need to pre-fetch a slice on a machine that does, or switch `stream=False` and take the full-download hit.
+- **`src/bench/data.py` eval_hidden load** — currently `.float()` copies the entire cached tensor into RAM up front. For a 1000×1024×4096 float32 tensor that's 16 GB — fine for now, but if the cache scales up this'll need to become truly lazy (mmap tensor passed straight to model).
