@@ -46,7 +46,26 @@ PY
 done
 
 echo ""
-echo "=== All models cached ==="
+echo "=== Caching reasoning datasets (GSM8K, MATH500) ==="
+# Small curated datasets — safe to pull fully. Required because Trillium
+# compute nodes have no network; only login can reach HF Hub.
+python - <<'PY'
+from datasets import load_dataset
+for name, args in [
+    ("openai/gsm8k", {"name": "main", "split": "train"}),
+    ("openai/gsm8k", {"name": "main", "split": "test"}),
+    ("HuggingFaceH4/MATH-500", {"split": "test"}),
+]:
+    print(f">> {name} {args}")
+    try:
+        ds = load_dataset(name, **args)
+        print(f"   {len(ds)} examples cached")
+    except Exception as e:
+        print(f"   WARN: {e}")
+PY
+
+echo ""
+echo "=== All models + datasets cached ==="
 echo "Memory check: verify DeepSeek-R1-Distill-Llama-8B fits in fp16 on target GPU."
 echo "Run inside a GPU allocation:"
 echo "  python scripts/verify_gpu_fit.py --model deepseek-r1-distill-llama-8b"

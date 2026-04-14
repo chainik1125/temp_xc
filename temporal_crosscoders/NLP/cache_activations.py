@@ -99,21 +99,28 @@ def _load_text_stream(
 ) -> list[str]:
     from datasets import load_dataset
 
+    # Small curated datasets must be fully cached (streaming requires network,
+    # Trillium compute nodes are offline). Large web-scale datasets stay
+    # streaming and require login-node pre-fetching of a slice.
+    stream = True
     if dataset == "fineweb":
         hf_path, subset, split = "HuggingFaceFW/fineweb", "sample-10BT", "train"
     elif dataset == "coding":
         hf_path, subset, split = "codeparrot/codeparrot-clean", None, "train"
     elif dataset == "gsm8k":
         hf_path, subset, split = "openai/gsm8k", "main", "train"
+        stream = False
     elif dataset == "math500":
         hf_path, subset, split = "HuggingFaceH4/MATH-500", None, "test"
+        stream = False
     elif dataset == "custom":
         assert hf_path, "--dataset_hf_path required for custom"
     else:
         raise ValueError(f"Unknown dataset '{dataset}'")
 
-    print(f"Streaming {hf_path} / {subset or '-'} / {split} ({num_samples} samples)")
-    kwargs = dict(split=split, streaming=True)
+    print(f"Loading {hf_path} / {subset or '-'} / {split} "
+          f"({num_samples} samples, streaming={stream})")
+    kwargs = dict(split=split, streaming=stream)
     if subset:
         ds = load_dataset(hf_path, subset, **kwargs)
     else:
