@@ -32,6 +32,25 @@ exploration.md
 data/cached_activations/
 reports/
 results/bench/
+results/nlp/
+
+# SLURM / run-time artifacts
+logs/
+han_plots/
+report/
+temporal_crosscoders/logs/
+temporal_crosscoders/viz_outputs*/
+temporal_crosscoders/wandb/
+temporal_crosscoders/checkpoints/
+temporal_crosscoders/NLP/cached_activations/
+temporal_crosscoders/NLP/logs/
+temporal_crosscoders/NLP/viz_outputs/
+temporal_crosscoders/NLP/checkpoints/
+wandb/
 
 # Vendored external repos (Venhoff thinking-llms-interp, etc.)
 external/
+
+# Local env / secrets
+.env
+.txc_secrets.env
