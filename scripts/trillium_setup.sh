@@ -87,16 +87,22 @@ mkdir -p "$CACHE_DIR/huggingface" "$CACHE_DIR/wandb" "$CACHE_DIR/torch"
 
 ACTIVATE_ADDON="$ENV_DIR/bin/activate.d/txc_env.sh"
 mkdir -p "$(dirname "$ACTIVATE_ADDON")"
-cat > "$ACTIVATE_ADDON" <<EOF
+cat > "$ACTIVATE_ADDON" <<'EOF'
 # Auto-sourced by trillium_activate.sh
-export HF_HOME="$CACHE_DIR/huggingface"
-export TRANSFORMERS_CACHE="$CACHE_DIR/huggingface/transformers"
-export HF_DATASETS_CACHE="$CACHE_DIR/huggingface/datasets"
-export WANDB_DIR="$CACHE_DIR/wandb"
-export WANDB_CACHE_DIR="$CACHE_DIR/wandb"
-export TORCH_HOME="$CACHE_DIR/torch"
+export HF_HOME="$SCRATCH/.cache/huggingface"
+export HF_DATASETS_CACHE="$SCRATCH/.cache/huggingface/datasets"
+export WANDB_DIR="$SCRATCH/.cache/wandb"
+export WANDB_CACHE_DIR="$SCRATCH/.cache/wandb"
+export TORCH_HOME="$SCRATCH/.cache/torch"
 export TOKENIZERS_PARALLELISM=false
 export PYTHONUNBUFFERED=1
+# Trillium compute nodes have no outbound internet — force offline mode so
+# transformers/huggingface_hub don't try to HEAD huggingface.co for every
+# from_pretrained call. Downloads still work on login nodes (no SLURM_JOB_ID).
+if [ -n "${SLURM_JOB_ID:-}" ]; then
+    export HF_HUB_OFFLINE=1
+    export TRANSFORMERS_OFFLINE=1
+fi
 EOF
 
 # ---------------------------------------------------------------- secrets --
