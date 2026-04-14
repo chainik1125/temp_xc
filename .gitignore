@@ -26,11 +26,6 @@ Thumbs.db
 !.vscode/extensions.json
 .idea/
 
-# Local guides
-.trillium-guide.md
-
-# Trillium HPC scripts (personal cluster config)
-scripts/trillium_*
 exploration.md
 
 # Real-LM cached activations and model checkpoints (too large for git)
