@@ -215,7 +215,7 @@ python scripts/aggregate_results.py --root results/nlp --out reports/day1-gsm8k
 
 ### Note on the `scripts/trillium_*` scripts
 
-Those are Aniket's cluster-specific wrappers (SLURM, Compute Canada wheel pins). **Ignore them.** Nothing in the portable workflow above depends on them, and the underlying Python commands they wrap are the same ones in sections 1–3 of this cheat sheet. If you're curious about a specific one, read it — they're short — but you shouldn't have to.
+Those are Aniket's cluster-specific wrappers. **Ignore them.** Nothing in the portable workflow above depends on them, and the underlying Python commands they wrap are the same ones in sections 1–3 of this cheat sheet. If you're curious about a specific one, read it — they're short — but you shouldn't have to.
 
 ## 6. Adding things
 
