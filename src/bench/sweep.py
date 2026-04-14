@@ -41,8 +41,9 @@ from src.bench.config import (
     TrainConfig,
     SweepConfig,
 )
-from src.bench.data import build_data_pipeline, DataPipeline
+from src.bench.data import build_data_pipeline, build_pipeline, DataPipeline
 from src.bench.eval import evaluate_model, EvalResult
+from src.bench.model_registry import get_model_config, list_models
 
 
 def _get_generator(pipeline: DataPipeline, gen_key: str):
@@ -227,6 +228,118 @@ def run_sweep(
     return all_results
 
 
+def run_cached_sweep(
+    models: list[ModelEntry],
+    data_config: DataConfig,
+    train_config: TrainConfig,
+    sweep_config: SweepConfig,
+    device: torch.device,
+    results_dir: str = "results",
+    verbose: bool = True,
+) -> list[dict]:
+    """Real-LM sweep over pre-cached activations.
+
+    No rho loop (there's no Markov temperature), no coupling, no true_features.
+    Iterates (seed, k, model_entry), trains on the cached activation pipeline,
+    evaluates on the held-out slice, writes one JSON per run.
+    """
+    os.makedirs(results_dir, exist_ok=True)
+    all_results: list[dict] = []
+
+    cfg = get_model_config(data_config.model_name)
+    d_in = cfg.d_model
+    d_sae = data_config.d_sae  # caller must have set this sensibly
+
+    window_sizes = set()
+    for entry in models:
+        if entry.gen_key.startswith("window_"):
+            window_sizes.add(int(entry.gen_key.split("_")[1]))
+
+    if verbose:
+        print(f"\n{'=' * 60}")
+        print(f"  CACHED SWEEP | {data_config.model_name}")
+        print(f"    dataset = {data_config.cached_dataset}")
+        print(f"    layer   = {data_config.cached_layer_key}")
+        print(f"    shuffle = {data_config.shuffle_within_sequence}")
+        print(f"    d_in    = {d_in}   d_sae = {d_sae}")
+        print(f"{'=' * 60}")
+
+    pipeline = build_pipeline(
+        data_config, device, window_sizes=list(window_sizes) or None,
+    )
+
+    for seed in sweep_config.seeds:
+        for k in sweep_config.k_values:
+            if verbose:
+                print(f"\n  seed={seed}  k={k}:")
+            for entry in models:
+                torch.manual_seed(seed)
+                t0 = time.time()
+
+                batch_size = entry.training_overrides.get(
+                    "batch_size", train_config.batch_size,
+                )
+                lr = entry.training_overrides.get("lr", train_config.lr)
+                total_steps = entry.training_overrides.get(
+                    "total_steps", train_config.total_steps,
+                )
+
+                model = entry.spec.create(
+                    d_in=d_in, d_sae=d_sae, k=k, device=device,
+                )
+                gen_fn = _get_generator(pipeline, entry.gen_key)
+                entry.spec.train(
+                    model, gen_fn,
+                    total_steps=total_steps, batch_size=batch_size, lr=lr,
+                    device=device, log_every=train_config.log_every,
+                    grad_clip=train_config.grad_clip,
+                )
+
+                result = evaluate_model(
+                    entry.spec, model, pipeline.eval_hidden, device,
+                    true_features=None, global_features=None,
+                    seq_len=pipeline.eval_hidden.shape[1],
+                )
+                elapsed = time.time() - t0
+
+                row = {
+                    "arch": entry.name,
+                    "subject_model": data_config.model_name,
+                    "cached_dataset": data_config.cached_dataset,
+                    "layer_key": data_config.cached_layer_key,
+                    "shuffled": bool(data_config.shuffle_within_sequence),
+                    "k": k,
+                    "seed": seed,
+                    "d_in": d_in,
+                    "d_sae": d_sae,
+                    **result.to_dict(),
+                    "elapsed_sec": round(elapsed, 1),
+                }
+                all_results.append(row)
+
+                if verbose:
+                    print(
+                        f"    {entry.name:20s} | NMSE={result.nmse:.4f} "
+                        f"| L0={result.l0:.2f} | {elapsed:.0f}s"
+                    )
+
+                del model
+                if torch.cuda.is_available():
+                    torch.cuda.empty_cache()
+
+    tag = (
+        f"{data_config.model_name}__{data_config.cached_dataset}"
+        f"__{data_config.cached_layer_key}"
+        f"{'__shuffled' if data_config.shuffle_within_sequence else ''}"
+    )
+    path = os.path.join(results_dir, f"results_{tag}.json")
+    with open(path, "w") as f:
+        json.dump(all_results, f, indent=2)
+    if verbose:
+        print(f"\n  SWEEP COMPLETE | {len(all_results)} runs | {path}")
+    return all_results
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Run architecture comparison sweep"
@@ -260,6 +373,22 @@ def main():
     parser.add_argument("--n-parents", type=int, default=2,
                         help="Parents per emission (coupled mode)")
 
+    # Real-LM cached-activation mode
+    parser.add_argument("--dataset-type", type=str, default="markov",
+                        choices=["markov", "cached_activations"],
+                        help="Switch between toy Markov and real-LM cached acts")
+    parser.add_argument("--model-name", type=str, default="deepseek-r1-distill-llama-8b",
+                        choices=list_models(),
+                        help="Subject LM key (cached_activations mode)")
+    parser.add_argument("--cached-dataset", type=str, default="gsm8k",
+                        help="Subdir under data/cached_activations/<model>/")
+    parser.add_argument("--cached-layer-key", type=str, default="resid_L12",
+                        help="Which <key>.npy to load (e.g. resid_L12)")
+    parser.add_argument("--shuffle-within-sequence", action="store_true",
+                        help="Temporal shuffled control baseline")
+    parser.add_argument("--expansion-factor", type=int, default=8,
+                        help="d_sae = d_model * expansion_factor (cached mode)")
+
     args = parser.parse_args()
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -273,6 +402,45 @@ def main():
     train_config = TrainConfig(
         total_steps=args.steps or 30_000,
     )
+
+    # Dispatch: cached activations path is a completely different code path.
+    if args.dataset_type == "cached_activations":
+        cfg = get_model_config(args.model_name)
+        d_sae = cfg.d_model * args.expansion_factor
+        data_config = DataConfig(
+            dataset_type="cached_activations",
+            model_name=args.model_name,
+            cached_dataset=args.cached_dataset,
+            cached_layer_key=args.cached_layer_key,
+            shuffle_within_sequence=args.shuffle_within_sequence,
+            d_sae=d_sae,
+        )
+        models = get_default_models(sweep_config.T_values)
+        if args.models:
+            models = [m for m in models if any(
+                f.lower() in m.name.lower() for f in args.models
+            )]
+        print(f"{'=' * 60}")
+        print(f"  REAL-LM CACHED-ACTIVATION SWEEP")
+        print(f"  Subject:  {args.model_name}  (d_model={cfg.d_model})")
+        print(f"  Dataset:  {args.cached_dataset} / {args.cached_layer_key}")
+        print(f"  Shuffle:  {args.shuffle_within_sequence}")
+        print(f"  d_sae:    {d_sae}  (×{args.expansion_factor} expansion)")
+        print(f"  Models:   {[m.name for m in models]}")
+        print(f"  K:        {sweep_config.k_values}")
+        print(f"  Steps:    {train_config.total_steps:,}")
+        print(f"{'=' * 60}")
+        if args.dry_run:
+            return
+        run_cached_sweep(
+            models=models,
+            data_config=data_config,
+            train_config=train_config,
+            sweep_config=sweep_config,
+            device=device,
+            results_dir=args.results_dir,
+        )
+        return
 
     coupling = None
     if args.coupled:
