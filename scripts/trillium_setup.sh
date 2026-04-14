@@ -73,6 +73,10 @@ pip install --upgrade "typing_extensions>=4.14"
 # pydantic for wandb; anthropic SDK extras.
 pip install "pydantic>=2.0,<3" distro docstring-parser jiter
 
+# wandb 0.24 .proto stubs were compiled against protobuf 4.x and break
+# against CC's shipped 7.34. Shadow it in the venv.
+pip install --upgrade "protobuf>=4.25,<5"
+
 # Editable install of the project itself.
 pip install --no-deps -e "$REPO_DIR"
 
