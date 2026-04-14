@@ -1,0 +1,102 @@
+_wandb:
+    value:
+        cli_version: 0.24.2
+        e:
+            wqyarx8te9jmbdbnunesg4voiyhqalxd:
+                codePath: temporal_crosscoders/sweep.py
+                codePathLocal: sweep.py
+                cpu_count: 16
+                cpu_count_logical: 16
+                cudaVersion: "12.9"
+                disk:
+                    /:
+                        total: "2106063220736"
+                        used: "2049670381568"
+                email: standartikom@gmail.com
+                executable: /home/cs29824/miniconda3/envs/dfc/bin/python
+                git:
+                    commit: 3e49ee1c3a4c91e48bcdbb5de8f70d72a7d80313
+                    remote: https://antebe:@github.com/chainik1125/temp_xc.git
+                gpu: Quadro RTX 8000
+                gpu_count: 2
+                gpu_nvidia:
+                    - architecture: Turing
+                      cudaCores: 4608
+                      memoryTotal: "48318382080"
+                      name: Quadro RTX 8000
+                      uuid: GPU-0f30e6ab-fd4f-01e6-b206-66f6e6256412
+                    - architecture: Turing
+                      cudaCores: 4608
+                      memoryTotal: "48318382080"
+                      name: Quadro RTX 8000
+                      uuid: GPU-1e33d333-a725-f74a-6c4c-368b138d1876
+                host: sting-vm-1
+                memory:
+                    total: "135079645184"
+                os: Linux-5.19.0-1010-nvidia-lowlatency-x86_64-with-glibc2.35
+                program: /home/cs29824/andre/temp_xc/temporal_crosscoders/sweep.py
+                python: CPython 3.11.14
+                root: /home/cs29824/andre/temp_xc/temporal_crosscoders
+                startedAt: "2026-03-05T01:14:54.166754Z"
+                writerId: wqyarx8te9jmbdbnunesg4voiyhqalxd
+        m: []
+        python_version: 3.11.14
+        t:
+            "1":
+                - 1
+                - 105
+            "2":
+                - 1
+                - 105
+            "3":
+                - 2
+                - 13
+                - 15
+                - 16
+                - 61
+            "4": 3.11.14
+            "5": 0.24.2
+            "10":
+                - 20
+            "12": 0.24.2
+            "13": linux-x86_64
+T:
+    value: 5
+batch_size:
+    value: 1
+d_sae:
+    value: 50
+dataset:
+    value: markov
+effective_k:
+    value: 5
+experiment_tag:
+    value: v7
+feat_mean:
+    value: 1
+feat_prob:
+    value: 0.05
+feat_std:
+    value: 0.15
+grad_clip:
+    value: 1
+hidden_dim:
+    value: 100
+k:
+    value: 5
+log_interval:
+    value: 1500
+lr:
+    value: 0.0003
+markov_alpha:
+    value: 0.95
+markov_beta:
+    value: 0.03
+model_type:
+    value: sae
+num_feats:
+    value: 50
+seed:
+    value: 42
+train_steps:
+    value: 80000

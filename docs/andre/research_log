@@ -1,0 +1,23 @@
+---
+title: "Andre About Me"
+author: Andre Shportko
+date: 2026-02-26
+type: log
+---
+
+## wk 1
+
+- replicated notebooks\sae_token_embeddings.ipynb
+- Decided to trust Anikets results and focus on adaptation of the notebook to the txcdr. Revisiting ideas in slack for toy models
+
+## wk 2
+
+First null results: current TXCDR architecture [doesn't outperform](./tx_v_sae.md) SAEs. 
+
+## wk 3-4
+
+Changed to stacked_SAEs and included loss values to my comparison. [See here](v2_tx_v_sae.md).
+
+## wk 5-7
+
+testing on natural language models. [gemma2_summary](nlp_gemma2_summary.md) and [UMAP](nlp_feature_map.md)

@@ -24,3 +24,21 @@ Thumbs.db
 .vscode/*
 !.vscode/extensions.json
 .idea/
+
+# Checkpoints and cached data (large files — push to HF separately)
+**/checkpoints/
+**/cached_activations/
+temporal_crosscoders/**/*.npy
+temporal_crosscoders/**/*.pt
+
+# Wandb local run data
+wandb/
+
+# Visualization outputs (regenerable from logs)
+temporal_crosscoders/**/viz_outputs*/
+
+# Sweep JSON logs (regenerable)
+temporal_crosscoders/**/logs/
+
+# HuggingFace cache
+.cache/

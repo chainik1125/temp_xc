@@ -1,0 +1,13 @@
+{"time":"2026-03-05T00:49:07.363518674Z","level":"INFO","msg":"stream: starting","core version":"0.24.2"}
+{"time":"2026-03-05T00:49:07.516130752Z","level":"INFO","msg":"stream: created new stream","id":"rfj14x42"}
+{"time":"2026-03-05T00:49:07.516193875Z","level":"INFO","msg":"handler: started","stream_id":"rfj14x42"}
+{"time":"2026-03-05T00:49:07.516280737Z","level":"INFO","msg":"stream: started","id":"rfj14x42"}
+{"time":"2026-03-05T00:49:07.516297449Z","level":"INFO","msg":"writer: started","stream_id":"rfj14x42"}
+{"time":"2026-03-05T00:49:07.516312983Z","level":"INFO","msg":"sender: started","stream_id":"rfj14x42"}
+{"time":"2026-03-05T00:51:53.009050918Z","level":"INFO","msg":"api: retrying HTTP error","status":502,"url":"https://api.wandb.ai/files/standartikom-northwestern-university/temporal-crosscoders-sweep-final/rfj14x42/file_stream","body":"\n<html><head>\n<meta http-equiv=\"content-type\" content=\"text/html;charset=utf-8\">\n<title>502 Server Error</title>\n</head>\n<body text=#000000 bgcolor=#ffffff>\n<h1>Error: Server Error</h1>\n<h2>The server encountered a temporary error and could not complete your request.<p>Please try again in 30 seconds.</h2>\n<h2></h2>\n</body></html>\n"}
+{"time":"2026-03-05T00:52:07.390358013Z","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2026-03-05T00:52:07.599826124Z","level":"INFO","msg":"handler: operation stats","stats":{}}
+{"time":"2026-03-05T00:52:07.603346898Z","level":"INFO","msg":"stream: closing","id":"rfj14x42"}
+{"time":"2026-03-05T00:52:07.603376628Z","level":"INFO","msg":"handler: closed","stream_id":"rfj14x42"}
+{"time":"2026-03-05T00:52:07.603442307Z","level":"INFO","msg":"sender: closed","stream_id":"rfj14x42"}
+{"time":"2026-03-05T00:52:07.603451691Z","level":"INFO","msg":"stream: closed","id":"rfj14x42"}

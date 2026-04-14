@@ -1,0 +1,1 @@
+{"mean_max_cos_sim":0.2865408957004547,"_timestamp":1.7739828156315885e+09,"step":999,"window_l0":15,"l0":15,"auc":0.2861224489795918,"_step":999,"_runtime":4.025494048,"recovery_90":0,"recovery_80":0,"_wandb":{"runtime":4},"loss":2.4099948406219482}

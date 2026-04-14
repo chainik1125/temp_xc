@@ -1,0 +1,12 @@
+{"time":"2026-03-05T01:37:41.883247905Z","level":"INFO","msg":"stream: starting","core version":"0.24.2"}
+{"time":"2026-03-05T01:37:42.042504478Z","level":"INFO","msg":"stream: created new stream","id":"vgae25va"}
+{"time":"2026-03-05T01:37:42.042598186Z","level":"INFO","msg":"handler: started","stream_id":"vgae25va"}
+{"time":"2026-03-05T01:37:42.042648377Z","level":"INFO","msg":"stream: started","id":"vgae25va"}
+{"time":"2026-03-05T01:37:42.042661444Z","level":"INFO","msg":"writer: started","stream_id":"vgae25va"}
+{"time":"2026-03-05T01:37:42.042670774Z","level":"INFO","msg":"sender: started","stream_id":"vgae25va"}
+{"time":"2026-03-05T01:40:20.185490146Z","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2026-03-05T01:40:20.420065303Z","level":"INFO","msg":"handler: operation stats","stats":{}}
+{"time":"2026-03-05T01:40:20.42289809Z","level":"INFO","msg":"stream: closing","id":"vgae25va"}
+{"time":"2026-03-05T01:40:20.42293223Z","level":"INFO","msg":"handler: closed","stream_id":"vgae25va"}
+{"time":"2026-03-05T01:40:20.423061464Z","level":"INFO","msg":"sender: closed","stream_id":"vgae25va"}
+{"time":"2026-03-05T01:40:20.423083746Z","level":"INFO","msg":"stream: closed","id":"vgae25va"}
