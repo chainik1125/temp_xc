@@ -15,7 +15,10 @@ set -euo pipefail
 echo "=== temporal-crosscoders sprint setup on Trillium ==="
 
 # ---------------------------------------------------------------- modules ---
-module load StdEnv/2023 python/3.11 cuda/12.2 scipy-stack/2024a
+# Compute Canada ships a "dummy" pyarrow wheel that intentionally errors out
+# so users load the real thing from the `arrow` module. Load it here so the
+# datasets package finds pyarrow via $PYTHONPATH during the install below.
+module load StdEnv/2023 gcc python/3.11 cuda/12.2 scipy-stack/2024a arrow
 
 # ---------------------------------------------------------------- repo -----
 cd "$SCRATCH"
@@ -50,10 +53,11 @@ pip install --no-deps -r "$REPO_DIR/scripts/trillium_sprint_requirements.txt"
 
 # Resolve any secondary deps the --no-deps pass missed. Run without --no-deps
 # but with torch already pinned; `--upgrade-strategy only-if-needed` prevents
-# surprise upgrades.
+# surprise upgrades. Do NOT list pyarrow here — on Compute Canada it's served
+# by the `arrow` module (loaded above), not pip.
 pip install --upgrade-strategy only-if-needed \
     filelock typing_extensions packaging regex requests \
-    pyarrow fsspec aiohttp multidict yarl \
+    fsspec aiohttp multidict yarl \
     jinja2 sympy networkx \
     click psutil gitpython sentry-sdk setproctitle \
     pillow kiwisolver cycler fonttools pyparsing \
@@ -103,7 +107,7 @@ python - <<'PY'
 import importlib, sys
 mods = ["torch", "numpy", "scipy", "einops", "transformers",
         "datasets", "transformer_lens", "huggingface_hub",
-        "wandb", "matplotlib", "anthropic",
+        "wandb", "matplotlib", "anthropic", "pyarrow",
         "sklearn", "umap", "hdbscan", "sentencepiece"]
 for m in mods:
     try:
