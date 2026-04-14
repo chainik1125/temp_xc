@@ -61,7 +61,10 @@ pip install --upgrade-strategy only-if-needed \
     jinja2 sympy networkx \
     click psutil gitpython sentry-sdk setproctitle \
     pillow kiwisolver cycler fonttools pyparsing \
-    pynndescent llvmlite tbb joblib threadpoolctl
+    pynndescent llvmlite tbb joblib threadpoolctl \
+    httpx httpcore h11 anyio \
+    dill "multiprocess<0.70.20" xxhash \
+    "cython<3"
 
 # Editable install of the project itself.
 pip install --no-deps -e "$REPO_DIR"
@@ -106,7 +109,7 @@ echo "=== Smoke test ==="
 python - <<'PY'
 import importlib, sys
 mods = ["torch", "numpy", "scipy", "einops", "transformers",
-        "datasets", "transformer_lens", "huggingface_hub",
+        "datasets", "huggingface_hub",
         "wandb", "matplotlib", "anthropic", "pyarrow",
         "sklearn", "umap", "hdbscan", "sentencepiece"]
 for m in mods:

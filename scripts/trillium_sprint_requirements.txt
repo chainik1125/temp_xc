@@ -11,22 +11,26 @@ pyyaml>=6.0
 safetensors>=0.4.2
 
 # --- huggingface stack (DeepSeek-R1-Distill-Llama-8B, Llama-3.1-8B, Gemma 2 2B) ---
-# transformers 4.46+ is required for DeepSeek-R1-Distill (Llama-3 arch variants)
-# and Gemma 2. Pinned below the 4.50 window where several Gemma hooks moved.
+# Version pins target Compute Canada's Trillium preinstalls
+# (transformers 4.49+computecanada, torch 2.4.1+computecanada). Do NOT let
+# pip upgrade to PyPI latest — it'll pull transformers 4.57 which breaks the
+# torch ABI.
 transformers>=4.46,<4.50
-tokenizers>=0.20
+tokenizers>=0.20,<0.22      # transformers 4.49 wants <0.22
 datasets>=2.19
-huggingface_hub>=0.24
+huggingface_hub>=0.24,<1.0  # transformers 4.49 + CC pin
 accelerate>=0.33
 sentencepiece>=0.2          # Llama + DeepSeek tokenizers
 protobuf>=4.25              # sentencepiece proto
 safetensors>=0.4.2
 
 # --- mech interp ---
-transformer-lens>=2.0
+# transformer-lens is NOT required by the new sprint pipeline — cache_activations.py
+# uses raw HF register_forward_hook. TL 2.18 pins torch>=2.6 / transformers>=4.57
+# which conflict with Compute Canada's torch 2.4.1+computecanada. Leave it out;
+# if a specific experiment needs TL later, install an older version manually.
 # sae-lens is imported in src/shared/metrics.py but not required by the bench
-# eval path. Install only if a run actually needs it (pulls pyarrow, breaks on
-# Trillium). Leave commented.
+# eval path. Install only if a run actually needs it.
 # sae-lens>=4.0
 
 # --- logging / viz ---
