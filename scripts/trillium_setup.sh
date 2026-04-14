@@ -56,15 +56,22 @@ pip install --no-deps -r "$REPO_DIR/scripts/trillium_sprint_requirements.txt"
 # surprise upgrades. Do NOT list pyarrow here — on Compute Canada it's served
 # by the `arrow` module (loaded above), not pip.
 pip install --upgrade-strategy only-if-needed \
-    filelock typing_extensions packaging regex requests \
+    filelock packaging regex requests \
     fsspec aiohttp multidict yarl \
     jinja2 sympy networkx \
     click psutil gitpython sentry-sdk setproctitle \
     pillow kiwisolver cycler fonttools pyparsing \
     pynndescent llvmlite tbb joblib threadpoolctl \
-    httpx httpcore h11 anyio \
+    httpx httpcore h11 anyio sniffio \
     dill "multiprocess<0.70.20" xxhash \
     "cython<3"
+
+# typing-extensions from CC's ipykernel module is 4.12.2 but anthropic wants
+# >=4.14. Force-install a new one into the venv so it shadows the module path.
+pip install --upgrade "typing_extensions>=4.14"
+
+# pydantic for wandb; anthropic SDK extras.
+pip install "pydantic>=2.0,<3" distro docstring-parser jiter
 
 # Editable install of the project itself.
 pip install --no-deps -e "$REPO_DIR"
