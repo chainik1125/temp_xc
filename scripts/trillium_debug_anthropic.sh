@@ -19,22 +19,33 @@ if [ ! -f "$SECRETS" ]; then
     exit 1
 fi
 
-# ─── 1. byte-level view ────────────────────────────────────────────────────
+# ─── 1. byte-level view (does NOT print the key) ──────────────────────────
 echo "=== 1. byte-level view of the key ==="
 
-# Grab the raw line, strip the "export ANTHROPIC_API_KEY=" prefix and outer quotes
-RAW=$(grep -E '^export ANTHROPIC_API_KEY=' "$SECRETS" || true)
-if [ -z "$RAW" ]; then
+# Check that the export line exists — without printing its contents.
+if ! grep -qE '^export ANTHROPIC_API_KEY=' "$SECRETS"; then
     echo "FAIL: no 'export ANTHROPIC_API_KEY=' line in $SECRETS"
     exit 2
 fi
-echo "  raw line in file:"
-echo "    $RAW" | cat -A     # cat -A shows \t as ^I, \r as ^M, trailing $
 
 # Extract the value (strips "export ANTHROPIC_API_KEY=" and surrounding quotes)
 KEY=$(sed -n 's/^export ANTHROPIC_API_KEY=["'\'']\{0,1\}\([^"'\'']*\)["'\'']\{0,1\}.*$/\1/p' "$SECRETS")
 LEN=${#KEY}
 echo "  parsed length: $LEN"
+
+# Check the raw line for trailing CR / trailing whitespace WITHOUT printing
+# the key itself. awk reads the line and only reports metadata.
+awk '/^export ANTHROPIC_API_KEY=/ {
+    line = $0
+    has_cr       = (line ~ /\r/)
+    has_trail_ws = (line ~ /[ \t]$/)
+    has_quote_o  = (line ~ /=["\x27]/)
+    has_quote_c  = (line ~ /["\x27]$/)
+    printf "  has trailing CR:        %s\n", has_cr ? "YES (Windows line ending — bad)" : "no"
+    printf "  has trailing whitespace: %s\n", has_trail_ws ? "YES (bad)" : "no"
+    printf "  has opening quote:      %s\n", has_quote_o ? "yes" : "no"
+    printf "  has closing quote:      %s\n", has_quote_c ? "yes" : "no"
+}' "$SECRETS"
 
 if [ "$LEN" -eq 0 ]; then
     echo "FAIL: parsed key is empty. Check quoting in $SECRETS."
