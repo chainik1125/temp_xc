@@ -84,6 +84,10 @@ for TAG in unshuffled shuffled; do
 
     echo ""
     echo ">> [$TAG] autointerp (explanations only, scoring off)"
+    # Force CPU for the TopKFinder scan: the login node has a shared H100
+    # that is typically saturated by other users' processes, and --scan-device
+    # auto picks cuda if *available* rather than if *free*. CPU scan over
+    # 2000 chains x 28 windows x d_sae=18432 finishes in a few minutes.
     python -m temporal_crosscoders.NLP.autointerp \
         --checkpoint "$CKPT" \
         --model crosscoder --subject-model $MODEL \
@@ -93,6 +97,7 @@ for TAG in unshuffled shuffled; do
         --output-dir "$REPORT_DIR" \
         --explain-model claude-haiku-4-5-20251001 \
         --top-features 30 \
+        --scan-device cpu --explain-device cpu \
         --no-score --no-harm
 
     echo ""

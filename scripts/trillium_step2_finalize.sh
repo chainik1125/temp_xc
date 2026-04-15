@@ -62,6 +62,8 @@ for TAG in unshuffled shuffled; do
 
     echo ""
     echo ">> [$TAG] autointerp (explanations only, scoring off)"
+    # Force CPU — login node GPU is shared and usually saturated. See
+    # trillium_step1_finalize.sh for the rationale.
     python -m temporal_crosscoders.NLP.autointerp \
         --checkpoint "$CKPT" \
         --model crosscoder --subject-model $MODEL \
@@ -71,6 +73,7 @@ for TAG in unshuffled shuffled; do
         --output-dir "$REPORT_DIR" \
         --explain-model claude-haiku-4-5-20251001 \
         --top-features 30 \
+        --scan-device cpu --explain-device cpu \
         --no-score --no-harm
 
     echo ""
