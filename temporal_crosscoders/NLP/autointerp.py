@@ -819,17 +819,26 @@ def load_model(
 
 def main():
     parser = argparse.ArgumentParser(description="AutoInterp for NLP temporal crosscoders")
-    parser.add_argument("--checkpoint", type=str, required=True,
-                        help="Path to a trained .pt checkpoint")
+    parser.add_argument("--phase", type=str, default="full",
+                        choices=["scan", "explain", "full"],
+                        help="scan = run TopKFinder + save feat_*.json with "
+                             "top_texts but no Claude calls (GPU + no network). "
+                             "explain = read existing feat_*.json, call Claude, "
+                             "update explanation field (network + ~no CPU). "
+                             "full = both (old default behavior).")
+    parser.add_argument("--checkpoint", type=str, default=None,
+                        help="Path to a trained .pt checkpoint (required for "
+                             "scan and full; unused for explain)")
     parser.add_argument("--model", type=str, default="crosscoder",
                         choices=["topk_sae", "stacked_sae", "crosscoder", "txcdr"])
-    parser.add_argument("--subject-model", type=str, required=True,
+    parser.add_argument("--subject-model", type=str, default=None,
                         choices=list_models(),
-                        help="Subject LM the checkpoint was trained on")
-    parser.add_argument("--cached-dataset", type=str, required=True,
-                        help="dataset subdir (e.g. fineweb, gsm8k)")
-    parser.add_argument("--layer-key", type=str, required=True,
-                        help="Which <key>.npy to scan (e.g. resid_L12)")
+                        help="Subject LM the checkpoint was trained on "
+                             "(required for scan and full)")
+    parser.add_argument("--cached-dataset", type=str, default=None,
+                        help="dataset subdir (required for scan and full)")
+    parser.add_argument("--layer-key", type=str, default=None,
+                        help="Which <key>.npy to scan (required for scan and full)")
     parser.add_argument("--k", type=int, default=100)
     parser.add_argument("--T", type=int, default=5)
     parser.add_argument("--expansion-factor", type=int, default=8)
@@ -860,14 +869,6 @@ def main():
     random.seed(SEED)
 
     arch = "crosscoder" if args.model == "txcdr" else args.model
-    cache_dir = cache_dir_for(args.subject_model, args.cached_dataset)
-
-    if not os.path.exists(args.checkpoint):
-        log.error(f"Checkpoint not found: {args.checkpoint}")
-        sys.exit(1)
-    if not os.path.exists(cache_dir):
-        log.error(f"Cache dir not found: {cache_dir}")
-        sys.exit(1)
 
     # Resolve devices: "auto" => cuda if available else cpu.
     def _auto(dev: str) -> str:
@@ -877,11 +878,45 @@ def main():
 
     scan_device = _auto(args.scan_device)
     explain_device = _auto(args.explain_device)
-    log.info(f"  scan_device={scan_device}  explain_device={explain_device}")
 
     output_root = args.output_dir or VIZ_DIR
     results_dir = os.path.join(output_root, "autointerp", args.label)
+    log.info(f"  phase: {args.phase}")
     log.info(f"  results -> {results_dir}")
+
+    # ── Explain phase: no checkpoint, no model, no cache. Just read existing
+    #    feat_*.json files and call Claude to fill in explanations. Safe on
+    #    login nodes since it uses ~zero CPU.
+    if args.phase == "explain":
+        run_explain_phase(
+            results_dir=results_dir,
+            explain_model=args.explain_model,
+            harm_eval=not args.no_harm,
+        )
+        return
+
+    # ── Scan or full: need checkpoint, cache_dir, and a loaded model.
+    missing = [
+        flag for flag, val in [
+            ("--checkpoint", args.checkpoint),
+            ("--subject-model", args.subject_model),
+            ("--cached-dataset", args.cached_dataset),
+            ("--layer-key", args.layer_key),
+        ] if val is None
+    ]
+    if missing:
+        log.error(f"Phase '{args.phase}' requires: {', '.join(missing)}")
+        sys.exit(1)
+
+    cache_dir = cache_dir_for(args.subject_model, args.cached_dataset)
+    if not os.path.exists(args.checkpoint):
+        log.error(f"Checkpoint not found: {args.checkpoint}")
+        sys.exit(1)
+    if not os.path.exists(cache_dir):
+        log.error(f"Cache dir not found: {cache_dir}")
+        sys.exit(1)
+
+    log.info(f"  scan_device={scan_device}  explain_device={explain_device}")
 
     model = load_model(
         ckpt_path=args.checkpoint,
@@ -891,7 +926,7 @@ def main():
         expansion_factor=args.expansion_factor,
     )
 
-    pipeline = AutoInterpPipeline(
+    run_scan_phase(
         model=model,
         model_type=arch,
         layer_key=args.layer_key,
@@ -900,84 +935,152 @@ def main():
         top_k=args.top_k,
         top_features=args.top_features,
         feature_subset=args.features,
-        explain_model=args.explain_model,
         sample_chains=args.sample_chains,
         scan_device=scan_device,
-        explain_device=explain_device,
-        score=not args.no_score,
-        harm_eval=not args.no_harm,
+        subject_model=args.subject_model,
     )
 
-    # Pass subject_model through to the pipeline's TextContext creation.
-    # The pipeline loads TextContext internally with the old MODEL_NAME
-    # constant — override by monkey-patching the kwarg via a local closure.
-    pipeline._subject_model = args.subject_model
-    # Replace the hardcoded TextContext call in pipeline.run() by monkey-patching
-    # the pipeline's _process_feature + text_ctx creation through a wrapper.
-    # Cleanest: override the run() method to build TextContext with the
-    # subject model arg.
-    orig_run = pipeline.run
-    def _run_with_subject():
-        # Copy of pipeline.run() but with subject-model-aware TextContext
-        log.info("=" * 60)
-        log.info(f"  AutoInterp: {pipeline.model_type} / {pipeline.layer_key}")
-        log.info("=" * 60)
-
-        log.info("[Stage 1] Scanning for top-K activating windows...")
-        finder = TopKFinder(
-            pipeline.model, pipeline.model_type, pipeline.layer_key,
-            pipeline.cache_dir, k=pipeline.top_k,
-            sample_chains=pipeline.sample_chains,
-            device=pipeline.scan_device,
+    if args.phase == "full":
+        run_explain_phase(
+            results_dir=results_dir,
+            explain_model=args.explain_model,
+            harm_eval=not args.no_harm,
         )
-        finder.run()
 
-        if pipeline.feature_subset is not None:
-            top_feature_ids = [
-                fi for fi in pipeline.feature_subset if fi in finder.results
-            ]
-        else:
-            feature_mass = {
-                idx: sum(e.activation for e in examples)
-                for idx, examples in finder.results.items()
-                if len(examples) >= 3
-            }
-            top_feature_ids = sorted(
-                feature_mass, key=feature_mass.get, reverse=True
-            )[: pipeline.top_features]
-        log.info(f"  Selected {len(top_feature_ids)} features for interpretation.")
-
-        log.info("[Stage 2] Loading text context...")
-        text_ctx = TextContext(pipeline.cache_dir, pipeline._subject_model)
-
-        log.info("[Stage 3] Running explanation + detection scoring...")
-        pending = [fi for fi in top_feature_ids if not pipeline.store.exists(fi)]
-        log.info(f"  {len(pending)} features to process "
-                 f"({len(top_feature_ids) - len(pending)} already done).")
-
-        async def _run():
-            for feat_idx in tqdm(pending, desc="Interpreting features"):
-                examples = finder.results[feat_idx]
-                await pipeline._process_feature(feat_idx, examples, text_ctx)
-                rec = pipeline.store.load(feat_idx)
-                if rec and rec.explanation:
-                    det = (
-                        f"det={rec.detection_score:.2f}"
-                        if rec.detection_score >= 0 else "det=N/A"
-                    )
-                    log.info(f"  f{feat_idx}: {rec.explanation} [{det}]")
-
-        asyncio.run(_run())
-
-        summary = pipeline.store.summary()
-        log.info(f"\n  Summary: {json.dumps(summary, indent=2)}")
-        summary_path = Path(pipeline.store.results_dir) / "summary.json"
-        summary_path.write_text(json.dumps(summary, indent=2))
-        log.info(f"  Saved: {summary_path}")
-        return summary
-
-    _run_with_subject()
     del model
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# PHASE RUNNERS — split so scan can run inside sbatch (GPU, no network)
+# and explain can run on the login node (network, ~zero CPU).
+# ══════════════════════════════════════════════════════════════════════════════
+
+def run_scan_phase(
+    model: torch.nn.Module,
+    model_type: str,
+    layer_key: str,
+    cache_dir: str,
+    results_dir: str,
+    top_k: int,
+    top_features: int,
+    feature_subset: list[int] | None,
+    sample_chains: int,
+    scan_device: str,
+    subject_model: str,
+) -> None:
+    """Run TopKFinder + save feat_*.json with top_texts/top_activations but
+    an empty explanation field. No Claude backend created — safe to run
+    inside an sbatch job on a compute node with no outbound network.
+    """
+    log.info("=" * 60)
+    log.info(f"  SCAN phase: {model_type} / {layer_key}")
+    log.info("=" * 60)
+
+    log.info("[Stage 1] Scanning for top-K activating windows...")
+    finder = TopKFinder(
+        model, model_type, layer_key, cache_dir,
+        k=top_k, sample_chains=sample_chains, device=scan_device,
+    )
+    finder.run()
+
+    if feature_subset is not None:
+        top_feature_ids = [fi for fi in feature_subset if fi in finder.results]
+    else:
+        feature_mass = {
+            idx: sum(e.activation for e in examples)
+            for idx, examples in finder.results.items()
+            if len(examples) >= 3
+        }
+        top_feature_ids = sorted(
+            feature_mass, key=feature_mass.get, reverse=True,
+        )[:top_features]
+    log.info(f"  Selected {len(top_feature_ids)} features for interpretation.")
+
+    log.info("[Stage 2] Loading text context...")
+    text_ctx = TextContext(cache_dir, subject_model)
+    store = ResultsStore(results_dir)
+    T = model.T
+
+    log.info(f"[Stage 3] Writing feat_*.json (no Claude calls)...")
+    for feat_idx in tqdm(top_feature_ids, desc="Scan"):
+        if store.exists(feat_idx):
+            existing = store.load(feat_idx)
+            if existing and existing.top_texts:
+                continue  # already scanned, no overwrite
+        examples = finder.results[feat_idx]
+        rec = FeatureRecord(
+            feat_idx=feat_idx,
+            model_type=model_type,
+            layer=layer_key,
+        )
+        rec.top_texts = [
+            text_ctx.get_window_text(e.chain_idx, e.window_start, T)
+            for e in examples
+        ]
+        rec.top_activations = [e.activation for e in examples]
+        # explanation stays empty — filled in by the explain phase.
+        store.save(rec)
+
+    summary = store.summary()
+    log.info(f"\n  scan summary: {json.dumps(summary, indent=2)}")
+
+
+def run_explain_phase(
+    results_dir: str,
+    explain_model: str,
+    harm_eval: bool = False,
+) -> None:
+    """Read feat_*.json files written by run_scan_phase and fill in the
+    explanation field via Claude. Network required, ~zero CPU, safe on a
+    login node inside the CPU-time cap.
+    """
+    log.info("=" * 60)
+    log.info(f"  EXPLAIN phase: {results_dir}")
+    log.info("=" * 60)
+
+    store = ResultsStore(results_dir)
+    if not store.results_dir.is_dir():
+        log.error(f"No results dir — run scan phase first: {results_dir}")
+        sys.exit(1)
+
+    pending: list[FeatureRecord] = []
+    for p in sorted(store.results_dir.glob("feat_*.json")):
+        try:
+            d = json.loads(p.read_text())
+        except Exception:
+            continue
+        rec = FeatureRecord(**{k: v for k, v in d.items() if k in FeatureRecord.__dataclass_fields__})
+        if rec.top_texts and not rec.explanation:
+            pending.append(rec)
+
+    if not pending:
+        log.info("  nothing to explain (all features already have explanations)")
+        return
+    log.info(f"  {len(pending)} features pending explanation")
+    log.info(f"  explain_model={explain_model}")
+
+    backend = make_backend(explain_model, device="cpu")
+    explainer = AsyncExplainer(backend, harm_eval=harm_eval)
+
+    async def _run():
+        for rec in tqdm(pending, desc="Explain"):
+            try:
+                result = await explainer.explain(rec.top_texts, rec.top_activations)
+                rec.explanation = result.explanation
+                rec.harmful = result.harmful
+                rec.harmful_reason = result.harmful_reason
+            except Exception as e:
+                rec.error = str(e)
+                log.error(f"  feat {rec.feat_idx}: {e}")
+            store.save(rec)
+            if rec.explanation:
+                log.info(f"  f{rec.feat_idx}: {rec.explanation}")
+
+    asyncio.run(_run())
+    summary = store.summary()
+    log.info(f"\n  explain summary: {json.dumps(summary, indent=2)}")
+    summary_path = Path(store.results_dir) / "summary.json"
+    summary_path.write_text(json.dumps(summary, indent=2))
 
 
 if __name__ == "__main__":
