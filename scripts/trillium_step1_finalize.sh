@@ -20,8 +20,15 @@
 #      made inline during the sbatch sweep.
 #
 # Cost estimate (Claude Haiku 4.5, ~$1/MTok in, $5/MTok out):
-#   per checkpoint: 50 features * (~2k in + ~1k out tokens) ≈ $0.35
-#   two checkpoints (unshuffled + shuffled) ≈ $0.70 total
+#   per checkpoint: 30 features * 1 explain call (~2k in + ~500 out) ≈ $0.14
+#   two checkpoints (unshuffled + shuffled) ≈ $0.28 total
+#
+# Detection scoring is OFF. Our current MATCH/NO_MATCH Claude scorer is
+# both expensive (second round-trip per feature) and weak. Andre saw it
+# balloon on his local-Gemma runs, and HypotheSAEs-style fidelity scoring
+# (Hewitt et al.) is the proper SOTA replacement — wiring that in is a
+# TODO before the paper version. For the exploration-sprint Slack reports
+# we only need the explanations, not the validation scores.
 #
 # Usage:
 #   bash scripts/trillium_step1_finalize.sh
@@ -57,7 +64,9 @@ echo "  subject:    $MODEL"
 echo "  dataset:    $DATASET"
 echo "  layer:      $LAYER"
 echo "  k=$K T=$T"
-echo "  cost est:   ~\$0.35 per checkpoint, ~\$0.70 total"
+echo "  top-features: 30   (autointerp will explain this many per ckpt)"
+echo "  scoring:    OFF  (HypotheSAEs fidelity scoring is the TODO)"
+echo "  cost est:   ~\$0.14 per checkpoint, ~\$0.28 total"
 echo ""
 
 for TAG in unshuffled shuffled; do
@@ -74,7 +83,7 @@ for TAG in unshuffled shuffled; do
     fi
 
     echo ""
-    echo ">> [$TAG] autointerp"
+    echo ">> [$TAG] autointerp (explanations only, scoring off)"
     python -m temporal_crosscoders.NLP.autointerp \
         --checkpoint "$CKPT" \
         --model crosscoder --subject-model $MODEL \
@@ -83,7 +92,8 @@ for TAG in unshuffled shuffled; do
         --label "$LABEL" \
         --output-dir "$REPORT_DIR" \
         --explain-model claude-haiku-4-5-20251001 \
-        --no-harm
+        --top-features 30 \
+        --no-score --no-harm
 
     echo ""
     echo ">> [$TAG] labeled feature_map"
