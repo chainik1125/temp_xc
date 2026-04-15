@@ -70,6 +70,13 @@ fi
 echo ">> streaming $HF_PATH ${SUBSET:+($SUBSET)} / $SPLIT  target=$N samples"
 echo ">> output:   $OUT"
 
+# Compute Canada's pyarrow has a known interpreter-teardown race that fires
+# AFTER all work completes and the file is fully written. It surfaces as:
+#     Fatal Python error: PyGILState_Release
+# Harmless — just Python's cleanup racing pyarrow's cleanup. We run the
+# Python block without `set -e` and judge success by whether the output
+# file ended up with the expected number of lines, ignoring the exit code.
+set +e
 python - <<PY
 import json
 from datasets import load_dataset
@@ -102,7 +109,19 @@ with open(out_path, "w") as fout:
         if kept >= n:
             break
 
-print(f"  wrote {kept} samples to {out_path}")
+print(f"  wrote {kept} samples to {out_path}", flush=True)
 PY
+set -e
 
+# Judge success by file state, not python exit code.
+if [ ! -f "$OUT" ]; then
+    echo "FAIL: $OUT was not created."
+    exit 1
+fi
+LINES=$(wc -l < "$OUT")
+echo ">> wrote $LINES lines to $OUT"
+if [ "$LINES" -lt "$N" ]; then
+    echo "FAIL: expected $N lines but got $LINES. Re-run the prefetch."
+    exit 1
+fi
 ls -lh "$OUT"
