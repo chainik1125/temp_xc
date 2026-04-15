@@ -300,9 +300,24 @@ def run_cached_sweep(
                     true_features=None, global_features=None,
                     seq_len=pipeline.eval_hidden.shape[1],
                 )
+
+                # Save checkpoint so downstream tools (feature_map.py, autointerp,
+                # steering) can reload it. Name includes the full run tag.
+                ckpt_dir = os.path.join(results_dir, "ckpts")
+                os.makedirs(ckpt_dir, exist_ok=True)
+                shuf_tag = "_shuffled" if data_config.shuffle_within_sequence else ""
+                ckpt_name = (
+                    f"{entry.name}__{data_config.model_name}"
+                    f"__{data_config.cached_dataset}__{data_config.cached_layer_key}"
+                    f"__k{k}__seed{seed}{shuf_tag}.pt"
+                )
+                ckpt_path = os.path.join(ckpt_dir, ckpt_name)
+                torch.save(model.state_dict(), ckpt_path)
+
                 elapsed = time.time() - t0
 
                 row = {
+                    "checkpoint": ckpt_path,
                     "arch": entry.name,
                     "subject_model": data_config.model_name,
                     "cached_dataset": data_config.cached_dataset,
