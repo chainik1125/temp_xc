@@ -356,11 +356,15 @@ Text samples (evaluate each in order):
 # ══════════════════════════════════════════════════════════════════════════════
 
 class LocalGemmaBackend:
-    """Run gemma-2-2b-it locally for autointerp."""
+    """Run a local HF chat model (e.g. gemma-2-2b-it) as the autointerp backend.
+
+    Not used on the current sprint path — we go through ClaudeAPIBackend for
+    explanations — but kept here so a future offline-only run can fall back.
+    """
 
     def __init__(
         self,
-        model_name: str = MODEL_NAME,
+        model_name: str = "google/gemma-2-2b-it",
         max_tokens: int = 256,
         device: str = "cuda",
     ):
