@@ -333,12 +333,17 @@ def run_cached_sweep(
                 )
 
                 # Save checkpoint so downstream tools (feature_map.py, autointerp,
-                # steering) can reload it. Name includes the full run tag.
+                # steering) can reload it. Use the registry key (topk_sae,
+                # stacked_sae, crosscoder, tfa, tfa_pos) rather than the display
+                # name — the finalize/feature_map scripts look up checkpoints by
+                # registry key, and display names contain spaces ("Stacked T=5")
+                # which are a shell-escape headache.
                 ckpt_dir = os.path.join(results_dir, "ckpts")
                 os.makedirs(ckpt_dir, exist_ok=True)
                 shuf_tag = "_shuffled" if data_config.shuffle_within_sequence else ""
+                arch_key = _arch_registry_key(entry)
                 ckpt_name = (
-                    f"{entry.name}__{data_config.model_name}"
+                    f"{arch_key}__{data_config.model_name}"
                     f"__{data_config.cached_dataset}__{data_config.cached_layer_key}"
                     f"__k{k}__seed{seed}{shuf_tag}.pt"
                 )
