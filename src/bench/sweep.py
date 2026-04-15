@@ -46,6 +46,37 @@ from src.bench.eval import evaluate_model, EvalResult
 from src.bench.model_registry import get_model_config, list_models
 
 
+def _arch_registry_key(entry: ModelEntry) -> str:
+    """Map a ModelEntry to its registry key (topk_sae, stacked_sae, crosscoder, tfa, tfa_pos).
+
+    get_default_models() labels entries with display names ("TopKSAE",
+    "Stacked T=5", "TXCDR T=5") but users pass registry keys via --models.
+    Bridge the two by matching on the ArchSpec class + pos-encoding flag.
+    """
+    from src.bench.architectures.topk_sae import TopKSAESpec
+    from src.bench.architectures.stacked_sae import StackedSAESpec
+    from src.bench.architectures.crosscoder import CrosscoderSpec
+    from src.bench.architectures.tfa import TFASpec
+
+    spec = entry.spec
+    if isinstance(spec, TopKSAESpec):
+        return "topk_sae"
+    if isinstance(spec, StackedSAESpec):
+        return "stacked_sae"
+    if isinstance(spec, CrosscoderSpec):
+        return "crosscoder"
+    if isinstance(spec, TFASpec):
+        return "tfa_pos" if getattr(spec, "use_pos_encoding", False) else "tfa"
+    return entry.name.lower()
+
+
+def _filter_by_registry_keys(
+    models: list[ModelEntry], wanted_keys: list[str],
+) -> list[ModelEntry]:
+    wanted = {k.lower() for k in wanted_keys}
+    return [m for m in models if _arch_registry_key(m) in wanted]
+
+
 def _get_generator(pipeline: DataPipeline, gen_key: str):
     """Look up the right data generator from the pipeline."""
     if gen_key == "flat":
@@ -432,9 +463,12 @@ def main():
         )
         models = get_default_models(sweep_config.T_values)
         if args.models:
-            models = [m for m in models if any(
-                f.lower() in m.name.lower() for f in args.models
-            )]
+            models = _filter_by_registry_keys(models, args.models)
+            if not models:
+                raise ValueError(
+                    f"--models {args.models} matched zero architectures. "
+                    f"Valid keys: topk_sae, stacked_sae, crosscoder, tfa, tfa_pos"
+                )
         print(f"{'=' * 60}")
         print(f"  REAL-LM CACHED-ACTIVATION SWEEP")
         print(f"  Subject:  {args.model_name}  (d_model={cfg.d_model})")
@@ -475,9 +509,12 @@ def main():
 
     # Filter models if requested
     if args.models:
-        models = [m for m in models if any(
-            f.lower() in m.name.lower() for f in args.models
-        )]
+        models = _filter_by_registry_keys(models, args.models)
+        if not models:
+            raise ValueError(
+                f"--models {args.models} matched zero architectures. "
+                f"Valid keys: topk_sae, stacked_sae, crosscoder, tfa, tfa_pos"
+            )
 
     # Build job list for display
     jobs = list(itertools.product(

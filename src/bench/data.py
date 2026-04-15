@@ -377,12 +377,22 @@ def build_cached_activations_pipeline(
     if config.shuffle_within_sequence:
         full = _shuffle_within_sequence_(full)
 
-    # Held-out eval slice — last eval_n_seq sequences.
-    n_eval = min(config.eval_n_seq, n_seq)
+    # Held-out eval slice — last eval_n_seq sequences. Clamp so we always
+    # leave at least 80% of the sequences for training, otherwise caches
+    # smaller than eval_n_seq (e.g. 1000 DeepSeek reasoning traces with a
+    # default eval_n_seq of 2000) leave an empty train_pool and crash the
+    # first gen_flat / gen_window call.
+    max_eval = max(1, n_seq // 5)  # 20% of data, at minimum 1
+    n_eval = min(config.eval_n_seq, max_eval)
     eval_hidden = full[-n_eval:].to(device)
-    train_pool = full[:-n_eval] if n_eval < n_seq else full
+    train_pool = full[:-n_eval]
     train_N = train_pool.shape[0]
     train_NT = train_N * seq_len
+    if train_N == 0:
+        raise ValueError(
+            f"train_pool empty: n_seq={n_seq} n_eval={n_eval}. "
+            f"Reduce DataConfig.eval_n_seq or cache more sequences."
+        )
 
     def gen_flat(batch_size: int) -> torch.Tensor:
         idx = torch.randint(0, train_NT, (batch_size,))
