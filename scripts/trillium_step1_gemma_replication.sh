@@ -29,7 +29,12 @@ set -euo pipefail
 
 cd "$SCRATCH/temp_xc"
 git pull origin aniket
-mkdir -p logs/slurm reports
+mkdir -p logs/slurm reports data/prefetched
+
+# ─── 0. prefetch FineWeb on the login node (compute has no network) ───────
+if [ "${SKIP_PREFETCH:-0}" != "1" ]; then
+    bash scripts/prefetch_text_dataset.sh fineweb "${NUM_SEQS:-24000}"
+fi
 
 MODEL="gemma-2-2b"
 DATASET="fineweb"

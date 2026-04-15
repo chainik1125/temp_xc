@@ -99,6 +99,31 @@ def _load_text_stream(
 ) -> list[str]:
     from datasets import load_dataset
 
+    # Large web-scale datasets (fineweb, coding) can be pre-fetched as a
+    # JSONL slice on a login node with network access. If the slice exists,
+    # prefer it — avoids the "no network on compute nodes" issue on HPC.
+    # Pre-fetch via: scripts/prefetch_text_dataset.sh
+    from temporal_crosscoders.NLP.config import DATA_ROOT
+    prefetch_dir = os.path.join(DATA_ROOT, "prefetched")
+    prefetch_candidates = [
+        os.path.join(prefetch_dir, f"{dataset}_{num_samples}.jsonl"),
+        os.path.join(prefetch_dir, f"{dataset}.jsonl"),
+    ]
+    for pp in prefetch_candidates:
+        if os.path.exists(pp):
+            print(f"Loading pre-fetched slice: {pp}")
+            out: list[str] = []
+            with open(pp) as f:
+                for line in f:
+                    rec = json.loads(line)
+                    txt = rec.get("text") or rec.get("content") or ""
+                    if txt:
+                        out.append(txt)
+                    if len(out) >= num_samples:
+                        break
+            print(f"  loaded {len(out)} texts from prefetch")
+            return out
+
     # Small curated datasets must be fully cached (streaming requires network,
     # Trillium compute nodes are offline). Large web-scale datasets stay
     # streaming and require login-node pre-fetching of a slice.
