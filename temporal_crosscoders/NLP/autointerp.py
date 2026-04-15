@@ -38,13 +38,16 @@ import numpy as np
 import torch
 from tqdm.auto import tqdm
 
-from config import (
-    D_SAE, LAYER_SPECS, SEED, MODEL_NAME,
-    CACHE_DIR, CHECKPOINT_DIR, LOG_DIR, VIZ_DIR,
-    AUTOINTERP_MODEL, AUTOINTERP_MAX_EXAMPLES, AUTOINTERP_TOP_FEATURES,
-    run_name,
+from src.bench.model_registry import get_model_config, list_models
+from temporal_crosscoders.NLP.config import (
+    SEED, VIZ_DIR,
+    AUTOINTERP_API_MODEL as AUTOINTERP_MODEL,
+    AUTOINTERP_MAX_EXAMPLES, AUTOINTERP_TOP_FEATURES,
+    cache_dir_for,
 )
-from fast_models import FastStackedSAE, FastTemporalCrosscoder
+from temporal_crosscoders.NLP.fast_models import (
+    FastStackedSAE, FastTemporalCrosscoder,
+)
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
 log = logging.getLogger("autointerp")
@@ -211,20 +214,41 @@ class TopKFinder:
 # ══════════════════════════════════════════════════════════════════════════════
 
 class TextContext:
-    """Decode token windows into readable text using the model tokenizer."""
+    """Decode token windows into readable text using the subject-model tokenizer."""
 
-    def __init__(self, cache_dir: str, model_name: str = MODEL_NAME):
+    def __init__(self, cache_dir: str, subject_model: str):
         from transformers import AutoTokenizer
 
+        # forward-mode caches have token_ids.npy per sequence.
+        # generate-mode caches have trace_tokens.jsonl (ragged).
         token_path = os.path.join(cache_dir, "token_ids.npy")
-        if not os.path.exists(token_path):
+        jsonl_path = os.path.join(cache_dir, "trace_tokens.jsonl")
+        if os.path.exists(token_path):
+            self.token_ids = np.load(token_path, mmap_mode="r")
+            self._ragged = None
+            log.info(f"  TextContext: loaded token_ids {self.token_ids.shape}")
+        elif os.path.exists(jsonl_path):
+            self._ragged = []
+            with open(jsonl_path) as f:
+                for line in f:
+                    self._ragged.append(json.loads(line))
+            max_len = max(len(t) for t in self._ragged) if self._ragged else 0
+            # Materialize a rectangular token_ids for uniform indexing.
+            self.token_ids = np.full((len(self._ragged), max_len), -1, dtype=np.int64)
+            for i, toks in enumerate(self._ragged):
+                self.token_ids[i, : len(toks)] = toks
+            log.info(
+                f"  TextContext: loaded trace_tokens {self.token_ids.shape} (ragged)"
+            )
+        else:
             raise FileNotFoundError(
-                f"Token IDs not found at {token_path}. Run cache_activations.py first."
+                f"Neither token_ids.npy nor trace_tokens.jsonl in {cache_dir}. "
+                f"Run cache_activations.py first."
             )
 
-        self.token_ids = np.load(token_path, mmap_mode="r")
-        self.tokenizer = AutoTokenizer.from_pretrained(model_name)
-        log.info(f"  TextContext: loaded token_ids {self.token_ids.shape}, tokenizer={model_name}")
+        cfg = get_model_config(subject_model)
+        self.tokenizer = AutoTokenizer.from_pretrained(cfg.tokenizer)
+        log.info(f"  TextContext: tokenizer={cfg.tokenizer}")
 
     def get_window_text(
         self, chain_idx: int, window_start: int, T: int, context: int = 10,
@@ -241,15 +265,21 @@ class TextContext:
         win_tokens = self.token_ids[chain_idx, window_start:window_start + T]
         post_tokens = self.token_ids[chain_idx, window_start + T:post_end]
 
-        pre = self.tokenizer.decode(pre_tokens, skip_special_tokens=True)
-        win = self.tokenizer.decode(win_tokens, skip_special_tokens=True)
-        post = self.tokenizer.decode(post_tokens, skip_special_tokens=True)
+        # Drop pad sentinel (-1) from ragged-generate mode
+        def _clean(a):
+            a = np.asarray(a)
+            return a[a >= 0].tolist()
+
+        pre = self.tokenizer.decode(_clean(pre_tokens), skip_special_tokens=True)
+        win = self.tokenizer.decode(_clean(win_tokens), skip_special_tokens=True)
+        post = self.tokenizer.decode(_clean(post_tokens), skip_special_tokens=True)
 
         return f"{pre}>>>{win}<<<{post}"
 
     def get_full_text(self, chain_idx: int) -> str:
         """Get the full sequence text for a chain."""
         tokens = self.token_ids[chain_idx]
+        tokens = tokens[tokens >= 0].tolist()
         return self.tokenizer.decode(tokens, skip_special_tokens=True)
 
     def get_random_texts(self, n: int, exclude_chains: set[int]) -> list[str]:
@@ -751,44 +781,27 @@ class AutoInterpPipeline:
 # CHECKPOINT UTILITIES
 # ══════════════════════════════════════════════════════════════════════════════
 
-def find_best_checkpoints(log_dir: str, checkpoint_dir: str) -> dict[str, dict]:
-    """Find best checkpoint per architecture by lowest final loss."""
-    summary_path = os.path.join(log_dir, "sweep_summary.json")
-    if not os.path.exists(summary_path):
-        raise FileNotFoundError(f"No sweep summary at {summary_path}. Run sweep.py first.")
+def load_model(
+    ckpt_path: str,
+    model_type: str,
+    subject_model: str,
+    k: int,
+    T: int,
+    expansion_factor: int = 8,
+) -> torch.nn.Module:
+    """Load a trained SAE/crosscoder checkpoint.
 
-    with open(summary_path) as f:
-        summary = json.load(f)
+    Subject model routes through the registry to resolve d_in;
+    d_sae = d_in * expansion_factor.
+    """
+    cfg = get_model_config(subject_model)
+    d_in = cfg.d_model
+    d_sae = d_in * expansion_factor
 
-    best: dict[str, dict] = {}
-    for row in summary:
-        model_type = row["model"]
-        loss = row["final_loss"]
-        ckpt_name = f"{model_type}__{row['layer']}__k{row['k']}__T{row['T']}.pt"
-        ckpt_path = os.path.join(checkpoint_dir, ckpt_name)
-
-        if not os.path.exists(ckpt_path):
-            continue
-
-        if model_type not in best or loss < best[model_type]["loss"]:
-            best[model_type] = {
-                "path": ckpt_path,
-                "model": model_type,
-                "layer": row["layer"],
-                "k": row["k"],
-                "T": row["T"],
-                "loss": loss,
-            }
-
-    return best
-
-
-def load_model(model_type: str, layer: str, k: int, T: int, ckpt_path: str) -> torch.nn.Module:
-    d_act = LAYER_SPECS[layer]["d_act"]
     if model_type == "stacked_sae":
-        model = FastStackedSAE(d_in=d_act, d_sae=D_SAE, T=T, k=k)
+        model = FastStackedSAE(d_in=d_in, d_sae=d_sae, T=T, k=k)
     else:
-        model = FastTemporalCrosscoder(d_in=d_act, d_sae=D_SAE, T=T, k=k)
+        model = FastTemporalCrosscoder(d_in=d_in, d_sae=d_sae, T=T, k=k)
 
     state = torch.load(ckpt_path, map_location="cpu", weights_only=True)
     model.load_state_dict(state)
@@ -802,12 +815,22 @@ def load_model(model_type: str, layer: str, k: int, T: int, ckpt_path: str) -> t
 
 def main():
     parser = argparse.ArgumentParser(description="AutoInterp for NLP temporal crosscoders")
-    parser.add_argument("--model", type=str, default=None,
-                        choices=["stacked_sae", "txcdr"])
-    parser.add_argument("--layer", type=str, default=None)
-    parser.add_argument("--k", type=int, default=None)
-    parser.add_argument("--T", type=int, default=None)
-    parser.add_argument("--checkpoint", type=str, default=None)
+    parser.add_argument("--checkpoint", type=str, required=True,
+                        help="Path to a trained .pt checkpoint")
+    parser.add_argument("--model", type=str, default="crosscoder",
+                        choices=["topk_sae", "stacked_sae", "crosscoder", "txcdr"])
+    parser.add_argument("--subject-model", type=str, required=True,
+                        choices=list_models(),
+                        help="Subject LM the checkpoint was trained on")
+    parser.add_argument("--cached-dataset", type=str, required=True,
+                        help="dataset subdir (e.g. fineweb, gsm8k)")
+    parser.add_argument("--layer-key", type=str, required=True,
+                        help="Which <key>.npy to scan (e.g. resid_L12)")
+    parser.add_argument("--k", type=int, default=100)
+    parser.add_argument("--T", type=int, default=5)
+    parser.add_argument("--expansion-factor", type=int, default=8)
+    parser.add_argument("--label", type=str, required=True,
+                        help="Output subdir name under <output-dir>/autointerp/")
     parser.add_argument("--top-features", type=int, default=AUTOINTERP_TOP_FEATURES)
     parser.add_argument("--features", type=int, nargs="+", default=None,
                         help="Specific feature indices to interpret (default: auto-select top-N)")
@@ -816,86 +839,141 @@ def main():
     parser.add_argument("--no-score", action="store_true",
                         help="Skip detection scoring (only generate explanations)")
     parser.add_argument("--no-harm", action="store_true",
-                        help="Skip harmful-content evaluation (saves response tokens)")
-    parser.add_argument("--explain-model", type=str, default=AUTOINTERP_MODEL)
-    parser.add_argument("--scan-device", type=str, default="cuda:1",
-                        help="Device for SAE/TXCDR forward passes (default: cuda:1)")
-    parser.add_argument("--explain-device", type=str, default="cuda:0",
-                        help="Device for the local LLM explainer (default: cuda:0)")
-    parser.add_argument("--output-dir", type=str, default=None)
+                        help="Skip harmful-content evaluation")
+    parser.add_argument("--explain-model", type=str, default=AUTOINTERP_MODEL,
+                        help="Claude model id or HF path (HF path => local)")
+    parser.add_argument("--scan-device", type=str, default="auto",
+                        help="'auto' picks cuda if available else cpu")
+    parser.add_argument("--explain-device", type=str, default="auto",
+                        help="Only used for local HF explainers")
+    parser.add_argument("--output-dir", type=str, default=None,
+                        help="Parent dir (default: <VIZ_DIR>). Results go to "
+                             "<output-dir>/autointerp/<label>/")
     args = parser.parse_args()
 
     torch.manual_seed(SEED)
     np.random.seed(SEED)
     random.seed(SEED)
 
-    # Determine which models to interpret
-    if args.checkpoint:
-        if not all([args.model, args.layer, args.k, args.T]):
-            raise ValueError(
-                "With --checkpoint, also provide --model, --layer, --k, --T"
-            )
-        models_to_interp = {
-            args.model: {
-                "path": args.checkpoint,
-                "model": args.model,
-                "layer": args.layer,
-                "k": args.k,
-                "T": args.T,
-            }
-        }
-    elif args.model and args.layer and args.k and args.T:
-        ckpt_path = os.path.join(
-            CHECKPOINT_DIR, f"{run_name(args.model, args.layer, args.k, args.T)}.pt"
-        )
-        if not os.path.exists(ckpt_path):
-            raise FileNotFoundError(f"Checkpoint not found: {ckpt_path}")
-        models_to_interp = {
-            args.model: {
-                "path": ckpt_path,
-                "model": args.model,
-                "layer": args.layer,
-                "k": args.k,
-                "T": args.T,
-            }
-        }
-    else:
-        log.info("Finding best checkpoints by lowest loss...")
-        models_to_interp = find_best_checkpoints(LOG_DIR, CHECKPOINT_DIR)
-        for key, info in models_to_interp.items():
-            log.info(f"  Best {key}: {info['layer']} k={info['k']} T={info['T']} loss={info.get('loss', '?')}")
+    arch = "crosscoder" if args.model == "txcdr" else args.model
+    cache_dir = cache_dir_for(args.subject_model, args.cached_dataset)
 
-    if not models_to_interp:
-        log.error("No checkpoints found. Run sweep.py first.")
+    if not os.path.exists(args.checkpoint):
+        log.error(f"Checkpoint not found: {args.checkpoint}")
+        sys.exit(1)
+    if not os.path.exists(cache_dir):
+        log.error(f"Cache dir not found: {cache_dir}")
         sys.exit(1)
 
-    for model_type, info in models_to_interp.items():
-        label = f"{info['model']}_{info['layer']}_k{info['k']}_T{info['T']}"
-        output_dir = args.output_dir or os.path.join(VIZ_DIR, "autointerp", label)
+    # Resolve devices: "auto" => cuda if available else cpu.
+    def _auto(dev: str) -> str:
+        if dev != "auto":
+            return dev
+        return "cuda" if torch.cuda.is_available() else "cpu"
 
-        model = load_model(
-            info["model"], info["layer"], info["k"], info["T"], info["path"],
+    scan_device = _auto(args.scan_device)
+    explain_device = _auto(args.explain_device)
+    log.info(f"  scan_device={scan_device}  explain_device={explain_device}")
+
+    output_root = args.output_dir or VIZ_DIR
+    results_dir = os.path.join(output_root, "autointerp", args.label)
+    log.info(f"  results -> {results_dir}")
+
+    model = load_model(
+        ckpt_path=args.checkpoint,
+        model_type=arch,
+        subject_model=args.subject_model,
+        k=args.k, T=args.T,
+        expansion_factor=args.expansion_factor,
+    )
+
+    pipeline = AutoInterpPipeline(
+        model=model,
+        model_type=arch,
+        layer_key=args.layer_key,
+        cache_dir=cache_dir,
+        results_dir=results_dir,
+        top_k=args.top_k,
+        top_features=args.top_features,
+        feature_subset=args.features,
+        explain_model=args.explain_model,
+        sample_chains=args.sample_chains,
+        scan_device=scan_device,
+        explain_device=explain_device,
+        score=not args.no_score,
+        harm_eval=not args.no_harm,
+    )
+
+    # Pass subject_model through to the pipeline's TextContext creation.
+    # The pipeline loads TextContext internally with the old MODEL_NAME
+    # constant — override by monkey-patching the kwarg via a local closure.
+    pipeline._subject_model = args.subject_model
+    # Replace the hardcoded TextContext call in pipeline.run() by monkey-patching
+    # the pipeline's _process_feature + text_ctx creation through a wrapper.
+    # Cleanest: override the run() method to build TextContext with the
+    # subject model arg.
+    orig_run = pipeline.run
+    def _run_with_subject():
+        # Copy of pipeline.run() but with subject-model-aware TextContext
+        log.info("=" * 60)
+        log.info(f"  AutoInterp: {pipeline.model_type} / {pipeline.layer_key}")
+        log.info("=" * 60)
+
+        log.info("[Stage 1] Scanning for top-K activating windows...")
+        finder = TopKFinder(
+            pipeline.model, pipeline.model_type, pipeline.layer_key,
+            pipeline.cache_dir, k=pipeline.top_k,
+            sample_chains=pipeline.sample_chains,
+            device=pipeline.scan_device,
         )
+        finder.run()
 
-        pipeline = AutoInterpPipeline(
-            model=model,
-            model_type=info["model"],
-            layer_key=info["layer"],
-            cache_dir=CACHE_DIR,
-            results_dir=output_dir,
-            top_k=args.top_k,
-            top_features=args.top_features,
-            feature_subset=args.features,
-            explain_model=args.explain_model,
-            sample_chains=args.sample_chains,
-            scan_device=args.scan_device,
-            explain_device=args.explain_device,
-            score=not args.no_score,
-            harm_eval=not args.no_harm,
-        )
-        pipeline.run()
+        if pipeline.feature_subset is not None:
+            top_feature_ids = [
+                fi for fi in pipeline.feature_subset if fi in finder.results
+            ]
+        else:
+            feature_mass = {
+                idx: sum(e.activation for e in examples)
+                for idx, examples in finder.results.items()
+                if len(examples) >= 3
+            }
+            top_feature_ids = sorted(
+                feature_mass, key=feature_mass.get, reverse=True
+            )[: pipeline.top_features]
+        log.info(f"  Selected {len(top_feature_ids)} features for interpretation.")
 
-        del model
+        log.info("[Stage 2] Loading text context...")
+        text_ctx = TextContext(pipeline.cache_dir, pipeline._subject_model)
+
+        log.info("[Stage 3] Running explanation + detection scoring...")
+        pending = [fi for fi in top_feature_ids if not pipeline.store.exists(fi)]
+        log.info(f"  {len(pending)} features to process "
+                 f"({len(top_feature_ids) - len(pending)} already done).")
+
+        async def _run():
+            for feat_idx in tqdm(pending, desc="Interpreting features"):
+                examples = finder.results[feat_idx]
+                await pipeline._process_feature(feat_idx, examples, text_ctx)
+                rec = pipeline.store.load(feat_idx)
+                if rec and rec.explanation:
+                    det = (
+                        f"det={rec.detection_score:.2f}"
+                        if rec.detection_score >= 0 else "det=N/A"
+                    )
+                    log.info(f"  f{feat_idx}: {rec.explanation} [{det}]")
+
+        asyncio.run(_run())
+
+        summary = pipeline.store.summary()
+        log.info(f"\n  Summary: {json.dumps(summary, indent=2)}")
+        summary_path = Path(pipeline.store.results_dir) / "summary.json"
+        summary_path.write_text(json.dumps(summary, indent=2))
+        log.info(f"  Saved: {summary_path}")
+        return summary
+
+    _run_with_subject()
+    del model
 
 
 if __name__ == "__main__":
