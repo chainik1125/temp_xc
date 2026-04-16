@@ -327,6 +327,31 @@ Guidelines:
 Your response MUST end with exactly this line:
 [EXPLANATION]: <your concise explanation>"""
 
+# Code-specific variant: activations are from Python source files, so the
+# natural feature vocabulary is syntactic/semantic code structure rather
+# than linguistic content.
+EXPLAIN_SYSTEM_CODE = """\
+You are a meticulous AI researcher analyzing patterns in neural network features.
+You will be shown Python source-code snippets that strongly activate a specific \
+feature in a language model. Your task is to identify what code pattern, \
+syntactic structure, or semantic construct the feature represents.
+
+Guidelines:
+- Focus on patterns COMMON across snippets, not one-off identifiers.
+- Consider: syntactic tokens (keywords, operators, punctuation), scope \
+structure (function bodies, class blocks, indentation), control flow \
+(if/else, loops, try/except), data-flow (variable definition-to-use, \
+argument passing), type/API patterns (imports, decorators, common library \
+calls), or longer-range code structure (function-spanning dependencies).
+- Be concise: 5-9 words maximum. Don't start with \"This feature represents...\" \
+— just the concept.
+- Prefer code-native terminology over linguistic description (\"list \
+comprehension with conditional filter\" over \"iterative expression\").
+- Do NOT mention activation strengths or technical details.
+
+Your response MUST end with exactly this line:
+[EXPLANATION]: <your concise explanation>"""
+
 EXPLAIN_USER_TEMPLATE = """\
 The following {n} text samples most strongly activate this feature \
 (activation strength in parentheses, highest first):
@@ -502,22 +527,39 @@ def _parse_explanation(raw: str) -> ExplanationResult:
 
 
 class AsyncExplainer:
-    def __init__(self, claude, max_text_chars: int = 400, harm_eval: bool = True):
+    def __init__(
+        self,
+        claude,
+        max_text_chars: int = 400,
+        harm_eval: bool = True,
+        code_prompt: bool = False,
+    ):
         self.claude = claude
         self.max_text_chars = max_text_chars
         self.harm_eval = harm_eval
+        self.code_prompt = code_prompt
 
     async def explain(
         self, texts: list[str], activations: list[float],
     ) -> ExplanationResult:
         lines = []
         for i, (txt, act) in enumerate(zip(texts, activations), 1):
-            truncated = txt[:self.max_text_chars].replace("\n", " ").strip()
+            # For code, preserving newlines helps Claude read the structure;
+            # for natural language, flattening is fine.
+            if self.code_prompt:
+                truncated = txt[:self.max_text_chars].rstrip()
+            else:
+                truncated = txt[:self.max_text_chars].replace("\n", " ").strip()
             lines.append(f"  {i}. (act={act:.3f})  {truncated}")
         example_str = "\n".join(lines)
 
         user_msg = EXPLAIN_USER_TEMPLATE.format(n=len(texts), examples=example_str)
-        system = EXPLAIN_SYSTEM if self.harm_eval else EXPLAIN_SYSTEM_NO_HARM
+        if self.code_prompt:
+            system = EXPLAIN_SYSTEM_CODE
+        elif self.harm_eval:
+            system = EXPLAIN_SYSTEM
+        else:
+            system = EXPLAIN_SYSTEM_NO_HARM
         raw = await self.claude.call(system, user_msg)
         return _parse_explanation(raw)
 
@@ -853,6 +895,11 @@ def main():
                         help="Skip detection scoring (only generate explanations)")
     parser.add_argument("--no-harm", action="store_true",
                         help="Skip harmful-content evaluation")
+    parser.add_argument("--code-prompt", action="store_true",
+                        help="Use the code-specific explanation prompt "
+                             "(syntax, scope, control flow). Recommended "
+                             "for Stack-Python / coding activation caches. "
+                             "Implies --no-harm.")
     parser.add_argument("--explain-model", type=str, default=AUTOINTERP_MODEL,
                         help="Claude model id or HF path (HF path => local)")
     parser.add_argument("--scan-device", type=str, default="auto",
@@ -887,11 +934,15 @@ def main():
     # ── Explain phase: no checkpoint, no model, no cache. Just read existing
     #    feat_*.json files and call Claude to fill in explanations. Safe on
     #    login nodes since it uses ~zero CPU.
+    #    --code-prompt implies --no-harm (syntactic patterns aren't
+    #    harm-relevant in the same sense).
+    harm_eval = not args.no_harm and not args.code_prompt
     if args.phase == "explain":
         run_explain_phase(
             results_dir=results_dir,
             explain_model=args.explain_model,
-            harm_eval=not args.no_harm,
+            harm_eval=harm_eval,
+            code_prompt=args.code_prompt,
         )
         return
 
@@ -944,7 +995,8 @@ def main():
         run_explain_phase(
             results_dir=results_dir,
             explain_model=args.explain_model,
-            harm_eval=not args.no_harm,
+            harm_eval=harm_eval,
+            code_prompt=args.code_prompt,
         )
 
     del model
@@ -1029,6 +1081,7 @@ def run_explain_phase(
     results_dir: str,
     explain_model: str,
     harm_eval: bool = False,
+    code_prompt: bool = False,
 ) -> None:
     """Read feat_*.json files written by run_scan_phase and fill in the
     explanation field via Claude. Network required, ~zero CPU, safe on a
@@ -1057,10 +1110,10 @@ def run_explain_phase(
         log.info("  nothing to explain (all features already have explanations)")
         return
     log.info(f"  {len(pending)} features pending explanation")
-    log.info(f"  explain_model={explain_model}")
+    log.info(f"  explain_model={explain_model}  code_prompt={code_prompt}")
 
     backend = make_backend(explain_model, device="cpu")
-    explainer = AsyncExplainer(backend, harm_eval=harm_eval)
+    explainer = AsyncExplainer(backend, harm_eval=harm_eval, code_prompt=code_prompt)
 
     async def _run():
         for rec in tqdm(pending, desc="Explain"):
