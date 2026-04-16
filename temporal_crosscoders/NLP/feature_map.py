@@ -87,13 +87,16 @@ def get_feature_directions(model: torch.nn.Module, model_type: str) -> np.ndarra
     return dirs.detach().cpu().numpy()
 
 
-def load_autointerp(label: str) -> dict[int, dict]:
-    """Load existing autointerp explanations from viz_outputs/autointerp/<label>/.
+def load_autointerp(label: str, output_dir: str | None = None) -> dict[int, dict]:
+    """Load existing autointerp explanations from <output_dir>/autointerp/<label>/.
 
     label is any string that uniquely identifies the run (e.g.
-    'crosscoder__deepseek-r1-distill-llama-8b__resid_L12__k100__T5').
+    'step1-unshuffled'). output_dir defaults to VIZ_DIR for backwards
+    compat but should be the same --output-dir you passed to autointerp
+    so reads and writes live under the same reports/ tree.
     """
-    interp_dir = Path(VIZ_DIR) / "autointerp" / label
+    root = output_dir or VIZ_DIR
+    interp_dir = Path(root) / "autointerp" / label
     if not interp_dir.is_dir():
         return {}
 
@@ -445,9 +448,9 @@ def main():
     print(f"  directions: {directions.shape}")
     del model
 
-    # Load existing autointerp
+    # Load existing autointerp (from the same parent dir we write outputs to)
     print("Loading autointerp explanations...")
-    interps = load_autointerp(label)
+    interps = load_autointerp(label, output_dir=args.output_dir)
     print(f"  {len(interps)} / {d_sae} features have explanations")
 
     # Filter features
