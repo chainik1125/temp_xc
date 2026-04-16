@@ -210,6 +210,13 @@ same island, the structure is data-driven, not architecture-driven.
    boundaries align with those categories? Requires integrating their
    annotation pipeline.
 
+7. **2×3 extension — Gemma+Stack as the H3 rule-out cell.** The current
+   2-cell comparison varies model, data, and inference mode
+   simultaneously. Adding Gemma+Stack (forward mode) isolates the
+   data-modality axis within a single model. Pre-registration with
+   hypotheses, metrics, and predicted orderings in
+   [[sprint_coding_dataset_plan]].
+
 ### Files
 
 **Feature maps (step 1 — Gemma + FineWeb):**

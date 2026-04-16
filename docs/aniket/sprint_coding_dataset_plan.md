@@ -47,14 +47,25 @@ DeepSeek+FineWeb to disentangle.
 
 ## Metric definitions
 
-Computed on TXCDR decoder directions (T-averaged, L2-normalized,
-projected via the existing PCA → UMAP pipeline). All three metrics are
-backfilled on the four existing step 1 / step 2 checkpoints before any
-new cell is launched, so the table is apples-to-apples from day one.
+Two of the three metrics are geometric over decoder directions; the
+third requires forward-passing cached activations through the
+architecture's `encode()`. Different pipeline inputs, different cost
+profiles — splitting them matters for "what do I actually need to run
+to get the number." All three are backfilled on the four existing
+step 1 / step 2 checkpoints before any new cell is launched, so the
+table is apples-to-apples from day one.
+
+**From decoder geometry** (TXCDR decoder directions, T-averaged,
+L2-normalized, projected via the existing PCA → UMAP pipeline):
 
 - **Silhouette score** over KMeans cluster labels (k=20, matching the existing pipeline), using cosine distance in the pre-UMAP PCA-50 space. **Δsilhouette = silhouette(unshuffled) − silhouette(shuffled)**. Positive = shuffling degraded cluster separation.
 - **Cluster size entropy** H = −Σ pᵢ log pᵢ where pᵢ is the fraction of features in cluster i. Larger entropy = more uniform cluster sizes = less dominant islands. **Δentropy = entropy(shuffled) − entropy(unshuffled)**. Positive = shuffling smeared out dominant clusters (predicted direction).
-- **Mean auto-MI across lags.** For each feature, compute MI between its binarized activation at position `t` and at position `t+k` for `k ∈ {1, 2, 4, 8}` using `src/shared/temporal_metrics.py::temporal_mi`. Report `mean_mi_per_lag` (length-4 vector) and `frac_features_above_threshold` in the output JSON for transparency, but the **pre-registered headline scalar is `mean(mean_mi_per_lag)` — one number per checkpoint, averaged across lags {1,2,4,8} and features, unambiguous.** **ΔTemporalMI = TemporalMI(unshuffled) − TemporalMI(shuffled)**. Positive = shuffling destroyed temporal coherence in feature firing patterns (predicted). TopKSAE is included in the metric: its auto-MI is just token-level feature auto-correlation with no architectural mechanism for temporal binding, which is exactly the right null baseline.
+
+**From encoded activations** (forward-pass the cached activation tensor
+through `encode()` on a held-out sample; produces per-feature firing
+patterns of shape `(B, T, d_sae)`):
+
+- **Mean auto-MI across lags.** For each feature, compute MI between its binarized activation at position `t` and at position `t+k` for `k ∈ {1, 2, 4, 8}` using `src/shared/temporal_metrics.py::temporal_mi`. Report `mean_mi_per_lag` (length-4 vector) and `frac_features_above_threshold` in the output JSON for transparency, but the **pre-registered headline scalar is `mean(mean_mi_per_lag)` — one number per checkpoint, averaged across lags {1,2,4,8} and features, unambiguous.** **ΔTemporalMI = TemporalMI(unshuffled) − TemporalMI(shuffled)**. Positive = shuffling destroyed temporal coherence in feature firing patterns (predicted). TopKSAE is included in the metric as a secondary sanity check — see caveat below.
 
 ## Encode contract
 
@@ -62,8 +73,18 @@ new cell is launched, so the table is apples-to-apples from day one.
 TopKSAE applies its encoder token-by-token, Stacked SAE T=5 uses its
 per-position encoder, TXCDRv2 its native shared-z encoder. The uniform
 shape is load-bearing because `src/shared/temporal_metrics.py` asserts
-`ndim == 3` on input. TopKSAE's token-independent encode is not a hack
-— it's exactly the null baseline described above.
+`ndim == 3` on input. Defined in `src/bench/architectures/base.py` as a
+method on `ArchSpec`; implemented by the architectures in `topk_sae.py`,
+`stacked_sae.py`, and `crosscoder.py`.
+
+Note on the TopKSAE-as-null-baseline framing: TopKSAE's auto-MI
+represents token-level feature auto-correlation with no architectural
+mechanism for temporal binding. But TopKSAE and TXCDR also learn
+different feature *populations*, so their auto-MI baselines could
+diverge for reasons unrelated to temporal binding. The primary
+pre-registered comparison is within-architecture (TXCDR unshuffled vs
+shuffled); TopKSAE is a secondary sanity check, not the headline
+baseline. See the matching ugly case below.
 
 ## Pre-registered predictions
 
@@ -98,6 +119,7 @@ no function-spanning emergence.
 - **Stack > GSM8K on shuffle sensitivity.** Possible: Python's positional semantics are brutal (bracket matching, scope via indentation, variable binding). Story shifts from "reasoning is specially temporal" to "structured modalities generally produce temporal features" — arguably a stronger claim for NeurIPS, but the ICML workshop framing (reasoning-focused) would need to adjust.
 - **Stack ≈ FineWeb despite code's obvious structure.** Likely means T=5 is too short to capture code's structural patterns (function bodies span 20–100 tokens, not 5). Before concluding anything, run a T-sweep on Stack. Han's T-sweep experiments become critical-path rather than nice-to-have.
 - **Stack between FineWeb and GSM8K, but FineWeb-to-Stack gap tiny and Stack-to-GSM8K huge.** Weak H1 support; H3 partially alive. Would need autointerp character evidence (function-spanning features appearing in Stack but not FineWeb) to shore up the claim. Another reason to scale autointerp on all six cells, not just DeepSeek.
+- **TopKSAE auto-MI substantially different from TXCDR auto-MI across all three datasets.** Means the null baseline is contaminated by feature-population differences between architectures rather than reflecting a clean "no temporal binding" floor. Fallback: treat the within-architecture ΔTemporalMI (TXCDR shuf vs unshuf) as the primary signal and demote TopKSAE to a sanity check. The pre-registered headline already uses within-TXCDR, so this is a framing risk — don't over-claim TopKSAE as "the null" in the paper draft.
 
 ## Related
 
