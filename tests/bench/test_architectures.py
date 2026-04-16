@@ -117,3 +117,72 @@ class TestRegistry:
         assert "TFA-pos" in names
         assert "Stacked T=2" in names
         assert "TXCDR T=2" in names
+
+
+class TestEncodeContract:
+    """ArchSpec.encode((B, T, d_in)) → (B, T, d_sae) for every arch."""
+
+    def test_topksae_encode_shape(self):
+        spec = TopKSAESpec()
+        model = spec.create(D_IN, D_SAE, K, DEVICE)
+        x = torch.randn(4, T, D_IN)
+        z = spec.encode(model, x)
+        assert z.shape == (4, T, D_SAE)
+        # TopKSAE applies per-token, so each position has exactly K actives
+        per_pos_l0 = (z > 0).float().sum(dim=-1)
+        assert per_pos_l0.mean().item() == pytest.approx(K, abs=0.5)
+
+    def test_stacked_sae_encode_shape(self):
+        spec = StackedSAESpec(T=T)
+        model = spec.create(D_IN, D_SAE, K, DEVICE)
+        x = torch.randn(4, T, D_IN)
+        z = spec.encode(model, x)
+        assert z.shape == (4, T, D_SAE)
+
+    def test_crosscoder_encode_shape(self):
+        spec = CrosscoderSpec(T=T)
+        model = spec.create(D_IN, D_SAE, K, DEVICE)
+        x = torch.randn(4, T, D_IN)
+        z = spec.encode(model, x)
+        assert z.shape == (4, T, D_SAE)
+
+    def test_crosscoder_encode_mask_exact_zero(self):
+        """Option B contract: features not selected by shared-z TopK must
+        be *exactly* zero across all positions, not float epsilon — auto-MI
+        downstream will pick up any nonzero noise as spurious signal."""
+        spec = CrosscoderSpec(T=T)
+        model = spec.create(D_IN, D_SAE, K, DEVICE)
+        x = torch.randn(4, T, D_IN)
+        z = spec.encode(model, x)
+
+        # Replicate the native shared-z TopK support
+        with torch.no_grad():
+            pre = torch.einsum("btd,tds->bs", x, model.W_enc) + model.b_enc
+            _, topk_idx = pre.topk(model.k, dim=-1)
+            alive = torch.zeros_like(pre, dtype=torch.bool)
+            alive.scatter_(1, topk_idx, True)  # (B, d_sae)
+
+        # For every (b, f) not in TopK, z[b, :, f] must be exactly 0.0
+        masked = z[~alive.unsqueeze(1).expand_as(z)]
+        assert masked.abs().max().item() == 0.0
+
+    def test_crosscoder_encode_shuffle_sensitive(self):
+        """The whole point of Option B: per-position output must differ
+        under within-window shuffling. Native shared-z output would be
+        permutation-invariant; per-position output must not be."""
+        spec = CrosscoderSpec(T=T)
+        model = spec.create(D_IN, D_SAE, K, DEVICE)
+        x = torch.randn(4, T, D_IN)
+        z = spec.encode(model, x)
+
+        # Shuffle positions within each batch element
+        perm = torch.randperm(T)
+        x_shuf = x[:, perm, :]
+        z_shuf = spec.encode(model, x_shuf)
+
+        # Alive-feature set may be identical (sum is permutation-invariant),
+        # but the per-position values on alive features must differ.
+        assert not torch.allclose(z, z_shuf), (
+            "crosscoder per-position encode is permutation-invariant — "
+            "Option B failed, fell back to shared-z native output"
+        )

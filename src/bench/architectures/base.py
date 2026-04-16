@@ -131,6 +131,31 @@ class ArchSpec(ABC):
         """
         ...
 
+    def encode(self, model: nn.Module, x: torch.Tensor) -> torch.Tensor:
+        """Return per-position feature activations of shape (B, T, d_sae).
+
+        Uniform contract across architectures so `src.shared.temporal_metrics`
+        can consume the output without special-casing. The concrete shape
+        comes from architecture-specific semantics:
+
+        - Token-independent SAEs (TopKSAE) apply their encoder to each
+          position in turn and stack.
+        - Per-position SAEs (StackedSAE) call each position-specific
+          encoder directly.
+        - Shared-latent crosscoder (TXCDRv2) returns per-position
+          pre-activation contributions masked by the shared-z TopK support
+          — *not* the native `(B, h)` output, which is permutation-invariant
+          under within-window shuffling and therefore mathematically
+          non-functional as a shuffle-sensitivity metric. See
+          `docs/aniket/sprint_coding_dataset_plan.md` § Encode contract.
+
+        Subclasses should override. Default raises so callers fail loudly
+        rather than silently returning None.
+        """
+        raise NotImplementedError(
+            f"{type(self).__name__} does not implement encode()"
+        )
+
     @property
     def n_decoder_positions(self) -> int | None:
         """Number of per-position decoders, or None for single-decoder models."""

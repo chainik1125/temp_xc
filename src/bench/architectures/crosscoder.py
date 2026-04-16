@@ -134,3 +134,37 @@ class CrosscoderSpec(ArchSpec):
         if pos is None:
             return model.decoder_dirs_averaged
         return model.decoder_directions_at(pos)
+
+    def encode(self, model, x):
+        """(B, T, d_in) → (B, T, d_sae): per-position contributions with
+        shared-z TopK mask applied.
+
+        *Not* the native shared-z `(B, h)` output — that output is a
+        sum-over-T before TopK, so it is permutation-invariant under
+        within-window shuffling and therefore mathematically
+        non-functional as a shuffle-sensitivity signal. The per-position
+        formulation preserves the shared-z feature selection (TopK on
+        the summed pre-activation, same as the native forward) but
+        exposes how much each position contributed to each active
+        feature. See `docs/aniket/sprint_coding_dataset_plan.md`
+        § Encode contract.
+        """
+        B, T, d = x.shape
+        pre_per_pos = torch.einsum("btd,tds->bts", x, model.W_enc)  # (B, T, d_sae)
+        if model.k is None:
+            return F.relu(pre_per_pos)
+
+        pre_sum = pre_per_pos.sum(dim=1) + model.b_enc  # (B, d_sae) — native shared-z pre
+        _, topk_idx = pre_sum.topk(model.k, dim=-1)
+        mask = torch.zeros_like(pre_sum)
+        mask.scatter_(1, topk_idx, 1.0)  # (B, d_sae), 1.0 where feature is in TopK
+
+        z_per_pos = F.relu(pre_per_pos) * mask.unsqueeze(1)  # (B, T, d_sae)
+
+        # Zero-check: IEEE 754 guarantees 0.0 * x == 0.0 for finite x,
+        # so masked-out features are exactly zero (not float noise).
+        # Cheap assertion that fires if some future refactor breaks this.
+        assert z_per_pos[mask.unsqueeze(1).expand_as(z_per_pos) == 0].abs().max() == 0.0, \
+            "crosscoder encode: masked features not exactly zero"
+
+        return z_per_pos

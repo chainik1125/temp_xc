@@ -115,3 +115,8 @@ class StackedSAESpec(ArchSpec):
         if pos is None:
             return model.decoder_directions
         return model.decoder_directions_at(pos)
+
+    def encode(self, model, x):
+        """(B, T, d_in) → (B, T, d_sae) via per-position encoders."""
+        zs = [model.saes[t].encode(x[:, t, :]) for t in range(self.T)]
+        return torch.stack(zs, dim=1)

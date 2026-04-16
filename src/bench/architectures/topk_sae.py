@@ -110,3 +110,17 @@ class TopKSAESpec(ArchSpec):
 
     def decoder_directions(self, model, pos=None):
         return model.W_dec.data  # (d_in, d_sae)
+
+    def encode(self, model, x):
+        """(B, T, d_in) → (B, T, d_sae) via per-token application.
+
+        TopKSAE's native encode takes (B, d_in); we flatten positions,
+        run encode, then reshape back. This is the intentional null
+        baseline for the auto-MI metric — TopKSAE has no architectural
+        mechanism for temporal binding, so any auto-MI it shows is
+        just token-level feature auto-correlation.
+        """
+        B, T, d = x.shape
+        flat = x.reshape(B * T, d)
+        z = model.encode(flat)  # (B*T, d_sae)
+        return z.reshape(B, T, -1)

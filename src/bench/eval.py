@@ -198,35 +198,24 @@ def _encode_for_metrics(
     seq_len: int,
     max_seqs: int = 512,
 ) -> torch.Tensor | None:
-    """Best-effort feature extraction for temporal metrics.
+    """Feature extraction for temporal metrics.
 
-    Runs the model on a slice of eval_data and tries to return activations of
-    shape (B, T, F). Falls back to None if the architecture doesn't expose a
-    hookable encode path.
+    Runs `spec.encode(model, x)` on a slice of eval_data and returns
+    (B, T, d_sae). Every architecture returns this shape by contract
+    (see ArchSpec.encode docstring). Returns None only if the architecture
+    hasn't overridden encode() yet (NotImplementedError).
     """
     n = min(eval_data.shape[0], max_seqs)
     x = eval_data[:n].to(device)
-    encode = getattr(spec, "encode", None) or getattr(model, "encode", None)
-    if encode is None:
-        return None
     try:
         with torch.no_grad():
-            feats = encode(x) if callable(encode) else None
-    except TypeError:
-        try:
-            with torch.no_grad():
-                feats = encode(model, x)
-        except Exception:
-            return None
-    except Exception:
+            feats = spec.encode(model, x)
+    except NotImplementedError:
         return None
-    if feats is None:
-        return None
-    if feats.dim() == 2:
-        # flat path — reshape to (B, T, F)
-        feats = feats.reshape(n, -1, feats.shape[-1])
-    if feats.dim() != 3:
-        return None
+    assert feats.dim() == 3, (
+        f"{type(spec).__name__}.encode returned shape {tuple(feats.shape)}, "
+        f"expected (B, T, d_sae)"
+    )
     return feats.detach().float().cpu()
 
 
