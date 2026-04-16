@@ -79,11 +79,14 @@ fidelity scoring is the paper-version TODO).
 - No dramatic geometric change from unshuffled.
 - PCA explained variance: 6.8%.
 
-**Interpretation:** shuffling had minimal effect on Gemma+FineWeb
-geometry. The TXCDR feature structure on web text at seq_len=32 is
-primarily *architectural* (shared-z bias), not driven by temporal content
-in the data. FineWeb at 32-token windows has weak temporal regularities —
-the window captures noisy web tokens, not coherent multi-token constructs.
+**Interpretation:** shuffling had a *smaller* effect on Gemma+FineWeb
+than on DeepSeek, but it's not zero. The unshuffled megacluster 10
+(n=3,232) has no shuffled analogue of that size, and the overall cluster
+concentration drops. FineWeb at 32-token windows has *some* local
+temporal structure (it's still natural language), just much less than
+multi-step reasoning traces. This is not a null result — it's a weaker
+temporal signal, consistent with **temporal sensitivity scaling with the
+temporal richness of the data.**
 
 #### Step 2: DeepSeek-R1-Distill + GSM8K reasoning traces
 
@@ -91,7 +94,7 @@ the window captures noisy web tokens, not coherent multi-token constructs.
 ![Step 2 unshuffled — DeepSeek-R1-Distill + GSM8K](sprint_feature_geometry/feature_map_step2-unshuffled.png)
 [Interactive HTML (hover for feature labels)](../../reports/step2-deepseek-reasoning/feature_map_step2-unshuffled.html)
 
-- **Strikingly different** from Step 1. Clear separated sub-structures.
+- **Visibly more structured** than Step 1. Clear separated sub-structures.
 - Large dense island on the right (cluster 6, n=4,208) well-separated
   from the main mass. Another dense region (clusters 9, 14) overlaps it.
 - Left side has fragmented, elongated arms with visible gaps between
@@ -111,11 +114,19 @@ the window captures noisy web tokens, not coherent multi-token constructs.
   islands.
 - PCA explained variance: 8.9%.
 
-**Interpretation:** there IS a visible difference. The unshuffled
-condition has clearer cluster separation that *partially dissolves* under
-shuffling. This is the direction the temporal-structure hypothesis
-predicts: TXCDR finds temporally coherent feature groups on reasoning
-traces, and destroying the temporal order degrades that coherence.
+**Interpretation:** the unshuffled condition has clearer cluster
+separation that *partially dissolves* under shuffling — the direction the
+temporal-structure hypothesis predicts. But the contrast is not as
+dramatic as a full "structure → uniform cloud" collapse, and UMAP
+embeddings are seed-dependent. **Quantitative metrics (silhouette score,
+cluster entropy) are needed before calling this effect robust.** The
+visual evidence is suggestive, not conclusive.
+
+**Critical control needed:** if a TopKSAE baseline trained on the same
+DeepSeek data also shows the isolated right-side island, the structure
+is a property of the data/layer, not TXCDR's temporal inductive bias.
+TopKSAE checkpoints exist from the same sweep — running feature_map on
+them is the gate before scaling autointerp.
 
 ### NMSE results (from the sweep)
 
@@ -137,24 +148,30 @@ NMSE is secondary to the feature geometry result for the sprint thesis
 ("qualitatively different features" rather than "lower reconstruction
 loss").
 
-### Headline finding
+### Headline finding (provisional — pending quantitative validation)
 
 The cross-model contrast is the main result:
 
-1. **On web text (Gemma+FineWeb):** TXCDR feature geometry is structured
-   but **temporally insensitive** — shuffling doesn't break it. The
-   structure is architectural.
+1. **Temporal sensitivity scales with temporal richness of the data.**
+   FineWeb (web text, 32-token windows) shows a weak shuffle effect.
+   GSM8K reasoning traces (1024-token `<think>` blocks) show a stronger
+   one. This is not a binary "architectural vs temporal" — it's a
+   gradient, with more temporally structured data producing more
+   temporally sensitive features.
 
-2. **On reasoning traces (DeepSeek+GSM8K):** TXCDR feature geometry is
-   **more structured AND temporally sensitive** — shuffling partially
-   degrades the cluster separation. The large island in the unshuffled
-   plot represents features that depend on sequential reasoning structure.
+2. **On reasoning traces (DeepSeek+GSM8K):** TXCDR feature geometry has
+   visibly clearer cluster separation unshuffled than shuffled. The large
+   island in the unshuffled plot partially dissolves under shuffling.
 
 3. **The temporal crosscoder's value proposition is data-dependent.** It
    discovers richer, more organized features when the data contains
-   genuine multi-token temporal patterns (reasoning traces), and the
-   temporal structure of those features is verifiable via the shuffle
-   control.
+   genuine multi-token temporal patterns, and the temporal nature of
+   those features is verifiable via the shuffle control.
+
+**Caveats:** (a) visual UMAP differences are seed-dependent — need
+silhouette scores / cluster entropy to make this robust; (b) the
+TopKSAE control on DeepSeek hasn't been run yet — if SAE shows the
+same island, the structure is data-driven, not architecture-driven.
 
 ### Open questions
 
