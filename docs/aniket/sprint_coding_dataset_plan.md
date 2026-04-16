@@ -70,21 +70,43 @@ patterns of shape `(B, T, d_sae)`):
 ## Encode contract
 
 `encode(x: (B, T, d_in)) → (B, T, d_sae)` is uniform across architectures:
-TopKSAE applies its encoder token-by-token, Stacked SAE T=5 uses its
-per-position encoder, TXCDRv2 its native shared-z encoder. The uniform
-shape is load-bearing because `src/shared/temporal_metrics.py` asserts
-`ndim == 3` on input. Defined in `src/bench/architectures/base.py` as a
-method on `ArchSpec`; implemented by the architectures in `topk_sae.py`,
-`stacked_sae.py`, and `crosscoder.py`.
 
-Note on the TopKSAE-as-null-baseline framing: TopKSAE's auto-MI
-represents token-level feature auto-correlation with no architectural
-mechanism for temporal binding. But TopKSAE and TXCDR also learn
-different feature *populations*, so their auto-MI baselines could
-diverge for reasons unrelated to temporal binding. The primary
-pre-registered comparison is within-architecture (TXCDR unshuffled vs
-shuffled); TopKSAE is a secondary sanity check, not the headline
-baseline. See the matching ugly case below.
+- **TopKSAE** applies its per-token encoder independently at each position.
+- **Stacked SAE T=5** uses its per-position encoders directly.
+- **TXCDRv2** returns per-position feature contributions with the shared-z TopK mask applied: for each active feature in the window, its activation at position `t` is the position-`t` pre-activation contribution to that feature (zero elsewhere).
+
+Defined in `src/bench/architectures/base.py` as a method on `ArchSpec`;
+implemented in `topk_sae.py`, `stacked_sae.py`, and `crosscoder.py`. The
+uniform shape is load-bearing because `src/shared/temporal_metrics.py`
+asserts `ndim == 3` on input.
+
+We deliberately do *not* use TXCDRv2's native `(B, h)` shared-z output.
+The native encode sums pre-activations across `T` before TopK
+(`einsum("btd,tds->bs", ...)` + TopK), so the output is
+permutation-invariant under within-window shuffling: `z_unshuf ==
+z_shuf` bitwise, and auto-MI is constant under the treatment variable.
+That makes the native output mathematically non-functional as a
+shuffle-sensitivity metric — not merely "insensitive," literally
+invariant. The per-position contribution formulation preserves
+position-dependent signal while respecting the shared-z TopK feature
+selection. Implementation note: after masking by the shared-z TopK
+support, verify that masked-out features are *exactly* zero — einsum
+floating-point noise can show up as spurious auto-MI otherwise.
+
+Cross-architecture comparability caveat: for TopKSAE and StackedSAE,
+`encode(x)[b, t, f]` is "feature f's activation magnitude at position
+t." For TXCDRv2 under the per-position formulation, it's "position t's
+contribution to shared feature f." These are related but not identical
+quantities — a TXCDRv2 feature that fires because position 3 did all
+the work has large `f[3]` and small `f[0..4]`, while a TopKSAE feature
+firing at every position has large `f[t]` everywhere. Consequence:
+**absolute auto-MI magnitudes across architectures are only
+approximately comparable**. The pre-registered clean signal is the
+within-architecture Δ (unshuf − shuf); cross-architecture absolute
+comparisons are qualitative tie-breakers, not the headline. The same
+caveat tightens the "TopKSAE as null baseline" framing — it's a
+secondary sanity check, not the rigorous zero-point. See the matching
+ugly case below.
 
 ## Pre-registered predictions
 
