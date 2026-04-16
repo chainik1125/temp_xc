@@ -41,6 +41,7 @@ from temporal_crosscoders.NLP.config import (
 from temporal_crosscoders.NLP.fast_models import (
     FastStackedSAE, FastTemporalCrosscoder,
 )
+from src.bench.architectures.topk_sae import TopKSAE
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -64,7 +65,11 @@ def load_model(
     if not os.path.exists(checkpoint):
         raise FileNotFoundError(f"Checkpoint not found: {checkpoint}")
 
-    if model_type == "stacked_sae":
+    if model_type == "topk_sae":
+        # Single-token SAE — no T dimension. Uses the spec-based TopKSAE
+        # class directly (same one that src.bench.sweep saves from).
+        model = TopKSAE(d_in=d_in, d_sae=d_sae, k=k)
+    elif model_type == "stacked_sae":
         model = FastStackedSAE(d_in=d_in, d_sae=d_sae, T=T, k=k)
     else:
         model = FastTemporalCrosscoder(d_in=d_in, d_sae=d_sae, T=T, k=k)
@@ -78,7 +83,10 @@ def load_model(
 def get_feature_directions(model: torch.nn.Module, model_type: str) -> np.ndarray:
     """Return (d_sae, d_in) — each row is one feature's decoder direction."""
     with torch.no_grad():
-        if model_type == "stacked_sae":
+        if model_type == "topk_sae":
+            # W_dec: (d_in, d_sae) — no T dimension, just transpose
+            dirs = model.W_dec.T  # (d_sae, d_in)
+        elif model_type == "stacked_sae":
             # W_dec: (T, d_in, d_sae) -> mean over T -> (d_in, d_sae) -> transpose
             dirs = model.W_dec.mean(dim=0).T  # (d_sae, d_in)
         else:
