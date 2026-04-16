@@ -22,7 +22,11 @@ REGISTRY: dict[str, type[ArchSpec]] = {
 }
 
 
-def get_default_models(T_values: list[int]) -> list[ModelEntry]:
+def get_default_models(
+    T_values: list[int],
+    tfa_bottleneck_factor: int = 1,
+    tfa_batch_size: int = 64,
+) -> list[ModelEntry]:
     """Build the standard set of models for a sweep.
 
     Creates one entry per architecture per T value (where applicable).
@@ -30,6 +34,13 @@ def get_default_models(T_values: list[int]) -> list[ModelEntry]:
 
     Args:
         T_values: Window sizes to sweep over.
+        tfa_bottleneck_factor: Bottleneck factor for TFA attention.
+            At NLP scale (d_sae > 10K), TFA's attention params scale
+            with d_sae^2 / bottleneck_factor. Use 1 for toy scale,
+            4+ for NLP scale to keep TFA feasible on a single GPU.
+        tfa_batch_size: Batch size for TFA (number of sequences).
+            TFA processes full sequences so needs smaller batches
+            than window-based models.
 
     Returns:
         List of ModelEntry for all registered architectures.
@@ -46,15 +57,15 @@ def get_default_models(T_values: list[int]) -> list[ModelEntry]:
     # TFA: full-sequence models
     models.append(ModelEntry(
         name="TFA",
-        spec=TFASpec(use_pos_encoding=False),
+        spec=TFASpec(use_pos_encoding=False, bottleneck_factor=tfa_bottleneck_factor),
         gen_key="seq",
-        training_overrides={"batch_size": 64, "lr": 1e-3},
+        training_overrides={"batch_size": tfa_batch_size, "lr": 1e-3},
     ))
     models.append(ModelEntry(
         name="TFA-pos",
-        spec=TFASpec(use_pos_encoding=True),
+        spec=TFASpec(use_pos_encoding=True, bottleneck_factor=tfa_bottleneck_factor),
         gen_key="seq",
-        training_overrides={"batch_size": 64, "lr": 1e-3},
+        training_overrides={"batch_size": tfa_batch_size, "lr": 1e-3},
     ))
 
     # Stacked SAE and Crosscoder: one per T

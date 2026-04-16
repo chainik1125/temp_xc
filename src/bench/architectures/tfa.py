@@ -5,6 +5,12 @@ full sequences (B, T, d) and uses causal attention to decompose each
 token into predictable (from context) and novel components.
 
 Training adapted from Han's train_tfa.py.
+
+Input scaling: TFA's internal lam = 1/(4*dimin) assumes inputs have
+norm ~ sqrt(d). Real LLM activations have much larger norms (100-1000+),
+so we compute a scaling factor on the first training batch and apply it
+to all inputs (train + eval). This matches the reference TFA paper's
+scaling_factor parameter and our toy experiment convention.
 """
 
 import math
@@ -41,6 +47,7 @@ class TFASpec(ArchSpec):
         self.n_attn_layers = n_attn_layers
         self.bottleneck_factor = bottleneck_factor
         self.name = "TFA-pos" if use_pos_encoding else "TFA"
+        self._scaling_factor: float | None = None
 
     def create(self, d_in, d_sae, k, device):
         sae_diff_type = "topk" if k is not None else "relu"
@@ -55,11 +62,25 @@ class TFASpec(ArchSpec):
             bottleneck_factor=self.bottleneck_factor,
             use_pos_encoding=self.use_pos_encoding,
         )
+        self._scaling_factor = None
         return tfa.to(device)
+
+    def _compute_scaling_factor(self, x: torch.Tensor) -> float:
+        """Compute sqrt(d) / mean(||x||) so TFA sees norm ~ sqrt(d) inputs."""
+        d = x.shape[-1]
+        mean_norm = x.norm(dim=-1).mean().item()
+        if mean_norm < 1e-8:
+            return 1.0
+        return math.sqrt(d) / mean_norm
+
+    def _scale(self, x: torch.Tensor) -> torch.Tensor:
+        """Apply the cached scaling factor. Computes it on first call."""
+        if self._scaling_factor is None:
+            self._scaling_factor = self._compute_scaling_factor(x)
+        return x * self._scaling_factor
 
     def train(self, model, gen_fn, total_steps, batch_size, lr, device,
               log_every=500, grad_clip=1.0):
-        # TFA uses AdamW with cosine LR schedule (from Han's train_tfa.py)
         min_lr = lr * 0.9
         warmup_steps = min(200, total_steps // 10)
 
@@ -91,7 +112,7 @@ class TFASpec(ArchSpec):
                 pg["lr"] = current_lr
 
             # TFA expects full sequences: gen_fn(n_seq) -> (B, T, d)
-            batch = gen_fn(batch_size).to(device)
+            batch = self._scale(gen_fn(batch_size).to(device))
             recons, intermediates = model(batch)
 
             batch_flat = batch.reshape(-1, batch.shape[-1])
@@ -120,6 +141,7 @@ class TFASpec(ArchSpec):
         return log
 
     def eval_forward(self, model, x):
+        x = self._scale(x)
         recons, inter = model(x)
         B, T, D = x.shape
         se = (recons - x).pow(2).sum().item()
@@ -132,6 +154,17 @@ class TFASpec(ArchSpec):
             sum_l0=novel_l0 + pred_l0,
             n_tokens=B * T,
         )
+
+    def encode(self, model, x):
+        """Encode input sequences to feature activations for temporal metrics.
+
+        Returns total codes (pred + novel) of shape (B, T, d_sae).
+        The eval framework calls this via _encode_for_metrics to compute
+        temporal MI, activation span stats, and feature clustering.
+        """
+        x = self._scale(x)
+        _, inter = model(x)
+        return inter["pred_codes"] + inter["novel_codes"]
 
     def decoder_directions(self, model, pos=None):
         return model.D.data.T  # (dimin, width)

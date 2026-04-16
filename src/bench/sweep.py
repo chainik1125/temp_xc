@@ -41,8 +41,40 @@ from src.bench.config import (
     TrainConfig,
     SweepConfig,
 )
-from src.bench.data import build_data_pipeline, DataPipeline
+from src.bench.data import build_data_pipeline, build_pipeline, DataPipeline
 from src.bench.eval import evaluate_model, EvalResult
+from src.bench.model_registry import get_model_config, list_models
+
+
+def _arch_registry_key(entry: ModelEntry) -> str:
+    """Map a ModelEntry to its registry key (topk_sae, stacked_sae, crosscoder, tfa, tfa_pos).
+
+    get_default_models() labels entries with display names ("TopKSAE",
+    "Stacked T=5", "TXCDR T=5") but users pass registry keys via --models.
+    Bridge the two by matching on the ArchSpec class + pos-encoding flag.
+    """
+    from src.bench.architectures.topk_sae import TopKSAESpec
+    from src.bench.architectures.stacked_sae import StackedSAESpec
+    from src.bench.architectures.crosscoder import CrosscoderSpec
+    from src.bench.architectures.tfa import TFASpec
+
+    spec = entry.spec
+    if isinstance(spec, TopKSAESpec):
+        return "topk_sae"
+    if isinstance(spec, StackedSAESpec):
+        return "stacked_sae"
+    if isinstance(spec, CrosscoderSpec):
+        return "crosscoder"
+    if isinstance(spec, TFASpec):
+        return "tfa_pos" if getattr(spec, "use_pos_encoding", False) else "tfa"
+    return entry.name.lower()
+
+
+def _filter_by_registry_keys(
+    models: list[ModelEntry], wanted_keys: list[str],
+) -> list[ModelEntry]:
+    wanted = {k.lower() for k in wanted_keys}
+    return [m for m in models if _arch_registry_key(m) in wanted]
 
 
 def _get_generator(pipeline: DataPipeline, gen_key: str):
@@ -134,15 +166,6 @@ def run_sweep(
                     print(f"\n  k = {k}:")
 
                 for entry in models:
-                    # Skip crosscoders where k*T > d_sae
-                    if hasattr(entry.spec, 'T') and entry.spec.T is not None:
-                        k_eff = k * entry.spec.T
-                        if k_eff > data_config.d_sae:
-                            if verbose:
-                                print(f"    {entry.name:<20s} | SKIPPED "
-                                      f"(k*T={k_eff} > d_sae={data_config.d_sae})")
-                            continue
-
                     # Seed training for reproducibility
                     torch.manual_seed(seed)
                     t0 = time.time()
@@ -236,6 +259,169 @@ def run_sweep(
     return all_results
 
 
+def run_cached_sweep(
+    models: list[ModelEntry],
+    data_config: DataConfig,
+    train_config: TrainConfig,
+    sweep_config: SweepConfig,
+    device: torch.device,
+    results_dir: str = "results",
+    verbose: bool = True,
+) -> list[dict]:
+    """Real-LM sweep over pre-cached activations.
+
+    No rho loop (there's no Markov temperature), no coupling, no true_features.
+    Iterates (seed, k, model_entry), trains on the cached activation pipeline,
+    evaluates on the held-out slice, writes one JSON per run.
+    """
+    os.makedirs(results_dir, exist_ok=True)
+
+    cfg = get_model_config(data_config.model_name)
+    d_in = cfg.d_model
+    d_sae = data_config.d_sae  # caller must have set this sensibly
+
+    # Load existing results for resume support
+    tag = (
+        f"{data_config.model_name}__{data_config.cached_dataset}"
+        f"__{data_config.cached_layer_key}"
+        f"{'__shuffled' if data_config.shuffle_within_sequence else ''}"
+    )
+    results_path = os.path.join(results_dir, f"results_{tag}.json")
+    all_results: list[dict] = []
+    done_keys: set[str] = set()
+    if os.path.exists(results_path):
+        with open(results_path) as f:
+            all_results = json.load(f)
+        for r in all_results:
+            done_keys.add(f"{r['arch']}__{r['k']}__{r.get('seed', 42)}")
+        if verbose and done_keys:
+            print(f"  Resuming: {len(done_keys)} runs already completed")
+
+    window_sizes = set()
+    for entry in models:
+        if entry.gen_key.startswith("window_"):
+            window_sizes.add(int(entry.gen_key.split("_")[1]))
+
+    if verbose:
+        print(f"\n{'=' * 60}")
+        print(f"  CACHED SWEEP | {data_config.model_name}")
+        print(f"    dataset = {data_config.cached_dataset}")
+        print(f"    layer   = {data_config.cached_layer_key}")
+        print(f"    shuffle = {data_config.shuffle_within_sequence}")
+        print(f"    d_in    = {d_in}   d_sae = {d_sae}")
+        print(f"{'=' * 60}")
+
+    pipeline = build_pipeline(
+        data_config, device, window_sizes=list(window_sizes) or None,
+    )
+
+    for seed in sweep_config.seeds:
+        for k in sweep_config.k_values:
+            if verbose:
+                print(f"\n  seed={seed}  k={k}:")
+            for entry in models:
+                run_key = f"{entry.name}__{k}__{seed}"
+                if run_key in done_keys:
+                    if verbose:
+                        print(f"    {entry.name:20s} | SKIPPED (already done)")
+                    continue
+                torch.manual_seed(seed)
+                t0 = time.time()
+
+                batch_size = entry.training_overrides.get(
+                    "batch_size", train_config.batch_size,
+                )
+                lr = entry.training_overrides.get("lr", train_config.lr)
+                total_steps = entry.training_overrides.get(
+                    "total_steps", train_config.total_steps,
+                )
+
+                model = entry.spec.create(
+                    d_in=d_in, d_sae=d_sae, k=k, device=device,
+                )
+                gen_fn = _get_generator(pipeline, entry.gen_key)
+                entry.spec.train(
+                    model, gen_fn,
+                    total_steps=total_steps, batch_size=batch_size, lr=lr,
+                    device=device, log_every=train_config.log_every,
+                    grad_clip=train_config.grad_clip,
+                )
+
+                result = evaluate_model(
+                    entry.spec, model, pipeline.eval_hidden, device,
+                    true_features=None, global_features=None,
+                    seq_len=pipeline.eval_hidden.shape[1],
+                )
+
+                # Save checkpoint so downstream tools (feature_map.py, autointerp,
+                # steering) can reload it. Use the registry key (topk_sae,
+                # stacked_sae, crosscoder, tfa, tfa_pos) rather than the display
+                # name — the finalize/feature_map scripts look up checkpoints by
+                # registry key, and display names contain spaces ("Stacked T=5")
+                # which are a shell-escape headache.
+                ckpt_dir = os.path.join(results_dir, "ckpts")
+                os.makedirs(ckpt_dir, exist_ok=True)
+                shuf_tag = "_shuffled" if data_config.shuffle_within_sequence else ""
+                arch_key = _arch_registry_key(entry)
+                ckpt_name = (
+                    f"{arch_key}__{data_config.model_name}"
+                    f"__{data_config.cached_dataset}__{data_config.cached_layer_key}"
+                    f"__k{k}__seed{seed}{shuf_tag}.pt"
+                )
+                ckpt_path = os.path.join(ckpt_dir, ckpt_name)
+                torch.save(model.state_dict(), ckpt_path)
+
+                elapsed = time.time() - t0
+
+                row = {
+                    "checkpoint": ckpt_path,
+                    "arch": entry.name,
+                    "subject_model": data_config.model_name,
+                    "cached_dataset": data_config.cached_dataset,
+                    "layer_key": data_config.cached_layer_key,
+                    "shuffled": bool(data_config.shuffle_within_sequence),
+                    "k": k,
+                    "seed": seed,
+                    "d_in": d_in,
+                    "d_sae": d_sae,
+                    **result.to_dict(),
+                    "elapsed_sec": round(elapsed, 1),
+                }
+                all_results.append(row)
+
+                if verbose:
+                    print(
+                        f"    {entry.name:20s} | NMSE={result.nmse:.4f} "
+                        f"| L0={result.l0:.2f} | {elapsed:.0f}s"
+                    )
+
+                # Incremental save after each run so results survive interruption
+                tag = (
+                    f"{data_config.model_name}__{data_config.cached_dataset}"
+                    f"__{data_config.cached_layer_key}"
+                    f"{'__shuffled' if data_config.shuffle_within_sequence else ''}"
+                )
+                path = os.path.join(results_dir, f"results_{tag}.json")
+                with open(path, "w") as f:
+                    json.dump(all_results, f, indent=2)
+
+                del model
+                if torch.cuda.is_available():
+                    torch.cuda.empty_cache()
+
+    tag = (
+        f"{data_config.model_name}__{data_config.cached_dataset}"
+        f"__{data_config.cached_layer_key}"
+        f"{'__shuffled' if data_config.shuffle_within_sequence else ''}"
+    )
+    path = os.path.join(results_dir, f"results_{tag}.json")
+    with open(path, "w") as f:
+        json.dump(all_results, f, indent=2)
+    if verbose:
+        print(f"\n  SWEEP COMPLETE | {len(all_results)} runs | {path}")
+    return all_results
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Run architecture comparison sweep"
@@ -268,8 +454,29 @@ def main():
                         help="Number of emission features (coupled mode)")
     parser.add_argument("--n-parents", type=int, default=2,
                         help="Parents per emission (coupled mode)")
-    parser.add_argument("--d-sae", type=int, default=None,
-                        help="Dictionary width (default: M_emission if coupled, else 128)")
+
+    # Real-LM cached-activation mode
+    parser.add_argument("--dataset-type", type=str, default="markov",
+                        choices=["markov", "cached_activations"],
+                        help="Switch between toy Markov and real-LM cached acts")
+    parser.add_argument("--model-name", type=str, default="deepseek-r1-distill-llama-8b",
+                        choices=list_models(),
+                        help="Subject LM key (cached_activations mode)")
+    parser.add_argument("--cached-dataset", type=str, default="gsm8k",
+                        help="Subdir under data/cached_activations/<model>/")
+    parser.add_argument("--cached-layer-key", type=str, default="resid_L12",
+                        help="Which <key>.npy to load (e.g. resid_L12)")
+    parser.add_argument("--shuffle-within-sequence", action="store_true",
+                        help="Temporal shuffled control baseline")
+    parser.add_argument("--expansion-factor", type=int, default=8,
+                        help="d_sae = d_model * expansion_factor (cached mode)")
+    parser.add_argument("--tfa-bottleneck-factor", type=int, default=None,
+                        help="TFA attention bottleneck factor. Auto-set to 4 for "
+                             "cached_activations mode if not specified. Controls "
+                             "attention param count: O(d_sae^2 / bottleneck_factor)")
+    parser.add_argument("--tfa-batch-size", type=int, default=None,
+                        help="Batch size for TFA (number of sequences). "
+                             "Defaults to 64 for toy, 16 for cached_activations")
 
     args = parser.parse_args()
 
@@ -285,6 +492,55 @@ def main():
         total_steps=args.steps or 30_000,
     )
 
+    # Dispatch: cached activations path is a completely different code path.
+    if args.dataset_type == "cached_activations":
+        cfg = get_model_config(args.model_name)
+        d_sae = cfg.d_model * args.expansion_factor
+        data_config = DataConfig(
+            dataset_type="cached_activations",
+            model_name=args.model_name,
+            cached_dataset=args.cached_dataset,
+            cached_layer_key=args.cached_layer_key,
+            shuffle_within_sequence=args.shuffle_within_sequence,
+            d_sae=d_sae,
+        )
+        tfa_bf = args.tfa_bottleneck_factor if args.tfa_bottleneck_factor is not None else 4
+        tfa_bs = args.tfa_batch_size if args.tfa_batch_size is not None else 16
+        models = get_default_models(
+            sweep_config.T_values,
+            tfa_bottleneck_factor=tfa_bf,
+            tfa_batch_size=tfa_bs,
+        )
+        if args.models:
+            models = _filter_by_registry_keys(models, args.models)
+            if not models:
+                raise ValueError(
+                    f"--models {args.models} matched zero architectures. "
+                    f"Valid keys: topk_sae, stacked_sae, crosscoder, tfa, tfa_pos"
+                )
+        print(f"{'=' * 60}")
+        print(f"  REAL-LM CACHED-ACTIVATION SWEEP")
+        print(f"  Subject:  {args.model_name}  (d_model={cfg.d_model})")
+        print(f"  Dataset:  {args.cached_dataset} / {args.cached_layer_key}")
+        print(f"  Shuffle:  {args.shuffle_within_sequence}")
+        print(f"  d_sae:    {d_sae}  (×{args.expansion_factor} expansion)")
+        print(f"  TFA bf:   {tfa_bf}  (batch_size={tfa_bs})")
+        print(f"  Models:   {[m.name for m in models]}")
+        print(f"  K:        {sweep_config.k_values}")
+        print(f"  Steps:    {train_config.total_steps:,}")
+        print(f"{'=' * 60}")
+        if args.dry_run:
+            return
+        run_cached_sweep(
+            models=models,
+            data_config=data_config,
+            train_config=train_config,
+            sweep_config=sweep_config,
+            device=device,
+            results_dir=args.results_dir,
+        )
+        return
+
     coupling = None
     if args.coupled:
         coupling = CouplingConfig(
@@ -296,16 +552,25 @@ def main():
     data_config = DataConfig(
         markov=MarkovConfig(delta=args.delta),
         coupling=coupling,
-        d_sae=args.d_sae or (args.M_emission if args.coupled else 128),
+        d_sae=args.M_emission if args.coupled else 128,
     )
 
-    models = get_default_models(sweep_config.T_values)
+    tfa_bf = args.tfa_bottleneck_factor if args.tfa_bottleneck_factor is not None else 1
+    tfa_bs = args.tfa_batch_size if args.tfa_batch_size is not None else 64
+    models = get_default_models(
+        sweep_config.T_values,
+        tfa_bottleneck_factor=tfa_bf,
+        tfa_batch_size=tfa_bs,
+    )
 
     # Filter models if requested
     if args.models:
-        models = [m for m in models if any(
-            f.lower() in m.name.lower() for f in args.models
-        )]
+        models = _filter_by_registry_keys(models, args.models)
+        if not models:
+            raise ValueError(
+                f"--models {args.models} matched zero architectures. "
+                f"Valid keys: topk_sae, stacked_sae, crosscoder, tfa, tfa_pos"
+            )
 
     # Build job list for display
     jobs = list(itertools.product(

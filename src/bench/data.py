@@ -20,10 +20,13 @@ Usage:
     pipeline.global_features  # (hidden_dim, K) -- for global AUC
 """
 
+import json
 import math
+import os
 from dataclasses import dataclass, field
 from typing import Callable
 
+import numpy as np
 import torch
 import torch.nn as nn
 
@@ -308,3 +311,156 @@ def build_data_pipeline(
         gen_windows=gen_windows,
         global_features=global_features,
     )
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# Real-LM cached activations
+# ═══════════════════════════════════════════════════════════════════════════
+def _shuffle_within_sequence_(x: torch.Tensor) -> torch.Tensor:
+    """Randomly permute the sequence axis independently per sample.
+
+    x: (B, T, d). Returns a shuffled view (new tensor). This is the temporal
+    shuffled-control transform — any metric that drops after applying this
+    was measuring genuinely temporal structure, anything that survives was
+    measuring something else (the TFA free-dense-channel problem).
+    """
+    B, T, _ = x.shape
+    idx = torch.stack([torch.randperm(T, device=x.device) for _ in range(B)])
+    return torch.gather(x, 1, idx.unsqueeze(-1).expand(-1, -1, x.shape[-1]))
+
+
+def build_cached_activations_pipeline(
+    config: DataConfig,
+    device: torch.device,
+    window_sizes: list[int] | None = None,
+) -> DataPipeline:
+    """Load pre-cached real-LM activations and wrap them in a DataPipeline.
+
+    Expects output from `temporal_crosscoders/NLP/cache_activations.py`:
+        <root>/cached_activations/<model_name>/<cached_dataset>/
+            <layer_key>.npy           (N, seq_len, d_model) float32
+            layer_specs.json          metadata
+            token_ids.npy             optional, for autointerp
+
+    Returns a DataPipeline where `true_features` / `global_features` are None
+    (no ground truth on real data) but all sampling generators are populated.
+    """
+    # Resolve the cache directory via config or fall back to the default.
+    if config.cached_root is not None:
+        root = config.cached_root
+    else:
+        from temporal_crosscoders.NLP.config import cache_dir_for
+        root = cache_dir_for(config.model_name, config.cached_dataset)
+
+    acts_path = os.path.join(root, f"{config.cached_layer_key}.npy")
+    if not os.path.exists(acts_path):
+        raise FileNotFoundError(
+            f"No cached activations at {acts_path}. "
+            f"Run: python -m temporal_crosscoders.NLP.cache_activations "
+            f"--model {config.model_name} --dataset {config.cached_dataset}"
+        )
+
+    print(f"[data] loading cached activations {acts_path}")
+    arr = np.load(acts_path, mmap_mode="r")  # (N, T, d)
+    n_seq, seq_len, d_model = arr.shape
+    print(f"  shape=({n_seq},{seq_len},{d_model}) shuffle={config.shuffle_within_sequence}")
+
+    specs_path = os.path.join(root, "layer_specs.json")
+    if os.path.exists(specs_path):
+        with open(specs_path) as f:
+            _meta = json.load(f)
+        assert _meta["d_model"] == d_model, "cached d_model does not match layer_specs.json"
+
+    # Memory-efficient loading: keep the numpy mmap and load slices on demand.
+    # At 24K x 128 x 2304 x 4 bytes = 28 GB, materializing the full array
+    # would exhaust system RAM. Instead, generators index into the mmap
+    # and convert small batches to torch tensors per-call.
+
+    max_eval = max(1, n_seq // 5)  # 20% of data, at minimum 1
+    n_eval = min(config.eval_n_seq, max_eval)
+    train_N = n_seq - n_eval
+    train_NT = train_N * seq_len
+    if train_N == 0:
+        raise ValueError(
+            f"train_pool empty: n_seq={n_seq} n_eval={n_eval}. "
+            f"Reduce DataConfig.eval_n_seq or cache more sequences."
+        )
+
+    # Build a shuffle permutation if requested. Applied as an index remap
+    # rather than materializing a shuffled copy of the full array.
+    if config.shuffle_within_sequence:
+        # Build per-sequence position permutations
+        rng = np.random.RandomState(config.seed)
+        shuf_perms = np.stack([rng.permutation(seq_len) for _ in range(n_seq)])
+    else:
+        shuf_perms = None
+
+    def _load_seqs(indices) -> torch.Tensor:
+        """Load sequences by index from the mmap, apply shuffle if needed."""
+        batch_np = np.array(arr[indices])  # copy from mmap: (n, S, d)
+        if shuf_perms is not None:
+            perms = shuf_perms[indices]  # (n, S)
+            # Vectorized fancy-index shuffle along the seq dimension
+            n, S, d = batch_np.shape
+            row_idx = np.arange(n)[:, None].repeat(S, axis=1)
+            batch_np = batch_np[row_idx, perms]
+        return torch.from_numpy(batch_np).float()
+
+    # Eval slice: small enough to hold in GPU memory (n_eval << n_seq).
+    eval_hidden = _load_seqs(list(range(n_seq - n_eval, n_seq))).to(device)
+    print(f"  train_N={train_N}, eval_N={n_eval}, eval_hidden={eval_hidden.shape}")
+
+    def gen_flat(batch_size: int) -> torch.Tensor:
+        idx = torch.randint(0, train_NT, (batch_size,)).numpy()
+        seq_idx = idx // seq_len
+        tok_idx = idx % seq_len
+        batch_np = np.array(arr[seq_idx, tok_idx])  # (B, d)
+        # No shuffle needed for flat (single tokens)
+        return torch.from_numpy(batch_np).float().to(device, non_blocking=True)
+
+    def gen_seq(n: int) -> torch.Tensor:
+        idx = torch.randint(0, train_N, (n,)).numpy()
+        return _load_seqs(idx).to(device, non_blocking=True)
+
+    gen_windows: dict[int, Callable[[int], torch.Tensor]] = {}
+    for T in window_sizes or []:
+        def _make(T_: int) -> Callable[[int], torch.Tensor]:
+            def gen(batch_size: int) -> torch.Tensor:
+                n = max(1, batch_size // max(1, seq_len - T_ + 1)) + 1
+                idx = torch.randint(0, train_N, (n,)).numpy()
+                seqs = _load_seqs(idx)  # (n, S, d)
+                wins = [seqs[:, t : t + T_, :] for t in range(seq_len - T_ + 1)]
+                all_w = torch.cat(wins, dim=0)
+                pick = torch.randperm(all_w.shape[0])[:batch_size]
+                return all_w[pick].to(device, non_blocking=True)
+            return gen
+        gen_windows[T] = _make(T)
+
+    # Dummy toy_model + scaling — not used on real data, but the dataclass
+    # requires them. Keep lightweight.
+    toy_model = nn.Module()
+    toy_model.hidden_dim = d_model  # type: ignore[attr-defined]
+
+    return DataPipeline(
+        toy_model=toy_model,  # type: ignore[arg-type]
+        scaling_factor=1.0,
+        true_features=torch.zeros(d_model, 1),  # placeholder — recovery AUC is skipped
+        eval_hidden=eval_hidden,
+        gen_flat=gen_flat,
+        gen_seq=gen_seq,
+        gen_windows=gen_windows,
+        global_features=None,
+    )
+
+
+def build_pipeline(
+    config: DataConfig,
+    device: torch.device,
+    window_sizes: list[int] | None = None,
+) -> DataPipeline:
+    """Single entry point that dispatches on config.dataset_type."""
+    if config.dataset_type == "markov":
+        return build_data_pipeline(config, device, window_sizes)
+    if config.dataset_type == "cached_activations":
+        return build_cached_activations_pipeline(config, device, window_sizes)
+    raise ValueError(f"Unknown dataset_type: {config.dataset_type}")
