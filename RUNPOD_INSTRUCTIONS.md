@@ -16,18 +16,20 @@ cd temp_xc && git checkout han && git pull
 # Install uv if the pod image doesn't ship it
 command -v uv >/dev/null || curl -LsSf https://astral.sh/uv/install.sh | sh
 
-# Persist HF cache and auth on /workspace (add to ~/.bashrc so new shells pick it up)
+# Persist HF cache, HF auth, and uv's link-mode setting on /workspace
+# (UV_LINK_MODE=copy is required: uv's cache and /workspace are on different
+# filesystems, so the default hardlink mode silently produces broken installs
+# on MooseFS — e.g. packages with only a partial file tree.)
 export HF_HOME=/workspace/hf_cache
-grep -q 'HF_HOME=/workspace/hf_cache' ~/.bashrc || echo 'export HF_HOME=/workspace/hf_cache' >> ~/.bashrc
+export UV_LINK_MODE=copy
+for line in 'export HF_HOME=/workspace/hf_cache' 'export UV_LINK_MODE=copy'; do
+    grep -qF "$line" ~/.bashrc || echo "$line" >> ~/.bashrc
+done
 
-# Create .venv on the persistent volume once; reuse on every later session
-if [ ! -x .venv/bin/python ]; then
-    uv venv .venv --python 3.12
-    source .venv/bin/activate
-    uv pip install torch transformers datasets huggingface_hub tqdm plotly kaleido scipy scikit-learn numpy
-else
-    source .venv/bin/activate
-fi
+# Resolve deps from pyproject.toml + uv.lock into .venv/ (persistent volume).
+# Safe to re-run; no-op when already in sync.
+uv sync
+source .venv/bin/activate
 
 # Only needed the first time — token is stored under $HF_HOME and persists
 huggingface-cli whoami >/dev/null 2>&1 || huggingface-cli login
