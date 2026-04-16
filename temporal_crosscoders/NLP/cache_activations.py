@@ -132,6 +132,48 @@ def _load_text_stream(
         hf_path, subset, split = "HuggingFaceFW/fineweb", "sample-10BT", "train"
     elif dataset == "coding":
         hf_path, subset, split = "codeparrot/codeparrot-clean", None, "train"
+    elif dataset == "stack-python":
+        # The Stack v2 deduplicated, Python only. Gated on HuggingFace —
+        # accept the license at https://huggingface.co/datasets/bigcode/the-stack-v2-dedup
+        # Fallback: bigcode/starcoderdata if v2 access is painful. Filters
+        # to 100–2000-line files to skip trivial snippets and pathological
+        # long-tail outliers; dedup upstream handles near-duplicates.
+        print("Loading bigcode/the-stack-v2-dedup (Python, streaming, "
+              "100–2000 line filter)")
+        try:
+            ds = load_dataset(
+                "bigcode/the-stack-v2-dedup",
+                split="train",
+                streaming=True,
+            )
+            ds = ds.filter(lambda s: s.get("language") == "Python")
+        except Exception as e:
+            print(f"  v2 load failed ({e}); falling back to bigcode/starcoderdata")
+            ds = load_dataset(
+                "bigcode/starcoderdata",
+                data_dir="python",
+                split="train",
+                streaming=True,
+            )
+
+        def extract_code(sample: dict) -> str | None:
+            content = sample.get("content") or sample.get("text") or ""
+            if not content:
+                return None
+            n_lines = content.count("\n") + 1
+            if n_lines < 100 or n_lines > 2000:
+                return None
+            return content
+
+        out: list[str] = []
+        for sample in tqdm(ds, total=num_samples, desc="Fetching Python files"):
+            txt = extract_code(sample)
+            if txt is None or len(txt) < 20:
+                continue
+            out.append(txt)
+            if len(out) >= num_samples:
+                break
+        return out
     elif dataset == "gsm8k":
         hf_path, subset, split = "openai/gsm8k", "main", "train"
         stream = False
@@ -401,7 +443,7 @@ def main():
     p = argparse.ArgumentParser()
     p.add_argument("--model", required=True, choices=list_models())
     p.add_argument("--dataset", default="fineweb",
-                   choices=["fineweb", "coding", "gsm8k", "math500", "custom"])
+                   choices=["fineweb", "coding", "stack-python", "gsm8k", "math500", "custom"])
     p.add_argument("--dataset_hf_path", type=str, default=None)
     p.add_argument("--dataset_subset", type=str, default=None)
     p.add_argument("--dataset_split", type=str, default=DATASET_SPLIT_DEFAULT)

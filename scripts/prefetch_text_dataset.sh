@@ -35,6 +35,15 @@ if [ -z "$HF_PATH" ]; then
             SUBSET=""
             SPLIT="train"
             ;;
+        stack-python)
+            # The Stack v2 deduplicated, Python only. Requires gated HF
+            # access. The prefetch script uses the standard streaming path;
+            # Python filtering happens in the inline Python block below via
+            # the DATASET-aware filter.
+            HF_PATH="bigcode/the-stack-v2-dedup"
+            SUBSET=""
+            SPLIT="train"
+            ;;
         *)
             echo "Unknown dataset '$DATASET'. Pass hf_path/subset/split explicitly."
             exit 1
@@ -82,17 +91,31 @@ import json
 from datasets import load_dataset
 from tqdm.auto import tqdm
 
-hf_path = "$HF_PATH"
-subset  = "$SUBSET" or None
-split   = "$SPLIT"
-n       = $N
+hf_path  = "$HF_PATH"
+subset   = "$SUBSET" or None
+split    = "$SPLIT"
+n        = $N
 out_path = "$OUT"
+dataset  = "$DATASET"
 
 kwargs = dict(split=split, streaming=True)
 if subset:
     ds = load_dataset(hf_path, subset, **kwargs)
 else:
     ds = load_dataset(hf_path, **kwargs)
+
+# stack-python: language filter + line-count filter (100-2000 lines)
+if dataset == "stack-python":
+    ds = ds.filter(lambda s: s.get("language") == "Python")
+
+def accept(txt: str) -> bool:
+    if not txt or len(txt) < 100:
+        return False
+    if dataset == "stack-python":
+        n_lines = txt.count("\n") + 1
+        if n_lines < 100 or n_lines > 2000:
+            return False
+    return True
 
 kept = 0
 with open(out_path, "w") as fout:
@@ -102,7 +125,7 @@ with open(out_path, "w") as fout:
             if col in sample and sample[col]:
                 txt = str(sample[col])
                 break
-        if not txt or len(txt) < 100:
+        if not accept(txt):
             continue
         fout.write(json.dumps({"text": txt}) + "\n")
         kept += 1
