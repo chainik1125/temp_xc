@@ -9,4 +9,8 @@ if [ -f "$HOME/.txc_secrets.env" ]; then
     source "$HOME/.txc_secrets.env"
 fi
 export REPO_DIR="$SCRATCH/temp_xc"
+# Numba (used by UMAP) tries to write JIT cache next to the source .py file,
+# which fails on compute nodes where /home/ is read-only. Point it at $SCRATCH.
+export NUMBA_CACHE_DIR="$SCRATCH/.cache/numba"
+mkdir -p "$NUMBA_CACHE_DIR" 2>/dev/null || true
 cd "$REPO_DIR"
