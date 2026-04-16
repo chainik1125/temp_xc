@@ -61,7 +61,7 @@ fidelity scoring is the paper-version TODO).
 #### Step 1: Gemma 2B + FineWeb
 
 **Unshuffled:**
-![[feature_map_step1-unshuffled.png]]
+![Step 1 unshuffled — Gemma 2B + FineWeb](sprint_feature_geometry/feature_map_step1-unshuffled.png)
 [Interactive HTML (hover for feature labels)](../../reports/step1-gemma-replication/feature_map_step1-unshuffled.html)
 
 - Moderately structured connected mass with peripheral islands.
@@ -71,7 +71,7 @@ fidelity scoring is the paper-version TODO).
 - PCA explained variance: 7.3% at 50 components.
 
 **Shuffled:**
-![[feature_map_step1-shuffled.png]]
+![Step 1 shuffled — Gemma 2B + FineWeb](sprint_feature_geometry/feature_map_step1-shuffled.png)
 [Interactive HTML (hover for feature labels)](../../reports/step1-gemma-replication/feature_map_step1-shuffled.html)
 
 - Similar overall shape — connected mass with peripheral islands.
@@ -88,7 +88,7 @@ the window captures noisy web tokens, not coherent multi-token constructs.
 #### Step 2: DeepSeek-R1-Distill + GSM8K reasoning traces
 
 **Unshuffled:**
-![[feature_map_step2-unshuffled.png]]
+![Step 2 unshuffled — DeepSeek-R1-Distill + GSM8K](sprint_feature_geometry/feature_map_step2-unshuffled.png)
 [Interactive HTML (hover for feature labels)](../../reports/step2-deepseek-reasoning/feature_map_step2-unshuffled.html)
 
 - **Strikingly different** from Step 1. Clear separated sub-structures.
@@ -100,7 +100,7 @@ the window captures noisy web tokens, not coherent multi-token constructs.
 - PCA explained variance: 8.7%.
 
 **Shuffled:**
-![[feature_map_step2-shuffled.png]]
+![Step 2 shuffled — DeepSeek-R1-Distill + GSM8K](sprint_feature_geometry/feature_map_step2-shuffled.png)
 [Interactive HTML (hover for feature labels)](../../reports/step2-deepseek-reasoning/feature_map_step2-shuffled.html)
 
 - **Noticeably more diffuse.** The large separated island on the right is
