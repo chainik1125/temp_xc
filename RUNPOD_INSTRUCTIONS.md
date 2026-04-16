@@ -6,12 +6,31 @@ Run a 36-run NLP sweep comparing TFA-pos vs TXCDR vs Stacked SAE on real LLM act
 
 ## Setup
 
+The uv venv lives at `/workspace/temp_xc/.venv` and the HF cache at `/workspace/hf_cache` — both on RunPod's persistent `/workspace` volume, so they survive pod stop/start cycles. First session creates them; later sessions just re-activate.
+
 ```bash
 cd /workspace
-git clone https://github.com/chainik1125/temp_xc.git
-cd temp_xc && git checkout han
-pip install transformers datasets huggingface_hub tqdm plotly kaleido scipy scikit-learn
-huggingface-cli login  # use a fresh token — Gemma is gated
+[ -d temp_xc ] || git clone https://github.com/chainik1125/temp_xc.git
+cd temp_xc && git checkout han && git pull
+
+# Install uv if the pod image doesn't ship it
+command -v uv >/dev/null || curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Persist HF cache and auth on /workspace (add to ~/.bashrc so new shells pick it up)
+export HF_HOME=/workspace/hf_cache
+grep -q 'HF_HOME=/workspace/hf_cache' ~/.bashrc || echo 'export HF_HOME=/workspace/hf_cache' >> ~/.bashrc
+
+# Create .venv on the persistent volume once; reuse on every later session
+if [ ! -x .venv/bin/python ]; then
+    uv venv .venv --python 3.12
+    source .venv/bin/activate
+    uv pip install torch transformers datasets huggingface_hub tqdm plotly kaleido scipy scikit-learn numpy
+else
+    source .venv/bin/activate
+fi
+
+# Only needed the first time — token is stored under $HF_HOME and persists
+huggingface-cli whoami >/dev/null 2>&1 || huggingface-cli login
 ```
 
 Verify:
@@ -21,6 +40,38 @@ import torch; print(f'GPU: {torch.cuda.get_device_name(0)}, VRAM: {torch.cuda.ge
 from src.bench.model_registry import list_models; print('Models:', list_models())
 "
 ```
+
+### Reconnecting to an existing pod
+
+```bash
+cd /workspace/temp_xc
+source .venv/bin/activate
+export HF_HOME=/workspace/hf_cache   # already in ~/.bashrc after first setup
+```
+
+### GitHub push access (persistent across pod sessions)
+
+The token lives at `/workspace/.github-token` (persistent volume) and a per-repo credential helper reads it at push time. Both survive pod stop/start, so `git push origin han` works in every new session with no re-auth.
+
+First-time setup (once per persistent volume):
+
+```bash
+# 1) Write the PAT to the persistent volume. Use printf (no trailing newline).
+printf '%s' 'ghp_YOUR_CLASSIC_PAT' > /workspace/.github-token
+chmod 600 /workspace/.github-token   # NB: RunPod volume may ignore chmod; pod is single-tenant
+
+# 2) Wire it into the repo's git config (once per clone of temp_xc)
+cd /workspace/temp_xc
+git config --local credential.helper \
+    '!f() { echo username=x-access-token; printf "password=%s\n" "$(cat /workspace/.github-token)"; }; f'
+
+# 3) Verify
+git push --dry-run origin han
+```
+
+Token type: use a **classic** PAT with the `repo` scope. Fine-grained PATs must also list `chainik1125/temp_xc` under "selected repositories" — forgetting this is the #1 reason pushes 403 even when you're a collaborator.
+
+Rotation: overwrite `/workspace/.github-token` in place; no other changes needed.
 
 ## Run the sweep
 

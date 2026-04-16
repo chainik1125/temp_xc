@@ -5,7 +5,7 @@
 #
 # Prerequisites:
 #   - HF_TOKEN set (Gemma is gated)
-#   - conda env torchgpu activated
+#   - uv venv at /workspace/temp_xc/.venv (see RUNPOD_INSTRUCTIONS.md)
 #   - ~120 GB free disk
 #   - RTX 5090 (32 GB VRAM)
 #
@@ -16,10 +16,16 @@
 set -euo pipefail
 
 export TQDM_DISABLE=1
-export PYTHONPATH=/home/elysium/temp_xc
+export PYTHONPATH=/workspace/temp_xc
 export PYTHONUNBUFFERED=1
+export HF_HOME="${HF_HOME:-/workspace/hf_cache}"
 
-PYTHON="/home/elysium/miniforge3/envs/torchgpu/bin/python"
+PYTHON="${PYTHON:-/workspace/temp_xc/.venv/bin/python}"
+if [ ! -x "$PYTHON" ]; then
+    echo "ERROR: python not found at $PYTHON" >&2
+    echo "  Run the setup steps in RUNPOD_INSTRUCTIONS.md to create the uv venv." >&2
+    exit 1
+fi
 RESULTS_DIR="results/nlp_sweep"
 STEPS=10000
 
@@ -29,7 +35,7 @@ echo "============================================================"
 echo "  NLP SWEEP — $(date)"
 echo "  GPU: $(nvidia-smi --query-gpu=name --format=csv,noheader)"
 echo "  VRAM: $(nvidia-smi --query-gpu=memory.total --format=csv,noheader)"
-echo "  Disk free: $(df -h /home/elysium/temp_xc | tail -1 | awk '{print $4}')"
+echo "  Disk free: $(df -h /workspace/temp_xc | tail -1 | awk '{print $4}')"
 echo "============================================================"
 
 # ── PHASE 1: Cache Gemma-2-2B-IT activations ────────────────────
