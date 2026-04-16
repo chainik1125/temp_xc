@@ -62,7 +62,7 @@ fidelity scoring is the paper-version TODO).
 
 **Unshuffled:**
 ![[feature_map_step1-unshuffled.png]]
-Interactive: [[feature_map_step1-unshuffled.html]]
+[Interactive HTML (hover for feature labels)](../../reports/step1-gemma-replication/feature_map_step1-unshuffled.html)
 
 - Moderately structured connected mass with peripheral islands.
 - Three megaclusters (1, 10, 14, each ~3k features) dominate the core,
@@ -72,7 +72,7 @@ Interactive: [[feature_map_step1-unshuffled.html]]
 
 **Shuffled:**
 ![[feature_map_step1-shuffled.png]]
-Interactive: [[feature_map_step1-shuffled.html]]
+[Interactive HTML (hover for feature labels)](../../reports/step1-gemma-replication/feature_map_step1-shuffled.html)
 
 - Similar overall shape — connected mass with peripheral islands.
 - Cluster sizes more uniform (largest: 2,917 vs 3,232 unshuffled).
@@ -89,7 +89,7 @@ the window captures noisy web tokens, not coherent multi-token constructs.
 
 **Unshuffled:**
 ![[feature_map_step2-unshuffled.png]]
-Interactive: [[feature_map_step2-unshuffled.html]]
+[Interactive HTML (hover for feature labels)](../../reports/step2-deepseek-reasoning/feature_map_step2-unshuffled.html)
 
 - **Strikingly different** from Step 1. Clear separated sub-structures.
 - Large dense island on the right (cluster 6, n=4,208) well-separated
@@ -101,7 +101,7 @@ Interactive: [[feature_map_step2-unshuffled.html]]
 
 **Shuffled:**
 ![[feature_map_step2-shuffled.png]]
-Interactive: [[feature_map_step2-shuffled.html]]
+[Interactive HTML (hover for feature labels)](../../reports/step2-deepseek-reasoning/feature_map_step2-shuffled.html)
 
 - **Noticeably more diffuse.** The large separated island on the right is
   gone.
