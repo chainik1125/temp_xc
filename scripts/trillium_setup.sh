@@ -77,6 +77,9 @@ pip install "pydantic>=2.0,<3" distro docstring-parser jiter
 # against CC's shipped 7.34. Shadow it in the venv.
 pip install --upgrade "protobuf>=4.25,<5"
 
+# plotly 6.7 added a narwhals dependency
+pip install narwhals 2>/dev/null || true
+
 # Editable install of the project itself.
 pip install --no-deps -e "$REPO_DIR"
 

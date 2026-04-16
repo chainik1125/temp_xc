@@ -44,15 +44,19 @@ run_fmap() {
 
     echo ""
     echo ">> [$TAG] labeled feature_map"
-    # Drop --include-unlabeled: restrict clustering to features that have
-    # autointerp explanations, so hover text / cluster legend are populated.
+    # --include-unlabeled: cluster ALL d_sae features (like Andre's original
+    # analysis), not just the 30 with autointerp labels. The 30 labeled
+    # features appear with hover text in the interactive HTML; the rest
+    # appear as "(unlabeled)". This gives the same cluster geometry as
+    # Andre's plots rather than a degenerate 30-into-20 split.
+    pip install narwhals -q 2>/dev/null || true
     python -m temporal_crosscoders.NLP.feature_map \
         --checkpoint "$CKPT" \
         --model crosscoder --subject-model "$MODEL" \
         --k 100 --T 5 \
         --label "$TAG" \
         --output-dir "$REPORT_DIR" \
-        --skip-llm-labels
+        --include-unlabeled --skip-llm-labels
 }
 
 run_fmap step1-unshuffled gemma-2-2b                     fineweb  resid_L13 "" \
