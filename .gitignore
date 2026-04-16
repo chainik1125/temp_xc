@@ -24,6 +24,10 @@ docs/.obsidian/graph.json
 papers/
 docs/han/agent_onboarding/
 
+# Runtime artifacts (keep results/ tracked; activations + logs are too big)
+data/cached_activations/
+logs/
+
 # OS
 .DS_Store
 Thumbs.db

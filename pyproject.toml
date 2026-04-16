@@ -5,8 +5,11 @@ requires-python = ">=3.12"
 dependencies = [
     "torch>=2.8,<2.10",
     "transformers",
+    "accelerate",
     "datasets",
     "huggingface-hub",
+    "sentencepiece",
+    "protobuf",
     "tqdm",
     "plotly",
     "kaleido",
