@@ -212,6 +212,15 @@ class TemporalSAE(nn.Module):
             proj_scale = (
                 (Dz_pred_ * x_input).sum(dim=-1, keepdim=True) / Dz_norm_.pow(2)
             )
+            # Numerical stability for real-LM scale: with dimin=2304+ and
+            # lam=1/(4*dimin) the attention output Dz_pred_ is tiny in early
+            # steps, which makes Dz_norm_.pow(2) ~ eps^2 and proj_scale
+            # explode to ~1e6+. The actual projected update s*Dz_pred_ is
+            # bounded (Cauchy-Schwarz), but the raw proj_scale multiplies
+            # z_pred_ via the next line — unclamped, this blows gradients
+            # and NaNs AdamW before warmup finishes. Toy-model dims were
+            # small enough for this to never trigger.
+            proj_scale = proj_scale.clamp(min=-10.0, max=10.0)
             z_pred = z_pred + (z_pred_ * proj_scale)
             x_input = x_input - proj_scale * Dz_pred_
             if return_graph:

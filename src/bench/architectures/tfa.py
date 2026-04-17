@@ -121,6 +121,11 @@ class TFASpec(ArchSpec):
             loss = F.mse_loss(recons_flat, batch_flat, reduction="sum") / n_tokens
 
             optimizer.zero_grad()
+            # Defense-in-depth: if loss is NaN/Inf, skip the update.
+            # Prevents a single bad step from poisoning AdamW moments and
+            # locking the run into permanent NaN.
+            if not torch.isfinite(loss):
+                continue
             loss.backward()
             nn.utils.clip_grad_norm_(model.parameters(), grad_clip)
             optimizer.step()
