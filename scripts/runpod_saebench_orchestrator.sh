@@ -40,6 +40,10 @@ set -euo pipefail
 cd "$(git rev-parse --show-toplevel)"
 source scripts/runpod_activate.sh
 
+# Tag all W&B runs from this orchestrator invocation with the same group
+# so the dashboard shows them as one experiment.
+export WANDB_GROUP="${WANDB_GROUP:-saebench-$(date +%Y%m%d-%H%M)}"
+
 PHASE="${1:-full}"
 T_SWEEP_MAX="${T_SWEEP_MAX:-20}"
 STEPS="${STEPS:-5000}"

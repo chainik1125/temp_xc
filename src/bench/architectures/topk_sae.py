@@ -102,6 +102,14 @@ class TopKSAESpec(ArchSpec):
                     f"| loss={loss.item():.4f} | l0={l0:.2f}",
                     flush=True,
                 )
+                # Stream to W&B if active (silent fallback if not).
+                try:
+                    import wandb
+                    if wandb.run is not None:
+                        wandb.log({"train/loss": loss.item(), "train/l0": l0},
+                                  step=step)
+                except Exception:
+                    pass
 
         model.eval()
         return log

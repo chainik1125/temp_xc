@@ -315,6 +315,53 @@ def run_cached_sweep(
                     "total_steps", train_config.total_steps,
                 )
 
+                # Optional W&B tracking. Enable by setting WANDB_API_KEY
+                # in the env; leave unset for local dry runs. Per-run
+                # name encodes the full (arch, subject, dataset, layer,
+                # k, seed, shuffle) tuple so the web dashboard groups
+                # related runs together without manual tagging.
+                _wandb_run = None
+                if os.environ.get("WANDB_API_KEY"):
+                    try:
+                        import wandb
+                        run_name = (
+                            f"{_arch_registry_key(entry)}__{data_config.model_name}"
+                            f"__{data_config.cached_dataset}"
+                            f"__{data_config.cached_layer_key}"
+                            f"__k{k}__seed{seed}"
+                            f"{'_shuffled' if data_config.shuffle_within_sequence else ''}"
+                        )
+                        _wandb_run = wandb.init(
+                            project=os.environ.get(
+                                "WANDB_PROJECT", "temporal-crosscoders"
+                            ),
+                            entity=os.environ.get("WANDB_ENTITY") or None,
+                            name=run_name,
+                            group=os.environ.get("WANDB_GROUP") or None,
+                            reinit=True,
+                            config={
+                                "arch": entry.name,
+                                "arch_key": _arch_registry_key(entry),
+                                "subject_model": data_config.model_name,
+                                "cached_dataset": data_config.cached_dataset,
+                                "cached_layer_key": data_config.cached_layer_key,
+                                "cached_layer_keys": data_config.cached_layer_keys,
+                                "shuffle_within_sequence":
+                                    data_config.shuffle_within_sequence,
+                                "k": k,
+                                "seed": seed,
+                                "d_in": d_in,
+                                "d_sae": d_sae,
+                                "total_steps": total_steps,
+                                "batch_size": batch_size,
+                                "lr": lr,
+                                "dataset_type": data_config.dataset_type,
+                            },
+                        )
+                    except Exception as e:
+                        print(f"  WARN: wandb.init failed ({e}); continuing without W&B")
+                        _wandb_run = None
+
                 model = entry.spec.create(
                     d_in=d_in, d_sae=d_sae, k=k, device=device,
                 )
@@ -349,6 +396,35 @@ def run_cached_sweep(
                 ckpt_path = os.path.join(ckpt_dir, ckpt_name)
                 torch.save(model.state_dict(), ckpt_path)
 
+                # Log checkpoint to W&B as an Artifact for team-visible
+                # persistence + cross-pod retrieval. Falls back silently
+                # if W&B isn't initialized.
+                if _wandb_run is not None:
+                    try:
+                        import wandb
+                        artifact = wandb.Artifact(
+                            name=ckpt_name.replace(".pt", "").replace("__", "-"),
+                            type="sae_checkpoint",
+                            description=(
+                                f"{entry.name} | k={k} | seed={seed} | "
+                                f"{data_config.model_name}/"
+                                f"{data_config.cached_dataset}/"
+                                f"{data_config.cached_layer_key}"
+                            ),
+                            metadata={
+                                "arch_key": _arch_registry_key(entry),
+                                "k": k,
+                                "seed": seed,
+                                "d_in": d_in,
+                                "d_sae": d_sae,
+                                "total_steps": total_steps,
+                            },
+                        )
+                        artifact.add_file(ckpt_path)
+                        _wandb_run.log_artifact(artifact)
+                    except Exception as e:
+                        print(f"  WARN: wandb artifact upload failed ({e})")
+
                 result = evaluate_model(
                     entry.spec, model, pipeline.eval_hidden, device,
                     true_features=None, global_features=None,
@@ -378,6 +454,16 @@ def run_cached_sweep(
                         f"    {entry.name:20s} | NMSE={result.nmse:.4f} "
                         f"| L0={result.l0:.2f} | {elapsed:.0f}s"
                     )
+
+                # Finalize the W&B run — log terminal eval metrics and close.
+                if _wandb_run is not None:
+                    try:
+                        _wandb_run.summary["nmse"] = result.nmse
+                        _wandb_run.summary["l0"] = result.l0
+                        _wandb_run.summary["elapsed_sec"] = elapsed
+                        _wandb_run.finish()
+                    except Exception as e:
+                        print(f"  WARN: wandb finish failed ({e})")
 
                 del model
                 if torch.cuda.is_available():

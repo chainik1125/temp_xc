@@ -54,3 +54,6 @@ external/
 # Local env / secrets
 .env
 .txc_secrets.env
+
+# Session context dump (regenerated per /clear; never committed)
+.session_context.md

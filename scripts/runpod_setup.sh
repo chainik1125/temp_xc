@@ -38,8 +38,15 @@ export ANTHROPIC_API_KEY=""
 export HF_TOKEN=""
 export HUGGING_FACE_HUB_TOKEN="$HF_TOKEN"
 
-# Weights & Biases (optional — sweep logging)
+# Weights & Biases — experiment tracking + checkpoint artifact registry
+# When WANDB_API_KEY is set, sweep.py logs per-step train loss/L0,
+# checkpoints as W&B Artifacts, and final eval NMSE/L0 to the project
+# below. Leave WANDB_ENTITY blank for a personal project, or set it to
+# your team's entity name (e.g. "spar-temp-xc") for team-visible runs.
 export WANDB_API_KEY=""
+export WANDB_PROJECT="temporal-crosscoders"
+export WANDB_ENTITY=""
+export WANDB_GROUP=""
 
 # HF cache lives on the persistent volume so it survives pod restarts
 export HF_HOME="/workspace/.cache/huggingface"

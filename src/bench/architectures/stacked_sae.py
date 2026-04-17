@@ -104,6 +104,13 @@ class StackedSAESpec(ArchSpec):
                     f"| loss={loss.item():.4f} | window_l0={window_l0:.2f}",
                     flush=True,
                 )
+                try:
+                    import wandb
+                    if wandb.run is not None:
+                        wandb.log({"train/loss": loss.item(),
+                                   "train/window_l0": window_l0}, step=step)
+                except Exception:
+                    pass
 
         model.eval()
         return log
