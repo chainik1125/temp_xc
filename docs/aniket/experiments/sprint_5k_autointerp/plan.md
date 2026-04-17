@@ -8,7 +8,7 @@ tags:
 
 ## Sprint 5k Autointerp Plan — Completed
 
-Next step in the [[sprint_feature_geometry_results|sprint feature geometry
+Next step in the [[experiments/sprint_feature_geometry/summary|sprint feature geometry
 sprint]]: scale autointerp from 30 to ~5000 features per TXCDR checkpoint
 so we can label every major cluster in the step2 DeepSeek+GSM8K feature
 map. The 30-feature run produced the sprint's early plots; 5000 is
@@ -101,4 +101,4 @@ placing this at paper-grade coverage.
 - Step 2 — `scripts/runpod_explain_5k.sh`
 - Step 3 — `scripts/runpod_fmap_5k.sh`
 
-Related: [[sprint_feature_geometry_results]], [[SPRINT_PIPELINE]]
+Related: [[experiments/sprint_feature_geometry/summary|feature-geometry results]], [[SPRINT_PIPELINE]]

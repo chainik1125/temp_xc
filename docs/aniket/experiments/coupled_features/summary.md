@@ -312,4 +312,4 @@ pipeline.global_features  # (hidden_dim, 10) -- hidden features (global)
 - **Leaky reset**: `src/data_generation/transition.py` (`build_leaky_transition_matrix`)
 - **Validation plots**: `src/data_generation/plot_coupled.py`
 - **Results**: `results/coupled_validation/`
-- **Plan doc**: [[coupled_features_plan]]
+- **Plan doc**: [[experiments/coupled_features/plan|coupled-features plan]]

@@ -61,8 +61,8 @@ fidelity scoring is the paper-version TODO).
 #### Step 1: Gemma 2B + FineWeb
 
 **Unshuffled:**
-![Step 1 unshuffled — Gemma 2B + FineWeb](sprint_feature_geometry/feature_map_step1-unshuffled.png)
-[Interactive HTML (hover for feature labels)](../../reports/step1-gemma-replication/feature_map_step1-unshuffled.html)
+![Step 1 unshuffled — Gemma 2B + FineWeb](images/feature_map_step1-unshuffled.png)
+[Interactive HTML (hover for feature labels)](../../../../reports/step1-gemma-replication/feature_map_step1-unshuffled.html)
 
 - Moderately structured connected mass with peripheral islands.
 - Three megaclusters (1, 10, 14, each ~3k features) dominate the core,
@@ -71,8 +71,8 @@ fidelity scoring is the paper-version TODO).
 - PCA explained variance: 7.3% at 50 components.
 
 **Shuffled:**
-![Step 1 shuffled — Gemma 2B + FineWeb](sprint_feature_geometry/feature_map_step1-shuffled.png)
-[Interactive HTML (hover for feature labels)](../../reports/step1-gemma-replication/feature_map_step1-shuffled.html)
+![Step 1 shuffled — Gemma 2B + FineWeb](images/feature_map_step1-shuffled.png)
+[Interactive HTML (hover for feature labels)](../../../../reports/step1-gemma-replication/feature_map_step1-shuffled.html)
 
 - Similar overall shape — connected mass with peripheral islands.
 - Cluster sizes more uniform (largest: 2,917 vs 3,232 unshuffled).
@@ -91,8 +91,8 @@ temporal richness of the data.**
 #### Step 2: DeepSeek-R1-Distill + GSM8K reasoning traces
 
 **Unshuffled:**
-![Step 2 unshuffled — DeepSeek-R1-Distill + GSM8K](sprint_feature_geometry/feature_map_step2-unshuffled.png)
-[Interactive HTML (hover for feature labels)](../../reports/step2-deepseek-reasoning/feature_map_step2-unshuffled.html)
+![Step 2 unshuffled — DeepSeek-R1-Distill + GSM8K](images/feature_map_step2-unshuffled.png)
+[Interactive HTML (hover for feature labels)](../../../../reports/step2-deepseek-reasoning/feature_map_step2-unshuffled.html)
 
 - **Visibly more structured** than Step 1. Clear separated sub-structures.
 - Large dense island on the right (cluster 6, n=4,208) well-separated
@@ -103,8 +103,8 @@ temporal richness of the data.**
 - PCA explained variance: 8.7%.
 
 **Shuffled:**
-![Step 2 shuffled — DeepSeek-R1-Distill + GSM8K](sprint_feature_geometry/feature_map_step2-shuffled.png)
-[Interactive HTML (hover for feature labels)](../../reports/step2-deepseek-reasoning/feature_map_step2-shuffled.html)
+![Step 2 shuffled — DeepSeek-R1-Distill + GSM8K](images/feature_map_step2-shuffled.png)
+[Interactive HTML (hover for feature labels)](../../../../reports/step2-deepseek-reasoning/feature_map_step2-shuffled.html)
 
 - **Noticeably more diffuse.** The large separated island on the right is
   gone.
@@ -215,7 +215,7 @@ same island, the structure is data-driven, not architecture-driven.
    simultaneously. Adding Gemma+Stack (forward mode) isolates the
    data-modality axis within a single model. Pre-registration with
    hypotheses, metrics, and predicted orderings in
-   [[sprint_coding_dataset_plan]].
+   [[experiments/sprint_coding_dataset/plan|coding-dataset plan]].
 
 ### Files
 

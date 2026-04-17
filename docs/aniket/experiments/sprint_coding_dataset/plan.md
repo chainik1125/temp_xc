@@ -9,7 +9,7 @@ tags:
 ## Sprint Coding Dataset Plan — Pre-Registration
 
 Pre-registers the Gemma+Stack-Python cell that extends the current 2-cell
-shuffle-vs-unshuffle sprint ([[sprint_feature_geometry_results]]) to a
+shuffle-vs-unshuffle sprint ([[experiments/sprint_feature_geometry/summary|feature-geometry results]]) to a
 2×3 matrix. Purpose: commit to predictions before results land so
 post-hoc rationalization isn't possible.
 
@@ -145,6 +145,6 @@ no function-spanning emergence.
 
 ## Related
 
-- [[sprint_feature_geometry_results]] — existing 2-cell results (step 1 + step 2)
-- [[sprint_5k_autointerp_plan]] — 5k autointerp scale-up, gated on TopKSAE control
+- [[experiments/sprint_feature_geometry/summary|feature-geometry results]] — existing 2-cell results (step 1 + step 2)
+- [[experiments/sprint_5k_autointerp/plan|5k autointerp plan]] — 5k autointerp scale-up, gated on TopKSAE control
 - [[SPRINT_PIPELINE]] — overall sprint infrastructure
