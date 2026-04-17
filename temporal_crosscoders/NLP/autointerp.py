@@ -164,7 +164,8 @@ class TopKFinder:
                 # stacked_sae and TFA both emit per-token activations (B*nw, T, h)
                 # — mean over T to get one activation per window. Crosscoder
                 # already emits one z per window.
-                if self.model_type in ("stacked_sae", "tfa", "tfa_pos"):
+                if self.model_type in ("stacked_sae", "tfa", "tfa_pos",
+                                       "tfa_pos_pred"):
                     _, _, u = self.model(flat_windows)  # (B*nw, T, h)
                     feat_acts = u.mean(dim=1)  # (B*nw, h)
                 else:
@@ -813,10 +814,14 @@ def load_model(
         model = load_bench_stacked_sae(d_in=d_in, d_sae=d_sae, T=T, k=k)
     elif model_type in ("crosscoder", "txcdr"):
         model = load_bench_crosscoder(d_in=d_in, d_sae=d_sae, T=T, k=k)
-    elif model_type in ("tfa", "tfa_pos"):
+    elif model_type in ("tfa", "tfa_pos", "tfa_pos_pred"):
+        # *_pred variants emit pred_codes as feat_acts instead of novel_codes
+        # so TopKFinder ranks features by attention-predicted mass.
+        feat_source = "pred" if model_type.endswith("_pred") else "novel"
+        use_pos = model_type.startswith("tfa_pos")
         model = BenchTFAAdapter(
             d_in=d_in, d_sae=d_sae, T=T, k=k,
-            use_pos_encoding=(model_type == "tfa_pos"),
+            use_pos_encoding=use_pos, feat_source=feat_source,
         )
     else:
         raise ValueError(f"Unknown model_type: {model_type}")
@@ -824,7 +829,7 @@ def load_model(
     state = torch.load(ckpt_path, map_location="cpu", weights_only=True)
     # TFA sweep checkpoints have the TemporalSAE params at the top level;
     # our adapter wraps TemporalSAE as self._inner, so re-prefix.
-    if model_type in ("tfa", "tfa_pos"):
+    if model_type.startswith("tfa"):
         state = {f"_inner.{key}": val for key, val in state.items()}
     model.load_state_dict(state)
     model.eval()

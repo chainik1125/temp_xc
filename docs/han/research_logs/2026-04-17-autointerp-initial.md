@@ -107,27 +107,122 @@ once in each of many different documents.
 - No LLM explainer yet — the "document-initial", "botanical", "URL-fragment"
   labels above are my inspection of a handful of examples, not validated.
 
+## Follow-up: pred vs novel decomposition for TFA (analysis 1)
+
+The "TFA is passage-local" claim above **was a novel_codes artifact**. TFA
+splits its latents into two essentially disjoint subsets:
+
+- **Novel** (sparse, topk=50 per token): detects local passage-specific
+  phenomena, activations of order 0.03 (scaled down by `lam=1/(4·d_in)`).
+- **Pred** (semi-dense, ~3619 nonzero of 18432 per token): carries
+  attention-predicted context, activations 1–4× larger per entry and
+  contributing ~6× more to reconstruction (`||D·pred||` median 174 vs
+  `||D·novel||` median 29 per window).
+
+Top-50 features by pred_mass vs top-50 by novel_mass have **zero overlap**.
+TFA has learned two separate feature libraries.
+
+Re-running the scan with TopKFinder ranking by pred_codes instead of
+novel_codes (new `tfa_pos_pred` model type) gives:
+
+| metric | tfa_pos (novel) | tfa_pos_pred | stacked_sae | crosscoder |
+|---|---:|---:|---:|---:|
+| active feats / 18432 | 15,664 | 7,796 | 15,932 | 2,970 |
+| med chain-diversity of top-10 | **1** | **10** | 10 | 10 |
+| all-10-from-same-chain features (of 100) | **55** | **0** | 0 | 19 |
+
+**TFA pred features are document-general** — indistinguishable from
+stacked_sae or crosscoder on the chain-diversity metric. TFA's passage-
+locality is entirely in the novel_codes path; pred_codes generalize
+normally.
+
+## Follow-up: temporal spread per feature (analysis 2)
+
+Per-feature concentration score = mean over exemplars of
+`max_position_activation / sum_position_activation`. Value 1 = fully
+localized at one of the T=5 positions; 1/T=0.2 = uniform spread.
+
+| arch | median conc | localized (>0.5) / spread (<0.3) of 300 | peak position counts |
+|---|---:|---:|---|
+| stacked_sae | 1.000 | **300 / 0** | {0: 90, 1: 58, 2: 48, 3: 50, 4: 54} — uniform across positions |
+| **tfa_pos (novel)** | **0.244** | **0 / 286** | spread evenly |
+| tfa_pos_pred | 0.997 | 300 / 0 | **{0: 257, 4: 43}** — only boundaries |
+
+- Stacked is *trivially* position-localized (each position has its own
+  independent SAE; the feature at position t has no well-defined
+  activation at position t′≠t). Peak distribution is flat because each
+  position's SAE has its own feature library.
+- **TFA novel is the only arch where features genuinely span the window.**
+  95% of features have concentration near 1/T — fires on multiple
+  positions per window. Consistent with the novel codes detecting
+  multi-token substrings (URLs, CamelCase blobs) where every position in
+  the window is inside the same pattern.
+- TFA pred peaks at the causal-attention boundaries: position 0 (where
+  context is just the zero vector so pred ≈ bias_v constant) and
+  position 4 (full context available). Middle positions 1–3 get no
+  concentration mass.
+
+## Follow-up: cross-arch feature matching (analysis 3)
+
+Best-match cosine similarity between decoder directions. Using
+per-position decoders at position 0 (TFA's D is position-shared):
+
+| pair | median best-sim | features sim>0.7 | features sim>0.5 |
+|---|---:|---:|---:|
+| stacked[0] ↔ crosscoder[0] | 0.11 | **340 / 18432** | 1018 |
+| stacked[0] ↔ tfa | 0.08 | **0** | **0** |
+| crosscoder[0] ↔ tfa | 0.08 | **0** | **0** |
+| control: stacked[0] ↔ stacked[1] | 0.12 | 2377 | 3991 |
+| control: crosscoder[0] ↔ crosscoder[1] | 0.21 | 1630 | 2698 |
+
+- **Stacked and Crosscoder share a small aligned core**: 340/18432
+  features match with cosine > 0.7 at position 0. Max alignment 0.964.
+  Enough that cross-arch feature correspondence is real but sparse (~2%).
+- **TFA is decoder-disjoint from both** (zero features above 0.5 in
+  either direction). TFA's D lives on a genuinely different basis —
+  consistent with the "TFA uses two independent libraries" finding
+  above and with the attention-driven forward pass producing outputs
+  that don't align with linear-encoder SAEs.
+- Within-arch: even at position 0 vs 1 inside one arch, only ~2400/18432
+  features match strongly. Real per-position specialization exists
+  inside stacked and crosscoder too.
+
+## Unified picture
+
+Three architectures, three distinct feature-discovery profiles:
+
+| property | stacked_sae | crosscoder | tfa_pos |
+|---|---|---|---|
+| Latent capacity used | 86% | 16% (tight core) | 85% novel + 42% pred (disjoint) |
+| Per-position behavior | Independent per-position SAEs | Shared latent, position-weighted decode | Shared decoder; novel spreads across pos, pred peaks at boundaries |
+| Feature locality | Document-general | Document-general | Novel: **passage-local**. Pred: document-general. |
+| Decoder alignment with others | ~340 shared with crosscoder at pos 0 | ~340 shared with stacked at pos 0 | **Disjoint from both** |
+| Where "temporal features" (spread across positions) live | Impossible by construction | Not per-position observable; single z per window | Novel codes (unique among archs) |
+
+TFA's novel codes are the **only features in the sweep that span multiple
+token positions within a single window**. They detect specific multi-
+token phenomena (URLs, codes, camelcase) that stacked/crosscoder handle
+via separate per-position features. This is the value-add TFA provides
+to the feature library — even with its weaker reconstruction (NMSE 0.12
+vs stacked 0.06, crosscoder 0.08), it surfaces multi-token structure
+the others don't.
+
 ## Next steps
 
-1. **pred vs novel decomposition for TFA** — for each feature, what fraction
-   of total activation mass comes from pred vs novel across the top-K
-   exemplars? Features where pred dominates should generalize across
-   documents; novel-only features should stay passage-local. If that
-   hypothesis holds, the "TFA is passage-local" result above is a
-   novel_codes artifact, not a TFA-the-arch property.
-2. **Temporal spread per feature** — how concentrated is each feature's
-   activation on one position within the T=5 window vs spread across
-   positions? This is the "is this a temporal feature" metric; requires
-   the per-position codes, not the mean-over-T that TopKFinder currently
-   stores.
-3. **Feature matching across archs** — are there 1-1 correspondences between
-   Stacked / Crosscoder / TFA features via decoder cosine similarity? Which
-   Stacked features have no Crosscoder/TFA match, and vice versa?
-4. **LLM explainer** — once 1-3 are in place, run gemma-2-2b-it or Claude
-   on the top-K windows to get natural-language labels for each feature.
-5. **Second layer (resid_L13)** — train one more sweep invocation (unshuffled
-   only, ~8h) to get a shallower-layer comparison. Probably different
-   feature types (more syntactic) vs L25 (more semantic).
+1. **LLM explainer** — run Claude on top-K windows for each arch's top
+   features to get natural-language labels, enabling semantic cross-arch
+   comparison on top of the structural findings above.
+2. **Second layer (resid_L13)** — rerun the sweep invocation 3 (unshuffled
+   L13, ~8h), then repeat analyses 1–3 on a shallower layer. Probably
+   different feature types (more syntactic vs L25's more semantic).
+3. **Generalize TFA pred-analysis** — apply the same novel/pred split to
+   TFA without positional encoding (`tfa`), and on shuffled-training
+   checkpoints to confirm pred's generalization advantage is
+   architectural not data-dependent.
+4. **Reliability of TFA novel codes** — given TFA's weaker NMSE and
+   the fragile training dynamics (NaN risks fixed by `proj_scale.clamp`
+   + grad-finiteness check), check whether the passage-local novel
+   features survive a longer-training or smaller-LR re-train.
 
 ## Files
 

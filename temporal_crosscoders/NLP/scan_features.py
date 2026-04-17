@@ -43,10 +43,13 @@ log = logging.getLogger("scan_features")
 
 def _ckpt_path(ckpt_dir: str, arch: str, subject: str, dataset: str,
                layer: str, k: int, seed: int, shuffled: bool) -> str:
+    # tfa_pos_pred is a load-time variant of tfa_pos that emits pred_codes
+    # instead of novel_codes; the underlying checkpoint is the same file.
+    ckpt_arch = "tfa_pos" if arch == "tfa_pos_pred" else arch
     tag = "_shuffled" if shuffled else ""
     return os.path.join(
         ckpt_dir,
-        f"{arch}__{subject}__{dataset}__{layer}__k{k}__seed{seed}{tag}.pt",
+        f"{ckpt_arch}__{subject}__{dataset}__{layer}__k{k}__seed{seed}{tag}.pt",
     )
 
 
@@ -134,7 +137,8 @@ def scan_one(
 def main():
     p = argparse.ArgumentParser()
     p.add_argument("--arches", nargs="+", required=True,
-                   choices=["stacked_sae", "crosscoder", "tfa", "tfa_pos"])
+                   choices=["stacked_sae", "crosscoder", "tfa", "tfa_pos",
+                            "tfa_pos_pred"])
     p.add_argument("--subject-model", default="gemma-2-2b-it")
     p.add_argument("--cached-dataset", default="fineweb")
     p.add_argument("--layer-key", default="resid_L25")

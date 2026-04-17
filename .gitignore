@@ -36,3 +36,7 @@ Thumbs.db
 .vscode/*
 !.vscode/extensions.json
 .idea/
+
+# API keys (never commit)
+.anthropic-key
+*.apikey

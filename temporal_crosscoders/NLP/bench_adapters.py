@@ -65,7 +65,9 @@ class BenchTFAAdapter(nn.Module):
         n_attn_layers: int = 1,
         bottleneck_factor: int = 8,
         keep_pred_novel: bool = False,
+        feat_source: str = "novel",
     ):
+        assert feat_source in ("novel", "pred", "sum"), feat_source
         super().__init__()
         from src.bench.architectures._tfa_module import TemporalSAE
         self._inner = TemporalSAE(
@@ -85,6 +87,7 @@ class BenchTFAAdapter(nn.Module):
         self.k = k
         self._scaling_factor: float | None = None
         self.keep_pred_novel = keep_pred_novel
+        self.feat_source = feat_source
         self.last_novel: torch.Tensor | None = None
         self.last_pred: torch.Tensor | None = None
 
@@ -105,6 +108,11 @@ class BenchTFAAdapter(nn.Module):
         if self.keep_pred_novel:
             self.last_novel = novel.detach()
             self.last_pred = pred.detach()
-        feat_acts = novel  # sparse signal only — see module docstring
+        if self.feat_source == "novel":
+            feat_acts = novel
+        elif self.feat_source == "pred":
+            feat_acts = pred
+        else:  # "sum"
+            feat_acts = novel + pred
         loss = (x_recons - x_scaled).pow(2).sum(dim=-1).mean()
         return loss, x_recons, feat_acts
