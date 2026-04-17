@@ -1,9 +1,9 @@
 ---
-author: aniket
+author: Aniket
 date: 2026-04-16
 tags:
   - results
-  - in-progress
+  - complete
 ---
 
 ## Sprint Feature Geometry Results — Temporal Crosscoder Decoder Clustering
@@ -25,7 +25,7 @@ or is it an architectural artifact of the shared-latent window?
 
 | | unshuffled (natural order) | shuffled (temporal order destroyed) |
 |---|---|---|
-| **Gemma 2B + FineWeb** (web text) | replication of [[nlp_feature_map\|Andre's feature map result]] | temporal control |
+| **Gemma 2B + FineWeb** (web text) | replication of Andre's FineWeb feature-map result | temporal control |
 | **DeepSeek-R1-Distill-8B + GSM8K** (reasoning traces) | extension to thinking model | temporal control |
 
 **Architecture:** TXCDRv2 (crosscoder) with k=100, T=5 window, 8x

@@ -150,7 +150,12 @@ def _load_text_stream(
                 split="train",
                 streaming=True,
             )
-            _first = next(iter(ds))  # force one sample to surface auth errors early
+            # Probe one sample so a 401 / license-not-accepted surfaces
+            # here (loud, immediate) rather than silently yielding zero
+            # matches from a huge stream. We re-load the dataset below
+            # because a streaming iterator is single-pass — calling
+            # next() on it consumes the first sample.
+            _first = next(iter(ds))
             ds = load_dataset(
                 "bigcode/starcoderdata",
                 data_dir="python",

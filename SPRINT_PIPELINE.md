@@ -217,6 +217,8 @@ python scripts/aggregate_results.py --root results/nlp --out reports/day1-gsm8k
 
 Those are Aniket's RunPod-specific wrappers for the common flows (setup, verify GPU, cache activations, sweep, autointerp scan/explain/fmap, backfill metrics, delphi labeling). Portable by design — they just run the same Python commands as sections 1–3 of this cheat sheet, with `uv`-managed env activation and sensible defaults. Read one if you want a template for your own pod.
 
+`scripts/runpod_delphi_label.sh` is the SOTA-labeling entry point: wraps `temporal_crosscoders/NLP/delphi_adapter.py` (adapter that feeds our cached activations into EleutherAI's `delphi` pipeline) and renders paper-grade labels. Use it for the final paper run; the Haiku-only autointerp pipeline in `scripts/runpod_scan_5k.sh` / `runpod_explain_5k.sh` / `runpod_fmap_5k.sh` is the sprint-grade fallback.
+
 ## 6. Adding things
 
 ### Add a new subject model

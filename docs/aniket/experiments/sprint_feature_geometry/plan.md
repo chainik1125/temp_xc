@@ -70,10 +70,27 @@ for the paper-grade labeling pass that follows.
 Under the hypothesis "temporal sensitivity scales with the temporal
 richness of the data":
 
-- FineWeb at seq_len=32: weak shuffle effect (natural language has
-  local structure, but short windows limit it).
-- GSM8K reasoning traces at seq_len=1024: strong shuffle effect
-  (multi-step reasoning is highly temporal).
+| metric (direction of Δ = unshuf − shuf) | Gemma + FineWeb | DeepSeek + GSM8K |
+|---|---|---|
+| cluster separation (visual, silhouette) | small | large |
+| dominant-cluster entropy drop | small | large |
+| mean auto-MI across lags | ≈ 0 | clearly positive |
+
+Rationale: FineWeb at `seq_len=32` has weak local temporal structure
+(natural language, but only T=5 windows visible), so TXCDR's shared-z
+inductive bias has little to latch onto. GSM8K reasoning traces at
+`seq_len=1024` are highly temporal (multi-step arithmetic, backtracking,
+case analysis), so shuffling should break coherent features visibly.
+
+## Andre-replication criterion
+
+This experiment *replicates* Andre's Gemma+FineWeb feature-map run
+(`docs/andre/nlp_feature_map.md`) as its unshuffled step1 cell. We
+count replication as successful if **at least 2 of the top 3 cluster
+themes** from Andre's 20-cluster KMeans labels appear in our cluster
+summaries with matching dominant concepts (e.g., "event/time",
+"product/brand", "location"). Cluster counts and sizes may differ
+since our clustering re-runs with a fresh UMAP seed.
 
 ## Follow-ups
 

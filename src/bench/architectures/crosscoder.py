@@ -204,8 +204,13 @@ class CrosscoderSpec(ArchSpec):
 
         # Zero-check: IEEE 754 guarantees 0.0 * x == 0.0 for finite x,
         # so masked-out features are exactly zero (not float noise).
-        # Cheap assertion that fires if some future refactor breaks this.
-        assert z_per_pos[mask.unsqueeze(1).expand_as(z_per_pos) == 0].abs().max() == 0.0, \
-            "crosscoder encode: masked features not exactly zero"
+        # The check materializes a B×T×d_sae boolean tensor, which for
+        # B=1024, T=5, d_sae=18432 is ~94M booleans — fine but not free.
+        # Run by default; set CROSSCODER_SKIP_MASK_CHECK=1 to skip when
+        # encode() is in a hot path (e.g. large-batch metric backfills).
+        import os as _os
+        if _os.environ.get("CROSSCODER_SKIP_MASK_CHECK") != "1":
+            assert z_per_pos[mask.unsqueeze(1).expand_as(z_per_pos) == 0].abs().max() == 0.0, \
+                "crosscoder encode: masked features not exactly zero"
 
         return z_per_pos

@@ -316,8 +316,10 @@ class AnthropicClient:
         self.n_errors = 0
 
     async def generate(self, prompt: str, **kwargs) -> str:
-        """Single-turn generation. Accepts `system`, `max_tokens`,
-        `temperature` in kwargs, matching delphi's conventions.
+        """Async single-turn generation. Accepts `system`, `max_tokens`,
+        `temperature` in kwargs, matching delphi's conventions. Uses
+        the module-level asyncio semaphore for concurrency control and
+        retries transient errors with exponential backoff.
         """
         import asyncio
         import random

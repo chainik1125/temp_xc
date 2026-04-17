@@ -215,6 +215,16 @@ def label_clusters_with_gemma(
     )
     llm.eval()
 
+    # Gemma-2 defaults to a static-KV-cache generation path that triggers
+    # torch.compile → inductor → triton. Environments without triton
+    # (e.g. some Compute Canada venvs) crash here. Force the dynamic
+    # eager path via cache_implementation=None, and suppress any
+    # remaining dynamo compile errors as a belt-and-suspenders fallback.
+    import torch._dynamo
+    torch._dynamo.config.suppress_errors = True
+    if hasattr(llm, "generation_config") and llm.generation_config is not None:
+        llm.generation_config.cache_implementation = None
+
     labels: dict[int, str] = {}
     for cid in tqdm(sorted(by_cluster), desc="Labeling clusters"):
         feats = by_cluster[cid]

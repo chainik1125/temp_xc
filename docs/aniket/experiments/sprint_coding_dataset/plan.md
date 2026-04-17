@@ -136,6 +136,15 @@ Under H3, Stack clusters look like FineWeb clusters in *character* even
 though the tokens are different — mostly single-token semantic features,
 no function-spanning emergence.
 
+## Seed variance
+
+All runs use a single seed (`seed=42`). UMAP, KMeans, and TopK-training
+are seed-dependent, so the three metrics above have unquantified
+seed-variance. **Commitment:** before treating any single-number Δ as
+evidence, we re-run one condition (step2-unshuffled, TXCDR) at 3 seeds
+and report the per-metric seed-stddev. Any observed Δ must exceed ~2×
+that stddev to count as signal.
+
 ## Ugly-case planning
 
 - **Stack > GSM8K on shuffle sensitivity.** Possible: Python's positional semantics are brutal (bracket matching, scope via indentation, variable binding). Story shifts from "reasoning is specially temporal" to "structured modalities generally produce temporal features" — arguably a stronger claim for NeurIPS, but the ICML workshop framing (reasoning-focused) would need to adjust.

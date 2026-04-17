@@ -32,6 +32,13 @@ PNGs in `reports/sae-control-deepseek/`:
 - *TopKSAE also shows the isolated island* → claim collapses. **Do not
   spend the ~\$80.** Structure is data-driven; revise the writeup.
 
+Quantitative backstop: once
+[[experiments/sprint_coding_dataset/plan|the backfill metrics]] land,
+prefer a numeric threshold — *claim holds if silhouette(TXCDR) −
+silhouette(TopKSAE) > 0.05 on DeepSeek+GSM8K at the same 20-cluster
+KMeans*. The visual-diffuseness rule above is the quick-look fallback
+when the quantitative numbers aren't ready yet.
+
 ## 5k autointerp — three commands
 
 All three are bash-only wrappers. Run in order.
