@@ -207,11 +207,108 @@ to the feature library — even with its weaker reconstruction (NMSE 0.12
 vs stacked 0.06, crosscoder 0.08), it surfaces multi-token structure
 the others don't.
 
-## Next steps
+## Follow-up: LLM explainer (analysis 4)
 
-1. **LLM explainer** — run Claude on top-K windows for each arch's top
-   features to get natural-language labels, enabling semantic cross-arch
-   comparison on top of the structural findings above.
+Top 50 features per arch × top 10 activating windows each, labeled by
+`claude-haiku-4-5-20251001` via `explain_features.py`. Prompt: "identify
+the single pattern these windows share in one short sentence; say
+'unclear' if the windows look unrelated".
+
+### Label success rate
+
+| arch | labeled | unclear | error (post-retry) |
+|---|---:|---:|---:|
+| stacked_sae | 50 | 0 | 0 |
+| crosscoder | 45 | 5 | 0 |
+| **tfa_pos (novel)** | **11** | **39 (78%)** | 0 |
+| tfa_pos_pred | 41 | 9 | 0 |
+
+TFA novel features are mostly unlabelable by the LLM — consistent with
+their top-10 exemplars all coming from one passage (analysis 1 chain-
+diversity result): you can't identify a "pattern" from 10 overlapping
+slides of the same URL fragment.
+
+### Coarse semantic categories (keyword-tagged, features can match multiple)
+
+| category | stacked | crosscoder | tfa_pos | tfa_pos_pred |
+|---|---:|---:|---:|---:|
+| document_start | 27 | 14 | **1** | **39** |
+| proper_noun_or_name | 23 | 12 | 4 | 23 |
+| section_transition | 17 | 11 | 0 | 13 |
+| punctuation_delim | 6 | 8 | 1 | 10 |
+| url_or_code | 6 | 5 | 5 | 3 |
+| date_or_time | 2 | 2 | 1 | 2 |
+| promotional | 5 | 0 | 0 | 1 |
+| domain_specific | 0 | 2 | 2 | 0 |
+| unclear_or_noisy | 0 | 6 | **39** | 9 |
+
+**TFA pred's category profile closely tracks stacked_sae's** (document-
+start, proper-noun, section-transition). Crosscoder is in the middle,
+shifted slightly toward domain-specific content (botanical, Intel
+processor specs). TFA novel is an outlier — dominated by "unclear".
+
+### The 11 labeled TFA novel features — what they actually detect
+
+The ones that *did* get a coherent label are all tokenizer-boundary
+phenomena:
+
+- feat 72: "Document classification codes or hierarchical identifier
+  sequences (USDOC/ITA/OEENIS/NISD/CLUCYK format)"
+- feat 4406: "Forward slashes separating alphanumeric classification or
+  document code components"
+- feat 6333: "URL path separators and domain/path boundary characters"
+- feat 7089: "camelCase compound words or names being split or joined
+  mid-token"
+- feat 16356: "URLs and domain names being split across token
+  boundaries"
+- feat 17979: "Phrases or words being split across morpheme or word
+  boundaries during tokenization"
+- feat 13133: "item or product identifiers and catalog numbers embedded
+  in text"
+- feat 15232: "Numeric sequences or digit strings"
+- plus feat 72, 11071, 2198, 7720 around specific naming conventions
+
+**TFA's novel codes specialize in tokenization-boundary oddities.** This
+is a qualitatively different feature type from what stacked/crosscoder
+learn. The other archs detect *content* (proper nouns, dates, topics);
+TFA novel detects *tokenization structure* (where BPE split a word,
+where a URL slash appears, where a CamelCase boundary is). The causal
+attention gives TFA novel access to the per-token context it needs to
+notice these local anomalies.
+
+The "unclear" 39 features are most likely the same kind of thing —
+more specific sub-cases of token-boundary oddities that don't
+generalize enough across 10 exemplars for the LLM to abstract.
+
+## Synthesis
+
+The four analyses together paint a consistent picture:
+
+1. **stacked_sae** and **crosscoder** learn largely overlapping feature
+   libraries detecting high-level content: sequence starts, named
+   entities, topic transitions. Their decoders share ~340 features at
+   position 0 with cosine > 0.7. Semantic categories match.
+2. **TFA-pos** learns a **two-library system** with no analog in the
+   other archs:
+   - *pred_codes* (semi-dense, attention-driven): behaves like an
+     extra stacked/crosscoder library — same semantic categories,
+     same document-general pattern — just driven by attention rather
+     than a per-token linear encoder.
+   - *novel_codes* (sparse, topk=50): unique to TFA. Spreads across
+     all T positions of the window (the only place "temporal
+     features" genuinely exist in this sweep). Specializes in
+     tokenization-boundary anomalies. Passage-local because these
+     anomalies are specific to particular strings. Decoder basis
+     orthogonal to the other archs.
+
+**The research-question answer**: TFA does find feature types the other
+archs miss — but it's not the features we expected. The conjecture was
+that temporal architectures would exploit cross-token semantics. What
+TFA actually captures is cross-token *tokenization structure* — a
+different kind of temporal pattern, useful for a different reason
+(robustness to subword tokenization artifacts).
+
+## Next steps
 2. **Second layer (resid_L13)** — rerun the sweep invocation 3 (unshuffled
    L13, ~8h), then repeat analyses 1–3 on a shallower layer. Probably
    different feature types (more syntactic vs L25's more semantic).

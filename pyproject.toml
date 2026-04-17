@@ -16,6 +16,7 @@ dependencies = [
     "scipy",
     "scikit-learn",
     "numpy",
+    "anthropic",
 ]
 
 [dependency-groups]
