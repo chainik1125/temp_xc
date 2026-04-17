@@ -160,8 +160,11 @@ class TopKFinder:
                 # Flatten to (B*n_windows, T, d)
                 flat_windows = windows.reshape(B * n_windows, T, chains.shape[-1])
 
-                # One batched forward pass
-                if self.model_type == "stacked_sae":
+                # One batched forward pass.
+                # stacked_sae and TFA both emit per-token activations (B*nw, T, h)
+                # — mean over T to get one activation per window. Crosscoder
+                # already emits one z per window.
+                if self.model_type in ("stacked_sae", "tfa", "tfa_pos"):
                     _, _, u = self.model(flat_windows)  # (B*nw, T, h)
                     feat_acts = u.mean(dim=1)  # (B*nw, h)
                 else:
@@ -360,7 +363,7 @@ class LocalGemmaBackend:
 
     def __init__(
         self,
-        model_name: str = MODEL_NAME,
+        model_name: str = AUTOINTERP_MODEL,
         max_tokens: int = 256,
         device: str = "cuda",
     ):
@@ -747,7 +750,7 @@ class AutoInterpPipeline:
 
         # Stage 2: Load text context
         log.info("[Stage 2] Loading text context (gemma-2-2b-it tokenizer)...")
-        text_ctx = TextContext(self.cache_dir, MODEL_NAME)
+        text_ctx = TextContext(self.cache_dir, self._subject_model)
 
         # Stage 3: Explain + Score
         log.info("[Stage 3] Running explanation + detection scoring...")
@@ -789,21 +792,40 @@ def load_model(
     T: int,
     expansion_factor: int = 8,
 ) -> torch.nn.Module:
-    """Load a trained SAE/crosscoder checkpoint.
+    """Load a trained SAE/crosscoder/TFA checkpoint.
 
-    Subject model routes through the registry to resolve d_in;
-    d_sae = d_in * expansion_factor.
+    Routes to the training-time classes in src/bench/architectures so
+    checkpoints saved by src.bench.sweep load without remapping. Subject
+    model routes through the registry to resolve d_in; d_sae = d_in *
+    expansion_factor.
     """
+    from temporal_crosscoders.NLP.bench_adapters import (
+        BenchTFAAdapter,
+        load_bench_crosscoder,
+        load_bench_stacked_sae,
+    )
+
     cfg = get_model_config(subject_model)
     d_in = cfg.d_model
     d_sae = d_in * expansion_factor
 
     if model_type == "stacked_sae":
-        model = FastStackedSAE(d_in=d_in, d_sae=d_sae, T=T, k=k)
+        model = load_bench_stacked_sae(d_in=d_in, d_sae=d_sae, T=T, k=k)
+    elif model_type in ("crosscoder", "txcdr"):
+        model = load_bench_crosscoder(d_in=d_in, d_sae=d_sae, T=T, k=k)
+    elif model_type in ("tfa", "tfa_pos"):
+        model = BenchTFAAdapter(
+            d_in=d_in, d_sae=d_sae, T=T, k=k,
+            use_pos_encoding=(model_type == "tfa_pos"),
+        )
     else:
-        model = FastTemporalCrosscoder(d_in=d_in, d_sae=d_sae, T=T, k=k)
+        raise ValueError(f"Unknown model_type: {model_type}")
 
     state = torch.load(ckpt_path, map_location="cpu", weights_only=True)
+    # TFA sweep checkpoints have the TemporalSAE params at the top level;
+    # our adapter wraps TemporalSAE as self._inner, so re-prefix.
+    if model_type in ("tfa", "tfa_pos"):
+        state = {f"_inner.{key}": val for key, val in state.items()}
     model.load_state_dict(state)
     model.eval()
     return model
@@ -818,7 +840,8 @@ def main():
     parser.add_argument("--checkpoint", type=str, required=True,
                         help="Path to a trained .pt checkpoint")
     parser.add_argument("--model", type=str, default="crosscoder",
-                        choices=["topk_sae", "stacked_sae", "crosscoder", "txcdr"])
+                        choices=["topk_sae", "stacked_sae", "crosscoder", "txcdr",
+                                 "tfa", "tfa_pos"])
     parser.add_argument("--subject-model", type=str, required=True,
                         choices=list_models(),
                         help="Subject LM the checkpoint was trained on")
