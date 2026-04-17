@@ -25,6 +25,12 @@ fi
 
 export PATH="$HOME/.local/bin:$PATH"
 
+# Put the repo root on Python's import path so `from src.bench...` and
+# `from temporal_crosscoders.NLP...` work regardless of cwd or how the
+# script is invoked. Trillium's env did this implicitly via a venv
+# activate.d hook; RunPod doesn't get that for free.
+export PYTHONPATH="$REPO_ROOT${PYTHONPATH:+:$PYTHONPATH}"
+
 # tqdm progress bars work better when stderr isn't buffered
 export PYTHONUNBUFFERED=1
 
