@@ -118,6 +118,11 @@ class CrosscoderSpec(ArchSpec):
                     window_l0 = (z > 0).float().sum(dim=-1).mean().item()
                 log["loss"].append(loss.item())
                 log["l0"].append(window_l0)
+                print(
+                    f"      [{self.name}] step {step:5d}/{total_steps} "
+                    f"| loss={loss.item():.4f} | window_l0={window_l0:.2f}",
+                    flush=True,
+                )
 
         model.eval()
         return log
