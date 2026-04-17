@@ -494,7 +494,9 @@ def build_multi_layer_activations_pipeline(
 
     max_eval = max(1, N // 5)
     n_eval = min(config.eval_n_seq, max_eval)
-    eval_hidden = full[-n_eval:, :, n_layers // 2, :].to(device)  # anchor-layer eval
+    # Keep all layers so MLC eval receives (B, n_layers, d_model) samples.
+    # _eval_multi_layer in eval.py flat-samples across (n_eval * seq_len).
+    eval_hidden = full[-n_eval:].to(device)  # (n_eval, seq_len, n_layers, d_model)
     train_pool = full[:-n_eval]
     train_N = train_pool.shape[0]
     train_NT = train_N * seq_len

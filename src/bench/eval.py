@@ -122,6 +122,8 @@ def evaluate_model(
         _eval_seq(spec, model, eval_data, device, acc)
     elif spec.data_format == "window":
         _eval_window(spec, model, eval_data, device, acc, seq_len)
+    elif spec.data_format == "multi_layer":
+        _eval_multi_layer(spec, model, eval_data, device, acc)
     else:
         raise ValueError(f"Unknown data_format: {spec.data_format}")
 
@@ -186,7 +188,13 @@ def evaluate_model(
 
 
 def _want_temporal_metrics(spec: ArchSpec, eval_data: torch.Tensor) -> bool:
-    """Only compute temporal metrics on real-LM data (3D and no ground truth)."""
+    """Only compute temporal metrics on real-LM data (3D and no ground truth).
+
+    Skip for MLC: its "T" axis is layers, not time, so temporal-MI /
+    span-correlation / cluster metrics don't apply.
+    """
+    if spec.data_format == "multi_layer":
+        return False
     return eval_data.dim() == 3 and eval_data.shape[1] > 1
 
 
@@ -280,3 +288,20 @@ def _eval_window(spec, model, eval_data, device, acc, seq_len):
             acc.sum_signal += out.sum_signal
             acc.sum_l0 += out.sum_l0
             acc.n_tokens += out.n_tokens
+
+
+def _eval_multi_layer(spec, model, eval_data, device, acc):
+    """MLC eval: flat-sample tokens across (n_eval * seq_len) and feed
+    (B, n_layers, d_model) chunks through the layer-axis crosscoder.
+
+    eval_data shape: (n_eval, seq_len, n_layers, d_model).
+    """
+    n_seq, seq_len, n_layers, d_model = eval_data.shape
+    flat = eval_data.reshape(n_seq * seq_len, n_layers, d_model)
+    for s in range(0, flat.shape[0], 1024):
+        x = flat[s : s + 1024].to(device)
+        out = spec.eval_forward(model, x)
+        acc.sum_se += out.sum_se
+        acc.sum_signal += out.sum_signal
+        acc.sum_l0 += out.sum_l0
+        acc.n_tokens += out.n_tokens
