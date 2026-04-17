@@ -33,8 +33,13 @@ echo "=== fetching Trillium results → $(pwd) ==="
 echo ""
 
 # ─── reports/ — labeled feature maps, autointerp JSONs, gate plots ──────
+# NOTE: no --delete-after. Local reports/step3-gemma-stack/ (from the
+# pod's stack-python sweep) doesn't exist on Trillium and must not be
+# wiped. rsync still overwrites files that exist on both sides when the
+# remote mtime is newer — so replacing old unlabeled plots with freshly
+# labeled ones from the gemma-2-2b-it cluster-summary pass works fine.
 echo ">> reports/ (feature maps + autointerp)"
-rsync -avzP --delete-after \
+rsync -avzP \
     --exclude='*.tmp' \
     "${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_BASE}/reports/" \
     reports/
