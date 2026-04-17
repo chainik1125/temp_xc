@@ -212,10 +212,25 @@ def _encode_for_metrics(
             feats = spec.encode(model, x)
     except NotImplementedError:
         return None
-    assert feats.dim() == 3, (
-        f"{type(spec).__name__}.encode returned shape {tuple(feats.shape)}, "
-        f"expected (B, T, d_sae)"
-    )
+    except Exception as e:
+        # Don't crash the sweep on metric-computation failures. The
+        # checkpoint is already saved (sweep.py saves before eval); the
+        # metric JSON just gets None for temporal fields on this arch.
+        # Backfill via scripts/compute_temporal_metrics.py offline.
+        print(
+            f"  WARN: {type(spec).__name__}.encode failed "
+            f"({type(e).__name__}: {e}); skipping temporal metrics",
+            flush=True,
+        )
+        return None
+    if feats.dim() != 3:
+        print(
+            f"  WARN: {type(spec).__name__}.encode returned shape "
+            f"{tuple(feats.shape)}, expected (B, T, d_sae); "
+            f"skipping temporal metrics",
+            flush=True,
+        )
+        return None
     return feats.detach().float().cpu()
 
 

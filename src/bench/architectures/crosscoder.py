@@ -141,8 +141,15 @@ class CrosscoderSpec(ArchSpec):
         return model.decoder_directions_at(pos)
 
     def encode(self, model, x):
-        """(B, T, d_in) → (B, T, d_sae): per-position contributions with
-        shared-z TopK mask applied.
+        """(B, L, d_in) → (B, L_out, d_sae): per-position contributions
+        with shared-z TopK mask applied.
+
+        If L == T: returns shape (B, T, d_sae), one encode on a single
+        length-T window.
+        If L > T: slides length-T windows over the sequence (stride 1),
+        encodes each, and returns the centre-position activation per
+        window, shape (B, L-T+1, d_sae). This is the path the sweep's
+        temporal metrics take when eval_data has full seq_len=256.
 
         *Not* the native shared-z `(B, h)` output — that output is a
         sum-over-T before TopK, so it is permutation-invariant under
@@ -154,6 +161,26 @@ class CrosscoderSpec(ArchSpec):
         feature. See `docs/aniket/sprint_coding_dataset_plan.md`
         § Encode contract.
         """
+        B, L, d = x.shape
+        T = model.T
+        if L < T:
+            raise ValueError(
+                f"crosscoder encode: seq_len {L} < T {T}, cannot form a window"
+            )
+
+        if L == T:
+            return self._encode_window(model, x)
+
+        # L > T: slide windows, return per-window centre activations
+        n_windows = L - T + 1
+        windows = x.unfold(1, T, 1).permute(0, 1, 3, 2).contiguous()  # (B, n_windows, T, d)
+        flat = windows.reshape(B * n_windows, T, d)
+        z = self._encode_window(model, flat)  # (B*n_windows, T, d_sae)
+        centre = T // 2
+        return z[:, centre, :].reshape(B, n_windows, -1)
+
+    def _encode_window(self, model, x):
+        """Encode a single length-T window batch: (B, T, d_in) → (B, T, d_sae)."""
         B, T, d = x.shape
         pre_per_pos = torch.einsum("btd,tds->bts", x, model.W_enc)  # (B, T, d_sae)
         if model.k is None:

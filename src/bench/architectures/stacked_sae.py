@@ -122,6 +122,35 @@ class StackedSAESpec(ArchSpec):
         return model.decoder_directions_at(pos)
 
     def encode(self, model, x):
-        """(B, T, d_in) → (B, T, d_sae) via per-position encoders."""
-        zs = [model.saes[t].encode(x[:, t, :]) for t in range(self.T)]
+        """(B, L, d_in) → (B, L_out, d_sae) via per-position encoders.
+
+        If L == T: one window, returns (B, T, d_sae) via position-wise
+        encoders.
+        If L > T: slides length-T windows stride-1 over the sequence,
+        takes the centre-position encoder activation of each, returns
+        (B, L-T+1, d_sae). Matches the crosscoder long-sequence path so
+        temporal metrics are apples-to-apples across architectures.
+        """
+        B, L, d = x.shape
+        if L < self.T:
+            raise ValueError(
+                f"stacked encode: seq_len {L} < T {self.T}, cannot form a window"
+            )
+        if L == self.T:
+            zs = [model.saes[t].encode(x[:, t, :]) for t in range(self.T)]
+            return torch.stack(zs, dim=1)
+
+        # L > T: slide windows, pick centre position per window
+        centre = self.T // 2
+        n_windows = L - self.T + 1
+        # Each window's centre-position encoder is model.saes[centre].
+        # Across windows, the centre position walks over seq positions
+        # [centre, centre+1, ..., L-1-centre], so we just apply
+        # saes[centre] to x[:, t, :] for t in that range.
+        zs = [
+            model.saes[centre].encode(x[:, t, :])
+            for t in range(centre, L - (self.T - 1 - centre))
+        ]
+        # Safety: n_windows should match len(zs)
+        assert len(zs) == n_windows, f"{len(zs)} != {n_windows}"
         return torch.stack(zs, dim=1)

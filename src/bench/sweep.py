@@ -326,18 +326,17 @@ def run_cached_sweep(
                     grad_clip=train_config.grad_clip,
                 )
 
-                result = evaluate_model(
-                    entry.spec, model, pipeline.eval_hidden, device,
-                    true_features=None, global_features=None,
-                    seq_len=pipeline.eval_hidden.shape[1],
-                )
-
-                # Save checkpoint so downstream tools (feature_map.py, autointerp,
-                # steering) can reload it. Use the registry key (topk_sae,
-                # stacked_sae, crosscoder, tfa, tfa_pos) rather than the display
-                # name — the finalize/feature_map scripts look up checkpoints by
-                # registry key, and display names contain spaces ("Stacked T=5")
-                # which are a shell-escape headache.
+                # Save checkpoint IMMEDIATELY after training, before eval.
+                # If evaluate_model crashes (e.g. encode() shape mismatch on
+                # long sequences), we don't want to lose the hours of GPU
+                # time that went into training. Downstream tools read the
+                # same .pt file; the sweep JSON's metrics may be None if eval
+                # crashes, but the checkpoint is the load-bearing artifact.
+                # Use the registry key (topk_sae, stacked_sae, crosscoder,
+                # tfa, tfa_pos) rather than the display name — the
+                # finalize/feature_map scripts look up checkpoints by
+                # registry key, and display names contain spaces
+                # ("Stacked T=5") which are a shell-escape headache.
                 ckpt_dir = os.path.join(results_dir, "ckpts")
                 os.makedirs(ckpt_dir, exist_ok=True)
                 shuf_tag = "_shuffled" if data_config.shuffle_within_sequence else ""
@@ -349,6 +348,12 @@ def run_cached_sweep(
                 )
                 ckpt_path = os.path.join(ckpt_dir, ckpt_name)
                 torch.save(model.state_dict(), ckpt_path)
+
+                result = evaluate_model(
+                    entry.spec, model, pipeline.eval_hidden, device,
+                    true_features=None, global_features=None,
+                    seq_len=pipeline.eval_hidden.shape[1],
+                )
 
                 elapsed = time.time() - t0
 
