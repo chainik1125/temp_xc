@@ -32,6 +32,9 @@ from pathlib import Path
 
 import numpy as np
 import torch
+import torch._dynamo  # loaded at module level so label_clusters_with_gemma
+                     # can set torch._dynamo.config without rebinding `torch`
+                     # as a local variable inside the function.
 from tqdm.auto import tqdm
 
 from src.bench.model_registry import get_model_config, list_models
@@ -220,7 +223,9 @@ def label_clusters_with_gemma(
     # (e.g. some Compute Canada venvs) crash here. Force the dynamic
     # eager path via cache_implementation=None, and suppress any
     # remaining dynamo compile errors as a belt-and-suspenders fallback.
-    import torch._dynamo
+    # NOTE: torch._dynamo is imported at module top to avoid shadowing
+    # `torch` as a local variable inside this function (`import torch.X`
+    # inside a function makes `torch` function-local everywhere).
     torch._dynamo.config.suppress_errors = True
     if hasattr(llm, "generation_config") and llm.generation_config is not None:
         llm.generation_config.cache_implementation = None
