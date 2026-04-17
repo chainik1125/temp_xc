@@ -56,6 +56,7 @@ def _arch_registry_key(entry: ModelEntry) -> str:
     from src.bench.architectures.topk_sae import TopKSAESpec
     from src.bench.architectures.stacked_sae import StackedSAESpec
     from src.bench.architectures.crosscoder import CrosscoderSpec
+    from src.bench.architectures.mlc import LayerCrosscoderSpec
     from src.bench.architectures.tfa import TFASpec
 
     spec = entry.spec
@@ -63,6 +64,9 @@ def _arch_registry_key(entry: ModelEntry) -> str:
         return "topk_sae"
     if isinstance(spec, StackedSAESpec):
         return "stacked_sae"
+    # MLC must come before CrosscoderSpec — LayerCrosscoderSpec subclasses it.
+    if isinstance(spec, LayerCrosscoderSpec):
+        return "mlc"
     if isinstance(spec, CrosscoderSpec):
         return "crosscoder"
     if isinstance(spec, TFASpec):
@@ -567,7 +571,7 @@ def main():
             if not models:
                 raise ValueError(
                     f"--models {args.models} matched zero architectures. "
-                    f"Valid keys: topk_sae, stacked_sae, crosscoder, tfa, tfa_pos"
+                    f"Valid keys: topk_sae, stacked_sae, crosscoder, mlc, tfa, tfa_pos"
                 )
         print(f"{'=' * 60}")
         print(f"  REAL-LM CACHED-ACTIVATION SWEEP")
@@ -613,7 +617,7 @@ def main():
         if not models:
             raise ValueError(
                 f"--models {args.models} matched zero architectures. "
-                f"Valid keys: topk_sae, stacked_sae, crosscoder, tfa, tfa_pos"
+                f"Valid keys: topk_sae, stacked_sae, crosscoder, mlc, tfa, tfa_pos"
             )
 
     # Build job list for display
