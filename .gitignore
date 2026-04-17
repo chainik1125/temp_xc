@@ -28,6 +28,10 @@ docs/han/agent_onboarding/
 data/cached_activations/
 logs/
 
+# Model checkpoints: .pt files in results/ (1.5-3 GB each, exceed GitHub's
+# 100 MB limit). Small metadata JSONs in the same tree stay tracked.
+results/nlp_sweep/**/ckpts/
+
 # OS
 .DS_Store
 Thumbs.db
