@@ -171,13 +171,22 @@ class CrosscoderSpec(ArchSpec):
         if L == T:
             return self._encode_window(model, x)
 
-        # L > T: slide windows, return per-window centre activations
+        # L > T: slide windows, return per-window centre activations.
+        # We chunk over the (B*n_windows) flat dim because the per-position
+        # pre-activation tensor is (chunk, T, d_sae) — for d_sae ~18k and
+        # T=5, full B*n_windows can blow up to 40+ GB. 1024 keeps it under
+        # ~400 MB per chunk.
         n_windows = L - T + 1
         windows = x.unfold(1, T, 1).permute(0, 1, 3, 2).contiguous()  # (B, n_windows, T, d)
         flat = windows.reshape(B * n_windows, T, d)
-        z = self._encode_window(model, flat)  # (B*n_windows, T, d_sae)
         centre = T // 2
-        return z[:, centre, :].reshape(B, n_windows, -1)
+        chunk = 1024
+        out = []
+        for i in range(0, flat.shape[0], chunk):
+            z_chunk = self._encode_window(model, flat[i : i + chunk])  # (chunk, T, d_sae)
+            out.append(z_chunk[:, centre, :].cpu())  # take centre, push to CPU
+        z_centre = torch.cat(out, dim=0)
+        return z_centre.reshape(B, n_windows, -1)
 
     def _encode_window(self, model, x):
         """Encode a single length-T window batch: (B, T, d_in) → (B, T, d_sae)."""

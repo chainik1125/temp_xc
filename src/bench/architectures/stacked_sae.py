@@ -140,15 +140,15 @@ class StackedSAESpec(ArchSpec):
             zs = [model.saes[t].encode(x[:, t, :]) for t in range(self.T)]
             return torch.stack(zs, dim=1)
 
-        # L > T: slide windows, pick centre position per window
+        # L > T: slide windows, pick centre position per window.
+        # We just apply the centre-position encoder model.saes[centre] to
+        # each token at positions [centre, ..., L-1-(T-1-centre)]. Each
+        # encode call is (B, d) → (B, d_sae) which is cheap memory-wise,
+        # so no per-token chunking needed (unlike crosscoder).
         centre = self.T // 2
         n_windows = L - self.T + 1
-        # Each window's centre-position encoder is model.saes[centre].
-        # Across windows, the centre position walks over seq positions
-        # [centre, centre+1, ..., L-1-centre], so we just apply
-        # saes[centre] to x[:, t, :] for t in that range.
         zs = [
-            model.saes[centre].encode(x[:, t, :])
+            model.saes[centre].encode(x[:, t, :]).cpu()
             for t in range(centre, L - (self.T - 1 - centre))
         ]
         # Safety: n_windows should match len(zs)

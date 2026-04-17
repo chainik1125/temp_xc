@@ -14,6 +14,14 @@ dependencies = [
     "seaborn",
     "safetensors",
     "anthropic",
+    # Used by feature_map.py (PCA→UMAP→KMeans) and temporal_metrics.py
+    "scikit-learn",
+    "umap-learn",
+    "hdbscan",
+    "pandas",
+    # narwhals is a runtime dep of plotly 6+ for DataFrame back-end dispatch;
+    # not always pulled in transitively.
+    "narwhals",
     # EleutherAI delphi (SOTA auto-interp pipeline, Paulo et al. ICLR 2025)
     # Not on PyPI under its canonical name; installed from source.
     "eai-delphi @ git+https://github.com/EleutherAI/delphi",
