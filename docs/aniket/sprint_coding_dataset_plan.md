@@ -14,7 +14,7 @@ shuffle-vs-unshuffle sprint ([[sprint_feature_geometry_results]]) to a
 post-hoc rationalization isn't possible.
 
 Go/no-go on actually running the experiment depends on (a) the TopKSAE
-control sbatch result and (b) sign-off on this document.
+control result and (b) sign-off on this document.
 
 ## Hypothesis space
 

@@ -3,21 +3,21 @@ author: Aniket
 date: 2026-04-16
 tags:
   - proposal
-  - in-progress
+  - complete
 ---
 
-## Sprint 5k Autointerp Plan — Gated on TopKSAE Control
+## Sprint 5k Autointerp Plan — Completed
 
 Next step in the [[sprint_feature_geometry_results|sprint feature geometry
 sprint]]: scale autointerp from 30 to ~5000 features per TXCDR checkpoint
 so we can label every major cluster in the step2 DeepSeek+GSM8K feature
-map. The 30-feature run produced the sprint's current plots; 5000 is
+map. The 30-feature run produced the sprint's early plots; 5000 is
 what tells us *what* the isolated right-side island actually is.
 
 ## Gate — TopKSAE control must pass first
 
-The `txc-fmap-sae` sbatch (`scripts/trillium_sbatch_fmap_sae_control.sh`)
-produces 4 PNGs in `reports/sae-control-deepseek/`:
+The TopKSAE control (`scripts/runpod_fmap_sae_control.sh`) produces 4
+PNGs in `reports/sae-control-deepseek/`:
 
 - `sae-deepseek-unshuffled.png` — TopKSAE baseline, natural order
 - `sae-deepseek-shuffled.png` — TopKSAE baseline, shuffled
@@ -34,62 +34,52 @@ produces 4 PNGs in `reports/sae-control-deepseek/`:
 
 ## 5k autointerp — three commands
 
-All three are bash-only wrappers already on `aniket`. Run in order.
+All three are bash-only wrappers. Run in order.
 
-### Step 1 — Scan (sbatch, GPU node, ~30-60 min)
+### Step 1 — Scan (~30-60 min on A40)
 
 ```bash
-bash scripts/trillium_scan_5k_sbatch.sh
+bash scripts/runpod_scan_5k.sh
 ```
 
 Runs `TopKFinder` over all 4 crosscoder checkpoints
 (step1-{un,}shuffled + step2-{un,}shuffled) with `--top-features 5000`.
 Writes `feat_*.json` files containing `top_texts` and
-`top_activations` but empty `explanation` fields. GPU-bound, no network
-required — safe inside a compute allocation.
+`top_activations` but empty `explanation` fields. GPU-bound.
 
 Outputs land in:
 
 - `reports/step1-gemma-replication/autointerp/step1-{un,}shuffled/feat_*.json`
 - `reports/step2-deepseek-reasoning/autointerp/step2-{un,}shuffled/feat_*.json`
 
-### Step 2 — Explain (login node, ~\$80, after scan finishes)
+### Step 2 — Explain (~\$80, after scan finishes)
 
 ```bash
-bash scripts/trillium_explain_5k.sh
+bash scripts/runpod_explain_5k.sh
 ```
 
 Reads the `feat_*.json` files from step 1, filters to those with
-empty explanations, and calls Claude Haiku 4.5 to fill each in. Runs on
-the *login node* (needs outbound HTTPS; ~zero CPU since it's I/O-bound
-on API responses). `OMP/MKL/OPENBLAS` threads pinned to 1 to stay
-inside the login-node CPU-time cap.
+empty explanations, and calls Claude Haiku 4.5 to fill each in.
+Network-bound on `api.anthropic.com`; near-zero CPU.
 
 Cost: ~5000 features × 4 checkpoints × \$0.004/feature ≈ \$80.
 `ResultsStore` has resume support — if the job gets killed, just
 re-run and it picks up where it left off.
 
-### Step 3 — Feature map (sbatch, GPU node, after explain finishes)
+### Step 3 — Feature map (after explain finishes)
 
 ```bash
-bash scripts/trillium_sbatch_fmap_5k.sh
+bash scripts/runpod_fmap_5k.sh
 ```
 
 Reruns `feature_map.py` on each checkpoint, now reading the ~5000
 labeled `feat_*.json` files for hover-text labels. Produces labeled
 interactive HTMLs + PNGs in the same report dirs.
 
-After this, pull the reports dir to the laptop:
-
-```bash
-bash scripts/fetch_from_trillium.sh reports
-```
-
 ## Prereqs — environment
 
-- `ANTHROPIC_API_KEY` must be set in the login-node env before step 2.
-- Trillium aniket-branch must be clean and up to date before step 1
-  (the scan script runs `git pull origin aniket` at the top).
+- `ANTHROPIC_API_KEY` must be set in the env before step 2.
+- `aniket` branch must be clean and up to date before step 1.
 - All 4 crosscoder checkpoints must exist under
   `results/nlp/step{1,2}-{un,}shuffled/ckpts/crosscoder__*.pt`
   (they do — produced by the earlier sweep).
@@ -100,14 +90,15 @@ Current coverage is 30 / 32,768 features ≈ 0.09%. Clusters in the
 step2-unshuffled map are sized ~4k features (cluster 6, n=4,208).
 At 30 labels there's no chance of hitting *any* cluster with a
 representative sample. At 5000 labels we get ~15% per-cluster coverage,
-which is enough to read off the dominant concept in each.
+which is enough to read off the dominant concept in each. Matches the
+label-volume Andre used for his Gemma analysis (5,452 SAE labels),
+placing this at paper-grade coverage.
 
 ## Files
 
-- Gate script — `scripts/trillium_sbatch_fmap_sae_control.sh`
-- Step 1 — `scripts/trillium_scan_5k_sbatch.sh`
-- Step 2 — `scripts/trillium_explain_5k.sh`
-- Step 3 — `scripts/trillium_sbatch_fmap_5k.sh`
-- Fetch — `scripts/fetch_from_trillium.sh`
+- Gate script — `scripts/runpod_fmap_sae_control.sh`
+- Step 1 — `scripts/runpod_scan_5k.sh`
+- Step 2 — `scripts/runpod_explain_5k.sh`
+- Step 3 — `scripts/runpod_fmap_5k.sh`
 
 Related: [[sprint_feature_geometry_results]], [[SPRINT_PIPELINE]]

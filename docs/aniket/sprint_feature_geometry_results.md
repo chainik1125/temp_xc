@@ -193,7 +193,7 @@ same island, the structure is data-driven, not architecture-driven.
    SAE-vs-TXCDR on Gemma. The same comparison on DeepSeek would confirm
    that the geometric structure is TXCDR-specific, not just a property of
    richer data. TopKSAE checkpoints exist from the sweep — running
-   feature_map on them is one sbatch command.
+   feature_map on them is one bash command.
 
 4. **Does more training help?** The current sweeps used 10,000 steps. The
    Stacked SAE NMSE anomaly on Gemma (shuffled much better than
@@ -241,12 +241,12 @@ same island, the structure is data-driven, not architecture-driven.
 - `results/nlp/step2-unshuffled/results_*.json`
 - `results/nlp/step2-shuffled/results_*.json`
 
-**Checkpoints (on Trillium $SCRATCH only):**
+**Checkpoints** (not checked into git — large binaries):
 - `results/nlp/step{1,2}-{un,}shuffled/ckpts/crosscoder__*.pt`
 - `results/nlp/step{1,2}-{un,}shuffled/ckpts/topk_sae__*.pt`
 - `results/nlp/step{1,2}-{un,}shuffled/ckpts/stacked_sae__*.pt`
 
-**Cached activations (on Trillium $SCRATCH only):**
+**Cached activations** (not checked into git — tens of GB):
 - `data/cached_activations/gemma-2-2b/fineweb/` (14 GB)
 - `data/cached_activations/deepseek-r1-distill-llama-8b/gsm8k/` (32 GB)
 

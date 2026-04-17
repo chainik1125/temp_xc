@@ -213,9 +213,9 @@ python scripts/aggregate_results.py --root results/nlp --out reports/day1-gsm8k
 - `results/nlp/` is KB per run — fine to sync anywhere.
 - `reports/` is what you paste into Slack.
 
-### Note on the `scripts/trillium_*` scripts
+### Note on the `scripts/runpod_*` scripts
 
-Those are Aniket's cluster-specific wrappers. **Ignore them.** Nothing in the portable workflow above depends on them, and the underlying Python commands they wrap are the same ones in sections 1–3 of this cheat sheet. If you're curious about a specific one, read it — they're short — but you shouldn't have to.
+Those are Aniket's RunPod-specific wrappers for the common flows (setup, verify GPU, cache activations, sweep, autointerp scan/explain/fmap, backfill metrics, delphi labeling). Portable by design — they just run the same Python commands as sections 1–3 of this cheat sheet, with `uv`-managed env activation and sensible defaults. Read one if you want a template for your own pod.
 
 ## 6. Adding things
 
@@ -284,7 +284,7 @@ scripts/
   verify_gpu_fit.py            # memory sanity check for any registry model
   cache_reasoning_traces.py    # wrapper for GSM8K/MATH500 in generate mode
   aggregate_results.py         # Pareto / MI / span plots + markdown report
-  trillium_*                   # Aniket's cluster-specific wrappers — ignore
+  runpod_*                     # RunPod-specific wrappers (portable, optional)
 data/
   cached_activations/          # .gitignored — Stage 1 outputs, ~30 GB/run
 results/nlp/                   # .gitignored — Stage 2 outputs, KB/run
