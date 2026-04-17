@@ -87,6 +87,17 @@ Running both yields 3 architectures × 2 protocols = **6 trained
 checkpoints at T=5**. The pattern across protocols is itself part
 of the finding.
 
+**Protocol-B direction note.** Dmitry's Slack framing was
+"SAE at k, TempXC at k/T" — i.e. keep SAE anchored at k=100 and
+reduce TempXC to 100/T. Our table above does the opposite direction
+(keep TempXC's k in the familiar 100–500 range, scale up if needed).
+The two framings are mathematically equivalent — both test "match
+total-window activation budget" — but anchoring TempXC's k to its
+training-time value (100 at T=5) may be cleaner for the paper
+write-up. If we flip direction before training, the downstream
+matching_protocols.protocol_k() values change but nothing else in
+the infrastructure does.
+
 ## 5. Four aggregation strategies
 
 TempXC produces `(T, d_sae)` per window. SAEBench's
@@ -120,6 +131,22 @@ only wins under full-window, the paper claim becomes "TempXC features
 carry position-specific information" rather than "TempXC features are
 individually better."
 
+**Full-window semantics caveat.** SAEBench's
+`get_sae_meaned_activations` mean-pools the encoded output across the
+sequence axis `L` regardless of aggregation. For `full_window`,
+`encode` returns `(B, L, T × d_sae)` — one window's worth of activations
+per sequence position — and SAEBench's subsequent mean-pool across `L`
+reduces that to `(B, T × d_sae)`. Each feature axis is therefore
+"feature `i` at window-relative position `j`, averaged across all `L`
+sequence positions where window-position `j` appeared." The probe
+picks `(feature, window-position)` pairs, but the "window-position"
+signal is aggregated over all stride-1 windows in the sequence rather
+than a single window. Paper framing must phrase this as "features fire
+in characteristic patterns across window-relative positions" rather
+than "position-specificity within a single window matters." The
+weaker interpretation is still informative and publishable; just don't
+over-claim.
+
 ## 6. T-sweep extension (H100 bonus run)
 
 Dmitry's addition: *"spin up an H100, push T as far as can fit."* On
@@ -137,6 +164,24 @@ Three possible patterns, all publishable:
 - Advantage plateaus at small T → T=5 captures most of what's there.
 - Advantage shrinks at large T → shared-z saturates or dilutes
   (most scientifically interesting — reveals inductive-bias edge).
+
+**Runtime warning at large T.** Stride-1 sliding-window encoding at
+`T=40, L=128` yields `L - T + 1 = 89` overlapping windows per
+sequence. Our `_encode_window` chunks through these in batches of
+1024, but the total compute is ~`5–10×` the `T=5` cost per probing
+eval. The 10-min-per-probing-eval estimate in § 12 is for T=5; at T=40
+expect 50-100 min per eval. **Benchmark one probing eval at T=40
+before committing to the full sweep** (via
+`runpod_saebench_run_eval.sh --t 40 --aggregation last` on one
+checkpoint). If prohibitive, two fallbacks:
+
+- **Stride > 1.** Change the sliding-window step from 1 to
+  `max(1, T // 4)`. Documented loss of per-token resolution — some
+  tokens get encoding from a different-centered window than their
+  neighbours. Reduces compute by ~4× at T=40.
+- **Cap the sweep at T=20.** Halves T-sweep compute at the cost of
+  less extrapolation range. T=20 still distinguishes "advantage grows
+  monotonically" from "plateau at small T" for most scaling shapes.
 
 ## 7. The full experimental grid
 
@@ -237,6 +282,50 @@ Configs live in Python (`configs.py`), not YAML, matching
 `src/bench/config.py` conventions. The Python-dataclass approach
 gives type-checking + single-source-of-truth without adding a
 YAML-parsing dependency.
+
+### MLC integration roadmap
+
+MLC is **the critical path for the headline claim**. Without it the
+comparison collapses to "TempXC vs SAE," which cannot rule out H2
+(multi-position crosscoding wins, temporal-specificity irrelevant).
+
+Status:
+
+- **Architecture** — landed in `src/bench/architectures/mlc.py`.
+  `LayerCrosscoder` inherits from `TemporalCrosscoder` with identical
+  encode/decode math; `LayerCrosscoderSpec` sets
+  `data_format="multi_layer"` and a distinct `name` for logging.
+  Registered in `REGISTRY`. Trainable once the data pipeline below
+  lands.
+- **Training data pipeline** — TODO. Needs multi-hook activation
+  caching: simultaneous hooks on Gemma layers `{10, 11, 12, 13, 14}`
+  writing `(n_seq, seq_len, 5, d_model)` tensors to disk. Path:
+  extend `temporal_crosscoders/NLP/cache_activations.py` to accept
+  multiple `--layer_indices` and stack into a 4-D output tensor, OR
+  write a new `cache_mlc_activations.py` that hooks all 5 layers in
+  one Gemma forward pass and stacks. Expect ~5× disk vs a
+  single-layer cache.
+- **Sweep runner data dispatch** — TODO. `src/bench/sweep.py`'s
+  `build_pipeline()` currently dispatches on `data_format` ∈
+  {`flat`, `seq`, `window`}. Add `multi_layer` → iterator yields
+  batches of `(B, n_layers, d_model)` from the multi-hook cache.
+- **SAEBench probing eval integration** — TODO. SAEBench's
+  `run_eval_single_dataset` hooks a single layer and hands the
+  adapter `(B, L, d_in)`. For MLC we need either: (a) a ~200 LoC
+  fork that hooks `{10..14}`, collects `(B, L, 5, d_model)`, and
+  passes that to a dedicated `SAEBenchAdapter` encode path; or (b) a
+  pre-compute-and-inject path where we pre-encode our MLC on cached
+  multi-layer activations, write `(B, L, d_sae)` to disk, and use a
+  minimal probing script that skips SAEBench's data collection. (a) is
+  more faithful; (b) is cheaper to implement.
+- **Currently guarded paths.** `saebench_wrapper.SAEBenchAdapter.encode`
+  raises `NotImplementedError` for `arch="mlc"` with a pointer to this
+  section. `scripts/runpod_saebench_train.sh --arch mlc` fails fast
+  with the same pointer. Architecture imports + `protocol_k("mlc", ...)`
+  are fully functional — integration only blocks the runtime path.
+
+Scoping these four items as a separate block of work rather than
+inside this pre-registration; estimate 2-3 days of focused work.
 
 **Output schema** (one JSONL record per
 arch × T × protocol × aggregation × task × k):

@@ -97,7 +97,14 @@ case "$ARCH" in
         T_FLAG="--T $T"
         ;;
     mlc)
-        echo "FAIL: MLC ArchSpec not implemented — see plan § 11"
+        # MLC architecture is implemented (src/bench/architectures/mlc.py)
+        # but requires multi-layer cached activations. The existing sweep
+        # runner's data pipeline hasn't been extended for data_format=
+        # "multi_layer" yet — see plan § 11. Until that lands, this
+        # branch fails fast rather than silently producing wrong outputs.
+        echo "FAIL: MLC architecture is present but its multi-layer"
+        echo "      training data pipeline is not yet wired."
+        echo "      See docs/aniket/experiments/sparse_probing/plan.md § 11."
         exit 3
         ;;
 esac

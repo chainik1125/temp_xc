@@ -143,12 +143,11 @@ class SAEBenchAdapter(nn.Module):
         """
         if self._arch_name == "sae":
             return self._model.W_enc.T.contiguous()  # TopKSAE: (d_sae, d_in) → (d_in, d_sae)
-        if self._arch_name == "tempxc":
-            # TempXC W_enc is (T, d_in, d_sae); mean across T gives (d_in, d_sae)
+        if self._arch_name in ("tempxc", "mlc"):
+            # Both use (T-or-n_layers, d_in, d_sae) native shape; mean over
+            # the leading axis for SAEBench's (d_in, d_sae) view.
             with torch.no_grad():
                 return self._model.W_enc.mean(dim=0).contiguous()
-        if self._arch_name == "mlc":
-            raise NotImplementedError("MLC W_enc — MLC adapter not yet implemented")
         raise ValueError(f"unknown arch: {self._arch_name}")
 
     @property
@@ -156,12 +155,10 @@ class SAEBenchAdapter(nn.Module):
         """SAEBench shape `(d_sae_effective, d_in)` with unit-norm rows."""
         if self._arch_name == "sae":
             return self._model.W_dec.T.contiguous()  # TopKSAE: (d_in, d_sae) → (d_sae, d_in)
-        if self._arch_name == "tempxc":
-            # TempXC W_dec is (d_sae, T, d_in); mean across T
+        if self._arch_name in ("tempxc", "mlc"):
+            # Both: (d_sae, T-or-n_layers, d_in); mean across axis 1.
             with torch.no_grad():
                 return self._model.W_dec.mean(dim=1).contiguous()
-        if self._arch_name == "mlc":
-            raise NotImplementedError("MLC W_dec — MLC adapter not yet implemented")
         raise ValueError(f"unknown arch: {self._arch_name}")
 
     @property
@@ -172,7 +169,7 @@ class SAEBenchAdapter(nn.Module):
     def b_dec(self) -> torch.Tensor:
         if self._arch_name == "sae":
             return self._model.b_dec
-        # TempXC: b_dec is (T, d_in); mean across T
+        # TempXC / MLC: b_dec is (T-or-n_layers, d_in); mean across axis 0.
         with torch.no_grad():
             return self._model.b_dec.mean(dim=0)
 
@@ -197,9 +194,20 @@ class SAEBenchAdapter(nn.Module):
             return self._encode_tempxc(x)
 
         if self._arch_name == "mlc":
+            # MLC crosscodes across *layers* not time. SAEBench's
+            # sparse_probing only hooks one layer, so the (B, L, d_in)
+            # input here is single-layer activations at layer 12 —
+            # insufficient for MLC which needs (B, L, 5, d_model)
+            # simultaneous layer acts {10..14}. Resolving this requires
+            # a multi-hook variant of SAEBench's run_eval (plan § 11).
+            # Until that lands, MLC probing is a deliberate TODO.
             raise NotImplementedError(
-                "MLC adapter not yet implemented — MLC ArchSpec is pending. "
-                "See plan § 11."
+                "MLC probing through SAEBench's standard pipeline is not "
+                "supported — SAEBench hooks only one layer, MLC needs 5. "
+                "See docs/aniket/experiments/sparse_probing/plan.md § 11 "
+                "for the multi-hook integration roadmap. The MLC "
+                "architecture itself is trainable via the sweep runner "
+                "once the multi-layer data pipeline lands."
             )
         raise ValueError(f"unknown arch: {self._arch_name}")
 

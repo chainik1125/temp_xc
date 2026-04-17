@@ -10,6 +10,7 @@ from src.bench.architectures.base import ArchSpec, ModelEntry, EvalOutput
 from src.bench.architectures.topk_sae import TopKSAESpec
 from src.bench.architectures.stacked_sae import StackedSAESpec
 from src.bench.architectures.crosscoder import CrosscoderSpec
+from src.bench.architectures.mlc import LayerCrosscoderSpec
 from src.bench.architectures.tfa import TFASpec
 
 # Central registry: name -> ArchSpec constructor
@@ -17,6 +18,7 @@ REGISTRY: dict[str, type[ArchSpec]] = {
     "topk_sae": TopKSAESpec,
     "stacked_sae": StackedSAESpec,
     "crosscoder": CrosscoderSpec,
+    "mlc": LayerCrosscoderSpec,
     "tfa": TFASpec,
     "tfa_pos": TFASpec,
 }

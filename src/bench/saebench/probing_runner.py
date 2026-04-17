@@ -53,6 +53,7 @@ def _load_arch_and_model(
     """Instantiate the right ArchSpec + model, load the checkpoint."""
     from src.bench.architectures.topk_sae import TopKSAESpec
     from src.bench.architectures.crosscoder import CrosscoderSpec
+    from src.bench.architectures.mlc import LayerCrosscoderSpec
 
     if arch == "sae":
         spec = TopKSAESpec()
@@ -61,10 +62,11 @@ def _load_arch_and_model(
         spec = CrosscoderSpec(T=t)
         model = spec.create(d_in=D_MODEL, d_sae=D_SAE, k=k, device=device)
     elif arch == "mlc":
-        raise NotImplementedError(
-            "MLC ArchSpec pending — plan § 11. "
-            "Cannot instantiate MLC here until it lands in src/bench/architectures/."
-        )
+        # MLC's own architecture loads fine; t here is reinterpreted as
+        # n_layers (the layer window width). The probing path through
+        # SAEBench isn't wired yet — see plan § 11.
+        spec = LayerCrosscoderSpec(n_layers=t)
+        model = spec.create(d_in=D_MODEL, d_sae=D_SAE, k=k, device=device)
     else:
         raise ValueError(f"unknown arch: {arch}")
 
