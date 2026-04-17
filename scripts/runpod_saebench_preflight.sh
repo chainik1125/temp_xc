@@ -54,7 +54,7 @@ PY
 
 # ─── 3. verify JSONL schema ───────────────────────────────────────────
 echo ""
-echo ">> [3/3] verify JSONL schema"
+echo ">> [3/4] verify JSONL schema"
 python - <<'PY'
 import json
 import sys
@@ -84,6 +84,23 @@ print(f"  OK — {len(records)} records, schema valid")
 print(f"  sample: {r0}")
 PY
 
+# ─── 4. Clean up preflight-trained ckpt so the real sweep trains fresh ─
+# The preflight SAE shares its ckpt path with the orchestrator's real
+# SAE × protA × T=5 cell. Without this cleanup, runpod_saebench_train.sh's
+# skip-if-exists guard would silently pick up the 500-step preflight ckpt
+# as if it were a full 5000-step run.
+echo ""
+echo ">> [4/4] cleanup preflight-polluted ckpt (500-step; real sweep needs full steps)"
+PREFLIGHT_CKPT=$(python - <<'PY'
+from src.bench.saebench.configs import CKPT_DIR, ckpt_name
+print(f"{CKPT_DIR}/{ckpt_name('sae', 'A')}")
+PY
+)
+rm -f "$PREFLIGHT_CKPT"
+rm -rf results/saebench/sweeps/sae_protA_T5
+echo "   removed $PREFLIGHT_CKPT"
+echo "   removed results/saebench/sweeps/sae_protA_T5/"
+
 echo ""
 echo "=== pre-flight PASSED ==="
-echo "  safe to launch: bash scripts/runpod_saebench_orchestrator.sh both"
+echo "  safe to launch: bash scripts/runpod_saebench_orchestrator.sh full"
