@@ -539,3 +539,40 @@ single-layer / single-k / unshuffled-only scope.
 - Labels: `results/nlp_sweep/gemma/scans/labels__<arch>__resid_L25__k50.json`
 - Analyses: `results/nlp_sweep/gemma/scans/{tspread,tfa_pred_novel,feature_match}__*.json`
 - Sweep checkpoints: `results/nlp_sweep/gemma/ckpts/`
+
+## Post-hoc sanity check (2026-04-17)
+
+All Phase-1 sanity checks from `RUNPOD_INSTRUCTIONS.md` passed (see
+companion doc `2026-04-17-neurips-gap.md` for details). Two additions
+to the record:
+
+- **TFA pred/novel partition is sharper than initially claimed.**
+  Recomputed directly from the trained ckpt on 25 000 windows: top-50
+  overlap 0 (as claimed), **top-500 overlap still 0** (vs ≈13.6 expected
+  by chance), top-2000 overlap 24 (vs ≈217 expected).
+- **"Content-bearing" does not imply "cross-chain".** Of the 14
+  crosscoder high-span content-bearing features in top-15,
+  chain-diversity within their top-10 exemplars is: 8 fully cross-chain
+  (10/10 distinct chains), 3 near-cross-chain (8-9/10), **3 are
+  single-chain or near-single** (feat 15524 botanical prose, 1 chain;
+  feat 12231 "Vitamin D-3" nutrition-label, 1 chain; feat 11714 single
+  diplomatic cable, 1 chain; feat 8016 one zombie-apocalypse passage,
+  2 chains). So the sharper claim is **crosscoder has 11/14 genuinely
+  cross-chain content-bearing high-span features, vs TFA novel's 1/1**.
+  The "TXCDR wins on generalized high-span content" direction is
+  unchanged but the margin is 11 vs 1, not 14 vs 1.
+- **Content-based (exemplar-set Jaccard) matching independently
+  confirms the cross-arch orthogonality claim.** No cross-arch pair
+  has a single feature with Jaccard ≥ 0.3; mean best-Jaccard ≤ 0.008
+  for all 12 directed pairs. Figure: `content_based_match.png`.
+  Script: `temporal_crosscoders/NLP/content_based_match.py`.
+- **Held-out (rank 51-100) Haiku labeling changes the TFA-novel story.**
+  For Stacked, Crosscoder, TFA pred, interpretability is stable between
+  top-50 and the held-out tranche. But **TFA novel's unclear rate drops
+  from 78 % at top-50 to 20 % at rank 51-100**, and the tokenization-
+  boundary rate rises from 8 % to 28 %. So "TFA novel is dominated by
+  unclear padding artifacts" is overstated — it is a property of the
+  very top-ranked features. The library as a whole is more
+  interpretable than the initial scan suggested, with a token-boundary
+  family dominating the mid-ranks. New artifacts:
+  `labels__*__heldout50-100.json`.

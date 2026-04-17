@@ -1,0 +1,3263 @@
+{
+  "arch": "crosscoder",
+  "subject_model": "gemma-2-2b-it",
+  "layer_key": "resid_L25",
+  "k": 50,
+  "T": 5,
+  "sample_chains": 1000,
+  "top_k_per_feature": 10,
+  "d_sae": 18432,
+  "num_active_features": 2970,
+  "features": {
+    "3138": {
+      "mass": 5962.2861328125,
+      "examples": [
+        {
+          "activation": 643.4478759765625,
+          "chain_idx": 11340,
+          "window_start": 80,
+          "text": " and nipped at him, once he did that>>> the algea eater ran<<< away.\nI watched them for a few minutes"
+        },
+        {
+          "activation": 619.8573608398438,
+          "chain_idx": 18897,
+          "window_start": 97,
+          "text": " while allowing light in from the outside. Available in>>> either hobbled (also<<< known as teardrop) or flat fold styles,"
+        },
+        {
+          "activation": 597.701171875,
+          "chain_idx": 11340,
+          "window_start": 101,
+          "text": " for a few minutes and everytime Zeke gets near the>>> little algea eater his<<< gills start to flare, somtimes he'll"
+        },
+        {
+          "activation": 595.47802734375,
+          "chain_idx": 10260,
+          "window_start": 32,
+          "text": ": Varies\nDescription: Adult stages are medium to>>> large (3/8<<< to 1-1/8 inch) flies"
+        },
+        {
+          "activation": 590.5980834960938,
+          "chain_idx": 6761,
+          "window_start": 34,
+          "text": " are common and varied, but no effective standard for>>> stopping hiccups has been<<< documented. It has been shown that reinfection after"
+        },
+        {
+          "activation": 588.7186889648438,
+          "chain_idx": 322,
+          "window_start": 61,
+          "text": ". Throwdown is, however, a no->>>holds-barred kick in<<< the pants performance truck competition where testing weeds out lesser"
+        },
+        {
+          "activation": 586.4624633789062,
+          "chain_idx": 22784,
+          "window_start": 101,
+          "text": " this new role, she was being forced into this>>> one-size-fits<<<-all mould of how a mother should look\u2014"
+        },
+        {
+          "activation": 584.1312255859375,
+          "chain_idx": 22988,
+          "window_start": 82,
+          "text": " sex vids and pics? Amateur Girls Unleashed features>>> the horniest you could<<< think of! Our exclusive HD content is updated daily"
+        },
+        {
+          "activation": 582.8671264648438,
+          "chain_idx": 5983,
+          "window_start": 91,
+          "text": " In case it's been so long since you>>> ate a whole-food<<< snack that you can't recall what your options"
+        },
+        {
+          "activation": 573.0241088867188,
+          "chain_idx": 901,
+          "window_start": 120,
+          "text": " I repotted it. It appeared to have>>> a baby growing halfway up<<< on of the"
+        }
+      ]
+    },
+    "14804": {
+      "mass": 5915.0621337890625,
+      "examples": [
+        {
+          "activation": 596.1898803710938,
+          "chain_idx": 23651,
+          "window_start": 1,
+          "text": ">>>an<<< oddity in the Industrial scene, because their music"
+        },
+        {
+          "activation": 594.7576293945312,
+          "chain_idx": 11345,
+          "window_start": 1,
+          "text": ">>>separation<<< of nucleus protein - lysis buffer (Jun/0"
+        },
+        {
+          "activation": 593.7544555664062,
+          "chain_idx": 6041,
+          "window_start": 25,
+          "text": ">>>Monday<<< will start off cool as a Delta breeze pumps through"
+        },
+        {
+          "activation": 592.5654907226562,
+          "chain_idx": 18928,
+          "window_start": 1,
+          "text": ">>>\"<<<The guys at Music House are the best in the"
+        },
+        {
+          "activation": 591.4903564453125,
+          "chain_idx": 20667,
+          "window_start": 17,
+          "text": ">>>Wednesday<<<, May 25, 201"
+        },
+        {
+          "activation": 591.2537231445312,
+          "chain_idx": 322,
+          "window_start": 6,
+          "text": ">>>Wanna<<<-bes stay home. Truckin\u2019s Throw"
+        },
+        {
+          "activation": 589.3573608398438,
+          "chain_idx": 11077,
+          "window_start": 1,
+          "text": ">>>Web<<< Design Programer\nClosed - This job posting"
+        },
+        {
+          "activation": 589.2528076171875,
+          "chain_idx": 11382,
+          "window_start": 2,
+          "text": ">>>Thousands<<< of dumb, funny, and amusing college quotes submitted"
+        },
+        {
+          "activation": 588.3383178710938,
+          "chain_idx": 15638,
+          "window_start": 1,
+          "text": ">>>The<<< Armor S2000 is a concentrated sodium"
+        },
+        {
+          "activation": 588.1021118164062,
+          "chain_idx": 16315,
+          "window_start": 47,
+          "text": ">>>Wednesday<<<, April 1, 2015"
+        }
+      ]
+    },
+    "3441": {
+      "mass": 5908.0570068359375,
+      "examples": [
+        {
+          "activation": 647.0712890625,
+          "chain_idx": 18394,
+          "window_start": 7,
+          "text": "General Motors contemplates just that:>>>\nThe U.S<<<. government is pouring billions into General Motors in hopes"
+        },
+        {
+          "activation": 615.961181640625,
+          "chain_idx": 15555,
+          "window_start": 0,
+          "text": ">>>The U.S<<<. and Tunisia have finalized U.S. export"
+        },
+        {
+          "activation": 598.8555297851562,
+          "chain_idx": 4358,
+          "window_start": 101,
+          "text": " can beat Samsung in playing catch-up\"\n>>>The crippling U.S<<<. patent court\n$1.05B"
+        },
+        {
+          "activation": 589.2002563476562,
+          "chain_idx": 13101,
+          "window_start": 12,
+          "text": "uries headed for their biggest weekly decline in a month>>> before a U.S<<<. report forecast to show home sales increased in December"
+        },
+        {
+          "activation": 583.50244140625,
+          "chain_idx": 6126,
+          "window_start": 12,
+          "text": " Iraqi government has moved to sharply restrict the movement and>>> activities of U.S<<<. forces in a new reading of a six-"
+        },
+        {
+          "activation": 578.4296875,
+          "chain_idx": 15555,
+          "window_start": 8,
+          "text": "The U.S. and Tunisia>>> have finalized U.S<<<. export certificates to allow imports of U.S"
+        },
+        {
+          "activation": 575.9082641601562,
+          "chain_idx": 21420,
+          "window_start": 68,
+          "text": " beat and 3 and 4 part harmonies.>>> Because most U.S<<<. radio stations don\u2019t penetrate Cuba, and"
+        },
+        {
+          "activation": 574.2058715820312,
+          "chain_idx": 12913,
+          "window_start": 9,
+          "text": "Closer look shows weak employment in much of>>> state\nU.S<<<. Rep. Scott Tipton isn\u2019t alone"
+        },
+        {
+          "activation": 573.2500610351562,
+          "chain_idx": 7784,
+          "window_start": 17,
+          "text": " Beverage Portfolio (PBJ) is composed of >>>30 U.S<<<. food and beverage companies, and is benchmarked"
+        },
+        {
+          "activation": 571.6724243164062,
+          "chain_idx": 16397,
+          "window_start": 38,
+          "text": " Nova Memorial Race Car is dedicated to all the fallen>>> and living U.S<<<. Marines of the Iraq War.\nCreated by"
+        }
+      ]
+    },
+    "7970": {
+      "mass": 5899.296569824219,
+      "examples": [
+        {
+          "activation": 595.2686767578125,
+          "chain_idx": 11345,
+          "window_start": 1,
+          "text": ">>>separation<<< of nucleus protein - lysis buffer (Jun/0"
+        },
+        {
+          "activation": 594.639892578125,
+          "chain_idx": 322,
+          "window_start": 6,
+          "text": ">>>Wanna<<<-bes stay home. Truckin\u2019s Throw"
+        },
+        {
+          "activation": 593.0536499023438,
+          "chain_idx": 11077,
+          "window_start": 1,
+          "text": ">>>Web<<< Design Programer\nClosed - This job posting"
+        },
+        {
+          "activation": 592.1356201171875,
+          "chain_idx": 2804,
+          "window_start": 6,
+          "text": ">>>Bri<<<desmaids' dresses often get a bad rep,"
+        },
+        {
+          "activation": 591.3203125,
+          "chain_idx": 12755,
+          "window_start": 12,
+          "text": ">>>Kat<<<ka is the kind of woman who just plain enjoys"
+        },
+        {
+          "activation": 588.5083618164062,
+          "chain_idx": 18928,
+          "window_start": 1,
+          "text": ">>>\"<<<The guys at Music House are the best in the"
+        },
+        {
+          "activation": 587.019287109375,
+          "chain_idx": 3683,
+          "window_start": 8,
+          "text": ">>>Priest<<< turned vigilante Father John (Van Cleef) hunts"
+        },
+        {
+          "activation": 585.8740844726562,
+          "chain_idx": 3877,
+          "window_start": 17,
+          "text": ">>>Come<<< stay with us\nin beautiful Hawaii. Whether it"
+        },
+        {
+          "activation": 585.7964477539062,
+          "chain_idx": 23651,
+          "window_start": 1,
+          "text": ">>>an<<< oddity in the Industrial scene, because their music"
+        },
+        {
+          "activation": 585.6802368164062,
+          "chain_idx": 15638,
+          "window_start": 1,
+          "text": ">>>The<<< Armor S2000 is a concentrated sodium"
+        }
+      ]
+    },
+    "18043": {
+      "mass": 5700.921691894531,
+      "examples": [
+        {
+          "activation": 634.2666625976562,
+          "chain_idx": 14072,
+          "window_start": 73,
+          "text": " cornea.\nOriginal Article Source Credits: Healthline>>> , https://www.<<<healthline.com/\nArticle Written By:"
+        },
+        {
+          "activation": 611.9983520507812,
+          "chain_idx": 13721,
+          "window_start": 3,
+          "text": "karenad>>>min http://www.<<<karen-foo.com/wp-content/"
+        },
+        {
+          "activation": 596.1275634765625,
+          "chain_idx": 14072,
+          "window_start": 115,
+          "text": " 2020\nLink to Original Article>>>: https://www.<<<healthline.com/health/dry"
+        },
+        {
+          "activation": 588.1671752929688,
+          "chain_idx": 19887,
+          "window_start": 3,
+          "text": "Recently NPR>>>* http://www.<<<npr.org/ published FAQs on \u201cUnderstanding The"
+        },
+        {
+          "activation": 584.2592163085938,
+          "chain_idx": 7203,
+          "window_start": 123,
+          "text": " I used this website for tutorials on responsive grid etc>>>. https://www.<<<"
+        },
+        {
+          "activation": 568.4981689453125,
+          "chain_idx": 19143,
+          "window_start": 74,
+          "text": " which was supposedly built under the direction of CPD.>>>\nhttp://www.<<<yachtworld.com/offshoremarine/index"
+        },
+        {
+          "activation": 556.0380859375,
+          "chain_idx": 7626,
+          "window_start": 101,
+          "text": " initiatives, such as our own Catamount Health Care>>> (http://www.<<<yaleruddcenter.org/resources/upload"
+        },
+        {
+          "activation": 543.8756713867188,
+          "chain_idx": 19053,
+          "window_start": 111,
+          "text": " main job is a fashion/commercial and wedding photographer>>> \u2013 http://www.<<<jackietranphoto.com \u2013 but to travel"
+        },
+        {
+          "activation": 509.64306640625,
+          "chain_idx": 16825,
+          "window_start": 114,
+          "text": " and efficiency as an educational leader.\nImage credit>>>: http://gurure<<<viewbonus.com/wp-content/"
+        },
+        {
+          "activation": 508.0477294921875,
+          "chain_idx": 10197,
+          "window_start": 116,
+          "text": " He truly cares about his students.\"\nRead more>>>: http://bit.<<<ly/2qWfsSX"
+        }
+      ]
+    },
+    "8483": {
+      "mass": 5693.14501953125,
+      "examples": [
+        {
+          "activation": 691.1644897460938,
+          "chain_idx": 14072,
+          "window_start": 74,
+          "text": ".\nOriginal Article Source Credits: Healthline ,>>> https://www.health<<<line.com/\nArticle Written By: Ch"
+        },
+        {
+          "activation": 649.1173095703125,
+          "chain_idx": 14072,
+          "window_start": 116,
+          "text": "2020\nLink to Original Article:>>> https://www.health<<<line.com/health/dry"
+        },
+        {
+          "activation": 643.0280151367188,
+          "chain_idx": 19887,
+          "window_start": 4,
+          "text": "Recently NPR*>>> http://www.npr<<<.org/ published FAQs on \u201cUnderstanding The Health"
+        },
+        {
+          "activation": 638.06787109375,
+          "chain_idx": 13721,
+          "window_start": 4,
+          "text": "karenadmin>>> http://www.karen<<<-foo.com/wp-content/uploads"
+        },
+        {
+          "activation": 627.2759399414062,
+          "chain_idx": 19143,
+          "window_start": 75,
+          "text": " was supposedly built under the direction of CPD.\n>>>http://www.yacht<<<world.com/offshoremarine/index."
+        },
+        {
+          "activation": 571.3673706054688,
+          "chain_idx": 7626,
+          "window_start": 102,
+          "text": ", such as our own Catamount Health Care (>>>http://www.yal<<<eruddcenter.org/resources/upload/"
+        },
+        {
+          "activation": 548.9049682617188,
+          "chain_idx": 19053,
+          "window_start": 112,
+          "text": " job is a fashion/commercial and wedding photographer \u2013>>> http://www.jack<<<ietranphoto.com \u2013 but to travel,"
+        },
+        {
+          "activation": 490.9488525390625,
+          "chain_idx": 10197,
+          "window_start": 117,
+          "text": " truly cares about his students.\"\nRead more:>>> http://bit.ly<<</2qWfsSX"
+        },
+        {
+          "activation": 435.7020263671875,
+          "chain_idx": 16825,
+          "window_start": 115,
+          "text": " efficiency as an educational leader.\nImage credit:>>> http://gurureview<<<bonus.com/wp-content/"
+        },
+        {
+          "activation": 397.56817626953125,
+          "chain_idx": 6746,
+          "window_start": 94,
+          "text": " the Department of Justice\u2019s website (archived at>>> https://perma.cc<<</C24U-HCME).\n"
+        }
+      ]
+    },
+    "17013": {
+      "mass": 5685.25927734375,
+      "examples": [
+        {
+          "activation": 817.5053100585938,
+          "chain_idx": 13343,
+          "window_start": 37,
+          "text": " thanks\n@simmytu: Bedankt!>>> En hier komen ze dan<<<.\nI did a lot of downloading and upgrading"
+        },
+        {
+          "activation": 777.6422729492188,
+          "chain_idx": 13343,
+          "window_start": 38,
+          "text": "\n@simmytu: Bedankt! En>>> hier komen ze dan.<<<\nI did a lot of downloading and upgrading in"
+        },
+        {
+          "activation": 770.037109375,
+          "chain_idx": 13343,
+          "window_start": 36,
+          "text": " And thanks\n@simmytu: Bedankt>>>! En hier komen ze<<< dan.\nI did a lot of downloading and"
+        },
+        {
+          "activation": 738.5941162109375,
+          "chain_idx": 13343,
+          "window_start": 35,
+          "text": ". And thanks\n@simmytu: Bed>>>ankt! En hier komen<<< ze dan.\nI did a lot of downloading"
+        },
+        {
+          "activation": 651.0573120117188,
+          "chain_idx": 13343,
+          "window_start": 39,
+          "text": "@simmytu: Bedankt! En hier>>> komen ze dan.\n<<<I did a lot of downloading and upgrading in my"
+        },
+        {
+          "activation": 608.587646484375,
+          "chain_idx": 13343,
+          "window_start": 34,
+          "text": " week. And thanks\n@simmytu:>>> Bedankt! En hier<<< komen ze dan.\nI did a lot of"
+        },
+        {
+          "activation": 451.604736328125,
+          "chain_idx": 13343,
+          "window_start": 40,
+          "text": "simmytu: Bedankt! En hier komen>>> ze dan.\nI<<< did a lot of downloading and upgrading in my City"
+        },
+        {
+          "activation": 398.18939208984375,
+          "chain_idx": 13343,
+          "window_start": 33,
+          "text": " every week. And thanks\n@simmytu>>>: Bedankt! En<<< hier komen ze dan.\nI did a lot"
+        },
+        {
+          "activation": 269.9528503417969,
+          "chain_idx": 13343,
+          "window_start": 41,
+          "text": "mytu: Bedankt! En hier komen ze>>> dan.\nI did<<< a lot of downloading and upgrading in my City."
+        },
+        {
+          "activation": 202.08853149414062,
+          "chain_idx": 13343,
+          "window_start": 32,
+          "text": " once every week. And thanks\n@simmy>>>tu: Bedankt!<<< En hier komen ze dan.\nI did a"
+        }
+      ]
+    },
+    "17800": {
+      "mass": 5660.5430908203125,
+      "examples": [
+        {
+          "activation": 583.1549682617188,
+          "chain_idx": 4166,
+          "window_start": 6,
+          "text": ">>>Venice is<<< a real expierence, which starts with the"
+        },
+        {
+          "activation": 575.793212890625,
+          "chain_idx": 9767,
+          "window_start": 0,
+          "text": ">>>To correct<<< this error:\n- Uninstall the controlled-release"
+        },
+        {
+          "activation": 574.1771850585938,
+          "chain_idx": 11077,
+          "window_start": 2,
+          "text": ">>>Web Design<<< Programer\nClosed - This job posting has"
+        },
+        {
+          "activation": 567.73828125,
+          "chain_idx": 8740,
+          "window_start": 12,
+          "text": ">>>Finding the<<< perfect ink is hard. I by myself am on"
+        },
+        {
+          "activation": 563.1332397460938,
+          "chain_idx": 16861,
+          "window_start": 33,
+          "text": ">>>CG is<<< your all-inclusive computer\ngraphic solutions company offering"
+        },
+        {
+          "activation": 561.9388427734375,
+          "chain_idx": 19121,
+          "window_start": 35,
+          "text": ">>>CBT works<<< on the basis that our thoughts, emotions and behaviours"
+        },
+        {
+          "activation": 560.7324829101562,
+          "chain_idx": 15638,
+          "window_start": 2,
+          "text": ">>>The Armor<<< S2000 is a concentrated sodium silicate"
+        },
+        {
+          "activation": 558.4891357421875,
+          "chain_idx": 11345,
+          "window_start": 2,
+          "text": ">>>separation of<<< nucleus protein - lysis buffer (Jun/02"
+        },
+        {
+          "activation": 558.0347900390625,
+          "chain_idx": 3662,
+          "window_start": 15,
+          "text": ">>>TestPad<<< is a tool that districts may use in multiple ways"
+        },
+        {
+          "activation": 557.3509521484375,
+          "chain_idx": 23651,
+          "window_start": 2,
+          "text": ">>>an odd<<<ity in the Industrial scene, because their music features"
+        }
+      ]
+    },
+    "2111": {
+      "mass": 5644.523742675781,
+      "examples": [
+        {
+          "activation": 591.7099609375,
+          "chain_idx": 14400,
+          "window_start": 47,
+          "text": ">>>Sign up for<<< the mailing list and receive access to download all of"
+        },
+        {
+          "activation": 575.0392456054688,
+          "chain_idx": 6008,
+          "window_start": 0,
+          "text": ">>>David Harder,<<< DVM, Medical Director\nDr. Harder opened"
+        },
+        {
+          "activation": 567.593505859375,
+          "chain_idx": 9316,
+          "window_start": 14,
+          "text": ">>>[ Home ><<< Spirits > liqueur > Pear > Badel Svato"
+        },
+        {
+          "activation": 565.7884521484375,
+          "chain_idx": 13272,
+          "window_start": 28,
+          "text": ">>>Staffing Services<<< provides assistance to individuals who are seeking employment with Lee"
+        },
+        {
+          "activation": 559.7552490234375,
+          "chain_idx": 14267,
+          "window_start": 15,
+          "text": ">>>Spend $5<<<0 more and get free shipping!\nYour cart"
+        },
+        {
+          "activation": 558.705078125,
+          "chain_idx": 13707,
+          "window_start": 34,
+          "text": ">>>Never before has<<< a high-tech road bike been so capable on"
+        },
+        {
+          "activation": 557.1221313476562,
+          "chain_idx": 18198,
+          "window_start": 30,
+          "text": ">>>Connect with us<<<:\nThe First Ten Years of Precious Metal Clay"
+        },
+        {
+          "activation": 556.8817749023438,
+          "chain_idx": 18958,
+          "window_start": 11,
+          "text": ">>>WearGhana as<<< you SeeGhana, EatGhana, and FeelGhana"
+        },
+        {
+          "activation": 556.724365234375,
+          "chain_idx": 20351,
+          "window_start": 6,
+          "text": ">>>|Home||<<<\u00bb Products||\u00bb Cotton Printed Dress||\u00bb Designer"
+        },
+        {
+          "activation": 555.2039794921875,
+          "chain_idx": 11077,
+          "window_start": 3,
+          "text": ">>>Web Design Pro<<<gramer\nClosed - This job posting has been"
+        }
+      ]
+    },
+    "9596": {
+      "mass": 5639.9666748046875,
+      "examples": [
+        {
+          "activation": 620.9091186523438,
+          "chain_idx": 22672,
+          "window_start": 78,
+          "text": "- 0.3oz (10 ml>>>) of lemon juice\n<<<- 0.3oz (10 ml"
+        },
+        {
+          "activation": 615.3953247070312,
+          "chain_idx": 22672,
+          "window_start": 79,
+          "text": " 0.3oz (10 ml)>>> of lemon juice\n-<<< 0.3oz (10 ml)"
+        },
+        {
+          "activation": 573.919921875,
+          "chain_idx": 22672,
+          "window_start": 63,
+          "text": "- 0.5oz (15 ml>>>) of vermouth\n<<<- 0.3oz (10 ml"
+        },
+        {
+          "activation": 571.1204223632812,
+          "chain_idx": 22672,
+          "window_start": 77,
+          "text": "\n- 0.3oz (10>>> ml) of lemon juice<<<\n- 0.3oz (10"
+        },
+        {
+          "activation": 568.5799560546875,
+          "chain_idx": 9316,
+          "window_start": 21,
+          "text": "[ Home > Spirits >>>> liqueur > Pear > Ba<<<del Svatovski Kruskovac 1."
+        },
+        {
+          "activation": 558.194091796875,
+          "chain_idx": 22672,
+          "window_start": 49,
+          "text": " Gin\n- 1oz (30 ml>>>) of vodka\n-<<< 0.5oz (15 ml)"
+        },
+        {
+          "activation": 541.854736328125,
+          "chain_idx": 22672,
+          "window_start": 93,
+          "text": "- 0.3oz (10 ml>>>) of cocoa liquor\n<<<Place the a\u00e7a\u00ed in the shaker, add"
+        },
+        {
+          "activation": 535.7887573242188,
+          "chain_idx": 22672,
+          "window_start": 113,
+          "text": " in the shaker, add the gin, ice,>>> and then the vodka,<<< liqueur and lemon.\nShake well and strain into"
+        },
+        {
+          "activation": 531.7847290039062,
+          "chain_idx": 22672,
+          "window_start": 114,
+          "text": " the shaker, add the gin, ice, and>>> then the vodka, liqueur<<< and lemon.\nShake well and strain into"
+        },
+        {
+          "activation": 522.4196166992188,
+          "chain_idx": 22672,
+          "window_start": 112,
+          "text": "\u00ed in the shaker, add the gin, ice>>>, and then the vodka<<<, liqueur and lemon.\nShake well and strain"
+        }
+      ]
+    },
+    "16499": {
+      "mass": 5599.012634277344,
+      "examples": [
+        {
+          "activation": 573.3048095703125,
+          "chain_idx": 7772,
+          "window_start": 7,
+          "text": "March 25, >>>2011\n<<<AUBURN, Ala. \u2013 The Vanderbilt women"
+        },
+        {
+          "activation": 571.6868286132812,
+          "chain_idx": 527,
+          "window_start": 16,
+          "text": " Avoid\nPosted on July 25, >>>2012 by<<< nina\nPublished by Fast Company\nWith all the"
+        },
+        {
+          "activation": 569.6201171875,
+          "chain_idx": 21364,
+          "window_start": 7,
+          "text": "January 13, >>>2012\n<<<Ironing Out the Wrinkles\nRituals are"
+        },
+        {
+          "activation": 568.09716796875,
+          "chain_idx": 8456,
+          "window_start": 7,
+          "text": "Nov 13, >>>2016\n<<<Weyerbacher Sunday Morning Stout\nWell, for"
+        },
+        {
+          "activation": 560.6087646484375,
+          "chain_idx": 10197,
+          "window_start": 52,
+          "text": " Kellye Lynn\nMay 23, >>>2017\n<<<WASHINGTON (ABC7) \u2014 A major surprise for"
+        },
+        {
+          "activation": 559.8968505859375,
+          "chain_idx": 19763,
+          "window_start": 10,
+          "text": "Published on October 22nd, >>>2013 |<<< by ABCUSA0\nCouncil Meets to Launch Study"
+        },
+        {
+          "activation": 554.8023681640625,
+          "chain_idx": 12818,
+          "window_start": 55,
+          "text": "\nNEW YORK, April 22, >>>2013 /<<<PRNewswire/ -- As part of the NYSE celebration"
+        },
+        {
+          "activation": 548.0126953125,
+          "chain_idx": 4358,
+          "window_start": 30,
+          "text": "ed in South Korea\nSeptember 4, >>>2012 <<<11:44 AM\ncomment(s"
+        },
+        {
+          "activation": 546.696533203125,
+          "chain_idx": 14639,
+          "window_start": 13,
+          "text": " Direct Marketing -\nNovember 1st, >>>2010\n<<<Sale of products/Services\nLead Generation- People"
+        },
+        {
+          "activation": 546.2864990234375,
+          "chain_idx": 14813,
+          "window_start": 23,
+          "text": " Marie, Michigan\nJune 28, >>>2011--<<<As Independence Day quickly approaches the Sault Area Chamber of"
+        }
+      ]
+    },
+    "1310": {
+      "mass": 5583.694152832031,
+      "examples": [
+        {
+          "activation": 573.0984497070312,
+          "chain_idx": 3069,
+          "window_start": 56,
+          "text": "18 5:20 pm\nWe>>> are opning up Booth<<< Bookings on the following dates: 24 Dec"
+        },
+        {
+          "activation": 570.82373046875,
+          "chain_idx": 7409,
+          "window_start": 12,
+          "text": " Polo Hongkong Hotel\nCheck rates and availability for this>>> hotel\nFind the best<<< prices for Marco Polo Hongkong Hotel from our 1"
+        },
+        {
+          "activation": 570.1320190429688,
+          "chain_idx": 13687,
+          "window_start": 4,
+          "text": "The latest concept>>> from Smart is a funky<<< little utility vehicle. Designed to combine active lifestyle practicality"
+        },
+        {
+          "activation": 567.1207885742188,
+          "chain_idx": 1208,
+          "window_start": 58,
+          "text": "3 days of winning hockey predictions? Wait no longer>>>.\nStart your free<<< trial today betting on hockey. Our 3 days"
+        },
+        {
+          "activation": 557.7193603515625,
+          "chain_idx": 22313,
+          "window_start": 64,
+          "text": "free transportation. We are able to bring our services>>> to new places through our<<< partnerships with parks departments and other land stewards like the"
+        },
+        {
+          "activation": 557.5157470703125,
+          "chain_idx": 8175,
+          "window_start": 37,
+          "text": " Anegada-formed entirely of coral and limestone>>>.\nAvailable on Wednesdays<<< through Bitter End Yacht Club (includes lunch) and"
+        },
+        {
+          "activation": 553.5972290039062,
+          "chain_idx": 9163,
+          "window_start": 107,
+          "text": " ski season 2011/12>>>.\nFor more information<<< click here\nTo book tickets click here\nStart"
+        },
+        {
+          "activation": 547.3020629882812,
+          "chain_idx": 107,
+          "window_start": 119,
+          "text": ", anticipating your needs and making our resources your resources>>>.\nOur original company<<<, Monson Chemicals"
+        },
+        {
+          "activation": 543.213623046875,
+          "chain_idx": 1060,
+          "window_start": 97,
+          "text": " past 13 have been below normal in Portland>>>!\nAnother interesting fact<<<? We haven\u2019t seen a frost in Portland"
+        },
+        {
+          "activation": 543.171142578125,
+          "chain_idx": 3069,
+          "window_start": 75,
+          "text": " dates: 24 Dec and 31>>> Dec. These will be<<< at Sunday's booking rates. Subject to minimum"
+        }
+      ]
+    },
+    "10341": {
+      "mass": 5561.749267578125,
+      "examples": [
+        {
+          "activation": 583.202392578125,
+          "chain_idx": 21364,
+          "window_start": 6,
+          "text": "January 13,>>> 2012<<<\nIroning Out the Wrinkles\nRituals"
+        },
+        {
+          "activation": 582.6749267578125,
+          "chain_idx": 7772,
+          "window_start": 6,
+          "text": "March 25,>>> 2011<<<\nAUBURN, Ala. \u2013 The Vanderbilt"
+        },
+        {
+          "activation": 577.316162109375,
+          "chain_idx": 11572,
+          "window_start": 8,
+          "text": "Friday, July 27,>>> 2012<<<\nEFA Coordination and Policy Formulation\nUNESCO Dhaka"
+        },
+        {
+          "activation": 571.636474609375,
+          "chain_idx": 20222,
+          "window_start": 8,
+          "text": "Thursday, June 21,>>> 2012<<<\nMy work week sabotaged by distractions\n"
+        },
+        {
+          "activation": 568.607177734375,
+          "chain_idx": 8456,
+          "window_start": 6,
+          "text": "Nov 13,>>> 2016<<<\nWeyerbacher Sunday Morning Stout\nWell,"
+        },
+        {
+          "activation": 545.244140625,
+          "chain_idx": 6253,
+          "window_start": 8,
+          "text": "Tuesday, November 29,>>> 2011<<<\nFool us once...\nRelease the Kraken!"
+        },
+        {
+          "activation": 536.1810302734375,
+          "chain_idx": 10996,
+          "window_start": 8,
+          "text": "Thursday, March 26,>>> 2009<<<\nValparaiso scored three times in the ninth inning"
+        },
+        {
+          "activation": 534.79150390625,
+          "chain_idx": 9360,
+          "window_start": 8,
+          "text": "Tuesday, September 28,>>> 2010<<<\nSunland Park: Aguilera Ousted for O"
+        },
+        {
+          "activation": 531.0853271484375,
+          "chain_idx": 23135,
+          "window_start": 7,
+          "text": "Aug. 16,>>> 2004<<< Of course, not the crab itself, but its"
+        },
+        {
+          "activation": 531.0101318359375,
+          "chain_idx": 3990,
+          "window_start": 8,
+          "text": "Monday, March 17,>>> 2014<<<\nAn attorney who had no prior discipline in "
+        }
+      ]
+    },
+    "16259": {
+      "mass": 5561.565124511719,
+      "examples": [
+        {
+          "activation": 594.1915893554688,
+          "chain_idx": 20897,
+          "window_start": 20,
+          "text": " Description\n100% long staple ring->>>spun cotton pile and blended<<< ground. Finished in an advanced, environmentally friendly,"
+        },
+        {
+          "activation": 583.84375,
+          "chain_idx": 20897,
+          "window_start": 17,
+          "text": "\nSalon One Description\n100% long>>> staple ring-spun cotton<<< pile and blended ground. Finished in an advanced,"
+        },
+        {
+          "activation": 560.0344848632812,
+          "chain_idx": 20897,
+          "window_start": 16,
+          "text": " Towels\nSalon One Description\n100%>>> long staple ring-spun<<< cotton pile and blended ground. Finished in an advanced"
+        },
+        {
+          "activation": 557.349365234375,
+          "chain_idx": 20897,
+          "window_start": 19,
+          "text": " One Description\n100% long staple ring>>>-spun cotton pile and<<< blended ground. Finished in an advanced, environmentally friendly"
+        },
+        {
+          "activation": 554.9450073242188,
+          "chain_idx": 20897,
+          "window_start": 14,
+          "text": " Safe Salon Towels\nSalon One Description\n10>>>0% long staple ring<<<-spun cotton pile and blended ground. Finished in"
+        },
+        {
+          "activation": 548.7499389648438,
+          "chain_idx": 20897,
+          "window_start": 22,
+          "text": "100% long staple ring-spun cotton>>> pile and blended ground.<<< Finished in an advanced, environmentally friendly, continuous bleach"
+        },
+        {
+          "activation": 548.4549560546875,
+          "chain_idx": 20897,
+          "window_start": 21,
+          "text": "\n100% long staple ring-spun>>> cotton pile and blended ground<<<. Finished in an advanced, environmentally friendly, continuous"
+        },
+        {
+          "activation": 548.4302978515625,
+          "chain_idx": 20897,
+          "window_start": 23,
+          "text": "00% long staple ring-spun cotton pile>>> and blended ground. Finished<<< in an advanced, environmentally friendly, continuous bleach and"
+        },
+        {
+          "activation": 536.2208251953125,
+          "chain_idx": 20897,
+          "window_start": 15,
+          "text": " Salon Towels\nSalon One Description\n100>>>% long staple ring-<<<spun cotton pile and blended ground. Finished in an"
+        },
+        {
+          "activation": 529.3449096679688,
+          "chain_idx": 17877,
+          "window_start": 43,
+          "text": " a durable 9.5-oz 1>>>00% polyester fleece<<< that has a sweater-knit face and a fleece"
+        }
+      ]
+    },
+    "11403": {
+      "mass": 5521.263427734375,
+      "examples": [
+        {
+          "activation": 580.4177856445312,
+          "chain_idx": 2042,
+          "window_start": 18,
+          "text": "1, 2012 -- 7>>>:40 a.<<<m.\nDelta Air Lines Inc. is buying"
+        },
+        {
+          "activation": 579.2830810546875,
+          "chain_idx": 4358,
+          "window_start": 37,
+          "text": "4, 2012 11>>>:44 AM\n<<<comment(s) - last by\nApple is"
+        },
+        {
+          "activation": 572.3219604492188,
+          "chain_idx": 19962,
+          "window_start": 36,
+          "text": "th, 2013 10>>>:13 AM #<<<21\u2665Mckinley Mayfair, Christian"
+        },
+        {
+          "activation": 551.3836059570312,
+          "chain_idx": 23068,
+          "window_start": 15,
+          "text": " 6, 2008 9>>>:04 am|<<<\n|Jamey Wood||Nov 6,"
+        },
+        {
+          "activation": 547.920654296875,
+          "chain_idx": 22867,
+          "window_start": 30,
+          "text": "0, 2017 @ 7>>>:00 pm -<<< 7:55 pm PDT\nMillennials"
+        },
+        {
+          "activation": 546.2783813476562,
+          "chain_idx": 23825,
+          "window_start": 36,
+          "text": ", 2018, 10>>>:50 a.<<<m. PT: Danica Patrick and Aaron Rodgers"
+        },
+        {
+          "activation": 541.2057495117188,
+          "chain_idx": 696,
+          "window_start": 8,
+          "text": "June 10, 1>>>:15 PM @<<< Meadowlark Senior Center\nRegular meetings take place"
+        },
+        {
+          "activation": 539.0942993164062,
+          "chain_idx": 7935,
+          "window_start": 121,
+          "text": "1, 2013 at 8>>>:10am \u2014<<< No Comments"
+        },
+        {
+          "activation": 537.9282836914062,
+          "chain_idx": 3069,
+          "window_start": 50,
+          "text": " 21 2018 5>>>:20 pm\n<<<We are opning up Booth Bookings on the following"
+        },
+        {
+          "activation": 525.4296264648438,
+          "chain_idx": 1233,
+          "window_start": 31,
+          "text": " David Hogan\nMay 19 @ 9>>>:00 am -<<< 12:00 pm$20"
+        }
+      ]
+    },
+    "4355": {
+      "mass": 5518.559631347656,
+      "examples": [
+        {
+          "activation": 568.9415893554688,
+          "chain_idx": 22777,
+          "window_start": 36,
+          "text": ">>>Anybody<<< pregnant with there Husband leaving for basic training? Im"
+        },
+        {
+          "activation": 567.8248291015625,
+          "chain_idx": 16315,
+          "window_start": 47,
+          "text": ">>>Wednesday<<<, April 1, 2015"
+        },
+        {
+          "activation": 564.6049194335938,
+          "chain_idx": 6041,
+          "window_start": 25,
+          "text": ">>>Monday<<< will start off cool as a Delta breeze pumps through"
+        },
+        {
+          "activation": 557.2744750976562,
+          "chain_idx": 11187,
+          "window_start": 14,
+          "text": ">>>These<<< sleek and sporty IRONMAN\u00ae Unyielding"
+        },
+        {
+          "activation": 555.78076171875,
+          "chain_idx": 18494,
+          "window_start": 58,
+          "text": ">>>Reviews<<<No reviews have been added for Amersham & Chel"
+        },
+        {
+          "activation": 552.5586547851562,
+          "chain_idx": 16788,
+          "window_start": 55,
+          "text": ">>>The<<< melodies and synths are nice but you need to"
+        },
+        {
+          "activation": 538.7655029296875,
+          "chain_idx": 21708,
+          "window_start": 36,
+          "text": ">>>Welcome<<< To Greater Lansing\nThis is Michigan's capital"
+        },
+        {
+          "activation": 538.00830078125,
+          "chain_idx": 8044,
+          "window_start": 58,
+          "text": ">>>This<<< is the online portfolio for Helen Stower. The"
+        },
+        {
+          "activation": 537.9356079101562,
+          "chain_idx": 8827,
+          "window_start": 58,
+          "text": ">>>Guides<<< and Tips\n13 of the best glamping"
+        },
+        {
+          "activation": 536.864990234375,
+          "chain_idx": 17889,
+          "window_start": 46,
+          "text": ">>>The<<< goal of Mitigation Banks is to replace the exact function"
+        }
+      ]
+    },
+    "2920": {
+      "mass": 5518.298522949219,
+      "examples": [
+        {
+          "activation": 580.1101684570312,
+          "chain_idx": 11340,
+          "window_start": 14,
+          "text": " eater??\nI just got two algea eaters>>> to live with my two<<< bettas. they are in a 2."
+        },
+        {
+          "activation": 576.927490234375,
+          "chain_idx": 11340,
+          "window_start": 21,
+          "text": " algea eaters to live with my two bettas>>>. they are in a<<< 2.5 gal tank, and after I"
+        },
+        {
+          "activation": 561.1741943359375,
+          "chain_idx": 11340,
+          "window_start": 17,
+          "text": "I just got two algea eaters to live with>>> my two bettas.<<< they are in a 2.5 gal tank"
+        },
+        {
+          "activation": 557.8318481445312,
+          "chain_idx": 11340,
+          "window_start": 37,
+          "text": "2.5 gal tank, and after I cleaned>>> the tanks I put the<<< algea eater in first.\nHowever when I"
+        },
+        {
+          "activation": 552.7981567382812,
+          "chain_idx": 11340,
+          "window_start": 23,
+          "text": " eaters to live with my two bettas. they>>> are in a 2<<<.5 gal tank, and after I cleaned the"
+        },
+        {
+          "activation": 548.9549560546875,
+          "chain_idx": 11340,
+          "window_start": 22,
+          "text": "ea eaters to live with my two bettas.>>> they are in a <<<2.5 gal tank, and after I cleaned"
+        },
+        {
+          "activation": 539.5601806640625,
+          "chain_idx": 11340,
+          "window_start": 16,
+          "text": "\nI just got two algea eaters to live>>> with my two bettas<<<. they are in a 2.5 gal"
+        },
+        {
+          "activation": 538.8256225585938,
+          "chain_idx": 11340,
+          "window_start": 15,
+          "text": "??\nI just got two algea eaters to>>> live with my two bet<<<tas. they are in a 2.5"
+        },
+        {
+          "activation": 534.4496459960938,
+          "chain_idx": 11340,
+          "window_start": 13,
+          "text": "ea eater??\nI just got two algea>>> eaters to live with my<<< two bettas. they are in a 2"
+        },
+        {
+          "activation": 527.666259765625,
+          "chain_idx": 11340,
+          "window_start": 35,
+          "text": " a 2.5 gal tank, and after>>> I cleaned the tanks I<<< put the algea eater in first.\nHowever"
+        }
+      ]
+    },
+    "5630": {
+      "mass": 5509.740539550781,
+      "examples": [
+        {
+          "activation": 559.5086669921875,
+          "chain_idx": 18928,
+          "window_start": 1,
+          "text": ">>>\"<<<The guys at Music House are the best in the"
+        },
+        {
+          "activation": 555.167724609375,
+          "chain_idx": 22018,
+          "window_start": 17,
+          "text": ">>>Black<<< box fraud occurs when customer premises equipment (CPE)"
+        },
+        {
+          "activation": 553.845947265625,
+          "chain_idx": 11077,
+          "window_start": 1,
+          "text": ">>>Web<<< Design Programer\nClosed - This job posting"
+        },
+        {
+          "activation": 553.376708984375,
+          "chain_idx": 15638,
+          "window_start": 1,
+          "text": ">>>The<<< Armor S2000 is a concentrated sodium"
+        },
+        {
+          "activation": 551.71240234375,
+          "chain_idx": 3559,
+          "window_start": 3,
+          "text": ">>>Over<<<sized Acrylic Star Charm Statement Necklace\n\ud83c\udf4d Chain "
+        },
+        {
+          "activation": 549.7949829101562,
+          "chain_idx": 11345,
+          "window_start": 1,
+          "text": ">>>separation<<< of nucleus protein - lysis buffer (Jun/0"
+        },
+        {
+          "activation": 547.4396362304688,
+          "chain_idx": 19756,
+          "window_start": 3,
+          "text": ">>>The<<< hardworking RG Daniels welcomes fellow stand-ups to this"
+        },
+        {
+          "activation": 547.34521484375,
+          "chain_idx": 5033,
+          "window_start": 4,
+          "text": ">>>It<<<'s Sharon here with a new mixed media project"
+        },
+        {
+          "activation": 546.2003173828125,
+          "chain_idx": 18706,
+          "window_start": 6,
+          "text": ">>>account<<<ability is a key component of realizing a goal."
+        },
+        {
+          "activation": 545.3489379882812,
+          "chain_idx": 13391,
+          "window_start": 10,
+          "text": ">>>Back<<< to Dresses\n- Come to stock\n- From"
+        }
+      ]
+    },
+    "9768": {
+      "mass": 5458.730133056641,
+      "examples": [
+        {
+          "activation": 787.394775390625,
+          "chain_idx": 7763,
+          "window_start": 51,
+          "text": " double precision floating point calculations.\nBased on Intel>>>'s MIC (many<<< integrated core) architecture, the new chip will be"
+        },
+        {
+          "activation": 644.5565185546875,
+          "chain_idx": 7763,
+          "window_start": 50,
+          "text": " sustained double precision floating point calculations.\nBased on>>> Intel's MIC (<<<many integrated core) architecture, the new chip will"
+        },
+        {
+          "activation": 628.78759765625,
+          "chain_idx": 7763,
+          "window_start": 52,
+          "text": " precision floating point calculations.\nBased on Intel'>>>s MIC (many integrated<<< core) architecture, the new chip will be made"
+        },
+        {
+          "activation": 559.1906127929688,
+          "chain_idx": 7763,
+          "window_start": 49,
+          "text": " of sustained double precision floating point calculations.\nBased>>> on Intel's MIC<<< (many integrated core) architecture, the new chip"
+        },
+        {
+          "activation": 506.081298828125,
+          "chain_idx": 7763,
+          "window_start": 54,
+          "text": " point calculations.\nBased on Intel's MIC>>> (many integrated core)<<< architecture, the new chip will be made with Intel"
+        },
+        {
+          "activation": 487.81414794921875,
+          "chain_idx": 7763,
+          "window_start": 58,
+          "text": "Based on Intel's MIC (many integrated core>>>) architecture, the new<<< chip will be made with Intel's 3"
+        },
+        {
+          "activation": 478.49090576171875,
+          "chain_idx": 7763,
+          "window_start": 57,
+          "text": "\nBased on Intel's MIC (many integrated>>> core) architecture, the<<< new chip will be made with Intel's "
+        },
+        {
+          "activation": 466.76153564453125,
+          "chain_idx": 7763,
+          "window_start": 48,
+          "text": "lop of sustained double precision floating point calculations.\n>>>Based on Intel's<<< MIC (many integrated core) architecture, the new"
+        },
+        {
+          "activation": 451.23199462890625,
+          "chain_idx": 7763,
+          "window_start": 56,
+          "text": ".\nBased on Intel's MIC (many>>> integrated core) architecture,<<< the new chip will be made with Intel's"
+        },
+        {
+          "activation": 448.4207458496094,
+          "chain_idx": 7763,
+          "window_start": 77,
+          "text": " with Intel's 3-D Tri->>>Gate 22nm<<< transistor process and is optimised for highly parallel supercomp"
+        }
+      ]
+    },
+    "13676": {
+      "mass": 5424.079895019531,
+      "examples": [
+        {
+          "activation": 697.0078125,
+          "chain_idx": 21021,
+          "window_start": 54,
+          "text": " drive for that data. I have tried to have>>> it mounted as a drive<<< on the host or as pass through to the VM"
+        },
+        {
+          "activation": 622.4650268554688,
+          "chain_idx": 21021,
+          "window_start": 53,
+          "text": " SSD drive for that data. I have tried to>>> have it mounted as a<<< drive on the host or as pass through to the"
+        },
+        {
+          "activation": 583.393798828125,
+          "chain_idx": 21021,
+          "window_start": 55,
+          "text": " for that data. I have tried to have it>>> mounted as a drive on<<< the host or as pass through to the VM."
+        },
+        {
+          "activation": 559.5284423828125,
+          "chain_idx": 21021,
+          "window_start": 52,
+          "text": " external SSD drive for that data. I have tried>>> to have it mounted as<<< a drive on the host or as pass through to"
+        },
+        {
+          "activation": 530.4053344726562,
+          "chain_idx": 21021,
+          "window_start": 56,
+          "text": " that data. I have tried to have it mounted>>> as a drive on the<<< host or as pass through to the VM. In"
+        },
+        {
+          "activation": 497.7005615234375,
+          "chain_idx": 21021,
+          "window_start": 75,
+          "text": " through to the VM. In either case, the>>> drive is being mounted with<<< permissions 777. Nextcloud complains as"
+        },
+        {
+          "activation": 490.50067138671875,
+          "chain_idx": 21021,
+          "window_start": 50,
+          "text": " have an external SSD drive for that data. I>>> have tried to have it<<< mounted as a drive on the host or as pass"
+        },
+        {
+          "activation": 484.9547424316406,
+          "chain_idx": 21021,
+          "window_start": 73,
+          "text": " as pass through to the VM. In either case>>>, the drive is being<<< mounted with permissions 777. Nextcloud"
+        },
+        {
+          "activation": 484.2841796875,
+          "chain_idx": 21021,
+          "window_start": 51,
+          "text": " an external SSD drive for that data. I have>>> tried to have it mounted<<< as a drive on the host or as pass through"
+        },
+        {
+          "activation": 473.8393249511719,
+          "chain_idx": 21021,
+          "window_start": 74,
+          "text": " pass through to the VM. In either case,>>> the drive is being mounted<<< with permissions 777. Nextcloud complains"
+        }
+      ]
+    },
+    "11306": {
+      "mass": 5410.695495605469,
+      "examples": [
+        {
+          "activation": 581.3665771484375,
+          "chain_idx": 517,
+          "window_start": 112,
+          "text": " depressant. Many people think the opposite because drinking>>> gives them a \u201cpick<<<-me-up.\u201d The truth is that alcohol"
+        },
+        {
+          "activation": 550.2590942382812,
+          "chain_idx": 8480,
+          "window_start": 51,
+          "text": " you punish yourself? Deluge yourself with a lot>>> of negative self-talk<<<? Begin to feel unworthy of good things? Or"
+        },
+        {
+          "activation": 543.1258544921875,
+          "chain_idx": 20418,
+          "window_start": 45,
+          "text": "\nThat YES to the dress feeling \ud83d\udc83\ud83c\udffb>>>\u2764\ufe0f Congratulations to @ly<<<ka_ecvwidder you found the exact"
+        },
+        {
+          "activation": 542.8394775390625,
+          "chain_idx": 14984,
+          "window_start": 82,
+          "text": " learn how to make African food, as well as>>> bring a little \"home<<< cooking\" to our everyday lives. It just helps"
+        },
+        {
+          "activation": 541.6712646484375,
+          "chain_idx": 16963,
+          "window_start": 25,
+          "text": "\u2019t understand it. To me, it seemed>>> like another time-suck<<< Web 2.0 creation.\nThen one"
+        },
+        {
+          "activation": 540.5440063476562,
+          "chain_idx": 3166,
+          "window_start": 69,
+          "text": " which Veronica and Cheryl Blossom decide to resolve their rivalry>>> with a dance-off<<<. But the writing is also oriented around the spectacle"
+        },
+        {
+          "activation": 533.4854125976562,
+          "chain_idx": 322,
+          "window_start": 57,
+          "text": " for more show points. Throwdown is, however>>>, a no-holds<<<-barred kick in the pants performance truck competition where"
+        },
+        {
+          "activation": 532.5160522460938,
+          "chain_idx": 13552,
+          "window_start": 118,
+          "text": " if you\u2019re not careful, online shopping can>>> turn your furniture-buying<<< experience into an extraordinarily expensive"
+        },
+        {
+          "activation": 524.7103881835938,
+          "chain_idx": 3877,
+          "window_start": 86,
+          "text": " alternative\nto staying in crowded and expensive tourist areas>>>. Our beachfront\ncon<<<dos and cottages are the perfect way to spend your"
+        },
+        {
+          "activation": 520.1773681640625,
+          "chain_idx": 13877,
+          "window_start": 53,
+          "text": " maintained\u2026 no matter the cost.\nStatistics on>>> how often police \u201cuse<<<\u201d the system\u2026 the numbers sound unbelievable \u2026 but"
+        }
+      ]
+    },
+    "8775": {
+      "mass": 5406.904052734375,
+      "examples": [
+        {
+          "activation": 557.231689453125,
+          "chain_idx": 10197,
+          "window_start": 39,
+          "text": ">>>By Kellye<<< Lynn\nMay 23, 20"
+        },
+        {
+          "activation": 550.393310546875,
+          "chain_idx": 21023,
+          "window_start": 1,
+          "text": ">>>All Photos \u00a9 Christine Elise<<< McCarthy 2013\nTo see images"
+        },
+        {
+          "activation": 550.2884521484375,
+          "chain_idx": 8087,
+          "window_start": 92,
+          "text": " that what we needed was to be able to efficiently>>> transfer cold,\u201d explained Dr<<< Hussam Jouhara of Brunel\u2019s Institute"
+        },
+        {
+          "activation": 547.6421508789062,
+          "chain_idx": 15987,
+          "window_start": 106,
+          "text": "The station\u2019s long-running anchor show,>>> \u201cPrimetime with Isaac<<< and Suke,\u201d will remain in its 3"
+        },
+        {
+          "activation": 542.2042846679688,
+          "chain_idx": 1852,
+          "window_start": 26,
+          "text": " help teach school children about engineering and science.\n>>>The video features Dr Rahul<<< Mandal, research associate at the Nuclear AMRC and"
+        },
+        {
+          "activation": 540.29736328125,
+          "chain_idx": 2134,
+          "window_start": 54,
+          "text": " senior residents.\n\"We're going to>>> expand respectfully,\" said Carol<<< J. Martin, executive director of the Fairfield Housing"
+        },
+        {
+          "activation": 531.505126953125,
+          "chain_idx": 15987,
+          "window_start": 107,
+          "text": " station\u2019s long-running anchor show, \u201c>>>Primetime with Isaac and<<< Suke,\u201d will remain in its 3-"
+        },
+        {
+          "activation": 531.307373046875,
+          "chain_idx": 18791,
+          "window_start": 61,
+          "text": " him?\n(a) Uncle Nevil.>>>\n(b) Uncle<<< Earle.\n(c) Uncle Beau.\n"
+        },
+        {
+          "activation": 528.6494140625,
+          "chain_idx": 18791,
+          "window_start": 68,
+          "text": " Nevil.\n(b) Uncle Earle.>>>\n(c) Uncle<<< Beau.\n2. How does Bone spend her"
+        },
+        {
+          "activation": 527.3848876953125,
+          "chain_idx": 5833,
+          "window_start": 116,
+          "text": "; Orley\u2019s Matt Orley, Alex>>> Orley, and Samantha<<< Florence; Ryan Roche; Daniel Cor"
+        }
+      ]
+    },
+    "4338": {
+      "mass": 5398.791015625,
+      "examples": [
+        {
+          "activation": 559.294677734375,
+          "chain_idx": 6008,
+          "window_start": 0,
+          "text": ">>>David Harder,<<< DVM, Medical Director\nDr. Harder opened"
+        },
+        {
+          "activation": 553.8215942382812,
+          "chain_idx": 4166,
+          "window_start": 7,
+          "text": ">>>Venice is a<<< real expierence, which starts with the water"
+        },
+        {
+          "activation": 549.0555419921875,
+          "chain_idx": 6041,
+          "window_start": 27,
+          "text": ">>>Monday will start<<< off cool as a Delta breeze pumps through the Valley"
+        },
+        {
+          "activation": 539.9912719726562,
+          "chain_idx": 11345,
+          "window_start": 3,
+          "text": ">>>separation of nucleus<<< protein - lysis buffer (Jun/02/"
+        },
+        {
+          "activation": 538.8124389648438,
+          "chain_idx": 2804,
+          "window_start": 8,
+          "text": ">>>Bridesmaids<<<' dresses often get a bad rep, but we"
+        },
+        {
+          "activation": 534.6533813476562,
+          "chain_idx": 9767,
+          "window_start": 1,
+          "text": ">>>To correct this<<< error:\n- Uninstall the controlled-release ("
+        },
+        {
+          "activation": 534.1941528320312,
+          "chain_idx": 17912,
+          "window_start": 8,
+          "text": ">>>Today I\u2019<<<m completely crushing on these sweet, pink and gold"
+        },
+        {
+          "activation": 530.5927124023438,
+          "chain_idx": 322,
+          "window_start": 8,
+          "text": ">>>Wanna-bes<<< stay home. Truckin\u2019s Throwdown isn"
+        },
+        {
+          "activation": 529.2724609375,
+          "chain_idx": 12640,
+          "window_start": 8,
+          "text": ">>>The world\u2019<<<s most dangerous animal isn\u2019t the lion,"
+        },
+        {
+          "activation": 529.102783203125,
+          "chain_idx": 8740,
+          "window_start": 13,
+          "text": ">>>Finding the perfect<<< ink is hard. I by myself am on the"
+        }
+      ]
+    },
+    "7183": {
+      "mass": 5358.833435058594,
+      "examples": [
+        {
+          "activation": 1175.6038818359375,
+          "chain_idx": 1040,
+          "window_start": 48,
+          "text": " up\n- Stationary play items-Jungle Gym,>>> 2 See-S<<<aws, 3 Seat Swing, Stand- Alone"
+        },
+        {
+          "activation": 914.4976196289062,
+          "chain_idx": 1040,
+          "window_start": 47,
+          "text": " cleaning up\n- Stationary play items-Jungle Gym>>>, 2 See-<<<Saws, 3 Seat Swing, Stand-"
+        },
+        {
+          "activation": 667.2988891601562,
+          "chain_idx": 1040,
+          "window_start": 55,
+          "text": "Jungle Gym, 2 See-Saws,>>> 3 Seat Swing,<<< Stand- Alone Slide & House, Merry-Go"
+        },
+        {
+          "activation": 549.6549682617188,
+          "chain_idx": 1040,
+          "window_start": 54,
+          "text": "-Jungle Gym, 2 See-Saws>>>, 3 Seat Swing<<<, Stand- Alone Slide & House, Merry-"
+        },
+        {
+          "activation": 396.73065185546875,
+          "chain_idx": 1040,
+          "window_start": 46,
+          "text": " & cleaning up\n- Stationary play items-Jungle>>> Gym, 2 See<<<-Saws, 3 Seat Swing, Stand"
+        },
+        {
+          "activation": 366.4780578613281,
+          "chain_idx": 1040,
+          "window_start": 72,
+          "text": " Alone Slide & House, Merry-Go-Round>>> and 3 Spring Rock<<<ers and Pin-the \u2013Tail on the Zebra"
+        },
+        {
+          "activation": 354.4508972167969,
+          "chain_idx": 1040,
+          "window_start": 49,
+          "text": "\n- Stationary play items-Jungle Gym, >>>2 See-Saws<<<, 3 Seat Swing, Stand- Alone Slide"
+        },
+        {
+          "activation": 351.3891296386719,
+          "chain_idx": 1040,
+          "window_start": 73,
+          "text": " Slide & House, Merry-Go-Round and>>> 3 Spring Rockers<<< and Pin-the \u2013Tail on the Zebra."
+        },
+        {
+          "activation": 296.247314453125,
+          "chain_idx": 1040,
+          "window_start": 56,
+          "text": " Gym, 2 See-Saws, >>>3 Seat Swing, Stand<<<- Alone Slide & House, Merry-Go-"
+        },
+        {
+          "activation": 286.4820251464844,
+          "chain_idx": 1040,
+          "window_start": 53,
+          "text": " items-Jungle Gym, 2 See-S>>>aws, 3 Seat<<< Swing, Stand- Alone Slide & House, Merry"
+        }
+      ]
+    },
+    "13183": {
+      "mass": 5354.8248291015625,
+      "examples": [
+        {
+          "activation": 559.802734375,
+          "chain_idx": 3699,
+          "window_start": 90,
+          "text": " than two feet from a yarn display and I picked>>> up two balls of L<<<opi Einband. Einband is Lopi'"
+        },
+        {
+          "activation": 554.3956909179688,
+          "chain_idx": 15383,
+          "window_start": 11,
+          "text": "Although not endemic from>>> where I am, F<<<allow Deer have become well established since their liberation "
+        },
+        {
+          "activation": 550.7163696289062,
+          "chain_idx": 5405,
+          "window_start": 72,
+          "text": " next several years, but no worries, as we>>> have an abundance of D<<<atura wrightii that bloom every year all summer"
+        },
+        {
+          "activation": 545.8536987304688,
+          "chain_idx": 5922,
+          "window_start": 75,
+          "text": "\nTo date, the West Coast and Texas have>>> documented the majority of G<<<HB exposures in the United States. Reports of misuse"
+        },
+        {
+          "activation": 537.828857421875,
+          "chain_idx": 7010,
+          "window_start": 27,
+          "text": ".\nThere are plenty of great interface icon sets>>> available for download. Squ<<<ircular brings joy to the icon game without being"
+        },
+        {
+          "activation": 524.7304077148438,
+          "chain_idx": 23771,
+          "window_start": 76,
+          "text": " service solutions they need to drive new insights and approaches>>>, they count on Quin<<<tilesIMS. With a global team of 5"
+        },
+        {
+          "activation": 523.9208984375,
+          "chain_idx": 22079,
+          "window_start": 123,
+          "text": " used by patients and prescribed by pros to treat this>>> kind of condition. Pred<<<"
+        },
+        {
+          "activation": 520.2252807617188,
+          "chain_idx": 6039,
+          "window_start": 105,
+          "text": " easily assigned to a less busy ringing position. This>>> selection is suitable for mas<<<sed ringing and is an ideal choice for a youth"
+        },
+        {
+          "activation": 519.9072265625,
+          "chain_idx": 3939,
+          "window_start": 34,
+          "text": " 500 gram bar of gold full of>>> tungsten, at the W<<<.C. Heraeus foundry, the world\u2019"
+        },
+        {
+          "activation": 517.4436645507812,
+          "chain_idx": 22079,
+          "window_start": 94,
+          "text": " the body tissues that result in a disturbance of the>>> affected body parts. Pred<<<nisone prednisolone is one of those solutions"
+        }
+      ]
+    },
+    "16922": {
+      "mass": 5340.941192626953,
+      "examples": [
+        {
+          "activation": 584.3728637695312,
+          "chain_idx": 446,
+          "window_start": 25,
+          "text": " me to realize how we could really use new versions>>> of the main characters from<<< both TPM and AOTC. Maybe \"vintage\""
+        },
+        {
+          "activation": 577.7548828125,
+          "chain_idx": 446,
+          "window_start": 26,
+          "text": " to realize how we could really use new versions of>>> the main characters from both<<< TPM and AOTC. Maybe \"vintage\" isn"
+        },
+        {
+          "activation": 571.933837890625,
+          "chain_idx": 446,
+          "window_start": 29,
+          "text": " we could really use new versions of the main characters>>> from both TPM and A<<<OTC. Maybe \"vintage\" isn't the"
+        },
+        {
+          "activation": 557.5260620117188,
+          "chain_idx": 446,
+          "window_start": 97,
+          "text": " incarnations. The TPM figures seem pretty dated compared>>> to the ROTS/<<<TSC offerings, and many of the AOTC era"
+        },
+        {
+          "activation": 523.63623046875,
+          "chain_idx": 446,
+          "window_start": 27,
+          "text": " realize how we could really use new versions of the>>> main characters from both TPM<<< and AOTC. Maybe \"vintage\" isn'"
+        },
+        {
+          "activation": 521.9340209960938,
+          "chain_idx": 446,
+          "window_start": 28,
+          "text": " how we could really use new versions of the main>>> characters from both TPM and<<< AOTC. Maybe \"vintage\" isn't"
+        },
+        {
+          "activation": 520.6863403320312,
+          "chain_idx": 446,
+          "window_start": 23,
+          "text": " cabinet helped me to realize how we could really use>>> new versions of the main<<< characters from both TPM and AOTC. Maybe \""
+        },
+        {
+          "activation": 514.864990234375,
+          "chain_idx": 446,
+          "window_start": 30,
+          "text": " could really use new versions of the main characters from>>> both TPM and AOTC<<<. Maybe \"vintage\" isn't the right"
+        },
+        {
+          "activation": 498.5476379394531,
+          "chain_idx": 446,
+          "window_start": 24,
+          "text": " helped me to realize how we could really use new>>> versions of the main characters<<< from both TPM and AOTC. Maybe \"vintage"
+        },
+        {
+          "activation": 469.684326171875,
+          "chain_idx": 446,
+          "window_start": 98,
+          "text": "nations. The TPM figures seem pretty dated compared to>>> the ROTS/TSC<<< offerings, and many of the AOTC era figures"
+        }
+      ]
+    },
+    "6562": {
+      "mass": 5335.489227294922,
+      "examples": [
+        {
+          "activation": 1054.414794921875,
+          "chain_idx": 7685,
+          "window_start": 84,
+          "text": " algebra and algebraic data types, imperative languages and Floyd>>>-Hoare logic,<<< and advanced chapters on polymorphism and modules, subtyping"
+        },
+        {
+          "activation": 767.5496215820312,
+          "chain_idx": 7685,
+          "window_start": 83,
+          "text": " universal algebra and algebraic data types, imperative languages and>>> Floyd-Hoare logic<<<, and advanced chapters on polymorphism and modules, sub"
+        },
+        {
+          "activation": 454.3425598144531,
+          "chain_idx": 7685,
+          "window_start": 33,
+          "text": " study the axiomatic, operational, and denot>>>ational semantics of sequential programming<<< languages. Later chapters are devoted to progressively more sophisticated"
+        },
+        {
+          "activation": 446.13330078125,
+          "chain_idx": 7685,
+          "window_start": 34,
+          "text": " the axiomatic, operational, and denotational>>> semantics of sequential programming languages<<<. Later chapters are devoted to progressively more sophisticated type"
+        },
+        {
+          "activation": 445.753173828125,
+          "chain_idx": 7685,
+          "window_start": 85,
+          "text": " and algebraic data types, imperative languages and Floyd->>>Hoare logic, and<<< advanced chapters on polymorphism and modules, subtyping and"
+        },
+        {
+          "activation": 444.3114013671875,
+          "chain_idx": 7685,
+          "window_start": 101,
+          "text": " chapters on polymorphism and modules, subtyping and object>>>-oriented concepts, and<<< type inference. The book is mathematically oriented but includes"
+        },
+        {
+          "activation": 439.16473388671875,
+          "chain_idx": 7685,
+          "window_start": 100,
+          "text": " advanced chapters on polymorphism and modules, subtyping and>>> object-oriented concepts,<<< and type inference. The book is mathematically oriented but"
+        },
+        {
+          "activation": 433.6147155761719,
+          "chain_idx": 7685,
+          "window_start": 99,
+          "text": " and advanced chapters on polymorphism and modules, subtyping>>> and object-oriented concepts<<<, and type inference. The book is mathematically oriented"
+        },
+        {
+          "activation": 425.1412658691406,
+          "chain_idx": 7685,
+          "window_start": 98,
+          "text": ", and advanced chapters on polymorphism and modules, sub>>>typing and object-oriented<<< concepts, and type inference. The book is mathematically"
+        },
+        {
+          "activation": 425.06365966796875,
+          "chain_idx": 7685,
+          "window_start": 26,
+          "text": " series of typed lambda calculi to study the axio>>>matic, operational, and<<< denotational semantics of sequential programming languages. Later"
+        }
+      ]
+    },
+    "810": {
+      "mass": 5333.667541503906,
+      "examples": [
+        {
+          "activation": 546.5709838867188,
+          "chain_idx": 3877,
+          "window_start": 19,
+          "text": ">>>Come stay with<<< us\nin beautiful Hawaii. Whether it is your"
+        },
+        {
+          "activation": 544.2339477539062,
+          "chain_idx": 12062,
+          "window_start": 46,
+          "text": ">>>Steampunk watch<<< movement hair grip bobby pin SP013\n"
+        },
+        {
+          "activation": 543.0947875976562,
+          "chain_idx": 4166,
+          "window_start": 7,
+          "text": ">>>Venice is a<<< real expierence, which starts with the water"
+        },
+        {
+          "activation": 542.7263793945312,
+          "chain_idx": 6008,
+          "window_start": 0,
+          "text": ">>>David Harder,<<< DVM, Medical Director\nDr. Harder opened"
+        },
+        {
+          "activation": 535.064453125,
+          "chain_idx": 9079,
+          "window_start": 11,
+          "text": ">>>Tea is a<<< tradition that dates back centuries, and while our own"
+        },
+        {
+          "activation": 531.7730102539062,
+          "chain_idx": 23651,
+          "window_start": 3,
+          "text": ">>>an oddity<<< in the Industrial scene, because their music features Christian"
+        },
+        {
+          "activation": 524.218994140625,
+          "chain_idx": 23964,
+          "window_start": 38,
+          "text": ">>>A new Blade<<< and Soul trailer from this years' G-Star"
+        },
+        {
+          "activation": 522.8460083007812,
+          "chain_idx": 9767,
+          "window_start": 1,
+          "text": ">>>To correct this<<< error:\n- Uninstall the controlled-release ("
+        },
+        {
+          "activation": 521.8963012695312,
+          "chain_idx": 3683,
+          "window_start": 10,
+          "text": ">>>Priest turned vigilante<<< Father John (Van Cleef) hunts down a"
+        },
+        {
+          "activation": 521.24267578125,
+          "chain_idx": 11538,
+          "window_start": 10,
+          "text": ">>>For Manhole<<< Monday today, I\u2019d like to direct you"
+        }
+      ]
+    },
+    "8031": {
+      "mass": 5333.467102050781,
+      "examples": [
+        {
+          "activation": 574.6656494140625,
+          "chain_idx": 13101,
+          "window_start": 65,
+          "text": " year since 2003 after data yesterday>>> showed employment and manufacturing improved<<<, while declining yields at European debt sales stoked speculation"
+        },
+        {
+          "activation": 547.9934692382812,
+          "chain_idx": 13101,
+          "window_start": 68,
+          "text": "2003 after data yesterday showed employment and>>> manufacturing improved, while declining<<< yields at European debt sales stoked speculation the region\u2019"
+        },
+        {
+          "activation": 538.720947265625,
+          "chain_idx": 13101,
+          "window_start": 27,
+          "text": ". report forecast to show home sales increased in December>>>, adding to signs the<<< world\u2019s largest economy is gaining momentum.\n"
+        },
+        {
+          "activation": 532.38525390625,
+          "chain_idx": 1182,
+          "window_start": 105,
+          "text": " an immediate imposition of tariffs on Mexico and retail sales>>> data in May showed a<<< pick-up in consumer spending. Furthermore, Beijing"
+        },
+        {
+          "activation": 530.8800659179688,
+          "chain_idx": 13101,
+          "window_start": 64,
+          "text": " a year since 2003 after data>>> yesterday showed employment and manufacturing<<< improved, while declining yields at European debt sales stoked"
+        },
+        {
+          "activation": 529.1552734375,
+          "chain_idx": 1182,
+          "window_start": 104,
+          "text": " from an immediate imposition of tariffs on Mexico and retail>>> sales data in May showed<<< a pick-up in consumer spending. Furthermore,"
+        },
+        {
+          "activation": 525.7120361328125,
+          "chain_idx": 13101,
+          "window_start": 21,
+          "text": " month before a U.S. report forecast to>>> show home sales increased in<<< December, adding to signs the world\u2019s largest"
+        },
+        {
+          "activation": 522.0262451171875,
+          "chain_idx": 13101,
+          "window_start": 67,
+          "text": " 2003 after data yesterday showed employment>>> and manufacturing improved, while<<< declining yields at European debt sales stoked speculation the region"
+        },
+        {
+          "activation": 516.4038696289062,
+          "chain_idx": 13101,
+          "window_start": 66,
+          "text": " since 2003 after data yesterday showed>>> employment and manufacturing improved,<<< while declining yields at European debt sales stoked speculation the"
+        },
+        {
+          "activation": 515.5242919921875,
+          "chain_idx": 13101,
+          "window_start": 63,
+          "text": " to a year since 2003 after>>> data yesterday showed employment and<<< manufacturing improved, while declining yields at European debt sales"
+        }
+      ]
+    },
+    "11706": {
+      "mass": 5320.438507080078,
+      "examples": [
+        {
+          "activation": 565.3656616210938,
+          "chain_idx": 8438,
+          "window_start": 71,
+          "text": " a few of your teeth, we can fit you>>> with a removable partial denture<<< (RPD). Although mainly considered a temporary solution for"
+        },
+        {
+          "activation": 553.8948974609375,
+          "chain_idx": 8438,
+          "window_start": 70,
+          "text": " just a few of your teeth, we can fit>>> you with a removable partial<<< denture (RPD). Although mainly considered a temporary solution"
+        },
+        {
+          "activation": 545.528076171875,
+          "chain_idx": 8438,
+          "window_start": 69,
+          "text": " lost just a few of your teeth, we can>>> fit you with a removable<<< partial denture (RPD). Although mainly considered a temporary"
+        },
+        {
+          "activation": 543.73681640625,
+          "chain_idx": 8438,
+          "window_start": 60,
+          "text": " tooth loss only. Even if you've lost>>> just a few of your<<< teeth, we can fit you with a removable partial"
+        },
+        {
+          "activation": 539.5499267578125,
+          "chain_idx": 8438,
+          "window_start": 61,
+          "text": " loss only. Even if you've lost just>>> a few of your teeth<<<, we can fit you with a removable partial denture"
+        },
+        {
+          "activation": 528.5087890625,
+          "chain_idx": 8438,
+          "window_start": 58,
+          "text": " for total tooth loss only. Even if you'>>>ve lost just a few<<< of your teeth, we can fit you with a"
+        },
+        {
+          "activation": 524.757080078125,
+          "chain_idx": 8438,
+          "window_start": 62,
+          "text": " only. Even if you've lost just a>>> few of your teeth,<<< we can fit you with a removable partial denture ("
+        },
+        {
+          "activation": 516.98193359375,
+          "chain_idx": 8438,
+          "window_start": 59,
+          "text": " total tooth loss only. Even if you've>>> lost just a few of<<< your teeth, we can fit you with a removable"
+        },
+        {
+          "activation": 509.42486572265625,
+          "chain_idx": 8438,
+          "window_start": 82,
+          "text": " a removable partial denture (RPD). Although mainly considered>>> a temporary solution for missing<<< teeth, some people depend on an RPD for"
+        },
+        {
+          "activation": 492.6904602050781,
+          "chain_idx": 8438,
+          "window_start": 72,
+          "text": " few of your teeth, we can fit you with>>> a removable partial denture (<<<RPD). Although mainly considered a temporary solution for missing"
+        }
+      ]
+    },
+    "8967": {
+      "mass": 5300.258697509766,
+      "examples": [
+        {
+          "activation": 792.926513671875,
+          "chain_idx": 19916,
+          "window_start": 117,
+          "text": " it would let the FDA regulate the levels of tar>>>, nicotine and other harmful<<< components of tobacco products. Cigarette"
+        },
+        {
+          "activation": 698.6489868164062,
+          "chain_idx": 19916,
+          "window_start": 115,
+          "text": "Specifically, it would let the FDA regulate the levels>>> of tar, nicotine and<<< other harmful components of tobacco products. Cigarette"
+        },
+        {
+          "activation": 679.6159057617188,
+          "chain_idx": 19916,
+          "window_start": 120,
+          "text": " the FDA regulate the levels of tar, nicotine and>>> other harmful components of tobacco<<< products. Cigarette"
+        },
+        {
+          "activation": 659.8298950195312,
+          "chain_idx": 19916,
+          "window_start": 119,
+          "text": " let the FDA regulate the levels of tar, nicotine>>> and other harmful components of<<< tobacco products. Cigarette"
+        },
+        {
+          "activation": 634.7988891601562,
+          "chain_idx": 19916,
+          "window_start": 116,
+          "text": ", it would let the FDA regulate the levels of>>> tar, nicotine and other<<< harmful components of tobacco products. Cigarette"
+        },
+        {
+          "activation": 442.8851623535156,
+          "chain_idx": 19916,
+          "window_start": 80,
+          "text": " House legislation, would give the FDA the same authority>>> over cigarettes and other tobacco<<< products that the regulatory agency now has over drugs,"
+        },
+        {
+          "activation": 409.3827209472656,
+          "chain_idx": 19916,
+          "window_start": 114,
+          "text": "\nSpecifically, it would let the FDA regulate the>>> levels of tar, nicotine<<< and other harmful components of tobacco products. Cigarette"
+        },
+        {
+          "activation": 360.6807556152344,
+          "chain_idx": 19916,
+          "window_start": 118,
+          "text": " would let the FDA regulate the levels of tar,>>> nicotine and other harmful components<<< of tobacco products. Cigarette"
+        },
+        {
+          "activation": 337.0223693847656,
+          "chain_idx": 19916,
+          "window_start": 79,
+          "text": " to House legislation, would give the FDA the same>>> authority over cigarettes and other<<< tobacco products that the regulatory agency now has over drugs"
+        },
+        {
+          "activation": 284.4674987792969,
+          "chain_idx": 19916,
+          "window_start": 123,
+          "text": " the levels of tar, nicotine and other harmful components>>> of tobacco products. Cigarette<<<"
+        }
+      ]
+    },
+    "14602": {
+      "mass": 5276.366394042969,
+      "examples": [
+        {
+          "activation": 535.2610473632812,
+          "chain_idx": 23651,
+          "window_start": 2,
+          "text": ">>>an odd<<<ity in the Industrial scene, because their music features"
+        },
+        {
+          "activation": 529.4794921875,
+          "chain_idx": 12640,
+          "window_start": 7,
+          "text": ">>>The world<<<\u2019s most dangerous animal isn\u2019t the lion"
+        },
+        {
+          "activation": 528.77392578125,
+          "chain_idx": 16788,
+          "window_start": 56,
+          "text": ">>>The melodies<<< and synths are nice but you need to practice"
+        },
+        {
+          "activation": 528.1903686523438,
+          "chain_idx": 11077,
+          "window_start": 2,
+          "text": ">>>Web Design<<< Programer\nClosed - This job posting has"
+        },
+        {
+          "activation": 526.7733154296875,
+          "chain_idx": 21936,
+          "window_start": 18,
+          "text": ">>>This is<<< a paragraph-long reading which asks students to not"
+        },
+        {
+          "activation": 526.1016235351562,
+          "chain_idx": 6656,
+          "window_start": 33,
+          "text": ">>>Well,<<< I made myself a blog\nI\u2019ve been"
+        },
+        {
+          "activation": 526.0404663085938,
+          "chain_idx": 17889,
+          "window_start": 47,
+          "text": ">>>The goal<<< of Mitigation Banks is to replace the exact function and"
+        },
+        {
+          "activation": 525.95849609375,
+          "chain_idx": 12062,
+          "window_start": 45,
+          "text": ">>>Steampunk<<< watch movement hair grip bobby pin SP013"
+        },
+        {
+          "activation": 525.2470703125,
+          "chain_idx": 11534,
+          "window_start": 33,
+          "text": ">>>The Alum<<<alock Double Handgun Locking Case in Black by"
+        },
+        {
+          "activation": 524.5405883789062,
+          "chain_idx": 16389,
+          "window_start": 13,
+          "text": ">>>Satin<<<-finished, stainless steel base plates are welded with"
+        }
+      ]
+    },
+    "5108": {
+      "mass": 5268.390869140625,
+      "examples": [
+        {
+          "activation": 547.1263427734375,
+          "chain_idx": 19105,
+          "window_start": 70,
+          "text": "!\nThis zany, hilarious tale, delightfully>>> brought to life by Ben<<< Cort's vibrant illustrations, is sure to enchant"
+        },
+        {
+          "activation": 541.1544189453125,
+          "chain_idx": 23073,
+          "window_start": 61,
+          "text": "uldani\u00f0urfellingar. The original idea>>> of this comes from Steve<<< Keen but, I believe, the actual process is"
+        },
+        {
+          "activation": 532.1790161132812,
+          "chain_idx": 1093,
+          "window_start": 54,
+          "text": " clicking HERE.\nThe official trailer offers a glimpse>>> at all phases of Coach<<< Shaw\u2019s life from his early coaching career at"
+        },
+        {
+          "activation": 531.0620727539062,
+          "chain_idx": 20900,
+          "window_start": 13,
+          "text": " Fear: Syria\u2019s Alawites in War>>> and Peace. By Leon<<< Goldsmith. Oxford University Press; 306"
+        },
+        {
+          "activation": 527.9091186523438,
+          "chain_idx": 16397,
+          "window_start": 104,
+          "text": " which are female. Some of the most notable names>>> on this car are Jason<<< Dunham, Rafael Peralta, Mike Anderson Jr., and"
+        },
+        {
+          "activation": 522.6781005859375,
+          "chain_idx": 12640,
+          "window_start": 46,
+          "text": "quitos have killed more humans than any other creature in>>> human history,\u201d says Haydn<<< Parry in today\u2019s talk. \u201cThe mosquito"
+        },
+        {
+          "activation": 518.009765625,
+          "chain_idx": 6141,
+          "window_start": 121,
+          "text": "s it to you?\": Canada Admits its>>> Crime, Again. Larry<<< Gambone"
+        },
+        {
+          "activation": 517.1494750976562,
+          "chain_idx": 11402,
+          "window_start": 10,
+          "text": "Real Girls, Real Bodies, Real Issues,>>> Real Answers\nby Nancy<<< Amanda Redd\nThis is a great book for"
+        },
+        {
+          "activation": 515.6708374023438,
+          "chain_idx": 22423,
+          "window_start": 90,
+          "text": " Interpersonal dynamics, and organizational management. It will be>>> taught by Dr. Phil<<< Bray, lead pastor of Macon First Baptist Church,"
+        },
+        {
+          "activation": 515.4517211914062,
+          "chain_idx": 17203,
+          "window_start": 121,
+          "text": " 11: Foreign Policy published a Letter to>>> the Editor written by Ambassador<<< Erth"
+        }
+      ]
+    },
+    "15709": {
+      "mass": 5251.563049316406,
+      "examples": [
+        {
+          "activation": 532.0677490234375,
+          "chain_idx": 11345,
+          "window_start": 1,
+          "text": ">>>separation<<< of nucleus protein - lysis buffer (Jun/0"
+        },
+        {
+          "activation": 529.3864135742188,
+          "chain_idx": 8827,
+          "window_start": 58,
+          "text": ">>>Guides<<< and Tips\n13 of the best glamping"
+        },
+        {
+          "activation": 528.7445678710938,
+          "chain_idx": 15638,
+          "window_start": 1,
+          "text": ">>>The<<< Armor S2000 is a concentrated sodium"
+        },
+        {
+          "activation": 524.3817749023438,
+          "chain_idx": 21302,
+          "window_start": 30,
+          "text": ">>>Stepping<<< outside what we normally do can give us fresh insights"
+        },
+        {
+          "activation": 523.60888671875,
+          "chain_idx": 11382,
+          "window_start": 2,
+          "text": ">>>Thousands<<< of dumb, funny, and amusing college quotes submitted"
+        },
+        {
+          "activation": 523.365234375,
+          "chain_idx": 18198,
+          "window_start": 28,
+          "text": ">>>Connect<<< with us:\nThe First Ten Years of Precious"
+        },
+        {
+          "activation": 522.6416625976562,
+          "chain_idx": 11187,
+          "window_start": 14,
+          "text": ">>>These<<< sleek and sporty IRONMAN\u00ae Unyielding"
+        },
+        {
+          "activation": 522.5584716796875,
+          "chain_idx": 19756,
+          "window_start": 3,
+          "text": ">>>The<<< hardworking RG Daniels welcomes fellow stand-ups to this"
+        },
+        {
+          "activation": 522.50244140625,
+          "chain_idx": 15383,
+          "window_start": 3,
+          "text": ">>>Although<<< not endemic from where I am, Fallow Deer"
+        },
+        {
+          "activation": 522.3058471679688,
+          "chain_idx": 18301,
+          "window_start": 48,
+          "text": ">>>joined<<< 5 years ago\nThis group will be host"
+        }
+      ]
+    },
+    "3973": {
+      "mass": 5239.454650878906,
+      "examples": [
+        {
+          "activation": 554.0840454101562,
+          "chain_idx": 10971,
+          "window_start": 34,
+          "text": " is not the name you expected.\nAnence>>>phaly is a term<<< that refers to the incomplete development of the brain,"
+        },
+        {
+          "activation": 549.5620727539062,
+          "chain_idx": 10971,
+          "window_start": 22,
+          "text": " possible that the main title of the report Anence>>>phaly is not the<<< name you expected.\nAnencephaly is"
+        },
+        {
+          "activation": 528.3729248046875,
+          "chain_idx": 23833,
+          "window_start": 2,
+          "text": "Personality>>> psychology research topics ideas for<<< experiments, papers, and projects. Our faculty conducts"
+        },
+        {
+          "activation": 527.9669189453125,
+          "chain_idx": 10993,
+          "window_start": 7,
+          "text": "Vaccines, Blood & Bio>>>logics\nResources for<<< You\nSynonymous (\u201cSilent\u201d) Mutations in Health"
+        },
+        {
+          "activation": 521.1580810546875,
+          "chain_idx": 14400,
+          "window_start": 79,
+          "text": "!\nOur Subscribers Get\nSpecial deals, discounts>>> and gifts. Plus,<<< get regular updates on what's going on in"
+        },
+        {
+          "activation": 520.2310180664062,
+          "chain_idx": 17889,
+          "window_start": 121,
+          "text": "heet\n- Mitigation Resource Group\n- Westervelt>>> Ecological Services - mitigation and<<< conservation banks"
+        },
+        {
+          "activation": 515.5217895507812,
+          "chain_idx": 1045,
+          "window_start": 42,
+          "text": ".. and will comprise of 3 section\nSection>>> 1: Ques on<<< data sufficiency\nQues on time and work, boat"
+        },
+        {
+          "activation": 510.3757019042969,
+          "chain_idx": 14361,
+          "window_start": 47,
+          "text": "Parent Directory | Revision Log\n>>>Merging latest changes to<<< the rc-scripts branch. This merge is based"
+        },
+        {
+          "activation": 506.9870300292969,
+          "chain_idx": 23833,
+          "window_start": 41,
+          "text": " research concentration are listed below click the topics. The>>> best sources to look up<<< for the stunning topics for your final paper are psychology"
+        },
+        {
+          "activation": 505.195068359375,
+          "chain_idx": 8607,
+          "window_start": 111,
+          "text": "'s not clear exactly how atherosclerosis starts or what>>> causes it. However,<<< a gradual buildup of plaque or thickening due to inflammation"
+        }
+      ]
+    },
+    "11343": {
+      "mass": 5237.504669189453,
+      "examples": [
+        {
+          "activation": 615.7000732421875,
+          "chain_idx": 14267,
+          "window_start": 71,
+          "text": "\nVIEJO SAN JUAN\n202 B>>> Calle San Justo, San<<< Juan, Puerto Rico 00901"
+        },
+        {
+          "activation": 579.8525390625,
+          "chain_idx": 14267,
+          "window_start": 72,
+          "text": "VIEJO SAN JUAN\n202 B Calle>>> San Justo, San Juan<<<, Puerto Rico 00901\n"
+        },
+        {
+          "activation": 576.057861328125,
+          "chain_idx": 14267,
+          "window_start": 73,
+          "text": "JO SAN JUAN\n202 B Calle San>>> Justo, San Juan,<<< Puerto Rico 00901\nOPEN"
+        },
+        {
+          "activation": 558.73974609375,
+          "chain_idx": 14267,
+          "window_start": 74,
+          "text": " SAN JUAN\n202 B Calle San Justo>>>, San Juan, Puerto<<< Rico 00901\nOPENThurs"
+        },
+        {
+          "activation": 522.0859375,
+          "chain_idx": 14267,
+          "window_start": 75,
+          "text": " JUAN\n202 B Calle San Justo,>>> San Juan, Puerto Rico<<< 00901\nOPENThursdays"
+        },
+        {
+          "activation": 491.4888916015625,
+          "chain_idx": 14267,
+          "window_start": 76,
+          "text": "\n202 B Calle San Justo, San>>> Juan, Puerto Rico <<<00901\nOPENThursdays to"
+        },
+        {
+          "activation": 481.8760070800781,
+          "chain_idx": 14267,
+          "window_start": 70,
+          "text": " you\nVIEJO SAN JUAN\n202>>> B Calle San Justo,<<< San Juan, Puerto Rico 0090"
+        },
+        {
+          "activation": 475.2455749511719,
+          "chain_idx": 21420,
+          "window_start": 118,
+          "text": " excellent educations most Cubans get\u2014this going back>>> to the lectores tradition in<<< cigar factories where employees got"
+        },
+        {
+          "activation": 468.91473388671875,
+          "chain_idx": 119,
+          "window_start": 40,
+          "text": "\nDurango state prosecutors say the officers worked in>>> the Durango cities of Gomez<<< Palacio and Lerdo. They say soldiers and state"
+        },
+        {
+          "activation": 467.5433044433594,
+          "chain_idx": 119,
+          "window_start": 39,
+          "text": ".\nDurango state prosecutors say the officers worked>>> in the Durango cities of<<< Gomez Palacio and Lerdo. They say soldiers and"
+        }
+      ]
+    },
+    "1723": {
+      "mass": 5218.3187255859375,
+      "examples": [
+        {
+          "activation": 535.4027099609375,
+          "chain_idx": 10400,
+          "window_start": 45,
+          "text": ") immersed, via a practical exercise and in the>>> context of the 2<<<019 Spring School, in the design and"
+        },
+        {
+          "activation": 530.9365844726562,
+          "chain_idx": 15363,
+          "window_start": 17,
+          "text": " that, last year, Jenni and Natasha took>>> part in the 6<<<4 Million Artists January Challenge. Well, we\u2019"
+        },
+        {
+          "activation": 530.23876953125,
+          "chain_idx": 12639,
+          "window_start": 53,
+          "text": " Czech and part Cuban, with blonde hair, green>>> eyes and a 3<<<2DD bust. Recently single, she works as"
+        },
+        {
+          "activation": 524.83740234375,
+          "chain_idx": 4467,
+          "window_start": 0,
+          "text": ">>>Map of 3<<<071 Dasha Palm Dr, Kissim"
+        },
+        {
+          "activation": 518.6509399414062,
+          "chain_idx": 20315,
+          "window_start": 51,
+          "text": "- 5pm - 5.30>>>pm\n- 6<<<pm - 6.30pm\n-"
+        },
+        {
+          "activation": 518.28759765625,
+          "chain_idx": 5367,
+          "window_start": 48,
+          "text": " event was a huge success with 275>>> runners crossing the 5<<<K finish line and over 324 registered"
+        },
+        {
+          "activation": 517.7799072265625,
+          "chain_idx": 13829,
+          "window_start": 82,
+          "text": " introducing the first field programmable gate array (FPGA)>>> implementation of the 3<<<2-bit V1 ColdFire\u00ae core on"
+        },
+        {
+          "activation": 514.6697998046875,
+          "chain_idx": 4270,
+          "window_start": 104,
+          "text": " However, I find it interesting that the same people>>> that were yelling 4<<<0, 50, 60 years"
+        },
+        {
+          "activation": 514.071533203125,
+          "chain_idx": 7020,
+          "window_start": 2,
+          "text": "Success>>>or of the 4<<<88 GTB, the F8 Tributo"
+        },
+        {
+          "activation": 513.4434814453125,
+          "chain_idx": 23223,
+          "window_start": 2,
+          "text": "NEW>>> YORK \u2013 The 4<<<4th-ranked Columbia men\u2019s tennis team"
+        }
+      ]
+    },
+    "7699": {
+      "mass": 5190.139709472656,
+      "examples": [
+        {
+          "activation": 574.072509765625,
+          "chain_idx": 14267,
+          "window_start": 101,
+          "text": " Sunday 11:00 a.m>>>. - 4:<<<00 p.m.\nCLOSED. Monday"
+        },
+        {
+          "activation": 552.6798706054688,
+          "chain_idx": 18312,
+          "window_start": 39,
+          "text": " a Forsyth County Sheriff\u2019s incident report.\n>>>At about 3:<<<30 p.m. on June 8"
+        },
+        {
+          "activation": 533.4551391601562,
+          "chain_idx": 7115,
+          "window_start": 117,
+          "text": " held at a Member\u2019s business premises and usually>>> commence at 6.<<<30pm. These quarterly"
+        },
+        {
+          "activation": 524.564697265625,
+          "chain_idx": 8539,
+          "window_start": 34,
+          "text": " 2019\n9:00>>> am to 5:<<<00 pm\n$290 plus $"
+        },
+        {
+          "activation": 521.6494140625,
+          "chain_idx": 8095,
+          "window_start": 51,
+          "text": " Camps start at 9.30 am and>>> finish at 2.<<<30 pm. The cost is 30"
+        },
+        {
+          "activation": 515.1389770507812,
+          "chain_idx": 8095,
+          "window_start": 42,
+          "text": " 2016.\nThe Pony Camps>>> start at 9.<<<30 am and finish at 2.3"
+        },
+        {
+          "activation": 511.0464172363281,
+          "chain_idx": 22062,
+          "window_start": 93,
+          "text": " at 5:30 pm and it goes>>> until 10:<<<00 pm every evening from November 1st"
+        },
+        {
+          "activation": 491.5889587402344,
+          "chain_idx": 1233,
+          "window_start": 27,
+          "text": " Deliverance\u201d with David Hogan\nMay 1>>>9 @ 9:<<<00 am - 12:00"
+        },
+        {
+          "activation": 483.2391357421875,
+          "chain_idx": 7115,
+          "window_start": 65,
+          "text": " first and third Wednesdays of each month. They are>>> start at 9.<<<30am and are held at a local cafe"
+        },
+        {
+          "activation": 482.70458984375,
+          "chain_idx": 1233,
+          "window_start": 35,
+          "text": " 19 @ 9:00 am>>> - 12:<<<00 pm$20\nby Perth Out"
+        }
+      ]
+    },
+    "6646": {
+      "mass": 5185.109100341797,
+      "examples": [
+        {
+          "activation": 542.5126342773438,
+          "chain_idx": 20853,
+          "window_start": 52,
+          "text": " was found hanging days ago, dozens of people gathered>>> thursday to demand justice for<<< fuller and to honor george floyd , the black man"
+        },
+        {
+          "activation": 536.6964111328125,
+          "chain_idx": 20853,
+          "window_start": 68,
+          "text": " and to honor george floyd , the black man who>>> died in police custody in<<< minneapolis.\nPalmdale is also one"
+        },
+        {
+          "activation": 526.5990600585938,
+          "chain_idx": 20853,
+          "window_start": 70,
+          "text": " honor george floyd , the black man who died in>>> police custody in minneapolis<<<.\nPalmdale is also one of Ladies"
+        },
+        {
+          "activation": 525.3101806640625,
+          "chain_idx": 20853,
+          "window_start": 60,
+          "text": " people gathered thursday to demand justice for fuller and to>>> honor george floyd , the<<< black man who died in police custody in minneapolis"
+        },
+        {
+          "activation": 516.76416015625,
+          "chain_idx": 20853,
+          "window_start": 57,
+          "text": ", dozens of people gathered thursday to demand justice for>>> fuller and to honor george<<< floyd , the black man who died in police custody"
+        },
+        {
+          "activation": 509.97991943359375,
+          "chain_idx": 20853,
+          "window_start": 54,
+          "text": " hanging days ago, dozens of people gathered thursday to>>> demand justice for fuller and<<< to honor george floyd , the black man who died"
+        },
+        {
+          "activation": 509.8166198730469,
+          "chain_idx": 20853,
+          "window_start": 31,
+          "text": " at poncitlan square in palmdale,>>> steps away from city hall<<< where the body of robert fuller was found hanging days"
+        },
+        {
+          "activation": 508.6512451171875,
+          "chain_idx": 20853,
+          "window_start": 32,
+          "text": " poncitlan square in palmdale, steps>>> away from city hall where<<< the body of robert fuller was found hanging days ago"
+        },
+        {
+          "activation": 507.6531066894531,
+          "chain_idx": 11340,
+          "window_start": 99,
+          "text": " watched them for a few minutes and everytime Zeke gets>>> near the little algea<<< eater his gills start to flare, somtimes he"
+        },
+        {
+          "activation": 501.1257629394531,
+          "chain_idx": 20853,
+          "window_start": 59,
+          "text": " of people gathered thursday to demand justice for fuller and>>> to honor george floyd ,<<< the black man who died in police custody in min"
+        }
+      ]
+    },
+    "3964": {
+      "mass": 5172.732025146484,
+      "examples": [
+        {
+          "activation": 587.2382202148438,
+          "chain_idx": 19266,
+          "window_start": 111,
+          "text": ". Red currant adds a hint of fruit that leads>>> to a woody fusion of<<< balsam, oak, cedar, and cypress in the"
+        },
+        {
+          "activation": 536.1721801757812,
+          "chain_idx": 19266,
+          "window_start": 110,
+          "text": " aroma. Red currant adds a hint of fruit that>>> leads to a woody fusion<<< of balsam, oak, cedar, and cypress in"
+        },
+        {
+          "activation": 532.156005859375,
+          "chain_idx": 19266,
+          "window_start": 112,
+          "text": " Red currant adds a hint of fruit that leads to>>> a woody fusion of balsam<<<, oak, cedar, and cypress in the base"
+        },
+        {
+          "activation": 531.1581420898438,
+          "chain_idx": 19266,
+          "window_start": 109,
+          "text": " signature aroma. Red currant adds a hint of fruit>>> that leads to a woody<<< fusion of balsam, oak, cedar, and cypress"
+        },
+        {
+          "activation": 518.5684814453125,
+          "chain_idx": 19266,
+          "window_start": 113,
+          "text": " currant adds a hint of fruit that leads to a>>> woody fusion of balsam,<<< oak, cedar, and cypress in the base."
+        },
+        {
+          "activation": 501.0453186035156,
+          "chain_idx": 19266,
+          "window_start": 103,
+          "text": " this light-bodied spirit its signature aroma. Red>>> currant adds a hint of<<< fruit that leads to a woody fusion of balsam,"
+        },
+        {
+          "activation": 498.4203796386719,
+          "chain_idx": 19266,
+          "window_start": 97,
+          "text": ". A juniper top note gives this light-bodied>>> spirit its signature aroma.<<< Red currant adds a hint of fruit that leads to"
+        },
+        {
+          "activation": 492.4312744140625,
+          "chain_idx": 19266,
+          "window_start": 104,
+          "text": " light-bodied spirit its signature aroma. Red currant>>> adds a hint of fruit<<< that leads to a woody fusion of balsam, oak"
+        },
+        {
+          "activation": 490.2993469238281,
+          "chain_idx": 19266,
+          "window_start": 88,
+          "text": " a refined blend of botanical gin and aged woods.>>> A juniper top note gives<<< this light-bodied spirit its signature aroma. Red"
+        },
+        {
+          "activation": 485.24267578125,
+          "chain_idx": 19266,
+          "window_start": 108,
+          "text": " its signature aroma. Red currant adds a hint of>>> fruit that leads to a<<< woody fusion of balsam, oak, cedar, and"
+        }
+      ]
+    },
+    "3521": {
+      "mass": 5167.432891845703,
+      "examples": [
+        {
+          "activation": 528.1636962890625,
+          "chain_idx": 10400,
+          "window_start": 46,
+          "text": " immersed, via a practical exercise and in the context>>> of the 20<<<19 Spring School, in the design and establishment"
+        },
+        {
+          "activation": 527.579833984375,
+          "chain_idx": 12639,
+          "window_start": 54,
+          "text": " and part Cuban, with blonde hair, green eyes>>> and a 32<<<DD bust. Recently single, she works as an"
+        },
+        {
+          "activation": 520.2225341796875,
+          "chain_idx": 4467,
+          "window_start": 1,
+          "text": ">>>Map of 30<<<71 Dasha Palm Dr, Kissimmee"
+        },
+        {
+          "activation": 518.673828125,
+          "chain_idx": 20315,
+          "window_start": 52,
+          "text": " 5pm - 5.30pm>>>\n- 6pm<<< - 6.30pm\n- "
+        },
+        {
+          "activation": 517.1273193359375,
+          "chain_idx": 18928,
+          "window_start": 76,
+          "text": " to the care and attention they give\".\nJon>>> Barlow / 3Beat<<<\nI have used Euro Sulution exclusively for my"
+        },
+        {
+          "activation": 515.4380493164062,
+          "chain_idx": 15363,
+          "window_start": 18,
+          "text": ", last year, Jenni and Natasha took part>>> in the 64<<< Million Artists January Challenge. Well, we\u2019re"
+        },
+        {
+          "activation": 511.284912109375,
+          "chain_idx": 21420,
+          "window_start": 51,
+          "text": "ta Compton. Cuban hip hop combines lyric rapping accompanied>>> by the 3/<<<2 clave beat and 3 and 4 part"
+        },
+        {
+          "activation": 511.0896911621094,
+          "chain_idx": 4270,
+          "window_start": 105,
+          "text": ", I find it interesting that the same people that>>> were yelling 40<<<, 50, 60 years ago"
+        },
+        {
+          "activation": 509.45111083984375,
+          "chain_idx": 23223,
+          "window_start": 3,
+          "text": "NEW YORK>>> \u2013 The 44<<<th-ranked Columbia men\u2019s tennis team will"
+        },
+        {
+          "activation": 508.40191650390625,
+          "chain_idx": 5928,
+          "window_start": 3,
+          "text": "Ranked #>>>1 in 8 out<<< of the 10 evaluated specialties by U."
+        }
+      ]
+    },
+    "18219": {
+      "mass": 5159.312164306641,
+      "examples": [
+        {
+          "activation": 542.6635131835938,
+          "chain_idx": 12639,
+          "window_start": 84,
+          "text": " with her two-year-old daughter in Laguna>>> Niguel, a planned<<< community in the San Jo...\nOver 1"
+        },
+        {
+          "activation": 526.8719482421875,
+          "chain_idx": 398,
+          "window_start": 60,
+          "text": " huge selection of information for people with the last name>>> Pacey will ensure that<<< you find the person you are searching for.\n"
+        },
+        {
+          "activation": 517.0587768554688,
+          "chain_idx": 22540,
+          "window_start": 83,
+          "text": " company's Ovi Store.\nNokia didn>>>'t provide any details<<< on when the first applications for its upcoming Windows Phone"
+        },
+        {
+          "activation": 515.7620849609375,
+          "chain_idx": 8175,
+          "window_start": 115,
+          "text": " land and water. We can easily arrange Jeeps>>> or taxis to get you<<< there.\nSailing Aboard Crystal Clear"
+        },
+        {
+          "activation": 511.9975280761719,
+          "chain_idx": 2804,
+          "window_start": 40,
+          "text": " change all of that! Style Me Pretty and Wedding>>>ton Way came together to<<< create the Style Me Pretty + Weddington Way Collection"
+        },
+        {
+          "activation": 511.1583251953125,
+          "chain_idx": 21185,
+          "window_start": 113,
+          "text": " reference to a plethora of elite connections complaints, that>>>\u2019s unfortunately not the<<< case. Well, except your motives are to aim"
+        },
+        {
+          "activation": 509.86053466796875,
+          "chain_idx": 865,
+          "window_start": 88,
+          "text": " Congo in the east, the Angola exclave of>>> Cabiada in the South<<<, and Central African Republic and Cameroon in the north"
+        },
+        {
+          "activation": 508.1495666503906,
+          "chain_idx": 22730,
+          "window_start": 55,
+          "text": "\nThis opportunity would be ideal for an experienced Sales>>> Negotiator looking for their<<< next step within Estate Agency or an existing Sales Val"
+        },
+        {
+          "activation": 507.93902587890625,
+          "chain_idx": 119,
+          "window_start": 47,
+          "text": " officers worked in the Durango cities of Gomez Palacio and>>> Lerdo. They say<<< soldiers and state police officers will patrol the cities."
+        },
+        {
+          "activation": 507.8508605957031,
+          "chain_idx": 21420,
+          "window_start": 86,
+          "text": " don\u2019t penetrate Cuba, and because Cubans don>>>\u2019t have wide internet<<< access, most inspiration for lyrics and themes comes from"
+        }
+      ]
+    },
+    "9716": {
+      "mass": 5158.657897949219,
+      "examples": [
+        {
+          "activation": 527.1559448242188,
+          "chain_idx": 8456,
+          "window_start": 8,
+          "text": "Nov 13, 2>>>016\nWey<<<erbacher Sunday Morning Stout\nWell, for the"
+        },
+        {
+          "activation": 523.3954467773438,
+          "chain_idx": 7772,
+          "window_start": 8,
+          "text": "March 25, 2>>>011\nA<<<UBURN, Ala. \u2013 The Vanderbilt women\u2019"
+        },
+        {
+          "activation": 522.6553344726562,
+          "chain_idx": 19763,
+          "window_start": 11,
+          "text": "Published on October 22nd, 2>>>013 | by<<< ABCUSA0\nCouncil Meets to Launch Study Regarding"
+        },
+        {
+          "activation": 520.276611328125,
+          "chain_idx": 4358,
+          "window_start": 31,
+          "text": " in South Korea\nSeptember 4, 2>>>012 1<<<1:44 AM\ncomment(s)"
+        },
+        {
+          "activation": 518.3362426757812,
+          "chain_idx": 527,
+          "window_start": 17,
+          "text": "\nPosted on July 25, 2>>>012 by nina<<<\nPublished by Fast Company\nWith all the startups"
+        },
+        {
+          "activation": 517.190185546875,
+          "chain_idx": 21364,
+          "window_start": 8,
+          "text": "January 13, 2>>>012\nIron<<<ing Out the Wrinkles\nRituals are appreciated"
+        },
+        {
+          "activation": 510.54364013671875,
+          "chain_idx": 7935,
+          "window_start": 115,
+          "text": " Training USA on April 11, 2>>>013 at <<<8:10am \u2014 No Comments"
+        },
+        {
+          "activation": 509.330810546875,
+          "chain_idx": 10197,
+          "window_start": 53,
+          "text": "e Lynn\nMay 23, 2>>>017\nWASHINGTON<<< (ABC7) \u2014 A major surprise for a"
+        },
+        {
+          "activation": 505.9892578125,
+          "chain_idx": 23825,
+          "window_start": 29,
+          "text": ")\nUpdated March 28, 2>>>018, <<<10:50 a.m. PT"
+        },
+        {
+          "activation": 503.784423828125,
+          "chain_idx": 12950,
+          "window_start": 13,
+          "text": " wants hackers prosecuted\nJanuary 6, 2>>>009\nBy<<< Linda Ensor (Business Day)\nCAPE TOWN"
+        }
+      ]
+    },
+    "1982": {
+      "mass": 5138.629821777344,
+      "examples": [
+        {
+          "activation": 546.111572265625,
+          "chain_idx": 23825,
+          "window_start": 33,
+          "text": " 28, 2018,>>> 10:5<<<0 a.m. PT: Danica Patrick"
+        },
+        {
+          "activation": 536.1056518554688,
+          "chain_idx": 18312,
+          "window_start": 40,
+          "text": " Forsyth County Sheriff\u2019s incident report.\nAt>>> about 3:3<<<0 p.m. on June 8,"
+        },
+        {
+          "activation": 531.4483642578125,
+          "chain_idx": 2042,
+          "window_start": 15,
+          "text": " December 11, 2012>>> -- 7:4<<<0 a.m.\nDelta Air Lines Inc"
+        },
+        {
+          "activation": 523.441650390625,
+          "chain_idx": 19962,
+          "window_start": 33,
+          "text": " 24th, 2013>>> 10:1<<<3 AM #21\u2665Mckinley May"
+        },
+        {
+          "activation": 509.9187927246094,
+          "chain_idx": 19143,
+          "window_start": 40,
+          "text": "05-13-2002>>> 09:5<<<5 AM ET (US)\nI was amused"
+        },
+        {
+          "activation": 507.2622375488281,
+          "chain_idx": 2429,
+          "window_start": 13,
+          "text": "4-07-2012,>>> 12:4<<<2 AM||#1|\nJoin Date:"
+        },
+        {
+          "activation": 504.35516357421875,
+          "chain_idx": 7935,
+          "window_start": 118,
+          "text": " April 11, 2013>>> at 8:1<<<0am \u2014 No Comments"
+        },
+        {
+          "activation": 498.6858825683594,
+          "chain_idx": 16101,
+          "window_start": 15,
+          "text": ", 06 Jan 2007>>> 12:5<<<3:11 +0000\n"
+        },
+        {
+          "activation": 491.7069091796875,
+          "chain_idx": 4358,
+          "window_start": 34,
+          "text": "\nSeptember 4, 2012>>> 11:4<<<4 AM\ncomment(s) - last by"
+        },
+        {
+          "activation": 489.5935974121094,
+          "chain_idx": 19143,
+          "window_start": 117,
+          "text": "05-13-2002>>> 10:3<<<6 AM ET (US)"
+        }
+      ]
+    },
+    "4060": {
+      "mass": 5136.573181152344,
+      "examples": [
+        {
+          "activation": 565.4302978515625,
+          "chain_idx": 18394,
+          "window_start": 6,
+          "text": "General Motors contemplates just that>>>:\nThe U.<<<S. government is pouring billions into General Motors in"
+        },
+        {
+          "activation": 532.3444213867188,
+          "chain_idx": 21420,
+          "window_start": 67,
+          "text": " clave beat and 3 and 4 part harmonies>>>. Because most U.<<<S. radio stations don\u2019t penetrate Cuba,"
+        },
+        {
+          "activation": 511.55169677734375,
+          "chain_idx": 2929,
+          "window_start": 51,
+          "text": "\u2019s always good to remember that although our condition>>> here in the U.<<<S. is deteriorating almost daily, we\u2019re"
+        },
+        {
+          "activation": 510.913818359375,
+          "chain_idx": 23502,
+          "window_start": 27,
+          "text": " Meridian, Idaho. Each mug is decorated by hand>>> here in the U.<<<S. They are microwave and dishwasher safe.\n"
+        },
+        {
+          "activation": 510.3108825683594,
+          "chain_idx": 14569,
+          "window_start": 95,
+          "text": "s National Day of Prayer, which is May >>>6.\nU.<<<S. District Court Judge Barbara Crabb in Wisconsin"
+        },
+        {
+          "activation": 505.70880126953125,
+          "chain_idx": 2440,
+          "window_start": 111,
+          "text": " speaking at the event as part of a wider series>>> of meetings with U.<<<K. government officials, said that at least $"
+        },
+        {
+          "activation": 504.81573486328125,
+          "chain_idx": 18048,
+          "window_start": 10,
+          "text": "Scientific Delivery Schedule\nScientific Skin offers FREE STANDARD>>> SHIPPING on all U.<<<S. merchandise orders $75 and over ("
+        },
+        {
+          "activation": 501.2574157714844,
+          "chain_idx": 16008,
+          "window_start": 8,
+          "text": "Remarks Mr Mark Oviatt,>>> Principal Officer, U.<<< S. Agency for International Development/Eastern and Southern"
+        },
+        {
+          "activation": 497.4692077636719,
+          "chain_idx": 6746,
+          "window_start": 43,
+          "text": "year investigation into possible Russian interference with the 2>>>016 U.<<<S. presidential election. Both the New York Times"
+        },
+        {
+          "activation": 496.7709045410156,
+          "chain_idx": 4358,
+          "window_start": 6,
+          "text": "Apple Moves to Ban More>>> Samsung Devices in U.<<<S.; Samsung \"Mimicry\" Questioned"
+        }
+      ]
+    },
+    "12469": {
+      "mass": 5124.143493652344,
+      "examples": [
+        {
+          "activation": 516.4410400390625,
+          "chain_idx": 23651,
+          "window_start": 0,
+          "text": ">>><<<an oddity in the Industrial scene, because their"
+        },
+        {
+          "activation": 516.4410400390625,
+          "chain_idx": 18928,
+          "window_start": 0,
+          "text": ">>><<<\"The guys at Music House are the best in"
+        },
+        {
+          "activation": 516.4410400390625,
+          "chain_idx": 15638,
+          "window_start": 0,
+          "text": ">>><<<The Armor S2000 is a concentrated"
+        },
+        {
+          "activation": 516.4410400390625,
+          "chain_idx": 11345,
+          "window_start": 0,
+          "text": ">>><<<separation of nucleus protein - lysis buffer (Jun/"
+        },
+        {
+          "activation": 516.4410400390625,
+          "chain_idx": 11077,
+          "window_start": 0,
+          "text": ">>><<<Web Design Programer\nClosed - This job"
+        },
+        {
+          "activation": 511.8564758300781,
+          "chain_idx": 11382,
+          "window_start": 1,
+          "text": ">>><<<Thousands of dumb, funny, and amusing college quotes"
+        },
+        {
+          "activation": 508.34173583984375,
+          "chain_idx": 19756,
+          "window_start": 2,
+          "text": ">>><<<The hardworking RG Daniels welcomes fellow stand-ups to"
+        },
+        {
+          "activation": 508.34173583984375,
+          "chain_idx": 15383,
+          "window_start": 2,
+          "text": ">>><<<Although not endemic from where I am, Fallow"
+        },
+        {
+          "activation": 508.34173583984375,
+          "chain_idx": 3559,
+          "window_start": 2,
+          "text": ">>><<<Oversized Acrylic Star Charm Statement Necklace\n\ud83c\udf4d Chain"
+        },
+        {
+          "activation": 505.0566101074219,
+          "chain_idx": 20351,
+          "window_start": 3,
+          "text": ">>><<<|Home||\u00bb Products||\u00bb Cotton Printed Dress"
+        }
+      ]
+    },
+    "13621": {
+      "mass": 5111.027252197266,
+      "examples": [
+        {
+          "activation": 554.0962524414062,
+          "chain_idx": 10517,
+          "window_start": 102,
+          "text": " ADPr (Ser-ADPr) as a>>> new type of histone mark<<< (Leidecker et al. Nature Chemical Biology"
+        },
+        {
+          "activation": 538.8330688476562,
+          "chain_idx": 10517,
+          "window_start": 101,
+          "text": " serine ADPr (Ser-ADPr) as>>> a new type of histone<<< mark (Leidecker et al. Nature Chemical"
+        },
+        {
+          "activation": 534.1650390625,
+          "chain_idx": 10517,
+          "window_start": 29,
+          "text": " damage response\nADP-ribosylation (AD>>>Pr) is a biologically<<< and clinically important post-translational modification (PT"
+        },
+        {
+          "activation": 514.21875,
+          "chain_idx": 21929,
+          "window_start": 15,
+          "text": " miRNA repression through alternative polyadenylation\nChanging where>>> the polyA tail is<<< added to an mRNA transcript can fine-tune the"
+        },
+        {
+          "activation": 510.8981628417969,
+          "chain_idx": 10517,
+          "window_start": 30,
+          "text": " response\nADP-ribosylation (ADPr>>>) is a biologically and<<< clinically important post-translational modification (PTM"
+        },
+        {
+          "activation": 499.22210693359375,
+          "chain_idx": 10517,
+          "window_start": 36,
+          "text": "ylation (ADPr) is a biologically and clinically>>> important post-translational<<< modification (PTM) of proteins. Yet despite"
+        },
+        {
+          "activation": 492.84368896484375,
+          "chain_idx": 10517,
+          "window_start": 99,
+          "text": " we uncovered serine ADPr (Ser-ADPr>>>) as a new type<<< of histone mark (Leidecker et al."
+        },
+        {
+          "activation": 491.41192626953125,
+          "chain_idx": 21929,
+          "window_start": 17,
+          "text": " through alternative polyadenylation\nChanging where the poly>>>A tail is added to<<< an mRNA transcript can fine-tune the tissue-"
+        },
+        {
+          "activation": 490.3549499511719,
+          "chain_idx": 10517,
+          "window_start": 98,
+          "text": ", we uncovered serine ADPr (Ser-AD>>>Pr) as a new<<< type of histone mark (Leidecker et al"
+        },
+        {
+          "activation": 484.9833068847656,
+          "chain_idx": 10517,
+          "window_start": 100,
+          "text": " uncovered serine ADPr (Ser-ADPr)>>> as a new type of<<< histone mark (Leidecker et al. Nature"
+        }
+      ]
+    },
+    "13242": {
+      "mass": 5108.1005859375,
+      "examples": [
+        {
+          "activation": 523.1314697265625,
+          "chain_idx": 10400,
+          "window_start": 47,
+          "text": ", via a practical exercise and in the context of>>> the 201<<<9 Spring School, in the design and establishment of"
+        },
+        {
+          "activation": 517.5393676757812,
+          "chain_idx": 23223,
+          "window_start": 4,
+          "text": "NEW YORK \u2013>>> The 44th<<<-ranked Columbia men\u2019s tennis team will begin"
+        },
+        {
+          "activation": 516.2034301757812,
+          "chain_idx": 15363,
+          "window_start": 19,
+          "text": " last year, Jenni and Natasha took part in>>> the 64 Million<<< Artists January Challenge. Well, we\u2019re embarking"
+        },
+        {
+          "activation": 515.2813110351562,
+          "chain_idx": 12639,
+          "window_start": 55,
+          "text": " part Cuban, with blonde hair, green eyes and>>> a 32DD<<< bust. Recently single, she works as an est"
+        },
+        {
+          "activation": 514.0977172851562,
+          "chain_idx": 4270,
+          "window_start": 106,
+          "text": " I find it interesting that the same people that were>>> yelling 40,<<< 50, 60 years ago for"
+        },
+        {
+          "activation": 507.7816467285156,
+          "chain_idx": 18928,
+          "window_start": 77,
+          "text": " the care and attention they give\".\nJon Barlow>>> / 3Beat\n<<<I have used Euro Sulution exclusively for my bigger"
+        },
+        {
+          "activation": 507.6741638183594,
+          "chain_idx": 13829,
+          "window_start": 84,
+          "text": " first field programmable gate array (FPGA) implementation of>>> the 32-<<<bit V1 ColdFire\u00ae core on the Al"
+        },
+        {
+          "activation": 504.4854431152344,
+          "chain_idx": 4467,
+          "window_start": 2,
+          "text": "Map>>> of 307<<<1 Dasha Palm Dr, Kissimmee..."
+        },
+        {
+          "activation": 501.9009704589844,
+          "chain_idx": 20315,
+          "window_start": 53,
+          "text": "5pm - 5.30pm\n>>>- 6pm -<<< 6.30pm\n- 6"
+        },
+        {
+          "activation": 500.00506591796875,
+          "chain_idx": 7020,
+          "window_start": 4,
+          "text": "Successor of>>> the 488<<< GTB, the F8 Tributo will make"
+        }
+      ]
+    },
+    "4320": {
+      "mass": 5103.765197753906,
+      "examples": [
+        {
+          "activation": 556.7520141601562,
+          "chain_idx": 10864,
+          "window_start": 61,
+          "text": " Calories from Fat 914\n% Daily>>> Value*\nTotal Fat<<< 104 g159.5"
+        },
+        {
+          "activation": 555.1937255859375,
+          "chain_idx": 10864,
+          "window_start": 59,
+          "text": "57 Calories from Fat 914\n>>>% Daily Value*\n<<<Total Fat 104 g159"
+        },
+        {
+          "activation": 533.2568969726562,
+          "chain_idx": 10864,
+          "window_start": 60,
+          "text": "7 Calories from Fat 914\n%>>> Daily Value*\nTotal<<< Fat 104 g159."
+        },
+        {
+          "activation": 520.3048095703125,
+          "chain_idx": 10864,
+          "window_start": 57,
+          "text": "1757 Calories from Fat 91>>>4\n% Daily Value<<<*\nTotal Fat 104 g1"
+        },
+        {
+          "activation": 511.595947265625,
+          "chain_idx": 10864,
+          "window_start": 56,
+          "text": " 1757 Calories from Fat 9>>>14\n% Daily<<< Value*\nTotal Fat 104 g"
+        },
+        {
+          "activation": 499.7851867675781,
+          "chain_idx": 10864,
+          "window_start": 58,
+          "text": "757 Calories from Fat 914>>>\n% Daily Value*<<<\nTotal Fat 104 g15"
+        },
+        {
+          "activation": 487.93212890625,
+          "chain_idx": 10864,
+          "window_start": 73,
+          "text": "\nTotal Fat 104 g15>>>9.5%\n<<<Saturated Fat 62.2 g3"
+        },
+        {
+          "activation": 482.27093505859375,
+          "chain_idx": 10864,
+          "window_start": 75,
+          "text": " Fat 104 g159.>>>5%\nSaturated<<< Fat 62.2 g310"
+        },
+        {
+          "activation": 480.8387145996094,
+          "chain_idx": 10864,
+          "window_start": 74,
+          "text": "Total Fat 104 g159>>>.5%\nS<<<aturated Fat 62.2 g31"
+        },
+        {
+          "activation": 475.8348388671875,
+          "chain_idx": 10864,
+          "window_start": 62,
+          "text": " from Fat 914\n% Daily Value>>>*\nTotal Fat <<<104 g159.5%"
+        }
+      ]
+    },
+    "12158": {
+      "mass": 5102.830657958984,
+      "examples": [
+        {
+          "activation": 591.631103515625,
+          "chain_idx": 20394,
+          "window_start": 9,
+          "text": ">>>WE DO NOT<<< HAVE A PHYSICAL SHELTER/ BUILDING.\nALL"
+        },
+        {
+          "activation": 564.6325073242188,
+          "chain_idx": 5249,
+          "window_start": 58,
+          "text": " Linda 6391\nThe Czech Casting>>> Identification Thread\nCZECH<<< CASTING PORN @ VIP Wank\nSweet"
+        },
+        {
+          "activation": 525.5513305664062,
+          "chain_idx": 9322,
+          "window_start": 95,
+          "text": " your MintyBoost still fits nicely in an Alto>>>ids tin, but MAKE<<< notes that things are a little different on the inside"
+        },
+        {
+          "activation": 514.3798217773438,
+          "chain_idx": 22129,
+          "window_start": 7,
+          "text": "This story is The Sprig>>> of Rosemary from\nTHE<<< PINK FAIRY BOOK Edited by Andrew Lang\nThis"
+        },
+        {
+          "activation": 493.9931335449219,
+          "chain_idx": 2373,
+          "window_start": 15,
+          "text": ", including commentary and archival articles published in The New>>> York Times.\nART<<<ICLES ABOUT CHARLES BUSCH\nAmong the top pleasures"
+        },
+        {
+          "activation": 489.6478576660156,
+          "chain_idx": 16424,
+          "window_start": 57,
+          "text": ">>>MUS 3<<<801 History and Literature of Music I ("
+        },
+        {
+          "activation": 485.7712097167969,
+          "chain_idx": 7592,
+          "window_start": 10,
+          "text": "Begin with creating a work order that includes your>>> specific requirements.\nQUICK<<< AND EFFECTIVE!\nThe work order will be viewed"
+        },
+        {
+          "activation": 482.39495849609375,
+          "chain_idx": 17582,
+          "window_start": 32,
+          "text": "FREE SHIPPING on most orders over $5,0>>>00*\nDREAM<<< KITCHEN SALE!\nITS AS EASY AS 1"
+        },
+        {
+          "activation": 481.02740478515625,
+          "chain_idx": 15449,
+          "window_start": 28,
+          "text": "'ve just been in an un-blogging>>> state of mind. FIRST<<<, if you read my Twitter feeds, you'"
+        },
+        {
+          "activation": 473.80133056640625,
+          "chain_idx": 9624,
+          "window_start": 53,
+          "text": ">>>Kreg KJ<<<SC/MICROBIT - Micro Pocket Depth Collar\n"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,3263 @@
+{
+  "arch": "tfa_pos_pred",
+  "subject_model": "gemma-2-2b-it",
+  "layer_key": "resid_L25",
+  "k": 50,
+  "T": 5,
+  "sample_chains": 1000,
+  "top_k_per_feature": 10,
+  "d_sae": 18432,
+  "num_active_features": 7796,
+  "features": {
+    "15056": {
+      "mass": 0.4726141691207886,
+      "examples": [
+        {
+          "activation": 0.05486581474542618,
+          "chain_idx": 9854,
+          "window_start": 33,
+          "text": ">>>Monday,<<< October 31, 2011"
+        },
+        {
+          "activation": 0.049698103219270706,
+          "chain_idx": 14725,
+          "window_start": 56,
+          "text": ">>>of adventure<<<, connection, and change making.\nHappy to"
+        },
+        {
+          "activation": 0.048393379896879196,
+          "chain_idx": 21200,
+          "window_start": 41,
+          "text": ">>>Beyond stunning<<<! We love Shanteles work so much!"
+        },
+        {
+          "activation": 0.046934641897678375,
+          "chain_idx": 6753,
+          "window_start": 58,
+          "text": ">>>The advanced<<< Snickers Workwear 3-series design"
+        },
+        {
+          "activation": 0.04632372781634331,
+          "chain_idx": 11667,
+          "window_start": 39,
+          "text": ">>>Check out<<< this post about how to get $15 off"
+        },
+        {
+          "activation": 0.04616762325167656,
+          "chain_idx": 18620,
+          "window_start": 70,
+          "text": ">>>presents:<<< Skyler Nicole gets her mouth and asshole filled with"
+        },
+        {
+          "activation": 0.04570469632744789,
+          "chain_idx": 21982,
+          "window_start": 44,
+          "text": ">>>Added:<<< Jan 22, 2009"
+        },
+        {
+          "activation": 0.04511034116148949,
+          "chain_idx": 5630,
+          "window_start": 28,
+          "text": ">>>Your are<<< here: Home // Posts Tagged With vegan\nI"
+        },
+        {
+          "activation": 0.04490835592150688,
+          "chain_idx": 10904,
+          "window_start": 35,
+          "text": ">>>How many<<< of you were brave enough to make weight loss your"
+        },
+        {
+          "activation": 0.04450748488306999,
+          "chain_idx": 15909,
+          "window_start": 31,
+          "text": ">>>These brass<<< barbell eyes come ready-made with colored eyes and"
+        }
+      ]
+    },
+    "10783": {
+      "mass": 0.4691501632332802,
+      "examples": [
+        {
+          "activation": 0.04692208021879196,
+          "chain_idx": 663,
+          "window_start": 0,
+          "text": ">>>KANEOHE,<<< HI, UNITED STATES\nMARINE CORPS BASE"
+        },
+        {
+          "activation": 0.04692034050822258,
+          "chain_idx": 7484,
+          "window_start": 0,
+          "text": ">>>Rupture and Repair<<<: Episodes of Resistance and Resilience in Teachers\u2019 Learning"
+        },
+        {
+          "activation": 0.04691740497946739,
+          "chain_idx": 10373,
+          "window_start": 0,
+          "text": ">>>Kurt Russell and John<<< Carpenter are synonymous with 1980s"
+        },
+        {
+          "activation": 0.046915922313928604,
+          "chain_idx": 9114,
+          "window_start": 0,
+          "text": ">>>Frugal Dating Tips<<< For Tough Economic Times\nBy Aleks Oniszczak"
+        },
+        {
+          "activation": 0.046915795654058456,
+          "chain_idx": 22726,
+          "window_start": 0,
+          "text": ">>>Paula Stuart-Warren<<<, CG\u2120, FMGS, FUGA\n"
+        },
+        {
+          "activation": 0.04691367968916893,
+          "chain_idx": 9979,
+          "window_start": 0,
+          "text": ">>>Bungee jump fail<<<: Horrifying moment woman smashes into riverbed"
+        },
+        {
+          "activation": 0.04691160097718239,
+          "chain_idx": 13712,
+          "window_start": 0,
+          "text": ">>>Demi Lovato\u2019s<<< Rehab Treatment: Get the Details on Her \u2018Drill"
+        },
+        {
+          "activation": 0.0469113253057003,
+          "chain_idx": 13415,
+          "window_start": 0,
+          "text": ">>>BERLIN (AP<<<) \u2014 A German woman accused of involvement in "
+        },
+        {
+          "activation": 0.046911146491765976,
+          "chain_idx": 19822,
+          "window_start": 0,
+          "text": ">>>ESPNDallas.<<<com is reporting that the San Jose Sharks and Minnesota"
+        },
+        {
+          "activation": 0.04691086709499359,
+          "chain_idx": 10490,
+          "window_start": 0,
+          "text": ">>>Foward Cycle allows<<< you to forward your form to a selected user,"
+        }
+      ]
+    },
+    "5023": {
+      "mass": 0.46550724655389786,
+      "examples": [
+        {
+          "activation": 0.046550724655389786,
+          "chain_idx": 23243,
+          "window_start": 0,
+          "text": ">>>Why choose customized travel<<< mugs for advertising your brand?\nPromotional travel mugs"
+        },
+        {
+          "activation": 0.046550724655389786,
+          "chain_idx": 19658,
+          "window_start": 0,
+          "text": ">>>Hortonworks Brings<<< Its Hadoop Distribution To Windows8:30 AM"
+        },
+        {
+          "activation": 0.046550724655389786,
+          "chain_idx": 16229,
+          "window_start": 0,
+          "text": ">>>Stock Status: In<<< Stock\nProvides guidance in the preparation of control drawings"
+        },
+        {
+          "activation": 0.046550724655389786,
+          "chain_idx": 12880,
+          "window_start": 0,
+          "text": ">>>Sue Kaczor<<<, Secretary\nThis office oversees the identification of students"
+        },
+        {
+          "activation": 0.046550724655389786,
+          "chain_idx": 7725,
+          "window_start": 0,
+          "text": ">>>Newt Gingrich<<< says he never lobbied for Freddie Mac and"
+        },
+        {
+          "activation": 0.046550724655389786,
+          "chain_idx": 6784,
+          "window_start": 0,
+          "text": ">>>Paper: Highly accurate<<< optical \u00b5CMM for measurement of micro holes\n"
+        },
+        {
+          "activation": 0.046550724655389786,
+          "chain_idx": 4174,
+          "window_start": 0,
+          "text": ">>>Russia HIV Infections Rise<<< 5 Percent in 2011:"
+        },
+        {
+          "activation": 0.046550724655389786,
+          "chain_idx": 3973,
+          "window_start": 0,
+          "text": ">>>Founded in 1<<<874, York is recognized as the largest"
+        },
+        {
+          "activation": 0.046550724655389786,
+          "chain_idx": 3135,
+          "window_start": 0,
+          "text": ">>>When The Conversation launched<<< in the UK five years ago, \u201cfake news"
+        },
+        {
+          "activation": 0.046550724655389786,
+          "chain_idx": 1014,
+          "window_start": 0,
+          "text": ">>>Can you offer maternity<<< coverage in the USA\nPacific Prime is able to"
+        }
+      ]
+    },
+    "12902": {
+      "mass": 0.46457137912511826,
+      "examples": [
+        {
+          "activation": 0.046457137912511826,
+          "chain_idx": 23243,
+          "window_start": 0,
+          "text": ">>>Why choose customized travel<<< mugs for advertising your brand?\nPromotional travel mugs"
+        },
+        {
+          "activation": 0.046457137912511826,
+          "chain_idx": 19658,
+          "window_start": 0,
+          "text": ">>>Hortonworks Brings<<< Its Hadoop Distribution To Windows8:30 AM"
+        },
+        {
+          "activation": 0.046457137912511826,
+          "chain_idx": 16229,
+          "window_start": 0,
+          "text": ">>>Stock Status: In<<< Stock\nProvides guidance in the preparation of control drawings"
+        },
+        {
+          "activation": 0.046457137912511826,
+          "chain_idx": 12880,
+          "window_start": 0,
+          "text": ">>>Sue Kaczor<<<, Secretary\nThis office oversees the identification of students"
+        },
+        {
+          "activation": 0.046457137912511826,
+          "chain_idx": 7725,
+          "window_start": 0,
+          "text": ">>>Newt Gingrich<<< says he never lobbied for Freddie Mac and"
+        },
+        {
+          "activation": 0.046457137912511826,
+          "chain_idx": 6784,
+          "window_start": 0,
+          "text": ">>>Paper: Highly accurate<<< optical \u00b5CMM for measurement of micro holes\n"
+        },
+        {
+          "activation": 0.046457137912511826,
+          "chain_idx": 4174,
+          "window_start": 0,
+          "text": ">>>Russia HIV Infections Rise<<< 5 Percent in 2011:"
+        },
+        {
+          "activation": 0.046457137912511826,
+          "chain_idx": 3973,
+          "window_start": 0,
+          "text": ">>>Founded in 1<<<874, York is recognized as the largest"
+        },
+        {
+          "activation": 0.046457137912511826,
+          "chain_idx": 3135,
+          "window_start": 0,
+          "text": ">>>When The Conversation launched<<< in the UK five years ago, \u201cfake news"
+        },
+        {
+          "activation": 0.046457137912511826,
+          "chain_idx": 1014,
+          "window_start": 0,
+          "text": ">>>Can you offer maternity<<< coverage in the USA\nPacific Prime is able to"
+        }
+      ]
+    },
+    "1400": {
+      "mass": 0.46360626071691513,
+      "examples": [
+        {
+          "activation": 0.05370067432522774,
+          "chain_idx": 9854,
+          "window_start": 33,
+          "text": ">>>Monday,<<< October 31, 2011"
+        },
+        {
+          "activation": 0.04869937524199486,
+          "chain_idx": 14725,
+          "window_start": 56,
+          "text": ">>>of adventure<<<, connection, and change making.\nHappy to"
+        },
+        {
+          "activation": 0.04745129495859146,
+          "chain_idx": 21200,
+          "window_start": 41,
+          "text": ">>>Beyond stunning<<<! We love Shanteles work so much!"
+        },
+        {
+          "activation": 0.04603375121951103,
+          "chain_idx": 6753,
+          "window_start": 58,
+          "text": ">>>The advanced<<< Snickers Workwear 3-series design"
+        },
+        {
+          "activation": 0.04545946046710014,
+          "chain_idx": 11667,
+          "window_start": 39,
+          "text": ">>>Check out<<< this post about how to get $15 off"
+        },
+        {
+          "activation": 0.04528691619634628,
+          "chain_idx": 18620,
+          "window_start": 70,
+          "text": ">>>presents:<<< Skyler Nicole gets her mouth and asshole filled with"
+        },
+        {
+          "activation": 0.044858913868665695,
+          "chain_idx": 21982,
+          "window_start": 44,
+          "text": ">>>Added:<<< Jan 22, 2009"
+        },
+        {
+          "activation": 0.044303759932518005,
+          "chain_idx": 5630,
+          "window_start": 28,
+          "text": ">>>Your are<<< here: Home // Posts Tagged With vegan\nI"
+        },
+        {
+          "activation": 0.04409829527139664,
+          "chain_idx": 10904,
+          "window_start": 35,
+          "text": ">>>How many<<< of you were brave enough to make weight loss your"
+        },
+        {
+          "activation": 0.04371381923556328,
+          "chain_idx": 15909,
+          "window_start": 31,
+          "text": ">>>These brass<<< barbell eyes come ready-made with colored eyes and"
+        }
+      ]
+    },
+    "11145": {
+      "mass": 0.4624963849782944,
+      "examples": [
+        {
+          "activation": 0.053565334528684616,
+          "chain_idx": 9854,
+          "window_start": 33,
+          "text": ">>>Monday,<<< October 31, 2011"
+        },
+        {
+          "activation": 0.048579685389995575,
+          "chain_idx": 14725,
+          "window_start": 56,
+          "text": ">>>of adventure<<<, connection, and change making.\nHappy to"
+        },
+        {
+          "activation": 0.047336652874946594,
+          "chain_idx": 21200,
+          "window_start": 41,
+          "text": ">>>Beyond stunning<<<! We love Shanteles work so much!"
+        },
+        {
+          "activation": 0.045922935009002686,
+          "chain_idx": 6753,
+          "window_start": 58,
+          "text": ">>>The advanced<<< Snickers Workwear 3-series design"
+        },
+        {
+          "activation": 0.045351892709732056,
+          "chain_idx": 11667,
+          "window_start": 39,
+          "text": ">>>Check out<<< this post about how to get $15 off"
+        },
+        {
+          "activation": 0.045178767293691635,
+          "chain_idx": 18620,
+          "window_start": 70,
+          "text": ">>>presents:<<< Skyler Nicole gets her mouth and asshole filled with"
+        },
+        {
+          "activation": 0.044752877205610275,
+          "chain_idx": 21982,
+          "window_start": 44,
+          "text": ">>>Added:<<< Jan 22, 2009"
+        },
+        {
+          "activation": 0.0442003570497036,
+          "chain_idx": 5630,
+          "window_start": 28,
+          "text": ">>>Your are<<< here: Home // Posts Tagged With vegan\nI"
+        },
+        {
+          "activation": 0.043995391577482224,
+          "chain_idx": 10904,
+          "window_start": 35,
+          "text": ">>>How many<<< of you were brave enough to make weight loss your"
+        },
+        {
+          "activation": 0.043612491339445114,
+          "chain_idx": 15909,
+          "window_start": 31,
+          "text": ">>>These brass<<< barbell eyes come ready-made with colored eyes and"
+        }
+      ]
+    },
+    "12823": {
+      "mass": 0.4537883847951889,
+      "examples": [
+        {
+          "activation": 0.04540281742811203,
+          "chain_idx": 663,
+          "window_start": 0,
+          "text": ">>>KANEOHE,<<< HI, UNITED STATES\nMARINE CORPS BASE"
+        },
+        {
+          "activation": 0.04539690539240837,
+          "chain_idx": 7484,
+          "window_start": 0,
+          "text": ">>>Rupture and Repair<<<: Episodes of Resistance and Resilience in Teachers\u2019 Learning"
+        },
+        {
+          "activation": 0.045386943966150284,
+          "chain_idx": 10373,
+          "window_start": 0,
+          "text": ">>>Kurt Russell and John<<< Carpenter are synonymous with 1980s"
+        },
+        {
+          "activation": 0.04538191482424736,
+          "chain_idx": 9114,
+          "window_start": 0,
+          "text": ">>>Frugal Dating Tips<<< For Tough Economic Times\nBy Aleks Oniszczak"
+        },
+        {
+          "activation": 0.04538148269057274,
+          "chain_idx": 22726,
+          "window_start": 0,
+          "text": ">>>Paula Stuart-Warren<<<, CG\u2120, FMGS, FUGA\n"
+        },
+        {
+          "activation": 0.0453743077814579,
+          "chain_idx": 9979,
+          "window_start": 0,
+          "text": ">>>Bungee jump fail<<<: Horrifying moment woman smashes into riverbed"
+        },
+        {
+          "activation": 0.04536724090576172,
+          "chain_idx": 13712,
+          "window_start": 0,
+          "text": ">>>Demi Lovato\u2019s<<< Rehab Treatment: Get the Details on Her \u2018Drill"
+        },
+        {
+          "activation": 0.0453663133084774,
+          "chain_idx": 13415,
+          "window_start": 0,
+          "text": ">>>BERLIN (AP<<<) \u2014 A German woman accused of involvement in "
+        },
+        {
+          "activation": 0.04536570608615875,
+          "chain_idx": 19822,
+          "window_start": 0,
+          "text": ">>>ESPNDallas.<<<com is reporting that the San Jose Sharks and Minnesota"
+        },
+        {
+          "activation": 0.045364752411842346,
+          "chain_idx": 10490,
+          "window_start": 0,
+          "text": ">>>Foward Cycle allows<<< you to forward your form to a selected user,"
+        }
+      ]
+    },
+    "5681": {
+      "mass": 0.4536459967494011,
+      "examples": [
+        {
+          "activation": 0.04536459967494011,
+          "chain_idx": 23243,
+          "window_start": 0,
+          "text": ">>>Why choose customized travel<<< mugs for advertising your brand?\nPromotional travel mugs"
+        },
+        {
+          "activation": 0.04536459967494011,
+          "chain_idx": 19658,
+          "window_start": 0,
+          "text": ">>>Hortonworks Brings<<< Its Hadoop Distribution To Windows8:30 AM"
+        },
+        {
+          "activation": 0.04536459967494011,
+          "chain_idx": 16229,
+          "window_start": 0,
+          "text": ">>>Stock Status: In<<< Stock\nProvides guidance in the preparation of control drawings"
+        },
+        {
+          "activation": 0.04536459967494011,
+          "chain_idx": 12880,
+          "window_start": 0,
+          "text": ">>>Sue Kaczor<<<, Secretary\nThis office oversees the identification of students"
+        },
+        {
+          "activation": 0.04536459967494011,
+          "chain_idx": 7725,
+          "window_start": 0,
+          "text": ">>>Newt Gingrich<<< says he never lobbied for Freddie Mac and"
+        },
+        {
+          "activation": 0.04536459967494011,
+          "chain_idx": 6784,
+          "window_start": 0,
+          "text": ">>>Paper: Highly accurate<<< optical \u00b5CMM for measurement of micro holes\n"
+        },
+        {
+          "activation": 0.04536459967494011,
+          "chain_idx": 4174,
+          "window_start": 0,
+          "text": ">>>Russia HIV Infections Rise<<< 5 Percent in 2011:"
+        },
+        {
+          "activation": 0.04536459967494011,
+          "chain_idx": 3973,
+          "window_start": 0,
+          "text": ">>>Founded in 1<<<874, York is recognized as the largest"
+        },
+        {
+          "activation": 0.04536459967494011,
+          "chain_idx": 3135,
+          "window_start": 0,
+          "text": ">>>When The Conversation launched<<< in the UK five years ago, \u201cfake news"
+        },
+        {
+          "activation": 0.04536459967494011,
+          "chain_idx": 1014,
+          "window_start": 0,
+          "text": ">>>Can you offer maternity<<< coverage in the USA\nPacific Prime is able to"
+        }
+      ]
+    },
+    "3076": {
+      "mass": 0.45250382274389267,
+      "examples": [
+        {
+          "activation": 0.04525038227438927,
+          "chain_idx": 23243,
+          "window_start": 0,
+          "text": ">>>Why choose customized travel<<< mugs for advertising your brand?\nPromotional travel mugs"
+        },
+        {
+          "activation": 0.04525038227438927,
+          "chain_idx": 19658,
+          "window_start": 0,
+          "text": ">>>Hortonworks Brings<<< Its Hadoop Distribution To Windows8:30 AM"
+        },
+        {
+          "activation": 0.04525038227438927,
+          "chain_idx": 16229,
+          "window_start": 0,
+          "text": ">>>Stock Status: In<<< Stock\nProvides guidance in the preparation of control drawings"
+        },
+        {
+          "activation": 0.04525038227438927,
+          "chain_idx": 12880,
+          "window_start": 0,
+          "text": ">>>Sue Kaczor<<<, Secretary\nThis office oversees the identification of students"
+        },
+        {
+          "activation": 0.04525038227438927,
+          "chain_idx": 7725,
+          "window_start": 0,
+          "text": ">>>Newt Gingrich<<< says he never lobbied for Freddie Mac and"
+        },
+        {
+          "activation": 0.04525038227438927,
+          "chain_idx": 6784,
+          "window_start": 0,
+          "text": ">>>Paper: Highly accurate<<< optical \u00b5CMM for measurement of micro holes\n"
+        },
+        {
+          "activation": 0.04525038227438927,
+          "chain_idx": 4174,
+          "window_start": 0,
+          "text": ">>>Russia HIV Infections Rise<<< 5 Percent in 2011:"
+        },
+        {
+          "activation": 0.04525038227438927,
+          "chain_idx": 3973,
+          "window_start": 0,
+          "text": ">>>Founded in 1<<<874, York is recognized as the largest"
+        },
+        {
+          "activation": 0.04525038227438927,
+          "chain_idx": 3135,
+          "window_start": 0,
+          "text": ">>>When The Conversation launched<<< in the UK five years ago, \u201cfake news"
+        },
+        {
+          "activation": 0.04525038227438927,
+          "chain_idx": 1014,
+          "window_start": 0,
+          "text": ">>>Can you offer maternity<<< coverage in the USA\nPacific Prime is able to"
+        }
+      ]
+    },
+    "14403": {
+      "mass": 0.45004379004240036,
+      "examples": [
+        {
+          "activation": 0.045004379004240036,
+          "chain_idx": 23243,
+          "window_start": 0,
+          "text": ">>>Why choose customized travel<<< mugs for advertising your brand?\nPromotional travel mugs"
+        },
+        {
+          "activation": 0.045004379004240036,
+          "chain_idx": 19658,
+          "window_start": 0,
+          "text": ">>>Hortonworks Brings<<< Its Hadoop Distribution To Windows8:30 AM"
+        },
+        {
+          "activation": 0.045004379004240036,
+          "chain_idx": 16229,
+          "window_start": 0,
+          "text": ">>>Stock Status: In<<< Stock\nProvides guidance in the preparation of control drawings"
+        },
+        {
+          "activation": 0.045004379004240036,
+          "chain_idx": 12880,
+          "window_start": 0,
+          "text": ">>>Sue Kaczor<<<, Secretary\nThis office oversees the identification of students"
+        },
+        {
+          "activation": 0.045004379004240036,
+          "chain_idx": 7725,
+          "window_start": 0,
+          "text": ">>>Newt Gingrich<<< says he never lobbied for Freddie Mac and"
+        },
+        {
+          "activation": 0.045004379004240036,
+          "chain_idx": 6784,
+          "window_start": 0,
+          "text": ">>>Paper: Highly accurate<<< optical \u00b5CMM for measurement of micro holes\n"
+        },
+        {
+          "activation": 0.045004379004240036,
+          "chain_idx": 4174,
+          "window_start": 0,
+          "text": ">>>Russia HIV Infections Rise<<< 5 Percent in 2011:"
+        },
+        {
+          "activation": 0.045004379004240036,
+          "chain_idx": 3973,
+          "window_start": 0,
+          "text": ">>>Founded in 1<<<874, York is recognized as the largest"
+        },
+        {
+          "activation": 0.045004379004240036,
+          "chain_idx": 3135,
+          "window_start": 0,
+          "text": ">>>When The Conversation launched<<< in the UK five years ago, \u201cfake news"
+        },
+        {
+          "activation": 0.045004379004240036,
+          "chain_idx": 1014,
+          "window_start": 0,
+          "text": ">>>Can you offer maternity<<< coverage in the USA\nPacific Prime is able to"
+        }
+      ]
+    },
+    "5386": {
+      "mass": 0.44986214488744736,
+      "examples": [
+        {
+          "activation": 0.044986214488744736,
+          "chain_idx": 23243,
+          "window_start": 0,
+          "text": ">>>Why choose customized travel<<< mugs for advertising your brand?\nPromotional travel mugs"
+        },
+        {
+          "activation": 0.044986214488744736,
+          "chain_idx": 19658,
+          "window_start": 0,
+          "text": ">>>Hortonworks Brings<<< Its Hadoop Distribution To Windows8:30 AM"
+        },
+        {
+          "activation": 0.044986214488744736,
+          "chain_idx": 16229,
+          "window_start": 0,
+          "text": ">>>Stock Status: In<<< Stock\nProvides guidance in the preparation of control drawings"
+        },
+        {
+          "activation": 0.044986214488744736,
+          "chain_idx": 12880,
+          "window_start": 0,
+          "text": ">>>Sue Kaczor<<<, Secretary\nThis office oversees the identification of students"
+        },
+        {
+          "activation": 0.044986214488744736,
+          "chain_idx": 7725,
+          "window_start": 0,
+          "text": ">>>Newt Gingrich<<< says he never lobbied for Freddie Mac and"
+        },
+        {
+          "activation": 0.044986214488744736,
+          "chain_idx": 6784,
+          "window_start": 0,
+          "text": ">>>Paper: Highly accurate<<< optical \u00b5CMM for measurement of micro holes\n"
+        },
+        {
+          "activation": 0.044986214488744736,
+          "chain_idx": 4174,
+          "window_start": 0,
+          "text": ">>>Russia HIV Infections Rise<<< 5 Percent in 2011:"
+        },
+        {
+          "activation": 0.044986214488744736,
+          "chain_idx": 3973,
+          "window_start": 0,
+          "text": ">>>Founded in 1<<<874, York is recognized as the largest"
+        },
+        {
+          "activation": 0.044986214488744736,
+          "chain_idx": 3135,
+          "window_start": 0,
+          "text": ">>>When The Conversation launched<<< in the UK five years ago, \u201cfake news"
+        },
+        {
+          "activation": 0.044986214488744736,
+          "chain_idx": 1014,
+          "window_start": 0,
+          "text": ">>>Can you offer maternity<<< coverage in the USA\nPacific Prime is able to"
+        }
+      ]
+    },
+    "5663": {
+      "mass": 0.44617999345064163,
+      "examples": [
+        {
+          "activation": 0.04461799934506416,
+          "chain_idx": 23243,
+          "window_start": 0,
+          "text": ">>>Why choose customized travel<<< mugs for advertising your brand?\nPromotional travel mugs"
+        },
+        {
+          "activation": 0.04461799934506416,
+          "chain_idx": 19658,
+          "window_start": 0,
+          "text": ">>>Hortonworks Brings<<< Its Hadoop Distribution To Windows8:30 AM"
+        },
+        {
+          "activation": 0.04461799934506416,
+          "chain_idx": 16229,
+          "window_start": 0,
+          "text": ">>>Stock Status: In<<< Stock\nProvides guidance in the preparation of control drawings"
+        },
+        {
+          "activation": 0.04461799934506416,
+          "chain_idx": 12880,
+          "window_start": 0,
+          "text": ">>>Sue Kaczor<<<, Secretary\nThis office oversees the identification of students"
+        },
+        {
+          "activation": 0.04461799934506416,
+          "chain_idx": 7725,
+          "window_start": 0,
+          "text": ">>>Newt Gingrich<<< says he never lobbied for Freddie Mac and"
+        },
+        {
+          "activation": 0.04461799934506416,
+          "chain_idx": 6784,
+          "window_start": 0,
+          "text": ">>>Paper: Highly accurate<<< optical \u00b5CMM for measurement of micro holes\n"
+        },
+        {
+          "activation": 0.04461799934506416,
+          "chain_idx": 4174,
+          "window_start": 0,
+          "text": ">>>Russia HIV Infections Rise<<< 5 Percent in 2011:"
+        },
+        {
+          "activation": 0.04461799934506416,
+          "chain_idx": 3973,
+          "window_start": 0,
+          "text": ">>>Founded in 1<<<874, York is recognized as the largest"
+        },
+        {
+          "activation": 0.04461799934506416,
+          "chain_idx": 3135,
+          "window_start": 0,
+          "text": ">>>When The Conversation launched<<< in the UK five years ago, \u201cfake news"
+        },
+        {
+          "activation": 0.04461799934506416,
+          "chain_idx": 1014,
+          "window_start": 0,
+          "text": ">>>Can you offer maternity<<< coverage in the USA\nPacific Prime is able to"
+        }
+      ]
+    },
+    "15423": {
+      "mass": 0.44566716253757477,
+      "examples": [
+        {
+          "activation": 0.04465647414326668,
+          "chain_idx": 663,
+          "window_start": 0,
+          "text": ">>>KANEOHE,<<< HI, UNITED STATES\nMARINE CORPS BASE"
+        },
+        {
+          "activation": 0.04463435709476471,
+          "chain_idx": 7484,
+          "window_start": 0,
+          "text": ">>>Rupture and Repair<<<: Episodes of Resistance and Resilience in Teachers\u2019 Learning"
+        },
+        {
+          "activation": 0.04459705948829651,
+          "chain_idx": 10373,
+          "window_start": 0,
+          "text": ">>>Kurt Russell and John<<< Carpenter are synonymous with 1980s"
+        },
+        {
+          "activation": 0.04457822069525719,
+          "chain_idx": 9114,
+          "window_start": 0,
+          "text": ">>>Frugal Dating Tips<<< For Tough Economic Times\nBy Aleks Oniszczak"
+        },
+        {
+          "activation": 0.04457661882042885,
+          "chain_idx": 22726,
+          "window_start": 0,
+          "text": ">>>Paula Stuart-Warren<<<, CG\u2120, FMGS, FUGA\n"
+        },
+        {
+          "activation": 0.04454975575208664,
+          "chain_idx": 9979,
+          "window_start": 0,
+          "text": ">>>Bungee jump fail<<<: Horrifying moment woman smashes into riverbed"
+        },
+        {
+          "activation": 0.04452329874038696,
+          "chain_idx": 13712,
+          "window_start": 0,
+          "text": ">>>Demi Lovato\u2019s<<< Rehab Treatment: Get the Details on Her \u2018Drill"
+        },
+        {
+          "activation": 0.044519826769828796,
+          "chain_idx": 13415,
+          "window_start": 0,
+          "text": ">>>BERLIN (AP<<<) \u2014 A German woman accused of involvement in "
+        },
+        {
+          "activation": 0.04451755806803703,
+          "chain_idx": 19822,
+          "window_start": 0,
+          "text": ">>>ESPNDallas.<<<com is reporting that the San Jose Sharks and Minnesota"
+        },
+        {
+          "activation": 0.044513992965221405,
+          "chain_idx": 10490,
+          "window_start": 0,
+          "text": ">>>Foward Cycle allows<<< you to forward your form to a selected user,"
+        }
+      ]
+    },
+    "17992": {
+      "mass": 0.4436034709215164,
+      "examples": [
+        {
+          "activation": 0.05142184719443321,
+          "chain_idx": 9854,
+          "window_start": 33,
+          "text": ">>>Monday,<<< October 31, 2011"
+        },
+        {
+          "activation": 0.0466059111058712,
+          "chain_idx": 14725,
+          "window_start": 56,
+          "text": ">>>of adventure<<<, connection, and change making.\nHappy to"
+        },
+        {
+          "activation": 0.045409005135297775,
+          "chain_idx": 21200,
+          "window_start": 41,
+          "text": ">>>Beyond stunning<<<! We love Shanteles work so much!"
+        },
+        {
+          "activation": 0.04404197260737419,
+          "chain_idx": 6753,
+          "window_start": 58,
+          "text": ">>>The advanced<<< Snickers Workwear 3-series design"
+        },
+        {
+          "activation": 0.04349492862820625,
+          "chain_idx": 11667,
+          "window_start": 39,
+          "text": ">>>Check out<<< this post about how to get $15 off"
+        },
+        {
+          "activation": 0.043322283774614334,
+          "chain_idx": 18620,
+          "window_start": 70,
+          "text": ">>>presents:<<< Skyler Nicole gets her mouth and asshole filled with"
+        },
+        {
+          "activation": 0.04291599988937378,
+          "chain_idx": 21982,
+          "window_start": 44,
+          "text": ">>>Added:<<< Jan 22, 2009"
+        },
+        {
+          "activation": 0.04238766059279442,
+          "chain_idx": 5630,
+          "window_start": 28,
+          "text": ">>>Your are<<< here: Home // Posts Tagged With vegan\nI"
+        },
+        {
+          "activation": 0.04218657687306404,
+          "chain_idx": 10904,
+          "window_start": 35,
+          "text": ">>>How many<<< of you were brave enough to make weight loss your"
+        },
+        {
+          "activation": 0.04181728512048721,
+          "chain_idx": 15909,
+          "window_start": 31,
+          "text": ">>>These brass<<< barbell eyes come ready-made with colored eyes and"
+        }
+      ]
+    },
+    "9186": {
+      "mass": 0.4434300735592842,
+      "examples": [
+        {
+          "activation": 0.04444659873843193,
+          "chain_idx": 663,
+          "window_start": 0,
+          "text": ">>>KANEOHE,<<< HI, UNITED STATES\nMARINE CORPS BASE"
+        },
+        {
+          "activation": 0.04442107304930687,
+          "chain_idx": 7484,
+          "window_start": 0,
+          "text": ">>>Rupture and Repair<<<: Episodes of Resistance and Resilience in Teachers\u2019 Learning"
+        },
+        {
+          "activation": 0.04437802731990814,
+          "chain_idx": 10373,
+          "window_start": 0,
+          "text": ">>>Kurt Russell and John<<< Carpenter are synonymous with 1980s"
+        },
+        {
+          "activation": 0.04435628280043602,
+          "chain_idx": 9114,
+          "window_start": 0,
+          "text": ">>>Frugal Dating Tips<<< For Tough Economic Times\nBy Aleks Oniszczak"
+        },
+        {
+          "activation": 0.04435443505644798,
+          "chain_idx": 22726,
+          "window_start": 0,
+          "text": ">>>Paula Stuart-Warren<<<, CG\u2120, FMGS, FUGA\n"
+        },
+        {
+          "activation": 0.044323429465293884,
+          "chain_idx": 9979,
+          "window_start": 0,
+          "text": ">>>Bungee jump fail<<<: Horrifying moment woman smashes into riverbed"
+        },
+        {
+          "activation": 0.04429290071129799,
+          "chain_idx": 13712,
+          "window_start": 0,
+          "text": ">>>Demi Lovato\u2019s<<< Rehab Treatment: Get the Details on Her \u2018Drill"
+        },
+        {
+          "activation": 0.044288892298936844,
+          "chain_idx": 13415,
+          "window_start": 0,
+          "text": ">>>BERLIN (AP<<<) \u2014 A German woman accused of involvement in "
+        },
+        {
+          "activation": 0.044286277145147324,
+          "chain_idx": 19822,
+          "window_start": 0,
+          "text": ">>>ESPNDallas.<<<com is reporting that the San Jose Sharks and Minnesota"
+        },
+        {
+          "activation": 0.044282156974077225,
+          "chain_idx": 10490,
+          "window_start": 0,
+          "text": ">>>Foward Cycle allows<<< you to forward your form to a selected user,"
+        }
+      ]
+    },
+    "18322": {
+      "mass": 0.44085171073675156,
+      "examples": [
+        {
+          "activation": 0.044085171073675156,
+          "chain_idx": 23243,
+          "window_start": 0,
+          "text": ">>>Why choose customized travel<<< mugs for advertising your brand?\nPromotional travel mugs"
+        },
+        {
+          "activation": 0.044085171073675156,
+          "chain_idx": 19658,
+          "window_start": 0,
+          "text": ">>>Hortonworks Brings<<< Its Hadoop Distribution To Windows8:30 AM"
+        },
+        {
+          "activation": 0.044085171073675156,
+          "chain_idx": 16229,
+          "window_start": 0,
+          "text": ">>>Stock Status: In<<< Stock\nProvides guidance in the preparation of control drawings"
+        },
+        {
+          "activation": 0.044085171073675156,
+          "chain_idx": 12880,
+          "window_start": 0,
+          "text": ">>>Sue Kaczor<<<, Secretary\nThis office oversees the identification of students"
+        },
+        {
+          "activation": 0.044085171073675156,
+          "chain_idx": 7725,
+          "window_start": 0,
+          "text": ">>>Newt Gingrich<<< says he never lobbied for Freddie Mac and"
+        },
+        {
+          "activation": 0.044085171073675156,
+          "chain_idx": 6784,
+          "window_start": 0,
+          "text": ">>>Paper: Highly accurate<<< optical \u00b5CMM for measurement of micro holes\n"
+        },
+        {
+          "activation": 0.044085171073675156,
+          "chain_idx": 4174,
+          "window_start": 0,
+          "text": ">>>Russia HIV Infections Rise<<< 5 Percent in 2011:"
+        },
+        {
+          "activation": 0.044085171073675156,
+          "chain_idx": 3973,
+          "window_start": 0,
+          "text": ">>>Founded in 1<<<874, York is recognized as the largest"
+        },
+        {
+          "activation": 0.044085171073675156,
+          "chain_idx": 3135,
+          "window_start": 0,
+          "text": ">>>When The Conversation launched<<< in the UK five years ago, \u201cfake news"
+        },
+        {
+          "activation": 0.044085171073675156,
+          "chain_idx": 1014,
+          "window_start": 0,
+          "text": ">>>Can you offer maternity<<< coverage in the USA\nPacific Prime is able to"
+        }
+      ]
+    },
+    "6615": {
+      "mass": 0.4373789578676224,
+      "examples": [
+        {
+          "activation": 0.04373789578676224,
+          "chain_idx": 23243,
+          "window_start": 0,
+          "text": ">>>Why choose customized travel<<< mugs for advertising your brand?\nPromotional travel mugs"
+        },
+        {
+          "activation": 0.04373789578676224,
+          "chain_idx": 19658,
+          "window_start": 0,
+          "text": ">>>Hortonworks Brings<<< Its Hadoop Distribution To Windows8:30 AM"
+        },
+        {
+          "activation": 0.04373789578676224,
+          "chain_idx": 16229,
+          "window_start": 0,
+          "text": ">>>Stock Status: In<<< Stock\nProvides guidance in the preparation of control drawings"
+        },
+        {
+          "activation": 0.04373789578676224,
+          "chain_idx": 12880,
+          "window_start": 0,
+          "text": ">>>Sue Kaczor<<<, Secretary\nThis office oversees the identification of students"
+        },
+        {
+          "activation": 0.04373789578676224,
+          "chain_idx": 7725,
+          "window_start": 0,
+          "text": ">>>Newt Gingrich<<< says he never lobbied for Freddie Mac and"
+        },
+        {
+          "activation": 0.04373789578676224,
+          "chain_idx": 6784,
+          "window_start": 0,
+          "text": ">>>Paper: Highly accurate<<< optical \u00b5CMM for measurement of micro holes\n"
+        },
+        {
+          "activation": 0.04373789578676224,
+          "chain_idx": 4174,
+          "window_start": 0,
+          "text": ">>>Russia HIV Infections Rise<<< 5 Percent in 2011:"
+        },
+        {
+          "activation": 0.04373789578676224,
+          "chain_idx": 3973,
+          "window_start": 0,
+          "text": ">>>Founded in 1<<<874, York is recognized as the largest"
+        },
+        {
+          "activation": 0.04373789578676224,
+          "chain_idx": 3135,
+          "window_start": 0,
+          "text": ">>>When The Conversation launched<<< in the UK five years ago, \u201cfake news"
+        },
+        {
+          "activation": 0.04373789578676224,
+          "chain_idx": 1014,
+          "window_start": 0,
+          "text": ">>>Can you offer maternity<<< coverage in the USA\nPacific Prime is able to"
+        }
+      ]
+    },
+    "6894": {
+      "mass": 0.4373512528836727,
+      "examples": [
+        {
+          "activation": 0.04398171603679657,
+          "chain_idx": 663,
+          "window_start": 0,
+          "text": ">>>KANEOHE,<<< HI, UNITED STATES\nMARINE CORPS BASE"
+        },
+        {
+          "activation": 0.043921224772930145,
+          "chain_idx": 7484,
+          "window_start": 0,
+          "text": ">>>Rupture and Repair<<<: Episodes of Resistance and Resilience in Teachers\u2019 Learning"
+        },
+        {
+          "activation": 0.04381893575191498,
+          "chain_idx": 10373,
+          "window_start": 0,
+          "text": ">>>Kurt Russell and John<<< Carpenter are synonymous with 1980s"
+        },
+        {
+          "activation": 0.04376726597547531,
+          "chain_idx": 9114,
+          "window_start": 0,
+          "text": ">>>Frugal Dating Tips<<< For Tough Economic Times\nBy Aleks Oniszczak"
+        },
+        {
+          "activation": 0.043762873858213425,
+          "chain_idx": 22726,
+          "window_start": 0,
+          "text": ">>>Paula Stuart-Warren<<<, CG\u2120, FMGS, FUGA\n"
+        },
+        {
+          "activation": 0.043689191341400146,
+          "chain_idx": 9979,
+          "window_start": 0,
+          "text": ">>>Bungee jump fail<<<: Horrifying moment woman smashes into riverbed"
+        },
+        {
+          "activation": 0.0436166413128376,
+          "chain_idx": 13712,
+          "window_start": 0,
+          "text": ">>>Demi Lovato\u2019s<<< Rehab Treatment: Get the Details on Her \u2018Drill"
+        },
+        {
+          "activation": 0.043601397424936295,
+          "chain_idx": 12868,
+          "window_start": 0,
+          "text": ">>>DES MOINES,<<< Iowa (AP) - The numbers have been drawn"
+        },
+        {
+          "activation": 0.0436008982360363,
+          "chain_idx": 19822,
+          "window_start": 0,
+          "text": ">>>ESPNDallas.<<<com is reporting that the San Jose Sharks and Minnesota"
+        },
+        {
+          "activation": 0.04359110817313194,
+          "chain_idx": 10490,
+          "window_start": 0,
+          "text": ">>>Foward Cycle allows<<< you to forward your form to a selected user,"
+        }
+      ]
+    },
+    "13915": {
+      "mass": 0.43667494878172874,
+      "examples": [
+        {
+          "activation": 0.043686315417289734,
+          "chain_idx": 663,
+          "window_start": 0,
+          "text": ">>>KANEOHE,<<< HI, UNITED STATES\nMARINE CORPS BASE"
+        },
+        {
+          "activation": 0.043682761490345,
+          "chain_idx": 7484,
+          "window_start": 0,
+          "text": ">>>Rupture and Repair<<<: Episodes of Resistance and Resilience in Teachers\u2019 Learning"
+        },
+        {
+          "activation": 0.04367959126830101,
+          "chain_idx": 12868,
+          "window_start": 0,
+          "text": ">>>DES MOINES,<<< Iowa (AP) - The numbers have been drawn"
+        },
+        {
+          "activation": 0.043672990053892136,
+          "chain_idx": 10373,
+          "window_start": 0,
+          "text": ">>>Kurt Russell and John<<< Carpenter are synonymous with 1980s"
+        },
+        {
+          "activation": 0.043668050318956375,
+          "chain_idx": 9114,
+          "window_start": 0,
+          "text": ">>>Frugal Dating Tips<<< For Tough Economic Times\nBy Aleks Oniszczak"
+        },
+        {
+          "activation": 0.04366762936115265,
+          "chain_idx": 22726,
+          "window_start": 0,
+          "text": ">>>Paula Stuart-Warren<<<, CG\u2120, FMGS, FUGA\n"
+        },
+        {
+          "activation": 0.043660588562488556,
+          "chain_idx": 9979,
+          "window_start": 0,
+          "text": ">>>Bungee jump fail<<<: Horrifying moment woman smashes into riverbed"
+        },
+        {
+          "activation": 0.04365365579724312,
+          "chain_idx": 13712,
+          "window_start": 0,
+          "text": ">>>Demi Lovato\u2019s<<< Rehab Treatment: Get the Details on Her \u2018Drill"
+        },
+        {
+          "activation": 0.04365215077996254,
+          "chain_idx": 19822,
+          "window_start": 0,
+          "text": ">>>ESPNDallas.<<<com is reporting that the San Jose Sharks and Minnesota"
+        },
+        {
+          "activation": 0.043651215732097626,
+          "chain_idx": 10490,
+          "window_start": 0,
+          "text": ">>>Foward Cycle allows<<< you to forward your form to a selected user,"
+        }
+      ]
+    },
+    "5462": {
+      "mass": 0.4360312968492508,
+      "examples": [
+        {
+          "activation": 0.04360312968492508,
+          "chain_idx": 23243,
+          "window_start": 0,
+          "text": ">>>Why choose customized travel<<< mugs for advertising your brand?\nPromotional travel mugs"
+        },
+        {
+          "activation": 0.04360312968492508,
+          "chain_idx": 19658,
+          "window_start": 0,
+          "text": ">>>Hortonworks Brings<<< Its Hadoop Distribution To Windows8:30 AM"
+        },
+        {
+          "activation": 0.04360312968492508,
+          "chain_idx": 16229,
+          "window_start": 0,
+          "text": ">>>Stock Status: In<<< Stock\nProvides guidance in the preparation of control drawings"
+        },
+        {
+          "activation": 0.04360312968492508,
+          "chain_idx": 12880,
+          "window_start": 0,
+          "text": ">>>Sue Kaczor<<<, Secretary\nThis office oversees the identification of students"
+        },
+        {
+          "activation": 0.04360312968492508,
+          "chain_idx": 7725,
+          "window_start": 0,
+          "text": ">>>Newt Gingrich<<< says he never lobbied for Freddie Mac and"
+        },
+        {
+          "activation": 0.04360312968492508,
+          "chain_idx": 6784,
+          "window_start": 0,
+          "text": ">>>Paper: Highly accurate<<< optical \u00b5CMM for measurement of micro holes\n"
+        },
+        {
+          "activation": 0.04360312968492508,
+          "chain_idx": 4174,
+          "window_start": 0,
+          "text": ">>>Russia HIV Infections Rise<<< 5 Percent in 2011:"
+        },
+        {
+          "activation": 0.04360312968492508,
+          "chain_idx": 3973,
+          "window_start": 0,
+          "text": ">>>Founded in 1<<<874, York is recognized as the largest"
+        },
+        {
+          "activation": 0.04360312968492508,
+          "chain_idx": 3135,
+          "window_start": 0,
+          "text": ">>>When The Conversation launched<<< in the UK five years ago, \u201cfake news"
+        },
+        {
+          "activation": 0.04360312968492508,
+          "chain_idx": 1014,
+          "window_start": 0,
+          "text": ">>>Can you offer maternity<<< coverage in the USA\nPacific Prime is able to"
+        }
+      ]
+    },
+    "12957": {
+      "mass": 0.4336389899253845,
+      "examples": [
+        {
+          "activation": 0.04336389899253845,
+          "chain_idx": 23243,
+          "window_start": 0,
+          "text": ">>>Why choose customized travel<<< mugs for advertising your brand?\nPromotional travel mugs"
+        },
+        {
+          "activation": 0.04336389899253845,
+          "chain_idx": 19658,
+          "window_start": 0,
+          "text": ">>>Hortonworks Brings<<< Its Hadoop Distribution To Windows8:30 AM"
+        },
+        {
+          "activation": 0.04336389899253845,
+          "chain_idx": 16229,
+          "window_start": 0,
+          "text": ">>>Stock Status: In<<< Stock\nProvides guidance in the preparation of control drawings"
+        },
+        {
+          "activation": 0.04336389899253845,
+          "chain_idx": 12880,
+          "window_start": 0,
+          "text": ">>>Sue Kaczor<<<, Secretary\nThis office oversees the identification of students"
+        },
+        {
+          "activation": 0.04336389899253845,
+          "chain_idx": 7725,
+          "window_start": 0,
+          "text": ">>>Newt Gingrich<<< says he never lobbied for Freddie Mac and"
+        },
+        {
+          "activation": 0.04336389899253845,
+          "chain_idx": 6784,
+          "window_start": 0,
+          "text": ">>>Paper: Highly accurate<<< optical \u00b5CMM for measurement of micro holes\n"
+        },
+        {
+          "activation": 0.04336389899253845,
+          "chain_idx": 4174,
+          "window_start": 0,
+          "text": ">>>Russia HIV Infections Rise<<< 5 Percent in 2011:"
+        },
+        {
+          "activation": 0.04336389899253845,
+          "chain_idx": 3973,
+          "window_start": 0,
+          "text": ">>>Founded in 1<<<874, York is recognized as the largest"
+        },
+        {
+          "activation": 0.04336389899253845,
+          "chain_idx": 3135,
+          "window_start": 0,
+          "text": ">>>When The Conversation launched<<< in the UK five years ago, \u201cfake news"
+        },
+        {
+          "activation": 0.04336389899253845,
+          "chain_idx": 1014,
+          "window_start": 0,
+          "text": ">>>Can you offer maternity<<< coverage in the USA\nPacific Prime is able to"
+        }
+      ]
+    },
+    "2440": {
+      "mass": 0.43358300253748894,
+      "examples": [
+        {
+          "activation": 0.043451424688100815,
+          "chain_idx": 663,
+          "window_start": 0,
+          "text": ">>>KANEOHE,<<< HI, UNITED STATES\nMARINE CORPS BASE"
+        },
+        {
+          "activation": 0.04342847689986229,
+          "chain_idx": 7484,
+          "window_start": 0,
+          "text": ">>>Rupture and Repair<<<: Episodes of Resistance and Resilience in Teachers\u2019 Learning"
+        },
+        {
+          "activation": 0.043389782309532166,
+          "chain_idx": 10373,
+          "window_start": 0,
+          "text": ">>>Kurt Russell and John<<< Carpenter are synonymous with 1980s"
+        },
+        {
+          "activation": 0.043370235711336136,
+          "chain_idx": 9114,
+          "window_start": 0,
+          "text": ">>>Frugal Dating Tips<<< For Tough Economic Times\nBy Aleks Oniszczak"
+        },
+        {
+          "activation": 0.04336857423186302,
+          "chain_idx": 22726,
+          "window_start": 0,
+          "text": ">>>Paula Stuart-Warren<<<, CG\u2120, FMGS, FUGA\n"
+        },
+        {
+          "activation": 0.04334070160984993,
+          "chain_idx": 9979,
+          "window_start": 0,
+          "text": ">>>Bungee jump fail<<<: Horrifying moment woman smashes into riverbed"
+        },
+        {
+          "activation": 0.04331325367093086,
+          "chain_idx": 13712,
+          "window_start": 0,
+          "text": ">>>Demi Lovato\u2019s<<< Rehab Treatment: Get the Details on Her \u2018Drill"
+        },
+        {
+          "activation": 0.04330965504050255,
+          "chain_idx": 13415,
+          "window_start": 0,
+          "text": ">>>BERLIN (AP<<<) \u2014 A German woman accused of involvement in "
+        },
+        {
+          "activation": 0.04330730065703392,
+          "chain_idx": 19822,
+          "window_start": 0,
+          "text": ">>>ESPNDallas.<<<com is reporting that the San Jose Sharks and Minnesota"
+        },
+        {
+          "activation": 0.04330359771847725,
+          "chain_idx": 10490,
+          "window_start": 0,
+          "text": ">>>Foward Cycle allows<<< you to forward your form to a selected user,"
+        }
+      ]
+    },
+    "8409": {
+      "mass": 0.43287385255098343,
+      "examples": [
+        {
+          "activation": 0.04328738525509834,
+          "chain_idx": 23243,
+          "window_start": 0,
+          "text": ">>>Why choose customized travel<<< mugs for advertising your brand?\nPromotional travel mugs"
+        },
+        {
+          "activation": 0.04328738525509834,
+          "chain_idx": 19658,
+          "window_start": 0,
+          "text": ">>>Hortonworks Brings<<< Its Hadoop Distribution To Windows8:30 AM"
+        },
+        {
+          "activation": 0.04328738525509834,
+          "chain_idx": 16229,
+          "window_start": 0,
+          "text": ">>>Stock Status: In<<< Stock\nProvides guidance in the preparation of control drawings"
+        },
+        {
+          "activation": 0.04328738525509834,
+          "chain_idx": 12880,
+          "window_start": 0,
+          "text": ">>>Sue Kaczor<<<, Secretary\nThis office oversees the identification of students"
+        },
+        {
+          "activation": 0.04328738525509834,
+          "chain_idx": 7725,
+          "window_start": 0,
+          "text": ">>>Newt Gingrich<<< says he never lobbied for Freddie Mac and"
+        },
+        {
+          "activation": 0.04328738525509834,
+          "chain_idx": 6784,
+          "window_start": 0,
+          "text": ">>>Paper: Highly accurate<<< optical \u00b5CMM for measurement of micro holes\n"
+        },
+        {
+          "activation": 0.04328738525509834,
+          "chain_idx": 4174,
+          "window_start": 0,
+          "text": ">>>Russia HIV Infections Rise<<< 5 Percent in 2011:"
+        },
+        {
+          "activation": 0.04328738525509834,
+          "chain_idx": 3973,
+          "window_start": 0,
+          "text": ">>>Founded in 1<<<874, York is recognized as the largest"
+        },
+        {
+          "activation": 0.04328738525509834,
+          "chain_idx": 3135,
+          "window_start": 0,
+          "text": ">>>When The Conversation launched<<< in the UK five years ago, \u201cfake news"
+        },
+        {
+          "activation": 0.04328738525509834,
+          "chain_idx": 1014,
+          "window_start": 0,
+          "text": ">>>Can you offer maternity<<< coverage in the USA\nPacific Prime is able to"
+        }
+      ]
+    },
+    "5954": {
+      "mass": 0.43274949863553047,
+      "examples": [
+        {
+          "activation": 0.04332588240504265,
+          "chain_idx": 663,
+          "window_start": 0,
+          "text": ">>>KANEOHE,<<< HI, UNITED STATES\nMARINE CORPS BASE"
+        },
+        {
+          "activation": 0.04331333562731743,
+          "chain_idx": 7484,
+          "window_start": 0,
+          "text": ">>>Rupture and Repair<<<: Episodes of Resistance and Resilience in Teachers\u2019 Learning"
+        },
+        {
+          "activation": 0.04329216852784157,
+          "chain_idx": 10373,
+          "window_start": 0,
+          "text": ">>>Kurt Russell and John<<< Carpenter are synonymous with 1980s"
+        },
+        {
+          "activation": 0.04328147694468498,
+          "chain_idx": 9114,
+          "window_start": 0,
+          "text": ">>>Frugal Dating Tips<<< For Tough Economic Times\nBy Aleks Oniszczak"
+        },
+        {
+          "activation": 0.04328056797385216,
+          "chain_idx": 22726,
+          "window_start": 0,
+          "text": ">>>Paula Stuart-Warren<<<, CG\u2120, FMGS, FUGA\n"
+        },
+        {
+          "activation": 0.04326532408595085,
+          "chain_idx": 9979,
+          "window_start": 0,
+          "text": ">>>Bungee jump fail<<<: Horrifying moment woman smashes into riverbed"
+        },
+        {
+          "activation": 0.04325031489133835,
+          "chain_idx": 13712,
+          "window_start": 0,
+          "text": ">>>Demi Lovato\u2019s<<< Rehab Treatment: Get the Details on Her \u2018Drill"
+        },
+        {
+          "activation": 0.04324834421277046,
+          "chain_idx": 13415,
+          "window_start": 0,
+          "text": ">>>BERLIN (AP<<<) \u2014 A German woman accused of involvement in "
+        },
+        {
+          "activation": 0.043247055262327194,
+          "chain_idx": 19822,
+          "window_start": 0,
+          "text": ">>>ESPNDallas.<<<com is reporting that the San Jose Sharks and Minnesota"
+        },
+        {
+          "activation": 0.04324502870440483,
+          "chain_idx": 10490,
+          "window_start": 0,
+          "text": ">>>Foward Cycle allows<<< you to forward your form to a selected user,"
+        }
+      ]
+    },
+    "3048": {
+      "mass": 0.4317684471607208,
+      "examples": [
+        {
+          "activation": 0.04317684471607208,
+          "chain_idx": 23243,
+          "window_start": 0,
+          "text": ">>>Why choose customized travel<<< mugs for advertising your brand?\nPromotional travel mugs"
+        },
+        {
+          "activation": 0.04317684471607208,
+          "chain_idx": 19658,
+          "window_start": 0,
+          "text": ">>>Hortonworks Brings<<< Its Hadoop Distribution To Windows8:30 AM"
+        },
+        {
+          "activation": 0.04317684471607208,
+          "chain_idx": 16229,
+          "window_start": 0,
+          "text": ">>>Stock Status: In<<< Stock\nProvides guidance in the preparation of control drawings"
+        },
+        {
+          "activation": 0.04317684471607208,
+          "chain_idx": 12880,
+          "window_start": 0,
+          "text": ">>>Sue Kaczor<<<, Secretary\nThis office oversees the identification of students"
+        },
+        {
+          "activation": 0.04317684471607208,
+          "chain_idx": 7725,
+          "window_start": 0,
+          "text": ">>>Newt Gingrich<<< says he never lobbied for Freddie Mac and"
+        },
+        {
+          "activation": 0.04317684471607208,
+          "chain_idx": 6784,
+          "window_start": 0,
+          "text": ">>>Paper: Highly accurate<<< optical \u00b5CMM for measurement of micro holes\n"
+        },
+        {
+          "activation": 0.04317684471607208,
+          "chain_idx": 4174,
+          "window_start": 0,
+          "text": ">>>Russia HIV Infections Rise<<< 5 Percent in 2011:"
+        },
+        {
+          "activation": 0.04317684471607208,
+          "chain_idx": 3973,
+          "window_start": 0,
+          "text": ">>>Founded in 1<<<874, York is recognized as the largest"
+        },
+        {
+          "activation": 0.04317684471607208,
+          "chain_idx": 3135,
+          "window_start": 0,
+          "text": ">>>When The Conversation launched<<< in the UK five years ago, \u201cfake news"
+        },
+        {
+          "activation": 0.04317684471607208,
+          "chain_idx": 1014,
+          "window_start": 0,
+          "text": ">>>Can you offer maternity<<< coverage in the USA\nPacific Prime is able to"
+        }
+      ]
+    },
+    "4559": {
+      "mass": 0.431645181030035,
+      "examples": [
+        {
+          "activation": 0.04326304420828819,
+          "chain_idx": 663,
+          "window_start": 0,
+          "text": ">>>KANEOHE,<<< HI, UNITED STATES\nMARINE CORPS BASE"
+        },
+        {
+          "activation": 0.043240856379270554,
+          "chain_idx": 7484,
+          "window_start": 0,
+          "text": ">>>Rupture and Repair<<<: Episodes of Resistance and Resilience in Teachers\u2019 Learning"
+        },
+        {
+          "activation": 0.043201591819524765,
+          "chain_idx": 10373,
+          "window_start": 0,
+          "text": ">>>Kurt Russell and John<<< Carpenter are synonymous with 1980s"
+        },
+        {
+          "activation": 0.04318007081747055,
+          "chain_idx": 22726,
+          "window_start": 0,
+          "text": ">>>Paula Stuart-Warren<<<, CG\u2120, FMGS, FUGA\n"
+        },
+        {
+          "activation": 0.043151792138814926,
+          "chain_idx": 9979,
+          "window_start": 0,
+          "text": ">>>Bungee jump fail<<<: Horrifying moment woman smashes into riverbed"
+        },
+        {
+          "activation": 0.04313395544886589,
+          "chain_idx": 12868,
+          "window_start": 0,
+          "text": ">>>DES MOINES,<<< Iowa (AP) - The numbers have been drawn"
+        },
+        {
+          "activation": 0.043123941868543625,
+          "chain_idx": 13712,
+          "window_start": 0,
+          "text": ">>>Demi Lovato\u2019s<<< Rehab Treatment: Get the Details on Her \u2018Drill"
+        },
+        {
+          "activation": 0.04311789944767952,
+          "chain_idx": 19822,
+          "window_start": 0,
+          "text": ">>>ESPNDallas.<<<com is reporting that the San Jose Sharks and Minnesota"
+        },
+        {
+          "activation": 0.043117888271808624,
+          "chain_idx": 9114,
+          "window_start": 0,
+          "text": ">>>Frugal Dating Tips<<< For Tough Economic Times\nBy Aleks Oniszczak"
+        },
+        {
+          "activation": 0.04311414062976837,
+          "chain_idx": 10490,
+          "window_start": 0,
+          "text": ">>>Foward Cycle allows<<< you to forward your form to a selected user,"
+        }
+      ]
+    },
+    "13062": {
+      "mass": 0.4315127581357956,
+      "examples": [
+        {
+          "activation": 0.0500231571495533,
+          "chain_idx": 9854,
+          "window_start": 33,
+          "text": ">>>Monday,<<< October 31, 2011"
+        },
+        {
+          "activation": 0.045336779206991196,
+          "chain_idx": 14725,
+          "window_start": 56,
+          "text": ">>>of adventure<<<, connection, and change making.\nHappy to"
+        },
+        {
+          "activation": 0.044171810150146484,
+          "chain_idx": 21200,
+          "window_start": 41,
+          "text": ">>>Beyond stunning<<<! We love Shanteles work so much!"
+        },
+        {
+          "activation": 0.04284172132611275,
+          "chain_idx": 6753,
+          "window_start": 58,
+          "text": ">>>The advanced<<< Snickers Workwear 3-series design"
+        },
+        {
+          "activation": 0.04230911657214165,
+          "chain_idx": 11667,
+          "window_start": 39,
+          "text": ">>>Check out<<< this post about how to get $15 off"
+        },
+        {
+          "activation": 0.04214140400290489,
+          "chain_idx": 18620,
+          "window_start": 70,
+          "text": ">>>presents:<<< Skyler Nicole gets her mouth and asshole filled with"
+        },
+        {
+          "activation": 0.041745591908693314,
+          "chain_idx": 21982,
+          "window_start": 44,
+          "text": ">>>Added:<<< Jan 22, 2009"
+        },
+        {
+          "activation": 0.0412309356033802,
+          "chain_idx": 5630,
+          "window_start": 28,
+          "text": ">>>Your are<<< here: Home // Posts Tagged With vegan\nI"
+        },
+        {
+          "activation": 0.0410357341170311,
+          "chain_idx": 10904,
+          "window_start": 35,
+          "text": ">>>How many<<< of you were brave enough to make weight loss your"
+        },
+        {
+          "activation": 0.040676508098840714,
+          "chain_idx": 15909,
+          "window_start": 31,
+          "text": ">>>These brass<<< barbell eyes come ready-made with colored eyes and"
+        }
+      ]
+    },
+    "3665": {
+      "mass": 0.43046771362423897,
+      "examples": [
+        {
+          "activation": 0.0499691478908062,
+          "chain_idx": 9854,
+          "window_start": 33,
+          "text": ">>>Monday,<<< October 31, 2011"
+        },
+        {
+          "activation": 0.04526084288954735,
+          "chain_idx": 14725,
+          "window_start": 56,
+          "text": ">>>of adventure<<<, connection, and change making.\nHappy to"
+        },
+        {
+          "activation": 0.04407636076211929,
+          "chain_idx": 21200,
+          "window_start": 41,
+          "text": ">>>Beyond stunning<<<! We love Shanteles work so much!"
+        },
+        {
+          "activation": 0.04274562746286392,
+          "chain_idx": 6753,
+          "window_start": 58,
+          "text": ">>>The advanced<<< Snickers Workwear 3-series design"
+        },
+        {
+          "activation": 0.04219460114836693,
+          "chain_idx": 11667,
+          "window_start": 39,
+          "text": ">>>Check out<<< this post about how to get $15 off"
+        },
+        {
+          "activation": 0.042043983936309814,
+          "chain_idx": 18620,
+          "window_start": 70,
+          "text": ">>>presents:<<< Skyler Nicole gets her mouth and asshole filled with"
+        },
+        {
+          "activation": 0.04163011163473129,
+          "chain_idx": 21982,
+          "window_start": 44,
+          "text": ">>>Added:<<< Jan 22, 2009"
+        },
+        {
+          "activation": 0.041094839572906494,
+          "chain_idx": 5630,
+          "window_start": 28,
+          "text": ">>>Your are<<< here: Home // Posts Tagged With vegan\nI"
+        },
+        {
+          "activation": 0.04090822860598564,
+          "chain_idx": 10904,
+          "window_start": 35,
+          "text": ">>>How many<<< of you were brave enough to make weight loss your"
+        },
+        {
+          "activation": 0.040543969720602036,
+          "chain_idx": 15909,
+          "window_start": 31,
+          "text": ">>>These brass<<< barbell eyes come ready-made with colored eyes and"
+        }
+      ]
+    },
+    "15231": {
+      "mass": 0.4277149327099323,
+      "examples": [
+        {
+          "activation": 0.04281789809465408,
+          "chain_idx": 663,
+          "window_start": 0,
+          "text": ">>>KANEOHE,<<< HI, UNITED STATES\nMARINE CORPS BASE"
+        },
+        {
+          "activation": 0.042806439101696014,
+          "chain_idx": 7484,
+          "window_start": 0,
+          "text": ">>>Rupture and Repair<<<: Episodes of Resistance and Resilience in Teachers\u2019 Learning"
+        },
+        {
+          "activation": 0.04278711602091789,
+          "chain_idx": 10373,
+          "window_start": 0,
+          "text": ">>>Kurt Russell and John<<< Carpenter are synonymous with 1980s"
+        },
+        {
+          "activation": 0.04277735576033592,
+          "chain_idx": 9114,
+          "window_start": 0,
+          "text": ">>>Frugal Dating Tips<<< For Tough Economic Times\nBy Aleks Oniszczak"
+        },
+        {
+          "activation": 0.04277652129530907,
+          "chain_idx": 22726,
+          "window_start": 0,
+          "text": ">>>Paula Stuart-Warren<<<, CG\u2120, FMGS, FUGA\n"
+        },
+        {
+          "activation": 0.04276260361075401,
+          "chain_idx": 9979,
+          "window_start": 0,
+          "text": ">>>Bungee jump fail<<<: Horrifying moment woman smashes into riverbed"
+        },
+        {
+          "activation": 0.04274889826774597,
+          "chain_idx": 13712,
+          "window_start": 0,
+          "text": ">>>Demi Lovato\u2019s<<< Rehab Treatment: Get the Details on Her \u2018Drill"
+        },
+        {
+          "activation": 0.04274710267782211,
+          "chain_idx": 13415,
+          "window_start": 0,
+          "text": ">>>BERLIN (AP<<<) \u2014 A German woman accused of involvement in "
+        },
+        {
+          "activation": 0.0427459254860878,
+          "chain_idx": 19822,
+          "window_start": 0,
+          "text": ">>>ESPNDallas.<<<com is reporting that the San Jose Sharks and Minnesota"
+        },
+        {
+          "activation": 0.04274507239460945,
+          "chain_idx": 12868,
+          "window_start": 0,
+          "text": ">>>DES MOINES,<<< Iowa (AP) - The numbers have been drawn"
+        }
+      ]
+    },
+    "1261": {
+      "mass": 0.4264688119292259,
+      "examples": [
+        {
+          "activation": 0.04264688119292259,
+          "chain_idx": 23243,
+          "window_start": 0,
+          "text": ">>>Why choose customized travel<<< mugs for advertising your brand?\nPromotional travel mugs"
+        },
+        {
+          "activation": 0.04264688119292259,
+          "chain_idx": 19658,
+          "window_start": 0,
+          "text": ">>>Hortonworks Brings<<< Its Hadoop Distribution To Windows8:30 AM"
+        },
+        {
+          "activation": 0.04264688119292259,
+          "chain_idx": 16229,
+          "window_start": 0,
+          "text": ">>>Stock Status: In<<< Stock\nProvides guidance in the preparation of control drawings"
+        },
+        {
+          "activation": 0.04264688119292259,
+          "chain_idx": 12880,
+          "window_start": 0,
+          "text": ">>>Sue Kaczor<<<, Secretary\nThis office oversees the identification of students"
+        },
+        {
+          "activation": 0.04264688119292259,
+          "chain_idx": 7725,
+          "window_start": 0,
+          "text": ">>>Newt Gingrich<<< says he never lobbied for Freddie Mac and"
+        },
+        {
+          "activation": 0.04264688119292259,
+          "chain_idx": 6784,
+          "window_start": 0,
+          "text": ">>>Paper: Highly accurate<<< optical \u00b5CMM for measurement of micro holes\n"
+        },
+        {
+          "activation": 0.04264688119292259,
+          "chain_idx": 4174,
+          "window_start": 0,
+          "text": ">>>Russia HIV Infections Rise<<< 5 Percent in 2011:"
+        },
+        {
+          "activation": 0.04264688119292259,
+          "chain_idx": 3973,
+          "window_start": 0,
+          "text": ">>>Founded in 1<<<874, York is recognized as the largest"
+        },
+        {
+          "activation": 0.04264688119292259,
+          "chain_idx": 3135,
+          "window_start": 0,
+          "text": ">>>When The Conversation launched<<< in the UK five years ago, \u201cfake news"
+        },
+        {
+          "activation": 0.04264688119292259,
+          "chain_idx": 1014,
+          "window_start": 0,
+          "text": ">>>Can you offer maternity<<< coverage in the USA\nPacific Prime is able to"
+        }
+      ]
+    },
+    "9086": {
+      "mass": 0.42306704446673393,
+      "examples": [
+        {
+          "activation": 0.04236837849020958,
+          "chain_idx": 663,
+          "window_start": 0,
+          "text": ">>>KANEOHE,<<< HI, UNITED STATES\nMARINE CORPS BASE"
+        },
+        {
+          "activation": 0.042353179305791855,
+          "chain_idx": 7484,
+          "window_start": 0,
+          "text": ">>>Rupture and Repair<<<: Episodes of Resistance and Resilience in Teachers\u2019 Learning"
+        },
+        {
+          "activation": 0.042327553033828735,
+          "chain_idx": 10373,
+          "window_start": 0,
+          "text": ">>>Kurt Russell and John<<< Carpenter are synonymous with 1980s"
+        },
+        {
+          "activation": 0.04231460765004158,
+          "chain_idx": 9114,
+          "window_start": 0,
+          "text": ">>>Frugal Dating Tips<<< For Tough Economic Times\nBy Aleks Oniszczak"
+        },
+        {
+          "activation": 0.042313508689403534,
+          "chain_idx": 22726,
+          "window_start": 0,
+          "text": ">>>Paula Stuart-Warren<<<, CG\u2120, FMGS, FUGA\n"
+        },
+        {
+          "activation": 0.042295049875974655,
+          "chain_idx": 9979,
+          "window_start": 0,
+          "text": ">>>Bungee jump fail<<<: Horrifying moment woman smashes into riverbed"
+        },
+        {
+          "activation": 0.04227687418460846,
+          "chain_idx": 13712,
+          "window_start": 0,
+          "text": ">>>Demi Lovato\u2019s<<< Rehab Treatment: Get the Details on Her \u2018Drill"
+        },
+        {
+          "activation": 0.042274486273527145,
+          "chain_idx": 13415,
+          "window_start": 0,
+          "text": ">>>BERLIN (AP<<<) \u2014 A German woman accused of involvement in "
+        },
+        {
+          "activation": 0.04227292910218239,
+          "chain_idx": 19822,
+          "window_start": 0,
+          "text": ">>>ESPNDallas.<<<com is reporting that the San Jose Sharks and Minnesota"
+        },
+        {
+          "activation": 0.042270477861166,
+          "chain_idx": 10490,
+          "window_start": 0,
+          "text": ">>>Foward Cycle allows<<< you to forward your form to a selected user,"
+        }
+      ]
+    },
+    "16297": {
+      "mass": 0.42299773544073105,
+      "examples": [
+        {
+          "activation": 0.042299773544073105,
+          "chain_idx": 23243,
+          "window_start": 0,
+          "text": ">>>Why choose customized travel<<< mugs for advertising your brand?\nPromotional travel mugs"
+        },
+        {
+          "activation": 0.042299773544073105,
+          "chain_idx": 19658,
+          "window_start": 0,
+          "text": ">>>Hortonworks Brings<<< Its Hadoop Distribution To Windows8:30 AM"
+        },
+        {
+          "activation": 0.042299773544073105,
+          "chain_idx": 16229,
+          "window_start": 0,
+          "text": ">>>Stock Status: In<<< Stock\nProvides guidance in the preparation of control drawings"
+        },
+        {
+          "activation": 0.042299773544073105,
+          "chain_idx": 12880,
+          "window_start": 0,
+          "text": ">>>Sue Kaczor<<<, Secretary\nThis office oversees the identification of students"
+        },
+        {
+          "activation": 0.042299773544073105,
+          "chain_idx": 7725,
+          "window_start": 0,
+          "text": ">>>Newt Gingrich<<< says he never lobbied for Freddie Mac and"
+        },
+        {
+          "activation": 0.042299773544073105,
+          "chain_idx": 6784,
+          "window_start": 0,
+          "text": ">>>Paper: Highly accurate<<< optical \u00b5CMM for measurement of micro holes\n"
+        },
+        {
+          "activation": 0.042299773544073105,
+          "chain_idx": 4174,
+          "window_start": 0,
+          "text": ">>>Russia HIV Infections Rise<<< 5 Percent in 2011:"
+        },
+        {
+          "activation": 0.042299773544073105,
+          "chain_idx": 3973,
+          "window_start": 0,
+          "text": ">>>Founded in 1<<<874, York is recognized as the largest"
+        },
+        {
+          "activation": 0.042299773544073105,
+          "chain_idx": 3135,
+          "window_start": 0,
+          "text": ">>>When The Conversation launched<<< in the UK five years ago, \u201cfake news"
+        },
+        {
+          "activation": 0.042299773544073105,
+          "chain_idx": 1014,
+          "window_start": 0,
+          "text": ">>>Can you offer maternity<<< coverage in the USA\nPacific Prime is able to"
+        }
+      ]
+    },
+    "9053": {
+      "mass": 0.4223201870918274,
+      "examples": [
+        {
+          "activation": 0.04232387617230415,
+          "chain_idx": 663,
+          "window_start": 0,
+          "text": ">>>KANEOHE,<<< HI, UNITED STATES\nMARINE CORPS BASE"
+        },
+        {
+          "activation": 0.04230627790093422,
+          "chain_idx": 12868,
+          "window_start": 0,
+          "text": ">>>DES MOINES,<<< Iowa (AP) - The numbers have been drawn"
+        },
+        {
+          "activation": 0.04228352755308151,
+          "chain_idx": 10373,
+          "window_start": 0,
+          "text": ">>>Kurt Russell and John<<< Carpenter are synonymous with 1980s"
+        },
+        {
+          "activation": 0.04226380214095116,
+          "chain_idx": 22726,
+          "window_start": 0,
+          "text": ">>>Paula Stuart-Warren<<<, CG\u2120, FMGS, FUGA\n"
+        },
+        {
+          "activation": 0.04223788529634476,
+          "chain_idx": 9979,
+          "window_start": 0,
+          "text": ">>>Bungee jump fail<<<: Horrifying moment woman smashes into riverbed"
+        },
+        {
+          "activation": 0.042212363332509995,
+          "chain_idx": 13712,
+          "window_start": 0,
+          "text": ">>>Demi Lovato\u2019s<<< Rehab Treatment: Get the Details on Her \u2018Drill"
+        },
+        {
+          "activation": 0.0422033816576004,
+          "chain_idx": 10490,
+          "window_start": 0,
+          "text": ">>>Foward Cycle allows<<< you to forward your form to a selected user,"
+        },
+        {
+          "activation": 0.042168211191892624,
+          "chain_idx": 12019,
+          "window_start": 0,
+          "text": ">>>Keswick is an<<< attractive and picturesque market town at the heart of the"
+        },
+        {
+          "activation": 0.042163267731666565,
+          "chain_idx": 17743,
+          "window_start": 0,
+          "text": ">>>Ariana Grande Relaxes<<< In A Steamy Hot Tub During Fun Utah Ge"
+        },
+        {
+          "activation": 0.04215759411454201,
+          "chain_idx": 19265,
+          "window_start": 0,
+          "text": ">>>Natwest is another<<< bank heavily involved in the PPI scandal. Find out"
+        }
+      ]
+    },
+    "6099": {
+      "mass": 0.4219277910888195,
+      "examples": [
+        {
+          "activation": 0.04225867614150047,
+          "chain_idx": 12868,
+          "window_start": 0,
+          "text": ">>>DES MOINES,<<< Iowa (AP) - The numbers have been drawn"
+        },
+        {
+          "activation": 0.0422399640083313,
+          "chain_idx": 663,
+          "window_start": 0,
+          "text": ">>>KANEOHE,<<< HI, UNITED STATES\nMARINE CORPS BASE"
+        },
+        {
+          "activation": 0.04222351685166359,
+          "chain_idx": 10373,
+          "window_start": 0,
+          "text": ">>>Kurt Russell and John<<< Carpenter are synonymous with 1980s"
+        },
+        {
+          "activation": 0.04221460968255997,
+          "chain_idx": 22726,
+          "window_start": 0,
+          "text": ">>>Paula Stuart-Warren<<<, CG\u2120, FMGS, FUGA\n"
+        },
+        {
+          "activation": 0.042187321931123734,
+          "chain_idx": 10490,
+          "window_start": 0,
+          "text": ">>>Foward Cycle allows<<< you to forward your form to a selected user,"
+        },
+        {
+          "activation": 0.04216920956969261,
+          "chain_idx": 17743,
+          "window_start": 0,
+          "text": ">>>Ariana Grande Relaxes<<< In A Steamy Hot Tub During Fun Utah Ge"
+        },
+        {
+          "activation": 0.0421626940369606,
+          "chain_idx": 3681,
+          "window_start": 0,
+          "text": ">>>Ramona A.<<< Kimmel, age 79, of LaFol"
+        },
+        {
+          "activation": 0.04215984791517258,
+          "chain_idx": 21242,
+          "window_start": 0,
+          "text": ">>>Kikwete to<<< feature in 2012 Kili Marathon?"
+        },
+        {
+          "activation": 0.042157381772994995,
+          "chain_idx": 108,
+          "window_start": 0,
+          "text": ">>>PARKERSBURG -<<< Despite the economic downturn of the past few years and"
+        },
+        {
+          "activation": 0.042154569178819656,
+          "chain_idx": 3401,
+          "window_start": 0,
+          "text": ">>>Elena (ID:<<< 41356)\n- Date"
+        }
+      ]
+    },
+    "11839": {
+      "mass": 0.42057979479432106,
+      "examples": [
+        {
+          "activation": 0.04214053973555565,
+          "chain_idx": 663,
+          "window_start": 0,
+          "text": ">>>KANEOHE,<<< HI, UNITED STATES\nMARINE CORPS BASE"
+        },
+        {
+          "activation": 0.04212019592523575,
+          "chain_idx": 7484,
+          "window_start": 0,
+          "text": ">>>Rupture and Repair<<<: Episodes of Resistance and Resilience in Teachers\u2019 Learning"
+        },
+        {
+          "activation": 0.04208588972687721,
+          "chain_idx": 10373,
+          "window_start": 0,
+          "text": ">>>Kurt Russell and John<<< Carpenter are synonymous with 1980s"
+        },
+        {
+          "activation": 0.04206855967640877,
+          "chain_idx": 9114,
+          "window_start": 0,
+          "text": ">>>Frugal Dating Tips<<< For Tough Economic Times\nBy Aleks Oniszczak"
+        },
+        {
+          "activation": 0.042067088186740875,
+          "chain_idx": 22726,
+          "window_start": 0,
+          "text": ">>>Paula Stuart-Warren<<<, CG\u2120, FMGS, FUGA\n"
+        },
+        {
+          "activation": 0.04204237833619118,
+          "chain_idx": 9979,
+          "window_start": 0,
+          "text": ">>>Bungee jump fail<<<: Horrifying moment woman smashes into riverbed"
+        },
+        {
+          "activation": 0.042018044739961624,
+          "chain_idx": 13712,
+          "window_start": 0,
+          "text": ">>>Demi Lovato\u2019s<<< Rehab Treatment: Get the Details on Her \u2018Drill"
+        },
+        {
+          "activation": 0.042014848440885544,
+          "chain_idx": 13415,
+          "window_start": 0,
+          "text": ">>>BERLIN (AP<<<) \u2014 A German woman accused of involvement in "
+        },
+        {
+          "activation": 0.042012766003608704,
+          "chain_idx": 19822,
+          "window_start": 0,
+          "text": ">>>ESPNDallas.<<<com is reporting that the San Jose Sharks and Minnesota"
+        },
+        {
+          "activation": 0.04200948402285576,
+          "chain_idx": 10490,
+          "window_start": 0,
+          "text": ">>>Foward Cycle allows<<< you to forward your form to a selected user,"
+        }
+      ]
+    },
+    "8682": {
+      "mass": 0.4198414608836174,
+      "examples": [
+        {
+          "activation": 0.04199245199561119,
+          "chain_idx": 663,
+          "window_start": 0,
+          "text": ">>>KANEOHE,<<< HI, UNITED STATES\nMARINE CORPS BASE"
+        },
+        {
+          "activation": 0.041990406811237335,
+          "chain_idx": 7484,
+          "window_start": 0,
+          "text": ">>>Rupture and Repair<<<: Episodes of Resistance and Resilience in Teachers\u2019 Learning"
+        },
+        {
+          "activation": 0.04198695346713066,
+          "chain_idx": 10373,
+          "window_start": 0,
+          "text": ">>>Kurt Russell and John<<< Carpenter are synonymous with 1980s"
+        },
+        {
+          "activation": 0.04198521003127098,
+          "chain_idx": 9114,
+          "window_start": 0,
+          "text": ">>>Frugal Dating Tips<<< For Tough Economic Times\nBy Aleks Oniszczak"
+        },
+        {
+          "activation": 0.04198506101965904,
+          "chain_idx": 22726,
+          "window_start": 0,
+          "text": ">>>Paula Stuart-Warren<<<, CG\u2120, FMGS, FUGA\n"
+        },
+        {
+          "activation": 0.04198257625102997,
+          "chain_idx": 9979,
+          "window_start": 0,
+          "text": ">>>Bungee jump fail<<<: Horrifying moment woman smashes into riverbed"
+        },
+        {
+          "activation": 0.04198012873530388,
+          "chain_idx": 13712,
+          "window_start": 0,
+          "text": ">>>Demi Lovato\u2019s<<< Rehab Treatment: Get the Details on Her \u2018Drill"
+        },
+        {
+          "activation": 0.04197980836033821,
+          "chain_idx": 13415,
+          "window_start": 0,
+          "text": ">>>BERLIN (AP<<<) \u2014 A German woman accused of involvement in "
+        },
+        {
+          "activation": 0.0419795960187912,
+          "chain_idx": 19822,
+          "window_start": 0,
+          "text": ">>>ESPNDallas.<<<com is reporting that the San Jose Sharks and Minnesota"
+        },
+        {
+          "activation": 0.041979268193244934,
+          "chain_idx": 10490,
+          "window_start": 0,
+          "text": ">>>Foward Cycle allows<<< you to forward your form to a selected user,"
+        }
+      ]
+    },
+    "216": {
+      "mass": 0.41830844804644585,
+      "examples": [
+        {
+          "activation": 0.04207610338926315,
+          "chain_idx": 663,
+          "window_start": 0,
+          "text": ">>>KANEOHE,<<< HI, UNITED STATES\nMARINE CORPS BASE"
+        },
+        {
+          "activation": 0.041982632130384445,
+          "chain_idx": 10373,
+          "window_start": 0,
+          "text": ">>>Kurt Russell and John<<< Carpenter are synonymous with 1980s"
+        },
+        {
+          "activation": 0.041943952441215515,
+          "chain_idx": 22726,
+          "window_start": 0,
+          "text": ">>>Paula Stuart-Warren<<<, CG\u2120, FMGS, FUGA\n"
+        },
+        {
+          "activation": 0.04193786531686783,
+          "chain_idx": 12868,
+          "window_start": 0,
+          "text": ">>>DES MOINES,<<< Iowa (AP) - The numbers have been drawn"
+        },
+        {
+          "activation": 0.04182545095682144,
+          "chain_idx": 10490,
+          "window_start": 0,
+          "text": ">>>Foward Cycle allows<<< you to forward your form to a selected user,"
+        },
+        {
+          "activation": 0.0417330376803875,
+          "chain_idx": 108,
+          "window_start": 0,
+          "text": ">>>PARKERSBURG -<<< Despite the economic downturn of the past few years and"
+        },
+        {
+          "activation": 0.041719093918800354,
+          "chain_idx": 9979,
+          "window_start": 0,
+          "text": ">>>Bungee jump fail<<<: Horrifying moment woman smashes into riverbed"
+        },
+        {
+          "activation": 0.04170593246817589,
+          "chain_idx": 21242,
+          "window_start": 0,
+          "text": ">>>Kikwete to<<< feature in 2012 Kili Marathon?"
+        },
+        {
+          "activation": 0.041702937334775925,
+          "chain_idx": 17743,
+          "window_start": 0,
+          "text": ">>>Ariana Grande Relaxes<<< In A Steamy Hot Tub During Fun Utah Ge"
+        },
+        {
+          "activation": 0.0416814424097538,
+          "chain_idx": 4028,
+          "window_start": 0,
+          "text": ">>>Travis Proulx '<<<04\nTravis Babcock Proulx '04"
+        }
+      ]
+    },
+    "6069": {
+      "mass": 0.4172130823135376,
+      "examples": [
+        {
+          "activation": 0.04184062406420708,
+          "chain_idx": 663,
+          "window_start": 0,
+          "text": ">>>KANEOHE,<<< HI, UNITED STATES\nMARINE CORPS BASE"
+        },
+        {
+          "activation": 0.04177824780344963,
+          "chain_idx": 10373,
+          "window_start": 0,
+          "text": ">>>Kurt Russell and John<<< Carpenter are synonymous with 1980s"
+        },
+        {
+          "activation": 0.0417606346309185,
+          "chain_idx": 7484,
+          "window_start": 0,
+          "text": ">>>Rupture and Repair<<<: Episodes of Resistance and Resilience in Teachers\u2019 Learning"
+        },
+        {
+          "activation": 0.0417565181851387,
+          "chain_idx": 12868,
+          "window_start": 0,
+          "text": ">>>DES MOINES,<<< Iowa (AP) - The numbers have been drawn"
+        },
+        {
+          "activation": 0.0417524129152298,
+          "chain_idx": 22726,
+          "window_start": 0,
+          "text": ">>>Paula Stuart-Warren<<<, CG\u2120, FMGS, FUGA\n"
+        },
+        {
+          "activation": 0.041718460619449615,
+          "chain_idx": 9979,
+          "window_start": 0,
+          "text": ">>>Bungee jump fail<<<: Horrifying moment woman smashes into riverbed"
+        },
+        {
+          "activation": 0.04168502613902092,
+          "chain_idx": 13712,
+          "window_start": 0,
+          "text": ">>>Demi Lovato\u2019s<<< Rehab Treatment: Get the Details on Her \u2018Drill"
+        },
+        {
+          "activation": 0.04167325794696808,
+          "chain_idx": 10490,
+          "window_start": 0,
+          "text": ">>>Foward Cycle allows<<< you to forward your form to a selected user,"
+        },
+        {
+          "activation": 0.041627187281847,
+          "chain_idx": 12019,
+          "window_start": 0,
+          "text": ">>>Keswick is an<<< attractive and picturesque market town at the heart of the"
+        },
+        {
+          "activation": 0.04162071272730827,
+          "chain_idx": 17743,
+          "window_start": 0,
+          "text": ">>>Ariana Grande Relaxes<<< In A Steamy Hot Tub During Fun Utah Ge"
+        }
+      ]
+    },
+    "684": {
+      "mass": 0.41552409529685974,
+      "examples": [
+        {
+          "activation": 0.041552409529685974,
+          "chain_idx": 23243,
+          "window_start": 0,
+          "text": ">>>Why choose customized travel<<< mugs for advertising your brand?\nPromotional travel mugs"
+        },
+        {
+          "activation": 0.041552409529685974,
+          "chain_idx": 19658,
+          "window_start": 0,
+          "text": ">>>Hortonworks Brings<<< Its Hadoop Distribution To Windows8:30 AM"
+        },
+        {
+          "activation": 0.041552409529685974,
+          "chain_idx": 16229,
+          "window_start": 0,
+          "text": ">>>Stock Status: In<<< Stock\nProvides guidance in the preparation of control drawings"
+        },
+        {
+          "activation": 0.041552409529685974,
+          "chain_idx": 12880,
+          "window_start": 0,
+          "text": ">>>Sue Kaczor<<<, Secretary\nThis office oversees the identification of students"
+        },
+        {
+          "activation": 0.041552409529685974,
+          "chain_idx": 7725,
+          "window_start": 0,
+          "text": ">>>Newt Gingrich<<< says he never lobbied for Freddie Mac and"
+        },
+        {
+          "activation": 0.041552409529685974,
+          "chain_idx": 6784,
+          "window_start": 0,
+          "text": ">>>Paper: Highly accurate<<< optical \u00b5CMM for measurement of micro holes\n"
+        },
+        {
+          "activation": 0.041552409529685974,
+          "chain_idx": 4174,
+          "window_start": 0,
+          "text": ">>>Russia HIV Infections Rise<<< 5 Percent in 2011:"
+        },
+        {
+          "activation": 0.041552409529685974,
+          "chain_idx": 3973,
+          "window_start": 0,
+          "text": ">>>Founded in 1<<<874, York is recognized as the largest"
+        },
+        {
+          "activation": 0.041552409529685974,
+          "chain_idx": 3135,
+          "window_start": 0,
+          "text": ">>>When The Conversation launched<<< in the UK five years ago, \u201cfake news"
+        },
+        {
+          "activation": 0.041552409529685974,
+          "chain_idx": 1014,
+          "window_start": 0,
+          "text": ">>>Can you offer maternity<<< coverage in the USA\nPacific Prime is able to"
+        }
+      ]
+    },
+    "12065": {
+      "mass": 0.4144599810242653,
+      "examples": [
+        {
+          "activation": 0.041488539427518845,
+          "chain_idx": 663,
+          "window_start": 0,
+          "text": ">>>KANEOHE,<<< HI, UNITED STATES\nMARINE CORPS BASE"
+        },
+        {
+          "activation": 0.041478052735328674,
+          "chain_idx": 7484,
+          "window_start": 0,
+          "text": ">>>Rupture and Repair<<<: Episodes of Resistance and Resilience in Teachers\u2019 Learning"
+        },
+        {
+          "activation": 0.04146037623286247,
+          "chain_idx": 10373,
+          "window_start": 0,
+          "text": ">>>Kurt Russell and John<<< Carpenter are synonymous with 1980s"
+        },
+        {
+          "activation": 0.04145145043730736,
+          "chain_idx": 9114,
+          "window_start": 0,
+          "text": ">>>Frugal Dating Tips<<< For Tough Economic Times\nBy Aleks Oniszczak"
+        },
+        {
+          "activation": 0.04145069047808647,
+          "chain_idx": 22726,
+          "window_start": 0,
+          "text": ">>>Paula Stuart-Warren<<<, CG\u2120, FMGS, FUGA\n"
+        },
+        {
+          "activation": 0.04143796116113663,
+          "chain_idx": 9979,
+          "window_start": 0,
+          "text": ">>>Bungee jump fail<<<: Horrifying moment woman smashes into riverbed"
+        },
+        {
+          "activation": 0.041425421833992004,
+          "chain_idx": 13712,
+          "window_start": 0,
+          "text": ">>>Demi Lovato\u2019s<<< Rehab Treatment: Get the Details on Her \u2018Drill"
+        },
+        {
+          "activation": 0.04142377898097038,
+          "chain_idx": 13415,
+          "window_start": 0,
+          "text": ">>>BERLIN (AP<<<) \u2014 A German woman accused of involvement in "
+        },
+        {
+          "activation": 0.04142270237207413,
+          "chain_idx": 19822,
+          "window_start": 0,
+          "text": ">>>ESPNDallas.<<<com is reporting that the San Jose Sharks and Minnesota"
+        },
+        {
+          "activation": 0.04142100736498833,
+          "chain_idx": 10490,
+          "window_start": 0,
+          "text": ">>>Foward Cycle allows<<< you to forward your form to a selected user,"
+        }
+      ]
+    },
+    "15319": {
+      "mass": 0.41133005172014236,
+      "examples": [
+        {
+          "activation": 0.041133005172014236,
+          "chain_idx": 23243,
+          "window_start": 0,
+          "text": ">>>Why choose customized travel<<< mugs for advertising your brand?\nPromotional travel mugs"
+        },
+        {
+          "activation": 0.041133005172014236,
+          "chain_idx": 19658,
+          "window_start": 0,
+          "text": ">>>Hortonworks Brings<<< Its Hadoop Distribution To Windows8:30 AM"
+        },
+        {
+          "activation": 0.041133005172014236,
+          "chain_idx": 16229,
+          "window_start": 0,
+          "text": ">>>Stock Status: In<<< Stock\nProvides guidance in the preparation of control drawings"
+        },
+        {
+          "activation": 0.041133005172014236,
+          "chain_idx": 12880,
+          "window_start": 0,
+          "text": ">>>Sue Kaczor<<<, Secretary\nThis office oversees the identification of students"
+        },
+        {
+          "activation": 0.041133005172014236,
+          "chain_idx": 7725,
+          "window_start": 0,
+          "text": ">>>Newt Gingrich<<< says he never lobbied for Freddie Mac and"
+        },
+        {
+          "activation": 0.041133005172014236,
+          "chain_idx": 6784,
+          "window_start": 0,
+          "text": ">>>Paper: Highly accurate<<< optical \u00b5CMM for measurement of micro holes\n"
+        },
+        {
+          "activation": 0.041133005172014236,
+          "chain_idx": 4174,
+          "window_start": 0,
+          "text": ">>>Russia HIV Infections Rise<<< 5 Percent in 2011:"
+        },
+        {
+          "activation": 0.041133005172014236,
+          "chain_idx": 3973,
+          "window_start": 0,
+          "text": ">>>Founded in 1<<<874, York is recognized as the largest"
+        },
+        {
+          "activation": 0.041133005172014236,
+          "chain_idx": 3135,
+          "window_start": 0,
+          "text": ">>>When The Conversation launched<<< in the UK five years ago, \u201cfake news"
+        },
+        {
+          "activation": 0.041133005172014236,
+          "chain_idx": 1014,
+          "window_start": 0,
+          "text": ">>>Can you offer maternity<<< coverage in the USA\nPacific Prime is able to"
+        }
+      ]
+    },
+    "14908": {
+      "mass": 0.41104700416326523,
+      "examples": [
+        {
+          "activation": 0.04110470041632652,
+          "chain_idx": 23243,
+          "window_start": 0,
+          "text": ">>>Why choose customized travel<<< mugs for advertising your brand?\nPromotional travel mugs"
+        },
+        {
+          "activation": 0.04110470041632652,
+          "chain_idx": 19658,
+          "window_start": 0,
+          "text": ">>>Hortonworks Brings<<< Its Hadoop Distribution To Windows8:30 AM"
+        },
+        {
+          "activation": 0.04110470041632652,
+          "chain_idx": 16229,
+          "window_start": 0,
+          "text": ">>>Stock Status: In<<< Stock\nProvides guidance in the preparation of control drawings"
+        },
+        {
+          "activation": 0.04110470041632652,
+          "chain_idx": 12880,
+          "window_start": 0,
+          "text": ">>>Sue Kaczor<<<, Secretary\nThis office oversees the identification of students"
+        },
+        {
+          "activation": 0.04110470041632652,
+          "chain_idx": 7725,
+          "window_start": 0,
+          "text": ">>>Newt Gingrich<<< says he never lobbied for Freddie Mac and"
+        },
+        {
+          "activation": 0.04110470041632652,
+          "chain_idx": 6784,
+          "window_start": 0,
+          "text": ">>>Paper: Highly accurate<<< optical \u00b5CMM for measurement of micro holes\n"
+        },
+        {
+          "activation": 0.04110470041632652,
+          "chain_idx": 4174,
+          "window_start": 0,
+          "text": ">>>Russia HIV Infections Rise<<< 5 Percent in 2011:"
+        },
+        {
+          "activation": 0.04110470041632652,
+          "chain_idx": 3973,
+          "window_start": 0,
+          "text": ">>>Founded in 1<<<874, York is recognized as the largest"
+        },
+        {
+          "activation": 0.04110470041632652,
+          "chain_idx": 3135,
+          "window_start": 0,
+          "text": ">>>When The Conversation launched<<< in the UK five years ago, \u201cfake news"
+        },
+        {
+          "activation": 0.04110470041632652,
+          "chain_idx": 1014,
+          "window_start": 0,
+          "text": ">>>Can you offer maternity<<< coverage in the USA\nPacific Prime is able to"
+        }
+      ]
+    },
+    "12492": {
+      "mass": 0.4099784269928932,
+      "examples": [
+        {
+          "activation": 0.0475274883210659,
+          "chain_idx": 9854,
+          "window_start": 33,
+          "text": ">>>Monday,<<< October 31, 2011"
+        },
+        {
+          "activation": 0.043088819831609726,
+          "chain_idx": 14725,
+          "window_start": 56,
+          "text": ">>>of adventure<<<, connection, and change making.\nHappy to"
+        },
+        {
+          "activation": 0.0419696643948555,
+          "chain_idx": 21200,
+          "window_start": 41,
+          "text": ">>>Beyond stunning<<<! We love Shanteles work so much!"
+        },
+        {
+          "activation": 0.04071594774723053,
+          "chain_idx": 6753,
+          "window_start": 58,
+          "text": ">>>The advanced<<< Snickers Workwear 3-series design"
+        },
+        {
+          "activation": 0.04019299894571304,
+          "chain_idx": 11667,
+          "window_start": 39,
+          "text": ">>>Check out<<< this post about how to get $15 off"
+        },
+        {
+          "activation": 0.04005622863769531,
+          "chain_idx": 18620,
+          "window_start": 70,
+          "text": ">>>presents:<<< Skyler Nicole gets her mouth and asshole filled with"
+        },
+        {
+          "activation": 0.039661258459091187,
+          "chain_idx": 21982,
+          "window_start": 44,
+          "text": ">>>Added:<<< Jan 22, 2009"
+        },
+        {
+          "activation": 0.03915274888277054,
+          "chain_idx": 5630,
+          "window_start": 28,
+          "text": ">>>Your are<<< here: Home // Posts Tagged With vegan\nI"
+        },
+        {
+          "activation": 0.03897867724299431,
+          "chain_idx": 10904,
+          "window_start": 35,
+          "text": ">>>How many<<< of you were brave enough to make weight loss your"
+        },
+        {
+          "activation": 0.03863459452986717,
+          "chain_idx": 15909,
+          "window_start": 31,
+          "text": ">>>These brass<<< barbell eyes come ready-made with colored eyes and"
+        }
+      ]
+    },
+    "15107": {
+      "mass": 0.40679898113012314,
+      "examples": [
+        {
+          "activation": 0.040679898113012314,
+          "chain_idx": 23243,
+          "window_start": 0,
+          "text": ">>>Why choose customized travel<<< mugs for advertising your brand?\nPromotional travel mugs"
+        },
+        {
+          "activation": 0.040679898113012314,
+          "chain_idx": 19658,
+          "window_start": 0,
+          "text": ">>>Hortonworks Brings<<< Its Hadoop Distribution To Windows8:30 AM"
+        },
+        {
+          "activation": 0.040679898113012314,
+          "chain_idx": 16229,
+          "window_start": 0,
+          "text": ">>>Stock Status: In<<< Stock\nProvides guidance in the preparation of control drawings"
+        },
+        {
+          "activation": 0.040679898113012314,
+          "chain_idx": 12880,
+          "window_start": 0,
+          "text": ">>>Sue Kaczor<<<, Secretary\nThis office oversees the identification of students"
+        },
+        {
+          "activation": 0.040679898113012314,
+          "chain_idx": 7725,
+          "window_start": 0,
+          "text": ">>>Newt Gingrich<<< says he never lobbied for Freddie Mac and"
+        },
+        {
+          "activation": 0.040679898113012314,
+          "chain_idx": 6784,
+          "window_start": 0,
+          "text": ">>>Paper: Highly accurate<<< optical \u00b5CMM for measurement of micro holes\n"
+        },
+        {
+          "activation": 0.040679898113012314,
+          "chain_idx": 4174,
+          "window_start": 0,
+          "text": ">>>Russia HIV Infections Rise<<< 5 Percent in 2011:"
+        },
+        {
+          "activation": 0.040679898113012314,
+          "chain_idx": 3973,
+          "window_start": 0,
+          "text": ">>>Founded in 1<<<874, York is recognized as the largest"
+        },
+        {
+          "activation": 0.040679898113012314,
+          "chain_idx": 3135,
+          "window_start": 0,
+          "text": ">>>When The Conversation launched<<< in the UK five years ago, \u201cfake news"
+        },
+        {
+          "activation": 0.040679898113012314,
+          "chain_idx": 1014,
+          "window_start": 0,
+          "text": ">>>Can you offer maternity<<< coverage in the USA\nPacific Prime is able to"
+        }
+      ]
+    },
+    "17659": {
+      "mass": 0.4057793729007244,
+      "examples": [
+        {
+          "activation": 0.0465870201587677,
+          "chain_idx": 9854,
+          "window_start": 33,
+          "text": ">>>Monday,<<< October 31, 2011"
+        },
+        {
+          "activation": 0.042243339121341705,
+          "chain_idx": 14725,
+          "window_start": 56,
+          "text": ">>>of adventure<<<, connection, and change making.\nHappy to"
+        },
+        {
+          "activation": 0.04116892069578171,
+          "chain_idx": 21200,
+          "window_start": 41,
+          "text": ">>>Beyond stunning<<<! We love Shanteles work so much!"
+        },
+        {
+          "activation": 0.03993403539061546,
+          "chain_idx": 6753,
+          "window_start": 58,
+          "text": ">>>The advanced<<< Snickers Workwear 3-series design"
+        },
+        {
+          "activation": 0.03944531828165054,
+          "chain_idx": 11667,
+          "window_start": 39,
+          "text": ">>>Check out<<< this post about how to get $15 off"
+        },
+        {
+          "activation": 0.039297014474868774,
+          "chain_idx": 663,
+          "window_start": 0,
+          "text": ">>>KANEOHE,<<< HI, UNITED STATES\nMARINE CORPS BASE"
+        },
+        {
+          "activation": 0.03928698971867561,
+          "chain_idx": 7484,
+          "window_start": 0,
+          "text": ">>>Rupture and Repair<<<: Episodes of Resistance and Resilience in Teachers\u2019 Learning"
+        },
+        {
+          "activation": 0.03928510844707489,
+          "chain_idx": 18620,
+          "window_start": 70,
+          "text": ">>>presents:<<< Skyler Nicole gets her mouth and asshole filled with"
+        },
+        {
+          "activation": 0.03927008435130119,
+          "chain_idx": 10373,
+          "window_start": 0,
+          "text": ">>>Kurt Russell and John<<< Carpenter are synonymous with 1980s"
+        },
+        {
+          "activation": 0.03926154226064682,
+          "chain_idx": 9114,
+          "window_start": 0,
+          "text": ">>>Frugal Dating Tips<<< For Tough Economic Times\nBy Aleks Oniszczak"
+        }
+      ]
+    },
+    "17407": {
+      "mass": 0.404640756547451,
+      "examples": [
+        {
+          "activation": 0.04068785905838013,
+          "chain_idx": 663,
+          "window_start": 0,
+          "text": ">>>KANEOHE,<<< HI, UNITED STATES\nMARINE CORPS BASE"
+        },
+        {
+          "activation": 0.04056514799594879,
+          "chain_idx": 10373,
+          "window_start": 0,
+          "text": ">>>Kurt Russell and John<<< Carpenter are synonymous with 1980s"
+        },
+        {
+          "activation": 0.04053578898310661,
+          "chain_idx": 21242,
+          "window_start": 0,
+          "text": ">>>Kikwete to<<< feature in 2012 Kili Marathon?"
+        },
+        {
+          "activation": 0.04045354202389717,
+          "chain_idx": 12868,
+          "window_start": 0,
+          "text": ">>>DES MOINES,<<< Iowa (AP) - The numbers have been drawn"
+        },
+        {
+          "activation": 0.040427710860967636,
+          "chain_idx": 4028,
+          "window_start": 0,
+          "text": ">>>Travis Proulx '<<<04\nTravis Babcock Proulx '04"
+        },
+        {
+          "activation": 0.0404251404106617,
+          "chain_idx": 12880,
+          "window_start": 0,
+          "text": ">>>Sue Kaczor<<<, Secretary\nThis office oversees the identification of students"
+        },
+        {
+          "activation": 0.040423523634672165,
+          "chain_idx": 20216,
+          "window_start": 0,
+          "text": ">>>Bradley Merrill Thompson Quoted<<< in \u201cONC Announces Realignment\u201dModern Healthcare"
+        },
+        {
+          "activation": 0.040380265563726425,
+          "chain_idx": 10830,
+          "window_start": 0,
+          "text": ">>>Fred V. Brown<<< is currently in his fourth term as 8th"
+        },
+        {
+          "activation": 0.04037407785654068,
+          "chain_idx": 16577,
+          "window_start": 0,
+          "text": ">>>Leonard Ncube Victoria<<< Falls Reporter\nA NATIONAL Railways of Zimbabwe employee almost"
+        },
+        {
+          "activation": 0.04036770015954971,
+          "chain_idx": 7101,
+          "window_start": 0,
+          "text": ">>>Jessica Mifsud<<<- Bonnici\n- Course: MA Social and"
+        }
+      ]
+    },
+    "10322": {
+      "mass": 0.402105700224638,
+      "examples": [
+        {
+          "activation": 0.046662941575050354,
+          "chain_idx": 9854,
+          "window_start": 33,
+          "text": ">>>Monday,<<< October 31, 2011"
+        },
+        {
+          "activation": 0.04226904362440109,
+          "chain_idx": 14725,
+          "window_start": 56,
+          "text": ">>>of adventure<<<, connection, and change making.\nHappy to"
+        },
+        {
+          "activation": 0.041169703006744385,
+          "chain_idx": 21200,
+          "window_start": 41,
+          "text": ">>>Beyond stunning<<<! We love Shanteles work so much!"
+        },
+        {
+          "activation": 0.039925578981637955,
+          "chain_idx": 6753,
+          "window_start": 58,
+          "text": ">>>The advanced<<< Snickers Workwear 3-series design"
+        },
+        {
+          "activation": 0.03941792994737625,
+          "chain_idx": 11667,
+          "window_start": 39,
+          "text": ">>>Check out<<< this post about how to get $15 off"
+        },
+        {
+          "activation": 0.03927011042833328,
+          "chain_idx": 18620,
+          "window_start": 70,
+          "text": ">>>presents:<<< Skyler Nicole gets her mouth and asshole filled with"
+        },
+        {
+          "activation": 0.038890399038791656,
+          "chain_idx": 21982,
+          "window_start": 44,
+          "text": ">>>Added:<<< Jan 22, 2009"
+        },
+        {
+          "activation": 0.03839794918894768,
+          "chain_idx": 5630,
+          "window_start": 28,
+          "text": ">>>Your are<<< here: Home // Posts Tagged With vegan\nI"
+        },
+        {
+          "activation": 0.038220301270484924,
+          "chain_idx": 10904,
+          "window_start": 35,
+          "text": ">>>How many<<< of you were brave enough to make weight loss your"
+        },
+        {
+          "activation": 0.03788174316287041,
+          "chain_idx": 15909,
+          "window_start": 31,
+          "text": ">>>These brass<<< barbell eyes come ready-made with colored eyes and"
+        }
+      ]
+    },
+    "4594": {
+      "mass": 0.40108170360326767,
+      "examples": [
+        {
+          "activation": 0.04010817036032677,
+          "chain_idx": 23243,
+          "window_start": 0,
+          "text": ">>>Why choose customized travel<<< mugs for advertising your brand?\nPromotional travel mugs"
+        },
+        {
+          "activation": 0.04010817036032677,
+          "chain_idx": 19658,
+          "window_start": 0,
+          "text": ">>>Hortonworks Brings<<< Its Hadoop Distribution To Windows8:30 AM"
+        },
+        {
+          "activation": 0.04010817036032677,
+          "chain_idx": 16229,
+          "window_start": 0,
+          "text": ">>>Stock Status: In<<< Stock\nProvides guidance in the preparation of control drawings"
+        },
+        {
+          "activation": 0.04010817036032677,
+          "chain_idx": 12880,
+          "window_start": 0,
+          "text": ">>>Sue Kaczor<<<, Secretary\nThis office oversees the identification of students"
+        },
+        {
+          "activation": 0.04010817036032677,
+          "chain_idx": 7725,
+          "window_start": 0,
+          "text": ">>>Newt Gingrich<<< says he never lobbied for Freddie Mac and"
+        },
+        {
+          "activation": 0.04010817036032677,
+          "chain_idx": 6784,
+          "window_start": 0,
+          "text": ">>>Paper: Highly accurate<<< optical \u00b5CMM for measurement of micro holes\n"
+        },
+        {
+          "activation": 0.04010817036032677,
+          "chain_idx": 4174,
+          "window_start": 0,
+          "text": ">>>Russia HIV Infections Rise<<< 5 Percent in 2011:"
+        },
+        {
+          "activation": 0.04010817036032677,
+          "chain_idx": 3973,
+          "window_start": 0,
+          "text": ">>>Founded in 1<<<874, York is recognized as the largest"
+        },
+        {
+          "activation": 0.04010817036032677,
+          "chain_idx": 3135,
+          "window_start": 0,
+          "text": ">>>When The Conversation launched<<< in the UK five years ago, \u201cfake news"
+        },
+        {
+          "activation": 0.04010817036032677,
+          "chain_idx": 1014,
+          "window_start": 0,
+          "text": ">>>Can you offer maternity<<< coverage in the USA\nPacific Prime is able to"
+        }
+      ]
+    },
+    "14901": {
+      "mass": 0.39913152158260345,
+      "examples": [
+        {
+          "activation": 0.03995293751358986,
+          "chain_idx": 663,
+          "window_start": 0,
+          "text": ">>>KANEOHE,<<< HI, UNITED STATES\nMARINE CORPS BASE"
+        },
+        {
+          "activation": 0.039948366582393646,
+          "chain_idx": 7484,
+          "window_start": 0,
+          "text": ">>>Rupture and Repair<<<: Episodes of Resistance and Resilience in Teachers\u2019 Learning"
+        },
+        {
+          "activation": 0.03993609547615051,
+          "chain_idx": 12868,
+          "window_start": 0,
+          "text": ">>>DES MOINES,<<< Iowa (AP) - The numbers have been drawn"
+        },
+        {
+          "activation": 0.039929624646902084,
+          "chain_idx": 10373,
+          "window_start": 0,
+          "text": ">>>Kurt Russell and John<<< Carpenter are synonymous with 1980s"
+        },
+        {
+          "activation": 0.039919354021549225,
+          "chain_idx": 22726,
+          "window_start": 0,
+          "text": ">>>Paula Stuart-Warren<<<, CG\u2120, FMGS, FUGA\n"
+        },
+        {
+          "activation": 0.0399058572947979,
+          "chain_idx": 9979,
+          "window_start": 0,
+          "text": ">>>Bungee jump fail<<<: Horrifying moment woman smashes into riverbed"
+        },
+        {
+          "activation": 0.039892565459012985,
+          "chain_idx": 13712,
+          "window_start": 0,
+          "text": ">>>Demi Lovato\u2019s<<< Rehab Treatment: Get the Details on Her \u2018Drill"
+        },
+        {
+          "activation": 0.039887934923172,
+          "chain_idx": 9114,
+          "window_start": 0,
+          "text": ">>>Frugal Dating Tips<<< For Tough Economic Times\nBy Aleks Oniszczak"
+        },
+        {
+          "activation": 0.03988788649439812,
+          "chain_idx": 10490,
+          "window_start": 0,
+          "text": ">>>Foward Cycle allows<<< you to forward your form to a selected user,"
+        },
+        {
+          "activation": 0.03987089917063713,
+          "chain_idx": 10365,
+          "window_start": 0,
+          "text": ">>>Vigorous enforcement of<<< U.S. immigration law at the Mexican border"
+        }
+      ]
+    },
+    "11430": {
+      "mass": 0.39779718965291977,
+      "examples": [
+        {
+          "activation": 0.03977971896529198,
+          "chain_idx": 23243,
+          "window_start": 0,
+          "text": ">>>Why choose customized travel<<< mugs for advertising your brand?\nPromotional travel mugs"
+        },
+        {
+          "activation": 0.03977971896529198,
+          "chain_idx": 19658,
+          "window_start": 0,
+          "text": ">>>Hortonworks Brings<<< Its Hadoop Distribution To Windows8:30 AM"
+        },
+        {
+          "activation": 0.03977971896529198,
+          "chain_idx": 16229,
+          "window_start": 0,
+          "text": ">>>Stock Status: In<<< Stock\nProvides guidance in the preparation of control drawings"
+        },
+        {
+          "activation": 0.03977971896529198,
+          "chain_idx": 12880,
+          "window_start": 0,
+          "text": ">>>Sue Kaczor<<<, Secretary\nThis office oversees the identification of students"
+        },
+        {
+          "activation": 0.03977971896529198,
+          "chain_idx": 7725,
+          "window_start": 0,
+          "text": ">>>Newt Gingrich<<< says he never lobbied for Freddie Mac and"
+        },
+        {
+          "activation": 0.03977971896529198,
+          "chain_idx": 6784,
+          "window_start": 0,
+          "text": ">>>Paper: Highly accurate<<< optical \u00b5CMM for measurement of micro holes\n"
+        },
+        {
+          "activation": 0.03977971896529198,
+          "chain_idx": 4174,
+          "window_start": 0,
+          "text": ">>>Russia HIV Infections Rise<<< 5 Percent in 2011:"
+        },
+        {
+          "activation": 0.03977971896529198,
+          "chain_idx": 3973,
+          "window_start": 0,
+          "text": ">>>Founded in 1<<<874, York is recognized as the largest"
+        },
+        {
+          "activation": 0.03977971896529198,
+          "chain_idx": 3135,
+          "window_start": 0,
+          "text": ">>>When The Conversation launched<<< in the UK five years ago, \u201cfake news"
+        },
+        {
+          "activation": 0.03977971896529198,
+          "chain_idx": 1014,
+          "window_start": 0,
+          "text": ">>>Can you offer maternity<<< coverage in the USA\nPacific Prime is able to"
+        }
+      ]
+    }
+  }
+}

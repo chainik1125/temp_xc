@@ -1,0 +1,3263 @@
+{
+  "arch": "tfa_pos",
+  "subject_model": "gemma-2-2b-it",
+  "layer_key": "resid_L25",
+  "k": 50,
+  "T": 5,
+  "sample_chains": 1000,
+  "top_k_per_feature": 10,
+  "d_sae": 18432,
+  "num_active_features": 15664,
+  "features": {
+    "5557": {
+      "mass": 0.3063678741455078,
+      "examples": [
+        {
+          "activation": 0.03063678741455078,
+          "chain_idx": 23694,
+          "window_start": 9,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.03063678741455078,
+          "chain_idx": 23694,
+          "window_start": 8,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.03063678741455078,
+          "chain_idx": 23694,
+          "window_start": 7,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.03063678741455078,
+          "chain_idx": 23694,
+          "window_start": 6,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.03063678741455078,
+          "chain_idx": 23694,
+          "window_start": 5,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.03063678741455078,
+          "chain_idx": 23694,
+          "window_start": 4,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.03063678741455078,
+          "chain_idx": 23694,
+          "window_start": 3,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.03063678741455078,
+          "chain_idx": 23694,
+          "window_start": 2,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.03063678741455078,
+          "chain_idx": 23694,
+          "window_start": 1,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.03063678741455078,
+          "chain_idx": 23694,
+          "window_start": 0,
+          "text": ">>><<<"
+        }
+      ]
+    },
+    "18010": {
+      "mass": 0.3060499858111143,
+      "examples": [
+        {
+          "activation": 0.031765419989824295,
+          "chain_idx": 18159,
+          "window_start": 96,
+          "text": "Bunny KokaneeandKahlua LBJ1>>>0 LittlePuffyTail<<< LongEaredLions MoveDiagonally RabbitPam"
+        },
+        {
+          "activation": 0.03172970563173294,
+          "chain_idx": 23617,
+          "window_start": 27,
+          "text": " Paul L. Blackaby, David H. Sloane>>>, Peter J.\n<<<Year of Publication:\nIZA Discussion paper series "
+        },
+        {
+          "activation": 0.03153463453054428,
+          "chain_idx": 18159,
+          "window_start": 97,
+          "text": " KokaneeandKahlua LBJ10>>> LittlePuffyTail Long<<<EaredLions MoveDiagonally RabbitPam Sar"
+        },
+        {
+          "activation": 0.030504649505019188,
+          "chain_idx": 18159,
+          "window_start": 95,
+          "text": "inkyBunny KokaneeandKahlua LBJ>>>10 LittlePuffy<<<Tail LongEaredLions MoveDiagonally Rabbit"
+        },
+        {
+          "activation": 0.030465487390756607,
+          "chain_idx": 10707,
+          "window_start": 29,
+          "text": "th April, 2005\nS>>>.R.O (<<<I)/2005.- In pursuance of"
+        },
+        {
+          "activation": 0.03031064011156559,
+          "chain_idx": 20717,
+          "window_start": 38,
+          "text": " Series has brought back to life names like Kotani>>>; Kobayashi;Yoda;<<<Ichijima; Samura; Tokuyama"
+        },
+        {
+          "activation": 0.030224179849028587,
+          "chain_idx": 18159,
+          "window_start": 94,
+          "text": " BinkyBunny KokaneeandKahlua LB>>>J10 LittlePuff<<<yTail LongEaredLions MoveDiagonally"
+        },
+        {
+          "activation": 0.030120057985186577,
+          "chain_idx": 23617,
+          "window_start": 25,
+          "text": "ille, Paul L. Blackaby, David H>>>. Sloane, Peter J<<<.\nYear of Publication:\nIZA Discussion paper"
+        },
+        {
+          "activation": 0.029906777665019035,
+          "chain_idx": 23617,
+          "window_start": 26,
+          "text": ", Paul L. Blackaby, David H.>>> Sloane, Peter J.<<<\nYear of Publication:\nIZA Discussion paper series"
+        },
+        {
+          "activation": 0.02948843315243721,
+          "chain_idx": 18159,
+          "window_start": 93,
+          "text": "7 BinkyBunny KokaneeandKahlua>>> LBJ10 Little<<<PuffyTail LongEaredLions MoveDiagon"
+        }
+      ]
+    },
+    "14820": {
+      "mass": 0.3050720691680908,
+      "examples": [
+        {
+          "activation": 0.030507206916809082,
+          "chain_idx": 23694,
+          "window_start": 9,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.030507206916809082,
+          "chain_idx": 23694,
+          "window_start": 8,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.030507206916809082,
+          "chain_idx": 23694,
+          "window_start": 7,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.030507206916809082,
+          "chain_idx": 23694,
+          "window_start": 6,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.030507206916809082,
+          "chain_idx": 23694,
+          "window_start": 5,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.030507206916809082,
+          "chain_idx": 23694,
+          "window_start": 4,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.030507206916809082,
+          "chain_idx": 23694,
+          "window_start": 3,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.030507206916809082,
+          "chain_idx": 23694,
+          "window_start": 2,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.030507206916809082,
+          "chain_idx": 23694,
+          "window_start": 1,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.030507206916809082,
+          "chain_idx": 23694,
+          "window_start": 0,
+          "text": ">>><<<"
+        }
+      ]
+    },
+    "7942": {
+      "mass": 0.30505238100886345,
+      "examples": [
+        {
+          "activation": 0.030505238100886345,
+          "chain_idx": 23694,
+          "window_start": 9,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.030505238100886345,
+          "chain_idx": 23694,
+          "window_start": 8,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.030505238100886345,
+          "chain_idx": 23694,
+          "window_start": 7,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.030505238100886345,
+          "chain_idx": 23694,
+          "window_start": 6,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.030505238100886345,
+          "chain_idx": 23694,
+          "window_start": 5,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.030505238100886345,
+          "chain_idx": 23694,
+          "window_start": 4,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.030505238100886345,
+          "chain_idx": 23694,
+          "window_start": 3,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.030505238100886345,
+          "chain_idx": 23694,
+          "window_start": 2,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.030505238100886345,
+          "chain_idx": 23694,
+          "window_start": 1,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.030505238100886345,
+          "chain_idx": 23694,
+          "window_start": 0,
+          "text": ">>><<<"
+        }
+      ]
+    },
+    "17268": {
+      "mass": 0.3013572096824646,
+      "examples": [
+        {
+          "activation": 0.03013572096824646,
+          "chain_idx": 23694,
+          "window_start": 9,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.03013572096824646,
+          "chain_idx": 23694,
+          "window_start": 8,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.03013572096824646,
+          "chain_idx": 23694,
+          "window_start": 7,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.03013572096824646,
+          "chain_idx": 23694,
+          "window_start": 6,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.03013572096824646,
+          "chain_idx": 23694,
+          "window_start": 5,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.03013572096824646,
+          "chain_idx": 23694,
+          "window_start": 4,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.03013572096824646,
+          "chain_idx": 23694,
+          "window_start": 3,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.03013572096824646,
+          "chain_idx": 23694,
+          "window_start": 2,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.03013572096824646,
+          "chain_idx": 23694,
+          "window_start": 1,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.03013572096824646,
+          "chain_idx": 23694,
+          "window_start": 0,
+          "text": ">>><<<"
+        }
+      ]
+    },
+    "2924": {
+      "mass": 0.2997738681733608,
+      "examples": [
+        {
+          "activation": 0.029977386817336082,
+          "chain_idx": 23694,
+          "window_start": 9,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.029977386817336082,
+          "chain_idx": 23694,
+          "window_start": 8,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.029977386817336082,
+          "chain_idx": 23694,
+          "window_start": 7,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.029977386817336082,
+          "chain_idx": 23694,
+          "window_start": 6,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.029977386817336082,
+          "chain_idx": 23694,
+          "window_start": 5,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.029977386817336082,
+          "chain_idx": 23694,
+          "window_start": 4,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.029977386817336082,
+          "chain_idx": 23694,
+          "window_start": 3,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.029977386817336082,
+          "chain_idx": 23694,
+          "window_start": 2,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.029977386817336082,
+          "chain_idx": 23694,
+          "window_start": 1,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.029977386817336082,
+          "chain_idx": 23694,
+          "window_start": 0,
+          "text": ">>><<<"
+        }
+      ]
+    },
+    "7416": {
+      "mass": 0.2991985771805048,
+      "examples": [
+        {
+          "activation": 0.03285261616110802,
+          "chain_idx": 8085,
+          "window_start": 41,
+          "text": " day without pulling the, \"ButThat's>>>OkLifeIsGoodAnd<<<I'mHappy,\" drawstring to wrap it up"
+        },
+        {
+          "activation": 0.032572176307439804,
+          "chain_idx": 8085,
+          "window_start": 42,
+          "text": " without pulling the, \"ButThat'sOk>>>LifeIsGoodAndI<<<'mHappy,\" drawstring to wrap it up tid"
+        },
+        {
+          "activation": 0.031127972528338432,
+          "chain_idx": 8085,
+          "window_start": 40,
+          "text": " my day without pulling the, \"ButThat'>>>sOkLifeIsGood<<<AndI'mHappy,\" drawstring to wrap it"
+        },
+        {
+          "activation": 0.030513674020767212,
+          "chain_idx": 104,
+          "window_start": 48,
+          "text": " sample of her writing on the topic of optimism.>>>\n* * *\n<<<If you\u2019re craving a quick hit of optimism"
+        },
+        {
+          "activation": 0.02993895672261715,
+          "chain_idx": 8085,
+          "window_start": 43,
+          "text": " pulling the, \"ButThat'sOkLife>>>IsGoodAndI'<<<mHappy,\" drawstring to wrap it up tidily"
+        },
+        {
+          "activation": 0.02987426519393921,
+          "chain_idx": 8085,
+          "window_start": 44,
+          "text": " the, \"ButThat'sOkLifeIs>>>GoodAndI'm<<<Happy,\" drawstring to wrap it up tidily at"
+        },
+        {
+          "activation": 0.029758596792817116,
+          "chain_idx": 8085,
+          "window_start": 45,
+          "text": ", \"ButThat'sOkLifeIsGood>>>AndI'mHappy<<<,\" drawstring to wrap it up tidily at the"
+        },
+        {
+          "activation": 0.027678102254867554,
+          "chain_idx": 22437,
+          "window_start": 105,
+          "text": "00 lbs|\n|Ships via UPS?>>>||Yes|\n|<<<Carton Pack Quantity||1 PK|\n|"
+        },
+        {
+          "activation": 0.02749619260430336,
+          "chain_idx": 20375,
+          "window_start": 78,
+          "text": " more details.\nFile name: DunnsRiver>>>Falls5.jpg\n<<<Format: digital, 3000+"
+        },
+        {
+          "activation": 0.027386024594306946,
+          "chain_idx": 8085,
+          "window_start": 39,
+          "text": " about my day without pulling the, \"ButThat>>>'sOkLifeIs<<<GoodAndI'mHappy,\" drawstring to wrap"
+        }
+      ]
+    },
+    "3445": {
+      "mass": 0.29813826084136963,
+      "examples": [
+        {
+          "activation": 0.029813826084136963,
+          "chain_idx": 23694,
+          "window_start": 9,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.029813826084136963,
+          "chain_idx": 23694,
+          "window_start": 8,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.029813826084136963,
+          "chain_idx": 23694,
+          "window_start": 7,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.029813826084136963,
+          "chain_idx": 23694,
+          "window_start": 6,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.029813826084136963,
+          "chain_idx": 23694,
+          "window_start": 5,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.029813826084136963,
+          "chain_idx": 23694,
+          "window_start": 4,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.029813826084136963,
+          "chain_idx": 23694,
+          "window_start": 3,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.029813826084136963,
+          "chain_idx": 23694,
+          "window_start": 2,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.029813826084136963,
+          "chain_idx": 23694,
+          "window_start": 1,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.029813826084136963,
+          "chain_idx": 23694,
+          "window_start": 0,
+          "text": ">>><<<"
+        }
+      ]
+    },
+    "18274": {
+      "mass": 0.2965158689767122,
+      "examples": [
+        {
+          "activation": 0.03358102962374687,
+          "chain_idx": 8085,
+          "window_start": 42,
+          "text": " without pulling the, \"ButThat'sOk>>>LifeIsGoodAndI<<<'mHappy,\" drawstring to wrap it up tid"
+        },
+        {
+          "activation": 0.033201586455106735,
+          "chain_idx": 8085,
+          "window_start": 41,
+          "text": " day without pulling the, \"ButThat's>>>OkLifeIsGoodAnd<<<I'mHappy,\" drawstring to wrap it up"
+        },
+        {
+          "activation": 0.03247979283332825,
+          "chain_idx": 8085,
+          "window_start": 45,
+          "text": ", \"ButThat'sOkLifeIsGood>>>AndI'mHappy<<<,\" drawstring to wrap it up tidily at the"
+        },
+        {
+          "activation": 0.032154764980077744,
+          "chain_idx": 8085,
+          "window_start": 43,
+          "text": " pulling the, \"ButThat'sOkLife>>>IsGoodAndI'<<<mHappy,\" drawstring to wrap it up tidily"
+        },
+        {
+          "activation": 0.03215378150343895,
+          "chain_idx": 8085,
+          "window_start": 44,
+          "text": " the, \"ButThat'sOkLifeIs>>>GoodAndI'm<<<Happy,\" drawstring to wrap it up tidily at"
+        },
+        {
+          "activation": 0.031771715730428696,
+          "chain_idx": 8085,
+          "window_start": 40,
+          "text": " my day without pulling the, \"ButThat'>>>sOkLifeIsGood<<<AndI'mHappy,\" drawstring to wrap it"
+        },
+        {
+          "activation": 0.02607421576976776,
+          "chain_idx": 104,
+          "window_start": 48,
+          "text": " sample of her writing on the topic of optimism.>>>\n* * *\n<<<If you\u2019re craving a quick hit of optimism"
+        },
+        {
+          "activation": 0.025947192683815956,
+          "chain_idx": 8085,
+          "window_start": 39,
+          "text": " about my day without pulling the, \"ButThat>>>'sOkLifeIs<<<GoodAndI'mHappy,\" drawstring to wrap"
+        },
+        {
+          "activation": 0.024596868082880974,
+          "chain_idx": 8085,
+          "window_start": 46,
+          "text": " \"ButThat'sOkLifeIsGoodAnd>>>I'mHappy,\"<<< drawstring to wrap it up tidily at the end"
+        },
+        {
+          "activation": 0.024554921314120293,
+          "chain_idx": 8085,
+          "window_start": 38,
+          "text": " truth about my day without pulling the, \"But>>>That'sOkLife<<<IsGoodAndI'mHappy,\" drawstring to"
+        }
+      ]
+    },
+    "17846": {
+      "mass": 0.29472533613443375,
+      "examples": [
+        {
+          "activation": 0.029472533613443375,
+          "chain_idx": 23694,
+          "window_start": 9,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.029472533613443375,
+          "chain_idx": 23694,
+          "window_start": 8,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.029472533613443375,
+          "chain_idx": 23694,
+          "window_start": 7,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.029472533613443375,
+          "chain_idx": 23694,
+          "window_start": 6,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.029472533613443375,
+          "chain_idx": 23694,
+          "window_start": 5,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.029472533613443375,
+          "chain_idx": 23694,
+          "window_start": 4,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.029472533613443375,
+          "chain_idx": 23694,
+          "window_start": 3,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.029472533613443375,
+          "chain_idx": 23694,
+          "window_start": 2,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.029472533613443375,
+          "chain_idx": 23694,
+          "window_start": 1,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.029472533613443375,
+          "chain_idx": 23694,
+          "window_start": 0,
+          "text": ">>><<<"
+        }
+      ]
+    },
+    "6935": {
+      "mass": 0.29386454448103905,
+      "examples": [
+        {
+          "activation": 0.031278591603040695,
+          "chain_idx": 13216,
+          "window_start": 78,
+          "text": ".\nPlease call 1.888>>>.222.<<<7639 to speak with a Customer Service"
+        },
+        {
+          "activation": 0.030490314587950706,
+          "chain_idx": 13886,
+          "window_start": 86,
+          "text": "4231/ITA/OEENIS>>>/NISD/CL<<<UCYK\nEO 12958"
+        },
+        {
+          "activation": 0.03031737171113491,
+          "chain_idx": 13886,
+          "window_start": 85,
+          "text": " 4231/ITA/OEEN>>>IS/NISD/<<<CLUCYK\nEO 1295"
+        },
+        {
+          "activation": 0.029715022072196007,
+          "chain_idx": 13886,
+          "window_start": 82,
+          "text": "USDOC FOR 4231/ITA>>>/OEENIS/<<<NISD/CLUCYK\nEO 1"
+        },
+        {
+          "activation": 0.0290855523198843,
+          "chain_idx": 3906,
+          "window_start": 43,
+          "text": ".\nConsumer enquiries (1-800>>>-932-<<<9326)\nOur Consumer Relations department"
+        },
+        {
+          "activation": 0.02887547016143799,
+          "chain_idx": 13886,
+          "window_start": 83,
+          "text": "OC FOR 4231/ITA/>>>OEENIS/NIS<<<D/CLUCYK\nEO 12"
+        },
+        {
+          "activation": 0.028654998168349266,
+          "chain_idx": 13216,
+          "window_start": 77,
+          "text": " Us.\nPlease call 1.88>>>8.222<<<.7639 to speak with a Customer"
+        },
+        {
+          "activation": 0.02859148383140564,
+          "chain_idx": 13886,
+          "window_start": 84,
+          "text": " FOR 4231/ITA/OE>>>ENIS/NISD<<</CLUCYK\nEO 129"
+        },
+        {
+          "activation": 0.028558406978845596,
+          "chain_idx": 13216,
+          "window_start": 79,
+          "text": "\nPlease call 1.888.>>>222.7<<<639 to speak with a Customer Service Representative"
+        },
+        {
+          "activation": 0.028297333046793938,
+          "chain_idx": 13886,
+          "window_start": 80,
+          "text": "AU\nUSDOC FOR 4231>>>/ITA/OEEN<<<IS/NISD/CLUCYK\nEO"
+        }
+      ]
+    },
+    "4370": {
+      "mass": 0.29179348051548004,
+      "examples": [
+        {
+          "activation": 0.03378979116678238,
+          "chain_idx": 8085,
+          "window_start": 41,
+          "text": " day without pulling the, \"ButThat's>>>OkLifeIsGoodAnd<<<I'mHappy,\" drawstring to wrap it up"
+        },
+        {
+          "activation": 0.033593084663152695,
+          "chain_idx": 8085,
+          "window_start": 42,
+          "text": " without pulling the, \"ButThat'sOk>>>LifeIsGoodAndI<<<'mHappy,\" drawstring to wrap it up tid"
+        },
+        {
+          "activation": 0.0328822061419487,
+          "chain_idx": 8085,
+          "window_start": 40,
+          "text": " my day without pulling the, \"ButThat'>>>sOkLifeIsGood<<<AndI'mHappy,\" drawstring to wrap it"
+        },
+        {
+          "activation": 0.030294016003608704,
+          "chain_idx": 8085,
+          "window_start": 43,
+          "text": " pulling the, \"ButThat'sOkLife>>>IsGoodAndI'<<<mHappy,\" drawstring to wrap it up tidily"
+        },
+        {
+          "activation": 0.029280826449394226,
+          "chain_idx": 8085,
+          "window_start": 45,
+          "text": ", \"ButThat'sOkLifeIsGood>>>AndI'mHappy<<<,\" drawstring to wrap it up tidily at the"
+        },
+        {
+          "activation": 0.02889772690832615,
+          "chain_idx": 8085,
+          "window_start": 44,
+          "text": " the, \"ButThat'sOkLifeIs>>>GoodAndI'm<<<Happy,\" drawstring to wrap it up tidily at"
+        },
+        {
+          "activation": 0.02863471582531929,
+          "chain_idx": 8085,
+          "window_start": 39,
+          "text": " about my day without pulling the, \"ButThat>>>'sOkLifeIs<<<GoodAndI'mHappy,\" drawstring to wrap"
+        },
+        {
+          "activation": 0.025026220828294754,
+          "chain_idx": 20375,
+          "window_start": 77,
+          "text": " for more details.\nFile name: Dunns>>>RiverFalls5.jpg<<<\nFormat: digital, 3000"
+        },
+        {
+          "activation": 0.02496251091361046,
+          "chain_idx": 20375,
+          "window_start": 78,
+          "text": " more details.\nFile name: DunnsRiver>>>Falls5.jpg\n<<<Format: digital, 3000+"
+        },
+        {
+          "activation": 0.024432381615042686,
+          "chain_idx": 8085,
+          "window_start": 38,
+          "text": " truth about my day without pulling the, \"But>>>That'sOkLife<<<IsGoodAndI'mHappy,\" drawstring to"
+        }
+      ]
+    },
+    "1192": {
+      "mass": 0.2915434632450342,
+      "examples": [
+        {
+          "activation": 0.033359747380018234,
+          "chain_idx": 20664,
+          "window_start": 121,
+          "text": " for details \u2013 vist the website for more information http>>>://waynepaulward.<<<es/"
+        },
+        {
+          "activation": 0.0306014996021986,
+          "chain_idx": 2578,
+          "window_start": 110,
+          "text": " flea/tick and heartworm preventative. Visit www>>>.ruffloverescue<<<.com/adopt to make this pup a member"
+        },
+        {
+          "activation": 0.030333733186125755,
+          "chain_idx": 2683,
+          "window_start": 7,
+          "text": "This website (http://www>>>.crownwatchblog.<<<com), the related web pages contained herein (colle"
+        },
+        {
+          "activation": 0.029284214600920677,
+          "chain_idx": 2578,
+          "window_start": 111,
+          "text": "/tick and heartworm preventative. Visit www.>>>ruffloverescue.<<<com/adopt to make this pup a member of"
+        },
+        {
+          "activation": 0.028670845553278923,
+          "chain_idx": 11800,
+          "window_start": 100,
+          "text": " upgrades. You can download our newest build at http>>>://wintercellstudios.<<<itch.io/soulhunt . For the full"
+        },
+        {
+          "activation": 0.02847626619040966,
+          "chain_idx": 8923,
+          "window_start": 35,
+          "text": "pie Gallery\u201d http://www.facebook.com>>>/hainesmagpie<<< in Haines because I was having souvenir shop withdrawals."
+        },
+        {
+          "activation": 0.028170904144644737,
+          "chain_idx": 14835,
+          "window_start": 93,
+          "text": ".recapped.com/sarah-silverman>>>-and-michelle-<<<williams-in-take-this-waltz"
+        },
+        {
+          "activation": 0.027592498809099197,
+          "chain_idx": 14835,
+          "window_start": 95,
+          "text": "capped.com/sarah-silverman-and>>>-michelle-williams-<<<in-take-this-waltz As you"
+        },
+        {
+          "activation": 0.027539128437638283,
+          "chain_idx": 2683,
+          "window_start": 5,
+          "text": "This website (http>>>://www.crownwatch<<<blog.com), the related web pages contained herein"
+        },
+        {
+          "activation": 0.02751462534070015,
+          "chain_idx": 14835,
+          "window_start": 97,
+          "text": "com/sarah-silverman-and-michelle>>>-williams-in-<<<take-this-waltz As you may have"
+        }
+      ]
+    },
+    "136": {
+      "mass": 0.2913221884518862,
+      "examples": [
+        {
+          "activation": 0.030863983556628227,
+          "chain_idx": 13664,
+          "window_start": 118,
+          "text": " St. Lawrence RR Station, Hermon NY\n>>>POSTAL USAGE: PM<<< 1909"
+        },
+        {
+          "activation": 0.029762646183371544,
+          "chain_idx": 5655,
+          "window_start": 71,
+          "text": " 6, 2005 Monday,>>> SECTION: OPINION\nAS<<< a longtime fan of both George Bushes' eccentric"
+        },
+        {
+          "activation": 0.029581094160676003,
+          "chain_idx": 13886,
+          "window_start": 76,
+          "text": ", RBOUDREAU\nUSDOC FOR >>>4231/<<<ITA/OEENIS/NISD/CL"
+        },
+        {
+          "activation": 0.02936679497361183,
+          "chain_idx": 13886,
+          "window_start": 77,
+          "text": " RBOUDREAU\nUSDOC FOR 4>>>231/ITA<<</OEENIS/NISD/CLUC"
+        },
+        {
+          "activation": 0.028793856501579285,
+          "chain_idx": 17526,
+          "window_start": 3,
+          "text": "SCALLO>>>PED SWEET POTATOES<<<, BUTTERNUT SQUASH AND ZUCCH"
+        },
+        {
+          "activation": 0.028685608878731728,
+          "chain_idx": 5394,
+          "window_start": 54,
+          "text": "Futures For You by Carley Garner\n>>>FED STIMULUS AND<<< ASSET PRICES\nDoes government stimulus result in higher"
+        },
+        {
+          "activation": 0.028655150905251503,
+          "chain_idx": 13886,
+          "window_start": 78,
+          "text": "OUDREAU\nUSDOC FOR 42>>>31/ITA/<<<OEENIS/NISD/CLUCYK"
+        },
+        {
+          "activation": 0.028598377481102943,
+          "chain_idx": 13886,
+          "window_start": 83,
+          "text": "OC FOR 4231/ITA/>>>OEENIS/NIS<<<D/CLUCYK\nEO 12"
+        },
+        {
+          "activation": 0.02855803444981575,
+          "chain_idx": 499,
+          "window_start": 21,
+          "text": " ESTATES OF DECEASED PERSONS AND ABSENTE>>>ES, GUARDIANSHIP<<<, CONSERVATORSHIP AND TRUSTSPrev Next\n"
+        },
+        {
+          "activation": 0.028456641361117363,
+          "chain_idx": 12213,
+          "window_start": 36,
+          "text": "inox at The Butchers Blocks. MPN:>>> VIC-405<<<36. Hurry! Limited time offer. Offer"
+        }
+      ]
+    },
+    "4947": {
+      "mass": 0.2896341998130083,
+      "examples": [
+        {
+          "activation": 0.029687708243727684,
+          "chain_idx": 3906,
+          "window_start": 43,
+          "text": ".\nConsumer enquiries (1-800>>>-932-<<<9326)\nOur Consumer Relations department"
+        },
+        {
+          "activation": 0.029213858768343925,
+          "chain_idx": 13269,
+          "window_start": 122,
+          "text": "148889||K14>>>11630<<<||"
+        },
+        {
+          "activation": 0.029210982844233513,
+          "chain_idx": 2801,
+          "window_start": 77,
+          "text": ".Learn More\nITEM#: 124>>>19186<<<The Amalfi Paradise Area Rug is a stylish,"
+        },
+        {
+          "activation": 0.02909122407436371,
+          "chain_idx": 13216,
+          "window_start": 78,
+          "text": ".\nPlease call 1.888>>>.222.<<<7639 to speak with a Customer Service"
+        },
+        {
+          "activation": 0.02903471700847149,
+          "chain_idx": 13269,
+          "window_start": 121,
+          "text": "0148889||K1>>>41163<<<0||"
+        },
+        {
+          "activation": 0.02900238335132599,
+          "chain_idx": 13269,
+          "window_start": 120,
+          "text": "00148889||K>>>14116<<<30||"
+        },
+        {
+          "activation": 0.028723547235131264,
+          "chain_idx": 2801,
+          "window_start": 76,
+          "text": " review.Learn More\nITEM#: 12>>>41918<<<6The Amalfi Paradise Area Rug is a stylish"
+        },
+        {
+          "activation": 0.028569966554641724,
+          "chain_idx": 13269,
+          "window_start": 119,
+          "text": "300148889||>>>K1411<<<630||"
+        },
+        {
+          "activation": 0.028555888682603836,
+          "chain_idx": 13269,
+          "window_start": 118,
+          "text": "1300148889>>>||K141<<<1630||"
+        },
+        {
+          "activation": 0.028543923050165176,
+          "chain_idx": 13269,
+          "window_start": 123,
+          "text": "48889||K141>>>1630||<<<"
+        }
+      ]
+    },
+    "8392": {
+      "mass": 0.2896181121468544,
+      "examples": [
+        {
+          "activation": 0.02896181121468544,
+          "chain_idx": 23694,
+          "window_start": 9,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.02896181121468544,
+          "chain_idx": 23694,
+          "window_start": 8,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.02896181121468544,
+          "chain_idx": 23694,
+          "window_start": 7,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.02896181121468544,
+          "chain_idx": 23694,
+          "window_start": 6,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.02896181121468544,
+          "chain_idx": 23694,
+          "window_start": 5,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.02896181121468544,
+          "chain_idx": 23694,
+          "window_start": 4,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.02896181121468544,
+          "chain_idx": 23694,
+          "window_start": 3,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.02896181121468544,
+          "chain_idx": 23694,
+          "window_start": 2,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.02896181121468544,
+          "chain_idx": 23694,
+          "window_start": 1,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.02896181121468544,
+          "chain_idx": 23694,
+          "window_start": 0,
+          "text": ">>><<<"
+        }
+      ]
+    },
+    "9491": {
+      "mass": 0.2863552160561085,
+      "examples": [
+        {
+          "activation": 0.02908150665462017,
+          "chain_idx": 22082,
+          "window_start": 98,
+          "text": "folio.com/bdimages/f1>>>47112<<<090/\nThe tracks are all beautifully"
+        },
+        {
+          "activation": 0.029054824262857437,
+          "chain_idx": 10997,
+          "window_start": 38,
+          "text": "198:||Line 198>>>:|\n| * [<<<http://incubator.apache.org/tika"
+        },
+        {
+          "activation": 0.028932010754942894,
+          "chain_idx": 22082,
+          "window_start": 99,
+          "text": ".com/bdimages/f14>>>71120<<<90/\nThe tracks are all beautifully green"
+        },
+        {
+          "activation": 0.028885692358016968,
+          "chain_idx": 13202,
+          "window_start": 45,
+          "text": "1475 views||0 times favorited>>>||5 comments|\n<<<This is my third cutting board that I have made"
+        },
+        {
+          "activation": 0.028787145391106606,
+          "chain_idx": 22082,
+          "window_start": 97,
+          "text": "zenfolio.com/bdimages/f>>>14711<<<2090/\nThe tracks are all"
+        },
+        {
+          "activation": 0.028735268861055374,
+          "chain_idx": 22082,
+          "window_start": 100,
+          "text": "com/bdimages/f147>>>11209<<<0/\nThe tracks are all beautifully green with"
+        },
+        {
+          "activation": 0.028484756126999855,
+          "chain_idx": 6474,
+          "window_start": 67,
+          "text": "|Fits||Forster Collet Bullet Puller>>>|\n|Function||<<<Collet that clamps down on bullet to remove it"
+        },
+        {
+          "activation": 0.02835957147181034,
+          "chain_idx": 14851,
+          "window_start": 56,
+          "text": " per order can be imported.\nPosted by Reviewer>>>29260<<<05 on Aug 03, 2"
+        },
+        {
+          "activation": 0.028226906433701515,
+          "chain_idx": 22082,
+          "window_start": 101,
+          "text": "/bdimages/f1471>>>12090<<</\nThe tracks are all beautifully green with moss"
+        },
+        {
+          "activation": 0.027807533740997314,
+          "chain_idx": 14851,
+          "window_start": 57,
+          "text": " order can be imported.\nPosted by Reviewer2>>>92600<<<5 on Aug 03, 20"
+        }
+      ]
+    },
+    "4041": {
+      "mass": 0.28566670790314674,
+      "examples": [
+        {
+          "activation": 0.03042629361152649,
+          "chain_idx": 13269,
+          "window_start": 118,
+          "text": "1300148889>>>||K141<<<1630||"
+        },
+        {
+          "activation": 0.030145352706313133,
+          "chain_idx": 13269,
+          "window_start": 119,
+          "text": "300148889||>>>K1411<<<630||"
+        },
+        {
+          "activation": 0.029771436005830765,
+          "chain_idx": 13269,
+          "window_start": 120,
+          "text": "00148889||K>>>14116<<<30||"
+        },
+        {
+          "activation": 0.029305918142199516,
+          "chain_idx": 13269,
+          "window_start": 121,
+          "text": "0148889||K1>>>41163<<<0||"
+        },
+        {
+          "activation": 0.0291341133415699,
+          "chain_idx": 13269,
+          "window_start": 117,
+          "text": "4130014888>>>9||K14<<<11630||"
+        },
+        {
+          "activation": 0.028830284252762794,
+          "chain_idx": 13269,
+          "window_start": 122,
+          "text": "148889||K14>>>11630<<<||"
+        },
+        {
+          "activation": 0.027975717559456825,
+          "chain_idx": 13269,
+          "window_start": 123,
+          "text": "48889||K141>>>1630||<<<"
+        },
+        {
+          "activation": 0.027426177635788918,
+          "chain_idx": 13269,
+          "window_start": 116,
+          "text": "6413001488>>>89||K1<<<411630||"
+        },
+        {
+          "activation": 0.026455441489815712,
+          "chain_idx": 2801,
+          "window_start": 77,
+          "text": ".Learn More\nITEM#: 124>>>19186<<<The Amalfi Paradise Area Rug is a stylish,"
+        },
+        {
+          "activation": 0.02619597315788269,
+          "chain_idx": 13269,
+          "window_start": 115,
+          "text": "0641300148>>>889||K<<<1411630||"
+        }
+      ]
+    },
+    "5583": {
+      "mass": 0.28408829867839813,
+      "examples": [
+        {
+          "activation": 0.029865896329283714,
+          "chain_idx": 8981,
+          "window_start": 105,
+          "text": " (English) PAMELA SPEES, SENIOR ATTORNEY>>> IN THE INTERNATIONAL HUMAN RIGHTS<<< PROGRAM AT THE CENTER FOR CONSTITUTIONAL RIGHTS, SAY"
+        },
+        {
+          "activation": 0.029513800516724586,
+          "chain_idx": 8981,
+          "window_start": 106,
+          "text": "English) PAMELA SPEES, SENIOR ATTORNEY IN>>> THE INTERNATIONAL HUMAN RIGHTS PROGRAM<<< AT THE CENTER FOR CONSTITUTIONAL RIGHTS, SAYING"
+        },
+        {
+          "activation": 0.02933902107179165,
+          "chain_idx": 8981,
+          "window_start": 107,
+          "text": ") PAMELA SPEES, SENIOR ATTORNEY IN THE>>> INTERNATIONAL HUMAN RIGHTS PROGRAM AT<<< THE CENTER FOR CONSTITUTIONAL RIGHTS, SAYING:"
+        },
+        {
+          "activation": 0.02870538830757141,
+          "chain_idx": 8981,
+          "window_start": 108,
+          "text": " PAMELA SPEES, SENIOR ATTORNEY IN THE INTERNATIONAL>>> HUMAN RIGHTS PROGRAM AT THE<<< CENTER FOR CONSTITUTIONAL RIGHTS, SAYING: \""
+        },
+        {
+          "activation": 0.02857118286192417,
+          "chain_idx": 8981,
+          "window_start": 104,
+          "text": ") (English) PAMELA SPEES, SENIOR>>> ATTORNEY IN THE INTERNATIONAL HUMAN<<< RIGHTS PROGRAM AT THE CENTER FOR CONSTITUTIONAL RIGHTS,"
+        },
+        {
+          "activation": 0.028416840359568596,
+          "chain_idx": 8981,
+          "window_start": 109,
+          "text": "ELA SPEES, SENIOR ATTORNEY IN THE INTERNATIONAL HUMAN>>> RIGHTS PROGRAM AT THE CENTER<<< FOR CONSTITUTIONAL RIGHTS, SAYING: \"In"
+        },
+        {
+          "activation": 0.028072386980056763,
+          "chain_idx": 8981,
+          "window_start": 103,
+          "text": "SOUNDBITE) (English) PAMELA SPEES,>>> SENIOR ATTORNEY IN THE INTERNATIONAL<<< HUMAN RIGHTS PROGRAM AT THE CENTER FOR CONSTITUTIONAL RIGHTS"
+        },
+        {
+          "activation": 0.02733059599995613,
+          "chain_idx": 23353,
+          "window_start": 57,
+          "text": "2:15:00 AM\nPLEASE>>> TAKE A MOMENT TO BOOK<<<MARK US & VISIT US DAILY\nWWE Smackdown"
+        },
+        {
+          "activation": 0.027325216680765152,
+          "chain_idx": 8981,
+          "window_start": 102,
+          "text": " (SOUNDBITE) (English) PAMELA SPEES>>>, SENIOR ATTORNEY IN THE<<< INTERNATIONAL HUMAN RIGHTS PROGRAM AT THE CENTER FOR CONSTITUTIONAL"
+        },
+        {
+          "activation": 0.02694796957075596,
+          "chain_idx": 499,
+          "window_start": 9,
+          "text": "TITLE II DESCENT AND DISTRIBUTION, WILL>>>S, ESTATES OF<<< DECEASED PERSONS AND ABSENTEES, GUARD"
+        }
+      ]
+    },
+    "7309": {
+      "mass": 0.28368079662323,
+      "examples": [
+        {
+          "activation": 0.03132615238428116,
+          "chain_idx": 8844,
+          "window_start": 56,
+          "text": " 2021\n|Nov 2>>>7|| |\n|<<<Dec 05|| |\n\u201cWho controls"
+        },
+        {
+          "activation": 0.0296772550791502,
+          "chain_idx": 104,
+          "window_start": 48,
+          "text": " sample of her writing on the topic of optimism.>>>\n* * *\n<<<If you\u2019re craving a quick hit of optimism"
+        },
+        {
+          "activation": 0.028460858389735222,
+          "chain_idx": 2801,
+          "window_start": 77,
+          "text": ".Learn More\nITEM#: 124>>>19186<<<The Amalfi Paradise Area Rug is a stylish,"
+        },
+        {
+          "activation": 0.027944499626755714,
+          "chain_idx": 8844,
+          "window_start": 57,
+          "text": "2021\n|Nov 27>>>|| |\n|Dec<<< 05|| |\n\u201cWho controls the"
+        },
+        {
+          "activation": 0.02784530632197857,
+          "chain_idx": 20717,
+          "window_start": 13,
+          "text": " Basics of Masters DVD Hal SharpSKU: VD6>>>853A\n<<<Once again Hal Sharp and his now famous Bushido"
+        },
+        {
+          "activation": 0.027833355590701103,
+          "chain_idx": 22805,
+          "window_start": 24,
+          "text": "ORANGE ROSES WEDDING ARRANG>>>EMENT\u00a375\n<<<We've carefully choosen orange roses and gy"
+        },
+        {
+          "activation": 0.027817759662866592,
+          "chain_idx": 18159,
+          "window_start": 93,
+          "text": "7 BinkyBunny KokaneeandKahlua>>> LBJ10 Little<<<PuffyTail LongEaredLions MoveDiagon"
+        },
+        {
+          "activation": 0.02770872786641121,
+          "chain_idx": 8085,
+          "window_start": 41,
+          "text": " day without pulling the, \"ButThat's>>>OkLifeIsGoodAnd<<<I'mHappy,\" drawstring to wrap it up"
+        },
+        {
+          "activation": 0.027551908046007156,
+          "chain_idx": 2801,
+          "window_start": 76,
+          "text": " review.Learn More\nITEM#: 12>>>41918<<<6The Amalfi Paradise Area Rug is a stylish"
+        },
+        {
+          "activation": 0.027514973655343056,
+          "chain_idx": 8085,
+          "window_start": 42,
+          "text": " without pulling the, \"ButThat'sOk>>>LifeIsGoodAndI<<<'mHappy,\" drawstring to wrap it up tid"
+        }
+      ]
+    },
+    "2694": {
+      "mass": 0.2827382292598486,
+      "examples": [
+        {
+          "activation": 0.031201278790831566,
+          "chain_idx": 20664,
+          "window_start": 121,
+          "text": " for details \u2013 vist the website for more information http>>>://waynepaulward.<<<es/"
+        },
+        {
+          "activation": 0.029758227989077568,
+          "chain_idx": 2578,
+          "window_start": 111,
+          "text": "/tick and heartworm preventative. Visit www.>>>ruffloverescue.<<<com/adopt to make this pup a member of"
+        },
+        {
+          "activation": 0.029042407870292664,
+          "chain_idx": 2578,
+          "window_start": 110,
+          "text": " flea/tick and heartworm preventative. Visit www>>>.ruffloverescue<<<.com/adopt to make this pup a member"
+        },
+        {
+          "activation": 0.0282271858304739,
+          "chain_idx": 21459,
+          "window_start": 33,
+          "text": " Jeff Mills\nNews URL: http://www.>>>tenchikandojo.<<<com/kobayashisenseicourse."
+        },
+        {
+          "activation": 0.02787366881966591,
+          "chain_idx": 2683,
+          "window_start": 7,
+          "text": "This website (http://www>>>.crownwatchblog.<<<com), the related web pages contained herein (colle"
+        },
+        {
+          "activation": 0.02773853950202465,
+          "chain_idx": 2683,
+          "window_start": 5,
+          "text": "This website (http>>>://www.crownwatch<<<blog.com), the related web pages contained herein"
+        },
+        {
+          "activation": 0.02763989567756653,
+          "chain_idx": 21459,
+          "window_start": 32,
+          "text": " by Jeff Mills\nNews URL: http://www>>>.tenchikandojo<<<.com/kobayashisenseicourse"
+        },
+        {
+          "activation": 0.02761918306350708,
+          "chain_idx": 21459,
+          "window_start": 42,
+          "text": ".tenchikandojo.com/kobay>>>ashisenseicourse<<<.html\nFrom 18th October -"
+        },
+        {
+          "activation": 0.02683708630502224,
+          "chain_idx": 21459,
+          "window_start": 43,
+          "text": "tenchikandojo.com/kobayash>>>isenseicourse.<<<html\nFrom 18th October - "
+        },
+        {
+          "activation": 0.02680075541138649,
+          "chain_idx": 11800,
+          "window_start": 100,
+          "text": " upgrades. You can download our newest build at http>>>://wintercellstudios.<<<itch.io/soulhunt . For the full"
+        }
+      ]
+    },
+    "4181": {
+      "mass": 0.28195979073643684,
+      "examples": [
+        {
+          "activation": 0.029590914025902748,
+          "chain_idx": 13269,
+          "window_start": 118,
+          "text": "1300148889>>>||K141<<<1630||"
+        },
+        {
+          "activation": 0.029242072254419327,
+          "chain_idx": 13269,
+          "window_start": 120,
+          "text": "00148889||K>>>14116<<<30||"
+        },
+        {
+          "activation": 0.029204046353697777,
+          "chain_idx": 13269,
+          "window_start": 119,
+          "text": "300148889||>>>K1411<<<630||"
+        },
+        {
+          "activation": 0.02883041463792324,
+          "chain_idx": 13269,
+          "window_start": 117,
+          "text": "4130014888>>>9||K14<<<11630||"
+        },
+        {
+          "activation": 0.02859191969037056,
+          "chain_idx": 13269,
+          "window_start": 121,
+          "text": "0148889||K1>>>41163<<<0||"
+        },
+        {
+          "activation": 0.02816518023610115,
+          "chain_idx": 13269,
+          "window_start": 122,
+          "text": "148889||K14>>>11630<<<||"
+        },
+        {
+          "activation": 0.027906954288482666,
+          "chain_idx": 2801,
+          "window_start": 74,
+          "text": " writing this review.Learn More\nITEM#: >>>12419<<<186The Amalfi Paradise Area Rug is"
+        },
+        {
+          "activation": 0.027180993929505348,
+          "chain_idx": 2801,
+          "window_start": 75,
+          "text": " this review.Learn More\nITEM#: 1>>>24191<<<86The Amalfi Paradise Area Rug is a"
+        },
+        {
+          "activation": 0.026789451017975807,
+          "chain_idx": 13269,
+          "window_start": 116,
+          "text": "6413001488>>>89||K1<<<411630||"
+        },
+        {
+          "activation": 0.02645784430205822,
+          "chain_idx": 13269,
+          "window_start": 105,
+          "text": "8mm / 680mm||0>>>06413<<<00148889||K"
+        }
+      ]
+    },
+    "4875": {
+      "mass": 0.28094807639718056,
+      "examples": [
+        {
+          "activation": 0.028094807639718056,
+          "chain_idx": 23694,
+          "window_start": 9,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.028094807639718056,
+          "chain_idx": 23694,
+          "window_start": 8,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.028094807639718056,
+          "chain_idx": 23694,
+          "window_start": 7,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.028094807639718056,
+          "chain_idx": 23694,
+          "window_start": 6,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.028094807639718056,
+          "chain_idx": 23694,
+          "window_start": 5,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.028094807639718056,
+          "chain_idx": 23694,
+          "window_start": 4,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.028094807639718056,
+          "chain_idx": 23694,
+          "window_start": 3,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.028094807639718056,
+          "chain_idx": 23694,
+          "window_start": 2,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.028094807639718056,
+          "chain_idx": 23694,
+          "window_start": 1,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.028094807639718056,
+          "chain_idx": 23694,
+          "window_start": 0,
+          "text": ">>><<<"
+        }
+      ]
+    },
+    "10292": {
+      "mass": 0.2806137390434742,
+      "examples": [
+        {
+          "activation": 0.028934640809893608,
+          "chain_idx": 15419,
+          "window_start": 8,
+          "text": "Vicair Active O2\n>>>FOR THE ACTIVE WHEELCHAIR<<< USER\nO2 Machine Washable | 10"
+        },
+        {
+          "activation": 0.028850747272372246,
+          "chain_idx": 762,
+          "window_start": 105,
+          "text": "0 pm | CLICK HERE TO VIEW MORE AND REGISTER>>> FOR MENSCHFEST<<<!Escape\u2026\n9:15 am -"
+        },
+        {
+          "activation": 0.028376778587698936,
+          "chain_idx": 1853,
+          "window_start": 96,
+          "text": " the Press Release:\nFANBASE PRESS PLUM>>>BS THE DEPTHS OF<<< CREATIVITY IN \u2018THE MARGINS\u2019\nLOS"
+        },
+        {
+          "activation": 0.02823146991431713,
+          "chain_idx": 762,
+          "window_start": 103,
+          "text": ":00 pm | CLICK HERE TO VIEW MORE>>> AND REGISTER FOR MENS<<<CHFEST!Escape\u2026\n9:15"
+        },
+        {
+          "activation": 0.02801675908267498,
+          "chain_idx": 15419,
+          "window_start": 9,
+          "text": "Vicair Active O2\nFOR>>> THE ACTIVE WHEELCHAIR USER<<<\nO2 Machine Washable | 100"
+        },
+        {
+          "activation": 0.027825910598039627,
+          "chain_idx": 1853,
+          "window_start": 101,
+          "text": "FANBASE PRESS PLUMBS THE DEPTHS OF>>> CREATIVITY IN \u2018THE<<< MARGINS\u2019\nLOS ANGELES, CA \u2013 February"
+        },
+        {
+          "activation": 0.027692431584000587,
+          "chain_idx": 23353,
+          "window_start": 57,
+          "text": "2:15:00 AM\nPLEASE>>> TAKE A MOMENT TO BOOK<<<MARK US & VISIT US DAILY\nWWE Smackdown"
+        },
+        {
+          "activation": 0.027607599273324013,
+          "chain_idx": 762,
+          "window_start": 104,
+          "text": "00 pm | CLICK HERE TO VIEW MORE AND>>> REGISTER FOR MENSCHF<<<EST!Escape\u2026\n9:15 am"
+        },
+        {
+          "activation": 0.02754075825214386,
+          "chain_idx": 5394,
+          "window_start": 57,
+          "text": " For You by Carley Garner\nFED STIM>>>ULUS AND ASSET PRICES<<<\nDoes government stimulus result in higher commodity prices?"
+        },
+        {
+          "activation": 0.02753664366900921,
+          "chain_idx": 762,
+          "window_start": 106,
+          "text": " pm | CLICK HERE TO VIEW MORE AND REGISTER FOR>>> MENSCHFEST!<<<Escape\u2026\n9:15 am - "
+        }
+      ]
+    },
+    "15879": {
+      "mass": 0.2804662249982357,
+      "examples": [
+        {
+          "activation": 0.03017592988908291,
+          "chain_idx": 104,
+          "window_start": 48,
+          "text": " sample of her writing on the topic of optimism.>>>\n* * *\n<<<If you\u2019re craving a quick hit of optimism"
+        },
+        {
+          "activation": 0.029776556417346,
+          "chain_idx": 8085,
+          "window_start": 42,
+          "text": " without pulling the, \"ButThat'sOk>>>LifeIsGoodAndI<<<'mHappy,\" drawstring to wrap it up tid"
+        },
+        {
+          "activation": 0.029431462287902832,
+          "chain_idx": 8085,
+          "window_start": 45,
+          "text": ", \"ButThat'sOkLifeIsGood>>>AndI'mHappy<<<,\" drawstring to wrap it up tidily at the"
+        },
+        {
+          "activation": 0.02942953072488308,
+          "chain_idx": 8085,
+          "window_start": 41,
+          "text": " day without pulling the, \"ButThat's>>>OkLifeIsGoodAnd<<<I'mHappy,\" drawstring to wrap it up"
+        },
+        {
+          "activation": 0.028746027499437332,
+          "chain_idx": 8085,
+          "window_start": 44,
+          "text": " the, \"ButThat'sOkLifeIs>>>GoodAndI'm<<<Happy,\" drawstring to wrap it up tidily at"
+        },
+        {
+          "activation": 0.028658870607614517,
+          "chain_idx": 8085,
+          "window_start": 43,
+          "text": " pulling the, \"ButThat'sOkLife>>>IsGoodAndI'<<<mHappy,\" drawstring to wrap it up tidily"
+        },
+        {
+          "activation": 0.027779830619692802,
+          "chain_idx": 8085,
+          "window_start": 40,
+          "text": " my day without pulling the, \"ButThat'>>>sOkLifeIsGood<<<AndI'mHappy,\" drawstring to wrap it"
+        },
+        {
+          "activation": 0.025879621505737305,
+          "chain_idx": 20717,
+          "window_start": 13,
+          "text": " Basics of Masters DVD Hal SharpSKU: VD6>>>853A\n<<<Once again Hal Sharp and his now famous Bushido"
+        },
+        {
+          "activation": 0.02552316151559353,
+          "chain_idx": 8844,
+          "window_start": 56,
+          "text": " 2021\n|Nov 2>>>7|| |\n|<<<Dec 05|| |\n\u201cWho controls"
+        },
+        {
+          "activation": 0.025065233930945396,
+          "chain_idx": 8844,
+          "window_start": 57,
+          "text": "2021\n|Nov 27>>>|| |\n|Dec<<< 05|| |\n\u201cWho controls the"
+        }
+      ]
+    },
+    "9070": {
+      "mass": 0.27879849821329117,
+      "examples": [
+        {
+          "activation": 0.03201419115066528,
+          "chain_idx": 8085,
+          "window_start": 42,
+          "text": " without pulling the, \"ButThat'sOk>>>LifeIsGoodAndI<<<'mHappy,\" drawstring to wrap it up tid"
+        },
+        {
+          "activation": 0.03185398876667023,
+          "chain_idx": 8085,
+          "window_start": 41,
+          "text": " day without pulling the, \"ButThat's>>>OkLifeIsGoodAnd<<<I'mHappy,\" drawstring to wrap it up"
+        },
+        {
+          "activation": 0.029819408431649208,
+          "chain_idx": 8085,
+          "window_start": 40,
+          "text": " my day without pulling the, \"ButThat'>>>sOkLifeIsGood<<<AndI'mHappy,\" drawstring to wrap it"
+        },
+        {
+          "activation": 0.027638865634799004,
+          "chain_idx": 13490,
+          "window_start": 12,
+          "text": " Wine Goblet Skull and RoseItem #: 2>>>1305\n<<<Premium Wine Goblet Skull and Rose\nEnjoy a"
+        },
+        {
+          "activation": 0.02743871510028839,
+          "chain_idx": 20717,
+          "window_start": 13,
+          "text": " Basics of Masters DVD Hal SharpSKU: VD6>>>853A\n<<<Once again Hal Sharp and his now famous Bushido"
+        },
+        {
+          "activation": 0.026430973783135414,
+          "chain_idx": 22437,
+          "window_start": 105,
+          "text": "00 lbs|\n|Ships via UPS?>>>||Yes|\n|<<<Carton Pack Quantity||1 PK|\n|"
+        },
+        {
+          "activation": 0.02614380232989788,
+          "chain_idx": 8085,
+          "window_start": 45,
+          "text": ", \"ButThat'sOkLifeIsGood>>>AndI'mHappy<<<,\" drawstring to wrap it up tidily at the"
+        },
+        {
+          "activation": 0.025826359167695045,
+          "chain_idx": 104,
+          "window_start": 48,
+          "text": " sample of her writing on the topic of optimism.>>>\n* * *\n<<<If you\u2019re craving a quick hit of optimism"
+        },
+        {
+          "activation": 0.025816647335886955,
+          "chain_idx": 8085,
+          "window_start": 44,
+          "text": " the, \"ButThat'sOkLifeIs>>>GoodAndI'm<<<Happy,\" drawstring to wrap it up tidily at"
+        },
+        {
+          "activation": 0.02581554651260376,
+          "chain_idx": 8085,
+          "window_start": 43,
+          "text": " pulling the, \"ButThat'sOkLife>>>IsGoodAndI'<<<mHappy,\" drawstring to wrap it up tidily"
+        }
+      ]
+    },
+    "5121": {
+      "mass": 0.27875810116529465,
+      "examples": [
+        {
+          "activation": 0.02861653082072735,
+          "chain_idx": 13269,
+          "window_start": 120,
+          "text": "00148889||K>>>14116<<<30||"
+        },
+        {
+          "activation": 0.028452111408114433,
+          "chain_idx": 13269,
+          "window_start": 121,
+          "text": "0148889||K1>>>41163<<<0||"
+        },
+        {
+          "activation": 0.028369218111038208,
+          "chain_idx": 13269,
+          "window_start": 122,
+          "text": "148889||K14>>>11630<<<||"
+        },
+        {
+          "activation": 0.028222879394888878,
+          "chain_idx": 13269,
+          "window_start": 119,
+          "text": "300148889||>>>K1411<<<630||"
+        },
+        {
+          "activation": 0.02806789241731167,
+          "chain_idx": 2801,
+          "window_start": 74,
+          "text": " writing this review.Learn More\nITEM#: >>>12419<<<186The Amalfi Paradise Area Rug is"
+        },
+        {
+          "activation": 0.02804829739034176,
+          "chain_idx": 13269,
+          "window_start": 118,
+          "text": "1300148889>>>||K141<<<1630||"
+        },
+        {
+          "activation": 0.02764873020350933,
+          "chain_idx": 2801,
+          "window_start": 75,
+          "text": " this review.Learn More\nITEM#: 1>>>24191<<<86The Amalfi Paradise Area Rug is a"
+        },
+        {
+          "activation": 0.027238646522164345,
+          "chain_idx": 2801,
+          "window_start": 73,
+          "text": " for writing this review.Learn More\nITEM#:>>> 1241<<<9186The Amalfi Paradise Area Rug"
+        },
+        {
+          "activation": 0.027054769918322563,
+          "chain_idx": 13269,
+          "window_start": 123,
+          "text": "48889||K141>>>1630||<<<"
+        },
+        {
+          "activation": 0.027039024978876114,
+          "chain_idx": 3906,
+          "window_start": 43,
+          "text": ".\nConsumer enquiries (1-800>>>-932-<<<9326)\nOur Consumer Relations department"
+        }
+      ]
+    },
+    "4802": {
+      "mass": 0.27771323546767235,
+      "examples": [
+        {
+          "activation": 0.029538972303271294,
+          "chain_idx": 20717,
+          "window_start": 38,
+          "text": " Series has brought back to life names like Kotani>>>; Kobayashi;Yoda;<<<Ichijima; Samura; Tokuyama"
+        },
+        {
+          "activation": 0.028722161427140236,
+          "chain_idx": 12761,
+          "window_start": 70,
+          "text": " Ridgecrest.\nThe event was hosted by Ja>>>que and Art Hickman at<<< the Boulder Creek RV Park. With a hosted bar"
+        },
+        {
+          "activation": 0.02851180173456669,
+          "chain_idx": 20717,
+          "window_start": 37,
+          "text": "ido Series has brought back to life names like Kot>>>ani; Kobayashi;Yoda<<<;Ichijima; Samura; Toku"
+        },
+        {
+          "activation": 0.027935553342103958,
+          "chain_idx": 12761,
+          "window_start": 68,
+          "text": " Bishop and Ridgecrest.\nThe event was hosted>>> by Jaque and Art<<< Hickman at the Boulder Creek RV Park. With a"
+        },
+        {
+          "activation": 0.027377648279070854,
+          "chain_idx": 21676,
+          "window_start": 38,
+          "text": " 2011, at Liberty Cemetery with>>> ministers Alton and Wilfred Baker<<< officiating.\nMr. Beckhusen died Monday"
+        },
+        {
+          "activation": 0.027252251282334328,
+          "chain_idx": 10874,
+          "window_start": 2,
+          "text": "Bar>>>biero, Laurent and<<< Parate, Harshad R and Descloitres"
+        },
+        {
+          "activation": 0.027250397950410843,
+          "chain_idx": 23127,
+          "window_start": 61,
+          "text": "\nRoss, 37, whose legal name>>> is William L. Roberts<<<, and his passenger, fashion designer Shateria L"
+        },
+        {
+          "activation": 0.027118608355522156,
+          "chain_idx": 10874,
+          "window_start": 26,
+          "text": "itres, Marc and Bost, Adelphe and F>>>urian, Sonia and Kumar<<<, MS Mohan and Kumar, C and Braun,"
+        },
+        {
+          "activation": 0.027100631967186928,
+          "chain_idx": 12761,
+          "window_start": 69,
+          "text": " and Ridgecrest.\nThe event was hosted by>>> Jaque and Art Hickman<<< at the Boulder Creek RV Park. With a hosted"
+        },
+        {
+          "activation": 0.026905208826065063,
+          "chain_idx": 17239,
+          "window_start": 96,
+          "text": " potential partners.\nMaster Matchmaker is operated by>>> Joann and Steve Ward<<<. Get suggestions by answering a few simple questions."
+        }
+      ]
+    },
+    "8089": {
+      "mass": 0.2771069537848234,
+      "examples": [
+        {
+          "activation": 0.02930004894733429,
+          "chain_idx": 12213,
+          "window_start": 36,
+          "text": "inox at The Butchers Blocks. MPN:>>> VIC-405<<<36. Hurry! Limited time offer. Offer"
+        },
+        {
+          "activation": 0.028817972168326378,
+          "chain_idx": 13886,
+          "window_start": 86,
+          "text": "4231/ITA/OEENIS>>>/NISD/CL<<<UCYK\nEO 12958"
+        },
+        {
+          "activation": 0.028245771303772926,
+          "chain_idx": 12213,
+          "window_start": 37,
+          "text": " at The Butchers Blocks. MPN: VIC>>>-4053<<<6. Hurry! Limited time offer. Offer valid"
+        },
+        {
+          "activation": 0.028084350749850273,
+          "chain_idx": 13886,
+          "window_start": 87,
+          "text": "231/ITA/OEENIS/>>>NISD/CLUC<<<YK\nEO 12958 DEC"
+        },
+        {
+          "activation": 0.02761281095445156,
+          "chain_idx": 12213,
+          "window_start": 38,
+          "text": " The Butchers Blocks. MPN: VIC->>>40536<<<. Hurry! Limited time offer. Offer valid only"
+        },
+        {
+          "activation": 0.02745761349797249,
+          "chain_idx": 13886,
+          "window_start": 85,
+          "text": " 4231/ITA/OEEN>>>IS/NISD/<<<CLUCYK\nEO 1295"
+        },
+        {
+          "activation": 0.027097312733530998,
+          "chain_idx": 13886,
+          "window_start": 84,
+          "text": " FOR 4231/ITA/OE>>>ENIS/NISD<<</CLUCYK\nEO 129"
+        },
+        {
+          "activation": 0.02703733555972576,
+          "chain_idx": 13269,
+          "window_start": 118,
+          "text": "1300148889>>>||K141<<<1630||"
+        },
+        {
+          "activation": 0.026810502633452415,
+          "chain_idx": 13886,
+          "window_start": 83,
+          "text": "OC FOR 4231/ITA/>>>OEENIS/NIS<<<D/CLUCYK\nEO 12"
+        },
+        {
+          "activation": 0.026643235236406326,
+          "chain_idx": 13269,
+          "window_start": 119,
+          "text": "300148889||>>>K1411<<<630||"
+        }
+      ]
+    },
+    "14532": {
+      "mass": 0.2765896711498499,
+      "examples": [
+        {
+          "activation": 0.03024732507765293,
+          "chain_idx": 20664,
+          "window_start": 121,
+          "text": " for details \u2013 vist the website for more information http>>>://waynepaulward.<<<es/"
+        },
+        {
+          "activation": 0.02935222163796425,
+          "chain_idx": 2578,
+          "window_start": 111,
+          "text": "/tick and heartworm preventative. Visit www.>>>ruffloverescue.<<<com/adopt to make this pup a member of"
+        },
+        {
+          "activation": 0.02888425625860691,
+          "chain_idx": 20664,
+          "window_start": 122,
+          "text": " details \u2013 vist the website for more information http://>>>waynepaulward.es<<</"
+        },
+        {
+          "activation": 0.027605950832366943,
+          "chain_idx": 2683,
+          "window_start": 7,
+          "text": "This website (http://www>>>.crownwatchblog.<<<com), the related web pages contained herein (colle"
+        },
+        {
+          "activation": 0.027223749086260796,
+          "chain_idx": 12534,
+          "window_start": 47,
+          "text": "trnx-is-set-to-bring>>>-smile-on-<<<the-investors-face-as-analysts"
+        },
+        {
+          "activation": 0.026838917285203934,
+          "chain_idx": 12534,
+          "window_start": 55,
+          "text": "-bring-smile-on-the-investors>>>-face-as-<<<analysts-sets-mean-target-price"
+        },
+        {
+          "activation": 0.02675166167318821,
+          "chain_idx": 2683,
+          "window_start": 5,
+          "text": "This website (http>>>://www.crownwatch<<<blog.com), the related web pages contained herein"
+        },
+        {
+          "activation": 0.026569081470370293,
+          "chain_idx": 21459,
+          "window_start": 43,
+          "text": "tenchikandojo.com/kobayash>>>isenseicourse.<<<html\nFrom 18th October - "
+        },
+        {
+          "activation": 0.026568932458758354,
+          "chain_idx": 12534,
+          "window_start": 48,
+          "text": "nx-is-set-to-bring->>>smile-on-the<<<-investors-face-as-analysts-"
+        },
+        {
+          "activation": 0.026547575369477272,
+          "chain_idx": 20664,
+          "window_start": 120,
+          "text": " email for details \u2013 vist the website for more information>>> http://waynepaulward<<<.es/"
+        }
+      ]
+    },
+    "1571": {
+      "mass": 0.27600359730422497,
+      "examples": [
+        {
+          "activation": 0.028047824278473854,
+          "chain_idx": 13886,
+          "window_start": 80,
+          "text": "AU\nUSDOC FOR 4231>>>/ITA/OEEN<<<IS/NISD/CLUCYK\nEO"
+        },
+        {
+          "activation": 0.028017235919833183,
+          "chain_idx": 13886,
+          "window_start": 81,
+          "text": "\nUSDOC FOR 4231/>>>ITA/OEENIS<<</NISD/CLUCYK\nEO "
+        },
+        {
+          "activation": 0.02790585160255432,
+          "chain_idx": 13886,
+          "window_start": 77,
+          "text": " RBOUDREAU\nUSDOC FOR 4>>>231/ITA<<</OEENIS/NISD/CLUC"
+        },
+        {
+          "activation": 0.02778555452823639,
+          "chain_idx": 13886,
+          "window_start": 79,
+          "text": "DREAU\nUSDOC FOR 423>>>1/ITA/OE<<<ENIS/NISD/CLUCYK\n"
+        },
+        {
+          "activation": 0.027751445770263672,
+          "chain_idx": 13886,
+          "window_start": 83,
+          "text": "OC FOR 4231/ITA/>>>OEENIS/NIS<<<D/CLUCYK\nEO 12"
+        },
+        {
+          "activation": 0.02771361544728279,
+          "chain_idx": 13886,
+          "window_start": 76,
+          "text": ", RBOUDREAU\nUSDOC FOR >>>4231/<<<ITA/OEENIS/NISD/CL"
+        },
+        {
+          "activation": 0.027665143832564354,
+          "chain_idx": 13886,
+          "window_start": 82,
+          "text": "USDOC FOR 4231/ITA>>>/OEENIS/<<<NISD/CLUCYK\nEO 1"
+        },
+        {
+          "activation": 0.02749755047261715,
+          "chain_idx": 13886,
+          "window_start": 78,
+          "text": "OUDREAU\nUSDOC FOR 42>>>31/ITA/<<<OEENIS/NISD/CLUCYK"
+        },
+        {
+          "activation": 0.027005046606063843,
+          "chain_idx": 13886,
+          "window_start": 86,
+          "text": "4231/ITA/OEENIS>>>/NISD/CL<<<UCYK\nEO 12958"
+        },
+        {
+          "activation": 0.02661432884633541,
+          "chain_idx": 13886,
+          "window_start": 84,
+          "text": " FOR 4231/ITA/OE>>>ENIS/NISD<<</CLUCYK\nEO 129"
+        }
+      ]
+    },
+    "7651": {
+      "mass": 0.27493559941649437,
+      "examples": [
+        {
+          "activation": 0.029887864366173744,
+          "chain_idx": 12534,
+          "window_start": 39,
+          "text": "taronis-technologies-inc-trnx>>>-is-set-<<<to-bring-smile-on-the-"
+        },
+        {
+          "activation": 0.029080325737595558,
+          "chain_idx": 12534,
+          "window_start": 40,
+          "text": "aronis-technologies-inc-trnx->>>is-set-to<<<-bring-smile-on-the-investors"
+        },
+        {
+          "activation": 0.028798723593354225,
+          "chain_idx": 12534,
+          "window_start": 41,
+          "text": "is-technologies-inc-trnx-is>>>-set-to-<<<bring-smile-on-the-investors-"
+        },
+        {
+          "activation": 0.027625126764178276,
+          "chain_idx": 2578,
+          "window_start": 110,
+          "text": " flea/tick and heartworm preventative. Visit www>>>.ruffloverescue<<<.com/adopt to make this pup a member"
+        },
+        {
+          "activation": 0.027394061908125877,
+          "chain_idx": 2578,
+          "window_start": 111,
+          "text": "/tick and heartworm preventative. Visit www.>>>ruffloverescue.<<<com/adopt to make this pup a member of"
+        },
+        {
+          "activation": 0.02722175233066082,
+          "chain_idx": 20664,
+          "window_start": 121,
+          "text": " for details \u2013 vist the website for more information http>>>://waynepaulward.<<<es/"
+        },
+        {
+          "activation": 0.026764383539557457,
+          "chain_idx": 12534,
+          "window_start": 42,
+          "text": "-technologies-inc-trnx-is->>>set-to-bring<<<-smile-on-the-investors-face"
+        },
+        {
+          "activation": 0.026180608198046684,
+          "chain_idx": 21459,
+          "window_start": 42,
+          "text": ".tenchikandojo.com/kobay>>>ashisenseicourse<<<.html\nFrom 18th October -"
+        },
+        {
+          "activation": 0.02605212666094303,
+          "chain_idx": 2578,
+          "window_start": 109,
+          "text": " on flea/tick and heartworm preventative. Visit>>> www.ruffloveres<<<cue.com/adopt to make this pup a"
+        },
+        {
+          "activation": 0.025930626317858696,
+          "chain_idx": 12534,
+          "window_start": 43,
+          "text": "technologies-inc-trnx-is-set>>>-to-bring-<<<smile-on-the-investors-face-"
+        }
+      ]
+    },
+    "15211": {
+      "mass": 0.27306189201772213,
+      "examples": [
+        {
+          "activation": 0.028236327692866325,
+          "chain_idx": 13886,
+          "window_start": 86,
+          "text": "4231/ITA/OEENIS>>>/NISD/CL<<<UCYK\nEO 12958"
+        },
+        {
+          "activation": 0.02817760407924652,
+          "chain_idx": 13886,
+          "window_start": 84,
+          "text": " FOR 4231/ITA/OE>>>ENIS/NISD<<</CLUCYK\nEO 129"
+        },
+        {
+          "activation": 0.028097648173570633,
+          "chain_idx": 13886,
+          "window_start": 85,
+          "text": " 4231/ITA/OEEN>>>IS/NISD/<<<CLUCYK\nEO 1295"
+        },
+        {
+          "activation": 0.028074873611330986,
+          "chain_idx": 13886,
+          "window_start": 83,
+          "text": "OC FOR 4231/ITA/>>>OEENIS/NIS<<<D/CLUCYK\nEO 12"
+        },
+        {
+          "activation": 0.027912337332963943,
+          "chain_idx": 13886,
+          "window_start": 82,
+          "text": "USDOC FOR 4231/ITA>>>/OEENIS/<<<NISD/CLUCYK\nEO 1"
+        },
+        {
+          "activation": 0.02702380158007145,
+          "chain_idx": 13886,
+          "window_start": 80,
+          "text": "AU\nUSDOC FOR 4231>>>/ITA/OEEN<<<IS/NISD/CLUCYK\nEO"
+        },
+        {
+          "activation": 0.026813972741365433,
+          "chain_idx": 13886,
+          "window_start": 81,
+          "text": "\nUSDOC FOR 4231/>>>ITA/OEENIS<<</NISD/CLUCYK\nEO "
+        },
+        {
+          "activation": 0.026392443105578423,
+          "chain_idx": 13886,
+          "window_start": 87,
+          "text": "231/ITA/OEENIS/>>>NISD/CLUC<<<YK\nEO 12958 DEC"
+        },
+        {
+          "activation": 0.026232948526740074,
+          "chain_idx": 13886,
+          "window_start": 78,
+          "text": "OUDREAU\nUSDOC FOR 42>>>31/ITA/<<<OEENIS/NISD/CLUCYK"
+        },
+        {
+          "activation": 0.026099935173988342,
+          "chain_idx": 13886,
+          "window_start": 79,
+          "text": "DREAU\nUSDOC FOR 423>>>1/ITA/OE<<<ENIS/NISD/CLUCYK\n"
+        }
+      ]
+    },
+    "7267": {
+      "mass": 0.2727039959281683,
+      "examples": [
+        {
+          "activation": 0.027866903692483902,
+          "chain_idx": 3906,
+          "window_start": 43,
+          "text": ".\nConsumer enquiries (1-800>>>-932-<<<9326)\nOur Consumer Relations department"
+        },
+        {
+          "activation": 0.027731169015169144,
+          "chain_idx": 723,
+          "window_start": 2,
+          "text": "NEVER>>> TRUST A SKINNY CUP<<<CAKE BAKER\nBook 1 of the Death"
+        },
+        {
+          "activation": 0.02753627672791481,
+          "chain_idx": 23353,
+          "window_start": 57,
+          "text": "2:15:00 AM\nPLEASE>>> TAKE A MOMENT TO BOOK<<<MARK US & VISIT US DAILY\nWWE Smackdown"
+        },
+        {
+          "activation": 0.027393463999032974,
+          "chain_idx": 6125,
+          "window_start": 17,
+          "text": " associate Print version|\nWELCOME TO FORKLIFT>>>ACTION.COM, MATERIALS<<< HANDLING ONLINE.\nThis is issue #28"
+        },
+        {
+          "activation": 0.027191758155822754,
+          "chain_idx": 23353,
+          "window_start": 63,
+          "text": "0 AM\nPLEASE TAKE A MOMENT TO BOOKMARK>>> US & VISIT US DAILY<<<\nWWE Smackdown TV taping results\nFebruary "
+        },
+        {
+          "activation": 0.0271102637052536,
+          "chain_idx": 23353,
+          "window_start": 58,
+          "text": ":15:00 AM\nPLEASE TAKE>>> A MOMENT TO BOOKMARK<<< US & VISIT US DAILY\nWWE Smackdown TV"
+        },
+        {
+          "activation": 0.027091925963759422,
+          "chain_idx": 6125,
+          "window_start": 16,
+          "text": " an associate Print version|\nWELCOME TO FORKL>>>IFTACTION.COM,<<< MATERIALS HANDLING ONLINE.\nThis is issue #2"
+        },
+        {
+          "activation": 0.02708287350833416,
+          "chain_idx": 6125,
+          "window_start": 18,
+          "text": " Print version|\nWELCOME TO FORKLIFTACTION>>>.COM, MATERIALS HANDLING<<< ONLINE.\nThis is issue #288"
+        },
+        {
+          "activation": 0.02689903788268566,
+          "chain_idx": 723,
+          "window_start": 1,
+          "text": ">>>NEVER TRUST A SKINNY<<< CUPCAKE BAKER\nBook 1 of the"
+        },
+        {
+          "activation": 0.02680032327771187,
+          "chain_idx": 13216,
+          "window_start": 78,
+          "text": ".\nPlease call 1.888>>>.222.<<<7639 to speak with a Customer Service"
+        }
+      ]
+    },
+    "14715": {
+      "mass": 0.27230193838477135,
+      "examples": [
+        {
+          "activation": 0.027230193838477135,
+          "chain_idx": 23694,
+          "window_start": 9,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.027230193838477135,
+          "chain_idx": 23694,
+          "window_start": 8,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.027230193838477135,
+          "chain_idx": 23694,
+          "window_start": 7,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.027230193838477135,
+          "chain_idx": 23694,
+          "window_start": 6,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.027230193838477135,
+          "chain_idx": 23694,
+          "window_start": 5,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.027230193838477135,
+          "chain_idx": 23694,
+          "window_start": 4,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.027230193838477135,
+          "chain_idx": 23694,
+          "window_start": 3,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.027230193838477135,
+          "chain_idx": 23694,
+          "window_start": 2,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.027230193838477135,
+          "chain_idx": 23694,
+          "window_start": 1,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.027230193838477135,
+          "chain_idx": 23694,
+          "window_start": 0,
+          "text": ">>><<<"
+        }
+      ]
+    },
+    "15844": {
+      "mass": 0.2713778968900442,
+      "examples": [
+        {
+          "activation": 0.02884260192513466,
+          "chain_idx": 2683,
+          "window_start": 7,
+          "text": "This website (http://www>>>.crownwatchblog.<<<com), the related web pages contained herein (colle"
+        },
+        {
+          "activation": 0.028832951560616493,
+          "chain_idx": 2578,
+          "window_start": 110,
+          "text": " flea/tick and heartworm preventative. Visit www>>>.ruffloverescue<<<.com/adopt to make this pup a member"
+        },
+        {
+          "activation": 0.028595274314284325,
+          "chain_idx": 20664,
+          "window_start": 121,
+          "text": " for details \u2013 vist the website for more information http>>>://waynepaulward.<<<es/"
+        },
+        {
+          "activation": 0.028383944183588028,
+          "chain_idx": 2683,
+          "window_start": 5,
+          "text": "This website (http>>>://www.crownwatch<<<blog.com), the related web pages contained herein"
+        },
+        {
+          "activation": 0.02668462134897709,
+          "chain_idx": 21459,
+          "window_start": 35,
+          "text": "\nNews URL: http://www.tenchik>>>andojo.com/<<<kobayashisenseicourse.html\n"
+        },
+        {
+          "activation": 0.02634957991540432,
+          "chain_idx": 11800,
+          "window_start": 100,
+          "text": " upgrades. You can download our newest build at http>>>://wintercellstudios.<<<itch.io/soulhunt . For the full"
+        },
+        {
+          "activation": 0.02622372843325138,
+          "chain_idx": 12534,
+          "window_start": 32,
+          "text": "/03/03/taronis>>>-technologies-inc-<<<trnx-is-set-to-bring"
+        },
+        {
+          "activation": 0.025867899879813194,
+          "chain_idx": 10399,
+          "window_start": 34,
+          "text": " at https://www.census.gov/construction>>>/c30/<<<definitions.html\nMethodology details can be found at"
+        },
+        {
+          "activation": 0.02581522800028324,
+          "chain_idx": 21767,
+          "window_start": 61,
+          "text": "and more from Salt Water Sportsman.\nwww>>>.ask.com/<<<youtube?q=Basic Saltwater Fishing Tips&"
+        },
+        {
+          "activation": 0.025782067328691483,
+          "chain_idx": 21459,
+          "window_start": 33,
+          "text": " Jeff Mills\nNews URL: http://www.>>>tenchikandojo.<<<com/kobayashisenseicourse."
+        }
+      ]
+    },
+    "898": {
+      "mass": 0.26995218731462955,
+      "examples": [
+        {
+          "activation": 0.028015602380037308,
+          "chain_idx": 13886,
+          "window_start": 83,
+          "text": "OC FOR 4231/ITA/>>>OEENIS/NIS<<<D/CLUCYK\nEO 12"
+        },
+        {
+          "activation": 0.027897516265511513,
+          "chain_idx": 13886,
+          "window_start": 81,
+          "text": "\nUSDOC FOR 4231/>>>ITA/OEENIS<<</NISD/CLUCYK\nEO "
+        },
+        {
+          "activation": 0.027788549661636353,
+          "chain_idx": 13886,
+          "window_start": 84,
+          "text": " FOR 4231/ITA/OE>>>ENIS/NISD<<</CLUCYK\nEO 129"
+        },
+        {
+          "activation": 0.026942526921629906,
+          "chain_idx": 18967,
+          "window_start": 7,
+          "text": "RANCHO OSORIO ->>> CLOSE TO DZILAM<<< GONZALEZ\nJUST REDUCED! Large "
+        },
+        {
+          "activation": 0.026903999969363213,
+          "chain_idx": 13886,
+          "window_start": 80,
+          "text": "AU\nUSDOC FOR 4231>>>/ITA/OEEN<<<IS/NISD/CLUCYK\nEO"
+        },
+        {
+          "activation": 0.02681608498096466,
+          "chain_idx": 13886,
+          "window_start": 82,
+          "text": "USDOC FOR 4231/ITA>>>/OEENIS/<<<NISD/CLUCYK\nEO 1"
+        },
+        {
+          "activation": 0.026602962985634804,
+          "chain_idx": 6125,
+          "window_start": 16,
+          "text": " an associate Print version|\nWELCOME TO FORKL>>>IFTACTION.COM,<<< MATERIALS HANDLING ONLINE.\nThis is issue #2"
+        },
+        {
+          "activation": 0.026507198810577393,
+          "chain_idx": 13886,
+          "window_start": 85,
+          "text": " 4231/ITA/OEEN>>>IS/NISD/<<<CLUCYK\nEO 1295"
+        },
+        {
+          "activation": 0.02635205164551735,
+          "chain_idx": 13886,
+          "window_start": 77,
+          "text": " RBOUDREAU\nUSDOC FOR 4>>>231/ITA<<</OEENIS/NISD/CLUC"
+        },
+        {
+          "activation": 0.026125693693757057,
+          "chain_idx": 13886,
+          "window_start": 79,
+          "text": "DREAU\nUSDOC FOR 423>>>1/ITA/OE<<<ENIS/NISD/CLUCYK\n"
+        }
+      ]
+    },
+    "12663": {
+      "mass": 0.269925132393837,
+      "examples": [
+        {
+          "activation": 0.030786631628870964,
+          "chain_idx": 8085,
+          "window_start": 41,
+          "text": " day without pulling the, \"ButThat's>>>OkLifeIsGoodAnd<<<I'mHappy,\" drawstring to wrap it up"
+        },
+        {
+          "activation": 0.02968614175915718,
+          "chain_idx": 8085,
+          "window_start": 42,
+          "text": " without pulling the, \"ButThat'sOk>>>LifeIsGoodAndI<<<'mHappy,\" drawstring to wrap it up tid"
+        },
+        {
+          "activation": 0.029635101556777954,
+          "chain_idx": 8085,
+          "window_start": 40,
+          "text": " my day without pulling the, \"ButThat'>>>sOkLifeIsGood<<<AndI'mHappy,\" drawstring to wrap it"
+        },
+        {
+          "activation": 0.026938283815979958,
+          "chain_idx": 104,
+          "window_start": 48,
+          "text": " sample of her writing on the topic of optimism.>>>\n* * *\n<<<If you\u2019re craving a quick hit of optimism"
+        },
+        {
+          "activation": 0.026467854157090187,
+          "chain_idx": 16714,
+          "window_start": 98,
+          "text": "Me: \u201cyeah floor it\u201d\n\u2014 car>>>lol (@CarelW<<<illemse) May 28, 2"
+        },
+        {
+          "activation": 0.025909332558512688,
+          "chain_idx": 16714,
+          "window_start": 99,
+          "text": ": \u201cyeah floor it\u201d\n\u2014 carlol>>> (@CarelWille<<<mse) May 28, 20"
+        },
+        {
+          "activation": 0.025674065575003624,
+          "chain_idx": 18159,
+          "window_start": 97,
+          "text": " KokaneeandKahlua LBJ10>>> LittlePuffyTail Long<<<EaredLions MoveDiagonally RabbitPam Sar"
+        },
+        {
+          "activation": 0.0251627117395401,
+          "chain_idx": 18159,
+          "window_start": 108,
+          "text": "PuffyTail LongEaredLions MoveDiagon>>>ally RabbitPam Sarita<<<\nLooking for a carrier for Cyrus-Bunny."
+        },
+        {
+          "activation": 0.024874268099665642,
+          "chain_idx": 18159,
+          "window_start": 103,
+          "text": " LBJ10 LittlePuffyTail LongE>>>aredLions MoveDiagon<<<ally RabbitPam Sarita\nLooking for a carrier"
+        },
+        {
+          "activation": 0.024790741503238678,
+          "chain_idx": 16714,
+          "window_start": 100,
+          "text": " \u201cyeah floor it\u201d\n\u2014 carlol (@>>>CarelWillemse<<<) May 28, 201"
+        }
+      ]
+    },
+    "5002": {
+      "mass": 0.268840117380023,
+      "examples": [
+        {
+          "activation": 0.02981220744550228,
+          "chain_idx": 21676,
+          "window_start": 37,
+          "text": ", 2011, at Liberty Cemetery>>> with ministers Alton and Wilfred<<< Baker officiating.\nMr. Beckhusen died"
+        },
+        {
+          "activation": 0.029339376837015152,
+          "chain_idx": 21676,
+          "window_start": 38,
+          "text": " 2011, at Liberty Cemetery with>>> ministers Alton and Wilfred Baker<<< officiating.\nMr. Beckhusen died Monday"
+        },
+        {
+          "activation": 0.028239766135811806,
+          "chain_idx": 19849,
+          "window_start": 107,
+          "text": " Ga., died Wednesday. Beggs Funeral Home.>>> Mr. Henry E.<<< Johnson, Aiken, S.C., died Wednesday"
+        },
+        {
+          "activation": 0.02739166095852852,
+          "chain_idx": 19849,
+          "window_start": 108,
+          "text": "., died Wednesday. Beggs Funeral Home. Mr>>>. Henry E. Johnson<<<, Aiken, S.C., died Wednesday."
+        },
+        {
+          "activation": 0.02717624418437481,
+          "chain_idx": 14959,
+          "window_start": 74,
+          "text": "7 in St. Joseph, Missouri the first child>>> of Bessie Wilcox and Louis<<< Ryse. Juanita was an independent woman who lived"
+        },
+        {
+          "activation": 0.02662753127515316,
+          "chain_idx": 21676,
+          "window_start": 39,
+          "text": "2011, at Liberty Cemetery with ministers>>> Alton and Wilfred Baker officiating<<<.\nMr. Beckhusen died Monday,"
+        },
+        {
+          "activation": 0.02550041675567627,
+          "chain_idx": 10673,
+          "window_start": 75,
+          "text": "970. A log cabin, was built>>> by his son, William<<<, around the late 1880'"
+        },
+        {
+          "activation": 0.02535885013639927,
+          "chain_idx": 21676,
+          "window_start": 36,
+          "text": "5, 2011, at Liberty>>> Cemetery with ministers Alton and<<< Wilfred Baker officiating.\nMr. Beckhusen"
+        },
+        {
+          "activation": 0.025063781067728996,
+          "chain_idx": 19849,
+          "window_start": 109,
+          "text": " died Wednesday. Beggs Funeral Home. Mr.>>> Henry E. Johnson,<<< Aiken, S.C., died Wednesday. G"
+        },
+        {
+          "activation": 0.02433028258383274,
+          "chain_idx": 19849,
+          "window_start": 48,
+          "text": "., died Wednesday. Davenport-McLendon Mortuary.>>> Mrs. Mary A.<<< Brown, Thomson, Ga., died Wednesday. Thomson"
+        }
+      ]
+    },
+    "11835": {
+      "mass": 0.2687999792397022,
+      "examples": [
+        {
+          "activation": 0.028020545840263367,
+          "chain_idx": 21676,
+          "window_start": 37,
+          "text": ", 2011, at Liberty Cemetery>>> with ministers Alton and Wilfred<<< Baker officiating.\nMr. Beckhusen died"
+        },
+        {
+          "activation": 0.02746451459825039,
+          "chain_idx": 7644,
+          "window_start": 56,
+          "text": " Charge. Pre-Registration is Mandatory\nCourse Director>>>: Douglas S. Darling<<<, Ph.D.\nGuest Speaker: Jan"
+        },
+        {
+          "activation": 0.027350295335054398,
+          "chain_idx": 7399,
+          "window_start": 105,
+          "text": "J headquarters, in the Continuing Education Building, >>>1041 N<<<. Virginia St., on the University of Nevada,"
+        },
+        {
+          "activation": 0.027016980573534966,
+          "chain_idx": 7399,
+          "window_start": 104,
+          "text": "FCJ headquarters, in the Continuing Education Building,>>> 1041<<< N. Virginia St., on the University of Nevada"
+        },
+        {
+          "activation": 0.026776207610964775,
+          "chain_idx": 7644,
+          "window_start": 55,
+          "text": " No Charge. Pre-Registration is Mandatory\nCourse>>> Director: Douglas S.<<< Darling, Ph.D.\nGuest Speaker:"
+        },
+        {
+          "activation": 0.026545224711298943,
+          "chain_idx": 23127,
+          "window_start": 61,
+          "text": "\nRoss, 37, whose legal name>>> is William L. Roberts<<<, and his passenger, fashion designer Shateria L"
+        },
+        {
+          "activation": 0.026525715366005898,
+          "chain_idx": 20183,
+          "window_start": 40,
+          "text": " Christensen (Chair), Tom McFarland (Park Authority),>>> Roger Wilson, and Jean<<< Voss\nCounty Staff: Adam Lind\nCall to"
+        },
+        {
+          "activation": 0.026405204087495804,
+          "chain_idx": 630,
+          "window_start": 20,
+          "text": "6-22 at the Baldwin Theatre, >>>415 S.<<< Lafayette, Royal Oak. Advance tickets are $2"
+        },
+        {
+          "activation": 0.026389453560113907,
+          "chain_idx": 7399,
+          "window_start": 106,
+          "text": " headquarters, in the Continuing Education Building, 1>>>041 N.<<< Virginia St., on the University of Nevada, Reno"
+        },
+        {
+          "activation": 0.02630583755671978,
+          "chain_idx": 7644,
+          "window_start": 57,
+          "text": ". Pre-Registration is Mandatory\nCourse Director:>>> Douglas S. Darling,<<< Ph.D.\nGuest Speaker: Jan S"
+        }
+      ]
+    },
+    "11495": {
+      "mass": 0.2678941562771797,
+      "examples": [
+        {
+          "activation": 0.028508801013231277,
+          "chain_idx": 8085,
+          "window_start": 42,
+          "text": " without pulling the, \"ButThat'sOk>>>LifeIsGoodAndI<<<'mHappy,\" drawstring to wrap it up tid"
+        },
+        {
+          "activation": 0.02787942625582218,
+          "chain_idx": 8085,
+          "window_start": 45,
+          "text": ", \"ButThat'sOkLifeIsGood>>>AndI'mHappy<<<,\" drawstring to wrap it up tidily at the"
+        },
+        {
+          "activation": 0.027784083038568497,
+          "chain_idx": 8085,
+          "window_start": 43,
+          "text": " pulling the, \"ButThat'sOkLife>>>IsGoodAndI'<<<mHappy,\" drawstring to wrap it up tidily"
+        },
+        {
+          "activation": 0.027671245858073235,
+          "chain_idx": 8085,
+          "window_start": 44,
+          "text": " the, \"ButThat'sOkLifeIs>>>GoodAndI'm<<<Happy,\" drawstring to wrap it up tidily at"
+        },
+        {
+          "activation": 0.02739838697016239,
+          "chain_idx": 8085,
+          "window_start": 41,
+          "text": " day without pulling the, \"ButThat's>>>OkLifeIsGoodAnd<<<I'mHappy,\" drawstring to wrap it up"
+        },
+        {
+          "activation": 0.026651302352547646,
+          "chain_idx": 20375,
+          "window_start": 76,
+          "text": " Click for more details.\nFile name: Dun>>>nsRiverFalls5.<<<jpg\nFormat: digital, 300"
+        },
+        {
+          "activation": 0.02642475999891758,
+          "chain_idx": 8085,
+          "window_start": 40,
+          "text": " my day without pulling the, \"ButThat'>>>sOkLifeIsGood<<<AndI'mHappy,\" drawstring to wrap it"
+        },
+        {
+          "activation": 0.02596631646156311,
+          "chain_idx": 104,
+          "window_start": 48,
+          "text": " sample of her writing on the topic of optimism.>>>\n* * *\n<<<If you\u2019re craving a quick hit of optimism"
+        },
+        {
+          "activation": 0.025248616933822632,
+          "chain_idx": 21767,
+          "window_start": 65,
+          "text": " Water Sportsman.\nwww.ask.com>>>/youtube?q=<<<Basic Saltwater Fishing Tips&v=nGAR"
+        },
+        {
+          "activation": 0.02436121739447117,
+          "chain_idx": 20375,
+          "window_start": 75,
+          "text": ". Click for more details.\nFile name:>>> DunnsRiverFalls5<<<.jpg\nFormat: digital, 30"
+        }
+      ]
+    },
+    "9551": {
+      "mass": 0.267889766022563,
+      "examples": [
+        {
+          "activation": 0.028465107083320618,
+          "chain_idx": 2801,
+          "window_start": 77,
+          "text": ".Learn More\nITEM#: 124>>>19186<<<The Amalfi Paradise Area Rug is a stylish,"
+        },
+        {
+          "activation": 0.02782806195318699,
+          "chain_idx": 2801,
+          "window_start": 76,
+          "text": " review.Learn More\nITEM#: 12>>>41918<<<6The Amalfi Paradise Area Rug is a stylish"
+        },
+        {
+          "activation": 0.02677345834672451,
+          "chain_idx": 13886,
+          "window_start": 82,
+          "text": "USDOC FOR 4231/ITA>>>/OEENIS/<<<NISD/CLUCYK\nEO 1"
+        },
+        {
+          "activation": 0.02676350250840187,
+          "chain_idx": 2801,
+          "window_start": 75,
+          "text": " this review.Learn More\nITEM#: 1>>>24191<<<86The Amalfi Paradise Area Rug is a"
+        },
+        {
+          "activation": 0.02674509398639202,
+          "chain_idx": 13886,
+          "window_start": 78,
+          "text": "OUDREAU\nUSDOC FOR 42>>>31/ITA/<<<OEENIS/NISD/CLUCYK"
+        },
+        {
+          "activation": 0.02641350030899048,
+          "chain_idx": 12213,
+          "window_start": 37,
+          "text": " at The Butchers Blocks. MPN: VIC>>>-4053<<<6. Hurry! Limited time offer. Offer valid"
+        },
+        {
+          "activation": 0.026299718767404556,
+          "chain_idx": 13886,
+          "window_start": 79,
+          "text": "DREAU\nUSDOC FOR 423>>>1/ITA/OE<<<ENIS/NISD/CLUCYK\n"
+        },
+        {
+          "activation": 0.02625150792300701,
+          "chain_idx": 13269,
+          "window_start": 120,
+          "text": "00148889||K>>>14116<<<30||"
+        },
+        {
+          "activation": 0.02621902897953987,
+          "chain_idx": 13886,
+          "window_start": 85,
+          "text": " 4231/ITA/OEEN>>>IS/NISD/<<<CLUCYK\nEO 1295"
+        },
+        {
+          "activation": 0.026130786165595055,
+          "chain_idx": 13269,
+          "window_start": 123,
+          "text": "48889||K141>>>1630||<<<"
+        }
+      ]
+    },
+    "16210": {
+      "mass": 0.26784530468285084,
+      "examples": [
+        {
+          "activation": 0.02768261544406414,
+          "chain_idx": 13886,
+          "window_start": 78,
+          "text": "OUDREAU\nUSDOC FOR 42>>>31/ITA/<<<OEENIS/NISD/CLUCYK"
+        },
+        {
+          "activation": 0.02765231765806675,
+          "chain_idx": 13886,
+          "window_start": 79,
+          "text": "DREAU\nUSDOC FOR 423>>>1/ITA/OE<<<ENIS/NISD/CLUCYK\n"
+        },
+        {
+          "activation": 0.02719155326485634,
+          "chain_idx": 13886,
+          "window_start": 77,
+          "text": " RBOUDREAU\nUSDOC FOR 4>>>231/ITA<<</OEENIS/NISD/CLUC"
+        },
+        {
+          "activation": 0.02710564248263836,
+          "chain_idx": 13886,
+          "window_start": 80,
+          "text": "AU\nUSDOC FOR 4231>>>/ITA/OEEN<<<IS/NISD/CLUCYK\nEO"
+        },
+        {
+          "activation": 0.02681470848619938,
+          "chain_idx": 13886,
+          "window_start": 76,
+          "text": ", RBOUDREAU\nUSDOC FOR >>>4231/<<<ITA/OEENIS/NISD/CL"
+        },
+        {
+          "activation": 0.02672572247684002,
+          "chain_idx": 13886,
+          "window_start": 82,
+          "text": "USDOC FOR 4231/ITA>>>/OEENIS/<<<NISD/CLUCYK\nEO 1"
+        },
+        {
+          "activation": 0.026422960683703423,
+          "chain_idx": 13886,
+          "window_start": 83,
+          "text": "OC FOR 4231/ITA/>>>OEENIS/NIS<<<D/CLUCYK\nEO 12"
+        },
+        {
+          "activation": 0.02628318779170513,
+          "chain_idx": 13886,
+          "window_start": 85,
+          "text": " 4231/ITA/OEEN>>>IS/NISD/<<<CLUCYK\nEO 1295"
+        },
+        {
+          "activation": 0.026160940527915955,
+          "chain_idx": 13886,
+          "window_start": 81,
+          "text": "\nUSDOC FOR 4231/>>>ITA/OEENIS<<</NISD/CLUCYK\nEO "
+        },
+        {
+          "activation": 0.025805655866861343,
+          "chain_idx": 13886,
+          "window_start": 46,
+          "text": "DEPT FOR EUR/UMB\nEEB/ESC>>>/IEC FOR SGALLO<<<GLY AND LWRIGHT\nDOE FOR LEKIM"
+        }
+      ]
+    },
+    "4444": {
+      "mass": 0.2670909706503153,
+      "examples": [
+        {
+          "activation": 0.02780010737478733,
+          "chain_idx": 13886,
+          "window_start": 84,
+          "text": " FOR 4231/ITA/OE>>>ENIS/NISD<<</CLUCYK\nEO 129"
+        },
+        {
+          "activation": 0.027749864384531975,
+          "chain_idx": 13886,
+          "window_start": 86,
+          "text": "4231/ITA/OEENIS>>>/NISD/CL<<<UCYK\nEO 12958"
+        },
+        {
+          "activation": 0.027554471045732498,
+          "chain_idx": 13886,
+          "window_start": 85,
+          "text": " 4231/ITA/OEEN>>>IS/NISD/<<<CLUCYK\nEO 1295"
+        },
+        {
+          "activation": 0.027056166902184486,
+          "chain_idx": 13886,
+          "window_start": 83,
+          "text": "OC FOR 4231/ITA/>>>OEENIS/NIS<<<D/CLUCYK\nEO 12"
+        },
+        {
+          "activation": 0.02666272595524788,
+          "chain_idx": 13886,
+          "window_start": 87,
+          "text": "231/ITA/OEENIS/>>>NISD/CLUC<<<YK\nEO 12958 DEC"
+        },
+        {
+          "activation": 0.026403991505503654,
+          "chain_idx": 13886,
+          "window_start": 81,
+          "text": "\nUSDOC FOR 4231/>>>ITA/OEENIS<<</NISD/CLUCYK\nEO "
+        },
+        {
+          "activation": 0.026065904647111893,
+          "chain_idx": 13886,
+          "window_start": 82,
+          "text": "USDOC FOR 4231/ITA>>>/OEENIS/<<<NISD/CLUCYK\nEO 1"
+        },
+        {
+          "activation": 0.025942150503396988,
+          "chain_idx": 13886,
+          "window_start": 77,
+          "text": " RBOUDREAU\nUSDOC FOR 4>>>231/ITA<<</OEENIS/NISD/CLUC"
+        },
+        {
+          "activation": 0.025938352569937706,
+          "chain_idx": 13886,
+          "window_start": 80,
+          "text": "AU\nUSDOC FOR 4231>>>/ITA/OEEN<<<IS/NISD/CLUCYK\nEO"
+        },
+        {
+          "activation": 0.025917235761880875,
+          "chain_idx": 13886,
+          "window_start": 88,
+          "text": "31/ITA/OEENIS/NIS>>>D/CLUCYK<<<\nEO 12958 DECL"
+        }
+      ]
+    },
+    "13402": {
+      "mass": 0.2665636017918587,
+      "examples": [
+        {
+          "activation": 0.031171118840575218,
+          "chain_idx": 20664,
+          "window_start": 121,
+          "text": " for details \u2013 vist the website for more information http>>>://waynepaulward.<<<es/"
+        },
+        {
+          "activation": 0.028614535927772522,
+          "chain_idx": 20664,
+          "window_start": 122,
+          "text": " details \u2013 vist the website for more information http://>>>waynepaulward.es<<</"
+        },
+        {
+          "activation": 0.026573775336146355,
+          "chain_idx": 11800,
+          "window_start": 100,
+          "text": " upgrades. You can download our newest build at http>>>://wintercellstudios.<<<itch.io/soulhunt . For the full"
+        },
+        {
+          "activation": 0.026194417849183083,
+          "chain_idx": 20664,
+          "window_start": 120,
+          "text": " email for details \u2013 vist the website for more information>>> http://waynepaulward<<<.es/"
+        },
+        {
+          "activation": 0.026093190535902977,
+          "chain_idx": 11800,
+          "window_start": 101,
+          "text": ". You can download our newest build at http://>>>wintercellstudios.itch<<<.io/soulhunt . For the full list"
+        },
+        {
+          "activation": 0.02601041831076145,
+          "chain_idx": 2578,
+          "window_start": 111,
+          "text": "/tick and heartworm preventative. Visit www.>>>ruffloverescue.<<<com/adopt to make this pup a member of"
+        },
+        {
+          "activation": 0.0256247129291296,
+          "chain_idx": 2683,
+          "window_start": 5,
+          "text": "This website (http>>>://www.crownwatch<<<blog.com), the related web pages contained herein"
+        },
+        {
+          "activation": 0.025511665269732475,
+          "chain_idx": 12534,
+          "window_start": 39,
+          "text": "taronis-technologies-inc-trnx>>>-is-set-<<<to-bring-smile-on-the-"
+        },
+        {
+          "activation": 0.025406166911125183,
+          "chain_idx": 2683,
+          "window_start": 7,
+          "text": "This website (http://www>>>.crownwatchblog.<<<com), the related web pages contained herein (colle"
+        },
+        {
+          "activation": 0.025363599881529808,
+          "chain_idx": 2578,
+          "window_start": 110,
+          "text": " flea/tick and heartworm preventative. Visit www>>>.ruffloverescue<<<.com/adopt to make this pup a member"
+        }
+      ]
+    },
+    "16616": {
+      "mass": 0.26635300926864147,
+      "examples": [
+        {
+          "activation": 0.027973711490631104,
+          "chain_idx": 2801,
+          "window_start": 77,
+          "text": ".Learn More\nITEM#: 124>>>19186<<<The Amalfi Paradise Area Rug is a stylish,"
+        },
+        {
+          "activation": 0.027726879343390465,
+          "chain_idx": 2801,
+          "window_start": 76,
+          "text": " review.Learn More\nITEM#: 12>>>41918<<<6The Amalfi Paradise Area Rug is a stylish"
+        },
+        {
+          "activation": 0.027642322704195976,
+          "chain_idx": 12213,
+          "window_start": 38,
+          "text": " The Butchers Blocks. MPN: VIC->>>40536<<<. Hurry! Limited time offer. Offer valid only"
+        },
+        {
+          "activation": 0.02690654993057251,
+          "chain_idx": 2801,
+          "window_start": 75,
+          "text": " this review.Learn More\nITEM#: 1>>>24191<<<86The Amalfi Paradise Area Rug is a"
+        },
+        {
+          "activation": 0.026742368936538696,
+          "chain_idx": 12213,
+          "window_start": 37,
+          "text": " at The Butchers Blocks. MPN: VIC>>>-4053<<<6. Hurry! Limited time offer. Offer valid"
+        },
+        {
+          "activation": 0.026121526956558228,
+          "chain_idx": 12213,
+          "window_start": 36,
+          "text": "inox at The Butchers Blocks. MPN:>>> VIC-405<<<36. Hurry! Limited time offer. Offer"
+        },
+        {
+          "activation": 0.026053715497255325,
+          "chain_idx": 13269,
+          "window_start": 120,
+          "text": "00148889||K>>>14116<<<30||"
+        },
+        {
+          "activation": 0.02599664404988289,
+          "chain_idx": 2801,
+          "window_start": 74,
+          "text": " writing this review.Learn More\nITEM#: >>>12419<<<186The Amalfi Paradise Area Rug is"
+        },
+        {
+          "activation": 0.02562171034514904,
+          "chain_idx": 13269,
+          "window_start": 121,
+          "text": "0148889||K1>>>41163<<<0||"
+        },
+        {
+          "activation": 0.02556758001446724,
+          "chain_idx": 12213,
+          "window_start": 39,
+          "text": " Butchers Blocks. MPN: VIC-4>>>0536.<<< Hurry! Limited time offer. Offer valid only while"
+        }
+      ]
+    },
+    "15312": {
+      "mass": 0.2660854756832123,
+      "examples": [
+        {
+          "activation": 0.028391921892762184,
+          "chain_idx": 16714,
+          "window_start": 97,
+          "text": "\nMe: \u201cyeah floor it\u201d\n\u2014>>> carlol (@Carel<<<Willemse) May 28, "
+        },
+        {
+          "activation": 0.028306690976023674,
+          "chain_idx": 2578,
+          "window_start": 110,
+          "text": " flea/tick and heartworm preventative. Visit www>>>.ruffloverescue<<<.com/adopt to make this pup a member"
+        },
+        {
+          "activation": 0.02779809944331646,
+          "chain_idx": 2578,
+          "window_start": 111,
+          "text": "/tick and heartworm preventative. Visit www.>>>ruffloverescue.<<<com/adopt to make this pup a member of"
+        },
+        {
+          "activation": 0.027436479926109314,
+          "chain_idx": 16714,
+          "window_start": 98,
+          "text": "Me: \u201cyeah floor it\u201d\n\u2014 car>>>lol (@CarelW<<<illemse) May 28, 2"
+        },
+        {
+          "activation": 0.026936590671539307,
+          "chain_idx": 21459,
+          "window_start": 33,
+          "text": " Jeff Mills\nNews URL: http://www.>>>tenchikandojo.<<<com/kobayashisenseicourse."
+        },
+        {
+          "activation": 0.026199832558631897,
+          "chain_idx": 21459,
+          "window_start": 32,
+          "text": " by Jeff Mills\nNews URL: http://www>>>.tenchikandojo<<<.com/kobayashisenseicourse"
+        },
+        {
+          "activation": 0.02574782446026802,
+          "chain_idx": 16714,
+          "window_start": 99,
+          "text": ": \u201cyeah floor it\u201d\n\u2014 carlol>>> (@CarelWille<<<mse) May 28, 20"
+        },
+        {
+          "activation": 0.025474874302744865,
+          "chain_idx": 2578,
+          "window_start": 109,
+          "text": " on flea/tick and heartworm preventative. Visit>>> www.ruffloveres<<<cue.com/adopt to make this pup a"
+        },
+        {
+          "activation": 0.02523789182305336,
+          "chain_idx": 21459,
+          "window_start": 42,
+          "text": ".tenchikandojo.com/kobay>>>ashisenseicourse<<<.html\nFrom 18th October -"
+        },
+        {
+          "activation": 0.0245552696287632,
+          "chain_idx": 908,
+          "window_start": 16,
+          "text": ".\nDiscussion in 'Community Discussion' started by>>> jb6060<<<6, May 23, 20"
+        }
+      ]
+    },
+    "12303": {
+      "mass": 0.26558901742100716,
+      "examples": [
+        {
+          "activation": 0.02896713651716709,
+          "chain_idx": 19849,
+          "window_start": 48,
+          "text": "., died Wednesday. Davenport-McLendon Mortuary.>>> Mrs. Mary A.<<< Brown, Thomson, Ga., died Wednesday. Thomson"
+        },
+        {
+          "activation": 0.02834496833384037,
+          "chain_idx": 19849,
+          "window_start": 49,
+          "text": " died Wednesday. Davenport-McLendon Mortuary. Mrs>>>. Mary A. Brown<<<, Thomson, Ga., died Wednesday. Thomson Funeral"
+        },
+        {
+          "activation": 0.02783809043467045,
+          "chain_idx": 21676,
+          "window_start": 38,
+          "text": " 2011, at Liberty Cemetery with>>> ministers Alton and Wilfred Baker<<< officiating.\nMr. Beckhusen died Monday"
+        },
+        {
+          "activation": 0.02685190550982952,
+          "chain_idx": 23127,
+          "window_start": 61,
+          "text": "\nRoss, 37, whose legal name>>> is William L. Roberts<<<, and his passenger, fashion designer Shateria L"
+        },
+        {
+          "activation": 0.02661122754216194,
+          "chain_idx": 19849,
+          "window_start": 107,
+          "text": " Ga., died Wednesday. Beggs Funeral Home.>>> Mr. Henry E.<<< Johnson, Aiken, S.C., died Wednesday"
+        },
+        {
+          "activation": 0.026292089372873306,
+          "chain_idx": 5958,
+          "window_start": 10,
+          "text": "Leola N. King, wife of Cap>>>. E.H.<<< King, med. capt.\nLeola N"
+        },
+        {
+          "activation": 0.02568240277469158,
+          "chain_idx": 19849,
+          "window_start": 108,
+          "text": "., died Wednesday. Beggs Funeral Home. Mr>>>. Henry E. Johnson<<<, Aiken, S.C., died Wednesday."
+        },
+        {
+          "activation": 0.025241469964385033,
+          "chain_idx": 20717,
+          "window_start": 38,
+          "text": " Series has brought back to life names like Kotani>>>; Kobayashi;Yoda;<<<Ichijima; Samura; Tokuyama"
+        },
+        {
+          "activation": 0.025002658367156982,
+          "chain_idx": 21676,
+          "window_start": 7,
+          "text": "CAMERON\u2014Funeral services for>>> George Allen Beckhusen<<<, 55, of Cameron were held Thursday"
+        },
+        {
+          "activation": 0.02475706860423088,
+          "chain_idx": 21676,
+          "window_start": 37,
+          "text": ", 2011, at Liberty Cemetery>>> with ministers Alton and Wilfred<<< Baker officiating.\nMr. Beckhusen died"
+        }
+      ]
+    },
+    "16648": {
+      "mass": 0.2641545254737139,
+      "examples": [
+        {
+          "activation": 0.029537145048379898,
+          "chain_idx": 20664,
+          "window_start": 121,
+          "text": " for details \u2013 vist the website for more information http>>>://waynepaulward.<<<es/"
+        },
+        {
+          "activation": 0.027356375008821487,
+          "chain_idx": 2578,
+          "window_start": 111,
+          "text": "/tick and heartworm preventative. Visit www.>>>ruffloverescue.<<<com/adopt to make this pup a member of"
+        },
+        {
+          "activation": 0.027324629947543144,
+          "chain_idx": 2578,
+          "window_start": 110,
+          "text": " flea/tick and heartworm preventative. Visit www>>>.ruffloverescue<<<.com/adopt to make this pup a member"
+        },
+        {
+          "activation": 0.027058159932494164,
+          "chain_idx": 14835,
+          "window_start": 93,
+          "text": ".recapped.com/sarah-silverman>>>-and-michelle-<<<williams-in-take-this-waltz"
+        },
+        {
+          "activation": 0.026440773159265518,
+          "chain_idx": 14835,
+          "window_start": 97,
+          "text": "com/sarah-silverman-and-michelle>>>-williams-in-<<<take-this-waltz As you may have"
+        },
+        {
+          "activation": 0.025970960035920143,
+          "chain_idx": 14835,
+          "window_start": 95,
+          "text": "capped.com/sarah-silverman-and>>>-michelle-williams-<<<in-take-this-waltz As you"
+        },
+        {
+          "activation": 0.02558419667184353,
+          "chain_idx": 20664,
+          "window_start": 120,
+          "text": " email for details \u2013 vist the website for more information>>> http://waynepaulward<<<.es/"
+        },
+        {
+          "activation": 0.02557617425918579,
+          "chain_idx": 12534,
+          "window_start": 39,
+          "text": "taronis-technologies-inc-trnx>>>-is-set-<<<to-bring-smile-on-the-"
+        },
+        {
+          "activation": 0.024847254157066345,
+          "chain_idx": 12534,
+          "window_start": 32,
+          "text": "/03/03/taronis>>>-technologies-inc-<<<trnx-is-set-to-bring"
+        },
+        {
+          "activation": 0.024458857253193855,
+          "chain_idx": 14835,
+          "window_start": 91,
+          "text": "://www.recapped.com/sarah->>>silverman-and-<<<michelle-williams-in-take-this-"
+        }
+      ]
+    },
+    "2344": {
+      "mass": 0.2640630193054676,
+      "examples": [
+        {
+          "activation": 0.027779681608080864,
+          "chain_idx": 13886,
+          "window_start": 106,
+          "text": "12958 DECL: 1>>>2/10/<<<2018\nTAGS EINV, EN"
+        },
+        {
+          "activation": 0.027082199230790138,
+          "chain_idx": 13269,
+          "window_start": 120,
+          "text": "00148889||K>>>14116<<<30||"
+        },
+        {
+          "activation": 0.026920411735773087,
+          "chain_idx": 13269,
+          "window_start": 121,
+          "text": "0148889||K1>>>41163<<<0||"
+        },
+        {
+          "activation": 0.026712631806731224,
+          "chain_idx": 13269,
+          "window_start": 122,
+          "text": "148889||K14>>>11630<<<||"
+        },
+        {
+          "activation": 0.026596296578645706,
+          "chain_idx": 13886,
+          "window_start": 105,
+          "text": " 12958 DECL: >>>12/10<<</2018\nTAGS EINV,"
+        },
+        {
+          "activation": 0.025973781943321228,
+          "chain_idx": 13269,
+          "window_start": 107,
+          "text": " / 680mm||006>>>41300<<<148889||K14"
+        },
+        {
+          "activation": 0.025885719805955887,
+          "chain_idx": 13269,
+          "window_start": 106,
+          "text": "mm / 680mm||00>>>64130<<<0148889||K1"
+        },
+        {
+          "activation": 0.025756165385246277,
+          "chain_idx": 3906,
+          "window_start": 43,
+          "text": ".\nConsumer enquiries (1-800>>>-932-<<<9326)\nOur Consumer Relations department"
+        },
+        {
+          "activation": 0.025716328993439674,
+          "chain_idx": 13269,
+          "window_start": 105,
+          "text": "8mm / 680mm||0>>>06413<<<00148889||K"
+        },
+        {
+          "activation": 0.02563980221748352,
+          "chain_idx": 13269,
+          "window_start": 109,
+          "text": "680mm||00641>>>30014<<<8889||K1411"
+        }
+      ]
+    }
+  }
+}
