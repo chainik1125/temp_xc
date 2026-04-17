@@ -60,6 +60,11 @@ SCANS = "results/nlp_sweep/gemma/scans"
 CKPTS = "results/nlp_sweep/gemma/ckpts"
 OUT = "results/nlp_sweep/gemma/figures"
 
+# Overridable by CLI in main()
+LAYER_KEY = "resid_L25"
+K = 50
+FIG_SUFFIX = ""
+
 ARCHS = ["stacked_sae", "crosscoder", "tfa_pos", "tfa_pos_pred"]
 ARCH_COLORS = {
     "stacked_sae":  "#1f77b4",  # blue
@@ -81,23 +86,23 @@ def _load(path):
 
 
 def load_scans():
-    return {a: _load(f"{SCANS}/scan__{a}__resid_L25__k50.json") for a in ARCHS}
+    return {a: _load(f"{SCANS}/scan__{a}__{LAYER_KEY}__k{K}.json") for a in ARCHS}
 
 
 def load_tspread():
     return {
-        a: _load(f"{SCANS}/tspread__{a}__resid_L25__k50.json")
+        a: _load(f"{SCANS}/tspread__{a}__{LAYER_KEY}__k{K}.json")
         for a in ["stacked_sae", "tfa_pos", "tfa_pos_pred"]
     }
 
 
 def load_tfa_pred_novel():
-    return _load(f"{SCANS}/tfa_pred_novel__resid_L25__k50.json")
+    return _load(f"{SCANS}/tfa_pred_novel__{LAYER_KEY}__k{K}.json")
 
 
 def load_labels():
     return {
-        a: _load(f"{SCANS}/labels__{a}__resid_L25__k50.json")["labels"]
+        a: _load(f"{SCANS}/labels__{a}__{LAYER_KEY}__k{K}.json")["labels"]
         for a in ARCHS
     }
 
@@ -150,7 +155,7 @@ def plot_passage_locality(scans):
     fig.suptitle("Analysis 1 — TFA novel codes are passage-local; pred codes generalize",
                  fontsize=12)
     fig.tight_layout(rect=(0, 0, 1, 0.94))
-    save_three_sizes(fig, f"{OUT}/passage_locality")
+    save_three_sizes(fig, f"{OUT}/passage_locality{FIG_SUFFIX}")
     plt.close(fig)
     log.info("  → passage_locality.png")
 
@@ -184,7 +189,7 @@ def plot_temporal_concentration(tspreads):
         fontsize=12,
     )
     fig.tight_layout(rect=(0, 0, 1, 0.92))
-    save_three_sizes(fig, f"{OUT}/temporal_concentration")
+    save_three_sizes(fig, f"{OUT}/temporal_concentration{FIG_SUFFIX}")
     plt.close(fig)
     log.info("  → temporal_concentration.png")
 
@@ -211,7 +216,7 @@ def plot_tfa_novel_vs_pred(pn):
     ax.axvline(0, color="black", alpha=0.3, linewidth=0.5)
     ax.grid(alpha=0.3)
     fig.tight_layout()
-    save_three_sizes(fig, f"{OUT}/tfa_novel_vs_pred_mass")
+    save_three_sizes(fig, f"{OUT}/tfa_novel_vs_pred_mass{FIG_SUFFIX}")
     plt.close(fig)
     log.info("  → tfa_novel_vs_pred_mass.png")
 
@@ -222,9 +227,9 @@ def plot_tfa_novel_vs_pred(pn):
 # ────────────────────────────────────────────────────────────────────
 def _load_decoder_pos0(arch):
     model = load_model(
-        ckpt_path=f"{CKPTS}/{arch.replace('_pred', '')}__gemma-2-2b-it__fineweb__resid_L25__k50__seed42.pt",
+        ckpt_path=f"{CKPTS}/{arch.replace('_pred', '')}__gemma-2-2b-it__fineweb__{LAYER_KEY}__k{K}__seed42.pt",
         model_type=arch if not arch.endswith("_pred") else arch,
-        subject_model="gemma-2-2b-it", k=50, T=5,
+        subject_model="gemma-2-2b-it", k=K, T=5,
     )
     with torch.no_grad():
         if arch == "stacked_sae":
@@ -254,8 +259,8 @@ def plot_cross_arch_sim():
     # Within-arch control
     xcdr_p1 = F.normalize(
         load_model(
-            ckpt_path=f"{CKPTS}/crosscoder__gemma-2-2b-it__fineweb__resid_L25__k50__seed42.pt",
-            model_type="crosscoder", subject_model="gemma-2-2b-it", k=50, T=5,
+            ckpt_path=f"{CKPTS}/crosscoder__gemma-2-2b-it__fineweb__{LAYER_KEY}__k{K}__seed42.pt",
+            model_type="crosscoder", subject_model="gemma-2-2b-it", k=K, T=5,
         ).W_dec.data[:, 1, :].float(),
         dim=-1,
     )
@@ -312,7 +317,7 @@ def plot_cross_arch_sim():
     fig.suptitle("Analysis 3 — Stacked & Crosscoder share a core; TFA is orthogonal",
                  fontsize=12)
     fig.tight_layout(rect=(0, 0, 1, 0.94))
-    save_three_sizes(fig, f"{OUT}/cross_arch_decoder_sim")
+    save_three_sizes(fig, f"{OUT}/cross_arch_decoder_sim{FIG_SUFFIX}")
     plt.close(fig)
     log.info("  → cross_arch_decoder_sim.png")
 
@@ -382,7 +387,7 @@ def plot_semantic_categories(labels):
     ax.legend(fontsize=8, bbox_to_anchor=(1.01, 1), loc="upper left")
     ax.grid(axis="x", alpha=0.3)
     fig.tight_layout()
-    save_three_sizes(fig, f"{OUT}/semantic_categories")
+    save_three_sizes(fig, f"{OUT}/semantic_categories{FIG_SUFFIX}")
     plt.close(fig)
     log.info("  → semantic_categories.png")
 
@@ -506,7 +511,7 @@ def plot_txcdr_vs_tfa_hero(scans, tspreads, labels):
         fontsize=15,
     )
     fig.tight_layout(rect=(0, 0, 1, 0.96))
-    save_three_sizes(fig, f"{OUT}/txcdr_vs_tfa_hero")
+    save_three_sizes(fig, f"{OUT}/txcdr_vs_tfa_hero{FIG_SUFFIX}")
     plt.close(fig)
     log.info("  → txcdr_vs_tfa_hero.png")
 
@@ -515,7 +520,16 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--skip-decoder-sim", action="store_true",
                         help="Skip plot 4 which needs the GPU + model loads")
+    parser.add_argument("--layer-key", default="resid_L25")
+    parser.add_argument("--k", type=int, default=50)
+    parser.add_argument("--fig-suffix", default="",
+                        help="appended to every figure basename (e.g. '_L13')")
     args = parser.parse_args()
+
+    global LAYER_KEY, K, FIG_SUFFIX
+    LAYER_KEY = args.layer_key
+    K = args.k
+    FIG_SUFFIX = args.fig_suffix
 
     os.makedirs(OUT, exist_ok=True)
 

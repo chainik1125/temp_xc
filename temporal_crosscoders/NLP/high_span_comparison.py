@@ -81,12 +81,12 @@ def _load(path):
 # ────────────────────────────────────────────────────────────────────
 # 1. Crosscoder decoder-based concentration (new — fills the analysis gap)
 # ────────────────────────────────────────────────────────────────────
-def crosscoder_temporal_concentration() -> dict[int, dict]:
+def crosscoder_temporal_concentration(layer_key: str = "resid_L25", k: int = 50) -> dict[int, dict]:
     """For each crosscoder feature, compute decoder-norm concentration
     across T=5 positions. Model-inherent; no data needed."""
-    ckpt = f"{CKPTS}/crosscoder__gemma-2-2b-it__fineweb__resid_L25__k50__seed42.pt"
+    ckpt = f"{CKPTS}/crosscoder__gemma-2-2b-it__fineweb__{layer_key}__k{k}__seed42.pt"
     model = load_model(ckpt_path=ckpt, model_type="crosscoder",
-                       subject_model="gemma-2-2b-it", k=50, T=5).cpu()
+                       subject_model="gemma-2-2b-it", k=k, T=5).cpu()
     with torch.no_grad():
         # W_dec: (d_sae, T, d_in)
         W = model.W_dec.data
@@ -107,8 +107,8 @@ def crosscoder_temporal_concentration() -> dict[int, dict]:
 # ────────────────────────────────────────────────────────────────────
 # 2. TFA concentrations loaded from existing tspread JSONs
 # ────────────────────────────────────────────────────────────────────
-def tfa_concentrations(arch: str) -> dict[int, dict]:
-    d = _load(f"{SCANS}/tspread__{arch}__resid_L25__k50.json")
+def tfa_concentrations(arch: str, layer_key: str = "resid_L25", k: int = 50) -> dict[int, dict]:
+    d = _load(f"{SCANS}/tspread__{arch}__{layer_key}__k{k}.json")
     return {int(fi): rec for fi, rec in d["features"].items()}
 
 
@@ -206,7 +206,7 @@ def save_three_sizes(fig, path_base: str):
 # Main figure: concentration distributions + high-span subset counts +
 # selected exemplar excerpts
 # ────────────────────────────────────────────────────────────────────
-def plot_high_span_figure(concentrations: dict, high_span: dict):
+def plot_high_span_figure(concentrations: dict, high_span: dict, fig_suffix: str = ""):
     fig = plt.figure(figsize=(18, 13))
     gs = fig.add_gridspec(3, 3, hspace=0.55, wspace=0.28,
                           height_ratios=[1.0, 1.2, 1.0])
@@ -328,20 +328,27 @@ def plot_high_span_figure(concentrations: dict, high_span: dict):
     )
 
     os.makedirs(FIGS, exist_ok=True)
-    save_three_sizes(fig, f"{FIGS}/high_span_comparison")
-    log.info(f"wrote {FIGS}/high_span_comparison.png (+.doc.png, +.thumb.png)")
+    base = f"{FIGS}/high_span_comparison{fig_suffix}"
+    save_three_sizes(fig, base)
+    log.info(f"wrote {base}.png (+.doc.png, +.thumb.png)")
 
 
 def main():
     parser = argparse.ArgumentParser()
+    parser.add_argument("--layer-key", default="resid_L25")
+    parser.add_argument("--k", type=int, default=50)
+    parser.add_argument("--fig-suffix", default="",
+                        help="appended to figure basename (e.g. '_L13')")
     args = parser.parse_args()
+    layer_key = args.layer_key
+    k = args.k
 
-    log.info("computing Crosscoder decoder-based concentration (full d_sae)")
-    xcdr_concs = crosscoder_temporal_concentration()
+    log.info(f"computing Crosscoder decoder-based concentration ({layer_key} k={k})")
+    xcdr_concs = crosscoder_temporal_concentration(layer_key, k)
 
     log.info("loading TFA novel + pred concentrations from tspread JSONs")
-    tfa_novel_concs = tfa_concentrations("tfa_pos")
-    tfa_pred_concs = tfa_concentrations("tfa_pos_pred")
+    tfa_novel_concs = tfa_concentrations("tfa_pos", layer_key, k)
+    tfa_pred_concs = tfa_concentrations("tfa_pos_pred", layer_key, k)
 
     concentrations = {
         "crosscoder":   xcdr_concs,
@@ -351,7 +358,7 @@ def main():
 
     # Load scans (top-300 features w/ texts + masses)
     scans = {
-        a: _load(f"{SCANS}/scan__{a}__resid_L25__k50.json")
+        a: _load(f"{SCANS}/scan__{a}__{layer_key}__k{k}.json")
         for a in ["crosscoder", "tfa_pos", "tfa_pos_pred"]
     }
     # For crosscoder, restrict to features that actually appeared in the
@@ -364,7 +371,8 @@ def main():
 
     # Persist the high-span subset (raw + content-bearing) for each arch
     os.makedirs(SCANS, exist_ok=True)
-    with open(f"{SCANS}/high_span__resid_L25__k50.json", "w") as f:
+    out_path = f"{SCANS}/high_span__{layer_key}__k{k}.json"
+    with open(out_path, "w") as f:
         json.dump({
             "threshold": HIGH_SPAN_THRESHOLD,
             "min_content_fraction": 0.6,
@@ -389,7 +397,7 @@ def main():
                 for a in concentrations
             },
         }, f, indent=2)
-    log.info(f"wrote {SCANS}/high_span__resid_L25__k50.json")
+    log.info(f"wrote {out_path}")
 
     # Summary
     for arch in concentrations:
@@ -401,7 +409,7 @@ def main():
                  f"({100*hs/len(concs):.1f}%)  "
                  f"median conc={np.median(concs):.3f}")
 
-    plot_high_span_figure(concentrations, high_span)
+    plot_high_span_figure(concentrations, high_span, fig_suffix=args.fig_suffix)
 
 
 if __name__ == "__main__":
