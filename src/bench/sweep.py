@@ -328,11 +328,19 @@ def run_cached_sweep(
                 if os.environ.get("WANDB_API_KEY"):
                     try:
                         import wandb
+                        # Optional SAEBench-scoped tags. The saebench
+                        # orchestrator exports these so run names stay
+                        # distinguishable across protocol A/B and T
+                        # values; other callers leave them unset.
+                        _protocol = os.environ.get("SAEBENCH_PROTOCOL")
+                        _t_display = os.environ.get("SAEBENCH_T")
                         run_name = (
                             f"{_arch_registry_key(entry)}__{data_config.model_name}"
                             f"__{data_config.cached_dataset}"
                             f"__{data_config.cached_layer_key}"
                             f"__k{k}__seed{seed}"
+                            f"{f'__prot{_protocol}' if _protocol else ''}"
+                            f"{f'__T{_t_display}' if _t_display else ''}"
                             f"{'_shuffled' if data_config.shuffle_within_sequence else ''}"
                         )
                         _wandb_run = wandb.init(
@@ -360,6 +368,8 @@ def run_cached_sweep(
                                 "batch_size": batch_size,
                                 "lr": lr,
                                 "dataset_type": data_config.dataset_type,
+                                "saebench_protocol": _protocol,
+                                "saebench_t": int(_t_display) if _t_display else None,
                             },
                         )
                     except Exception as e:

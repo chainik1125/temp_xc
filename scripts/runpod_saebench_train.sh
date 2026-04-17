@@ -115,6 +115,10 @@ esac
 SWEEP_RESULTS_DIR="results/saebench/sweeps/${ARCH}_prot${PROTOCOL}_T${T}"
 mkdir -p "$SWEEP_RESULTS_DIR"
 
+# Surface protocol + T into the W&B run name (sweep.py reads these).
+export SAEBENCH_PROTOCOL="$PROTOCOL"
+export SAEBENCH_T="$T"
+
 python -m src.bench.sweep \
     $DATASET_FLAGS \
     --model-name gemma-2-2b \
