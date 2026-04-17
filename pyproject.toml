@@ -12,10 +12,15 @@ dependencies = [
     "tqdm",
     "numpy",
     "seaborn",
+    "safetensors",
+    "anthropic",
+    # EleutherAI delphi (SOTA auto-interp pipeline, Paulo et al. ICLR 2025)
+    # Not on PyPI under its canonical name; installed from source.
+    "eai-delphi @ git+https://github.com/EleutherAI/delphi",
 ]
 
 [tool.setuptools.packages.find]
-include = ["src*"]
+include = ["src*", "temporal_crosscoders*"]
 
 [dependency-groups]
 dev = [
