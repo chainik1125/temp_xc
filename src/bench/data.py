@@ -437,6 +437,103 @@ def build_cached_activations_pipeline(
     )
 
 
+def build_multi_layer_activations_pipeline(
+    config: DataConfig,
+    device: torch.device,
+    window_sizes: list[int] | None = None,
+) -> DataPipeline:
+    """Multi-layer variant of cached-activations loader.
+
+    Loads N per-layer .npy caches (one per `cached_layer_keys[i]`), stacks
+    along a new layer axis, and yields batches of shape
+    `(B, n_layers, d_model)` — one token's activations across the layer
+    window. Used for MLC (layer-wise crosscoder) training, where each
+    "window" is a token's residual-stream pattern across depth rather
+    than across time.
+
+    The `gen_windows` dict is populated with a single entry keyed on
+    `n_layers` (the length of `cached_layer_keys`), so ArchSpecs with
+    `gen_key == f"window_{n_layers}"` route here cleanly.
+    """
+    if not config.cached_layer_keys:
+        raise ValueError(
+            "multi_layer_activations requires DataConfig.cached_layer_keys "
+            "(a list of per-layer cache filenames)."
+        )
+    if config.cached_root is not None:
+        root = config.cached_root
+    else:
+        from temporal_crosscoders.NLP.config import cache_dir_for
+        root = cache_dir_for(config.model_name, config.cached_dataset)
+
+    print(f"[data] multi-layer cached activations root={root}")
+    arrs = []
+    for key in config.cached_layer_keys:
+        p = os.path.join(root, f"{key}.npy")
+        if not os.path.exists(p):
+            raise FileNotFoundError(
+                f"missing layer cache: {p}. "
+                f"Run cache_activations.py with --layer_indices covering all of "
+                f"{config.cached_layer_keys}"
+            )
+        print(f"  loading {key}.npy")
+        arrs.append(np.asarray(np.load(p, mmap_mode="r")))
+
+    # Stack along a new layer axis: (N, seq_len, d_model) × n_layers →
+    # (N, seq_len, n_layers, d_model)
+    stacked = np.stack(arrs, axis=2).astype(np.float32)
+    N, seq_len, n_layers, d_model = stacked.shape
+    print(f"  stacked: N={N} seq_len={seq_len} n_layers={n_layers} d_model={d_model}")
+
+    full = torch.from_numpy(stacked)  # CPU
+    # NOTE: shuffle_within_sequence doesn't apply here — MLC's "window"
+    # is the layer axis, not the time axis. Shuffling layers would
+    # corrupt the architectural signal we're trying to measure.
+    if config.shuffle_within_sequence:
+        print("  WARN: shuffle_within_sequence=True ignored for multi_layer data.")
+
+    max_eval = max(1, N // 5)
+    n_eval = min(config.eval_n_seq, max_eval)
+    eval_hidden = full[-n_eval:, :, n_layers // 2, :].to(device)  # anchor-layer eval
+    train_pool = full[:-n_eval]
+    train_N = train_pool.shape[0]
+    train_NT = train_N * seq_len
+    if train_N == 0:
+        raise ValueError(f"train_pool empty: N={N} n_eval={n_eval}")
+
+    def gen_multi_layer(batch_size: int) -> torch.Tensor:
+        """Sample random (seq, token) positions, return (B, n_layers, d_model)."""
+        idx = torch.randint(0, train_NT, (batch_size,))
+        seq_idx = idx // seq_len
+        tok_idx = idx % seq_len
+        x = train_pool[seq_idx, tok_idx]  # (B, n_layers, d_model)
+        return x.to(device, non_blocking=True)
+
+    # Also provide a per-token flat stream for loss logging on the anchor
+    def gen_flat(batch_size: int) -> torch.Tensor:
+        idx = torch.randint(0, train_NT, (batch_size,))
+        seq_idx = idx // seq_len
+        tok_idx = idx % seq_len
+        return train_pool[seq_idx, tok_idx, n_layers // 2, :].to(device, non_blocking=True)
+
+    # gen_windows keyed by n_layers — this matches MLC's ArchSpec.gen_key
+    gen_windows: dict[int, Callable[[int], torch.Tensor]] = {n_layers: gen_multi_layer}
+
+    toy_model = nn.Module()
+    toy_model.hidden_dim = d_model  # type: ignore[attr-defined]
+
+    return DataPipeline(
+        toy_model=toy_model,  # type: ignore[arg-type]
+        scaling_factor=1.0,
+        true_features=torch.zeros(d_model, 1),
+        eval_hidden=eval_hidden,
+        gen_flat=gen_flat,
+        gen_seq=gen_flat,  # no per-sequence path in multi-layer mode; fallback
+        gen_windows=gen_windows,
+        global_features=None,
+    )
+
+
 def build_pipeline(
     config: DataConfig,
     device: torch.device,
@@ -447,4 +544,6 @@ def build_pipeline(
         return build_data_pipeline(config, device, window_sizes)
     if config.dataset_type == "cached_activations":
         return build_cached_activations_pipeline(config, device, window_sizes)
+    if config.dataset_type == "multi_layer_activations":
+        return build_multi_layer_activations_pipeline(config, device, window_sizes)
     raise ValueError(f"Unknown dataset_type: {config.dataset_type}")

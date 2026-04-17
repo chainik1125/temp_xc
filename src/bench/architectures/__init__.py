@@ -72,4 +72,14 @@ def get_default_models(T_values: list[int]) -> list[ModelEntry]:
             gen_key=f"window_{T}",
         ))
 
+    # MLC (layer-wise crosscoder): 5-layer window, middle-out around
+    # layer 12 for Gemma-2-2B. Uses gen_key "window_5" to reuse the
+    # window-batch machinery in data.py — the multi_layer data
+    # pipeline populates gen_windows[5] with layer-stacked samples.
+    models.append(ModelEntry(
+        name="MLC n_layers=5",
+        spec=LayerCrosscoderSpec(n_layers=5),
+        gen_key="window_5",
+    ))
+
     return models

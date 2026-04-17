@@ -125,7 +125,23 @@ def run_probing(
     # 1. Instantiate our architecture + load weights
     spec, model = _load_arch_and_model(arch, ckpt_path, k, t, torch_device)
 
-    # 2. Wrap in SAEBench-compatible adapter
+    # 2. MLC requires multi-hook collection; dispatch to the forked
+    #    probing path for MLC. SAE and TempXC use SAEBench's stock flow.
+    if arch == "mlc":
+        from src.bench.saebench.mlc_probing import run_mlc_probing
+        return run_mlc_probing(
+            ckpt_path=ckpt_path,
+            protocol=protocol,
+            aggregation=aggregation,
+            output_jsonl=output_jsonl,
+            device=device,
+            random_seed=random_seed,
+            n_layers=t,  # t is reinterpreted as n_layers for MLC
+            k_values=k_values,
+            artifacts_path=artifacts_path,
+        )
+
+    # 2. Wrap in SAEBench-compatible adapter (SAE / TempXC)
     adapter = SAEBenchAdapter(
         arch=arch, spec=spec, model=model,
         t=t, aggregation=aggregation,

@@ -87,25 +87,28 @@ fi
 # full sweep; for a single-architecture saebench run we call it with
 # --models <arch-key> and a matching results-dir, then rename the
 # checkpoint into our saebench layout afterwards.
+STEPS="${STEPS:-5000}"   # reduced from 10k to fit single-session sweep
+
 case "$ARCH" in
     sae)
         MODELS="topk_sae"
         T_FLAG=""
+        DATASET_FLAGS="--dataset-type cached_activations --cached-layer-key resid_L12"
         ;;
     tempxc)
         MODELS="crosscoder"
         T_FLAG="--T $T"
+        DATASET_FLAGS="--dataset-type cached_activations --cached-layer-key resid_L12"
         ;;
     mlc)
-        # MLC architecture is implemented (src/bench/architectures/mlc.py)
-        # but requires multi-layer cached activations. The existing sweep
-        # runner's data pipeline hasn't been extended for data_format=
-        # "multi_layer" yet — see plan § 11. Until that lands, this
-        # branch fails fast rather than silently producing wrong outputs.
-        echo "FAIL: MLC architecture is present but its multi-layer"
-        echo "      training data pipeline is not yet wired."
-        echo "      See docs/aniket/experiments/sparse_probing/plan.md § 11."
-        exit 3
+        MODELS="mlc"
+        # MLC's "T" is n_layers (window width across the layer axis);
+        # we reuse --T to keep the sweep CLI uniform.
+        T_FLAG="--T 5"
+        # Multi-layer cache: sweep builds (B, 5, d_model) inputs by
+        # stacking layers 10..14 from separate per-layer .npy caches.
+        DATASET_FLAGS="--dataset-type multi_layer_activations \
+            --cached-layer-keys resid_L10 resid_L11 resid_L12 resid_L13 resid_L14"
         ;;
 esac
 
@@ -113,12 +116,11 @@ SWEEP_RESULTS_DIR="results/saebench/sweeps/${ARCH}_prot${PROTOCOL}_T${T}"
 mkdir -p "$SWEEP_RESULTS_DIR"
 
 python -m src.bench.sweep \
-    --dataset-type cached_activations \
+    $DATASET_FLAGS \
     --model-name gemma-2-2b \
     --cached-dataset fineweb \
-    --cached-layer-key resid_L13 \
     --models "$MODELS" \
-    --k "$K" $T_FLAG --steps 10000 \
+    --k "$K" $T_FLAG --steps "$STEPS" \
     --results-dir "$SWEEP_RESULTS_DIR" \
     2>&1 | tee "$LOG_PATH"
 

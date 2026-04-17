@@ -95,10 +95,11 @@ class DataConfig:
     eval_n_seq: int = 2000
 
     # Real-LM fields (used when dataset_type == "cached_activations") -------
-    dataset_type: str = "markov"          # "markov" | "cached_activations"
+    dataset_type: str = "markov"          # "markov" | "cached_activations" | "multi_layer_activations"
     model_name: str = "deepseek-r1-distill-llama-8b"
     cached_dataset: str = "fineweb"       # subdir under data/cached_activations/<model>/
-    cached_layer_key: str = "resid_L12"   # which <key>.npy to load
+    cached_layer_key: str = "resid_L12"   # which <key>.npy to load (single-layer mode)
+    cached_layer_keys: list[str] | None = None  # multi-layer mode: list of layer keys to stack
     cached_root: str | None = None        # override default path; None = use config default
 
     # Common ----------------------------------------------------------------

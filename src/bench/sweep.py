@@ -431,7 +431,7 @@ def main():
 
     # Real-LM cached-activation mode
     parser.add_argument("--dataset-type", type=str, default="markov",
-                        choices=["markov", "cached_activations"],
+                        choices=["markov", "cached_activations", "multi_layer_activations"],
                         help="Switch between toy Markov and real-LM cached acts")
     parser.add_argument("--model-name", type=str, default="deepseek-r1-distill-llama-8b",
                         choices=list_models(),
@@ -439,7 +439,10 @@ def main():
     parser.add_argument("--cached-dataset", type=str, default="gsm8k",
                         help="Subdir under data/cached_activations/<model>/")
     parser.add_argument("--cached-layer-key", type=str, default="resid_L12",
-                        help="Which <key>.npy to load (e.g. resid_L12)")
+                        help="Which <key>.npy to load (single-layer mode)")
+    parser.add_argument("--cached-layer-keys", type=str, nargs="+", default=None,
+                        help="Multi-layer mode: list of <key>.npy files to stack "
+                             "(e.g. resid_L10 resid_L11 resid_L12 resid_L13 resid_L14)")
     parser.add_argument("--shuffle-within-sequence", action="store_true",
                         help="Temporal shuffled control baseline")
     parser.add_argument("--expansion-factor", type=int, default=8,
@@ -460,14 +463,15 @@ def main():
     )
 
     # Dispatch: cached activations path is a completely different code path.
-    if args.dataset_type == "cached_activations":
+    if args.dataset_type in ("cached_activations", "multi_layer_activations"):
         cfg = get_model_config(args.model_name)
         d_sae = cfg.d_model * args.expansion_factor
         data_config = DataConfig(
-            dataset_type="cached_activations",
+            dataset_type=args.dataset_type,
             model_name=args.model_name,
             cached_dataset=args.cached_dataset,
             cached_layer_key=args.cached_layer_key,
+            cached_layer_keys=args.cached_layer_keys,
             shuffle_within_sequence=args.shuffle_within_sequence,
             d_sae=d_sae,
         )

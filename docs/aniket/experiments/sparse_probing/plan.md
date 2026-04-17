@@ -155,6 +155,14 @@ T=5 first, extrapolate to set max T — at 80 GB we expect T=40 to fit
 at normal batch size. If T=40 OOMs in probing (where the Gemma
 forward is the dominant consumer at ~22 GB), fall back to T=32.
 
+**Default launch caps T-sweep at T=20** to keep the full sweep
+overnight-feasible (~12–14 h total). T=40 doubles the training
+budget and adds ~5× probing cost (stride-1 × 124 windows per
+seq_len=128 sequence). Once the T ∈ {5, 10, 20} sweep finishes and
+the headline direction is clear, a second-session T=40 run is a
+~6-hour add-on. The orchestrator's `T_SWEEP_MAX=40` override
+re-enables it without touching any other config.
+
 Purpose: tests whether probing advantage scales with window size.
 MLC and SAE unchanged (no T axis) — the sweep is **TempXC-only**.
 Three possible patterns, all publishable:
@@ -360,15 +368,63 @@ Checkpoint training (on H100 80GB):
 | TempXC T=20 | ~90 min | T-sweep |
 | TempXC T=40 | ~150 min | T-sweep; may need batch-size reduction |
 
-Total: ~6-8 hours of H100 time for all 9 checkpoints.
+Total: ~5 hours of H100 time for all 10 checkpoints (2 SAE + 2 MLC +
+6 TempXC spanning T ∈ {5, 10, 20} × 2 protocols), at 5000 training
+steps each (half the sprint's 10k default — chosen to fit the full
+sweep in one overnight session without sacrificing convergence).
 
-Probing eval per checkpoint: ~10 min (Gemma forward on ~32k labeled
-examples, SAE encode, sklearn probes). 9 checkpoints × 4 aggregations
-= 36 probing-run invocations × ~10 min = **~6 hours**.
+Probing eval per checkpoint × aggregation: ~10 min (Gemma forward
+amortized across runs via SAEBench's activation cache, SAE encode +
+sklearn probes per run). 10 checkpoints × 4 aggregations = 40
+probing invocations × ~10 min = **~6-7 hours**.
 
-**Grand total: ~14 hours on H100 ≈ \$40-60** depending on pod pricing.
+**Grand total: ~13-14 hours on H100.** Fits the "launch + leave
+overnight" profile.
 
-## 13. Related docs
+## 13. Launch procedure
+
+**Pre-flight.** Before committing to the overnight sweep, run the
+30-minute pre-flight validation — trains one SAE for 500 steps, runs
+probing on one task (`ag_news`), verifies the JSONL output has the
+expected schema fields. Saves a 14-hour run on a silent schema bug.
+
+```bash
+# On the H100 pod, from repo root:
+bash scripts/runpod_saebench_preflight.sh
+```
+
+Exits non-zero if anything's off. If it passes, launch the full
+orchestrator:
+
+```bash
+bash scripts/runpod_saebench_orchestrator.sh full 2>&1 | \
+    tee logs/saebench-$(date +%Y%m%d-%H%M).log
+```
+
+Or phase-by-phase (handy if you want to re-run a single stage without
+the others):
+
+```bash
+bash scripts/runpod_saebench_orchestrator.sh cache       # ~1 h
+bash scripts/runpod_saebench_orchestrator.sh preflight   # ~30 min
+bash scripts/runpod_saebench_orchestrator.sh train       # ~5 h
+bash scripts/runpod_saebench_orchestrator.sh eval        # ~7 h
+bash scripts/runpod_saebench_orchestrator.sh summary     # seconds
+```
+
+**Pull results locally when done** (from the laptop):
+
+```bash
+bash scripts/fetch_saebench_results.sh
+```
+
+SSH target (`c2o4it0x73x88e-64412168@ssh.runpod.io`) is baked into
+the script; override with `POD_SSH=... bash scripts/fetch_saebench_results.sh`
+when the pod rotates.
+
+## 14. Related docs
+
+## 15. Related docs
 
 - [[experiments/sparse_probing/saebench_notes|SAEBench exploration notes]]
 - [[experiments/sprint_feature_geometry/summary|feature-geometry results]]
