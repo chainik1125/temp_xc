@@ -220,7 +220,7 @@ class TemporalSAE(nn.Module):
             # z_pred_ via the next line — unclamped, this blows gradients
             # and NaNs AdamW before warmup finishes. Toy-model dims were
             # small enough for this to never trigger.
-            proj_scale = proj_scale.clamp(min=-10.0, max=10.0)
+            proj_scale = proj_scale.clamp(min=-1.0, max=1.0)
             z_pred = z_pred + (z_pred_ * proj_scale)
             x_input = x_input - proj_scale * Dz_pred_
             if return_graph:

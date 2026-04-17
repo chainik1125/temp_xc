@@ -121,13 +121,21 @@ class TFASpec(ArchSpec):
             loss = F.mse_loss(recons_flat, batch_flat, reduction="sum") / n_tokens
 
             optimizer.zero_grad()
-            # Defense-in-depth: if loss is NaN/Inf, skip the update.
-            # Prevents a single bad step from poisoning AdamW moments and
-            # locking the run into permanent NaN.
             if not torch.isfinite(loss):
                 continue
             loss.backward()
-            nn.utils.clip_grad_norm_(model.parameters(), grad_clip)
+            # clip_grad_norm_ with any inf gradient sends clip factor = 1/inf
+            # = 0, then 0 * inf = NaN — which poisons every param's grad and,
+            # via AdamW's moments, every param in the next step(). Check
+            # gradients BEFORE clipping: a single overflow anywhere means
+            # skip the whole update.
+            try:
+                nn.utils.clip_grad_norm_(
+                    model.parameters(), grad_clip, error_if_nonfinite=True,
+                )
+            except RuntimeError:
+                optimizer.zero_grad()
+                continue
             optimizer.step()
 
             if step % log_every == 0 or step == total_steps - 1:
