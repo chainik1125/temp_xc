@@ -17,6 +17,7 @@ dependencies = [
     "scikit-learn",
     "numpy",
     "anthropic",
+    "matplotlib",
 ]
 
 [dependency-groups]

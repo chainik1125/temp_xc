@@ -11,12 +11,27 @@ tags:
 First pass of feature-level comparison across **stacked_sae**, **crosscoder**,
 and **tfa_pos** on Gemma-2-2B-IT residual stream (layer 25), k=50, T=5,
 d_sae=18,432, trained for 10k steps on FineWeb via the benchmark sweep
-(`src/bench/sweep.py`). No LLM explainer yet — this is the scan + text-decode
-stage only.
+(`src/bench/sweep.py`).
 
 Scans live at `results/nlp_sweep/gemma/scans/scan__<arch>__resid_L25__k50.json`.
 Each file has the top 300 features by total top-10-example activation mass,
 with window text decoded through the Gemma tokenizer.
+
+## Key figure — TXCDR vs TFA
+
+[![TXCDR vs TFA hero](../../../results/nlp_sweep/gemma/figures/txcdr_vs_tfa_hero.thumb.png)](../../../results/nlp_sweep/gemma/figures/txcdr_vs_tfa_hero.png)
+
+Four-panel summary contrasting Crosscoder (TXCDR) with TFA-pos's two
+libraries (novel + pred). A: TFA novel is the only arch with many
+features whose top-10 exemplars all come from one chain (passage-local).
+B: TFA novel is also the only arch where per-feature activation spreads
+across the T=5 window (concentration ~ 1/T = 0.2). C: TFA novel is the
+only arch dominated by "unclear" and "tokenization_boundary" labels;
+TFA pred's semantic distribution mirrors Stacked SAE. D: Crosscoder uses
+only 16% of its 18432 latents (tight core); TFA uses 85% for novel and
+42% for pred, on disjoint subsets.
+
+Full-resolution: `results/nlp_sweep/gemma/figures/txcdr_vs_tfa_hero.png`.
 
 ## Method
 
@@ -109,6 +124,18 @@ once in each of many different documents.
 
 ## Follow-up: pred vs novel decomposition for TFA (analysis 1)
 
+[![passage locality](../../../results/nlp_sweep/gemma/figures/passage_locality.thumb.png)](../../../results/nlp_sweep/gemma/figures/passage_locality.png)
+
+[![TFA novel vs pred mass](../../../results/nlp_sweep/gemma/figures/tfa_novel_vs_pred_mass.thumb.png)](../../../results/nlp_sweep/gemma/figures/tfa_novel_vs_pred_mass.png)
+
+The right panel of the first figure is the headline: 55 of TFA novel's
+top-100 features have all 10 exemplars from a single chain, vs 0 for
+Stacked SAE, 19 for Crosscoder, and 0 for TFA pred. The second figure
+is the per-feature scatter of novel-mass vs pred-mass — the L-shape
+shows that TFA features cluster along one axis or the other but never
+both (zero overlap between top-50-novel and top-50-pred).
+
+
 The "TFA is passage-local" claim above **was a novel_codes artifact**. TFA
 splits its latents into two essentially disjoint subsets:
 
@@ -138,6 +165,19 @@ normally.
 
 ## Follow-up: temporal spread per feature (analysis 2)
 
+[![temporal concentration](../../../results/nlp_sweep/gemma/figures/temporal_concentration.thumb.png)](../../../results/nlp_sweep/gemma/figures/temporal_concentration.png)
+
+Three histograms side by side. Stacked SAE spikes at concentration=1.0
+(every feature is trivially position-localized by construction). TFA
+pred also spikes at 1.0 — its features peak at a single position,
+mostly position 0 (257/300) due to bias-dominated attention at the
+start of the window. **TFA novel is uniquely different**: the
+distribution sits near 1/T=0.2, meaning each feature fires roughly
+evenly across all 5 positions of the window. Crosscoder is absent from
+this figure because it has no per-position codes (single z per window
+by construction).
+
+
 Per-feature concentration score = mean over exemplars of
 `max_position_activation / sum_position_activation`. Value 1 = fully
 localized at one of the T=5 positions; 1/T=0.2 = uniform spread.
@@ -163,6 +203,19 @@ localized at one of the T=5 positions; 1/T=0.2 = uniform spread.
   concentration mass.
 
 ## Follow-up: cross-arch feature matching (analysis 3)
+
+[![cross-arch decoder similarity](../../../results/nlp_sweep/gemma/figures/cross_arch_decoder_sim.thumb.png)](../../../results/nlp_sweep/gemma/figures/cross_arch_decoder_sim.png)
+
+Left: CDF of best-match cosine per feature across arch pairs. Stacked
+↔ Crosscoder (blue) has a long upper tail — some features match at
+cos>0.9. The stacked_sae↔tfa_pos and crosscoder↔tfa_pos curves (orange
+and green) saturate far below the 0.5 line: TFA has no counterparts
+in the other two archs. The grey dashed line is a within-arch control
+(Crosscoder pos 0 vs Crosscoder pos 1): even within one arch,
+different positions only share a subset of features. Right: counts of
+feature pairs above fixed cosine thresholds — zero TFA matches above
+0.5 in either direction.
+
 
 Best-match cosine similarity between decoder directions. Using
 per-position decoders at position 0 (TFA's D is position-shared):
@@ -208,6 +261,17 @@ vs stacked 0.06, crosscoder 0.08), it surfaces multi-token structure
 the others don't.
 
 ## Follow-up: LLM explainer (analysis 4)
+
+[![semantic categories](../../../results/nlp_sweep/gemma/figures/semantic_categories.thumb.png)](../../../results/nlp_sweep/gemma/figures/semantic_categories.png)
+
+Horizontal stacked bars of category tag counts per arch (features can
+take multiple tags). Stacked SAE and TFA pred look structurally similar
+— both dominated by document_start + proper_noun_or_name +
+section_transition. Crosscoder is a compressed version of the same
+profile (16% of latents used, so shorter bars overall). TFA novel's bar
+is visibly distinct: mostly 'unclear' (39/50) plus a tokenization_boundary
+cluster that does not exist in the other archs.
+
 
 Top 50 features per arch × top 10 activating windows each, labeled by
 `claude-haiku-4-5-20251001` via `explain_features.py`. Prompt: "identify
@@ -323,7 +387,28 @@ different kind of temporal pattern, useful for a different reason
 
 ## Files
 
+### Code
+
 - Adapters: `temporal_crosscoders/NLP/bench_adapters.py` (commit `3b8759b`)
 - Scanner: `temporal_crosscoders/NLP/scan_features.py`
-- Scan outputs: `results/nlp_sweep/gemma/scans/scan__<arch>__resid_L25__k50.json`
+- Pred/novel split: `temporal_crosscoders/NLP/tfa_pred_novel_split.py`
+- Temporal spread: `temporal_crosscoders/NLP/temporal_spread.py`
+- Cross-arch matching: `temporal_crosscoders/NLP/feature_match.py`
+- LLM labeler: `temporal_crosscoders/NLP/explain_features.py`
+- Plots: `temporal_crosscoders/NLP/plot_autointerp_summary.py`
+
+### Figures (full-res under `results/nlp_sweep/gemma/figures/`)
+
+- `txcdr_vs_tfa_hero.png` — four-panel TXCDR vs TFA summary
+- `passage_locality.png` — chain-diversity of top features
+- `temporal_concentration.png` — per-position activation spread
+- `tfa_novel_vs_pred_mass.png` — scatter showing disjoint libraries
+- `cross_arch_decoder_sim.png` — CDF of best-match cosines
+- `semantic_categories.png` — label category counts per arch
+
+### Data
+
+- Scans: `results/nlp_sweep/gemma/scans/scan__<arch>__resid_L25__k50.json`
+- Labels: `results/nlp_sweep/gemma/scans/labels__<arch>__resid_L25__k50.json`
+- Analyses: `results/nlp_sweep/gemma/scans/{tspread,tfa_pred_novel,feature_match}__*.json`
 - Sweep checkpoints: `results/nlp_sweep/gemma/ckpts/`
