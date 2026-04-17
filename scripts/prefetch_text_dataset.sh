@@ -36,11 +36,13 @@ if [ -z "$HF_PATH" ]; then
             SPLIT="train"
             ;;
         stack-python)
-            # The Stack v2 deduplicated, Python only. Requires gated HF
-            # access. The prefetch script uses the standard streaming path;
-            # Python filtering happens in the inline Python block below via
-            # the DATASET-aware filter.
-            HF_PATH="bigcode/the-stack-v2-dedup"
+            # Python source code with inline content. bigcode/the-stack-v2
+            # is unusable here because it only ships blob_ids (content
+            # lives on Software Heritage S3). Use starcoderdata's Python
+            # subset (gated BigCode license — accept at
+            # https://huggingface.co/datasets/bigcode/starcoderdata) or
+            # fall back to codeparrot/codeparrot-clean (open access).
+            HF_PATH="bigcode/starcoderdata"
             SUBSET=""
             SPLIT="train"
             ;;

@@ -133,30 +133,42 @@ def _load_text_stream(
     elif dataset == "coding":
         hf_path, subset, split = "codeparrot/codeparrot-clean", None, "train"
     elif dataset == "stack-python":
-        # The Stack v2 deduplicated, Python only. Gated on HuggingFace —
-        # accept the license at https://huggingface.co/datasets/bigcode/the-stack-v2-dedup
-        # Fallback: bigcode/starcoderdata if v2 access is painful. Filters
-        # to 100–2000-line files to skip trivial snippets and pathological
-        # long-tail outliers; dedup upstream handles near-duplicates.
-        print("Loading bigcode/the-stack-v2-dedup (Python, streaming, "
-              "100–2000 line filter)")
+        # Python source-code dataset with INLINE content.
+        # Note: bigcode/the-stack-v2-dedup only ships blob_id pointers,
+        # not content — Software Heritage S3 fetch required. Don't use.
+        # Primary:  bigcode/starcoderdata (Python subset, inline content,
+        #           BigCode license — accept at
+        #           https://huggingface.co/datasets/bigcode/starcoderdata )
+        # Fallback: codeparrot/codeparrot-clean (open access, Python only,
+        #           inline content — always works even w/o gated access)
+        # Filter: 100–2000 lines per file.
         try:
-            ds = load_dataset(
-                "bigcode/the-stack-v2-dedup",
-                split="train",
-                streaming=True,
-            )
-            ds = ds.filter(lambda s: s.get("language") == "Python")
-        except Exception as e:
-            print(f"  v2 load failed ({e}); falling back to bigcode/starcoderdata")
+            print("Loading bigcode/starcoderdata (Python, streaming)")
             ds = load_dataset(
                 "bigcode/starcoderdata",
                 data_dir="python",
                 split="train",
                 streaming=True,
             )
+            _first = next(iter(ds))  # force one sample to surface auth errors early
+            ds = load_dataset(
+                "bigcode/starcoderdata",
+                data_dir="python",
+                split="train",
+                streaming=True,
+            )
+        except Exception as e:
+            print(f"  starcoderdata load failed ({e})")
+            print("  falling back to codeparrot/codeparrot-clean (open)")
+            ds = load_dataset(
+                "codeparrot/codeparrot-clean",
+                split="train",
+                streaming=True,
+            )
 
         def extract_code(sample: dict) -> str | None:
+            # starcoderdata uses "content"; codeparrot-clean uses "content"
+            # too. Both have inline strings.
             content = sample.get("content") or sample.get("text") or ""
             if not content:
                 return None
