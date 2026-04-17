@@ -28,7 +28,29 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 
-from src.utils.plot import save_figure
+from src.utils.plot import save_figure  # noqa: F401 (kept for convention)
+
+
+def save_three_sizes(fig, path_base: str):
+    """Save .png (full-res, 200 DPI), .doc.png (~1400px doc-embed),
+    .thumb.png (480px agent-inspect)."""
+    from PIL import Image
+    full = path_base + ".png"
+    fig.savefig(full, dpi=200, bbox_inches="tight")
+    im = Image.open(full)
+    if im.width > 1400:
+        ratio = 1400 / im.width
+        im.resize((1400, int(im.height * ratio)), Image.LANCZOS).save(
+            path_base + ".doc.png", optimize=True)
+    else:
+        im.save(path_base + ".doc.png", optimize=True)
+    if im.width > 480:
+        ratio = 480 / im.width
+        im.resize((480, int(im.height * ratio)), Image.LANCZOS).save(
+            path_base + ".thumb.png", optimize=True)
+    else:
+        im.save(path_base + ".thumb.png", optimize=True)
+    plt.close(fig)
 from temporal_crosscoders.NLP.autointerp import load_model
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s")
@@ -128,7 +150,7 @@ def plot_passage_locality(scans):
     fig.suptitle("Analysis 1 — TFA novel codes are passage-local; pred codes generalize",
                  fontsize=12)
     fig.tight_layout(rect=(0, 0, 1, 0.94))
-    save_figure(fig, f"{OUT}/passage_locality.png")
+    save_three_sizes(fig, f"{OUT}/passage_locality")
     plt.close(fig)
     log.info("  → passage_locality.png")
 
@@ -162,7 +184,7 @@ def plot_temporal_concentration(tspreads):
         fontsize=12,
     )
     fig.tight_layout(rect=(0, 0, 1, 0.92))
-    save_figure(fig, f"{OUT}/temporal_concentration.png")
+    save_three_sizes(fig, f"{OUT}/temporal_concentration")
     plt.close(fig)
     log.info("  → temporal_concentration.png")
 
@@ -189,7 +211,7 @@ def plot_tfa_novel_vs_pred(pn):
     ax.axvline(0, color="black", alpha=0.3, linewidth=0.5)
     ax.grid(alpha=0.3)
     fig.tight_layout()
-    save_figure(fig, f"{OUT}/tfa_novel_vs_pred_mass.png")
+    save_three_sizes(fig, f"{OUT}/tfa_novel_vs_pred_mass")
     plt.close(fig)
     log.info("  → tfa_novel_vs_pred_mass.png")
 
@@ -290,7 +312,7 @@ def plot_cross_arch_sim():
     fig.suptitle("Analysis 3 — Stacked & Crosscoder share a core; TFA is orthogonal",
                  fontsize=12)
     fig.tight_layout(rect=(0, 0, 1, 0.94))
-    save_figure(fig, f"{OUT}/cross_arch_decoder_sim.png")
+    save_three_sizes(fig, f"{OUT}/cross_arch_decoder_sim")
     plt.close(fig)
     log.info("  → cross_arch_decoder_sim.png")
 
@@ -360,7 +382,7 @@ def plot_semantic_categories(labels):
     ax.legend(fontsize=8, bbox_to_anchor=(1.01, 1), loc="upper left")
     ax.grid(axis="x", alpha=0.3)
     fig.tight_layout()
-    save_figure(fig, f"{OUT}/semantic_categories.png")
+    save_three_sizes(fig, f"{OUT}/semantic_categories")
     plt.close(fig)
     log.info("  → semantic_categories.png")
 
@@ -484,7 +506,7 @@ def plot_txcdr_vs_tfa_hero(scans, tspreads, labels):
         fontsize=15,
     )
     fig.tight_layout(rect=(0, 0, 1, 0.96))
-    save_figure(fig, f"{OUT}/txcdr_vs_tfa_hero.png")
+    save_three_sizes(fig, f"{OUT}/txcdr_vs_tfa_hero")
     plt.close(fig)
     log.info("  → txcdr_vs_tfa_hero.png")
 

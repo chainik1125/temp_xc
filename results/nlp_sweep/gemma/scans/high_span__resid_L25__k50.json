@@ -1,0 +1,1547 @@
+{
+  "threshold": 0.35,
+  "min_content_fraction": 0.6,
+  "by_arch": {
+    "crosscoder": {
+      "raw_top15_by_mass": [
+        {
+          "feat_idx": 17925,
+          "concentration": 0.312396377325058,
+          "mass": 15207.5830078125,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>David Harder,<<< DVM, Medical Director\nDr. Harder opened",
+            ">>>To correct this<<< error:\n- Uninstall the controlled-release (",
+            ">>>The Armor S<<<2000 is a concentrated sodium silicate den",
+            ">>>an oddity<<< in the Industrial scene, because their music features Christian",
+            ">>>separation of nucleus<<< protein - lysis buffer (Jun/02/"
+          ],
+          "top_activations": [
+            1584.9598388671875,
+            1560.0118408203125,
+            1517.1612548828125,
+            1513.706787109375,
+            1512.1488037109375
+          ]
+        },
+        {
+          "feat_idx": 11796,
+          "concentration": 0.33066484332084656,
+          "mass": 10896.233154296875,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>Wotan had taken<<< away her immortality, but at least she still had",
+            ">>>Airline approved Expandal<<<be soft-side Foldabel Pet Bag Pet Carrier",
+            ">>>Crucified With<<< Christ\nby Nan Doud, Guest Writer\n",
+            ">>>Plastered all over<<< the walls in the Australian team room of their Auckland",
+            ">>>Sometimes You Mate For<<< Life\nKatie Smith is the best of her class"
+          ],
+          "top_activations": [
+            1097.9404296875,
+            1097.8599853515625,
+            1095.6754150390625,
+            1089.35009765625,
+            1088.3052978515625
+          ]
+        },
+        {
+          "feat_idx": 15524,
+          "concentration": 0.20250622928142548,
+          "mass": 9905.291137695312,
+          "content_fraction": 1.0,
+          "top_texts": [
+            " petiolelike; cauline 0-several>>>, sometimes proximalmost appearing<<< as basal, reduced. Inflorescences monoch",
+            " Leaves sessile; basal persistent or withering by flowering>>>, solitary, blade base<<< sometimes attenuate and petiolelike; cauline",
+            "-reticulate. Stems scapelike or leafy>>>, simple or branched,<<< glabrous, often glaucous; bulblets sometimes",
+            "olelike; cauline 0-several,>>> sometimes proximalmost appearing as<<< basal, reduced. Inflorescences monochasi",
+            "; cauline 0-several, sometimes proximal>>>most appearing as basal,<<< reduced. Inflorescences monochasiate or"
+          ],
+          "top_activations": [
+            1046.226806640625,
+            1010.5748291015625,
+            995.6646118164062,
+            994.2203979492188,
+            993.3914794921875
+          ]
+        },
+        {
+          "feat_idx": 15214,
+          "concentration": 0.25721365213394165,
+          "mass": 9456.768371582031,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>Monday will start<<< off cool as a Delta breeze pumps through the Valley",
+            ">>>joined 5<<< years ago\nThis group will be host to all",
+            ">>>Wednesday, April<<< 1, 2015\nAlternate",
+            ">>>Spend $5<<<0 more and get free shipping!\nYour cart",
+            ">>>The melodies and<<< synths are nice but you need to practice with"
+          ],
+          "top_activations": [
+            991.017822265625,
+            981.509521484375,
+            958.5402221679688,
+            948.3211669921875,
+            940.0819091796875
+          ]
+        },
+        {
+          "feat_idx": 3961,
+          "concentration": 0.30979716777801514,
+          "mass": 9302.519653320312,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>David Harder,<<< DVM, Medical Director\nDr. Harder opened",
+            ">>>To correct this<<< error:\n- Uninstall the controlled-release (",
+            ">>>[ Home ><<< Spirits > liqueur > Pear > Badel Svato",
+            ">>>separation of nucleus<<< protein - lysis buffer (Jun/02/",
+            ">>>|Home||<<<\u00bb Products||\u00bb Cotton Printed Dress||\u00bb Designer"
+          ],
+          "top_activations": [
+            981.41845703125,
+            952.5228271484375,
+            926.2500610351562,
+            923.3104858398438,
+            923.2271728515625
+          ]
+        },
+        {
+          "feat_idx": 16658,
+          "concentration": 0.23612238466739655,
+          "mass": 8795.709289550781,
+          "content_fraction": 1.0,
+          "top_texts": [
+            " of their mind. They may have feelings that are>>> just below the surface.<<< I find that business owners who see their success happening",
+            " grows, there won\u2019t feel like there is>>> anywhere near enough time.<<< Crucial to success is access to expertise, communication tools",
+            " able to ensure that you are satisfied and benefit greatly>>> from their professional services.<<<\nInstallation of Energy Efficient Windows\nOne of the",
+            " beginning new challenges. The feeling of defeat seemed to>>> creep into my mindset.<<< And then I became a part of the WordPress community",
+            " barber and cut to the regular short length? Or>>> there is another possibility.<<< You can stick to the new medium length, which"
+          ],
+          "top_activations": [
+            943.361572265625,
+            921.2390747070312,
+            880.3270263671875,
+            878.7803955078125,
+            871.045654296875
+          ]
+        },
+        {
+          "feat_idx": 12231,
+          "concentration": 0.2171662151813507,
+          "mass": 8676.276336669922,
+          "content_fraction": 1.0,
+          "top_texts": [
+            "||% Daily Value**|\n|Vitamin D>>>-3 (as Cho<<<lacealciferol) (fish)||",
+            "Amount||% Daily Value**|\n|Vitamin>>> D-3 (as<<< Cholacealciferol) (fish)||",
+            "||Amount||% Daily Value**|\n|>>>Vitamin D-3 (<<<as Cholacealciferol) (fish)||",
+            "% Daily Value**|\n|Vitamin D->>>3 (as Cholace<<<alciferol) (fish)||",
+            " Daily Value**|\n|Vitamin D-3>>> (as Cholacealc<<<iferol) (fish)||"
+          ],
+          "top_activations": [
+            1235.2220458984375,
+            1226.832275390625,
+            1107.75634765625,
+            1053.338623046875,
+            959.8876953125
+          ]
+        },
+        {
+          "feat_idx": 14849,
+          "concentration": 0.2852232754230499,
+          "mass": 8084.080993652344,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>joined<<< 5 years ago\nThis group will be host",
+            ">>>Spend<<< $50 more and get free shipping!\n",
+            ">>>Reviews<<<No reviews have been added for Amersham & Chel",
+            ">>>Anybody<<< pregnant with there Husband leaving for basic training? Im",
+            ">>>Visit<<< create.airbnb.com \u00bb\nThanks for taking"
+          ],
+          "top_activations": [
+            829.4105834960938,
+            825.50244140625,
+            811.171630859375,
+            807.2759399414062,
+            805.9559326171875
+          ]
+        },
+        {
+          "feat_idx": 11714,
+          "concentration": 0.20903199911117554,
+          "mass": 7966.910461425781,
+          "content_fraction": 1.0,
+          "top_texts": [
+            "IV 002414\nDEPT>>> FOR EUR/UMB\n<<<EEB/ESC/IEC FOR SGALLOGLY",
+            " E C R E T KYIV 00>>>2414\n<<<DEPT FOR EUR/UMB\nEEB/ESC",
+            " R E T KYIV 0024>>>14\nDEPT FOR<<< EUR/UMB\nEEB/ESC/IEC",
+            "002414\nDEPT FOR EUR>>>/UMB\nEEB<<</ESC/IEC FOR SGALLOGLY AND L",
+            " E T KYIV 00241>>>4\nDEPT FOR EUR<<</UMB\nEEB/ESC/IEC FOR"
+          ],
+          "top_activations": [
+            1187.6326904296875,
+            866.9511108398438,
+            862.608642578125,
+            830.4088745117188,
+            776.7596435546875
+          ]
+        },
+        {
+          "feat_idx": 5231,
+          "concentration": 0.28662991523742676,
+          "mass": 7904.198974609375,
+          "content_fraction": 0.0,
+          "top_texts": [
+            ">>><<<an oddity in the Industrial scene, because their",
+            ">>><<<\"The guys at Music House are the best in",
+            ">>><<<The Armor S2000 is a concentrated",
+            ">>><<<separation of nucleus protein - lysis buffer (Jun/",
+            ">>><<<Web Design Programer\nClosed - This job"
+          ],
+          "top_activations": [
+            796.0938110351562,
+            796.0938110351562,
+            796.0938110351562,
+            796.0938110351562,
+            796.0938110351562
+          ]
+        },
+        {
+          "feat_idx": 14562,
+          "concentration": 0.23677045106887817,
+          "mass": 7708.66796875,
+          "content_fraction": 1.0,
+          "top_texts": [
+            " familiar to snow bunnies in the area. That\u2019>>>s because Wrightwood is<<< home to Mountain High, one of the most accessible",
+            " resorts to the greater Los Angeles area. Not only>>> that, Wrightwood offers<<< hiking trails, local watering holes after your trip down",
+            " October, and yes, winter grade fuel helps reduce>>> problems with gelling when<<< temps drop below 30 degrees. But if",
+            " Hero\u201d hit makers were left panicking earlier this>>> year when Grohl ended<<< the group\u2019s extensive world tour by announcing he",
+            " and listening to some of her older performances it\u2019>>>s clear Rona has<<< a powerful voice and"
+          ],
+          "top_activations": [
+            861.9794921875,
+            814.9490966796875,
+            811.0733032226562,
+            773.0565185546875,
+            751.7186279296875
+          ]
+        },
+        {
+          "feat_idx": 6189,
+          "concentration": 0.20921272039413452,
+          "mass": 7524.248046875,
+          "content_fraction": 0.8,
+          "top_texts": [
+            ">>>\"<<<The guys at Music House are the best in the",
+            ">>>an<<< oddity in the Industrial scene, because their music",
+            ">>>Web<<< Design Programer\nClosed - This job posting",
+            ">>>The<<< Armor S2000 is a concentrated sodium",
+            ">>>It<<<'s Sharon here with a new mixed media project"
+          ],
+          "top_activations": [
+            765.9578247070312,
+            761.1392822265625,
+            755.277587890625,
+            755.0421752929688,
+            751.6626586914062
+          ]
+        },
+        {
+          "feat_idx": 3784,
+          "concentration": 0.3149876892566681,
+          "mass": 7389.5789794921875,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>WQAQ is<<< the radio station for Quinnipiac, by Quin",
+            ">>>you might ask yourself<<<:\nWhat is this place?\ncoarse.",
+            ">>>Recently NPR* http<<<://www.npr.org/ published FAQs on",
+            ">>>Weeell, traditionally<<< guitar fretboards stop at 21 or ",
+            ">>>Oh, great,<<< another depressing article about the state of American academia."
+          ],
+          "top_activations": [
+            745.38427734375,
+            740.9570922851562,
+            739.80078125,
+            739.4956665039062,
+            738.7449951171875
+          ]
+        },
+        {
+          "feat_idx": 9251,
+          "concentration": 0.21112167835235596,
+          "mass": 7313.5943603515625,
+          "content_fraction": 1.0,
+          "top_texts": [
+            " during the rain when a Blue Jay stopped by.>>>\nI had not seen<<< one",
+            "re new here or you have previously subscribed by Google>>> Friend Connect, you may<<< want to subscribe to my RSS feed or by email",
+            ", unceremoniously ripped off like a soiled band>>>-aid and thrown into<<< the rubbish heap? Do we know the",
+            "t room for a jet-ski or a quad>>>-bike but there is<<< plenty of space for a couple of electric bikes.",
+            " with the summer movie preview, a weekend-by>>>-weekend breakdown of all<<< the movies coming out this summer. I figured out"
+          ],
+          "top_activations": [
+            765.2262573242188,
+            755.8002319335938,
+            743.2848510742188,
+            734.8984985351562,
+            729.841796875
+          ]
+        },
+        {
+          "feat_idx": 8016,
+          "concentration": 0.22716793417930603,
+          "mass": 7269.543212890625,
+          "content_fraction": 1.0,
+          "top_texts": [
+            " \"BE PREPARED FOR AN \"EMERGENCY\" WITH>>> A PICTURE OF A Z<<<OMBIE BEING THE OBVIOUS THEME. YOU CAN",
+            " BUT THEN ONE OF THE ADS STATED \"IF>>> YOUR READY FOR THE Z<<<OMBIE APOCALYPSE THEN YOUR READY FOR",
+            " FOR ME, THAT'S PRETTY SWEET!>>> I LOVE HOW THE SPARK<<< OF FEAR AND CURIOSITY HIT THE WEB WITHIN",
+            " READY FOR THE ZOMBIE APOCALYPSE>>> THEN YOUR READY FOR ANY<<< EMERGENCY\" WHICH TURNED THE HEAT DOWN",
+            " THESE ADS WERE FREAKING EVERYWHERE, BUT THEN>>> ONE OF THE ADS ST<<<ATED \"IF YOUR READY FOR THE ZOMBIE"
+          ],
+          "top_activations": [
+            751.6378173828125,
+            749.7225952148438,
+            749.1221923828125,
+            739.7865600585938,
+            721.1848754882812
+          ]
+        }
+      ],
+      "content_within_raw_top15": [
+        {
+          "feat_idx": 17925,
+          "concentration": 0.312396377325058,
+          "mass": 15207.5830078125,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>David Harder,<<< DVM, Medical Director\nDr. Harder opened",
+            ">>>To correct this<<< error:\n- Uninstall the controlled-release (",
+            ">>>The Armor S<<<2000 is a concentrated sodium silicate den",
+            ">>>an oddity<<< in the Industrial scene, because their music features Christian",
+            ">>>separation of nucleus<<< protein - lysis buffer (Jun/02/"
+          ],
+          "top_activations": [
+            1584.9598388671875,
+            1560.0118408203125,
+            1517.1612548828125,
+            1513.706787109375,
+            1512.1488037109375
+          ]
+        },
+        {
+          "feat_idx": 11796,
+          "concentration": 0.33066484332084656,
+          "mass": 10896.233154296875,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>Wotan had taken<<< away her immortality, but at least she still had",
+            ">>>Airline approved Expandal<<<be soft-side Foldabel Pet Bag Pet Carrier",
+            ">>>Crucified With<<< Christ\nby Nan Doud, Guest Writer\n",
+            ">>>Plastered all over<<< the walls in the Australian team room of their Auckland",
+            ">>>Sometimes You Mate For<<< Life\nKatie Smith is the best of her class"
+          ],
+          "top_activations": [
+            1097.9404296875,
+            1097.8599853515625,
+            1095.6754150390625,
+            1089.35009765625,
+            1088.3052978515625
+          ]
+        },
+        {
+          "feat_idx": 15524,
+          "concentration": 0.20250622928142548,
+          "mass": 9905.291137695312,
+          "content_fraction": 1.0,
+          "top_texts": [
+            " petiolelike; cauline 0-several>>>, sometimes proximalmost appearing<<< as basal, reduced. Inflorescences monoch",
+            " Leaves sessile; basal persistent or withering by flowering>>>, solitary, blade base<<< sometimes attenuate and petiolelike; cauline",
+            "-reticulate. Stems scapelike or leafy>>>, simple or branched,<<< glabrous, often glaucous; bulblets sometimes",
+            "olelike; cauline 0-several,>>> sometimes proximalmost appearing as<<< basal, reduced. Inflorescences monochasi",
+            "; cauline 0-several, sometimes proximal>>>most appearing as basal,<<< reduced. Inflorescences monochasiate or"
+          ],
+          "top_activations": [
+            1046.226806640625,
+            1010.5748291015625,
+            995.6646118164062,
+            994.2203979492188,
+            993.3914794921875
+          ]
+        },
+        {
+          "feat_idx": 15214,
+          "concentration": 0.25721365213394165,
+          "mass": 9456.768371582031,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>Monday will start<<< off cool as a Delta breeze pumps through the Valley",
+            ">>>joined 5<<< years ago\nThis group will be host to all",
+            ">>>Wednesday, April<<< 1, 2015\nAlternate",
+            ">>>Spend $5<<<0 more and get free shipping!\nYour cart",
+            ">>>The melodies and<<< synths are nice but you need to practice with"
+          ],
+          "top_activations": [
+            991.017822265625,
+            981.509521484375,
+            958.5402221679688,
+            948.3211669921875,
+            940.0819091796875
+          ]
+        },
+        {
+          "feat_idx": 3961,
+          "concentration": 0.30979716777801514,
+          "mass": 9302.519653320312,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>David Harder,<<< DVM, Medical Director\nDr. Harder opened",
+            ">>>To correct this<<< error:\n- Uninstall the controlled-release (",
+            ">>>[ Home ><<< Spirits > liqueur > Pear > Badel Svato",
+            ">>>separation of nucleus<<< protein - lysis buffer (Jun/02/",
+            ">>>|Home||<<<\u00bb Products||\u00bb Cotton Printed Dress||\u00bb Designer"
+          ],
+          "top_activations": [
+            981.41845703125,
+            952.5228271484375,
+            926.2500610351562,
+            923.3104858398438,
+            923.2271728515625
+          ]
+        },
+        {
+          "feat_idx": 16658,
+          "concentration": 0.23612238466739655,
+          "mass": 8795.709289550781,
+          "content_fraction": 1.0,
+          "top_texts": [
+            " of their mind. They may have feelings that are>>> just below the surface.<<< I find that business owners who see their success happening",
+            " grows, there won\u2019t feel like there is>>> anywhere near enough time.<<< Crucial to success is access to expertise, communication tools",
+            " able to ensure that you are satisfied and benefit greatly>>> from their professional services.<<<\nInstallation of Energy Efficient Windows\nOne of the",
+            " beginning new challenges. The feeling of defeat seemed to>>> creep into my mindset.<<< And then I became a part of the WordPress community",
+            " barber and cut to the regular short length? Or>>> there is another possibility.<<< You can stick to the new medium length, which"
+          ],
+          "top_activations": [
+            943.361572265625,
+            921.2390747070312,
+            880.3270263671875,
+            878.7803955078125,
+            871.045654296875
+          ]
+        },
+        {
+          "feat_idx": 12231,
+          "concentration": 0.2171662151813507,
+          "mass": 8676.276336669922,
+          "content_fraction": 1.0,
+          "top_texts": [
+            "||% Daily Value**|\n|Vitamin D>>>-3 (as Cho<<<lacealciferol) (fish)||",
+            "Amount||% Daily Value**|\n|Vitamin>>> D-3 (as<<< Cholacealciferol) (fish)||",
+            "||Amount||% Daily Value**|\n|>>>Vitamin D-3 (<<<as Cholacealciferol) (fish)||",
+            "% Daily Value**|\n|Vitamin D->>>3 (as Cholace<<<alciferol) (fish)||",
+            " Daily Value**|\n|Vitamin D-3>>> (as Cholacealc<<<iferol) (fish)||"
+          ],
+          "top_activations": [
+            1235.2220458984375,
+            1226.832275390625,
+            1107.75634765625,
+            1053.338623046875,
+            959.8876953125
+          ]
+        },
+        {
+          "feat_idx": 14849,
+          "concentration": 0.2852232754230499,
+          "mass": 8084.080993652344,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>joined<<< 5 years ago\nThis group will be host",
+            ">>>Spend<<< $50 more and get free shipping!\n",
+            ">>>Reviews<<<No reviews have been added for Amersham & Chel",
+            ">>>Anybody<<< pregnant with there Husband leaving for basic training? Im",
+            ">>>Visit<<< create.airbnb.com \u00bb\nThanks for taking"
+          ],
+          "top_activations": [
+            829.4105834960938,
+            825.50244140625,
+            811.171630859375,
+            807.2759399414062,
+            805.9559326171875
+          ]
+        },
+        {
+          "feat_idx": 11714,
+          "concentration": 0.20903199911117554,
+          "mass": 7966.910461425781,
+          "content_fraction": 1.0,
+          "top_texts": [
+            "IV 002414\nDEPT>>> FOR EUR/UMB\n<<<EEB/ESC/IEC FOR SGALLOGLY",
+            " E C R E T KYIV 00>>>2414\n<<<DEPT FOR EUR/UMB\nEEB/ESC",
+            " R E T KYIV 0024>>>14\nDEPT FOR<<< EUR/UMB\nEEB/ESC/IEC",
+            "002414\nDEPT FOR EUR>>>/UMB\nEEB<<</ESC/IEC FOR SGALLOGLY AND L",
+            " E T KYIV 00241>>>4\nDEPT FOR EUR<<</UMB\nEEB/ESC/IEC FOR"
+          ],
+          "top_activations": [
+            1187.6326904296875,
+            866.9511108398438,
+            862.608642578125,
+            830.4088745117188,
+            776.7596435546875
+          ]
+        },
+        {
+          "feat_idx": 14562,
+          "concentration": 0.23677045106887817,
+          "mass": 7708.66796875,
+          "content_fraction": 1.0,
+          "top_texts": [
+            " familiar to snow bunnies in the area. That\u2019>>>s because Wrightwood is<<< home to Mountain High, one of the most accessible",
+            " resorts to the greater Los Angeles area. Not only>>> that, Wrightwood offers<<< hiking trails, local watering holes after your trip down",
+            " October, and yes, winter grade fuel helps reduce>>> problems with gelling when<<< temps drop below 30 degrees. But if",
+            " Hero\u201d hit makers were left panicking earlier this>>> year when Grohl ended<<< the group\u2019s extensive world tour by announcing he",
+            " and listening to some of her older performances it\u2019>>>s clear Rona has<<< a powerful voice and"
+          ],
+          "top_activations": [
+            861.9794921875,
+            814.9490966796875,
+            811.0733032226562,
+            773.0565185546875,
+            751.7186279296875
+          ]
+        },
+        {
+          "feat_idx": 6189,
+          "concentration": 0.20921272039413452,
+          "mass": 7524.248046875,
+          "content_fraction": 0.8,
+          "top_texts": [
+            ">>>\"<<<The guys at Music House are the best in the",
+            ">>>an<<< oddity in the Industrial scene, because their music",
+            ">>>Web<<< Design Programer\nClosed - This job posting",
+            ">>>The<<< Armor S2000 is a concentrated sodium",
+            ">>>It<<<'s Sharon here with a new mixed media project"
+          ],
+          "top_activations": [
+            765.9578247070312,
+            761.1392822265625,
+            755.277587890625,
+            755.0421752929688,
+            751.6626586914062
+          ]
+        },
+        {
+          "feat_idx": 3784,
+          "concentration": 0.3149876892566681,
+          "mass": 7389.5789794921875,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>WQAQ is<<< the radio station for Quinnipiac, by Quin",
+            ">>>you might ask yourself<<<:\nWhat is this place?\ncoarse.",
+            ">>>Recently NPR* http<<<://www.npr.org/ published FAQs on",
+            ">>>Weeell, traditionally<<< guitar fretboards stop at 21 or ",
+            ">>>Oh, great,<<< another depressing article about the state of American academia."
+          ],
+          "top_activations": [
+            745.38427734375,
+            740.9570922851562,
+            739.80078125,
+            739.4956665039062,
+            738.7449951171875
+          ]
+        },
+        {
+          "feat_idx": 9251,
+          "concentration": 0.21112167835235596,
+          "mass": 7313.5943603515625,
+          "content_fraction": 1.0,
+          "top_texts": [
+            " during the rain when a Blue Jay stopped by.>>>\nI had not seen<<< one",
+            "re new here or you have previously subscribed by Google>>> Friend Connect, you may<<< want to subscribe to my RSS feed or by email",
+            ", unceremoniously ripped off like a soiled band>>>-aid and thrown into<<< the rubbish heap? Do we know the",
+            "t room for a jet-ski or a quad>>>-bike but there is<<< plenty of space for a couple of electric bikes.",
+            " with the summer movie preview, a weekend-by>>>-weekend breakdown of all<<< the movies coming out this summer. I figured out"
+          ],
+          "top_activations": [
+            765.2262573242188,
+            755.8002319335938,
+            743.2848510742188,
+            734.8984985351562,
+            729.841796875
+          ]
+        },
+        {
+          "feat_idx": 8016,
+          "concentration": 0.22716793417930603,
+          "mass": 7269.543212890625,
+          "content_fraction": 1.0,
+          "top_texts": [
+            " \"BE PREPARED FOR AN \"EMERGENCY\" WITH>>> A PICTURE OF A Z<<<OMBIE BEING THE OBVIOUS THEME. YOU CAN",
+            " BUT THEN ONE OF THE ADS STATED \"IF>>> YOUR READY FOR THE Z<<<OMBIE APOCALYPSE THEN YOUR READY FOR",
+            " FOR ME, THAT'S PRETTY SWEET!>>> I LOVE HOW THE SPARK<<< OF FEAR AND CURIOSITY HIT THE WEB WITHIN",
+            " READY FOR THE ZOMBIE APOCALYPSE>>> THEN YOUR READY FOR ANY<<< EMERGENCY\" WHICH TURNED THE HEAT DOWN",
+            " THESE ADS WERE FREAKING EVERYWHERE, BUT THEN>>> ONE OF THE ADS ST<<<ATED \"IF YOUR READY FOR THE ZOMBIE"
+          ],
+          "top_activations": [
+            751.6378173828125,
+            749.7225952148438,
+            749.1221923828125,
+            739.7865600585938,
+            721.1848754882812
+          ]
+        }
+      ],
+      "top15_content_bearing_anyrank": [
+        {
+          "feat_idx": 17925,
+          "concentration": 0.312396377325058,
+          "mass": 15207.5830078125,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>David Harder,<<< DVM, Medical Director\nDr. Harder opened",
+            ">>>To correct this<<< error:\n- Uninstall the controlled-release (",
+            ">>>The Armor S<<<2000 is a concentrated sodium silicate den",
+            ">>>an oddity<<< in the Industrial scene, because their music features Christian",
+            ">>>separation of nucleus<<< protein - lysis buffer (Jun/02/"
+          ],
+          "top_activations": [
+            1584.9598388671875,
+            1560.0118408203125,
+            1517.1612548828125,
+            1513.706787109375,
+            1512.1488037109375
+          ]
+        },
+        {
+          "feat_idx": 11796,
+          "concentration": 0.33066484332084656,
+          "mass": 10896.233154296875,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>Wotan had taken<<< away her immortality, but at least she still had",
+            ">>>Airline approved Expandal<<<be soft-side Foldabel Pet Bag Pet Carrier",
+            ">>>Crucified With<<< Christ\nby Nan Doud, Guest Writer\n",
+            ">>>Plastered all over<<< the walls in the Australian team room of their Auckland",
+            ">>>Sometimes You Mate For<<< Life\nKatie Smith is the best of her class"
+          ],
+          "top_activations": [
+            1097.9404296875,
+            1097.8599853515625,
+            1095.6754150390625,
+            1089.35009765625,
+            1088.3052978515625
+          ]
+        },
+        {
+          "feat_idx": 15524,
+          "concentration": 0.20250622928142548,
+          "mass": 9905.291137695312,
+          "content_fraction": 1.0,
+          "top_texts": [
+            " petiolelike; cauline 0-several>>>, sometimes proximalmost appearing<<< as basal, reduced. Inflorescences monoch",
+            " Leaves sessile; basal persistent or withering by flowering>>>, solitary, blade base<<< sometimes attenuate and petiolelike; cauline",
+            "-reticulate. Stems scapelike or leafy>>>, simple or branched,<<< glabrous, often glaucous; bulblets sometimes",
+            "olelike; cauline 0-several,>>> sometimes proximalmost appearing as<<< basal, reduced. Inflorescences monochasi",
+            "; cauline 0-several, sometimes proximal>>>most appearing as basal,<<< reduced. Inflorescences monochasiate or"
+          ],
+          "top_activations": [
+            1046.226806640625,
+            1010.5748291015625,
+            995.6646118164062,
+            994.2203979492188,
+            993.3914794921875
+          ]
+        },
+        {
+          "feat_idx": 15214,
+          "concentration": 0.25721365213394165,
+          "mass": 9456.768371582031,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>Monday will start<<< off cool as a Delta breeze pumps through the Valley",
+            ">>>joined 5<<< years ago\nThis group will be host to all",
+            ">>>Wednesday, April<<< 1, 2015\nAlternate",
+            ">>>Spend $5<<<0 more and get free shipping!\nYour cart",
+            ">>>The melodies and<<< synths are nice but you need to practice with"
+          ],
+          "top_activations": [
+            991.017822265625,
+            981.509521484375,
+            958.5402221679688,
+            948.3211669921875,
+            940.0819091796875
+          ]
+        },
+        {
+          "feat_idx": 3961,
+          "concentration": 0.30979716777801514,
+          "mass": 9302.519653320312,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>David Harder,<<< DVM, Medical Director\nDr. Harder opened",
+            ">>>To correct this<<< error:\n- Uninstall the controlled-release (",
+            ">>>[ Home ><<< Spirits > liqueur > Pear > Badel Svato",
+            ">>>separation of nucleus<<< protein - lysis buffer (Jun/02/",
+            ">>>|Home||<<<\u00bb Products||\u00bb Cotton Printed Dress||\u00bb Designer"
+          ],
+          "top_activations": [
+            981.41845703125,
+            952.5228271484375,
+            926.2500610351562,
+            923.3104858398438,
+            923.2271728515625
+          ]
+        },
+        {
+          "feat_idx": 16658,
+          "concentration": 0.23612238466739655,
+          "mass": 8795.709289550781,
+          "content_fraction": 1.0,
+          "top_texts": [
+            " of their mind. They may have feelings that are>>> just below the surface.<<< I find that business owners who see their success happening",
+            " grows, there won\u2019t feel like there is>>> anywhere near enough time.<<< Crucial to success is access to expertise, communication tools",
+            " able to ensure that you are satisfied and benefit greatly>>> from their professional services.<<<\nInstallation of Energy Efficient Windows\nOne of the",
+            " beginning new challenges. The feeling of defeat seemed to>>> creep into my mindset.<<< And then I became a part of the WordPress community",
+            " barber and cut to the regular short length? Or>>> there is another possibility.<<< You can stick to the new medium length, which"
+          ],
+          "top_activations": [
+            943.361572265625,
+            921.2390747070312,
+            880.3270263671875,
+            878.7803955078125,
+            871.045654296875
+          ]
+        },
+        {
+          "feat_idx": 12231,
+          "concentration": 0.2171662151813507,
+          "mass": 8676.276336669922,
+          "content_fraction": 1.0,
+          "top_texts": [
+            "||% Daily Value**|\n|Vitamin D>>>-3 (as Cho<<<lacealciferol) (fish)||",
+            "Amount||% Daily Value**|\n|Vitamin>>> D-3 (as<<< Cholacealciferol) (fish)||",
+            "||Amount||% Daily Value**|\n|>>>Vitamin D-3 (<<<as Cholacealciferol) (fish)||",
+            "% Daily Value**|\n|Vitamin D->>>3 (as Cholace<<<alciferol) (fish)||",
+            " Daily Value**|\n|Vitamin D-3>>> (as Cholacealc<<<iferol) (fish)||"
+          ],
+          "top_activations": [
+            1235.2220458984375,
+            1226.832275390625,
+            1107.75634765625,
+            1053.338623046875,
+            959.8876953125
+          ]
+        },
+        {
+          "feat_idx": 14849,
+          "concentration": 0.2852232754230499,
+          "mass": 8084.080993652344,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>joined<<< 5 years ago\nThis group will be host",
+            ">>>Spend<<< $50 more and get free shipping!\n",
+            ">>>Reviews<<<No reviews have been added for Amersham & Chel",
+            ">>>Anybody<<< pregnant with there Husband leaving for basic training? Im",
+            ">>>Visit<<< create.airbnb.com \u00bb\nThanks for taking"
+          ],
+          "top_activations": [
+            829.4105834960938,
+            825.50244140625,
+            811.171630859375,
+            807.2759399414062,
+            805.9559326171875
+          ]
+        },
+        {
+          "feat_idx": 11714,
+          "concentration": 0.20903199911117554,
+          "mass": 7966.910461425781,
+          "content_fraction": 1.0,
+          "top_texts": [
+            "IV 002414\nDEPT>>> FOR EUR/UMB\n<<<EEB/ESC/IEC FOR SGALLOGLY",
+            " E C R E T KYIV 00>>>2414\n<<<DEPT FOR EUR/UMB\nEEB/ESC",
+            " R E T KYIV 0024>>>14\nDEPT FOR<<< EUR/UMB\nEEB/ESC/IEC",
+            "002414\nDEPT FOR EUR>>>/UMB\nEEB<<</ESC/IEC FOR SGALLOGLY AND L",
+            " E T KYIV 00241>>>4\nDEPT FOR EUR<<</UMB\nEEB/ESC/IEC FOR"
+          ],
+          "top_activations": [
+            1187.6326904296875,
+            866.9511108398438,
+            862.608642578125,
+            830.4088745117188,
+            776.7596435546875
+          ]
+        },
+        {
+          "feat_idx": 14562,
+          "concentration": 0.23677045106887817,
+          "mass": 7708.66796875,
+          "content_fraction": 1.0,
+          "top_texts": [
+            " familiar to snow bunnies in the area. That\u2019>>>s because Wrightwood is<<< home to Mountain High, one of the most accessible",
+            " resorts to the greater Los Angeles area. Not only>>> that, Wrightwood offers<<< hiking trails, local watering holes after your trip down",
+            " October, and yes, winter grade fuel helps reduce>>> problems with gelling when<<< temps drop below 30 degrees. But if",
+            " Hero\u201d hit makers were left panicking earlier this>>> year when Grohl ended<<< the group\u2019s extensive world tour by announcing he",
+            " and listening to some of her older performances it\u2019>>>s clear Rona has<<< a powerful voice and"
+          ],
+          "top_activations": [
+            861.9794921875,
+            814.9490966796875,
+            811.0733032226562,
+            773.0565185546875,
+            751.7186279296875
+          ]
+        },
+        {
+          "feat_idx": 6189,
+          "concentration": 0.20921272039413452,
+          "mass": 7524.248046875,
+          "content_fraction": 0.8,
+          "top_texts": [
+            ">>>\"<<<The guys at Music House are the best in the",
+            ">>>an<<< oddity in the Industrial scene, because their music",
+            ">>>Web<<< Design Programer\nClosed - This job posting",
+            ">>>The<<< Armor S2000 is a concentrated sodium",
+            ">>>It<<<'s Sharon here with a new mixed media project"
+          ],
+          "top_activations": [
+            765.9578247070312,
+            761.1392822265625,
+            755.277587890625,
+            755.0421752929688,
+            751.6626586914062
+          ]
+        },
+        {
+          "feat_idx": 3784,
+          "concentration": 0.3149876892566681,
+          "mass": 7389.5789794921875,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>WQAQ is<<< the radio station for Quinnipiac, by Quin",
+            ">>>you might ask yourself<<<:\nWhat is this place?\ncoarse.",
+            ">>>Recently NPR* http<<<://www.npr.org/ published FAQs on",
+            ">>>Weeell, traditionally<<< guitar fretboards stop at 21 or ",
+            ">>>Oh, great,<<< another depressing article about the state of American academia."
+          ],
+          "top_activations": [
+            745.38427734375,
+            740.9570922851562,
+            739.80078125,
+            739.4956665039062,
+            738.7449951171875
+          ]
+        },
+        {
+          "feat_idx": 9251,
+          "concentration": 0.21112167835235596,
+          "mass": 7313.5943603515625,
+          "content_fraction": 1.0,
+          "top_texts": [
+            " during the rain when a Blue Jay stopped by.>>>\nI had not seen<<< one",
+            "re new here or you have previously subscribed by Google>>> Friend Connect, you may<<< want to subscribe to my RSS feed or by email",
+            ", unceremoniously ripped off like a soiled band>>>-aid and thrown into<<< the rubbish heap? Do we know the",
+            "t room for a jet-ski or a quad>>>-bike but there is<<< plenty of space for a couple of electric bikes.",
+            " with the summer movie preview, a weekend-by>>>-weekend breakdown of all<<< the movies coming out this summer. I figured out"
+          ],
+          "top_activations": [
+            765.2262573242188,
+            755.8002319335938,
+            743.2848510742188,
+            734.8984985351562,
+            729.841796875
+          ]
+        },
+        {
+          "feat_idx": 8016,
+          "concentration": 0.22716793417930603,
+          "mass": 7269.543212890625,
+          "content_fraction": 1.0,
+          "top_texts": [
+            " \"BE PREPARED FOR AN \"EMERGENCY\" WITH>>> A PICTURE OF A Z<<<OMBIE BEING THE OBVIOUS THEME. YOU CAN",
+            " BUT THEN ONE OF THE ADS STATED \"IF>>> YOUR READY FOR THE Z<<<OMBIE APOCALYPSE THEN YOUR READY FOR",
+            " FOR ME, THAT'S PRETTY SWEET!>>> I LOVE HOW THE SPARK<<< OF FEAR AND CURIOSITY HIT THE WEB WITHIN",
+            " READY FOR THE ZOMBIE APOCALYPSE>>> THEN YOUR READY FOR ANY<<< EMERGENCY\" WHICH TURNED THE HEAT DOWN",
+            " THESE ADS WERE FREAKING EVERYWHERE, BUT THEN>>> ONE OF THE ADS ST<<<ATED \"IF YOUR READY FOR THE ZOMBIE"
+          ],
+          "top_activations": [
+            751.6378173828125,
+            749.7225952148438,
+            749.1221923828125,
+            739.7865600585938,
+            721.1848754882812
+          ]
+        },
+        {
+          "feat_idx": 9407,
+          "concentration": 0.23489312827587128,
+          "mass": 7129.308410644531,
+          "content_fraction": 1.0,
+          "top_texts": [
+            " READY FOR THE ZOMBIE APOCALYPSE>>> THEN YOUR READY FOR ANY<<< EMERGENCY\" WHICH TURNED THE HEAT DOWN",
+            ",3.\n1)CLICK THE SHOP ONLINE>>> TAB. SELECT YOUR DREAM<<< KITCHEN FINISH\n2)FILL YOUR CART WITH THE",
+            " FOR THE ZOMBIE APOCALYPSE THEN>>> YOUR READY FOR ANY EMERGENCY<<<\" WHICH TURNED THE HEAT DOWN",
+            " YOUR READY FOR THE ZOMBIE APOCALYP>>>SE THEN YOUR READY FOR<<< ANY EMERGENCY\" WHICH TURNED THE HEAT DOWN",
+            " NOT HAVE A PHYSICAL SHELTER/ BUILDING.\n>>>ALL ANIMALS ARE IN FOSTER<<< HOMES AND CAN BE SEEN BY APPOINTMENT ONLY."
+          ],
+          "top_activations": [
+            747.551513671875,
+            742.1536254882812,
+            731.8693237304688,
+            715.3190307617188,
+            710.583740234375
+          ]
+        }
+      ]
+    },
+    "tfa_pos": {
+      "raw_top15_by_mass": [
+        {
+          "feat_idx": 13994,
+          "concentration": 0.20013851369124463,
+          "mass": 0.3887255862355232,
+          "content_fraction": 0.0,
+          "top_texts": [
+            ">>><<<",
+            ">>><<<",
+            ">>><<<",
+            ">>><<<",
+            ">>><<<"
+          ],
+          "top_activations": [
+            0.03887255862355232,
+            0.03887255862355232,
+            0.03887255862355232,
+            0.03887255862355232,
+            0.03887255862355232
+          ]
+        },
+        {
+          "feat_idx": 8380,
+          "concentration": 0.2032763322415128,
+          "mass": 0.3708367422223091,
+          "content_fraction": 0.0,
+          "top_texts": [
+            ">>><<<",
+            ">>><<<",
+            ">>><<<",
+            ">>><<<",
+            ">>><<<"
+          ],
+          "top_activations": [
+            0.03708367422223091,
+            0.03708367422223091,
+            0.03708367422223091,
+            0.03708367422223091,
+            0.03708367422223091
+          ]
+        },
+        {
+          "feat_idx": 6333,
+          "concentration": 0.22807513064599583,
+          "mass": 0.37072253227233887,
+          "content_fraction": 1.0,
+          "top_texts": [
+            "q=Basic Saltwater Fishing Tips&v=>>>nGARvZT_<<<nCw\nAug 5, 20",
+            "?q=Basic Saltwater Fishing Tips&v>>>=nGARvZT<<<_nCw\nAug 5, 2",
+            " flea/tick and heartworm preventative. Visit www>>>.ruffloverescue<<<.com/adopt to make this pup a member",
+            "/tick and heartworm preventative. Visit www.>>>ruffloverescue.<<<com/adopt to make this pup a member of",
+            " rains.http://www.zenfolio.com>>>/bdimages/<<<f147112090"
+          ],
+          "top_activations": [
+            0.03811964392662048,
+            0.03790993615984917,
+            0.037739310413599014,
+            0.03767653927206993,
+            0.03754880651831627
+          ]
+        },
+        {
+          "feat_idx": 12738,
+          "concentration": 0.20086682786361068,
+          "mass": 0.3634274750947952,
+          "content_fraction": 0.0,
+          "top_texts": [
+            ">>><<<",
+            ">>><<<",
+            ">>><<<",
+            ">>><<<",
+            ">>><<<"
+          ],
+          "top_activations": [
+            0.03634274750947952,
+            0.03634274750947952,
+            0.03634274750947952,
+            0.03634274750947952,
+            0.03634274750947952
+          ]
+        },
+        {
+          "feat_idx": 17674,
+          "concentration": 0.20078342493742496,
+          "mass": 0.36122534424066544,
+          "content_fraction": 0.0,
+          "top_texts": [
+            ">>><<<",
+            ">>><<<",
+            ">>><<<",
+            ">>><<<",
+            ">>><<<"
+          ],
+          "top_activations": [
+            0.036122534424066544,
+            0.036122534424066544,
+            0.036122534424066544,
+            0.036122534424066544,
+            0.036122534424066544
+          ]
+        },
+        {
+          "feat_idx": 8864,
+          "concentration": 0.20015502444203986,
+          "mass": 0.3597896546125412,
+          "content_fraction": 0.0,
+          "top_texts": [
+            ">>><<<",
+            ">>><<<",
+            ">>><<<",
+            ">>><<<",
+            ">>><<<"
+          ],
+          "top_activations": [
+            0.03597896546125412,
+            0.03597896546125412,
+            0.03597896546125412,
+            0.03597896546125412,
+            0.03597896546125412
+          ]
+        },
+        {
+          "feat_idx": 13091,
+          "concentration": 0.2034788532619874,
+          "mass": 0.3559025004506111,
+          "content_fraction": 0.0,
+          "top_texts": [
+            ">>><<<",
+            ">>><<<",
+            ">>><<<",
+            ">>><<<",
+            ">>><<<"
+          ],
+          "top_activations": [
+            0.03559025004506111,
+            0.03559025004506111,
+            0.03559025004506111,
+            0.03559025004506111,
+            0.03559025004506111
+          ]
+        },
+        {
+          "feat_idx": 4626,
+          "concentration": 0.20297900518759232,
+          "mass": 0.3539072349667549,
+          "content_fraction": 0.0,
+          "top_texts": [
+            ">>><<<",
+            ">>><<<",
+            ">>><<<",
+            ">>><<<",
+            ">>><<<"
+          ],
+          "top_activations": [
+            0.03539072349667549,
+            0.03539072349667549,
+            0.03539072349667549,
+            0.03539072349667549,
+            0.03539072349667549
+          ]
+        },
+        {
+          "feat_idx": 1245,
+          "concentration": 0.20368329823046988,
+          "mass": 0.3509977459907532,
+          "content_fraction": 0.0,
+          "top_texts": [
+            ">>><<<",
+            ">>><<<",
+            ">>><<<",
+            ">>><<<",
+            ">>><<<"
+          ],
+          "top_activations": [
+            0.03509977459907532,
+            0.03509977459907532,
+            0.03509977459907532,
+            0.03509977459907532,
+            0.03509977459907532
+          ]
+        },
+        {
+          "feat_idx": 2656,
+          "concentration": 0.2007519128895162,
+          "mass": 0.34995943307876587,
+          "content_fraction": 0.0,
+          "top_texts": [
+            ">>><<<",
+            ">>><<<",
+            ">>><<<",
+            ">>><<<",
+            ">>><<<"
+          ],
+          "top_activations": [
+            0.03499594330787659,
+            0.03499594330787659,
+            0.03499594330787659,
+            0.03499594330787659,
+            0.03499594330787659
+          ]
+        },
+        {
+          "feat_idx": 5887,
+          "concentration": 0.20120499590971308,
+          "mass": 0.3490949794650078,
+          "content_fraction": 0.0,
+          "top_texts": [
+            ">>><<<",
+            ">>><<<",
+            ">>><<<",
+            ">>><<<",
+            ">>><<<"
+          ],
+          "top_activations": [
+            0.03490949794650078,
+            0.03490949794650078,
+            0.03490949794650078,
+            0.03490949794650078,
+            0.03490949794650078
+          ]
+        },
+        {
+          "feat_idx": 8638,
+          "concentration": 0.2008153127895254,
+          "mass": 0.34651562571525574,
+          "content_fraction": 0.0,
+          "top_texts": [
+            ">>><<<",
+            ">>><<<",
+            ">>><<<",
+            ">>><<<",
+            ">>><<<"
+          ],
+          "top_activations": [
+            0.034651562571525574,
+            0.034651562571525574,
+            0.034651562571525574,
+            0.034651562571525574,
+            0.034651562571525574
+          ]
+        },
+        {
+          "feat_idx": 16364,
+          "concentration": 0.20062580295562576,
+          "mass": 0.3465104103088379,
+          "content_fraction": 0.0,
+          "top_texts": [
+            ">>><<<",
+            ">>><<<",
+            ">>><<<",
+            ">>><<<",
+            ">>><<<"
+          ],
+          "top_activations": [
+            0.03465104103088379,
+            0.03465104103088379,
+            0.03465104103088379,
+            0.03465104103088379,
+            0.03465104103088379
+          ]
+        },
+        {
+          "feat_idx": 18226,
+          "concentration": 0.20057021027310756,
+          "mass": 0.34325920045375824,
+          "content_fraction": 0.0,
+          "top_texts": [
+            ">>><<<",
+            ">>><<<",
+            ">>><<<",
+            ">>><<<",
+            ">>><<<"
+          ],
+          "top_activations": [
+            0.034325920045375824,
+            0.034325920045375824,
+            0.034325920045375824,
+            0.034325920045375824,
+            0.034325920045375824
+          ]
+        },
+        {
+          "feat_idx": 1975,
+          "concentration": 0.20114542485779469,
+          "mass": 0.342220738530159,
+          "content_fraction": 0.0,
+          "top_texts": [
+            ">>><<<",
+            ">>><<<",
+            ">>><<<",
+            ">>><<<",
+            ">>><<<"
+          ],
+          "top_activations": [
+            0.0342220738530159,
+            0.0342220738530159,
+            0.0342220738530159,
+            0.0342220738530159,
+            0.0342220738530159
+          ]
+        }
+      ],
+      "content_within_raw_top15": [
+        {
+          "feat_idx": 6333,
+          "concentration": 0.22807513064599583,
+          "mass": 0.37072253227233887,
+          "content_fraction": 1.0,
+          "top_texts": [
+            "q=Basic Saltwater Fishing Tips&v=>>>nGARvZT_<<<nCw\nAug 5, 20",
+            "?q=Basic Saltwater Fishing Tips&v>>>=nGARvZT<<<_nCw\nAug 5, 2",
+            " flea/tick and heartworm preventative. Visit www>>>.ruffloverescue<<<.com/adopt to make this pup a member",
+            "/tick and heartworm preventative. Visit www.>>>ruffloverescue.<<<com/adopt to make this pup a member of",
+            " rains.http://www.zenfolio.com>>>/bdimages/<<<f147112090"
+          ],
+          "top_activations": [
+            0.03811964392662048,
+            0.03790993615984917,
+            0.037739310413599014,
+            0.03767653927206993,
+            0.03754880651831627
+          ]
+        }
+      ],
+      "top15_content_bearing_anyrank": [
+        {
+          "feat_idx": 6333,
+          "concentration": 0.22807513064599583,
+          "mass": 0.37072253227233887,
+          "content_fraction": 1.0,
+          "top_texts": [
+            "q=Basic Saltwater Fishing Tips&v=>>>nGARvZT_<<<nCw\nAug 5, 20",
+            "?q=Basic Saltwater Fishing Tips&v>>>=nGARvZT<<<_nCw\nAug 5, 2",
+            " flea/tick and heartworm preventative. Visit www>>>.ruffloverescue<<<.com/adopt to make this pup a member",
+            "/tick and heartworm preventative. Visit www.>>>ruffloverescue.<<<com/adopt to make this pup a member of",
+            " rains.http://www.zenfolio.com>>>/bdimages/<<<f147112090"
+          ],
+          "top_activations": [
+            0.03811964392662048,
+            0.03790993615984917,
+            0.037739310413599014,
+            0.03767653927206993,
+            0.03754880651831627
+          ]
+        },
+        {
+          "feat_idx": 72,
+          "concentration": 0.21962761943961967,
+          "mass": 0.33376967906951904,
+          "content_fraction": 1.0,
+          "top_texts": [
+            "OC FOR 4231/ITA/>>>OEENIS/NIS<<<D/CLUCYK\nEO 12",
+            " FOR 4231/ITA/OE>>>ENIS/NISD<<</CLUCYK\nEO 129",
+            "\nUSDOC FOR 4231/>>>ITA/OEENIS<<</NISD/CLUCYK\nEO ",
+            "USDOC FOR 4231/ITA>>>/OEENIS/<<<NISD/CLUCYK\nEO 1",
+            "AU\nUSDOC FOR 4231>>>/ITA/OEEN<<<IS/NISD/CLUCYK\nEO"
+          ],
+          "top_activations": [
+            0.034364085644483566,
+            0.034337569028139114,
+            0.033851027488708496,
+            0.0337158665060997,
+            0.03350492939352989
+          ]
+        },
+        {
+          "feat_idx": 2198,
+          "concentration": 0.2542248375248002,
+          "mass": 0.3302594665437937,
+          "content_fraction": 1.0,
+          "top_texts": [
+            " without pulling the, \"ButThat'sOk>>>LifeIsGoodAndI<<<'mHappy,\" drawstring to wrap it up tid",
+            " day without pulling the, \"ButThat's>>>OkLifeIsGoodAnd<<<I'mHappy,\" drawstring to wrap it up",
+            " pulling the, \"ButThat'sOkLife>>>IsGoodAndI'<<<mHappy,\" drawstring to wrap it up tidily",
+            ", \"ButThat'sOkLifeIsGood>>>AndI'mHappy<<<,\" drawstring to wrap it up tidily at the",
+            " the, \"ButThat'sOkLifeIs>>>GoodAndI'm<<<Happy,\" drawstring to wrap it up tidily at"
+          ],
+          "top_activations": [
+            0.03709730505943298,
+            0.036502908915281296,
+            0.03527655825018883,
+            0.03502150624990463,
+            0.034700073301792145
+          ]
+        },
+        {
+          "feat_idx": 4406,
+          "concentration": 0.2257036403045219,
+          "mass": 0.3176828268915415,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ", RBOUDREAU\nUSDOC FOR >>>4231/<<<ITA/OEENIS/NISD/CL",
+            "OUDREAU\nUSDOC FOR 42>>>31/ITA/<<<OEENIS/NISD/CLUCYK",
+            " RBOUDREAU\nUSDOC FOR 4>>>231/ITA<<</OEENIS/NISD/CLUC",
+            "DREAU\nUSDOC FOR 423>>>1/ITA/OE<<<ENIS/NISD/CLUCYK\n",
+            "USDOC FOR 4231/ITA>>>/OEENIS/<<<NISD/CLUCYK\nEO 1"
+          ],
+          "top_activations": [
+            0.033243417739868164,
+            0.032711874693632126,
+            0.0320994071662426,
+            0.03184795752167702,
+            0.031790196895599365
+          ]
+        },
+        {
+          "feat_idx": 13133,
+          "concentration": 0.23648710918696553,
+          "mass": 0.31591493263840675,
+          "content_fraction": 1.0,
+          "top_texts": [
+            " without pulling the, \"ButThat'sOk>>>LifeIsGoodAndI<<<'mHappy,\" drawstring to wrap it up tid",
+            " day without pulling the, \"ButThat's>>>OkLifeIsGoodAnd<<<I'mHappy,\" drawstring to wrap it up",
+            ", \"ButThat'sOkLifeIsGood>>>AndI'mHappy<<<,\" drawstring to wrap it up tidily at the",
+            " my day without pulling the, \"ButThat'>>>sOkLifeIsGood<<<AndI'mHappy,\" drawstring to wrap it",
+            " the, \"ButThat'sOkLifeIs>>>GoodAndI'm<<<Happy,\" drawstring to wrap it up tidily at"
+          ],
+          "top_activations": [
+            0.03429229557514191,
+            0.033935245126485825,
+            0.03291761502623558,
+            0.03262611851096153,
+            0.03199895843863487
+          ]
+        },
+        {
+          "feat_idx": 17979,
+          "concentration": 0.2344667649184534,
+          "mass": 0.3152164239436388,
+          "content_fraction": 1.0,
+          "top_texts": [
+            "Vicair Active O2\n>>>FOR THE ACTIVE WHEELCHAIR<<< USER\nO2 Machine Washable | 10",
+            " the Press Release:\nFANBASE PRESS PLUM>>>BS THE DEPTHS OF<<< CREATIVITY IN \u2018THE MARGINS\u2019\nLOS",
+            "NEVER>>> TRUST A SKINNY CUP<<<CAKE BAKER\nBook 1 of the Death",
+            "Vicair Active O2\nFOR>>> THE ACTIVE WHEELCHAIR USER<<<\nO2 Machine Washable | 100",
+            " Press Release:\nFANBASE PRESS PLUMBS>>> THE DEPTHS OF CREAT<<<IVITY IN \u2018THE MARGINS\u2019\nLOS ANGELES"
+          ],
+          "top_activations": [
+            0.034455977380275726,
+            0.03286230191588402,
+            0.032458752393722534,
+            0.03230588510632515,
+            0.031105104833841324
+          ]
+        },
+        {
+          "feat_idx": 11071,
+          "concentration": 0.268267363107773,
+          "mass": 0.3140655718743801,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ", Marc and Bost, Adelphe and Furian>>>, Sonia and Kumar,<<< MS Mohan and Kumar, C and Braun, Jean",
+            " and Furian, Sonia and Kumar, MS Mohan>>> and Kumar, C and<<< Braun, Jean-Jacques (2007",
+            " Series has brought back to life names like Kotani>>>; Kobayashi;Yoda;<<<Ichijima; Samura; Tokuyama",
+            "itres, Marc and Bost, Adelphe and F>>>urian, Sonia and Kumar<<<, MS Mohan and Kumar, C and Braun,",
+            " Marc and Bost, Adelphe and Furian,>>> Sonia and Kumar, MS<<< Mohan and Kumar, C and Braun, Jean-"
+          ],
+          "top_activations": [
+            0.0350886695086956,
+            0.033910199999809265,
+            0.03166484832763672,
+            0.03153020143508911,
+            0.03100275807082653
+          ]
+        },
+        {
+          "feat_idx": 15232,
+          "concentration": 0.2408453608882824,
+          "mass": 0.312280610203743,
+          "content_fraction": 1.0,
+          "top_texts": [
+            "12958 DECL: 1>>>2/10/<<<2018\nTAGS EINV, EN",
+            "EO 12958 DECL:>>> 12/1<<<0/2018\nTAGS EINV",
+            ".\nConsumer enquiries (1-800>>>-932-<<<9326)\nOur Consumer Relations department",
+            " 12958 DECL: >>>12/10<<</2018\nTAGS EINV,",
+            "\nEO 12958 DECL>>>: 12/<<<10/2018\nTAGS E"
+          ],
+          "top_activations": [
+            0.03274716064333916,
+            0.03253994137048721,
+            0.032290760427713394,
+            0.031864773482084274,
+            0.030824849382042885
+          ]
+        },
+        {
+          "feat_idx": 16356,
+          "concentration": 0.24309784065797718,
+          "mass": 0.3117417711764574,
+          "content_fraction": 1.0,
+          "top_texts": [
+            " Water Sportsman.\nwww.ask.com>>>/youtube?q=<<<Basic Saltwater Fishing Tips&v=nGAR",
+            "): Free HD videos here http://www.re>>>capped.com/sarah<<<-silverman-and-michelle-williams-",
+            "taronis-technologies-inc-trnx>>>-is-set-<<<to-bring-smile-on-the-",
+            "This website (http>>>://www.crownwatch<<<blog.com), the related web pages contained herein",
+            " for details \u2013 vist the website for more information http>>>://waynepaulward.<<<es/"
+          ],
+          "top_activations": [
+            0.032321035861968994,
+            0.03196562081575394,
+            0.03136085718870163,
+            0.031306035816669464,
+            0.031142324209213257
+          ]
+        },
+        {
+          "feat_idx": 7720,
+          "concentration": 0.24508407218501455,
+          "mass": 0.3096396643668413,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ", 2011, at Liberty Cemetery>>> with ministers Alton and Wilfred<<< Baker officiating.\nMr. Beckhusen died",
+            " 2011, at Liberty Cemetery with>>> ministers Alton and Wilfred Baker<<< officiating.\nMr. Beckhusen died Monday",
+            "7 in St. Joseph, Missouri the first child>>> of Bessie Wilcox and Louis<<< Ryse. Juanita was an independent woman who lived",
+            "., died Wednesday. Davenport-McLendon Mortuary.>>> Mrs. Mary A.<<< Brown, Thomson, Ga., died Wednesday. Thomson",
+            ".\nRoss, 37, whose legal>>> name is William L.<<< Roberts, and his passenger, fashion designer Shateria"
+          ],
+          "top_activations": [
+            0.035086821764707565,
+            0.03215523064136505,
+            0.0315021388232708,
+            0.03104320727288723,
+            0.030842244625091553
+          ]
+        },
+        {
+          "feat_idx": 7089,
+          "concentration": 0.26665192730658316,
+          "mass": 0.3067747950553894,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ".\nLEADERS: Beka27 B>>>inkyBunny Kokaneeand<<<Kahlua LBJ10 LittlePuffy",
+            " KokaneeandKahlua LBJ10>>> LittlePuffyTail Long<<<EaredLions MoveDiagonally RabbitPam Sar",
+            " like Kotani; Kobayashi;Yoda;Ichij>>>ima; Samura;<<< Tokuyama and Otaki. Names that would",
+            "Bunny KokaneeandKahlua LBJ1>>>0 LittlePuffyTail<<< LongEaredLions MoveDiagonally RabbitPam",
+            "PuffyTail LongEaredLions MoveDiagon>>>ally RabbitPam Sarita<<<\nLooking for a carrier for Cyrus-Bunny."
+          ],
+          "top_activations": [
+            0.03288440778851509,
+            0.0314350388944149,
+            0.03129424527287483,
+            0.031174493953585625,
+            0.03104834072291851
+          ]
+        },
+        {
+          "feat_idx": 18010,
+          "concentration": 0.25154590327260984,
+          "mass": 0.3060499858111143,
+          "content_fraction": 1.0,
+          "top_texts": [
+            "Bunny KokaneeandKahlua LBJ1>>>0 LittlePuffyTail<<< LongEaredLions MoveDiagonally RabbitPam",
+            " Paul L. Blackaby, David H. Sloane>>>, Peter J.\n<<<Year of Publication:\nIZA Discussion paper series ",
+            " KokaneeandKahlua LBJ10>>> LittlePuffyTail Long<<<EaredLions MoveDiagonally RabbitPam Sar",
+            "inkyBunny KokaneeandKahlua LBJ>>>10 LittlePuffy<<<Tail LongEaredLions MoveDiagonally Rabbit",
+            "th April, 2005\nS>>>.R.O (<<<I)/2005.- In pursuance of"
+          ],
+          "top_activations": [
+            0.031765419989824295,
+            0.03172970563173294,
+            0.03153463453054428,
+            0.030504649505019188,
+            0.030465487390756607
+          ]
+        },
+        {
+          "feat_idx": 7416,
+          "concentration": 0.23791136154054238,
+          "mass": 0.2991985771805048,
+          "content_fraction": 1.0,
+          "top_texts": [
+            " day without pulling the, \"ButThat's>>>OkLifeIsGoodAnd<<<I'mHappy,\" drawstring to wrap it up",
+            " without pulling the, \"ButThat'sOk>>>LifeIsGoodAndI<<<'mHappy,\" drawstring to wrap it up tid",
+            " my day without pulling the, \"ButThat'>>>sOkLifeIsGood<<<AndI'mHappy,\" drawstring to wrap it",
+            " sample of her writing on the topic of optimism.>>>\n* * *\n<<<If you\u2019re craving a quick hit of optimism",
+            " pulling the, \"ButThat'sOkLife>>>IsGoodAndI'<<<mHappy,\" drawstring to wrap it up tidily"
+          ],
+          "top_activations": [
+            0.03285261616110802,
+            0.032572176307439804,
+            0.031127972528338432,
+            0.030513674020767212,
+            0.02993895672261715
+          ]
+        },
+        {
+          "feat_idx": 18274,
+          "concentration": 0.2513588373324112,
+          "mass": 0.2965158689767122,
+          "content_fraction": 1.0,
+          "top_texts": [
+            " without pulling the, \"ButThat'sOk>>>LifeIsGoodAndI<<<'mHappy,\" drawstring to wrap it up tid",
+            " day without pulling the, \"ButThat's>>>OkLifeIsGoodAnd<<<I'mHappy,\" drawstring to wrap it up",
+            ", \"ButThat'sOkLifeIsGood>>>AndI'mHappy<<<,\" drawstring to wrap it up tidily at the",
+            " pulling the, \"ButThat'sOkLife>>>IsGoodAndI'<<<mHappy,\" drawstring to wrap it up tidily",
+            " the, \"ButThat'sOkLifeIs>>>GoodAndI'm<<<Happy,\" drawstring to wrap it up tidily at"
+          ],
+          "top_activations": [
+            0.03358102962374687,
+            0.033201586455106735,
+            0.03247979283332825,
+            0.032154764980077744,
+            0.03215378150343895
+          ]
+        },
+        {
+          "feat_idx": 6935,
+          "concentration": 0.2509121518909004,
+          "mass": 0.29386454448103905,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ".\nPlease call 1.888>>>.222.<<<7639 to speak with a Customer Service",
+            "4231/ITA/OEENIS>>>/NISD/CL<<<UCYK\nEO 12958",
+            " 4231/ITA/OEEN>>>IS/NISD/<<<CLUCYK\nEO 1295",
+            "USDOC FOR 4231/ITA>>>/OEENIS/<<<NISD/CLUCYK\nEO 1",
+            ".\nConsumer enquiries (1-800>>>-932-<<<9326)\nOur Consumer Relations department"
+          ],
+          "top_activations": [
+            0.031278591603040695,
+            0.030490314587950706,
+            0.03031737171113491,
+            0.029715022072196007,
+            0.0290855523198843
+          ]
+        }
+      ]
+    },
+    "tfa_pos_pred": {
+      "raw_top15_by_mass": [],
+      "content_within_raw_top15": [],
+      "top15_content_bearing_anyrank": []
+    }
+  },
+  "counts": {
+    "crosscoder": {
+      "total_features_with_conc": 18432,
+      "high_span_count": 17660,
+      "raw_top15": 15,
+      "content_within_raw_top15": 14
+    },
+    "tfa_pos": {
+      "total_features_with_conc": 300,
+      "high_span_count": 300,
+      "raw_top15": 15,
+      "content_within_raw_top15": 1
+    },
+    "tfa_pos_pred": {
+      "total_features_with_conc": 300,
+      "high_span_count": 0,
+      "raw_top15": 0,
+      "content_within_raw_top15": 0
+    }
+  }
+}
