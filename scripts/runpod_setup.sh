@@ -25,7 +25,7 @@ uv --version
 echo ">> uv sync (resolves pyproject.toml + lockfile)..."
 uv sync
 
-echo ">> Creating .env template (you'll need to fill it in)..."
+echo ">> Ensuring .env has all required variables..."
 if [ ! -f .env ]; then
     cat > .env <<'ENV'
 # RunPod environment variables — sourced by scripts/runpod_activate.sh.
@@ -54,7 +54,31 @@ export TRANSFORMERS_CACHE="$HF_HOME"
 ENV
     echo "   Created .env template — edit it with your keys."
 else
-    echo "   .env already exists, leaving it."
+    echo "   .env exists — appending any missing variables."
+    # Idempotent: append only the var-block for any VAR not already
+    # defined in .env. Preserves existing values; never overwrites.
+    ensure_var() {
+        local var="$1"
+        local default_value="$2"
+        local comment="$3"
+        if ! grep -qE "^export ${var}=" .env; then
+            {
+                echo ""
+                [ -n "$comment" ] && echo "# $comment"
+                echo "export ${var}=\"${default_value}\""
+            } >> .env
+            echo "   + added ${var}"
+        fi
+    }
+    ensure_var ANTHROPIC_API_KEY "" "Anthropic API key"
+    ensure_var HF_TOKEN "" "HuggingFace token"
+    ensure_var HUGGING_FACE_HUB_TOKEN "\$HF_TOKEN" "HF alias (reads HF_TOKEN)"
+    ensure_var WANDB_API_KEY "" "Weights & Biases API key"
+    ensure_var WANDB_PROJECT "temporal-crosscoders" "W&B project name"
+    ensure_var WANDB_ENTITY "" "W&B entity (personal if blank; team handle otherwise)"
+    ensure_var WANDB_GROUP "" "W&B run group (orchestrator sets this per launch)"
+    ensure_var HF_HOME "/workspace/.cache/huggingface" "HF cache dir on persistent volume"
+    ensure_var TRANSFORMERS_CACHE "\$HF_HOME" "transformers cache alias"
 fi
 
 mkdir -p "/workspace/.cache/huggingface" data/cached_activations reports results/nlp logs
