@@ -35,94 +35,103 @@ Full-resolution: `results/nlp_sweep/gemma/figures/txcdr_vs_tfa_hero.png`.
 
 ## Does TXCDR extract substantially different temporal features from TFA? — focused on high-span features
 
+> **TL;DR.** Yes, the two archs find substantially different high-span
+> features. **TXCDR's are corpus-general and content-bearing
+> (dates, phrase starts, list delimiters). TFA novel's are
+> passage-local — mostly padding-fire artifacts near sequence ends,
+> with a thin residue of same-passage URL / code-fragment detectors.**
+> Of the top-15 high-span features ranked by activation mass:
+> Crosscoder has 14/15 content-bearing, TFA novel has 1/15, TFA pred
+> has 0 high-span features at all. The figure below and the
+> side-by-side exemplar table are the readable versions of that claim.
+
 [![high-span comparison](../../../results/nlp_sweep/gemma/figures/high_span_comparison.doc.png)](../../../results/nlp_sweep/gemma/figures/high_span_comparison.png)
 
-**Yes — and TXCDR extracts better high-span features than TFA at this training scale.**
+### Headline comparison (top-15 high-span features per arch, by activation mass)
 
-A "high-span feature" here is one whose reconstruction contribution is
-spread across multiple positions of the T=5 window — temporal
-concentration `< 0.35` (where `1/T=0.2` means fully uniform spread,
-`1.0` means localized at one position). Concentration is measured
-differently per arch:
+| metric | Crosscoder (TXCDR) | TFA novel | TFA pred |
+|---|:---:|:---:|:---:|
+| high-span feats in top 15 | 15 | 15 | 0 |
+| …with *content-bearing* exemplars (≥60% non-empty) | **14 (93 %)** | **1 (7 %)** | 0 |
+| dominant content type | dates · phrase starts · list delimiters · botanical enum | repeated URL fragment inside one chain | — |
+| document-general? | ✅ | ❌ (same-passage only) | — |
+| interpretable by Claude Haiku? | ✅ (45 / 50 labels clean) | ❌ (39 / 50 "unclear") | ✅ |
 
-- **Crosscoder** (decoder-based, model-inherent): for feature `f`, use
-  `||W_dec[f, t, :]||` across positions `t`. Most Crosscoder features
-  have nearly uniform decoder energy across the 5 positions — 95.8%
-  (17,660 / 18,432) pass the high-span threshold. This is a
-  structural property of how Crosscoder was trained (encoder pools the
-  whole window; decoder distributes back).
-- **TFA novel / pred** (activation-based, data-dependent): per-feature
-  mean over top-10 exemplars of `max_pos / sum_pos` of the per-position
-  novel (or pred) activation. 100% of the top-300 novel features and
-  0% of top-300 pred features are high-span.
+### The feature flavors side by side
 
-### The critical filter: does the feature actually detect content?
+**Crosscoder high-span (representative, content-bearing):**
 
-Raw high-span counts are misleading for TFA novel because its top
-features often fire on *padding / empty-window tokens* at sequence
-ends. Decoded windows come back as `>>><<<` (empty). Filtering to
-features where ≥60% of top-5 exemplars have non-empty `>>>…<<<`
-payload gives the real story:
+| feat | concentration | top-3 exemplar windows |
+|---:|---:|---|
+| 17925 | 0.31 | `>>>David Harder,<<< DVM, Medical Director` · `>>>To correct this<<< error: - Uninstall` · `>>>The Armor S<<<2000 is a concentrated sodium silicate` |
+| 11796 | 0.33 | `>>>Wotan had taken<<< away her immortality` · `>>>Airline approved Expandal<<<be soft-side Foldabel Pet Bag` · `>>>Crucified With<<< Christ by Nan Doud` |
+| 15524 | 0.20 | `petiolelike; cauline 0-several>>>, sometimes proximalmost appearing<<<` · `Leaves sessile; basal persistent or withering by flowering>>>, solitary, blade base<<<` · `-reticulate. Stems scapelike or leafy>>>, simple or branched,<<< glabrous` |
+| 15214 | 0.26 | `>>>Monday will start<<< off cool as a Delta breeze` · `>>>joined 5<<< years ago` · `>>>Wednesday, April<<< 1, 2015` |
 
-| arch | raw high-span (top-15) | content-bearing | example content |
-|---|---:|---:|---|
-| **Crosscoder** | 15 | **14 (93%)** | dates, phrase starts, list delimiters, botanical enumeration |
-| TFA novel | 15 | **1 (7%)** | same URL fragment `=nGARvZT_nCw` across sliding windows of one chain |
-| TFA pred | 0 | 0 | (no high-span features) |
+Each row is *one feature with exemplars from different documents* —
+corpus-general detectors for sentence-start names, topic openers,
+comma-delimited enumerations, and date expressions.
 
-### The kinds of high-span features each arch actually finds
+**TFA novel high-span (the single content-bearing feature):**
 
-**Crosscoder high-span examples (content-bearing):**
-- feat 17925, 3961: sentence-openers across documents (`"David Harder,"`, `"To correct this"`, `"The Armor S"`)
-- feat 11796: topic-opener phrases (`"Wotan had taken"`, `"Airline approved Expandal"`, `"Crucified With"`)
-- feat 15524: botanical enumeration delimiters (`", sometimes proximalmost appearing"`, `", solitary, blade base"`)
-- feat 15214: dates / days (`"Monday will start"`, `"Wednesday, April"`, `"joined 5"`)
+| feat | concentration | top-3 exemplar windows |
+|---:|---:|---|
+| 6333 | 0.23 | `q=Basic Saltwater Fishing Tips&v=>>>nGARvZT_<<<nCw` · `?q=Basic Saltwater Fishing Tips&v>>>=nGARvZT<<<_nCw` · `flea/tick and heartworm preventative. Visit www>>>.ruffloverescue<<<.com/adopt` |
 
-**TFA novel high-span example (the one content-bearing feature):**
-- feat 6333: URL path fragments — fires on `=nGARvZT_` at window_start 78, then at ws=77 on `=nGARvZT`, i.e. the *same URL* appearing in three sliding windows of the same chain.
+Three "exemplars" but the first two are **the same URL in the same
+chain**, caught by the sliding window at consecutive positions. That's
+the TFA-novel pattern: detect one specific multi-token substring
+somewhere in one passage, then light up as the window slides over it.
+Not a feature library — a passage-specific spike detector.
 
-So TXCDR's high-span features genuinely detect cross-position patterns
-that recur across many documents. TFA novel's "high-span" behavior
-is almost entirely an artifact of firing on padding near sequence
-ends; when filtered to features that actually activate on visible
-content, the same URL-fragment story from the main analysis comes
-back — a *single passage's URL detected by one feature across
-overlapping windows*, not a generalizable multi-token pattern.
+The other 14 of TFA novel's top-15 high-span features have exemplar
+windows that decode to empty strings (`>>><<<`) — they fire on
+end-of-sequence padding where the "spread across positions" comes
+from uniform activation on pad tokens, not from detecting a real
+multi-token pattern.
 
-### What this means
+### How "high-span" is defined
 
-- The user's conjecture (`optimal_k(TXCDR) >> optimal_k(SAE)`) was a
-  *reconstruction* conjecture. It says nothing about feature quality.
-- On the feature-quality axis that matters for autointerp — *does a
-  high-span feature detect a recurring multi-token pattern across the
-  corpus?* — **TXCDR wins cleanly** at this training scale.
-- TFA's novel-code library does detect something real (URL fragments,
-  tokenization-boundary phenomena per analysis 4), but it's
-  passage-local, not corpus-general; and many of its "high span"
-  features are padding-fire artifacts.
-- TFA's pred library is not high-span — its features localize at
-  window boundaries (position 0 and 4). So TFA's "temporal"
-  behavior, in the sense of features that span the window, lives
-  entirely in novel_codes and is currently dominated by artifacts.
+A high-span feature has temporal concentration `< 0.35`
+(where `1/T=0.2` is uniform spread and `1.0` is fully localized).
+Concentration is measured *differently* per arch — this is the
+biggest interpretational caveat:
 
-### Caveats specific to this finding
+- **Crosscoder (TXCDR)** — *decoder-based*, data-independent:
+  for feature `f`, use `||W_dec[f, t, :]||` across positions `t`.
+  95.8% of features (17,660 / 18,432) pass the threshold. This is a
+  structural property of Crosscoder's training (encoder pools across
+  the window; decoder distributes back). Taken strictly, "all
+  Crosscoder features are temporal" is nearly tautological — what
+  saves the comparison is the *content filter* below.
+- **TFA novel / pred** — *activation-based*, data-dependent:
+  per-feature mean over top-10 exemplars of `max_pos / sum_pos` of
+  the per-position novel (or pred) activation. 100% of TFA novel
+  and 0% of TFA pred pass the threshold.
+
+### The critical filter
+
+Raw high-span counts oversell TFA novel because its activation often
+peaks on sequence-end *padding tokens* that decode to empty strings
+(`>>><<<`). Filter: ≥60% of a feature's top-5 exemplars must have
+non-empty `>>>…<<<` payload. After filtering, the numbers in the
+headline table above are what's left. The side-by-side exemplar
+tables make the qualitative difference concrete.
+
+### Caveats
 
 - TFA-pos at k=50 had NMSE=0.1246 (vs stacked 0.06, crosscoder 0.08)
-  and its k=100 run diverged even with the NaN-prevention patch. So
-  TFA is under-trained relative to the other archs; the novel-code
-  feature quality may improve with a longer schedule, smaller LR, or
-  a different `lam` normalization.
-- The Crosscoder "95.8% high-span" number is *decoder-based* and
-  therefore a model-geometry claim, not a data-driven one. What it
-  says is that Crosscoder spreads reconstruction uniformly across the
-  window — a structural consequence of training with k×T=250 active
-  latents per window and a decoder indexed by position. If you
-  interpret that strictly, "all Crosscoder features are temporal" is
-  nearly tautological.
-- What saves the comparison is the *content filter*. After requiring
-  non-empty payload, 14/15 Crosscoder features have clear
-  cross-passage patterns while only 1/15 TFA novel features do. That
-  asymmetry is what the headline is about.
+  and its k=100 run diverged even with the v2 NaN-prevention patch.
+  So TFA is *under-trained* relative to the other archs; the
+  novel-code feature library might get better with a longer
+  schedule, smaller LR, or a different `lam` normalization.
+- The Crosscoder high-span count is *decoder-based* and reports a
+  model-geometry fact (Crosscoder spreads reconstruction uniformly
+  across the window). TFA novel's is *activation-based* and
+  reports what happens on real data. They aren't the same axis;
+  the content filter is what makes them comparable.
+- Single layer, single `k`. Could look different at `resid_L13`,
+  at `k=100`, or with shuffled-sequence training as a control.
 
 ## Method
 
@@ -335,21 +344,26 @@ per-position decoders at position 0 (TFA's D is position-shared):
 
 Three architectures, three distinct feature-discovery profiles:
 
-| property | stacked_sae | crosscoder | tfa_pos |
+| property | stacked_sae | crosscoder (TXCDR) | tfa_pos |
 |---|---|---|---|
 | Latent capacity used | 86% | 16% (tight core) | 85% novel + 42% pred (disjoint) |
 | Per-position behavior | Independent per-position SAEs | Shared latent, position-weighted decode | Shared decoder; novel spreads across pos, pred peaks at boundaries |
 | Feature locality | Document-general | Document-general | Novel: **passage-local**. Pred: document-general. |
 | Decoder alignment with others | ~340 shared with crosscoder at pos 0 | ~340 shared with stacked at pos 0 | **Disjoint from both** |
-| Where "temporal features" (spread across positions) live | Impossible by construction | Not per-position observable; single z per window | Novel codes (unique among archs) |
+| High-span features that are **content-bearing** (of top-15) | N/A (position-trivial) | **14 / 15** (dates, phrase starts, enumeration, etc.) | 1 / 15 (single-passage URL fragment) |
+| High-span features that are **artifacts** | N/A | 1 / 15 (near-empty) | 14 / 15 (padding-fire) |
 
-TFA's novel codes are the **only features in the sweep that span multiple
-token positions within a single window**. They detect specific multi-
-token phenomena (URLs, codes, camelcase) that stacked/crosscoder handle
-via separate per-position features. This is the value-add TFA provides
-to the feature library — even with its weaker reconstruction (NMSE 0.12
-vs stacked 0.06, crosscoder 0.08), it surfaces multi-token structure
-the others don't.
+The earlier framing — that TFA novel uniquely spans multiple positions
+— is literally true by the activation-spread metric, but **TFA
+novel's span is mostly padding artifacts at this training scale**.
+When the content filter is applied, TXCDR produces ~14× more
+content-bearing high-span features than TFA novel. The architectural
+mechanism is different (TFA uses causal attention, TXCDR pools across
+the window in the encoder), and the one TFA novel feature that
+survives the content filter detects URL fragments within a single
+passage — a kind of feature TXCDR wouldn't fire on, but also a kind
+that appears in only one document rather than recurring across the
+corpus.
 
 ## Follow-up: LLM explainer (analysis 4)
 
@@ -437,8 +451,6 @@ generalize enough across 10 exemplars for the LLM to abstract.
 
 ## Synthesis
 
-The four analyses together paint a consistent picture:
-
 1. **stacked_sae** and **crosscoder** learn largely overlapping feature
    libraries detecting high-level content: sequence starts, named
    entities, topic transitions. Their decoders share ~340 features at
@@ -449,32 +461,54 @@ The four analyses together paint a consistent picture:
      extra stacked/crosscoder library — same semantic categories,
      same document-general pattern — just driven by attention rather
      than a per-token linear encoder.
-   - *novel_codes* (sparse, topk=50): unique to TFA. Spreads across
-     all T positions of the window (the only place "temporal
-     features" genuinely exist in this sweep). Specializes in
-     tokenization-boundary anomalies. Passage-local because these
-     anomalies are specific to particular strings. Decoder basis
-     orthogonal to the other archs.
+   - *novel_codes* (sparse, topk=50): unique to TFA. Its activation
+     does spread across all T positions by the concentration metric,
+     but the exemplar content is dominated by padding-fire behavior;
+     the sliver of content-bearing novel features detects
+     tokenization-boundary anomalies (URLs, CamelCase breaks,
+     diplomatic codes) that are passage-specific rather than
+     corpus-general. Decoder basis orthogonal to the other archs.
 
-**The research-question answer**: TFA does find feature types the other
-archs miss — but it's not the features we expected. The conjecture was
-that temporal architectures would exploit cross-token semantics. What
-TFA actually captures is cross-token *tokenization structure* — a
-different kind of temporal pattern, useful for a different reason
-(robustness to subword tokenization artifacts).
+**Research-question answer.** The user's conjecture was a
+reconstruction claim (`optimal_k(TXCDR) >> optimal_k(SAE)`) that says
+nothing about feature quality. On the feature-quality axis that
+matters for autointerp — *do high-span features detect recurring
+multi-token patterns across the corpus?* — **TXCDR wins cleanly at
+this training scale**. TXCDR's high-span features are content-bearing
+(dates, enumerations, phrase starts), 45/50 get clean LLM labels. TFA
+novel's high-span features are 93% padding artifacts and 1 URL
+fragment per passage — the LLM labels 39/50 as "unclear".
+
+TFA does find something the other archs miss: the tokenization-
+boundary detector family. But these are *passage-local* and
+individually low-mass — they are not the "temporal features" the
+conjecture anticipated. It's a different kind of temporal pattern
+(single-passage multi-token substring detection) with a different
+utility (robustness to BPE splits, URL-structure awareness).
+
+Whether the current verdict holds up: caveats are TFA's under-
+training (NMSE 0.12 vs stacked 0.06), the different concentration
+metrics for TXCDR (decoder-based) vs TFA (activation-based), and the
+single-layer / single-k / unshuffled-only scope.
 
 ## Next steps
-2. **Second layer (resid_L13)** — rerun the sweep invocation 3 (unshuffled
-   L13, ~8h), then repeat analyses 1–3 on a shallower layer. Probably
-   different feature types (more syntactic vs L25's more semantic).
-3. **Generalize TFA pred-analysis** — apply the same novel/pred split to
-   TFA without positional encoding (`tfa`), and on shuffled-training
-   checkpoints to confirm pred's generalization advantage is
-   architectural not data-dependent.
-4. **Reliability of TFA novel codes** — given TFA's weaker NMSE and
-   the fragile training dynamics (NaN risks fixed by `proj_scale.clamp`
-   + grad-finiteness check), check whether the passage-local novel
-   features survive a longer-training or smaller-LR re-train.
+
+1. **Retrain TFA-pos with better stability** (smaller LR, larger
+   batch, or a revised `lam` normalization) and re-run the high-span
+   analysis. The headline verdict above is tied to TFA's weak
+   reconstruction at this checkpoint; more stable TFA training could
+   change whether its novel features surface real corpus-general
+   multi-token patterns or stay passage-local.
+2. **Second layer (resid_L13)** — rerun the sweep invocation 3
+   (unshuffled L13, ~8h), then repeat analyses 1–4 on a shallower
+   layer. Likely different feature types (more syntactic vs L25's
+   more semantic).
+3. **Shuffled-sequence controls** — we have 3 shuffled-training
+   k=50 checkpoints. Re-run high-span analysis on them: if TFA
+   novel's high-span behavior survives shuffling, the "temporal"
+   mechanism is architectural, not data-driven.
+4. **Generalize TFA pred-analysis** — apply the novel/pred split to
+   TFA without positional encoding (`tfa`) as well as `tfa_pos`.
 
 ## Files
 
