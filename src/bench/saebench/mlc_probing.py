@@ -189,71 +189,65 @@ def run_mlc_probing(
         class_names = sorted(train_data.keys())
         per_class_test_accs: dict[int, list[float]] = {kv: [] for kv in k_values}
 
+        # Encode every unique text ONCE, keyed by (split, class_idx_within_class).
+        # Previously we re-encoded each text ~N_classes times (each text serving
+        # as a negative for every other class). At 28 classes that was a 28×
+        # Gemma-forward overhead per dataset. Now: encode once, per-class
+        # label-masks are cheap.
+        def encode_flat(texts):
+            feats_out = []
+            for i in range(0, len(texts), batch_size):
+                chunk = texts[i : i + batch_size]
+                toks = llm.to_tokens(chunk, prepend_bos=True)
+                toks = toks[:, :CONTEXT_LENGTH]
+                pad_id = getattr(llm.tokenizer, "pad_token_id", 0) or 0
+                bos_id = getattr(llm.tokenizer, "bos_token_id", 2) or 2
+
+                stacked = _collect_multi_layer_activations(
+                    llm, toks, hook_names,
+                    mask_bos_pad=True, bos_token_id=bos_id, pad_token_id=pad_id,
+                )  # (B, L, n_layers, d_model)
+
+                with torch.no_grad():
+                    B, L, NL, D = stacked.shape
+                    flat = stacked.reshape(B * L, NL, D)
+                    z_flat = spec._encode_window(model, flat)
+                    z = z_flat.view(B, L, NL, -1)
+
+                z_agg = aggregate(z, aggregation)
+                token_mask = (toks != bos_id) & (toks != pad_id)
+                token_mask = token_mask.unsqueeze(-1).float()
+                pooled = (z_agg * token_mask).sum(dim=1) / token_mask.sum(dim=1).clamp(min=1)
+                feats_out.append(pooled.cpu())
+            return torch.cat(feats_out, dim=0)  # (N, d_sae_eff)
+
+        # Flatten into one long list per split; remember where each class lives.
+        def flatten_with_index(data_dict, class_names):
+            all_texts: list[str] = []
+            class_ids: list[int] = []
+            for ci, c in enumerate(class_names):
+                texts = data_dict[c]
+                all_texts.extend(texts)
+                class_ids.extend([ci] * len(texts))
+            return all_texts, np.array(class_ids, dtype=np.int64)
+
+        train_texts_all, train_cls = flatten_with_index(train_data, class_names)
+        test_texts_all, test_cls = flatten_with_index(test_data, class_names)
+        print(f"  encoding {len(train_texts_all)} train + "
+              f"{len(test_texts_all)} test texts through MLC "
+              f"(aggregation={aggregation})...")
+        t_enc = time.time()
+        train_feats = encode_flat(train_texts_all)  # (N_train, d_sae_eff)
+        test_feats = encode_flat(test_texts_all)    # (N_test,  d_sae_eff)
+        print(f"  encode took {time.time() - t_enc:.1f}s")
+
+        from sklearn.linear_model import LogisticRegression
         for class_idx, class_name in enumerate(class_names):
-            train_pos_texts = train_data[class_name]
-            test_pos_texts = test_data[class_name]
-            # Negative pool: all other classes combined
-            train_neg_texts = [
-                t for c, texts in train_data.items() if c != class_name for t in texts
-            ]
-            test_neg_texts = [
-                t for c, texts in test_data.items() if c != class_name for t in texts
-            ]
+            train_labels = (train_cls == class_idx).astype(np.int64)
+            test_labels = (test_cls == class_idx).astype(np.int64)
 
-            def encode_texts(pos_texts, neg_texts):
-                all_texts = list(pos_texts) + list(neg_texts)
-                labels = np.array([1] * len(pos_texts) + [0] * len(neg_texts))
-                # Tokenize in batches, hook Gemma, encode through MLC
-                feats_out = []
-                for i in range(0, len(all_texts), batch_size):
-                    chunk = all_texts[i : i + batch_size]
-                    # SAEBench's SparseProbingEvalConfig doesn't carry prepend_bos /
-                    # context_length; the stock pipeline hardcodes them. Mirror that
-                    # here. Gemma-2's tokenizer requires BOS, and our pre-registered
-                    # context length is 128 (configs.CONTEXT_LENGTH).
-                    toks = llm.to_tokens(chunk, prepend_bos=True)
-                    toks = toks[:, :CONTEXT_LENGTH]
-                    # pad token id for gemma-2-2b
-                    pad_id = getattr(llm.tokenizer, "pad_token_id", 0) or 0
-                    bos_id = getattr(llm.tokenizer, "bos_token_id", 2) or 2
-
-                    stacked = _collect_multi_layer_activations(
-                        llm, toks, hook_names,
-                        mask_bos_pad=True, bos_token_id=bos_id, pad_token_id=pad_id,
-                    )  # (B, L, n_layers, d_model)
-
-                    # Encode via MLC: treat the layer axis like TempXC's T
-                    with torch.no_grad():
-                        B, L, NL, D = stacked.shape
-                        # _encode_window treats the 2nd axis as the "window" axis
-                        flat = stacked.reshape(B * L, NL, D)
-                        z_flat = spec._encode_window(model, flat)  # (B*L, NL, d_sae)
-                        z = z_flat.view(B, L, NL, -1)
-
-                    # For MLC, aggregation operates on the layer axis.
-                    # Our aggregate() function treats the 3rd axis as "T",
-                    # so we pass (B, L, NL, d_sae) directly.
-                    z_agg = aggregate(z, aggregation)  # (B, L, d_sae_eff)
-
-                    # Mean-pool over non-zero (non-BOS/pad) positions
-                    token_mask = (toks != bos_id) & (toks != pad_id)
-                    token_mask = token_mask.unsqueeze(-1).float()
-                    pooled = (z_agg * token_mask).sum(dim=1) / token_mask.sum(dim=1).clamp(min=1)
-                    feats_out.append(pooled.cpu())
-                feats = torch.cat(feats_out, dim=0)  # (N, d_sae_eff)
-                return feats, labels
-
-            train_feats, train_labels = encode_texts(train_pos_texts, train_neg_texts)
-            test_feats, test_labels = encode_texts(test_pos_texts, test_neg_texts)
-
-            # For each k, select top-k features + fit probe + measure accuracy.
-            # SAEBench's train_probe_on_activations has a different multi-class
-            # contract (dict[class, Tensor]); for our one-vs-rest binary setup
-            # we just use sklearn's LogisticRegression directly — same thing
-            # SAEBench does internally for binary.
-            from sklearn.linear_model import LogisticRegression
             for kv in k_values:
-                # Class-separation score: mean difference between classes.
+                # Class-separation score on the pre-computed features.
                 pos_mean = train_feats[train_labels == 1].mean(dim=0)
                 neg_mean = train_feats[train_labels == 0].mean(dim=0)
                 score = (pos_mean - neg_mean).abs()
