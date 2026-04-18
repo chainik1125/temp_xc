@@ -27,6 +27,13 @@ log = logging.getLogger("scan_specific")
 
 
 def main():
+    import numpy as np
+    import torch
+    import random
+    np.random.seed(42)
+    torch.manual_seed(42)
+    random.seed(42)
+
     ap = argparse.ArgumentParser()
     ap.add_argument("--arch", required=True,
                     choices=["stacked_sae", "crosscoder", "tfa_pos", "tfa_pos_pred"])
@@ -64,12 +71,20 @@ def main():
         device=args.device,
     )
     log.info(f"[{args.arch}] scanning {args.sample_chains} chains...")
+    # Seed RIGHT before the scan (scan uses np.random.choice for chain
+    # sampling; tokenizer / text-context init advance the RNG state).
+    import numpy as _np
+    import torch as _torch
+    _np.random.seed(42)
+    _torch.manual_seed(42)
     finder.run()
 
-    wanted = set(args.feats)
-    found = [fi for fi in wanted if fi in finder.results]
-    missing = [fi for fi in wanted if fi not in finder.results]
-    log.info(f"[{args.arch}] requested {len(wanted)} feats;"
+    wanted_set = set(args.feats)
+    # Preserve --feats input order so downstream consumers (explain_features)
+    # see span-weighted rank, not set-iteration order.
+    found = [fi for fi in args.feats if fi in finder.results]
+    missing = [fi for fi in args.feats if fi not in finder.results]
+    log.info(f"[{args.arch}] requested {len(wanted_set)} feats;"
              f" found {len(found)} active, {len(missing)} dead in scan")
 
     out = {
@@ -81,7 +96,7 @@ def main():
         "top_k_per_feature": args.top_k,
         "d_sae": finder.d_sae,
         "num_active_features": len(finder.results),
-        "requested_feats": sorted(wanted),
+        "requested_feats": sorted(wanted_set),
         "dead_feats": sorted(missing),
         "features": {},
     }
