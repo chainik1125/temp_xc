@@ -1,6 +1,6 @@
 ---
 author: Han
-date: 2026-04-18
+date: 2026-04-19
 tags:
   - proposal
   - in-progress
@@ -15,6 +15,8 @@ This document briefs a fresh agent to pick up Phase 5. Read it top-to-bottom bef
 Phases 2--4 established that TXCDR recovers ground-truth features better than per-token SAEs at matched sparsity in toy settings (Phase 2, 3) and that on Gemma-2-2B-IT the three architectures fill disjoint regions of direction-space (Phase 4). None of these results demonstrate **downstream utility** --- whether TXCDR features are differentially useful for a concrete interpretability task.
 
 The motivating paper is `papers/are_saes_useful.md` (Kantamneni et al., 2025). Headline finding: on 113 probing datasets across four difficult regimes, SAE probes fail to beat baseline methods (logistic regression, PCA, KNN, XGBoost, MLPs) when matched against *strong* baselines. The one regime where SAEs *looked* useful --- detecting attributes distributed over multiple tokens --- collapses when attention-pooled baselines are added. This is Phase 5's ceiling: if a *temporal* SAE is useful, it should be useful *here*.
+
+**Phase 5 is the architectural-creativity phase of this project.** The toy benchmarks (Phases 2–3) and Gemma plumbing (Phase 4) are stable; `ArchSpec` plugs any new architecture into both toy and NLP sweeps with a few dozen lines. Phase 3 coupled-features toy validation runs in minutes, so new ideas can be filtered cheaply before they burn Gemma compute. Aniket's negative result does not close the door on temporal SAEs — it opens the door on temporal-SAE *variants*, and the right response is to try a lot of them. Treat the "Architecture menu" below as a starting set of seed ideas, not a complete list. Genuinely new designs — not on the list, not in the literature — are exactly the kind of contribution Phase 5 should produce. **Be ambitious about proposing architectures; be rigorous about evaluating them.** Those two do not trade off: rigor is what lets ambitious claims survive.
 
 ### What Aniket already did
 
@@ -60,7 +62,7 @@ Do not skip ahead. Each sub-phase's exit criteria guarantee the next sub-phase's
 - [ ] **Close architecture-layer infrastructure gaps** (see "Reference: Infrastructure audit" below). Port `l1_coeff` / `warmup_steps` / `weight_decay` into `CrosscoderSpec.train` and `StackedSAESpec.train`; add L1 penalty to `TFASpec.train` when `k=None`; add `match_stacked_budget: bool = True` flag to `CrosscoderSpec`; consolidate or delete `src/architectures/relu_sae.py`. Roughly 2--3 hours.
 - [ ] **Pre-register the plan** as `docs/han/research_logs/phase5_downstream_utility/plan.md`. Must contain: full architecture list, convergence protocol, per-architecture hyperparameter search budget, attention-pooled baseline protocol, success/failure criteria. Do not train any checkpoint before this is reviewed.
 
-*Entry:* all three reading-list items in the "Reading list" section read in full. *Exit:* leakage audit passed; infrastructure gaps closed; `plan.md` committed.
+*Entry:* "Reading list" items 1, 6, 7 read in full (the others are needed before later sub-phases but not 5.0). *Exit:* leakage audit passed; infrastructure gaps closed; `plan.md` committed.
 
 #### Sub-phase 5.1 — Convergence-corrected replication [P1]
 
@@ -83,15 +85,19 @@ Pins down *where on the capacity spectrum* the best architecture sits. Cheap: ha
 
 *Entry:* 5.0 infrastructure fixes landed. Can run in parallel with 5.1. *Exit:* six additional rows on the headline table.
 
-#### Sub-phase 5.3 — One novel architectural contribution [P1]
+#### Sub-phase 5.3 — Novel architectural contributions [P1]
 
-The paper's positive contribution regardless of outcome. Pick **exactly one** of the four primary extensions in "Reference: Architecture menu" below. Recommendation in order: Matryoshka-TXCDR (position-nested) > rotational decoder > causal TXCDR > Time×Layer joint crosscoder.
+The paper's positive contribution regardless of outcome. **At least one** genuinely novel architecture must appear in the headline table — this is the minimum bar. **Multiple novel architectures are explicitly encouraged.** The "Architecture menu" lists four seed ideas but you are not limited to them; each additional variant strengthens the paper by mapping the design space more densely, and the Phase 3 toy sandbox makes rapid iteration cheap. If you spot a design axis we haven't listed, build it.
 
-- [ ] Implement the chosen architecture under the existing `ArchSpec` interface.
-- [ ] **Ablate on Phase 3 coupled-features toy data first.** Cheap sanity check — if the variant fails there, it will fail on NLP too, and iterating on toy is 100× cheaper than on Gemma.
-- [ ] Run the SAEBench eval under the 5.1 protocol.
+Per-variant validation ladder (budget ~1 day toy, 1–2 days Gemma):
 
-*Entry:* 5.0 infrastructure fixes landed. Can run in parallel with 5.1 / 5.2. *Exit:* novel architecture has a row on the headline table and a toy-data ablation plot.
+- [ ] Implement under the existing `ArchSpec` interface.
+- [ ] **Validate on Phase 3 coupled-features toy data first.** Cheap sanity check — if the variant fails there, it will fail on NLP too, and iterating on toy is 100× cheaper than on Gemma. Skip to the next variant rather than debugging NLP failures.
+- [ ] For any variant that clears the toy check: run the SAEBench eval under the 5.1 protocol.
+
+Recommended starting order (pick one, add more as time allows): Matryoshka-TXCDR (position-nested) > rotational decoder > causal TXCDR > Time×Layer joint crosscoder. But if you have a better idea — one not on this list, one we missed — pursue it. The Phase 5 agent is not a technician running our menu; they are a co-author.
+
+*Entry:* 5.0 infrastructure fixes landed. Can run in parallel with 5.1 / 5.2. *Exit:* at least one novel architecture has a row on the headline table and a toy-data ablation plot; ideally more.
 
 #### Sub-phase 5.4 — Cross-token probing task [P1]
 
@@ -117,7 +123,7 @@ Candidates (in order of expected implementation effort):
 
 Only after 5.1–5.5 are complete.
 
-- Remaining primary architectural extensions not picked for 5.3 — e.g. if Matryoshka was picked, also run the rotational decoder as a secondary contribution.
+- **Additional architecture seeds not exhausted in 5.3** — any menu seed or open-axis idea from "Invent your own" that 5.3 didn't get to. The more variants on the headline table, the denser the design-space map.
 - **Layer robustness**: repeat the headline sweep at `resid_L13` on Gemma.
 - **More cross-token tasks**: if 5.4 picked coreference, add BLiMP; if 5.4 picked BLiMP, add reasoning-trace attributes.
 - **Scale to DeepSeek-R1-Distill-Llama-8B** for reasoning-trace probing — the most compelling test of the "temporal features matter for reasoning" thesis.
@@ -129,9 +135,9 @@ Only after 5.1–5.5 are complete.
 
 The remaining sections are a library the sub-phases above draw from. Skim on first read; consult the specific section when the corresponding sub-phase runs.
 
-### Reference: Architecture menu (primary extensions for 5.3)
+### Reference: Architecture menu (seed ideas for 5.3, not an exclusive list)
 
-Vanilla TXCDR has structural limitations worth addressing. Each is a candidate Phase 5 contribution; sub-phase 5.3 picks one:
+Vanilla TXCDR has structural limitations worth addressing. Below are **four seed ideas** to spark sub-phase 5.3, not a fixed menu. Treat them as starting points — if you see a promising variant we haven't sketched, build it. After the four primary candidates, an "Invent your own" subsection lists open design axes that could seed further variants.
 
 **1. Matryoshka-TXCDR (recommended primary).** Currently TXCDR applies a single TopK to a shared pre-activation summed over T positions. There is no mechanism to force *any* latent to carry per-position (local) signal. A Matryoshka variant forces prefixes of the latent vector to reconstruct sub-windows: first $m_1$ latents must reconstruct each position alone; the next $m_2$ latents extend to windows of size 2; and so on. This gives TXCDR an explicit place to put local-token information --- directly addressing Aniket's observation that "TempXC loses on language-ID and code detection where local-token information dominates."
 
@@ -157,6 +163,20 @@ The position-nested version is the more novel contribution.
 The rotational parameterization is the most novel candidate — clean geometric hypothesis, interpretable angular-velocity parameter, publishable on its own if it works.
 
 **Failure mode to watch.** Over-regularization collapses to Shared SAE (`W_dec⁽ᵗ⁾ ≈ W_dec⁽⁰⁾` for all `t`). Shared SAE already loses to MLC in Aniket's contest, so the sweet spot is "slowly varying but non-trivial."
+
+#### Invent your own — open design axes
+
+The four above are seed ideas we've already sketched. The Phase 5 agent is explicitly encouraged to propose variants we haven't thought of. Some open axes worth exploring:
+
+- **Different sparsity structures.** TopK at the window level is one choice; group-wise TopK (partition latents into groups, TopK within each), BatchTopK (sparsity over batch × position jointly), JumpReLU, and straight-through estimators all give different inductive biases. Any of these could be applied to TXCDR's shared latent.
+- **Different latent-sharing policies.** MLC shares across layers; vanilla TXCDR shares across positions. What about sharing across a *learned* dimension (contrastively grouping tokens into "shared context classes" and sharing latents within each class)? Across attention heads? Across token types (content vs. function words)?
+- **Hierarchical / multi-resolution latents.** Learn features at multiple time scales simultaneously — a small latent at T=5 plus a larger latent at T=20, with a cross-scale consistency penalty. Related to Matryoshka but orthogonal.
+- **Dynamics-based encoders.** Features evolve according to a learned latent dynamical system: `z_{t+1} = g(z_t, x_{t+1})` instead of being independently re-computed at each position. Continuous analog: neural ODE in feature space. Cleanly captures "same feature, changing state."
+- **Non-token-aligned windows.** Sentence-level, paragraph-level, or dynamically-segmented windows instead of fixed T-token windows. Requires a segmenter but may match the natural scale of temporal features better.
+- **Attention-based TXCDR encoders.** Between vanilla TXCDR (per-position linear matrices) and TFA (full multi-head attention) lies a family of lightweight attention encoders — a single head with fixed positional kernels, attention restricted to a local window, etc. This axis directly compares "how much attention machinery does a temporal SAE need?"
+- **Hybrid TFA × TXCDR.** TFA's pred head is dense and covers long range; TXCDR's shared latent is sparse and covers a short window. What if TFA's predictable component fed into a TXCDR-style sparse per-window decoder instead of a single shared dictionary? Nobody has tried.
+
+None of these are committed to. They are prompts. If one matches your intuition, build it and validate on the toy sandbox — at worst it's a cheap negative result, at best it's the paper.
 
 ### Reference: Weight-sharing ablation ladder (for sub-phase 5.2)
 
@@ -212,7 +232,7 @@ return TemporalCrosscoder(d_in, d_sae, self.T, k_eff)
 
 So when the sweep runner passes `k=5` to a `CrosscoderSpec(T=5)`, the resulting TXCDR has a TopK of **25** on its shared latent — not 5. This is the Phase-2 "TXCDRv2" convention (`k_win = k · T`, matching a Stacked SAE's total-window budget of T·k). A naive reading that "k=5 means 5 active features" is wrong for TXCDR under this spec. Under this convention, all architectures in a sweep row with the same `k` argument have the *same* `k_win` — which is what we want for a fair reconstruction comparison, but it means **TXCDR's raw `k` and the probing-study's `k` are not the same number**.
 
-The audit earlier in this brief recommends adding a `match_stacked_budget: bool = True` flag to expose the "unfair" alternative (`k_win = k`). Until that lands, **every TXCDR number produced by `CrosscoderSpec` is at `k_win = k · T`**, and this must be stated explicitly in every figure, table, and JSONL record.
+The "Reference: Infrastructure audit" section below recommends adding a `match_stacked_budget: bool = True` flag to expose the "unfair" alternative (`k_win = k`). Until that lands, **every TXCDR number produced by `CrosscoderSpec` is at `k_win = k · T`**, and this must be stated explicitly in every figure, table, and JSONL record.
 
 **Aniket's two sparsity protocols, translated:**
 
@@ -281,11 +301,11 @@ These are mechanical fixes, roughly two to three hours of work. Land them before
 
 ### Three possible outcomes and what each means
 
-- **TXCDR or a variant wins head-to-head against MLC on matched convergence + matched baselines.** Clean positive result for temporal SAEs; paper writes itself.
-- **MLC > TXCDR variants, but some TXCDR variant beats attention-pooled baseline on at least one cross-token task.** A nuanced positive: "layer-axis is better in general, but temporal-axis carries genuinely distinct information useful in specific regimes." Still publishable.
-- **MLC > everything temporal, and no TXCDR variant beats attention-pooled baselines on any task.** A negative result in the spirit of `are_saes_useful.md`. The paper becomes "temporal crosscoding over token positions is not a free win; layer-axis crosscoding is. Here is why, and here are three architectural attempts that didn't rescue it." This is still publishable and genuinely useful to the field.
+- **A TXCDR variant wins head-to-head against MLC on matched convergence + matched baselines.** Clean positive result for temporal SAEs. If *multiple* variants win, even better — the paper becomes a design-space map rather than a single architectural claim, and each winning variant can be taken as a co-contribution. This is the outcome the project has been building toward since Phase 2; give it the best shot the compute budget allows.
+- **MLC > TXCDR variants on SAEBench, but some TXCDR variant beats attention-pooled baseline on at least one cross-token task.** A nuanced positive: "layer-axis is better in general, but temporal-axis carries genuinely distinct information useful in specific regimes." Still publishable, and genuinely informative about where temporal structure pays off.
+- **MLC > everything temporal, and no TXCDR variant beats attention-pooled baselines on any task.** A negative result in the spirit of `are_saes_useful.md`. The paper becomes "temporal crosscoding over token positions is not a free win; layer-axis crosscoding is. Here is why, and here are the architectural attempts that didn't rescue it." This is still publishable and genuinely useful to the field — but arrive here only after you've *seriously tried* a diverse set of variants, not as a shortcut.
 
-Do not optimize for outcome (1). Optimize for a result that is honest under whichever of the three holds.
+Be ambitious about reaching outcome (1) and honest about reporting whichever of the three actually holds. Those are not in tension: the architecture menu + "Invent your own" axes are specifically designed to maximize the chance of finding a winning variant, and the fairness rubric is specifically designed to make any win credible.
 
 ### Reading list for the Phase 5 agent
 
