@@ -9,16 +9,16 @@ See docs/aniket/coupled_features_plan.md for the mathematical specification.
 
 import torch
 
-from src.data_generation.activations import generate_activations
-from src.data_generation.configs import CoupledDataGenerationConfig
-from src.data_generation.support import apply_emission
-from src.data_generation.coupling import (
+from src.data.toy.activations import generate_activations
+from src.data.toy.configs import CoupledDataGenerationConfig
+from src.data.toy.support import apply_emission
+from src.data.toy.coupling import (
     apply_coupling,
     compute_hidden_features,
     generate_coupling_matrix,
 )
-from src.data_generation.magnitudes import sample_magnitudes
-from src.data_generation.support import generate_hidden_states
+from src.data.toy.magnitudes import sample_magnitudes
+from src.data.toy.support import generate_hidden_states
 from src.shared.orthogonalize import orthogonalize
 from src.utils.logging import log
 

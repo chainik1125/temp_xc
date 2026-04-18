@@ -9,8 +9,8 @@ from dataclasses import dataclass, asdict
 import numpy as np
 import torch
 
-from src.v2_temporal_schemeC.experiment.model_specs import EvalOutput
-from src.v2_temporal_schemeC.feature_recovery import feature_recovery_score
+from src.pipeline.toy_models import EvalOutput
+from src.eval.feature_recovery import feature_recovery_score
 
 
 @dataclass

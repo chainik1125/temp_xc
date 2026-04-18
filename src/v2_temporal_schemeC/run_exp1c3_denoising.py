@@ -25,28 +25,26 @@ import torch
 
 from src.utils.plot import save_figure
 from src.utils.seed import set_seed
-from src.data_generation.configs import (
+from src.data.toy.configs import (
     CoupledDataGenerationConfig, CouplingConfig,
     TransitionConfig, SequenceConfig, MagnitudeConfig,
 )
-from src.data_generation.coupled_dataset import generate_coupled_dataset
-from src.v2_temporal_schemeC.experiment import (
-    TFAModelSpec, TXCDRv2ModelSpec, StackedSAEModelSpec,
-    evaluate_model,
-)
-from src.v2_temporal_schemeC.experiment.denoising import (
+from src.data.toy.coupled_dataset import generate_coupled_dataset
+from src.pipeline.toy_models import (TFAModelSpec, TXCDRv2ModelSpec, StackedSAEModelSpec)
+from src.eval.toy_unified import evaluate_model
+from src.eval.denoising import (
     extract_latents_tfa, extract_latents_windowed,
     compute_correlation_against_targets, run_linear_probes_general,
 )
-from src.v2_temporal_schemeC.experiment.eval_unified import _compute_auc
-from src.v2_temporal_schemeC.feature_recovery import cos_sims
-from src.v2_temporal_schemeC.train_tfa import create_tfa, train_tfa, TFATrainingConfig
+from src.eval.toy_unified import _compute_auc
+from src.eval.feature_recovery import cos_sims
+from src.training.train_tfa import create_tfa, train_tfa, TFATrainingConfig
 from src.architectures.crosscoder import TemporalCrosscoder
 from src.architectures.stacked_sae import StackedSAE
-from src.v2_temporal_schemeC.temporal_crosscoder import (
+from src.training.train_crosscoder import (
     CrosscoderTrainingConfig, train_crosscoder,
 )
-from src.v2_temporal_schemeC.stacked_sae import (
+from src.training.train_stacked_sae import (
     StackedSAETrainingConfig, train_stacked_sae,
 )
 

@@ -9,7 +9,7 @@ import torch
 from sklearn.linear_model import Ridge
 from sklearn.metrics import r2_score
 
-from src.v2_temporal_schemeC.feature_recovery import cos_sims
+from src.eval.feature_recovery import cos_sims
 
 
 def pearson(x: torch.Tensor, y: torch.Tensor) -> float:

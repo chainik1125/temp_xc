@@ -2,7 +2,7 @@
 
 import torch
 
-from src.data_generation.configs import (
+from src.data.toy.configs import (
     DataGenerationConfig,
     EmissionConfig,
     FeatureConfig,
@@ -10,8 +10,8 @@ from src.data_generation.configs import (
     SequenceConfig,
     TransitionConfig,
 )
-from src.data_generation.dataset import generate_dataset
-from src.data_generation.transition import (
+from src.data.toy.dataset import generate_dataset
+from src.data.toy.transition import (
     hmm_autocorrelation_amplitude,
     hmm_marginal_sparsity,
     stationary_distribution,
@@ -134,7 +134,7 @@ log("result", "x vectors correct for HMM case")
 
 log("info", "smoke test 4: leaky reset transition")
 
-from src.data_generation.transition import build_leaky_transition_matrix
+from src.data.toy.transition import build_leaky_transition_matrix
 
 # delta=0 should reproduce standard reset
 P_standard = TransitionConfig.from_reset_process(lam=0.5, p=0.05).matrix
@@ -171,8 +171,8 @@ log("result", f"autocorrelation increases with delta: {[f'{r:.4f}' for r in rhos
 
 log("info", "smoke test 5: coupled features (OR gate)")
 
-from src.data_generation.configs import CoupledDataGenerationConfig, CouplingConfig
-from src.data_generation.coupled_dataset import generate_coupled_dataset
+from src.data.toy.configs import CoupledDataGenerationConfig, CouplingConfig
+from src.data.toy.coupled_dataset import generate_coupled_dataset
 
 cfg5 = CoupledDataGenerationConfig(
     transition=TransitionConfig.from_reset_process(lam=0.5, p=0.1),

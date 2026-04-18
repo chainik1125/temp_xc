@@ -31,15 +31,13 @@ from sklearn.metrics import r2_score
 
 from src.utils.plot import save_figure
 from src.utils.seed import set_seed
-from src.data_generation.configs import (
+from src.data.toy.configs import (
     DataGenerationConfig, EmissionConfig, TransitionConfig,
     FeatureConfig, SequenceConfig,
 )
-from src.data_generation.dataset import generate_dataset
-from src.v2_temporal_schemeC.experiment import (
-    TFAModelSpec, TXCDRv2ModelSpec, StackedSAEModelSpec,
-)
-from src.v2_temporal_schemeC.train_tfa import create_tfa
+from src.data.toy.dataset import generate_dataset
+from src.pipeline.toy_models import (TFAModelSpec, TXCDRv2ModelSpec, StackedSAEModelSpec)
+from src.training.train_tfa import create_tfa
 from src.architectures.crosscoder import TemporalCrosscoder
 from src.architectures.stacked_sae import StackedSAE
 

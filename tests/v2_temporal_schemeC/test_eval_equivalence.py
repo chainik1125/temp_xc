@@ -6,23 +6,23 @@ import pytest
 import torch
 
 from src.utils.seed import set_seed
-from src.v2_temporal_schemeC.toy_model import ToyModel
-from src.v2_temporal_schemeC.markov_data_generation import generate_markov_activations
-from src.v2_temporal_schemeC.relu_sae import ReLUSAE, ReLUSAETrainingConfig, train_relu_sae
-from src.v2_temporal_schemeC.train_tfa import create_tfa, train_tfa, TFATrainingConfig
+from src.data.toy.toy_model import ToyModel
+from src.data.toy.markov import generate_markov_activations
+from src.architectures.relu_sae import ReLUSAE, ReLUSAETrainingConfig, train_relu_sae
+from src.training.train_tfa import create_tfa, train_tfa, TFATrainingConfig
 from src.architectures.crosscoder import TemporalCrosscoder
-from src.v2_temporal_schemeC.temporal_crosscoder import (
+from src.training.train_crosscoder import (
     CrosscoderTrainingConfig, train_crosscoder,
 )
-from src.v2_temporal_schemeC.feature_recovery import (
+from src.eval.feature_recovery import (
     feature_recovery_score, sae_decoder_directions, tfa_decoder_directions,
 )
 
 # Will be implemented:
-from src.v2_temporal_schemeC.experiment.model_specs import (
+from src.pipeline.toy_models import (
     SAEModelSpec, TFAModelSpec, TXCDRModelSpec,
 )
-from src.v2_temporal_schemeC.experiment.eval_unified import evaluate_model
+from src.eval.toy_unified import evaluate_model
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 

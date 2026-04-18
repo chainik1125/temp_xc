@@ -3,15 +3,15 @@
 import pytest
 import torch
 
-from src.data_generation.configs import (
+from src.data.toy.configs import (
     DataGenerationConfig,
     FeatureConfig,
     MagnitudeConfig,
     SequenceConfig,
     TransitionConfig,
 )
-from src.data_generation.dataset import generate_dataset
-from src.data_generation.transition import (
+from src.data.toy.dataset import generate_dataset
+from src.data.toy.transition import (
     build_transition_matrix,
     expected_holding_times,
     stationary_distribution,

@@ -6,7 +6,7 @@ Import these everywhere; never hardcode constants elsewhere.
 
 from dataclasses import dataclass, field
 
-from src.data_generation.configs import CouplingConfig
+from src.data.toy.configs import CouplingConfig
 
 
 @dataclass

@@ -22,7 +22,7 @@ class TransitionConfig:
         if not isinstance(self.matrix, torch.Tensor):
             self.matrix = torch.tensor(self.matrix, dtype=torch.float32)
         # Deferred import to avoid circular dependency: configs <- transition <- configs
-        from src.data_generation.transition import validate_transition_matrix
+        from src.data.toy.transition import validate_transition_matrix
 
         validate_transition_matrix(self.matrix)
 
@@ -35,7 +35,7 @@ class TransitionConfig:
             p: Stationary firing probability.
         """
         # Deferred import to avoid circular dependency: configs <- transition <- configs
-        from src.data_generation.transition import build_transition_matrix
+        from src.data.toy.transition import build_transition_matrix
 
         matrix = build_transition_matrix(lam, p)
         return cls(matrix=matrix, stationary_on_prob=p)
@@ -54,7 +54,7 @@ class TransitionConfig:
             p: Stationary firing probability.
             delta: Leak parameter in [0, 1]. 0 = standard reset, 1 = absorbing.
         """
-        from src.data_generation.transition import build_leaky_transition_matrix
+        from src.data.toy.transition import build_leaky_transition_matrix
 
         matrix = build_leaky_transition_matrix(lam, p, delta)
         return cls(matrix=matrix, stationary_on_prob=p)

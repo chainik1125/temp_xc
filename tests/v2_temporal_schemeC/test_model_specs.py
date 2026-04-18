@@ -4,12 +4,12 @@ import pytest
 import torch
 
 from src.utils.seed import set_seed
-from src.v2_temporal_schemeC.relu_sae import ReLUSAE
+from src.architectures.relu_sae import ReLUSAE
 from src.architectures._tfa_module import TemporalSAE
 from src.architectures.crosscoder import TemporalCrosscoder
 
 # Will be implemented:
-from src.v2_temporal_schemeC.experiment.model_specs import (
+from src.pipeline.toy_models import (
     SAEModelSpec,
     TFAModelSpec,
     TXCDRModelSpec,

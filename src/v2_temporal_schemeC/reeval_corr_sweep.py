@@ -13,11 +13,8 @@ import json, os, sys, time
 import torch
 sys.stdout.reconfigure(line_buffering=True)
 from src.utils.seed import set_seed
-from src.v2_temporal_schemeC.experiment import (
-    DataConfig, build_data_pipeline,
-    TXCDRModelSpec, StackedSAEModelSpec,
-    evaluate_model,
-)
+from src.pipeline.toy_models import (DataConfig, build_data_pipeline, TXCDRModelSpec, StackedSAEModelSpec)
+from src.eval.toy_unified import evaluate_model
 DEVICE = torch.device("cuda")
 RHO_VALUES = [0.0, 0.3, 0.5, 0.7, 0.9]
 K_VALUES = [3, 10]

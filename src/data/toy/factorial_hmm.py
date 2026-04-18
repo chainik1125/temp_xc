@@ -22,7 +22,7 @@ more useful than per-feature autocorrelation alone?
 import torch
 
 from src.utils.device import DEFAULT_DEVICE
-from src.v2_temporal_schemeC.markov_data_generation import markov_transition_probs
+from src.data.toy.markov import markov_transition_probs
 
 
 # ── Membership matrix constructors ──────────────────────────────────

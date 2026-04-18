@@ -33,23 +33,21 @@ import torch
 
 from src.utils.plot import save_figure
 from src.utils.seed import set_seed
-from src.data_generation.configs import (
+from src.data.toy.configs import (
     DataGenerationConfig, EmissionConfig, TransitionConfig,
     FeatureConfig, SequenceConfig,
 )
-from src.data_generation.dataset import generate_dataset
-from src.v2_temporal_schemeC.experiment import (
-    TFAModelSpec, TXCDRv2ModelSpec, StackedSAEModelSpec,
-    evaluate_model,
-)
-from src.v2_temporal_schemeC.experiment.denoising import compute_global_recovery
-from src.v2_temporal_schemeC.train_tfa import create_tfa, train_tfa, TFATrainingConfig
+from src.data.toy.dataset import generate_dataset
+from src.pipeline.toy_models import (TFAModelSpec, TXCDRv2ModelSpec, StackedSAEModelSpec)
+from src.eval.toy_unified import evaluate_model
+from src.eval.denoising import compute_global_recovery
+from src.training.train_tfa import create_tfa, train_tfa, TFATrainingConfig
 from src.architectures.crosscoder import TemporalCrosscoder
-from src.v2_temporal_schemeC.temporal_crosscoder import (
+from src.training.train_crosscoder import (
     CrosscoderTrainingConfig, train_crosscoder,
 )
 from src.architectures.stacked_sae import StackedSAE
-from src.v2_temporal_schemeC.stacked_sae import (
+from src.training.train_stacked_sae import (
     StackedSAETrainingConfig, train_stacked_sae,
 )
 

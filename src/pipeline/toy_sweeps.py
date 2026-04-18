@@ -8,11 +8,11 @@ from dataclasses import dataclass, field, asdict
 import torch
 
 from src.utils.seed import set_seed
-from src.v2_temporal_schemeC.experiment.data_pipeline import (
+from src.pipeline.toy_data import (
     DataConfig, DataPipeline, build_data_pipeline,
 )
-from src.v2_temporal_schemeC.experiment.model_specs import ModelEntry
-from src.v2_temporal_schemeC.experiment.eval_unified import EvalResult, evaluate_model
+from src.pipeline.toy_models import ModelEntry
+from src.eval.toy_unified import EvalResult, evaluate_model
 
 
 def _cache_key(model_name: str, k, data_config: DataConfig, params: dict) -> str:
@@ -65,7 +65,7 @@ def _get_generator(pipeline: DataPipeline, gen_key: str):
 
 def _get_training_params(spec, overrides: dict) -> dict:
     """Get training params with defaults based on model type, then apply overrides."""
-    from src.v2_temporal_schemeC.experiment.model_specs import (
+    from src.pipeline.toy_models import (
         SAEModelSpec, TFAModelSpec, TXCDRModelSpec, TXCDRv2ModelSpec,
         StackedSAEModelSpec,
     )

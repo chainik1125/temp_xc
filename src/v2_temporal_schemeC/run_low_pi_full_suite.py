@@ -29,14 +29,14 @@ import torch.nn.functional as F
 
 from src.utils.device import DEFAULT_DEVICE
 from src.utils.seed import set_seed
-from src.v2_temporal_schemeC.toy_model import ToyModel
-from src.v2_temporal_schemeC.markov_data_generation import generate_markov_activations
-from src.v2_temporal_schemeC.train_tfa import (
+from src.data.toy.toy_model import ToyModel
+from src.data.toy.markov import generate_markov_activations
+from src.training.train_tfa import (
     TFATrainingConfig,
     create_tfa,
     train_tfa,
 )
-from src.v2_temporal_schemeC.relu_sae import (
+from src.architectures.relu_sae import (
     ReLUSAE,
     ReLUSAETrainingConfig,
     train_relu_sae,

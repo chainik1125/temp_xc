@@ -31,7 +31,7 @@ import torch
 import torch.nn as nn
 
 from src.training.config import CouplingConfig, DataConfig
-from src.data_generation.coupling import (
+from src.data.toy.coupling import (
     apply_coupling,
     compute_hidden_features,
     generate_coupling_matrix,

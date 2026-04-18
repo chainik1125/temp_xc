@@ -7,7 +7,7 @@ Generates plots to verify the coupled-feature pipeline is working correctly:
 4. Sparsity comparison (hidden states vs emissions over time)
 
 Usage:
-    python -m src.data_generation.plot_coupled [--output-dir results/coupled_validation]
+    python -m src.plotting.coupled [--output-dir results/coupled_validation]
 """
 
 import argparse
@@ -20,14 +20,14 @@ import torch
 
 matplotlib.use("Agg")
 
-from src.data_generation.configs import (
+from src.data.toy.configs import (
     CoupledDataGenerationConfig,
     CouplingConfig,
     SequenceConfig,
     TransitionConfig,
 )
-from src.data_generation.coupled_dataset import generate_coupled_dataset
-from src.data_generation.coupling import compute_hidden_features
+from src.data.toy.coupled_dataset import generate_coupled_dataset
+from src.data.toy.coupling import compute_hidden_features
 
 
 def _ensure_dir(path: str) -> None:

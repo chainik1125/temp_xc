@@ -20,18 +20,16 @@ import numpy as np
 import torch
 
 from src.utils.seed import set_seed
-from src.data_generation.configs import (
+from src.data.toy.configs import (
     DataGenerationConfig, EmissionConfig, TransitionConfig,
     FeatureConfig, SequenceConfig,
 )
-from src.data_generation.dataset import generate_dataset
-from src.v2_temporal_schemeC.experiment import (
-    TFAModelSpec, TXCDRv2ModelSpec, StackedSAEModelSpec,
-)
-from src.v2_temporal_schemeC.experiment.denoising import (
+from src.data.toy.dataset import generate_dataset
+from src.pipeline.toy_models import (TFAModelSpec, TXCDRv2ModelSpec, StackedSAEModelSpec)
+from src.eval.denoising import (
     extract_latents_tfa, extract_latents_windowed, run_linear_probes,
 )
-from src.v2_temporal_schemeC.train_tfa import create_tfa
+from src.training.train_tfa import create_tfa
 from src.architectures.crosscoder import TemporalCrosscoder
 from src.architectures.stacked_sae import StackedSAE
 

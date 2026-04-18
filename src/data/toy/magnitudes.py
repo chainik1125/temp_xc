@@ -2,7 +2,7 @@
 
 import torch
 
-from src.data_generation.configs import MagnitudeConfig
+from src.data.toy.configs import MagnitudeConfig
 
 
 def sample_magnitudes(

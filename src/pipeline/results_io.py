@@ -6,7 +6,7 @@ from datetime import datetime
 
 import numpy as np
 
-from src.v2_temporal_schemeC.experiment.eval_unified import EvalResult
+from src.eval.toy_unified import EvalResult
 
 
 class NumpySafeEncoder(json.JSONEncoder):

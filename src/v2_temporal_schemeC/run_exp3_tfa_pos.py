@@ -27,9 +27,9 @@ import torch
 from src.utils.device import DEFAULT_DEVICE
 from src.utils.plot import save_figure
 from src.utils.seed import set_seed
-from src.v2_temporal_schemeC.toy_model import ToyModel
-from src.v2_temporal_schemeC.markov_data_generation import generate_markov_activations
-from src.v2_temporal_schemeC.train_tfa import create_tfa, train_tfa, TFATrainingConfig
+from src.data.toy.toy_model import ToyModel
+from src.data.toy.markov import generate_markov_activations
+from src.training.train_tfa import create_tfa, train_tfa, TFATrainingConfig
 
 NUM_FEATURES = 20
 HIDDEN_DIM = 40

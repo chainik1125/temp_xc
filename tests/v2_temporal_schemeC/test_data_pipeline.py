@@ -6,11 +6,11 @@ import pytest
 import torch
 
 from src.utils.seed import set_seed
-from src.v2_temporal_schemeC.toy_model import ToyModel
-from src.v2_temporal_schemeC.markov_data_generation import generate_markov_activations
+from src.data.toy.toy_model import ToyModel
+from src.data.toy.markov import generate_markov_activations
 
 # Will be implemented:
-from src.v2_temporal_schemeC.experiment.data_pipeline import (
+from src.pipeline.toy_data import (
     DataConfig,
     DataPipeline,
     build_data_pipeline,

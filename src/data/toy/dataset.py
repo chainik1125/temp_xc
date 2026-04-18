@@ -2,10 +2,10 @@
 
 import torch
 
-from src.data_generation.activations import generate_activations
-from src.data_generation.configs import DataGenerationConfig
-from src.data_generation.magnitudes import sample_magnitudes
-from src.data_generation.support import generate_support
+from src.data.toy.activations import generate_activations
+from src.data.toy.configs import DataGenerationConfig
+from src.data.toy.magnitudes import sample_magnitudes
+from src.data.toy.support import generate_support
 from src.shared.orthogonalize import orthogonalize
 from src.utils.logging import log
 

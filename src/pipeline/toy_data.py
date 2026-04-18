@@ -11,8 +11,8 @@ from typing import Callable
 import torch
 
 from src.utils.seed import set_seed
-from src.v2_temporal_schemeC.toy_model import ToyModel
-from src.v2_temporal_schemeC.markov_data_generation import generate_markov_activations
+from src.data.toy.toy_model import ToyModel
+from src.data.toy.markov import generate_markov_activations
 
 
 @dataclass
@@ -63,7 +63,7 @@ def _generate_raw_activations(
 ) -> torch.Tensor:
     """Generate raw feature activations using either independent Markov or event mode."""
     if config.event_config is not None:
-        from src.v2_temporal_schemeC.factorial_hmm import (
+        from src.data.toy.factorial_hmm import (
             generate_event_activations,
             generate_event_activations_general,
         )
