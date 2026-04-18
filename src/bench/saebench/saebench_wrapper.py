@@ -214,6 +214,34 @@ class SAEBenchAdapter(nn.Module):
     def _encode_tempxc(self, x: torch.Tensor) -> torch.Tensor:
         """TempXC long-sequence encode with T-windowing and aggregation.
 
+        Dispatches to `_encode_tempxc_batch` in chunks of B to bound peak
+        VRAM. With SAEBench's probing passing B ~200+, a single-shot
+        (B, L, T, d_sae) tensor for Gemma-2-2B at T=5 is 10+ GB, and
+        two of them (intermediate z + padded windows) OOMs an 80 GB H100
+        after Gemma's 5 GB and SAEBench's cached activations are resident.
+        """
+        B = x.shape[0]
+        # Target peak alloc per chunk ~1.5 GB for the padded windows tensor.
+        # chunk_B * L * T * d_sae * 4B ≈ 1.5e9
+        #   at L=128, d_sae=18432, T=5  → chunk_B ≈ 32
+        #   at L=128, d_sae=18432, T=20 → chunk_B ≈ 8
+        L = x.shape[1]
+        target_bytes = 1_500_000_000
+        chunk_B = max(
+            1,
+            target_bytes // (L * self._t * self._base_d_sae * 4),
+        )
+        if B <= chunk_B:
+            return self._encode_tempxc_batch(x)
+
+        outs: list[torch.Tensor] = []
+        for i in range(0, B, chunk_B):
+            outs.append(self._encode_tempxc_batch(x[i : i + chunk_B]))
+        return torch.cat(outs, dim=0)
+
+    def _encode_tempxc_batch(self, x: torch.Tensor) -> torch.Tensor:
+        """Inner single-chunk TempXC encode.
+
         Strategy:
           1. Build stride-1 T-wide windows from the `(B, L, d_in)` input
              → `(B, n_windows, T, d_in)` where n_windows = L - T + 1.
@@ -229,7 +257,7 @@ class SAEBenchAdapter(nn.Module):
         """
         from src.bench.architectures.crosscoder import CrosscoderSpec
         assert isinstance(self._spec, CrosscoderSpec), (
-            f"_encode_tempxc called with spec type {type(self._spec).__name__}"
+            f"_encode_tempxc_batch called with spec type {type(self._spec).__name__}"
         )
 
         B, L, d_in = x.shape
@@ -247,28 +275,26 @@ class SAEBenchAdapter(nn.Module):
         win_in = x.unfold(1, T, 1).permute(0, 1, 3, 2).contiguous()  # (B, n_windows, T, d_in)
         flat = win_in.reshape(B * n_windows, T, d_in)
 
-        # Chunk through _encode_window to keep peak VRAM bounded.
-        # B=32, L=128, T=5, d_sae=18432 → per-chunk alloc
-        # chunk × T × d_sae × 4B; at chunk=1024 that's ~380 MB.
+        # Chunk through _encode_window to keep peak VRAM bounded for the
+        # inner einsum; at chunk=1024 that's ~380 MB for T=5 d_sae=18432.
         chunk = 1024
         outs: list[torch.Tensor] = []
         for i in range(0, flat.shape[0], chunk):
             outs.append(self._spec._encode_window(self._model, flat[i : i + chunk]))
         z_flat = torch.cat(outs, dim=0)  # (B * n_windows, T, d_sae)
         z = z_flat.view(B, n_windows, T, self._base_d_sae)
+        del z_flat
 
-        # Pad per-token: token at position t uses the window ending at t
-        # for `last` aggregation semantics (most common downstream assumption).
-        # Tokens t < T-1 have no complete preceding window → zero-fill.
-        # We align so `windows[:, t, :, :]` is the window covering [t-T+1 .. t].
+        # Pad per-token: token at position t uses the window ending at t.
+        # window index w covers tokens [w .. w+T-1]; the window ending at
+        # token t (for t >= T-1) is at w = t - T + 1.
         windows = torch.zeros(
             B, L, T, self._base_d_sae,
             device=z.device, dtype=z.dtype,
         )
-        # window index w covers tokens [w .. w+T-1]; the window ending at
-        # token t (for t >= T-1) is at w = t - T + 1.
         for t in range(T - 1, L):
             windows[:, t, :, :] = z[:, t - (T - 1), :, :]
+        del z
 
         return aggregate(windows, self._aggregation)
 
