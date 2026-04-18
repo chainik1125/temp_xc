@@ -2,7 +2,7 @@
 """Cache residual/attention activations from any registered subject model.
 
 Model-agnostic: resolves hf_path, d_model, dtype, architecture family, and
-default layer indices from `src.bench.model_registry`. Adding a new model is
+default layer indices from `src.data.nlp.models`. Adding a new model is
 a registry edit, not a code change here.
 
 Two modes:
@@ -21,14 +21,14 @@ Datasets (built in):
     custom           --dataset_hf_path + --dataset_subset
 
 Usage:
-    python -m src.bench.cache_activations \
+    python -m src.data.nlp.cache_activations \
         --model deepseek-r1-distill-llama-8b \
         --dataset gsm8k \
         --mode generate \
         --num-sequences 1000 \
         --seq-length 512
 
-    python -m src.bench.cache_activations \
+    python -m src.data.nlp.cache_activations \
         --model gemma-2-2b-it --dataset fineweb --mode forward \
         --num-sequences 24000 --seq-length 32
 """
@@ -44,13 +44,13 @@ import numpy as np
 import torch
 from tqdm.auto import tqdm
 
-from src.bench.model_registry import (
+from src.data.nlp.models import (
     get_model_config,
     resid_hook_target,
     attn_hook_target,
     list_models,
 )
-from src.bench.cache_config import (
+from src.data.nlp.cache_config import (
     CACHE_BATCH_SIZE,
     DATASET_NAME_DEFAULT,
     DATASET_SPLIT_DEFAULT,
@@ -103,7 +103,7 @@ def _load_text_stream(
     # JSONL slice on a login node with network access. If the slice exists,
     # prefer it — avoids the "no network on compute nodes" issue on HPC.
     # Pre-fetch via: scripts/prefetch_text_dataset.sh
-    from src.bench.cache_config import DATA_ROOT
+    from src.data.nlp.cache_config import DATA_ROOT
     prefetch_dir = os.path.join(DATA_ROOT, "prefetched")
     prefetch_candidates = [
         os.path.join(prefetch_dir, f"{dataset}_{num_samples}.jsonl"),

@@ -9,7 +9,7 @@ Usage:
 import argparse
 import torch
 
-from src.bench.model_registry import get_model_config, list_models
+from src.data.nlp.models import get_model_config, list_models
 
 
 def main():

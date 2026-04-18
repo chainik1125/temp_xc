@@ -11,7 +11,7 @@ from typing import Callable
 import torch
 import torch.nn.functional as F
 
-from src.bench.architectures._tfa_module import TemporalSAE
+from src.architectures._tfa_module import TemporalSAE
 from src.utils.device import DEFAULT_DEVICE
 
 

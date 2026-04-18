@@ -1,6 +1,6 @@
 """NLP pipeline config — model-agnostic.
 
-Everything model-specific flows from `src.bench.model_registry.get_model_config`.
+Everything model-specific flows from `src.data.nlp.models.get_model_config`.
 This module holds only *training/caching/sweep* hyperparameters that are
 independent of the subject LM.
 
@@ -15,7 +15,7 @@ import os
 
 import torch
 
-from src.bench.model_registry import ModelConfig, get_model_config
+from src.data.nlp.models import ModelConfig, get_model_config
 
 # ─── Experiment identity ────────────────────────────────────────────────────────
 PROJECT_NAME = "temporal-crosscoders-nlp"

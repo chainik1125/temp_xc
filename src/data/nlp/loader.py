@@ -30,7 +30,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 
-from src.bench.config import CouplingConfig, DataConfig
+from src.training.config import CouplingConfig, DataConfig
 from src.data_generation.coupling import (
     apply_coupling,
     compute_hidden_features,
@@ -349,14 +349,14 @@ def build_cached_activations_pipeline(
     if config.cached_root is not None:
         root = config.cached_root
     else:
-        from src.bench.cache_config import cache_dir_for
+        from src.data.nlp.cache_config import cache_dir_for
         root = cache_dir_for(config.model_name, config.cached_dataset)
 
     acts_path = os.path.join(root, f"{config.cached_layer_key}.npy")
     if not os.path.exists(acts_path):
         raise FileNotFoundError(
             f"No cached activations at {acts_path}. "
-            f"Run: python -m src.bench.cache_activations "
+            f"Run: python -m src.data.nlp.cache_activations "
             f"--model {config.model_name} --dataset {config.cached_dataset}"
         )
 

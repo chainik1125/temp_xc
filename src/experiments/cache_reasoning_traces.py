@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Generate + cache reasoning traces on GSM8K/MATH500 with a thinking model.
 
-Thin wrapper around `src.bench.cache_activations` that enforces
+Thin wrapper around `src.data.nlp.cache_activations` that enforces
 the right defaults for the reasoning track: `--mode generate`, a thinking
 model (`is_thinking_model == True`), longer `gen_max_new_tokens`.
 
@@ -20,7 +20,7 @@ import argparse
 import subprocess
 import sys
 
-from src.bench.model_registry import get_model_config, list_models
+from src.data.nlp.models import get_model_config, list_models
 
 
 def main():
@@ -43,7 +43,7 @@ def main():
         )
 
     cmd = [
-        sys.executable, "-m", "src.bench.cache_activations",
+        sys.executable, "-m", "src.data.nlp.cache_activations",
         "--model", args.model,
         "--dataset", args.dataset,
         "--mode", "generate",

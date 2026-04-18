@@ -18,11 +18,11 @@ import torch
 
 sys.path.insert(0, "/home/elysium/temp_xc")
 
-from src.bench.architectures.tfa import TFASpec
-from src.bench.architectures._tfa_module import TemporalSAE
-from src.bench.data import build_cached_activations_pipeline
-from src.bench.config import DataConfig
-from src.bench.eval import evaluate_model
+from src.architectures.tfa import TFASpec
+from src.architectures._tfa_module import TemporalSAE
+from src.data.nlp.loader import build_cached_activations_pipeline
+from src.training.config import DataConfig
+from src.eval.runner import evaluate_model
 
 
 def reeval_one(ckpt_path: str, row: dict, device) -> dict:

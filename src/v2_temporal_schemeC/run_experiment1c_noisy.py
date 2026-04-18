@@ -44,8 +44,8 @@ from src.v2_temporal_schemeC.experiment import (
 from src.v2_temporal_schemeC.experiment.eval_unified import EvalResult
 from src.v2_temporal_schemeC.relu_sae import ReLUSAE, ReLUSAETrainingConfig, train_relu_sae
 from src.v2_temporal_schemeC.train_tfa import create_tfa, train_tfa, TFATrainingConfig
-from src.bench.architectures.crosscoder import TemporalCrosscoder
-from src.bench.architectures.stacked_sae import StackedSAE
+from src.architectures.crosscoder import TemporalCrosscoder
+from src.architectures.stacked_sae import StackedSAE
 from src.v2_temporal_schemeC.temporal_crosscoder import (
     CrosscoderTrainingConfig, train_crosscoder,
 )

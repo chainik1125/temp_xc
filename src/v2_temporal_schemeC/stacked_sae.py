@@ -13,7 +13,7 @@ from dataclasses import dataclass
 import torch
 import torch.nn as nn
 
-from src.bench.architectures.stacked_sae import StackedSAE
+from src.architectures.stacked_sae import StackedSAE
 
 
 @dataclass

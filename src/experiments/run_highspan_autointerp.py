@@ -97,7 +97,7 @@ def load_txcdr_cofiring_split() -> tuple[list[int], list[int]]:
         return out
 
     def tfa_fire():
-        from src.bench.architectures._tfa_module import TemporalSAE
+        from src.architectures._tfa_module import TemporalSAE
         st = torch.load(
             f"/home/elysium/temp_xc/results/nlp_sweep/gemma/ckpts/"
             f"tfa_pos__gemma-2-2b-it__fineweb__{LAYER}__k{K}__seed42.pt",

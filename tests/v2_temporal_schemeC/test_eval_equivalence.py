@@ -10,7 +10,7 @@ from src.v2_temporal_schemeC.toy_model import ToyModel
 from src.v2_temporal_schemeC.markov_data_generation import generate_markov_activations
 from src.v2_temporal_schemeC.relu_sae import ReLUSAE, ReLUSAETrainingConfig, train_relu_sae
 from src.v2_temporal_schemeC.train_tfa import create_tfa, train_tfa, TFATrainingConfig
-from src.bench.architectures.crosscoder import TemporalCrosscoder
+from src.architectures.crosscoder import TemporalCrosscoder
 from src.v2_temporal_schemeC.temporal_crosscoder import (
     CrosscoderTrainingConfig, train_crosscoder,
 )

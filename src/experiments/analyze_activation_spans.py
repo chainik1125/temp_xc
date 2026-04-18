@@ -131,7 +131,7 @@ def txcdr_activations(eval_x: torch.Tensor) -> np.ndarray:
 @torch.no_grad()
 def tfa_activations(eval_x: torch.Tensor) -> tuple[np.ndarray, np.ndarray]:
     """Return (novel_active, pred_active), both (N, seq_len, d_sae) bool."""
-    from src.bench.architectures._tfa_module import TemporalSAE
+    from src.architectures._tfa_module import TemporalSAE
 
     state = torch.load(
         f"{CKPT_DIR}/tfa_pos__gemma-2-2b-it__fineweb__{LAYER}__k{K}__seed42.pt",

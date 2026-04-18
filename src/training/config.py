@@ -72,7 +72,7 @@ class DataConfig:
 
     - `cached_activations`: load pre-cached real-LM activations produced by
                 `src/bench/cache_activations.py`. Specify the
-                `model_name` (routes through `src.bench.model_registry`), the
+                `model_name` (routes through `src.data.nlp.models`), the
                 `cached_dataset` (e.g. "fineweb", "gsm8k", "coding"), and the
                 `cached_layer_key` (e.g. "resid_L12"). Used for the sprint's
                 real-LM comparison track.

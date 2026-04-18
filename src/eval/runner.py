@@ -16,7 +16,7 @@ from dataclasses import dataclass, asdict
 import numpy as np
 import torch
 
-from src.bench.architectures.base import ArchSpec, EvalOutput
+from src.architectures.base import ArchSpec, EvalOutput
 
 
 @dataclass

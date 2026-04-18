@@ -3,16 +3,16 @@
 import pytest
 import torch
 
-from src.bench.config import (
+from src.training.config import (
     CouplingConfig,
     DataConfig,
     MarkovConfig,
     ToyModelConfig,
 )
-from src.bench.data import build_data_pipeline
-from src.bench.eval import evaluate_model, feature_recovery_auc
-from src.bench.architectures.topk_sae import TopKSAESpec
-from src.bench.architectures.crosscoder import CrosscoderSpec
+from src.data.nlp.loader import build_data_pipeline
+from src.eval.runner import evaluate_model, feature_recovery_auc
+from src.architectures.topk_sae import TopKSAESpec
+from src.architectures.crosscoder import CrosscoderSpec
 
 DEVICE = torch.device("cpu")
 

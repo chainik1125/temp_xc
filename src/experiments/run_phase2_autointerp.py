@@ -76,7 +76,7 @@ def compute_tfa_masses_excluding_pad(
 
     Used to re-rank TFA features for scanning.
     """
-    from src.bench.architectures._tfa_module import TemporalSAE
+    from src.architectures._tfa_module import TemporalSAE
 
     state = torch.load(
         f"{CKPT_DIR}/tfa_pos__gemma-2-2b-it__fineweb__{LAYER}__k{K}__seed42.pt",
@@ -113,7 +113,7 @@ def scan_tfa_codes(
     feature_indices: list[int], eval_x: torch.Tensor, eval_tokens: np.ndarray,
     use_pred: bool,
 ) -> dict[int, list]:
-    from src.bench.architectures._tfa_module import TemporalSAE
+    from src.architectures._tfa_module import TemporalSAE
     state = torch.load(
         f"{CKPT_DIR}/tfa_pos__gemma-2-2b-it__fineweb__{LAYER}__k{K}__seed42.pt",
         map_location="cpu", weights_only=True,

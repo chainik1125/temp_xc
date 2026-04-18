@@ -13,7 +13,7 @@ from typing import Callable
 import torch
 import torch.nn as nn
 
-from src.bench.architectures.crosscoder import TemporalCrosscoder
+from src.architectures.crosscoder import TemporalCrosscoder
 from src.utils.device import DEFAULT_DEVICE
 
 

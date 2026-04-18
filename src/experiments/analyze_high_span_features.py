@@ -146,7 +146,7 @@ def txcdr_activations(eval_x: torch.Tensor) -> np.ndarray:
 
 @torch.no_grad()
 def tfa_pred_activations(eval_x: torch.Tensor) -> np.ndarray:
-    from src.bench.architectures._tfa_module import TemporalSAE
+    from src.architectures._tfa_module import TemporalSAE
     state = torch.load(
         f"{CKPT_DIR}/tfa_pos__gemma-2-2b-it__fineweb__{LAYER}__k{K}__seed42.pt",
         map_location="cpu", weights_only=True,

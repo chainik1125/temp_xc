@@ -11,8 +11,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from src.bench.architectures.base import ArchSpec, EvalOutput
-from src.bench.architectures.topk_sae import TopKSAE
+from src.architectures.base import ArchSpec, EvalOutput
+from src.architectures.topk_sae import TopKSAE
 
 
 class StackedSAE(nn.Module):

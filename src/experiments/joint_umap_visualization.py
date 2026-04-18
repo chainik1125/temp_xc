@@ -96,7 +96,7 @@ def classify_tfa_pred_ratio() -> np.ndarray:
     Phase 1c showed this is cleanly bimodal at 0 and 1.
     """
     import math
-    from src.bench.architectures._tfa_module import TemporalSAE
+    from src.architectures._tfa_module import TemporalSAE
 
     ACT_PATH = "/home/elysium/temp_xc/data/cached_activations/gemma-2-2b-it/fineweb/resid_L25.npy"
     state = torch.load(

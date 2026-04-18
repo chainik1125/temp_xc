@@ -3,11 +3,11 @@
 import pytest
 import torch
 
-from src.bench.architectures.topk_sae import TopKSAESpec
-from src.bench.architectures.stacked_sae import StackedSAESpec
-from src.bench.architectures.crosscoder import CrosscoderSpec
-from src.bench.architectures.tfa import TFASpec
-from src.bench.architectures import get_default_models
+from src.architectures.topk_sae import TopKSAESpec
+from src.architectures.stacked_sae import StackedSAESpec
+from src.architectures.crosscoder import CrosscoderSpec
+from src.architectures.tfa import TFASpec
+from src.architectures import get_default_models
 
 D_IN = 32
 D_SAE = 16

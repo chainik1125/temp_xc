@@ -10,7 +10,7 @@ import torch.nn.functional as F
 
 sys.path.insert(0, "/home/elysium/temp_xc")
 
-from src.bench.architectures._tfa_module import TemporalSAE
+from src.architectures._tfa_module import TemporalSAE
 
 
 def run_trial(

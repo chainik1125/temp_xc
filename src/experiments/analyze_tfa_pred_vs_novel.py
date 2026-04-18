@@ -40,7 +40,7 @@ N_EVAL = 1000
 
 @torch.no_grad()
 def compute_masses():
-    from src.bench.architectures._tfa_module import TemporalSAE
+    from src.architectures._tfa_module import TemporalSAE
     state = torch.load(CKPT, map_location="cpu", weights_only=True)
     model = TemporalSAE(
         dimin=D_IN, width=D_SAE, n_heads=4, sae_diff_type="topk", kval_topk=K,

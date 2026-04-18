@@ -4,25 +4,25 @@ Provides run_sweep() for programmatic use and a CLI for command-line sweeps.
 
 Usage:
     # Full sweep (all combos):
-    python -m src.bench.sweep
+    python -m src.pipeline.sweep
 
     # Single run:
-    python -m src.bench.sweep --rho 0.9 --k 5 --T 2
+    python -m src.pipeline.sweep --rho 0.9 --k 5 --T 2
 
     # Specific models only:
-    python -m src.bench.sweep --models topk_sae crosscoder
+    python -m src.pipeline.sweep --models topk_sae crosscoder
 
     # Quick test:
-    python -m src.bench.sweep --steps 100
+    python -m src.pipeline.sweep --steps 100
 
     # Leaky reset:
-    python -m src.bench.sweep --delta 0.5
+    python -m src.pipeline.sweep --delta 0.5
 
     # Coupled features (K=10 hidden, M=20 emissions):
-    python -m src.bench.sweep --coupled --K-hidden 10 --M-emission 20 --n-parents 2
+    python -m src.pipeline.sweep --coupled --K-hidden 10 --M-emission 20 --n-parents 2
 
     # Dry run:
-    python -m src.bench.sweep --dry-run
+    python -m src.pipeline.sweep --dry-run
 """
 
 import argparse
@@ -33,17 +33,17 @@ import time
 
 import torch
 
-from src.bench.architectures import get_default_models, ModelEntry
-from src.bench.config import (
+from src.architectures import get_default_models, ModelEntry
+from src.training.config import (
     CouplingConfig,
     DataConfig,
     MarkovConfig,
     TrainConfig,
     SweepConfig,
 )
-from src.bench.data import build_data_pipeline, build_pipeline, DataPipeline
-from src.bench.eval import evaluate_model, EvalResult
-from src.bench.model_registry import get_model_config, list_models
+from src.data.nlp.loader import build_data_pipeline, build_pipeline, DataPipeline
+from src.eval.runner import evaluate_model, EvalResult
+from src.data.nlp.models import get_model_config, list_models
 
 
 def _arch_registry_key(entry: ModelEntry) -> str:
@@ -53,10 +53,10 @@ def _arch_registry_key(entry: ModelEntry) -> str:
     "Stacked T=5", "TXCDR T=5") but users pass registry keys via --models.
     Bridge the two by matching on the ArchSpec class + pos-encoding flag.
     """
-    from src.bench.architectures.topk_sae import TopKSAESpec
-    from src.bench.architectures.stacked_sae import StackedSAESpec
-    from src.bench.architectures.crosscoder import CrosscoderSpec
-    from src.bench.architectures.tfa import TFASpec
+    from src.architectures.topk_sae import TopKSAESpec
+    from src.architectures.stacked_sae import StackedSAESpec
+    from src.architectures.crosscoder import CrosscoderSpec
+    from src.architectures.tfa import TFASpec
 
     spec = entry.spec
     if isinstance(spec, TopKSAESpec):

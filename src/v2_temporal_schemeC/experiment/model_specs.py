@@ -13,15 +13,15 @@ import torch.nn as nn
 from src.v2_temporal_schemeC.relu_sae import (
     ReLUSAE, ReLUSAETrainingConfig, train_relu_sae,
 )
-from src.bench.architectures._tfa_module import TemporalSAE
+from src.architectures._tfa_module import TemporalSAE
 from src.v2_temporal_schemeC.train_tfa import (
     TFATrainingConfig, train_tfa,
 )
-from src.bench.architectures.crosscoder import TemporalCrosscoder
+from src.architectures.crosscoder import TemporalCrosscoder
 from src.v2_temporal_schemeC.temporal_crosscoder import (
     CrosscoderTrainingConfig, train_crosscoder,
 )
-from src.bench.architectures.stacked_sae import StackedSAE
+from src.architectures.stacked_sae import StackedSAE
 from src.v2_temporal_schemeC.stacked_sae import (
     StackedSAETrainingConfig, train_stacked_sae,
 )

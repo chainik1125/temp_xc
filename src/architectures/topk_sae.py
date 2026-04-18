@@ -15,7 +15,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from src.bench.architectures.base import ArchSpec, EvalOutput
+from src.architectures.base import ArchSpec, EvalOutput
 
 
 class TopKSAE(nn.Module):

@@ -126,7 +126,7 @@ def compute_activation_freq_tfa(
     state: dict, eval_x: torch.Tensor, use_pos: bool = True,
 ) -> tuple[torch.Tensor, torch.Tensor]:
     """Return (novel_freq, pred_freq) for each of 18432 features."""
-    from src.bench.architectures._tfa_module import TemporalSAE
+    from src.architectures._tfa_module import TemporalSAE
     import math
 
     model = TemporalSAE(

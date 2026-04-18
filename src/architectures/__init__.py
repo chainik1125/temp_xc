@@ -6,11 +6,11 @@ Register all ArchSpec subclasses here. To add a new architecture:
     3. It's now available in sweeps via get_default_models()
 """
 
-from src.bench.architectures.base import ArchSpec, ModelEntry, EvalOutput
-from src.bench.architectures.topk_sae import TopKSAESpec
-from src.bench.architectures.stacked_sae import StackedSAESpec
-from src.bench.architectures.crosscoder import CrosscoderSpec
-from src.bench.architectures.tfa import TFASpec
+from src.architectures.base import ArchSpec, ModelEntry, EvalOutput
+from src.architectures.topk_sae import TopKSAESpec
+from src.architectures.stacked_sae import StackedSAESpec
+from src.architectures.crosscoder import CrosscoderSpec
+from src.architectures.tfa import TFASpec
 
 # Central registry: name -> ArchSpec constructor
 REGISTRY: dict[str, type[ArchSpec]] = {
