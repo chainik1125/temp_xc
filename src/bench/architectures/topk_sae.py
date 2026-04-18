@@ -1,13 +1,15 @@
-"""TopK SAE — single-token sparse autoencoder with TopK activation.
+"""TopK SAE — single-token sparse autoencoder.
 
 This is the standard SAE baseline. It processes each token independently
 (no temporal structure). When used in a windowed comparison, it sees
 flattened (B*T, d) input.
 
-Ported from Aniket's original crosscoder models.
-"""
+Supports both TopK sparsity (k set) and ReLU+L1 sparsity (k=None plus
+l1_coeff>0 in training). Training also supports LR warmup and Adam
+weight decay.
 
-import math
+Ported from Aniket's original crosscoder models and Han's relu_sae.py.
+"""
 
 import torch
 import torch.nn as nn
@@ -17,14 +19,14 @@ from src.bench.architectures.base import ArchSpec, EvalOutput
 
 
 class TopKSAE(nn.Module):
-    """Standard SAE with TopK activation — exactly k latents active per token.
+    """Standard SAE — TopK when k is set, ReLU when k is None.
 
     Input:  x in R^d
-    Latent: z in R^h  (k non-zero)
+    Latent: z in R^h  (k non-zero if k is set, else non-negative)
     Output: x_hat in R^d
     """
 
-    def __init__(self, d_in: int, d_sae: int, k: int | None):
+    def __init__(self, d_in: int, d_sae: int, k: int | None = None):
         super().__init__()
         self.d_in = d_in
         self.d_sae = d_sae
@@ -77,14 +79,39 @@ class TopKSAESpec(ArchSpec):
         return TopKSAE(d_in, d_sae, k).to(device)
 
     def train(self, model, gen_fn, total_steps, batch_size, lr, device,
-              log_every=500, grad_clip=1.0):
-        optimizer = torch.optim.Adam(model.parameters(), lr=lr)
-        log = {"loss": [], "l0": []}
+              log_every=500, grad_clip=1.0, l1_coeff=0.0, warmup_steps=0,
+              weight_decay=0.0):
+        """Train the SAE.
+
+        Extra args:
+            l1_coeff: L1 penalty coefficient on latent codes. Required
+                when model.k is None (ReLU mode) to enforce sparsity.
+            warmup_steps: linear LR warmup from 0 to lr over the first N
+                steps. 0 disables warmup.
+            weight_decay: Adam weight decay (L2 on parameters, separate
+                from the L1 sparsity penalty).
+        """
+        optimizer = torch.optim.Adam(
+            model.parameters(), lr=lr, weight_decay=weight_decay
+        )
+        log = {"loss": [], "mse": [], "l1": [], "l0": []}
         model.train()
 
         for step in range(total_steps):
+            if warmup_steps > 0 and step < warmup_steps:
+                cur_lr = lr * (step + 1) / warmup_steps
+                for pg in optimizer.param_groups:
+                    pg["lr"] = cur_lr
+
             x = gen_fn(batch_size).to(device)
-            loss, _, z = model(x)
+            mse, _, z = model(x)
+
+            if l1_coeff > 0:
+                l1 = z.abs().sum(dim=-1).mean()
+                loss = mse + l1_coeff * l1
+            else:
+                l1 = torch.zeros((), device=mse.device)
+                loss = mse
 
             optimizer.zero_grad()
             loss.backward()
@@ -96,6 +123,8 @@ class TopKSAESpec(ArchSpec):
                 with torch.no_grad():
                     l0 = (z > 0).float().sum(dim=-1).mean().item()
                 log["loss"].append(loss.item())
+                log["mse"].append(mse.item())
+                log["l1"].append(l1.item())
                 log["l0"].append(l0)
 
         model.eval()
