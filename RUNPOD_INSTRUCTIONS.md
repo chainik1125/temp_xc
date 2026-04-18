@@ -1,12 +1,10 @@
-# RunPod Sweep Instructions
+# RunPod agent setup
 
-## What to do
+This doc covers only the **environment**. For what to work on, read the latest research log under `docs/han/research_logs/phase*/` — the most recent phase subdir is usually the active one.
 
-Run a 36-run NLP sweep comparing TFA-pos vs TXCDR vs Stacked SAE on real LLM activations (Gemma-2-2B-IT + DeepSeek-R1-8B).
+## First-time setup on a new pod
 
-## Setup
-
-The uv venv lives at `/workspace/temp_xc/.venv` and the HF cache at `/workspace/hf_cache` — both on RunPod's persistent `/workspace` volume, so they survive pod stop/start cycles. First session creates them; later sessions just re-activate.
+Everything lives on RunPod's persistent `/workspace` volume so it survives pod stop/start cycles.
 
 ```bash
 cd /workspace
@@ -16,53 +14,58 @@ cd temp_xc && git checkout han && git pull
 # Install uv if the pod image doesn't ship it
 command -v uv >/dev/null || curl -LsSf https://astral.sh/uv/install.sh | sh
 
-# Persist HF cache, HF auth, and uv's link-mode setting on /workspace
-# (UV_LINK_MODE=copy is required: uv's cache and /workspace are on different
-# filesystems, so the default hardlink mode silently produces broken installs
-# on MooseFS — e.g. packages with only a partial file tree.)
+# Persist HF cache + uv link-mode on /workspace
+# UV_LINK_MODE=copy is REQUIRED: uv's cache and /workspace live on different
+# filesystems, and the default hardlink mode silently produces broken installs
+# on MooseFS (packages end up with partial file trees).
 export HF_HOME=/workspace/hf_cache
 export UV_LINK_MODE=copy
 for line in 'export HF_HOME=/workspace/hf_cache' 'export UV_LINK_MODE=copy'; do
     grep -qF "$line" ~/.bashrc || echo "$line" >> ~/.bashrc
 done
 
-# Resolve deps from pyproject.toml + uv.lock into .venv/ (persistent volume).
-# Safe to re-run; no-op when already in sync.
+# Build the venv from pyproject.toml + uv.lock. Idempotent; safe to re-run.
 uv sync
-source .venv/bin/activate
 
-# Only needed the first time — token is stored under $HF_HOME and persists
+# Hugging Face auth (only needed first time; the token is stored under $HF_HOME)
 huggingface-cli whoami >/dev/null 2>&1 || huggingface-cli login
 ```
 
-Verify:
-```bash
-PYTHONPATH=/workspace/temp_xc python -c "
-import torch; print(f'GPU: {torch.cuda.get_device_name(0)}, VRAM: {torch.cuda.get_device_properties(0).total_memory/1e9:.0f} GB')
-from src.bench.model_registry import list_models; print('Models:', list_models())
-"
-```
-
-### Reconnecting to an existing pod
+## Reconnecting to an existing pod
 
 ```bash
 cd /workspace/temp_xc
-source .venv/bin/activate
-export HF_HOME=/workspace/hf_cache   # already in ~/.bashrc after first setup
+source .venv/bin/activate    # activates uv's venv
+# HF_HOME / UV_LINK_MODE are already in ~/.bashrc after first setup
+git pull origin han
+uv sync                      # no-op if in sync
 ```
 
-### GitHub push access (persistent across pod sessions)
+## Verify the environment
 
-The token lives at `/workspace/.github-token` (persistent volume) and a per-repo credential helper reads it at push time. Both survive pod stop/start, so `git push origin han` works in every new session with no re-auth.
+```bash
+uv run python -c "
+import torch
+print(f'GPU: {torch.cuda.get_device_name(0)}')
+print(f'VRAM: {torch.cuda.get_device_properties(0).total_memory/1e9:.0f} GB')
+print(f'torch: {torch.__version__}, cuda: {torch.cuda.is_available()}')
+from src.bench.architectures._tfa_module import TemporalSAE  # smoke test
+print('✓ bench imports ok')
+"
+```
+
+## GitHub push access (persistent across pod sessions)
+
+The token lives at `/workspace/.github-token` on the persistent volume; a per-repo credential helper reads it at push time. Survives pod stop/start — `git push origin han` works in every new session.
 
 First-time setup (once per persistent volume):
 
 ```bash
 # 1) Write the PAT to the persistent volume. Use printf (no trailing newline).
 printf '%s' 'ghp_YOUR_CLASSIC_PAT' > /workspace/.github-token
-chmod 600 /workspace/.github-token   # NB: RunPod volume may ignore chmod; pod is single-tenant
+chmod 600 /workspace/.github-token
 
-# 2) Wire it into the repo's git config (once per clone of temp_xc)
+# 2) Wire it into the repo's git config (once per clone)
 cd /workspace/temp_xc
 git config --local credential.helper \
     '!f() { echo username=x-access-token; printf "password=%s\n" "$(cat /workspace/.github-token)"; }; f'
@@ -71,67 +74,62 @@ git config --local credential.helper \
 git push --dry-run origin han
 ```
 
-Token type: use a **classic** PAT with the `repo` scope. Fine-grained PATs must also list `chainik1125/temp_xc` under "selected repositories" — forgetting this is the #1 reason pushes 403 even when you're a collaborator.
+**Token type:** classic PAT with `repo` scope. Fine-grained PATs must also list `chainik1125/temp_xc` under "selected repositories" — forgetting this is the #1 cause of 403s even when you're a collaborator.
 
-Rotation: overwrite `/workspace/.github-token` in place; no other changes needed.
+**Rotation:** overwrite `/workspace/.github-token` in place; no other changes needed.
 
-## Run the sweep
+## Anthropic API key (for autointerp)
+
+If the task involves Claude Haiku labeling, set the key once per pod:
+
+```bash
+printf '%s' 'sk-ant-YOUR_KEY' > /workspace/.anthropic-key
+chmod 600 /workspace/.anthropic-key
+grep -qF 'ANTHROPIC_API_KEY' ~/.bashrc || \
+    echo 'export ANTHROPIC_API_KEY=$(cat /workspace/.anthropic-key)' >> ~/.bashrc
+```
+
+## Running experiments
+
+From the repo root with the venv active:
+
+```bash
+TQDM_DISABLE=1 uv run python scripts/<script_name>.py
+```
+
+`TQDM_DISABLE=1` is mandatory — progress bars flood logs and break reading them back through the agent's tools.
+
+For long-running sweeps, launch under `nohup`:
 
 ```bash
 mkdir -p logs
-TQDM_DISABLE=1 nohup bash scripts/run_nlp_sweep_16h.sh > logs/nlp_sweep.log 2>&1 &
-tail -f logs/nlp_sweep.log
+TQDM_DISABLE=1 nohup uv run python scripts/<script>.py > logs/<run>.log 2>&1 &
+tail -f logs/<run>.log
 ```
 
-The script is **resumable** — if interrupted, restart the same command and it skips completed runs.
+Resumable sweeps save per-run JSONs incrementally; restarting the same command picks up where it left off.
 
-## What the script does (in order)
+## What to work on
 
-1. **Cache Gemma-2-2B-IT activations** (~2h): 24K seqs × 128 tokens, layers 13+25, FineWeb
-2. **Train Gemma sweeps** (~7.2h): TFA-pos + TXCDR T=5 + Stacked T=5, k=50/100, 2 layers × shuffled/unshuffled = 24 runs
-3. **Cache DeepSeek-R1-8B activations** (~3h): 12K seqs × 128 tokens, layers 12+24, FineWeb
-4. **Train DeepSeek sweeps** (~3.1h): same 3 architectures, k=50/100, 1 layer × shuffled/unshuffled = 12 runs
-5. **Aggregate** all results to `results/nlp_sweep/all_results.json`
-
-## Architecture details
-
-| Model | What it is | Data format | Key parameter |
-|---|---|---|---|
-| TFA-pos | Causal attention SAE with positional encoding | Full 128-token sequences | bottleneck_factor=8 (controls attention param count) |
-| TXCDR T=5 | Shared-latent crosscoder, 5-token window | 5-token sliding windows | k×T active latents |
-| Stacked T=5 | Independent per-position SAEs, 5-token window | 5-token sliding windows | k active per position |
-
-## Important implementation notes
-
-- **TFA input scaling**: TFA has `lam = 1/(4*dimin)` internally which assumes norm ~ sqrt(d). Real LM activations have norms ~200-1200. The TFASpec computes `scaling_factor = sqrt(d)/mean(||x||)` on the first training batch and applies it to all inputs. Without this, TFA produces NaN.
-- **Memory-efficient data loading**: The cached activations pipeline reads slices from numpy mmap on demand (not materializing the full 28GB array). This keeps RAM usage at ~3GB.
-- **Incremental saves**: Each completed run writes to JSON immediately. On resume, existing results are loaded and completed runs are skipped.
-- **Shuffled control**: Running every experiment twice (unshuffled + shuffled) decomposes temporal vs architectural advantage.
-
-## Expansion factors
-
-- Gemma (d_model=2304): **8× expansion** → d_sae=18,432
-- DeepSeek (d_model=4096): **4× expansion** → d_sae=16,384 (TFA too expensive at 8× for 4096)
-
-## Monitoring
+This file does NOT describe the current experiment. The active work is always in the most recent research log:
 
 ```bash
-# Check progress
-grep -c "NMSE=" logs/nlp_sweep.log        # completed runs (target: 36)
-tail -5 logs/nlp_sweep.log                  # latest activity
-nvidia-smi                                  # GPU usage
-
-# Check results so far
-find results/nlp_sweep -name "*.json" -exec sh -c 'echo "$1: $(python3 -c "import json; print(len(json.load(open(\"$1\"))))" 2>/dev/null) runs"' _ {} \;
+ls docs/han/research_logs/phase*/  | tail                        # newest phase
+ls -t docs/han/research_logs/phase*/*.md | head                   # newest log
 ```
 
-## After completion
+Read the latest log for context, branch state, open questions, and next steps before running anything.
 
-Push results back:
-```bash
-git add results/nlp_sweep/ && git commit -m "NLP sweep results: TFA vs TXCDR on Gemma + DeepSeek" && git push origin han
-```
+## Quick reference — where things live
 
-## If the A40 has 48GB VRAM
-
-You can optionally use `--tfa-bottleneck-factor 4` instead of 8 for better TFA attention capacity. Edit `scripts/run_nlp_sweep_16h.sh` and change `--tfa-bottleneck-factor 8` to `--tfa-bottleneck-factor 4`. This makes TFA ~20% slower per run but gives it a stronger attention mechanism.
+| Thing | Path |
+|---|---|
+| Python env | `/workspace/temp_xc/.venv/` |
+| HF cache (models, datasets) | `/workspace/hf_cache/` |
+| Cached activations | `/workspace/temp_xc/data/cached_activations/` |
+| Trained checkpoints | `/workspace/temp_xc/results/nlp_sweep/**/ckpts/` (gitignored; on-disk only) |
+| Research logs | `/workspace/temp_xc/docs/han/research_logs/phase*/` |
+| Bench framework | `/workspace/temp_xc/src/bench/` |
+| Analysis scripts | `/workspace/temp_xc/scripts/` |
+| GitHub token | `/workspace/.github-token` |
+| Anthropic key | `/workspace/.anthropic-key` |

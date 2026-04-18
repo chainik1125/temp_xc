@@ -27,6 +27,8 @@ The repo uses a single **`uv`-managed virtualenv** at `.venv/`, reproducible on 
 
 Install `uv` if missing: https://docs.astral.sh/uv/getting-started/installation/ — standalone binary, no system deps.
 
+**On RunPod:** see `RUNPOD_INSTRUCTIONS.md` at the repo root for persistent-volume paths, HF/GitHub/Anthropic auth, and reconnection workflow.
+
 First-time setup (clones a fresh `.venv` from `pyproject.toml` + `uv.lock`):
 
 ```bash
