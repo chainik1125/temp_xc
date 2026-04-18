@@ -23,7 +23,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-from src.utils.plot import save_figure
+from src.plotting.save_figure import save_figure
 
 BASE = os.path.dirname(__file__)
 EXP1C_DIR = os.path.join(BASE, "results", "experiment1c_noisy")

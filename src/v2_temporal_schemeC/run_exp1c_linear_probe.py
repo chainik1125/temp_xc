@@ -29,7 +29,7 @@ import torch
 from sklearn.linear_model import Ridge
 from sklearn.metrics import r2_score
 
-from src.utils.plot import save_figure
+from src.plotting.save_figure import save_figure
 from src.utils.seed import set_seed
 from src.data.toy.configs import (
     DataGenerationConfig, EmissionConfig, TransitionConfig,

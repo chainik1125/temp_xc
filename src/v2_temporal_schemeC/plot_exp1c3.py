@@ -17,7 +17,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 
-from src.utils.plot import save_figure
+from src.plotting.save_figure import save_figure
 
 BASE = os.path.dirname(__file__)
 RESULTS_DIR = os.path.join(BASE, "results", "experiment1c3_coupled")

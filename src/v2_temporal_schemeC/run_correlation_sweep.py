@@ -22,7 +22,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import torch
 
-from src.utils.plot import save_figure
+from src.plotting.save_figure import save_figure
 from src.pipeline.toy_models import (DataConfig, SAEModelSpec, TFAModelSpec, ModelEntry, run_topk_sweep, save_results)
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")

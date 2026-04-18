@@ -13,7 +13,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-from src.utils.plot import save_figure
+from src.plotting.save_figure import save_figure
 
 BASE = os.path.join(os.path.dirname(__file__), "results", "correlation_sweep")
 RHO_VALUES = [0.0, 0.3, 0.5, 0.7, 0.9]

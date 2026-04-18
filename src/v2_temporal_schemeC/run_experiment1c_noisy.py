@@ -30,7 +30,7 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 
-from src.utils.plot import save_figure
+from src.plotting.save_figure import save_figure
 from src.utils.seed import set_seed
 from src.data.toy.configs import (
     DataGenerationConfig, EmissionConfig, TransitionConfig,

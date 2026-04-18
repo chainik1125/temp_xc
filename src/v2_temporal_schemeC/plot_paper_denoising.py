@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import numpy as np
 
-from src.utils.plot import save_figure
+from src.plotting.save_figure import save_figure
 
 BASE = os.path.dirname(__file__)
 DATA_DIR = os.path.join(BASE, "results", "experiment1c2_sparse")
