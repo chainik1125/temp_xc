@@ -380,12 +380,20 @@ def run_cached_sweep(
                     d_in=d_in, d_sae=d_sae, k=k, device=device,
                 )
                 gen_fn = _get_generator(pipeline, entry.gen_key)
-                entry.spec.train(
-                    model, gen_fn,
+                _train_kwargs = dict(
                     total_steps=total_steps, batch_size=batch_size, lr=lr,
                     device=device, log_every=train_config.log_every,
                     grad_clip=train_config.grad_clip,
                 )
+                # Plateau kwargs only passed to train loops that accept them
+                # (crosscoder + topk_sae). Introspect to avoid breaking archs
+                # that haven't been updated.
+                import inspect
+                _params = inspect.signature(entry.spec.train).parameters
+                if "plateau_pct" in _params:
+                    _train_kwargs["plateau_pct"] = train_config.plateau_pct
+                    _train_kwargs["plateau_min_steps"] = train_config.plateau_min_steps
+                entry.spec.train(model, gen_fn, **_train_kwargs)
 
                 # Save checkpoint IMMEDIATELY after training, before eval.
                 # If evaluate_model crashes (e.g. encode() shape mismatch on
@@ -509,7 +517,19 @@ def main():
     parser.add_argument("--models", type=str, nargs="+", default=None,
                         help="Filter to specific model names")
     parser.add_argument("--steps", type=int, default=None,
-                        help="Override training steps")
+                        help="Override training steps (hard upper bound)")
+    parser.add_argument(
+        "--stop-on-plateau", type=float, default=None, dest="plateau_pct",
+        help="Stop training early when fractional loss drop over the last "
+             "2*log_every steps falls below this value (e.g. 0.01 = 1%%). "
+             "Combined with a generous --steps upper bound, this runs each "
+             "arch 'long enough to plateau' without wasting compute.",
+    )
+    parser.add_argument(
+        "--plateau-min-steps", type=int, default=5000,
+        help="Floor for plateau early-stop (default 5000). Prevents exits "
+             "during transient early-training plateaus.",
+    )
     parser.add_argument("--seeds", type=int, nargs="+", default=None,
                         help="Seeds to sweep (default: [42])")
     parser.add_argument("--results-dir", type=str, default="results/bench",
@@ -560,6 +580,8 @@ def main():
     )
     train_config = TrainConfig(
         total_steps=args.steps or 30_000,
+        plateau_pct=args.plateau_pct,
+        plateau_min_steps=args.plateau_min_steps,
     )
 
     # Dispatch: cached activations path is a completely different code path.

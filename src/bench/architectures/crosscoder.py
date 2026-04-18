@@ -98,7 +98,20 @@ class CrosscoderSpec(ArchSpec):
         return TemporalCrosscoder(d_in, d_sae, self.T, k).to(device)
 
     def train(self, model, gen_fn, total_steps, batch_size, lr, device,
-              log_every=500, grad_clip=1.0):
+              log_every=500, grad_clip=1.0,
+              plateau_pct: float | None = None, plateau_min_steps: int = 5000):
+        """Train the crosscoder.
+
+        plateau_pct: if set, stop early when the fractional loss drop
+            over the last 2*log_every steps falls below this value
+            (e.g. 0.01 = 1%). Useful when total_steps is a generous
+            upper bound and you want to save compute on runs that
+            converge fast. None (default) disables early stopping.
+        plateau_min_steps: floor before plateau check can trigger;
+            prevents early exits at the start of training.
+        """
+        from src.bench.plateau import should_stop_plateau
+
         optimizer = torch.optim.Adam(model.parameters(), lr=lr)
         log = {"loss": [], "l0": []}
         model.train()
@@ -130,6 +143,20 @@ class CrosscoderSpec(ArchSpec):
                                    "train/window_l0": window_l0}, step=step)
                 except Exception:
                     pass
+
+                # Plateau check (opt-in via plateau_pct).
+                if should_stop_plateau(
+                    log["loss"], step=step,
+                    threshold_pct=plateau_pct,
+                    min_steps=plateau_min_steps,
+                ):
+                    print(
+                        f"      [{self.name}] PLATEAU at step {step}: "
+                        f"stopping early (plateau_pct={plateau_pct}, "
+                        f"min_steps={plateau_min_steps}).",
+                        flush=True,
+                    )
+                    break
 
         model.eval()
         return log

@@ -77,7 +77,10 @@ class TopKSAESpec(ArchSpec):
         return TopKSAE(d_in, d_sae, k).to(device)
 
     def train(self, model, gen_fn, total_steps, batch_size, lr, device,
-              log_every=500, grad_clip=1.0):
+              log_every=500, grad_clip=1.0,
+              plateau_pct: float | None = None, plateau_min_steps: int = 5000):
+        from src.bench.plateau import should_stop_plateau
+
         optimizer = torch.optim.Adam(model.parameters(), lr=lr)
         log = {"loss": [], "l0": []}
         model.train()
@@ -110,6 +113,19 @@ class TopKSAESpec(ArchSpec):
                                   step=step)
                 except Exception:
                     pass
+
+                # Plateau check (opt-in via plateau_pct).
+                if should_stop_plateau(
+                    log["loss"], step=step,
+                    threshold_pct=plateau_pct,
+                    min_steps=plateau_min_steps,
+                ):
+                    print(
+                        f"      [{self.name}] PLATEAU at step {step}: "
+                        f"stopping early (plateau_pct={plateau_pct}).",
+                        flush=True,
+                    )
+                    break
 
         model.eval()
         return log

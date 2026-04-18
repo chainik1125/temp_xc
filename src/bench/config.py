@@ -116,6 +116,12 @@ class TrainConfig:
     grad_clip: float = 1.0
     log_every: int = 500
     seed: int = 42
+    # Plateau-detection knobs (opt-in). When plateau_pct is set, train
+    # loops stop early if the fractional loss drop over the last
+    # ~2*log_every steps falls below this value. min_steps floors
+    # the earliest possible stop. See src/bench/plateau.py.
+    plateau_pct: float | None = None
+    plateau_min_steps: int = 5000
 
 
 @dataclass
