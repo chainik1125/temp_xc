@@ -38,7 +38,7 @@ from src.data.toy.configs import (
     FeatureConfig, SequenceConfig,
 )
 from src.data.toy.dataset import generate_dataset
-from src.pipeline.toy_models import (TFAModelSpec, TXCDRv2ModelSpec, StackedSAEModelSpec)
+from src.pipeline.toy_models import TFAModelSpec, TXCDRv2ModelSpec, StackedSAEModelSpec
 from src.eval.toy_unified import evaluate_model
 from src.eval.denoising import compute_global_recovery
 from src.training.train_tfa import create_tfa, train_tfa, TFATrainingConfig

@@ -36,7 +36,7 @@ from src.data.toy.configs import (
     FeatureConfig, SequenceConfig,
 )
 from src.data.toy.dataset import generate_dataset
-from src.pipeline.toy_models import (TFAModelSpec, TXCDRv2ModelSpec, StackedSAEModelSpec)
+from src.pipeline.toy_models import TFAModelSpec, TXCDRv2ModelSpec, StackedSAEModelSpec
 from src.training.train_tfa import create_tfa
 from src.architectures.crosscoder import TemporalCrosscoder
 from src.architectures.stacked_sae import StackedSAE

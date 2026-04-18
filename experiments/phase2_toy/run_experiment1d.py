@@ -24,7 +24,10 @@ import matplotlib.pyplot as plt
 import torch
 
 from src.plotting.save_figure import save_figure
-from src.pipeline.toy_models import (DataConfig, run_topk_sweep, save_results, TFAModelSpec, TXCDRv2ModelSpec, StackedSAEModelSpec, ModelEntry)
+from src.pipeline.toy_data import DataConfig
+from src.pipeline.toy_sweeps import run_topk_sweep
+from src.pipeline.results_io import save_results
+from src.pipeline.toy_models import TFAModelSpec, TXCDRv2ModelSpec, StackedSAEModelSpec, ModelEntry
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 

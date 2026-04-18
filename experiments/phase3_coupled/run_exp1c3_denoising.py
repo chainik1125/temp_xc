@@ -30,7 +30,7 @@ from src.data.toy.configs import (
     TransitionConfig, SequenceConfig, MagnitudeConfig,
 )
 from src.data.toy.coupled_dataset import generate_coupled_dataset
-from src.pipeline.toy_models import (TFAModelSpec, TXCDRv2ModelSpec, StackedSAEModelSpec)
+from src.pipeline.toy_models import TFAModelSpec, TXCDRv2ModelSpec, StackedSAEModelSpec
 from src.eval.toy_unified import evaluate_model
 from src.eval.denoising import (
     extract_latents_tfa, extract_latents_windowed,

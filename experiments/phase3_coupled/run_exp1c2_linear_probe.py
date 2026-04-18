@@ -25,7 +25,7 @@ from src.data.toy.configs import (
     FeatureConfig, SequenceConfig,
 )
 from src.data.toy.dataset import generate_dataset
-from src.pipeline.toy_models import (TFAModelSpec, TXCDRv2ModelSpec, StackedSAEModelSpec)
+from src.pipeline.toy_models import TFAModelSpec, TXCDRv2ModelSpec, StackedSAEModelSpec
 from src.eval.denoising import (
     extract_latents_tfa, extract_latents_windowed, run_linear_probes,
 )

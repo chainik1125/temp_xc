@@ -23,8 +23,12 @@ import torch
 
 sys.path.insert(0, "/home/elysium/temp_xc")
 
-# Reuse the scanning and explainer functions from Phase 2
-from scripts.run_phase2_autointerp import (
+# Reuse the scanning and explainer functions from the sibling phase-4
+# autointerp driver.
+import sys as _sys
+from pathlib import Path as _Path
+_sys.path.insert(0, str(_Path(__file__).parent))
+from run_phase2_autointerp import (
     load_tokenizer,
     decode_window,
     is_content_mask,

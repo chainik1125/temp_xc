@@ -37,7 +37,9 @@ from src.data.toy.configs import (
     FeatureConfig, SequenceConfig,
 )
 from src.data.toy.dataset import generate_dataset
-from src.pipeline.toy_models import (SAEModelSpec, TFAModelSpec, TXCDRv2ModelSpec, StackedSAEModelSpec, ModelEntry)
+from src.pipeline.toy_models import (
+    SAEModelSpec, TFAModelSpec, TXCDRv2ModelSpec, StackedSAEModelSpec, ModelEntry,
+)
 from src.eval.toy_unified import evaluate_model
 from src.eval.toy_unified import EvalResult
 from src.architectures.relu_sae import ReLUSAE, ReLUSAETrainingConfig, train_relu_sae

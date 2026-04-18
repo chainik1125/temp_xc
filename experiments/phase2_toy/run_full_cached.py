@@ -20,7 +20,12 @@ sys.stdout.reconfigure(line_buffering=True)
 import numpy as np
 import torch
 
-from src.pipeline.toy_models import (DataConfig, SAEModelSpec, TFAModelSpec, TXCDRModelSpec, TXCDRv2ModelSpec, StackedSAEModelSpec, ModelEntry, run_topk_sweep, run_l1_sweep, save_results)
+from src.pipeline.toy_data import DataConfig
+from src.pipeline.toy_sweeps import run_topk_sweep, run_l1_sweep
+from src.pipeline.results_io import save_results
+from src.pipeline.toy_models import (
+    SAEModelSpec, TFAModelSpec, TXCDRModelSpec, TXCDRv2ModelSpec, StackedSAEModelSpec, ModelEntry,
+)
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
