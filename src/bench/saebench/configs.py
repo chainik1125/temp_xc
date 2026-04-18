@@ -65,11 +65,19 @@ class MatchingProtocol:
     tempxc_k_base: int  # k at T=T_BASE; scales with T in protocol B
 
     def tempxc_k_at(self, t: int) -> int:
-        """TempXC k for a given T. Protocol A: constant. Protocol B:
-        scales linearly with T so the total-window budget stays fixed."""
+        """Per-position TopK k for TempXC (the crosscoder's __init__
+        multiplies by T to get window_k).
+
+        Protocol A (per-token matched): constant per-position k, so
+        window_k = tempxc_k_base * T scales with T.
+
+        Protocol B (total-window budget matched): window_k fixed at
+        tempxc_k_base, so per-position k = tempxc_k_base / T
+        inversely scales with T. At T=5, B coincides with A by design.
+        """
         if self.name == "A":
             return self.tempxc_k_base
-        return self.tempxc_k_base * (t // T_BASE)
+        return max(1, self.tempxc_k_base // t)
 
 
 PROTOCOL_A = MatchingProtocol(name="A", sae_k=100, mlc_k=100, tempxc_k_base=100)
