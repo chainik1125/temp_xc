@@ -78,17 +78,17 @@ In the deterministic version, probe ratio was $\approx 1$ for everyone. With noi
 
 ### Plots
 
-![Decoder AUC](../../../src/v2_temporal_schemeC/results/experiment1c3_noisy_coupled/exp1c3n_auc.png)
+![Decoder AUC](../../../../src/v2_temporal_schemeC/results/experiment1c3_noisy_coupled/exp1c3n_auc.png)
 
-![Single-latent correlation](../../../src/v2_temporal_schemeC/results/experiment1c3_noisy_coupled/exp1c3n_corr.png)
+![Single-latent correlation](../../../../src/v2_temporal_schemeC/results/experiment1c3_noisy_coupled/exp1c3n_corr.png)
 
-![Linear probe R²](../../../src/v2_temporal_schemeC/results/experiment1c3_noisy_coupled/exp1c3n_probe.png)
+![Linear probe R²](../../../../src/v2_temporal_schemeC/results/experiment1c3_noisy_coupled/exp1c3n_probe.png)
 
-![All three ratios vs k](../../../src/v2_temporal_schemeC/results/experiment1c3_noisy_coupled/exp1c3n_ratios.png)
+![All three ratios vs k](../../../../src/v2_temporal_schemeC/results/experiment1c3_noisy_coupled/exp1c3n_ratios.png)
 
-![Scatter: hidden vs emission](../../../src/v2_temporal_schemeC/results/experiment1c3_noisy_coupled/exp1c3n_scatter.png)
+![Scatter: hidden vs emission](../../../../src/v2_temporal_schemeC/results/experiment1c3_noisy_coupled/exp1c3n_scatter.png)
 
-![Global AUC vs T](../../../src/v2_temporal_schemeC/results/experiment1c3_noisy_coupled/exp1c3n_gauc_vs_T.png)
+![Global AUC vs T](../../../../src/v2_temporal_schemeC/results/experiment1c3_noisy_coupled/exp1c3n_gauc_vs_T.png)
 
 ### Reproduction
 

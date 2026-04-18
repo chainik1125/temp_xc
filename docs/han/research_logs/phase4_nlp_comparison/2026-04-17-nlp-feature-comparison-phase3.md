@@ -18,7 +18,7 @@ Projecting all 35,575 alive decoder directions into a shared 2D UMAP reveals **f
 - **Stacked SAE (blue)** — large cloud in center-right
 - **TXCDR (orange)** — overlaps the Stacked cloud, consistent with partial Stacked↔TXCDR alignment
 
-![joint UMAP overview](../../../results/analysis/joint_umap/umap_all.png)
+![joint UMAP overview](../../../../results/analysis/joint_umap/umap_all.png)
 
 This visually confirms Phases 1 and 2: each architecture's dictionary occupies a distinct region of direction-space, even after aggressive dimensionality reduction.
 
@@ -45,7 +45,7 @@ Script: `scripts/joint_umap_visualization.py`.
 
 ### Main figure: all architectures overlaid
 
-![joint UMAP overview](../../../results/analysis/joint_umap/umap_all.png)
+![joint UMAP overview](../../../../results/analysis/joint_umap/umap_all.png)
 
 Four distinct territories, nearly disjoint:
 
@@ -58,7 +58,7 @@ This is the Phase 1a finding shown visually: each architecture occupies its own 
 
 ### Per-architecture panels
 
-![per-arch panels](../../../results/analysis/joint_umap/umap_per_arch.png)
+![per-arch panels](../../../../results/analysis/joint_umap/umap_per_arch.png)
 
 Showing each architecture's features in color against the full distribution in gray makes the overlap structure explicit:
 
@@ -69,7 +69,7 @@ Showing each architecture's features in color against the full distribution in g
 
 ### Annotated figure: what the regions mean semantically
 
-![annotated UMAP](../../../results/analysis/joint_umap/umap_all_annotated.png)
+![annotated UMAP](../../../../results/analysis/joint_umap/umap_all_annotated.png)
 
 Three representative features per category are labeled with their Phase 2 autointerp explanations. The labels anchor UMAP regions to semantic content:
 

@@ -24,12 +24,12 @@ Ran two experiments:
 
 Correlation matrices:
 
-![Positive correlation matrix](../../../src/v0_toy_model/results/small_experiment/corr_matrix_positive.png)
-![Negative correlation matrix](../../../src/v0_toy_model/results/small_experiment/corr_matrix_negative.png)
+![Positive correlation matrix](../../../../src/v0_toy_model/results/small_experiment/corr_matrix_positive.png)
+![Negative correlation matrix](../../../../src/v0_toy_model/results/small_experiment/corr_matrix_negative.png)
 
 **Large experiment** (Sections 3.2/3.5): 50 features, $d=100$, power-law firing probabilities (0.345 to 0.05), random correlation matrix (strength 0.3-0.9, sparsity 0.3). Swept $k \in \{1,2,3,5,7,9,11,13,15,18,21,25\}$ with 5 seeds each. Total: 60 SAE training runs.
 
-![Large experiment correlation matrix](../../../src/v0_toy_model/results/large_experiment/corr_matrix.png)
+![Large experiment correlation matrix](../../../../src/v0_toy_model/results/large_experiment/corr_matrix.png)
 
 ## what we found
 
@@ -46,37 +46,37 @@ At the correct L0, SAE latents cleanly recover true features. At too-low L0, the
 
 Positive correlations, $k=2.0$ (correct L0) — clean diagonal:
 
-![Positive k=2.0](../../../src/v0_toy_model/results/small_experiment/heatmap_positive_k2p0.png)
+![Positive k=2.0](../../../../src/v0_toy_model/results/small_experiment/heatmap_positive_k2p0.png)
 
 Positive correlations, $k=1.8$ (too low) — $f_0$ absorbs correlated features:
 
-![Positive k=1.8](../../../src/v0_toy_model/results/small_experiment/heatmap_positive_k1p8.png)
+![Positive k=1.8](../../../../src/v0_toy_model/results/small_experiment/heatmap_positive_k1p8.png)
 
 Negative correlations, $k=2.0$ (correct L0) — clean diagonal:
 
-![Negative k=2.0](../../../src/v0_toy_model/results/small_experiment/heatmap_negative_k2p0.png)
+![Negative k=2.0](../../../../src/v0_toy_model/results/small_experiment/heatmap_negative_k2p0.png)
 
 Negative correlations, $k=1.8$ (too low) — $f_0$ repels correlated features:
 
-![Negative k=1.8](../../../src/v0_toy_model/results/small_experiment/heatmap_negative_k1p8.png)
+![Negative k=1.8](../../../../src/v0_toy_model/results/small_experiment/heatmap_negative_k1p8.png)
 
 **Large experiment — agrees with Chanin et al.:**
 
 $c_{\text{dec}}$ vs L0 — V-shaped curve minimized at $k=11$ ($c_{\text{dec}}=0.003$), near the true $L_0 \approx 9.9$. Matches Figure 6:
 
-![c_dec vs L0](../../../src/v0_toy_model/results/large_experiment/cdec_vs_l0.png)
+![c_dec vs L0](../../../../src/v0_toy_model/results/large_experiment/cdec_vs_l0.png)
 
 $k=5$ (too low) — widespread mixing, columns show multiple features absorbed into single latents:
 
-![Heatmap k=5](../../../src/v0_toy_model/results/large_experiment/heatmap_k5.png)
+![Heatmap k=5](../../../../src/v0_toy_model/results/large_experiment/heatmap_k5.png)
 
 $k=11$ (correct) — near-perfect identity matrix, clean feature recovery:
 
-![Heatmap k=11](../../../src/v0_toy_model/results/large_experiment/heatmap_k11.png)
+![Heatmap k=11](../../../../src/v0_toy_model/results/large_experiment/heatmap_k11.png)
 
 $k=18$ (too high) — degenerate mixing with dead features. Matches Figure 1:
 
-![Heatmap k=18](../../../src/v0_toy_model/results/large_experiment/heatmap_k18.png)
+![Heatmap k=18](../../../../src/v0_toy_model/results/large_experiment/heatmap_k18.png)
 
 **One divergence from the paper:**
 

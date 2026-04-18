@@ -83,17 +83,17 @@ Note: for windowed models, latent activations are averaged across overlapping wi
 
 ### Plots
 
-![Decoder AUC: emission vs hidden](../../../src/v2_temporal_schemeC/results/experiment1c3_coupled/exp1c3_auc.png)
+![Decoder AUC: emission vs hidden](../../../../src/v2_temporal_schemeC/results/experiment1c3_coupled/exp1c3_auc.png)
 
-![Single-latent correlation](../../../src/v2_temporal_schemeC/results/experiment1c3_coupled/exp1c3_corr.png)
+![Single-latent correlation](../../../../src/v2_temporal_schemeC/results/experiment1c3_coupled/exp1c3_corr.png)
 
-![Linear probe R²](../../../src/v2_temporal_schemeC/results/experiment1c3_coupled/exp1c3_probe.png)
+![Linear probe R²](../../../../src/v2_temporal_schemeC/results/experiment1c3_coupled/exp1c3_probe.png)
 
-![All three ratios vs k](../../../src/v2_temporal_schemeC/results/experiment1c3_coupled/exp1c3_ratios.png)
+![All three ratios vs k](../../../../src/v2_temporal_schemeC/results/experiment1c3_coupled/exp1c3_ratios.png)
 
-![Scatter: hidden vs emission (3 metrics)](../../../src/v2_temporal_schemeC/results/experiment1c3_coupled/exp1c3_scatter.png)
+![Scatter: hidden vs emission (3 metrics)](../../../../src/v2_temporal_schemeC/results/experiment1c3_coupled/exp1c3_scatter.png)
 
-![Global AUC vs window size T](../../../src/v2_temporal_schemeC/results/experiment1c3_coupled/exp1c3_gauc_vs_T.png)
+![Global AUC vs window size T](../../../../src/v2_temporal_schemeC/results/experiment1c3_coupled/exp1c3_gauc_vs_T.png)
 
 ### Reproduction
 

@@ -20,9 +20,9 @@ Each architecture finds a qualitatively different type of feature:
 
 TFA pred-only finds features that per-token SAEs architecturally cannot (the identity of a digit token depends on context). Stacked's lexical features are unreachable to TFA. TXCDR partially overlaps both.
 
-![confidence summary](../../../results/analysis/autointerp/confidence_summary.png)
+![confidence summary](../../../../results/analysis/autointerp/confidence_summary.png)
 
-![feature examples](../../../results/analysis/autointerp/feature_examples.png)
+![feature examples](../../../../results/analysis/autointerp/feature_examples.png)
 
 ## Method
 

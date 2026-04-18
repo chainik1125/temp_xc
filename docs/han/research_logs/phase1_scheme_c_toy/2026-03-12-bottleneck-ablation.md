@@ -107,7 +107,7 @@ These match the original v2 results exactly (same seed).
 | 5 | 2 | 1.05 | 0.94 | 0.64 | 1.32 |
 | 10 | 1 | 1.02 | 1.01 | 1.03 | 1.54 |
 
-![Bottleneck sweep](../../../src/v2_temporal_schemeC/results/bottleneck_ablation/bottleneck_sweep.png)
+![Bottleneck sweep](../../../../src/v2_temporal_schemeC/results/bottleneck_ablation/bottleneck_sweep.png)
 
 **Detailed NMSE (SAE / TFA / TFA-shuffled):**
 
@@ -118,7 +118,7 @@ These match the original v2 results exactly (same seed).
 | nh4_bf5 | .2202 / .1057 / .1111 | .1428 / .0608 / .0572 | .0678 / .0299 / .0189 | .0318 / .0076 / .0100 |
 | nh4_bf10 | .2202 / .1478 / .1509 | .1428 / .0956 / .0967 | .0678 / .0237 / .0244 | .0318 / .0054 / .0083 |
 
-![NMSE by bottleneck](../../../src/v2_temporal_schemeC/results/bottleneck_ablation/nmse_by_bottleneck.png)
+![NMSE by bottleneck](../../../../src/v2_temporal_schemeC/results/bottleneck_ablation/nmse_by_bottleneck.png)
 
 ### Part 2: n_heads sweep (bf=1)
 
@@ -146,7 +146,7 @@ These match the original v2 results exactly (same seed).
 | nh2_bf1 | .2202 / .0841 / .0988 | .1428 / .0378 / .0587 | .0678 / .0088 / .0163 | .0318 / .0043 / .0076 |
 | nh4_bf1 | .2202 / .0740 / .0901 | .1428 / .0409 / .0527 | .0678 / .0135 / .0179 | .0318 / .0047 / .0056 |
 
-![n_heads sweep](../../../src/v2_temporal_schemeC/results/bottleneck_ablation/nheads_sweep.png)
+![n_heads sweep](../../../../src/v2_temporal_schemeC/results/bottleneck_ablation/nheads_sweep.png)
 
 ## Findings
 

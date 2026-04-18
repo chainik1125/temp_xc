@@ -114,9 +114,9 @@ The temporal fraction measures what share of TFA's NMSE improvement over the SAE
 | 0.7 | 0.0245 | 97% | 3% | 0.0289 | 91% | **9%** |
 | 0.9 | 0.0287 | 99% | 1% | 0.0273 | 94% | 6% |
 
-![Correlation sweep k=3](../../../src/v2_temporal_schemeC/results/correlation_sweep/correlation_sweep_k3.png)
+![Correlation sweep k=3](../../../../src/v2_temporal_schemeC/results/correlation_sweep/correlation_sweep_k3.png)
 
-![Correlation sweep k=10](../../../src/v2_temporal_schemeC/results/correlation_sweep/correlation_sweep_k10.png)
+![Correlation sweep k=10](../../../../src/v2_temporal_schemeC/results/correlation_sweep/correlation_sweep_k10.png)
 
 ## Findings
 

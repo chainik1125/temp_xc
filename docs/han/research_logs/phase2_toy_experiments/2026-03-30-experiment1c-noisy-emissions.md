@@ -179,15 +179,15 @@ The linear probe results corroborate the single-latent correlation analysis in a
 
 ### Plots
 
-![NMSE and AUC vs k](../../../src/v2_temporal_schemeC/results/experiment1c_noisy/exp1c_topk_auc.png)
+![NMSE and AUC vs k](../../../../src/v2_temporal_schemeC/results/experiment1c_noisy/exp1c_topk_auc.png)
 
-![Windowed models only](../../../src/v2_temporal_schemeC/results/experiment1c_noisy/exp1c_windowed_only.png)
+![Windowed models only](../../../../src/v2_temporal_schemeC/results/experiment1c_noisy/exp1c_windowed_only.png)
 
-![Denoising analysis](../../../src/v2_temporal_schemeC/results/experiment1c_noisy/exp1c_denoising.png)
+![Denoising analysis](../../../../src/v2_temporal_schemeC/results/experiment1c_noisy/exp1c_denoising.png)
 
-![Linear probe analysis](../../../src/v2_temporal_schemeC/results/experiment1c_noisy/exp1c_linear_probe.png)
+![Linear probe analysis](../../../../src/v2_temporal_schemeC/results/experiment1c_noisy/exp1c_linear_probe.png)
 
-![Linear probe scatter](../../../src/v2_temporal_schemeC/results/experiment1c_noisy/exp1c_probe_scatter.png)
+![Linear probe scatter](../../../../src/v2_temporal_schemeC/results/experiment1c_noisy/exp1c_probe_scatter.png)
 
 ### Reproduction
 

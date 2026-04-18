@@ -130,13 +130,13 @@ Despite the higher per-token floor, **the same denoising hierarchy holds**: TFA-
 
 ### Plots
 
-![NMSE and AUC](../../../src/v2_temporal_schemeC/results/experiment1c2_sparse/exp1c2_topk_auc.png)
+![NMSE and AUC](../../../../src/v2_temporal_schemeC/results/experiment1c2_sparse/exp1c2_topk_auc.png)
 
-![Denoising ratio vs k](../../../src/v2_temporal_schemeC/results/experiment1c2_sparse/exp1c2_denoising.png)
+![Denoising ratio vs k](../../../../src/v2_temporal_schemeC/results/experiment1c2_sparse/exp1c2_denoising.png)
 
-![Denoising ratio vs T](../../../src/v2_temporal_schemeC/results/experiment1c2_sparse/exp1c2_denoising_vs_T.png)
+![Denoising ratio vs T](../../../../src/v2_temporal_schemeC/results/experiment1c2_sparse/exp1c2_denoising_vs_T.png)
 
-![Per-rho-group denoising](../../../src/v2_temporal_schemeC/results/experiment1c2_sparse/exp1c2_per_rho_denoising.png)
+![Per-rho-group denoising](../../../../src/v2_temporal_schemeC/results/experiment1c2_sparse/exp1c2_per_rho_denoising.png)
 
 ### Reproduction
 

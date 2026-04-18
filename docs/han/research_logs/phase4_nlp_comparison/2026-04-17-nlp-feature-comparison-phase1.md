@@ -101,11 +101,11 @@ All 20 high-alignment TFA features map to **the same single TXCDR feature** (ind
 
 TXCDR ↔ Stacked alignment (median 0.23) is meaningfully higher than TFA ↔ anything (median 0.10–0.12). The window-based architectures partially overlap each other; both differ sharply from TFA.
 
-![alive alignment histogram](../../../results/analysis/decoder_alignment/alive_best_match_hist.png)
+![alive alignment histogram](../../../../results/analysis/decoder_alignment/alive_best_match_hist.png)
 
 And the scatter (one panel per architecture; each point is one alive feature, positioned by its best-|cos| match with each of the other two architectures; red shading marks the "unique" region where best-match < 0.3 on both axes):
 
-![alive alignment scatter](../../../results/analysis/decoder_alignment/best_match_scatter.png)
+![alive alignment scatter](../../../../results/analysis/decoder_alignment/best_match_scatter.png)
 
 ### Phase 1a conclusion
 
@@ -126,7 +126,7 @@ Method: run each trained model on 500 eval sequences (128 tokens each), binarize
 | TFA novel | **1.10** | 1 | 1 | 2 | 0.1% | 0.1% | 0.1% |
 | TFA pred | **4.46** | 2 | 9 | **51.0** | 16.7% | 8.1% | **3.6%** |
 
-![activation spans](../../../results/analysis/activation_spans/span_histograms.png)
+![activation spans](../../../../results/analysis/activation_spans/span_histograms.png)
 
 ### Interpretation
 
@@ -151,7 +151,7 @@ summed over 1000 eval sequences × 128 tokens.
 
 ### Result: complete bimodal specialization
 
-![pred vs novel](../../../results/analysis/tfa_pred_vs_novel/pred_ratio_hist.png)
+![pred vs novel](../../../../results/analysis/tfa_pred_vs_novel/pred_ratio_hist.png)
 
 The distribution of `pred_ratio` is **entirely bimodal at 0 and 1**. Mean = 0.43, median = 0.00, with a sharp bimodal peak:
 

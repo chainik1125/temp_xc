@@ -78,7 +78,7 @@ SAE/TFA/TFA-shuffled trained 30K steps; TXCDR trained 80K steps. Evaluated on 12
 | 10 | **0.990** | 0.927 | 0.928 | 0.911 | 0.817 |
 | 15 | 0.964 | 0.886 | 0.886 | **0.953** | 0.818 |
 
-![Exp 1: TopK sweep](../../../src/v2_temporal_schemeC/results/low_pi_regime/exp1_topk_sweep.png)
+![Exp 1: TopK sweep](../../../../src/v2_temporal_schemeC/results/low_pi_regime/exp1_topk_sweep.png)
 
 **Findings.**
 
@@ -96,7 +96,7 @@ SAE/TFA/TFA-shuffled trained 30K steps; TXCDR trained 80K steps. Evaluated on 12
 
 Swept $\lambda$ over 15 log-spaced values (ReLU SAE: $10^{-2}$ to $10^{2}$; TFA: $10^{-1}$ to $10^{2.5}$; TXCDR $T$=2: $10^{-1}$ to $10^{2}$).
 
-![Exp 2: Pareto frontier](../../../src/v2_temporal_schemeC/results/low_pi_regime/exp2_pareto.png)
+![Exp 2: Pareto frontier](../../../../src/v2_temporal_schemeC/results/low_pi_regime/exp2_pareto.png)
 
 **Findings.**
 
@@ -137,7 +137,7 @@ The attention now **strongly distinguishes** long continuations from sudden onse
 
 Temporal $\approx$ shuffled for global direction quality. The negative cosine indicates the directions are anti-aligned with $x_t$ (an artifact of the learned dictionary orientation), but the magnitude is similar. Both capture ~76% variance explained vs 1% for random.
 
-![Exp 3: Direction and run-length analysis, k=3](../../../src/v2_temporal_schemeC/results/low_pi_regime/exp3_k3.png)
+![Exp 3: Direction and run-length analysis, k=3](../../../../src/v2_temporal_schemeC/results/low_pi_regime/exp3_k3.png)
 
 ### Run-length prediction projections (after proj\_scale)
 

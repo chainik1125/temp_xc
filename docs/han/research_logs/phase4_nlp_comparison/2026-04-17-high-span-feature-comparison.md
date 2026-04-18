@@ -25,7 +25,7 @@ Three tests of direct comparison on the high-span (most-temporal) subsets:
 
 Conclusion: the three architectures find **three different kinds of temporal signal**, encoded in **orthogonal directions** with **partially overlapping activation coverage**. TFA-pred is the qualitatively distinct one — its top high-span features identify structural positions that depend on preceding context and cannot be found by per-token or window-local SAEs.
 
-![high-span comparison](../../../results/analysis/high_span_comparison/high_span_comparison.png)
+![high-span comparison](../../../../results/analysis/high_span_comparison/high_span_comparison.png)
 
 ## Method
 

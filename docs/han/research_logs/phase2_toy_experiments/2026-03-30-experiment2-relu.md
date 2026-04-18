@@ -9,7 +9,7 @@ tags:
 
 **Models.** Same architectures as Experiment 1, but using **ReLU + L1** sparsity instead of TopK. Both the SAE and TFA's novel component use a ReLU encoder with an L1 penalty $\lambda \|z\|_1$ on the latent codes; L0 emerges from training rather than being fixed. We call the SAE baseline in this experiment the **ReLU SAE** to distinguish it from the Shared SAE in Experiment 1. Swept $\lambda$ over 15 log-spaced values (ReLU SAE: $5 \times 10^{-3}$ to $20$; TFA: $0.15$ to $60$; TXCDR: $3.2 \times 10^{-2}$ to $32$). Each $\lambda$ produces one (L0, NMSE) point; the Pareto frontier is the lower envelope.
 
-![Pareto with AUC](../../../src/v2_temporal_schemeC/results/auc_and_crosscoder/exp2_pareto_auc.png)
+![Pareto with AUC](../../../../src/v2_temporal_schemeC/results/auc_and_crosscoder/exp2_pareto_auc.png)
 
 Left: L0 vs NMSE Pareto. Centre: L0 vs AUC Pareto. Right: NMSE vs AUC scatter. **Solid lines with large markers** are Pareto frontiers; **faded dots** are dominated runs.
 
