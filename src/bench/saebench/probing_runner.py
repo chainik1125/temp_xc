@@ -46,14 +46,24 @@ from src.bench.saebench.saebench_wrapper import SAEBenchAdapter
 def _load_arch_and_model(
     arch: ArchName,
     ckpt_path: str,
-    k: int,
+    protocol: ProtocolName,
     t: int,
     device: torch.device,
 ):
-    """Instantiate the right ArchSpec + model, load the checkpoint."""
+    """Instantiate the right ArchSpec + model, load the checkpoint.
+
+    Resolves the architecture's training-time TopK k from (arch, protocol, t)
+    via `protocol_k`. This is load-bearing: TopKSAE / TemporalCrosscoder
+    keep `k` as a plain Python int, not in `state_dict`, so if we instantiate
+    with the wrong k the loaded weights work but `encode()` runs `topk(k, ...)`
+    at the wrong sparsity — k=0 silently returns all zeros.
+    """
     from src.bench.architectures.topk_sae import TopKSAESpec
     from src.bench.architectures.crosscoder import CrosscoderSpec
     from src.bench.architectures.mlc import LayerCrosscoderSpec
+    from src.bench.saebench.matching_protocols import protocol_k
+
+    k = protocol_k(arch, protocol, t=t)
 
     if arch == "sae":
         spec = TopKSAESpec()
@@ -128,8 +138,10 @@ def run_probing(
 
     torch_device = torch.device(device)
 
-    # 1. Instantiate our architecture + load weights
-    spec, model = _load_arch_and_model(arch, ckpt_path, k, t, torch_device)
+    # 1. Instantiate our architecture + load weights. The `k` arg is a
+    # placeholder (probing k is swept inside SAEBench); the SAE's
+    # training-time TopK k is resolved from (arch, protocol, t).
+    spec, model = _load_arch_and_model(arch, ckpt_path, protocol, t, torch_device)
 
     # 2. MLC requires multi-hook collection; dispatch to the forked
     #    probing path for MLC. SAE and TempXC use SAEBench's stock flow.
