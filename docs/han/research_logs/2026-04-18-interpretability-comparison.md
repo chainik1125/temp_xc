@@ -40,6 +40,39 @@ Artifacts:
 - `results/nlp_sweep/gemma/scans/span_weighted_labels__<arch>__<layer>__k50.json`
   — Haiku labels.
 
+## Summary figure
+
+[![interpretability comparison hero](../../../results/nlp_sweep/gemma/figures/interpretability_comparison_hero.doc.png)](../../../results/nlp_sweep/gemma/figures/interpretability_comparison_hero.png)
+
+One page, two rows (L25 top, L13 bottom), three panels each:
+
+- **A. Quality-filter pass count.** Of each arch's span-weighted top-25
+  (Crosscoder: decoder-conc top-15), how many features pass progressively
+  stricter quality filters — content-bearing exemplars, cross-chain ≥ 3,
+  window_start diverse ≥ 3, Haiku-labeled-not-unclear. TFA pred drops to
+  **0 at the "cross-chain ≥ 3" filter at L25** (all 25 come from one
+  Chinese-language passage) and **to 0 at "window_start diverse ≥ 3" at
+  L13** (all 25 fire exclusively at position 0, a BOS-detector signature).
+  Stacked SAE, Crosscoder, and TFA novel keep 8–25 features through the
+  full filter stack.
+- **B. Per-feature exemplar diversity.** Scatter of (unique chains, unique
+  window_starts) in each feature's top-10. Healthy features cluster at
+  (10, 10). **TFA pred L25 collapses to (1, 10)** — single chain, varied
+  positions within that chain. **TFA pred L13 collapses to (10, 1)** —
+  different chains, all at position 0.
+- **C. Label collapse.** Size of the largest Haiku-label cluster (features
+  sharing the same 5-content-word label prefix after stripping "the
+  feature fires on" boilerplate). **TFA pred L13 has 13 / 25 (52%)
+  features all labeled "introductory or transitional phrases"**, because
+  Haiku imposes the same semantic on identical BOS-position signatures.
+  Other archs: 1–3 features per largest cluster.
+
+Direct reading of the figure: TFA pred's "features" at span-weighted
+rank are not multiple distinct semantic detectors — they are one or two
+positional/architectural signatures that Haiku cannot distinguish.
+Crosscoder, Stacked, and TFA novel produce diverse, cross-chain, content-
+bearing features under the same ranking.
+
 ## TL;DR
 
 - **The prior claim "TFA pred has 0 high-span features" was wrong in
