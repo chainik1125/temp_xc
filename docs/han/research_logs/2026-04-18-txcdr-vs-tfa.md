@@ -272,67 +272,65 @@ Fisher-exact TFA pred 4 / 200 vs TXCDR 139 / 200: **p = 2.8 × 10⁻⁵²**.
 
 ## Qualitative comparison — 10 top-span-weighted features per arch
 
-Top 10 features by span-weighted rank, seeded.
-"n_chains" = distinct chains in top-10. "n_ws" = distinct
-`window_start` values in top-10.
-
-*(Haiku labels for some features are being refreshed; `[…]` marks
-features currently unlabeled — v3 of the labeler is running.)*
+Top 10 features by span-weighted rank, seeded. "ch" = distinct chains
+in top-10. "ws" = distinct `window_start` values in top-10. Labels
+are Claude Haiku on top-10 exemplars.
 
 ### resid_L25
 
 **TXCDR (Crosscoder) — top 10 decoder-based span-weighted**
 
-| rank | feat | n_ch | n_ws | top exemplar |
-|---|---:|---:|---:|---|
-| 1 | 17925 | 10 | 5 | `>>>Tif Fus<<<sell \| dottie angel dearies 2 \|` |
-| 2 | 11796 | 10 | 1 | `>>>Stumblers don<<<’t have any interests in any commercial organisations,` |
-| 3 | 15214 | 10 | 10 | `>>>Tuesday, September<<< 23, 2014\n` |
-| 4 | 16658 | 10 | 10 | `to use their left hand when using the right hand >>>was no longer possible.<<<` |
-| 5 | 9996 | 10 | 6 | `>>>Exotica<<< Jasper Smooth Stone\nAKA Porcelain Jasper\nAKA Sci` |
-| 6 | 3961 | 10 | 5 | `>>>Tif Fus<<<sell \| dottie angel dearies 2 \|` |
-| 7 | 17013 | 1 | 10 | `Canon EOS 5D Mark IV Legenden fortsätter >>>- för visst måste man<<< ändå kalla` |
-| 8 | 1172 | 1 | 10 | `Patient CT images were segmented into liver tissues, >>>contrast-enhanced vessels,<<<` |
-| 9 | 6189 | 10 | 6 | `>>>Best<<< Skin Care Courses in India \| Lakme Lajpat` |
-| 10 | 14849 | 10 | 9 | `>>>Is<<< casting your own ammo worth the trouble?` |
+| rank | feat | ch | ws | Haiku label | top exemplar |
+|---|---:|---:|---:|---|---|
+| 1 | 17925 | 10 | 5 | Titles or headlines followed by descriptive content | `>>>Tif Fus<<<sell \| dottie angel…` |
+| 2 | 11796 | 10 | 1 | Text boundaries / section headers separating titles | `>>>Stumblers don<<<'t have any interests…` |
+| 3 | 15214 | 10 | 10 | Phrases that begin sentences or new topics | `>>>Tuesday, September<<< 23, 2014` |
+| 4 | 16658 | 10 | 10 | Periods / transitions between sentences | `…the right hand >>>was no longer possible.<<<` |
+| 5 | 9996 | 10 | 6 | Capitalised phrases introducing product names | `>>>Exotica<<< Jasper Smooth Stone` |
+| 6 | 3961 | 10 | 5 | Proper nouns / brand names followed by descriptive text | `>>>Tif Fus<<<sell \| dottie…` |
+| 7 | 17013 | 1 | 10 | Swedish camera-spec / evaluative transitions (single-passage) | `Canon EOS 5D Mark IV Legenden…` |
+| 8 | 1172 | 1 | 10 | CT-imaging anatomical segmentation (single-passage) | `Patient CT images were segmented into…` |
+| 9 | 6189 | 10 | 6 | Starting words that begin sentences or phrases | `>>>Best<<< Skin Care Courses in India` |
+| 10 | 14849 | 10 | 9 | Words at the beginning of sentences (capitalised starters) | `>>>Is<<< casting your own ammo worth…` |
 
-Pattern: capitalised sentence starts (17925, 3961, 14849, 6189),
-dates / temporal markers (15214), domain-specific prose (9996,
-16658), single-passage memorisers at ranks 7-8 (17013 Swedish
-camera review; 1172 radiology prose).
+Pattern: structural openers (sentence starts, titles, section
+headers) and a couple of domain-specific single-passage detectors
+(ranks 7-8). 8 / 10 cross-chain.
 
 **TFA novel — top 10 activation-based span-weighted**
 
-| rank | feat | n_ch | n_ws | top exemplar |
-|---|---:|---:|---:|---|
-| 1 | 11071 | 4 | 9 | `I interview the founder of the >>>company, Dr. Ayala<<<, and she talks abou` |
-| 2 | 11310 | 5 | 9 | `Weezy didn>>>'t seem to be<<< feeling the crowd's reaction` |
-| 3 | 18010 | 6 | 10 | `Ida M.>>>(Smith) Murphy-<<<Rawcliffe, 90, of Swansea` |
-| 4 | 12076 | 8 | 10 | `Information now travels really >>>fast and is much more<<<` |
-| 5 | 4239 | 8 | 10 | `organic approach to ambient noise, this is just structured >>>enough to attain a consider<<<` |
-| 6 | 7720 | 7 | 10 | `In this video, I interview the founder of the >>>company, Dr. Ayala<<<, and she talks abou` |
-| 7 | 9491 | 7 | 10 | `Jasmine Lynn\|\|Stashed: 75>>>7 times\|\n\|<<<Director: N/A` |
-| 8 | 12072 | 9 | 9 | `each design->>>focused chapter presenting a s<<<` |
-| 9 | 17616 | 6 | 10 | `Ryan Wilson and I debate on >>>the latest edition of the<<<` |
-| 10 | 7309 | 7 | 10 | `:00 AM to 6:00 >>>PM\n\|Where\|\|<<<Vail Public Library` |
+| rank | feat | ch | ws | Haiku label | top exemplar |
+|---|---:|---:|---:|---|---|
+| 1 | 11071 | 4 | 9 | Personal titles / names of people being introduced | `…the founder of the >>>company, Dr. Ayala<<<…` |
+| 2 | 11310 | 5 | 9 | Negative or contrary conditions ("didn't / not") | `…Weezy didn>>>'t seem to be<<<…` |
+| 3 | 18010 | 6 | 10 | Person names / titles in formal biographical context | `Ida M.>>>(Smith) Murphy-<<<Rawcliffe…` |
+| 4 | 12076 | 8 | 10 | Text describing methods / processes | `…travels really >>>fast and is much more<<<…` |
+| 5 | 4239 | 8 | 10 | Phrases describing benefits between comparative structures | `…just structured >>>enough to attain a consider<<<…` |
+| 6 | 7720 | 7 | 10 | Personal names / titles being introduced | `…the founder of the >>>company, Dr. Ayala<<<…` |
+| 7 | 9491 | 7 | 10 | Pipe delimiters separating metadata fields | `Jasmine Lynn\|\|Stashed: 75>>>7 times\| \|<<<…` |
+| 8 | 12072 | 9 | 9 | Phrases introducing consequences / results | `each design->>>focused chapter presenting a s<<<…` |
+| 9 | 17616 | 6 | 10 | Phrases marking transitions between quoted material | `…I debate on >>>the latest edition of the<<<…` |
+| 10 | 7309 | 7 | 10 | Pipes separating navigation elements in web content | `:00 AM to 6:00 >>>PM \|Where\| \|<<<…` |
 
-Pattern: mid-sentence prose transitions, name/title detectors,
-structural markers in table-like formatting. Real features; more
-prose-oriented than TXCDR which leans structural. The 49-feature
-max-cluster is probably a sub-family of these (many features hit
-similar interview/bio passages — features 11071 and 7720 share the
-same top exemplar).
+Pattern: prose transitions, person-name detectors, table-delimiter
+patterns. Cross-chain and semantically diverse at the individual-
+feature level. But note features 11071 and 7720 share the same top
+exemplar — the 49-feature max-cluster at L25 is a family of
+"person-introduction" features that Haiku labels distinctly but
+share exemplars.
 
 **TFA pred — top 10 activation-based span-weighted**
 
-All 10 features' top-10 exemplar set is identical: a biochemistry
-passage ("NUCLEOTIDES joined together in a POLYNUCLEOTIDE CHAIN by
-PHOSPHODIEST…"). Every feature has n_chains = 6 and n_ws = 9 by
-happy accident (the passage spans 6 chains because the text appears
-in cross-references). Haiku labels most of them "Unclear"; a few get
-"proper names or compound words where a name is split across token
-boundaries" — which is Haiku hallucinating semantics on what is
-structurally a single passage memoriser.
+All 10 features' top-10 exemplar set is **literally identical**:
+a biochemistry passage ("NUCLEOTIDES joined together in a
+POLYNUCLEOTIDE CHAIN by PHOSPHODIESTER BONDS"). Every feature has
+n_chains = 6 and n_ws = 9 — they're all reading the same activation
+pattern. Haiku labels them with different surface descriptions
+("Unclear", "proper nouns split across boundaries", "word boundaries
+within multi-syllabic words", "named entities split", …) because
+the labeler sees the same text 10 times and picks different framings.
+The labels are artifacts of the labeler trying to disambiguate
+identical inputs.
 
 This is the headline result: **194 / 200 TFA pred features at L25
 share this exact top-10 exemplar set**. They are not 200 features;
@@ -342,55 +340,60 @@ they are essentially one feature direction duplicated.
 
 **TXCDR (Crosscoder) — top 10 decoder-based span-weighted**
 
-| rank | feat | n_ch | n_ws | top exemplar |
-|---|---:|---:|---:|---|
-| 1 | 1004 | 10 | 1 | `>>>I have taken several<<< Marcy Tilton workshops` |
-| 2 | 7820 | 10 | 1 | `>>>TORONTO, Jan<<<. 10 /CNW/ - The` |
-| 3 | 7347 | 10 | 6 | `>>>St.<<< patrick's day is quickly approaching!` |
-| 4 | 5080 | 10 | 1 | `>>>Airbnb’s new<<< Experiences and Places has been filling the news` |
-| 5 | 2587 | 10 | 5 | `>>>Barney is back<<< with new licensees for products` |
-| 6 | 5065 | 10 | 5 | `>>>Time management was<<< vital in Premier Inn` |
-| 7 | 16314 | 10 | 7 | `>>>St.<<< patrick's day is quickly approaching!` |
-| 8 | 11488 | 10 | 5 | `>>>Best<<< Skin Care Courses in India \| Lakme Lajpat` |
-| 9 | 10540 | 10 | 6 | `>>>Tif Fus<<<sell \| dottie angel dearies 2 \|` |
-| 10 | 15465 | 10 | 7 | `>>>Israeli<<< army probes video of dancing soldier` |
+| rank | feat | ch | ws | Haiku label | top exemplar |
+|---|---:|---:|---:|---|---|
+| 1 | 1004 | 10 | 1 | First-person statements introducing personal experiences | `>>>I have taken several<<< Marcy Tilton workshops…` |
+| 2 | 7820 | 10 | 1 | Informal greetings / announcements introducing events | `>>>TORONTO, Jan<<<. 10 /CNW/ - The` |
+| 3 | 7347 | 10 | 6 | Capitalised phrases marking titles / headings | `>>>St.<<< patrick's day is quickly approaching!` |
+| 4 | 5080 | 10 | 1 | Noun phrases followed by descriptive words | `>>>Airbnb's new<<< Experiences and Places…` |
+| 5 | 2587 | 10 | 5 | Promotional headings / product names / navigation labels | `>>>Barney is back<<< with new licensees…` |
+| 6 | 5065 | 10 | 5 | Possessive constructions followed by descriptive phrases | `>>>Time management was<<< vital in Premier Inn` |
+| 7 | 16314 | 10 | 7 | Short noun phrases serving as titles / introductory labels | `>>>St.<<< patrick's day is quickly approaching!` |
+| 8 | 11488 | 10 | 5 | Capitalised words at start of text segments / titles | `>>>Best<<< Skin Care Courses in India` |
+| 9 | 10540 | 10 | 6 | Capitalised proper nouns / brand names at phrase start | `>>>Tif Fus<<<sell \| dottie…` |
+| 10 | 15465 | 10 | 7 | Capitalised words starting sentences / titles | `>>>Israeli<<< army probes video…` |
 
-Pattern: sentence-start detectors at position 0 (1004, 7820, 5080) —
-news datelines, headlines. Ranks 3-10 fire at more diverse
-positions, capturing structural titles / openings across genres.
+Pattern: news datelines (7820 "TORONTO, Jan."), sentence-openers,
+headline detectors. All 10 / 10 cross-chain. Ranks 1, 2, 4 have
+`n_ws = 1` — these fire specifically at sentence-start (position 0
+of their window), which is a meaningful structural property at
+mid-layer.
 
 **TFA novel — top 10 activation-based span-weighted**
 
-| rank | feat | n_ch | n_ws | top exemplar |
-|---|---:|---:|---:|---|
-| 1 | 8814 | 5 | 10 | `blog guests will be my >>>pleasure… so stay tune<<<!` |
-| 2 | 17349 | 8 | 10 | `resolution brain scans, coupled with computational analysis, >>>could play a critical rol<<<` |
-| 3 | 16109 | 8 | 10 | `National Historic Landmarks. Joe Schmidt >>>was kin<<<` |
-| 4 | 17108 | 5 | 9 | `related post section >>>at below of this post<<<` |
-| 5 | 15544 | 4 | 10 | `>>>Meanwhile… here are<<< some new and old men` |
-| 6 | 11776 | 5 | 10 | `would like to send us >>>extra materia<<<` |
-| 7 | 8573 | 5 | 10 | `GIMP a little more and here is a little` |
-| 8 | 12512 | 4 | 10 | `without ever scheduling` |
-| 9 | 8992 | 6 | 10 | `If you have found a problem with this lecture` |
-| 10 | 16516 | 6 | 10 | `browse through the search field beside or related post section` |
+| rank | feat | ch | ws | Haiku label | top exemplar |
+|---|---:|---:|---:|---|---|
+| 1 | 8814 | 5 | 10 | Temporal-sequence phrases | `…my >>>pleasure… so stay tune<<<!` |
+| 2 | 17349 | 8 | 10 | Phrases expressing potential utility / capability | `…analysis, >>>could play a critical role<<<…` |
+| 3 | 16109 | 8 | 10 | Transitions between independent clauses / sentences | `…Joe Schmidt >>>was kind enough to answer<<<…` |
+| 4 | 17108 | 5 | 9 | Tokens marking transitions between clauses | `…>>>at below of this post<<<…` |
+| 5 | 15544 | 4 | 10 | Transitions introducing new topics ("here are …") | `stay tune! >>>Meanwhile… here are<<<…` |
+| 6 | 11776 | 5 | 10 | Transition phrases connecting instructions to next step | `…or >>>would like to send us<<<…` |
+| 7 | 8573 | 5 | 10 | First-person statements expressing experience / pride | `…So;>>> I have been playing with<<<…` |
+| 8 | 12512 | 4 | 10 | Transition from completed action to consequences | `…close last week>>>, but he did so<<<…` |
+| 9 | 8992 | 6 | 10 | Phrases expressing conditional requests / hypotheticals | `If you have found a problem…>>>would like to send<<<…` |
+| 10 | 16516 | 6 | 10 | Phrases indicating location / context | `…search field beside or >>>at below of this post<<<…` |
 
-Pattern: mid-sentence transition phrases, instructional text,
-forward-referential phrases ("here are some…"). Cross-chain and
-position-diverse — 194 / 200 TFA novel features at L13 pass all
-structural filters. This is genuinely competitive with TXCDR.
+Pattern: mid-sentence clause-transition phrases and instructional
+discourse. Cross-chain (4-8 chains per feature) and fully
+w-start-diverse (10/10). Genuinely competitive with TXCDR — 194/200
+TFA novel features at L13 pass all structural filters.
 
 **TFA pred — top 10 activation-based span-weighted**
 
-All 10 features share an identical top-10 exemplar set: `From
-helping you find the right protection for your assets and income,
-to…` (a commercial insurance boilerplate phrase), with `n_ws = 1`
-for all 10 features (every exemplar at `window_start = 0`). Haiku
-labels most of them "?" / unclear, with 2 calling them "introductory
-or transitional phrases." The structural reality is a
-BOS-token-adjacent detector at L13, not 200 distinct features.
+All 10 features' top-10 exemplar set is **literally identical**: a
+commercial insurance boilerplate ("From helping you find the right
+protection for your assets and income, to…"). Every feature has
+`n_ws = 1` (every exemplar at `window_start = 0`) and
+`n_chains = 10` (the same boilerplate appears at position 0 of 10
+different chains). Haiku labels all 10 features as variants of
+"Phrases introducing / transitioning to explanatory content" —
+which accurately describes the *boilerplate*, not the features.
 
-158 / 200 TFA pred features at L13 share this exact top-10
-exemplar set.
+Structurally this is a BOS-adjacent "this sequence starts with a
+commercial description" detector, not 200 distinct features.
+158 / 200 TFA pred features at L13 share this exact top-10 exemplar
+set.
 
 ### What each arch captures (pattern categorisation)
 
