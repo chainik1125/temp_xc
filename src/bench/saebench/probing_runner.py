@@ -92,9 +92,15 @@ def run_probing(
     device: str = "cuda:0",
     random_seed: int = 42,
     artifacts_path: str = SAEBENCH_ARTIFACTS_DIR,
-    force_rerun: bool = False,
+    force_rerun: bool = True,
 ) -> dict:
     """Run SAEBench sparse_probing on one (checkpoint, aggregation) config.
+
+    `force_rerun` defaults to True because our `run_id` embeds a
+    placeholder `k=0` (k is swept inside SAEBench), so preflight and
+    real-eval collide on the same cache key. Re-running is cheap since
+    SAEBench's activation_collection caches Gemma activations to
+    `artifacts_path` independently of the probe training.
 
     Side effects:
       - Runs SAEBench (which itself runs the Gemma forward pass + caches
@@ -199,7 +205,7 @@ def run_probing(
             dataset_name = row["dataset_name"]
             for k_val in k_values:
                 acc_key = f"sae_top_{k_val}_test_accuracy"
-                if acc_key not in row:
+                if acc_key not in row or row[acc_key] is None:
                     continue
                 record = {
                     "architecture": arch,
