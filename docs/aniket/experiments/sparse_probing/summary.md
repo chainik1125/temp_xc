@@ -119,6 +119,70 @@ All three architectures improve monotonically from k=1 to k=20
 ordering and gap between architectures are preserved across k,
 so the headline conclusion isn't a k-sensitivity artifact.
 
+### Reconstruction loss
+
+Pulled from the W&B summary / training logs. TempXC doesn't just
+probe worse — it reconstructs worse too.
+
+| arch   | T  | protocol  | per-pos k | window_k | final NMSE |
+|--------|----|-----------|-----------|----------|------------|
+| SAE    | —  | A & B     | 100/tok   | —        | **0.066**  |
+| MLC    | —  | A & B     | 100/tok   | —        | **0.051**  |
+| TempXC | 5  | A (= B)   | 100       | 500      | 0.148      |
+| TempXC | 10 | A         | 100       | 1000     | 0.196      |
+| TempXC | 20 | A         | 100       | 2000     | 0.261      |
+| TempXC | 10 | B         | 50        | 500      | 0.215      |
+| TempXC | 20 | B         | 25        | 500      | 0.283      |
+
+TempXC reconstruction NMSE is 2.2× worse than SAE at T=5, rising to
+4× at T=20. MLC reconstructs *better* than SAE, consistent with its
+probing win. Story aligns on both axes: MLC wins recon + probing,
+TempXC loses on both.
+
+### Training dynamics — is TempXC undertrained?
+
+Dmitry's follow-up: "much better SAE NMSE — could you save the loss
+curves for XC training so we know if we need to train longer?"
+
+![training-curves-all](../../../../results/saebench/plots/fig6_training_curves_all.png)
+![training-curves-tempxc](../../../../results/saebench/plots/fig7_tempxc_training_curves.png)
+![normalized-loss](../../../../results/saebench/plots/fig8_normalized_loss.png)
+
+**Yes, TempXC is undertrained.** Fractional loss drop in the last
+1k steps (step 4000 → 4999) out of 5000 total:
+
+| cell         | Δ last 1k steps | status                        |
+|--------------|-----------------|-------------------------------|
+| SAE          | −2.2 %          | converged                     |
+| MLC          | −3.5 %          | converged                     |
+| TempXC T=5   | **−5.9 %**      | still dropping meaningfully   |
+| TempXC T=10  | +0.4 %          | flat (converged or noise)     |
+| TempXC T=20  | **−5.1 %**      | still dropping meaningfully   |
+
+SAE and MLC have plateaued by step 5000. TempXC at T=5 and T=20
+is still losing ~5 % of its loss per 1000 steps — clearly under
+a longer-training regime.
+
+**What this means for the headline.** The "TempXC ≈ SAE at T=5,
+degrades with T" finding is drawn from checkpoints that were not
+converged. A 15-20k-step rerun would:
+- Certainly narrow the reconstruction gap between TempXC and SAE.
+- *Might* narrow the probing gap. Whether it does is the open
+  question.
+
+Two possibilities:
+- **Probing gap closes** → the original finding was a convergence
+  artifact; TempXC *does* learn useful features, just slowly. Still
+  informative: slow convergence with fixed architecture + data is
+  itself a weakness worth reporting.
+- **Probing gap holds or grows** → TempXC's features genuinely
+  aren't as probe-useful, and better reconstruction doesn't help.
+  This would strengthen the "inductive-bias mismatch" reading.
+
+Either outcome is publishable; the current result is diagnostically
+ambiguous until we retrain. Pausing on the rerun until Dmitry
+weighs in.
+
 ### Interpretation
 
 **Why does MLC win?**
