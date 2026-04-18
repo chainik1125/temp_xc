@@ -43,7 +43,7 @@ export CUDA_VISIBLE_DEVICES=0
 SHUF_FLAG=""
 [ "$SHUFFLE" = "1" ] && SHUF_FLAG="--shuffle-within-sequence"
 
-python -m src.bench.sweep \\
+python -m src.pipeline.sweep \\
     --dataset-type cached_activations \\
     --model-name $MODEL \\
     --cached-dataset $DATASET \\

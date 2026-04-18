@@ -32,7 +32,7 @@ for LAYER in resid_L25 resid_L13; do
         [ -n "$SHUF" ] && MODE="shuffled"
         echo ""
         echo "---- Gemma | ${LAYER} | ${MODE} | $(date) ----"
-        $PYTHON -u -m src.bench.sweep \
+        $PYTHON -u -m src.pipeline.sweep \
             --dataset-type cached_activations \
             --model-name gemma-2-2b-it \
             --cached-dataset fineweb \
@@ -54,7 +54,7 @@ for LAYER in resid_L25 resid_L13; do
         [ -n "$SHUF" ] && MODE="shuffled"
         echo ""
         echo "---- Gemma TFA | ${LAYER} | ${MODE} | $(date) ----"
-        $PYTHON -u -m src.bench.sweep \
+        $PYTHON -u -m src.pipeline.sweep \
             --dataset-type cached_activations \
             --model-name gemma-2-2b-it \
             --cached-dataset fineweb \
@@ -72,7 +72,7 @@ done
 # ── Phase C: DeepSeek caching ───────────────────────────────────
 echo ""
 echo "==== PHASE C: Cache DeepSeek-R1-8B (12K x 128 tok, L12) ===="
-$PYTHON -u -m src.bench.cache_activations \
+$PYTHON -u -m src.data.nlp.cache_activations \
     --model deepseek-r1-distill-llama-8b \
     --dataset fineweb --mode forward \
     --num-sequences 12000 --seq-length 128 \
@@ -90,7 +90,7 @@ for SHUF in "" "--shuffle-within-sequence"; do
     echo "---- DeepSeek | resid_L12 | ${MODE} | $(date) ----"
 
     # Fast archs first
-    $PYTHON -u -m src.bench.sweep \
+    $PYTHON -u -m src.pipeline.sweep \
         --dataset-type cached_activations \
         --model-name deepseek-r1-distill-llama-8b \
         --cached-dataset fineweb \
@@ -102,7 +102,7 @@ for SHUF in "" "--shuffle-within-sequence"; do
         $SHUF
 
     # TFA
-    $PYTHON -u -m src.bench.sweep \
+    $PYTHON -u -m src.pipeline.sweep \
         --dataset-type cached_activations \
         --model-name deepseek-r1-distill-llama-8b \
         --cached-dataset fineweb \

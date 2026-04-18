@@ -43,7 +43,7 @@ echo ""
 echo "==== PHASE 1: Cache Gemma-2-2B-IT (24K x 128 tok, layers 13+25) ===="
 echo "  Started: $(date)"
 
-$PYTHON -u -m src.bench.cache_activations \
+$PYTHON -u -m src.data.nlp.cache_activations \
     --model gemma-2-2b-it \
     --dataset fineweb \
     --mode forward \
@@ -67,7 +67,7 @@ for LAYER in resid_L25 resid_L13; do
         echo ""
         echo "---- Gemma | ${LAYER} | ${MODE} | $(date) ----"
 
-        $PYTHON -u -m src.bench.sweep \
+        $PYTHON -u -m src.pipeline.sweep \
             --dataset-type cached_activations \
             --model-name gemma-2-2b-it \
             --cached-dataset fineweb \
@@ -92,7 +92,7 @@ echo ""
 echo "==== PHASE 3: Cache DeepSeek-R1-8B (12K x 128 tok, layers 12+24) ===="
 echo "  Started: $(date)"
 
-$PYTHON -u -m src.bench.cache_activations \
+$PYTHON -u -m src.data.nlp.cache_activations \
     --model deepseek-r1-distill-llama-8b \
     --dataset fineweb \
     --mode forward \
@@ -115,7 +115,7 @@ for SHUF_FLAG in "" "--shuffle-within-sequence"; do
     echo ""
     echo "---- DeepSeek | resid_L12 | ${MODE} | $(date) ----"
 
-    $PYTHON -u -m src.bench.sweep \
+    $PYTHON -u -m src.pipeline.sweep \
         --dataset-type cached_activations \
         --model-name deepseek-r1-distill-llama-8b \
         --cached-dataset fineweb \
