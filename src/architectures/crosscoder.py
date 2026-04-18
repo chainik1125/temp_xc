@@ -88,21 +88,40 @@ class TemporalCrosscoder(nn.Module):
 
 
 class CrosscoderSpec(ArchSpec):
-    """ArchSpec for the Temporal Crosscoder."""
+    """ArchSpec for the Temporal Crosscoder.
+
+    Args:
+        T: window size.
+        match_stacked_budget: when True (default), `k` passed to `.create`
+            is interpreted as per-token-budget and is silently multiplied
+            by T to set the window-level TopK (so k_win = k*T, matching a
+            Stacked SAE's total window L0). When False, `k` is interpreted
+            as-is at the window level (k_win = k, "unfair" TXCDR). Phase 5
+            Protocol B uses match_stacked_budget=False with k=500 to hold
+            k_win fixed as T grows.
+    """
 
     data_format = "window"
 
-    def __init__(self, T: int):
+    def __init__(self, T: int, match_stacked_budget: bool = True):
         self.T = T
-        self.name = f"TXCDR T={T}"
+        self.match_stacked_budget = match_stacked_budget
+        tag = f"T={T}"
+        if not match_stacked_budget:
+            tag += "_fixedkwin"
+        self.name = f"TXCDR {tag}"
 
     @property
     def n_decoder_positions(self):
         return self.T
 
     def create(self, d_in, d_sae, k, device):
-        # Match stacked SAE's total L0: k per position * T positions.
-        k_eff = k * self.T if k is not None else None
+        if k is None:
+            k_eff = None
+        elif self.match_stacked_budget:
+            k_eff = k * self.T  # caller provides per-token k; scale to window
+        else:
+            k_eff = k  # caller provides window-level k directly
         return TemporalCrosscoder(d_in, d_sae, self.T, k_eff).to(device)
 
     def train(self, model, gen_fn, total_steps, batch_size, lr, device,
