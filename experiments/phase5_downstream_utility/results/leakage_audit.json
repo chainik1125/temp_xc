@@ -1,0 +1,10 @@
+{
+  "total_signatures": 875,
+  "hits": 0,
+  "hit_rate": 0.0,
+  "verdict": "ACCEPTABLE",
+  "per_dataset_counts": {},
+  "fineweb_cache": "data/cached_activations/gemma-2-2b-it/fineweb/",
+  "fineweb_sequences": 24000,
+  "fineweb_context_length": 128
+}
