@@ -86,16 +86,7 @@ When starting a new experiment, create a new script under `experiments/phaseN_*/
 
 ## Current progress
 
-Research logs live in `docs/han/research_logs/phase{1,2,3,4}_*/`, grouped by research phase. Each phase's key finding is summarized below; open the log linked for the full methodology and numbers. **Always read the newest log in the active phase before starting work.**
-
-### Phase 1 — Scheme C Markov-chain toy model (Mar 2026)
-
-Built a Markov-chain data generator where feature activations persist across tokens with tunable probability. Chose Scheme C (per-feature persistence probability) over mixing-based schemes because the latter (gamma) was a confound — it changed per-token marginal statistics, making the cross-architecture comparison unclean.
-
-Key outcome: a clean toy setting where TFA and SAE see identical marginal distributions but TFA has access to temporal structure.
-
-- [`phase1_scheme_c_toy/2026-03-04-v2-briefing.md`](../research_logs/phase1_scheme_c_toy/2026-03-04-v2-briefing.md)
-- [`phase1_scheme_c_toy/2026-03-21-temporal-settings-roadmap.md`](../research_logs/phase1_scheme_c_toy/2026-03-21-temporal-settings-roadmap.md)
+Research logs live in `docs/han/research_logs/phase{2,3,4}_*/`, grouped by research phase. Each phase's key finding is summarized below; open the log linked for the full methodology and numbers. **Always read the newest log in the active phase before starting work.**
 
 ### Phase 2 — toy experiments: TFA vs SAE at varying sparsity (Mar–Apr 2026)
 
