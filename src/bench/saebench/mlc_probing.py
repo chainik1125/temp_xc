@@ -124,14 +124,15 @@ def run_mlc_probing(
 
     Collects multi-layer Gemma activations, encodes through MLC with
     the chosen aggregation, mean-pools over L (matching SAEBench's
-    convention), trains sklearn logistic-regression probes using
-    SAEBench's `probe_training.train_probe_on_activations`.
+    convention), trains sklearn logistic-regression probes one-vs-rest
+    per class (SAEBench's train_probe_on_activations takes a
+    dict[class, Tensor] multi-class interface; we inline sklearn
+    instead to keep the MLC path purely binary).
 
     Emits one JSONL record per (task, k) to `output_jsonl`.
     """
     # Deferred SAEBench imports — sidecar venv.
     from sae_bench.evals.sparse_probing.eval_config import SparseProbingEvalConfig
-    from sae_bench.evals.sparse_probing import probe_training
     from sae_bench.sae_bench_utils import (
         activation_collection,
         dataset_utils,
@@ -245,9 +246,14 @@ def run_mlc_probing(
             train_feats, train_labels = encode_texts(train_pos_texts, train_neg_texts)
             test_feats, test_labels = encode_texts(test_pos_texts, test_neg_texts)
 
-            # For each k, select top-k features + fit probe + measure accuracy
+            # For each k, select top-k features + fit probe + measure accuracy.
+            # SAEBench's train_probe_on_activations has a different multi-class
+            # contract (dict[class, Tensor]); for our one-vs-rest binary setup
+            # we just use sklearn's LogisticRegression directly — same thing
+            # SAEBench does internally for binary.
+            from sklearn.linear_model import LogisticRegression
             for kv in k_values:
-                # Class-separation score: mean difference between classes
+                # Class-separation score: mean difference between classes.
                 pos_mean = train_feats[train_labels == 1].mean(dim=0)
                 neg_mean = train_feats[train_labels == 0].mean(dim=0)
                 score = (pos_mean - neg_mean).abs()
@@ -256,9 +262,9 @@ def run_mlc_probing(
                 X_train = train_feats[:, top_k_feat_idx].numpy()
                 X_test = test_feats[:, top_k_feat_idx].numpy()
 
-                acc = probe_training.train_probe_on_activations(
-                    X_train, train_labels, X_test, test_labels,
-                )
+                probe = LogisticRegression(max_iter=1000, random_state=random_seed)
+                probe.fit(X_train, train_labels)
+                acc = probe.score(X_test, test_labels)
                 per_class_test_accs[kv].append(float(acc))
 
         # Average across classes for each k
