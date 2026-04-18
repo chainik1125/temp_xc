@@ -82,22 +82,21 @@ echo ""
 
 for agg in "${AGGREGATIONS[@]}"; do
     echo ""
-    echo ">> running probing eval for aggregation=$agg"
-    python - <<PY
-from src.bench.saebench.probing_runner import run_probing
-summary = run_probing(
-    arch="$ARCH",
-    ckpt_path="$CKPT_PATH",
-    protocol="$PROTOCOL",
-    t=$T,
-    aggregation="$agg",
-    output_jsonl="$OUT_JSONL",
-    k=0,  # placeholder — k is swept inside sparse_probing; we parse all k from the output
-    device="cuda:0",
-    random_seed=$SEED,
-)
-print(f"  wrote {summary['n_records_written']} records in {summary['elapsed_sec']:.1f}s")
-PY
+    echo ">> running probing eval for aggregation=$agg (ordered + shuffled pair)"
+    # Uses the new run_eval.py CLI which invokes run_probing twice:
+    # once ordered, once shuffled (seed=42). Per-example predictions are
+    # persisted via the shared probe_fit utility (see item 8). Regression
+    # gate runs at startup; --skip-regressions bypasses it if needed.
+    python -m src.bench.run_eval \
+        --architecture "$ARCH" \
+        --protocol "$PROTOCOL" \
+        --t "$T" \
+        --aggregation "$agg" \
+        --ckpt "$CKPT_PATH" \
+        --output "$OUT_JSONL" \
+        --seed "$SEED" \
+        --device "cuda:0" \
+        --both-ordered-shuffled
 done
 
 echo ""

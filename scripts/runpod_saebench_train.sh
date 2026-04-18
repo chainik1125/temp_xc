@@ -87,7 +87,9 @@ fi
 # full sweep; for a single-architecture saebench run we call it with
 # --models <arch-key> and a matching results-dir, then rename the
 # checkpoint into our saebench layout afterwards.
-STEPS="${STEPS:-5000}"   # reduced from 10k to fit single-session sweep
+STEPS="${STEPS:-30000}"  # generous upper bound; paired with plateau early-stop
+PLATEAU_PCT="${PLATEAU_PCT:-0.005}"   # 0.5% drop / 2k steps = plateaued
+PLATEAU_MIN_STEPS="${PLATEAU_MIN_STEPS:-5000}"
 
 case "$ARCH" in
     sae)
@@ -125,6 +127,8 @@ python -m src.bench.sweep \
     --cached-dataset fineweb \
     --models "$MODELS" \
     --k "$K" $T_FLAG --steps "$STEPS" \
+    --stop-on-plateau "$PLATEAU_PCT" \
+    --plateau-min-steps "$PLATEAU_MIN_STEPS" \
     --results-dir "$SWEEP_RESULTS_DIR" \
     2>&1 | tee "$LOG_PATH"
 
