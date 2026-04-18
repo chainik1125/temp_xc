@@ -15,13 +15,27 @@ import torch
 import torch.nn as nn
 
 
-def _shuffle_within_sequence(x: torch.Tensor, seed: int) -> torch.Tensor:
-    """Permute each sequence's token order with a per-sequence seed.
+def shuffle_within_sequence(x: torch.Tensor, seed: int) -> torch.Tensor:
+    """Permute each sequence's token order along axis 1 with a
+    per-sequence seed.
 
-    Matches `src.bench.data._shuffle_within_sequence_` but operates on
-    GPU tensors for the probing path (data.py's version is for CPU
-    cached activations). Two archs called with the same seed see
-    identically permuted inputs → paired delta metrics are fair.
+    CANONICAL probing-time shuffle helper. Every harness site that
+    needs an ordered/shuffled pair must use this function so that
+    (a) two archs called with the same `seed` receive identically
+    permuted inputs, and (b) no drift can creep in from divergent
+    inline implementations.
+
+    Works on any tensor shape (B, L, ...) — arch inputs (B, L, d_in),
+    multi-layer stacks (B, L, n_layers, d_model), token ids (B, L).
+    For paired shuffles (e.g. activations + matching token mask),
+    call twice with the SAME seed — the per-row generators produce
+    matched permutations.
+
+    NOTE: `src.bench.data._shuffle_within_sequence_` is a DIFFERENT
+    helper — it shuffles cached training activations at load time
+    with no seed control. Keep the two separate: this one is
+    probing-time (seeded, paired); that one is training-time (cold,
+    random).
     """
     assert x.dim() >= 2, f"expected (B, L, ...), got {tuple(x.shape)}"
     B, L = x.shape[0], x.shape[1]
@@ -208,7 +222,7 @@ class ArchSpec(ABC):
         is why SAEBench's per-arch benchmarking stays simple.
         """
         if shuffle_seed is not None:
-            x = _shuffle_within_sequence(x, shuffle_seed)
+            x = shuffle_within_sequence(x, shuffle_seed)
         return self.encode(model, x)
 
 

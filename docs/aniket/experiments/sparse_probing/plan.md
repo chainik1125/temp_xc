@@ -418,22 +418,21 @@ bash scripts/runpod_saebench_preflight.sh
 ```
 
 Exits non-zero if anything's off. If it passes, launch the full
-orchestrator:
+pipeline via the single-entry launcher:
 
 ```bash
-bash scripts/runpod_saebench_orchestrator.sh full 2>&1 | \
+bash scripts/runpod_saebench_launch.sh 2>&1 | \
     tee logs/saebench-$(date +%Y%m%d-%H%M).log
 ```
 
-Or phase-by-phase (handy if you want to re-run a single stage without
-the others):
+Environment overrides (for partial runs / tuning; see the script
+header for the full list):
 
 ```bash
-bash scripts/runpod_saebench_orchestrator.sh cache       # ~1 h
-bash scripts/runpod_saebench_orchestrator.sh preflight   # ~30 min
-bash scripts/runpod_saebench_orchestrator.sh train       # ~5 h
-bash scripts/runpod_saebench_orchestrator.sh eval        # ~7 h
-bash scripts/runpod_saebench_orchestrator.sh summary     # seconds
+SKIP_CACHE=1     bash scripts/runpod_saebench_launch.sh   # skip phase 1
+SKIP_PREFLIGHT=1 bash scripts/runpod_saebench_launch.sh   # skip phase 2
+STEPS=50000 PLATEAU_PCT=0.003 \
+                 bash scripts/runpod_saebench_launch.sh   # longer plateau hunt
 ```
 
 **Pull results locally when done** (from the laptop):

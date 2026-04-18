@@ -103,4 +103,4 @@ echo "   removed results/saebench/sweeps/sae_protA_T5/"
 
 echo ""
 echo "=== pre-flight PASSED ==="
-echo "  safe to launch: bash scripts/runpod_saebench_orchestrator.sh full"
+echo "  safe to launch: bash scripts/runpod_saebench_launch.sh"

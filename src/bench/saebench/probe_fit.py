@@ -27,6 +27,28 @@ from sklearn.linear_model import LogisticRegression
 PREDICTIONS_DIR = "results/saebench/predictions"
 
 
+def shuffle_tag(shuffle_seed: int | None) -> str:
+    """Canonical suffix for run_ids and filenames: '__ordered' or
+    '__shuffled'. Same string format across both probing paths so
+    downstream globs work uniformly.
+    """
+    return "__shuffled" if shuffle_seed is not None else "__ordered"
+
+
+def build_example_id_to_text(dataset_name: str, test_texts: list) -> dict[str, str]:
+    """example_id_to_text mapping for persistence; example_id is the
+    test row's position, stable across all (class, k) iterations.
+
+    One canonical construction so nothing can drift between MLC and
+    SAE/TempXC paths (they must share example_ids for cross-arch
+    confusion-matrix joins).
+    """
+    return {
+        f"{dataset_name}__test_{i}": (t if isinstance(t, str) else str(t))
+        for i, t in enumerate(test_texts)
+    }
+
+
 def fit_one_vs_rest_probes(
     train_feats: np.ndarray,          # (N_train, d_sae_eff)
     train_cls: np.ndarray,            # (N_train,) class indices

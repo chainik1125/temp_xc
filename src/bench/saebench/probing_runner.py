@@ -114,6 +114,7 @@ def _run_prediction_pass(
     from src.bench.saebench.probe_fit import (
         fit_one_vs_rest_probes, write_predictions,
         sanity_check_persistence, cross_check_probe_aggregates,
+        build_example_id_to_text,
     )
 
     # Map SAEBench's eval_result_details by dataset for the cross-check.
@@ -153,10 +154,7 @@ def _run_prediction_pass(
             adapter, test_texts, cfg, device, cache_dir_tag="test",
         )
 
-        example_id_to_text = {
-            f"{dataset_name}__test_{i}": (t if isinstance(t, str) else str(t))
-            for i, t in enumerate(test_texts)
-        }
+        example_id_to_text = build_example_id_to_text(dataset_name, test_texts)
         aggregate_accs, per_example_preds = fit_one_vs_rest_probes(
             train_feats=train_feats, train_cls=train_cls,
             test_feats=test_feats, test_cls=test_cls,
@@ -285,15 +283,15 @@ def run_probing(
                 and r.get("shuffle_seed") == shuffle_seed  # ordered vs shuffled distinct
             ]
             if hit:
-                shuf_str = "shuffled" if shuffle_seed is not None else "ordered"
+                from src.bench.saebench.probe_fit import shuffle_tag as _shuf_tag
+                tag = _shuf_tag(shuffle_seed)
                 print(
                     f"  SKIP — {len(hit)} records already exist for "
-                    f"{arch} prot={protocol} T={t} agg={aggregation} ({shuf_str}). "
+                    f"{arch} prot={protocol} T={t} agg={aggregation} ({tag.lstrip('_')}). "
                     f"Delete {output_jsonl} to force re-eval."
                 )
-                shuf_tag = "__shuffled" if shuffle_seed is not None else "__ordered"
                 return {
-                    "run_id": f"{arch}__prot{protocol}__T{t}__agg{aggregation}{shuf_tag}",
+                    "run_id": f"{arch}__prot{protocol}__T{t}__agg{aggregation}{tag}",
                     "n_records_written": 0,
                     "elapsed_sec": 0.0,
                     "skipped": True,
@@ -350,9 +348,9 @@ def run_probing(
     # 3. Configure SAEBench sparse-probing. Suffix the run_id with
     # shuffle status so ordered and shuffled runs don't collide in the
     # SAEBench output cache (same bug class as B11 w/ k=0 placeholder).
-    shuffle_tag = "__shuffled" if shuffle_seed is not None else "__ordered"
+    from src.bench.saebench.probe_fit import shuffle_tag as _shuf_tag
     run_id = (
-        f"{arch}__prot{protocol}__T{t}__agg{aggregation}__k{k}{shuffle_tag}"
+        f"{arch}__prot{protocol}__T{t}__agg{aggregation}__k{k}{_shuf_tag(shuffle_seed)}"
     )
     cfg = SparseProbingEvalConfig(
         random_seed=random_seed,

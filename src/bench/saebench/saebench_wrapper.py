@@ -202,15 +202,11 @@ class SAEBenchAdapter(nn.Module):
         B, L, d_in = x.shape
 
         if self._shuffle_seed is not None:
-            # Per-sequence seeded permutation; done here rather than in
-            # the arch's encode() so the data-pipeline concern stays out
-            # of architecture code.
-            shuffled = torch.empty_like(x)
-            for b in range(B):
-                g = torch.Generator(device="cpu").manual_seed(self._shuffle_seed + b)
-                perm = torch.randperm(L, generator=g).to(x.device)
-                shuffled[b] = x[b, perm]
-            x = shuffled
+            # Canonical shuffle helper. Keeps the data-pipeline concern
+            # out of architecture code AND out of this wrapper's
+            # implementation (pushback on duplicate inline loops).
+            from src.bench.architectures.base import shuffle_within_sequence
+            x = shuffle_within_sequence(x, self._shuffle_seed)
 
         if self._arch_name == "sae":
             # TopKSAE is per-token, no T axis. Flatten → encode → reshape.

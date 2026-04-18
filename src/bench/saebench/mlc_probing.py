@@ -178,8 +178,8 @@ def run_mlc_probing(
 
     # 3. For each dataset, collect acts → encode via MLC → probe
     results_per_task: list[dict] = []
-    shuffle_tag = "__shuffled" if shuffle_seed is not None else "__ordered"
-    run_id = f"mlc__prot{protocol}__agg{aggregation}{shuffle_tag}"
+    from src.bench.saebench.probe_fit import shuffle_tag as _shuf_tag
+    run_id = f"mlc__prot{protocol}__agg{aggregation}{_shuf_tag(shuffle_seed)}"
 
     for dataset_name in cfg.dataset_names:
         t_ds = time.time()
@@ -222,24 +222,16 @@ def run_mlc_probing(
                     mask_bos_pad=True, bos_token_id=bos_id, pad_token_id=pad_id,
                 )  # (B, L, n_layers, d_model)
 
-                # Within-sequence shuffle control (item 8 + team 4/18 ask).
-                # Permutes the L axis of `stacked` per sequence. The token
-                # mask used below is NOT shuffled — BOS/pad positions after
-                # shuffle are spread through the sequence, so mask-based
-                # pooling still correctly excludes them.
+                # Within-sequence shuffle (item 8 + team 4/18 ask).
+                # Shuffle `stacked` AND `toks` with the same per-row seed
+                # so the BOS/pad mask stays aligned with its activations.
+                # Canonical helper from base.py; two calls with the same
+                # seed produce matched permutations.
                 if shuffle_seed is not None:
-                    B_, L_ = stacked.shape[0], stacked.shape[1]
-                    shuffled = torch.empty_like(stacked)
-                    shuffled_toks = torch.empty_like(toks)
-                    for b in range(B_):
-                        g = torch.Generator(device="cpu").manual_seed(
-                            shuffle_seed + global_offset + i + b
-                        )
-                        perm = torch.randperm(L_, generator=g).to(stacked.device)
-                        shuffled[b] = stacked[b, perm]
-                        shuffled_toks[b] = toks[b, perm]
-                    stacked = shuffled
-                    toks = shuffled_toks
+                    from src.bench.architectures.base import shuffle_within_sequence
+                    batch_seed = shuffle_seed + global_offset + i
+                    stacked = shuffle_within_sequence(stacked, batch_seed)
+                    toks = shuffle_within_sequence(toks, batch_seed)
 
                 with torch.no_grad():
                     B, L, NL, D = stacked.shape
@@ -278,14 +270,11 @@ def run_mlc_probing(
         # Storage-split: predictions store (example_id, class, k, pred, prob,
         # label) — text lives in a sibling <task>__texts.jsonl keyed by
         # example_id. See src/bench/saebench/probe_fit.py.
-        example_id_to_text: dict[str, str] = {
-            f"{dataset_name}__test_{i}":
-                (t if isinstance(t, str) else str(t))
-            for i, t in enumerate(test_texts_all)
-        }
         from src.bench.saebench.probe_fit import (
             fit_one_vs_rest_probes, write_predictions, sanity_check_persistence,
+            build_example_id_to_text,
         )
+        example_id_to_text = build_example_id_to_text(dataset_name, test_texts_all)
         aggregate_accs, per_example_preds = fit_one_vs_rest_probes(
             train_feats=train_feats.numpy() if hasattr(train_feats, "numpy") else train_feats,
             train_cls=train_cls,
