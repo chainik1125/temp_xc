@@ -1,6 +1,6 @@
 # RunPod agent setup
 
-This doc covers only the **environment**. For what to work on, read the latest research log under `docs/han/research_logs/phase*/` — the most recent phase subdir is usually the active one.
+This doc covers only the **environment**. For what to work on, read the latest active phase's `brief.md` and most recent dated log under `docs/han/research_logs/phaseN_<shortname>/`. Each phase's experiments live at `experiments/phaseN_<shortname>/` (same slug). See `CLAUDE.md` "Phase convention" section for the full file-naming rules inside a phase dir (`brief.md` → `plan.md` → dated experiments → `summary.md`).
 
 ## First-time setup on a new pod
 
@@ -94,7 +94,7 @@ grep -qF 'ANTHROPIC_API_KEY' ~/.bashrc || \
 From the repo root with the venv active:
 
 ```bash
-TQDM_DISABLE=1 uv run python src/experiments/<script_name>.py
+TQDM_DISABLE=1 uv run python experiments/phaseN_<shortname>/<script_name>.py
 ```
 
 `TQDM_DISABLE=1` is mandatory — progress bars flood logs and break reading them back through the agent's tools.
@@ -103,7 +103,7 @@ For long-running sweeps, launch under `nohup`:
 
 ```bash
 mkdir -p logs
-TQDM_DISABLE=1 nohup uv run python src/experiments/<script>.py > logs/<run>.log 2>&1 &
+TQDM_DISABLE=1 nohup uv run python experiments/phaseN_<shortname>/<script>.py > logs/<run>.log 2>&1 &
 tail -f logs/<run>.log
 ```
 
@@ -111,14 +111,15 @@ Resumable sweeps save per-run JSONs incrementally; restarting the same command p
 
 ## What to work on
 
-This file does NOT describe the current experiment. The active work is always in the most recent research log:
+This file does NOT describe the current experiment. The active work is always in the most recent phase dir:
 
 ```bash
-ls docs/han/research_logs/phase*/  | tail                        # newest phase
-ls -t docs/han/research_logs/phase*/*.md | head                   # newest log
+ls -d docs/han/research_logs/phase*_*/ | tail -n 1               # newest phase dir
+ls -t docs/han/research_logs/phase*_*/brief.md                   # per-phase briefings
+ls -t docs/han/research_logs/phase*_*/*.md | head                # newest log across all phases
 ```
 
-Read the latest log for context, branch state, open questions, and next steps before running anything.
+For a phase that's just starting, read `brief.md` first (context, priorities, sub-phase ordering), then `plan.md` (pre-registered methodology). For a phase in flight, read the newest dated experiment log. Branch state, open questions, and next steps all live in these files.
 
 ## Quick reference — where things live
 
@@ -130,6 +131,6 @@ Read the latest log for context, branch state, open questions, and next steps be
 | Trained checkpoints | `/workspace/temp_xc/results/nlp_sweep/**/ckpts/` (gitignored; on-disk only) |
 | Research logs | `/workspace/temp_xc/docs/han/research_logs/phase*/` |
 | Backend (architectures, data, eval, training, plotting, pipeline) | `/workspace/temp_xc/src/` |
-| Experiment scripts | `/workspace/temp_xc/experiments/phase{2,3,4}_*/` |
+| Experiment scripts | `/workspace/temp_xc/experiments/phaseN_<shortname>/` (paired with `docs/han/research_logs/phaseN_<shortname>/`) |
 | GitHub token | `/workspace/.github-token` |
 | Anthropic key | `/workspace/.anthropic-key` |

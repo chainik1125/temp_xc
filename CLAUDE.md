@@ -7,11 +7,12 @@ Welcome. You are an AI agent working on a research project to develop temporal S
 ## Repository structure
 
 - `src/` -- reusable backend (architectures, data, training, eval, plotting, pipeline, utils)
-- `experiments/phase{2,3,4}_*/` -- phase-specific one-off experiment scripts
+- `experiments/phaseN_<shortname>/` -- phase-specific one-off experiment scripts + their `results/` output
 - `tests/` -- pytest test suite (covers `src/` only)
 - `references/` -- vendored paper code (e.g. TemporalFeatureAnalysis); reference-only, not imported
 - `papers/` -- markdown paper summaries for agents to ingest
 - `docs/` -- Obsidian documentation vault (research logs, project brief)
+- `docs/han/research_logs/phaseN_<shortname>/` -- per-phase briefings, plans, experiment writeups, and summaries; `<shortname>` must match the `experiments/` sibling
 - `docs/templates/` -- document templates (Base.md, Guide.md)
 - `docs/Tags.md` -- tag taxonomy index
 - `run-checks.sh` -- runs all quality checks locally
@@ -23,6 +24,24 @@ Welcome. You are an AI agent working on a research project to develop temporal S
 **Layer rule:** `experiments/` may import from `src/*`; `src/*` never imports from `experiments/`. The filesystem split enforces this — keep it that way.
 
 **Adding a new architecture:** drop a new file in `src/architectures/`, subclass `ArchSpec`, register it in `src/architectures/__init__.py`. It then plugs into both toy and NLP pipelines automatically.
+
+## Phase convention
+
+Each research phase has a **paired** directory at two locations, and they must match:
+
+- `experiments/phaseN_<shortname>/` — scripts that run the phase's experiments and the `results/` subtree those scripts write to.
+- `docs/han/research_logs/phaseN_<shortname>/` — writeups for the phase: briefings, pre-registered plans, experiment logs, and summaries.
+
+The `<shortname>` slug must be identical across the two paths (e.g. `phase4_nlp_comparison` appears under both `experiments/` and `docs/han/research_logs/`). This lets any agent locate a phase's code and its documentation from knowing either one.
+
+**Canonical filenames within a phase's research-log dir:**
+
+- `brief.md` — pre-phase briefing: context, motivation, candidate directions, architecture menu, open questions. Written before the phase starts. The target audience is a fresh agent picking up the phase cold.
+- `plan.md` — pre-registered experimental plan (hypotheses, success criteria, figures to produce). Written before any checkpoint is trained.
+- `YYYY-MM-DD-<topic>.md` — individual experiment writeups. One file per experiment.
+- `summary.md` — end-of-phase synthesis across all experiments.
+
+When starting a new phase, create the paired `experiments/phaseN_*/` and `docs/han/research_logs/phaseN_*/` directories simultaneously and draft `brief.md` first.
 
 ## Environment setup
 
