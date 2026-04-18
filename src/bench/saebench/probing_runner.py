@@ -121,6 +121,36 @@ def run_probing(
     Returns a dict with aggregate accuracy + FLOPs stats, useful for the
     orchestrator's summary print.
     """
+    # Skip-if-JSONL-records-exist: if this (arch, protocol, T, aggregation)
+    # tuple is already fully represented in the output JSONL from a prior
+    # run (crash mid-sweep, restart), don't re-run. Saves ~1–2 hours across
+    # a restarted eval phase. Delete the JSONL to force re-eval.
+    if os.path.exists(output_jsonl):
+        try:
+            with open(output_jsonl) as fin:
+                existing = [json.loads(line) for line in fin if line.strip()]
+            hit = [
+                r for r in existing
+                if r.get("architecture") == arch
+                and r.get("matching_protocol") == protocol
+                and r.get("t") == t
+                and r.get("aggregation") == aggregation
+            ]
+            if hit:
+                print(
+                    f"  SKIP — {len(hit)} records already exist for "
+                    f"{arch} prot={protocol} T={t} agg={aggregation}. "
+                    f"Delete {output_jsonl} to force re-eval."
+                )
+                return {
+                    "run_id": f"{arch}__prot{protocol}__T{t}__agg{aggregation}",
+                    "n_records_written": 0,
+                    "elapsed_sec": 0.0,
+                    "skipped": True,
+                }
+        except (json.JSONDecodeError, OSError) as e:
+            print(f"  WARN: could not pre-check {output_jsonl} ({e}); running anyway")
+
     # SAEBench imports are deferred because they pull in numpy<2 +
     # sae_lens + transformer_lens — cost we only pay when actually
     # running an eval.
