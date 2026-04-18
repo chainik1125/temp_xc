@@ -23,7 +23,7 @@
 
 set -euo pipefail
 
-BRANCH="aniket-runpod"
+BRANCH="aniket"  # Target the main dev branch directly; simpler than a separate transfer branch.
 
 cd "$(git rev-parse --show-toplevel)"
 
