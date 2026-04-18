@@ -67,3 +67,6 @@ external/
 
 # Session context dump (regenerated per /clear; never committed)
 .session_context.md
+
+# Personal infra / eval-running lesson notes — local reference only
+eval_infra_lessons.md
