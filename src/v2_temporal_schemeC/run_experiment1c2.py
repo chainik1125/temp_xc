@@ -48,8 +48,9 @@ from src.bench.architectures.crosscoder import TemporalCrosscoder
 from src.v2_temporal_schemeC.temporal_crosscoder import (
     CrosscoderTrainingConfig, train_crosscoder,
 )
+from src.bench.architectures.stacked_sae import StackedSAE
 from src.v2_temporal_schemeC.stacked_sae import (
-    StackedSAE, StackedSAETrainingConfig, train_stacked_sae,
+    StackedSAETrainingConfig, train_stacked_sae,
 )
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")

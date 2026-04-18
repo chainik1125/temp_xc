@@ -44,11 +44,13 @@ from src.v2_temporal_schemeC.experiment import (
 from src.v2_temporal_schemeC.experiment.eval_unified import EvalResult
 from src.v2_temporal_schemeC.relu_sae import ReLUSAE, ReLUSAETrainingConfig, train_relu_sae
 from src.v2_temporal_schemeC.train_tfa import create_tfa, train_tfa, TFATrainingConfig
+from src.bench.architectures.crosscoder import TemporalCrosscoder
+from src.bench.architectures.stacked_sae import StackedSAE
 from src.v2_temporal_schemeC.temporal_crosscoder import (
-    TemporalCrosscoder, CrosscoderTrainingConfig, train_crosscoder,
+    CrosscoderTrainingConfig, train_crosscoder,
 )
 from src.v2_temporal_schemeC.stacked_sae import (
-    StackedSAE, StackedSAETrainingConfig, train_stacked_sae,
+    StackedSAETrainingConfig, train_stacked_sae,
 )
 from src.v2_temporal_schemeC.experiment.denoising import compute_global_recovery
 from src.v2_temporal_schemeC.feature_recovery import feature_recovery_score, cos_sims

@@ -41,11 +41,13 @@ from src.v2_temporal_schemeC.experiment.denoising import (
 from src.v2_temporal_schemeC.experiment.eval_unified import _compute_auc
 from src.v2_temporal_schemeC.feature_recovery import cos_sims
 from src.v2_temporal_schemeC.train_tfa import create_tfa, train_tfa, TFATrainingConfig
+from src.bench.architectures.crosscoder import TemporalCrosscoder
+from src.bench.architectures.stacked_sae import StackedSAE
 from src.v2_temporal_schemeC.temporal_crosscoder import (
-    TemporalCrosscoder, CrosscoderTrainingConfig, train_crosscoder,
+    CrosscoderTrainingConfig, train_crosscoder,
 )
 from src.v2_temporal_schemeC.stacked_sae import (
-    StackedSAE, StackedSAETrainingConfig, train_stacked_sae,
+    StackedSAETrainingConfig, train_stacked_sae,
 )
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")

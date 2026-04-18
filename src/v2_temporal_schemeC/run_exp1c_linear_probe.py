@@ -41,7 +41,7 @@ from src.v2_temporal_schemeC.experiment import (
 )
 from src.v2_temporal_schemeC.train_tfa import create_tfa
 from src.bench.architectures.crosscoder import TemporalCrosscoder
-from src.v2_temporal_schemeC.stacked_sae import StackedSAE
+from src.bench.architectures.stacked_sae import StackedSAE
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 

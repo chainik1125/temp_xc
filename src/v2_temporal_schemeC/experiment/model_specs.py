@@ -21,8 +21,9 @@ from src.bench.architectures.crosscoder import TemporalCrosscoder
 from src.v2_temporal_schemeC.temporal_crosscoder import (
     CrosscoderTrainingConfig, train_crosscoder,
 )
+from src.bench.architectures.stacked_sae import StackedSAE
 from src.v2_temporal_schemeC.stacked_sae import (
-    StackedSAE, StackedSAETrainingConfig, train_stacked_sae,
+    StackedSAETrainingConfig, train_stacked_sae,
 )
 
 
@@ -285,4 +286,4 @@ class StackedSAEModelSpec:
                            pos: int | None = None) -> torch.Tensor:
         if pos is None:
             pos = 0
-        return model.decoder_directions(pos)  # (d_in, d_sae)
+        return model.decoder_directions_at(pos)  # (d_in, d_sae)
