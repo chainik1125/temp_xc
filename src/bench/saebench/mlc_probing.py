@@ -144,6 +144,7 @@ def run_mlc_probing(
         raise FileNotFoundError(f"checkpoint not found: {ckpt_path}")
 
     torch_device = torch.device(device)
+    t_start = time.time()
 
     # 1. Load MLC
     k = protocol_k("mlc", protocol)
@@ -308,4 +309,5 @@ def run_mlc_probing(
         "run_id": run_id,
         "n_records_written": n_written,
         "n_tasks": len(results_per_task),
+        "elapsed_sec": time.time() - t_start,
     }
