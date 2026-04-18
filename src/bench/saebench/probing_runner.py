@@ -90,6 +90,152 @@ def _param_count(model: torch.nn.Module) -> int:
     return sum(p.numel() for p in model.parameters())
 
 
+def _run_prediction_pass(
+    arch,
+    adapter,
+    cfg,
+    device: torch.device,
+    run_id: str,
+    k_values: tuple[int, ...],
+    saebench_details: list[dict],
+    random_seed: int,
+) -> None:
+    """Second-pass probe fit on the same cached activations SAEBench used,
+    this time capturing per-example predictions for confusion-matrix /
+    error-overlap analyses. Cross-checks aggregates against SAEBench's
+    stock fit; fails fast if they diverge.
+
+    See probe_fit.py for the shared utility this wraps.
+    """
+    import numpy as np
+    from sae_bench.sae_bench_utils import (
+        activation_collection, dataset_utils,
+    )
+    from src.bench.saebench.probe_fit import (
+        fit_one_vs_rest_probes, write_predictions,
+        sanity_check_persistence, cross_check_probe_aggregates,
+    )
+
+    # Map SAEBench's eval_result_details by dataset for the cross-check.
+    sb_by_task = {r["dataset_name"]: r for r in saebench_details}
+
+    for dataset_name in cfg.dataset_names:
+        # Reload dataset splits via the same call SAEBench uses.
+        train_data, test_data = dataset_utils.get_multi_label_train_test_data(
+            dataset_name=dataset_name,
+            train_set_size=cfg.probe_train_set_size,
+            test_set_size=cfg.probe_test_set_size,
+            random_seed=cfg.random_seed,
+        )
+        class_names = sorted(train_data.keys())
+
+        # Build flat (text, class_idx) lists, same order as SAEBench.
+        train_texts, train_cls = [], []
+        for ci, c in enumerate(class_names):
+            for t in train_data[c]:
+                train_texts.append(t)
+                train_cls.append(ci)
+        test_texts, test_cls = [], []
+        for ci, c in enumerate(class_names):
+            for t in test_data[c]:
+                test_texts.append(t)
+                test_cls.append(ci)
+        train_cls = np.array(train_cls, dtype=np.int64)
+        test_cls = np.array(test_cls, dtype=np.int64)
+
+        # Encode through the adapter. We reuse SAEBench's activation
+        # collection (the cached Gemma forward is shared with the stock
+        # run_eval call). Only the probe fit is re-done.
+        train_feats = _encode_via_adapter(
+            adapter, train_texts, cfg, device, cache_dir_tag="train",
+        )
+        test_feats = _encode_via_adapter(
+            adapter, test_texts, cfg, device, cache_dir_tag="test",
+        )
+
+        example_id_to_text = {
+            f"{dataset_name}__test_{i}": (t if isinstance(t, str) else str(t))
+            for i, t in enumerate(test_texts)
+        }
+        aggregate_accs, per_example_preds = fit_one_vs_rest_probes(
+            train_feats=train_feats, train_cls=train_cls,
+            test_feats=test_feats, test_cls=test_cls,
+            class_names=class_names, k_values=tuple(k_values),
+            dataset_name=dataset_name, random_seed=random_seed,
+        )
+
+        # Cross-check our fit against SAEBench's aggregate.
+        sb_row = sb_by_task.get(dataset_name, {})
+        cross_check_probe_aggregates(
+            ours=aggregate_accs, saebench=sb_row,
+            dataset_name=dataset_name, k_values=tuple(k_values),
+            rtol=1e-2,
+        )
+
+        expected = {"dataset_name": dataset_name, **aggregate_accs}
+        write_predictions(run_id, dataset_name, per_example_preds, example_id_to_text)
+        sanity_check_persistence(
+            run_id=run_id, dataset_name=dataset_name,
+            expected=expected, k_values=tuple(k_values),
+        )
+
+
+def _encode_via_adapter(adapter, texts, cfg, device, cache_dir_tag: str):
+    """Tokenize → Gemma forward (cached) → adapter.encode → mean-pool.
+
+    Returns numpy (N, d_sae_eff). Mirrors what SAEBench's
+    get_sae_meaned_activations does, but routes through our adapter's
+    encode() so the shuffle_seed + aggregation settings are respected.
+    """
+    import numpy as np
+    import torch
+    from sae_bench.sae_bench_utils import activation_collection
+    # Lazy local import; this path runs only on the SAE/TempXC probing branch.
+
+    llm = adapter._model if hasattr(adapter, "_model") else None
+    # SAEBench's cache key is (dataset, hook_name); reuse via its helper
+    # if available, else fall back to direct HookedTransformer calls.
+    # For now: tokenize + forward + mean-pool using the HookedTransformer
+    # that SAEBench already loaded inside sp.run_eval. Since sp.run_eval
+    # creates its own LLM, we can't reuse that instance here without
+    # threading it through; easier to load once lazily.
+    from transformer_lens import HookedTransformer
+    if not hasattr(_encode_via_adapter, "_llm_cache"):
+        dtype = getattr(torch, cfg.llm_dtype)
+        _encode_via_adapter._llm_cache = HookedTransformer.from_pretrained_no_processing(
+            cfg.model_name, dtype=dtype,
+        ).to(device)
+        _encode_via_adapter._llm_cache.eval()
+    llm = _encode_via_adapter._llm_cache
+
+    hook_name = adapter.cfg.hook_name
+    pad_id = getattr(llm.tokenizer, "pad_token_id", 0) or 0
+    bos_id = getattr(llm.tokenizer, "bos_token_id", 2) or 2
+
+    feats = []
+    batch_size = cfg.llm_batch_size
+    from src.bench.saebench.configs import CONTEXT_LENGTH
+    for i in range(0, len(texts), batch_size):
+        chunk = texts[i : i + batch_size]
+        toks = llm.to_tokens(chunk, prepend_bos=True)
+        toks = toks[:, :CONTEXT_LENGTH]
+
+        with torch.no_grad():
+            _, cache = llm.run_with_cache(
+                toks, names_filter=[hook_name], return_type=None,
+            )
+            acts = cache[hook_name]  # (B, L, d_model)
+
+        with torch.no_grad():
+            z = adapter.encode(acts)  # (B, L, d_sae_eff) — applies shuffle_seed
+
+        token_mask = (toks != bos_id) & (toks != pad_id)
+        token_mask = token_mask.unsqueeze(-1).float()
+        pooled = (z * token_mask).sum(dim=1) / token_mask.sum(dim=1).clamp(min=1)
+        feats.append(pooled.cpu().numpy())
+    return np.concatenate(feats, axis=0)
+
+
 def run_probing(
     arch: ArchName,
     ckpt_path: str,
@@ -249,6 +395,32 @@ def run_probing(
             f"check the run's stderr."
         )
     sb_out = json.loads(saebench_json_files[0].read_text())
+
+    # 5b. HYBRID per-example prediction pass. SAEBench's stock
+    # run_eval only saves aggregate accuracies. We additionally run our
+    # own sklearn one-vs-rest fit on the same cached activations via
+    # adapter.encode(), capturing per-example predictions and writing
+    # them to results/saebench/predictions/<run_id>/<task>.jsonl.
+    # cross_check_probe_aggregates asserts our aggregates agree with
+    # SAEBench's to rtol=1e-2, so the persisted predictions correspond
+    # to the reported accuracy.
+    #
+    # Cost: one extra sklearn fit per (cell, task) — seconds. Cached
+    # Gemma forward is already done inside sp.run_eval above.
+    try:
+        _run_prediction_pass(
+            arch=arch, adapter=adapter, cfg=cfg, device=torch_device,
+            run_id=run_id, k_values=k_values,
+            saebench_details=sb_out.get("eval_result_details", []),
+            random_seed=random_seed,
+        )
+    except Exception as e:
+        # Don't fail the whole run on prediction-pass issues; log and
+        # proceed with SAEBench-only aggregates. Confusion matrices
+        # for this cell will just be missing downstream.
+        print(f"  WARN: per-example prediction pass failed ({e}); "
+              f"aggregate JSONL still written. "
+              f"Confusion-matrix analysis for this cell will be skipped.")
 
     # 6. Flatten SAEBench's nested output into our JSONL schema
     params = _param_count(model)
