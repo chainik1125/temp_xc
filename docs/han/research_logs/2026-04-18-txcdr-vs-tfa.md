@@ -46,13 +46,47 @@ On span-weighted top-200 features per arch, seeded and reproducible
   position-diversity filter because 6 % of its top features still
   fire on BOS-adjacent tokens (compared to 2 % for TXCDR).
 
-## Quick summary figure
+## Quick summary figures
+
+### Per-feature concentration — what each arch's span profile looks like
+
+[![concentration distribution](../../../results/nlp_sweep/gemma/figures/concentration_distribution.doc.png)](../../../results/nlp_sweep/gemma/figures/concentration_distribution.png)
+
+Concentration = `max_t / sum_t` of a per-feature per-position quantity:
+decoder-norm `||W_dec[f, t, :]||` for TXCDR, mean-abs-activation
+`|z_f(t)|` for everyone else. 1/T=0.2 = "spreads uniformly across all
+T=5 window positions" (the limit at which the feature is maximally
+span-using); 1.0 = "fires at exactly one position."
+
+Mean concentration per arch:
+
+| arch | L25 mean | L25 % below 0.35 | L13 mean | L13 % below 0.35 |
+|---|---:|---:|---:|---:|
+| Stacked SAE | 0.89 | 0.1 % | 0.88 | 0.1 % |
+| **TXCDR** | **0.22** | **95.8 %** | **0.25** | **86.4 %** |
+| TFA novel | 0.53 | 36.8 % | 0.45 | 52.0 % |
+| TFA pred | 0.57 | 43.8 % | 0.33 | 78.4 % |
+
+**Reading:** TXCDR's decoder-based concentration sits near 1/T at both
+layers — nearly every TXCDR feature contributes to reconstructing
+*multiple* window positions. Stacked SAE is ≈1.0 by construction
+(per-position SAEs are independent; each feature fires at one
+position). TFA sits in between.
+
+**Caveat on comparability:** the metric is architecture-faithful (decoder
+norm for TXCDR's per-position decoder; activation-based for codes
+without a per-position decoder). The absolute values are not directly
+comparable across architectures — what they share is the concept "how
+much of feature f's contribution is at one position vs spread?" This
+plot shows each arch's *span profile* but does not on its own say "TXCDR
+wins." For the win claim see the feature-distinctness metric below.
+
+### Head-to-head quality-filter + rank-robustness figure
 
 [![hero N=200](../../../results/nlp_sweep/gemma/figures/interpretability_comparison_hero_n200.doc.png)](../../../results/nlp_sweep/gemma/figures/interpretability_comparison_hero_n200.png)
 
 Panel A: filter-pass rate with 95% Wilson CIs. Panel B: rank-decile
-robustness. Panel C: label-cluster size (to be replaced with
-feature-distinctness in a follow-up; see "headline metric" below).
+robustness. Panel C: label-cluster size.
 
 ## Setup
 
