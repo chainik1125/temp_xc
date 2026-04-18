@@ -23,47 +23,39 @@ All code lives in `src/`. If `src/` does not yet exist, create it with appropria
 
 ## Environment setup
 
-Use the **`torchgpu`** conda environment. Activate it before running any code:
+The repo uses a single **`uv`-managed virtualenv** at `.venv/`, reproducible on any machine (local, RunPod, CI). Python ≥ 3.12 + PyTorch CU128.
+
+Install `uv` if missing: https://docs.astral.sh/uv/getting-started/installation/ — standalone binary, no system deps.
+
+First-time setup (clones a fresh `.venv` from `pyproject.toml` + `uv.lock`):
 
 ```bash
-conda activate torchgpu
+uv sync
 ```
 
-or if you are in a docker container, do
+From then on, run commands via `uv run` (auto-activates the venv) or directly through `.venv/bin/python`:
+
 ```bash
-source /opt/conda/etc/profile.d/conda.sh
-conda activate torchgpu
+uv run python scripts/analyze_activation_spans.py
+# or
+.venv/bin/python scripts/analyze_activation_spans.py
 ```
 
-The environment has the following key packages:
+Dependency source-of-truth is `pyproject.toml`. `uv.lock` pins exact versions. To add a package:
 
-| Package | Version |
-|---|---|
-| python | 3.12.11 |
-| torch | 2.8.0+cu128 |
-| transformers | 4.57.6 |
-| transformer-lens | 2.17.0 |
-| sae-lens | 6.35.0 |
-| plotly | 6.5.2 |
-| matplotlib | 3.10.5 |
-| seaborn | 0.13.2 |
-| kaleido | 1.2.0 |
-| pandas | 3.0.0 |
-| tqdm | 4.67.1 |
-| pyyaml | 6.0.2 |
-| jaxtyping | 0.3.7 |
-| einops | 0.8.2 |
-| circuitsvis | 1.43.3 |
+```bash
+uv add <package>         # adds to [project.dependencies] and relocks
+uv add --dev <package>   # adds to [dependency-groups.dev]
+```
 
-Do not install additional packages without discussion. If you need something not listed here, flag it.
+Do not `pip install` into the venv directly — it'll drift from the lockfile.
 
 ## Running code
 
-All scripts should be run from the repository root. Example:
+All scripts run from the repository root. Example:
 
 ```bash
-conda activate torchgpu
-python src/experiments/toy_model.py
+uv run python src/experiments/toy_model.py
 ```
 
 ### Disabling progress bars
@@ -77,7 +69,7 @@ export TQDM_DISABLE=1
 Or inline:
 
 ```bash
-TQDM_DISABLE=1 python src/experiments/toy_model.py
+TQDM_DISABLE=1 uv run python src/experiments/toy_model.py
 ```
 
 This keeps logs clean and avoids flooding output with progress bar updates.
@@ -106,7 +98,7 @@ save_figure(fig, os.path.join(results_dir, "my_plot.png"))
 5. **Sanity check everything.** When training SAEs, always check basic health metrics: fraction of alive features, reconstruction loss, L0, and decoder cosine similarity ($c_{\text{dec}}$). If something looks off, investigate before proceeding.
 6. **Use seeds.** All experiments should set random seeds for reproducibility. Use `torch.manual_seed()`, `np.random.seed()`, and any other relevant RNG seeding.
 7. **Keep code modular.** Separate data generation, model definitions, training loops, and evaluation into distinct files/functions. Avoid monolithic scripts.
-8. **No unnecessary dependencies.** Work with what is in the conda environment. Do not pip install new packages without flagging the need.
+8. **No unnecessary dependencies.** Work with what is pinned in `pyproject.toml` + `uv.lock`. If you need a new package, use `uv add <pkg>` and commit the updated `pyproject.toml` + `uv.lock` together.
 9. **GPU memory awareness.** We work on single-GPU setups. Be mindful of memory — use `torch.no_grad()` during evaluation, clear caches when needed, and report GPU memory usage for large experiments.
 10. **Ask if uncertain.** If the task is ambiguous or you are unsure about a design choice, ask rather than guessing.
  
