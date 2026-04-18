@@ -79,4 +79,76 @@ When starting a new experiment, create a new subdirectory (e.g. `src/v2_temporal
 
 ## Current progress
 
-Check `docs/han/research_logs/` for my most recent research logs. These are updated regularly and contain the latest experimental results, design decisions, and open questions. **Always read the most recent research log before starting work** to avoid duplicating effort or working from stale assumptions.
+Research logs live in `docs/han/research_logs/phase{0,1,2,3,4}_*/`, grouped by research phase. Each phase's key finding is summarized below; open the log linked for the full methodology and numbers. **Always read the newest log in the active phase before starting work.**
+
+### Phase 0 — v0 toy-model reproduction (Feb 2026)
+
+Reproduced Chanin et al. "Sparse but Wrong" toy model. Established that correct L0 is necessary for SAEs to recover ground-truth features. This is the baseline our temporal variants are compared against.
+
+- [`phase0_v0_reproduction/2026-02-20-v0-toy-model-reproduction.md`](../research_logs/phase0_v0_reproduction/2026-02-20-v0-toy-model-reproduction.md)
+
+### Phase 1 — Scheme C Markov-chain toy model (Mar 2026)
+
+Built a Markov-chain data generator where feature activations persist across tokens with tunable probability. Chose Scheme C (per-feature persistence probability) over mixing-based schemes because the latter (gamma) was a confound — it changed per-token marginal statistics, making the cross-architecture comparison unclean.
+
+Key outcome: a clean toy setting where TFA and SAE see identical marginal distributions but TFA has access to temporal structure.
+
+- [`phase1_scheme_c_toy/2026-03-04-v2-briefing.md`](../research_logs/phase1_scheme_c_toy/2026-03-04-v2-briefing.md)
+- [`phase1_scheme_c_toy/2026-03-21-temporal-settings-roadmap.md`](../research_logs/phase1_scheme_c_toy/2026-03-21-temporal-settings-roadmap.md)
+
+### Phase 2 — toy experiments: TFA vs SAE at varying sparsity (Mar–Apr 2026)
+
+Ran experiments 1a–1d, 2, 3 on the Scheme C toy model. Headline results:
+
+- **TFA wins massively when `k < true L0`.** At matched sparsity budget, TFA reconstructs better than stacked SAE whenever the per-token budget is below the true number of active features. Robust across seeds.
+- **Tied at `k = true L0`.** Neither architecture has an advantage when sparsity exactly matches.
+- **TFA advantage widens with scale.** At 30 features, TFA dominates across a wider `k` range than at toy scale.
+- **TFA convergence is slow but keeps improving.** ~7.5k steps to match SAE at `k=2`; still improving at 30k+.
+
+Interpretation: the predictable-component head gives TFA "free" features that are perfectly reconstructable from context, letting the sparse novel head use its budget on genuinely new information.
+
+- [`phase2_toy_experiments/2026-03-30-synthesis.md`](../research_logs/phase2_toy_experiments/2026-03-30-synthesis.md) — cross-experiment summary
+- [`phase2_toy_experiments/2026-03-30-experiment1-topk-sweep.md`](../research_logs/phase2_toy_experiments/2026-03-30-experiment1-topk-sweep.md) — the headline k-sweep
+
+### Phase 3 — coupled features in the toy model (Apr 2026)
+
+Extended the toy model to coupled feature groups (OR-gated + stochastic emission). Tested whether temporal SAEs can recover coupling structure that standard SAEs miss.
+
+Finding: TFA recovers coupled features more cleanly than stacked SAE when the coupling is temporal (OR-gate across positions), but the advantage is narrower than the matched-k result — most of the gap is explained by TFA's pred head, not the coupling per se.
+
+- [`phase3_coupled_features/2026-04-07-experiment1c3-coupled-features.md`](../research_logs/phase3_coupled_features/2026-04-07-experiment1c3-coupled-features.md)
+- [`phase3_coupled_features/2026-04-10-experiment1c3-noisy-coupled.md`](../research_logs/phase3_coupled_features/2026-04-10-experiment1c3-noisy-coupled.md) — stochastic emission variant
+
+### Phase 4 — NLP comparison on Gemma-2-2B-IT (Apr 2026, active)
+
+Ported Aniket's NLP pipeline (`src/bench/`) and ran a three-way comparison — Stacked SAE, TXCDR (temporal crosscoder), TFA-pos — on `resid_L25` of Gemma-2-2B-IT, `d_sae = 18432`, FineWeb.
+
+Findings (as written up on `han`):
+
+1. **Nearly disjoint feature dictionaries.** Cross-architecture decoder cosine median = 0.10–0.23, barely above random baseline 0.09. Each architecture fills a different region of direction-space.
+2. **TFA's dictionary bimodally splits.** 42.6% pred-only / 57.4% novel-only features; essentially 0% mixed use. Pred-only features have long spans (mean 4.5 tokens, p99 = 51); novel-only are transient (mean 1.1).
+3. **Each architecture specializes.** Autointerp on top-unique features per category read as distinct semantic types: Stacked = concrete lexical ("motor"), TXCDR = grammatical/multilingual (function words, Cyrillic), TFA-pred = context-determined structural tokens ("second digit of HH:MM"), TFA-novel = sequence-boundary markers (partly caching artifact).
+4. **Joint UMAP** shows four spatially-separated territories confirming the above.
+
+- [`phase4_nlp_comparison/2026-04-17-nlp-comparison-index.md`](../research_logs/phase4_nlp_comparison/2026-04-17-nlp-comparison-index.md) — read first
+- [`phase4_nlp_comparison/2026-04-17-nlp-feature-comparison-phase1.md`](../research_logs/phase4_nlp_comparison/2026-04-17-nlp-feature-comparison-phase1.md) — structural metrics
+- [`phase4_nlp_comparison/2026-04-17-nlp-feature-comparison-phase2.md`](../research_logs/phase4_nlp_comparison/2026-04-17-nlp-feature-comparison-phase2.md) — autointerp
+- [`phase4_nlp_comparison/2026-04-17-nlp-feature-comparison-phase3.md`](../research_logs/phase4_nlp_comparison/2026-04-17-nlp-feature-comparison-phase3.md) — joint UMAP
+- [`phase4_nlp_comparison/2026-04-17-high-span-feature-comparison.md`](../research_logs/phase4_nlp_comparison/2026-04-17-high-span-feature-comparison.md) — temporal-subset follow-up
+
+### Open questions and known caveats
+
+1. **Parallel work on the `han-runpod` branch contradicts the "TFA-pred is interpretable" finding.** Using a stronger *feature distinctness* metric (unique top-10 exemplar sets across features), they find 194 / 200 top span-weighted TFA-pred features share *literally identical* top-10 exemplars at L25 (one biochem passage), and 158 / 200 at L13 (one insurance boilerplate). Fisher p ≪ 10⁻⁷². If this replicates on our checkpoints it means the `han` "TFA pred exposes a new category" claim is an artifact of our top-N-by-mass ranking; the real claim should be "TXCDR wins cleanly on feature distinctness." Not yet reconciled on `han`. See `origin/han-runpod:docs/han/research_logs/2026-04-18-txcdr-vs-tfa.md`.
+2. **Single seed, single layer, single k** for all NLP results. Needs at least one more of {layer, seed, k} to make the architectural claims robust.
+3. **TFA training is fragile at real-LM scale.** Required stability fixes (decoder row renorm, NaN/inf batch skip, lr=3e-4, smaller batch). Still diverges at higher k values. Training budget is not matched across archs.
+4. **TXCDR has severe dead-feature problem** at d_sae=18,432 — only 12% alive. All comparisons filter to alive features, but the effective capacity is much smaller than nominal.
+5. **Sparsity-budget asymmetry makes TXCDR ↔ TFA-pred comparison unclean.** TFA-pred is dense (ReLU only, no TopK); TXCDR is sparse (TopK at k·T=500). Direct comparison requires either a sparsified TFA-pred variant or a matched-density protocol.
+6. **TFA novel on our caching scheme is dominated by sequence-boundary features.** Right-padded 128-token caching concentrates TFA novel mass on first-content tokens. Re-run with a packed-sequence cache to get genuinely transient intra-text features.
+7. **No downstream utility demonstration.** Nothing yet tested on circuit discovery, feature steering, or a probing benchmark. Required for a "temporal SAEs are useful" claim.
+
+### Suggested next directions (not committed to)
+
+- Reconcile with `han-runpod`: port their feature-distinctness metric and span-weighted ranking, re-rank our TFA-pred features, update Phase 4 writeup honestly.
+- Layer replication: run Phase 4 at `resid_L13` on Gemma.
+- Packed-sequence cache + rerun to defuse the TFA-novel boundary artifact.
+- Scale to DeepSeek-R1-Distill-Llama-8B (reasoning traces) — infrastructure exists, caching was interrupted.
