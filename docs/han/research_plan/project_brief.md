@@ -71,7 +71,6 @@ All code lives in `src/`. Each experiment or body of work gets its own subdirect
 |---|---|
 | `src/shared/` | Shared modules reused across experiments (data generation, SAE training, evaluation, plotting, configs) |
 | `src/utils/` | Small standalone utilities (device selection, cosine similarity, seeding) |
-| `src/v0_toy_model/` | Reproduction of Chanin et al. "Sparse but Wrong" — the baseline toy model |
 | `src/v2_temporal_schemeC/` | Temporal SAE experiments using Scheme C (Markov chain) data |
 | `src/TemporalFeatureAnalysis/` | **Reference code** from the paper "Priors in Time: Missing Inductive Biases for Language Model Interpretability". This is *not* our code — it is the paper's source included for reference. Do not modify it. |
 
@@ -79,13 +78,7 @@ When starting a new experiment, create a new subdirectory (e.g. `src/v2_temporal
 
 ## Current progress
 
-Research logs live in `docs/han/research_logs/phase{0,1,2,3,4}_*/`, grouped by research phase. Each phase's key finding is summarized below; open the log linked for the full methodology and numbers. **Always read the newest log in the active phase before starting work.**
-
-### Phase 0 — v0 toy-model reproduction (Feb 2026)
-
-Reproduced Chanin et al. "Sparse but Wrong" toy model. Established that correct L0 is necessary for SAEs to recover ground-truth features. This is the baseline our temporal variants are compared against.
-
-- [`phase0_v0_reproduction/2026-02-20-v0-toy-model-reproduction.md`](../research_logs/phase0_v0_reproduction/2026-02-20-v0-toy-model-reproduction.md)
+Research logs live in `docs/han/research_logs/phase{1,2,3,4}_*/`, grouped by research phase. Each phase's key finding is summarized below; open the log linked for the full methodology and numbers. **Always read the newest log in the active phase before starting work.**
 
 ### Phase 1 — Scheme C Markov-chain toy model (Mar 2026)
 
