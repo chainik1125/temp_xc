@@ -73,30 +73,54 @@ d_sae + tokens as the practical proxy and report FLOPs as a column.
 
 ## 4. Matched sparsity — two protocols, both reported
 
-SAE at TopK=k activates k features per token → over a T-token window
-it spends k×T total activations. TempXC at TopK=k activates k features
-per window total. "Matched k" and "matched total budget" are
-different sparsity constraints.
+**Definition.** SAE/MLC at TopK=k activate k features per *token*,
+so over a T-token window they spend k × T total activations.
+TempXC at TopK=k activates k features per *window total* (a shared
+latent across T positions). "Matched k" therefore has to pick an
+axis: per-token rate, or total-window budget. We run both.
 
-| protocol | SAE k | MLC k | TempXC k (T=5) | tests |
+The table below reports *effective window-level k* — the total
+number of active features a given architecture's encode produces
+over one T-token window. This is the quantity that determines
+representational capacity at the probing step and is directly
+comparable across architectures. Listing the underlying TopK
+parameter instead is misleading because TempXC's TopK applies to
+the whole window while SAE's applies per-token.
+
+| protocol | SAE window_k | MLC window_k | TempXC window_k | tests |
 |---|---|---|---|---|
-| **A — per-token k matched** | 100 | 100 | 100 | are TempXC's *individual* features more probing-useful? |
-| **B — total-window budget matched** | 100 | 100 | 500 | is TempXC's representation *as a whole* more probing-useful? |
+| **A — per-token rate matched** | 100·T | 100·T | 100·T (= 100 per position) | are TempXC's features more probing-useful *when it has the same per-token budget as SAE*? |
+| **B — total-window budget matched** | 100·T | 100·T | **500 fixed** (for all T) | is TempXC's representation better *with a fixed, SAE-like window budget that doesn't scale*? |
+
+At **T=5** the two protocols coincide for TempXC (both give
+window_k = 500), so A and B are equivalent. They diverge at T≥10:
+A scales TempXC's budget with T (1000, 2000 at T=10, 20); B holds
+it fixed at 500. SAE and MLC window_k scale with T under both
+protocols because their per-token k is fixed at 100 — the only
+variable is TempXC.
+
+**Underlying TopK parameters (what actually gets passed to the
+crosscoder's `__init__`).** The crosscoder's `__init__` takes a
+*per-position* k and internally multiplies by T to get window_k.
+So:
+
+| protocol | TempXC per-position k at T=5 / 10 / 20 | TempXC window_k at T=5 / 10 / 20 |
+|---|---|---|
+| **A** | 100 / 100 / 100 (constant) | 500 / 1000 / 2000 (scales) |
+| **B** | 100 / 50 / 25 (decreases) | 500 / 500 / 500 (fixed) |
 
 Running both yields 3 architectures × 2 protocols = **6 trained
-checkpoints at T=5**. The pattern across protocols is itself part
-of the finding.
+checkpoints at T=5**, plus 4 TempXC-only checkpoints at T ∈ {10, 20}
+for the T-sweep. The pattern across protocols is itself part of the
+finding.
 
 **Protocol-B direction note.** Dmitry's Slack framing was
 "SAE at k, TempXC at k/T" — i.e. keep SAE anchored at k=100 and
-reduce TempXC to 100/T. Our table above does the opposite direction
-(keep TempXC's k in the familiar 100–500 range, scale up if needed).
-The two framings are mathematically equivalent — both test "match
-total-window activation budget" — but anchoring TempXC's k to its
-training-time value (100 at T=5) may be cleaner for the paper
-write-up. If we flip direction before training, the downstream
-matching_protocols.protocol_k() values change but nothing else in
-the infrastructure does.
+reduce TempXC's per-position k to 100/T. That's mathematically
+equivalent to "match total-window activation budget = 500 at T=5,
+fixed as T grows," which is what Protocol B above runs. The two
+framings produce identical window_k values; only the presentation
+differs.
 
 ## 5. Four aggregation strategies
 
