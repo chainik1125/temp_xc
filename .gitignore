@@ -33,9 +33,19 @@ data/cached_activations/
 reports/
 results/bench/
 results/nlp/
+# SAEBench experiment: exclude bulky checkpoint + cached-activation
+# artifacts; keep the JSONL results + logs + preflight (~small).
+results/saebench/ckpts/
+results/saebench/saebench_artifacts/
+results/saebench/sweeps/
 
 # SLURM / run-time artifacts
 logs/
+# Un-ignore results/saebench/logs/ specifically — the bare `logs/`
+# rule above matches any directory named `logs`, which otherwise
+# swallows the SAEBench training logs we want to commit.
+!results/saebench/logs/
+!results/saebench/logs/**
 han_plots/
 report/
 temporal_crosscoders/logs/
