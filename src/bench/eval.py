@@ -40,6 +40,9 @@ class EvalResult:
     global_auc: float | None = None
     global_r90: float | None = None
     global_mean_max_cos: float | None = None
+    # Architecture-specific L0 breakdown. For TFA this holds
+    # {"l0_novel": ..., "l0_pred": ...}. Empty for other architectures.
+    l0_components: dict[str, float] | None = None
     # Real-LM temporal metrics (None on toy data)
     temporal_mi: dict | None = None
     span_stats: dict | None = None
@@ -127,6 +130,11 @@ def evaluate_model(
 
     nmse = acc.sum_se / max(acc.sum_signal, 1e-12)
     l0 = acc.sum_l0 / max(acc.n_tokens, 1)
+    l0_components = (
+        {k: v / max(acc.n_tokens, 1) for k, v in acc.extra.items()}
+        if acc.extra
+        else None
+    )
 
     # Compute decoder directions once (reused for local and global AUC)
     auc = r90 = mean_max_cos = None
@@ -179,6 +187,7 @@ def evaluate_model(
         auc=auc, r90=r90, mean_max_cos=mean_max_cos,
         global_auc=global_auc, global_r90=global_r90,
         global_mean_max_cos=global_mean_max_cos,
+        l0_components=l0_components,
         temporal_mi=temporal_mi_d,
         span_stats=span_d,
         cluster=cluster_d,
@@ -243,26 +252,27 @@ def _get_decoder_averaged(
     return torch.stack(dds).mean(dim=0)
 
 
+def _accumulate(acc: EvalOutput, out: EvalOutput) -> None:
+    acc.sum_se += out.sum_se
+    acc.sum_signal += out.sum_signal
+    acc.sum_l0 += out.sum_l0
+    acc.n_tokens += out.n_tokens
+    for k, v in out.extra.items():
+        acc.extra[k] = acc.extra.get(k, 0.0) + v
+
+
 def _eval_flat(spec, model, eval_data, device, acc):
     d = eval_data.shape[-1]
     flat = eval_data.reshape(-1, d)
     for s in range(0, flat.shape[0], 4096):
         x = flat[s : s + 4096].to(device)
-        out = spec.eval_forward(model, x)
-        acc.sum_se += out.sum_se
-        acc.sum_signal += out.sum_signal
-        acc.sum_l0 += out.sum_l0
-        acc.n_tokens += out.n_tokens
+        _accumulate(acc, spec.eval_forward(model, x))
 
 
 def _eval_seq(spec, model, eval_data, device, acc):
     for s in range(0, eval_data.shape[0], 256):
         x = eval_data[s : s + 256].to(device)
-        out = spec.eval_forward(model, x)
-        acc.sum_se += out.sum_se
-        acc.sum_signal += out.sum_signal
-        acc.sum_l0 += out.sum_l0
-        acc.n_tokens += out.n_tokens
+        _accumulate(acc, spec.eval_forward(model, x))
 
 
 def _eval_window(spec, model, eval_data, device, acc, seq_len):
@@ -271,8 +281,4 @@ def _eval_window(spec, model, eval_data, device, acc, seq_len):
         seqs = eval_data[s : s + 256].to(device)
         for t in range(seq_len - T + 1):
             w = seqs[:, t : t + T, :]
-            out = spec.eval_forward(model, w)
-            acc.sum_se += out.sum_se
-            acc.sum_signal += out.sum_signal
-            acc.sum_l0 += out.sum_l0
-            acc.n_tokens += out.n_tokens
+            _accumulate(acc, spec.eval_forward(model, w))

@@ -81,8 +81,13 @@ class TFASpec(ArchSpec):
 
     def train(self, model, gen_fn, total_steps, batch_size, lr, device,
               log_every=500, grad_clip=1.0):
-        min_lr = lr * 0.9
-        warmup_steps = min(200, total_steps // 10)
+        # Stability hardening for real-LM training:
+        #  - decoder unit-norm after each step (prevents D explosion)
+        #  - skip batches with NaN/inf loss or grad
+        #  - deeper LR decay (min_lr = 0.1 * lr, not 0.9)
+        # See docs/han/ + logs/tfa_debug_fix_v4.json for the stability study.
+        min_lr = lr * 0.1
+        warmup_steps = min(500, total_steps // 10)
 
         decay_params = [p for p in model.parameters() if p.requires_grad and p.dim() >= 2]
         no_decay_params = [p for p in model.parameters() if p.requires_grad and p.dim() < 2]
@@ -95,23 +100,19 @@ class TFASpec(ArchSpec):
             betas=(0.9, 0.95),
         )
 
-        log = {"loss": [], "l0": []}
+        log = {"loss": [], "l0": [], "skipped": 0}
         model.train()
 
         for step in range(total_steps):
-            # Cosine warmup schedule
             if step < warmup_steps:
                 current_lr = lr * step / max(1, warmup_steps)
             else:
-                decay_ratio = (step - warmup_steps) / max(
-                    1, total_steps - warmup_steps
-                )
+                decay_ratio = (step - warmup_steps) / max(1, total_steps - warmup_steps)
                 coeff = 0.5 * (1.0 + math.cos(math.pi * decay_ratio))
                 current_lr = min_lr + coeff * (lr - min_lr)
             for pg in optimizer.param_groups:
                 pg["lr"] = current_lr
 
-            # TFA expects full sequences: gen_fn(n_seq) -> (B, T, d)
             batch = self._scale(gen_fn(batch_size).to(device))
             recons, intermediates = model(batch)
 
@@ -120,10 +121,28 @@ class TFASpec(ArchSpec):
             n_tokens = batch_flat.shape[0]
             loss = F.mse_loss(recons_flat, batch_flat, reduction="sum") / n_tokens
 
+            if loss.isnan().any() or loss.isinf().any():
+                log["skipped"] += 1
+                optimizer.zero_grad(set_to_none=True)
+                if any(p.isnan().any() for p in model.parameters()):
+                    print(f"  [TFA] step {step}: params NaN, halting")
+                    break
+                continue
+
             optimizer.zero_grad()
             loss.backward()
+            grad_norm = nn.utils.clip_grad_norm_(model.parameters(), float("inf"))
+            if grad_norm.isnan() or grad_norm.isinf():
+                log["skipped"] += 1
+                optimizer.zero_grad(set_to_none=True)
+                continue
             nn.utils.clip_grad_norm_(model.parameters(), grad_clip)
             optimizer.step()
+
+            # Re-normalize decoder rows to unit norm (critical for stability)
+            with torch.no_grad():
+                norms = model.D.data.norm(dim=1, keepdim=True).clamp(min=1e-8)
+                model.D.data.div_(norms)
 
             if step % log_every == 0 or step == total_steps - 1:
                 with torch.no_grad():
@@ -153,6 +172,7 @@ class TFASpec(ArchSpec):
             sum_signal=signal,
             sum_l0=novel_l0 + pred_l0,
             n_tokens=B * T,
+            extra={"l0_novel": novel_l0, "l0_pred": pred_l0},
         )
 
     def encode(self, model, x):

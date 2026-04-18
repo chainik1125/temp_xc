@@ -32,3 +32,26 @@ Thumbs.db
 .vscode/*
 !.vscode/extensions.json
 .idea/
+.env_autointerp
+
+# Raw result artifacts — reproducible from scripts + cached activations.
+# Per-feature JSONs contain unfiltered FineWeb text; don't commit.
+results/nlp_sweep/ckpts/
+results/nlp_sweep/**/ckpts/
+results/nlp_sweep/**/results_*.json
+results/analysis/**/feat_*.json
+results/analysis/**/*.pt
+results/analysis/**/firing_frequencies.pt
+results/analysis/**/umap_coords.json
+results/analysis/**/annotations.json
+results/analysis/**/top_*_dominated_features.json
+results/analysis/**/alive_top_unique.json
+
+# Cached model weights — too big for git
+src/v2_temporal_schemeC/model_cache/
+
+# Cached LLM activations — too big and potentially contains FineWeb text ids
+data/
+
+# Logs
+logs/

@@ -504,8 +504,8 @@ def main():
             shuffle_within_sequence=args.shuffle_within_sequence,
             d_sae=d_sae,
         )
-        tfa_bf = args.tfa_bottleneck_factor if args.tfa_bottleneck_factor is not None else 4
-        tfa_bs = args.tfa_batch_size if args.tfa_batch_size is not None else 16
+        tfa_bf = args.tfa_bottleneck_factor if args.tfa_bottleneck_factor is not None else 8
+        tfa_bs = args.tfa_batch_size if args.tfa_batch_size is not None else 32
         models = get_default_models(
             sweep_config.T_values,
             tfa_bottleneck_factor=tfa_bf,

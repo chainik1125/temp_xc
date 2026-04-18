@@ -54,18 +54,20 @@ def get_default_models(
         gen_key="flat",
     ))
 
-    # TFA: full-sequence models
+    # TFA: full-sequence models. NLP-scale uses lr=3e-4 + large batch for
+    # stability (see logs/tfa_debug_fix_v4.json study).
+    tfa_lr = 3e-4 if tfa_batch_size >= 32 else 1e-3
     models.append(ModelEntry(
         name="TFA",
         spec=TFASpec(use_pos_encoding=False, bottleneck_factor=tfa_bottleneck_factor),
         gen_key="seq",
-        training_overrides={"batch_size": tfa_batch_size, "lr": 1e-3},
+        training_overrides={"batch_size": tfa_batch_size, "lr": tfa_lr},
     ))
     models.append(ModelEntry(
         name="TFA-pos",
         spec=TFASpec(use_pos_encoding=True, bottleneck_factor=tfa_bottleneck_factor),
         gen_key="seq",
-        training_overrides={"batch_size": tfa_batch_size, "lr": 1e-3},
+        training_overrides={"batch_size": tfa_batch_size, "lr": tfa_lr},
     ))
 
     # Stacked SAE and Crosscoder: one per T

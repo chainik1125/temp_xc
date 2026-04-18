@@ -26,7 +26,7 @@ Two questions:
 - 2500 sequences total (2000 eval, 500 train)
 - Scaling factor: $\sqrt{d} / \mathbb{E}[\|x\|] = 2.0655$
 
-**Models** (5 total):
+**Models** (5 total): 
 
 | Model | Training config |
 |-------|-----------------|

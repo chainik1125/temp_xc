@@ -20,12 +20,18 @@ class EvalOutput:
     """Raw evaluation totals from one forward pass.
 
     Uses sums (not means) so batches of different sizes can be aggregated.
+
+    `extra` holds architecture-specific metrics that are summed across
+    batches and divided by `n_tokens` at the end (see evaluate_model).
+    E.g. TFA returns {"l0_novel": ..., "l0_pred": ...} so downstream
+    consumers can distinguish the sparse (novel) and dense (pred) heads.
     """
 
     sum_se: float
     sum_signal: float
     sum_l0: float
     n_tokens: int
+    extra: dict[str, float] = field(default_factory=dict)
 
 
 @dataclass
