@@ -8,6 +8,16 @@ tags:
 
 ## NeurIPS-grade gap analysis — TXCDR vs TFA feature comparison
 
+> **Update 2026-04-18**: The L13 replication
+> (`2026-04-18-l13-replication.md`) and the span-weighted analysis
+> (`2026-04-18-interpretability-comparison.md`) close Reviewer
+> attacks #3 and #4 more strongly than this doc originally claimed,
+> and expand the "TFA under-training" concern (Reviewer #2) to
+> "TFA recipe is layer-fragile — fails at L13 with same hyperparams."
+> The five-blocker list below is still the right frame; classifications
+> still hold.
+
+
 Companion to `2026-04-17-autointerp-initial.md`. The initial log establishes
 that on Gemma-2-2B-IT resid_L25 k=50, Crosscoder and TFA-pos find
 substantially different features: **TXCDR's top-15 high-span features are

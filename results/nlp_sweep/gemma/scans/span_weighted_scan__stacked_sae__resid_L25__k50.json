@@ -1,0 +1,1666 @@
+{
+  "arch": "stacked_sae",
+  "subject_model": "gemma-2-2b-it",
+  "layer_key": "resid_L25",
+  "k": 50,
+  "T": 5,
+  "sample_chains": 1000,
+  "top_k_per_feature": 10,
+  "d_sae": 18432,
+  "num_active_features": 15938,
+  "requested_feats": [
+    143,
+    435,
+    871,
+    1284,
+    2363,
+    4063,
+    5267,
+    7290,
+    7599,
+    8399,
+    9249,
+    9955,
+    11012,
+    12028,
+    12035,
+    12112,
+    12607,
+    13165,
+    13186,
+    14414,
+    14802,
+    15493,
+    15526,
+    17996,
+    18017
+  ],
+  "dead_feats": [],
+  "features": {
+    "13186": {
+      "mass": 379.5072441101074,
+      "examples": [
+        {
+          "activation": 42.94269943237305,
+          "chain_idx": 21510,
+          "window_start": 108,
+          "text": " players decide to use this as a money making technique>>>. Warning: If you<<< choose to use this money making technique, be reminded"
+        },
+        {
+          "activation": 40.784969329833984,
+          "chain_idx": 12042,
+          "window_start": 65,
+          "text": " a waterfront area displaying the relationship of math and nature>>>.\nShiver me<<< timbers, it's a pirate ship in John"
+        },
+        {
+          "activation": 38.180511474609375,
+          "chain_idx": 10981,
+          "window_start": 92,
+          "text": " xscreensaver-command -watch, but I>>>'d rather not have<<< to make sure I have that process always running and"
+        },
+        {
+          "activation": 37.536861419677734,
+          "chain_idx": 15384,
+          "window_start": 111,
+          "text": "Streamlined data processing for maximum print and postal savings>>>.\nNo direct mailing<<< job is too large or small \u2013 or too difficult"
+        },
+        {
+          "activation": 37.53220748901367,
+          "chain_idx": 9630,
+          "window_start": 91,
+          "text": " hospital chief executives have also been invited to the rallies>>>.\n\"Nurse-<<<patient ratios have been critical in maintaining a regional work"
+        },
+        {
+          "activation": 37.24252700805664,
+          "chain_idx": 15476,
+          "window_start": 79,
+          "text": "-developed automatic plate ice machine integration technology was born>>>. It is reported that<<< the technical program not only covers the automatic integration process"
+        },
+        {
+          "activation": 37.1312255859375,
+          "chain_idx": 10512,
+          "window_start": 109,
+          "text": " at their pleasure, cruel to cross in their mood>>>,\nAnd set on<<< paths of their choosing as the hogs of Andred"
+        },
+        {
+          "activation": 36.1972770690918,
+          "chain_idx": 23858,
+          "window_start": 116,
+          "text": "40,000 views on social media>>>.\nCole was heard<<< comparing the street to those found in"
+        },
+        {
+          "activation": 36.04168701171875,
+          "chain_idx": 18271,
+          "window_start": 123,
+          "text": " serve people with ALL disabilities who have no other resources>>>. UCP builds wheelchair<<<"
+        },
+        {
+          "activation": 35.91727828979492,
+          "chain_idx": 15096,
+          "window_start": 31,
+          "text": "gout the bedrooms, bathroom and hall of the basement>>>\n- Painted the master<<< bedroom (from brown/cream to gray/teal"
+        }
+      ]
+    },
+    "12035": {
+      "mass": 1332.8373260498047,
+      "examples": [
+        {
+          "activation": 139.28599548339844,
+          "chain_idx": 15147,
+          "window_start": 121,
+          "text": " creates a textured aesthetic.\nORDER BY 5>>>PM FOR NEXT DAY DELIVERY<<< within the"
+        },
+        {
+          "activation": 137.8640594482422,
+          "chain_idx": 15147,
+          "window_start": 120,
+          "text": " upper creates a textured aesthetic.\nORDER BY >>>5PM FOR NEXT DAY<<< DELIVERY within the"
+        },
+        {
+          "activation": 133.42263793945312,
+          "chain_idx": 21000,
+          "window_start": 27,
+          "text": ", SINGING TELEGRAMS AUCKLAND,>>> HENS PARTY ENTERTAINMENT AU<<<CKLAND, AUCKLAND SINGING TELEGRAM"
+        },
+        {
+          "activation": 132.76461791992188,
+          "chain_idx": 15147,
+          "window_start": 119,
+          "text": " printed upper creates a textured aesthetic.\nORDER BY>>> 5PM FOR NEXT<<< DAY DELIVERY within the"
+        },
+        {
+          "activation": 132.17539978027344,
+          "chain_idx": 21000,
+          "window_start": 66,
+          "text": " PARTIES AUCKLAND, HENS NIGHTS AU>>>CKLAND, BIRTHDAY SING<<<ING TELEG||\nRocky Horror telegram\nRocky"
+        },
+        {
+          "activation": 132.0109405517578,
+          "chain_idx": 21959,
+          "window_start": 32,
+          "text": " or more rightly so, Australian for \u201cgimm>>>ick\u201d. WORLD OF L<<<IES sits as The Berzerker\u2019s third"
+        },
+        {
+          "activation": 131.7156219482422,
+          "chain_idx": 21582,
+          "window_start": 90,
+          "text": "FROM CAIRO TO\nBT. LOUIS OR CHICAGO>>>.\nONLY ONE CHANGE<<< OF CABS\nO.M CAIHU"
+        },
+        {
+          "activation": 131.6330108642578,
+          "chain_idx": 20484,
+          "window_start": 117,
+          "text": " juicy homestyle cuts are sliced thicker, bursting with>>> flavour.\nFIND THEM<<< IN THE CHILLED AISLES"
+        },
+        {
+          "activation": 131.00015258789062,
+          "chain_idx": 15068,
+          "window_start": 1,
+          "text": ">>>3 WORLDS OF G<<<ULLIVER STILL\nDescription: original; colour;"
+        },
+        {
+          "activation": 130.9648895263672,
+          "chain_idx": 20484,
+          "window_start": 120,
+          "text": " cuts are sliced thicker, bursting with flavour.\n>>>FIND THEM IN THE CHIL<<<LED AISLES"
+        }
+      ]
+    },
+    "11012": {
+      "mass": 500.4450035095215,
+      "examples": [
+        {
+          "activation": 60.47573471069336,
+          "chain_idx": 21505,
+          "window_start": 59,
+          "text": " to rusting and corrosion\n- Large 1>>>9 oz. bottle included<<< - hidden with below-deck installation\n- Top"
+        },
+        {
+          "activation": 53.562355041503906,
+          "chain_idx": 12523,
+          "window_start": 5,
+          "text": "Tealight Candles >>>50\n- Set<<< of 50 fully refined paraffin wax tealight"
+        },
+        {
+          "activation": 51.4205322265625,
+          "chain_idx": 8315,
+          "window_start": 60,
+          "text": " with no lag time. It has a 1>>>0:1 reduction ratio<<<. Two J-shredder hammers and two rectangular"
+        },
+        {
+          "activation": 50.03949737548828,
+          "chain_idx": 8315,
+          "window_start": 6,
+          "text": "The YARDMAX >>>2-in-1<<< Chipper Shredder features a highly versatile design and"
+        },
+        {
+          "activation": 49.90009307861328,
+          "chain_idx": 11904,
+          "window_start": 15,
+          "text": " Stationary Barstool\n- Stationary Barstool 1>>>8w x 1<<<4d x 24 or 30"
+        },
+        {
+          "activation": 48.238643646240234,
+          "chain_idx": 6441,
+          "window_start": 31,
+          "text": " LED Mini Floodlight 30w 2>>>400lm\n<<<This LED floodlight has a modern, slimline"
+        },
+        {
+          "activation": 47.702945709228516,
+          "chain_idx": 15679,
+          "window_start": 73,
+          "text": " surfaces that Finish All Paints.\nSize: >>>32oz Quart (<<<1 Liter)\nThis Color Blocking HIDE primer"
+        },
+        {
+          "activation": 46.55152893066406,
+          "chain_idx": 18072,
+          "window_start": 97,
+          "text": "\" caption add a fun look.\n- >>>7.8\"H<<< x 4.65\"D\n-"
+        },
+        {
+          "activation": 46.40242004394531,
+          "chain_idx": 8296,
+          "window_start": 39,
+          "text": " 13 lb.) Outfitted with 1>>>2\" pneumatic tires,<<< kick-stand for stability, 1\" wide"
+        },
+        {
+          "activation": 46.15125274658203,
+          "chain_idx": 15679,
+          "window_start": 74,
+          "text": " that Finish All Paints.\nSize: 3>>>2oz Quart (1<<< Liter)\nThis Color Blocking HIDE primer is"
+        }
+      ]
+    },
+    "15493": {
+      "mass": 598.1563415527344,
+      "examples": [
+        {
+          "activation": 62.15088653564453,
+          "chain_idx": 12249,
+          "window_start": 0,
+          "text": ">>>Adam Schefter of<<< ESPN reported Thursday morning that the Pittsburgh Steelers will not"
+        },
+        {
+          "activation": 61.62483596801758,
+          "chain_idx": 122,
+          "window_start": 0,
+          "text": ">>>Structural Intervention Time Series<<< Analysis of Crime Rates: The Impact of Sentence Reform"
+        },
+        {
+          "activation": 60.87153244018555,
+          "chain_idx": 4441,
+          "window_start": 0,
+          "text": ">>>Current Policies and Historical<<< Publications\nADA historical publications include Annual Reports and Resolutions"
+        },
+        {
+          "activation": 60.7536735534668,
+          "chain_idx": 14857,
+          "window_start": 0,
+          "text": ">>>Physics Education Mailing Lists<<<\nThese lists use the standard LISTSERV protocol."
+        },
+        {
+          "activation": 60.245941162109375,
+          "chain_idx": 13337,
+          "window_start": 0,
+          "text": ">>>Federal Agency Obtains<<< Policy Changes and $600,00"
+        },
+        {
+          "activation": 59.86528396606445,
+          "chain_idx": 13597,
+          "window_start": 0,
+          "text": ">>>Cultural Mapping of the<<< Warli community\nThe Dahanu Chapter undertook"
+        },
+        {
+          "activation": 58.65592575073242,
+          "chain_idx": 8544,
+          "window_start": 0,
+          "text": ">>>Current Employment Opportunities at<<< Enjoy Church IT\nEnjoy Church is growing, and"
+        },
+        {
+          "activation": 58.10559844970703,
+          "chain_idx": 21480,
+          "window_start": 0,
+          "text": ">>>Alcohol Enforcement and Hand<<<gun Violation\nWESTERN DISTRICT - ALCOHOL ENFORCEMENT -"
+        },
+        {
+          "activation": 58.01382064819336,
+          "chain_idx": 10279,
+          "window_start": 0,
+          "text": ">>>Disability Inclusion Drives Business<<< Success\nGroundbreaking research from Accenture in partnership"
+        },
+        {
+          "activation": 57.86884307861328,
+          "chain_idx": 14268,
+          "window_start": 0,
+          "text": ">>>Officer Positions, Mait<<<re, Regents, Cavistes, Educateurs,"
+        }
+      ]
+    },
+    "1284": {
+      "mass": 278.5176544189453,
+      "examples": [
+        {
+          "activation": 34.85513687133789,
+          "chain_idx": 5596,
+          "window_start": 83,
+          "text": " the finishing touches, our focus is to partner with>>> the client to achieve their<<< end result.\nwill help you to\nCREATE"
+        },
+        {
+          "activation": 29.488290786743164,
+          "chain_idx": 1430,
+          "window_start": 22,
+          "text": " all the sectors worldwide, mainly the start-ups>>>, the future of EV<<< stands frozen. This year started with the growing support"
+        },
+        {
+          "activation": 27.867401123046875,
+          "chain_idx": 22869,
+          "window_start": 97,
+          "text": " look? Either way, your Athens painting contractor will>>> be able to offer suggestions<<< on how to create the mood you desire with the"
+        },
+        {
+          "activation": 27.538259506225586,
+          "chain_idx": 21919,
+          "window_start": 105,
+          "text": " magazine focuses on the biggest topics in the leasing sector>>> over the summer; PCP<<<, the challenges facing diesel, how the EIB"
+        },
+        {
+          "activation": 27.466516494750977,
+          "chain_idx": 1894,
+          "window_start": 21,
+          "text": " time where we showcase the most stunning weddings that have>>> graced the pages of SMP<<< throughout the year as picked by you, our lovely"
+        },
+        {
+          "activation": 27.068622589111328,
+          "chain_idx": 11224,
+          "window_start": 121,
+          "text": "600-3k CDN).\nAs>>> with all emerging technologies,<<< they come"
+        },
+        {
+          "activation": 26.641748428344727,
+          "chain_idx": 8201,
+          "window_start": 114,
+          "text": "33 mm is the right size to properly snap>>> into the RJ45<<< socket and be removable with only a bit of"
+        },
+        {
+          "activation": 26.080495834350586,
+          "chain_idx": 4950,
+          "window_start": 67,
+          "text": " the foliage. This might not be possible in reality>>> for everyone to experience.<<< However with our nature inspired stencils, we can experience"
+        },
+        {
+          "activation": 25.85174560546875,
+          "chain_idx": 12026,
+          "window_start": 75,
+          "text": " rectify faults. At John\u2019s Garage I leave>>> the car there for MOT<<<, Servicing and repair. It\u2019s always \u2018"
+        },
+        {
+          "activation": 25.65943717956543,
+          "chain_idx": 4299,
+          "window_start": 119,
+          "text": " cyclist who reckons it's prevalent in pretty>>> much all professional sports,<<< including football.Robert"
+        }
+      ]
+    },
+    "143": {
+      "mass": 402.88109588623047,
+      "examples": [
+        {
+          "activation": 43.314910888671875,
+          "chain_idx": 5461,
+          "window_start": 66,
+          "text": ", managing the science program for the Hubble Space Telescope>>> and the forthcoming James Webb<<< Space Telescope. Grunsfeld\u2019s background includes"
+        },
+        {
+          "activation": 42.56812286376953,
+          "chain_idx": 21623,
+          "window_start": 121,
+          "text": " to talk about the Cosmic Microwave Background, light element>>> ratios, and so forth<<<, but"
+        },
+        {
+          "activation": 41.4315185546875,
+          "chain_idx": 5461,
+          "window_start": 105,
+          "text": " field of exoplanet studies with specific interest in>>> future astronomical instrumentation.\n<<<Grunsfeld graduated from the Massachusetts Institute of"
+        },
+        {
+          "activation": 41.36711120605469,
+          "chain_idx": 5461,
+          "window_start": 67,
+          "text": " managing the science program for the Hubble Space Telescope and>>> the forthcoming James Webb Space<<< Telescope. Grunsfeld\u2019s background includes research"
+        },
+        {
+          "activation": 41.16764450073242,
+          "chain_idx": 10216,
+          "window_start": 71,
+          "text": ", making it not the world's most beautiful>>>! but it drives safe<<< and smoothly. We have been all around Sweden,"
+        },
+        {
+          "activation": 40.85933303833008,
+          "chain_idx": 21623,
+          "window_start": 117,
+          "text": " aback. I tried to talk about the Cosmic Microwave>>> Background, light element ratios<<<, and so forth, but"
+        },
+        {
+          "activation": 40.5562858581543,
+          "chain_idx": 5461,
+          "window_start": 61,
+          "text": " Telescope Science Institute in Baltimore, managing the science program>>> for the Hubble Space Telescope<<< and the forthcoming James Webb Space Telescope. Grunsf"
+        },
+        {
+          "activation": 40.330841064453125,
+          "chain_idx": 21623,
+          "window_start": 122,
+          "text": " talk about the Cosmic Microwave Background, light element ratios>>>, and so forth,<<< but"
+        },
+        {
+          "activation": 35.830955505371094,
+          "chain_idx": 21623,
+          "window_start": 116,
+          "text": " taken aback. I tried to talk about the Cosmic>>> Microwave Background, light element<<< ratios, and so forth, but"
+        },
+        {
+          "activation": 35.45437240600586,
+          "chain_idx": 5260,
+          "window_start": 4,
+          "text": "If you are>>> one of millions trying to<<< sell a home right now, see how Seller\u2019"
+        }
+      ]
+    },
+    "5267": {
+      "mass": 392.1570243835449,
+      "examples": [
+        {
+          "activation": 51.409149169921875,
+          "chain_idx": 16166,
+          "window_start": 113,
+          "text": " course by clicking\non one of the following kanji>>>:\nMac OS X<<<, Java works best in the Safari browser. As"
+        },
+        {
+          "activation": 43.026432037353516,
+          "chain_idx": 17695,
+          "window_start": 5,
+          "text": "4902>>> 113th<<< Ave N, Clearwater, FL 337"
+        },
+        {
+          "activation": 41.757415771484375,
+          "chain_idx": 8288,
+          "window_start": 13,
+          "text": "w limited (pccw, \u96fb\u8a0a\u76c8>>>\u79d1) is the largest<<< telecommunication enterprise in hong kong. pccw"
+        },
+        {
+          "activation": 39.43692398071289,
+          "chain_idx": 18655,
+          "window_start": 2,
+          "text": "VDC>>> 10 mm x<<< 90 mm Velcro Cable Tie\nThese reuse"
+        },
+        {
+          "activation": 38.24586486816406,
+          "chain_idx": 13399,
+          "window_start": 56,
+          "text": " \u2013 \u201cCrying out lout, making sounds\u201d>>> (Fu Hok Jok Seng<<< in Cantonese). For example, in Fat Saan"
+        },
+        {
+          "activation": 37.61500930786133,
+          "chain_idx": 379,
+          "window_start": 3,
+          "text": "Range Rover>>> (2013<<<) pictures and hands-on\nA new Range"
+        },
+        {
+          "activation": 35.689117431640625,
+          "chain_idx": 192,
+          "window_start": 53,
+          "text": "UEFA Euro 2012 official logo\n>>>|Dates||8 June<<< \u2013 1 July|\n|Venue(s"
+        },
+        {
+          "activation": 35.58675003051758,
+          "chain_idx": 15201,
+          "window_start": 2,
+          "text": "NBA>>> 2K17<<< was just released few days ago. Gamers were very"
+        },
+        {
+          "activation": 35.253475189208984,
+          "chain_idx": 8288,
+          "window_start": 14,
+          "text": " limited (pccw, \u96fb\u8a0a\u76c8\u79d1>>>) is the largest tele<<<communication enterprise in hong kong. pccw have"
+        },
+        {
+          "activation": 34.13688659667969,
+          "chain_idx": 192,
+          "window_start": 41,
+          "text": " \u0404\u0432\u0440\u043e\u043f\u0438 \u0437 \u0444\u0443\u0442\u0431\u043e\u043b\u0443 201>>>2\nUEFA Euro <<<2012 official logo\n|Dates||"
+        }
+      ]
+    },
+    "9249": {
+      "mass": 944.2486953735352,
+      "examples": [
+        {
+          "activation": 98.21611785888672,
+          "chain_idx": 1149,
+          "window_start": 0,
+          "text": ">>>The summer is close<<< here in Miami and the sun is shining, the"
+        },
+        {
+          "activation": 98.04601287841797,
+          "chain_idx": 14235,
+          "window_start": 0,
+          "text": ">>>The internet site sites<<< had been launched in has tens and thousands of the"
+        },
+        {
+          "activation": 95.88228607177734,
+          "chain_idx": 5574,
+          "window_start": 0,
+          "text": ">>>The Republican Party has<<< won a majority of the popular vote just once in"
+        },
+        {
+          "activation": 95.44390869140625,
+          "chain_idx": 10051,
+          "window_start": 0,
+          "text": ">>>The Photographic Performance <<<2018 / Marilyn Maxwell\nThis is"
+        },
+        {
+          "activation": 95.2555160522461,
+          "chain_idx": 16956,
+          "window_start": 0,
+          "text": ">>>The cold temperature that<<< winter brings makes it necessary for us to make sure"
+        },
+        {
+          "activation": 93.25547790527344,
+          "chain_idx": 12867,
+          "window_start": 0,
+          "text": ">>>Your Plumbing, HVAC<<<, & Industrial Contractor:\nW.W."
+        },
+        {
+          "activation": 92.86854553222656,
+          "chain_idx": 12711,
+          "window_start": 0,
+          "text": ">>>Our risk management framework<<< provides a uniform governance structure for the identification and management"
+        },
+        {
+          "activation": 91.86769104003906,
+          "chain_idx": 2832,
+          "window_start": 0,
+          "text": ">>>The game of Mar<<<bles as we know it today gets its name from"
+        },
+        {
+          "activation": 91.71809387207031,
+          "chain_idx": 19519,
+          "window_start": 0,
+          "text": ">>>The Tennessee and New<<< Jersey senates are both considering bills that will affect"
+        },
+        {
+          "activation": 91.6950454711914,
+          "chain_idx": 22642,
+          "window_start": 0,
+          "text": ">>>The young mother of<<< two in the recent A Walk on the Moon followed"
+        }
+      ]
+    },
+    "15526": {
+      "mass": 409.96562576293945,
+      "examples": [
+        {
+          "activation": 49.32973098754883,
+          "chain_idx": 16822,
+          "window_start": 87,
+          "text": " new records on the NYSE, NASDAQ and>>> S&P 5<<<00 Index? That oil prices seemed to stabilize"
+        },
+        {
+          "activation": 46.60062789916992,
+          "chain_idx": 14670,
+          "window_start": 65,
+          "text": " by step. She is also called just L.>>>S.P for short<<<, and to be completely honest with you, I"
+        },
+        {
+          "activation": 45.6656608581543,
+          "chain_idx": 18271,
+          "window_start": 64,
+          "text": "CELEBRATING SUMMER FUN IN TENNESSEE\nto benefit>>> United Cerebral Palsy\n<<<June 24, 2011"
+        },
+        {
+          "activation": 43.60687255859375,
+          "chain_idx": 4681,
+          "window_start": 104,
+          "text": " 2200G desktop APUs (>>>Accelerated Processing Units)<<< with four Zen cores apiece. The chips are distinguishable"
+        },
+        {
+          "activation": 38.73451232910156,
+          "chain_idx": 5290,
+          "window_start": 85,
+          "text": " color scheme usually relies on a layered composition of subtle>>> and muted color tones.<<< It is helpful to keep an eye on the individual"
+        },
+        {
+          "activation": 38.387725830078125,
+          "chain_idx": 15798,
+          "window_start": 106,
+          "text": " risk;\n- The most common methods for monitoring>>> third-party risk.<<<\nWhite is the founder and CEO of RiskRecon"
+        },
+        {
+          "activation": 37.474365234375,
+          "chain_idx": 2693,
+          "window_start": 7,
+          "text": "Following the Efficient Frontier search CPC>>> (cost per click)<<< trends release, we are now sharing the Display CPM"
+        },
+        {
+          "activation": 36.89165115356445,
+          "chain_idx": 14749,
+          "window_start": 22,
+          "text": " more information about Parking Stations, including quotes, reviews>>> or special coupon... read<<< moreoffers in dLook's business listings within"
+        },
+        {
+          "activation": 36.774593353271484,
+          "chain_idx": 20484,
+          "window_start": 72,
+          "text": " up tastes? You can create fabulous sandwiches, rolls>>>, ploughman\u2019s<<< lunches & platters with our exciting new products."
+        },
+        {
+          "activation": 36.49988555908203,
+          "chain_idx": 15268,
+          "window_start": 38,
+          "text": " cuts for all sexes, ages, lifestyles, hair>>> types and time constraints.<<< We keep up with the most current trends and styles"
+        }
+      ]
+    },
+    "7599": {
+      "mass": 470.8427391052246,
+      "examples": [
+        {
+          "activation": 49.03015899658203,
+          "chain_idx": 2540,
+          "window_start": 38,
+          "text": "'s father's line back to the Teg>>>eler's in Wagen<<<feld Hanover, Prussia, Germany in the late "
+        },
+        {
+          "activation": 49.02581787109375,
+          "chain_idx": 2693,
+          "window_start": 5,
+          "text": "Following the Efficient Frontier>>> search CPC (cost per<<< click) trends release, we are now sharing the"
+        },
+        {
+          "activation": 48.86213302612305,
+          "chain_idx": 2540,
+          "window_start": 66,
+          "text": "0's and to the Otting/P>>>attmann family in W<<<etzchen, Germany around 1840"
+        },
+        {
+          "activation": 48.743072509765625,
+          "chain_idx": 2540,
+          "window_start": 70,
+          "text": " to the Otting/Pattmann family in>>> Wetzchen, Germany<<< around 1840.|\nMy father"
+        },
+        {
+          "activation": 48.10857009887695,
+          "chain_idx": 11158,
+          "window_start": 73,
+          "text": " leading a campaign designed not to antagonise her countrymen>>>, jokes Frankfurter Allgemeine Zeitung<<<.\nLooking at Germany from above, the country"
+        },
+        {
+          "activation": 48.087440490722656,
+          "chain_idx": 2540,
+          "window_start": 32,
+          "text": "|I have traced my father's father'>>>s line back to the<<< Tegeler's in Wagenfeld Hanover, Prussia"
+        },
+        {
+          "activation": 47.71951675415039,
+          "chain_idx": 2540,
+          "window_start": 40,
+          "text": " father's line back to the Tegeler'>>>s in Wagenfeld Hanover<<<, Prussia, Germany in the late 18"
+        },
+        {
+          "activation": 43.999637603759766,
+          "chain_idx": 5802,
+          "window_start": 24,
+          "text": " has been nominated for the 2009>>> Deutche Borse Photography<<< Prize. In the volumes, which very in length"
+        },
+        {
+          "activation": 43.649757385253906,
+          "chain_idx": 8852,
+          "window_start": 102,
+          "text": " Deliciense, a small specialist store. They>>> do home delivery in case<<< you don\u2019t want to make the trip to"
+        },
+        {
+          "activation": 43.616634368896484,
+          "chain_idx": 21060,
+          "window_start": 10,
+          "text": "Simply and effective advertising on web\nFarala>>> \u2013 alles wird gut!<<<\nJust a selfie from her :)\nThe ladies"
+        }
+      ]
+    },
+    "435": {
+      "mass": 445.7769355773926,
+      "examples": [
+        {
+          "activation": 52.5311393737793,
+          "chain_idx": 8387,
+          "window_start": 89,
+          "text": " fruit, vegetables, and meat. So far it>>> has worked out and I<<< have not had too many bad cravings.\nI"
+        },
+        {
+          "activation": 50.159446716308594,
+          "chain_idx": 8387,
+          "window_start": 88,
+          "text": " eating fruit, vegetables, and meat. So far>>> it has worked out and<<< I have not had too many bad cravings.\n"
+        },
+        {
+          "activation": 48.14366912841797,
+          "chain_idx": 21308,
+          "window_start": 118,
+          "text": " wasnt dissolved properly. The top green layer you'>>>ll note worked better because<<< i figured that out,"
+        },
+        {
+          "activation": 47.784820556640625,
+          "chain_idx": 6630,
+          "window_start": 26,
+          "text": " see more of them in the upcoming years. The>>> technology is advancing all the<<< time though. LG Chem has now developed new plastic"
+        },
+        {
+          "activation": 44.588890075683594,
+          "chain_idx": 659,
+          "window_start": 47,
+          "text": " the binding to hold it down until you get it>>> sewn. Works great.<<< I would like to know if you are supposed to"
+        },
+        {
+          "activation": 43.988433837890625,
+          "chain_idx": 4603,
+          "window_start": 32,
+          "text": " to make a loaf or two of this delicious bread>>>. It freezes well,<<< and for added convenience, slice it first and freeze"
+        },
+        {
+          "activation": 41.414852142333984,
+          "chain_idx": 10216,
+          "window_start": 72,
+          "text": " making it not the world's most beautiful!>>> but it drives safe and<<< smoothly. We have been all around Sweden, from"
+        },
+        {
+          "activation": 39.67527770996094,
+          "chain_idx": 8946,
+          "window_start": 8,
+          "text": "Moderna\u2019s COVID-1>>>9 vaccine works in babies<<<, toddlers and preschoolers the company announced Wednesday \u2014"
+        },
+        {
+          "activation": 39.20671844482422,
+          "chain_idx": 4127,
+          "window_start": 115,
+          "text": " like a dark taupe, which is even better.>>> Fits your hand perfectly.<<< If there was ever a perfect mug."
+        },
+        {
+          "activation": 38.283687591552734,
+          "chain_idx": 23297,
+          "window_start": 58,
+          "text": "\n|SkaAddict||They'll work>>>. They work on hatches<<< and sedans up to 2005"
+        }
+      ]
+    },
+    "2363": {
+      "mass": 373.5265350341797,
+      "examples": [
+        {
+          "activation": 41.721675872802734,
+          "chain_idx": 12232,
+          "window_start": 106,
+          "text": " reacting to your efforts with the indifference of a teenager>>> finding their clothes have been<<< tidied and bed made every day.\nOne"
+        },
+        {
+          "activation": 36.86720657348633,
+          "chain_idx": 18604,
+          "window_start": 9,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 36.86720657348633,
+          "chain_idx": 18604,
+          "window_start": 8,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 36.86720657348633,
+          "chain_idx": 18604,
+          "window_start": 7,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 36.86720657348633,
+          "chain_idx": 18604,
+          "window_start": 6,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 36.86720657348633,
+          "chain_idx": 18604,
+          "window_start": 5,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 36.86720657348633,
+          "chain_idx": 18604,
+          "window_start": 4,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 36.86720657348633,
+          "chain_idx": 18604,
+          "window_start": 3,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 36.86720657348633,
+          "chain_idx": 18604,
+          "window_start": 2,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 36.86720657348633,
+          "chain_idx": 18604,
+          "window_start": 1,
+          "text": ">>><<<"
+        }
+      ]
+    },
+    "12607": {
+      "mass": 420.1966552734375,
+      "examples": [
+        {
+          "activation": 44.60683059692383,
+          "chain_idx": 18423,
+          "window_start": 61,
+          "text": " blue chair to curl up in!\nView more>>> titles online at go/<<<inclusivitydisplay and recommend books that have inspired you"
+        },
+        {
+          "activation": 43.667049407958984,
+          "chain_idx": 3152,
+          "window_start": 5,
+          "text": "For bookings, please>>> phone us on 0<<<1539 43211"
+        },
+        {
+          "activation": 43.43352127075195,
+          "chain_idx": 11206,
+          "window_start": 26,
+          "text": "The Sweetees Beau Dress combines luxury and comfort>>> all in one. Constructed<<< from a dense jersey, it has a strapless dress"
+        },
+        {
+          "activation": 42.78071594238281,
+          "chain_idx": 14974,
+          "window_start": 102,
+          "text": " Reviews: 7239 - Favs>>>: 6,2<<<21 - Follows: 930 -"
+        },
+        {
+          "activation": 41.77889633178711,
+          "chain_idx": 11908,
+          "window_start": 91,
+          "text": " into movies shelf (showing 1-50>>> of 1,2<<<50) the hunger games rate this book clear"
+        },
+        {
+          "activation": 41.340999603271484,
+          "chain_idx": 15366,
+          "window_start": 67,
+          "text": " and back to Wales! Its gonna be awesome!!!>>> Head over to our events<<< page for all the dates or check out the tour"
+        },
+        {
+          "activation": 41.122615814208984,
+          "chain_idx": 8998,
+          "window_start": 46,
+          "text": ", this Monaco Rectangular Coffee Table is sophisticated, elegant>>> and wonderfully practical.\n<<<Adding warmth and depth to any space, this coffee"
+        },
+        {
+          "activation": 41.063838958740234,
+          "chain_idx": 20931,
+          "window_start": 63,
+          "text": " expect to pay between $3,077>>> and $5,4<<<31.\nThe average cost for shower installation"
+        },
+        {
+          "activation": 40.38248062133789,
+          "chain_idx": 5128,
+          "window_start": 104,
+          "text": " to partly off-set this charge by achieving a>>> significant reduction of \u00a39<<<000 in our operating budget, as follows"
+        },
+        {
+          "activation": 40.01970672607422,
+          "chain_idx": 14974,
+          "window_start": 84,
+          "text": " - Chapters: 30 - Words: >>>114,5<<<25 - Reviews: 7239"
+        }
+      ]
+    },
+    "17996": {
+      "mass": 319.0969715118408,
+      "examples": [
+        {
+          "activation": 34.12046432495117,
+          "chain_idx": 23268,
+          "window_start": 89,
+          "text": " the best thing about these is that you can eat>>> them right away! This<<< is a perfect summer treat to nourish you through day"
+        },
+        {
+          "activation": 33.68173599243164,
+          "chain_idx": 22856,
+          "window_start": 8,
+          "text": "9-Year-Old Boy Starts>>> His Own Newspaper To Help<<< Local Food Banks\nLULU GARCIA-NAV"
+        },
+        {
+          "activation": 33.48405075073242,
+          "chain_idx": 16198,
+          "window_start": 22,
+          "text": " Governor Christie Announces Peer-to-Peer Assistance Program>>> Available for Sandy-Imp<<<acted Firefighters\nGovernor Christie Announces Peer-to"
+        },
+        {
+          "activation": 33.0516357421875,
+          "chain_idx": 14412,
+          "window_start": 9,
+          "text": "Final Mike Martin Radio Show To Be A>>>ired On Wednesday At Hope<<< Street Pizza\nProvidence, R.I. -"
+        },
+        {
+          "activation": 32.436275482177734,
+          "chain_idx": 4793,
+          "window_start": 5,
+          "text": "How Much To Remo>>>del A Small Bathroom\n<<<How Much To Remodel A Small Bathroom was published"
+        },
+        {
+          "activation": 31.7257137298584,
+          "chain_idx": 8961,
+          "window_start": 54,
+          "text": " within seven days. The edit of the images was>>> done afterwards. Every time<<< we handed over a copy, we made a selection"
+        },
+        {
+          "activation": 31.68800163269043,
+          "chain_idx": 21092,
+          "window_start": 4,
+          "text": "Getting Your Mind>>> Back on Track: Ending<<< Rumination with Mindful MeditationPosted: June"
+        },
+        {
+          "activation": 30.057828903198242,
+          "chain_idx": 22496,
+          "window_start": 8,
+          "text": "Montreal Ranked The WORST City To>>> Run A Business In All<<< Of Canada\nOne title the city definitely doesn'"
+        },
+        {
+          "activation": 29.46497917175293,
+          "chain_idx": 1899,
+          "window_start": 59,
+          "text": " Under Investigation for Alleged Assault\nWhat Do You>>> Do With a Tattoo of<<< an Ex-Girlfriend?\n'DWTS"
+        },
+        {
+          "activation": 29.38628578186035,
+          "chain_idx": 15705,
+          "window_start": 83,
+          "text": "-board WiFi hotspots can help students get their homework>>> completed during those long after<<<-school commutes.\nThe idea came about"
+        }
+      ]
+    },
+    "14414": {
+      "mass": 406.70801544189453,
+      "examples": [
+        {
+          "activation": 51.116676330566406,
+          "chain_idx": 22828,
+          "window_start": 73,
+          "text": "\n\u201cAs the lines between offline and online shopping>>> blur due to digitally-<<<influenced sales, Profitero\u2019s e-commerce"
+        },
+        {
+          "activation": 47.82761764526367,
+          "chain_idx": 8416,
+          "window_start": 71,
+          "text": " established operations in the Kingdom. The growth will increase>>> further as Boeing has recently<<< signed an agreement to source $1 billion worth of"
+        },
+        {
+          "activation": 42.66122055053711,
+          "chain_idx": 5630,
+          "window_start": 106,
+          "text": ".\nAt a time when our planet is in>>> peril, people should actively<<< seek out different things in which they can do to"
+        },
+        {
+          "activation": 41.39962387084961,
+          "chain_idx": 11633,
+          "window_start": 20,
+          "text": "charge Your Firm\u2019s Sales Performance\nMaximize sales>>> productivity and efficiency. Instantly<<< energize your sales team by using these customized skills"
+        },
+        {
+          "activation": 39.611698150634766,
+          "chain_idx": 22558,
+          "window_start": 32,
+          "text": ".\nWithin a matter of weeks, this figure>>> rose considerably as businesses scrambled<<< to meet new demands and challenges, with 4"
+        },
+        {
+          "activation": 39.34718704223633,
+          "chain_idx": 11279,
+          "window_start": 50,
+          "text": ".\nThe number of refineries in Australia has dwind>>>led in recent\nyears<<< as vast new processing facilities have sprung up in India"
+        },
+        {
+          "activation": 36.8885612487793,
+          "chain_idx": 10240,
+          "window_start": 39,
+          "text": "0. Recent Surveys have shown that funeral costs have>>> risen by 61<<<% over the past seven years, leaving families of"
+        },
+        {
+          "activation": 36.02973175048828,
+          "chain_idx": 12946,
+          "window_start": 79,
+          "text": ".\nINF: Brandon Yepiz, San D>>>imas, Sr.\n<<<INF: Fernando Gonzalez, Baldwin Park, Sr."
+        },
+        {
+          "activation": 35.9720344543457,
+          "chain_idx": 12946,
+          "window_start": 41,
+          "text": ", Sr.\nP: Eddie Gutierrez, Baldwin>>> Park, Jr.\n<<<INF: Andrew Carillo, Covina, Jr"
+        },
+        {
+          "activation": 35.85366439819336,
+          "chain_idx": 19594,
+          "window_start": 55,
+          "text": " since 1875. The technology has>>> evolved \u2013 computers have made<<< the process quicker and more comfortable \u2013 but basic concept"
+        }
+      ]
+    },
+    "8399": {
+      "mass": 376.76122665405273,
+      "examples": [
+        {
+          "activation": 47.050209045410156,
+          "chain_idx": 21480,
+          "window_start": 69,
+          "text": " conducted Operation S.A.V.E.>>> (Selective Alcohol Violation Enforcement<<<) to check compliance of county liquor laws at several"
+        },
+        {
+          "activation": 45.01582336425781,
+          "chain_idx": 5621,
+          "window_start": 97,
+          "text": " joined by members of the AOA (Arthurian>>> Order of Avalon). For<<< the\nlongest time I only had four faithfully attending"
+        },
+        {
+          "activation": 39.09035873413086,
+          "chain_idx": 21103,
+          "window_start": 100,
+          "text": " parts you want to adjust into it, avoiding modifying>>> Q2A itself.<<<\nNow, this answer assumes you're a"
+        },
+        {
+          "activation": 38.13732147216797,
+          "chain_idx": 2195,
+          "window_start": 65,
+          "text": "127th Street (between 5th>>> & Madison)\n2<<< blocks from Metro North and the 125"
+        },
+        {
+          "activation": 35.89643478393555,
+          "chain_idx": 5621,
+          "window_start": 93,
+          "text": " since\nwe were joined by members of the A>>>OA (Arthurian Order<<< of Avalon). For the\nlongest time I only"
+        },
+        {
+          "activation": 35.76029586791992,
+          "chain_idx": 5621,
+          "window_start": 96,
+          "text": " were joined by members of the AOA (Arth>>>urian Order of Avalon).<<< For the\nlongest time I only had four faithfully"
+        },
+        {
+          "activation": 34.77244186401367,
+          "chain_idx": 9649,
+          "window_start": 61,
+          "text": "s top court has declared it unconstitutional to deny>>> social security to new immigrants<<<.\nThe unanimous Court of Final Appeal ruling means"
+        },
+        {
+          "activation": 34.72216033935547,
+          "chain_idx": 23199,
+          "window_start": 46,
+          "text": "A, Ga. -- Jim Tudor, president of>>> the Georgia Association of Convenience<<< Stores (GACS), wrote the following opinion piece"
+        },
+        {
+          "activation": 33.44887161254883,
+          "chain_idx": 7155,
+          "window_start": 85,
+          "text": " plans or stay on the line to join Lila for>>> Q+A.\n<<<This date night will be one that you won\u2019"
+        },
+        {
+          "activation": 32.8673095703125,
+          "chain_idx": 13337,
+          "window_start": 43,
+          "text": " lawsuit alleging that the company violated the Americans With Disabilities>>> Act (ADA) when<<< it refused to allow employees with disabilities to work reduced"
+        }
+      ]
+    },
+    "12112": {
+      "mass": 947.6096725463867,
+      "examples": [
+        {
+          "activation": 99.50614166259766,
+          "chain_idx": 1418,
+          "window_start": 13,
+          "text": " 901 is a small team of volunteers>>> who are dedicated to helping<<< cats in need in pounds and the community. We"
+        },
+        {
+          "activation": 99.42987060546875,
+          "chain_idx": 5241,
+          "window_start": 70,
+          "text": " Childhood Education throughout Southeastern Pennsylvania.\nThe goal Of>>> SPECC is to ensure<<< every child from birth to age eight has access to"
+        },
+        {
+          "activation": 96.08161926269531,
+          "chain_idx": 1418,
+          "window_start": 99,
+          "text": ".\nIn October that year Leanne and I>>> contacted CatRescue to see<<< if we would be suitable new parents for two adorable"
+        },
+        {
+          "activation": 94.8237533569336,
+          "chain_idx": 12173,
+          "window_start": 106,
+          "text": " year\u2019s worth of bottle labels (and accompanying>>> monthly donations to rescue organizations<<<) bears witness to our canine compassion. So too"
+        },
+        {
+          "activation": 93.4035873413086,
+          "chain_idx": 12375,
+          "window_start": 112,
+          "text": "sellor\nThis may be your first or subsequent pregnancy>>> and at this very exciting<<< time you want to be able to experience the wonderful"
+        },
+        {
+          "activation": 93.1247787475586,
+          "chain_idx": 1418,
+          "window_start": 34,
+          "text": " the community. We do not receive any funding and>>> are only able to continue<<< our vital rescue work thanks to the generosity of the"
+        },
+        {
+          "activation": 93.1019287109375,
+          "chain_idx": 9196,
+          "window_start": 69,
+          "text": " coast as Seattle\u2019s Don\u2019t Talk To>>> The Cops! offers up<<< this remix of ShowYouSuck\u2019s \u201cAll"
+        },
+        {
+          "activation": 93.06575775146484,
+          "chain_idx": 8091,
+          "window_start": 47,
+          "text": ", a digital marketing agency.\nPhilip talks us>>> through what his definition of<<< Influencer marketing is, who makes and influencer and how"
+        },
+        {
+          "activation": 92.8629379272461,
+          "chain_idx": 1418,
+          "window_start": 38,
+          "text": " do not receive any funding and are only able to>>> continue our vital rescue work<<< thanks to the generosity of the community. Donations over"
+        },
+        {
+          "activation": 92.20929718017578,
+          "chain_idx": 1418,
+          "window_start": 107,
+          "text": " and I contacted CatRescue to see if we would>>> be suitable new parents for<<< two adorable tabby kittens who had been dumped in a"
+        }
+      ]
+    },
+    "14802": {
+      "mass": 332.89466285705566,
+      "examples": [
+        {
+          "activation": 36.739051818847656,
+          "chain_idx": 13831,
+          "window_start": 102,
+          "text": ", to Thomas Mann (1875->>>1955),<<< who, operating from within this tradition, attempted a"
+        },
+        {
+          "activation": 35.75691604614258,
+          "chain_idx": 9205,
+          "window_start": 22,
+          "text": " the Copenhagen summit and President Obama. Ch\u00e1vez calls the>>> COP15 summit und<<<emocratic and accuses world leaders of only seeking a"
+        },
+        {
+          "activation": 35.113826751708984,
+          "chain_idx": 11760,
+          "window_start": 60,
+          "text": " military service would incrementally shrink from a wartime high>>> of 570<<<,000 active-duty soldiers to "
+        },
+        {
+          "activation": 34.533199310302734,
+          "chain_idx": 7574,
+          "window_start": 41,
+          "text": " Groups.\nAn extension to your real life group>>> of friends, interests and<<< communities.\nWhat's new :\nYou"
+        },
+        {
+          "activation": 33.0516471862793,
+          "chain_idx": 944,
+          "window_start": 35,
+          "text": "113 Min and was released on 2>>>001-1<<<0-26 with MPAA rating is "
+        },
+        {
+          "activation": 32.28062057495117,
+          "chain_idx": 13141,
+          "window_start": 74,
+          "text": " team that has been itching to return to the field>>> of battle after making it<<< all the way to the CIF Semifinals in"
+        },
+        {
+          "activation": 31.819265365600586,
+          "chain_idx": 16831,
+          "window_start": 57,
+          "text": " Lake City was all but over. One significant region>>> of Utah had not been<<< colonized because it remained in Native American hands--the"
+        },
+        {
+          "activation": 31.61616325378418,
+          "chain_idx": 15798,
+          "window_start": 33,
+          "text": " critical element of managing third-party risk seems obvious>>> but is often lacking:<<< Identifying your third-party partners. Kelly White of"
+        },
+        {
+          "activation": 31.263187408447266,
+          "chain_idx": 12978,
+          "window_start": 96,
+          "text": " Montvale Avenue\nStoneham, MA 0>>>2180\n<<<|Language:||Mandarin Chinese, Portuguese|"
+        },
+        {
+          "activation": 30.72078514099121,
+          "chain_idx": 15068,
+          "window_start": 50,
+          "text": "AKA: 3 worlds of gulliver (1>>>960) movie<<< poster\n- See all similar posters.\n-"
+        }
+      ]
+    },
+    "4063": {
+      "mass": 619.9884719848633,
+      "examples": [
+        {
+          "activation": 74.05989837646484,
+          "chain_idx": 12039,
+          "window_start": 33,
+          "text": ">>>The Bionic<<<SoftHand is pneumatically operated, so that it"
+        },
+        {
+          "activation": 64.22862243652344,
+          "chain_idx": 11904,
+          "window_start": 0,
+          "text": ">>>- Kalston<<< Stationary Barstool\n- Stationary Barstool 1"
+        },
+        {
+          "activation": 61.532257080078125,
+          "chain_idx": 9767,
+          "window_start": 1,
+          "text": ">>>To correct this<<< error:\n- Uninstall the controlled-release ("
+        },
+        {
+          "activation": 61.39166259765625,
+          "chain_idx": 22028,
+          "window_start": 23,
+          "text": ">>>The first few<<< times I photographed Delicate Arch in Utah\u2019s"
+        },
+        {
+          "activation": 60.138275146484375,
+          "chain_idx": 16749,
+          "window_start": 2,
+          "text": ">>>Unlike my son<<< and myself (except I do enjoy a bit of"
+        },
+        {
+          "activation": 60.138275146484375,
+          "chain_idx": 15278,
+          "window_start": 2,
+          "text": ">>>In a large<<< saute pan, heat vegetable oil to medium high heat"
+        },
+        {
+          "activation": 60.138275146484375,
+          "chain_idx": 2849,
+          "window_start": 2,
+          "text": ">>>Find here the<<< list of our awesome Premium Referral Partners. We are"
+        },
+        {
+          "activation": 59.771484375,
+          "chain_idx": 8384,
+          "window_start": 27,
+          "text": ">>>- Whatever your<<< fitness style, you can count on the Ring Sandal"
+        },
+        {
+          "activation": 59.29486083984375,
+          "chain_idx": 23651,
+          "window_start": 3,
+          "text": ">>>an oddity<<< in the Industrial scene, because their music features Christian"
+        },
+        {
+          "activation": 59.29486083984375,
+          "chain_idx": 16737,
+          "window_start": 3,
+          "text": ">>>\u201cDon\u2019<<<t worry, be happy.\u201d Sounds simple enough,"
+        }
+      ]
+    },
+    "18017": {
+      "mass": 408.64560317993164,
+      "examples": [
+        {
+          "activation": 50.91810989379883,
+          "chain_idx": 15201,
+          "window_start": 41,
+          "text": " who have not purchased the game that\u2019s why>>> NBA2KWorld is<<< doing this NBA 2K17 Review."
+        },
+        {
+          "activation": 48.624324798583984,
+          "chain_idx": 15201,
+          "window_start": 74,
+          "text": " decide whether the game is improved after reading this nba>>> 2k17<<< review. Before anything else, this review would be"
+        },
+        {
+          "activation": 45.21592330932617,
+          "chain_idx": 16116,
+          "window_start": 40,
+          "text": " heading to a Halloween party with her daughter Anja,>>> 3, in Los<<< Angeles, Calif. on Sunday (October 3"
+        },
+        {
+          "activation": 42.68540954589844,
+          "chain_idx": 15201,
+          "window_start": 96,
+          "text": " review would be based on my Playstation 4.>>> NBA2KWorld hereby<<< stated that the game is reviewed based on the Paul"
+        },
+        {
+          "activation": 41.303104400634766,
+          "chain_idx": 15201,
+          "window_start": 49,
+          "text": "s why NBA2KWorld is doing this NBA>>> 2K17<<< Review. Fans of the game should be able to"
+        },
+        {
+          "activation": 38.061248779296875,
+          "chain_idx": 19115,
+          "window_start": 73,
+          "text": " the NCAA basketball title\n18 Another Opening,>>> Another Tour\nIn Los<<< Angeles, Billy Casper launches golf into the 1"
+        },
+        {
+          "activation": 36.11201095581055,
+          "chain_idx": 2038,
+          "window_start": 100,
+          "text": "\u2019s growing dominance of the global solar market has>>> been on display in Los<<< Angeles this week at the Solar Power International conference,"
+        },
+        {
+          "activation": 35.82877731323242,
+          "chain_idx": 9798,
+          "window_start": 29,
+          "text": " who as of April 2016 said>>> she had moved to Los<<< Angeles indefinitely, was caught on camera in New York"
+        },
+        {
+          "activation": 35.34067153930664,
+          "chain_idx": 22289,
+          "window_start": 118,
+          "text": " will be coming to the Xbox One X in full>>> 4K glory.<<<\nMore Backwards Compatibility"
+        },
+        {
+          "activation": 34.55602264404297,
+          "chain_idx": 21745,
+          "window_start": 2,
+          "text": "Welcome>>> to Moodle @ East Los<<< Angeles College\nLogin Instructions: Please sign on to"
+        }
+      ]
+    },
+    "9955": {
+      "mass": 492.9240303039551,
+      "examples": [
+        {
+          "activation": 53.565853118896484,
+          "chain_idx": 12173,
+          "window_start": 79,
+          "text": " the coolest indoor dog run in the Triad.>>>\nIt\u2019s a<<< legacy we should have seen coming.\nOur devotion"
+        },
+        {
+          "activation": 53.16274642944336,
+          "chain_idx": 8361,
+          "window_start": 27,
+          "text": " commercial banking\nThe glassy new offices under construction in>>> St. Paul are a<<< clear sign that Associated Banc-Corp has emerged"
+        },
+        {
+          "activation": 51.3641242980957,
+          "chain_idx": 15820,
+          "window_start": 11,
+          "text": "Because of our impending move, my 20>>>18 goals were a<<< bit sparse and honestly I\u2019ve not done the"
+        },
+        {
+          "activation": 50.12090301513672,
+          "chain_idx": 5630,
+          "window_start": 53,
+          "text": " love meat, so going to the vegan restaurant Loving>>> Hut in Upland was a<<< departure. Knowing that there would be no lean and"
+        },
+        {
+          "activation": 48.309165954589844,
+          "chain_idx": 23978,
+          "window_start": 119,
+          "text": " our final impressions.\nOverall impressions \u2013 The Cities>>>\n- Rome was a<<< fascinating city that I"
+        },
+        {
+          "activation": 47.948089599609375,
+          "chain_idx": 20362,
+          "window_start": 90,
+          "text": " decision to move factories from Shenzhen to the country'>>>s interior. The workers<<< wanted to be reassigned in Shenzhen or released from"
+        },
+        {
+          "activation": 47.48701095581055,
+          "chain_idx": 23452,
+          "window_start": 109,
+          "text": " paper. This was an entirely computer-free class>>>, which is definitely a<<< switch for me. A good one, I think"
+        },
+        {
+          "activation": 47.30094528198242,
+          "chain_idx": 2707,
+          "window_start": 89,
+          "text": ", stash of feather-tipped arrows, and mud>>>-colored cape was a<<< drawn-out escapade; my mom spent several"
+        },
+        {
+          "activation": 47.03250503540039,
+          "chain_idx": 2296,
+          "window_start": 40,
+          "text": " practice at the Senior Bowl in Mobile, Ala.>>>\nThe game was a<<< mere formality. What really counts is what happens during"
+        },
+        {
+          "activation": 46.632686614990234,
+          "chain_idx": 6478,
+          "window_start": 21,
+          "text": " to remove the gray wolf from Endangered Species Act protection>>> raises questions about the trade<<<-offs between science-based decisionmaking and political"
+        }
+      ]
+    },
+    "871": {
+      "mass": 1351.0640869140625,
+      "examples": [
+        {
+          "activation": 139.16946411132812,
+          "chain_idx": 22146,
+          "window_start": 73,
+          "text": " youth bureau director has been vacant since last year,>>> when longtime director Donna Ly<<<czkowski retired. The Town Board eliminated the position"
+        },
+        {
+          "activation": 138.84193420410156,
+          "chain_idx": 5145,
+          "window_start": 88,
+          "text": " July 19,\nBashforth, H>>>., and N. R<<<. Parmar. 2010."
+        },
+        {
+          "activation": 135.98692321777344,
+          "chain_idx": 5145,
+          "window_start": 90,
+          "text": "19,\nBashforth, H., and>>> N. R. Par<<<mar. 2010. \u201cThe"
+        },
+        {
+          "activation": 135.52976989746094,
+          "chain_idx": 18324,
+          "window_start": 42,
+          "text": " aircraft recovery in his feature article \u201cExplore the Aviation>>> Market.\u201d And Peter Fuer<<<st of the International [\u2026]\nFrom our latest issue"
+        },
+        {
+          "activation": 135.12783813476562,
+          "chain_idx": 16452,
+          "window_start": 99,
+          "text": ". This one's published by my friends John>>> Nephew and Michelle Brown<<<. Just a coincidence.\nBest RPG Adventure:"
+        },
+        {
+          "activation": 133.5556182861328,
+          "chain_idx": 5145,
+          "window_start": 3,
+          "text": "Ashford>>>, P., and A<<<. Mills. 2006. \u201c"
+        },
+        {
+          "activation": 133.5459747314453,
+          "chain_idx": 13586,
+          "window_start": 53,
+          "text": "They are obviously people who knew our facility in and>>> out,\" said Tom St<<<radalli, owner of Stradalli Cycle."
+        },
+        {
+          "activation": 133.30404663085938,
+          "chain_idx": 122,
+          "window_start": 26,
+          "text": " Virginia\nVuji\u0107, S., Commandeur>>>, J. and Koop<<<man, S. J., 201"
+        },
+        {
+          "activation": 133.09910583496094,
+          "chain_idx": 6672,
+          "window_start": 69,
+          "text": " of the worms:\nC. Schlechtri>>>em, M. Ricci<<<, U. Focken and K. Becker The"
+        },
+        {
+          "activation": 132.90341186523438,
+          "chain_idx": 19683,
+          "window_start": 100,
+          "text": " Rachel Grygiel, Hoboken High School, Hoboken>>>; and Donata Nicholas<<<, East Orange Campus High School, East Orange."
+        }
+      ]
+    },
+    "13165": {
+      "mass": 476.55201721191406,
+      "examples": [
+        {
+          "activation": 52.296199798583984,
+          "chain_idx": 22828,
+          "window_start": 37,
+          "text": " sales and profitability.\nThe Profitero platform helps>>> brands optimise and analyse their<<< sales and marketing performance across 700 retail"
+        },
+        {
+          "activation": 50.60200881958008,
+          "chain_idx": 14363,
+          "window_start": 87,
+          "text": " minutes from the East exit and has about 8>>> floors of things to look<<< through.\nThe Asakusabashi area"
+        },
+        {
+          "activation": 50.20820236206055,
+          "chain_idx": 14363,
+          "window_start": 85,
+          "text": " 3 minutes from the East exit and has about>>> 8 floors of things<<< to look through.\nThe Asakusab"
+        },
+        {
+          "activation": 50.18186569213867,
+          "chain_idx": 22828,
+          "window_start": 40,
+          "text": ".\nThe Profitero platform helps brands optimise and>>> analyse their sales and marketing<<< performance across 700 retail websites and "
+        },
+        {
+          "activation": 47.795166015625,
+          "chain_idx": 9197,
+          "window_start": 76,
+          "text": "\nWe are a community of shoppers sharing our best>>> finds from across the web<<<.\n\u00a9 2013 ThisNext"
+        },
+        {
+          "activation": 47.367977142333984,
+          "chain_idx": 22828,
+          "window_start": 48,
+          "text": " optimise and analyse their sales and marketing performance across >>>700 retail websites<<< and 70 million products around the world."
+        },
+        {
+          "activation": 44.87301254272461,
+          "chain_idx": 4032,
+          "window_start": 118,
+          "text": " do not know each other - bought their clothes from>>> the same Primark store<<< in Swansea.\nPri"
+        },
+        {
+          "activation": 44.834571838378906,
+          "chain_idx": 13741,
+          "window_start": 50,
+          "text": " Springs American Eagle Outfitters.Be sure to view>>> their Clearance department for special<<< deals.American Eagle Outfitters in The Promenade Shops"
+        },
+        {
+          "activation": 44.335304260253906,
+          "chain_idx": 22828,
+          "window_start": 50,
+          "text": " analyse their sales and marketing performance across 70>>>0 retail websites and <<<70 million products around the world.\n\u201c"
+        },
+        {
+          "activation": 44.057708740234375,
+          "chain_idx": 22828,
+          "window_start": 35,
+          "text": "\u2019 commerce sales and profitability.\nThe Profitero>>> platform helps brands optimise and<<< analyse their sales and marketing performance across 70"
+        }
+      ]
+    },
+    "7290": {
+      "mass": 337.3337993621826,
+      "examples": [
+        {
+          "activation": 37.1048698425293,
+          "chain_idx": 4942,
+          "window_start": 3,
+          "text": "The New>>> York Women\u2019s Foundation<<< distributed a record $8 million in 20"
+        },
+        {
+          "activation": 35.186038970947266,
+          "chain_idx": 4337,
+          "window_start": 18,
+          "text": " Worldwide Benefit from Free Health Screenings\nWashington,>>> DC \u2013 Special Olympics International<<< and the International Federation of Podiatrists/F\u00e9"
+        },
+        {
+          "activation": 34.122711181640625,
+          "chain_idx": 20967,
+          "window_start": 55,
+          "text": " print out on your own printer. It is a>>> downloadable, digital PDF file<<< so you will not receive anything in the post."
+        },
+        {
+          "activation": 34.076744079589844,
+          "chain_idx": 20967,
+          "window_start": 58,
+          "text": " your own printer. It is a downloadable, digital>>> PDF file so you will<<< not receive anything in the post.\nPersonal use"
+        },
+        {
+          "activation": 33.790802001953125,
+          "chain_idx": 20716,
+          "window_start": 40,
+          "text": " Automotive News, some dealerships are adding new roles to>>> keep up with the ever<<<-evolving retail automotive market.\nIs your"
+        },
+        {
+          "activation": 33.71242141723633,
+          "chain_idx": 13982,
+          "window_start": 6,
+          "text": "The Center for Disease Controls>>> and Prevention (CDC)<<< reports that the rate of fentanyl-related overdose deaths"
+        },
+        {
+          "activation": 32.95576858520508,
+          "chain_idx": 13640,
+          "window_start": 64,
+          "text": "izing that popular trees may not thrive under the changing>>> conditions, UC Cooperative Extension<<< scientists are partnering with the U.S. Forest"
+        },
+        {
+          "activation": 32.40140914916992,
+          "chain_idx": 5241,
+          "window_start": 2,
+          "text": "The>>> Southeastern Pennsylvania Early Childhood Coalition<<<, now First Up, trains early childhood professionals in"
+        },
+        {
+          "activation": 32.135196685791016,
+          "chain_idx": 11999,
+          "window_start": 122,
+          "text": "-scale variation in the magnitude and relative importance of>>> processes associated with Hg transport<<<,"
+        },
+        {
+          "activation": 31.847837448120117,
+          "chain_idx": 5241,
+          "window_start": 7,
+          "text": "The Southeastern Pennsylvania Early Childhood Coalition>>>, now First Up,<<< trains early childhood professionals in best practice skills and career"
+        }
+      ]
+    },
+    "12028": {
+      "mass": 389.9165458679199,
+      "examples": [
+        {
+          "activation": 49.35203170776367,
+          "chain_idx": 8416,
+          "window_start": 29,
+          "text": "2$2000\nThe Moroccan aeronau>>>tical sector is growing at<<< an annual rate of 15-20"
+        },
+        {
+          "activation": 46.41059112548828,
+          "chain_idx": 14605,
+          "window_start": 67,
+          "text": " three local sites in 2009,>>> the network had grown to<<< more than 100 news sites within a"
+        },
+        {
+          "activation": 41.09529113769531,
+          "chain_idx": 8544,
+          "window_start": 9,
+          "text": "Current Employment Opportunities at Enjoy Church IT\n>>>Enjoy Church is growing,<<< and we are now seeking to fill several roles in"
+        },
+        {
+          "activation": 39.949405670166016,
+          "chain_idx": 6630,
+          "window_start": 25,
+          "text": " to see more of them in the upcoming years.>>> The technology is advancing all<<< the time though. LG Chem has now developed new"
+        },
+        {
+          "activation": 38.79326248168945,
+          "chain_idx": 12446,
+          "window_start": 95,
+          "text": "\nWhile there is still dispute over its effectiveness,>>> SARMs are growing in<<< popularity. This is due to the various benefits it"
+        },
+        {
+          "activation": 37.02640914916992,
+          "chain_idx": 19594,
+          "window_start": 52,
+          "text": " has been around since 1875.>>> The technology has evolved \u2013<<< computers have made the process quicker and more comfortable \u2013"
+        },
+        {
+          "activation": 35.688636779785156,
+          "chain_idx": 2610,
+          "window_start": 95,
+          "text": " another ahead of self.\nMay the love that>>> brought us together grow and<<< mature with each passing year.\nBring us both"
+        },
+        {
+          "activation": 34.2095832824707,
+          "chain_idx": 2610,
+          "window_start": 121,
+          "text": " closer to You through our love for each other.>>>Let our love grow to<<< perfection."
+        },
+        {
+          "activation": 33.69913864135742,
+          "chain_idx": 3164,
+          "window_start": 15,
+          "text": " Office\nWelcome to the City of Ocala'>>>s News and Press Release<<< page. Here you will find press releases from the"
+        },
+        {
+          "activation": 33.692195892333984,
+          "chain_idx": 22558,
+          "window_start": 29,
+          "text": "020.\nWithin a matter of weeks>>>, this figure rose considerably<<< as businesses scrambled to meet new demands and challenges,"
+        }
+      ]
+    }
+  }
+}

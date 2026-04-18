@@ -1,0 +1,1251 @@
+{
+  "layer_key": "resid_L13",
+  "k": 50,
+  "top_n": 25,
+  "per_arch": {
+    "stacked_sae": {
+      "top_span_weighted": [
+        {
+          "feat_idx": 14653,
+          "concentration": 0.9684141874313354,
+          "mass": 1094642.125,
+          "span_weighted": 34575.16099001467,
+          "peak_position": 0,
+          "has_exemplars": true
+        },
+        {
+          "feat_idx": 8824,
+          "concentration": 0.6368995904922485,
+          "mass": 90468.0859375,
+          "span_weighted": 32848.9990512887,
+          "peak_position": 0,
+          "has_exemplars": false
+        },
+        {
+          "feat_idx": 18238,
+          "concentration": 0.5126554369926453,
+          "mass": 49553.140625,
+          "span_weighted": 24149.453663532622,
+          "peak_position": 0,
+          "has_exemplars": false
+        },
+        {
+          "feat_idx": 12515,
+          "concentration": 0.5025004744529724,
+          "mass": 41568.52734375,
+          "span_weighted": 20680.322631204268,
+          "peak_position": 0,
+          "has_exemplars": false
+        },
+        {
+          "feat_idx": 17609,
+          "concentration": 0.5472460985183716,
+          "mass": 39788.79296875,
+          "span_weighted": 18014.531251846347,
+          "peak_position": 2,
+          "has_exemplars": false
+        },
+        {
+          "feat_idx": 728,
+          "concentration": 0.6649565100669861,
+          "mass": 53239.9453125,
+          "span_weighted": 17837.697081342805,
+          "peak_position": 4,
+          "has_exemplars": true
+        },
+        {
+          "feat_idx": 14396,
+          "concentration": 0.6226590871810913,
+          "mass": 46918.36328125,
+          "span_weighted": 17704.218028516043,
+          "peak_position": 1,
+          "has_exemplars": false
+        },
+        {
+          "feat_idx": 11915,
+          "concentration": 0.6425590515136719,
+          "mass": 47896.24609375,
+          "span_weighted": 17120.07963268459,
+          "peak_position": 1,
+          "has_exemplars": false
+        },
+        {
+          "feat_idx": 4820,
+          "concentration": 0.47405070066452026,
+          "mass": 31832.458984375,
+          "span_weighted": 16742.259498957428,
+          "peak_position": 4,
+          "has_exemplars": false
+        },
+        {
+          "feat_idx": 14336,
+          "concentration": 0.6539471745491028,
+          "mass": 43529.81640625,
+          "span_weighted": 15063.615958741633,
+          "peak_position": 1,
+          "has_exemplars": false
+        },
+        {
+          "feat_idx": 4879,
+          "concentration": 0.5177697539329529,
+          "mass": 29964.439453125,
+          "span_weighted": 14449.759010741604,
+          "peak_position": 2,
+          "has_exemplars": false
+        },
+        {
+          "feat_idx": 8465,
+          "concentration": 0.7331122159957886,
+          "mass": 52774.1484375,
+          "span_weighted": 14084.775529193692,
+          "peak_position": 0,
+          "has_exemplars": false
+        },
+        {
+          "feat_idx": 9852,
+          "concentration": 0.759996235370636,
+          "mass": 57430.26953125,
+          "span_weighted": 13783.48089117906,
+          "peak_position": 0,
+          "has_exemplars": false
+        },
+        {
+          "feat_idx": 11338,
+          "concentration": 0.4701126217842102,
+          "mass": 25605.416015625,
+          "span_weighted": 13567.986760644126,
+          "peak_position": 2,
+          "has_exemplars": false
+        },
+        {
+          "feat_idx": 1744,
+          "concentration": 0.6328907608985901,
+          "mass": 36910.09765625,
+          "span_weighted": 13550.03786574467,
+          "peak_position": 0,
+          "has_exemplars": false
+        },
+        {
+          "feat_idx": 11633,
+          "concentration": 0.892299473285675,
+          "mass": 118477.21875,
+          "span_weighted": 12760.058863023296,
+          "peak_position": 3,
+          "has_exemplars": false
+        },
+        {
+          "feat_idx": 6965,
+          "concentration": 0.39528974890708923,
+          "mass": 20601.017578125,
+          "span_weighted": 12457.646512437437,
+          "peak_position": 4,
+          "has_exemplars": false
+        },
+        {
+          "feat_idx": 15643,
+          "concentration": 0.5715473294258118,
+          "mass": 29007.35546875,
+          "span_weighted": 12428.278916880721,
+          "peak_position": 3,
+          "has_exemplars": false
+        },
+        {
+          "feat_idx": 7842,
+          "concentration": 0.3363786041736603,
+          "mass": 18526.294921875,
+          "span_weighted": 12294.445695545117,
+          "peak_position": 0,
+          "has_exemplars": false
+        },
+        {
+          "feat_idx": 2742,
+          "concentration": 0.5827605724334717,
+          "mass": 29231.84765625,
+          "span_weighted": 12196.679382805713,
+          "peak_position": 2,
+          "has_exemplars": true
+        },
+        {
+          "feat_idx": 3441,
+          "concentration": 0.5447346568107605,
+          "mass": 26097.9609375,
+          "span_weighted": 11881.497142750304,
+          "peak_position": 4,
+          "has_exemplars": false
+        },
+        {
+          "feat_idx": 9507,
+          "concentration": 0.5832981467247009,
+          "mass": 28040.7734375,
+          "span_weighted": 11684.642258679029,
+          "peak_position": 3,
+          "has_exemplars": false
+        },
+        {
+          "feat_idx": 10921,
+          "concentration": 0.9535403251647949,
+          "mass": 248105.296875,
+          "span_weighted": 11526.891417704523,
+          "peak_position": 0,
+          "has_exemplars": true
+        },
+        {
+          "feat_idx": 16212,
+          "concentration": 0.7141973972320557,
+          "mass": 39672.83984375,
+          "span_weighted": 11338.600886539556,
+          "peak_position": 3,
+          "has_exemplars": false
+        },
+        {
+          "feat_idx": 11532,
+          "concentration": 0.47004884481430054,
+          "mass": 21134.732421875,
+          "span_weighted": 11200.375861513312,
+          "peak_position": 1,
+          "has_exemplars": false
+        }
+      ],
+      "top_mass_reference": [
+        {
+          "feat_idx": 7535,
+          "concentration": 0.9969413876533508,
+          "mass": 1546670.125,
+          "peak_position": 4
+        },
+        {
+          "feat_idx": 8039,
+          "concentration": 1.0,
+          "mass": 1531270.875,
+          "peak_position": 1
+        },
+        {
+          "feat_idx": 1241,
+          "concentration": 0.9999232292175293,
+          "mass": 1275629.25,
+          "peak_position": 3
+        },
+        {
+          "feat_idx": 3886,
+          "concentration": 0.9987808465957642,
+          "mass": 1254710.25,
+          "peak_position": 2
+        },
+        {
+          "feat_idx": 14653,
+          "concentration": 0.9684141874313354,
+          "mass": 1094642.125,
+          "peak_position": 0
+        },
+        {
+          "feat_idx": 7896,
+          "concentration": 1.0,
+          "mass": 1028920.8125,
+          "peak_position": 0
+        },
+        {
+          "feat_idx": 16111,
+          "concentration": 0.9906221628189087,
+          "mass": 978961.625,
+          "peak_position": 2
+        },
+        {
+          "feat_idx": 17486,
+          "concentration": 0.9992066025733948,
+          "mass": 870590.875,
+          "peak_position": 3
+        },
+        {
+          "feat_idx": 5361,
+          "concentration": 1.0,
+          "mass": 667382.6875,
+          "peak_position": 4
+        },
+        {
+          "feat_idx": 3074,
+          "concentration": 0.9985141158103943,
+          "mass": 595348.1875,
+          "peak_position": 1
+        },
+        {
+          "feat_idx": 14275,
+          "concentration": 0.9971718192100525,
+          "mass": 561894.75,
+          "peak_position": 1
+        },
+        {
+          "feat_idx": 6460,
+          "concentration": 0.993935227394104,
+          "mass": 301150.9375,
+          "peak_position": 0
+        },
+        {
+          "feat_idx": 6087,
+          "concentration": 0.9938122630119324,
+          "mass": 293722.84375,
+          "peak_position": 0
+        },
+        {
+          "feat_idx": 11546,
+          "concentration": 0.9954906702041626,
+          "mass": 284860.0625,
+          "peak_position": 4
+        },
+        {
+          "feat_idx": 5794,
+          "concentration": 0.9796861410140991,
+          "mass": 278523.875,
+          "peak_position": 0
+        }
+      ],
+      "n_need_targeted_scan": 21
+    },
+    "crosscoder": {
+      "top_span_weighted": [
+        {
+          "feat_idx": 0,
+          "concentration": 0.0,
+          "mass": 80579344.0,
+          "span_weighted": 80579344.0,
+          "peak_position": 0,
+          "has_exemplars": false
+        },
+        {
+          "feat_idx": 1,
+          "concentration": 0.0,
+          "mass": 80579344.0,
+          "span_weighted": 80579344.0,
+          "peak_position": 0,
+          "has_exemplars": false
+        },
+        {
+          "feat_idx": 2,
+          "concentration": 0.0,
+          "mass": 80579344.0,
+          "span_weighted": 80579344.0,
+          "peak_position": 0,
+          "has_exemplars": false
+        },
+        {
+          "feat_idx": 3,
+          "concentration": 0.0,
+          "mass": 80579344.0,
+          "span_weighted": 80579344.0,
+          "peak_position": 0,
+          "has_exemplars": false
+        },
+        {
+          "feat_idx": 4,
+          "concentration": 0.0,
+          "mass": 80579344.0,
+          "span_weighted": 80579344.0,
+          "peak_position": 0,
+          "has_exemplars": false
+        },
+        {
+          "feat_idx": 5,
+          "concentration": 0.0,
+          "mass": 80579344.0,
+          "span_weighted": 80579344.0,
+          "peak_position": 0,
+          "has_exemplars": false
+        },
+        {
+          "feat_idx": 6,
+          "concentration": 0.0,
+          "mass": 80579344.0,
+          "span_weighted": 80579344.0,
+          "peak_position": 0,
+          "has_exemplars": false
+        },
+        {
+          "feat_idx": 7,
+          "concentration": 0.0,
+          "mass": 80579344.0,
+          "span_weighted": 80579344.0,
+          "peak_position": 0,
+          "has_exemplars": false
+        },
+        {
+          "feat_idx": 8,
+          "concentration": 0.0,
+          "mass": 80579344.0,
+          "span_weighted": 80579344.0,
+          "peak_position": 0,
+          "has_exemplars": false
+        },
+        {
+          "feat_idx": 10,
+          "concentration": 0.0,
+          "mass": 80579344.0,
+          "span_weighted": 80579344.0,
+          "peak_position": 0,
+          "has_exemplars": false
+        },
+        {
+          "feat_idx": 11,
+          "concentration": 0.0,
+          "mass": 80579344.0,
+          "span_weighted": 80579344.0,
+          "peak_position": 0,
+          "has_exemplars": false
+        },
+        {
+          "feat_idx": 12,
+          "concentration": 0.0,
+          "mass": 80579344.0,
+          "span_weighted": 80579344.0,
+          "peak_position": 0,
+          "has_exemplars": false
+        },
+        {
+          "feat_idx": 13,
+          "concentration": 0.0,
+          "mass": 80579344.0,
+          "span_weighted": 80579344.0,
+          "peak_position": 0,
+          "has_exemplars": false
+        },
+        {
+          "feat_idx": 17,
+          "concentration": 0.0,
+          "mass": 80579344.0,
+          "span_weighted": 80579344.0,
+          "peak_position": 0,
+          "has_exemplars": false
+        },
+        {
+          "feat_idx": 18,
+          "concentration": 0.0,
+          "mass": 80579344.0,
+          "span_weighted": 80579344.0,
+          "peak_position": 0,
+          "has_exemplars": false
+        },
+        {
+          "feat_idx": 19,
+          "concentration": 0.0,
+          "mass": 80579344.0,
+          "span_weighted": 80579344.0,
+          "peak_position": 0,
+          "has_exemplars": false
+        },
+        {
+          "feat_idx": 20,
+          "concentration": 0.0,
+          "mass": 80579344.0,
+          "span_weighted": 80579344.0,
+          "peak_position": 0,
+          "has_exemplars": false
+        },
+        {
+          "feat_idx": 21,
+          "concentration": 0.0,
+          "mass": 80579344.0,
+          "span_weighted": 80579344.0,
+          "peak_position": 0,
+          "has_exemplars": false
+        },
+        {
+          "feat_idx": 24,
+          "concentration": 0.0,
+          "mass": 80579344.0,
+          "span_weighted": 80579344.0,
+          "peak_position": 0,
+          "has_exemplars": false
+        },
+        {
+          "feat_idx": 26,
+          "concentration": 0.0,
+          "mass": 80579344.0,
+          "span_weighted": 80579344.0,
+          "peak_position": 0,
+          "has_exemplars": false
+        },
+        {
+          "feat_idx": 27,
+          "concentration": 0.0,
+          "mass": 80579344.0,
+          "span_weighted": 80579344.0,
+          "peak_position": 0,
+          "has_exemplars": false
+        },
+        {
+          "feat_idx": 28,
+          "concentration": 0.0,
+          "mass": 80579344.0,
+          "span_weighted": 80579344.0,
+          "peak_position": 0,
+          "has_exemplars": false
+        },
+        {
+          "feat_idx": 30,
+          "concentration": 0.0,
+          "mass": 80579344.0,
+          "span_weighted": 80579344.0,
+          "peak_position": 0,
+          "has_exemplars": false
+        },
+        {
+          "feat_idx": 33,
+          "concentration": 0.0,
+          "mass": 80579344.0,
+          "span_weighted": 80579344.0,
+          "peak_position": 0,
+          "has_exemplars": false
+        },
+        {
+          "feat_idx": 34,
+          "concentration": 0.0,
+          "mass": 80579344.0,
+          "span_weighted": 80579344.0,
+          "peak_position": 0,
+          "has_exemplars": false
+        }
+      ],
+      "top_mass_reference": [
+        {
+          "feat_idx": 0,
+          "concentration": 0.0,
+          "mass": 80579344.0,
+          "peak_position": 0
+        },
+        {
+          "feat_idx": 1,
+          "concentration": 0.0,
+          "mass": 80579344.0,
+          "peak_position": 0
+        },
+        {
+          "feat_idx": 2,
+          "concentration": 0.0,
+          "mass": 80579344.0,
+          "peak_position": 0
+        },
+        {
+          "feat_idx": 3,
+          "concentration": 0.0,
+          "mass": 80579344.0,
+          "peak_position": 0
+        },
+        {
+          "feat_idx": 4,
+          "concentration": 0.0,
+          "mass": 80579344.0,
+          "peak_position": 0
+        },
+        {
+          "feat_idx": 5,
+          "concentration": 0.0,
+          "mass": 80579344.0,
+          "peak_position": 0
+        },
+        {
+          "feat_idx": 6,
+          "concentration": 0.0,
+          "mass": 80579344.0,
+          "peak_position": 0
+        },
+        {
+          "feat_idx": 7,
+          "concentration": 0.0,
+          "mass": 80579344.0,
+          "peak_position": 0
+        },
+        {
+          "feat_idx": 8,
+          "concentration": 0.0,
+          "mass": 80579344.0,
+          "peak_position": 0
+        },
+        {
+          "feat_idx": 9,
+          "concentration": 0.20000000298023224,
+          "mass": 80579344.0,
+          "peak_position": 0
+        },
+        {
+          "feat_idx": 10,
+          "concentration": 0.0,
+          "mass": 80579344.0,
+          "peak_position": 0
+        },
+        {
+          "feat_idx": 11,
+          "concentration": 0.0,
+          "mass": 80579344.0,
+          "peak_position": 0
+        },
+        {
+          "feat_idx": 12,
+          "concentration": 0.0,
+          "mass": 80579344.0,
+          "peak_position": 0
+        },
+        {
+          "feat_idx": 13,
+          "concentration": 0.0,
+          "mass": 80579344.0,
+          "peak_position": 0
+        },
+        {
+          "feat_idx": 14,
+          "concentration": 0.20000000298023224,
+          "mass": 80579344.0,
+          "peak_position": 0
+        }
+      ],
+      "n_need_targeted_scan": 25
+    },
+    "tfa_pos": {
+      "top_span_weighted": [
+        {
+          "feat_idx": 8814,
+          "concentration": 0.2424057424068451,
+          "mass": 2468.30615234375,
+          "span_weighted": 1869.97456699748,
+          "peak_position": 0,
+          "has_exemplars": true
+        },
+        {
+          "feat_idx": 17349,
+          "concentration": 0.271657794713974,
+          "mass": 2548.753173828125,
+          "span_weighted": 1856.3645073557345,
+          "peak_position": 0,
+          "has_exemplars": true
+        },
+        {
+          "feat_idx": 16109,
+          "concentration": 0.25713658332824707,
+          "mass": 2190.15966796875,
+          "span_weighted": 1626.9894940039376,
+          "peak_position": 0,
+          "has_exemplars": true
+        },
+        {
+          "feat_idx": 17108,
+          "concentration": 0.26701638102531433,
+          "mass": 2137.337646484375,
+          "span_weighted": 1566.6334830909545,
+          "peak_position": 0,
+          "has_exemplars": true
+        },
+        {
+          "feat_idx": 15544,
+          "concentration": 0.2079397737979889,
+          "mass": 1938.6895751953125,
+          "span_weighted": 1535.55890346468,
+          "peak_position": 0,
+          "has_exemplars": true
+        },
+        {
+          "feat_idx": 11776,
+          "concentration": 0.20831681787967682,
+          "mass": 1833.450927734375,
+          "span_weighted": 1451.5122647302087,
+          "peak_position": 0,
+          "has_exemplars": true
+        },
+        {
+          "feat_idx": 8573,
+          "concentration": 0.26186397671699524,
+          "mass": 1650.830322265625,
+          "span_weighted": 1218.5373291921496,
+          "peak_position": 0,
+          "has_exemplars": true
+        },
+        {
+          "feat_idx": 12512,
+          "concentration": 0.33798640966415405,
+          "mass": 1823.1995849609375,
+          "span_weighted": 1206.9829031388144,
+          "peak_position": 0,
+          "has_exemplars": true
+        },
+        {
+          "feat_idx": 8992,
+          "concentration": 0.2996473014354706,
+          "mass": 1667.337158203125,
+          "span_weighted": 1167.7240781644723,
+          "peak_position": 0,
+          "has_exemplars": true
+        },
+        {
+          "feat_idx": 16516,
+          "concentration": 0.20425774157047272,
+          "mass": 1456.9110107421875,
+          "span_weighted": 1159.3256580188336,
+          "peak_position": 3,
+          "has_exemplars": true
+        },
+        {
+          "feat_idx": 12712,
+          "concentration": 0.24881094694137573,
+          "mass": 1535.8310546875,
+          "span_weighted": 1153.6994756287313,
+          "peak_position": 0,
+          "has_exemplars": true
+        },
+        {
+          "feat_idx": 16584,
+          "concentration": 0.20318642258644104,
+          "mass": 1390.412109375,
+          "span_weighted": 1107.8992469502264,
+          "peak_position": 4,
+          "has_exemplars": true
+        },
+        {
+          "feat_idx": 14450,
+          "concentration": 0.20502562820911407,
+          "mass": 1380.14306640625,
+          "span_weighted": 1097.1783671978556,
+          "peak_position": 4,
+          "has_exemplars": true
+        },
+        {
+          "feat_idx": 8120,
+          "concentration": 0.42315366864204407,
+          "mass": 1860.7138671875,
+          "span_weighted": 1073.3459679939842,
+          "peak_position": 0,
+          "has_exemplars": true
+        },
+        {
+          "feat_idx": 17410,
+          "concentration": 0.283026784658432,
+          "mass": 1480.4927978515625,
+          "span_weighted": 1061.4736815656688,
+          "peak_position": 0,
+          "has_exemplars": true
+        },
+        {
+          "feat_idx": 11414,
+          "concentration": 0.2323690950870514,
+          "mass": 1356.578125,
+          "span_weighted": 1041.351293678861,
+          "peak_position": 1,
+          "has_exemplars": true
+        },
+        {
+          "feat_idx": 15530,
+          "concentration": 0.2291196882724762,
+          "mass": 1347.8665771484375,
+          "span_weighted": 1039.043807159298,
+          "peak_position": 0,
+          "has_exemplars": true
+        },
+        {
+          "feat_idx": 4956,
+          "concentration": 0.20691780745983124,
+          "mass": 1227.3787841796875,
+          "span_weighted": 973.4122572345132,
+          "peak_position": 4,
+          "has_exemplars": true
+        },
+        {
+          "feat_idx": 17344,
+          "concentration": 0.20168718695640564,
+          "mass": 1194.7890625,
+          "span_weighted": 953.8154174780939,
+          "peak_position": 3,
+          "has_exemplars": true
+        },
+        {
+          "feat_idx": 10981,
+          "concentration": 0.3038638234138489,
+          "mass": 1321.5980224609375,
+          "span_weighted": 920.0121943397753,
+          "peak_position": 0,
+          "has_exemplars": true
+        },
+        {
+          "feat_idx": 8656,
+          "concentration": 0.2585700750350952,
+          "mass": 1232.6915283203125,
+          "span_weighted": 913.9543873474031,
+          "peak_position": 0,
+          "has_exemplars": true
+        },
+        {
+          "feat_idx": 17368,
+          "concentration": 0.2286488562822342,
+          "mass": 1165.691650390625,
+          "span_weighted": 899.1575877510586,
+          "peak_position": 3,
+          "has_exemplars": true
+        },
+        {
+          "feat_idx": 11630,
+          "concentration": 0.3205467760562897,
+          "mass": 1322.1558837890625,
+          "span_weighted": 898.3430777966241,
+          "peak_position": 0,
+          "has_exemplars": true
+        },
+        {
+          "feat_idx": 16749,
+          "concentration": 0.20410390198230743,
+          "mass": 1124.9254150390625,
+          "span_weighted": 895.3237483905232,
+          "peak_position": 1,
+          "has_exemplars": true
+        },
+        {
+          "feat_idx": 17052,
+          "concentration": 0.32604503631591797,
+          "mass": 1321.5030517578125,
+          "span_weighted": 890.6335412558401,
+          "peak_position": 0,
+          "has_exemplars": true
+        }
+      ],
+      "top_mass_reference": [
+        {
+          "feat_idx": 17349,
+          "concentration": 0.271657794713974,
+          "mass": 2548.753173828125,
+          "peak_position": 0
+        },
+        {
+          "feat_idx": 8814,
+          "concentration": 0.2424057424068451,
+          "mass": 2468.30615234375,
+          "peak_position": 0
+        },
+        {
+          "feat_idx": 16109,
+          "concentration": 0.25713658332824707,
+          "mass": 2190.15966796875,
+          "peak_position": 0
+        },
+        {
+          "feat_idx": 17108,
+          "concentration": 0.26701638102531433,
+          "mass": 2137.337646484375,
+          "peak_position": 0
+        },
+        {
+          "feat_idx": 15544,
+          "concentration": 0.2079397737979889,
+          "mass": 1938.6895751953125,
+          "peak_position": 0
+        },
+        {
+          "feat_idx": 8120,
+          "concentration": 0.42315366864204407,
+          "mass": 1860.7138671875,
+          "peak_position": 0
+        },
+        {
+          "feat_idx": 11776,
+          "concentration": 0.20831681787967682,
+          "mass": 1833.450927734375,
+          "peak_position": 0
+        },
+        {
+          "feat_idx": 12512,
+          "concentration": 0.33798640966415405,
+          "mass": 1823.1995849609375,
+          "peak_position": 0
+        },
+        {
+          "feat_idx": 8992,
+          "concentration": 0.2996473014354706,
+          "mass": 1667.337158203125,
+          "peak_position": 0
+        },
+        {
+          "feat_idx": 8573,
+          "concentration": 0.26186397671699524,
+          "mass": 1650.830322265625,
+          "peak_position": 0
+        },
+        {
+          "feat_idx": 12712,
+          "concentration": 0.24881094694137573,
+          "mass": 1535.8310546875,
+          "peak_position": 0
+        },
+        {
+          "feat_idx": 17410,
+          "concentration": 0.283026784658432,
+          "mass": 1480.4927978515625,
+          "peak_position": 0
+        },
+        {
+          "feat_idx": 16516,
+          "concentration": 0.20425774157047272,
+          "mass": 1456.9110107421875,
+          "peak_position": 3
+        },
+        {
+          "feat_idx": 16584,
+          "concentration": 0.20318642258644104,
+          "mass": 1390.412109375,
+          "peak_position": 4
+        },
+        {
+          "feat_idx": 14450,
+          "concentration": 0.20502562820911407,
+          "mass": 1380.14306640625,
+          "peak_position": 4
+        }
+      ],
+      "n_need_targeted_scan": 0
+    },
+    "tfa_pos_pred": {
+      "top_span_weighted": [
+        {
+          "feat_idx": 7037,
+          "concentration": 0.43699830770492554,
+          "mass": 1921.58740234375,
+          "span_weighted": 1081.8569594124274,
+          "peak_position": 0,
+          "has_exemplars": true
+        },
+        {
+          "feat_idx": 4851,
+          "concentration": 0.3271474242210388,
+          "mass": 1382.4481201171875,
+          "span_weighted": 930.1837785016323,
+          "peak_position": 0,
+          "has_exemplars": true
+        },
+        {
+          "feat_idx": 1168,
+          "concentration": 0.5344658493995667,
+          "mass": 1996.7606201171875,
+          "span_weighted": 929.5602592386495,
+          "peak_position": 0,
+          "has_exemplars": true
+        },
+        {
+          "feat_idx": 11084,
+          "concentration": 0.4245123565196991,
+          "mass": 1614.3408203125,
+          "span_weighted": 929.0331944556965,
+          "peak_position": 0,
+          "has_exemplars": true
+        },
+        {
+          "feat_idx": 7029,
+          "concentration": 0.3916873037815094,
+          "mass": 1450.0406494140625,
+          "span_weighted": 882.0781370714794,
+          "peak_position": 0,
+          "has_exemplars": true
+        },
+        {
+          "feat_idx": 345,
+          "concentration": 0.5528104305267334,
+          "mass": 1740.1300048828125,
+          "span_weighted": 778.1679877110582,
+          "peak_position": 0,
+          "has_exemplars": true
+        },
+        {
+          "feat_idx": 4642,
+          "concentration": 0.49589988589286804,
+          "mass": 1535.2454833984375,
+          "span_weighted": 773.9174233636113,
+          "peak_position": 0,
+          "has_exemplars": true
+        },
+        {
+          "feat_idx": 55,
+          "concentration": 0.534615695476532,
+          "mass": 1654.6966552734375,
+          "span_weighted": 770.0698521117374,
+          "peak_position": 0,
+          "has_exemplars": true
+        },
+        {
+          "feat_idx": 6514,
+          "concentration": 0.32838523387908936,
+          "mass": 1138.940673828125,
+          "span_weighted": 764.9293742786685,
+          "peak_position": 0,
+          "has_exemplars": true
+        },
+        {
+          "feat_idx": 1530,
+          "concentration": 0.5298570394515991,
+          "mass": 1619.309814453125,
+          "span_weighted": 761.3071102120739,
+          "peak_position": 0,
+          "has_exemplars": true
+        },
+        {
+          "feat_idx": 755,
+          "concentration": 0.5184655785560608,
+          "mass": 1564.48779296875,
+          "span_weighted": 753.3547242433124,
+          "peak_position": 0,
+          "has_exemplars": true
+        },
+        {
+          "feat_idx": 3698,
+          "concentration": 0.5421285033226013,
+          "mass": 1610.2711181640625,
+          "span_weighted": 737.2972469301676,
+          "peak_position": 0,
+          "has_exemplars": true
+        },
+        {
+          "feat_idx": 1299,
+          "concentration": 0.4842979311943054,
+          "mass": 1428.619873046875,
+          "span_weighted": 736.7422240672022,
+          "peak_position": 0,
+          "has_exemplars": true
+        },
+        {
+          "feat_idx": 3190,
+          "concentration": 0.528489351272583,
+          "mass": 1544.839599609375,
+          "span_weighted": 728.4083217916195,
+          "peak_position": 0,
+          "has_exemplars": true
+        },
+        {
+          "feat_idx": 6148,
+          "concentration": 0.3913038969039917,
+          "mass": 1184.7757568359375,
+          "span_weighted": 721.1683862286591,
+          "peak_position": 0,
+          "has_exemplars": true
+        },
+        {
+          "feat_idx": 6401,
+          "concentration": 0.4558025002479553,
+          "mass": 1273.4791259765625,
+          "span_weighted": 693.0241563428644,
+          "peak_position": 0,
+          "has_exemplars": true
+        },
+        {
+          "feat_idx": 4739,
+          "concentration": 0.39553195238113403,
+          "mass": 1143.729248046875,
+          "span_weighted": 691.3477855714882,
+          "peak_position": 0,
+          "has_exemplars": true
+        },
+        {
+          "feat_idx": 6364,
+          "concentration": 0.22189775109291077,
+          "mass": 874.0431518554688,
+          "span_weighted": 680.0949421005807,
+          "peak_position": 1,
+          "has_exemplars": false
+        },
+        {
+          "feat_idx": 5117,
+          "concentration": 0.5112470388412476,
+          "mass": 1370.72265625,
+          "span_weighted": 669.9447571695782,
+          "peak_position": 0,
+          "has_exemplars": true
+        },
+        {
+          "feat_idx": 6181,
+          "concentration": 0.5318987965583801,
+          "mass": 1429.9376220703125,
+          "span_weighted": 669.3555217375615,
+          "peak_position": 0,
+          "has_exemplars": true
+        },
+        {
+          "feat_idx": 5700,
+          "concentration": 0.4330073595046997,
+          "mass": 1171.7890625,
+          "span_weighted": 664.3957746503875,
+          "peak_position": 0,
+          "has_exemplars": true
+        },
+        {
+          "feat_idx": 4199,
+          "concentration": 0.3229983150959015,
+          "mass": 972.7617797851562,
+          "span_weighted": 658.5613639248604,
+          "peak_position": 0,
+          "has_exemplars": true
+        },
+        {
+          "feat_idx": 4801,
+          "concentration": 0.27777382731437683,
+          "mass": 911.60693359375,
+          "span_weighted": 658.3863866430911,
+          "peak_position": 0,
+          "has_exemplars": true
+        },
+        {
+          "feat_idx": 12552,
+          "concentration": 0.46948808431625366,
+          "mass": 1209.831298828125,
+          "span_weighted": 641.8299199954636,
+          "peak_position": 0,
+          "has_exemplars": true
+        },
+        {
+          "feat_idx": 5742,
+          "concentration": 0.39867112040519714,
+          "mass": 1067.2388916015625,
+          "span_weighted": 641.7615669467668,
+          "peak_position": 0,
+          "has_exemplars": true
+        }
+      ],
+      "top_mass_reference": [
+        {
+          "feat_idx": 1168,
+          "concentration": 0.5344658493995667,
+          "mass": 1996.7606201171875,
+          "peak_position": 0
+        },
+        {
+          "feat_idx": 7037,
+          "concentration": 0.43699830770492554,
+          "mass": 1921.58740234375,
+          "peak_position": 0
+        },
+        {
+          "feat_idx": 345,
+          "concentration": 0.5528104305267334,
+          "mass": 1740.1300048828125,
+          "peak_position": 0
+        },
+        {
+          "feat_idx": 55,
+          "concentration": 0.534615695476532,
+          "mass": 1654.6966552734375,
+          "peak_position": 0
+        },
+        {
+          "feat_idx": 1530,
+          "concentration": 0.5298570394515991,
+          "mass": 1619.309814453125,
+          "peak_position": 0
+        },
+        {
+          "feat_idx": 11084,
+          "concentration": 0.4245123565196991,
+          "mass": 1614.3408203125,
+          "peak_position": 0
+        },
+        {
+          "feat_idx": 3698,
+          "concentration": 0.5421285033226013,
+          "mass": 1610.2711181640625,
+          "peak_position": 0
+        },
+        {
+          "feat_idx": 755,
+          "concentration": 0.5184655785560608,
+          "mass": 1564.48779296875,
+          "peak_position": 0
+        },
+        {
+          "feat_idx": 3190,
+          "concentration": 0.528489351272583,
+          "mass": 1544.839599609375,
+          "peak_position": 0
+        },
+        {
+          "feat_idx": 4642,
+          "concentration": 0.49589988589286804,
+          "mass": 1535.2454833984375,
+          "peak_position": 0
+        },
+        {
+          "feat_idx": 7029,
+          "concentration": 0.3916873037815094,
+          "mass": 1450.0406494140625,
+          "peak_position": 0
+        },
+        {
+          "feat_idx": 1828,
+          "concentration": 0.5913824439048767,
+          "mass": 1438.3382568359375,
+          "peak_position": 0
+        },
+        {
+          "feat_idx": 6181,
+          "concentration": 0.5318987965583801,
+          "mass": 1429.9376220703125,
+          "peak_position": 0
+        },
+        {
+          "feat_idx": 1299,
+          "concentration": 0.4842979311943054,
+          "mass": 1428.619873046875,
+          "peak_position": 0
+        },
+        {
+          "feat_idx": 4851,
+          "concentration": 0.3271474242210388,
+          "mass": 1382.4481201171875,
+          "peak_position": 0
+        }
+      ],
+      "n_need_targeted_scan": 1
+    }
+  },
+  "feats_needing_targeted_scan": {
+    "stacked_sae": [
+      8824,
+      18238,
+      12515,
+      17609,
+      14396,
+      11915,
+      4820,
+      14336,
+      4879,
+      8465,
+      9852,
+      11338,
+      1744,
+      11633,
+      6965,
+      15643,
+      7842,
+      3441,
+      9507,
+      16212,
+      11532
+    ],
+    "crosscoder": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      10,
+      11,
+      12,
+      13,
+      17,
+      18,
+      19,
+      20,
+      21,
+      24,
+      26,
+      27,
+      28,
+      30,
+      33,
+      34
+    ],
+    "tfa_pos": [],
+    "tfa_pos_pred": [
+      6364
+    ]
+  }
+}

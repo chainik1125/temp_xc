@@ -1,0 +1,1666 @@
+{
+  "arch": "tfa_pos_pred",
+  "subject_model": "gemma-2-2b-it",
+  "layer_key": "resid_L13",
+  "k": 50,
+  "T": 5,
+  "sample_chains": 1000,
+  "top_k_per_feature": 10,
+  "d_sae": 18432,
+  "num_active_features": 10019,
+  "requested_feats": [
+    55,
+    345,
+    755,
+    1168,
+    1299,
+    1530,
+    3190,
+    3698,
+    4199,
+    4642,
+    4739,
+    4801,
+    4851,
+    5117,
+    5700,
+    5742,
+    6148,
+    6181,
+    6364,
+    6401,
+    6514,
+    7029,
+    7037,
+    11084,
+    12552
+  ],
+  "dead_feats": [],
+  "features": {
+    "6401": {
+      "mass": 0.4329890199005604,
+      "examples": [
+        {
+          "activation": 0.043357428163290024,
+          "chain_idx": 11751,
+          "window_start": 0,
+          "text": ">>>For particular automobiles,<<< additional elements and attention might be necessary to return the"
+        },
+        {
+          "activation": 0.0433313213288784,
+          "chain_idx": 9575,
+          "window_start": 0,
+          "text": ">>>In many industries,<<< including tobacco, a small number of companies control most"
+        },
+        {
+          "activation": 0.04330156743526459,
+          "chain_idx": 20880,
+          "window_start": 0,
+          "text": ">>>A shame it was<<< a white sky day in Montreal yesterday. I cannot"
+        },
+        {
+          "activation": 0.043300312012434006,
+          "chain_idx": 8884,
+          "window_start": 0,
+          "text": ">>>According to new data<<<, threat actors attacked businesses more than 72"
+        },
+        {
+          "activation": 0.043291445821523666,
+          "chain_idx": 1144,
+          "window_start": 0,
+          "text": ">>>Blogging is writing<<<. It is not the-big-important writing"
+        },
+        {
+          "activation": 0.04329083859920502,
+          "chain_idx": 6715,
+          "window_start": 0,
+          "text": ">>>I was recently invited<<< to escape cold, gray Columbus, Ohio for a"
+        },
+        {
+          "activation": 0.04328928142786026,
+          "chain_idx": 5458,
+          "window_start": 0,
+          "text": ">>>10 things you<<< may have missed at Google I/O\nLast"
+        },
+        {
+          "activation": 0.043285999447107315,
+          "chain_idx": 15545,
+          "window_start": 0,
+          "text": ">>>I need some fresh<<< eyes here, thanks in advance! I'll"
+        },
+        {
+          "activation": 0.0432722382247448,
+          "chain_idx": 19338,
+          "window_start": 0,
+          "text": ">>>In Florida, property<<< owners are generally liable for dangerous conditions that are not"
+        },
+        {
+          "activation": 0.043268587440252304,
+          "chain_idx": 11317,
+          "window_start": 0,
+          "text": ">>>It's time<<< for me to take a little time off from blogging"
+        }
+      ]
+    },
+    "4739": {
+      "mass": 0.3497561514377594,
+      "examples": [
+        {
+          "activation": 0.03503531217575073,
+          "chain_idx": 11751,
+          "window_start": 0,
+          "text": ">>>For particular automobiles,<<< additional elements and attention might be necessary to return the"
+        },
+        {
+          "activation": 0.03500860556960106,
+          "chain_idx": 9575,
+          "window_start": 0,
+          "text": ">>>In many industries,<<< including tobacco, a small number of companies control most"
+        },
+        {
+          "activation": 0.03497958183288574,
+          "chain_idx": 20880,
+          "window_start": 0,
+          "text": ">>>A shame it was<<< a white sky day in Montreal yesterday. I cannot"
+        },
+        {
+          "activation": 0.0349765345454216,
+          "chain_idx": 8884,
+          "window_start": 0,
+          "text": ">>>According to new data<<<, threat actors attacked businesses more than 72"
+        },
+        {
+          "activation": 0.03496912494301796,
+          "chain_idx": 1144,
+          "window_start": 0,
+          "text": ">>>Blogging is writing<<<. It is not the-big-important writing"
+        },
+        {
+          "activation": 0.03496698662638664,
+          "chain_idx": 6715,
+          "window_start": 0,
+          "text": ">>>I was recently invited<<< to escape cold, gray Columbus, Ohio for a"
+        },
+        {
+          "activation": 0.034965191036462784,
+          "chain_idx": 5458,
+          "window_start": 0,
+          "text": ">>>10 things you<<< may have missed at Google I/O\nLast"
+        },
+        {
+          "activation": 0.03496217727661133,
+          "chain_idx": 15545,
+          "window_start": 0,
+          "text": ">>>I need some fresh<<< eyes here, thanks in advance! I'll"
+        },
+        {
+          "activation": 0.03494837507605553,
+          "chain_idx": 19338,
+          "window_start": 0,
+          "text": ">>>In Florida, property<<< owners are generally liable for dangerous conditions that are not"
+        },
+        {
+          "activation": 0.034944262355566025,
+          "chain_idx": 11317,
+          "window_start": 0,
+          "text": ">>>It's time<<< for me to take a little time off from blogging"
+        }
+      ]
+    },
+    "6148": {
+      "mass": 0.346689160913229,
+      "examples": [
+        {
+          "activation": 0.03471717610955238,
+          "chain_idx": 11751,
+          "window_start": 0,
+          "text": ">>>For particular automobiles,<<< additional elements and attention might be necessary to return the"
+        },
+        {
+          "activation": 0.03469545766711235,
+          "chain_idx": 9575,
+          "window_start": 0,
+          "text": ">>>In many industries,<<< including tobacco, a small number of companies control most"
+        },
+        {
+          "activation": 0.03467176482081413,
+          "chain_idx": 8884,
+          "window_start": 0,
+          "text": ">>>According to new data<<<, threat actors attacked businesses more than 72"
+        },
+        {
+          "activation": 0.03467030078172684,
+          "chain_idx": 20880,
+          "window_start": 0,
+          "text": ">>>A shame it was<<< a white sky day in Montreal yesterday. I cannot"
+        },
+        {
+          "activation": 0.03466392681002617,
+          "chain_idx": 1144,
+          "window_start": 0,
+          "text": ">>>Blogging is writing<<<. It is not the-big-important writing"
+        },
+        {
+          "activation": 0.034661613404750824,
+          "chain_idx": 6715,
+          "window_start": 0,
+          "text": ">>>I was recently invited<<< to escape cold, gray Columbus, Ohio for a"
+        },
+        {
+          "activation": 0.034661050885915756,
+          "chain_idx": 5458,
+          "window_start": 0,
+          "text": ">>>10 things you<<< may have missed at Google I/O\nLast"
+        },
+        {
+          "activation": 0.03465719148516655,
+          "chain_idx": 15545,
+          "window_start": 0,
+          "text": ">>>I need some fresh<<< eyes here, thanks in advance! I'll"
+        },
+        {
+          "activation": 0.03464670851826668,
+          "chain_idx": 19338,
+          "window_start": 0,
+          "text": ">>>In Florida, property<<< owners are generally liable for dangerous conditions that are not"
+        },
+        {
+          "activation": 0.03464397042989731,
+          "chain_idx": 11317,
+          "window_start": 0,
+          "text": ">>>It's time<<< for me to take a little time off from blogging"
+        }
+      ]
+    },
+    "12552": {
+      "mass": 0.4238126091659069,
+      "examples": [
+        {
+          "activation": 0.042439308017492294,
+          "chain_idx": 11751,
+          "window_start": 0,
+          "text": ">>>For particular automobiles,<<< additional elements and attention might be necessary to return the"
+        },
+        {
+          "activation": 0.0424136184155941,
+          "chain_idx": 9575,
+          "window_start": 0,
+          "text": ">>>In many industries,<<< including tobacco, a small number of companies control most"
+        },
+        {
+          "activation": 0.04238435626029968,
+          "chain_idx": 20880,
+          "window_start": 0,
+          "text": ">>>A shame it was<<< a white sky day in Montreal yesterday. I cannot"
+        },
+        {
+          "activation": 0.042382385581731796,
+          "chain_idx": 8884,
+          "window_start": 0,
+          "text": ">>>According to new data<<<, threat actors attacked businesses more than 72"
+        },
+        {
+          "activation": 0.04237453266978264,
+          "chain_idx": 1144,
+          "window_start": 0,
+          "text": ">>>Blogging is writing<<<. It is not the-big-important writing"
+        },
+        {
+          "activation": 0.04237314686179161,
+          "chain_idx": 6715,
+          "window_start": 0,
+          "text": ">>>I was recently invited<<< to escape cold, gray Columbus, Ohio for a"
+        },
+        {
+          "activation": 0.04237119108438492,
+          "chain_idx": 5458,
+          "window_start": 0,
+          "text": ">>>10 things you<<< may have missed at Google I/O\nLast"
+        },
+        {
+          "activation": 0.04236803203821182,
+          "chain_idx": 15545,
+          "window_start": 0,
+          "text": ">>>I need some fresh<<< eyes here, thanks in advance! I'll"
+        },
+        {
+          "activation": 0.042355019599199295,
+          "chain_idx": 19338,
+          "window_start": 0,
+          "text": ">>>In Florida, property<<< owners are generally liable for dangerous conditions that are not"
+        },
+        {
+          "activation": 0.04235101863741875,
+          "chain_idx": 11317,
+          "window_start": 0,
+          "text": ">>>It's time<<< for me to take a little time off from blogging"
+        }
+      ]
+    },
+    "1168": {
+      "mass": 0.7630335688591003,
+      "examples": [
+        {
+          "activation": 0.07637643069028854,
+          "chain_idx": 11751,
+          "window_start": 0,
+          "text": ">>>For particular automobiles,<<< additional elements and attention might be necessary to return the"
+        },
+        {
+          "activation": 0.07634398341178894,
+          "chain_idx": 9575,
+          "window_start": 0,
+          "text": ">>>In many industries,<<< including tobacco, a small number of companies control most"
+        },
+        {
+          "activation": 0.07630676031112671,
+          "chain_idx": 20880,
+          "window_start": 0,
+          "text": ">>>A shame it was<<< a white sky day in Montreal yesterday. I cannot"
+        },
+        {
+          "activation": 0.07630308717489243,
+          "chain_idx": 8884,
+          "window_start": 0,
+          "text": ">>>According to new data<<<, threat actors attacked businesses more than 72"
+        },
+        {
+          "activation": 0.07629396766424179,
+          "chain_idx": 1144,
+          "window_start": 0,
+          "text": ">>>Blogging is writing<<<. It is not the-big-important writing"
+        },
+        {
+          "activation": 0.07629361003637314,
+          "chain_idx": 6715,
+          "window_start": 0,
+          "text": ">>>I was recently invited<<< to escape cold, gray Columbus, Ohio for a"
+        },
+        {
+          "activation": 0.07629116624593735,
+          "chain_idx": 5458,
+          "window_start": 0,
+          "text": ">>>10 things you<<< may have missed at Google I/O\nLast"
+        },
+        {
+          "activation": 0.07628755271434784,
+          "chain_idx": 15545,
+          "window_start": 0,
+          "text": ">>>I need some fresh<<< eyes here, thanks in advance! I'll"
+        },
+        {
+          "activation": 0.07627058029174805,
+          "chain_idx": 19338,
+          "window_start": 0,
+          "text": ">>>In Florida, property<<< owners are generally liable for dangerous conditions that are not"
+        },
+        {
+          "activation": 0.07626643031835556,
+          "chain_idx": 11317,
+          "window_start": 0,
+          "text": ">>>It's time<<< for me to take a little time off from blogging"
+        }
+      ]
+    },
+    "1299": {
+      "mass": 0.5173001140356064,
+      "examples": [
+        {
+          "activation": 0.05180216580629349,
+          "chain_idx": 11751,
+          "window_start": 0,
+          "text": ">>>For particular automobiles,<<< additional elements and attention might be necessary to return the"
+        },
+        {
+          "activation": 0.05176991969347,
+          "chain_idx": 9575,
+          "window_start": 0,
+          "text": ">>>In many industries,<<< including tobacco, a small number of companies control most"
+        },
+        {
+          "activation": 0.051733531057834625,
+          "chain_idx": 20880,
+          "window_start": 0,
+          "text": ">>>A shame it was<<< a white sky day in Montreal yesterday. I cannot"
+        },
+        {
+          "activation": 0.051731616258621216,
+          "chain_idx": 8884,
+          "window_start": 0,
+          "text": ">>>According to new data<<<, threat actors attacked businesses more than 72"
+        },
+        {
+          "activation": 0.051721662282943726,
+          "chain_idx": 1144,
+          "window_start": 0,
+          "text": ">>>Blogging is writing<<<. It is not the-big-important writing"
+        },
+        {
+          "activation": 0.05171995982527733,
+          "chain_idx": 6715,
+          "window_start": 0,
+          "text": ">>>I was recently invited<<< to escape cold, gray Columbus, Ohio for a"
+        },
+        {
+          "activation": 0.051717549562454224,
+          "chain_idx": 5458,
+          "window_start": 0,
+          "text": ">>>10 things you<<< may have missed at Google I/O\nLast"
+        },
+        {
+          "activation": 0.05171383172273636,
+          "chain_idx": 15545,
+          "window_start": 0,
+          "text": ">>>I need some fresh<<< eyes here, thanks in advance! I'll"
+        },
+        {
+          "activation": 0.051697105169296265,
+          "chain_idx": 19338,
+          "window_start": 0,
+          "text": ">>>In Florida, property<<< owners are generally liable for dangerous conditions that are not"
+        },
+        {
+          "activation": 0.05169277265667915,
+          "chain_idx": 11317,
+          "window_start": 0,
+          "text": ">>>It's time<<< for me to take a little time off from blogging"
+        }
+      ]
+    },
+    "4642": {
+      "mass": 0.5479818396270275,
+      "examples": [
+        {
+          "activation": 0.054853808134794235,
+          "chain_idx": 11751,
+          "window_start": 0,
+          "text": ">>>For particular automobiles,<<< additional elements and attention might be necessary to return the"
+        },
+        {
+          "activation": 0.054828789085149765,
+          "chain_idx": 9575,
+          "window_start": 0,
+          "text": ">>>In many industries,<<< including tobacco, a small number of companies control most"
+        },
+        {
+          "activation": 0.05480039864778519,
+          "chain_idx": 20880,
+          "window_start": 0,
+          "text": ">>>A shame it was<<< a white sky day in Montreal yesterday. I cannot"
+        },
+        {
+          "activation": 0.05479954555630684,
+          "chain_idx": 8884,
+          "window_start": 0,
+          "text": ">>>According to new data<<<, threat actors attacked businesses more than 72"
+        },
+        {
+          "activation": 0.054791320115327835,
+          "chain_idx": 1144,
+          "window_start": 0,
+          "text": ">>>Blogging is writing<<<. It is not the-big-important writing"
+        },
+        {
+          "activation": 0.05479053407907486,
+          "chain_idx": 6715,
+          "window_start": 0,
+          "text": ">>>I was recently invited<<< to escape cold, gray Columbus, Ohio for a"
+        },
+        {
+          "activation": 0.054789017885923386,
+          "chain_idx": 5458,
+          "window_start": 0,
+          "text": ">>>10 things you<<< may have missed at Google I/O\nLast"
+        },
+        {
+          "activation": 0.05478587746620178,
+          "chain_idx": 15545,
+          "window_start": 0,
+          "text": ">>>I need some fresh<<< eyes here, thanks in advance! I'll"
+        },
+        {
+          "activation": 0.05477278307080269,
+          "chain_idx": 19338,
+          "window_start": 0,
+          "text": ">>>In Florida, property<<< owners are generally liable for dangerous conditions that are not"
+        },
+        {
+          "activation": 0.054769765585660934,
+          "chain_idx": 11317,
+          "window_start": 0,
+          "text": ">>>It's time<<< for me to take a little time off from blogging"
+        }
+      ]
+    },
+    "6181": {
+      "mass": 0.5549970306456089,
+      "examples": [
+        {
+          "activation": 0.05556359887123108,
+          "chain_idx": 11751,
+          "window_start": 0,
+          "text": ">>>For particular automobiles,<<< additional elements and attention might be necessary to return the"
+        },
+        {
+          "activation": 0.05553522706031799,
+          "chain_idx": 9575,
+          "window_start": 0,
+          "text": ">>>In many industries,<<< including tobacco, a small number of companies control most"
+        },
+        {
+          "activation": 0.05550259351730347,
+          "chain_idx": 20880,
+          "window_start": 0,
+          "text": ">>>A shame it was<<< a white sky day in Montreal yesterday. I cannot"
+        },
+        {
+          "activation": 0.055500369518995285,
+          "chain_idx": 8884,
+          "window_start": 0,
+          "text": ">>>According to new data<<<, threat actors attacked businesses more than 72"
+        },
+        {
+          "activation": 0.05549159646034241,
+          "chain_idx": 1144,
+          "window_start": 0,
+          "text": ">>>Blogging is writing<<<. It is not the-big-important writing"
+        },
+        {
+          "activation": 0.05549102649092674,
+          "chain_idx": 6715,
+          "window_start": 0,
+          "text": ">>>I was recently invited<<< to escape cold, gray Columbus, Ohio for a"
+        },
+        {
+          "activation": 0.055489182472229004,
+          "chain_idx": 5458,
+          "window_start": 0,
+          "text": ">>>10 things you<<< may have missed at Google I/O\nLast"
+        },
+        {
+          "activation": 0.05548572167754173,
+          "chain_idx": 15545,
+          "window_start": 0,
+          "text": ">>>I need some fresh<<< eyes here, thanks in advance! I'll"
+        },
+        {
+          "activation": 0.05547083541750908,
+          "chain_idx": 19338,
+          "window_start": 0,
+          "text": ">>>In Florida, property<<< owners are generally liable for dangerous conditions that are not"
+        },
+        {
+          "activation": 0.05546687915921211,
+          "chain_idx": 11317,
+          "window_start": 0,
+          "text": ">>>It's time<<< for me to take a little time off from blogging"
+        }
+      ]
+    },
+    "55": {
+      "mass": 0.6433902308344841,
+      "examples": [
+        {
+          "activation": 0.0644112154841423,
+          "chain_idx": 11751,
+          "window_start": 0,
+          "text": ">>>For particular automobiles,<<< additional elements and attention might be necessary to return the"
+        },
+        {
+          "activation": 0.06437911838293076,
+          "chain_idx": 9575,
+          "window_start": 0,
+          "text": ">>>In many industries,<<< including tobacco, a small number of companies control most"
+        },
+        {
+          "activation": 0.06434228271245956,
+          "chain_idx": 20880,
+          "window_start": 0,
+          "text": ">>>A shame it was<<< a white sky day in Montreal yesterday. I cannot"
+        },
+        {
+          "activation": 0.06433974206447601,
+          "chain_idx": 8884,
+          "window_start": 0,
+          "text": ">>>According to new data<<<, threat actors attacked businesses more than 72"
+        },
+        {
+          "activation": 0.06432994455099106,
+          "chain_idx": 1144,
+          "window_start": 0,
+          "text": ">>>Blogging is writing<<<. It is not the-big-important writing"
+        },
+        {
+          "activation": 0.06432921439409256,
+          "chain_idx": 6715,
+          "window_start": 0,
+          "text": ">>>I was recently invited<<< to escape cold, gray Columbus, Ohio for a"
+        },
+        {
+          "activation": 0.06432701647281647,
+          "chain_idx": 5458,
+          "window_start": 0,
+          "text": ">>>10 things you<<< may have missed at Google I/O\nLast"
+        },
+        {
+          "activation": 0.06432315707206726,
+          "chain_idx": 15545,
+          "window_start": 0,
+          "text": ">>>I need some fresh<<< eyes here, thanks in advance! I'll"
+        },
+        {
+          "activation": 0.06430640071630478,
+          "chain_idx": 19338,
+          "window_start": 0,
+          "text": ">>>In Florida, property<<< owners are generally liable for dangerous conditions that are not"
+        },
+        {
+          "activation": 0.06430213898420334,
+          "chain_idx": 11317,
+          "window_start": 0,
+          "text": ">>>It's time<<< for me to take a little time off from blogging"
+        }
+      ]
+    },
+    "4801": {
+      "mass": 0.20838851295411587,
+      "examples": [
+        {
+          "activation": 0.020886747166514397,
+          "chain_idx": 11751,
+          "window_start": 0,
+          "text": ">>>For particular automobiles,<<< additional elements and attention might be necessary to return the"
+        },
+        {
+          "activation": 0.02086527645587921,
+          "chain_idx": 9575,
+          "window_start": 0,
+          "text": ">>>In many industries,<<< including tobacco, a small number of companies control most"
+        },
+        {
+          "activation": 0.020841309800744057,
+          "chain_idx": 20880,
+          "window_start": 0,
+          "text": ">>>A shame it was<<< a white sky day in Montreal yesterday. I cannot"
+        },
+        {
+          "activation": 0.020839979872107506,
+          "chain_idx": 8884,
+          "window_start": 0,
+          "text": ">>>According to new data<<<, threat actors attacked businesses more than 72"
+        },
+        {
+          "activation": 0.02083396539092064,
+          "chain_idx": 1144,
+          "window_start": 0,
+          "text": ">>>Blogging is writing<<<. It is not the-big-important writing"
+        },
+        {
+          "activation": 0.02083227038383484,
+          "chain_idx": 6715,
+          "window_start": 0,
+          "text": ">>>I was recently invited<<< to escape cold, gray Columbus, Ohio for a"
+        },
+        {
+          "activation": 0.020830007269978523,
+          "chain_idx": 5458,
+          "window_start": 0,
+          "text": ">>>10 things you<<< may have missed at Google I/O\nLast"
+        },
+        {
+          "activation": 0.020827889442443848,
+          "chain_idx": 15545,
+          "window_start": 0,
+          "text": ">>>I need some fresh<<< eyes here, thanks in advance! I'll"
+        },
+        {
+          "activation": 0.020817022770643234,
+          "chain_idx": 19338,
+          "window_start": 0,
+          "text": ">>>In Florida, property<<< owners are generally liable for dangerous conditions that are not"
+        },
+        {
+          "activation": 0.020814044401049614,
+          "chain_idx": 11317,
+          "window_start": 0,
+          "text": ">>>It's time<<< for me to take a little time off from blogging"
+        }
+      ]
+    },
+    "5700": {
+      "mass": 0.37016410008072853,
+      "examples": [
+        {
+          "activation": 0.03705911710858345,
+          "chain_idx": 11751,
+          "window_start": 0,
+          "text": ">>>For particular automobiles,<<< additional elements and attention might be necessary to return the"
+        },
+        {
+          "activation": 0.03703951835632324,
+          "chain_idx": 9575,
+          "window_start": 0,
+          "text": ">>>In many industries,<<< including tobacco, a small number of companies control most"
+        },
+        {
+          "activation": 0.03701941296458244,
+          "chain_idx": 8884,
+          "window_start": 0,
+          "text": ">>>According to new data<<<, threat actors attacked businesses more than 72"
+        },
+        {
+          "activation": 0.037017934024333954,
+          "chain_idx": 20880,
+          "window_start": 0,
+          "text": ">>>A shame it was<<< a white sky day in Montreal yesterday. I cannot"
+        },
+        {
+          "activation": 0.03701253607869148,
+          "chain_idx": 1144,
+          "window_start": 0,
+          "text": ">>>Blogging is writing<<<. It is not the-big-important writing"
+        },
+        {
+          "activation": 0.03701002895832062,
+          "chain_idx": 6715,
+          "window_start": 0,
+          "text": ">>>I was recently invited<<< to escape cold, gray Columbus, Ohio for a"
+        },
+        {
+          "activation": 0.037008922547101974,
+          "chain_idx": 5458,
+          "window_start": 0,
+          "text": ">>>10 things you<<< may have missed at Google I/O\nLast"
+        },
+        {
+          "activation": 0.03700629994273186,
+          "chain_idx": 15545,
+          "window_start": 0,
+          "text": ">>>I need some fresh<<< eyes here, thanks in advance! I'll"
+        },
+        {
+          "activation": 0.03699629381299019,
+          "chain_idx": 19338,
+          "window_start": 0,
+          "text": ">>>In Florida, property<<< owners are generally liable for dangerous conditions that are not"
+        },
+        {
+          "activation": 0.03699403628706932,
+          "chain_idx": 11317,
+          "window_start": 0,
+          "text": ">>>It's time<<< for me to take a little time off from blogging"
+        }
+      ]
+    },
+    "11084": {
+      "mass": 0.52207475528121,
+      "examples": [
+        {
+          "activation": 0.05228918790817261,
+          "chain_idx": 11751,
+          "window_start": 0,
+          "text": ">>>For particular automobiles,<<< additional elements and attention might be necessary to return the"
+        },
+        {
+          "activation": 0.0522526279091835,
+          "chain_idx": 9575,
+          "window_start": 0,
+          "text": ">>>In many industries,<<< including tobacco, a small number of companies control most"
+        },
+        {
+          "activation": 0.05221156030893326,
+          "chain_idx": 20880,
+          "window_start": 0,
+          "text": ">>>A shame it was<<< a white sky day in Montreal yesterday. I cannot"
+        },
+        {
+          "activation": 0.052209239453077316,
+          "chain_idx": 8884,
+          "window_start": 0,
+          "text": ">>>According to new data<<<, threat actors attacked businesses more than 72"
+        },
+        {
+          "activation": 0.05219822749495506,
+          "chain_idx": 1144,
+          "window_start": 0,
+          "text": ">>>Blogging is writing<<<. It is not the-big-important writing"
+        },
+        {
+          "activation": 0.05219615250825882,
+          "chain_idx": 6715,
+          "window_start": 0,
+          "text": ">>>I was recently invited<<< to escape cold, gray Columbus, Ohio for a"
+        },
+        {
+          "activation": 0.052193474024534225,
+          "chain_idx": 5458,
+          "window_start": 0,
+          "text": ">>>10 things you<<< may have missed at Google I/O\nLast"
+        },
+        {
+          "activation": 0.05218922719359398,
+          "chain_idx": 15545,
+          "window_start": 0,
+          "text": ">>>I need some fresh<<< eyes here, thanks in advance! I'll"
+        },
+        {
+          "activation": 0.052170027047395706,
+          "chain_idx": 19338,
+          "window_start": 0,
+          "text": ">>>In Florida, property<<< owners are generally liable for dangerous conditions that are not"
+        },
+        {
+          "activation": 0.05216503143310547,
+          "chain_idx": 11317,
+          "window_start": 0,
+          "text": ">>>It's time<<< for me to take a little time off from blogging"
+        }
+      ]
+    },
+    "7037": {
+      "mass": 0.6341686621308327,
+      "examples": [
+        {
+          "activation": 0.06351204961538315,
+          "chain_idx": 11751,
+          "window_start": 0,
+          "text": ">>>For particular automobiles,<<< additional elements and attention might be necessary to return the"
+        },
+        {
+          "activation": 0.06346958130598068,
+          "chain_idx": 9575,
+          "window_start": 0,
+          "text": ">>>In many industries,<<< including tobacco, a small number of companies control most"
+        },
+        {
+          "activation": 0.06342200189828873,
+          "chain_idx": 20880,
+          "window_start": 0,
+          "text": ">>>A shame it was<<< a white sky day in Montreal yesterday. I cannot"
+        },
+        {
+          "activation": 0.06341972947120667,
+          "chain_idx": 8884,
+          "window_start": 0,
+          "text": ">>>According to new data<<<, threat actors attacked businesses more than 72"
+        },
+        {
+          "activation": 0.06340745836496353,
+          "chain_idx": 1144,
+          "window_start": 0,
+          "text": ">>>Blogging is writing<<<. It is not the-big-important writing"
+        },
+        {
+          "activation": 0.06340315192937851,
+          "chain_idx": 6715,
+          "window_start": 0,
+          "text": ">>>I was recently invited<<< to escape cold, gray Columbus, Ohio for a"
+        },
+        {
+          "activation": 0.06339968740940094,
+          "chain_idx": 5458,
+          "window_start": 0,
+          "text": ">>>10 things you<<< may have missed at Google I/O\nLast"
+        },
+        {
+          "activation": 0.06339477002620697,
+          "chain_idx": 15545,
+          "window_start": 0,
+          "text": ">>>I need some fresh<<< eyes here, thanks in advance! I'll"
+        },
+        {
+          "activation": 0.06337320059537888,
+          "chain_idx": 19338,
+          "window_start": 0,
+          "text": ">>>In Florida, property<<< owners are generally liable for dangerous conditions that are not"
+        },
+        {
+          "activation": 0.06336703151464462,
+          "chain_idx": 11317,
+          "window_start": 0,
+          "text": ">>>It's time<<< for me to take a little time off from blogging"
+        }
+      ]
+    },
+    "345": {
+      "mass": 0.6967970505356789,
+      "examples": [
+        {
+          "activation": 0.06975536793470383,
+          "chain_idx": 11751,
+          "window_start": 0,
+          "text": ">>>For particular automobiles,<<< additional elements and attention might be necessary to return the"
+        },
+        {
+          "activation": 0.06972169876098633,
+          "chain_idx": 9575,
+          "window_start": 0,
+          "text": ">>>In many industries,<<< including tobacco, a small number of companies control most"
+        },
+        {
+          "activation": 0.06968297809362411,
+          "chain_idx": 20880,
+          "window_start": 0,
+          "text": ">>>A shame it was<<< a white sky day in Montreal yesterday. I cannot"
+        },
+        {
+          "activation": 0.06968073546886444,
+          "chain_idx": 8884,
+          "window_start": 0,
+          "text": ">>>According to new data<<<, threat actors attacked businesses more than 72"
+        },
+        {
+          "activation": 0.06967059522867203,
+          "chain_idx": 1144,
+          "window_start": 0,
+          "text": ">>>Blogging is writing<<<. It is not the-big-important writing"
+        },
+        {
+          "activation": 0.06966928392648697,
+          "chain_idx": 6715,
+          "window_start": 0,
+          "text": ">>>I was recently invited<<< to escape cold, gray Columbus, Ohio for a"
+        },
+        {
+          "activation": 0.06966684013605118,
+          "chain_idx": 5458,
+          "window_start": 0,
+          "text": ">>>10 things you<<< may have missed at Google I/O\nLast"
+        },
+        {
+          "activation": 0.06966286152601242,
+          "chain_idx": 15545,
+          "window_start": 0,
+          "text": ">>>I need some fresh<<< eyes here, thanks in advance! I'll"
+        },
+        {
+          "activation": 0.06964557617902756,
+          "chain_idx": 19338,
+          "window_start": 0,
+          "text": ">>>In Florida, property<<< owners are generally liable for dangerous conditions that are not"
+        },
+        {
+          "activation": 0.06964111328125,
+          "chain_idx": 11317,
+          "window_start": 0,
+          "text": ">>>It's time<<< for me to take a little time off from blogging"
+        }
+      ]
+    },
+    "6364": {
+      "mass": 0.117015415802598,
+      "examples": [
+        {
+          "activation": 0.011751287616789341,
+          "chain_idx": 11751,
+          "window_start": 0,
+          "text": ">>>For particular automobiles,<<< additional elements and attention might be necessary to return the"
+        },
+        {
+          "activation": 0.011728675104677677,
+          "chain_idx": 9575,
+          "window_start": 0,
+          "text": ">>>In many industries,<<< including tobacco, a small number of companies control most"
+        },
+        {
+          "activation": 0.011704707518219948,
+          "chain_idx": 8884,
+          "window_start": 0,
+          "text": ">>>According to new data<<<, threat actors attacked businesses more than 72"
+        },
+        {
+          "activation": 0.011704165488481522,
+          "chain_idx": 20880,
+          "window_start": 0,
+          "text": ">>>A shame it was<<< a white sky day in Montreal yesterday. I cannot"
+        },
+        {
+          "activation": 0.011697685346007347,
+          "chain_idx": 1144,
+          "window_start": 0,
+          "text": ">>>Blogging is writing<<<. It is not the-big-important writing"
+        },
+        {
+          "activation": 0.01169386226683855,
+          "chain_idx": 6715,
+          "window_start": 0,
+          "text": ">>>I was recently invited<<< to escape cold, gray Columbus, Ohio for a"
+        },
+        {
+          "activation": 0.011692235246300697,
+          "chain_idx": 5458,
+          "window_start": 0,
+          "text": ">>>10 things you<<< may have missed at Google I/O\nLast"
+        },
+        {
+          "activation": 0.01168927364051342,
+          "chain_idx": 15545,
+          "window_start": 0,
+          "text": ">>>I need some fresh<<< eyes here, thanks in advance! I'll"
+        },
+        {
+          "activation": 0.01167853269726038,
+          "chain_idx": 19338,
+          "window_start": 0,
+          "text": ">>>In Florida, property<<< owners are generally liable for dangerous conditions that are not"
+        },
+        {
+          "activation": 0.011674990877509117,
+          "chain_idx": 11317,
+          "window_start": 0,
+          "text": ">>>It's time<<< for me to take a little time off from blogging"
+        }
+      ]
+    },
+    "4199": {
+      "mass": 0.24396548233926296,
+      "examples": [
+        {
+          "activation": 0.024439668282866478,
+          "chain_idx": 11751,
+          "window_start": 0,
+          "text": ">>>For particular automobiles,<<< additional elements and attention might be necessary to return the"
+        },
+        {
+          "activation": 0.02441995218396187,
+          "chain_idx": 9575,
+          "window_start": 0,
+          "text": ">>>In many industries,<<< including tobacco, a small number of companies control most"
+        },
+        {
+          "activation": 0.024400239810347557,
+          "chain_idx": 8884,
+          "window_start": 0,
+          "text": ">>>According to new data<<<, threat actors attacked businesses more than 72"
+        },
+        {
+          "activation": 0.024398868903517723,
+          "chain_idx": 20880,
+          "window_start": 0,
+          "text": ">>>A shame it was<<< a white sky day in Montreal yesterday. I cannot"
+        },
+        {
+          "activation": 0.024393154308199883,
+          "chain_idx": 1144,
+          "window_start": 0,
+          "text": ">>>Blogging is writing<<<. It is not the-big-important writing"
+        },
+        {
+          "activation": 0.024389581754803658,
+          "chain_idx": 6715,
+          "window_start": 0,
+          "text": ">>>I was recently invited<<< to escape cold, gray Columbus, Ohio for a"
+        },
+        {
+          "activation": 0.024388203397393227,
+          "chain_idx": 5458,
+          "window_start": 0,
+          "text": ">>>10 things you<<< may have missed at Google I/O\nLast"
+        },
+        {
+          "activation": 0.02438574843108654,
+          "chain_idx": 15545,
+          "window_start": 0,
+          "text": ">>>I need some fresh<<< eyes here, thanks in advance! I'll"
+        },
+        {
+          "activation": 0.02437634766101837,
+          "chain_idx": 19338,
+          "window_start": 0,
+          "text": ">>>In Florida, property<<< owners are generally liable for dangerous conditions that are not"
+        },
+        {
+          "activation": 0.024373717606067657,
+          "chain_idx": 11317,
+          "window_start": 0,
+          "text": ">>>It's time<<< for me to take a little time off from blogging"
+        }
+      ]
+    },
+    "5742": {
+      "mass": 0.32028649747371674,
+      "examples": [
+        {
+          "activation": 0.03207560256123543,
+          "chain_idx": 11751,
+          "window_start": 0,
+          "text": ">>>For particular automobiles,<<< additional elements and attention might be necessary to return the"
+        },
+        {
+          "activation": 0.03205407038331032,
+          "chain_idx": 9575,
+          "window_start": 0,
+          "text": ">>>In many industries,<<< including tobacco, a small number of companies control most"
+        },
+        {
+          "activation": 0.03203130140900612,
+          "chain_idx": 8884,
+          "window_start": 0,
+          "text": ">>>According to new data<<<, threat actors attacked businesses more than 72"
+        },
+        {
+          "activation": 0.032030798494815826,
+          "chain_idx": 20880,
+          "window_start": 0,
+          "text": ">>>A shame it was<<< a white sky day in Montreal yesterday. I cannot"
+        },
+        {
+          "activation": 0.032023992389440536,
+          "chain_idx": 1144,
+          "window_start": 0,
+          "text": ">>>Blogging is writing<<<. It is not the-big-important writing"
+        },
+        {
+          "activation": 0.032021719962358475,
+          "chain_idx": 6715,
+          "window_start": 0,
+          "text": ">>>I was recently invited<<< to escape cold, gray Columbus, Ohio for a"
+        },
+        {
+          "activation": 0.0320202074944973,
+          "chain_idx": 5458,
+          "window_start": 0,
+          "text": ">>>10 things you<<< may have missed at Google I/O\nLast"
+        },
+        {
+          "activation": 0.03201757371425629,
+          "chain_idx": 15545,
+          "window_start": 0,
+          "text": ">>>I need some fresh<<< eyes here, thanks in advance! I'll"
+        },
+        {
+          "activation": 0.03200693055987358,
+          "chain_idx": 19338,
+          "window_start": 0,
+          "text": ">>>In Florida, property<<< owners are generally liable for dangerous conditions that are not"
+        },
+        {
+          "activation": 0.03200430050492287,
+          "chain_idx": 11317,
+          "window_start": 0,
+          "text": ">>>It's time<<< for me to take a little time off from blogging"
+        }
+      ]
+    },
+    "6514": {
+      "mass": 0.28824966959655285,
+      "examples": [
+        {
+          "activation": 0.028874633833765984,
+          "chain_idx": 11751,
+          "window_start": 0,
+          "text": ">>>For particular automobiles,<<< additional elements and attention might be necessary to return the"
+        },
+        {
+          "activation": 0.028851887211203575,
+          "chain_idx": 9575,
+          "window_start": 0,
+          "text": ">>>In many industries,<<< including tobacco, a small number of companies control most"
+        },
+        {
+          "activation": 0.02882780134677887,
+          "chain_idx": 20880,
+          "window_start": 0,
+          "text": ">>>A shame it was<<< a white sky day in Montreal yesterday. I cannot"
+        },
+        {
+          "activation": 0.028827298432588577,
+          "chain_idx": 8884,
+          "window_start": 0,
+          "text": ">>>According to new data<<<, threat actors attacked businesses more than 72"
+        },
+        {
+          "activation": 0.02882109023630619,
+          "chain_idx": 1144,
+          "window_start": 0,
+          "text": ">>>Blogging is writing<<<. It is not the-big-important writing"
+        },
+        {
+          "activation": 0.028817420825362206,
+          "chain_idx": 6715,
+          "window_start": 0,
+          "text": ">>>I was recently invited<<< to escape cold, gray Columbus, Ohio for a"
+        },
+        {
+          "activation": 0.0288156159222126,
+          "chain_idx": 5458,
+          "window_start": 0,
+          "text": ">>>10 things you<<< may have missed at Google I/O\nLast"
+        },
+        {
+          "activation": 0.02881302498281002,
+          "chain_idx": 15545,
+          "window_start": 0,
+          "text": ">>>I need some fresh<<< eyes here, thanks in advance! I'll"
+        },
+        {
+          "activation": 0.02880196087062359,
+          "chain_idx": 19338,
+          "window_start": 0,
+          "text": ">>>In Florida, property<<< owners are generally liable for dangerous conditions that are not"
+        },
+        {
+          "activation": 0.028798935934901237,
+          "chain_idx": 11317,
+          "window_start": 0,
+          "text": ">>>It's time<<< for me to take a little time off from blogging"
+        }
+      ]
+    },
+    "4851": {
+      "mass": 0.3632834032177925,
+      "examples": [
+        {
+          "activation": 0.03640278801321983,
+          "chain_idx": 11751,
+          "window_start": 0,
+          "text": ">>>For particular automobiles,<<< additional elements and attention might be necessary to return the"
+        },
+        {
+          "activation": 0.036369290202856064,
+          "chain_idx": 9575,
+          "window_start": 0,
+          "text": ">>>In many industries,<<< including tobacco, a small number of companies control most"
+        },
+        {
+          "activation": 0.03633163496851921,
+          "chain_idx": 20880,
+          "window_start": 0,
+          "text": ">>>A shame it was<<< a white sky day in Montreal yesterday. I cannot"
+        },
+        {
+          "activation": 0.03633125498890877,
+          "chain_idx": 8884,
+          "window_start": 0,
+          "text": ">>>According to new data<<<, threat actors attacked businesses more than 72"
+        },
+        {
+          "activation": 0.03631997108459473,
+          "chain_idx": 1144,
+          "window_start": 0,
+          "text": ">>>Blogging is writing<<<. It is not the-big-important writing"
+        },
+        {
+          "activation": 0.03631758317351341,
+          "chain_idx": 6715,
+          "window_start": 0,
+          "text": ">>>I was recently invited<<< to escape cold, gray Columbus, Ohio for a"
+        },
+        {
+          "activation": 0.03631586208939552,
+          "chain_idx": 5458,
+          "window_start": 0,
+          "text": ">>>10 things you<<< may have missed at Google I/O\nLast"
+        },
+        {
+          "activation": 0.036311060190200806,
+          "chain_idx": 15545,
+          "window_start": 0,
+          "text": ">>>I need some fresh<<< eyes here, thanks in advance! I'll"
+        },
+        {
+          "activation": 0.03629421815276146,
+          "chain_idx": 19338,
+          "window_start": 0,
+          "text": ">>>In Florida, property<<< owners are generally liable for dangerous conditions that are not"
+        },
+        {
+          "activation": 0.03628974035382271,
+          "chain_idx": 11317,
+          "window_start": 0,
+          "text": ">>>It's time<<< for me to take a little time off from blogging"
+        }
+      ]
+    },
+    "755": {
+      "mass": 0.588962510228157,
+      "examples": [
+        {
+          "activation": 0.0589618980884552,
+          "chain_idx": 11751,
+          "window_start": 0,
+          "text": ">>>For particular automobiles,<<< additional elements and attention might be necessary to return the"
+        },
+        {
+          "activation": 0.05893242359161377,
+          "chain_idx": 9575,
+          "window_start": 0,
+          "text": ">>>In many industries,<<< including tobacco, a small number of companies control most"
+        },
+        {
+          "activation": 0.05889932066202164,
+          "chain_idx": 20880,
+          "window_start": 0,
+          "text": ">>>A shame it was<<< a white sky day in Montreal yesterday. I cannot"
+        },
+        {
+          "activation": 0.058898117393255234,
+          "chain_idx": 8884,
+          "window_start": 0,
+          "text": ">>>According to new data<<<, threat actors attacked businesses more than 72"
+        },
+        {
+          "activation": 0.05888905003666878,
+          "chain_idx": 1144,
+          "window_start": 0,
+          "text": ">>>Blogging is writing<<<. It is not the-big-important writing"
+        },
+        {
+          "activation": 0.05888695269823074,
+          "chain_idx": 6715,
+          "window_start": 0,
+          "text": ">>>I was recently invited<<< to escape cold, gray Columbus, Ohio for a"
+        },
+        {
+          "activation": 0.05888479948043823,
+          "chain_idx": 5458,
+          "window_start": 0,
+          "text": ">>>10 things you<<< may have missed at Google I/O\nLast"
+        },
+        {
+          "activation": 0.058881308883428574,
+          "chain_idx": 15545,
+          "window_start": 0,
+          "text": ">>>I need some fresh<<< eyes here, thanks in advance! I'll"
+        },
+        {
+          "activation": 0.05886626988649368,
+          "chain_idx": 19338,
+          "window_start": 0,
+          "text": ">>>In Florida, property<<< owners are generally liable for dangerous conditions that are not"
+        },
+        {
+          "activation": 0.05886236950755119,
+          "chain_idx": 11317,
+          "window_start": 0,
+          "text": ">>>It's time<<< for me to take a little time off from blogging"
+        }
+      ]
+    },
+    "7029": {
+      "mass": 0.4399399645626545,
+      "examples": [
+        {
+          "activation": 0.0440702810883522,
+          "chain_idx": 11751,
+          "window_start": 0,
+          "text": ">>>For particular automobiles,<<< additional elements and attention might be necessary to return the"
+        },
+        {
+          "activation": 0.044036056846380234,
+          "chain_idx": 9575,
+          "window_start": 0,
+          "text": ">>>In many industries,<<< including tobacco, a small number of companies control most"
+        },
+        {
+          "activation": 0.043997857719659805,
+          "chain_idx": 20880,
+          "window_start": 0,
+          "text": ">>>A shame it was<<< a white sky day in Montreal yesterday. I cannot"
+        },
+        {
+          "activation": 0.04399745166301727,
+          "chain_idx": 8884,
+          "window_start": 0,
+          "text": ">>>According to new data<<<, threat actors attacked businesses more than 72"
+        },
+        {
+          "activation": 0.04398653283715248,
+          "chain_idx": 1144,
+          "window_start": 0,
+          "text": ">>>Blogging is writing<<<. It is not the-big-important writing"
+        },
+        {
+          "activation": 0.04398299381136894,
+          "chain_idx": 6715,
+          "window_start": 0,
+          "text": ">>>I was recently invited<<< to escape cold, gray Columbus, Ohio for a"
+        },
+        {
+          "activation": 0.04398023709654808,
+          "chain_idx": 5458,
+          "window_start": 0,
+          "text": ">>>10 things you<<< may have missed at Google I/O\nLast"
+        },
+        {
+          "activation": 0.04397628828883171,
+          "chain_idx": 15545,
+          "window_start": 0,
+          "text": ">>>I need some fresh<<< eyes here, thanks in advance! I'll"
+        },
+        {
+          "activation": 0.0439586266875267,
+          "chain_idx": 19338,
+          "window_start": 0,
+          "text": ">>>In Florida, property<<< owners are generally liable for dangerous conditions that are not"
+        },
+        {
+          "activation": 0.04395363852381706,
+          "chain_idx": 11317,
+          "window_start": 0,
+          "text": ">>>It's time<<< for me to take a little time off from blogging"
+        }
+      ]
+    },
+    "3698": {
+      "mass": 0.6206903494894505,
+      "examples": [
+        {
+          "activation": 0.06212541460990906,
+          "chain_idx": 11751,
+          "window_start": 0,
+          "text": ">>>For particular automobiles,<<< additional elements and attention might be necessary to return the"
+        },
+        {
+          "activation": 0.06210056692361832,
+          "chain_idx": 9575,
+          "window_start": 0,
+          "text": ">>>In many industries,<<< including tobacco, a small number of companies control most"
+        },
+        {
+          "activation": 0.06207182630896568,
+          "chain_idx": 20880,
+          "window_start": 0,
+          "text": ">>>A shame it was<<< a white sky day in Montreal yesterday. I cannot"
+        },
+        {
+          "activation": 0.06206808611750603,
+          "chain_idx": 8884,
+          "window_start": 0,
+          "text": ">>>According to new data<<<, threat actors attacked businesses more than 72"
+        },
+        {
+          "activation": 0.06206166744232178,
+          "chain_idx": 1144,
+          "window_start": 0,
+          "text": ">>>Blogging is writing<<<. It is not the-big-important writing"
+        },
+        {
+          "activation": 0.06206165626645088,
+          "chain_idx": 6715,
+          "window_start": 0,
+          "text": ">>>I was recently invited<<< to escape cold, gray Columbus, Ohio for a"
+        },
+        {
+          "activation": 0.062059350311756134,
+          "chain_idx": 5458,
+          "window_start": 0,
+          "text": ">>>10 things you<<< may have missed at Google I/O\nLast"
+        },
+        {
+          "activation": 0.06205696985125542,
+          "chain_idx": 15545,
+          "window_start": 0,
+          "text": ">>>I need some fresh<<< eyes here, thanks in advance! I'll"
+        },
+        {
+          "activation": 0.06204409524798393,
+          "chain_idx": 19338,
+          "window_start": 0,
+          "text": ">>>In Florida, property<<< owners are generally liable for dangerous conditions that are not"
+        },
+        {
+          "activation": 0.06204071640968323,
+          "chain_idx": 11317,
+          "window_start": 0,
+          "text": ">>>It's time<<< for me to take a little time off from blogging"
+        }
+      ]
+    },
+    "3190": {
+      "mass": 0.5814473181962967,
+      "examples": [
+        {
+          "activation": 0.05819813534617424,
+          "chain_idx": 11751,
+          "window_start": 0,
+          "text": ">>>For particular automobiles,<<< additional elements and attention might be necessary to return the"
+        },
+        {
+          "activation": 0.058174390345811844,
+          "chain_idx": 9575,
+          "window_start": 0,
+          "text": ">>>In many industries,<<< including tobacco, a small number of companies control most"
+        },
+        {
+          "activation": 0.05814724788069725,
+          "chain_idx": 20880,
+          "window_start": 0,
+          "text": ">>>A shame it was<<< a white sky day in Montreal yesterday. I cannot"
+        },
+        {
+          "activation": 0.05814441666007042,
+          "chain_idx": 8884,
+          "window_start": 0,
+          "text": ">>>According to new data<<<, threat actors attacked businesses more than 72"
+        },
+        {
+          "activation": 0.058137740939855576,
+          "chain_idx": 1144,
+          "window_start": 0,
+          "text": ">>>Blogging is writing<<<. It is not the-big-important writing"
+        },
+        {
+          "activation": 0.05813765153288841,
+          "chain_idx": 6715,
+          "window_start": 0,
+          "text": ">>>I was recently invited<<< to escape cold, gray Columbus, Ohio for a"
+        },
+        {
+          "activation": 0.058135826140642166,
+          "chain_idx": 5458,
+          "window_start": 0,
+          "text": ">>>10 things you<<< may have missed at Google I/O\nLast"
+        },
+        {
+          "activation": 0.058133240789175034,
+          "chain_idx": 15545,
+          "window_start": 0,
+          "text": ">>>I need some fresh<<< eyes here, thanks in advance! I'll"
+        },
+        {
+          "activation": 0.05812084302306175,
+          "chain_idx": 19338,
+          "window_start": 0,
+          "text": ">>>In Florida, property<<< owners are generally liable for dangerous conditions that are not"
+        },
+        {
+          "activation": 0.05811782553792,
+          "chain_idx": 11317,
+          "window_start": 0,
+          "text": ">>>It's time<<< for me to take a little time off from blogging"
+        }
+      ]
+    },
+    "1530": {
+      "mass": 0.6176656112074852,
+      "examples": [
+        {
+          "activation": 0.06183093413710594,
+          "chain_idx": 11751,
+          "window_start": 0,
+          "text": ">>>For particular automobiles,<<< additional elements and attention might be necessary to return the"
+        },
+        {
+          "activation": 0.061802495270967484,
+          "chain_idx": 9575,
+          "window_start": 0,
+          "text": ">>>In many industries,<<< including tobacco, a small number of companies control most"
+        },
+        {
+          "activation": 0.06177015230059624,
+          "chain_idx": 20880,
+          "window_start": 0,
+          "text": ">>>A shame it was<<< a white sky day in Montreal yesterday. I cannot"
+        },
+        {
+          "activation": 0.06176527217030525,
+          "chain_idx": 8884,
+          "window_start": 0,
+          "text": ">>>According to new data<<<, threat actors attacked businesses more than 72"
+        },
+        {
+          "activation": 0.06175846979022026,
+          "chain_idx": 1144,
+          "window_start": 0,
+          "text": ">>>Blogging is writing<<<. It is not the-big-important writing"
+        },
+        {
+          "activation": 0.06175832822918892,
+          "chain_idx": 6715,
+          "window_start": 0,
+          "text": ">>>I was recently invited<<< to escape cold, gray Columbus, Ohio for a"
+        },
+        {
+          "activation": 0.06175512075424194,
+          "chain_idx": 5458,
+          "window_start": 0,
+          "text": ">>>10 things you<<< may have missed at Google I/O\nLast"
+        },
+        {
+          "activation": 0.06175285577774048,
+          "chain_idx": 15545,
+          "window_start": 0,
+          "text": ">>>I need some fresh<<< eyes here, thanks in advance! I'll"
+        },
+        {
+          "activation": 0.061737995594739914,
+          "chain_idx": 19338,
+          "window_start": 0,
+          "text": ">>>In Florida, property<<< owners are generally liable for dangerous conditions that are not"
+        },
+        {
+          "activation": 0.06173398718237877,
+          "chain_idx": 11317,
+          "window_start": 0,
+          "text": ">>>It's time<<< for me to take a little time off from blogging"
+        }
+      ]
+    },
+    "5117": {
+      "mass": 0.5066364742815495,
+      "examples": [
+        {
+          "activation": 0.05071789771318436,
+          "chain_idx": 11751,
+          "window_start": 0,
+          "text": ">>>For particular automobiles,<<< additional elements and attention might be necessary to return the"
+        },
+        {
+          "activation": 0.05069325119256973,
+          "chain_idx": 9575,
+          "window_start": 0,
+          "text": ">>>In many industries,<<< including tobacco, a small number of companies control most"
+        },
+        {
+          "activation": 0.050665825605392456,
+          "chain_idx": 20880,
+          "window_start": 0,
+          "text": ">>>A shame it was<<< a white sky day in Montreal yesterday. I cannot"
+        },
+        {
+          "activation": 0.050665706396102905,
+          "chain_idx": 8884,
+          "window_start": 0,
+          "text": ">>>According to new data<<<, threat actors attacked businesses more than 72"
+        },
+        {
+          "activation": 0.05065775662660599,
+          "chain_idx": 1144,
+          "window_start": 0,
+          "text": ">>>Blogging is writing<<<. It is not the-big-important writing"
+        },
+        {
+          "activation": 0.05065632611513138,
+          "chain_idx": 6715,
+          "window_start": 0,
+          "text": ">>>I was recently invited<<< to escape cold, gray Columbus, Ohio for a"
+        },
+        {
+          "activation": 0.05065393075346947,
+          "chain_idx": 5458,
+          "window_start": 0,
+          "text": ">>>10 things you<<< may have missed at Google I/O\nLast"
+        },
+        {
+          "activation": 0.05065136030316353,
+          "chain_idx": 15545,
+          "window_start": 0,
+          "text": ">>>I need some fresh<<< eyes here, thanks in advance! I'll"
+        },
+        {
+          "activation": 0.05063873529434204,
+          "chain_idx": 19338,
+          "window_start": 0,
+          "text": ">>>In Florida, property<<< owners are generally liable for dangerous conditions that are not"
+        },
+        {
+          "activation": 0.0506356842815876,
+          "chain_idx": 11317,
+          "window_start": 0,
+          "text": ">>>It's time<<< for me to take a little time off from blogging"
+        }
+      ]
+    }
+  }
+}

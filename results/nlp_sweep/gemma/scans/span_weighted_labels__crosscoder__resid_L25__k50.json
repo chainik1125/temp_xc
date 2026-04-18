@@ -1,0 +1,12 @@
+{
+  "arch": "crosscoder",
+  "layer_key": "resid_L25",
+  "k": 50,
+  "T": 5,
+  "explainer": "claude-haiku-4-5-20251001",
+  "n_features_labeled": 1,
+  "top_features": 25,
+  "labels": {
+    "4": "Tokens immediately following \"would\" or \"did\" that complete verb phrases or introduce qualitative descriptions."
+  }
+}

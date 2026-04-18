@@ -1,0 +1,1666 @@
+{
+  "arch": "tfa_pos_pred",
+  "subject_model": "gemma-2-2b-it",
+  "layer_key": "resid_L25",
+  "k": 50,
+  "T": 5,
+  "sample_chains": 1000,
+  "top_k_per_feature": 10,
+  "d_sae": 18432,
+  "num_active_features": 7783,
+  "requested_feats": [
+    1579,
+    1969,
+    2175,
+    3142,
+    3148,
+    3281,
+    3715,
+    4792,
+    5298,
+    6370,
+    6471,
+    6783,
+    7287,
+    9722,
+    10180,
+    10702,
+    12861,
+    13011,
+    13375,
+    14892,
+    15186,
+    16462,
+    16843,
+    17179,
+    17416
+  ],
+  "dead_feats": [],
+  "features": {
+    "3715": {
+      "mass": 0.021777407731860876,
+      "examples": [
+        {
+          "activation": 0.0026005518157035112,
+          "chain_idx": 20809,
+          "window_start": 54,
+          "text": "\u9019\u500b\u5730\u9ede\u6700\u5947\u7279\u7684\u5730\u65b9\u662f\u897f\u90e8\uff0c\u9130>>>\u8fd1\u4e00\u4e9b\u5bb6\u65cf\u6c0f\u65cf\u7684<<<\u5893\u5730\u3002\u8a72\u5893\u5730\u4e5f\u5b9a\u7fa9\u4e86\u6751"
+        },
+        {
+          "activation": 0.002375589683651924,
+          "chain_idx": 20809,
+          "window_start": 55,
+          "text": "\u5730\u9ede\u6700\u5947\u7279\u7684\u5730\u65b9\u662f\u897f\u90e8\uff0c\u9130\u8fd1>>>\u4e00\u4e9b\u5bb6\u65cf\u6c0f\u65cf\u7684\u5893<<<\u5730\u3002\u8a72\u5893\u5730\u4e5f\u5b9a\u7fa9\u4e86\u6751\u838a"
+        },
+        {
+          "activation": 0.0023468981962651014,
+          "chain_idx": 20809,
+          "window_start": 5,
+          "text": "\u9019\u5ea7\u623f\u5b50\u5750>>>\u843d\u5728\u5168\u5dde\u5e02\u90ca\u7684\u4e00\u500b<<<\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168\u5dde\u5e02"
+        },
+        {
+          "activation": 0.0022140773944556713,
+          "chain_idx": 20809,
+          "window_start": 32,
+          "text": "\u6700\u5e73\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00\u3002>>>\u5317\u90e8\u6709\u4e00\u7247\u677e\u6a39<<<\u6797\uff0c\u5357\u90e8\u6709\u4e00\u500b\u679c\u5712\uff0c\u9019\u500b\u5730\u9ede\u6700"
+        },
+        {
+          "activation": 0.002200458897277713,
+          "chain_idx": 20809,
+          "window_start": 4,
+          "text": "\u9019\u5ea7\u623f\u5b50>>>\u5750\u843d\u5728\u5168\u5dde\u5e02\u90ca<<<\u7684\u4e00\u500b\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168"
+        },
+        {
+          "activation": 0.002104818122461438,
+          "chain_idx": 20809,
+          "window_start": 6,
+          "text": "\u9019\u5ea7\u623f\u5b50\u5750\u843d\u5728>>>\u5168\u5dde\u5e02\u90ca\u7684\u4e00\u500b\u53eb\u505a<<< Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168\u5dde\u5e02\u662f"
+        },
+        {
+          "activation": 0.0020154048688709736,
+          "chain_idx": 20809,
+          "window_start": 31,
+          "text": "\u97d3\u570b\u6700\u5e73\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00>>>\u3002\u5317\u90e8\u6709\u4e00\u7247\u677e<<<\u6a39\u6797\uff0c\u5357\u90e8\u6709\u4e00\u500b\u679c\u5712\uff0c\u9019\u500b\u5730\u9ede"
+        },
+        {
+          "activation": 0.0019874856807291508,
+          "chain_idx": 20809,
+          "window_start": 19,
+          "text": "\u7684\u4e00\u500b\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168>>>\u5dde\u5e02\u662f\u97d3\u570b\u6700\u5e73<<<\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00\u3002\u5317\u90e8\u6709\u4e00"
+        },
+        {
+          "activation": 0.001971099991351366,
+          "chain_idx": 20809,
+          "window_start": 33,
+          "text": "\u5e73\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00\u3002\u5317\u90e8>>>\u6709\u4e00\u7247\u677e\u6a39\u6797<<<\uff0c\u5357\u90e8\u6709\u4e00\u500b\u679c\u5712\uff0c\u9019\u500b\u5730\u9ede\u6700\u5947"
+        },
+        {
+          "activation": 0.0019610230810940266,
+          "chain_idx": 20809,
+          "window_start": 37,
+          "text": "\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00\u3002\u5317\u90e8\u6709\u4e00\u7247\u677e\u6a39>>>\u6797\uff0c\u5357\u90e8\u6709\u4e00\u500b\u679c<<<\u5712\uff0c\u9019\u500b\u5730\u9ede\u6700\u5947\u7279\u7684\u5730\u65b9\u662f\u897f\u90e8"
+        }
+      ]
+    },
+    "17416": {
+      "mass": 0.021124404040165246,
+      "examples": [
+        {
+          "activation": 0.002537274267524481,
+          "chain_idx": 20809,
+          "window_start": 54,
+          "text": "\u9019\u500b\u5730\u9ede\u6700\u5947\u7279\u7684\u5730\u65b9\u662f\u897f\u90e8\uff0c\u9130>>>\u8fd1\u4e00\u4e9b\u5bb6\u65cf\u6c0f\u65cf\u7684<<<\u5893\u5730\u3002\u8a72\u5893\u5730\u4e5f\u5b9a\u7fa9\u4e86\u6751"
+        },
+        {
+          "activation": 0.002291746437549591,
+          "chain_idx": 20809,
+          "window_start": 55,
+          "text": "\u5730\u9ede\u6700\u5947\u7279\u7684\u5730\u65b9\u662f\u897f\u90e8\uff0c\u9130\u8fd1>>>\u4e00\u4e9b\u5bb6\u65cf\u6c0f\u65cf\u7684\u5893<<<\u5730\u3002\u8a72\u5893\u5730\u4e5f\u5b9a\u7fa9\u4e86\u6751\u838a"
+        },
+        {
+          "activation": 0.002269360702484846,
+          "chain_idx": 20809,
+          "window_start": 5,
+          "text": "\u9019\u5ea7\u623f\u5b50\u5750>>>\u843d\u5728\u5168\u5dde\u5e02\u90ca\u7684\u4e00\u500b<<<\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168\u5dde\u5e02"
+        },
+        {
+          "activation": 0.002157032024115324,
+          "chain_idx": 20809,
+          "window_start": 32,
+          "text": "\u6700\u5e73\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00\u3002>>>\u5317\u90e8\u6709\u4e00\u7247\u677e\u6a39<<<\u6797\uff0c\u5357\u90e8\u6709\u4e00\u500b\u679c\u5712\uff0c\u9019\u500b\u5730\u9ede\u6700"
+        },
+        {
+          "activation": 0.0021299973595887423,
+          "chain_idx": 20809,
+          "window_start": 4,
+          "text": "\u9019\u5ea7\u623f\u5b50>>>\u5750\u843d\u5728\u5168\u5dde\u5e02\u90ca<<<\u7684\u4e00\u500b\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168"
+        },
+        {
+          "activation": 0.0020293144043534994,
+          "chain_idx": 20809,
+          "window_start": 6,
+          "text": "\u9019\u5ea7\u623f\u5b50\u5750\u843d\u5728>>>\u5168\u5dde\u5e02\u90ca\u7684\u4e00\u500b\u53eb\u505a<<< Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168\u5dde\u5e02\u662f"
+        },
+        {
+          "activation": 0.001957796048372984,
+          "chain_idx": 20809,
+          "window_start": 31,
+          "text": "\u97d3\u570b\u6700\u5e73\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00>>>\u3002\u5317\u90e8\u6709\u4e00\u7247\u677e<<<\u6a39\u6797\uff0c\u5357\u90e8\u6709\u4e00\u500b\u679c\u5712\uff0c\u9019\u500b\u5730\u9ede"
+        },
+        {
+          "activation": 0.0019211508333683014,
+          "chain_idx": 20809,
+          "window_start": 19,
+          "text": "\u7684\u4e00\u500b\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168>>>\u5dde\u5e02\u662f\u97d3\u570b\u6700\u5e73<<<\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00\u3002\u5317\u90e8\u6709\u4e00"
+        },
+        {
+          "activation": 0.0019198025111109018,
+          "chain_idx": 20809,
+          "window_start": 3,
+          "text": "\u9019\u5ea7>>>\u623f\u5b50\u5750\u843d\u5728\u5168\u5dde\u5e02<<<\u90ca\u7684\u4e00\u500b\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c"
+        },
+        {
+          "activation": 0.0019109294516965747,
+          "chain_idx": 20809,
+          "window_start": 53,
+          "text": "\uff0c\u9019\u500b\u5730\u9ede\u6700\u5947\u7279\u7684\u5730\u65b9\u662f\u897f\u90e8\uff0c>>>\u9130\u8fd1\u4e00\u4e9b\u5bb6\u65cf\u6c0f<<<\u65cf\u7684\u5893\u5730\u3002\u8a72\u5893\u5730\u4e5f\u5b9a\u7fa9\u4e86"
+        }
+      ]
+    },
+    "17179": {
+      "mass": 0.020396220381371677,
+      "examples": [
+        {
+          "activation": 0.0024399838875979185,
+          "chain_idx": 20809,
+          "window_start": 54,
+          "text": "\u9019\u500b\u5730\u9ede\u6700\u5947\u7279\u7684\u5730\u65b9\u662f\u897f\u90e8\uff0c\u9130>>>\u8fd1\u4e00\u4e9b\u5bb6\u65cf\u6c0f\u65cf\u7684<<<\u5893\u5730\u3002\u8a72\u5893\u5730\u4e5f\u5b9a\u7fa9\u4e86\u6751"
+        },
+        {
+          "activation": 0.002211370039731264,
+          "chain_idx": 20809,
+          "window_start": 55,
+          "text": "\u5730\u9ede\u6700\u5947\u7279\u7684\u5730\u65b9\u662f\u897f\u90e8\uff0c\u9130\u8fd1>>>\u4e00\u4e9b\u5bb6\u65cf\u6c0f\u65cf\u7684\u5893<<<\u5730\u3002\u8a72\u5893\u5730\u4e5f\u5b9a\u7fa9\u4e86\u6751\u838a"
+        },
+        {
+          "activation": 0.0021908050402998924,
+          "chain_idx": 20809,
+          "window_start": 5,
+          "text": "\u9019\u5ea7\u623f\u5b50\u5750>>>\u843d\u5728\u5168\u5dde\u5e02\u90ca\u7684\u4e00\u500b<<<\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168\u5dde\u5e02"
+        },
+        {
+          "activation": 0.0020786940585821867,
+          "chain_idx": 20809,
+          "window_start": 32,
+          "text": "\u6700\u5e73\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00\u3002>>>\u5317\u90e8\u6709\u4e00\u7247\u677e\u6a39<<<\u6797\uff0c\u5357\u90e8\u6709\u4e00\u500b\u679c\u5712\uff0c\u9019\u500b\u5730\u9ede\u6700"
+        },
+        {
+          "activation": 0.0020580238196998835,
+          "chain_idx": 20809,
+          "window_start": 4,
+          "text": "\u9019\u5ea7\u623f\u5b50>>>\u5750\u843d\u5728\u5168\u5dde\u5e02\u90ca<<<\u7684\u4e00\u500b\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168"
+        },
+        {
+          "activation": 0.0019662342965602875,
+          "chain_idx": 20809,
+          "window_start": 6,
+          "text": "\u9019\u5ea7\u623f\u5b50\u5750\u843d\u5728>>>\u5168\u5dde\u5e02\u90ca\u7684\u4e00\u500b\u53eb\u505a<<< Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168\u5dde\u5e02\u662f"
+        },
+        {
+          "activation": 0.001900233211927116,
+          "chain_idx": 20809,
+          "window_start": 31,
+          "text": "\u97d3\u570b\u6700\u5e73\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00>>>\u3002\u5317\u90e8\u6709\u4e00\u7247\u677e<<<\u6a39\u6797\uff0c\u5357\u90e8\u6709\u4e00\u500b\u679c\u5712\uff0c\u9019\u500b\u5730\u9ede"
+        },
+        {
+          "activation": 0.0018594451248645782,
+          "chain_idx": 20809,
+          "window_start": 19,
+          "text": "\u7684\u4e00\u500b\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168>>>\u5dde\u5e02\u662f\u97d3\u570b\u6700\u5e73<<<\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00\u3002\u5317\u90e8\u6709\u4e00"
+        },
+        {
+          "activation": 0.0018506081542000175,
+          "chain_idx": 20809,
+          "window_start": 37,
+          "text": "\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00\u3002\u5317\u90e8\u6709\u4e00\u7247\u677e\u6a39>>>\u6797\uff0c\u5357\u90e8\u6709\u4e00\u500b\u679c<<<\u5712\uff0c\u9019\u500b\u5730\u9ede\u6700\u5947\u7279\u7684\u5730\u65b9\u662f\u897f\u90e8"
+        },
+        {
+          "activation": 0.0018408227479085326,
+          "chain_idx": 20809,
+          "window_start": 3,
+          "text": "\u9019\u5ea7>>>\u623f\u5b50\u5750\u843d\u5728\u5168\u5dde\u5e02<<<\u90ca\u7684\u4e00\u500b\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c"
+        }
+      ]
+    },
+    "1579": {
+      "mass": 0.033273878740146756,
+      "examples": [
+        {
+          "activation": 0.003981296438723803,
+          "chain_idx": 20809,
+          "window_start": 54,
+          "text": "\u9019\u500b\u5730\u9ede\u6700\u5947\u7279\u7684\u5730\u65b9\u662f\u897f\u90e8\uff0c\u9130>>>\u8fd1\u4e00\u4e9b\u5bb6\u65cf\u6c0f\u65cf\u7684<<<\u5893\u5730\u3002\u8a72\u5893\u5730\u4e5f\u5b9a\u7fa9\u4e86\u6751"
+        },
+        {
+          "activation": 0.0035903628449887037,
+          "chain_idx": 20809,
+          "window_start": 55,
+          "text": "\u5730\u9ede\u6700\u5947\u7279\u7684\u5730\u65b9\u662f\u897f\u90e8\uff0c\u9130\u8fd1>>>\u4e00\u4e9b\u5bb6\u65cf\u6c0f\u65cf\u7684\u5893<<<\u5730\u3002\u8a72\u5893\u5730\u4e5f\u5b9a\u7fa9\u4e86\u6751\u838a"
+        },
+        {
+          "activation": 0.0035766318906098604,
+          "chain_idx": 20809,
+          "window_start": 5,
+          "text": "\u9019\u5ea7\u623f\u5b50\u5750>>>\u843d\u5728\u5168\u5dde\u5e02\u90ca\u7684\u4e00\u500b<<<\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168\u5dde\u5e02"
+        },
+        {
+          "activation": 0.0034120045602321625,
+          "chain_idx": 20809,
+          "window_start": 32,
+          "text": "\u6700\u5e73\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00\u3002>>>\u5317\u90e8\u6709\u4e00\u7247\u677e\u6a39<<<\u6797\uff0c\u5357\u90e8\u6709\u4e00\u500b\u679c\u5712\uff0c\u9019\u500b\u5730\u9ede\u6700"
+        },
+        {
+          "activation": 0.003360072849318385,
+          "chain_idx": 20809,
+          "window_start": 4,
+          "text": "\u9019\u5ea7\u623f\u5b50>>>\u5750\u843d\u5728\u5168\u5dde\u5e02\u90ca<<<\u7684\u4e00\u500b\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168"
+        },
+        {
+          "activation": 0.0032190510537475348,
+          "chain_idx": 20809,
+          "window_start": 6,
+          "text": "\u9019\u5ea7\u623f\u5b50\u5750\u843d\u5728>>>\u5168\u5dde\u5e02\u90ca\u7684\u4e00\u500b\u53eb\u505a<<< Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168\u5dde\u5e02\u662f"
+        },
+        {
+          "activation": 0.0030889175832271576,
+          "chain_idx": 20809,
+          "window_start": 31,
+          "text": "\u97d3\u570b\u6700\u5e73\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00>>>\u3002\u5317\u90e8\u6709\u4e00\u7247\u677e<<<\u6a39\u6797\uff0c\u5357\u90e8\u6709\u4e00\u500b\u679c\u5712\uff0c\u9019\u500b\u5730\u9ede"
+        },
+        {
+          "activation": 0.003036661772057414,
+          "chain_idx": 20809,
+          "window_start": 19,
+          "text": "\u7684\u4e00\u500b\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168>>>\u5dde\u5e02\u662f\u97d3\u570b\u6700\u5e73<<<\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00\u3002\u5317\u90e8\u6709\u4e00"
+        },
+        {
+          "activation": 0.003008059225976467,
+          "chain_idx": 20809,
+          "window_start": 3,
+          "text": "\u9019\u5ea7>>>\u623f\u5b50\u5750\u843d\u5728\u5168\u5dde\u5e02<<<\u90ca\u7684\u4e00\u500b\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c"
+        },
+        {
+          "activation": 0.0030008205212652683,
+          "chain_idx": 20809,
+          "window_start": 53,
+          "text": "\uff0c\u9019\u500b\u5730\u9ede\u6700\u5947\u7279\u7684\u5730\u65b9\u662f\u897f\u90e8\uff0c>>>\u9130\u8fd1\u4e00\u4e9b\u5bb6\u65cf\u6c0f<<<\u65cf\u7684\u5893\u5730\u3002\u8a72\u5893\u5730\u4e5f\u5b9a\u7fa9\u4e86"
+        }
+      ]
+    },
+    "14892": {
+      "mass": 0.02219957672059536,
+      "examples": [
+        {
+          "activation": 0.002660722006112337,
+          "chain_idx": 20809,
+          "window_start": 54,
+          "text": "\u9019\u500b\u5730\u9ede\u6700\u5947\u7279\u7684\u5730\u65b9\u662f\u897f\u90e8\uff0c\u9130>>>\u8fd1\u4e00\u4e9b\u5bb6\u65cf\u6c0f\u65cf\u7684<<<\u5893\u5730\u3002\u8a72\u5893\u5730\u4e5f\u5b9a\u7fa9\u4e86\u6751"
+        },
+        {
+          "activation": 0.002389746019616723,
+          "chain_idx": 20809,
+          "window_start": 5,
+          "text": "\u9019\u5ea7\u623f\u5b50\u5750>>>\u843d\u5728\u5168\u5dde\u5e02\u90ca\u7684\u4e00\u500b<<<\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168\u5dde\u5e02"
+        },
+        {
+          "activation": 0.0023887460120022297,
+          "chain_idx": 20809,
+          "window_start": 55,
+          "text": "\u5730\u9ede\u6700\u5947\u7279\u7684\u5730\u65b9\u662f\u897f\u90e8\uff0c\u9130\u8fd1>>>\u4e00\u4e9b\u5bb6\u65cf\u6c0f\u65cf\u7684\u5893<<<\u5730\u3002\u8a72\u5893\u5730\u4e5f\u5b9a\u7fa9\u4e86\u6751\u838a"
+        },
+        {
+          "activation": 0.002275534439831972,
+          "chain_idx": 20809,
+          "window_start": 32,
+          "text": "\u6700\u5e73\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00\u3002>>>\u5317\u90e8\u6709\u4e00\u7247\u677e\u6a39<<<\u6797\uff0c\u5357\u90e8\u6709\u4e00\u500b\u679c\u5712\uff0c\u9019\u500b\u5730\u9ede\u6700"
+        },
+        {
+          "activation": 0.0022462885826826096,
+          "chain_idx": 20809,
+          "window_start": 4,
+          "text": "\u9019\u5ea7\u623f\u5b50>>>\u5750\u843d\u5728\u5168\u5dde\u5e02\u90ca<<<\u7684\u4e00\u500b\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168"
+        },
+        {
+          "activation": 0.0021368234883993864,
+          "chain_idx": 20809,
+          "window_start": 6,
+          "text": "\u9019\u5ea7\u623f\u5b50\u5750\u843d\u5728>>>\u5168\u5dde\u5e02\u90ca\u7684\u4e00\u500b\u53eb\u505a<<< Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168\u5dde\u5e02\u662f"
+        },
+        {
+          "activation": 0.0020659840665757656,
+          "chain_idx": 20809,
+          "window_start": 31,
+          "text": "\u97d3\u570b\u6700\u5e73\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00>>>\u3002\u5317\u90e8\u6709\u4e00\u7247\u677e<<<\u6a39\u6797\uff0c\u5357\u90e8\u6709\u4e00\u500b\u679c\u5712\uff0c\u9019\u500b\u5730\u9ede"
+        },
+        {
+          "activation": 0.0020161964930593967,
+          "chain_idx": 20809,
+          "window_start": 19,
+          "text": "\u7684\u4e00\u500b\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168>>>\u5dde\u5e02\u662f\u97d3\u570b\u6700\u5e73<<<\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00\u3002\u5317\u90e8\u6709\u4e00"
+        },
+        {
+          "activation": 0.0020160996355116367,
+          "chain_idx": 20809,
+          "window_start": 3,
+          "text": "\u9019\u5ea7>>>\u623f\u5b50\u5750\u843d\u5728\u5168\u5dde\u5e02<<<\u90ca\u7684\u4e00\u500b\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c"
+        },
+        {
+          "activation": 0.0020034359768033028,
+          "chain_idx": 20809,
+          "window_start": 53,
+          "text": "\uff0c\u9019\u500b\u5730\u9ede\u6700\u5947\u7279\u7684\u5730\u65b9\u662f\u897f\u90e8\uff0c>>>\u9130\u8fd1\u4e00\u4e9b\u5bb6\u65cf\u6c0f<<<\u65cf\u7684\u5893\u5730\u3002\u8a72\u5893\u5730\u4e5f\u5b9a\u7fa9\u4e86"
+        }
+      ]
+    },
+    "1969": {
+      "mass": 0.021018058992922306,
+      "examples": [
+        {
+          "activation": 0.002502952702343464,
+          "chain_idx": 20809,
+          "window_start": 54,
+          "text": "\u9019\u500b\u5730\u9ede\u6700\u5947\u7279\u7684\u5730\u65b9\u662f\u897f\u90e8\uff0c\u9130>>>\u8fd1\u4e00\u4e9b\u5bb6\u65cf\u6c0f\u65cf\u7684<<<\u5893\u5730\u3002\u8a72\u5893\u5730\u4e5f\u5b9a\u7fa9\u4e86\u6751"
+        },
+        {
+          "activation": 0.0022900302428752184,
+          "chain_idx": 20809,
+          "window_start": 55,
+          "text": "\u5730\u9ede\u6700\u5947\u7279\u7684\u5730\u65b9\u662f\u897f\u90e8\uff0c\u9130\u8fd1>>>\u4e00\u4e9b\u5bb6\u65cf\u6c0f\u65cf\u7684\u5893<<<\u5730\u3002\u8a72\u5893\u5730\u4e5f\u5b9a\u7fa9\u4e86\u6751\u838a"
+        },
+        {
+          "activation": 0.002267955569550395,
+          "chain_idx": 20809,
+          "window_start": 5,
+          "text": "\u9019\u5ea7\u623f\u5b50\u5750>>>\u843d\u5728\u5168\u5dde\u5e02\u90ca\u7684\u4e00\u500b<<<\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168\u5dde\u5e02"
+        },
+        {
+          "activation": 0.002150361193343997,
+          "chain_idx": 20809,
+          "window_start": 32,
+          "text": "\u6700\u5e73\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00\u3002>>>\u5317\u90e8\u6709\u4e00\u7247\u677e\u6a39<<<\u6797\uff0c\u5357\u90e8\u6709\u4e00\u500b\u679c\u5712\uff0c\u9019\u500b\u5730\u9ede\u6700"
+        },
+        {
+          "activation": 0.002112489426508546,
+          "chain_idx": 20809,
+          "window_start": 4,
+          "text": "\u9019\u5ea7\u623f\u5b50>>>\u5750\u843d\u5728\u5168\u5dde\u5e02\u90ca<<<\u7684\u4e00\u500b\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168"
+        },
+        {
+          "activation": 0.0020355142187327147,
+          "chain_idx": 20809,
+          "window_start": 6,
+          "text": "\u9019\u5ea7\u623f\u5b50\u5750\u843d\u5728>>>\u5168\u5dde\u5e02\u90ca\u7684\u4e00\u500b\u53eb\u505a<<< Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168\u5dde\u5e02\u662f"
+        },
+        {
+          "activation": 0.001964758848771453,
+          "chain_idx": 20809,
+          "window_start": 31,
+          "text": "\u97d3\u570b\u6700\u5e73\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00>>>\u3002\u5317\u90e8\u6709\u4e00\u7247\u677e<<<\u6a39\u6797\uff0c\u5357\u90e8\u6709\u4e00\u500b\u679c\u5712\uff0c\u9019\u500b\u5730\u9ede"
+        },
+        {
+          "activation": 0.0019131748704239726,
+          "chain_idx": 20809,
+          "window_start": 19,
+          "text": "\u7684\u4e00\u500b\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168>>>\u5dde\u5e02\u662f\u97d3\u570b\u6700\u5e73<<<\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00\u3002\u5317\u90e8\u6709\u4e00"
+        },
+        {
+          "activation": 0.0018965557683259249,
+          "chain_idx": 20809,
+          "window_start": 33,
+          "text": "\u5e73\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00\u3002\u5317\u90e8>>>\u6709\u4e00\u7247\u677e\u6a39\u6797<<<\uff0c\u5357\u90e8\u6709\u4e00\u500b\u679c\u5712\uff0c\u9019\u500b\u5730\u9ede\u6700\u5947"
+        },
+        {
+          "activation": 0.0018842661520466208,
+          "chain_idx": 20809,
+          "window_start": 53,
+          "text": "\uff0c\u9019\u500b\u5730\u9ede\u6700\u5947\u7279\u7684\u5730\u65b9\u662f\u897f\u90e8\uff0c>>>\u9130\u8fd1\u4e00\u4e9b\u5bb6\u65cf\u6c0f<<<\u65cf\u7684\u5893\u5730\u3002\u8a72\u5893\u5730\u4e5f\u5b9a\u7fa9\u4e86"
+        }
+      ]
+    },
+    "5298": {
+      "mass": 0.022809211863204837,
+      "examples": [
+        {
+          "activation": 0.00272361165843904,
+          "chain_idx": 20809,
+          "window_start": 54,
+          "text": "\u9019\u500b\u5730\u9ede\u6700\u5947\u7279\u7684\u5730\u65b9\u662f\u897f\u90e8\uff0c\u9130>>>\u8fd1\u4e00\u4e9b\u5bb6\u65cf\u6c0f\u65cf\u7684<<<\u5893\u5730\u3002\u8a72\u5893\u5730\u4e5f\u5b9a\u7fa9\u4e86\u6751"
+        },
+        {
+          "activation": 0.002501976676285267,
+          "chain_idx": 20809,
+          "window_start": 55,
+          "text": "\u5730\u9ede\u6700\u5947\u7279\u7684\u5730\u65b9\u662f\u897f\u90e8\uff0c\u9130\u8fd1>>>\u4e00\u4e9b\u5bb6\u65cf\u6c0f\u65cf\u7684\u5893<<<\u5730\u3002\u8a72\u5893\u5730\u4e5f\u5b9a\u7fa9\u4e86\u6751\u838a"
+        },
+        {
+          "activation": 0.0024471173528581858,
+          "chain_idx": 20809,
+          "window_start": 5,
+          "text": "\u9019\u5ea7\u623f\u5b50\u5750>>>\u843d\u5728\u5168\u5dde\u5e02\u90ca\u7684\u4e00\u500b<<<\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168\u5dde\u5e02"
+        },
+        {
+          "activation": 0.0023171857465058565,
+          "chain_idx": 20809,
+          "window_start": 32,
+          "text": "\u6700\u5e73\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00\u3002>>>\u5317\u90e8\u6709\u4e00\u7247\u677e\u6a39<<<\u6797\uff0c\u5357\u90e8\u6709\u4e00\u500b\u679c\u5712\uff0c\u9019\u500b\u5730\u9ede\u6700"
+        },
+        {
+          "activation": 0.00229291757568717,
+          "chain_idx": 20809,
+          "window_start": 4,
+          "text": "\u9019\u5ea7\u623f\u5b50>>>\u5750\u843d\u5728\u5168\u5dde\u5e02\u90ca<<<\u7684\u4e00\u500b\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168"
+        },
+        {
+          "activation": 0.002211289945989847,
+          "chain_idx": 20809,
+          "window_start": 6,
+          "text": "\u9019\u5ea7\u623f\u5b50\u5750\u843d\u5728>>>\u5168\u5dde\u5e02\u90ca\u7684\u4e00\u500b\u53eb\u505a<<< Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168\u5dde\u5e02\u662f"
+        },
+        {
+          "activation": 0.002114733448252082,
+          "chain_idx": 20809,
+          "window_start": 31,
+          "text": "\u97d3\u570b\u6700\u5e73\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00>>>\u3002\u5317\u90e8\u6709\u4e00\u7247\u677e<<<\u6a39\u6797\uff0c\u5357\u90e8\u6709\u4e00\u500b\u679c\u5712\uff0c\u9019\u500b\u5730\u9ede"
+        },
+        {
+          "activation": 0.0020884850528091192,
+          "chain_idx": 20809,
+          "window_start": 19,
+          "text": "\u7684\u4e00\u500b\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168>>>\u5dde\u5e02\u662f\u97d3\u570b\u6700\u5e73<<<\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00\u3002\u5317\u90e8\u6709\u4e00"
+        },
+        {
+          "activation": 0.0020657319109886885,
+          "chain_idx": 20809,
+          "window_start": 33,
+          "text": "\u5e73\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00\u3002\u5317\u90e8>>>\u6709\u4e00\u7247\u677e\u6a39\u6797<<<\uff0c\u5357\u90e8\u6709\u4e00\u500b\u679c\u5712\uff0c\u9019\u500b\u5730\u9ede\u6700\u5947"
+        },
+        {
+          "activation": 0.0020461624953895807,
+          "chain_idx": 20809,
+          "window_start": 37,
+          "text": "\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00\u3002\u5317\u90e8\u6709\u4e00\u7247\u677e\u6a39>>>\u6797\uff0c\u5357\u90e8\u6709\u4e00\u500b\u679c<<<\u5712\uff0c\u9019\u500b\u5730\u9ede\u6700\u5947\u7279\u7684\u5730\u65b9\u662f\u897f\u90e8"
+        }
+      ]
+    },
+    "4792": {
+      "mass": 0.020510878530330956,
+      "examples": [
+        {
+          "activation": 0.0024385012220591307,
+          "chain_idx": 20809,
+          "window_start": 54,
+          "text": "\u9019\u500b\u5730\u9ede\u6700\u5947\u7279\u7684\u5730\u65b9\u662f\u897f\u90e8\uff0c\u9130>>>\u8fd1\u4e00\u4e9b\u5bb6\u65cf\u6c0f\u65cf\u7684<<<\u5893\u5730\u3002\u8a72\u5893\u5730\u4e5f\u5b9a\u7fa9\u4e86\u6751"
+        },
+        {
+          "activation": 0.002198808593675494,
+          "chain_idx": 20809,
+          "window_start": 5,
+          "text": "\u9019\u5ea7\u623f\u5b50\u5750>>>\u843d\u5728\u5168\u5dde\u5e02\u90ca\u7684\u4e00\u500b<<<\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168\u5dde\u5e02"
+        },
+        {
+          "activation": 0.0021925922483205795,
+          "chain_idx": 20809,
+          "window_start": 55,
+          "text": "\u5730\u9ede\u6700\u5947\u7279\u7684\u5730\u65b9\u662f\u897f\u90e8\uff0c\u9130\u8fd1>>>\u4e00\u4e9b\u5bb6\u65cf\u6c0f\u65cf\u7684\u5893<<<\u5730\u3002\u8a72\u5893\u5730\u4e5f\u5b9a\u7fa9\u4e86\u6751\u838a"
+        },
+        {
+          "activation": 0.002115790266543627,
+          "chain_idx": 20809,
+          "window_start": 32,
+          "text": "\u6700\u5e73\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00\u3002>>>\u5317\u90e8\u6709\u4e00\u7247\u677e\u6a39<<<\u6797\uff0c\u5357\u90e8\u6709\u4e00\u500b\u679c\u5712\uff0c\u9019\u500b\u5730\u9ede\u6700"
+        },
+        {
+          "activation": 0.0020644927863031626,
+          "chain_idx": 20809,
+          "window_start": 4,
+          "text": "\u9019\u5ea7\u623f\u5b50>>>\u5750\u843d\u5728\u5168\u5dde\u5e02\u90ca<<<\u7684\u4e00\u500b\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168"
+        },
+        {
+          "activation": 0.0019756208639591932,
+          "chain_idx": 20809,
+          "window_start": 6,
+          "text": "\u9019\u5ea7\u623f\u5b50\u5750\u843d\u5728>>>\u5168\u5dde\u5e02\u90ca\u7684\u4e00\u500b\u53eb\u505a<<< Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168\u5dde\u5e02\u662f"
+        },
+        {
+          "activation": 0.001938426517881453,
+          "chain_idx": 20809,
+          "window_start": 31,
+          "text": "\u97d3\u570b\u6700\u5e73\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00>>>\u3002\u5317\u90e8\u6709\u4e00\u7247\u677e<<<\u6a39\u6797\uff0c\u5357\u90e8\u6709\u4e00\u500b\u679c\u5712\uff0c\u9019\u500b\u5730\u9ede"
+        },
+        {
+          "activation": 0.0018802756676450372,
+          "chain_idx": 20809,
+          "window_start": 19,
+          "text": "\u7684\u4e00\u500b\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168>>>\u5dde\u5e02\u662f\u97d3\u570b\u6700\u5e73<<<\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00\u3002\u5317\u90e8\u6709\u4e00"
+        },
+        {
+          "activation": 0.0018557505682110786,
+          "chain_idx": 20809,
+          "window_start": 3,
+          "text": "\u9019\u5ea7>>>\u623f\u5b50\u5750\u843d\u5728\u5168\u5dde\u5e02<<<\u90ca\u7684\u4e00\u500b\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c"
+        },
+        {
+          "activation": 0.0018506197957322001,
+          "chain_idx": 20809,
+          "window_start": 37,
+          "text": "\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00\u3002\u5317\u90e8\u6709\u4e00\u7247\u677e\u6a39>>>\u6797\uff0c\u5357\u90e8\u6709\u4e00\u500b\u679c<<<\u5712\uff0c\u9019\u500b\u5730\u9ede\u6700\u5947\u7279\u7684\u5730\u65b9\u662f\u897f\u90e8"
+        }
+      ]
+    },
+    "12861": {
+      "mass": 0.02056542260106653,
+      "examples": [
+        {
+          "activation": 0.0024612934794276953,
+          "chain_idx": 20809,
+          "window_start": 54,
+          "text": "\u9019\u500b\u5730\u9ede\u6700\u5947\u7279\u7684\u5730\u65b9\u662f\u897f\u90e8\uff0c\u9130>>>\u8fd1\u4e00\u4e9b\u5bb6\u65cf\u6c0f\u65cf\u7684<<<\u5893\u5730\u3002\u8a72\u5893\u5730\u4e5f\u5b9a\u7fa9\u4e86\u6751"
+        },
+        {
+          "activation": 0.0022088733967393637,
+          "chain_idx": 20809,
+          "window_start": 5,
+          "text": "\u9019\u5ea7\u623f\u5b50\u5750>>>\u843d\u5728\u5168\u5dde\u5e02\u90ca\u7684\u4e00\u500b<<<\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168\u5dde\u5e02"
+        },
+        {
+          "activation": 0.002208663849160075,
+          "chain_idx": 20809,
+          "window_start": 55,
+          "text": "\u5730\u9ede\u6700\u5947\u7279\u7684\u5730\u65b9\u662f\u897f\u90e8\uff0c\u9130\u8fd1>>>\u4e00\u4e9b\u5bb6\u65cf\u6c0f\u65cf\u7684\u5893<<<\u5730\u3002\u8a72\u5893\u5730\u4e5f\u5b9a\u7fa9\u4e86\u6751\u838a"
+        },
+        {
+          "activation": 0.002121020806953311,
+          "chain_idx": 20809,
+          "window_start": 32,
+          "text": "\u6700\u5e73\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00\u3002>>>\u5317\u90e8\u6709\u4e00\u7247\u677e\u6a39<<<\u6797\uff0c\u5357\u90e8\u6709\u4e00\u500b\u679c\u5712\uff0c\u9019\u500b\u5730\u9ede\u6700"
+        },
+        {
+          "activation": 0.0020744618959724903,
+          "chain_idx": 20809,
+          "window_start": 4,
+          "text": "\u9019\u5ea7\u623f\u5b50>>>\u5750\u843d\u5728\u5168\u5dde\u5e02\u90ca<<<\u7684\u4e00\u500b\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168"
+        },
+        {
+          "activation": 0.001973577542230487,
+          "chain_idx": 20809,
+          "window_start": 6,
+          "text": "\u9019\u5ea7\u623f\u5b50\u5750\u843d\u5728>>>\u5168\u5dde\u5e02\u90ca\u7684\u4e00\u500b\u53eb\u505a<<< Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168\u5dde\u5e02\u662f"
+        },
+        {
+          "activation": 0.0019204173004254699,
+          "chain_idx": 20809,
+          "window_start": 31,
+          "text": "\u97d3\u570b\u6700\u5e73\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00>>>\u3002\u5317\u90e8\u6709\u4e00\u7247\u677e<<<\u6a39\u6797\uff0c\u5357\u90e8\u6709\u4e00\u500b\u679c\u5712\uff0c\u9019\u500b\u5730\u9ede"
+        },
+        {
+          "activation": 0.0018755145138129592,
+          "chain_idx": 20809,
+          "window_start": 19,
+          "text": "\u7684\u4e00\u500b\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168>>>\u5dde\u5e02\u662f\u97d3\u570b\u6700\u5e73<<<\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00\u3002\u5317\u90e8\u6709\u4e00"
+        },
+        {
+          "activation": 0.0018628131365403533,
+          "chain_idx": 20809,
+          "window_start": 3,
+          "text": "\u9019\u5ea7>>>\u623f\u5b50\u5750\u843d\u5728\u5168\u5dde\u5e02<<<\u90ca\u7684\u4e00\u500b\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c"
+        },
+        {
+          "activation": 0.001858786679804325,
+          "chain_idx": 20809,
+          "window_start": 53,
+          "text": "\uff0c\u9019\u500b\u5730\u9ede\u6700\u5947\u7279\u7684\u5730\u65b9\u662f\u897f\u90e8\uff0c>>>\u9130\u8fd1\u4e00\u4e9b\u5bb6\u65cf\u6c0f<<<\u65cf\u7684\u5893\u5730\u3002\u8a72\u5893\u5730\u4e5f\u5b9a\u7fa9\u4e86"
+        }
+      ]
+    },
+    "13375": {
+      "mass": 0.021370314992964268,
+      "examples": [
+        {
+          "activation": 0.0025509644765406847,
+          "chain_idx": 20809,
+          "window_start": 54,
+          "text": "\u9019\u500b\u5730\u9ede\u6700\u5947\u7279\u7684\u5730\u65b9\u662f\u897f\u90e8\uff0c\u9130>>>\u8fd1\u4e00\u4e9b\u5bb6\u65cf\u6c0f\u65cf\u7684<<<\u5893\u5730\u3002\u8a72\u5893\u5730\u4e5f\u5b9a\u7fa9\u4e86\u6751"
+        },
+        {
+          "activation": 0.002300512744113803,
+          "chain_idx": 20809,
+          "window_start": 5,
+          "text": "\u9019\u5ea7\u623f\u5b50\u5750>>>\u843d\u5728\u5168\u5dde\u5e02\u90ca\u7684\u4e00\u500b<<<\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168\u5dde\u5e02"
+        },
+        {
+          "activation": 0.0022836176212877035,
+          "chain_idx": 20809,
+          "window_start": 55,
+          "text": "\u5730\u9ede\u6700\u5947\u7279\u7684\u5730\u65b9\u662f\u897f\u90e8\uff0c\u9130\u8fd1>>>\u4e00\u4e9b\u5bb6\u65cf\u6c0f\u65cf\u7684\u5893<<<\u5730\u3002\u8a72\u5893\u5730\u4e5f\u5b9a\u7fa9\u4e86\u6751\u838a"
+        },
+        {
+          "activation": 0.002216754714027047,
+          "chain_idx": 20809,
+          "window_start": 32,
+          "text": "\u6700\u5e73\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00\u3002>>>\u5317\u90e8\u6709\u4e00\u7247\u677e\u6a39<<<\u6797\uff0c\u5357\u90e8\u6709\u4e00\u500b\u679c\u5712\uff0c\u9019\u500b\u5730\u9ede\u6700"
+        },
+        {
+          "activation": 0.0021526122000068426,
+          "chain_idx": 20809,
+          "window_start": 4,
+          "text": "\u9019\u5ea7\u623f\u5b50>>>\u5750\u843d\u5728\u5168\u5dde\u5e02\u90ca<<<\u7684\u4e00\u500b\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168"
+        },
+        {
+          "activation": 0.0020617095287889242,
+          "chain_idx": 20809,
+          "window_start": 6,
+          "text": "\u9019\u5ea7\u623f\u5b50\u5750\u843d\u5728>>>\u5168\u5dde\u5e02\u90ca\u7684\u4e00\u500b\u53eb\u505a<<< Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168\u5dde\u5e02\u662f"
+        },
+        {
+          "activation": 0.0020022534299641848,
+          "chain_idx": 20809,
+          "window_start": 31,
+          "text": "\u97d3\u570b\u6700\u5e73\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00>>>\u3002\u5317\u90e8\u6709\u4e00\u7247\u677e<<<\u6a39\u6797\uff0c\u5357\u90e8\u6709\u4e00\u500b\u679c\u5712\uff0c\u9019\u500b\u5730\u9ede"
+        },
+        {
+          "activation": 0.0019486881792545319,
+          "chain_idx": 20809,
+          "window_start": 19,
+          "text": "\u7684\u4e00\u500b\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168>>>\u5dde\u5e02\u662f\u97d3\u570b\u6700\u5e73<<<\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00\u3002\u5317\u90e8\u6709\u4e00"
+        },
+        {
+          "activation": 0.0019268069881945848,
+          "chain_idx": 20809,
+          "window_start": 3,
+          "text": "\u9019\u5ea7>>>\u623f\u5b50\u5750\u843d\u5728\u5168\u5dde\u5e02<<<\u90ca\u7684\u4e00\u500b\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c"
+        },
+        {
+          "activation": 0.0019263951107859612,
+          "chain_idx": 20809,
+          "window_start": 53,
+          "text": "\uff0c\u9019\u500b\u5730\u9ede\u6700\u5947\u7279\u7684\u5730\u65b9\u662f\u897f\u90e8\uff0c>>>\u9130\u8fd1\u4e00\u4e9b\u5bb6\u65cf\u6c0f<<<\u65cf\u7684\u5893\u5730\u3002\u8a72\u5893\u5730\u4e5f\u5b9a\u7fa9\u4e86"
+        }
+      ]
+    },
+    "2175": {
+      "mass": 0.025767048820853233,
+      "examples": [
+        {
+          "activation": 0.003073999425396323,
+          "chain_idx": 20809,
+          "window_start": 54,
+          "text": "\u9019\u500b\u5730\u9ede\u6700\u5947\u7279\u7684\u5730\u65b9\u662f\u897f\u90e8\uff0c\u9130>>>\u8fd1\u4e00\u4e9b\u5bb6\u65cf\u6c0f\u65cf\u7684<<<\u5893\u5730\u3002\u8a72\u5893\u5730\u4e5f\u5b9a\u7fa9\u4e86\u6751"
+        },
+        {
+          "activation": 0.0027763950638473034,
+          "chain_idx": 20809,
+          "window_start": 55,
+          "text": "\u5730\u9ede\u6700\u5947\u7279\u7684\u5730\u65b9\u662f\u897f\u90e8\uff0c\u9130\u8fd1>>>\u4e00\u4e9b\u5bb6\u65cf\u6c0f\u65cf\u7684\u5893<<<\u5730\u3002\u8a72\u5893\u5730\u4e5f\u5b9a\u7fa9\u4e86\u6751\u838a"
+        },
+        {
+          "activation": 0.002769438549876213,
+          "chain_idx": 20809,
+          "window_start": 5,
+          "text": "\u9019\u5ea7\u623f\u5b50\u5750>>>\u843d\u5728\u5168\u5dde\u5e02\u90ca\u7684\u4e00\u500b<<<\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168\u5dde\u5e02"
+        },
+        {
+          "activation": 0.0026432254817336798,
+          "chain_idx": 20809,
+          "window_start": 32,
+          "text": "\u6700\u5e73\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00\u3002>>>\u5317\u90e8\u6709\u4e00\u7247\u677e\u6a39<<<\u6797\uff0c\u5357\u90e8\u6709\u4e00\u500b\u679c\u5712\uff0c\u9019\u500b\u5730\u9ede\u6700"
+        },
+        {
+          "activation": 0.002602867316454649,
+          "chain_idx": 20809,
+          "window_start": 4,
+          "text": "\u9019\u5ea7\u623f\u5b50>>>\u5750\u843d\u5728\u5168\u5dde\u5e02\u90ca<<<\u7684\u4e00\u500b\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168"
+        },
+        {
+          "activation": 0.0024822077248245478,
+          "chain_idx": 20809,
+          "window_start": 6,
+          "text": "\u9019\u5ea7\u623f\u5b50\u5750\u843d\u5728>>>\u5168\u5dde\u5e02\u90ca\u7684\u4e00\u500b\u53eb\u505a<<< Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168\u5dde\u5e02\u662f"
+        },
+        {
+          "activation": 0.0024189152754843235,
+          "chain_idx": 20809,
+          "window_start": 31,
+          "text": "\u97d3\u570b\u6700\u5e73\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00>>>\u3002\u5317\u90e8\u6709\u4e00\u7247\u677e<<<\u6a39\u6797\uff0c\u5357\u90e8\u6709\u4e00\u500b\u679c\u5712\uff0c\u9019\u500b\u5730\u9ede"
+        },
+        {
+          "activation": 0.0023507254663854837,
+          "chain_idx": 20809,
+          "window_start": 19,
+          "text": "\u7684\u4e00\u500b\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168>>>\u5dde\u5e02\u662f\u97d3\u570b\u6700\u5e73<<<\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00\u3002\u5317\u90e8\u6709\u4e00"
+        },
+        {
+          "activation": 0.002330099232494831,
+          "chain_idx": 20809,
+          "window_start": 3,
+          "text": "\u9019\u5ea7>>>\u623f\u5b50\u5750\u843d\u5728\u5168\u5dde\u5e02<<<\u90ca\u7684\u4e00\u500b\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c"
+        },
+        {
+          "activation": 0.002319175284355879,
+          "chain_idx": 20809,
+          "window_start": 53,
+          "text": "\uff0c\u9019\u500b\u5730\u9ede\u6700\u5947\u7279\u7684\u5730\u65b9\u662f\u897f\u90e8\uff0c>>>\u9130\u8fd1\u4e00\u4e9b\u5bb6\u65cf\u6c0f<<<\u65cf\u7684\u5893\u5730\u3002\u8a72\u5893\u5730\u4e5f\u5b9a\u7fa9\u4e86"
+        }
+      ]
+    },
+    "10180": {
+      "mass": 0.02149132709018886,
+      "examples": [
+        {
+          "activation": 0.0025742165744304657,
+          "chain_idx": 20809,
+          "window_start": 54,
+          "text": "\u9019\u500b\u5730\u9ede\u6700\u5947\u7279\u7684\u5730\u65b9\u662f\u897f\u90e8\uff0c\u9130>>>\u8fd1\u4e00\u4e9b\u5bb6\u65cf\u6c0f\u65cf\u7684<<<\u5893\u5730\u3002\u8a72\u5893\u5730\u4e5f\u5b9a\u7fa9\u4e86\u6751"
+        },
+        {
+          "activation": 0.002352572977542877,
+          "chain_idx": 20809,
+          "window_start": 55,
+          "text": "\u5730\u9ede\u6700\u5947\u7279\u7684\u5730\u65b9\u662f\u897f\u90e8\uff0c\u9130\u8fd1>>>\u4e00\u4e9b\u5bb6\u65cf\u6c0f\u65cf\u7684\u5893<<<\u5730\u3002\u8a72\u5893\u5730\u4e5f\u5b9a\u7fa9\u4e86\u6751\u838a"
+        },
+        {
+          "activation": 0.002316557103767991,
+          "chain_idx": 20809,
+          "window_start": 5,
+          "text": "\u9019\u5ea7\u623f\u5b50\u5750>>>\u843d\u5728\u5168\u5dde\u5e02\u90ca\u7684\u4e00\u500b<<<\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168\u5dde\u5e02"
+        },
+        {
+          "activation": 0.002184982178732753,
+          "chain_idx": 20809,
+          "window_start": 32,
+          "text": "\u6700\u5e73\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00\u3002>>>\u5317\u90e8\u6709\u4e00\u7247\u677e\u6a39<<<\u6797\uff0c\u5357\u90e8\u6709\u4e00\u500b\u679c\u5712\uff0c\u9019\u500b\u5730\u9ede\u6700"
+        },
+        {
+          "activation": 0.0021644216030836105,
+          "chain_idx": 20809,
+          "window_start": 4,
+          "text": "\u9019\u5ea7\u623f\u5b50>>>\u5750\u843d\u5728\u5168\u5dde\u5e02\u90ca<<<\u7684\u4e00\u500b\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168"
+        },
+        {
+          "activation": 0.0020738602615892887,
+          "chain_idx": 20809,
+          "window_start": 6,
+          "text": "\u9019\u5ea7\u623f\u5b50\u5750\u843d\u5728>>>\u5168\u5dde\u5e02\u90ca\u7684\u4e00\u500b\u53eb\u505a<<< Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168\u5dde\u5e02\u662f"
+        },
+        {
+          "activation": 0.002000668318942189,
+          "chain_idx": 20809,
+          "window_start": 31,
+          "text": "\u97d3\u570b\u6700\u5e73\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00>>>\u3002\u5317\u90e8\u6709\u4e00\u7247\u677e<<<\u6a39\u6797\uff0c\u5357\u90e8\u6709\u4e00\u500b\u679c\u5712\uff0c\u9019\u500b\u5730\u9ede"
+        },
+        {
+          "activation": 0.0019534395541995764,
+          "chain_idx": 20809,
+          "window_start": 19,
+          "text": "\u7684\u4e00\u500b\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168>>>\u5dde\u5e02\u662f\u97d3\u570b\u6700\u5e73<<<\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00\u3002\u5317\u90e8\u6709\u4e00"
+        },
+        {
+          "activation": 0.001935502514243126,
+          "chain_idx": 20809,
+          "window_start": 3,
+          "text": "\u9019\u5ea7>>>\u623f\u5b50\u5750\u843d\u5728\u5168\u5dde\u5e02<<<\u90ca\u7684\u4e00\u500b\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c"
+        },
+        {
+          "activation": 0.0019351060036569834,
+          "chain_idx": 20809,
+          "window_start": 53,
+          "text": "\uff0c\u9019\u500b\u5730\u9ede\u6700\u5947\u7279\u7684\u5730\u65b9\u662f\u897f\u90e8\uff0c>>>\u9130\u8fd1\u4e00\u4e9b\u5bb6\u65cf\u6c0f<<<\u65cf\u7684\u5893\u5730\u3002\u8a72\u5893\u5730\u4e5f\u5b9a\u7fa9\u4e86"
+        }
+      ]
+    },
+    "3142": {
+      "mass": 0.0220028106123209,
+      "examples": [
+        {
+          "activation": 0.0026240104343742132,
+          "chain_idx": 20809,
+          "window_start": 54,
+          "text": "\u9019\u500b\u5730\u9ede\u6700\u5947\u7279\u7684\u5730\u65b9\u662f\u897f\u90e8\uff0c\u9130>>>\u8fd1\u4e00\u4e9b\u5bb6\u65cf\u6c0f\u65cf\u7684<<<\u5893\u5730\u3002\u8a72\u5893\u5730\u4e5f\u5b9a\u7fa9\u4e86\u6751"
+        },
+        {
+          "activation": 0.0023755270522087812,
+          "chain_idx": 20809,
+          "window_start": 5,
+          "text": "\u9019\u5ea7\u623f\u5b50\u5750>>>\u843d\u5728\u5168\u5dde\u5e02\u90ca\u7684\u4e00\u500b<<<\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168\u5dde\u5e02"
+        },
+        {
+          "activation": 0.0023693933617323637,
+          "chain_idx": 20809,
+          "window_start": 55,
+          "text": "\u5730\u9ede\u6700\u5947\u7279\u7684\u5730\u65b9\u662f\u897f\u90e8\uff0c\u9130\u8fd1>>>\u4e00\u4e9b\u5bb6\u65cf\u6c0f\u65cf\u7684\u5893<<<\u5730\u3002\u8a72\u5893\u5730\u4e5f\u5b9a\u7fa9\u4e86\u6751\u838a"
+        },
+        {
+          "activation": 0.00224323314614594,
+          "chain_idx": 20809,
+          "window_start": 4,
+          "text": "\u9019\u5ea7\u623f\u5b50>>>\u5750\u843d\u5728\u5168\u5dde\u5e02\u90ca<<<\u7684\u4e00\u500b\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168"
+        },
+        {
+          "activation": 0.002242839429527521,
+          "chain_idx": 20809,
+          "window_start": 32,
+          "text": "\u6700\u5e73\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00\u3002>>>\u5317\u90e8\u6709\u4e00\u7247\u677e\u6a39<<<\u6797\uff0c\u5357\u90e8\u6709\u4e00\u500b\u679c\u5712\uff0c\u9019\u500b\u5730\u9ede\u6700"
+        },
+        {
+          "activation": 0.002134771319106221,
+          "chain_idx": 20809,
+          "window_start": 6,
+          "text": "\u9019\u5ea7\u623f\u5b50\u5750\u843d\u5728>>>\u5168\u5dde\u5e02\u90ca\u7684\u4e00\u500b\u53eb\u505a<<< Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168\u5dde\u5e02\u662f"
+        },
+        {
+          "activation": 0.0020318757742643356,
+          "chain_idx": 20809,
+          "window_start": 31,
+          "text": "\u97d3\u570b\u6700\u5e73\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00>>>\u3002\u5317\u90e8\u6709\u4e00\u7247\u677e<<<\u6a39\u6797\uff0c\u5357\u90e8\u6709\u4e00\u500b\u679c\u5712\uff0c\u9019\u500b\u5730\u9ede"
+        },
+        {
+          "activation": 0.001999887637794018,
+          "chain_idx": 20809,
+          "window_start": 3,
+          "text": "\u9019\u5ea7>>>\u623f\u5b50\u5750\u843d\u5728\u5168\u5dde\u5e02<<<\u90ca\u7684\u4e00\u500b\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c"
+        },
+        {
+          "activation": 0.001999462954699993,
+          "chain_idx": 20809,
+          "window_start": 19,
+          "text": "\u7684\u4e00\u500b\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168>>>\u5dde\u5e02\u662f\u97d3\u570b\u6700\u5e73<<<\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00\u3002\u5317\u90e8\u6709\u4e00"
+        },
+        {
+          "activation": 0.001981809502467513,
+          "chain_idx": 20809,
+          "window_start": 53,
+          "text": "\uff0c\u9019\u500b\u5730\u9ede\u6700\u5947\u7279\u7684\u5730\u65b9\u662f\u897f\u90e8\uff0c>>>\u9130\u8fd1\u4e00\u4e9b\u5bb6\u65cf\u6c0f<<<\u65cf\u7684\u5893\u5730\u3002\u8a72\u5893\u5730\u4e5f\u5b9a\u7fa9\u4e86"
+        }
+      ]
+    },
+    "6471": {
+      "mass": 0.021814202424138784,
+      "examples": [
+        {
+          "activation": 0.0026067798025906086,
+          "chain_idx": 20809,
+          "window_start": 54,
+          "text": "\u9019\u500b\u5730\u9ede\u6700\u5947\u7279\u7684\u5730\u65b9\u662f\u897f\u90e8\uff0c\u9130>>>\u8fd1\u4e00\u4e9b\u5bb6\u65cf\u6c0f\u65cf\u7684<<<\u5893\u5730\u3002\u8a72\u5893\u5730\u4e5f\u5b9a\u7fa9\u4e86\u6751"
+        },
+        {
+          "activation": 0.002375315874814987,
+          "chain_idx": 20809,
+          "window_start": 55,
+          "text": "\u5730\u9ede\u6700\u5947\u7279\u7684\u5730\u65b9\u662f\u897f\u90e8\uff0c\u9130\u8fd1>>>\u4e00\u4e9b\u5bb6\u65cf\u6c0f\u65cf\u7684\u5893<<<\u5730\u3002\u8a72\u5893\u5730\u4e5f\u5b9a\u7fa9\u4e86\u6751\u838a"
+        },
+        {
+          "activation": 0.002344200387597084,
+          "chain_idx": 20809,
+          "window_start": 5,
+          "text": "\u9019\u5ea7\u623f\u5b50\u5750>>>\u843d\u5728\u5168\u5dde\u5e02\u90ca\u7684\u4e00\u500b<<<\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168\u5dde\u5e02"
+        },
+        {
+          "activation": 0.0022250302135944366,
+          "chain_idx": 20809,
+          "window_start": 32,
+          "text": "\u6700\u5e73\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00\u3002>>>\u5317\u90e8\u6709\u4e00\u7247\u677e\u6a39<<<\u6797\uff0c\u5357\u90e8\u6709\u4e00\u500b\u679c\u5712\uff0c\u9019\u500b\u5730\u9ede\u6700"
+        },
+        {
+          "activation": 0.002204048912972212,
+          "chain_idx": 20809,
+          "window_start": 4,
+          "text": "\u9019\u5ea7\u623f\u5b50>>>\u5750\u843d\u5728\u5168\u5dde\u5e02\u90ca<<<\u7684\u4e00\u500b\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168"
+        },
+        {
+          "activation": 0.0021038076374679804,
+          "chain_idx": 20809,
+          "window_start": 6,
+          "text": "\u9019\u5ea7\u623f\u5b50\u5750\u843d\u5728>>>\u5168\u5dde\u5e02\u90ca\u7684\u4e00\u500b\u53eb\u505a<<< Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168\u5dde\u5e02\u662f"
+        },
+        {
+          "activation": 0.0020274072885513306,
+          "chain_idx": 20809,
+          "window_start": 31,
+          "text": "\u97d3\u570b\u6700\u5e73\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00>>>\u3002\u5317\u90e8\u6709\u4e00\u7247\u677e<<<\u6a39\u6797\uff0c\u5357\u90e8\u6709\u4e00\u500b\u679c\u5712\uff0c\u9019\u500b\u5730\u9ede"
+        },
+        {
+          "activation": 0.0019925248343497515,
+          "chain_idx": 20809,
+          "window_start": 19,
+          "text": "\u7684\u4e00\u500b\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168>>>\u5dde\u5e02\u662f\u97d3\u570b\u6700\u5e73<<<\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00\u3002\u5317\u90e8\u6709\u4e00"
+        },
+        {
+          "activation": 0.0019676389638334513,
+          "chain_idx": 20809,
+          "window_start": 53,
+          "text": "\uff0c\u9019\u500b\u5730\u9ede\u6700\u5947\u7279\u7684\u5730\u65b9\u662f\u897f\u90e8\uff0c>>>\u9130\u8fd1\u4e00\u4e9b\u5bb6\u65cf\u6c0f<<<\u65cf\u7684\u5893\u5730\u3002\u8a72\u5893\u5730\u4e5f\u5b9a\u7fa9\u4e86"
+        },
+        {
+          "activation": 0.0019674485083669424,
+          "chain_idx": 20809,
+          "window_start": 33,
+          "text": "\u5e73\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00\u3002\u5317\u90e8>>>\u6709\u4e00\u7247\u677e\u6a39\u6797<<<\uff0c\u5357\u90e8\u6709\u4e00\u500b\u679c\u5712\uff0c\u9019\u500b\u5730\u9ede\u6700\u5947"
+        }
+      ]
+    },
+    "16843": {
+      "mass": 0.02130944817326963,
+      "examples": [
+        {
+          "activation": 0.002557493047788739,
+          "chain_idx": 20809,
+          "window_start": 54,
+          "text": "\u9019\u500b\u5730\u9ede\u6700\u5947\u7279\u7684\u5730\u65b9\u662f\u897f\u90e8\uff0c\u9130>>>\u8fd1\u4e00\u4e9b\u5bb6\u65cf\u6c0f\u65cf\u7684<<<\u5893\u5730\u3002\u8a72\u5893\u5730\u4e5f\u5b9a\u7fa9\u4e86\u6751"
+        },
+        {
+          "activation": 0.0023052736651152372,
+          "chain_idx": 20809,
+          "window_start": 55,
+          "text": "\u5730\u9ede\u6700\u5947\u7279\u7684\u5730\u65b9\u662f\u897f\u90e8\uff0c\u9130\u8fd1>>>\u4e00\u4e9b\u5bb6\u65cf\u6c0f\u65cf\u7684\u5893<<<\u5730\u3002\u8a72\u5893\u5730\u4e5f\u5b9a\u7fa9\u4e86\u6751\u838a"
+        },
+        {
+          "activation": 0.002288087969645858,
+          "chain_idx": 20809,
+          "window_start": 5,
+          "text": "\u9019\u5ea7\u623f\u5b50\u5750>>>\u843d\u5728\u5168\u5dde\u5e02\u90ca\u7684\u4e00\u500b<<<\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168\u5dde\u5e02"
+        },
+        {
+          "activation": 0.002184209180995822,
+          "chain_idx": 20809,
+          "window_start": 32,
+          "text": "\u6700\u5e73\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00\u3002>>>\u5317\u90e8\u6709\u4e00\u7247\u677e\u6a39<<<\u6797\uff0c\u5357\u90e8\u6709\u4e00\u500b\u679c\u5712\uff0c\u9019\u500b\u5730\u9ede\u6700"
+        },
+        {
+          "activation": 0.0021515158005058765,
+          "chain_idx": 20809,
+          "window_start": 4,
+          "text": "\u9019\u5ea7\u623f\u5b50>>>\u5750\u843d\u5728\u5168\u5dde\u5e02\u90ca<<<\u7684\u4e00\u500b\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168"
+        },
+        {
+          "activation": 0.0020540067926049232,
+          "chain_idx": 20809,
+          "window_start": 6,
+          "text": "\u9019\u5ea7\u623f\u5b50\u5750\u843d\u5728>>>\u5168\u5dde\u5e02\u90ca\u7684\u4e00\u500b\u53eb\u505a<<< Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168\u5dde\u5e02\u662f"
+        },
+        {
+          "activation": 0.001968302996829152,
+          "chain_idx": 20809,
+          "window_start": 31,
+          "text": "\u97d3\u570b\u6700\u5e73\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00>>>\u3002\u5317\u90e8\u6709\u4e00\u7247\u677e<<<\u6a39\u6797\uff0c\u5357\u90e8\u6709\u4e00\u500b\u679c\u5712\uff0c\u9019\u500b\u5730\u9ede"
+        },
+        {
+          "activation": 0.0019398151198402047,
+          "chain_idx": 20809,
+          "window_start": 19,
+          "text": "\u7684\u4e00\u500b\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168>>>\u5dde\u5e02\u662f\u97d3\u570b\u6700\u5e73<<<\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00\u3002\u5317\u90e8\u6709\u4e00"
+        },
+        {
+          "activation": 0.0019369159126654267,
+          "chain_idx": 20809,
+          "window_start": 3,
+          "text": "\u9019\u5ea7>>>\u623f\u5b50\u5750\u843d\u5728\u5168\u5dde\u5e02<<<\u90ca\u7684\u4e00\u500b\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c"
+        },
+        {
+          "activation": 0.00192382768727839,
+          "chain_idx": 20809,
+          "window_start": 53,
+          "text": "\uff0c\u9019\u500b\u5730\u9ede\u6700\u5947\u7279\u7684\u5730\u65b9\u662f\u897f\u90e8\uff0c>>>\u9130\u8fd1\u4e00\u4e9b\u5bb6\u65cf\u6c0f<<<\u65cf\u7684\u5893\u5730\u3002\u8a72\u5893\u5730\u4e5f\u5b9a\u7fa9\u4e86"
+        }
+      ]
+    },
+    "3148": {
+      "mass": 0.021076168632134795,
+      "examples": [
+        {
+          "activation": 0.002518633846193552,
+          "chain_idx": 20809,
+          "window_start": 54,
+          "text": "\u9019\u500b\u5730\u9ede\u6700\u5947\u7279\u7684\u5730\u65b9\u662f\u897f\u90e8\uff0c\u9130>>>\u8fd1\u4e00\u4e9b\u5bb6\u65cf\u6c0f\u65cf\u7684<<<\u5893\u5730\u3002\u8a72\u5893\u5730\u4e5f\u5b9a\u7fa9\u4e86\u6751"
+        },
+        {
+          "activation": 0.002279210602864623,
+          "chain_idx": 20809,
+          "window_start": 55,
+          "text": "\u5730\u9ede\u6700\u5947\u7279\u7684\u5730\u65b9\u662f\u897f\u90e8\uff0c\u9130\u8fd1>>>\u4e00\u4e9b\u5bb6\u65cf\u6c0f\u65cf\u7684\u5893<<<\u5730\u3002\u8a72\u5893\u5730\u4e5f\u5b9a\u7fa9\u4e86\u6751\u838a"
+        },
+        {
+          "activation": 0.0022725455928593874,
+          "chain_idx": 20809,
+          "window_start": 5,
+          "text": "\u9019\u5ea7\u623f\u5b50\u5750>>>\u843d\u5728\u5168\u5dde\u5e02\u90ca\u7684\u4e00\u500b<<<\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168\u5dde\u5e02"
+        },
+        {
+          "activation": 0.0021490014623850584,
+          "chain_idx": 20809,
+          "window_start": 32,
+          "text": "\u6700\u5e73\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00\u3002>>>\u5317\u90e8\u6709\u4e00\u7247\u677e\u6a39<<<\u6797\uff0c\u5357\u90e8\u6709\u4e00\u500b\u679c\u5712\uff0c\u9019\u500b\u5730\u9ede\u6700"
+        },
+        {
+          "activation": 0.002136633498594165,
+          "chain_idx": 20809,
+          "window_start": 4,
+          "text": "\u9019\u5ea7\u623f\u5b50>>>\u5750\u843d\u5728\u5168\u5dde\u5e02\u90ca<<<\u7684\u4e00\u500b\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168"
+        },
+        {
+          "activation": 0.002050993265584111,
+          "chain_idx": 20809,
+          "window_start": 6,
+          "text": "\u9019\u5ea7\u623f\u5b50\u5750\u843d\u5728>>>\u5168\u5dde\u5e02\u90ca\u7684\u4e00\u500b\u53eb\u505a<<< Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168\u5dde\u5e02\u662f"
+        },
+        {
+          "activation": 0.001954588806256652,
+          "chain_idx": 20809,
+          "window_start": 31,
+          "text": "\u97d3\u570b\u6700\u5e73\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00>>>\u3002\u5317\u90e8\u6709\u4e00\u7247\u677e<<<\u6a39\u6797\uff0c\u5357\u90e8\u6709\u4e00\u500b\u679c\u5712\uff0c\u9019\u500b\u5730\u9ede"
+        },
+        {
+          "activation": 0.001922065974213183,
+          "chain_idx": 20809,
+          "window_start": 19,
+          "text": "\u7684\u4e00\u500b\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168>>>\u5dde\u5e02\u662f\u97d3\u570b\u6700\u5e73<<<\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00\u3002\u5317\u90e8\u6709\u4e00"
+        },
+        {
+          "activation": 0.0018987645162269473,
+          "chain_idx": 20809,
+          "window_start": 33,
+          "text": "\u5e73\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00\u3002\u5317\u90e8>>>\u6709\u4e00\u7247\u677e\u6a39\u6797<<<\uff0c\u5357\u90e8\u6709\u4e00\u500b\u679c\u5712\uff0c\u9019\u500b\u5730\u9ede\u6700\u5947"
+        },
+        {
+          "activation": 0.0018937310669571161,
+          "chain_idx": 20809,
+          "window_start": 3,
+          "text": "\u9019\u5ea7>>>\u623f\u5b50\u5750\u843d\u5728\u5168\u5dde\u5e02<<<\u90ca\u7684\u4e00\u500b\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c"
+        }
+      ]
+    },
+    "16462": {
+      "mass": 0.02233929466456175,
+      "examples": [
+        {
+          "activation": 0.0026693360414355993,
+          "chain_idx": 20809,
+          "window_start": 54,
+          "text": "\u9019\u500b\u5730\u9ede\u6700\u5947\u7279\u7684\u5730\u65b9\u662f\u897f\u90e8\uff0c\u9130>>>\u8fd1\u4e00\u4e9b\u5bb6\u65cf\u6c0f\u65cf\u7684<<<\u5893\u5730\u3002\u8a72\u5893\u5730\u4e5f\u5b9a\u7fa9\u4e86\u6751"
+        },
+        {
+          "activation": 0.0024246610701084137,
+          "chain_idx": 20809,
+          "window_start": 55,
+          "text": "\u5730\u9ede\u6700\u5947\u7279\u7684\u5730\u65b9\u662f\u897f\u90e8\uff0c\u9130\u8fd1>>>\u4e00\u4e9b\u5bb6\u65cf\u6c0f\u65cf\u7684\u5893<<<\u5730\u3002\u8a72\u5893\u5730\u4e5f\u5b9a\u7fa9\u4e86\u6751\u838a"
+        },
+        {
+          "activation": 0.0024040478747338057,
+          "chain_idx": 20809,
+          "window_start": 5,
+          "text": "\u9019\u5ea7\u623f\u5b50\u5750>>>\u843d\u5728\u5168\u5dde\u5e02\u90ca\u7684\u4e00\u500b<<<\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168\u5dde\u5e02"
+        },
+        {
+          "activation": 0.0022901117336004972,
+          "chain_idx": 20809,
+          "window_start": 32,
+          "text": "\u6700\u5e73\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00\u3002>>>\u5317\u90e8\u6709\u4e00\u7247\u677e\u6a39<<<\u6797\uff0c\u5357\u90e8\u6709\u4e00\u500b\u679c\u5712\uff0c\u9019\u500b\u5730\u9ede\u6700"
+        },
+        {
+          "activation": 0.0022541775833815336,
+          "chain_idx": 20809,
+          "window_start": 4,
+          "text": "\u9019\u5ea7\u623f\u5b50>>>\u5750\u843d\u5728\u5168\u5dde\u5e02\u90ca<<<\u7684\u4e00\u500b\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168"
+        },
+        {
+          "activation": 0.002162110060453415,
+          "chain_idx": 20809,
+          "window_start": 6,
+          "text": "\u9019\u5ea7\u623f\u5b50\u5750\u843d\u5728>>>\u5168\u5dde\u5e02\u90ca\u7684\u4e00\u500b\u53eb\u505a<<< Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168\u5dde\u5e02\u662f"
+        },
+        {
+          "activation": 0.002079555531963706,
+          "chain_idx": 20809,
+          "window_start": 31,
+          "text": "\u97d3\u570b\u6700\u5e73\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00>>>\u3002\u5317\u90e8\u6709\u4e00\u7247\u677e<<<\u6a39\u6797\uff0c\u5357\u90e8\u6709\u4e00\u500b\u679c\u5712\uff0c\u9019\u500b\u5730\u9ede"
+        },
+        {
+          "activation": 0.0020345263183116913,
+          "chain_idx": 20809,
+          "window_start": 19,
+          "text": "\u7684\u4e00\u500b\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168>>>\u5dde\u5e02\u662f\u97d3\u570b\u6700\u5e73<<<\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00\u3002\u5317\u90e8\u6709\u4e00"
+        },
+        {
+          "activation": 0.00201323046348989,
+          "chain_idx": 20809,
+          "window_start": 33,
+          "text": "\u5e73\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00\u3002\u5317\u90e8>>>\u6709\u4e00\u7247\u677e\u6a39\u6797<<<\uff0c\u5357\u90e8\u6709\u4e00\u500b\u679c\u5712\uff0c\u9019\u500b\u5730\u9ede\u6700\u5947"
+        },
+        {
+          "activation": 0.0020075379870831966,
+          "chain_idx": 20809,
+          "window_start": 53,
+          "text": "\uff0c\u9019\u500b\u5730\u9ede\u6700\u5947\u7279\u7684\u5730\u65b9\u662f\u897f\u90e8\uff0c>>>\u9130\u8fd1\u4e00\u4e9b\u5bb6\u65cf\u6c0f<<<\u65cf\u7684\u5893\u5730\u3002\u8a72\u5893\u5730\u4e5f\u5b9a\u7fa9\u4e86"
+        }
+      ]
+    },
+    "10702": {
+      "mass": 0.02132671477738768,
+      "examples": [
+        {
+          "activation": 0.0025567677803337574,
+          "chain_idx": 20809,
+          "window_start": 54,
+          "text": "\u9019\u500b\u5730\u9ede\u6700\u5947\u7279\u7684\u5730\u65b9\u662f\u897f\u90e8\uff0c\u9130>>>\u8fd1\u4e00\u4e9b\u5bb6\u65cf\u6c0f\u65cf\u7684<<<\u5893\u5730\u3002\u8a72\u5893\u5730\u4e5f\u5b9a\u7fa9\u4e86\u6751"
+        },
+        {
+          "activation": 0.0023244034964591265,
+          "chain_idx": 20809,
+          "window_start": 55,
+          "text": "\u5730\u9ede\u6700\u5947\u7279\u7684\u5730\u65b9\u662f\u897f\u90e8\uff0c\u9130\u8fd1>>>\u4e00\u4e9b\u5bb6\u65cf\u6c0f\u65cf\u7684\u5893<<<\u5730\u3002\u8a72\u5893\u5730\u4e5f\u5b9a\u7fa9\u4e86\u6751\u838a"
+        },
+        {
+          "activation": 0.002299979329109192,
+          "chain_idx": 20809,
+          "window_start": 5,
+          "text": "\u9019\u5ea7\u623f\u5b50\u5750>>>\u843d\u5728\u5168\u5dde\u5e02\u90ca\u7684\u4e00\u500b<<<\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168\u5dde\u5e02"
+        },
+        {
+          "activation": 0.0021641114726662636,
+          "chain_idx": 20809,
+          "window_start": 32,
+          "text": "\u6700\u5e73\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00\u3002>>>\u5317\u90e8\u6709\u4e00\u7247\u677e\u6a39<<<\u6797\uff0c\u5357\u90e8\u6709\u4e00\u500b\u679c\u5712\uff0c\u9019\u500b\u5730\u9ede\u6700"
+        },
+        {
+          "activation": 0.0021565051283687353,
+          "chain_idx": 20809,
+          "window_start": 4,
+          "text": "\u9019\u5ea7\u623f\u5b50>>>\u5750\u843d\u5728\u5168\u5dde\u5e02\u90ca<<<\u7684\u4e00\u500b\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168"
+        },
+        {
+          "activation": 0.0020607656333595514,
+          "chain_idx": 20809,
+          "window_start": 6,
+          "text": "\u9019\u5ea7\u623f\u5b50\u5750\u843d\u5728>>>\u5168\u5dde\u5e02\u90ca\u7684\u4e00\u500b\u53eb\u505a<<< Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168\u5dde\u5e02\u662f"
+        },
+        {
+          "activation": 0.0019705560989677906,
+          "chain_idx": 20809,
+          "window_start": 31,
+          "text": "\u97d3\u570b\u6700\u5e73\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00>>>\u3002\u5317\u90e8\u6709\u4e00\u7247\u677e<<<\u6a39\u6797\uff0c\u5357\u90e8\u6709\u4e00\u500b\u679c\u5712\uff0c\u9019\u500b\u5730\u9ede"
+        },
+        {
+          "activation": 0.0019413577392697334,
+          "chain_idx": 20809,
+          "window_start": 19,
+          "text": "\u7684\u4e00\u500b\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168>>>\u5dde\u5e02\u662f\u97d3\u570b\u6700\u5e73<<<\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00\u3002\u5317\u90e8\u6709\u4e00"
+        },
+        {
+          "activation": 0.001926350756548345,
+          "chain_idx": 20809,
+          "window_start": 53,
+          "text": "\uff0c\u9019\u500b\u5730\u9ede\u6700\u5947\u7279\u7684\u5730\u65b9\u662f\u897f\u90e8\uff0c>>>\u9130\u8fd1\u4e00\u4e9b\u5bb6\u65cf\u6c0f<<<\u65cf\u7684\u5893\u5730\u3002\u8a72\u5893\u5730\u4e5f\u5b9a\u7fa9\u4e86"
+        },
+        {
+          "activation": 0.0019259173423051834,
+          "chain_idx": 20809,
+          "window_start": 3,
+          "text": "\u9019\u5ea7>>>\u623f\u5b50\u5750\u843d\u5728\u5168\u5dde\u5e02<<<\u90ca\u7684\u4e00\u500b\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c"
+        }
+      ]
+    },
+    "3281": {
+      "mass": 0.020589494961313903,
+      "examples": [
+        {
+          "activation": 0.0024609414394944906,
+          "chain_idx": 20809,
+          "window_start": 54,
+          "text": "\u9019\u500b\u5730\u9ede\u6700\u5947\u7279\u7684\u5730\u65b9\u662f\u897f\u90e8\uff0c\u9130>>>\u8fd1\u4e00\u4e9b\u5bb6\u65cf\u6c0f\u65cf\u7684<<<\u5893\u5730\u3002\u8a72\u5893\u5730\u4e5f\u5b9a\u7fa9\u4e86\u6751"
+        },
+        {
+          "activation": 0.0022214967757463455,
+          "chain_idx": 20809,
+          "window_start": 55,
+          "text": "\u5730\u9ede\u6700\u5947\u7279\u7684\u5730\u65b9\u662f\u897f\u90e8\uff0c\u9130\u8fd1>>>\u4e00\u4e9b\u5bb6\u65cf\u6c0f\u65cf\u7684\u5893<<<\u5730\u3002\u8a72\u5893\u5730\u4e5f\u5b9a\u7fa9\u4e86\u6751\u838a"
+        },
+        {
+          "activation": 0.0022174029145389795,
+          "chain_idx": 20809,
+          "window_start": 5,
+          "text": "\u9019\u5ea7\u623f\u5b50\u5750>>>\u843d\u5728\u5168\u5dde\u5e02\u90ca\u7684\u4e00\u500b<<<\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168\u5dde\u5e02"
+        },
+        {
+          "activation": 0.002101960126310587,
+          "chain_idx": 20809,
+          "window_start": 32,
+          "text": "\u6700\u5e73\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00\u3002>>>\u5317\u90e8\u6709\u4e00\u7247\u677e\u6a39<<<\u6797\uff0c\u5357\u90e8\u6709\u4e00\u500b\u679c\u5712\uff0c\u9019\u500b\u5730\u9ede\u6700"
+        },
+        {
+          "activation": 0.002083325758576393,
+          "chain_idx": 20809,
+          "window_start": 4,
+          "text": "\u9019\u5ea7\u623f\u5b50>>>\u5750\u843d\u5728\u5168\u5dde\u5e02\u90ca<<<\u7684\u4e00\u500b\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168"
+        },
+        {
+          "activation": 0.0019998711068183184,
+          "chain_idx": 20809,
+          "window_start": 6,
+          "text": "\u9019\u5ea7\u623f\u5b50\u5750\u843d\u5728>>>\u5168\u5dde\u5e02\u90ca\u7684\u4e00\u500b\u53eb\u505a<<< Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168\u5dde\u5e02\u662f"
+        },
+        {
+          "activation": 0.0019143139943480492,
+          "chain_idx": 20809,
+          "window_start": 31,
+          "text": "\u97d3\u570b\u6700\u5e73\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00>>>\u3002\u5317\u90e8\u6709\u4e00\u7247\u677e<<<\u6a39\u6797\uff0c\u5357\u90e8\u6709\u4e00\u500b\u679c\u5712\uff0c\u9019\u500b\u5730\u9ede"
+        },
+        {
+          "activation": 0.001870949985459447,
+          "chain_idx": 20809,
+          "window_start": 19,
+          "text": "\u7684\u4e00\u500b\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168>>>\u5dde\u5e02\u662f\u97d3\u570b\u6700\u5e73<<<\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00\u3002\u5317\u90e8\u6709\u4e00"
+        },
+        {
+          "activation": 0.0018670251592993736,
+          "chain_idx": 20809,
+          "window_start": 3,
+          "text": "\u9019\u5ea7>>>\u623f\u5b50\u5750\u843d\u5728\u5168\u5dde\u5e02<<<\u90ca\u7684\u4e00\u500b\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c"
+        },
+        {
+          "activation": 0.0018522077007219195,
+          "chain_idx": 20809,
+          "window_start": 53,
+          "text": "\uff0c\u9019\u500b\u5730\u9ede\u6700\u5947\u7279\u7684\u5730\u65b9\u662f\u897f\u90e8\uff0c>>>\u9130\u8fd1\u4e00\u4e9b\u5bb6\u65cf\u6c0f<<<\u65cf\u7684\u5893\u5730\u3002\u8a72\u5893\u5730\u4e5f\u5b9a\u7fa9\u4e86"
+        }
+      ]
+    },
+    "15186": {
+      "mass": 0.021679060766473413,
+      "examples": [
+        {
+          "activation": 0.002599169500172138,
+          "chain_idx": 20809,
+          "window_start": 54,
+          "text": "\u9019\u500b\u5730\u9ede\u6700\u5947\u7279\u7684\u5730\u65b9\u662f\u897f\u90e8\uff0c\u9130>>>\u8fd1\u4e00\u4e9b\u5bb6\u65cf\u6c0f\u65cf\u7684<<<\u5893\u5730\u3002\u8a72\u5893\u5730\u4e5f\u5b9a\u7fa9\u4e86\u6751"
+        },
+        {
+          "activation": 0.002371020382270217,
+          "chain_idx": 20809,
+          "window_start": 55,
+          "text": "\u5730\u9ede\u6700\u5947\u7279\u7684\u5730\u65b9\u662f\u897f\u90e8\uff0c\u9130\u8fd1>>>\u4e00\u4e9b\u5bb6\u65cf\u6c0f\u65cf\u7684\u5893<<<\u5730\u3002\u8a72\u5893\u5730\u4e5f\u5b9a\u7fa9\u4e86\u6751\u838a"
+        },
+        {
+          "activation": 0.0023446609266102314,
+          "chain_idx": 20809,
+          "window_start": 5,
+          "text": "\u9019\u5ea7\u623f\u5b50\u5750>>>\u843d\u5728\u5168\u5dde\u5e02\u90ca\u7684\u4e00\u500b<<<\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168\u5dde\u5e02"
+        },
+        {
+          "activation": 0.0022026095539331436,
+          "chain_idx": 20809,
+          "window_start": 4,
+          "text": "\u9019\u5ea7\u623f\u5b50>>>\u5750\u843d\u5728\u5168\u5dde\u5e02\u90ca<<<\u7684\u4e00\u500b\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168"
+        },
+        {
+          "activation": 0.002187167527154088,
+          "chain_idx": 20809,
+          "window_start": 32,
+          "text": "\u6700\u5e73\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00\u3002>>>\u5317\u90e8\u6709\u4e00\u7247\u677e\u6a39<<<\u6797\uff0c\u5357\u90e8\u6709\u4e00\u500b\u679c\u5712\uff0c\u9019\u500b\u5730\u9ede\u6700"
+        },
+        {
+          "activation": 0.0021146275103092194,
+          "chain_idx": 20809,
+          "window_start": 6,
+          "text": "\u9019\u5ea7\u623f\u5b50\u5750\u843d\u5728>>>\u5168\u5dde\u5e02\u90ca\u7684\u4e00\u500b\u53eb\u505a<<< Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168\u5dde\u5e02\u662f"
+        },
+        {
+          "activation": 0.0019829161465168,
+          "chain_idx": 20809,
+          "window_start": 31,
+          "text": "\u97d3\u570b\u6700\u5e73\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00>>>\u3002\u5317\u90e8\u6709\u4e00\u7247\u677e<<<\u6a39\u6797\uff0c\u5357\u90e8\u6709\u4e00\u500b\u679c\u5712\uff0c\u9019\u500b\u5730\u9ede"
+        },
+        {
+          "activation": 0.0019691509660333395,
+          "chain_idx": 20809,
+          "window_start": 19,
+          "text": "\u7684\u4e00\u500b\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168>>>\u5dde\u5e02\u662f\u97d3\u570b\u6700\u5e73<<<\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00\u3002\u5317\u90e8\u6709\u4e00"
+        },
+        {
+          "activation": 0.001955077750608325,
+          "chain_idx": 20809,
+          "window_start": 3,
+          "text": "\u9019\u5ea7>>>\u623f\u5b50\u5750\u843d\u5728\u5168\u5dde\u5e02<<<\u90ca\u7684\u4e00\u500b\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c"
+        },
+        {
+          "activation": 0.0019526605028659105,
+          "chain_idx": 20809,
+          "window_start": 33,
+          "text": "\u5e73\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00\u3002\u5317\u90e8>>>\u6709\u4e00\u7247\u677e\u6a39\u6797<<<\uff0c\u5357\u90e8\u6709\u4e00\u500b\u679c\u5712\uff0c\u9019\u500b\u5730\u9ede\u6700\u5947"
+        }
+      ]
+    },
+    "13011": {
+      "mass": 0.02436002972535789,
+      "examples": [
+        {
+          "activation": 0.0029124014545232058,
+          "chain_idx": 20809,
+          "window_start": 54,
+          "text": "\u9019\u500b\u5730\u9ede\u6700\u5947\u7279\u7684\u5730\u65b9\u662f\u897f\u90e8\uff0c\u9130>>>\u8fd1\u4e00\u4e9b\u5bb6\u65cf\u6c0f\u65cf\u7684<<<\u5893\u5730\u3002\u8a72\u5893\u5730\u4e5f\u5b9a\u7fa9\u4e86\u6751"
+        },
+        {
+          "activation": 0.0026544753927737474,
+          "chain_idx": 20809,
+          "window_start": 55,
+          "text": "\u5730\u9ede\u6700\u5947\u7279\u7684\u5730\u65b9\u662f\u897f\u90e8\uff0c\u9130\u8fd1>>>\u4e00\u4e9b\u5bb6\u65cf\u6c0f\u65cf\u7684\u5893<<<\u5730\u3002\u8a72\u5893\u5730\u4e5f\u5b9a\u7fa9\u4e86\u6751\u838a"
+        },
+        {
+          "activation": 0.0026358847972005606,
+          "chain_idx": 20809,
+          "window_start": 5,
+          "text": "\u9019\u5ea7\u623f\u5b50\u5750>>>\u843d\u5728\u5168\u5dde\u5e02\u90ca\u7684\u4e00\u500b<<<\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168\u5dde\u5e02"
+        },
+        {
+          "activation": 0.0024798864033073187,
+          "chain_idx": 20809,
+          "window_start": 32,
+          "text": "\u6700\u5e73\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00\u3002>>>\u5317\u90e8\u6709\u4e00\u7247\u677e\u6a39<<<\u6797\uff0c\u5357\u90e8\u6709\u4e00\u500b\u679c\u5712\uff0c\u9019\u500b\u5730\u9ede\u6700"
+        },
+        {
+          "activation": 0.00246442761272192,
+          "chain_idx": 20809,
+          "window_start": 4,
+          "text": "\u9019\u5ea7\u623f\u5b50>>>\u5750\u843d\u5728\u5168\u5dde\u5e02\u90ca<<<\u7684\u4e00\u500b\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168"
+        },
+        {
+          "activation": 0.002366157714277506,
+          "chain_idx": 20809,
+          "window_start": 6,
+          "text": "\u9019\u5ea7\u623f\u5b50\u5750\u843d\u5728>>>\u5168\u5dde\u5e02\u90ca\u7684\u4e00\u500b\u53eb\u505a<<< Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168\u5dde\u5e02\u662f"
+        },
+        {
+          "activation": 0.0022444792557507753,
+          "chain_idx": 20809,
+          "window_start": 31,
+          "text": "\u97d3\u570b\u6700\u5e73\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00>>>\u3002\u5317\u90e8\u6709\u4e00\u7247\u677e<<<\u6a39\u6797\uff0c\u5357\u90e8\u6709\u4e00\u500b\u679c\u5712\uff0c\u9019\u500b\u5730\u9ede"
+        },
+        {
+          "activation": 0.002210546750575304,
+          "chain_idx": 20809,
+          "window_start": 19,
+          "text": "\u7684\u4e00\u500b\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168>>>\u5dde\u5e02\u662f\u97d3\u570b\u6700\u5e73<<<\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00\u3002\u5317\u90e8\u6709\u4e00"
+        },
+        {
+          "activation": 0.0021982414182275534,
+          "chain_idx": 20809,
+          "window_start": 33,
+          "text": "\u5e73\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00\u3002\u5317\u90e8>>>\u6709\u4e00\u7247\u677e\u6a39\u6797<<<\uff0c\u5357\u90e8\u6709\u4e00\u500b\u679c\u5712\uff0c\u9019\u500b\u5730\u9ede\u6700\u5947"
+        },
+        {
+          "activation": 0.002193528925999999,
+          "chain_idx": 20809,
+          "window_start": 53,
+          "text": "\uff0c\u9019\u500b\u5730\u9ede\u6700\u5947\u7279\u7684\u5730\u65b9\u662f\u897f\u90e8\uff0c>>>\u9130\u8fd1\u4e00\u4e9b\u5bb6\u65cf\u6c0f<<<\u65cf\u7684\u5893\u5730\u3002\u8a72\u5893\u5730\u4e5f\u5b9a\u7fa9\u4e86"
+        }
+      ]
+    },
+    "6370": {
+      "mass": 0.023468986619263887,
+      "examples": [
+        {
+          "activation": 0.00280353263951838,
+          "chain_idx": 20809,
+          "window_start": 54,
+          "text": "\u9019\u500b\u5730\u9ede\u6700\u5947\u7279\u7684\u5730\u65b9\u662f\u897f\u90e8\uff0c\u9130>>>\u8fd1\u4e00\u4e9b\u5bb6\u65cf\u6c0f\u65cf\u7684<<<\u5893\u5730\u3002\u8a72\u5893\u5730\u4e5f\u5b9a\u7fa9\u4e86\u6751"
+        },
+        {
+          "activation": 0.002553576370701194,
+          "chain_idx": 20809,
+          "window_start": 55,
+          "text": "\u5730\u9ede\u6700\u5947\u7279\u7684\u5730\u65b9\u662f\u897f\u90e8\uff0c\u9130\u8fd1>>>\u4e00\u4e9b\u5bb6\u65cf\u6c0f\u65cf\u7684\u5893<<<\u5730\u3002\u8a72\u5893\u5730\u4e5f\u5b9a\u7fa9\u4e86\u6751\u838a"
+        },
+        {
+          "activation": 0.0025319019332528114,
+          "chain_idx": 20809,
+          "window_start": 5,
+          "text": "\u9019\u5ea7\u623f\u5b50\u5750>>>\u843d\u5728\u5168\u5dde\u5e02\u90ca\u7684\u4e00\u500b<<<\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168\u5dde\u5e02"
+        },
+        {
+          "activation": 0.002382229547947645,
+          "chain_idx": 20809,
+          "window_start": 32,
+          "text": "\u6700\u5e73\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00\u3002>>>\u5317\u90e8\u6709\u4e00\u7247\u677e\u6a39<<<\u6797\uff0c\u5357\u90e8\u6709\u4e00\u500b\u679c\u5712\uff0c\u9019\u500b\u5730\u9ede\u6700"
+        },
+        {
+          "activation": 0.00237781903706491,
+          "chain_idx": 20809,
+          "window_start": 4,
+          "text": "\u9019\u5ea7\u623f\u5b50>>>\u5750\u843d\u5728\u5168\u5dde\u5e02\u90ca<<<\u7684\u4e00\u500b\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168"
+        },
+        {
+          "activation": 0.002281764056533575,
+          "chain_idx": 20809,
+          "window_start": 6,
+          "text": "\u9019\u5ea7\u623f\u5b50\u5750\u843d\u5728>>>\u5168\u5dde\u5e02\u90ca\u7684\u4e00\u500b\u53eb\u505a<<< Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168\u5dde\u5e02\u662f"
+        },
+        {
+          "activation": 0.00218008179217577,
+          "chain_idx": 20809,
+          "window_start": 31,
+          "text": "\u97d3\u570b\u6700\u5e73\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00>>>\u3002\u5317\u90e8\u6709\u4e00\u7247\u677e<<<\u6a39\u6797\uff0c\u5357\u90e8\u6709\u4e00\u500b\u679c\u5712\uff0c\u9019\u500b\u5730\u9ede"
+        },
+        {
+          "activation": 0.0021323745604604483,
+          "chain_idx": 20809,
+          "window_start": 19,
+          "text": "\u7684\u4e00\u500b\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168>>>\u5dde\u5e02\u662f\u97d3\u570b\u6700\u5e73<<<\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00\u3002\u5317\u90e8\u6709\u4e00"
+        },
+        {
+          "activation": 0.00211576116271317,
+          "chain_idx": 20809,
+          "window_start": 3,
+          "text": "\u9019\u5ea7>>>\u623f\u5b50\u5750\u843d\u5728\u5168\u5dde\u5e02<<<\u90ca\u7684\u4e00\u500b\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c"
+        },
+        {
+          "activation": 0.0021099455188959837,
+          "chain_idx": 20809,
+          "window_start": 53,
+          "text": "\uff0c\u9019\u500b\u5730\u9ede\u6700\u5947\u7279\u7684\u5730\u65b9\u662f\u897f\u90e8\uff0c>>>\u9130\u8fd1\u4e00\u4e9b\u5bb6\u65cf\u6c0f<<<\u65cf\u7684\u5893\u5730\u3002\u8a72\u5893\u5730\u4e5f\u5b9a\u7fa9\u4e86"
+        }
+      ]
+    },
+    "7287": {
+      "mass": 0.020757739432156086,
+      "examples": [
+        {
+          "activation": 0.002481402363628149,
+          "chain_idx": 20809,
+          "window_start": 54,
+          "text": "\u9019\u500b\u5730\u9ede\u6700\u5947\u7279\u7684\u5730\u65b9\u662f\u897f\u90e8\uff0c\u9130>>>\u8fd1\u4e00\u4e9b\u5bb6\u65cf\u6c0f\u65cf\u7684<<<\u5893\u5730\u3002\u8a72\u5893\u5730\u4e5f\u5b9a\u7fa9\u4e86\u6751"
+        },
+        {
+          "activation": 0.00226495205424726,
+          "chain_idx": 20809,
+          "window_start": 55,
+          "text": "\u5730\u9ede\u6700\u5947\u7279\u7684\u5730\u65b9\u662f\u897f\u90e8\uff0c\u9130\u8fd1>>>\u4e00\u4e9b\u5bb6\u65cf\u6c0f\u65cf\u7684\u5893<<<\u5730\u3002\u8a72\u5893\u5730\u4e5f\u5b9a\u7fa9\u4e86\u6751\u838a"
+        },
+        {
+          "activation": 0.0022388766519725323,
+          "chain_idx": 20809,
+          "window_start": 5,
+          "text": "\u9019\u5ea7\u623f\u5b50\u5750>>>\u843d\u5728\u5168\u5dde\u5e02\u90ca\u7684\u4e00\u500b<<<\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168\u5dde\u5e02"
+        },
+        {
+          "activation": 0.0021192922722548246,
+          "chain_idx": 20809,
+          "window_start": 32,
+          "text": "\u6700\u5e73\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00\u3002>>>\u5317\u90e8\u6709\u4e00\u7247\u677e\u6a39<<<\u6797\uff0c\u5357\u90e8\u6709\u4e00\u500b\u679c\u5712\uff0c\u9019\u500b\u5730\u9ede\u6700"
+        },
+        {
+          "activation": 0.0021000413689762354,
+          "chain_idx": 20809,
+          "window_start": 4,
+          "text": "\u9019\u5ea7\u623f\u5b50>>>\u5750\u843d\u5728\u5168\u5dde\u5e02\u90ca<<<\u7684\u4e00\u500b\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168"
+        },
+        {
+          "activation": 0.002010511001572013,
+          "chain_idx": 20809,
+          "window_start": 6,
+          "text": "\u9019\u5ea7\u623f\u5b50\u5750\u843d\u5728>>>\u5168\u5dde\u5e02\u90ca\u7684\u4e00\u500b\u53eb\u505a<<< Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168\u5dde\u5e02\u662f"
+        },
+        {
+          "activation": 0.001928758225403726,
+          "chain_idx": 20809,
+          "window_start": 31,
+          "text": "\u97d3\u570b\u6700\u5e73\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00>>>\u3002\u5317\u90e8\u6709\u4e00\u7247\u677e<<<\u6a39\u6797\uff0c\u5357\u90e8\u6709\u4e00\u500b\u679c\u5712\uff0c\u9019\u500b\u5730\u9ede"
+        },
+        {
+          "activation": 0.0018807158339768648,
+          "chain_idx": 20809,
+          "window_start": 19,
+          "text": "\u7684\u4e00\u500b\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168>>>\u5dde\u5e02\u662f\u97d3\u570b\u6700\u5e73<<<\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00\u3002\u5317\u90e8\u6709\u4e00"
+        },
+        {
+          "activation": 0.001866837847046554,
+          "chain_idx": 20809,
+          "window_start": 53,
+          "text": "\uff0c\u9019\u500b\u5730\u9ede\u6700\u5947\u7279\u7684\u5730\u65b9\u662f\u897f\u90e8\uff0c>>>\u9130\u8fd1\u4e00\u4e9b\u5bb6\u65cf\u6c0f<<<\u65cf\u7684\u5893\u5730\u3002\u8a72\u5893\u5730\u4e5f\u5b9a\u7fa9\u4e86"
+        },
+        {
+          "activation": 0.0018663518130779266,
+          "chain_idx": 20809,
+          "window_start": 33,
+          "text": "\u5e73\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00\u3002\u5317\u90e8>>>\u6709\u4e00\u7247\u677e\u6a39\u6797<<<\uff0c\u5357\u90e8\u6709\u4e00\u500b\u679c\u5712\uff0c\u9019\u500b\u5730\u9ede\u6700\u5947"
+        }
+      ]
+    },
+    "9722": {
+      "mass": 0.021190178813412786,
+      "examples": [
+        {
+          "activation": 0.0025315512903034687,
+          "chain_idx": 20809,
+          "window_start": 54,
+          "text": "\u9019\u500b\u5730\u9ede\u6700\u5947\u7279\u7684\u5730\u65b9\u662f\u897f\u90e8\uff0c\u9130>>>\u8fd1\u4e00\u4e9b\u5bb6\u65cf\u6c0f\u65cf\u7684<<<\u5893\u5730\u3002\u8a72\u5893\u5730\u4e5f\u5b9a\u7fa9\u4e86\u6751"
+        },
+        {
+          "activation": 0.0022910800762474537,
+          "chain_idx": 20809,
+          "window_start": 55,
+          "text": "\u5730\u9ede\u6700\u5947\u7279\u7684\u5730\u65b9\u662f\u897f\u90e8\uff0c\u9130\u8fd1>>>\u4e00\u4e9b\u5bb6\u65cf\u6c0f\u65cf\u7684\u5893<<<\u5730\u3002\u8a72\u5893\u5730\u4e5f\u5b9a\u7fa9\u4e86\u6751\u838a"
+        },
+        {
+          "activation": 0.002279881853610277,
+          "chain_idx": 20809,
+          "window_start": 5,
+          "text": "\u9019\u5ea7\u623f\u5b50\u5750>>>\u843d\u5728\u5168\u5dde\u5e02\u90ca\u7684\u4e00\u500b<<<\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168\u5dde\u5e02"
+        },
+        {
+          "activation": 0.0021606902591884136,
+          "chain_idx": 20809,
+          "window_start": 32,
+          "text": "\u6700\u5e73\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00\u3002>>>\u5317\u90e8\u6709\u4e00\u7247\u677e\u6a39<<<\u6797\uff0c\u5357\u90e8\u6709\u4e00\u500b\u679c\u5712\uff0c\u9019\u500b\u5730\u9ede\u6700"
+        },
+        {
+          "activation": 0.002139204880222678,
+          "chain_idx": 20809,
+          "window_start": 4,
+          "text": "\u9019\u5ea7\u623f\u5b50>>>\u5750\u843d\u5728\u5168\u5dde\u5e02\u90ca<<<\u7684\u4e00\u500b\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168"
+        },
+        {
+          "activation": 0.002047311281785369,
+          "chain_idx": 20809,
+          "window_start": 6,
+          "text": "\u9019\u5ea7\u623f\u5b50\u5750\u843d\u5728>>>\u5168\u5dde\u5e02\u90ca\u7684\u4e00\u500b\u53eb\u505a<<< Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168\u5dde\u5e02\u662f"
+        },
+        {
+          "activation": 0.001977211330085993,
+          "chain_idx": 20809,
+          "window_start": 31,
+          "text": "\u97d3\u570b\u6700\u5e73\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00>>>\u3002\u5317\u90e8\u6709\u4e00\u7247\u677e<<<\u6a39\u6797\uff0c\u5357\u90e8\u6709\u4e00\u500b\u679c\u5712\uff0c\u9019\u500b\u5730\u9ede"
+        },
+        {
+          "activation": 0.001936442102305591,
+          "chain_idx": 20809,
+          "window_start": 19,
+          "text": "\u7684\u4e00\u500b\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168>>>\u5dde\u5e02\u662f\u97d3\u570b\u6700\u5e73<<<\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00\u3002\u5317\u90e8\u6709\u4e00"
+        },
+        {
+          "activation": 0.0019149743020534515,
+          "chain_idx": 20809,
+          "window_start": 3,
+          "text": "\u9019\u5ea7>>>\u623f\u5b50\u5750\u843d\u5728\u5168\u5dde\u5e02<<<\u90ca\u7684\u4e00\u500b\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c"
+        },
+        {
+          "activation": 0.0019118314376100898,
+          "chain_idx": 20809,
+          "window_start": 37,
+          "text": "\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00\u3002\u5317\u90e8\u6709\u4e00\u7247\u677e\u6a39>>>\u6797\uff0c\u5357\u90e8\u6709\u4e00\u500b\u679c<<<\u5712\uff0c\u9019\u500b\u5730\u9ede\u6700\u5947\u7279\u7684\u5730\u65b9\u662f\u897f\u90e8"
+        }
+      ]
+    },
+    "6783": {
+      "mass": 0.020778871257789433,
+      "examples": [
+        {
+          "activation": 0.002500050002709031,
+          "chain_idx": 20809,
+          "window_start": 54,
+          "text": "\u9019\u500b\u5730\u9ede\u6700\u5947\u7279\u7684\u5730\u65b9\u662f\u897f\u90e8\uff0c\u9130>>>\u8fd1\u4e00\u4e9b\u5bb6\u65cf\u6c0f\u65cf\u7684<<<\u5893\u5730\u3002\u8a72\u5893\u5730\u4e5f\u5b9a\u7fa9\u4e86\u6751"
+        },
+        {
+          "activation": 0.0022620833478868008,
+          "chain_idx": 20809,
+          "window_start": 55,
+          "text": "\u5730\u9ede\u6700\u5947\u7279\u7684\u5730\u65b9\u662f\u897f\u90e8\uff0c\u9130\u8fd1>>>\u4e00\u4e9b\u5bb6\u65cf\u6c0f\u65cf\u7684\u5893<<<\u5730\u3002\u8a72\u5893\u5730\u4e5f\u5b9a\u7fa9\u4e86\u6751\u838a"
+        },
+        {
+          "activation": 0.002240650122985244,
+          "chain_idx": 20809,
+          "window_start": 5,
+          "text": "\u9019\u5ea7\u623f\u5b50\u5750>>>\u843d\u5728\u5168\u5dde\u5e02\u90ca\u7684\u4e00\u500b<<<\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168\u5dde\u5e02"
+        },
+        {
+          "activation": 0.002115635434165597,
+          "chain_idx": 20809,
+          "window_start": 32,
+          "text": "\u6700\u5e73\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00\u3002>>>\u5317\u90e8\u6709\u4e00\u7247\u677e\u6a39<<<\u6797\uff0c\u5357\u90e8\u6709\u4e00\u500b\u679c\u5712\uff0c\u9019\u500b\u5730\u9ede\u6700"
+        },
+        {
+          "activation": 0.002107786014676094,
+          "chain_idx": 20809,
+          "window_start": 4,
+          "text": "\u9019\u5ea7\u623f\u5b50>>>\u5750\u843d\u5728\u5168\u5dde\u5e02\u90ca<<<\u7684\u4e00\u500b\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168"
+        },
+        {
+          "activation": 0.0020122507121413946,
+          "chain_idx": 20809,
+          "window_start": 6,
+          "text": "\u9019\u5ea7\u623f\u5b50\u5750\u843d\u5728>>>\u5168\u5dde\u5e02\u90ca\u7684\u4e00\u500b\u53eb\u505a<<< Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168\u5dde\u5e02\u662f"
+        },
+        {
+          "activation": 0.0018969522789120674,
+          "chain_idx": 20809,
+          "window_start": 31,
+          "text": "\u97d3\u570b\u6700\u5e73\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00>>>\u3002\u5317\u90e8\u6709\u4e00\u7247\u677e<<<\u6a39\u6797\uff0c\u5357\u90e8\u6709\u4e00\u500b\u679c\u5712\uff0c\u9019\u500b\u5730\u9ede"
+        },
+        {
+          "activation": 0.0018868092447519302,
+          "chain_idx": 20809,
+          "window_start": 3,
+          "text": "\u9019\u5ea7>>>\u623f\u5b50\u5750\u843d\u5728\u5168\u5dde\u5e02<<<\u90ca\u7684\u4e00\u500b\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c"
+        },
+        {
+          "activation": 0.001881101750768721,
+          "chain_idx": 20809,
+          "window_start": 19,
+          "text": "\u7684\u4e00\u500b\u53eb\u505a Banwall \u7684\u6751\u838a\u91cc\uff0c\u5168>>>\u5dde\u5e02\u662f\u97d3\u570b\u6700\u5e73<<<\u975c\uff0c\u6700\u7f8e\u9e97\u7684\u57ce\u5e02\u4e4b\u4e00\u3002\u5317\u90e8\u6709\u4e00"
+        },
+        {
+          "activation": 0.001875552348792553,
+          "chain_idx": 20809,
+          "window_start": 53,
+          "text": "\uff0c\u9019\u500b\u5730\u9ede\u6700\u5947\u7279\u7684\u5730\u65b9\u662f\u897f\u90e8\uff0c>>>\u9130\u8fd1\u4e00\u4e9b\u5bb6\u65cf\u6c0f<<<\u65cf\u7684\u5893\u5730\u3002\u8a72\u5893\u5730\u4e5f\u5b9a\u7fa9\u4e86"
+        }
+      ]
+    }
+  }
+}

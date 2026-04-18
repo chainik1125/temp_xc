@@ -1,0 +1,1666 @@
+{
+  "arch": "tfa_pos",
+  "subject_model": "gemma-2-2b-it",
+  "layer_key": "resid_L13",
+  "k": 50,
+  "T": 5,
+  "sample_chains": 1000,
+  "top_k_per_feature": 10,
+  "d_sae": 18432,
+  "num_active_features": 8050,
+  "requested_feats": [
+    4956,
+    8120,
+    8573,
+    8656,
+    8814,
+    8992,
+    10981,
+    11414,
+    11630,
+    11776,
+    12512,
+    12712,
+    14450,
+    15530,
+    15544,
+    16109,
+    16516,
+    16584,
+    16749,
+    17052,
+    17108,
+    17344,
+    17349,
+    17368,
+    17410
+  ],
+  "dead_feats": [],
+  "features": {
+    "11776": {
+      "mass": 0.5956307649612427,
+      "examples": [
+        {
+          "activation": 0.06188689544796944,
+          "chain_idx": 1356,
+          "window_start": 121,
+          "text": "'s internal memory and then use any Android file>>> manager you prefer to browse<<< & install"
+        },
+        {
+          "activation": 0.061341773718595505,
+          "chain_idx": 1356,
+          "window_start": 122,
+          "text": "s internal memory and then use any Android file manager>>> you prefer to browse &<<< install"
+        },
+        {
+          "activation": 0.060953523963689804,
+          "chain_idx": 8743,
+          "window_start": 108,
+          "text": " at your own pace, try out the suggestions,>>> and return as often as<<< you wish.\nBuilding resilience can provide tools for"
+        },
+        {
+          "activation": 0.059762418270111084,
+          "chain_idx": 1356,
+          "window_start": 123,
+          "text": " internal memory and then use any Android file manager you>>> prefer to browse & install<<<"
+        },
+        {
+          "activation": 0.05963757261633873,
+          "chain_idx": 22797,
+          "window_start": 123,
+          "text": "), then join our Patreon community.\nYou can>>> also watch this podcast in<<<"
+        },
+        {
+          "activation": 0.05908818170428276,
+          "chain_idx": 14955,
+          "window_start": 46,
+          "text": " you have a quick read of what she said first>>>, then come back here<<<. I'll make some tea.\nRight"
+        },
+        {
+          "activation": 0.05888326093554497,
+          "chain_idx": 8743,
+          "window_start": 107,
+          "text": " Proceed at your own pace, try out the suggestions>>>, and return as often<<< as you wish.\nBuilding resilience can provide tools"
+        },
+        {
+          "activation": 0.05824827775359154,
+          "chain_idx": 3884,
+          "window_start": 81,
+          "text": " Ansteorrans would give to these questions,>>> so with\npermission of<<< the original poster, I reproduce this interesting missive"
+        },
+        {
+          "activation": 0.05817136913537979,
+          "chain_idx": 8327,
+          "window_start": 107,
+          "text": " the website via the link, please tap the following>>> link.\nYoutubeLive<<< Program Web Page\nSchedule: August 23"
+        },
+        {
+          "activation": 0.05765749141573906,
+          "chain_idx": 21883,
+          "window_start": 109,
+          "text": " by FlyPix.\nWe have provided a link>>> below so you can view<<< the video for yourselves.\nCheck our calendar of"
+        }
+      ]
+    },
+    "17410": {
+      "mass": 0.5745239853858948,
+      "examples": [
+        {
+          "activation": 0.06116478517651558,
+          "chain_idx": 5509,
+          "window_start": 52,
+          "text": " good fic, and I hope you update soon!>>> And I was wondering,<<< Ted as in Ted Tonks? Or is Ted"
+        },
+        {
+          "activation": 0.06058154255151749,
+          "chain_idx": 5509,
+          "window_start": 51,
+          "text": " very good fic, and I hope you update soon>>>! And I was wondering<<<, Ted as in Ted Tonks? Or is"
+        },
+        {
+          "activation": 0.05817871913313866,
+          "chain_idx": 5509,
+          "window_start": 50,
+          "text": " a very good fic, and I hope you update>>> soon! And I was<<< wondering, Ted as in Ted Tonks? Or"
+        },
+        {
+          "activation": 0.057262178510427475,
+          "chain_idx": 4425,
+          "window_start": 23,
+          "text": "2009. Not very good grammar but>>> I will post it anyway<<<)\nSo tell me about your first telescope stories"
+        },
+        {
+          "activation": 0.05673820897936821,
+          "chain_idx": 13307,
+          "window_start": 73,
+          "text": "\u2019ve been doing a lot of proofreading,>>> and because I enjoyed writing<<< about Game of Thrones, misogyny and medieval"
+        },
+        {
+          "activation": 0.05639296770095825,
+          "chain_idx": 10432,
+          "window_start": 119,
+          "text": " moment to review us on Amazon by clicking the link>>> below. If you do<<< so, let us"
+        },
+        {
+          "activation": 0.05627897009253502,
+          "chain_idx": 10432,
+          "window_start": 118,
+          "text": " a moment to review us on Amazon by clicking the>>> link below. If you<<< do so, let us"
+        },
+        {
+          "activation": 0.056227147579193115,
+          "chain_idx": 14955,
+          "window_start": 45,
+          "text": " if you have a quick read of what she said>>> first, then come back<<< here. I'll make some tea.\n"
+        },
+        {
+          "activation": 0.055878497660160065,
+          "chain_idx": 3884,
+          "window_start": 91,
+          "text": " so with\npermission of the original poster, I>>> reproduce this interesting missive<<<:\nDate: Mon, 14 Jul"
+        },
+        {
+          "activation": 0.05582096800208092,
+          "chain_idx": 3884,
+          "window_start": 61,
+          "text": " the\nnature of chivalry was posed for consideration.>>> I was curious as to<<< what\nkinds of answers Ansteorrans would"
+        }
+      ]
+    },
+    "16516": {
+      "mass": 0.5435390472412109,
+      "examples": [
+        {
+          "activation": 0.055961549282073975,
+          "chain_idx": 16215,
+          "window_start": 17,
+          "text": "m working on a longer posting that I\u2019ll>>> put up in a bit<<<, but these two topics aren\u2019t related,"
+        },
+        {
+          "activation": 0.055336784571409225,
+          "chain_idx": 22272,
+          "window_start": 50,
+          "text": "15)\nA printed edition of this Special>>> Issue is available here.<<<\nProf. Dr. K.C. Chan"
+        },
+        {
+          "activation": 0.05514981970191002,
+          "chain_idx": 16215,
+          "window_start": 16,
+          "text": "\u2019m working on a longer posting that I\u2019>>>ll put up in a<<< bit, but these two topics aren\u2019t related"
+        },
+        {
+          "activation": 0.05494635924696922,
+          "chain_idx": 11378,
+          "window_start": 41,
+          "text": " by the same author. The review of this collection>>> may be found at Graphics<<< for the Calculus Classroom.\nType of Material:"
+        },
+        {
+          "activation": 0.05487455055117607,
+          "chain_idx": 11619,
+          "window_start": 94,
+          "text": " leeks are common in the northern regions we typically>>> visit on our cycling tours<<< and ski tours. Here in regions such as Trent"
+        },
+        {
+          "activation": 0.05454021319746971,
+          "chain_idx": 3618,
+          "window_start": 91,
+          "text": " comparison in the largest Chinese online stores. It'>>>s a search engine,<<< offering a wide variety of products including gadgets, electronics"
+        },
+        {
+          "activation": 0.053441550582647324,
+          "chain_idx": 11619,
+          "window_start": 95,
+          "text": "eks are common in the northern regions we typically visit>>> on our cycling tours and<<< ski tours. Here in regions such as Trentino"
+        },
+        {
+          "activation": 0.05314207077026367,
+          "chain_idx": 9181,
+          "window_start": 11,
+          "text": "This blog does not host any of the files mentioned>>> on this blog or on<<< its own servers. It only points out to various"
+        },
+        {
+          "activation": 0.05311143025755882,
+          "chain_idx": 16215,
+          "window_start": 18,
+          "text": " working on a longer posting that I\u2019ll put>>> up in a bit,<<< but these two topics aren\u2019t related, thus"
+        },
+        {
+          "activation": 0.053034719079732895,
+          "chain_idx": 3618,
+          "window_start": 89,
+          "text": " and price comparison in the largest Chinese online stores.>>> It's a search<<< engine, offering a wide variety of products including gadgets"
+        }
+      ]
+    },
+    "11414": {
+      "mass": 0.6512646228075027,
+      "examples": [
+        {
+          "activation": 0.06804563850164413,
+          "chain_idx": 4425,
+          "window_start": 1,
+          "text": ">>>(This article originally was<<< written April 26, 200"
+        },
+        {
+          "activation": 0.06688805669546127,
+          "chain_idx": 17464,
+          "window_start": 1,
+          "text": ">>>What activities we offer\n<<<At Pissup we have a huge number of"
+        },
+        {
+          "activation": 0.06595180928707123,
+          "chain_idx": 8156,
+          "window_start": 1,
+          "text": ">>>According to our registry,<<< Professional Draw is capable of opening the files listed below"
+        },
+        {
+          "activation": 0.0654248297214508,
+          "chain_idx": 1659,
+          "window_start": 1,
+          "text": ">>>The city council is considering<<< a pilot scheme where pest control officers would provide a"
+        },
+        {
+          "activation": 0.06533819437026978,
+          "chain_idx": 3968,
+          "window_start": 1,
+          "text": ">>>Title page for ETD<<< etd-1121201"
+        },
+        {
+          "activation": 0.06489160656929016,
+          "chain_idx": 23031,
+          "window_start": 1,
+          "text": ">>>Front Page Titles (by<<< Subject) Goethe's Works, vol. "
+        },
+        {
+          "activation": 0.06391187757253647,
+          "chain_idx": 4782,
+          "window_start": 1,
+          "text": ">>>By Lorraine Hutchinson\nThe<<< year 2012 was the best of"
+        },
+        {
+          "activation": 0.06384814530611038,
+          "chain_idx": 8541,
+          "window_start": 1,
+          "text": ">>>Merritt Supply does<<< not manufacture any products. The only warranties in effect"
+        },
+        {
+          "activation": 0.06359880417585373,
+          "chain_idx": 15711,
+          "window_start": 1,
+          "text": ">>>ACC Digital Pvt Ltd,<<< the producers of \u201cRangbaz\u201d are also the"
+        },
+        {
+          "activation": 0.06336566060781479,
+          "chain_idx": 2489,
+          "window_start": 1,
+          "text": ">>>By Vella Munn\n<<<She was a tiny thing, several inches shorter than"
+        }
+      ]
+    },
+    "17052": {
+      "mass": 0.5275697633624077,
+      "examples": [
+        {
+          "activation": 0.055232591927051544,
+          "chain_idx": 14955,
+          "window_start": 57,
+          "text": " then come back here. I'll make some>>> tea.\nRight.<<< Maybe there's a UK/US divide here"
+        },
+        {
+          "activation": 0.053730905055999756,
+          "chain_idx": 14955,
+          "window_start": 48,
+          "text": " a quick read of what she said first, then>>> come back here. I<<<'ll make some tea.\nRight. Maybe"
+        },
+        {
+          "activation": 0.053318191319704056,
+          "chain_idx": 14570,
+          "window_start": 86,
+          "text": " 2009Updated: 9:>>>09 am EDT May<<< 7, 2009\nCOLLEGE"
+        },
+        {
+          "activation": 0.052963342517614365,
+          "chain_idx": 14955,
+          "window_start": 42,
+          "text": ". Probably best if you have a quick read of>>> what she said first,<<< then come back here. I'll make some"
+        },
+        {
+          "activation": 0.0526435561478138,
+          "chain_idx": 14955,
+          "window_start": 41,
+          "text": " on. Probably best if you have a quick read>>> of what she said first<<<, then come back here. I'll make"
+        },
+        {
+          "activation": 0.05256180092692375,
+          "chain_idx": 12217,
+          "window_start": 123,
+          "text": "13 October 2020, >>>14:57<<<"
+        },
+        {
+          "activation": 0.05185665562748909,
+          "chain_idx": 6694,
+          "window_start": 71,
+          "text": " liquidity management, cash flow forecasting, and debt management>>>. Prior to Towne Park<<<, Kelvin spent two and a half years at Sun"
+        },
+        {
+          "activation": 0.05180279165506363,
+          "chain_idx": 14955,
+          "window_start": 40,
+          "text": " comment on. Probably best if you have a quick>>> read of what she said<<< first, then come back here. I'll"
+        },
+        {
+          "activation": 0.05173218995332718,
+          "chain_idx": 14570,
+          "window_start": 85,
+          "text": ", 2009Updated: 9>>>:09 am EDT<<< May 7, 2009\n"
+        },
+        {
+          "activation": 0.05172773823142052,
+          "chain_idx": 6755,
+          "window_start": 64,
+          "text": "8 metre catamaran moored in Paris this July to>>> meet and greet, prior<<< to setting out to sea.\nIts crew,"
+        }
+      ]
+    },
+    "8992": {
+      "mass": 0.5544500648975372,
+      "examples": [
+        {
+          "activation": 0.056991156190633774,
+          "chain_idx": 1536,
+          "window_start": 62,
+          "text": "FCIA), \u201chaving met the educational and practical>>> experience requirements prescribed by Chartered<<< Institute of Administration Act No. 103"
+        },
+        {
+          "activation": 0.05634806305170059,
+          "chain_idx": 22397,
+          "window_start": 97,
+          "text": " your warmer secure and in place! Simply peel off>>> the velcro backer on<<< each piece. Attach one to the warmer and the"
+        },
+        {
+          "activation": 0.05605762079358101,
+          "chain_idx": 22397,
+          "window_start": 95,
+          "text": " to keep your warmer secure and in place! Simply>>> peel off the velcro back<<<er on each piece. Attach one to the warmer"
+        },
+        {
+          "activation": 0.05579952523112297,
+          "chain_idx": 22397,
+          "window_start": 96,
+          "text": " keep your warmer secure and in place! Simply peel>>> off the velcro backer<<< on each piece. Attach one to the warmer and"
+        },
+        {
+          "activation": 0.055740028619766235,
+          "chain_idx": 6304,
+          "window_start": 112,
+          "text": " and taken instead but I had hoped the same conditions>>> would soon appear again.<<< I had mentioned to my oldest daughter, Lora if"
+        },
+        {
+          "activation": 0.055409986525774,
+          "chain_idx": 18728,
+          "window_start": 57,
+          "text": " a bird on a branch\nBrilliant gold and orange>>> hues bleed like fire in<<< the east over the rivers\nAnd peeking through the"
+        },
+        {
+          "activation": 0.05483401566743851,
+          "chain_idx": 19694,
+          "window_start": 108,
+          "text": " smart people at the top, so long as they>>> are given the power to<<< change things.\nLibertarians, on the other"
+        },
+        {
+          "activation": 0.05470995232462883,
+          "chain_idx": 16317,
+          "window_start": 93,
+          "text": " loaded. Thus, in one of your boot scripts>>>, you should have:<<<\nThis loads the lirc_i2c"
+        },
+        {
+          "activation": 0.05445636436343193,
+          "chain_idx": 17143,
+          "window_start": 74,
+          "text": " worth little in the labour camps. In order to>>> get rid of some of<<< them, and to have a little laugh, Non"
+        },
+        {
+          "activation": 0.05410335212945938,
+          "chain_idx": 17143,
+          "window_start": 77,
+          "text": " the labour camps. In order to get rid of>>> some of them, and<<< to have a little laugh, Nonotin devises"
+        }
+      ]
+    },
+    "12712": {
+      "mass": 0.5291945338249207,
+      "examples": [
+        {
+          "activation": 0.05441318079829216,
+          "chain_idx": 11544,
+          "window_start": 90,
+          "text": " Run an airfare search now to update and compare>>> prices. Find Flights\n<<<How Much is a Flight from Port Blair to Zurich"
+        },
+        {
+          "activation": 0.05329231172800064,
+          "chain_idx": 2223,
+          "window_start": 83,
+          "text": " clothing....from head to toe: shirt, tie>>>, pants, shoes...<<<light grays, dark grays...then get"
+        },
+        {
+          "activation": 0.053239744156599045,
+          "chain_idx": 4300,
+          "window_start": 63,
+          "text": " hands-down the a\npremiere web service providing>>> tools, service, and<<< support that is above all\nothers. Plus,"
+        },
+        {
+          "activation": 0.053200989961624146,
+          "chain_idx": 10432,
+          "window_start": 122,
+          "text": " us on Amazon by clicking the link below. If>>> you do so, let<<< us"
+        },
+        {
+          "activation": 0.052742958068847656,
+          "chain_idx": 4300,
+          "window_start": 64,
+          "text": "-down the a\npremiere web service providing tools>>>, service, and support<<< that is above all\nothers. Plus, their"
+        },
+        {
+          "activation": 0.05269157886505127,
+          "chain_idx": 5509,
+          "window_start": 52,
+          "text": " good fic, and I hope you update soon!>>> And I was wondering,<<< Ted as in Ted Tonks? Or is Ted"
+        },
+        {
+          "activation": 0.05262460932135582,
+          "chain_idx": 10432,
+          "window_start": 121,
+          "text": " review us on Amazon by clicking the link below.>>> If you do so,<<< let us"
+        },
+        {
+          "activation": 0.0524996779859066,
+          "chain_idx": 10432,
+          "window_start": 123,
+          "text": " on Amazon by clicking the link below. If you>>> do so, let us<<<"
+        },
+        {
+          "activation": 0.05225164815783501,
+          "chain_idx": 16563,
+          "window_start": 65,
+          "text": " balances, debit card transactions and purchases, and MasterCard>>>\u00ae purchases and payments.<<<\n- Sign up for FREE eStatements. Faster"
+        },
+        {
+          "activation": 0.05223783478140831,
+          "chain_idx": 12959,
+          "window_start": 123,
+          "text": " the three person revenue board that must approve city contracts>>>, budgets and expenditures before<<<"
+        }
+      ]
+    },
+    "15530": {
+      "mass": 0.5458954833447933,
+      "examples": [
+        {
+          "activation": 0.05644786357879639,
+          "chain_idx": 1728,
+          "window_start": 36,
+          "text": " stylish stars who made it one to remember.\n>>>Below are just some of<<< the stars we unanimously agreed made 201"
+        },
+        {
+          "activation": 0.0556744821369648,
+          "chain_idx": 11370,
+          "window_start": 60,
+          "text": " veteran director and a newcomer that I can\u2019t>>> resist spending some time on<<< them. Both, it turns out, are interested"
+        },
+        {
+          "activation": 0.054911088198423386,
+          "chain_idx": 20125,
+          "window_start": 11,
+          "text": "YOU MAY ALSO LIKE\nI love sparkling cider so>>> when I came across this<<< recipe, I couldn\u2019t wait to try it"
+        },
+        {
+          "activation": 0.05489813908934593,
+          "chain_idx": 11370,
+          "window_start": 59,
+          "text": " a veteran director and a newcomer that I can\u2019>>>t resist spending some time<<< on them. Both, it turns out, are"
+        },
+        {
+          "activation": 0.05473983287811279,
+          "chain_idx": 9940,
+          "window_start": 23,
+          "text": " and needing rescue, or worse, having perished.>>> Here are some links to<<< articles about incidents that have occurred recently on Arizona trails"
+        },
+        {
+          "activation": 0.054713524878025055,
+          "chain_idx": 20125,
+          "window_start": 13,
+          "text": " ALSO LIKE\nI love sparkling cider so when I>>> came across this recipe,<<< I couldn\u2019t wait to try it. When"
+        },
+        {
+          "activation": 0.053743649274110794,
+          "chain_idx": 2085,
+          "window_start": 36,
+          "text": " hit the streets and with it, Pinball News>>> has got their hands on<<< a prototype of the game and have snapped some shots"
+        },
+        {
+          "activation": 0.05370054766535759,
+          "chain_idx": 10396,
+          "window_start": 103,
+          "text": " white soles. One of the many Chinese sneakerhead>>> accounts on Instagram indicated that<<< Curry was wearing a prototype of the Curry8 \u2014"
+        },
+        {
+          "activation": 0.053586628288030624,
+          "chain_idx": 20119,
+          "window_start": 6,
+          "text": "Did you make these yourself>>> or are they from some<<< $5/logo website?\nThe reason I"
+        },
+        {
+          "activation": 0.05347972735762596,
+          "chain_idx": 5285,
+          "window_start": 46,
+          "text": " the point of captivation for many people. You>>> can find a lot of<<< books and blogs filled with admiration.\nNow one"
+        }
+      ]
+    },
+    "8120": {
+      "mass": 0.6651446223258972,
+      "examples": [
+        {
+          "activation": 0.06651446223258972,
+          "chain_idx": 9077,
+          "window_start": 9,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.06651446223258972,
+          "chain_idx": 9077,
+          "window_start": 8,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.06651446223258972,
+          "chain_idx": 9077,
+          "window_start": 7,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.06651446223258972,
+          "chain_idx": 9077,
+          "window_start": 6,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.06651446223258972,
+          "chain_idx": 9077,
+          "window_start": 5,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.06651446223258972,
+          "chain_idx": 9077,
+          "window_start": 4,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.06651446223258972,
+          "chain_idx": 9077,
+          "window_start": 3,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.06651446223258972,
+          "chain_idx": 9077,
+          "window_start": 2,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.06651446223258972,
+          "chain_idx": 9077,
+          "window_start": 1,
+          "text": ">>><<<"
+        },
+        {
+          "activation": 0.06651446223258972,
+          "chain_idx": 9077,
+          "window_start": 0,
+          "text": ">>><<<"
+        }
+      ]
+    },
+    "15544": {
+      "mass": 0.6164675951004028,
+      "examples": [
+        {
+          "activation": 0.06555957347154617,
+          "chain_idx": 14955,
+          "window_start": 48,
+          "text": " a quick read of what she said first, then>>> come back here. I<<<'ll make some tea.\nRight. Maybe"
+        },
+        {
+          "activation": 0.06450984627008438,
+          "chain_idx": 14955,
+          "window_start": 46,
+          "text": " you have a quick read of what she said first>>>, then come back here<<<. I'll make some tea.\nRight"
+        },
+        {
+          "activation": 0.06400234252214432,
+          "chain_idx": 14955,
+          "window_start": 47,
+          "text": " have a quick read of what she said first,>>> then come back here.<<< I'll make some tea.\nRight."
+        },
+        {
+          "activation": 0.06316474825143814,
+          "chain_idx": 14955,
+          "window_start": 45,
+          "text": " if you have a quick read of what she said>>> first, then come back<<< here. I'll make some tea.\n"
+        },
+        {
+          "activation": 0.06192284822463989,
+          "chain_idx": 14955,
+          "window_start": 54,
+          "text": " said first, then come back here. I'>>>ll make some tea.<<<\nRight. Maybe there's a UK/"
+        },
+        {
+          "activation": 0.060496121644973755,
+          "chain_idx": 14955,
+          "window_start": 44,
+          "text": " best if you have a quick read of what she>>> said first, then come<<< back here. I'll make some tea."
+        },
+        {
+          "activation": 0.059689294546842575,
+          "chain_idx": 14955,
+          "window_start": 58,
+          "text": " come back here. I'll make some tea>>>.\nRight. Maybe<<< there's a UK/US divide here -"
+        },
+        {
+          "activation": 0.05934801697731018,
+          "chain_idx": 4425,
+          "window_start": 23,
+          "text": "2009. Not very good grammar but>>> I will post it anyway<<<)\nSo tell me about your first telescope stories"
+        },
+        {
+          "activation": 0.05890774726867676,
+          "chain_idx": 16212,
+          "window_start": 79,
+          "text": " among those players you're already familiar with.>>> This is especially necessary given<<< the new park and league that he's playing"
+        },
+        {
+          "activation": 0.05886705592274666,
+          "chain_idx": 14955,
+          "window_start": 55,
+          "text": " first, then come back here. I'll>>> make some tea.\n<<<Right. Maybe there's a UK/US"
+        }
+      ]
+    },
+    "17344": {
+      "mass": 0.559160403907299,
+      "examples": [
+        {
+          "activation": 0.058500200510025024,
+          "chain_idx": 15389,
+          "window_start": 95,
+          "text": " interpretation of the venue statute for patent infringement suits seems>>>, at first glance,<<< to fit that mold. According to the Federal Circuit"
+        },
+        {
+          "activation": 0.05734661966562271,
+          "chain_idx": 15389,
+          "window_start": 98,
+          "text": " venue statute for patent infringement suits seems, at first>>> glance, to fit that<<< mold. According to the Federal Circuit, the statute"
+        },
+        {
+          "activation": 0.05715546756982803,
+          "chain_idx": 15389,
+          "window_start": 97,
+          "text": " the venue statute for patent infringement suits seems, at>>> first glance, to fit<<< that mold. According to the Federal Circuit, the"
+        },
+        {
+          "activation": 0.05688127502799034,
+          "chain_idx": 15389,
+          "window_start": 96,
+          "text": " of the venue statute for patent infringement suits seems,>>> at first glance, to<<< fit that mold. According to the Federal Circuit,"
+        },
+        {
+          "activation": 0.05666564777493477,
+          "chain_idx": 15389,
+          "window_start": 94,
+          "text": "s interpretation of the venue statute for patent infringement suits>>> seems, at first glance<<<, to fit that mold. According to the Federal"
+        },
+        {
+          "activation": 0.05483051761984825,
+          "chain_idx": 11370,
+          "window_start": 60,
+          "text": " veteran director and a newcomer that I can\u2019t>>> resist spending some time on<<< them. Both, it turns out, are interested"
+        },
+        {
+          "activation": 0.05473651364445686,
+          "chain_idx": 3884,
+          "window_start": 61,
+          "text": " the\nnature of chivalry was posed for consideration.>>> I was curious as to<<< what\nkinds of answers Ansteorrans would"
+        },
+        {
+          "activation": 0.054580915719270706,
+          "chain_idx": 5217,
+          "window_start": 101,
+          "text": " revealed to the public by the Daily Mail: something>>> which to most people -<<< except those who might know them personally - might be"
+        },
+        {
+          "activation": 0.05435151606798172,
+          "chain_idx": 3884,
+          "window_start": 81,
+          "text": " Ansteorrans would give to these questions,>>> so with\npermission of<<< the original poster, I reproduce this interesting missive"
+        },
+        {
+          "activation": 0.05411173030734062,
+          "chain_idx": 11370,
+          "window_start": 59,
+          "text": " a veteran director and a newcomer that I can\u2019>>>t resist spending some time<<< on them. Both, it turns out, are"
+        }
+      ]
+    },
+    "17349": {
+      "mass": 0.5746277570724487,
+      "examples": [
+        {
+          "activation": 0.05878559499979019,
+          "chain_idx": 2168,
+          "window_start": 38,
+          "text": " Communities Series\nIn five compelling chapters, this volume>>> elucidates several key factors<<< of the signed languages used in select international Deaf communities"
+        },
+        {
+          "activation": 0.05841856077313423,
+          "chain_idx": 136,
+          "window_start": 87,
+          "text": "\nThe official who has direct knowledge of the discussions>>> declined to be identified because<<< of the sensitive nature of the information.\nThe"
+        },
+        {
+          "activation": 0.05821710452437401,
+          "chain_idx": 15389,
+          "window_start": 94,
+          "text": "s interpretation of the venue statute for patent infringement suits>>> seems, at first glance<<<, to fit that mold. According to the Federal"
+        },
+        {
+          "activation": 0.05747025087475777,
+          "chain_idx": 136,
+          "window_start": 88,
+          "text": "The official who has direct knowledge of the discussions declined>>> to be identified because of<<< the sensitive nature of the information.\nThe Pentagon"
+        },
+        {
+          "activation": 0.05723601207137108,
+          "chain_idx": 23253,
+          "window_start": 72,
+          "text": "S. military service personnel, suggests vitamin D supplements>>> could play a leading role<<< in preventing the autoimmune disease.\n\"It is"
+        },
+        {
+          "activation": 0.05705530568957329,
+          "chain_idx": 17030,
+          "window_start": 39,
+          "text": " widely through the sciences and humanities. This hypothesis is>>> being currently tested to see<<< whether the Anthropocene may become part of the Geological"
+        },
+        {
+          "activation": 0.05697132274508476,
+          "chain_idx": 12541,
+          "window_start": 31,
+          "text": ", the GFT rope cleaner combines all the cleaning>>> processes into one simple step<<<, effectively cleaning your bore in a single pass."
+        },
+        {
+          "activation": 0.05687153339385986,
+          "chain_idx": 15389,
+          "window_start": 95,
+          "text": " interpretation of the venue statute for patent infringement suits seems>>>, at first glance,<<< to fit that mold. According to the Federal Circuit"
+        },
+        {
+          "activation": 0.05680739879608154,
+          "chain_idx": 3468,
+          "window_start": 81,
+          "text": " terms and conditions set out below. These terms and>>> conditions are without prejudice to<<< any more specific terms and conditions applicable to IT tools"
+        },
+        {
+          "activation": 0.056794673204422,
+          "chain_idx": 3468,
+          "window_start": 82,
+          "text": " and conditions set out below. These terms and conditions>>> are without prejudice to any<<< more specific terms and conditions applicable to IT tools or"
+        }
+      ]
+    },
+    "16584": {
+      "mass": 0.545710988342762,
+      "examples": [
+        {
+          "activation": 0.05849286913871765,
+          "chain_idx": 15734,
+          "window_start": 104,
+          "text": " back on flagging public support for their policies.>>> Their favored tactic is to<<< label those who wish to end these failed policies as"
+        },
+        {
+          "activation": 0.05656103044748306,
+          "chain_idx": 15734,
+          "window_start": 103,
+          "text": " pushing back on flagging public support for their policies>>>. Their favored tactic is<<< to label those who wish to end these failed policies"
+        },
+        {
+          "activation": 0.0564260259270668,
+          "chain_idx": 15734,
+          "window_start": 105,
+          "text": " on flagging public support for their policies. Their>>> favored tactic is to label<<< those who wish to end these failed policies as \u201c"
+        },
+        {
+          "activation": 0.05420082435011864,
+          "chain_idx": 2306,
+          "window_start": 111,
+          "text": " new work to help strengthen marriages and shape families.>>> This particular project is being<<< spearheaded by Bubba & Cindy Cathy, who have reached"
+        },
+        {
+          "activation": 0.05390101671218872,
+          "chain_idx": 15734,
+          "window_start": 106,
+          "text": " flagging public support for their policies. Their favored>>> tactic is to label those<<< who wish to end these failed policies as \u201cisolation"
+        },
+        {
+          "activation": 0.05366174504160881,
+          "chain_idx": 20709,
+          "window_start": 66,
+          "text": " BUNDLES - In your Vendors/Products area>>> you can now see a<<< list of your bundles, You can also delete bundles"
+        },
+        {
+          "activation": 0.05358939990401268,
+          "chain_idx": 21513,
+          "window_start": 44,
+          "text": " writing this new story of mine called Twisted Sanity.>>> Anyway, this is still<<< in Nikki's POV but it'll switch"
+        },
+        {
+          "activation": 0.053139861673116684,
+          "chain_idx": 20709,
+          "window_start": 67,
+          "text": "UNDLES - In your Vendors/Products area you>>> can now see a list<<< of your bundles, You can also delete bundles in"
+        },
+        {
+          "activation": 0.0529632531106472,
+          "chain_idx": 8302,
+          "window_start": 97,
+          "text": " I know they wanted the statue along Kennedy Boulevard,>>> and they wanted to note<<< Kennedy's downtown visit here during the 1"
+        },
+        {
+          "activation": 0.05277496203780174,
+          "chain_idx": 22120,
+          "window_start": 49,
+          "text": " on our long-standing reputation and name recognition.>>> Here are a few ways<<< to work with us.\nAlogent works"
+        }
+      ]
+    },
+    "8656": {
+      "mass": 0.5261297188699245,
+      "examples": [
+        {
+          "activation": 0.05404798313975334,
+          "chain_idx": 22492,
+          "window_start": 108,
+          "text": " list in notebook 7, and and mention of>>> Tsilhqot'<<<in in notebook 14. A basic table"
+        },
+        {
+          "activation": 0.053861040621995926,
+          "chain_idx": 16547,
+          "window_start": 97,
+          "text": " by its Minister of Foreign Affairs. The Head of>>> Government or Minister of Foreign<<< Affairs of each member of the Security Council shall be"
+        },
+        {
+          "activation": 0.05375596880912781,
+          "chain_idx": 16547,
+          "window_start": 98,
+          "text": " its Minister of Foreign Affairs. The Head of Government>>> or Minister of Foreign Affairs<<< of each member of the Security Council shall be entitled"
+        },
+        {
+          "activation": 0.05285388231277466,
+          "chain_idx": 18306,
+          "window_start": 94,
+          "text": "s Foundation, a funding system that sprung from former>>> Gov. Phil Bredesen<<<'s program called Books From Birth - all of"
+        },
+        {
+          "activation": 0.05263441801071167,
+          "chain_idx": 16547,
+          "window_start": 95,
+          "text": " concerned or by its Minister of Foreign Affairs. The>>> Head of Government or Minister<<< of Foreign Affairs of each member of the Security Council"
+        },
+        {
+          "activation": 0.05262726545333862,
+          "chain_idx": 23031,
+          "window_start": 60,
+          "text": ". 2 (Faust 1 & 2>>>, Egmont, Natural<<< Daughter, Sorrows of Young Werther) "
+        },
+        {
+          "activation": 0.05206475406885147,
+          "chain_idx": 16547,
+          "window_start": 96,
+          "text": " or by its Minister of Foreign Affairs. The Head>>> of Government or Minister of<<< Foreign Affairs of each member of the Security Council shall"
+        },
+        {
+          "activation": 0.05166248604655266,
+          "chain_idx": 18306,
+          "window_start": 93,
+          "text": "'s Foundation, a funding system that sprung from>>> former Gov. Phil Bred<<<esen's program called Books From Birth - all"
+        },
+        {
+          "activation": 0.05151255056262016,
+          "chain_idx": 23031,
+          "window_start": 61,
+          "text": " 2 (Faust 1 & 2,>>> Egmont, Natural Daughter<<<, Sorrows of Young Werther) \n"
+        },
+        {
+          "activation": 0.05110936984419823,
+          "chain_idx": 18306,
+          "window_start": 92,
+          "text": " Governor's Foundation, a funding system that sprung>>> from former Gov. Phil<<< Bredesen's program called Books From Birth -"
+        }
+      ]
+    },
+    "17108": {
+      "mass": 0.5768178142607212,
+      "examples": [
+        {
+          "activation": 0.05881452560424805,
+          "chain_idx": 18352,
+          "window_start": 91,
+          "text": " request comes in, this transaction was seamless.\n>>>Edwards\u2019 initial answer was<<< something along the lines of: \u201cOK. Send"
+        },
+        {
+          "activation": 0.058082111179828644,
+          "chain_idx": 18352,
+          "window_start": 92,
+          "text": " comes in, this transaction was seamless.\nEdwards>>>\u2019 initial answer was something<<< along the lines of: \u201cOK. Send me"
+        },
+        {
+          "activation": 0.057932090014219284,
+          "chain_idx": 14955,
+          "window_start": 48,
+          "text": " a quick read of what she said first, then>>> come back here. I<<<'ll make some tea.\nRight. Maybe"
+        },
+        {
+          "activation": 0.05771994590759277,
+          "chain_idx": 22160,
+          "window_start": 30,
+          "text": " from graduates of the university of calgary university of>>> calgary library catalogue.<<< How to choose thesis university of calgary thesis topic"
+        },
+        {
+          "activation": 0.05757370591163635,
+          "chain_idx": 14623,
+          "window_start": 98,
+          "text": "!\nPlease add your topics to the meeting wiki>>> page at:\nPlease<<< add topics as soon as possible. Also, if"
+        },
+        {
+          "activation": 0.05755332112312317,
+          "chain_idx": 14955,
+          "window_start": 46,
+          "text": " you have a quick read of what she said first>>>, then come back here<<<. I'll make some tea.\nRight"
+        },
+        {
+          "activation": 0.05747288465499878,
+          "chain_idx": 16215,
+          "window_start": 19,
+          "text": " on a longer posting that I\u2019ll put up>>> in a bit, but<<< these two topics aren\u2019t related, thus separate"
+        },
+        {
+          "activation": 0.057289738208055496,
+          "chain_idx": 16215,
+          "window_start": 20,
+          "text": " a longer posting that I\u2019ll put up in>>> a bit, but these<<< two topics aren\u2019t related, thus separate threads"
+        },
+        {
+          "activation": 0.05723616108298302,
+          "chain_idx": 22160,
+          "window_start": 31,
+          "text": " graduates of the university of calgary university of cal>>>gary library catalogue. How<<< to choose thesis university of calgary thesis topic dr"
+        },
+        {
+          "activation": 0.057143330574035645,
+          "chain_idx": 14955,
+          "window_start": 47,
+          "text": " have a quick read of what she said first,>>> then come back here.<<< I'll make some tea.\nRight."
+        }
+      ]
+    },
+    "17368": {
+      "mass": 0.5249829515814781,
+      "examples": [
+        {
+          "activation": 0.053430527448654175,
+          "chain_idx": 19561,
+          "window_start": 66,
+          "text": " on requests made to HHS earlier this year and on>>> requests made more recently by<<< governors and state Medicaid directors in the aftermath of the"
+        },
+        {
+          "activation": 0.053408849984407425,
+          "chain_idx": 397,
+          "window_start": 109,
+          "text": " decor includes copper awnings, reclaimed Chicago brick (>>>some of which may be<<< more than 100 years old), Austin"
+        },
+        {
+          "activation": 0.05327242612838745,
+          "chain_idx": 19561,
+          "window_start": 65,
+          "text": " up on requests made to HHS earlier this year and>>> on requests made more recently<<< by governors and state Medicaid directors in the aftermath of"
+        },
+        {
+          "activation": 0.05321251228451729,
+          "chain_idx": 397,
+          "window_start": 110,
+          "text": " includes copper awnings, reclaimed Chicago brick (some>>> of which may be more<<< than 100 years old), Austin chalk"
+        },
+        {
+          "activation": 0.052173878997564316,
+          "chain_idx": 19561,
+          "window_start": 64,
+          "text": " follow up on requests made to HHS earlier this year>>> and on requests made more<<< recently by governors and state Medicaid directors in the aftermath"
+        },
+        {
+          "activation": 0.051994483917951584,
+          "chain_idx": 17573,
+          "window_start": 76,
+          "text": " Dan-A-Palooza tour. The>>> tour runs through January,<<< or as the comedians prefer to call it, \u201c"
+        },
+        {
+          "activation": 0.051992934197187424,
+          "chain_idx": 22565,
+          "window_start": 120,
+          "text": " \u201cthe last full measure of devotion.\u201d Lincoln spoke>>> those words, part of<<< the Gettysburg Address"
+        },
+        {
+          "activation": 0.05184316635131836,
+          "chain_idx": 19698,
+          "window_start": 113,
+          "text": "00 people without the disorder.\nTheir findings>>>, which are reported in<<< the journal Nature Genetics, show that DNA variants that"
+        },
+        {
+          "activation": 0.05183032155036926,
+          "chain_idx": 9694,
+          "window_start": 105,
+          "text": "olds from September 2015. The>>> process will be complete by<<< 2017. Any foreign language can"
+        },
+        {
+          "activation": 0.051823850721120834,
+          "chain_idx": 3884,
+          "window_start": 77,
+          "text": "\nkinds of answers Ansteorrans would give>>> to these questions, so<<< with\npermission of the original poster, I reproduce"
+        }
+      ]
+    },
+    "4956": {
+      "mass": 0.553553868085146,
+      "examples": [
+        {
+          "activation": 0.05640773847699165,
+          "chain_idx": 18352,
+          "window_start": 114,
+          "text": ". Send me an e-mail to remind me>>>.\u201d\nI did,<<< and got one back that said: \u201cIs"
+        },
+        {
+          "activation": 0.05622002109885216,
+          "chain_idx": 18352,
+          "window_start": 116,
+          "text": " me an e-mail to remind me.\u201d\n>>>I did, and got<<< one back that said: \u201cIs"
+        },
+        {
+          "activation": 0.05608239397406578,
+          "chain_idx": 18352,
+          "window_start": 115,
+          "text": " Send me an e-mail to remind me.\u201d>>>\nI did, and<<< got one back that said: \u201cIs"
+        },
+        {
+          "activation": 0.055880554020404816,
+          "chain_idx": 18352,
+          "window_start": 117,
+          "text": " an e-mail to remind me.\u201d\nI>>> did, and got one<<< back that said: \u201cIs"
+        },
+        {
+          "activation": 0.055372294038534164,
+          "chain_idx": 604,
+          "window_start": 84,
+          "text": ", and about how best to respond to it.>>> It is helpful to treat<<< these questions separately.\nThe central question concerns what"
+        },
+        {
+          "activation": 0.055200379341840744,
+          "chain_idx": 19861,
+          "window_start": 60,
+          "text": " will always be thiis type of phishing attack,>>> and there are various ways<<< of seeing whether the link in emails are real,"
+        },
+        {
+          "activation": 0.054704077541828156,
+          "chain_idx": 19116,
+          "window_start": 99,
+          "text": " vehicle information is accurate and true. Despite our efforts>>>, however, it is<<< inevitable that some inaccuracies may occasionally be present. For"
+        },
+        {
+          "activation": 0.05459241941571236,
+          "chain_idx": 5285,
+          "window_start": 108,
+          "text": " their tool of generating an abundance of worth.\n>>>It will be hard to<<< believe such an assumption to be valid. But it"
+        },
+        {
+          "activation": 0.05457135662436485,
+          "chain_idx": 19116,
+          "window_start": 101,
+          "text": " is accurate and true. Despite our efforts, however>>>, it is inevitable that<<< some inaccuracies may occasionally be present. For this reason"
+        },
+        {
+          "activation": 0.05452263355255127,
+          "chain_idx": 19861,
+          "window_start": 59,
+          "text": " there will always be thiis type of phishing attack>>>, and there are various<<< ways of seeing whether the link in emails are real"
+        }
+      ]
+    },
+    "12512": {
+      "mass": 0.5489049665629864,
+      "examples": [
+        {
+          "activation": 0.05797703191637993,
+          "chain_idx": 13477,
+          "window_start": 66,
+          "text": "012 legislative session to a close last week>>>, but he did so<<< without ever scheduling a hearing on a pension reform plan"
+        },
+        {
+          "activation": 0.05602545663714409,
+          "chain_idx": 13477,
+          "window_start": 65,
+          "text": "2012 legislative session to a close last>>> week, but he did<<< so without ever scheduling a hearing on a pension reform"
+        },
+        {
+          "activation": 0.05585406348109245,
+          "chain_idx": 13477,
+          "window_start": 64,
+          "text": " 2012 legislative session to a close>>> last week, but he<<< did so without ever scheduling a hearing on a pension"
+        },
+        {
+          "activation": 0.05485061556100845,
+          "chain_idx": 13477,
+          "window_start": 67,
+          "text": "12 legislative session to a close last week,>>> but he did so without<<< ever scheduling a hearing on a pension reform plan submitted"
+        },
+        {
+          "activation": 0.05470956489443779,
+          "chain_idx": 13477,
+          "window_start": 63,
+          "text": " the 2012 legislative session to a>>> close last week, but<<< he did so without ever scheduling a hearing on a"
+        },
+        {
+          "activation": 0.054581522941589355,
+          "chain_idx": 14955,
+          "window_start": 45,
+          "text": " if you have a quick read of what she said>>> first, then come back<<< here. I'll make some tea.\n"
+        },
+        {
+          "activation": 0.05391224846243858,
+          "chain_idx": 13477,
+          "window_start": 68,
+          "text": "2 legislative session to a close last week, but>>> he did so without ever<<< scheduling a hearing on a pension reform plan submitted by"
+        },
+        {
+          "activation": 0.05373407527804375,
+          "chain_idx": 2571,
+          "window_start": 53,
+          "text": " by Scott Drummond. The conference officially ends at noon>>> tomorrow, but for many<<<, this is the last session, as people fly"
+        },
+        {
+          "activation": 0.05366162583231926,
+          "chain_idx": 2168,
+          "window_start": 35,
+          "text": "istics in Deaf Communities Series\nIn five compelling chapters>>>, this volume elucidates<<< several key factors of the signed languages used in select"
+        },
+        {
+          "activation": 0.053598761558532715,
+          "chain_idx": 11516,
+          "window_start": 91,
+          "text": " video throughout the day.\nAll the work was>>> well worth it evidenced by<<< the applause of the 300 plus guests"
+        }
+      ]
+    },
+    "10981": {
+      "mass": 0.5435626171529293,
+      "examples": [
+        {
+          "activation": 0.05646636709570885,
+          "chain_idx": 15626,
+          "window_start": 57,
+          "text": "1/28/15 Views: >>>99,76<<<5The Koch brothers bring campaign financing to the next"
+        },
+        {
+          "activation": 0.056014906615018845,
+          "chain_idx": 15626,
+          "window_start": 58,
+          "text": "/28/15 Views: 9>>>9,765<<<The Koch brothers bring campaign financing to the next level"
+        },
+        {
+          "activation": 0.0557713508605957,
+          "chain_idx": 358,
+          "window_start": 117,
+          "text": " focus of 74% of their 2>>>2,552<<< student population.'\n- The"
+        },
+        {
+          "activation": 0.053977251052856445,
+          "chain_idx": 358,
+          "window_start": 118,
+          "text": " of 74% of their 22>>>,552 student<<< population.'\n- The"
+        },
+        {
+          "activation": 0.0538974292576313,
+          "chain_idx": 358,
+          "window_start": 119,
+          "text": " 74% of their 22,>>>552 student population<<<.'\n- The"
+        },
+        {
+          "activation": 0.05388627201318741,
+          "chain_idx": 12963,
+          "window_start": 44,
+          "text": " year\nPurchasing and availability details\nyou save \u00a3>>>5.98\n<<<- Check stock in store Stocked in store\n"
+        },
+        {
+          "activation": 0.05377111956477165,
+          "chain_idx": 12963,
+          "window_start": 43,
+          "text": "1 year\nPurchasing and availability details\nyou save>>> \u00a35.98<<<\n- Check stock in store Stocked in store"
+        },
+        {
+          "activation": 0.05341406539082527,
+          "chain_idx": 4627,
+          "window_start": 23,
+          "text": " for recipe)\nManchester, NH had a population>>> of about 90<<<,000 when I was growing up there"
+        },
+        {
+          "activation": 0.053246673196554184,
+          "chain_idx": 21896,
+          "window_start": 69,
+          "text": " Chennai - 600 130>>>, Tamil Nadu, India<<<\nReception : 044-67"
+        },
+        {
+          "activation": 0.05311718210577965,
+          "chain_idx": 1471,
+          "window_start": 120,
+          "text": "Postage for this (by itself) within Australia>>> will be $13<<<.\nOverseas"
+        }
+      ]
+    },
+    "16109": {
+      "mass": 0.5683132372796535,
+      "examples": [
+        {
+          "activation": 0.057907141745090485,
+          "chain_idx": 22272,
+          "window_start": 53,
+          "text": "\nA printed edition of this Special Issue is available>>> here.\nProf.<<< Dr. K.C. Chan\nProf."
+        },
+        {
+          "activation": 0.05740634351968765,
+          "chain_idx": 22272,
+          "window_start": 52,
+          "text": ")\nA printed edition of this Special Issue is>>> available here.\nProf<<<. Dr. K.C. Chan\nProf"
+        },
+        {
+          "activation": 0.05714154243469238,
+          "chain_idx": 22492,
+          "window_start": 47,
+          "text": "hqot'in materials in the ACLS collection>>> are found within two larger<<< sets of materials in the collections. In the \""
+        },
+        {
+          "activation": 0.0570257194340229,
+          "chain_idx": 397,
+          "window_start": 109,
+          "text": " decor includes copper awnings, reclaimed Chicago brick (>>>some of which may be<<< more than 100 years old), Austin"
+        },
+        {
+          "activation": 0.057011254131793976,
+          "chain_idx": 397,
+          "window_start": 110,
+          "text": " includes copper awnings, reclaimed Chicago brick (some>>> of which may be more<<< than 100 years old), Austin chalk"
+        },
+        {
+          "activation": 0.05696389824151993,
+          "chain_idx": 1728,
+          "window_start": 36,
+          "text": " stylish stars who made it one to remember.\n>>>Below are just some of<<< the stars we unanimously agreed made 201"
+        },
+        {
+          "activation": 0.05653351545333862,
+          "chain_idx": 22492,
+          "window_start": 48,
+          "text": "ot'in materials in the ACLS collection are>>> found within two larger sets<<< of materials in the collections. In the \"Qu"
+        },
+        {
+          "activation": 0.05632687360048294,
+          "chain_idx": 397,
+          "window_start": 108,
+          "text": "s decor includes copper awnings, reclaimed Chicago brick>>> (some of which may<<< be more than 100 years old),"
+        },
+        {
+          "activation": 0.0560724250972271,
+          "chain_idx": 22492,
+          "window_start": 103,
+          "text": "hqot'in word list in notebook 7>>>, and and mention of<<< Tsilhqot'in in notebook 1"
+        },
+        {
+          "activation": 0.05592452362179756,
+          "chain_idx": 22492,
+          "window_start": 85,
+          "text": "s \"Quinault ethnographic and field notes\">>> include a 6-<<<page Tsilhqot'in word list in"
+        }
+      ]
+    },
+    "8814": {
+      "mass": 0.5792457014322281,
+      "examples": [
+        {
+          "activation": 0.06049701198935509,
+          "chain_idx": 3468,
+          "window_start": 81,
+          "text": " terms and conditions set out below. These terms and>>> conditions are without prejudice to<<< any more specific terms and conditions applicable to IT tools"
+        },
+        {
+          "activation": 0.05904703959822655,
+          "chain_idx": 11378,
+          "window_start": 40,
+          "text": " items by the same author. The review of this>>> collection may be found at<<< Graphics for the Calculus Classroom.\nType of Material"
+        },
+        {
+          "activation": 0.058199163526296616,
+          "chain_idx": 6755,
+          "window_start": 67,
+          "text": "amaran moored in Paris this July to meet and greet>>>, prior to setting out<<< to sea.\nIts crew, led by J\u00e9r\u00f4me"
+        },
+        {
+          "activation": 0.05794237181544304,
+          "chain_idx": 4795,
+          "window_start": 114,
+          "text": " of the college as Teachers Training College and the college>>> has started its function from<<< 8th March, 193"
+        },
+        {
+          "activation": 0.05781189352273941,
+          "chain_idx": 7562,
+          "window_start": 113,
+          "text": ". . . b/c of you. An>>> inspiration that is much needed<<< in the world today. Thank you so much for"
+        },
+        {
+          "activation": 0.05735110864043236,
+          "chain_idx": 4795,
+          "window_start": 113,
+          "text": " affiliation of the college as Teachers Training College and the>>> college has started its function<<< from 8th March, 193"
+        },
+        {
+          "activation": 0.057163871824741364,
+          "chain_idx": 17030,
+          "window_start": 61,
+          "text": " of the Geological Time Scale. An Anthropocene Working>>> Group has been established to<<< assemble the evidence. The decision regarding formalization is"
+        },
+        {
+          "activation": 0.05712584778666496,
+          "chain_idx": 4300,
+          "window_start": 62,
+          "text": " are hands-down the a\npremiere web service>>> providing tools, service,<<< and support that is above all\nothers. Plus"
+        },
+        {
+          "activation": 0.05705706402659416,
+          "chain_idx": 4300,
+          "window_start": 61,
+          "text": "! are hands-down the a\npremiere web>>> service providing tools, service<<<, and support that is above all\nothers."
+        },
+        {
+          "activation": 0.05705032870173454,
+          "chain_idx": 2615,
+          "window_start": 24,
+          "text": " was rumored and the phone is not announced officially yet>>> but expected announcement will be<<< in April 2017. The phone"
+        }
+      ]
+    },
+    "11630": {
+      "mass": 0.5507130585610867,
+      "examples": [
+        {
+          "activation": 0.05729234963655472,
+          "chain_idx": 13913,
+          "window_start": 117,
+          "text": " hard-working, supportive and all-around fantastic>>> people I have ever met<<< in the publishing industry. As"
+        },
+        {
+          "activation": 0.05692054703831673,
+          "chain_idx": 13913,
+          "window_start": 118,
+          "text": "-working, supportive and all-around fantastic people>>> I have ever met in<<< the publishing industry. As"
+        },
+        {
+          "activation": 0.055347513407468796,
+          "chain_idx": 13913,
+          "window_start": 116,
+          "text": ", hard-working, supportive and all-around>>> fantastic people I have ever<<< met in the publishing industry. As"
+        },
+        {
+          "activation": 0.05529111251235008,
+          "chain_idx": 22107,
+          "window_start": 68,
+          "text": "and then deleting) words, phrases, & sentences>>>, I am wrestling with<<< the truth. Do I want to say what really"
+        },
+        {
+          "activation": 0.05516991764307022,
+          "chain_idx": 22107,
+          "window_start": 67,
+          "text": " (and then deleting) words, phrases, &>>> sentences, I am wrestling<<< with the truth. Do I want to say what"
+        },
+        {
+          "activation": 0.05462421104311943,
+          "chain_idx": 3884,
+          "window_start": 75,
+          "text": " to what\nkinds of answers Ansteorrans>>> would give to these questions<<<, so with\npermission of the original poster,"
+        },
+        {
+          "activation": 0.05418577790260315,
+          "chain_idx": 3884,
+          "window_start": 76,
+          "text": " what\nkinds of answers Ansteorrans would>>> give to these questions,<<< so with\npermission of the original poster, I"
+        },
+        {
+          "activation": 0.054124053567647934,
+          "chain_idx": 13307,
+          "window_start": 116,
+          "text": " @WetheHumanities today) going round and>>> round in my head today<<<. She was talking about the popularity"
+        },
+        {
+          "activation": 0.053922999650239944,
+          "chain_idx": 3884,
+          "window_start": 74,
+          "text": " as to what\nkinds of answers Ansteor>>>rans would give to these<<< questions, so with\npermission of the original poster"
+        },
+        {
+          "activation": 0.05383457615971565,
+          "chain_idx": 22383,
+          "window_start": 71,
+          "text": " I\u2019m a reader looking for my next book>>>. Pitch me one of<<< your books in five to ten sentences.\nDangerous"
+        }
+      ]
+    },
+    "16749": {
+      "mass": 0.5527399815618992,
+      "examples": [
+        {
+          "activation": 0.05802737548947334,
+          "chain_idx": 6113,
+          "window_start": 79,
+          "text": "rich sites.\nEvery parent knows that schools process>>> an extraordinarily large amount of<<< documents on a daily basis. To be productive and"
+        },
+        {
+          "activation": 0.057539619505405426,
+          "chain_idx": 19211,
+          "window_start": 22,
+          "text": " team of professionals. Every member of our team has>>> spent many hours polishing professional<<< skills and earning a unique experience in the spheres of"
+        },
+        {
+          "activation": 0.05739525705575943,
+          "chain_idx": 19211,
+          "window_start": 21,
+          "text": " a team of professionals. Every member of our team>>> has spent many hours polishing<<< professional skills and earning a unique experience in the spheres"
+        },
+        {
+          "activation": 0.05709045007824898,
+          "chain_idx": 6113,
+          "window_start": 80,
+          "text": " sites.\nEvery parent knows that schools process an>>> extraordinarily large amount of documents<<< on a daily basis. To be productive and to"
+        },
+        {
+          "activation": 0.05669248104095459,
+          "chain_idx": 6113,
+          "window_start": 78,
+          "text": "-rich sites.\nEvery parent knows that schools>>> process an extraordinarily large amount<<< of documents on a daily basis. To be productive"
+        },
+        {
+          "activation": 0.054429151117801666,
+          "chain_idx": 19211,
+          "window_start": 23,
+          "text": " of professionals. Every member of our team has spent>>> many hours polishing professional skills<<< and earning a unique experience in the spheres of website"
+        },
+        {
+          "activation": 0.05398004129528999,
+          "chain_idx": 6113,
+          "window_start": 81,
+          "text": ".\nEvery parent knows that schools process an extraordinarily>>> large amount of documents on<<< a daily basis. To be productive and to be"
+        },
+        {
+          "activation": 0.05311918258666992,
+          "chain_idx": 17464,
+          "window_start": 11,
+          "text": "What activities we offer\nAt Pissup we>>> have a huge number of<<< stag do activities to suit a range of tastes and"
+        },
+        {
+          "activation": 0.052356865257024765,
+          "chain_idx": 16500,
+          "window_start": 88,
+          "text": " they are supposed to prevent. Growing numbers of citizens>>> now realize they must act<<< before it is too late. This book exposes what"
+        },
+        {
+          "activation": 0.05210955813527107,
+          "chain_idx": 16500,
+          "window_start": 89,
+          "text": " are supposed to prevent. Growing numbers of citizens now>>> realize they must act before<<< it is too late. This book exposes what is"
+        }
+      ]
+    },
+    "14450": {
+      "mass": 0.5520483925938606,
+      "examples": [
+        {
+          "activation": 0.05690641328692436,
+          "chain_idx": 4838,
+          "window_start": 109,
+          "text": " Trade Show planning, Promotional products (regular/custom>>>), or consulting we welcome<<< the opportunity to assist.\nThanks for visiting -"
+        },
+        {
+          "activation": 0.056469183415174484,
+          "chain_idx": 4838,
+          "window_start": 112,
+          "text": ", Promotional products (regular/custom), or consulting>>> we welcome the opportunity to<<< assist.\nThanks for visiting - and come back"
+        },
+        {
+          "activation": 0.05625009164214134,
+          "chain_idx": 4838,
+          "window_start": 113,
+          "text": " Promotional products (regular/custom), or consulting we>>> welcome the opportunity to assist<<<.\nThanks for visiting - and come back soon"
+        },
+        {
+          "activation": 0.05617706850171089,
+          "chain_idx": 4838,
+          "window_start": 111,
+          "text": " planning, Promotional products (regular/custom), or>>> consulting we welcome the opportunity<<< to assist.\nThanks for visiting - and come"
+        },
+        {
+          "activation": 0.05604450777173042,
+          "chain_idx": 4838,
+          "window_start": 110,
+          "text": " Show planning, Promotional products (regular/custom),>>> or consulting we welcome the<<< opportunity to assist.\nThanks for visiting - and"
+        },
+        {
+          "activation": 0.05518833547830582,
+          "chain_idx": 23077,
+          "window_start": 66,
+          "text": " additional graduate training or a wide variety of social service>>> positions in areas such as<<< mental health, corrections, probation and parole, family"
+        },
+        {
+          "activation": 0.05408381298184395,
+          "chain_idx": 18193,
+          "window_start": 113,
+          "text": " There is no one with whom to bounce ideas around>>>, or to talk about<<< deep and troubling subjects. They have no one to"
+        },
+        {
+          "activation": 0.05386591702699661,
+          "chain_idx": 23077,
+          "window_start": 65,
+          "text": " with additional graduate training or a wide variety of social>>> service positions in areas such<<< as mental health, corrections, probation and parole,"
+        },
+        {
+          "activation": 0.05356050655245781,
+          "chain_idx": 18937,
+          "window_start": 28,
+          "text": " University of Otago and leads our Youth Employment Success Programme>>> alongside working on many of<<< our other client projects.\nArmed with a Bachelor"
+        },
+        {
+          "activation": 0.053502555936574936,
+          "chain_idx": 17021,
+          "window_start": 103,
+          "text": " decision support services to help Federal agencies with a number>>> of activities, including deploying<<< renewable energy technologies, meeting energy goals and regulations,"
+        }
+      ]
+    },
+    "8573": {
+      "mass": 0.5722936801612377,
+      "examples": [
+        {
+          "activation": 0.05862170457839966,
+          "chain_idx": 22638,
+          "window_start": 59,
+          "text": " michjc, found at umich dot edu\n>>>Hi. I am an<<< associate professor in Computer Science and Engineering\nat the"
+        },
+        {
+          "activation": 0.05814346298575401,
+          "chain_idx": 1251,
+          "window_start": 19,
+          "text": " have owned your computer for a year or more,>>> you have probably run into<<< the problem of large files, and hard-drive"
+        },
+        {
+          "activation": 0.057901035994291306,
+          "chain_idx": 397,
+          "window_start": 28,
+          "text": ".\n- Filed Under\nFor months we'>>>ve been eyeballing the<<< new building being constructed at 7173"
+        },
+        {
+          "activation": 0.057513654232025146,
+          "chain_idx": 1858,
+          "window_start": 40,
+          "text": " watch brand is called Cobra de Calibre.\n>>>I have to say that<<< it does look good. The basic specs are:"
+        },
+        {
+          "activation": 0.056998033076524734,
+          "chain_idx": 1251,
+          "window_start": 18,
+          "text": " you have owned your computer for a year or more>>>, you have probably run<<< into the problem of large files, and hard-"
+        },
+        {
+          "activation": 0.056855179369449615,
+          "chain_idx": 16500,
+          "window_start": 8,
+          "text": "Looking for an examination copy?\n>>>If you are interested in<<< the title for your course we can consider offering an"
+        },
+        {
+          "activation": 0.056768953800201416,
+          "chain_idx": 8253,
+          "window_start": 66,
+          "text": "-imaging mounts from iOptron. We'>>>ve made a few changes<<< on the iEQ45 including:\n-"
+        },
+        {
+          "activation": 0.05660169944167137,
+          "chain_idx": 14570,
+          "window_start": 21,
+          "text": "09 12:48pm\n>>>For those who feel that<<< honest citizens do not need the right to bear arms"
+        },
+        {
+          "activation": 0.05646068975329399,
+          "chain_idx": 22638,
+          "window_start": 60,
+          "text": "jc, found at umich dot edu\nHi>>>. I am an associate<<< professor in Computer Science and Engineering\nat the University"
+        },
+        {
+          "activation": 0.056429266929626465,
+          "chain_idx": 21883,
+          "window_start": 27,
+          "text": "0-2015 All rights reserved\n>>>We will be shortly migrating<<< our site to a new server and we apologise for"
+        }
+      ]
+    }
+  }
+}

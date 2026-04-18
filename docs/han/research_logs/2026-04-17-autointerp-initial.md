@@ -8,6 +8,23 @@ tags:
 
 ## Initial cross-architecture autointerp scan (Gemma-2-2B-IT, resid_L25)
 
+> **Update 2026-04-18**: Several claims in this log were revised after
+> the L13 replication and the span-weighted analysis. See
+> `2026-04-18-l13-replication.md` for the cross-layer comparison and
+> `2026-04-18-interpretability-comparison.md` for the corrected story
+> on "TFA pred vs TXCDR interpretability." The corrections are:
+> - "TFA pred has 0 high-span features" → only true for the
+>   mass-ranked top-300; TFA pred has many span-weighted candidates
+>   but they are degenerate (single-chain at L25; BOS-detectors at
+>   L13).
+> - "TFA novel is mostly unclear padding" → true for top-50 by mass,
+>   but TFA novel span-weighted top-25 is cross-chain, content-
+>   bearing, and varied.
+> - The headline "TXCDR wins 14/15 vs 1/15" survives with the stricter
+>   cross-chain + position-diverse filter: TXCDR remains the clean
+>   winner for temporal-span interpretability.
+
+
 First pass of feature-level comparison across **stacked_sae**, **crosscoder**,
 and **tfa_pos** on Gemma-2-2B-IT residual stream (layer 25), k=50, T=5,
 d_sae=18,432, trained for 10k steps on FineWeb via the benchmark sweep
