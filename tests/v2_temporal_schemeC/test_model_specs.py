@@ -6,7 +6,7 @@ import torch
 from src.utils.seed import set_seed
 from src.v2_temporal_schemeC.relu_sae import ReLUSAE
 from src.bench.architectures._tfa_module import TemporalSAE
-from src.v2_temporal_schemeC.temporal_crosscoder import TemporalCrosscoder
+from src.bench.architectures.crosscoder import TemporalCrosscoder
 
 # Will be implemented:
 from src.v2_temporal_schemeC.experiment.model_specs import (

@@ -28,12 +28,18 @@ class TemporalCrosscoder(nn.Module):
     """
 
     def __init__(self, d_in: int, d_sae: int, T: int, k: int | None):
+        """k is the number of active latents per window, as-is.
+
+        If you want to match a stacked SAE's total L0 (which uses k per
+        position across T positions), the caller should pass k*T here.
+        CrosscoderSpec.create handles that scaling; direct callers are
+        on their own.
+        """
         super().__init__()
         self.d_in = d_in
         self.d_sae = d_sae
         self.T = T
-        # Match stacked SAE's total L0: k per position * T positions
-        self.k = k * T if k is not None else None
+        self.k = k
 
         self.W_enc = nn.Parameter(
             torch.randn(T, d_in, d_sae) * (1.0 / d_in**0.5)
@@ -95,7 +101,9 @@ class CrosscoderSpec(ArchSpec):
         return self.T
 
     def create(self, d_in, d_sae, k, device):
-        return TemporalCrosscoder(d_in, d_sae, self.T, k).to(device)
+        # Match stacked SAE's total L0: k per position * T positions.
+        k_eff = k * self.T if k is not None else None
+        return TemporalCrosscoder(d_in, d_sae, self.T, k_eff).to(device)
 
     def train(self, model, gen_fn, total_steps, batch_size, lr, device,
               log_every=500, grad_clip=1.0):

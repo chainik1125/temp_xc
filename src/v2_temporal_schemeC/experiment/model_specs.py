@@ -17,8 +17,9 @@ from src.bench.architectures._tfa_module import TemporalSAE
 from src.v2_temporal_schemeC.train_tfa import (
     TFATrainingConfig, train_tfa,
 )
+from src.bench.architectures.crosscoder import TemporalCrosscoder
 from src.v2_temporal_schemeC.temporal_crosscoder import (
-    TemporalCrosscoder, CrosscoderTrainingConfig, train_crosscoder,
+    CrosscoderTrainingConfig, train_crosscoder,
 )
 from src.v2_temporal_schemeC.stacked_sae import (
     StackedSAE, StackedSAETrainingConfig, train_stacked_sae,
@@ -210,7 +211,7 @@ class TXCDRModelSpec:
                            pos: int | None = None) -> torch.Tensor:
         if pos is None:
             pos = 0
-        return model.decoder_directions(pos)  # (d_in, d_sae)
+        return model.decoder_directions_at(pos)  # (d_in, d_sae)
 
 
 class TXCDRv2ModelSpec(TXCDRModelSpec):

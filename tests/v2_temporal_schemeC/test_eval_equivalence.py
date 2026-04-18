@@ -10,8 +10,9 @@ from src.v2_temporal_schemeC.toy_model import ToyModel
 from src.v2_temporal_schemeC.markov_data_generation import generate_markov_activations
 from src.v2_temporal_schemeC.relu_sae import ReLUSAE, ReLUSAETrainingConfig, train_relu_sae
 from src.v2_temporal_schemeC.train_tfa import create_tfa, train_tfa, TFATrainingConfig
+from src.bench.architectures.crosscoder import TemporalCrosscoder
 from src.v2_temporal_schemeC.temporal_crosscoder import (
-    TemporalCrosscoder, CrosscoderTrainingConfig, train_crosscoder,
+    CrosscoderTrainingConfig, train_crosscoder,
 )
 from src.v2_temporal_schemeC.feature_recovery import (
     feature_recovery_score, sae_decoder_directions, tfa_decoder_directions,
@@ -270,8 +271,8 @@ class TestTXCDREvalEquivalence:
         true_feats = model.feature_directions
         # Decoder-averaging approach: average decoder matrices, then compute AUC
         tf = true_feats.T.to(DEVICE)
-        dd0 = trained_txcdr.decoder_directions(0).to(DEVICE)
-        dd1 = trained_txcdr.decoder_directions(1).to(DEVICE)
+        dd0 = trained_txcdr.decoder_directions_at(0).to(DEVICE)
+        dd1 = trained_txcdr.decoder_directions_at(1).to(DEVICE)
         avg_dd = (dd0 + dd1) / 2
         expected_auc = feature_recovery_score(avg_dd, tf)["auc"]
         new = evaluate_model(TXCDRModelSpec(T=2), trained_txcdr, hidden, DEVICE,
