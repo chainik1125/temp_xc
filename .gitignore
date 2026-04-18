@@ -55,3 +55,4 @@ data/
 
 # Logs
 logs/
+experiments/*/model_cache/
