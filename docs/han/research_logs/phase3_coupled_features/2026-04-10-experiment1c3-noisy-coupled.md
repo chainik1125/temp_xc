@@ -78,17 +78,17 @@ In the deterministic version, probe ratio was $\approx 1$ for everyone. With noi
 
 ### Plots
 
-![Decoder AUC](../../../../src/v2_temporal_schemeC/results/experiment1c3_noisy_coupled/exp1c3n_auc.png)
+![Decoder AUC](../../../../experiments/phase3_coupled/results/experiment1c3_noisy_coupled/exp1c3n_auc.png)
 
-![Single-latent correlation](../../../../src/v2_temporal_schemeC/results/experiment1c3_noisy_coupled/exp1c3n_corr.png)
+![Single-latent correlation](../../../../experiments/phase3_coupled/results/experiment1c3_noisy_coupled/exp1c3n_corr.png)
 
-![Linear probe R²](../../../../src/v2_temporal_schemeC/results/experiment1c3_noisy_coupled/exp1c3n_probe.png)
+![Linear probe R²](../../../../experiments/phase3_coupled/results/experiment1c3_noisy_coupled/exp1c3n_probe.png)
 
-![All three ratios vs k](../../../../src/v2_temporal_schemeC/results/experiment1c3_noisy_coupled/exp1c3n_ratios.png)
+![All three ratios vs k](../../../../experiments/phase3_coupled/results/experiment1c3_noisy_coupled/exp1c3n_ratios.png)
 
-![Scatter: hidden vs emission](../../../../src/v2_temporal_schemeC/results/experiment1c3_noisy_coupled/exp1c3n_scatter.png)
+![Scatter: hidden vs emission](../../../../experiments/phase3_coupled/results/experiment1c3_noisy_coupled/exp1c3n_scatter.png)
 
-![Global AUC vs T](../../../../src/v2_temporal_schemeC/results/experiment1c3_noisy_coupled/exp1c3n_gauc_vs_T.png)
+![Global AUC vs T](../../../../experiments/phase3_coupled/results/experiment1c3_noisy_coupled/exp1c3n_gauc_vs_T.png)
 
 ### Reproduction
 
@@ -101,6 +101,6 @@ TQDM_DISABLE=1 PYTHONUNBUFFERED=1 PYTHONPATH=/home/elysium/temp_xc \
 PYTHONPATH=/home/elysium/temp_xc python src/v2_temporal_schemeC/plot_exp1c3_noisy.py
 ```
 
-Results: `src/v2_temporal_schemeC/results/experiment1c3_noisy_coupled/`
+Results: `experiments/phase3_coupled/results/experiment1c3_noisy_coupled/`
 
 Runtime: ~66 minutes on RTX 5090.

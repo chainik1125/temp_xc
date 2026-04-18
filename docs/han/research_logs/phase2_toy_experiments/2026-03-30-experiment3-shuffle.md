@@ -17,15 +17,15 @@ For each event type and $\rho$-group, we compute the **mean absolute prediction 
 
 If TFA exploits temporal structure, we expect: (1) continuations should have higher prediction projection than onsets (persistent features are predictable from context), (2) offset/absent should have low projection (inactive features should not be predicted), and (3) these patterns should be sharper for high-$\rho$ features (which are more temporally persistent).
 
-![Continuation vs onset with CIs](../../../../src/v2_temporal_schemeC/results/temporal_decomposition_v2/cont_vs_onset_ci.png)
+![Continuation vs onset with CIs](../../../../experiments/phase2_toy/results/temporal_decomposition_v2/cont_vs_onset_ci.png)
 
 Mean prediction projection for continuations vs onsets across $\rho$ groups, with 95% bootstrap CIs.
 
-![False positive analysis](../../../../src/v2_temporal_schemeC/results/temporal_decomposition_v2/false_positive.png)
+![False positive analysis](../../../../experiments/phase2_toy/results/temporal_decomposition_v2/false_positive.png)
 
 Mean prediction projection when the feature is ON vs OFF, showing high false-positive rates.
 
-![All event types](../../../../src/v2_temporal_schemeC/results/temporal_decomposition_v2/pred_proj_by_event.png)
+![All event types](../../../../experiments/phase2_toy/results/temporal_decomposition_v2/pred_proj_by_event.png)
 
 All four event types: continuation $\approx$ onset and offset $\approx$ absent at every $k$ and $\rho$.
 
@@ -84,11 +84,11 @@ The same pattern holds for the OFF side: sudden offset $\approx$ long absence at
 
 With positional encoding, TFA-pos shows a long/sudden ratio of **1.39 at $\rho = 0.9$, $k = 8$** --- a 39% distinction that is absent in position-blind TFA (ratio 1.02). This confirms that positional encoding enables some temporal discrimination in the attention direction. The effect is modest and not uniform: at $k = 5$, $\rho = 0.9$, the ratio is 0.91, suggesting the temporal routing learned by TFA-pos is $k$-dependent.
 
-![Run-length comparison k=8](../../../../src/v2_temporal_schemeC/results/temporal_decomposition_v3/run_length_comparison_k8.png)
+![Run-length comparison k=8](../../../../experiments/phase2_toy/results/temporal_decomposition_v3/run_length_comparison_k8.png)
 
 For position-blind TFA (above plot): long continuation, sudden onset, and short continuation all produce virtually identical prediction projections at every $\rho$. The three curves overlap completely.
 
-![TFA-pos run-length comparison k=8](../../../../src/v2_temporal_schemeC/results/exp3_tfa_pos/run_length_k8.png)
+![TFA-pos run-length comparison k=8](../../../../experiments/phase2_toy/results/exp3_tfa_pos/run_length_k8.png)
 
 For TFA-pos (above plot): at $\rho = 0.9$, long continuation produces higher prediction projections than sudden onset, showing the positional encoding enables some temporal discrimination.
 
@@ -101,7 +101,7 @@ For TFA-pos (above plot): at $\rho = 0.9$, long continuation produces higher pre
 | 256 | 0.5 | 0.237 | 0.237 | 1.001 |
 | 256 | 0.9 | 3.862 | 3.844 | 1.005 |
 
-![Sequence length comparison](../../../../src/v2_temporal_schemeC/results/temporal_decomposition_v3/seqlen_comparison.png)
+![Sequence length comparison](../../../../experiments/phase2_toy/results/temporal_decomposition_v3/seqlen_comparison.png)
 
 At $T = 256$ with ~12 full ON/OFF cycles per feature (vs ~3 at $T = 64$), the long/sudden ratio moves *closer* to 1.0, not further.
 
@@ -160,7 +160,7 @@ Long continuation $\approx$ sudden onset for **all** conditions — temporal, sh
 | Sudden offset ($\rho = 0.9$) | 0.971 | 94.3% |
 | Long absent ($\rho = 0.9$) | 0.971 | 94.3% |
 
-![Attention direction quality k=8](../../../../src/v2_temporal_schemeC/results/attention_direction_analysis/direction_quality_k8.png)
+![Attention direction quality k=8](../../../../experiments/phase2_toy/results/attention_direction_analysis/direction_quality_k8.png)
 
 **Findings.**
 

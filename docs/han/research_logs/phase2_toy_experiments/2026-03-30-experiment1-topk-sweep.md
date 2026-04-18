@@ -96,11 +96,11 @@ All models trained 30K steps.[^1]
 | 17 | 0.787 | 0.602 | 0.631 | 0.720 | 0.523 | 0.688 | 0.587 | **0.979** | 0.906 | 0.711 | --- |
 | 20 | 0.595 | 0.568 | 0.533 | 0.638 | 0.528 | 0.601 | 0.529 | **0.989** | **0.954** | 0.530 | --- |
 
-![NMSE and AUC vs k](../../../../src/v2_temporal_schemeC/results/auc_and_crosscoder/exp1_topk_auc.png)
+![NMSE and AUC vs k](../../../../experiments/phase2_toy/results/auc_and_crosscoder/exp1_topk_auc.png)
 
 Left: NMSE vs $k$. Centre: feature recovery AUC vs $k$. Right: NMSE vs AUC scatter.
 
-![Windowed models only](../../../../src/v2_temporal_schemeC/results/auc_and_crosscoder/exp1_windowed_only.png)
+![Windowed models only](../../../../experiments/phase2_toy/results/auc_and_crosscoder/exp1_windowed_only.png)
 
 Windowed models only: Stacked SAE, TXCDR, and TXCDRv2 at $T$=2 and $T$=5. AUC is decoder-averaged (mean of per-position decoder matrices before computing cosine similarity with true features).
 

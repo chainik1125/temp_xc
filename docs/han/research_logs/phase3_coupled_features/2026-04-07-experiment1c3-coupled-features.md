@@ -83,17 +83,17 @@ Note: for windowed models, latent activations are averaged across overlapping wi
 
 ### Plots
 
-![Decoder AUC: emission vs hidden](../../../../src/v2_temporal_schemeC/results/experiment1c3_coupled/exp1c3_auc.png)
+![Decoder AUC: emission vs hidden](../../../../experiments/phase3_coupled/results/experiment1c3_coupled/exp1c3_auc.png)
 
-![Single-latent correlation](../../../../src/v2_temporal_schemeC/results/experiment1c3_coupled/exp1c3_corr.png)
+![Single-latent correlation](../../../../experiments/phase3_coupled/results/experiment1c3_coupled/exp1c3_corr.png)
 
-![Linear probe R²](../../../../src/v2_temporal_schemeC/results/experiment1c3_coupled/exp1c3_probe.png)
+![Linear probe R²](../../../../experiments/phase3_coupled/results/experiment1c3_coupled/exp1c3_probe.png)
 
-![All three ratios vs k](../../../../src/v2_temporal_schemeC/results/experiment1c3_coupled/exp1c3_ratios.png)
+![All three ratios vs k](../../../../experiments/phase3_coupled/results/experiment1c3_coupled/exp1c3_ratios.png)
 
-![Scatter: hidden vs emission (3 metrics)](../../../../src/v2_temporal_schemeC/results/experiment1c3_coupled/exp1c3_scatter.png)
+![Scatter: hidden vs emission (3 metrics)](../../../../experiments/phase3_coupled/results/experiment1c3_coupled/exp1c3_scatter.png)
 
-![Global AUC vs window size T](../../../../src/v2_temporal_schemeC/results/experiment1c3_coupled/exp1c3_gauc_vs_T.png)
+![Global AUC vs window size T](../../../../experiments/phase3_coupled/results/experiment1c3_coupled/exp1c3_gauc_vs_T.png)
 
 ### Reproduction
 
@@ -107,6 +107,6 @@ TQDM_DISABLE=1 PYTHONUNBUFFERED=1 PYTHONPATH=/home/elysium/temp_xc \
 PYTHONPATH=/home/elysium/temp_xc python src/v2_temporal_schemeC/plot_exp1c3.py
 ```
 
-Results: `src/v2_temporal_schemeC/results/experiment1c3_coupled/`
+Results: `experiments/phase3_coupled/results/experiment1c3_coupled/`
 
 Runtime: ~68 minutes on RTX 5090.

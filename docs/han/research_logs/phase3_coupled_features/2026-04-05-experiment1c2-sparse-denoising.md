@@ -130,13 +130,13 @@ Despite the higher per-token floor, **the same denoising hierarchy holds**: TFA-
 
 ### Plots
 
-![NMSE and AUC](../../../../src/v2_temporal_schemeC/results/experiment1c2_sparse/exp1c2_topk_auc.png)
+![NMSE and AUC](../../../../experiments/phase3_coupled/results/experiment1c2_sparse/exp1c2_topk_auc.png)
 
-![Denoising ratio vs k](../../../../src/v2_temporal_schemeC/results/experiment1c2_sparse/exp1c2_denoising.png)
+![Denoising ratio vs k](../../../../experiments/phase3_coupled/results/experiment1c2_sparse/exp1c2_denoising.png)
 
-![Denoising ratio vs T](../../../../src/v2_temporal_schemeC/results/experiment1c2_sparse/exp1c2_denoising_vs_T.png)
+![Denoising ratio vs T](../../../../experiments/phase3_coupled/results/experiment1c2_sparse/exp1c2_denoising_vs_T.png)
 
-![Per-rho-group denoising](../../../../src/v2_temporal_schemeC/results/experiment1c2_sparse/exp1c2_per_rho_denoising.png)
+![Per-rho-group denoising](../../../../experiments/phase3_coupled/results/experiment1c2_sparse/exp1c2_per_rho_denoising.png)
 
 ### Reproduction
 
@@ -146,6 +146,6 @@ TQDM_DISABLE=1 PYTHONUNBUFFERED=1 PYTHONPATH=/home/elysium/temp_xc \
   src/v2_temporal_schemeC/run_experiment1c2.py
 ```
 
-Results: `src/v2_temporal_schemeC/results/experiment1c2_sparse/`
+Results: `experiments/phase3_coupled/results/experiment1c2_sparse/`
 
 Runtime: ~94 minutes on RTX 5090.
