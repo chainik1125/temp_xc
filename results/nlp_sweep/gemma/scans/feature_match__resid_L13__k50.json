@@ -1,0 +1,72 @@
+{
+  "archs": [
+    "stacked_sae",
+    "crosscoder",
+    "tfa_pos"
+  ],
+  "layer_key": null,
+  "k": 50,
+  "T": 5,
+  "pairs": {
+    "stacked_sae__vs__crosscoder": {
+      "A_to_B": {
+        "median_best_sim": 0.2172650694847107,
+        "mean_best_sim": 0.21933217346668243,
+        "p90_best_sim": 0.36505308747291565,
+        "features_sim_above_0.7": 0,
+        "features_sim_above_0.5": 0,
+        "features_sim_below_0.3": 13383
+      },
+      "B_to_A": {
+        "median_best_sim": 0.10719960182905197,
+        "mean_best_sim": 0.16021589934825897,
+        "p90_best_sim": 0.3430156707763672,
+        "features_sim_above_0.7": 0,
+        "features_sim_above_0.5": 0,
+        "features_sim_below_0.3": 15415
+      },
+      "d_sae_A": 18432,
+      "d_sae_B": 18432
+    },
+    "stacked_sae__vs__tfa_pos": {
+      "A_to_B": {
+        "median_best_sim": 0.08339951932430267,
+        "mean_best_sim": 0.0846417248249054,
+        "p90_best_sim": 0.09772197157144547,
+        "features_sim_above_0.7": 0,
+        "features_sim_above_0.5": 0,
+        "features_sim_below_0.3": 18432
+      },
+      "B_to_A": {
+        "median_best_sim": 0.0931607261300087,
+        "mean_best_sim": 0.09455469995737076,
+        "p90_best_sim": 0.11406321823596954,
+        "features_sim_above_0.7": 0,
+        "features_sim_above_0.5": 0,
+        "features_sim_below_0.3": 18432
+      },
+      "d_sae_A": 18432,
+      "d_sae_B": 18432
+    },
+    "crosscoder__vs__tfa_pos": {
+      "A_to_B": {
+        "median_best_sim": 0.08555219322443008,
+        "mean_best_sim": 0.08899427205324173,
+        "p90_best_sim": 0.10794464498758316,
+        "features_sim_above_0.7": 0,
+        "features_sim_above_0.5": 0,
+        "features_sim_below_0.3": 18430
+      },
+      "B_to_A": {
+        "median_best_sim": 0.14247624576091766,
+        "mean_best_sim": 0.1398702710866928,
+        "p90_best_sim": 0.17708739638328552,
+        "features_sim_above_0.7": 0,
+        "features_sim_above_0.5": 0,
+        "features_sim_below_0.3": 18431
+      },
+      "d_sae_A": 18432,
+      "d_sae_B": 18432
+    }
+  }
+}

@@ -1,0 +1,111 @@
+[
+  {
+    "checkpoint": "results/nlp_sweep/gemma/ckpts/tfa_pos__gemma-2-2b-it__fineweb__resid_L13__k50__seed42.pt",
+    "arch": "TFA-pos",
+    "subject_model": "gemma-2-2b-it",
+    "cached_dataset": "fineweb",
+    "layer_key": "resid_L13",
+    "shuffled": false,
+    "k": 50,
+    "seed": 42,
+    "d_in": 2304,
+    "d_sae": 18432,
+    "nmse": 0.9568869761714429,
+    "l0": 3420.082125,
+    "auc": null,
+    "r90": null,
+    "mean_max_cos": null,
+    "global_auc": null,
+    "global_r90": null,
+    "global_mean_max_cos": null,
+    "temporal_mi": {
+      "lags": [
+        1,
+        2,
+        4,
+        8
+      ],
+      "mean_mi_per_lag": [
+        0.04955999180674553,
+        0.04040316864848137,
+        0.03504224494099617,
+        0.03047231398522854
+      ],
+      "frac_features_above_threshold": [
+        0.50537109375,
+        0.49951171875,
+        0.498046875,
+        0.48291015625
+      ],
+      "threshold": 0.01
+    },
+    "span_stats": {
+      "mean_span": 2.5840768178270053,
+      "mean_bursts_per_seq": 3.428274154663086,
+      "mean_duty_cycle": 0.09080438315868378,
+      "fraction_single_token": 0.416015625
+    },
+    "cluster": {
+      "coords_shape": [
+        18432,
+        2
+      ],
+      "labels_unique": 20,
+      "n_clusters": 20,
+      "method": "kmeans_fallback",
+      "umap_params": {
+        "fallback": "pca",
+        "reason": "No module named 'umap'"
+      }
+    },
+    "elapsed_sec": 6643.9
+  },
+  {
+    "checkpoint": "results/nlp_sweep/gemma/ckpts/stacked_sae__gemma-2-2b-it__fineweb__resid_L13__k50__seed42.pt",
+    "arch": "Stacked T=5",
+    "subject_model": "gemma-2-2b-it",
+    "cached_dataset": "fineweb",
+    "layer_key": "resid_L13",
+    "shuffled": false,
+    "k": 50,
+    "seed": 42,
+    "d_in": 2304,
+    "d_sae": 18432,
+    "nmse": 0.13837831730797634,
+    "l0": 49.746933172410536,
+    "auc": null,
+    "r90": null,
+    "mean_max_cos": null,
+    "global_auc": null,
+    "global_r90": null,
+    "global_mean_max_cos": null,
+    "temporal_mi": null,
+    "span_stats": null,
+    "cluster": null,
+    "elapsed_sec": 3585.8
+  },
+  {
+    "checkpoint": "results/nlp_sweep/gemma/ckpts/crosscoder__gemma-2-2b-it__fineweb__resid_L13__k50__seed42.pt",
+    "arch": "TXCDR T=5",
+    "subject_model": "gemma-2-2b-it",
+    "cached_dataset": "fineweb",
+    "layer_key": "resid_L13",
+    "shuffled": false,
+    "k": 50,
+    "seed": 42,
+    "d_in": 2304,
+    "d_sae": 18432,
+    "nmse": 0.154924012047272,
+    "l0": 245.45235080645162,
+    "auc": null,
+    "r90": null,
+    "mean_max_cos": null,
+    "global_auc": null,
+    "global_r90": null,
+    "global_mean_max_cos": null,
+    "temporal_mi": null,
+    "span_stats": null,
+    "cluster": null,
+    "elapsed_sec": 3040.8
+  }
+]

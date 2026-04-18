@@ -1,0 +1,1587 @@
+{
+  "threshold": 0.35,
+  "min_content_fraction": 0.6,
+  "by_arch": {
+    "crosscoder": {
+      "raw_top15_by_mass": [
+        {
+          "feat_idx": 7820,
+          "concentration": 0.31585773825645447,
+          "mass": 7683.4744873046875,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>JERUSALEM (<<<AP) \u2014 When Stella Knobel\u2019s family",
+            ">>>Good morning, everyone<<<! Nice to see you again here in my website",
+            ">>>BANGKOK, Thailand<<< -- For years, zesty Tom Yum Gung",
+            ">>>SAN JOSE, Calif<<<. \u2013 A former Samsung licensing director said disclosing a",
+            ">>>MELBOURNE, Fla<<<.--(BUSINESS WIRE)--Oak Ridge Energy Technologies,"
+          ],
+          "top_activations": [
+            770.8865966796875,
+            770.6796264648438,
+            770.559814453125,
+            769.3238525390625,
+            769.2611083984375
+          ]
+        },
+        {
+          "feat_idx": 5080,
+          "concentration": 0.29956912994384766,
+          "mass": 6808.490295410156,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>Cisco made undisclosed extensions<<< to the Tensilica instruction set. None of",
+            ">>>UNDP works in more<<< than 170 countries to simultaneously reduce poverty",
+            ">>>Font Size: AAA<<<\nExternal Meetings: Meeting with ICAP\nXIII",
+            ">>>TED Talk Tuesday #<<<65: The danger of a single story\n",
+            ">>>Cats deflate Hogs<<< in Rupp\n1/25/2"
+          ],
+          "top_activations": [
+            686.2606201171875,
+            685.336669921875,
+            685.2505493164062,
+            682.60107421875,
+            681.7546997070312
+          ]
+        },
+        {
+          "feat_idx": 7347,
+          "concentration": 0.24569882452487946,
+          "mass": 6755.6806640625,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>This is<<< an excellent documentary into the breakup of the former Socialist",
+            ">>>The Wisconsin<<< Highway Research Program was established in 199",
+            ">>>***Off<<<ical 2012 STL Cardinals World Champions",
+            ">>>The Metropolitan<<< Opera says it has replaced next season\u2019s revival",
+            ">>>Web Design<<< Programer\nClosed - This job posting has"
+          ],
+          "top_activations": [
+            705.4221801757812,
+            701.1630859375,
+            694.4556884765625,
+            687.8251342773438,
+            667.6575927734375
+          ]
+        },
+        {
+          "feat_idx": 2587,
+          "concentration": 0.25429049134254456,
+          "mass": 5881.595458984375,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>Thanks to all<<< who joined us at Trade Days 201",
+            ">>>In this case<<< ZhyperMU is based on the book 'The",
+            ">>>Blogger was down<<< for about 14 hours by my calculation.",
+            ">>>***Offical<<< 2012 STL Cardinals World Champions Thread",
+            ">>>Portrait Contest Winners<<< Announced\nThe votes are in, and we\u2019"
+          ],
+          "top_activations": [
+            606.417724609375,
+            601.603759765625,
+            595.70263671875,
+            586.7344360351562,
+            585.4146728515625
+          ]
+        },
+        {
+          "feat_idx": 5065,
+          "concentration": 0.23874187469482422,
+          "mass": 5265.8343505859375,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>In this case<<< ZhyperMU is based on the book 'The",
+            ">>>The Wisconsin Highway<<< Research Program was established in 1998",
+            ">>>Thanks to all<<< who joined us at Trade Days 201",
+            ">>>This is an<<< excellent documentary into the breakup of the former Socialist Federal",
+            ">>>The Metropolitan Opera<<< says it has replaced next season\u2019s revival of"
+          ],
+          "top_activations": [
+            558.3843383789062,
+            536.4595336914062,
+            536.041015625,
+            530.9970092773438,
+            527.5869750976562
+          ]
+        },
+        {
+          "feat_idx": 16314,
+          "concentration": 0.23087771236896515,
+          "mass": 4978.609191894531,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>This is<<< an excellent documentary into the breakup of the former Socialist",
+            ">>>The Wisconsin<<< Highway Research Program was established in 199",
+            ">>>***Off<<<ical 2012 STL Cardinals World Champions",
+            ">>>The Metropolitan<<< Opera says it has replaced next season\u2019s revival",
+            ">>>Web Design<<< Programer\nClosed - This job posting has"
+          ],
+          "top_activations": [
+            512.8783569335938,
+            512.3651733398438,
+            511.8011779785156,
+            498.304931640625,
+            498.0776672363281
+          ]
+        },
+        {
+          "feat_idx": 14602,
+          "concentration": 0.3353380858898163,
+          "mass": 4867.18408203125,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>The Wisconsin<<< Highway Research Program was established in 199",
+            ">>>This is<<< an excellent documentary into the breakup of the former Socialist",
+            ">>>***Off<<<ical 2012 STL Cardinals World Champions",
+            ">>>Web Design<<< Programer\nClosed - This job posting has",
+            ">>>The Metropolitan<<< Opera says it has replaced next season\u2019s revival"
+          ],
+          "top_activations": [
+            492.7916259765625,
+            492.08038330078125,
+            491.36981201171875,
+            489.2947998046875,
+            489.02301025390625
+          ]
+        },
+        {
+          "feat_idx": 11488,
+          "concentration": 0.25387904047966003,
+          "mass": 4795.804534912109,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>The<<< Metropolitan Opera says it has replaced next season\u2019s",
+            ">>>Web<<< Design Programer\nClosed - This job posting",
+            ">>>Download<<< Ayaka Ozubulu \u2013 Mpompo N",
+            ">>>Mon<<<delez International, Inc. engages in the manufacture",
+            ">>>The<<< search for a suspected bank robber ended in a tense"
+          ],
+          "top_activations": [
+            491.40838623046875,
+            485.7200012207031,
+            483.9084167480469,
+            480.5793762207031,
+            479.8185729980469
+          ]
+        },
+        {
+          "feat_idx": 15465,
+          "concentration": 0.27560850977897644,
+          "mass": 4723.212890625,
+          "content_fraction": 0.8,
+          "top_texts": [
+            ">>>Blogger<<< was down for about 14 hours by my",
+            ">>>The<<< Metropolitan Opera says it has replaced next season\u2019s",
+            ">>>'<<<Ray has two goals and three assists in 6",
+            ">>>Quality<<< management in general\nISO 9001",
+            ">>>Download<<< Ayaka Ozubulu \u2013 Mpompo N"
+          ],
+          "top_activations": [
+            487.72412109375,
+            477.45037841796875,
+            472.59478759765625,
+            471.8895263671875,
+            471.2296142578125
+          ]
+        },
+        {
+          "feat_idx": 10540,
+          "concentration": 0.23272879421710968,
+          "mass": 4628.719421386719,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>Thanks to all<<< who joined us at Trade Days 201",
+            ">>>In this case<<< ZhyperMU is based on the book 'The",
+            ">>>The Wisconsin Highway<<< Research Program was established in 1998",
+            ">>>***Offical<<< 2012 STL Cardinals World Champions Thread",
+            ">>>This is an<<< excellent documentary into the breakup of the former Socialist Federal"
+          ],
+          "top_activations": [
+            493.0408630371094,
+            488.87664794921875,
+            469.7535095214844,
+            468.8634948730469,
+            465.44000244140625
+          ]
+        },
+        {
+          "feat_idx": 16932,
+          "concentration": 0.2544744908809662,
+          "mass": 4096.537536621094,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>Thanks to all<<< who joined us at Trade Days 201",
+            ">>>In this case<<< ZhyperMU is based on the book 'The",
+            ">>>***Offical<<< 2012 STL Cardinals World Champions Thread",
+            ">>>The Wisconsin Highway<<< Research Program was established in 1998",
+            ">>>This is an<<< excellent documentary into the breakup of the former Socialist Federal"
+          ],
+          "top_activations": [
+            438.6466369628906,
+            434.859130859375,
+            419.0113525390625,
+            413.5124816894531,
+            413.1701354980469
+          ]
+        },
+        {
+          "feat_idx": 9913,
+          "concentration": 0.2910829484462738,
+          "mass": 3897.8448486328125,
+          "content_fraction": 0.0,
+          "top_texts": [
+            ">>><<<Download Ayaka Ozubulu \u2013 Mpompo",
+            ">>><<<Web Design Programer\nClosed - This job",
+            ">>><<<Mondelez International, Inc. engages in the",
+            ">>><<<Quality management in general\nISO 900",
+            ">>><<<The search for a suspected bank robber ended in a"
+          ],
+          "top_activations": [
+            394.8446960449219,
+            394.8446960449219,
+            391.6403503417969,
+            391.6403503417969,
+            391.6403503417969
+          ]
+        },
+        {
+          "feat_idx": 9113,
+          "concentration": 0.2512587308883667,
+          "mass": 3710.5677795410156,
+          "content_fraction": 0.0,
+          "top_texts": [
+            ">>><<<Download Ayaka Ozubulu \u2013 Mpompo",
+            ">>><<<Web Design Programer\nClosed - This job",
+            ">>><<<Mondelez International, Inc. engages in the",
+            ">>><<<Quality management in general\nISO 900",
+            ">>><<<The search for a suspected bank robber ended in a"
+          ],
+          "top_activations": [
+            374.9153747558594,
+            374.9153747558594,
+            372.455078125,
+            372.455078125,
+            372.455078125
+          ]
+        },
+        {
+          "feat_idx": 7911,
+          "concentration": 0.22643697261810303,
+          "mass": 3684.433074951172,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>The Wisconsin<<< Highway Research Program was established in 199",
+            ">>>***Off<<<ical 2012 STL Cardinals World Champions",
+            ">>>This is<<< an excellent documentary into the breakup of the former Socialist",
+            ">>>The Metropolitan<<< Opera says it has replaced next season\u2019s revival",
+            ">>>Web Design<<< Programer\nClosed - This job posting has"
+          ],
+          "top_activations": [
+            379.10302734375,
+            378.22711181640625,
+            377.868896484375,
+            372.90435791015625,
+            366.1423645019531
+          ]
+        },
+        {
+          "feat_idx": 7187,
+          "concentration": 0.23853006958961487,
+          "mass": 3524.3749084472656,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>Blogger was<<< down for about 14 hours by my calculation",
+            ">>>Ukparty<<<warehouse.com Coupon Codes\nUkpartywarehouse.",
+            ">>>'Ray<<< has two goals and three assists in 68",
+            ">>>Wanna-<<<bes stay home. Truckin\u2019s Throwdown",
+            ">>>NBA public<<< relations have been a complete disaster lately.\nThe"
+          ],
+          "top_activations": [
+            358.0900573730469,
+            355.42474365234375,
+            355.1063232421875,
+            353.3411560058594,
+            352.3373107910156
+          ]
+        }
+      ],
+      "content_within_raw_top15": [
+        {
+          "feat_idx": 7820,
+          "concentration": 0.31585773825645447,
+          "mass": 7683.4744873046875,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>JERUSALEM (<<<AP) \u2014 When Stella Knobel\u2019s family",
+            ">>>Good morning, everyone<<<! Nice to see you again here in my website",
+            ">>>BANGKOK, Thailand<<< -- For years, zesty Tom Yum Gung",
+            ">>>SAN JOSE, Calif<<<. \u2013 A former Samsung licensing director said disclosing a",
+            ">>>MELBOURNE, Fla<<<.--(BUSINESS WIRE)--Oak Ridge Energy Technologies,"
+          ],
+          "top_activations": [
+            770.8865966796875,
+            770.6796264648438,
+            770.559814453125,
+            769.3238525390625,
+            769.2611083984375
+          ]
+        },
+        {
+          "feat_idx": 5080,
+          "concentration": 0.29956912994384766,
+          "mass": 6808.490295410156,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>Cisco made undisclosed extensions<<< to the Tensilica instruction set. None of",
+            ">>>UNDP works in more<<< than 170 countries to simultaneously reduce poverty",
+            ">>>Font Size: AAA<<<\nExternal Meetings: Meeting with ICAP\nXIII",
+            ">>>TED Talk Tuesday #<<<65: The danger of a single story\n",
+            ">>>Cats deflate Hogs<<< in Rupp\n1/25/2"
+          ],
+          "top_activations": [
+            686.2606201171875,
+            685.336669921875,
+            685.2505493164062,
+            682.60107421875,
+            681.7546997070312
+          ]
+        },
+        {
+          "feat_idx": 7347,
+          "concentration": 0.24569882452487946,
+          "mass": 6755.6806640625,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>This is<<< an excellent documentary into the breakup of the former Socialist",
+            ">>>The Wisconsin<<< Highway Research Program was established in 199",
+            ">>>***Off<<<ical 2012 STL Cardinals World Champions",
+            ">>>The Metropolitan<<< Opera says it has replaced next season\u2019s revival",
+            ">>>Web Design<<< Programer\nClosed - This job posting has"
+          ],
+          "top_activations": [
+            705.4221801757812,
+            701.1630859375,
+            694.4556884765625,
+            687.8251342773438,
+            667.6575927734375
+          ]
+        },
+        {
+          "feat_idx": 2587,
+          "concentration": 0.25429049134254456,
+          "mass": 5881.595458984375,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>Thanks to all<<< who joined us at Trade Days 201",
+            ">>>In this case<<< ZhyperMU is based on the book 'The",
+            ">>>Blogger was down<<< for about 14 hours by my calculation.",
+            ">>>***Offical<<< 2012 STL Cardinals World Champions Thread",
+            ">>>Portrait Contest Winners<<< Announced\nThe votes are in, and we\u2019"
+          ],
+          "top_activations": [
+            606.417724609375,
+            601.603759765625,
+            595.70263671875,
+            586.7344360351562,
+            585.4146728515625
+          ]
+        },
+        {
+          "feat_idx": 5065,
+          "concentration": 0.23874187469482422,
+          "mass": 5265.8343505859375,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>In this case<<< ZhyperMU is based on the book 'The",
+            ">>>The Wisconsin Highway<<< Research Program was established in 1998",
+            ">>>Thanks to all<<< who joined us at Trade Days 201",
+            ">>>This is an<<< excellent documentary into the breakup of the former Socialist Federal",
+            ">>>The Metropolitan Opera<<< says it has replaced next season\u2019s revival of"
+          ],
+          "top_activations": [
+            558.3843383789062,
+            536.4595336914062,
+            536.041015625,
+            530.9970092773438,
+            527.5869750976562
+          ]
+        },
+        {
+          "feat_idx": 16314,
+          "concentration": 0.23087771236896515,
+          "mass": 4978.609191894531,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>This is<<< an excellent documentary into the breakup of the former Socialist",
+            ">>>The Wisconsin<<< Highway Research Program was established in 199",
+            ">>>***Off<<<ical 2012 STL Cardinals World Champions",
+            ">>>The Metropolitan<<< Opera says it has replaced next season\u2019s revival",
+            ">>>Web Design<<< Programer\nClosed - This job posting has"
+          ],
+          "top_activations": [
+            512.8783569335938,
+            512.3651733398438,
+            511.8011779785156,
+            498.304931640625,
+            498.0776672363281
+          ]
+        },
+        {
+          "feat_idx": 14602,
+          "concentration": 0.3353380858898163,
+          "mass": 4867.18408203125,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>The Wisconsin<<< Highway Research Program was established in 199",
+            ">>>This is<<< an excellent documentary into the breakup of the former Socialist",
+            ">>>***Off<<<ical 2012 STL Cardinals World Champions",
+            ">>>Web Design<<< Programer\nClosed - This job posting has",
+            ">>>The Metropolitan<<< Opera says it has replaced next season\u2019s revival"
+          ],
+          "top_activations": [
+            492.7916259765625,
+            492.08038330078125,
+            491.36981201171875,
+            489.2947998046875,
+            489.02301025390625
+          ]
+        },
+        {
+          "feat_idx": 11488,
+          "concentration": 0.25387904047966003,
+          "mass": 4795.804534912109,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>The<<< Metropolitan Opera says it has replaced next season\u2019s",
+            ">>>Web<<< Design Programer\nClosed - This job posting",
+            ">>>Download<<< Ayaka Ozubulu \u2013 Mpompo N",
+            ">>>Mon<<<delez International, Inc. engages in the manufacture",
+            ">>>The<<< search for a suspected bank robber ended in a tense"
+          ],
+          "top_activations": [
+            491.40838623046875,
+            485.7200012207031,
+            483.9084167480469,
+            480.5793762207031,
+            479.8185729980469
+          ]
+        },
+        {
+          "feat_idx": 15465,
+          "concentration": 0.27560850977897644,
+          "mass": 4723.212890625,
+          "content_fraction": 0.8,
+          "top_texts": [
+            ">>>Blogger<<< was down for about 14 hours by my",
+            ">>>The<<< Metropolitan Opera says it has replaced next season\u2019s",
+            ">>>'<<<Ray has two goals and three assists in 6",
+            ">>>Quality<<< management in general\nISO 9001",
+            ">>>Download<<< Ayaka Ozubulu \u2013 Mpompo N"
+          ],
+          "top_activations": [
+            487.72412109375,
+            477.45037841796875,
+            472.59478759765625,
+            471.8895263671875,
+            471.2296142578125
+          ]
+        },
+        {
+          "feat_idx": 10540,
+          "concentration": 0.23272879421710968,
+          "mass": 4628.719421386719,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>Thanks to all<<< who joined us at Trade Days 201",
+            ">>>In this case<<< ZhyperMU is based on the book 'The",
+            ">>>The Wisconsin Highway<<< Research Program was established in 1998",
+            ">>>***Offical<<< 2012 STL Cardinals World Champions Thread",
+            ">>>This is an<<< excellent documentary into the breakup of the former Socialist Federal"
+          ],
+          "top_activations": [
+            493.0408630371094,
+            488.87664794921875,
+            469.7535095214844,
+            468.8634948730469,
+            465.44000244140625
+          ]
+        },
+        {
+          "feat_idx": 16932,
+          "concentration": 0.2544744908809662,
+          "mass": 4096.537536621094,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>Thanks to all<<< who joined us at Trade Days 201",
+            ">>>In this case<<< ZhyperMU is based on the book 'The",
+            ">>>***Offical<<< 2012 STL Cardinals World Champions Thread",
+            ">>>The Wisconsin Highway<<< Research Program was established in 1998",
+            ">>>This is an<<< excellent documentary into the breakup of the former Socialist Federal"
+          ],
+          "top_activations": [
+            438.6466369628906,
+            434.859130859375,
+            419.0113525390625,
+            413.5124816894531,
+            413.1701354980469
+          ]
+        },
+        {
+          "feat_idx": 7911,
+          "concentration": 0.22643697261810303,
+          "mass": 3684.433074951172,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>The Wisconsin<<< Highway Research Program was established in 199",
+            ">>>***Off<<<ical 2012 STL Cardinals World Champions",
+            ">>>This is<<< an excellent documentary into the breakup of the former Socialist",
+            ">>>The Metropolitan<<< Opera says it has replaced next season\u2019s revival",
+            ">>>Web Design<<< Programer\nClosed - This job posting has"
+          ],
+          "top_activations": [
+            379.10302734375,
+            378.22711181640625,
+            377.868896484375,
+            372.90435791015625,
+            366.1423645019531
+          ]
+        },
+        {
+          "feat_idx": 7187,
+          "concentration": 0.23853006958961487,
+          "mass": 3524.3749084472656,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>Blogger was<<< down for about 14 hours by my calculation",
+            ">>>Ukparty<<<warehouse.com Coupon Codes\nUkpartywarehouse.",
+            ">>>'Ray<<< has two goals and three assists in 68",
+            ">>>Wanna-<<<bes stay home. Truckin\u2019s Throwdown",
+            ">>>NBA public<<< relations have been a complete disaster lately.\nThe"
+          ],
+          "top_activations": [
+            358.0900573730469,
+            355.42474365234375,
+            355.1063232421875,
+            353.3411560058594,
+            352.3373107910156
+          ]
+        }
+      ],
+      "top15_content_bearing_anyrank": [
+        {
+          "feat_idx": 7820,
+          "concentration": 0.31585773825645447,
+          "mass": 7683.4744873046875,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>JERUSALEM (<<<AP) \u2014 When Stella Knobel\u2019s family",
+            ">>>Good morning, everyone<<<! Nice to see you again here in my website",
+            ">>>BANGKOK, Thailand<<< -- For years, zesty Tom Yum Gung",
+            ">>>SAN JOSE, Calif<<<. \u2013 A former Samsung licensing director said disclosing a",
+            ">>>MELBOURNE, Fla<<<.--(BUSINESS WIRE)--Oak Ridge Energy Technologies,"
+          ],
+          "top_activations": [
+            770.8865966796875,
+            770.6796264648438,
+            770.559814453125,
+            769.3238525390625,
+            769.2611083984375
+          ]
+        },
+        {
+          "feat_idx": 5080,
+          "concentration": 0.29956912994384766,
+          "mass": 6808.490295410156,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>Cisco made undisclosed extensions<<< to the Tensilica instruction set. None of",
+            ">>>UNDP works in more<<< than 170 countries to simultaneously reduce poverty",
+            ">>>Font Size: AAA<<<\nExternal Meetings: Meeting with ICAP\nXIII",
+            ">>>TED Talk Tuesday #<<<65: The danger of a single story\n",
+            ">>>Cats deflate Hogs<<< in Rupp\n1/25/2"
+          ],
+          "top_activations": [
+            686.2606201171875,
+            685.336669921875,
+            685.2505493164062,
+            682.60107421875,
+            681.7546997070312
+          ]
+        },
+        {
+          "feat_idx": 7347,
+          "concentration": 0.24569882452487946,
+          "mass": 6755.6806640625,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>This is<<< an excellent documentary into the breakup of the former Socialist",
+            ">>>The Wisconsin<<< Highway Research Program was established in 199",
+            ">>>***Off<<<ical 2012 STL Cardinals World Champions",
+            ">>>The Metropolitan<<< Opera says it has replaced next season\u2019s revival",
+            ">>>Web Design<<< Programer\nClosed - This job posting has"
+          ],
+          "top_activations": [
+            705.4221801757812,
+            701.1630859375,
+            694.4556884765625,
+            687.8251342773438,
+            667.6575927734375
+          ]
+        },
+        {
+          "feat_idx": 2587,
+          "concentration": 0.25429049134254456,
+          "mass": 5881.595458984375,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>Thanks to all<<< who joined us at Trade Days 201",
+            ">>>In this case<<< ZhyperMU is based on the book 'The",
+            ">>>Blogger was down<<< for about 14 hours by my calculation.",
+            ">>>***Offical<<< 2012 STL Cardinals World Champions Thread",
+            ">>>Portrait Contest Winners<<< Announced\nThe votes are in, and we\u2019"
+          ],
+          "top_activations": [
+            606.417724609375,
+            601.603759765625,
+            595.70263671875,
+            586.7344360351562,
+            585.4146728515625
+          ]
+        },
+        {
+          "feat_idx": 5065,
+          "concentration": 0.23874187469482422,
+          "mass": 5265.8343505859375,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>In this case<<< ZhyperMU is based on the book 'The",
+            ">>>The Wisconsin Highway<<< Research Program was established in 1998",
+            ">>>Thanks to all<<< who joined us at Trade Days 201",
+            ">>>This is an<<< excellent documentary into the breakup of the former Socialist Federal",
+            ">>>The Metropolitan Opera<<< says it has replaced next season\u2019s revival of"
+          ],
+          "top_activations": [
+            558.3843383789062,
+            536.4595336914062,
+            536.041015625,
+            530.9970092773438,
+            527.5869750976562
+          ]
+        },
+        {
+          "feat_idx": 16314,
+          "concentration": 0.23087771236896515,
+          "mass": 4978.609191894531,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>This is<<< an excellent documentary into the breakup of the former Socialist",
+            ">>>The Wisconsin<<< Highway Research Program was established in 199",
+            ">>>***Off<<<ical 2012 STL Cardinals World Champions",
+            ">>>The Metropolitan<<< Opera says it has replaced next season\u2019s revival",
+            ">>>Web Design<<< Programer\nClosed - This job posting has"
+          ],
+          "top_activations": [
+            512.8783569335938,
+            512.3651733398438,
+            511.8011779785156,
+            498.304931640625,
+            498.0776672363281
+          ]
+        },
+        {
+          "feat_idx": 14602,
+          "concentration": 0.3353380858898163,
+          "mass": 4867.18408203125,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>The Wisconsin<<< Highway Research Program was established in 199",
+            ">>>This is<<< an excellent documentary into the breakup of the former Socialist",
+            ">>>***Off<<<ical 2012 STL Cardinals World Champions",
+            ">>>Web Design<<< Programer\nClosed - This job posting has",
+            ">>>The Metropolitan<<< Opera says it has replaced next season\u2019s revival"
+          ],
+          "top_activations": [
+            492.7916259765625,
+            492.08038330078125,
+            491.36981201171875,
+            489.2947998046875,
+            489.02301025390625
+          ]
+        },
+        {
+          "feat_idx": 11488,
+          "concentration": 0.25387904047966003,
+          "mass": 4795.804534912109,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>The<<< Metropolitan Opera says it has replaced next season\u2019s",
+            ">>>Web<<< Design Programer\nClosed - This job posting",
+            ">>>Download<<< Ayaka Ozubulu \u2013 Mpompo N",
+            ">>>Mon<<<delez International, Inc. engages in the manufacture",
+            ">>>The<<< search for a suspected bank robber ended in a tense"
+          ],
+          "top_activations": [
+            491.40838623046875,
+            485.7200012207031,
+            483.9084167480469,
+            480.5793762207031,
+            479.8185729980469
+          ]
+        },
+        {
+          "feat_idx": 15465,
+          "concentration": 0.27560850977897644,
+          "mass": 4723.212890625,
+          "content_fraction": 0.8,
+          "top_texts": [
+            ">>>Blogger<<< was down for about 14 hours by my",
+            ">>>The<<< Metropolitan Opera says it has replaced next season\u2019s",
+            ">>>'<<<Ray has two goals and three assists in 6",
+            ">>>Quality<<< management in general\nISO 9001",
+            ">>>Download<<< Ayaka Ozubulu \u2013 Mpompo N"
+          ],
+          "top_activations": [
+            487.72412109375,
+            477.45037841796875,
+            472.59478759765625,
+            471.8895263671875,
+            471.2296142578125
+          ]
+        },
+        {
+          "feat_idx": 10540,
+          "concentration": 0.23272879421710968,
+          "mass": 4628.719421386719,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>Thanks to all<<< who joined us at Trade Days 201",
+            ">>>In this case<<< ZhyperMU is based on the book 'The",
+            ">>>The Wisconsin Highway<<< Research Program was established in 1998",
+            ">>>***Offical<<< 2012 STL Cardinals World Champions Thread",
+            ">>>This is an<<< excellent documentary into the breakup of the former Socialist Federal"
+          ],
+          "top_activations": [
+            493.0408630371094,
+            488.87664794921875,
+            469.7535095214844,
+            468.8634948730469,
+            465.44000244140625
+          ]
+        },
+        {
+          "feat_idx": 16932,
+          "concentration": 0.2544744908809662,
+          "mass": 4096.537536621094,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>Thanks to all<<< who joined us at Trade Days 201",
+            ">>>In this case<<< ZhyperMU is based on the book 'The",
+            ">>>***Offical<<< 2012 STL Cardinals World Champions Thread",
+            ">>>The Wisconsin Highway<<< Research Program was established in 1998",
+            ">>>This is an<<< excellent documentary into the breakup of the former Socialist Federal"
+          ],
+          "top_activations": [
+            438.6466369628906,
+            434.859130859375,
+            419.0113525390625,
+            413.5124816894531,
+            413.1701354980469
+          ]
+        },
+        {
+          "feat_idx": 7911,
+          "concentration": 0.22643697261810303,
+          "mass": 3684.433074951172,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>The Wisconsin<<< Highway Research Program was established in 199",
+            ">>>***Off<<<ical 2012 STL Cardinals World Champions",
+            ">>>This is<<< an excellent documentary into the breakup of the former Socialist",
+            ">>>The Metropolitan<<< Opera says it has replaced next season\u2019s revival",
+            ">>>Web Design<<< Programer\nClosed - This job posting has"
+          ],
+          "top_activations": [
+            379.10302734375,
+            378.22711181640625,
+            377.868896484375,
+            372.90435791015625,
+            366.1423645019531
+          ]
+        },
+        {
+          "feat_idx": 7187,
+          "concentration": 0.23853006958961487,
+          "mass": 3524.3749084472656,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>Blogger was<<< down for about 14 hours by my calculation",
+            ">>>Ukparty<<<warehouse.com Coupon Codes\nUkpartywarehouse.",
+            ">>>'Ray<<< has two goals and three assists in 68",
+            ">>>Wanna-<<<bes stay home. Truckin\u2019s Throwdown",
+            ">>>NBA public<<< relations have been a complete disaster lately.\nThe"
+          ],
+          "top_activations": [
+            358.0900573730469,
+            355.42474365234375,
+            355.1063232421875,
+            353.3411560058594,
+            352.3373107910156
+          ]
+        },
+        {
+          "feat_idx": 9540,
+          "concentration": 0.2230266034603119,
+          "mass": 3332.70361328125,
+          "content_fraction": 0.8,
+          "top_texts": [
+            ">>>The<<< Metropolitan Opera says it has replaced next season\u2019s",
+            ">>>Web<<< Design Programer\nClosed - This job posting",
+            ">>>*<<<Floor plans and pricing are subject to change, please",
+            ">>>Download<<< Ayaka Ozubulu \u2013 Mpompo N",
+            ">>>The<<< search for a suspected bank robber ended in a tense"
+          ],
+          "top_activations": [
+            339.9786071777344,
+            336.2449645996094,
+            336.1247253417969,
+            334.9565124511719,
+            334.6949768066406
+          ]
+        },
+        {
+          "feat_idx": 12410,
+          "concentration": 0.28069886565208435,
+          "mass": 3274.907928466797,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>In this case<<< ZhyperMU is based on the book 'The",
+            ">>>Thanks to all<<< who joined us at Trade Days 201",
+            ">>>The Wisconsin Highway<<< Research Program was established in 1998",
+            ">>>The Metropolitan Opera<<< says it has replaced next season\u2019s revival of",
+            ">>>This is an<<< excellent documentary into the breakup of the former Socialist Federal"
+          ],
+          "top_activations": [
+            332.228759765625,
+            330.9314880371094,
+            328.7256164550781,
+            328.4984130859375,
+            327.8721923828125
+          ]
+        }
+      ]
+    },
+    "tfa_pos": {
+      "raw_top15_by_mass": [
+        {
+          "feat_idx": 7021,
+          "concentration": NaN,
+          "mass": 0.8408493548631668,
+          "content_fraction": 0.0,
+          "top_texts": [
+            ">>><<<Free Home Survey\nHome",
+            ">>><<<Free Home Survey\n",
+            ">>><<<Free Home Survey",
+            ">>><<<Free Home",
+            ">>><<<Free"
+          ],
+          "top_activations": [
+            0.08408493548631668,
+            0.08408493548631668,
+            0.08408493548631668,
+            0.08408493548631668,
+            0.08408493548631668
+          ]
+        },
+        {
+          "feat_idx": 10178,
+          "concentration": 0.20728816160284125,
+          "mass": 0.7984794676303864,
+          "content_fraction": 0.0,
+          "top_texts": [
+            ">>><<<Free Home Survey\nHome",
+            ">>><<<Free Home Survey\n",
+            ">>><<<Free Home Survey",
+            ">>><<<Free Home",
+            ">>><<<Free"
+          ],
+          "top_activations": [
+            0.07984794676303864,
+            0.07984794676303864,
+            0.07984794676303864,
+            0.07984794676303864,
+            0.07984794676303864
+          ]
+        },
+        {
+          "feat_idx": 7126,
+          "concentration": 0.21432910573977412,
+          "mass": 0.7717802375555038,
+          "content_fraction": 0.0,
+          "top_texts": [
+            ">>><<<Free Home Survey\nHome",
+            ">>><<<Free Home Survey\n",
+            ">>><<<Free Home Survey",
+            ">>><<<Free Home",
+            ">>><<<Free"
+          ],
+          "top_activations": [
+            0.07717802375555038,
+            0.07717802375555038,
+            0.07717802375555038,
+            0.07717802375555038,
+            0.07717802375555038
+          ]
+        },
+        {
+          "feat_idx": 4739,
+          "concentration": NaN,
+          "mass": 0.7422375828027725,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>Publicis Singapore<<< campaign puts beer fridges in parking lots. What",
+            ">>>Publicis<<< Singapore campaign puts beer fridges in parking lots.",
+            ">>>XIV International exhibition<<< and business forum for pulp and paper, forestry,",
+            ">>>Custom framed Team<<< USA Soccer jersey signed by Tim Howard! We even",
+            ">>>The contestants for<<< Miss October are locked and loaded. Who\u2019s"
+          ],
+          "top_activations": [
+            0.07744485139846802,
+            0.07601398974657059,
+            0.07532032579183578,
+            0.07510217279195786,
+            0.07409773766994476
+          ]
+        },
+        {
+          "feat_idx": 7037,
+          "concentration": NaN,
+          "mass": 0.7230454683303833,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>It's<<< been a while since we've pimped the",
+            ">>>Don't<<< miss the conceptual exhibition by the cult skincare brand.",
+            ">>>eyeBeamCounter<<<Path Solutions Inc. - Shareware\neyeBeam",
+            ">>>Christy Kite,<<< wife of World Golf Hall-of-Famer",
+            ">>>Publicis Singapore<<< campaign puts beer fridges in parking lots. What"
+          ],
+          "top_activations": [
+            0.07360001653432846,
+            0.07312197238206863,
+            0.0727430209517479,
+            0.0727430209517479,
+            0.0727430209517479
+          ]
+        },
+        {
+          "feat_idx": 6080,
+          "concentration": NaN,
+          "mass": 0.7138762101531029,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>It's<<< been a while since we've pimped the",
+            ">>>Don't<<< miss the conceptual exhibition by the cult skincare brand.",
+            ">>>\u00a9 2<<<012 Copyright Playboy.com. All rights",
+            ">>>The contestants for<<< Miss October are locked and loaded. Who\u2019s",
+            ">>>Foundation volunteers celebrate<<< success\nSeptember 12, 20"
+          ],
+          "top_activations": [
+            0.07253887504339218,
+            0.07199618965387344,
+            0.07171599566936493,
+            0.07170595973730087,
+            0.07134398072957993
+          ]
+        },
+        {
+          "feat_idx": 14620,
+          "concentration": 0.20201935492103057,
+          "mass": 0.7057018578052521,
+          "content_fraction": 0.0,
+          "top_texts": [
+            ">>><<<Free Home Survey\nHome",
+            ">>><<<Free Home Survey\n",
+            ">>><<<Free Home Survey",
+            ">>><<<Free Home",
+            ">>><<<Free"
+          ],
+          "top_activations": [
+            0.07057018578052521,
+            0.07057018578052521,
+            0.07057018578052521,
+            0.07057018578052521,
+            0.07057018578052521
+          ]
+        },
+        {
+          "feat_idx": 321,
+          "concentration": NaN,
+          "mass": 0.6926657259464264,
+          "content_fraction": 0.0,
+          "top_texts": [
+            ">>><<<Free Home Survey\nHome",
+            ">>><<<Free Home Survey\n",
+            ">>><<<Free Home Survey",
+            ">>><<<Free Home",
+            ">>><<<Free"
+          ],
+          "top_activations": [
+            0.06926657259464264,
+            0.06926657259464264,
+            0.06926657259464264,
+            0.06926657259464264,
+            0.06926657259464264
+          ]
+        },
+        {
+          "feat_idx": 9424,
+          "concentration": 0.20112702408166042,
+          "mass": 0.6781037896871567,
+          "content_fraction": 0.0,
+          "top_texts": [
+            ">>><<<Free Home Survey\nHome",
+            ">>><<<Free Home Survey\n",
+            ">>><<<Free Home Survey",
+            ">>><<<Free Home",
+            ">>><<<Free"
+          ],
+          "top_activations": [
+            0.06781037896871567,
+            0.06781037896871567,
+            0.06781037896871567,
+            0.06781037896871567,
+            0.06781037896871567
+          ]
+        },
+        {
+          "feat_idx": 12226,
+          "concentration": 0.202004388216905,
+          "mass": 0.669441744685173,
+          "content_fraction": 0.0,
+          "top_texts": [
+            ">>><<<Free Home Survey\nHome",
+            ">>><<<Free Home Survey\n",
+            ">>><<<Free Home Survey",
+            ">>><<<Free Home",
+            ">>><<<Free"
+          ],
+          "top_activations": [
+            0.0669441744685173,
+            0.0669441744685173,
+            0.0669441744685173,
+            0.0669441744685173,
+            0.0669441744685173
+          ]
+        },
+        {
+          "feat_idx": 8120,
+          "concentration": 0.20034410787680107,
+          "mass": 0.6668590754270554,
+          "content_fraction": 0.0,
+          "top_texts": [
+            ">>><<<Free Home Survey\nHome",
+            ">>><<<Free Home Survey\n",
+            ">>><<<Free Home Survey",
+            ">>><<<Free Home",
+            ">>><<<Free"
+          ],
+          "top_activations": [
+            0.06668590754270554,
+            0.06668590754270554,
+            0.06668590754270554,
+            0.06668590754270554,
+            0.06668590754270554
+          ]
+        },
+        {
+          "feat_idx": 3294,
+          "concentration": 0.20022129584136444,
+          "mass": 0.649101734161377,
+          "content_fraction": 0.0,
+          "top_texts": [
+            ">>><<<Free Home Survey\nHome",
+            ">>><<<Free Home Survey\n",
+            ">>><<<Free Home Survey",
+            ">>><<<Free Home",
+            ">>><<<Free"
+          ],
+          "top_activations": [
+            0.0649101734161377,
+            0.0649101734161377,
+            0.0649101734161377,
+            0.0649101734161377,
+            0.0649101734161377
+          ]
+        },
+        {
+          "feat_idx": 6416,
+          "concentration": NaN,
+          "mass": 0.6436563655734062,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>R Systems'<<< mission is to help enterprises derive intelligent insights and put",
+            ">>>eyeBeamCounter<<<Path Solutions Inc. - Shareware\neyeBeam",
+            ">>>Christy Kite,<<< wife of World Golf Hall-of-Famer",
+            ">>>Publicis Singapore<<< campaign puts beer fridges in parking lots. What",
+            ">>>Solis Spa<<< Covers - Professional, Knowledgeable and Prompt\n"
+          ],
+          "top_activations": [
+            0.06714432686567307,
+            0.0647374838590622,
+            0.0647374838590622,
+            0.0647374838590622,
+            0.06418745964765549
+          ]
+        },
+        {
+          "feat_idx": 6954,
+          "concentration": 0.2011103159782252,
+          "mass": 0.6423323601484299,
+          "content_fraction": 0.0,
+          "top_texts": [
+            ">>><<<Free Home Survey\nHome",
+            ">>><<<Free Home Survey\n",
+            ">>><<<Free Home Survey",
+            ">>><<<Free Home",
+            ">>><<<Free"
+          ],
+          "top_activations": [
+            0.06423323601484299,
+            0.06423323601484299,
+            0.06423323601484299,
+            0.06423323601484299,
+            0.06423323601484299
+          ]
+        },
+        {
+          "feat_idx": 6216,
+          "concentration": NaN,
+          "mass": 0.642077848315239,
+          "content_fraction": 0.0,
+          "top_texts": [
+            ">>><<<Free Home Survey\nHome",
+            ">>><<<Free Home Survey\n",
+            ">>><<<Free Home Survey",
+            ">>><<<Free Home",
+            ">>><<<Free"
+          ],
+          "top_activations": [
+            0.0642077848315239,
+            0.0642077848315239,
+            0.0642077848315239,
+            0.0642077848315239,
+            0.0642077848315239
+          ]
+        }
+      ],
+      "content_within_raw_top15": [
+        {
+          "feat_idx": 4739,
+          "concentration": NaN,
+          "mass": 0.7422375828027725,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>Publicis Singapore<<< campaign puts beer fridges in parking lots. What",
+            ">>>Publicis<<< Singapore campaign puts beer fridges in parking lots.",
+            ">>>XIV International exhibition<<< and business forum for pulp and paper, forestry,",
+            ">>>Custom framed Team<<< USA Soccer jersey signed by Tim Howard! We even",
+            ">>>The contestants for<<< Miss October are locked and loaded. Who\u2019s"
+          ],
+          "top_activations": [
+            0.07744485139846802,
+            0.07601398974657059,
+            0.07532032579183578,
+            0.07510217279195786,
+            0.07409773766994476
+          ]
+        },
+        {
+          "feat_idx": 7037,
+          "concentration": NaN,
+          "mass": 0.7230454683303833,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>It's<<< been a while since we've pimped the",
+            ">>>Don't<<< miss the conceptual exhibition by the cult skincare brand.",
+            ">>>eyeBeamCounter<<<Path Solutions Inc. - Shareware\neyeBeam",
+            ">>>Christy Kite,<<< wife of World Golf Hall-of-Famer",
+            ">>>Publicis Singapore<<< campaign puts beer fridges in parking lots. What"
+          ],
+          "top_activations": [
+            0.07360001653432846,
+            0.07312197238206863,
+            0.0727430209517479,
+            0.0727430209517479,
+            0.0727430209517479
+          ]
+        },
+        {
+          "feat_idx": 6080,
+          "concentration": NaN,
+          "mass": 0.7138762101531029,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>It's<<< been a while since we've pimped the",
+            ">>>Don't<<< miss the conceptual exhibition by the cult skincare brand.",
+            ">>>\u00a9 2<<<012 Copyright Playboy.com. All rights",
+            ">>>The contestants for<<< Miss October are locked and loaded. Who\u2019s",
+            ">>>Foundation volunteers celebrate<<< success\nSeptember 12, 20"
+          ],
+          "top_activations": [
+            0.07253887504339218,
+            0.07199618965387344,
+            0.07171599566936493,
+            0.07170595973730087,
+            0.07134398072957993
+          ]
+        },
+        {
+          "feat_idx": 6416,
+          "concentration": NaN,
+          "mass": 0.6436563655734062,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>R Systems'<<< mission is to help enterprises derive intelligent insights and put",
+            ">>>eyeBeamCounter<<<Path Solutions Inc. - Shareware\neyeBeam",
+            ">>>Christy Kite,<<< wife of World Golf Hall-of-Famer",
+            ">>>Publicis Singapore<<< campaign puts beer fridges in parking lots. What",
+            ">>>Solis Spa<<< Covers - Professional, Knowledgeable and Prompt\n"
+          ],
+          "top_activations": [
+            0.06714432686567307,
+            0.0647374838590622,
+            0.0647374838590622,
+            0.0647374838590622,
+            0.06418745964765549
+          ]
+        }
+      ],
+      "top15_content_bearing_anyrank": [
+        {
+          "feat_idx": 4739,
+          "concentration": NaN,
+          "mass": 0.7422375828027725,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>Publicis Singapore<<< campaign puts beer fridges in parking lots. What",
+            ">>>Publicis<<< Singapore campaign puts beer fridges in parking lots.",
+            ">>>XIV International exhibition<<< and business forum for pulp and paper, forestry,",
+            ">>>Custom framed Team<<< USA Soccer jersey signed by Tim Howard! We even",
+            ">>>The contestants for<<< Miss October are locked and loaded. Who\u2019s"
+          ],
+          "top_activations": [
+            0.07744485139846802,
+            0.07601398974657059,
+            0.07532032579183578,
+            0.07510217279195786,
+            0.07409773766994476
+          ]
+        },
+        {
+          "feat_idx": 7037,
+          "concentration": NaN,
+          "mass": 0.7230454683303833,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>It's<<< been a while since we've pimped the",
+            ">>>Don't<<< miss the conceptual exhibition by the cult skincare brand.",
+            ">>>eyeBeamCounter<<<Path Solutions Inc. - Shareware\neyeBeam",
+            ">>>Christy Kite,<<< wife of World Golf Hall-of-Famer",
+            ">>>Publicis Singapore<<< campaign puts beer fridges in parking lots. What"
+          ],
+          "top_activations": [
+            0.07360001653432846,
+            0.07312197238206863,
+            0.0727430209517479,
+            0.0727430209517479,
+            0.0727430209517479
+          ]
+        },
+        {
+          "feat_idx": 6080,
+          "concentration": NaN,
+          "mass": 0.7138762101531029,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>It's<<< been a while since we've pimped the",
+            ">>>Don't<<< miss the conceptual exhibition by the cult skincare brand.",
+            ">>>\u00a9 2<<<012 Copyright Playboy.com. All rights",
+            ">>>The contestants for<<< Miss October are locked and loaded. Who\u2019s",
+            ">>>Foundation volunteers celebrate<<< success\nSeptember 12, 20"
+          ],
+          "top_activations": [
+            0.07253887504339218,
+            0.07199618965387344,
+            0.07171599566936493,
+            0.07170595973730087,
+            0.07134398072957993
+          ]
+        },
+        {
+          "feat_idx": 6416,
+          "concentration": NaN,
+          "mass": 0.6436563655734062,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>R Systems'<<< mission is to help enterprises derive intelligent insights and put",
+            ">>>eyeBeamCounter<<<Path Solutions Inc. - Shareware\neyeBeam",
+            ">>>Christy Kite,<<< wife of World Golf Hall-of-Famer",
+            ">>>Publicis Singapore<<< campaign puts beer fridges in parking lots. What",
+            ">>>Solis Spa<<< Covers - Professional, Knowledgeable and Prompt\n"
+          ],
+          "top_activations": [
+            0.06714432686567307,
+            0.0647374838590622,
+            0.0647374838590622,
+            0.0647374838590622,
+            0.06418745964765549
+          ]
+        },
+        {
+          "feat_idx": 6615,
+          "concentration": NaN,
+          "mass": 0.6405148357152939,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>eyeBeamCounter<<<Path Solutions Inc. - Shareware\neyeBeam",
+            ">>>Christy Kite,<<< wife of World Golf Hall-of-Famer",
+            ">>>Publicis Singapore<<< campaign puts beer fridges in parking lots. What",
+            ">>>Solis Spa<<< Covers - Professional, Knowledgeable and Prompt\n",
+            ">>>AKQA has<<< been named 'Agency of the Year' by the"
+          ],
+          "top_activations": [
+            0.06511019170284271,
+            0.06511019170284271,
+            0.06511019170284271,
+            0.06432025134563446,
+            0.06432025134563446
+          ]
+        },
+        {
+          "feat_idx": 6194,
+          "concentration": NaN,
+          "mass": 0.6402858048677444,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>Please note that<<< this is a dyed to order listing. All orders",
+            ">>>Christy Kite,<<< wife of World Golf Hall-of-Famer",
+            ">>>Leslie Cahill,<<< seventeen, falls in love with an \u201colder\u201d",
+            ">>>About: Scott<<< Cole\nScott Cole has been playing Campaign Series since",
+            ">>>Please note<<< that this is a dyed to order listing. All"
+          ],
+          "top_activations": [
+            0.06579824537038803,
+            0.06548789143562317,
+            0.06454774737358093,
+            0.06430841982364655,
+            0.06402986496686935
+          ]
+        },
+        {
+          "feat_idx": 3720,
+          "concentration": NaN,
+          "mass": 0.6351954415440559,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>The contestants for<<< Miss October are locked and loaded. Who\u2019s",
+            ">>>eyeBeamCounter<<<Path Solutions Inc. - Shareware\neyeBeam",
+            ">>>Christy Kite,<<< wife of World Golf Hall-of-Famer",
+            ">>>Publicis Singapore<<< campaign puts beer fridges in parking lots. What",
+            ">>>Solis Spa<<< Covers - Professional, Knowledgeable and Prompt\n"
+          ],
+          "top_activations": [
+            0.06492208689451218,
+            0.06415954977273941,
+            0.06415954977273941,
+            0.06415954977273941,
+            0.06344825029373169
+          ]
+        },
+        {
+          "feat_idx": 6806,
+          "concentration": NaN,
+          "mass": 0.6318165063858032,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>eyeBeamCounter<<<Path Solutions Inc. - Shareware\neyeBeam",
+            ">>>Christy Kite,<<< wife of World Golf Hall-of-Famer",
+            ">>>Publicis Singapore<<< campaign puts beer fridges in parking lots. What",
+            ">>>Solis Spa<<< Covers - Professional, Knowledgeable and Prompt\n",
+            ">>>AKQA has<<< been named 'Agency of the Year' by the"
+          ],
+          "top_activations": [
+            0.06480249017477036,
+            0.06480249017477036,
+            0.06480249017477036,
+            0.06338634341955185,
+            0.06338634341955185
+          ]
+        },
+        {
+          "feat_idx": 3762,
+          "concentration": NaN,
+          "mass": 0.6281471326947212,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>Looking for love<<<? It's in the pipeline -- though maybe",
+            ">>>eyeBeamCounter<<<Path Solutions Inc. - Shareware\neyeBeam",
+            ">>>Christy Kite,<<< wife of World Golf Hall-of-Famer",
+            ">>>Publicis Singapore<<< campaign puts beer fridges in parking lots. What",
+            ">>>Solis Spa<<< Covers - Professional, Knowledgeable and Prompt\n"
+          ],
+          "top_activations": [
+            0.06423119455575943,
+            0.06359129399061203,
+            0.06359129399061203,
+            0.06359129399061203,
+            0.06280648708343506
+          ]
+        },
+        {
+          "feat_idx": 4534,
+          "concentration": NaN,
+          "mass": 0.6264531388878822,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>eyeBeamCounter<<<Path Solutions Inc. - Shareware\neyeBeam",
+            ">>>Christy Kite,<<< wife of World Golf Hall-of-Famer",
+            ">>>Publicis Singapore<<< campaign puts beer fridges in parking lots. What",
+            ">>>Solis Spa<<< Covers - Professional, Knowledgeable and Prompt\n",
+            ">>>AKQA has<<< been named 'Agency of the Year' by the"
+          ],
+          "top_activations": [
+            0.06390491127967834,
+            0.06390491127967834,
+            0.06390491127967834,
+            0.06282242387533188,
+            0.06282242387533188
+          ]
+        },
+        {
+          "feat_idx": 4665,
+          "concentration": NaN,
+          "mass": 0.6261314675211906,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>You can also<<< score points by submitting book puzzles.\nThe latest",
+            ">>>On this page<<< you will find literally thousands of photos and videos,",
+            ">>>You can<<< also score points by submitting book puzzles.\nThe",
+            ">>>Starboy<<< Entertainment\u2019s authorized label Disc Jockey,DJ Tune",
+            ">>>eyeBeamCounter<<<Path Solutions Inc. - Shareware\neyeBeam"
+          ],
+          "top_activations": [
+            0.06608548015356064,
+            0.06532963365316391,
+            0.06443389505147934,
+            0.06267853081226349,
+            0.06143077835440636
+          ]
+        },
+        {
+          "feat_idx": 16571,
+          "concentration": 0.2224943984755539,
+          "mass": 0.6258647926151752,
+          "content_fraction": 1.0,
+          "top_texts": [
+            "Posted on:>>> July 10,<<< 2015 | Category: Design Ideas",
+            "WASHINGTON (>>>July 10,<<< 2015) \u2014 There was nothing",
+            "June>>> 17, <<<2019 3:19:",
+            "Sennheiser Launches Online Audio for Video Tutorial Series\n>>>October 11,<<< 2012 by David Weiss\nWant",
+            "BOTHELL, WA ->>> March 10,<<< 2010 - SonoSite, Inc"
+          ],
+          "top_activations": [
+            0.06418819725513458,
+            0.06315279006958008,
+            0.06281532347202301,
+            0.06252322345972061,
+            0.0624246709048748
+          ]
+        },
+        {
+          "feat_idx": 8518,
+          "concentration": 0.24588808411109805,
+          "mass": 0.6199484542012215,
+          "content_fraction": 1.0,
+          "top_texts": [
+            "FORT LAUDERD>>>ALE, Fla. -<<< Fort Lauderdale police arrested nine people caught by Local ",
+            "FORT LAUD>>>ERDALE, Fla.<<< - Fort Lauderdale police arrested nine people caught by Local",
+            "ORLAND>>>O,Fla. -<<< An Orange County man claims his property was ruined inside",
+            "OR>>>LANDO,Fla.<<< - An Orange County man claims his property was ruined",
+            "CAMBRIDGE>>>, Mass., Aug.<<< 13, 2013 ("
+          ],
+          "top_activations": [
+            0.06813349574804306,
+            0.06684428453445435,
+            0.06570470333099365,
+            0.06233653053641319,
+            0.060684751719236374
+          ]
+        },
+        {
+          "feat_idx": 7529,
+          "concentration": NaN,
+          "mass": 0.6137497276067734,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>XIV International exhibition<<< and business forum for pulp and paper, forestry,",
+            ">>>eyeBeamCounter<<<Path Solutions Inc. - Shareware\neyeBeam",
+            ">>>Christy Kite,<<< wife of World Golf Hall-of-Famer",
+            ">>>Publicis Singapore<<< campaign puts beer fridges in parking lots. What",
+            ">>>Solis Spa<<< Covers - Professional, Knowledgeable and Prompt\n"
+          ],
+          "top_activations": [
+            0.0637538731098175,
+            0.062033262103796005,
+            0.062033262103796005,
+            0.062033262103796005,
+            0.06130489334464073
+          ]
+        },
+        {
+          "feat_idx": 6010,
+          "concentration": NaN,
+          "mass": 0.6123565249145031,
+          "content_fraction": 1.0,
+          "top_texts": [
+            ">>>Christy Kite,<<< wife of World Golf Hall-of-Famer",
+            ">>>This boot is<<< exceptional quality and is, hands down, the most",
+            ">>>Leslie Cahill,<<< seventeen, falls in love with an \u201colder\u201d",
+            ">>>Wanna-bes<<< stay home. Truckin\u2019s Throwdown isn",
+            ">>>Monday will start<<< off cool as a Delta breeze pumps through the Valley"
+          ],
+          "top_activations": [
+            0.06353345513343811,
+            0.062305059283971786,
+            0.062200065702199936,
+            0.06208586320281029,
+            0.061743032187223434
+          ]
+        }
+      ]
+    },
+    "tfa_pos_pred": {
+      "raw_top15_by_mass": [],
+      "content_within_raw_top15": [],
+      "top15_content_bearing_anyrank": []
+    }
+  },
+  "counts": {
+    "crosscoder": {
+      "total_features_with_conc": 18432,
+      "high_span_count": 15931,
+      "raw_top15": 15,
+      "content_within_raw_top15": 13
+    },
+    "tfa_pos": {
+      "total_features_with_conc": 300,
+      "high_span_count": 176,
+      "raw_top15": 15,
+      "content_within_raw_top15": 4
+    },
+    "tfa_pos_pred": {
+      "total_features_with_conc": 300,
+      "high_span_count": 0,
+      "raw_top15": 0,
+      "content_within_raw_top15": 0
+    }
+  }
+}

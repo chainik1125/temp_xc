@@ -109,6 +109,8 @@ def main():
     ap.add_argument("--layer-key", default="resid_L25")
     ap.add_argument("--k", type=int, default=50)
     ap.add_argument("--top-k-exemplars", type=int, default=10)
+    ap.add_argument("--fig-suffix", default="",
+                    help="appended to figure basename (e.g. '_L13')")
     args = ap.parse_args()
 
     os.makedirs(args.out_dir, exist_ok=True)
@@ -254,7 +256,7 @@ def main():
     fig.tight_layout()
 
     # save as three sizes (matches existing convention)
-    base = os.path.join(args.out_dir, "content_based_match")
+    base = os.path.join(args.out_dir, f"content_based_match{args.fig_suffix}")
     from PIL import Image
     fig.savefig(base + ".png", dpi=200, bbox_inches="tight")
     im = Image.open(base + ".png")

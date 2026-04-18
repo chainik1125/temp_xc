@@ -117,10 +117,8 @@ echo "==== CONTENT-BASED MATCHING — $(date) ===="
 $PYTHON -u -m temporal_crosscoders.NLP.content_based_match \
     --scan-dir "$SCAN_DIR" \
     --out-dir "$FIG_DIR" \
-    --layer-key "$LAYER" --k $K
-mv "$FIG_DIR/content_based_match.png" "$FIG_DIR/content_based_match_L13.png" 2>/dev/null || true
-mv "$FIG_DIR/content_based_match.doc.png" "$FIG_DIR/content_based_match_L13.doc.png" 2>/dev/null || true
-mv "$FIG_DIR/content_based_match.thumb.png" "$FIG_DIR/content_based_match_L13.thumb.png" 2>/dev/null || true
+    --layer-key "$LAYER" --k $K \
+    --fig-suffix "_L13"
 
 echo ""
 echo "==== EXPLAIN FEATURES (Claude Haiku) — $(date) ===="
