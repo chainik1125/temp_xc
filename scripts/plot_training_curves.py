@@ -96,42 +96,54 @@ def _style(proto):
     return "-" if proto == "A" else "--"
 
 
-def plot_all(curves):
-    # Two panels: loss + L0, log-scale loss so plateau is visible
+def _skip_step0(rows):
+    """Log-x needs step > 0. Drop the step-0 row."""
+    return [r for r in rows if r[0] > 0]
+
+
+def plot_all(curves, logx=False, out_name="fig6_training_curves_all.png"):
+    """Two panels: loss + L0. logx=True produces the log-log variant
+    for asymptotic scaling inspection (Dmitry's ask)."""
     fig, axes = plt.subplots(1, 2, figsize=(14, 5.5))
     ax_loss, ax_l0 = axes
 
     for c in curves:
-        steps = [r[0] for r in c["rows"]]
-        losses = [r[1] for r in c["rows"]]
-        l0s = [r[2] for r in c["rows"]]
+        rows = _skip_step0(c["rows"]) if logx else c["rows"]
+        steps = [r[0] for r in rows]
+        losses = [r[1] for r in rows]
+        l0s = [r[2] for r in rows]
         color = _color(c["arch"], c["proto"], c["t"])
         style = _style(c["proto"])
         ax_loss.plot(steps, losses, style, color=color, label=c["label"], linewidth=1.8, marker="o", markersize=4)
         ax_l0.plot(steps, l0s, style, color=color, label=c["label"], linewidth=1.8, marker="o", markersize=4)
 
-    ax_loss.set_xlabel("training step")
+    x_label = "training step (log)" if logx else "training step"
+    ax_loss.set_xlabel(x_label)
     ax_loss.set_ylabel("MSE reconstruction loss")
     ax_loss.set_yscale("log")
-    ax_loss.set_title("Training loss (log scale)")
-    ax_loss.grid(alpha=0.3)
+    if logx:
+        ax_loss.set_xscale("log")
+    ax_loss.set_title("Training loss" + (" (log-log)" if logx else " (log y)"))
+    ax_loss.grid(alpha=0.3, which="both" if logx else "major")
     ax_loss.legend(loc="upper right", fontsize=8, ncol=2)
 
-    ax_l0.set_xlabel("training step")
+    ax_l0.set_xlabel(x_label)
     ax_l0.set_ylabel("effective L0 (non-zero features per window)")
+    if logx:
+        ax_l0.set_xscale("log")
     ax_l0.set_title("L0 / window activation count")
-    ax_l0.grid(alpha=0.3)
+    ax_l0.grid(alpha=0.3, which="both" if logx else "major")
     ax_l0.legend(loc="upper right", fontsize=8, ncol=2)
 
     fig.suptitle("Training dynamics — all 10 valid checkpoints", y=1.02)
     fig.tight_layout()
-    out = PLOTS_DIR / "fig6_training_curves_all.png"
+    out = PLOTS_DIR / out_name
     fig.savefig(out, dpi=150, bbox_inches="tight")
     plt.close(fig)
-    print(f"\nsaved {out}")
+    print(f"saved {out}")
 
 
-def plot_tempxc_only(curves):
+def plot_tempxc_only(curves, logx=False, out_name="fig7_tempxc_training_curves.png"):
     """TempXC only, with protocol-A solid / protocol-B dashed. Separate
     because Dmitry's question is specifically about TempXC convergence."""
     tempxc = [c for c in curves if c["arch"] == "tempxc"]
@@ -143,9 +155,10 @@ def plot_tempxc_only(curves):
 
     # TempXC cells
     for c in tempxc:
-        steps = [r[0] for r in c["rows"]]
-        losses = [r[1] for r in c["rows"]]
-        l0s = [r[2] for r in c["rows"]]
+        rows = _skip_step0(c["rows"]) if logx else c["rows"]
+        steps = [r[0] for r in rows]
+        losses = [r[1] for r in rows]
+        l0s = [r[2] for r in rows]
         color = _color(c["arch"], c["proto"], c["t"])
         style = _style(c["proto"])
         ax_loss.plot(steps, losses, style, color=color, label=c["label"], linewidth=2, marker="o", markersize=5)
@@ -153,56 +166,67 @@ def plot_tempxc_only(curves):
 
     # SAE + MLC reference (protA only, thin lines)
     for c in sae_a + mlc_a:
-        steps = [r[0] for r in c["rows"]]
-        losses = [r[1] for r in c["rows"]]
-        l0s = [r[2] for r in c["rows"]]
+        rows = _skip_step0(c["rows"]) if logx else c["rows"]
+        steps = [r[0] for r in rows]
+        losses = [r[1] for r in rows]
+        l0s = [r[2] for r in rows]
         color = _color(c["arch"], c["proto"], None)
         ax_loss.plot(steps, losses, "-", color=color, label=c["label"] + " (ref)", linewidth=1.5, alpha=0.7)
         ax_l0.plot(steps, l0s, "-", color=color, label=c["label"] + " (ref)", linewidth=1.5, alpha=0.7)
 
-    ax_loss.set_xlabel("training step")
+    x_label = "training step (log)" if logx else "training step"
+    ax_loss.set_xlabel(x_label)
     ax_loss.set_ylabel("MSE reconstruction loss")
     ax_loss.set_yscale("log")
-    ax_loss.set_title("Loss: TempXC vs SAE/MLC reference")
-    ax_loss.grid(alpha=0.3)
+    if logx:
+        ax_loss.set_xscale("log")
+    ax_loss.set_title("Loss: TempXC vs SAE/MLC reference" + (" (log-log)" if logx else " (log y)"))
+    ax_loss.grid(alpha=0.3, which="both" if logx else "major")
     ax_loss.legend(loc="upper right", fontsize=8)
 
-    ax_l0.set_xlabel("training step")
+    ax_l0.set_xlabel(x_label)
     ax_l0.set_ylabel("L0 / window activations")
+    if logx:
+        ax_l0.set_xscale("log")
     ax_l0.set_title("L0 stability")
-    ax_l0.grid(alpha=0.3)
+    ax_l0.grid(alpha=0.3, which="both" if logx else "major")
     ax_l0.legend(loc="upper right", fontsize=8)
 
     fig.suptitle("TempXC training curves — is it undertrained?", y=1.02)
     fig.tight_layout()
-    out = PLOTS_DIR / "fig7_tempxc_training_curves.png"
+    out = PLOTS_DIR / out_name
     fig.savefig(out, dpi=150, bbox_inches="tight")
     plt.close(fig)
     print(f"saved {out}")
 
 
-def plot_normalized_loss(curves):
+def plot_normalized_loss(curves, logx=False, out_name="fig8_normalized_loss.png"):
     """Normalize each curve by its step-0 loss to visualize fractional
     progress. Tells us who's still moving fastest at step 5000."""
     fig, ax = plt.subplots(figsize=(9, 5.5))
     for c in curves:
-        steps = [r[0] for r in c["rows"]]
-        losses = [r[1] for r in c["rows"]]
-        if losses[0] == 0:
+        # Normalization uses the original step-0 loss
+        loss_0 = c["rows"][0][1]
+        if loss_0 == 0:
             continue
-        normalized = [l / losses[0] for l in losses]
+        rows = _skip_step0(c["rows"]) if logx else c["rows"]
+        steps = [r[0] for r in rows]
+        normalized = [r[1] / loss_0 for r in rows]
         color = _color(c["arch"], c["proto"], c["t"])
         style = _style(c["proto"])
         ax.plot(steps, normalized, style, color=color, label=c["label"],
                 linewidth=1.8, marker="o", markersize=4)
-    ax.set_xlabel("training step")
+    ax.set_xlabel("training step (log)" if logx else "training step")
     ax.set_ylabel("loss(t) / loss(0)")
     ax.set_yscale("log")
-    ax.set_title("Normalized loss: fraction of initial reconstruction error remaining")
-    ax.grid(alpha=0.3)
+    if logx:
+        ax.set_xscale("log")
+    ax.set_title("Normalized loss: fraction of initial reconstruction error remaining"
+                 + (" (log-log)" if logx else " (log y)"))
+    ax.grid(alpha=0.3, which="both" if logx else "major")
     ax.legend(loc="upper right", fontsize=8, ncol=2)
     fig.tight_layout()
-    out = PLOTS_DIR / "fig8_normalized_loss.png"
+    out = PLOTS_DIR / out_name
     fig.savefig(out, dpi=150, bbox_inches="tight")
     plt.close(fig)
     print(f"saved {out}")
@@ -231,10 +255,15 @@ def main():
     curves = load_all()
     print()
 
-    print("=== generating plots ===")
-    plot_all(curves)
-    plot_tempxc_only(curves)
-    plot_normalized_loss(curves)
+    print("=== generating plots (linear x) ===")
+    plot_all(curves, logx=False, out_name="fig6_training_curves_all.png")
+    plot_tempxc_only(curves, logx=False, out_name="fig7_tempxc_training_curves.png")
+    plot_normalized_loss(curves, logx=False, out_name="fig8_normalized_loss.png")
+
+    print("\n=== generating plots (log-log — scaling-law view) ===")
+    plot_all(curves, logx=True, out_name="fig6b_training_curves_all_loglog.png")
+    plot_tempxc_only(curves, logx=True, out_name="fig7b_tempxc_training_curves_loglog.png")
+    plot_normalized_loss(curves, logx=True, out_name="fig8b_normalized_loss_loglog.png")
 
     print_slope_report(curves)
     print(f"\nAll plots in {PLOTS_DIR}/")

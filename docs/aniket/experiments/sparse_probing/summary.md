@@ -144,9 +144,19 @@ TempXC loses on both.
 Dmitry's follow-up: "much better SAE NMSE — could you save the loss
 curves for XC training so we know if we need to train longer?"
 
+Linear-x (what you'd eyeball):
+
 ![training-curves-all](../../../../results/saebench/plots/fig6_training_curves_all.png)
 ![training-curves-tempxc](../../../../results/saebench/plots/fig7_tempxc_training_curves.png)
 ![normalized-loss](../../../../results/saebench/plots/fig8_normalized_loss.png)
+
+Log-log (same data on log-step axis — per Dmitry's note, asymptotic
+training-time scaling is cleaner here. Power-law decay shows as a
+straight line; plateaus show as a knee):
+
+![training-curves-all-loglog](../../../../results/saebench/plots/fig6b_training_curves_all_loglog.png)
+![training-curves-tempxc-loglog](../../../../results/saebench/plots/fig7b_tempxc_training_curves_loglog.png)
+![normalized-loss-loglog](../../../../results/saebench/plots/fig8b_normalized_loss_loglog.png)
 
 **Yes, TempXC is undertrained.** Fractional loss drop in the last
 1k steps (step 4000 → 4999) out of 5000 total:
