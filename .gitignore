@@ -21,7 +21,6 @@ docs/.obsidian/graph.json
 *.html
 
 # Local-only directories
-papers/
 docs/han/agent_onboarding/
 
 # OS
