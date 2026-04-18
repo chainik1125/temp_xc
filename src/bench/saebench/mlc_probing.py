@@ -213,6 +213,7 @@ def run_mlc_probing(
     k_values: tuple[int, ...] = PROBING_K_VALUES,
     artifacts_path: str = SAEBENCH_ARTIFACTS_DIR,
     batch_size: int = 32,
+    shuffle_seed: int | None = None,
 ) -> dict:
     """Fork of SAEBench's sparse_probing.run_eval for MLC.
 
@@ -267,7 +268,8 @@ def run_mlc_probing(
 
     # 3. For each dataset, collect acts → encode via MLC → probe
     results_per_task: list[dict] = []
-    run_id = f"mlc__prot{protocol}__agg{aggregation}"
+    shuffle_tag = "__shuffled" if shuffle_seed is not None else "__ordered"
+    run_id = f"mlc__prot{protocol}__agg{aggregation}{shuffle_tag}"
 
     for dataset_name in cfg.dataset_names:
         t_ds = time.time()
@@ -289,7 +291,14 @@ def run_mlc_probing(
         # as a negative for every other class). At 28 classes that was a 28×
         # Gemma-forward overhead per dataset. Now: encode once, per-class
         # label-masks are cheap.
-        def encode_flat(texts):
+        def encode_flat(texts, global_offset: int = 0):
+            """Encode `texts` through MLC after optional per-sequence shuffle.
+
+            `global_offset`: passed in so shuffle seeds are unique per
+            batch (same chunk position across ordered/shuffled runs gets
+            the same seed; two archs with the same shuffle_seed see
+            identically permuted inputs).
+            """
             feats_out = []
             for i in range(0, len(texts), batch_size):
                 chunk = texts[i : i + batch_size]
@@ -302,6 +311,25 @@ def run_mlc_probing(
                     llm, toks, hook_names,
                     mask_bos_pad=True, bos_token_id=bos_id, pad_token_id=pad_id,
                 )  # (B, L, n_layers, d_model)
+
+                # Within-sequence shuffle control (item 8 + team 4/18 ask).
+                # Permutes the L axis of `stacked` per sequence. The token
+                # mask used below is NOT shuffled — BOS/pad positions after
+                # shuffle are spread through the sequence, so mask-based
+                # pooling still correctly excludes them.
+                if shuffle_seed is not None:
+                    B_, L_ = stacked.shape[0], stacked.shape[1]
+                    shuffled = torch.empty_like(stacked)
+                    shuffled_toks = torch.empty_like(toks)
+                    for b in range(B_):
+                        g = torch.Generator(device="cpu").manual_seed(
+                            shuffle_seed + global_offset + i + b
+                        )
+                        perm = torch.randperm(L_, generator=g).to(stacked.device)
+                        shuffled[b] = stacked[b, perm]
+                        shuffled_toks[b] = toks[b, perm]
+                    stacked = shuffled
+                    toks = shuffled_toks
 
                 with torch.no_grad():
                     B, L, NL, D = stacked.shape
@@ -428,6 +456,7 @@ def run_mlc_probing(
                     "checkpoint_path": ckpt_path,
                     "checkpoint_basename": ckpt_basename,
                     "saebench_run_id": run_id,
+                    "shuffle_seed": shuffle_seed,  # None → ordered run
                 }
                 fout.write(json.dumps(rec) + "\n")
                 n_written += 1

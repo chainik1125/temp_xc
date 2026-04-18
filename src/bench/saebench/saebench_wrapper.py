@@ -102,7 +102,17 @@ class SAEBenchAdapter(nn.Module):
         d_sae: int = D_SAE,
         hook_layer: int = LAYER,
         hook_name: str = HOOK_NAME,
+        shuffle_seed: int | None = None,
     ):
+        """
+        shuffle_seed: if set, `encode(x)` permutes tokens within each
+            sequence using `torch.Generator().manual_seed(shuffle_seed + seq_idx)`
+            before calling the underlying arch. Enables the
+            ordered + shuffled paired probing the team agreed on in the
+            4/18 meeting. Two adapters called with the same shuffle_seed
+            see identically permuted inputs — paired delta metrics are
+            fair. None (default) disables shuffling.
+        """
         super().__init__()
         self._arch_name = arch
         self._spec = spec
@@ -111,6 +121,7 @@ class SAEBenchAdapter(nn.Module):
         self._aggregation = aggregation
         self._base_d_sae = d_sae
         self._effective_d_sae = effective_d_sae(d_sae, t, aggregation)
+        self._shuffle_seed = shuffle_seed
 
         self.cfg = AdapterConfig(
             d_in=d_in,
@@ -180,9 +191,26 @@ class SAEBenchAdapter(nn.Module):
         SAEBench calls this inside `get_sae_meaned_activations` after
         zeroing BOS/pad positions in `x`. We forward to the underlying
         architecture, applying T-windowing + aggregation for TempXC.
+
+        If `self._shuffle_seed` is set, tokens within each sequence are
+        permuted BEFORE the encode (but after BOS/pad zeroing, since
+        SAEBench's caller handles that). This is the harness's ordered +
+        shuffled control knob; two adapters sharing a shuffle_seed
+        receive identically permuted inputs.
         """
         assert x.ndim == 3, f"expected (B, L, d_in), got {tuple(x.shape)}"
         B, L, d_in = x.shape
+
+        if self._shuffle_seed is not None:
+            # Per-sequence seeded permutation; done here rather than in
+            # the arch's encode() so the data-pipeline concern stays out
+            # of architecture code.
+            shuffled = torch.empty_like(x)
+            for b in range(B):
+                g = torch.Generator(device="cpu").manual_seed(self._shuffle_seed + b)
+                perm = torch.randperm(L, generator=g).to(x.device)
+                shuffled[b] = x[b, perm]
+            x = shuffled
 
         if self._arch_name == "sae":
             # TopKSAE is per-token, no T axis. Flatten → encode → reshape.

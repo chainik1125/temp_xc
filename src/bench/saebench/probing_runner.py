@@ -103,6 +103,7 @@ def run_probing(
     random_seed: int = 42,
     artifacts_path: str = SAEBENCH_ARTIFACTS_DIR,
     force_rerun: bool = True,
+    shuffle_seed: int | None = None,
 ) -> dict:
     """Run SAEBench sparse_probing on one (checkpoint, aggregation) config.
 
@@ -135,15 +136,18 @@ def run_probing(
                 and r.get("matching_protocol") == protocol
                 and r.get("t") == t
                 and r.get("aggregation") == aggregation
+                and r.get("shuffle_seed") == shuffle_seed  # ordered vs shuffled distinct
             ]
             if hit:
+                shuf_str = "shuffled" if shuffle_seed is not None else "ordered"
                 print(
                     f"  SKIP — {len(hit)} records already exist for "
-                    f"{arch} prot={protocol} T={t} agg={aggregation}. "
+                    f"{arch} prot={protocol} T={t} agg={aggregation} ({shuf_str}). "
                     f"Delete {output_jsonl} to force re-eval."
                 )
+                shuf_tag = "__shuffled" if shuffle_seed is not None else "__ordered"
                 return {
-                    "run_id": f"{arch}__prot{protocol}__T{t}__agg{aggregation}",
+                    "run_id": f"{arch}__prot{protocol}__T{t}__agg{aggregation}{shuf_tag}",
                     "n_records_written": 0,
                     "elapsed_sec": 0.0,
                     "skipped": True,
@@ -187,17 +191,22 @@ def run_probing(
             n_layers=t,  # t is reinterpreted as n_layers for MLC
             k_values=k_values,
             artifacts_path=artifacts_path,
+            shuffle_seed=shuffle_seed,
         )
 
     # 2. Wrap in SAEBench-compatible adapter (SAE / TempXC)
     adapter = SAEBenchAdapter(
         arch=arch, spec=spec, model=model,
         t=t, aggregation=aggregation,
+        shuffle_seed=shuffle_seed,
     )
 
-    # 3. Configure SAEBench sparse-probing
+    # 3. Configure SAEBench sparse-probing. Suffix the run_id with
+    # shuffle status so ordered and shuffled runs don't collide in the
+    # SAEBench output cache (same bug class as B11 w/ k=0 placeholder).
+    shuffle_tag = "__shuffled" if shuffle_seed is not None else "__ordered"
     run_id = (
-        f"{arch}__prot{protocol}__T{t}__agg{aggregation}__k{k}"
+        f"{arch}__prot{protocol}__T{t}__agg{aggregation}__k{k}{shuffle_tag}"
     )
     cfg = SparseProbingEvalConfig(
         random_seed=random_seed,
@@ -269,6 +278,7 @@ def run_probing(
                     "checkpoint_basename": ckpt_basename,
                     "saebench_run_id": run_id,
                     "elapsed_sec": round(elapsed, 1),
+                    "shuffle_seed": shuffle_seed,  # None → ordered run
                 }
                 fout.write(json.dumps(record) + "\n")
                 n_records_written += 1
