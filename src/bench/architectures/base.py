@@ -15,6 +15,24 @@ import torch
 import torch.nn as nn
 
 
+def _shuffle_within_sequence(x: torch.Tensor, seed: int) -> torch.Tensor:
+    """Permute each sequence's token order with a per-sequence seed.
+
+    Matches `src.bench.data._shuffle_within_sequence_` but operates on
+    GPU tensors for the probing path (data.py's version is for CPU
+    cached activations). Two archs called with the same seed see
+    identically permuted inputs → paired delta metrics are fair.
+    """
+    assert x.dim() >= 2, f"expected (B, L, ...), got {tuple(x.shape)}"
+    B, L = x.shape[0], x.shape[1]
+    out = torch.empty_like(x)
+    for b in range(B):
+        g = torch.Generator(device="cpu").manual_seed(seed + b)
+        perm = torch.randperm(L, generator=g).to(x.device)
+        out[b] = x[b, perm]
+    return out
+
+
 @dataclass
 class EvalOutput:
     """Raw evaluation totals from one forward pass.
@@ -160,6 +178,38 @@ class ArchSpec(ABC):
     def n_decoder_positions(self) -> int | None:
         """Number of per-position decoders, or None for single-decoder models."""
         return None
+
+    def encode_for_probing(
+        self,
+        model: nn.Module,
+        x: torch.Tensor,
+        shuffle_seed: int | None = None,
+    ) -> torch.Tensor:
+        """Probing-time encode with optional within-sequence shuffle control.
+
+        Contract — SAME for every arch:
+            input:  x of shape (B, L, d_in)
+            output: features of shape (B, L, d_sae_effective)
+
+        `shuffle_seed` is the reproducibility knob the harness uses to
+        get paired ordered / shuffled measurements. When set, each
+        sequence in the batch is permuted along its token axis with
+        `torch.Generator().manual_seed(shuffle_seed + seq_idx)`, so
+        two architectures called with the same `shuffle_seed` see
+        identically permuted inputs.
+
+        Subclasses may override if they need more than "shuffle input,
+        then call encode()" — the default is correct for every current
+        arch (SAE, TempXC, MLC via its own probing path).
+
+        Note: shuffling is deliberately NOT done inside the model's
+        `encode()`. The arch is an encoder; whether its input was
+        shuffled is a data-pipeline concern. Keeping this separation
+        is why SAEBench's per-arch benchmarking stays simple.
+        """
+        if shuffle_seed is not None:
+            x = _shuffle_within_sequence(x, shuffle_seed)
+        return self.encode(model, x)
 
 
 @dataclass
