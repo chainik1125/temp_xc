@@ -11,7 +11,7 @@ def init_sae_to_features(
 ) -> None:
     """Set SAE encoder/decoder weights to ground-truth feature directions.
 
-    This creates the "ground-truth SAE" described in Chanin et al.:
+    Creates the "ground-truth SAE" baseline from Chanin et al.:
     W_enc = F^T, W_dec = F, b_enc = 0, b_dec = 0.
 
     Args:
@@ -26,7 +26,7 @@ def init_sae_to_features(
         features = features / features.norm(dim=1, keepdim=True)
 
     with torch.no_grad():
-        sae.W_enc.data = features.T.to(sae.W_enc.device)  # (d_in, d_sae)
-        sae.W_dec.data = features.to(sae.W_dec.device)  # (d_sae, d_in)
+        sae.W_enc.data = features.T.to(sae.W_enc.device)
+        sae.W_dec.data = features.to(sae.W_dec.device)
         sae.b_enc.data.zero_()
         sae.b_dec.data.zero_()

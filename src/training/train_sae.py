@@ -6,7 +6,7 @@ import torch
 from sae_lens import BatchTopKTrainingSAE, BatchTopKTrainingSAEConfig, SAETrainer
 from sae_lens.config import LoggingConfig, SAETrainerConfig
 
-from src.shared.configs import TrainingConfig
+from src.training.toy_configs import TrainingConfig
 from src.utils.device import DEFAULT_DEVICE
 
 

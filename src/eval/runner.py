@@ -28,7 +28,7 @@ class EvalResult:
     hidden-state-level recovery.
 
     `temporal_mi`, `span_stats`, and `cluster` are populated on real-LM
-    cached-activation runs (see src.shared.temporal_metrics). They stay None
+    cached-activation runs (see src.eval.temporal). They stay None
     on toy Markov data where they're not informative.
     """
 
@@ -163,7 +163,7 @@ def evaluate_model(
     if _want_temporal_metrics(spec, eval_data):
         feats = _encode_for_metrics(spec, model, eval_data, device, seq_len)
         if feats is not None:
-            from src.shared.temporal_metrics import (
+            from src.eval.temporal import (
                 temporal_mi as _temporal_mi,
                 activation_span_stats,
                 cluster_features,

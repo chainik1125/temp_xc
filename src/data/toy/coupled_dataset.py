@@ -19,7 +19,7 @@ from src.data.toy.coupling import (
 )
 from src.data.toy.magnitudes import sample_magnitudes
 from src.data.toy.support import generate_hidden_states
-from src.shared.orthogonalize import orthogonalize
+from src.utils.orthogonalize import orthogonalize
 from src.utils.logging import log
 
 

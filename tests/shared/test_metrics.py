@@ -3,15 +3,15 @@
 import torch
 import pytest
 
-from src.shared.metrics import (
+from src.eval.metrics import (
     decoder_feature_cosine_similarity,
     decoder_pairwise_cosine_similarity,
     match_sae_latents_to_features,
     variance_explained,
 )
-from src.shared.initialization import init_sae_to_features
-from src.shared.train_sae import create_sae
-from src.shared.orthogonalize import orthogonalize
+from src.training.init import init_sae_to_features
+from src.training.train_sae import create_sae
+from src.utils.orthogonalize import orthogonalize
 
 
 class TestDecoderFeatureCosineSimilarityTensorInterface:

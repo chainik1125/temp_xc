@@ -17,7 +17,7 @@ live in a temporal architecture":
                         cluster centroids, compare clusters across archs.
 
 Kept in its own module so nothing that imports these has to pull in sae_lens
-via `src.shared.metrics`. Safe to `from src.shared.temporal_metrics import *`.
+via `src.eval.metrics`. Safe to `from src.eval.temporal import *`.
 """
 
 from __future__ import annotations

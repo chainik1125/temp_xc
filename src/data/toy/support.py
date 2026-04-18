@@ -3,7 +3,7 @@
 import torch
 
 from src.data.toy.configs import EmissionConfig, TransitionConfig
-from src.shared.temporal_support import (
+from src.utils.temporal_support import (
     generate_support_markov,
     generate_support_per_feature,
     per_feature_from_pi_rho,

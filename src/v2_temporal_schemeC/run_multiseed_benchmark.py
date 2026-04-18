@@ -14,8 +14,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import torch
 
-from src.shared.configs import TrainingConfig
-from src.shared.train_sae import create_sae, train_sae
+from src.training.toy_configs import TrainingConfig
+from src.training.train_sae import create_sae, train_sae
 from src.utils.device import DEFAULT_DEVICE
 from src.utils.seed import set_seed
 from src.data.toy.toy_model import ToyModel

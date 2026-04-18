@@ -10,7 +10,7 @@ from typing import Any
 import torch
 from transformer_lens.hook_points import HookedRootModule
 
-from src.shared.orthogonalize import orthogonalize
+from src.utils.orthogonalize import orthogonalize
 
 
 class ToyModel(HookedRootModule):

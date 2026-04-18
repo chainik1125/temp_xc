@@ -36,7 +36,7 @@ from src.data.toy.coupling import (
     compute_hidden_features,
     generate_coupling_matrix,
 )
-from src.shared.orthogonalize import orthogonalize
+from src.utils.orthogonalize import orthogonalize
 
 
 class ToyModel(nn.Module):

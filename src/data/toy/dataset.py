@@ -6,7 +6,7 @@ from src.data.toy.activations import generate_activations
 from src.data.toy.configs import DataGenerationConfig
 from src.data.toy.magnitudes import sample_magnitudes
 from src.data.toy.support import generate_support
-from src.shared.orthogonalize import orthogonalize
+from src.utils.orthogonalize import orthogonalize
 from src.utils.logging import log
 
 
