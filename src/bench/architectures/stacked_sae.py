@@ -4,7 +4,7 @@ The "per-layer SAEs" baseline from the crosscoders paper, adapted to
 the temporal setting. Each position has its own SAE with independent
 weights. Window-level L0 = k * T.
 
-Ported from temporal_crosscoders/models.py and Han's stacked_sae.py.
+Ported from Aniket's original crosscoder models and Han's stacked_sae.py.
 """
 
 import torch

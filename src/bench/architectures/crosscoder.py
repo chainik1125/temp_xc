@@ -4,7 +4,7 @@ Encodes a window of T consecutive tokens into a single shared latent
 vector z with k*T active features (matching StackedSAE's total L0),
 then decodes back to T positions using per-position decoder weights.
 
-Ported from temporal_crosscoders/models.py and Han's temporal_crosscoder.py.
+Ported from Aniket's original crosscoder models and Han's temporal_crosscoder.py.
 """
 
 import torch

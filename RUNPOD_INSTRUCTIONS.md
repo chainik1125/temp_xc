@@ -94,7 +94,7 @@ grep -qF 'ANTHROPIC_API_KEY' ~/.bashrc || \
 From the repo root with the venv active:
 
 ```bash
-TQDM_DISABLE=1 uv run python scripts/<script_name>.py
+TQDM_DISABLE=1 uv run python src/experiments/<script_name>.py
 ```
 
 `TQDM_DISABLE=1` is mandatory — progress bars flood logs and break reading them back through the agent's tools.
@@ -103,7 +103,7 @@ For long-running sweeps, launch under `nohup`:
 
 ```bash
 mkdir -p logs
-TQDM_DISABLE=1 nohup uv run python scripts/<script>.py > logs/<run>.log 2>&1 &
+TQDM_DISABLE=1 nohup uv run python src/experiments/<script>.py > logs/<run>.log 2>&1 &
 tail -f logs/<run>.log
 ```
 
@@ -130,6 +130,6 @@ Read the latest log for context, branch state, open questions, and next steps be
 | Trained checkpoints | `/workspace/temp_xc/results/nlp_sweep/**/ckpts/` (gitignored; on-disk only) |
 | Research logs | `/workspace/temp_xc/docs/han/research_logs/phase*/` |
 | Bench framework | `/workspace/temp_xc/src/bench/` |
-| Analysis scripts | `/workspace/temp_xc/scripts/` |
+| Analysis scripts | `/workspace/temp_xc/src/experiments/` |
 | GitHub token | `/workspace/.github-token` |
 | Anthropic key | `/workspace/.anthropic-key` |

@@ -4,7 +4,7 @@ This is the standard SAE baseline. It processes each token independently
 (no temporal structure). When used in a windowed comparison, it sees
 flattened (B*T, d) input.
 
-Ported from temporal_crosscoders/models.py.
+Ported from Aniket's original crosscoder models.
 """
 
 import math

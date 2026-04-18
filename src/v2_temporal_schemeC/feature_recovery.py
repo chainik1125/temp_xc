@@ -3,7 +3,7 @@
 Given a decoder matrix and ground-truth feature directions, measures how
 well the learned dictionary recovers the true features.
 
-Adapted from Andre Shportko's temporal_crosscoders/metrics.py.
+Adapted from Andre Shportko's Aniket's original metrics module.
 """
 
 import numpy as np

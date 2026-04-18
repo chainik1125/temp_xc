@@ -61,8 +61,8 @@ url = "https://download.pytorch.org/whl/cu128"
 explicit = true
 
 [tool.setuptools.packages.find]
-# Treat top-level code dirs as implicit packages so `from src.bench ...`
-# works when the venv is activated. We don't build wheels from this repo.
+# All code lives under src/. Expose it as a package tree so
+# `from src.bench ...` works when the venv is activated.
 where = ["."]
-include = ["src*", "scripts*", "temporal_crosscoders*"]
+include = ["src*"]
 exclude = ["src.v1*", "*.model_cache*", "docs*", "results*"]

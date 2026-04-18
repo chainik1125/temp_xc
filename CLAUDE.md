@@ -38,9 +38,9 @@ uv sync
 From then on, run commands via `uv run` (auto-activates the venv) or directly through `.venv/bin/python`:
 
 ```bash
-uv run python scripts/analyze_activation_spans.py
+uv run python src/experiments/analyze_activation_spans.py
 # or
-.venv/bin/python scripts/analyze_activation_spans.py
+.venv/bin/python src/experiments/analyze_activation_spans.py
 ```
 
 Dependency source-of-truth is `pyproject.toml`. `uv.lock` pins exact versions. To add a package:

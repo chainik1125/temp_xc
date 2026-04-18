@@ -336,7 +336,7 @@ def build_cached_activations_pipeline(
 ) -> DataPipeline:
     """Load pre-cached real-LM activations and wrap them in a DataPipeline.
 
-    Expects output from `temporal_crosscoders/NLP/cache_activations.py`:
+    Expects output from `src/bench/cache_activations.py`:
         <root>/cached_activations/<model_name>/<cached_dataset>/
             <layer_key>.npy           (N, seq_len, d_model) float32
             layer_specs.json          metadata
@@ -349,14 +349,14 @@ def build_cached_activations_pipeline(
     if config.cached_root is not None:
         root = config.cached_root
     else:
-        from temporal_crosscoders.NLP.config import cache_dir_for
+        from src.bench.cache_config import cache_dir_for
         root = cache_dir_for(config.model_name, config.cached_dataset)
 
     acts_path = os.path.join(root, f"{config.cached_layer_key}.npy")
     if not os.path.exists(acts_path):
         raise FileNotFoundError(
             f"No cached activations at {acts_path}. "
-            f"Run: python -m temporal_crosscoders.NLP.cache_activations "
+            f"Run: python -m src.bench.cache_activations "
             f"--model {config.model_name} --dataset {config.cached_dataset}"
         )
 

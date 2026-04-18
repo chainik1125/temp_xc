@@ -90,9 +90,9 @@ This is NOT integrated into `generate_dataset` yet -- you'd need to build the fu
 pipeline (magnitudes, features, x vectors) manually. The per-feature generator
 produces the support tensor; the rest of the pipeline works the same.
 
-### I want to use Andre's temporal_crosscoders/ sweep with HMM data
+### I want to use Andre's original sprint sweep code with HMM data
 
-`generate_sequences` in `temporal_crosscoders/data.py` now accepts `p_A` and `p_B`:
+`generate_sequences` in `Andre's original data module` now accepts `p_A` and `p_B`:
 
 ```python
 from data import generate_sequences

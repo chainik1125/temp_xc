@@ -1,8 +1,0 @@
-{"time":"2026-03-05T00:38:48.753201493Z","level":"INFO","msg":"stream: starting","core version":"0.24.2"}
-{"time":"2026-03-05T00:38:48.926725001Z","level":"INFO","msg":"stream: created new stream","id":"du4jnc9b"}
-{"time":"2026-03-05T00:38:48.926822676Z","level":"INFO","msg":"handler: started","stream_id":"du4jnc9b"}
-{"time":"2026-03-05T00:38:48.926978888Z","level":"INFO","msg":"stream: started","id":"du4jnc9b"}
-{"time":"2026-03-05T00:38:48.92698434Z","level":"INFO","msg":"writer: started","stream_id":"du4jnc9b"}
-{"time":"2026-03-05T00:38:48.926987518Z","level":"INFO","msg":"sender: started","stream_id":"du4jnc9b"}
-{"time":"2026-03-05T00:44:19.594209603Z","level":"ERROR","msg":"api: HTTP error","status":404,"method":"POST","url":"https://api.wandb.ai/files/standartikom-northwestern-university/temporal-crosscoders-sweep-final/du4jnc9b/file_stream"}
-{"time":"2026-03-05T00:44:19.594298019Z","level":"ERROR+4","msg":"filestream: fatal error: filestream: failed to upload: 404 Not Found url=https://api.wandb.ai/files/standartikom-northwestern-university/temporal-crosscoders-sweep-final/du4jnc9b/file_stream: {\"error\":\"run temporal-crosscoders-sweep-final/du4jnc9b not found while streaming file\"}"}

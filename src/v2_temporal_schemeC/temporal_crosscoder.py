@@ -13,7 +13,7 @@ Architecture:
     Encode: z = TopK(sum_t(x_t @ W_enc[t]) + b_enc)  → (B, h), k non-zeros
     Decode: x_hat_t = z @ W_dec[:, t, :].T + b_dec[t]  → (B, T, d)
 
-Ported from Andre Shportko's temporal_crosscoders/models.py.
+Ported from Andre Shportko's Aniket's original crosscoder models.
 """
 
 import math

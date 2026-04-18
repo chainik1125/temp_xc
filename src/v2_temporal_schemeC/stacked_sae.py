@@ -4,7 +4,7 @@ The "per-layer SAEs" baseline from the crosscoders paper, adapted to the
 temporal setting. Each position has its own TopKSAE with independent weights.
 Each position gets k active latents, so window-level L0 = k * T.
 
-Ported from Andre Shportko's temporal_crosscoders/models.py.
+Ported from Andre Shportko's Aniket's original crosscoder models.
 """
 
 import torch

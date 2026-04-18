@@ -8,7 +8,7 @@ For coupled-feature data, computes dual AUC:
   - local AUC: decoder vs emission features (M directions)
   - global AUC: decoder vs hidden features (K directions)
 
-Adapted from Han's eval_unified.py and temporal_crosscoders/metrics.py.
+Adapted from Han's eval_unified.py and Aniket's original metrics module.
 """
 
 from dataclasses import dataclass, asdict
