@@ -40,7 +40,59 @@ Artifacts:
 - `results/nlp_sweep/gemma/scans/span_weighted_labels__<arch>__<layer>__k50.json`
   — Haiku labels.
 
-## Summary figure
+## Summary figure (N=200 per arch with 95% CIs)
+
+[![interpretability comparison N=200](../../../results/nlp_sweep/gemma/figures/interpretability_comparison_hero_n200.doc.png)](../../../results/nlp_sweep/gemma/figures/interpretability_comparison_hero_n200.png)
+
+This is the figure to lead with: **N=200 per arch, 95% Wilson CIs,
+Fisher's exact p-values annotated**. The story is robust to sample
+size and rank — not a top-25 fluke.
+
+### Panel A — filter-pass rate, N=200
+
+Proportion of span-weighted top-200 features passing progressively
+stricter quality filters. Error bars are 95% Wilson CIs.
+
+| layer | filter | Stacked | Crosscoder (TXCDR) | TFA novel | TFA pred |
+|---|---|---:|---:|---:|---:|
+| L25 | content-bearing | 198/200 | 190/200 | 151/200 | 200/200 |
+| L25 | +cross-chain ≥ 3 | 193/200 | 133/200 | 145/200 | **31/200** |
+| L25 | +w-start-diverse ≥ 3 | 189/200 | 128/200 | 145/200 | **30/200** |
+| L25 | +clear Haiku label (top-50) | 44/50 | 28/50 | 43/50 | **8/50** |
+| L13 | content-bearing | 193/200 | 174/200 | 192/200 | 200/200 |
+| L13 | +cross-chain ≥ 3 | 191/200 | 152/200 | 192/200 | 200/200 |
+| L13 | +w-start-diverse ≥ 3 | 187/200 | 139/200 | 188/200 | **4/200** |
+| L13 | +clear Haiku label (top-50) | 47/50 | 31/50 | 48/50 | **1/50** |
+
+Fisher's exact (two-sided) p-values, TFA pred vs TXCDR on the
+strict "+w-start-diverse ≥ 3" filter:
+- **L25: 30/200 vs 128/200 → p = 2.1×10⁻²⁴**
+- **L13: 4/200 vs 139/200 → p = 2.8×10⁻⁵²**
+
+(L25 cross-chain filter: 31/200 vs 133/200 → p = 4.6×10⁻²⁶)
+
+### Panel B — rank-decile robustness
+
+The pass rate (content + cross-chain ≥ 3 + w-start-diverse ≥ 3) by
+rank-bucket (positions 1-20, 21-40, …, 181-200). If the N=25 claim
+were a top-rank artifact, TFA pred's curve would rise rapidly by
+decile 5; instead it stays near 0-15 % across all 10 buckets at
+both layers. The other three archs stay above ~60 % at every bucket.
+
+### Panel C — label collapse (top-50 labeled)
+
+Size of the largest Haiku-label cluster among the top-50 labeled
+span-weighted features per arch. At L13 TFA pred collapses 6/50
+(12 %) into one "introductory/transitional phrases" cluster vs
+1-2/50 for other archs. At L25 the cluster metric is weaker (3/49 =
+6 %) because the Chinese-passage collapse is spread over more
+features than the prior N=25 tranche sampled; the content filter
+(Panel A column 1) and cross-chain filter (Panel A column 2) are
+the primary signals at L25.
+
+---
+
+### Earlier N=25 version (for reference)
 
 [![interpretability comparison hero](../../../results/nlp_sweep/gemma/figures/interpretability_comparison_hero.doc.png)](../../../results/nlp_sweep/gemma/figures/interpretability_comparison_hero.png)
 
