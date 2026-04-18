@@ -57,6 +57,100 @@ from src.bench.saebench.configs import (
 from src.bench.saebench.matching_protocols import protocol_k
 
 
+# ─── Per-example prediction persistence (item 8) ────────────────────────
+
+PREDICTIONS_DIR = "results/saebench/predictions"
+
+
+def _write_predictions(
+    run_id: str,
+    dataset_name: str,
+    rows: list[dict],
+    example_id_to_text: dict[str, str],
+) -> str:
+    """Write per-example predictions to predictions/<run_id>/<task>.jsonl.
+
+    Storage-split so text isn't duplicated across every (class, k):
+      <task>.jsonl       — one row per (example_id, class, k): pred, prob, label
+      <task>__texts.jsonl — one row per example_id: the raw text (shared)
+
+    Downstream confusion-matrix analysis joins on example_id. Total
+    footprint drops from ~3 GB to ~70 MB per (task, arch, aggregation).
+    See eval_infra_lessons.md item 8.
+    """
+    safe_task = dataset_name.replace("/", "_")
+    out_dir = Path(PREDICTIONS_DIR) / run_id
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    preds_path = out_dir / f"{safe_task}.jsonl"
+    with open(preds_path, "w") as fout:
+        for r in rows:
+            fout.write(json.dumps(r) + "\n")
+
+    texts_path = out_dir / f"{safe_task}__texts.jsonl"
+    if not texts_path.exists():  # text mapping is task-scoped, write once
+        with open(texts_path, "w") as fout:
+            for eid, text in example_id_to_text.items():
+                fout.write(json.dumps({"example_id": eid, "text": text}) + "\n")
+    return str(preds_path)
+
+
+def _sanity_check_persistence(
+    run_id: str,
+    dataset_name: str,
+    expected: dict,
+    k_values: tuple[int, ...],
+    rtol: float = 1e-10,
+) -> None:
+    """Recompute aggregate accuracy from persisted per-example predictions,
+    assert it matches the probing loop's reported aggregate to machine
+    precision. Catches silent persistence-layer drift — the "prediction
+    row misaligned with label" class of bug.
+
+    `expected` is the ds_result dict with sae_top_K_test_accuracy keys.
+    """
+    safe_task = dataset_name.replace("/", "_")
+    path = Path(PREDICTIONS_DIR) / run_id / f"{safe_task}.jsonl"
+    if not path.exists():
+        raise AssertionError(
+            f"item 8 sanity check: predictions JSONL missing for "
+            f"{run_id}/{safe_task}. Expected at {path}."
+        )
+    rows = [json.loads(ln) for ln in path.read_text().splitlines() if ln.strip()]
+    # Per-class accuracy = mean(pred==label) over test examples for that class
+    # at each k. Averaged across classes per k, should match the expected dict.
+    from collections import defaultdict
+    per_class: dict[int, dict[str, list[int]]] = defaultdict(
+        lambda: defaultdict(list)
+    )  # [k][class] -> list of (1 if correct else 0)
+    for r in rows:
+        per_class[r["k"]][r["class"]].append(int(r["pred"] == r["label"]))
+    for kv in k_values:
+        key = f"sae_top_{kv}_test_accuracy"
+        if key not in expected:
+            continue
+        per_class_accs = [
+            np.mean(v) for v in per_class[kv].values() if v
+        ]
+        if not per_class_accs:
+            raise AssertionError(
+                f"item 8: no persisted predictions for k={kv} on "
+                f"{dataset_name}."
+            )
+        recomputed = float(np.mean(per_class_accs))
+        reported = float(expected[key])
+        if abs(recomputed - reported) > rtol * max(1.0, abs(reported)):
+            raise AssertionError(
+                f"item 8 FAILED: persistence drift on {dataset_name} at k={kv}. "
+                f"reported={reported:.12f}, recomputed={recomputed:.12f}, "
+                f"|Δ|={abs(recomputed - reported):.3e}. This means the "
+                f"persisted per-example predictions don't reproduce the "
+                f"aggregate the probe loop reported — label alignment or "
+                f"dataset ordering has drifted. See "
+                f"docs/aniket/bench_harness/bug_ledger_check.md § Item 8."
+            )
+
+
 def _load_mlc(
     ckpt_path: str,
     k: int,
@@ -242,6 +336,19 @@ def run_mlc_probing(
         test_feats = encode_flat(test_texts_all)    # (N_test,  d_sae_eff)
         print(f"  encode took {time.time() - t_enc:.1f}s")
 
+        # Per-example prediction persistence (see item 8 + bug_ledger_check.md).
+        # Storage-split: predictions store (example_id, class, k, pred, prob,
+        # label) — text goes to a sibling <task>__texts.jsonl keyed by
+        # example_id. Avoids N_classes × N_k × N_test copies of the text.
+        per_example_preds: list[dict] = []
+        # Build example_id → text map once per dataset. example_id is the test
+        # row's position in test_texts_all, stable across all (class, k).
+        example_id_to_text: dict[str, str] = {
+            f"{dataset_name}__test_{i}":
+                (t if isinstance(t, str) else str(t))
+            for i, t in enumerate(test_texts_all)
+        }
+
         from sklearn.linear_model import LogisticRegression
         for class_idx, class_name in enumerate(class_names):
             train_labels = (train_cls == class_idx).astype(np.int64)
@@ -262,6 +369,23 @@ def run_mlc_probing(
                 acc = probe.score(X_test, test_labels)
                 per_class_test_accs[kv].append(float(acc))
 
+                # Capture per-example predictions for the TEST split. example_id
+                # is the test row's position in test_texts_all — stable across
+                # all (class, k) iterations so downstream joins work.
+                test_preds = probe.predict(X_test)
+                test_probs = probe.predict_proba(X_test)[:, 1]  # P(class_name)
+                for eid_idx, (p, prob, y) in enumerate(
+                    zip(test_preds, test_probs, test_labels)
+                ):
+                    per_example_preds.append({
+                        "example_id": f"{dataset_name}__test_{eid_idx}",
+                        "class": class_name,
+                        "k": int(kv),
+                        "pred": int(p),
+                        "prob": float(prob),
+                        "label": int(y),
+                    })
+
         # Average across classes for each k
         ds_result = {"dataset_name": dataset_name}
         for kv in k_values:
@@ -270,6 +394,13 @@ def run_mlc_probing(
                     np.mean(per_class_test_accs[kv])
                 )
         results_per_task.append(ds_result)
+        # Persist this dataset's per-example predictions (preds + sibling text map)
+        _write_predictions(run_id, dataset_name, per_example_preds, example_id_to_text)
+        # Item 8: sanity-check that persisted aggregates recompute cleanly.
+        _sanity_check_persistence(
+            run_id=run_id, dataset_name=dataset_name,
+            expected=ds_result, k_values=k_values,
+        )
         print(f"  [{dataset_name}] done in {time.time() - t_ds:.1f}s; "
               f"top-5 acc = {ds_result.get('sae_top_5_test_accuracy', 'N/A')}")
 
