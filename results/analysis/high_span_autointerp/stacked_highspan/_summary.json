@@ -1,0 +1,102 @@
+[
+  {
+    "feat_idx": 12990,
+    "explanation": "This feature detects tokens that follow conditional or contrastive logical connectors (if, but, or) and mark pivotal moments where a constraint, condition, or limiting factor is introduced\u2014tokens like \"amount,\" \"step,\" \"need,\" \"from\" that represent the scope or boundary of what follows.",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 3279,
+    "explanation": "This feature fires on capitalized or title-cased words that begin sentences, titles, or appear in formal/proper noun contexts, as well as on definite articles and adverbs positioned at the start of phrases. The token consistently marks the beginning of a significant semantic unit (proper nouns like \"American,\" \"Active,\" \"Depth,\" descriptive adjectives, or function words at phrase boundaries).",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 17208,
+    "explanation": "This feature fires on tokens that appear in informal, colloquial, or misspelled contexts\u2014particularly words that are intentionally distorted, slang variants, or part of casual/vulgar speech patterns (e.g., \"of,\" \"and,\" \"to,\" \"do,\" \"white\" in mocking contexts, \"ti\" as part of a name pun, \"cazal\" as a brand reference). The common thread is tokens embedded within non-standard linguistic constructions, often in internet forum/comment contexts with deliberate spelling deviation or crude humor.",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 4864,
+    "explanation": "This feature fires on product model numbers and brand suffixes\u2014specifically the numerical or letter components that complete product names (like \"dyne\" in Prodyne, \"Pro\" in model variants, \"X\" in APX, \"0\" in CK-300, \"set\" in Quickset, \"la\" in Joola). These are tokens that follow product identifiers and disambiguate or complete model designations.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 5130,
+    "explanation": "This feature fires on common English nouns and pronouns that serve as direct objects or complements following verbs or prepositions (this, often, lives, progress, dwell, spread, topic, things). It appears to detect discourse-typical content words that follow function words and carry semantic weight in sentence structure.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 14322,
+    "explanation": "This feature fires on prepositions and conjunctions that introduce location, contact information, or directional phrases\u2014specifically \"at\" (as in email addresses or locations), \"to\" (as in sending/mailing), and commas separating clauses. The token marks a transition point where contact details, destinations, or additional context information is about to be specified.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 11366,
+    "explanation": "This feature fires on punctuation and special characters that appear between or immediately after text tokens, particularly forward slashes (/), quotation marks (\"), and angle brackets (<, >). These are delimiters or boundary markers that separate distinct semantic units like URLs, quoted phrases, email addresses, and usernames.",
+    "confidence": "HIGH"
+  },
+  {
+    "feat_idx": 6375,
+    "explanation": "This feature fires on prepositions and punctuation marks that introduce or connect clauses, particularly \"by,\" \"of,\" \"on,\" and colons/periods that mark transitions between ideas or introduce attributions/ratings. The token consistently serves a structural role in establishing relationships between phrases or beginning new informational units.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 14966,
+    "explanation": "This feature fires on words that follow descriptive or qualifying phrases and serve as key nouns/concepts that complete or fulfill the information provided in the preceding clause\u2014functioning as the semantic \"object\" or \"result\" of the setup (enabling application processing, company having rights, understanding issues, recognition for experience, etc.).",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 11878,
+    "explanation": "This feature detects prepositions and auxiliary verbs that connect clauses or noun phrases, particularly words like \"of,\" \"with,\" \"were,\" \"through,\" \"are,\" \"as,\" and \"have\" that serve as grammatical bridges between semantic units in complex sentences.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 6805,
+    "explanation": "This feature detects tokens that immediately follow \"GOING\" or appear in contexts of upcoming events/actions, particularly capturing the infinitive marker \"TO\" and possessive/article determiners that follow action verbs in enthusiastic, promotional text. The feature fires on words that introduce what will happen next in sequences describing future plans or celebrations.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 6349,
+    "explanation": "This feature fires on newline tokens (`\\n`) that mark transitions from one section or content block to another, typically separating headers/titles from body content or marking structural breaks in web pages and formatted text.",
+    "confidence": "HIGH"
+  },
+  {
+    "feat_idx": 15339,
+    "explanation": "This feature fires on individual digits or small numbers that appear within larger numerical contexts, particularly in cricket statistics and scores (like runs, strike rates, partnership totals, and ball counts). The firing tokens are typically single digits extracted from multi-digit numbers or appearing as standalone score components.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 10409,
+    "explanation": "This feature fires on nouns that represent collective entities, communities, or organized groups (Federation, providers, community, Media, business hub). The pattern captures tokens that denote aggregations of people, services, or commercial activity operating as a unified whole.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 13462,
+    "explanation": "This feature detects coordinating conjunctions and prepositions that connect nouns or noun phrases in product descriptions, particularly \"and\", \"of\", and commas functioning as list separators in enumerative contexts (instruments, loops, phrases, presets, etc.).",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 7459,
+    "explanation": "This feature fires on noun phrases and specific terms that appear in UI text and system messages, particularly words denoting temporal concepts, inventory states, or interface elements (like \"messages,\" \"deleted,\" \"Date\"). The common thread is nouns appearing in structured/formatted text blocks with specific semantic roles in system interfaces.",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 4250,
+    "explanation": "This feature detects punctuation marks that appear at the beginning of new sections, list items, or sentences\u2014specifically periods, commas, and bullet points that follow structural breaks or enumeration markers (like numbers, section headers, or padded sequences indicating document structure).",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 17271,
+    "explanation": "This feature detects tokens that are part of common phrases or constructions within dating/relationship advice discourse, particularly words that serve as connective or descriptive elements in instructional text about online dating profiles and meeting people.",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 3140,
+    "explanation": "This feature detects prepositions and articles that function as grammatical connectors or introducers in mathematical/technical prose, particularly those linking clauses, prepositional phrases, or introducing noun phrases (e.g., \"combines\", \"in\", \"and\", \"for\", \"type\", \"some\", \"a\", \"known\").",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 10985,
+    "explanation": "This feature fires on tokens that immediately precede or are part of noun phrases describing time, sequence, or possession\u2014specifically words like \"they,\" \"use,\" \"'d,\" \"following,\" \"of,\" \"your,\" \"money,\" and \"appointed\" that function as determiners, prepositions, or modifiers establishing relationships between entities and their attributes or temporal/sequential positioning.",
+    "confidence": "LOW"
+  }
+]

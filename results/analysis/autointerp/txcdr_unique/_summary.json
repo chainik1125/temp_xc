@@ -1,0 +1,147 @@
+[
+  {
+    "feat_idx": 633,
+    "explanation": "This feature fires on Cyrillic (Russian) word fragments and morpheme boundaries, particularly detecting syllable or morpheme divisions within Russian words (such as \"\u0441\u0432\u044f\u00ab\u0437\u044c\u00bb\", \"\u043c\u0430\u043a\u0440\u043e\u00ab\u0440\u0435\u00bb\u0433\u0438\u043e\u043d\", \"\u0438\u043d\u00ab\u0444\u043e\u0440\u043c\u00bb\") and Russian text initiation markers like sentence starts with Cyrillic characters.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 10297,
+    "explanation": "This feature activates on modal auxiliary verbs (can, would, could) and the relative pronoun \"that\" when they introduce a clause describing potential consequences, conditions, or capabilities of an action or situation.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 8154,
+    "explanation": "This feature detects the boundaries and segmentation points within or around Cyrillic company/organization names, particularly the tokenization breaks within \"\u0423\u0440\u0430\u043b\u0441\u0432\u044f\u0437\u044c\u0438\u043d\u0444\u043e\u0440\u043c\" and similar Russian corporate entities. The firing occurs at character boundaries where the token splitter fragments longer Russian words into smaller subword tokens.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 14358,
+    "explanation": "This feature fires on tokens that immediately follow conjunctions or connective words (particularly \"\u0438\" meaning \"and\" in Russian, or \"and\" in English) at points where the sentence structure shifts to introduce new information or clauses. The firing tokens tend to be the first substantive word following these connectors, marking transitions in discourse flow.",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 1979,
+    "explanation": "This feature detects function words and prepositions that appear in enumerated or list-like sequences, particularly articles (\"the\", \"of\") and conjunctions that connect items in procedural or descriptive lists. The high activations on \"of\" and \"the\" across multiple contexts suggest it marks grammatical connectors within itemized or step-by-step descriptions.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 533,
+    "explanation": "This feature detects tokens that appear at natural clause or sentence boundaries, particularly pronouns, verbs, and punctuation marks that serve as pivots between independent clauses or discourse segments (e.g., \"it\", \"leaves\", \"seen\", \"me\", \"turn\", \"all\" functioning as subjects/objects at clause junctures, or punctuation marking shifts in thought).",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 3847,
+    "explanation": "This feature fires on function words and short particles that serve grammatical rather than lexical purposes\u2014specifically verbs like \"is,\" \"to,\" \"in,\" prepositions, and short connecting words that appear at pivot points between clauses or phrases.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 1463,
+    "explanation": "This feature detects country/nation names, specifically those that appear in geopolitical or security contexts referring to Eastern European nations and their intelligence/security operations.",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 10183,
+    "explanation": "This feature fires on tokens that immediately follow a descriptor or modifier in a noun phrase, typically marking the boundary between an adjective/attribute and its head noun (e.g., \"should complete\", \"articles and\", \"celery stalk\", \"Good condition\"). It appears to detect tokens that complete or follow attributive descriptions.",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 1603,
+    "explanation": "This feature fires on prepositions and function words that connect clauses or phrases (are, on, using, in, is) as well as punctuation and adjectives that mark boundaries between distinct ideas or descriptive segments. The common pattern is tokens that serve as relational connectors or delimiters between semantic units rather than content words.",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 14463,
+    "explanation": "This feature detects words that function as descriptive modifiers or qualifiers in product/service comparisons and marketing contexts, particularly adjectives and conjunctions that frame alternatives or product attributes (e.g., \"that\", \"companies\", \"version\", \"or\", \"insurance\", \"compete\", \"soft\", \"having\").",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 17557,
+    "explanation": "This feature fires on function words and prepositions that introduce descriptive phrases or clauses (such as \"as,\" \"so,\" \"a,\" \"from,\" \"that,\" \"crossing\"), particularly when they precede explanatory or qualifying information that elaborates on the preceding noun or action.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 646,
+    "explanation": "This feature fires on tokens that immediately follow the start of imperative or instructional clauses, particularly verbs and prepositions that initiate action sequences in procedural/instructional text (e.g., \"can set\", \"set up\", \"with lots\"). It captures the onset of syntactic units that carry instructional content.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 15066,
+    "explanation": "This feature fires on function words and conjunctions that connect clauses or ideas within sentences (e.g., \"and\", \"that\", \"then\", \"themselves\") and occasionally on key content words in descriptive contexts, particularly when they appear mid-sentence to link or introduce new information.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 13175,
+    "explanation": "This feature activates on tokens that are part of action-oriented business or operational statements, particularly verbs and objects within imperative or descriptive sentences about organizational processes (generating business, detecting issues, automating workflows).",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 17451,
+    "explanation": "This feature fires on nouns and noun phrases that represent concrete objects, materials, or specific items (card, from, their, energy, printed, comma separating manufacturing processes, gold crown). It appears to detect tokens that are part of enumerations, descriptions of physical goods, or specifications of tangible things in commercial/instructional contexts.",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 3878,
+    "explanation": "This feature detects the digit \"0\" when it appears as part of a numerical address or coordinate sequence, particularly in street addresses or location identifiers where zeros are terminal or embedded within multi-digit numbers.",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 15977,
+    "explanation": "This feature fires on tokens that introduce or precede clauses describing actions, consequences, or descriptive information\u2014particularly pronouns, auxiliary verbs, and determiners that initiate dependent or relative clauses (e.g., \"when they tried,\" \"some of the topics\"). The feature appears to detect clause-initiating function words that follow descriptive setup phrases.",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 13753,
+    "explanation": "This feature fires on tokens that immediately follow common prepositions or function words (\"of,\" \"on,\" \"to\") and on punctuation marks and contractions that serve as grammatical connectors or markers in sentences. It appears to detect tokens at grammatical inflection points where prose transitions between clauses or introduces new semantic content.",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 11465,
+    "explanation": "This feature detects tokens that serve as pivotal connectors or semantic bridges within clauses, particularly words that introduce new actions, properties, or consequences (verbs like \"forged,\" \"may,\" modal/auxiliary verbs, and punctuation like commas that separate clauses). It fires on tokens that either initiate a new predicate or mark transitions between related ideas in compound/complex sentence structures.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 6579,
+    "explanation": "This feature fires on punctuation and structural tokens (soft, comma, newline, parenthesis) that appear at natural clause or sentence boundaries, particularly in product descriptions where these marks separate descriptive clauses or introduce new information.",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 4349,
+    "explanation": "This feature fires on tokens that appear in the middle or later portion of English sentences, particularly articles, prepositions, and auxiliary verbs that follow noun phrases or clause subjects\u2014common function words that establish connections between content words or introduce objects/complements.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 18191,
+    "explanation": "This feature activates on words that immediately follow common function words or prepositions (like \"with,\" \"of,\" \"at\") and on content words that begin noun phrases or follow auxiliary verbs. The firing tokens tend to be the first substantive word after a structural connector or the head of a phrase following a grammatical frame.",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 6655,
+    "explanation": "This feature fires on function words and particles that serve as grammatical bridges or connectors in sentences\u2014specifically articles (a, the), prepositions (in, to), auxiliary verbs (has, have), pronouns (I), and commas that separate clauses or list items. These are high-frequency grammatical tokens that facilitate syntactic structure rather than carrying primary semantic content.",
+    "confidence": "HIGH"
+  },
+  {
+    "feat_idx": 14306,
+    "explanation": "This feature detects function words and short prepositions that appear in instructional or procedural text, particularly \"for,\" \"via,\" \"it,\" and \"small\" that serve to connect clauses or specify methods/purposes in medical, product review, or how-to contexts.",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 13565,
+    "explanation": "Arabic token boundaries in Arabic text sequences (original explanation redacted \u2014 source examples contained NSFW content from FineWeb)",
+    "confidence": "REDACTED"
+  },
+  {
+    "feat_idx": 6888,
+    "explanation": "This feature fires on prepositions and function words that introduce descriptive modifiers or technical specifications (e.g., \"with,\" \"inside,\" commas separating clauses). The token often marks a boundary where a property or detail is about to be added to a noun or concept.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 14583,
+    "explanation": "This feature fires on action verbs and instructional/imperative words that initiate procedures or direct users to perform tasks (Apply, click, guidelines) or on nouns representing products/market segments that are being marketed or described (snack, toner). The common thread is tokens that introduce or anchor actionable information or key product categories in instructional and marketing copy.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 14661,
+    "explanation": "This feature detects tokens that immediately precede or follow temporal/transitional phrases and connective words\u2014specifically particles and prepositions that link clauses or mark shifts in time, condition, or perspective (e.g., \"from,\" \"to,\" \"in,\" \"we,\" \"whole\"). The feature fires on functional words that introduce causal, comparative, or sequential relationships within sentences.",
+    "confidence": "LOW"
+  }
+]

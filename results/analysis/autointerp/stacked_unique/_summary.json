@@ -1,0 +1,87 @@
+[
+  {
+    "feat_idx": 6963,
+    "explanation": "This feature detects possessive markers and conjunctions that connect entities or attributes in biographical/descriptive contexts, particularly the apostrophe-s possessive form (\u00ab's\u00bb) and coordinating conjunctions (\u00aband\u00bb) used to link names, professions, or descriptive phrases in people-focused text.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 7199,
+    "explanation": "This feature fires on punctuation and prepositions that directly precede or introduce location information\u2014specifically commas before city names, \"in\" before places, and \"from\" before hometowns. It captures tokens that mark the boundary between a person/event and their geographic location.",
+    "confidence": "HIGH"
+  },
+  {
+    "feat_idx": 1116,
+    "explanation": "This feature fires on nouns that are part of product/item descriptions, particularly when they modify or specify lighting fixtures and garden accessories (LED, Powered, solar, garden). The token represents a key descriptive noun in a commercial or instructional product listing.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 9426,
+    "explanation": "This feature detects the token \"motor\" when it appears as a noun in compound nouns or proper nouns (Motor Company, motor yachts, motor skills, motorsports contexts), particularly in descriptive or technical contexts about vehicles, equipment, or mechanical systems.",
+    "confidence": "HIGH"
+  },
+  {
+    "feat_idx": 6292,
+    "explanation": "This feature detects partial or abbreviated company/brand names and ticker symbols, particularly when they appear as standalone tokens that truncate or shorten a full organizational name (e.g., \"\u0431\u0438\u043e\" from biotech, \"GL\" from a name, \"XYL\" ticker).",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 2524,
+    "explanation": "This feature detects non-English alphabetic characters and diacritical marks, particularly vowels with accents or special letter forms (\u00e6 in Icelandic, ij in Dutch). It fires on orthographically unusual characters specific to non-English languages.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 394,
+    "explanation": "This feature fires on common English words or word fragments that typically follow or complete proper nouns, brand names, and capitalized terms (e.g., \"Fran\" Bennett, \"Carpet One\", \"Frisbee\", \"Dealership\"). The pattern suggests detection of tokens that naturally complete or follow established named entities and branded terms.",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 8592,
+    "explanation": "This feature detects tokens that are part of proper nouns or branded event/conference names, particularly the distinctive or identifying components of event titles (like \"Cisco\", \"Live\", \"CMG\", \"imPACt\"). The feature fires strongly on capitalized words and fragments that form recognizable brand or event identifiers.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 89,
+    "explanation": "This feature fires on tokens that complete proper nouns or named entities, particularly surnames and place names that follow partial or interrupted text. The token serves as the completion of a name that was either split across tokens (like \"Sor\" + \"rells\", \"Sor\" + \"man\", \"Sor\" + \"rows\") or appears in a list/catalog context.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 16979,
+    "explanation": "This feature fires on the second part of compound words or multi-part proper nouns that are split across tokens, where the firing token completes a place name, person name, or institutional name (e.g., \"Jokinen\", \"Makati\", \"Pakkahuone\", \"Mikki\"). It captures the continuation token in hyphenated or space-separated name components.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 16520,
+    "explanation": "This feature detects tokens that appear within a specific repeated product description sentence about aquarium-safe coral replicas cast from molds. The feature fires on various tokens (adjectives, prepositions, articles, and compound words) that occur in this boilerplate marketing text across different positions, suggesting it's capturing the presence of this particular descriptive passage rather than a single semantic/syntactic property.",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 12171,
+    "explanation": "This feature fires on proper nouns that appear at the beginning of a location name or geographical identifier, particularly the first word of place names (Fontanelle, Terrebonne, North Cross, Port Elizabeth) or the opening word of titles/names in geographical contexts.",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 1798,
+    "explanation": "This feature fires on female given names, particularly common English first names like Susan, Sarah, Suzanne, Sue, and Marianna. The pattern appears to capture tokens that are standalone female proper names, often appearing in positions where they serve as identifiers for specific individuals.",
+    "confidence": "HIGH"
+  },
+  {
+    "feat_idx": 14492,
+    "explanation": "This feature detects the word \"cyber\" or its abbreviation \"cy\" when it appears as part of compound terms or phrases, particularly in contexts where \"cyber\" functions as a modifier (cyber warfare, cyber threats, cyber fraud, Cyber-shot, Cybermen). The token fires strongly on the \"cyber\" component itself across security/technology domains and branded product names.",
+    "confidence": "HIGH"
+  },
+  {
+    "feat_idx": 237,
+    "explanation": "This feature fires on tokens that introduce or connect attributions, citations, and source references\u2014specifically prepositions (\"by\", \"on\"), conjunctions (\"and\"), and quotation marks that frame titles, authors, and quoted material in written text.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 17212,
+    "explanation": "This feature detects commas and spaces that appear in structured address/contact information formats, particularly those separating location components, postal codes, and geographic qualifiers in institutional contact details.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 12993,
+    "explanation": "This feature detects adjectives and modifiers describing boundlessness or lack of limits (infinite, endless, unlimited, immeasurable), particularly when these words appear in philosophical, theological, or abstract contexts discussing concepts that transcend normal constraints.",
+    "confidence": "HIGH"
+  }
+]

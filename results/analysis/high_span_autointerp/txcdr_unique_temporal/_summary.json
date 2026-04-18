@@ -1,0 +1,102 @@
+[
+  {
+    "feat_idx": 6228,
+    "explanation": "This feature fires on adjectives and descriptive words that characterize or evaluate nouns/states, particularly those describing difficulty, absence, or notable qualities (like \"obvious,\" \"faint,\" \"healthy\"). The tokens capture evaluative or qualifying descriptors that add interpretive depth to the concepts they modify.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 16726,
+    "explanation": "This feature detects function words and particles that introduce or connect clauses, particularly infinitive markers (\"to\"), articles (\"a\"), relative pronouns (\"which\"), and quotation marks that signal discourse structure shifts. These tokens serve grammatical bridging roles between major clausal or discourse units.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 7006,
+    "explanation": "This feature fires on tokens that conclude noun phrases or clauses within advertising/promotional copy, particularly at natural stopping points where a product service or benefit statement ends before transitioning to the next sentence or clause.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 17020,
+    "explanation": "This feature fires on punctuation and special characters that appear at word boundaries or within contractions/abbreviations (apostrophes, ampersands, spaces within phrases), particularly when they interrupt or connect text segments in business/technical writing contexts.",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 757,
+    "explanation": "This feature detects the contraction apostrophe (') in English contractions and possessives, particularly firing on the apostrophe character itself when it appears in words like \"doesn't,\" \"Sedona's,\" and \"guy's,\" as well as in phrases involving \"the\" or other possessive constructions.",
+    "confidence": "HIGH"
+  },
+  {
+    "feat_idx": 18219,
+    "explanation": "This feature fires on proper nouns and named entities that are being introduced or identified for the first time in a text, particularly place names (Gerlach, Picton, Ekaterinburg), personal names (Hafiz), and other specific entities (Raleway font, Unready).",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 14573,
+    "explanation": "This feature fires on pronouns and light verbs/function words that appear in positions immediately following a clause or independent thought, typically serving as bridges to new information or continuations (it, me, the, at, seems, a, about, found).",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 9383,
+    "explanation": "This feature fires on function words and light verbs that serve as grammatical connectors or continuation markers in poetic/literary text\u2014particularly articles (\"One\"), prepositions (\"by\", \"to\"), conjunctions (\"and\"), and modifiers that link clauses or sustain parallelism. It's especially activated in rhythmic or formulaic passages with repetitive structure.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 14288,
+    "explanation": "This feature fires on nouns or noun phrases that complete descriptive comparisons or metaphorical statements, particularly when the token represents an object/concept being used as a reference point for analogy or evaluation (e.g., \"dryer,\" \"down,\" \"do,\" \"choice,\" \"garden,\" \"varnish,\" \"is\").",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 7051,
+    "explanation": "This feature fires on tokens that follow a noun phrase and function as determiners, pronouns, or adjectives that modify or refer back to previously mentioned entities (e.g., \"it,\" \"with,\" \"my,\" \"long,\" \"so,\" \"previous,\" \"the,\" \"one's\"). It captures words that establish anaphoric or attributive relationships to preceding nouns.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 1503,
+    "explanation": "This feature detects tokens that appear immediately after a dash or hyphen, particularly when the dash separates distinct elements like postal codes from place names, first names from middle names, or reference numbers from identifiers.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 12986,
+    "explanation": "This feature detects numeric tokens that appear in date expressions, particularly the day component of dates (e.g., \"28\" in \"March 28, 2011\", \"30\" in \"30 April 2015\", \"18\" in \"18 August 2014\") or time expressions (e.g., \"3\" in \"7:30 a.m.\"). The firing consistently captures day numbers and numeric time components within temporal contexts.",
+    "confidence": "HIGH"
+  },
+  {
+    "feat_idx": 8655,
+    "explanation": "This feature fires on nouns and noun phrases that follow prepositions or linking verbs, particularly those that represent valuable offerings, outcomes, or benefits being presented to an audience (e.g., \"both value,\" \"providing service,\" \"your choice,\" \"of expertise\"). The tokens capture the object of propositions that highlight what is being delivered or promised.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 3138,
+    "explanation": "This feature detects intensifiers and evaluative adjectives that modify or intensify the noun or phrase immediately following them\u2014words like \"difficult,\" \"awful,\" \"good,\" and \"such\" that carry strong qualitative judgments, as well as certain particle verbs and directional phrases that express change or transition.",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 6288,
+    "explanation": "This feature fires on punctuation and special characters (periods, question marks, quotation marks) that appear at the end of section headers, titles, or column names in formatted text (newspapers, newsletters, business documents). The punctuation marks terminal positions in structured metadata or section dividers.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 1293,
+    "explanation": "This feature fires on punctuation marks and conjunctions that serve as connectors or delimiters between clauses or list items\u2014specifically tokens like \"before,\" \"a,\" \"on,\" \"\u2013,\" \"included,\" \"causes,\" \"),\" and \",\" that link structural or informational units in technical documentation and explanatory text.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 7074,
+    "explanation": "This feature detects whitespace or line break tokens that appear between distinct structural elements (ratings, dates, titles, metadata) in semi-structured text like reviews, forum posts, and product listings. The firing tokens are consistently spaces or newlines that separate different information blocks.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 428,
+    "explanation": "This feature fires on capitalized nouns and proper nouns that follow descriptive or organizational contexts, particularly titles, institutions, organizations, and formal named entities (U.S., Publication, Center, Institute, Royal Society). The tokens tend to be significant proper nouns or capitalized words that name specific entities, organizations, or formal concepts.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 923,
+    "explanation": "This feature fires on common nouns and nominal phrases that appear in descriptive or informational contexts, particularly words that introduce new concepts, products, or announcements (e.g., \"Magazine,\" \"House,\" \"launch,\" \"once\"). The tokens tend to be semantically significant words that serve as reference points in text about products, events, or institutional information.",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 2625,
+    "explanation": "This feature detects tokens that appear in ALL-CAPS or formal/structured text sections, particularly at boundaries of capitalized phrases or emphatic statements. The firing tokens are often single words or short phrases that stand out within uppercase contexts (like \"NOT,\" \"LOOK,\" \"PROFESSIONALLY,\" \"LABORATORY,\" \"AREAS,\" \"HAZARDOUS\") or appear as emphasized/separated elements.",
+    "confidence": "MEDIUM"
+  }
+]

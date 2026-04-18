@@ -1,0 +1,102 @@
+[
+  {
+    "feat_idx": 14562,
+    "explanation": "This feature fires on common English words that typically appear in the middle or end of clauses/sentences, often serving as predicates, participles, or conjunctions that connect ideas (think, known, game, found, Artists, buyers, comma, while). These are function words that bridge semantic content rather than carry primary meaning themselves.",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 300,
+    "explanation": "This feature detects tokens that follow prepositional phrases or function words introducing gratitude, support, or accompaniment (e.g., \"to do justice,\" \"with support,\" \"thanks to,\" \"with people,\" \"together with\"). The firing tokens are often the direct objects or beneficiaries that complete these relational expressions.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 9251,
+    "explanation": "This feature fires on the second part of hyphenated or compound words, specifically detecting tokens that complete portmanteau words, brand names, or multi-token proper nouns (e.g., \"ta\" in \"Fantagraphics,\" \"ni\" in \"beatniks,\" \"boun\" in \"bouncer,\" \"uan\" in \"truancy,\" \"Sto\" in \"Stooges\"). It identifies mid-word token boundaries where the continuation completes a recognizable compound term.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 5771,
+    "explanation": "This feature fires on function words and prepositions (pill, distribute, however, in, with, a, find) that appear in low-quality, spam-like or garbled text\u2014often pharmaceutical advertisements, broken English, or malformed content. The feature seems to detect tokens that are semantically lightweight but serve as connective tissue in degraded or spam-generated language.",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 17925,
+    "explanation": "This feature fires on contracted auxiliary verbs (primarily \"can't\", \"Let's\", \"that's\", \"it's\") and possessive/relational constructions (\"in-law\"), specifically tokens that are part of contraction markers or compound word formations that follow a gap or boundary in the text.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 7340,
+    "explanation": "This feature fires on capitalized nouns that appear in titles, headlines, or proper names, particularly words that are semantically significant and often stand alone as emphasized terms (Victory, Campaign, Star, distance, House, Grindcraft, Pole, Hardcore).",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 2732,
+    "explanation": "This feature fires on possessive markers and contractions that involve apostrophes\u2014specifically the apostrophe-s ('s) in possessives, apostrophe-t contractions (n't, 's), and standalone periods/punctuation that follow proper nouns or titles. The common pattern is orthographic: tokens containing or immediately following apostrophes in their written form.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 18219,
+    "explanation": "This feature activates on tokens that are parts of proper nouns or place names that have been split across token boundaries, particularly where the firing token represents a non-initial syllable or fragment (e.g., \"Haf\u00bbiz\", \"Ger\u00bblach\", \"Ral\u00bbway\", \"Un\u00bbready\", \"Pic\u00bbton\", \"aterin\u00bbburg\"). The feature appears to detect mid-word continuations of multi-syllable proper nouns.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 4947,
+    "explanation": "This feature detects coordinating conjunctions and determiners that connect or qualify multiple entities or concepts\u2014specifically tokens like \"multiple,\" \"their,\" \"observed,\" \"to,\" \"and,\" \"or\" that appear in contexts discussing plurality, alternatives, collections, or enumerated options. The feature activates when tokens introduce or precede a shift toward discussing multiple items, methods, opinions, or possibilities.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 923,
+    "explanation": "This feature fires on common English words that immediately follow prepositions, articles, or function words\u2014specifically words like \"once,\" \"Magazine,\" \"the,\" \"House,\" and \"launch\" that serve as the head noun or key content word in noun phrases. The pattern appears to capture tokens that represent the semantic focus or main referent following grammatical function words.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 15379,
+    "explanation": "This feature fires on nouns or noun phrases that complete descriptive statements about entities (games, places, services, products), particularly when the noun identifies or categorizes what is being described. The firing tokens are typically common nouns that serve as the semantic head of the object being introduced.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 10430,
+    "explanation": "This feature fires on common auxiliary verbs and prepositions that introduce or connect clauses (\"are\", \"to\", \"company\", \"House\", \"know\") \u2014 specifically tokens that serve as structural linkers or copular elements bridging subjects to predicates or objects in formal/journalistic prose.",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 5578,
+    "explanation": "This feature activates on auxiliary verbs and infinitive markers that appear in negative constructions or modal contexts (don't have, don't have someone, to be, to commit, to take, will also help you). The tokens consistently mark grammatical function words that bridge between negation/modality and main predicates.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 17157,
+    "explanation": "This feature fires on coordinating conjunctions and linking verbs that connect independent clauses or major phrase boundaries (particularly \"and\", \"as\", \"of\", \"only\", \"is\", \"begin\") in contexts where they join substantial semantic units or introduce new information flows in prose passages.",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 14710,
+    "explanation": "This feature fires on tokens that appear in passive voice constructions or periphrastic structures where an auxiliary verb or preposition bridges the main verb and its object/complement. The firing tokens (will, be, and, to, our, work, searched) consistently occur in positions that connect clausal or verbal elements in constructions like \"will be able to,\" \"to be done,\" and \"frequently searched keywords.\"",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 6646,
+    "explanation": "This feature detects tokens that are parts of URLs or domain names, particularly tokens that appear within or immediately adjacent to URL structures (like domain extensions, path segments, or numeric URL components).",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 17020,
+    "explanation": "This feature fires on punctuation and special characters that appear within or immediately adjacent to words, particularly apostrophes in contractions (didn't, isn't, here's), ampersands in compound names (Sound&Vision), and other mid-word or boundary punctuation that breaks up text flow.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 7051,
+    "explanation": "This feature fires on discourse markers and conjunctive/contrastive words that connect clauses or introduce subordinate information\u2014tokens like \"it,\" \"with,\" \"my,\" \"long,\" \"so,\" \"previous,\" \"the,\" and \"Knowing\" that serve functional roles in linking ideas or specifying relationships between sentence components.",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 2045,
+    "explanation": "This feature fires on nouns and noun-like words that appear in contexts emphasizing positive qualities, improvements, or noteworthy attributes\u2014tokens like \"doing,\" \"joy,\" \"unique,\" \"adaptation,\" and \"work\" that represent substantive things worthy of attention or that mark a shift toward something better or more interesting.",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 1214,
+    "explanation": "This feature fires on tokens that immediately follow or are part of conditional/contrastive clauses or transitions, particularly detecting conjunctions and articles that introduce alternatives or conditions (e.g., \"whether\", \"the\", \"a\") and sentence-ending punctuation that marks breaks in narrative flow or specification.",
+    "confidence": "LOW"
+  }
+]

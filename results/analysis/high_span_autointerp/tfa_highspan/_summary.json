@@ -1,0 +1,102 @@
+[
+  {
+    "feat_idx": 17996,
+    "explanation": "This feature fires on noun adjuncts and attributive modifiers\u2014words that directly modify or describe a following noun without a preposition (e.g., \"router supplier,\" \"research analyst,\" \"board,\" \"depth look,\" \"proud father\"). These are tokens that function as qualifiers immediately preceding their head nouns.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 1579,
+    "explanation": "This feature fires on numeric values that appear as decimal numbers in data tables and metrics, particularly single digits after decimal points in ratings, percentages, and statistical measurements (TV ratings, financial ratios, percentages, viewership numbers).",
+    "confidence": "HIGH"
+  },
+  {
+    "feat_idx": 16973,
+    "explanation": "This feature fires on tokens that appear immediately after location names or geographic identifiers (city names like Gerlach, Carrollton, Dunnell\u200bon) or within time/numeric strings that follow specific formatting patterns. The common thread is tokens that complete or punctuate geographic references and structured data fields.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 10225,
+    "explanation": "This feature fires on tokens that appear immediately after a period or apostrophe, particularly at the boundary between sentences or within contractions where a new grammatical unit begins (e.g., \"org\" after period, \"were\" after period, \"is\" after period, \"s\" in contractions like \"Here's\" and \"it's\").",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 17098,
+    "explanation": "This feature fires on tokens that immediately follow proper nouns or at punctuation/grammatical boundaries in biographical or geographical contexts, particularly detecting transitions between location names and descriptive clauses or punctuation that separate a location from additional context.",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 347,
+    "explanation": "This feature fires on tokens that appear at or near the end of noun phrases or descriptive phrases, particularly words that complete units of information (time specifications like \"40\", spatial/structural descriptors like \"area\" and \"system\", and modal/functional words like \"to\", \"app\", and \"be\" that conclude clauses or phrases).",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 2175,
+    "explanation": "This feature detects transition tokens that introduce new clauses, examples, or temporal/spatial shifts\u2014specifically words like \"For,\" \"when,\" \"the,\" \"present,\" and punctuation colons that mark a pivot point or elaboration following a statement or topic. These are discourse markers and connectors that signal a shift in focus or the beginning of supporting details.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 9374,
+    "explanation": "This feature detects contractions formed with the apostrophe-s pattern ('s), particularly in common sentence-opening constructions like \"There's,\" \"Here's,\" and possessive forms like \"Sheriff's.\" The firings cluster on the contracted or possessive 's token that immediately follows an apostrophe in high-frequency discourse markers.",
+    "confidence": "HIGH"
+  },
+  {
+    "feat_idx": 15410,
+    "explanation": "This feature detects numerical tokens that appear in timestamp, time, or date contexts\u2014specifically the digit or number portions of times (like hours, minutes, seconds) and dates within formatted temporal expressions.",
+    "confidence": "HIGH"
+  },
+  {
+    "feat_idx": 10180,
+    "explanation": "This feature fires on numerical tokens that appear in dates, times, publication years, and other temporal/metadata contexts within citations and timestamps (e.g., \"2014\", \"11\", \"28:00\", \"6:28:00\"). The pattern is detecting numbers that serve as discrete quantitative values in structured information rather than quantities within narrative text.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 18203,
+    "explanation": "This feature detects tokens that appear immediately after punctuation marks or at structural boundaries (apostrophes, periods, newlines, angle brackets), particularly at the beginning of new clauses, sentences, or formatted sections.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 7287,
+    "explanation": "This feature fires on tokens that complete or are part of proper nouns, brand names, and distinctive titles\u2014particularly the second word in two-word proper noun phrases like \"Seahorse Rodeo,\" \"Friends,\" \"Ark Encounter,\" and \"Evil That Men Do.\" It detects tokens that form recognizable named entities or quoted titles.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 11209,
+    "explanation": "This feature detects tokens that are digits (0-9) appearing in factual contexts like sports statistics, dates, addresses, and scores, where the number conveys specific quantitative information.",
+    "confidence": "HIGH"
+  },
+  {
+    "feat_idx": 4849,
+    "explanation": "This feature detects punctuation and structural markers that separate metadata fields or introduce new content sections, particularly colons and commas that appear after timestamps, dates, or temporal/categorical headers in formatted text (emails, logs, listings).",
+    "confidence": "HIGH"
+  },
+  {
+    "feat_idx": 13011,
+    "explanation": "This feature fires on tokens that complete or follow product/item names and product descriptors in commercial or product listing contexts, particularly nouns that denote specific product types, varieties, or branded items (Locker, erve, Yellow, Bindings, Konqueror, etc.).",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 6271,
+    "explanation": "This feature fires on tokens that immediately follow a period, comma, or other punctuation/structural boundary at the beginning of clauses or sentences. The feature detects sentence-initial or clause-initial positions marked by preceding punctuation.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 12231,
+    "explanation": "This feature fires on conjunctions and connecting words (commas, \"and\", \"to\", \"which\", \"as\", \"passed\") that link clauses or coordinate elements within longer descriptive sentences, particularly in marketing/product description or narrative contexts.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 3715,
+    "explanation": "This feature detects commas that immediately follow day-of-week names (Monday, Friday, Saturday, Sunday, etc.) in date expressions. The comma consistently separates the day name from the following date information.",
+    "confidence": "HIGH"
+  },
+  {
+    "feat_idx": 13415,
+    "explanation": "This feature detects contractions and colloquial constructions that begin sentences or clauses, particularly \"There's,\" \"Here's,\" and \"We've\" - forms that combine pronouns/demonstratives with auxiliary verbs in informal, conversational speech.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 17461,
+    "explanation": "This feature fires on tokens that immediately follow punctuation, commas, or numbers in text, particularly on common function words and numbers that appear in publication/listing contexts like dates, prices, and author attributions.",
+    "confidence": "LOW"
+  }
+]

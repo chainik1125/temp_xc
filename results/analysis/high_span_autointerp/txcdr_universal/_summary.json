@@ -1,0 +1,102 @@
+[
+  {
+    "feat_idx": 15381,
+    "explanation": "This feature detects function words and prepositions that serve as connective elements in clauses, particularly articles (\"the\"), prepositions (\"of\", \"in\", \"after\"), auxiliary verbs (\"has\", \"was\"), and quantifier nouns (\"amount\", \"career\") that link noun phrases or clausal components together.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 16933,
+    "explanation": "This feature detects tokens that are part of the technical vocabulary and structural elements in mathematical papers about semilinear elliptic systems, particularly firing on key domain-specific nouns (elliptic, systems), mathematical notation (\u221e), and prepositions that connect technical concepts (for, in, of).",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 14562,
+    "explanation": "This feature detects common English words that typically appear in the middle or latter portions of sentences, functioning as main verbs, auxiliary verbs, or conjunctions that connect clauses or introduce new information (think, known, game, found, Artists, buyers, while).",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 1868,
+    "explanation": "This feature detects tokens that appear within or immediately adjacent to biblical verse citations and their quoted speech content, particularly marking structural elements (punctuation, verbs, conjunctions) that connect the citation reference to the direct quotation that follows.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 13263,
+    "explanation": "This feature detects tokens that appear in contexts discussing marijuana, tobacco, or related substance use. The firing tokens are often function words or key nouns appearing within sentences that describe regulations, warnings, products, or the act of consuming these substances.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 7176,
+    "explanation": "This feature detects tokens that appear in prepositional phrases or functional words within Christian/religious discourse, particularly capturing prepositions (\"of\", \"in\", \"for\") and pronouns (\"us\", \"to\") that structure evangelical or devotional language about faith and spiritual experience.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 5771,
+    "explanation": "This feature fires on function words and prepositions (pill, distribute, however, in, with, a, find) that appear in low-quality, spam-like or garbled text contexts, particularly in pharmaceutical spam and malformed sentences. The feature seems to detect common small words appearing in incoherent, potentially auto-generated or corrupted passages rather than natural language.",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 10958,
+    "explanation": "This feature detects common function words and prepositions that appear in the middle of noun phrases or prepositional phrases, particularly words like \"the,\" \"their,\" \"on,\" \"can,\" and \"own\" that serve as grammatical connectors or modifiers within clausal structures.",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 9251,
+    "explanation": "This feature fires on the second part of hyphenated or compound words, particularly the suffix portion after a dash or within multi-part terms (like \"Fantographics,\" \"beatniks,\" \"Yankovic,\" \"bouncer,\" \"truancy,\" \"Three Stooges\"). It appears to detect word continuations or the second component of compound/hyphenated constructions.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 4947,
+    "explanation": "This feature fires on coordinating conjunctions and prepositions that connect or introduce multiple entities, alternatives, or expanded scope (words like \"multiple,\" \"and,\" \"or,\" \"to\") in contexts where the text is enumerating, listing, or describing diverse options/approaches.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 5578,
+    "explanation": "This feature fires on tokens that follow negations or modal constructions in clauses expressing absence, inability, or lack (e.g., \"don't have\", \"ought to take\", \"will help you\"). The tokens are typically auxiliary verbs, pronouns, or prepositions that complete negated or modal phrases.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 7340,
+    "explanation": "This feature fires on capitalized nouns that are part of proper nouns, titles, or branded names (e.g., \"Victory\" in a game title, \"Campaign\" in a game series name, \"Star\" in \"G-Star expo\", \"Grindcraft\" as a game name, \"Pole Position\" as a title). It detects title-case words functioning as part of distinctive proper names or product titles.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 15379,
+    "explanation": "This feature fires on nouns and noun phrases that complete descriptive or categorical statements, particularly when they follow adjectives or appear in positions where they define or specify what something \"is\" or what category/type something belongs to. The tokens are typically content words (yes, City, scopes, abled, capacity, accommodation, will, specialize) that ground abstract or general descriptions into concrete semantic categories.",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 2732,
+    "explanation": "This feature fires on possessive markers and contractions involving apostrophes, particularly on the apostrophe itself or the letter(s) immediately following it in constructions like \"'s\", \"'t\", and \"'s\". The common pattern is the apostrophe-based morphological marking that indicates possession, contraction, or grammatical modification.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 10430,
+    "explanation": "This feature fires on tokens that complete or follow short, high-frequency function words and phrasemes, particularly copula/auxiliary verbs (\"are\"), prepositions (\"to\"), and nouns that complete common noun phrases (\"company\", \"House\", \"know\"). The pattern suggests detection of tokens that appear in frequent, templatic sequences following discourse markers or opening clauses.",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 17157,
+    "explanation": "This feature fires on short, high-frequency function words and auxiliary verbs (among, as, only, and, of, adults, is, begin) that serve as grammatical connectors or markers within clauses, particularly those that introduce new semantic units or modify existing ones.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 14710,
+    "explanation": "This feature detects tokens that appear in passive voice constructions or auxiliary verb phrases, particularly words immediately preceding or within \"will be,\" \"to be,\" or similar passive/auxiliary patterns where the token functions as a grammatical connector or subject in a reduced relative clause structure.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 16434,
+    "explanation": "This feature fires on common English words (particularly pronouns, auxiliaries, and nouns) that appear in positions where they function as semantic anchors or topic-shifters within argumentative or informational text, likely capturing general high-frequency tokens that carry propositional weight in discourse.",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 2045,
+    "explanation": "This feature fires on common nouns and noun phrases that follow prepositions, verbs, or other function words\u2014specifically tokens that serve as objects or complements completing a clause or phrase (e.g., \"doing,\" \"in,\" \"joy,\" \"unique,\" \"adaptation,\" \"work\"). The feature appears to detect syntactically significant content words that anchor meaning after lightweight structural words.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 10661,
+    "explanation": "This feature fires on tokens that introduce or emphasize consequential statements, particularly auxiliary verbs (\"would,\" \"is,\" \"are\") and key content words (\"usually,\" \"tips,\" \"explain\") that signal the onset of important information, consequences, or practical guidance following a setup or condition.",
+    "confidence": "MEDIUM"
+  }
+]

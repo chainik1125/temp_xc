@@ -1,0 +1,152 @@
+[
+  {
+    "feat_idx": 1579,
+    "explanation": "This feature fires on single decimal digits (particularly 3-9) that appear immediately after a decimal point in numerical values, especially in contexts involving ratings, percentages, statistics, and metrics.",
+    "confidence": "HIGH"
+  },
+  {
+    "feat_idx": 16973,
+    "explanation": "This feature fires on location names and geographic identifiers (city names like Gerlach, Carrollton Ga., Dunnellon, Mount Evelyn), as well as numerals that follow specific formatting patterns (times like 8:01 PM, 2:00pm, prices like $186.14). The common thread is tokens that appear in informational/factual contexts providing specific place or numerical data.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 17996,
+    "explanation": "This feature detects abbreviations and abbreviated forms, particularly common short abbreviations like \"i.e.\" (id est), \"a.m.\" (ante meridiem), and domain-specific abbreviated titles or roles (analyst, board, depth used as modifier). The firing tokens mark the end or completion of these truncated word forms.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 11209,
+    "explanation": "This feature detects numeric tokens that appear in the middle of compound numbers or as individual digits within larger numerical contexts (scores, dates, addresses, match statistics). The firing occurs on the digit itself when it's part of multi-digit numbers like \"40\", \"2009\", \"6\", \"10\", \"199\", \"2-1\", and \"5th\".",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 10180,
+    "explanation": "This feature fires on numeric tokens that appear in metadata contexts like timestamps, dates, publication years, and reference citations\u2014specifically numbers that follow colons, slashes, or parentheses in structured information blocks.",
+    "confidence": "HIGH"
+  },
+  {
+    "feat_idx": 347,
+    "explanation": "This feature fires on tokens that complete or conclude descriptive phrases about physical spaces, amenities, or services\u2014particularly nouns and verbs that end clauses describing what a location/product includes or offers (e.g., \"area\", \"system\", \"app\", \"be available\"). The feature appears sensitive to tokens following descriptive content in marketing/informational text.",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 15410,
+    "explanation": "This feature detects the second digit in two-digit time components (minutes or hours in timestamps), particularly when those digits are in the range 4-9. The firing tokens are consistently the second digit of minutes (26, 15, 34, 44) or hours (19, 11) in temporal expressions.",
+    "confidence": "HIGH"
+  },
+  {
+    "feat_idx": 10225,
+    "explanation": "This feature fires on auxiliary verbs and copulas in passive voice constructions or present perfect/progressive tenses (\"were spent\", \"is available\", \"with\", \"s\" as contraction of \"is\"). The pattern involves verbs that follow passive voice subjects or link clauses together in descriptive statements about states/actions.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 8171,
+    "explanation": "This feature detects tokens that appear within product description or marketing copy, particularly nouns, adjectives, and verbs that describe product features, ingredients, or characteristics (like \"cleaner,\" \"glass,\" \"acting,\" \"formula\"). The firing pattern suggests it activates on content-bearing words in commercial/promotional text blocks.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 1969,
+    "explanation": "This feature fires on punctuation and short grammatical markers (periods, commas, colons, \"of\", \"Bought\") that appear at natural boundaries in structured text like product listings, bibliographic entries, and metadata fields.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 7287,
+    "explanation": "This feature detects tokens that complete or are part of proper nouns, brand names, titles, or distinctive quoted phrases\u2014specifically the second word in compound nominal expressions or the concluding word of a titled work/entity name that appears in quotation marks or as a defined reference.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 13011,
+    "explanation": "This feature fires on tokens that complete or conclude product names, product descriptions, and quantitative specifications\u2014typically nouns or numbers that finish branded items, product categories, or inventory counts (Locker, erve, 0, Yellow, ings, in, or, 0).",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 6271,
+    "explanation": "This feature fires on punctuation and contraction markers that follow or are embedded within common word boundaries, particularly commas, apostrophes in contractions (It's, There's), and periods/numbers that serve as sentence or numerical delimiters. The activations cluster around tokens that mark structural boundaries in text rather than semantic content.",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 9374,
+    "explanation": "This feature detects the contracted form \"'s\" (apostrophe-s) appearing after pronouns and proper nouns, particularly in opening phrases like \"There's\" and \"Here's\" that begin sentences, as well as possessive constructions like \"Sheriff's\" and contractions like \"haven't\".",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 18203,
+    "explanation": "This feature detects tokens that appear at formatting or structural boundaries, particularly punctuation marks, possessive apostrophes, and capitalized words that mark transitions between distinct text sections or metadata fields (time stamps, headers, product descriptions, medical information). These tokens commonly appear immediately before or after line breaks, category shifts, or content type changes.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 10787,
+    "explanation": "This feature fires on nouns or noun phrases that appear in lists or enumerations, particularly items being catalogued, described as amenities, or itemized as part of a series. The tokens are typically products, materials, or features being listed with commas or as part of descriptive inventories.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 17416,
+    "explanation": "This feature fires on tokens that complete or follow specific time/date references, numerical specifications, or formal administrative/legislative titles. The pattern includes time designations (pm), date years (1821, 2012), measurement ranges, and formal institutional terms (Average, Act, Saucer, to).",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 10702,
+    "explanation": "This feature fires on abbreviations and shortened forms that follow time expressions or appear in text formatting contexts, particularly \"p.m.\" and \"a.m.\" time designations, as well as occasional standalone abbreviated words like \"Inspirational\" that follow special formatting symbols.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 9058,
+    "explanation": "This feature detects the firing token as part of a proper noun or surname, particularly when the token completes a person's name (surnames like \"Santoro\", \"de Stefano\", \"Grosjean\", \"Brockovich\", \"Ioia\") or religious/formal titles (like \"Matushka\"). The feature fires on the final morphological component of multi-part names.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 16895,
+    "explanation": "This feature detects tokens that appear within or immediately adjacent to placeholder/filler text, specifically the Latin \"Lorem Ipsum\"-style passage (\"Mauris felis leo, consectetur in tempus quis, commodo ut sapien\") that commonly appears as dummy content in templates and web design mockups.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 6370,
+    "explanation": "This feature fires on abbreviations and shortened forms, particularly common initialisms like \"U.S.\" and \"a.m.\"/\"p.m.\" that appear in formal or journalistic writing, as well as numerical components within larger expressions like \"48-year-old\".",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 12402,
+    "explanation": "This feature fires on punctuation and structural markers that separate or conclude metadata/informational elements, particularly commas, dashes, and \"on/were/after\" connectors that link descriptive or categorical information in formatted text (dates, locations, attributions, tags).",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 17098,
+    "explanation": "This feature fires on tokens that immediately follow proper nouns or geographic locations (surnames, place names, and possessive markers after names), particularly when they mark transitions in text structure like commas after place names or apostrophes in possessives.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 2175,
+    "explanation": "This feature detects tokens that follow punctuation marks or function words and introduce new clausal or topical content, particularly those that begin sentences, examples, or explanatory phrases (like \"For\", \"when\", \"the\", \"present\"). It fires on words that serve as discourse markers or conjunctions that shift focus or elaborate on preceding information.",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 12648,
+    "explanation": "This feature fires on tokens that immediately follow a period or abbreviation marker, particularly tokens that complete abbreviated forms (like \"S.\" for United States, \"p.m.\" for time) or serve as the second element in paired constructions (like \"and the\"). It appears to detect tokens that follow punctuation or formatting breaks that signal a new informational unit.",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 16964,
+    "explanation": "This feature detects measurement units and quantitative descriptors that follow numeric values or quantities, including units of weight/volume (lbs, oz, ml), material specifications (plated, leather), and prepositional phrases that complete quantitative expressions (with salt, and).",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 4265,
+    "explanation": "This feature fires on tokens that appear immediately before or after structural/punctuation elements that separate list items, prices, or citations\u2014specifically tokens that precede conjunctions like \"to\", possessives like \"'s\", numbers in pricing/dates, or serve as connectors in enumerated content. The feature captures boundary markers in semi-structured text formats.",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 27,
+    "explanation": "This feature fires on the second part of hyphenated or parenthetically-defined medical/scientific terms, specifically when a word is broken across a line or followed by a pronunciation guide, abbreviation expansion, or technical clarification in parentheses.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 13714,
+    "explanation": "This feature fires on discourse connectives and transition words that introduce new clauses or sentences, particularly words like \"On,\" \"of,\" \"to,\" \"The,\" \"with,\" \"This,\" and \"A\" that appear at the beginning of new narrative units or clauses following periods or other major punctuation.",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 4849,
+    "explanation": "This feature fires on punctuation and structural markers that separate metadata fields or introduce list items\u2014specifically colons, commas, and apostrophes that demarcate temporal/date information, field labels, or transitional phrases in semi-structured text like email headers, timestamps, and enumerated content.",
+    "confidence": "MEDIUM"
+  }
+]

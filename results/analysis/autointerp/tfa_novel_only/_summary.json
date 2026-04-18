@@ -1,0 +1,152 @@
+[
+  {
+    "feat_idx": 15328,
+    "explanation": "This feature fires on opening punctuation marks (parentheses, quotation marks, dollar signs) that begin quoted speech, titles, prices, or parenthetical asides\u2014specifically the delimiter that introduces a distinct textual unit or value interrupting the main narrative flow.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 4370,
+    "explanation": "This feature fires on opening quotation marks and similar punctuation that precede direct speech, quoted text, or structured list/document markers (like line breaks introducing new sections). The token positions consistently mark the beginning of quoted material or formal structural boundaries.",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 4826,
+    "explanation": "This feature fires on opening quotation marks (both straight quotes \" and parentheses used as quotative markers) that introduce quoted speech, titles, or referenced phrases within text.",
+    "confidence": "HIGH"
+  },
+  {
+    "feat_idx": 12325,
+    "explanation": "This feature fires on tokens immediately following punctuation or special characters (parentheses, quotes, newlines) that mark boundaries or insertions in text, particularly when the next token begins a new semantic unit or provides clarification/metadata.",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 6790,
+    "explanation": "This feature detects hyphens used as compound word/phrase connectors or separators, particularly in contexts where they link adjectives to nouns (world-class, first-round, pro-) or create hyphenated proper nouns (Pulitzer-Prize). The feature also fires on standalone hyphens serving as list/item markers or structural separators.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "feat_idx": 12074,
+    "explanation": "This feature fires on list markers and delimiters that separate items or introduce new content\u2014specifically tokens like \"1\" at the start of a line (beginning list items), \"-\" introducing bullet points, \"|\" as a column separator, and \"the\" beginning a descriptive phrase after a name. The feature appears to detect structural formatting tokens that mark content boundaries or item introductions.",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 18411,
+    "explanation": "This feature fires on tokens that immediately follow the beginning-of-sequence marker (<bos>) or appear as list/formatting delimiters (numbers, dashes, pipes), capturing tokens that serve as structural markers or initiators of new content blocks rather than semantic content.",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 1102,
+    "explanation": "This feature fires on tokens that begin structured list or bullet-point sections, particularly the first item marker or delimiter (digits \"1\", hyphens \"-\", pipes \"|\") that introduce enumerated content or formatted metadata. The consistently low activation values and diverse contexts suggest the feature weakly detects structural markers that signal the onset of list formatting.",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 17230,
+    "explanation": "This feature detects newline tokens (represented as \u00ab\\n\u00bb) that appear after metadata, headers, or structural breaks in text documents. These newlines typically mark transitions between document sections like titles/bylines and content, or between metadata and main text.",
+    "confidence": "HIGH"
+  },
+  {
+    "feat_idx": 12854,
+    "explanation": "This feature fires on numeric tokens (digits or numbers like \"1\", \"2\", \"12:15pm\") and years that appear in specific contexts, particularly at the beginning of proper nouns, titles, or temporal references in structured text like product reviews, dates, and event names.",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 4043,
+    "explanation": "This feature fires on tokens immediately following the beginning-of-sequence marker (<bos>) or padding sequences, particularly on numerical digits, hyphens, and common words that often start documents or list items. It appears to detect tokens that occur at the very start of text sequences or structural boundaries.",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 16803,
+    "explanation": "This feature detects tokens that appear immediately after padding or beginning-of-sequence markers at the start of text sequences, particularly numeric characters (1, -) and common function words (is, the) that typically begin actual content after formatting/structural tokens.",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 7527,
+    "explanation": "This feature fires on tokens that begin proper nouns or specific named entities (names of people like \"Lil C\", \"Samuel Joseph\", place names like \"China\", and numbers starting sequences like \"100\"). The activation appears to detect the onset of distinctive, capitalized identifiers within running text.",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 9464,
+    "explanation": "This feature fires on tokens immediately following proper nouns or named entities (names of people, places, organizations, products) when they appear at or near the beginning of text passages, particularly after padding or beginning-of-sequence markers. The activations seem to mark the start of substantive content after metadata or structural elements.",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 2311,
+    "explanation": "This feature fires on tokens immediately following the beginning-of-sequence marker (<bos>) or padding sequences, particularly capturing the first substantive token in a document or the start of actual content after structural markers.",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 9398,
+    "explanation": "This feature fires on tokens immediately following the beginning-of-sequence marker (<bos>) or padding, particularly on punctuation, numbers, and articles that start new documents or list items. These are tokens at document/sequence boundaries that serve structural or formatting roles rather than carrying primary semantic content.",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 3385,
+    "explanation": "This feature detects tokens that appear immediately after the beginning-of-sequence marker (<bos>) or padding sequences, particularly numeric tokens, single characters, or short words that start new text segments or list items.",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 3452,
+    "explanation": "This feature fires on tokens immediately following beginning-of-sequence markers (<bos>) or after padding, typically capturing the first substantive token of a new text segment or the start of meaningful content after structural padding.",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 13940,
+    "explanation": "This feature fires on tokens that appear immediately after the beginning-of-sequence marker (<bos>) or after padding, particularly capturing numeric digits, dashes, and common structural words that typically initiate content. It detects the onset of actual content generation after padding/initialization tokens.",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 16392,
+    "explanation": "This feature fires on tokens that appear immediately after the beginning-of-sequence marker (`<bos>`) or padding sequences, typically capturing the first substantive token of a new text segment or the start of a list/enumeration item. The activation pattern suggests the feature detects structural boundaries where new content begins.",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 14552,
+    "explanation": "This feature fires on tokens immediately following the beginning-of-sequence marker (`<bos>`) or after padding, typically capturing the first meaningful token of a document or list item. The firing tokens are diverse (numbers, hyphens, articles, proper nouns) but share the positional property of appearing at document boundaries or list starts.",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 8622,
+    "explanation": "This feature fires on tokens that appear immediately after padding or beginning-of-sequence markers at the start of documents/lists, typically capturing the first substantive content token (numbers, dashes, or articles) that initiates a new section or item.",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 12344,
+    "explanation": "This feature fires on structural markers at the beginning of sequences\u2014specifically numbers (1, -) and short words/contractions (is, the, inas) that appear immediately after BOS tokens or padding, often marking the start of lists, titles, or formatted text blocks.",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 16192,
+    "explanation": "This feature fires on tokens immediately following the beginning-of-sequence marker (<bos>) or padding, typically capturing the first substantive token of a new text sequence or section. The firing tokens are consistently initial position markers, numbers, or first words that begin fresh content blocks.",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 18332,
+    "explanation": "This feature fires on tokens that immediately follow proper nouns, names, or title beginnings\u2014specifically detecting the continuation or completion of named entities and their associated descriptive elements (like \"is\", \"the\", \"approach\", etc.). The pattern shows activation on tokens that follow or are part of names and then transition into additional contextual information about those entities.",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 9770,
+    "explanation": "This feature detects tokens that immediately follow the beginning-of-sequence marker (<bos>) or appear at the start of a new line/section in structured text, particularly hyphens, numbers, and articles that function as opening tokens in lists, itemized content, or document headers.",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 16828,
+    "explanation": "This feature detects tokens that follow common noun phrases or proper nouns in contexts where the token itself completes or continues an entity reference\u2014specifically articles (\"the\", \"is\"), numbers (\"1\"), or parts of names (\"inas\", \"Jones\", \"Weis\") that serve as continuations or identifiers of entities just introduced or referenced.",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 8869,
+    "explanation": "This feature detects tokens that appear immediately after padding sequences or at the beginning of text (after <bos> or <pad>), particularly marking the start of new content blocks or list items. The firing tokens are largely structural markers (numbers, dashes, articles) that initiate document sections or entries.",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 13644,
+    "explanation": "This feature fires on tokens that appear immediately after the beginning-of-sequence marker (<bos>) or after padding, typically capturing the first meaningful token in a sequence or the start of list/bullet point items (marked by dashes or numbers).",
+    "confidence": "LOW"
+  },
+  {
+    "feat_idx": 2807,
+    "explanation": "This feature fires on tokens immediately following the beginning-of-sequence marker (<bos>) or padding sequences, particularly on numerical characters, punctuation, and common function words that typically begin documents or list items. It appears to detect tokens in initial/structural positions that mark the start of new content blocks.",
+    "confidence": "LOW"
+  }
+]
