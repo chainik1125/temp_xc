@@ -44,6 +44,7 @@ import torch
 from src.bench.saebench.aggregation import AggregationName, aggregate
 from src.bench.saebench.configs import (
     CKPT_DIR,
+    CONTEXT_LENGTH,
     D_MODEL,
     D_SAE,
     MLC_LAYERS,
@@ -205,8 +206,12 @@ def run_mlc_probing(
                 feats_out = []
                 for i in range(0, len(all_texts), batch_size):
                     chunk = all_texts[i : i + batch_size]
-                    toks = llm.to_tokens(chunk, prepend_bos=cfg.prepend_bos)
-                    toks = toks[:, : cfg.context_length]  # truncate to context_length
+                    # SAEBench's SparseProbingEvalConfig doesn't carry prepend_bos /
+                    # context_length; the stock pipeline hardcodes them. Mirror that
+                    # here. Gemma-2's tokenizer requires BOS, and our pre-registered
+                    # context length is 128 (configs.CONTEXT_LENGTH).
+                    toks = llm.to_tokens(chunk, prepend_bos=True)
+                    toks = toks[:, :CONTEXT_LENGTH]
                     # pad token id for gemma-2-2b
                     pad_id = getattr(llm.tokenizer, "pad_token_id", 0) or 0
                     bos_id = getattr(llm.tokenizer, "bos_token_id", 2) or 2
