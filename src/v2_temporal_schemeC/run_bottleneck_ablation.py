@@ -45,7 +45,7 @@ from src.utils.device import DEFAULT_DEVICE
 from src.utils.seed import set_seed
 from src.v2_temporal_schemeC.toy_model import ToyModel
 from src.v2_temporal_schemeC.markov_data_generation import generate_markov_activations
-from src.v2_temporal_schemeC.tfa import TemporalSAE
+from src.bench.architectures._tfa_module import TemporalSAE
 from src.v2_temporal_schemeC.train_tfa import (
     TFATrainingConfig,
     create_tfa,
