@@ -58,7 +58,7 @@ def feature_recovery_score(
     curve = np.array([
         (max_per_true.cpu().numpy() >= t).mean() for t in thresholds
     ])
-    auc_val = float(np.trapz(curve, thresholds))
+    auc_val = float(np.trapezoid(curve, thresholds))
 
     return {
         "auc": auc_val,
