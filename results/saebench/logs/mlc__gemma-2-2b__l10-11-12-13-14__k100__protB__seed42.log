@@ -1,0 +1,71 @@
+============================================================
+  REAL-LM CACHED-ACTIVATION SWEEP
+  Subject:  gemma-2-2b  (d_model=2304)
+  Dataset:  fineweb / resid_L12
+  Shuffle:  False
+  d_sae:    18432  (×8 expansion)
+  Models:   ['MLC n_layers=5']
+  K:        [100]
+  Steps:    5,000
+============================================================
+
+============================================================
+  CACHED SWEEP | gemma-2-2b
+    dataset = fineweb
+    layer   = resid_L12
+    shuffle = False
+    d_in    = 2304   d_sae = 18432
+============================================================
+[data] multi-layer cached activations root=/workspace/temp_xc/data/cached_activations/gemma-2-2b/fineweb
+  loading resid_L10.npy
+  loading resid_L11.npy
+  loading resid_L12.npy
+  loading resid_L13.npy
+  loading resid_L14.npy
+  stacked: N=6000 seq_len=128 n_layers=5 d_model=2304
+
+  seed=42  k=100:
+wandb: [wandb.login()] Loaded credentials for https://api.wandb.ai from WANDB_API_KEY.
+wandb: Currently logged in as: aniketdesh (spar-temp-xc) to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
+wandb: WARNING Using a boolean value for 'reinit' is deprecated. Use 'return_previous' or 'finish_previous' instead.
+wandb: setting up run 8ixw8vfi
+wandb: Tracking run with wandb version 0.25.0
+wandb: Run data is saved locally in /workspace/temp_xc/wandb/run-20260417_212652-8ixw8vfi
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run mlc__gemma-2-2b__fineweb__resid_L12__k100__seed42__protB__T5
+wandb: ⭐️ View project at https://wandb.ai/spar-temp-xc/temporal-crosscoders
+wandb: 🚀 View run at https://wandb.ai/spar-temp-xc/temporal-crosscoders/runs/8ixw8vfi
+      [MLC n_layers=5] step     0/5000 | loss=102661.3594 | window_l0=500.00
+      [MLC n_layers=5] step   500/5000 | loss=3343.2539 | window_l0=492.01
+      [MLC n_layers=5] step  1000/5000 | loss=2918.9207 | window_l0=492.59
+      [MLC n_layers=5] step  1500/5000 | loss=2750.6213 | window_l0=487.97
+      [MLC n_layers=5] step  2000/5000 | loss=2699.3152 | window_l0=492.25
+      [MLC n_layers=5] step  2500/5000 | loss=2684.3633 | window_l0=490.18
+      [MLC n_layers=5] step  3000/5000 | loss=2568.3611 | window_l0=487.90
+      [MLC n_layers=5] step  3500/5000 | loss=2585.2480 | window_l0=488.71
+      [MLC n_layers=5] step  4000/5000 | loss=2556.1333 | window_l0=489.34
+      [MLC n_layers=5] step  4500/5000 | loss=2546.1133 | window_l0=489.60
+      [MLC n_layers=5] step  4999/5000 | loss=2466.1023 | window_l0=486.24
+    MLC n_layers=5       | NMSE=0.0505 | L0=489.15 | 630s
+wandb: updating run metadata
+wandb: uploading output.log; uploading wandb-summary.json; uploading config.yaml
+wandb: uploading output.log; uploading wandb-summary.json
+wandb: uploading history steps 10-10, summary, console lines 11-11
+wandb: 
+wandb: Run history:
+wandb:      train/loss █▁▁▁▁▁▁▁▁▁▁
+wandb: train/window_l0 █▄▄▂▄▃▂▂▃▃▁
+wandb: 
+wandb: Run summary:
+wandb:     elapsed_sec 630.4939
+wandb:              l0 489.1525
+wandb:            nmse 0.05051
+wandb:      train/loss 2466.10229
+wandb: train/window_l0 486.23633
+wandb: 
+wandb: 🚀 View run mlc__gemma-2-2b__fineweb__resid_L12__k100__seed42__protB__T5 at: https://wandb.ai/spar-temp-xc/temporal-crosscoders/runs/8ixw8vfi
+wandb: ⭐️ View project at: https://wandb.ai/spar-temp-xc/temporal-crosscoders
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./wandb/run-20260417_212652-8ixw8vfi/logs
+
+  SWEEP COMPLETE | 1 runs | results/saebench/sweeps/mlc_protB_T5/results_gemma-2-2b__fineweb__resid_L12.json

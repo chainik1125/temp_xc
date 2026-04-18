@@ -1,0 +1,79 @@
+============================================================
+  REAL-LM CACHED-ACTIVATION SWEEP
+  Subject:  gemma-2-2b  (d_model=2304)
+  Dataset:  fineweb / resid_L12
+  Shuffle:  False
+  d_sae:    18432  (×8 expansion)
+  Models:   ['TXCDR T=20']
+  K:        [2000]
+  Steps:    5,000
+============================================================
+
+============================================================
+  CACHED SWEEP | gemma-2-2b
+    dataset = fineweb
+    layer   = resid_L12
+    shuffle = False
+    d_in    = 2304   d_sae = 18432
+============================================================
+[data] loading cached activations /workspace/temp_xc/data/cached_activations/gemma-2-2b/fineweb/resid_L12.npy
+  shape=(6000,128,2304) shuffle=False
+/workspace/temp_xc/src/bench/data.py:376: UserWarning: The given NumPy array is not writable, and PyTorch does not support non-writable tensors. This means writing to this tensor will result in undefined behavior. You may want to copy the array to protect its data or make it writable before converting it to a tensor. This type of warning will be suppressed for the rest of this program. (Triggered internally at /pytorch/torch/csrc/utils/tensor_numpy.cpp:203.)
+  full = torch.from_numpy(np.asarray(arr)).float()
+
+  seed=42  k=2000:
+wandb: [wandb.login()] Loaded credentials for https://api.wandb.ai from WANDB_API_KEY.
+wandb: Currently logged in as: aniketdesh (spar-temp-xc) to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
+2026/04/17 23:41:56 ERROR main: failed to get logger path error="error opening log file: open /root/.cache/wandb/logs/core-debug-20260417_234156.log: no space left on device"
+2026/04/17 23:41:56 WARN server/listeners: couldn't open Unix socket in os.TempDir() error="server/listeners: failed to make tempdir for Unix socket: mkdir /tmp/wandb-11501-11573-1744240943: no space left on device"
+2026/04/17 23:41:56 WARN server/listeners: failed to make some listeners error="server/listeners: failed to make folder in /tmp for Unix socket: mkdir /tmp/wandb-11501-11573-1534111073: no space left on device"
+2026/04/17 23:41:56 INFO server: accepting connections addr=127.0.0.1:41673
+2026/04/17 23:41:56 INFO server: will exit if parent process dies ppid=11501
+2026/04/17 23:41:56 INFO connection: ManageConnectionData: new connection created id=1(127.0.0.1:46386)
+2026/04/17 23:41:56 INFO handleInformInit: received streamId=x7ktm1wi id=1(127.0.0.1:46386)
+wandb: WARNING Using a boolean value for 'reinit' is deprecated. Use 'return_previous' or 'finish_previous' instead.
+2026/04/17 23:41:57 INFO handleInformInit: stream started streamId=x7ktm1wi id=1(127.0.0.1:46386)
+wandb: setting up run x7ktm1wi
+wandb: Tracking run with wandb version 0.25.0
+wandb: Run data is saved locally in /workspace/temp_xc/wandb/run-20260417_234156-x7ktm1wi
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run crosscoder__gemma-2-2b__fineweb__resid_L12__k2000__seed42__protB__T20
+wandb: ⭐️ View project at https://wandb.ai/spar-temp-xc/temporal-crosscoders
+wandb: 🚀 View run at https://wandb.ai/spar-temp-xc/temporal-crosscoders/runs/x7ktm1wi
+2026/04/17 23:42:03 INFO connection: cancelling request id=1(127.0.0.1:46386) requestId=cf8zc2d8fy39
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/workspace/temp_xc/src/bench/sweep.py", line 675, in <module>
+    main()
+  File "/workspace/temp_xc/src/bench/sweep.py", line 598, in main
+    run_cached_sweep(
+  File "/workspace/temp_xc/src/bench/sweep.py", line 383, in run_cached_sweep
+    entry.spec.train(
+  File "/workspace/temp_xc/src/bench/architectures/crosscoder.py", line 108, in train
+    loss, _, z = model(x)
+                 ^^^^^^^^
+  File "/workspace/temp_xc/.venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1773, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/temp_xc/.venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1784, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/temp_xc/src/bench/architectures/crosscoder.py", line 69, in forward
+    z = self.encode(x)
+        ^^^^^^^^^^^^^^
+  File "/workspace/temp_xc/src/bench/architectures/crosscoder.py", line 56, in encode
+    topk_vals, topk_idx = pre.topk(self.k, dim=-1)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: selected index k out of range
+2026/04/17 23:42:10 INFO handleInformTeardown: server teardown initiated id=1(127.0.0.1:46386)
+2026/04/17 23:42:10 INFO server is shutting down
+2026/04/17 23:42:10 INFO connection: closing id=1(127.0.0.1:46386)
+2026/04/17 23:42:10 INFO server: listener closed addr=127.0.0.1:41673
+2026/04/17 23:42:10 INFO connection: closed successfully id=1(127.0.0.1:46386)
+[1;34mwandb[0m: 
+[1;34mwandb[0m: 🚀 View run [33mcrosscoder__gemma-2-2b__fineweb__resid_L12__k2000__seed42__protB__T20[0m at: [34mhttps://wandb.ai/spar-temp-xc/temporal-crosscoders/runs/x7ktm1wi[0m
+[1;34mwandb[0m: Find logs at: [1;35mwandb/run-20260417_234156-x7ktm1wi/logs[0m
+2026/04/17 23:42:12 INFO handleInformTeardown: server shutdown complete id=1(127.0.0.1:46386)
+2026/04/17 23:42:12 INFO connection: ManageConnectionData: connection closed id=1(127.0.0.1:46386)
+2026/04/17 23:42:12 INFO server is closed

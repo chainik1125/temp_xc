@@ -1,0 +1,72 @@
+============================================================
+  REAL-LM CACHED-ACTIVATION SWEEP
+  Subject:  gemma-2-2b  (d_model=2304)
+  Dataset:  fineweb / resid_L12
+  Shuffle:  False
+  d_sae:    18432  (×8 expansion)
+  Models:   ['TXCDR T=5']
+  K:        [100]
+  Steps:    5,000
+============================================================
+
+============================================================
+  CACHED SWEEP | gemma-2-2b
+    dataset = fineweb
+    layer   = resid_L12
+    shuffle = False
+    d_in    = 2304   d_sae = 18432
+============================================================
+[data] loading cached activations /workspace/temp_xc/data/cached_activations/gemma-2-2b/fineweb/resid_L12.npy
+  shape=(6000,128,2304) shuffle=False
+/workspace/temp_xc/src/bench/data.py:376: UserWarning: The given NumPy array is not writable, and PyTorch does not support non-writable tensors. This means writing to this tensor will result in undefined behavior. You may want to copy the array to protect its data or make it writable before converting it to a tensor. This type of warning will be suppressed for the rest of this program. (Triggered internally at /pytorch/torch/csrc/utils/tensor_numpy.cpp:203.)
+  full = torch.from_numpy(np.asarray(arr)).float()
+
+  seed=42  k=100:
+wandb: [wandb.login()] Loaded credentials for https://api.wandb.ai from WANDB_API_KEY.
+wandb: Currently logged in as: aniketdesh (spar-temp-xc) to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
+wandb: WARNING Using a boolean value for 'reinit' is deprecated. Use 'return_previous' or 'finish_previous' instead.
+wandb: setting up run 8mcqh7yr
+wandb: Tracking run with wandb version 0.25.0
+wandb: Run data is saved locally in /workspace/temp_xc/wandb/run-20260417_213729-8mcqh7yr
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run crosscoder__gemma-2-2b__fineweb__resid_L12__k100__seed42__protA__T5
+wandb: ⭐️ View project at https://wandb.ai/spar-temp-xc/temporal-crosscoders
+wandb: 🚀 View run at https://wandb.ai/spar-temp-xc/temporal-crosscoders/runs/8mcqh7yr
+      [TXCDR T=5] step     0/5000 | loss=52834.4492 | window_l0=500.00
+      [TXCDR T=5] step   500/5000 | loss=5842.7612 | window_l0=490.36
+      [TXCDR T=5] step  1000/5000 | loss=5246.8140 | window_l0=488.65
+      [TXCDR T=5] step  1500/5000 | loss=4567.6641 | window_l0=491.11
+      [TXCDR T=5] step  2000/5000 | loss=4479.1558 | window_l0=471.01
+      [TXCDR T=5] step  2500/5000 | loss=4537.6606 | window_l0=473.19
+      [TXCDR T=5] step  3000/5000 | loss=4352.2290 | window_l0=485.63
+      [TXCDR T=5] step  3500/5000 | loss=4146.1367 | window_l0=493.79
+      [TXCDR T=5] step  4000/5000 | loss=4294.3228 | window_l0=499.91
+      [TXCDR T=5] step  4500/5000 | loss=4151.0371 | window_l0=479.20
+      [TXCDR T=5] step  4999/5000 | loss=4040.4226 | window_l0=477.77
+/workspace/temp_xc/.venv/lib/python3.11/site-packages/umap/umap_.py:1952: UserWarning: n_jobs value 1 overridden to 1 by setting random_state. Use no seed for parallelism.
+  warn(
+    TXCDR T=5            | NMSE=0.1477 | L0=490.42 | 930s
+wandb: uploading artifact crosscoder-gemma-2-2b-fineweb-resid_L12-k100-seed42; updating run metadata
+wandb: uploading artifact crosscoder-gemma-2-2b-fineweb-resid_L12-k100-seed42
+wandb: uploading artifact crosscoder-gemma-2-2b-fineweb-resid_L12-k100-seed42; uploading output.log; uploading wandb-summary.json; uploading config.yaml
+wandb: uploading artifact crosscoder-gemma-2-2b-fineweb-resid_L12-k100-seed42; uploading output.log; uploading config.yaml
+wandb: uploading artifact crosscoder-gemma-2-2b-fineweb-resid_L12-k100-seed42; uploading output.log; uploading config.yaml; uploading history steps 10-10, summary, console lines 13-13
+wandb: uploading artifact crosscoder-gemma-2-2b-fineweb-resid_L12-k100-seed42
+wandb: 
+wandb: Run history:
+wandb:      train/loss █▁▁▁▁▁▁▁▁▁▁
+wandb: train/window_l0 █▆▅▆▁▂▅▆█▃▃
+wandb: 
+wandb: Run summary:
+wandb:     elapsed_sec 930.46893
+wandb:              l0 490.41987
+wandb:            nmse 0.14765
+wandb:      train/loss 4040.42261
+wandb: train/window_l0 477.76562
+wandb: 
+wandb: 🚀 View run crosscoder__gemma-2-2b__fineweb__resid_L12__k100__seed42__protA__T5 at: https://wandb.ai/spar-temp-xc/temporal-crosscoders/runs/8mcqh7yr
+wandb: ⭐️ View project at: https://wandb.ai/spar-temp-xc/temporal-crosscoders
+wandb: Synced 5 W&B file(s), 0 media file(s), 2 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./wandb/run-20260417_213729-8mcqh7yr/logs
+
+  SWEEP COMPLETE | 1 runs | results/saebench/sweeps/tempxc_protA_T5/results_gemma-2-2b__fineweb__resid_L12.json

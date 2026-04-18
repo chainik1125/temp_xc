@@ -1,0 +1,69 @@
+============================================================
+  REAL-LM CACHED-ACTIVATION SWEEP
+  Subject:  gemma-2-2b  (d_model=2304)
+  Dataset:  fineweb / resid_L12
+  Shuffle:  False
+  d_sae:    18432  (×8 expansion)
+  Models:   ['TXCDR T=10']
+  K:        [50]
+  Steps:    5,000
+============================================================
+
+============================================================
+  CACHED SWEEP | gemma-2-2b
+    dataset = fineweb
+    layer   = resid_L12
+    shuffle = False
+    d_in    = 2304   d_sae = 18432
+============================================================
+[data] loading cached activations /workspace/temp_xc/data/cached_activations/gemma-2-2b/fineweb/resid_L12.npy
+  shape=(6000,128,2304) shuffle=False
+/workspace/temp_xc/src/bench/data.py:376: UserWarning: The given NumPy array is not writable, and PyTorch does not support non-writable tensors. This means writing to this tensor will result in undefined behavior. You may want to copy the array to protect its data or make it writable before converting it to a tensor. This type of warning will be suppressed for the rest of this program. (Triggered internally at /pytorch/torch/csrc/utils/tensor_numpy.cpp:203.)
+  full = torch.from_numpy(np.asarray(arr)).float()
+
+  seed=42  k=50:
+wandb: [wandb.login()] Loaded credentials for https://api.wandb.ai from WANDB_API_KEY.
+wandb: Currently logged in as: aniketdesh (spar-temp-xc) to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
+wandb: WARNING Using a boolean value for 'reinit' is deprecated. Use 'return_previous' or 'finish_previous' instead.
+wandb: setting up run pjse7zcq
+wandb: Tracking run with wandb version 0.25.0
+wandb: Run data is saved locally in /workspace/temp_xc/wandb/wandb/run-20260418_005058-pjse7zcq
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run crosscoder__gemma-2-2b__fineweb__resid_L12__k50__seed42__protB__T10
+wandb: ⭐️ View project at https://wandb.ai/spar-temp-xc/temporal-crosscoders
+wandb: 🚀 View run at https://wandb.ai/spar-temp-xc/temporal-crosscoders/runs/pjse7zcq
+      [TXCDR T=10] step     0/5000 | loss=64775.9883 | window_l0=500.00
+      [TXCDR T=10] step   500/5000 | loss=7199.6860 | window_l0=492.20
+      [TXCDR T=10] step  1000/5000 | loss=6631.7642 | window_l0=500.00
+      [TXCDR T=10] step  1500/5000 | loss=5924.9297 | window_l0=482.69
+      [TXCDR T=10] step  2000/5000 | loss=6015.9556 | window_l0=496.35
+      [TXCDR T=10] step  2500/5000 | loss=5555.5952 | window_l0=482.20
+      [TXCDR T=10] step  3000/5000 | loss=5645.2983 | window_l0=493.65
+      [TXCDR T=10] step  3500/5000 | loss=5332.0107 | window_l0=500.00
+      [TXCDR T=10] step  4000/5000 | loss=5162.5571 | window_l0=478.36
+      [TXCDR T=10] step  4500/5000 | loss=5321.9644 | window_l0=483.85
+      [TXCDR T=10] step  4999/5000 | loss=5191.5732 | window_l0=473.38
+/workspace/temp_xc/.venv/lib/python3.11/site-packages/umap/umap_.py:1952: UserWarning: n_jobs value 1 overridden to 1 by setting random_state. Use no seed for parallelism.
+  warn(
+    TXCDR T=10           | NMSE=0.2145 | L0=491.16 | 1407s
+wandb: updating run metadata
+wandb: uploading output.log; uploading wandb-summary.json; uploading config.yaml
+wandb: uploading history steps 10-10, summary, console lines 13-13
+wandb: 
+wandb: Run history:
+wandb:      train/loss █▁▁▁▁▁▁▁▁▁▁
+wandb: train/window_l0 █▆█▃▇▃▆█▂▄▁
+wandb: 
+wandb: Run summary:
+wandb:     elapsed_sec 1407.08592
+wandb:              l0 491.15767
+wandb:            nmse 0.21455
+wandb:      train/loss 5191.57324
+wandb: train/window_l0 473.3833
+wandb: 
+wandb: 🚀 View run crosscoder__gemma-2-2b__fineweb__resid_L12__k50__seed42__protB__T10 at: https://wandb.ai/spar-temp-xc/temporal-crosscoders/runs/pjse7zcq
+wandb: ⭐️ View project at: https://wandb.ai/spar-temp-xc/temporal-crosscoders
+wandb: Synced 5 W&B file(s), 0 media file(s), 2 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./wandb/wandb/run-20260418_005058-pjse7zcq/logs
+
+  SWEEP COMPLETE | 1 runs | results/saebench/sweeps/tempxc_protB_T10/results_gemma-2-2b__fineweb__resid_L12.json
