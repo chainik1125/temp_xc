@@ -206,6 +206,12 @@ def run_probing(
     cfg.llm_batch_size = activation_collection.LLM_NAME_TO_BATCH_SIZE[SUBJECT_MODEL]
     cfg.llm_dtype = activation_collection.LLM_NAME_TO_DTYPE[SUBJECT_MODEL]
     cfg.k_values = list(k_values)
+    # Lower SAE-encode batch size so (B, L, T*d_sae) output fits on H100
+    # when full_window aggregation is in play. At T=20 full_window the
+    # output is 20*d_sae=368k features, and the default 125 gives
+    # 125 * 128 * 368640 * 4 = 23 GB, OOMing the ~10 GB we have free
+    # after Gemma + SAEBench's cached activations are resident.
+    cfg.sae_batch_size = 16
 
     selected_saes = [(run_id, adapter)]
 
