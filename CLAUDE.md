@@ -6,10 +6,12 @@ Welcome. You are an AI agent working on a research project to develop temporal S
 
 ## Repository structure
 
-- `src/` -- Python source code
-- `tests/` -- pytest test suite
-- `papers/` -- markdown papers for agents to ingest
-- `docs/` -- Obsidian documentation vault
+- `src/` -- reusable backend (architectures, data, training, eval, plotting, pipeline, utils)
+- `experiments/phase{2,3,4}_*/` -- phase-specific one-off experiment scripts
+- `tests/` -- pytest test suite (covers `src/` only)
+- `references/` -- vendored paper code (e.g. TemporalFeatureAnalysis); reference-only, not imported
+- `papers/` -- markdown paper summaries for agents to ingest
+- `docs/` -- Obsidian documentation vault (research logs, project brief)
 - `docs/templates/` -- document templates (Base.md, Guide.md)
 - `docs/Tags.md` -- tag taxonomy index
 - `run-checks.sh` -- runs all quality checks locally
@@ -18,8 +20,9 @@ Welcome. You are an AI agent working on a research project to develop temporal S
 - `.markdownlint.jsonc` -- markdown linting rules
 - `pyproject.toml` -- Python project configuration
 
+**Layer rule:** `experiments/` may import from `src/*`; `src/*` never imports from `experiments/`. The filesystem split enforces this — keep it that way.
 
-All code lives in `src/`. If `src/` does not yet exist, create it with appropriate submodules as needed.
+**Adding a new architecture:** drop a new file in `src/architectures/`, subclass `ArchSpec`, register it in `src/architectures/__init__.py`. It then plugs into both toy and NLP pipelines automatically.
 
 ## Environment setup
 

@@ -65,16 +65,24 @@ Shared documents: the architectural design document is at `docs/shared/temporal_
 
 ## Source code layout
 
-All code lives in `src/`. Each experiment or body of work gets its own subdirectory, but code sharing between experiments is encouraged via the `src/shared/` and `src/utils/` modules.
+Reusable backend lives in `src/` (organised by role, not version). Phase-specific experiment scripts live at repo root under `experiments/phase{2,3,4}_*/`. Filesystem enforces the separation — experiments can import from `src.*`, but `src/` never imports from `experiments/`.
 
 | Directory | Description |
 |---|---|
-| `src/shared/` | Shared modules reused across experiments (data generation, SAE training, evaluation, plotting, configs) |
-| `src/utils/` | Small standalone utilities (device selection, cosine similarity, seeding) |
-| `src/v2_temporal_schemeC/` | Temporal SAE experiments using Scheme C (Markov chain) data |
-| `src/TemporalFeatureAnalysis/` | **Reference code** from the paper "Priors in Time: Missing Inductive Biases for Language Model Interpretability". This is *not* our code — it is the paper's source included for reference. Do not modify it. |
+| `src/architectures/` | SAE variant models (TopK, ReLU, Stacked, TXCDR, TFA) with a shared `ArchSpec` interface. Single source of truth — both toy and NLP pipelines import from here. |
+| `src/data/toy/` | Synthetic data generators (Markov chain, OR-gated coupled features, base features) |
+| `src/data/nlp/` | Real-LM cached activations — loader, cache builder, layer specs, subject-model registry |
+| `src/training/` | Training loops and config dataclasses (train_tfa, train_crosscoder, train_stacked_sae, train_sae) |
+| `src/eval/` | Evaluation runner + metrics (NMSE/L0/AUC, temporal MI, activation spans, feature recovery) |
+| `src/plotting/` | Shared plot utilities (heatmaps, UMAP, save_figure) |
+| `src/pipeline/` | Reusable orchestration (architecture sweep runner, autointerp, toy sweeps, results I/O) |
+| `src/utils/` | Small cross-cutting helpers (device, seed, cos_sim, orthogonalize) |
+| `experiments/phase2_toy/` | Toy TFA-vs-SAE benchmarks, convergence/multi-seed, correlation sweeps |
+| `experiments/phase3_coupled/` | Coupled-features experiments (OR-gated, noisy emission, linear probes) |
+| `experiments/phase4_nlp/` | Gemma NLP comparison: cache activations, NLP sweep, decoder alignment, autointerp, UMAP |
+| `references/TemporalFeatureAnalysis/` | **Vendored** paper code — reference only, not imported at runtime. |
 
-When starting a new experiment, create a new subdirectory (e.g. `src/v2_temporal_xc/`) and import shared utilities from `src/shared/` rather than duplicating code.
+When starting a new experiment, create a new script under `experiments/phaseN_*/` and import backend modules from `src.*`. When the backend needs a new capability (e.g. a new architecture), add it under `src/architectures/` following the `ArchSpec` interface — it is then automatically available to any experiment.
 
 ## Current progress
 

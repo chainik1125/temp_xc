@@ -49,7 +49,7 @@ import torch
 print(f'GPU: {torch.cuda.get_device_name(0)}')
 print(f'VRAM: {torch.cuda.get_device_properties(0).total_memory/1e9:.0f} GB')
 print(f'torch: {torch.__version__}, cuda: {torch.cuda.is_available()}')
-from src.bench.architectures._tfa_module import TemporalSAE  # smoke test
+from src.architectures._tfa_module import TemporalSAE  # smoke test
 print('✓ bench imports ok')
 "
 ```
@@ -129,7 +129,7 @@ Read the latest log for context, branch state, open questions, and next steps be
 | Cached activations | `/workspace/temp_xc/data/cached_activations/` |
 | Trained checkpoints | `/workspace/temp_xc/results/nlp_sweep/**/ckpts/` (gitignored; on-disk only) |
 | Research logs | `/workspace/temp_xc/docs/han/research_logs/phase*/` |
-| Bench framework | `/workspace/temp_xc/src/bench/` |
-| Analysis scripts | `/workspace/temp_xc/src/experiments/` |
+| Backend (architectures, data, eval, training, plotting, pipeline) | `/workspace/temp_xc/src/` |
+| Experiment scripts | `/workspace/temp_xc/experiments/phase{2,3,4}_*/` |
 | GitHub token | `/workspace/.github-token` |
 | Anthropic key | `/workspace/.anthropic-key` |
