@@ -179,15 +179,17 @@ of Venhoff source, what we changed, why.
 | cluster sizes | `{5, 10, 15, 20, 25, 30, 35, 40, 45, 50}` | Full sweep matches their protocol. Smoke tests one size. |
 | k (topk) | **3** | Their default. Our small-k retrain (Path 1) uses this. |
 | judge model | **claude-haiku-4-5-20251001** (Haiku 4.5) | **Deviation from Venhoff's GPT-4o default**. Rationale: cost + we already have Anthropic credits; Venhoff's code exposes `anthropic` as an officially supported fallback. Flagged as pre-registered invariant violation in `VENHOFF_PROVENANCE.md`. Cross-judge bridge run on N=100 sentences from smoke test to quantify GPT-4o↔Haiku drift before committing. |
+| max training steps | **10 000** (all fits — small-k Path 1 and wide Path 3) with **plateau-based early stop** (same infra as commit `2fae76c`) | Hard cap on training budget. Justification: our SAEBench runs showed NMSE plateaus well before 10k steps on fine-grained data, and reasoning-trace activations are comparable. Early stop triggers if validation NMSE improves < 0.5% over a 1000-step window. Whichever fires first (plateau or 10k cap) ends the fit. Applies to SAE, TempXC, and MLC — no per-arch exception. |
 
 ## 6. Compute + disk sizing (for the pod spec)
 
-Assuming 1× H100 80GB, full Phase 1 run (SAE + TempXC + MLC, 3 T values, 10 cluster sizes):
+Assuming 1× H100 80GB, full Phase 1 run (SAE + TempXC-T5 + MLC, 10 cluster sizes,
+all fits capped at **10k steps with plateau early-stop** per § 5):
 
 - **Trace generation**: 1.1 h / 1000 traces / 8B model. Full: ~10 h for 10k traces.
-- **Activation dump**: ~0.5 h per layer per dataset (6 layers, one pass). ~5 GB disk per layer.
-- **SAE / TempXC / MLC training (small-k, Path 1)**: <5 min per (arch, cluster-size). 3 arches × 10 sizes × 6 layers = 180 tiny trainings = ~15 h (embarrassingly parallel, but sequential on one GPU).
-- **Path 3 training** (wide TempXC on reasoning activations): ~6 h for T=5 only (collapsed from 3 T values = 18 h; see plan.md § 3 for rationale).
+- **Activation dump**: ~0.5 h per layer per dataset (layer 6 only per § 5; 1 pass). ~5 GB disk.
+- **SAE / TempXC / MLC training (small-k, Path 1)**: <5 min per (arch, cluster-size) at the 10k cap. 3 arches × 10 sizes = 30 tiny trainings = ~2.5 h on one GPU (most plateau-stop well under 10k steps).
+- **Path 3 training** (wide TempXC on reasoning activations, T=5 only, 10k-step cap): ~3-4 h (down from the earlier ~6 h un-capped estimate; plateau typically trips ~6-8k steps on reasoning activations).
 - **Haiku 4.5 labeling** (substituted for GPT-4o): ~$5-15 in judge fees per arch across full cluster-size sweep (Haiku 4.5 is ~4-10× cheaper than GPT-4o). Wall time: ~2-6 h with Anthropic message-batches API; sub-hour with direct calls at low QPS.
 - **Taxonomy scoring**: negligible compute, same batch-API wall.
 
@@ -195,7 +197,8 @@ Assuming 1× H100 80GB, full Phase 1 run (SAE + TempXC + MLC, 3 T values, 10 clu
 Larger volume than SAEBench because of trace caches + activation pickles for
 two datasets (FineWeb-trained ckpts + reasoning-trace activations).
 
-Total compute: ~**40 H100 hours across 2-3 days** for full Phase 1. Smoke test
+Total compute: ~**20-25 H100 hours across 1-2 days** for full Phase 1 (revised
+down from ~40 h after the T=5-only collapse + 10k-step cap). Smoke test
 (one arch, one cluster size, 1000 traces): ~2-3 H100 hours.
 
 ## 7. Hazards audit

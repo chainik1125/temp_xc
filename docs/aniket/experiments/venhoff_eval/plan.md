@@ -88,20 +88,33 @@ Per Dmitry's 4/18 simplification: `{SAE, TempXC, MLC}` only. No TFA.
 
 Phase 1 full run:
 
-- 3 architectures
+- 3 architectures (SAE, TempXC-T5, MLC)
 - 10 cluster sizes per arch (Venhoff's full sweep: `5..50`)
-- For TempXC: × 1 T value (T=5) × 4 aggregation strategies = 4 TempXC
-  variants per cluster size
-- Fixed layer 6 (Venhoff's chosen anchor for Llama-8B)
+- **Fixed layer 6 only** (not a sweep — locked in the Slack proposal
+  as Q2 answered "anchor, not sweep")
+- For TempXC: × 4 aggregation strategies at *annotation time* (Path 3
+  re-encodes the same wide T=5 ckpt 4× — not 4 separate trainings)
 - 5000 traces generated from MMLU-Pro test
+- All fits capped at **10k training steps** with plateau-based
+  early stop (see [[integration_plan#5. Configuration choices|integration_plan § 5]])
 - Shuffled-control pair for every cell
 
-**Total cells**: (SAE) 10 + (TempXC × 4 aggs) 40 + (MLC) 10 = 60 cells
-per cluster size × 10 cluster sizes = 600 fits. Each small-k fit
-takes <5 min, so ~2 H100-days of small-k training (down from ~3).
+**Training fit count** (what actually consumes GPU):
+- SAE (Path 1): 10 cluster sizes × 1 layer = **10 fits**
+- MLC (Path 1): 10 cluster sizes × 1 layer = **10 fits**
+- TempXC: 1 wide Path 3 ckpt (re-use SAEBench T=5 if available, else
+  1 retrain @ 10k-cap) + small-k reducer per cluster size if Path 1
+  hybrid needed = **1-10 fits**
+- **Total: ~30 fits**, each <5 min at the 10k cap → **~2.5 H100-hours**
+  of dictionary training (earlier doc said ~2 days; that was wrong,
+  it assumed the layer sweep web-claude flagged)
 
-**Plus** the Path 3 re-encode of the existing wide T=5 TempXC ckpt
-from SAEBench (fast, hours not days).
+**Evaluation cell count** (what the judge scores):
+- SAE: 10 sizes = 10 cells
+- TempXC: 10 sizes × 4 aggregations = 40 cells
+- MLC: 10 sizes = 10 cells
+- **Total: 60 cells**, each gets a (accuracy, completeness, orthogonality)
+  triple from Haiku 4.5
 
 ## 5. Predictions
 
