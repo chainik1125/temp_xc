@@ -9,9 +9,17 @@ tags:
 
 ## Venhoff reasoning-eval integration plan
 
-**Status**: pre-registration. Written before any integration code. The
-axis-collapse decision in § 3 is load-bearing and should be reviewed
-by Dmitry or Han before Phase 1a starts.
+**Status**: pre-registration. Written before any integration code.
+
+### Decisions locked (2026-04-18, Slack review with Dmitry)
+
+- **Q1 integration path**: Path 1 for SAE + MLC; Path 3 for TempXC. Approved.
+- **Q2 layer**: **Layer 6** fixed anchor for DeepSeek-R1-Distill-Llama-8B. No sweep.
+- **Q3 aggregation**: **All 4 aggregation strategies** (`last`, `mean`, `max`, `full_window`) run as pre-registered ablation. **`full_window` is the headline** — the other three are reported in the supplement.
+- **Q4 scale**: Smoke at **1k traces**, full run at **5k traces**.
+- **Q5 judge**: Haiku 4.5 (`claude-haiku-4-5-20251001`). Bridge run on 100 sentences during smoke; **drift threshold 0.5 points on the 0-10 rubric** before committing. Above threshold, revisit.
+
+**Still open** (not blocking Phase 1a): **P2 vs P3 as the NeurIPS abstract bar.** Dmitry to confirm whether a P2-strength result (TempXC wins at small cluster sizes only) clears the abstract, or whether P3 (monotonic win) is required. Phase 1a launches before this resolves.
 
 **Paper**: Venhoff et al., *"Base Models Know How to Reason, Thinking
 Models Learn When"* ([arXiv:2510.07364](https://arxiv.org/abs/2510.07364)).
@@ -130,21 +138,21 @@ Replace `process_saved_responses`'s per-sentence-mean step with:
   `VENHOFF_PROVENANCE.md`.
 - **Cost**: 1-2 days integration + same compute as Path 1.
 
-### Decision
+### Decision (locked 2026-04-18)
 
-**Preferred: Path 1 for the SAE + MLC baseline, Path 3 for TempXC.** The SAE and
-MLC don't have a meaningful temporal axis to preserve, so Venhoff's contract is
-the natural one. TempXC's temporal axis is the whole thesis, so we need Path 3
-for it to have a fair shot. Path 2 is a fallback for TempXC if Path 3 proves too
-invasive.
+**Path 1 for the SAE + MLC baseline, Path 3 for TempXC.** SAE and MLC
+don't have a meaningful temporal axis to preserve, so Venhoff's contract
+is the natural one. TempXC's temporal axis is the whole thesis, so
+Path 3 is needed for a fair shot. Path 2 stays as a fallback for
+TempXC if Path 3 proves too invasive.
 
-**Aggregation sweep for TempXC (Path 3)**: run all four (`last`, `mean`, `max`,
-`full_window`). If only one wins, that's informative about *what* temporal
-scale reasoning operates at.
-
-**Action item before coding**: Dmitry/Han 10-min review. Their input on Path 1
-vs Path 3 trades against paper narrative clarity (Path 1 is cleaner to write up,
-Path 3 is the actually-fair comparison).
+**Aggregation ablation (TempXC Path 3)**: run all four (`last`, `mean`,
+`max`, `full_window`) as a pre-registered ablation. **`full_window` is
+the headline** — it's the one reported in the main figure and whose
+delta vs SAE determines the P1-P4 prediction call. The other three
+aggregations are reported in the supplement; if one of them beats
+`full_window` we note that in the discussion but do not re-crown the
+headline post-hoc (that would be the multiple-hypothesis hazard).
 
 ## 4. File-port list (once path is confirmed)
 
@@ -257,13 +265,12 @@ aggregation strategy. Publishable as a nuance finding.
 spot-check on 20 sampled (sentence, cluster_label) pairs rates TempXC labels
 as more temporally-coherent. This is the headline paper result.
 
-## 10. What to pre-align with Dmitry/Han before coding
+## 10. Dmitry pre-alignment — outcome
 
-1. **Path 1 + Path 3 hybrid** vs Path 1 only for all arches? (Path narrative clarity trade-off.)
-2. **Layer 6** as the fixed anchor, or sweep {6, 10, 14, 18, 22, 26}? (Compute trade-off: 6× the sweep cost for each extra layer.)
-3. **Aggregation strategy — run all 4, or commit to one** before seeing results? (Avoids the multiple-hypothesis testing concern; favors all-4 since the plan is pre-registered here.)
-4. **Smoke-test dataset size**: 1000 traces vs 5000. Venhoff uses ~7000 for the paper; 1000 is their README quick-start.
-5. **Judge model: Haiku 4.5 instead of GPT-4o.** Our choice (cost + credits). We plan a bridge run on 100 sentences to quantify drift. Risk: reviewers could argue our numbers aren't directly comparable to Venhoff's Table X. Mitigation options: (a) run GPT-4o on the final headline cells only, (b) publish both judge scores, (c) report only relative deltas (TempXC - SAE) under the same judge.
-
-These decisions should land in a 10-min sync; waiting on them blocks Phase 1a
-but not longer.
+Items Q1-Q5 locked at the top of this doc (2026-04-18 Slack review).
+The single remaining open question is **P2 vs P3 as the NeurIPS
+abstract bar**: whether a prediction-P2-strength result (TempXC wins
+at small cluster sizes only, flattens at larger sizes) clears the
+NeurIPS abstract, or whether P3 (monotonic win across cluster sizes)
+is required. This does not gate Phase 1a — the smoke test runs the
+same pipeline either way — so launch on everything else.

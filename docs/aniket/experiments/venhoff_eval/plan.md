@@ -20,6 +20,17 @@ See [[integration_plan|integration_plan.md]] for the code-level
 decisions and axis-collapse strategy. This document covers the
 experiment-level hypothesis, metric, and predictions.
 
+### Decisions locked (2026-04-18)
+
+| # | decision | status |
+|---|---|---|
+| Q1 | Path 1 (SAE/MLC) + Path 3 (TempXC) hybrid | **locked** |
+| Q2 | Layer 6 fixed; no layer sweep | **locked** |
+| Q3 | All 4 aggregations run; `full_window` is the headline | **locked** |
+| Q4 | Smoke 1k traces, full 5k traces | **locked** |
+| Q5 | Haiku 4.5 judge; GPT-4o bridge on 100 sentences at smoke; drift threshold 0.5/10 | **locked** |
+| — | P2 vs P3 as NeurIPS-abstract bar | **open**, not blocking Phase 1a |
+
 ## 1. Hypothesis
 
 > On reasoning traces from DeepSeek-R1-Distill-Llama-8B, TempXC features
@@ -56,7 +67,9 @@ smoke test quantifies judge-drift vs GPT-4o before committing to full
 sweep.
 
 Composite: `avg_final_score` rolled up per cluster size, reported for
-each (architecture, T, layer, aggregation) combo.
+each (architecture, T, layer, aggregation) combo. **Headline composite
+uses TempXC-`full_window`** (locked Q3); other three aggregations
+reported as supplement rows.
 
 Plus our harness-native metrics:
 - **Reconstruction NMSE** on reasoning activations (SAEBench-parallel)
@@ -130,8 +143,11 @@ happened.
 | **P4 (strong)**: TempXC wins monotonically AND MLC loses to TempXC in the same window | TempXC > MLC on composite | Specifically *temporal* structure matters, not just multi-position. Best-case paper finding. |
 
 **Win criteria for the paper**:
-- **NeurIPS abstract**: Any of P2, P3, or P4. P1 triggers the careful-null
-  writeup instead.
+- **NeurIPS abstract**: tentatively any of P2, P3, or P4. **Open:**
+  Dmitry to confirm whether P2 (weak signal at small cluster sizes
+  only) clears the abstract bar or whether P3 (monotonic win across
+  sizes) is required. Not blocking Phase 1a; the same pipeline runs
+  regardless.
 - **ICML workshop fallback**: P1 with diagnostic clarity (e.g. training
   curves show TempXC converged but still lost) is still publishable as a
   careful negative.
@@ -185,12 +201,18 @@ One plot, saved at `results/venhoff_eval/plots/fig1_taxonomy_quality.png`:
 
 - x-axis: cluster size (5..50)
 - y-axis: composite taxonomy quality score (0–10)
-- lines: SAE (blue), TempXC-T5 (green, one line per aggregation strategy
-  — `last`, `mean`, `max`, `full_window` — in progressively darker
-  shades), MLC (orange)
+- headline lines: SAE (blue), **TempXC-T5 `full_window` (green, bold —
+  this is the headline TempXC line per Q3 lock-in)**, MLC (orange)
+- supplement lines (same plot, lighter/dashed so they're visible but
+  non-dominant): TempXC-T5 `last`, `mean`, `max`
 - error bars: from 3 repetitions per cluster size
-- shaded region: ordered-vs-shuffled delta — the portion of advantage
-  attributable to temporal structure specifically
+- **shuffled-control shaded region per cell**: for each (arch, cluster
+  size) cell, shade the band between the ordered-trace composite and
+  the shuffled-trace composite. The shaded height quantifies how much
+  of the score is attributable to temporal structure specifically
+  (the shuffle control removes within-trace ordering). A narrow band
+  means the advantage is not temporal; a wide band means it is. This
+  is the figure-level evidence for the "temporal" claim.
 
 This is the figure Dmitry + team react to at check-in. If it shows
 TempXC above SAE, paper is alive.
