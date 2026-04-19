@@ -522,6 +522,13 @@ def run_all(seeds, max_steps, archs=None):
 
             _save_run(run_id, arch, model, log, meta)
             del model
+            # Free the MLC multi-layer buffer after MLC training — it's
+            # 18 GB on GPU and nothing else uses it. Keeping it around
+            # OOMs TXCDR T=20's Adam-state allocation. Same for anchor
+            # between big window archs — reload is cheap (3.5 GB fp16
+            # from disk to GPU is <15 s).
+            if arch == "mlc":
+                ml_buf = None
             torch.cuda.empty_cache()
 
 
