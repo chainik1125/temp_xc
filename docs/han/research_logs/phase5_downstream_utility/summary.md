@@ -79,9 +79,7 @@ retraining.
 
 #### Figure 1 — Headline bar chart
 
-![Headline bar chart, mean AUC k=5](../../../../experiments/phase5_downstream_utility/results/plots/headline_bar_k5.thumb.png)
-
-Full resolution: [`plots/headline_bar_k5.png`](../../../../experiments/phase5_downstream_utility/results/plots/headline_bar_k5.png).
+![Headline bar chart, mean AUC k=5](../../../../experiments/phase5_downstream_utility/results/plots/headline_bar_k5.png)
 
 Mean AUC across 27 tasks, `last_position` aggregation, k_feat = 5.
 Baselines drawn as dashed horizontal lines. For the two cross-token
@@ -111,9 +109,7 @@ layer 13.
 
 #### Figure 2 — Per-task heatmap
 
-![Per-task AUC heatmap](../../../../experiments/phase5_downstream_utility/results/plots/per_task_k5.thumb.png)
-
-Full resolution: [`plots/per_task_k5.png`](../../../../experiments/phase5_downstream_utility/results/plots/per_task_k5.png).
+![Per-task AUC heatmap](../../../../experiments/phase5_downstream_utility/results/plots/per_task_k5.png)
 
 Color scale is AUC (viridis, 0.5 → 1.0). europarl rows are
 near-ceiling for every arch (language-ID is trivially encoded in
@@ -152,10 +148,9 @@ cross-token, not smallest.
 
 #### Training dynamics
 
-![Training loss curves (log-log)](../../../../experiments/phase5_downstream_utility/results/plots/training_curves_loglog.thumb.png)
+![Training loss curves (log-log)](../../../../experiments/phase5_downstream_utility/results/plots/training_curves_loglog.png)
 
-Full resolution: [`plots/training_curves_loglog.png`](../../../../experiments/phase5_downstream_utility/results/plots/training_curves_loglog.png)
-and linear: [`plots/training_curves.png`](../../../../experiments/phase5_downstream_utility/results/plots/training_curves.png).
+Linear-scale version: [`plots/training_curves.png`](../../../../experiments/phase5_downstream_utility/results/plots/training_curves.png).
 
 Every arch hit the 2 %/1k plateau within the 25 000-step cap
 (`conv=True` on every row of `training_index.jsonl`). TXCDR-T20
