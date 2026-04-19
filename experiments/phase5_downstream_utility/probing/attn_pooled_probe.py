@@ -137,17 +137,18 @@ def train_attn_probe(
     cfg = cfg or AttnProbeConfig()
     torch.manual_seed(cfg.seed)
 
-    # Carve out 10% of train for validation (early-stopping + model selection).
-    Xtr, ytr, Xval, yval = _split_train_val(
-        X_train, y_train, val_fraction=0.1, seed=cfg.seed
-    )
+    # Carve out 10% of train for validation. Reuse the same permutation
+    # for X, y, and mask so they stay aligned.
+    n = X_train.shape[0]
+    g = torch.Generator().manual_seed(cfg.seed)
+    perm = torch.randperm(n, generator=g)
+    n_val = max(1, int(n * 0.1))
+    val_idx, train_idx = perm[:n_val], perm[n_val:]
+    Xtr, Xval = X_train[train_idx], X_train[val_idx]
+    ytr, yval = y_train[train_idx], y_train[val_idx]
     if mask_train is not None:
-        mtr, mval = _split_train_val(
-            mask_train.float(), y_train, val_fraction=0.1, seed=cfg.seed
-        )[:2] + _split_train_val(  # type: ignore
-            mask_train.float(), y_train, val_fraction=0.1, seed=cfg.seed
-        )[2:4]
-        mtr, mval = mtr.bool(), mval.bool()
+        mtr = mask_train[train_idx].bool()
+        mval = mask_train[val_idx].bool()
     else:
         mtr = mval = None
 

@@ -12,6 +12,7 @@ from src.architectures.stacked_sae import StackedSAESpec
 from src.architectures.crosscoder import CrosscoderSpec
 from src.architectures.tfa import TFASpec
 from src.architectures.mlc import MLCSpec
+from src.architectures.matryoshka_txcdr import MatryoshkaTXCDRSpec
 
 # Central registry: name -> ArchSpec constructor
 REGISTRY: dict[str, type[ArchSpec]] = {
@@ -21,6 +22,7 @@ REGISTRY: dict[str, type[ArchSpec]] = {
     "tfa": TFASpec,
     "tfa_pos": TFASpec,
     "mlc": MLCSpec,
+    "matryoshka_txcdr": MatryoshkaTXCDRSpec,
 }
 
 
