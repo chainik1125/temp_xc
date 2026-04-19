@@ -39,9 +39,10 @@ Gemma-2-2B-IT layer 13, <arch> achieves mean AUC = <X.XXX> across
   europarl × 4, amazon_reviews × 1, sentiment × 1). Tasks use SAEBench's
   split sizes: `n_train = 4000`, `n_test = 1000` (or smaller if a
   class's balanced support is capped).
-- **Architectures**: 10 primary — TopKSAE, MLC (L=5), TXCDR (T=5, T=20),
-  StackedSAE (T=5, T=20), SharedPerPositionSAE (T=5), TFA, TFA-pos,
-  MatryoshkaTXCDR (T=5).
+- **Architectures**: 7 primary after scope-cut addenda — TopKSAE, MLC
+  (L=5), TXCDR (T=5, T=20), StackedSAE (T=5, T=20), MatryoshkaTXCDR (T=5).
+  TFA / TFA-pos / SharedPerPositionSAE deferred to sub-phase 5.6 (see
+  plan.md addendum 2026-04-19).
 - **Sparsity**: k_pos = 100 across all archs; TXCDR & Stacked have
   k_win = 100·T. TFA has k=100 on novel head, dense pred head.
   Matryoshka has k_win = 500 on the shared window latent.
