@@ -73,7 +73,7 @@ def main() -> None:
     OUT_ROOT.mkdir(parents=True, exist_ok=True)
 
     from transformers import AutoModelForCausalLM, AutoTokenizer
-    from experiments.phase5_downstream_utility.probing.datasets import (
+    from experiments.phase5_downstream_utility.probing.probe_datasets import (
         load_all_probing_tasks,
     )
 
