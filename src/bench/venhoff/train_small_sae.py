@@ -111,24 +111,24 @@ def _train_sae(arch: ArchName, d_in: int, cluster_size: int, cfg: TrainConfig,
         return model, log_
 
     if arch == "mlc":
-        from src.bench.architectures.mlc import MLCSpec
-
-        spec = MLCSpec()
-        model = spec.create(d_in=d_in, d_sae=cluster_size, k=cfg.k, device=device)
-        log_ = spec.train(
-            model=model, gen_fn=gen_fn,
-            total_steps=cfg.total_steps, batch_size=cfg.batch_size, lr=cfg.lr,
-            device=device, plateau_pct=cfg.plateau_pct,
-            plateau_min_steps=cfg.plateau_min_steps,
+        # MLC requires simultaneous (B, n_layers, d) activations from a
+        # window of layers around the anchor. Our current
+        # activation_collection.py collects only `paths.identity.layer`
+        # (single-layer), so MLC is out of scope for this run.
+        # Enabling it requires extending activation_collection.py with
+        # a multi-layer hook; tracked in plan.md § 3.
+        raise NotImplementedError(
+            "MLC requires multi-layer activation collection (n_layers=5 "
+            "around the anchor). Not implemented in Phase 1a; use arch=sae "
+            "or arch=tempxc."
         )
-        return model, log_
 
     if arch == "tempxc":
-        from src.bench.architectures.crosscoder import TemporalCrosscoderSpec
+        from src.bench.architectures.crosscoder import CrosscoderSpec
 
-        spec = TemporalCrosscoderSpec()
-        # TempXC expects T from its own config; forward what Path 3 collected.
-        model = spec.create(d_in=d_in, d_sae=cluster_size, k=cfg.k, device=device, T=cfg.T)
+        spec = CrosscoderSpec(T=cfg.T)
+        # T is held on the spec, not passed to create().
+        model = spec.create(d_in=d_in, d_sae=cluster_size, k=cfg.k, device=device)
         log_ = spec.train(
             model=model, gen_fn=gen_fn,
             total_steps=cfg.total_steps, batch_size=cfg.batch_size, lr=cfg.lr,
@@ -245,13 +245,11 @@ def load_ckpt(ckpt_path: Path, device: str = "cuda") -> tuple[torch.nn.Module, d
         from src.bench.architectures.topk_sae import TopKSAE
         model = TopKSAE(d_in=d_in, d_sae=cluster_size, k=k).to(device)
     elif arch == "mlc":
-        from src.bench.architectures.mlc import MLCSpec
-        spec = MLCSpec()
-        model = spec.create(d_in=d_in, d_sae=cluster_size, k=k, device=device)
+        raise NotImplementedError("MLC requires multi-layer activation collection; see _train_sae().")
     elif arch == "tempxc":
-        from src.bench.architectures.crosscoder import TemporalCrosscoderSpec
-        spec = TemporalCrosscoderSpec()
-        model = spec.create(d_in=d_in, d_sae=cluster_size, k=k, device=device, T=T)
+        from src.bench.architectures.crosscoder import CrosscoderSpec
+        spec = CrosscoderSpec(T=T)
+        model = spec.create(d_in=d_in, d_sae=cluster_size, k=k, device=device)
     else:
         raise ValueError(f"unknown arch {arch!r}")
     model.load_state_dict(sd)

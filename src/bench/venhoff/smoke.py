@@ -224,7 +224,17 @@ async def _run_bridge_stage(
     aggregation: str,
     force: bool,
 ) -> bool:
-    meta = {"stage": "bridge", "n": BRIDGE_N_SENTENCES}
+    # Cell info is part of the resume key — two bridge runs against
+    # different cells in the same run_dir must not collide on the cache.
+    meta = {
+        "stage": "bridge",
+        "n": BRIDGE_N_SENTENCES,
+        "arch": arch,
+        "cluster_size": cluster_size,
+        "path": path_name,
+        "aggregation": aggregation,
+        "seed": paths.identity.seed,
+    }
     out = paths.bridge_json
     if not force and can_resume(out, meta):
         existing = json.loads(out.read_text())

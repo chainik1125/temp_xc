@@ -59,7 +59,11 @@ if [[ "$MODE" == "smoke" ]]; then
 elif [[ "$MODE" == "full" ]]; then
     N_TRACES="${N_TRACES:-5000}"
     CLUSTER_SIZES="${CLUSTER_SIZES:-5 10 15 20 25 30 35 40 45 50}"
-    ARCHES="${ARCHES:-sae mlc tempxc}"
+    # MLC requires multi-layer activation collection (n_layers=5 around
+    # the anchor) which isn't wired in Phase 1a — see train_small_sae.py
+    # _train_sae. To enable, override ARCHES="sae mlc tempxc" once the
+    # multi-layer collector lands.
+    ARCHES="${ARCHES:-sae tempxc}"
     AGGREGATIONS="${AGGREGATIONS:-last mean max full_window}"
 else
     echo "Unknown MODE=$MODE (expected: smoke|full)" >&2
@@ -77,11 +81,16 @@ COMMON_FLAGS=(
 
 python_flag_for_force_stage=()
 if [[ -n "$FORCE_STAGE" ]]; then
-    python_flag_for_force_stage+=(--force-stage "$FORCE_STAGE")
+    # Support space-separated list: FORCE_STAGE="label score"
+    for stage in $FORCE_STAGE; do
+        python_flag_for_force_stage+=(--force-stage "$stage")
+    done
 fi
 python_flag_for_skip_stage=()
 if [[ -n "$SKIP_STAGE" ]]; then
-    python_flag_for_skip_stage+=(--skip-stage "$SKIP_STAGE")
+    for stage in $SKIP_STAGE; do
+        python_flag_for_skip_stage+=(--skip-stage "$stage")
+    done
 fi
 if [[ "$SKIP_BRIDGE" == "1" ]]; then
     python_flag_for_skip_stage+=(--skip-bridge)
@@ -116,14 +125,14 @@ echo ""
 echo "── Stage 1: generate traces"
 python -m src.bench.venhoff.generate_traces \
     "${COMMON_FLAGS[@]}" --engine "$ENGINE" \
-    $([ "$FORCE" == "1" ] && echo --force)
+    "${FORCE_FLAGS[@]}"
 
 echo ""
 echo "── Stage 2: collect activations (path1 + path3)"
 python -m src.bench.venhoff.activation_collection \
     "${COMMON_FLAGS[@]}" \
     --paths path1 path3 --T 5 \
-    $([ "$FORCE" == "1" ] && echo --force)
+    "${FORCE_FLAGS[@]}"
 
 echo ""
 echo "── Stage 3-6: train + annotate + label + score per cell"
@@ -144,7 +153,7 @@ for arch in $ARCHES; do
             "${COMMON_FLAGS[@]}" \
             --arch "$arch" --cluster-size "$cluster_size" --path "$path" \
             --T 5 \
-            $([ "$FORCE" == "1" ] && echo --force)
+            "${FORCE_FLAGS[@]}"
 
         for agg in $aggs; do
             echo "    · aggregation=$agg"
@@ -152,11 +161,13 @@ for arch in $ARCHES; do
                 "${COMMON_FLAGS[@]}" \
                 --arch "$arch" --cluster-size "$cluster_size" --path "$path" \
                 --aggregation "$agg" \
-                $([ "$FORCE" == "1" ] && echo --force)
+                "${FORCE_FLAGS[@]}"
 
             # label + score go through smoke.py with --skip-stage for the
             # stages already run; it's the single entrypoint that knows
             # how to read assignments and emit cluster labels + scores.
+            # Propagate FORCE / FORCE_STAGE so `FORCE_STAGE="label score"`
+            # triggers per-cell rebuilds here too.
             python -m src.bench.venhoff.smoke \
                 "${COMMON_FLAGS[@]}" \
                 --arch "$arch" --cluster-size "$cluster_size" --path "$path" \
@@ -165,7 +176,8 @@ for arch in $ARCHES; do
                 --skip-stage train --skip-stage annotate \
                 --skip-bridge \
                 --judge-model "$JUDGE" \
-                $([ "$FORCE" == "1" ] && echo --force-stage label --force-stage score)
+                "${FORCE_FLAGS[@]}" \
+                "${python_flag_for_force_stage[@]}"
         done
     done
 done

@@ -1,11 +1,13 @@
 """Contract + dimensionality tests for the SAE shim.
 
 Verifies:
-  - Path 1 shim: (B, d) → (B, d_sae)
-  - Path 3 shim with each aggregation: correct output shape
+  - Path 1 shim (SAE): (B, d) → (B, d_sae)
+  - Path 3 shim (TempXC) with each aggregation: correct output shape
   - argmax_labels returns valid latent ids
 
-No GPU required — all on CPU with a tiny TopKSAE.
+Path 1 wraps TopKSAE (single-token contract). Path 3 wraps
+TemporalCrosscoder (the real target — its 3D W_enc is what the
+shim's einsum needs). No GPU required.
 """
 
 from __future__ import annotations
@@ -17,6 +19,7 @@ import numpy as np
 import pytest
 import torch
 
+from src.bench.architectures.crosscoder import TemporalCrosscoder
 from src.bench.architectures.topk_sae import TopKSAE
 from src.bench.venhoff.sae_shim import argmax_labels, wrap_for_path1, wrap_for_path3
 
@@ -47,7 +50,7 @@ def test_path1_shim_shape(tmp_path: Path) -> None:
 
 @pytest.mark.parametrize("agg", ["last", "mean", "max"])
 def test_path3_shim_shape_collapsing_aggs(agg: str, tmp_path: Path) -> None:
-    base = TopKSAE(d_in=D_IN, d_sae=D_SAE, k=3)
+    base = TemporalCrosscoder(d_in=D_IN, d_sae=D_SAE, T=T, k=2)
     shim = wrap_for_path3(base, _make_mean_pkl(tmp_path), T=T, aggregation=agg)
 
     x = torch.randn(BATCH, T, D_IN)
@@ -57,7 +60,7 @@ def test_path3_shim_shape_collapsing_aggs(agg: str, tmp_path: Path) -> None:
 
 
 def test_path3_shim_shape_full_window(tmp_path: Path) -> None:
-    base = TopKSAE(d_in=D_IN, d_sae=D_SAE, k=3)
+    base = TemporalCrosscoder(d_in=D_IN, d_sae=D_SAE, T=T, k=2)
     shim = wrap_for_path3(base, _make_mean_pkl(tmp_path), T=T, aggregation="full_window")
 
     x = torch.randn(BATCH, T, D_IN)
@@ -81,9 +84,19 @@ def test_argmax_labels_in_range_path1(tmp_path: Path) -> None:
 
 
 def test_path3_t_mismatch_raises(tmp_path: Path) -> None:
-    base = TopKSAE(d_in=D_IN, d_sae=D_SAE, k=3)
+    base = TemporalCrosscoder(d_in=D_IN, d_sae=D_SAE, T=T, k=2)
     shim = wrap_for_path3(base, _make_mean_pkl(tmp_path), T=T, aggregation="mean")
 
     bad_x = torch.randn(BATCH, T + 1, D_IN)
     with pytest.raises(AssertionError, match="T mismatch"):
+        shim.encoder(bad_x)
+
+
+def test_path1_rejects_3d_input(tmp_path: Path) -> None:
+    """Path 1 shim only handles (B, d) — (B, T, d) is Path 3 territory."""
+    base = TopKSAE(d_in=D_IN, d_sae=D_SAE, k=3)
+    shim = wrap_for_path1(base, _make_mean_pkl(tmp_path))
+
+    bad_x = torch.randn(BATCH, T, D_IN)
+    with pytest.raises(AssertionError, match=r"path1 encoder expects \(B, d\)"):
         shim.encoder(bad_x)

@@ -42,7 +42,13 @@ def _load_mean(mean_pkl: Path) -> torch.Tensor:
 
 
 class _Path1Shim(torch.nn.Module):
-    """For SAE / MLC: (B, d) → (B, d_sae). Input is already sentence-mean."""
+    """For SAE: (B, d) → (B, d_sae). Input is already sentence-mean.
+
+    SAE's native `.encode((B, d))` returns `(B, d_sae)`. MLC would need
+    `(B, n_layers, d)` input which Path 1's per-sentence-mean collector
+    doesn't produce — MLC support is deferred until multi-layer
+    collection lands (see `train_small_sae.py::_train_sae`).
+    """
 
     def __init__(self, base: torch.nn.Module, activation_mean: torch.Tensor):
         super().__init__()
@@ -50,6 +56,11 @@ class _Path1Shim(torch.nn.Module):
         self.register_buffer("activation_mean", activation_mean)
 
     def encoder(self, x: torch.Tensor) -> torch.Tensor:
+        assert x.ndim == 2, (
+            f"path1 encoder expects (B, d), got {tuple(x.shape)}. "
+            "If you're wrapping MLC here, use multi-layer activation "
+            "collection and Path 3 instead."
+        )
         return self.base.encode(x)
 
     @property
@@ -62,11 +73,15 @@ class _Path1Shim(torch.nn.Module):
 
 
 class _Path3Shim(torch.nn.Module):
-    """For TempXC: (B, T, d) → (B, d_sae) via per-window encode + aggregation.
+    """For TempXC: (B, T, d) → (B, d_sae) via per-position encode + aggregation.
 
-    The per-window encoding is TempXC's `.encode(x)` call, which already
-    returns `(B, T, d_sae)` — we reshape to `(B, 1, T, d_sae)` (single
-    "window" per sentence) and feed through the aggregation helper.
+    TempXC's native `.encode(x)` returns the *shared-z* latent
+    `(B, d_sae)` — already summed over positions inside the einsum. For
+    our Path 3 aggregation ablation we need the **per-position**
+    activations `(B, T, d_sae)` so `last`/`mean`/`max`/`full_window`
+    have distinct semantics. We replicate `CrosscoderSpec._encode_window`
+    inline: per-position pre-activation, shared-z TopK mask computed
+    from the summed pre, mask broadcast across T, ReLU.
     """
 
     def __init__(
@@ -84,15 +99,28 @@ class _Path3Shim(torch.nn.Module):
 
     def encoder(self, x: torch.Tensor) -> torch.Tensor:
         """`x` is `(B, T, d_in)` — one window per sentence."""
+        import torch.nn.functional as F
+
         assert x.ndim == 3, f"path3 encoder expects (B, T, d), got {tuple(x.shape)}"
         B, T, d = x.shape
         assert T == self.T, f"T mismatch: got {T}, shim configured for {self.T}"
-        z = self.base.encode(x)  # (B, T, d_sae)
-        assert z.ndim == 3 and z.shape[0] == B and z.shape[1] == T
-        windows = z.unsqueeze(1)  # (B, 1, T, d_sae)
-        collapsed = aggregate(windows, self.aggregation)  # (B, 1, d_sae) or (B, 1, T*d_sae)
-        out = collapsed.squeeze(1)
-        return out
+
+        # Per-position pre-activation (same einsum as shared-z but without
+        # summing over T). Then shared-z TopK mask from the summed pre.
+        pre_per_pos = torch.einsum("btd,tds->bts", x, self.base.W_enc)  # (B, T, d_sae)
+        pre_sum = pre_per_pos.sum(dim=1) + self.base.b_enc              # (B, d_sae)
+        if self.base.k is None:
+            z_per_pos = F.relu(pre_per_pos)
+        else:
+            _, topk_idx = pre_sum.topk(self.base.k, dim=-1)
+            mask = torch.zeros_like(pre_sum)
+            mask.scatter_(1, topk_idx, 1.0)                             # (B, d_sae)
+            z_per_pos = F.relu(pre_per_pos) * mask.unsqueeze(1)         # (B, T, d_sae)
+
+        # aggregate() expects (B, L, T, d_sae); we have L=1 (one window per row).
+        windows = z_per_pos.unsqueeze(1)                                # (B, 1, T, d_sae)
+        collapsed = aggregate(windows, self.aggregation)                # (B, 1, d_sae) or (B, 1, T*d_sae)
+        return collapsed.squeeze(1)
 
     @property
     def W_dec(self) -> torch.Tensor:

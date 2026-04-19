@@ -216,10 +216,12 @@ def collect_path1(
     assert np.all(norms > 0), "zero-norm sentence vector after centering"
     normalized = centered / norms
 
-    # Persist
-    with act_pkl.open("wb") as f:
-        pickle.dump((normalized, sentence_texts), f)
-    write_with_metadata(act_pkl, act_pkl.read_bytes(), meta)
+    # Atomic write: serialize to buffer first, hand the bytes to
+    # write_with_metadata which does tmp+rename together with sidecar.
+    import io
+    act_buf = io.BytesIO()
+    pickle.dump((normalized, sentence_texts), act_buf)
+    write_with_metadata(act_pkl, act_buf.getvalue(), meta)
 
     mean_payload = {
         "model_id": paths.identity.model,
@@ -228,9 +230,9 @@ def collect_path1(
         "count_vectors": int(mean_count),
         "activation_mean": running_mean,
     }
-    with mean_pkl.open("wb") as f:
-        pickle.dump(mean_payload, f)
-    write_with_metadata(mean_pkl, mean_pkl.read_bytes(), meta)
+    mean_buf = io.BytesIO()
+    pickle.dump(mean_payload, mean_buf)
+    write_with_metadata(mean_pkl, mean_buf.getvalue(), meta)
 
     write_with_metadata(sent_json, json.dumps(sentence_texts), meta)
 
@@ -313,9 +315,10 @@ def collect_path3(
 
     windows_np = np.stack(windows, axis=0)  # (N, T, d_model)
 
-    with act_pkl.open("wb") as f:
-        pickle.dump((windows_np, sentence_texts), f)
-    write_with_metadata(act_pkl, act_pkl.read_bytes(), meta)
+    import io
+    act_buf = io.BytesIO()
+    pickle.dump((windows_np, sentence_texts), act_buf)
+    write_with_metadata(act_pkl, act_buf.getvalue(), meta)
 
     mean_payload = {
         "model_id": paths.identity.model,
@@ -325,9 +328,9 @@ def collect_path3(
         "count_vectors": int(mean_count),
         "activation_mean": running_mean,
     }
-    with mean_pkl.open("wb") as f:
-        pickle.dump(mean_payload, f)
-    write_with_metadata(mean_pkl, mean_pkl.read_bytes(), meta)
+    mean_buf = io.BytesIO()
+    pickle.dump(mean_payload, mean_buf)
+    write_with_metadata(mean_pkl, mean_buf.getvalue(), meta)
 
     write_with_metadata(sent_json, json.dumps(sentence_texts), meta)
 
