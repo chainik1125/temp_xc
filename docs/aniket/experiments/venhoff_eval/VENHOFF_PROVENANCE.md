@@ -56,8 +56,6 @@ comparable:
   Stating Assumptions, Recalling Mathematical Definitions).
   Changing these changes the benchmark. Held fixed across SAE /
   TempXC / MLC comparisons.
-- GPT-4o judge model (not gpt-4o-mini, not Anthropic) — their paper's
-  default.
 - Judge prompts in `utils/autograder_prompts.py` — all three
   (accuracy, completeness, semantic-orthogonality) used as-shipped.
 - n_autograder_examples = 100, accuracy_target_cluster_percentage =
@@ -65,3 +63,9 @@ comparable:
   benchmark anymore.
 
 Any deviation from these requires a note in this file with a reason.
+
+## Deliberate deviations from Venhoff's setup
+
+| invariant | their value | ours | reason |
+|---|---|---|---|
+| judge model | gpt-4o | **claude-haiku-4-5-20251001** (Haiku 4.5) | Cost (~4-10× cheaper) + existing Anthropic credits. Venhoff's code exposes `anthropic` as a first-class fallback, so the swap is supported. **Bridge plan**: during the smoke run, re-judge the same 100 sentences with GPT-4o and report the drift. If mean per-metric drift > 0.5 points on the 0-10 rubric, revisit. Until then, report only within-judge deltas (TempXC vs SAE under the same judge) rather than absolute scores. |

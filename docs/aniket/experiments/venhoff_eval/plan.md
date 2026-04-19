@@ -26,7 +26,8 @@ experiment-level hypothesis, metric, and predictions.
 > cluster into more coherent and temporally-structured reasoning categories
 > than per-token SAE features, as measured by Venhoff et al.'s taxonomy-
 > quality metrics (accuracy, completeness, semantic orthogonality) with
-> GPT-4o as judge.
+> **Claude Haiku 4.5** as judge (deviation from their GPT-4o default; see
+> [[integration_plan#5. Configuration choices|integration_plan § 5]]).
 
 Why we'd expect this: reasoning steps (backtracking, verification,
 case analysis) span multiple sentences or multi-token phrases — they're
@@ -42,12 +43,17 @@ Venhoff's pipeline produces three scalar quality metrics per trained
 dictionary, averaged across cluster-sizes and repetitions:
 
 - **accuracy** — does each cluster's (title, description) actually
-  apply to the sentences assigned to it? GPT-4o Yes/No over 100 sampled
+  apply to the sentences assigned to it? Judge Yes/No over 100 sampled
   sentences. 0–1.
 - **completeness** — does each sentence match its cluster's description?
-  GPT-4o 0–10 rubric.
+  Judge 0–10 rubric.
 - **semantic orthogonality** — how non-redundant are cluster descriptions?
-  Pairwise GPT-4o 0–10, inverted.
+  Pairwise judge 0–10, inverted.
+
+Judge is **Claude Haiku 4.5** (model id `claude-haiku-4-5-20251001`),
+substituted for Venhoff's GPT-4o. Bridge run on 100 sentences during
+smoke test quantifies judge-drift vs GPT-4o before committing to full
+sweep.
 
 Composite: `avg_final_score` rolled up per cluster size, reported for
 each (architecture, T, layer, aggregation) combo.
@@ -113,9 +119,10 @@ happened.
 
 ## 6. Runtime expectations
 
-Per `integration_plan § 6`: ~40 H100-hours + ~$60 in GPT-4o batch fees
-for full Phase 1. Smoke test at 1000 traces, one arch, one cluster
-size: ~2-3 H100-hours + ~$2 judge fee.
+Per `integration_plan § 6`: ~40 H100-hours + ~$15 in Haiku 4.5 judge
+fees for full Phase 1 (4-10× cheaper than Venhoff's GPT-4o default).
+Smoke test at 1000 traces, one arch, one cluster size: ~2-3 H100-hours
++ <$1 judge fee.
 
 ## 7. Relationship to SAEBench result
 
@@ -141,8 +148,8 @@ better-matched benchmark.
 - No hybrid-model experiments (Phase 3)
 - No non-{Llama-8B} models (Phase 4)
 - No comparison to TFA (Dmitry's 4/18 simplification)
-- No auto-interp-heavy feature analysis beyond the GPT-4o cluster titles
-  Venhoff's pipeline already emits
+- No auto-interp-heavy feature analysis beyond the judge-generated cluster
+  titles Venhoff's pipeline already emits
 
 ## 9. Fallback plan
 

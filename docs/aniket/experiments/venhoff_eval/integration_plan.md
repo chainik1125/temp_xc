@@ -178,7 +178,7 @@ of Venhoff source, what we changed, why.
 | n_traces (full) | **5000-10000** | Grow after smoke passes. |
 | cluster sizes | `{5, 10, 15, 20, 25, 30, 35, 40, 45, 50}` | Full sweep matches their protocol. Smoke tests one size. |
 | k (topk) | **3** | Their default. Our small-k retrain (Path 1) uses this. |
-| judge model | **gpt-4o** | Their README default; `anthropic` is fallback. Budget ~$5-20 per sweep per arch. |
+| judge model | **claude-haiku-4-5-20251001** (Haiku 4.5) | **Deviation from Venhoff's GPT-4o default**. Rationale: cost + we already have Anthropic credits; Venhoff's code exposes `anthropic` as an officially supported fallback. Flagged as pre-registered invariant violation in `VENHOFF_PROVENANCE.md`. Cross-judge bridge run on N=100 sentences from smoke test to quantify GPT-4o↔Haiku drift before committing. |
 
 ## 6. Compute + disk sizing (for the pod spec)
 
@@ -188,7 +188,7 @@ Assuming 1× H100 80GB, full Phase 1 run (SAE + TempXC + MLC, 3 T values, 10 clu
 - **Activation dump**: ~0.5 h per layer per dataset (6 layers, one pass). ~5 GB disk per layer.
 - **SAE / TempXC / MLC training (small-k, Path 1)**: <5 min per (arch, cluster-size). 3 arches × 10 sizes × 6 layers = 180 tiny trainings = ~15 h (embarrassingly parallel, but sequential on one GPU).
 - **Path 3 training** (wide TempXC on reasoning activations): ~6 h per T value. 3 T values = 18 h.
-- **GPT-4o labeling**: ~$30-60 in judge fees per arch across full cluster-size sweep. Wall time: ~24 h (batch API SLA).
+- **Haiku 4.5 labeling** (substituted for GPT-4o): ~$5-15 in judge fees per arch across full cluster-size sweep (Haiku 4.5 is ~4-10× cheaper than GPT-4o). Wall time: ~2-6 h with Anthropic message-batches API; sub-hour with direct calls at low QPS.
 - **Taxonomy scoring**: negligible compute, same batch-API wall.
 
 **Recommended pod**: 1× H100 SXM 80GB, **40 GB root**, **500 GB volume**.
@@ -260,6 +260,7 @@ as more temporally-coherent. This is the headline paper result.
 2. **Layer 6** as the fixed anchor, or sweep {6, 10, 14, 18, 22, 26}? (Compute trade-off: 6× the sweep cost for each extra layer.)
 3. **Aggregation strategy — run all 4, or commit to one** before seeing results? (Avoids the multiple-hypothesis testing concern; favors all-4 since the plan is pre-registered here.)
 4. **Smoke-test dataset size**: 1000 traces vs 5000. Venhoff uses ~7000 for the paper; 1000 is their README quick-start.
+5. **Judge model: Haiku 4.5 instead of GPT-4o.** Our choice (cost + credits). We plan a bridge run on 100 sentences to quantify drift. Risk: reviewers could argue our numbers aren't directly comparable to Venhoff's Table X. Mitigation options: (a) run GPT-4o on the final headline cells only, (b) publish both judge scores, (c) report only relative deltas (TempXC - SAE) under the same judge.
 
 These decisions should land in a 10-min sync; waiting on them blocks Phase 1a
 but not longer.
