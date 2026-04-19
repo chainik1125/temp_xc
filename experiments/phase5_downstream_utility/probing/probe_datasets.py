@@ -157,8 +157,12 @@ def _load_amazon_reviews(rng: random.Random) -> list[ProbingTask]:
         if i >= 20_000:
             break
         t = row.get("text") or row.get("review_body")
-        c = row.get("category") or row.get("main_category")
-        # HF `canrager/amazon_reviews_mcauley_1and5` stores category as int
+        # EXPLICIT None check — category=0 is falsy, so `or` fallback
+        # swallows it. Without this, all category=0 rows are silently
+        # filtered, leaving the dataset with only category=1 rows.
+        c = row.get("category")
+        if c is None:
+            c = row.get("main_category")
         if isinstance(t, str) and c is not None and len(t) > 20:
             texts.append(t)
             cats.append(c)
