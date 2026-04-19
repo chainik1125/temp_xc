@@ -55,3 +55,7 @@ data/
 # Logs
 logs/
 experiments/*/model_cache/
+
+# Phase 5 large binary artifacts — reproducible from training/probing scripts
+experiments/phase5_downstream_utility/results/ckpts/
+experiments/phase5_downstream_utility/results/probe_cache/
