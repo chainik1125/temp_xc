@@ -1,14 +1,18 @@
-"""Sparse-probing runner for Phase 5.
+"""Sparse-probing runner for Phase 5 — v2 using split-cache format.
 
-For each (trained_checkpoint, task), encode the cached per-task
-activations with the checkpoint, select top-k latents by class
-separation on the train split only, fit sklearn logistic regression,
-and record test AUC on a held-out test set.
+Cache format (from build_probe_cache.py):
+    acts_anchor.npz:  train_acts (N, LAST_N=20, d), train_last_idx, train_labels +
+                      test_*  — L13 tail. Used by TopK/TXCDR/Stacked/Matryoshka.
+    acts_mlc.npz:     train_acts (N, 5, d), train_labels + test_*.  MLC-specific.
 
-Writes one JSONL row per (checkpoint, task, k_feat) to
-`results/probing_results.jsonl`. Also runs baselines:
-    - Last-token L2 logistic regression on raw L13 activations.
-    - Attention-pooled (Eq. 2 of Kantamneni et al.) over the tail-32 tokens.
+Probing protocol (matches Kantamneni et al. §2.2):
+    - Top-k latents by abs(mean_train[y=1] - mean_train[y=0])
+    - Fit L1 logistic regression on those k features
+    - AUC on held-out test set
+
+Baselines:
+    - L2 LR on raw last-token L13 activations.
+    - Attention-pooled (Eq. 2) over the tail-20 L13 activations.
 """
 
 from __future__ import annotations
@@ -40,49 +44,44 @@ PROBE_CACHE = REPO / "experiments/phase5_downstream_utility/results/probe_cache"
 CKPT_DIR = REPO / "experiments/phase5_downstream_utility/results/ckpts"
 OUT_JSONL = REPO / "experiments/phase5_downstream_utility/results/probing_results.jsonl"
 
-LAYERS = [11, 12, 13, 14, 15]
-ANCHOR_IDX = 2  # index of L13 within LAYERS
 K_VALUES = [1, 2, 5, 20]
 
 
 def _load_task_cache(task_dir: Path) -> dict[str, Any]:
-    npz = np.load(task_dir / "acts_tail.npz")
+    anchor = np.load(task_dir / "acts_anchor.npz")
+    mlc = np.load(task_dir / "acts_mlc.npz")
     meta = json.loads((task_dir / "meta.json").read_text())
     return {
-        "train_acts": npz["train_acts"].astype(np.float32),
-        "test_acts": npz["test_acts"].astype(np.float32),
-        "train_last_idx": npz["train_last_idx"],
-        "test_last_idx": npz["test_last_idx"],
-        "train_labels": npz["train_labels"],
-        "test_labels": npz["test_labels"],
+        "anchor_train": anchor["train_acts"].astype(np.float32),  # (N, LAST_N, d)
+        "anchor_test": anchor["test_acts"].astype(np.float32),
+        "train_last_idx": anchor["train_last_idx"],
+        "test_last_idx": anchor["test_last_idx"],
+        "mlc_train": mlc["train_acts"].astype(np.float32),  # (N, 5, d)
+        "mlc_test": mlc["test_acts"].astype(np.float32),
+        "train_labels": anchor["train_labels"],
+        "test_labels": anchor["test_labels"],
         "meta": meta,
     }
 
 
-def _last_token(acts, last_idx, layer_idx):
+def _last_token(acts, last_idx):
+    """(N, LAST_N, d) + last_idx -> (N, d) at each sample's last real pos."""
     N = acts.shape[0]
     out = np.empty((N, acts.shape[-1]), dtype=np.float32)
-    for i in range(N):
-        out[i] = acts[i, int(last_idx[i]), layer_idx]
-    return out
-
-
-def _last_token_multilayer(acts, last_idx):
-    N = acts.shape[0]
-    out = np.empty((N, acts.shape[2], acts.shape[3]), dtype=np.float32)
     for i in range(N):
         out[i] = acts[i, int(last_idx[i])]
     return out
 
 
-def _window_at_last(acts, last_idx, layer_idx, T):
+def _window_at_last(acts, last_idx, T):
+    """(N, LAST_N, d) + last_idx -> (N, T, d) left-clamped window ending at last_idx."""
     N = acts.shape[0]
     d = acts.shape[-1]
     out = np.empty((N, T, d), dtype=np.float32)
     for i in range(N):
         li = int(last_idx[i])
         start = max(0, li - T + 1)
-        win = acts[i, start:li + 1, layer_idx]
+        win = acts[i, start:li + 1]
         if win.shape[0] < T:
             pad = np.broadcast_to(win[0:1], (T - win.shape[0], d))
             win = np.concatenate([pad, win], axis=0)
@@ -90,69 +89,44 @@ def _window_at_last(acts, last_idx, layer_idx, T):
     return out
 
 
-def _encode_topk(model, acts, last_idx, device):
-    X = _last_token(acts, last_idx, ANCHOR_IDX)
+# ─── encoders per arch ───
+
+def _encode_topk(model, anchor_acts, last_idx, device):
+    X = _last_token(anchor_acts, last_idx)
     with torch.no_grad():
         z = model.encode(torch.from_numpy(X).to(device))
     return z.cpu().numpy()
 
 
-def _encode_mlc(model, acts, last_idx, device):
-    X = _last_token_multilayer(acts, last_idx)
+def _encode_mlc(model, mlc_acts, device):
+    with torch.no_grad():
+        z = model.encode(torch.from_numpy(mlc_acts).to(device))
+    return z.cpu().numpy()
+
+
+def _encode_txcdr(model, anchor_acts, last_idx, T, device):
+    X = _window_at_last(anchor_acts, last_idx, T)
     with torch.no_grad():
         z = model.encode(torch.from_numpy(X).to(device))
     return z.cpu().numpy()
 
 
-def _encode_txcdr(model, acts, last_idx, T, device):
-    X = _window_at_last(acts, last_idx, ANCHOR_IDX, T)
-    with torch.no_grad():
-        z = model.encode(torch.from_numpy(X).to(device))
-    return z.cpu().numpy()
-
-
-def _encode_stacked_last(model, acts, last_idx, T, device):
-    X = _last_token(acts, last_idx, ANCHOR_IDX)
+def _encode_stacked_last(model, anchor_acts, last_idx, T, device):
+    """Last-position SAE within the stack, applied to the anchor last token."""
+    X = _last_token(anchor_acts, last_idx)
     with torch.no_grad():
         z = model.saes[-1].encode(torch.from_numpy(X).to(device))
     return z.cpu().numpy()
 
 
-def _encode_sharedperpos_last(model, acts, last_idx, T, device):
-    X = _last_token(acts, last_idx, ANCHOR_IDX)
-    Xt = torch.from_numpy(X).to(device)
-    with torch.no_grad():
-        z = model.encode(Xt.unsqueeze(1))[:, 0, :]
-    return z.cpu().numpy()
-
-
-def _encode_tfa(model, acts, last_idx, device):
-    N = acts.shape[0]
-    d = acts.shape[-1]
-    X = acts[:, :, ANCHOR_IDX, :]
-    sample = X[:min(256, N)]
-    mean_norm = np.linalg.norm(sample.reshape(-1, d), axis=-1).mean()
-    scale = (d ** 0.5) / max(mean_norm, 1e-8)
-    X_scaled = X * scale
-    width = getattr(model, "width", 18432)
-    Z_out = np.empty((N, width), dtype=np.float32)
-    with torch.no_grad():
-        for start in range(0, N, 32):
-            end = min(start + 32, N)
-            xb = torch.from_numpy(X_scaled[start:end]).to(device)
-            _, inter = model(xb)
-            novel = inter["novel_codes"]
-            li = last_idx[start:end]
-            for j in range(end - start):
-                Z_out[start + j] = novel[j, int(li[j])].cpu().numpy()
-    return Z_out
-
-
-def _encode_matryoshka(model, acts, last_idx, T, device):
-    X = _window_at_last(acts, last_idx, ANCHOR_IDX, T)
+def _encode_matryoshka(model, anchor_acts, last_idx, T, device):
+    X = _window_at_last(anchor_acts, last_idx, T)
     with torch.no_grad():
         z = model.encode(torch.from_numpy(X).to(device))
     return z.cpu().numpy()
+
+
+# ─── feature selection + probe ───
 
 
 def top_k_by_class_sep(Z_train, y_train, k):
@@ -205,15 +179,14 @@ def last_token_lr_auc(X_train, y_train, X_test, y_test):
 
 def attn_pool_auc(acts_tr, last_tr, y_tr, acts_te, last_te, y_te, device,
                   seed: int = 42):
-    X_tr = acts_tr[:, :, ANCHOR_IDX, :]
-    X_te = acts_te[:, :, ANCHOR_IDX, :]
-    mask_tr = np.arange(X_tr.shape[1])[None, :] <= last_tr[:, None]
-    mask_te = np.arange(X_te.shape[1])[None, :] <= last_te[:, None]
+    """acts_* shape: (N, LAST_N, d); L13 only (anchor)."""
+    mask_tr = np.arange(acts_tr.shape[1])[None, :] <= last_tr[:, None]
+    mask_te = np.arange(acts_te.shape[1])[None, :] <= last_te[:, None]
     try:
         out = train_attn_probe(
-            X_train=torch.from_numpy(X_tr).float(),
+            X_train=torch.from_numpy(acts_tr).float(),
             y_train=torch.from_numpy(y_tr),
-            X_test=torch.from_numpy(X_te).float(),
+            X_test=torch.from_numpy(acts_te).float(),
             y_test=torch.from_numpy(y_te),
             mask_train=torch.from_numpy(mask_tr),
             mask_test=torch.from_numpy(mask_te),
@@ -249,30 +222,19 @@ def _load_model_for_run(run_id, ckpt_path, device):
     elif arch.startswith("stacked_t"):
         T = meta["T"]
         model = StackedSAE(d_in, d_sae, T, k=meta["k_pos"]).to(device)
+    elif arch == "matryoshka_t5":
+        from src.architectures.matryoshka_txcdr import PositionMatryoshkaTXCDR
+        T = meta["T"]
+        k_eff = meta["k_win"] or (meta["k_pos"] * T)
+        model = PositionMatryoshkaTXCDR(d_in, d_sae, T, k_eff).to(device)
     elif arch == "shared_perpos_t5":
         from experiments.phase5_downstream_utility.train_primary_archs import (
             SharedPerPositionSAE,
         )
         T = meta["T"]
         model = SharedPerPositionSAE(d_in, d_sae, T, k=meta["k_pos"]).to(device)
-    elif arch in ("tfa", "tfa_pos"):
-        from src.architectures._tfa_module import TemporalSAE
-        use_pos = (arch == "tfa_pos")
-        model = TemporalSAE(
-            dimin=d_in, width=d_sae, n_heads=4,
-            sae_diff_type="topk", kval_topk=meta["k_pos"],
-            tied_weights=True, n_attn_layers=1,
-            bottleneck_factor=4, use_pos_encoding=use_pos,
-        ).to(device)
-    elif arch == "matryoshka_t5":
-        from src.architectures.matryoshka_txcdr import PositionMatryoshkaTXCDR
-        T = meta["T"]
-        k_eff = meta["k_win"] or (meta["k_pos"] * T)
-        model = PositionMatryoshkaTXCDR(d_in, d_sae, T, k_eff).to(device)
     else:
         raise ValueError(f"Unknown arch {arch}")
-    # Cast the loaded (possibly fp16) state_dict to the module's dtype (fp32)
-    # explicitly to avoid silent precision drops in Matryoshka's mean() calls.
     cast_state = {
         k: v.to(torch.float32) if v.dtype == torch.float16 else v
         for k, v in state["state_dict"].items()
@@ -284,34 +246,39 @@ def _load_model_for_run(run_id, ckpt_path, device):
 
 def _encode_for_probe(
     model, arch, meta,
-    train_acts, train_last_idx,
-    test_acts, test_last_idx, device,
+    tc: dict, split: str,
+    device,
 ):
+    if split == "train":
+        anchor = tc["anchor_train"]
+        mlc = tc["mlc_train"]
+        li = tc["train_last_idx"]
+    else:
+        anchor = tc["anchor_test"]
+        mlc = tc["mlc_test"]
+        li = tc["test_last_idx"]
+
     if arch == "topk_sae":
-        return (_encode_topk(model, train_acts, train_last_idx, device),
-                _encode_topk(model, test_acts, test_last_idx, device))
+        return _encode_topk(model, anchor, li, device)
     if arch == "mlc":
-        return (_encode_mlc(model, train_acts, train_last_idx, device),
-                _encode_mlc(model, test_acts, test_last_idx, device))
+        return _encode_mlc(model, mlc, device)
     if arch.startswith("txcdr_t"):
         T = meta["T"]
-        return (_encode_txcdr(model, train_acts, train_last_idx, T, device),
-                _encode_txcdr(model, test_acts, test_last_idx, T, device))
+        return _encode_txcdr(model, anchor, li, T, device)
     if arch.startswith("stacked_t"):
         T = meta["T"]
-        return (_encode_stacked_last(model, train_acts, train_last_idx, T, device),
-                _encode_stacked_last(model, test_acts, test_last_idx, T, device))
-    if arch == "shared_perpos_t5":
-        T = meta["T"]
-        return (_encode_sharedperpos_last(model, train_acts, train_last_idx, T, device),
-                _encode_sharedperpos_last(model, test_acts, test_last_idx, T, device))
-    if arch in ("tfa", "tfa_pos"):
-        return (_encode_tfa(model, train_acts, train_last_idx, device),
-                _encode_tfa(model, test_acts, test_last_idx, device))
+        return _encode_stacked_last(model, anchor, li, T, device)
     if arch == "matryoshka_t5":
         T = meta["T"]
-        return (_encode_matryoshka(model, train_acts, train_last_idx, T, device),
-                _encode_matryoshka(model, test_acts, test_last_idx, T, device))
+        return _encode_matryoshka(model, anchor, li, T, device)
+    if arch == "shared_perpos_t5":
+        T = meta["T"]
+        X = _last_token(anchor, li)
+        with torch.no_grad():
+            z = model.encode(
+                torch.from_numpy(X).to(device).unsqueeze(1)
+            )[:, 0, :]
+        return z.cpu().numpy()
     raise ValueError(f"Unknown arch {arch}")
 
 
@@ -326,6 +293,11 @@ def run_probing(
     task_dirs = [d for d in sorted(PROBE_CACHE.iterdir()) if d.is_dir()]
     if task_names:
         task_dirs = [d for d in task_dirs if d.name in task_names]
+    # Only load dirs that have both caches
+    task_dirs = [
+        d for d in task_dirs
+        if (d / "acts_anchor.npz").exists() and (d / "acts_mlc.npz").exists()
+    ]
     task_cache = {d.name: _load_task_cache(d) for d in task_dirs}
     print(f"Probing {len(task_cache)} tasks")
 
@@ -335,8 +307,8 @@ def run_probing(
                 ytr, yte = tc["train_labels"], tc["test_labels"]
                 dkey = tc["meta"]["dataset_key"]
 
-                X_last_tr = _last_token(tc["train_acts"], tc["train_last_idx"], ANCHOR_IDX)
-                X_last_te = _last_token(tc["test_acts"], tc["test_last_idx"], ANCHOR_IDX)
+                X_last_tr = _last_token(tc["anchor_train"], tc["train_last_idx"])
+                X_last_te = _last_token(tc["anchor_test"], tc["test_last_idx"])
 
                 t0 = time.time()
                 last_auc = last_token_lr_auc(X_last_tr, ytr, X_last_te, yte)
@@ -352,8 +324,8 @@ def run_probing(
 
                 t0 = time.time()
                 ap_auc = attn_pool_auc(
-                    tc["train_acts"], tc["train_last_idx"], ytr,
-                    tc["test_acts"], tc["test_last_idx"], yte, device,
+                    tc["anchor_train"], tc["train_last_idx"], ytr,
+                    tc["anchor_test"], tc["test_last_idx"], yte, device,
                 )
                 out_f.write(json.dumps({
                     "run_id": "BASELINE_attn_pool",
@@ -379,11 +351,8 @@ def run_probing(
             for task_name, tc in task_cache.items():
                 try:
                     t0 = time.time()
-                    Ztr, Zte = _encode_for_probe(
-                        model, arch, meta,
-                        tc["train_acts"], tc["train_last_idx"],
-                        tc["test_acts"], tc["test_last_idx"], device,
-                    )
+                    Ztr = _encode_for_probe(model, arch, meta, tc, "train", device)
+                    Zte = _encode_for_probe(model, arch, meta, tc, "test", device)
                     for k in k_values:
                         auc = sae_probe_auc(
                             Ztr, tc["train_labels"],

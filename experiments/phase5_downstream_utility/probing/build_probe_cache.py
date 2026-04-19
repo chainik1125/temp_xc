@@ -1,12 +1,28 @@
-"""Cache Gemma-2-2B-IT last-32-token activations for SAEBench probing tasks.
+"""Cache Gemma-2-2B-IT activations for SAEBench probing tasks.
 
-Saves (N, LAST_N=32, n_layers=5, d_model=2304) fp16 slices per task to
-experiments/phase5_downstream_utility/results/probe_cache/<task>/acts_tail.npz.
+v2: **two smaller caches per task** to keep disk under quota:
 
-Usage (from repo root):
-    HF_HOME=/workspace/hf_cache TQDM_DISABLE=1 \\
-      PYTHONPATH=/workspace/temp_xc \\
-      .venv/bin/python experiments/phase5_downstream_utility/probing/build_probe_cache.py
+    - `acts_anchor.npz`:  (N, LAST_N=20, d_model) fp16 — L13 tail only.
+      Used by TopK / TXCDR (T ≤ 20) / Stacked / Matryoshka.
+    - `acts_mlc.npz`:     (N, n_layers=5, d_model) fp16 — L11..L15 at
+      the last real token position only. Used by MLC.
+
+The old one-file design was (N, 32, 5, 2304) fp16 = ~3.7 GB per task,
+× 28 tasks = 104 GB (over quota). The split design is:
+
+    - anchor:  5000 × 20 × 2304 × 2 = 460 MB
+    - mlc:     5000 × 5  × 2304 × 2 = 115 MB
+    total:     ~575 MB per task × 28 = ~16 GB (under quota)
+
+MLC only ever probes at the last real token (it has no temporal axis),
+so caching its tail-N is wasted. TXCDR / Matryoshka / Stacked need
+tail-T tokens at a single layer — we give them tail-20 at L13 which
+covers T up to 20.
+
+Schema: each .npz has `train_acts`, `test_acts`, `train_labels`,
+`test_labels`, plus (for the anchor cache) `train_last_idx` /
+`test_last_idx` indicating where the last real token sits within the
+tail.
 """
 
 from __future__ import annotations
@@ -23,10 +39,11 @@ os.environ.setdefault("HF_HOME", "/workspace/hf_cache")
 os.environ.setdefault("TQDM_DISABLE", "1")
 
 
-LAYERS = [11, 12, 13, 14, 15]
+MLC_LAYERS = [11, 12, 13, 14, 15]
+ANCHOR_LAYER = 13
 CTX = 128
-LAST_N = 32
-BATCH_SIZE = 64          # 64 × 128 ctx is still well under A40 memory at bf16
+LAST_N = 20
+BATCH_SIZE = 64
 DTYPE = torch.bfloat16
 MODEL_NAME = "google/gemma-2-2b-it"
 OUT_ROOT = Path(
@@ -34,9 +51,12 @@ OUT_ROOT = Path(
 )
 
 
-def _encode_split(model, tok, texts, hooks_captured, device):
-    layer_acts: dict[int, list[torch.Tensor]] = {li: [] for li in LAYERS}
+def _encode_split(model, tok, texts, captured, device):
+    """Forward Gemma on `texts`; return anchor tail + MLC last-token stacks."""
+    anchor_tail: list[torch.Tensor] = []
+    mlc_last: list[torch.Tensor] = []
     last_indices: list[int] = []
+
     for start in range(0, len(texts), BATCH_SIZE):
         chunk = texts[start:start + BATCH_SIZE]
         enc = tok(
@@ -48,16 +68,33 @@ def _encode_split(model, tok, texts, hooks_captured, device):
         last_full = (attn_mask.sum(dim=1) - 1).clamp(min=0).cpu()
         tail_last = (last_full - (CTX - LAST_N)).clamp(min=0)
         last_indices.extend(tail_last.tolist())
-        hooks_captured.clear()
+
+        captured.clear()
         with torch.no_grad():
             model(input_ids, attention_mask=attn_mask)
-        for li in LAYERS:
-            tail = hooks_captured[li][:, -LAST_N:, :].to(torch.float16)
-            layer_acts[li].append(tail)
-    per_layer = [torch.cat(layer_acts[li], dim=0) for li in LAYERS]
-    stacked = torch.stack(per_layer, dim=2)  # (N, LAST_N, n_layers, d)
-    return {"acts": stacked.numpy(),
-            "last_idx": np.asarray(last_indices, dtype=np.int64)}
+
+        # anchor tail at L13, shape (B, LAST_N, d)
+        at = captured[ANCHOR_LAYER][:, -LAST_N:, :].to(torch.float16)
+        anchor_tail.append(at)
+
+        # MLC last-token stack at L11..L15, shape (B, 5, d)
+        bsz = input_ids.shape[0]
+        mlc_batch = torch.empty(
+            (bsz, len(MLC_LAYERS), captured[ANCHOR_LAYER].shape[-1]),
+            dtype=torch.float16,
+        )
+        for idx, li in enumerate(MLC_LAYERS):
+            full = captured[li]                 # (B, CTX, d)
+            mlc_batch[:, idx, :] = (
+                full[torch.arange(bsz), last_full].to(torch.float16)
+            )
+        mlc_last.append(mlc_batch)
+
+    return {
+        "anchor_tail": torch.cat(anchor_tail, dim=0).numpy(),
+        "mlc_last": torch.cat(mlc_last, dim=0).numpy(),
+        "last_idx": np.asarray(last_indices, dtype=np.int64),
+    }
 
 
 def main() -> None:
@@ -91,7 +128,7 @@ def main() -> None:
 
     captured: dict[int, torch.Tensor] = {}
     hooks = []
-    for li in LAYERS:
+    for li in MLC_LAYERS:
         def make_hook(layer_idx: int):
             def hook_fn(module, inp, output):
                 acts = output[0] if isinstance(output, tuple) else output
@@ -111,25 +148,35 @@ def main() -> None:
     device = torch.device("cuda")
     for task in tasks:
         out_dir = OUT_ROOT / task.task_name
-        npz_path = out_dir / "acts_tail.npz"
-        if npz_path.exists() and not args.force:
+        anchor_path = out_dir / "acts_anchor.npz"
+        mlc_path = out_dir / "acts_mlc.npz"
+        if anchor_path.exists() and mlc_path.exists() and not args.force:
             print(f"  {task.task_name}: cached, skip")
             continue
         out_dir.mkdir(parents=True, exist_ok=True)
         if not task.train_texts or not task.test_texts:
             print(f"  {task.task_name}: empty, skip")
             continue
+
         print(
             f"  {task.task_name}: "
             f"{len(task.train_texts)}/{len(task.test_texts)} prompts"
         )
         tr = _encode_split(model, tok, task.train_texts, captured, device)
         te = _encode_split(model, tok, task.test_texts, captured, device)
+
         np.savez(
-            npz_path,
-            train_acts=tr["acts"], train_last_idx=tr["last_idx"],
+            anchor_path,
+            train_acts=tr["anchor_tail"], train_last_idx=tr["last_idx"],
             train_labels=np.asarray(task.train_labels, dtype=np.int64),
-            test_acts=te["acts"], test_last_idx=te["last_idx"],
+            test_acts=te["anchor_tail"], test_last_idx=te["last_idx"],
+            test_labels=np.asarray(task.test_labels, dtype=np.int64),
+        )
+        np.savez(
+            mlc_path,
+            train_acts=tr["mlc_last"],
+            train_labels=np.asarray(task.train_labels, dtype=np.int64),
+            test_acts=te["mlc_last"],
             test_labels=np.asarray(task.test_labels, dtype=np.int64),
         )
         (out_dir / "meta.json").write_text(json.dumps({
@@ -139,10 +186,15 @@ def main() -> None:
             "n_test": int(len(task.test_texts)),
             "train_pos_frac": float(task.train_labels.mean()),
             "test_pos_frac": float(task.test_labels.mean()),
-            "layers": LAYERS, "last_n": LAST_N, "d_model": 2304,
+            "mlc_layers": MLC_LAYERS,
+            "anchor_layer": ANCHOR_LAYER,
+            "last_n": LAST_N, "d_model": 2304,
             "context_size": CTX, "model": MODEL_NAME,
         }, indent=2))
-        print(f"    -> {npz_path} ({npz_path.stat().st_size / 1e9:.2f} GB)")
+        print(
+            f"    -> {anchor_path.stat().st_size / 1e6:.1f} + "
+            f"{mlc_path.stat().st_size / 1e6:.1f} MB"
+        )
 
     for h in hooks:
         h.remove()
