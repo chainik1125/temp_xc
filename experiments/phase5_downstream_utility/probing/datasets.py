@@ -220,7 +220,8 @@ def _load_amazon_reviews_sentiment(rng: random.Random) -> list[ProbingTask]:
 def _load_europarl(rng: random.Random) -> list[ProbingTask]:
     from datasets import load_dataset
     print("Loading Helsinki-NLP/europarl (5 lang pairs)...")
-    configs = ["en-fr", "en-de", "en-es", "en-it", "en-nl"]
+    # HF europarl pairs are alphabetized: de-en not en-de, el-en not en-el, etc.
+    configs = ["en-fr", "de-en", "en-es", "en-it", "en-nl"]
     target_langs = ["fr", "de", "es", "it", "nl"]
     lang_texts: dict[str, list[str]] = {"en": []}
     for cfg, lang in zip(configs, target_langs):
