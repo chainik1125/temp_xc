@@ -28,6 +28,8 @@ JSONL = RESULTS_DIR / "probing_results.jsonl"
 PLOTS_DIR = RESULTS_DIR / "plots"
 HEADLINE_K = 5
 
+FLIP_TASKS = {"winogrande_correct_completion", "wsc_coreference"}
+
 
 def _load_records() -> list[dict]:
     if not JSONL.exists():
@@ -58,7 +60,10 @@ def aggregate(records: list[dict]) -> dict:
             continue
         arch = r.get("arch")
         task = r.get("task_name")
-        out[arch][task] = float(r["test_auc"])
+        auc = float(r["test_auc"])
+        if task in FLIP_TASKS:
+            auc = max(auc, 1.0 - auc)
+        out[arch][task] = auc
     return out
 
 
