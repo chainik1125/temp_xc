@@ -201,9 +201,13 @@ def train_attn_probe(
             mask_test.to(device) if mask_test is not None else None,
         )
     test_auc = _auc(test_logit, y_test)
+    test_acc = float(
+        ((test_logit.detach().cpu() > 0).long() == y_test.long()).float().mean()
+    )
 
     return {
         "test_auc": test_auc,
+        "test_acc": test_acc,
         "best_val_auc": best_val,
         "epochs_to_best": best_epoch,
         "stopped_early": patience <= 0,

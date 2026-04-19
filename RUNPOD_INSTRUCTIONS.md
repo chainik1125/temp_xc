@@ -36,10 +36,17 @@ huggingface-cli whoami >/dev/null 2>&1 || huggingface-cli login
 ```bash
 cd /workspace/temp_xc
 source .venv/bin/activate    # activates uv's venv
-# HF_HOME / UV_LINK_MODE are already in ~/.bashrc after first setup
 git pull origin han
 uv sync                      # no-op if in sync
 ```
+
+**Check `HF_HOME` and `UV_LINK_MODE` first.** `~/.bashrc` lives at `/home/appuser/.bashrc`, which is NOT guaranteed to persist across pod stop/start on all RunPod configurations. Run:
+
+```bash
+echo "HF_HOME=$HF_HOME  UV_LINK_MODE=$UV_LINK_MODE"
+```
+
+If either is empty, re-run the `export` + `~/.bashrc` block from first-time setup before touching `uv sync`. Running `uv sync` without `UV_LINK_MODE=copy` on MooseFS silently produces partial installs (dist-info dirs without `RECORD` files), which then make every subsequent `uv sync` spin its wheels — see "Known failure: orphan dist-info" below.
 
 ## Verify the environment
 
@@ -53,6 +60,34 @@ from src.architectures._tfa_module import TemporalSAE  # smoke test
 print('✓ bench imports ok')
 "
 ```
+
+Also confirm `uv sync` is idempotent — the venv is clean if the second call only audits, without any "Uninstalled"/"Installed" lines:
+
+```bash
+uv sync && uv sync   # second run should show only "Resolved ... / Audited ..."
+```
+
+If the second run still installs or uninstalls, see the next section.
+
+### Known failure: orphan dist-info
+
+**Symptom.** `uv sync` uninstalls and reinstalls the same package every invocation and prints:
+
+```
+warning: Failed to uninstall package at .venv/lib/python3.12/site-packages/<pkg>-<ver>.dist-info due to missing `RECORD` file.
+```
+
+**Cause.** A prior `uv sync` ran without `UV_LINK_MODE=copy`, leaving a partial dist-info directory (metadata only, no `RECORD`). `uv` notices the unexpected install every run, tries to uninstall, can't, and reinstalls the correct version — but never cleans the orphan, so the loop repeats.
+
+**Fix.** Delete the orphan dist-info directory and re-sync. Confirm `UV_LINK_MODE=copy` is set first:
+
+```bash
+export UV_LINK_MODE=copy
+rm -rf .venv/lib/python3.12/site-packages/<pkg>-<ver>.dist-info
+uv sync && uv sync    # second run should audit only
+```
+
+The package's actual code lives in a sibling directory (e.g. `pytest/`), not in `*.dist-info/`, so deleting the orphan metadata dir is safe.
 
 ## GitHub push access (persistent across pod sessions)
 

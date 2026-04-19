@@ -153,8 +153,10 @@ def _load_amazon_reviews(rng: random.Random) -> list[ProbingTask]:
         return []
     texts: list[str] = []
     cats: list = []
+    # Increased from 20k to 100k to capture all 7 categories in the stream
+    # (20k only saw 1-2 classes and collapsed to a single binary task).
     for i, row in enumerate(ds):
-        if i >= 20_000:
+        if i >= 100_000:
             break
         t = row.get("text") or row.get("review_body")
         # EXPLICIT None check — category=0 is falsy, so `or` fallback
@@ -280,25 +282,30 @@ def _load_europarl(rng: random.Random) -> list[ProbingTask]:
 
 
 def _load_github_code(rng: random.Random) -> list[ProbingTask]:
+    """Programming-language ID tasks.
+
+    `bigcode/the-stack-smol` (Aniket's source) is gated on HF. We fall
+    back to `code_search_net`, which covers python/java/javascript/go
+    without auth. The ruby and php branches are also available there
+    if needed; we pick the 4 languages that overlap Aniket's set.
+    """
     from datasets import load_dataset
-    print("Loading bigcode/the-stack-smol (5 langs)...")
-    langs = ["python", "java", "javascript", "cpp", "go"]
+    langs = ["python", "java", "javascript", "go"]
     per_lang: dict[str, list[str]] = {lg: [] for lg in langs}
     for lg in langs:
         try:
             ds = load_dataset(
-                "bigcode/the-stack-smol",
-                data_dir=f"data/{lg}",
+                "code_search_net", lg,
                 split="train", streaming=True,
             )
             for i, row in enumerate(ds):
                 if i >= 3000:
                     break
-                c = row.get("content")
+                c = row.get("whole_func_string") or row.get("func_code_string")
                 if isinstance(c, str) and 50 < len(c) < 4000:
                     per_lang[lg].append(c)
         except Exception as e:
-            print(f"  FAIL {lg}: {e}")
+            print(f"  code_search_net/{lg} FAIL: {e}")
 
     texts_flat: list[str] = []
     langs_flat: list[str] = []
@@ -306,7 +313,9 @@ def _load_github_code(rng: random.Random) -> list[ProbingTask]:
         texts_flat.extend(per_lang[lg])
         langs_flat.extend([lg] * len(per_lang[lg]))
     if not texts_flat:
+        print("  github_code: no samples — tasks skipped")
         return []
+    print(f"  github_code loaded: {dict(Counter(langs_flat))}")
 
     out: list[ProbingTask] = []
     for lg in langs:

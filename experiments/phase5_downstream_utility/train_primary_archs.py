@@ -345,7 +345,115 @@ def train_matryoshka_txcdr(cfg, device, k, T, d_sae=DEFAULT_D_SAE, buf=None):
     return model, log
 
 
-def train_tfa(cfg, device, k, use_pos, d_sae=DEFAULT_D_SAE, buf=None):
+def train_txcdr_variant(cfg, device, k, T, variant: str,
+                        d_sae=DEFAULT_D_SAE, buf=None):
+    """Train one of the TXCDR weight-sharing / novel variants.
+
+    variant: shared_dec | shared_enc | tied | pos | causal |
+             block_sparse | lowrank_dec
+    """
+    from src.architectures.txcdr_variants import (
+        TXCDRSharedDec, TXCDRSharedEnc, TXCDRTied, TXCDRPos, TXCDRCausal,
+        TXCDRBlockSparseTopK, TXCDRLowRankDec, TXCDRRankKFeature,
+    )
+    buf = buf if buf is not None else _preload_single(ANCHOR_LAYER_KEY, device)
+    d_in = buf.shape[-1]
+    k_eff = k * T  # match Stacked / TXCDR k_win
+    cls_map = {
+        "shared_dec": TXCDRSharedDec,
+        "shared_enc": TXCDRSharedEnc,
+        "tied": TXCDRTied,
+        "pos": TXCDRPos,
+        "causal": TXCDRCausal,
+        "block_sparse": TXCDRBlockSparseTopK,
+        "lowrank_dec": TXCDRLowRankDec,
+        "rank_k_feature": TXCDRRankKFeature,
+    }
+    if variant not in cls_map:
+        raise ValueError(variant)
+    model = cls_map[variant](d_in, d_sae, T, k_eff).to(device)
+    gen = make_window_gen_gpu(buf, T)
+
+    def norm(): model._normalize_decoder()
+
+    # Latent L0 reporting depends on encoder output shape.
+    if variant in ("causal", "block_sparse"):
+        # (B, T, d_sae) output; L0 is total non-zero count per window.
+        def l0(z):
+            return (z > 0).float().sum(dim=(-1, -2)).mean().item()
+    else:
+        def l0(z):
+            return (z > 0).float().sum(dim=-1).mean().item()
+
+    log = _iterate_train(
+        model, gen, cfg, device, normalize_decoder=norm, latent_l0_fn=l0,
+    )
+    return model, log
+
+
+def train_time_layer(cfg, device, k, T, d_sae=8192, buf=None):
+    """Train the Time×Layer joint crosscoder.
+
+    Args:
+        d_sae: reduced (8192) to fit VRAM alongside the 18 GB multilayer
+            buffer and Adam state. Full 18432 would OOM at T=L=5.
+    """
+    from src.architectures.time_layer_crosscoder import TimeLayerCrosscoder
+    buf = buf if buf is not None else _preload_multilayer(device)  # (N, L_seq, L, d)
+    # Need (B, T, L, d) windows. Use a custom generator.
+    N, L_seq, L_lay, d_in = buf.shape
+    n_wins = L_seq - T + 1
+    k_eff = k * T * L_lay  # match per-(t, l) sparsity × T × L
+
+    def gen(batch_size: int) -> torch.Tensor:
+        seq = torch.randint(0, N, (batch_size,), device=buf.device)
+        off = torch.randint(0, n_wins, (batch_size,), device=buf.device)
+        rng = torch.arange(T, device=buf.device)
+        pos = off.unsqueeze(1) + rng.unsqueeze(0)  # (B, T)
+        # buf[seq.view(B,1,1), pos.view(B,T,1), layer_idx.view(1,1,L)]
+        return buf[seq[:, None], pos, :].float()  # (B, T, L, d)
+
+    model = TimeLayerCrosscoder(d_in, d_sae, T, L_lay, k_eff).to(device)
+
+    def norm(): model._normalize_decoder()
+
+    def l0(z):
+        return (z > 0).float().sum(dim=(-1, -2, -3)).mean().item()
+
+    log = _iterate_train(
+        model, gen, cfg, device, normalize_decoder=norm, latent_l0_fn=l0,
+    )
+    return model, log
+
+
+def train_temporal_contrastive(cfg, device, k, d_sae=DEFAULT_D_SAE,
+                               buf=None, alpha: float = 1.0):
+    """Ye et al. 2025 contrastive + matryoshka temporal SAE."""
+    from src.architectures.temporal_contrastive_sae import (
+        TemporalContrastiveSAE,
+    )
+    buf = buf if buf is not None else _preload_single(ANCHOR_LAYER_KEY, device)
+    d_in = buf.shape[-1]
+    model = TemporalContrastiveSAE(d_in, d_sae, k=k).to(device)
+    gen_pair = make_window_gen_gpu(buf, T=2)  # (B, 2, d) adjacent pairs
+
+    def gen(batch_size):
+        return gen_pair(batch_size)
+
+    def norm(): model._normalize_decoder()
+
+    def l0(z):
+        # z here is the current-token latent; k active features per token.
+        return (z > 0).float().sum(dim=-1).mean().item()
+
+    log = _iterate_train(
+        model, gen, cfg, device, normalize_decoder=norm, latent_l0_fn=l0,
+    )
+    return model, log
+
+
+def train_tfa(cfg, device, k, use_pos, d_sae=DEFAULT_D_SAE, buf=None,
+              seq_len: int | None = None):
     from src.architectures._tfa_module import TemporalSAE
     buf = buf if buf is not None else _preload_single(ANCHOR_LAYER_KEY, device)
     d_in = buf.shape[-1]
@@ -362,10 +470,16 @@ def train_tfa(cfg, device, k, use_pos, d_sae=DEFAULT_D_SAE, buf=None):
     ).to(device)
 
     base_seq_gen = make_seq_gen_gpu(buf)
+    _, L_full, _ = buf.shape
+    _sl = seq_len if (seq_len is not None and seq_len < L_full) else L_full
 
     def gen(batch_size: int) -> torch.Tensor:
         bs = min(batch_size, 32)
-        return base_seq_gen(bs) * scale
+        seqs = base_seq_gen(bs)  # (bs, L_full, d)
+        if _sl < L_full:
+            start = int(torch.randint(0, L_full - _sl + 1, (1,)).item())
+            seqs = seqs[:, start:start + _sl, :]
+        return seqs * scale
 
     def norm():
         with torch.no_grad():
@@ -383,6 +497,7 @@ def train_tfa(cfg, device, k, use_pos, d_sae=DEFAULT_D_SAE, buf=None):
         model, gen, tfa_cfg, device,
         normalize_decoder=norm, latent_l0_fn=l0, tfa_mode=True,
     )
+    log["input_scale"] = float(scale)
     return model, log
 
 
@@ -516,6 +631,90 @@ def run_all(seeds, max_steps, archs=None):
                 model, log = train_matryoshka_txcdr(cfg, device, k=100, T=5,
                                                     buf=get_anchor())
                 meta = dict(seed=seed, k_pos=100, k_win=500, T=5, layer=13)
+            elif arch == "tfa_small":
+                # Reduced-size TFA for overnight budget (plan.md addendum).
+                model, log = train_tfa(cfg, device, k=100, use_pos=False,
+                                       d_sae=4096, buf=get_anchor(),
+                                       seq_len=32)
+                meta = dict(seed=seed, k_pos=100, k_win=None, T=32,
+                            use_pos=False, d_sae=4096, layer=13,
+                            scale=log.get("input_scale", 1.0))
+            elif arch == "tfa_pos_small":
+                model, log = train_tfa(cfg, device, k=100, use_pos=True,
+                                       d_sae=4096, buf=get_anchor(),
+                                       seq_len=32)
+                meta = dict(seed=seed, k_pos=100, k_win=None, T=32,
+                            use_pos=True, d_sae=4096, layer=13,
+                            scale=log.get("input_scale", 1.0))
+            elif arch == "txcdr_shared_dec_t5":
+                model, log = train_txcdr_variant(
+                    cfg, device, k=100, T=5, variant="shared_dec",
+                    buf=get_anchor(),
+                )
+                meta = dict(seed=seed, k_pos=100, k_win=500, T=5,
+                            variant="shared_dec", layer=13)
+            elif arch == "txcdr_shared_enc_t5":
+                model, log = train_txcdr_variant(
+                    cfg, device, k=100, T=5, variant="shared_enc",
+                    buf=get_anchor(),
+                )
+                meta = dict(seed=seed, k_pos=100, k_win=500, T=5,
+                            variant="shared_enc", layer=13)
+            elif arch == "txcdr_tied_t5":
+                model, log = train_txcdr_variant(
+                    cfg, device, k=100, T=5, variant="tied",
+                    buf=get_anchor(),
+                )
+                meta = dict(seed=seed, k_pos=100, k_win=500, T=5,
+                            variant="tied", layer=13)
+            elif arch == "txcdr_pos_t5":
+                model, log = train_txcdr_variant(
+                    cfg, device, k=100, T=5, variant="pos",
+                    buf=get_anchor(),
+                )
+                meta = dict(seed=seed, k_pos=100, k_win=500, T=5,
+                            variant="pos", layer=13)
+            elif arch == "txcdr_causal_t5":
+                model, log = train_txcdr_variant(
+                    cfg, device, k=100, T=5, variant="causal",
+                    buf=get_anchor(),
+                )
+                meta = dict(seed=seed, k_pos=100, k_win=500, T=5,
+                            variant="causal", layer=13)
+            elif arch == "txcdr_block_sparse_t5":
+                model, log = train_txcdr_variant(
+                    cfg, device, k=100, T=5, variant="block_sparse",
+                    buf=get_anchor(),
+                )
+                meta = dict(seed=seed, k_pos=100, k_win=500, T=5,
+                            variant="block_sparse", layer=13)
+            elif arch == "txcdr_lowrank_dec_t5":
+                model, log = train_txcdr_variant(
+                    cfg, device, k=100, T=5, variant="lowrank_dec",
+                    buf=get_anchor(),
+                )
+                meta = dict(seed=seed, k_pos=100, k_win=500, T=5,
+                            variant="lowrank_dec", rank=8, layer=13)
+            elif arch == "txcdr_rank_k_dec_t5":
+                model, log = train_txcdr_variant(
+                    cfg, device, k=100, T=5, variant="rank_k_feature",
+                    buf=get_anchor(),
+                )
+                meta = dict(seed=seed, k_pos=100, k_win=500, T=5,
+                            variant="rank_k_feature", K_rank=4, layer=13)
+            elif arch == "time_layer_crosscoder_t5":
+                model, log = train_time_layer(
+                    cfg, device, k=100, T=5, d_sae=8192, buf=get_ml(),
+                )
+                meta = dict(seed=seed, k_pos=100, k_win=None, T=5,
+                            n_layers=5, d_sae=8192,
+                            layers="L11-L15", layer=13)
+            elif arch == "temporal_contrastive":
+                model, log = train_temporal_contrastive(
+                    cfg, device, k=100, buf=get_anchor(),
+                )
+                meta = dict(seed=seed, k_pos=100, k_win=None, T=2,
+                            variant="contrastive_matryoshka", layer=13)
             else:
                 print(f"  unknown arch: {arch}")
                 continue
