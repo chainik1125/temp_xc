@@ -1,8 +1,8 @@
 {
   "baseline_last_token_lr": {
-    "mean_auc": 0.9342055350320082,
-    "std_auc": 0.055661144406580855,
-    "n_tasks": 27,
+    "mean_auc": 0.9441220465208627,
+    "std_auc": 0.04352137314973168,
+    "n_tasks": 25,
     "per_task": {
       "ag_news_business": 0.9448827085181899,
       "ag_news_scitech": 0.9401108033240997,
@@ -28,15 +28,13 @@
       "europarl_es": 0.9986080269087585,
       "europarl_fr": 0.9981591836734695,
       "europarl_it": 0.998902714061861,
-      "europarl_nl": 0.9998295841854125,
-      "winogrande_correct_completion": 0.7708229581673307,
-      "wsc_coreference": 0.8496753246753247
+      "europarl_nl": 0.9998295841854125
     }
   },
   "baseline_attn_pool": {
-    "mean_auc": 0.9134136297100036,
-    "std_auc": 0.11704530179973856,
-    "n_tasks": 27,
+    "mean_auc": 0.9436669068074538,
+    "std_auc": 0.049359123124857504,
+    "n_tasks": 25,
     "per_task": {
       "ag_news_business": 0.9325920585625554,
       "ag_news_scitech": 0.9518975069252078,
@@ -62,15 +60,13 @@
       "europarl_es": 0.9914073215335379,
       "europarl_fr": 0.9911061224489796,
       "europarl_it": 0.9969024954144785,
-      "europarl_nl": 0.9995415003083714,
-      "winogrande_correct_completion": 0.5415992280876494,
-      "wsc_coreference": 0.5288961038961039
+      "europarl_nl": 0.9995415003083714
     }
   },
   "matryoshka_t5": {
-    "mean_auc": 0.7545410278335298,
-    "std_auc": 0.09454827120503626,
-    "n_tasks": 27,
+    "mean_auc": 0.772174398537472,
+    "std_auc": 0.07334396750319738,
+    "n_tasks": 25,
     "per_task": {
       "ag_news_business": 0.8142676907719608,
       "ag_news_scitech": 0.7377389196675901,
@@ -96,15 +92,13 @@
       "europarl_es": 0.7866811442753576,
       "europarl_fr": 0.7983183673469387,
       "europarl_it": 0.789904159564001,
-      "europarl_nl": 0.7538140682312462,
-      "winogrande_correct_completion": 0.502988047808765,
-      "wsc_coreference": 0.5652597402597402
+      "europarl_nl": 0.7538140682312462
     }
   },
   "mlc": {
-    "mean_auc": 0.8073714384678706,
-    "std_auc": 0.09046985073299313,
-    "n_tasks": 27,
+    "mean_auc": 0.8232449129880487,
+    "std_auc": 0.07330460558524242,
+    "n_tasks": 25,
     "per_task": {
       "ag_news_business": 0.8481241681455189,
       "ag_news_scitech": 0.8580678670360111,
@@ -130,15 +124,13 @@
       "europarl_es": 0.7827419828881196,
       "europarl_fr": 0.7284408163265306,
       "europarl_it": 0.7744854700716273,
-      "europarl_nl": 0.9117327230824164,
-      "winogrande_correct_completion": 0.5805683515936255,
-      "wsc_coreference": 0.6373376623376623
+      "europarl_nl": 0.9117327230824164
     }
   },
   "stacked_t20": {
-    "mean_auc": 0.7282211725043605,
-    "std_auc": 0.10544016997147412,
-    "n_tasks": 27,
+    "mean_auc": 0.7432385370373631,
+    "std_auc": 0.09429893036111774,
+    "n_tasks": 25,
     "per_task": {
       "ag_news_business": 0.8284924023957408,
       "ag_news_scitech": 0.782735457063712,
@@ -164,15 +156,13 @@
       "europarl_es": 0.7248342694794593,
       "europarl_fr": 0.6659469387755103,
       "europarl_it": 0.5701513930672584,
-      "europarl_nl": 0.7376448534423994,
-      "winogrande_correct_completion": 0.5108783615537849,
-      "wsc_coreference": 0.57012987012987
+      "europarl_nl": 0.7376448534423994
     }
   },
   "stacked_t5": {
-    "mean_auc": 0.7430795012249353,
-    "std_auc": 0.1050297066669804,
-    "n_tasks": 27,
+    "mean_auc": 0.7574200491818839,
+    "std_auc": 0.09513512356758017,
+    "n_tasks": 25,
     "per_task": {
       "ag_news_business": 0.814947038598048,
       "ag_news_scitech": 0.7579986149584488,
@@ -198,15 +188,13 @@
       "europarl_es": 0.8394454967017179,
       "europarl_fr": 0.7582326530612244,
       "europarl_it": 0.585211743793856,
-      "europarl_nl": 0.8224632388742817,
-      "winogrande_correct_completion": 0.5308920567729083,
-      "wsc_coreference": 0.5967532467532468
+      "europarl_nl": 0.8224632388742817
     }
   },
   "topk_sae": {
-    "mean_auc": 0.7445371581497534,
-    "std_auc": 0.09996469779563466,
-    "n_tasks": 27,
+    "mean_auc": 0.7608737942647648,
+    "std_auc": 0.08418892530851242,
+    "n_tasks": 25,
     "per_task": {
       "ag_news_business": 0.8378576974267968,
       "ag_news_scitech": 0.7552770083102494,
@@ -232,15 +220,13 @@
       "europarl_es": 0.6549335445104827,
       "europarl_fr": 0.6243428571428571,
       "europarl_it": 0.6628538342247938,
-      "europarl_nl": 0.70962768202032,
-      "winogrande_correct_completion": 0.5046843874501992,
-      "wsc_coreference": 0.575974025974026
+      "europarl_nl": 0.70962768202032
     }
   },
   "txcdr_t20": {
-    "mean_auc": 0.7505844397830399,
-    "std_auc": 0.09669676756558415,
-    "n_tasks": 27,
+    "mean_auc": 0.7654987183785252,
+    "std_auc": 0.0834684899751523,
+    "n_tasks": 25,
     "per_task": {
       "ag_news_business": 0.8338093389529724,
       "ag_news_scitech": 0.8695637119113574,
@@ -266,15 +252,13 @@
       "europarl_es": 0.6948517405786689,
       "europarl_fr": 0.7784448979591836,
       "europarl_it": 0.6384867981520248,
-      "europarl_nl": 0.7632964910572273,
-      "winogrande_correct_completion": 0.5240911354581673,
-      "wsc_coreference": 0.6042207792207792
+      "europarl_nl": 0.7632964910572273
     }
   },
   "txcdr_t5": {
-    "mean_auc": 0.7967603917621359,
-    "std_auc": 0.08692740246422492,
-    "n_tasks": 27,
+    "mean_auc": 0.8149334180247189,
+    "std_auc": 0.05997735404861028,
+    "n_tasks": 25,
     "per_task": {
       "ag_news_business": 0.8051311557231587,
       "ag_news_scitech": 0.783718836565097,
@@ -300,9 +284,7 @@
       "europarl_es": 0.8279423290444778,
       "europarl_fr": 0.8184775510204083,
       "europarl_it": 0.8463678215837358,
-      "europarl_nl": 0.8281640536241763,
-      "winogrande_correct_completion": 0.533350971115538,
-      "wsc_coreference": 0.6058441558441559
+      "europarl_nl": 0.8281640536241763
     }
   }
 }
