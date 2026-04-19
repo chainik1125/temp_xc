@@ -64,6 +64,10 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--limit-tasks", type=int, default=None)
     ap.add_argument("--force", action="store_true")
+    ap.add_argument(
+        "--include-crosstoken", action="store_true",
+        help="Also cache the WinoGrande+WSC coref tasks for sub-phase 5.4.",
+    )
     args = ap.parse_args()
 
     OUT_ROOT.mkdir(parents=True, exist_ok=True)
@@ -96,6 +100,11 @@ def main() -> None:
         hooks.append(model.model.layers[li].register_forward_hook(make_hook(li)))
 
     tasks = load_all_probing_tasks()
+    if args.include_crosstoken:
+        from experiments.phase5_downstream_utility.probing.crosstoken_datasets import (
+            load_all_crosstoken_tasks,
+        )
+        tasks.extend(load_all_crosstoken_tasks())
     if args.limit_tasks:
         tasks = tasks[:args.limit_tasks]
 

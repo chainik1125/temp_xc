@@ -19,8 +19,9 @@ export TQDM_DISABLE=1
 export UV_LINK_MODE=copy
 export PYTHONPATH=/workspace/temp_xc
 
-echo "=== [1/4] BUILD PROBE ACTIVATION CACHE ==="
+echo "=== [1/4] BUILD PROBE ACTIVATION CACHE (+ cross-token for 5.4) ==="
 .venv/bin/python experiments/phase5_downstream_utility/probing/build_probe_cache.py \
+    --include-crosstoken \
     2>&1 | tee logs/phase5_probe_cache.log
 
 echo "=== [2/4] TRAIN PRIMARY ARCHS (seed 42) ==="
