@@ -14,6 +14,8 @@ dependencies = [
     "seaborn",
     "safetensors",
     "anthropic",
+    "openai",
+    "datasets",
     "wandb",
     # Used by feature_map.py (PCA→UMAP→KMeans) and temporal_metrics.py
     "scikit-learn",

@@ -60,6 +60,7 @@ wandb/
 
 # Vendored external repos (Venhoff thinking-llms-interp, etc.)
 external/
+vendor/
 
 # Local env / secrets
 .env
