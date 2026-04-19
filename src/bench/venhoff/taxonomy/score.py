@@ -36,6 +36,7 @@ from src.bench.venhoff.autograder_prompts import (
 )
 from src.bench.venhoff.judge_client import Judge
 
+logging.basicConfig(level=logging.INFO, format="%(message)s")
 log = logging.getLogger("venhoff.score")
 
 

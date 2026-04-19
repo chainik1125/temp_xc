@@ -24,6 +24,7 @@ from src.bench.venhoff.autograder_prompts import build_cluster_description_promp
 from src.bench.venhoff.judge_client import Judge
 from src.bench.venhoff.taxonomy.score import Cluster
 
+logging.basicConfig(level=logging.INFO, format="%(message)s")
 log = logging.getLogger("venhoff.label")
 
 
@@ -83,7 +84,7 @@ async def _label_one(
     raw = await judge.call(system="", user=prompt)
     parsed = _parse_title_description(raw)
     if parsed is None:
-        log.warning("label parse failed for cluster %d (raw=%r)", cluster.cluster_id, raw[:200])
+        log.warning("[warn] label_parse_failed | cluster_id=%d | raw=%r", cluster.cluster_id, raw[:200])
         return None
     title, description = parsed
     return Cluster(

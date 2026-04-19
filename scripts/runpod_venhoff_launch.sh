@@ -100,12 +100,9 @@ if [[ "$FORCE" == "1" ]]; then
     FORCE_FLAGS+=(--force)
 fi
 
-echo "════════════════════════════════════════════════════════════"
-echo " Venhoff reasoning-eval launch ($MODE)"
-echo " model=$MODEL  layer=$LAYER  n_traces=$N_TRACES  seed=$SEED"
-echo " arches=$ARCHES  cluster_sizes=$CLUSTER_SIZES  aggs=$AGGREGATIONS"
-echo " judge=$JUDGE  engine=$ENGINE"
-echo "════════════════════════════════════════════════════════════"
+echo "[info] venhoff_launch | mode=$MODE | model=$MODEL | layer=$LAYER | n_traces=$N_TRACES | seed=$SEED"
+echo "[info] venhoff_grid | arches=$ARCHES | cluster_sizes=$CLUSTER_SIZES | aggregations=$AGGREGATIONS"
+echo "[info] venhoff_judge | judge=$JUDGE | engine=$ENGINE"
 
 # Phase 1a smoke is a single cell — use smoke.py (it wraps all stages).
 if [[ "$MODE" == "smoke" ]]; then
@@ -121,21 +118,34 @@ fi
 
 # Phase 1b full sweep: generate traces once, collect activations once,
 # then fan out across (arch, cluster_size, path, aggregation) cells.
-echo ""
-echo "── Stage 1: generate traces"
+echo "[info] stage=generate_traces | status=start"
 python -m src.bench.venhoff.generate_traces \
     "${COMMON_FLAGS[@]}" --engine "$ENGINE" \
     "${FORCE_FLAGS[@]}"
 
-echo ""
-echo "── Stage 2: collect activations (path1 + path3)"
+echo "[info] stage=collect_activations | status=start | paths=path1,path3 | T=5"
 python -m src.bench.venhoff.activation_collection \
     "${COMMON_FLAGS[@]}" \
     --paths path1 path3 --T 5 \
     "${FORCE_FLAGS[@]}"
 
-echo ""
-echo "── Stage 3-6: train + annotate + label + score per cell"
+echo "[info] stage=fanout | status=start | steps=train+annotate+label+score"
+
+# Pre-compute total cells for [sweep XX/YY] progress counter. Path1 arches
+# (sae) get 1 aggregation; path3 arches (tempxc) get $AGGREGATIONS.
+TOTAL_CELLS=0
+for arch_ in $ARCHES; do
+    for _cs in $CLUSTER_SIZES; do
+        if [[ "$arch_" == "tempxc" ]]; then
+            for _ in $AGGREGATIONS; do TOTAL_CELLS=$((TOTAL_CELLS + 1)); done
+        else
+            TOTAL_CELLS=$((TOTAL_CELLS + 1))
+        fi
+    done
+done
+CELL_COUNT=0
+CELL_WIDTH=${#TOTAL_CELLS}
+
 for arch in $ARCHES; do
     # Path 1 for sae/mlc; path 3 for tempxc (Q1 lock-in).
     if [[ "$arch" == "tempxc" ]]; then
@@ -148,7 +158,7 @@ for arch in $ARCHES; do
     fi
 
     for cluster_size in $CLUSTER_SIZES; do
-        echo "  → arch=$arch cluster_size=$cluster_size path=$path"
+        echo "[info] train_small_sae | arch=$arch | cluster_size=$cluster_size | path=$path"
         python -m src.bench.venhoff.train_small_sae \
             "${COMMON_FLAGS[@]}" \
             --arch "$arch" --cluster-size "$cluster_size" --path "$path" \
@@ -156,7 +166,10 @@ for arch in $ARCHES; do
             "${FORCE_FLAGS[@]}"
 
         for agg in $aggs; do
-            echo "    · aggregation=$agg"
+            CELL_COUNT=$((CELL_COUNT + 1))
+            printf -v CELL_IDX "%0${CELL_WIDTH}d" "$CELL_COUNT"
+            printf -v CELL_TOT "%0${CELL_WIDTH}d" "$TOTAL_CELLS"
+            echo "[sweep $CELL_IDX/$CELL_TOT] arch=$arch | cluster_size=$cluster_size | path=$path | aggregation=$agg"
             python -m src.bench.venhoff.annotate \
                 "${COMMON_FLAGS[@]}" \
                 --arch "$arch" --cluster-size "$cluster_size" --path "$path" \
@@ -182,9 +195,8 @@ for arch in $ARCHES; do
     done
 done
 
-echo ""
 if [[ "$SKIP_BRIDGE" != "1" ]]; then
-    echo "── Stage 7: judge-bridge drift (on smoke-size labels)"
+    echo "[info] stage=bridge | status=start | cell=sae/k15/path1/full_window"
     # Bridge uses the smoke cell's labels as its input sample.
     python -m src.bench.venhoff.smoke \
         "${COMMON_FLAGS[@]}" \
@@ -195,8 +207,4 @@ if [[ "$SKIP_BRIDGE" != "1" ]]; then
         --judge-model "$JUDGE"
 fi
 
-echo ""
-echo "════════════════════════════════════════════════════════════"
-echo " Venhoff $MODE complete."
-echo " Results under: $ROOT/"
-echo "════════════════════════════════════════════════════════════"
+echo "[done] venhoff_launch | mode=$MODE | results_root=$ROOT"

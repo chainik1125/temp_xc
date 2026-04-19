@@ -32,7 +32,7 @@ from src.bench.venhoff.dataset import MMLUProExample, load_mmlu_pro
 from src.bench.venhoff.paths import ArtifactPaths, RunIdentity, can_resume, write_with_metadata
 from src.bench.venhoff.responses import extract_thinking_process
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
+logging.basicConfig(level=logging.INFO, format="%(message)s")
 log = logging.getLogger("venhoff.generate_traces")
 
 
@@ -212,7 +212,7 @@ def generate(
     }
 
     if not force and can_resume(out, config):
-        log.info("resume: traces already cached at %s", out)
+        log.info("[info] resume | stage=generate_traces | cache=%s", out)
         return out
 
     examples = list(
@@ -223,7 +223,7 @@ def generate(
             shuffle=True,
         )
     )
-    log.info("loaded %d MMLU-Pro examples; generating via %s", len(examples), engine)
+    log.info("[data] mmlu_pro examples | n=%d | engine=%s", len(examples), engine)
 
     if engine == "vllm":
         traces = generate_traces_vllm(
@@ -251,7 +251,7 @@ def generate(
 
     payload = json.dumps([asdict(t) for t in traces], indent=2)
     write_with_metadata(out, payload, config)
-    log.info("wrote %d traces to %s", len(traces), out)
+    log.info("[done] saved traces | n=%d | path=%s", len(traces), out)
     return out
 
 

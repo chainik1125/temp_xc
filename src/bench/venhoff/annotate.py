@@ -34,7 +34,7 @@ from src.bench.venhoff.paths import ArtifactPaths, RunIdentity, can_resume, writ
 from src.bench.venhoff.sae_shim import wrap_for_path1, wrap_for_path3
 from src.bench.venhoff.train_small_sae import load_ckpt
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
+logging.basicConfig(level=logging.INFO, format="%(message)s")
 log = logging.getLogger("venhoff.annotate")
 
 PathName = Literal["path1", "path3"]
@@ -71,7 +71,7 @@ def annotate(
         "n_traces": paths.identity.n_traces,
     }
     if not force and can_resume(out, meta):
-        log.info("resume: assignments exist at %s", out)
+        log.info("[info] resume | stage=annotate | cache=%s", out)
         return out
 
     ckpt_path = paths.ckpt(arch, cluster_size, path_name)
@@ -112,7 +112,10 @@ def annotate(
         "cluster_size_configured": cluster_size,
     }
     write_with_metadata(out, json.dumps(payload, indent=2), meta)
-    log.info("annotate → %s (%d non-empty / %d configured)", out, len(clusters), cluster_size)
+    log.info(
+        "[done] saved assignments | arch=%s | cluster_size=%d | path=%s | aggregation=%s | n_clusters_nonempty=%d | n_clusters_configured=%d | path_out=%s",
+        arch, cluster_size, path_name, aggregation, len(clusters), cluster_size, out,
+    )
     return out
 
 

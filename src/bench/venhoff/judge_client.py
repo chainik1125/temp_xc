@@ -19,6 +19,7 @@ import logging
 import random
 from typing import Protocol
 
+logging.basicConfig(level=logging.INFO, format="%(message)s")
 log = logging.getLogger("venhoff.judge")
 
 HAIKU_4_5 = "claude-haiku-4-5-20251001"
@@ -71,9 +72,9 @@ class AnthropicJudge:
             except Exception as e:
                 self.n_errors += 1
                 if attempt == self.max_retries - 1:
-                    log.error("anthropic judge failed after %d attempts: %s", self.max_retries, e)
+                    log.error("[error] anthropic_judge_failed | attempts=%d | exc=%s", self.max_retries, e)
                     return ""
-                log.warning("anthropic judge error (attempt %d): %s — retry in %.1fs", attempt + 1, e, delay)
+                log.warning("[warn] anthropic_judge_retry | attempt=%d | exc=%s | delay=%.1fs", attempt + 1, e, delay)
                 await asyncio.sleep(delay + random.uniform(0, 0.5))
                 delay = min(delay * 2, 60.0)
         return ""
@@ -122,9 +123,9 @@ class OpenAIJudge:
             except Exception as e:
                 self.n_errors += 1
                 if attempt == self.max_retries - 1:
-                    log.error("openai judge failed after %d attempts: %s", self.max_retries, e)
+                    log.error("[error] openai_judge_failed | attempts=%d | exc=%s", self.max_retries, e)
                     return ""
-                log.warning("openai judge error (attempt %d): %s — retry in %.1fs", attempt + 1, e, delay)
+                log.warning("[warn] openai_judge_retry | attempt=%d | exc=%s | delay=%.1fs", attempt + 1, e, delay)
                 await asyncio.sleep(delay + random.uniform(0, 0.5))
                 delay = min(delay * 2, 60.0)
         return ""

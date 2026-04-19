@@ -49,7 +49,7 @@ from src.bench.venhoff.taxonomy.label import UnlabeledCluster, label_clusters
 from src.bench.venhoff.taxonomy.score import Cluster, score_taxonomy
 from src.bench.venhoff.train_small_sae import TrainConfig, train
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
+logging.basicConfig(level=logging.INFO, format="%(message)s")
 log = logging.getLogger("venhoff.smoke")
 
 STAGES = ("traces", "activations", "train", "annotate", "label", "score", "bridge")
@@ -65,7 +65,7 @@ BRIDGE_N_SENTENCES = 100
 
 def _stage_should_run(stage: str, force: bool, force_stage: set[str], skip_stage: set[str]) -> bool:
     if stage in skip_stage:
-        log.info("skip (requested): %s", stage)
+        log.info("[info] skip | stage=%s | reason=user_requested", stage)
         return False
     if force or stage in force_stage:
         return True
@@ -107,9 +107,12 @@ async def _label_and_score(
         clusters = await label_clusters(judge, unlabeled, sentences, seed=paths.identity.seed)
         payload = json.dumps([_cluster_to_dict(c) for c in clusters], indent=2)
         write_with_metadata(labels_path, payload, label_meta)
-        log.info("label → %s (%d labeled / %d non-empty)", labels_path, len(clusters), len(unlabeled))
+        log.info(
+            "[done] saved labels | arch=%s | cluster_size=%d | path=%s | aggregation=%s | n_labeled=%d | n_clusters_nonempty=%d | path_out=%s",
+            arch, cluster_size, path_name, aggregation, len(clusters), len(unlabeled), labels_path,
+        )
     else:
-        log.info("resume: labels exist at %s", labels_path)
+        log.info("[info] resume | stage=label | cache=%s", labels_path)
 
     # ── Scores
     score_meta = {"stage": "score", "arch": arch, "cluster_size": cluster_size,
@@ -124,9 +127,14 @@ async def _label_and_score(
         scores = await score_taxonomy(judge, clusters, sentences, seed=paths.identity.seed)
         payload = json.dumps(_scores_to_dict(scores), indent=2)
         write_with_metadata(scores_path, payload, score_meta)
-        log.info("score → %s (composite=%.3f)", scores_path, scores.avg_final_score)
+        log.info(
+            "[eval] taxonomy_scores | arch=%s | cluster_size=%d | path=%s | aggregation=%s | accuracy=%.4f | completeness=%.4f | semantic_orthogonality=%.4f | avg_final_score=%.4f",
+            arch, cluster_size, path_name, aggregation,
+            scores.accuracy, scores.completeness, scores.semantic_orthogonality, scores.avg_final_score,
+        )
+        log.info("[done] saved scores | path=%s", scores_path)
     else:
-        log.info("resume: scores exist at %s", scores_path)
+        log.info("[info] resume | stage=score | cache=%s", scores_path)
 
     return json.loads(scores_path.read_text())
 
@@ -212,7 +220,14 @@ async def run_smoke(
         bridge_ok = await _run_bridge_stage(paths, arch, cluster_size, path_name,
                                             aggregation, force=_force("bridge", force, force_set))
 
-    log.info("smoke done. scores=%s bridge_ok=%s", scores_payload, bridge_ok)
+    composite = (scores_payload or {}).get("avg_final_score")
+    if composite is not None:
+        log.info(
+            "[result] smoke_done | avg_final_score=%.4f | bridge_pass=%s",
+            composite, bridge_ok,
+        )
+    else:
+        log.info("[result] smoke_done | avg_final_score=skipped | bridge_pass=%s", bridge_ok)
     return 0 if bridge_ok else 1
 
 
@@ -242,7 +257,7 @@ async def _run_bridge_stage(
 
     labels_path = paths.labels_json(arch, cluster_size, path_name, aggregation)
     if not labels_path.exists():
-        log.error("bridge: no labels found at %s — run label stage first", labels_path)
+        log.error("[error] bridge_missing_labels | expected_path=%s | hint=run_label_stage_first", labels_path)
         return False
     with labels_path.open() as f:
         clusters = [Cluster(**c) for c in json.load(f)]
@@ -262,7 +277,12 @@ async def _run_bridge_stage(
     result = await run_bridge(triples)
     from dataclasses import asdict
     write_with_metadata(out, json.dumps(asdict(result), indent=2), meta)
-    log.info("bridge: |drift|=%.3f pass=%s", result.mean_abs_drift, result.passed)
+    log.info(
+        "[eval] bridge_drift | n=%d | valid=%d | mean_haiku=%.4f | mean_gpt4o=%.4f | mean_abs_drift=%.4f | pass=%s",
+        result.n_sentences, result.n_valid_pairs,
+        result.mean_haiku, result.mean_gpt4o, result.mean_abs_drift, result.passed,
+    )
+    log.info("[done] saved bridge_drift | path=%s", out)
     return result.passed
 
 

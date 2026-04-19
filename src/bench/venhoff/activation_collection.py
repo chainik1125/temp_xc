@@ -40,7 +40,7 @@ from src.bench.venhoff.paths import ArtifactPaths, RunIdentity, can_resume, writ
 from src.bench.venhoff.responses import extract_thinking_process
 from src.bench.venhoff.tokenization import get_char_to_token_map, split_into_sentences
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
+logging.basicConfig(level=logging.INFO, format="%(message)s")
 log = logging.getLogger("venhoff.activation_collection")
 
 PathName = Literal["path1", "path3"]
@@ -161,7 +161,7 @@ def collect_path1(
         "max_sentences_per_trace": config.max_sentences_per_trace,
     }
     if not force and all(can_resume(p, meta) for p in (act_pkl, mean_pkl, sent_json)):
-        log.info("resume: path1 activations already cached at %s", act_pkl)
+        log.info("[info] resume | stage=collect_path1 | cache=%s", act_pkl)
         return act_pkl, mean_pkl, sent_json
 
     traces_path = paths.traces_json
@@ -236,7 +236,7 @@ def collect_path1(
 
     write_with_metadata(sent_json, json.dumps(sentence_texts), meta)
 
-    log.info("path1: %d sentences → %s", len(sentence_texts), act_pkl)
+    log.info("[done] saved path1_activations | n_sentences=%d | path=%s", len(sentence_texts), act_pkl)
     return act_pkl, mean_pkl, sent_json
 
 
@@ -265,7 +265,7 @@ def collect_path3(
         "max_sentences_per_trace": config.max_sentences_per_trace,
     }
     if not force and all(can_resume(p, meta) for p in (act_pkl, mean_pkl, sent_json)):
-        log.info("resume: path3 activations already cached at %s", act_pkl)
+        log.info("[info] resume | stage=collect_path3 | cache=%s", act_pkl)
         return act_pkl, mean_pkl, sent_json
 
     with paths.traces_json.open() as f:
@@ -334,7 +334,7 @@ def collect_path3(
 
     write_with_metadata(sent_json, json.dumps(sentence_texts), meta)
 
-    log.info("path3: %d sentence-windows → %s", len(sentence_texts), act_pkl)
+    log.info("[done] saved path3_activations | n_sentences=%d | T=%d | path=%s", len(sentence_texts), T, act_pkl)
     return act_pkl, mean_pkl, sent_json
 
 

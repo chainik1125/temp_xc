@@ -37,7 +37,7 @@ import torch
 
 from src.bench.venhoff.paths import ArtifactPaths, RunIdentity, can_resume, write_with_metadata
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
+logging.basicConfig(level=logging.INFO, format="%(message)s")
 log = logging.getLogger("venhoff.train_small_sae")
 
 ArchName = Literal["sae", "tempxc", "mlc"]
@@ -170,7 +170,7 @@ def train(
         "n_traces": paths.identity.n_traces,
     }
     if not force and can_resume(ckpt_path, meta):
-        log.info("resume: ckpt exists at %s", ckpt_path)
+        log.info("[info] resume | stage=train | cache=%s", ckpt_path)
         return ckpt_path
 
     # Load activations for the selected path.
@@ -186,16 +186,19 @@ def train(
     rng = np.random.default_rng(cfg.seed)
     gen_fn = _make_gen_fn(x, cfg.batch_size, device, rng)
 
-    log.info("training %s k=%d path=%s on %s — %d steps (plateau %g%%)",
-             cfg.arch, cfg.cluster_size, cfg.path, tuple(x.shape),
-             cfg.total_steps, cfg.plateau_pct * 100)
+    log.info(
+        "[train] start | arch=%s | cluster_size=%d | path=%s | x_shape=%s | total_steps=%d | plateau_pct=%.3f",
+        cfg.arch, cfg.cluster_size, cfg.path, tuple(x.shape),
+        cfg.total_steps, cfg.plateau_pct,
+    )
 
     torch.manual_seed(cfg.seed)
     model, train_log = _train_sae(cfg.arch, d_in, cfg.cluster_size, cfg, gen_fn, device)
 
     payload_bytes = _serialize_ckpt(model, train_log, cfg)
     write_with_metadata(ckpt_path, payload_bytes, meta)
-    log.info("wrote ckpt: %s", ckpt_path)
+    log.info("[done] saved ckpt | arch=%s | cluster_size=%d | path=%s | ckpt=%s",
+             cfg.arch, cfg.cluster_size, cfg.path, ckpt_path)
     return ckpt_path
 
 

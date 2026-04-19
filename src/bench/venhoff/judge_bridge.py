@@ -42,6 +42,7 @@ logging.basicConfig(level=logging.INFO, format="%(message)s")
 log = logging.getLogger("venhoff.bridge")
 
 
+
 @dataclass(frozen=True)
 class BridgeResult:
     n_sentences: int
@@ -135,15 +136,17 @@ def main(argv: list[str] | None = None) -> int:
 
     triples = _load_triples(args.labeled_clusters, args.sentences, args.n, args.seed)
     if not triples:
-        log.error("no (sentence, title, description) triples loaded — check inputs")
+        log.error("[error] bridge_empty_input | reason=no_triples_loaded | hint=check_inputs")
         return 2
 
     result = asyncio.run(run_bridge(triples, args.haiku_model, args.gpt_model))
     args.out.write_text(json.dumps(asdict(result), indent=2))
 
-    log.info("bridge: n=%d valid=%d mean_haiku=%.3f mean_gpt4o=%.3f |drift|=%.3f pass=%s",
-             result.n_sentences, result.n_valid_pairs, result.mean_haiku,
-             result.mean_gpt4o, result.mean_abs_drift, result.passed)
+    log.info(
+        "[eval] bridge_drift | n=%d | valid=%d | mean_haiku=%.4f | mean_gpt4o=%.4f | mean_abs_drift=%.4f | pass=%s",
+        result.n_sentences, result.n_valid_pairs, result.mean_haiku,
+        result.mean_gpt4o, result.mean_abs_drift, result.passed,
+    )
 
     return 0 if result.passed else 1
 
