@@ -187,7 +187,7 @@ Assuming 1× H100 80GB, full Phase 1 run (SAE + TempXC + MLC, 3 T values, 10 clu
 - **Trace generation**: 1.1 h / 1000 traces / 8B model. Full: ~10 h for 10k traces.
 - **Activation dump**: ~0.5 h per layer per dataset (6 layers, one pass). ~5 GB disk per layer.
 - **SAE / TempXC / MLC training (small-k, Path 1)**: <5 min per (arch, cluster-size). 3 arches × 10 sizes × 6 layers = 180 tiny trainings = ~15 h (embarrassingly parallel, but sequential on one GPU).
-- **Path 3 training** (wide TempXC on reasoning activations): ~6 h per T value. 3 T values = 18 h.
+- **Path 3 training** (wide TempXC on reasoning activations): ~6 h for T=5 only (collapsed from 3 T values = 18 h; see plan.md § 3 for rationale).
 - **Haiku 4.5 labeling** (substituted for GPT-4o): ~$5-15 in judge fees per arch across full cluster-size sweep (Haiku 4.5 is ~4-10× cheaper than GPT-4o). Wall time: ~2-6 h with Anthropic message-batches API; sub-hour with direct calls at low QPS.
 - **Taxonomy scoring**: negligible compute, same batch-API wall.
 
@@ -234,8 +234,8 @@ once we hit any of these):
 - Generate the headline plot
 
 **Phase 1c (extension, ~2 days if signal):**
-- MLC + T-sweep for TempXC (T=10, 20)
-- Aggregation ablation for TempXC
+- T-sweep for TempXC (add T=10, 20 — only if T=5 shows positive signal)
+- Aggregation ablation deeper analysis (per-category breakdown)
 - Shuffled-activation control (harness-native)
 
 If Phase 1b shows TempXC ≤ SAE across all aggregations + cluster sizes, **we

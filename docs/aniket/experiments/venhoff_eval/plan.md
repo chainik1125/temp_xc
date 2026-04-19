@@ -70,11 +70,17 @@ Plus our harness-native metrics:
 Per Dmitry's 4/18 simplification: `{SAE, TempXC, MLC}` only. No TFA.
 
 - **SAE**: standard TopK per-token. Baseline. Venhoff's default slot.
-- **TempXC**: `T ∈ {5, 10, 20}`. Trained either on per-sentence-mean
-  activations (Path 1, matches Venhoff's contract) or on per-token
-  activations with aggregation at annotation time (Path 3, preserves
-  temporal axis). Plan defaults to Path 3 for TempXC (see
-  integration_plan § 3).
+- **TempXC**: `T = 5` only (single value, not swept). Trained on
+  per-token activations with aggregation at annotation time (Path 3,
+  preserves temporal axis) — see [[integration_plan#3. Axis-collapse decision (load-bearing)|integration_plan § 3]].
+  Rationale for collapsing the T sweep: (a) SAEBench showed T=5 was
+  the least-degraded of our T values, so it's the setting most likely
+  to produce a positive signal at all — if T=5 nulls, T=10/20 is very
+  unlikely to rescue; (b) we already have T=5 checkpoints from the
+  SAEBench rerun, avoiding a full retrain; (c) 3× compute + judge
+  savings, which keeps Phase 1 inside one pod-week. If T=5 shows
+  signal, expanding to T ∈ {10, 20} moves to Phase 1c instead of the
+  main run.
 - **MLC**: `n_layers = 5` around the anchor layer. Venhoff uses layer
   6 for 8B, so MLC window is `{4, 5, 6, 7, 8}`.
 
@@ -84,18 +90,18 @@ Phase 1 full run:
 
 - 3 architectures
 - 10 cluster sizes per arch (Venhoff's full sweep: `5..50`)
-- For TempXC: × 3 T values × 4 aggregation strategies = 12 TempXC
+- For TempXC: × 1 T value (T=5) × 4 aggregation strategies = 4 TempXC
   variants per cluster size
 - Fixed layer 6 (Venhoff's chosen anchor for Llama-8B)
 - 5000 traces generated from MMLU-Pro test
 - Shuffled-control pair for every cell
 
-**Total cells**: 10 + 120 + 10 = 140 trained small-k dictionaries per
-cluster size × 10 cluster sizes = 1400 fits, but each tiny SAE takes
-<5 min so it's ~3 H100-days of small-k training.
+**Total cells**: (SAE) 10 + (TempXC × 4 aggs) 40 + (MLC) 10 = 60 cells
+per cluster size × 10 cluster sizes = 600 fits. Each small-k fit
+takes <5 min, so ~2 H100-days of small-k training (down from ~3).
 
-**Plus** the Path 3 re-encode of our existing wide TempXC ckpts from
-SAEBench (fast, hours not days).
+**Plus** the Path 3 re-encode of the existing wide T=5 TempXC ckpt
+from SAEBench (fast, hours not days).
 
 ## 5. Predictions
 
@@ -166,8 +172,9 @@ One plot, saved at `results/venhoff_eval/plots/fig1_taxonomy_quality.png`:
 
 - x-axis: cluster size (5..50)
 - y-axis: composite taxonomy quality score (0–10)
-- lines: SAE (blue), TempXC-T5 (light green), TempXC-T10 (mid green),
-  TempXC-T20 (dark green), MLC (orange)
+- lines: SAE (blue), TempXC-T5 (green, one line per aggregation strategy
+  — `last`, `mean`, `max`, `full_window` — in progressively darker
+  shades), MLC (orange)
 - error bars: from 3 repetitions per cluster size
 - shaded region: ordered-vs-shuffled delta — the portion of advantage
   attributable to temporal structure specifically
