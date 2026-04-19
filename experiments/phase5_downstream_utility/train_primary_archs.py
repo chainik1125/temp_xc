@@ -420,10 +420,23 @@ def _save_run(run_id, arch, model, log, meta):
 
 def run_all(seeds, max_steps, archs=None):
     device = torch.device("cuda")
+    # Headline 5.1 sweep: 7 architectures, all trainable within the 48 h budget.
+    #
+    # Deferred to sub-phase 5.6 (bonus):
+    #   - shared_perpos_t5: mathematically identical to topk_sae under the
+    #     last_position probing aggregation; adds no new information to the
+    #     headline comparison, only to training-dynamics analysis.
+    #   - tfa / tfa_pos: self-attention on 128-token sequences at
+    #     d_sae=18432 costs ~20 s per step; 25k steps ≈ 5.8 days. Including
+    #     TFA in 5.1 would consume the entire 5.1 budget on one arch.
     DEFAULT_ARCHS = [
-        "topk_sae", "mlc", "txcdr_t5", "txcdr_t20",
-        "stacked_t5", "stacked_t20", "shared_perpos_t5",
-        "tfa", "tfa_pos", "matryoshka_t5",
+        "topk_sae",
+        "mlc",
+        "txcdr_t5",
+        "txcdr_t20",
+        "stacked_t5",
+        "stacked_t20",
+        "matryoshka_t5",
     ]
     archs_to_run = archs or DEFAULT_ARCHS
 

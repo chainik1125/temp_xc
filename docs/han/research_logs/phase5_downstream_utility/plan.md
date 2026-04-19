@@ -318,3 +318,78 @@ Each new arch registers itself in `src/architectures/__init__.py`'s
 
 Addenda go below this line, dated, one entry per deviation from the
 pre-registered plan.
+
+### Addendum — 2026-04-19 (scope reduction for 5.1 compute budget)
+
+**Change**: dropped TFA, TFA-pos, and SharedPerPositionSAE from the
+default 5.1 sweep. Primary headline now covers 7 architectures:
+TopKSAE, MLC, TXCDR T=5, TXCDR T=20, Stacked T=5, Stacked T=20,
+MatryoshkaTXCDR T=5.
+
+**Why**:
+- TFA's self-attention at seq_len=128, d_sae=18 432 is ≈ 20 s per
+  training step on A40 under my pipeline. 25 000 steps ≈ 5.8 days.
+  Keeping TFA in 5.1 would consume the entire Phase-5 budget on a
+  single architecture.
+- SharedPerPositionSAE is mathematically identical to TopKSAE under
+  the last_position probing aggregation we use for the headline cell
+  (shared encoder + per-position data → shared dictionary + constant
+  per-position bias is a no-op at read-out). Adding it to the headline
+  bar adds no discriminating signal.
+
+**How to apply**:
+- TFA / TFA-pos move to sub-phase 5.6 (bonus, after 5.1–5.5 land). If
+  5.6 is reached, train with a smaller d_sae (≤ 4 000) or shorter
+  sequences (≤ 32 tokens) to keep wall-clock feasible.
+- SharedPerPositionSAE is deferred to a targeted training-dynamics
+  ablation in 5.2 (the full weight-sharing ladder) where its
+  comparison to TopKSAE under matched data generators is informative.
+
+Runnable via the train script's `--archs` override if a future
+session wants to include them.
+
+### Addendum — 2026-04-19 (probing-harness deviation)
+
+**Change**: ditched the SAEBench sidecar plan. Instead, wrote an
+independent sparse-probing runner in
+`experiments/phase5_downstream_utility/probing/` that reproduces
+SAEBench's sparse-probing semantics (train/test splits, top-k class-
+separation feature selection from Kantamneni Eq. 1, sklearn L1
+logistic regression) without depending on SAEBench at all.
+
+**Why**:
+- SAEBench pins `numpy < 2` and `datasets < 4`, incompatible with
+  our main `uv` environment. A sidecar env is a lot of install pain
+  on MooseFS (we already hit quota + null-byte write issues from
+  the main env).
+- A direct reimplementation is ~300 LoC vs ~2 days of debugging
+  SAEBench + its dataset-name drift (bias_in_bios_class_set*
+  subsets are not on HF; SAEBench builds them internally).
+- The user's direction is to build Phase 5 independently — porting
+  our own probing code is aligned with that.
+
+**How to apply**: our `probing_results.jsonl` format is NOT byte-
+identical to SAEBench's `eval_results.json` format. Any downstream
+analysis should read our schema:
+`{run_id, arch, task_name, dataset_key, aggregation, k_feat,
+  test_auc, n_train, n_test, elapsed_s}`. The baselines (last-token
+LR, attention-pooled Eq.2) are emitted with `run_id=BASELINE_*` and
+`arch=baseline_*`.
+
+**Caveat**: our 25 binary probing tasks span the SAEBench 7 dataset
+families but are **not** 1:1 identical to SAEBench's tasks.
+Differences:
+- bias_in_bios: we select the top-15 professions by HF-test-set
+  frequency and partition into 3 sets of 5; SAEBench's internal class
+  sets may pick different professions.
+- amazon_reviews: SAEBench has 5 categories; the HF dataset we access
+  only exposes 2 category IDs in the first 20k rows, so we have 1
+  task (category=0 vs category=1) on this pair.
+- github-code: deprecated HF script. The substitute `bigcode/the-stack-smol`
+  is gated; we have zero tasks for now. Skipped for 5.1.
+
+Our sweep is therefore a 25-task benchmark, not the 30-ish-task
+canonical SAEBench set. All architecture comparisons are
+within-sweep (apples-to-apples), so the absolute AUC numbers will
+differ from SAEBench-on-Gemma2B-base but the arch ordering and
+attention-pool-baseline gap are the headline claim.
