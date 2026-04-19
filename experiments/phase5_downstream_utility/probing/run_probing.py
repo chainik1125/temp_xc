@@ -271,7 +271,13 @@ def _load_model_for_run(run_id, ckpt_path, device):
         model = PositionMatryoshkaTXCDR(d_in, d_sae, T, k_eff).to(device)
     else:
         raise ValueError(f"Unknown arch {arch}")
-    model.load_state_dict(state["state_dict"])
+    # Cast the loaded (possibly fp16) state_dict to the module's dtype (fp32)
+    # explicitly to avoid silent precision drops in Matryoshka's mean() calls.
+    cast_state = {
+        k: v.to(torch.float32) if v.dtype == torch.float16 else v
+        for k, v in state["state_dict"].items()
+    }
+    model.load_state_dict(cast_state)
     model.eval()
     return model, arch, meta
 

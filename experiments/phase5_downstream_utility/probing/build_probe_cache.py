@@ -26,7 +26,7 @@ os.environ.setdefault("TQDM_DISABLE", "1")
 LAYERS = [11, 12, 13, 14, 15]
 CTX = 128
 LAST_N = 32
-BATCH_SIZE = 32
+BATCH_SIZE = 64          # 64 × 128 ctx is still well under A40 memory at bf16
 DTYPE = torch.bfloat16
 MODEL_NAME = "google/gemma-2-2b-it"
 OUT_ROOT = Path(

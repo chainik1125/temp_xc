@@ -396,8 +396,16 @@ def _save_run(run_id, arch, model, log, meta):
 
     ckpt_path = CKPT_DIR / f"{run_id}.pt"
     log_path = LOGS_DIR / f"{run_id}.json"
+    # Save in fp16 to halve disk cost — our quota is tight. Reconstructed
+    # model in run_probing.py casts the fp16 state_dict back into the
+    # newly-built fp32 module via load_state_dict's implicit casting.
+    fp16_state = {
+        k: v.to(torch.float16) if v.dtype == torch.float32 else v
+        for k, v in model.state_dict().items()
+    }
     torch.save(
-        {"state_dict": model.state_dict(), "arch": arch, "meta": meta},
+        {"state_dict": fp16_state, "arch": arch, "meta": meta,
+         "state_dict_dtype": "float16"},
         ckpt_path,
     )
     log_path.write_text(json.dumps({
