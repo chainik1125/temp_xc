@@ -36,6 +36,19 @@ to pick up.
   full_window probing (now streaming-patched). Any new code that
   materialises large `(N, K, T, L, d)` tensors can blow this — prefer
   slide-by-slide streaming loops.
+- **Claude Code state does not persist across pod restart.** The CLI
+  installation, credentials, conversation history, scheduled tasks,
+  and per-project sessions all live at `/home/appuser/.claude/` on
+  container disk — not pod volume. If the pod restarts, the next
+  agent will **lose all conversation history, lose the scheduled
+  wakeups, and need to re-auth**. Mitigation: before any risky action
+  (e.g. long-running reboot-prone process), the user can run
+  `cp -a /home/appuser/.claude /workspace/claude_home_backup` to
+  stash a copy. For permanent fix, they'd need to `mv
+  /home/appuser/.claude /workspace/claude_home && ln -s
+  /workspace/claude_home /home/appuser/.claude` — but this needs the
+  current session to be idle and is outside the scope of the
+  overnight tasks below. Flag this to the user before acting.
 
 Planned writes for the overnight tasks (T15–T17):
 
