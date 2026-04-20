@@ -34,6 +34,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from src.bench.venhoff.paths import ArtifactPaths, can_resume, write_with_metadata
+from src.bench.venhoff.steering import _venhoff_python
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
 log = logging.getLogger("venhoff.hybrid")
@@ -107,7 +108,7 @@ def run_hybrid(
         return results_dir
 
     cmd = [
-        sys.executable, "hybrid_token.py",
+        _venhoff_python(venhoff_root), "hybrid_token.py",
         "--dataset", cfg.dataset,
         "--thinking_model", cfg.thinking_model,
         "--base_model", cfg.base_model,

@@ -27,6 +27,7 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 import subprocess
 import sys
 from dataclasses import dataclass
@@ -36,6 +37,31 @@ from src.bench.venhoff.paths import ArtifactPaths, can_resume, write_with_metada
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
 log = logging.getLogger("venhoff.steering")
+
+
+def _venhoff_python(venhoff_root: Path) -> str:
+    """Resolve the python interpreter to run Venhoff's scripts with.
+
+    Priority:
+      1. `VENHOFF_PYTHON` env var (explicit override)
+      2. `<venhoff_root>/.venv/bin/python` (from `uv sync` inside vendor)
+      3. `sys.executable` — our venv, with a warning (will fail on
+         chat-limiter + numpy<2.0 deps; only used when the user
+         explicitly installed Venhoff's deps into the main venv).
+    """
+    override = os.environ.get("VENHOFF_PYTHON", "").strip()
+    if override:
+        if not Path(override).exists():
+            raise FileNotFoundError(f"VENHOFF_PYTHON points to missing file: {override}")
+        return override
+    candidate = venhoff_root / ".venv" / "bin" / "python"
+    if candidate.exists():
+        return str(candidate)
+    log.warning(
+        "[warn] venhoff_venv_missing | expected=%s | falling_back=sys.executable | hint=run 'uv sync' inside %s",
+        candidate, venhoff_root,
+    )
+    return sys.executable
 
 
 @dataclass(frozen=True)
@@ -96,7 +122,7 @@ def train_one_vector(
         return expected_out
 
     cmd = [
-        sys.executable, "optimize_steering_vectors.py",
+        _venhoff_python(venhoff_root), "optimize_steering_vectors.py",
         "--model", cfg.base_model,
         "--max_iters", str(cfg.max_iters),
         "--n_training_examples", str(cfg.n_training_examples),
