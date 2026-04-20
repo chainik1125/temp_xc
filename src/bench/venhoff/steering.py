@@ -42,25 +42,31 @@ log = logging.getLogger("venhoff.steering")
 def _venhoff_python(venhoff_root: Path) -> str:
     """Resolve the python interpreter to run Venhoff's scripts with.
 
-    Always returns an absolute path — subprocess.run is called with
-    `cwd=<venhoff_root>/train-vectors|hybrid`, so a relative path like
-    `vendor/thinking-llms-interp/.venv/bin/python` resolves from the
-    wrong directory and raises FileNotFoundError.
+    Returns an absolute path that PRESERVES any symlink to the venv's
+    shim binary. A uv venv's `.venv/bin/python` is a symlink to the
+    base Python interpreter; what makes it a *venv* Python is the
+    `pyvenv.cfg` sitting next to the symlink, which Python detects
+    via the invocation path. If we `.resolve()` the symlink we hand
+    subprocess the raw base interpreter path, Python doesn't find
+    pyvenv.cfg, and the venv's site-packages is invisible — that's
+    what caused the `No module named 'dotenv'` error on 2026-04-20.
+
+    Use `.absolute()` (no symlink resolution) instead. subprocess.run
+    uses cwd=<venhoff_root>/train-vectors|hybrid, so the path must be
+    absolute or the relative prefix is wrong — but NOT symlink-resolved.
 
     Priority:
       1. `VENHOFF_PYTHON` env var (explicit override)
-      2. `<venhoff_root>/.venv/bin/python` (from `uv sync` inside vendor)
-      3. `sys.executable` — our venv, with a warning (will fail on
-         chat-limiter + numpy<2.0 deps; only used when the user
-         explicitly installed Venhoff's deps into the main venv).
+      2. `<venhoff_root>/.venv/bin/python`
+      3. `sys.executable` — warn-level fallback
     """
     override = os.environ.get("VENHOFF_PYTHON", "").strip()
     if override:
-        p = Path(override).resolve()
+        p = Path(override).absolute()
         if not p.exists():
             raise FileNotFoundError(f"VENHOFF_PYTHON points to missing file: {p}")
         return str(p)
-    candidate = (venhoff_root / ".venv" / "bin" / "python").resolve()
+    candidate = (venhoff_root / ".venv" / "bin" / "python").absolute()
     if candidate.exists():
         return str(candidate)
     log.warning(
