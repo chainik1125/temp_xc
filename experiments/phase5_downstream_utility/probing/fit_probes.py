@@ -1,15 +1,15 @@
 """Probe fit+eval on cached features — decoupled from SAE/arch training.
 
 Reads per-(run, task, aggregation) feature caches produced by
-`extract_features.py`, fits top-k class-separation + L1 logistic
-regression probes, and writes `probing_results.jsonl` with both test
-AUC and test accuracy. Also emits the two required baselines
-(raw-last-token L2-LR, attention-pooled Eq. 2) per task — these run
-directly from the probe_cache (anchor activations).
+`extract_features.py` (scipy CSR format), fits top-k class-separation
++ L1 logistic regression probes, and writes `probing_results.jsonl`
+with both test AUC and test accuracy. Also emits the two required
+baselines (raw-last-token L2-LR, attention-pooled Eq. 2) per task —
+these run directly from the probe_cache.
 
 Re-running this script does NOT re-encode SAE features. That makes
-iterating on the probe fit / metric / k_feat cheap (~minutes) instead of
-tens of minutes per arch.
+iterating on the probe fit / metric / k_feat cheap (~minutes) instead
+of tens of minutes per arch.
 
 Output JSONL schema:
     {run_id, arch, task_name, dataset_key, aggregation, k_feat,
@@ -30,13 +30,16 @@ import time
 from pathlib import Path
 
 import numpy as np
+import scipy.sparse
 import torch
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, roc_auc_score
+from sklearn.preprocessing import StandardScaler
 
 os.environ.setdefault("TQDM_DISABLE", "1")
 
 from experiments.phase5_downstream_utility.probing.run_probing import (
     _load_task_cache,
-    sae_probe_metrics,
     last_token_lr_metrics,
     attn_pool_metrics,
     _last_token,
@@ -50,24 +53,75 @@ FEATURE_CACHE = REPO / "experiments/phase5_downstream_utility/results/feature_ca
 OUT_JSONL = REPO / "experiments/phase5_downstream_utility/results/probing_results.jsonl"
 
 
-def _load_feat(path: Path) -> dict[str, np.ndarray]:
+def _load_feat(path: Path) -> dict:
     z = np.load(path)
+    Ztr = scipy.sparse.csr_matrix(
+        (z["Ztr_data"].astype(np.float32), z["Ztr_idx"], z["Ztr_ptr"]),
+        shape=tuple(z["Ztr_shape"]),
+    )
+    Zte = scipy.sparse.csr_matrix(
+        (z["Zte_data"].astype(np.float32), z["Zte_idx"], z["Zte_ptr"]),
+        shape=tuple(z["Zte_shape"]),
+    )
     return {
-        "Z_train": z["Z_train"].astype(np.float32),
-        "Z_test":  z["Z_test"].astype(np.float32),
+        "Z_train": Ztr,
+        "Z_test":  Zte,
         "y_train": z["y_train"],
         "y_test":  z["y_test"],
     }
 
 
+def top_k_by_class_sep_sparse(Z_train: scipy.sparse.csr_matrix,
+                              y_train: np.ndarray, k: int) -> np.ndarray:
+    """Top-k features by |mean_pos - mean_neg| on sparse Z_train."""
+    pos_mask = (y_train == 1)
+    neg_mask = (y_train == 0)
+    n_pos = max(1, int(pos_mask.sum()))
+    n_neg = max(1, int(neg_mask.sum()))
+    pos_mean = np.asarray(Z_train[pos_mask].sum(axis=0)).ravel() / n_pos
+    neg_mean = np.asarray(Z_train[neg_mask].sum(axis=0)).ravel() / n_neg
+    diff = np.abs(pos_mean - neg_mean)
+    k = min(k, Z_train.shape[1])
+    top = np.argpartition(-diff, k - 1)[:k]
+    return np.sort(top)
+
+
+def sae_probe_metrics_sparse(
+    Z_train: scipy.sparse.csr_matrix, y_train: np.ndarray,
+    Z_test: scipy.sparse.csr_matrix, y_test: np.ndarray,
+    k: int,
+) -> tuple[float, float]:
+    """Sparse-aware top-k class-sep + L1 LR. Returns (auc, acc)."""
+    if Z_train.shape[0] < 5 or len(np.unique(y_train)) < 2:
+        return 0.5, 0.5
+    idx = top_k_by_class_sep_sparse(Z_train, y_train, k)
+    Xtr = Z_train[:, idx].toarray()
+    Xte = Z_test[:, idx].toarray()
+    scaler = StandardScaler(with_mean=False)
+    Xtr_s = scaler.fit_transform(Xtr)
+    Xte_s = scaler.transform(Xte)
+    try:
+        clf = LogisticRegression(
+            penalty="l1", solver="liblinear", max_iter=2000, C=1.0,
+        )
+        clf.fit(Xtr_s, y_train)
+    except Exception:
+        return 0.5, 0.5
+    if len(np.unique(y_test)) < 2:
+        return 0.5, 0.5
+    preds_score = clf.decision_function(Xte_s)
+    preds_cls = clf.predict(Xte_s)
+    return (
+        float(roc_auc_score(y_test, preds_score)),
+        float(accuracy_score(y_test, preds_cls)),
+    )
+
+
 def _arch_from_run(run_id: str) -> str:
-    """Strip the `__seed*` suffix and return the arch slug."""
     return run_id.split("__", 1)[0]
 
 
 def _read_existing_keys(jsonl_path: Path) -> set[tuple]:
-    """Return the set of (run_id, task_name, aggregation, k_feat) cells
-    already present in the jsonl, so re-runs can skip them."""
     if not jsonl_path.exists():
         return set()
     keys = set()
@@ -95,7 +149,6 @@ def run_baselines(
     dataset_keys: dict[str, str],
     device: torch.device,
 ) -> None:
-    """Write baseline rows for each (task, aggregation)."""
     task_dirs = [
         d for d in sorted(PROBE_CACHE.iterdir())
         if d.is_dir()
@@ -189,7 +242,6 @@ def fit_probes(
             files = sorted(run_dir.glob("*.npz"))
             print(f"=== {run_id} ({arch})  {len(files)} feature files ===")
             for fp in files:
-                # name: `{task}__{aggregation}.npz`
                 stem = fp.stem
                 if "__" not in stem:
                     continue
@@ -199,7 +251,6 @@ def fit_probes(
                 if task_names and task_name not in task_names:
                     continue
 
-                # Early skip if all k_feat for this cell already logged
                 all_in = all(
                     (run_id, task_name, aggregation, k) in existing_keys
                     for k in k_values
@@ -213,7 +264,6 @@ def fit_probes(
                     print(f"  {task_name} [{aggregation}]: load FAIL: {e}")
                     continue
                 if task_name not in dataset_keys:
-                    # Cheap-load meta.json if baselines weren't run.
                     meta_path = PROBE_CACHE / task_name / "meta.json"
                     if meta_path.exists():
                         dataset_keys[task_name] = json.loads(
@@ -228,7 +278,7 @@ def fit_probes(
                     if (run_id, task_name, aggregation, k) in existing_keys:
                         continue
                     t0 = time.time()
-                    auc, acc = sae_probe_metrics(Ztr, ytr, Zte, yte, k)
+                    auc, acc = sae_probe_metrics_sparse(Ztr, ytr, Zte, yte, k)
                     out_f.write(json.dumps({
                         "run_id": run_id, "arch": arch,
                         "task_name": task_name,
@@ -242,7 +292,7 @@ def fit_probes(
                     out_f.flush()
                 print(
                     f"  {task_name} [{aggregation}]: "
-                    f"d_feat={Ztr.shape[1]}  ks={list(k_values)}"
+                    f"d_feat={Ztr.shape[1]}  nnz={Ztr.nnz}"
                 )
 
 

@@ -1,18 +1,20 @@
 """Feature extraction for Phase 5 probing — writes per-(run, task, aggregation) caches.
 
 This is the encode-once-fit-many separation for Phase 5. Running this
-script once per `(run_id, task_name, aggregation)` cell produces a
-`.npz` with the encoded train+test features. `fit_probes.py` then
+script once per `(run_id, task_name, aggregation)` cell produces an
+NPZ with the encoded train+test features (scipy CSR sparse format;
+TopK SAEs produce >99% sparse outputs). `fit_probes.py` then
 fits/evaluates probes against those features without ever touching the
-SAE checkpoints again — so the probe training / selection / metric code
-can be iterated on without a single re-encode.
+SAE checkpoints again — so the probe training / selection / metric
+code can be iterated on without a single re-encode.
 
 Cache layout:
     results/feature_cache/
       {run_id}/
         {task_name}__{aggregation}.npz
-          Z_train (n_train, d_feat) fp16
-          Z_test  (n_test,  d_feat) fp16
+          # CSR payload for Z_train and Z_test:
+          Ztr_data, Ztr_idx, Ztr_ptr, Ztr_shape
+          Zte_data, Zte_idx, Zte_ptr, Zte_shape
           y_train (n_train,) int64
           y_test  (n_test,) int64
 
@@ -33,6 +35,7 @@ import time
 from pathlib import Path
 
 import numpy as np
+import scipy.sparse
 import torch
 
 os.environ.setdefault("TQDM_DISABLE", "1")
@@ -50,16 +53,25 @@ CKPT_DIR = REPO / "experiments/phase5_downstream_utility/results/ckpts"
 FEATURE_CACHE = REPO / "experiments/phase5_downstream_utility/results/feature_cache"
 
 
+def _dense_to_sparse(Z: np.ndarray) -> scipy.sparse.csr_matrix:
+    # Cast to fp16 BEFORE CSR conversion so the CSR data buffer is fp16.
+    return scipy.sparse.csr_matrix(Z.astype(np.float16))
+
+
 def _save_features(
     out_path: Path,
     Z_train: np.ndarray, Z_test: np.ndarray,
     y_train: np.ndarray, y_test: np.ndarray,
 ) -> None:
     out_path.parent.mkdir(parents=True, exist_ok=True)
+    Ztr = _dense_to_sparse(Z_train)
+    Zte = _dense_to_sparse(Z_test)
     np.savez(
         out_path,
-        Z_train=Z_train.astype(np.float16),
-        Z_test=Z_test.astype(np.float16),
+        Ztr_data=Ztr.data, Ztr_idx=Ztr.indices, Ztr_ptr=Ztr.indptr,
+        Ztr_shape=np.asarray(Ztr.shape, dtype=np.int64),
+        Zte_data=Zte.data, Zte_idx=Zte.indices, Zte_ptr=Zte.indptr,
+        Zte_shape=np.asarray(Zte.shape, dtype=np.int64),
         y_train=np.asarray(y_train, dtype=np.int64),
         y_test=np.asarray(y_test, dtype=np.int64),
     )
@@ -95,8 +107,6 @@ def extract_features(
             print(f"  {run_id}: ckpt missing, skip")
             continue
 
-        # Fast-path: check whether every (task, aggregation) feature file
-        # already exists. If so, skip the model load entirely.
         need_any = False
         for task_name in task_cache:
             for aggregation in aggregations:
@@ -119,7 +129,6 @@ def extract_features(
         print(f"=== {run_id} ({arch}) ===")
         for task_name, tc in task_cache.items():
             for aggregation in aggregations:
-                # MLC is inherently last-position (probe cache is last-token-only)
                 if arch == "mlc" and aggregation == "full_window":
                     continue
                 out = FEATURE_CACHE / run_id / f"{task_name}__{aggregation}.npz"
@@ -139,9 +148,13 @@ def extract_features(
                         out, Ztr, Zte,
                         tc["train_labels"], tc["test_labels"],
                     )
+                    # Sparsity + shape for quick visual diagnostics.
+                    nnz_tr = int((Ztr != 0).sum())
+                    sparsity = nnz_tr / max(1, Ztr.size)
                     print(
                         f"  {task_name}__{aggregation}: "
-                        f"Z_tr={Ztr.shape} [{time.time() - t0:.1f}s] -> {out.name}"
+                        f"Z_tr={Ztr.shape} dense={sparsity:.3%} "
+                        f"[{time.time() - t0:.1f}s] -> {out.name}"
                     )
                 except torch.cuda.OutOfMemoryError:
                     torch.cuda.empty_cache()
