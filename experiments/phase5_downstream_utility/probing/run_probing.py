@@ -51,7 +51,7 @@ def _load_task_cache(task_dir: Path) -> dict[str, Any]:
     anchor = np.load(task_dir / "acts_anchor.npz")
     mlc = np.load(task_dir / "acts_mlc.npz")
     meta = json.loads((task_dir / "meta.json").read_text())
-    return {
+    out = {
         "anchor_train": anchor["train_acts"].astype(np.float32),  # (N, LAST_N, d)
         "anchor_test": anchor["test_acts"].astype(np.float32),
         "train_last_idx": anchor["train_last_idx"],
@@ -62,6 +62,13 @@ def _load_task_cache(task_dir: Path) -> dict[str, Any]:
         "test_labels": anchor["test_labels"],
         "meta": meta,
     }
+    # Optional: multi-layer × tail-20 cache for time_layer_crosscoder probing.
+    mlc_tail_path = task_dir / "acts_mlc_tail.npz"
+    if mlc_tail_path.exists():
+        mlc_tail = np.load(mlc_tail_path)
+        out["mlc_tail_train"] = mlc_tail["train_acts"].astype(np.float32)  # (N, LAST_N, L, d)
+        out["mlc_tail_test"] = mlc_tail["test_acts"].astype(np.float32)
+    return out
 
 
 def _last_token(acts, last_idx):
@@ -130,9 +137,20 @@ def _encode_topk(model, anchor_acts, last_idx, device, aggregation="last_positio
     return z.reshape(N, LN * z.shape[-1])
 
 
-def _encode_mlc(model, mlc_acts, device, aggregation="last_position"):
-    # MLC cache is last-token only; no slide possible. last_position only.
-    return _encode_per_token(model.encode, mlc_acts, device)
+def _encode_mlc(model, mlc_acts, device, aggregation="last_position",
+                mlc_tail=None):
+    """MLC encoding.
+
+    last_position: use (N, L, d) mlc_acts at prompt's last real token.
+    full_window:   if mlc_tail (N, TAIL, L, d) is available, encode each
+                   of the TAIL positions and flatten; else last_position.
+    """
+    if aggregation == "last_position" or mlc_tail is None:
+        return _encode_per_token(model.encode, mlc_acts, device)
+    N, TAIL, L, d = mlc_tail.shape
+    flat = mlc_tail.reshape(N * TAIL, L, d)
+    z = _encode_per_token(model.encode, flat, device)  # (N*TAIL, d_sae)
+    return z.reshape(N, TAIL * z.shape[-1])
 
 
 def _encode_txcdr(model, anchor_acts, last_idx, T, device,
@@ -358,19 +376,19 @@ def _encode_for_probe(
         anchor = tc["anchor_train"]
         mlc = tc["mlc_train"]
         li = tc["train_last_idx"]
+        mlc_tail = tc.get("mlc_tail_train")
     else:
         anchor = tc["anchor_test"]
         mlc = tc["mlc_test"]
         li = tc["test_last_idx"]
+        mlc_tail = tc.get("mlc_tail_test")
 
     if arch == "topk_sae":
         return _encode_topk(model, anchor, li, device, aggregation)
     if arch == "mlc":
-        # MLC probe cache is last-token-only (no per-position slide possible
-        # without rebuilding the probe cache for all 20 tail positions ×
-        # 5 layers, which would bust the MooseFS quota). Emit last_position
-        # only; probing runner skips MLC records for full_window.
-        return _encode_mlc(model, mlc, device, aggregation)
+        # last_position: use mlc (N, L, d) at last real token.
+        # full_window:   use mlc_tail (N, TAIL=5, L, d) if available.
+        return _encode_mlc(model, mlc, device, aggregation, mlc_tail=mlc_tail)
     if arch.startswith("txcdr_t"):
         T = meta["T"]
         return _encode_txcdr(model, anchor, li, T, device, aggregation)
@@ -419,27 +437,53 @@ def _encode_for_probe(
         Z_last = np.concatenate(outs, axis=0)
         return Z_last.reshape(N, K * Z_last.shape[-1])
     if arch == "time_layer_crosscoder_t5":
-        # TxL probing fallback: use last-token multi-layer cache with a
-        # T=1 degenerate window. (B, 1, L, d) through the T=5-trained
-        # encoder uses only W_enc[0, :, :, :]. Genuine (B, T, L, d)
-        # probing requires a rebuilt cache; deferred.
         T = meta["T"]
         L = meta.get("n_layers", 5)
-        d_sae_eff = meta.get("d_sae", 8192)
-        X_1 = mlc[:, None, :, :]  # (N, 1, L, d)
+        center_l = L // 2
+        mlc_tail_key = "mlc_tail_train" if split == "train" else "mlc_tail_test"
+        if mlc_tail_key in tc:
+            # PROPER: mlc_tail shape (N, TAIL_MLC_N=5, L, d). With T=5 and
+            # TAIL_MLC_N=5, the whole tail is the window — one (T, L, d)
+            # slab per sample.
+            mlc_tail = tc[mlc_tail_key]  # (N, 5, L, d)
+            N, LN, _, d = mlc_tail.shape
+            if aggregation == "last_position" or LN == T:
+                # Pass the tail directly as the T-window.
+                X_win = mlc_tail[:, -T:, :, :].astype(np.float32)
+                outs = []
+                for i in range(0, N, 256):
+                    Xb = torch.from_numpy(X_win[i:i + 256]).to(device)
+                    with torch.no_grad():
+                        Zb = model.encode(Xb)
+                    outs.append(Zb[:, -1, center_l, :].cpu().numpy())
+                return np.concatenate(outs, axis=0)
+            # full_window fallback when LN > T: slide a T-window across LN.
+            K = LN - T + 1
+            starts = np.arange(K)
+            offsets = np.arange(T)
+            idx = starts[:, None] + offsets[None, :]
+            wins = mlc_tail[:, idx, :, :]
+            flat = wins.reshape(N * K, T, L, d)
+            outs = []
+            for i in range(0, flat.shape[0], 256):
+                Xb = torch.from_numpy(flat[i:i + 256]).to(device)
+                with torch.no_grad():
+                    Zb = model.encode(Xb)
+                outs.append(Zb[:, -1, center_l, :].cpu().numpy())
+            z_last = np.concatenate(outs, axis=0)
+            return z_last.reshape(N, K * z_last.shape[-1])
+        # Legacy fallback: T-1 zero-pad of last-token multilayer cache.
+        X_1 = mlc[:, None, :, :]
         X_pad = np.concatenate(
             [np.zeros_like(X_1) for _ in range(T - 1)] + [X_1], axis=1
-        )  # (N, T, L, d) — fill earlier T-1 slots with zeros
-        # Batch to avoid GPU OOM — Z has shape (N, T, L, d_sae)
-        center_l = L // 2
-        outs_early = []
+        )
+        outs = []
         for i in range(0, X_pad.shape[0], 512):
             Xb = torch.from_numpy(X_pad[i:i + 512]).to(device)
             with torch.no_grad():
                 Zb = model.encode(Xb)
-            outs_early.append(Zb[:, -1, center_l, :].cpu().numpy())
-        z_last = np.concatenate(outs_early, axis=0)
-        return z_last
+            outs.append(Zb[:, -1, center_l, :].cpu().numpy())
+        return np.concatenate(outs, axis=0)
     if arch == "txcdr_causal_t5":
         T = meta["T"]
         # Causal returns (B, T, d_sae). last_position = position T-1 of
@@ -580,7 +624,23 @@ def run_probing(
                 print(f"  {run_id}: load FAIL: {e}")
                 continue
             if arch == "mlc" and aggregation == "full_window":
-                print(f"  {run_id}: MLC has no full_window (cache is last-token only), skip")
+                # MLC encoder operates on 1 token × 5 layers. A "full_window"
+                # probe would require a tail-20 × 5 layers cache (50 GB) to
+                # slide the 1-token encoder across; that busts the MooseFS
+                # quota. Skipping keeps the plot honest — using a tail-5
+                # cache instead would give MLC a 4× smaller feature pool
+                # than TXCDR full_window, a strictly unfair comparison.
+                print(f"  {run_id}: MLC full_window requires tail-20 × 5L cache (50 GB, quota-blocked), skip")
+                del model
+                torch.cuda.empty_cache()
+                continue
+            if arch == "time_layer_crosscoder_t5" and aggregation == "full_window":
+                # time_layer probing uses a T=1 zero-pad fallback (see
+                # _encode_for_probe for this arch): last_position and
+                # full_window produce identical Z. Emitting full_window
+                # records is misleading — skip until a genuine tail × multi-
+                # layer cache exists.
+                print(f"  {run_id}: time_layer full_window is degenerate under T-1 pad fallback, skip")
                 del model
                 torch.cuda.empty_cache()
                 continue

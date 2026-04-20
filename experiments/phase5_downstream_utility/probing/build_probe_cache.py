@@ -43,6 +43,10 @@ MLC_LAYERS = [11, 12, 13, 14, 15]
 ANCHOR_LAYER = 13
 CTX = 128
 LAST_N = 20
+TAIL_MLC_N = 5  # mlc_tail stores L11-L15 × last-5 tokens (quota-limited).
+                # Enough for T=5 time_layer last_position + MLC full_window
+                # over a 5-position slide (smaller than anchor's 20 but still
+                # multi-position).
 BATCH_SIZE = 64
 DTYPE = torch.bfloat16
 MODEL_NAME = "google/gemma-2-2b-it"
@@ -52,9 +56,10 @@ OUT_ROOT = Path(
 
 
 def _encode_split(model, tok, texts, captured, device):
-    """Forward Gemma on `texts`; return anchor tail + MLC last-token stacks."""
+    """Forward Gemma on `texts`; return anchor tail + MLC last + MLC tail stacks."""
     anchor_tail: list[torch.Tensor] = []
     mlc_last: list[torch.Tensor] = []
+    mlc_tail: list[torch.Tensor] = []
     last_indices: list[int] = []
 
     for start in range(0, len(texts), BATCH_SIZE):
@@ -79,9 +84,9 @@ def _encode_split(model, tok, texts, captured, device):
 
         # MLC last-token stack at L11..L15, shape (B, 5, d)
         bsz = input_ids.shape[0]
+        d = captured[ANCHOR_LAYER].shape[-1]
         mlc_batch = torch.empty(
-            (bsz, len(MLC_LAYERS), captured[ANCHOR_LAYER].shape[-1]),
-            dtype=torch.float16,
+            (bsz, len(MLC_LAYERS), d), dtype=torch.float16,
         )
         for idx, li in enumerate(MLC_LAYERS):
             full = captured[li]                 # (B, CTX, d)
@@ -90,9 +95,22 @@ def _encode_split(model, tok, texts, captured, device):
             )
         mlc_last.append(mlc_batch)
 
+        # MLC tail stack at L11..L15, shape (B, TAIL_MLC_N, 5, d) — needed
+        # for time_layer_crosscoder probing and MLC full_window. Only the
+        # last TAIL_MLC_N tokens (quota-limited).
+        mlc_tail_batch = torch.empty(
+            (bsz, TAIL_MLC_N, len(MLC_LAYERS), d), dtype=torch.float16,
+        )
+        for idx, li in enumerate(MLC_LAYERS):
+            mlc_tail_batch[:, :, idx, :] = (
+                captured[li][:, -TAIL_MLC_N:, :].to(torch.float16)
+            )
+        mlc_tail.append(mlc_tail_batch)
+
     return {
         "anchor_tail": torch.cat(anchor_tail, dim=0).numpy(),
         "mlc_last": torch.cat(mlc_last, dim=0).numpy(),
+        "mlc_tail": torch.cat(mlc_tail, dim=0).numpy(),
         "last_idx": np.asarray(last_indices, dtype=np.int64),
     }
 
@@ -150,8 +168,13 @@ def main() -> None:
         out_dir = OUT_ROOT / task.task_name
         anchor_path = out_dir / "acts_anchor.npz"
         mlc_path = out_dir / "acts_mlc.npz"
-        if anchor_path.exists() and mlc_path.exists() and not args.force:
-            print(f"  {task.task_name}: cached, skip")
+        mlc_tail_path = out_dir / "acts_mlc_tail.npz"
+        # Skip only if ALL three caches exist (mlc_tail added 2026-04-20).
+        if (
+            anchor_path.exists() and mlc_path.exists()
+            and mlc_tail_path.exists() and not args.force
+        ):
+            print(f"  {task.task_name}: cached (all 3), skip")
             continue
         out_dir.mkdir(parents=True, exist_ok=True)
         if not task.train_texts or not task.test_texts:
@@ -177,6 +200,15 @@ def main() -> None:
             train_acts=tr["mlc_last"],
             train_labels=np.asarray(task.train_labels, dtype=np.int64),
             test_acts=te["mlc_last"],
+            test_labels=np.asarray(task.test_labels, dtype=np.int64),
+        )
+        # MLC tail: (N, LAST_N=20, L=5, d) fp16 for time_layer probing.
+        # Shares train_last_idx with acts_anchor.npz (same token positions).
+        np.savez(
+            mlc_tail_path,
+            train_acts=tr["mlc_tail"],
+            train_labels=np.asarray(task.train_labels, dtype=np.int64),
+            test_acts=te["mlc_tail"],
             test_labels=np.asarray(task.test_labels, dtype=np.int64),
         )
         (out_dir / "meta.json").write_text(json.dumps({

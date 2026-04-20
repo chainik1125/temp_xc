@@ -203,6 +203,36 @@ the single-token baselines). The full-window baseline-mean entries
 in the tables therefore reflect those 9 tasks only; the SAE rows
 reflect all 36. Per-task deltas are comparable within each row.
 
+#### Who is *in* each plot (and why)
+
+The 4 last-position plots include **all 19 SAEs** (every trained
+arch) plus the 2 baselines — 21 bars total.
+
+The 4 full-window plots include **17 SAEs** plus the 2 baselines —
+19 bars total. **MLC and time_layer_crosscoder_t5 are intentionally
+omitted from the full-window plots**:
+
+- **MLC** has a 1-token × 5-layer encoder. Sliding it across tail-20
+  positions would require a `(N, 20, 5, d)` probe cache — 50 GB at
+  fp16, which busts the MooseFS quota. Using a truncated tail-5
+  cache would give MLC a 4× smaller feature pool than TXCDR's tail-20
+  full-window, which is a strict disadvantage for bad reasons
+  (larger pool = more chance of finding a task-relevant feature
+  under top-k selection). Rather than emit a misleadingly-low MLC
+  number, we skip it. MLC's last-position number (the aggregation
+  it's actually trained for) is unchanged and present in all 4
+  last-position plots.
+- **time_layer_crosscoder_t5** has the same tail-20 × 5-layer cache
+  constraint. It's currently probed via a T-1 zero-pad fallback
+  that makes `full_window = last_position` numerically (max per-task
+  diff 0.0006). Emitting those records under the "full_window"
+  label would be misleading. Skipped for the same reason as MLC;
+  deferred to 5.6 when a genuine tail × multi-layer cache is built.
+
+The remaining 17 archs in the full-window plots all have a real
+temporal axis (T ≥ 2 or T = 1 slid across tail-20) that produces a
+genuinely different aggregation from last-position.
+
 #### Cross-token breakdown (sub-phase 5.4)
 
 Same 2 tasks as before (`winogrande_correct_completion`,
