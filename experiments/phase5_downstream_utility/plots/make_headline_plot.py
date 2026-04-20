@@ -44,12 +44,23 @@ ANIKET_DATASET_KEYS = {
 }
 
 ORDERED_ARCHS = [
-    "topk_sae", "stacked_t5", "stacked_t20",
-    "shared_perpos_t5", "txcdr_t5", "txcdr_t20",
+    # Single-token / non-temporal baselines first
+    "topk_sae", "temporal_contrastive",
+    # Stacked (T independent SAEs)
+    "stacked_t5", "stacked_t20",
+    # TXCDR family — T-sweep + weight-sharing ablations
+    "shared_perpos_t5",
+    "txcdr_t5", "txcdr_t20",
     "txcdr_shared_dec_t5", "txcdr_shared_enc_t5",
     "txcdr_tied_t5", "txcdr_pos_t5", "txcdr_causal_t5",
-    "matryoshka_t5", "temporal_contrastive",
-    "mlc", "tfa", "tfa_pos", "tfa_small", "tfa_pos_small",
+    # Novel-parameterized decoders
+    "txcdr_block_sparse_t5", "txcdr_lowrank_dec_t5", "txcdr_rank_k_dec_t5",
+    # Matryoshka (position-nested)
+    "matryoshka_t5",
+    # Layer-axis + joint
+    "mlc", "time_layer_crosscoder_t5",
+    # TFA (self-attention encoder)
+    "tfa", "tfa_pos", "tfa_small", "tfa_pos_small",
 ]
 BASELINE_ARCHS = ["baseline_last_token_lr", "baseline_attn_pool"]
 
