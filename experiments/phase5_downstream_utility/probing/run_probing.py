@@ -525,6 +525,7 @@ def run_probing(
                     "n_train": int(ytr.size), "n_test": int(yte.size),
                     "elapsed_s": time.time() - t0,
                 }) + "\n")
+                out_f.flush()
                 print(f"  {task_name} last-LR  auc={last_auc:.4f} acc={last_acc:.4f}")
 
                 t0 = time.time()
@@ -542,6 +543,7 @@ def run_probing(
                     "n_train": int(ytr.size), "n_test": int(yte.size),
                     "elapsed_s": time.time() - t0,
                 }) + "\n")
+                out_f.flush()
                 print(f"  {task_name} attn-pool auc={ap_auc:.4f} acc={ap_acc:.4f}")
 
     with OUT_JSONL.open("a") as out_f:
@@ -587,13 +589,16 @@ def run_probing(
                             "n_test": int(tc["test_labels"].size),
                             "elapsed_s": time.time() - t0,
                         }) + "\n")
-                    print(f"  {task_name}: [{(time.time()-t0):.1f}s]")
+                    out_f.flush()
+                    print(f"  {task_name}: [{(time.time()-t0):.1f}s]", flush=True)
                 except Exception as e:
-                    print(f"  {task_name} FAIL: {e}")
+                    print(f"  {task_name} FAIL: {e}", flush=True)
                     out_f.write(json.dumps({
                         "run_id": run_id, "arch": arch,
                         "task_name": task_name, "error": str(e),
                     }) + "\n")
+                    out_f.flush()
+                out_f.flush()
             del model
             torch.cuda.empty_cache()
 
