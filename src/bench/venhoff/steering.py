@@ -42,6 +42,11 @@ log = logging.getLogger("venhoff.steering")
 def _venhoff_python(venhoff_root: Path) -> str:
     """Resolve the python interpreter to run Venhoff's scripts with.
 
+    Always returns an absolute path — subprocess.run is called with
+    `cwd=<venhoff_root>/train-vectors|hybrid`, so a relative path like
+    `vendor/thinking-llms-interp/.venv/bin/python` resolves from the
+    wrong directory and raises FileNotFoundError.
+
     Priority:
       1. `VENHOFF_PYTHON` env var (explicit override)
       2. `<venhoff_root>/.venv/bin/python` (from `uv sync` inside vendor)
@@ -51,10 +56,11 @@ def _venhoff_python(venhoff_root: Path) -> str:
     """
     override = os.environ.get("VENHOFF_PYTHON", "").strip()
     if override:
-        if not Path(override).exists():
-            raise FileNotFoundError(f"VENHOFF_PYTHON points to missing file: {override}")
-        return override
-    candidate = venhoff_root / ".venv" / "bin" / "python"
+        p = Path(override).resolve()
+        if not p.exists():
+            raise FileNotFoundError(f"VENHOFF_PYTHON points to missing file: {p}")
+        return str(p)
+    candidate = (venhoff_root / ".venv" / "bin" / "python").resolve()
     if candidate.exists():
         return str(candidate)
     log.warning(
