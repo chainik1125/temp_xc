@@ -400,16 +400,24 @@ def _encode_for_probe(
         # position T-1 of the window ending at the last real token.
         if aggregation == "last_position":
             X = _window_at_last(anchor, li, T)
-            with torch.no_grad():
-                Z = model.encode(torch.from_numpy(X).to(device))
-            return Z[:, -1, :].cpu().numpy()
+            outs = []
+            for i in range(0, X.shape[0], 512):
+                Xb = torch.from_numpy(X[i:i + 512]).to(device)
+                with torch.no_grad():
+                    Zb = model.encode(Xb)
+                outs.append(Zb[:, -1, :].cpu().numpy())
+            return np.concatenate(outs, axis=0)
         wins = _slide_windows(anchor, T)
         N, K, _, d = wins.shape
         flat = wins.reshape(N * K, T, d)
-        with torch.no_grad():
-            Z = model.encode(torch.from_numpy(flat).to(device))
-        Z_last = Z[:, -1, :]
-        return Z_last.reshape(N, K * Z_last.shape[-1]).cpu().numpy()
+        outs = []
+        for i in range(0, flat.shape[0], 512):
+            Xb = torch.from_numpy(flat[i:i + 512]).to(device)
+            with torch.no_grad():
+                Zb = model.encode(Xb)
+            outs.append(Zb[:, -1, :].cpu().numpy())
+        Z_last = np.concatenate(outs, axis=0)
+        return Z_last.reshape(N, K * Z_last.shape[-1])
     if arch == "time_layer_crosscoder_t5":
         # TxL probing fallback: use last-token multi-layer cache with a
         # T=1 degenerate window. (B, 1, L, d) through the T=5-trained
@@ -422,49 +430,57 @@ def _encode_for_probe(
         X_pad = np.concatenate(
             [np.zeros_like(X_1) for _ in range(T - 1)] + [X_1], axis=1
         )  # (N, T, L, d) — fill earlier T-1 slots with zeros
-        with torch.no_grad():
-            Z = model.encode(torch.from_numpy(X_pad).to(device))
-        # Take the last (time, layer) slab — features at (T-1, center_layer)
+        # Batch to avoid GPU OOM — Z has shape (N, T, L, d_sae)
         center_l = L // 2
-        z_last = Z[:, -1, center_l, :]  # (N, d_sae_eff)
-        return z_last.cpu().numpy()
+        outs_early = []
+        for i in range(0, X_pad.shape[0], 512):
+            Xb = torch.from_numpy(X_pad[i:i + 512]).to(device)
+            with torch.no_grad():
+                Zb = model.encode(Xb)
+            outs_early.append(Zb[:, -1, center_l, :].cpu().numpy())
+        z_last = np.concatenate(outs_early, axis=0)
+        return z_last
     if arch == "txcdr_causal_t5":
         T = meta["T"]
         # Causal returns (B, T, d_sae). last_position = position T-1 of
-        # the window ending at the last real token.
+        # the window ending at the last real token. Batched to avoid GPU
+        # OOM — causal encoder stacks T intermediate tensors internally.
         if aggregation == "last_position":
             X = _window_at_last(anchor, li, T)
-            with torch.no_grad():
-                Z = model.encode(torch.from_numpy(X).to(device))
-            return Z[:, -1, :].cpu().numpy()
-        # full_window: slide T-window across tail-20, flatten per-position
+            outs = []
+            for i in range(0, X.shape[0], 512):
+                Xb = torch.from_numpy(X[i:i + 512]).to(device)
+                with torch.no_grad():
+                    Zb = model.encode(Xb)
+                outs.append(Zb[:, -1, :].cpu().numpy())
+            return np.concatenate(outs, axis=0)
         wins = _slide_windows(anchor, T)  # (N, K, T, d)
         N, K, _, d = wins.shape
         flat = wins.reshape(N * K, T, d)
-        with torch.no_grad():
-            Z = model.encode(torch.from_numpy(flat).to(device))  # (N*K, T, d_sae)
-        # Take the last position of each window (t = T-1 is "current")
-        Z_last = Z[:, -1, :]  # (N*K, d_sae)
-        return Z_last.reshape(N, K * Z_last.shape[-1]).cpu().numpy()
+        outs = []
+        for i in range(0, flat.shape[0], 512):
+            Xb = torch.from_numpy(flat[i:i + 512]).to(device)
+            with torch.no_grad():
+                Zb = model.encode(Xb)
+            outs.append(Zb[:, -1, :].cpu().numpy())
+        Z_last = np.concatenate(outs, axis=0)  # (N*K, d_sae)
+        return Z_last.reshape(N, K * Z_last.shape[-1])
     if arch in ("tfa", "tfa_pos", "tfa_small", "tfa_pos_small"):
         # TFA takes (B, T, d); novel_codes live at inter["novel_codes"].
         # Scaling factor must match training; saved in meta as `scale`.
         scale = float(meta.get("scale", 1.0))
-        if aggregation == "last_position":
-            X = anchor  # (N, 20, d)
-            X_t = torch.from_numpy(X).float().to(device) * scale
+        outs = []
+        for i in range(0, anchor.shape[0], 256):
+            Xb = torch.from_numpy(anchor[i:i + 256]).float().to(device) * scale
             with torch.no_grad():
-                _, inter = model(X_t)
-            novel = inter["novel_codes"]  # (N, 20, d_sae)
-            out = novel[torch.arange(novel.shape[0], device=device),
-                        torch.from_numpy(li).to(device)]
-            return out.cpu().numpy()
-        # full_window: flatten all 20 positions
-        X_t = torch.from_numpy(anchor).float().to(device) * scale
-        with torch.no_grad():
-            _, inter = model(X_t)
-        novel = inter["novel_codes"]  # (N, 20, d_sae)
-        return novel.reshape(novel.shape[0], -1).cpu().numpy()
+                _, inter = model(Xb)
+            novel = inter["novel_codes"]  # (B, 20, d_sae)
+            if aggregation == "last_position":
+                lib = torch.from_numpy(li[i:i + 256]).to(device)
+                outs.append(novel[torch.arange(novel.shape[0], device=device), lib].cpu().numpy())
+            else:
+                outs.append(novel.reshape(novel.shape[0], -1).cpu().numpy())
+        return np.concatenate(outs, axis=0)
     if arch == "temporal_contrastive":
         # Token-level SAE; encode last token directly.
         if aggregation == "last_position":
