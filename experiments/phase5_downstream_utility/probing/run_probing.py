@@ -273,7 +273,7 @@ def _load_model_for_run(run_id, ckpt_path, device):
         model = TopKSAE(d_in, d_sae, k=meta["k_pos"]).to(device)
     elif arch == "mlc":
         model = MultiLayerCrosscoder(d_in, d_sae, n_layers=5, k=meta["k_pos"]).to(device)
-    elif arch.startswith("txcdr_t"):
+    elif arch in ("txcdr_t5", "txcdr_t20"):
         T = meta["T"]
         k_eff = meta["k_win"] or (meta["k_pos"] * T)
         model = TemporalCrosscoder(d_in, d_sae, T, k_eff).to(device)
