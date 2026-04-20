@@ -11,15 +11,18 @@ tags:
 
 **Status**: pre-registration. Written before any integration code.
 
-### Decisions locked (2026-04-18, Slack review with Dmitry)
+### Decisions locked
 
-- **Q1 integration path**: Path 1 for SAE + MLC; Path 3 for TempXC. Approved.
-- **Q2 layer**: **Layer 6** fixed anchor for DeepSeek-R1-Distill-Llama-8B. No sweep.
-- **Q3 aggregation**: **All 4 aggregation strategies** (`last`, `mean`, `max`, `full_window`) run as pre-registered ablation. **`full_window` is the headline** — the other three are reported in the supplement.
-- **Q4 scale**: Smoke at **1k traces**, full run at **5k traces**.
-- **Q5 judge**: Haiku 4.5 (`claude-haiku-4-5-20251001`). Bridge run on 100 sentences during smoke; **drift threshold 0.5 points on the 0-10 rubric** before committing. Above threshold, revisit.
+- **Q1 (2026-04-18) integration path**: Path 1 for SAE; Path 3 for TempXC; Path MLC for MLC. Approved.
+- **Q2 (2026-04-18) layer**: SAE/TempXC/MLC training anchor layer **6**. Steering layer **12** (Llama-8B base; Venhoff's default).
+- **Q3 (2026-04-18) aggregation**: All 4 TempXC aggregations run; **`full_window` is the headline**.
+- **Q4 (2026-04-20 updated)**: Smoke **100 MATH500 problems** (SAE-only P0 gate); full hybrid run **500 MATH500 problems** (whole split).
+- **Q5 (2026-04-18) taxonomy side-channel**: Haiku 4.5 judge + GPT-4o bridge kept from original plan; side-channel only now.
+- **Q6 (2026-04-20) dataset**: **MATH500** — Dmitry's redirect. Venhoff reports 3.5% Gap Recovery on the Llama-8B×MATH500 cell (Table 2). That's the bar.
+- **Q7 (2026-04-20) model pair**: **Llama-3.1-8B base ↔ DeepSeek-R1-Distill-Llama-8B thinking**.
+- **Q8 (2026-04-20) Phase 2/3 code approach**: **vendor Venhoff's `train-vectors/` + `hybrid/` scripts, drive via subprocess with our ckpts exported in their format**. Saves porting 250k lines.
 
-**Still open** (not blocking Phase 1a): **P2 vs P3 as the NeurIPS abstract bar.** Dmitry to confirm whether a P2-strength result (TempXC wins at small cluster sizes only) clears the abstract, or whether P3 (monotonic win) is required. Phase 1a launches before this resolves.
+**Still open**: **P2 vs P3 as the NeurIPS-abstract bar.** Dmitry to confirm whether a P2-strength result (5-15% Gap Recovery — above 3.5% but not overwhelming) clears the abstract, or whether we need P3 (>15%). Phase 1a smoke launches before this resolves.
 
 **Paper**: Venhoff et al., *"Base Models Know How to Reason, Thinking
 Models Learn When"* ([arXiv:2510.07364](https://arxiv.org/abs/2510.07364)).

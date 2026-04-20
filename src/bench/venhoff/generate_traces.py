@@ -28,7 +28,7 @@ from pathlib import Path
 from typing import Iterable
 
 from src.bench.model_registry import get_model_config
-from src.bench.venhoff.dataset import MMLUProExample, load_mmlu_pro
+from src.bench.venhoff.dataset import load_dataset_uniform
 from src.bench.venhoff.paths import ArtifactPaths, RunIdentity, can_resume, write_with_metadata
 from src.bench.venhoff.responses import extract_thinking_process
 
@@ -41,9 +41,34 @@ DEFAULT_TEMPERATURE = 0.0
 DEFAULT_TOP_P = 1.0
 
 
+def _make_trace(ex, full_response: str) -> "Trace":
+    """Convert a dataset example + model output into a Trace.
+
+    Handles both MMLUProExample (has `category` + `answer_index`) and
+    MATH500Example (has `subject`; open-ended so answer_index=-1).
+    """
+    thinking = extract_thinking_process(full_response)
+    cat = getattr(ex, "category", None) or getattr(ex, "subject", "unknown")
+    ans_idx = getattr(ex, "answer_index", -1)
+    return Trace(
+        question_id=ex.question_id,
+        category=str(cat),
+        prompt=ex.prompt,
+        full_response=full_response,
+        thinking_process=thinking,
+        answer=ex.answer,
+        answer_index=int(ans_idx),
+    )
+
+
 @dataclass(frozen=True)
 class Trace:
-    """One reasoning trace produced by the subject model."""
+    """One reasoning trace produced by the subject model.
+
+    `category` doubles as "subject" for MATH500 (algebra/geometry/etc.)
+    and as "category" for MMLU-Pro (math/chemistry/etc.). `answer_index`
+    is -1 for open-ended generation datasets like MATH500.
+    """
 
     question_id: str
     category: str
@@ -56,7 +81,7 @@ class Trace:
 
 def generate_traces_vllm(
     model_name: str,
-    examples: list[MMLUProExample],
+    examples: list,  # MMLUProExample | MATH500Example (both have .prompt/.answer/.category-or-subject)
     max_tokens: int,
     temperature: float,
     top_p: float,
@@ -98,23 +123,13 @@ def generate_traces_vllm(
     traces: list[Trace] = []
     for ex, out in zip(examples, outputs):
         full_response = out.outputs[0].text
-        traces.append(
-            Trace(
-                question_id=ex.question_id,
-                category=ex.category,
-                prompt=ex.prompt,
-                full_response=full_response,
-                thinking_process=extract_thinking_process(full_response),
-                answer=ex.answer,
-                answer_index=ex.answer_index,
-            )
-        )
+        traces.append(_make_trace(ex, full_response))
     return traces
 
 
 def generate_traces_transformers(
     model_name: str,
-    examples: list[MMLUProExample],
+    examples: list,  # MMLUProExample | MATH500Example (both have .prompt/.answer/.category-or-subject)
     max_tokens: int,
     temperature: float,
     top_p: float,
@@ -163,17 +178,7 @@ def generate_traces_transformers(
         for ex, in_ids, full_ids in zip(chunk, inputs.input_ids, out_ids):
             new_tokens = full_ids[in_ids.shape[0]:]
             full_response = tokenizer.decode(new_tokens, skip_special_tokens=True)
-            traces.append(
-                Trace(
-                    question_id=ex.question_id,
-                    category=ex.category,
-                    prompt=ex.prompt,
-                    full_response=full_response,
-                    thinking_process=extract_thinking_process(full_response),
-                    answer=ex.answer,
-                    answer_index=ex.answer_index,
-                )
-            )
+            traces.append(_make_trace(ex, full_response))
     return traces
 
 
@@ -216,14 +221,15 @@ def generate(
         return out
 
     examples = list(
-        load_mmlu_pro(
+        load_dataset_uniform(
+            name=paths.identity.dataset,
             split=paths.identity.dataset_split,
             limit=n_traces,
             seed=paths.identity.seed,
-            shuffle=True,
+            shuffle=(paths.identity.dataset == "mmlu-pro"),  # MATH500 is only 500 problems; no need to shuffle
         )
     )
-    log.info("[data] mmlu_pro examples | n=%d | engine=%s", len(examples), engine)
+    log.info("[data] %s examples | n=%d | engine=%s", paths.identity.dataset, len(examples), engine)
 
     if engine == "vllm":
         traces = generate_traces_vllm(
@@ -259,7 +265,7 @@ def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     p.add_argument("--root", type=Path, default=Path("results/venhoff_eval"))
     p.add_argument("--model", default="deepseek-r1-distill-llama-8b")
-    p.add_argument("--dataset", default="mmlu-pro")
+    p.add_argument("--dataset", default="math500", choices=["mmlu-pro", "math500"])
     p.add_argument("--split", default="test")
     p.add_argument("--n-traces", type=int, default=1000)
     p.add_argument("--layer", type=int, default=6)

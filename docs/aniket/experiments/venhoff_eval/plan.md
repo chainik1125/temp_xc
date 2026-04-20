@@ -9,73 +9,105 @@ tags:
 
 ## Venhoff reasoning-eval — experiment plan
 
-**Purpose**: test whether Temporal Crosscoder (TempXC) features produce
-a more coherent taxonomy of reasoning behavior than per-token SAE
-features, using Venhoff et al.'s reasoning-trace pipeline as the
-evaluation harness.
+**Purpose (primary, post-2026-04-20 pivot):** test whether Temporal
+Crosscoder (TempXC), MLC, or SAE features produce *steering vectors*
+that recover a larger fraction of the thinking-model-vs-base-model
+accuracy gap on MATH500 than Venhoff's per-sentence steering does,
+using Llama-3.1-8B (base) ↔ DeepSeek-R1-Distill-Llama-8B (thinking)
+as the base/thinking pair. **The bar to clear is Venhoff's 3.5% Gap
+Recovery on that cell** (their Table 2). Any architecture-Gap-Recovery
+combo > 3.5% is a publishable positive signal.
 
-**Paper deadline**: NeurIPS abstract May 4 (16 days). ICML workshop May 8.
+**Purpose (secondary, kept as side-channel):** the taxonomy-quality
+comparison from the original plan runs as a free byproduct since
+Phase 1 (cluster + label + score) already produces the clusters the
+steering phase consumes. Predictions P1′-P4′ against MLC on Haiku 4.5
+judge scores are kept in Appendix A.
+
+**Paper deadline**: NeurIPS abstract May 4 (14 days). ICML workshop May 8.
 
 See [[integration_plan|integration_plan.md]] for the code-level
-decisions and axis-collapse strategy. This document covers the
-experiment-level hypothesis, metric, and predictions.
+decisions. This document covers the experiment-level hypothesis,
+metric, and predictions.
 
-### Decisions locked (2026-04-18)
+### Decisions locked
 
-| # | decision | status |
-|---|---|---|
-| Q1 | Path 1 (SAE/MLC) + Path 3 (TempXC) hybrid | **locked** |
-| Q2 | Layer 6 fixed; no layer sweep | **locked** |
-| Q3 | All 4 aggregations run; `full_window` is the headline | **locked** |
-| Q4 | Smoke 1k traces, full 5k traces | **locked** |
-| Q5 | Haiku 4.5 judge; GPT-4o bridge on 100 sentences at smoke; drift threshold 0.5/10 | **locked** |
-| — | P2 vs P3 as NeurIPS-abstract bar | **open**, not blocking Phase 1a |
+| date | # | decision | status |
+|---|---|---|---|
+| 2026-04-18 | Q1 | Path 1 (SAE) + Path 3 (TempXC) + Path MLC (MLC) | **locked** |
+| 2026-04-18 | Q2 | Anchor layer 6 (SAE/TempXC/MLC training), steering layer 12 (Llama-8B base → Venhoff default) | **locked** |
+| 2026-04-18 | Q3 | All 4 TempXC aggregations run; `full_window` is the headline | **locked** |
+| 2026-04-18 | Q4 | Smoke 100 MATH500 problems, full 500 (the whole split) | **locked** |
+| 2026-04-18 | Q5 | Haiku 4.5 judge for taxonomy side-channel; deterministic grader for primary Gap Recovery | **locked** |
+| 2026-04-20 | Q6 | **Dataset: MATH500** (not MMLU-Pro, not GSM8K) — Dmitry's redirect | **locked** |
+| 2026-04-20 | Q7 | **Model pair: Llama-3.1-8B base ↔ DeepSeek-R1-Distill-Llama-8B thinking** — the cell where Venhoff's method failed (3.5% Gap Recovery). | **locked** |
+| 2026-04-20 | Q8 | **Phase 2/3 code approach: vendor Venhoff's `train-vectors/` + `hybrid/` scripts, drive via subprocess with our ckpts exported in their format.** Avoids porting 250k lines. | **locked** |
 
 ## 1. Hypothesis
 
-> On reasoning traces from DeepSeek-R1-Distill-Llama-8B, TempXC features
-> cluster into more coherent and temporally-structured reasoning categories
-> than per-token SAE features, as measured by Venhoff et al.'s taxonomy-
-> quality metrics (accuracy, completeness, semantic orthogonality) with
-> **Claude Haiku 4.5** as judge (deviation from their GPT-4o default; see
-> [[integration_plan#5. Configuration choices|integration_plan § 5]]).
+**Primary (post-pivot).**
 
-Why we'd expect this: reasoning steps (backtracking, verification,
-case analysis) span multiple sentences or multi-token phrases — they're
-not token-local. A per-token SAE sees one token's residual stream at a
-time, so multi-step patterns can only be reconstructed by
-superposition of single-token features. TempXC's shared-latent
-window explicitly represents multi-position structure as a single
-feature.
+> Per-cluster steering vectors optimized from TempXC (or MLC) cluster
+> assignments recover a larger fraction of the Llama-3.1-8B → DeepSeek-R1-
+> Distill-Llama-8B accuracy gap on MATH500 than Venhoff's per-sentence
+> steering vectors trained from their SAE. Their reported number is
+> **3.5% Gap Recovery**; any architecture > 3.5% supports the paper.
+
+Why we'd expect this: Venhoff's method fails on MATH500-Llama-8B
+specifically because per-position steering vectors can only inject
+single-token reasoning cues. If reasoning-model advantage is a
+multi-position phenomenon (long backtracks, multi-sentence case
+analysis), a temporal method that binds together structure across
+token positions should transfer more of the signal.
+
+**Secondary (kept as side-channel).**
+
+> On reasoning traces, TempXC / MLC features cluster into more
+> coherent reasoning categories than per-token SAE features, as
+> measured by Venhoff's taxonomy-quality metrics (accuracy,
+> completeness, semantic orthogonality) with Claude Haiku 4.5 as
+> judge. Predictions in Appendix A.
 
 ## 2. What we're measuring
 
-Venhoff's pipeline produces three scalar quality metrics per trained
-dictionary, averaged across cluster-sizes and repetitions:
+### Primary metric — Gap Recovery on MATH500
 
-- **accuracy** — does each cluster's (title, description) actually
-  apply to the sentences assigned to it? Judge Yes/No over 100 sampled
-  sentences. 0–1.
-- **completeness** — does each sentence match its cluster's description?
-  Judge 0–10 rubric.
-- **semantic orthogonality** — how non-redundant are cluster descriptions?
-  Pairwise judge 0–10, inverted.
+Define (exact quantity from Venhoff Table 2):
 
-Judge is **Claude Haiku 4.5** (model id `claude-haiku-4-5-20251001`),
-substituted for Venhoff's GPT-4o. Bridge run on 100 sentences during
-smoke test quantifies judge-drift vs GPT-4o before committing to full
-sweep.
+```
+gap_recovery = (hybrid_accuracy - base_accuracy) / (thinking_accuracy - base_accuracy)
+```
 
-Composite: `avg_final_score` rolled up per cluster size, reported for
-each (architecture, T, layer, aggregation) combo. **Headline composite
-uses TempXC-`full_window`** (locked Q3); other three aggregations
-reported as supplement rows.
+where:
+- `base_accuracy` = Llama-3.1-8B base on MATH500 (Venhoff: 27.8%).
+- `thinking_accuracy` = DeepSeek-R1-Distill-Llama-8B on MATH500 (Venhoff: 79.8%).
+- `hybrid_accuracy` = base + per-cluster steering vectors trained from
+  our SAE/TempXC/MLC cluster annotations, applied at layer 12 during
+  base-model inference over MATH500.
+
+**Venhoff's baseline to beat: 3.5%.**
+
+All three arch-level scores (`gap_recovery_sae`, `gap_recovery_tempxc`,
+`gap_recovery_mlc`) are reported as max over Venhoff's 10 × 5
+hyperparameter grid:
+- `coefficient ∈ {0.1, 0.2, ..., 1.0}` — steering vector scale
+- `token_window ∈ {0, -1, -15, -50, -100}` — how far back in the
+  generated stream we apply steering
+
+500 MATH500 problems per cell. Grading is deterministic via
+canonical-answer extraction from `\boxed{}` (no LLM judge).
+
+### Secondary metric — taxonomy quality (side channel)
+
+Kept from the original plan since Phase 1 clustering + labeling runs
+anyway as input to steering-vector training. Same three Venhoff scores
+with Haiku 4.5 judge (see Appendix A for predictions). Reported in the
+supplement; not on the headline figure.
 
 Plus our harness-native metrics:
 - **Reconstruction NMSE** on reasoning activations (SAEBench-parallel)
-- **Training loss curves** with plateau-early-stop (same plateau infra
-  we built in commit `2fae76c`)
-- **Ordered + shuffled pair** for each eval cell — advantage must
+- **Training loss curves** with plateau-early-stop
+- **Ordered + shuffled pair** for each taxonomy eval cell — advantage must
   survive shuffling to count as "temporal"
 
 ## 3. Architectures compared
@@ -99,82 +131,110 @@ Per Dmitry's 4/18 simplification: `{SAE, TempXC, MLC}` only. No TFA.
 
 ## 4. Grid
 
-Phase 1 full run:
+Phase 1 + 2 + 3 full run (MATH500 × Llama-8B pair):
 
-- 3 architectures (SAE, TempXC-T5, MLC)
-- 10 cluster sizes per arch (Venhoff's full sweep: `5..50`)
-- **Fixed layer 6 only** (not a sweep — locked in the Slack proposal
-  as Q2 answered "anchor, not sweep")
-- For TempXC: × 4 aggregation strategies at *annotation time* (Path 3
-  re-encodes the same wide T=5 ckpt 4× — not 4 separate trainings)
-- 5000 traces generated from MMLU-Pro test
-- All fits capped at **10k training steps** with plateau-based
-  early stop (see [[integration_plan#5. Configuration choices|integration_plan § 5]])
-- Shuffled-control pair for every cell
+- **Phase 1** (cluster discovery — reused from original plan)
+  - 3 architectures (SAE path1, TempXC-T5 path3, MLC path_mlc)
+  - Pinned `n_clusters = 15` at first (Venhoff's default for their
+    Llama-8B cell). Sweep 5..50 kept as a supplement run if signal.
+  - Layer 6 for SAE / MLC / TempXC training.
+  - **500 MATH500 problems** (full split; not 5k like MMLU-Pro).
+  - All dictionary fits capped at 10k steps with plateau early-stop.
 
-**Training fit count** (what actually consumes GPU):
-- SAE (Path 1, per-sentence-mean at layer 6): 10 cluster sizes = **10 fits**
-- MLC (Path MLC, per-sentence-mean over layers {4,5,6,7,8}): 10 cluster
-  sizes = **10 fits**
-- TempXC (Path 3, T=5 token window per sentence): 10 cluster sizes = **10 fits**
-- **Total: 30 fits**, each <5 min at the 10k-step cap → **~2.5 H100-hours**
-  of dictionary training.
+- **Phase 2** (steering-vector training — new)
+  - For each architecture's trained SAE at n_clusters=15, run Venhoff's
+    `optimize_steering_vectors.py` for each of 15 categories + 1 bias
+    vector = 16 steering vectors per arch.
+  - `steering_layer = 12` (Llama-8B; Venhoff's default, *not* our SAE
+    training layer).
+  - `n_training_examples = 2048, n_eval_examples = 512, max_iters = 50`.
+  - **48 vectors total** (3 arches × 16 per arch).
 
-**Evaluation cell count** (what the judge scores):
-- SAE: 10 sizes = 10 cells
-- MLC: 10 sizes = 10 cells
-- TempXC: 10 sizes × 4 aggregations = 40 cells
-- **Total: 60 cells**, each gets a (accuracy, completeness, orthogonality)
-  triple from Haiku 4.5.
+- **Phase 3** (hybrid inference on MATH500 — new)
+  - For each arch: run Venhoff's `hybrid_token.py` over the 10 × 5
+    hyperparam grid (coefficients × token_windows). 50 hybrid runs
+    per arch.
+  - Each hybrid run: base model generates MATH500 with steering vectors
+    gated per sentence-cluster assignment.
+  - **150 hybrid runs total** (3 arches × 50 hyperparam cells).
+
+**Training fit count** (what consumes GPU for Phase 1):
+- SAE: 1 fit × 1 cluster_size = **1 fit** (smoke bar); 10 fits for sweep
+- MLC: same
+- TempXC: same
+- **Headline: 3 fits** (one per arch at n_clusters=15). Each <5 min.
+
+**Steering + hybrid compute (Phases 2 + 3):**
+- Phase 2: ~15 min per vector × 48 vectors = ~12 H100-hours
+- Phase 3: ~2 min per MATH500 hybrid run × 150 runs = ~5 H100-hours
+  (vLLM-batched over the 500 problems per run; grading deterministic).
+- **Total Phase 2 + 3: ~17 H100-hours.**
+
+**Secondary (taxonomy-quality, side-channel):**
+- 60 cells × (accuracy, completeness, orthogonality) = same as before,
+  Haiku 4.5 judge, ~$15 fees. Runs in parallel with Phase 2 since they
+  share no GPU.
 
 ## 5. Predictions
 
-Pre-registered. If results match prediction, the narrative is clean.
-If they don't, the plan doc has to update to reflect what actually
-happened.
+Pre-registered 2026-04-20 against Gap Recovery on MATH500-Llama-8B.
+Venhoff's baseline on this cell is **3.5% Gap Recovery** (Table 2 of
+arXiv:2510.07364). All P-labels are for the *best* Gap Recovery across
+our (coefficient, token_window) grid, per architecture.
 
-### Reframing after Han's 2026-04-19 sparse-probing rerun
-
-On 2026-04-19 Han reran the sparse-probing benchmark with proper
-convergence and expanded the task count from 8 → 27. The headline
-number flipped from "MLC wins decisively (0.941 vs 0.862 TXC-T5)" to
-"MLC and TXCDR-T5 at parity (0.807 vs 0.797, overlapping error bars)".
-This was **before the Venhoff eval ran**, so it's not a post-hoc
-re-interpretation of Venhoff results — it's an update to what the
-Venhoff eval is *for*. The relevant comparison is no longer
-TempXC-vs-SAE; it's TempXC-vs-MLC, with SAE held as a per-token
-baseline that neither outperforms on probing.
-
-If sparse probing says MLC ≈ TempXC-T5, then Venhoff's taxonomy-quality
-metric is the differentiator between "the axes surface different
-features" and "MLC is strictly better." That's the load-bearing
-question now.
-
-Predictions below are against MLC (primary) with SAE as a sanity floor.
-
-| prediction | composite score delta | interpretation if observed |
+| prediction | arch-level Gap Recovery | interpretation |
 |---|---|---|
-| **P1 (null)**: TempXC ≤ MLC on all metrics, all cluster sizes, all aggregations; TempXC also ≤ SAE | Δ ≤ 0 vs both | TempXC doesn't help for reasoning taxonomies and doesn't even beat the per-token baseline. Combined with the sparse-probing parity, TempXC's case is weak. Paper pivots to "MLC is a strong crosscoder; temporal axis doesn't generalize." |
-| **P2 (weak)**: TempXC > SAE at small cluster sizes (5-20) under `full_window`, but MLC matches or beats TempXC at all sizes | TempXC − SAE > 0 for k≤20; TempXC − MLC ≤ 0 | Temporal axis offers some structure beyond per-token but MLC captures at least as much. Supports "any non-trivial crosscoding axis helps; which axis matters less." Medium paper finding; autointerp/feature-geometry becomes the main differentiator. |
-| **P3 (medium)**: TempXC and MLC at parity on the headline `full_window` metric, but diverge on *which* clusters they surface (qualitative) | \|TempXC − MLC\| < 0.5 pt on composite | This is the outcome most consistent with Han's sparse-probing parity. Paper headline becomes "temporal and layer crosscoding find complementary but non-overlapping reasoning categories," motivating the feature-geometry contribution. Strong NeurIPS story. |
-| **P4 (strong)**: TempXC beats MLC on composite under `full_window` at 5k traces | TempXC − MLC > +0.5 pt | Temporal axis genuinely better for reasoning than layer axis. Strongest possible result; motivates Phase 2 steering-vector work immediately. |
+| **P0 (sanity-floor)**: Our SAE reproduces Venhoff's ~3.5% on the Llama-8B cell | SAE ≈ 3.5 ± 2 pp | If we're far from this we've broken their method; stop and debug before reporting anything. |
+| **P1 (null)**: No architecture > 5% Gap Recovery | all arches ≤ 5% | Temporal / layer crosscoding does not rescue the Llama-8B cell. Paper becomes a careful dual-null writeup, foregrounding the taxonomy side-channel + Han's SVD diagnostic as the mechanism story. |
+| **P2 (weak)**: TempXC *or* MLC > 5% but < 15% Gap Recovery; SAE ≤ 5% | best arch ∈ (5%, 15%) | Crosscoders help but the improvement is modest. Publishable with caveats — the delta from 3.5% → ~10% is "2-3× the Venhoff number" which is a decent headline. Steering-vector Phase 2 is viable. |
+| **P3 (medium)**: TempXC or MLC > 15% Gap Recovery | best arch > 15% | Strong positive signal; at this scale Phase 2 + contrastive-loss TempXC is clearly worth investment. Clean NeurIPS abstract. |
+| **P4 (strong)**: TempXC > MLC on Gap Recovery AND both > 15% | TempXC − MLC > 2 pp, both > 15% | Best case — temporal axis specifically beats layer axis, motivating the "reasoning is multi-position" framing end-to-end. |
 
-**Win criteria for the paper** (post-2026-04-19 reframing):
-- **NeurIPS abstract**: P3 or P4 both support the abstract cleanly. P2
-  supports a weaker version ("temporal axis helps over SAE but not over
-  MLC"). P1 pivots to a negative-result writeup.
-- **Open with Dmitry**: whether P2 clears the bar. Not blocking the run
-  — the same pipeline produces the evidence to decide either way.
-- **ICML workshop fallback**: P1 with diagnostic clarity (training
-  curves, SVD spectrum per Han's T20 finding) is still a careful
-  negative worth publishing.
+**Win criteria for the paper:**
+- **NeurIPS abstract**: P2, P3, or P4 clear the bar; the delta from
+  3.5% is the lede. P1 pivots to a careful dual-null writeup.
+- **P0 is a go/no-go gate.** If our SAE Gap Recovery on the Llama-8B
+  cell comes in wildly off from Venhoff's 3.5% (say < 1% or > 10%),
+  the whole pipeline is suspect — either our ckpt export format is
+  wrong or their scripts are misconfigured in our env. **Check P0
+  *first* on the smoke run before launching full arch sweep.**
+- **ICML workshop fallback**: P1 + clear diagnostic story (taxonomy
+  differences, SVD spectrum, training curves) is publishable as a
+  careful negative.
+
+**Open with Dmitry**: Do we count a narrow win at 5-10% as "enough"
+for the NeurIPS abstract, or do we want P3+ before we lead with it?
+Not blocking the run — the same pipeline produces evidence either way.
+
+### Sanity checks before declaring a result
+
+- Gap Recovery must be positive — `hybrid_accuracy > base_accuracy`.
+  If our steering makes the base model *worse*, the number is
+  ill-defined (negative Gap Recovery); report as "regression" and
+  investigate.
+- `thinking_accuracy` we compute should come in at ~79.8% (Venhoff
+  Table 2). Big deviation = we're generating on the wrong model /
+  wrong dataset / wrong prompt template.
+- Coefficient sweep: we expect best-gap-recovery to be at some
+  *interior* coefficient (not 0.1 nor 1.0). If it's at the boundary,
+  widen the grid.
 
 ## 6. Runtime expectations
 
-Per `integration_plan § 6`: ~40 H100-hours + ~$15 in Haiku 4.5 judge
-fees for full Phase 1 (4-10× cheaper than Venhoff's GPT-4o default).
-Smoke test at 1000 traces, one arch, one cluster size: ~2-3 H100-hours
-+ <$1 judge fee.
+Per `integration_plan § 6` (post-pivot):
+
+- **Phase 1** (trace + activations + dictionary): ~3-4 H100-hours for
+  500 MATH500 problems × 3 arches at n_clusters=15.
+- **Phase 2** (steering-vector training): ~12 H100-hours (48 vectors ×
+  ~15 min each).
+- **Phase 3** (hybrid inference over 10×5 grid): ~5 H100-hours.
+- **Side-channel taxonomy scoring**: ~$15 in Haiku 4.5 fees, overlaps
+  with Phase 2 compute (judge calls don't block GPU).
+
+**Total ~20-22 H100-hours + ~$15 API fees**, across ~1 full pod day.
+
+Smoke: 100 MATH500 problems × SAE only × P0 gate → ~1-2 H100-hours +
+negligible API. If P0 clears (our SAE ≈ Venhoff's 3.5%), unlock full.
 
 ## 7. Relationship to sparse-probing result
 
@@ -197,46 +257,69 @@ Implications for Venhoff:
   regression is a separate story (act_fn / regularization) Han is
   investigating on a different track.
 
-## 8. Out-of-scope for Phase 1
+## 8. Out-of-scope
 
-- No steering-vector training (Phase 2)
-- No hybrid-model experiments (Phase 3)
-- No non-{Llama-8B} models (Phase 4)
-- No comparison to TFA (Dmitry's 4/18 simplification)
-- No auto-interp-heavy feature analysis beyond the judge-generated cluster
-  titles Venhoff's pipeline already emits
+- **Datasets other than MATH500** (GSM8K / AIME / MedQA / LegalBench
+  etc. all supported by Venhoff's `hybrid_token.py` but deferred to
+  post-NeurIPS extension).
+- **Models other than Llama-3.1-8B ↔ DeepSeek-R1-Distill-Llama-8B**
+  (the cell Dmitry specifically flagged; Qwen pairs deferred).
+- **Steering-strategies other than `linear`** (Venhoff's
+  `adaptive_linear` / `resid_lora` variants deferred — `linear` is
+  their default and the baseline we're trying to beat).
+- **Han's contrastive-loss TempXC variant** — orthogonal track; if it
+  lands before our Phase 2 completes, re-run against it, otherwise
+  the TopK baseline is what we report.
+- **Auto-interp feature analysis** beyond what Venhoff's cluster-title
+  prompt already produces.
 
 ## 9. Fallback plan
 
-If smoke test (Phase 1a) reveals that Venhoff's released pipeline
-can't be reproduced cleanly in our env (dep mismatches, missing data,
-broken scripts), escalate: we either (a) email the authors for help
-or (b) drop to a scaled-down variant where we do the clustering + LLM
-labeling ourselves from scratch, without their code. Budget 2 days
-for Phase 1a; if it's still not running by then, escalate.
+If P0 (our SAE reproducing Venhoff's 3.5%) fails on the smoke run:
+budget 1 day to debug the ckpt-export format + their subprocess CLI.
+If still broken after that day, email the authors and run the
+taxonomy-quality side-channel alone.
 
 ## 10. What produces the headline figure
 
-One plot, saved at `results/venhoff_eval/plots/fig1_taxonomy_quality.png`:
+Primary headline: `results/venhoff_eval/plots/fig1_gap_recovery.png`
 
-- x-axis: cluster size (5..50)
-- y-axis: composite taxonomy quality score (0–10)
-- headline lines: **MLC (orange, bold — primary comparison post-2026-04-19)**,
-  **TempXC-T5 `full_window` (green, bold)**, SAE (blue, dashed — per-token
-  baseline, not the story)
-- supplement lines (same plot, lighter/dashed so they're visible but
-  non-dominant): TempXC-T5 `last`, `mean`, `max`
-- error bars: from 3 repetitions per cluster size
-- **shuffled-control shaded region per cell**: for each (arch, cluster
-  size) cell, shade the band between the ordered-trace composite and
-  the shuffled-trace composite. The shaded height quantifies how much
-  of the score is attributable to temporal structure specifically
-  (the shuffle control removes within-trace ordering). A narrow band
-  means the advantage is not temporal; a wide band means it is. This
-  is the figure-level evidence for the "temporal" claim.
-- The MLC line is the thing Dmitry reads first. If MLC ≥ TempXC at
-  every cluster size, the paper story becomes qualitative (§ 5 P2/P3);
-  if TempXC ≥ MLC, it's P4 — the strongest outcome.
+- x-axis: coefficient (0.1..1.0)
+- y-axis: Gap Recovery (%), with `3.5%` drawn as a dashed horizontal
+  line labeled "Venhoff baseline"
+- one subplot per token_window ∈ {0, −1, −15, −50, −100}
+- lines per subplot: **SAE (blue)**, **TempXC-T5 full_window (green, bold)**,
+  **MLC (orange)**. Each line has 10 points (one per coefficient).
+- error bars: bootstrap over the 500 MATH500 problems (±1.96 × se)
+- the best-cell-per-arch is annotated directly on the plot with the
+  exact Gap Recovery number, so it reads off the figure without
+  cross-referencing a table.
 
-This is the figure Dmitry + team react to at check-in. If it shows
-TempXC above SAE, paper is alive.
+Secondary (supplement): `fig2_taxonomy_quality.png` — the cluster
+quality figure from the original plan, relegated to the supplement
+since it's the side-channel now. Unchanged spec except it's marked
+"Supp. Figure" not "Figure 1."
+
+---
+
+## Appendix A — Taxonomy-quality predictions (secondary signal)
+
+Kept from the pre-pivot plan. Runs as a free byproduct of Phase 1
+since we cluster + label for steering-vector training anyway. Not the
+headline; reported in the supplement.
+
+### Reframing context (2026-04-19 Han sparse-probing rerun)
+
+MLC 0.807 vs TXCDR-T5 0.797 — parity on broader (27-task) sparse
+probing, down from the 8-task "MLC wins decisively" number. This
+reshaped the taxonomy side-channel from "is TempXC better than SAE"
+to "do MLC and TempXC surface *different* reasoning categories."
+
+### Secondary predictions
+
+| prediction | composite score delta | interpretation |
+|---|---|---|
+| **P1′ (null)**: TempXC ≤ MLC on all metrics, cluster sizes, aggregations; TempXC also ≤ SAE | Δ ≤ 0 vs both | Nothing to say beyond what the primary Gap Recovery table already says. |
+| **P2′ (weak)**: TempXC > SAE at small cluster sizes, but MLC ≥ TempXC throughout | TempXC − SAE > 0 at k≤20; TempXC − MLC ≤ 0 | Temporal axis offers structure beyond per-token but MLC captures as much. Supplement note only. |
+| **P3′ (medium)**: TempXC ≈ MLC on composite, but diverge on *which* clusters they surface | \|TempXC − MLC\| < 0.5 pt | Parity on coherence, divergence in content. Feature-geometry supplement becomes interesting; motivates autointerp follow-up. |
+| **P4′ (strong)**: TempXC > MLC on composite at `full_window` | TempXC − MLC > +0.5 pt | Temporal axis better for reasoning taxonomies specifically. Supports the primary story if Gap Recovery also favours TempXC. |

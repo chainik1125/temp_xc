@@ -49,26 +49,44 @@ FORCE="${FORCE:-0}"
 FORCE_STAGE="${FORCE_STAGE:-}"
 SKIP_STAGE="${SKIP_STAGE:-}"
 MODEL="${MODEL:-deepseek-r1-distill-llama-8b}"
+BASE_MODEL="${BASE_MODEL:-meta-llama/Llama-3.1-8B}"
+THINKING_MODEL_HF="${THINKING_MODEL_HF:-deepseek-ai/DeepSeek-R1-Distill-Llama-8B}"
+DATASET="${DATASET:-math500}"
 ROOT="${ROOT:-results/venhoff_eval}"
+VENHOFF_ROOT="${VENHOFF_ROOT:-vendor/thinking-llms-interp}"
+
+# Steering/hybrid phase configuration (locked per plan.md Q7/Q8).
+STEERING_LAYER="${STEERING_LAYER:-12}"
+SAE_LAYER="${SAE_LAYER:-6}"
+N_CLUSTERS_HYBRID="${N_CLUSTERS_HYBRID:-15}"
 
 if [[ "$MODE" == "smoke" ]]; then
-    N_TRACES="${N_TRACES:-1000}"
+    # Smoke: 100 MATH500 problems × SAE only × P0 gate (reproduce Venhoff's 3.5%).
+    N_TRACES="${N_TRACES:-100}"
     CLUSTER_SIZES="${CLUSTER_SIZES:-15}"
     ARCHES="${ARCHES:-sae}"
     AGGREGATIONS="${AGGREGATIONS:-full_window}"
     N_LAYERS_MLC="${N_LAYERS_MLC:-5}"
 elif [[ "$MODE" == "full" ]]; then
+    # Phase 1 full taxonomy sweep (retained as side-channel on MMLU-Pro).
+    # Use MODE=hybrid for the MATH500 Gap-Recovery primary run.
     N_TRACES="${N_TRACES:-5000}"
+    DATASET="${DATASET:-mmlu-pro}"
     CLUSTER_SIZES="${CLUSTER_SIZES:-5 10 15 20 25 30 35 40 45 50}"
-    # MLC enabled via path_mlc (multi-layer collection). Re-added after
-    # Han's 4/19 27-task sparse-probing result showed MLC ≈ TXCDR-T5 at
-    # parity — Venhoff is now the MLC-vs-TempXC differentiation run,
-    # not just a side-by-side.
     ARCHES="${ARCHES:-sae tempxc mlc}"
     AGGREGATIONS="${AGGREGATIONS:-last mean max full_window}"
     N_LAYERS_MLC="${N_LAYERS_MLC:-5}"
+elif [[ "$MODE" == "hybrid" ]]; then
+    # Primary post-2026-04-20 pivot: MATH500 Gap Recovery on Llama-8B cell.
+    # 500 problems × 3 arches × n_clusters=15 × (10 coef × 5 window) grid.
+    N_TRACES="${N_TRACES:-500}"
+    DATASET="${DATASET:-math500}"
+    CLUSTER_SIZES="${CLUSTER_SIZES:-15}"
+    ARCHES="${ARCHES:-sae tempxc mlc}"
+    AGGREGATIONS="${AGGREGATIONS:-full_window}"
+    N_LAYERS_MLC="${N_LAYERS_MLC:-5}"
 else
-    echo "Unknown MODE=$MODE (expected: smoke|full)" >&2
+    echo "Unknown MODE=$MODE (expected: smoke|full|hybrid)" >&2
     exit 2
 fi
 
@@ -76,6 +94,7 @@ fi
 COMMON_FLAGS=(
     --root "$ROOT"
     --model "$MODEL"
+    --dataset "$DATASET"
     --n-traces "$N_TRACES"
     --layer "$LAYER"
     --seed "$SEED"
@@ -207,7 +226,7 @@ for arch in $ARCHES; do
     done
 done
 
-if [[ "$SKIP_BRIDGE" != "1" ]]; then
+if [[ "$MODE" == "full" && "$SKIP_BRIDGE" != "1" ]]; then
     echo "[info] stage=bridge | status=start | cell=sae/k15/path1/full_window"
     # Bridge uses the smoke cell's labels as its input sample.
     python -m src.bench.venhoff.smoke \
@@ -217,6 +236,64 @@ if [[ "$SKIP_BRIDGE" != "1" ]]; then
         --skip-stage train --skip-stage annotate \
         --skip-stage label --skip-stage score \
         --judge-model "$JUDGE"
+fi
+
+# ═══════════════════════════════════════════════════════════════════
+#  MODE=hybrid: Phases 2 + 3 (steering vectors → hybrid inference)
+# ═══════════════════════════════════════════════════════════════════
+if [[ "$MODE" == "hybrid" ]]; then
+    echo "[info] stage=export_ckpts_venhoff_format | status=start"
+    # For each arch, export the trained n_clusters=15 ckpt at layer 6
+    # into Venhoff's expected path so their optimize_steering_vectors.py
+    # and hybrid_token.py can load it via `load_sae(model_id, layer, n_clusters)`.
+    THINKING_MODEL_ID="$(basename "$THINKING_MODEL_HF" | tr '[:upper:]' '[:lower:]')"
+    for arch in $ARCHES; do
+        case "$arch" in
+            tempxc) path="path3" ;;
+            mlc)    path="path_mlc" ;;
+            *)      path="path1" ;;
+        esac
+        echo "[info] export | arch=$arch | path=$path | clusters=$N_CLUSTERS_HYBRID"
+        python -m src.bench.venhoff.export_venhoff_ckpt \
+            --root "$ROOT" --model "$MODEL" --dataset "$DATASET" \
+            --n-traces "$N_TRACES" --layer "$LAYER" --seed "$SEED" \
+            --arch "$arch" --cluster-size "$N_CLUSTERS_HYBRID" --path "$path" \
+            --venhoff-root "$VENHOFF_ROOT" \
+            --thinking-model-id "$THINKING_MODEL_ID"
+    done
+
+    for arch in $ARCHES; do
+        echo "[info] stage=train_steering_vectors | arch=$arch | status=start"
+        python -m src.bench.venhoff.run_steering \
+            --root "$ROOT" --model "$MODEL" --dataset "$DATASET" \
+            --n-traces "$N_TRACES" --layer "$LAYER" --seed "$SEED" \
+            --arch "$arch" \
+            --venhoff-root "$VENHOFF_ROOT" \
+            --base-model "$BASE_MODEL" --thinking-model "$THINKING_MODEL_HF" \
+            --steering-layer "$STEERING_LAYER" --sae-layer "$SAE_LAYER" \
+            --n-clusters "$N_CLUSTERS_HYBRID" \
+            "${FORCE_FLAGS[@]}"
+
+        echo "[info] stage=hybrid_inference | arch=$arch | status=start"
+        python -m src.bench.venhoff.run_hybrid \
+            --root "$ROOT" --model "$MODEL" --dataset "$DATASET" \
+            --n-traces "$N_TRACES" --layer "$LAYER" --seed "$SEED" \
+            --arch "$arch" \
+            --venhoff-root "$VENHOFF_ROOT" \
+            --base-model "$BASE_MODEL" --thinking-model "$THINKING_MODEL_HF" \
+            --steering-layer "$STEERING_LAYER" --sae-layer "$SAE_LAYER" \
+            --n-clusters "$N_CLUSTERS_HYBRID" \
+            "${FORCE_FLAGS[@]}"
+
+        echo "[info] stage=grade | arch=$arch | status=start"
+        python -m src.bench.venhoff.run_grade \
+            --root "$ROOT" --arch "$arch" \
+            --venhoff-root "$VENHOFF_ROOT" \
+            --base-model "$BASE_MODEL" --thinking-model "$THINKING_MODEL_HF" \
+            --dataset "$DATASET" \
+            --steering-layer "$STEERING_LAYER" --sae-layer "$SAE_LAYER" \
+            --n-clusters "$N_CLUSTERS_HYBRID"
+    done
 fi
 
 echo "[done] venhoff_launch | mode=$MODE | results_root=$ROOT"
