@@ -487,21 +487,26 @@ def run_probing(
     k_values = k_values or K_VALUES
     device = torch.device("cuda")
     OUT_JSONL.parent.mkdir(parents=True, exist_ok=True)
+    import gc
 
     task_dirs = [d for d in sorted(PROBE_CACHE.iterdir()) if d.is_dir()]
     if task_names:
         task_dirs = [d for d in task_dirs if d.name in task_names]
-    # Only load dirs that have both caches
     task_dirs = [
         d for d in task_dirs
         if (d / "acts_anchor.npz").exists() and (d / "acts_mlc.npz").exists()
     ]
-    task_cache = {d.name: _load_task_cache(d) for d in task_dirs}
-    print(f"Probing {len(task_cache)} tasks  aggregation={aggregation}")
+    # STREAMING: load each task only when probing it. This caps RAM at
+    # ~1 task cache + model + Z tensors (~5 GB peak), fitting in a 46 GB
+    # container. Previously loaded all 36 task caches upfront (~18 GB fp32)
+    # which combined with encoding peaks caused OOM kills.
+    print(f"Probing {len(task_dirs)} tasks  aggregation={aggregation}")
 
     if include_baselines:
         with OUT_JSONL.open("a") as out_f:
-            for task_name, tc in task_cache.items():
+            for task_dir in task_dirs:
+                task_name = task_dir.name
+                tc = _load_task_cache(task_dir)
                 ytr, yte = tc["train_labels"], tc["test_labels"]
                 dkey = tc["meta"]["dataset_key"]
 
@@ -545,6 +550,8 @@ def run_probing(
                 }) + "\n")
                 out_f.flush()
                 print(f"  {task_name} attn-pool auc={ap_auc:.4f} acc={ap_acc:.4f}")
+                del tc, X_last_tr, X_last_te
+                gc.collect()
 
     with OUT_JSONL.open("a") as out_f:
         for run_id, ckpt_path in _iter_ckpts(run_ids):
@@ -562,7 +569,9 @@ def run_probing(
                 torch.cuda.empty_cache()
                 continue
             print(f"=== {run_id} ({arch})  aggregation={aggregation} ===")
-            for task_name, tc in task_cache.items():
+            for task_dir in task_dirs:
+                task_name = task_dir.name
+                tc = _load_task_cache(task_dir)
                 try:
                     t0 = time.time()
                     Ztr = _encode_for_probe(
@@ -591,6 +600,7 @@ def run_probing(
                         }) + "\n")
                     out_f.flush()
                     print(f"  {task_name}: [{(time.time()-t0):.1f}s]", flush=True)
+                    del Ztr, Zte
                 except Exception as e:
                     print(f"  {task_name} FAIL: {e}", flush=True)
                     out_f.write(json.dumps({
@@ -599,7 +609,11 @@ def run_probing(
                     }) + "\n")
                     out_f.flush()
                 out_f.flush()
+                del tc
+                gc.collect()
+                torch.cuda.empty_cache()
             del model
+            gc.collect()
             torch.cuda.empty_cache()
 
 
