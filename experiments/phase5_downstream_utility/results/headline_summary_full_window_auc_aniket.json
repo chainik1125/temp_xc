@@ -1,8 +1,8 @@
 {
   "matryoshka_t5": {
-    "mean_auc": 0.7063933134828321,
-    "std_auc": 0.08429600662247108,
-    "n_tasks": 25,
+    "mean_auc": 0.7099608313677097,
+    "std_auc": 0.08739376149984517,
+    "n_tasks": 34,
     "per_task": {
       "ag_news_business": 0.6493594720496895,
       "ag_news_scitech": 0.6544321329639889,
@@ -28,13 +28,22 @@
       "europarl_es": 0.7674608941284043,
       "europarl_fr": 0.7818857142857143,
       "europarl_it": 0.5808813109125288,
-      "europarl_nl": 0.7011596390430745
+      "europarl_nl": 0.7011596390430745,
+      "amazon_reviews_cat0": 0.7610441767068273,
+      "amazon_reviews_cat1": 0.768275447903113,
+      "amazon_reviews_cat2": 0.7644110576442307,
+      "amazon_reviews_cat3": 0.5358290224884077,
+      "amazon_reviews_cat5": 0.6612678056410031,
+      "github_code_go": 0.9011284406238624,
+      "github_code_java": 0.713136385661825,
+      "github_code_javascript": 0.6520292574794233,
+      "github_code_python": 0.7217138352826314
     }
   },
   "stacked_t20": {
-    "mean_auc": 0.6804429634569074,
-    "std_auc": 0.10315945282618227,
-    "n_tasks": 25,
+    "mean_auc": 0.6742382511025893,
+    "std_auc": 0.1008077841441864,
+    "n_tasks": 34,
     "per_task": {
       "ag_news_business": 0.7261708351818987,
       "ag_news_scitech": 0.6217555401662049,
@@ -60,13 +69,22 @@
       "europarl_es": 0.6642773169616616,
       "europarl_fr": 0.5396285714285715,
       "europarl_it": 0.5939799087349629,
-      "europarl_nl": 0.5551132859415069
+      "europarl_nl": 0.5551132859415069,
+      "amazon_reviews_cat0": 0.5485207763324214,
+      "amazon_reviews_cat1": 0.7723831448303473,
+      "amazon_reviews_cat2": 0.6275065100260402,
+      "amazon_reviews_cat3": 0.550579913663078,
+      "amazon_reviews_cat5": 0.5679204451360249,
+      "github_code_go": 0.8278478025208906,
+      "github_code_java": 0.6537737624694145,
+      "github_code_javascript": 0.6736782717600502,
+      "github_code_python": 0.690815824327082
     }
   },
   "stacked_t5": {
-    "mean_auc": 0.6644778127284581,
-    "std_auc": 0.10840917039466479,
-    "n_tasks": 25,
+    "mean_auc": 0.6575982506862853,
+    "std_auc": 0.10878280375561651,
+    "n_tasks": 34,
     "per_task": {
       "ag_news_business": 0.7464576863354038,
       "ag_news_scitech": 0.6808725761772854,
@@ -92,13 +110,22 @@
       "europarl_es": 0.7769128404415125,
       "europarl_fr": 0.5282775510204081,
       "europarl_it": 0.555016135367024,
-      "europarl_nl": 0.5689615996364463
+      "europarl_nl": 0.5689615996364463,
+      "amazon_reviews_cat0": 0.5521728347653563,
+      "amazon_reviews_cat1": 0.5407186467821039,
+      "amazon_reviews_cat2": 0.5490341961367845,
+      "amazon_reviews_cat3": 0.5724522006313237,
+      "amazon_reviews_cat5": 0.6052017872643415,
+      "github_code_go": 0.9016524594885416,
+      "github_code_java": 0.6741913652181922,
+      "github_code_javascript": 0.688022919425894,
+      "github_code_python": 0.6629487954097129
     }
   },
   "topk_sae": {
-    "mean_auc": 0.6903803811679273,
-    "std_auc": 0.11830148879472072,
-    "n_tasks": 25,
+    "mean_auc": 0.674436414028969,
+    "std_auc": 0.11902189240042885,
+    "n_tasks": 34,
     "per_task": {
       "ag_news_business": 0.7897487799467613,
       "ag_news_scitech": 0.6613504155124654,
@@ -124,13 +151,22 @@
       "europarl_es": 0.633088547449546,
       "europarl_fr": 0.5088979591836735,
       "europarl_it": 0.5566397946334215,
-      "europarl_nl": 0.5695174797935534
+      "europarl_nl": 0.5695174797935534,
+      "amazon_reviews_cat0": 0.5873413974623595,
+      "amazon_reviews_cat1": 0.5382003803423081,
+      "amazon_reviews_cat2": 0.5286261145044581,
+      "amazon_reviews_cat3": 0.5575652827954278,
+      "amazon_reviews_cat5": 0.5525238908600709,
+      "github_code_go": 0.8854638766995613,
+      "github_code_java": 0.6281301184168899,
+      "github_code_javascript": 0.6666119822822594,
+      "github_code_python": 0.7268655044234333
     }
   },
   "txcdr_t20": {
-    "mean_auc": 0.7677355853324301,
-    "std_auc": 0.0862398376521952,
-    "n_tasks": 25,
+    "mean_auc": 0.7627579642790513,
+    "std_auc": 0.08836704115398836,
+    "n_tasks": 34,
     "per_task": {
       "ag_news_business": 0.8303432786157942,
       "ag_news_scitech": 0.8685664819944597,
@@ -156,13 +192,22 @@
       "europarl_es": 0.6803646071451896,
       "europarl_fr": 0.7052979591836736,
       "europarl_it": 0.6481315771359621,
-      "europarl_nl": 0.7605698380238258
+      "europarl_nl": 0.7605698380238258,
+      "amazon_reviews_cat0": 0.7853805660890574,
+      "amazon_reviews_cat1": 0.8063096787108398,
+      "amazon_reviews_cat2": 0.6498625994503977,
+      "amazon_reviews_cat3": 0.6291553144416305,
+      "amazon_reviews_cat5": 0.6607237860562981,
+      "github_code_go": 0.9436459712549652,
+      "github_code_java": 0.780382121732723,
+      "github_code_javascript": 0.7135191802143895,
+      "github_code_python": 0.7714019342266893
     }
   },
   "txcdr_t5": {
-    "mean_auc": 0.7568914735203213,
-    "std_auc": 0.0842346552295645,
-    "n_tasks": 25,
+    "mean_auc": 0.7362855489967421,
+    "std_auc": 0.0971740385852869,
+    "n_tasks": 34,
     "per_task": {
       "ag_news_business": 0.6629880212954747,
       "ag_news_scitech": 0.6457202216066482,
@@ -188,7 +233,48 @@
       "europarl_es": 0.8224336261511331,
       "europarl_fr": 0.8198061224489795,
       "europarl_it": 0.6258983775554412,
-      "europarl_nl": 0.8245488038432824
+      "europarl_nl": 0.8245488038432824,
+      "amazon_reviews_cat0": 0.8053808860941776,
+      "amazon_reviews_cat1": 0.641181062956661,
+      "amazon_reviews_cat2": 0.5438661754647018,
+      "amazon_reviews_cat3": 0.624886477749639,
+      "amazon_reviews_cat5": 0.7855042781540135,
+      "github_code_go": 0.8616190182846583,
+      "github_code_java": 0.553916327274329,
+      "github_code_javascript": 0.6839736074488133,
+      "github_code_python": 0.6110939944542032
+    }
+  },
+  "baseline_last_token_lr": {
+    "mean_auc": 0.902932100449838,
+    "std_auc": 0.09031529109116082,
+    "n_tasks": 9,
+    "per_task": {
+      "amazon_reviews_cat0": 0.8715499447991167,
+      "amazon_reviews_cat1": 0.8895165649084176,
+      "amazon_reviews_cat2": 0.8340033360133441,
+      "amazon_reviews_cat3": 0.752071405995575,
+      "amazon_reviews_cat5": 0.7991727702197278,
+      "github_code_go": 1.0,
+      "github_code_java": 0.9968003011481272,
+      "github_code_javascript": 0.9914252217718541,
+      "github_code_python": 0.9918493591923783
+    }
+  },
+  "baseline_attn_pool": {
+    "mean_auc": 0.975958361946973,
+    "std_auc": 0.02273627279460607,
+    "n_tasks": 9,
+    "per_task": {
+      "amazon_reviews_cat0": 0.9641194259108146,
+      "amazon_reviews_cat1": 0.9699889900910821,
+      "amazon_reviews_cat2": 0.9604958419833679,
+      "amazon_reviews_cat3": 0.9365435625382574,
+      "amazon_reviews_cat5": 0.9544183590609261,
+      "github_code_go": 1.0,
+      "github_code_java": 0.9996475926170653,
+      "github_code_javascript": 0.999207743308832,
+      "github_code_python": 0.999203742012412
     }
   }
 }

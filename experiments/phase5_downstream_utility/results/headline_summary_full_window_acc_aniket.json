@@ -1,8 +1,8 @@
 {
   "matryoshka_t5": {
-    "mean_acc": 0.6547425808862224,
-    "std_acc": 0.07997955617662261,
-    "n_tasks": 25,
+    "mean_acc": 0.658634250651634,
+    "std_acc": 0.08145963044302429,
+    "n_tasks": 34,
     "per_task": {
       "ag_news_business": 0.5947368421052631,
       "ag_news_scitech": 0.6118421052631579,
@@ -28,13 +28,22 @@
       "europarl_es": 0.7,
       "europarl_fr": 0.7222222222222222,
       "europarl_it": 0.5744466800804829,
-      "europarl_nl": 0.6233635448136958
+      "europarl_nl": 0.6233635448136958,
+      "amazon_reviews_cat0": 0.712,
+      "amazon_reviews_cat1": 0.718,
+      "amazon_reviews_cat2": 0.7,
+      "amazon_reviews_cat3": 0.519,
+      "amazon_reviews_cat5": 0.623,
+      "github_code_go": 0.835,
+      "github_code_java": 0.642,
+      "github_code_javascript": 0.592,
+      "github_code_python": 0.684
     }
   },
   "stacked_t20": {
-    "mean_acc": 0.6465812960125119,
-    "std_acc": 0.10095088692164644,
-    "n_tasks": 25,
+    "mean_acc": 0.6435744823621411,
+    "std_acc": 0.09846714296201088,
+    "n_tasks": 34,
     "per_task": {
       "ag_news_business": 0.6394736842105263,
       "ag_news_scitech": 0.5828947368421052,
@@ -60,13 +69,22 @@
       "europarl_es": 0.6242424242424243,
       "europarl_fr": 0.5393939393939394,
       "europarl_it": 0.5583501006036218,
-      "europarl_nl": 0.525679758308157
+      "europarl_nl": 0.525679758308157,
+      "amazon_reviews_cat0": 0.542,
+      "amazon_reviews_cat1": 0.748,
+      "amazon_reviews_cat2": 0.605,
+      "amazon_reviews_cat3": 0.542,
+      "amazon_reviews_cat5": 0.554,
+      "github_code_go": 0.824,
+      "github_code_java": 0.613,
+      "github_code_javascript": 0.637,
+      "github_code_python": 0.652
     }
   },
   "stacked_t5": {
-    "mean_acc": 0.62704913626892,
-    "std_acc": 0.1044558276223284,
-    "n_tasks": 25,
+    "mean_acc": 0.6190949531389118,
+    "std_acc": 0.10075288733655387,
+    "n_tasks": 34,
     "per_task": {
       "ag_news_business": 0.7092105263157895,
       "ag_news_scitech": 0.6434210526315789,
@@ -92,13 +110,22 @@
       "europarl_es": 0.7585858585858586,
       "europarl_fr": 0.5383838383838384,
       "europarl_it": 0.5503018108651911,
-      "europarl_nl": 0.5115810674723061
+      "europarl_nl": 0.5115810674723061,
+      "amazon_reviews_cat0": 0.541,
+      "amazon_reviews_cat1": 0.519,
+      "amazon_reviews_cat2": 0.52,
+      "amazon_reviews_cat3": 0.546,
+      "amazon_reviews_cat5": 0.566,
+      "github_code_go": 0.809,
+      "github_code_java": 0.632,
+      "github_code_javascript": 0.605,
+      "github_code_python": 0.635
     }
   },
   "topk_sae": {
-    "mean_acc": 0.6572927261825531,
-    "std_acc": 0.11190835271944259,
-    "n_tasks": 25,
+    "mean_acc": 0.6418328868989361,
+    "std_acc": 0.10834269194809484,
+    "n_tasks": 34,
     "per_task": {
       "ag_news_business": 0.7513157894736842,
       "ag_news_scitech": 0.6236842105263158,
@@ -124,13 +151,22 @@
       "europarl_es": 0.6101010101010101,
       "europarl_fr": 0.5252525252525253,
       "europarl_it": 0.56841046277666,
-      "europarl_nl": 0.49244712990936557
+      "europarl_nl": 0.49244712990936557,
+      "amazon_reviews_cat0": 0.566,
+      "amazon_reviews_cat1": 0.534,
+      "amazon_reviews_cat2": 0.514,
+      "amazon_reviews_cat3": 0.511,
+      "amazon_reviews_cat5": 0.549,
+      "github_code_go": 0.783,
+      "github_code_java": 0.625,
+      "github_code_javascript": 0.648,
+      "github_code_python": 0.66
     }
   },
   "txcdr_t20": {
-    "mean_acc": 0.7085687816642718,
-    "std_acc": 0.0813462940794013,
-    "n_tasks": 25,
+    "mean_acc": 0.7030652806354941,
+    "std_acc": 0.08456578145214959,
+    "n_tasks": 34,
     "per_task": {
       "ag_news_business": 0.7618421052631579,
       "ag_news_scitech": 0.781578947368421,
@@ -156,13 +192,22 @@
       "europarl_es": 0.6353535353535353,
       "europarl_fr": 0.6353535353535353,
       "europarl_it": 0.5925553319919518,
-      "europarl_nl": 0.7059415911379657
+      "europarl_nl": 0.7059415911379657,
+      "amazon_reviews_cat0": 0.725,
+      "amazon_reviews_cat1": 0.726,
+      "amazon_reviews_cat2": 0.599,
+      "amazon_reviews_cat3": 0.58,
+      "amazon_reviews_cat5": 0.625,
+      "github_code_go": 0.907,
+      "github_code_java": 0.672,
+      "github_code_javascript": 0.672,
+      "github_code_python": 0.684
     }
   },
   "txcdr_t5": {
-    "mean_acc": 0.707997501727865,
-    "std_acc": 0.08158320342806749,
-    "n_tasks": 25,
+    "mean_acc": 0.6907040453881361,
+    "std_acc": 0.0893733701017745,
+    "n_tasks": 34,
     "per_task": {
       "ag_news_business": 0.6447368421052632,
       "ag_news_scitech": 0.6052631578947368,
@@ -188,7 +233,48 @@
       "europarl_es": 0.7535353535353535,
       "europarl_fr": 0.7474747474747475,
       "europarl_it": 0.5804828973843058,
-      "europarl_nl": 0.7623363544813696
+      "europarl_nl": 0.7623363544813696,
+      "amazon_reviews_cat0": 0.732,
+      "amazon_reviews_cat1": 0.604,
+      "amazon_reviews_cat2": 0.524,
+      "amazon_reviews_cat3": 0.581,
+      "amazon_reviews_cat5": 0.759,
+      "github_code_go": 0.794,
+      "github_code_java": 0.59,
+      "github_code_javascript": 0.658,
+      "github_code_python": 0.542
+    }
+  },
+  "baseline_last_token_lr": {
+    "mean_acc": 0.8494444444444444,
+    "std_acc": 0.11572679619701173,
+    "n_tasks": 9,
+    "per_task": {
+      "amazon_reviews_cat0": 0.799,
+      "amazon_reviews_cat1": 0.801,
+      "amazon_reviews_cat2": 0.75,
+      "amazon_reviews_cat3": 0.692,
+      "amazon_reviews_cat5": 0.712,
+      "github_code_go": 0.999,
+      "github_code_java": 0.979,
+      "github_code_javascript": 0.957,
+      "github_code_python": 0.956
+    }
+  },
+  "baseline_attn_pool": {
+    "mean_acc": 0.9368888868225945,
+    "std_acc": 0.05198598766049296,
+    "n_tasks": 9,
+    "per_task": {
+      "amazon_reviews_cat0": 0.9049999713897705,
+      "amazon_reviews_cat1": 0.9150000214576721,
+      "amazon_reviews_cat2": 0.906000018119812,
+      "amazon_reviews_cat3": 0.847000002861023,
+      "amazon_reviews_cat5": 0.8939999938011169,
+      "github_code_go": 0.9990000128746033,
+      "github_code_java": 0.9929999709129333,
+      "github_code_javascript": 0.9900000095367432,
+      "github_code_python": 0.9829999804496765
     }
   }
 }

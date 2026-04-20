@@ -1,8 +1,8 @@
 {
   "matryoshka_t5": {
-    "mean_acc": 0.6442140402159874,
-    "std_acc": 0.08551834914083452,
-    "n_tasks": 27,
+    "mean_acc": 0.6505216412731016,
+    "std_acc": 0.08596229293747346,
+    "n_tasks": 36,
     "per_task": {
       "ag_news_business": 0.5947368421052631,
       "ag_news_scitech": 0.6118421052631579,
@@ -30,13 +30,22 @@
       "europarl_it": 0.5744466800804829,
       "europarl_nl": 0.6233635448136958,
       "winogrande_correct_completion": 0.5207100591715976,
-      "wsc_coreference": 0.5045045045045045
+      "wsc_coreference": 0.5045045045045045,
+      "amazon_reviews_cat0": 0.712,
+      "amazon_reviews_cat1": 0.718,
+      "amazon_reviews_cat2": 0.7,
+      "amazon_reviews_cat3": 0.519,
+      "amazon_reviews_cat5": 0.623,
+      "github_code_go": 0.835,
+      "github_code_java": 0.642,
+      "github_code_javascript": 0.592,
+      "github_code_python": 0.684
     }
   },
   "stacked_t20": {
-    "mean_acc": 0.6370225517380649,
-    "std_acc": 0.10291205046721721,
-    "n_tasks": 27,
+    "mean_acc": 0.6365724693591044,
+    "std_acc": 0.10000020376513048,
+    "n_tasks": 36,
     "per_task": {
       "ag_news_business": 0.6394736842105263,
       "ag_news_scitech": 0.5828947368421052,
@@ -64,13 +73,22 @@
       "europarl_it": 0.5583501006036218,
       "europarl_nl": 0.525679758308157,
       "winogrande_correct_completion": 0.5305719921104537,
-      "wsc_coreference": 0.5045045045045045
+      "wsc_coreference": 0.5045045045045045,
+      "amazon_reviews_cat0": 0.542,
+      "amazon_reviews_cat1": 0.748,
+      "amazon_reviews_cat2": 0.605,
+      "amazon_reviews_cat3": 0.542,
+      "amazon_reviews_cat5": 0.554,
+      "github_code_go": 0.824,
+      "github_code_java": 0.613,
+      "github_code_javascript": 0.637,
+      "github_code_python": 0.652
     }
   },
   "stacked_t5": {
-    "mean_acc": 0.6181336537360175,
-    "std_acc": 0.10534098410560468,
-    "n_tasks": 27,
+    "mean_acc": 0.6128502403020133,
+    "std_acc": 0.101244242714872,
+    "n_tasks": 36,
     "per_task": {
       "ag_news_business": 0.7092105263157895,
       "ag_news_scitech": 0.6434210526315789,
@@ -98,13 +116,22 @@
       "europarl_it": 0.5503018108651911,
       "europarl_nl": 0.5115810674723061,
       "winogrande_correct_completion": 0.5088757396449703,
-      "wsc_coreference": 0.5045045045045045
+      "wsc_coreference": 0.5045045045045045,
+      "amazon_reviews_cat0": 0.541,
+      "amazon_reviews_cat1": 0.519,
+      "amazon_reviews_cat2": 0.52,
+      "amazon_reviews_cat3": 0.546,
+      "amazon_reviews_cat5": 0.566,
+      "github_code_go": 0.809,
+      "github_code_java": 0.632,
+      "github_code_javascript": 0.605,
+      "github_code_python": 0.635
     }
   },
   "topk_sae": {
-    "mean_acc": 0.6458447723097117,
-    "std_acc": 0.11504016297445042,
-    "n_tasks": 27,
+    "mean_acc": 0.6341058014545061,
+    "std_acc": 0.11000557002069636,
+    "n_tasks": 36,
     "per_task": {
       "ag_news_business": 0.7513157894736842,
       "ag_news_scitech": 0.6236842105263158,
@@ -132,13 +159,22 @@
       "europarl_it": 0.56841046277666,
       "europarl_nl": 0.49244712990936557,
       "winogrande_correct_completion": 0.5009861932938856,
-      "wsc_coreference": 0.5045045045045045
+      "wsc_coreference": 0.5045045045045045,
+      "amazon_reviews_cat0": 0.566,
+      "amazon_reviews_cat1": 0.534,
+      "amazon_reviews_cat2": 0.514,
+      "amazon_reviews_cat3": 0.511,
+      "amazon_reviews_cat5": 0.549,
+      "github_code_go": 0.783,
+      "github_code_java": 0.625,
+      "github_code_javascript": 0.648,
+      "github_code_python": 0.66
     }
   },
   "txcdr_t20": {
-    "mean_acc": 0.6949297312717092,
-    "std_acc": 0.09209666056245225,
-    "n_tasks": 27,
+    "mean_acc": 0.6931417428982266,
+    "std_acc": 0.09192528411700511,
+    "n_tasks": 36,
     "per_task": {
       "ag_news_business": 0.7618421052631579,
       "ag_news_scitech": 0.781578947368421,
@@ -166,13 +202,22 @@
       "europarl_it": 0.5925553319919518,
       "europarl_nl": 0.7059415911379657,
       "winogrande_correct_completion": 0.5443786982248521,
-      "wsc_coreference": 0.5045045045045045
+      "wsc_coreference": 0.5045045045045045,
+      "amazon_reviews_cat0": 0.725,
+      "amazon_reviews_cat1": 0.726,
+      "amazon_reviews_cat2": 0.599,
+      "amazon_reviews_cat3": 0.58,
+      "amazon_reviews_cat5": 0.625,
+      "github_code_go": 0.907,
+      "github_code_java": 0.672,
+      "github_code_javascript": 0.672,
+      "github_code_python": 0.684
     }
   },
   "txcdr_t5": {
-    "mean_acc": 0.6930858439757814,
-    "std_acc": 0.09456541917417634,
-    "n_tasks": 27,
+    "mean_acc": 0.680481049648503,
+    "std_acc": 0.09654415085574278,
+    "n_tasks": 36,
     "per_task": {
       "ag_news_business": 0.6447368421052632,
       "ag_news_scitech": 0.6052631578947368,
@@ -200,7 +245,48 @@
       "europarl_it": 0.5804828973843058,
       "europarl_nl": 0.7623363544813696,
       "winogrande_correct_completion": 0.5088757396449703,
-      "wsc_coreference": 0.5045045045045045
+      "wsc_coreference": 0.5045045045045045,
+      "amazon_reviews_cat0": 0.732,
+      "amazon_reviews_cat1": 0.604,
+      "amazon_reviews_cat2": 0.524,
+      "amazon_reviews_cat3": 0.581,
+      "amazon_reviews_cat5": 0.759,
+      "github_code_go": 0.794,
+      "github_code_java": 0.59,
+      "github_code_javascript": 0.658,
+      "github_code_python": 0.542
+    }
+  },
+  "baseline_last_token_lr": {
+    "mean_acc": 0.8494444444444444,
+    "std_acc": 0.11572679619701173,
+    "n_tasks": 9,
+    "per_task": {
+      "amazon_reviews_cat0": 0.799,
+      "amazon_reviews_cat1": 0.801,
+      "amazon_reviews_cat2": 0.75,
+      "amazon_reviews_cat3": 0.692,
+      "amazon_reviews_cat5": 0.712,
+      "github_code_go": 0.999,
+      "github_code_java": 0.979,
+      "github_code_javascript": 0.957,
+      "github_code_python": 0.956
+    }
+  },
+  "baseline_attn_pool": {
+    "mean_acc": 0.9368888868225945,
+    "std_acc": 0.05198598766049296,
+    "n_tasks": 9,
+    "per_task": {
+      "amazon_reviews_cat0": 0.9049999713897705,
+      "amazon_reviews_cat1": 0.9150000214576721,
+      "amazon_reviews_cat2": 0.906000018119812,
+      "amazon_reviews_cat3": 0.847000002861023,
+      "amazon_reviews_cat5": 0.8939999938011169,
+      "github_code_go": 0.9990000128746033,
+      "github_code_java": 0.9929999709129333,
+      "github_code_javascript": 0.9900000095367432,
+      "github_code_python": 0.9829999804496765
     }
   }
 }

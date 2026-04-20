@@ -45,11 +45,14 @@ ANIKET_DATASET_KEYS = {
 
 ORDERED_ARCHS = [
     "topk_sae", "stacked_t5", "stacked_t20",
-    "shared_perpos_t5", "txcdr_t5", "txcdr_t20",
+    "txcdr_t5", "txcdr_t20",
     "txcdr_shared_dec_t5", "txcdr_shared_enc_t5",
     "txcdr_tied_t5", "txcdr_pos_t5", "txcdr_causal_t5",
+    "txcdr_block_sparse_t5", "txcdr_lowrank_dec_t5",
+    "txcdr_rank_k_dec_t5",
     "matryoshka_t5", "temporal_contrastive",
-    "mlc", "tfa", "tfa_pos", "tfa_small", "tfa_pos_small",
+    "time_layer_crosscoder_t5",
+    "mlc", "tfa_small", "tfa_pos_small",
 ]
 BASELINE_ARCHS = ["baseline_last_token_lr", "baseline_attn_pool"]
 

@@ -29,16 +29,25 @@ PLOTS_DIR = REPO / "experiments/phase5_downstream_utility/results/plots"
 
 
 COLORS = {
-    "topk_sae": "#1f77b4",       # blue
-    "mlc": "#2ca02c",            # green
-    "txcdr_t5": "#d62728",       # red
-    "txcdr_t20": "#9467bd",      # purple
-    "stacked_t5": "#ff7f0e",     # orange
-    "stacked_t20": "#e377c2",    # pink
-    "matryoshka_t5": "#17becf",  # cyan
-    "shared_perpos_t5": "#7f7f7f", # gray
-    "tfa": "#8c564b",            # brown
-    "tfa_pos": "#bcbd22",        # olive
+    "topk_sae": "#1f77b4",
+    "mlc": "#2ca02c",
+    "txcdr_t5": "#d62728",
+    "txcdr_t20": "#9467bd",
+    "stacked_t5": "#ff7f0e",
+    "stacked_t20": "#e377c2",
+    "matryoshka_t5": "#17becf",
+    "txcdr_shared_dec_t5": "#393b79",
+    "txcdr_shared_enc_t5": "#637939",
+    "txcdr_tied_t5": "#8c6d31",
+    "txcdr_pos_t5": "#843c39",
+    "txcdr_causal_t5": "#7b4173",
+    "txcdr_block_sparse_t5": "#3182bd",
+    "txcdr_lowrank_dec_t5": "#31a354",
+    "txcdr_rank_k_dec_t5": "#756bb1",
+    "temporal_contrastive": "#de9ed6",
+    "time_layer_crosscoder_t5": "#ce6dbd",
+    "tfa_small": "#8c564b",
+    "tfa_pos_small": "#bcbd22",
 }
 
 
