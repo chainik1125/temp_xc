@@ -39,6 +39,7 @@ from src.bench.venhoff.activation_collection import (
     _load_model,
     collect_path1,
     collect_path3,
+    collect_path_mlc,
 )
 from src.bench.venhoff.annotate import annotate
 from src.bench.venhoff.generate_traces import generate
@@ -183,9 +184,14 @@ async def run_smoke(
         if path_name == "path1":
             collect_path1(paths, model, tokenizer, cfg,
                           force=_force("activations", force, force_set))
-        else:
+        elif path_name == "path3":
             collect_path3(paths, model, tokenizer, cfg,
                           force=_force("activations", force, force_set))
+        elif path_name == "path_mlc":
+            collect_path_mlc(paths, model, tokenizer, cfg,
+                             force=_force("activations", force, force_set))
+        else:
+            raise ValueError(f"unknown path {path_name!r}")
 
     # Stage 3: train small-k dict
     if _stage_should_run("train", force, force_set, skip_set):
@@ -297,7 +303,7 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--seed", type=int, default=42)
     p.add_argument("--arch", default=SMOKE_ARCH, choices=["sae", "mlc", "tempxc"])
     p.add_argument("--cluster-size", type=int, default=SMOKE_CLUSTER_SIZE)
-    p.add_argument("--path", default=SMOKE_PATH, choices=["path1", "path3"])
+    p.add_argument("--path", default=SMOKE_PATH, choices=["path1", "path3", "path_mlc"])
     p.add_argument("--aggregation", default=SMOKE_AGGREGATION,
                    choices=["last", "mean", "max", "full_window"])
     p.add_argument("--engine", default="vllm", choices=["vllm", "transformers"])

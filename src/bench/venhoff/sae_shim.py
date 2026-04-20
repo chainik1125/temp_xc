@@ -34,10 +34,20 @@ from src.bench.saebench.aggregation import AggregationName, aggregate
 
 
 def _load_mean(mean_pkl: Path) -> torch.Tensor:
+    """Load a 1-D activation_mean from a sidecar (Path 1 / Path 3)."""
     with mean_pkl.open("rb") as f:
         payload = pickle.load(f)
     mean = np.asarray(payload["activation_mean"], dtype=np.float32)
     assert mean.ndim == 1, f"bad mean shape {mean.shape}"
+    return torch.from_numpy(mean)
+
+
+def _load_mean_mlc(mean_pkl: Path) -> torch.Tensor:
+    """Load a 2-D activation_mean (n_layers, d_model) for Path MLC."""
+    with mean_pkl.open("rb") as f:
+        payload = pickle.load(f)
+    mean = np.asarray(payload["activation_mean"], dtype=np.float32)
+    assert mean.ndim == 2, f"bad mlc mean shape {mean.shape}"
     return torch.from_numpy(mean)
 
 
@@ -131,6 +141,41 @@ class _Path3Shim(torch.nn.Module):
         return self.base.b_dec
 
 
+class _PathMLCShim(torch.nn.Module):
+    """For MLC: (B, n_layers, d) → (B, d_sae) via LayerCrosscoder.encode.
+
+    MLC's native `.encode((B, n_layers, d))` returns `(B, d_sae)` — the
+    shared-z latent with TopK mask already applied. No aggregation at
+    annotation time (the layer axis is the model's input, not something
+    to collapse post-hoc).
+    """
+
+    def __init__(
+        self,
+        base: torch.nn.Module,
+        activation_mean: torch.Tensor,  # shape (n_layers, d_model)
+        n_layers: int,
+    ):
+        super().__init__()
+        self.base = base
+        self.n_layers = n_layers
+        self.register_buffer("activation_mean", activation_mean)
+
+    def encoder(self, x: torch.Tensor) -> torch.Tensor:
+        assert x.ndim == 3, f"path_mlc encoder expects (B, n_layers, d), got {tuple(x.shape)}"
+        B, L, d = x.shape
+        assert L == self.n_layers, f"n_layers mismatch: got {L}, shim configured for {self.n_layers}"
+        return self.base.encode(x)
+
+    @property
+    def W_dec(self) -> torch.Tensor:
+        return self.base.W_dec
+
+    @property
+    def b_dec(self) -> torch.Tensor:
+        return self.base.b_dec
+
+
 def wrap_for_path1(base: torch.nn.Module, mean_pkl: Path) -> _Path1Shim:
     return _Path1Shim(base, _load_mean(mean_pkl))
 
@@ -142,6 +187,10 @@ def wrap_for_path3(
     aggregation: AggregationName,
 ) -> _Path3Shim:
     return _Path3Shim(base, _load_mean(mean_pkl), T, aggregation)
+
+
+def wrap_for_path_mlc(base: torch.nn.Module, mean_pkl: Path, n_layers: int) -> _PathMLCShim:
+    return _PathMLCShim(base, _load_mean_mlc(mean_pkl), n_layers)
 
 
 def argmax_labels(shim: torch.nn.Module, x: torch.Tensor) -> torch.Tensor:

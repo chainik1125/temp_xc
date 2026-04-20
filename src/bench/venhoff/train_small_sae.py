@@ -41,7 +41,7 @@ logging.basicConfig(level=logging.INFO, format="%(message)s")
 log = logging.getLogger("venhoff.train_small_sae")
 
 ArchName = Literal["sae", "tempxc", "mlc"]
-PathName = Literal["path1", "path3"]
+PathName = Literal["path1", "path3", "path_mlc"]
 
 MAX_TRAIN_STEPS = 10_000
 PLATEAU_PCT = 0.005       # 0.5% drop over window — locked per integration_plan § 5
@@ -57,6 +57,7 @@ class TrainConfig:
     cluster_size: int
     path: PathName
     T: int = 5
+    n_layers: int = 5     # only used for arch=mlc + path=path_mlc
     seed: int = 42
     total_steps: int = MAX_TRAIN_STEPS
     plateau_pct: float = PLATEAU_PCT
@@ -70,6 +71,13 @@ def _load_path1(paths: ArtifactPaths) -> tuple[torch.Tensor, list[str]]:
     with paths.activations_pkl("path1").open("rb") as f:
         acts, texts = pickle.load(f)
     return torch.from_numpy(np.asarray(acts, dtype=np.float32)), list(texts)
+
+
+def _load_path_mlc(paths: ArtifactPaths) -> tuple[torch.Tensor, list[str]]:
+    with paths.activations_pkl("path_mlc").open("rb") as f:
+        stacked, texts = pickle.load(f)
+    # stacked shape: (N, n_layers, d_model)
+    return torch.from_numpy(np.asarray(stacked, dtype=np.float32)), list(texts)
 
 
 def _load_path3(paths: ArtifactPaths) -> tuple[torch.Tensor, list[str]]:
@@ -111,17 +119,23 @@ def _train_sae(arch: ArchName, d_in: int, cluster_size: int, cfg: TrainConfig,
         return model, log_
 
     if arch == "mlc":
-        # MLC requires simultaneous (B, n_layers, d) activations from a
-        # window of layers around the anchor. Our current
-        # activation_collection.py collects only `paths.identity.layer`
-        # (single-layer), so MLC is out of scope for this run.
-        # Enabling it requires extending activation_collection.py with
-        # a multi-layer hook; tracked in plan.md § 3.
-        raise NotImplementedError(
-            "MLC requires multi-layer activation collection (n_layers=5 "
-            "around the anchor). Not implemented in Phase 1a; use arch=sae "
-            "or arch=tempxc."
+        from src.bench.architectures.mlc import LayerCrosscoderSpec
+
+        if cfg.path != "path_mlc":
+            raise ValueError(
+                f"MLC requires path=path_mlc (got {cfg.path!r}). "
+                "path_mlc provides (B, n_layers, d) inputs that LayerCrosscoder.encode expects."
+            )
+        # n_layers lives on the spec, not .create(); d_in is per-layer width.
+        spec = LayerCrosscoderSpec(n_layers=cfg.n_layers)
+        model = spec.create(d_in=d_in, d_sae=cluster_size, k=cfg.k, device=device)
+        log_ = spec.train(
+            model=model, gen_fn=gen_fn,
+            total_steps=cfg.total_steps, batch_size=cfg.batch_size, lr=cfg.lr,
+            device=device, plateau_pct=cfg.plateau_pct,
+            plateau_min_steps=cfg.plateau_min_steps,
         )
+        return model, log_
 
     if arch == "tempxc":
         from src.bench.architectures.crosscoder import CrosscoderSpec
@@ -159,6 +173,7 @@ def train(
         "cluster_size": cfg.cluster_size,
         "path": cfg.path,
         "T": cfg.T,
+        "n_layers": cfg.n_layers,
         "seed": cfg.seed,
         "total_steps": cfg.total_steps,
         "plateau_pct": cfg.plateau_pct,
@@ -176,12 +191,29 @@ def train(
     # Load activations for the selected path.
     if cfg.path == "path1":
         x, _texts = _load_path1(paths)
-    else:
+    elif cfg.path == "path3":
         x, _texts = _load_path3(paths)
+    elif cfg.path == "path_mlc":
+        x, _texts = _load_path_mlc(paths)
+    else:
+        raise ValueError(f"unknown path {cfg.path!r}")
 
     d_in = x.shape[-1]
-    if cfg.path == "path3" and cfg.arch != "tempxc":
-        raise ValueError(f"arch {cfg.arch!r} is path1-only; path3 is TempXC territory")
+    # Path compatibility with arch:
+    #   path1    → sae
+    #   path3    → tempxc
+    #   path_mlc → mlc
+    # Cross-combinations either have no meaningful inputs or no implementation.
+    arch_path_valid = {
+        ("sae", "path1"),
+        ("tempxc", "path3"),
+        ("mlc", "path_mlc"),
+    }
+    if (cfg.arch, cfg.path) not in arch_path_valid:
+        raise ValueError(
+            f"(arch={cfg.arch!r}, path={cfg.path!r}) is not a supported combo. "
+            f"Valid: {sorted(arch_path_valid)}"
+        )
 
     rng = np.random.default_rng(cfg.seed)
     gen_fn = _make_gen_fn(x, cfg.batch_size, device, rng)
@@ -214,6 +246,7 @@ def _serialize_ckpt(model: torch.nn.Module, train_log: dict, cfg: TrainConfig) -
                 "cluster_size": cfg.cluster_size,
                 "path": cfg.path,
                 "T": cfg.T,
+                "n_layers": cfg.n_layers,
                 "seed": cfg.seed,
                 "total_steps": cfg.total_steps,
                 "k": cfg.k,
@@ -248,7 +281,10 @@ def load_ckpt(ckpt_path: Path, device: str = "cuda") -> tuple[torch.nn.Module, d
         from src.bench.architectures.topk_sae import TopKSAE
         model = TopKSAE(d_in=d_in, d_sae=cluster_size, k=k).to(device)
     elif arch == "mlc":
-        raise NotImplementedError("MLC requires multi-layer activation collection; see _train_sae().")
+        from src.bench.architectures.mlc import LayerCrosscoderSpec
+        n_layers = int(cfg_dict.get("n_layers", 5))
+        spec = LayerCrosscoderSpec(n_layers=n_layers)
+        model = spec.create(d_in=d_in, d_sae=cluster_size, k=k, device=device)
     elif arch == "tempxc":
         from src.bench.architectures.crosscoder import CrosscoderSpec
         spec = CrosscoderSpec(T=T)
@@ -271,8 +307,10 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--seed", type=int, default=42)
     p.add_argument("--arch", required=True, choices=["sae", "mlc", "tempxc"])
     p.add_argument("--cluster-size", type=int, required=True)
-    p.add_argument("--path", required=True, choices=["path1", "path3"])
+    p.add_argument("--path", required=True, choices=["path1", "path3", "path_mlc"])
     p.add_argument("--T", type=int, default=5)
+    p.add_argument("--n-layers", type=int, default=5,
+                   help="MLC layer-window width; only used for arch=mlc + path=path_mlc.")
     p.add_argument("--total-steps", type=int, default=MAX_TRAIN_STEPS)
     p.add_argument("--batch-size", type=int, default=DEFAULT_BATCH_SIZE)
     p.add_argument("--lr", type=float, default=DEFAULT_LR)
@@ -288,8 +326,9 @@ def main(argv: list[str] | None = None) -> int:
         ),
     )
     cfg = TrainConfig(
-        arch=args.arch, cluster_size=args.cluster_size, path=args.path, T=args.T,
-        seed=args.seed, total_steps=args.total_steps, batch_size=args.batch_size, lr=args.lr,
+        arch=args.arch, cluster_size=args.cluster_size, path=args.path,
+        T=args.T, n_layers=args.n_layers, seed=args.seed,
+        total_steps=args.total_steps, batch_size=args.batch_size, lr=args.lr,
     )
     train(paths, cfg, device=args.device, force=args.force)
     return 0

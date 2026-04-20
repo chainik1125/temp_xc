@@ -43,17 +43,31 @@ from src.bench.venhoff.tokenization import get_char_to_token_map, split_into_sen
 logging.basicConfig(level=logging.INFO, format="%(message)s")
 log = logging.getLogger("venhoff.activation_collection")
 
-PathName = Literal["path1", "path3"]
+PathName = Literal["path1", "path3", "path_mlc"]
 
 
 @dataclass(frozen=True)
 class CollectionConfig:
     path: PathName
-    layer: int
-    T: int = 5  # only used for path3
+    layer: int              # anchor layer; for path_mlc, centre of the window
+    T: int = 5              # only used for path3
+    n_layers: int = 5       # only used for path_mlc — window width, symmetric around `layer`
     min_words: int = 3
     # Cap sentences per trace to keep memory sane; 0 = no cap.
     max_sentences_per_trace: int = 0
+
+
+def _mlc_layer_window(anchor: int, n_layers: int, total_layers: int) -> list[int]:
+    """Symmetric layer window around `anchor`, clipped to [0, total_layers).
+
+    For anchor=6, n_layers=5 → [4, 5, 6, 7, 8]. If `n_layers` is even the
+    anchor sits one past the centre (so n=4 at anchor=6 → [4, 5, 6, 7]).
+    """
+    half = n_layers // 2
+    start = max(0, anchor - half)
+    end = min(total_layers, start + n_layers)
+    start = max(0, end - n_layers)
+    return list(range(start, end))
 
 
 def _iter_sentence_spans(full_response: str, tokenizer) -> list[tuple[str, int, int]]:
@@ -86,31 +100,46 @@ def _iter_sentence_spans(full_response: str, tokenizer) -> list[tuple[str, int, 
 
 def _collect_layer_for_trace(model, layer: int, input_ids) -> "np.ndarray":
     """Return residual-stream activations at `layer` — shape (1, seq, d_model)."""
+    out_multi = _collect_layers_for_trace(model, [layer], input_ids)
+    return out_multi[0]  # (1, seq, d_model)
+
+
+def _collect_layers_for_trace(
+    model, layers: list[int], input_ids
+) -> list["np.ndarray"]:
+    """Return residual-stream activations at each of `layers` in one forward.
+
+    Output is a list of (1, seq, d_model) float32 numpy arrays, aligned
+    with the input `layers` order. One forward pass, n_layers parallel
+    hooks — important because we don't want 5× the compute for MLC.
+    """
     import torch
 
     family = get_model_config_for_model(model).architecture_family
-    target = resid_hook_target(model, layer, family)
+    targets = [resid_hook_target(model, layer, family) for layer in layers]
 
     # Use model.trace for nnsight backends; otherwise hook manually.
     try:
         with model.trace({"input_ids": input_ids}) as _tracer:
-            saved = target.output.save()
-        out = saved.detach().cpu().to(torch.float32).numpy()
+            saved_list = [t.output.save() for t in targets]
+        return [s.detach().cpu().to(torch.float32).numpy() for s in saved_list]
     except AttributeError:
-        # Fallback: plain HF forward hook.
-        captured: list[Any] = []
+        # Fallback: plain HF forward hooks, one per layer.
+        captured: dict[int, Any] = {}
 
-        def hook(_module, _inp, output):
-            captured.append(output[0] if isinstance(output, tuple) else output)
+        def make_hook(i: int):
+            def hook(_module, _inp, output):
+                captured[i] = output[0] if isinstance(output, tuple) else output
+            return hook
 
-        handle = target.register_forward_hook(hook)
+        handles = [t.register_forward_hook(make_hook(i)) for i, t in enumerate(targets)]
         try:
             with torch.no_grad():
                 _ = model(input_ids=input_ids)
         finally:
-            handle.remove()
-        out = captured[0].detach().cpu().to(torch.float32).numpy()
-    return out
+            for h in handles:
+                h.remove()
+        return [captured[i].detach().cpu().to(torch.float32).numpy() for i in range(len(layers))]
 
 
 def get_model_config_for_model(model):
@@ -338,6 +367,146 @@ def collect_path3(
     return act_pkl, mean_pkl, sent_json
 
 
+def collect_path_mlc(
+    paths: ArtifactPaths,
+    model,
+    tokenizer,
+    config: CollectionConfig,
+    force: bool = False,
+) -> tuple[Path, Path, Path]:
+    """Per-sentence-mean activations across a window of layers (MLC contract).
+
+    Output shape per sentence: (n_layers, d_model). Full tensor:
+    (N_sentences, n_layers, d_model). Sentence-span logic matches
+    Path 1 exactly — same token_start-1 offset, same sentence splitter
+    — only difference is we take the mean over the token axis *per
+    layer* and stack the 5 layer-means together.
+
+    MLC has no aggregation at annotation time; the layer axis is the
+    model's native input, handled inside `LayerCrosscoder.encode`.
+    """
+    import torch
+
+    act_pkl = paths.activations_pkl("path_mlc")
+    mean_pkl = paths.activation_mean_pkl("path_mlc")
+    sent_json = paths.sentences_json("path_mlc")
+
+    mcfg = get_model_config(paths.identity.model)
+    layer_window = _mlc_layer_window(config.layer, config.n_layers, mcfg.n_layers)
+
+    meta = {
+        "stage": "collect_path_mlc",
+        "model": paths.identity.model,
+        "n_traces": paths.identity.n_traces,
+        "anchor_layer": config.layer,
+        "n_layers": len(layer_window),
+        "layer_window": layer_window,
+        "seed": paths.identity.seed,
+        "min_words": config.min_words,
+        "max_sentences_per_trace": config.max_sentences_per_trace,
+    }
+    if not force and all(can_resume(p, meta) for p in (act_pkl, mean_pkl, sent_json)):
+        log.info("[info] resume | stage=collect_path_mlc | cache=%s", act_pkl)
+        return act_pkl, mean_pkl, sent_json
+
+    with paths.traces_json.open() as f:
+        traces = json.load(f)
+
+    d_model = mcfg.d_model
+    n_layers = len(layer_window)
+    # Running mean is (n_layers, d_model) — one mean vector per layer.
+    running_mean = np.zeros((n_layers, d_model), dtype=np.float32)
+    mean_count = 0
+    stacked_means: list[np.ndarray] = []  # each: (n_layers, d_model)
+    sentence_texts: list[str] = []
+
+    for trace in traces:
+        full_response = trace["full_response"]
+        input_ids = tokenizer.encode(full_response, return_tensors="pt").to(model.device)
+        # One forward pass, n_layers hooks → list of (1, seq, d_model).
+        per_layer = _collect_layers_for_trace(model, layer_window, input_ids)
+
+        spans = _iter_sentence_spans(full_response, tokenizer)
+        if config.max_sentences_per_trace > 0:
+            spans = spans[: config.max_sentences_per_trace]
+
+        tmin, tmax = 10**9, -1
+        for sentence, token_start, token_end in spans:
+            per_layer_means: list[np.ndarray] = []
+            ok = True
+            for acts in per_layer:
+                # Venhoff's `-1` offset preserved on every layer.
+                segment = acts[:, token_start - 1 : token_end, :]
+                if segment.shape[1] <= 0:
+                    ok = False
+                    break
+                per_layer_means.append(
+                    segment.mean(axis=1).reshape(-1).astype(np.float32)
+                )
+            if not ok:
+                continue
+            stacked = np.stack(per_layer_means, axis=0)  # (n_layers, d_model)
+            stacked_means.append(stacked)
+            sentence_texts.append(sentence)
+            tmin = min(tmin, token_start)
+            tmax = max(tmax, token_end)
+
+        # Per-layer running mean over the span-covered slice.
+        if tmax > 0 and tmin < per_layer[0].shape[1]:
+            span_means = np.stack(
+                [a[:, tmin:tmax, :].mean(axis=1).reshape(-1).astype(np.float32) for a in per_layer],
+                axis=0,
+            )  # (n_layers, d_model)
+            running_mean = running_mean + (span_means - running_mean) / (mean_count + 1)
+            mean_count += 1
+
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+
+    if not stacked_means:
+        raise ValueError("no multi-layer sentence means collected — check traces / splitter / layer window")
+
+    acts_np = np.stack(stacked_means, axis=0)  # (N, n_layers, d_model)
+
+    # Center + L2-normalize *per-sentence* (flatten n_layers × d_model and norm).
+    # This matches Path 1's contract but vectorized across the layer axis.
+    N = acts_np.shape[0]
+    flat = acts_np.reshape(N, n_layers * d_model)
+    mean_flat = running_mean.reshape(n_layers * d_model)
+    centered = flat - mean_flat[None, :]
+    norms = np.linalg.norm(centered, axis=1, keepdims=True)
+    assert np.all(norms > 0), "zero-norm multi-layer sentence vector after centering"
+    normalized_flat = centered / norms
+    normalized = normalized_flat.reshape(N, n_layers, d_model).astype(np.float32)
+
+    import io
+    act_buf = io.BytesIO()
+    pickle.dump((normalized, sentence_texts), act_buf)
+    write_with_metadata(act_pkl, act_buf.getvalue(), meta)
+
+    mean_payload = {
+        "model_id": paths.identity.model,
+        "anchor_layer": int(config.layer),
+        "layer_window": layer_window,
+        "n_layers": int(n_layers),
+        "n_examples": int(paths.identity.n_traces),
+        "count_vectors": int(mean_count),
+        # Save as (n_layers, d_model) so the shim can reshape if needed.
+        "activation_mean": running_mean,
+    }
+    mean_buf = io.BytesIO()
+    pickle.dump(mean_payload, mean_buf)
+    write_with_metadata(mean_pkl, mean_buf.getvalue(), meta)
+
+    write_with_metadata(sent_json, json.dumps(sentence_texts), meta)
+
+    log.info(
+        "[done] saved path_mlc_activations | n_sentences=%d | n_layers=%d | layer_window=%s | path=%s",
+        len(sentence_texts), n_layers, layer_window, act_pkl,
+    )
+    return act_pkl, mean_pkl, sent_json
+
+
 def _load_model(model_name: str, device: str = "auto"):
     """Load HF model + tokenizer for activation collection."""
     import torch
@@ -367,7 +536,10 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--layer", type=int, default=6)
     p.add_argument("--seed", type=int, default=42)
     p.add_argument("--T", type=int, default=5)
-    p.add_argument("--paths", nargs="+", default=["path1", "path3"], choices=["path1", "path3"])
+    p.add_argument("--n-layers", type=int, default=5,
+                   help="MLC layer-window width; only used for path_mlc.")
+    p.add_argument("--paths", nargs="+", default=["path1", "path3"],
+                   choices=["path1", "path3", "path_mlc"])
     p.add_argument("--max-sentences-per-trace", type=int, default=0)
     p.add_argument("--force", action="store_true")
     args = p.parse_args(argv)
@@ -383,13 +555,17 @@ def main(argv: list[str] | None = None) -> int:
 
     for pname in args.paths:
         cfg = CollectionConfig(
-            path=pname, layer=args.layer, T=args.T,
+            path=pname, layer=args.layer, T=args.T, n_layers=args.n_layers,
             max_sentences_per_trace=args.max_sentences_per_trace,
         )
         if pname == "path1":
             collect_path1(paths, model, tokenizer, cfg, force=args.force)
-        else:
+        elif pname == "path3":
             collect_path3(paths, model, tokenizer, cfg, force=args.force)
+        elif pname == "path_mlc":
+            collect_path_mlc(paths, model, tokenizer, cfg, force=args.force)
+        else:
+            raise ValueError(f"unknown path: {pname!r}")
     return 0
 
 

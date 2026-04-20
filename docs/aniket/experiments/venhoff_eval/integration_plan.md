@@ -201,9 +201,20 @@ all fits capped at **10k steps with plateau early-stop** per § 5):
 - **Haiku 4.5 labeling** (substituted for GPT-4o): ~$5-15 in judge fees per arch across full cluster-size sweep (Haiku 4.5 is ~4-10× cheaper than GPT-4o). Wall time: ~2-6 h with Anthropic message-batches API; sub-hour with direct calls at low QPS.
 - **Taxonomy scoring**: negligible compute, same batch-API wall.
 
-**Recommended pod**: 1× H100 SXM 80GB, **40 GB root**, **500 GB volume**.
-Larger volume than SAEBench because of trace caches + activation pickles for
-two datasets (FineWeb-trained ckpts + reasoning-trace activations).
+**Recommended pod**: 1× H100 SXM 80GB, **40 GB root**, **300 GB volume**.
+Volume sizing breakdown at 5k traces:
+- DeepSeek-R1-Distill-Llama-8B bf16 weights (HF cache): ~16 GB
+- Path 1 activation pickle (`N × d_model` float32, N≈150k, d=4096): ~2.5 GB
+- Path 3 activation pickle (`N × T × d_model`, T=5): ~12 GB
+- Path MLC activation pickle (`N × n_layers × d_model`, n_layers=5): ~12 GB
+- vLLM KV cache working set at inference: ~20 GB peak
+- Traces JSON + assignments/labels/scores JSON: <1 GB
+- pip cache overflow + logs + vendor clone: ~20 GB
+- Headroom for retries / reruns: ~200 GB
+
+(Bumped from 250 GB after adding path_mlc on 2026-04-20 — the
+multi-layer pickle is the same shape as path3, so we now carry two
+12 GB pickles instead of one.)
 
 Total compute: ~**20-25 H100 hours across 1-2 days** for full Phase 1 (revised
 down from ~40 h after the T=5-only collapse + 10k-step cap). Smoke test

@@ -56,15 +56,17 @@ if [[ "$MODE" == "smoke" ]]; then
     CLUSTER_SIZES="${CLUSTER_SIZES:-15}"
     ARCHES="${ARCHES:-sae}"
     AGGREGATIONS="${AGGREGATIONS:-full_window}"
+    N_LAYERS_MLC="${N_LAYERS_MLC:-5}"
 elif [[ "$MODE" == "full" ]]; then
     N_TRACES="${N_TRACES:-5000}"
     CLUSTER_SIZES="${CLUSTER_SIZES:-5 10 15 20 25 30 35 40 45 50}"
-    # MLC requires multi-layer activation collection (n_layers=5 around
-    # the anchor) which isn't wired in Phase 1a — see train_small_sae.py
-    # _train_sae. To enable, override ARCHES="sae mlc tempxc" once the
-    # multi-layer collector lands.
-    ARCHES="${ARCHES:-sae tempxc}"
+    # MLC enabled via path_mlc (multi-layer collection). Re-added after
+    # Han's 4/19 27-task sparse-probing result showed MLC ≈ TXCDR-T5 at
+    # parity — Venhoff is now the MLC-vs-TempXC differentiation run,
+    # not just a side-by-side.
+    ARCHES="${ARCHES:-sae tempxc mlc}"
     AGGREGATIONS="${AGGREGATIONS:-last mean max full_window}"
+    N_LAYERS_MLC="${N_LAYERS_MLC:-5}"
 else
     echo "Unknown MODE=$MODE (expected: smoke|full)" >&2
     exit 2
@@ -123,16 +125,26 @@ python -m src.bench.venhoff.generate_traces \
     "${COMMON_FLAGS[@]}" --engine "$ENGINE" \
     "${FORCE_FLAGS[@]}"
 
-echo "[info] stage=collect_activations | status=start | paths=path1,path3 | T=5"
+# Collect every path this run needs. If MLC is in ARCHES we also collect
+# path_mlc (multi-hook forward over a window of layers around the anchor).
+ACT_PATHS="path1 path3"
+for _a in $ARCHES; do
+    if [[ "$_a" == "mlc" ]]; then
+        ACT_PATHS="$ACT_PATHS path_mlc"
+        break
+    fi
+done
+echo "[info] stage=collect_activations | status=start | paths=$ACT_PATHS | T=5 | n_layers_mlc=$N_LAYERS_MLC"
 python -m src.bench.venhoff.activation_collection \
     "${COMMON_FLAGS[@]}" \
-    --paths path1 path3 --T 5 \
+    --paths $ACT_PATHS --T 5 --n-layers "$N_LAYERS_MLC" \
     "${FORCE_FLAGS[@]}"
 
 echo "[info] stage=fanout | status=start | steps=train+annotate+label+score"
 
-# Pre-compute total cells for [sweep XX/YY] progress counter. Path1 arches
-# (sae) get 1 aggregation; path3 arches (tempxc) get $AGGREGATIONS.
+# Pre-compute total cells for [sweep XX/YY] progress counter.
+# path1 / path_mlc cells run a single aggregation (placeholder); path3
+# (tempxc) gets |AGGREGATIONS|.
 TOTAL_CELLS=0
 for arch_ in $ARCHES; do
     for _cs in $CLUSTER_SIZES; do
@@ -147,22 +159,22 @@ CELL_COUNT=0
 CELL_WIDTH=${#TOTAL_CELLS}
 
 for arch in $ARCHES; do
-    # Path 1 for sae/mlc; path 3 for tempxc (Q1 lock-in).
-    if [[ "$arch" == "tempxc" ]]; then
-        path="path3"
-        aggs="$AGGREGATIONS"
-    else
-        path="path1"
-        # Path 1 doesn't use aggregation but keeps naming consistent.
-        aggs="full_window"
-    fi
+    # Arch → path routing (Q1 lock-in + MLC extension post-4/19):
+    #   sae    → path1      (per-sentence-mean)
+    #   tempxc → path3      (T-window per sentence)
+    #   mlc    → path_mlc   (multi-layer per-sentence-mean)
+    case "$arch" in
+        tempxc) path="path3"; aggs="$AGGREGATIONS" ;;
+        mlc)    path="path_mlc"; aggs="full_window" ;;  # placeholder agg name
+        *)      path="path1"; aggs="full_window" ;;
+    esac
 
     for cluster_size in $CLUSTER_SIZES; do
         echo "[info] train_small_sae | arch=$arch | cluster_size=$cluster_size | path=$path"
         python -m src.bench.venhoff.train_small_sae \
             "${COMMON_FLAGS[@]}" \
             --arch "$arch" --cluster-size "$cluster_size" --path "$path" \
-            --T 5 \
+            --T 5 --n-layers "$N_LAYERS_MLC" \
             "${FORCE_FLAGS[@]}"
 
         for agg in $aggs; do

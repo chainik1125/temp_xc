@@ -31,13 +31,13 @@ import torch
 
 from src.bench.saebench.aggregation import AggregationName
 from src.bench.venhoff.paths import ArtifactPaths, RunIdentity, can_resume, write_with_metadata
-from src.bench.venhoff.sae_shim import wrap_for_path1, wrap_for_path3
+from src.bench.venhoff.sae_shim import wrap_for_path1, wrap_for_path3, wrap_for_path_mlc
 from src.bench.venhoff.train_small_sae import load_ckpt
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
 log = logging.getLogger("venhoff.annotate")
 
-PathName = Literal["path1", "path3"]
+PathName = Literal["path1", "path3", "path_mlc"]
 ANNOTATE_BATCH_SIZE = 512
 
 
@@ -80,9 +80,14 @@ def annotate(
     mean_pkl = paths.activation_mean_pkl(path_name)
     if path_name == "path1":
         shim = wrap_for_path1(model, mean_pkl).to(device)
-    else:
+    elif path_name == "path3":
         T = int(ckpt_cfg.get("T", 5))
         shim = wrap_for_path3(model, mean_pkl, T=T, aggregation=str(aggregation)).to(device)
+    elif path_name == "path_mlc":
+        n_layers = int(ckpt_cfg.get("n_layers", 5))
+        shim = wrap_for_path_mlc(model, mean_pkl, n_layers=n_layers).to(device)
+    else:
+        raise ValueError(f"unknown path {path_name!r}")
 
     x, texts = _load_acts(paths, path_name)
     x = x.to(device)
@@ -130,7 +135,7 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--seed", type=int, default=42)
     p.add_argument("--arch", required=True)
     p.add_argument("--cluster-size", type=int, required=True)
-    p.add_argument("--path", required=True, choices=["path1", "path3"])
+    p.add_argument("--path", required=True, choices=["path1", "path3", "path_mlc"])
     p.add_argument("--aggregation", default="full_window",
                    choices=["last", "mean", "max", "full_window"])
     p.add_argument("--device", default="cuda")

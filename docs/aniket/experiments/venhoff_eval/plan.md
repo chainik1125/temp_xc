@@ -113,21 +113,19 @@ Phase 1 full run:
 - Shuffled-control pair for every cell
 
 **Training fit count** (what actually consumes GPU):
-- SAE (Path 1): 10 cluster sizes × 1 layer = **10 fits**
-- MLC (Path 1): 10 cluster sizes × 1 layer = **10 fits**
-- TempXC: 1 wide Path 3 ckpt (re-use SAEBench T=5 if available, else
-  1 retrain @ 10k-cap) + small-k reducer per cluster size if Path 1
-  hybrid needed = **1-10 fits**
-- **Total: ~30 fits**, each <5 min at the 10k cap → **~2.5 H100-hours**
-  of dictionary training (earlier doc said ~2 days; that was wrong,
-  it assumed the layer sweep web-claude flagged)
+- SAE (Path 1, per-sentence-mean at layer 6): 10 cluster sizes = **10 fits**
+- MLC (Path MLC, per-sentence-mean over layers {4,5,6,7,8}): 10 cluster
+  sizes = **10 fits**
+- TempXC (Path 3, T=5 token window per sentence): 10 cluster sizes = **10 fits**
+- **Total: 30 fits**, each <5 min at the 10k-step cap → **~2.5 H100-hours**
+  of dictionary training.
 
 **Evaluation cell count** (what the judge scores):
 - SAE: 10 sizes = 10 cells
-- TempXC: 10 sizes × 4 aggregations = 40 cells
 - MLC: 10 sizes = 10 cells
+- TempXC: 10 sizes × 4 aggregations = 40 cells
 - **Total: 60 cells**, each gets a (accuracy, completeness, orthogonality)
-  triple from Haiku 4.5
+  triple from Haiku 4.5.
 
 ## 5. Predictions
 
@@ -135,22 +133,41 @@ Pre-registered. If results match prediction, the narrative is clean.
 If they don't, the plan doc has to update to reflect what actually
 happened.
 
+### Reframing after Han's 2026-04-19 sparse-probing rerun
+
+On 2026-04-19 Han reran the sparse-probing benchmark with proper
+convergence and expanded the task count from 8 → 27. The headline
+number flipped from "MLC wins decisively (0.941 vs 0.862 TXC-T5)" to
+"MLC and TXCDR-T5 at parity (0.807 vs 0.797, overlapping error bars)".
+This was **before the Venhoff eval ran**, so it's not a post-hoc
+re-interpretation of Venhoff results — it's an update to what the
+Venhoff eval is *for*. The relevant comparison is no longer
+TempXC-vs-SAE; it's TempXC-vs-MLC, with SAE held as a per-token
+baseline that neither outperforms on probing.
+
+If sparse probing says MLC ≈ TempXC-T5, then Venhoff's taxonomy-quality
+metric is the differentiator between "the axes surface different
+features" and "MLC is strictly better." That's the load-bearing
+question now.
+
+Predictions below are against MLC (primary) with SAE as a sanity floor.
+
 | prediction | composite score delta | interpretation if observed |
 |---|---|---|
-| **P1 (null)**: TempXC ≤ SAE on all metrics, all cluster sizes, all aggregations | Δ ≤ 0 | TempXC doesn't help for reasoning. Combined with the SAEBench null, the architecture is dead for this domain. Paper becomes a careful dual-null writeup. |
-| **P2 (weak)**: TempXC wins under `full_window` aggregation at small cluster sizes (5-20) but flattens at large (30-50) | Δ = +0.5–1 pt at k≤20, ≈0 at k≥30 | Temporal features matter when the taxonomy is small enough that individual categories have to compress; at larger cluster sizes each cluster gets to be token-local anyway. Medium-strength paper finding. |
-| **P3 (medium)**: TempXC wins monotonically across cluster sizes under the right aggregation | Δ = +1–2 pt consistently | Strong positive signal. Steering-vector Phase 2 almost certainly worth doing. Publishable as NeurIPS abstract. |
-| **P4 (strong)**: TempXC wins monotonically AND MLC loses to TempXC in the same window | TempXC > MLC on composite | Specifically *temporal* structure matters, not just multi-position. Best-case paper finding. |
+| **P1 (null)**: TempXC ≤ MLC on all metrics, all cluster sizes, all aggregations; TempXC also ≤ SAE | Δ ≤ 0 vs both | TempXC doesn't help for reasoning taxonomies and doesn't even beat the per-token baseline. Combined with the sparse-probing parity, TempXC's case is weak. Paper pivots to "MLC is a strong crosscoder; temporal axis doesn't generalize." |
+| **P2 (weak)**: TempXC > SAE at small cluster sizes (5-20) under `full_window`, but MLC matches or beats TempXC at all sizes | TempXC − SAE > 0 for k≤20; TempXC − MLC ≤ 0 | Temporal axis offers some structure beyond per-token but MLC captures at least as much. Supports "any non-trivial crosscoding axis helps; which axis matters less." Medium paper finding; autointerp/feature-geometry becomes the main differentiator. |
+| **P3 (medium)**: TempXC and MLC at parity on the headline `full_window` metric, but diverge on *which* clusters they surface (qualitative) | \|TempXC − MLC\| < 0.5 pt on composite | This is the outcome most consistent with Han's sparse-probing parity. Paper headline becomes "temporal and layer crosscoding find complementary but non-overlapping reasoning categories," motivating the feature-geometry contribution. Strong NeurIPS story. |
+| **P4 (strong)**: TempXC beats MLC on composite under `full_window` at 5k traces | TempXC − MLC > +0.5 pt | Temporal axis genuinely better for reasoning than layer axis. Strongest possible result; motivates Phase 2 steering-vector work immediately. |
 
-**Win criteria for the paper**:
-- **NeurIPS abstract**: tentatively any of P2, P3, or P4. **Open:**
-  Dmitry to confirm whether P2 (weak signal at small cluster sizes
-  only) clears the abstract bar or whether P3 (monotonic win across
-  sizes) is required. Not blocking Phase 1a; the same pipeline runs
-  regardless.
-- **ICML workshop fallback**: P1 with diagnostic clarity (e.g. training
-  curves show TempXC converged but still lost) is still publishable as a
-  careful negative.
+**Win criteria for the paper** (post-2026-04-19 reframing):
+- **NeurIPS abstract**: P3 or P4 both support the abstract cleanly. P2
+  supports a weaker version ("temporal axis helps over SAE but not over
+  MLC"). P1 pivots to a negative-result writeup.
+- **Open with Dmitry**: whether P2 clears the bar. Not blocking the run
+  — the same pipeline produces the evidence to decide either way.
+- **ICML workshop fallback**: P1 with diagnostic clarity (training
+  curves, SVD spectrum per Han's T20 finding) is still a careful
+  negative worth publishing.
 
 ## 6. Runtime expectations
 
@@ -159,23 +176,26 @@ fees for full Phase 1 (4-10× cheaper than Venhoff's GPT-4o default).
 Smoke test at 1000 traces, one arch, one cluster size: ~2-3 H100-hours
 + <$1 judge fee.
 
-## 7. Relationship to SAEBench result
+## 7. Relationship to sparse-probing result
 
-SAEBench (our previous eval) found TempXC ≈ SAE at T=5 with degradation
-at larger T. That was on single-token probing — not the domain TempXC
-was designed for.
+**2026-04-19 update (Han's 27-task rerun with proper convergence):**
+MLC: 0.807. TXCDR-T5: 0.797. Overlapping error bars — parity.
+TXCDR-T20: 0.751 (regression, confirming under-regularization per
+Han's SVD-spectrum diagnostic). SAE: 0.745. Last-token logistic
+regression baseline: 0.934 (well above every dictionary — consistent
+with "SAEs don't recover the probe's signal cleanly at this scale").
 
-Reasoning traces are a strictly friendlier domain for TempXC:
-- Multi-sentence patterns are the *norm*, not rare
-- The discovery task (cluster/label) is more permissive than single-
-  token classification
-- The clustering + taxonomy metric weights structural coherence, which
-  is TempXC's strongest axis
-
-So a null result here is meaningfully stronger evidence against
-temporal crosscoding than the SAEBench null was. Conversely, a positive
-result here outweighs the SAEBench negative because this is the
-better-matched benchmark.
+Implications for Venhoff:
+- TempXC-vs-SAE is no longer the core comparison. TempXC does beat SAE
+  by ~5 pp on the new numbers, but that's not the story.
+- TempXC-vs-MLC is the load-bearing question. Venhoff's clustering +
+  taxonomy metric rewards structural coherence, which is the axis
+  where "different features" could surface even if benchmark accuracy
+  ties. If MLC and TempXC select different reasoning categories, the
+  Venhoff eval exposes it.
+- T=5 is confirmed as the right TempXC operating point. T=20's
+  regression is a separate story (act_fn / regularization) Han is
+  investigating on a different track.
 
 ## 8. Out-of-scope for Phase 1
 
@@ -201,8 +221,9 @@ One plot, saved at `results/venhoff_eval/plots/fig1_taxonomy_quality.png`:
 
 - x-axis: cluster size (5..50)
 - y-axis: composite taxonomy quality score (0–10)
-- headline lines: SAE (blue), **TempXC-T5 `full_window` (green, bold —
-  this is the headline TempXC line per Q3 lock-in)**, MLC (orange)
+- headline lines: **MLC (orange, bold — primary comparison post-2026-04-19)**,
+  **TempXC-T5 `full_window` (green, bold)**, SAE (blue, dashed — per-token
+  baseline, not the story)
 - supplement lines (same plot, lighter/dashed so they're visible but
   non-dominant): TempXC-T5 `last`, `mean`, `max`
 - error bars: from 3 repetitions per cluster size
@@ -213,6 +234,9 @@ One plot, saved at `results/venhoff_eval/plots/fig1_taxonomy_quality.png`:
   (the shuffle control removes within-trace ordering). A narrow band
   means the advantage is not temporal; a wide band means it is. This
   is the figure-level evidence for the "temporal" claim.
+- The MLC line is the thing Dmitry reads first. If MLC ≥ TempXC at
+  every cluster size, the paper story becomes qualitative (§ 5 P2/P3);
+  if TempXC ≥ MLC, it's P4 — the strongest outcome.
 
 This is the figure Dmitry + team react to at check-in. If it shows
 TempXC above SAE, paper is alive.
