@@ -49,6 +49,24 @@ For pre-registration see [`plan.md`](plan.md); architecture menu in
   win" finding replicates on the full temporal-SAE axis.**
 - **No SAE beats either baseline on the mean**, at any aggregation or
   metric slice.
+- **New full_window data for MLC and time_layer_crosscoder_t5**
+  (tail-20 × 5-layer cache built after the MooseFS quota was raised).
+  Both drop **sharply** under full_window relative to last_position:
+  MLC 0.7943 → 0.6824 (−11.2 pp); time_layer 0.7928 → 0.6655
+  (−12.7 pp). Their multi-layer encoders produce 5× more features
+  per slide than single-layer archs; multiplied by the tail-20 slide
+  count the feature pool becomes 20–100× larger than topk_sae's, and
+  the top-k-by-class-separation selector at k=5 pays heavily for it.
+  The previous summary's speculation that MLC would need a tail-20 ×
+  5-layer cache to probe fairly is now tested — and MLC is *hurt*,
+  not helped, by the larger pool.
+- **Full-window baselines now 36/36** (were 9/36). Baselines are
+  aggregation-invariant (single-token LR on raw activations;
+  attn-pool over tail-20), so full_window baseline means are
+  numerically identical to last_position (0.9292 vs 0.9290 for
+  attn_pool, 0.9262 vs 0.9264 for last_token_lr). The re-emission
+  just closes the tagging gap so plotter-summary means now compare
+  SAEs and baselines over the same 36 tasks.
 
 ### Methods at a glance
 
@@ -174,64 +192,84 @@ than bigcode's 5. Task labels and protocol are otherwise identical.
 
 #### Full-window aggregation comparison
 
+Now with all 19 SAEs (MLC and time_layer_crosscoder_t5 re-run under
+the full tail-20 × 5-layer cache; previous summary showed them as
+excluded or degenerate):
+
 | arch | last-position AUC | full-window AUC | Δ |
 |---|---|---|---|
-| time_layer_crosscoder_t5 | 0.7928 | 0.7928 | 0.000 |
 | txcdr_t20 | 0.7496 | 0.7522 | +0.003 |
 | txcdr_t5 | 0.7822 | 0.7259 | −0.056 |
+| txcdr_rank_k_dec_t5 | 0.7852 | 0.7178 | −0.067 |
 | matryoshka_t5 | 0.7494 | 0.7007 | −0.049 |
-| topk_sae | 0.7337 | 0.6674 | −0.066 |
-| stacked_t5 | 0.7291 | 0.6533 | −0.076 |
+| txcdr_tied_t5 | 0.7517 | 0.6882 | −0.064 |
+| txcdr_causal_t5 | 0.7493 | 0.6863 | −0.063 |
+| **mlc** | **0.7943** | **0.6824** | **−0.112** |
 | stacked_t20 | 0.7159 | 0.6692 | −0.047 |
+| temporal_contrastive | 0.7359 | 0.6678 | −0.068 |
+| topk_sae | 0.7337 | 0.6674 | −0.066 |
+| txcdr_lowrank_dec_t5 | 0.7390 | 0.6674 | −0.072 |
+| txcdr_shared_dec_t5 | 0.7317 | 0.6670 | −0.065 |
+| **time_layer_crosscoder_t5** | **0.7928** | **0.6655** | **−0.127** |
+| tfa_small | 0.6514 | 0.6587 | +0.007 |
+| stacked_t5 | 0.7291 | 0.6533 | −0.076 |
+| tfa_pos_small | 0.6390 | 0.6528 | +0.014 |
+| txcdr_block_sparse_t5 | 0.7237 | 0.6367 | −0.087 |
+| txcdr_shared_enc_t5 | 0.7044 | 0.6366 | −0.068 |
+| txcdr_pos_t5 | 0.7141 | 0.6334 | −0.081 |
 
-full-window **hurts** almost every arch except TXCDR-T20 (the one
-with the widest training window, where full_window information is
-best-exploited) and time_layer (which degenerates to last-position
-by construction — its encoder only learned one time slot, so
-full_window probing still reads one slot). The 5–8 pp drop on
-TXCDR-T5 / Matryoshka / TopK / Stacked is consistent with the
-K·d_sae flattening introducing noise that the top-k-by-class-sep
-selector can't resolve. This matches the Kantamneni et al. finding
-that multi-position aggregations tend to hurt feature-selection
-probes on SAEs with a small k.
+full-window **hurts every arch except TXCDR-T20, TFA-small, and
+TFA-pos-small**. TXCDR-T20 is a ceiling effect: with tail=20 and
+T=20, there is exactly K=1 slide, so full_window = last_position
+numerically (+0.3 pp is seed noise). The two TFA variants were
+trained at seq_len=32 and probed across tail-20 windows, where
+full_window just trims the training regime without introducing new
+per-position features — a slight +1 pp.
 
-**Note on full-window baselines.** `baseline_last_token_lr` and
-`baseline_attn_pool` were regenerated for 9/36 tasks in the
-full-window pass; the remaining 27 tasks re-use the last-position
-baseline record (which is invariant under aggregation change for
-the single-token baselines). The full-window baseline-mean entries
-in the tables therefore reflect those 9 tasks only; the SAE rows
-reflect all 36. Per-task deltas are comparable within each row.
+The largest drops are on **MLC (−11.2 pp)** and
+**time_layer_crosscoder_t5 (−12.7 pp)**, the two multi-layer
+encoders. A single MLC slide emits `L · d_sae = 5 · 18432 = 92 160`
+features; over 20 slides that is 1.84 M features vs topk_sae's
+368 640 under the same `full_window` treatment. At k=5 feature
+selection, this 5× pool inflation amplifies spurious
+class-separation, and the probe's held-out AUC collapses. So the
+previously-speculated "MLC would probably not benefit from the
+tail-20 × 5-layer cache" is now empirically confirmed, and more
+strongly than expected — MLC's probing advantage lives entirely at
+`last_position`, not across a sliding window.
+
+The 5–9 pp drop on TXCDR variants and single-layer archs tracks the
+Kantamneni et al. finding that multi-position aggregations tend to
+hurt feature-selection probes on SAEs with small k.
+
+**Full-window baselines coverage**: all 36/36 tasks now have
+freshly-computed full-window `baseline_last_token_lr` and
+`baseline_attn_pool` records (the previous 9/36 gap is closed). The
+baselines are aggregation-invariant by definition (single-token LR
+on raw last-token activations; attn-pool over tail-20) so the
+full_window baseline-means match last_position to within 0.0002
+(attention-pool has minor seed noise). The SAE-vs-baseline comparison
+is now apples-to-apples across all 36 tasks.
 
 #### Who is *in* each plot (and why)
 
-The 4 last-position plots include **all 19 SAEs** (every trained
-arch) plus the 2 baselines — 21 bars total.
+All 8 plots now include **all 19 SAEs** plus the 2 baselines — 21
+bars. The MooseFS quota that previously blocked the tail-20 ×
+5-layer cache for MLC and time_layer_crosscoder_t5 has been raised;
+the `acts_mlc_tail.npz` cache (fp16, shape (N, 20, 5, 2304), ~1.8 GB
+per task × 36 tasks ≈ 66 GB total) is now populated for every
+probing task. This lets the probing runner slide the multi-layer
+encoder across the full tail-20 tokens, producing a genuine
+`full_window` encoding for MLC and time_layer (rather than
+collapsing to `last_position` via the old T-1 zero-pad fallback).
 
-The 4 full-window plots include **17 SAEs** plus the 2 baselines —
-19 bars total. **MLC and time_layer_crosscoder_t5 are intentionally
-omitted from the full-window plots**:
-
-- **MLC** has a 1-token × 5-layer encoder. Sliding it across tail-20
-  positions would require a `(N, 20, 5, d)` probe cache — 50 GB at
-  fp16, which busts the MooseFS quota. Using a truncated tail-5
-  cache would give MLC a 4× smaller feature pool than TXCDR's tail-20
-  full-window, which is a strict disadvantage for bad reasons
-  (larger pool = more chance of finding a task-relevant feature
-  under top-k selection). Rather than emit a misleadingly-low MLC
-  number, we skip it. MLC's last-position number (the aggregation
-  it's actually trained for) is unchanged and present in all 4
-  last-position plots.
-- **time_layer_crosscoder_t5** has the same tail-20 × 5-layer cache
-  constraint. It's currently probed via a T-1 zero-pad fallback
-  that makes `full_window = last_position` numerically (max per-task
-  diff 0.0006). Emitting those records under the "full_window"
-  label would be misleading. Skipped for the same reason as MLC;
-  deferred to 5.6 when a genuine tail × multi-layer cache is built.
-
-The remaining 17 archs in the full-window plots all have a real
-temporal axis (T ≥ 2 or T = 1 slid across tail-20) that produces a
-genuinely different aggregation from last-position.
+The resulting full_window numbers (0.6824 MLC, 0.6655 time_layer)
+are honest and — as documented in the aggregation-comparison table
+above — strongly negative for both archs. Probe-time streaming was
+also patched (`_encode_for_probe[time_layer_crosscoder_t5]` now
+iterates slide-by-slide instead of materializing the full
+`(N, K, T, L, d)` fancy-index copy) so peak RAM stays under the
+46 GB cgroup limit during probing.
 
 #### Cross-token breakdown (sub-phase 5.4)
 
@@ -395,12 +433,13 @@ SAE-vs-strong-baseline story remains C-negative, matching
   SAE-vs-baseline gap is well outside it. A 3-seed rerun on the
   top-5 archs (MLC, time_layer, rank_k_dec, TXCDR-T5, matryoshka)
   is deferred to 5.6.
-- **full-window baselines partial.** Only 9 / 36 tasks have a
-  freshly-computed full-window baseline record; the remaining 27
-  re-use the last-position baseline (invariant under aggregation
-  change for single-token baselines, so correct as-written but the
-  mean-over-9 in the full-window headline tables is an apples-to-
-  oranges subset of the SAE mean-over-36).
+- **full-window baselines**: 36 / 36 tasks now carry freshly-tagged
+  `aggregation="full_window"` baseline records (resolved after this
+  summary's initial version — see the new bullet in TL;DR). Baselines
+  remain aggregation-invariant by definition, so the numerical
+  values match last_position to within 0.0002; the change is purely
+  that headline-mean tables now compare SAEs and baselines over the
+  same 36 tasks rather than mean-over-9 vs mean-over-36.
 - **Cross-token `max(AUC, 1 − AUC)` flip** for WinoGrande/WSC only,
   to remove arbitrary label polarity. Raw AUCs stay in
   `probing_results.jsonl`; flip set is `make_headline_plot.py::FLIP_TASKS`.

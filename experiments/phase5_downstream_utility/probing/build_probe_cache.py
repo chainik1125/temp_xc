@@ -43,10 +43,13 @@ MLC_LAYERS = [11, 12, 13, 14, 15]
 ANCHOR_LAYER = 13
 CTX = 128
 LAST_N = 20
-TAIL_MLC_N = 5  # mlc_tail stores L11-L15 × last-5 tokens (quota-limited).
-                # Enough for T=5 time_layer last_position + MLC full_window
-                # over a 5-position slide (smaller than anchor's 20 but still
-                # multi-position).
+TAIL_MLC_N = 20  # mlc_tail stores L11-L15 × last-20 tokens, matching
+                 # the anchor cache's LAST_N. Enables MLC full_window
+                 # (slide 1-token encoder across tail-20) and
+                 # time_layer_crosscoder_t5 full_window (T=5 slide →
+                 # K=16 windows). Bumped from 5 after the MooseFS quota
+                 # was raised; per-task cost rises from ~438 MB to ~1.75 GB,
+                 # total ~63 GB across 36 tasks (was ~16 GB).
 BATCH_SIZE = 64
 DTYPE = torch.bfloat16
 MODEL_NAME = "google/gemma-2-2b-it"

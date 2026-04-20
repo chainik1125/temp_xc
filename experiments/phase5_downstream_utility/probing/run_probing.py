@@ -291,7 +291,8 @@ def _load_model_for_run(run_id, ckpt_path, device):
         model = TopKSAE(d_in, d_sae, k=meta["k_pos"]).to(device)
     elif arch == "mlc":
         model = MultiLayerCrosscoder(d_in, d_sae, n_layers=5, k=meta["k_pos"]).to(device)
-    elif arch in ("txcdr_t5", "txcdr_t20"):
+    elif arch in ("txcdr_t2", "txcdr_t3", "txcdr_t5", "txcdr_t8",
+                  "txcdr_t10", "txcdr_t15", "txcdr_t20"):
         T = meta["T"]
         k_eff = meta["k_win"] or (meta["k_pos"] * T)
         model = TemporalCrosscoder(d_in, d_sae, T, k_eff).to(device)
@@ -457,21 +458,28 @@ def _encode_for_probe(
                         Zb = model.encode(Xb)
                     outs.append(Zb[:, -1, center_l, :].cpu().numpy())
                 return np.concatenate(outs, axis=0)
-            # full_window fallback when LN > T: slide a T-window across LN.
+            # full_window when LN > T: slide a T-window across LN.
+            # STREAMING: iterate slide-by-slide and pre-allocate the
+            # output to avoid materializing the full (N, K, T, L, d)
+            # fancy-index copy (~22 GB at TAIL_MLC_N=20 × T=5 × N=3040).
+            # Peak per slide is (N, T, L, d) ≈ 1.4 GB.
             K = LN - T + 1
-            starts = np.arange(K)
-            offsets = np.arange(T)
-            idx = starts[:, None] + offsets[None, :]
-            wins = mlc_tail[:, idx, :, :]
-            flat = wins.reshape(N * K, T, L, d)
-            outs = []
-            for i in range(0, flat.shape[0], 256):
-                Xb = torch.from_numpy(flat[i:i + 256]).to(device)
-                with torch.no_grad():
-                    Zb = model.encode(Xb)
-                outs.append(Zb[:, -1, center_l, :].cpu().numpy())
-            z_last = np.concatenate(outs, axis=0)
-            return z_last.reshape(N, K * z_last.shape[-1])
+            d_sae = model.encode(torch.from_numpy(
+                mlc_tail[:1, :T, :, :].astype(np.float32)
+            ).to(device)).shape[-1]
+            z_out = np.empty((N, K, d_sae), dtype=np.float32)
+            for k in range(K):
+                win_k = mlc_tail[:, k:k + T, :, :]  # (N, T, L, d) — contiguous slice, ~1.4 GB
+                for i in range(0, N, 256):
+                    Xb = torch.from_numpy(
+                        win_k[i:i + 256].astype(np.float32)
+                    ).to(device)
+                    with torch.no_grad():
+                        Zb = model.encode(Xb)
+                    z_out[i:i + Xb.shape[0], k, :] = (
+                        Zb[:, -1, center_l, :].cpu().numpy()
+                    )
+            return z_out.reshape(N, K * d_sae)
         # Legacy fallback: T-1 zero-pad of last-token multilayer cache.
         X_1 = mlc[:, None, :, :]
         X_pad = np.concatenate(
@@ -623,27 +631,18 @@ def run_probing(
             except Exception as e:
                 print(f"  {run_id}: load FAIL: {e}")
                 continue
-            if arch == "mlc" and aggregation == "full_window":
-                # MLC encoder operates on 1 token × 5 layers. A "full_window"
-                # probe would require a tail-20 × 5 layers cache (50 GB) to
-                # slide the 1-token encoder across; that busts the MooseFS
-                # quota. Skipping keeps the plot honest — using a tail-5
-                # cache instead would give MLC a 4× smaller feature pool
-                # than TXCDR full_window, a strictly unfair comparison.
-                print(f"  {run_id}: MLC full_window requires tail-20 × 5L cache (50 GB, quota-blocked), skip")
-                del model
-                torch.cuda.empty_cache()
-                continue
-            if arch == "time_layer_crosscoder_t5" and aggregation == "full_window":
-                # time_layer probing uses a T=1 zero-pad fallback (see
-                # _encode_for_probe for this arch): last_position and
-                # full_window produce identical Z. Emitting full_window
-                # records is misleading — skip until a genuine tail × multi-
-                # layer cache exists.
-                print(f"  {run_id}: time_layer full_window is degenerate under T-1 pad fallback, skip")
-                del model
-                torch.cuda.empty_cache()
-                continue
+            if arch in ("mlc", "time_layer_crosscoder_t5") and aggregation == "full_window":
+                # Both archs need the tail × multi-layer cache
+                # (acts_mlc_tail.npz) to run full_window meaningfully.
+                # Sample the first task — if mlc_tail is missing there, it is
+                # missing everywhere, and we skip rather than emit records
+                # that silently fall back to last_position semantics.
+                sample_tail = task_dirs[0] / "acts_mlc_tail.npz"
+                if not sample_tail.exists():
+                    print(f"  {run_id}: acts_mlc_tail.npz absent — run build_probe_cache.py first, skip")
+                    del model
+                    torch.cuda.empty_cache()
+                    continue
             print(f"=== {run_id} ({arch})  aggregation={aggregation} ===")
             for task_dir in task_dirs:
                 task_name = task_dir.name

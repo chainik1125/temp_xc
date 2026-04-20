@@ -610,6 +610,12 @@ def run_all(seeds, max_steps, archs=None):
                 model, log = train_txcdr(cfg, device, k=100, T=20, buf=get_anchor())
                 meta = dict(seed=seed, k_pos=100, k_win=2000, T=20,
                             match_budget=True, layer=13)
+            elif arch in ("txcdr_t2", "txcdr_t3", "txcdr_t8",
+                          "txcdr_t10", "txcdr_t15"):
+                T = int(arch.removeprefix("txcdr_t"))
+                model, log = train_txcdr(cfg, device, k=100, T=T, buf=get_anchor())
+                meta = dict(seed=seed, k_pos=100, k_win=100 * T, T=T,
+                            match_budget=True, layer=13)
             elif arch == "stacked_t5":
                 model, log = train_stacked(cfg, device, k=100, T=5, buf=get_anchor())
                 meta = dict(seed=seed, k_pos=100, k_win=500, T=5, layer=13)
@@ -622,11 +628,13 @@ def run_all(seeds, max_steps, archs=None):
             elif arch == "tfa":
                 model, log = train_tfa(cfg, device, k=100, use_pos=False, buf=get_anchor())
                 meta = dict(seed=seed, k_pos=100, k_win=None, T=128,
-                            use_pos=False, layer=13)
+                            use_pos=False, layer=13,
+                            scale=log.get("input_scale", 1.0))
             elif arch == "tfa_pos":
                 model, log = train_tfa(cfg, device, k=100, use_pos=True, buf=get_anchor())
                 meta = dict(seed=seed, k_pos=100, k_win=None, T=128,
-                            use_pos=True, layer=13)
+                            use_pos=True, layer=13,
+                            scale=log.get("input_scale", 1.0))
             elif arch == "matryoshka_t5":
                 model, log = train_matryoshka_txcdr(cfg, device, k=100, T=5,
                                                     buf=get_anchor())
