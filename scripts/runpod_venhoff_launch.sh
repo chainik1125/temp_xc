@@ -125,16 +125,76 @@ echo "[info] venhoff_launch | mode=$MODE | model=$MODEL | layer=$LAYER | n_trace
 echo "[info] venhoff_grid | arches=$ARCHES | cluster_sizes=$CLUSTER_SIZES | aggregations=$AGGREGATIONS"
 echo "[info] venhoff_judge | judge=$JUDGE | engine=$ENGINE"
 
-# Phase 1a smoke is a single cell — use smoke.py (it wraps all stages).
+# MODE=smoke is the P0 gate post-2026-04-20 pivot: run the full MATH500
+# Gap Recovery pipeline on SAE-only at n_clusters=15 with 100 problems,
+# and compare our number to Venhoff's 3.5%. Skip the taxonomy
+# side-channel (label/score/bridge) because that's MODE=full only —
+# it burns Haiku calls and is orthogonal to P0.
 if [[ "$MODE" == "smoke" ]]; then
-    python -m src.bench.venhoff.smoke \
+    echo "[info] stage=generate_traces | status=start"
+    python -m src.bench.venhoff.generate_traces \
+        "${COMMON_FLAGS[@]}" --engine "$ENGINE" \
+        "${FORCE_FLAGS[@]}"
+
+    echo "[info] stage=collect_activations | status=start | paths=path1"
+    python -m src.bench.venhoff.activation_collection \
+        "${COMMON_FLAGS[@]}" --paths path1 --T 5 \
+        "${FORCE_FLAGS[@]}"
+
+    echo "[info] stage=train_small_sae | arch=sae | cluster_size=15"
+    python -m src.bench.venhoff.train_small_sae \
+        "${COMMON_FLAGS[@]}" \
+        --arch sae --cluster-size 15 --path path1 --T 5 \
+        "${FORCE_FLAGS[@]}"
+
+    echo "[info] stage=annotate | arch=sae"
+    python -m src.bench.venhoff.annotate \
         "${COMMON_FLAGS[@]}" \
         --arch sae --cluster-size 15 --path path1 --aggregation full_window \
-        --engine "$ENGINE" --judge-model "$JUDGE" \
-        "${FORCE_FLAGS[@]}" \
-        "${python_flag_for_force_stage[@]}" \
-        "${python_flag_for_skip_stage[@]}"
-    exit $?
+        "${FORCE_FLAGS[@]}"
+
+    THINKING_MODEL_ID="$(basename "$THINKING_MODEL_HF" | tr '[:upper:]' '[:lower:]')"
+    echo "[info] stage=export_ckpt_venhoff_format | arch=sae"
+    python -m src.bench.venhoff.export_venhoff_ckpt \
+        --root "$ROOT" --model "$MODEL" --dataset "$DATASET" \
+        --n-traces "$N_TRACES" --layer "$LAYER" --seed "$SEED" \
+        --arch sae --cluster-size "$N_CLUSTERS_HYBRID" --path path1 \
+        --venhoff-root "$VENHOFF_ROOT" \
+        --thinking-model-id "$THINKING_MODEL_ID"
+
+    echo "[info] stage=train_steering_vectors | arch=sae"
+    python -m src.bench.venhoff.run_steering \
+        --root "$ROOT" --model "$MODEL" --dataset "$DATASET" \
+        --n-traces "$N_TRACES" --layer "$LAYER" --seed "$SEED" \
+        --arch sae \
+        --venhoff-root "$VENHOFF_ROOT" \
+        --base-model "$BASE_MODEL" --thinking-model "$THINKING_MODEL_HF" \
+        --steering-layer "$STEERING_LAYER" --sae-layer "$SAE_LAYER" \
+        --n-clusters "$N_CLUSTERS_HYBRID" \
+        "${FORCE_FLAGS[@]}"
+
+    echo "[info] stage=hybrid_inference | arch=sae"
+    python -m src.bench.venhoff.run_hybrid \
+        --root "$ROOT" --model "$MODEL" --dataset "$DATASET" \
+        --n-traces "$N_TRACES" --layer "$LAYER" --seed "$SEED" \
+        --arch sae \
+        --venhoff-root "$VENHOFF_ROOT" \
+        --base-model "$BASE_MODEL" --thinking-model "$THINKING_MODEL_HF" \
+        --steering-layer "$STEERING_LAYER" --sae-layer "$SAE_LAYER" \
+        --n-clusters "$N_CLUSTERS_HYBRID" \
+        "${FORCE_FLAGS[@]}"
+
+    echo "[info] stage=grade | arch=sae"
+    python -m src.bench.venhoff.run_grade \
+        --root "$ROOT" --arch sae \
+        --venhoff-root "$VENHOFF_ROOT" \
+        --base-model "$BASE_MODEL" --thinking-model "$THINKING_MODEL_HF" \
+        --dataset "$DATASET" \
+        --steering-layer "$STEERING_LAYER" --sae-layer "$SAE_LAYER" \
+        --n-clusters "$N_CLUSTERS_HYBRID"
+
+    echo "[done] smoke complete. Compare the gap_recovery line above to Venhoff's 0.035 baseline."
+    exit 0
 fi
 
 # Phase 1b full sweep: generate traces once, collect activations once,
