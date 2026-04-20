@@ -43,6 +43,7 @@ REPO = Path("/workspace/temp_xc")
 PROBE_CACHE = REPO / "experiments/phase5_downstream_utility/results/probe_cache"
 CKPT_DIR = REPO / "experiments/phase5_downstream_utility/results/ckpts"
 OUT_JSONL = REPO / "experiments/phase5_downstream_utility/results/probing_results.jsonl"
+PREDICTIONS_DIR = REPO / "experiments/phase5_downstream_utility/results/predictions"
 
 K_VALUES = [1, 2, 5, 20]
 
@@ -204,8 +205,9 @@ def top_k_by_class_sep(Z_train, y_train, k):
     return np.sort(top)
 
 
-def sae_probe_metrics(Z_train, y_train, Z_test, y_test, k):
-    """Return (auc, acc). Uses top-k class-sep + L1 LR."""
+def sae_probe_metrics(Z_train, y_train, Z_test, y_test, k, save_path=None):
+    """Return (auc, acc). Uses top-k class-sep + L1 LR.
+    If save_path is given, dumps (example_id, y_true, decision_score, y_pred) .npz."""
     idx = top_k_by_class_sep(Z_train, y_train, k)
     Xtr = Z_train[:, idx]
     Xte = Z_test[:, idx]
@@ -225,6 +227,16 @@ def sae_probe_metrics(Z_train, y_train, Z_test, y_test, k):
         return 0.5, 0.5
     preds_score = clf.decision_function(Xte_s)
     preds_cls = clf.predict(Xte_s)
+    if save_path is not None:
+        save_path = Path(save_path)
+        save_path.parent.mkdir(parents=True, exist_ok=True)
+        np.savez_compressed(
+            save_path,
+            example_id=np.arange(len(y_test), dtype=np.int32),
+            y_true=np.asarray(y_test, dtype=np.int8),
+            decision_score=preds_score.astype(np.float32),
+            y_pred=preds_cls.astype(np.int8),
+        )
     return (
         float(roc_auc_score(y_test, preds_score)),
         float(accuracy_score(y_test, preds_cls)),
@@ -576,6 +588,7 @@ def run_probing(
     run_ids=None, task_names=None, k_values=None,
     include_baselines: bool = True,
     aggregation: str = "last_position",
+    save_predictions: bool = False,
 ):
     assert aggregation in ("last_position", "full_window", "mean_pool"), aggregation
     k_values = k_values or K_VALUES
@@ -684,9 +697,16 @@ def run_probing(
                         aggregation=aggregation,
                     )
                     for k in k_values:
+                        save_path = None
+                        if save_predictions:
+                            save_path = (
+                                PREDICTIONS_DIR
+                                / f"{run_id}__{aggregation}__{task_name}__k{k}.npz"
+                            )
                         auc, acc = sae_probe_metrics(
                             Ztr, tc["train_labels"],
                             Zte, tc["test_labels"], k,
+                            save_path=save_path,
                         )
                         out_f.write(json.dumps({
                             "run_id": run_id, "arch": arch,
@@ -724,6 +744,8 @@ def main():
     ap.add_argument("--tasks", nargs="+", default=None)
     ap.add_argument("--k-values", nargs="+", type=int, default=K_VALUES)
     ap.add_argument("--skip-baselines", action="store_true")
+    ap.add_argument("--save-predictions", action="store_true",
+                    help="Dump per-example predictions to results/predictions/ for confusion-matrix analysis.")
     ap.add_argument(
         "--aggregation",
         choices=["last_position", "full_window", "mean_pool"],
@@ -734,6 +756,7 @@ def main():
         run_ids=args.run_ids, task_names=args.tasks,
         k_values=args.k_values, include_baselines=not args.skip_baselines,
         aggregation=args.aggregation,
+        save_predictions=args.save_predictions,
     )
 
 

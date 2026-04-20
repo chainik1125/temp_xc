@@ -3,7 +3,11 @@
 Generates one bar + one heatmap per (aggregation, metric) combo:
     headline_{bar,per_task}_k5_{aggregation}_{metric}.png
 
-where aggregation ∈ {last_position, full_window, mean_pool} and metric ∈ {auc, acc}.
+where aggregation ∈ {last_position, mean_pool} and metric ∈ {auc, acc}.
+
+`full_window` is deprecated as of 2026-04-20 (redundant with mean_pool;
+mean_pool matches SAEBench/Kantamneni convention). JSONL rows are kept
+for reproducibility but are no longer plotted.
 
 Also writes `headline_summary.json` at the top level for the default
 pair (last_position × auc) for historical compatibility.
@@ -219,7 +223,8 @@ def main() -> None:
         ("full", None),
         ("aniket", ANIKET_DATASET_KEYS),
     ):
-        for aggregation in ("last_position", "full_window", "mean_pool"):
+        # full_window deprecated 2026-04-20 — JSONL rows retained for reproducibility.
+        for aggregation in ("last_position", "mean_pool"):
             for metric in ("auc", "acc"):
                 agg_dict = aggregate(
                     records, aggregation, metric,
