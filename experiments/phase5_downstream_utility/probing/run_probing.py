@@ -291,6 +291,12 @@ def _load_model_for_run(run_id, ckpt_path, device):
         model = TopKSAE(d_in, d_sae, k=meta["k_pos"]).to(device)
     elif arch == "mlc":
         model = MultiLayerCrosscoder(d_in, d_sae, n_layers=5, k=meta["k_pos"]).to(device)
+    elif arch == "mlc_contrastive":
+        from src.architectures.mlc_contrastive import MLCContrastive
+        model = MLCContrastive(
+            d_in, d_sae, n_layers=5,
+            k=meta["k_pos"], h=meta.get("h", d_sae // 2),
+        ).to(device)
     elif arch in ("txcdr_t2", "txcdr_t3", "txcdr_t5", "txcdr_t8",
                   "txcdr_t10", "txcdr_t15", "txcdr_t20"):
         T = meta["T"]
@@ -373,6 +379,25 @@ def _encode_for_probe(
     device,
     aggregation: str = "last_position",
 ):
+    # `mean_pool` reuses the `full_window` slide-and-encode path but
+    # averages the K per-slide d_sae vectors instead of concatenating,
+    # matching SAEBench / Kantamneni convention (probe sees one d_sae
+    # feature vector per example, averaged over the sequence tail).
+    # One extra np.reshape+mean — no additional GPU forward.
+    if aggregation == "mean_pool":
+        Z = _encode_for_probe(
+            model, arch, meta, tc, split, device,
+            aggregation="full_window",
+        )
+        N = Z.shape[0]
+        d_sae = int(meta.get("d_sae", 18_432))
+        K, rem = divmod(Z.shape[1], d_sae)
+        assert rem == 0, (
+            f"mean_pool reshape expected K*d_sae; got {Z.shape[1]} "
+            f"not divisible by d_sae={d_sae} for arch={arch}"
+        )
+        return Z.reshape(N, K, d_sae).mean(axis=1)
+
     if split == "train":
         anchor = tc["anchor_train"]
         mlc = tc["mlc_train"]
@@ -386,9 +411,10 @@ def _encode_for_probe(
 
     if arch == "topk_sae":
         return _encode_topk(model, anchor, li, device, aggregation)
-    if arch == "mlc":
+    if arch in ("mlc", "mlc_contrastive"):
+        # mlc_contrastive has identical encode API — subclass of MLC.
         # last_position: use mlc (N, L, d) at last real token.
-        # full_window:   use mlc_tail (N, TAIL=5, L, d) if available.
+        # full_window:   use mlc_tail (N, TAIL=20, L, d) if available.
         return _encode_mlc(model, mlc, device, aggregation, mlc_tail=mlc_tail)
     if arch.startswith("txcdr_t"):
         T = meta["T"]
@@ -551,7 +577,7 @@ def run_probing(
     include_baselines: bool = True,
     aggregation: str = "last_position",
 ):
-    assert aggregation in ("last_position", "full_window"), aggregation
+    assert aggregation in ("last_position", "full_window", "mean_pool"), aggregation
     k_values = k_values or K_VALUES
     device = torch.device("cuda")
     OUT_JSONL.parent.mkdir(parents=True, exist_ok=True)
@@ -631,12 +657,12 @@ def run_probing(
             except Exception as e:
                 print(f"  {run_id}: load FAIL: {e}")
                 continue
-            if arch in ("mlc", "time_layer_crosscoder_t5") and aggregation == "full_window":
+            if (arch in ("mlc", "mlc_contrastive", "time_layer_crosscoder_t5")
+                    and aggregation in ("full_window", "mean_pool")):
                 # Both archs need the tail × multi-layer cache
-                # (acts_mlc_tail.npz) to run full_window meaningfully.
-                # Sample the first task — if mlc_tail is missing there, it is
-                # missing everywhere, and we skip rather than emit records
-                # that silently fall back to last_position semantics.
+                # (acts_mlc_tail.npz) for full_window; mean_pool delegates
+                # to the full_window path internally so it needs the same
+                # cache.
                 sample_tail = task_dirs[0] / "acts_mlc_tail.npz"
                 if not sample_tail.exists():
                     print(f"  {run_id}: acts_mlc_tail.npz absent — run build_probe_cache.py first, skip")
@@ -699,7 +725,8 @@ def main():
     ap.add_argument("--k-values", nargs="+", type=int, default=K_VALUES)
     ap.add_argument("--skip-baselines", action="store_true")
     ap.add_argument(
-        "--aggregation", choices=["last_position", "full_window"],
+        "--aggregation",
+        choices=["last_position", "full_window", "mean_pool"],
         default="last_position",
     )
     args = ap.parse_args()

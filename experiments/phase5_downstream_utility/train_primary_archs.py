@@ -293,6 +293,51 @@ def train_mlc(cfg, device, k, d_sae=DEFAULT_D_SAE,
     return model, log
 
 
+def make_pair_multilayer_gen_gpu(buf: torch.Tensor):
+    """`buf` shape (N, L_seq, n_layers, d). Sample adjacent-token pairs:
+    (B, 2, n_layers, d) where [:, 0] = x_{t-1}, [:, 1] = x_t."""
+    N, L, n_layers, d = buf.shape
+
+    def gen(batch_size: int) -> torch.Tensor:
+        seq = torch.randint(0, N, (batch_size,), device=buf.device)
+        tok = torch.randint(1, L, (batch_size,), device=buf.device)  # t >= 1
+        x_cur = buf[seq, tok].float()       # (B, n_layers, d)
+        x_prev = buf[seq, tok - 1].float()
+        return torch.stack([x_prev, x_cur], dim=1)  # (B, 2, n_layers, d)
+    return gen
+
+
+def train_mlc_contrastive(cfg, device, k, alpha=0.1,
+                          d_sae=DEFAULT_D_SAE, h=None,
+                          buf: torch.Tensor | None = None):
+    """MLC + Matryoshka H/L + InfoNCE contrastive (Ye et al. 2025 port)."""
+    from src.architectures.mlc_contrastive import MLCContrastive
+    buf = buf if buf is not None else _preload_multilayer(device)
+    d_in = buf.shape[-1]
+    n_layers = buf.shape[2]
+    model = MLCContrastive(
+        d_in, d_sae, n_layers=n_layers, k=k, h=h,
+    ).to(device)
+    pair_gen = make_pair_multilayer_gen_gpu(buf)
+
+    def gen(batch_size):
+        return pair_gen(batch_size)   # (B, 2, n_layers, d)
+
+    def norm(): model._normalize_decoder()
+
+    # Wrap model.forward to pass alpha through _iterate_train's (loss, _, z)
+    # convention. We monkey-patch via a closure-style "adapter" module.
+    orig_forward = model.forward
+
+    def forward_with_alpha(x):
+        return orig_forward(x, alpha=alpha)
+
+    model.forward = forward_with_alpha   # type: ignore[method-assign]
+    log = _iterate_train(model, gen, cfg, device, normalize_decoder=norm)
+    model.forward = orig_forward   # type: ignore[method-assign]
+    return model, log
+
+
 def train_txcdr(cfg, device, k, T, match_budget=True,
                 d_sae=DEFAULT_D_SAE, buf=None):
     from src.architectures.crosscoder import TemporalCrosscoder
@@ -602,6 +647,13 @@ def run_all(seeds, max_steps, archs=None):
                 model, log = train_mlc(cfg, device, k=100, buf=get_ml())
                 meta = dict(seed=seed, k_pos=100, k_win=None, T=1,
                             layers="L11-L15")
+            elif arch == "mlc_contrastive":
+                model, log = train_mlc_contrastive(
+                    cfg, device, k=100, alpha=0.1, buf=get_ml(),
+                )
+                meta = dict(seed=seed, k_pos=100, k_win=None, T=1,
+                            layers="L11-L15", alpha=0.1,
+                            h=DEFAULT_D_SAE // 2)
             elif arch == "txcdr_t5":
                 model, log = train_txcdr(cfg, device, k=100, T=5, buf=get_anchor())
                 meta = dict(seed=seed, k_pos=100, k_win=500, T=5,

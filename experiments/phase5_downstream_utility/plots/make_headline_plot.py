@@ -3,7 +3,7 @@
 Generates one bar + one heatmap per (aggregation, metric) combo:
     headline_{bar,per_task}_k5_{aggregation}_{metric}.png
 
-where aggregation ∈ {last_position, full_window} and metric ∈ {auc, acc}.
+where aggregation ∈ {last_position, full_window, mean_pool} and metric ∈ {auc, acc}.
 
 Also writes `headline_summary.json` at the top level for the default
 pair (last_position × auc) for historical compatibility.
@@ -52,7 +52,8 @@ ORDERED_ARCHS = [
     "txcdr_rank_k_dec_t5",
     "matryoshka_t5", "temporal_contrastive",
     "time_layer_crosscoder_t5",
-    "mlc", "tfa_small", "tfa_pos_small",
+    "mlc", "mlc_contrastive",
+    "tfa_small", "tfa_pos_small",
 ]
 BASELINE_ARCHS = ["baseline_last_token_lr", "baseline_attn_pool"]
 
@@ -83,7 +84,7 @@ def aggregate(
             "acc" -> uses test_acc (same flip convention for fairness).
     dataset_filter: optional set of dataset_key values to keep.
     """
-    assert aggregation in ("last_position", "full_window")
+    assert aggregation in ("last_position", "full_window", "mean_pool")
     assert metric in ("auc", "acc")
     out: dict[str, dict[str, float]] = defaultdict(dict)
     key = "test_auc" if metric == "auc" else "test_acc"
@@ -218,7 +219,7 @@ def main() -> None:
         ("full", None),
         ("aniket", ANIKET_DATASET_KEYS),
     ):
-        for aggregation in ("last_position", "full_window"):
+        for aggregation in ("last_position", "full_window", "mean_pool"):
             for metric in ("auc", "acc"):
                 agg_dict = aggregate(
                     records, aggregation, metric,
