@@ -25,7 +25,12 @@ from src.bench.venhoff.sae_shim import argmax_labels, wrap_for_path1, wrap_for_p
 
 
 D_IN = 16
-D_SAE = 5
+# TemporalCrosscoder sets `self.k = k * T` internally (stacked-SAE-equivalent
+# total L0), so d_sae must be ≥ k*T or the native TopK is undefined.
+# Real-pipeline ratios: d_sae=15, k=3, T=5 → k*T=15 ≤ 15 (just fits).
+# Test config: d_sae=20, k=2, T=5 → k*T=10 ≤ 20, well-defined.
+D_SAE_SAE = 5       # TopKSAE: k=3, d_sae=5 → k ≤ d_sae, fine.
+D_SAE_XC = 20       # TempXC: k*T=10, d_sae=20.
 T = 5
 BATCH = 8
 
@@ -39,39 +44,39 @@ def _make_mean_pkl(tmp_path: Path) -> Path:
 
 
 def test_path1_shim_shape(tmp_path: Path) -> None:
-    base = TopKSAE(d_in=D_IN, d_sae=D_SAE, k=3)
+    base = TopKSAE(d_in=D_IN, d_sae=D_SAE_SAE, k=3)
     shim = wrap_for_path1(base, _make_mean_pkl(tmp_path))
 
     x = torch.randn(BATCH, D_IN)
     z = shim.encoder(x)
 
-    assert z.shape == (BATCH, D_SAE)
+    assert z.shape == (BATCH, D_SAE_SAE)
 
 
 @pytest.mark.parametrize("agg", ["last", "mean", "max"])
 def test_path3_shim_shape_collapsing_aggs(agg: str, tmp_path: Path) -> None:
-    base = TemporalCrosscoder(d_in=D_IN, d_sae=D_SAE, T=T, k=2)
+    base = TemporalCrosscoder(d_in=D_IN, d_sae=D_SAE_XC, T=T, k=2)
     shim = wrap_for_path3(base, _make_mean_pkl(tmp_path), T=T, aggregation=agg)
 
     x = torch.randn(BATCH, T, D_IN)
     z = shim.encoder(x)
 
-    assert z.shape == (BATCH, D_SAE)
+    assert z.shape == (BATCH, D_SAE_XC)
 
 
 def test_path3_shim_shape_full_window(tmp_path: Path) -> None:
-    base = TemporalCrosscoder(d_in=D_IN, d_sae=D_SAE, T=T, k=2)
+    base = TemporalCrosscoder(d_in=D_IN, d_sae=D_SAE_XC, T=T, k=2)
     shim = wrap_for_path3(base, _make_mean_pkl(tmp_path), T=T, aggregation="full_window")
 
     x = torch.randn(BATCH, T, D_IN)
     z = shim.encoder(x)
 
     # full_window concatenates T × d_sae along the feature axis.
-    assert z.shape == (BATCH, T * D_SAE)
+    assert z.shape == (BATCH, T * D_SAE_XC)
 
 
 def test_argmax_labels_in_range_path1(tmp_path: Path) -> None:
-    base = TopKSAE(d_in=D_IN, d_sae=D_SAE, k=3)
+    base = TopKSAE(d_in=D_IN, d_sae=D_SAE_SAE, k=3)
     shim = wrap_for_path1(base, _make_mean_pkl(tmp_path))
 
     x = torch.randn(BATCH, D_IN)
@@ -80,11 +85,11 @@ def test_argmax_labels_in_range_path1(tmp_path: Path) -> None:
     assert labels.shape == (BATCH,)
     assert labels.dtype == torch.int64
     assert labels.min() >= 0
-    assert labels.max() < D_SAE
+    assert labels.max() < D_SAE_SAE
 
 
 def test_path3_t_mismatch_raises(tmp_path: Path) -> None:
-    base = TemporalCrosscoder(d_in=D_IN, d_sae=D_SAE, T=T, k=2)
+    base = TemporalCrosscoder(d_in=D_IN, d_sae=D_SAE_XC, T=T, k=2)
     shim = wrap_for_path3(base, _make_mean_pkl(tmp_path), T=T, aggregation="mean")
 
     bad_x = torch.randn(BATCH, T + 1, D_IN)
@@ -94,7 +99,7 @@ def test_path3_t_mismatch_raises(tmp_path: Path) -> None:
 
 def test_path1_rejects_3d_input(tmp_path: Path) -> None:
     """Path 1 shim only handles (B, d) — (B, T, d) is Path 3 territory."""
-    base = TopKSAE(d_in=D_IN, d_sae=D_SAE, k=3)
+    base = TopKSAE(d_in=D_IN, d_sae=D_SAE_SAE, k=3)
     shim = wrap_for_path1(base, _make_mean_pkl(tmp_path))
 
     bad_x = torch.randn(BATCH, T, D_IN)
