@@ -37,13 +37,33 @@ to pick up.
   materialises large `(N, K, T, L, d)` tensors can blow this — prefer
   slide-by-slide streaming loops.
 - **Claude Code state — RELOCATED to pod volume (2026-04-20 21:53 UTC).**
-  `/home/appuser/.claude` is now a symlink to `/workspace/claude_home`
-  (6.66 MB on moosefs; previously 7.4 MB on container disk).
-  Conversation history, credentials, scheduled tasks, and per-project
-  sessions now survive pod restart. Safety backup left at
-  `/home/appuser/.claude.bak.20260420-215347` — the next agent can
-  delete it once comfortable. Verified via `touch`/`rm` through the
-  symlink during the relocation.
+  `/home/appuser/.claude` is a symlink to `/workspace/claude_home`
+  (6.66 MB on moosefs; previously 7.4 MB on container disk). Data
+  persists across pod restart; the **symlink itself does not** (it
+  lives on container disk). After any pod-settings change that wipes
+  `/home/appuser/`, the next agent must recreate the symlink before
+  launching Claude Code:
+
+  ```bash
+  bash /workspace/temp_xc/scripts/bootstrap_claude.sh
+  ```
+
+  The script is idempotent (no-op when symlink is already correct).
+  Safety backup of original state: `/home/appuser/.claude.bak.20260420-215347`
+  (delete when comfortable).
+
+  **Other things a pod restart also kills** that pod-volume persistence
+  does not rescue:
+    1. All running background processes (the three live orchestrators
+       at PIDs 1102, 2593, 4038 — would need to be re-launched from
+       where they left off by inspecting `probing_results.jsonl` and
+       `training_index.jsonl` to see which runs completed).
+    2. Scheduled wakeups (the daemon that fires them dies with the
+       pod; the wakeup records are data files in `/workspace/claude_home/`
+       but have to be re-scheduled by a live agent).
+    3. The Claude Code CLI binary if it's installed under `/home/appuser/`
+       or `/usr/local/`. Reinstall if `which claude` returns nothing
+       after the rebuild.
 
 Planned writes for the overnight tasks (T15–T17):
 
