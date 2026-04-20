@@ -23,7 +23,8 @@ import numpy as np
 from src.plotting.save_figure import save_figure
 
 
-REPO = Path("/workspace/temp_xc")
+import os
+REPO = Path(os.environ.get("PHASE5_REPO", Path(__file__).resolve().parents[3]))
 LOGS_DIR = REPO / "experiments/phase5_downstream_utility/results/training_logs"
 PLOTS_DIR = REPO / "experiments/phase5_downstream_utility/results/plots"
 

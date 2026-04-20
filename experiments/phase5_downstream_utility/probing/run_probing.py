@@ -39,7 +39,8 @@ from experiments.phase5_downstream_utility.probing.attn_pooled_probe import (
 )
 
 
-REPO = Path("/workspace/temp_xc")
+import os
+REPO = Path(os.environ.get("PHASE5_REPO", Path(__file__).resolve().parents[3]))
 PROBE_CACHE = REPO / "experiments/phase5_downstream_utility/results/probe_cache"
 CKPT_DIR = REPO / "experiments/phase5_downstream_utility/results/ckpts"
 OUT_JSONL = REPO / "experiments/phase5_downstream_utility/results/probing_results.jsonl"

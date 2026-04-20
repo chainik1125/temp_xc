@@ -28,7 +28,6 @@ from dataclasses import dataclass
 
 import numpy as np
 
-os.environ.setdefault("HF_HOME", "/workspace/hf_cache")
 os.environ.setdefault("HF_DATASETS_TRUST_REMOTE_CODE", "1")
 
 

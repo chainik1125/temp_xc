@@ -131,9 +131,10 @@ def cache_single_layer(
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--layer", type=int, required=True)
+    default_repo = Path(os.environ.get("PHASE5_REPO", Path(__file__).resolve().parents[2]))
     ap.add_argument(
         "--cache-dir", type=Path,
-        default=Path("/workspace/temp_xc/data/cached_activations/gemma-2-2b-it/fineweb"),
+        default=default_repo / "data/cached_activations/gemma-2-2b-it/fineweb",
     )
     ap.add_argument("--batch-size", type=int, default=16)
     ap.add_argument("--flush-every", type=int, default=1_000)

@@ -35,7 +35,6 @@ from pathlib import Path
 import numpy as np
 import torch
 
-os.environ.setdefault("HF_HOME", "/workspace/hf_cache")
 os.environ.setdefault("TQDM_DISABLE", "1")
 
 
@@ -46,9 +45,8 @@ LAST_N = 20
 BATCH_SIZE = 64
 DTYPE = torch.bfloat16
 MODEL_NAME = "google/gemma-2-2b-it"
-OUT_ROOT = Path(
-    "/workspace/temp_xc/experiments/phase5_downstream_utility/results/probe_cache"
-)
+REPO = Path(os.environ.get("PHASE5_REPO", Path(__file__).resolve().parents[3]))
+OUT_ROOT = REPO / "experiments/phase5_downstream_utility/results/probe_cache"
 
 
 def _encode_split(model, tok, texts, captured, device):

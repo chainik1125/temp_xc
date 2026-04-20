@@ -21,7 +21,8 @@ from pathlib import Path
 
 import numpy as np
 
-CACHE_DIR = Path("/workspace/temp_xc/data/cached_activations/gemma-2-2b-it/fineweb")
+import os
+CACHE_DIR = Path(os.environ.get("PHASE5_REPO", Path(__file__).resolve().parents[2])) / "data/cached_activations/gemma-2-2b-it/fineweb"
 KEEP_N = 6000
 
 layers = [11, 12, 13, 14, 15]

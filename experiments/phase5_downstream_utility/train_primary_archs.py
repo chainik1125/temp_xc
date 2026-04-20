@@ -36,7 +36,7 @@ import torch.nn.functional as F
 
 os.environ.setdefault("TQDM_DISABLE", "1")
 
-REPO = Path("/workspace/temp_xc")
+REPO = Path(os.environ.get("PHASE5_REPO", Path(__file__).resolve().parents[2]))
 CACHE_DIR = REPO / "data/cached_activations/gemma-2-2b-it/fineweb"
 OUT_DIR = REPO / "experiments/phase5_downstream_utility/results"
 CKPT_DIR = OUT_DIR / "ckpts"
@@ -46,7 +46,10 @@ INDEX_PATH = OUT_DIR / "training_index.jsonl"
 DEFAULT_D_SAE = 18_432
 ANCHOR_LAYER_KEY = "resid_L13"
 MLC_LAYER_KEYS = ("resid_L11", "resid_L12", "resid_L13", "resid_L14", "resid_L15")
-PRELOAD_SEQS = 6_000         # size of the in-GPU activation buffer
+PRELOAD_SEQS = 6_000         # size of the in-GPU activation buffer (anchor)
+# RTX 5090 has 32GB VRAM (vs A40 48GB). Reduce multilayer preload to keep
+# room for the MLC / TxL crosscoder weights + Adam state.
+PRELOAD_SEQS_ML = 3_000
 TRAIN_FRAC = 0.9             # remainder reserved for eval slice (not used here)
 
 
@@ -61,7 +64,7 @@ def _preload_single(layer_key: str, device: torch.device,
 
 
 def _preload_multilayer(device: torch.device,
-                        n_seqs: int = PRELOAD_SEQS) -> torch.Tensor:
+                        n_seqs: int = PRELOAD_SEQS_ML) -> torch.Tensor:
     """(N, L, n_layers, d) stacked on GPU."""
     arrs = []
     for lk in MLC_LAYER_KEYS:

@@ -34,7 +34,8 @@ import torch
 from src.plotting.save_figure import save_figure
 
 
-REPO = Path("/workspace/temp_xc")
+import os
+REPO = Path(os.environ.get("PHASE5_REPO", Path(__file__).resolve().parents[2]))
 RESULTS_DIR = REPO / "experiments/phase5_downstream_utility/results"
 CKPT_DIR = RESULTS_DIR / "ckpts"
 PLOTS_DIR = RESULTS_DIR / "plots"
