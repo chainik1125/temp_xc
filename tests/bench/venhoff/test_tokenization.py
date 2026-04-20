@@ -136,3 +136,28 @@ def test_sentence_token_span_returns_none_on_missing():
     tok = _FakeTokenizer()
     c2t = get_char_to_token_map(full, tok)
     assert sentence_token_span("unrelated sentence", full, c2t) is None
+
+
+def test_sentence_token_span_handles_trailing_sentence():
+    """Regression test for the MATH500 final-sentence edge case.
+
+    When a sentence ends at `len(full_text)`, the exclusive-end index
+    `text_pos + len(sentence)` lands outside every token's half-open
+    range — HF tokenizer offset maps use `[start, end)`. Previous code
+    returned None (Venhoff's behavior), silently dropping the last
+    sentence of every trace. The fallback walks backwards to the last
+    char inside a token and adds 1 for the exclusive end.
+    """
+    from src.bench.venhoff.tokenization import get_char_to_token_map
+
+    full = "First sentence here. Second goes here too."
+    tok = _FakeTokenizer()
+    c2t = get_char_to_token_map(full, tok)
+    span = sentence_token_span("Second goes here too.", full, c2t)
+    assert span is not None
+    start, end = span
+    # "Second" is token 3; "too." is the last token. Exclusive end is
+    # last_token_idx + 1 = 7 (tokens: First=0, sentence=1, here.=2,
+    # Second=3, goes=4, here=5, too.=6).
+    assert start == 3
+    assert end == 7

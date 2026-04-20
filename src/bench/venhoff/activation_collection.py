@@ -38,7 +38,11 @@ import numpy as np
 from src.bench.model_registry import get_model_config, resid_hook_target
 from src.bench.venhoff.paths import ArtifactPaths, RunIdentity, can_resume, write_with_metadata
 from src.bench.venhoff.responses import extract_thinking_process
-from src.bench.venhoff.tokenization import get_char_to_token_map, split_into_sentences
+from src.bench.venhoff.tokenization import (
+    get_char_to_token_map,
+    sentence_token_span,
+    split_into_sentences,
+)
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
 log = logging.getLogger("venhoff.activation_collection")
@@ -87,13 +91,10 @@ def _iter_sentence_spans(full_response: str, tokenizer) -> list[tuple[str, int, 
 
     spans: list[tuple[str, int, int]] = []
     for sentence in sentences:
-        text_pos = full_response.find(sentence)
-        if text_pos < 0:
+        span = sentence_token_span(sentence, full_response, char_to_token)
+        if span is None:
             continue
-        token_start = char_to_token.get(text_pos)
-        token_end = char_to_token.get(text_pos + len(sentence))
-        if token_start is None or token_end is None or token_start >= token_end:
-            continue
+        token_start, token_end = span
         spans.append((sentence, token_start, token_end))
     return spans
 

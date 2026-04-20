@@ -127,13 +127,35 @@ def sentence_token_span(
     `[token_start - 1:token_end]` themselves if they want their exact
     per-sentence-mean contract. Returns None if the sentence cannot be
     located or its token span is empty / degenerate.
+
+    Edge case handled (not in Venhoff's code — there they silently drop
+    these): when the sentence sits at the very end of the text, the
+    exclusive end position `text_pos + len(sentence)` is not in
+    `char_to_token` (HF `offset_mapping` uses half-open intervals). Fall
+    back to `char_to_token[last_char_pos] + 1`, which reproduces the
+    exclusive-end convention from the last token that contains content.
+    Without this fallback the final sentence of every trace gets
+    silently skipped — painful on MATH500 where the `<think>` block
+    often ends at the response boundary.
     """
     text_pos = full_text.find(sentence)
     if text_pos < 0:
         return None
     token_start = char_to_token.get(text_pos)
-    token_end = char_to_token.get(text_pos + len(sentence))
-    if token_start is None or token_end is None:
+    if token_start is None:
+        return None
+    end_pos = text_pos + len(sentence)
+    token_end = char_to_token.get(end_pos)
+    if token_end is None:
+        # Walk backwards from end_pos-1 until we land inside a token, then
+        # add 1 to get the exclusive end. Bounded by the sentence length
+        # so we never cross into preceding content.
+        for probe in range(end_pos - 1, text_pos - 1, -1):
+            containing = char_to_token.get(probe)
+            if containing is not None:
+                token_end = containing + 1
+                break
+    if token_end is None:
         return None
     if token_start >= token_end:
         return None
