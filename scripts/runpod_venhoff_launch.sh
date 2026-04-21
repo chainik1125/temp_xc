@@ -74,12 +74,17 @@ STEER_MINIBATCH="${STEER_MINIBATCH:-4}"
 # ~3× with minor quality loss. Set STEER_TOP_K=15 to match Venhoff.
 STEER_TOP_K="${STEER_TOP_K:-5}"
 
-# Number of GPUs for Phase 2 parallel vector training. Each vector
-# subprocess pins to one GPU via CUDA_VISIBLE_DEVICES — linear speedup.
-# Default auto-detect; override for e.g. splitting Phase 2 and Phase 3
-# across pods.
-NUM_GPUS_STEERING="${NUM_GPUS_STEERING:-$(nvidia-smi -L 2>/dev/null | wc -l)}"
-if [[ "$NUM_GPUS_STEERING" -lt 1 ]]; then NUM_GPUS_STEERING=1; fi
+# GPU inventory for parallelism.
+#   NUM_GPUS_STEERING: Phase 2 parallel vector training (independent
+#   vectors pinned via CUDA_VISIBLE_DEVICES in run_steering.py).
+#   NUM_GPUS_HYBRID: Phase 3 parallel ARCH training — the three arches
+#   (sae / tempxc / mlc) each run their own hybrid_token.py concurrently,
+#   one per GPU, since they're independent.
+# Both default to the pod's total GPU count.
+_DETECTED_GPUS="$(nvidia-smi -L 2>/dev/null | wc -l)"
+if [[ "$_DETECTED_GPUS" -lt 1 ]]; then _DETECTED_GPUS=1; fi
+NUM_GPUS_STEERING="${NUM_GPUS_STEERING:-$_DETECTED_GPUS}"
+NUM_GPUS_HYBRID="${NUM_GPUS_HYBRID:-$_DETECTED_GPUS}"
 
 # Problem subset for Phase 3 hybrid inference. Venhoff's hybrid_token.py
 # --n_tasks default is 500 (full MATH500). Reduce for faster iteration;
@@ -353,6 +358,10 @@ if [[ "$MODE" == "hybrid" ]]; then
             --thinking-model-id "$THINKING_MODEL_ID"
     done
 
+    # ── Phase 2: steering-vector training, serial per arch.
+    # Each arch's run_steering internally parallelizes the 18 vectors
+    # across NUM_GPUS_STEERING via CUDA_VISIBLE_DEVICES. Arches are
+    # serial here because each arch uses all GPUs simultaneously.
     for arch in $ARCHES; do
         echo "[info] stage=train_steering_vectors | arch=$arch | status=start | max_iters=$STEER_MAX_ITERS | n_train=$STEER_N_TRAINING | top_k=$STEER_TOP_K | num_gpus=$NUM_GPUS_STEERING"
         python -m src.bench.venhoff.run_steering \
@@ -370,19 +379,65 @@ if [[ "$MODE" == "hybrid" ]]; then
             --top-k-clusters "$STEER_TOP_K" \
             --num-gpus "$NUM_GPUS_STEERING" \
             "${FORCE_FLAGS[@]}"
+    done
 
-        echo "[info] stage=hybrid_inference | arch=$arch | n_tasks=$HYBRID_N_TASKS | status=start"
-        python -m src.bench.venhoff.run_hybrid \
-            --root "$ROOT" --model "$MODEL" --dataset "$DATASET" \
-            --n-traces "$N_TRACES" --layer "$LAYER" --seed "$SEED" \
-            --arch "$arch" \
-            --venhoff-root "$VENHOFF_ROOT" \
-            --base-model "$BASE_MODEL" --thinking-model "$THINKING_MODEL_HF" \
-            --steering-layer "$STEERING_LAYER" --sae-layer "$SAE_LAYER" \
-            --n-clusters "$N_CLUSTERS_HYBRID" \
-            --n-tasks "$HYBRID_N_TASKS" \
-            "${FORCE_FLAGS[@]}"
+    # ── Phase 3: hybrid inference, PARALLEL across arches.
+    # Each arch's hybrid_token.py is single-GPU (can't shard the
+    # base/thinking-model loads cleanly), but arches are independent so
+    # we fan them across GPUs via CUDA_VISIBLE_DEVICES. When |ARCHES| >
+    # NUM_GPUS_HYBRID, arches are scheduled in waves — first
+    # NUM_GPUS_HYBRID run in parallel, wait, then the next wave.
+    echo "[info] stage=hybrid_inference | status=start | arches=$ARCHES | num_gpus=$NUM_GPUS_HYBRID | n_tasks=$HYBRID_N_TASKS"
+    mkdir -p logs/hybrid_per_arch
 
+    # Convert ARCHES to an indexed array for wave-based scheduling.
+    ARCH_LIST=($ARCHES)
+    N_ARCHES=${#ARCH_LIST[@]}
+    i=0
+    while [[ $i -lt $N_ARCHES ]]; do
+        wave_pids=()
+        wave_archs=()
+        for ((gpu_idx = 0; gpu_idx < NUM_GPUS_HYBRID && i < N_ARCHES; gpu_idx++, i++)); do
+            arch="${ARCH_LIST[$i]}"
+            wave_archs+=("$arch")
+            echo "[info] hybrid_wave | arch=$arch | gpu=$gpu_idx | status=launching"
+            CUDA_VISIBLE_DEVICES="$gpu_idx" \
+                python -m src.bench.venhoff.run_hybrid \
+                    --root "$ROOT" --model "$MODEL" --dataset "$DATASET" \
+                    --n-traces "$N_TRACES" --layer "$LAYER" --seed "$SEED" \
+                    --arch "$arch" \
+                    --venhoff-root "$VENHOFF_ROOT" \
+                    --base-model "$BASE_MODEL" --thinking-model "$THINKING_MODEL_HF" \
+                    --steering-layer "$STEERING_LAYER" --sae-layer "$SAE_LAYER" \
+                    --n-clusters "$N_CLUSTERS_HYBRID" \
+                    --n-tasks "$HYBRID_N_TASKS" \
+                    "${FORCE_FLAGS[@]}" \
+                    >"logs/hybrid_per_arch/${arch}.log" 2>&1 &
+            wave_pids+=($!)
+        done
+        # Wait for this wave. Report per-arch exit status rather than
+        # `wait` with no args so a single failure doesn't silently eat
+        # the others' output.
+        wave_failed=0
+        for idx in "${!wave_pids[@]}"; do
+            pid="${wave_pids[$idx]}"
+            arch="${wave_archs[$idx]}"
+            if wait "$pid"; then
+                echo "[done] hybrid_wave | arch=$arch | status=ok"
+            else
+                rc=$?
+                echo "[error] hybrid_wave | arch=$arch | rc=$rc | log=logs/hybrid_per_arch/${arch}.log"
+                wave_failed=1
+            fi
+        done
+        if [[ $wave_failed -eq 1 ]]; then
+            echo "[error] one or more arches failed in this hybrid wave; aborting before grade stage"
+            exit 1
+        fi
+    done
+
+    # ── Grade: cheap (no compute), serial.
+    for arch in $ARCHES; do
         echo "[info] stage=grade | arch=$arch | status=start"
         python -m src.bench.venhoff.run_grade \
             --root "$ROOT" --arch "$arch" \
