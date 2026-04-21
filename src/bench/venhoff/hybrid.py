@@ -36,6 +36,7 @@ from pathlib import Path
 
 from src.bench.venhoff.paths import ArtifactPaths, can_resume, write_with_metadata
 from src.bench.venhoff.steering import _venhoff_python
+from src.bench.venhoff.vendor_patches import ensure_hybrid_judge_patched
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
 log = logging.getLogger("venhoff.hybrid")
@@ -121,6 +122,11 @@ def run_hybrid(
         "--coefficients", *[str(c) for c in cfg.coefficients],
         "--token_windows", *[str(w) for w in cfg.token_windows],
     ]
+    # Patch hybrid_token.py's hardcoded gpt-5.2 judge to claude-haiku-4.5
+    # (idempotent — no-op if already applied). Deliberate deviation from
+    # Venhoff; documented in VENHOFF_PROVENANCE.md.
+    ensure_hybrid_judge_patched(venhoff_root)
+
     log.info("[info] hybrid | dataset=%s | cmd=%s", cfg.dataset, " ".join(cmd))
     # Same PYTHONPATH fix as steering.py — hybrid_token.py does
     # `from utils.sae import load_sae` without a sys.path prefix.

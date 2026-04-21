@@ -99,3 +99,24 @@ paper number), not `gpt-4.1-mini` (the current code default), so a
 positive bridge pass means we reproduce the paper's judge contract,
 not the code-as-shipped. Flagged so this discrepancy doesn't quietly
 become "Venhoff uses gpt-4o" in downstream summaries.
+
+### hybrid_token.py: in-place judge model swap (2026-04-21)
+
+`hybrid_token.py` hard-codes `openai/gpt-5.2` as its MATH500
+answer-grading judge at three call sites (lines 1206, 1234, 1363 at
+the pinned upstream commit). We patch those strings to
+`anthropic/claude-haiku-4.5` via `src/bench/venhoff/vendor_patches.py`
+before invoking the script. Idempotent — the patch is a no-op if
+already applied.
+
+**Why:** gpt-5.2 via OpenRouter is ~5-10× more expensive than Haiku
+4.5. The grading task is Yes/No answer-equivalence, which Haiku 4.5
+handles at parity with larger models in our experience.
+
+**Caveat for paper narrative:** Venhoff's 3.5% Gap Recovery baseline
+was computed with gpt-5.2. Our numbers under Haiku 4.5 aren't
+strictly apples-to-apples with that cell. Options for remediation:
+(a) re-judge a random 50-problem subset with gpt-5.2 as a bridge /
+drift check, (b) report both judge numbers side-by-side, (c) report
+only relative deltas (SAE-vs-TempXC-vs-MLC under the same judge) and
+sidestep the absolute comparison.

@@ -42,10 +42,12 @@ ANTHROPIC_API_KEY=""
 OPENAI_API_KEY=""
 
 # OpenRouter API — REQUIRED for MODE=hybrid. Venhoff's hybrid_token.py
-# routes its answer-grading judge (openai/gpt-5.2) through OpenRouter
-# via chat_limiter. We use the same judge for apples-to-apples
-# comparability with their 3.5% baseline. Get a key at
-# https://openrouter.ai/keys — free tier + credit-based thereafter.
+# uses OpenRouter for its MATH500 answer-grading judge. We patch the
+# hardcoded gpt-5.2 model to anthropic/claude-haiku-4.5 (5-10× cheaper,
+# Yes/No grading is a task Haiku handles well) but the routing still
+# goes through OpenRouter. Get a key at https://openrouter.ai/keys —
+# free signup, credit-based thereafter (~$1 for a smoke run at the
+# Haiku rate).
 OPENROUTER_API_KEY=""
 
 # ── Optional ──
