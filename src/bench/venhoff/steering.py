@@ -83,12 +83,22 @@ class SteeringConfig:
     steering_layer: int = 12
     sae_layer: int = 6
     n_clusters: int = 15
-    max_iters: int = 50
-    n_training_examples: int = 2048
-    n_eval_examples: int = 512
+    # Scale defaults cut from Venhoff's run_llama_8b.sh (2048 / 50) to
+    # (256 / 10) — ~60× cheaper. Venhoff's script is HF-only (no vLLM
+    # engine hook), so full-scale defaults cost ~50 H100-hours/vector
+    # on a single H100. Override via env / CLI if you have more compute.
+    max_iters: int = 10
+    n_training_examples: int = 256
+    n_eval_examples: int = 64
     optim_minibatch_size: int = 4
     lr: str = "1e-2"
     seed: int = 42
+    # If set, only train vectors for these cluster indices (plus always
+    # the bias at idx=-1). Useful for smoke runs where you only want to
+    # confirm end-to-end plumbing on one vector.
+    cluster_indices: tuple[int, ...] | None = None
+    # If True, skip cluster vectors entirely and only train the bias.
+    bias_only: bool = False
 
 
 def _venhoff_expected_vector_path(
@@ -140,6 +150,7 @@ def train_one_vector(
         "--n_training_examples", str(cfg.n_training_examples),
         "--n_eval_examples", str(cfg.n_eval_examples),
         "--optim_minibatch_size", str(cfg.optim_minibatch_size),
+        "--base_gen_minibatch_size", str(cfg.optim_minibatch_size),
         "--layer", str(cfg.steering_layer),
         "--steering_vector_idx", str(cluster_idx),
         "--lr", cfg.lr,
@@ -171,10 +182,21 @@ def train_all_vectors(
     paths: ArtifactPaths,
     force: bool = False,
 ) -> list[Path]:
-    """Train bias (idx=-1) + n_clusters vectors. Returns ordered list of paths."""
+    """Train bias (idx=-1) + requested cluster vectors.
+
+    Respects cfg.bias_only (only bias) and cfg.cluster_indices (subset
+    of cluster idx to train). Returns ordered list of output paths.
+    """
     out = []
-    # Venhoff trains the bias first, then each cluster idx 0..n_clusters-1.
     out.append(train_one_vector(venhoff_root, cfg, -1, paths, force=force))
-    for cluster_idx in range(cfg.n_clusters):
+    if cfg.bias_only:
+        log.info("[info] steering | bias_only=True | skipping cluster vectors")
+        return out
+    cluster_indices = (
+        tuple(range(cfg.n_clusters))
+        if cfg.cluster_indices is None
+        else cfg.cluster_indices
+    )
+    for cluster_idx in cluster_indices:
         out.append(train_one_vector(venhoff_root, cfg, cluster_idx, paths, force=force))
     return out

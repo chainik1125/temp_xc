@@ -33,8 +33,15 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--steering-layer", type=int, default=12)
     p.add_argument("--sae-layer", type=int, default=6)
     p.add_argument("--n-clusters", type=int, default=15)
-    p.add_argument("--max-iters", type=int, default=50)
+    p.add_argument("--max-iters", type=int, default=10)
+    p.add_argument("--n-training-examples", type=int, default=256)
+    p.add_argument("--n-eval-examples", type=int, default=64)
+    p.add_argument("--optim-minibatch-size", type=int, default=4)
     p.add_argument("--lr", default="1e-2")
+    p.add_argument("--bias-only", action="store_true",
+                   help="Only train the bias vector (idx=-1); skip cluster vectors.")
+    p.add_argument("--cluster-indices", type=int, nargs="*", default=None,
+                   help="Only train these cluster idxs (plus bias). Default: all 0..n_clusters-1.")
     p.add_argument("--force", action="store_true")
     args = p.parse_args(argv)
 
@@ -52,8 +59,13 @@ def main(argv: list[str] | None = None) -> int:
         sae_layer=args.sae_layer,
         n_clusters=args.n_clusters,
         max_iters=args.max_iters,
+        n_training_examples=args.n_training_examples,
+        n_eval_examples=args.n_eval_examples,
+        optim_minibatch_size=args.optim_minibatch_size,
         lr=args.lr,
         seed=args.seed,
+        bias_only=args.bias_only,
+        cluster_indices=tuple(args.cluster_indices) if args.cluster_indices else None,
     )
     train_all_vectors(
         venhoff_root=args.venhoff_root,

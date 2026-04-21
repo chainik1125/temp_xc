@@ -60,6 +60,14 @@ STEERING_LAYER="${STEERING_LAYER:-12}"
 SAE_LAYER="${SAE_LAYER:-6}"
 N_CLUSTERS_HYBRID="${N_CLUSTERS_HYBRID:-15}"
 
+# Phase 2 (steering-vector training) scale. Venhoff's run_llama_8b.sh
+# uses 2048/50 which costs ~50 H100-hours/vector (HF-only, no vLLM).
+# Our defaults are 60× cheaper and produce usable vectors.
+STEER_MAX_ITERS="${STEER_MAX_ITERS:-10}"
+STEER_N_TRAINING="${STEER_N_TRAINING:-256}"
+STEER_N_EVAL="${STEER_N_EVAL:-64}"
+STEER_MINIBATCH="${STEER_MINIBATCH:-4}"
+
 if [[ "$MODE" == "smoke" ]]; then
     # Smoke: 100 MATH500 problems × SAE only × P0 gate (reproduce Venhoff's 3.5%).
     N_TRACES="${N_TRACES:-100}"
@@ -162,7 +170,9 @@ if [[ "$MODE" == "smoke" ]]; then
         --venhoff-root "$VENHOFF_ROOT" \
         --thinking-model-id "$THINKING_MODEL_ID"
 
-    echo "[info] stage=train_steering_vectors | arch=sae"
+    echo "[info] stage=train_steering_vectors | arch=sae | bias_only=true | scale=smoke"
+    # Smoke trains ONLY the bias vector with ultra-small scale to confirm
+    # end-to-end plumbing. ~15 min on H100. Cluster vectors deferred to MODE=hybrid.
     python -m src.bench.venhoff.run_steering \
         --root "$ROOT" --model "$MODEL" --dataset "$DATASET" \
         --n-traces "$N_TRACES" --layer "$LAYER" --seed "$SEED" \
@@ -171,6 +181,9 @@ if [[ "$MODE" == "smoke" ]]; then
         --base-model "$BASE_MODEL" --thinking-model "$THINKING_MODEL_HF" \
         --steering-layer "$STEERING_LAYER" --sae-layer "$SAE_LAYER" \
         --n-clusters "$N_CLUSTERS_HYBRID" \
+        --max-iters 3 --n-training-examples 64 --n-eval-examples 16 \
+        --optim-minibatch-size 4 \
+        --bias-only \
         "${FORCE_FLAGS[@]}"
 
     echo "[info] stage=hybrid_inference | arch=sae"
@@ -323,7 +336,7 @@ if [[ "$MODE" == "hybrid" ]]; then
     done
 
     for arch in $ARCHES; do
-        echo "[info] stage=train_steering_vectors | arch=$arch | status=start"
+        echo "[info] stage=train_steering_vectors | arch=$arch | status=start | max_iters=$STEER_MAX_ITERS | n_train=$STEER_N_TRAINING"
         python -m src.bench.venhoff.run_steering \
             --root "$ROOT" --model "$MODEL" --dataset "$DATASET" \
             --n-traces "$N_TRACES" --layer "$LAYER" --seed "$SEED" \
@@ -332,6 +345,10 @@ if [[ "$MODE" == "hybrid" ]]; then
             --base-model "$BASE_MODEL" --thinking-model "$THINKING_MODEL_HF" \
             --steering-layer "$STEERING_LAYER" --sae-layer "$SAE_LAYER" \
             --n-clusters "$N_CLUSTERS_HYBRID" \
+            --max-iters "$STEER_MAX_ITERS" \
+            --n-training-examples "$STEER_N_TRAINING" \
+            --n-eval-examples "$STEER_N_EVAL" \
+            --optim-minibatch-size "$STEER_MINIBATCH" \
             "${FORCE_FLAGS[@]}"
 
         echo "[info] stage=hybrid_inference | arch=$arch | status=start"
