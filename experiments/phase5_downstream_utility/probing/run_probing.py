@@ -47,6 +47,31 @@ PREDICTIONS_DIR = REPO / "experiments/phase5_downstream_utility/results/predicti
 
 K_VALUES = [1, 2, 5, 20]
 
+# Phase 5.7 autoresearch val/test split.
+# Per task: 3040 train -> train' (2432) + val (608), 80/20, deterministic
+# seed from dataset_key. Test (760) untouched. The base aggregations
+# (last_position, mean_pool) fit on full train, evaluate on test. The
+# *_val variants fit on train', evaluate on val so the agent can
+# iterate without peeking at test.
+VAL_FRAC = 0.20
+BASE_AGGREGATIONS = ("last_position", "full_window", "mean_pool")
+VAL_AGGREGATIONS = ("last_position_val", "mean_pool_val")
+ALL_AGGREGATIONS = BASE_AGGREGATIONS + VAL_AGGREGATIONS
+
+
+def _split_indices_for_dataset(dataset_key: str, n_train: int) -> tuple[np.ndarray, np.ndarray]:
+    """Deterministic train'/val index split keyed on dataset_key.
+
+    Same dataset_key -> same split, regardless of arch / seed.
+    """
+    seed = abs(hash(dataset_key)) % (2 ** 32)
+    rng = np.random.default_rng(seed)
+    perm = rng.permutation(n_train)
+    n_val = int(round(n_train * VAL_FRAC))
+    val_idx = np.sort(perm[:n_val])
+    train_idx = np.sort(perm[n_val:])
+    return train_idx, val_idx
+
 
 def _load_task_cache(task_dir: Path) -> dict[str, Any]:
     anchor = np.load(task_dir / "acts_anchor.npz")
@@ -314,6 +339,13 @@ def _load_model_for_run(run_id, ckpt_path, device):
         T = meta["T"]
         k_eff = meta["k_win"] or (meta["k_pos"] * T)
         model = TemporalCrosscoder(d_in, d_sae, T, k_eff).to(device)
+    elif arch == "txcdr_contrastive_t5":
+        from src.architectures.txcdr_contrastive import TXCDRContrastive
+        T = meta["T"]
+        k_eff = meta["k_win"] or (meta["k_pos"] * T)
+        model = TXCDRContrastive(
+            d_in, d_sae, T, k_eff, h=meta.get("h", d_sae // 2),
+        ).to(device)
     elif arch.startswith("stacked_t"):
         T = meta["T"]
         model = StackedSAE(d_in, d_sae, T, k=meta["k_pos"]).to(device)
@@ -391,6 +423,11 @@ def _encode_for_probe(
     device,
     aggregation: str = "last_position",
 ):
+    # *_val aggregations encode the same way as their base; the train'/val
+    # split is applied AFTER encoding inside `run_probing`. Strip the
+    # suffix here so encoder dispatch is identical.
+    if aggregation.endswith("_val"):
+        aggregation = aggregation[: -len("_val")]
     # `mean_pool` reuses the `full_window` slide-and-encode path but
     # averages the K per-slide d_sae vectors instead of concatenating,
     # matching SAEBench / Kantamneni convention (probe sees one d_sae
@@ -428,7 +465,7 @@ def _encode_for_probe(
         # last_position: use mlc (N, L, d) at last real token.
         # full_window:   use mlc_tail (N, TAIL=20, L, d) if available.
         return _encode_mlc(model, mlc, device, aggregation, mlc_tail=mlc_tail)
-    if arch.startswith("txcdr_t"):
+    if arch.startswith("txcdr_t") or arch == "txcdr_contrastive_t5":
         T = meta["T"]
         return _encode_txcdr(model, anchor, li, T, device, aggregation)
     if arch.startswith("stacked_t"):
@@ -590,7 +627,8 @@ def run_probing(
     aggregation: str = "last_position",
     save_predictions: bool = False,
 ):
-    assert aggregation in ("last_position", "full_window", "mean_pool"), aggregation
+    assert aggregation in ALL_AGGREGATIONS, aggregation
+    is_val = aggregation.endswith("_val")
     k_values = k_values or K_VALUES
     device = torch.device("cuda")
     OUT_JSONL.parent.mkdir(parents=True, exist_ok=True)
@@ -614,14 +652,35 @@ def run_probing(
             for task_dir in task_dirs:
                 task_name = task_dir.name
                 tc = _load_task_cache(task_dir)
-                ytr, yte = tc["train_labels"], tc["test_labels"]
                 dkey = tc["meta"]["dataset_key"]
 
                 # last-token LR baseline is single-token by design; we keep
                 # the same X regardless of aggregation — both aggregation
                 # records tagged so downstream filters work uniformly.
-                X_last_tr = _last_token(tc["anchor_train"], tc["train_last_idx"])
-                X_last_te = _last_token(tc["anchor_test"], tc["test_last_idx"])
+                X_last_tr_full = _last_token(tc["anchor_train"], tc["train_last_idx"])
+                if is_val:
+                    # Baselines also fit on train', evaluate on val — never
+                    # touch the held-out test split when in val mode.
+                    train_idx, val_idx = _split_indices_for_dataset(
+                        dkey, n_train=tc["train_labels"].shape[0],
+                    )
+                    X_last_tr = X_last_tr_full[train_idx]
+                    X_last_te = X_last_tr_full[val_idx]
+                    ytr = tc["train_labels"][train_idx]
+                    yte = tc["train_labels"][val_idx]
+                    anchor_for_attn_tr = tc["anchor_train"][train_idx]
+                    anchor_for_attn_te = tc["anchor_train"][val_idx]
+                    last_idx_attn_tr = tc["train_last_idx"][train_idx]
+                    last_idx_attn_te = tc["train_last_idx"][val_idx]
+                else:
+                    X_last_tr = X_last_tr_full
+                    X_last_te = _last_token(tc["anchor_test"], tc["test_last_idx"])
+                    ytr = tc["train_labels"]
+                    yte = tc["test_labels"]
+                    anchor_for_attn_tr = tc["anchor_train"]
+                    anchor_for_attn_te = tc["anchor_test"]
+                    last_idx_attn_tr = tc["train_last_idx"]
+                    last_idx_attn_te = tc["test_last_idx"]
 
                 t0 = time.time()
                 last_auc, last_acc = last_token_lr_metrics(
@@ -642,8 +701,8 @@ def run_probing(
 
                 t0 = time.time()
                 ap_auc, ap_acc = attn_pool_metrics(
-                    tc["anchor_train"], tc["train_last_idx"], ytr,
-                    tc["anchor_test"], tc["test_last_idx"], yte, device,
+                    anchor_for_attn_tr, last_idx_attn_tr, ytr,
+                    anchor_for_attn_te, last_idx_attn_te, yte, device,
                 )
                 out_f.write(json.dumps({
                     "run_id": "BASELINE_attn_pool",
@@ -670,8 +729,9 @@ def run_probing(
             except Exception as e:
                 print(f"  {run_id}: load FAIL: {e}")
                 continue
+            mlc_tail_aggs = ("full_window", "mean_pool", "mean_pool_val")
             if (arch in ("mlc", "mlc_contrastive", "time_layer_crosscoder_t5")
-                    and aggregation in ("full_window", "mean_pool")):
+                    and aggregation in mlc_tail_aggs):
                 # Both archs need the tail × multi-layer cache
                 # (acts_mlc_tail.npz) for full_window; mean_pool delegates
                 # to the full_window path internally so it needs the same
@@ -688,14 +748,36 @@ def run_probing(
                 tc = _load_task_cache(task_dir)
                 try:
                     t0 = time.time()
-                    Ztr = _encode_for_probe(
-                        model, arch, meta, tc, "train", device,
-                        aggregation=aggregation,
-                    )
-                    Zte = _encode_for_probe(
-                        model, arch, meta, tc, "test", device,
-                        aggregation=aggregation,
-                    )
+                    if is_val:
+                        # VAL MODE: encode train only, split into train' + val.
+                        # Test split is NOT loaded or encoded — train acts only.
+                        Z_full = _encode_for_probe(
+                            model, arch, meta, tc, "train", device,
+                            aggregation=aggregation,
+                        )
+                        y_full = tc["train_labels"]
+                        train_idx, val_idx = _split_indices_for_dataset(
+                            tc["meta"]["dataset_key"], n_train=Z_full.shape[0],
+                        )
+                        Ztr = Z_full[train_idx]
+                        ytr_split = y_full[train_idx]
+                        Zte = Z_full[val_idx]
+                        yte_split = y_full[val_idx]
+                        n_train_used = int(ytr_split.size)
+                        n_test_used = int(yte_split.size)
+                    else:
+                        Ztr = _encode_for_probe(
+                            model, arch, meta, tc, "train", device,
+                            aggregation=aggregation,
+                        )
+                        Zte = _encode_for_probe(
+                            model, arch, meta, tc, "test", device,
+                            aggregation=aggregation,
+                        )
+                        ytr_split = tc["train_labels"]
+                        yte_split = tc["test_labels"]
+                        n_train_used = int(ytr_split.size)
+                        n_test_used = int(yte_split.size)
                     for k in k_values:
                         save_path = None
                         if save_predictions:
@@ -704,8 +786,8 @@ def run_probing(
                                 / f"{run_id}__{aggregation}__{task_name}__k{k}.npz"
                             )
                         auc, acc = sae_probe_metrics(
-                            Ztr, tc["train_labels"],
-                            Zte, tc["test_labels"], k,
+                            Ztr, ytr_split,
+                            Zte, yte_split, k,
                             save_path=save_path,
                         )
                         out_f.write(json.dumps({
@@ -715,8 +797,8 @@ def run_probing(
                             "aggregation": aggregation,
                             "k_feat": k,
                             "test_auc": auc, "test_acc": acc,
-                            "n_train": int(tc["train_labels"].size),
-                            "n_test": int(tc["test_labels"].size),
+                            "n_train": n_train_used,
+                            "n_test": n_test_used,
                             "elapsed_s": time.time() - t0,
                         }) + "\n")
                     out_f.flush()
@@ -748,8 +830,11 @@ def main():
                     help="Dump per-example predictions to results/predictions/ for confusion-matrix analysis.")
     ap.add_argument(
         "--aggregation",
-        choices=["last_position", "full_window", "mean_pool"],
+        choices=list(ALL_AGGREGATIONS),
         default="last_position",
+        help=("Base aggregations probe full-train→test. *_val variants "
+              "split train (3040) into train' (2432) + val (608) keyed on "
+              "dataset_key — test split is never read."),
     )
     args = ap.parse_args()
     run_probing(

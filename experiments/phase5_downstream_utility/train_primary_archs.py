@@ -338,6 +338,57 @@ def train_mlc_contrastive(cfg, device, k, alpha=0.1,
     return model, log
 
 
+def make_pair_window_gen_gpu(buf: torch.Tensor, T: int):
+    """Adjacent T-windows (shifted by 1 token).
+
+    `buf` shape (N, L, d). For each batch sample picks an offset
+    `off ∈ [0, L - T)`, returns
+        x_prev = buf[seq, off:off+T]      # window ending at off+T-1
+        x_cur  = buf[seq, off+1:off+T+1]  # window ending at off+T
+    Stacked as (B, 2, T, d) with [:, 0] = prev, [:, 1] = cur.
+    """
+    N, L, d = buf.shape
+    assert L >= T + 1, f"need L>={T+1} to form adjacent T-windows; got L={L}"
+
+    def gen(batch_size: int) -> torch.Tensor:
+        seq = torch.randint(0, N, (batch_size,), device=buf.device)
+        off = torch.randint(0, L - T, (batch_size,), device=buf.device)
+        rng = torch.arange(T, device=buf.device)
+        # prev: pos = off + 0..T-1; cur: pos = (off+1) + 0..T-1
+        pos_prev = off.unsqueeze(1) + rng.unsqueeze(0)         # (B, T)
+        pos_cur = (off + 1).unsqueeze(1) + rng.unsqueeze(0)    # (B, T)
+        x_prev = buf[seq.unsqueeze(1).expand(-1, T), pos_prev].float()
+        x_cur = buf[seq.unsqueeze(1).expand(-1, T), pos_cur].float()
+        return torch.stack([x_prev, x_cur], dim=1)  # (B, 2, T, d)
+    return gen
+
+
+def train_txcdr_contrastive(cfg, device, k, T, alpha=0.1,
+                            d_sae=DEFAULT_D_SAE, h=None,
+                            buf: torch.Tensor | None = None):
+    """TXCDR + Matryoshka H/L + adjacent-window InfoNCE (A2)."""
+    from src.architectures.txcdr_contrastive import TXCDRContrastive
+    buf = buf if buf is not None else _preload_single(ANCHOR_LAYER_KEY, device)
+    k_eff = k * T  # match TXCDR convention: per-token k scaled to window
+    model = TXCDRContrastive(buf.shape[-1], d_sae, T, k_eff, h=h).to(device)
+    pair_gen = make_pair_window_gen_gpu(buf, T)
+
+    def gen(batch_size):
+        return pair_gen(batch_size)   # (B, 2, T, d)
+
+    def norm(): model._normalize_decoder()
+
+    orig_forward = model.forward
+
+    def forward_with_alpha(x):
+        return orig_forward(x, alpha=alpha)
+
+    model.forward = forward_with_alpha   # type: ignore[method-assign]
+    log = _iterate_train(model, gen, cfg, device, normalize_decoder=norm)
+    model.forward = orig_forward   # type: ignore[method-assign]
+    return model, log
+
+
 def train_txcdr(cfg, device, k, T, match_budget=True,
                 d_sae=DEFAULT_D_SAE, buf=None):
     from src.architectures.crosscoder import TemporalCrosscoder
@@ -658,6 +709,13 @@ def run_all(seeds, max_steps, archs=None):
                 model, log = train_txcdr(cfg, device, k=100, T=5, buf=get_anchor())
                 meta = dict(seed=seed, k_pos=100, k_win=500, T=5,
                             match_budget=True, layer=13)
+            elif arch == "txcdr_contrastive_t5":
+                model, log = train_txcdr_contrastive(
+                    cfg, device, k=100, T=5, alpha=0.1, buf=get_anchor(),
+                )
+                meta = dict(seed=seed, k_pos=100, k_win=500, T=5,
+                            match_budget=True, layer=13, alpha=0.1,
+                            h=DEFAULT_D_SAE // 2)
             elif arch == "txcdr_t20":
                 model, log = train_txcdr(cfg, device, k=100, T=20, buf=get_anchor())
                 meta = dict(seed=seed, k_pos=100, k_win=2000, T=20,
