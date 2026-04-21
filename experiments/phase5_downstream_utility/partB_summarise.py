@@ -115,11 +115,36 @@ def _records():
     return rows
 
 
+def _test_per_task(rows, arch, seed, k, metric, aggregation):
+    """{task: AUC} for test-set rows at a given aggregation (last_position / mean_pool)."""
+    out = {}
+    rid_target = f"{arch}__seed{seed}"
+    key = f"test_{metric}"
+    for r in rows:
+        if r.get("error") or r.get(key) is None:
+            continue
+        if r.get("aggregation") != aggregation:
+            continue
+        if r.get("k_feat") != k:
+            continue
+        if r.get("run_id") != rid_target:
+            continue
+        task = r.get("task_name")
+        v = float(r[key])
+        if task in FLIP_TASKS:
+            v = max(v, 1.0 - v)
+        out[task] = v
+    return out
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--k", type=int, default=5)
     ap.add_argument("--metric", choices=["auc", "acc"], default="auc")
     ap.add_argument("--seed", type=int, default=42)
+    ap.add_argument("--include-test", action="store_true",
+                    help="Also emit a test-set table at last_position + "
+                         "mean_pool (requires partB_finalize.py to have run).")
     args = ap.parse_args()
 
     rows = _records()
@@ -175,6 +200,48 @@ def main():
             })
         out["families"][family_name] = family_out
         print()
+
+    # Optional: test-set table (last_position + mean_pool on held-out test).
+    # These rows only exist after partB_finalize.py --run has been invoked.
+    if args.include_test:
+        print("### Test-set results  (last_position + mean_pool, k=5)")
+        print()
+        print("| arch | last_position AUC | Δ vs vanilla base (test) | mean_pool AUC | Δ vs vanilla base (test) |")
+        print("|---|---|---|---|---|")
+        test_summary = {}
+        for fam_name, fam in FAMILIES.items():
+            vanilla_base = fam["vanilla_base"]
+            for arch, label, alpha, k_win in fam["variants"]:
+                rowdict = {"arch": arch, "label": label, "family": fam_name,
+                           "vanilla_base": vanilla_base}
+                for agg in ("last_position", "mean_pool"):
+                    cand_pt = _test_per_task(
+                        rows, arch, args.seed, args.k, args.metric, agg,
+                    )
+                    base_pt = _test_per_task(
+                        rows, vanilla_base, args.seed, args.k, args.metric, agg,
+                    )
+                    if not cand_pt:
+                        rowdict[agg] = None
+                        continue
+                    mean_cand = float(np.mean(list(cand_pt.values())))
+                    d = _paired_stats(cand_pt, base_pt) if base_pt else None
+                    rowdict[agg] = {
+                        "mean": mean_cand,
+                        "vs_vanilla": d,
+                    }
+                lp = rowdict.get("last_position")
+                mp = rowdict.get("mean_pool")
+                lp_auc = f"{lp['mean']:.4f}" if lp else "—"
+                lp_d = (f"{lp['vs_vanilla']['mean']:+.4f}"
+                        if lp and lp.get("vs_vanilla") else "—")
+                mp_auc = f"{mp['mean']:.4f}" if mp else "—"
+                mp_d = (f"{mp['vs_vanilla']['mean']:+.4f}"
+                        if mp and mp.get("vs_vanilla") else "—")
+                print(f"| {arch} | {lp_auc} | {lp_d} | {mp_auc} | {mp_d} |")
+                test_summary[arch] = rowdict
+        print()
+        out["test_summary"] = test_summary
 
     (RESULTS / "partB_summary.json").write_text(json.dumps(out, indent=2))
     print(f"JSON: {RESULTS / 'partB_summary.json'}")
