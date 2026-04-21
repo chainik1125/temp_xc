@@ -102,14 +102,20 @@ class SteeringConfig:
 
 
 def _venhoff_expected_vector_path(
-    venhoff_root: Path, base_model: str, cluster_idx: int
+    venhoff_root: Path,
+    base_model: str,
+    cluster_idx: int,
+    steering_type: str = "linear",
 ) -> Path:
-    """Venhoff saves vectors at `train-vectors/results/vars/optimized_vectors/{model}_idx{idx}.pt`.
+    """Venhoff saves vectors at `train-vectors/results/vars/optimized_vectors/{model_lower}_{tag}_{steering_type}.pt`.
 
-    `cluster_idx = -1` → bias vector; otherwise the cluster id.
+    Confirmed from smoke-run output 2026-04-21:
+      bias (idx=-1) → `llama-3.1-8b_bias_linear.pt`
+      cluster N     → `llama-3.1-8b_idx{N}_linear.pt`
     """
-    model_short = base_model.split("/")[-1]
-    name = f"{model_short}_idx{cluster_idx}.pt"
+    model_short = base_model.split("/")[-1].lower()
+    tag = "bias" if cluster_idx == -1 else f"idx{cluster_idx}"
+    name = f"{model_short}_{tag}_{steering_type}.pt"
     return venhoff_root / "train-vectors" / "results" / "vars" / "optimized_vectors" / name
 
 
