@@ -29,7 +29,18 @@ GIT_USER_EMAIL="hxuany0@gmail.com"
 
 QUOTA_DIR=/workspace/temp_xc/experiments/phase5_downstream_utility/results
 free_gb() { df -BG "$1" | awk 'NR==2{gsub(/G/,"",$4); print $4}'; }
-mem_gb_used() { awk '{printf "%.1f", $1/1024/1024/1024}' /sys/fs/cgroup/memory.current; }
+mem_gb_used() {
+    # cgroup v1 path (this pod); fall back to v2 if v1 missing.
+    local path
+    if [ -f /sys/fs/cgroup/memory/memory.usage_in_bytes ]; then
+        path=/sys/fs/cgroup/memory/memory.usage_in_bytes
+    elif [ -f /sys/fs/cgroup/memory.current ]; then
+        path=/sys/fs/cgroup/memory.current
+    else
+        echo "0.0"; return
+    fi
+    awk '{printf "%.1f", $1/1024/1024/1024}' "$path"
+}
 
 commit_and_push() {
     local msg="$1"
