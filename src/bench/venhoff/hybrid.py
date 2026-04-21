@@ -28,6 +28,7 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 import subprocess
 import sys
 from dataclasses import dataclass, field
@@ -121,7 +122,10 @@ def run_hybrid(
         "--token_windows", *[str(w) for w in cfg.token_windows],
     ]
     log.info("[info] hybrid | dataset=%s | cmd=%s", cfg.dataset, " ".join(cmd))
-    result = subprocess.run(cmd, cwd=_venhoff_script_dir(venhoff_root), check=False)
+    # Same PYTHONPATH fix as steering.py — hybrid_token.py does
+    # `from utils.sae import load_sae` without a sys.path prefix.
+    env = {**os.environ, "PYTHONPATH": str(venhoff_root.absolute())}
+    result = subprocess.run(cmd, cwd=_venhoff_script_dir(venhoff_root), env=env, check=False)
     if result.returncode != 0:
         raise RuntimeError(f"hybrid_token.py failed on dataset={cfg.dataset} (rc={result.returncode})")
 

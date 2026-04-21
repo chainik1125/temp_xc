@@ -168,7 +168,11 @@ def train_one_vector(
         cmd.append("--use_activation_perplexity_selection")
 
     log.info("[info] steering | cluster_idx=%d | cmd=%s", cluster_idx, " ".join(cmd))
-    result = subprocess.run(cmd, cwd=_venhoff_script_dir(venhoff_root), check=False)
+    # Inject PYTHONPATH=<venhoff_root> so `from utils.X import ...` resolves
+    # regardless of cwd. Some Venhoff scripts sys.path.append('..') themselves;
+    # hybrid_token.py doesn't, so we make it uniform here.
+    env = {**os.environ, "PYTHONPATH": str(venhoff_root.absolute())}
+    result = subprocess.run(cmd, cwd=_venhoff_script_dir(venhoff_root), env=env, check=False)
     if result.returncode != 0:
         raise RuntimeError(f"optimize_steering_vectors.py failed for cluster_idx={cluster_idx} (rc={result.returncode})")
 
