@@ -931,6 +931,44 @@ def run_all(seeds, max_steps, archs=None):
                 meta = dict(seed=seed, k_pos=100, k_win=None, T=5,
                             match_budget=False, layer=13,
                             variant="dynamics")
+            # ── Part B α sensitivity variants (α ∈ {0.03, 1.0}; default 0.1
+            # was the A2/A3 FINALIST config). Same arch classes as A2/A3,
+            # only alpha differs.
+            elif arch in ("txcdr_contrastive_t5_alpha003",
+                          "txcdr_contrastive_t5_alpha100"):
+                alpha_val = 0.03 if arch.endswith("003") else 1.0
+                model, log = train_txcdr_contrastive(
+                    cfg, device, k=100, T=5, alpha=alpha_val, buf=get_anchor(),
+                )
+                meta = dict(seed=seed, k_pos=100, k_win=500, T=5,
+                            match_budget=True, layer=13, alpha=alpha_val,
+                            h=DEFAULT_D_SAE // 2,
+                            variant="txcdr_contrastive_alpha_sweep")
+            elif arch in ("matryoshka_txcdr_contrastive_t5_alpha003",
+                          "matryoshka_txcdr_contrastive_t5_alpha100"):
+                alpha_val = 0.03 if arch.endswith("003") else 1.0
+                model, log = train_matryoshka_txcdr_contrastive(
+                    cfg, device, k=100, T=5, alpha=alpha_val, buf=get_anchor(),
+                )
+                meta = dict(seed=seed, k_pos=100, k_win=500, T=5,
+                            match_budget=True, layer=13, alpha=alpha_val,
+                            variant="matryoshka_contrastive_alpha_sweep")
+            # ── Part B k=2× sparsity variants (B2 if time permits).
+            elif arch == "txcdr_contrastive_t5_k2x":
+                model, log = train_txcdr_contrastive(
+                    cfg, device, k=200, T=5, alpha=0.1, buf=get_anchor(),
+                )
+                meta = dict(seed=seed, k_pos=200, k_win=1000, T=5,
+                            match_budget=True, layer=13, alpha=0.1,
+                            h=DEFAULT_D_SAE // 2,
+                            variant="txcdr_contrastive_k2x")
+            elif arch == "matryoshka_txcdr_contrastive_t5_k2x":
+                model, log = train_matryoshka_txcdr_contrastive(
+                    cfg, device, k=200, T=5, alpha=0.1, buf=get_anchor(),
+                )
+                meta = dict(seed=seed, k_pos=200, k_win=1000, T=5,
+                            match_budget=True, layer=13, alpha=0.1,
+                            variant="matryoshka_contrastive_k2x")
             elif arch == "txcdr_t20":
                 model, log = train_txcdr(cfg, device, k=100, T=20, buf=get_anchor())
                 meta = dict(seed=seed, k_pos=100, k_win=2000, T=20,

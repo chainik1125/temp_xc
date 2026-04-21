@@ -43,6 +43,17 @@ BASE_OF[matryoshka_txcdr_contrastive_t5]=matryoshka_t5
 BASE_OF[matryoshka_feature_idx_t5]=matryoshka_t5
 BASE_OF[mlc_temporal_t3]=mlc
 BASE_OF[time_layer_contrastive_t5]=time_layer_crosscoder_t5
+# Part B α / k sweep variants — compared vs the same vanilla base as the
+# α=0.1 reference (A2 -> txcdr_t5, A3 -> matryoshka_t5) to give an
+# apples-to-apples absolute Δ_val. Post-hoc summariser also runs a
+# second comparison against the α=0.1 reference variant to show
+# sensitivity within the contrastive family.
+BASE_OF[txcdr_contrastive_t5_alpha003]=txcdr_t5
+BASE_OF[txcdr_contrastive_t5_alpha100]=txcdr_t5
+BASE_OF[txcdr_contrastive_t5_k2x]=txcdr_t5
+BASE_OF[matryoshka_txcdr_contrastive_t5_alpha003]=matryoshka_t5
+BASE_OF[matryoshka_txcdr_contrastive_t5_alpha100]=matryoshka_t5
+BASE_OF[matryoshka_txcdr_contrastive_t5_k2x]=matryoshka_t5
 
 commit_and_push() {
     local msg="$1"; shift

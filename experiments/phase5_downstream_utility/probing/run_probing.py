@@ -339,7 +339,10 @@ def _load_model_for_run(run_id, ckpt_path, device):
         T = meta["T"]
         k_eff = meta["k_win"] or (meta["k_pos"] * T)
         model = TemporalCrosscoder(d_in, d_sae, T, k_eff).to(device)
-    elif arch == "txcdr_contrastive_t5":
+    elif arch in ("txcdr_contrastive_t5",
+                  "txcdr_contrastive_t5_alpha003",
+                  "txcdr_contrastive_t5_alpha100",
+                  "txcdr_contrastive_t5_k2x"):
         from src.architectures.txcdr_contrastive import TXCDRContrastive
         T = meta["T"]
         k_eff = meta["k_win"] or (meta["k_pos"] * T)
@@ -353,7 +356,10 @@ def _load_model_for_run(run_id, ckpt_path, device):
         model = TXCDRRotational(
             d_in, d_sae, T, k_eff, K_rank=meta.get("K_rank", 8),
         ).to(device)
-    elif arch == "matryoshka_txcdr_contrastive_t5":
+    elif arch in ("matryoshka_txcdr_contrastive_t5",
+                  "matryoshka_txcdr_contrastive_t5_alpha003",
+                  "matryoshka_txcdr_contrastive_t5_alpha100",
+                  "matryoshka_txcdr_contrastive_t5_k2x"):
         from src.architectures.matryoshka_txcdr_contrastive import (
             MatryoshkaTXCDRContrastive,
         )
@@ -508,7 +514,11 @@ def _encode_for_probe(
         # full_window:   use mlc_tail (N, TAIL=20, L, d) if available.
         return _encode_mlc(model, mlc, device, aggregation, mlc_tail=mlc_tail)
     if (arch.startswith("txcdr_t")
-            or arch in ("txcdr_contrastive_t5", "txcdr_rotational_t5",
+            or arch in ("txcdr_contrastive_t5",
+                        "txcdr_contrastive_t5_alpha003",
+                        "txcdr_contrastive_t5_alpha100",
+                        "txcdr_contrastive_t5_k2x",
+                        "txcdr_rotational_t5",
                         "txcdr_basis_expansion_t5")):
         T = meta["T"]
         return _encode_txcdr(model, anchor, li, T, device, aggregation)
@@ -542,7 +552,10 @@ def _encode_for_probe(
     if arch.startswith("stacked_t"):
         T = meta["T"]
         return _encode_stacked_last(model, anchor, li, T, device, aggregation)
-    if arch in ("matryoshka_t5", "matryoshka_txcdr_contrastive_t5"):
+    if arch in ("matryoshka_t5", "matryoshka_txcdr_contrastive_t5",
+                "matryoshka_txcdr_contrastive_t5_alpha003",
+                "matryoshka_txcdr_contrastive_t5_alpha100",
+                "matryoshka_txcdr_contrastive_t5_k2x"):
         T = meta["T"]
         return _encode_matryoshka(model, anchor, li, T, device, aggregation)
     if arch == "mlc_temporal_t3":
