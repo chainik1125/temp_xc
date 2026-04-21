@@ -60,12 +60,19 @@ Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>" 2>&1 | tee
     git push origin han 2>&1 | tee -a "$MAIN" || say "  push FAILED; continuing"
 }
 
+MIN_VAL_TASKS=30   # probe baseline again if <30/36 tasks have val rows at k=5
+
 probe_val_if_missing() {
     local rid="$1"
-    # Returns 0 if probing rows for last_position_val k=5 already exist
-    # for this run_id, else 1.
-    if grep -q "\"run_id\": \"$rid\".*\"aggregation\": \"last_position_val\".*\"k_feat\": 5" \
-        /workspace/temp_xc/experiments/phase5_downstream_utility/results/probing_results.jsonl 2>/dev/null; then
+    # Returns 0 (skip) only if we have val rows for at least MIN_VAL_TASKS
+    # distinct tasks at k=5. Prior bug: any single matching row caused a
+    # skip, so the smoke-test row for ag_news_business made the whole
+    # baseline probe get skipped.
+    local n
+    n=$(grep "\"run_id\": \"$rid\".*\"aggregation\": \"last_position_val\".*\"k_feat\": 5" \
+        /workspace/temp_xc/experiments/phase5_downstream_utility/results/probing_results.jsonl 2>/dev/null \
+        | wc -l)
+    if [ "${n:-0}" -ge "$MIN_VAL_TASKS" ]; then
         return 0
     fi
     return 1

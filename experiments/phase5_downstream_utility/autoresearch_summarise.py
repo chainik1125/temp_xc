@@ -142,8 +142,14 @@ def main():
         wins = losses = ties = 0
         t_stat = float("nan")
 
-    # Verdict per plan thresholds
-    if delta_mean > 0.010:
+    # Verdict per plan thresholds.
+    # Guard: if n_paired < 10 we don't trust the delta enough to verdict
+    # (e.g., baseline wasn't probed on all tasks). Return INSUFFICIENT
+    # instead of silently reporting a verdict built on 1–2 tasks.
+    if len(common) < 10:
+        verdict = (f"INSUFFICIENT (n_paired={len(common)} < 10; "
+                   f"re-probe baseline {base} at last_position_val)")
+    elif delta_mean > 0.010:
         verdict = "FINALIST"
     elif delta_mean < -0.020:
         verdict = "DISCARD"
