@@ -389,6 +389,87 @@ def train_txcdr_contrastive(cfg, device, k, T, alpha=0.1,
     return model, log
 
 
+def make_pair_window_multilayer_gen_gpu(buf: torch.Tensor, T: int):
+    """Adjacent T-token windows across multilayer buffer, shift=1.
+
+    `buf` shape (N, L_seq, n_layers, d). Yields batches of
+    `(B, 2, T, n_layers, d)` where `[:, 0]` = prev window, `[:, 1]` = cur
+    window (shifted by 1 token).
+    """
+    N, L_seq, n_layers, d = buf.shape
+    assert L_seq >= T + 1, f"need L_seq>={T+1}; got {L_seq}"
+
+    def gen(batch_size: int) -> torch.Tensor:
+        seq = torch.randint(0, N, (batch_size,), device=buf.device)
+        off = torch.randint(0, L_seq - T, (batch_size,), device=buf.device)
+        rng = torch.arange(T, device=buf.device)
+        pos_prev = off.unsqueeze(1) + rng.unsqueeze(0)        # (B, T)
+        pos_cur = (off + 1).unsqueeze(1) + rng.unsqueeze(0)   # (B, T)
+        x_prev = buf[seq[:, None], pos_prev, :, :].float()    # (B, T, L, d)
+        x_cur = buf[seq[:, None], pos_cur, :, :].float()      # (B, T, L, d)
+        return torch.stack([x_prev, x_cur], dim=1)            # (B, 2, T, L, d)
+    return gen
+
+
+def train_time_layer_contrastive(cfg, device, k, T, alpha=0.1,
+                                  d_sae=8192, h=None,
+                                  buf: torch.Tensor | None = None):
+    """A10: time_layer_crosscoder + InfoNCE on adjacent-window latent slabs."""
+    from src.architectures.time_layer_contrastive import TimeLayerContrastive
+    buf = buf if buf is not None else _preload_multilayer(device)
+    d_in = buf.shape[-1]
+    n_layers = buf.shape[2]
+    # Match time_layer_crosscoder_t5's k convention: k_total = k * T * L.
+    k_eff = k * T * n_layers
+    model = TimeLayerContrastive(
+        d_in, d_sae, T, n_layers, k_eff, h=h,
+    ).to(device)
+    pair_gen = make_pair_window_multilayer_gen_gpu(buf, T)
+
+    def gen(batch_size):
+        return pair_gen(batch_size)   # (B, 2, T, L, d)
+
+    def norm(): model._normalize_decoder()
+
+    def l0(z):
+        # z here is z_cur shape (B, T, L, d_sae); sum over all but batch.
+        return (z > 0).float().sum(dim=(-1, -2, -3)).mean().item()
+
+    orig_forward = model.forward
+
+    def forward_with_alpha(x):
+        return orig_forward(x, alpha=alpha)
+
+    model.forward = forward_with_alpha   # type: ignore[method-assign]
+    log = _iterate_train(
+        model, gen, cfg, device, normalize_decoder=norm, latent_l0_fn=l0,
+    )
+    model.forward = orig_forward   # type: ignore[method-assign]
+    return model, log
+
+
+def train_txcdr_dynamics(cfg, device, k, T, d_sae=DEFAULT_D_SAE, buf=None):
+    """A8: recurrent sparse latent over a T-window (shared enc/dec + per-feature gate)."""
+    from src.architectures.txcdr_dynamics import TXCDRDynamics
+    buf = buf if buf is not None else _preload_single(ANCHOR_LAYER_KEY, device)
+    # k applies per-position here (not per-window). Use k=100 directly —
+    # total L0 over the window = k * T, same as TXCDR's k_win = k * T budget.
+    model = TXCDRDynamics(buf.shape[-1], d_sae, T, k).to(device)
+    gen = make_window_gen_gpu(buf, T)
+
+    def norm(): model._normalize_decoder()
+
+    # z returned by forward is z_last (B, d_sae); L0 per position.
+    # (Window-level L0 is k * T since each position runs its own TopK.)
+    def l0(z):
+        return (z > 0).float().sum(dim=-1).mean().item() * T
+
+    log = _iterate_train(
+        model, gen, cfg, device, normalize_decoder=norm, latent_l0_fn=l0,
+    )
+    return model, log
+
+
 def train_matryoshka_txcdr_contrastive(cfg, device, k, T, alpha=0.1,
                                         d_sae=DEFAULT_D_SAE, buf=None):
     """A3: Matryoshka TXCDR + adjacent-window InfoNCE on scale-1 prefix."""
@@ -834,6 +915,22 @@ def run_all(seeds, max_steps, archs=None):
                 meta = dict(seed=seed, k_pos=100, k_win=500, T=5,
                             match_budget=True, layer=13, K_basis=3,
                             variant="basis_expansion")
+            elif arch == "time_layer_contrastive_t5":
+                model, log = train_time_layer_contrastive(
+                    cfg, device, k=100, T=5, alpha=0.1,
+                    d_sae=8192, buf=get_ml(),
+                )
+                meta = dict(seed=seed, k_pos=100, k_win=None, T=5,
+                            n_layers=5, d_sae=8192, alpha=0.1,
+                            h=8192 // 2, layers="L11-L15", layer=13,
+                            variant="time_layer_contrastive")
+            elif arch == "txcdr_dynamics_t5":
+                model, log = train_txcdr_dynamics(
+                    cfg, device, k=100, T=5, buf=get_anchor(),
+                )
+                meta = dict(seed=seed, k_pos=100, k_win=None, T=5,
+                            match_budget=False, layer=13,
+                            variant="dynamics")
             elif arch == "txcdr_t20":
                 model, log = train_txcdr(cfg, device, k=100, T=20, buf=get_anchor())
                 meta = dict(seed=seed, k_pos=100, k_win=2000, T=20,

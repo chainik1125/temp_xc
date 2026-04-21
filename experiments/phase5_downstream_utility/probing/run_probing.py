@@ -373,6 +373,21 @@ def _load_model_for_run(run_id, ckpt_path, device):
         model = TXCDRBasisExpansion(
             d_in, d_sae, T, k_eff, K_basis=meta.get("K_basis", 3),
         ).to(device)
+    elif arch == "time_layer_contrastive_t5":
+        from src.architectures.time_layer_contrastive import TimeLayerContrastive
+        T = meta["T"]
+        L = meta.get("n_layers", 5)
+        d_sae_eff = meta.get("d_sae", 8192)
+        k_total = meta["k_pos"] * T * L
+        model = TimeLayerContrastive(
+            d_in, d_sae_eff, T, L, k_total,
+            h=meta.get("h", d_sae_eff // 2),
+        ).to(device)
+    elif arch == "txcdr_dynamics_t5":
+        from src.architectures.txcdr_dynamics import TXCDRDynamics
+        T = meta["T"]
+        # Per-position k (not k * T). Stored as k_pos.
+        model = TXCDRDynamics(d_in, d_sae, T, k=meta["k_pos"]).to(device)
     elif arch.startswith("stacked_t"):
         T = meta["T"]
         model = StackedSAE(d_in, d_sae, T, k=meta["k_pos"]).to(device)
@@ -497,6 +512,33 @@ def _encode_for_probe(
                         "txcdr_basis_expansion_t5")):
         T = meta["T"]
         return _encode_txcdr(model, anchor, li, T, device, aggregation)
+    if arch == "txcdr_dynamics_t5":
+        # Dynamics model: encode returns z_last (B, d_sae). For mean_pool
+        # we want all T intermediate states averaged — use encode_sequence.
+        T = meta["T"]
+        if aggregation == "last_position":
+            X = _window_at_last(anchor, li, T)
+            return _encode_per_token(model.encode, X, device)
+        # full_window/mean_pool: slide T-window across tail-20, get all T
+        # latents per slide, flatten. (mean_pool path in _encode_for_probe
+        # later averages over the K slides.)
+        wins = _slide_windows(anchor, T)  # (N, K, T, d)
+        N, K, _, d = wins.shape
+        flat = wins.reshape(N * K, T, d)
+        # encode_sequence -> (N*K, T, d_sae). Flatten to (N, K * T * d_sae)
+        # for full_window; mean_pool will reshape to (N, K, T*d_sae) and
+        # then average... actually simpler: return (N, K, d_sae) using
+        # z_last per slide so it matches the other archs' full_window
+        # semantics (one d_sae vector per slide).
+        outs = []
+        batch = 512
+        for i in range(0, flat.shape[0], batch):
+            Xb = torch.from_numpy(flat[i:i + batch]).to(device)
+            with torch.no_grad():
+                z_seq = model.encode_sequence(Xb)   # (B, T, d_sae)
+            outs.append(z_seq[:, -1, :].cpu().numpy())  # take last position
+        Z_last = np.concatenate(outs, axis=0)          # (N*K, d_sae)
+        return Z_last.reshape(N, K * Z_last.shape[-1])
     if arch.startswith("stacked_t"):
         T = meta["T"]
         return _encode_stacked_last(model, anchor, li, T, device, aggregation)
@@ -582,7 +624,7 @@ def _encode_for_probe(
             outs.append(Zb[:, -1, :].cpu().numpy())
         Z_last = np.concatenate(outs, axis=0)
         return Z_last.reshape(N, K * Z_last.shape[-1])
-    if arch == "time_layer_crosscoder_t5":
+    if arch in ("time_layer_crosscoder_t5", "time_layer_contrastive_t5"):
         T = meta["T"]
         L = meta.get("n_layers", 5)
         center_l = L // 2
@@ -812,7 +854,9 @@ def run_probing(
                     del model
                     torch.cuda.empty_cache()
                     continue
-            if (arch in ("mlc", "mlc_contrastive", "time_layer_crosscoder_t5")
+            if (arch in ("mlc", "mlc_contrastive",
+                         "time_layer_crosscoder_t5",
+                         "time_layer_contrastive_t5")
                     and aggregation in mlc_tail_aggs):
                 # Both archs need the tail × multi-layer cache
                 # (acts_mlc_tail.npz) for full_window; mean_pool delegates

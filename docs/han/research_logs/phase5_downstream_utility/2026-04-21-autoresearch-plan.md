@@ -224,6 +224,65 @@ Each candidate emits:
 - `autoresearch_index.jsonl` summary row.
 - `logs/overnight/autoresearch_<cand>.log`.
 
+### Tier 1 results (run 2026-04-21, seed 42, last_position_val, k=5)
+
+All five Tier 1 candidates completed. Baseline probes for txcdr_t5,
+matryoshka_t5, mlc now present at `last_position_val` (full 36 tasks).
+
+| candidate | verdict | Δ_val | t | wins/losses |
+|---|---|---|---|---|
+| A3 matryoshka_txcdr_contrastive_t5 | **FINALIST** | +0.0155 | +1.46 | 22/12 |
+| A2 txcdr_contrastive_t5 | **FINALIST** | +0.0120 | +1.17 | 24/10 |
+| A1 txcdr_rotational_t5 | DISCARD | −0.0332 | −3.12 | 12/23 |
+| A5 txcdr_basis_expansion_t5 | DISCARD | −0.0448 | −4.15 | 9/26 |
+| A4 mlc_temporal_t3 | DISCARD | −0.0615 | −3.54 | 7/27 |
+
+**Clean pattern (5/5 agreement)**:
+- InfoNCE on adjacent-latent pairs (A2, A3) → both FINALIST.
+- Decoder-constraint / weight-sharing (A1, A5, A4) → all DISCARD.
+
+Working hypothesis: at 25 k steps with d_sae=18432 we are
+capacity-limited, not structure-limited. Adding soft structural
+priors to the decoder hurts; adding an auxiliary contrastive signal
+that the model is free to shape helps.
+
+### Tier 2 shelving decision (2026-04-21)
+
+Given the Tier 1 pattern, the 5 plan items are reprioritised:
+
+**Tried next:**
+- **A10 `time_layer_contrastive_t5`** — adds InfoNCE to
+  `time_layer_crosscoder_t5` (already top-5 at last_position).
+  Direct generality test of the InfoNCE win. Highest prior.
+- **A8 `txcdr_dynamics_t5`** — recurrent sparse latent
+  `z_{t+1} = TopK(γ·z_t + W_enc·x_{t+1})`. Constrains the ENCODER /
+  LATENT TRAJECTORY rather than decoder, so orthogonal to A1/A5/A4.
+  Shares family with contrastive (both enforce "adjacent latents
+  should agree") — contrastive does it as a loss, dynamics as an
+  architecture. Aligned with the winning signal. Plan had it tagged
+  "save until Tier 1 signals direction" — signal now present.
+
+**Shelved (predicted-loss or low-prior, reasoning):**
+- **A6 `txcdr_film_t5`** — FiLM is a *more* restrictive
+  decoder-parameterization than A1 (rotational) or A5 (basis-K=3).
+  3/3 decoder-constraint ideas already DISCARD; skipping saves ~25 min
+  of predictable negative result.
+- **A7 `txcdr_smoothness_t5`** — soft cosine penalty on adjacent
+  `W_dec[j,t]` columns. Same axis as A1/A5, softer knob. Same
+  capacity argument applies. If latent-level smoothness (A2/A3
+  InfoNCE) is the right knob, weight-level smoothness is probably
+  still the wrong one.
+- **A9 `matryoshka_feature_idx_t5` (standalone)** — feature-nested
+  Matryoshka is same capacity as existing `matryoshka_t5` (position-
+  nested), just a different partition. Standalone version ≈
+  matryoshka_t5. Interesting compound is A9+contrastive, which we'd
+  revisit only if we wanted to test the "feature-nested axis"
+  independently; but A3 already validates the
+  "Matryoshka+contrastive" pattern, so the marginal value is low.
+  Shelved unless A10/A8 motivate revisiting.
+
+**Tier 3 remains fully parked.**
+
 ### Open questions / decisions for the next agent
 
 1. **Start with A1 (`txcdr_rotational_t5`) or A2 (`txcdr_contrastive_t5`)?**
