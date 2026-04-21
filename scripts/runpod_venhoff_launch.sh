@@ -65,8 +65,14 @@ N_CLUSTERS_HYBRID="${N_CLUSTERS_HYBRID:-15}"
 # Our defaults are 60× cheaper and produce usable vectors.
 STEER_MAX_ITERS="${STEER_MAX_ITERS:-10}"
 STEER_N_TRAINING="${STEER_N_TRAINING:-256}"
-STEER_N_EVAL="${STEER_N_EVAL:-64}"
+# Eval disabled by default — not used for early stopping; pure instrumentation cost.
+STEER_N_EVAL="${STEER_N_EVAL:-0}"
 STEER_MINIBATCH="${STEER_MINIBATCH:-4}"
+# Top-K clusters to train per arch (plus the bias, always). Venhoff's
+# Gap Recovery metric is the max over the 10×5 grid — most clusters
+# don't contribute to the headline. Training 5 of 15 cuts Phase 2 by
+# ~3× with minor quality loss. Set STEER_TOP_K=15 to match Venhoff.
+STEER_TOP_K="${STEER_TOP_K:-5}"
 
 if [[ "$MODE" == "smoke" ]]; then
     # Smoke: 100 MATH500 problems × SAE only × P0 gate (reproduce Venhoff's 3.5%).
@@ -336,7 +342,7 @@ if [[ "$MODE" == "hybrid" ]]; then
     done
 
     for arch in $ARCHES; do
-        echo "[info] stage=train_steering_vectors | arch=$arch | status=start | max_iters=$STEER_MAX_ITERS | n_train=$STEER_N_TRAINING"
+        echo "[info] stage=train_steering_vectors | arch=$arch | status=start | max_iters=$STEER_MAX_ITERS | n_train=$STEER_N_TRAINING | top_k=$STEER_TOP_K"
         python -m src.bench.venhoff.run_steering \
             --root "$ROOT" --model "$MODEL" --dataset "$DATASET" \
             --n-traces "$N_TRACES" --layer "$LAYER" --seed "$SEED" \
@@ -349,6 +355,7 @@ if [[ "$MODE" == "hybrid" ]]; then
             --n-training-examples "$STEER_N_TRAINING" \
             --n-eval-examples "$STEER_N_EVAL" \
             --optim-minibatch-size "$STEER_MINIBATCH" \
+            --top-k-clusters "$STEER_TOP_K" \
             "${FORCE_FLAGS[@]}"
 
         echo "[info] stage=hybrid_inference | arch=$arch | status=start"

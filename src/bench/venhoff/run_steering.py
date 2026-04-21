@@ -35,15 +35,33 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--n-clusters", type=int, default=15)
     p.add_argument("--max-iters", type=int, default=10)
     p.add_argument("--n-training-examples", type=int, default=256)
-    p.add_argument("--n-eval-examples", type=int, default=64)
+    # Default 0 (eval disabled) per web-claude speed-up suggestion #4:
+    # --use_activation_perplexity_selection does inline selection for
+    # cluster vectors; bias vector doesn't use eval for early-stop.
+    # Eval is pure instrumentation cost during the training loop.
+    p.add_argument("--n-eval-examples", type=int, default=0)
     p.add_argument("--optim-minibatch-size", type=int, default=4)
     p.add_argument("--lr", default="1e-2")
     p.add_argument("--bias-only", action="store_true",
                    help="Only train the bias vector (idx=-1); skip cluster vectors.")
     p.add_argument("--cluster-indices", type=int, nargs="*", default=None,
                    help="Only train these cluster idxs (plus bias). Default: all 0..n_clusters-1.")
+    p.add_argument("--top-k-clusters", type=int, default=None,
+                   help="Train only the first K cluster indices (plus bias). "
+                        "Complements Venhoff's max-over-10x5-grid metric — most "
+                        "clusters don't contribute to the headline Gap Recovery. "
+                        "K=5 cuts Phase 2 cost by ~3x with minor quality loss.")
     p.add_argument("--force", action="store_true")
     args = p.parse_args(argv)
+
+    if args.top_k_clusters is not None and args.cluster_indices is not None:
+        raise SystemExit("specify --top-k-clusters OR --cluster-indices, not both")
+    if args.top_k_clusters is not None:
+        cluster_idxs: tuple[int, ...] | None = tuple(range(args.top_k_clusters))
+    elif args.cluster_indices is not None:
+        cluster_idxs = tuple(args.cluster_indices)
+    else:
+        cluster_idxs = None
 
     paths = ArtifactPaths(
         root=args.root,
@@ -65,7 +83,7 @@ def main(argv: list[str] | None = None) -> int:
         lr=args.lr,
         seed=args.seed,
         bias_only=args.bias_only,
-        cluster_indices=tuple(args.cluster_indices) if args.cluster_indices else None,
+        cluster_indices=cluster_idxs,
     )
     train_all_vectors(
         venhoff_root=args.venhoff_root,
