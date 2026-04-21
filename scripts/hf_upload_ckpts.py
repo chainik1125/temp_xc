@@ -48,14 +48,9 @@ def main():
 
     api = HfApi()
 
-    # 1. Upload README.
-    print(f"Uploading README to {REPO}")
-    api.upload_file(
-        path_or_fileobj=str(README_SRC),
-        path_in_repo="README.md",
-        repo_id=REPO, repo_type=REPO_TYPE,
-        commit_message="Add model card describing Phase 5 + 5.7 ckpts",
-    )
+    # 1. README intentionally NOT pushed from here — we keep a minimal
+    # stub README on the HF repo (just a link back to github) per Han's
+    # request that HF READMEs not duplicate research narrative.
 
     # 2. Upload ckpts folder. upload_folder handles the chunking + parallel
     # uploads and skips already-uploaded files by hash.
