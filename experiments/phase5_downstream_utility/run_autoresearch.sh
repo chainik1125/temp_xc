@@ -72,7 +72,10 @@ probe_val_if_missing() {
 }
 
 # ── Wait for any in-flight train/probe job ──────────────────────────────
-while pgrep -f "run_probing.py\|train_primary_archs" >/dev/null; do
+# pgrep -f basic regex doesn't accept `\|` as alternation. Use two checks
+# chained with || so we wait on EITHER a probing OR a training process.
+while pgrep -f "run_probing.py" >/dev/null \
+   || pgrep -f "train_primary_archs" >/dev/null; do
     say "waiting for in-flight train/probe job to exit..."
     sleep 30
 done
