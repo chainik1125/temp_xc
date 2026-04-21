@@ -21,6 +21,12 @@ checked-in `summary.md`.
 **Out of scope**: Phase 5.7 autoresearch (in flight), `full_window`
 aggregation (deprecated, kept in JSONL only for the record).
 
+> **Shortcut**: if your goal is just re-probing against the committed
+> ckpts rather than verifying the activation/cache pipeline, skip
+> Steps 1-4 below and download everything from HuggingFace instead —
+> see [`docs/huggingface-artifacts.md`](../../../huggingface-artifacts.md).
+> That's a ~40-min download vs the ~12-15 hr full rebuild.
+
 ### Target state
 
 Reproduce the benchmark that's committed on branch `han`. When this
