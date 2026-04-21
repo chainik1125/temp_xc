@@ -59,6 +59,9 @@ class HybridConfig:
     coefficients: tuple[float, ...] = field(default_factory=lambda: DEFAULT_COEFFICIENTS)
     token_windows: tuple[int, ...] = field(default_factory=lambda: DEFAULT_TOKEN_WINDOWS)
     seed: int = 42
+    # Venhoff's hybrid_token.py has a `--n_tasks` arg (default 500) with
+    # built-in resume. Set to a subset size to cap problem count.
+    n_tasks: int = 500
 
 
 def _venhoff_script_dir(venhoff_root: Path) -> Path:
@@ -117,6 +120,7 @@ def run_hybrid(
         "--steering_layer", str(cfg.steering_layer),
         "--sae_layer", str(cfg.sae_layer),
         "--n_clusters", str(cfg.n_clusters),
+        "--n_tasks", str(cfg.n_tasks),
         "--max_new_tokens", str(cfg.max_new_tokens),
         "--max_thinking_tokens", str(cfg.max_thinking_tokens),
         "--coefficients", *[str(c) for c in cfg.coefficients],

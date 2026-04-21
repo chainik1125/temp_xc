@@ -37,6 +37,9 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--max-thinking-tokens", type=int, default=2000)
     p.add_argument("--coefficients", type=float, nargs="+", default=list(DEFAULT_COEFFICIENTS))
     p.add_argument("--token-windows", type=int, nargs="+", default=list(DEFAULT_TOKEN_WINDOWS))
+    p.add_argument("--n-tasks", type=int, default=500,
+                   help="MATH500 problem cap (Venhoff's hybrid_token.py has built-in "
+                        "resume so rerunning with a higher N continues from the cached progress).")
     p.add_argument("--force", action="store_true")
     args = p.parse_args(argv)
 
@@ -59,6 +62,7 @@ def main(argv: list[str] | None = None) -> int:
         coefficients=tuple(args.coefficients),
         token_windows=tuple(args.token_windows),
         seed=args.seed,
+        n_tasks=args.n_tasks,
     )
     run_hybrid(
         venhoff_root=args.venhoff_root,

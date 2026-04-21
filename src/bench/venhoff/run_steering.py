@@ -51,6 +51,9 @@ def main(argv: list[str] | None = None) -> int:
                         "Complements Venhoff's max-over-10x5-grid metric — most "
                         "clusters don't contribute to the headline Gap Recovery. "
                         "K=5 cuts Phase 2 cost by ~3x with minor quality loss.")
+    p.add_argument("--num-gpus", type=int, default=1,
+                   help="Parallelize vector training across this many GPUs. "
+                        "Each vector subprocess is pinned via CUDA_VISIBLE_DEVICES.")
     p.add_argument("--force", action="store_true")
     args = p.parse_args(argv)
 
@@ -90,6 +93,7 @@ def main(argv: list[str] | None = None) -> int:
         cfg=cfg,
         paths=paths,
         force=args.force,
+        num_gpus=args.num_gpus,
     )
     return 0
 

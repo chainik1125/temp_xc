@@ -74,6 +74,18 @@ STEER_MINIBATCH="${STEER_MINIBATCH:-4}"
 # ~3× with minor quality loss. Set STEER_TOP_K=15 to match Venhoff.
 STEER_TOP_K="${STEER_TOP_K:-5}"
 
+# Number of GPUs for Phase 2 parallel vector training. Each vector
+# subprocess pins to one GPU via CUDA_VISIBLE_DEVICES — linear speedup.
+# Default auto-detect; override for e.g. splitting Phase 2 and Phase 3
+# across pods.
+NUM_GPUS_STEERING="${NUM_GPUS_STEERING:-$(nvidia-smi -L 2>/dev/null | wc -l)}"
+if [[ "$NUM_GPUS_STEERING" -lt 1 ]]; then NUM_GPUS_STEERING=1; fi
+
+# Problem subset for Phase 3 hybrid inference. Venhoff's hybrid_token.py
+# --n_tasks default is 500 (full MATH500). Reduce for faster iteration;
+# their script has built-in resume so bumping higher continues.
+HYBRID_N_TASKS="${HYBRID_N_TASKS:-500}"
+
 if [[ "$MODE" == "smoke" ]]; then
     # Smoke: 100 MATH500 problems × SAE only × P0 gate (reproduce Venhoff's 3.5%).
     N_TRACES="${N_TRACES:-100}"
@@ -342,7 +354,7 @@ if [[ "$MODE" == "hybrid" ]]; then
     done
 
     for arch in $ARCHES; do
-        echo "[info] stage=train_steering_vectors | arch=$arch | status=start | max_iters=$STEER_MAX_ITERS | n_train=$STEER_N_TRAINING | top_k=$STEER_TOP_K"
+        echo "[info] stage=train_steering_vectors | arch=$arch | status=start | max_iters=$STEER_MAX_ITERS | n_train=$STEER_N_TRAINING | top_k=$STEER_TOP_K | num_gpus=$NUM_GPUS_STEERING"
         python -m src.bench.venhoff.run_steering \
             --root "$ROOT" --model "$MODEL" --dataset "$DATASET" \
             --n-traces "$N_TRACES" --layer "$LAYER" --seed "$SEED" \
@@ -356,9 +368,10 @@ if [[ "$MODE" == "hybrid" ]]; then
             --n-eval-examples "$STEER_N_EVAL" \
             --optim-minibatch-size "$STEER_MINIBATCH" \
             --top-k-clusters "$STEER_TOP_K" \
+            --num-gpus "$NUM_GPUS_STEERING" \
             "${FORCE_FLAGS[@]}"
 
-        echo "[info] stage=hybrid_inference | arch=$arch | status=start"
+        echo "[info] stage=hybrid_inference | arch=$arch | n_tasks=$HYBRID_N_TASKS | status=start"
         python -m src.bench.venhoff.run_hybrid \
             --root "$ROOT" --model "$MODEL" --dataset "$DATASET" \
             --n-traces "$N_TRACES" --layer "$LAYER" --seed "$SEED" \
@@ -367,6 +380,7 @@ if [[ "$MODE" == "hybrid" ]]; then
             --base-model "$BASE_MODEL" --thinking-model "$THINKING_MODEL_HF" \
             --steering-layer "$STEERING_LAYER" --sae-layer "$SAE_LAYER" \
             --n-clusters "$N_CLUSTERS_HYBRID" \
+            --n-tasks "$HYBRID_N_TASKS" \
             "${FORCE_FLAGS[@]}"
 
         echo "[info] stage=grade | arch=$arch | status=start"

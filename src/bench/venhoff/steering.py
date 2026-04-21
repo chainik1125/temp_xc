@@ -129,8 +129,14 @@ def train_one_vector(
     cluster_idx: int,
     paths: ArtifactPaths,
     force: bool = False,
+    gpu_id: int | None = None,
 ) -> Path:
-    """Invoke Venhoff's optimize_steering_vectors.py for one cluster/bias."""
+    """Invoke Venhoff's optimize_steering_vectors.py for one cluster/bias.
+
+    If `gpu_id` is set, pins the subprocess to that GPU via
+    CUDA_VISIBLE_DEVICES. Used by train_all_vectors when multi-GPU
+    parallel training is requested.
+    """
     expected_out = _venhoff_expected_vector_path(venhoff_root, cfg.base_model, cluster_idx)
 
     meta_path = paths.run_dir / "steering" / f"vector_{cluster_idx}.meta.json"
@@ -167,11 +173,14 @@ def train_one_vector(
     if cluster_idx != -1:
         cmd.append("--use_activation_perplexity_selection")
 
-    log.info("[info] steering | cluster_idx=%d | cmd=%s", cluster_idx, " ".join(cmd))
+    log.info("[info] steering | cluster_idx=%d | gpu=%s | cmd=%s",
+             cluster_idx, gpu_id if gpu_id is not None else "default", " ".join(cmd))
     # Inject PYTHONPATH=<venhoff_root> so `from utils.X import ...` resolves
     # regardless of cwd. Some Venhoff scripts sys.path.append('..') themselves;
     # hybrid_token.py doesn't, so we make it uniform here.
     env = {**os.environ, "PYTHONPATH": str(venhoff_root.absolute())}
+    if gpu_id is not None:
+        env["CUDA_VISIBLE_DEVICES"] = str(gpu_id)
     result = subprocess.run(cmd, cwd=_venhoff_script_dir(venhoff_root), env=env, check=False)
     if result.returncode != 0:
         raise RuntimeError(f"optimize_steering_vectors.py failed for cluster_idx={cluster_idx} (rc={result.returncode})")
@@ -191,22 +200,59 @@ def train_all_vectors(
     cfg: SteeringConfig,
     paths: ArtifactPaths,
     force: bool = False,
+    num_gpus: int = 1,
 ) -> list[Path]:
     """Train bias (idx=-1) + requested cluster vectors.
 
     Respects cfg.bias_only (only bias) and cfg.cluster_indices (subset
-    of cluster idx to train). Returns ordered list of output paths.
+    of cluster idx to train).
+
+    If `num_gpus > 1`, vectors are trained in parallel — each
+    subprocess is pinned to a different GPU via CUDA_VISIBLE_DEVICES.
+    Linear speedup since every vector is independent. Returns ordered
+    list of output paths (insertion order matches scheduling order,
+    which may differ from completion order).
     """
-    out = []
-    out.append(train_one_vector(venhoff_root, cfg, -1, paths, force=force))
-    if cfg.bias_only:
-        log.info("[info] steering | bias_only=True | skipping cluster vectors")
-        return out
     cluster_indices = (
         tuple(range(cfg.n_clusters))
         if cfg.cluster_indices is None
         else cfg.cluster_indices
     )
-    for cluster_idx in cluster_indices:
-        out.append(train_one_vector(venhoff_root, cfg, cluster_idx, paths, force=force))
-    return out
+    # Bias always comes first. Cluster vectors only if not bias-only.
+    all_idxs: list[int] = [-1]
+    if not cfg.bias_only:
+        all_idxs.extend(cluster_indices)
+    else:
+        log.info("[info] steering | bias_only=True | skipping cluster vectors")
+
+    if num_gpus <= 1 or len(all_idxs) == 1:
+        # Serial path — one GPU or just the bias.
+        out = []
+        for idx in all_idxs:
+            out.append(train_one_vector(venhoff_root, cfg, idx, paths, force=force))
+        return out
+
+    # Parallel path — fan N vectors across num_gpus processes.
+    log.info(
+        "[info] steering | multi_gpu | num_gpus=%d | n_vectors=%d",
+        num_gpus, len(all_idxs),
+    )
+    from concurrent.futures import ProcessPoolExecutor, as_completed
+
+    # Snapshot config for pickling to worker processes.
+    worker_args = [
+        (venhoff_root, cfg, idx, paths, force, idx_position % num_gpus)
+        for idx_position, idx in enumerate(all_idxs)
+    ]
+    out: list[Path | None] = [None] * len(all_idxs)
+    with ProcessPoolExecutor(max_workers=num_gpus) as pool:
+        futures = {
+            pool.submit(train_one_vector, vr, c, ci, p, f, g): pos
+            for pos, (vr, c, ci, p, f, g) in enumerate(worker_args)
+        }
+        for fut in as_completed(futures):
+            pos = futures[fut]
+            path = fut.result()  # re-raises on worker error
+            out[pos] = path
+    assert all(p is not None for p in out)
+    return [p for p in out if p is not None]
