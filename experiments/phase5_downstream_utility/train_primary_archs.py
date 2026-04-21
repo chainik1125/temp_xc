@@ -389,6 +389,20 @@ def train_txcdr_contrastive(cfg, device, k, T, alpha=0.1,
     return model, log
 
 
+def train_txcdr_rotational(cfg, device, k, T, K_rank=8,
+                           d_sae=DEFAULT_D_SAE, buf=None):
+    """TXCDR with rotational (Lie-group) decoder, A1 from autoresearch plan."""
+    from src.architectures.txcdr_rotational import TXCDRRotational
+    buf = buf if buf is not None else _preload_single(ANCHOR_LAYER_KEY, device)
+    k_eff = k * T
+    model = TXCDRRotational(buf.shape[-1], d_sae, T, k_eff, K_rank=K_rank).to(device)
+    gen = make_window_gen_gpu(buf, T)
+
+    def norm(): model._normalize_decoder()
+    log = _iterate_train(model, gen, cfg, device, normalize_decoder=norm)
+    return model, log
+
+
 def train_txcdr(cfg, device, k, T, match_budget=True,
                 d_sae=DEFAULT_D_SAE, buf=None):
     from src.architectures.crosscoder import TemporalCrosscoder
@@ -716,6 +730,13 @@ def run_all(seeds, max_steps, archs=None):
                 meta = dict(seed=seed, k_pos=100, k_win=500, T=5,
                             match_budget=True, layer=13, alpha=0.1,
                             h=DEFAULT_D_SAE // 2)
+            elif arch == "txcdr_rotational_t5":
+                model, log = train_txcdr_rotational(
+                    cfg, device, k=100, T=5, K_rank=8, buf=get_anchor(),
+                )
+                meta = dict(seed=seed, k_pos=100, k_win=500, T=5,
+                            match_budget=True, layer=13, K_rank=8,
+                            variant="rotational")
             elif arch == "txcdr_t20":
                 model, log = train_txcdr(cfg, device, k=100, T=20, buf=get_anchor())
                 meta = dict(seed=seed, k_pos=100, k_win=2000, T=20,

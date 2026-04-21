@@ -346,6 +346,13 @@ def _load_model_for_run(run_id, ckpt_path, device):
         model = TXCDRContrastive(
             d_in, d_sae, T, k_eff, h=meta.get("h", d_sae // 2),
         ).to(device)
+    elif arch == "txcdr_rotational_t5":
+        from src.architectures.txcdr_rotational import TXCDRRotational
+        T = meta["T"]
+        k_eff = meta["k_win"] or (meta["k_pos"] * T)
+        model = TXCDRRotational(
+            d_in, d_sae, T, k_eff, K_rank=meta.get("K_rank", 8),
+        ).to(device)
     elif arch.startswith("stacked_t"):
         T = meta["T"]
         model = StackedSAE(d_in, d_sae, T, k=meta["k_pos"]).to(device)
@@ -465,7 +472,8 @@ def _encode_for_probe(
         # last_position: use mlc (N, L, d) at last real token.
         # full_window:   use mlc_tail (N, TAIL=20, L, d) if available.
         return _encode_mlc(model, mlc, device, aggregation, mlc_tail=mlc_tail)
-    if arch.startswith("txcdr_t") or arch == "txcdr_contrastive_t5":
+    if (arch.startswith("txcdr_t")
+            or arch in ("txcdr_contrastive_t5", "txcdr_rotational_t5")):
         T = meta["T"]
         return _encode_txcdr(model, anchor, li, T, device, aggregation)
     if arch.startswith("stacked_t"):
