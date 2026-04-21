@@ -1,0 +1,199 @@
+=== separation_sweep_v2 / device=cuda ===
+Sweep: delta ∈ [0.0, 0.05, 0.1, 0.15, 0.2]
+
+=== CELL delta=0.0 ===
+  generator components=[{'component_type': 'hmm', 'process_name': 'mess3', 'process_params': {'x': 0.25, 'a': 0.6}}, {'component_type': 'hmm', 'process_name': 'mess3', 'process_params': {'x': 0.25, 'a': 0.6}}, {'component_type': 'hmm', 'process_name': 'mess3', 'process_params': {'x': 0.25, 'a': 0.6}}]  vocab=3
+Moving model to device:  cuda
+    transformer step 4000/20000  loss=1.0971
+    transformer step 8000/20000  loss=1.0966
+    transformer step 12000/20000  loss=1.0954
+    transformer step 16000/20000  loss=1.0942
+    transformer step 20000/20000  loss=1.0890
+  transformer final_loss=1.0890
+  dense_linear mean_r2=-0.0153  per_comp=[-0.027, -0.007, -0.012]
+  dense_mlp mean_r2=-0.0306  per_comp=[-0.047, -0.024, -0.021]  (stopped at epoch 36)
+  >>> TopK SAE  family=topk
+    best_single=0.0001  per_comp=[0.0, -0.001, -0.001]  lin_mean=-0.0085
+  >>> TXC  family=txc
+    best_single=0.0007  per_comp=[0.001, -0.001, -0.002]  lin_mean=-0.0211
+  >>> MatryoshkaTXC  family=mattxc
+    best_single=0.0007  per_comp=[0.001, -0.015, -0.017]  lin_mean=-0.0271
+  >>> MultiLayerCrosscoder  family=mlxc
+    best_single=0.0001  per_comp=[0.0, 0.0, -0.002]  lin_mean=-0.0117
+  >>> TFA  family=tfa
+    TFA step     0/3000 lr=0.00e+00 MSE=61.631989 pred_energy=0.088
+    TFA step   600/3000 lr=9.95e-04 MSE=13.500833 pred_energy=0.754
+    TFA step  1200/3000 lr=9.72e-04 MSE=7.789991 pred_energy=0.657
+    TFA step  1800/3000 lr=9.39e-04 MSE=6.074402 pred_energy=0.665
+    TFA step  2400/3000 lr=9.11e-04 MSE=5.168720 pred_energy=0.676
+    TFA step  2999/3000 lr=9.00e-04 MSE=4.654079 pred_energy=0.685
+    best_single=0.0001  per_comp=[0.0, -0.001, -0.002]  lin_mean=-0.0194
+  >>> TFA-pos  family=tfa
+    TFA step     0/3000 lr=0.00e+00 MSE=61.632027 pred_energy=0.088
+    TFA step   600/3000 lr=9.95e-04 MSE=14.674752 pred_energy=0.720
+    TFA step  1200/3000 lr=9.72e-04 MSE=8.083723 pred_energy=0.617
+    TFA step  1800/3000 lr=9.39e-04 MSE=6.074025 pred_energy=0.642
+    TFA step  2400/3000 lr=9.11e-04 MSE=5.103915 pred_energy=0.666
+    TFA step  2999/3000 lr=9.00e-04 MSE=4.639657 pred_energy=0.689
+    best_single=0.0001  per_comp=[0.0, -0.001, -0.001]  lin_mean=-0.0263
+  >>> Temporal BatchTopK SAE  family=tsae
+    best_single=0.0000  per_comp=[0.0, -0.001, -0.001]  lin_mean=-0.0153
+  saved /root/sae_day/experiments/transformer_nonergodic/outputs/runs/separation_sweep_v2/results/cell_delta_0/results.json  elapsed=20.1 min
+
+=== CELL delta=0.05 ===
+  generator components=[{'component_type': 'hmm', 'process_name': 'mess3', 'process_params': {'x': 0.2, 'a': 0.65}}, {'component_type': 'hmm', 'process_name': 'mess3', 'process_params': {'x': 0.25, 'a': 0.6}}, {'component_type': 'hmm', 'process_name': 'mess3', 'process_params': {'x': 0.3, 'a': 0.5499999999999999}}]  vocab=3
+Moving model to device:  cuda
+    transformer step 4000/20000  loss=1.0960
+    transformer step 8000/20000  loss=1.0961
+    transformer step 12000/20000  loss=1.0957
+    transformer step 16000/20000  loss=1.0935
+    transformer step 20000/20000  loss=1.0886
+  transformer final_loss=1.0886
+  dense_linear mean_r2=-0.0073  per_comp=[-0.009, -0.006, -0.007]
+  dense_mlp mean_r2=-0.0177  per_comp=[-0.019, -0.022, -0.012]  (stopped at epoch 50)
+  >>> TopK SAE  family=topk
+    best_single=0.0007  per_comp=[0.001, -0.001, -0.002]  lin_mean=-0.0022
+  >>> TXC  family=txc
+    best_single=0.0011  per_comp=[0.001, -0.001, -0.001]  lin_mean=-0.0018
+  >>> MatryoshkaTXC  family=mattxc
+    best_single=0.0002  per_comp=[0.0, -0.017, -0.02]  lin_mean=-0.0334
+  >>> MultiLayerCrosscoder  family=mlxc
+    best_single=0.0006  per_comp=[0.001, -0.001, -0.001]  lin_mean=-0.0039
+  >>> TFA  family=tfa
+    TFA step     0/3000 lr=0.00e+00 MSE=56.560650 pred_energy=0.428
+    TFA step   600/3000 lr=9.95e-04 MSE=10.418779 pred_energy=0.832
+    TFA step  1200/3000 lr=9.72e-04 MSE=6.024895 pred_energy=0.744
+    TFA step  1800/3000 lr=9.39e-04 MSE=4.524702 pred_energy=0.743
+    TFA step  2400/3000 lr=9.11e-04 MSE=3.783350 pred_energy=0.756
+    TFA step  2999/3000 lr=9.00e-04 MSE=3.423554 pred_energy=0.758
+    best_single=0.0013  per_comp=[0.001, -0.001, -0.001]  lin_mean=-0.0068
+  >>> TFA-pos  family=tfa
+    TFA step     0/3000 lr=0.00e+00 MSE=56.560661 pred_energy=0.428
+    TFA step   600/3000 lr=9.95e-04 MSE=11.505495 pred_energy=0.805
+    TFA step  1200/3000 lr=9.72e-04 MSE=6.189574 pred_energy=0.723
+    TFA step  1800/3000 lr=9.39e-04 MSE=4.583250 pred_energy=0.734
+    TFA step  2400/3000 lr=9.11e-04 MSE=3.748008 pred_energy=0.763
+    TFA step  2999/3000 lr=9.00e-04 MSE=3.352585 pred_energy=0.777
+    best_single=0.0015  per_comp=[0.002, -0.001, -0.001]  lin_mean=-0.0120
+  >>> Temporal BatchTopK SAE  family=tsae
+    best_single=0.0010  per_comp=[0.001, -0.001, -0.001]  lin_mean=-0.0042
+  saved /root/sae_day/experiments/transformer_nonergodic/outputs/runs/separation_sweep_v2/results/cell_delta_0.05/results.json  elapsed=20.2 min
+
+=== CELL delta=0.1 ===
+  generator components=[{'component_type': 'hmm', 'process_name': 'mess3', 'process_params': {'x': 0.15, 'a': 0.7}}, {'component_type': 'hmm', 'process_name': 'mess3', 'process_params': {'x': 0.25, 'a': 0.6}}, {'component_type': 'hmm', 'process_name': 'mess3', 'process_params': {'x': 0.35, 'a': 0.5}}]  vocab=3
+Moving model to device:  cuda
+    transformer step 4000/20000  loss=1.0919
+    transformer step 8000/20000  loss=1.0907
+    transformer step 12000/20000  loss=1.0903
+    transformer step 16000/20000  loss=1.0872
+    transformer step 20000/20000  loss=1.0814
+  transformer final_loss=1.0814
+  dense_linear mean_r2=0.0263  per_comp=[0.058, 0.003, 0.019]
+  dense_mlp mean_r2=0.0418  per_comp=[0.1, -0.004, 0.029]  (stopped at epoch 36)
+  >>> TopK SAE  family=topk
+    best_single=0.0059  per_comp=[0.006, 0.0, 0.001]  lin_mean=0.0160
+  >>> TXC  family=txc
+    best_single=0.0633  per_comp=[0.063, 0.012, 0.014]  lin_mean=0.0466
+  >>> MatryoshkaTXC  family=mattxc
+    best_single=0.0255  per_comp=[0.025, -0.011, -0.015]  lin_mean=0.0388
+  >>> MultiLayerCrosscoder  family=mlxc
+    best_single=0.0436  per_comp=[0.044, 0.005, 0.017]  lin_mean=0.0609
+  >>> TFA  family=tfa
+    TFA step     0/3000 lr=0.00e+00 MSE=53.995216 pred_energy=0.092
+    TFA step   600/3000 lr=9.95e-04 MSE=15.321803 pred_energy=0.729
+    TFA step  1200/3000 lr=9.72e-04 MSE=9.287580 pred_energy=0.634
+    TFA step  1800/3000 lr=9.39e-04 MSE=7.295846 pred_energy=0.645
+    TFA step  2400/3000 lr=9.11e-04 MSE=6.134871 pred_energy=0.670
+    TFA step  2999/3000 lr=9.00e-04 MSE=5.596134 pred_energy=0.685
+    best_single=0.0040  per_comp=[0.004, 0.0, -0.0]  lin_mean=0.0436
+  >>> TFA-pos  family=tfa
+    TFA step     0/3000 lr=0.00e+00 MSE=53.995178 pred_energy=0.092
+    TFA step   600/3000 lr=9.95e-04 MSE=15.523135 pred_energy=0.742
+    TFA step  1200/3000 lr=9.72e-04 MSE=9.251837 pred_energy=0.615
+    TFA step  1800/3000 lr=9.39e-04 MSE=7.332904 pred_energy=0.638
+    TFA step  2400/3000 lr=9.11e-04 MSE=6.236934 pred_energy=0.666
+    TFA step  2999/3000 lr=9.00e-04 MSE=5.619159 pred_energy=0.678
+    best_single=0.0043  per_comp=[0.004, 0.001, 0.0]  lin_mean=0.0328
+  >>> Temporal BatchTopK SAE  family=tsae
+    best_single=0.0148  per_comp=[0.015, 0.001, 0.004]  lin_mean=0.0274
+  saved /root/sae_day/experiments/transformer_nonergodic/outputs/runs/separation_sweep_v2/results/cell_delta_0.1/results.json  elapsed=19.7 min
+
+=== CELL delta=0.15 ===
+  generator components=[{'component_type': 'hmm', 'process_name': 'mess3', 'process_params': {'x': 0.1, 'a': 0.75}}, {'component_type': 'hmm', 'process_name': 'mess3', 'process_params': {'x': 0.25, 'a': 0.6}}, {'component_type': 'hmm', 'process_name': 'mess3', 'process_params': {'x': 0.4, 'a': 0.44999999999999996}}]  vocab=3
+Moving model to device:  cuda
+    transformer step 4000/20000  loss=1.0735
+    transformer step 8000/20000  loss=1.0736
+    transformer step 12000/20000  loss=1.0767
+    transformer step 16000/20000  loss=1.0657
+    transformer step 20000/20000  loss=1.0637
+  transformer final_loss=1.0637
+  dense_linear mean_r2=0.2609  per_comp=[0.524, 0.116, 0.143]
+  dense_mlp mean_r2=0.3154  per_comp=[0.653, 0.134, 0.16]  (stopped at epoch 51)
+  >>> TopK SAE  family=topk
+    best_single=0.0953  per_comp=[0.095, 0.027, 0.027]  lin_mean=0.2451
+  >>> TXC  family=txc
+    best_single=0.4881  per_comp=[0.488, 0.124, 0.121]  lin_mean=0.3564
+  >>> MatryoshkaTXC  family=mattxc
+    best_single=0.5517  per_comp=[0.552, 0.092, 0.147]  lin_mean=0.3501
+  >>> MultiLayerCrosscoder  family=mlxc
+    best_single=0.1850  per_comp=[0.185, 0.037, 0.054]  lin_mean=0.2826
+  >>> TFA  family=tfa
+    TFA step     0/3000 lr=0.00e+00 MSE=59.475616 pred_energy=0.214
+    TFA step   600/3000 lr=9.95e-04 MSE=21.005291 pred_energy=0.692
+    TFA step  1200/3000 lr=9.72e-04 MSE=13.682940 pred_energy=0.618
+    TFA step  1800/3000 lr=9.39e-04 MSE=10.829079 pred_energy=0.644
+    TFA step  2400/3000 lr=9.11e-04 MSE=9.517946 pred_energy=0.663
+    TFA step  2999/3000 lr=9.00e-04 MSE=8.734607 pred_energy=0.692
+    best_single=0.0983  per_comp=[0.098, 0.027, 0.031]  lin_mean=0.2851
+  >>> TFA-pos  family=tfa
+    TFA step     0/3000 lr=0.00e+00 MSE=59.475723 pred_energy=0.214
+    TFA step   600/3000 lr=9.95e-04 MSE=21.247272 pred_energy=0.687
+    TFA step  1200/3000 lr=9.72e-04 MSE=13.811631 pred_energy=0.620
+    TFA step  1800/3000 lr=9.39e-04 MSE=11.322914 pred_energy=0.641
+    TFA step  2400/3000 lr=9.11e-04 MSE=9.942743 pred_energy=0.672
+    TFA step  2999/3000 lr=9.00e-04 MSE=9.247933 pred_energy=0.704
+    best_single=0.1578  per_comp=[0.158, 0.04, 0.037]  lin_mean=0.2880
+  >>> Temporal BatchTopK SAE  family=tsae
+    best_single=0.2193  per_comp=[0.219, 0.055, 0.054]  lin_mean=0.2508
+  saved /root/sae_day/experiments/transformer_nonergodic/outputs/runs/separation_sweep_v2/results/cell_delta_0.15/results.json  elapsed=19.1 min
+
+=== CELL delta=0.2 ===
+  generator components=[{'component_type': 'hmm', 'process_name': 'mess3', 'process_params': {'x': 0.04999999999999999, 'a': 0.8}}, {'component_type': 'hmm', 'process_name': 'mess3', 'process_params': {'x': 0.25, 'a': 0.6}}, {'component_type': 'hmm', 'process_name': 'mess3', 'process_params': {'x': 0.45, 'a': 0.39999999999999997}}]  vocab=3
+Moving model to device:  cuda
+    transformer step 4000/20000  loss=1.0246
+    transformer step 8000/20000  loss=1.0321
+    transformer step 12000/20000  loss=1.0421
+    transformer step 16000/20000  loss=1.0232
+    transformer step 20000/20000  loss=1.0274
+  transformer final_loss=1.0274
+  dense_linear mean_r2=0.3609  per_comp=[0.718, 0.159, 0.206]
+  dense_mlp mean_r2=0.4156  per_comp=[0.849, 0.196, 0.202]  (stopped at epoch 63)
+  >>> TopK SAE  family=topk
+    best_single=0.1396  per_comp=[0.14, 0.035, 0.033]  lin_mean=0.3316
+  >>> TXC  family=txc
+    best_single=0.4190  per_comp=[0.419, 0.095, 0.114]  lin_mean=0.4339
+  >>> MatryoshkaTXC  family=mattxc
+    best_single=0.8725  per_comp=[0.872, 0.125, 0.265]  lin_mean=0.4494
+  >>> MultiLayerCrosscoder  family=mlxc
+    best_single=0.2958  per_comp=[0.296, 0.066, 0.082]  lin_mean=0.4044
+  >>> TFA  family=tfa
+    TFA step     0/3000 lr=0.00e+00 MSE=53.242500 pred_energy=0.257
+    TFA step   600/3000 lr=9.95e-04 MSE=24.737644 pred_energy=0.556
+    TFA step  1200/3000 lr=9.72e-04 MSE=15.935182 pred_energy=0.499
+    TFA step  1800/3000 lr=9.39e-04 MSE=12.699497 pred_energy=0.569
+    TFA step  2400/3000 lr=9.11e-04 MSE=10.805308 pred_energy=0.644
+    TFA step  2999/3000 lr=9.00e-04 MSE=9.771674 pred_energy=0.689
+    best_single=0.3768  per_comp=[0.377, 0.082, 0.11]  lin_mean=0.3722
+  >>> TFA-pos  family=tfa
+    TFA step     0/3000 lr=0.00e+00 MSE=53.242496 pred_energy=0.257
+    TFA step   600/3000 lr=9.95e-04 MSE=24.224213 pred_energy=0.582
+    TFA step  1200/3000 lr=9.72e-04 MSE=16.286453 pred_energy=0.473
+    TFA step  1800/3000 lr=9.39e-04 MSE=13.089059 pred_energy=0.544
+    TFA step  2400/3000 lr=9.11e-04 MSE=11.415375 pred_energy=0.623
+    TFA step  2999/3000 lr=9.00e-04 MSE=10.438760 pred_energy=0.671
+    best_single=0.3748  per_comp=[0.375, 0.071, 0.115]  lin_mean=0.3702
+  >>> Temporal BatchTopK SAE  family=tsae
+    best_single=0.1555  per_comp=[0.155, 0.039, 0.041]  lin_mean=0.3397
+  saved /root/sae_day/experiments/transformer_nonergodic/outputs/runs/separation_sweep_v2/results/cell_delta_0.2/results.json  elapsed=19.3 min
+
+Saved combined /root/sae_day/experiments/transformer_nonergodic/outputs/runs/separation_sweep_v2/results/combined.json

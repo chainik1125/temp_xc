@@ -1,0 +1,24 @@
+{
+  "sweep_value": 0.15,
+  "window_size": 10,
+  "d_in_single": 64,
+  "d_in_window": 640,
+  "samples_per_seq_single": 128,
+  "samples_per_seq_window": 119,
+  "single_position": {
+    "mean_r2": 0.2609081733761049,
+    "per_component_r2": [
+      0.5240217112230344,
+      0.11559416921548571,
+      0.1431086396897946
+    ]
+  },
+  "window": {
+    "mean_r2": 0.3056524350132475,
+    "per_component_r2": [
+      0.6481627427083703,
+      0.10351748060364863,
+      0.1652770817277237
+    ]
+  }
+}
