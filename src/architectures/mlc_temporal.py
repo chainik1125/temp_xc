@@ -71,9 +71,19 @@ class MLCTemporal(nn.Module):
 
     @torch.no_grad()
     def _normalize_decoder(self) -> None:
-        """Unit-norm each dictionary atom taken jointly over (T, L, d_in)."""
-        norms = self.W_dec.norm(dim=(1, 2, 3), keepdim=True).clamp(min=1e-8)
-        self.W_dec.data = self.W_dec.data / norms
+        """Unit-norm each dictionary atom taken jointly over (T, L, d_in).
+
+        torch.Tensor.norm with a >2-element dim tuple dispatches to
+        linalg.matrix_norm which only accepts 2 dims. Flatten the trailing
+        (T, L, d_in) dims first, then vector_norm over the flattened axis.
+        """
+        d_sae = self.W_dec.shape[0]
+        flat = self.W_dec.reshape(d_sae, -1)                      # (d_sae, T*L*d_in)
+        norms = torch.linalg.vector_norm(
+            flat, dim=1, keepdim=True,
+        ).clamp(min=1e-8)
+        flat_normed = flat / norms
+        self.W_dec.data = flat_normed.reshape_as(self.W_dec)
 
     def encode(self, x: torch.Tensor) -> torch.Tensor:
         """x: (B, T, L, d_in) -> z: (B, d_sae) with k non-zeros.
