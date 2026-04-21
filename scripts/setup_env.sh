@@ -34,12 +34,19 @@ HF_TOKEN=""
 # ── Required only for the taxonomy side-channel (Phase 1 / MODE=full) ──
 
 # Anthropic Claude API — Haiku 4.5 judges the three taxonomy metrics.
-# Not needed for MODE=hybrid (Gap Recovery uses deterministic grading).
+# Not needed for MODE=hybrid.
 ANTHROPIC_API_KEY=""
 
 # OpenAI API — used only by the GPT-4o drift bridge at smoke time.
 # Not needed for MODE=hybrid.
 OPENAI_API_KEY=""
+
+# OpenRouter API — REQUIRED for MODE=hybrid. Venhoff's hybrid_token.py
+# routes its answer-grading judge (openai/gpt-5.2) through OpenRouter
+# via chat_limiter. We use the same judge for apples-to-apples
+# comparability with their 3.5% baseline. Get a key at
+# https://openrouter.ai/keys — free tier + credit-based thereafter.
+OPENROUTER_API_KEY=""
 
 # ── Optional ──
 
