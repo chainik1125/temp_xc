@@ -1064,5 +1064,46 @@
       "github_code_javascript": 0.707,
       "github_code_python": 0.695
     }
+  },
+  "mlc_contrastive": {
+    "mean_acc": 0.7322360677611977,
+    "std_acc": 0.08531093162878114,
+    "n_tasks": 34,
+    "per_task": {
+      "ag_news_business": 0.7513157894736842,
+      "ag_news_scitech": 0.7513157894736842,
+      "ag_news_sports": 0.8026315789473685,
+      "ag_news_world": 0.8223684210526315,
+      "amazon_reviews_cat0": 0.825,
+      "amazon_reviews_cat1": 0.795,
+      "amazon_reviews_cat2": 0.775,
+      "amazon_reviews_cat3": 0.68,
+      "amazon_reviews_cat5": 0.815,
+      "amazon_reviews_sentiment_5star": 0.927,
+      "bias_in_bios_set1_prof11": 0.6616915422885572,
+      "bias_in_bios_set1_prof18": 0.7634854771784232,
+      "bias_in_bios_set1_prof19": 0.8404761904761905,
+      "bias_in_bios_set1_prof2": 0.6373456790123457,
+      "bias_in_bios_set1_prof21": 0.798,
+      "bias_in_bios_set2_prof13": 0.7054054054054054,
+      "bias_in_bios_set2_prof22": 0.5858310626702997,
+      "bias_in_bios_set2_prof25": 0.6608391608391608,
+      "bias_in_bios_set2_prof26": 0.6656626506024096,
+      "bias_in_bios_set2_prof6": 0.7713310580204779,
+      "bias_in_bios_set3_prof1": 0.6225490196078431,
+      "bias_in_bios_set3_prof12": 0.7543859649122807,
+      "bias_in_bios_set3_prof14": 0.8525641025641025,
+      "bias_in_bios_set3_prof20": 0.7534246575342466,
+      "bias_in_bios_set3_prof9": 0.6346153846153846,
+      "europarl_de": 0.6471774193548387,
+      "europarl_es": 0.7474747474747475,
+      "europarl_fr": 0.6202020202020202,
+      "europarl_it": 0.5583501006036218,
+      "europarl_nl": 0.797583081570997,
+      "github_code_go": 0.825,
+      "github_code_java": 0.686,
+      "github_code_javascript": 0.686,
+      "github_code_python": 0.676
+    }
   }
 }

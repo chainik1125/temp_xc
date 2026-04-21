@@ -1116,5 +1116,48 @@
       "winogrande_correct_completion": 0.5630291334661354,
       "wsc_coreference": 0.6211038961038962
     }
+  },
+  "mlc_contrastive": {
+    "mean_auc": 0.7801010534083757,
+    "std_auc": 0.10431402861201246,
+    "n_tasks": 36,
+    "per_task": {
+      "ag_news_business": 0.7939565771960959,
+      "ag_news_scitech": 0.8226592797783935,
+      "ag_news_sports": 0.8600210619665225,
+      "ag_news_world": 0.889934624227818,
+      "amazon_reviews_cat0": 0.9041624665994656,
+      "amazon_reviews_cat1": 0.8649864878390553,
+      "amazon_reviews_cat2": 0.8640954563818255,
+      "amazon_reviews_cat3": 0.7551520097939195,
+      "amazon_reviews_cat5": 0.8563868299258773,
+      "amazon_reviews_sentiment_5star": 0.9734751619783976,
+      "bias_in_bios_set1_prof11": 0.6901688182720953,
+      "bias_in_bios_set1_prof18": 0.8589370316134035,
+      "bias_in_bios_set1_prof19": 0.8854060863298739,
+      "bias_in_bios_set1_prof2": 0.6817131398013752,
+      "bias_in_bios_set1_prof21": 0.8624129651860746,
+      "bias_in_bios_set2_prof13": 0.767,
+      "bias_in_bios_set2_prof22": 0.6210338680926917,
+      "bias_in_bios_set2_prof25": 0.7172630947620953,
+      "bias_in_bios_set2_prof26": 0.720061468661959,
+      "bias_in_bios_set2_prof6": 0.7764112713222129,
+      "bias_in_bios_set3_prof1": 0.6793232721330386,
+      "bias_in_bios_set3_prof12": 0.8746231844340915,
+      "bias_in_bios_set3_prof14": 0.9053852526926262,
+      "bias_in_bios_set3_prof20": 0.8423423423423424,
+      "bias_in_bios_set3_prof9": 0.7066666666666667,
+      "europarl_de": 0.702815784658548,
+      "europarl_es": 0.8099149574378527,
+      "europarl_fr": 0.6585877551020408,
+      "europarl_it": 0.5989335341560587,
+      "europarl_nl": 0.8724484000778866,
+      "github_code_go": 0.8869879315655365,
+      "github_code_java": 0.7614121924945236,
+      "github_code_javascript": 0.7564570920978397,
+      "github_code_python": 0.7515515026868707,
+      "winogrande_correct_completion": 0.5253984063745021,
+      "wsc_coreference": 0.5855519480519481
+    }
   }
 }
