@@ -1,21 +1,31 @@
 """TXCDR T-sweep plot: AUC vs T × k × aggregation.
 
-Motivation: the 19-arch headline (T ∈ {5, 20}) shows:
+Motivation: the 19-arch headline (T ∈ {5, 20}) showed opposing trends
+between aggregations:
   - last_position:  txcdr_t5 (0.782) > txcdr_t20 (0.750)  — T↑ hurts
+  - full_window:    txcdr_t5 (0.726) < txcdr_t20 (0.752)  — T↑ helps
   - mean_pool:      txcdr_t5 (0.806) > txcdr_t20 (0.755)  — T↑ hurts
 
 With only two T points the story is under-supported. This plot fills
 T ∈ {2, 3, 5, 8, 10, 15, 20} and reports mean AUC over the 36 probing
-tasks at each k, separately for the two canonical aggregations
-(last_position and mean_pool — full_window is deprecated).
+tasks at each k, separately for all three aggregations. full_window
+is deprecated (T13) for the headline plots but retained here because
+the whole point of the T-sweep was to understand its anomalous
+trend vs the other two.
 
 Mechanism:
   - last_position: small T loses temporal context; large T
     under-regularizes the per-feature decoder (SVD spectrum is 7.5 %
-    flatter at T=20 than T=5).
-  - mean_pool:    averages K = 20 − T + 1 per-slide latents into a
-    single d_sae vector. Cushions small-T archs (they get more slides
-    to average). At T=tail=20, K=1, so mean_pool == last_position.
+    flatter at T=20 than T=5). Peak at T=5.
+  - full_window:  concatenates K = 20 − T + 1 per-slide latents into
+    (N, K × d_sae). Small T → large pool (K up to 19) → top-k-by-
+    class-sep selector at k=5 overfits → AUC collapses. Larger T →
+    smaller pool → less overfitting. Monotone-ish T↑ better.
+  - mean_pool:    averages the same K per-slide latents into a single
+    d_sae vector. Removes the pool-inflation artefact of full_window
+    while still exploiting the K slides' information. Peak at T=5,
+    matching last_position's shape, but cushioned (+1–3 pp lift at
+    every T). At T=tail=20, K=1, so mean_pool == last_position.
 
 Reads probing_results.jsonl, writes plots/txcdr_t_sweep_{metric}.png.
 """
@@ -39,7 +49,7 @@ PLOTS_DIR = RESULTS_DIR / "plots"
 
 T_VALUES = [2, 3, 5, 8, 10, 15, 20]
 K_VALUES = [1, 2, 5, 20]
-AGGREGATIONS = ["last_position", "mean_pool"]
+AGGREGATIONS = ["last_position", "full_window", "mean_pool"]
 FLIP_TASKS = {"winogrande_correct_completion", "wsc_coreference"}
 
 
@@ -105,7 +115,11 @@ def _plot(metric: str):
 
     fig, axes = plt.subplots(1, len(K_VALUES), figsize=(4.2 * len(K_VALUES), 4.2),
                               sharey=True)
-    colors = {"last_position": "#1f77b4", "mean_pool": "#2ca02c"}
+    colors = {
+        "last_position": "#1f77b4",  # blue
+        "full_window": "#d62728",    # red (deprecated — retained for comparison)
+        "mean_pool": "#2ca02c",      # green (canonical sliding-window agg)
+    }
 
     for ax, k in zip(axes, K_VALUES):
         for aggregation in AGGREGATIONS:

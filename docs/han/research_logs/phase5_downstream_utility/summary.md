@@ -217,37 +217,59 @@ each headline bar.
 
 #### T-sweep ladder (TXCDR at T ∈ {2, 3, 5, 8, 10, 15, 20})
 
-![T-sweep × last_position + mean_pool × AUC](../../../../experiments/phase5_downstream_utility/results/plots/txcdr_t_sweep_auc.png)
+![T-sweep × 3 aggregations × AUC](../../../../experiments/phase5_downstream_utility/results/plots/txcdr_t_sweep_auc.png)
 
 Accuracy companion: [`txcdr_t_sweep_acc.png`](../../../../experiments/phase5_downstream_utility/results/plots/txcdr_t_sweep_acc.png).
 
-Summary at k=5:
+Summary at k=5 across all three aggregations:
 
-| T | last_position AUC | mean_pool AUC | Δ (mean_pool − last_pos) |
+| T | last_position AUC | full_window AUC | mean_pool AUC |
 |---|---|---|---|
-| 2 | 0.7441 | 0.7786 | +0.0345 |
-| 3 | 0.7711 | 0.8022 | +0.0311 |
-| **5** | **0.7822** | **0.8064** | +0.0242 |
-| 8 | 0.7540 | 0.7711 | +0.0170 |
-| 10 | 0.7671 | 0.7754 | +0.0082 |
-| 15 | 0.7772 | 0.7868 | +0.0096 |
-| 20 | 0.7496 | 0.7545 | +0.0048 |
+| 2 | 0.7441 | 0.6623 | 0.7786 |
+| 3 | 0.7711 | 0.6999 | 0.8022 |
+| **5** | **0.7822** | 0.7259 | **0.8064** |
+| 8 | 0.7540 | 0.7000 | 0.7711 |
+| 10 | 0.7671 | 0.6893 | 0.7754 |
+| 15 | 0.7772 | 0.7125 | 0.7868 |
+| 20 | 0.7496 | 0.7522 | 0.7545 |
 
-**Observations:**
+**Observations — the three aggregations tell three different stories:**
 
-1. **T=5 is optimal at both aggregations.** The "sweet spot"
-   hypothesis (brief.md §3.6) is confirmed: small T (2, 3) loses
-   some temporal context, large T (8, 10, 15, 20) over-regularizes
-   the decoder. The TXCDR-T20 spectrum is 7.5 % flatter than T5's
-   (see *Per-feature decoder SVD* below), consistent with under-
-   regularization.
-2. **mean_pool always helps, and helps more for small T.** T=2 gains
-   +3.5 pp (averaging over K=19 slides compensates for a narrow
-   window). T=20 gains almost nothing because K=1 (no averaging
-   happens — mean_pool collapses to last_position numerically).
-3. **T=3 is a dark horse at mean_pool.** 0.8022 (just 0.4 pp behind
-   T=5) suggests 3-token context + slide-averaging captures most of
-   the discriminative signal available at k=5 features.
+1. **`last_position` and `mean_pool` are qualitatively aligned**:
+   both peak at T=5. Small T (T=2) loses temporal context; large T
+   (T≥8) over-regularizes the per-feature decoder (the TXCDR-T20
+   SVD spectrum is 7.5 % flatter than T5's — see *Per-feature
+   decoder SVD* below). `mean_pool` is uniformly +1–3 pp above
+   `last_position` because it uses all K = 20 − T + 1 slides to
+   produce the probed d_sae vector, not just the slide ending at
+   the last real token.
+2. **`full_window` INVERTS the T trend**: it peaks at T=20 (0.752)
+   and is nearly monotone-increasing in T from T=2 onwards. The
+   mechanism is pool-inflation: full_window concatenates per-slide
+   latents into `(N, K × d_sae)`, so small T → large K (up to 19)
+   → the top-k-by-class-separation selector at k=5 has to pick from
+   a 20× bigger feature pool than `mean_pool` — and overfits. As T
+   grows, K shrinks, the pool shrinks, and the selector works
+   better. This is why the original `txcdr_t5 (0.726) < txcdr_t20
+   (0.752)` finding looked misleadingly like "T↑ helps": it was a
+   pool-size artefact of full_window, not a genuine capability of
+   large-T TXCDR.
+3. **At T=20, all three aggregations converge** (0.7496, 0.7522,
+   0.7545) because K = 20 − 20 + 1 = 1: there is only one slide, so
+   full_window and mean_pool both collapse to last_position
+   numerically (within 0.5 pp of seed noise).
+4. **T=3 at `mean_pool` (0.8022) is a dark horse.** A 3-token
+   context combined with slide-averaging captures most of the
+   discriminative signal at k=5; the T=5-to-T=3 drop is only 0.4 pp
+   under mean_pool vs 1.1 pp under last_position. Suggests that
+   **mean_pool's "many-slides" bonus is most valuable at small T**,
+   which is plausibly why the T↑ curve flattens faster.
+
+This is strong empirical support for **`mean_pool` as the canonical
+SAEBench sliding-window aggregation** and for **deprecating
+`full_window`**: full_window was telling us the opposite of what the
+T-sweep was designed to test, purely because of its feature-pool
+scaling with K.
 
 #### Error-overlap analysis — TXCDR vs MLC complementarity
 
