@@ -389,6 +389,83 @@ def train_txcdr_contrastive(cfg, device, k, T, alpha=0.1,
     return model, log
 
 
+def train_matryoshka_txcdr_contrastive(cfg, device, k, T, alpha=0.1,
+                                        d_sae=DEFAULT_D_SAE, buf=None):
+    """A3: Matryoshka TXCDR + adjacent-window InfoNCE on scale-1 prefix."""
+    from src.architectures.matryoshka_txcdr_contrastive import (
+        MatryoshkaTXCDRContrastive,
+    )
+    buf = buf if buf is not None else _preload_single(ANCHOR_LAYER_KEY, device)
+    k_eff = k * T
+    model = MatryoshkaTXCDRContrastive(buf.shape[-1], d_sae, T, k_eff).to(device)
+    pair_gen = make_pair_window_gen_gpu(buf, T)
+
+    def gen(batch_size):
+        return pair_gen(batch_size)
+
+    def norm(): model._normalize_decoder()
+
+    orig_forward = model.forward
+
+    def forward_with_alpha(x):
+        return orig_forward(x, alpha=alpha)
+
+    model.forward = forward_with_alpha   # type: ignore[method-assign]
+    log = _iterate_train(model, gen, cfg, device, normalize_decoder=norm)
+    model.forward = orig_forward   # type: ignore[method-assign]
+    return model, log
+
+
+def make_window_multilayer_gen_gpu(buf: torch.Tensor, T: int):
+    """Adjacent T-token windows across multilayer buffer.
+
+    `buf` shape (N, L_seq, n_layers, d). Returns batches shaped
+    `(B, T, n_layers, d)` with a random T-window per sample.
+    """
+    N, L_seq, n_layers, d = buf.shape
+    assert L_seq >= T, f"need L_seq>={T}; got {L_seq}"
+    n_wins = L_seq - T + 1
+
+    def gen(batch_size: int) -> torch.Tensor:
+        seq = torch.randint(0, N, (batch_size,), device=buf.device)
+        off = torch.randint(0, n_wins, (batch_size,), device=buf.device)
+        rng = torch.arange(T, device=buf.device)
+        pos = off.unsqueeze(1) + rng.unsqueeze(0)  # (B, T)
+        # buf[seq[:, None], pos, :, :] via broadcast fancy indexing
+        return buf[seq[:, None], pos, :, :].float()  # (B, T, n_layers, d)
+    return gen
+
+
+def train_mlc_temporal(cfg, device, k, T, d_sae=DEFAULT_D_SAE, buf=None):
+    """A4: MLC with shared-across-time encoder + per-(t, l) decoder."""
+    from src.architectures.mlc_temporal import MLCTemporal
+    buf = buf if buf is not None else _preload_multilayer(device)
+    d_in = buf.shape[-1]
+    n_layers = buf.shape[2]
+    k_eff = k * T   # match TXCDR budget scaling: per-token-budget × T
+    model = MLCTemporal(d_in, d_sae, T, n_layers, k_eff).to(device)
+    gen = make_window_multilayer_gen_gpu(buf, T)
+
+    def norm(): model._normalize_decoder()
+    log = _iterate_train(model, gen, cfg, device, normalize_decoder=norm)
+    return model, log
+
+
+def train_txcdr_basis(cfg, device, k, T, K_basis=3,
+                      d_sae=DEFAULT_D_SAE, buf=None):
+    """A5: TXCDR with basis-expansion decoder (K_basis shared W_base matrices)."""
+    from src.architectures.txcdr_basis import TXCDRBasisExpansion
+    buf = buf if buf is not None else _preload_single(ANCHOR_LAYER_KEY, device)
+    k_eff = k * T
+    model = TXCDRBasisExpansion(buf.shape[-1], d_sae, T, k_eff,
+                                 K_basis=K_basis).to(device)
+    gen = make_window_gen_gpu(buf, T)
+
+    def norm(): model._normalize_decoder()
+    log = _iterate_train(model, gen, cfg, device, normalize_decoder=norm)
+    return model, log
+
+
 def train_txcdr_rotational(cfg, device, k, T, K_rank=8,
                            d_sae=DEFAULT_D_SAE, buf=None):
     """TXCDR with rotational (Lie-group) decoder, A1 from autoresearch plan."""
@@ -737,6 +814,26 @@ def run_all(seeds, max_steps, archs=None):
                 meta = dict(seed=seed, k_pos=100, k_win=500, T=5,
                             match_budget=True, layer=13, K_rank=8,
                             variant="rotational")
+            elif arch == "matryoshka_txcdr_contrastive_t5":
+                model, log = train_matryoshka_txcdr_contrastive(
+                    cfg, device, k=100, T=5, alpha=0.1, buf=get_anchor(),
+                )
+                meta = dict(seed=seed, k_pos=100, k_win=500, T=5,
+                            match_budget=True, layer=13, alpha=0.1,
+                            variant="matryoshka_contrastive")
+            elif arch == "mlc_temporal_t3":
+                model, log = train_mlc_temporal(
+                    cfg, device, k=100, T=3, buf=get_ml(),
+                )
+                meta = dict(seed=seed, k_pos=100, k_win=300, T=3,
+                            layers="L11-L15", variant="mlc_temporal")
+            elif arch == "txcdr_basis_expansion_t5":
+                model, log = train_txcdr_basis(
+                    cfg, device, k=100, T=5, K_basis=3, buf=get_anchor(),
+                )
+                meta = dict(seed=seed, k_pos=100, k_win=500, T=5,
+                            match_budget=True, layer=13, K_basis=3,
+                            variant="basis_expansion")
             elif arch == "txcdr_t20":
                 model, log = train_txcdr(cfg, device, k=100, T=20, buf=get_anchor())
                 meta = dict(seed=seed, k_pos=100, k_win=2000, T=20,

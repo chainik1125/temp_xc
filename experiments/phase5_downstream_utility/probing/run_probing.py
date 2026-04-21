@@ -353,6 +353,26 @@ def _load_model_for_run(run_id, ckpt_path, device):
         model = TXCDRRotational(
             d_in, d_sae, T, k_eff, K_rank=meta.get("K_rank", 8),
         ).to(device)
+    elif arch == "matryoshka_txcdr_contrastive_t5":
+        from src.architectures.matryoshka_txcdr_contrastive import (
+            MatryoshkaTXCDRContrastive,
+        )
+        T = meta["T"]
+        k_eff = meta["k_win"] or (meta["k_pos"] * T)
+        model = MatryoshkaTXCDRContrastive(d_in, d_sae, T, k_eff).to(device)
+    elif arch == "mlc_temporal_t3":
+        from src.architectures.mlc_temporal import MLCTemporal
+        T = meta["T"]
+        L = meta.get("n_layers", 5)
+        k_eff = meta["k_win"] or (meta["k_pos"] * T)
+        model = MLCTemporal(d_in, d_sae, T, L, k_eff).to(device)
+    elif arch == "txcdr_basis_expansion_t5":
+        from src.architectures.txcdr_basis import TXCDRBasisExpansion
+        T = meta["T"]
+        k_eff = meta["k_win"] or (meta["k_pos"] * T)
+        model = TXCDRBasisExpansion(
+            d_in, d_sae, T, k_eff, K_basis=meta.get("K_basis", 3),
+        ).to(device)
     elif arch.startswith("stacked_t"):
         T = meta["T"]
         model = StackedSAE(d_in, d_sae, T, k=meta["k_pos"]).to(device)
@@ -473,15 +493,57 @@ def _encode_for_probe(
         # full_window:   use mlc_tail (N, TAIL=20, L, d) if available.
         return _encode_mlc(model, mlc, device, aggregation, mlc_tail=mlc_tail)
     if (arch.startswith("txcdr_t")
-            or arch in ("txcdr_contrastive_t5", "txcdr_rotational_t5")):
+            or arch in ("txcdr_contrastive_t5", "txcdr_rotational_t5",
+                        "txcdr_basis_expansion_t5")):
         T = meta["T"]
         return _encode_txcdr(model, anchor, li, T, device, aggregation)
     if arch.startswith("stacked_t"):
         T = meta["T"]
         return _encode_stacked_last(model, anchor, li, T, device, aggregation)
-    if arch == "matryoshka_t5":
+    if arch in ("matryoshka_t5", "matryoshka_txcdr_contrastive_t5"):
         T = meta["T"]
         return _encode_matryoshka(model, anchor, li, T, device, aggregation)
+    if arch == "mlc_temporal_t3":
+        # Input shape (B, T, L, d_in). Use mlc_tail cache which is
+        # (N, TAIL_MLC_N, L, d). For last_position take the last T positions;
+        # for mean_pool slide a T-window across the tail.
+        T = meta["T"]
+        L = meta.get("n_layers", 5)
+        center_l = L // 2  # unused but kept for symmetry
+        mlc_tail_key = "mlc_tail_train" if split == "train" else "mlc_tail_test"
+        if mlc_tail_key not in tc:
+            raise ValueError(
+                f"mlc_temporal_t3 requires mlc_tail cache; not found for {split}"
+            )
+        mlc_tail = tc[mlc_tail_key]  # (N, TAIL, L, d)
+        N, TAIL, _, d = mlc_tail.shape
+        if aggregation == "last_position":
+            X_win = mlc_tail[:, -T:, :, :].astype(np.float32)  # (N, T, L, d)
+            outs = []
+            for i in range(0, N, 256):
+                Xb = torch.from_numpy(X_win[i:i + 256]).to(device)
+                with torch.no_grad():
+                    zb = model.encode(Xb)  # (B, d_sae)
+                outs.append(zb.cpu().numpy())
+            return np.concatenate(outs, axis=0)
+        # full_window / mean_pool: slide T-window across TAIL.
+        K = TAIL - T + 1
+        if K <= 0:
+            raise ValueError(
+                f"mlc_temporal_t3 needs TAIL >= T; TAIL={TAIL}, T={T}"
+            )
+        d_sae_eff = int(meta.get("d_sae", 18_432))
+        z_out = np.empty((N, K, d_sae_eff), dtype=np.float32)
+        for k in range(K):
+            win_k = mlc_tail[:, k:k + T, :, :]  # (N, T, L, d)
+            for i in range(0, N, 256):
+                Xb = torch.from_numpy(
+                    win_k[i:i + 256].astype(np.float32)
+                ).to(device)
+                with torch.no_grad():
+                    zb = model.encode(Xb)  # (B, d_sae)
+                z_out[i:i + Xb.shape[0], k, :] = zb.cpu().numpy()
+        return z_out.reshape(N, K * d_sae_eff)
     if arch == "shared_perpos_t5":
         # Kept for forward-compat; we do not train this arch in 5.1.
         X = _last_token(anchor, li)
@@ -738,6 +800,18 @@ def run_probing(
                 print(f"  {run_id}: load FAIL: {e}")
                 continue
             mlc_tail_aggs = ("full_window", "mean_pool", "mean_pool_val")
+            # mlc_temporal_t3 always needs the multi-layer tail cache (even
+            # at last_position, since its input shape is (B, T, L, d)).
+            if arch == "mlc_temporal_t3" and aggregation in (
+                "last_position", "last_position_val",
+                *mlc_tail_aggs,
+            ):
+                sample_tail = task_dirs[0] / "acts_mlc_tail.npz"
+                if not sample_tail.exists():
+                    print(f"  {run_id}: acts_mlc_tail.npz absent — run build_probe_cache.py first, skip")
+                    del model
+                    torch.cuda.empty_cache()
+                    continue
             if (arch in ("mlc", "mlc_contrastive", "time_layer_crosscoder_t5")
                     and aggregation in mlc_tail_aggs):
                 # Both archs need the tail × multi-layer cache
