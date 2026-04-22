@@ -251,8 +251,40 @@ results of the prior cycle.
   already near-optimal because scale-1 needs to dominate, γ=1.0 should
   regress.
 **Change**: same arch `MatryoshkaTXCDRContrastiveMultiscale`,
-  n_contr_scales=3, **γ=1.0** (vs 0.5 in cycle 02). New dispatcher
-  `agentic_txc_03`; probe routing; BASE_OF entry.
+  n_contr_scales=3, **γ=1.0** (vs 0.5 in cycle 02).
+**Code**: commit `d01765d`.
+**Result**: Δ_val = **+0.0072 ±0.0124** (t=+0.58, n=36, 18/2/16) vs
+  `matryoshka_t5`. A major **regression** from cycle 02 (+0.0354).
+**Verdict**: **LOST vs cycle-02 reference**. Ambiguous vs vanilla.
+**Takeaway**: **The decay matters, not just the multi-scale-ness**.
+  Setting γ=1.0 (equal weight on scales 1, 2, 3) disrupts what γ=0.5
+  achieved. Scale-1 needs to remain the *dominant* contrastive signal;
+  scales 2, 3 benefit from some gradient but full-weight pressure forces
+  those latents to be shift-invariant, which conflicts with their role
+  of capturing window-level structure that's NOT translation-invariant.
+  The cycle 02 sweet spot comes from the combination: strong scale-1
+  shift-invariance + gentle scale-2, 3 smoothing. Remember going forward:
+  the discovery is in the *weight schedule*, not just the multi-scale
+  architecture.
+**Next**: Cycle 04 extends cycle 02's successful γ=0.5 decay to ALL
+  5 scales (n_contr_scales=5). Adds 0.125 at scale-4, 0.0625 at scale-5.
+  Tests whether truncation at 3 was right or if tail scales contribute
+  more useful signal under the right decay.
+
+---
+
+### Cycle 04 — multi-scale, γ=0.5, all 5 scales
+**Family**: TXC
+**Reference to beat**: `agentic_txc_02` at Δ_val = +0.0354.
+**Hypothesis**: Cycle 02 established γ=0.5 is the right decay; cycle 03
+  showed going up to γ=1.0 hurts. Cycle 04 extends the γ=0.5 schedule
+  to all T=5 scales. With γ=0.5, scale-4 contributes weight 0.125 and
+  scale-5 weight 0.0625 — small but potentially useful. Prediction:
+  modest improvement if the tail scales benefit from the same gentle
+  signal; no change if the gradient is too small to matter at these
+  weights; regression if full-window contrastive at any weight hurts.
+**Change**: `MatryoshkaTXCDRContrastiveMultiscale` with
+  **n_contr_scales=5**, γ=0.5. Everything else identical to cycle 02.
 **Code**: commit forthcoming.
 **Result**: pending.
 **Verdict**: pending.
