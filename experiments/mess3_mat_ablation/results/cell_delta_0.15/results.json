@@ -1,0 +1,174 @@
+{
+  "sweep_parameter": "delta",
+  "sweep_value": 0.15,
+  "generator_params": [
+    [
+      "component_type",
+      "process_name",
+      "process_params"
+    ],
+    [
+      "component_type",
+      "process_name",
+      "process_params"
+    ],
+    [
+      "component_type",
+      "process_name",
+      "process_params"
+    ]
+  ],
+  "transformer": {
+    "final_loss": 1.0690324306488037,
+    "was_loaded": false,
+    "eval_resid_l2_mean": 14.870331764221191,
+    "config": {
+      "n_layers": 3,
+      "d_model": 64,
+      "n_heads": 2,
+      "d_head": 32,
+      "d_mlp": 256,
+      "n_ctx": 128,
+      "act_fn": "gelu",
+      "normalization_type": "LN",
+      "attention_dir": "causal",
+      "default_prepend_bos": false,
+      "init_mode": "gpt2",
+      "initializer_range": 0.001,
+      "probe_layer": 1,
+      "probe_hook_name": "blocks.1.hook_resid_post",
+      "extract_batch_size": 16,
+      "load_if_exists": true,
+      "training": {
+        "steps": 20000,
+        "batch_size": 128,
+        "lr": 0.001,
+        "data_chunks": 4,
+        "data_chunk_size": 5000
+      }
+    }
+  },
+  "dense_linear": {
+    "per_component_r2": [
+      0.30423325261197876,
+      0.0760597300395418,
+      0.07449191173203162
+    ],
+    "mean_r2": 0.1515949647945174
+  },
+  "dense_mlp": null,
+  "architectures": {
+    "TopK SAE": {
+      "best_single_r2": 0.05352912863680137,
+      "per_component_best_r2": [
+        0.05352912863680137,
+        0.01163699669128515,
+        0.013739949533849494
+      ],
+      "linear_mean_r2": 0.12778716088737196,
+      "linear_per_component_r2": [
+        0.25502480169211916,
+        0.05765332944220425,
+        0.07068335152779248
+      ],
+      "sae_final_loss": 61.07085418701172,
+      "family": "topk",
+      "config": {
+        "dict_size": 64,
+        "k": 4,
+        "sae_steps": 2000,
+        "n_sequences": 1000,
+        "seq_len": 128
+      }
+    },
+    "TXC": {
+      "best_single_r2": 0.15819104228256342,
+      "per_component_best_r2": [
+        0.15819104228256342,
+        0.04769593809401429,
+        0.034731675096393744
+      ],
+      "linear_mean_r2": 0.3208142714337377,
+      "linear_per_component_r2": [
+        0.625623160555375,
+        0.14280055034009487,
+        0.19401910340574313
+      ],
+      "sae_final_loss": 104.27593994140625,
+      "family": "txc",
+      "config": {
+        "dict_size": 64,
+        "k": 1,
+        "window_size": 30,
+        "temporal_steps": 3000,
+        "n_sequences": 1000,
+        "seq_len": 128
+      }
+    },
+    "MatryoshkaSAE (no-window)": {
+      "best_single_r2": 0.03997740286782625,
+      "per_component_best_r2": [
+        0.03997740286782625,
+        -0.009724985507407968,
+        -0.00957655280741232
+      ],
+      "linear_mean_r2": 0.04163855646257116,
+      "linear_per_component_r2": [
+        0.10993200107969292,
+        0.0013826488470723985,
+        0.01360101946094816
+      ],
+      "sae_final_loss": 141.2259521484375,
+      "family": "matsae",
+      "config": {
+        "dict_size": 128,
+        "matryoshka_widths": [
+          8,
+          16,
+          32,
+          64,
+          128
+        ],
+        "k": 1,
+        "inner_weight": 10.0,
+        "sae_steps": 1500,
+        "n_sequences": 400,
+        "seq_len": 128
+      }
+    },
+    "MatryoshkaTXC": {
+      "best_single_r2": 0.1511536963410287,
+      "per_component_best_r2": [
+        0.1511536963410287,
+        0.02266446815037204,
+        0.02593066790443188
+      ],
+      "linear_mean_r2": 0.3075235642511469,
+      "linear_per_component_r2": [
+        0.6369402398519289,
+        0.12183222308420705,
+        0.16379822981730474
+      ],
+      "sae_final_loss": 146.576171875,
+      "family": "mattxc",
+      "config": {
+        "dict_size": 128,
+        "matryoshka_widths": [
+          8,
+          16,
+          32,
+          64,
+          128
+        ],
+        "k": 1,
+        "fixed_k_total": 10,
+        "inner_weight": 10.0,
+        "window_size": 60,
+        "temporal_steps": 1500,
+        "n_sequences": 400,
+        "seq_len": 128
+      }
+    }
+  },
+  "cell_elapsed_sec": 677.3428781032562
+}

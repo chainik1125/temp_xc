@@ -1,0 +1,39 @@
+{
+  "seed": 42,
+  "sweep_value": 0.0,
+  "generator": {
+    "type": "mess3_shared",
+    "sweep_parameter": "delta",
+    "fixed_params": {
+      "base_x": 0.25,
+      "base_a": 0.6,
+      "parameterization": "symmetric_line"
+    }
+  },
+  "transformer": {
+    "n_layers": 3,
+    "d_model": 64,
+    "n_heads": 2,
+    "d_head": 32,
+    "d_mlp": 256,
+    "n_ctx": 128,
+    "act_fn": "gelu",
+    "normalization_type": "LN",
+    "attention_dir": "causal",
+    "default_prepend_bos": false,
+    "init_mode": "gpt2",
+    "initializer_range": 0.001,
+    "probe_layer": 1,
+    "probe_hook_name": "blocks.1.hook_resid_post",
+    "extract_batch_size": 16,
+    "load_if_exists": true,
+    "training": {
+      "steps": 20000,
+      "batch_size": 128,
+      "lr": 0.001,
+      "data_chunks": 4,
+      "data_chunk_size": 5000
+    }
+  },
+  "final_loss": 1.090467095375061
+}
