@@ -229,19 +229,165 @@ Create Phase 6 artifacts under:
 Per the [CLAUDE.md](../../../../CLAUDE.md) phase convention. Shortname
 `phase6_qualitative_latents` is used in both paths.
 
+### Storage sizing (for pod config)
+
+Approximate disk footprint for Phase 6, based on Phase 5.7 numbers:
+
+| item | size |
+|---|---|
+| `.venv` + git repo + code | ~15 GB |
+| HF cache (Gemma-2-2b-IT model) | ~6 GB |
+| Pre-trained ckpts from HF: `agentic_txc_02` 1.3 GB + `agentic_mlc_08` 0.8 GB + `tfa_big` ~1.3 GB | ~3.4 GB |
+| `tsae_ours` ckpt trained locally | ~1.3 GB |
+| Activation cache (required if training `tsae_ours` / `tfa_big` locally) | 17 GB |
+| Phase 6 z-caches (4 archs × 3 concat-sets × fp32) | ~1 GB |
+| Autointerp contexts + labels | ~2 GB |
+
+**Tiered pod sizing**:
+
+- **~30 GB**: inference-only, all ckpts pre-trained elsewhere. Unusual.
+- **~50 GB**: realistic — train `tsae_ours` locally, includes activation
+  cache. Most likely path.
+- **80 GB**: comfortable buffer for logs + autointerp API caches +
+  intermediate UMAP tensors. **Recommended default.**
+- **150 GB**: if you also want `probe_cache` for the stretch-goal
+  HH-RLHF alignment study (Appendix B.1 mirror), add 66 GB.
+- **170 GB**: full Phase 5.7 + 6 cold reproduction with everything
+  downloaded from HF.
+
+### Hugging Face: access check, backup convention, Phase 6 uploads
+
+The project uses two HF repos as the canonical backup for anything
+gitignored (ckpts, probe-caches, large activation buffers). The
+canonical doc is [`docs/huggingface-artifacts.md`](../../../huggingface-artifacts.md) —
+read it first if you haven't set up HF before. Phase-6-specific notes
+follow.
+
+**Verify HF access (do this first before any HF work)**:
+
+```bash
+# 1. Confirm the token file exists. Write-scoped token lives here.
+ls -la /workspace/hf_cache/token
+cat /workspace/hf_cache/token   # single line, starts with 'hf_'
+
+# 2. Probe read access on the model repo (no auth needed for public repos)
+.venv/bin/python -c "
+from huggingface_hub import HfApi
+api = HfApi()
+print('model repo commits:', [c.commit_id[:8] for c in api.list_repo_commits('han1823123123/txcdr')][:3])
+print('dataset repo commits:', [c.commit_id[:8] for c in api.list_repo_commits('han1823123123/txcdr-data', repo_type='dataset')][:3])
+"
+
+# 3. Probe write access (uploads a 1-byte canary then deletes it)
+HF_HOME=/workspace/hf_cache .venv/bin/python -c "
+import os, tempfile
+from huggingface_hub import HfApi
+api = HfApi(token=open('/workspace/hf_cache/token').read().strip())
+with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as f:
+    f.write('phase6-write-probe'); p = f.name
+try:
+    r = api.upload_file(path_or_fileobj=p, path_in_repo='.phase6_write_probe.txt',
+                        repo_id='han1823123123/txcdr', commit_message='phase6 write probe')
+    print('WRITE OK:', r.commit_url)
+    api.delete_file('.phase6_write_probe.txt', 'han1823123123/txcdr',
+                    commit_message='remove phase6 write probe')
+    print('CLEANUP OK')
+except Exception as e:
+    print('WRITE FAILED:', e)
+finally:
+    os.unlink(p)
+"
+```
+
+If write access fails with 403, ask Han to regenerate a write-scoped
+token and update `/workspace/hf_cache/token`. The token is explicitly
+**separate** from the `HF_TOKEN` environment variable — use the
+file path, not the env var.
+
+**Backup convention** (same as Phase 5.7, from `docs/huggingface-artifacts.md`):
+
+- **Two repos**, purpose-separated:
+  - `han1823123123/txcdr` (model repo) → all `.pt` ckpts, mirroring
+    `experiments/*/results/ckpts/<name>.pt` → `experiments/*/results/ckpts/<name>.pt`
+    in the HF repo. Exact mirror paths so a reproducer using
+    `huggingface-cli download --local-dir .` lands everything in place.
+  - `han1823123123/txcdr-data` (dataset repo) → activation buffers
+    and probing caches (gitignored large `.npz` files), same
+    mirror-path convention.
+- **Upload scripts** (always prefer these over ad-hoc `upload_folder`):
+  - `scripts/hf_upload_ckpts.py` — idempotent; `upload_folder` skips
+    unchanged files by hash.
+  - `scripts/hf_upload_data.py` — same, for dataset repo.
+- **Neither repo has a README** with research narrative — Han's
+  explicit instruction is to keep them empty-ish (license + github
+  link only). Don't push writeups there.
+
+**What Phase 6 should upload at end**:
+
+1. **New ckpts** to the model repo:
+   - `tsae_ours__seed42.pt` (the Ye et al. recipe port — new to Phase 6).
+   - `tfa_big__seed42.pt` + symlinks `tfa_big_full__seed42.pt` etc. (if
+     Phase 6 trains them ahead of Phase 5.7 handover (i) finishing).
+
+2. **New dataset-repo artefacts** (if you want reproducibility):
+   - `experiments/phase6_qualitative_latents/concat_corpora/` — the
+     concat-set A/B/C token IDs + provenance JSON.
+   - `experiments/phase6_qualitative_latents/z_cache/` — encoded
+     latents per arch per concat-set. These are expensive to
+     recompute and help reviewers reproduce the UMAPs fast.
+
+3. **Don't upload**:
+   - Autointerp labels / writeups / figures (those go to git via the
+     research log).
+   - Per-feature dump tensors if they're easy to recompute from ckpt
+     + concat corpora.
+
+**Running the uploads at end of Phase 6**:
+
+```bash
+# Model repo — picks up the new tsae_ours ckpt + any tfa_big you trained
+HF_HOME=/workspace/hf_cache .venv/bin/python scripts/hf_upload_ckpts.py
+
+# Dataset repo — add Phase 6 corpora + z_caches BEFORE running this.
+# You may need to update the script to include the phase6 subdirs; check
+# before running. Current script uploads data/cached_activations +
+# probe_cache. Extend LOCAL_PATHS if Phase 6 adds a new subtree.
+HF_HOME=/workspace/hf_cache .venv/bin/python scripts/hf_upload_data.py
+```
+
+If you extend `hf_upload_data.py`, commit that change to git — don't
+leave a fork-only helper.
+
+**Downloading for a cold reproduction** (useful reference for your
+writeup's "reproduction" section):
+
+```bash
+# Full model + data mirror in one shot
+cd /workspace/temp_xc   # repo root — mirror paths land things correctly
+HF_HOME=/workspace/hf_cache \
+  huggingface-cli download han1823123123/txcdr --local-dir .
+HF_HOME=/workspace/hf_cache \
+  huggingface-cli download --repo-type dataset han1823123123/txcdr-data --local-dir .
+```
+
+This restores ckpts + probe_cache in one pass, matching local paths.
+
 ### Resume checklist (first 15 min)
 
 1. `git log --oneline | head -5` — confirm at `8a72a62` or later.
 2. Read this brief and `papers/temporal_sae.md` (~30 min).
 3. Glance at `references/TemporalFeatureAnalysis/sae/saeTemporal.py`
    (~15 min) — confirm you understand the TSAE loss.
-4. `ls experiments/phase5_downstream_utility/results/ckpts/` — confirm
+4. **Run the HF access check** at the top of the previous section.
+   If write access fails, escalate before doing any other work.
+5. `ls experiments/phase5_downstream_utility/results/ckpts/` — confirm
    `agentic_txc_02`, `agentic_mlc_08`, `tfa_big` (if trained) exist.
-5. Check the Phase 5.7 handover progress:
+   If not, download from HF per the cold-reproduction command above.
+6. Check the Phase 5.7 handover progress:
    `cat docs/han/research_logs/phase5_downstream_utility/2026-04-22-handover-batchtopk-tsweep.md | head -80`.
-6. If `tfa_big` not done yet, decide: (a) wait or (b) train it here
+7. If `tfa_big` not done yet, decide: (a) wait or (b) train it here
    yourself (30-90 min).
-7. Start by porting the TSAE recipe as the lowest-risk step.
+8. Start by porting the TSAE recipe as the lowest-risk step.
 
 ### What success looks like
 
