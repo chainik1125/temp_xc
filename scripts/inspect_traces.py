@@ -82,6 +82,14 @@ def main(path: Path) -> int:
     print(f"    literal underscore '_':      {fr.count('_')}")
     print(f"    SP marker U+2581 '▁':        {fr.count(chr(0x2581))}")
     print(f"  whitespace-split token count:  {len(fr.split())}")
+    # Dump the histogram of every unique character in the first 300 chars,
+    # so we can tell what the mystery "separator" actually is.
+    sample = fr[:300]
+    from collections import Counter
+    char_hist = Counter(sample)
+    print(f"  unique-char histogram (first 300 chars), top 15 by count:")
+    for ch, cnt in char_hist.most_common(15):
+        print(f"    U+{ord(ch):04X} ({ch!r:>8}): {cnt}")
     print()
 
     # ── thinking_process diagnostics ───────────────────────────────
