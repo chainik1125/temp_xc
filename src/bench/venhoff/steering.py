@@ -181,9 +181,35 @@ def train_one_vector(
     env = {**os.environ, "PYTHONPATH": str(venhoff_root.absolute())}
     if gpu_id is not None:
         env["CUDA_VISIBLE_DEVICES"] = str(gpu_id)
-    result = subprocess.run(cmd, cwd=_venhoff_script_dir(venhoff_root), env=env, check=False)
+
+    # Capture subprocess stdout+stderr to a per-vector log. Parallel workers'
+    # output in the parent tmux is otherwise interleaved and a failure is
+    # opaque. Tee to both the log file and the parent (so existing tmux view
+    # stays informative for the happy path) via a pipe + `tee`.
+    per_vec_log = paths.run_dir / "steering" / f"vector_{cluster_idx}_{cfg.base_model.split('/')[-1]}.log"
+    per_vec_log.parent.mkdir(parents=True, exist_ok=True)
+    with per_vec_log.open("w") as lf:
+        result = subprocess.run(
+            cmd,
+            cwd=_venhoff_script_dir(venhoff_root),
+            env=env,
+            check=False,
+            stdout=lf,
+            stderr=subprocess.STDOUT,
+        )
     if result.returncode != 0:
-        raise RuntimeError(f"optimize_steering_vectors.py failed for cluster_idx={cluster_idx} (rc={result.returncode})")
+        # Surface the last ~30 lines of the per-vector log so the parent
+        # exception message is actionable without going hunting.
+        tail_lines: list[str] = []
+        try:
+            tail_lines = per_vec_log.read_text().splitlines()[-30:]
+        except Exception:
+            pass
+        tail_str = "\n    ".join(tail_lines) if tail_lines else "(no log captured)"
+        raise RuntimeError(
+            f"optimize_steering_vectors.py failed for cluster_idx={cluster_idx} "
+            f"(rc={result.returncode}). Tail of {per_vec_log}:\n    {tail_str}"
+        )
 
     if not expected_out.exists():
         raise FileNotFoundError(f"expected steering vector not produced at {expected_out}")
