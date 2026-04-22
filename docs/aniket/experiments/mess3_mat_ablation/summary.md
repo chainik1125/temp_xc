@@ -233,13 +233,6 @@ Concretely, honest framing for the paper draft:
   $\text{sae\_steps} \geq 3000$, that should be stated explicitly
   (and compared to other archs at the same budget).
 
-Suggested message to Dmitry: "H1 confirmed on summed R² (MatSAE ≈
-TopK, MatTXC ≈ TXC at δ=0.20 — window does the work). **Diversity
-metric surprised me though** — at `sae_steps=1500, n_sequences=400`,
-every arch collapses to diversity=1 at δ=0.20 (argmax IDs and fig
-attached). Does your published MatTXC diversity=3 require more
-training than our budget? Happy to re-run at your original settings if
-we want to anchor that claim in the paper."
 
 ## 9. Reproducing this result
 
