@@ -52,17 +52,25 @@ HYBRID_JUDGE_PATCHES = [
 ]
 
 
-# Phase 2 patch: newer transformers (≥4.45 or so) rejects the bare
-# `load_in_8bit=` kwarg on AutoModelForCausalLM.from_pretrained, even
-# when False. Drop the kwarg since we run in bf16 (fits in 80GB H100
-# comfortably for Llama-8B + DeepSeek-R1-Distill-Llama-8B). If we ever
-# need 8-bit, the modern path is quantization_config=BitsAndBytesConfig(...).
+# Phase 2 patches for modern transformers compat:
+#   - drop deprecated `load_in_8bit=` kwarg (use bf16 instead; Llama-8B
+#     fits in 80GB H100).
+#   - replace `tokenizer.encode_plus(..., return_offsets_mapping=True)`
+#     with `tokenizer(..., return_offsets_mapping=True)` — encode_plus
+#     was removed in recent transformers and only fast tokenizers
+#     support offset mappings anyway.
 STEERING_8BIT_PATCHES = [
     Patch(
         file_rel="train-vectors/optimize_steering_vectors.py",
         find="        load_in_8bit=args.load_in_8bit,\n",
         replace="",
         description="drop deprecated load_in_8bit= kwarg from AutoModelForCausalLM load",
+    ),
+    Patch(
+        file_rel="utils/utils.py",
+        find="    token_offsets = tokenizer.encode_plus(text, return_offsets_mapping=True)['offset_mapping']",
+        replace="    token_offsets = tokenizer(text, return_offsets_mapping=True)['offset_mapping']",
+        description="swap tokenizer.encode_plus(...) → tokenizer(...) (encode_plus dropped in new transformers)",
     ),
 ]
 
