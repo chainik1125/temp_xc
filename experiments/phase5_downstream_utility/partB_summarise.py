@@ -54,7 +54,17 @@ FAMILIES = {
             ("matryoshka_txcdr_contrastive_t5_alpha003", "α=0.03, k=500", 0.03, 500),
             ("matryoshka_txcdr_contrastive_t5", "α=0.10, k=500 (ref)", 0.10, 500),
             ("matryoshka_txcdr_contrastive_t5_alpha100", "α=1.00, k=500", 1.00, 500),
+            ("matryoshka_txcdr_contrastive_t5_alpha300", "α=3.00, k=500", 3.00, 500),
             ("matryoshka_txcdr_contrastive_t5_k2x", "α=0.10, k=1000", 0.10, 1000),
+        ],
+    },
+    "MLC": {
+        "vanilla_base": "mlc",
+        "ref": "mlc_contrastive",
+        "variants": [
+            ("mlc_contrastive_alpha003", "α=0.03", 0.03, None),
+            ("mlc_contrastive", "α=0.10 (ref)", 0.10, None),
+            ("mlc_contrastive_alpha100", "α=1.00", 1.00, None),
         ],
     },
 }

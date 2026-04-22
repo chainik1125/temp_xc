@@ -328,7 +328,9 @@ def _load_model_for_run(run_id, ckpt_path, device):
         model = TopKSAE(d_in, d_sae, k=meta["k_pos"]).to(device)
     elif arch == "mlc":
         model = MultiLayerCrosscoder(d_in, d_sae, n_layers=5, k=meta["k_pos"]).to(device)
-    elif arch == "mlc_contrastive":
+    elif arch in ("mlc_contrastive",
+                  "mlc_contrastive_alpha003",
+                  "mlc_contrastive_alpha100"):
         from src.architectures.mlc_contrastive import MLCContrastive
         model = MLCContrastive(
             d_in, d_sae, n_layers=5,
@@ -359,6 +361,8 @@ def _load_model_for_run(run_id, ckpt_path, device):
     elif arch in ("matryoshka_txcdr_contrastive_t5",
                   "matryoshka_txcdr_contrastive_t5_alpha003",
                   "matryoshka_txcdr_contrastive_t5_alpha100",
+                  "matryoshka_txcdr_contrastive_t5_alpha300",
+                  "matryoshka_txcdr_contrastive_t5_alpha1000",
                   "matryoshka_txcdr_contrastive_t5_k2x"):
         from src.architectures.matryoshka_txcdr_contrastive import (
             MatryoshkaTXCDRContrastive,
@@ -366,6 +370,15 @@ def _load_model_for_run(run_id, ckpt_path, device):
         T = meta["T"]
         k_eff = meta["k_win"] or (meta["k_pos"] * T)
         model = MatryoshkaTXCDRContrastive(d_in, d_sae, T, k_eff).to(device)
+    elif arch == "agentic_txc_01":
+        from src.architectures.matryoshka_txcdr_contrastive_orth import (
+            MatryoshkaTXCDRContrastiveOrth,
+        )
+        T = meta["T"]
+        k_eff = meta["k_win"] or (meta["k_pos"] * T)
+        model = MatryoshkaTXCDRContrastiveOrth(
+            d_in, d_sae, T, k_eff, lam_orth=meta.get("lam_orth", 0.01),
+        ).to(device)
     elif arch == "mlc_temporal_t3":
         from src.architectures.mlc_temporal import MLCTemporal
         T = meta["T"]
@@ -508,7 +521,9 @@ def _encode_for_probe(
 
     if arch == "topk_sae":
         return _encode_topk(model, anchor, li, device, aggregation)
-    if arch in ("mlc", "mlc_contrastive"):
+    if arch in ("mlc", "mlc_contrastive",
+                "mlc_contrastive_alpha003",
+                "mlc_contrastive_alpha100"):
         # mlc_contrastive has identical encode API — subclass of MLC.
         # last_position: use mlc (N, L, d) at last real token.
         # full_window:   use mlc_tail (N, TAIL=20, L, d) if available.
@@ -555,7 +570,10 @@ def _encode_for_probe(
     if arch in ("matryoshka_t5", "matryoshka_txcdr_contrastive_t5",
                 "matryoshka_txcdr_contrastive_t5_alpha003",
                 "matryoshka_txcdr_contrastive_t5_alpha100",
-                "matryoshka_txcdr_contrastive_t5_k2x"):
+                "matryoshka_txcdr_contrastive_t5_alpha300",
+                "matryoshka_txcdr_contrastive_t5_alpha1000",
+                "matryoshka_txcdr_contrastive_t5_k2x",
+                "agentic_txc_01"):
         T = meta["T"]
         return _encode_matryoshka(model, anchor, li, T, device, aggregation)
     if arch == "mlc_temporal_t3":
@@ -868,6 +886,8 @@ def run_probing(
                     torch.cuda.empty_cache()
                     continue
             if (arch in ("mlc", "mlc_contrastive",
+                         "mlc_contrastive_alpha003",
+                         "mlc_contrastive_alpha100",
                          "time_layer_crosscoder_t5",
                          "time_layer_contrastive_t5")
                     and aggregation in mlc_tail_aggs):

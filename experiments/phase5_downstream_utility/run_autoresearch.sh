@@ -53,7 +53,17 @@ BASE_OF[txcdr_contrastive_t5_alpha100]=txcdr_t5
 BASE_OF[txcdr_contrastive_t5_k2x]=txcdr_t5
 BASE_OF[matryoshka_txcdr_contrastive_t5_alpha003]=matryoshka_t5
 BASE_OF[matryoshka_txcdr_contrastive_t5_alpha100]=matryoshka_t5
+BASE_OF[matryoshka_txcdr_contrastive_t5_alpha300]=matryoshka_t5
+BASE_OF[matryoshka_txcdr_contrastive_t5_alpha1000]=matryoshka_t5
 BASE_OF[matryoshka_txcdr_contrastive_t5_k2x]=matryoshka_t5
+# MLC-family α sweep — tune the strongest non-TXCDR baseline so the
+# bench comparison is apples-to-apples on α too.
+BASE_OF[mlc_contrastive_alpha003]=mlc
+BASE_OF[mlc_contrastive_alpha100]=mlc
+# Agentic autoresearch cycles (Karpathy-style hypothesis-driven loop).
+# Each new cycle adds its own entry here. See
+# docs/han/research_logs/phase5_downstream_utility/2026-04-21-agentic-log.md
+BASE_OF[agentic_txc_01]=matryoshka_t5
 
 commit_and_push() {
     local msg="$1"; shift

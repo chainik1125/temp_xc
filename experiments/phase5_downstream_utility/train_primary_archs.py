@@ -497,6 +497,36 @@ def train_matryoshka_txcdr_contrastive(cfg, device, k, T, alpha=0.1,
     return model, log
 
 
+def train_matryoshka_txcdr_contrastive_orth(cfg, device, k, T, alpha=1.0,
+                                             lam_orth=0.01,
+                                             d_sae=DEFAULT_D_SAE, buf=None):
+    """Agentic cycle 01: A3 + scale-1 orthogonality penalty."""
+    from src.architectures.matryoshka_txcdr_contrastive_orth import (
+        MatryoshkaTXCDRContrastiveOrth,
+    )
+    buf = buf if buf is not None else _preload_single(ANCHOR_LAYER_KEY, device)
+    k_eff = k * T
+    model = MatryoshkaTXCDRContrastiveOrth(
+        buf.shape[-1], d_sae, T, k_eff, lam_orth=lam_orth,
+    ).to(device)
+    pair_gen = make_pair_window_gen_gpu(buf, T)
+
+    def gen(batch_size):
+        return pair_gen(batch_size)
+
+    def norm(): model._normalize_decoder()
+
+    orig_forward = model.forward
+
+    def forward_with_alpha(x):
+        return orig_forward(x, alpha=alpha)
+
+    model.forward = forward_with_alpha   # type: ignore[method-assign]
+    log = _iterate_train(model, gen, cfg, device, normalize_decoder=norm)
+    model.forward = orig_forward   # type: ignore[method-assign]
+    return model, log
+
+
 def make_window_multilayer_gen_gpu(buf: torch.Tensor, T: int):
     """Adjacent T-token windows across multilayer buffer.
 
@@ -945,14 +975,27 @@ def run_all(seeds, max_steps, archs=None):
                             h=DEFAULT_D_SAE // 2,
                             variant="txcdr_contrastive_alpha_sweep")
             elif arch in ("matryoshka_txcdr_contrastive_t5_alpha003",
-                          "matryoshka_txcdr_contrastive_t5_alpha100"):
-                alpha_val = 0.03 if arch.endswith("003") else 1.0
+                          "matryoshka_txcdr_contrastive_t5_alpha100",
+                          "matryoshka_txcdr_contrastive_t5_alpha300",
+                          "matryoshka_txcdr_contrastive_t5_alpha1000"):
+                alpha_map = {"003": 0.03, "100": 1.0, "300": 3.0, "1000": 10.0}
+                alpha_val = alpha_map[arch.rsplit("alpha", 1)[1]]
                 model, log = train_matryoshka_txcdr_contrastive(
                     cfg, device, k=100, T=5, alpha=alpha_val, buf=get_anchor(),
                 )
                 meta = dict(seed=seed, k_pos=100, k_win=500, T=5,
                             match_budget=True, layer=13, alpha=alpha_val,
                             variant="matryoshka_contrastive_alpha_sweep")
+            elif arch in ("mlc_contrastive_alpha003",
+                          "mlc_contrastive_alpha100"):
+                alpha_val = 0.03 if arch.endswith("003") else 1.0
+                model, log = train_mlc_contrastive(
+                    cfg, device, k=100, alpha=alpha_val, buf=get_ml(),
+                )
+                meta = dict(seed=seed, k_pos=100, k_win=None, T=1,
+                            layers="L11-L15", alpha=alpha_val,
+                            h=DEFAULT_D_SAE // 2,
+                            variant="mlc_contrastive_alpha_sweep")
             # ── Part B k=2× sparsity variants (B2 if time permits).
             elif arch == "txcdr_contrastive_t5_k2x":
                 model, log = train_txcdr_contrastive(
@@ -962,6 +1005,16 @@ def run_all(seeds, max_steps, archs=None):
                             match_budget=True, layer=13, alpha=0.1,
                             h=DEFAULT_D_SAE // 2,
                             variant="txcdr_contrastive_k2x")
+            elif arch == "agentic_txc_01":
+                # Agentic cycle 01: A3 α=1.0 + scale-1 orthogonality (λ=0.01).
+                model, log = train_matryoshka_txcdr_contrastive_orth(
+                    cfg, device, k=100, T=5, alpha=1.0, lam_orth=0.01,
+                    buf=get_anchor(),
+                )
+                meta = dict(seed=seed, k_pos=100, k_win=500, T=5,
+                            match_budget=True, layer=13, alpha=1.0,
+                            lam_orth=0.01,
+                            variant="agentic_txc_01_orth_scale1")
             elif arch == "matryoshka_txcdr_contrastive_t5_k2x":
                 model, log = train_matryoshka_txcdr_contrastive(
                     cfg, device, k=200, T=5, alpha=0.1, buf=get_anchor(),

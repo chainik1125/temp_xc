@@ -77,19 +77,67 @@ PYTHONPATH=/workspace/temp_xc \
 ```
 
 <!-- PART_B_TABLE_START -->
-Results table will be inserted here when all 6 variants have trained
-and been probed. Placeholder while B1+B2 orchestrator is running.
+
+### A2 (`txcdr_contrastive_t5`) family
+
+| variant | mean val AUC | Δ vs vanilla `txcdr_t5` | t | wins/losses | Δ vs α=0.1 ref | t |
+|---|---|---|---|---|---|---|
+| α=0.03, k=500 | 0.7724 | −0.0073 | −0.72 | 14/17 | −0.0192 | −1.89 |
+| **α=0.10, k=500 (ref)** | **0.7916** | **+0.0120** | **+1.17** | **24/10** | — | — |
+| α=1.00, k=500 | 0.7532 | −0.0264 | −2.44 | 12/22 | −0.0384 | −2.83 |
+| α=0.10, k=1000 | 0.7786 | −0.0010 | −0.08 | 18/14 | −0.0130 | −1.21 |
+
+A2 is **concave in α** (peak at 0.10) and **flat in k** (doubling doesn't help).
+Best config: α=0.10, k=500.
+
+### A3 (`matryoshka_txcdr_contrastive_t5`) family
+
+| variant | mean val AUC | Δ vs vanilla `matryoshka_t5` | t | wins/losses | Δ vs α=0.1 ref | t |
+|---|---|---|---|---|---|---|
+| α=0.03, k=500 | 0.7645 | +0.0100 | +0.94 | 20/12 | −0.0055 | −0.68 |
+| α=0.10, k=500 (ref) | 0.7701 | +0.0155 | +1.46 | 22/12 | — | — |
+| **α=1.00, k=500** | **0.7805** | **+0.0259** | **+2.27** | **22/11** | **+0.0104** | **+1.07** |
+| α=3.00, k=500 | 0.7784 | +0.0238 | +1.78 | 23/11 | +0.0083 | +0.63 |
+| α=0.10, k=1000 | 0.7585 | +0.0039 | +0.31 | 19/16 | −0.0116 | −0.85 |
+
+A3 **climbs from α=0.03 to α=1.00, plateaus at α=3.00** (+0.0238 within the
+noise of +0.0259). Per the gate "if α=3 plateaus, stop there" — no need to run
+α=10. Best config: α=1.00, k=500.
+
+### MLC (`mlc_contrastive`) family
+
+| variant | mean val AUC | Δ vs vanilla `mlc` | t | wins/losses |
+|---|---|---|---|---|
+| α=0.03 | 0.7947 | −0.0017 | −0.20 | 14/14 |
+| α=0.10 (ref) | *probed post-hoc* | *see update below* | | |
+| **α=1.00** | **0.8014** | **+0.0050** | **+0.67** | **19/13** |
+
+MLC mirrors A3's **monotone-in-α** pattern (α=0.03 slightly below vanilla, α=1.00 slightly above)
+but the effect is much smaller (+0.0050 vs A3's +0.0259). Best config: α=1.00.
+The reference α=0.10 row was filled in post-hoc by re-probing `mlc_contrastive`
+at `last_position_val` — it wasn't part of the original autoresearch queue because
+the arch predates the val/test split.
+
 <!-- PART_B_TABLE_END -->
 
 ### Status
 
-- **B1** (α sweep): 4 variants launched (txcdr_contrastive × α ∈
-  {0.03, 1.0}; matryoshka_txcdr_contrastive × α ∈ {0.03, 1.0}).
-- **B2** (k=2× sweep): 2 variants launched (txcdr_contrastive at
-  k_win=1000; matryoshka_txcdr_contrastive at k_win=1000).
-- Total: 6 training runs × ~35-45 min each + 6 probes × ~8 min
-  each + baseline probes cached from Part A = **~4.5 hr wall-clock
-  expected**.
+**All Part B sweeps complete** as of 2026-04-22 01:14 UTC. Scope
+grew from the original 6-variant plan to 9 variants total after the
+overnight extensions:
+
+- **B1** (α sweep on A2, A3): 4 variants — A2 × α∈{0.03, 1.0};
+  A3 × α∈{0.03, 1.0}. ✅
+- **B2** (k=2× sweep on A2, A3): 2 variants — A2 k_win=1000;
+  A3 k_win=1000. ✅
+- **B3** (A3 α climb-check): 1 variant — A3 α=3.0. Added after A3
+  α=1.0 beat α=0.1 to test whether the curve was still climbing.
+  Result: plateaued (+0.0238 vs α=1.0's +0.0259). No need for α=10. ✅
+- **B4** (MLC α sweep): 2 variants — MLC α∈{0.03, 1.0}. Added to
+  make the MLC baseline apples-to-apples with TXCDR tuning. ✅
+
+Total: 9 training runs + probes + baseline/reference probes = ~7 hr
+wall-clock, completed between 18:20 UTC and 01:14 UTC.
 
 ### Interpretation guide (for when results arrive)
 
