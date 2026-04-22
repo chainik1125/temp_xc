@@ -388,6 +388,66 @@ The per-task asymmetric-errors plot for the mlc-vs-txcdr_t5 axis
 (collaborator's explicit ask) lives at
 [`error_overlap_per_task_mlc_vs_txcdr_t5_k5_last_position.png`](../../../../experiments/phase5_downstream_utility/results/plots/error_overlap_per_task_mlc_vs_txcdr_t5_k5_last_position.png).
 
+#### Complementarity: TXC/MLC routing
+
+Concretises the "TXC and MLC are complementary" story from the
+error-overlap analysis, using only the two agentic winners
+(`agentic_txc_02` + `agentic_mlc_08`). Script:
+[`analysis/router.py`](../../../../experiments/phase5_downstream_utility/analysis/router.py).
+
+Four numbers per aggregation:
+
+| aggregation | best individual | oracle router | learned (LOO) | learned (6-fold) |
+|---|---|---|---|---|
+| last_position | **0.8047** (MLC) | 0.8155 | 0.7998 | 0.8009 |
+| mean_pool | **0.8007** (TXC) | 0.8134 | **0.8078** | **0.8060** |
+
+Procedure: for each task, assign the winner arch as the one with
+higher `test_auc` at `seed=42, k=5`. Features = dataset-source one-hot
+(7) + `bias_in_bios` set index (1) + train class-balance magnitude
+`|pos_frac − 0.5|` (1) + raw `pos_frac` (1) = **10 features** per task.
+Classifier = L2-regularised logistic regression (`C=1.0`).
+Leave-one-out (LOO) and 6-fold CV across the 36 tasks; effective AUC =
+mean over held-out tasks of `per_task_auc[predicted_arch]`.
+
+**Reading**:
+
+- **mean_pool**: the learned router **beats TXC-alone by +0.71 pp (LOO)
+  / +0.53 pp (6-fold)** and captures ~56 % of the +1.27 pp
+  oracle-router ceiling. LOO accuracy 77.8 % → the classifier does
+  learn a non-trivial partition from source features alone. Concrete
+  evidence that the two archs *together* outperform either alone when
+  task identity is observable.
+- **last_position**: MLC dominates 22/36 tasks (and 15/21 where
+  TXC+MLC are both above 0.8). The 14 residual TXC-wins don't
+  correlate cleanly with dataset-source features, so the learned
+  router regresses below MLC-alone (0.7998 vs 0.8047). Routing from
+  task metadata alone is not the right complementarity story at this
+  aggregation — the error-overlap analysis above captures it better.
+
+**Per-source win breakdown (mean_pool)**:
+
+| source | n | TXC wins | MLC wins |
+|---|---|---|---|
+| ag_news | 4 | 3 | 1 |
+| amazon_reviews | 6 | 1 | 5 |
+| bias_in_bios | 15 | 9 | 6 |
+| europarl | 5 | 3 | 2 |
+| github_code | 4 | 4 | 0 |
+| winogrande | 1 | 1 | 0 |
+| wsc | 1 | 0 | 1 |
+
+The source-level pattern: TXC handles structural/positional tasks
+(github_code, winogrande, europarl), MLC handles semantic-polarity
+tasks (amazon_reviews, ag_news at last_position). `bias_in_bios` is
+mixed at both aggregations.
+
+Raw table: [`results/router_results.json`](../../../../experiments/phase5_downstream_utility/results/router_results.json).
+Plots:
+[router_summary](../../../../experiments/phase5_downstream_utility/results/plots/router_summary.png),
+[router_per_task_mean_pool](../../../../experiments/phase5_downstream_utility/results/plots/router_per_task_mean_pool.png),
+[router_per_task_last_position](../../../../experiments/phase5_downstream_utility/results/plots/router_per_task_last_position.png).
+
 #### Is our task set a superset of Aniket's?
 
 **Yes, with one caveat.** Aniket's SAEBench sweep covers `ag_news`,
