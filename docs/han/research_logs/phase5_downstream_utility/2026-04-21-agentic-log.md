@@ -461,6 +461,29 @@ variance.
 See [`2026-04-22-morning-brief.md`](2026-04-22-morning-brief.md) for
 consolidated summary.
 
+### Test-set follow-up (afternoon 2026-04-22)
+
+After the morning review, probed both agentic winners + Part-B winners
+on the held-out test split at `last_position` and `mean_pool`, 3
+seeds each for the two agentic winners. Also re-probed the vanilla
+baselines so all rows in `summary.md` use numbers from a single
+probe-noise era.
+
+Test-set AUC (3-seed mean ± σ):
+
+| arch | last_position | mean_pool |
+|---|---|---|
+| **agentic_txc_02** | 0.7749 ± 0.0038 | **0.7987 ± 0.0020** |
+| **agentic_mlc_08** | **0.8046 ± 0.0009** | 0.7851 ± 0.0065 |
+
+Each family wins its "home" aggregation (MLC at last_position, TXC at
+mean_pool). Both are top-3 at both aggregations. The 3-seed σ=0.001 for
+MLC at last_position is the tightest seed variance we've seen on this
+bench — strong evidence the recipe reproduces.
+
+See `summary.md` Figure 1/2 for the full apples-to-apples table
+including all Part-B and vanilla-baseline archs at the same probe era.
+
 ### Appendix: how to run a cycle
 
 Per-cycle steps (manual for now — `/loop` could automate the wait

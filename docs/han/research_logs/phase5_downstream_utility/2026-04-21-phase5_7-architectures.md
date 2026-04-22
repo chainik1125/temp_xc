@@ -385,10 +385,60 @@ the candidate at val, summarise, write a row to
 | A1 | txcdr_rotational_t5 | DISCARD | −0.0332 | −3.12 | 12/23 |
 | A5 | txcdr_basis_expansion_t5 | DISCARD | −0.0448 | −4.15 | 9/26 |
 | A4 | mlc_temporal_t3 | DISCARD | −0.0615 | −3.54 | 7/27 |
-| A10 | time_layer_contrastive_t5 | (training) | — | — | — |
-| A8 | txcdr_dynamics_t5 | (queued) | — | — | — |
+| A10 | time_layer_contrastive_t5 | AMBIGUOUS | −0.0147 | −1.11 | 15/18 |
+| A8 | txcdr_dynamics_t5 | DISCARD | −0.0658 | −5.64 | 5/29 |
 
 Observed pattern: InfoNCE on adjacent latents wins (2/2); hand-designed
 decoder / encoder constraints lose (3/3). See autoresearch plan's
 *"Tier 1 results"* + *"Tier 2 shelving decision"* sections for the
 full discussion.
+
+### Agentic autoresearch cycles (2026-04-21 → 2026-04-22, 8 cycles + 4 variance runs)
+
+Inspired by Karpathy's autoresearch: Claude-driven
+hypothesis → code change → result → takeaway loop. Full per-cycle
+log at [`2026-04-21-agentic-log.md`](2026-04-21-agentic-log.md).
+Seeded from the 8 TXC / 4 MLC hypotheses listed there.
+
+**Cycle inventory (Δ_val vs family vanilla base, last_position_val, seed 42):**
+
+| # | arch name | family | change vs Part-B A3/A2/MLC | Δ_val | t | verdict |
+|---|---|---|---|---|---|---|
+| 01 | `agentic_txc_01` | TXC | + orth penalty λ=1.0 on scale-1 decoder | +0.0078 | +0.63 | LOST |
+| **02** | **`agentic_txc_02`** | TXC | **InfoNCE at scales 1,2,3 with γ=0.5 decay** | **+0.0354** | **+3.81** | **BEAT_REF** |
+| 03 | `agentic_txc_03` | TXC | cycle 02 but γ=1.0 (equal weights) | +0.0072 | +0.58 | LOST |
+| 04 | `agentic_txc_04` | TXC | n_scales=5 (all scales), γ=0.5 | +0.0054 | +0.41 | LOST |
+| 05 | `agentic_txc_05` | TXC | n=3, γ=0.3 (sharper decay) | −0.0096 | −0.85 | LOST |
+| 06 | `agentic_txc_06` | TXC | cycle 02 + K=4 same-sequence hard negatives | +0.0291 | +3.80 | TIE |
+| 07 | `agentic_txc_07` | TXC | cycle 02 with InfoNCE → cosine consistency | +0.0174 | +1.81 | LOST |
+| **08** | **`agentic_mlc_08`** | MLC | **InfoNCE at prefix lengths d_sae/4, d_sae/2, d_sae with γ=0.5** | **+0.0163** | **+2.45** | **BEAT_REF** |
+
+**Implementation files for the two winners**:
+
+- TXC: `src/architectures/matryoshka_txcdr_contrastive_multiscale.py`
+  — subclass of `MatryoshkaTXCDRContrastive` overriding `forward` to
+  compute InfoNCE at multiple scales.
+- MLC: `src/architectures/mlc_contrastive_multiscale.py` — subclass of
+  `MLCContrastive` applying InfoNCE at multiple prefix lengths.
+
+**Losing variants also available for reference** (all in `src/architectures/`):
+`matryoshka_txcdr_contrastive_orth.py` (cycle 01),
+`matryoshka_txcdr_contrastive_hardneg.py` (cycle 06),
+`matryoshka_txcdr_contrastive_consistency.py` (cycle 07).
+
+### 3-seed test-set AUC for the two winners
+
+Final test-set numbers (seed ∈ {42, 1, 2}; full-train 3040 / test 760
+at `last_position` and `mean_pool`):
+
+| arch | last_position (3-seed mean ± σ) | mean_pool (3-seed mean ± σ) |
+|---|---|---|
+| `agentic_txc_02` | 0.7749 ± 0.0038 | **0.7987 ± 0.0020** |
+| `agentic_mlc_08` | **0.8046 ± 0.0009** | 0.7851 ± 0.0065 |
+
+Each winner dominates at its family's "home" aggregation. Both top-3
+at both aggregations. MLC at last_position has σ=0.0009 — tightest
+seed variance on the bench.
+
+Full ranking against all 25 previously-benched archs: see `summary.md`
+Figure 1 (last_position) and Figure 2 (mean_pool).

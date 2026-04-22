@@ -148,3 +148,61 @@ nothing.
 
 All commits are on the `han` branch, pushed. Latest commit should be
 in the `9aed37f` range (final seed-variance commit).
+
+---
+
+### Afternoon follow-up (2026-04-22 18:30 UTC)
+
+After Han's morning review, followed up with three work items:
+
+1. **Test-set eval (apples-to-apples).** Probed both agentic winners +
+   Part-B winners on the held-out test split at `last_position` and
+   `mean_pool`, 3 seeds each for the agentic winners. Also re-probed
+   the key vanilla baselines (matryoshka_t5, mlc, txcdr_t5,
+   mlc_contrastive) from the same probe-noise era so the updated
+   `summary.md` is consistent across all rows.
+
+   Test-set headline (seed=42):
+   - **agentic_mlc_08 @ last_position: 0.8047** (new overall best;
+     3-seed mean 0.8046 ± 0.0009 — remarkable stability).
+   - **agentic_txc_02 @ mean_pool: 0.8007** (new mean_pool best; 3-seed
+     mean 0.7987 ± 0.0020).
+   - Each family wins its "home" aggregation; rankings flip between
+     aggregations but both agentic winners are top-3 at both.
+
+2. **TFA audit resolution — dual probing.** The overnight "fix" to
+   probe `z_novel + z_pred` gave MIXED results (wins only at mean_pool
+   for `tfa_pos_small`, loses everywhere else vs `z_novel` alone).
+   Final resolution: report both as separate bench entries.
+   - `tfa_small` / `tfa_pos_small` = `z_novel` only (historical).
+   - `tfa_small_full` / `tfa_pos_small_full` = `z_novel + z_pred`.
+   Probing non-determinism shifted historical numbers by ~0.005–0.010;
+   ranking stable. Documented in `summary.md` Caveats section.
+
+3. **HF sync + plot regeneration.**
+   - Ckpts pushed to `han1823123123/txcdr`: commit
+     [`d475446`](https://huggingface.co/han1823123123/txcdr/commit/d47544688176f79628446060595b1a1270ee9ae8).
+     All 65 ckpts (agentic winners, Part-B winners, seed variance
+     variants, 8 agentic cycles including the losing ablations).
+   - Data repo `han1823123123/txcdr-data`: no changes (all 88 GB from
+     overnight still match).
+   - `make_headline_plot.py` regenerated all 12 bar/heatmap PNGs with
+     new agentic + dual-TFA entries.
+
+**Latest commits on `han`** (as of 18:43 UTC):
+- `c12e3d9` — dual TFA probing + regenerated plots
+- `3211cbf` — Phase 5.7 bench update + TFA audit patch
+- `6b181f8` — re-probe baselines at test-set for apples-to-apples
+- `b6f8eba` — test-set eval: agentic winners + Part-B winners
+
+**Phase 5.7 is now effectively complete.** The paper has:
+- 29 bench entries (25 original + 4 new: 2 agentic winners, 2 Part-B winners)
+- Dual TFA probing transparency
+- 3-seed variance on the 2 agentic winners
+- Apples-to-apples comparison across all entries
+- Family-agnostic multi-scale recipe (γ=0.5) as the headline finding
+
+Remaining deferred from the 18-hr plan: full-size TFA (Phase 2), TFA
+axis sweeps (Phase 3), complementarity concat analysis (Phase 5).
+These are all "future work" quality deliverables, not blockers for
+the paper claim.
