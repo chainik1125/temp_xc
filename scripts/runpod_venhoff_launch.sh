@@ -60,14 +60,17 @@ STEERING_LAYER="${STEERING_LAYER:-12}"
 SAE_LAYER="${SAE_LAYER:-6}"
 N_CLUSTERS_HYBRID="${N_CLUSTERS_HYBRID:-15}"
 
-# Phase 2 (steering-vector training) scale. Venhoff's run_llama_8b.sh
-# uses 2048/50 which costs ~50 H100-hours/vector (HF-only, no vLLM).
-# Our defaults are 60× cheaper and produce usable vectors.
-STEER_MAX_ITERS="${STEER_MAX_ITERS:-10}"
-STEER_N_TRAINING="${STEER_N_TRAINING:-256}"
+# Phase 2 (steering-vector training) scale — paper defaults from
+# Venhoff et al. 2025 Appendix C.1 (arXiv:2510.07364): 50 iters, pool
+# size 2048, minibatch 6, lr 1e-2. See
+# docs/aniket/experiments/venhoff_eval/compute_estimate.md for the
+# compute breakdown. Override via env for quick smoke runs
+# (STEER_MAX_ITERS=10 STEER_N_TRAINING=256 STEER_MINIBATCH=4).
+STEER_MAX_ITERS="${STEER_MAX_ITERS:-50}"
+STEER_N_TRAINING="${STEER_N_TRAINING:-2048}"
 # Eval disabled by default — not used for early stopping; pure instrumentation cost.
 STEER_N_EVAL="${STEER_N_EVAL:-0}"
-STEER_MINIBATCH="${STEER_MINIBATCH:-4}"
+STEER_MINIBATCH="${STEER_MINIBATCH:-6}"
 # Top-K clusters to train per arch (plus the bias, always). Venhoff's
 # Gap Recovery metric is the max over the 10×5 grid — most clusters
 # don't contribute to the headline. Training 5 of 15 cuts Phase 2 by

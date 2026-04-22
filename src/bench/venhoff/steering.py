@@ -83,14 +83,17 @@ class SteeringConfig:
     steering_layer: int = 12
     sae_layer: int = 6
     n_clusters: int = 15
-    # Scale defaults cut from Venhoff's run_llama_8b.sh (2048 / 50) to
-    # (256 / 10) — ~60× cheaper. Venhoff's script is HF-only (no vLLM
-    # engine hook), so full-scale defaults cost ~50 H100-hours/vector
-    # on a single H100. Override via env / CLI if you have more compute.
-    max_iters: int = 10
-    n_training_examples: int = 256
+    # Paper defaults (Venhoff et al. 2025 Appendix C.1):
+    #   max_iters=50, n_training_examples=2048, optim_minibatch_size=6.
+    # These match arXiv:2510.07364 — use them when reporting numbers
+    # you want to cite head-to-head against the paper. Under our earlier
+    # 10/256/4 undercut (2026-04-21 preliminary), MATH500 Gap Recovery
+    # came in at 22.3% for the SAE arm (Venhoff's baseline: 3.5%). The
+    # undercut is still replayable via env vars / CLI overrides.
+    max_iters: int = 50
+    n_training_examples: int = 2048
     n_eval_examples: int = 64
-    optim_minibatch_size: int = 4
+    optim_minibatch_size: int = 6
     lr: str = "1e-2"
     seed: int = 42
     # If set, only train vectors for these cluster indices (plus always
@@ -107,16 +110,34 @@ def _venhoff_expected_vector_path(
     cluster_idx: int,
     steering_type: str = "linear",
 ) -> Path:
-    """Venhoff saves vectors at `train-vectors/results/vars/optimized_vectors/{model_lower}_{tag}_{steering_type}.pt`.
+    """Venhoff saves vectors at `train-vectors/results/vars/optimized_vectors/`.
 
-    Confirmed from smoke-run output 2026-04-21:
-      bias (idx=-1) → `llama-3.1-8b_bias_linear.pt`
-      cluster N     → `llama-3.1-8b_idx{N}_linear.pt`
+    Two filename conventions exist in the vendored repo:
+
+      1. `{model}_{tag}_{steering_type}.pt` — what their script emits when
+         training fresh (`_linear.pt`, `_adaptive_linear.pt`, `_resid_lora.pt`).
+      2. `{model}_{tag}.pt` — bare filename for the pre-trained vectors
+         they ship in `results/vars/optimized_vectors/` for reproducibility
+         (these are the plain-linear variant; no suffix).
+
+    We prefer (1) if it exists (fresh-trained output from our own run),
+    else fall back to (2) (Venhoff's shipped vector). This lets the SAE
+    arch skip Phase 2 entirely when targeting the Llama-3.1-8B cell
+    — the `llama-3.1-8b_idx0.pt` … `llama-3.1-8b_idx14.pt` + `llama-3.1-8b_bias.pt`
+    are all checked into the repo.
     """
     model_short = base_model.split("/")[-1].lower()
     tag = "bias" if cluster_idx == -1 else f"idx{cluster_idx}"
-    name = f"{model_short}_{tag}_{steering_type}.pt"
-    return venhoff_root / "train-vectors" / "results" / "vars" / "optimized_vectors" / name
+    root = venhoff_root / "train-vectors" / "results" / "vars" / "optimized_vectors"
+    suffixed = root / f"{model_short}_{tag}_{steering_type}.pt"
+    if suffixed.exists():
+        return suffixed
+    bare = root / f"{model_short}_{tag}.pt"
+    if bare.exists() and steering_type == "linear":
+        return bare
+    # Neither exists yet — return the suffixed name so Venhoff's script
+    # creates it on the next training invocation.
+    return suffixed
 
 
 def _venhoff_script_dir(venhoff_root: Path) -> Path:
