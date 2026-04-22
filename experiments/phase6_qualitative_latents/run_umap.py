@@ -53,10 +53,10 @@ ARCH_SPLITS: dict[str, tuple[tuple[int, int], tuple[int, int] | None]] = {
 SILHOUETTE_SUBSAMPLE = 2000  # keep silhouette computation fast
 
 
-def load_z_and_labels(arch: str):
-    """Return (z flat, subject_labels, qid_labels, pos_labels) for concat_C."""
-    z_path = Z_DIR / "concat_C" / f"{arch}__z.npy"
-    prov_path = Z_DIR / "concat_C" / "provenance.json"
+def load_z_and_labels(arch: str, concat_name: str = "concat_C"):
+    """Return (z flat, subject_labels, qid_labels, pos_labels) for a concat."""
+    z_path = Z_DIR / concat_name / f"{arch}__z.npy"
+    prov_path = Z_DIR / concat_name / "provenance.json"
     z = np.load(z_path).astype(np.float32)  # (160, 20, d_sae)
     prov = json.loads(prov_path.read_text())
     n_seq, seq_len, d_sae = z.shape
@@ -185,18 +185,21 @@ def main():
     p.add_argument("--archs", type=str, nargs="+",
                    default=["agentic_txc_02", "agentic_mlc_08",
                             "tsae_paper", "tsae_ours", "tfa_big"])
+    p.add_argument("--concat", type=str, default="concat_C_v2",
+                   help="Which concat-set to use (default: concat_C_v2, "
+                        "the paper-faithful 10-subject × 30-token set).")
     args = p.parse_args()
 
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     silhouette_rows = []
 
     for arch in args.archs:
-        z_path = Z_DIR / "concat_C" / f"{arch}__z.npy"
+        z_path = Z_DIR / args.concat / f"{arch}__z.npy"
         if not z_path.exists():
-            print(f"skip {arch}: no z cache")
+            print(f"skip {arch}/{args.concat}: no z cache")
             continue
-        print(f"[{arch}] load + UMAP")
-        z_flat, subj, qid, pos = load_z_and_labels(arch)
+        print(f"[{arch}] load + UMAP on {args.concat}")
+        z_flat, subj, qid, pos = load_z_and_labels(arch, args.concat)
 
         for kind, z_slice in (("high", slice_high_low(arch, z_flat)[0]),
                               ("low", slice_high_low(arch, z_flat)[1])):
@@ -211,20 +214,22 @@ def main():
             ]:
                 plot_umap(
                     coords, labels,
-                    title=f"{arch} — {kind} — {label_name}",
-                    dst=OUT_DIR / f"umap_{kind}__{arch}__{label_name}.png",
+                    title=f"{arch} — {kind} — {label_name} — {args.concat}",
+                    dst=OUT_DIR / f"{args.concat}__umap_{kind}__{arch}__{label_name}.png",
                 )
                 score = _silhouette(z_slice, labels)
                 silhouette_rows.append({
+                    "concat": args.concat,
                     "arch": arch, "prefix": kind, "label": label_name,
                     "silhouette": score,
                 })
 
     import csv
-    with open(OUT_DIR / "silhouette_scores.csv", "w", newline="") as f:
-        w = csv.DictWriter(f, fieldnames=["arch", "prefix", "label", "silhouette"])
+    dst = OUT_DIR / f"{args.concat}__silhouette_scores.csv"
+    with open(dst, "w", newline="") as f:
+        w = csv.DictWriter(f, fieldnames=["concat", "arch", "prefix", "label", "silhouette"])
         w.writeheader(); w.writerows(silhouette_rows)
-    print(f"wrote {OUT_DIR / 'silhouette_scores.csv'}")
+    print(f"wrote {dst}")
 
 
 if __name__ == "__main__":

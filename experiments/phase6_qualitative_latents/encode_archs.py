@@ -51,11 +51,18 @@ D_SAE = 18_432
 
 
 def load_concats():
-    """Return tuple (A, B, C) — dicts from JSON on disk."""
-    A = json.loads((CONCAT_DIR / "concat_A.json").read_text())
-    B = json.loads((CONCAT_DIR / "concat_B.json").read_text())
-    C = json.loads((CONCAT_DIR / "concat_C.json").read_text())
-    return A, B, C
+    """Return dict of concat-set name -> concat dict.
+
+    C_v2 is the paper-faithful TSNE set (200 × 30 tokens across 10 MMLU
+    subjects, last-N-token convention). C is kept for backward compat
+    with the earlier 160 × 20-token variant.
+    """
+    out = {}
+    for nm in ("concat_A", "concat_B", "concat_C", "concat_C_v2"):
+        p = CONCAT_DIR / f"{nm}.json"
+        if p.exists():
+            out[nm] = json.loads(p.read_text())
+    return out
 
 
 # ─────────────────────────────────────────────── Gemma resid extraction
@@ -315,9 +322,10 @@ def encode_concat_AB(concat, concat_name: str, archs: list[str], device):
         torch.cuda.empty_cache()
 
 
-def encode_concat_C(concat, archs: list[str], device):
-    """Encode 160 × 20-token sequences under each arch."""
-    out = OUT_DIR / "concat_C"
+def encode_concat_C(concat, archs: list[str], device, out_name: str = "concat_C"):
+    """Encode N × k-token short sequences under each arch. Writes to
+    `z_cache/<out_name>/`. `concat` schema: {"sequences": [...], ...}."""
+    out = OUT_DIR / out_name
     out.mkdir(parents=True, exist_ok=True)
 
     token_id_lists = [s["token_ids"] for s in concat["sequences"]]
@@ -366,7 +374,7 @@ def main():
     p = argparse.ArgumentParser()
     p.add_argument("--archs", type=str, nargs="+", default=DEFAULT_ARCHS)
     p.add_argument("--sets", type=str, nargs="+",
-                   default=["A", "B", "C"])
+                   default=["A", "B", "C", "C_v2"])
     args = p.parse_args()
 
     # Skip archs whose ckpt isn't present (e.g. tfa_big not trained yet).
@@ -379,14 +387,18 @@ def main():
         raise SystemExit("no archs available")
 
     device = torch.device("cuda")
-    A, B, C = load_concats()
+    concats = load_concats()
 
-    if "A" in args.sets:
-        encode_concat_AB(A, "concat_A", archs, device)
-    if "B" in args.sets:
-        encode_concat_AB(B, "concat_B", archs, device)
-    if "C" in args.sets:
-        encode_concat_C(C, archs, device)
+    # A and B: single long sequences — encode_concat_AB
+    for nm in ("concat_A", "concat_B"):
+        short = nm.split("_")[-1]
+        if short in args.sets and nm in concats:
+            encode_concat_AB(concats[nm], nm, archs, device)
+    # C and C_v2: many short sequences — encode_concat_C (writes per-set dir)
+    if "C" in args.sets and "concat_C" in concats:
+        encode_concat_C(concats["concat_C"], archs, device, out_name="concat_C")
+    if "C_v2" in args.sets and "concat_C_v2" in concats:
+        encode_concat_C(concats["concat_C_v2"], archs, device, out_name="concat_C_v2")
 
 
 if __name__ == "__main__":
