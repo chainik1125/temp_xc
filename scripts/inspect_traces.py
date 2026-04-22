@@ -21,6 +21,12 @@ import json
 import sys
 from pathlib import Path
 
+# Ensure the repo root is on sys.path so `from src.bench...` works even
+# when the script is invoked without PYTHONPATH set.
+_REPO_ROOT = Path(__file__).resolve().parent.parent
+if str(_REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(_REPO_ROOT))
+
 DEFAULT_PATH = Path(
     "results/venhoff_eval/"
     "deepseek-r1-distill-llama-8b_math500-test_n500_L6_seed42/"
@@ -79,7 +85,11 @@ def main(path: Path) -> int:
     # ── extract + split pipeline ───────────────────────────────────
     try:
         from src.bench.venhoff.responses import extract_thinking_process
-        from src.bench.venhoff.tokenization import split_into_sentences
+        from src.bench.venhoff.tokenization import (
+            split_into_sentences,
+            sentence_token_span,
+            get_char_to_token_map,
+        )
     except ImportError as e:
         print(f"[warn] cannot import Phase 1 helpers ({e}); install/activate venv first")
         return 1
@@ -93,6 +103,30 @@ def main(path: Path) -> int:
     print(f"split_into_sentences(extracted): {len(sentences)} sentences")
     for i, s in enumerate(sentences[:3]):
         print(f"  [{i}] {s[:80]!r}")
+    print()
+
+    # ── test sentence_token_span on the first few sentences ───────
+    # This is what Phase 1 uses downstream — if spans are None, Phase 1
+    # collects no activations.
+    print("sentence_token_span trial (uses HF tokenizer — loads on demand):")
+    try:
+        from transformers import AutoTokenizer
+        tokenizer = AutoTokenizer.from_pretrained(
+            "deepseek-ai/DeepSeek-R1-Distill-Llama-8B"
+        )
+        char_to_token = get_char_to_token_map(fr, tokenizer)
+        print(f"  char_to_token len: {len(char_to_token)} (full_response chars: {len(fr)})")
+        span_hits = 0
+        for i, s in enumerate(sentences[:5]):
+            span = sentence_token_span(s, fr, char_to_token)
+            if span is None:
+                print(f"  [{i}] span=None  sentence={s[:60]!r}")
+            else:
+                span_hits += 1
+                print(f"  [{i}] span={span}  sentence={s[:60]!r}")
+        print(f"  {span_hits}/5 sentences produced a non-None span")
+    except Exception as e:
+        print(f"  [warn] could not run token-span check: {e}")
     print()
 
     # ── aggregate across all traces ────────────────────────────────
