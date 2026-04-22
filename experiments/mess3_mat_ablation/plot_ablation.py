@@ -132,7 +132,11 @@ def plot_gap_recovery(results: dict[float, dict], ceiling: dict[float, float], o
     ax.set_ylabel(ylabel)
     ax.set_ylim(-0.05, 1.1 if ceiling else None)
     ax.set_title("Mess3: Mat-TopK-SAE ablation — 2×2 on matryoshka × temporal window")
-    ax.legend(loc="upper left", fontsize=8, frameon=False)
+    # Legend outside the axes so it never overlaps the curves (which
+    # rise into the upper-right and used to collide with an upper-left
+    # legend at low δ values).
+    ax.legend(loc="center left", bbox_to_anchor=(1.02, 0.5),
+              fontsize=8, frameon=False)
     ax.grid(True, alpha=0.25, linestyle="--")
     fig.tight_layout()
     fig.savefig(out_path, format="pdf", bbox_inches="tight")
@@ -189,8 +193,11 @@ def plot_feature_diversity(results: dict[float, dict], out_path: Path) -> None:
     ax.set_xlabel("δ")
     ax.set_ylabel("|{argmax feature per Mess3 component}|")
     ax.set_title("Feature diversity: does each arch recover the indicator basis?")
-    ax.set_ylim(0, 3.3)
-    ax.legend(loc="upper left", fontsize=8, frameon=False, ncol=2)
+    ax.set_ylim(0, 3.6)
+    # Legend outside the axes — bars at δ=0 reach the top (diversity=3)
+    # and any in-axes legend collides with them.
+    ax.legend(loc="center left", bbox_to_anchor=(1.02, 0.5),
+              fontsize=8, frameon=False)
     ax.grid(True, axis="y", alpha=0.25, linestyle="--")
     fig.tight_layout()
     fig.savefig(out_path, format="pdf", bbox_inches="tight")
