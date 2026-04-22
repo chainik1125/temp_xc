@@ -137,40 +137,99 @@ def write_summary(agg: dict, metric: str) -> dict:
     return rows
 
 
+FLAVOR_COLORS = {
+    "txc":        "#1f77b4",   # blue        — TXCDR family (incl. matryoshka + agentic_txc)
+    "mlc":        "#2ca02c",   # green       — MLC family (incl. agentic_mlc)
+    "tfa":        "#d62728",   # red         — TFA (novel and novel+pred)
+    "topk_sae":   "#ff7f0e",   # orange      — single-token TopK SAE
+    "stacked":    "#9467bd",   # purple      — per-position stacked-t
+    "time_layer": "#8c564b",   # brown       — layer-axis crosscoder
+    "temporal":   "#e377c2",   # pink        — temporal_contrastive (single-token contrastive SAE)
+}
+
+
+def flavor_of(arch: str) -> str:
+    """Map an arch name to one of the flavor keys in FLAVOR_COLORS."""
+    if arch == "topk_sae":
+        return "topk_sae"
+    if arch.startswith("stacked_"):
+        return "stacked"
+    if arch.startswith("tfa_"):
+        return "tfa"
+    if arch.startswith("time_layer_"):
+        return "time_layer"
+    if arch == "temporal_contrastive":
+        return "temporal"
+    if arch == "mlc" or arch.startswith("mlc_") or arch.startswith("agentic_mlc_"):
+        return "mlc"
+    # Everything else that's TXCDR-shaped: vanilla TXCDR variants, matryoshka
+    # variants (incl. matryoshka_txcdr_*), and agentic TXC cycles.
+    if arch.startswith("txcdr_") or arch.startswith("matryoshka_") or arch.startswith("agentic_txc_"):
+        return "txc"
+    return "txc"   # safe default for any un-mapped arch
+
+
 def _headline_bar(
     summary: dict, out_path: Path,
     metric: str, aggregation: str,
 ) -> None:
-    ordered = [a for a in ORDERED_ARCHS if a in summary]
+    candidates = [a for a in ORDERED_ARCHS if a in summary]
     baselines = [a for a in BASELINE_ARCHS if a in summary]
 
-    fig, ax = plt.subplots(figsize=(10, 5))
-    x = np.arange(len(ordered))
-    means = [summary[a][f"mean_{metric}"] for a in ordered]
-    stds = [summary[a][f"std_{metric}"] for a in ordered]
-    bars = ax.bar(x, means, yerr=stds, capsize=4,
-                  color=["C0"] * len(ordered))
+    # Sort by mean metric descending so the chart is visually a ranking.
+    candidates.sort(key=lambda a: -summary[a][f"mean_{metric}"])
+
+    fig, ax = plt.subplots(figsize=(11, 5.5))
+    x = np.arange(len(candidates))
+    means = [summary[a][f"mean_{metric}"] for a in candidates]
+    stds = [summary[a][f"std_{metric}"] for a in candidates]
+    flavors = [flavor_of(a) for a in candidates]
+    colors = [FLAVOR_COLORS[f] for f in flavors]
+    bars = ax.bar(x, means, yerr=stds, capsize=4, color=colors,
+                  edgecolor="#333", linewidth=0.5)
     ax.set_xticks(x)
-    ax.set_xticklabels(ordered, rotation=30, ha="right")
+    ax.set_xticklabels(candidates, rotation=45, ha="right", fontsize=8)
     ax.set_ylabel(f"mean {metric.upper()} (k={HEADLINE_K})")
     ax.set_title(
         f"Phase 5: sparse-probing {metric.upper()} by arch "
-        f"[{aggregation}]"
+        f"[{aggregation}] — sorted by score, coloured by family"
     )
     ax.set_ylim(0.5, 1.0)
 
-    colors = {"baseline_last_token_lr": "red",
-              "baseline_attn_pool": "purple"}
+    # Two legends: (1) flavor swatches in the upper-right; (2) attn-pool /
+    # last-token LR dashed baselines in lower-right. Keep them distinct so
+    # viewers can read both without overlap.
+    used_flavors = []
+    for f in flavors:
+        if f not in used_flavors:
+            used_flavors.append(f)
+    from matplotlib.patches import Patch
+    flavor_handles = [Patch(facecolor=FLAVOR_COLORS[f], label=f) for f in used_flavors]
+    leg_flavor = ax.legend(handles=flavor_handles, title="family",
+                           loc="upper right", fontsize=8, title_fontsize=8,
+                           framealpha=0.9)
+    ax.add_artist(leg_flavor)
+
+    baseline_colors = {"baseline_last_token_lr": "black",
+                       "baseline_attn_pool": "gray"}
+    baseline_handles = []
     for ba in baselines:
         m = summary[ba][f"mean_{metric}"]
-        ax.axhline(m, color=colors.get(ba, "black"), ls="--",
-                   label=f"{ba.replace('baseline_', '')} ({m:.3f})")
-    ax.legend(loc="lower right")
+        bc = baseline_colors.get(ba, "black")
+        line = ax.axhline(m, color=bc, ls="--", lw=1.2,
+                          label=f"{ba.replace('baseline_', '')} ({m:.3f})")
+        baseline_handles.append(line)
+    if baseline_handles:
+        ax.legend(handles=baseline_handles, loc="lower right", fontsize=8,
+                  framealpha=0.9)
 
+    # Value labels on top of each bar
     for bar, m in zip(bars, means):
         ax.text(bar.get_x() + bar.get_width() / 2, m + 0.005,
-                f"{m:.3f}", ha="center", fontsize=8)
+                f"{m:.3f}", ha="center", fontsize=7, rotation=90,
+                va="bottom")
 
+    fig.tight_layout()
     save_figure(fig, str(out_path))
     plt.close(fig)
 
@@ -180,6 +239,9 @@ def _per_task_heatmap(
     metric: str, aggregation: str,
 ) -> None:
     ordered = [a for a in ORDERED_ARCHS if a in agg]
+    # Sort heatmap rows by mean across tasks (descending), matching the
+    # bar-chart ordering.
+    ordered.sort(key=lambda a: -float(np.mean(list(agg[a].values()))))
     tasks = sorted({t for a in ordered for t in agg[a].keys()})
     if not tasks or not ordered:
         return
