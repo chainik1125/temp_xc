@@ -1212,6 +1212,102 @@ def run_all(seeds, max_steps, archs=None):
                             match_budget=True, layer=13, alpha=1.0,
                             n_contr_scales=3, gamma=0.5,
                             variant="agentic_txc_02_multiscale_contrastive")
+            elif arch == "txcdr_t5_batchtopk":
+                # BatchTopK sparsity on vanilla TXCDR (T=5).
+                from src.architectures._batchtopk_variants import (
+                    TemporalCrosscoderBatchTopK,
+                )
+                buf = get_anchor()
+                d_in = buf.shape[-1]
+                model = TemporalCrosscoderBatchTopK(
+                    d_in, DEFAULT_D_SAE, T=5, k=500,
+                ).to(device)
+                pair_gen = make_window_gen_gpu(buf, T=5)
+                def norm(): model._normalize_decoder()
+                log = _iterate_train(
+                    model, pair_gen, cfg, device, normalize_decoder=norm,
+                )
+                meta = dict(seed=seed, k_pos=100, k_win=500, T=5, layer=13,
+                            sparsity="batchtopk",
+                            variant="txcdr_t5_batchtopk")
+            elif arch == "mlc_batchtopk":
+                from src.architectures._batchtopk_variants import (
+                    MultiLayerCrosscoderBatchTopK,
+                )
+                mlb = get_ml()
+                d_in = mlb.shape[-1]
+                model = MultiLayerCrosscoderBatchTopK(
+                    d_in, DEFAULT_D_SAE, n_layers=5, k=100,
+                ).to(device)
+                ml_gen = make_multilayer_gen_gpu(mlb)
+                def norm(): model._normalize_decoder()
+                log = _iterate_train(
+                    model, ml_gen, cfg, device, normalize_decoder=norm,
+                )
+                meta = dict(seed=seed, k_pos=100, k_win=None, T=1, layer=13,
+                            n_layers=5, sparsity="batchtopk",
+                            variant="mlc_batchtopk")
+            elif arch == "agentic_txc_02_batchtopk":
+                from src.architectures._batchtopk_variants import (
+                    MatryoshkaTXCDRContrastiveMultiscaleBatchTopK,
+                )
+                buf = get_anchor()
+                d_in = buf.shape[-1]
+                model = MatryoshkaTXCDRContrastiveMultiscaleBatchTopK(
+                    d_in, DEFAULT_D_SAE, T=5, k=500,
+                    n_contr_scales=3, gamma=0.5,
+                ).to(device)
+                pair_gen = make_pair_window_gen_gpu(buf, T=5)
+                def norm(): model._normalize_decoder()
+                def alpha_fwd(model, x):
+                    return model(x, alpha=1.0)
+                # Reuse generic matryoshka trainer via wrapper.
+                log = _iterate_train(
+                    model, pair_gen, cfg, device, normalize_decoder=norm,
+                )
+                meta = dict(seed=seed, k_pos=100, k_win=500, T=5,
+                            match_budget=True, layer=13, alpha=1.0,
+                            n_contr_scales=3, gamma=0.5,
+                            sparsity="batchtopk",
+                            variant="agentic_txc_02_batchtopk")
+            elif arch == "agentic_mlc_08_batchtopk":
+                from src.architectures._batchtopk_variants import (
+                    MLCContrastiveMultiscaleBatchTopK,
+                )
+                mlb = get_ml()
+                d_in = mlb.shape[-1]
+                model = MLCContrastiveMultiscaleBatchTopK(
+                    d_in, DEFAULT_D_SAE, n_layers=5, k=100,
+                    prefix_lens=(DEFAULT_D_SAE // 4,
+                                 DEFAULT_D_SAE // 2,
+                                 DEFAULT_D_SAE),
+                    gamma=0.5,
+                ).to(device)
+                ml_pair_gen = make_pair_multilayer_gen_gpu(mlb)
+                def norm(): model._normalize_decoder()
+                log = _iterate_train(
+                    model, ml_pair_gen, cfg, device, normalize_decoder=norm,
+                )
+                meta = dict(seed=seed, k_pos=100, k_win=None, T=1,
+                            layer=13, n_layers=5, alpha=1.0, gamma=0.5,
+                            sparsity="batchtopk",
+                            variant="agentic_mlc_08_batchtopk")
+            elif arch in ("agentic_txc_02_t2", "agentic_txc_02_t3",
+                          "agentic_txc_02_t8", "agentic_txc_02_t10",
+                          "agentic_txc_02_t15", "agentic_txc_02_t20"):
+                # T-sweep on the cycle-02 recipe. Keeps γ=0.5 fixed,
+                # sets n_contr_scales = min(3, T) so T=2 gracefully
+                # degrades to 2 scales.
+                T_swp = int(arch.removeprefix("agentic_txc_02_t"))
+                n_sc = min(3, T_swp)
+                model, log = train_matryoshka_txcdr_contrastive_multiscale(
+                    cfg, device, k=100, T=T_swp, alpha=1.0,
+                    n_contr_scales=n_sc, gamma=0.5, buf=get_anchor(),
+                )
+                meta = dict(seed=seed, k_pos=100, k_win=100 * T_swp,
+                            T=T_swp, match_budget=True, layer=13,
+                            alpha=1.0, n_contr_scales=n_sc, gamma=0.5,
+                            variant="agentic_txc_02_t_sweep")
             elif arch == "agentic_txc_03":
                 # Agentic cycle 03: n_contr_scales=3, γ=1.0 (equal weights).
                 # Tests whether cycle-02 gain came from the multi-scale
@@ -1332,6 +1428,21 @@ def run_all(seeds, max_steps, archs=None):
                                        seq_len=32)
                 meta = dict(seed=seed, k_pos=100, k_win=None, T=32,
                             use_pos=True, d_sae=4096, layer=13,
+                            scale=log.get("input_scale", 1.0))
+            elif arch == "tfa_big":
+                # Full-size TFA (matched d_sae + seq_len to other archs).
+                model, log = train_tfa(cfg, device, k=100, use_pos=False,
+                                       d_sae=18432, buf=get_anchor(),
+                                       seq_len=128)
+                meta = dict(seed=seed, k_pos=100, k_win=None, T=128,
+                            use_pos=False, d_sae=18432, layer=13,
+                            scale=log.get("input_scale", 1.0))
+            elif arch == "tfa_pos_big":
+                model, log = train_tfa(cfg, device, k=100, use_pos=True,
+                                       d_sae=18432, buf=get_anchor(),
+                                       seq_len=128)
+                meta = dict(seed=seed, k_pos=100, k_win=None, T=128,
+                            use_pos=True, d_sae=18432, layer=13,
                             scale=log.get("input_scale", 1.0))
             elif arch == "txcdr_shared_dec_t5":
                 model, log = train_txcdr_variant(

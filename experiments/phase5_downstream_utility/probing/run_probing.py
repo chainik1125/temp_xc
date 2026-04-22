@@ -354,6 +354,39 @@ def _load_model_for_run(run_id, ckpt_path, device):
         T = meta["T"]
         k_eff = meta["k_win"] or (meta["k_pos"] * T)
         model = TemporalCrosscoder(d_in, d_sae, T, k_eff).to(device)
+    elif arch == "txcdr_t5_batchtopk":
+        from src.architectures._batchtopk_variants import (
+            TemporalCrosscoderBatchTopK,
+        )
+        T = meta["T"]
+        k_eff = meta["k_win"] or (meta["k_pos"] * T)
+        model = TemporalCrosscoderBatchTopK(d_in, d_sae, T, k_eff).to(device)
+    elif arch == "mlc_batchtopk":
+        from src.architectures._batchtopk_variants import (
+            MultiLayerCrosscoderBatchTopK,
+        )
+        model = MultiLayerCrosscoderBatchTopK(
+            d_in, d_sae, n_layers=5, k=meta["k_pos"],
+        ).to(device)
+    elif arch == "agentic_txc_02_batchtopk":
+        from src.architectures._batchtopk_variants import (
+            MatryoshkaTXCDRContrastiveMultiscaleBatchTopK,
+        )
+        T = meta["T"]
+        k_eff = meta["k_win"] or (meta["k_pos"] * T)
+        model = MatryoshkaTXCDRContrastiveMultiscaleBatchTopK(
+            d_in, d_sae, T, k_eff,
+            n_contr_scales=meta.get("n_contr_scales", 3),
+            gamma=meta.get("gamma", 0.5),
+        ).to(device)
+    elif arch == "agentic_mlc_08_batchtopk":
+        from src.architectures._batchtopk_variants import (
+            MLCContrastiveMultiscaleBatchTopK,
+        )
+        model = MLCContrastiveMultiscaleBatchTopK(
+            d_in, d_sae, n_layers=5, k=meta["k_pos"],
+            gamma=meta.get("gamma", 0.5),
+        ).to(device)
     elif arch in ("txcdr_contrastive_t5",
                   "txcdr_contrastive_t5_alpha003",
                   "txcdr_contrastive_t5_alpha100",
@@ -393,7 +426,10 @@ def _load_model_for_run(run_id, ckpt_path, device):
             d_in, d_sae, T, k_eff, lam_orth=meta.get("lam_orth", 0.01),
         ).to(device)
     elif arch in ("agentic_txc_02", "agentic_txc_03", "agentic_txc_04",
-                  "agentic_txc_05"):
+                  "agentic_txc_05",
+                  "agentic_txc_02_t2", "agentic_txc_02_t3",
+                  "agentic_txc_02_t8", "agentic_txc_02_t10",
+                  "agentic_txc_02_t15", "agentic_txc_02_t20"):
         from src.architectures.matryoshka_txcdr_contrastive_multiscale import (
             MatryoshkaTXCDRContrastiveMultiscale,
         )
@@ -470,7 +506,9 @@ def _load_model_for_run(run_id, ckpt_path, device):
         T = meta["T"]
         model = SharedPerPositionSAE(d_in, d_sae, T, k=meta["k_pos"]).to(device)
     elif arch in ("tfa", "tfa_pos", "tfa_small", "tfa_pos_small",
-                  "tfa_small_full", "tfa_pos_small_full"):
+                  "tfa_small_full", "tfa_pos_small_full",
+                  "tfa_big", "tfa_pos_big",
+                  "tfa_big_full", "tfa_pos_big_full"):
         # *_full variants share ckpt with their base arch — they only
         # differ in probing logic (z_novel vs z_novel+z_pred).
         from src.architectures._tfa_module import TemporalSAE
@@ -575,7 +613,9 @@ def _encode_for_probe(
     if arch in ("mlc", "mlc_contrastive",
                 "mlc_contrastive_alpha003",
                 "mlc_contrastive_alpha100",
-                "agentic_mlc_08"):
+                "agentic_mlc_08",
+                "mlc_batchtopk",
+                "agentic_mlc_08_batchtopk"):
         # mlc_contrastive has identical encode API — subclass of MLC.
         # last_position: use mlc (N, L, d) at last real token.
         # full_window:   use mlc_tail (N, TAIL=20, L, d) if available.
@@ -631,7 +671,14 @@ def _encode_for_probe(
                 "agentic_txc_04",
                 "agentic_txc_05",
                 "agentic_txc_06",
-                "agentic_txc_07"):
+                "agentic_txc_07",
+                "agentic_txc_02_t2",
+                "agentic_txc_02_t3",
+                "agentic_txc_02_t8",
+                "agentic_txc_02_t10",
+                "agentic_txc_02_t15",
+                "agentic_txc_02_t20",
+                "agentic_txc_02_batchtopk"):
         T = meta["T"]
         return _encode_matryoshka(model, anchor, li, T, device, aggregation)
     if arch == "mlc_temporal_t3":
@@ -794,7 +841,9 @@ def _encode_for_probe(
         Z_last = np.concatenate(outs, axis=0)  # (N*K, d_sae)
         return Z_last.reshape(N, K * Z_last.shape[-1])
     if arch in ("tfa", "tfa_pos", "tfa_small", "tfa_pos_small",
-                "tfa_small_full", "tfa_pos_small_full"):
+                "tfa_small_full", "tfa_pos_small_full",
+                "tfa_big", "tfa_pos_big",
+                "tfa_big_full", "tfa_pos_big_full"):
         # TFA probing — two variants, reported as separate bench entries:
         #   * `tfa_small` / `tfa_pos_small`: probe z_novel only (the
         #     sparse TopK-selected "novel" component). Historical
@@ -962,6 +1011,8 @@ def run_probing(
                          "mlc_contrastive_alpha003",
                          "mlc_contrastive_alpha100",
                          "agentic_mlc_08",
+                         "mlc_batchtopk",
+                         "agentic_mlc_08_batchtopk",
                          "time_layer_crosscoder_t5",
                          "time_layer_contrastive_t5")
                     and aggregation in mlc_tail_aggs):

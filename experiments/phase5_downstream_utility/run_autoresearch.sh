@@ -72,6 +72,22 @@ BASE_OF[agentic_txc_06]=matryoshka_t5
 BASE_OF[agentic_txc_07]=matryoshka_t5
 # MLC agentic cycles (compared against vanilla mlc).
 BASE_OF[agentic_mlc_08]=mlc
+# Phase 5.7 handover experiments (i)-(iii):
+#   - tfa_big / tfa_pos_big: full-size TFA (d_sae=18432, seq_len=128)
+#   - agentic_txc_02_t{2..20}: T-sweep on the cycle-02 recipe
+#   - *_batchtopk: apples-to-apples BatchTopK comparison
+BASE_OF[tfa_big]=tfa_small
+BASE_OF[tfa_pos_big]=tfa_pos_small
+BASE_OF[agentic_txc_02_t2]=txcdr_t2
+BASE_OF[agentic_txc_02_t3]=txcdr_t3
+BASE_OF[agentic_txc_02_t8]=txcdr_t8
+BASE_OF[agentic_txc_02_t10]=txcdr_t10
+BASE_OF[agentic_txc_02_t15]=txcdr_t15
+BASE_OF[agentic_txc_02_t20]=txcdr_t20
+BASE_OF[txcdr_t5_batchtopk]=txcdr_t5
+BASE_OF[mlc_batchtopk]=mlc
+BASE_OF[agentic_txc_02_batchtopk]=txcdr_t5_batchtopk
+BASE_OF[agentic_mlc_08_batchtopk]=mlc_batchtopk
 
 commit_and_push() {
     local msg="$1"; shift
