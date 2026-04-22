@@ -1333,6 +1333,20 @@ def run_all(seeds, max_steps, archs=None):
                 meta = dict(seed=seed, k_pos=100, k_win=None, T=32,
                             use_pos=True, d_sae=4096, layer=13,
                             scale=log.get("input_scale", 1.0))
+            elif arch == "tfa_big":
+                model, log = train_tfa(cfg, device, k=100, use_pos=False,
+                                       d_sae=DEFAULT_D_SAE, buf=get_anchor(),
+                                       seq_len=128)
+                meta = dict(seed=seed, k_pos=100, k_win=None, T=128,
+                            use_pos=False, d_sae=DEFAULT_D_SAE, layer=13,
+                            scale=log.get("input_scale", 1.0))
+            elif arch == "tfa_pos_big":
+                model, log = train_tfa(cfg, device, k=100, use_pos=True,
+                                       d_sae=DEFAULT_D_SAE, buf=get_anchor(),
+                                       seq_len=128)
+                meta = dict(seed=seed, k_pos=100, k_win=None, T=128,
+                            use_pos=True, d_sae=DEFAULT_D_SAE, layer=13,
+                            scale=log.get("input_scale", 1.0))
             elif arch == "txcdr_shared_dec_t5":
                 model, log = train_txcdr_variant(
                     cfg, device, k=100, T=5, variant="shared_dec",
