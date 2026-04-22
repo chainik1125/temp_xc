@@ -1,0 +1,12 @@
+# Vendored snapshot of Dmitry's sae_day code — pulled at runtime
+# via git archive (see setup_vendor.sh). Not committed; each checkout
+# re-vendors from origin/dmitry at the pinned commit.
+vendor/
+
+# Run artifacts — keep on disk locally, don't clutter git.
+results/cell_delta_*/
+results/combined.json
+results/window_probes_w*_combined.json
+logs/
+plots/*.png
+r2_ceiling.json

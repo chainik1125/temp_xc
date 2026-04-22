@@ -1,0 +1,118 @@
+experiment_name: mess3_mat_ablation
+description: |
+  2×2 ablation of Dmitry's separation_scaling result: add the missing
+  "no-window × matryoshka" cell (MatryoshkaSAE, single-position) to
+  disambiguate whether the MatTXC advantage is driven by matryoshka
+  alone or by matryoshka × temporal-window interaction.
+
+  Runs the full δ ∈ {0, 0.05, 0.10, 0.15, 0.20} sweep matching Dmitry's
+  config.yaml for direct comparability, and four architectures that
+  form the 2×2:
+      TopK SAE       (no-matryoshka × no-window, plain TopK)
+      TXC            (no-matryoshka × window)
+      MatryoshkaSAE  (matryoshka × no-window) ← new cell
+      MatTXC         (matryoshka × window)
+
+  Shares transformer configuration + probe dataset + eval protocol with
+  Dmitry's config.yaml so the numbers are directly comparable. See
+  docs/aniket/experiments/mess3_mat_ablation/plan.md for predictions.
+
+seed: 42
+
+generator:
+  type: mess3_shared
+  sweep:
+    parameter: delta
+    values: [0.0, 0.05, 0.1, 0.15, 0.2]
+  fixed_params:
+    base_x: 0.25
+    base_a: 0.6
+    parameterization: symmetric_line
+
+transformer:
+  n_layers: 3
+  d_model: 64
+  n_heads: 2
+  d_head: 32
+  d_mlp: 256
+  n_ctx: 128
+  act_fn: gelu
+  normalization_type: LN
+  attention_dir: causal
+  default_prepend_bos: false
+  init_mode: gpt2
+  initializer_range: 1.0e-3
+  probe_layer: 1
+  probe_hook_name: blocks.1.hook_resid_post
+  extract_batch_size: 16
+  load_if_exists: true
+  training:
+    steps: 20000
+    batch_size: 128
+    lr: 1.0e-3
+    data_chunks: 4
+    data_chunk_size: 5000
+
+architectures:
+  - name: "TopK SAE"
+    family: topk
+    kwargs:
+      dict_size: 64
+      k: 4
+      sae_steps: 2000
+      n_sequences: 1000
+      seq_len: 128
+
+  - name: "TXC"
+    family: txc
+    kwargs:
+      dict_size: 64
+      k: 1
+      window_size: 30
+      temporal_steps: 3000
+      n_sequences: 1000
+      seq_len: 128
+
+  # ── THE NEW CELL ──
+  - name: "MatryoshkaSAE (no-window)"
+    family: matsae
+    kwargs:
+      dict_size: 128
+      matryoshka_widths: [8, 16, 32, 64, 128]
+      k: 1
+      inner_weight: 10.0
+      sae_steps: 1500        # mirrors MatTXC's temporal_steps
+      n_sequences: 400       # mirrors MatTXC
+      seq_len: 128
+
+  - name: "MatryoshkaTXC"
+    family: mattxc
+    kwargs:
+      dict_size: 128
+      matryoshka_widths: [8, 16, 32, 64, 128]
+      k: 1
+      fixed_k_total: 10
+      inner_weight: 10.0
+      window_size: 60
+      temporal_steps: 1500
+      n_sequences: 400
+      seq_len: 128
+
+probes:
+  dense_linear: {enabled: true}
+  dense_mlp:
+    enabled: false   # Dmitry's enabled=true is for the dense-MLP ceiling; we skip to save time.
+
+probe_dataset:
+  train_sequences: 1000
+  eval_sequences: 500
+  train_seed: 10042
+  eval_seed: 20042
+
+output_root: results
+
+reproduce: |
+  # From the temp_xc repo root:
+  cd experiments/mess3_mat_ablation
+  bash setup_vendor.sh
+  bash run_ablation.sh
