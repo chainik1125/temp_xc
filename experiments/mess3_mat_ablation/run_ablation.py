@@ -1,10 +1,17 @@
 """Entry point for the Mess3 Mat-TopK-SAE ablation.
 
-Imports Dmitry's `sae_day.run_driver` and monkey-patches its
-`evaluate_one_arch` dispatch to recognize `family="matsae"`, routing to
-our `evaluate_matsae_on_activations`. Everything else in his driver —
-transformer training, caching, per-cell JSON emission, probe fitting —
-runs unchanged.
+Imports Dmitry's `sae_day.run_driver` and monkey-patches:
+  1. `run_architecture` to recognize `family="matsae"` and route to our
+     `evaluate_matsae_on_activations`.
+  2. `run_architecture` (again) to capture
+     `metrics["single_feature_probe"]["per_component_best_feature"]`,
+     which Dmitry computes but discards before serialization.
+  3. `run_one_cell` to inject the captured argmax feature IDs into the
+     saved `results.json` and the in-memory payload (so `combined.json`
+     also picks them up).
+
+Everything else in the driver — transformer training, caching, probe
+fitting — runs unchanged.
 
 Usage:
     python run_ablation.py --config config_ablation.yaml
@@ -13,31 +20,27 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import json
 import sys
 from pathlib import Path
 
-# Resolve our evaluator + Dmitry's vendored driver via PYTHONPATH set in
-# run_ablation.sh. Import here so any path error surfaces early.
 from evaluate_matsae import evaluate_matsae_on_activations  # noqa: E402
 from sae_day import run_driver  # type: ignore[import-not-found]  # noqa: E402
 
 
-def _install_matsae_dispatch() -> None:
-    """Wrap `run_driver.run_architecture` so family='matsae' dispatches here.
+# Per-cell scratchpad: arch name → per-component argmax feature IDs.
+# Reset at the start of each cell by the run_one_cell wrapper.
+_CAPTURED_FEAT_IDS: dict[str, list[int]] = {}
 
-    Function name + signature match Dmitry's vendored run_driver.py at
-    commit 16452d5: `run_architecture(arch_entry, *, seed, train_acts,
-    train_acts_ml, eval_acts, eval_acts_ml, eval_omega, d_model, device,
-    checkpoint_path=None)`.
-    """
+
+def _install_matsae_dispatch_and_capture() -> None:
+    """Wrap `run_driver.run_architecture` for matsae dispatch + feature-ID capture."""
     original_dispatch = run_driver.run_architecture
 
     def patched_dispatch(arch_entry, **kwargs):
         if arch_entry.get("family") == "matsae":
-            # Reuse _merge_kwargs so our config entry picks up the same
-            # defaults layer as every other arch.
             arch_cfg = run_driver._merge_kwargs(arch_entry["name"], arch_entry.get("kwargs", {}))
-            return evaluate_matsae_on_activations(
+            run = evaluate_matsae_on_activations(
                 seed=kwargs["seed"],
                 arch_cfg=arch_cfg,
                 train_acts=kwargs["train_acts"],
@@ -47,9 +50,47 @@ def _install_matsae_dispatch() -> None:
                 device=kwargs["device"],
                 checkpoint_path=kwargs.get("checkpoint_path"),
             )
-        return original_dispatch(arch_entry, **kwargs)
+        else:
+            run = original_dispatch(arch_entry, **kwargs)
+
+        # Capture per-component argmax feature IDs (always present in
+        # Dmitry's summarize_single_feature_probe output, just not
+        # otherwise serialized).
+        m = run.get("metrics", {}).get("single_feature_probe", {})
+        ids = m.get("per_component_best_feature")
+        if ids is not None:
+            _CAPTURED_FEAT_IDS[arch_entry["name"]] = [int(i) for i in ids]
+        return run
 
     run_driver.run_architecture = patched_dispatch
+
+
+def _install_run_one_cell_augmenter() -> None:
+    """Wrap `run_driver.run_one_cell` to inject captured feature IDs into results.
+
+    Mutates both:
+      - the on-disk `cell_dir/results.json` (so re-runs with --skip-existing
+        pick them up via the json read in main()).
+      - the returned payload dict (so `combined.json` carries them).
+    """
+    original_run_one_cell = run_driver.run_one_cell
+
+    def wrapped(*args, **kwargs):
+        global _CAPTURED_FEAT_IDS
+        _CAPTURED_FEAT_IDS = {}
+        payload = original_run_one_cell(*args, **kwargs)
+        cell_dir: Path = kwargs.get("cell_dir") or args[2] if len(args) > 2 else None
+        for arch_name, feat_ids in _CAPTURED_FEAT_IDS.items():
+            arch_dict = payload.get("architectures", {}).get(arch_name)
+            if arch_dict is not None:
+                arch_dict["per_component_best_feature"] = feat_ids
+        if cell_dir is not None:
+            results_json = Path(cell_dir) / "results.json"
+            if results_json.exists():
+                results_json.write_text(json.dumps(payload, indent=2))
+        return payload
+
+    run_driver.run_one_cell = wrapped
 
 
 def main() -> int:
@@ -58,11 +99,9 @@ def main() -> int:
                    help="Path to config YAML (e.g. config_ablation.yaml).")
     args = p.parse_args()
 
-    _install_matsae_dispatch()
+    _install_matsae_dispatch_and_capture()
+    _install_run_one_cell_augmenter()
 
-    # Delegate to Dmitry's driver main. It parses the YAML, loops cells,
-    # trains/caches transformers, dispatches per arch, and writes per-cell
-    # JSONs to `output_root`.
     sys.argv = ["run_driver.py", "--config", str(args.config)]
     return run_driver.main()
 

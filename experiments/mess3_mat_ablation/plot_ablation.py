@@ -74,20 +74,19 @@ def _arch_r2_over_delta(results: dict[float, dict], arch_name: str) -> list[floa
 
 
 def _feature_diversity(cell: dict, arch_name: str) -> int | None:
-    """For one (cell, arch), count distinct argmax features across the C=3
-    Mess3 components. None if the arch didn't run on this cell.
+    """For one (cell, arch), count distinct argmax features across the
+    C=3 Mess3 components. None if the arch didn't run on this cell, or
+    if the per-component feature IDs weren't persisted.
 
-    Dmitry's driver doesn't persist argmax feature IDs — only best R² per
-    component. Without raw z_all we can't compute diversity. Returns None
-    so the plot still produces something (empty bars for this metric).
-    To enable, modify Dmitry's `summarize_single_feature_probe` to save
-    `per_component_best_feature_idx` and propagate through run_one_cell.
+    The IDs are populated by `run_ablation.py`'s wrappers around
+    `run_architecture` + `run_one_cell` (Dmitry's driver computes them
+    in `summarize_single_feature_probe` but drops them on the floor).
     """
     arches_dict = cell.get("architectures", {})
     match = arches_dict.get(arch_name)
     if match is None:
         return None
-    idxs = match.get("per_component_argmax_feature") or match.get("per_component_best_r2_feature_id")
+    idxs = match.get("per_component_best_feature")
     if idxs is None:
         return None
     return len(set(int(i) for i in idxs))
@@ -161,10 +160,11 @@ def plot_feature_diversity(results: dict[float, dict], out_path: Path) -> None:
         fig, ax = plt.subplots(figsize=(6.5, 3.0), dpi=300)
         ax.text(
             0.5, 0.5,
-            "Feature-diversity plot requires per_component_argmax_feature IDs,\n"
-            "which Dmitry's run_one_cell doesn't currently persist.\n"
-            "Extend run_one_cell to save m['per_component_best_feature_idx']\n"
-            "in arch_results, then re-run plot_ablation.py.",
+            "Feature-diversity plot requires per_component_best_feature IDs,\n"
+            "which run_ablation.py's wrappers should inject. None present in\n"
+            "the loaded cell JSONs — re-run with the updated run_ablation.py\n"
+            "(delete results/cell_delta_*/results.json first to defeat\n"
+            "--skip-existing).",
             ha="center", va="center", fontsize=10,
         )
         ax.set_axis_off()
