@@ -31,7 +31,7 @@
       ],
       "transformer": {
         "final_loss": 1.090467095375061,
-        "was_loaded": false,
+        "was_loaded": true,
         "eval_resid_l2_mean": 40.30771255493164,
         "config": {
           "n_layers": 3,
@@ -90,7 +90,12 @@
             "sae_steps": 2000,
             "n_sequences": 1000,
             "seq_len": 128
-          }
+          },
+          "per_component_best_feature": [
+            29,
+            27,
+            6
+          ]
         },
         "TXC": {
           "best_single_r2": 0.0011407941822043632,
@@ -114,7 +119,12 @@
             "temporal_steps": 3000,
             "n_sequences": 1000,
             "seq_len": 128
-          }
+          },
+          "per_component_best_feature": [
+            9,
+            28,
+            15
+          ]
         },
         "MatryoshkaSAE (no-window)": {
           "best_single_r2": -6.109071471782634e-05,
@@ -145,7 +155,12 @@
             "sae_steps": 1500,
             "n_sequences": 400,
             "seq_len": 128
-          }
+          },
+          "per_component_best_feature": [
+            28,
+            6,
+            23
+          ]
         },
         "MatryoshkaTXC": {
           "best_single_r2": 0.001715599113615851,
@@ -178,10 +193,15 @@
             "temporal_steps": 1500,
             "n_sequences": 400,
             "seq_len": 128
-          }
+          },
+          "per_component_best_feature": [
+            2,
+            5,
+            75
+          ]
         }
       },
-      "cell_elapsed_sec": 759.3810834884644
+      "cell_elapsed_sec": 159.21429991722107
     },
     "0.05": {
       "sweep_parameter": "delta",
@@ -205,7 +225,7 @@
       ],
       "transformer": {
         "final_loss": 1.0873486995697021,
-        "was_loaded": false,
+        "was_loaded": true,
         "eval_resid_l2_mean": 40.060890197753906,
         "config": {
           "n_layers": 3,
@@ -264,7 +284,12 @@
             "sae_steps": 2000,
             "n_sequences": 1000,
             "seq_len": 128
-          }
+          },
+          "per_component_best_feature": [
+            38,
+            3,
+            56
+          ]
         },
         "TXC": {
           "best_single_r2": 0.001709432651776699,
@@ -288,7 +313,12 @@
             "temporal_steps": 3000,
             "n_sequences": 1000,
             "seq_len": 128
-          }
+          },
+          "per_component_best_feature": [
+            17,
+            50,
+            17
+          ]
         },
         "MatryoshkaSAE (no-window)": {
           "best_single_r2": -5.9566082965423206e-05,
@@ -319,7 +349,12 @@
             "sae_steps": 1500,
             "n_sequences": 400,
             "seq_len": 128
-          }
+          },
+          "per_component_best_feature": [
+            66,
+            11,
+            66
+          ]
         },
         "MatryoshkaTXC": {
           "best_single_r2": 0.0009385855622191519,
@@ -352,10 +387,15 @@
             "temporal_steps": 1500,
             "n_sequences": 400,
             "seq_len": 128
-          }
+          },
+          "per_component_best_feature": [
+            7,
+            3,
+            20
+          ]
         }
       },
-      "cell_elapsed_sec": 679.021689414978
+      "cell_elapsed_sec": 50.311506271362305
     },
     "0.1": {
       "sweep_parameter": "delta",
@@ -379,7 +419,7 @@
       ],
       "transformer": {
         "final_loss": 1.080666184425354,
-        "was_loaded": false,
+        "was_loaded": true,
         "eval_resid_l2_mean": 22.705230712890625,
         "config": {
           "n_layers": 3,
@@ -438,7 +478,12 @@
             "sae_steps": 2000,
             "n_sequences": 1000,
             "seq_len": 128
-          }
+          },
+          "per_component_best_feature": [
+            0,
+            0,
+            32
+          ]
         },
         "TXC": {
           "best_single_r2": 0.08209456720873043,
@@ -462,7 +507,12 @@
             "temporal_steps": 3000,
             "n_sequences": 1000,
             "seq_len": 128
-          }
+          },
+          "per_component_best_feature": [
+            49,
+            49,
+            49
+          ]
         },
         "MatryoshkaSAE (no-window)": {
           "best_single_r2": 0.0018911958536991236,
@@ -493,7 +543,12 @@
             "sae_steps": 1500,
             "n_sequences": 400,
             "seq_len": 128
-          }
+          },
+          "per_component_best_feature": [
+            10,
+            0,
+            7
+          ]
         },
         "MatryoshkaTXC": {
           "best_single_r2": 0.17023633292819917,
@@ -526,10 +581,15 @@
             "temporal_steps": 1500,
             "n_sequences": 400,
             "seq_len": 128
-          }
+          },
+          "per_component_best_feature": [
+            1,
+            1,
+            1
+          ]
         }
       },
-      "cell_elapsed_sec": 675.1543538570404
+      "cell_elapsed_sec": 53.91802954673767
     },
     "0.15": {
       "sweep_parameter": "delta",
@@ -553,7 +613,7 @@
       ],
       "transformer": {
         "final_loss": 1.0690324306488037,
-        "was_loaded": false,
+        "was_loaded": true,
         "eval_resid_l2_mean": 14.870331764221191,
         "config": {
           "n_layers": 3,
@@ -612,7 +672,12 @@
             "sae_steps": 2000,
             "n_sequences": 1000,
             "seq_len": 128
-          }
+          },
+          "per_component_best_feature": [
+            15,
+            15,
+            10
+          ]
         },
         "TXC": {
           "best_single_r2": 0.15819104228256342,
@@ -636,7 +701,12 @@
             "temporal_steps": 3000,
             "n_sequences": 1000,
             "seq_len": 128
-          }
+          },
+          "per_component_best_feature": [
+            8,
+            18,
+            8
+          ]
         },
         "MatryoshkaSAE (no-window)": {
           "best_single_r2": 0.03997740286782625,
@@ -667,7 +737,12 @@
             "sae_steps": 1500,
             "n_sequences": 400,
             "seq_len": 128
-          }
+          },
+          "per_component_best_feature": [
+            7,
+            7,
+            7
+          ]
         },
         "MatryoshkaTXC": {
           "best_single_r2": 0.1511536963410287,
@@ -700,10 +775,15 @@
             "temporal_steps": 1500,
             "n_sequences": 400,
             "seq_len": 128
-          }
+          },
+          "per_component_best_feature": [
+            0,
+            4,
+            0
+          ]
         }
       },
-      "cell_elapsed_sec": 677.3428781032562
+      "cell_elapsed_sec": 49.35558772087097
     },
     "0.2": {
       "sweep_parameter": "delta",
@@ -727,7 +807,7 @@
       ],
       "transformer": {
         "final_loss": 1.027206301689148,
-        "was_loaded": false,
+        "was_loaded": true,
         "eval_resid_l2_mean": 12.024303436279297,
         "config": {
           "n_layers": 3,
@@ -786,7 +866,12 @@
             "sae_steps": 2000,
             "n_sequences": 1000,
             "seq_len": 128
-          }
+          },
+          "per_component_best_feature": [
+            56,
+            56,
+            56
+          ]
         },
         "TXC": {
           "best_single_r2": 0.4455151965935308,
@@ -810,7 +895,12 @@
             "temporal_steps": 3000,
             "n_sequences": 1000,
             "seq_len": 128
-          }
+          },
+          "per_component_best_feature": [
+            62,
+            62,
+            62
+          ]
         },
         "MatryoshkaSAE (no-window)": {
           "best_single_r2": 0.1664262380680651,
@@ -841,7 +931,12 @@
             "sae_steps": 1500,
             "n_sequences": 400,
             "seq_len": 128
-          }
+          },
+          "per_component_best_feature": [
+            7,
+            7,
+            7
+          ]
         },
         "MatryoshkaTXC": {
           "best_single_r2": 0.41572805902523524,
@@ -874,10 +969,15 @@
             "temporal_steps": 1500,
             "n_sequences": 400,
             "seq_len": 128
-          }
+          },
+          "per_component_best_feature": [
+            7,
+            7,
+            7
+          ]
         }
       },
-      "cell_elapsed_sec": 672.1931848526001
+      "cell_elapsed_sec": 54.97349214553833
     }
   }
 }

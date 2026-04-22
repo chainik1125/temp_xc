@@ -20,7 +20,7 @@
   ],
   "transformer": {
     "final_loss": 1.090467095375061,
-    "was_loaded": false,
+    "was_loaded": true,
     "eval_resid_l2_mean": 40.30771255493164,
     "config": {
       "n_layers": 3,
@@ -170,5 +170,5 @@
       }
     }
   },
-  "cell_elapsed_sec": 759.3810834884644
+  "cell_elapsed_sec": 159.21429991722107
 }
