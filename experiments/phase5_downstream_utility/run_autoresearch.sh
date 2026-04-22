@@ -103,10 +103,14 @@ probe_val_if_missing() {
 }
 
 # ── Wait for any in-flight train/probe job ──────────────────────────────
+# Check for running Python training/probing processes.
+# IMPORTANT: use a narrow pattern that matches only actual Python
+# invocations, not any shell whose command line happens to contain
+# the substring (e.g. bash -c commit messages mentioning these files).
 # pgrep -f basic regex doesn't accept `\|` as alternation. Use two checks
 # chained with || so we wait on EITHER a probing OR a training process.
-while pgrep -f "run_probing.py" >/dev/null \
-   || pgrep -f "train_primary_archs" >/dev/null; do
+while pgrep -f "python.* run_probing\.py" >/dev/null \
+   || pgrep -f "train_primary_archs.*run_all" >/dev/null; do
     say "waiting for in-flight train/probe job to exit..."
     sleep 30
 done
