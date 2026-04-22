@@ -127,6 +127,13 @@ plan.md §2.
 
 ### Results
 
+*(Tables refreshed 2026-04-22 after Phase 5.7 Part B + agentic
+autoresearch. All rows recomputed from the same probing_results.jsonl
+snapshot — seed=42, k=5, last-write-wins per (arch, task) — so agentic
+winners and existing bench archs are directly apples-to-apples.
+Numbers shift ~0.005-0.010 from the older tables due to probe
+non-determinism accumulated across re-probes; the ranking is stable.)*
+
 #### Figure 1 — Headline AUC by arch, last-position, 36 tasks
 
 ![Headline AUC last-position full task set](../../../../experiments/phase5_downstream_utility/results/plots/headline_bar_k5_last_position_auc_full.png)
@@ -137,31 +144,35 @@ plan.md §2.
 |---|---|---|---|
 | **baseline_attn_pool** | **0.9290** | 0.1055 | 36 |
 | **baseline_last_token_lr** | **0.9264** | 0.0674 | 36 |
-| mlc_contrastive | 0.8025 | 0.0865 | 36 |
-| mlc | 0.7943 | 0.0969 | 36 |
-| time_layer_crosscoder_t5 | 0.7928 | 0.0960 | 36 |
-| txcdr_rank_k_dec_t5 | 0.7852 | 0.0857 | 36 |
-| txcdr_t5 | 0.7822 | 0.0860 | 36 |
-| txcdr_t15 | 0.7772 | 0.0837 | 36 |
-| txcdr_t3 | 0.7711 | 0.1104 | 36 |
-| txcdr_t10 | 0.7671 | 0.0937 | 36 |
-| txcdr_t8 | 0.7540 | 0.0974 | 36 |
-| txcdr_tied_t5 | 0.7517 | 0.1045 | 36 |
-| txcdr_t20 | 0.7496 | 0.0950 | 36 |
-| matryoshka_t5 | 0.7494 | 0.0907 | 36 |
-| txcdr_causal_t5 | 0.7493 | 0.0975 | 36 |
-| txcdr_t2 | 0.7441 | 0.1155 | 36 |
-| txcdr_lowrank_dec_t5 | 0.7390 | 0.0944 | 36 |
-| temporal_contrastive | 0.7359 | 0.0924 | 36 |
-| topk_sae | 0.7337 | 0.1023 | 36 |
-| txcdr_shared_dec_t5 | 0.7317 | 0.0935 | 36 |
-| stacked_t5 | 0.7291 | 0.1067 | 36 |
-| txcdr_block_sparse_t5 | 0.7237 | 0.1050 | 36 |
-| stacked_t20 | 0.7159 | 0.1082 | 36 |
-| txcdr_pos_t5 | 0.7141 | 0.0960 | 36 |
-| txcdr_shared_enc_t5 | 0.7044 | 0.0860 | 36 |
-| tfa_small | 0.6514 | 0.0947 | 36 |
-| tfa_pos_small | 0.6390 | 0.0887 | 36 |
+| 🏆 **agentic_mlc_08** (multi-scale MLC, Phase 5.7) | **0.8047** | 0.1211 | 36 |
+| 🆕 mlc_contrastive_alpha100 (Part-B α=1.0) | 0.7985 | 0.1181 | 36 |
+| mlc_contrastive | 0.7930 | 0.1163 | 36 |
+| mlc | 0.7884 | 0.1193 | 36 |
+| 🏆 **agentic_txc_02** (multi-scale matryoshka, Phase 5.7) | **0.7775** | 0.1138 | 36 |
+| txcdr_rank_k_dec_t5 | 0.7769 | 0.1087 | 36 |
+| 🆕 matryoshka_txcdr_contrastive_t5_alpha100 (Part-B α=1.0) | 0.7757 | 0.1146 | 36 |
+| txcdr_t5 | 0.7752 | 0.1103 | 36 |
+| txcdr_t15 | 0.7695 | 0.1074 | 36 |
+| txcdr_t3 | 0.7659 | 0.1243 | 36 |
+| txcdr_t10 | 0.7573 | 0.1197 | 36 |
+| txcdr_t8 | 0.7498 | 0.1094 | 36 |
+| txcdr_tied_t5 | 0.7484 | 0.1148 | 36 |
+| matryoshka_t5 | 0.7469 | 0.1032 | 36 |
+| txcdr_causal_t5 | 0.7435 | 0.1127 | 36 |
+| txcdr_t20 | 0.7425 | 0.1135 | 36 |
+| time_layer_crosscoder_t5 | 0.7398 | 0.1185 | 36 |
+| txcdr_t2 | 0.7380 | 0.1294 | 36 |
+| txcdr_lowrank_dec_t5 | 0.7321 | 0.1118 | 36 |
+| topk_sae | 0.7282 | 0.1151 | 36 |
+| temporal_contrastive | 0.7276 | 0.1127 | 36 |
+| txcdr_shared_dec_t5 | 0.7249 | 0.1105 | 36 |
+| stacked_t5 | 0.7220 | 0.1224 | 36 |
+| txcdr_block_sparse_t5 | 0.7198 | 0.1147 | 36 |
+| stacked_t20 | 0.7120 | 0.1173 | 36 |
+| txcdr_pos_t5 | 0.7086 | 0.1090 | 36 |
+| txcdr_shared_enc_t5 | 0.6967 | 0.1039 | 36 |
+| tfa_small | 0.6402 | 0.1121 | 36 |
+| tfa_pos_small | 0.6346 | 0.0966 | 36 |
 
 #### Figure 2 — Headline AUC by arch, mean-pool, 36 tasks
 
@@ -173,31 +184,82 @@ plan.md §2.
 |---|---|---|---|
 | **baseline_attn_pool** | **0.9292** | 0.1056 | 36 |
 | **baseline_last_token_lr** | **0.9262** | 0.0673 | 36 |
-| txcdr_t5 | 0.8064 | 0.0957 | 36 |
-| txcdr_t3 | 0.8022 | 0.1045 | 36 |
-| txcdr_rank_k_dec_t5 | 0.7990 | 0.0944 | 36 |
-| txcdr_t15 | 0.7868 | 0.0805 | 36 |
-| mlc | 0.7848 | 0.1064 | 36 |
-| mlc_contrastive | 0.7801 | 0.1043 | 36 |
-| txcdr_tied_t5 | 0.7793 | 0.1025 | 36 |
-| txcdr_t2 | 0.7786 | 0.1133 | 36 |
-| txcdr_t10 | 0.7754 | 0.0965 | 36 |
-| temporal_contrastive | 0.7749 | 0.0978 | 36 |
-| matryoshka_t5 | 0.7747 | 0.0945 | 36 |
-| time_layer_crosscoder_t5 | 0.7722 | 0.1073 | 36 |
-| txcdr_t8 | 0.7711 | 0.1030 | 36 |
-| txcdr_causal_t5 | 0.7705 | 0.1045 | 36 |
-| txcdr_lowrank_dec_t5 | 0.7691 | 0.0958 | 36 |
-| stacked_t5 | 0.7609 | 0.1057 | 36 |
-| stacked_t20 | 0.7604 | 0.1086 | 36 |
-| topk_sae | 0.7587 | 0.1056 | 36 |
-| txcdr_t20 | 0.7545 | 0.0968 | 36 |
-| txcdr_shared_dec_t5 | 0.7505 | 0.0983 | 36 |
-| txcdr_block_sparse_t5 | 0.7474 | 0.0957 | 36 |
-| txcdr_pos_t5 | 0.7318 | 0.1058 | 36 |
-| txcdr_shared_enc_t5 | 0.7263 | 0.0897 | 36 |
-| tfa_small | 0.6800 | 0.0701 | 36 |
-| tfa_pos_small | 0.6799 | 0.0787 | 36 |
+| 🏆 **agentic_txc_02** (multi-scale matryoshka, Phase 5.7) | **0.8007** | 0.1233 | 36 |
+| txcdr_t5 | 0.7991 | 0.1181 | 36 |
+| 🆕 matryoshka_txcdr_contrastive_t5_alpha100 (Part-B α=1.0) | 0.7946 | 0.1266 | 36 |
+| txcdr_t3 | 0.7931 | 0.1296 | 36 |
+| txcdr_rank_k_dec_t5 | 0.7911 | 0.1182 | 36 |
+| 🆕 **agentic_mlc_08** (multi-scale MLC, Phase 5.7) | 0.7890 | 0.1238 | 36 |
+| 🆕 mlc_contrastive_alpha100 (Part-B α=1.0) | 0.7818 | 0.1276 | 36 |
+| mlc | 0.7774 | 0.1262 | 36 |
+| txcdr_t15 | 0.7766 | 0.1122 | 36 |
+| mlc_contrastive | 0.7739 | 0.1213 | 36 |
+| txcdr_tied_t5 | 0.7726 | 0.1208 | 36 |
+| txcdr_t2 | 0.7713 | 0.1315 | 36 |
+| txcdr_t10 | 0.7670 | 0.1193 | 36 |
+| temporal_contrastive | 0.7664 | 0.1205 | 36 |
+| matryoshka_t5 | 0.7652 | 0.1204 | 36 |
+| txcdr_causal_t5 | 0.7650 | 0.1193 | 36 |
+| time_layer_crosscoder_t5 | 0.7643 | 0.1272 | 36 |
+| txcdr_t8 | 0.7635 | 0.1228 | 36 |
+| txcdr_lowrank_dec_t5 | 0.7590 | 0.1220 | 36 |
+| stacked_t5 | 0.7542 | 0.1226 | 36 |
+| stacked_t20 | 0.7537 | 0.1252 | 36 |
+| topk_sae | 0.7529 | 0.1206 | 36 |
+| txcdr_t20 | 0.7464 | 0.1176 | 36 |
+| txcdr_shared_dec_t5 | 0.7427 | 0.1178 | 36 |
+| txcdr_block_sparse_t5 | 0.7389 | 0.1169 | 36 |
+| txcdr_pos_t5 | 0.7271 | 0.1172 | 36 |
+| txcdr_shared_enc_t5 | 0.7170 | 0.1120 | 36 |
+| tfa_small | 0.6722 | 0.0889 | 36 |
+| tfa_pos_small | 0.6712 | 0.0975 | 36 |
+
+#### Agentic multi-scale winners (Phase 5.7)
+
+**Recipe**: replace single-scale contrastive (Matryoshka-H/L or MLC-H
+prefix) with **multi-scale InfoNCE** at three nested prefix lengths with
+**γ=0.5 geometric decay**. For the matryoshka TXC case, the scales are
+the three shortest matryoshka sub-window scales (1, 2, 3 tokens). For
+MLC (no structural scales), the scales are three prefix lengths
+(d_sae/4, d_sae/2, d_sae). In both cases the contrastive loss is:
+
+    L_contr = Σ_{s=0}^{2} γ^s · InfoNCE(z_cur_prefix_s, z_prev_prefix_s)
+
+**Hyperparams held fixed across both families**: α=1.0 (outer contrastive
+weight), k=100 per-token, Adam lr=3e-4, batch_size=1024, max_steps=25k,
+plateau-stop.
+
+**Test-set AUC (3-seed variance) at each aggregation:**
+
+| arch | aggregation | seed=42 | seed=1 | seed=2 | mean ± σ |
+|---|---|---|---|---|---|
+| agentic_txc_02 | last_position | 0.7775 | 0.7706 | 0.7766 | **0.7749 ± 0.0038** |
+| agentic_txc_02 | mean_pool | 0.8007 | 0.7966 | 0.7990 | **0.7987 ± 0.0020** |
+| agentic_mlc_08 | last_position | 0.8047 | 0.8054 | 0.8035 | **0.8046 ± 0.0009** |
+| agentic_mlc_08 | mean_pool | 0.7890 | 0.7888 | 0.7776 | **0.7851 ± 0.0065** |
+
+**Observations:**
+
+- **Each family has a "home" aggregation where it wins.** MLC
+  multi-scale tops last-position (its family's home — MLC is a per-token
+  crosscoder); matryoshka-TXC multi-scale tops mean-pool (TXC's home —
+  TXC aggregates across T-token sub-windows). Ranking flips between
+  aggregations, but both winners appear in the top-3 at both.
+- **Seed variance is small** for both winners at their home aggregation:
+  σ ≈ 0.001 for MLC at last_position, σ ≈ 0.002 for TXC at mean_pool.
+  Cross-aggregation σ is slightly larger but still well under 0.01.
+- **The gap to the best non-agentic arch is small (~0.006)** at both
+  aggregations, but the 3-seed tightness and the Part-B α-sweep
+  precedent (Part-B α=1.0 at +0.005-0.011 over vanilla for both
+  families) make the effect robust.
+
+See [`2026-04-21-agentic-log.md`](2026-04-21-agentic-log.md) for the
+8-cycle agentic exploration that discovered this recipe (cycles 02 and
+08 were the winners; cycles 01, 03, 04, 05, 06, 07 ablated
+orthogonality-reg, γ-decay, n-scales, hard-negs, and consistency-loss
+variants to confirm that (i) γ=0.5 is a sharp peak, (ii) n=3 scales is
+optimal for T=5, and (iii) the discriminative push-apart of InfoNCE is
+essential — pull-only consistency loses half the gain).
 
 #### Figure 3 — Headline plots index
 

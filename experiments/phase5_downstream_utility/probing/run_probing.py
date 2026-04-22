@@ -784,7 +784,12 @@ def _encode_for_probe(
         Z_last = np.concatenate(outs, axis=0)  # (N*K, d_sae)
         return Z_last.reshape(N, K * Z_last.shape[-1])
     if arch in ("tfa", "tfa_pos", "tfa_small", "tfa_pos_small"):
-        # TFA takes (B, T, d); novel_codes live at inter["novel_codes"].
+        # TFA takes (B, T, d). The effective per-token representation is
+        # `z_novel + z_pred` (see `_tfa_module.py:232`: reconstruction is
+        # `(z_novel + z_pred) @ D + b`). Earlier builds probed `z_novel`
+        # alone, stripping TFA's defining context-predicted features and
+        # making the bench comparison unfair. Fixed 2026-04-22 — see
+        # 2026-04-21-handover-18hr.md "TFA audit finding".
         # Scaling factor must match training; saved in meta as `scale`.
         scale = float(meta.get("scale", 1.0))
         outs = []
@@ -792,12 +797,12 @@ def _encode_for_probe(
             Xb = torch.from_numpy(anchor[i:i + 256]).float().to(device) * scale
             with torch.no_grad():
                 _, inter = model(Xb)
-            novel = inter["novel_codes"]  # (B, 20, d_sae)
+            z_eff = inter["novel_codes"] + inter["pred_codes"]  # (B, 20, d_sae)
             if aggregation == "last_position":
                 lib = torch.from_numpy(li[i:i + 256]).to(device)
-                outs.append(novel[torch.arange(novel.shape[0], device=device), lib].cpu().numpy())
+                outs.append(z_eff[torch.arange(z_eff.shape[0], device=device), lib].cpu().numpy())
             else:
-                outs.append(novel.reshape(novel.shape[0], -1).cpu().numpy())
+                outs.append(z_eff.reshape(z_eff.shape[0], -1).cpu().numpy())
         return np.concatenate(outs, axis=0)
     if arch == "temporal_contrastive":
         # Token-level SAE; encode last token directly.
