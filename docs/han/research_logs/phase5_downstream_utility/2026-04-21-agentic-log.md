@@ -319,13 +319,45 @@ results of the prior cycle.
   cycle 02. To know whether cycle 02 is on a plateau or a peak, sweep
   γ downward. γ=0.3 gives scale-1 weight 1, scale-2 weight 0.3, scale-3
   weight 0.09 — still multi-scale but with stronger scale-1 dominance.
-  Prediction: roughly similar to cycle 02 if decay insensitivity within
-  [0.3, 0.5]; modest improvement if scale-1 under-weighting at γ=0.5
-  was the limiting factor; regression if signal at scales 2, 3 was
-  doing real work at γ=0.5 and we're starving it at γ=0.3.
-**Change**: `MatryoshkaTXCDRContrastiveMultiscale`,
-  **n_contr_scales=3**, γ=0.3. Same dispatcher pattern — new
-  `agentic_txc_05` arch name.
+**Change**: `MatryoshkaTXCDRContrastiveMultiscale`, n_contr_scales=3,
+  γ=0.3.
+**Code**: commit `9ec5fb7`.
+**Result**: Δ_val = **−0.0096 ±0.0113** (t=−0.85, n=36, 16/3/17) vs
+  `matryoshka_t5`. **Regressed below vanilla**.
+**Verdict**: **LOST vs vanilla and vs cycle 02**. Cycle 02 is a narrow
+  peak on this axis, not a plateau.
+**Takeaway**: The γ curve is **sharply peaked at 0.5**. Both γ=0.3
+  (−0.0096) and γ=1.0 (+0.0072) are worse than cycle 02's +0.0354.
+  The surprise is γ=0.3 is WORSE than γ=1.0 — suggests that once
+  scales 2, 3 contrastive pressure drops below a threshold, it adds
+  noise without gain. Multi-scale contrastive is fragile on the
+  weighting axis.
+**Next**: Multi-scale axis is exhausted. Pivot to a different axis:
+  contrastive SIGNAL QUALITY via hard negatives (H-TXC2).
+
+---
+
+### Cycle 06 — hard negatives at cycle-02 config (H-TXC2)
+**Family**: TXC
+**Reference to beat**: `agentic_txc_02` at Δ_val = +0.0354.
+**Hypothesis**: Current contrastive uses in-batch random negatives,
+  which are mostly cross-sequence and "easy" (different contexts are
+  trivially distinguishable). Adding K=4 same-sequence hard negatives
+  per anchor (positions ≥ 10 tokens from anchor/positive) forces the
+  scale-1/2/3 features to discriminate *within* a sequence — sharper
+  signal. Prediction: non-trivial improvement if the discriminative
+  quality of contrastive was limited by easy negatives; neutral if
+  cross-seq negatives were already providing enough signal; regression
+  if hard negs destabilize training.
+**Change**:
+  - New pair-gen `make_pair_hardneg_window_gen_gpu(buf, T, K=4, min_gap=10)`
+    returns (B, 2+K, T, d).
+  - New class `MatryoshkaTXCDRContrastiveHardneg` subclassing
+    `MatryoshkaTXCDRContrastiveMultiscale`. Forward accepts
+    (B, 2+K, T, d), encodes all 2+K windows, computes multi-scale
+    InfoNCE with per-anchor hard negatives added to the denominator.
+  - Same winning config: n=3, γ=0.5, α=1.0. K=4 per anchor.
+  - New arch `agentic_txc_06`, dispatcher, probe routing, BASE_OF.
 **Code**: commit forthcoming.
 **Result**: pending.
 **Verdict**: pending.

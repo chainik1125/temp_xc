@@ -363,6 +363,60 @@ def make_pair_window_gen_gpu(buf: torch.Tensor, T: int):
     return gen
 
 
+def make_pair_hardneg_window_gen_gpu(
+    buf: torch.Tensor, T: int, K: int = 4, min_gap: int = 10,
+):
+    """Adjacent T-windows (shifted by 1 token) + K same-sequence
+    hard negatives per anchor, with |position_diff| ≥ min_gap from
+    the anchor/positive pair.
+
+    Returns a (B, 2+K, T, d) tensor:
+      [:, 0]       = anchor window (off..off+T)
+      [:, 1]       = positive window (off+1..off+T+1)
+      [:, 2:2+K]   = K hard-negative windows, same sequence, far positions
+
+    Used by the `agentic_txc_06` cycle (H-TXC2 hardnegs hypothesis).
+    """
+    N, L, d = buf.shape
+    assert L >= T + 1 + min_gap, (
+        f"need L>={T+1+min_gap} for anchor+positive+gap+neg window; got L={L}"
+    )
+
+    def gen(batch_size: int) -> torch.Tensor:
+        dev = buf.device
+        seq = torch.randint(0, N, (batch_size,), device=dev)
+        off = torch.randint(0, L - T, (batch_size,), device=dev)
+        rng = torch.arange(T, device=dev)
+        pos_prev = off.unsqueeze(1) + rng.unsqueeze(0)          # (B, T)
+        pos_cur = (off + 1).unsqueeze(1) + rng.unsqueeze(0)     # (B, T)
+        x_prev = buf[seq.unsqueeze(1).expand(-1, T), pos_prev].float()
+        x_cur = buf[seq.unsqueeze(1).expand(-1, T), pos_cur].float()
+
+        # Sample K hard-neg offsets per anchor s.t. |hn_off - off| ≥ min_gap.
+        # Strategy: draw candidates in [0, L-T), reject-and-resample any
+        # within min_gap; with L-T >> 2*min_gap, rejection rate is low so
+        # we do at most a handful of retries.
+        hn_off = torch.randint(0, L - T, (batch_size, K), device=dev)
+        for _ in range(6):
+            too_close = (hn_off - off.unsqueeze(1)).abs() < min_gap
+            if not too_close.any():
+                break
+            # resample the too-close slots
+            replacement = torch.randint(0, L - T, (batch_size, K), device=dev)
+            hn_off = torch.where(too_close, replacement, hn_off)
+
+        # Gather the K hard-neg windows per anchor
+        # pos_hn[i, k, t] = hn_off[i, k] + t
+        pos_hn = hn_off.unsqueeze(2) + rng.view(1, 1, -1)        # (B, K, T)
+        seq_hn = seq.view(-1, 1, 1).expand(-1, K, T)             # (B, K, T)
+        x_hn = buf[seq_hn, pos_hn].float()                       # (B, K, T, d)
+
+        # Stack to (B, 2+K, T, d)
+        xs = torch.cat([x_prev.unsqueeze(1), x_cur.unsqueeze(1), x_hn], dim=1)
+        return xs
+    return gen
+
+
 def train_txcdr_contrastive(cfg, device, k, T, alpha=0.1,
                             d_sae=DEFAULT_D_SAE, h=None,
                             buf: torch.Tensor | None = None):
@@ -480,6 +534,38 @@ def train_matryoshka_txcdr_contrastive(cfg, device, k, T, alpha=0.1,
     k_eff = k * T
     model = MatryoshkaTXCDRContrastive(buf.shape[-1], d_sae, T, k_eff).to(device)
     pair_gen = make_pair_window_gen_gpu(buf, T)
+
+    def gen(batch_size):
+        return pair_gen(batch_size)
+
+    def norm(): model._normalize_decoder()
+
+    orig_forward = model.forward
+
+    def forward_with_alpha(x):
+        return orig_forward(x, alpha=alpha)
+
+    model.forward = forward_with_alpha   # type: ignore[method-assign]
+    log = _iterate_train(model, gen, cfg, device, normalize_decoder=norm)
+    model.forward = orig_forward   # type: ignore[method-assign]
+    return model, log
+
+
+def train_matryoshka_txcdr_contrastive_hardneg(
+    cfg, device, k, T, alpha=1.0, n_contr_scales=3, gamma=0.5,
+    K_hardneg=4, min_gap=10, d_sae=DEFAULT_D_SAE, buf=None,
+):
+    """Agentic cycle 06: cycle-02 config + K same-sequence hard negs."""
+    from src.architectures.matryoshka_txcdr_contrastive_hardneg import (
+        MatryoshkaTXCDRContrastiveHardneg,
+    )
+    buf = buf if buf is not None else _preload_single(ANCHOR_LAYER_KEY, device)
+    k_eff = k * T
+    model = MatryoshkaTXCDRContrastiveHardneg(
+        buf.shape[-1], d_sae, T, k_eff,
+        n_contr_scales=n_contr_scales, gamma=gamma, K_hardneg=K_hardneg,
+    ).to(device)
+    pair_gen = make_pair_hardneg_window_gen_gpu(buf, T, K=K_hardneg, min_gap=min_gap)
 
     def gen(batch_size):
         return pair_gen(batch_size)
@@ -1094,6 +1180,19 @@ def run_all(seeds, max_steps, archs=None):
                             match_budget=True, layer=13, alpha=1.0,
                             n_contr_scales=3, gamma=0.3,
                             variant="agentic_txc_05_multiscale_n3_g03")
+            elif arch == "agentic_txc_06":
+                # Agentic cycle 06: cycle-02 config (n=3, γ=0.5)
+                # + K=4 same-seq hard negatives (min gap=10 tokens).
+                model, log = train_matryoshka_txcdr_contrastive_hardneg(
+                    cfg, device, k=100, T=5, alpha=1.0,
+                    n_contr_scales=3, gamma=0.5,
+                    K_hardneg=4, min_gap=10, buf=get_anchor(),
+                )
+                meta = dict(seed=seed, k_pos=100, k_win=500, T=5,
+                            match_budget=True, layer=13, alpha=1.0,
+                            n_contr_scales=3, gamma=0.5,
+                            K_hardneg=4, min_gap=10,
+                            variant="agentic_txc_06_hardneg")
             elif arch == "matryoshka_txcdr_contrastive_t5_k2x":
                 model, log = train_matryoshka_txcdr_contrastive(
                     cfg, device, k=200, T=5, alpha=0.1, buf=get_anchor(),

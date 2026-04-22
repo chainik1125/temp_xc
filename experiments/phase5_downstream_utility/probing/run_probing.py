@@ -391,6 +391,18 @@ def _load_model_for_run(run_id, ckpt_path, device):
             n_contr_scales=meta.get("n_contr_scales", 3),
             gamma=meta.get("gamma", 0.5),
         ).to(device)
+    elif arch == "agentic_txc_06":
+        from src.architectures.matryoshka_txcdr_contrastive_hardneg import (
+            MatryoshkaTXCDRContrastiveHardneg,
+        )
+        T = meta["T"]
+        k_eff = meta["k_win"] or (meta["k_pos"] * T)
+        model = MatryoshkaTXCDRContrastiveHardneg(
+            d_in, d_sae, T, k_eff,
+            n_contr_scales=meta.get("n_contr_scales", 3),
+            gamma=meta.get("gamma", 0.5),
+            K_hardneg=meta.get("K_hardneg", 4),
+        ).to(device)
     elif arch == "mlc_temporal_t3":
         from src.architectures.mlc_temporal import MLCTemporal
         T = meta["T"]
@@ -589,7 +601,8 @@ def _encode_for_probe(
                 "agentic_txc_02",
                 "agentic_txc_03",
                 "agentic_txc_04",
-                "agentic_txc_05"):
+                "agentic_txc_05",
+                "agentic_txc_06"):
         T = meta["T"]
         return _encode_matryoshka(model, anchor, li, T, device, aggregation)
     if arch == "mlc_temporal_t3":
