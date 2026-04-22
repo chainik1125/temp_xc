@@ -107,7 +107,17 @@ def get_char_to_token_map(text: str, tokenizer: Any) -> dict[int, int]:
     that token's index. Characters outside any token (e.g. whitespace
     that was dropped) are simply absent from the dict.
     """
-    offsets = tokenizer.encode_plus(text, return_offsets_mapping=True)['offset_mapping']
+    # Modern transformers deprecated encode_plus on slow tokenizers and
+    # removed return_offsets_mapping from it entirely. Call the fast
+    # tokenizer directly — semantically identical, and only the fast
+    # variant supports offset mappings anyway.
+    if not getattr(tokenizer, "is_fast", False):
+        raise ValueError(
+            f"{type(tokenizer).__name__} is a slow tokenizer; "
+            "get_char_to_token_map requires a fast tokenizer "
+            "(AutoTokenizer.from_pretrained(..., use_fast=True))."
+        )
+    offsets = tokenizer(text, return_offsets_mapping=True)["offset_mapping"]
     char_to_token: dict[int, int] = {}
     for token_idx, (start, end) in enumerate(offsets):
         for char_pos in range(start, end):

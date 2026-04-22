@@ -518,7 +518,9 @@ def _load_model(model_name: str, device: str = "auto"):
 
     cfg = get_model_config(model_name)
     torch_dtype = {"float16": torch.float16, "bfloat16": torch.bfloat16, "float32": torch.float32}[cfg.dtype]
-    tokenizer = AutoTokenizer.from_pretrained(cfg.tokenizer)
+    # use_fast=True is required — only fast tokenizers support
+    # return_offsets_mapping, which get_char_to_token_map needs.
+    tokenizer = AutoTokenizer.from_pretrained(cfg.tokenizer, use_fast=True)
     if tokenizer.pad_token_id is None:
         tokenizer.pad_token_id = tokenizer.eos_token_id
     model = AutoModelForCausalLM.from_pretrained(
