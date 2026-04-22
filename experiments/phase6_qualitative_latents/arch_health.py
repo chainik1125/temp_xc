@@ -177,9 +177,11 @@ def main():
         if "error" in r:
             print(f"  {r['arch']:<20}  ERROR")
         else:
-            print(f"  {r['arch']:<20}  alive={r.get('alive_fraction', '?'):.4f}"
-                  f"  L0={r.get('l0_per_token', '?'):>6.2f}"
-                  f"  dec|cos|={r.get('decoder_mean_abs_cos', float('nan')):.4f}")
+            alive = r.get('alive_fraction'); l0 = r.get('l0_per_token')
+            dec = r.get('decoder_mean_abs_cos')
+            print(f"  {r['arch']:<20}  alive={alive if alive is None else f'{alive:.4f}'}"
+                  f"  L0={l0 if l0 is None else f'{l0:>6.2f}'}"
+                  f"  dec|cos|={dec if dec is None else f'{dec:.4f}'}")
 
 
 if __name__ == "__main__":

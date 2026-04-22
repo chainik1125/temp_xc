@@ -1,0 +1,186 @@
+[
+  {
+    "feature_idx": 2745,
+    "label": "references to George Orwell's Animal Farm preface",
+    "variance": 217.03016662597656,
+    "n_contexts": 10,
+    "contexts": [
+      {
+        "position": 1343,
+        "strength": 78.625,
+        "text": " a period when Russia lived under the Marxist\u2013Len\u00abinist\u00bb ideology of Joseph Stalin. Orwell, a democratic"
+      },
+      {
+        "position": 1272,
+        "strength": 77.1875,
+        "text": " for criticisms or corrections, because I should wish to\u00ab bear\u00bb\nalone the loip of the pigs,"
+      },
+      {
+        "position": 1547,
+        "strength": 72.8125,
+        "text": " socialistes animales for the French translation, which abbre\u00abvi\u00bbates to URSA, the Latin word for"
+      }
+    ]
+  },
+  {
+    "feature_idx": 3582,
+    "label": "Punctuation marks and grammatical delimiters",
+    "variance": 111.58567810058594,
+    "n_contexts": 10,
+    "contexts": [
+      {
+        "position": 1264,
+        "strength": 52.875,
+        "text": " name those to whom I\nam indebted for criticisms\u00ab or\u00bb corrections, because I should wish to bear\n"
+      },
+      {
+        "position": 165,
+        "strength": 52.65625,
+        "text": "Respiciens miser\u00e6 solummodo commoda vit\u00ab\u00e6\u00bb.\n  Jam vero Superis conviv\u00e6"
+      },
+      {
+        "position": 783,
+        "strength": 52.65625,
+        "text": ", more of the taller individuals are able to obtain\u00ab nutrients\u00bb and survive to pass along their genetic information."
+      }
+    ]
+  },
+  {
+    "feature_idx": 2138,
+    "label": "George Orwell and Animal Farm references",
+    "variance": 93.8829574584961,
+    "n_contexts": 10,
+    "contexts": [
+      {
+        "position": 1702,
+        "strength": 44.34375,
+        "text": " gave way to the Cold War.\nTime magazine\u00ab chose\u00bb the book as one of thIf a pen"
+      },
+      {
+        "position": 1707,
+        "strength": 44.0625,
+        "text": " War.\nTime magazine chose the book as one\u00ab of\u00bb thIf a pentagon P with vertices at"
+      },
+      {
+        "position": 1493,
+        "strength": 43.375,
+        "text": " of the novel was Animal Farm: A Fairy Story\u00ab.\u00bb American publishers dropped the subtitle when it was published"
+      }
+    ]
+  },
+  {
+    "feature_idx": 1815,
+    "label": "historical biographical documentation and correspondence",
+    "variance": 82.37916564941406,
+    "n_contexts": 10,
+    "contexts": [
+      {
+        "position": 900,
+        "strength": 74.625,
+        "text": " as supplying a frame-work of facts round which\u00ab\n\u00bbletters may be grouped. It is unfortunately written"
+      },
+      {
+        "position": 979,
+        "strength": 74.1875,
+        "text": " his letters, so that but for the Diary it\u00ab\n\u00bbwould have been all but impossible to unravel the"
+      },
+      {
+        "position": 1008,
+        "strength": 73.0625,
+        "text": " enabled me to assign dates to many letters which would\u00ab\n\u00bbotherwise have been shorn of half their value"
+      }
+    ]
+  },
+  {
+    "feature_idx": 2882,
+    "label": "Archaic or poetic English language syntax",
+    "variance": 66.61228942871094,
+    "n_contexts": 10,
+    "contexts": [
+      {
+        "position": 357,
+        "strength": 44.4375,
+        "text": ", an environmental change occurs that favors individuals that are\u00ab tallest\u00bb. As a result, more of the taller"
+      },
+      {
+        "position": 447,
+        "strength": 44.375,
+        "text": "sign-badge\n  Was Hanuman the monkey,\u00ab spake\u00bb this thing\n  To Krishna the Divine,"
+      },
+      {
+        "position": 481,
+        "strength": 43.25,
+        "text": "! to yonder open ground\n  Betwixt the\u00ab armies\u00bb; I would see more nigh\n  These"
+      }
+    ]
+  },
+  {
+    "feature_idx": 3457,
+    "label": "Political ideology and authoritarian regimes",
+    "variance": 64.49918365478516,
+    "n_contexts": 10,
+    "contexts": [
+      {
+        "position": 620,
+        "strength": 35.75,
+        "text": " they stand,\n  Thy kindred of the Kur\u00abus\u00bb:\" and the Prince\n  Marked on each"
+      },
+      {
+        "position": 1347,
+        "strength": 34.125,
+        "text": " lived under the Marxist\u2013Leninist ideology of Joseph\u00ab Stalin\u00bb. Orwell, a democratic socialist, was a"
+      },
+      {
+        "position": 1580,
+        "strength": 33.8125,
+        "text": " French name of the Soviet Union, Union des r\u00e9\u00abpub\u00bbliques socialistes sovi\u00e9tiques.\nOrwell"
+      }
+    ]
+  },
+  {
+    "feature_idx": 2873,
+    "label": "Latin poetry text with classical/Newtonian themes",
+    "variance": 64.28578186035156,
+    "n_contexts": 10,
+    "contexts": [
+      {
+        "position": 266,
+        "strength": 38.15625,
+        "text": "\n  _NEWTONVM_ clausi res\u00aberan\u00bbtem scrinia Veri,\n  "
+      },
+      {
+        "position": 88,
+        "strength": 35.625,
+        "text": "ibus Urbes\n  Autor erat; Cereris\u00abve\u00bb beavit munere gentes;\n  Vel"
+      },
+      {
+        "position": 265,
+        "strength": 33.5625,
+        "text": ",\n  _NEWTONVM_ clausi\u00ab res\u00bberantem scrinia Veri,\n"
+      }
+    ]
+  },
+  {
+    "feature_idx": 2982,
+    "label": "Commas and punctuation in mathematical notation",
+    "variance": 63.888587951660156,
+    "n_contexts": 10,
+    "contexts": [
+      {
+        "position": 1732,
+        "strength": 33.21875,
+        "text": " \u2013 4), (\u2013 4, \u00ab1\u00bb), (\u20131, 4), ("
+      },
+      {
+        "position": 1739,
+        "strength": 30.578125,
+        "text": "4, 1), (\u20131, \u00ab4\u00bb), (2, 4), and ("
+      },
+      {
+        "position": 1462,
+        "strength": 30.515625,
+        "text": " first book in which I tried, with full consciousness\u00ab of\u00bb what I was doing, to fuse political purpose"
+      }
+    ]
+  }
+]
