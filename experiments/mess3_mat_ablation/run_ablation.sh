@@ -26,12 +26,16 @@ else
     echo "[info] stage=setup_vendor | status=cached | pin=$(head -1 vendor/COMMIT_SHA)"
 fi
 
-# Dmitry's code assumes `simplexity` + deps from his [separation-scaling] extra.
-# If unavailable, document the missing extra and stop.
-if ! "$REPO_ROOT/.venv/bin/python" -c "import simplexity" >/dev/null 2>&1; then
-    echo "[info] simplexity missing — attempting uv sync --extra separation-scaling"
-    (cd "$REPO_ROOT" && uv sync --extra separation-scaling)
-fi
+# Minimum deps we actually exercise: torch, jax, numpy, scikit-learn,
+# matplotlib, pyyaml, transformer_lens. Confirmed via grep that
+# `simplexity` is NOT imported in any vendored file (Dmitry kept it as
+# a project-level extras dep for his full pipeline, but the code paths
+# we hit don't reference it). The separation-scaling extras group also
+# doesn't exist on aniket branch. Skip both preconditions.
+#
+# If a later rebase of origin/dmitry starts actually importing
+# simplexity, the script will fail loudly at the run_driver.py import
+# site and this block needs to come back.
 
 # Step 2: run driver with our matsae dispatch.
 echo "[info] stage=run_driver | status=start | config=config_ablation.yaml"
