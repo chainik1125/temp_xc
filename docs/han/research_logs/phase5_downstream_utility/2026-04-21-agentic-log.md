@@ -161,10 +161,59 @@ results of the prior cycle.
   - Probe routing in `run_probing.py` (load + encode branches).
   - `BASE_OF[agentic_txc_01]=matryoshka_t5` in `run_autoresearch.sh`.
 **Code**: commit forthcoming with this log update.
-**Result**: pending — launched at the next GPU-idle window.
+**Result**: Δ_val = **+0.0078 ±0.0123** (t=0.63, n=36, 21/4/11) vs
+  `matryoshka_t5`. Compared to the reference A3 α=1.0 (+0.0259), this is
+  a ~0.018 **regression**. Training loss trajectory basically identical
+  to A3 α=1.0 (final losses within 0.04% at the same step), so the
+  penalty didn't change the training objective value — but its gradient
+  still perturbed features enough to hurt probing.
+**Verdict**: **LOST vs reference** (cycle-local verdict AMBIGUOUS vs
+  vanilla, but the reference-relative delta is what matters for the
+  agentic loop).
+**Takeaway**: Scale-1 features after matryoshka + contrastive are
+  already at a local optimum for downstream probing. Adding
+  orthogonality pressure at λ=1.0 perturbs the decoder columns *away*
+  from that optimum — probing wants correlated features that
+  co-activate on task-discriminative contexts, not maximally independent
+  ones. The reconstruction objective was largely unchanged (features
+  still reconstruct within 0.04% of the reference's loss), so the
+  damage is specifically in probing-relevant structure. Worth
+  remembering: orthogonality ≠ probing utility.
+**Next**: Stop trying to add *more pressure* — α=3 already plateaued,
+  orth regressed, so the local optimum under current signal structure
+  is reached. Change the *signal itself*: cycle 02 tries H-TXC7
+  (multi-scale contrastive — InfoNCE at scales 1, 2, 3 with decaying
+  weights γ=0.5). Tests whether single-scale contrastive is leaving
+  cross-token signal on the table at larger scales.
+
+---
+
+### Cycle 02 — multi-scale contrastive (H-TXC7)
+**Family**: TXC
+**Reference to beat**: `matryoshka_txcdr_contrastive_t5_alpha100`
+  (A3 α=1.0), Δ_val = +0.0259.
+**Hypothesis**: Current A3 contrastive only acts on the scale-1 prefix
+  (`d_sae//T` latents). Scales 2, 3, …, T latents receive no
+  contrastive pressure — they learn shift-non-invariant features
+  purely via reconstruction. Extending InfoNCE to the scale-2 and
+  scale-3 prefixes (with γ^s decay so scale-1 stays dominant) may add
+  useful cross-token structure at larger window sizes. Prediction:
+  modest positive Δ if multi-scale signal helps; negative if scale-1
+  was the only "useful" place for contrastive.
+**Change**:
+  - New class `MatryoshkaTXCDRContrastiveMultiscale` subclassing
+    `MatryoshkaTXCDRContrastive`, overriding `forward` to compute
+    InfoNCE at each of the first `n_contr_scales` scales with weights
+    `γ^s`.
+  - Keep α=1.0 (outer contrastive weight), add `n_contr_scales=3`,
+    `gamma=0.5`. Final contrastive contribution is
+    `α · Σ_s γ^s · InfoNCE(z_prefix_s, z_prev_prefix_s)`.
+  - New dispatcher `agentic_txc_02`; probe routing; BASE_OF entry.
+**Code**: commit forthcoming.
+**Result**: pending.
 **Verdict**: pending.
 **Takeaway**: pending.
-**Next**: pending (conditional on result).
+**Next**: pending.
 
 ---
 

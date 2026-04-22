@@ -497,6 +497,38 @@ def train_matryoshka_txcdr_contrastive(cfg, device, k, T, alpha=0.1,
     return model, log
 
 
+def train_matryoshka_txcdr_contrastive_multiscale(
+    cfg, device, k, T, alpha=1.0, n_contr_scales=3, gamma=0.5,
+    d_sae=DEFAULT_D_SAE, buf=None,
+):
+    """Agentic cycle 02: A3 + multi-scale InfoNCE."""
+    from src.architectures.matryoshka_txcdr_contrastive_multiscale import (
+        MatryoshkaTXCDRContrastiveMultiscale,
+    )
+    buf = buf if buf is not None else _preload_single(ANCHOR_LAYER_KEY, device)
+    k_eff = k * T
+    model = MatryoshkaTXCDRContrastiveMultiscale(
+        buf.shape[-1], d_sae, T, k_eff,
+        n_contr_scales=n_contr_scales, gamma=gamma,
+    ).to(device)
+    pair_gen = make_pair_window_gen_gpu(buf, T)
+
+    def gen(batch_size):
+        return pair_gen(batch_size)
+
+    def norm(): model._normalize_decoder()
+
+    orig_forward = model.forward
+
+    def forward_with_alpha(x):
+        return orig_forward(x, alpha=alpha)
+
+    model.forward = forward_with_alpha   # type: ignore[method-assign]
+    log = _iterate_train(model, gen, cfg, device, normalize_decoder=norm)
+    model.forward = orig_forward   # type: ignore[method-assign]
+    return model, log
+
+
 def train_matryoshka_txcdr_contrastive_orth(cfg, device, k, T, alpha=1.0,
                                              lam_orth=0.01,
                                              d_sae=DEFAULT_D_SAE, buf=None):
@@ -1006,15 +1038,29 @@ def run_all(seeds, max_steps, archs=None):
                             h=DEFAULT_D_SAE // 2,
                             variant="txcdr_contrastive_k2x")
             elif arch == "agentic_txc_01":
-                # Agentic cycle 01: A3 α=1.0 + scale-1 orthogonality (λ=0.01).
+                # Agentic cycle 01: A3 α=1.0 + scale-1 orthogonality (λ=1.0).
+                # λ picked so per-step perturbation on W_dec_scale1
+                # (≈ λ·lr·|cosim|) is ~O(7e-5) — comparable to the
+                # contrastive objective's per-step nudge at α=1.
                 model, log = train_matryoshka_txcdr_contrastive_orth(
-                    cfg, device, k=100, T=5, alpha=1.0, lam_orth=0.01,
+                    cfg, device, k=100, T=5, alpha=1.0, lam_orth=1.0,
                     buf=get_anchor(),
                 )
                 meta = dict(seed=seed, k_pos=100, k_win=500, T=5,
                             match_budget=True, layer=13, alpha=1.0,
-                            lam_orth=0.01,
+                            lam_orth=1.0,
                             variant="agentic_txc_01_orth_scale1")
+            elif arch == "agentic_txc_02":
+                # Agentic cycle 02: A3 α=1.0 + multi-scale InfoNCE
+                # at scales 1, 2, 3 with γ=0.5 geometric decay.
+                model, log = train_matryoshka_txcdr_contrastive_multiscale(
+                    cfg, device, k=100, T=5, alpha=1.0,
+                    n_contr_scales=3, gamma=0.5, buf=get_anchor(),
+                )
+                meta = dict(seed=seed, k_pos=100, k_win=500, T=5,
+                            match_budget=True, layer=13, alpha=1.0,
+                            n_contr_scales=3, gamma=0.5,
+                            variant="agentic_txc_02_multiscale_contrastive")
             elif arch == "matryoshka_txcdr_contrastive_t5_k2x":
                 model, log = train_matryoshka_txcdr_contrastive(
                     cfg, device, k=200, T=5, alpha=0.1, buf=get_anchor(),

@@ -64,6 +64,7 @@ BASE_OF[mlc_contrastive_alpha100]=mlc
 # Each new cycle adds its own entry here. See
 # docs/han/research_logs/phase5_downstream_utility/2026-04-21-agentic-log.md
 BASE_OF[agentic_txc_01]=matryoshka_t5
+BASE_OF[agentic_txc_02]=matryoshka_t5
 
 commit_and_push() {
     local msg="$1"; shift
