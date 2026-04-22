@@ -59,13 +59,16 @@ fi
 uv --version
 
 # ── 3. Main repo venv (Python 3.11 — what pyproject.toml requires).
+# --no-extra separation-scaling skips the mess3-ablation optional extra,
+# which pins simplexity>=3.12 and would otherwise make resolution
+# unsatisfiable on a 3.11 venv. The Venhoff pipeline doesn't need that
+# extra; it's only for experiments/mess3_mat_ablation/.
 if [[ ! -d .venv ]]; then
-    echo ">> creating main 3.11 venv + syncing deps"
+    echo ">> creating main 3.11 venv + syncing deps (skipping separation-scaling extra)"
     uv venv --python 3.11 .venv
 fi
-# Always sync — cheap and ensures any newly-committed deps land.
 source .venv/bin/activate
-uv sync
+uv sync --no-extra separation-scaling
 deactivate
 
 # ── 4. Clone Venhoff's vendor repo (needed for steering-vector training
