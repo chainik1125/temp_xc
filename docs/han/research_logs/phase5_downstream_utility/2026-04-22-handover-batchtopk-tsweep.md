@@ -6,11 +6,20 @@ tags:
   - in-progress
 ---
 
-## Handover: BatchTopK comparison + T-sweep on agentic_txc_02
+## Handover: full-size TFA + BatchTopK + T-sweep on agentic_txc_02
 
-**Audience**: post-compact agent picking up the two deferred
-follow-on experiments after Phase 5.7 closed (morning brief +
-agentic log committed at `326394b`).
+**Audience**: post-compact agent picking up three deferred follow-on
+experiments after Phase 5.7 closed (morning brief + agentic log
+committed at `326394b`).
+
+**Ordering constraint from Han**: full-size TFA **MUST** be done
+**before** the BatchTopK experiment (experiment (ii) below). The
+reason: the current bench uses `tfa_small` (d_sae=4096, seq_len=32)
+which is a capacity-underpowered comparison against the d_sae=18 432,
+seq_len=128 archs. Reviewers (and `summary.md` Caveats) already
+flag this; closing the gap is a prerequisite before adding new
+cross-sparsity comparisons that would otherwise inherit the same
+unfairness.
 
 **Latest relevant commits on `han`** (all pushed to github):
 
@@ -62,7 +71,144 @@ If you retrain these at seed=42, you should land within ~0.005 of:
 
 ---
 
-## Experiment (i): BatchTopK apples-to-apples
+## Experiment (i): Full-size TFA [DO BEFORE EXPERIMENT (ii)]
+
+**Purpose**: the current bench lists `tfa_small` / `tfa_pos_small` at
+d_sae=4096, seq_len=32 — significantly smaller than every other bench
+arch at d_sae=18 432, seq_len=128. This is flagged explicitly in
+[`summary.md`](summary.md) Caveats section:
+
+> **TFA "small" variants (d_sae = 4096, seq_len = 32).** The full-size
+> TFA would not fit the A40 wall-clock budget without a significant
+> refactor… SAEBench numbers are therefore not a like-for-like
+> comparison against the d_sae = 18 432 archs.
+
+Full-size TFA closes this gap. After the overnight audit showed TFA
+probing conventions matter (dual entries `tfa_*` vs `tfa_*_full`),
+the fair comparison is full-size TFA at both probing variants, then
+compare against the matched-capacity (d_sae=18 432) bench archs.
+
+**Scope**: 2 new archs:
+
+1. `tfa_big` — use_pos=False, d_sae=18 432, seq_len=128
+2. `tfa_pos_big` — use_pos=True, d_sae=18 432, seq_len=128
+
+Plus the `*_full` dual probing is automatic via the arch-suffix
+routing added on 2026-04-22 (see `run_probing.py::_load_model_for_run`
+alias logic). Creating symlinks
+`tfa_big_full__seed42.pt -> tfa_big__seed42.pt` after training gives
+you the dual probe out of the box — same pattern as the small
+variants.
+
+**Implementation plan**:
+
+1. **Confirm `train_tfa` helper already supports d_sae and seq_len kwargs.**
+   Inspect `experiments/phase5_downstream_utility/train_primary_archs.py::train_tfa`.
+   If it already accepts `d_sae` and `seq_len`, you only need dispatcher
+   branches. If not, extend the helper to pass through to
+   `src/architectures/_tfa_module.py::TemporalSAE` constructor.
+
+2. **Add 2 dispatcher branches** in `train_primary_archs.py`:
+
+   ```python
+   elif arch == "tfa_big":
+       model, log = train_tfa(cfg, device, k=100, use_pos=False,
+                              d_sae=18432, seq_len=128,
+                              buf=get_anchor())
+       meta = dict(seed=seed, k_pos=100, k_win=None, T=128,
+                   use_pos=False, d_sae=18432, layer=13,
+                   scale=log.get("input_scale", 1.0))
+   elif arch == "tfa_pos_big":
+       model, log = train_tfa(cfg, device, k=100, use_pos=True,
+                              d_sae=18432, seq_len=128,
+                              buf=get_anchor())
+       meta = dict(seed=seed, k_pos=100, k_win=None, T=128,
+                   use_pos=True, d_sae=18432, layer=13,
+                   scale=log.get("input_scale", 1.0))
+   ```
+
+3. **Probe routing extension** in `run_probing.py`:
+   - `_load_model_for_run` tfa branch already handles
+     `d_sae_eff = meta.get("d_sae", d_sae)` — no change.
+   - Add `tfa_big` + `tfa_pos_big` (plus `_full` aliases) to the
+     `arch in (...)` tuples in BOTH `_load_model_for_run` and
+     `_encode_for_probe`.
+
+4. **Launch training**. First check VRAM headroom — at d_sae=18 432
+   and seq_len=128, the TFA model's pre-activation + bottleneck attention
+   tensors are ~4.5× larger in d_sae and ~4× larger in seq_len than
+   the small variant, so roughly **~18× more memory per forward**
+   than tfa_small. The small variant used ~6 GB peak; the big variant
+   projects to ~25-35 GB peak on A40 (46 GB total). Should fit but
+   check with batch_size=256 first, scale down if OOM:
+
+   ```bash
+   PYTHONPATH=/workspace/temp_xc TQDM_DISABLE=1 PYTHONUNBUFFERED=1 \
+     .venv/bin/python -u -c "
+   from experiments.phase5_downstream_utility.train_primary_archs import run_all
+   run_all(seeds=[42], max_steps=25000, archs=['tfa_big','tfa_pos_big'])
+   " > logs/overnight/tfa_big_train.log 2>&1 &
+   ```
+
+5. **If OOM**, drop d_sae to 8192 first (halfway between small=4096
+   and big=18432). Retrain, probe, document the compromise in
+   summary.md Caveats.
+
+6. **After training, create symlinks for the dual-probing `_full`
+   variants** (matches the pattern already used for tfa_small):
+
+   ```bash
+   cd experiments/phase5_downstream_utility/results/ckpts
+   ln -sf tfa_big__seed42.pt tfa_big_full__seed42.pt
+   ln -sf tfa_pos_big__seed42.pt tfa_pos_big_full__seed42.pt
+   ```
+
+7. **Probe all 4 run_ids** (`tfa_big`, `tfa_big_full`, `tfa_pos_big`,
+   `tfa_pos_big_full`) at both `last_position` and `mean_pool`:
+
+   ```bash
+   for AGG in last_position mean_pool; do
+     PYTHONPATH=/workspace/temp_xc TQDM_DISABLE=1 \
+       .venv/bin/python experiments/phase5_downstream_utility/probing/run_probing.py \
+       --aggregation $AGG --skip-baselines \
+       --run-ids tfa_big__seed42 tfa_big_full__seed42 \
+                 tfa_pos_big__seed42 tfa_pos_big_full__seed42
+   done
+   ```
+
+8. **Update `summary.md`**:
+   - Add 4 new rows to Figure 1 (last_position) + Figure 2 (mean_pool),
+     keeping the dual `_full` convention established for tfa_small.
+   - Rewrite the "TFA small variants" Caveats entry to note that a
+     full-size comparison is now available.
+   - Keep the small-TFA rows for continuity (historical reference).
+
+9. **Regenerate plots**: add `tfa_big`, `tfa_big_full`, `tfa_pos_big`,
+   `tfa_pos_big_full` to `ORDERED_ARCHS` in `plots/make_headline_plot.py`
+   (the `flavor_of` function will map them to "tfa" flavor
+   automatically via the `tfa_` prefix). Regenerate via
+   `.venv/bin/python plots/make_headline_plot.py`.
+
+10. **Commit per-arch** via the orchestrator (`run_autoresearch.sh`),
+    or manually if you skipped the orchestrator.
+
+**Time estimate**: `tfa_small` took 155s to plateau at 4000 steps.
+At d_sae=18 432 × seq_len=128 the per-step cost scales ~4.5× × 4× ≈
+18×, so roughly **45 min per run** (2 archs → 90 min).
+Probing 4 run_ids × 2 aggregations at ~8 min each = **~65 min**.
+Total: **~2.5 hr wall-clock**. Add 1-2 hr buffer for VRAM debugging.
+
+**Known risk**: VRAM. TFA's n_attn_layers=1 bottleneck attention scales
+quadratically in seq_len. If batch_size=256 OOMs, drop to 128. If
+still OOMing, drop d_sae to 8192 and document.
+
+**Deliverable**: 4 new rows in both bench tables; updated plots; Caveats
+entry rewrite. This is what Han asked for: proper-sized TFA in the
+bench before any new capacity-sensitive experiments (i.e. BatchTopK).
+
+---
+
+## Experiment (ii): BatchTopK apples-to-apples
 
 **Purpose**: the bench currently uses TopK sparsity everywhere. SAEBench
 reviewers will ask about BatchTopK (Bussmann et al. 2024) — which picks
@@ -183,7 +329,7 @@ quantile of training activations).
 
 ---
 
-## Experiment (ii): T-sweep on agentic_txc_02
+## Experiment (iii): T-sweep on agentic_txc_02
 
 **Purpose**: extend the existing Figure 3 T-sweep (`txcdr_t{2, 3, 5, 8, 10, 15, 20}`)
 to the multi-scale winner. The vanilla sweep showed T=5 is the peak
@@ -287,15 +433,32 @@ nested prefixes. If so, reduce k to 50 for T=20 runs and document.
 
 ## What to do first
 
-**If reviewer defense is the main worry**: do (i) BatchTopK first. The
-"you didn't test BatchTopK" critique is real and widely known.
+**Hard constraint from Han**: experiment (i) full-size TFA **must
+precede** experiment (ii) BatchTopK. Rationale in the opening
+ordering note — you can't do capacity-sensitive cross-sparsity
+experiments while leaving an under-capacity TFA in the bench.
 
-**If scientific story tightness is the main worry**: do (ii) T-sweep
-first. It's faster, lower-risk, and directly extends an existing figure.
+**Recommended order**:
 
-**If you have time for both**: do (ii) first (lower risk, faster),
-then (i). You can run (ii) in ~7 hr and commit, then start (i)
-fresh. ~15-16 hr total wall-clock, doable in one overnight session.
+1. **(i) Full-size TFA** (~2.5 hr + buffer) — shortest, closes the
+   d_sae-mismatch unfairness, enables every subsequent comparison
+   to include fair TFA numbers.
+2. **(iii) T-sweep on agentic_txc_02** (~7 hr) — lowest-risk
+   exploration, extends the existing Figure 3 cleanly, independent
+   of TFA work.
+3. **(ii) BatchTopK** (~7-9 hr) — highest engineering cost, defensive
+   against SAEBench reviewers; run last when (i)'s full-TFA numbers
+   are in the bench so BatchTopK arch comparisons are built on fair
+   capacity.
+
+**Alternative ordering if time-pressed**: (i) → (ii), skip (iii).
+You'd still have a fully fair bench with BatchTopK for reviewer
+defense; the T-sweep is "nice to have" completeness for the paper's
+recipe claim.
+
+**Total wall-clock for all three**: ~17-19 hr (≈ one full overnight
+session + morning). If you do only (i) + (iii): ~10 hr. If you do
+only (i) + (ii): ~10-12 hr.
 
 ## Gotchas
 
@@ -326,5 +489,8 @@ fresh. ~15-16 hr total wall-clock, doable in one overnight session.
    — should be empty (nothing in flight).
 5. `nvidia-smi --query-gpu=memory.used,utilization.gpu --format=csv`
    — GPU should be idle.
-6. Decide (i) or (ii) first. Commit per the "what to do first" section.
-7. Implement, launch, monitor, update summary.md, commit+push.
+6. Start with **(i) full-size TFA** (hard ordering constraint from
+   Han — before BatchTopK). Then (iii) T-sweep, then (ii) BatchTopK,
+   unless time-pressed per the "what to do first" section.
+7. Implement, launch, monitor, update summary.md + regenerate plots,
+   commit+push per experiment.
