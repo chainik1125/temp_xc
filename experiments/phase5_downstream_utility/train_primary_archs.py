@@ -551,6 +551,38 @@ def train_matryoshka_txcdr_contrastive(cfg, device, k, T, alpha=0.1,
     return model, log
 
 
+def train_matryoshka_txcdr_contrastive_consistency(
+    cfg, device, k, T, alpha=1.0, n_contr_scales=3, gamma=0.5,
+    d_sae=DEFAULT_D_SAE, buf=None,
+):
+    """Agentic cycle 07: cycle-02 config + cosine consistency loss."""
+    from src.architectures.matryoshka_txcdr_contrastive_consistency import (
+        MatryoshkaTXCDRContrastiveConsistency,
+    )
+    buf = buf if buf is not None else _preload_single(ANCHOR_LAYER_KEY, device)
+    k_eff = k * T
+    model = MatryoshkaTXCDRContrastiveConsistency(
+        buf.shape[-1], d_sae, T, k_eff,
+        n_contr_scales=n_contr_scales, gamma=gamma,
+    ).to(device)
+    pair_gen = make_pair_window_gen_gpu(buf, T)
+
+    def gen(batch_size):
+        return pair_gen(batch_size)
+
+    def norm(): model._normalize_decoder()
+
+    orig_forward = model.forward
+
+    def forward_with_alpha(x):
+        return orig_forward(x, alpha=alpha)
+
+    model.forward = forward_with_alpha   # type: ignore[method-assign]
+    log = _iterate_train(model, gen, cfg, device, normalize_decoder=norm)
+    model.forward = orig_forward   # type: ignore[method-assign]
+    return model, log
+
+
 def train_matryoshka_txcdr_contrastive_hardneg(
     cfg, device, k, T, alpha=1.0, n_contr_scales=3, gamma=0.5,
     K_hardneg=4, min_gap=10, d_sae=DEFAULT_D_SAE, buf=None,
@@ -1180,6 +1212,17 @@ def run_all(seeds, max_steps, archs=None):
                             match_budget=True, layer=13, alpha=1.0,
                             n_contr_scales=3, gamma=0.3,
                             variant="agentic_txc_05_multiscale_n3_g03")
+            elif arch == "agentic_txc_07":
+                # Agentic cycle 07: cycle-02 config (n=3, γ=0.5)
+                # + COSINE CONSISTENCY replacing InfoNCE (H-TXC6).
+                model, log = train_matryoshka_txcdr_contrastive_consistency(
+                    cfg, device, k=100, T=5, alpha=1.0,
+                    n_contr_scales=3, gamma=0.5, buf=get_anchor(),
+                )
+                meta = dict(seed=seed, k_pos=100, k_win=500, T=5,
+                            match_budget=True, layer=13, alpha=1.0,
+                            n_contr_scales=3, gamma=0.5,
+                            variant="agentic_txc_07_consistency")
             elif arch == "agentic_txc_06":
                 # Agentic cycle 06: cycle-02 config (n=3, γ=0.5)
                 # + K=4 same-seq hard negatives (min gap=10 tokens).

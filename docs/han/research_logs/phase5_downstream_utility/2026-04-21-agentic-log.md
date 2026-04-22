@@ -344,20 +344,43 @@ results of the prior cycle.
   which are mostly cross-sequence and "easy" (different contexts are
   trivially distinguishable). Adding K=4 same-sequence hard negatives
   per anchor (positions ≥ 10 tokens from anchor/positive) forces the
-  scale-1/2/3 features to discriminate *within* a sequence — sharper
-  signal. Prediction: non-trivial improvement if the discriminative
-  quality of contrastive was limited by easy negatives; neutral if
-  cross-seq negatives were already providing enough signal; regression
-  if hard negs destabilize training.
-**Change**:
-  - New pair-gen `make_pair_hardneg_window_gen_gpu(buf, T, K=4, min_gap=10)`
-    returns (B, 2+K, T, d).
-  - New class `MatryoshkaTXCDRContrastiveHardneg` subclassing
-    `MatryoshkaTXCDRContrastiveMultiscale`. Forward accepts
-    (B, 2+K, T, d), encodes all 2+K windows, computes multi-scale
-    InfoNCE with per-anchor hard negatives added to the denominator.
-  - Same winning config: n=3, γ=0.5, α=1.0. K=4 per anchor.
-  - New arch `agentic_txc_06`, dispatcher, probe routing, BASE_OF.
+  scale-1/2/3 features to discriminate *within* a sequence.
+**Change**: New arch `MatryoshkaTXCDRContrastiveHardneg` + pair-gen
+  extension. n=3, γ=0.5, K=4 per anchor, min_gap=10.
+**Code**: commit `e5d6f93`.
+**Result**: Δ_val = **+0.0291 ±0.0077** (t=+3.80, n=36, 25/1/10) vs
+  `matryoshka_t5`. Strong t-stat matching cycle 02's, but mean AUC
+  slightly below cycle 02's. FINALIST vs vanilla but **LOST vs cycle 02**.
+**Verdict**: **LOST vs cycle-02 reference** (by ~0.006, within noise
+  of each other given each has stderr ~0.008).
+**Takeaway**: Hard negatives don't add value on top of multi-scale
+  matryoshka contrastive at B=1024. With 1023 in-batch negatives already
+  available per anchor, adding K=4 same-sequence negatives doesn't
+  meaningfully change the softmax distribution. The contrastive signal
+  is already sufficiently discriminative via the sheer variety of
+  in-batch cross-sequence negatives.
+**Next**: Pivot to *mechanism* — test whether discriminative InfoNCE
+  was essential at all, or if a pull-together-only generative objective
+  would suffice. Cycle 07: cosine consistency loss replacing InfoNCE,
+  same multi-scale structure (n=3, γ=0.5).
+
+---
+
+### Cycle 07 — cosine consistency at cycle-02 config (H-TXC6)
+**Family**: TXC
+**Reference to beat**: `agentic_txc_02` at Δ_val = +0.0354.
+**Hypothesis**: Cycle 02's gain came from pulling adjacent-window
+  scale-1/2/3 features together via InfoNCE. Cycle 06 showed the "push
+  apart" component (negatives) wasn't contributing much on top. Does
+  that mean pull-only would work? Replace InfoNCE with a symmetric
+  cosine-consistency loss (2 - 2 · cos_sim), which has only pull-together
+  gradient. Prediction: small positive Δ if pull-together alone
+  sufficient; regression if the push-apart was a stabilizer against
+  collapse; modest improvement if removing push-apart noise.
+**Change**: new class `MatryoshkaTXCDRContrastiveConsistency` subclassing
+  `MatryoshkaTXCDRContrastiveMultiscale` but overriding forward to use
+  cosine-consistency at each scale with the same γ^s decay. Same
+  n=3, γ=0.5.
 **Code**: commit forthcoming.
 **Result**: pending.
 **Verdict**: pending.
