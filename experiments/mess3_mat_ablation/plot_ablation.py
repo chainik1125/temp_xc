@@ -5,11 +5,12 @@ the Bayes ceiling from `r2_ceiling.json` if present (else computes
 R²/R²_max using the per-cell `linear_probe` number as a proxy ceiling).
 
 Outputs two PDFs under `plots/`:
-  fig1_gap_recovery_2x2.pdf   — R²/R²_max vs δ for the 4 arches
+  fig1_gap_recovery_2x2.pdf   — R² vs δ for the 4 arches
   fig2_feature_diversity.pdf  — |{argmax feature per component}| per cell
 
-Both figures are laid out with publication-grade defaults (1-col, 300dpi,
-white background, serif labels, single legend).
+Styling aims for single-column publication use: serif typeface, ticks
+inward, minimal grid, legend placed inside an empty region of the axes
+with a faint boxed background so labels don't overlap data.
 """
 
 from __future__ import annotations
@@ -18,17 +19,52 @@ import argparse
 import json
 from pathlib import Path
 
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 
 
-# Four archs that form the 2x2 ablation. Order matters for plot legend.
-# (name_in_config, legend_label, color, linestyle, marker)
+# ──────────────────────────────────────────────────────────────────────────
+# Publication-style matplotlib defaults.
+# ──────────────────────────────────────────────────────────────────────────
+_PUB_RC = {
+    "font.family": "serif",
+    "font.serif": ["Times New Roman", "Times", "DejaVu Serif"],
+    "font.size": 9,
+    "axes.labelsize": 10,
+    "axes.titlesize": 10,
+    "axes.linewidth": 0.8,
+    "axes.spines.top": False,
+    "axes.spines.right": False,
+    "xtick.direction": "in",
+    "ytick.direction": "in",
+    "xtick.major.size": 4,
+    "ytick.major.size": 4,
+    "xtick.major.width": 0.8,
+    "ytick.major.width": 0.8,
+    "xtick.labelsize": 8.5,
+    "ytick.labelsize": 8.5,
+    "legend.fontsize": 8,
+    "legend.frameon": True,
+    "legend.framealpha": 0.92,
+    "legend.fancybox": False,
+    "legend.edgecolor": "0.85",
+    "pdf.fonttype": 42,  # embed TrueType so editors can edit text
+    "ps.fonttype": 42,
+    "savefig.dpi": 300,
+}
+
+
+# Four archs that form the 2×2 ablation. Short legend labels — the
+# "no-matryoshka / window" semantics is communicated via the linestyle
+# (solid = window, dashed = no window) and color (blue = no-matryoshka,
+# orange = matryoshka). The caption of the figure carries the decoder.
 ARCH_STYLE = [
-    ("TopK SAE",                 "TopK SAE (no-matryoshka, no-window)",  "#4C72B0", "--", "o"),
-    ("TXC",                      "TXC (no-matryoshka, window)",          "#4C72B0", "-",  "o"),
-    ("MatryoshkaSAE (no-window)", "MatryoshkaSAE (matryoshka, no-window) ← ablation", "#DD8452", "--", "s"),
-    ("MatryoshkaTXC",            "MatTXC (matryoshka, window)",          "#DD8452", "-",  "s"),
+    # (name_in_config,             short_label,  color,     linestyle, marker)
+    ("TopK SAE",                   "TopK SAE",   "#4C72B0", "--",      "o"),
+    ("TXC",                        "TXC",        "#4C72B0", "-",       "o"),
+    ("MatryoshkaSAE (no-window)",  "MatSAE",     "#DD8452", "--",      "s"),
+    ("MatryoshkaTXC",              "MatTXC",     "#DD8452", "-",       "s"),
 ]
 
 
@@ -47,16 +83,11 @@ def _load_r2_ceiling(root: Path) -> dict[float, float]:
         return {}
     with p.open() as f:
         data = json.load(f)
-    # Expected schema: {"cells": [{"delta": 0.15, "r2_max": 0.36}, ...]}
     return {float(c["delta"]): float(c.get("r2_max", float("nan"))) for c in data.get("cells", [])}
 
 
 def _arch_r2_over_delta(results: dict[float, dict], arch_name: str) -> list[float | None]:
-    """Return the per-δ best-single-feature-R² summed across components for one arch.
-
-    Matches the "all" column in Dmitry's separation_scaling.md table.
-    Dmitry's `architectures` field is a DICT keyed by arch name (not a list).
-    """
+    """Per-δ summed best-single-feature R² across the 3 components."""
     out: list[float | None] = []
     for delta in sorted(results):
         cell = results[delta]
@@ -74,14 +105,7 @@ def _arch_r2_over_delta(results: dict[float, dict], arch_name: str) -> list[floa
 
 
 def _feature_diversity(cell: dict, arch_name: str) -> int | None:
-    """For one (cell, arch), count distinct argmax features across the
-    C=3 Mess3 components. None if the arch didn't run on this cell, or
-    if the per-component feature IDs weren't persisted.
-
-    The IDs are populated by `run_ablation.py`'s wrappers around
-    `run_architecture` + `run_one_cell` (Dmitry's driver computes them
-    in `summarize_single_feature_probe` but drops them on the floor).
-    """
+    """Count distinct argmax features across C=3 Mess3 components."""
     arches_dict = cell.get("architectures", {})
     match = arches_dict.get(arch_name)
     if match is None:
@@ -106,102 +130,126 @@ def _load_all(results_root: Path) -> dict[float, dict]:
 
 
 def plot_gap_recovery(results: dict[float, dict], ceiling: dict[float, float], out_path: Path) -> None:
-    """fig1: gap recovery (summed per-component best R² / R²_max) vs δ."""
+    """fig1: summed-best-feature R² (or R²/R²_max if ceiling is known) vs δ."""
     deltas = sorted(results)
-    fig, ax = plt.subplots(figsize=(6.5, 4.2), dpi=300)
+    with mpl.rc_context(_PUB_RC):
+        fig, ax = plt.subplots(figsize=(4.2, 3.0))
 
-    for arch_name, label, color, ls, marker in ARCH_STYLE:
-        raw = _arch_r2_over_delta(results, arch_name)
+        for arch_name, label, color, ls, marker in ARCH_STYLE:
+            raw = _arch_r2_over_delta(results, arch_name)
+            if ceiling:
+                y = [
+                    (r / ceiling.get(d)) if (r is not None and ceiling.get(d, 0) > 0) else None
+                    for r, d in zip(raw, deltas)
+                ]
+            else:
+                y = raw
+            xs_ys = [(d, v) for d, v in zip(deltas, y) if v is not None]
+            if not xs_ys:
+                continue
+            xs, ys = zip(*xs_ys)
+            ax.plot(xs, ys, color=color, linestyle=ls, marker=marker,
+                    markersize=4.5, linewidth=1.4, label=label)
+
         if ceiling:
-            y = [
-                (r / ceiling.get(d)) if (r is not None and ceiling.get(d, 0) > 0) else None
-                for r, d in zip(raw, deltas)
-            ]
-        else:
-            y = raw
-        xs_ys = [(d, v) for d, v in zip(deltas, y) if v is not None]
-        if not xs_ys:
-            continue
-        xs, ys = zip(*xs_ys)
-        ax.plot(xs, ys, color=color, linestyle=ls, marker=marker,
-                markersize=6, linewidth=2.0, label=label)
+            ax.axhline(1.0, color="0.5", linestyle=":", linewidth=0.8)
 
-    ax.axhline(1.0, color="gray", linestyle=":", linewidth=1, alpha=0.7)
-    ax.set_xlabel("δ  (temporal-separation strength)")
-    ylabel = "R² / R²_max  (gap recovery)" if ceiling else "R²  (summed best single-feature across components)"
-    ax.set_ylabel(ylabel)
-    ax.set_ylim(-0.05, 1.1 if ceiling else None)
-    ax.set_title("Mess3: Mat-TopK-SAE ablation — 2×2 on matryoshka × temporal window")
-    # Legend outside the axes so it never overlaps the curves (which
-    # rise into the upper-right and used to collide with an upper-left
-    # legend at low δ values).
-    ax.legend(loc="center left", bbox_to_anchor=(1.02, 0.5),
-              fontsize=8, frameon=False)
-    ax.grid(True, alpha=0.25, linestyle="--")
-    fig.tight_layout()
-    fig.savefig(out_path, format="pdf", bbox_inches="tight")
-    plt.close(fig)
+        ax.set_xlabel(r"$\delta$ (temporal-separation strength)")
+        ylabel = r"$R^2 / R^2_{\max}$" if ceiling else r"summed best single-feature $R^2$"
+        ax.set_ylabel(ylabel)
+        if ceiling:
+            ax.set_ylim(-0.05, 1.1)
+        else:
+            ax.set_ylim(-0.08, 0.78)
+        ax.set_xlim(-0.01, 0.21)
+
+        # Legend below the axes in a single row — matches the fig2
+        # layout and keeps the plot area uncluttered.
+        ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.18),
+                  ncol=4, handlelength=2.0, handletextpad=0.5,
+                  columnspacing=1.5, borderpad=0.4,
+                  frameon=False)
+
+        ax.grid(True, alpha=0.25, linestyle="-", linewidth=0.4)
+        fig.tight_layout(pad=0.4)
+        fig.savefig(out_path, format="pdf", bbox_inches="tight")
+        plt.close(fig)
     print(f"[done] wrote {out_path}")
 
 
 def plot_feature_diversity(results: dict[float, dict], out_path: Path) -> None:
-    """fig2: distinct argmax features per component, grouped by arch × δ.
-
-    Skips entirely if no arch has diversity data — which is the current
-    default until we extend Dmitry's driver to persist argmax feature IDs.
-    Rather than produce a blank bar chart, emits a placeholder PDF with
-    a note.
-    """
+    """fig2: per-arch × δ bar chart of distinct argmax features per component."""
     deltas = sorted(results)
     arches = [name for name, *_ in ARCH_STYLE]
-    colors = {name: color for name, _, color, _, _ in ARCH_STYLE}
+    labels = {name: label for name, label, *_ in ARCH_STYLE}
+    colors = {name: color for name, _, color, *_ in ARCH_STYLE}
+    # Distinguish no-window (faded) from window (saturated) within each color
+    # family — avoids hatching clutter.
+    alphas = {"TopK SAE": 0.55, "TXC": 1.0,
+              "MatryoshkaSAE (no-window)": 0.55, "MatryoshkaTXC": 1.0}
 
     have_any = any(
         _feature_diversity(results[d], arch_name) is not None
         for d in deltas for arch_name in arches
     )
     if not have_any:
-        fig, ax = plt.subplots(figsize=(6.5, 3.0), dpi=300)
-        ax.text(
-            0.5, 0.5,
-            "Feature-diversity plot requires per_component_best_feature IDs,\n"
-            "which run_ablation.py's wrappers should inject. None present in\n"
-            "the loaded cell JSONs — re-run with the updated run_ablation.py\n"
-            "(delete results/cell_delta_*/results.json first to defeat\n"
-            "--skip-existing).",
-            ha="center", va="center", fontsize=10,
-        )
-        ax.set_axis_off()
-        fig.savefig(out_path, format="pdf", bbox_inches="tight")
-        plt.close(fig)
-        print(f"[warn] wrote placeholder to {out_path} (no diversity data available)")
+        with mpl.rc_context(_PUB_RC):
+            fig, ax = plt.subplots(figsize=(4.2, 2.2))
+            ax.text(
+                0.5, 0.5,
+                "Feature-diversity plot requires per_component_best_feature\n"
+                "IDs. Re-run run_ablation.py after deleting per-cell\n"
+                "results.json to defeat --skip-existing.",
+                ha="center", va="center", fontsize=8,
+            )
+            ax.set_axis_off()
+            fig.savefig(out_path, format="pdf", bbox_inches="tight")
+            plt.close(fig)
+        print(f"[warn] wrote placeholder to {out_path}")
         return
 
-    fig, ax = plt.subplots(figsize=(6.5, 4.0), dpi=300)
-    width = 0.8 / len(arches)
-    x = np.arange(len(deltas))
+    with mpl.rc_context(_PUB_RC):
+        fig, ax = plt.subplots(figsize=(4.8, 3.0))
+        width = 0.8 / len(arches)
+        x = np.arange(len(deltas))
 
-    for i, arch_name in enumerate(arches):
-        heights = [_feature_diversity(results[d], arch_name) or 0 for d in deltas]
-        offset = (i - (len(arches) - 1) / 2) * width
-        ax.bar(x + offset, heights, width=width * 0.9, color=colors[arch_name], label=arch_name, alpha=0.85)
+        for i, arch_name in enumerate(arches):
+            heights = [_feature_diversity(results[d], arch_name) or 0 for d in deltas]
+            offset = (i - (len(arches) - 1) / 2) * width
+            ax.bar(x + offset, heights, width=width * 0.92,
+                   color=colors[arch_name], edgecolor="white",
+                   linewidth=0.4, alpha=alphas.get(arch_name, 1.0),
+                   label=labels[arch_name])
 
-    ax.axhline(3.0, color="black", linestyle=":", linewidth=1, alpha=0.7,
-               label="ideal (one feature per component)")
-    ax.set_xticks(x)
-    ax.set_xticklabels([f"{d:.2f}" for d in deltas])
-    ax.set_xlabel("δ")
-    ax.set_ylabel("|{argmax feature per Mess3 component}|")
-    ax.set_title("Feature diversity: does each arch recover the indicator basis?")
-    ax.set_ylim(0, 3.6)
-    # Legend outside the axes — bars at δ=0 reach the top (diversity=3)
-    # and any in-axes legend collides with them.
-    ax.legend(loc="center left", bbox_to_anchor=(1.02, 0.5),
-              fontsize=8, frameon=False)
-    ax.grid(True, axis="y", alpha=0.25, linestyle="--")
-    fig.tight_layout()
-    fig.savefig(out_path, format="pdf", bbox_inches="tight")
-    plt.close(fig)
+        # Ideal reference line, labeled on the far left inside the axes
+        # above the highest data there (3.0), so it never competes with
+        # the legend region.
+        ax.axhline(3.0, color="0.2", linestyle=":", linewidth=0.8,
+                   zorder=0)
+        ax.text(-0.4, 3.08, "ideal (one feature per component)",
+                fontsize=7, color="0.3", va="bottom", ha="left",
+                style="italic")
+
+        ax.set_xticks(x)
+        ax.set_xticklabels([f"{d:.2f}" for d in deltas])
+        ax.set_xlabel(r"$\delta$")
+        ax.set_ylabel(r"$|\{\mathrm{argmax\ feature\ per\ component}\}|$")
+        ax.set_ylim(0, 3.45)
+        ax.set_yticks([0, 1, 2, 3])
+
+        # Legend below the axes in a single row. No data can ever be
+        # "below the x-axis" so this is collision-free and matches
+        # common single-column paper layouts.
+        ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.18),
+                  ncol=4, handlelength=1.3, handletextpad=0.5,
+                  columnspacing=1.2, borderpad=0.4,
+                  frameon=False)
+
+        ax.grid(True, axis="y", alpha=0.25, linestyle="-", linewidth=0.4)
+        ax.set_axisbelow(True)
+        fig.tight_layout(pad=0.4)
+        fig.savefig(out_path, format="pdf", bbox_inches="tight")
+        plt.close(fig)
     print(f"[done] wrote {out_path}")
 
 
