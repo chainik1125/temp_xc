@@ -81,21 +81,56 @@ extreme than predicted.
 
 ## 4. Feature diversity (secondary metric)
 
-![feature diversity placeholder](plots/fig2_feature_diversity.png)
+![feature diversity per arch × delta](plots/fig2_feature_diversity.png)
 
-Dmitry's `run_one_cell` does not persist `per_component_argmax_feature`
-IDs — only the best R² per component. Without raw $z_{\text{all}}$ we
-cannot count how many distinct features won across the three Mess3
-components, so `fig2_feature_diversity.pdf` was emitted as a placeholder
-explaining the gap. The qualitative claim that MatTXC recovers a
-3-feature indicator basis (vs. TopK SAE smearing identity across many
-features) remains untested in this run.
+Diversity counts $|\{\arg\max_f R^2(f, c)\}_{c \in \{1,2,3\}}|$ per
+(arch, δ) — **3** is the ideal indicator basis (a different feature
+wins for each Mess3 component), **1** is "one feature wins everywhere"
+(component identity is smeared onto a single direction).
 
-To enable the plot, extend `evaluate_topk_on_activations` /
-`evaluate_matsae_on_activations` to save
-`m["per_component_best_feature_idx"]` in `arch_results`, then re-run
-`plot_ablation.py`. Estimated cost: ~30 LOC + a re-eval pass (no
-re-training needed if checkpoints are kept).
+Raw IDs at each $\delta$:
+
+| $\delta$ | TopK SAE | TXC | MatryoshkaSAE | MatTXC |
+|---:|---|---|---|---|
+| $0.00$ | $[29, 27, 6]$ | $[9, 28, 15]$ | $[28, 6, 23]$ | $[2, 5, 75]$ |
+| $0.05$ | $[38, 3, 56]$ | $[17, 50, 17]$ | $[66, 11, 66]$ | $[7, 3, 20]$ |
+| $0.10$ | $[0, 0, 32]$ | $[49, 49, 49]$ | $[10, 0, 7]$ | $[1, 1, 1]$ |
+| $0.15$ | $[15, 15, 10]$ | $[8, 18, 8]$ | $[7, 7, 7]$ | $[0, 4, 0]$ |
+| $0.20$ | $[56, 56, 56]$ | $[62, 62, 62]$ | $[7, 7, 7]$ | $[7, 7, 7]$ |
+
+**Two findings, both surprising:**
+
+1. At $\delta = 0$ all four archs show diversity $= 3$. That's not
+   structure — it's noise. When R² is $\approx 0$ across features,
+   $\arg\max$ is effectively random over the dictionary. Diversity at
+   $\delta = 0$ is a floor, not a ceiling.
+
+2. **At the decision δ = 0.20, *all four archs collapse to diversity = 1*.**
+   This directly contradicts Dmitry's claim that MatTXC recovers a
+   3-feature indicator basis. At our compute budget (sae_steps=1500,
+   n_sequences=400 for matryoshka), even MatTXC picks a single feature
+   that weakly correlates with all three components. The summed-R²
+   story (§2) says MatTXC is good at the *first* component and noisy
+   on the other two; the diversity metric confirms the "other two" are
+   just noise — the same feature wins on all of them because that
+   feature has the highest residual correlation, not because any
+   indicator has been learned for components 2 or 3.
+
+The qualitative MatTXC-recovers-indicator-basis claim is therefore
+**not replicated** under reduced compute. Most likely this is
+training-budget-limited: Dmitry's published numbers use more SAE
+training steps than our `sae_steps=1500`. If the diversity matters for
+the paper story, we should either re-run at Dmitry's scale
+(`sae_steps >= 3000, n_sequences >= 1000`) or annotate the claim as
+"recovered at $\geq N$ training steps" rather than as an architectural
+property.
+
+**Separately**, note that MatryoshkaSAE at $\delta \in \{0.15,\ 0.20\}$
+has ids $[7, 7, 7]$ — the same feature 7 wins every component. MatTXC
+at $\delta = 0.20$ *also* picks feature 7 (coincidental given the
+random init shared across archs is not obvious — they're independently
+initialized). Likely the matryoshka nested-width training pushes an
+early-index feature into a "generic HMM" role.
 
 ## 5. δ-sweep curves
 
@@ -173,25 +208,38 @@ behavior — it's consistent with Dmitry's published `tables/separation_scaling.
 
 ## 8. What this means for the paper
 
-H1 is the framing Dmitry was already pursuing. This experiment
-**confirms** that framing rather than forcing a pivot, which is the
-boring-but-publishable outcome. Concretely:
+**H1 on summed R²** (primary metric): the temporal window explains
+the MatTXC gap, matryoshka is near-no-op alone. This is the framing
+Dmitry was already pursuing.
 
-- The "compositional" claim survives: window + matryoshka is the
-  combination that finds the clean 3-feature indicator basis, and
-  matryoshka alone does not approximate it.
-- The "Matryoshka finds the most reducible latent in any architecture"
-  framing (H0) is **falsified** at this scale — matryoshka with no
-  temporal context behaves indistinguishably from a plain TopK SAE.
-- Honest framing for the paper: the temporal window is the **necessary**
-  condition; matryoshka is a **useful regularizer that reshapes the
-  feature basis** (per Dmitry's argmax-diversity claim), but adds
-  near-zero summed R² on its own.
+**Diversity claim needs revisiting**. At our budget, *no* arch recovers
+a 3-feature indicator basis at the decision δ. Either (a) the published
+MatTXC diversity=3 result requires a bigger budget than we ran, or
+(b) the diversity metric is genuinely unstable / dominated by the
+residual-correlation of component-1 features. Before publishing the
+"compositional → clean indicator basis" claim, we should replicate
+Dmitry's original diversity number at his exact budget.
 
-Suggested message to Dmitry: "H1 confirmed cleanly — MatryoshkaSAE
-sits on top of TopK SAE at all δ, MatTXC ≈ TXC at $\delta = 0.20$ on
-summed R². Window does the work. Want me to write up the diversity
-metric next? Need argmax-feature IDs persisted from `run_one_cell`."
+Concretely, honest framing for the paper draft:
+
+- The "compositional" claim **survives on summed R²** (§2-3): window +
+  matryoshka is the regime where absolute performance peaks.
+- The H0 framing ("Matryoshka finds the most reducible latent in any
+  architecture") is **falsified** — matryoshka with no temporal
+  context behaves indistinguishably from a plain TopK SAE on both R²
+  and diversity metrics.
+- The "clean 3-feature indicator basis" claim needs a **scale-check**
+  before it goes in the paper. If the indicator basis only emerges at
+  $\text{sae\_steps} \geq 3000$, that should be stated explicitly
+  (and compared to other archs at the same budget).
+
+Suggested message to Dmitry: "H1 confirmed on summed R² (MatSAE ≈
+TopK, MatTXC ≈ TXC at δ=0.20 — window does the work). **Diversity
+metric surprised me though** — at `sae_steps=1500, n_sequences=400`,
+every arch collapses to diversity=1 at δ=0.20 (argmax IDs and fig
+attached). Does your published MatTXC diversity=3 require more
+training than our budget? Happy to re-run at your original settings if
+we want to anchor that claim in the paper."
 
 ## 9. Reproducing this result
 

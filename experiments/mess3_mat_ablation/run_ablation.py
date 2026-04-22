@@ -79,7 +79,9 @@ def _install_run_one_cell_augmenter() -> None:
         global _CAPTURED_FEAT_IDS
         _CAPTURED_FEAT_IDS = {}
         payload = original_run_one_cell(*args, **kwargs)
-        cell_dir: Path = kwargs.get("cell_dir") or args[2] if len(args) > 2 else None
+        cell_dir = kwargs.get("cell_dir")
+        if cell_dir is None and len(args) > 2:
+            cell_dir = args[2]
         for arch_name, feat_ids in _CAPTURED_FEAT_IDS.items():
             arch_dict = payload.get("architectures", {}).get(arch_name)
             if arch_dict is not None:

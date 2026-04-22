@@ -20,7 +20,7 @@
   ],
   "transformer": {
     "final_loss": 1.0873486995697021,
-    "was_loaded": false,
+    "was_loaded": true,
     "eval_resid_l2_mean": 40.060890197753906,
     "config": {
       "n_layers": 3,
@@ -79,7 +79,12 @@
         "sae_steps": 2000,
         "n_sequences": 1000,
         "seq_len": 128
-      }
+      },
+      "per_component_best_feature": [
+        38,
+        3,
+        56
+      ]
     },
     "TXC": {
       "best_single_r2": 0.001709432651776699,
@@ -103,7 +108,12 @@
         "temporal_steps": 3000,
         "n_sequences": 1000,
         "seq_len": 128
-      }
+      },
+      "per_component_best_feature": [
+        17,
+        50,
+        17
+      ]
     },
     "MatryoshkaSAE (no-window)": {
       "best_single_r2": -5.9566082965423206e-05,
@@ -134,7 +144,12 @@
         "sae_steps": 1500,
         "n_sequences": 400,
         "seq_len": 128
-      }
+      },
+      "per_component_best_feature": [
+        66,
+        11,
+        66
+      ]
     },
     "MatryoshkaTXC": {
       "best_single_r2": 0.0009385855622191519,
@@ -167,8 +182,13 @@
         "temporal_steps": 1500,
         "n_sequences": 400,
         "seq_len": 128
-      }
+      },
+      "per_component_best_feature": [
+        7,
+        3,
+        20
+      ]
     }
   },
-  "cell_elapsed_sec": 679.021689414978
+  "cell_elapsed_sec": 50.311506271362305
 }
