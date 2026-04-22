@@ -37,7 +37,10 @@ import numpy as np
 
 from src.bench.model_registry import get_model_config, resid_hook_target
 from src.bench.venhoff.paths import ArtifactPaths, RunIdentity, can_resume, write_with_metadata
-from src.bench.venhoff.responses import extract_thinking_process
+from src.bench.venhoff.responses import (
+    _normalize_byte_level_bpe,
+    extract_thinking_process,
+)
 from src.bench.venhoff.tokenization import (
     get_char_to_token_map,
     sentence_token_span,
@@ -206,7 +209,7 @@ def collect_path1(
     sentence_texts: list[str] = []
 
     for trace in traces:
-        full_response = trace["full_response"]
+        full_response = _normalize_byte_level_bpe(trace["full_response"])
         input_ids = tokenizer.encode(full_response, return_tensors="pt").to(model.device)
         acts = _collect_layer_for_trace(model, config.layer, input_ids)  # (1, seq, d)
         assert acts.ndim == 3 and acts.shape[-1] == d_model, f"bad act shape {acts.shape}"
@@ -310,7 +313,7 @@ def collect_path3(
     sentence_texts: list[str] = []
 
     for trace in traces:
-        full_response = trace["full_response"]
+        full_response = _normalize_byte_level_bpe(trace["full_response"])
         input_ids = tokenizer.encode(full_response, return_tensors="pt").to(model.device)
         acts = _collect_layer_for_trace(model, config.layer, input_ids)  # (1, seq, d)
         seq_len = acts.shape[1]
@@ -422,7 +425,7 @@ def collect_path_mlc(
     sentence_texts: list[str] = []
 
     for trace in traces:
-        full_response = trace["full_response"]
+        full_response = _normalize_byte_level_bpe(trace["full_response"])
         input_ids = tokenizer.encode(full_response, return_tensors="pt").to(model.device)
         # One forward pass, n_layers hooks → list of (1, seq, d_model).
         per_layer = _collect_layers_for_trace(model, layer_window, input_ids)
