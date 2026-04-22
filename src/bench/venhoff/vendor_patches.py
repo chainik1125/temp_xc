@@ -52,6 +52,21 @@ HYBRID_JUDGE_PATCHES = [
 ]
 
 
+# Phase 2 patch: newer transformers (≥4.45 or so) rejects the bare
+# `load_in_8bit=` kwarg on AutoModelForCausalLM.from_pretrained, even
+# when False. Drop the kwarg since we run in bf16 (fits in 80GB H100
+# comfortably for Llama-8B + DeepSeek-R1-Distill-Llama-8B). If we ever
+# need 8-bit, the modern path is quantization_config=BitsAndBytesConfig(...).
+STEERING_8BIT_PATCHES = [
+    Patch(
+        file_rel="train-vectors/optimize_steering_vectors.py",
+        find="        load_in_8bit=args.load_in_8bit,\n",
+        replace="",
+        description="drop deprecated load_in_8bit= kwarg from AutoModelForCausalLM load",
+    ),
+]
+
+
 def apply_patch(venhoff_root: Path, patch: Patch) -> bool:
     """Apply one patch. Returns True if the file was modified, False if no-op."""
     path = venhoff_root / patch.file_rel
@@ -86,4 +101,14 @@ def ensure_hybrid_judge_patched(venhoff_root: Path) -> None:
     are reported with that caveat (see plan.md § 5 P0 notes).
     """
     for patch in HYBRID_JUDGE_PATCHES:
+        apply_patch(venhoff_root, patch)
+
+
+def ensure_steering_patched(venhoff_root: Path) -> None:
+    """Apply patches required for Phase 2 steering-vector training.
+
+    Currently: drops the deprecated `load_in_8bit=` kwarg from
+    optimize_steering_vectors.py so it works with modern transformers.
+    """
+    for patch in STEERING_8BIT_PATCHES:
         apply_patch(venhoff_root, patch)

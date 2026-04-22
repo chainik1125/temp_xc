@@ -34,6 +34,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from src.bench.venhoff.paths import ArtifactPaths, can_resume, write_with_metadata
+from src.bench.venhoff.vendor_patches import ensure_steering_patched
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
 log = logging.getLogger("venhoff.steering")
@@ -260,6 +261,10 @@ def train_all_vectors(
     list of output paths (insertion order matches scheduling order,
     which may differ from completion order).
     """
+    # Apply vendor patches (drop deprecated load_in_8bit=) before any
+    # subprocess fires. Idempotent; no-op on second call.
+    ensure_steering_patched(venhoff_root)
+
     cluster_indices = (
         tuple(range(cfg.n_clusters))
         if cfg.cluster_indices is None
