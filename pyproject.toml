@@ -33,20 +33,6 @@ dependencies = [
 [tool.setuptools.packages.find]
 include = ["src*", "temporal_crosscoders*"]
 
-[project.optional-dependencies]
-# Dependencies for experiments/mess3_mat_ablation/ (Dmitry's sae_day
-# pipeline, vendored at runtime via git archive from origin/dmitry).
-# Install with: uv sync --extra separation-scaling
-#
-# Mirrors Dmitry's group in his pyproject.toml so setups on aniket +
-# dmitry converge on the same deps.
-separation-scaling = [
-    "pyyaml>=6.0",
-    "jax>=0.4",
-    "jaxlib>=0.4",
-    "simplexity @ git+https://github.com/Astera-org/simplexity.git@review/nonergodic-pr172",
-]
-
 [dependency-groups]
 dev = [
     "pytest",
