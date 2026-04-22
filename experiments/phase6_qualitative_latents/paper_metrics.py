@@ -45,6 +45,22 @@ def _sample_sequences(n_seqs: int, seed: int = 0) -> np.ndarray:
     return np.asarray(arr[idx], dtype=np.float32)  # (N, L, d)
 
 
+def _sample_multilayer(n_seqs: int, seed: int = 0) -> np.ndarray | None:
+    """Return n_seqs × 128 × 5 × d stack from L11..L15 or None if missing."""
+    layers = [11, 12, 13, 14, 15]
+    paths = [CACHE / f"resid_L{L}.npy" for L in layers]
+    if not all(p.exists() for p in paths):
+        return None
+    rng = np.random.default_rng(seed)
+    n_total = np.load(paths[0], mmap_mode="r").shape[0]
+    idx = rng.choice(n_total, size=n_seqs, replace=False)
+    stacks = []
+    for p in paths:
+        arr = np.load(p, mmap_mode="r")
+        stacks.append(np.asarray(arr[idx], dtype=np.float32))
+    return np.stack(stacks, axis=2)  # (N, L=128, 5, d)
+
+
 def load_arch_model(arch: str, device):
     """Load arch for reconstruction eval. Returns (model, meta, arch_kind)."""
     state = torch.load(CKPT_DIR / f"{arch}__seed42.pt",
@@ -104,10 +120,28 @@ def reconstruct(model, arch_kind: str, seqs: np.ndarray, device):
     MLC would need multi-layer activations which we don't have
     here, so we skip MLC in this eval.
     """
-    N, L, d = seqs.shape
     if arch_kind == "mlc":
-        # Needs L11-L15 activations. Skip for this eval.
-        return None, None
+        # MLC input is (B, 5, d_in); reconstructs 5-layer stack.
+        # `seqs` here is actually the multilayer stack (N, L, 5, d).
+        assert seqs.ndim == 4 and seqs.shape[2] == 5, (
+            f"MLC needs multilayer stack, got {seqs.shape}"
+        )
+        N, L, Lw, d = seqs.shape
+        x = torch.from_numpy(seqs).to(device)  # (N, L, 5, d)
+        flat = x.reshape(-1, Lw, d)           # (N*L, 5, d)
+        BATCH = 256
+        z_rows = []; xhat_rows = []
+        for b0 in range(0, flat.shape[0], BATCH):
+            b1 = min(b0 + BATCH, flat.shape[0])
+            zi = model.encode(flat[b0:b1])         # (B, d_sae)
+            xh = model.decode(zi)                  # (B, 5, d)
+            z_rows.append(zi); xhat_rows.append(xh)
+        z_flat = torch.cat(z_rows, dim=0)           # (N*L, d_sae)
+        xhat_flat = torch.cat(xhat_rows, dim=0)     # (N*L, 5, d)
+        xhat = xhat_flat.reshape(N, L, Lw, d)
+        z = z_flat.reshape(N, L, -1)
+        return xhat, z
+    N, L, d = seqs.shape
     x = torch.from_numpy(seqs).to(device)  # (N, L, d)
     if arch_kind in ("tsae_paper",):
         flat = x.reshape(-1, d)
@@ -160,22 +194,37 @@ def reconstruct(model, arch_kind: str, seqs: np.ndarray, device):
 @torch.no_grad()
 def paper_metrics(arch: str, device, n_seqs: int = 256) -> dict:
     print(f"[{arch}] sampling {n_seqs} sequences...")
-    seqs = _sample_sequences(n_seqs)
     model, meta, kind = load_arch_model(arch, device)
+
+    if kind == "mlc":
+        seqs = _sample_multilayer(n_seqs)
+        if seqs is None:
+            print(f"  [{arch}] skipped (L11-L15 activations not all cached)")
+            return {"arch": arch, "skipped": True}
+    else:
+        seqs = _sample_sequences(n_seqs)
     xhat, z = reconstruct(model, kind, seqs, device)
     if xhat is None:
         print(f"  [{arch}] skipped (multi-layer input not available locally)")
         return {"arch": arch, "skipped": True}
 
     x = torch.from_numpy(seqs).to(device)
-    # FVE
-    var_x = x.float().var(dim=(0, 1))  # (d,)
-    var_err = (x - xhat).float().var(dim=(0, 1))
+    # FVE — compute over last dim variance; for MLC average across layers
+    if kind == "mlc":
+        var_x = x.float().var(dim=(0, 1, 2))  # (d,)  flatten N, L, Lw
+        var_err = (x - xhat).float().var(dim=(0, 1, 2))
+    else:
+        var_x = x.float().var(dim=(0, 1))  # (d,)
+        var_err = (x - xhat).float().var(dim=(0, 1))
     fve = float(1 - (var_err.mean() / var_x.mean()))
 
-    # Cos Sim
-    x_flat = x.reshape(-1, x.shape[-1])
-    xh_flat = xhat.reshape(-1, xhat.shape[-1])
+    # Cos Sim — per-token (for MLC flatten layer dim too)
+    if kind == "mlc":
+        x_flat = x.reshape(-1, x.shape[-1])
+        xh_flat = xhat.reshape(-1, xhat.shape[-1])
+    else:
+        x_flat = x.reshape(-1, x.shape[-1])
+        xh_flat = xhat.reshape(-1, xhat.shape[-1])
     cs = torch.nn.functional.cosine_similarity(x_flat, xh_flat, dim=-1).mean()
     cos_sim = float(cs)
 
@@ -199,7 +248,12 @@ def paper_metrics(arch: str, device, n_seqs: int = 256) -> dict:
         hi = d_sae  # tfa: no H/L split
     z_hi = z[..., :hi]  # (N, L, hi)
     dz = (z_hi[:, 1:, :] - z_hi[:, :-1, :]).abs()  # (N, L-1, hi)
-    dx = (x[:, 1:, :] - x[:, :-1, :]).float().norm(dim=-1).clamp(min=1e-6)  # (N, L-1)
+    if kind == "mlc":
+        # dx on the 5-layer stack: use L13 slice for denominator (our anchor)
+        x_anchor = x[:, :, 2, :].float()  # (N, L, d)  layer index 2 = L13
+        dx = (x_anchor[:, 1:, :] - x_anchor[:, :-1, :]).norm(dim=-1).clamp(min=1e-6)
+    else:
+        dx = (x[:, 1:, :] - x[:, :-1, :]).float().norm(dim=-1).clamp(min=1e-6)  # (N, L-1)
     # Per-feature active mask on each seq: active if ≥1 activation in seq
     active_mask = (z_hi > 0).any(dim=1).float()  # (N, hi)
     n_active = active_mask.sum(dim=-1).clamp(min=1.0)  # (N,)

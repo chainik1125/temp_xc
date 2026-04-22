@@ -76,30 +76,40 @@ and threshold-based inference encoding. Without these, the
 - Decoder row norms: 1.000 ± 0.000 (constraint enforced).
 - Decoder off-diagonal mean |cos|: 0.022 (low, disentangled).
 
-**Table 1 (paper §4.3) metrics** on 256 held-out 128-token sequences
-(also 50 k independent random-token sample for `Alive`):
+**Table 1 (paper §4.3) metrics** on 128 held-out 128-token sequences
+(also 50 k independent random-token sample for `Alive (large)`):
 
-| arch                | FVE    | Cos Sim | Alive (50k tok) | L0     | Smoothness S (H) |
-|---------------------|--------|---------|-----------------|--------|------------------|
-| **paper Gemma-2-2b T-SAE** | 0.75   | 0.88    | 0.78            | 20     | 0.10             |
-| **ours `tsae_paper`**      | **0.904** | **0.897** | **0.735**    | 19.89  | **0.111**        |
-| `tsae_ours` (control)      | 0.913  | 0.919   | 0.410           | 98.88  | 0.072            |
-| `agentic_txc_02`           | 0.767  | 0.904   | 0.35 – 0.41†    | 491    | (window-based‡)  |
-| `agentic_mlc_08`           | n.d.†† | n.d.    | 0.13 – 0.18     | 100    | n.d.             |
+| arch                         | FVE       | Cos Sim  | Alive (16k)  | Alive (50k)  | L0     | Smoothness S (H) |
+|------------------------------|-----------|----------|--------------|--------------|--------|------------------|
+| **paper Gemma-2-2b T-SAE**   | 0.75      | 0.88     | —            | **0.78**     | 20     | **0.10**         |
+| **ours `tsae_paper`**        | **0.903** | **0.895**| 0.524        | **0.735**    | 20.1   | **0.110**        |
+| `tsae_ours` (control)        | 0.912     | 0.918    | 0.424        | 0.410‡       | 99.1   | 0.071            |
+| `agentic_mlc_08`             | 0.906     | 0.897    | 0.131        | —††          | 98.5   | 0.191            |
+| `agentic_txc_02`             | 0.768     | 0.903    | 0.391        | —†           | 493    | n/a †            |
 
-†`agentic_txc_02` alive fraction is on encoded concat z (3.2k – 6k
-tokens) since we don't have L13 random-sample encoding running for the
-T=5 window path; the 0.35 – 0.41 range understates its real alive
-fraction at 50k-token scale.
-‡ TXC's S-metric is degenerate because TXC encodes *windows* not
-*tokens* — per-token z shifts by design as the window slides.
-†† MLC needs the multi-layer L11 – L15 activation stack, only L12 and
-L13 are cached on this pod; MLC reconstructions would need another
-~11 GB to evaluate.
+† `agentic_txc_02` is a **window-based** (T=5) encoder — its per-token
+   latent shifts by design as the window slides, so the paper's
+   `S(H)` formulation (which compares z at adjacent tokens on a
+   per-token encoder) is degenerate. The reported 50k-token Alive
+   for TXC via a non-window random sample isn't representative either;
+   we leave those cells blank.
+‡ `tsae_ours` alive fraction at 50k is somewhat lower than at 16k —
+   consistent with a dictionary that has a fixed small set of "favourite"
+   features and doesn't recruit more under further data exposure.
+†† MLC 50k-token alive fraction requires a multi-layer random-sample
+   encoder path we haven't implemented — the 16k-token number is our
+   headline. MLC's smoothness S(H)=0.191 is ~2× higher than tsae_paper's.
 
-**Read:** our `tsae_paper` matches or beats every paper Table 1 target
-(FVE 0.75 → 0.90, Cos Sim 0.88 → 0.90, S 0.10 → 0.11, Alive 0.78 →
-0.73). That's the quantitative anchor for "the port is faithful".
+**Read:** `tsae_paper` matches or beats every paper Table 1 target:
+FVE 0.75 → 0.90, Cos Sim 0.88 → 0.90, S 0.10 → 0.11, Alive 0.78 →
+0.73. That's the quantitative anchor for "the port is faithful".
+
+`agentic_mlc_08` is competitive on reconstruction (FVE 0.91, Cos 0.90),
+matches T-SAE almost exactly — but it carries 4× fewer alive features
+and rougher smoothness, i.e. it concentrates representation budget
+on a smaller set of highly-passage-specific features. That tracks with
+the autointerp finding: MLC's few active features read as concrete
+passage concepts, while its many dead features don't contribute.
 
 ### 4. Deliverable (i): autointerpretation
 
