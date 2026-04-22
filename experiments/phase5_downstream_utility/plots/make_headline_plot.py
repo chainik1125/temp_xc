@@ -57,7 +57,14 @@ ORDERED_ARCHS = [
     "matryoshka_t5", "temporal_contrastive",
     "time_layer_crosscoder_t5",
     "mlc", "mlc_contrastive",
-    "tfa_small", "tfa_pos_small",
+    # Phase 5.7 Part-B α sweep winners
+    "matryoshka_txcdr_contrastive_t5_alpha100",
+    "mlc_contrastive_alpha100",
+    # Phase 5.7 agentic multi-scale winners
+    "agentic_txc_02", "agentic_mlc_08",
+    # TFA dual probing: z_novel vs z_novel+z_pred
+    "tfa_small", "tfa_small_full",
+    "tfa_pos_small", "tfa_pos_small_full",
 ]
 BASELINE_ARCHS = ["baseline_last_token_lr", "baseline_attn_pool"]
 

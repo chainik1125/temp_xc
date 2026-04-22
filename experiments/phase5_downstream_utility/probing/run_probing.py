@@ -322,6 +322,13 @@ def _load_model_for_run(run_id, ckpt_path, device):
     state = torch.load(ckpt_path, map_location=device, weights_only=False)
     meta = state["meta"]
     arch = state["arch"]
+    # *_full aliases share a ckpt with the base arch (symlink). Override
+    # the arch to route to the alt probing branch (e.g. tfa_small_full
+    # probes z_novel + z_pred rather than z_novel alone).
+    if "__seed" in run_id:
+        rid_arch = run_id.rsplit("__seed", 1)[0]
+        if rid_arch.endswith("_full") and rid_arch != arch:
+            arch = rid_arch
     d_sae = 18_432
     d_in = 2304
     if arch == "topk_sae":
@@ -462,7 +469,10 @@ def _load_model_for_run(run_id, ckpt_path, device):
         )
         T = meta["T"]
         model = SharedPerPositionSAE(d_in, d_sae, T, k=meta["k_pos"]).to(device)
-    elif arch in ("tfa", "tfa_pos", "tfa_small", "tfa_pos_small"):
+    elif arch in ("tfa", "tfa_pos", "tfa_small", "tfa_pos_small",
+                  "tfa_small_full", "tfa_pos_small_full"):
+        # *_full variants share ckpt with their base arch — they only
+        # differ in probing logic (z_novel vs z_novel+z_pred).
         from src.architectures._tfa_module import TemporalSAE
         d_sae_eff = meta.get("d_sae", d_sae)
         use_pos = bool(meta.get("use_pos", arch.startswith("tfa_pos")))
@@ -783,21 +793,31 @@ def _encode_for_probe(
             outs.append(Zb[:, -1, :].cpu().numpy())
         Z_last = np.concatenate(outs, axis=0)  # (N*K, d_sae)
         return Z_last.reshape(N, K * Z_last.shape[-1])
-    if arch in ("tfa", "tfa_pos", "tfa_small", "tfa_pos_small"):
-        # TFA takes (B, T, d). The effective per-token representation is
-        # `z_novel + z_pred` (see `_tfa_module.py:232`: reconstruction is
-        # `(z_novel + z_pred) @ D + b`). Earlier builds probed `z_novel`
-        # alone, stripping TFA's defining context-predicted features and
-        # making the bench comparison unfair. Fixed 2026-04-22 — see
-        # 2026-04-21-handover-18hr.md "TFA audit finding".
-        # Scaling factor must match training; saved in meta as `scale`.
+    if arch in ("tfa", "tfa_pos", "tfa_small", "tfa_pos_small",
+                "tfa_small_full", "tfa_pos_small_full"):
+        # TFA probing — two variants, reported as separate bench entries:
+        #   * `tfa_small` / `tfa_pos_small`: probe z_novel only (the
+        #     sparse TopK-selected "novel" component). Historical
+        #     convention; matches what other TopK archs probe.
+        #   * `tfa_small_full` / `tfa_pos_small_full`: probe z_novel +
+        #     z_pred (the *full* effective reconstruction input per
+        #     `_tfa_module.py:232`, where recon = (z_novel + z_pred) @ D
+        #     + b). Tests whether the dense context-predicted features
+        #     add downstream signal.
+        # Empirical finding (Phase 5.7 audit, 2026-04-22): z_novel alone
+        # wins at last_position; z_novel+z_pred wins at mean_pool for
+        # tfa_pos. See summary.md "Caveats" section.
+        use_full = arch.endswith("_full")
         scale = float(meta.get("scale", 1.0))
         outs = []
         for i in range(0, anchor.shape[0], 256):
             Xb = torch.from_numpy(anchor[i:i + 256]).float().to(device) * scale
             with torch.no_grad():
                 _, inter = model(Xb)
-            z_eff = inter["novel_codes"] + inter["pred_codes"]  # (B, 20, d_sae)
+            if use_full:
+                z_eff = inter["novel_codes"] + inter["pred_codes"]  # (B, 20, d_sae)
+            else:
+                z_eff = inter["novel_codes"]
             if aggregation == "last_position":
                 lib = torch.from_numpy(li[i:i + 256]).to(device)
                 outs.append(z_eff[torch.arange(z_eff.shape[0], device=device), lib].cpu().numpy())

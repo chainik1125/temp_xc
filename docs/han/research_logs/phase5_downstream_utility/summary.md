@@ -171,8 +171,10 @@ non-determinism accumulated across re-probes; the ranking is stable.)*
 | stacked_t20 | 0.7120 | 0.1173 | 36 |
 | txcdr_pos_t5 | 0.7086 | 0.1090 | 36 |
 | txcdr_shared_enc_t5 | 0.6967 | 0.1039 | 36 |
-| tfa_small | 0.6402 | 0.1121 | 36 |
-| tfa_pos_small | 0.6346 | 0.0966 | 36 |
+| tfa_small (z_novel) | 0.6402 | 0.1121 | 36 |
+| tfa_pos_small (z_novel) | 0.6346 | 0.0966 | 36 |
+| tfa_small_full (z_novel+z_pred) | 0.5996 | 0.0852 | 36 |
+| tfa_pos_small_full (z_novel+z_pred) | 0.5884 | 0.0864 | 36 |
 
 #### Figure 2 — Headline AUC by arch, mean-pool, 36 tasks
 
@@ -210,9 +212,11 @@ non-determinism accumulated across re-probes; the ranking is stable.)*
 | txcdr_shared_dec_t5 | 0.7427 | 0.1178 | 36 |
 | txcdr_block_sparse_t5 | 0.7389 | 0.1169 | 36 |
 | txcdr_pos_t5 | 0.7271 | 0.1172 | 36 |
+| tfa_pos_small_full (z_novel+z_pred) | 0.7242 | 0.1206 | 36 |
 | txcdr_shared_enc_t5 | 0.7170 | 0.1120 | 36 |
-| tfa_small | 0.6722 | 0.0889 | 36 |
-| tfa_pos_small | 0.6712 | 0.0975 | 36 |
+| tfa_small (z_novel) | 0.6722 | 0.0889 | 36 |
+| tfa_pos_small (z_novel) | 0.6712 | 0.0975 | 36 |
+| tfa_small_full (z_novel+z_pred) | 0.6576 | 0.1023 | 36 |
 
 #### Agentic multi-scale winners (Phase 5.7)
 
@@ -567,6 +571,19 @@ omit this aggregation.
   SAEBench numbers are therefore not a like-for-like comparison
   against the d_sae = 18 432 archs and should be read as "TFA at
   matched total sparsity budget".
+- **TFA dual probing (z_novel vs z_novel + z_pred).** TFA's decoder
+  reconstructs from `z_novel + z_pred` (see `_tfa_module.py:232`). The
+  Phase 5.7 audit considered whether probing should use the full
+  effective latent (`z_novel + z_pred`) rather than the sparse novelty
+  component alone (`z_novel`). Empirical finding: **neither is
+  universally better**. `tfa_*` (z_novel only) wins at last_position
+  (0.6402 / 0.6346 vs 0.5996 / 0.5884) because the TopK-sparse novelty
+  latents match the top-k-by-class-separation selector's assumption.
+  `tfa_pos_small_full` wins at mean_pool (0.7242 vs 0.6712) because the
+  dense z_pred features survive averaging and contribute signal.
+  Both variants are listed in the bench tables (suffix `_full` =
+  z_novel + z_pred). This is the fair two-sided comparison; collapsing
+  to one would hide the finding.
 - **Gemma-2-2B-IT vs Gemma-2-2B (base)** divergence from Aniket's
   setup. All 25 rows are internally consistent on -IT; direct
   bit-level comparison with Aniket is not possible on these numbers.
