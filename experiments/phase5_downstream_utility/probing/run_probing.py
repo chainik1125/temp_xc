@@ -336,6 +336,12 @@ def _load_model_for_run(run_id, ckpt_path, device):
             d_in, d_sae, n_layers=5,
             k=meta["k_pos"], h=meta.get("h", d_sae // 2),
         ).to(device)
+    elif arch == "agentic_mlc_08":
+        from src.architectures.mlc_contrastive_multiscale import MLCContrastiveMultiscale
+        model = MLCContrastiveMultiscale(
+            d_in, d_sae, n_layers=5, k=meta["k_pos"],
+            gamma=meta.get("gamma", 0.5),
+        ).to(device)
     elif arch in ("txcdr_t2", "txcdr_t3", "txcdr_t5", "txcdr_t8",
                   "txcdr_t10", "txcdr_t15", "txcdr_t20"):
         T = meta["T"]
@@ -558,7 +564,8 @@ def _encode_for_probe(
         return _encode_topk(model, anchor, li, device, aggregation)
     if arch in ("mlc", "mlc_contrastive",
                 "mlc_contrastive_alpha003",
-                "mlc_contrastive_alpha100"):
+                "mlc_contrastive_alpha100",
+                "agentic_mlc_08"):
         # mlc_contrastive has identical encode API — subclass of MLC.
         # last_position: use mlc (N, L, d) at last real token.
         # full_window:   use mlc_tail (N, TAIL=20, L, d) if available.
@@ -929,6 +936,7 @@ def run_probing(
             if (arch in ("mlc", "mlc_contrastive",
                          "mlc_contrastive_alpha003",
                          "mlc_contrastive_alpha100",
+                         "agentic_mlc_08",
                          "time_layer_crosscoder_t5",
                          "time_layer_contrastive_t5")
                     and aggregation in mlc_tail_aggs):

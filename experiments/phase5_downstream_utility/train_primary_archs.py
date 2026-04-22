@@ -551,6 +551,39 @@ def train_matryoshka_txcdr_contrastive(cfg, device, k, T, alpha=0.1,
     return model, log
 
 
+def train_mlc_contrastive_multiscale(
+    cfg, device, k, alpha=1.0, prefix_lens=None, gamma=0.5,
+    d_sae=DEFAULT_D_SAE, buf=None,
+):
+    """Agentic cycle 08: MLC + multi-scale contrastive (port of cycle 02)."""
+    from src.architectures.mlc_contrastive_multiscale import MLCContrastiveMultiscale
+    buf = buf if buf is not None else _preload_multilayer(device)
+    d_in = buf.shape[-1]
+    n_layers = buf.shape[2]
+    if prefix_lens is None:
+        prefix_lens = (d_sae // 4, d_sae // 2, d_sae)
+    model = MLCContrastiveMultiscale(
+        d_in, d_sae, n_layers=n_layers, k=k,
+        prefix_lens=prefix_lens, gamma=gamma,
+    ).to(device)
+    pair_gen = make_pair_multilayer_gen_gpu(buf)
+
+    def gen(batch_size):
+        return pair_gen(batch_size)
+
+    def norm(): model._normalize_decoder()
+
+    orig_forward = model.forward
+
+    def forward_with_alpha(x):
+        return orig_forward(x, alpha=alpha)
+
+    model.forward = forward_with_alpha   # type: ignore[method-assign]
+    log = _iterate_train(model, gen, cfg, device, normalize_decoder=norm)
+    model.forward = orig_forward   # type: ignore[method-assign]
+    return model, log
+
+
 def train_matryoshka_txcdr_contrastive_consistency(
     cfg, device, k, T, alpha=1.0, n_contr_scales=3, gamma=0.5,
     d_sae=DEFAULT_D_SAE, buf=None,
@@ -1212,6 +1245,15 @@ def run_all(seeds, max_steps, archs=None):
                             match_budget=True, layer=13, alpha=1.0,
                             n_contr_scales=3, gamma=0.3,
                             variant="agentic_txc_05_multiscale_n3_g03")
+            elif arch == "agentic_mlc_08":
+                # Agentic cycle 08: MLC + multi-scale InfoNCE (port of cycle 02).
+                # α=1.0 (MLC best from Part B), γ=0.5, prefix_lens at d_sae/4, d_sae/2, d_sae.
+                model, log = train_mlc_contrastive_multiscale(
+                    cfg, device, k=100, alpha=1.0, gamma=0.5, buf=get_ml(),
+                )
+                meta = dict(seed=seed, k_pos=100, k_win=None, T=1,
+                            layers="L11-L15", alpha=1.0, gamma=0.5,
+                            variant="agentic_mlc_08_multiscale")
             elif arch == "agentic_txc_07":
                 # Agentic cycle 07: cycle-02 config (n=3, γ=0.5)
                 # + COSINE CONSISTENCY replacing InfoNCE (H-TXC6).

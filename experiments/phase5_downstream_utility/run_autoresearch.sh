@@ -70,6 +70,8 @@ BASE_OF[agentic_txc_04]=matryoshka_t5
 BASE_OF[agentic_txc_05]=matryoshka_t5
 BASE_OF[agentic_txc_06]=matryoshka_t5
 BASE_OF[agentic_txc_07]=matryoshka_t5
+# MLC agentic cycles (compared against vanilla mlc).
+BASE_OF[agentic_mlc_08]=mlc
 
 commit_and_push() {
     local msg="$1"; shift

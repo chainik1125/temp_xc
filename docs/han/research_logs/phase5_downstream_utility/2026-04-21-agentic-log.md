@@ -372,15 +372,43 @@ results of the prior cycle.
 **Hypothesis**: Cycle 02's gain came from pulling adjacent-window
   scale-1/2/3 features together via InfoNCE. Cycle 06 showed the "push
   apart" component (negatives) wasn't contributing much on top. Does
-  that mean pull-only would work? Replace InfoNCE with a symmetric
-  cosine-consistency loss (2 - 2 · cos_sim), which has only pull-together
-  gradient. Prediction: small positive Δ if pull-together alone
-  sufficient; regression if the push-apart was a stabilizer against
-  collapse; modest improvement if removing push-apart noise.
-**Change**: new class `MatryoshkaTXCDRContrastiveConsistency` subclassing
-  `MatryoshkaTXCDRContrastiveMultiscale` but overriding forward to use
-  cosine-consistency at each scale with the same γ^s decay. Same
-  n=3, γ=0.5.
+  that mean pull-only would work?
+**Change**: `MatryoshkaTXCDRContrastiveConsistency` subclassing
+  Multiscale. Symmetric cosine-consistency (2 - 2 · cos_sim) at each
+  scale with same γ^s decay. n=3, γ=0.5.
+**Code**: commit forthcoming.
+**Result**: Δ_val = **+0.0174 ±0.0096** (t=+1.81, n=36, 20/5/11) vs
+  `matryoshka_t5`. FINALIST vs vanilla but **LOST vs cycle 02** by
+  ~0.018 (about half the cycle 02 gain).
+**Verdict**: **LOST vs cycle-02 reference**.
+**Takeaway**: The push-apart (negative-discrimination) half of InfoNCE
+  contributes meaningfully — removing it drops the gain by half.
+  Combining with cycle 06 (negatives were fine — hard negs didn't
+  help on top of B=1024 random ones): InfoNCE's pull-together AND
+  push-apart both matter, but adding MORE negatives doesn't. The
+  multi-scale InfoNCE as currently formulated appears near-optimal on
+  the objective axis. Consistent with SSL literature: discriminative
+  contrastive beats pull-only consistency at matched hyperparams.
+**Next**: TXC exploration is largely exhausted — 7 cycles tried;
+  cycle 02 remains champion. Pivoting to MLC family for cycle 08.
+  Port the multi-scale idea: apply InfoNCE at multiple d_sae prefix
+  lengths (d_sae/4, d_sae/2, d_sae) with γ=0.5 decay.
+
+---
+
+### Cycle 08 — MLC multi-scale contrastive (port of cycle 02 to MLC)
+**Family**: MLC
+**Reference to beat**: `mlc_contrastive_alpha100` (α=1.0) at Δ_val =
+  +0.0050 vs vanilla `mlc`. (MLC best from Part B.)
+**Hypothesis**: Cycle 02's winning multi-scale InfoNCE pattern (apply
+  InfoNCE at multiple prefix lengths with γ^s decay) gave +0.01 over
+  single-scale on TXC. Port to MLC: apply InfoNCE at
+  (d_sae/4, d_sae/2, d_sae) with γ=0.5. MLC scales are 1-D (prefix
+  lengths, not matryoshka reconstruction scales), so this is an
+  analogical port — tests whether the multi-scale contrastive pattern
+  is family-agnostic or tied to TXC's matryoshka nesting.
+**Change**: new class `MLCContrastiveMultiscale` subclassing
+  `MLCContrastive`. New training helper + dispatcher `agentic_mlc_08`.
 **Code**: commit forthcoming.
 **Result**: pending.
 **Verdict**: pending.
