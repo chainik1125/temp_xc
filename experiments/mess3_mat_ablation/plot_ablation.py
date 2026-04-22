@@ -54,20 +54,17 @@ def _load_r2_ceiling(root: Path) -> dict[float, float]:
 def _arch_r2_over_delta(results: dict[float, dict], arch_name: str) -> list[float | None]:
     """Return the per-δ best-single-feature-R² summed across components for one arch.
 
-    Matches the "best" column in Dmitry's separation_scaling.md table.
+    Matches the "all" column in Dmitry's separation_scaling.md table.
+    Dmitry's `architectures` field is a DICT keyed by arch name (not a list).
     """
     out: list[float | None] = []
     for delta in sorted(results):
         cell = results[delta]
-        arches = cell.get("architectures", [])
-        match = next((a for a in arches if a.get("name") == arch_name), None)
+        arches_dict = cell.get("architectures", {})
+        match = arches_dict.get(arch_name)
         if match is None:
             out.append(None)
             continue
-        # Dmitry's per-arch entry has "per_component_best_r2": list[float]
-        # (one entry per Mess3 component). We report the summed best — same
-        # as the "all" column in separation_scaling.md, aligned with the
-        # gap-recovery axis the plot uses.
         per_comp = match.get("per_component_best_r2")
         if not per_comp:
             out.append(None)
@@ -79,16 +76,18 @@ def _arch_r2_over_delta(results: dict[float, dict], arch_name: str) -> list[floa
 def _feature_diversity(cell: dict, arch_name: str) -> int | None:
     """For one (cell, arch), count distinct argmax features across the C=3
     Mess3 components. None if the arch didn't run on this cell.
+
+    Dmitry's driver doesn't persist argmax feature IDs — only best R² per
+    component. Without raw z_all we can't compute diversity. Returns None
+    so the plot still produces something (empty bars for this metric).
+    To enable, modify Dmitry's `summarize_single_feature_probe` to save
+    `per_component_best_feature_idx` and propagate through run_one_cell.
     """
-    arches = cell.get("architectures", [])
-    match = next((a for a in arches if a.get("name") == arch_name), None)
+    arches_dict = cell.get("architectures", {})
+    match = arches_dict.get(arch_name)
     if match is None:
         return None
-    # Stored field: "per_component_argmax_feature" if available,
-    # else reconstruct from "per_component_best_r2_feature_id".
-    idxs = match.get("per_component_argmax_feature")
-    if idxs is None:
-        idxs = match.get("per_component_best_r2_feature_id")
+    idxs = match.get("per_component_argmax_feature") or match.get("per_component_best_r2_feature_id")
     if idxs is None:
         return None
     return len(set(int(i) for i in idxs))
@@ -143,10 +142,36 @@ def plot_gap_recovery(results: dict[float, dict], ceiling: dict[float, float], o
 
 
 def plot_feature_diversity(results: dict[float, dict], out_path: Path) -> None:
-    """fig2: distinct argmax features per component, grouped by arch × δ."""
+    """fig2: distinct argmax features per component, grouped by arch × δ.
+
+    Skips entirely if no arch has diversity data — which is the current
+    default until we extend Dmitry's driver to persist argmax feature IDs.
+    Rather than produce a blank bar chart, emits a placeholder PDF with
+    a note.
+    """
     deltas = sorted(results)
     arches = [name for name, *_ in ARCH_STYLE]
     colors = {name: color for name, _, color, _, _ in ARCH_STYLE}
+
+    have_any = any(
+        _feature_diversity(results[d], arch_name) is not None
+        for d in deltas for arch_name in arches
+    )
+    if not have_any:
+        fig, ax = plt.subplots(figsize=(6.5, 3.0), dpi=300)
+        ax.text(
+            0.5, 0.5,
+            "Feature-diversity plot requires per_component_argmax_feature IDs,\n"
+            "which Dmitry's run_one_cell doesn't currently persist.\n"
+            "Extend run_one_cell to save m['per_component_best_feature_idx']\n"
+            "in arch_results, then re-run plot_ablation.py.",
+            ha="center", va="center", fontsize=10,
+        )
+        ax.set_axis_off()
+        fig.savefig(out_path, format="pdf", bbox_inches="tight")
+        plt.close(fig)
+        print(f"[warn] wrote placeholder to {out_path} (no diversity data available)")
+        return
 
     fig, ax = plt.subplots(figsize=(6.5, 4.0), dpi=300)
     width = 0.8 / len(arches)

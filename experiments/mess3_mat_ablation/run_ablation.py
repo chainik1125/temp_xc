@@ -23,49 +23,33 @@ from sae_day import run_driver  # type: ignore[import-not-found]  # noqa: E402
 
 
 def _install_matsae_dispatch() -> None:
-    """Wrap `run_driver.evaluate_one_arch` so family='matsae' dispatches here."""
-    original_dispatch = run_driver.evaluate_one_arch
+    """Wrap `run_driver.run_architecture` so family='matsae' dispatches here.
 
-    def patched_dispatch(
-        seed,
-        arch_entry,
-        train_acts,
-        eval_acts,
-        train_acts_ml,
-        eval_acts_ml,
-        eval_omega,
-        d_model,
-        device,
-        checkpoint_path=None,
-    ):
+    Function name + signature match Dmitry's vendored run_driver.py at
+    commit 16452d5: `run_architecture(arch_entry, *, seed, train_acts,
+    train_acts_ml, eval_acts, eval_acts_ml, eval_omega, d_model, device,
+    checkpoint_path=None)`.
+    """
+    original_dispatch = run_driver.run_architecture
+
+    def patched_dispatch(arch_entry, **kwargs):
         if arch_entry.get("family") == "matsae":
-            # _merge_kwargs lives in run_driver; reuse so our config entry
-            # picks up the same defaults layer as every other arch.
+            # Reuse _merge_kwargs so our config entry picks up the same
+            # defaults layer as every other arch.
             arch_cfg = run_driver._merge_kwargs(arch_entry["name"], arch_entry.get("kwargs", {}))
             return evaluate_matsae_on_activations(
-                seed=seed,
+                seed=kwargs["seed"],
                 arch_cfg=arch_cfg,
-                train_acts=train_acts,
-                eval_acts=eval_acts,
-                eval_omega=eval_omega,
-                d_model=d_model,
-                device=device,
-                checkpoint_path=checkpoint_path,
+                train_acts=kwargs["train_acts"],
+                eval_acts=kwargs["eval_acts"],
+                eval_omega=kwargs["eval_omega"],
+                d_model=kwargs["d_model"],
+                device=kwargs["device"],
+                checkpoint_path=kwargs.get("checkpoint_path"),
             )
-        return original_dispatch(
-            seed,
-            arch_entry,
-            train_acts,
-            eval_acts,
-            train_acts_ml,
-            eval_acts_ml,
-            eval_omega,
-            d_model,
-            device,
-            checkpoint_path=checkpoint_path,
-        )
+        return original_dispatch(arch_entry, **kwargs)
 
-    run_driver.evaluate_one_arch = patched_dispatch
+    run_driver.run_architecture = patched_dispatch
 
 
 def main() -> int:
