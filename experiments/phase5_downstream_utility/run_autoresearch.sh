@@ -67,6 +67,7 @@ BASE_OF[agentic_txc_01]=matryoshka_t5
 BASE_OF[agentic_txc_02]=matryoshka_t5
 BASE_OF[agentic_txc_03]=matryoshka_t5
 BASE_OF[agentic_txc_04]=matryoshka_t5
+BASE_OF[agentic_txc_05]=matryoshka_t5
 
 commit_and_push() {
     local msg="$1"; shift

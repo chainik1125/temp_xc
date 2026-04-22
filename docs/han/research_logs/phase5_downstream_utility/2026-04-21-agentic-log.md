@@ -285,6 +285,47 @@ results of the prior cycle.
   weights; regression if full-window contrastive at any weight hurts.
 **Change**: `MatryoshkaTXCDRContrastiveMultiscale` with
   **n_contr_scales=5**, γ=0.5. Everything else identical to cycle 02.
+**Code**: commit `648e1a8`. (Downstream ran via watchdog after the
+  orchestrator was killed fixing an unrelated pgrep bug — see commit
+  `009292a`; watchdog had a flag bug for the summariser, manually
+  re-run; see commit `0267e94`.)
+**Result**: Δ_val = **+0.0054 ±0.0132** (t=+0.41, n=36, 18/0/18) vs
+  `matryoshka_t5`. **Major regression** from cycle 02.
+**Verdict**: **LOST vs cycle-02 reference**. Ambiguous vs vanilla.
+**Takeaway**: Scales 4 and 5 bring in bad contrastive signal even at
+  gentle decay weights (0.125 and 0.0625). Reason (post-hoc): scale-4
+  and scale-5 latents reconstruct longer sub-windows (4 and 5 tokens).
+  Adjacent full windows only share 4 of 5 positions, and scale-4 only
+  shares 3 of 4 center-tokens across adjacent. Contrastive pressure
+  forces those long-window latents to be shift-invariant, which
+  directly contradicts what they must do to reconstruct. The fact that
+  cycle 04 comes in WORSE than cycle 03 (γ=1.0 at n=3) tells us the
+  problem is the MEMBERSHIP in contrastive (scales 4, 5) more than
+  the weighting. **Implication**: the shift-invariance boundary
+  sits between scale-3 and scale-4 for T=5 — scales 1-3 are "shift-safe"
+  (reconstruction targets overlap heavily across adjacent windows),
+  scales 4-5 are not.
+**Next**: Both directions of multi-scale extension regressed (γ=1.0
+  and n=5). Cycle 02 is near a narrow peak. Next cycle maps the γ
+  axis below 0.5: try γ=0.3 at n=3. If matches cycle 02, the sweet
+  spot is a plateau. If regresses, cycle 02 hit the peak exactly.
+
+---
+
+### Cycle 05 — multi-scale n=3, γ=0.3
+**Family**: TXC
+**Reference to beat**: `agentic_txc_02` at Δ_val = +0.0354.
+**Hypothesis**: Cycles 03 (γ=1.0) and 04 (n=5) both regressed from
+  cycle 02. To know whether cycle 02 is on a plateau or a peak, sweep
+  γ downward. γ=0.3 gives scale-1 weight 1, scale-2 weight 0.3, scale-3
+  weight 0.09 — still multi-scale but with stronger scale-1 dominance.
+  Prediction: roughly similar to cycle 02 if decay insensitivity within
+  [0.3, 0.5]; modest improvement if scale-1 under-weighting at γ=0.5
+  was the limiting factor; regression if signal at scales 2, 3 was
+  doing real work at γ=0.5 and we're starving it at γ=0.3.
+**Change**: `MatryoshkaTXCDRContrastiveMultiscale`,
+  **n_contr_scales=3**, γ=0.3. Same dispatcher pattern — new
+  `agentic_txc_05` arch name.
 **Code**: commit forthcoming.
 **Result**: pending.
 **Verdict**: pending.

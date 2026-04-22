@@ -1084,6 +1084,16 @@ def run_all(seeds, max_steps, archs=None):
                             match_budget=True, layer=13, alpha=1.0,
                             n_contr_scales=5, gamma=0.5,
                             variant="agentic_txc_04_multiscale_n5_g05")
+            elif arch == "agentic_txc_05":
+                # Agentic cycle 05: n=3, γ=0.3. Probes below 0.5.
+                model, log = train_matryoshka_txcdr_contrastive_multiscale(
+                    cfg, device, k=100, T=5, alpha=1.0,
+                    n_contr_scales=3, gamma=0.3, buf=get_anchor(),
+                )
+                meta = dict(seed=seed, k_pos=100, k_win=500, T=5,
+                            match_budget=True, layer=13, alpha=1.0,
+                            n_contr_scales=3, gamma=0.3,
+                            variant="agentic_txc_05_multiscale_n3_g03")
             elif arch == "matryoshka_txcdr_contrastive_t5_k2x":
                 model, log = train_matryoshka_txcdr_contrastive(
                     cfg, device, k=200, T=5, alpha=0.1, buf=get_anchor(),
