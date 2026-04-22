@@ -173,9 +173,26 @@ def train_one_vector(
         "lr": cfg.lr,
         "seed": cfg.seed,
     }
-    if not force and expected_out.exists() and can_resume(meta_path, meta):
-        log.info("[info] resume | stage=steering | cluster_idx=%d | cache=%s", cluster_idx, expected_out)
-        return expected_out
+    # Resume rules:
+    #   1. expected_out exists AND our meta sidecar matches → we trained
+    #      this before, skip.
+    #   2. expected_out exists AND NO sidecar (i.e., Venhoff's shipped
+    #      pre-trained vector) → skip training. Write a sidecar so the
+    #      skip reason is greppable.
+    if not force and expected_out.exists():
+        if meta_path.exists() and can_resume(meta_path, meta):
+            log.info("[info] resume | stage=steering | cluster_idx=%d | cache=%s", cluster_idx, expected_out)
+            return expected_out
+        if not meta_path.exists():
+            log.info("[info] reuse_shipped | stage=steering | cluster_idx=%d | cache=%s",
+                     cluster_idx, expected_out)
+            meta_path.parent.mkdir(parents=True, exist_ok=True)
+            write_with_metadata(
+                meta_path,
+                json.dumps({"vector_path": str(expected_out), "source": "venhoff_shipped"}),
+                {**meta, "source": "venhoff_shipped"},
+            )
+            return expected_out
 
     cmd = [
         _venhoff_python(venhoff_root), "optimize_steering_vectors.py",
