@@ -7,12 +7,12 @@ Or point at a different traces.json:
     python scripts/inspect_traces.py path/to/traces.json
 
 Reports:
-  - file type + size
-  - number of traces
-  - keys on each trace
-  - response / thinking text length
-  - first ~300 chars of the response so we can tell if it's empty or
-    the splitter is what's broken.
+  - file type + size, number of traces, keys present
+  - full_response and thinking_process field lengths + previews
+  - whether <think>...</think> tags are present
+  - what extract_thinking_process() returns
+  - what split_into_sentences() returns
+  - final verdict: regenerate Phase 0 | fix extract | fix splitter | schema mismatch
 """
 
 from __future__ import annotations
@@ -42,44 +42,108 @@ def main(path: Path) -> int:
 
     print(f"json type: {type(d).__name__}")
 
-    if isinstance(d, list):
-        print(f"n_traces:  {len(d)}")
-        if not d:
-            print("[verdict] traces list is EMPTY — regenerate Phase 0")
-            return 0
-        first = d[0]
-        print(f"keys[0]:   {list(first.keys())}")
-        for field in ("response", "thinking", "trace", "completion", "text"):
-            if field in first:
-                text = first[field]
-                if isinstance(text, str):
-                    print(f"{field!r}: len={len(text)} chars")
-                    print(f"  sample: {text[:300]!r}")
-                    print(f"  has newlines: {text.count(chr(10))} line-breaks")
-                    print(f"  has periods:  {text.count('.')} periods")
-        # Stats across all traces
-        if isinstance(first.get("response"), str):
-            lens = [len(t.get("response", "")) for t in d]
-        elif isinstance(first.get("thinking"), str):
-            lens = [len(t.get("thinking", "")) for t in d]
-        else:
-            lens = []
-        if lens:
-            import statistics
-            print(f"\nresponse lengths: min={min(lens)} median={statistics.median(lens):.0f} max={max(lens)}")
-            n_empty = sum(1 for L in lens if L == 0)
-            print(f"empty traces:     {n_empty}/{len(lens)}")
-            if n_empty == len(lens):
-                print("[verdict] every trace has empty response — regenerate Phase 0")
-            elif n_empty > 0:
-                print(f"[verdict] {n_empty} traces empty, rest look ok — splitter may fail on empty ones")
-            else:
-                print("[verdict] traces look populated — problem is downstream in sentence splitter")
-    elif isinstance(d, dict):
-        print(f"top keys:  {list(d.keys())[:20]}")
-        print("[verdict] traces.json is a dict, not a list — schema mismatch?")
-    else:
+    if not isinstance(d, list):
         print(f"[verdict] unexpected JSON root type: {type(d).__name__}")
+        return 0
+
+    print(f"n_traces:  {len(d)}")
+    if not d:
+        print("[verdict] traces list is EMPTY — regenerate Phase 0")
+        return 0
+
+    first = d[0]
+    print(f"keys[0]:   {list(first.keys())}")
+    print()
+
+    # ── full_response diagnostics ──────────────────────────────────
+    fr = first.get("full_response", "")
+    if not isinstance(fr, str):
+        print(f"[warn] full_response is {type(fr).__name__}, not str")
+        fr = ""
+    n_open = fr.count("<think>")
+    n_close = fr.count("</think>")
+    print(f"full_response[0]: len={len(fr)} chars")
+    print(f"  <think> count:  {n_open}")
+    print(f"  </think> count: {n_close}")
+    print(f"  first 300 chars: {fr[:300]!r}")
+    print(f"  last 200 chars:  {fr[-200:]!r}")
+    print()
+
+    # ── thinking_process diagnostics ───────────────────────────────
+    tp = first.get("thinking_process", "")
+    if isinstance(tp, str):
+        print(f"thinking_process[0]: len={len(tp)} chars")
+        print(f"  first 300 chars: {tp[:300]!r}")
+        print()
+
+    # ── extract + split pipeline ───────────────────────────────────
+    try:
+        from src.bench.venhoff.responses import extract_thinking_process
+        from src.bench.venhoff.tokenization import split_into_sentences
+    except ImportError as e:
+        print(f"[warn] cannot import Phase 1 helpers ({e}); install/activate venv first")
+        return 1
+
+    extracted = extract_thinking_process(fr)
+    print(f"extract_thinking_process(full_response): len={len(extracted)}")
+    print(f"  first 300 chars: {extracted[:300]!r}")
+    print()
+
+    sentences = split_into_sentences(extracted)
+    print(f"split_into_sentences(extracted): {len(sentences)} sentences")
+    for i, s in enumerate(sentences[:3]):
+        print(f"  [{i}] {s[:80]!r}")
+    print()
+
+    # ── aggregate across all traces ────────────────────────────────
+    empty_fr = sum(1 for t in d if not t.get("full_response"))
+    empty_tp = sum(1 for t in d if not t.get("thinking_process"))
+    no_think_tags = sum(
+        1 for t in d
+        if isinstance(t.get("full_response"), str) and "<think>" not in t["full_response"]
+    )
+    print(f"across all {len(d)} traces:")
+    print(f"  empty full_response:    {empty_fr}")
+    print(f"  empty thinking_process: {empty_tp}")
+    print(f"  missing <think> tag:    {no_think_tags}")
+    print()
+
+    # Sample 20 traces through the extract+split pipeline
+    sent_counts = []
+    for t in d[:20]:
+        fr_t = t.get("full_response", "")
+        if not isinstance(fr_t, str):
+            sent_counts.append(0)
+            continue
+        ex = extract_thinking_process(fr_t)
+        ss = split_into_sentences(ex)
+        sent_counts.append(len(ss))
+    import statistics
+    if sent_counts:
+        print(f"pipeline sentences / first 20 traces:")
+        print(f"  min={min(sent_counts)} median={int(statistics.median(sent_counts))} max={max(sent_counts)}")
+        zero = sum(1 for c in sent_counts if c == 0)
+        print(f"  traces with 0 sentences: {zero}/20")
+
+    print()
+    # ── verdict ────────────────────────────────────────────────────
+    if empty_fr == len(d):
+        print("[verdict] every full_response is empty → regenerate Phase 0")
+    elif empty_fr > 0:
+        print(f"[verdict] {empty_fr}/{len(d)} traces have empty full_response → partial regenerate")
+    elif no_think_tags == len(d) and sent_counts and max(sent_counts) > 0:
+        print("[verdict] no <think> tags anywhere, but splitter still produces sentences")
+        print("          → extract_thinking_process falls through to full text, should work;"
+              " inspect why activation_collection raises")
+    elif no_think_tags == len(d):
+        print("[verdict] no <think> tags AND splitter returns 0 → splitter is hitting empty text")
+        print("          → either fix extract_thinking_process to use thinking_process field,"
+              " or debug the splitter")
+    elif sent_counts and max(sent_counts) == 0:
+        print("[verdict] extract succeeds but splitter returns 0 sentences → splitter is broken")
+    else:
+        print("[verdict] pipeline works on sample traces → something else in Phase 1 is failing")
+        print("          Check activation_collection.py:240 for additional filters / token spans")
 
     return 0
 
