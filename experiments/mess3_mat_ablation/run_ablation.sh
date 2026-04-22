@@ -26,16 +26,15 @@ else
     echo "[info] stage=setup_vendor | status=cached | pin=$(head -1 vendor/COMMIT_SHA)"
 fi
 
-# Minimum deps we actually exercise: torch, jax, numpy, scikit-learn,
-# matplotlib, pyyaml, transformer_lens. Confirmed via grep that
-# `simplexity` is NOT imported in any vendored file (Dmitry kept it as
-# a project-level extras dep for his full pipeline, but the code paths
-# we hit don't reference it). The separation-scaling extras group also
-# doesn't exist on aniket branch. Skip both preconditions.
-#
-# If a later rebase of origin/dmitry starts actually importing
-# simplexity, the script will fail loudly at the run_driver.py import
-# site and this block needs to come back.
+# simplexity IS required: nonergodic_generator.py lazy-imports it inside
+# functions that build the Mess3 HMM. The initial top-of-file grep
+# missed it because imports are indented under function bodies.
+# aniket branch now has a [separation-scaling] extras group in
+# pyproject.toml (mirroring Dmitry's); we use it here.
+if ! "$REPO_ROOT/.venv/bin/python" -c "import simplexity" >/dev/null 2>&1; then
+    echo "[info] simplexity missing — uv sync --extra separation-scaling"
+    (cd "$REPO_ROOT" && uv sync --extra separation-scaling)
+fi
 
 # Step 2: run driver with our matsae dispatch.
 echo "[info] stage=run_driver | status=start | config=config_ablation.yaml"
