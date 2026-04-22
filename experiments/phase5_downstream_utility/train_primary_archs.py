@@ -933,6 +933,36 @@ def train_temporal_contrastive(cfg, device, k, d_sae=DEFAULT_D_SAE,
     return model, log
 
 
+def train_tsae_ours(cfg, device, k, d_sae=DEFAULT_D_SAE,
+                    buf=None, alpha: float = 1.0):
+    """Phase 6 literal port of Ye et al. 2025 T-SAE (arxiv 2511.05541).
+
+    Distinguished from `train_temporal_contrastive` by the module it
+    instantiates: `TSAEOurs` applies L_matr only on x_cur (matching the
+    paper's Eq. in §3.2), whereas `TemporalContrastiveSAE` applies it on
+    both sides of the pair. All other training loop details identical
+    (Adam lr=3e-4, batch 1024, plateau stop).
+    """
+    from src.architectures.tsae_ours import TSAEOurs
+    buf = buf if buf is not None else _preload_single(ANCHOR_LAYER_KEY, device)
+    d_in = buf.shape[-1]
+    model = TSAEOurs(d_in, d_sae, k=k).to(device)
+    gen_pair = make_window_gen_gpu(buf, T=2)  # (B, 2, d) adjacent pairs
+
+    def gen(batch_size):
+        return gen_pair(batch_size)
+
+    def norm(): model._normalize_decoder()
+
+    def l0(z):
+        return (z > 0).float().sum(dim=-1).mean().item()
+
+    log = _iterate_train(
+        model, gen, cfg, device, normalize_decoder=norm, latent_l0_fn=l0,
+    )
+    return model, log
+
+
 def train_tfa(cfg, device, k, use_pos, d_sae=DEFAULT_D_SAE, buf=None,
               seq_len: int | None = None):
     from src.architectures._tfa_module import TemporalSAE
@@ -1416,6 +1446,12 @@ def run_all(seeds, max_steps, archs=None):
                 )
                 meta = dict(seed=seed, k_pos=100, k_win=None, T=2,
                             variant="contrastive_matryoshka", layer=13)
+            elif arch == "tsae_ours":
+                model, log = train_tsae_ours(
+                    cfg, device, k=100, buf=get_anchor(),
+                )
+                meta = dict(seed=seed, k_pos=100, k_win=None, T=2,
+                            variant="tsae_paper_literal", layer=13)
             else:
                 print(f"  unknown arch: {arch}")
                 continue
