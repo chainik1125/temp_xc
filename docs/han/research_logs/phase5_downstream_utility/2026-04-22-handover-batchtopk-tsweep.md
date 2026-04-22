@@ -6,9 +6,9 @@ tags:
   - in-progress
 ---
 
-## Handover: full-size TFA + BatchTopK + T-sweep on agentic_txc_02
+## Handover: full-size TFA + BatchTopK + T-sweep + TXC/MLC router
 
-**Audience**: post-compact agent picking up three deferred follow-on
+**Audience**: post-compact agent picking up four deferred follow-on
 experiments after Phase 5.7 closed (morning brief + agentic log
 committed at `326394b`).
 
@@ -431,6 +431,144 @@ nested prefixes. If so, reduce k to 50 for T=20 runs and document.
 
 ---
 
+## Experiment (iv): TXC ↔ MLC task router
+
+**Purpose**: the bench currently shows `agentic_txc_02` and
+`agentic_mlc_08` each win at their "home" aggregation — TXC at
+mean_pool, MLC at last_position (see `summary.md` Figure 1/2). The
+implicit "they're complementary" claim is soft: it's based on
+different overall rankings and the earlier Jaccard error-overlap
+number (0.34). This experiment *concretizes* the complementarity
+story: build a simple learned classifier that routes each task to
+either TXC or MLC, and show this router dominates either arch alone.
+
+**The headline claim to test**: on the 36-task bench,
+`route(task) → {TXC, MLC}` achieves a mean AUC greater than *either
+arch's individual mean AUC on all 36 tasks*. Three numbers to report:
+
+1. **Best individual**: max(mean(agentic_txc_02), mean(agentic_mlc_08))
+   per aggregation.
+2. **Oracle router** (upper bound): for each task, pick whichever arch
+   has higher test_auc on that task. This is the ceiling for any
+   router given these two archs.
+3. **Learned router**: predict winner from task features via k-fold
+   CV; report effective AUC = mean across folds of "use the
+   predicted-winner arch's test_auc per held-out task".
+
+If (3) ≳ (1), you've concretized the complementarity. If (3) is near
+(2), routing is learnable and close to oracle. If (3) ≈ (1), routing
+from task features alone isn't learnable and we fall back to the
+Jaccard error-overlap argument for complementarity.
+
+**Why this is fast**: no retraining, no GPU. Pure post-hoc analysis
+of the existing `probing_results.jsonl` + task metadata. Implementable
+in a single afternoon.
+
+**Implementation plan**:
+
+1. **Extract per-task AUCs** for both archs at both aggregations
+   (seed=42, k=5, last-write-wins) — reuse the pattern in
+   `experiments/phase5_downstream_utility/agentic/compute_bench_table.py`
+   or adapt the `_val_per_task` helper from `partB_summarise.py`.
+   Store as a 36×2 table per aggregation.
+
+2. **Compute oracle upper bound**:
+   ```python
+   oracle_auc = per_task[["agentic_txc_02", "agentic_mlc_08"]].max(axis=1).mean()
+   ```
+
+3. **Define task features** — keep simple, since n=36 tasks. Three
+   feature sets to try in order of simplicity:
+   - **F1 (metadata)**: dataset source one-hot (15 sources: ag_news,
+     amazon_reviews, bias_in_bios_set{1,2,3}, europarl, github_code,
+     language_id, mmlu, winogrande, wsc, …), label-type indicator
+     (binary / multi-class), average example length. 15-20 features
+     per task.
+   - **F2 (activation summary)**: per-task mean + std of scale-1
+     agentic_txc_02 latents and of MLC agentic_mlc_08 latents on the
+     task's train set (768-dim — 2 × 2 × d_sae/T //? actually keep
+     small: just a few summary statistics like L0, mean activation
+     magnitude, top-k sparsity). Lets the router see "how sparse /
+     active is each arch on this task".
+   - **F3 (difficulty proxy)**: the per-arch AUC at train time minus
+     a simple baseline (e.g., majority-class AUC). This leaks target
+     information if used naively; only use for a sanity check.
+   Start with F1. If F1 gives a learnable signal, stop.
+
+4. **Fit a classifier** with 6-fold CV on 36 tasks (6 tasks per fold).
+   Start with `sklearn.linear_model.LogisticRegression(C=1.0, penalty="l2")`.
+   Target = `argmax_arch(test_auc_per_task)`. Report:
+   - CV accuracy (how often the router picks the right arch on
+     held-out tasks)
+   - Effective AUC = mean-across-folds of
+     `per_task[predicted_arch, held_out_task]`
+
+5. **Also compute the concat-latent probing baseline** — a separate
+   way to "use both archs at once", complementary to routing:
+   - Concatenate agentic_txc_02 and agentic_mlc_08 latents per task
+     into a (n, 2·d_sae) tensor.
+   - Run the standard top-k-by-class-separation probe (k=5) on the
+     concatenated tensor.
+   - Compare resulting mean AUC to (1), (2), (3). If concat-probing
+     > routing, the "use both" flavor with shared probe is the
+     stronger claim. If routing > concat, task-level assignment is
+     the right granularity.
+
+   The `run_probing.py` pipeline supports arbitrary latent
+   concatenation — most effort is in constructing the concat tensor
+   from two separate encoded outputs. See the existing error-overlap
+   analysis in `experiments/phase5_downstream_utility/analysis/`
+   (specifically `error_overlap_summary_last_position_k5.json`) for
+   the join-keys pattern on (task, sample) pairs.
+
+6. **Run for both aggregations** (last_position + mean_pool). Expect
+   each aggregation to give a different routing pattern since TXC
+   dominates mean_pool and MLC dominates last_position.
+
+7. **Write up the numbers as a small table in `summary.md`** —
+   something like:
+
+   | aggregation | best individual | oracle router | learned router | concat probe |
+   |---|---|---|---|---|
+   | last_position | 0.8047 (MLC) | TBD | TBD | TBD |
+   | mean_pool | 0.8007 (TXC) | TBD | TBD | TBD |
+
+   Add a 1-paragraph interpretation: which claim survives.
+
+**Time estimate**: 30 min feature extraction + 15 min CV + 1 hr
+concat-probing + 1-2 hr writeup/figures = **~3 hr wall-clock**.
+No GPU required for routing; concat-probing wants ~15 min on GPU.
+
+**Known risks**:
+- **Only 36 samples**. Logistic regression with 15-20 features + 36
+  samples has high variance. CV accuracy may be near 50% even if
+  oracle is meaningfully above best individual. That's an *honest*
+  finding: routing needs more tasks to be learnable.
+- **Dataset-source one-hot could overfit**. If a single source has
+  only 1-2 tasks and one arch wins there, the router memorizes that
+  signal. Guard by per-source stratified CV if feasible.
+- **Oracle may be only marginally above best individual**. If
+  agentic_mlc_08 wins 30/36 tasks at last_position, oracle pick is
+  close to agentic_mlc_08 alone. Check the per-task win distribution
+  before over-investing — if one arch dominates 80%+ of tasks, the
+  routing story is weak for THAT aggregation but may still work at
+  the other.
+
+**Deliverable**: a new section in `summary.md` titled
+"Complementarity: TXC/MLC routing and concat probing" with the
+numbers table, a per-task bar plot showing winner breakdown, and a
+1-paragraph conclusion.
+
+**Pointers**:
+- Existing error-overlap analysis:
+  `experiments/phase5_downstream_utility/results/error_overlap_summary_last_position_k5.json`
+- Per-task AUC extraction pattern:
+  `experiments/phase5_downstream_utility/agentic/compute_bench_table.py::load_last_write`
+- Task list + dataset sources:
+  `experiments/phase5_downstream_utility/results/probe_cache/` (36 task dirs)
+
+---
+
 ## What to do first
 
 **Hard constraint from Han**: experiment (i) full-size TFA **must
@@ -440,25 +578,28 @@ experiments while leaving an under-capacity TFA in the bench.
 
 **Recommended order**:
 
-1. **(i) Full-size TFA** (~2.5 hr + buffer) — shortest, closes the
+1. **(iv) TXC/MLC router** (~3 hr) — shortest, no GPU, no training,
+   concretizes the "they're complementary" story that's currently
+   soft in the paper. Do this early while longer experiments queue.
+2. **(i) Full-size TFA** (~2.5 hr + buffer) — closes the
    d_sae-mismatch unfairness, enables every subsequent comparison
    to include fair TFA numbers.
-2. **(iii) T-sweep on agentic_txc_02** (~7 hr) — lowest-risk
+3. **(iii) T-sweep on agentic_txc_02** (~7 hr) — lowest-risk
    exploration, extends the existing Figure 3 cleanly, independent
    of TFA work.
-3. **(ii) BatchTopK** (~7-9 hr) — highest engineering cost, defensive
+4. **(ii) BatchTopK** (~7-9 hr) — highest engineering cost, defensive
    against SAEBench reviewers; run last when (i)'s full-TFA numbers
    are in the bench so BatchTopK arch comparisons are built on fair
    capacity.
 
-**Alternative ordering if time-pressed**: (i) → (ii), skip (iii).
+**Alternative ordering if time-pressed**: (iv) → (i) → (ii), skip (iii).
 You'd still have a fully fair bench with BatchTopK for reviewer
-defense; the T-sweep is "nice to have" completeness for the paper's
-recipe claim.
+defense plus the complementarity story; the T-sweep is "nice to
+have" completeness for the paper's recipe claim.
 
-**Total wall-clock for all three**: ~17-19 hr (≈ one full overnight
-session + morning). If you do only (i) + (iii): ~10 hr. If you do
-only (i) + (ii): ~10-12 hr.
+**Total wall-clock for all four**: ~20-22 hr (≈ one full overnight
+session + morning). If you do (iv) + (i) + (iii): ~13 hr. If you do
+(iv) + (i) + (ii): ~13-15 hr.
 
 ## Gotchas
 
@@ -489,8 +630,10 @@ only (i) + (ii): ~10-12 hr.
    — should be empty (nothing in flight).
 5. `nvidia-smi --query-gpu=memory.used,utilization.gpu --format=csv`
    — GPU should be idle.
-6. Start with **(i) full-size TFA** (hard ordering constraint from
-   Han — before BatchTopK). Then (iii) T-sweep, then (ii) BatchTopK,
-   unless time-pressed per the "what to do first" section.
+6. Start with **(iv) TXC/MLC router** (fast, CPU-only, concretizes the
+   complementarity story) or **(i) full-size TFA** (hard ordering
+   constraint — must precede (ii) BatchTopK). Can do (iv) first on
+   CPU while (i) trains on GPU. Then (iii) T-sweep or (ii) BatchTopK,
+   per the "what to do first" ordering.
 7. Implement, launch, monitor, update summary.md + regenerate plots,
    commit+push per experiment.
