@@ -1,0 +1,186 @@
+[
+  {
+    "feature_idx": 4454,
+    "label": "Evolution and natural selection in populations",
+    "variance": 4167.1875,
+    "n_contexts": 10,
+    "contexts": [
+      {
+        "position": 358,
+        "strength": 331.25,
+        "text": " an environmental change occurs that favors individuals that are tallest\u00ab.\u00bb As a result, more of the taller individuals"
+      },
+      {
+        "position": 357,
+        "strength": 328.5,
+        "text": ", an environmental change occurs that favors individuals that are\u00ab tallest\u00bb. As a result, more of the taller"
+      },
+      {
+        "position": 344,
+        "strength": 315.25,
+        "text": "*       *       *       *In a population\u00ab of\u00bb giraffes, an environmental change occurs that favors"
+      }
+    ]
+  },
+  {
+    "feature_idx": 7968,
+    "label": "Natural selection and evolution in populations",
+    "variance": 3023.14990234375,
+    "n_contexts": 10,
+    "contexts": [
+      {
+        "position": 358,
+        "strength": 284.75,
+        "text": " an environmental change occurs that favors individuals that are tallest\u00ab.\u00bb As a result, more of the taller individuals"
+      },
+      {
+        "position": 344,
+        "strength": 270.0,
+        "text": "*       *       *       *In a population\u00ab of\u00bb giraffes, an environmental change occurs that favors"
+      },
+      {
+        "position": 357,
+        "strength": 269.0,
+        "text": ", an environmental change occurs that favors individuals that are\u00ab tallest\u00bb. As a result, more of the taller"
+      }
+    ]
+  },
+  {
+    "feature_idx": 4587,
+    "label": "Orwell's acknowledgments and autobiographical references",
+    "variance": 869.938720703125,
+    "n_contexts": 10,
+    "contexts": [
+      {
+        "position": 1236,
+        "strength": 143.125,
+        "text": " kind coadjutors\nI gladly acknowledge my\u00ab indebtedness\u00bb. The names of some occur in\nconnection"
+      },
+      {
+        "position": 1396,
+        "strength": 138.0,
+        "text": " POUM and Stalinist forces, during the Spanish\u00ab Civil\u00bb War. In a letter to Yvonne Davet"
+      },
+      {
+        "position": 1397,
+        "strength": 136.0,
+        "text": "UM and Stalinist forces, during the Spanish Civil\u00ab War\u00bb. In a letter to Yvonne Davet ("
+      }
+    ]
+  },
+  {
+    "feature_idx": 70,
+    "label": "Digits and numbers in historical dates",
+    "variance": 747.9818115234375,
+    "n_contexts": 10,
+    "contexts": [
+      {
+        "position": 1601,
+        "strength": 296.75,
+        "text": " the book between November 1943 and\u00ab February\u00bb 1944, when the United"
+      },
+      {
+        "position": 1599,
+        "strength": 291.75,
+        "text": "well wrote the book between November 194\u00ab3\u00bb and February 1944, when"
+      },
+      {
+        "position": 1604,
+        "strength": 283.5,
+        "text": " November 1943 and February 1\u00ab9\u00bb44, when the United Kingdom was in"
+      }
+    ]
+  },
+  {
+    "feature_idx": 118,
+    "label": "Latin inflectional word endings",
+    "variance": 683.97802734375,
+    "n_contexts": 10,
+    "contexts": [
+      {
+        "position": 73,
+        "strength": 129.375,
+        "text": " Fraudis;\n  Quive vagis pop\u00abulis\u00bb circumdare moenibus Urbes\n  "
+      },
+      {
+        "position": 47,
+        "strength": 127.875,
+        "text": "tis jussit Tabulis compescere C\u00e6\u00abdes\u00bb\n  Furta & Adulteria,"
+      },
+      {
+        "position": 100,
+        "strength": 125.875,
+        "text": "vit munere gentes;\n  Vel qui cur\u00abarum\u00bb lenimen pressit ab Uva;\n"
+      }
+    ]
+  },
+  {
+    "feature_idx": 152,
+    "label": "Numerical digits in historical dates",
+    "variance": 602.3129272460938,
+    "n_contexts": 10,
+    "contexts": [
+      {
+        "position": 1599,
+        "strength": 265.5,
+        "text": "well wrote the book between November 194\u00ab3\u00bb and February 1944, when"
+      },
+      {
+        "position": 1601,
+        "strength": 262.0,
+        "text": " the book between November 1943 and\u00ab February\u00bb 1944, when the United"
+      },
+      {
+        "position": 1604,
+        "strength": 261.5,
+        "text": " November 1943 and February 1\u00ab9\u00bb44, when the United Kingdom was in"
+      }
+    ]
+  },
+  {
+    "feature_idx": 6121,
+    "label": "Historical context of Soviet/Stalinist era",
+    "variance": 591.3040161132812,
+    "n_contexts": 10,
+    "contexts": [
+      {
+        "position": 1347,
+        "strength": 120.9375,
+        "text": " lived under the Marxist\u2013Leninist ideology of Joseph\u00ab Stalin\u00bb. Orwell, a democratic socialist, was a"
+      },
+      {
+        "position": 1396,
+        "strength": 118.5,
+        "text": " POUM and Stalinist forces, during the Spanish\u00ab Civil\u00bb War. In a letter to Yvonne Davet"
+      },
+      {
+        "position": 1340,
+        "strength": 111.5,
+        "text": " Soviet Union, a period when Russia lived under the\u00ab Marxist\u00bb\u2013Leninist ideology of Joseph Stalin. Orwell"
+      }
+    ]
+  },
+  {
+    "feature_idx": 3205,
+    "label": "Latin language text passages",
+    "variance": 566.7091674804688,
+    "n_contexts": 10,
+    "contexts": [
+      {
+        "position": 73,
+        "strength": 110.9375,
+        "text": " Fraudis;\n  Quive vagis pop\u00abulis\u00bb circumdare moenibus Urbes\n  "
+      },
+      {
+        "position": 313,
+        "strength": 103.5625,
+        "text": "ine mentem:\n  Nec fas est propi\u00abus\u00bb Mortali attingere Divos.\n\n"
+      },
+      {
+        "position": 47,
+        "strength": 103.5625,
+        "text": "tis jussit Tabulis compescere C\u00e6\u00abdes\u00bb\n  Furta & Adulteria,"
+      }
+    ]
+  }
+]
