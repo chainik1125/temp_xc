@@ -73,6 +73,15 @@ def main(path: Path) -> int:
     print(f"  </think> count: {n_close}")
     print(f"  first 300 chars: {fr[:300]!r}")
     print(f"  last 200 chars:  {fr[-200:]!r}")
+    # Count whitespace vs SentencePiece markers vs underscores.
+    print("  character composition:")
+    print(f"    ASCII space (0x20):          {fr.count(chr(0x20))}")
+    print(f"    tab (0x09):                  {fr.count(chr(0x09))}")
+    print(f"    newline (0x0a):              {fr.count(chr(0x0a))}")
+    print(f"    non-breaking space (0xa0):   {fr.count(chr(0xa0))}")
+    print(f"    literal underscore '_':      {fr.count('_')}")
+    print(f"    SP marker U+2581 '▁':        {fr.count(chr(0x2581))}")
+    print(f"  whitespace-split token count:  {len(fr.split())}")
     print()
 
     # ── thinking_process diagnostics ───────────────────────────────
