@@ -161,7 +161,7 @@ def main():
     p = argparse.ArgumentParser()
     p.add_argument("--archs", type=str, nargs="+",
                    default=["agentic_txc_02", "agentic_mlc_08",
-                            "tsae_ours", "tfa_big"])
+                            "tsae_paper", "tsae_ours", "tfa_big"])
     p.add_argument("--model", type=str, default="claude-haiku-4-5")
     args = p.parse_args()
 

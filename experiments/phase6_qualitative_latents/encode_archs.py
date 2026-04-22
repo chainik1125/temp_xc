@@ -45,7 +45,7 @@ OUT_DIR = REPO / "experiments/phase6_qualitative_latents/z_cache"
 CKPT_DIR = REPO / "experiments/phase5_downstream_utility/results/ckpts"
 HF_TOKEN = open("/workspace/hf_cache/token").read().strip()
 
-DEFAULT_ARCHS = ["agentic_txc_02", "agentic_mlc_08", "tsae_ours", "tfa_big"]
+DEFAULT_ARCHS = ["agentic_txc_02", "agentic_mlc_08", "tsae_paper", "tsae_ours", "tfa_big"]
 D_IN = 2304
 D_SAE = 18_432
 
@@ -151,6 +151,13 @@ def load_arch(arch: str, device: torch.device) -> torch.nn.Module:
     elif arch == "tsae_ours":
         from src.architectures.tsae_ours import TSAEOurs
         model = TSAEOurs(D_IN, D_SAE, k=meta["k_pos"]).to(device)
+    elif arch == "tsae_paper":
+        from src.architectures.tsae_paper import TemporalMatryoshkaBatchTopKSAE
+        group_sizes = meta.get("group_sizes")
+        d_sae_eff = int(meta.get("d_sae", D_SAE))
+        model = TemporalMatryoshkaBatchTopKSAE(
+            D_IN, d_sae_eff, k=int(meta["k_pos"]), group_sizes=list(group_sizes),
+        ).to(device)
     elif arch == "tfa_big":
         from src.architectures._tfa_module import TemporalSAE
         model = TemporalSAE(
@@ -224,6 +231,23 @@ def encode_tsae_ours(model, resid_L13: torch.Tensor, device) -> np.ndarray:
 
 
 @torch.no_grad()
+def encode_tsae_paper(model, resid_L13: torch.Tensor, device) -> np.ndarray:
+    """Paper's T-SAE: threshold-based inference encoding, not BatchTopK.
+
+    resid_L13: (n_tokens, d) -> (n_tokens, d_sae).
+    """
+    n_tokens = resid_L13.shape[0]
+    z_rows = []
+    BATCH = 256
+    for b0 in range(0, n_tokens, BATCH):
+        b1 = min(b0 + BATCH, n_tokens)
+        x = resid_L13[b0:b1].to(device).float()
+        z = model.encode(x, use_threshold=True)
+        z_rows.append(z.to(torch.float16).cpu())
+    return torch.cat(z_rows, dim=0).numpy()
+
+
+@torch.no_grad()
 def encode_tfa(model, resid_L13: torch.Tensor, device,
                seq_len: int = 128) -> np.ndarray:
     """resid_L13: (n_tokens, d) -> (n_tokens, d_sae) using novel_codes.
@@ -278,6 +302,8 @@ def encode_concat_AB(concat, concat_name: str, archs: list[str], device):
             z = encode_mlc(model, stack, device)
         elif arch == "tsae_ours":
             z = encode_tsae_ours(model, resid_L13, device)
+        elif arch == "tsae_paper":
+            z = encode_tsae_paper(model, resid_L13, device)
         elif arch == "tfa_big":
             z = encode_tfa(model, resid_L13, device,
                            seq_len=int(meta.get("T", 128)))
@@ -322,6 +348,8 @@ def encode_concat_C(concat, archs: list[str], device):
                 z = encode_mlc(model, stack[si], device)  # (20, 5, d) -> (20, d_sae)
             elif arch == "tsae_ours":
                 z = encode_tsae_ours(model, resid_L13_i, device)
+            elif arch == "tsae_paper":
+                z = encode_tsae_paper(model, resid_L13_i, device)
             elif arch == "tfa_big":
                 z = encode_tfa(model, resid_L13_i, device,
                                seq_len=int(meta.get("T", 128)))

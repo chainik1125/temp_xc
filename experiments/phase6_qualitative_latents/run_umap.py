@@ -43,6 +43,8 @@ ARCH_SPLITS: dict[str, tuple[tuple[int, int], tuple[int, int] | None]] = {
     "agentic_txc_02": ((0, 18_432 // 5), (18_432 // 5, 18_432)),  # scale-1 = d_sae / T = 3686
     "agentic_mlc_08": ((0, 18_432 // 2), (18_432 // 2, 18_432)),
     "tsae_ours":      ((0, 18_432 // 2), (18_432 // 2, 18_432)),
+    # tsae_paper: matryoshka [0.2, 0.8] → high = first 3686 (20%), low = rest.
+    "tsae_paper":     ((0, 3686), (3686, 18_432)),
     # tfa_big: novel_codes has no intrinsic H/L; we'll rank by variance and
     # take top-50% as "high", bottom-50% as "low". Handled in code below.
     "tfa_big":        (None, None),
@@ -182,7 +184,7 @@ def main():
     p = argparse.ArgumentParser()
     p.add_argument("--archs", type=str, nargs="+",
                    default=["agentic_txc_02", "agentic_mlc_08",
-                            "tsae_ours", "tfa_big"])
+                            "tsae_paper", "tsae_ours", "tfa_big"])
     args = p.parse_args()
 
     OUT_DIR.mkdir(parents=True, exist_ok=True)
