@@ -1061,6 +1061,18 @@ def run_all(seeds, max_steps, archs=None):
                             match_budget=True, layer=13, alpha=1.0,
                             n_contr_scales=3, gamma=0.5,
                             variant="agentic_txc_02_multiscale_contrastive")
+            elif arch == "agentic_txc_03":
+                # Agentic cycle 03: n_contr_scales=3, γ=1.0 (equal weights).
+                # Tests whether cycle-02 gain came from the multi-scale
+                # signal per se or from the specific γ=0.5 decay.
+                model, log = train_matryoshka_txcdr_contrastive_multiscale(
+                    cfg, device, k=100, T=5, alpha=1.0,
+                    n_contr_scales=3, gamma=1.0, buf=get_anchor(),
+                )
+                meta = dict(seed=seed, k_pos=100, k_win=500, T=5,
+                            match_budget=True, layer=13, alpha=1.0,
+                            n_contr_scales=3, gamma=1.0,
+                            variant="agentic_txc_03_multiscale_g10")
             elif arch == "matryoshka_txcdr_contrastive_t5_k2x":
                 model, log = train_matryoshka_txcdr_contrastive(
                     cfg, device, k=200, T=5, alpha=0.1, buf=get_anchor(),

@@ -379,7 +379,7 @@ def _load_model_for_run(run_id, ckpt_path, device):
         model = MatryoshkaTXCDRContrastiveOrth(
             d_in, d_sae, T, k_eff, lam_orth=meta.get("lam_orth", 0.01),
         ).to(device)
-    elif arch == "agentic_txc_02":
+    elif arch in ("agentic_txc_02", "agentic_txc_03"):
         from src.architectures.matryoshka_txcdr_contrastive_multiscale import (
             MatryoshkaTXCDRContrastiveMultiscale,
         )
@@ -585,7 +585,8 @@ def _encode_for_probe(
                 "matryoshka_txcdr_contrastive_t5_alpha1000",
                 "matryoshka_txcdr_contrastive_t5_k2x",
                 "agentic_txc_01",
-                "agentic_txc_02"):
+                "agentic_txc_02",
+                "agentic_txc_03"):
         T = meta["T"]
         return _encode_matryoshka(model, anchor, li, T, device, aggregation)
     if arch == "mlc_temporal_t3":

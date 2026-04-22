@@ -188,6 +188,12 @@ results of the prior cycle.
 
 ---
 
+### Reference config update
+
+- **Cycle 02 beat the previous reference.** The TXC reference for
+  cycles 03+ is now `agentic_txc_02` at Δ_val = **+0.0354** vs vanilla
+  `matryoshka_t5` (t=3.81, 25/3/8).
+
 ### Cycle 02 — multi-scale contrastive (H-TXC7)
 **Family**: TXC
 **Reference to beat**: `matryoshka_txcdr_contrastive_t5_alpha100`
@@ -209,6 +215,44 @@ results of the prior cycle.
     `gamma=0.5`. Final contrastive contribution is
     `α · Σ_s γ^s · InfoNCE(z_prefix_s, z_prev_prefix_s)`.
   - New dispatcher `agentic_txc_02`; probe routing; BASE_OF entry.
+**Code**: commit `90237db`.
+**Result**: Δ_val = **+0.0354 ±0.0093** (t=**+3.81**, n=36, **25/3/8**)
+  vs vanilla `matryoshka_t5`. **+0.0095 over the A3 α=1.0 reference**.
+  mean val AUC = 0.7900 (vs 0.7805 at A3 α=1.0, vs 0.7546 vanilla).
+  Training loss trajectory near-identical to A3 α=1.0 (last step
+  16205 vs 16149 — within 0.3%).
+**Verdict**: **BEAT_REF** — first t > 3 finalist in all of Phase 5.7.
+  Strong win.
+**Takeaway**: Scale-1-only contrastive was leaving cross-token signal
+  on the table at larger scales. Scales 2 and 3 latents were learning
+  shift-NON-invariant features via reconstruction alone, which didn't
+  generalize well to probing. Adding γ^s-decayed InfoNCE pressure at
+  those scales improves probing without hurting reconstruction. The
+  fact that training loss is unchanged but AUC jumps ~0.01 confirms:
+  the benefit is in feature STRUCTURE, not reconstruction quality —
+  exactly what matryoshka+contrastive is supposed to deliver but
+  scale-1-only wasn't fully exploiting.
+**Next**: Sweep the multi-scale axis. Cycle 03 tests γ=1.0 (equal
+  weight at each scale) at n_contr_scales=3 to see whether the decay
+  or the multi-scale-ness is doing the work. Branch:
+  - If γ=1.0 improves further: push harder (γ=1.0, n=5 in cycle 04).
+  - If γ=1.0 regresses: decay matters. Try n=5 with γ=0.5 next.
+  - If γ=1.0 ties: signal is saturated at scales 1-3.
+
+---
+
+### Cycle 03 — multi-scale contrastive, γ=1.0
+**Family**: TXC
+**Reference to beat**: `agentic_txc_02` at Δ_val = +0.0354.
+**Hypothesis**: Cycle 02 showed multi-scale contrastive helps at γ=0.5.
+  Setting γ=1.0 (equal weight at scales 1, 2, 3) maximizes contrastive
+  pressure at larger scales. If scale-2 and scale-3 signal is
+  under-weighted at γ=0.5, γ=1.0 should improve further. If γ=0.5 was
+  already near-optimal because scale-1 needs to dominate, γ=1.0 should
+  regress.
+**Change**: same arch `MatryoshkaTXCDRContrastiveMultiscale`,
+  n_contr_scales=3, **γ=1.0** (vs 0.5 in cycle 02). New dispatcher
+  `agentic_txc_03`; probe routing; BASE_OF entry.
 **Code**: commit forthcoming.
 **Result**: pending.
 **Verdict**: pending.
