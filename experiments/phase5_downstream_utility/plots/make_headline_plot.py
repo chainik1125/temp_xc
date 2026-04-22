@@ -65,6 +65,16 @@ ORDERED_ARCHS = [
     # TFA dual probing: z_novel vs z_novel+z_pred
     "tfa_small", "tfa_small_full",
     "tfa_pos_small", "tfa_pos_small_full",
+    # Phase 5.7 experiment (i): full-size TFA (d_sae=18432, seq_len=128)
+    "tfa_big", "tfa_big_full",
+    "tfa_pos_big", "tfa_pos_big_full",
+    # Phase 5.7 experiment (ii): BatchTopK apples-to-apples
+    "txcdr_t5_batchtopk", "mlc_batchtopk",
+    "agentic_txc_02_batchtopk", "agentic_mlc_08_batchtopk",
+    # Phase 5.7 experiment (iii): T-sweep on agentic_txc_02
+    "agentic_txc_02_t2", "agentic_txc_02_t3",
+    "agentic_txc_02_t8", "agentic_txc_02_t10",
+    "agentic_txc_02_t15", "agentic_txc_02_t20",
 ]
 BASELINE_ARCHS = ["baseline_last_token_lr", "baseline_attn_pool"]
 
