@@ -82,6 +82,28 @@ STEERING_8BIT_PATCHES = [
         replace="    model = LanguageModel(model_name, dispatch=True, device_map=device, dtype=torch.bfloat16)",
         description="drop load_in_8bit= kwarg from LanguageModel(...) in load_model() (Phase 3 hybrid inference path)",
     ),
+    Patch(
+        file_rel="hybrid/hybrid_token.py",
+        find=(
+            "    # Clone inputs so we do not modify the originals in-place\n"
+            "    base_output_ids = base_input_ids.clone()\n"
+            "    thinking_output_ids = thinking_input_ids.clone()\n"
+            "    del base_input_ids, thinking_input_ids"
+        ),
+        replace=(
+            "    # Clone inputs so we do not modify the originals in-place.\n"
+            "    # Modern transformers returns BatchEncoding from apply_chat_template(return_tensors='pt')\n"
+            "    # in some configs; unwrap to Tensor before .clone() (BatchEncoding has no clone).\n"
+            "    if hasattr(base_input_ids, 'data') and 'input_ids' in getattr(base_input_ids, 'data', {}):\n"
+            "        base_input_ids = base_input_ids['input_ids']\n"
+            "    if hasattr(thinking_input_ids, 'data') and 'input_ids' in getattr(thinking_input_ids, 'data', {}):\n"
+            "        thinking_input_ids = thinking_input_ids['input_ids']\n"
+            "    base_output_ids = base_input_ids.clone()\n"
+            "    thinking_output_ids = thinking_input_ids.clone()\n"
+            "    del base_input_ids, thinking_input_ids"
+        ),
+        description="unwrap BatchEncoding -> Tensor before .clone() in hybrid_generate_token",
+    ),
 ]
 
 
