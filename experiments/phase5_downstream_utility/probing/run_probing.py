@@ -1085,6 +1085,8 @@ def run_probing(
                          "mlc_contrastive_alpha100",
                          "agentic_mlc_08",
                          "mlc_batchtopk",
+                         "mlc_contrastive_batchtopk",
+                         "mlc_contrastive_alpha100_batchtopk",
                          "agentic_mlc_08_batchtopk",
                          "time_layer_crosscoder_t5",
                          "time_layer_contrastive_t5",
