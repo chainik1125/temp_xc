@@ -576,7 +576,8 @@ last_pos 0.7749 ± 0.0038, mean_pool 0.7987 ± 0.0020.
 | baseline `agentic_txc_02` | **0.7749** (3-seed) | — | **0.7987** (3-seed) | — |
 | **Track 2 `agentic_txc_10_bare`** | **0.7752** | +0.0003 | **0.7995** | +0.0008 |
 | 2×2 cell `agentic_txc_12_bare_batchtopk` | 0.7711 | −0.004 | 0.7881 | −0.011 |
-| Cycle F `agentic_txc_02_batchtopk` (2-seed mean) | 0.7601 ± 0.0058 | **−0.015** | 0.7804 ± 0.0032 | **−0.018** |
+| Cycle F `agentic_txc_02_batchtopk` (3-seed mean) | **0.7593 ± 0.0034** | **−0.016** | **0.7826 ± 0.0028** | **−0.016** |
+| Cycle A `agentic_txc_09_auxk` (seed=42) | 0.7657 | −0.009 | 0.7973 | −0.001 |
 
 **Key probing finding:** the anti-dead stack does NOT cost probing
 utility. Track 2 is essentially tied with baseline on both
