@@ -221,20 +221,81 @@ Not blocking the run — the same pipeline produces evidence either way.
 
 ## 6. Runtime expectations
 
-Per `integration_plan § 6` (post-pivot):
+Per `integration_plan § 6` (post-pivot) and `compute_estimate.md`
+(2026-04-22 reconciliation against Venhoff App C.1):
 
 - **Phase 1** (trace + activations + dictionary): ~3-4 H100-hours for
   500 MATH500 problems × 3 arches at n_clusters=15.
-- **Phase 2** (steering-vector training): ~12 H100-hours (48 vectors ×
-  ~15 min each).
-- **Phase 3** (hybrid inference over 10×5 grid): ~5 H100-hours.
+- **Phase 2** (steering-vector training, paper budget = `max_iters=50,
+  n_training_examples=2048, optim_minibatch_size=6`): ~2 h for TempXC +
+  ~2 h for MLC on 4× H100 (~15 min/vector × 16 vectors × 2 arches /
+  4-wide parallelism). **SAE skipped** — reuses Venhoff's 16 shipped
+  `llama-3.1-8b_{bias,idx0..14}.pt` files from
+  `vendor/thinking-llms-interp/train-vectors/results/vars/optimized_vectors/`.
+- **Phase 3** (hybrid inference over 10×5 grid): ~3-5 H100-hours on 4× H100.
 - **Side-channel taxonomy scoring**: ~$15 in Haiku 4.5 fees, overlaps
   with Phase 2 compute (judge calls don't block GPU).
 
-**Total ~20-22 H100-hours + ~$15 API fees**, across ~1 full pod day.
+**Total ~10-12 H100-hours on 4× H100** (~half a pod day), vs our
+earlier ~20 h estimate when SAE-Phase-2 was still in scope.
 
 Smoke: 100 MATH500 problems × SAE only × P0 gate → ~1-2 H100-hours +
 negligible API. If P0 clears (our SAE ≈ Venhoff's 3.5%), unlock full.
+
+## 6b. 2026-04-22 paper-budget run log
+
+**Launch**: `bash scripts/runpod_venhoff_paper_run.sh` (one-shot wrapper
+around `MODE=hybrid` with paper-budget flags baked in).
+**Pod**: 4× H100 80GB (pod id `0p5f3ic7qs7dtv-64411fec@ssh.runpod.io`,
+host `53c06947125f`, different pod from 2026-04-21 smoke run).
+**Branch**: `aniket` HEAD (`551bcb7` → `e657900` after vendor patches).
+
+Fixes landed during launch (all committed to `aniket`):
+
+1. **Byte-level BPE normalization** (`6df2ff9`) — traces saved with
+   `Ġ` (U+0120) instead of spaces broke `split_into_sentences`. Added
+   `_normalize_byte_level_bpe()` in `src/bench/venhoff/responses.py`,
+   called by `extract_thinking_process` and at every `full_response`
+   load site in `activation_collection.py`. No trace regen needed.
+2. **Fast tokenizer forced** (`27774e6`) — newer transformers removed
+   `encode_plus` from slow tokenizers. `AutoTokenizer.from_pretrained(...,
+   use_fast=True)` and `tokenizer(text, return_offsets_mapping=True)`
+   instead of `tokenizer.encode_plus(...)`. Same patch applied to
+   Venhoff's vendored `utils/utils.py:243` via `vendor_patches.py`.
+3. **`load_in_8bit=` kwarg dropped** (`12b6241`) — same transformers
+   version rejects it on `AutoModelForCausalLM.from_pretrained` even
+   when False. Patched `vendor/.../optimize_steering_vectors.py:703`
+   to drop the kwarg; we run in bf16 and don't need 8-bit.
+4. **SAE reuse without sidecar** (`551bcb7`) — the resume check
+   required our own meta-sidecar. Added a branch that, when the
+   expected vector file exists but no sidecar does (Venhoff's shipped
+   vectors), writes a `source=venhoff_shipped` sidecar and skips
+   training. All 16 SAE vectors now log `reuse_shipped` at launch.
+
+Vendor patches are applied automatically by
+`ensure_steering_patched(venhoff_root)` at the top of
+`train_all_vectors()` in `src/bench/venhoff/steering.py` — idempotent.
+
+**Key SteeringConfig defaults (now in `steering.py`):**
+`max_iters=50, n_training_examples=2048, optim_minibatch_size=6, lr=1e-2,
+seed=42`. Matches Venhoff App C.1 exactly.
+
+**Results — Phase 0/1** (from the resume cache, previously run
+2026-04-22 AM under the undercut budget):
+
+- SAE smoke_done `avg_final_score=3.2629`
+- TempXC smoke_done `avg_final_score=6.7801`
+- MLC smoke_done `avg_final_score=3.0800`
+
+These are the *taxonomy-quality side-channel* scores (Haiku-4.5 judge
+on sentence classification), not Gap Recovery. TempXC's 6.78 vs
+SAE 3.26 / MLC 3.08 matches the pre-pivot P4′ prediction (TempXC wins
+taxonomy coherence) but doesn't itself speak to the primary Gap
+Recovery claim.
+
+**Status at time of writing**: Phase 2 TempXC running, 4 workers
+pinned to GPUs 0-3, each ~15 min/vector at paper budget. ETA for
+full pipeline (Phase 2 TempXC + MLC + Phase 3 hybrid gen): ~5-7 h.
 
 ## 7. Relationship to sparse-probing result
 
