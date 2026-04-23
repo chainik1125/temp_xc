@@ -97,9 +97,18 @@ echo "[chain] === STAGE 6: regenerate paper figures + tables ==="
   --agg mean_pool --out experiments/phase6_qualitative_latents/results/phase61_pareto_tradeoff_mean_pool.png \
   >> "$ASM_LOG" 2>&1
 
+echo "[chain] === STAGE 6b: HF sync — ckpts + z_caches + labels ==="
+# Per the feedback_hf_sync rule: push every newly-trained ckpt and
+# data artefact to han1823123123/txcdr{,-data} so cross-pod
+# reproduction is possible. Idempotent (manifest-indexed).
+.venv/bin/python scripts/hf_sync.py --go >> logs/hf_sync.log 2>&1 || true
+
 echo "[chain] === STAGE 7: launch Phase 6.2 autoresearch loop ==="
 # C3 (highest-prior) runs first. Covers C3, C1, C2, C5, C6 back to back.
 bash experiments/phase6_2_autoresearch/run_phase62_loop.sh \
   > logs/phase62_loop.log 2>&1
+
+echo "[chain] === STAGE 8: HF sync (post-Phase-6.2) ==="
+.venv/bin/python scripts/hf_sync.py --go >> logs/hf_sync.log 2>&1 || true
 
 echo "[chain] === FULL PIPELINE DONE: $(date -u) ==="
