@@ -564,35 +564,61 @@ actual state of the project, 2026-04-23:
   no clean "sparsity axis" story: the axis that matters is the
   anti-dead stack (Track 2 wins on random), not TopK vs BatchTopK.
 
-#### Sparse-probing regression (seed=42, k=5)
+#### Sparse-probing regression (k=5)
 
 Downloaded 66 GB `probe_cache` from `han1823123123/txcdr-data`. Ran
-the Phase 5 probing pipeline on Cycle F, Track 2, 2×2 cell at both
-aggregations. Baseline reference is `agentic_txc_02` 3-seed mean:
-last_pos 0.7749 ± 0.0038, mean_pool 0.7987 ± 0.0020.
+the Phase 5 probing pipeline on all Phase 6 archs at seed=42 (and
+3-seed for Cycle F + 2×2 cell). Baseline reference is
+`agentic_txc_02` 3-seed mean: last_pos 0.7749 ± 0.0038, mean_pool
+0.7987 ± 0.0020.
 
-| arch | last_pos AUC | Δ vs baseline | mean_pool AUC | Δ vs baseline |
-|---|---|---|---|---|
-| baseline `agentic_txc_02` | **0.7749** (3-seed) | — | **0.7987** (3-seed) | — |
-| **Track 2 `agentic_txc_10_bare`** | **0.7752** | +0.0003 | **0.7995** | +0.0008 |
-| 2×2 cell `agentic_txc_12_bare_batchtopk` | 0.7711 | −0.004 | 0.7881 | −0.011 |
-| Cycle F `agentic_txc_02_batchtopk` (3-seed mean) | **0.7593 ± 0.0034** | **−0.016** | **0.7826 ± 0.0028** | **−0.016** |
-| Cycle A `agentic_txc_09_auxk` (seed=42) | 0.7657 | −0.009 | 0.7973 | −0.001 |
+| arch | last_pos AUC | Δ | mean_pool AUC | Δ | random /32 |
+|---|---|---|---|---|---|
+| baseline `agentic_txc_02` (3-seed) | **0.7749** | — | **0.7987** | — | 0 |
+| **Track 2 `agentic_txc_10_bare`** (seed=42) | **0.7752** | +0.0003 | **0.7995** | +0.0008 | **5** |
+| **2×2 cell `agentic_txc_12_bare_batchtopk`** (3-seed) | **0.7771 ± 0.005** | +0.002 | **0.7956 ± 0.005** | −0.003 | 1.7 ± 0.3 |
+| Cycle F `agentic_txc_02_batchtopk` (3-seed) | 0.7593 ± 0.003 | **−0.016** | 0.7826 ± 0.003 | **−0.016** | 0 |
+| Cycle A `agentic_txc_09_auxk` (seed=42) | 0.7657 | −0.009 | 0.7973 | −0.001 | 0 |
+| Cycle H `agentic_txc_11_stack` (seed=42) | 0.7620 | −0.013 | 0.7851 | −0.014 | 0 |
+| MLC `agentic_mlc_08` (Phase 5) | 0.8047 | +0.030 | 0.7890 | −0.010 | 2 |
+| **`tsae_paper`** (seed=42) | **0.6844** | **−0.091** | **0.7173** | **−0.081** | **12** |
+| `tsae_ours` (seed=42) | 0.7253 | −0.050 | TBD | TBD | 3 |
 
-**Key probing finding:** the anti-dead stack does NOT cost probing
-utility. Track 2 is essentially tied with baseline on both
-aggregations (Δ AUC ≤ 0.001). **Cycle F loses 2 pp of AUC** at seed
-42 on both aggregations — BatchTopK alone costs probing utility.
-The 2×2 cell (BatchTopK + anti-dead) is intermediate (−0.004), so
-the anti-dead stack recovers about 4/5 of the BatchTopK regression
-but doesn't fully cancel it.
+**The key paper-story finding — there is a real, measurable trade-off
+between qualitative generalisation and probing utility:**
 
-Paper implication: **Track 2 is the TXC-family Pareto frontier point.**
-It has (a) baseline-level probing utility, (b) the highest random-concept
-count of any TXC variant (5/32 vs 0-2 for everything else), and (c)
-a clean mechanism story (anti-dead stack transfers tsae_paper's
-dead-feature machinery to the TXC encoder base). Cycle F and the
-2×2 cell both lose probing to BatchTopK; Track 2 avoids that cost.
+- `tsae_paper` is the clear qualitative winner (12/32 on concat_random)
+  but **loses ~9 pp of probing AUC** vs the TXC baseline. This is
+  ~25σ below baseline — an unambiguous regression.
+- The TXC family retains probing utility. **Track 2 (0.7752/0.7995)
+  and 2×2 cell (0.7771/0.7956) are Pareto-tied with baseline on both
+  aggregations** while giving up only 0 → 5 (Track 2) / 0 → 1.7
+  (2×2 cell) on random qualitative.
+- Cycle F loses BOTH probing (−0.016) AND qualitative (0/32
+  random) — dominated by Track 2. The Phase 6 §9.5 headline
+  "BatchTopK is the single biggest lever" retracted: BatchTopK's
+  curated-concat gain was a passage-content artefact, and it costs
+  probing utility.
+- Cycle H (BatchTopK + AuxK) is the worst-of-both TXC variant:
+  probing regression AND 0/32 random.
+
+**Paper Pareto summary:**
+
+```
+upper-right (wins both): nobody yet — Phase 6.2 C3 is the next shot
+-----------------------------------------------------------------
+high probing / low qual:  agentic_txc_02 (baseline)       (0.77, 0)
+                          agentic_mlc_08                  (0.80, 2)
+                          2x2 cell                        (0.78, 2)
+                          Track 2                         (0.78, 5)  ← best TXC
+high qual / low probing:  tsae_paper                      (0.68, 12)
+low / low:                Cycle F, Cycle A, Cycle H, TFA  (~0.76, 0)
+```
+
+Phase 6.2's C3 (full tsae_paper recipe on TXC base) is the direct
+test of whether we can close the qualitative gap to tsae_paper
+without giving up the TXC family's probing utility — the Pareto-
+ideal corner.
 
 #### Figure for Track 2 on concat_B (preliminary)
 
