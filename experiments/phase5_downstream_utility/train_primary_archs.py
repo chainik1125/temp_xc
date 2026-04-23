@@ -680,6 +680,80 @@ def train_matryoshka_txcdr_contrastive_multiscale(
     return model, log
 
 
+def train_txc_bare_antidead(
+    cfg, device, k, T,
+    aux_k=512, dead_threshold_tokens=10_000_000, auxk_alpha=1.0 / 32.0,
+    d_sae=DEFAULT_D_SAE, buf=None,
+):
+    """Phase 6.1 Track 2 (minimal baseline): bare window-based TXC +
+    full tsae_paper anti-dead stack (AuxK + unit-norm decoder + grad-
+    parallel removal + geometric-median b_dec init). No matryoshka,
+    no contrastive. Custom training loop (not `_iterate_train`) so we
+    can hook grad-parallel removal between backward and opt.step.
+    """
+    from src.architectures.txc_bare_antidead import TXCBareAntidead
+    buf = buf if buf is not None else _preload_single(ANCHOR_LAYER_KEY, device)
+    k_eff = k * T
+    model = TXCBareAntidead(
+        buf.shape[-1], d_sae, T, k_eff,
+        aux_k=aux_k, dead_threshold_tokens=dead_threshold_tokens,
+        auxk_alpha=auxk_alpha,
+    ).to(device)
+    gen = make_window_gen_gpu(buf, T)
+
+    torch.manual_seed(cfg.seed)
+    np.random.seed(cfg.seed)
+    opt = torch.optim.Adam(model.parameters(), lr=cfg.lr)
+    model.train()
+
+    # First batch: geometric-median init for b_dec
+    x0 = gen(cfg.batch_size).to(device)
+    model.init_b_dec_geometric_median(x0)
+
+    losses: list[float] = []
+    l0s: list[float] = []
+    steps_logged: list[int] = []
+    converged = False
+    plateau_val: float | None = None
+
+    t0 = time.time()
+    for step in range(cfg.max_steps):
+        x = gen(cfg.batch_size)
+        loss, _, z = model(x)
+        opt.zero_grad()
+        loss.backward()
+        # Decoder-parallel gradient removal (between backward and step)
+        model.remove_gradient_parallel_to_decoder()
+        nn.utils.clip_grad_norm_(model.parameters(), cfg.grad_clip)
+        opt.step()
+        # Re-enforce unit-norm decoder
+        model._normalize_decoder()
+
+        if step % cfg.log_every == 0 or step == cfg.max_steps - 1:
+            with torch.no_grad():
+                l0 = (z > 0).float().sum(dim=-1).mean().item()
+            losses.append(loss.item())
+            l0s.append(l0)
+            steps_logged.append(step)
+            plateau_val = compute_plateau(losses, window=5)
+            if (
+                plateau_val is not None
+                and plateau_val < cfg.plateau_threshold
+                and step >= cfg.min_steps
+            ):
+                converged = True
+                break
+
+    elapsed = time.time() - t0
+    model.eval()
+    return model, {
+        "loss": losses, "l0": l0s, "steps_logged": steps_logged,
+        "final_step": steps_logged[-1] if steps_logged else 0,
+        "converged": converged, "plateau_last": plateau_val,
+        "elapsed_s": elapsed,
+    }
+
+
 def train_matryoshka_txcdr_contrastive_multiscale_auxk(
     cfg, device, k, T, alpha=1.0, n_contr_scales=3, gamma=0.5,
     aux_k=512, dead_threshold_tokens=10_000_000, auxk_alpha=1.0 / 32.0,
@@ -1330,6 +1404,22 @@ def run_all(seeds, max_steps, archs=None):
                             match_budget=True, layer=13, alpha=1.0,
                             n_contr_scales=3, gamma=0.5,
                             variant="agentic_txc_07_consistency")
+            elif arch == "agentic_txc_10_bare":
+                # Phase 6.1 Track 2: bare TXC + anti-dead stack.
+                # No matryoshka, no contrastive. Tests whether window-
+                # encoding alone with the tsae_paper machinery is
+                # sufficient for qualitative.
+                model, log = train_txc_bare_antidead(
+                    cfg, device, k=100, T=5,
+                    aux_k=512, dead_threshold_tokens=10_000_000,
+                    auxk_alpha=1.0 / 32.0,
+                    buf=get_anchor(),
+                )
+                meta = dict(seed=seed, k_pos=100, k_win=500, T=5,
+                            match_budget=True, layer=13,
+                            aux_k=512, dead_threshold_tokens=10_000_000,
+                            auxk_alpha=1.0 / 32.0,
+                            variant="agentic_txc_10_bare_antidead_track2")
             elif arch == "agentic_txc_09_auxk":
                 # Phase 6.1 cycle A: cycle-02 recipe + AuxK loss to
                 # revive dead features. Expected +2 autointerp
