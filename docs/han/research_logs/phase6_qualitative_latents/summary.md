@@ -564,16 +564,35 @@ actual state of the project, 2026-04-23:
   no clean "sparsity axis" story: the axis that matters is the
   anti-dead stack (Track 2 wins on random), not TopK vs BatchTopK.
 
-#### Sparse-probing regression (pending — from #3 Phase 6.1 follow-up)
+#### Sparse-probing regression (seed=42, k=5)
 
-Downloaded 66 GB `probe_cache` from `han1823123123/txcdr-data`.
-Probing numbers for `agentic_txc_02_batchtopk` (Cycle F) and
-`agentic_txc_12_bare_batchtopk` (2×2 cell, new, training in
-progress) at both `last_position` and `mean_pool` vs the
-`agentic_txc_02` 3-seed mean (last_pos 0.7749 ± 0.0038, mean_pool
-0.7987 ± 0.0020) will appear here when the post-training pipeline
-completes. Target: Δ AUC ≤ 0.02 for the "TXC retains probing
-utility" half of the (now softened) claim.
+Downloaded 66 GB `probe_cache` from `han1823123123/txcdr-data`. Ran
+the Phase 5 probing pipeline on Cycle F, Track 2, 2×2 cell at both
+aggregations. Baseline reference is `agentic_txc_02` 3-seed mean:
+last_pos 0.7749 ± 0.0038, mean_pool 0.7987 ± 0.0020.
+
+| arch | last_pos AUC | Δ vs baseline | mean_pool AUC | Δ vs baseline |
+|---|---|---|---|---|
+| baseline `agentic_txc_02` | **0.7749** (3-seed) | — | **0.7987** (3-seed) | — |
+| **Track 2 `agentic_txc_10_bare`** | **0.7752** | +0.0003 | **0.7995** | +0.0008 |
+| 2×2 cell `agentic_txc_12_bare_batchtopk` | 0.7711 | −0.004 | TBD | TBD |
+| Cycle F `agentic_txc_02_batchtopk` (seed 42) | 0.7543 | **−0.021** | 0.7772 | **−0.022** |
+| Cycle F `agentic_txc_02_batchtopk` (seed 1) | 0.7659 | −0.009 | TBD | TBD |
+
+**Key probing finding:** the anti-dead stack does NOT cost probing
+utility. Track 2 is essentially tied with baseline on both
+aggregations (Δ AUC ≤ 0.001). **Cycle F loses 2 pp of AUC** at seed
+42 on both aggregations — BatchTopK alone costs probing utility.
+The 2×2 cell (BatchTopK + anti-dead) is intermediate (−0.004), so
+the anti-dead stack recovers about 4/5 of the BatchTopK regression
+but doesn't fully cancel it.
+
+Paper implication: **Track 2 is the TXC-family Pareto frontier point.**
+It has (a) baseline-level probing utility, (b) the highest random-concept
+count of any TXC variant (5/32 vs 0-2 for everything else), and (c)
+a clean mechanism story (anti-dead stack transfers tsae_paper's
+dead-feature machinery to the TXC encoder base). Cycle F and the
+2×2 cell both lose probing to BatchTopK; Track 2 avoids that cost.
 
 #### Figure for Track 2 on concat_B (preliminary)
 
