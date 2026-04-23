@@ -171,10 +171,14 @@ non-determinism accumulated across re-probes; the ranking is stable.)*
 | stacked_t20 | 0.7120 | 0.1173 | 36 |
 | txcdr_pos_t5 | 0.7086 | 0.1090 | 36 |
 | txcdr_shared_enc_t5 | 0.6967 | 0.1039 | 36 |
+| 🆕 tfa_pos_big (z_novel, d_sae=18432, seq_len=128) | 0.6661 | 0.1185 | 36 |
 | tfa_small (z_novel) | 0.6402 | 0.1121 | 36 |
+| 🆕 tfa_big (z_novel, d_sae=18432, seq_len=128) | 0.6360 | 0.1005 | 36 |
 | tfa_pos_small (z_novel) | 0.6346 | 0.0966 | 36 |
 | tfa_small_full (z_novel+z_pred) | 0.5996 | 0.0852 | 36 |
 | tfa_pos_small_full (z_novel+z_pred) | 0.5884 | 0.0864 | 36 |
+| 🆕 tfa_pos_big_full (z_novel+z_pred, d_sae=18432) | 0.5744 | 0.0851 | 36 |
+| 🆕 tfa_big_full (z_novel+z_pred, d_sae=18432) | 0.5439 | 0.0686 | 36 |
 
 #### Figure 2 — Headline AUC by arch, mean-pool, 36 tasks
 
@@ -214,9 +218,13 @@ non-determinism accumulated across re-probes; the ranking is stable.)*
 | txcdr_pos_t5 | 0.7271 | 0.1172 | 36 |
 | tfa_pos_small_full (z_novel+z_pred) | 0.7242 | 0.1206 | 36 |
 | txcdr_shared_enc_t5 | 0.7170 | 0.1120 | 36 |
+| 🆕 tfa_pos_big_full (z_novel+z_pred, d_sae=18432) | 0.6996 | 0.1170 | 36 |
+| 🆕 tfa_pos_big (z_novel, d_sae=18432, seq_len=128) | 0.6927 | 0.1052 | 36 |
 | tfa_small (z_novel) | 0.6722 | 0.0889 | 36 |
 | tfa_pos_small (z_novel) | 0.6712 | 0.0975 | 36 |
 | tfa_small_full (z_novel+z_pred) | 0.6576 | 0.1023 | 36 |
+| 🆕 tfa_big (z_novel, d_sae=18432, seq_len=128) | 0.6572 | 0.0877 | 36 |
+| 🆕 tfa_big_full (z_novel+z_pred, d_sae=18432) | 0.6272 | 0.0862 | 36 |
 
 #### Agentic multi-scale winners (Phase 5.7)
 
@@ -624,13 +632,17 @@ omit this aggregation.
 - **Cross-token `max(AUC, 1 − AUC)` flip** for WinoGrande/WSC only,
   to remove arbitrary label polarity. Raw AUCs stay in
   `probing_results.jsonl`; flip set is `make_headline_plot.py::FLIP_TASKS`.
-- **TFA "small" variants (d_sae = 4096, seq_len = 32).** The
-  full-size TFA would not fit the A40 wall-clock budget without a
-  significant refactor; we use the smaller scale that matches the
-  contracted attention-pooled probe's per-token budget. Their
-  SAEBench numbers are therefore not a like-for-like comparison
-  against the d_sae = 18 432 archs and should be read as "TFA at
-  matched total sparsity budget".
+- **TFA scale doesn't rescue it.** Phase 5.7 experiment (i) trained
+  `tfa_big` / `tfa_pos_big` at matched capacity (d_sae=18 432,
+  seq_len=128). Result: full-size TFA is **not** uniformly better than
+  small; `tfa_pos_big` improves +0.022 at mean_pool over `tfa_pos_small`
+  but `tfa_big` (no pos) regresses slightly, and `_full` (z_novel+z_pred)
+  variants regress at both aggregations. Even the best full-size TFA
+  (0.6927 at mean_pool) sits ~10 pp below the agentic winners (0.80+).
+  The d_sae/seq_len mismatch caveat in the previous draft is therefore
+  **not the reason TFA underperforms** — scaling up doesn't close the
+  gap. Small-TFA rows are kept for historical continuity, but the
+  like-for-like comparison is now in the bench.
 - **TFA dual probing (z_novel vs z_novel + z_pred).** TFA's decoder
   reconstructs from `z_novel + z_pred` (see `_tfa_module.py:232`). The
   Phase 5.7 audit considered whether probing should use the full
