@@ -266,6 +266,48 @@ for arch in ('agentic_txc_09_auxk', 'agentic_txc_10_bare', 'agentic_txc_11_stack
 
 ### Dead ends — do NOT re-run these
 
+- **Re-running the clustering panel with a different 2-D projection
+  method (UMAP → t-SNE).** Already done; doesn't help. The
+  [[summary]] §6 mentions a planned t-SNE rerun as a follow-on to
+  the UMAP-disconfirmed H1 (semantic clustering on high-level
+  prefix). It was executed — 48 PNGs under
+  [`experiments/phase6_qualitative_latents/results/tsne/`](../../../experiments/phase6_qualitative_latents/results/tsne/)
+  for all 4 archs × {high, low} × {semantic, context, pos}.
+  **Silhouette scores are computed on the raw SAE latent prefix
+  with cosine metric** (see
+  [`run_tsne.py:83`](../../../experiments/phase6_qualitative_latents/run_tsne.py)
+  and
+  [`run_umap.py`](../../../experiments/phase6_qualitative_latents/run_umap.py)
+  `_silhouette`), not on the 2D projection — so the scores are
+  byte-identical between
+  `results/umap/concat_C_v2__silhouette_scores.csv` and
+  `results/tsne/concat_C_v2__tsne_silhouette_scores.csv` for the
+  overlapping rows. All `high/semantic` scores are negative for
+  every arch including `tsae_paper`. Visually, t-SNE surfaces more
+  local structure (multiple small sub-clusters) than UMAP's single
+  central blob, but the sub-clusters are not MMLU-subject-aligned.
+  The H1 disconfirmation is upstream of the projection method and
+  unlikely to be fixable by a different projection.
+
+  **Likely real causes** (per summary §6 speculation, all unresolved):
+  Gemma-2-2b-**IT** L13 vs paper's Gemma-2-2b **BASE** L12 (IT
+  models have different internal representations at L13 than base
+  models at L12); 30-token MMLU windows may not carry enough
+  subject signal at this layer / model; cosine on TopK-sparse
+  vectors is dominated by the handful of active features. None of
+  these matter for Phase 6.1's headline result — autointerp and
+  passage-smoothness (§4, §5) reproduce cleanly and both are where
+  Cycle F's 7/8 win lives. The clustering panel is Figure 2 of the
+  paper; autointerp and smoothness are Figures 1 and 4. We have
+  Figures 1 and 4 — Figure 2 is the weak reproduction.
+
+  Don't spend cycles on a third projection method (e.g. PCA, MDS,
+  PaCMAP). If clustering matters for the paper, the intervention
+  has to be upstream: try Gemma-2-2b BASE L12 (match the paper's
+  model + layer exactly), or lengthen the MMLU context window, or
+  switch silhouette to an ℓ2 metric on per-feature activation
+  patterns rather than cosine on raw prefixes.
+
 - **More AuxK on BatchTopK.** Cycle H showed BatchTopK + AuxK
   regressed 7 → 5 /8. Adding AuxK gradient on top of BatchTopK
   shifts decoder directions toward residual-reconstruction
