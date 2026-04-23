@@ -504,6 +504,13 @@ scaling with K.
 
 #### T-sweep under BatchTopK sparsity (Phase 5.7 extended scope)
 
+![TXCDR T-sweep TopK vs BatchTopK, last_position](../../../../experiments/phase5_downstream_utility/results/plots/txcdr_t_sweep_batchtopk_comparison_last_position.png)
+
+Plot script:
+[`plots/plot_txcdr_t_sweep_batchtopk.py`](../../../../experiments/phase5_downstream_utility/plots/plot_txcdr_t_sweep_batchtopk.py).
+Re-running auto-adds a mean_pool panel once BatchTopK mean_pool
+probing completes (coverage check: all 7 T-values at n≥30).
+
 Parallel T-sweep with BatchTopK sparsity instead of TopK, using the
 same vanilla TXCDR architecture at each T. All 7 ckpts trained to
 plateau; last_position probing complete at n=36 (mean_pool pending —
