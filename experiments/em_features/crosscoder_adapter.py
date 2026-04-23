@@ -27,7 +27,7 @@ VENDOR_SRC = REPO_ROOT / "experiments" / "separation_scaling" / "vendor" / "src"
 if str(VENDOR_SRC) not in sys.path:
     sys.path.insert(0, str(VENDOR_SRC))
 
-from sae_day.sae import TemporalCrosscoder, MultiLayerCrosscoder  # noqa: E402
+from sae_day.sae import TemporalCrosscoder, MultiLayerCrosscoder, TopKSAE  # noqa: E402
 
 
 def _resolve_position(position, T):
@@ -52,6 +52,30 @@ def get_txc_feature_directions(
     window position. Shape of each returned tensor: (d_in,)."""
     t = _resolve_position(position, txc.T)
     rows = txc.W_dec.data[t, feature_ids, :]  # (k, d_in)
+    rows = rows / (rows.norm(dim=-1, keepdim=True) + 1e-8)
+    return [rows[i].clone() for i in range(rows.shape[0])]
+
+
+@torch.no_grad()
+def get_custom_sae_feature_directions(
+    ckpt_path,
+    feature_ids,
+    device: str = "cuda",
+) -> list[torch.Tensor]:
+    """Load a custom TopKSAE trained by run_training_sae_custom.py and return
+    unit-normed W_dec rows for the requested feature ids. Each tensor is
+    (d_in,)."""
+    from pathlib import Path
+    ckpt = torch.load(Path(ckpt_path), map_location=device)
+    ccfg = ckpt["config"]
+    from sae_day.sae import TopKSAE
+    sae = TopKSAE(d_in=ccfg["d_in"], d_sae=ccfg["d_sae"], k=ccfg["k"])
+    sae.load_state_dict(ckpt["state_dict"])
+    sae.eval().to(device)
+    dec = sae.W_dec.data.float()  # (d_sae, d_in)
+    if dec.shape[1] != ccfg["d_in"]:
+        dec = dec.T
+    rows = dec[feature_ids]
     rows = rows / (rows.norm(dim=-1, keepdim=True) + 1e-8)
     return [rows[i].clone() for i in range(rows.shape[0])]
 
