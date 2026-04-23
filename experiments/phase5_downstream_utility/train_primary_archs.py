@@ -1298,15 +1298,24 @@ def run_all(seeds, max_steps, archs=None):
                 # T-sweep on the cycle-02 recipe. Keeps γ=0.5 fixed,
                 # sets n_contr_scales = min(3, T) so T=2 gracefully
                 # degrades to 2 scales.
+                # At T>=10 the matryoshka decoder tensors + pair input
+                # activations OOM at batch_size=1024 on A40; halve for
+                # safety.
+                import dataclasses as _dc
                 T_swp = int(arch.removeprefix("agentic_txc_02_t"))
                 n_sc = min(3, T_swp)
+                local_cfg = cfg
+                if T_swp >= 10:
+                    new_bs = 256 if T_swp >= 15 else 512
+                    local_cfg = _dc.replace(cfg, batch_size=new_bs)
                 model, log = train_matryoshka_txcdr_contrastive_multiscale(
-                    cfg, device, k=100, T=T_swp, alpha=1.0,
+                    local_cfg, device, k=100, T=T_swp, alpha=1.0,
                     n_contr_scales=n_sc, gamma=0.5, buf=get_anchor(),
                 )
                 meta = dict(seed=seed, k_pos=100, k_win=100 * T_swp,
                             T=T_swp, match_budget=True, layer=13,
                             alpha=1.0, n_contr_scales=n_sc, gamma=0.5,
+                            batch_size=local_cfg.batch_size,
                             variant="agentic_txc_02_t_sweep")
             elif arch == "agentic_txc_03":
                 # Agentic cycle 03: n_contr_scales=3, γ=1.0 (equal weights).

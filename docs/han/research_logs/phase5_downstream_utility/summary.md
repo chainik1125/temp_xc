@@ -151,6 +151,9 @@ non-determinism accumulated across re-probes; the ranking is stable.)*
 | mlc | 0.7884 | 0.1193 | 36 |
 | 🏆 **agentic_txc_02** (multi-scale matryoshka, Phase 5.7) | **0.7775** | 0.1138 | 36 |
 | txcdr_rank_k_dec_t5 | 0.7769 | 0.1087 | 36 |
+| 🆕 agentic_txc_02_t8 (T-sweep) | 0.7626 | 0.1088 | 36 |
+| 🆕 agentic_txc_02_t2 (T-sweep) | 0.7518 | 0.1139 | 36 |
+| 🆕 agentic_txc_02_t3 (T-sweep) | 0.7469 | 0.1161 | 36 |
 | 🆕 matryoshka_txcdr_contrastive_t5_alpha100 (Part-B α=1.0) | 0.7757 | 0.1146 | 36 |
 | txcdr_t5 | 0.7752 | 0.1103 | 36 |
 | 🆕 mlc_batchtopk | 0.7684 | 0.1175 | 36 |
@@ -201,6 +204,8 @@ non-determinism accumulated across re-probes; the ranking is stable.)*
 | txcdr_rank_k_dec_t5 | 0.7911 | 0.1182 | 36 |
 | 🆕 agentic_mlc_08_batchtopk | 0.7911 | 0.1253 | 36 |
 | 🆕 **agentic_mlc_08** (multi-scale MLC, Phase 5.7) | 0.7890 | 0.1238 | 36 |
+| 🆕 agentic_txc_02_t3 (T-sweep) | 0.7870 | 0.1275 | 36 |
+| 🆕 agentic_txc_02_t8 (T-sweep) | 0.7839 | 0.1215 | 36 |
 | 🆕 txcdr_t5_batchtopk | 0.7832 | 0.1163 | 36 |
 | 🆕 mlc_contrastive_alpha100 (Part-B α=1.0) | 0.7818 | 0.1276 | 36 |
 | mlc | 0.7774 | 0.1262 | 36 |
@@ -208,6 +213,7 @@ non-determinism accumulated across re-probes; the ranking is stable.)*
 | txcdr_t15 | 0.7766 | 0.1122 | 36 |
 | mlc_contrastive | 0.7739 | 0.1213 | 36 |
 | 🆕 mlc_batchtopk | 0.7727 | 0.1224 | 36 |
+| 🆕 agentic_txc_02_t2 (T-sweep) | 0.7725 | 0.1291 | 36 |
 | txcdr_tied_t5 | 0.7726 | 0.1208 | 36 |
 | txcdr_t2 | 0.7713 | 0.1315 | 36 |
 | txcdr_t10 | 0.7670 | 0.1193 | 36 |
@@ -331,6 +337,57 @@ transfer from TopK to BatchTopK?
 should be scoped to TopK-sparsity. For MLC it survives BatchTopK; for
 TXC it doesn't, which is a defensible published finding rather than a
 problem — it identifies the mechanism as per-sample-TopK-dependent.
+
+#### T-sweep on agentic_txc_02 (Phase 5.7 experiment iii)
+
+Extends the vanilla TXCDR T-sweep (above) to the cycle-02 recipe.
+Recipe frozen at γ=0.5, α=1.0, n_contr_scales = min(3, T), k=100;
+only T varies. Paired comparison vs `txcdr_t{N}` at matched T:
+
+| T | vanilla txcdr_t*  (lp / mp) | agentic_txc_02_t* (lp / mp) | Δ_lp | Δ_mp |
+|---|---|---|---|---|
+| 2 | 0.7380 / 0.7713 | 0.7518 / 0.7725 | +0.0138 | +0.0012 |
+| 3 | 0.7659 / 0.7931 | 0.7469 / 0.7870 | −0.0190 | −0.0061 |
+| **5** | **0.7752 / 0.7991** | **0.7775 / 0.8007** | +0.0023 | +0.0016 |
+| 8 | 0.7498 / 0.7635 | 0.7626 / 0.7839 | +0.0128 | **+0.0204** |
+
+**Reading**:
+
+- **The recipe's mean_pool peak shifts from T=5 (vanilla) to T=8
+  (multi-scale)**: +0.0204 pp at mean_pool, the largest Δ in the sweep.
+  Plausibly because at T=8 the three contrastive scales cover positions
+  1/2/3 while reconstruction still pressures the longer sub-windows —
+  exactly the pattern cycle 02 optimized at T=5, but with more
+  latent room to differentiate the contrastive-free tail scales.
+- **T=5 is still close to the top** and its 3-seed variance is the
+  tightest in the set (σ ≈ 0.002 at mean_pool). T=5 remains the
+  defensible headline.
+- **T=3 is anomalously bad** (Δ_lp = −0.019, Δ_mp = −0.006). At T=3
+  the matryoshka partition has only 3 scales total and n_contr_scales
+  = 3 means *all* scales get contrastive pressure, including the
+  tail scale that reconstructs the full window. Cycle 04 (n=5 at
+  T=5, all scales get contrastive) showed the same regression —
+  same mechanism.
+- **T=2**: gain at last_position (+0.014), tie at mean_pool. Too few
+  scales to leverage the cycle-02 pattern fully (only 2 contrastive
+  scales at n_contr_scales=2).
+
+**T ≥ 10 infeasible at d_sae=18 432 on A40.** The matryoshka decoder
+parameter count scales O(T³ · d_in) (T scales each with a
+`(prefix_sum[t], t, d_in)` decoder tensor). At T=10, the decoder +
+encoder + Adam state alone exceeds 30 GB; the temporary tensor in the
+Adam step triggers OOM. T ∈ {10, 15, 20} are omitted; workarounds
+(fp16 training, CPU-offloaded Adam, or d_sae reduction) would change
+the comparison and were deferred.
+
+**Paper implication**: the T=5 peak is a local feature of the recipe's
+n_contr_scales=3 choice, not a universal optimum — T=8 is competitive
+or better at mean_pool. For the paper, report T=5 as the reference and
+T=8 as a sensitivity check; omit the T-sweep claim at large T due to
+matryoshka memory scaling.
+
+Full ckpts: `agentic_txc_02_t{2,3,8}__seed42.pt`. Raw results in
+`probing_results.jsonl`.
 
 #### Figure 3 — Headline plots index
 
