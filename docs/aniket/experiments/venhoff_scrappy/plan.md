@@ -242,45 +242,90 @@ Cons: agent may converge on a pathological local optimum (e.g., all cycles diffe
 
 **Recommendation**: start with A (5 curated cycles to validate the infra). If infra is stable, switch to B for overnight runs with an explicit candidate-axis plan in the prompt.
 
-### 6.3 Initial candidate batch (manual curation, ordered by marginal information)
+### 6.3 Exploration strategy — screening then exploit (web-claude revision)
 
-1. `baseline_sae` — reference. Δ = 0 by definition.
-2. `baseline_tempxc` — TempXC at scrappy budget (not paper budget). Confirms scrappy slice preserves TempXC > SAE ordering.
-3. `tempxc_layer8` — same as baseline_tempxc but `steering_layer: 8`. Tests layer sensitivity.
-4. `tempxc_layer16` — same but L16. Other end of the layer axis.
-5. `tempxc_sum_reduction` — TempXC with sum reduction. (If that's the default, swap for mean or max.)
-6. `tempxc_n_clusters_8` — halve the cluster count.
-7. `mlc_baseline` — MLC at scrappy budget. Confirms MLC viability in scrappy regime.
-8. `mlc_layer10` — MLC at L10.
+Pure coordinate descent on a O(10³) space traps the agent in **cheap-axis gravity** (it tweaks `coefficient` and `token_windows` because they're one-line YAML edits, skipping the real-effect axes like `reduction` or `n_clusters`). Two-phase plan:
 
-That's 8 cycles, ~80-160 min on a single GPU. Enough signal to commit to one axis for deeper exploration.
+**Screening phase** — fractional factorial on the three biggest-effect axes. Grid:
+- `arch ∈ {SAE, TempXC, MLC}` (3)
+- `steering_layer ∈ {8, 12, 16}` (3)
+- `reduction ∈ {sum, mean}` — TempXC-only (2)
+
+3×3×2 = 18 cycles. Plus the baseline + shuffle control below → **20 screening cycles, ~4 h**.
+
+**Exploit phase** — agent-driven coordinate descent on the screening winner, with hard constraint in system prompt: *every axis in the ledger must have ≥3 cycles before any verdict claim*. ~50 cycles, ~10 h.
+
+### 6.4 Initial curated batch (cycles 00-03, before launching the agent)
+
+1. **`baseline_sae`** — reference. Δ = 0 by definition. Establishes the absolute GR number on the scrappy slice.
+2. **`baseline_sae_shuffled`** — permute activations within-sequence before Phase 2 on SAE. Per our own "shuffle control is mandatory" learning (memory #andre_v2_sweep). If this scores close to `baseline_sae`, the TFA-style dense-channel confound is present on the Venhoff pipeline and the whole loop's conclusions are suspect. **Cheap to run once, saves the overnight from being uninterpretable.**
+3. **`baseline_tempxc`** — TempXC at scrappy budget. Confirms scrappy slice preserves TempXC > SAE ordering (smoke test for the full-budget headline).
+4. **`baseline_mlc`** — MLC at scrappy budget. Same smoke test for MLC.
+
+Then hand off to the screening phase (§6.3). ~4 cycles × 10 min = ~40 min to establish the sanity points before the agent takes over.
 
 ## 7. Metric, noise, verdict thresholds
 
-### 7.1 Metric: Gap Recovery
+### 7.1 Metric: Gap Recovery (absolute and paired Δ)
 
 Per `grade.py`:
 ```
 gap_recovery = (hybrid_acc - base_acc) / (thinking_acc - base_acc)
 ```
 
-At n=20 tasks:
-- thinking_acc ≈ 0.80 (SE ≈ 0.09)
-- base_acc ≈ 0.20 (SE ≈ 0.09)
-- hybrid_acc SE ≈ 0.09
-- Denominator (thinking - base) ≈ 0.60
-- Numerator SE (hybrid - base) ≈ √(0.09² + 0.09²) ≈ 0.13
-- **Gap Recovery SE ≈ 0.13 / 0.60 ≈ ±22 pp** — wider than I estimated in the README.
+**Absolute noise (n=20)**:
+- thinking_acc ≈ 0.80 (SE ≈ 0.09), base_acc ≈ 0.20 (SE ≈ 0.09), hybrid_acc SE ≈ 0.09
+- Denominator ≈ 0.60, unpaired numerator SE ≈ 0.13 → **absolute Gap Recovery SE ≈ ±22 pp**.
 
-**Implication**: the +10 pp finalist threshold is probably too loose. At n=20 with SE≈22 pp, a 10 pp difference has very low statistical power. Realistic options:
+**Paired Δ noise (what we actually care about)** — web-claude review (2026-04-23):
+The metric we verdict on is Δ = GR_cand − GR_baseline evaluated on **the same 20 tasks**. Denominator cancels in the Δ (thinking/base grades are fixed across candidates); numerator is `hybrid_cand − hybrid_base` on paired tasks with SE = √(2·p(1−p)(1−ρ)/n). With moderate task-level correlation ρ ≈ 0.4–0.6 (plausible — task difficulty is mostly intrinsic), **paired Δ SE ≈ ±10–15 pp**, not ±22.
 
-(a) Tighten threshold to Δ > +25 pp (2σ-ish). Nothing passes unless it's obviously better. High specificity, low sensitivity — may miss real wins.
+**Decision**: keep the +10 pp FINALIST threshold, with two mandatory additions:
 
-(b) Keep +10 pp but **always re-run FINALIST candidates at n=50 or n=100 before promoting to paper budget.** Scrappy acts as a coarse filter; re-run tightens the signal.
+1. **Deterministic 20-task slice** fixed across all candidates so pairing actually holds. Use `MATH500.test[:20]` (or a pre-computed stratified-by-level slice of 20; see §11). No per-cycle reseed.
+2. **Per-task outcomes vector** in every ledger row (20-element bool array). ~40 bytes/row, unlocks paired McNemar and paired bootstrap post-hoc for *any* pair of candidates without re-running.
 
-(c) Increase n_tasks to ~50 (triples cycle time to ~30 min but cuts SE to ~14 pp).
+Any FINALIST re-runs at **n=100** (~50 min scrappy) for confirmation before paper-budget promotion.
 
-**My proposal**: go with (b). Scrappy's job is cheap triage, not final verdict. Any Δ > +10 pp candidate re-runs at n=100 scrappy (~50 min) before paper-budget promotion.
+### 7.2 Verdict thresholds
+
+| Δ Gap Recovery | Verdict | Action |
+|----|----|----|
+| > +10 pp | FINALIST | promote to n=100 re-run |
+| +3 pp to +10 pp | PROMISING | accumulate; if 3 consecutive on same axis, re-run at n=100 |
+| −10 pp to +3 pp | AMBIGUOUS | continue search, don't discard |
+| < −10 pp | DISCARD | retire candidate family |
+
+### 7.3 Ledger schema (v1)
+
+Each row in `autoresearch_index.jsonl`:
+```json
+{
+  "schema_version": 1,
+  "ts": "...",
+  "candidate": "...", "baseline": "...",
+  "arch_cand": "...", "arch_base": "...",
+  "n_tasks": 20,
+  "thinking_acc": 0.80, "base_acc": 0.20, "hybrid_acc": 0.42,
+  "gap_recovery_cand": 0.367, "gap_recovery_base": 0.183,
+  "delta_pp": 18.4,
+  "absolute_gap_cand": 0.22, "absolute_gap_base": 0.11,
+  "best_cell": {"coefficient": 0.5, "token_window": 0, "hybrid_accuracy": 0.42},
+  "per_task_outcomes": [true, false, true, ...],
+  "verdict": "FINALIST",
+  "wall_time_s": 612,
+  "gap_recovery_per_gpu_minute": 0.0036,
+  "phase0_cache_hash": "sha256:abcd..."
+}
+```
+
+### 7.4 Stop criterion
+
+Adapted from Han's "5 consecutive cycles with Δ < +0.01 and no informative insight":
+
+> If 5 consecutive cycles produce Δ < +3 pp vs `baseline_sae` (PROMISING threshold) without a new mechanism insight, escalate to human for re-hypothesis.
+
+"Insight" = a qualitative pattern in the ledger (e.g., "all TempXC layers underperform SAE; reduction operator doesn't matter"). Agent decides this based on the ledger rows, not just the threshold number.
 
 ### 7.2 Verdict thresholds
 
@@ -299,23 +344,32 @@ Adapted from Han's "5 consecutive cycles with Δ < +0.01 and no informative insi
 
 "Insight" = a qualitative pattern in the ledger (e.g., "all TempXC layers underperform SAE; reduction operator doesn't matter"). Agent decides this based on the ledger rows, not just the threshold number.
 
-## 8. Open questions for review
+## 8. Review decisions (web-claude, 2026-04-23)
 
-These are the bits I'm genuinely unsure about and want web-claude to weigh in on:
+Questions from the previous revision, with resolutions now baked into the plan + code:
 
-1. **Noise floor vs threshold**. Is +10 pp + n=100 re-run (proposal (b) above) the right tradeoff, or should scrappy just run at n=50 by default (option (c)) and drop the re-run step?
+1. **Noise floor vs threshold** → keep +10 pp FINALIST + n=100 re-run. Paired Δ SE is ~±10–15 pp (not the ±22 pp of absolute GR), because the same 20 tasks are scored for every candidate and task-level correlation cancels. Enforced by deterministic slice + per-task outcomes vector (§7.3).
 
-2. **Phase 0 cache scope**. Symlinking the repo-level cache into each candidate's `paths.*` tree is hacky. Alternative: have `run_cycle.py` override `paths.identity.n_traces` to always point at the canonical cache location (one `ArtifactPaths` object shared across candidates). Is that cleaner, or does it break the vendor pipeline's assumptions?
+2. **Phase 0 cache scope** → ship symlinks; nothing writes to Phase 0 post-collection, so race risk is nil. Stamp a `phase0_cache_hash` in every ledger row so scrappy vs paper-budget provenance is auditable.
 
-3. **Candidate explosion**. With N layers × M reductions × K cluster counts × L coefficient schemes, the search space is O(10³). Scrappy at 10 min/cycle = ~150/day. We need an explicit exploration strategy (coordinate descent? random sample? structured factorial?). Han's setup is mostly "one axis at a time, guided by agent intuition" — is that actually principled, or should we be running a structured factorial for the first pass?
+3. **Candidate explosion** → 20-cycle fractional factorial screening phase (arch × layer × reduction) before the agent runs free (§6.3). Agent system prompt mandates ≥3 cycles per axis before verdict claims — anti cheap-axis gravity.
 
-4. **Metric alternatives**. Gap Recovery is the paper's framing, but it's a ratio (numerical instability near base_acc ≈ thinking_acc, though that's rare here). Should we also track **raw hybrid accuracy** and **absolute gap (hybrid − base)** as co-metrics? Decision cost is low; adds three columns to the ledger.
+4. **Metric alternatives** → track Gap Recovery, hybrid_acc, absolute gap, `best_cell`, **and per-task outcomes** in every row (§7.3). Adds ~80 bytes; unlocks paired post-hoc analysis.
 
-5. **Agent loop fragility**. If the Claude Code agent session dies (OOM, network, rate limit), does the autoresearch just stop silently? Han's orchestrator is bash and keeps going per-candidate, but a dead agent session means no new candidates get proposed. Do we need a heartbeat or auto-restart?
+5. **Agent loop fragility** → stateless agent sessions (each turn reads ledger + log from disk, no in-session memory dependence). Bash orchestrator per-cycle timeout kills stuck vLLM and emits a `FAILED` row. Optional tmux respawn loop. No heartbeat file.
 
-6. **Candidate loss tweaks**. Some hypothesized improvements (orthogonality penalty, contrastive term) require editing `vendor/thinking-llms-interp/train-vectors/optimize_steering_vectors.py`, not just YAML overrides. For those, each candidate needs a branch of the vendor file, or a patch file, or a fork. What's the cleanest pattern? Han's archs are first-class Python classes he edits directly; for us, vendor edits need to be patches.
+6. **Loss tweaks via monkey-patch** → extend `vendor_patches.py` with `register_loss_override(name, fn)`; candidate YAML references `loss_override: <name>`. Override functions live under `src/bench/venhoff/loss_overrides/` in version control. Patch-file fallback only for structural changes that can't be expressed as function substitution. No vendor fork.
 
-7. **Judge cost**. At 20 tasks × 3 gradings each (thinking, base, hybrid) = 60 Haiku 4.5 calls per cycle. At ~$0.001 per grading, that's ~$0.06/cycle. For 150 cycles/day, ~$9/day. Fine. But worth confirming the judge-cost math before committing.
+7. **Judge cost** → cache thinking/base grades once per slice (they're constants across candidates). Per-cycle judge calls drop from 60 → 20. ~$9/day → ~$3/day. Trivial optimization.
+
+## 9. Extra web-claude flags (incorporated)
+
+- **Shuffle control cycle** added as cycle 01 (`baseline_sae_shuffled`). Per our own "shuffle control is mandatory" learning — if TFA-style dense-channel confound is present on Venhoff pipeline, we catch it before spending 10 h on the agent loop.
+- **Slice stratification**: when MATH500 has level tags, take 4 tasks from each of the 5 difficulty levels (20 total) instead of first-20. Confirm `thinking_acc ∈ [0.75, 0.85]` and `base_acc ∈ [0.15, 0.25]` pre-flight; abort if collapsed (GR denominator unstable).
+- **Schema versioning**: `schema_version: 1` on every ledger row. Future schema additions stay queryable.
+- **Cost-adjusted Δ**: `gap_recovery_per_gpu_minute` in ledger. A +15 pp candidate that costs 3× more isn't obviously better than a +12 pp one at baseline cost. Helpful for paper-budget promotion decisions.
+- **Schema validation in summariser**: reject grade JSON with missing keys; don't silently score a partial run.
+- **Pre-write the story**: before launching the agent, draft the 4–5 sentences the exploration is trying to land (e.g., "TempXC at L16 dominates L12 across all reductions; reduction operator is a second-order axis"). Focuses the search; makes a non-story obvious.
 
 ## 9. Execution plan
 
@@ -358,7 +412,62 @@ Phased. Each phase has a concrete deliverable + go/no-go check.
 - **Judge drift**: Haiku 4.5 is deterministic at temperature=0 but model updates happen. If the dated id rotates, scrappy ledger rows become non-comparable to paper-budget. Mitigation: pin judge to dated id in `vendor_patches.py` (already done).
 - **Candidate YAML schema drift**: agent may invent keys not honored by run_cycle.py. Mitigation: validate merged config against a schema before dispatch; error loud.
 
-## 11. Not in scope
+## 11. Bugs-as-tests (main run lessons baked in)
+
+The full-budget MATH500 run took ~5 iterations to get green on 2026-04-22/23. Every one of those bugs is a latent trap for the scrappy pod too — the vendor tree and transformers version are identical. Lessons + preventive measures:
+
+### 11.1 Vendor patches (already in `src/bench/venhoff/vendor_patches.py`, auto-applied)
+
+Fresh scrappy pods pull `aniket` branch → get all of these for free. Listed here so future-you knows *why* each exists:
+
+| Fix | Commit | Symptom on fresh pod |
+|-----|--------|----------------------|
+| Byte-level BPE normalize (`Ġ`→space, `Ċ`→newline) in `responses.py` + `activation_collection.py` | `6df2ff9` | Phase 1: "no sentence activations collected" — traces saved in BPE-encoded form, sentence splitter returns nothing. |
+| Force `use_fast=True`; swap `encode_plus(return_offsets_mapping=True)` → `tokenizer(...).input_ids` in `tokenization.py` | `27774e6` | `LlamaTokenizer has no attribute encode_plus` — `encode_plus` removed in modern transformers; only fast tokenizers expose offset mapping. |
+| Drop `load_in_8bit=` kwarg at `optimize_steering_vectors.py` call site (Phase 2) | `12b6241` | `TypeError: LlamaForCausalLM.__init__() got an unexpected keyword argument 'load_in_8bit'` during Phase 2. |
+| Drop `load_in_8bit=` kwarg at `utils/utils.py:509` `LanguageModel(...)` call (Phase 3) | `8f73b7f` | Same TypeError but during Phase 3 hybrid inference. Two different call sites, both need patching. |
+| Swap `encode_plus` → `tokenizer(...)` in `utils/utils.py:243` (`get_char_to_token_map`) | `e657900` | Same `encode_plus` removal, different site. |
+| Venhoff SAE shipped-vector reuse (writes `source=venhoff_shipped` sidecar; SAE Phase 2 no-ops) | `551bcb7` | SAE arch re-trains all 16 vectors from scratch instead of reading `vendor/.../optimized_vectors/llama-3.1-8b_{bias,idx0..14}.pt`. Wastes ~40 GPU-min per run. |
+| Judge model id: `claude-haiku-4-5-20251001` (dated, not bare) | `8f73b7f` | `404 Not Found for url 'api.anthropic.com/v1/messages' \| model: claude-haiku-4.5` — bare name is OpenRouter-only; direct Anthropic API needs the dated id. |
+| BatchEncoding `.clone()` unwrap via `hasattr(x, 'clone')` probe at `hybrid_token.py:381` | `0cbe084` | `KeyError: 'clone'` from `BatchEncoding.__getattr__` — modern transformers `apply_chat_template(return_tensors="pt")` returns BatchEncoding, not Tensor, in some configs. |
+| `Patch.optional=True` for self-healing migration patches | `a87caf2` | `patch precondition failed` when fresh pod has a mix of previously-applied and new patches. Optional skip preserves idempotency. |
+
+**Smoke test** after bootstrap — run this to verify the vendor tree is in the expected state:
+```bash
+cd /workspace/spar-temporal-crosscoders
+.venv/bin/python -c "
+from pathlib import Path
+from src.bench.venhoff.vendor_patches import (
+    ensure_hybrid_judge_patched, ensure_steering_patched
+)
+root = Path('vendor/thinking-llms-interp')
+ensure_hybrid_judge_patched(root)
+ensure_steering_patched(root)
+print('[ok] all vendor patches applied/confirmed')
+"
+```
+
+### 11.2 Pod-level traps
+
+| Trap | Mitigation |
+|------|------------|
+| `/root/.cache/uv` eats container disk (17 GB after first `uv sync`) | Bootstrap deletes `~/.cache/uv` after sync. 30 GB container disk recommended (not 20). |
+| HF cache on container disk (32 GB for 2× 8B models) | Export `HF_HOME=/workspace/.cache/huggingface` **before** `hf auth login` or any model download. |
+| Torch inductor cache on container disk | Export `TORCHINDUCTOR_CACHE_DIR=/workspace/.cache/torchinductor`. |
+| `huggingface-cli` deprecated on modern pods | Use `hf auth login`. |
+| GPU orphan after subprocess crash (pkill pattern misses the actual python subprocess) | `run_autoresearch.sh` per-cycle timeout (30 min, 3× expected 10 min). On timeout: `ps -ef \| grep vendor/thinking-llms-interp/.venv \| awk '{print $2}' \| xargs -r kill -9`; wait 60 s for driver to reclaim VRAM; emit FAILED ledger row; continue to next candidate. |
+| vLLM "Free memory X/80 GiB" transient after orphan kill | Wait ~60 s before relaunching; driver reclaims memory asynchronously. |
+| SSH disconnect kills long-running process | Always run orchestrator inside `tmux new -s scrappy`. |
+| `uv sync` fails on py3.11 with `separation-scaling` extra | `separation-scaling` block removed from `pyproject.toml` on `aniket` branch; pull before sync. |
+| Model load race: vLLM + nnsight model load contend on memory | Serialize — don't run multiple cycles in parallel on a single GPU. Orchestrator is already serial per $@. |
+
+### 11.3 What stays risky on the scrappy pod
+
+- **New HuggingFace revision of `transformers`** between now and the scrappy run. If pip/uv pulls a newer version, new deprecations may break patches. Pin `transformers` version in `pyproject.toml`-or-vendor-venv if you want zero risk. Currently we don't pin.
+- **Venhoff upstream edits to `hybrid_token.py` or `utils.py`**. Our patches use literal-string `find`. If upstream reshuffles whitespace or renames variables, patches fail at precondition. Provenance-pinned commit in `docs/aniket/experiments/venhoff_eval/VENHOFF_PROVENANCE.md`; verify on bootstrap.
+- **Judge id rotation**. If Anthropic retires `claude-haiku-4-5-20251001`, patches silently start calling a 404. Mitigation: bootstrap smoke-test does a 1-prompt judge call before spending cycles.
+
+## 12. Not in scope
 
 - Non-MATH500 datasets (ARC-C, GSM8K, etc.). Venhoff tests a suite; we're scoped to MATH500 for the scrappy loop.
 - Other model cells (Llama-70B etc.). Scoped to the one cell where Venhoff's baseline is 3.5%.

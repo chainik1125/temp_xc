@@ -28,6 +28,11 @@ phase3_hybrid:
   dataset: math500
   dataset_split: test
   n_tasks: 20              # paper: 500
+  # Deterministic task selection across all candidates so paired
+  # Δ analysis holds. "first_n" = MATH500.test[:20]. "stratified_by_level"
+  # = 4 tasks per difficulty level when tags available (preferred).
+  slice_strategy: stratified_by_level
+  slice_fallback: first_n
   max_new_tokens: 500      # paper: 2000
   max_thinking_tokens: 500 # paper: 2000
   coefficients: [0.5]      # paper: [0.1, 0.2, ..., 1.0]
@@ -36,11 +41,24 @@ phase3_hybrid:
 grade:
   judge_model: claude-haiku-4-5-20251001
   judge_repetitions: 1     # paper: 1 (already minimal)
+  # thinking_acc and base_acc are constants across candidates on a
+  # fixed slice — cache them to cut judge calls from 60 → 20 per cycle.
+  cache_thinking_base_grades: true
 
 autoresearch:
   default_baseline: baseline_sae
   seed: 42
-  # Verdict thresholds on Δ Gap Recovery (pp):
+  # Verdict thresholds on Δ Gap Recovery (pp) — web-claude revision:
+  # paired Δ SE at n=20 is ~±10–15 pp, not ±22 (denominator + task
+  # correlation cancel). +10 pp is borderline but defensible with
+  # mandatory n=100 re-run for FINALISTs before paper-budget promotion.
   finalist_threshold_pp: 10.0
+  promising_threshold_pp: 3.0   # accumulate; 3-consec triggers re-run
   discard_threshold_pp: -10.0
   stop_after_n_stale_cycles: 5
+
+# Per-cycle timeout (bash kills stuck cycles and emits FAILED row):
+cycle_timeout_s: 1800    # 30 min (3× expected 10 min)
+
+# Schema versioning on ledger rows.
+ledger_schema_version: 1

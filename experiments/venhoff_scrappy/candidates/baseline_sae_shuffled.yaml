@@ -1,0 +1,24 @@
+# Shuffle control — per our "shuffle control is mandatory" learning
+# (memory: project_andre_v2_sweep).
+#
+# Same as baseline_sae but activations are permuted within-sequence
+# before Phase 2. If Gap Recovery here is ~equal to baseline_sae, the
+# TFA-style dense-channel confound is present on the Venhoff pipeline
+# and all scrappy loop conclusions about "which steering arch wins"
+# are suspect — we'd be measuring dense redistribution, not the
+# steering-direction content.
+#
+# Cheap (~10 min scrappy cycle), catches a fatal interpretability bug
+# before spending 10 h on the agent loop.
+
+name: baseline_sae_shuffled
+arch: sae
+baseline: baseline_sae
+reuse_venhoff_vectors: false    # regenerate vectors from shuffled activations
+shuffle_activations: within_sequence
+hypothesis: |
+  If GR_shuffled ≈ GR_baseline_sae, the Venhoff pipeline has the TFA
+  confound and our arch comparisons downstream are uninterpretable.
+  Expected: GR_shuffled < GR_baseline_sae by a wide margin (shuffle
+  destroys temporal structure). A null result here is the "stop the
+  presses" signal.
