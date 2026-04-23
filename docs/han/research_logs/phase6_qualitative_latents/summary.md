@@ -343,6 +343,100 @@ Docs (`docs/han/research_logs/phase6_qualitative_latents/`):
 - `2026-04-22-encoding-protocol.md` — per-arch encoding convention
 - `summary.md` (this document)
 
+### 9.5. Phase 6.1 update (2026-04-23) — BatchTopK is the lever
+
+See [[2026-04-23-agentic-log]] for full per-cycle detail. Headline:
+a 5-candidate agentic loop replaced `agentic_txc_02` as the Phase 6
+qualitative champion.
+
+**New autointerp table (sorted by semantic count):**
+
+| arch | sparsity | anti-dead stack | alive | /8 | verdict |
+|---|---|---|---|---|---|
+| **`agentic_txc_02_batchtopk`** | BatchTopK | none | **0.80** | **7** 🏆 | new champion, beats `tsae_paper` |
+| `tsae_paper` | BatchTopK | full | 0.73 | 6 | paper reference |
+| `tfa_big` | — | — | 1.00 | 6 | — |
+| `agentic_txc_10_bare` | TopK | full (AuxK + unit-norm + grad-⊥ + geom-med) | 0.62 | 6 | ties `tsae_paper`; no matryoshka/contrastive |
+| `agentic_mlc_08` | TopK | none | 0.13 | 5 | — |
+| `agentic_txc_11_stack` | BatchTopK | AuxK | 0.79 | 5 | stacking regresses |
+| `agentic_txc_09_auxk` | TopK | AuxK only | 0.37 | 3 | null effect |
+| `tsae_ours` | TopK | minimal | 0.42 | 3 | — |
+| `agentic_txc_02` | TopK | none | 0.37 | 2 | Phase 5.7 baseline |
+
+**Three main findings:**
+
+1. **BatchTopK sparsity is the single biggest lever** on TXC
+   qualitative (+5 labels, +0.43 alive vs `agentic_txc_02`). Variable
+   per-sample sparsity lets rare concept features fire on contexts
+   where they matter without displacing incumbents — matches
+   tsae_paper's alive fraction (actually beats it) with the same
+   matryoshka + multi-scale contrastive recipe that `agentic_txc_02`
+   already uses.
+2. **The anti-dead stack (unit-norm decoder + decoder-parallel grad
+   removal + geom-median `b_dec` init + AuxK) is an alternate path
+   that almost matches BatchTopK**: Track 2 at 6/8 on plain TopK.
+   Matryoshka + multi-scale contrastive is NOT load-bearing for
+   qualitative — only for Phase 5 probing AUC.
+3. **The two mechanism classes don't stack additively**: BatchTopK +
+   AuxK (Cycle H) regressed from 7/8 → 5/8. AuxK's residual
+   gradient promoted structural / format features into top-by-
+   variance slots.
+
+**Paper-story reframe candidate:** sparsity is a one-knob trade-off.
+TopK favours sparse-probing AUC (Phase 5 `agentic_txc_02` at 0.80
+mean-pool); BatchTopK favours qualitative (`agentic_txc_02_batchtopk`
+at 7/8). Same dictionary, knob selects regime. Probing-side
+quantification for the BatchTopK variant is deferred (70 GB
+`probe_cache` on HF; Phase 5.7 experiment (ii) already established
+a regression but the precise test-AUC delta on this branch is
+unmeasured).
+
+**Follow-ups for a subsequent agent:**
+
+Biggest expected gains, ordered:
+
+- **Seed variance on `agentic_txc_02_batchtopk`** (3 seeds). Phase 5.7
+  found that `agentic_txc_02`'s +0.0354 gain halved to +0.022 across
+  seeds — the 7/8 single-seed result may be similarly optimistic.
+  Cost: 3 × 35 min training + eval.
+- **Missing 2x2 cell: BatchTopK + full anti-dead stack**. We did
+  BatchTopK alone (Cycle F, 7/8) and full anti-dead alone (Track 2,
+  6/8). A *bare TXC + BatchTopK + full anti-dead stack* hasn't been
+  tested — might break past 7/8 if the mechanisms combine well
+  without Cycle H's matryoshka-related interference. One training
+  run (~30 min).
+- **Bump `min_steps` past the plateau-stop artefact**. Both Cycle F
+  and Cycle H converged at step 4000 / 25000. Full-length training
+  (`min_steps=8000` or 15000) might give the anti-dead mechanisms
+  more time to shape features. Cheap if Cycle F's trajectory is
+  already informative about where loss plateaus.
+- **Corpus-aware qualitative metric**. Top-8-by-variance is noisy
+  around punctuation and format features (e.g. MMLU answer
+  formatting in Cycle H was high-variance because MMLU questions
+  are clustered in concat_A). Filtering top-8 by "passage-
+  discriminative" (variance of mean activation across passages,
+  not across tokens) would suppress this class of confounder and
+  might reveal 8/8 on existing models.
+- **Sparse-probing regression quantification** on
+  `agentic_txc_02_batchtopk` — download `probe_cache` (70 GB,
+  `han1823123123/txcdr-data` HF dataset), run the Phase 5
+  `run_probing.py` at `last_position` + `mean_pool`, report Δ AUC
+  vs `agentic_txc_02`. Critical for the paper's trade-off claim.
+- **HF upload** of the 5 new ckpts (Cycle A, Track 2, Cycle F was
+  already up, Cycle H, + `agentic_txc_02_batchtopk` re-verified)
+  to `han1823123123/txcdr` so cross-pod reproduction is possible.
+
+Likely dead ends (from what we've already learned):
+
+- More AuxK on BatchTopK (Cycle H's regression).
+- Orthogonality penalty (Phase 5.7 Cycle 01 regressed; not expected
+  to help here either).
+- Hard negatives (Phase 5.7 Cycle 06 showed no benefit on top of
+  multi-scale at `B=1024`).
+- Feature-diversity Gram-matrix penalty (briefing flagged small
+  effect; Cycle 01's orth penalty is a close analogue that already
+  regressed).
+
 ### 10. Reproduction
 
 Given a warm `uv sync`ed venv with HF + Anthropic tokens:
