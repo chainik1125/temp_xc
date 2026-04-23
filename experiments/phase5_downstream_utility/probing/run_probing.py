@@ -479,6 +479,20 @@ def _load_model_for_run(run_id, ckpt_path, device):
             n_contr_scales=meta.get("n_contr_scales", 3),
             gamma=meta.get("gamma", 0.5),
         ).to(device)
+    elif arch == "agentic_txc_11_stack":
+        from src.architectures.matryoshka_txcdr_contrastive_multiscale_batchtopk_auxk import (
+            MatryoshkaTXCDRContrastiveMultiscaleBatchTopKAuxK,
+        )
+        T = meta["T"]
+        k_eff = meta["k_win"] or (meta["k_pos"] * T)
+        model = MatryoshkaTXCDRContrastiveMultiscaleBatchTopKAuxK(
+            d_in, d_sae, T, k_eff,
+            n_contr_scales=meta.get("n_contr_scales", 3),
+            gamma=meta.get("gamma", 0.5),
+            aux_k=int(meta.get("aux_k", 512)),
+            dead_threshold_tokens=int(meta.get("dead_threshold_tokens", 10_000_000)),
+            auxk_alpha=float(meta.get("auxk_alpha", 1.0 / 32.0)),
+        ).to(device)
     elif arch == "agentic_txc_06":
         from src.architectures.matryoshka_txcdr_contrastive_hardneg import (
             MatryoshkaTXCDRContrastiveHardneg,
