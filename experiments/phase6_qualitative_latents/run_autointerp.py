@@ -237,17 +237,35 @@ def _gather_contexts(ids, tok, z_col: np.ndarray, n_ctx=N_CONTEXTS,
     return out
 
 
-def _claude_call(client, model_id: str, prompt: str, max_tokens: int = 64) -> str:
+def _claude_call(client, model_id: str, prompt: str, max_tokens: int = 64,
+                  max_retries: int = 4) -> str:
     """Temperature=0 for reproducibility across reruns. Without this,
     Haiku's default temperature=1.0 causes label drift and the x/N
     metric becomes noisy across runs even with identical inputs
-    (observed ±5 labels on the same arch × concat)."""
-    msg = client.messages.create(
-        model=model_id, max_tokens=max_tokens,
-        temperature=0.0,
-        messages=[{"role": "user", "content": prompt}],
-    )
-    return msg.content[0].text.strip()
+    (observed ±5 labels on the same arch × concat).
+
+    Retries on RateLimitError + transient API errors with exponential
+    backoff. Rate-limit errors in the initial seed=42 A+B+random run
+    affected ~2% of calls (8 of ~500); retries eliminate these.
+    """
+    import time as _time
+    import anthropic as _anth
+    last_err = None
+    for attempt in range(max_retries):
+        try:
+            msg = client.messages.create(
+                model=model_id, max_tokens=max_tokens,
+                temperature=0.0,
+                messages=[{"role": "user", "content": prompt}],
+            )
+            return msg.content[0].text.strip()
+        except (_anth.RateLimitError, _anth.APIStatusError,
+                _anth.APIConnectionError) as e:
+            last_err = e
+            # Exponential backoff: 2, 4, 8, 16s
+            _time.sleep(2 ** (attempt + 1))
+    # All retries exhausted; re-raise
+    raise last_err
 
 
 def _judge_label(client, model_id: str, label: str) -> dict:

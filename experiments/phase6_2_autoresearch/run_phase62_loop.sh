@@ -17,10 +17,21 @@ MAX_CYCLES="${1:-6}"
 RESULTS_DIR="experiments/phase6_2_autoresearch/results"
 mkdir -p "$RESULTS_DIR" logs
 
-# Priority-ordered candidate list. Implementation-ready first (C5, C6),
-# then the ones that need new arch classes (C1-C4). An agent-based
-# proposer would reorder this dynamically based on prior results.
-PRIORITY_ORDER=("C5" "C6" "C1" "C2" "C3" "C4")
+# Priority-ordered candidate list.
+#
+# C3 (full tsae_paper recipe on TXC base) runs FIRST — it's the
+# highest-prior experiment for the TXC-parity claim. If C3 matches
+# tsae_paper (≥ 10/32 random), the paper's TXC-parity story holds
+# with a clean recipe.
+#
+# C1 (matryoshka only) + C2 (contrastive only) run next as ablations
+# to isolate which component of C3's stack delivered the gain.
+#
+# C5 (Track 2 longer) + C6 (2x2 cell longer) run as training-duration
+# sweeps. Cheap (no new code) but less likely to close the gap alone.
+#
+# C4 is deferred (needs threshold-tracking added to training).
+PRIORITY_ORDER=("C3" "C1" "C2" "C5" "C6" "C4")
 
 _already_done() {
   local cid="$1"
