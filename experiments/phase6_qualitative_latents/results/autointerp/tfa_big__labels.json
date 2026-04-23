@@ -1,0 +1,186 @@
+[
+  {
+    "feature_idx": 12150,
+    "label": "Soviet Union and Stalin references",
+    "variance": 1.126897473113786e-06,
+    "n_contexts": 10,
+    "contexts": [
+      {
+        "position": 1623,
+        "strength": 0.00522613525390625,
+        "text": " in its wartime alliance with the Soviet Union against Nazi\u00ab Germany\u00bb and the British intelligentsia held Stalin in high"
+      },
+      {
+        "position": 1620,
+        "strength": 0.00516510009765625,
+        "text": " United Kingdom was in its wartime alliance with the Soviet\u00ab Union\u00bb against Nazi Germany and the British intelligentsia held"
+      },
+      {
+        "position": 1367,
+        "strength": 0.004852294921875,
+        "text": " critic of Stalin and hostile to Moscow-directed Stalin\u00abism\u00bb, an attitude that was critically shaped by his"
+      }
+    ]
+  },
+  {
+    "feature_idx": 8418,
+    "label": "Orwell's political writings and motivations",
+    "variance": 9.096480653170147e-07,
+    "n_contexts": 10,
+    "contexts": [
+      {
+        "position": 1639,
+        "strength": 0.003719329833984375,
+        "text": " held Stalin in high esteem, which Orwell hated.\u00ab The\u00bb manuscript was initially rejected by several British and American"
+      },
+      {
+        "position": 1431,
+        "strength": 0.0035419464111328125,
+        "text": " (\"un conte satirique contre Staline\"), and\u00ab in\u00bb his essay \"Why I Write\" (1"
+      },
+      {
+        "position": 1444,
+        "strength": 0.0035037994384765625,
+        "text": " \"Why I Write\" (1946\u00ab)\u00bb wrote: \"Animal Farm was the first book"
+      }
+    ]
+  },
+  {
+    "feature_idx": 12777,
+    "label": "Orwell and Animal Farm biographical context",
+    "variance": 8.497269163854071e-07,
+    "n_contexts": 10,
+    "contexts": [
+      {
+        "position": 1639,
+        "strength": 0.0032329559326171875,
+        "text": " held Stalin in high esteem, which Orwell hated.\u00ab The\u00bb manuscript was initially rejected by several British and American"
+      },
+      {
+        "position": 1704,
+        "strength": 0.003231048583984375,
+        "text": " to the Cold War.\nTime magazine chose the\u00ab book\u00bb as one of thIf a pentagon P"
+      },
+      {
+        "position": 1433,
+        "strength": 0.003208160400390625,
+        "text": " conte satirique contre Staline\"), and in his\u00ab essay\u00bb \"Why I Write\" (194"
+      }
+    ]
+  },
+  {
+    "feature_idx": 1507,
+    "label": "Quotation marks and cited text transitions",
+    "variance": 8.383193517147447e-07,
+    "n_contexts": 10,
+    "contexts": [
+      {
+        "position": 1587,
+        "strength": 0.003940582275390625,
+        "text": " Union des r\u00e9publiques socialistes sovi\u00e9tiques.\u00ab\n\u00bbOrwell wrote the book between November 1"
+      },
+      {
+        "position": 1183,
+        "strength": 0.0038280487060546875,
+        "text": " of knowing something of his\nhabits and methods.\u00ab\n\n\u00bbI have received much help from my friends in"
+      },
+      {
+        "position": 1479,
+        "strength": 0.003719329833984375,
+        "text": " fuse political purpose and artistic purpose into one whole.\"\u00ab\n\u00bbThe original title of the novel was Animal Farm"
+      }
+    ]
+  },
+  {
+    "feature_idx": 11853,
+    "label": "French quotation marks and guillemets formatting",
+    "variance": 7.827069907762052e-07,
+    "n_contexts": 10,
+    "contexts": [
+      {
+        "position": 1433,
+        "strength": 0.0036106109619140625,
+        "text": " conte satirique contre Staline\"), and in his\u00ab essay\u00bb \"Why I Write\" (194"
+      },
+      {
+        "position": 1446,
+        "strength": 0.0033702850341796875,
+        "text": " I Write\" (1946) wrote\u00ab:\u00bb \"Animal Farm was the first book in which"
+      },
+      {
+        "position": 1183,
+        "strength": 0.0033664703369140625,
+        "text": " of knowing something of his\nhabits and methods.\u00ab\n\n\u00bbI have received much help from my friends in"
+      }
+    ]
+  },
+  {
+    "feature_idx": 6635,
+    "label": "\"George Orwell's political ideology and Stalin criticism\"",
+    "variance": 7.55906626181968e-07,
+    "n_contexts": 10,
+    "contexts": [
+      {
+        "position": 1478,
+        "strength": 0.004383087158203125,
+        "text": " to fuse political purpose and artistic purpose into one whole\u00ab.\"\u00bb\nThe original title of the novel was Animal"
+      },
+      {
+        "position": 1398,
+        "strength": 0.004207611083984375,
+        "text": " and Stalinist forces, during the Spanish Civil War\u00ab.\u00bb In a letter to Yvonne Davet (a"
+      },
+      {
+        "position": 1587,
+        "strength": 0.004199981689453125,
+        "text": " Union des r\u00e9publiques socialistes sovi\u00e9tiques.\u00ab\n\u00bbOrwell wrote the book between November 1"
+      }
+    ]
+  },
+  {
+    "feature_idx": 14775,
+    "label": "Orwell's Animal Farm publication and composition",
+    "variance": 7.55711027977668e-07,
+    "n_contexts": 10,
+    "contexts": [
+      {
+        "position": 1704,
+        "strength": 0.0034732818603515625,
+        "text": " to the Cold War.\nTime magazine chose the\u00ab book\u00bb as one of thIf a pentagon P"
+      },
+      {
+        "position": 1676,
+        "strength": 0.0034542083740234375,
+        "text": " its publication. It became a great commercial success when\u00ab it\u00bb did appear, as international relations and public opinion"
+      },
+      {
+        "position": 1433,
+        "strength": 0.00335693359375,
+        "text": " conte satirique contre Staline\"), and in his\u00ab essay\u00bb \"Why I Write\" (194"
+      }
+    ]
+  },
+  {
+    "feature_idx": 9295,
+    "label": "Acknowledgments and attributions in biographical prefaces",
+    "variance": 7.164650241975323e-07,
+    "n_contexts": 10,
+    "contexts": [
+      {
+        "position": 1478,
+        "strength": 0.00481414794921875,
+        "text": " to fuse political purpose and artistic purpose into one whole\u00ab.\"\u00bb\nThe original title of the novel was Animal"
+      },
+      {
+        "position": 1182,
+        "strength": 0.004505157470703125,
+        "text": " opportunity of knowing something of his\nhabits and methods\u00ab.\u00bb\n\nI have received much help from my friends"
+      },
+      {
+        "position": 1348,
+        "strength": 0.004451751708984375,
+        "text": " under the Marxist\u2013Leninist ideology of Joseph Stalin\u00ab.\u00bb Orwell, a democratic socialist, was a critic"
+      }
+    ]
+  }
+]

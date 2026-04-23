@@ -102,6 +102,11 @@ def load_arch_model(arch: str, device):
             tied_weights=True, n_attn_layers=1,
             bottleneck_factor=4, use_pos_encoding=False,
         ).to(device); kind = "tfa"
+        # Attach the training-time input scale so reconstruct() can
+        # apply it: train_tfa divides activations by scale=sqrt(d_in)/mean_norm
+        # to keep the attention stable, and the model's recons are in
+        # that scaled space.
+        model._tfa_scale = float(meta.get("scale", 1.0))
     else:
         raise ValueError(arch)
     cast = {k: v.to(torch.float32) if v.dtype == torch.float16 else v
@@ -177,17 +182,25 @@ def reconstruct(model, arch_kind: str, seqs: np.ndarray, device):
         z = torch.cat(z_rows, dim=0).reshape(N, L, -1)
         xhat = torch.cat(xhat_rows, dim=0).reshape(N, L, d)
     elif arch_kind == "tfa":
+        # train_tfa scales inputs by `meta["scale"]` — the model learned
+        # to reconstruct `scale * x`. We replicate that scaling at
+        # inference so the FVE/CosSim comparison is in the same space
+        # the model was trained on.
+        tfa_scale = float(getattr(model, "_tfa_scale", 1.0))
         seq = 128
-        # whole seq at once
+        x_scaled = x * tfa_scale  # apply train-time scale
         xhat_list = []; z_list = []
         BATCH = 8
         for b0 in range(0, N, BATCH):
             b1 = min(b0 + BATCH, N)
-            xhat_i, rd = model(x[b0:b1])
+            xhat_i, rd = model(x_scaled[b0:b1])
             xhat_list.append(xhat_i)
             z_list.append(rd["novel_codes"])
         xhat = torch.cat(xhat_list, dim=0)
         z = torch.cat(z_list, dim=0)
+        # Return in the scaled space so `x` should also be scaled for comparison
+        # Caller handles this via `_tfa_scale` marker.
+        x = x_scaled
     return xhat, z
 
 
@@ -209,6 +222,11 @@ def paper_metrics(arch: str, device, n_seqs: int = 256) -> dict:
         return {"arch": arch, "skipped": True}
 
     x = torch.from_numpy(seqs).to(device)
+    # TFA's model operates in a scaled space; rescale x to match xhat so
+    # FVE/CosSim compare like-for-like (the shape of the reconstruction
+    # task, just rescaled).
+    if kind == "tfa":
+        x = x * float(getattr(model, "_tfa_scale", 1.0))
     # FVE — compute over last dim variance; for MLC average across layers
     if kind == "mlc":
         var_x = x.float().var(dim=(0, 1, 2))  # (d,)  flatten N, L, Lw

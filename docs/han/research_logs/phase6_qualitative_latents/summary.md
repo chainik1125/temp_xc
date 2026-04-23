@@ -10,21 +10,23 @@ tags:
 
 ### Abstract
 
-We compare four sparse-autoencoder architectures on the qualitative
+We compare **five** sparse-autoencoder architectures on the qualitative
 feature-interpretability axes introduced by Ye et al. 2025's Temporal
-SAE paper (arxiv 2511.05541). Our paper-faithful T-SAE port
-reproduces the paper's core claims on our Gemma-2-2b-IT L13 setup:
-**73 % feature-alive fraction** (paper reports 78 %), **6 / 8
-top-by-variance features carry semantic concept labels** under Claude
-Haiku autointerp, and **top features show clear passage-level phase
-transitions** on Figure-1 / Figure-4-style concatenated sequences.
-Our Phase 5.7 winners (matryoshka-TXC and multi-layer MLC with
-multi-scale InfoNCE) are competitive: MLC achieves 5 / 8 semantic
-labels despite a much lower feature-alive fraction (17 %), and TXC
-recovers mostly punctuation features (2 / 8 semantic). The UMAP panel
-of the paper's Figure 2 does *not* cleanly reproduce on our setup for
-any arch — an independent finding with possible confounds documented
-below.
+SAE paper (arxiv 2511.05541): our Phase 5.7 winners
+(`agentic_txc_02`, `agentic_mlc_08`), a paper-faithful T-SAE port
+(`tsae_paper`), a crude-port control (`tsae_ours`), and full-size
+Temporal Feature Analysis (`tfa_big`, arxiv 2511.01836). The
+paper-faithful T-SAE port reproduces the paper's core claims on our
+Gemma-2-2b-IT L13 setup: **73 % feature-alive fraction** (paper
+reports 78 %), **6 / 8 top-by-variance features carry semantic
+concept labels** under Claude Haiku autointerp, and top features show
+**clear passage-level phase transitions** on Figure-1 / Figure-4-style
+concatenated sequences. Phase 5.7 MLC is competitive (5 / 8 semantic
+labels despite 13 % alive fraction); TFA dominates on alive-fraction
+(100 %) and smoothness (S=0.004); TXC recovers mostly punctuation
+features (2 / 8 semantic). The UMAP panel of the paper's Figure 2
+does *not* cleanly reproduce on our setup for any arch — confounds
+documented below.
 
 ### 1. Setup
 
@@ -86,6 +88,7 @@ and threshold-based inference encoding. Without these, the
 | `tsae_ours` (control)        | 0.912     | 0.918    | 0.424        | 0.410‡       | 99.1   | 0.071            |
 | `agentic_mlc_08`             | 0.906     | 0.897    | 0.131        | —††          | 98.5   | 0.191            |
 | `agentic_txc_02`             | 0.768     | 0.903    | 0.391        | —†           | 493    | n/a †            |
+| `tfa_big` (TFA arch)         | 0.814     | 0.789    | **1.000**    | —            | 100.0  | **0.004**        |
 
 † `agentic_txc_02` is a **window-based** (T=5) encoder — its per-token
    latent shifts by design as the window slides, so the paper's
@@ -123,6 +126,7 @@ Full tables at [[results/autointerp/summary]].
 | arch              | semantic labels | representative top-1 label                                |
 |-------------------|-----------------|-----------------------------------------------------------|
 | `tsae_paper`      | **6 / 8**       | "references to George Orwell's Animal Farm preface"       |
+| `tfa_big`         | **6 / 8**       | "Soviet Union and Stalin references"                      |
 | `agentic_mlc_08`  | 5 / 8           | "Evolution and natural selection in populations"          |
 | `tsae_ours`       | 3 / 8           | "Punctuation and narrative transition markers..."         |
 | `agentic_txc_02`  | 2 / 8           | "Family relationships in epic poetry"                     |
@@ -219,9 +223,21 @@ original headline qualitative claims; we reproduce both.
 ### 7. Overall read
 
 ```
-qualitative   tsae_paper > agentic_mlc_08 > tsae_ours > agentic_txc_02
-quantitative      TXC   ≈   MLC          >    -       (Phase 5.7)
-alive fraction  tsae_paper >>  MLC / TXC / tsae_ours
+qualitative (autointerp + smoothness)
+     tsae_paper ≈ tfa_big  >  agentic_mlc_08  >  tsae_ours  >  agentic_txc_02
+
+reconstruction (FVE / CosSim)
+     tsae_ours ≈ agentic_mlc_08 ≈ tsae_paper  >  tfa_big  >  agentic_txc_02
+
+alive fraction
+     tfa_big (100%) >> tsae_paper (73%) >> tsae_ours (42%) ≈ txc (39%) >> mlc (13%)
+
+smoothness S(H)
+     tfa_big (0.004)  <<  tsae_ours (0.07)  <  tsae_paper (0.11)
+         <  mlc (0.19)  <<  txc (n/a, window-based)
+
+sparse-probing utility (Phase 5.7, prior)
+     agentic_txc_02 ≈ agentic_mlc_08  >  others
 ```
 
 Two independent takeaways:
@@ -249,10 +265,14 @@ The cleanest paper narrative this phase enables:
 
 ### 8. Caveats
 
-- `tfa_big` (stretch): full-size TFA training launched at the end of
-  this writeup (~9 hr on A40). Results will be appended once it
-  completes. This covers the 4-arch comparison the brief originally
-  planned.
+- `tfa_big` trained to plateau at step 7800 / 25000 in 3.0 hr
+  (faster than the 9 hr worst-case projection). Its reconstruction
+  quality (FVE 0.81, CosSim 0.79) is lower than the single-token
+  archs because its training loss subtracts context-predictable
+  activations, so the "novel_codes" we compare here are residual
+  per-token signal rather than the full reconstruction. Alive
+  fraction 100 % and smoothness 0.004 reflect the attention-driven
+  feature sharing inherent to the arch.
 - spaCy wheels don't cover CPython 3.14; POS labels degrade to a
   char-class heuristic. Paper's POS silhouette scores therefore
   aren't directly reproducible on our setup.

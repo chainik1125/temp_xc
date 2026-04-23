@@ -6,11 +6,11 @@ Top-8 features per arch (ranked by variance on concat-sets A + B).
 
 | arch | rank | feat_idx | variance | label |
 |---|---|---|---|---|
-| tsae_paper | 1 | 2745 | 217.030 | references to George Orwell's Animal Farm preface |
-| tsae_paper | 2 | 3582 | 111.586 | Punctuation marks and grammatical delimiters |
-| tsae_paper | 3 | 2138 | 93.883 | George Orwell and Animal Farm references |
-| tsae_paper | 4 | 1815 | 82.379 | historical biographical documentation and correspondence |
-| tsae_paper | 5 | 2882 | 66.612 | Archaic or poetic English language syntax |
-| tsae_paper | 6 | 3457 | 64.499 | Political ideology and authoritarian regimes |
-| tsae_paper | 7 | 2873 | 64.286 | Latin poetry text with classical/Newtonian themes |
-| tsae_paper | 8 | 2982 | 63.889 | Commas and punctuation in mathematical notation |
+| tfa_big | 1 | 12150 | 0.000 | Soviet Union and Stalin references |
+| tfa_big | 2 | 8418 | 0.000 | Orwell's political writings and motivations |
+| tfa_big | 3 | 12777 | 0.000 | Orwell and Animal Farm biographical context |
+| tfa_big | 4 | 1507 | 0.000 | Quotation marks and cited text transitions |
+| tfa_big | 5 | 11853 | 0.000 | French quotation marks and guillemets formatting |
+| tfa_big | 6 | 6635 | 0.000 | "George Orwell's political ideology and Stalin criticism" |
+| tfa_big | 7 | 14775 | 0.000 | Orwell's Animal Farm publication and composition |
+| tfa_big | 8 | 9295 | 0.000 | Acknowledgments and attributions in biographical prefaces |
