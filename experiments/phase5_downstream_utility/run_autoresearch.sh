@@ -88,6 +88,24 @@ BASE_OF[txcdr_t5_batchtopk]=txcdr_t5
 BASE_OF[mlc_batchtopk]=mlc
 BASE_OF[agentic_txc_02_batchtopk]=txcdr_t5_batchtopk
 BASE_OF[agentic_mlc_08_batchtopk]=mlc_batchtopk
+# Phase 5.7 BatchTopK extended scope (2026-04-23)
+BASE_OF[topk_sae_batchtopk]=topk_sae
+BASE_OF[matryoshka_t5_batchtopk]=matryoshka_t5
+BASE_OF[matryoshka_txcdr_contrastive_t5_alpha100_batchtopk]=matryoshka_t5_batchtopk
+BASE_OF[mlc_contrastive_batchtopk]=mlc_batchtopk
+BASE_OF[mlc_contrastive_alpha100_batchtopk]=mlc_batchtopk
+BASE_OF[time_layer_crosscoder_t5_batchtopk]=time_layer_crosscoder_t5
+BASE_OF[stacked_t5_batchtopk]=stacked_t5
+BASE_OF[stacked_t20_batchtopk]=stacked_t20
+BASE_OF[txcdr_t2_batchtopk]=txcdr_t2
+BASE_OF[txcdr_t3_batchtopk]=txcdr_t3
+BASE_OF[txcdr_t8_batchtopk]=txcdr_t8
+BASE_OF[txcdr_t10_batchtopk]=txcdr_t10
+BASE_OF[txcdr_t15_batchtopk]=txcdr_t15
+BASE_OF[txcdr_t20_batchtopk]=txcdr_t20
+BASE_OF[agentic_txc_02_t2_batchtopk]=agentic_txc_02_t2
+BASE_OF[agentic_txc_02_t3_batchtopk]=agentic_txc_02_t3
+BASE_OF[agentic_txc_02_t8_batchtopk]=agentic_txc_02_t8
 
 commit_and_push() {
     local msg="$1"; shift

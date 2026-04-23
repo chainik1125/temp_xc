@@ -387,6 +387,66 @@ def _load_model_for_run(run_id, ckpt_path, device):
             d_in, d_sae, n_layers=5, k=meta["k_pos"],
             gamma=meta.get("gamma", 0.5),
         ).to(device)
+    # ─── Phase 5.7 BatchTopK extended scope (2026-04-23) ───
+    elif arch == "topk_sae_batchtopk":
+        from src.architectures._batchtopk_variants import TopKSAEBatchTopK
+        model = TopKSAEBatchTopK(d_in, d_sae, k=meta["k_pos"]).to(device)
+    elif arch == "matryoshka_t5_batchtopk":
+        from src.architectures._batchtopk_variants import (
+            PositionMatryoshkaTXCDRBatchTopK,
+        )
+        T = meta["T"]
+        k_eff = meta["k_win"] or (meta["k_pos"] * T)
+        model = PositionMatryoshkaTXCDRBatchTopK(
+            d_in, d_sae, T, k_eff,
+        ).to(device)
+    elif arch == "matryoshka_txcdr_contrastive_t5_alpha100_batchtopk":
+        from src.architectures._batchtopk_variants import (
+            MatryoshkaTXCDRContrastiveBatchTopK,
+        )
+        T = meta["T"]
+        k_eff = meta["k_win"] or (meta["k_pos"] * T)
+        model = MatryoshkaTXCDRContrastiveBatchTopK(
+            d_in, d_sae, T, k_eff,
+        ).to(device)
+    elif arch in ("mlc_contrastive_batchtopk",
+                  "mlc_contrastive_alpha100_batchtopk"):
+        from src.architectures._batchtopk_variants import MLCContrastiveBatchTopK
+        model = MLCContrastiveBatchTopK(
+            d_in, d_sae, n_layers=5, k=meta["k_pos"],
+            h=meta.get("h", d_sae // 2),
+        ).to(device)
+    elif arch == "time_layer_crosscoder_t5_batchtopk":
+        from src.architectures._batchtopk_variants import TimeLayerCrosscoderBatchTopK
+        T = meta["T"]
+        L = meta.get("n_layers", 5)
+        d_sae_eff = meta.get("d_sae", d_sae)
+        k_total = meta["k_pos"] * T * L
+        model = TimeLayerCrosscoderBatchTopK(d_in, d_sae_eff, T, L, k_total).to(device)
+    elif arch in ("stacked_t5_batchtopk", "stacked_t20_batchtopk"):
+        from src.architectures._batchtopk_variants import StackedSAEBatchTopK
+        T = meta["T"]
+        model = StackedSAEBatchTopK(d_in, d_sae, T, k=meta["k_pos"]).to(device)
+    elif arch in ("txcdr_t2_batchtopk", "txcdr_t3_batchtopk",
+                  "txcdr_t8_batchtopk", "txcdr_t10_batchtopk",
+                  "txcdr_t15_batchtopk", "txcdr_t20_batchtopk"):
+        from src.architectures._batchtopk_variants import TemporalCrosscoderBatchTopK
+        T = meta["T"]
+        k_eff = meta["k_win"] or (meta["k_pos"] * T)
+        model = TemporalCrosscoderBatchTopK(d_in, d_sae, T, k_eff).to(device)
+    elif arch in ("agentic_txc_02_t2_batchtopk",
+                  "agentic_txc_02_t3_batchtopk",
+                  "agentic_txc_02_t8_batchtopk"):
+        from src.architectures._batchtopk_variants import (
+            MatryoshkaTXCDRContrastiveMultiscaleBatchTopK,
+        )
+        T = meta["T"]
+        k_eff = meta["k_win"] or (meta["k_pos"] * T)
+        model = MatryoshkaTXCDRContrastiveMultiscaleBatchTopK(
+            d_in, d_sae, T, k_eff,
+            n_contr_scales=meta.get("n_contr_scales", min(3, T)),
+            gamma=meta.get("gamma", 0.5),
+        ).to(device)
     elif arch in ("txcdr_contrastive_t5",
                   "txcdr_contrastive_t5_alpha003",
                   "txcdr_contrastive_t5_alpha100",
@@ -608,13 +668,15 @@ def _encode_for_probe(
         li = tc["test_last_idx"]
         mlc_tail = tc.get("mlc_tail_test")
 
-    if arch == "topk_sae":
+    if arch in ("topk_sae", "topk_sae_batchtopk"):
         return _encode_topk(model, anchor, li, device, aggregation)
     if arch in ("mlc", "mlc_contrastive",
                 "mlc_contrastive_alpha003",
                 "mlc_contrastive_alpha100",
                 "agentic_mlc_08",
                 "mlc_batchtopk",
+                "mlc_contrastive_batchtopk",
+                "mlc_contrastive_alpha100_batchtopk",
                 "agentic_mlc_08_batchtopk"):
         # mlc_contrastive has identical encode API — subclass of MLC.
         # last_position: use mlc (N, L, d) at last real token.
@@ -626,7 +688,11 @@ def _encode_for_probe(
                         "txcdr_contrastive_t5_alpha100",
                         "txcdr_contrastive_t5_k2x",
                         "txcdr_rotational_t5",
-                        "txcdr_basis_expansion_t5")):
+                        "txcdr_basis_expansion_t5",
+                        # BatchTopK extended-scope archs (2026-04-23)
+                        "txcdr_t2_batchtopk", "txcdr_t3_batchtopk",
+                        "txcdr_t8_batchtopk", "txcdr_t10_batchtopk",
+                        "txcdr_t15_batchtopk", "txcdr_t20_batchtopk")):
         T = meta["T"]
         return _encode_txcdr(model, anchor, li, T, device, aggregation)
     if arch == "txcdr_dynamics_t5":
@@ -678,7 +744,13 @@ def _encode_for_probe(
                 "agentic_txc_02_t10",
                 "agentic_txc_02_t15",
                 "agentic_txc_02_t20",
-                "agentic_txc_02_batchtopk"):
+                "agentic_txc_02_batchtopk",
+                # BatchTopK extended-scope (2026-04-23)
+                "matryoshka_t5_batchtopk",
+                "matryoshka_txcdr_contrastive_t5_alpha100_batchtopk",
+                "agentic_txc_02_t2_batchtopk",
+                "agentic_txc_02_t3_batchtopk",
+                "agentic_txc_02_t8_batchtopk"):
         T = meta["T"]
         return _encode_matryoshka(model, anchor, li, T, device, aggregation)
     if arch == "mlc_temporal_t3":
@@ -760,7 +832,8 @@ def _encode_for_probe(
             outs.append(Zb[:, -1, :].cpu().numpy())
         Z_last = np.concatenate(outs, axis=0)
         return Z_last.reshape(N, K * Z_last.shape[-1])
-    if arch in ("time_layer_crosscoder_t5", "time_layer_contrastive_t5"):
+    if arch in ("time_layer_crosscoder_t5", "time_layer_contrastive_t5",
+                "time_layer_crosscoder_t5_batchtopk"):
         T = meta["T"]
         L = meta.get("n_layers", 5)
         center_l = L // 2
@@ -1014,7 +1087,8 @@ def run_probing(
                          "mlc_batchtopk",
                          "agentic_mlc_08_batchtopk",
                          "time_layer_crosscoder_t5",
-                         "time_layer_contrastive_t5")
+                         "time_layer_contrastive_t5",
+                         "time_layer_crosscoder_t5_batchtopk")
                     and aggregation in mlc_tail_aggs):
                 # Both archs need the tail × multi-layer cache
                 # (acts_mlc_tail.npz) for full_window; mean_pool delegates

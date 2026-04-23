@@ -71,6 +71,20 @@ ORDERED_ARCHS = [
     # Phase 5.7 experiment (ii): BatchTopK apples-to-apples
     "txcdr_t5_batchtopk", "mlc_batchtopk",
     "agentic_txc_02_batchtopk", "agentic_mlc_08_batchtopk",
+    # Phase 5.7 BatchTopK extended scope (2026-04-23)
+    "topk_sae_batchtopk",
+    "matryoshka_t5_batchtopk",
+    "matryoshka_txcdr_contrastive_t5_alpha100_batchtopk",
+    "mlc_contrastive_batchtopk",
+    "mlc_contrastive_alpha100_batchtopk",
+    "time_layer_crosscoder_t5_batchtopk",
+    "stacked_t5_batchtopk", "stacked_t20_batchtopk",
+    "txcdr_t2_batchtopk", "txcdr_t3_batchtopk",
+    "txcdr_t8_batchtopk", "txcdr_t10_batchtopk",
+    "txcdr_t15_batchtopk", "txcdr_t20_batchtopk",
+    "agentic_txc_02_t2_batchtopk",
+    "agentic_txc_02_t3_batchtopk",
+    "agentic_txc_02_t8_batchtopk",
     # Phase 5.7 experiment (iii): T-sweep on agentic_txc_02
     "agentic_txc_02_t2", "agentic_txc_02_t3",
     "agentic_txc_02_t8", "agentic_txc_02_t10",

@@ -1292,6 +1292,164 @@ def run_all(seeds, max_steps, archs=None):
                             layer=13, n_layers=5, alpha=1.0, gamma=0.5,
                             sparsity="batchtopk",
                             variant="agentic_mlc_08_batchtopk")
+            # ─── Phase 5.7 BatchTopK extended scope (2026-04-23) ───
+            elif arch == "topk_sae_batchtopk":
+                from src.architectures._batchtopk_variants import TopKSAEBatchTopK
+                buf = get_anchor()
+                d_in = buf.shape[-1]
+                model = TopKSAEBatchTopK(d_in, DEFAULT_D_SAE, k=100).to(device)
+                gen = make_flat_gen_gpu(buf)
+                def norm(): model._normalize_decoder()
+                log = _iterate_train(model, gen, cfg, device, normalize_decoder=norm)
+                meta = dict(seed=seed, k_pos=100, k_win=None, T=1, layer=13,
+                            sparsity="batchtopk", variant="topk_sae_batchtopk")
+            elif arch == "matryoshka_t5_batchtopk":
+                from src.architectures._batchtopk_variants import (
+                    PositionMatryoshkaTXCDRBatchTopK,
+                )
+                buf = get_anchor()
+                d_in = buf.shape[-1]
+                model = PositionMatryoshkaTXCDRBatchTopK(
+                    d_in, DEFAULT_D_SAE, T=5, k=500,
+                ).to(device)
+                gen = make_window_gen_gpu(buf, T=5)
+                def norm(): model._normalize_decoder()
+                log = _iterate_train(model, gen, cfg, device, normalize_decoder=norm)
+                meta = dict(seed=seed, k_pos=100, k_win=500, T=5,
+                            match_budget=True, layer=13,
+                            sparsity="batchtopk", variant="matryoshka_t5_batchtopk")
+            elif arch == "matryoshka_txcdr_contrastive_t5_alpha100_batchtopk":
+                from src.architectures._batchtopk_variants import (
+                    MatryoshkaTXCDRContrastiveBatchTopK,
+                )
+                buf = get_anchor()
+                d_in = buf.shape[-1]
+                model = MatryoshkaTXCDRContrastiveBatchTopK(
+                    d_in, DEFAULT_D_SAE, T=5, k=500,
+                ).to(device)
+                pair_gen = make_pair_window_gen_gpu(buf, T=5)
+                def norm(): model._normalize_decoder()
+                # Wrap forward to pass alpha=1.0 (Part-B winner).
+                _fwd_orig = model.forward
+                def _alpha_fwd(x): return _fwd_orig(x, alpha=1.0)
+                model.forward = _alpha_fwd
+                log = _iterate_train(model, pair_gen, cfg, device, normalize_decoder=norm)
+                model.forward = _fwd_orig
+                meta = dict(seed=seed, k_pos=100, k_win=500, T=5,
+                            match_budget=True, layer=13, alpha=1.0,
+                            sparsity="batchtopk",
+                            variant="matryoshka_txcdr_contrastive_t5_alpha100_batchtopk")
+            elif arch == "mlc_contrastive_batchtopk":
+                from src.architectures._batchtopk_variants import MLCContrastiveBatchTopK
+                mlb = get_ml()
+                d_in = mlb.shape[-1]
+                model = MLCContrastiveBatchTopK(
+                    d_in, DEFAULT_D_SAE, n_layers=5, k=100,
+                ).to(device)
+                ml_pair_gen = make_pair_multilayer_gen_gpu(mlb)
+                def norm(): model._normalize_decoder()
+                log = _iterate_train(model, ml_pair_gen, cfg, device, normalize_decoder=norm)
+                meta = dict(seed=seed, k_pos=100, k_win=None, T=1,
+                            layer=13, n_layers=5, alpha=0.1,
+                            sparsity="batchtopk", variant="mlc_contrastive_batchtopk")
+            elif arch == "mlc_contrastive_alpha100_batchtopk":
+                from src.architectures._batchtopk_variants import MLCContrastiveBatchTopK
+                mlb = get_ml()
+                d_in = mlb.shape[-1]
+                model = MLCContrastiveBatchTopK(
+                    d_in, DEFAULT_D_SAE, n_layers=5, k=100,
+                ).to(device)
+                ml_pair_gen = make_pair_multilayer_gen_gpu(mlb)
+                def norm(): model._normalize_decoder()
+                _fwd_orig = model.forward
+                def _alpha_fwd(x): return _fwd_orig(x, alpha=1.0)
+                model.forward = _alpha_fwd
+                log = _iterate_train(model, ml_pair_gen, cfg, device, normalize_decoder=norm)
+                model.forward = _fwd_orig
+                meta = dict(seed=seed, k_pos=100, k_win=None, T=1,
+                            layer=13, n_layers=5, alpha=1.0,
+                            sparsity="batchtopk", variant="mlc_contrastive_alpha100_batchtopk")
+            elif arch == "time_layer_crosscoder_t5_batchtopk":
+                from src.architectures._batchtopk_variants import (
+                    TimeLayerCrosscoderBatchTopK,
+                )
+                mlb = get_ml()
+                d_in = mlb.shape[-1]
+                # Match the existing time_layer_crosscoder_t5 dispatcher's
+                # d_sae=8192 + window-multilayer pair gen (see run_probing.py).
+                d_sae_tl = 8192
+                k_total = 100 * 5 * 5  # k_pos * T * L — matches TopK variant
+                model = TimeLayerCrosscoderBatchTopK(
+                    d_in, d_sae_tl, T=5, L=5, k=k_total,
+                ).to(device)
+                tl_gen = make_pair_window_multilayer_gen_gpu(mlb, T=5)
+                # tl_gen yields (B, 2, T, L, d); base arch trains on first slice
+                def gen(bs):
+                    pair = tl_gen(bs)
+                    return pair[:, 0]  # (B, T, L, d)
+                def norm(): model._normalize_decoder()
+                log = _iterate_train(model, gen, cfg, device, normalize_decoder=norm)
+                meta = dict(seed=seed, k_pos=100, k_win=None, T=5,
+                            n_layers=5, d_sae=d_sae_tl, layer=13,
+                            sparsity="batchtopk", variant="time_layer_crosscoder_t5_batchtopk")
+            elif arch in ("stacked_t5_batchtopk", "stacked_t20_batchtopk"):
+                from src.architectures._batchtopk_variants import StackedSAEBatchTopK
+                T_s = int(arch.removeprefix("stacked_t").removesuffix("_batchtopk"))
+                buf = get_anchor()
+                d_in = buf.shape[-1]
+                model = StackedSAEBatchTopK(
+                    d_in, DEFAULT_D_SAE, T=T_s, k=100,
+                ).to(device)
+                gen = make_window_gen_gpu(buf, T=T_s)
+                def norm(): model._normalize_decoder()
+                log = _iterate_train(model, gen, cfg, device, normalize_decoder=norm)
+                meta = dict(seed=seed, k_pos=100, k_win=None, T=T_s, layer=13,
+                            sparsity="batchtopk", variant=arch)
+            elif arch in ("txcdr_t2_batchtopk", "txcdr_t3_batchtopk",
+                          "txcdr_t8_batchtopk", "txcdr_t10_batchtopk",
+                          "txcdr_t15_batchtopk", "txcdr_t20_batchtopk"):
+                from src.architectures._batchtopk_variants import (
+                    TemporalCrosscoderBatchTopK,
+                )
+                T_swp = int(arch.removeprefix("txcdr_t").removesuffix("_batchtopk"))
+                k_win = 100 * T_swp
+                buf = get_anchor()
+                d_in = buf.shape[-1]
+                model = TemporalCrosscoderBatchTopK(
+                    d_in, DEFAULT_D_SAE, T=T_swp, k=k_win,
+                ).to(device)
+                gen = make_window_gen_gpu(buf, T=T_swp)
+                def norm(): model._normalize_decoder()
+                log = _iterate_train(model, gen, cfg, device, normalize_decoder=norm)
+                meta = dict(seed=seed, k_pos=100, k_win=k_win, T=T_swp,
+                            match_budget=True, layer=13,
+                            sparsity="batchtopk", variant=arch)
+            elif arch in ("agentic_txc_02_t2_batchtopk",
+                          "agentic_txc_02_t3_batchtopk",
+                          "agentic_txc_02_t8_batchtopk"):
+                from src.architectures._batchtopk_variants import (
+                    MatryoshkaTXCDRContrastiveMultiscaleBatchTopK,
+                )
+                T_swp = int(arch.removeprefix("agentic_txc_02_t").removesuffix("_batchtopk"))
+                n_sc = min(3, T_swp)
+                k_win = 100 * T_swp
+                buf = get_anchor()
+                d_in = buf.shape[-1]
+                model = MatryoshkaTXCDRContrastiveMultiscaleBatchTopK(
+                    d_in, DEFAULT_D_SAE, T=T_swp, k=k_win,
+                    n_contr_scales=n_sc, gamma=0.5,
+                ).to(device)
+                pair_gen = make_pair_window_gen_gpu(buf, T=T_swp)
+                def norm(): model._normalize_decoder()
+                _fwd_orig = model.forward
+                def _alpha_fwd(x): return _fwd_orig(x, alpha=1.0)
+                model.forward = _alpha_fwd
+                log = _iterate_train(model, pair_gen, cfg, device, normalize_decoder=norm)
+                model.forward = _fwd_orig
+                meta = dict(seed=seed, k_pos=100, k_win=k_win, T=T_swp,
+                            match_budget=True, layer=13, alpha=1.0,
+                            n_contr_scales=n_sc, gamma=0.5,
+                            sparsity="batchtopk", variant=arch)
             elif arch in ("agentic_txc_02_t2", "agentic_txc_02_t3",
                           "agentic_txc_02_t8", "agentic_txc_02_t10",
                           "agentic_txc_02_t15", "agentic_txc_02_t20"):
