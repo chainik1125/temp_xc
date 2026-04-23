@@ -421,114 +421,186 @@ Docs (`docs/han/research_logs/phase6_qualitative_latents/`):
 - `2026-04-22-encoding-protocol.md` — per-arch encoding convention
 - `summary.md` (this document)
 
-### 9.5. Phase 6.1 update (2026-04-23) — BatchTopK is the lever
+### 9.5. Phase 6.1 update (2026-04-23) — rigorous metric reveals TXC-parity claim is curated-concat specific
 
-![agentic_txc_02_batchtopk top-8 on concat_B](../../../experiments/phase6_qualitative_latents/results/top_features/concat_B__agentic_txc_02_batchtopk__top8.png)
+**Status**: seed=42 data complete for all 9 Phase 6 archs across
+concat_A, concat_B, and a new `concat_random` (7 random FineWeb
+passages, 1792 tokens). Triangle seed-variance retrain (Cycle F,
+2×2 cell, tsae_paper at seeds {1, 2}) and probing regression are
+in flight. This section will be updated with mean ± stderr numbers
+once training completes; the seed=42 headline below is stable.
 
-**Figure 6.** `agentic_txc_02_batchtopk` (Cycle F champion) top-8
-features on concat_B — the same Figure-4-analogue layout as §5's
-plots. Clear passage-phase transitions: feature #1636 ("Historical
-references to Stalinist Soviet Union") peaks in the Animal Farm
-section; #17462 ("historical text with archaic or foreign
-characters") in Darwin + Animal Farm; #2424 ("Acknowledgments and
-attribution in written works") in Darwin; #15702 ("poetic and
-archaic English text passages") activates across the archaic
-passages and silences in math_q. 7 of 8 carry concept labels; only
-#1310 (punctuation) is non-semantic — better fit to the paper's
-Figure-4 qualitative claim than any Phase 6 arch.
+**Supersedes** the earlier §9.5 draft's 9-arch /8 hand-classified
+table. Those numbers stay in git history but are **not directly
+comparable** to the rigorous metric below (hand-class was stricter
+than Haiku; N=8 was noisier than N=32; default-temp Haiku labels
+drifted ±5 labels between reruns — see commit `9917297`).
 
+#### Metric upgrade
 
-See [[2026-04-23-agentic-log]] for full per-cycle detail. Headline:
-a 5-candidate agentic loop replaced `agentic_txc_02` as the Phase 6
-qualitative champion.
+Four changes to the Phase 6 pipeline, each motivated by a real
+weakness in the original N=8 x/N metric:
 
-**New autointerp table (sorted by semantic count):**
+1. **N=8 → N=32.** More features per arch, cleaner ranking. Still
+   "top by per-token variance" to mirror the paper's Figure-1/4
+   construction.
+2. **Haiku labeller temperature=0.** Phase 6.1's smoke-test Cycle F
+   concat_A scored 25/32 vs 20/32 on back-to-back reruns with
+   default temperature=1.0. Setting temp=0 makes the labels
+   deterministic and the metric reproducible (commit `9917297`).
+3. **Multi-judge auto-classification.** Hand-classifying labels as
+   SEMANTIC/SYNTACTIC was a single labeller with no inter-rater
+   check. Replaced with 2 Haiku judges using 2 different prompts
+   (shared rubric, pre-registered edge cases); disagreement
+   rate emitted as a diagnostic.
+4. **`concat_random` generalisation control.** 7 random FineWeb
+   passages (256 tokens each, P=7) as a third concat alongside
+   the hand-curated A (P=3) and B (P=4). Same top-by-variance +
+   autointerp pipeline; tests whether the curated-concat signal
+   generalises to uncurated text.
 
-| arch | sparsity | anti-dead stack | alive | /8 | verdict |
-|---|---|---|---|---|---|
-| **`agentic_txc_02_batchtopk`** | BatchTopK | none | **0.80** | **7** 🏆 | new champion, beats `tsae_paper` |
-| `tsae_paper` | BatchTopK | full | 0.73 | 6 | paper reference |
-| `tfa_big` | — | — | 1.00 | 6 | — |
-| `agentic_txc_10_bare` | TopK | full (AuxK + unit-norm + grad-⊥ + geom-med) | 0.62 | 6 | ties `tsae_paper`; no matryoshka/contrastive |
-| `agentic_mlc_08` | TopK | none | 0.13 | 5 | — |
-| `agentic_txc_11_stack` | BatchTopK | AuxK | 0.79 | 5 | stacking regresses |
-| `agentic_txc_09_auxk` | TopK | AuxK only | 0.37 | 3 | null effect |
-| `tsae_ours` | TopK | minimal | 0.42 | 3 | — |
-| `agentic_txc_02` | TopK | none | 0.37 | 2 | Phase 5.7 baseline |
+Secondary: a **passage-coverage diagnostic** (`k/P` + Shannon
+entropy of peak-passage distribution) reports where the top-N
+features fire. Not discriminative at P=3, 4 (all archs saturate
+at full coverage); useful at P=7.
 
-**Three main findings:**
+#### Headline (seed=42, N=32, temp=0, multi-judge)
 
-1. **BatchTopK sparsity is the single biggest lever** on TXC
-   qualitative (+5 labels, +0.43 alive vs `agentic_txc_02`). Variable
-   per-sample sparsity lets rare concept features fire on contexts
-   where they matter without displacing incumbents — matches
-   tsae_paper's alive fraction (actually beats it) with the same
-   matryoshka + multi-scale contrastive recipe that `agentic_txc_02`
-   already uses.
-2. **The anti-dead stack (unit-norm decoder + decoder-parallel grad
-   removal + geom-median `b_dec` init + AuxK) is an alternate path
-   that almost matches BatchTopK**: Track 2 at 6/8 on plain TopK.
-   Matryoshka + multi-scale contrastive is NOT load-bearing for
-   qualitative — only for Phase 5 probing AUC.
-3. **The two mechanism classes don't stack additively**: BatchTopK +
-   AuxK (Cycle H) regressed from 7/8 → 5/8. AuxK's residual
-   gradient promoted structural / format features into top-by-
-   variance slots.
+| arch | concat_A /32 | concat_B /32 | **concat_random /32** | random cov k/P |
+|---|---|---|---|---|
+| `agentic_txc_02` (baseline) | 17 | 16 | **0** | 7/7 |
+| `agentic_txc_02_batchtopk` (Cycle F) | 20 | 13 | **0** | 6/7 |
+| `agentic_txc_09_auxk` (Cycle A) | 21 | 13 | **0** | 7/7 |
+| `agentic_txc_11_stack` (Cycle H) | 21 | 12 | **0** | 7/7 |
+| **`agentic_txc_10_bare` (Track 2)** | 20 | **19** | **5** | 7/7 |
+| `agentic_mlc_08` | 18 | 18 | 2 | 4/7 |
+| `tsae_ours` | 17 | 19 | 3 | 6/7 |
+| `tfa_big` | 14 | 12 | **0** | **2/7** |
+| **`tsae_paper`** | **23** | 18 | **12** | 7/7 |
 
-**Paper-story reframe candidate:** sparsity is a one-knob trade-off.
-TopK favours sparse-probing AUC (Phase 5 `agentic_txc_02` at 0.80
-mean-pool); BatchTopK favours qualitative (`agentic_txc_02_batchtopk`
-at 7/8). Same dictionary, knob selects regime. Probing-side
-quantification for the BatchTopK variant is deferred (70 GB
-`probe_cache` on HF; Phase 5.7 experiment (ii) already established
-a regression but the precise test-AUC delta on this branch is
-unmeasured).
+#### Four findings that change the Phase 6 narrative
 
-**Follow-ups for a subsequent agent:**
+**(1) The curated-concat score does NOT generalise to uncurated text.**
+Every TXC variant that relies on BatchTopK, AuxK-only, or bare TopK
+collapses to 0/32 on `concat_random`. Their top-32 features are
+dominated by boundary-pattern labels ("Beginning of sentence with
+capitalized word", "Transition between document sections"). On
+curated concat_A/B, the same features fire on tokens that happen
+to start sentences in topical passages, picking up labels like
+"Poetry from the Bhagavad Gita" or "Animal Farm preface" — the
+apparent semantic content comes from the passage, not the feature.
 
-Biggest expected gains, ordered:
+**(2) The original §9.5 "Cycle F beats tsae_paper 7/8 vs 6/8" was
+a curated-concat + noisy-labeller artefact.** Under the rigorous
+metric, Cycle F is **behind** tsae_paper on every axis:
+- concat_A: 20 vs 23 (tsae_paper leads)
+- concat_B: 13 vs 18 (tsae_paper leads)
+- concat_random: **0 vs 12** (tsae_paper's gap widens dramatically)
 
-- **Seed variance on `agentic_txc_02_batchtopk`** (3 seeds). Phase 5.7
-  found that `agentic_txc_02`'s +0.0354 gain halved to +0.022 across
-  seeds — the 7/8 single-seed result may be similarly optimistic.
-  Cost: 3 × 35 min training + eval.
-- **Missing 2x2 cell: BatchTopK + full anti-dead stack**. We did
-  BatchTopK alone (Cycle F, 7/8) and full anti-dead alone (Track 2,
-  6/8). A *bare TXC + BatchTopK + full anti-dead stack* hasn't been
-  tested — might break past 7/8 if the mechanisms combine well
-  without Cycle H's matryoshka-related interference. One training
-  run (~30 min).
-- **Bump `min_steps` past the plateau-stop artefact**. Both Cycle F
-  and Cycle H converged at step 4000 / 25000. Full-length training
-  (`min_steps=8000` or 15000) might give the anti-dead mechanisms
-  more time to shape features. Cheap if Cycle F's trajectory is
-  already informative about where loss plateaus.
-- **Corpus-aware qualitative metric**. Top-8-by-variance is noisy
-  around punctuation and format features (e.g. MMLU answer
-  formatting in Cycle H was high-variance because MMLU questions
-  are clustered in concat_A). Filtering top-8 by "passage-
-  discriminative" (variance of mean activation across passages,
-  not across tokens) would suppress this class of confounder and
-  might reveal 8/8 on existing models.
-- **Sparse-probing regression quantification** on
-  `agentic_txc_02_batchtopk` — download `probe_cache` (70 GB,
-  `han1823123123/txcdr-data` HF dataset), run the Phase 5
-  `run_probing.py` at `last_position` + `mean_pool`, report Δ AUC
-  vs `agentic_txc_02`. Critical for the paper's trade-off claim.
-- **HF upload** of the 5 new ckpts (Cycle A, Track 2, Cycle F was
-  already up, Cycle H, + `agentic_txc_02_batchtopk` re-verified)
-  to `han1823123123/txcdr` so cross-pod reproduction is possible.
+**(3) Track 2 is the TXC-family's best generalising arch, reaching
+~40% of tsae_paper's random-concept count.** Track 2 = bare window
+TXC + full anti-dead stack (unit-norm decoder + decoder-parallel
+gradient removal + geometric-median `b_dec` init + AuxK loss). It
+produces real concept labels on random FineWeb ("color accuracy and
+display standards", "medical education accreditation", "geographic
+locations") that survive the judge. On concat_B it even edges
+tsae_paper (19 vs 18) and ties on concat_A (20 vs 23, within judge
+variance).
 
-Likely dead ends (from what we've already learned):
+**(4) `tfa_big` collapses on uncurated text too, with a distinctive
+coverage signature.** TFA reaches 100% alive, S=0.004 smoothness,
+and 14/32 + 12/32 on concat_A/B — but falls to **0/32 on random
+with coverage 2/7** (all top-32 features peak on just 2 of the 7
+passages). The attention-combined feature structure that gives TFA
+its smoothness + alive-fraction wins on curated passages apparently
+concentrates the per-token-variance signal on whichever 2 passages
+the features happen to correlate with, missing the rest. TFA's
+strengths aren't qualitative-robustness on uncurated text.
 
-- More AuxK on BatchTopK (Cycle H's regression).
-- Orthogonality penalty (Phase 5.7 Cycle 01 regressed; not expected
-  to help here either).
-- Hard negatives (Phase 5.7 Cycle 06 showed no benefit on top of
-  multi-scale at `B=1024`).
-- Feature-diversity Gram-matrix penalty (briefing flagged small
-  effect; Cycle 01's orth penalty is a close analogue that already
-  regressed).
+**Takeaway:** tsae_paper's specific recipe (Matryoshka H/L
+reconstruction + single-scale InfoNCE on adjacent tokens + BatchTopK
++ full anti-dead stack + threshold-based inference) is qualitatively
+robust in a way that neither our TXC variants nor TFA are. The
+anti-dead stack (Track 2) gets ~40% of the way; the remaining
+axes — matryoshka, contrastive, threshold inference — are untested
+on a TXC encoder base.
+
+#### Paper-narrative reframe
+
+The originally-drafted "BatchTopK is the single biggest lever"
+finding does NOT survive the rigorous metric. Nor does the "TXC
+family achieves qualitative parity with T-SAE and TFA" claim. The
+actual state of the project, 2026-04-23:
+
+- **Track 2 is the TXC-family best qualitative arch on uncurated
+  text.** It falls short of tsae_paper by ~7 labels at N=32 random,
+  but it proves the anti-dead stack transfers to the TXC encoder
+  base.
+- **Cycle F, Cycle A, Cycle H, and baseline all fail on uncurated
+  text.** BatchTopK alone, AuxK alone, BatchTopK+AuxK, and plain
+  matryoshka+contrastive all produce zero concept-level features
+  on random FineWeb. The earlier "BatchTopK is the lever" finding
+  was measuring how well BatchTopK's top-32 happen to fire on
+  passage-content tokens in the curated concat, not whether
+  BatchTopK produces concept features in general.
+- **The one-knob sparsity trade-off reframe is abandoned.** There's
+  no clean "sparsity axis" story: the axis that matters is the
+  anti-dead stack (Track 2 wins on random), not TopK vs BatchTopK.
+
+#### Sparse-probing regression (pending — from #3 Phase 6.1 follow-up)
+
+Downloaded 66 GB `probe_cache` from `han1823123123/txcdr-data`.
+Probing numbers for `agentic_txc_02_batchtopk` (Cycle F) and
+`agentic_txc_12_bare_batchtopk` (2×2 cell, new, training in
+progress) at both `last_position` and `mean_pool` vs the
+`agentic_txc_02` 3-seed mean (last_pos 0.7749 ± 0.0038, mean_pool
+0.7987 ± 0.0020) will appear here when the post-training pipeline
+completes. Target: Δ AUC ≤ 0.02 for the "TXC retains probing
+utility" half of the (now softened) claim.
+
+#### Figure for Track 2 on concat_B (preliminary)
+
+Figure 6 in the git-history version of this section showed Cycle F's
+top-8 on concat_B with Animal Farm / Darwin / archaic labels and
+implied parity with tsae_paper. Under the rigorous metric those
+features still cluster on archaic/historical content, but the
+random-concat test shows they're not as general as they looked. A
+better Figure 6 candidate for this section is **Track 2's top-8 on
+concat_B** (19/32 semantic at N=32; we pick top-8 for plot
+readability) — it's the TXC arch whose features hold up best under
+the rigorous metric. Re-generating the plot is a small follow-up.
+
+#### Follow-ups
+
+**Pending from Phase 6.1 itself (in flight, see
+[[2026-04-23-handover-post-compact]]):**
+- Triangle seed-variance for Cycle F + tsae_paper + 2×2 cell at
+  seeds {1, 2}. Will tighten the single-seed numbers in the table.
+- 2×2 cell (`agentic_txc_12_bare_batchtopk`) — new arch, training
+  mid-pipeline. Tests whether BatchTopK + full anti-dead stack
+  (instead of just AuxK) generalises to random. Expected from the
+  Phase 6.1 data: if 2×2 cell ≈ Track 2's 5/32 random, anti-dead
+  stack is the lever (not BatchTopK); if ≈ Cycle H's 0/32, BatchTopK
+  interferes with the anti-dead stack.
+- Sparse-probing regression on Cycle F + 2×2 cell (see preceding
+  subsection).
+
+**New in Phase 6.2 — autoresearch toward the remaining gap** (see
+[[../phase6_2_autoresearch/brief]]):
+- 6-cycle loop seeded by Track 2 baseline, toggling the remaining
+  tsae_paper axes (matryoshka, contrastive, threshold inference,
+  training duration). Fitness = `concat_random x/32`. Target: TXC
+  arch with ≥ 10/32 random while preserving probing utility.
+- C3 (full tsae_paper recipe on TXC base, i.e. Track 2 + matryoshka +
+  InfoNCE contrastive) is the highest-prior candidate to implement
+  and run.
+
+**Known dead ends** (from Phase 6.1's own data):
+- More AuxK on BatchTopK → Cycle H's 0/32 on random.
+- Cycle F's matryoshka + multi-scale contrastive + BatchTopK → 0/32
+  on random. Adding mechanisms on top didn't help.
+- TFA's attention combination → 0/32 + coverage-2/7 on random.
+  Architectural path to robustness, but not via a simple tweak.
 
 ### 10. Reproduction
 
