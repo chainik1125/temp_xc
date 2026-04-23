@@ -11,10 +11,11 @@ tags:
 **Audience**: post-compact agent. Previous agent ran out of context
 mid-stream.
 
-**Timeline**: **NeurIPS submission in ~2 weeks.** This deadline is load-
-bearing for every decision below.
+**Scope**: one continuous session. Finish Part A first (foundation),
+then Part B (the research push). Both before you hand back — don't
+stop half-done.
 
-**State at handover**: `han` branch at commit `6454cff`. Extended
+**State at handover**: `han` branch at commit `75d90ad`. Extended
 BatchTopK pipeline is **still probing mean_pool** (17-arch extension).
 Monitor via `tail logs/overnight/probe_batchtopk_extend_mean_pool.log`.
 
@@ -22,20 +23,20 @@ Monitor via `tail logs/overnight/probe_batchtopk_extend_mean_pool.log`.
 
 ## Overview — two parts, in order
 
-**Part A (Week 1, ~3-4 days)**: finish the open session items that
-leave us with a complete, reviewer-defensible Phase 5.7 bench. These
-are not research — they're mechanical follow-throughs on experiments
-(i)-(iv) that were started but not closed.
+**Part A**: finish the open session items that leave us with a
+complete, reviewer-defensible Phase 5.7 bench. These are not research
+— they're mechanical follow-throughs on experiments (i)-(iv) that
+were started but not closed.
 
-**Part B (Week 2, ~7-10 days)**: find a TXC architecture whose
-downstream-probing AUC scales monotonically with T under the **fixed**
-evaluation protocol. Paper's central claim hinges on this. If no arch
-scales with T, the paper pivots to headlining MLC instead of TXC.
+**Part B**: find a TXC architecture whose downstream-probing AUC
+scales monotonically with T under the **fixed** evaluation protocol.
+Paper's central claim hinges on this. If no arch scales with T, the
+paper pivots to headlining MLC instead of TXC.
 
-**Do Part A first.** Part A is what makes the paper submittable at all;
-Part B is what makes the paper's TXC headline defensible. Without
-Part A the submission is incomplete; without Part B the submission
-is weak-but-complete (MLC pivot).
+**Do Part A first.** Part A is what makes the paper submittable at
+all; Part B is what makes the paper's TXC headline defensible.
+Without Part A the submission is incomplete; without Part B the
+submission is weak-but-complete (MLC pivot).
 
 ---
 
@@ -90,7 +91,7 @@ Do **not** mix these. A reviewer will notice and reject.
 
 ---
 
-## Part A — finish outstanding session items (Week 1)
+## Part A — finish outstanding session items
 
 ### A1. Concat-latent probing (experiment iv step 5)
 
@@ -216,7 +217,7 @@ Commit per step. HF sync is idempotent (skip-by-hash).
 
 ---
 
-## Part B — T-scaling architecture autoresearch (Week 2)
+## Part B — T-scaling architecture autoresearch
 
 ### The mission
 
@@ -242,8 +243,10 @@ If both hit, that's the submission headline.
 
 ### Cycle budget
 
-~2 hr per candidate (5 T × 25 min + 5 min probe), aim for 8-10 cycles
-in Week 2 = ~20-30 hr wall-clock.
+~2 hr per candidate (5 T × 25 min + 5 min probe). Run 8-10 cycles in
+sequence. Each cycle is self-contained (write arch → train → probe →
+score → log → commit). Don't parallelize cycles — serialize so each
+result informs the next.
 
 ### Hypotheses (architectural changes only, NOT probe changes)
 
@@ -399,12 +402,15 @@ acknowledged limitations. None require Part B to resolve.
 
 ## Bottom line
 
-**Week 1**: finish Part A. The bench becomes reviewer-defensible
-(seed variance, full BatchTopK Δ table, concat-probe, consolidated
-T-sweep). Submission is now possible at a minimum as the MLC story.
+Finish Part A first — the bench becomes reviewer-defensible (seed
+variance, full BatchTopK Δ table, concat-probe, consolidated
+T-sweep). Then Part B autoresearch until monotonicity ≥ 0.8 with
+Δ(30-5) > 0.02 hits, or the hypothesis pool is exhausted.
 
-**Week 2**: Part B autoresearch. If any hypothesis hits monotonicity
-≥ 0.8 with Δ(30-5) > 0.02, the paper headlines TXC. If not, pivot
-to MLC and submit honestly.
+- **If Part B finds a T-scaling arch**: paper headlines TXC.
+- **If Part B exhausts without a hit**: paper pivots to the MLC story
+  and submits honestly.
 
 **The evaluation protocol is the protocol. Architectural changes only.**
+
+One continuous session. Don't stop between parts.
