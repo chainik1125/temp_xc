@@ -1,0 +1,83 @@
+{
+  "summary": {
+    "family": "topk",
+    "nmse": 0.1372677981853485,
+    "explained_variance": 0.8181475400924683,
+    "l0_mean": 63.975390625,
+    "n_samples": 5120,
+    "loss_recovered": {
+      "ce_clean": 8.03203125,
+      "ce_zero": 12.4375,
+      "ce_patched": 8.0734375,
+      "loss_recovered": 0.9906011701954298
+    }
+  },
+  "category": {
+    "bracket_depth": {
+      "0\u20130": {
+        "n": 3794,
+        "nmse": 0.1265999674797058
+      },
+      "1\u20131": {
+        "n": 1102,
+        "nmse": 0.16675636172294617
+      },
+      "2\u20132": {
+        "n": 193,
+        "nmse": 0.17558054625988007
+      },
+      "\u22653": {
+        "n": 31,
+        "nmse": 0.1560792624950409
+      }
+    },
+    "indent_spaces": {
+      "0\u20133": {
+        "n": 1001,
+        "nmse": 0.03184352442622185
+      },
+      "4\u20137": {
+        "n": 2168,
+        "nmse": 0.1642175018787384
+      },
+      "8\u201311": {
+        "n": 155,
+        "nmse": 0.15690337121486664
+      },
+      "\u226512": {
+        "n": 1796,
+        "nmse": 0.16179971396923065
+      }
+    },
+    "scope_kind": {
+      "module": {
+        "n": 25,
+        "nmse": 0.05492044612765312
+      },
+      "function_body": {
+        "n": 2873,
+        "nmse": 0.15386469662189484
+      },
+      "comprehension": {
+        "n": 105,
+        "nmse": 0.16991497576236725
+      },
+      "string_literal": {
+        "n": 1199,
+        "nmse": 0.17408274114131927
+      },
+      "comment": {
+        "n": 154,
+        "nmse": 0.18334908783435822
+      }
+    }
+  },
+  "umap": {
+    "emb_shape": [
+      4000,
+      2
+    ],
+    "path_scope": "/root/temp_xc_cb/experiments/code_benchmark/plots/coarse_umap_topk_sae_scope.png",
+    "path_depth": "/root/temp_xc_cb/experiments/code_benchmark/plots/coarse_umap_topk_sae_depth.png"
+  }
+}

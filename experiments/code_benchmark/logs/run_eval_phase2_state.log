@@ -1,0 +1,11 @@
+<unknown>:29: SyntaxWarning: invalid escape sequence '\h'
+<unknown>:31: SyntaxWarning: invalid escape sequence '\h'
+<unknown>:61: SyntaxWarning: invalid escape sequence '\h'
+<unknown>:63: SyntaxWarning: invalid escape sequence '\e'
+<unknown>:15: SyntaxWarning: invalid escape sequence '\s'
+<unknown>:19: SyntaxWarning: invalid escape sequence '\*'
+<unknown>:25: SyntaxWarning: invalid escape sequence '\*'
+[phase2] topk_sae: overall={'bracket_depth': {'metric': 'r2', 'value': 0.6707841157913208, 'n_train': 16621, 'n_test': 4161}, 'indent_spaces': {'metric': 'r2', 'value': 0.11848390102386475, 'n_train': 16621, 'n_test': 4161}, 'scope_nesting': {'metric': 'r2', 'value': 0.22054404020309448, 'n_train': 16621, 'n_test': 4161}, 'distance_to_header': {'metric': 'r2', 'value': 0.3145636320114136, 'n_train': 16487, 'n_test': 4140}, 'scope_kind': {'metric': 'auc', 'value': 0.9932254493480365, 'n_train': 16621, 'n_test': 4161}, 'has_await': {'metric': 'auc', 'value': 0.9998968292179655, 'n_train': 16621, 'n_test': 4161}}
+[phase2] txc_t5: overall={'bracket_depth': {'metric': 'r2', 'value': 0.7884376645088196, 'n_train': 16537, 'n_test': 3465}, 'indent_spaces': {'metric': 'r2', 'value': 0.5274972915649414, 'n_train': 16537, 'n_test': 3465}, 'scope_nesting': {'metric': 'r2', 'value': 0.5504339337348938, 'n_train': 16537, 'n_test': 3465}, 'distance_to_header': {'metric': 'r2', 'value': 0.6951278448104858, 'n_train': 16498, 'n_test': 3451}, 'scope_kind': {'metric': 'auc', 'value': 0.9245832662733408, 'n_train': 16537, 'n_test': 3465}, 'has_await': {'metric': 'auc', 'value': 0.998976693038458, 'n_train': 16537, 'n_test': 3465}}
+[phase2] mlc_l5: overall={'bracket_depth': {'metric': 'r2', 'value': 0.7636489272117615, 'n_train': 16621, 'n_test': 4161}, 'indent_spaces': {'metric': 'r2', 'value': 0.4841683506965637, 'n_train': 16621, 'n_test': 4161}, 'scope_nesting': {'metric': 'r2', 'value': 0.48288828134536743, 'n_train': 16621, 'n_test': 4161}, 'distance_to_header': {'metric': 'r2', 'value': 0.6029651165008545, 'n_train': 16487, 'n_test': 4140}, 'scope_kind': {'metric': 'auc', 'value': 0.9931496701371192, 'n_train': 16621, 'n_test': 4161}, 'has_await': {'metric': 'auc', 'value': 1.0, 'n_train': 16621, 'n_test': 4161}}
+[phase2] done

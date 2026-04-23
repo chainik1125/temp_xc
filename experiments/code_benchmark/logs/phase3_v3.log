@@ -1,0 +1,14 @@
+WARNING:root:You tried to specify center_unembed=True for a model using logit softcap, but this can't be done! Softcapping is not invariant upon adding a constant Setting center_unembed=False instead.
+Loading weights:   0%|          | 0/288 [00:00<?, ?it/s]Loading weights:   3%|▎         | 10/288 [00:00<00:02, 96.28it/s]Loading weights:   7%|▋         | 20/288 [00:00<00:02, 91.19it/s]Loading weights:  14%|█▍        | 40/288 [00:00<00:02, 120.44it/s]Loading weights:  23%|██▎       | 67/288 [00:00<00:01, 167.64it/s]Loading weights:  29%|██▉       | 84/288 [00:00<00:01, 160.79it/s]Loading weights:  35%|███▌      | 101/288 [00:00<00:01, 123.61it/s]Loading weights:  41%|████▏     | 119/288 [00:00<00:01, 132.86it/s]Loading weights:  47%|████▋     | 134/288 [00:00<00:01, 136.47it/s]Loading weights:  52%|█████▏    | 149/288 [00:01<00:01, 115.20it/s]Loading weights:  56%|█████▋    | 162/288 [00:01<00:01, 95.39it/s] Loading weights:  64%|██████▍   | 185/288 [00:01<00:00, 114.77it/s]Loading weights:  72%|███████▏  | 207/288 [00:01<00:00, 125.90it/s]Loading weights:  77%|███████▋  | 223/288 [00:01<00:00, 129.66it/s]Loading weights:  84%|████████▎ | 241/288 [00:01<00:00, 131.81it/s]Loading weights:  89%|████████▉ | 257/288 [00:02<00:00, 134.19it/s]Loading weights: 100%|██████████| 288/288 [00:02<00:00, 136.52it/s]
+WARNING:root:With reduced precision, it is advised to use `from_pretrained_no_processing` instead of `from_pretrained`.
+Loaded pretrained model google/gemma-2-2b-it into HookedTransformer
+[phase3] lm ready, eval_chunks=100, anchor_hook=blocks.12.hook_resid_post
+[phase3] clean-forward batch 0/100
+[phase3] clean-forward batch 20/100
+[phase3] clean-forward batch 40/100
+[phase3] clean-forward batch 60/100
+[phase3] clean-forward batch 80/100
+[phase3] topk_sae: mean KL 0.1530, per-bin [0.10218038409948349, 0.20822380483150482, 0.17222218215465546, 0.12688978016376495]
+[phase3] txc_t5: mean KL 0.7855, per-bin [0.35678088665008545, 1.044925332069397, 0.9470455050468445, 0.7751935720443726]
+[phase3] mlc_l5: mean KL 0.2117, per-bin [0.1336585432291031, 0.2906128466129303, 0.23777993023395538, 0.18017344176769257]
+[phase3] done

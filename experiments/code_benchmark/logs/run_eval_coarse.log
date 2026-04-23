@@ -1,0 +1,30 @@
+/root/temp_xc_cb/.venv/lib/python3.12/site-packages/umap/umap_.py:1952: UserWarning: n_jobs value 1 overridden to 1 by setting random_state. Use no seed for parallelism.
+  warn(
+WARNING:root:You tried to specify center_unembed=True for a model using logit softcap, but this can't be done! Softcapping is not invariant upon adding a constant Setting center_unembed=False instead.
+[eval_coarse] device=cuda
+[eval_coarse] eval chunks: 40, T=128
+[eval_coarse] topk_sae family=topk
+Loading weights:   0%|          | 0/288 [00:00<?, ?it/s]Loading weights: 100%|██████████| 288/288 [00:00<00:00, 9108.01it/s]
+WARNING:root:With reduced precision, it is advised to use `from_pretrained_no_processing` instead of `from_pretrained`.
+/root/temp_xc_cb/.venv/lib/python3.12/site-packages/umap/umap_.py:1952: UserWarning: n_jobs value 1 overridden to 1 by setting random_state. Use no seed for parallelism.
+  warn(
+WARNING:root:You tried to specify center_unembed=True for a model using logit softcap, but this can't be done! Softcapping is not invariant upon adding a constant Setting center_unembed=False instead.
+Loaded pretrained model google/gemma-2-2b-it into HookedTransformer
+[eval_coarse] topk_sae loss_recovered = 0.9906 (CE clean=8.032 zero=12.438 patched=8.073)
+[eval_coarse] topk_sae: NMSE=0.1373 evar=0.8181 L0=63.98
+[eval_coarse] txc_t5 family=txc
+Loading weights:   0%|          | 0/288 [00:00<?, ?it/s]Loading weights: 100%|██████████| 288/288 [00:00<00:00, 9590.33it/s]
+WARNING:root:With reduced precision, it is advised to use `from_pretrained_no_processing` instead of `from_pretrained`.
+/root/temp_xc_cb/.venv/lib/python3.12/site-packages/umap/umap_.py:1952: UserWarning: n_jobs value 1 overridden to 1 by setting random_state. Use no seed for parallelism.
+  warn(
+WARNING:root:You tried to specify center_unembed=True for a model using logit softcap, but this can't be done! Softcapping is not invariant upon adding a constant Setting center_unembed=False instead.
+Loaded pretrained model google/gemma-2-2b-it into HookedTransformer
+[eval_coarse] txc_t5 loss_recovered = 0.8555 (CE clean=8.032 zero=12.438 patched=8.669)
+[eval_coarse] txc_t5: NMSE=0.2271 evar=0.6980 L0=63.12
+[eval_coarse] mlc_l5 family=mlxc
+Loading weights:   0%|          | 0/288 [00:00<?, ?it/s]Loading weights: 100%|██████████| 288/288 [00:00<00:00, 9160.79it/s]
+WARNING:root:With reduced precision, it is advised to use `from_pretrained_no_processing` instead of `from_pretrained`.
+Loaded pretrained model google/gemma-2-2b-it into HookedTransformer
+[eval_coarse] mlc_l5 loss_recovered = 0.9750 (CE clean=8.032 zero=12.438 patched=8.142)
+[eval_coarse] mlc_l5: NMSE=0.1689 evar=0.7760 L0=63.73
+[eval_coarse] done → /root/temp_xc_cb/experiments/code_benchmark/results/coarse_summary.json

@@ -1,0 +1,11 @@
+2026-04-23T08:37:47Z watcher started (pid=2226)
+2026-04-23T09:19:47Z all 3 checkpoints present — proceeding to evals
+2026-04-23T09:19:47Z starting run_eval_coarse.py --with-lm
+2026-04-23T09:40:00Z completed run_eval_coarse.py
+2026-04-23T09:40:00Z starting run_eval_phase1_spread.py 
+2026-04-23T10:14:34Z completed run_eval_phase1_spread.py
+2026-04-23T10:14:34Z starting run_eval_phase2_state.py 
+2026-04-23T10:17:29Z FAILED run_eval_phase2_state.py (exit 1)
+2026-04-23T10:17:29Z starting run_eval_phase3_kl.py 
+2026-04-23T10:19:01Z FAILED run_eval_phase3_kl.py (exit 1)
+2026-04-23T10:19:01Z PIPELINE COMPLETE

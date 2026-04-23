@@ -1,0 +1,148 @@
+{
+  "overall": {
+    "bracket_depth": {
+      "metric": "r2",
+      "value": 0.7636489272117615,
+      "n_train": 16621,
+      "n_test": 4161
+    },
+    "indent_spaces": {
+      "metric": "r2",
+      "value": 0.4841683506965637,
+      "n_train": 16621,
+      "n_test": 4161
+    },
+    "scope_nesting": {
+      "metric": "r2",
+      "value": 0.48288828134536743,
+      "n_train": 16621,
+      "n_test": 4161
+    },
+    "distance_to_header": {
+      "metric": "r2",
+      "value": 0.6029651165008545,
+      "n_train": 16487,
+      "n_test": 4140
+    },
+    "scope_kind": {
+      "metric": "auc",
+      "value": 0.9931496701371192,
+      "n_train": 16621,
+      "n_test": 4161
+    },
+    "has_await": {
+      "metric": "auc",
+      "value": 1.0,
+      "n_train": 16621,
+      "n_test": 4161
+    }
+  },
+  "stratified": {
+    "bracket_depth": {
+      "bucket_0": {
+        "bracket_depth": {
+          "metric": "r2",
+          "value": 1.0,
+          "n_train": 11421,
+          "n_test": 2875
+        },
+        "indent_spaces": {
+          "metric": "r2",
+          "value": 0.4700419306755066,
+          "n_train": 11421,
+          "n_test": 2875
+        },
+        "scope_nesting": {
+          "metric": "r2",
+          "value": 0.31821274757385254,
+          "n_train": 11421,
+          "n_test": 2875
+        },
+        "distance_to_header": {
+          "metric": "r2",
+          "value": 0.520653247833252,
+          "n_train": 11287,
+          "n_test": 2854
+        }
+      },
+      "bucket_1": {
+        "bracket_depth": {
+          "metric": "r2",
+          "value": 1.0,
+          "n_train": 4136,
+          "n_test": 987
+        },
+        "indent_spaces": {
+          "metric": "r2",
+          "value": -0.6329691410064697,
+          "n_train": 4136,
+          "n_test": 987
+        },
+        "scope_nesting": {
+          "metric": "r2",
+          "value": -0.32625842094421387,
+          "n_train": 4136,
+          "n_test": 987
+        },
+        "distance_to_header": {
+          "metric": "r2",
+          "value": 0.06659752130508423,
+          "n_train": 4136,
+          "n_test": 987
+        }
+      },
+      "bucket_2": {
+        "bracket_depth": {
+          "metric": "r2",
+          "value": 1.0,
+          "n_train": 845,
+          "n_test": 232
+        },
+        "indent_spaces": {
+          "metric": "r2",
+          "value": -13998.177734375,
+          "n_train": 845,
+          "n_test": 232
+        },
+        "scope_nesting": {
+          "metric": "r2",
+          "value": -4650.3095703125,
+          "n_train": 845,
+          "n_test": 232
+        },
+        "distance_to_header": {
+          "metric": "r2",
+          "value": -196461.203125,
+          "n_train": 845,
+          "n_test": 232
+        }
+      },
+      "bucket_3": {
+        "bracket_depth": {
+          "metric": "r2",
+          "value": -465.531005859375,
+          "n_train": 219,
+          "n_test": 67
+        },
+        "indent_spaces": {
+          "metric": "r2",
+          "value": -157.55706787109375,
+          "n_train": 219,
+          "n_test": 67
+        },
+        "scope_nesting": {
+          "metric": "r2",
+          "value": -95.22486114501953,
+          "n_train": 219,
+          "n_test": 67
+        },
+        "distance_to_header": {
+          "metric": "r2",
+          "value": -34.62228775024414,
+          "n_train": 219,
+          "n_test": 67
+        }
+      }
+    }
+  }
+}

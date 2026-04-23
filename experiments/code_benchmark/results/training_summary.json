@@ -1,0 +1,69 @@
+{
+  "runs": [
+    {
+      "name": "topk_sae",
+      "family": "topk",
+      "d_sae": 16384,
+      "k_total": 64,
+      "T": null,
+      "L": null,
+      "steps": 20000,
+      "batch_size": 1024,
+      "lr": 0.0003,
+      "n_train_samples": 470912,
+      "training_tokens": 482213888,
+      "final_loss": 2390.75634765625,
+      "best_loss": 2208.9150390625,
+      "elapsed_sec": 667.8
+    },
+    {
+      "name": "txc_t5",
+      "family": "txc",
+      "d_sae": 16384,
+      "k_total": 64,
+      "T": 5,
+      "L": null,
+      "steps": 20000,
+      "batch_size": 512,
+      "lr": 0.0003,
+      "n_train_samples": 456196,
+      "training_tokens": 233572352,
+      "final_loss": 4437.33447265625,
+      "best_loss": 3937.567626953125,
+      "elapsed_sec": 1001.1
+    },
+    {
+      "name": "mlc_l5",
+      "family": "mlxc",
+      "d_sae": 16384,
+      "k_total": 64,
+      "T": null,
+      "L": 5,
+      "steps": 20000,
+      "batch_size": 512,
+      "lr": 0.0003,
+      "n_train_samples": 470912,
+      "training_tokens": 241106944,
+      "final_loss": 3440.440673828125,
+      "best_loss": 3220.517578125,
+      "elapsed_sec": 1001.0
+    }
+  ],
+  "manifest": {
+    "n_chunks": 4088,
+    "chunk_tokens": 128,
+    "layers": [
+      10,
+      11,
+      12,
+      13,
+      14
+    ],
+    "subject_model": "google/gemma-2-2b-it",
+    "dtype": "bfloat16",
+    "d_model": 2304,
+    "train_eval_split": 0.9,
+    "seed": 42
+  },
+  "seed": 42
+}

@@ -1,0 +1,35 @@
+{
+  "topk_sae": {
+    "n_positions": 263,
+    "beta_norm": 1.468048725607758,
+    "mean_p_ref": 0.4124693443853461,
+    "mean_p_target": 0.39318468712339055,
+    "mean_p_random": 0.41066263654771257,
+    "mean_drop_target": 0.01928465726195558,
+    "mean_drop_random": 0.001806707837633502,
+    "mean_excess_drop": 0.017477949424322074,
+    "median_excess_drop": 0.001515805721282959
+  },
+  "txc_t5": {
+    "n_positions": 259,
+    "beta_norm": 0.6255238964649398,
+    "mean_p_ref": 0.4107702768876747,
+    "mean_p_target": 0.3805147453242939,
+    "mean_p_random": 0.39825699080604215,
+    "mean_drop_target": 0.03025553156338079,
+    "mean_drop_random": 0.012513286081632524,
+    "mean_excess_drop": 0.017742245481748263,
+    "median_excess_drop": 0.00027745718640896167
+  },
+  "mlc_l5": {
+    "n_positions": 263,
+    "beta_norm": 0.46663975925349377,
+    "mean_p_ref": 0.41245799482000267,
+    "mean_p_target": 0.3584278157650105,
+    "mean_p_random": 0.4043298735689006,
+    "mean_drop_target": 0.0540301790549922,
+    "mean_drop_random": 0.00812812125110205,
+    "mean_excess_drop": 0.04590205780389016,
+    "median_excess_drop": 0.007830776274204254
+  }
+}

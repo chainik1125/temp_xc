@@ -1,0 +1,127 @@
+experiment_name: code_benchmark
+description: |
+  Compare TXC (temporal crosscoder) vs MLC (multi-layer crosscoder) vs TopK SAE
+  baseline on Gemma-2B-it residual-stream activations over Python code.
+
+  Pipeline:
+    1. Activation extraction: Gemma-2B-it, anchor layer 12 (TXC/SAE) and
+       layers 10-14 (MLC), on Python functions from
+       bigcode/python-stack-v1-functions-filtered (fallback: codeparrot-clean).
+    2. Train all three architectures with matched d_sae / k_total / tokens.
+    3. Coarse eval: loss curves, labelled UMAP, loss-recovered, per-category
+       segmentation (scope kind, bracket depth, indentation).
+    4. Targeted evals: attribution spread, program-state probes, LM-KL fidelity.
+
+seed: 42
+device: auto         # "auto" | "cuda" | "cpu"
+dtype: bfloat16      # activation extraction dtype
+
+# -------------------------------------------------------------------
+# Subject LM and dataset
+# -------------------------------------------------------------------
+subject_model:
+  name: google/gemma-2-2b-it
+  anchor_layer: 12
+  mlc_layers: [10, 11, 12, 13, 14]
+  d_model: 2304                    # Gemma-2-2B residual dim
+
+dataset:
+  name: bigcode/python-stack-v1-functions-filtered
+  fallback_name: codeparrot/codeparrot-clean-valid
+  split: train
+  streaming: true
+  max_functions: 2000              # cap for first run (scales cache to ~12 GB)
+  min_tokens: 32
+  max_tokens: 512
+  chunk_tokens: 128                # window passed through LM
+  stride_tokens: 64
+  filter_ast_parse: true
+  train_eval_split: 0.9
+  seed: 42
+
+# -------------------------------------------------------------------
+# Architectures
+# -------------------------------------------------------------------
+architectures:
+  - name: topk_sae
+    family: topk
+    kwargs:
+      d_sae: 16384
+      k: 64
+      steps: 20000
+      batch_size: 1024
+      lr: 3.0e-4
+
+  - name: txc_t5
+    family: txc
+    kwargs:
+      d_sae: 16384
+      T: 5
+      k_total: 64
+      steps: 20000
+      batch_size: 512
+      lr: 3.0e-4
+
+  - name: mlc_l5
+    family: mlxc
+    kwargs:
+      d_sae: 16384
+      L: 5
+      k_total: 64
+      steps: 20000
+      batch_size: 512
+      lr: 3.0e-4
+
+# -------------------------------------------------------------------
+# Coarse evaluation (Pass 1)
+# -------------------------------------------------------------------
+coarse_eval:
+  n_eval_windows: 5000
+  umap:
+    n_neighbors: 25
+    min_dist: 0.1
+    n_components: 2
+    metric: cosine
+  loss_recovered:
+    n_sequences: 500
+  category_buckets:
+    bracket_depth: [0, 1, 2, 3]       # last bin = "≥3"
+    indent_spaces: [0, 4, 8, 12]      # last bin = "≥12"
+    scope_kinds:
+      - module
+      - function_body
+      - class_body
+      - comprehension
+      - lambda
+      - string_literal
+      - f_string_expr
+      - comment
+      - other
+
+# -------------------------------------------------------------------
+# Targeted evals (Passes 2-4)
+# -------------------------------------------------------------------
+phase1_spread:
+  ig_steps: 20                        # integrated-gradients steps
+  n_samples: 2000
+  top_features: 512                   # rank by activation mass
+
+phase2_state:
+  n_train_windows: 20000
+  n_eval_windows: 5000
+  ridge_lambda: 1.0e-3
+  stratify_by: [bracket_depth, scope_nesting, distance_to_header]
+
+phase3_kl:
+  n_sequences: 100                    # start small to validate; scale after
+  surprisal_delta:
+    short_context_len: 4              # for H(x_{t+1} | x_{t-3:t})
+  quantile_bins: [0.0, 0.25, 0.5, 0.75, 1.0]
+
+# -------------------------------------------------------------------
+# Output
+# -------------------------------------------------------------------
+output_root: results
+checkpoint_root: checkpoints
+cache_root: cache
+plot_root: plots

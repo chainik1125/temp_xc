@@ -1,0 +1,43 @@
+<unknown>:29: SyntaxWarning: invalid escape sequence '\h'
+<unknown>:31: SyntaxWarning: invalid escape sequence '\h'
+<unknown>:61: SyntaxWarning: invalid escape sequence '\h'
+<unknown>:63: SyntaxWarning: invalid escape sequence '\e'
+<unknown>:15: SyntaxWarning: invalid escape sequence '\s'
+<unknown>:19: SyntaxWarning: invalid escape sequence '\*'
+<unknown>:25: SyntaxWarning: invalid escape sequence '\*'
+<unknown>:8: SyntaxWarning: invalid escape sequence '\D'
+<unknown>:12: SyntaxWarning: invalid escape sequence '\.'
+<unknown>:9: SyntaxWarning: invalid escape sequence '\.'
+<unknown>:17: SyntaxWarning: invalid escape sequence '\.'
+<unknown>:19: SyntaxWarning: invalid escape sequence '\s'
+<unknown>:21: SyntaxWarning: invalid escape sequence '\s'
+<unknown>:29: SyntaxWarning: invalid escape sequence '\h'
+<unknown>:31: SyntaxWarning: invalid escape sequence '\h'
+<unknown>:61: SyntaxWarning: invalid escape sequence '\h'
+<unknown>:63: SyntaxWarning: invalid escape sequence '\e'
+<unknown>:21: SyntaxWarning: invalid escape sequence '\d'
+WARNING:root:You tried to specify center_unembed=True for a model using logit softcap, but this can't be done! Softcapping is not invariant upon adding a constant Setting center_unembed=False instead.
+Loading weights:   0%|          | 0/288 [00:00<?, ?it/s]Loading weights: 100%|██████████| 288/288 [00:00<00:00, 10199.26it/s]
+WARNING:root:With reduced precision, it is advised to use `from_pretrained_no_processing` instead of `from_pretrained`.
+Loaded pretrained model google/gemma-2-2b-it into HookedTransformer
+[phase4] close-bracket token ids: {')': 235275, ']': 235307, '}': 235270}
+[phase4] topk_sae (topk): β norm=1.4680  top-|β|=0.4168  d_sae=16384  top_k=20
+[phase4] txc_t5 (txc): β norm=0.6255  top-|β|=0.3484  d_sae=16384  top_k=20
+[phase4] mlc_l5 (mlxc): β norm=0.4666  top-|β|=0.1865  d_sae=16384  top_k=20
+[phase4] 263 test positions across 80 eval chunks
+[phase4] topk_sae @ chunk 20/80 n=71 mean_excess_drop=+0.0208
+[phase4] topk_sae @ chunk 40/80 n=144 mean_excess_drop=+0.0171
+[phase4] topk_sae @ chunk 60/80 n=217 mean_excess_drop=+0.0132
+[phase4] topk_sae @ chunk 80/80 n=263 mean_excess_drop=+0.0175
+[phase4] topk_sae: n=263 ref=0.4125  target=0.3932  random=0.4107  excess=+0.0175
+[phase4] txc_t5 @ chunk 20/80 n=70 mean_excess_drop=-0.0002
+[phase4] txc_t5 @ chunk 40/80 n=143 mean_excess_drop=+0.0089
+[phase4] txc_t5 @ chunk 60/80 n=213 mean_excess_drop=+0.0132
+[phase4] txc_t5 @ chunk 80/80 n=259 mean_excess_drop=+0.0177
+[phase4] txc_t5: n=259 ref=0.4108  target=0.3805  random=0.3983  excess=+0.0177
+[phase4] mlc_l5 @ chunk 20/80 n=71 mean_excess_drop=+0.0441
+[phase4] mlc_l5 @ chunk 40/80 n=144 mean_excess_drop=+0.0489
+[phase4] mlc_l5 @ chunk 60/80 n=217 mean_excess_drop=+0.0427
+[phase4] mlc_l5 @ chunk 80/80 n=263 mean_excess_drop=+0.0459
+[phase4] mlc_l5: n=263 ref=0.4125  target=0.3584  random=0.4043  excess=+0.0459
+[phase4] done

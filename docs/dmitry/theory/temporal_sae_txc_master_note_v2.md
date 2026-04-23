@@ -1,0 +1,1878 @@
+
+# Master note: temporal SAEs / temporal crosscoders on reset-HMM synthetic families
+
+This note is a **single combined writeup** of the analytic work we have done so far on temporal generalizations of SAEs and temporal crosscoders (TXCs), organized so that each model family has the same structure:
+
+1. **Pedagogical setup and derivation.**
+2. **A tiny worked calculation** with numbers plugged in.
+3. **A tiny theory-vs-experiment check** using either exact gradient descent, linear regression, or Monte Carlo simulation.
+4. **A pedagogical takeaway**: what the calculation is really saying about feature identity and model advantage.
+
+The note is meant to be self-contained, but it is based on three source documents:
+
+- the architecture note on temporal SAEs / TXCs and tensor-network-inspired proposals,
+- the modular-addition gradient-dynamics TeX note,
+- the reset-process / HMM note.
+
+It also consolidates the separate analytic notes we derived afterwards:
+regular SAE on HMM data, Proposal 3A / temporal XC, window-`T` TXC, Proposal 5, matched teacher processes, Jordan blocks, and direct-sum reset processes.
+
+The one major item from the architecture note that is **not** analytically solved here is the full Proposal 4 MPS autoencoder. Everything else below is part of the analytic story we actually worked through.
+
+---
+
+
+## 0. Master notation and the general method
+
+### 0.1 Reset-process / two-state HMM notation
+
+For a binary support process $s_t \in \{0,1\}$, let
+
+$$
+\pi := \Pr(s_t=1), \qquad \rho := \mathrm{Corr}(s_t,s_{t+1}).
+$$
+
+In the reset-process parametrization,
+
+$$
+p_{01} = \pi(1-\rho), \qquad p_{10} = (1-\pi)(1-\rho).
+$$
+
+For the centered process
+
+$$
+\xi_t := s_t - \pi,
+$$
+
+the stationary covariance is
+
+$$
+C_\tau := \mathbb E[\xi_t \xi_{t+\tau}] = C_0 \rho^{|\tau|},
+\qquad
+C_0 = \pi(1-\pi).
+$$
+
+This single identity is the backbone of almost every solvable temporal calculation below.
+
+### 0.2 The general analytic recipe
+
+The same pattern appeared over and over:
+
+1. **Write the batch forward pass.**
+2. **Project to the aligned / monosemantic basin.**  
+   Usually this means one learned feature aligned with one true direction.
+3. **Reduce to a quadratic or scalar recurrence.**
+4. **Solve full-batch gradient descent exactly.**
+5. **Then ask what changes with**
+   - persistence $\rho$,
+   - window size $T$,
+   - hidden-state rank / observability,
+   - or block-complexity in a direct-sum model.
+
+### 0.3 A zeroth tiny worked example
+
+Take
+
+$$
+\pi = 0.2, \qquad \rho = 0.7.
+$$
+
+Then
+
+$$
+C_0 = \pi(1-\pi) = 0.16,
+\qquad
+C_1 = 0.112,
+\qquad
+C_2 = 0.0784.
+$$
+
+So the signal already drops by about a factor of $0.7$ per extra lag. This is why almost every “how big should $T$ be?” answer eventually reduces to “roughly the correlation length, unless extra hidden directions appear.”
+
+### 0.4 Brief literature placement
+
+There are four literature streams sitting behind the calculations in this note.
+
+1. **Classical sparse coding / dictionary learning.**  
+   Gribonval--Schnass, Spielman--Wang--Wright, Arora et al., and related work give identifiability and recovery guarantees for sparse dictionaries under largely i.i.d. generative assumptions.
+
+2. **Exact gradient dynamics in linear or nearly-linear nets.**  
+   Saxe--McClelland--Ganguli and later deep-linear work are the direct template for our “write the batch objective, diagonalize the right moment matrix, solve mode-by-mode” strategy.
+
+3. **Modern SAE theory.**  
+   The toy-model superposition line, gated / JumpReLU SAEs, absorption / hierarchy work, and recent sparse-dictionary-learning analyses of SAEs explain shrinkage, dead features, absorption, and non-identifiability in the static setting.
+
+4. **Dependent-data / HMM-adjacent factorization.**  
+   There is work on dictionary learning or matrix factorization with Markov-dependent data, and of course a large HMM / spectral-learning / predictive-state literature.
+
+The gap this note fills is narrower and more concrete:
+
+> **What do regular SAEs, Proposal-3-style temporal layers, temporal XCs, and Proposal 5 do on controlled HMM/reset-process synthetic data, and how far can we solve their full-batch GD exactly?**
+
+To the best of our analysis so far, the clean results below are not just a repackaging of an existing theorem in the literature. They are a synthetic-theory map specialized to the temporal SAE / TXC setting.
+
+---
+
+
+## 0.5. Zeroth-order static case: the Chanin et al. “Sparse but Wrong” toy model
+
+This is the missing base case for the whole story. It is the place where feature mixing already appears **without any time dependence at all**. The reason it was missing from the previous version of the note is that Section 1 deliberately stayed inside the aligned monosemantic basin, so it could not see the global competition effect created by an incorrect $L0$ budget.
+
+### 0.5.1 How the static toy sits inside our HMM / reset framework
+
+Let $a_t\in\{0,1\}^g$ be the support pattern for one synthetic sample and let
+
+$$
+x_t = \sum_{i=1}^g m_{t,i} a_{t,i} f_i,
+$$
+
+with orthonormal true features $f_i$ and positive magnitudes $m_{t,i}$.
+
+The precise static-support law is some distribution
+
+$$
+q(a) = \Pr(a_t = a), \qquad a\in\{0,1\}^g.
+$$
+
+There are two equivalent ways to view this as a degenerate member of our temporal family.
+
+1. **Joint-state HMM view.**  
+   Take the hidden state to be the whole support pattern $z_t=a_t$. Then set
+   $$
+\Pr(z_{t+1}=a' \mid z_t=a) = q(a').
+$$
+   Every row of the transition matrix is identical, so this is a reset process with $\lambda=1$ on the joint support space. The sequence is iid across $t$.
+
+2. **Featurewise HMM view (only in the factorized special case).**  
+   If $q(a)$ factorizes as $\prod_i \mathrm{Bernoulli}(\pi_i)$, then each feature is just the $\rho_i=0$ limit of the two-state reset/HMM from the earlier sections.
+
+So the exact statement is slightly subtler than “one latent state per feature and no transitions.” That description is right only for the diagonal-$C$, factorized-support special case. The full Chanin toy with correlated Bernoulli support is more naturally the $\lambda=1$ reset limit on the **joint support pattern**.
+
+The punchline is simple:
+
+$$
+\mathrm{Cov}(a_{t,i},a_{t+\tau,j})=0 \qquad \text{for all } \tau\neq 0.
+$$
+
+There is no temporal signal to exploit. All the interesting structure is inside the same-sample co-firing law $q(a)$.
+
+### 0.5.2 Immediate consequence for temporal models
+
+Because all nonzero-lag covariances vanish, the window-$T$ Toeplitz system from Section 3 collapses.
+
+If a temporal XC includes the current token, then
+
+$$
+K_T = C_0 I, \qquad c_T = (C_0,0,\dots,0)^\top
+$$
+
+up to ordering convention, so
+
+$$
+\alpha_T^\star = \frac{C_0}{C_0+\gamma_{\mathrm{eff}}} e_0.
+$$
+
+All non-current taps are exactly zero.
+
+If the current token is excluded and the sequence is iid, then $c_T=0$ and the optimal temporal filter is identically zero.
+
+So in this zeroth-order regime:
+
+- Proposal 3A cannot gain from persistence because there is none.
+- A TXC cannot gain from longer windows because there is no predictive information across time.
+- The only nontrivial phenomenon left is **static feature competition under an incorrect $L0$ budget**.
+
+### 0.5.3 Pedagogical two-feature low-$L0$ calculation
+
+Now strip the toy all the way down to the first static competition problem.
+
+Take two orthonormal true features
+
+$$
+f_1, f_2 \in \mathbb R^d, \qquad f_1^\top f_2 = 0,
+$$
+
+and a support law with four outcomes:
+
+$$
+x = 0 \quad (P_0), \qquad
+x = m_1 f_1 \quad (P_1), \qquad
+x = m_2 f_2 \quad (P_2), \qquad
+x = m_1 f_1 + m_2 f_2 \quad (P_{12}),
+$$
+
+where
+
+$$
+P_0 + P_1 + P_2 + P_{12} = 1.
+$$
+
+The true expected $L0$ is
+
+$$
+L0_{\text{true}} = P_1 + P_2 + 2P_{12}.
+$$
+
+A Top-1 or BatchTopK SAE with effective budget $L0=1$ is under-budget whenever the co-firing mass $P_{12}$ is large enough to make $L0_{\text{true}}>1$.
+
+Now consider the simplest tied SAE with unit-norm decoder latents
+
+$$
+\ell_2 = f_2, \qquad
+\ell_1(\alpha) = \frac{\alpha f_1 + (1-\alpha) f_2}{\sqrt{\alpha^2 + (1-\alpha)^2}},
+\qquad \frac12 \le \alpha \le 1.
+$$
+
+Here $\alpha=1$ is the correct disentangled dictionary, and $\alpha<1$ mixes a piece of $f_2$ into the $f_1$-tracking latent.
+
+Because the SAE is tied and Top-1, reconstruction with active latent $\ell$ is
+
+$$
+\hat x = (\ell^\top x)\ell.
+$$
+
+#### Case 1: only $f_1$ fires
+
+Take $x=m_1 f_1$. Then Top-1 chooses $\ell_1$, so
+
+$$
+\hat x = \frac{m_1 \alpha}{\sqrt{\alpha^2+(1-\alpha)^2}} \, \ell_1
+= \frac{m_1 \alpha^2}{\alpha^2+(1-\alpha)^2} f_1
++ \frac{m_1 \alpha(1-\alpha)}{\alpha^2+(1-\alpha)^2} f_2.
+$$
+
+Hence
+
+$$
+L_1(\alpha)
+=
+\|m_1 f_1 - \hat x\|_2^2
+=
+m_1^2 \frac{(1-\alpha)^2}{\alpha^2+(1-\alpha)^2}.
+$$
+
+So mixing hurts the pure-$f_1$ samples.
+
+#### Case 2: only $f_2$ fires
+
+Take $x=m_2 f_2$. Then Top-1 chooses $\ell_2=f_2$, so
+
+$$
+L_2 = 0.
+$$
+
+#### Case 3: both features fire
+
+Take $x = m_1 f_1 + m_2 f_2$. For $\alpha \ge 1/2$, $\ell_1$ wins the Top-1 projection in the symmetric regime, so
+
+$$
+\hat x
+=
+\frac{m_1 \alpha + m_2(1-\alpha)}{\alpha^2+(1-\alpha)^2}
+\big(\alpha f_1 + (1-\alpha)f_2\big).
+$$
+
+A short calculation gives
+
+$$
+L_{12}(\alpha)
+=
+\frac{\big(m_1(1-\alpha) - m_2 \alpha\big)^2}{\alpha^2+(1-\alpha)^2}.
+$$
+
+This is the key term. When $\alpha=1$, the disentangled dictionary misses the $f_2$ part entirely and
+
+$$
+L_{12}(1)=m_2^2.
+$$
+
+When $m_1=m_2$, the equally mixed direction $\alpha=\frac12$ reconstructs the co-firing sample perfectly:
+
+$$
+L_{12}\!\left(\frac12\right)=0.
+$$
+
+So mixing hurts the single-feature event but can dramatically help the co-firing event.
+
+### 0.5.4 Expected loss and the exact optimizer in the equal-magnitude case
+
+Taking expectations gives
+
+$$
+\mathcal E(\alpha)
+=
+P_1 \, \mathbb E[L_1(\alpha)]
++
+P_{12} \, \mathbb E[L_{12}(\alpha)],
+$$
+
+since $L_2=L_0=0$.
+
+For fixed equal magnitudes $m_1=m_2=m$, this collapses to
+
+$$
+\boxed{
+\mathcal E(\alpha)
+=
+m^2 \,
+\frac{P_1 (1-\alpha)^2 + P_{12}(1-2\alpha)^2}{\alpha^2+(1-\alpha)^2}
+}.
+$$
+
+This is exactly the equal-magnitude specialization of the two-feature theorem proved in *Sparse but Wrong*; the benefit here is that the optimizer becomes completely explicit.
+
+Differentiating gives
+
+$$
+\mathcal E'(\alpha)
+=
+2m^2
+\frac{P_1 \alpha^2 - P_1 \alpha + 2P_{12}\alpha - P_{12}}
+{\big(\alpha^2+(1-\alpha)^2\big)^2}.
+$$
+
+Two consequences are immediate.
+
+First, at the disentangled point $\alpha=1$,
+
+$$
+\mathcal E'(1) = 2m^2 P_{12} > 0
+\qquad \text{whenever } P_{12}>0.
+$$
+
+So as soon as the two true features ever co-fire, the correct dictionary is not a local minimum of the Top-1 MSE objective. Moving left, i.e. mixing the features, lowers the loss.
+
+Second, the stationary point in $[1/2,1]$ is
+
+$$
+\boxed{
+\alpha^\star
+=
+\frac{P_1 - 2P_{12} + \sqrt{P_1^2 + 4P_{12}^2}}{2P_1}
+}.
+$$
+
+This gives the exact mixing-vs-cofiring tradeoff:
+
+- if $P_{12}=0$, then $\alpha^\star=1$: no mixing;
+- if $P_{12}\ll P_1$, then $\alpha^\star \approx 1 - P_{12}/P_1$: weak mixing;
+- if $P_{12}\gg P_1$, then $\alpha^\star \to 1/2$: the latent converges to the equal mixture.
+
+So the zeroth-order static “Sparse but Wrong” effect is not mysterious. It is just **loss-optimal compression of co-firing patterns under an insufficient latent budget**.
+
+### 0.5.5 Tiny worked example
+
+Take
+
+$$
+P_1=P_2=0.25, \qquad P_{12}=0.30, \qquad P_0=0.20, \qquad m=1.
+$$
+
+Then the true expected $L0$ is
+
+$$
+L0_{\text{true}} = 0.25 + 0.25 + 2(0.30) = 1.10,
+$$
+
+so a Top-1 SAE is indeed under-budget.
+
+The exact optimizer is
+
+$$
+\alpha^\star
+=
+\frac{0.25 - 0.60 + \sqrt{0.25^2 + 4(0.30)^2}}{0.50}
+=
+0.60.
+$$
+
+The disentangled dictionary $\alpha=1$ has expected loss
+
+$$
+\mathcal E(1)=0.30.
+$$
+
+The mixed optimum has
+
+$$
+\mathcal E(0.60)
+=
+\frac{0.25(0.4)^2 + 0.30(-0.2)^2}{0.6^2+0.4^2}
+=
+0.10.
+$$
+
+So the wrong latent is not just slightly better. It is **three times better in MSE** than the correct dictionary.
+
+### 0.5.6 Tiny theory-vs-experiment check
+
+Using the same parameters and a $2\times 10^5$-sample Monte Carlo experiment:
+
+- theory gives $\alpha^\star = 0.6000$,
+- Monte Carlo minimization gives $\hat\alpha^\star \approx 0.60$,
+- theory gives $\mathcal E(\alpha^\star)=0.1000$,
+- Monte Carlo gives $0.1002$,
+- theory gives $\mathcal E(1)=0.3000$,
+- Monte Carlo gives $0.2991$.
+
+The theory curve and simulation are visually indistinguishable in the companion figure below.
+
+![Static low-L0 theory vs experiment](static_sparse_but_wrong_loss_vs_alpha.png)
+
+### 0.5.7 How this connects back to the temporal story
+
+This zeroth-order case is the correct base of the benchmark ladder.
+
+1. It shows that **feature mixing already happens without time**.
+2. It identifies the missing mechanism from our earlier aligned-basin analysis: **global competition under an insufficient $L0$ budget**.
+3. It clarifies what temporal models need to add.  
+   If the process is iid across time, TXCs and Proposal 3A cannot help. Time only matters when it provides predictive information not already present in the same-sample support law.
+4. It suggests the right decomposition of difficulty:
+   - static difficulty = co-firing / correlation + low $L0$;
+   - temporal difficulty = partial observability / persistence / hidden-state aliasing across time.
+
+So the Chanin toy is the right **zeroth-order benchmark**, and the HMM/reset families in the rest of this note are the first genuine temporal extensions beyond it.
+
+
+## 1. Regular SAE on HMM/reset-process synthetic data
+
+### 1.1 Pedagogical setup
+
+Suppose
+
+$$
+x_t = \sum_{i=1}^F s_{t,i} d_i,
+$$
+
+with orthonormal true directions $d_i$ and binary supports $s_{t,i}$ generated by independent two-state HMMs / reset processes.
+
+In the aligned monosemantic basin for feature $i$, take the usual tied-direction scalar reduction
+
+$$
+a_i = d_i, \qquad b_i = -1, \qquad d_i^{\mathrm{(learned)}} = d_i,
+$$
+
+so the preactivation is
+
+$$
+a_i^\top x_t + b_i = s_{t,i} + u_i - 1,
+$$
+
+and the latent activation is
+
+$$
+h_{i,t} = \mathrm{ReLU}(s_{i,t} + u_i - 1).
+$$
+
+In the healthy region $0 < u_i < 1$, this simplifies exactly to
+
+$$
+h_{i,t} = u_i s_{i,t}.
+$$
+
+So the feature reconstructs only when the true support is on.
+
+### 1.2 Pedagogical calculation: why the population objective is blind to persistence
+
+In the healthy region, the reconstruction error for feature $i$ is present only when $s_{t,i}=1$. Therefore
+
+$$
+\mathcal L_i
+=
+\pi_i\left[\frac12 (1-u_i)^2 + \lambda_h u_i\right].
+$$
+
+The key point is that the loss depends on the **one-time marginal**
+$\pi_i = \Pr(s_{t,i}=1)$, but **not** on $\rho_i$.
+
+So the standard SAE does not see the transition matrix at the population level. It only sees the stationary distribution of the support.
+
+This is the cleanest theorem in the whole story:
+
+> **A regular time-local SAE trained on single time steps from a stationary HMM is population-equivalent to training on i.i.d. samples from the stationary one-time marginal.**
+
+### 1.3 Exact full-batch GD
+
+Differentiating gives
+
+$$
+\frac{\partial \mathcal L_i}{\partial u_i}
+=
+\pi_i(u_i - 1 + \lambda_h),
+$$
+
+so
+
+$$
+u_{i,t+1}
+=
+(1-\eta \pi_i)u_{i,t} + \eta \pi_i (1-\lambda_h).
+$$
+
+Hence
+
+$$
+u_{i,t}
+=
+(1-\lambda_h) + \big(u_{i,0}-(1-\lambda_h)\big)(1-\eta\pi_i)^t.
+$$
+
+So:
+
+- the fixed point is $u_i^\star = 1-\lambda_h$,
+- the learning speed scales like $1/(\eta \pi_i)$,
+- and $\rho_i$ does not enter.
+
+### 1.4 Tiny worked example
+
+Take
+
+$$
+\pi = 0.2, \qquad \lambda_h = 0.1, \qquad \eta = 0.4, \qquad u_0 = 10^{-3}.
+$$
+
+Then
+
+$$
+u_{t+1} = 0.92\,u_t + 0.072.
+$$
+
+So after 20 full-batch steps,
+
+$$
+u_{20}
+=
+0.9 + (10^{-3}-0.9)(0.92)^{20}
+\approx 0.730365.
+$$
+
+No matter which $\rho$ produced the data, the theory says the same full-batch trajectory should appear.
+
+### 1.5 Tiny theory-vs-experiment check
+
+**Check A. Full-batch learning curve does not care about $\rho$.**
+
+
+|   rho |   avg empirical pi |   u_20 theory |   u_20 experiment |   abs error |
+|------:|-------------------:|--------------:|------------------:|------------:|
+|   0   |           0.200051 |      0.730365 |          0.730436 |    7.2e-05  |
+|   0.5 |           0.200441 |      0.730365 |          0.730998 |    0.000633 |
+|   0.8 |           0.199643 |      0.730365 |          0.729815 |    0.00055  |
+
+
+**Check B. Contiguous-batch gradient variance *does* care about $\rho$.**
+
+For contiguous minibatches of size $B$,
+
+$$
+\mathrm{Var}(\bar g_B)
+=
+\frac{(u-1+\lambda_h)^2\pi(1-\pi)}{B^2}
+\left[
+B + 2\sum_{\tau=1}^{B-1}(B-\tau)\rho^\tau
+\right].
+$$
+
+Equivalently,
+
+$$
+B_{\mathrm{eff}} \approx B\frac{1-\rho}{1+\rho}.
+$$
+
+Numerically, for $u=0.3$ and $B=32$:
+
+
+|   rho |   Var theory |   Var experiment |   abs error |
+|------:|-------------:|-----------------:|------------:|
+|   0   |     0.0018   |         0.001803 |     3e-06   |
+|   0.5 |     0.005175 |         0.005159 |     1.6e-05 |
+|   0.8 |     0.013952 |         0.013919 |     3.3e-05 |
+
+
+### 1.6 Pedagogical takeaway
+
+For a standard SAE:
+
+- **which features get learned** is controlled by zero-lag statistics,
+- **how fast they learn in full-batch GD** is controlled by $\pi$,
+- **where temporal persistence enters** is mainly through contiguous-batch SGD noise.
+
+So if temporal models outperform a regular SAE in a meaningful way, it will not be because the regular SAE “secretly sees persistence already.” It does not.
+
+---
+
+## 2. Proposal 3A and the simplest two-layer temporal XC
+
+This is the first place where the model really starts to see time **at the objective level**.
+
+### 2.1 Pedagogical setup: one centered feature with one temporal self-connection
+
+Take one centered latent scalar $\xi_t$ and one learned feature with local gain $u$. The simplest causal temporal layer is
+
+$$
+h_t = u \xi_t,
+\qquad
+\tilde h_t = h_t + \beta h_{t-1}.
+$$
+
+The reconstruction target is $\xi_t$. The population loss is
+
+$$
+\mathcal L(u,\beta)
+=
+\frac12\Big(
+C_0 - 2u(C_0+\beta C_1)
++ u^2(C_0 + 2\beta C_1 + \beta^2 C_0)
+\Big)
++ \lambda_h \pi u
++ \frac{\lambda_\beta}{2}\beta^2.
+$$
+
+This is the one-lag version of the more general exact temporal-mode result
+
+$$
+k_j^\star(u)
+=
+\frac{u(1-u)\lambda_j}{u^2\lambda_j+\lambda_K},
+$$
+
+obtained by diagonalizing the full temporal moment operator $\Gamma$.
+
+### 2.2 Pedagogical calculation: solving the one-lag model
+
+At fixed $u$,
+
+$$
+\beta^\star(u)
+=
+\frac{u(1-u)C_1}{u^2 C_0 + \lambda_\beta}.
+$$
+
+If $\lambda_\beta = 0$, this becomes
+
+$$
+\beta^\star
+=
+\frac{C_1}{C_0}\frac{1-u^\star}{u^\star}
+=
+\rho \frac{1-u^\star}{u^\star}.
+$$
+
+So the temporal “copy strength” is directly proportional to persistence, up to the local-vs-temporal load-sharing factor.
+
+Plugging $\beta^\star$ back in gives
+
+$$
+u^\star
+=
+1 - \frac{\lambda_h \pi}{C_0 - C_1^2/C_0}.
+$$
+
+For a reset process, $C_1 = \rho C_0$, so
+
+$$
+u^\star
+=
+1 - \frac{\lambda_h \pi}{C_0(1-\rho^2)}.
+$$
+
+### 2.3 Tiny worked example
+
+Use the empirical moments of a long simulated reset process with
+
+$$
+\pi = 0.2,\qquad \rho \approx 0.706,
+\qquad C_0 \approx 0.161285,\qquad C_1 \approx 0.113829,
+$$
+
+and choose
+
+$$
+\lambda_h = 0.15,\qquad \lambda_\beta=0.
+$$
+
+Then
+
+$$
+u^\star
+=
+1 - \frac{0.15 \cdot 0.2}{C_0 - C_1^2/C_0}
+\approx 0.629390,
+$$
+
+and
+
+$$
+\beta^\star
+=
+\frac{C_1}{C_0}\frac{1-u^\star}{u^\star}
+\approx 0.415584.
+$$
+
+So the model uses both a local coefficient and a temporal copy term, and the temporal term is sizable because $\rho$ is sizable.
+
+### 2.4 Simplest two-layer temporal XC
+
+Now let the same latent be read from two layers,
+
+$$
+h_t = (c_1 + c_2)\xi_t = u\xi_t,
+\qquad
+\tilde h_t = h_t + \beta h_{t-1},
+$$
+
+with equal decoder heads and penalties $\lambda_{e,1},\lambda_{e,2}$.
+
+For fixed effective gain $u=c_1+c_2$, the best split solves
+
+$$
+c_1^\star = \frac{\lambda_{e,2}}{\lambda_{e,1}+\lambda_{e,2}}u,
+\qquad
+c_2^\star = \frac{\lambda_{e,1}}{\lambda_{e,1}+\lambda_{e,2}}u.
+$$
+
+So with equal penalties,
+
+$$
+c_1^\star = c_2^\star = \frac{u}{2},
+\qquad
+\lambda_{\mathrm{eff}}
+=
+\frac{\lambda_{e,1}\lambda_{e,2}}{\lambda_{e,1}+\lambda_{e,2}}
+=
+\frac{\lambda_e}{2}.
+$$
+
+If $E_D$ is the total decoder energy, then with $\lambda_\beta=0$,
+
+$$
+u^\star_{XC}
+=
+\frac{E_D(C_0 - C_1^2/C_0) - \lambda_h\pi}
+     {E_D(C_0 - C_1^2/C_0) + \lambda_{\mathrm{eff}}},
+$$
+
+and
+
+$$
+\beta^\star_{XC}
+=
+\frac{C_1}{C_0}\frac{1-u^\star_{XC}}{u^\star_{XC}}.
+$$
+
+So the XC mostly changes the scalar balance through decoder energy and read-in regularization, not through a new temporal formula.
+
+### 2.5 Tiny theory-vs-experiment check
+
+Using the same empirical moments, and for the XC taking
+
+$$
+E_D = 2,\qquad \lambda_{e,1}=\lambda_{e,2}=0.2,
+$$
+
+the numerical fixed points match the theory exactly:
+
+
+| model                 |   u* theory |   u* experiment |   beta* theory |   beta* experiment |
+|:----------------------|------------:|----------------:|---------------:|-------------------:|
+| Proposal 3A (one-lag) |    0.62939  |        0.62939  |       0.415584 |           0.415584 |
+| 2-layer XC (one-lag)  |    0.503618 |        0.503618 |       0.695626 |           0.695626 |
+
+
+For the layer split:
+
+
+| parameter   |   theory |   experiment |
+|:------------|---------:|-------------:|
+| c1          | 0.251809 |     0.251809 |
+| c2          | 0.251809 |     0.251809 |
+
+
+### 2.6 Pedagogical takeaway
+
+Proposal 3A is not “just a denoiser.” In the single-feature case it learns a genuine temporal filter whose strength scales with $C_1/C_0$, hence with $\rho$ in the reset process.
+
+The simplest two-layer temporal XC is analytically even cleaner than expected:
+
+- the **temporal ratio** $\beta^\star$ is the same kind of object as in Proposal 3A,
+- the **new XC-specific phenomenon** is the read-in split across layers,
+- and the split is solved exactly by a harmonic-mean / precision-weighting rule.
+
+---
+
+## 3. Window-`T` temporal XC and the role of observability
+
+The one-lag model is pedagogically useful, but it hides the real `T`-dependence. The full windowed TXC gives an exact Toeplitz Wiener-filter problem.
+
+### 3.1 Pedagogical setup
+
+Let the two source layers be noisy copies of the same centered latent:
+
+$$
+y_t^{(1)} = \xi_t + \varepsilon_t^{(1)},
+\qquad
+y_t^{(2)} = \xi_t + \varepsilon_t^{(2)},
+$$
+
+with independent Gaussian noise variances $\sigma_1^2,\sigma_2^2$.
+
+A window-`T` temporal XC uses
+
+$$
+h_t
+=
+\sum_{\tau=0}^{T-1}
+\big(
+c_{1,\tau} y_{t-\tau}^{(1)}
++
+c_{2,\tau} y_{t-\tau}^{(2)}
+\big).
+$$
+
+The centered population objective is
+
+$$
+\mathcal L_T(c)
+=
+\frac{E_D}{2}
+\Big(C_0 - 2k_T^\top c + c^\top \Sigma_T c\Big)
++
+\frac12 c^\top \Lambda c,
+$$
+
+where
+
+$$
+k_T = \begin{bmatrix} c_T \\ c_T \end{bmatrix},
+\qquad
+c_T = (C_0,C_1,\dots,C_{T-1})^\top,
+$$
+
+and
+
+$$
+\Sigma_T =
+\begin{bmatrix}
+K_T+\sigma_1^2 I & K_T \\
+K_T & K_T+\sigma_2^2 I
+\end{bmatrix},
+\qquad
+K_T = [C_{|i-j|}]_{i,j=0}^{T-1}.
+$$
+
+### 3.2 Pedagogical calculation: reduce the two-layer problem to one lag profile
+
+Only the sum
+
+$$
+\alpha_\tau := c_{1,\tau}+c_{2,\tau}
+$$
+
+affects the signal. The optimal layer split at each lag is
+
+$$
+c_{1,\tau}^\star = \frac{r_2}{r_1+r_2}\alpha_\tau,
+\qquad
+c_{2,\tau}^\star = \frac{r_1}{r_1+r_2}\alpha_\tau,
+$$
+
+with
+
+$$
+r_1 = E_D \sigma_1^2 + \lambda_{e,1},
+\qquad
+r_2 = E_D \sigma_2^2 + \lambda_{e,2}.
+$$
+
+So the effective scalar lag-profile problem is
+
+$$
+\mathcal L_T(\alpha)
+=
+\frac{E_D}{2}
+\Big(C_0 - 2 c_T^\top \alpha + \alpha^\top K_T \alpha\Big)
++
+\frac{r_{\mathrm{eff}}}{2}\|\alpha\|_2^2,
+$$
+
+where
+
+$$
+r_{\mathrm{eff}} = \frac{r_1r_2}{r_1+r_2},
+\qquad
+\gamma_{\mathrm{eff}} = \frac{r_{\mathrm{eff}}}{E_D}.
+$$
+
+Therefore the exact optimum is
+
+$$
+\alpha_T^\star = (K_T+\gamma_{\mathrm{eff}}I)^{-1}c_T.
+$$
+
+And full-batch GD is exactly linear:
+
+$$
+\alpha_{n+1}
+=
+\alpha_n - \eta E_D\big((K_T+\gamma_{\mathrm{eff}}I)\alpha_n - c_T\big).
+$$
+
+### 3.3 Tiny worked calculation: the $T=2$ case
+
+For $T=2$,
+
+$$
+K_2 =
+\begin{bmatrix}
+C_0 & C_1\\
+C_1 & C_0
+\end{bmatrix},
+\qquad
+c_2 =
+\begin{bmatrix}
+C_0\\ C_1
+\end{bmatrix}.
+$$
+
+So
+
+$$
+\alpha_2^\star
+=
+(K_2+\gamma I)^{-1}c_2
+=
+\frac{1}{(C_0+\gamma)^2 - C_1^2}
+\begin{bmatrix}
+C_0(C_0+\gamma)-C_1^2\\
+C_1\gamma
+\end{bmatrix}.
+$$
+
+This is a beautiful sanity check:
+
+- if $\gamma=0$, then $\alpha_2^\star=(1,0)$: the current token already suffices;
+- if $\gamma>0$, the second lag becomes useful and gets weight proportional to $C_1\gamma$.
+
+So larger windows matter only when there is noise, regularization, or ambiguity.
+
+### 3.4 Exact improvement from increasing $T$
+
+The minimum loss is
+
+$$
+\mathcal L_T^\star
+=
+\frac{E_D}{2}\Big(C_0 - c_T^\top (K_T+\gamma I)^{-1}c_T\Big).
+$$
+
+Extending the window from $T$ to $T+1$, the exact Schur-complement increment is
+
+$$
+\mathcal L_T^\star - \mathcal L_{T+1}^\star
+=
+\frac{E_D}{2}
+\frac{\big(C_T - b_T^\top Q_T^{-1}c_T\big)^2}
+     {C_0+\gamma - b_T^\top Q_T^{-1}b_T}
+\ge 0.
+$$
+
+So larger $T$ can only help.
+
+### 3.5 Tiny theory-vs-experiment check
+
+Using a reset process with
+
+$$
+\pi=0.2,\qquad \rho=0.7,\qquad \sigma_1=0.4,\qquad \sigma_2=0.8,
+\qquad E_D=2,\qquad \lambda_{e,1}=\lambda_{e,2}=0.1,
+$$
+
+the population optimum and empirical ridge-regression optimum match very closely:
+
+
+|   T |   loss theory |   loss experiment |   ||c_exp-c_theory||_2 |
+|----:|--------------:|------------------:|-----------------------:|
+|   1 |      0.080506 |          0.080442 |               0.000155 |
+|   2 |      0.069216 |          0.069155 |               0.000851 |
+|   4 |      0.067067 |          0.067009 |               0.001387 |
+
+
+The learned effective lag profile also matches lag-by-lag:
+
+
+|   T |   lag |   alpha_theory |   alpha_experiment |   abs error |
+|----:|------:|---------------:|-------------------:|------------:|
+|   2 |     0 |       0.429912 |           0.430243 |    0.000331 |
+|   2 |     1 |       0.199948 |           0.19969  |    0.000258 |
+|   4 |     0 |       0.416563 |           0.416725 |    0.000163 |
+|   4 |     1 |       0.171256 |           0.171176 |    8e-05    |
+|   4 |     2 |       0.071521 |           0.071443 |    7.8e-05  |
+|   4 |     3 |       0.033723 |           0.033691 |    3.2e-05  |
+
+
+### 3.6 Observability: the right way to make the HMM genuinely harder
+
+The real question is not only “how persistent is the signal?” but also:
+
+> **Does a $T$-token window reveal hidden directions that a one-token view cannot?**
+
+The right object is the observability matrix
+
+$$
+\mathcal O_T
+=
+\begin{bmatrix}
+B\\
+BP\\
+\vdots\\
+BP^{T-1}
+\end{bmatrix}.
+$$
+
+If $\mathrm{rank}(\mathcal O_T)=\mathrm{rank}(B)$, increasing $T$ only denoises.  
+If $\mathrm{rank}(\mathcal O_T)>\mathrm{rank}(B)$, then time reveals genuinely new hidden directions.
+
+A tiny explicit example is
+
+$$
+B=
+\begin{bmatrix}
+1 & 1 & 0\\
+0 & 0 & 1
+\end{bmatrix},
+\qquad
+P_{\mathrm{row}}=
+\begin{bmatrix}
+0.1 & 0.1 & 0.8\\
+0.8 & 0.1 & 0.1\\
+0.1 & 0.1 & 0.8
+\end{bmatrix}.
+$$
+
+Then
+
+$$
+\mathrm{rank}(B)=2,
+\qquad
+\mathrm{rank}(\mathcal O_2)=3.
+$$
+
+So a two-token window reveals a hidden distinction that is invisible locally.
+
+### 3.7 Pedagogical takeaway
+
+Window size $T$ does two conceptually different things:
+
+1. in the locally identifiable one-feature case, it just extends a Wiener filter and helps because of noise / regularization;
+2. in an **observable-but-locally-aliased** HMM, it creates genuinely new recoverable directions.
+
+That distinction is the clean answer to the question “what kind of harder HMM should we use?”
+
+---
+
+## 4. Proposal 5: shared temporal chain with factorial SAE emissions
+
+Proposal 5 is the first architecture in our list that is matched not to per-feature self-persistence, but to a **shared low-rank temporal mode**.
+
+### 4.1 Pedagogical setup
+
+Let a hidden chain $h_t\in\{1,\dots,\chi\}$ evolve by a Markov matrix $P$. Conditional on $h_t=h$, each feature support fires independently with probability $B_{kh}$.
+
+So
+
+$$
+q_{t,k}^{(T)}
+=
+\Pr(s_{t,k}=1 \mid \mathcal F_t^{(T)})
+=
+\sum_h B_{kh}\gamma_t^{(T)}(h),
+$$
+
+where $\gamma_t^{(T)}(h)$ is the posterior hidden-state marginal from a temporal window.
+
+In the aligned orthogonal basin, write the learned reconstruction as
+
+$$
+\hat x_t = \sum_k r_k q_{t,k}^{(T)} d_k.
+$$
+
+Define
+
+$$
+Q_{k,T}
+:=
+\mathbb E[(q_{t,k}^{(T)})^2].
+$$
+
+Then the population loss decouples feature-by-feature:
+
+$$
+\mathcal L_T(r)
+=
+\frac12\sum_k \pi_k
+-
+\sum_k Q_{k,T} r_k
++
+\frac12\sum_k (Q_{k,T}+\lambda)r_k^2
++
+\lambda_s \sum_k \pi_k.
+$$
+
+### 4.2 Pedagogical calculation
+
+The exact GD update for feature $k$ is
+
+$$
+r_{k,n+1}
+=
+(1-\eta(Q_{k,T}+\lambda))r_{k,n} + \eta Q_{k,T},
+$$
+
+so
+
+$$
+r_{k,\star}^{(T)} = \frac{Q_{k,T}}{Q_{k,T}+\lambda}.
+$$
+
+Moreover,
+
+$$
+Q_{k,T}
+=
+\pi_k - \mathbb E[\mathrm{Var}(s_{t,k}\mid \mathcal F_t^{(T)} )].
+$$
+
+So $Q_{k,T}$ is exactly “marginal support probability minus the posterior uncertainty that remains after the temporal inference module has looked at the window.”
+
+And if the sigma-fields are nested in $T$,
+
+$$
+Q_{k,T+1} - Q_{k,T}
+=
+\mathbb E\Big[\big(q_{t,k}^{(T+1)}-q_{t,k}^{(T)}\big)^2\Big]
+\ge 0.
+$$
+
+So larger windows monotonically increase posterior-explained support energy.
+
+### 4.3 Tiny worked example
+
+Take a binary hidden chain with persistence $0.9$, and a noisy binary observation channel:
+
+$$
+\Pr(y_t=1\mid h_t=1)=0.8,\qquad
+\Pr(y_t=1\mid h_t=0)=0.2.
+$$
+
+Use $s_t=h_t$ as the target support and define $q_t^{(T)}=\Pr(h_t=1\mid y_{t-T+1:t})$ by exact filtering on a length-$T$ window.
+
+Then $Q_T=\mathbb E[q_t^2]$ increases with $T$, so the learned scalar gain should also increase with $T$.
+
+### 4.4 Tiny theory-vs-experiment check
+
+With $\lambda=0.1$ and 20 full-batch GD steps:
+
+
+|   T |      Q_T |   r*_theory |   r_20 theory |   r_20 experiment |   abs error |
+|----:|---------:|------------:|--------------:|------------------:|------------:|
+|   1 | 0.339451 |    0.772443 |      0.767038 |          0.766916 |    0.000122 |
+|   3 | 0.37535  |    0.789628 |      0.786159 |          0.786508 |    0.000349 |
+|   5 | 0.380171 |    0.791741 |      0.788476 |          0.788765 |    0.000289 |
+
+
+### 4.5 Pedagogical takeaway
+
+Proposal 5 does **not** rank features by raw firing rate or zero-lag energy. It ranks them by
+
+$$
+Q_{k,T} = \mathbb E[(q_{t,k}^{(T)})^2],
+$$
+
+which is a posterior-explained support statistic.
+
+So if a feature becomes much more predictable once the shared chain is inferred, Proposal 5 should favor it even when a regular SAE would not.
+
+---
+
+## 5. Matched teacher processes and the Jordan-block family
+
+The previous sections all started from HMM-like supports. We then asked the opposite question:
+
+> Can we design a process that a temporal XC can recover **optimally**?
+
+The cleanest answer was a predictive-state / linear-Gaussian teacher, and the most informative exact example was the Jordan-block teacher.
+
+### 5.1 General matched teacher
+
+Take hidden state $z_t \in \mathbb R^r$ with
+
+$$
+z_{t+1} = A z_t + \xi_t,
+$$
+
+two source layers
+
+$$
+x_t^{(1)} = C_1 z_t + \varepsilon_t^{(1)},
+\qquad
+x_t^{(2)} = C_2 z_t + \varepsilon_t^{(2)},
+$$
+
+and target
+
+$$
+y_t = F z_t + \zeta_t.
+$$
+
+For a window $Y_t$ made of the source observations, the Bayes-optimal MSE predictor is exactly linear:
+
+$$
+\hat y_t^\star
+=
+\Sigma_{yY}\Sigma_{YY}^{-1}Y_t.
+$$
+
+So a linear temporal XC of width at least $r$ is exactly matched to this family.
+
+### 5.2 The Jordan-block teacher
+
+Now specialize to the deterministic noiseless teacher
+
+$$
+z_{t+1} = J_r(\rho) z_t,
+\qquad
+J_r(\rho)=\rho I + N,
+$$
+
+where $N$ is the nilpotent superdiagonal matrix. Observe only the first coordinate:
+
+$$
+s_t = e_1^\top z_t.
+$$
+
+Then
+
+$$
+J_r(\rho)^k
+=
+\sum_{j=0}^{r-1} \binom{k}{j}\rho^{k-j} N^j,
+$$
+
+so
+
+$$
+s_{t+k}
+=
+\sum_{j=0}^{r-1}
+\binom{k}{j}\rho^{k-j} z_t^{(j+1)}.
+$$
+
+This already shows that each extra lag reveals one more Jordan coordinate.
+
+### 5.3 Pedagogical calculation: temporal derivatives recover the hidden coordinates
+
+Define the shift operator $E$ by $Es_t=s_{t+1}$. Then
+
+$$
+(E-\rho)^j s_t = z_t^{(j+1)}.
+$$
+
+So for $r=4$,
+
+$$
+z_t^{(1)} = s_t,
+$$
+
+$$
+z_t^{(2)} = s_{t+1} - \rho s_t,
+$$
+
+$$
+z_t^{(3)} = s_{t+2} - 2\rho s_{t+1} + \rho^2 s_t,
+$$
+
+$$
+z_t^{(4)} = s_{t+3} - 3\rho s_{t+2} + 3\rho^2 s_{t+1} - \rho^3 s_t.
+$$
+
+So the hidden coordinates are literally weighted finite differences of one observed scalar stream.
+
+This proves the sharp single-view threshold:
+
+$$
+T_{\min}=r.
+$$
+
+### 5.4 Proposal 3A versus Proposal 3B
+
+This is exactly the regime where the distinction between Proposal 3A and Proposal 3B becomes sharp.
+
+- **Proposal 3A** only lets a feature talk to itself across time.  
+  It is not naturally matched to a Jordan chain, because the missing hidden coordinates are not “copies of the same feature at other times”; they are successive temporal derivatives.
+- **Proposal 3B** with $r$ temporal drivers is much closer.  
+  It can represent the window-to-state map.
+- **Proposal 3B with a learned $r\times r$ driver recurrence**
+  $$
+g_{t+1} = M g_t + U a_t
+$$
+  is the exact matched architecture for the Jordan family.
+
+So the Jordan teacher is the cleanest place where a tensor-network / low-predictive-rank temporal model is doing something genuinely new.
+
+### 5.5 Tiny theory-vs-experiment check
+
+For a noiseless $r=4$ Jordan teacher with $\rho=0.6$, linear regression from a length-$T$ forward window to the hidden state $z_t$ gives:
+
+
+|   T |   rank(O_T) |   empirical MSE for z_t recovery |
+|----:|------------:|---------------------------------:|
+|   1 |           1 |                         0.750915 |
+|   2 |           2 |                         0.500243 |
+|   3 |           3 |                         0.251073 |
+|   4 |           4 |                         0        |
+|   5 |           4 |                         0        |
+
+
+The pattern is exactly what the theory predicts:
+
+- each extra lag raises the rank by one,
+- and the MSE collapses to zero exactly when $T=r$.
+
+### 5.6 Pedagogical takeaway
+
+The Jordan family is the cleanest known synthetic setting where **time reveals genuinely hidden directions** rather than merely denoising a locally visible one.
+
+The exact hardness knob is not just persistence. It is the **observability index**.
+
+---
+
+## 6. Direct sum of two leaky-reset processes
+
+We next asked a more explicitly computational-mechanics-style question: can a single temporal feature track the coefficient of a belief-state decomposition?
+
+### 6.1 Pedagogical setup
+
+Let the hidden space be a disjoint union
+
+$$
+\mathcal S = \mathcal S_1 \sqcup \mathcal S_2,
+$$
+
+with block label $c\in\{1,2\}$ drawn once per sequence. Inside each block, the process evolves by a leaky-reset chain $T_i$. Then the predictive belief state decomposes as
+
+$$
+\eta_t
+=
+\omega_{1,t}\eta_{1,t}
+\oplus
+\omega_{2,t}\eta_{2,t},
+\qquad
+\omega_{1,t}+\omega_{2,t}=1.
+$$
+
+The natural hidden coordinate is therefore the block posterior weight $\omega_{1,t}$ (or its log-odds).
+
+### 6.2 Pedagogical calculation: the symmetric deterministic-emission case
+
+Take the especially clean symmetric case with $\pi=1/2$ inside each block. Then the only relevant observable statistic is the switch indicator
+
+$$
+u_s = \mathbf 1[x_s \neq x_{s-1}],
+$$
+
+which is i.i.d. Bernoulli with block-dependent parameter
+
+$$
+p_i = \lambda_i/2.
+$$
+
+So over a window of $n=T-1$ transitions, the sufficient statistic is the switch count
+
+$$
+U_t^{(T)} = \sum_{s=t-T+2}^{t} u_s.
+$$
+
+The exact posterior log-odds are affine in $U$:
+
+$$
+L_t^{(T)} = \beta_0(T) + \beta_1 U_t^{(T)},
+$$
+
+with
+
+$$
+\beta_0(T)
+=
+\log\frac{q_1}{q_2} + n\log\frac{1-p_1}{1-p_2},
+\qquad
+\beta_1
+=
+\log\frac{p_1(1-p_2)}{p_2(1-p_1)}.
+$$
+
+Hence
+
+$$
+\omega_{1,t}^{(T)} = \sigma\!\big(\beta_0(T)+\beta_1 U_t^{(T)}\big).
+$$
+
+So in this benchmark a **single scalar temporal feature** is sufficient for the exact Bayesian posterior.
+
+### 6.3 Linear TXC on the same benchmark
+
+Now linearize the problem by taking centered switch indicators
+
+$$
+g_s = u_s - \bar p,
+\qquad
+\bar p = q_1p_1 + q_2p_2,
+$$
+
+and target
+
+$$
+y_t = \mathbf 1[c=1]-q_1.
+$$
+
+For a rank-1 window feature $h_t=a^\top g$, the covariance is
+
+$$
+\Sigma_n = \sigma_{\mathrm{within}}^2 I_n + \Delta^2 \mathbf 1\mathbf 1^\top,
+$$
+
+where
+
+$$
+\sigma_{\mathrm{within}}^2
+=
+q_1p_1(1-p_1)+q_2p_2(1-p_2),
+\qquad
+\Delta^2 = q_1q_2(p_1-p_2)^2,
+\qquad
+\kappa = q_1q_2(p_1-p_2).
+$$
+
+Therefore the exact optimum is
+
+$$
+a_n^\star = \alpha_n^\star \mathbf 1,
+\qquad
+\alpha_n^\star = \frac{\kappa}{\sigma_{\mathrm{within}}^2 + n\Delta^2},
+$$
+
+and the exact best linear $R^2$ is
+
+$$
+R_n^2
+=
+\frac{n\Delta^2}{\sigma_{\mathrm{within}}^2+n\Delta^2}.
+$$
+
+This gives the useful window scale
+
+$$
+T_{\mathrm{sig}}-1
+\sim
+\frac{\sigma_{\mathrm{within}}^2}{\Delta^2}.
+$$
+
+### 6.4 Tiny worked example
+
+Choose equal priors $q_1=q_2=1/2$ and
+
+$$
+p_1 = 0.3,\qquad p_2 = 0.1,\qquad n=8 \quad (T=9).
+$$
+
+Then
+
+$$
+\beta_0 = 8\log\!\frac{0.7}{0.9} \approx -2.0105,
+\qquad
+\beta_1 = \log\!\frac{0.3\cdot 0.9}{0.1\cdot 0.7} \approx 1.3499.
+$$
+
+So
+
+$$
+\omega_1(U)=\sigma(-2.0105 + 1.3499\,U).
+$$
+
+And for the linear TXC,
+
+$$
+\sigma_{\mathrm{within}}^2 = 0.15,
+\qquad
+\Delta^2=0.01,
+\qquad
+\kappa=0.05,
+$$
+
+so
+
+$$
+\alpha_8^\star
+=
+\frac{0.05}{0.15 + 8\cdot 0.01}
+=
+0.217391,
+$$
+
+and
+
+$$
+R_8^2 = \frac{0.08}{0.23} \approx 0.347826.
+$$
+
+### 6.5 Tiny theory-vs-experiment check
+
+**Check A. Exact posterior versus switch count.**
+
+
+|   U |   omega_theory |   omega_experiment |   abs error |
+|----:|---------------:|-------------------:|------------:|
+|   0 |       0.118103 |           0.117255 |    0.000848 |
+|   1 |       0.340607 |           0.343957 |    0.00335  |
+|   2 |       0.66582  |           0.663052 |    0.002767 |
+|   3 |       0.884858 |           0.888873 |    0.004015 |
+|   4 |       0.967365 |           0.964367 |    0.002998 |
+|   5 |       0.991329 |           0.992081 |    0.000751 |
+|   6 |       0.997738 |           1        |    0.002262 |
+|   7 |       0.999412 |           1        |    0.000588 |
+|   8 |       0.999848 |           1        |    0.000152 |
+
+
+**Check B. Linear TXC optimum and $R^2$.**
+
+
+|   window T |   alpha* theory |   alpha* experiment |   R^2 theory |   R^2 experiment |
+|-----------:|----------------:|--------------------:|-------------:|-----------------:|
+|          9 |        0.217391 |            0.217831 |     0.347826 |         0.348201 |
+
+
+### 6.6 Pedagogical takeaway
+
+This is the cleanest case where a single temporal feature really can be interpreted as the latent belief coordinate:
+
+$$
+\eta_t = \omega_{1,t}\eta_{1,t}\oplus \omega_{2,t}\eta_{2,t}.
+$$
+
+In the symmetric deterministic-emission benchmark, one scalar window statistic is sufficient, so one temporal feature is enough.
+
+---
+
+## 7. $K$-block direct sums: when one feature is enough, and when it is not
+
+The two-block case tempts one to say “for $K$ blocks we should need $K-1$ temporal features.” That turns out to be only partly true.
+
+### 7.1 One-parameter $K$-block family
+
+Suppose block $i$ differs only by one scalar persistence / switch parameter $p_i$. Then the window likelihood depends only on the total switch count $U$, and the exact posterior is
+
+$$
+\omega_i(U)
+=
+\mathrm{softmax}_i(\alpha_i + \beta_i U).
+$$
+
+So although the posterior lives in a $(K-1)$-simplex in principle, the actual family of posteriors traces only a **1D curve** inside that simplex.
+
+This has two consequences:
+
+1. with a nonlinear softmax readout, one scalar temporal feature is enough;
+2. for a linear TXC, the informative rank is still only 1.
+
+### 7.2 Pedagogical calculation: rank-1 linear information in the one-parameter family
+
+In the one-parameter family the cross-covariance between the window statistic and the block label factorizes as
+
+$$
+k_n(f) \propto \mathbf 1_n,
+$$
+
+so the informative subspace is one-dimensional. In exact expectation, the linear signal matrix has rank 1 regardless of $K$.
+
+### 7.3 Tiny theory-vs-experiment check: $K=4$ one-parameter family
+
+For a sample $K=4$ family with switch parameters
+$$
+p=(0.05, 0.15, 0.25, 0.35),
+$$
+the sample singular values of the window-to-label cross-covariance are:
+
+
+|   singular value index |   sample singular value |
+|-----------------------:|------------------------:|
+|                      1 |                0.250186 |
+|                      2 |                0.002135 |
+|                      3 |                0.001271 |
+
+
+One large singular value, the rest essentially noise: exactly the rank-1 prediction.
+
+### 7.4 Genuine simplex family: the first place $K-1$ temporal features are really needed
+
+To obtain a true $(K-1)$-dimensional family, blocks must differ in **$K-1$ independent temporal directions**, not just one scalar.
+
+The clean matched construction uses $M=K-1$ independent reset channels or source layers, with block-specific parameter vectors
+
+$$
+p_i \in (0,1)^{K-1}.
+$$
+
+Then
+
+$$
+\omega_i(U)
+=
+\mathrm{softmax}_i(a_i + \theta_i^\top U),
+$$
+
+and the number of useful linear temporal features is the **affine rank** of the vectors $p_i$.
+
+A particularly symmetric choice is the regular-simplex family
+
+$$
+p_i = \bar p\,\mathbf 1 + \delta v_i,
+$$
+
+where the $v_i$ are regular-simplex vertices in $\mathbb R^{K-1}$. Then all informative modes are symmetry-equivalent, and
+
+$$
+n_{\mathrm{sig}}
+\sim
+\frac{(K-1)\bar p(1-\bar p)}{\delta^2}.
+$$
+
+### 7.5 Tiny theory-vs-experiment check: $K=3$, two independent channels
+
+For the smallest genuine simplex example ($K=3$, $M=2$), the two informative singular values should be equal by symmetry. Numerically:
+
+
+|   singular value index |   theory |   experiment |   abs error |
+|-----------------------:|---------:|-------------:|------------:|
+|                      1 | 0.653197 |     0.655765 |    0.002568 |
+|                      2 | 0.653197 |     0.654267 |    0.001069 |
+
+
+### 7.6 Pedagogical takeaway
+
+The correct statement is:
+
+> the number of useful linear temporal features is **not** the number of blocks; it is the affine rank of the family’s temporal sufficient statistics.
+
+So:
+
+- the naive one-parameter $K$-block family is still rank 1,
+- the genuine simplex family is rank $K-1$,
+- and the smallest truly nontrivial two-layer benchmark is $K=3$, $M=2$.
+
+---
+
+## 8. Global synthesis: what each architecture is actually matched to
+
+| architecture | exact object it learns in the solvable basin | exact closed-form control parameter | when time helps | first genuinely new win |
+|---|---|---|---|---|
+| static low-$L0$ SAE | co-firing / hedging direction under a budget constraint | support law $q(a)$, co-firing mass $P_{12}$ | it does not; the sequence is iid | expose static feature hedging before any temporal structure |
+| regular SAE | zero-lag marginal / covariance | $\pi$, $C_0$ | only through SGD noise unless loss is changed | never for pure persistence alone |
+| Proposal 3A | per-feature temporal filter | $C_1/C_0$ or modewise $k_j^\star$ | whenever self-persistence matters | denoising / self-persistence |
+| simplest 2-layer XC | same temporal filter plus optimal cross-layer split | $E_D$, $\lambda_{\mathrm{eff}}$ | when layers have different noise/cost or current token is noisy | read-in sharing across layers |
+| window-`T` TXC | Toeplitz Wiener filter $\alpha_T^\star$ | $K_T+\gamma I$ | with noise / regularization / ambiguity | hidden directions with $\mathrm{rank}(\mathcal O_T)>\mathrm{rank}(B)$ |
+| Proposal 5 | posterior-explained support energy $Q_{k,T}$ | $Q_{k,T}$ | when a shared chain explains multiple features | cross-feature temporal pooling |
+| Jordan / predictive-state teacher | predictive state / temporal derivatives | observability index $\nu$ | exactly when $T$ crosses $\nu$ | reveal truly hidden state coordinates |
+| 2-block direct sum | block log-odds / posterior weight $\omega$ | switch count $U$ | when block identity is temporally but not locally visible | one feature as belief-state coefficient |
+| $K$-block simplex | posterior simplex coordinates | affine rank of $p_i$-family | when multiple independent temporal signatures exist | need $K-1$ temporal modes |
+
+---
+
+## 9. What is solved, and what is still open
+
+### 9.1 What I think is essentially solved
+
+Within the aligned / monosemantic / low-rank basins studied above, the following are analytically clean:
+
+1. **Static low-$L0$ “Sparse but Wrong” toy.**  
+   Exact two-feature loss, exact mixing optimum in the equal-magnitude case, and exact reduction of the whole setup to the iid / $\lambda=1$ reset limit.
+
+2. **Regular SAE on stationary HMM data.**  
+   Population temporal blindness, exact scalar GD, exact contiguous-batch variance correction.
+
+3. **Proposal 3A single-feature temporal layer.**  
+   Exact modewise temporal solution, exact one-lag closed form.
+
+4. **Simplest two-layer temporal XC.**  
+   Exact harmonic-mean read-in split, exact one-lag solution.
+
+5. **Window-`T` temporal XC.**  
+   Exact Toeplitz objective, exact optimum, exact GD, exact Schur-complement gain from increasing $T$.
+
+6. **Proposal 5 in the aligned basin.**  
+   Exact reduction to $Q_{k,T}$, exact monotonicity in $T$, exact scalar GD.
+
+7. **Matched teacher / Jordan family.**  
+   Exact observability threshold and exact recovery formulas.
+
+8. **Direct-sum reset processes.**  
+   Exact posterior-coordinate reductions and exact linear-TXC solutions.
+
+### 9.2 What is still genuinely open
+
+1. **Global feature competition.**  
+   Multiple learned features competing for multiple true latents with superposition, hierarchy, and finite width.
+
+2. **Nonlinear tensor-core dynamics.**  
+   Once the temporal operator is parameterized by genuinely nonlinear MPO/MPS cores, the operator-level objective stays clean but the core dynamics inherit gauge and multiplicative nonlinearity.
+
+3. **Proposal 4 (MPS autoencoder).**  
+   We discussed it conceptually but did not derive an equally clean analytic reduction.
+
+4. **SGD basin selection in temporal models.**  
+   We have exact population GD; the next layer is how correlated minibatch noise changes component allocation in the multi-feature setting.
+
+5. **The first true assignment problem.**  
+   The single-feature cases are largely solved. The next analytically meaningful frontier is the first two-feature locally ambiguous setting where time can actually change **which component** is learned.
+
+---
+
+## 10. Recommended benchmark ladder going forward
+
+A clean hierarchy now suggests itself.
+
+### Level 0: static correlated-support / “Sparse but Wrong”
+Correlated Bernoulli supports with no time dependence.
+- Goal: verify the exact low-$L0$ mixing optimum and make sure temporal models do **not** gain when the sequence is iid.
+
+### Level 1: regular SAE sanity check
+Independent HMM features with deterministic locally identifiable emissions.
+- Goal: verify temporal blindness and the contiguous-batch variance law.
+
+### Level 2: Proposal 3A / simplest temporal XC
+Single feature with noisy local readout.
+- Goal: verify $u^\star$, $\beta^\star$, and the layer-split formula.
+
+### Level 3: window-`T` TXC
+Same feature, but finite read window and heterogeneous layer noise.
+- Goal: verify $\alpha_T^\star$, Schur-complement gain, and saturation scale.
+
+### Level 4: observability benchmark
+Small aliased HMM or Jordan-block teacher.
+- Goal: demonstrate that time reveals a hidden direction invisible locally.
+
+### Level 5: shared-chain benchmark
+Proposal 5 with one hidden mode driving several observable features.
+- Goal: verify ranking by $Q_{k,T}$.
+
+### Level 6: direct-sum belief benchmark
+Two-block or $K$-block direct sums.
+- Goal: make one learned temporal feature correspond to a belief-state coordinate $\omega_i$, or to a true simplex of such coordinates.
+
+This ladder is now much cleaner than it was at the start of the project, because we can see exactly where each architecture should start to win.
+
+---
+
+## 11. Final condensed takeaways
+
+1. **Static low-$L0$ mixing is the true zeroth-order failure mode.**  
+   Before time enters at all, an SAE with too-small $L0$ already wants to hedge by mixing co-firing features.
+
+2. **Regular SAEs are population-blind to persistence.**  
+   Persistence only enters through optimization noise unless the objective itself is temporal.
+
+3. **Proposal 3A is analytically solvable and really does learn persistence.**  
+   In the one-feature case it is learning a temporal filter, not just a denoiser.
+
+4. **The simplest two-layer temporal XC differs mostly through gain-splitting and noise-sharing.**  
+   In the single-feature case its extra flexibility is easy to solve exactly.
+
+5. **Window size $T$ matters in two distinct ways.**  
+   It either extends a Wiener filter, or it crosses an observability threshold and reveals hidden directions.
+
+6. **Proposal 5 changes the ranking statistic.**  
+   It favors features whose support becomes predictable once a shared hidden chain is inferred.
+
+7. **The Jordan teacher is the cleanest exact “time reveals hidden state” family.**  
+   It is the right benchmark for Proposal 3B-style recurrent temporal drivers.
+
+8. **Direct-sum reset processes are the cleanest belief-state benchmarks.**  
+   In the symmetric two-block case, one temporal feature can exactly be the posterior weight $\omega_1$.
+
+9. **For $K$-block families, “number of blocks” is not the right complexity measure.**  
+   The right measure is the affine rank of the temporal sufficient statistics.
+
+---
+
+## Appendix A. Source map
+
+This combined note consolidates the following separate threads:
+
+- static low-$L0$ / “Sparse but Wrong” toy model;
+- regular SAE on HMM/reset data;
+- Proposal 3A and simplest two-layer temporal XC;
+- window-`T` temporal XC and observability;
+- Proposal 5 shared chain;
+- matched optimal teacher process;
+- Jordan-block theory and Proposal 3;
+- two-block direct-sum reset process;
+- $K$-block direct-sum and simplex families.
+
+## Appendix B. Formula cheat sheet
+
+### Static low-$L0$ two-feature toy
+$$
+\mathcal E(\alpha)
+=
+m^2 \frac{P_1 (1-\alpha)^2 + P_{12}(1-2\alpha)^2}{\alpha^2+(1-\alpha)^2},
+\qquad
+\alpha^\star
+=
+\frac{P_1 - 2P_{12} + \sqrt{P_1^2 + 4P_{12}^2}}{2P_1}.
+$$
+
+### Regular SAE
+$$
+u_{t+1} = (1-\eta\pi)u_t + \eta\pi(1-\lambda_h).
+$$
+
+### Proposal 3A one-lag
+$$
+\beta^\star = \frac{C_1}{C_0}\frac{1-u^\star}{u^\star},
+\qquad
+u^\star = 1 - \frac{\lambda_h\pi}{C_0 - C_1^2/C_0}.
+$$
+
+### Simplest two-layer XC one-lag
+$$
+c_1^\star = \frac{\lambda_{e,2}}{\lambda_{e,1}+\lambda_{e,2}}u,
+\qquad
+c_2^\star = \frac{\lambda_{e,1}}{\lambda_{e,1}+\lambda_{e,2}}u.
+$$
+
+### Window-`T` TXC
+$$
+\alpha_T^\star = (K_T+\gamma_{\mathrm{eff}}I)^{-1} c_T.
+$$
+
+### Proposal 5
+$$
+r_{k,\star}^{(T)} = \frac{Q_{k,T}}{Q_{k,T}+\lambda}.
+$$
+
+### Jordan teacher
+$$
+(E-\rho)^j s_t = z_t^{(j+1)},
+\qquad
+T_{\min}=r \quad \text{(single-view case)}.
+$$
+
+### Two-block direct sum
+$$
+\omega_1(U)=\sigma(\beta_0+\beta_1 U),
+\qquad
+R_n^2 = \frac{n\Delta^2}{\sigma_{\mathrm{within}}^2+n\Delta^2}.
+$$
+
+### $K$-block simplex family
+$$
+n_{\mathrm{sig}} \sim \frac{(K-1)\bar p(1-\bar p)}{\delta^2}.
+$$

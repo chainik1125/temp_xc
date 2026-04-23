@@ -18,6 +18,25 @@ separation-scaling = [
     "simplexity @ git+https://github.com/Astera-org/simplexity.git@review/nonergodic-pr172",
 ]
 
+# Dependencies for experiments/code_benchmark/ (TempXC vs MLC on Gemma-2B-it
+# over Python code). Install with: uv sync --extra code-benchmark
+#
+# torch upper bound pinned to <2.8 so that cu12x wheels are selected — the
+# default wheel builds for 2.8+ ship cu130 which requires CUDA driver ≥ 13.
+# Our target A40 hosts run driver 12.x.
+code-benchmark = [
+    "torch>=2.4,<2.8",
+    "numpy>=1.26",
+    "scikit-learn>=1.4",
+    "matplotlib>=3.8",
+    "pyyaml>=6.0",
+    "transformer-lens>=2.0",
+    "transformers>=4.40",
+    "datasets>=2.18",
+    "umap-learn>=0.5",
+    "tqdm",
+]
+
 [dependency-groups]
 dev = [
     "pytest",
