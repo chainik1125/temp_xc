@@ -186,10 +186,23 @@ n_neighbors=15, min_dist=0.1, random_state=42. Coloured by MMLU
 subject, question ID, POS (char-class heuristic — spaCy is not
 available on CPython 3.14 yet).
 
-Silhouette scores are near-zero across the board (table in
-`results/umap/concat_C_v2__silhouette_scores.csv`; verdict section
-to be updated once the full 4-arch × 2-prefix × 3-label = 24-plot
-grid completes in background).
+Silhouette scores on concat_C_v2 (5 archs × 2 prefixes × 3 label
+types = 30 values):
+
+| arch             | H sem  | H ctx  | H pos  | L sem  | L ctx  | L pos  |
+|------------------|--------|--------|--------|--------|--------|--------|
+| `agentic_txc_02` | −0.042 | −0.181 | +0.116 | −0.018 | −0.113 | +0.053 |
+| `agentic_mlc_08` | −0.043 | −0.228 | +0.086 | −0.019 | −0.169 | +0.032 |
+| `tsae_paper`     | −0.032 | −0.178 | +0.072 | −0.003 | −0.130 | +0.022 |
+| `tsae_ours`      | −0.065 | −0.287 | +0.103 | −0.025 | −0.186 | +0.041 |
+| `tfa_big`        | −0.124 | −0.388 | −0.044 | −0.000 | −0.002 | +0.000 |
+
+All H/sem scores are negative (no arch clusters cleanly by MMLU
+subject on the high prefix). POS scores are consistently small but
+positive, confirming the bias-toward-syntax pattern the paper also
+finds in baseline SAEs. `tfa_big`'s negative semantic score is the
+strongest — its attention-combined features evidently compress into
+a single global blob that UMAP can't tease apart.
 
 **Preliminary reading** (from partial UMAP results on both concat-C
 variants): the semantic UMAP panel does **not** cleanly separate MMLU

@@ -226,10 +226,26 @@ def main():
 
     import csv
     dst = OUT_DIR / f"{args.concat}__silhouette_scores.csv"
+    # Merge with existing rows so single-arch reruns don't overwrite.
+    # We uniquely identify rows by (concat, arch, prefix, label); new
+    # rows win.
+    existing = []
+    if dst.exists():
+        with open(dst) as f:
+            existing = list(csv.DictReader(f))
+    keep = [
+        r for r in existing
+        if (r["concat"], r["arch"], r["prefix"], r["label"])
+        not in {(x["concat"], x["arch"], x["prefix"], x["label"])
+                for x in silhouette_rows}
+    ]
+    merged = keep + silhouette_rows
+    # Sort for stable output
+    merged.sort(key=lambda r: (r["concat"], r["arch"], r["prefix"], r["label"]))
     with open(dst, "w", newline="") as f:
         w = csv.DictWriter(f, fieldnames=["concat", "arch", "prefix", "label", "silhouette"])
-        w.writeheader(); w.writerows(silhouette_rows)
-    print(f"wrote {dst}")
+        w.writeheader(); w.writerows(merged)
+    print(f"wrote {dst} ({len(merged)} rows: {len(silhouette_rows)} new, {len(keep)} kept)")
 
 
 if __name__ == "__main__":

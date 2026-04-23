@@ -23,3 +23,9 @@ concat_C_v2,tsae_ours,high,pos,0.10294631123542786
 concat_C_v2,tsae_ours,low,semantic,-0.02467840164899826
 concat_C_v2,tsae_ours,low,context,-0.18614594638347626
 concat_C_v2,tsae_ours,low,pos,0.04112595319747925
+concat_C_v2,tfa_big,high,semantic,-0.12363424897193909
+concat_C_v2,tfa_big,high,context,-0.38797450065612793
+concat_C_v2,tfa_big,high,pos,-0.04367684945464134
+concat_C_v2,tfa_big,low,semantic,-6.984663923503831e-05
+concat_C_v2,tfa_big,low,context,-0.002070432063192129
+concat_C_v2,tfa_big,low,pos,5.3684461818193085e-06
