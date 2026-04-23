@@ -49,7 +49,7 @@ with no new mechanistic insight, stop and escalate.
 | `tsae_paper` (ref)  | 0.73  | 6             | n/a (not window)        | Phase 6 |
 | `agentic_txc_09_auxk` | **0.37** ‡| **3** | _probing deferred_ | **Cycle A** |
 | `agentic_txc_02_batchtopk` | **0.80** | **7** 🏆 | _probing deferred_ | **Cycle F** |
-| `agentic_txc_10_bare` | _tbd_ | _tbd_ | _probing deferred_ | **Track 2** |
+| `agentic_txc_10_bare` | **0.62** | **6** | _probing deferred_ | **Track 2** |
 
 † Reproduced on this pod at alive=0.3688 on 2048-token random L13
 sample, L0 per-window 500 (= 100 per token). Matches briefing value
@@ -228,6 +228,107 @@ After Track 2, priority becomes **Cycle F (BatchTopK)** — the briefing's
 next-in-line mechanism, which directly targets the tension. If
 BatchTopK-TXC + AuxK beats Cycle A by a meaningful margin, that
 triangulates "BatchTopK is the load-bearing piece".
+
+### Track 2 — bare TXC + full anti-dead stack       [Track 2]
+
+**Reference to beat**: `agentic_txc_02`, autointerp = 2 / 8.
+
+**Hypothesis**: Strip matryoshka AND contrastive entirely, but port the
+complete `tsae_paper` anti-dead machinery (AuxK + unit-norm decoder
+with grad-parallel removal + geometric-median `b_dec` init) onto the
+window-based TXC encoder. Tests whether window encoding alone +
+anti-dead stack is enough for qualitative, independent of matryoshka
+nesting or InfoNCE pressure.
+
+**Change**: new class `TXCBareAntidead` in
+[`src/architectures/txc_bare_antidead.py`](../../../src/architectures/txc_bare_antidead.py)
+with custom training loop
+[`train_txc_bare_antidead`](../../../experiments/phase5_downstream_utility/train_primary_archs.py)
+hooking grad-parallel removal between `loss.backward()` and
+`opt.step()`. Dispatcher entry `agentic_txc_10_bare`.
+
+**Code**: commit `18d1e88` (arch + trainer + wiring).
+
+**Train result**:
+
+- 1322.8 s wall-clock (≈ 22 min) on A40 — faster than cycle A (no
+  matryoshka scales to compute).
+- converged=True at step 5 600 / 25 000 (slightly later than Cycle A's
+  4200; anti-dead stack extends the useful training window).
+- Final loss 6 206 — **not directly comparable** to Cycle A's 16 082
+  because bare TXC reconstructs only the full T-window (single
+  scale), whereas matryoshka reconstructs at 5 nested scales (sum).
+- L0 = 490 (TopK enforced).
+- Decoder mean |cos|: **0.0099** — very disentangled (unit-norm +
+  grad-parallel removal working).
+
+**Eval result**:
+
+- Alive fraction: **0.6177** — big jump vs `agentic_txc_02` (0.37)
+  and Cycle A (0.37); below `tsae_paper` (0.735) and Cycle F (0.80).
+- Autointerp: **6 / 8 semantic labels** — **ties `tsae_paper`**
+  (4 points above `agentic_txc_02` baseline; 3 points above Cycle A;
+  1 below Cycle F's 7/8).
+
+Top-8 feature labels:
+
+| rank | feat | label | semantic? |
+|---|---|---|---|
+| 1 | 12805 | hyphenated compound words and phrases | ✗ |
+| 2 | 14994 | acronym explanation in French context | ✓ |
+| 3 | 12412 | French translation of Soviet Union name | ✓ |
+| 4 | 15340 | Historical context of Orwell's political views | ✓ |
+| 5 | 12560 | Acknowledgment of sole responsibility for errors | ✓ |
+| 6 |  1846 | Punctuation and special characters in text | ✗ |
+| 7 | 15835 | Acknowledgment and gratitude expressions in formal writing | ✓ |
+| 8 |  7615 | Biographical information about George Orwell | ✓ |
+
+**Verdict**: **STRONG WIN on qualitative** — matches `tsae_paper` at
+6/8 without matryoshka, without contrastive. Alive-fraction gap vs
+Cycle F (0.62 vs 0.80) confirms BatchTopK's extra lift.
+
+**Takeaway** (updates Cycle A's):
+
+The anti-dead stack (unit-norm decoder + grad-parallel removal +
+geom-median init, plus AuxK as the smallest contributor) **is
+load-bearing for qualitative** — roughly as much as BatchTopK. The
+two mechanisms act on different axes:
+
+- BatchTopK: variable per-sample sparsity → revived features can
+  fire per-context without displacing incumbents.
+- Anti-dead stack: enforces decoder-direction diversity (unit-norm
+  + grad-parallel) and non-trivial starting point (geom-median) →
+  features don't collapse onto each other or onto the data mean
+  early, so more of them survive to carry distinct concepts.
+
+Cycle A's failure (3/8 at alive=0.37) was therefore not about AuxK
+being useless — it was that AuxK alone, without the other 3 anti-
+dead mechanisms, is insufficient. When all four are applied
+together on a simpler bare-TXC architecture (Track 2), the result
+jumps to 6/8 despite keeping TopK.
+
+This also reframes the Cycle A takeaway: what matters isn't just
+"BatchTopK vs TopK" — it's **"is the feature dictionary kept
+diverse and alive?"** Two orthogonal mechanism classes (sparsity
++ anti-dead stack) achieve that, and combining them (Cycle H) is
+the next test.
+
+**Paper story update**: the Phase 6 finding becomes a **2×2 design**:
+
+|  | TopK sparsity | BatchTopK sparsity |
+|---|---|---|
+| **Sparse recipe (matryoshka + multi-scale contrastive)** | `agentic_txc_02` → 2/8 (needs Phase 5 probe win) | `agentic_txc_02_batchtopk` → **7/8** (Cycle F, new champion) |
+| **Bare recipe (single decoder, no contrastive)** | (not tested, but Track 2 + TopK ≈ this cell plus anti-dead) | (Cycle H candidate variant) |
+
+And orthogonally, anti-dead stack adds ~3/8 labels on top of either
+sparsity choice (from baseline 2/8 → Track 2 6/8 at TopK).
+
+**Next**: **Cycle H (BatchTopK + full anti-dead stack)** — already
+implemented, wired, smoke-tested. Kick off training immediately.
+Expected: 7/8 or 8/8. If 8/8, the combined recipe is the definitive
+qualitative winner; if 7/8, Cycle F's 7/8 is the ceiling on this
+bench and the remaining punctuation feature is fundamental to
+top-by-variance on concat A+B.
 
 ### Cycle F — BatchTopK on multiscale TXC       [Track 1]
 

@@ -1,0 +1,186 @@
+[
+  {
+    "feature_idx": 12805,
+    "label": "hyphenated compound words and phrases",
+    "variance": 505.25152587890625,
+    "n_contexts": 10,
+    "contexts": [
+      {
+        "position": 1343,
+        "strength": 150.75,
+        "text": " a period when Russia lived under the Marxist\u2013Len\u00abinist\u00bb ideology of Joseph Stalin. Orwell, a democratic"
+      },
+      {
+        "position": 1344,
+        "strength": 150.375,
+        "text": " period when Russia lived under the Marxist\u2013Leninist\u00ab ideology\u00bb of Joseph Stalin. Orwell, a democratic socialist"
+      },
+      {
+        "position": 1342,
+        "strength": 148.375,
+        "text": ", a period when Russia lived under the Marxist\u2013\u00abLen\u00bbinist ideology of Joseph Stalin. Orwell, a"
+      }
+    ]
+  },
+  {
+    "feature_idx": 14994,
+    "label": "acronym explanation in French context",
+    "variance": 479.3267517089844,
+    "n_contexts": 10,
+    "contexts": [
+      {
+        "position": 1544,
+        "strength": 146.0,
+        "text": " r\u00e9publiques socialistes animales for the French translation\u00ab,\u00bb which abbreviates to URSA, the"
+      },
+      {
+        "position": 1554,
+        "strength": 145.375,
+        "text": ", which abbreviates to URSA, the\u00ab Latin\u00bb word for \"bear\", a symbol of Russia"
+      },
+      {
+        "position": 1546,
+        "strength": 144.875,
+        "text": "liques socialistes animales for the French translation, which\u00ab abbre\u00bbviates to URSA, the Latin word"
+      }
+    ]
+  },
+  {
+    "feature_idx": 12412,
+    "label": "French translation of Soviet Union name",
+    "variance": 464.2760314941406,
+    "n_contexts": 10,
+    "contexts": [
+      {
+        "position": 1584,
+        "strength": 135.625,
+        "text": " Soviet Union, Union des r\u00e9publiques socialistes\u00ab sovi\u00bb\u00e9tiques.\nOrwell wrote the book between"
+      },
+      {
+        "position": 1583,
+        "strength": 130.25,
+        "text": " the Soviet Union, Union des r\u00e9publiques social\u00abistes\u00bb sovi\u00e9tiques.\nOrwell wrote the book"
+      },
+      {
+        "position": 1582,
+        "strength": 129.375,
+        "text": " of the Soviet Union, Union des r\u00e9publiques\u00ab social\u00bbistes sovi\u00e9tiques.\nOrwell wrote the"
+      }
+    ]
+  },
+  {
+    "feature_idx": 15340,
+    "label": "Historical context of Orwell's political views",
+    "variance": 395.60205078125,
+    "n_contexts": 10,
+    "contexts": [
+      {
+        "position": 1621,
+        "strength": 116.875,
+        "text": " Kingdom was in its wartime alliance with the Soviet Union\u00ab against\u00bb Nazi Germany and the British intelligentsia held Stalin"
+      },
+      {
+        "position": 1622,
+        "strength": 115.1875,
+        "text": " was in its wartime alliance with the Soviet Union against\u00ab Nazi\u00bb Germany and the British intelligentsia held Stalin in"
+      },
+      {
+        "position": 1632,
+        "strength": 112.0625,
+        "text": " Nazi Germany and the British intelligentsia held Stalin in\u00ab high\u00bb esteem, which Orwell hated. The manuscript was"
+      }
+    ]
+  },
+  {
+    "feature_idx": 12560,
+    "label": "Acknowledgment of sole responsibility for errors",
+    "variance": 373.6743469238281,
+    "n_contexts": 10,
+    "contexts": [
+      {
+        "position": 1265,
+        "strength": 97.9375,
+        "text": " those to whom I\nam indebted for criticisms or\u00ab corrections\u00bb, because I should wish to bear\nalone"
+      },
+      {
+        "position": 1264,
+        "strength": 96.6875,
+        "text": " name those to whom I\nam indebted for criticisms\u00ab or\u00bb corrections, because I should wish to bear\n"
+      },
+      {
+        "position": 1263,
+        "strength": 96.5,
+        "text": " not name those to whom I\nam indebted for\u00ab criticisms\u00bb or corrections, because I should wish to bear"
+      }
+    ]
+  },
+  {
+    "feature_idx": 1846,
+    "label": "Punctuation and special characters in text",
+    "variance": 328.8509521484375,
+    "n_contexts": 10,
+    "contexts": [
+      {
+        "position": 1105,
+        "strength": 126.6875,
+        "text": " years, destroyed nearly all letters\nreceived before \u00ab1\u00bb862. After that date he was"
+      },
+      {
+        "position": 1751,
+        "strength": 118.6875,
+        "text": " (2, 4), and (3,\u00ab \u00bb0) is reflected across the line y ="
+      },
+      {
+        "position": 1103,
+        "strength": 115.75,
+        "text": " on for years, destroyed nearly all letters\nreceived\u00ab before\u00bb 1862. After that date"
+      }
+    ]
+  },
+  {
+    "feature_idx": 15835,
+    "label": "Acknowledgment and gratitude expressions in formal writing",
+    "variance": 298.3660888671875,
+    "n_contexts": 10,
+    "contexts": [
+      {
+        "position": 1443,
+        "strength": 92.3125,
+        "text": " essay \"Why I Write\" (194\u00ab6\u00bb) wrote: \"Animal Farm was the first"
+      },
+      {
+        "position": 1234,
+        "strength": 91.4375,
+        "text": " all these kind coadjutors\nI gladly\u00ab acknowledge\u00bb my indebtedness. The names of some occur in"
+      },
+      {
+        "position": 1444,
+        "strength": 91.0625,
+        "text": " \"Why I Write\" (1946\u00ab)\u00bb wrote: \"Animal Farm was the first book"
+      }
+    ]
+  },
+  {
+    "feature_idx": 7615,
+    "label": "Biographical information about George Orwell",
+    "variance": 251.55160522460938,
+    "n_contexts": 10,
+    "contexts": [
+      {
+        "position": 1396,
+        "strength": 102.125,
+        "text": " POUM and Stalinist forces, during the Spanish\u00ab Civil\u00bb War. In a letter to Yvonne Davet"
+      },
+      {
+        "position": 1410,
+        "strength": 102.0,
+        "text": " a letter to Yvonne Davet (a French writer\u00ab),\u00bb Orwell described Animal Farm as a satirical tale against"
+      },
+      {
+        "position": 1395,
+        "strength": 101.5625,
+        "text": " the POUM and Stalinist forces, during the\u00ab Spanish\u00bb Civil War. In a letter to Yvonne Dav"
+      }
+    ]
+  }
+]

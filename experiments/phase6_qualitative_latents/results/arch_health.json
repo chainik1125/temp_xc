@@ -1,9 +1,9 @@
 [
   {
-    "arch": "agentic_txc_02_batchtopk",
-    "alive_fraction": 0.7953559160232544,
-    "l0_per_token": 661.8679809570312,
+    "arch": "agentic_txc_10_bare",
+    "alive_fraction": 0.6177300214767456,
+    "l0_per_token": 500.0000305175781,
     "n_tokens": 409,
-    "decoder_mean_abs_cos": null
+    "decoder_mean_abs_cos": 0.0099030751734972
   }
 ]
