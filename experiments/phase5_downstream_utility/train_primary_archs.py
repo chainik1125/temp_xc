@@ -650,15 +650,25 @@ def train_matryoshka_txcdr_contrastive_hardneg(
 
 def train_matryoshka_txcdr_contrastive_multiscale(
     cfg, device, k, T, alpha=1.0, n_contr_scales=3, gamma=0.5,
-    d_sae=DEFAULT_D_SAE, buf=None,
+    d_sae=DEFAULT_D_SAE, buf=None, batchtopk: bool = False,
 ):
-    """Agentic cycle 02: A3 + multi-scale InfoNCE."""
-    from src.architectures.matryoshka_txcdr_contrastive_multiscale import (
-        MatryoshkaTXCDRContrastiveMultiscale,
-    )
+    """Agentic cycle 02: A3 + multi-scale InfoNCE.
+
+    With `batchtopk=True`, swap the per-sample TopK for BatchTopK
+    on the encode path — this is Phase 6.1 Cycle F
+    (`agentic_txc_02_batchtopk`).
+    """
+    if batchtopk:
+        from src.architectures._batchtopk_variants import (
+            MatryoshkaTXCDRContrastiveMultiscaleBatchTopK as ArchCls,
+        )
+    else:
+        from src.architectures.matryoshka_txcdr_contrastive_multiscale import (
+            MatryoshkaTXCDRContrastiveMultiscale as ArchCls,
+        )
     buf = buf if buf is not None else _preload_single(ANCHOR_LAYER_KEY, device)
     k_eff = k * T
-    model = MatryoshkaTXCDRContrastiveMultiscale(
+    model = ArchCls(
         buf.shape[-1], d_sae, T, k_eff,
         n_contr_scales=n_contr_scales, gamma=gamma,
     ).to(device)
@@ -683,18 +693,30 @@ def train_matryoshka_txcdr_contrastive_multiscale(
 def train_txc_bare_antidead(
     cfg, device, k, T,
     aux_k=512, dead_threshold_tokens=10_000_000, auxk_alpha=1.0 / 32.0,
-    d_sae=DEFAULT_D_SAE, buf=None,
+    d_sae=DEFAULT_D_SAE, buf=None, batchtopk: bool = False,
 ):
     """Phase 6.1 Track 2 (minimal baseline): bare window-based TXC +
     full tsae_paper anti-dead stack (AuxK + unit-norm decoder + grad-
     parallel removal + geometric-median b_dec init). No matryoshka,
     no contrastive. Custom training loop (not `_iterate_train`) so we
     can hook grad-parallel removal between backward and opt.step.
+
+    With `batchtopk=True`: swap per-sample TopK for BatchTopK on the
+    primary encode path — this is the Phase 6.1 follow-up #4 arch
+    `agentic_txc_12_bare_batchtopk`. Otherwise it's Track 2
+    (`agentic_txc_10_bare`) with per-sample TopK.
     """
-    from src.architectures.txc_bare_antidead import TXCBareAntidead
+    if batchtopk:
+        from src.architectures.txc_bare_batchtopk_antidead import (
+            TXCBareBatchTopKAntidead,
+        )
+        ArchCls = TXCBareBatchTopKAntidead
+    else:
+        from src.architectures.txc_bare_antidead import TXCBareAntidead
+        ArchCls = TXCBareAntidead
     buf = buf if buf is not None else _preload_single(ANCHOR_LAYER_KEY, device)
     k_eff = k * T
-    model = TXCBareAntidead(
+    model = ArchCls(
         buf.shape[-1], d_sae, T, k_eff,
         aux_k=aux_k, dead_threshold_tokens=dead_threshold_tokens,
         auxk_alpha=auxk_alpha,
@@ -1439,6 +1461,19 @@ def run_all(seeds, max_steps, archs=None):
                             match_budget=True, layer=13, alpha=1.0,
                             n_contr_scales=3, gamma=0.5,
                             variant="agentic_txc_07_consistency")
+            elif arch == "agentic_txc_02_batchtopk":
+                # Phase 6.1 Cycle F: cycle-02 multi-scale TXC with
+                # per-sample TopK replaced by BatchTopK. No AuxK.
+                model, log = train_matryoshka_txcdr_contrastive_multiscale(
+                    cfg, device, k=100, T=5, alpha=1.0,
+                    n_contr_scales=3, gamma=0.5,
+                    buf=get_anchor(), batchtopk=True,
+                )
+                meta = dict(seed=seed, k_pos=100, k_win=500, T=5,
+                            match_budget=True, layer=13, alpha=1.0,
+                            n_contr_scales=3, gamma=0.5,
+                            sparsity="batchtopk",
+                            variant="agentic_txc_02_batchtopk_cycleF")
             elif arch == "agentic_txc_11_stack":
                 # Phase 6.1 cycle H: BatchTopK TXC + AuxK stacked.
                 # If Cycle F's BatchTopK at 7/8 is already near the
@@ -1474,6 +1509,24 @@ def run_all(seeds, max_steps, archs=None):
                             aux_k=512, dead_threshold_tokens=10_000_000,
                             auxk_alpha=1.0 / 32.0,
                             variant="agentic_txc_10_bare_antidead_track2")
+            elif arch == "agentic_txc_12_bare_batchtopk":
+                # Phase 6.1 follow-up #4: missing 2x2 cell — bare TXC +
+                # BatchTopK + full anti-dead stack. Tests whether
+                # BatchTopK + anti-dead compose without the matryoshka/
+                # contrastive context (Cycle H regressed with both in
+                # play — mechanism fingerprint isolated here).
+                model, log = train_txc_bare_antidead(
+                    cfg, device, k=100, T=5,
+                    aux_k=512, dead_threshold_tokens=10_000_000,
+                    auxk_alpha=1.0 / 32.0,
+                    buf=get_anchor(), batchtopk=True,
+                )
+                meta = dict(seed=seed, k_pos=100, k_win=500, T=5,
+                            match_budget=True, layer=13,
+                            sparsity="batchtopk",
+                            aux_k=512, dead_threshold_tokens=10_000_000,
+                            auxk_alpha=1.0 / 32.0,
+                            variant="agentic_txc_12_bare_batchtopk_2x2cell")
             elif arch == "agentic_txc_09_auxk":
                 # Phase 6.1 cycle A: cycle-02 recipe + AuxK loss to
                 # revive dead features. Expected +2 autointerp

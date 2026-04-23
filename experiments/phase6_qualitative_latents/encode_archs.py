@@ -56,10 +56,13 @@ def load_concats():
 
     C_v2 is the paper-faithful TSNE set (200 × 30 tokens across 10 MMLU
     subjects, last-N-token convention). C is kept for backward compat
-    with the earlier 160 × 20-token variant.
+    with the earlier 160 × 20-token variant. concat_random is the
+    random-FineWeb generalisation control (single long sequence, multiple
+    passage IDs in provenance).
     """
     out = {}
-    for nm in ("concat_A", "concat_B", "concat_C", "concat_C_v2"):
+    for nm in ("concat_A", "concat_B", "concat_C", "concat_C_v2",
+               "concat_random"):
         p = CONCAT_DIR / f"{nm}.json"
         if p.exists():
             out[nm] = json.loads(p.read_text())
@@ -131,9 +134,13 @@ def gemma_resid_cache(
 # ─────────────────────────────────────────────── per-arch encoders
 
 
-def load_arch(arch: str, device: torch.device) -> torch.nn.Module:
-    """Load one Phase 5/6 arch from its ckpt into eval mode on GPU."""
-    ckpt_path = CKPT_DIR / f"{arch}__seed42.pt"
+def load_arch(arch: str, device: torch.device, seed: int = 42) -> torch.nn.Module:
+    """Load one Phase 5/6 arch from its ckpt into eval mode on GPU.
+
+    The `seed` param selects `{arch}__seed{seed}.pt` under CKPT_DIR.
+    Required for Phase 6.1 multi-seed experiments.
+    """
+    ckpt_path = CKPT_DIR / f"{arch}__seed{seed}.pt"
     state = torch.load(ckpt_path, map_location=device, weights_only=False)
     meta = state["meta"]
 
@@ -182,6 +189,16 @@ def load_arch(arch: str, device: torch.device) -> torch.nn.Module:
             D_IN, D_SAE, T, k_eff,
             n_contr_scales=meta.get("n_contr_scales", 3),
             gamma=meta.get("gamma", 0.5),
+        ).to(device)
+    elif arch == "agentic_txc_12_bare_batchtopk":
+        from src.architectures.txc_bare_batchtopk_antidead import TXCBareBatchTopKAntidead
+        T = meta["T"]
+        k_eff = meta["k_win"] or (meta["k_pos"] * T)
+        model = TXCBareBatchTopKAntidead(
+            D_IN, D_SAE, T, k_eff,
+            aux_k=int(meta.get("aux_k", 512)),
+            dead_threshold_tokens=int(meta.get("dead_threshold_tokens", 10_000_000)),
+            auxk_alpha=float(meta.get("auxk_alpha", 1.0 / 32.0)),
         ).to(device)
     elif arch == "agentic_txc_11_stack":
         from src.architectures.matryoshka_txcdr_contrastive_multiscale_batchtopk_auxk import (
@@ -329,8 +346,17 @@ def encode_tfa(model, resid_L13: torch.Tensor, device,
 # ─────────────────────────────────────────────── driver
 
 
-def encode_concat_AB(concat, concat_name: str, archs: list[str], device):
-    """Encode a single long concat (A or B) under each arch."""
+def _z_filename(arch: str, seed: int) -> str:
+    """Per-seed z cache filename. Seed=42 keeps legacy `<arch>__z.npy`
+    for backward compat with pre-Phase-6.1 downstream scripts (UMAP,
+    TSNE). All seeds also emit `<arch>__seed{N}__z.npy` so downstream
+    can disambiguate when multi-seed is in play."""
+    return f"{arch}__seed{seed}__z.npy"
+
+
+def encode_concat_AB(concat, concat_name: str, archs: list[str], device,
+                     seed: int = 42):
+    """Encode a single long concat (A or B or random) under each arch."""
     out = OUT_DIR / concat_name
     out.mkdir(parents=True, exist_ok=True)
 
@@ -351,10 +377,11 @@ def encode_concat_AB(concat, concat_name: str, archs: list[str], device):
     (out / "provenance.json").write_text(json.dumps(concat, indent=2))
 
     for arch in archs:
-        print(f"[{concat_name}] encode: {arch}")
-        model, meta = load_arch(arch, device)
+        print(f"[{concat_name}] encode (seed={seed}): {arch}")
+        model, meta = load_arch(arch, device, seed=seed)
         if arch in ("agentic_txc_02", "agentic_txc_09_auxk", "agentic_txc_10_bare",
-                    "agentic_txc_02_batchtopk", "agentic_txc_11_stack"):
+                    "agentic_txc_02_batchtopk", "agentic_txc_11_stack",
+                    "agentic_txc_12_bare_batchtopk"):
             z = encode_txc(model, resid_L13, device, T=meta["T"])
         elif arch == "agentic_mlc_08":
             z = encode_mlc(model, stack, device)
@@ -367,13 +394,16 @@ def encode_concat_AB(concat, concat_name: str, archs: list[str], device):
                            seq_len=int(meta.get("T", 128)))
         else:
             raise ValueError(arch)
-        np.save(out / f"{arch}__z.npy", z)
+        np.save(out / _z_filename(arch, seed), z)
+        if seed == 42:
+            np.save(out / f"{arch}__z.npy", z)  # legacy BC
         print(f"  saved {arch}: {z.shape}  ({z.nbytes/1e6:.1f} MB fp16)")
         del model
         torch.cuda.empty_cache()
 
 
-def encode_concat_C(concat, archs: list[str], device, out_name: str = "concat_C"):
+def encode_concat_C(concat, archs: list[str], device, out_name: str = "concat_C",
+                    seed: int = 42):
     """Encode N × k-token short sequences under each arch. Writes to
     `z_cache/<out_name>/`. `concat` schema: {"sequences": [...], ...}."""
     out = OUT_DIR / out_name
@@ -394,15 +424,16 @@ def encode_concat_C(concat, archs: list[str], device, out_name: str = "concat_C"
     (out / "provenance.json").write_text(json.dumps(concat, indent=2))
 
     for arch in archs:
-        print(f"[concat_C] encode: {arch}")
-        model, meta = load_arch(arch, device)
+        print(f"[concat_C] encode (seed={seed}): {arch}")
+        model, meta = load_arch(arch, device, seed=seed)
         # We encode each 20-token seq independently so TXC windowing
         # uses edge-replicated padding within each seq.
         z_all = np.zeros((n_seq, seq_len, D_SAE), dtype=np.float16)
         for si in range(n_seq):
             resid_L13_i = resid[13][si]  # (20, d)
             if arch in ("agentic_txc_02", "agentic_txc_09_auxk", "agentic_txc_10_bare",
-                        "agentic_txc_02_batchtopk", "agentic_txc_11_stack"):
+                        "agentic_txc_02_batchtopk", "agentic_txc_11_stack",
+                        "agentic_txc_12_bare_batchtopk"):
                 z = encode_txc(model, resid_L13_i, device, T=meta["T"])
             elif arch == "agentic_mlc_08":
                 z = encode_mlc(model, stack[si], device)  # (20, 5, d) -> (20, d_sae)
@@ -416,7 +447,9 @@ def encode_concat_C(concat, archs: list[str], device, out_name: str = "concat_C"
             else:
                 raise ValueError(arch)
             z_all[si] = z
-        np.save(out / f"{arch}__z.npy", z_all)
+        np.save(out / _z_filename(arch, seed), z_all)
+        if seed == 42:
+            np.save(out / f"{arch}__z.npy", z_all)  # legacy BC
         print(f"  saved {arch}: {z_all.shape}  ({z_all.nbytes/1e6:.1f} MB fp16)")
         del model
         torch.cuda.empty_cache()
@@ -426,31 +459,36 @@ def main():
     p = argparse.ArgumentParser()
     p.add_argument("--archs", type=str, nargs="+", default=DEFAULT_ARCHS)
     p.add_argument("--sets", type=str, nargs="+",
-                   default=["A", "B", "C", "C_v2"])
+                   default=["A", "B", "C", "C_v2"],
+                   help="subset of {A, B, C, C_v2, random} to encode")
+    p.add_argument("--seed", type=int, default=42,
+                   help="ckpt seed — reads {arch}__seed{N}.pt from CKPT_DIR")
     args = p.parse_args()
 
-    # Skip archs whose ckpt isn't present (e.g. tfa_big not trained yet).
+    # Skip archs whose ckpt (for this seed) isn't present.
     archs = [a for a in args.archs
-             if (CKPT_DIR / f"{a}__seed42.pt").exists()]
+             if (CKPT_DIR / f"{a}__seed{args.seed}.pt").exists()]
     missing = set(args.archs) - set(archs)
     if missing:
-        print(f"skipping absent ckpts: {sorted(missing)}")
+        print(f"skipping absent ckpts at seed {args.seed}: {sorted(missing)}")
     if not archs:
-        raise SystemExit("no archs available")
+        raise SystemExit(f"no archs available for seed={args.seed}")
 
     device = torch.device("cuda")
     concats = load_concats()
 
-    # A and B: single long sequences — encode_concat_AB
-    for nm in ("concat_A", "concat_B"):
-        short = nm.split("_")[-1]
+    # A, B, random: single long sequences — encode_concat_AB
+    for nm in ("concat_A", "concat_B", "concat_random"):
+        short = nm.split("_", 1)[-1]  # "A", "B", "random"
         if short in args.sets and nm in concats:
-            encode_concat_AB(concats[nm], nm, archs, device)
+            encode_concat_AB(concats[nm], nm, archs, device, seed=args.seed)
     # C and C_v2: many short sequences — encode_concat_C (writes per-set dir)
     if "C" in args.sets and "concat_C" in concats:
-        encode_concat_C(concats["concat_C"], archs, device, out_name="concat_C")
+        encode_concat_C(concats["concat_C"], archs, device,
+                        out_name="concat_C", seed=args.seed)
     if "C_v2" in args.sets and "concat_C_v2" in concats:
-        encode_concat_C(concats["concat_C_v2"], archs, device, out_name="concat_C_v2")
+        encode_concat_C(concats["concat_C_v2"], archs, device,
+                        out_name="concat_C_v2", seed=args.seed)
 
 
 if __name__ == "__main__":

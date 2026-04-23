@@ -108,7 +108,8 @@ def diagnose(arch: str, device, n_tokens: int = 2048) -> dict:
         x = sample_L13(n_tokens, seed=0).to(device)
 
     if arch in ("agentic_txc_02", "agentic_txc_09_auxk", "agentic_txc_10_bare",
-                "agentic_txc_02_batchtopk", "agentic_txc_11_stack"):
+                "agentic_txc_02_batchtopk", "agentic_txc_11_stack",
+                "agentic_txc_12_bare_batchtopk"):
         # T=5 window: need (B, T, d). Build non-overlapping windows by reshape.
         # Trim to multiple of T=5.
         T = 5

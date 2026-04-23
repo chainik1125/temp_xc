@@ -48,14 +48,14 @@ echo
 echo "--- STEP 2: encode on concat A + B + C_v2 ---"
 TQDM_DISABLE=1 PYTHONPATH=. .venv/bin/python -u \
   experiments/phase6_qualitative_latents/encode_archs.py \
-  --archs "${ARCH}" --sets A B C_v2 \
+  --archs "${ARCH}" --sets A B C_v2 --seed "${SEED}" \
   2>&1 | tee "${LOGDIR}/eval_${ARCH}_encode.log"
 
 echo
-echo "--- STEP 3: autointerp (Claude Haiku) ---"
+echo "--- STEP 3: autointerp (Claude Haiku + Sonnet judges) ---"
 TQDM_DISABLE=1 PYTHONPATH=. .venv/bin/python -u \
   experiments/phase6_qualitative_latents/run_autointerp.py \
-  --archs "${ARCH}" \
+  --archs "${ARCH}" --seed "${SEED}" \
   2>&1 | tee "${LOGDIR}/eval_${ARCH}_autointerp.log"
 
 echo

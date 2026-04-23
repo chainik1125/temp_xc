@@ -18,34 +18,72 @@ then [[summary]] §9.5 (the new Phase 6.1 update section).
 ### Current state (end of 2026-04-23 session)
 
 Phase 6.1 ran 5 agentic cycles on top of `agentic_txc_02` (the Phase
-5.7 winner that lost Phase 6 qualitative 2 / 8). The goal was to
-push TXC autointerp on concat_A + concat_B to ≥ 5 / 8 semantic
-labels while preserving Phase 5 sparse-probing AUC within 0.01.
+5.7 TXC winner that lost Phase 6 qualitative 2 / 8 to `tsae_paper`
+6 / 8 and `tfa_big` 6 / 8). The goal was to push a **TXC-based**
+architecture to qualitative parity with the T-SAE and TFA baselines
+on concat_A + concat_B, while preserving the TXC family's Phase 5
+sparse-probing utility.
 
-**Outcome: 7 / 8 semantic, alive 0.80, new champion.**
+**Outcome (single-seed, N=8, label-count axis only): TXC-based Cycle F
+reaches 7 / 8 semantic, alive 0.80 — at or above both baselines on the
+x/N label-count metric. Coverage axis is unmeasured and is load-bearing
+— see framing note below.**
 
-| arch | sparsity | anti-dead | alive | /8 | role |
-|---|---|---|---|---|---|
-| `agentic_txc_02` | TopK | — | 0.37 | 2 | Phase 5 baseline |
-| `agentic_txc_09_auxk` (A) | TopK | AuxK only | 0.37 | 3 | null effect |
-| `agentic_txc_10_bare` (Track 2) | TopK | full (AuxK + unit-norm + grad-⊥ + geom-med) | 0.62 | 6 | ties `tsae_paper`! |
-| **`agentic_txc_02_batchtopk` (F)** | BatchTopK | — | **0.80** | **7** 🏆 | **champion** |
-| `agentic_txc_11_stack` (H) | BatchTopK | AuxK | 0.79 | 5 | stacking regresses |
+| arch | family | alive | /8 | role |
+|---|---|---|---|---|
+| **`agentic_txc_02_batchtopk` (F)** | **TXC** | **0.80** | **7** 🏆 | **TXC-based qualitative winner** |
+| `tsae_paper` | T-SAE | 0.73 | 6 | paper baseline |
+| `tfa_big` | TFA | 1.00 | 6 | TFA baseline |
+| `agentic_txc_10_bare` (Track 2) | TXC | 0.62 | 6 | ties baselines w/o BatchTopK |
+| `agentic_mlc_08` | MLC | 0.13 | 5 | Phase 5.7 MLC winner |
+| `agentic_txc_11_stack` (H) | TXC | 0.79 | 5 | Cycle F + AuxK, regresses |
+| `tsae_ours` | T-SAE (naive port) | 0.42 | 3 | control |
+| `agentic_txc_09_auxk` (A) | TXC | 0.37 | 3 | null effect |
+| `agentic_txc_02` | TXC | 0.37 | 2 | Phase 5 baseline |
 
-**Three load-bearing findings** (full reasoning in the agentic-log):
+**Framing (see also the `project_phase6_framing` memory):** the
+paper-narrative target is **TXC-family qualitative parity with
+T-SAE and TFA**, not a generic BatchTopK-vs-TopK sparsity-function
+ablation. Cycle F is evidence that the TXC family can be pushed to
+parity; BatchTopK is the mechanism that got us there, not the
+contribution. Frame summary / paper text as "TXC-based Cycle F
+matches or beats both baselines qualitatively while retaining
+TXC-family probing utility" (probing number pending #3 below),
+**not** as "BatchTopK is the lever".
 
-1. **BatchTopK sparsity is the single biggest lever** (+5 labels vs
-   baseline). Variable per-sample sparsity lets rare concept
-   features fire on the contexts where they matter without
-   displacing an incumbent top-500 winner.
+**Qualitative parity is a two-axis claim.** The paper's Figures 1
+and 4 implicitly require BOTH (a) the top-N features describe
+concepts (what x/N SEMANTIC label-count tests) AND (b) the top-N
+features collectively span the distinct passage types in the
+concat, each firing preferentially in its home passage. Our x/N
+only tests (a). Skimming Cycle F's 7/8 labels, (b) is *uneven* —
+top-8 features fire on Animal Farm / Darwin / "archaic English"
+multiple times but **neither MMLU-bio nor MMLU-math gets a
+top-8 feature peaking on it** (2 of the 7 passages in concat_A+B
+uncovered). So the "7/8" headline is label-count-only; coverage is
+unmeasured. #2's new sub-item (5) adds the coverage diagnostic.
+
+**Three mechanism findings from the 5 cycles** (full reasoning in the
+agentic-log; these are context for the paper's ablation section, not
+the headline):
+
+1. **Switching TXC from TopK to BatchTopK alone gives the biggest
+   single jump** (+5 labels vs baseline, 0.37 → 0.80 alive). Variable
+   per-sample sparsity lets rare concept features fire on the
+   contexts where they matter without displacing incumbents.
 2. **The anti-dead stack (unit-norm decoder + decoder-parallel grad
-   removal + geom-median `b_dec` init + AuxK) is an alternate path**
-   that almost matches BatchTopK at TopK sparsity. Matryoshka +
-   multi-scale contrastive is NOT required for qualitative — only
-   for Phase 5 probing AUC.
-3. **The two mechanism classes don't stack additively** — Cycle H
-   (BatchTopK + AuxK) regressed 7 → 5 /8. AuxK's residual gradient
-   promoted structural / format features into top-by-variance.
+   removal + geom-median `b_dec` init + AuxK) on bare TXC (Track 2)
+   gets most of the way there at TopK sparsity** (6 / 8, alive 0.62).
+   Matryoshka + multi-scale contrastive is not load-bearing for
+   qualitative — only for Phase 5 probing AUC.
+3. **The two mechanism classes don't stack additively** at single
+   seed — Cycle H (BatchTopK + AuxK) scored 5 / 8 vs Cycle F's 7 / 8
+   at the same seed. Δ=2 at single seed and single concat is within
+   plausible seed/corpus noise (Phase 5.7 precedent: ~1 label σ on
+   seed alone), so treat the mechanism story ("AuxK's residual
+   gradient promotes format features") as a **post-hoc explanation
+   of a suggestive effect**, not an established finding, until the
+   multi-seed re-run lands (#2 below).
 
 ### Everything is committed and pushed
 
@@ -118,185 +156,218 @@ If any of the above fails, fix it before any experiment work.
     `tsae_paper__seed42.pt`, `tsae_ours__seed42.pt`, `tfa_big` —
     from earlier work, reference checkpoints)
 
-### What to do next (ordered by expected impact × cost)
+### What to do next (ordered by information gain toward the TXC-parity claim)
 
-**#0 — Upgrade the evaluation metric (DO THIS FIRST).** This gates
-the evidence quality of every other follow-up. User explicitly
-approved the API budget for scaling up.
+The target the paper needs to land is **TXC-family qualitative parity
+with T-SAE and TFA baselines, while retaining TXC-family probing
+utility**. Follow-ups below are ranked by how directly they support
+(or could overturn) that claim. See the `project_phase6_framing` and
+`feedback_uncertainty_framing` memories for the motivating framing.
 
-The current `x / 8` metric has binomial stderr ±1.2 labels at
-p=0.75, so:
+**#0 — Fix `encode_archs.py:135` seed hardcode (PREREQUISITE).**
+The script reads `__seed42.pt` unconditionally. Every multi-seed
+downstream step blocks on this. Add a CLI flag / env var (~10 LoC).
+Audit `run_cycle_eval.sh` for the same assumption before re-running
+it on non-42 seeds. Nothing below works until this is done.
 
-- **Robust findings** (delta ≥ 4 labels, outside any reasonable noise):
-  BatchTopK lever (+5), anti-dead stack helps (+4), AuxK alone
-  null (Δ≈1 within noise — "null" is a robust call).
-- **Non-robust findings** (delta 1–2, within binomial noise):
-  *Cycle F beats `tsae_paper`* (7/8 vs 6/8 is Δ=1), *Cycle H
-  regresses from Cycle F* (5/8 vs 7/8 is ~2σ). Both could flip at a
-  different seed or at different N; both are load-bearing for the
-  paper narrative. Re-verify.
+**#1 — Seed variance on the comparison triangle: Cycle F,
+`tsae_paper`, `tfa_big`.** This is the headline experiment — the
+parity claim is a comparison between three arch families at three
+seeds each. The current 7 / 6 / 6 single-seed headline rests on
+seed-42 snapshots only; Phase 5.7 precedent had single-seed gains
+halving across 3 seeds, so the effect is unmeasured on **both
+directions** of the comparison.
 
-Four upgrades, combinable:
+Training cost: 3 archs × 2 extra seeds × ~30 min ≈ 3 hr GPU total,
+trivially parallelisable. If the `tfa_big` per-seed cost is too high
+(~3 hr/seed at plateau), you can scope it back to 1-seed and note
+the asymmetry in the summary — but Cycle F and `tsae_paper` seeds
+{1, 2} are non-negotiable, since they're the direct head-to-head.
 
-1. **Bump `N_TOP_FEATURES` from 8 → 32** in
-   [`experiments/phase6_qualitative_latents/run_autointerp.py`](../../../experiments/phase6_qualitative_latents/run_autointerp.py)
-   line 35 (single-line edit). Binomial stderr drops from ±1.2 to
-   ±0.76 labels. Cost: ~32 Haiku calls/arch ≈ $0.01 per arch.
-2. **Auto-classify semantic vs non-semantic** instead of hand-
-   classifying. Add a second Haiku call per label with an explicit
-   rubric. Removes single-labeller bias. ~30-line addition near
-   the existing `interp_arch` function. Example rubric:
+**Why the triangle, not just Cycle F:** the original plan retrained
+2 extra seeds of Cycle F only. That leaves the "Cycle F ≥ tsae_paper"
+claim asymmetric — the baseline's variance is unmeasured. If
+tsae_paper seed variance is ±1 label, a single-seed 7 vs 6 gap is
+within noise and the parity claim must be hedged accordingly.
+
+**#2 — Upgrade the evaluation metric: N=32 throughout, multi-judge,
+random-corpus control.** Applies on top of #1 to every
+(arch × seed × concat) cell. Sharpens every comparison in the
+triangle. User explicitly approved **N=32 throughout** (despite my
+suggestion to defer), so apply it globally. But note that the
+dominant uncertainty is **not** within-arch sampling noise — it's
+seed + corpus + judge. N=32 is a useful power boost for fine-grained
+ranking; treat it as one of four complementary improvements below,
+not as the primary fix for uncertainty.
+
+Four upgrades, combine cleanly:
+
+1. **N=32 throughout.** Bump `N_TOP_FEATURES` from 8 → 32 in
+   [`run_autointerp.py`](../../../experiments/phase6_qualitative_latents/run_autointerp.py)
+   line 35. Applies to every arch, every seed, every concat.
+   ~32 Haiku calls / cell ≈ $0.01 per cell.
+
+2. **Multi-judge auto-classify** semantic vs syntactic — **NOT
+   single-Haiku**. Single-Haiku just swaps hand-labeller bias for
+   LLM-labeller bias; the whole point is tightening judge variance.
+   Implementation: 2 judge models (Haiku + Sonnet) × 2–3 prompt
+   variants; take majority vote; emit `judge_disagreement_rate` as
+   a per-arch field. If disagreement is > ~15 % on any arch, flag
+   the /32 number as judge-sensitive in the summary. ~50 LoC. Cost:
+   ~$0.03/cell. Rubric (commit edge-case resolutions in the code
+   comment so they're pre-registered, not decided after seeing data):
 
    ```
    Given this SAE feature label: "{LABEL}"
    Classify as SEMANTIC or SYNTACTIC.
    SEMANTIC = names a concept, topic, theme, entity, or domain
      (examples: "plant biology", "Animal Farm references",
-      "archaic poetic English")
+      "archaic poetic English", "historical dates in biography")
    SYNTACTIC = describes surface patterns — punctuation, word class,
      capitalisation, formatting, hyphens, quoted text
      (examples: "sentence-ending periods", "multiple-choice answer
       formatting", "hyphens between compound words")
+   Edge cases (pre-registered):
+     - "historical dates"                     → SEMANTIC (concept)
+     - "quoted text from Animal Farm"         → SEMANTIC (corpus ref)
+     - "text in quotation marks"              → SYNTACTIC (surface)
+     - "MMLU answer-option formatting"        → SYNTACTIC (surface)
+     - "multi-layer/cross-domain terminology" → SEMANTIC (concept)
    Reply with exactly one word: SEMANTIC or SYNTACTIC.
    ```
 
-   Cost: another ~$0.01 per arch.
+3. **Random-FineWeb concat control (generalisation test).** Build a
+   ~1800-token concat from random FineWeb passages (NOT curated)
+   and re-run the whole pipeline on it. If Cycle F at 7/8 on
+   concat_A/B drops disproportionately more than tsae_paper on the
+   random corpus, the parity claim is curated-concat-specific — a
+   load-bearing caveat the paper needs to own. If all archs drop
+   proportionally, the ranking generalises. ~30 min to build the
+   corpus (new `build_concat_random.py`); no retrain, same
+   autointerp cost. Commit the FineWeb passage IDs for reproducibility.
 
-3. **Passage-discriminative ranking** instead of per-token variance.
-   The current top-by-variance ranking has a structural punctuation
-   floor because high-density token patterns (full-stops, spaces)
-   get high variance. Replace with:
+4. **Passage-discriminative ranking — DIAGNOSTIC ONLY, NOT PRIMARY.**
+   The original briefing proposed this as a replacement ranking.
+   **Do not swap it in as the primary metric**: ranking features by
+   "how well they discriminate passages" and then measuring "how
+   many have passage-concept labels" conditions on the outcome.
+   Keep top-by-variance as the primary metric (matches the paper's
+   Fig 1/4 construction); emit passage-discriminative
+   `semantic_count_pdvar` alongside `semantic_count_var` as a
+   secondary diagnostic with an explicit caveat. Same z_cache,
+   no retrain.
 
-   ```python
-   # In run_autointerp.py _pick_top_features:
-   # Original: var = z.var(axis=0); argsort(-var)[:N]
-   # Proposed: group tokens by passage, compute per-feature mean
-   # activation per passage, rank by variance OF THOSE PER-PASSAGE
-   # means. Features that fire uniformly on punctuation across
-   # passages have low passage-discriminative variance.
-   ```
+5. **Passage-coverage diagnostic (k/P) — THE SECOND PRIMARY AXIS,
+   alongside x/N SEMANTIC.** This directly tests the "span the
+   passage types" half of the paper's Figure 1/4 argument, which
+   x/N does not. For each top-N feature, compute its **peak
+   passage** = `argmax` over passages of `mean_activation_in_passage`
+   (passage IDs recoverable from `z_cache/<concat>/provenance.json`).
+   Emit two numbers per (arch × seed × concat):
 
-   Passage IDs are recoverable from `z_cache/<concat>/provenance.json`
-   (concat_A and concat_B each concatenate 3-4 named passages).
-   No retrain — works on existing z_cache. Expected: removes the
-   punctuation-floor tax uniformly across archs, might reveal 8/8
-   on current Cycle F checkpoint.
+   - `passage_coverage_count` = number of *distinct* passages
+     covered by any top-N feature's peak (max = min(N, P); P=7 for
+     concat_A+B, variable for random-FineWeb)
+   - `passage_coverage_entropy` = Shannon entropy of the peak-passage
+     distribution over the N features (nats; high = spread across
+     passages; low = concentrated on a few)
 
-4. **3 seeds on Cycle F** — this was formerly follow-up #1. Requires
-   ~80 min GPU to train seeds {1, 2}. Combined with #1 + #2 + #3,
-   each arch then has a proper `/32 score × 3 seeds` with mean ± stderr.
+   Does not select on the outcome of interest (keeps top-by-variance
+   ranking; just describes where the top-by-variance features peak),
+   so it's a clean complement to x/N SEMANTIC rather than a
+   re-ranking that conditions on the construct.
 
-**Concrete execution plan**:
+   **The paper-parity claim requires both axes to hold**: a TXC arch
+   with 8/8 SEMANTIC labels but 3/7 passage coverage has NOT
+   reproduced Figure 4. Current Cycle F x/8 = 7 but passage coverage
+   on top-8 is uneven (skips MMLU-bio + MMLU-math per skim). Report
+   both axes in the summary §9.5 table.
+
+   Implementation: ~20 LoC in `run_autointerp.py` after `_pick_top_features`.
+   No new API calls — works on existing z_cache + labels. Also add
+   to the outcome criteria below (coverage thresholds in addition
+   to x/N thresholds).
+
+**#3 — Sparse-probing regression on Cycle F (PAPER-CRITICAL for the
+"retains TXC probing utility" half of the claim).** The parity story
+has two halves: (a) qualitative parity with T-SAE/TFA baselines (what
+Cycle F establishes at single seed — #1 tightens it), and (b) TXC
+probing utility preserved. Without (b), the contribution collapses
+to "use T-SAE" — there's no reason to have invented a TXC variant.
+Currently (b) is unmeasured on the BatchTopK variant.
+
+Required: download `probe_cache` from `han1823123123/txcdr-data` on
+HF (70 GB, 144 files, ~30–60 min on RunPod network; fine after disk
+bump to 400 GB). Run non-GPU, parallel to #1 training.
 
 ```bash
-# Step A: edit run_autointerp.py
-#   (1) line 35: N_TOP_FEATURES = 32
-#   (2) add auto-classify function + wire into interp_arch
-#   (3) modify _pick_top_features for passage-discriminative ranking
-#   (4) emit a per-arch "semantic_count" field in the labels JSON
-#       so downstream doesn't need re-classification.
-
-# Step B: re-run on all 9 Phase 6 archs (no retrain)
-#   The z_cache already exists for every arch on concat_A/B.
-#   ~30 min, ~$0.10 total.
-export ANTHROPIC_API_KEY=$(cat /workspace/.anthropic-key)
-TQDM_DISABLE=1 PYTHONPATH=. .venv/bin/python -u \
-  experiments/phase6_qualitative_latents/run_autointerp.py \
-  --archs agentic_txc_02 agentic_txc_09_auxk agentic_txc_10_bare \
-          agentic_txc_02_batchtopk agentic_txc_11_stack \
-          tsae_paper tsae_ours tfa_big agentic_mlc_08
-
-# Step C: train Cycle F seeds {1, 2} in background (~80 min GPU)
-TQDM_DISABLE=1 PYTHONPATH=. nohup .venv/bin/python -u -c "
-from experiments.phase5_downstream_utility.train_primary_archs import run_all
-run_all(seeds=[1, 2], max_steps=25000, archs=['agentic_txc_02_batchtopk'])
-" > logs/cycleF_seedvar.log 2>&1 &
-
-# Step D: once Cycle F seeds land, encode + re-autointerp for each
-# using the upgraded metric. 3 seeds × (encode ~2 min + autointerp ~1 min).
-for SEED in 1 2; do
-  TQDM_DISABLE=1 PYTHONPATH=. .venv/bin/python -u \
-    experiments/phase6_qualitative_latents/encode_archs.py \
-    --archs agentic_txc_02_batchtopk --sets A B
-  # [then modify encode_archs.py to read seed from env var if not there;
-  # currently hardcoded to seed=42 — see encode_archs.py:135 CKPT_DIR]
-  TQDM_DISABLE=1 PYTHONPATH=. .venv/bin/python -u \
-    experiments/phase6_qualitative_latents/run_autointerp.py \
-    --archs agentic_txc_02_batchtopk
-done
-
-# Step E: update summary.md §9.5 and agentic-log headline table
-# with /32 means ± stderrs for all archs (3-seed for Cycle F,
-# 1-seed for others; note this explicitly).
+HF_HOME=/workspace/hf_cache HF_TOKEN=$(cat /workspace/.hf-token) \
+  uv run huggingface-cli download --repo-type dataset han1823123123/txcdr-data \
+  --include "experiments/phase5_downstream_utility/results/probe_cache/**" \
+  --local-dir .
 ```
 
-**Caveats to anticipate:**
+Then probe on all Cycle F seeds at both aggregations:
 
-- `encode_archs.py:135` hardcodes `__seed42.pt`. Multi-seed support
-  needs a small extension (env var or CLI flag).
-- `run_cycle_eval.sh` hardcodes seed=42 and calls the N=8 autointerp.
-  Update or fork once the upgraded autointerp is in place.
-- `plot_top_features.py` (used for Figure 6 in summary.md §9.5) still
-  plots top-8 by raw variance. Fine for visualisation — the paper's
-  Figure-4-analogue literally shows 8 features; change the metric
-  for the *score* but keep the *plot* at 8 for readability.
+```bash
+for AGG in last_position mean_pool; do
+  for SEED in 42 1 2; do
+    TQDM_DISABLE=1 PYTHONPATH=. .venv/bin/python -u \
+      experiments/phase5_downstream_utility/probing/run_probing.py \
+      --aggregation $AGG \
+      --run-ids agentic_txc_02_batchtopk__seed${SEED} \
+      --skip-baselines
+  done
+done
+```
 
-**What outcomes to watch for:**
+Compare to `agentic_txc_02` 3-seed means (Phase 5 summary §Agentic
+recipe: last_position 0.7749 ± 0.0038, mean_pool 0.7987 ± 0.0020).
+**Acceptable for the paper claim**: Δ AUC ≤ ~0.02 (within the
+Phase 5.7 agentic-recipe gain over baseline) → "TXC probing utility
+preserved". Δ AUC in (0.02, 0.05] → soften to "modest regression,
+family still competitive". Δ AUC > 0.05 → the parity story needs
+a different TXC variant (try the #4 2×2 cell) that retains probing.
 
-- If Cycle F at `/32 × 3 seeds` gives mean ≥ `tsae_paper`'s
-  `/32 × 1 seed` value minus 1 label → "Cycle F matches or beats
-  `tsae_paper`" headline survives.
-- If Cycle F mean falls below `tsae_paper` by > 1 label → headline
-  softens to "Cycle F matches within noise, paper claim is
-  sparsity-knob not beat-paper".
-- If Cycle H at `/32` is still clearly below Cycle F → "stacking
-  doesn't help" holds. If within noise → "stacking is neutral"
-  (weaker but still consistent with our mechanism analysis).
-- **Regardless**: the BatchTopK-is-the-lever story (+5 labels at N=8,
-  expect ≥ +12 labels at N=32 if the effect is pure scale) is
-  overwhelmingly robust.
-
-**Skip-retrain justification**: existing ckpts for seed=42 are
-fine; the noise we're worrying about is in the *evaluation*, not the
-*training*. Only Cycle F needs 2 extra seeds for the variance
-check. All other Phase 6 / 6.1 archs stay 1-seed — the /32 bump
-alone tightens their CIs enough that large deltas (3-4+ labels)
-become unambiguous.
-
-**#2 — Missing 2×2 cell: bare + BatchTopK + full anti-dead stack.**
-We did:
+**#4 — Missing 2×2 cell: bare + BatchTopK + full anti-dead stack
+(mechanism context; paper ablation section, not headline).**
+Secondary to the triangle comparison, but cheap and informative.
 
 |  | TopK | BatchTopK |
 |---|---|---|
 | matryoshka + contrastive | (baseline) 2 / 8 | **Cycle F 7 / 8** |
 | bare (no matryoshka / contrastive) | **Track 2** 6 / 8 | **⬜ not tested** |
 
-The empty cell is the simplest architecture with both anti-dead
-axes engaged. If it beats 7 / 8, the paper story simplifies to
-"BatchTopK + anti-dead stack, nothing fancy required". If it ties
-or loses, BatchTopK + anti-dead doesn't stack (similar interaction
-to Cycle H).
+Outcome readings:
+- Beats Cycle F (≥ 8 / 8 or significantly above): the simpler
+  recipe — "BatchTopK + anti-dead, no matryoshka or contrastive"
+  — is sufficient; matryoshka + contrastive is ornamental for
+  qualitative. Promote to candidate headline TXC arch.
+- Ties Cycle F: matryoshka + contrastive is orthogonal to
+  qualitative gain (already suspected from Track 2 at 6/8).
+- Regresses to ~5 / 8 (like Cycle H): anti-dead + BatchTopK don't
+  compose in general; Cycle H's regression generalises beyond
+  matryoshka. That IS a mechanism finding, just a different one.
 
 Implementation: subclass `TXCBareAntidead`
 ([`src/architectures/txc_bare_antidead.py`](../../../src/architectures/txc_bare_antidead.py))
-and replace its TopK-scatter with a `BatchTopK(k)` module from
+and swap its TopK-scatter for `BatchTopK(k)` from
 [`src/architectures/_batchtopk.py`](../../../src/architectures/_batchtopk.py).
-~20-line addition. Arch name suggestion: `agentic_txc_12_bare_batchtopk`.
+~20 LoC. Arch name: `agentic_txc_12_bare_batchtopk`. Dispatcher:
+add branch in `train_primary_archs.py` modelled on Track 2's branch
+(~line 1284). Wire `encode_archs.py`, `run_probing.py`,
+`arch_health.py` the same way Cycle A / Track 2 / Cycle F / Cycle H
+were wired. One training run ~30 min + eval ~5 min.
 
-Dispatcher: add branch in `train_primary_archs.py` modeled on the
-existing `agentic_txc_10_bare` branch (line ~1284 before edit).
-Wire `encode_archs.py`, `run_probing.py`, `arch_health.py` the same
-way Cycle A / Track 2 / Cycle F / Cycle H were wired.
+If it lands competitively (≥ 6 / 8 at seed 42), add it to #1's
+multi-seed retrain and #3's probing run — it may be a better
+headline arch than Cycle F.
 
-One training run ~30 min + eval ~5 min.
-
-**#3 — Longer training past the plateau-stop artefact.** All Phase
+**#5 — Longer training past the plateau-stop artefact.** All Phase
 6.1 cycles converged at step 4000 – 5600 / 25000 due to the 2 %
-plateau threshold. Phase 5.7 `agentic_txc_02` went to ~16 205 steps
-before plateau. The anti-dead mechanisms may shape decoder
-directions more effectively over the full window.
-
-Try bumping `min_steps` from 3000 → 10000 for Cycle F:
+plateau threshold. Phase 5.7 `agentic_txc_02` went to ~16 205 steps.
+The anti-dead mechanisms may shape decoder directions better over
+the full window.
 
 ```python
 # In train_primary_archs.py TrainCfg:
@@ -306,80 +377,143 @@ class TrainCfg:
     min_steps: int = 10_000        # was 3_000
 ```
 
-Or pass a custom cfg at call time. Re-train Cycle F, eval. Cheap
-(~40 min). Expected: modest improvement, probably not enough alone
-to push to 8 / 8.
+Cheap (~40 min per re-train). Expected: modest improvement, probably
+not enough alone to push past 7 / 8.
 
-**#4 — Corpus-aware qualitative metric.** Top-8-by-variance gets
-biased toward tokens that activate intermittently but strongly —
-punctuation, MMLU answer-option formatting, hyphens, ligatures.
-These appear in Cycle F's remaining 1 non-semantic feature and in
-most of Cycle H's non-semantic slots.
-
-Alternative ranking: **passage-discriminative variance**, i.e.
-rank features by `Var_over_passages(mean_activation_in_passage)`
-instead of `Var_over_tokens(activation)`. This suppresses features
-that fire on isolated tokens regardless of passage and lifts
-features that respond to passage-level semantics.
-
-Implementation: modify `_pick_top_features` in
-[`experiments/phase6_qualitative_latents/run_autointerp.py`](../../../experiments/phase6_qualitative_latents/run_autointerp.py)
-line 70. Compute per-feature (n_passages,)-shaped vector of mean
-activations per passage (passages are recoverable from concat_A
-and concat_B provenance JSONs in `z_cache/*/provenance.json`), then
-rank by that vector's variance.
-
-**No retraining needed** — this works on the existing Cycle F z
-cache. If the ranking reveals 8 / 8 on current ckpts, that's the
-cheapest win.
-
-**#5 — Sparse-probing regression on Cycle F (PAPER-CRITICAL).**
-The paper claim is "sparsity is a one-knob trade-off". That needs a
-numeric trade-off curve, not just a qualitative gain.
-
-Required: download `probe_cache` from
-`han1823123123/txcdr-data` on HF.
-
-```bash
-HF_HOME=/workspace/hf_cache HF_TOKEN=$(cat /workspace/.hf-token) \
-  uv run huggingface-cli download --repo-type dataset han1823123123/txcdr-data \
-  --include "experiments/phase5_downstream_utility/results/probe_cache/**" \
-  --local-dir .
-```
-
-Size: **70 GB**, 144 files, probably 30–60 min on RunPod network.
-After the disk bump to 400 GB this is fine.
-
-Then run probing:
-
-```bash
-TQDM_DISABLE=1 PYTHONPATH=. .venv/bin/python -u \
-  experiments/phase5_downstream_utility/probing/run_probing.py \
-  --aggregation last_position --run-ids agentic_txc_02_batchtopk__seed42 \
-  --skip-baselines
-TQDM_DISABLE=1 PYTHONPATH=. .venv/bin/python -u \
-  experiments/phase5_downstream_utility/probing/run_probing.py \
-  --aggregation mean_pool --run-ids agentic_txc_02_batchtopk__seed42 \
-  --skip-baselines
-```
-
-Compare Δ AUC vs `agentic_txc_02` (0.775 last_pos / 0.799 mean_pool).
-Phase 5.7 experiment (ii) found a regression; quantify the exact
-magnitude for the paper.
-
-**#6 — HF upload of the 4 new Phase 6.1 ckpts.** For cross-pod
-reproduction. Target repo: `han1823123123/txcdr`.
+**#6 — HF upload of Phase 6.1 ckpts.** Cross-pod reproduction. Target
+repo: `han1823123123/txcdr`. Cycle F seed 42 is already up; upload
+the rest (Cycle A, Track 2, Cycle H, the #4 2×2 cell if trained, and
+the new seeds {1, 2} for Cycle F + tsae_paper once they land).
 
 ```python
 from huggingface_hub import upload_file
-for arch in ('agentic_txc_09_auxk', 'agentic_txc_10_bare', 'agentic_txc_11_stack'):
-    upload_file(
-        path_or_fileobj=f'experiments/phase5_downstream_utility/results/ckpts/{arch}__seed42.pt',
-        path_in_repo=f'ckpts/{arch}__seed42.pt',
-        repo_id='han1823123123/txcdr',
-    )
-# agentic_txc_02_batchtopk already on HF
+# for arch in ('agentic_txc_09_auxk', 'agentic_txc_10_bare',
+#              'agentic_txc_11_stack', 'agentic_txc_12_bare_batchtopk'):
+#     for seed in (42, 1, 2):
+#         upload_file(
+#             path_or_fileobj=f'experiments/phase5_downstream_utility/results/ckpts/{arch}__seed{seed}.pt',
+#             path_in_repo=f'ckpts/{arch}__seed{seed}.pt',
+#             repo_id='han1823123123/txcdr',
+#         )
 ```
+
+**Concrete execution plan (parallelisable):**
+
+```bash
+# Step 0: PREREQ — fix encode_archs.py:135 seed hardcode + audit
+# run_cycle_eval.sh for the same assumption. Commit before anything
+# below.
+
+# Step A (non-GPU, no API key): start probe_cache download for #3.
+HF_HOME=/workspace/hf_cache HF_TOKEN=$(cat /workspace/.hf-token) \
+  nohup uv run huggingface-cli download --repo-type dataset \
+  han1823123123/txcdr-data \
+  --include "experiments/phase5_downstream_utility/results/probe_cache/**" \
+  --local-dir . > logs/probe_cache_dl.log 2>&1 &
+
+# Step B (GPU, parallel to A): triangle seed-variance training.
+# Cycle F + tsae_paper at seeds {1, 2}; add tfa_big if time permits.
+# Also add agentic_txc_12_bare_batchtopk (#4) here if implemented.
+TQDM_DISABLE=1 PYTHONPATH=. nohup .venv/bin/python -u -c "
+from experiments.phase5_downstream_utility.train_primary_archs import run_all
+run_all(seeds=[1, 2], max_steps=25000,
+        archs=['agentic_txc_02_batchtopk', 'tsae_paper'])
+" > logs/phase61_triangle_seedvar.log 2>&1 &
+
+# Step C (non-GPU, parallel to A+B): edit run_autointerp.py for #2
+#   (1) N_TOP_FEATURES = 32
+#   (2) multi-judge auto-classify (Haiku + Sonnet, 2-3 prompts)
+#   (3) passage-discriminative ranking as a SECONDARY emit
+#   (4) passage-coverage diagnostic (k/P + entropy) — SECOND PRIMARY
+#       axis alongside x/N; computed on top-by-variance features
+#       (no re-ranking)
+#   (5) per-cell {semantic_count_var, semantic_count_pdvar,
+#       passage_coverage_count, passage_coverage_entropy,
+#       judge_disagreement_rate} in labels JSON.
+
+# Step D (non-GPU, parallel to A+B): build the random-FineWeb concat.
+# New script: experiments/phase6_qualitative_latents/build_concat_random.py
+# Commit the passage IDs for reproducibility.
+
+# Step E (GPU, after B): encode every (arch × seed × concat) cell.
+for SEED in 42 1 2; do
+  for ARCH in agentic_txc_02_batchtopk tsae_paper tfa_big; do
+    TQDM_DISABLE=1 PYTHONPATH=. .venv/bin/python -u \
+      experiments/phase6_qualitative_latents/encode_archs.py \
+      --archs $ARCH --sets A B random --seed $SEED
+  done
+done
+# Also encode the remaining 6 archs at seed=42 on the random concat
+# so every row of §9.5 gets a random-corpus number.
+
+# Step F (after C+E): upgraded autointerp on every cell.
+export ANTHROPIC_API_KEY=$(cat /workspace/.anthropic-key)
+TQDM_DISABLE=1 PYTHONPATH=. .venv/bin/python -u \
+  experiments/phase6_qualitative_latents/run_autointerp.py
+
+# Step G (after A+B): probing on Cycle F (+ #4 cell if trained).
+# See #3 above for commands.
+
+# Step H: update summary.md §9.5 and agentic-log with:
+#   - Triangle 3-seed means ± stderrs at /32, both concat_A/B and
+#     random-FineWeb, for each arch
+#   - Judge-disagreement rates per arch
+#   - Cycle F probing Δ AUC at both aggregations (+ #4 cell if run)
+#   - Passage-discriminative diagnostic as a footnote, not headline
+# Reframe the summary's §9.5 headline from "BatchTopK is the lever"
+# / "one-knob trade-off" to "TXC-family qualitative parity with T-SAE
+# and TFA, probing utility retained" per project_phase6_framing.
+```
+
+**Outcomes that support the TXC-parity claim** (**BOTH qualitative
+axes should hold**: label-count AND passage-coverage):
+
+- **x/N label-count axis** (triangle at /32 × 3 seeds, both concats):
+  Cycle F mean within ±0.5 labels of both tsae_paper and tfa_big →
+  "matches both baselines". Cycle F strictly ≥ both → "matches or
+  beats".
+- **Passage-coverage axis** (new): Cycle F top-N coverage count ≥
+  baselines' count, and coverage entropy within 0.1 nats of
+  baselines'. Cycle F at 5/7 coverage is acceptable ONLY if
+  tsae_paper is also ~5/7; if tsae_paper is 7/7 and Cycle F is 5/7,
+  the parity claim fails on coverage regardless of label-count.
+- **Random-FineWeb concat:** all archs drop, but Cycle F's rank vs
+  baselines holds **on both axes** → generalisation confirmed. If
+  Cycle F drops disproportionately on either → "curated-concat-
+  specific", hedge the claim.
+- **Cycle F probing Δ AUC ≤ ~0.02:** TXC probing utility preserved;
+  full parity-plus-utility claim stands.
+- **Judge disagreement < 15 %:** /32 numbers are not judge-sensitive;
+  claims robust.
+
+**Outcomes that would overturn the claim:**
+
+- `tsae_paper` seed variance ≥ 1.5 labels and Cycle F ties it within
+  noise → demote x/N axis to "TXC matches within noise".
+- **Cycle F passage coverage materially below tsae_paper's** (e.g.
+  3/7 vs 6/7) while x/N matches → **this is the failure mode that a
+  skim of §9.5's top-8 labels already suggests.** The current top-8
+  concentrates on Animal Farm / Darwin / archaic passages and skips
+  MMLU-bio + MMLU-math. If the N=32 expansion doesn't recover those
+  passages, the paper-parity claim fails on the coverage axis even
+  though the label-count axis looks good. Acknowledge explicitly
+  rather than burying; the coverage gap is then a load-bearing
+  follow-up (longer training? more scale in contrastive? different
+  Phase 5 recipe?).
+- Cycle F drops disproportionately on the random concat → the
+  qualitative gain is corpus-specific; the paper has to own this.
+- Cycle F probing Δ AUC > 0.05 vs `agentic_txc_02` → probing utility
+  significantly degraded. The parity-plus-utility claim fails for
+  Cycle F specifically; shift to the #4 2×2 cell as the headline
+  arch if it gets both.
+
+**Caveats:**
+- `plot_top_features.py` (Figure 6 in §9.5) plots top-8 by raw
+  variance. Keep that for visualisation (paper Fig 4 literally shows
+  8 features) — change only the *score* metric to N=32, not the
+  plot.
+- `run_cycle_eval.sh` hardcodes seed=42 and calls the N=8
+  autointerp. Update or fork in Step 0.
 
 ### Dead ends — do NOT re-run these
 
@@ -490,16 +624,27 @@ for arch in ('agentic_txc_09_auxk', 'agentic_txc_10_bare', 'agentic_txc_11_stack
 ### One-paragraph restart
 
 On restart, verify tokens + venv + git state with the checklist
-above. If everything is green, **do follow-up #0 first** (upgrade the
-`x / N` metric to N=32 + auto-classify + passage-discriminative
-ranking). This is the smallest-LoC change and it upgrades every
-subsequent comparison — every other follow-up produces cleaner
-evidence once this is in place. Step A–B of #0 (edit script + re-
-run on existing 9 ckpts) takes ~30 min and ~$0.10; step C (train
-Cycle F seeds {1, 2}) takes ~80 min GPU and can run in parallel with
-**#5 (probe_cache download, 70 GB, CPU/network-only)**. By the time
-both finish, every row in the headline table has a proper
-`/32 semantic count` with auto-classification, plus Cycle F has
-3-seed variance and a sparse-probing regression number for the
-paper trade-off claim. **#2 and #3 are orthogonal ideas** for
-pushing past 7/8 once the measurement is trustworthy.
+above. Then: **#0 is a hard prereq** — fix `encode_archs.py:135`
+seed hardcode before touching anything else. After that, the work
+splits into three parallelisable tracks. **GPU track (#1):** kick
+off the triangle seed-variance training — Cycle F + `tsae_paper`
+(+ optionally `tfa_big` + the #4 2×2 cell) at seeds {1, 2}, ~3 hr
+background. **Non-GPU track (#3):** start the 70 GB `probe_cache`
+download in parallel, then probe Cycle F at both aggregations once
+the ckpts from #1 land. **Script-edit track (#2):** upgrade
+`run_autointerp.py` with **five** changes — N=32, multi-judge
+auto-classify (Haiku + Sonnet × 2–3 prompts), random-FineWeb concat,
+passage-discriminative as a secondary diagnostic only, and the
+**passage-coverage k/P diagnostic as a second primary axis** (this
+directly tests whether top-N features span the distinct passage
+types, which the x/N label-count does not — and a skim of current
+§9.5 top-8 labels suggests Cycle F may fail on this axis, skipping
+MMLU-bio and MMLU-math). Once tracks finish, every row in §9.5
+gets `/32` means ± seed stderrs **plus coverage k/P** on both curated
+and random concats, Cycle F gets a probing Δ AUC number, and the
+summary can be reframed from "BatchTopK is the lever" to the intended
+"TXC-family qualitative parity with T-SAE and TFA (both label-count
+and passage-coverage axes), probing utility retained".
+#4 (missing 2×2 cell) and #5 (longer training) are orthogonal
+ideas to explore if time remains or if the parity claim needs a
+better-scoring TXC variant.
