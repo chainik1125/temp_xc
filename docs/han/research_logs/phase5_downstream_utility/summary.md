@@ -359,11 +359,19 @@ should be scoped to TopK-sparsity. For MLC it survives BatchTopK; for
 TXC it doesn't, which is a defensible published finding rather than a
 problem — it identifies the mechanism as per-sample-TopK-dependent.
 
-**BatchTopK-dedicated bar charts** (Figure-1-style but filtered):
+**BatchTopK-dedicated bar charts** (Figure-1/2-style but filtered):
+
+_Last-position × AUC:_
 
 ![BatchTopK last-position headline](../../../../experiments/phase5_downstream_utility/results/plots/batchtopk_bar_k5_last_position_auc.png)
 
 ![TopK vs BatchTopK paired last-position](../../../../experiments/phase5_downstream_utility/results/plots/batchtopk_paired_k5_last_position_auc.png)
+
+_Mean-pool × AUC:_
+
+![BatchTopK mean-pool headline](../../../../experiments/phase5_downstream_utility/results/plots/batchtopk_bar_k5_mean_pool_auc.png)
+
+![TopK vs BatchTopK paired mean-pool](../../../../experiments/phase5_downstream_utility/results/plots/batchtopk_paired_k5_mean_pool_auc.png)
 
 Plot script:
 [`plots/make_batchtopk_plot.py`](../../../../experiments/phase5_downstream_utility/plots/make_batchtopk_plot.py).
