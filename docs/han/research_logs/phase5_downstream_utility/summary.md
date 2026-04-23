@@ -145,7 +145,9 @@ non-determinism accumulated across re-probes; the ranking is stable.)*
 | **baseline_attn_pool** | **0.9290** | 0.1055 | 36 |
 | **baseline_last_token_lr** | **0.9264** | 0.0674 | 36 |
 | 🏆 **agentic_mlc_08** (multi-scale MLC, Phase 5.7) | **0.8047** | 0.1211 | 36 |
+| 🆕 mlc_contrastive_alpha100_batchtopk (extended) | 0.8027 | 0.1212 | 36 |
 | 🆕 mlc_contrastive_alpha100 (Part-B α=1.0) | 0.7985 | 0.1181 | 36 |
+| 🆕 mlc_contrastive_batchtopk (extended) | 0.7829 | 0.1260 | 36 |
 | mlc_contrastive | 0.7930 | 0.1163 | 36 |
 | 🆕 agentic_mlc_08_batchtopk | 0.7907 | 0.1195 | 36 |
 | mlc | 0.7884 | 0.1193 | 36 |
@@ -172,6 +174,7 @@ non-determinism accumulated across re-probes; the ranking is stable.)*
 | txcdr_lowrank_dec_t5 | 0.7321 | 0.1118 | 36 |
 | topk_sae | 0.7282 | 0.1151 | 36 |
 | temporal_contrastive | 0.7276 | 0.1127 | 36 |
+| 🆕 topk_sae_batchtopk (extended) | 0.7440 | 0.1183 | 36 |
 | txcdr_shared_dec_t5 | 0.7249 | 0.1105 | 36 |
 | stacked_t5 | 0.7220 | 0.1224 | 36 |
 | txcdr_block_sparse_t5 | 0.7198 | 0.1147 | 36 |
@@ -294,6 +297,24 @@ Does the multi-scale contrastive recipe survive swapping TopK → BatchTopK
 across the batch and uses a calibrated JumpReLU-style threshold at
 inference. Module: [`_batchtopk.py`](../../../../src/architectures/_batchtopk.py).
 
+**Two rounds of experiments:**
+
+- **Minimum scope (first commit, 4 archs)**: `txcdr_t5`, `mlc`,
+  `agentic_txc_02`, `agentic_mlc_08` at matched k, probed at both
+  aggregations. Tables below.
+- **Extended scope (commit `9c67307`, 17 archs)**: every remaining
+  bench arch gets a BatchTopK counterpart so Figure 1/2 has a clean
+  TopK-vs-BatchTopK column for the whole family tree. Training done
+  (all 17 ckpts saved, no OOMs); probing in progress at time of
+  writing (last_position ≈ 40% complete, mean_pool pending). Three
+  extended-scope archs with complete n=36 probing are merged into
+  Figure 1 above: `topk_sae_batchtopk` (0.7440),
+  `mlc_contrastive_batchtopk` (0.7829),
+  `mlc_contrastive_alpha100_batchtopk` (**0.8027** — only 0.002 below
+  its TopK counterpart, showing the Part-B contrastive gains also
+  survive BatchTopK on the MLC family). Full extended table + updated
+  compositionality analysis will land when probing completes.
+
 Four archs retrained at matched k with BatchTopK, probed at both
 aggregations (seed=42, test set):
 
@@ -337,6 +358,18 @@ transfer from TopK to BatchTopK?
 should be scoped to TopK-sparsity. For MLC it survives BatchTopK; for
 TXC it doesn't, which is a defensible published finding rather than a
 problem — it identifies the mechanism as per-sample-TopK-dependent.
+
+**BatchTopK-dedicated bar charts** (Figure-1-style but filtered):
+
+![BatchTopK last-position headline](../../../../experiments/phase5_downstream_utility/results/plots/batchtopk_bar_k5_last_position_auc.png)
+
+![TopK vs BatchTopK paired last-position](../../../../experiments/phase5_downstream_utility/results/plots/batchtopk_paired_k5_last_position_auc.png)
+
+Plot script:
+[`plots/make_batchtopk_plot.py`](../../../../experiments/phase5_downstream_utility/plots/make_batchtopk_plot.py).
+Re-running regenerates the full set (both aggregations × headline + paired).
+Current figures reflect partial probing — they'll auto-fill as the
+extended pipeline completes.
 
 #### T-sweep on agentic_txc_02 (Phase 5.7 experiment iii)
 
