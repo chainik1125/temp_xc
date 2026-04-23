@@ -238,8 +238,13 @@ def _gather_contexts(ids, tok, z_col: np.ndarray, n_ctx=N_CONTEXTS,
 
 
 def _claude_call(client, model_id: str, prompt: str, max_tokens: int = 64) -> str:
+    """Temperature=0 for reproducibility across reruns. Without this,
+    Haiku's default temperature=1.0 causes label drift and the x/N
+    metric becomes noisy across runs even with identical inputs
+    (observed ±5 labels on the same arch × concat)."""
     msg = client.messages.create(
         model=model_id, max_tokens=max_tokens,
+        temperature=0.0,
         messages=[{"role": "user", "content": prompt}],
     )
     return msg.content[0].text.strip()
