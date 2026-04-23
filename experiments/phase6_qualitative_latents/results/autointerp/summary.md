@@ -6,11 +6,11 @@ Top-8 features per arch (ranked by variance on concat-sets A + B).
 
 | arch | rank | feat_idx | variance | label |
 |---|---|---|---|---|
-| agentic_txc_10_bare | 1 | 12805 | 505.252 | hyphenated compound words and phrases |
-| agentic_txc_10_bare | 2 | 14994 | 479.327 | acronym explanation in French context |
-| agentic_txc_10_bare | 3 | 12412 | 464.276 | French translation of Soviet Union name |
-| agentic_txc_10_bare | 4 | 15340 | 395.602 | Historical context of Orwell's political views |
-| agentic_txc_10_bare | 5 | 12560 | 373.674 | Acknowledgment of sole responsibility for errors |
-| agentic_txc_10_bare | 6 | 1846 | 328.851 | Punctuation and special characters in text |
-| agentic_txc_10_bare | 7 | 15835 | 298.366 | Acknowledgment and gratitude expressions in formal writing |
-| agentic_txc_10_bare | 8 | 7615 | 251.552 | Biographical information about George Orwell |
+| agentic_txc_11_stack | 1 | 3258 | 192.963 | Prepositions and conjunctions in historical narratives |
+| agentic_txc_11_stack | 2 | 16638 | 171.581 | family relationships in ancient Indian epic poetry |
+| agentic_txc_11_stack | 3 | 6768 | 136.323 | Stalin and Orwell's political opposition |
+| agentic_txc_11_stack | 4 | 8127 | 123.227 | Latin poetry text fragments with ligatures |
+| agentic_txc_11_stack | 5 | 1159 | 119.210 | Stalin and Soviet authoritarian ideology critique |
+| agentic_txc_11_stack | 6 | 1500 | 111.613 | multiple choice answer options formatting |
+| agentic_txc_11_stack | 7 | 1808 | 107.132 | Foreign language phrases and translations |
+| agentic_txc_11_stack | 8 | 555 | 103.016 | Text abbreviations and shortened word forms |

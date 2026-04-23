@@ -50,6 +50,7 @@ with no new mechanistic insight, stop and escalate.
 | `agentic_txc_09_auxk` | **0.37** ‡| **3** | _probing deferred_ | **Cycle A** |
 | `agentic_txc_02_batchtopk` | **0.80** | **7** 🏆 | _probing deferred_ | **Cycle F** |
 | `agentic_txc_10_bare` | **0.62** | **6** | _probing deferred_ | **Track 2** |
+| `agentic_txc_11_stack` | **0.79** | **5** ⬇ | _probing deferred_ | **Cycle H** |
 
 † Reproduced on this pod at alive=0.3688 on 2048-token random L13
 sample, L0 per-window 500 (= 100 per token). Matches briefing value
@@ -329,6 +330,127 @@ Expected: 7/8 or 8/8. If 8/8, the combined recipe is the definitive
 qualitative winner; if 7/8, Cycle F's 7/8 is the ceiling on this
 bench and the remaining punctuation feature is fundamental to
 top-by-variance on concat A+B.
+
+### Cycle H — BatchTopK + AuxK stacked            [Track 1]
+
+**Reference to beat**: Cycle F at 7 / 8.
+
+**Hypothesis**: BatchTopK and AuxK are two orthogonal anti-dead
+mechanisms — BatchTopK lets revived features fire per-sample without
+displacing incumbents; AuxK directly shapes dead-feature decoder
+directions via a residual-reconstruction gradient. Additively, they
+should push past Cycle F's 7 / 8 to 8 / 8.
+
+**Change**: `MatryoshkaTXCDRContrastiveMultiscaleBatchTopKAuxK` in
+[`src/architectures/matryoshka_txcdr_contrastive_multiscale_batchtopk_auxk.py`](../../../src/architectures/matryoshka_txcdr_contrastive_multiscale_batchtopk_auxk.py).
+Subclasses the Cycle F base and adds AuxK on the pair path.
+Dispatcher entry `agentic_txc_11_stack`.
+
+**Code**: commit `7816abc`.
+
+**Train result**:
+
+- 2273.7 s wall-clock (≈ 38 min), converged=True at step 4000 / 25k.
+- Final loss 17 756 — essentially identical to Cycle F's 17 657.
+- L0 = 500 (BatchTopK).
+
+**Eval result**:
+
+- Alive fraction: **0.7887** — essentially identical to Cycle F's
+  0.7954 (within noise). AuxK contributed nothing on this axis
+  because BatchTopK already saturates it at ~0.80.
+- Autointerp: **5 / 8 semantic** — **regression** from Cycle F's 7 / 8.
+
+Top-8 feature labels:
+
+| rank | feat | label | semantic? |
+|---|---|---|---|
+| 1 |  3258 | Prepositions and conjunctions in historical narratives | ✗ |
+| 2 | 16638 | family relationships in ancient Indian epic poetry | ✓ |
+| 3 |  6768 | Stalin and Orwell's political opposition | ✓ |
+| 4 |  8127 | Latin poetry text fragments with ligatures | ✓ |
+| 5 |  1159 | Stalin and Soviet authoritarian ideology critique | ✓ |
+| 6 |  1500 | multiple choice answer options formatting | ✗ |
+| 7 |  1808 | Foreign language phrases and translations | ✓ |
+| 8 |   555 | Text abbreviations and shortened word forms | ✗ |
+
+**Verdict**: **LOSS vs Cycle F**. Stacking does not stack.
+
+**Takeaway**:
+
+- BatchTopK and AuxK are NOT additive. When combined, AuxK's
+  residual-reconstruction gradient appears to **promote structural /
+  format features** (MMLU answer format, abbreviations,
+  preposition-in-narrative patterns) into the top-8-by-variance,
+  displacing clean passage-level concepts that Cycle F had.
+- Possible mechanism: AuxK pushes dead features' pre-activations
+  higher on the current batch's tokens. With BatchTopK's variable
+  sparsity, those nudged features fire on specific rare contexts.
+  Features that activate on structural/format tokens (e.g. "(A)
+  (B) (C)" for MCQs) end up with high variance across concat_A+B
+  because these structures appear intermittently and strongly.
+- Cycle F's 7 / 8 remains the Phase 6.1 champion.
+- Combined with Track 2 (6 / 8 at TopK + full anti-dead stack), the
+  full picture is: **the Phase 6.1 ceiling is somewhere near 7 / 8
+  on this particular autointerp bench**, with one punctuation-ish
+  feature appearing reliably in the top-8 regardless of recipe.
+  Reasons: concat A+B contains substantial punctuation-variance
+  tokens, and the variance-ranked top-8 is sensitive to that
+  because punctuation activations cluster strongly on specific
+  sub-word tokens.
+
+**Next**: Consolidate findings into Phase 6 summary update. Probing
+regression quantification (BatchTopK vs TopK on last_position /
+mean_pool) still pending probe_cache download.
+
+---
+
+### Final standings
+
+| Candidate | Sparsity | Anti-dead stack | Alive | /8 | Comment |
+|---|---|---|---|---|---|
+| `agentic_txc_02` | TopK | none | 0.37 | 2 | Phase 5 baseline |
+| `agentic_txc_09_auxk` (A) | TopK | AuxK only | 0.37 | 3 | AuxK alone null effect |
+| `agentic_txc_10_bare` (Track 2) | TopK | full (AuxK + unit-norm + grad-⊥ + geom-med) | 0.62 | 6 | ties tsae_paper! |
+| `agentic_txc_02_batchtopk` (F) | BatchTopK | none | **0.80** | **7** | 🏆 champion |
+| `agentic_txc_11_stack` (H) | BatchTopK | AuxK | 0.79 | 5 | stacking regresses |
+| `tsae_paper` (reference) | BatchTopK | full | 0.73 | 6 | paper port |
+
+### Summary of Phase 6.1 findings
+
+1. **AuxK alone on TopK is a null intervention** (Cycle A: no alive-
+   fraction movement, 2→3 labels is within seed noise).
+2. **BatchTopK alone is the single biggest lever** (Cycle F: +0.43
+   alive, +5 labels; beats `tsae_paper`).
+3. **The full anti-dead stack (unit-norm + grad-⊥ + geom-med + AuxK)
+   without BatchTopK is nearly as good** (Track 2: 6/8 at alive 0.62
+   even on TopK sparsity).
+4. **Anti-dead mechanisms don't stack additively**: Cycle H's
+   BatchTopK + AuxK regresses to 5/8. The two mechanisms work on
+   different axes but interact negatively for top-by-variance.
+5. **Matryoshka + multi-scale contrastive is not required for
+   qualitative** — Track 2 matches `tsae_paper` at 6/8 without them.
+   The matryoshka + contrastive recipe is load-bearing only for
+   sparse-probing AUC (Phase 5 story).
+
+### Paper-story reframe candidate
+
+Phase 5.7 + 6.1 together support the following headline narrative:
+
+> The matryoshka + multi-scale contrastive TXC recipe is a sparse-
+> probing winner (Phase 5.7 at `agentic_txc_02`, TopK), and the
+> **sparsity mechanism is a one-knob trade-off** between sparse
+> probing and qualitative interpretability: TopK favours probing,
+> BatchTopK favours qualitative (Phase 6.1 `agentic_txc_02_batchtopk`
+> at 7/8 semantic, beating the paper's T-SAE at 6/8). The same
+> underlying dictionary is capable of both regimes; the sparsity
+> choice selects which axis it optimises.
+
+Pending confirmation: BatchTopK's sparse-probing regression
+magnitude on this bench (requires probe_cache, 70 GB on HF). Phase
+5.7 experiment (ii) quantified this; re-run with test-set AUC at
+`last_position + mean_pool` would give the precise trade-off curve
+for the paper.
 
 ### Cycle F — BatchTopK on multiscale TXC       [Track 1]
 

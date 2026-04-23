@@ -1,0 +1,186 @@
+[
+  {
+    "feature_idx": 3258,
+    "label": "Prepositions and conjunctions in historical narratives",
+    "variance": 192.96337890625,
+    "n_contexts": 10,
+    "contexts": [
+      {
+        "position": 1621,
+        "strength": 76.0625,
+        "text": " Kingdom was in its wartime alliance with the Soviet Union\u00ab against\u00bb Nazi Germany and the British intelligentsia held Stalin"
+      },
+      {
+        "position": 1125,
+        "strength": 71.375,
+        "text": " persuaded to keep the more\ninteresting letters, and\u00ab these\u00bb are preserved in an accessible form.\n\nI"
+      },
+      {
+        "position": 1675,
+        "strength": 71.375,
+        "text": " delayed its publication. It became a great commercial success\u00ab when\u00bb it did appear, as international relations and public"
+      }
+    ]
+  },
+  {
+    "feature_idx": 16638,
+    "label": "family relationships in ancient Indian epic poetry",
+    "variance": 171.5806121826172,
+    "n_contexts": 10,
+    "contexts": [
+      {
+        "position": 744,
+        "strength": 68.6875,
+        "text": "\n  Their common blood, yon concourse of\u00ab our\u00bb kin,\n  My members failIn a"
+      },
+      {
+        "position": 635,
+        "strength": 65.5,
+        "text": "\n  Marked on each hand the kinsmen of\u00ab his\u00bb house,\n  Grandsires and si"
+      },
+      {
+        "position": 650,
+        "strength": 65.0,
+        "text": "Grandsires and sires, uncles and brothers\u00ab and\u00bb sons,\n  Cousins and sons-"
+      }
+    ]
+  },
+  {
+    "feature_idx": 6768,
+    "label": "Stalin and Orwell's political opposition",
+    "variance": 136.3229217529297,
+    "n_contexts": 10,
+    "contexts": [
+      {
+        "position": 510,
+        "strength": 79.1875,
+        "text": " slay\n  To-day, in war'\u00abs\u00bb arbitrament; for, sure,\n  "
+      },
+      {
+        "position": 1106,
+        "strength": 78.875,
+        "text": ", destroyed nearly all letters\nreceived before 1\u00ab8\u00bb62. After that date he was persuaded"
+      },
+      {
+        "position": 1752,
+        "strength": 75.0,
+        "text": "2, 4), and (3, \u00ab0\u00bb) is reflected across the line y = x"
+      }
+    ]
+  },
+  {
+    "feature_idx": 8127,
+    "label": "Latin poetry text fragments with ligatures",
+    "variance": 123.2266616821289,
+    "n_contexts": 10,
+    "contexts": [
+      {
+        "position": 90,
+        "strength": 49.8125,
+        "text": "bes\n  Autor erat; Cererisve bea\u00abvit\u00bb munere gentes;\n  Vel qui cur"
+      },
+      {
+        "position": 91,
+        "strength": 46.5,
+        "text": "\n  Autor erat; Cererisve beavit\u00ab mun\u00bbere gentes;\n  Vel qui curarum"
+      },
+      {
+        "position": 267,
+        "strength": 44.125,
+        "text": "  _NEWTONVM_ clausi reseran\u00abtem\u00bb scrinia Veri,\n  _"
+      }
+    ]
+  },
+  {
+    "feature_idx": 1159,
+    "label": "Stalin and Soviet authoritarian ideology critique",
+    "variance": 119.20952606201172,
+    "n_contexts": 10,
+    "contexts": [
+      {
+        "position": 1367,
+        "strength": 79.625,
+        "text": " critic of Stalin and hostile to Moscow-directed Stalin\u00abism\u00bb, an attitude that was critically shaped by his"
+      },
+      {
+        "position": 1359,
+        "strength": 74.875,
+        "text": " Orwell, a democratic socialist, was a critic of\u00ab Stalin\u00bb and hostile to Moscow-directed Stalinism,"
+      },
+      {
+        "position": 1353,
+        "strength": 68.75,
+        "text": "inist ideology of Joseph Stalin. Orwell, a democratic\u00ab socialist\u00bb, was a critic of Stalin and hostile to"
+      }
+    ]
+  },
+  {
+    "feature_idx": 1500,
+    "label": "multiple choice answer options formatting",
+    "variance": 111.61290740966797,
+    "n_contexts": 10,
+    "contexts": [
+      {
+        "position": 387,
+        "strength": 60.09375,
+        "text": " along their genetic information. This is an example of\u00ab\n\u00bbA. directional selection.\nB. stabilizing"
+      },
+      {
+        "position": 1780,
+        "strength": 58.1875,
+        "text": "\u2019, then one of the vertices of P\u2019 is\u00ab\n\u00bbA. (0, \u2013 3)"
+      },
+      {
+        "position": 828,
+        "strength": 57.53125,
+        "text": ". disruptive selection.f names, the use of\u00ab\n\u00bbcapitals, or in the matter of punctuation"
+      }
+    ]
+  },
+  {
+    "feature_idx": 1808,
+    "label": "Foreign language phrases and translations",
+    "variance": 107.13224792480469,
+    "n_contexts": 10,
+    "contexts": [
+      {
+        "position": 1459,
+        "strength": 48.5625,
+        "text": " Farm was the first book in which I tried,\u00ab with\u00bb full consciousness of what I was doing, to"
+      },
+      {
+        "position": 1347,
+        "strength": 47.90625,
+        "text": " lived under the Marxist\u2013Leninist ideology of Joseph\u00ab Stalin\u00bb. Orwell, a democratic socialist, was a"
+      },
+      {
+        "position": 1423,
+        "strength": 47.09375,
+        "text": " Animal Farm as a satirical tale against Stalin (\"un\u00ab conte\u00bb satirique contre Staline\"), and in his"
+      }
+    ]
+  },
+  {
+    "feature_idx": 555,
+    "label": "Text abbreviations and shortened word forms",
+    "variance": 103.01618194580078,
+    "n_contexts": 10,
+    "contexts": [
+      {
+        "position": 1518,
+        "strength": 46.53125,
+        "text": "6. Other title variations include subtitles like \"A\u00ab Sati\u00bbre\" and \"A Contemporary Satire\"."
+      },
+      {
+        "position": 1085,
+        "strength": 45.78125,
+        "text": " order that he might make use of the liberated \"\u00absp\u00bbits.\"\nThis process, carried on for"
+      },
+      {
+        "position": 263,
+        "strength": 44.625,
+        "text": " vesci,\n  _NEWTONVM_\u00ab cla\u00bbusi reserantem scrinia Veri"
+      }
+    ]
+  }
+]
