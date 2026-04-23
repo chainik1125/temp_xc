@@ -1,0 +1,26 @@
+subject_model: Qwen/Qwen2.5-7B-Instruct
+bad_model: andyrdt/Qwen2.5-7B-Instruct_bad-medical
+d_model: 3584
+layer_txc: 15
+
+txc:
+  d_sae: 32768
+  T: 5
+  k_total: 128
+  steps: 40000
+  batch_size: 256
+  lr: 3.0e-4
+
+streaming:
+  buffer_activations: 1000000
+  refill_chunks: 64
+  chunk_len: 256
+  corpus_mix:
+    - {name: monology/pile-uncopyrighted, weight: 0.7, split: train}
+    - {name: lmsys/lmsys-chat-1m,         weight: 0.3, split: train}
+
+sweep:
+  alpha_grid: [-2.0, -1.5, -1.0, -0.5, -0.25, 0.0, 0.25, 0.5]
+  k_bundle: 10
+  n_rollouts_sweep: 8
+  n_rollouts_pareto: 16
