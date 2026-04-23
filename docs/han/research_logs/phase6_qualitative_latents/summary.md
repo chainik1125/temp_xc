@@ -582,7 +582,7 @@ the Phase 5 probing pipeline on all Phase 6 archs at seed=42 (and
 | Cycle H `agentic_txc_11_stack` (seed=42) | 0.7620 | −0.013 | 0.7851 | −0.014 | 0 |
 | MLC `agentic_mlc_08` (Phase 5) | 0.8047 | +0.030 | 0.7890 | −0.010 | 2 |
 | **`tsae_paper`** (seed=42) | **0.6844** | **−0.091** | **0.7173** | **−0.081** | **12** |
-| `tsae_ours` (seed=42) | 0.7253 | −0.050 | TBD | TBD | 3 |
+| `tsae_ours` (seed=42) | 0.7253 | −0.050 | 0.7488 | −0.050 | 3 |
 
 **The key paper-story finding — there is a real, measurable trade-off
 between qualitative generalisation and probing utility:**
