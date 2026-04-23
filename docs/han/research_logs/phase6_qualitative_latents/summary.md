@@ -121,6 +121,84 @@ combined (total 1819 tokens). Top-10 activating 20-token contexts
 sent to `claude-haiku-4-5` with a Bills-et-al-style label prompt.
 Full tables at [[results/autointerp/summary]].
 
+#### The `x / 8 semantic labels` metric
+
+**What it measures.** For each arch we pick the top-8 features
+(ranked by per-token activation variance on concat_A + concat_B),
+send the top-10 activating 20-token contexts per feature to Claude
+Haiku, and get a one-line natural-language label. We then hand-
+classify each label as either **semantic** (names a concept / topic /
+theme — e.g. "Animal Farm preface references", "plant biology") or
+**non-semantic** (punctuation, whitespace, capitalisation, word-
+class or formatting pattern — e.g. "sentence-ending periods", "MMLU
+answer-option formatting", "hyphens between compound words"). The
+score is the count of semantic labels out of 8.
+
+**What it's designed to capture.** The paper's core claim (§1 and
+Fig 1 / 4) is that baseline SAEs recover *shallow, token-specific,
+syntactic* features — exemplified by their own example *"the phrase
+'The' at the start of sentences"* — while temporally-trained SAEs
+recover *high-level semantic concepts*. The `x / 8` count is a hard
+binary classifier on exactly that distinction: count the features
+that pass the "would-a-human-call-this-a-concept" bar in the top-8.
+
+**Relationship to the paper's Autointerp Score.** The paper reports
+a different quantity. Per §4.3 of Ye et al. 2025:
+
+> **Automated Interpretability (Autointerp) Score**: Score for how
+> correct feature explanations are. We use SAEBench to generate and
+> score feature explanations with Llama3.3-70B-Instruct. For each
+> latent, the LLM generates potential feature explanations based on
+> a range of activating examples. Then, we collect activating and
+> non-activating examples and ask a judge (also Llama3.3-70B-
+> Instruct) to use the feature explanation to categorize examples
+> and score its performance.
+
+Their score is a **continuous recall-like number in [0, 1]**,
+averaged across *all* features (via SAEBench's subsample), using an
+LLM judge that tests whether the explanation can separate activating
+from non-activating examples. Their reported Gemma-2-2b T-SAE score
+is **0.83 ± 0.15** — high, but it doesn't separate "concept-label vs
+syntactic-label" — a crisp label of "the phrase 'The'" would score
+near 1.0 on SAEBench too, because the LLM judge can trivially test
+that rule.
+
+Our `x / 8` is **stricter about semantic vs syntactic**: the hand-
+classification explicitly disqualifies feature labels that describe
+surface patterns even when they're accurate. It's also **cheaper**
+(8 Haiku calls / arch × 5 archs ≈ $1 vs SAEBench's many-features-
+per-arch cost) and **more targeted**: we care specifically about
+whether the top-by-variance features look like concepts (because
+those are what you see when you open the arch and sort by feature
+importance), not about the average-case interpretability.
+
+**Why top-8 by variance.** Matches the paper's Figure 1 / Figure 4
+construction: they plot the top-8 most-active features across a
+concat sequence and ask the reader to verify that each feature
+corresponds to a concept that fits one of the passages. The x / 8
+score formalises "how many of those 8 would a reader call a
+concept".
+
+**Caveats.**
+
+- **Top-8-by-variance is noisy around high-variance punctuation**
+  features (e.g. a feature that fires on every full-stop has very
+  high variance on a long concat because of the token-density of
+  full-stops). This shows up as 1/8 "punctuation" feature surviving
+  in every strong arch, including `tsae_paper` (Animal Farm preface
+  quote marks) and Cycle F (punctuation-at-token-boundaries). A
+  corpus-aware ranking (see [[2026-04-23-handover-post-compact]]
+  §"What to do next" #4) might remove this floor.
+- **Hand classification is a single labeller**, no inter-rater
+  agreement. Borderline cases ("multiple-choice answer formatting"
+  is format-ish but also concept-ish) are judged by the session
+  researcher. Numbers here and in [[2026-04-23-agentic-log]] are
+  consistent with each other because I classified them under one
+  rule; a second labeller might differ by ±1 on any given arch.
+- **1-seed** per arch. Seed variance on the Phase 5.7 winner was
+  ~halving the headline gain — same risk applies here. Phase 6.1
+  follow-up #1 (3-seed check on Cycle F) addresses this.
+
 **Semantic-label count (rough):**
 
 | arch              | semantic labels | representative top-1 label                                |
@@ -344,6 +422,21 @@ Docs (`docs/han/research_logs/phase6_qualitative_latents/`):
 - `summary.md` (this document)
 
 ### 9.5. Phase 6.1 update (2026-04-23) — BatchTopK is the lever
+
+![agentic_txc_02_batchtopk top-8 on concat_B](../../../experiments/phase6_qualitative_latents/results/top_features/concat_B__agentic_txc_02_batchtopk__top8.png)
+
+**Figure 6.** `agentic_txc_02_batchtopk` (Cycle F champion) top-8
+features on concat_B — the same Figure-4-analogue layout as §5's
+plots. Clear passage-phase transitions: feature #1636 ("Historical
+references to Stalinist Soviet Union") peaks in the Animal Farm
+section; #17462 ("historical text with archaic or foreign
+characters") in Darwin + Animal Farm; #2424 ("Acknowledgments and
+attribution in written works") in Darwin; #15702 ("poetic and
+archaic English text passages") activates across the archaic
+passages and silences in math_q. 7 of 8 carry concept labels; only
+#1310 (punctuation) is non-semantic — better fit to the paper's
+Figure-4 qualitative claim than any Phase 6 arch.
+
 
 See [[2026-04-23-agentic-log]] for full per-cycle detail. Headline:
 a 5-candidate agentic loop replaced `agentic_txc_02` as the Phase 6
