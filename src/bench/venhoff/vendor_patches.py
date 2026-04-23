@@ -24,6 +24,7 @@ class Patch:
     find: str                      # literal string to replace (must be unique per occurrence)
     replace: str                   # new string
     description: str               # one-liner for logs + provenance
+    optional: bool = False         # if True, skip silently when find is missing (for migration patches)
 
 
 JUDGE_MODEL_VENHOFF = "openai/gpt-5.2"
@@ -107,6 +108,7 @@ STEERING_8BIT_PATCHES = [
             "    del base_input_ids, thinking_input_ids"
         ),
         description="revert broken v1 BatchEncoding unwrap (uses Tensor.__contains__)",
+        optional=True,
     ),
     Patch(
         file_rel="hybrid/hybrid_token.py",
@@ -145,6 +147,13 @@ def apply_patch(venhoff_root: Path, patch: Patch) -> bool:
         # Already patched — no-op.
         return False
     if patch.find not in content:
+        if patch.optional:
+            log.info(
+                "[info] vendor_patch_skipped_optional | file=%s | desc=%s | reason=find_not_present",
+                patch.file_rel,
+                patch.description,
+            )
+            return False
         raise ValueError(
             f"patch precondition failed: '{patch.find[:80]}...' not found in {path}. "
             "Venhoff may have changed the code; re-verify the commit pin in VENHOFF_PROVENANCE.md."
