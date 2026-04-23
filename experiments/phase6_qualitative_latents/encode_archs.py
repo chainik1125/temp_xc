@@ -200,6 +200,23 @@ def load_arch(arch: str, device: torch.device, seed: int = 42) -> torch.nn.Modul
             dead_threshold_tokens=int(meta.get("dead_threshold_tokens", 10_000_000)),
             auxk_alpha=float(meta.get("auxk_alpha", 1.0 / 32.0)),
         ).to(device)
+    elif arch in ("phase62_c1_track2_matryoshka",
+                  "phase62_c2_track2_contrastive",
+                  "phase62_c3_track2_matryoshka_contrastive"):
+        from src.architectures.txc_bare_matryoshka_contrastive_antidead import (
+            TXCBareMatryoshkaContrastiveAntidead,
+        )
+        T = meta["T"]
+        k_eff = meta["k_win"] or (meta["k_pos"] * T)
+        mh = meta.get("matryoshka_h_size")
+        model = TXCBareMatryoshkaContrastiveAntidead(
+            D_IN, D_SAE, T, k_eff,
+            matryoshka_h_size=int(mh) if mh is not None else None,
+            alpha=float(meta.get("alpha", 0.0)),
+            aux_k=int(meta.get("aux_k", 512)),
+            dead_threshold_tokens=int(meta.get("dead_threshold_tokens", 10_000_000)),
+            auxk_alpha=float(meta.get("auxk_alpha", 1.0 / 32.0)),
+        ).to(device)
     elif arch == "agentic_txc_11_stack":
         from src.architectures.matryoshka_txcdr_contrastive_multiscale_batchtopk_auxk import (
             MatryoshkaTXCDRContrastiveMultiscaleBatchTopKAuxK,
@@ -381,7 +398,10 @@ def encode_concat_AB(concat, concat_name: str, archs: list[str], device,
         model, meta = load_arch(arch, device, seed=seed)
         if arch in ("agentic_txc_02", "agentic_txc_09_auxk", "agentic_txc_10_bare",
                     "agentic_txc_02_batchtopk", "agentic_txc_11_stack",
-                    "agentic_txc_12_bare_batchtopk"):
+                    "agentic_txc_12_bare_batchtopk",
+                    "phase62_c1_track2_matryoshka",
+                    "phase62_c2_track2_contrastive",
+                    "phase62_c3_track2_matryoshka_contrastive"):
             z = encode_txc(model, resid_L13, device, T=meta["T"])
         elif arch == "agentic_mlc_08":
             z = encode_mlc(model, stack, device)
@@ -433,7 +453,10 @@ def encode_concat_C(concat, archs: list[str], device, out_name: str = "concat_C"
             resid_L13_i = resid[13][si]  # (20, d)
             if arch in ("agentic_txc_02", "agentic_txc_09_auxk", "agentic_txc_10_bare",
                         "agentic_txc_02_batchtopk", "agentic_txc_11_stack",
-                        "agentic_txc_12_bare_batchtopk"):
+                        "agentic_txc_12_bare_batchtopk",
+                        "phase62_c1_track2_matryoshka",
+                        "phase62_c2_track2_contrastive",
+                        "phase62_c3_track2_matryoshka_contrastive"):
                 z = encode_txc(model, resid_L13_i, device, T=meta["T"])
             elif arch == "agentic_mlc_08":
                 z = encode_mlc(model, stack[si], device)  # (20, 5, d) -> (20, d_sae)

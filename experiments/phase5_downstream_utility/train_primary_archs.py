@@ -690,6 +690,99 @@ def train_matryoshka_txcdr_contrastive_multiscale(
     return model, log
 
 
+def train_txc_bare_matryoshka_contrastive_antidead(
+    cfg, device, k, T, alpha=1.0, matryoshka_h_size=None,
+    aux_k=512, dead_threshold_tokens=10_000_000, auxk_alpha=1.0 / 32.0,
+    d_sae=DEFAULT_D_SAE, buf=None,
+):
+    """Phase 6.2 C1/C2/C3: bare TXC + anti-dead + optional matryoshka +
+    optional InfoNCE contrastive on the H-prefix.
+
+    C1 arch call: matryoshka_h_size=int(d_sae*0.2), alpha=0.0  (+ pair buf? no, alpha=0 means no contrastive; uses single-window gen)
+    C2 arch call: matryoshka_h_size=None, alpha=1.0
+    C3 arch call: matryoshka_h_size=int(d_sae*0.2), alpha=1.0
+
+    For alpha=0 (C1), we use the single-window generator (same as
+    Track 2). For alpha>0 (C2, C3), we use the pair-window generator
+    so the model sees (x_prev, x_cur) pairs for the InfoNCE term.
+
+    Custom training loop (not `_iterate_train`) to preserve the grad-
+    parallel-removal hook between backward and opt.step (same as
+    `train_txc_bare_antidead`).
+    """
+    from src.architectures.txc_bare_matryoshka_contrastive_antidead import (
+        TXCBareMatryoshkaContrastiveAntidead,
+    )
+    buf = buf if buf is not None else _preload_single(ANCHOR_LAYER_KEY, device)
+    k_eff = k * T
+    model = TXCBareMatryoshkaContrastiveAntidead(
+        buf.shape[-1], d_sae, T, k_eff,
+        matryoshka_h_size=matryoshka_h_size,
+        alpha=alpha,
+        aux_k=aux_k, dead_threshold_tokens=dead_threshold_tokens,
+        auxk_alpha=auxk_alpha,
+    ).to(device)
+
+    if alpha > 0.0:
+        pair_gen = make_pair_window_gen_gpu(buf, T)
+        def gen(batch_size):
+            return pair_gen(batch_size)
+        # init b_dec on a single window slice from the pair
+        x0 = gen(cfg.batch_size)
+        x0_single = x0[:, 1]    # use `cur` for init
+    else:
+        single_gen = make_window_gen_gpu(buf, T)
+        def gen(batch_size):
+            return single_gen(batch_size)
+        x0_single = gen(cfg.batch_size).to(device)
+
+    torch.manual_seed(cfg.seed)
+    np.random.seed(cfg.seed)
+    opt = torch.optim.Adam(model.parameters(), lr=cfg.lr)
+    model.train()
+    model.init_b_dec_geometric_median(x0_single)
+
+    losses: list[float] = []
+    l0s: list[float] = []
+    steps_logged: list[int] = []
+    converged = False
+    plateau_val: float | None = None
+
+    import time as _time
+    t0 = _time.time()
+    for step in range(cfg.max_steps):
+        x = gen(cfg.batch_size)
+        loss, _, z = model(x, alpha=alpha)
+        opt.zero_grad()
+        loss.backward()
+        model.remove_gradient_parallel_to_decoder()
+        nn.utils.clip_grad_norm_(model.parameters(), cfg.grad_clip)
+        opt.step()
+        model._normalize_decoder()
+
+        if step % cfg.log_every == 0 or step == cfg.max_steps - 1:
+            with torch.no_grad():
+                l0 = (z > 0).float().sum(dim=-1).mean().item()
+            losses.append(loss.item())
+            l0s.append(l0)
+            steps_logged.append(step)
+            plateau_val = compute_plateau(losses, window=5)
+            if (plateau_val is not None
+                and plateau_val < cfg.plateau_threshold
+                and step >= cfg.min_steps):
+                converged = True
+                break
+
+    elapsed = _time.time() - t0
+    model.eval()
+    return model, {
+        "loss": losses, "l0": l0s, "steps_logged": steps_logged,
+        "final_step": steps_logged[-1] if steps_logged else 0,
+        "converged": converged, "plateau_last": plateau_val,
+        "elapsed_s": elapsed,
+    }
+
+
 def train_txc_bare_antidead(
     cfg, device, k, T,
     aux_k=512, dead_threshold_tokens=10_000_000, auxk_alpha=1.0 / 32.0,
@@ -1512,6 +1605,65 @@ def run_all(seeds, max_steps, archs=None, min_steps=None):
                             aux_k=512, dead_threshold_tokens=10_000_000,
                             auxk_alpha=1.0 / 32.0,
                             variant="agentic_txc_10_bare_antidead_track2")
+            elif arch == "phase62_c1_track2_matryoshka":
+                # Phase 6.2 C1: Track 2 + matryoshka H/L reconstruction,
+                # no contrastive. Tests whether hierarchical feature
+                # partitioning alone lifts TXC above Track 2's 5/32
+                # random baseline.
+                model, log = train_txc_bare_matryoshka_contrastive_antidead(
+                    cfg, device, k=100, T=5, alpha=0.0,
+                    matryoshka_h_size=int(DEFAULT_D_SAE * 0.2),
+                    aux_k=512, dead_threshold_tokens=10_000_000,
+                    auxk_alpha=1.0 / 32.0,
+                    buf=get_anchor(),
+                )
+                meta = dict(seed=seed, k_pos=100, k_win=500, T=5,
+                            match_budget=True, layer=13,
+                            alpha=0.0,
+                            matryoshka_h_size=int(DEFAULT_D_SAE * 0.2),
+                            aux_k=512, dead_threshold_tokens=10_000_000,
+                            auxk_alpha=1.0 / 32.0,
+                            variant="phase62_c1_track2_matryoshka")
+            elif arch == "phase62_c2_track2_contrastive":
+                # Phase 6.2 C2: Track 2 + InfoNCE contrastive (α=1.0)
+                # on the first 20% of z (conventional "H" split), no
+                # matryoshka. Tests whether temporal-consistency
+                # regularisation alone lifts random score.
+                model, log = train_txc_bare_matryoshka_contrastive_antidead(
+                    cfg, device, k=100, T=5, alpha=1.0,
+                    matryoshka_h_size=None,  # no matryoshka
+                    aux_k=512, dead_threshold_tokens=10_000_000,
+                    auxk_alpha=1.0 / 32.0,
+                    buf=get_anchor(),
+                )
+                meta = dict(seed=seed, k_pos=100, k_win=500, T=5,
+                            match_budget=True, layer=13,
+                            alpha=1.0, matryoshka_h_size=None,
+                            contr_prefix=int(DEFAULT_D_SAE * 0.2),
+                            aux_k=512, dead_threshold_tokens=10_000_000,
+                            auxk_alpha=1.0 / 32.0,
+                            variant="phase62_c2_track2_contrastive")
+            elif arch == "phase62_c3_track2_matryoshka_contrastive":
+                # Phase 6.2 C3: Track 2 + matryoshka + InfoNCE. This is
+                # the full tsae_paper recipe ported to the TXC window-
+                # based encoder (vs tsae_paper's per-token encoder).
+                # Highest-prior candidate: if it matches tsae_paper's
+                # 12/32 random within 2 labels, TXC-family parity
+                # holds with a clean recipe.
+                model, log = train_txc_bare_matryoshka_contrastive_antidead(
+                    cfg, device, k=100, T=5, alpha=1.0,
+                    matryoshka_h_size=int(DEFAULT_D_SAE * 0.2),
+                    aux_k=512, dead_threshold_tokens=10_000_000,
+                    auxk_alpha=1.0 / 32.0,
+                    buf=get_anchor(),
+                )
+                meta = dict(seed=seed, k_pos=100, k_win=500, T=5,
+                            match_budget=True, layer=13,
+                            alpha=1.0,
+                            matryoshka_h_size=int(DEFAULT_D_SAE * 0.2),
+                            aux_k=512, dead_threshold_tokens=10_000_000,
+                            auxk_alpha=1.0 / 32.0,
+                            variant="phase62_c3_track2_matryoshka_contrastive")
             elif arch == "agentic_txc_12_bare_batchtopk":
                 # Phase 6.1 follow-up #4: missing 2x2 cell — bare TXC +
                 # BatchTopK + full anti-dead stack. Tests whether

@@ -109,7 +109,10 @@ def diagnose(arch: str, device, n_tokens: int = 2048) -> dict:
 
     if arch in ("agentic_txc_02", "agentic_txc_09_auxk", "agentic_txc_10_bare",
                 "agentic_txc_02_batchtopk", "agentic_txc_11_stack",
-                "agentic_txc_12_bare_batchtopk"):
+                "agentic_txc_12_bare_batchtopk",
+                "phase62_c1_track2_matryoshka",
+                "phase62_c2_track2_contrastive",
+                "phase62_c3_track2_matryoshka_contrastive"):
         # T=5 window: need (B, T, d). Build non-overlapping windows by reshape.
         # Trim to multiple of T=5.
         T = 5

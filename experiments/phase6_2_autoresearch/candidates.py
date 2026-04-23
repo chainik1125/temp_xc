@@ -41,12 +41,10 @@ CANDIDATES = [
         expected_random="5-8/32 (small gain over Track 2)",
         cost_min=35,
         implementation_note=(
-            "Requires new arch class: subclass TXCBareAntidead, add "
-            "group_sizes field, override forward to add L_H recon on "
-            "H-prefix slice of z. Register dispatch branch in "
-            "train_primary_archs.py modelled on agentic_txc_10_bare."
+            "Implemented via TXCBareMatryoshkaContrastiveAntidead "
+            "with alpha=0.0 and matryoshka_h_size=int(d_sae*0.2)."
         ),
-        implemented=False,
+        implemented=True,
     ),
     Candidate(
         id="C2",
@@ -62,11 +60,11 @@ CANDIDATES = [
         expected_random="6-10/32 (moderate gain)",
         cost_min=40,
         implementation_note=(
-            "Requires pair generator (make_pair_window_gen_gpu is "
-            "already available), InfoNCE loss on z[:, :h] prefix. "
-            "Subclass TXCBareAntidead with contrastive forward path."
+            "Implemented via TXCBareMatryoshkaContrastiveAntidead "
+            "with matryoshka_h_size=None, alpha=1.0, contr_prefix "
+            "defaulting to 0.2*d_sae."
         ),
-        implemented=False,
+        implemented=True,
     ),
     Candidate(
         id="C3",
@@ -83,10 +81,10 @@ CANDIDATES = [
         expected_random="8-14/32 (strong candidate for the winner)",
         cost_min=45,
         implementation_note=(
-            "Combines C1 + C2 mechanisms in one class. Matryoshka H/L "
-            "recon + InfoNCE on H-prefix + Track 2's anti-dead stack."
+            "Implemented via TXCBareMatryoshkaContrastiveAntidead "
+            "with matryoshka_h_size=int(d_sae*0.2) and alpha=1.0."
         ),
-        implemented=False,
+        implemented=True,
     ),
     Candidate(
         id="C4",
