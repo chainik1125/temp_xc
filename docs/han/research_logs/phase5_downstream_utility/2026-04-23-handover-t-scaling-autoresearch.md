@@ -376,29 +376,57 @@ acknowledged limitations. None require Part B to resolve.
 
 ## Resume checklist (first 15 min)
 
-1. `git log --oneline | head -10` — confirm at `6454cff` or later.
-2. Check extended-probe pipeline: `ps -ef | grep run_probing`. If still
-   running, wait for mean_pool to finish before A4 / A6.
-3. Read this doc + `summary.md` §T-sweep (lines 382, 449, 499) +
+1. `git log --oneline | head -10` — confirm at `1458df8` or later.
+2. **HF token**: `export HF_HOME=/workspace/hf_cache`. Token lives at
+   `/workspace/hf_cache/token`, user `han1823123123`. Two repos:
+   `han1823123123/txcdr` (ckpts), `han1823123123/txcdr-data` (probe
+   caches + activations).
+3. Check extended-probe pipeline: `ps -ef | grep run_probing`. If still
+   running (PID was 16715 at handover), wait for mean_pool to finish
+   before A4 / A6. Monitor:
+   `tail -f logs/overnight/probe_batchtopk_extend_mean_pool.log`.
+4. Read this doc + `summary.md` §T-sweep (lines 382, 449, 499) +
    original handover
    [`2026-04-22-handover-batchtopk-tsweep.md`](2026-04-22-handover-batchtopk-tsweep.md).
-4. **Start with A1** (concat-probe, ~5-10 min). Fast, closes a loop.
-5. A2 (BatchTopK sanity check, ~30 min) in parallel — CPU-ish.
-6. A3 (3-seed variance) launched as an overnight batch while doing A4/A5.
-7. Only after Part A completes, begin Part B. **Don't skip Part A for
+5. **Phase 6 is running in parallel** on branch `han-phase6`
+   (commit `e40c0b6` at handover). Don't touch it. The Phase 6 agent
+   has its own briefing
+   [`docs/han/research_logs/phase6_qualitative_latents/2026-04-23-handover-txc-qualitative.md`](../phase6_qualitative_latents/)
+   pursuing TXC qualitative improvements (AuxK port, decoder norm,
+   etc.). If the Phase 5 T-scaling work here succeeds, the Phase 6
+   agent may want to rebase the improved arch.
+6. **Start with A1** (concat-probe, ~5-10 min). Fast, closes a loop.
+7. A2 (BatchTopK sanity check, ~30 min) in parallel — CPU-ish.
+8. A3 (3-seed variance) launched as a background batch while doing A4/A5.
+9. Only after Part A completes, begin Part B. **Don't skip Part A for
    Part B** — the submission needs A to be complete.
 
 ## Key files (cheat sheet)
 
-- **Architectures**: [`src/architectures/`](../../../src/architectures/)
+- **Architectures**: [`src/architectures/`](../../../src/architectures/) —
+  existing classes to subclass for Part B:
+  - `crosscoder.py::TemporalCrosscoder` — vanilla TXCDR (no matryoshka)
+  - `matryoshka_txcdr.py::PositionMatryoshkaTXCDR` — position-nested matryoshka
+  - `matryoshka_txcdr_contrastive.py::MatryoshkaTXCDRContrastive` — + InfoNCE
+  - `matryoshka_txcdr_contrastive_multiscale.py` — agentic_txc_02 base
+  - `_batchtopk.py` + `_batchtopk_variants.py` — BatchTopK sparsity layer
 - **Training dispatchers**: [`train_primary_archs.py`](../../../experiments/phase5_downstream_utility/train_primary_archs.py)
 - **Probe routing**: [`probing/run_probing.py`](../../../experiments/phase5_downstream_utility/probing/run_probing.py)
   — **DO NOT MODIFY** for Part B (that would be reward-hacking)
 - **Phase 5.7 agentic log template**: [`2026-04-21-agentic-log.md`](2026-04-21-agentic-log.md)
+- **Phase 5.7 architecture reference**: [`2026-04-21-phase5_7-architectures.md`](2026-04-21-phase5_7-architectures.md)
 - **Seed variance runner**: `experiments/phase5_downstream_utility/agentic/seed_variance.sh`
 - **Analysis helpers**: [`analysis/router.py`](../../../experiments/phase5_downstream_utility/analysis/router.py),
   [`analysis/concat_probe.py`](../../../experiments/phase5_downstream_utility/analysis/concat_probe.py)
   (ready), `analysis/t_scaling_score.py` (write in Part B cycle 1)
+- **Current summary.md state** (commit `1458df8`): BatchTopK section
+  updated with 3 new extended-scope last_position rows
+  (topk_sae/mlc_contrastive/mlc_contrastive_alpha100 batchtopk). Full
+  21-arch Δ table + mean_pool rows still need a pass (A4) after probe
+  pipeline finishes. BatchTopK T-sweep table + plot added at the
+  bottom of §T-sweep section.
+- **HF sync script**: `scripts/hf_upload_ckpts.py` (idempotent —
+  skip-by-hash; safe to re-run)
 
 ## Bottom line
 
