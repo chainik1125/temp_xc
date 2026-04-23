@@ -1218,7 +1218,7 @@ def _save_run(run_id, arch, model, log, meta):
     print(f"  -> {ckpt_path} ({log['elapsed_s']:.1f}s conv={log['converged']})")
 
 
-def run_all(seeds, max_steps, archs=None):
+def run_all(seeds, max_steps, archs=None, min_steps=None):
     device = torch.device("cuda")
     # Headline 5.1 sweep: 7 architectures, all trainable within the 48 h budget.
     #
@@ -1269,6 +1269,9 @@ def run_all(seeds, max_steps, archs=None):
     for seed in seeds:
         for arch in archs_to_run:
             cfg = TrainCfg(seed=seed, max_steps=max_steps)
+            if min_steps is not None:
+                cfg = TrainCfg(seed=seed, max_steps=max_steps,
+                               min_steps=min_steps)
             run_id = f"{arch}__seed{seed}"
             print(f"=== {run_id} ===")
 
@@ -1721,9 +1724,13 @@ def main():
     p = argparse.ArgumentParser()
     p.add_argument("--seeds", type=int, nargs="+", default=[42])
     p.add_argument("--max-steps", type=int, default=25_000)
+    p.add_argument("--min-steps", type=int, default=None,
+                   help="override TrainCfg.min_steps (default 3000); use "
+                        "e.g. 10000 for Phase 6.2 duration sweeps")
     p.add_argument("--archs", type=str, nargs="+", default=None)
     args = p.parse_args()
-    run_all(seeds=args.seeds, max_steps=args.max_steps, archs=args.archs)
+    run_all(seeds=args.seeds, max_steps=args.max_steps,
+            archs=args.archs, min_steps=args.min_steps)
 
 
 if __name__ == "__main__":
