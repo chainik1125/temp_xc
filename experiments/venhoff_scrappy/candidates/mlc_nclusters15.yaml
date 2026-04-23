@@ -1,0 +1,13 @@
+# Screening: mlc at n_clusters=15. Part of the 3 × 3 factorial
+# on (arch, n_clusters) at scrappy budget.
+
+name: mlc_nclusters15
+arch: mlc
+baseline: baseline_sae
+reuse_venhoff_vectors: false
+phase2_steering:
+  n_clusters: 15
+hypothesis: |
+  Does n_clusters=15 materially help mlc? Paper uses 15 by default.
+  If coarser (4) matches 15, cluster count isn't the dominant axis for
+  mlc. If fine-grained (15) dominates, the arch is cluster-limited.

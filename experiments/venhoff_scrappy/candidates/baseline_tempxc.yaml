@@ -1,0 +1,12 @@
+# Smoke test — confirms scrappy slice preserves the full-budget finding
+# that TempXC > SAE on this cell.
+
+name: baseline_tempxc
+arch: tempxc
+baseline: baseline_sae
+reuse_venhoff_vectors: false
+hypothesis: |
+  At the full-budget run (n_tasks=500), TempXC landed ~18% Gap Recovery
+  vs SAE's ~10%. On the scrappy slice (n=20), we expect the ordering
+  to be preserved (Δ > +3 pp, PROMISING or better). If not, the slice
+  is too small or wrong and downstream verdicts are unreliable.

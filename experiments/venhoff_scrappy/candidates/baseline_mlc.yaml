@@ -1,0 +1,12 @@
+# Smoke test — can MLC even train in 5 iters on 128 examples? Expected:
+# yes, but may underperform TempXC at scrappy budget.
+
+name: baseline_mlc
+arch: mlc
+baseline: baseline_sae
+reuse_venhoff_vectors: false
+hypothesis: |
+  MLC's per-layer contribution is heavier to train. At max_iters=5 the
+  vectors may not converge, which would show as Δ near 0 or negative.
+  A genuinely large negative Δ here tells us MLC needs higher scrappy
+  budget; a positive Δ is the happy path.

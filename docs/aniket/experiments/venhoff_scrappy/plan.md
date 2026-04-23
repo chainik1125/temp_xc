@@ -244,25 +244,28 @@ Cons: agent may converge on a pathological local optimum (e.g., all cycles diffe
 
 ### 6.3 Exploration strategy — screening then exploit (web-claude revision)
 
-Pure coordinate descent on a O(10³) space traps the agent in **cheap-axis gravity** (it tweaks `coefficient` and `token_windows` because they're one-line YAML edits, skipping the real-effect axes like `reduction` or `n_clusters`). Two-phase plan:
+Pure coordinate descent on a O(10³) space traps the agent in **cheap-axis gravity** (it tweaks `coefficient` and `token_windows` because they're one-line YAML edits, skipping the real-effect axes). Two-phase plan:
 
-**Screening phase** — fractional factorial on the three biggest-effect axes. Grid:
-- `arch ∈ {SAE, TempXC, MLC}` (3)
-- `steering_layer ∈ {8, 12, 16}` (3)
-- `reduction ∈ {sum, mean}` — TempXC-only (2)
+**Screening phase (scope of current wiring)** — 3 × 3 full factorial on `(arch ∈ {sae, tempxc, mlc}) × (n_clusters ∈ {4, 8, 15})`. 9 cycles. ~90 min on a single GPU at ~10 min/cycle.
 
-3×3×2 = 18 cycles. Plus the baseline + shuffle control below → **20 screening cycles, ~4 h**.
+Why only these two axes in the first wired batch:
+- `arch` is a hardcoded case in the vendor `optimize_steering_vectors.py` — no YAML override needed.
+- `n_clusters` is already a `SteeringConfig` field and flows through to Phase 2 + Phase 3.
+- `steering_layer` variation requires a second Phase 0 run per layer (activations are layer-specific) — deferred to a follow-up batch.
+- `reduction` (sum/mean/max for TempXC) is NOT a `SteeringConfig` field yet. Adding it requires a vendor-level patch or a new loss override. Deferred.
+- `coefficient` and `token_windows` are the cheap-axis gravity trap; excluded from screening by design. The agent can explore them in the exploit phase.
 
-**Exploit phase** — agent-driven coordinate descent on the screening winner, with hard constraint in system prompt: *every axis in the ledger must have ≥3 cycles before any verdict claim*. ~50 cycles, ~10 h.
+**Exploit phase** — agent-driven coordinate descent on the screening winner, adding `steering_layer` + `coefficient` + `token_windows` as axes. System prompt constraint: *every axis in the ledger must have ≥3 cycles before any verdict claim*. ~50 cycles, ~10 h.
 
-### 6.4 Initial curated batch (cycles 00-03, before launching the agent)
+### 6.4 Initial curated batch (cycles 00-02, before the factorial)
 
 1. **`baseline_sae`** — reference. Δ = 0 by definition. Establishes the absolute GR number on the scrappy slice.
-2. **`baseline_sae_shuffled`** — permute activations within-sequence before Phase 2 on SAE. Per our own "shuffle control is mandatory" learning (memory #andre_v2_sweep). If this scores close to `baseline_sae`, the TFA-style dense-channel confound is present on the Venhoff pipeline and the whole loop's conclusions are suspect. **Cheap to run once, saves the overnight from being uninterpretable.**
-3. **`baseline_tempxc`** — TempXC at scrappy budget. Confirms scrappy slice preserves TempXC > SAE ordering (smoke test for the full-budget headline).
-4. **`baseline_mlc`** — MLC at scrappy budget. Same smoke test for MLC.
+2. **`baseline_tempxc`** — TempXC at scrappy budget. Confirms scrappy slice preserves TempXC > SAE ordering (smoke test for the full-budget headline).
+3. **`baseline_mlc`** — MLC at scrappy budget. Same smoke test for MLC.
 
-Then hand off to the screening phase (§6.3). ~4 cycles × 10 min = ~40 min to establish the sanity points before the agent takes over.
+Then the 9-cycle factorial (§6.3). ~12 cycles × 10 min = ~2 h total.
+
+**Shuffle-control note**: `baseline_sae_shuffled` is scaffolded in `candidates/` but excluded from `run_all.sh`. Running it right with the Venhoff pipeline requires either retraining SAE from scratch on permuted activations (~60 min at n_clusters=15; ~15 min at n_clusters=4) or patching `hybrid_token.py` to shuffle steering-vector → cluster assignment at inference time. Treated as a post-hoc confound check invoked manually once the main batch is in.
 
 ## 7. Metric, noise, verdict thresholds
 

@@ -11,8 +11,11 @@ model:
   sae_layer: 6
 
 phase0_activations:
-  # Phase 0 (trace collection) is expensive and doesn't vary across cycles;
-  # cache it once at repo level, reuse across all scrappy candidates.
+  # Phase 0 (trace collection + activation extraction) is expensive and
+  # doesn't vary across cycles sharing the same (thinking_model, dataset,
+  # steering_layer). scripts/phase0_bootstrap.sh runs it once on pod;
+  # cycles symlink the cached artifacts in.
+  n_traces: 200           # paper: 400-500; scrappy cuts Phase 0 to ~20 min
   reuse_existing: true
 
 phase2_steering:
