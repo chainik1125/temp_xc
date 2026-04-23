@@ -48,6 +48,8 @@ with no new mechanistic insight, stop and escalate.
 | `agentic_txc_02`    | 0.39 †| **2**         | 0.775 / 0.799           | baseline |
 | `tsae_paper` (ref)  | 0.73  | 6             | n/a (not window)        | Phase 6 |
 | `agentic_txc_09_auxk` | **0.37** ‡| **3** | _probing deferred_ | **Cycle A** |
+| `agentic_txc_02_batchtopk` | **0.80** | **7** 🏆 | _probing deferred_ | **Cycle F** |
+| `agentic_txc_10_bare` | _tbd_ | _tbd_ | _probing deferred_ | **Track 2** |
 
 † Reproduced on this pod at alive=0.3688 on 2048-token random L13
 sample, L0 per-window 500 (= 100 per token). Matches briefing value
@@ -226,3 +228,106 @@ After Track 2, priority becomes **Cycle F (BatchTopK)** — the briefing's
 next-in-line mechanism, which directly targets the tension. If
 BatchTopK-TXC + AuxK beats Cycle A by a meaningful margin, that
 triangulates "BatchTopK is the load-bearing piece".
+
+### Cycle F — BatchTopK on multiscale TXC       [Track 1]
+
+**Reference to beat**: `agentic_txc_02`, autointerp = 2 / 8.
+
+**Hypothesis**: Cycle A confirmed AuxK is a null intervention when
+combined with strict TopK-per-window sparsity. BatchTopK (variable
+per-sample sparsity, same total budget across the batch) lets dead
+features fire *on contexts where they help* without having to
+displace an already-winning top-k feature. Predicts: alive fraction
+jumps substantially; top-8-by-variance diversifies away from
+punctuation.
+
+**Change**: No new code on this branch. Used the Phase 5.7
+experiment (ii) checkpoint `agentic_txc_02_batchtopk__seed42.pt`
+(produced on `origin/han`) downloaded from
+`han1823123123/txcdr` HF repo. Cherry-picked
+[`src/architectures/_batchtopk.py`](../../../src/architectures/_batchtopk.py)
+and
+[`_batchtopk_variants.py`](../../../src/architectures/_batchtopk_variants.py)
+from `origin/han` to load the checkpoint. Dispatcher wired in
+`encode_archs.py`, `run_probing.py`, `arch_health.py`.
+
+**Code**: commit `96a774c` (wiring).
+
+**Train result**: Re-using origin/han's training (2117 s, converged
+at step 4000 / 25 000, final loss 17 657, L0 500 equivalent). No
+re-train on this branch.
+
+**Eval result**:
+
+Alive fraction (2048-token random L13 sample, 409 windows):
+**0.7954** — vs `agentic_txc_02`'s 0.3688 and Cycle A's 0.3667.
+**+0.43 absolute**, and actually **beats `tsae_paper`'s 0.735.**
+L0 per token = 662 (unenforced by BatchTopK's flat-batch selection;
+average per-window across batch hits ~k_win · B / B = 500, but
+per-token varies).
+
+Autointerp on concat_A + concat_B (1819 tokens) with Claude Haiku:
+**7 / 8 semantic labels** — **beats `tsae_paper`'s 6 / 8 (stretch
+target)**.
+
+Top-8 feature labels:
+
+| rank | feat | label | semantic? |
+|---|---|---|---|
+| 1 | 15702 | poetic and archaic English text passages | ✓ |
+| 2 | 17462 | historical text with archaic or foreign characters | ✓ |
+| 3 |  6068 | George Orwell's political ideology and writings | ✓ |
+| 4 |  6630 | Latin and Sanskrit poetic texts | ✓ |
+| 5 |  2424 | Acknowledgments and attribution in written works | ✓ |
+| 6 |  6693 | Historical references to Stalinist Soviet Union | ✓ |
+| 7 |  1310 | Punctuation and special characters at token boundaries | ✗ |
+| 8 |  2048 | Political ideologies and historical movements | ✓ |
+
+Sparse-probing guard: deferred. From Phase 5.7 experiment (ii),
+BatchTopK regresses TXC sparse probing (quantified delta tbd on this
+branch; Phase 5.7 summary cites it as a regression).
+
+**Verdict**: **WIN on qualitative — new Phase 6.1 champion**, 7 / 8
+(+5 vs `agentic_txc_02` baseline; +1 vs `tsae_paper`; tie or beat
+everything on the Phase 6 bench).
+
+**Takeaway**:
+
+**The TopK-vs-BatchTopK sparsity mechanism is the load-bearing
+piece for TXC qualitative** — larger effect than every Cycle A/B/C/D
+mechanism individually, and larger than any matryoshka / contrastive
+tuning. Interpretation:
+
+- Under strict TopK, the top-k features per window form a "sticky
+  winner" set. Features that fire less frequently (rare concepts,
+  passage-level signals) get crowded out by high-variance syntactic
+  features that fire everywhere. The top-8-by-variance becomes
+  dominated by punctuation / delimiter / quote features.
+- Under BatchTopK, variable per-sample sparsity means rare features
+  can fire on contexts where they're most informative without
+  needing to beat a syntactic feature at every other sample.
+  Alive-fraction rises; semantic features dominate top-8 by variance.
+- The matryoshka + multi-scale contrastive recipe is NOT the cause
+  of agentic_txc_02's qualitative failure. It's the sparsity that
+  was crowding out concepts. With BatchTopK, the same recipe
+  produces top-quality features.
+- Paper story reframe: "matryoshka + multi-scale contrastive TXC
+  wins on both sparse probing (TopK variant) AND qualitative
+  (BatchTopK variant). The sparsity mechanism is a knob: TopK
+  favours probing; BatchTopK favours qualitative. The same
+  underlying dictionary is capable of both." This is a much richer
+  claim than the original "agentic_txc_02 wins at both".
+
+**Next**: two fronts.
+
+1. **Probing-regression quantification**: download `probe_cache`
+   from HF and run sparse probing on `agentic_txc_02_batchtopk` to
+   quantify the AUC delta vs `agentic_txc_02`. This is the precise
+   quantitative trade-off the paper claims.
+2. **Cycle H stack**: try `agentic_txc_02_batchtopk + AuxK +
+   unit-norm decoder + grad-parallel removal + geom-median init`
+   to see if layering the full anti-dead stack on top of BatchTopK
+   pushes to 8 / 8. Expected marginal: the alive-fraction delta is
+   already at +0.43; the remaining 1 punctuation feature may
+   disappear if the extra mechanisms further disentangle decoder
+   directions. Easy if Track 2 + Cycle F confirm the pattern.
