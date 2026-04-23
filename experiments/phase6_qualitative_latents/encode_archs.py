@@ -45,7 +45,8 @@ OUT_DIR = REPO / "experiments/phase6_qualitative_latents/z_cache"
 CKPT_DIR = REPO / "experiments/phase5_downstream_utility/results/ckpts"
 HF_TOKEN = open("/workspace/hf_cache/token").read().strip()
 
-DEFAULT_ARCHS = ["agentic_txc_02", "agentic_mlc_08", "tsae_paper", "tsae_ours", "tfa_big"]
+DEFAULT_ARCHS = ["agentic_txc_02", "agentic_mlc_08", "tsae_paper", "tsae_ours",
+                 "tfa_big", "agentic_txc_09_auxk"]
 D_IN = 2304
 D_SAE = 18_432
 
@@ -146,6 +147,20 @@ def load_arch(arch: str, device: torch.device) -> torch.nn.Module:
             D_IN, D_SAE, T, k_eff,
             n_contr_scales=meta.get("n_contr_scales", 3),
             gamma=meta.get("gamma", 0.5),
+        ).to(device)
+    elif arch == "agentic_txc_09_auxk":
+        from src.architectures.matryoshka_txcdr_contrastive_multiscale_auxk import (
+            MatryoshkaTXCDRContrastiveMultiscaleAuxK,
+        )
+        T = meta["T"]
+        k_eff = meta["k_win"] or (meta["k_pos"] * T)
+        model = MatryoshkaTXCDRContrastiveMultiscaleAuxK(
+            D_IN, D_SAE, T, k_eff,
+            n_contr_scales=meta.get("n_contr_scales", 3),
+            gamma=meta.get("gamma", 0.5),
+            aux_k=int(meta.get("aux_k", 512)),
+            dead_threshold_tokens=int(meta.get("dead_threshold_tokens", 10_000_000)),
+            auxk_alpha=float(meta.get("auxk_alpha", 1.0 / 32.0)),
         ).to(device)
     elif arch == "agentic_mlc_08":
         from src.architectures.mlc_contrastive_multiscale import (
@@ -303,7 +318,7 @@ def encode_concat_AB(concat, concat_name: str, archs: list[str], device):
     for arch in archs:
         print(f"[{concat_name}] encode: {arch}")
         model, meta = load_arch(arch, device)
-        if arch == "agentic_txc_02":
+        if arch in ("agentic_txc_02", "agentic_txc_09_auxk"):
             z = encode_txc(model, resid_L13, device, T=meta["T"])
         elif arch == "agentic_mlc_08":
             z = encode_mlc(model, stack, device)
@@ -350,7 +365,7 @@ def encode_concat_C(concat, archs: list[str], device, out_name: str = "concat_C"
         z_all = np.zeros((n_seq, seq_len, D_SAE), dtype=np.float16)
         for si in range(n_seq):
             resid_L13_i = resid[13][si]  # (20, d)
-            if arch == "agentic_txc_02":
+            if arch in ("agentic_txc_02", "agentic_txc_09_auxk"):
                 z = encode_txc(model, resid_L13_i, device, T=meta["T"])
             elif arch == "agentic_mlc_08":
                 z = encode_mlc(model, stack[si], device)  # (20, 5, d) -> (20, d_sae)

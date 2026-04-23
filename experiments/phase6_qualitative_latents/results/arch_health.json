@@ -1,26 +1,9 @@
 [
   {
-    "arch": "tsae_paper",
-    "alive_fraction": 0.5072157382965088,
-    "l0_per_token": 20.08349609375,
-    "n_tokens": 4096,
-    "decoder_mean_abs_cos": 0.021946098655462265
-  },
-  {
-    "arch": "tsae_ours",
-    "alive_fraction": 0.4098307192325592,
-    "l0_per_token": 98.935546875,
-    "n_tokens": 4096,
-    "decoder_mean_abs_cos": 0.017277291044592857
-  },
-  {
     "arch": "agentic_txc_02",
-    "alive_fraction": 0.4108072817325592,
+    "alive_fraction": 0.3687608540058136,
     "l0_per_token": 500.0000305175781,
-    "n_tokens": 819,
+    "n_tokens": 409,
     "decoder_mean_abs_cos": null
-  },
-  {
-    "arch": "agentic_mlc_08"
   }
 ]
