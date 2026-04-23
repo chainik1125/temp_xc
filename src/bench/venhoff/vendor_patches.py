@@ -27,7 +27,11 @@ class Patch:
 
 
 JUDGE_MODEL_VENHOFF = "openai/gpt-5.2"
-JUDGE_MODEL_OURS = "anthropic/claude-haiku-4.5"
+# Dated API id — bare "claude-haiku-4.5" isn't a recognized model on
+# the direct Anthropic API (only OpenRouter accepts the bare name).
+# safe_chat_batch in hybrid_token.py routes via the anthropic SDK when
+# the prefix is "anthropic/", so we use the SDK-accepted dated id.
+JUDGE_MODEL_OURS = "claude-haiku-4-5-20251001"
 
 
 HYBRID_JUDGE_PATCHES = [
@@ -71,6 +75,12 @@ STEERING_8BIT_PATCHES = [
         find="    token_offsets = tokenizer.encode_plus(text, return_offsets_mapping=True)['offset_mapping']",
         replace="    token_offsets = tokenizer(text, return_offsets_mapping=True)['offset_mapping']",
         description="swap tokenizer.encode_plus(...) → tokenizer(...) (encode_plus dropped in new transformers)",
+    ),
+    Patch(
+        file_rel="utils/utils.py",
+        find="    model = LanguageModel(model_name, dispatch=True, load_in_8bit=load_in_8bit, device_map=device, dtype=torch.bfloat16)",
+        replace="    model = LanguageModel(model_name, dispatch=True, device_map=device, dtype=torch.bfloat16)",
+        description="drop load_in_8bit= kwarg from LanguageModel(...) in load_model() (Phase 3 hybrid inference path)",
     ),
 ]
 
