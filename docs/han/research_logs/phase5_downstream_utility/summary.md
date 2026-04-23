@@ -147,11 +147,15 @@ non-determinism accumulated across re-probes; the ranking is stable.)*
 | 🏆 **agentic_mlc_08** (multi-scale MLC, Phase 5.7) | **0.8047** | 0.1211 | 36 |
 | 🆕 mlc_contrastive_alpha100 (Part-B α=1.0) | 0.7985 | 0.1181 | 36 |
 | mlc_contrastive | 0.7930 | 0.1163 | 36 |
+| 🆕 agentic_mlc_08_batchtopk | 0.7907 | 0.1195 | 36 |
 | mlc | 0.7884 | 0.1193 | 36 |
 | 🏆 **agentic_txc_02** (multi-scale matryoshka, Phase 5.7) | **0.7775** | 0.1138 | 36 |
 | txcdr_rank_k_dec_t5 | 0.7769 | 0.1087 | 36 |
 | 🆕 matryoshka_txcdr_contrastive_t5_alpha100 (Part-B α=1.0) | 0.7757 | 0.1146 | 36 |
 | txcdr_t5 | 0.7752 | 0.1103 | 36 |
+| 🆕 mlc_batchtopk | 0.7684 | 0.1175 | 36 |
+| 🆕 txcdr_t5_batchtopk | 0.7678 | 0.1061 | 36 |
+| 🆕 agentic_txc_02_batchtopk | 0.7543 | 0.1154 | 36 |
 | txcdr_t15 | 0.7695 | 0.1074 | 36 |
 | txcdr_t3 | 0.7659 | 0.1243 | 36 |
 | txcdr_t10 | 0.7573 | 0.1197 | 36 |
@@ -195,11 +199,15 @@ non-determinism accumulated across re-probes; the ranking is stable.)*
 | 🆕 matryoshka_txcdr_contrastive_t5_alpha100 (Part-B α=1.0) | 0.7946 | 0.1266 | 36 |
 | txcdr_t3 | 0.7931 | 0.1296 | 36 |
 | txcdr_rank_k_dec_t5 | 0.7911 | 0.1182 | 36 |
+| 🆕 agentic_mlc_08_batchtopk | 0.7911 | 0.1253 | 36 |
 | 🆕 **agentic_mlc_08** (multi-scale MLC, Phase 5.7) | 0.7890 | 0.1238 | 36 |
+| 🆕 txcdr_t5_batchtopk | 0.7832 | 0.1163 | 36 |
 | 🆕 mlc_contrastive_alpha100 (Part-B α=1.0) | 0.7818 | 0.1276 | 36 |
 | mlc | 0.7774 | 0.1262 | 36 |
+| 🆕 agentic_txc_02_batchtopk | 0.7772 | 0.1275 | 36 |
 | txcdr_t15 | 0.7766 | 0.1122 | 36 |
 | mlc_contrastive | 0.7739 | 0.1213 | 36 |
+| 🆕 mlc_batchtopk | 0.7727 | 0.1224 | 36 |
 | txcdr_tied_t5 | 0.7726 | 0.1208 | 36 |
 | txcdr_t2 | 0.7713 | 0.1315 | 36 |
 | txcdr_t10 | 0.7670 | 0.1193 | 36 |
@@ -272,6 +280,57 @@ orthogonality-reg, γ-decay, n-scales, hard-negs, and consistency-loss
 variants to confirm that (i) γ=0.5 is a sharp peak, (ii) n=3 scales is
 optimal for T=5, and (iii) the discriminative push-apart of InfoNCE is
 essential — pull-only consistency loses half the gain).
+
+#### BatchTopK apples-to-apples (Phase 5.7 experiment ii)
+
+Does the multi-scale contrastive recipe survive swapping TopK → BatchTopK
+(Bussmann et al. 2024)? BatchTopK pools the top B·k pre-activations
+across the batch and uses a calibrated JumpReLU-style threshold at
+inference. Module: [`_batchtopk.py`](../../../../src/architectures/_batchtopk.py).
+
+Four archs retrained at matched k with BatchTopK, probed at both
+aggregations (seed=42, test set):
+
+| arch | agg | TopK | BatchTopK | Δ |
+|---|---|---|---|---|
+| txcdr_t5 | last_position | 0.7752 | 0.7678 | −0.0074 |
+| txcdr_t5 | mean_pool | 0.7991 | 0.7832 | −0.0159 |
+| mlc | last_position | 0.7884 | 0.7684 | −0.0200 |
+| mlc | mean_pool | 0.7774 | 0.7727 | −0.0047 |
+| agentic_txc_02 | last_position | 0.7775 | 0.7543 | −0.0232 |
+| agentic_txc_02 | mean_pool | 0.8007 | 0.7772 | −0.0235 |
+| agentic_mlc_08 | last_position | 0.8047 | 0.7907 | −0.0140 |
+| agentic_mlc_08 | mean_pool | 0.7890 | **0.7911** | **+0.0021** |
+
+**Reading**: BatchTopK is a net regression in 7/8 cases. The
+inference-threshold calibration (JumpReLU-style EMA of per-batch cutoff)
+appears to introduce noise the top-k-by-class-separation probe is
+sensitive to. Raw k/d_sae sparsity is preserved in expectation but not
+per-sample, which is the published caveat.
+
+**Recipe compositionality** — does the multi-scale contrastive gain
+transfer from TopK to BatchTopK?
+
+| comparison | agg | Δ (TopK) | Δ (BatchTopK) |
+|---|---|---|---|
+| agentic_txc_02 − txcdr_t5 | last_position | +0.0023 | **−0.0135** |
+| agentic_txc_02 − txcdr_t5 | mean_pool | +0.0016 | **−0.0060** |
+| agentic_mlc_08 − mlc | last_position | +0.0163 | **+0.0223** |
+| agentic_mlc_08 − mlc | mean_pool | +0.0116 | **+0.0184** |
+
+- **MLC multi-scale composes with BatchTopK**: Δ grows from +0.016 to
+  +0.022 at last_position, +0.012 to +0.018 at mean_pool. The recipe is
+  robust to the sparsity mechanism swap.
+- **TXC multi-scale does NOT compose with BatchTopK**: Δ flips sign at
+  both aggregations. The cycle-02 mechanism (InfoNCE aligning scale-1
+  matryoshka latents across adjacent T-windows) relies on per-sample
+  TopK stability; when samples share a batch-level cutoff, the
+  pairwise alignment signal gets contaminated.
+
+**Paper implication**: the multi-scale recipe's universality claim
+should be scoped to TopK-sparsity. For MLC it survives BatchTopK; for
+TXC it doesn't, which is a defensible published finding rather than a
+problem — it identifies the mechanism as per-sample-TopK-dependent.
 
 #### Figure 3 — Headline plots index
 
