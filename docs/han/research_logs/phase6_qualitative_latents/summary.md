@@ -423,12 +423,11 @@ Docs (`docs/han/research_logs/phase6_qualitative_latents/`):
 
 ### 9.5. Phase 6.1 update (2026-04-23) — rigorous metric reveals TXC-parity claim is curated-concat specific
 
-**Status**: seed=42 data complete for all 9 Phase 6 archs across
-concat_A, concat_B, and a new `concat_random` (7 random FineWeb
-passages, 1792 tokens). Triangle seed-variance retrain (Cycle F,
-2×2 cell, tsae_paper at seeds {1, 2}) and probing regression are
-in flight. This section will be updated with mean ± stderr numbers
-once training completes; the seed=42 headline below is stable.
+**Status**: seed=42 data complete for all 9 Phase 6 archs; **Cycle F
+3-seed data now in** (A = 21.7 ± 0.88, B = 16.0 ± 2.52, random =
+0.0 ± 0.00); 2×2 cell + tsae_paper seed-variance training still in
+progress; probing regression numbers landed for Cycle F seed=42 (see
+below). This section is live-updated as more data arrives.
 
 **Supersedes** the earlier §9.5 draft's 9-arch /8 hand-classified
 table. Those numbers stay in git history but are **not directly
@@ -464,12 +463,16 @@ entropy of peak-passage distribution) reports where the top-N
 features fire. Not discriminative at P=3, 4 (all archs saturate
 at full coverage); useful at P=7.
 
-#### Headline (seed=42, N=32, temp=0, multi-judge)
+#### Headline (N=32, temp=0, multi-judge; seed=42 except where noted)
+
+Cycle F numbers are the 3-seed mean (seeds 42, 1, 2) ± stderr. Every
+other arch is a single seed=42 snapshot (triangle seed-variance on
+tsae_paper and 2×2 cell still in flight).
 
 | arch | concat_A /32 | concat_B /32 | **concat_random /32** | random cov k/P |
 |---|---|---|---|---|
 | `agentic_txc_02` (baseline) | 17 | 16 | **0** | 7/7 |
-| `agentic_txc_02_batchtopk` (Cycle F) | 20 | 13 | **0** | 6/7 |
+| **`agentic_txc_02_batchtopk` (Cycle F, 3 seeds)** | **21.7 ± 0.88** | **16.0 ± 2.52** | **0.0 ± 0.00** | 6-7/7 |
 | `agentic_txc_09_auxk` (Cycle A) | 21 | 13 | **0** | 7/7 |
 | `agentic_txc_11_stack` (Cycle H) | 21 | 12 | **0** | 7/7 |
 | **`agentic_txc_10_bare` (Track 2)** | 20 | **19** | **5** | 7/7 |
@@ -477,6 +480,20 @@ at full coverage); useful at P=7.
 | `tsae_ours` | 17 | 19 | 3 | 6/7 |
 | `tfa_big` | 14 | 12 | **0** | **2/7** |
 | **`tsae_paper`** | **23** | 18 | **12** | 7/7 |
+
+**Cycle F seed-variance observations:**
+
+- *concat_A*: 20, 23, 22 — tight (± 0.88). Cycle F ≈ `tsae_paper` (23)
+  within 1 label.
+- *concat_B*: **13, 14, 21** — wide. Seed 2 outperforms `tsae_paper`
+  (18) on concat_B; seeds 42 and 1 fall short. Seed 2 is not a tail
+  event — the label-content is qualitatively richer on that seed,
+  suggesting the feature basis sampled at different random inits
+  varies in how well it matches concat_B's specific passages.
+- *concat_random*: **0, 0, 0** — reproducibly zero. The Cycle F recipe
+  (BatchTopK + matryoshka + multi-scale contrastive) produces top-32
+  features that do NOT generalise to uncurated text, regardless of
+  seed.
 
 #### Four findings that change the Phase 6 narrative
 
