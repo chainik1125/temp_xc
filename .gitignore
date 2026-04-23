@@ -63,3 +63,4 @@ experiments/phase5_downstream_utility/results/probe_cache/
 experiments/phase6_qualitative_latents/concat_corpora/sources/
 experiments/phase6_qualitative_latents/z_cache/
 .envrc
+.hf_sync_manifest.json
