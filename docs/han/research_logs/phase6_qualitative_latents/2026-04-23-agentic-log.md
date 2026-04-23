@@ -47,11 +47,17 @@ with no new mechanistic insight, stop and escalate.
 |---------------------|-------|---------------|-------------------------|-------|
 | `agentic_txc_02`    | 0.39 †| **2**         | 0.775 / 0.799           | baseline |
 | `tsae_paper` (ref)  | 0.73  | 6             | n/a (not window)        | Phase 6 |
-| `agentic_txc_09_auxk` | _tbd_ | _tbd_ | _tbd_ | **Cycle A** |
+| `agentic_txc_09_auxk` | **0.37** ‡| **3** | _probing deferred_ | **Cycle A** |
 
 † Reproduced on this pod at alive=0.3688 on 2048-token random L13
 sample, L0 per-window 500 (= 100 per token). Matches briefing value
 within rounding.
+
+‡ Cycle A alive fraction: **0.3667** (2048-token random L13 sample,
+window-reshaped to 409 T=5 windows). Essentially identical to the
+0.3688 baseline — **AuxK produced no measurable effect on alive
+fraction**. Sparse-probing guard deferred (probe_cache not present
+on this pod; can download from HF if needed for the paper story).
 
 ### Two parallel tracks
 
@@ -128,14 +134,95 @@ Encoding wired in
 Probing wired in
 [`experiments/phase5_downstream_utility/probing/run_probing.py`](../../../experiments/phase5_downstream_utility/probing/run_probing.py).
 
-**Code**: commit _tbd_.
+**Code**: commit `3f903d3` (arch + trainer + dispatcher), `18d1e88`
+(Track 2), `decf79c` (eval harness).
 
-**Train result**: _tbd — waiting on 25k-step run_.
+**Train result**:
 
-**Eval result**: _tbd_.
+- 2385.5 s wall-clock (≈ 40 min) on A40.
+- **converged=True at step 4200 / 25 000** — `agentic_txc_02`
+  trained to step ~16 205 before plateau. Cycle A plateaus **~4×
+  earlier**. Plausible reasons:
+    1. AuxK accelerates convergence by reviving features that would
+       otherwise stay dead (good).
+    2. AuxK gradient destabilizes the late-training regime and
+       creates a false plateau (bad).
+- Final loss: 16 081.7 (comparable to `agentic_txc_02`'s reported
+  ~16 200; matryoshka primary loss seems unchanged in magnitude).
+- Final L0: 493 / 500 budget (BatchTopK honoured).
+- The 10 M-token dead threshold (paper default) triggers at step
+  ≈ 1 953 (at `B=1024, T=5`); Cycle A trained past that for ~2 250
+  additional steps before plateau, giving AuxK an active window.
 
-**Verdict**: _tbd_.
+**Eval result**:
 
-**Takeaway**: _tbd_.
+Autointerp on concat_A + concat_B (1819 tokens) with Claude Haiku:
+**3 / 8 semantic labels** (+1 vs `agentic_txc_02`'s 2 / 8 baseline;
+−2 vs realistic target 5 / 8; −3 vs stretch target 6 / 8).
 
-**Next**: _tbd_.
+Top-8 feature labels (rank by variance, concat A+B):
+
+| rank | feat | label | semantic? |
+|---|---|---|---|
+| 1 | 11193 | Punctuation and quotation marks in text | ✗ |
+| 2 |  7220 | Acknowledging debts and intellectual indebtedness | ✓ |
+| 3 |  1636 | Stalinism and Soviet Union historical context | ✓ |
+| 4 |  1088 | Punctuation marks and special characters | ✗ |
+| 5 | 14885 | References to family relations in poetic text | ✓ |
+| 6 |  3523 | punctuation and grammatical conjunctions | ✗ |
+| 7 | 16493 | Punctuation marks and special characters | ✗ |
+| 8 | 12655 | Punctuation and conjunctions in literary text | ✗ |
+
+Alive fraction: **0.3667** — unchanged from the `agentic_txc_02`
+baseline (0.3688). See takeaway below for interpretation.
+
+Sparse-probing guard: deferred — `probe_cache` not cached on this
+pod, and Cycle A already failed the qualitative target so the guard
+cannot flip the verdict. Will download from HF (`han1823123123/
+txcdr-data`) only if the eventual winner needs guard verification.
+
+**Verdict**: **Partial WIN** vs `agentic_txc_02` baseline (+1 label),
+**LOSS** vs `tsae_paper` (3 < 6) and vs `agentic_mlc_08` (3 < 5). Does
+not meet the 5 / 8 realistic target.
+
+**Takeaway**:
+
+- **AuxK produced no measurable effect on alive fraction** (0.367 vs
+  0.369 baseline). The +1 semantic label is plausibly seed noise.
+- **Root cause hypothesis**: TXC uses strict TopK-per-window sparsity
+  (exactly k_win=500 active features per window). AuxK can provide
+  gradient to dead features, but for a revived feature to actually
+  fire at inference, it must **displace** another top-500 feature.
+  The existing 500 active features are already winning the selection
+  because their activations are high — nudging a dead feature's
+  pre-activation by a small AuxK gradient doesn't overcome that gap
+  at matched `k`. In `tsae_paper`, BatchTopK allows variable per-
+  sample sparsity, so revived features can fire on contexts where
+  they're most relevant without displacing anything.
+- This suggests **AuxK without BatchTopK (or lowered k) is a weak
+  intervention on TXC**. The Phase 5.7 briefing flagged this
+  ordering — Cycle A was the cheapest test, Cycle F (BatchTopK) was
+  the targeted one.
+- The 3 semantic features that did appear (Darwin thanks, Animal
+  Farm Stalinism, Gita family) mirror what `tsae_paper` picks up on
+  the same passages — so the underlying representation does contain
+  some passage-level signal, it's just crowded out of the top-8 by
+  variance-dominant syntactic features.
+- Plateau-stop at step 4200 (4× earlier than `agentic_txc_02`'s
+  ~16 205) likely compounds the issue: AuxK only had ~2250 steps
+  past the dead threshold to act. A longer-trained Cycle A might
+  produce a slightly stronger effect, but probably not enough to
+  cross 5 / 8 given the fundamental TopK-vs-BatchTopK tension above.
+
+**Next**: **Track 2** immediately. The alive-fraction result (no
+movement) makes the TopK-vs-BatchTopK tension the leading hypothesis.
+Track 2's bare TXC has the SAME TopK-per-window budget as Cycle A
+(k_win=500 equivalent), so if the tension explanation is right,
+Track 2 alone won't fix it either — it just tests whether stripping
+matryoshka + contrastive at least lets the top-8-by-variance slots
+be dominated by cleaner features.
+
+After Track 2, priority becomes **Cycle F (BatchTopK)** — the briefing's
+next-in-line mechanism, which directly targets the tension. If
+BatchTopK-TXC + AuxK beats Cycle A by a meaningful margin, that
+triangulates "BatchTopK is the load-bearing piece".

@@ -1,7 +1,7 @@
 [
   {
-    "arch": "agentic_txc_02",
-    "alive_fraction": 0.3687608540058136,
+    "arch": "agentic_txc_09_auxk",
+    "alive_fraction": 0.36669921875,
     "l0_per_token": 500.0000305175781,
     "n_tokens": 409,
     "decoder_mean_abs_cos": null
