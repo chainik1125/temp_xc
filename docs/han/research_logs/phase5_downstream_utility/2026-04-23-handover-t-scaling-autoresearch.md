@@ -6,7 +6,7 @@ tags:
   - in-progress
 ---
 
-## Handover: find a T-scaling TXC architecture for the NeurIPS submission
+## Handover: finish Phase 5.7 session items, then find a T-scaling TXC arch
 
 **Audience**: post-compact agent. Previous agent ran out of context
 mid-stream.
@@ -14,340 +14,397 @@ mid-stream.
 **Timeline**: **NeurIPS submission in ~2 weeks.** This deadline is load-
 bearing for every decision below.
 
-**State at handover**: `han` branch at commit `1c6cd44`. Extended
+**State at handover**: `han` branch at commit `6454cff`. Extended
 BatchTopK pipeline is **still probing mean_pool** (17-arch extension).
 Monitor via `tail logs/overnight/probe_batchtopk_extend_mean_pool.log`.
 
 ---
 
-## The mission
+## Overview — two parts, in order
 
-**Find a TXC architecture (or probing protocol) such that sparse-probing
-AUC increases with T.** Everything else is secondary.
+**Part A (Week 1, ~3-4 days)**: finish the open session items that
+leave us with a complete, reviewer-defensible Phase 5.7 bench. These
+are not research — they're mechanical follow-throughs on experiments
+(i)-(iv) that were started but not closed.
 
-### Why this is the mission
+**Part B (Week 2, ~7-10 days)**: find a TXC architecture whose
+downstream-probing AUC scales monotonically with T under the **fixed**
+evaluation protocol. Paper's central claim hinges on this. If no arch
+scales with T, the paper pivots to headlining MLC instead of TXC.
 
-Our current paper framing — "temporal SAE with multi-scale contrastive" —
-implicitly claims longer windows help. What the data shows (see
-`summary.md` §T-sweep):
+**Do Part A first.** Part A is what makes the paper submittable at all;
+Part B is what makes the paper's TXC headline defensible. Without
+Part A the submission is incomplete; without Part B the submission
+is weak-but-complete (MLC pivot).
 
-- TopK TXCDR peaks at T=5, **fluctuates** for T ∈ {2, 3, 5, 8, 10, 15, 20}
-- BatchTopK TXCDR has a **U-shape** (T=2 and T=20 both good)
-- Multi-scale agentic_txc_02 is **flat** across T
+---
 
-**Monotonicity score of our best curve ≈ 0.6** (random = 0.5). Reviewers
-will ask: "if AUC doesn't scale with T, why is your arch *temporal*?"
-Without a refutation, the paper's central claim collapses.
+## Evaluation protocol is FIXED. Do not modify it.
 
-The other paper-level weaknesses (§"Methodological risks" below) are
-fixable in the last few days. **The T-scaling story is the one thing
-that needs a research breakthrough, not just more runs.**
+The probing protocol is the benchmark. It cannot be changed to favor
+a particular arch:
+
+1. **Fixed aggregation**: `last_position` and `mean_pool`, defined as
+   they are today in
+   [`probing/run_probing.py`](../../../experiments/phase5_downstream_utility/probing/run_probing.py).
+2. **Fixed feature selection**: top-k-by-class-separation on train
+   (Kantamneni Eq. 1), `k_feat = 5`.
+3. **Fixed classifier**: L1 logistic regression (`penalty="l1",
+   solver="liblinear", max_iter=2000, C=1.0`) on the 5 selected features.
+4. **Fixed test split**: the existing `probe_cache/*/acts_*.npz` splits.
+5. **Fixed seed**: 42 (plus 1, 2 for variance reporting).
+6. **Fixed task set**: the 36 binary tasks in `results/probe_cache/`.
+
+**Any change to the evaluation protocol is reward-hacking unless it
+applies uniformly to ALL archs in the bench.** If you find yourself
+wanting to add an attention-pooling step to the probe so your TXC
+features look better, stop. Either:
+
+- (a) Keep the arch under the fixed probe — if AUC scales with T here,
+  you've won honestly.
+- (b) Propose a new probing protocol *in a separate paper*, apply it
+  uniformly to the 30-arch bench, and report whatever it shows.
+
+Do **not** mix these. A reviewer will notice and reject.
+
+### Things that are *not* reward-hacking (OK to do)
+
+- Training a new architecture that outputs the same d_sae latent at the
+  same last position — fits the standard probe.
+- Changing the training objective (contrastive loss, sparsity
+  mechanism, decoder structure) — arch changes are fair.
+- Running the standard probe at k_feat ∈ {1, 2, 5, 20} as a sensitivity
+  check — this is already in the bench. k_feat=5 remains the headline.
+- Sweeping T at the architecture level and reporting all T values
+  including those that don't look great.
+
+### Things that ARE reward-hacking (forbidden)
+
+- Changing k_feat only for your candidate arch.
+- Introducing an attention-over-positions step in the probe for TXC
+  but not for TLC / MLC / TFA.
+- Dropping tasks where your arch does poorly.
+- Using different train/test splits.
+- Training on the test set or on val data leaked from test.
+- Tuning probe hyperparameters (C, solver, scaler) per arch.
+
+---
+
+## Part A — finish outstanding session items (Week 1)
+
+### A1. Concat-latent probing (experiment iv step 5)
+
+Script ready at
+[`analysis/concat_probe.py`](../../../experiments/phase5_downstream_utility/analysis/concat_probe.py).
+Encodes every task's train + test activations through both
+`agentic_txc_02` and `agentic_mlc_08`, concatenates to `(N, 2·d_sae)`,
+runs the standard top-k-by-class-sep + L1 LR at k=5.
+
+```bash
+PYTHONPATH=. TQDM_DISABLE=1 .venv/bin/python \
+  experiments/phase5_downstream_utility/analysis/concat_probe.py
+```
+
+Takes ~5–10 min on A40. Coordinate with the still-running mean_pool
+probe — they share GPU briefly. Writes
+`results/concat_probe_results.json`.
+
+**Deliverables**:
+- New column in `summary.md` §"Complementarity: TXC/MLC routing" —
+  adds `concat probe` to the 4-column table (best individual / oracle /
+  learned / **concat**).
+- Rename section heading to "Complementarity: TXC/MLC routing **and
+  concat probing**" (per original handover deliverable spec).
+- 1-paragraph interpretation: if concat > best individual, the "use
+  both archs at once" story is the stronger claim than routing.
+
+### A2. BatchTopK inference-threshold sanity check
+
+Origin: original handover Known Risk (experiment ii). Some BatchTopK
+archs regressed −0.02 AUC vs TopK counterparts — plausibly because the
+EMA-tracked inference threshold is miscalibrated.
+
+```python
+import torch
+from src.architectures._batchtopk_variants import MatryoshkaTXCDRContrastiveMultiscaleBatchTopK
+ckpt = torch.load("experiments/phase5_downstream_utility/results/ckpts/agentic_txc_02_batchtopk__seed42.pt",
+                  map_location="cuda", weights_only=False)
+m = MatryoshkaTXCDRContrastiveMultiscaleBatchTopK(
+    2304, 18432, T=5, k=500, n_contr_scales=3, gamma=0.5).cuda()
+m.load_state_dict({k: v.float() for k, v in ckpt["state_dict"].items()})
+m.eval()
+# Forward a batch of real activations, check per-sample nonzero rate.
+# Expected: ~k/d_sae = 500/18432 ≈ 0.027.
+# If actual << that → threshold too high → model shuts down at eval.
+# If actual >> that → threshold too low.
+```
+
+Do the check on all 21 BatchTopK archs. If any are miscalibrated (ratio
+< 0.5× or > 2× expected), **re-calibrate threshold** from the
+(d_sae − k) quantile of pre-activations on unlabeled fineweb data, save
+new ckpt, re-probe. Document finding in `summary.md` Caveats.
+
+### A3. 3-seed variance on baselines and headline winners
+
+**Critical for headline defense.** Currently only the 2 agentic
+winners have seeds {1, 2}; their baselines don't. Our Δ is
+`mean(agentic)_3seeds − single_seed(baseline)` — a reviewer will ask
+"what is the baseline's σ?" and we can't answer.
+
+Minimum scope (run seeds 1 and 2 for these 6 archs):
+
+- `txcdr_t5`, `mlc`, `matryoshka_t5`, `mlc_contrastive`
+- `agentic_txc_02_batchtopk`, `agentic_mlc_08_batchtopk`
+
+Pattern: `experiments/phase5_downstream_utility/agentic/seed_variance.sh`.
+~6 hr wall-clock. After, update the Δ columns in `summary.md` Figure 1/2
+tables with σ or with 95% CI, and add paired-t-test p-values with
+Bonferroni correction across the 29-arch bench.
+
+### A4. Full 21-arch TopK-vs-BatchTopK Δ table
+
+Extended BatchTopK probing is still running as of handover. Once
+complete, rewrite `summary.md` §"BatchTopK apples-to-apples" to include:
+
+- Full Δ table: all 21 archs with (base, batchtopk, Δ) at both
+  aggregations. Flag Δ < 0.01 as "within noise" honestly.
+- Section title fix: per original handover, the Complementarity
+  section should be "TXC/MLC routing and concat probing".
+- Caveats updates: note the mixed picture (7/21 regressions were the
+  headline; with 21 archs, pattern is more nuanced — some archs
+  actually gain with BatchTopK: `topk_sae` +0.016, `txcdr_t2` +0.024).
+
+### A5. Extended T-sweep to T ∈ {24, 28, 32, 36}
+
+Motivation: BatchTopK T-sweep at last_position jumps from T=15 (0.7577)
+to T=20 (0.7672), suggesting curve may still be climbing past T=20. We
+need T > 20 data to know if this is a second peak, ascent, or plateau.
+
+Scope: 8 new archs — `txcdr_t{24,28,32,36}` (TopK) and matching
+`_batchtopk` variants. Skip matryoshka variants at T ≥ 24 (they OOM
+at T ≥ 10 already — documented).
+
+**Critical caveat**: mean_pool probing is blocked at T > 20 because
+`acts_anchor` has LAST_N = 20; `K = LN − T + 1 ≤ 0`. Probe
+**last_position only** at T > 20. `_window_at_last` pads cleanly.
+
+Time: 8 archs × ~20 min train + ~5 min probe each = ~3.5 hr.
+
+### A6. Consolidate T-sweep into one `summary.md` section
+
+Currently scattered across 3 subsections (lines 382, 449, 499) plus
+inline rows in Figure 1/2 tables. Merge into a single `#### T-sweep
+matrix — {TopK, BatchTopK} × {TXCDR, agentic_txc_02} × {last_position,
+mean_pool}` with 4-panel plot. Template provided in prior commit's
+briefing; extend
+[`plots/plot_txcdr_t_sweep_batchtopk.py`](../../../experiments/phase5_downstream_utility/plots/plot_txcdr_t_sweep_batchtopk.py)
+for the 4-panel grid.
+
+Do this **last** in Part A — one consolidation pass after all T data
+lands (including A5's T > 20 results).
+
+### A7. HF sync + final plot regeneration
+
+```bash
+PYTHONPATH=. .venv/bin/python experiments/phase5_downstream_utility/plots/make_headline_plot.py
+PYTHONPATH=. .venv/bin/python experiments/phase5_downstream_utility/plots/make_batchtopk_plot.py
+PYTHONPATH=. .venv/bin/python experiments/phase5_downstream_utility/plots/plot_txcdr_t_sweep_batchtopk.py
+HF_HOME=/workspace/hf_cache .venv/bin/python scripts/hf_upload_ckpts.py
+```
+
+Commit per step. HF sync is idempotent (skip-by-hash).
+
+---
+
+## Part B — T-scaling architecture autoresearch (Week 2)
+
+### The mission
+
+Find a TXC architecture such that **sparse-probing AUC increases with T
+under the fixed evaluation protocol** (see "Evaluation protocol is
+FIXED" above).
 
 ### Success criteria
 
-For each candidate arch, train at T ∈ {5, 10, 15, 20, 30} seed=42.
-Probe at last_position only (mean_pool is tail=20-limited; see Part B
-note below). Report:
+Train each candidate at T ∈ {5, 10, 15, 20, 30} seed=42. Probe at
+last_position (mean_pool is tail-20-limited). Report:
 
-1. **Monotonicity score**: fraction of T-pairs (i<j) where auc(T_j) ≥ auc(T_i).
-   - Current best: ~0.6 (vanilla TXCDR BatchTopK)
-   - **Target: ≥ 0.8**
-   - Stretch: strict monotone (1.0)
+1. **Monotonicity score**: fraction of T-pairs (i<j) where
+   auc(T_j) ≥ auc(T_i). Range [0, 1], random ~0.5.
+   - Current best TXC: ~0.6.
+   - **Target: ≥ 0.8.**
+   - Strict monotone: 1.0.
 2. **Δ(T=30 − T=5)**: actual AUC gain from scaling up.
-   - Current: ~0.0
-   - **Target: > +0.02**
-3. **Does it hold at mean_pool** (for T ≤ 20)? Desirable but not required.
+   - Current: ~0.0.
+   - **Target: > +0.02.**
 
-If a candidate hits both targets, that's the submission headline.
-
-### If nothing works, pivot
-
-If after 8-10 cycles no arch hits both targets, the **paper pivots to MLC**:
-
-- `agentic_mlc_08` beats vanilla MLC by +0.016 at last_position
-  (well above noise; likely p < 0.05 after Bonferroni — needs verification)
-- 5/8 semantic autointerp labels in Phase 6 (competitive)
-- Honest framing: "multi-scale contrastive on the MLC family is our
-  contribution; temporal scaling remains an open question"
-
-This is a worse paper but defensible. **Don't fake T-scaling by
-cherry-picking T values or tasks.**
-
----
-
-## Context the next agent needs
-
-### Methodological risks uncovered 2026-04-23
-
-These are things a NeurIPS reviewer will attack. Most are fixable in
-the last few days; one is existential (T-scaling). Ranked by severity:
-
-1. **Current TXC headline Δ is +0.0023 at last_position, within probing
-   noise (~0.005).** Every arch in the bench needs 3-seed σ before the
-   paper can claim any Δ < 0.01. Only `agentic_txc_02` and
-   `agentic_mlc_08` have 3-seed — baselines have seed=42 only.
-   → Fix by running `agentic/seed_variance.sh` on txcdr_t5, mlc,
-   matryoshka_t5, mlc_contrastive at seeds 1, 2. ~6 hr.
-2. **T-scaling is absent** — the existential threat, central to this
-   handover. No currently-trained arch has monotonicity > 0.6.
-3. **Plateau-stop bias**: models converge at different step counts,
-   different total compute. Reviewer will ask "are you sure the
-   weaker arch isn't just undertrained?" → either retrain short
-   runs to 25k steps or report (steps, final_loss, converged) per arch.
-4. **WinoGrande + WSC `max(AUC, 1-AUC)` flip** inflates 2/36 tasks.
-   → Remove the flip or move those tasks to supplementary.
-5. **SAEs lose to baselines by 12 pp**. Standard SAE-community answer
-   (interpretability) needs Phase 6 numbers. Currently Phase 6 says
-   TXC qualitatively loses; MLC is mid.
-6. **"Family-agnostic" recipe** is based on one cross-family transfer
-   (TXC→MLC) with γ=0.5. Should sweep γ on MLC to verify.
-7. **Top-k-by-class-sep uses train labels**, is sensitive to train-
-   subset. No bootstrap stability check.
-8. **TLC has d_sae=8192 vs others' 18432** — half the feature-pool.
-   Cannot be directly ranked.
-
-**What a brutal reviewer reads as the current paper:**
-> "You invented a TXC arch that barely beats its baseline at sparse
-> probing (within noise), loses the interpretability comparison, and
-> doesn't scale with context length. Meanwhile your MLC arch is the
-> clear winner but you don't headline it because MLC is layer-wise,
-> not temporal."
-
-The T-scaling breakthrough is what turns this into a real paper.
-
----
-
-## Part A — T-scaling autoresearch (primary mission)
-
-Pattern: Karpathy-style agentic loop — hypothesis → arch change →
-evaluate → takeaway. Template:
-[`2026-04-21-agentic-log.md`](2026-04-21-agentic-log.md).
-
-Log new cycles to `2026-04-24-t-scaling-agentic-log.md`.
+If both hit, that's the submission headline.
 
 ### Cycle budget
 
-Target 8-10 cycles in **7-10 days**. Each cycle:
+~2 hr per candidate (5 T × 25 min + 5 min probe), aim for 8-10 cycles
+in Week 2 = ~20-30 hr wall-clock.
 
-- Engineering: 30-60 min (subclass + dispatcher + probe routing)
-- Training: **~2 hr per cycle** (5 T values × ~25 min each)
-- Probing: ~5 min (last_position only)
-- Writeup: 15 min
+### Hypotheses (architectural changes only, NOT probe changes)
 
-**Total per cycle: ~3 hr.** 10 cycles ≈ 30 hr.
+Ordered by ease × expected value. All use the standard probe.
 
-### Hypotheses to seed the loop
+#### H1 — Convolutional encoder
 
-Ordered by **expected value × ease**. Do H5 first — it's a probing-only
-change, testable on existing ckpts in hours.
+Replace `W_enc : (T, d_in, d_sae)` with a 1-D conv of kernel ≥ 3
+across the T positions, weights shared. Encoder becomes
+translation-invariant — features don't get position-imprinted. At
+larger T, each feature is computed from more "data". Intuition: a
+trans-invariant encoder should benefit more from longer context than
+the current per-position encoder.
 
-#### H5 — Positional-probe on existing TXC latents (RUN FIRST)
-
-**Why first:** no retraining. Tests whether the SAE features are
-already T-scaling but our single-position probe can't see it.
-
-**Method:** current probe takes latent at position T-1 (last) →
-top-k-by-class-sep → LR. New probe: for each feature f, compute
-activation at ALL T positions → `z[:, f] : (T,)` per example →
-flatten to `(N, T × d_sae)` → top-k across the T × d_sae pool → LR.
-Or: attention-pool the T positions per feature via a learned attention
-layer. Both are minor modifications to `run_probing.py`'s
-`_encode_for_probe`.
-
-**If H5 shows T-scaling on existing ckpts**: the paper headline becomes
-"TXC features encode T-context; standard last-position probing
-undersells them. With our T-aware probe, AUC scales with T by Δ."
-Much stronger paper than any single arch change.
-
-#### H1 — Attention-pooling decoder
+#### H2 — Attention-pooling decoder
 
 Replace per-position `W_dec^(t) : (d_sae, d_in)` with a single shared
 decoder accessed via learned cross-attention over T positions. Latent
-queries → attention over T position keys → decoded via shared V.
-Decoder params: `(d_sae, d_in)` + `(d_sae, d_attn)` keys +
-`(d_in, d_attn)` Vs = same size regardless of T. Forces latents to be
-position-invariant.
-
-#### H2 — Convolutional encoder
-
-Replace `W_enc : (T, d_in, d_sae)` with a 1-D conv (kernel 3, shared
-across T) producing the pre-activation. Makes the encoder
-translation-invariant — features don't get position-imprinted. Larger
-T → more "data" to compute each feature over.
+queries → attention over T position keys → decoded via shared V. Forces
+latents to be position-invariant; shared-decoder param count is
+constant in T. (Note: this is a **decoder** change, not a probe change.
+Latent is still a single d_sae vector at the last position.)
 
 #### H3 — Log-scale matryoshka
 
 Instead of T nested scales (scale-s reconstructs s-token sub-window),
-use **log₂-spaced** scales: 1, 2, 4, 8, 16, 32 token sub-windows. For
-T=32: 6 scales total. Keeps decoder param count O(log T · d_in · d_sae)
-instead of O(T² · d_in · d_sae) → escapes the OOM ceiling that stopped
-our matryoshka at T=10.
+use log₂-spaced scales: 1, 2, 4, 8, 16, 32 token sub-windows.
+- Captures coarse temporal structure
+- Escapes the O(T²) matryoshka decoder OOM that stopped our matryoshka
+  variants at T=10
+- Enables matryoshka-based arches at T ≥ 30
 
 #### H4 — Multi-distance contrastive
 
-InfoNCE at **multiple shift distances** simultaneously: shift-1 (local),
-shift-⌊T/4⌋, shift-⌊T/2⌋ (long-range). Inverse-distance weighted.
+InfoNCE at multiple shift distances simultaneously: shift-1 (local),
+shift-⌊T/4⌋, shift-⌊T/2⌋ (long-range), inverse-distance-weighted.
 Forces latents to be consistent across both local and long-range
-contexts. Handover of 2026-04-22 already queued as Cycle E; run
+contexts. Original 2026-04-22 handover queued this as Cycle E; run
 here explicitly.
+
+#### H5 — SVD-spectrum regularizer
+
+Phase 5.7 §"Per-feature decoder SVD" documented that vanilla TXCDR at
+T=20 has 7.5% flatter singular-value spectrum than T=5. Add penalty
+pushing spectrum toward Zipfian. Directly targets the
+"over-regularization at large T" failure mode identified empirically.
 
 #### H6 — State-space / Mamba-style encoder
 
-Replace per-position encoder with a recurrent state-space model
-producing features sequentially. Compute O(T) not O(T²). Features
-become genuinely sequential — analogous to how LSTMs beat plain
-MLPs on long-sequence tasks in pre-transformer NLP.
+Replace per-position `W_enc` with a recurrent state-space model. Compute
+O(T) instead of O(T²). Features become genuinely sequential. High
+effort; try only if H1-H5 don't yield a hit.
 
-#### H7 — SVD-spectrum regularizer
+#### H7 — Hybrid MLC-encoder + T-decoder
 
-Phase 5.7 §"Per-feature decoder SVD" found that vanilla TXCDR at T=20
-has 7.5% flatter singular-value spectrum than T=5. Add a penalty that
-pushes the spectrum toward Zipfian (not flat). Directly targets the
-"over-regularization at large T" failure mode.
+MLC's multi-layer sharing (the Phase 5 last_position winner) + a
+per-position (or attention-pool) decoder over T positions. Attempts to
+fuse the two winning ideas.
 
-#### H8 — Hybrid MLC + temporal read-out
+#### H8 — Stack winners from H1-H7
 
-Build TXC with MLC's layer-axis sharing as the encoder + temporal
-decoder that takes position-weighted combinations. MLC's multi-layer
-structure gave the Phase 5 win at last_position; bringing that into
-TXC might capture the "TXC feature use across layers and positions".
+If any 2-3 of H1-H7 individually improve monotonicity score, stack them
+into one arch and test. Stack candidates from `src/architectures/`
+subclass-hierarchy; aim for <200 lines of new code.
 
-#### H9 — Stack winners
+### Per-cycle protocol (mirrors Phase 5.7 agentic loop)
 
-After H1-H8, stack the top 2-3 into `agentic_tscale_stack`. If
-cumulative monotonicity ≥ 0.9 + Δ(30-5) > 0.03 → paper headline.
+1. Write new arch class in `src/architectures/`.
+2. Dispatcher branch in `train_primary_archs.py`.
+3. Probe routing in `run_probing.py`.
+4. Train at T ∈ {5, 10, 15, 20, 30} (~2 hr).
+5. Probe at last_position.
+6. Compute (monotonicity, Δ(30-5)) — write `analysis/t_scaling_score.py`
+   on cycle 1, ~30 lines.
+7. Log to new `2026-04-24-t-scaling-agentic-log.md` with hypothesis →
+   change → result → takeaway.
+8. Commit per cycle.
 
-### Expected outcomes
+### T-sweep constraints for large T
 
-Not all hypotheses will work. Likely outcomes:
+- **T > 20 at mean_pool blocked** by probe_cache tail size = 20.
+  Probe last_position only.
+- **Matryoshka at T ≥ 10 OOMs** at d_sae=18432. Only H3
+  (log-matryoshka) escapes this; H2/H7 OK if they don't use matryoshka.
+- **Training buffer supports T up to 128** — `resid_L13.npy` is
+  (6000, 128, 2304).
 
-- H5 (positional-probe): **highest a priori probability**. If TXC
-  features do encode T-context, a T-aware probe should reveal it.
-- H1, H2: attention/conv priors are well-motivated. Moderate chance.
-- H3 (log-matryoshka): low implementation cost, moderate chance —
-  at minimum it escapes OOM so we can probe T≥10 with matryoshka.
-- H6 (state-space): high effort, uncertain payoff. Skip unless others fail.
+### If no hypothesis wins
 
-### Evaluation per cycle
+**The paper pivots to MLC.** `agentic_mlc_08` beats vanilla MLC by
++0.016 at last_position (likely p < 0.05 Bonferroni-corrected, needs
+verification), 5/8 semantic autointerp labels in Phase 6. That's an
+MLC paper with a temporal-crosscoder complementarity argument, not a
+TXC paper. Submit it honestly rather than overclaim TXC.
 
-Immediately after training:
-
-```bash
-# Compute monotonicity score + Δ
-PYTHONPATH=. .venv/bin/python -c "
-from analysis.t_scaling_score import score_arch  # new helper
-score_arch('agentic_tscale_01', T_values=[5,10,15,20,30])
-"
-```
-
-Write `analysis/t_scaling_score.py` on first cycle — ~30 lines,
-reads probing_results.jsonl, computes the 2 metrics.
-
-**Commit per cycle.** Don't batch.
-
-### T-sweep caveats for large T
-
-- **T > 20 at mean_pool: blocked.** `acts_anchor` shape is `(N, 20, d)`;
-  slide-windowing with T > 20 gives K ≤ 0. Probe at **last_position
-  only** for T ∈ {24, 28, 30, 32, 36}. The `_window_at_last` pads
-  cleanly.
-- **Matryoshka at T ≥ 10 OOMs at d_sae=18432** due to O(T³) decoder
-  param scaling. Only H3 (log-matryoshka) resolves this at large T;
-  other matryoshka-based hypotheses are capped at T=8.
-- **Training buffer is fine** — `resid_L13.npy` has (6000, 128, 2304),
-  supports T up to 128.
+Don't fake T-scaling by cherry-picking T values, tasks, or the probe.
 
 ---
 
-## Part B — Secondary / supporting work (if time permits)
+## Methodological context (things reviewers will attack)
 
-Only do these if Part A finds a T-scaling arch early (Week 1), or
-after the paper's headline is locked in. **Do not prioritize these
-over Part A.**
+Background for decision-making; these are fixable in Part A or are
+acknowledged limitations. None require Part B to resolve.
 
-### B1. Concat-latent probing (wrap up experiment iv)
-
-Script ready at [`analysis/concat_probe.py`](../../../experiments/phase5_downstream_utility/analysis/concat_probe.py).
-Run ~5 min. Adds the missing "concat probe" column to the router
-table. Deliverable is the rename
-"Complementarity: TXC/MLC routing and concat probing" in summary.md.
-
-### B2. 3-seed variance on baselines + BatchTopK winners
-
-**Critical for headline defense** but listed as secondary here because
-(i) it's mechanical (no research), and (ii) the paper story depends on
-Part A first — if no T-scaling arch, headline changes and variance
-priorities change. Run at the end of Week 1 once headline is set.
-
-Pattern: `experiments/phase5_downstream_utility/agentic/seed_variance.sh`.
-Archs that need seeds {1, 2}: `txcdr_t5`, `mlc`, `matryoshka_t5`,
-`mlc_contrastive`, `agentic_txc_02_batchtopk`, `agentic_mlc_08_batchtopk`.
-~6 hr total.
-
-### B3. BatchTopK inference-threshold sanity check
-
-Some BatchTopK archs regressed −0.02 AUC vs TopK; may be EMA
-threshold miscalibration. Quick check on `agentic_txc_02_batchtopk`:
-forward in eval mode, confirm per-sample nonzero rate ≈ k/d_sae.
-If miscalibrated, recalibrate threshold from unlabeled batch's
-`(d_sae − k)`-quantile and re-save ckpt.
-
-### B4. Extended T-sweep to T ∈ {24, 28, 32, 36}
-
-**Only do if Part A reveals an arch worth extending.** For the current
-T=2-20 vanilla sweep, T=30 is useful but don't waste compute on
-T=24, 28, 32 if the trend is clear from T=5, 10, 15, 20, 30.
-
-### B5. Consolidate T-sweep section in `summary.md`
-
-See previous handover commit `1c6cd44` Part C for the matrix-table
-template. Do this **last**, once the final T-sweep data is in — one
-consolidation pass, not two.
-
-### B6. Full 21-arch TopK-vs-BatchTopK Δ table + paired plots
-
-Once extended BatchTopK mean_pool probing completes (still running
-as of this handover), regenerate:
-
-```bash
-PYTHONPATH=. .venv/bin/python experiments/phase5_downstream_utility/plots/make_batchtopk_plot.py
-PYTHONPATH=. .venv/bin/python experiments/phase5_downstream_utility/plots/make_headline_plot.py
-PYTHONPATH=. .venv/bin/python experiments/phase5_downstream_utility/plots/plot_txcdr_t_sweep_batchtopk.py
-```
-
-HF sync: `HF_HOME=/workspace/hf_cache .venv/bin/python scripts/hf_upload_ckpts.py`.
+1. **Effect sizes within probing noise**: TXC headline Δ is +0.0023
+   (within ~0.005 noise). 3-seed σ needed on baselines (Part A3).
+   Without σ, the TXC Δ is not a defensible claim.
+2. **T-scaling absence**: the central existential threat. Part B.
+3. **Plateau-stop bias**: models converge at different step counts.
+   Reviewer will ask "is the weak arch just undertrained?" → report
+   (steps, final_loss, converged) per arch in a new summary table.
+4. **winogrande + wsc polarity flip**: `max(AUC, 1-AUC)` inflates 2/36
+   tasks. Remove or move to supplementary.
+5. **12 pp gap to baselines**: SAEs lose to `baseline_attn_pool` by 12
+   pp. Standard SAE community answer (interpretability) depends on
+   Phase 6 — and TXC currently loses Phase 6. Reframe the paper's
+   downstream-utility claim as "SAE features preserve X% of raw probe
+   signal while enabling interpretability".
+6. **"Family-agnostic" claim weakness**: γ=0.5 tested on MLC only at
+   one value. Sweep γ ∈ {0.3, 0.5, 1.0} on MLC to verify — ~2 hr.
+7. **Top-k-by-class-sep stability**: no train-subsample bootstrap
+   reported. Easy to add as a sensitivity table.
+8. **TLC d_sae=8192** — half the feature-pool vs others' 18432.
+   Either acknowledge or retrain at matched d_sae.
 
 ---
 
-## Resume checklist
+## Resume checklist (first 15 min)
 
-1. `git log --oneline | head -10` — confirm at `1c6cd44` or later.
-2. Confirm extended BatchTopK probe pipeline status:
-   `ps -ef | grep run_probing` — may still be running mean_pool.
-3. Read this doc + `summary.md` §T-sweep (lines 382, 449, 499).
-4. Read Phase 5.7 agentic log pattern:
-   [`2026-04-21-agentic-log.md`](2026-04-21-agentic-log.md).
-5. **Start with H5 (positional-probe)** — it's a no-retrain experiment
-   that could answer the paper's central question in a day.
-6. If H5 works: build the paper around it. If not: start H1, H2, H3 in
-   parallel.
+1. `git log --oneline | head -10` — confirm at `6454cff` or later.
+2. Check extended-probe pipeline: `ps -ef | grep run_probing`. If still
+   running, wait for mean_pool to finish before A4 / A6.
+3. Read this doc + `summary.md` §T-sweep (lines 382, 449, 499) +
+   original handover
+   [`2026-04-22-handover-batchtopk-tsweep.md`](2026-04-22-handover-batchtopk-tsweep.md).
+4. **Start with A1** (concat-probe, ~5-10 min). Fast, closes a loop.
+5. A2 (BatchTopK sanity check, ~30 min) in parallel — CPU-ish.
+6. A3 (3-seed variance) launched as an overnight batch while doing A4/A5.
+7. Only after Part A completes, begin Part B. **Don't skip Part A for
+   Part B** — the submission needs A to be complete.
 
 ## Key files (cheat sheet)
 
 - **Architectures**: [`src/architectures/`](../../../src/architectures/)
-  — existing matryoshka variants live here; subclass for H1-H9
-- **Training dispatchers**: [`experiments/phase5_downstream_utility/train_primary_archs.py`](../../../experiments/phase5_downstream_utility/train_primary_archs.py)
-- **Probe routing**: [`experiments/phase5_downstream_utility/probing/run_probing.py`](../../../experiments/phase5_downstream_utility/probing/run_probing.py)
-  — H5 lives here: new path in `_encode_for_probe` for position-aware encoding
-- **Phase 5.7 agentic log (template)**: [`2026-04-21-agentic-log.md`](2026-04-21-agentic-log.md)
-- **T-sweep plot script**: [`plots/plot_txcdr_t_sweep_batchtopk.py`](../../../experiments/phase5_downstream_utility/plots/plot_txcdr_t_sweep_batchtopk.py)
-  — extend to show new candidates' T-sweep curves
-- **Analysis helpers**: [`analysis/`](../../../experiments/phase5_downstream_utility/analysis/)
-  — `router.py`, `concat_probe.py` exist; add `t_scaling_score.py`
+- **Training dispatchers**: [`train_primary_archs.py`](../../../experiments/phase5_downstream_utility/train_primary_archs.py)
+- **Probe routing**: [`probing/run_probing.py`](../../../experiments/phase5_downstream_utility/probing/run_probing.py)
+  — **DO NOT MODIFY** for Part B (that would be reward-hacking)
+- **Phase 5.7 agentic log template**: [`2026-04-21-agentic-log.md`](2026-04-21-agentic-log.md)
+- **Seed variance runner**: `experiments/phase5_downstream_utility/agentic/seed_variance.sh`
+- **Analysis helpers**: [`analysis/router.py`](../../../experiments/phase5_downstream_utility/analysis/router.py),
+  [`analysis/concat_probe.py`](../../../experiments/phase5_downstream_utility/analysis/concat_probe.py)
+  (ready), `analysis/t_scaling_score.py` (write in Part B cycle 1)
 
 ## Bottom line
 
-**You have 2 weeks. T-scaling is the research breakthrough we need;
-everything else is mechanical. Try H5 first (cheap, high-EV). If
-nothing in H1-H9 works, the paper pivots to MLC — the MLC story is
-already defensible and you should ship that rather than overclaim TXC.**
+**Week 1**: finish Part A. The bench becomes reviewer-defensible
+(seed variance, full BatchTopK Δ table, concat-probe, consolidated
+T-sweep). Submission is now possible at a minimum as the MLC story.
+
+**Week 2**: Part B autoresearch. If any hypothesis hits monotonicity
+≥ 0.8 with Δ(30-5) > 0.02, the paper headlines TXC. If not, pivot
+to MLC and submit honestly.
+
+**The evaluation protocol is the protocol. Architectural changes only.**
