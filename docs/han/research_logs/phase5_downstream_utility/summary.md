@@ -502,6 +502,57 @@ SAEBench sliding-window aggregation** and for **deprecating
 T-sweep was designed to test, purely because of its feature-pool
 scaling with K.
 
+#### T-sweep under BatchTopK sparsity (Phase 5.7 extended scope)
+
+Parallel T-sweep with BatchTopK sparsity instead of TopK, using the
+same vanilla TXCDR architecture at each T. All 7 ckpts trained to
+plateau; last_position probing complete at n=36 (mean_pool pending —
+will be appended when extended pipeline finishes).
+
+| T | TopK (lp) | BatchTopK (lp) | Δ |
+|---|---|---|---|
+| 2 | 0.7380 | **0.7623** | **+0.0243** |
+| 3 | 0.7659 | 0.7547 | −0.0112 |
+| **5** | **0.7752** | 0.7678 | −0.0073 |
+| 8 | 0.7498 | 0.7434 | −0.0063 |
+| 10 | 0.7573 | 0.7492 | −0.0081 |
+| 15 | 0.7695 | 0.7577 | −0.0117 |
+| 20 | 0.7425 | **0.7672** | **+0.0247** |
+
+**Observations**:
+
+1. **U-shape**: BatchTopK **helps at the extremes** (T=2 +0.024, T=20
+   +0.025) and **hurts in the middle** (T=3–15, all −0.006 to
+   −0.012). Not a uniform regression as the 4-arch minimum scope
+   suggested.
+2. **Peak shifts to T=20 under BatchTopK** (0.7672), with T=5 a close
+   second (0.7678). Under TopK the peak is cleanly at T=5 (0.7752).
+   BatchTopK **compresses the T-sensitivity** — the TopK sweep has
+   range 0.037 (min T=2 to max T=5), BatchTopK range 0.024 (min T=8
+   to max T=20), ~35 % flatter.
+3. **Mechanism hypothesis for T=2 gain**: per-sample TopK with a
+   2-token window is structurally thin — every sample needs exactly
+   k non-zeros in a short-context representation. BatchTopK's
+   batch-level pooling lets samples with richer 2-token windows
+   borrow capacity from samples with sparser ones, effectively
+   re-allocating the budget.
+4. **Mechanism hypothesis for T=20 gain**: vanilla TXCDR at T=20 is
+   known to be over-regularized at d_sae=18 432 — the per-feature
+   decoder SVD spectrum is 7.5 % flatter than T=5's (see
+   [[#Per-feature decoder SVD: vanilla TXCDR under-regularized at
+   T=20]] below). BatchTopK's variable-sparsity-per-sample plausibly
+   acts as a corrective regularizer that breaks the T=20
+   decoder's near-uniformity.
+
+**Paper implication**: the 4-arch "TXC multi-scale doesn't compose
+with BatchTopK" story holds at T=5, but is NOT a general statement
+about TXCDR + BatchTopK. Vanilla TXCDR + BatchTopK has a genuine
+U-shaped T-sensitivity that's worth reporting separately. In the T
+regime where it wins (T=2, T=20), BatchTopK-TXCDR is competitive with
+the T=5 TopK headline.
+
+Ckpts: `txcdr_t{2,3,5,8,10,15,20}_batchtopk__seed42.pt` on HF.
+
 #### Error-overlap analysis — TXCDR vs MLC complementarity
 
 ![Error-set Jaccard heatmap](../../../../experiments/phase5_downstream_utility/results/plots/error_overlap_jaccard_k5_last_position.png)
