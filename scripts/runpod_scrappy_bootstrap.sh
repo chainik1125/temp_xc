@@ -119,6 +119,10 @@ if [[ ! -d vendor/thinking-llms-interp/.venv ]]; then
     huggingface_hub
     openai
     anthropic
+    python-dotenv
+    math-verify
+    httpx
+    vllm
     ") 2>&1 | tail -5
     cd "$REPO_DIR"
 fi

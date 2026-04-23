@@ -235,7 +235,12 @@ def run_cycle(cfg: dict, candidate: str, result_dir: Path) -> dict:
     result_dir.mkdir(parents=True, exist_ok=True)
     (result_dir / "merged_config.yaml").write_text(yaml.safe_dump(cfg, sort_keys=False))
 
-    main_python = str((REPO / ".venv" / "bin" / "python").resolve())
+    # NB: .absolute() not .resolve() — uv venv's python is a symlink to the
+    # base interpreter; what makes it a *venv* python is the pyvenv.cfg
+    # sitting next to the symlink. .resolve() hands subprocess the raw
+    # base interpreter, which can't see the venv's site-packages. Same
+    # bug bit src/bench/venhoff/steering.py:43-77 on 2026-04-20.
+    main_python = str((REPO / ".venv" / "bin" / "python").absolute())
     venhoff_root = REPO / "vendor" / "thinking-llms-interp"
 
     cycle_eval_root = result_dir / "venhoff_eval"
