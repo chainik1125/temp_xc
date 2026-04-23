@@ -140,6 +140,116 @@ class StreamingActivationBuffer:
 
 
 # ---------------------------------------------------------------------------
+# Multi-layer buffer (for MultiLayerCrosscoder training). Same refill logic,
+# but stores per-layer activations and samples one-token-across-layers batches
+# instead of T-token single-layer windows.
+# ---------------------------------------------------------------------------
+
+
+@dataclass
+class MultiLayerBufferConfig:
+    layers: list[int]
+    d_model: int
+    buffer_seqs: int = 800
+    chunk_len: int = 256
+    refill_chunks: int = 64
+    refill_threshold: float = 0.5
+    device: str = "cuda"
+    dtype: torch.dtype = torch.float16
+
+
+class MultiLayerStreamingBuffer:
+    """Rolling buffer of residual activations at multiple layers.
+
+    Shape: ``(buffer_seqs, chunk_len, n_layers, d_model)``.
+    For a d_model=3584 Qwen-7B with 5 layers and 800 seqs × 256 toks × fp16
+    → ~7 GB VRAM (same order as the single-layer buffer at 4 k seqs).
+    """
+
+    def __init__(
+        self,
+        model: PreTrainedModel,
+        tokenizer: PreTrainedTokenizerBase,
+        text_iter: Iterator[str],
+        config: MultiLayerBufferConfig,
+    ):
+        self.model = model.eval()
+        self.tokenizer = tokenizer
+        self.text_iter = text_iter
+        self.cfg = config
+        self.n_layers = len(config.layers)
+        self._buf = torch.empty(
+            config.buffer_seqs, config.chunk_len, self.n_layers, config.d_model,
+            device=config.device, dtype=config.dtype,
+        )
+        self._samples_drawn = 0
+        self._filled = False
+
+    @torch.no_grad()
+    def _tokenize_batch(self, n: int) -> torch.Tensor:
+        texts: list[str] = []
+        for _ in range(n):
+            texts.append(next(self.text_iter))
+        enc = self.tokenizer(
+            texts, padding="max_length", truncation=True,
+            max_length=self.cfg.chunk_len, return_tensors="pt", add_special_tokens=True,
+        )
+        return enc.input_ids.to(self.cfg.device)
+
+    @torch.no_grad()
+    def _forward_and_extract(self, input_ids: torch.Tensor) -> torch.Tensor:
+        """Run the model and stack residuals at each configured layer.
+
+        hidden_states[L+1] is `resid_post` after block L.
+        """
+        out = self.model(input_ids=input_ids, output_hidden_states=True, use_cache=False)
+        per_layer = [out.hidden_states[L + 1] for L in self.cfg.layers]  # each (B, T, d)
+        stacked = torch.stack(per_layer, dim=2)  # (B, T, n_layers, d)
+        return stacked.to(self.cfg.dtype)
+
+    @torch.no_grad()
+    def _refill(self, n_seqs: int) -> None:
+        remaining = n_seqs
+        while remaining > 0:
+            b = min(self.cfg.refill_chunks, remaining)
+            ids = self._tokenize_batch(b)
+            acts = self._forward_and_extract(ids)
+            if not self._filled:
+                start = self.cfg.buffer_seqs - remaining
+                self._buf[start:start + b] = acts
+            else:
+                idx = torch.randint(self.cfg.buffer_seqs, (b,), device=self.cfg.device)
+                self._buf[idx] = acts
+            remaining -= b
+        if not self._filled:
+            self._filled = True
+        self._samples_drawn = 0
+
+    @torch.no_grad()
+    def warmup(self) -> None:
+        self._refill(self.cfg.buffer_seqs)
+
+    def _maybe_refill(self) -> None:
+        frac = self._samples_drawn / max(1, self.cfg.buffer_seqs)
+        if frac >= self.cfg.refill_threshold:
+            self._refill(max(1, self.cfg.refill_chunks))
+
+    @torch.no_grad()
+    def sample_mlc_batch(self, batch_size: int) -> torch.Tensor:
+        """Return ``(batch_size, n_layers, d_model)`` — one token per sample,
+        its activations across the configured layers.
+        """
+        if not self._filled:
+            raise RuntimeError("call warmup() before sampling")
+        self._maybe_refill()
+        seq_idx = torch.randint(self.cfg.buffer_seqs, (batch_size,), device=self.cfg.device)
+        pos_idx = torch.randint(self.cfg.chunk_len, (batch_size,), device=self.cfg.device)
+        batch = self._buf[seq_idx, pos_idx]  # (B, n_layers, d_model)
+        self._samples_drawn += batch_size
+        return batch.contiguous()
+
+
+# ---------------------------------------------------------------------------
 # Corpus iterator (mixed pile + lmsys-chat) — lazy to avoid HF datasets
 # import at module load.
 # ---------------------------------------------------------------------------

@@ -11,13 +11,22 @@ txc:
   batch_size: 256
   lr: 3.0e-4
 
+layers_mlc: [11, 13, 15, 17, 19]
+mlc:
+  d_sae: 32768
+  k_total: 128
+  steps: 40000
+  batch_size: 256
+  lr: 3.0e-4
+  buffer_seqs: 800
+
 streaming:
   buffer_activations: 1000000
   refill_chunks: 64
   chunk_len: 256
   corpus_mix:
-    - {name: monology/pile-uncopyrighted, weight: 0.7, split: train}
-    - {name: lmsys/lmsys-chat-1m,         weight: 0.3, split: train}
+    - {name: monology/pile-uncopyrighted,  weight: 0.7, split: train}
+    - {name: HuggingFaceH4/ultrachat_200k, weight: 0.3, split: train_sft}
 
 sweep:
   alpha_grid: [-2.0, -1.5, -1.0, -0.5, -0.25, 0.0, 0.25, 0.5]

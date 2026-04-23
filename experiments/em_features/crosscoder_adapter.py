@@ -27,7 +27,7 @@ VENDOR_SRC = REPO_ROOT / "experiments" / "separation_scaling" / "vendor" / "src"
 if str(VENDOR_SRC) not in sys.path:
     sys.path.insert(0, str(VENDOR_SRC))
 
-from sae_day.sae import TemporalCrosscoder  # noqa: E402
+from sae_day.sae import TemporalCrosscoder, MultiLayerCrosscoder  # noqa: E402
 
 
 def _resolve_position(position, T):
@@ -54,6 +54,70 @@ def get_txc_feature_directions(
     rows = txc.W_dec.data[t, feature_ids, :]  # (k, d_in)
     rows = rows / (rows.norm(dim=-1, keepdim=True) + 1e-8)
     return [rows[i].clone() for i in range(rows.shape[0])]
+
+
+@torch.no_grad()
+def get_mlc_feature_directions(
+    mlc: MultiLayerCrosscoder,
+    feature_ids,
+) -> list[list[torch.Tensor]]:
+    """Return per-feature, per-layer unit-normed decoder directions.
+
+    Result shape: ``result[feature_rank_in_list][layer_idx]`` is a ``(d_in,)``
+    tensor ready for ``ActivationSteerer(steering_vectors=..., layer_indices=layer_module_idx, ...)``.
+    Unit-normed per-slice so α has a consistent magnitude across SAE/TXC/MLC.
+    """
+    rows = mlc.W_dec.data[:, feature_ids, :]  # (L, k, d_in)
+    rows = rows / (rows.norm(dim=-1, keepdim=True) + 1e-8)
+    out: list[list[torch.Tensor]] = []
+    for fi in range(rows.shape[1]):
+        out.append([rows[layer_i, fi].clone() for layer_i in range(rows.shape[0])])
+    return out
+
+
+@torch.no_grad()
+def decompose_diff_on_mlc(
+    diff_vecs_by_layer: dict[int, torch.Tensor],
+    mlc: MultiLayerCrosscoder,
+    layers: list[int],
+    *,
+    top_k: int = 200,
+) -> dict:
+    """Cosine-similarity decomposition of stacked per-layer diff vectors onto
+    MLC decoder rows.
+
+    For each feature i, score = Σ_ℓ cos(W_dec[ℓ, i, :], diff_vecs_by_layer[ℓ]).
+    Uses the sum rather than the encoder-latent magnitude so the metric is
+    comparable across SAE/TXC/MLC (all three decompose onto decoder rows).
+    """
+    per_layer_scores = []
+    for layer_i, L in enumerate(layers):
+        if L not in diff_vecs_by_layer:
+            raise KeyError(f"layer {L} missing from diff_vecs_by_layer")
+        v = diff_vecs_by_layer[L].float().to(mlc.W_dec.device)
+        v_u = v / (v.norm() + 1e-8)
+        dec = mlc.W_dec.data[layer_i].float()  # (d_sae, d_in)
+        dec_u = dec / (dec.norm(dim=-1, keepdim=True) + 1e-8)
+        per_layer_scores.append(dec_u @ v_u)  # (d_sae,)
+    sims = torch.stack(per_layer_scores, dim=0).sum(dim=0)  # (d_sae,)
+
+    sorted_sims, sorted_idx = torch.sort(sims, descending=True)
+    k = min(top_k, sims.numel() // 2)
+    return {
+        "similarities": sims,
+        "sorted_similarities": sorted_sims,
+        "sorted_indices": sorted_idx,
+        "top_features": {
+            "indices": sorted_idx[:k].cpu().tolist(),
+            "similarities": sorted_sims[:k].cpu().tolist(),
+            "count": k,
+        },
+        "bottom_features": {
+            "indices": sorted_idx[-k:].flip(0).cpu().tolist(),
+            "similarities": sorted_sims[-k:].flip(0).cpu().tolist(),
+            "count": k,
+        },
+    }
 
 
 @torch.no_grad()
