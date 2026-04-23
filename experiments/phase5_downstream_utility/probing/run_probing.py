@@ -457,6 +457,17 @@ def _load_model_for_run(run_id, ckpt_path, device):
             dead_threshold_tokens=int(meta.get("dead_threshold_tokens", 10_000_000)),
             auxk_alpha=float(meta.get("auxk_alpha", 1.0 / 32.0)),
         ).to(device)
+    elif arch == "tsae_paper":
+        from src.architectures.tsae_paper import TemporalMatryoshkaBatchTopKSAE
+        group_sizes = meta.get("group_sizes")
+        d_sae_eff = int(meta.get("d_sae", d_sae))
+        model = TemporalMatryoshkaBatchTopKSAE(
+            d_in, d_sae_eff, k=int(meta["k_pos"]),
+            group_sizes=list(group_sizes) if group_sizes else None,
+        ).to(device)
+    elif arch == "tsae_ours":
+        from src.architectures.tsae_ours import TSAEOurs
+        model = TSAEOurs(d_in, d_sae, k=int(meta["k_pos"])).to(device)
     elif arch == "agentic_txc_02_batchtopk":
         from src.architectures._batchtopk_variants import (
             MatryoshkaTXCDRContrastiveMultiscaleBatchTopK,
@@ -635,6 +646,22 @@ def _encode_for_probe(
         mlc_tail = tc.get("mlc_tail_test")
 
     if arch == "topk_sae":
+        return _encode_topk(model, anchor, li, device, aggregation)
+    if arch == "tsae_paper":
+        # Paper-faithful: threshold-based inference (use_threshold=True).
+        # Wrap encode() so _encode_topk's per-token helper sees a
+        # (x) -> z mapping matching the TopKSAE contract.
+        enc = lambda x: model.encode(x, use_threshold=True)
+        if aggregation == "last_position":
+            X = _last_token(anchor, li)
+            return _encode_per_token(enc, X, device)
+        # full_window: encode every tail position, flatten (N, LAST_N * d_sae)
+        N, LN, d = anchor.shape
+        flat = anchor.reshape(N * LN, d)
+        z = _encode_per_token(enc, flat, device)
+        return z.reshape(N, LN * z.shape[-1])
+    if arch == "tsae_ours":
+        # Per-token TopK, same contract as topk_sae.
         return _encode_topk(model, anchor, li, device, aggregation)
     if arch in ("mlc", "mlc_contrastive",
                 "mlc_contrastive_alpha003",

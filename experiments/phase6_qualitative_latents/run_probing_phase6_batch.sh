@@ -15,8 +15,10 @@ cd /workspace/temp_xc
 source /workspace/temp_xc/.envrc
 mkdir -p logs
 
-echo "===== Phase 6 probing batch: Track 2, Cycle A, Cycle H ====="
-for ARCH in agentic_txc_10_bare agentic_txc_09_auxk agentic_txc_11_stack; do
+echo "===== Phase 6 probing batch: Track 2, Cycle A, Cycle H, tsae_paper, tsae_ours ====="
+# tsae_paper + tsae_ours were added to run_probing.py dispatch so they
+# can be placed on the Pareto trade-off plot next to the TXC archs.
+for ARCH in agentic_txc_10_bare agentic_txc_09_auxk agentic_txc_11_stack tsae_paper tsae_ours; do
   for AGG in last_position mean_pool; do
     CKPT="experiments/phase5_downstream_utility/results/ckpts/${ARCH}__seed42.pt"
     if [ ! -f "$CKPT" ]; then
