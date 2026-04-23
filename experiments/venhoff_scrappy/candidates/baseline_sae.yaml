@@ -1,0 +1,15 @@
+# The baseline candidate: Venhoff's SAE arch with shipped vectors.
+# Δ vs self is 0 by definition; this row exists so downstream candidates
+# have a reference Gap Recovery to compute Δ against.
+#
+# Inherits all scrappy defaults from ../config.yaml; only arch identity +
+# baseline self-reference are declared here.
+
+name: baseline_sae
+arch: sae                  # one of: sae | tempxc | mlc
+baseline: baseline_sae     # self-referential → Δ = 0
+reuse_venhoff_vectors: true  # skip Phase 2 entirely (vectors shipped in vendor tree)
+hypothesis: |
+  Reference point. No hypothesis under test — purely establishes the
+  baseline Gap Recovery number on the scrappy slice (n=20) for later
+  candidates to compute Δ against.

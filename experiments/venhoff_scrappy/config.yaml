@@ -1,0 +1,46 @@
+# Scrappy defaults for venhoff_scrappy autoresearch.
+# Candidates in candidates/*.yaml inherit from here and override individual keys.
+#
+# These settings are ~30x smaller than the paper budget, targeting
+# <10 min wall-clock per Phase 0→3 cycle on a single H100 (or ~20 min on A40).
+
+model:
+  thinking: deepseek-ai/DeepSeek-R1-Distill-Llama-8B
+  base: meta-llama/Llama-3.1-8B
+  steering_layer: 12
+  sae_layer: 6
+
+phase0_activations:
+  # Phase 0 (trace collection) is expensive and doesn't vary across cycles;
+  # cache it once at repo level, reuse across all scrappy candidates.
+  reuse_existing: true
+
+phase2_steering:
+  # Compared to paper App C.1 (max_iters=50, n_training_examples=2048):
+  max_iters: 5
+  n_training_examples: 128
+  optim_minibatch_size: 6
+  lr: 1e-2
+  n_clusters: 4            # paper: 15
+  reduction: sum           # TempXC-specific; one of {sum, mean, max}
+
+phase3_hybrid:
+  dataset: math500
+  dataset_split: test
+  n_tasks: 20              # paper: 500
+  max_new_tokens: 500      # paper: 2000
+  max_thinking_tokens: 500 # paper: 2000
+  coefficients: [0.5]      # paper: [0.1, 0.2, ..., 1.0]
+  token_windows: [0, -15]  # paper: [0, -1, -15, -50, -100]
+
+grade:
+  judge_model: claude-haiku-4-5-20251001
+  judge_repetitions: 1     # paper: 1 (already minimal)
+
+autoresearch:
+  default_baseline: baseline_sae
+  seed: 42
+  # Verdict thresholds on Δ Gap Recovery (pp):
+  finalist_threshold_pp: 10.0
+  discard_threshold_pp: -10.0
+  stop_after_n_stale_cycles: 5
