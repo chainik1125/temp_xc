@@ -172,6 +172,17 @@ def load_arch(arch: str, device: torch.device) -> torch.nn.Module:
             dead_threshold_tokens=int(meta.get("dead_threshold_tokens", 10_000_000)),
             auxk_alpha=float(meta.get("auxk_alpha", 1.0 / 32.0)),
         ).to(device)
+    elif arch == "agentic_txc_02_batchtopk":
+        from src.architectures._batchtopk_variants import (
+            MatryoshkaTXCDRContrastiveMultiscaleBatchTopK,
+        )
+        T = meta["T"]
+        k_eff = meta["k_win"] or (meta["k_pos"] * T)
+        model = MatryoshkaTXCDRContrastiveMultiscaleBatchTopK(
+            D_IN, D_SAE, T, k_eff,
+            n_contr_scales=meta.get("n_contr_scales", 3),
+            gamma=meta.get("gamma", 0.5),
+        ).to(device)
     elif arch == "agentic_mlc_08":
         from src.architectures.mlc_contrastive_multiscale import (
             MLCContrastiveMultiscale,
@@ -328,7 +339,8 @@ def encode_concat_AB(concat, concat_name: str, archs: list[str], device):
     for arch in archs:
         print(f"[{concat_name}] encode: {arch}")
         model, meta = load_arch(arch, device)
-        if arch in ("agentic_txc_02", "agentic_txc_09_auxk", "agentic_txc_10_bare"):
+        if arch in ("agentic_txc_02", "agentic_txc_09_auxk", "agentic_txc_10_bare",
+                    "agentic_txc_02_batchtopk"):
             z = encode_txc(model, resid_L13, device, T=meta["T"])
         elif arch == "agentic_mlc_08":
             z = encode_mlc(model, stack, device)
@@ -375,7 +387,8 @@ def encode_concat_C(concat, archs: list[str], device, out_name: str = "concat_C"
         z_all = np.zeros((n_seq, seq_len, D_SAE), dtype=np.float16)
         for si in range(n_seq):
             resid_L13_i = resid[13][si]  # (20, d)
-            if arch in ("agentic_txc_02", "agentic_txc_09_auxk", "agentic_txc_10_bare"):
+            if arch in ("agentic_txc_02", "agentic_txc_09_auxk", "agentic_txc_10_bare",
+                        "agentic_txc_02_batchtopk"):
                 z = encode_txc(model, resid_L13_i, device, T=meta["T"])
             elif arch == "agentic_mlc_08":
                 z = encode_mlc(model, stack[si], device)  # (20, 5, d) -> (20, d_sae)
