@@ -120,31 +120,148 @@ If any of the above fails, fix it before any experiment work.
 
 ### What to do next (ordered by expected impact × cost)
 
-**#1 — Seed variance on Cycle F (HIGH priority).** The 7 / 8 result
-is single-seed. Phase 5.7 found that `agentic_txc_02`'s headline
-gain halved across seeds (0.035 → 0.022 mean). Confirm 7 / 8 is
-real by training seeds {1, 2} and evaluating:
+**#0 — Upgrade the evaluation metric (DO THIS FIRST).** This gates
+the evidence quality of every other follow-up. User explicitly
+approved the API budget for scaling up.
+
+The current `x / 8` metric has binomial stderr ±1.2 labels at
+p=0.75, so:
+
+- **Robust findings** (delta ≥ 4 labels, outside any reasonable noise):
+  BatchTopK lever (+5), anti-dead stack helps (+4), AuxK alone
+  null (Δ≈1 within noise — "null" is a robust call).
+- **Non-robust findings** (delta 1–2, within binomial noise):
+  *Cycle F beats `tsae_paper`* (7/8 vs 6/8 is Δ=1), *Cycle H
+  regresses from Cycle F* (5/8 vs 7/8 is ~2σ). Both could flip at a
+  different seed or at different N; both are load-bearing for the
+  paper narrative. Re-verify.
+
+Four upgrades, combinable:
+
+1. **Bump `N_TOP_FEATURES` from 8 → 32** in
+   [`experiments/phase6_qualitative_latents/run_autointerp.py`](../../../experiments/phase6_qualitative_latents/run_autointerp.py)
+   line 35 (single-line edit). Binomial stderr drops from ±1.2 to
+   ±0.76 labels. Cost: ~32 Haiku calls/arch ≈ $0.01 per arch.
+2. **Auto-classify semantic vs non-semantic** instead of hand-
+   classifying. Add a second Haiku call per label with an explicit
+   rubric. Removes single-labeller bias. ~30-line addition near
+   the existing `interp_arch` function. Example rubric:
+
+   ```
+   Given this SAE feature label: "{LABEL}"
+   Classify as SEMANTIC or SYNTACTIC.
+   SEMANTIC = names a concept, topic, theme, entity, or domain
+     (examples: "plant biology", "Animal Farm references",
+      "archaic poetic English")
+   SYNTACTIC = describes surface patterns — punctuation, word class,
+     capitalisation, formatting, hyphens, quoted text
+     (examples: "sentence-ending periods", "multiple-choice answer
+      formatting", "hyphens between compound words")
+   Reply with exactly one word: SEMANTIC or SYNTACTIC.
+   ```
+
+   Cost: another ~$0.01 per arch.
+
+3. **Passage-discriminative ranking** instead of per-token variance.
+   The current top-by-variance ranking has a structural punctuation
+   floor because high-density token patterns (full-stops, spaces)
+   get high variance. Replace with:
+
+   ```python
+   # In run_autointerp.py _pick_top_features:
+   # Original: var = z.var(axis=0); argsort(-var)[:N]
+   # Proposed: group tokens by passage, compute per-feature mean
+   # activation per passage, rank by variance OF THOSE PER-PASSAGE
+   # means. Features that fire uniformly on punctuation across
+   # passages have low passage-discriminative variance.
+   ```
+
+   Passage IDs are recoverable from `z_cache/<concat>/provenance.json`
+   (concat_A and concat_B each concatenate 3-4 named passages).
+   No retrain — works on existing z_cache. Expected: removes the
+   punctuation-floor tax uniformly across archs, might reveal 8/8
+   on current Cycle F checkpoint.
+
+4. **3 seeds on Cycle F** — this was formerly follow-up #1. Requires
+   ~80 min GPU to train seeds {1, 2}. Combined with #1 + #2 + #3,
+   each arch then has a proper `/32 score × 3 seeds` with mean ± stderr.
+
+**Concrete execution plan**:
 
 ```bash
+# Step A: edit run_autointerp.py
+#   (1) line 35: N_TOP_FEATURES = 32
+#   (2) add auto-classify function + wire into interp_arch
+#   (3) modify _pick_top_features for passage-discriminative ranking
+#   (4) emit a per-arch "semantic_count" field in the labels JSON
+#       so downstream doesn't need re-classification.
+
+# Step B: re-run on all 9 Phase 6 archs (no retrain)
+#   The z_cache already exists for every arch on concat_A/B.
+#   ~30 min, ~$0.10 total.
+export ANTHROPIC_API_KEY=$(cat /workspace/.anthropic-key)
+TQDM_DISABLE=1 PYTHONPATH=. .venv/bin/python -u \
+  experiments/phase6_qualitative_latents/run_autointerp.py \
+  --archs agentic_txc_02 agentic_txc_09_auxk agentic_txc_10_bare \
+          agentic_txc_02_batchtopk agentic_txc_11_stack \
+          tsae_paper tsae_ours tfa_big agentic_mlc_08
+
+# Step C: train Cycle F seeds {1, 2} in background (~80 min GPU)
 TQDM_DISABLE=1 PYTHONPATH=. nohup .venv/bin/python -u -c "
 from experiments.phase5_downstream_utility.train_primary_archs import run_all
 run_all(seeds=[1, 2], max_steps=25000, archs=['agentic_txc_02_batchtopk'])
-" > logs/phase6.1_cycleF_seedvar.log 2>&1 &
+" > logs/cycleF_seedvar.log 2>&1 &
 
-# After both finish (~80 min), eval each with the harness:
-bash experiments/phase6_qualitative_latents/run_cycle_eval.sh agentic_txc_02_batchtopk  # seed=42 already done
-SEED=1 bash experiments/phase6_qualitative_latents/run_cycle_eval.sh agentic_txc_02_batchtopk
-SEED=2 bash experiments/phase6_qualitative_latents/run_cycle_eval.sh agentic_txc_02_batchtopk
+# Step D: once Cycle F seeds land, encode + re-autointerp for each
+# using the upgraded metric. 3 seeds × (encode ~2 min + autointerp ~1 min).
+for SEED in 1 2; do
+  TQDM_DISABLE=1 PYTHONPATH=. .venv/bin/python -u \
+    experiments/phase6_qualitative_latents/encode_archs.py \
+    --archs agentic_txc_02_batchtopk --sets A B
+  # [then modify encode_archs.py to read seed from env var if not there;
+  # currently hardcoded to seed=42 — see encode_archs.py:135 CKPT_DIR]
+  TQDM_DISABLE=1 PYTHONPATH=. .venv/bin/python -u \
+    experiments/phase6_qualitative_latents/run_autointerp.py \
+    --archs agentic_txc_02_batchtopk
+done
+
+# Step E: update summary.md §9.5 and agentic-log headline table
+# with /32 means ± stderrs for all archs (3-seed for Cycle F,
+# 1-seed for others; note this explicitly).
 ```
 
-**Caveat**: `run_cycle_eval.sh` hard-codes `seed=42` unless `SEED=` is
-exported. Also, `run_probing.py` will fail without `probe_cache`
-(see #5). You can skip that step in the harness by commenting out
-STEP 4a/4b.
+**Caveats to anticipate:**
 
-Expected: 3-seed variance on 7 / 8 likely falls in 5 / 8 – 7 / 8.
-A mean of ≥ 6 / 8 is sufficient for the paper claim (beats
-`tsae_paper` in mean at matched spec).
+- `encode_archs.py:135` hardcodes `__seed42.pt`. Multi-seed support
+  needs a small extension (env var or CLI flag).
+- `run_cycle_eval.sh` hardcodes seed=42 and calls the N=8 autointerp.
+  Update or fork once the upgraded autointerp is in place.
+- `plot_top_features.py` (used for Figure 6 in summary.md §9.5) still
+  plots top-8 by raw variance. Fine for visualisation — the paper's
+  Figure-4-analogue literally shows 8 features; change the metric
+  for the *score* but keep the *plot* at 8 for readability.
+
+**What outcomes to watch for:**
+
+- If Cycle F at `/32 × 3 seeds` gives mean ≥ `tsae_paper`'s
+  `/32 × 1 seed` value minus 1 label → "Cycle F matches or beats
+  `tsae_paper`" headline survives.
+- If Cycle F mean falls below `tsae_paper` by > 1 label → headline
+  softens to "Cycle F matches within noise, paper claim is
+  sparsity-knob not beat-paper".
+- If Cycle H at `/32` is still clearly below Cycle F → "stacking
+  doesn't help" holds. If within noise → "stacking is neutral"
+  (weaker but still consistent with our mechanism analysis).
+- **Regardless**: the BatchTopK-is-the-lever story (+5 labels at N=8,
+  expect ≥ +12 labels at N=32 if the effect is pure scale) is
+  overwhelmingly robust.
+
+**Skip-retrain justification**: existing ckpts for seed=42 are
+fine; the noise we're worrying about is in the *evaluation*, not the
+*training*. Only Cycle F needs 2 extra seeds for the variance
+check. All other Phase 6 / 6.1 archs stay 1-seed — the /32 bump
+alone tightens their CIs enough that large deltas (3-4+ labels)
+become unambiguous.
 
 **#2 — Missing 2×2 cell: bare + BatchTopK + full anti-dead stack.**
 We did:
@@ -373,10 +490,16 @@ for arch in ('agentic_txc_09_auxk', 'agentic_txc_10_bare', 'agentic_txc_11_stack
 ### One-paragraph restart
 
 On restart, verify tokens + venv + git state with the checklist
-above. If everything is green, start with **follow-up #1 (seed
-variance on Cycle F)** — it gates the paper claim and runs
-autonomously for ~80 minutes. In parallel, launch **#5 (probe_cache
-download)** which is CPU/network-only. By the time both finish,
-you'll have the full paper-ready result: mean 3-seed Cycle F
-qualitative + probing regression curve. **#2 and #4 are
-orthogonal ideas for pushing past 7 / 8** if time permits.
+above. If everything is green, **do follow-up #0 first** (upgrade the
+`x / N` metric to N=32 + auto-classify + passage-discriminative
+ranking). This is the smallest-LoC change and it upgrades every
+subsequent comparison — every other follow-up produces cleaner
+evidence once this is in place. Step A–B of #0 (edit script + re-
+run on existing 9 ckpts) takes ~30 min and ~$0.10; step C (train
+Cycle F seeds {1, 2}) takes ~80 min GPU and can run in parallel with
+**#5 (probe_cache download, 70 GB, CPU/network-only)**. By the time
+both finish, every row in the headline table has a proper
+`/32 semantic count` with auto-classification, plus Cycle F has
+3-seed variance and a sparse-probing regression number for the
+paper trade-off claim. **#2 and #3 are orthogonal ideas** for
+pushing past 7/8 once the measurement is trustworthy.
