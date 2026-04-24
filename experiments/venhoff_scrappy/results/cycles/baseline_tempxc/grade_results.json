@@ -1,0 +1,39 @@
+{
+  "candidate": "baseline_tempxc",
+  "arch": "tempxc",
+  "n_tasks": 20,
+  "thinking_acc": 0.5,
+  "base_acc": 0.25,
+  "hybrid_acc": 0.05,
+  "gap_recovery": -0.8,
+  "best_cell": {
+    "coefficient": 0.5,
+    "token_window": 0,
+    "accuracy": 0.05
+  },
+  "per_task_outcomes": [
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false
+  ],
+  "wall_time_s": 2879.0947732925415,
+  "phase0_cache_hash": "sha256:9a8b5b817d83dea2",
+  "scaffold": false
+}
