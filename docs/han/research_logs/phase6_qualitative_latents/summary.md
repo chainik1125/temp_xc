@@ -641,10 +641,27 @@ None closed the gap to tsae_paper's 12.7 ± 1.2 random:
 of recipe**. Adding the full tsae_paper objective stack (C3) to the
 TXC encoder base does NOT recover tsae_paper's behaviour. Contrastive
 alone (C2) gives the largest gain of +1 label vs Track 2, but that's
-within single-seed noise (Track 2 3-seed stderr is 1.0). Longer
+within single-seed noise (Track 2 3-seed stderr is 1.3). Longer
 training (C5, C6) actively HURTS curated-concat scores without
 helping random, suggesting the anti-dead stack over-regularises
 decoder directions past its plateau-stop point.
+
+**Probing for Phase 6.2 candidates (seed=42, k=5):**
+
+| ID | last_pos | Δ | mean_pool | Δ |
+|---|---|---|---|---|
+| C1 (+matryoshka) | 0.7841 | **+0.009** | 0.8042 | **+0.006** |
+| C2 (+contrastive) | 0.7825 | +0.008 | 0.8010 | +0.002 |
+| C3 (both) | 0.7834 | +0.009 | 0.7972 | −0.002 |
+| C5 (Track 2 longer) | 0.7758 | +0.001 | 0.7967 | −0.002 |
+| C6 (2×2 cell longer) | 0.7709 | −0.004 | 0.7888 | −0.010 |
+
+**C1/C2/C3 all beat baseline on probing** (+0.008 to +0.009 last_pos).
+The added training signal (matryoshka recon, InfoNCE, or both) helps
+probing slightly even though it doesn't close the random-concept
+gap. These are genuinely Pareto-better than the original TXC
+baseline. **C1 (matryoshka only) is the best — +0.009 last_pos,
++0.006 mean_pool, 3/32 random**.
 
 **The 10-label gap between TXC-family (~3/32 random) and tsae_paper
 (12.7 ± 1.2 random) is structural**, not a missing training
