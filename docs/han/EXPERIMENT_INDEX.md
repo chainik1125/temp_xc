@@ -48,8 +48,8 @@ and mirror on HF `han1823123123/txcdr/ckpts/`.
 |---|---|---|---|---|---|
 | `conv_txcdr_t{5,10,15,20,30}` (H1) | 42 | shared Conv1d k=3 encoder, sum-pool across T | 0.7612 (T=5); 0.6859-0.7294 (T>5) | 0.7731 (T=5) | ❌ fails T-scaling (mono 0.4, Δ=−0.032) |
 | `log_matryoshka_t{5,10,15,20,30}` (H3) | — | log-scale matryoshka {1,2,4,8,16,32} | — | — | arch ready, not run |
-| **`phase57_partB_h7_bare_multiscale`** (H7) | **42** | Track 2 anti-dead + matryoshka + **multi-scale** InfoNCE | **0.7915** | **0.8104** | ⭐ **mean_pool leader (+0.0035 over agentic_txc_02)** |
-| `phase57_partB_h8_bare_multidistance` (H8) | — | H7 base + multi-distance InfoNCE (shifts 1, 2) | — | — | arch + launcher ready, not run |
+| `phase57_partB_h7_bare_multiscale` (H7) | 42 + s2 | Track 2 anti-dead + matryoshka + multi-scale InfoNCE | 0.7915/0.7807 | 0.8104/0.7939 | superseded by H8 |
+| **`phase57_partB_h8_bare_multidistance`** (H8) | **42** | H7 base + **multi-distance** InfoNCE (shifts 1, 2) | **0.8039** | **0.8139** | ⭐⭐ **NEW TXC CHAMPION — tops overall mean_pool benchmark** |
 | `feature_nested_matryoshka_t5(_contrastive)` (H9) | 42 | user proposal: per-scale decoder reconstructs full T-window | — | — | training in progress |
 | `txc_shared_relu_sum_{pos,nopos}_t5` (H10a/b) | 42 | shared W_enc + Σ_t ReLU + pos embed (ablation) | — | — | queued |
 | `txc_shared_concat_two_layer_t5` (H12) | 42 | shared W_1 + pos + concat + W_2 | — | — | queued |

@@ -119,8 +119,8 @@ at T≥30 where per-position matryoshka OOMs on A40.
 |---|---|---|---|---|
 | 1 | H1 conv encoder (T-sweep) | 0.7612 | −0.014 | ❌ fails T-scaling |
 | 2 | H3 log-matryoshka (T-sweep) | _pending_ | _ | _ |
-| 3 | **H7 anti-dead × multi-scale** | **0.7915** (lp) / **0.8104** (mp) | +0.017 (lp), +0.012 (mp vs 3s) | ⭐ **tops mean_pool leaderboard (+0.0035 over agentic_txc_02)** |
-| 4 | H8 multi-distance contrastive | _pending_ | _ | _ |
+| 3 | H7 anti-dead × multi-scale | 0.7915 (lp) / 0.8104 (mp) | +0.017 lp, +0.012 mp | superseded by H8 |
+| 4 | **H8 multi-distance contrastive** (shifts {1,2}) | **0.8039** (lp) / **0.8139** (mp) | **+0.029 lp, +0.015 mp vs agentic_txc_02 3s** | ⭐⭐ **NEW TXC CHAMPION — tops mean_pool benchmark overall** |
 | 5 | H9 feature-nested matryoshka (plain) | _pending_ | _ | _ |
 | 6 | H9b feature-nested + contrastive | _pending_ | _ | _ |
 | 7 | H10a shared relu-sum encoder + pos | 0.7529 | −0.030 vs txcdr_t5 | ❌ pos embed can't replace per-pos W |
