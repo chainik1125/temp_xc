@@ -39,6 +39,7 @@ from experiments.em_features.streaming_buffer import (  # noqa: E402
     StreamingBufferConfig,
     mixed_text_iter,
 )
+from experiments.em_features.hf_upload import upload_if_enabled  # noqa: E402
 
 
 def parse_args():
@@ -153,6 +154,7 @@ def main():
             }
             torch.save(ckpt, ckpt_path)
             print(f"  snapshot saved: {ckpt_path}  (step {snap_step}, best loss {best:.4f})", flush=True)
+            upload_if_enabled(ckpt_path, category="txc")
             next_snap_idx += 1
 
     # Also write the full loss history next to the last snapshot.

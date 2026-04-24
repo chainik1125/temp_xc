@@ -38,6 +38,7 @@ from experiments.em_features.streaming_buffer import (  # noqa: E402
     MultiLayerBufferConfig,
     mixed_text_iter,
 )
+from experiments.em_features.hf_upload import upload_if_enabled  # noqa: E402
 
 
 def parse_args():
@@ -155,6 +156,11 @@ def main():
             }
             torch.save(ckpt, ckpt_path)
             print(f"  snapshot saved: {ckpt_path}  (step {snap_step}, best loss {best:.4f})", flush=True)
+            # Choose category by layer count: L<=5 → mlc; L>5 → mlc_all.
+            upload_if_enabled(
+                ckpt_path,
+                category="mlc_all" if len(args.layers) > 5 else "mlc",
+            )
             next_snap_idx += 1
 
     meta_path = args.out_prefix.with_name(f"{args.out_prefix.name}_training.meta.json")
