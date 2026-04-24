@@ -198,6 +198,26 @@ Monotonicity score: TBD
 | 2    | TBD    | TBD    |
 | **mean ± σ** | TBD | TBD |
 
+### ⭐ H8 3-seed FINAL — T=5, shifts={1,2}
+
+Auto-probe completed 22:53 UTC.
+
+| seed | lp AUC | mp AUC |
+|------|--------|--------|
+| 42   | 0.8039 | 0.8139 |
+| 1    | 0.7994 | 0.8148 |
+| 2    | 0.7981 | 0.8092 |
+| **mean ± σ** | **0.8005 ± 0.0030** | **0.8126 ± 0.0030** |
+
+**Verdict at T=5**: σ-defensible new TXC champion at BOTH aggregations.
+
+- **lp**: H8 (0.8005) cleanly beats H7 3-seed (0.7886 ± 0.0070) by +0.012 (>1.5σ).
+  Still 0.012 below MLC top (mlc_contrastive_alpha100_batchtopk 0.8124, single-seed).
+- **mp**: H8 3-seed (0.8126) tops the ENTIRE mp benchmark across all archs/families
+  (vs H7 3-seed 0.8059, agentic_txc_02 3-seed 0.7987 — both clearly below σ).
+
+Tighter σ (0.003) than H7 σ (0.007). H8's recipe is more reproducible.
+
 ---
 
 ## Key files
