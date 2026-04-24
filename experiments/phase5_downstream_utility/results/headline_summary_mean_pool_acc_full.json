@@ -3224,9 +3224,9 @@
     }
   },
   "feature_nested_matryoshka_t5_contrastive": {
-    "mean_acc": 0.7538471967851763,
-    "std_acc": 0.08456430516862481,
-    "n_tasks": 26,
+    "mean_acc": 0.7279874252458096,
+    "std_acc": 0.09719812035281679,
+    "n_tasks": 36,
     "per_task": {
       "ag_news_business": 0.7776315789473685,
       "ag_news_scitech": 0.7342105263157894,
@@ -3253,7 +3253,17 @@
       "bias_in_bios_set3_prof14": 0.9102564102564102,
       "bias_in_bios_set3_prof20": 0.7054794520547946,
       "bias_in_bios_set3_prof9": 0.6923076923076923,
-      "europarl_de": 0.6471774193548387
+      "europarl_de": 0.6471774193548387,
+      "europarl_es": 0.7444444444444445,
+      "europarl_fr": 0.7121212121212122,
+      "europarl_it": 0.5543259557344065,
+      "europarl_nl": 0.6858006042296072,
+      "github_code_go": 0.827,
+      "github_code_java": 0.718,
+      "github_code_javascript": 0.625,
+      "github_code_python": 0.688,
+      "winogrande_correct_completion": 0.5483234714003945,
+      "wsc_coreference": 0.5045045045045045
     }
   }
 }
