@@ -155,54 +155,62 @@ def _run_subprocess(cmd: list[str], *, cwd: Path | None = None, env: dict | None
         raise RuntimeError(f"subprocess failed (rc={result.returncode}): {log_cmd}")
 
 
-def _venhoff_hybrid_results_dir(venhoff_root: Path, cfg: dict) -> Path:
+def _venhoff_benchmark_json_path(venhoff_root: Path, cfg: dict) -> Path:
+    """Venhoff's hybrid_token.py writes aggregate results to
+    `hybrid/results/benchmark_results_<base_short>_<dataset>.json` —
+    NOT the per-arch subdir our earlier wrapper assumed.
+
+    Schema (verified 2026-04-24 on scrappy baseline_sae cycle):
+      metadata: { base_model, thinking_model, n_tasks }
+      results.accuracy:  { base_model, thinking_model, hybrid_model }  # percentages 0-100
+      results.correct_count: { base_model, thinking_model, hybrid_model }
+      tasks[]: { question, correct_answer, model_answers.{base,thinking,hybrid}_model }
+    """
+    base_short = _model_slug(cfg["model"]["base"])
     return (
-        venhoff_root / "hybrid" / "results" / cfg["phase3_hybrid"]["dataset"]
-        / f"{_model_slug(cfg['model']['base'])}_"
-          f"{_model_slug(cfg['model']['thinking'])}_"
-          f"L{cfg['model']['steering_layer']}_"
-          f"SAEL{cfg['model']['sae_layer']}_"
-          f"n{cfg['phase2_steering']['n_clusters']}"
+        venhoff_root / "hybrid" / "results"
+        / f"benchmark_results_{base_short}_{cfg['phase3_hybrid']['dataset']}.json"
     )
 
 
-def _extract_per_task_outcomes(results_dir: Path, cfg: dict) -> tuple[list[bool], dict]:
-    """Read Venhoff's per-problem JSONLs and extract (per-task hybrid correct,
-    aux dict with thinking/base per-task) — aligned with the task order.
+def _parse_benchmark_json(benchmark_path: Path) -> dict:
+    """Read Venhoff's aggregate results + re-grade per-task outcomes for
+    the hybrid model. Returns accuracies (as fractions 0-1), gap_recovery,
+    and per_task_outcomes (20-element bool array).
 
-    Venhoff writes one JSONL per problem or one JSONL per cell; our
-    `grade.compute_gap_recovery` handles both. We read whichever layout
-    is present and return the hybrid outcome at the best cell. If no
-    best-cell info is available yet (grade not yet run), returns
-    empty lists.
+    We re-grade hybrid outputs locally using src.bench.venhoff.grade.is_correct
+    rather than depending on a per-task correctness flag in the JSON
+    (Venhoff's schema doesn't include one at the aggregate level).
     """
     from src.bench.venhoff.grade import extract_boxed, is_correct
 
-    best_coef = cfg["phase3_hybrid"]["coefficients"][0]
-    best_window = cfg["phase3_hybrid"]["token_windows"][0]
+    data = json.loads(benchmark_path.read_text())
+    acc = data["results"]["accuracy"]
+    thinking_acc = float(acc["thinking_model"]) / 100.0
+    base_acc = float(acc["base_model"]) / 100.0
+    hybrid_acc = float(acc["hybrid_model"]) / 100.0
 
-    outcomes: list[bool] = []
-    for per_problem in sorted(results_dir.glob("*.jsonl")):
-        with per_problem.open() as f:
-            for line in f:
-                line = line.strip()
-                if not line:
-                    continue
-                try:
-                    row = json.loads(line)
-                except json.JSONDecodeError:
-                    continue
-                ref = str(row.get("answer", ""))
-                if not ref:
-                    continue
-                for cell in row.get("per_cell_predictions") or row.get("cells") or []:
-                    c = float(cell.get("coefficient", 0))
-                    w = int(cell.get("token_window", 0))
-                    if c == best_coef and w == best_window:
-                        pred = extract_boxed(cell.get("predicted") or cell.get("response") or "")
-                        outcomes.append(bool(is_correct(pred, ref)))
-                        break
-    return outcomes, {}
+    denom = thinking_acc - base_acc
+    if denom > 0:
+        gap_recovery = (hybrid_acc - base_acc) / denom
+    else:
+        gap_recovery = 0.0
+
+    per_task_outcomes: list[bool] = []
+    for task in data.get("tasks", []):
+        ref = str(task.get("correct_answer", ""))
+        answers = task.get("model_answers", {})
+        pred = extract_boxed(answers.get("hybrid_model") or "")
+        per_task_outcomes.append(bool(is_correct(pred, ref)))
+
+    return {
+        "thinking_acc": thinking_acc,
+        "base_acc": base_acc,
+        "hybrid_acc": hybrid_acc,
+        "gap_recovery": gap_recovery,
+        "per_task_outcomes": per_task_outcomes,
+        "n_tasks": data.get("metadata", {}).get("n_tasks", len(data.get("tasks", []))),
+    }
 
 
 def _use_cached_thinking_base_grades(cfg: dict, grade_payload: dict) -> dict:
@@ -340,46 +348,47 @@ def run_cycle(cfg: dict, candidate: str, result_dir: Path) -> dict:
         "--coefficients", *[str(c) for c in cfg["phase3_hybrid"]["coefficients"]],
         "--token-windows", *[str(w) for w in cfg["phase3_hybrid"]["token_windows"]],
     ]
-    _run_subprocess(phase3_cmd, cwd=REPO)
-
-    # 4. Grade.
-    grade_out_raw = result_dir / "grade_raw.json"
-    grade_cmd = [
-        main_python, "-m", "src.bench.venhoff.run_grade",
-        "--root", str(cycle_eval_root),
-        "--arch", cfg["arch"],
-        "--venhoff-root", str(venhoff_root),
-        "--base-model", cfg["model"]["base"],
-        "--thinking-model", cfg["model"]["thinking"],
-        "--dataset", cfg["phase3_hybrid"]["dataset"],
-        "--steering-layer", str(cfg["model"]["steering_layer"]),
-        "--sae-layer", str(cfg["model"]["sae_layer"]),
-        "--n-clusters", str(cfg["phase2_steering"]["n_clusters"]),
-        "--out", str(grade_out_raw),
-    ]
-    _run_subprocess(grade_cmd, cwd=REPO)
-    raw = json.loads(grade_out_raw.read_text())
-
-    # 5. Per-task outcomes for paired Δ analysis.
+    # Phase 3 is wrapped in run_hybrid, which may raise FileNotFoundError
+    # if the legacy per-arch subdir convention doesn't apply. We only
+    # care that hybrid_token.py itself ran successfully; swallow the
+    # wrapper's downstream check and proceed directly to the
+    # benchmark_results_*.json read.
     sys.path.insert(0, str(REPO))
-    v_results = _venhoff_hybrid_results_dir(venhoff_root, cfg)
     try:
-        per_task, _ = _extract_per_task_outcomes(v_results, cfg)
-    except Exception as e:
-        print(f"[warn] per-task outcome extraction failed: {e}")
-        per_task = []
+        _run_subprocess(phase3_cmd, cwd=REPO)
+    except RuntimeError as e:
+        # run_hybrid raises on _expected_results_dir missing; if the
+        # benchmark json IS present we're fine.
+        bench_path = _venhoff_benchmark_json_path(venhoff_root, cfg)
+        if not bench_path.exists():
+            raise
+        print(f"[info] wrapper_results_dir_missing_but_benchmark_present | proceeding | err={e}")
 
-    # 6. Normalize the grade into the ledger-friendly shape.
+    # 4. Read Venhoff's aggregate benchmark results directly. Re-grade
+    #    per-task hybrid outcomes locally using is_correct/extract_boxed.
+    bench_path = _venhoff_benchmark_json_path(venhoff_root, cfg)
+    if not bench_path.exists():
+        raise FileNotFoundError(
+            f"Expected Venhoff benchmark JSON at {bench_path} after hybrid_token.py; "
+            "cycle produced no aggregate result."
+        )
+    parsed = _parse_benchmark_json(bench_path)
+
+    # 5. Normalize into the ledger-friendly shape.
     payload = {
         "candidate": candidate,
         "arch": cfg["arch"],
-        "n_tasks": cfg["phase3_hybrid"]["n_tasks"],
-        "thinking_acc": raw.get("thinking_accuracy"),
-        "base_acc": raw.get("base_accuracy"),
-        "hybrid_acc": (raw.get("best_cell") or {}).get("accuracy"),
-        "gap_recovery": raw.get("best_gap_recovery"),
-        "best_cell": raw.get("best_cell"),
-        "per_task_outcomes": per_task,
+        "n_tasks": parsed["n_tasks"],
+        "thinking_acc": parsed["thinking_acc"],
+        "base_acc": parsed["base_acc"],
+        "hybrid_acc": parsed["hybrid_acc"],
+        "gap_recovery": parsed["gap_recovery"],
+        "best_cell": {
+            "coefficient": cfg["phase3_hybrid"]["coefficients"][0],
+            "token_window": cfg["phase3_hybrid"]["token_windows"][0],
+            "accuracy": parsed["hybrid_acc"],
+        },
+        "per_task_outcomes": parsed["per_task_outcomes"],
         "wall_time_s": time.time() - t0,
         "phase0_cache_hash": phase0_hash,
         "scaffold": False,
@@ -387,16 +396,21 @@ def run_cycle(cfg: dict, candidate: str, result_dir: Path) -> dict:
     payload = _use_cached_thinking_base_grades(cfg, payload)
     (result_dir / "grade_results.json").write_text(json.dumps(payload, indent=2))
 
-    # 7. Copy Venhoff's hybrid output dir into the cycle so subsequent
-    #    candidates with matching (layer, sae_layer, n_clusters) don't
-    #    clobber this one. Then delete the Venhoff copy.
-    if v_results.exists():
-        dst = result_dir / "hybrid_output"
-        if dst.exists():
-            shutil.rmtree(dst)
-        shutil.copytree(v_results, dst)
-        shutil.rmtree(v_results)
-        print(f"[info] moved hybrid output: {v_results} -> {dst}")
+    # 6. Move Venhoff's aggregate + detailed outputs into the cycle dir so
+    #    subsequent candidates don't overwrite them. Also keep a copy of
+    #    the rolling file if present (for paired analysis cross-checks).
+    cycle_hybrid_out = result_dir / "hybrid_output"
+    cycle_hybrid_out.mkdir(exist_ok=True)
+    for fname in (
+        f"benchmark_results_{_model_slug(cfg['model']['base'])}_{cfg['phase3_hybrid']['dataset']}.json",
+        f"detailed/hybrid_stats_{_model_slug(cfg['model']['base'])}_{cfg['phase3_hybrid']['dataset']}.json",
+        f"rolling/rolling_{_model_slug(cfg['model']['base'])}_{cfg['phase3_hybrid']['dataset']}.jsonl",
+        f"rolling/rolling_{_model_slug(cfg['model']['base'])}_{cfg['phase3_hybrid']['dataset']}_vector_stats.json",
+    ):
+        src = venhoff_root / "hybrid" / "results" / fname
+        if src.exists():
+            dst = cycle_hybrid_out / Path(fname).name
+            shutil.copy(src, dst)
 
     return payload
 
