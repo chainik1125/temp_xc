@@ -31,9 +31,10 @@ import sys
 sys.path.insert(0, 'experiments/phase6_2_autoresearch')
 from candidates import by_id
 c = by_id("${CAND_ID}")
-print(f"DISPATCH={c.dispatch}")
-print(f"NAME={c.name}")
-print(f"AXIS={c.axis_tested}")
+import shlex
+print(f"DISPATCH={shlex.quote(c.dispatch)}")
+print(f"NAME={shlex.quote(c.name)}")
+print(f"AXIS={shlex.quote(c.axis_tested)}")
 print(f"COST_MIN={c.cost_min}")
 print(f"IMPLEMENTED={int(c.implemented)}")
 EOF
