@@ -25,9 +25,9 @@ CURATED=(baseline_sae baseline_tempxc baseline_mlc)
 
 # Screening factorial: arch × n_clusters (9 cycles; ~90 min at 10 min/cycle):
 SCREENING=(
-    sae_nclusters4  sae_nclusters8  sae_nclusters15
-    tempxc_nclusters4 tempxc_nclusters8 tempxc_nclusters15
-    mlc_nclusters4  mlc_nclusters8  mlc_nclusters15
+    sae_nclusters5  sae_nclusters10  sae_nclusters15
+    tempxc_nclusters5 tempxc_nclusters10 tempxc_nclusters15
+    mlc_nclusters5  mlc_nclusters10  mlc_nclusters15
 )
 
 bash "$SCRAPPY/run_autoresearch.sh" "${CURATED[@]}" "${SCREENING[@]}"

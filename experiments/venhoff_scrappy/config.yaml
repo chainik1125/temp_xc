@@ -24,7 +24,10 @@ phase2_steering:
   n_training_examples: 128
   optim_minibatch_size: 6
   lr: 1e-2
-  n_clusters: 4            # paper: 15
+  # Venhoff ships cluster-SAEs at n_clusters ∈ {5, 10, 15, 20, ..., 50}
+  # for llama-8b layer6. Default to smallest shipped value for fastest
+  # scrappy cycles; screening factorial sweeps {5, 10, 15}.
+  n_clusters: 5            # paper: 15
   reduction: sum           # TempXC-specific; one of {sum, mean, max}
 
 phase3_hybrid:

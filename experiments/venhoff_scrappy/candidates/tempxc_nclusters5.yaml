@@ -1,13 +1,13 @@
-# Screening: tempxc at n_clusters=4. Part of the 3 × 3 factorial
+# Screening: tempxc at n_clusters=5. Part of the 3 × 3 factorial
 # on (arch, n_clusters) at scrappy budget.
 
-name: tempxc_nclusters4
+name: tempxc_nclusters5
 arch: tempxc
 baseline: baseline_sae
 reuse_venhoff_vectors: false
 phase2_steering:
-  n_clusters: 4
+  n_clusters: 5
 hypothesis: |
-  Does n_clusters=4 materially help tempxc? Paper uses 15 by default.
+  Does n_clusters=5 materially help tempxc? Paper uses 15 by default.
   If coarser (4) matches 15, cluster count isn't the dominant axis for
   tempxc. If fine-grained (15) dominates, the arch is cluster-limited.
