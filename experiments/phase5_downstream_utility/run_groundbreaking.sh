@@ -55,11 +55,13 @@ train_and_probe_both() {
 # Wait for ANY in-flight training process from the previous session/wrapper
 # to finish before we start the sequential queue. This avoids GPU OOM.
 wait_for_gpu_idle() {
-    echo "[$(date +%H:%M:%S)] waiting for in-flight train_primary_archs jobs to finish..."
-    while pgrep -f "train_primary_archs" >/dev/null 2>&1; do
+    # Match only python training processes (not tail -F monitors that
+    # happen to have these strings in their tailed-file paths).
+    echo "[$(date +%H:%M:%S)] waiting for in-flight python training jobs to finish..."
+    while pgrep -af '\.venv/bin/python.*train_primary_archs' >/dev/null 2>&1; do
         sleep 60
     done
-    while pgrep -f "phase57_partB_h8_bare_multidistance" >/dev/null 2>&1; do
+    while pgrep -af '\.venv/bin/python.*phase57_partB_h8_bare_multidistance' >/dev/null 2>&1; do
         sleep 60
     done
     echo "[$(date +%H:%M:%S)] GPU should be idle now. Free MiB:"
