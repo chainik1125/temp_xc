@@ -83,6 +83,33 @@ STEERING_8BIT_PATCHES = [
         replace="    model = LanguageModel(model_name, dispatch=True, device_map=device, dtype=torch.bfloat16)",
         description="drop load_in_8bit= kwarg from LanguageModel(...) in load_model() (Phase 3 hybrid inference path)",
     ),
+    # Older shipped cluster-SAEs (pre-2026-04-23 activation_mean embedding)
+    # don't contain the `activation_mean` key. The upstream assertion
+    # forbids loading them. Synthesize a zero mean — equivalent to the
+    # original uncentered-SAE behavior these checkpoints were trained with.
+    Patch(
+        file_rel="utils/sae.py",
+        find=(
+            "    if require_activation_mean:\n"
+            "        # Require activation mean for downstream parity with SAE training.\n"
+            "        assert \"activation_mean\" in checkpoint, (\n"
+            "            \"SAE checkpoint is missing 'activation_mean'. This repo now requires SAE checkpoints to embed the \"\n"
+            "            \"centering mean used for activation-cache construction so downstream usage can reproduce \"\n"
+            "            \"centered+L2-normalized activations.\"\n"
+            "        )"
+        ),
+        replace=(
+            "    if require_activation_mean:\n"
+            "        # Require activation mean for downstream parity with SAE training.\n"
+            "        if \"activation_mean\" not in checkpoint:\n"
+            "            # scrappy vendor patch: older shipped SAEs omit activation_mean;\n"
+            "            # synthesize zeros (no centering) to match pre-embedding behavior.\n"
+            "            import warnings\n"
+            "            warnings.warn(\"SAE ckpt missing 'activation_mean'; synthesizing zero mean for backcompat\")\n"
+            "            checkpoint[\"activation_mean\"] = torch.zeros(int(checkpoint[\"input_dim\"]))"
+        ),
+        description="soften activation_mean assertion — synthesize zero mean for pre-embedding shipped SAEs",
+    ),
     # Migration: earlier pods have the broken v1 body on disk (uses
     # `'input_ids' in tensor.data`, which trips Tensor.__contains__).
     # Revert it back to upstream so the main v2 patch below applies cleanly.
