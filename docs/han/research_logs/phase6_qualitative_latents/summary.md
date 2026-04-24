@@ -481,7 +481,7 @@ Seed counts per arch:
 | `agentic_mlc_08` | 18 | 18 | 2 | 4/7 |
 | `tsae_ours` | 17 | 19 | 3 | 6/7 |
 | `tfa_big` | 14 | 12 | **0** | **2/7** |
-| **`tsae_paper` (3-seed)** | **23.0 ± 1.15** | 17.7 ± 0.88 | **12.7 ± 1.20** | 7/7 |
+| **`tsae_paper` (3-seed)** | **23.0 ± 1.15** | 17.7 ± 0.88 | **13.7 ± 1.33** | 7/7 |
 
 **Cycle F seed-variance observations:**
 
