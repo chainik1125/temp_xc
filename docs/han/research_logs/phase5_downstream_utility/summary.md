@@ -509,16 +509,30 @@ need the log-scale-matryoshka fix (Part B hypothesis H3) to escape OOM.
 
 ##### Extended-T (A5: T > 20) — INFEASIBLE at d_sae=18432 on A40
 
-Attempted: vanilla TXCDR at T=30. Result: **OOM** during Adam state
-init. At T=30, `(T · d_in · d_sae) × 2 (W_enc + W_dec) = 2.55B` fp32
-params + 2× Adam state = 30.6 GB — just over A40's 44 GB after
-accounting for activations and buffer preloading.
+Attempted vanilla TXCDR and BatchTopK variants at T ∈ {24, 30}. All
+**OOM** during Adam state allocation:
 
-**This itself is a finding**: vanilla TXCDR does not scale to T=30
-at d_sae=18432 on A40 (46 GB total). Any Part B T-scaling hypothesis
-must use a more parameter-efficient architecture. ConvTXCDR (H1) has
-T-invariant encoder params (~127M); LogMatryoshkaTXCDR (H3) has
-~2.4B params at T=30 but can use smaller decoder scales.
+| T | params (W_enc + W_dec, fp32) | Adam state 2× | total | verdict |
+|---|---|---|---|---|
+| 20 | 6.8 GB | 13.6 GB | ~23 GB | fits (trained) |
+| 24 | 8.2 GB | 16.3 GB | ~27 GB | **OOM** at ~42 GB peak |
+| 28 | 9.5 GB | 19.0 GB | ~32 GB | **OOM expected** (same envelope) |
+| 30 | 10.2 GB | 20.4 GB | ~34 GB | **OOM** (verified) |
+| 32, 36 | >10.8 GB | >21.6 GB | >36 GB | **OOM expected** |
+
+Peak memory (>40 GB) exceeds free memory on A40 (44 GB after ~2 GB
+CUDA overhead). Larger activation tensors during Adam's `_foreach_sqrt`
+are the tipping point, not the ckpt size.
+
+**This itself is a finding**: vanilla TXCDR does not scale to T>20 at
+d_sae=18432 on A40. Any T-scaling hypothesis must be more
+parameter-efficient. ConvTXCDR (H1) has T-invariant encoder params
+(~127M); LogMatryoshkaTXCDR (H3) at T=30 with scales {1,2,4,8,16} is
+~2.4B params (trainable).
+
+Fine-grained low-T sweep (T={6, 7}) succeeded — fills the gap between
+T=5 peak and T=8 regression in the T-sweep matrix. Results pending
+probe.
 
 Workarounds deferred: fp16 training, CPU-offloaded Adam, d_sae reduction.
 
