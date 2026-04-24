@@ -50,43 +50,54 @@ touch "$EM/.stop_arditi"
 log "GPU before Run A:"; nvidia-smi --query-gpu=memory.used,memory.free --format=csv,noheader || true
 
 # ---------------------------------------------------------------------------
-# Run A — small TXC (d_sae=32768), 300k steps.
+# Run A — small TXC (d_sae=32768), 200k steps, snapshots at 40k/100k/200k.
+# Sweep each snapshot so we see the training-length trend.
 # ---------------------------------------------------------------------------
-RUN_A_CKPT=$CKPT_DIR/qwen_l15_txc_small_step300000.pt
-if [ ! -s "$RUN_A_CKPT" ]; then
-    log "RUN A: small TXC (d_sae=32768) × 300k steps"
+SMALL_PREFIX=$CKPT_DIR/qwen_l15_txc_small
+SMALL_FINAL=${SMALL_PREFIX}_step200000.pt
+if [ ! -s "$SMALL_FINAL" ]; then
+    log "RUN A: small TXC (d_sae=32768) × 200k steps, snapshots @ 40k/100k/200k"
     cd $TEMP_XC && PYTHONPATH=$TEMP_XC python -m experiments.em_features.run_training_txc_snapshots \
         --config $TEMP_XC/experiments/em_features/config.yaml \
         --d_sae 32768 --T 5 --k_total 128 \
-        --total_steps 300000 --snapshot_at 300000 \
-        --out_prefix $CKPT_DIR/qwen_l15_txc_small
+        --total_steps 200000 --snapshot_at 40000 100000 200000 \
+        --out_prefix "$SMALL_PREFIX"
 fi
 
-log "Stage A for small TXC @ 300k"
-cd $TEMP_XC && PYTHONPATH=$TEMP_XC python -m experiments.em_features.run_find_misalignment_features \
-    --ckpt "$RUN_A_CKPT" \
-    --diff_vectors "$DIFF" \
-    --layer $LAYER \
-    --out $TEMP_XC/experiments/em_features/results/qwen_l15_txc_small_step300000
+SMALL_SWEEP_ARGS=("--sweep" "SAE_k10=$SAE_SWEEP"
+                  "--sweep" "TXC_small_prev_40k=$RESULTS/qwen_l15_txc_bundled_frontier.json")
+for STEP in 40000 100000 200000; do
+    CKPT=${SMALL_PREFIX}_step${STEP}.pt
+    OUT_DIR=$TEMP_XC/experiments/em_features/results/qwen_l15_txc_small_step${STEP}
+    OUT_JSON=$RESULTS/qwen_l15_txc_small_step${STEP}_frontier.json
 
-RUN_A_SWEEP=$RESULTS/qwen_l15_txc_small_step300000_frontier.json
-log "Sweep small TXC @ 300k"
-cd $EM && python -m feature_ablation.frontier_sweep \
-    --steerer txc --model qwen --layer $LAYER \
-    --features_json $TEMP_XC/experiments/em_features/results/qwen_l15_txc_small_step300000/top_200_features_layer_${LAYER}.json \
-    --txc_ckpt "$RUN_A_CKPT" \
-    --k 10 \
-    --alpha_grid "${ALPHA_GRID[@]}" \
-    --n_rollouts 8 \
-    --out_path "$RUN_A_SWEEP"
+    log "Stage A for small TXC @ ${STEP}"
+    cd $TEMP_XC && PYTHONPATH=$TEMP_XC python -m experiments.em_features.run_find_misalignment_features \
+        --ckpt "$CKPT" --diff_vectors "$DIFF" --layer $LAYER --out "$OUT_DIR"
 
-log "intermediate plot after Run A"
+    log "Sweep small TXC @ ${STEP}"
+    cd $EM && python -m feature_ablation.frontier_sweep \
+        --steerer txc --model qwen --layer $LAYER \
+        --features_json $OUT_DIR/top_200_features_layer_${LAYER}.json \
+        --txc_ckpt "$CKPT" \
+        --k 10 --alpha_grid "${ALPHA_GRID[@]}" --n_rollouts 8 \
+        --out_path "$OUT_JSON"
+
+    SMALL_SWEEP_ARGS+=("--sweep" "TXC_small_${STEP}=$OUT_JSON")
+done
+
+RUN_A_SWEEP=$RESULTS/qwen_l15_txc_small_step200000_frontier.json
+
+log "intermediate plot + summary after small TXC"
 cd $TEMP_XC && PYTHONPATH=$TEMP_XC python -m experiments.em_features.plot_frontier \
-    --sweep "SAE_k10=$SAE_SWEEP" \
-    --sweep "TXC_small_40k=$RESULTS/qwen_l15_txc_bundled_frontier.json" \
-    --sweep "TXC_small_300k=$RUN_A_SWEEP" \
+    "${SMALL_SWEEP_ARGS[@]}" \
     --out $FIG_DIR/frontier_txc_small_scaling.png \
-    --title "TXC small-dict (d_sae=32768): 40k vs 300k training steps"
+    --title "TXC small-dict (d_sae=32768): 40k → 100k → 200k steps vs SAE baseline"
+cd $TEMP_XC && PYTHONPATH=$TEMP_XC python -m experiments.em_features.write_frontier_summary \
+    "${SMALL_SWEEP_ARGS[@]}" \
+    --baseline_align $BASELINE_ALIGN --baseline_coh $BASELINE_COH \
+    --out $DOCS_RESULTS/summary_txc_small_scaling.md \
+    --title "TXC small-dict training-length scaling"
 
 # ---------------------------------------------------------------------------
 # Runs B / C / D — big TXC (d_sae=$BIG_DSAE), single training to 300k with
@@ -97,21 +108,21 @@ log "GPU before Run B:"; nvidia-smi --query-gpu=memory.used,memory.free --format
 BIG_PREFIX=$CKPT_DIR/qwen_l15_txc_big_d${BIG_DSAE}
 SNAP_40K=$CKPT_DIR/qwen_l15_txc_big_d${BIG_DSAE}_step40000.pt
 SNAP_100K=$CKPT_DIR/qwen_l15_txc_big_d${BIG_DSAE}_step100000.pt
-SNAP_300K=$CKPT_DIR/qwen_l15_txc_big_d${BIG_DSAE}_step300000.pt
+SNAP_300K=$CKPT_DIR/qwen_l15_txc_big_d${BIG_DSAE}_step200000.pt
 
 if [ ! -s "$SNAP_300K" ]; then
     log "RUN B+C+D: big TXC (d_sae=$BIG_DSAE) × 300k steps with snapshots at 40k/100k/300k"
     cd $TEMP_XC && PYTHONPATH=$TEMP_XC python -m experiments.em_features.run_training_txc_snapshots \
         --config $TEMP_XC/experiments/em_features/config.yaml \
         --d_sae $BIG_DSAE --T 5 --k_total 128 \
-        --total_steps 300000 --snapshot_at 40000 100000 300000 \
+        --total_steps 200000 --snapshot_at 40000 100000 200000 \
         --out_prefix "$BIG_PREFIX"
 fi
 
 SWEEP_ARGS=("--sweep" "SAE_k10=$SAE_SWEEP"
             "--sweep" "TXC_small_300k=$RUN_A_SWEEP")
 
-for STEP in 40000 100000 300000; do
+for STEP in 40000 100000 200000; do
     CKPT=$CKPT_DIR/qwen_l15_txc_big_d${BIG_DSAE}_step${STEP}.pt
     OUT_DIR=$TEMP_XC/experiments/em_features/results/qwen_l15_txc_big_d${BIG_DSAE}_step${STEP}
     OUT_JSON=$RESULTS/qwen_l15_txc_big_d${BIG_DSAE}_step${STEP}_frontier.json

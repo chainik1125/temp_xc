@@ -36,65 +36,56 @@ log "GPU before Run A:"; nvidia-smi --query-gpu=memory.used,memory.free --format
 # Run A — small MLC (d_sae=32768, L=5), 300k steps.
 # ---------------------------------------------------------------------------
 RUN_A_PREFIX=$CKPT_DIR/qwen_mlc_small
-RUN_A_CKPT=${RUN_A_PREFIX}_step300000.pt
-if [ ! -s "$RUN_A_CKPT" ]; then
-    log "RUN A: small MLC (d_sae=32768, L=5) × 300k steps"
+RUN_A_FINAL=${RUN_A_PREFIX}_step200000.pt
+if [ ! -s "$RUN_A_FINAL" ]; then
+    log "RUN A: small MLC (d_sae=32768, L=5) × 200k steps, snapshots @ 40k/100k/200k"
     cd $TEMP_XC && PYTHONPATH=$TEMP_XC python -m experiments.em_features.run_training_mlc_snapshots \
         --config $TEMP_XC/experiments/em_features/config.yaml \
         --layers $LAYERS_L5 \
         --d_sae 32768 --k_total 128 \
-        --total_steps 300000 --snapshot_at 300000 \
+        --total_steps 200000 --snapshot_at 40000 100000 200000 \
         --out_prefix "$RUN_A_PREFIX"
 fi
 
-log "Stage A for small MLC @ 300k"
-cd $TEMP_XC && PYTHONPATH=$TEMP_XC python -m experiments.em_features.run_find_misalignment_features_mlc \
-    --ckpt "$RUN_A_CKPT" \
-    --diff_vectors "$DIFF" \
-    --out $TEMP_XC/experiments/em_features/results/qwen_mlc_small_step300000
+SMALL_MLC_SWEEP_ARGS=("--sweep" "SAE_k10=$SAE_SWEEP"
+                      "--sweep" "MLC_prev_40k=$SMALL_MLC_SWEEP")
+for STEP in 40000 100000 200000; do
+    CKPT=${RUN_A_PREFIX}_step${STEP}.pt
+    OUT_DIR=$TEMP_XC/experiments/em_features/results/qwen_mlc_small_step${STEP}
+    OUT_JSON=$RESULTS/qwen_mlc_small_step${STEP}_frontier.json
 
-RUN_A_SWEEP=$RESULTS/qwen_mlc_small_step300000_frontier.json
-log "Sweep small MLC @ 300k"
-cd $EM && python -m feature_ablation.frontier_sweep \
-    --steerer mlc --model qwen --layer $LAYER \
-    --features_json $TEMP_XC/experiments/em_features/results/qwen_mlc_small_step300000/top_200_features_mlc.json \
-    --mlc_ckpt "$RUN_A_CKPT" \
-    --k 10 \
-    --alpha_grid "${ALPHA_GRID[@]}" \
-    --n_rollouts 8 \
-    --out_path "$RUN_A_SWEEP"
+    log "Stage A for small MLC @ ${STEP}"
+    cd $TEMP_XC && PYTHONPATH=$TEMP_XC python -m experiments.em_features.run_find_misalignment_features_mlc \
+        --ckpt "$CKPT" --diff_vectors "$DIFF" --out "$OUT_DIR"
+
+    log "Sweep small MLC @ ${STEP}"
+    cd $EM && python -m feature_ablation.frontier_sweep \
+        --steerer mlc --model qwen --layer $LAYER \
+        --features_json $OUT_DIR/top_200_features_mlc.json \
+        --mlc_ckpt "$CKPT" \
+        --k 10 --alpha_grid "${ALPHA_GRID[@]}" --n_rollouts 8 \
+        --out_path "$OUT_JSON"
+
+    SMALL_MLC_SWEEP_ARGS+=("--sweep" "MLC_small_${STEP}=$OUT_JSON")
+done
+
+RUN_A_SWEEP=$RESULTS/qwen_mlc_small_step200000_frontier.json
 
 log "intermediate plot after MLC Run A"
 cd $TEMP_XC && PYTHONPATH=$TEMP_XC python -m experiments.em_features.plot_frontier \
-    --sweep "SAE_k10=$SAE_SWEEP" \
-    --sweep "MLC_small_40k=$SMALL_MLC_SWEEP" \
-    --sweep "MLC_small_300k=$RUN_A_SWEEP" \
+    "${SMALL_MLC_SWEEP_ARGS[@]}" \
     --out $FIG_DIR/frontier_mlc_small_scaling.png \
-    --title "MLC small-dict (d_sae=32768, L=5): 40k vs 300k training steps"
-
-# ---------------------------------------------------------------------------
-# Big-MLC L=5 phase intentionally SKIPPED — the L=5 at 40k and 300k data
-# points already tell us dict-size and length scaling for regional MLC;
-# next-highest-ROI work is all-layers MLC (see run_mlc_all_layers.sh).
-# To re-enable, set EM_RUN_BIG_MLC=1 in the env.
-# ---------------------------------------------------------------------------
-
-SWEEP_ARGS=("--sweep" "SAE_k10=$SAE_SWEEP"
-            "--sweep" "MLC_small_40k=$SMALL_MLC_SWEEP"
-            "--sweep" "MLC_small_300k=$RUN_A_SWEEP")
-
-log "MLC L=5 plot + summary (small-dict only)"
-cd $TEMP_XC && PYTHONPATH=$TEMP_XC python -m experiments.em_features.plot_frontier \
-    "${SWEEP_ARGS[@]}" \
-    --out $FIG_DIR/frontier_mlc_l5_scaling.png \
-    --title "MLC L=5, d_sae=32768: 40k → 300k steps vs SAE baseline"
+    --title "MLC small-dict (d_sae=32768, L=5): 40k → 100k → 200k steps vs SAE baseline"
 cd $TEMP_XC && PYTHONPATH=$TEMP_XC python -m experiments.em_features.write_frontier_summary \
-    "${SWEEP_ARGS[@]}" \
+    "${SMALL_MLC_SWEEP_ARGS[@]}" \
     --baseline_align $BASELINE_ALIGN --baseline_coh $BASELINE_COH \
-    --out $DOCS_RESULTS/summary_mlc_l5_scaling.md \
-    --title "MLC L=5 dict=32768: training-length scaling"
+    --out $DOCS_RESULTS/summary_mlc_small_scaling.md \
+    --title "MLC L=5 d_sae=32768: training-length scaling"
 
-log "MLC L=5 phase complete"
+# Big-MLC L=5 phase skipped (see plan notes; re-enable by restoring the
+# legacy block from git history if needed). The small-MLC scaling summary
+# above is the primary L=5 result.
+log "MLC L=5 phase complete (small-dict only)"
 
 # ---------------------------------------------------------------------------
 # If the deepdive succeeded, auto-continue to the all-layers MLC phase.

@@ -40,22 +40,22 @@ log "GPU before all-layers MLC:"; nvidia-smi --query-gpu=memory.used,memory.free
 ALL_PREFIX=$CKPT_DIR/qwen_mlc_all_d${D_SAE_ALL}
 SNAP_40K=${ALL_PREFIX}_step40000.pt
 SNAP_100K=${ALL_PREFIX}_step100000.pt
-SNAP_300K=${ALL_PREFIX}_step300000.pt
+SNAP_FINAL=${ALL_PREFIX}_step200000.pt
 
-if [ ! -s "$SNAP_300K" ]; then
-    log "TRAIN all-layers MLC (d_sae=$D_SAE_ALL, L=28) × 300k steps, snapshots at 40k/100k/300k"
+if [ ! -s "$SNAP_FINAL" ]; then
+    log "TRAIN all-layers MLC (d_sae=$D_SAE_ALL, L=28) × 200k steps, snapshots at 40k/100k/200k"
     cd $TEMP_XC && PYTHONPATH=$TEMP_XC python -m experiments.em_features.run_training_mlc_snapshots \
         --config $TEMP_XC/experiments/em_features/config.yaml \
         --layers $LAYERS_ALL \
         --d_sae $D_SAE_ALL --k_total $K_TOTAL \
         --buffer_seqs $BUFFER_SEQS \
-        --total_steps 300000 --snapshot_at 40000 100000 300000 \
+        --total_steps 200000 --snapshot_at 40000 100000 200000 \
         --out_prefix "$ALL_PREFIX"
 fi
 
 SWEEP_ARGS=("--sweep" "SAE_k10=$SAE_SWEEP")
 
-for STEP in 40000 100000 300000; do
+for STEP in 40000 100000 200000; do
     CKPT=${ALL_PREFIX}_step${STEP}.pt
     OUT_DIR=$TEMP_XC/experiments/em_features/results/qwen_mlc_all_d${D_SAE_ALL}_step${STEP}
     OUT_JSON=$RESULTS/qwen_mlc_all_d${D_SAE_ALL}_step${STEP}_frontier.json
