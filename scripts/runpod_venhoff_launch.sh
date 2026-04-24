@@ -94,6 +94,11 @@ NUM_GPUS_HYBRID="${NUM_GPUS_HYBRID:-$_DETECTED_GPUS}"
 # their script has built-in resume so bumping higher continues.
 HYBRID_N_TASKS="${HYBRID_N_TASKS:-500}"
 
+# Phase 3 grid (coefficients × token windows). Default to paper's full
+# 10×5=50 cells per task. Override to subset for faster runs.
+HYBRID_COEFFICIENTS="${HYBRID_COEFFICIENTS:-0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0}"
+HYBRID_TOKEN_WINDOWS="${HYBRID_TOKEN_WINDOWS:-0 -1 -15 -50 -100}"
+
 if [[ "$MODE" == "smoke" ]]; then
     # Smoke: 100 MATH500 problems × SAE only × P0 gate (reproduce Venhoff's 3.5%).
     N_TRACES="${N_TRACES:-100}"
@@ -414,6 +419,8 @@ if [[ "$MODE" == "hybrid" ]]; then
                     --steering-layer "$STEERING_LAYER" --sae-layer "$SAE_LAYER" \
                     --n-clusters "$N_CLUSTERS_HYBRID" \
                     --n-tasks "$HYBRID_N_TASKS" \
+                    --coefficients $HYBRID_COEFFICIENTS \
+                    --token-windows $HYBRID_TOKEN_WINDOWS \
                     "${FORCE_FLAGS[@]}" \
                     >"logs/hybrid_per_arch/${arch}.log" 2>&1 &
             wave_pids+=($!)

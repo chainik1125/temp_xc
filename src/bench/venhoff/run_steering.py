@@ -87,6 +87,7 @@ def main(argv: list[str] | None = None) -> int:
         seed=args.seed,
         bias_only=args.bias_only,
         cluster_indices=cluster_idxs,
+        arch=args.arch,
     )
     train_all_vectors(
         venhoff_root=args.venhoff_root,

@@ -86,59 +86,82 @@ class SteeringConfig:
     n_clusters: int = 15
     # Paper defaults (Venhoff et al. 2025 Appendix C.1):
     #   max_iters=50, n_training_examples=2048, optim_minibatch_size=6.
-    # These match arXiv:2510.07364 — use them when reporting numbers
-    # you want to cite head-to-head against the paper. Under our earlier
-    # 10/256/4 undercut (2026-04-21 preliminary), MATH500 Gap Recovery
-    # came in at 22.3% for the SAE arm (Venhoff's baseline: 3.5%). The
-    # undercut is still replayable via env vars / CLI overrides.
     max_iters: int = 50
     n_training_examples: int = 2048
     n_eval_examples: int = 64
     optim_minibatch_size: int = 6
     lr: str = "1e-2"
     seed: int = 42
-    # If set, only train vectors for these cluster indices (plus always
-    # the bias at idx=-1). Useful for smoke runs where you only want to
-    # confirm end-to-end plumbing on one vector.
     cluster_indices: tuple[int, ...] | None = None
-    # If True, skip cluster vectors entirely and only train the bias.
     bias_only: bool = False
+    # Arch identifier. Determines steering-vector output filename so
+    # multiple arches don't share the same `.pt` files on disk
+    # (the bug surfaced by the 2026-04-23 paper-budget run where SAE,
+    # TempXC, and MLC all read the same vectors → identical Gap Recovery).
+    #   - sae   → bare `{model}_{tag}.pt` (Venhoff's shipped path)
+    #   - tempxc → `{model}_{tag}_tempxc.pt`
+    #   - mlc    → `{model}_{tag}_mlc.pt`
+    arch: str = "sae"
 
 
 def _venhoff_expected_vector_path(
     venhoff_root: Path,
     base_model: str,
     cluster_idx: int,
+    arch: str = "sae",
     steering_type: str = "linear",
 ) -> Path:
-    """Venhoff saves vectors at `train-vectors/results/vars/optimized_vectors/`.
+    """Resolve the canonical steering-vector path for an arch.
 
-    Two filename conventions exist in the vendored repo:
+    Venhoff saves vectors at `train-vectors/results/vars/optimized_vectors/`.
+    We arch-key the filename so SAE / TempXC / MLC don't share the same
+    `.pt` file on disk (whoever trains last would otherwise overwrite the
+    shipped vectors and contaminate the other arches' Phase 3 runs):
 
-      1. `{model}_{tag}_{steering_type}.pt` — what their script emits when
-         training fresh (`_linear.pt`, `_adaptive_linear.pt`, `_resid_lora.pt`).
-      2. `{model}_{tag}.pt` — bare filename for the pre-trained vectors
-         they ship in `results/vars/optimized_vectors/` for reproducibility
-         (these are the plain-linear variant; no suffix).
+      sae    → bare `{model}_{tag}.pt`        (Venhoff's shipped path)
+      tempxc → `{model}_{tag}_tempxc.pt`      (our fresh-trained path)
+      mlc    → `{model}_{tag}_mlc.pt`         (our fresh-trained path)
 
-    We prefer (1) if it exists (fresh-trained output from our own run),
-    else fall back to (2) (Venhoff's shipped vector). This lets the SAE
-    arch skip Phase 2 entirely when targeting the Llama-3.1-8B cell
-    — the `llama-3.1-8b_idx0.pt` … `llama-3.1-8b_idx14.pt` + `llama-3.1-8b_bias.pt`
-    are all checked into the repo.
+    Within `arch=sae`, we still honor the legacy `_linear.pt` fresh-train
+    output if present (so older runs that didn't have arch-keying remain
+    loadable), but the canonical resolution order is:
+      1. arch-specific suffix (for non-sae)
+      2. bare shipped (for sae)
+      3. legacy `_linear.pt` (only for sae backcompat)
     """
     model_short = base_model.split("/")[-1].lower()
     tag = "bias" if cluster_idx == -1 else f"idx{cluster_idx}"
     root = venhoff_root / "train-vectors" / "results" / "vars" / "optimized_vectors"
-    suffixed = root / f"{model_short}_{tag}_{steering_type}.pt"
-    if suffixed.exists():
-        return suffixed
+
+    if arch != "sae":
+        return root / f"{model_short}_{tag}_{arch}.pt"
+
+    # SAE path: prefer Venhoff's bare shipped file; fall back to legacy
+    # `_linear.pt` if some old run left one around.
     bare = root / f"{model_short}_{tag}.pt"
-    if bare.exists() and steering_type == "linear":
+    if bare.exists():
         return bare
-    # Neither exists yet — return the suffixed name so Venhoff's script
-    # creates it on the next training invocation.
-    return suffixed
+    legacy_linear = root / f"{model_short}_{tag}_{steering_type}.pt"
+    if legacy_linear.exists():
+        return legacy_linear
+    return bare
+
+
+def _venhoff_subprocess_output_path(
+    venhoff_root: Path,
+    base_model: str,
+    cluster_idx: int,
+    steering_type: str = "linear",
+) -> Path:
+    """Where `optimize_steering_vectors.py` actually writes its trained
+    output (always `{model}_{tag}_{steering_type}.pt`, regardless of our
+    arch convention). We rename this to the arch-specific path after
+    training succeeds so the disk layout matches `_venhoff_expected_vector_path`.
+    """
+    model_short = base_model.split("/")[-1].lower()
+    tag = "bias" if cluster_idx == -1 else f"idx{cluster_idx}"
+    root = venhoff_root / "train-vectors" / "results" / "vars" / "optimized_vectors"
+    return root / f"{model_short}_{tag}_{steering_type}.pt"
 
 
 def _venhoff_script_dir(venhoff_root: Path) -> Path:
@@ -159,11 +182,16 @@ def train_one_vector(
     CUDA_VISIBLE_DEVICES. Used by train_all_vectors when multi-GPU
     parallel training is requested.
     """
-    expected_out = _venhoff_expected_vector_path(venhoff_root, cfg.base_model, cluster_idx)
+    expected_out = _venhoff_expected_vector_path(venhoff_root, cfg.base_model, cluster_idx, arch=cfg.arch)
 
-    meta_path = paths.run_dir / "steering" / f"vector_{cluster_idx}.meta.json"
+    # Arch in meta path + meta hash so a later arch's resume check can't
+    # match an earlier arch's training output (the contamination bug
+    # behind the 2026-04-23 paper-budget run's identical-across-arches
+    # Gap Recovery numbers).
+    meta_path = paths.run_dir / "steering" / f"vector_{cluster_idx}_{cfg.arch}.meta.json"
     meta = {
         "stage": "train_steering_vector",
+        "arch": cfg.arch,
         "cluster_idx": cluster_idx,
         "base_model": cfg.base_model,
         "steering_layer": cfg.steering_layer,
@@ -250,13 +278,29 @@ def train_one_vector(
             f"(rc={result.returncode}). Tail of {per_vec_log}:\n    {tail_str}"
         )
 
+    # optimize_steering_vectors.py writes to its own canonical path
+    # (`{model}_{tag}_{steering_type}.pt`, e.g. `_linear.pt`). For
+    # non-sae arches we rename to the arch-keyed path so disk layout
+    # matches our resume / hybrid-swap conventions. SAE writes through
+    # to the bare path (which would clobber Venhoff's shipped vectors)
+    # — so for SAE we always reuse_shipped above and never reach here.
+    if cfg.arch != "sae":
+        venhoff_default = _venhoff_subprocess_output_path(venhoff_root, cfg.base_model, cluster_idx)
+        if venhoff_default.exists() and venhoff_default != expected_out:
+            if expected_out.exists():
+                expected_out.unlink()
+            venhoff_default.rename(expected_out)
+            log.info("[info] steering | renamed | %s -> %s",
+                     venhoff_default.name, expected_out.name)
+
     if not expected_out.exists():
         raise FileNotFoundError(f"expected steering vector not produced at {expected_out}")
 
     # Record our own resume sidecar next to the vector (under our run_dir).
     meta_path.parent.mkdir(parents=True, exist_ok=True)
     write_with_metadata(meta_path, json.dumps({"vector_path": str(expected_out)}), meta)
-    log.info("[done] steering | cluster_idx=%d | vector=%s", cluster_idx, expected_out)
+    log.info("[done] steering | cluster_idx=%d | arch=%s | vector=%s",
+             cluster_idx, cfg.arch, expected_out)
     return expected_out
 
 

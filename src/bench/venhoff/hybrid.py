@@ -59,13 +59,68 @@ class HybridConfig:
     coefficients: tuple[float, ...] = field(default_factory=lambda: DEFAULT_COEFFICIENTS)
     token_windows: tuple[int, ...] = field(default_factory=lambda: DEFAULT_TOKEN_WINDOWS)
     seed: int = 42
-    # Venhoff's hybrid_token.py has a `--n_tasks` arg (default 500) with
-    # built-in resume. Set to a subset size to cap problem count.
     n_tasks: int = 500
+    # Arch identifier — selects which on-disk steering vectors get
+    # swapped to the bare path before hybrid_token.py reads them.
+    # See _swap_arch_vectors_in / _swap_arch_vectors_out.
+    arch: str = "sae"
 
 
 def _venhoff_script_dir(venhoff_root: Path) -> Path:
     return venhoff_root / "hybrid"
+
+
+def _vector_paths(venhoff_root: Path, base_model: str, n_clusters: int) -> list[tuple[str, Path]]:
+    """Yield (tag, bare_path) for every steering vector hybrid_token.py loads."""
+    model_short = base_model.split("/")[-1].lower()
+    root = venhoff_root / "train-vectors" / "results" / "vars" / "optimized_vectors"
+    tags = ["bias"] + [f"idx{i}" for i in range(n_clusters)]
+    return [(t, root / f"{model_short}_{t}.pt") for t in tags]
+
+
+def _swap_arch_vectors_in(venhoff_root: Path, cfg: HybridConfig) -> list[tuple[Path, Path | None]]:
+    """Swap arch-specific steering vectors into the bare paths that
+    hybrid_token.py reads from. Returns a list of (bare_path, prior_backup)
+    tuples for `_swap_arch_vectors_out` to undo.
+
+    For sae arch: no swap needed; bare paths already contain shipped
+    vectors (or whatever Phase 2 produced under the legacy convention).
+    """
+    if cfg.arch == "sae":
+        return []
+
+    swapped: list[tuple[Path, Path | None]] = []
+    for tag, bare_path in _vector_paths(venhoff_root, cfg.base_model, cfg.n_clusters):
+        arch_path = bare_path.parent / f"{bare_path.stem}_{cfg.arch}.pt"
+        if not arch_path.exists():
+            log.warning("[warn] arch_vector_missing | arch=%s | tag=%s | path=%s",
+                        cfg.arch, tag, arch_path)
+            continue
+        # Backup current bare to a sidecar so we can restore.
+        backup: Path | None = None
+        if bare_path.exists():
+            backup = bare_path.with_suffix(f".pt.preswap_{cfg.arch}")
+            if backup.exists():
+                backup.unlink()
+            bare_path.rename(backup)
+        # Copy (not symlink) so a downstream torch.load doesn't follow
+        # back to our arch-specific store.
+        import shutil as _shutil
+        _shutil.copy(arch_path, bare_path)
+        swapped.append((bare_path, backup))
+    log.info("[info] arch_vectors_swapped_in | arch=%s | n=%d", cfg.arch, len(swapped))
+    return swapped
+
+
+def _swap_arch_vectors_out(swapped: list[tuple[Path, Path | None]]) -> None:
+    """Restore the original bare-path contents (Venhoff shipped or
+    whichever arch was previously swapped in)."""
+    for bare_path, backup in swapped:
+        if bare_path.exists():
+            bare_path.unlink()
+        if backup is not None and backup.exists():
+            backup.rename(bare_path)
+    log.info("[info] arch_vectors_swapped_out | n=%d", len(swapped))
 
 
 def _expected_results_dir(venhoff_root: Path, cfg: HybridConfig) -> Path:
@@ -135,11 +190,18 @@ def run_hybrid(
     # kwarg, so share the same 8bit-stripping patches as Phase 2.
     ensure_steering_patched(venhoff_root)
 
-    log.info("[info] hybrid | dataset=%s | cmd=%s", cfg.dataset, " ".join(cmd))
-    # Same PYTHONPATH fix as steering.py — hybrid_token.py does
-    # `from utils.sae import load_sae` without a sys.path prefix.
+    log.info("[info] hybrid | dataset=%s | arch=%s | cmd=%s", cfg.dataset, cfg.arch, " ".join(cmd))
     env = {**os.environ, "PYTHONPATH": str(venhoff_root.absolute())}
-    result = subprocess.run(cmd, cwd=_venhoff_script_dir(venhoff_root), env=env, check=False)
+
+    # Swap this arch's steering vectors into the bare paths that
+    # hybrid_token.py reads. Wrap in try/finally so a crash still
+    # restores Venhoff's shipped vectors (otherwise the next arch's
+    # SAE run sees TempXC/MLC-trained vectors).
+    swapped = _swap_arch_vectors_in(venhoff_root, cfg)
+    try:
+        result = subprocess.run(cmd, cwd=_venhoff_script_dir(venhoff_root), env=env, check=False)
+    finally:
+        _swap_arch_vectors_out(swapped)
     if result.returncode != 0:
         raise RuntimeError(f"hybrid_token.py failed on dataset={cfg.dataset} (rc={result.returncode})")
 

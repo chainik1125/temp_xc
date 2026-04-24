@@ -63,6 +63,7 @@ def main(argv: list[str] | None = None) -> int:
         token_windows=tuple(args.token_windows),
         seed=args.seed,
         n_tasks=args.n_tasks,
+        arch=args.arch,
     )
     run_hybrid(
         venhoff_root=args.venhoff_root,
