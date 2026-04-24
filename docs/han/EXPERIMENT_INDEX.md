@@ -21,6 +21,36 @@ and mirror on HF `han1823123123/txcdr/ckpts/`.
 
 #### TXC family (window-based encoder, T=5 unless noted)
 
+**Phase 5.7 extensions (this session — 2026-04-24)**:
+
+| name | seeds | recipe | last_pos AUC | mean_pool AUC | notes |
+|---|---|---|---|---|---|
+| `txcdr_t{2,3,5,6,7,8,10,15,20}` | 42 | TXCDR T-sweep TopK, d_sae=18432 | see §T-sweep matrix | see §T-sweep matrix | T=6,7 fresh this session |
+| `txcdr_t{2,3,5,6,7,8,10,15,20}_batchtopk` | 42 | TXCDR T-sweep BatchTopK | see §T-sweep matrix | see §T-sweep matrix | T=15,20 thr miscalibrated (eval→dense) |
+| `txcdr_t{24,28}` | 42 | high-T extension (T=30,32,36 OOM) | in progress | N/A (T>LAST_N=20) | A5 |
+| `agentic_txc_02_t{2,3,6,7,8}` | 42 | matryoshka+multi-scale at T∈{2..8} | see §T-sweep | see §T-sweep | T≥10 OOM (O(T³·d_in)) |
+| `agentic_txc_02_t{2,3,8}_batchtopk` | 42 | above + BatchTopK | see §T-sweep | see §T-sweep | |
+| `mlc_contrastive_alpha100_batchtopk` | 42 | Part-B α=1.0 + BatchTopK | **0.8124** | 0.7835 | Fig 1 top — stat-tied (p_bonf=1.0 vs agentic_mlc_08) |
+| `mlc_contrastive_alpha100` | 42+1+2 | Part-B α=1.0 MLC contrastive, TopK | 0.8073 (42) | 0.7835 (42) | lp cluster leader candidate |
+| `mlc_contrastive_batchtopk` | 42 | MLC contrastive + BatchTopK | 0.7893 | 0.7643 | |
+| `mlc_batchtopk` | 42 | MLC + BatchTopK | 0.7742 | 0.7797 | |
+| `agentic_mlc_08_batchtopk` | 42 | agentic_mlc_08 + BatchTopK | 0.7981 | 0.7980 | A3 Tier 2 seeds 1,2 in flight |
+| `topk_sae_batchtopk` | 42 | TopKSAE + BatchTopK | 0.7457 | 0.7809 | +0.022 mp gain |
+| `time_layer_crosscoder_t5_batchtopk` | 42 | TLC + BatchTopK | 0.7534 | 0.7830 | |
+| `matryoshka_t5_batchtopk` | 42 | matryoshka + BatchTopK | 0.7487 | 0.7657 | |
+| `matryoshka_txcdr_contrastive_t5_alpha100_batchtopk` | 42 | matryoshka-contrastive α=1 + BatchTopK | 0.7722 | 0.7953 | |
+| `stacked_t{5,20}_batchtopk` | 42 | stacked + BatchTopK | see §BatchTopK | see §BatchTopK | |
+| `txcdr_t{15,20}_batchtopk_recal` | 42 | recalibrated thresholds | 0.7678 / 0.7740 (unchanged) | 0.7753 / 0.7807 (unchanged) | recal confirms stuck thresholds |
+
+**Part B hypotheses (this session — 2026-04-24)**:
+
+| name | seeds | recipe | lp monotonicity | Δ(T30−T5) lp | verdict |
+|---|---|---|---|---|---|
+| `conv_txcdr_t{5,10,15,20,30}` (H1) | 42 | shared Conv1d k=3 encoder, sum-pool across T | **0.4** | **−0.032** | ❌ fails T-scaling |
+| `log_matryoshka_t{5,10,15,20,30}` (H3) | 42 | log-scale matryoshka {1,2,4,8,16,32} | deferred | deferred | arch ready, not yet run |
+
+**Original Phase 5.7 agentic winners (3-seed baseline)**:
+
 | name | seeds | recipe | last_pos AUC | mean_pool AUC | random /32 | summary |
 |---|---|---|---|---|---|---|
 | `agentic_txc_02` | 42+1+2 | matryoshka + multi-scale contrastive, TopK | 0.7749 ± 0.004 (3s) | 0.7987 ± 0.002 (3s) | 0 | [Phase 5 §5.7](research_logs/phase5_downstream_utility/summary.md#5.7) |
@@ -108,6 +138,8 @@ All figures have `.thumb.png` siblings (≤48 dpi, agent-readable).
 | Phase 6.2 autoresearch | [research_logs/phase6_2_autoresearch/summary.md](research_logs/phase6_2_autoresearch/summary.md) | complete |
 | Phase 6.2 brief | [research_logs/phase6_2_autoresearch/brief.md](research_logs/phase6_2_autoresearch/brief.md) | complete |
 | Phase 6.3 T-sweep handover | [research_logs/phase6_2_autoresearch/2026-04-24-handover-t-sweep.md](research_logs/phase6_2_autoresearch/2026-04-24-handover-t-sweep.md) | todo |
+| Phase 5.7 Part A (2026-04-23 handover) | [research_logs/phase5_downstream_utility/2026-04-23-handover-t-scaling-autoresearch.md](research_logs/phase5_downstream_utility/2026-04-23-handover-t-scaling-autoresearch.md) | complete (A1,A2,A3,A4,A6 done; A5 partial — T=24,28 in flight; A7 plots done, HF sync pending) |
+| Phase 5.7 Part B T-scaling log (this session) | [research_logs/phase5_downstream_utility/2026-04-24-partB-tscaling-log.md](research_logs/phase5_downstream_utility/2026-04-24-partB-tscaling-log.md) | in-progress (H1 fail; H3 queued) |
 
 ### 6. Key scripts
 
