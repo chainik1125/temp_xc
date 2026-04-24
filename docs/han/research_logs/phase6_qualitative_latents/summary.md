@@ -476,7 +476,7 @@ Seed counts per arch:
 | `agentic_txc_02_batchtopk` (Cycle F, 3-seed) | 21.7 ± 0.88 | 16.0 ± 2.52 | **0.0 ± 0.00** | 6-7/7 |
 | `agentic_txc_09_auxk` (Cycle A) | 21 | 13 | **0** | 7/7 |
 | `agentic_txc_11_stack` (Cycle H) | 21 | 12 | **0** | 7/7 |
-| **`agentic_txc_10_bare` (Track 2, 3-seed)** | 21.0 ± 1.53 | 17.7 ± 2.40 | **3.0 ± 1.00** | 7/7 |
+| **`agentic_txc_10_bare` (Track 2, 3-seed)** | 21.3 ± 1.45 | 17.7 ± 2.40 | **3.3 ± 1.33** | 7/7 |
 | `agentic_txc_12_bare_batchtopk` (2×2 cell, 3-seed) | 20.3 ± 1.45 | 14.7 ± 1.33 | **1.7 ± 0.33** | 6-7/7 |
 | `agentic_mlc_08` | 18 | 18 | 2 | 4/7 |
 | `tsae_ours` | 17 | 19 | 3 | 6/7 |

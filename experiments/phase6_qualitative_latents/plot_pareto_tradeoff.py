@@ -39,6 +39,12 @@ ARCHS = {
     "agentic_txc_09_auxk": ("TXC+AuxK (Cycle A)", "#6baed6"),
     "agentic_txc_11_stack": ("TXC+BatchTopK+AuxK (Cycle H)", "#c6dbef"),
     "agentic_txc_10_bare": ("TXC+anti-dead (Track 2)", "#08519c"),
+    "agentic_txc_12_bare_batchtopk": ("TXC+anti-dead+BatchTopK (2×2)", "#4292c6"),
+    "phase62_c1_track2_matryoshka": ("Track2+matr (C1)", "#9e9ac8"),
+    "phase62_c2_track2_contrastive": ("Track2+contr (C2)", "#756bb1"),
+    "phase62_c3_track2_matryoshka_contrastive": ("Track2+matr+contr (C3)", "#54278f"),
+    "phase62_c5_track2_longer": ("Track2 longer (C5)", "#bcbddc"),
+    "phase62_c6_bare_batchtopk_longer": ("2×2 longer (C6)", "#dadaeb"),
     "agentic_mlc_08": ("MLC", "#31a354"),
     "tsae_paper": ("T-SAE (paper)", "#d62728"),
     # tsae_ours + tfa_big have no Phase 5 probing; skipped unless we add it
