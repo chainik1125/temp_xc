@@ -448,12 +448,15 @@ def mixed_text_iter(
     from datasets import load_dataset
 
     rng = random.Random(seed)
-    streams: list[tuple[float, str, Iterator]] = []
+    # (weight, name, split, iterator) — split is preserved so exhaustion-
+    # triggered restarts use the right split.
+    streams: list[tuple[float, str, str, Iterator]] = []
     total_w = sum(float(m["weight"]) for m in mix)
     for entry in mix:
         w = float(entry["weight"]) / total_w
-        ds = load_dataset(entry["name"], split=entry.get("split", "train"), streaming=True)
-        streams.append((w, entry["name"], iter(ds)))
+        split = entry.get("split", "train")
+        ds = load_dataset(entry["name"], split=split, streaming=True)
+        streams.append((w, entry["name"], split, iter(ds)))
 
     while True:
         r = rng.random()
@@ -464,15 +467,15 @@ def mixed_text_iter(
             if r <= cum:
                 picked = tup
                 break
-        _, name, it = picked
+        _, name, split, it = picked
         try:
             row = next(it)
         except StopIteration:
-            # Restart the stream on exhaustion.
-            ds = load_dataset(name, split="train", streaming=True)
+            # Restart the stream on exhaustion, preserving the configured split.
+            ds = load_dataset(name, split=split, streaming=True)
             it_new = iter(ds)
-            idx = [i for i, (_, n, _) in enumerate(streams) if n == name][0]
-            streams[idx] = (streams[idx][0], name, it_new)
+            idx = [i for i, (_, n, _, _) in enumerate(streams) if n == name][0]
+            streams[idx] = (streams[idx][0], name, split, it_new)
             row = next(it_new)
 
         if "messages" in row:
