@@ -622,6 +622,20 @@ test of whether we can close the qualitative gap to tsae_paper
 without giving up the TXC family's probing utility — the Pareto-
 ideal corner.
 
+**Phase 6.2 C3 result (seed=42):** Cycle F concat_A = 22, concat_B
+= 16, **concat_random = 2**. Adding matryoshka + single-scale
+InfoNCE to Track 2's anti-dead stack (≈ the full tsae_paper
+recipe on the TXC window-based encoder) gives roughly the same
+random-concept score as the 2×2 cell (BatchTopK + anti-dead
+without matryoshka / contrastive): both land at 2/32 random.
+**The tsae_paper recipe does NOT transfer cleanly to the TXC
+encoder base.** Phase 6.2 continues with C1 (matryoshka only),
+C2 (contrastive only), C5/C6 (longer training) to isolate what's
+different, but the headline is: the 10-label gap between TXC-family
+(all at 0-5/32 random) and tsae_paper (12.7 ± 1.2 /32 random) is
+structural to the TXC window encoder, not a missing training
+ingredient.
+
 #### Figure for Track 2 on concat_B (preliminary)
 
 Figure 6 in the git-history version of this section showed Cycle F's
