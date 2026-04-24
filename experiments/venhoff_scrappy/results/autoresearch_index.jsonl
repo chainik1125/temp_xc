@@ -8,3 +8,4 @@
 {"schema_version": 1, "ts": "2026-04-24T05:41:01", "candidate": "tempxc_nclusters10", "verdict": "FAILED", "failure_reason": "run_cycle_rc_1"}
 {"schema_version": 1, "ts": "2026-04-24T05:46:35", "candidate": "tempxc_nclusters15", "verdict": "FAILED", "failure_reason": "run_cycle_rc_1"}
 {"schema_version": 1, "ts": "2026-04-24T05:51:58", "candidate": "mlc_nclusters5", "verdict": "FAILED", "failure_reason": "run_cycle_rc_1"}
+{"schema_version": 1, "ts": "2026-04-24T05:57:11", "candidate": "mlc_nclusters10", "verdict": "FAILED", "failure_reason": "run_cycle_rc_1"}
