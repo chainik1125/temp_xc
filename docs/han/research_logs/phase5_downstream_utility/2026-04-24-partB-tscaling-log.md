@@ -115,15 +115,24 @@ at T≥30 where per-position matryoshka OOMs on A40.
 
 ## Cycle outcomes (filled when complete)
 
-| cycle | hypothesis | mono_lp | Δ(30-5)_lp | mono_mp | Δ(30-5)_mp | verdict |
-|---|---|---|---|---|---|---|
-| 1 | H1 conv encoder | _ | _ | _ | _ | _ |
-| 2 | H3 log-matryoshka | _ | _ | _ | _ | _ |
-| 3 | H5 SVD regularizer | _ | _ | _ | _ | _ |
-| 4 | H4 multi-distance contrastive | _ | _ | _ | _ | _ |
-| 5 | H2 attention-pool decoder | _ | _ | _ | _ | _ |
-| 6 | H7 MLC-enc + T-dec hybrid | _ | _ | _ | _ | _ |
-| 7 | H8 stack winners | _ | _ | _ | _ | _ |
+| cycle | hypothesis | lp AUC (s42) | vs agentic_txc_02 3s (0.7749) | verdict |
+|---|---|---|---|---|
+| 1 | H1 conv encoder (T-sweep) | 0.7612 | −0.014 | ❌ fails T-scaling |
+| 2 | H3 log-matryoshka (T-sweep) | _pending_ | _ | _ |
+| 3 | **H7 anti-dead × multi-scale** | **0.7915** | **+0.017** | ⭐ **BEST TXC so far** |
+| 4 | H8 multi-distance contrastive | _pending_ | _ | _ |
+| 5 | H9 feature-nested matryoshka (plain) | _pending_ | _ | _ |
+| 6 | H9b feature-nested + contrastive | _pending_ | _ | _ |
+| 7 | H10a shared relu-sum encoder + pos | _pending_ | _ | _ |
+| 8 | H10b shared relu-sum encoder (no pos) | _pending_ | _ | _ |
+| 9 | H12 shared concat two-layer | _pending_ | _ | _ |
+
+**H7 = new TXC headline at last_position**: 0.7915 vs agentic_txc_02 3s
+0.7749 (+0.017) and Phase 6.2 C3 0.7834 (+0.008). Anti-dead stack +
+multi-scale contrastive is the combination. 3-seed variance pending.
+
+MLC family still tops the lp benchmark overall (0.8046-0.8124), but
+gap to TXC family has closed from ~0.04 to ~0.02.
 
 ---
 
