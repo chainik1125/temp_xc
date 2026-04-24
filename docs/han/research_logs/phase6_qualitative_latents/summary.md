@@ -463,23 +463,25 @@ entropy of peak-passage distribution) reports where the top-N
 features fire. Not discriminative at P=3, 4 (all archs saturate
 at full coverage); useful at P=7.
 
-#### Headline (N=32, temp=0, multi-judge; seed=42 except where noted)
+#### Headline (N=32, temp=0, multi-judge)
 
-Cycle F numbers are the 3-seed mean (seeds 42, 1, 2) ± stderr. Every
-other arch is a single seed=42 snapshot (triangle seed-variance on
-tsae_paper and 2×2 cell still in flight).
+Seed counts per arch:
+- **3-seed**: Cycle F (42, 1, 2), 2×2 cell (42, 1, 2), tsae_paper (42, 1, 2)
+- **1-seed** (seed=42): everything else. Track 2 seed variance is
+  running in the chain's Stage 5; tables here are snapshot.
 
-| arch | concat_A /32 | concat_B /32 | **concat_random /32** | random cov k/P |
+| arch | concat_A | concat_B | **concat_random** | random cov k/P |
 |---|---|---|---|---|
 | `agentic_txc_02` (baseline) | 17 | 16 | **0** | 7/7 |
-| **`agentic_txc_02_batchtopk` (Cycle F, 3 seeds)** | **21.7 ± 0.88** | **16.0 ± 2.52** | **0.0 ± 0.00** | 6-7/7 |
+| `agentic_txc_02_batchtopk` (Cycle F, 3-seed) | 21.7 ± 0.88 | 16.0 ± 2.52 | **0.0 ± 0.00** | 6-7/7 |
 | `agentic_txc_09_auxk` (Cycle A) | 21 | 13 | **0** | 7/7 |
 | `agentic_txc_11_stack` (Cycle H) | 21 | 12 | **0** | 7/7 |
 | **`agentic_txc_10_bare` (Track 2)** | 20 | **19** | **5** | 7/7 |
+| `agentic_txc_12_bare_batchtopk` (2×2 cell, 3-seed) | 20.3 ± 1.45 | 14.7 ± 1.33 | **1.7 ± 0.33** | 6-7/7 |
 | `agentic_mlc_08` | 18 | 18 | 2 | 4/7 |
 | `tsae_ours` | 17 | 19 | 3 | 6/7 |
 | `tfa_big` | 14 | 12 | **0** | **2/7** |
-| **`tsae_paper`** | **23** | 18 | **12** | 7/7 |
+| **`tsae_paper` (3-seed)** | **23.0 ± 1.15** | 17.7 ± 0.88 | **12.7 ± 1.20** | 7/7 |
 
 **Cycle F seed-variance observations:**
 
