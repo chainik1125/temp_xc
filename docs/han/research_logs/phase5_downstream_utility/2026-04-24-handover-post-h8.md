@@ -32,6 +32,39 @@ inverse-distance weighted).
 The novel ingredient is multi-distance contrastive. Everything else
 was already tested individually.
 
+### Matryoshka H/L detail (NOT Phase 5.7's position-nested matryoshka)
+
+H8's matryoshka is tsae_paper-style: **two reconstructions, both
+targeting the full T-token window**. Not T nested sub-windows.
+
+```
+x_hat_H  = z[:, :3686]  · W_dec[:3686, :, :]  + b_dec   # H prefix = d_sae/5
+x_hat    = z            · W_dec              + b_dec    # full dict (d_sae=18432)
+
+L_recon  = MSE(x_hat_H, x)  +  MSE(x_hat, x)     # unweighted sum
+```
+
+Key differences from Phase 5.7 `agentic_txc_02`:
+- Only **2 scales** (H, Full) — not T scales.
+- **Both reconstructions target the FULL T-token window** — not centered
+  (s+1)-token sub-windows.
+- **Shared decoder** `W_dec : (d_sae, T, d_in)` — H recon uses the first
+  3686 rows. No per-scale separate decoders.
+- **Unweighted sum** — no γ-decay.
+
+The contrastive InfoNCE operates on `z[:, :3686]` (the H prefix).
+So the multi-distance invariance pressure ALSO lives in the H partition
+— the 3686 high-level latents must reconstruct x alone AND stay
+consistent across shift-1/2 pairs. The remaining 14746 (L partition)
+are free to specialize without contrastive constraint, and just
+contribute to the full recon.
+
+Handover of H8's arch class: `TXCBareMatryoshkaContrastiveAntidead`
+(parent, in `txc_bare_matryoshka_contrastive_antidead.py`) →
+`TXCBareMultiDistanceContrastiveAntidead` (H8, in
+`txc_bare_multidistance_contrastive_antidead.py`). The matryoshka
+logic lives in parent's `_recon_loss` method.
+
 ### New TXC runner-up: H7 = `phase57_partB_h7_bare_multiscale` (3-seed)
 
 Same stack as H8 but with agentic_txc_02's **multi-scale** InfoNCE
