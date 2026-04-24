@@ -42,7 +42,11 @@ phase3_hybrid:
   max_new_tokens: 500      # paper: 2000
   max_thinking_tokens: 500 # paper: 2000
   coefficients: [0.5]      # paper: [0.1, 0.2, ..., 1.0]
-  token_windows: [0, -15]  # paper: [0, -1, -15, -50, -100]
+  # Cut to 1 hybrid cell/task for scrappy budget — halves generation
+  # time vs [0, -15]. token_window=0 is the "apply at every token"
+  # variant that wins most of Venhoff's grid; -15 can come back in
+  # exploit phase after screening.
+  token_windows: [0]       # paper: [0, -1, -15, -50, -100]
 
 grade:
   judge_model: claude-haiku-4-5-20251001
@@ -63,8 +67,12 @@ autoresearch:
   discard_threshold_pp: -10.0
   stop_after_n_stale_cycles: 5
 
-# Per-cycle timeout (bash kills stuck cycles and emits FAILED row):
-cycle_timeout_s: 1800    # 30 min (3× expected 10 min)
+# Per-cycle timeout (bash kills stuck cycles and emits FAILED row).
+# Revised 2026-04-24: A40-scale no-vLLM hybrid is ~1.4s/tok. Worst-case
+# per-task = 3 gens × 500 tok × 1.4s = 35 min if none EOS early; with
+# 1 coef × 1 window × 20 tasks typical runs 30-60 min. Give 90 min
+# headroom; stuck cycles still get killed before they eat the night.
+cycle_timeout_s: 5400    # 90 min (was 30 min)
 
 # Schema versioning on ledger rows.
 ledger_schema_version: 1

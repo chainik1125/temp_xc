@@ -50,9 +50,9 @@ Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>" 2>&1 | tee
 }
 
 # Per-cycle timeout (kills stuck vLLM / nnsight processes instead of
-# burning the whole overnight budget). Default 30 min; can override
-# via env or config.yaml cycle_timeout_s.
-CYCLE_TIMEOUT_S="${CYCLE_TIMEOUT_S:-1800}"
+# burning the whole overnight budget). Default matches config.yaml's
+# cycle_timeout_s (90 min for A40-scale hybrid). Override via env.
+CYCLE_TIMEOUT_S="${CYCLE_TIMEOUT_S:-5400}"
 
 # GPU orphan cleanup — invoked on cycle timeout. Patterns learned the
 # hard way during the 2026-04-22 paper-budget run: pkill against
