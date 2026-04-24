@@ -782,6 +782,43 @@ tighten this.
 winner. The MLC-contrastive family dominates lp; TXCDR/matryoshka
 family dominates mp.
 
+##### Paired-t-test with Bonferroni correction (n_comp=16)
+
+For each pair (A, B), per-task Δ_i = AUC_A[task_i] − AUC_B[task_i];
+paired-t-test on 36 deltas. 3-seed columns average per-task AUCs over
+seeds {1, 2, 42} before differencing. Significance at Bonferroni-
+corrected p < 0.05 denoted ⭐.
+
+| A vs B | agg | Δ (3-seed avg) | p_raw | p_bonferroni | verdict |
+|---|---|---|---|---|---|
+| agentic_mlc_08 vs mlc | lp | +0.0185 | 0.0003 | **0.0047** | ⭐ significant |
+| agentic_mlc_08 vs mlc_contrastive | lp | +0.0067 | 0.094 | 1.00 | tied |
+| agentic_mlc_08 vs mlc | mp | +0.0112 | 0.127 | 1.00 | tied |
+| agentic_mlc_08_batchtopk vs agentic_mlc_08 | lp | −0.0145 | 0.012 | 0.20 | tied (negative trend) |
+| mlc_contrastive_alpha100 vs mlc_contrastive | lp | +0.0014 | 0.79 | 1.00 | tied |
+| mlc_contrastive_alpha100_batchtopk vs mlc_contrastive_alpha100 | lp | +0.0051 | 0.47 | 1.00 | tied |
+| mlc_contrastive_alpha100_batchtopk vs agentic_mlc_08 | lp | −0.0002 | 0.97 | 1.00 | **tied** (headline!) |
+| agentic_txc_02 vs txcdr_t5 | lp | −0.0009 | 0.89 | 1.00 | tied |
+| agentic_txc_02 vs txcdr_t5 | mp | +0.0028 | 0.66 | 1.00 | tied |
+| agentic_txc_02 vs matryoshka_t5 | lp | +0.0240 | 0.0006 | **0.0090** | ⭐ significant |
+| agentic_txc_02 vs matryoshka_t5 | mp | +0.0250 | 0.0003 | **0.0054** | ⭐ significant |
+
+**Key findings**:
+
+- **Only 2 of 16 comparisons survive Bonferroni correction**:
+  `agentic_mlc_08 vs mlc` (MLC multi-scale vs vanilla MLC at lp) and
+  `agentic_txc_02 vs matryoshka_t5` (agentic vs vanilla matryoshka at both aggs).
+- **The 4-way lp headline tie is real**: `mlc_contrastive_alpha100_batchtopk`,
+  `agentic_mlc_08`, `mlc_contrastive_alpha100`, `mlc_contrastive` are
+  pairwise statistically tied at lp. None beat the others significantly.
+- **agentic_txc_02's +0.0023 lp margin over txcdr_t5** (highlighted in earlier
+  headline) is NOT significant (p_bonf=1.00). Only the matryoshka family
+  comparison survives.
+- **BatchTopK swaps are trending negative on MLC-family** (agentic_mlc_08
+  Δ=−0.015 lp) but not reaching Bonferroni significance — noise-limited.
+
+Raw table: [`results/a3_seed_stats.json`](../../../../experiments/phase5_downstream_utility/results/a3_seed_stats.json).
+
 #### Training dynamics (25 archs)
 
 ![Training loss curves (log-log)](../../../../experiments/phase5_downstream_utility/results/plots/training_curves_loglog.png)
