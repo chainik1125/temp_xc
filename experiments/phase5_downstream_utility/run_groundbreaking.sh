@@ -71,6 +71,10 @@ wait_for_gpu_idle() {
 echo "================ P0a H8 T-sweep ================"
 wait_for_gpu_idle
 train_and_probe_both phase57_partB_h8_bare_multidistance_t10 42
+# Granular fill-in between T=5 (existing) and T=10 — cheap, paper-relevant.
+train_and_probe_both phase57_partB_h8_bare_multidistance_t6 42
+train_and_probe_both phase57_partB_h8_bare_multidistance_t7 42
+train_and_probe_both phase57_partB_h8_bare_multidistance_t8 42
 train_and_probe_both phase57_partB_h8_bare_multidistance_t15 42
 train_and_probe_both phase57_partB_h8_bare_multidistance_t20 42
 train_and_probe_both phase57_partB_h8_bare_multidistance_t30 42

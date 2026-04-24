@@ -100,6 +100,9 @@ ORDERED_ARCHS = [
     # Part B H8 (anti-dead + multi-distance InfoNCE — NEW CHAMPION at mp)
     "phase57_partB_h8_bare_multidistance",
     # Part B H8 T-sweep (paper-critical T-scaling test)
+    "phase57_partB_h8_bare_multidistance_t6",
+    "phase57_partB_h8_bare_multidistance_t7",
+    "phase57_partB_h8_bare_multidistance_t8",
     "phase57_partB_h8_bare_multidistance_t10",
     "phase57_partB_h8_bare_multidistance_t15",
     "phase57_partB_h8_bare_multidistance_t20",
