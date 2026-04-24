@@ -99,6 +99,19 @@ ORDERED_ARCHS = [
     "phase57_partB_h7_bare_multiscale",
     # Part B H8 (anti-dead + multi-distance InfoNCE — NEW CHAMPION at mp)
     "phase57_partB_h8_bare_multidistance",
+    # Part B H8 T-sweep (paper-critical T-scaling test)
+    "phase57_partB_h8_bare_multidistance_t10",
+    "phase57_partB_h8_bare_multidistance_t15",
+    "phase57_partB_h8_bare_multidistance_t20",
+    "phase57_partB_h8_bare_multidistance_t30",
+    # Part B H8a shift ablation
+    "phase57_partB_h8a_shifts1",
+    "phase57_partB_h8a_shifts123",
+    "phase57_partB_h8a_shifts1234",
+    "phase57_partB_h8a_shifts124",
+    "phase57_partB_h8a_shifts2",
+    "phase57_partB_h8a_shifts4",
+    "phase57_partB_h8a_shifts123_uniform",
     # Part B H9 (feature-nested matryoshka)
     "feature_nested_matryoshka_t5",
     "feature_nested_matryoshka_t5_contrastive",
@@ -106,6 +119,13 @@ ORDERED_ARCHS = [
     "txc_shared_relu_sum_pos_t5",
     "txc_shared_relu_sum_nopos_t5",
     "txc_shared_concat_two_layer_t5",
+    # Part B H3 log-matryoshka T-sweep
+    "log_matryoshka_t5", "log_matryoshka_t10", "log_matryoshka_t15",
+    "log_matryoshka_t20", "log_matryoshka_t30",
+    # P0c MLC + anti-dead (fairness counterparts)
+    "mlc_bare_antidead",
+    "mlc_bare_matryoshka_contrastive_antidead",
+    "mlc_bare_multiscale_antidead",
 ]
 BASELINE_ARCHS = ["baseline_last_token_lr", "baseline_attn_pool"]
 
