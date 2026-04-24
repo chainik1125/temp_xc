@@ -11,7 +11,7 @@ phase2_steering:
   n_training_examples: 128
   optim_minibatch_size: 6
   lr: 1e-2
-  n_clusters: 4
+  n_clusters: 5
   reduction: sum
 phase3_hybrid:
   dataset: math500
