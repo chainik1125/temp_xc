@@ -356,6 +356,22 @@ def _load_model_for_run(run_id, ckpt_path, device):
         T = meta["T"]
         k_eff = meta["k_win"] or (meta["k_pos"] * T)
         model = TemporalCrosscoder(d_in, d_sae, T, k_eff).to(device)
+    elif arch in ("feature_nested_matryoshka_t5",
+                  "feature_nested_matryoshka_t5_contrastive"):
+        # User proposal: per-position matryoshka with full-window
+        # reconstruction per scale (nests latent capacity only).
+        from src.architectures.feature_nested_matryoshka_txcdr import (
+            FeatureNestedMatryoshkaTXCDR,
+        )
+        T = meta["T"]
+        k_eff = meta["k_win"] or (meta["k_pos"] * T)
+        model = FeatureNestedMatryoshkaTXCDR(
+            d_in, d_sae, T=T, k=k_eff,
+            n_scales=T,
+            alpha=meta.get("alpha", 0.0),
+            n_contr_scales=meta.get("n_contr_scales", 3),
+            gamma=meta.get("gamma", 0.5),
+        ).to(device)
     elif arch == "phase57_partB_h8_bare_multidistance":
         # Part B H8: multi-distance InfoNCE + anti-dead.
         from src.architectures.txc_bare_multidistance_contrastive_antidead import (
@@ -743,6 +759,8 @@ def _encode_for_probe(
             or arch.startswith("log_matryoshka_t")   # Part B H3
             or arch == "phase57_partB_h7_bare_multiscale"  # Part B H7
             or arch == "phase57_partB_h8_bare_multidistance"  # Part B H8
+            or arch == "feature_nested_matryoshka_t5"  # Part B H9
+            or arch == "feature_nested_matryoshka_t5_contrastive"  # H9 + contrastive
 
             or arch in ("txcdr_contrastive_t5",
                         "txcdr_contrastive_t5_alpha003",

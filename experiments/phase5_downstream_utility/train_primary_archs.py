@@ -1022,6 +1022,54 @@ def train_txc_bare_multiscale_contrastive_antidead(
     }
 
 
+def train_feature_nested_matryoshka_txcdr(
+    cfg, device, k, T, alpha=0.0,
+    n_scales=None, n_contr_scales=3, gamma=0.5,
+    d_sae=DEFAULT_D_SAE, buf=None,
+):
+    """Feature-nested matryoshka: at each scale, reconstruct FULL T-window
+    from a different prefix of the latent (vs PositionMatryoshkaTXCDR
+    which nests window size + latent prefix together).
+
+    alpha=0: pure matryoshka, single-window training.
+    alpha>0: multi-scale InfoNCE on pair-windows at first
+    n_contr_scales prefix lengths with γ decay.
+    """
+    from src.architectures.feature_nested_matryoshka_txcdr import (
+        FeatureNestedMatryoshkaTXCDR,
+    )
+    buf = buf if buf is not None else _preload_single(ANCHOR_LAYER_KEY, device)
+    k_eff = k * T
+    if n_scales is None:
+        n_scales = int(T)
+    model = FeatureNestedMatryoshkaTXCDR(
+        buf.shape[-1], d_sae, T, k_eff,
+        n_scales=n_scales,
+        alpha=alpha,
+        n_contr_scales=n_contr_scales, gamma=gamma,
+    ).to(device)
+
+    if alpha > 0.0:
+        pair_gen = make_pair_window_gen_gpu(buf, T)
+        def gen(batch_size):
+            return pair_gen(batch_size)
+
+        # _iterate_train expects forward(x) -> (loss, ...). Ours supports
+        # alpha kwarg; bind default.
+        orig = model.forward
+        def forward_a(x, _a=alpha, _o=orig):
+            return _o(x, alpha=_a)
+        model.forward = forward_a  # type: ignore[method-assign]
+    else:
+        single_gen = make_window_gen_gpu(buf, T)
+        def gen(batch_size):
+            return single_gen(batch_size)
+
+    def norm(): model._normalize_decoder()
+    log = _iterate_train(model, gen, cfg, device, normalize_decoder=norm)
+    return model, log
+
+
 def train_txc_bare_multidistance_contrastive_antidead(
     cfg, device, k, T,
     alpha=1.0, shifts=None,
@@ -1743,6 +1791,29 @@ def run_all(seeds, max_steps, archs=None):
                 model, log = train_txcdr(cfg, device, k=100, T=T, buf=get_anchor())
                 meta = dict(seed=seed, k_pos=100, k_win=100 * T, T=T,
                             match_budget=True, layer=13)
+            elif arch == "feature_nested_matryoshka_t5":
+                # Feature-nested matryoshka (user proposal): per-scale decoder
+                # reconstructs full T-window using progressive latent prefix.
+                # Plain version (no contrastive).
+                model, log = train_feature_nested_matryoshka_txcdr(
+                    cfg, device, k=100, T=5, alpha=0.0,
+                    buf=get_anchor(),
+                )
+                meta = dict(seed=seed, k_pos=100, k_win=500, T=5,
+                            match_budget=True, layer=13, alpha=0.0,
+                            variant="feature_nested_matryoshka")
+            elif arch == "feature_nested_matryoshka_t5_contrastive":
+                # Feature-nested matryoshka + multi-scale InfoNCE
+                # (combines user's reformulation with agentic_txc_02 cycle 02 recipe).
+                model, log = train_feature_nested_matryoshka_txcdr(
+                    cfg, device, k=100, T=5, alpha=1.0,
+                    n_contr_scales=3, gamma=0.5,
+                    buf=get_anchor(),
+                )
+                meta = dict(seed=seed, k_pos=100, k_win=500, T=5,
+                            match_budget=True, layer=13, alpha=1.0,
+                            n_contr_scales=3, gamma=0.5,
+                            variant="feature_nested_matryoshka_contrastive")
             elif arch == "phase57_partB_h8_bare_multidistance":
                 # Part B H8: anti-dead + matryoshka + multi-distance InfoNCE
                 # (shifts {1, T/4, T/2} at T=5 → shifts {1, 2}).
