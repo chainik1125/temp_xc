@@ -577,7 +577,7 @@ the Phase 5 probing pipeline on all Phase 6 archs at seed=42 (and
 | arch | last_pos AUC | Δ | mean_pool AUC | Δ | random /32 |
 |---|---|---|---|---|---|
 | baseline `agentic_txc_02` (3-seed) | **0.7749** | — | **0.7987** | — | 0 |
-| **Track 2 `agentic_txc_10_bare`** (seed=42) | **0.7752** | +0.0003 | **0.7995** | +0.0008 | **5** |
+| **Track 2 `agentic_txc_10_bare`** (3-seed) | **0.7788 ± 0.003** | **+0.004** | **0.8014 ± 0.002** | **+0.003** | **3.0 ± 1.0** |
 | **2×2 cell `agentic_txc_12_bare_batchtopk`** (3-seed) | **0.7771 ± 0.005** | +0.002 | **0.7956 ± 0.005** | −0.003 | 1.7 ± 0.3 |
 | Cycle F `agentic_txc_02_batchtopk` (3-seed) | 0.7593 ± 0.003 | **−0.016** | 0.7826 ± 0.003 | **−0.016** | 0 |
 | Cycle A `agentic_txc_09_auxk` (seed=42) | 0.7657 | −0.009 | 0.7973 | −0.001 | 0 |
