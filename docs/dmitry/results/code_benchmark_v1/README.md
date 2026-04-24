@@ -157,6 +157,9 @@ Plots: `plots/coarse_nmse_by_category.png`, `plots/coarse_umap_<arch>_<colour>.p
 
 ## Pass 2 — Program-state recovery (the primary benchmark)
 
+> **⚠️ Pass 2's probe R² numbers below are under-regularised** (ridge λ=1e-3 on 16 384-dim SAE latents — ~4 orders of magnitude too low). Pass 5 rebuilds the comparison with a proper λ sweep and dim-matched controls. The ranking TXC > MLC > SAE reported here does **not** survive those controls. Read this section for what was originally computed; read Pass 5 for the final picture.
+
+
 ### What is "program state"?
 
 For each Gemma token, we derive labels from a Python tokenizer + AST walk. The labels are **functions of arbitrary history** — a single-token view cannot produce them. Our labeler emits, per token:
@@ -421,31 +424,145 @@ This disaggregates the original v2-plan claim. "TXC has a niche" is partially ri
 - Only close-bracket prediction; could extend to other syntactic decisions (indent token after `:`, argument count after a function call header, etc.). The test design generalises.
 - v1 through v4 variants are stored in `experiments/code_benchmark/logs/phase4_v1.log` through `phase4_v4.log` as debugging artifacts.
 
+## Pass 5 — Probe-regularization and matched-dim controls (revisions to Phase 2)
+
+### Why this pass happened
+
+After Phase 4 produced the three-way role split below, a reviewer flagged an obvious concern: Phase 2's "TXC wins program-state probes" might just be **TXC sees a 5-token window, SAE sees one token**. Five sub-passes isolate which piece of the Phase 2 result survives matched controls.
+
+### Pass 5a — Raw residual baselines (no SAE in the loop)
+
+Dense ridge probes directly on the Gemma residuals at the anchor layer (before any SAE). Three input configurations:
+
+- `single_pos`   `x_t`                                      (2 304-d)
+- `temporal_window`   `concat(x_{t−4..t})` at layer 12      (11 520-d)
+- `layer_stack`       `concat(x_t at layers 10–14)`          (11 520-d)
+
+With **ridge λ=1** (matching what Phase 2 used on the SAE latents), the temporal-window probe R² was *lower* than the single-position probe — a giveaway that the high-dim baselines were under-regularised.
+
+### Pass 5b — Ridge-λ sweep on the raw baselines
+
+Swept `λ ∈ {10⁻³, …, 10⁵}`. Best λ lands at **10⁴** for every field × input. Raw baseline R²:
+
+| field | raw single-pos (2 304) | raw temporal-window (11 520) | raw layer-stack (11 520) |
+|---|---:|---:|---:|
+| bracket_depth | 0.722 | 0.778 | **0.807** |
+| indent_spaces | 0.558 | 0.629 | **0.720** |
+| scope_nesting | 0.433 | 0.515 | **0.611** |
+| distance_to_header | 0.627 | 0.699 | **0.767** |
+
+Note these raw probes already *beat* the Phase-2 SAE probe numbers on every field — SAE 0.12 → raw 0.56 on indent_spaces is a 44 pp gap. **That is a pure probe-regularisation artefact, not SAE weakness.** Phase 2 used `ridge=1e-3` on 16 384-dim SAE latents; the right λ is 10³–10⁴ by four orders of magnitude.
+
+### Pass 5c — Re-running SAE/MLC probes with proper λ
+
+Same probe data as Phase 2, but sweep `λ ∈ {1, 10, 10², 10³, 10⁴, 10⁵}` with dual-form kernel ridge for the 81 920-dim windowed variants (primal matrix inversion on 80k cols is 54 GB in float64 — OOMs even at 234 GB cgroup; dual form uses the 18 000×18 000 kernel = 2.4 GB).
+
+Input variants:
+
+- `sae_single`  — SAE latent at position t               (16 384-d)
+- `sae_window5` — concat SAE latent at positions t−4..t  (81 920-d)
+- `mlc_single`  — MLC latent at position t               (16 384-d)
+- `mlc_window5` — concat MLC latent at positions t−4..t  (81 920-d)
+
+**Properly-regularised full probe R²:**
+
+| field | SAE single | **SAE window5** | MLC single | **MLC window5** | (Phase 2 TXC) |
+|---|---:|---:|---:|---:|---:|
+| bracket_depth | 0.833 | **0.873** | 0.793 | 0.839 | 0.788 |
+| indent_spaces | 0.565 | **0.702** | 0.517 | 0.624 | 0.527 |
+| scope_nesting | 0.542 | **0.682** | 0.533 | 0.636 | 0.550 |
+| distance_to_header | 0.698 | **0.790** | 0.657 | 0.720 | 0.695 |
+
+Every field's Phase-2 "TXC wins" result overturned — SAE-window beats TXC by **8–17 pp** on all four fields; SAE-single (single-position) beats TXC on three out of four. TXC's apparent Phase-2 advantage was largely Phase 2's own under-regularisation, plus TXC's built-in 5-position access that the Phase-2 single-position SAE probe did not have.
+
+### Pass 5d — Does the SAE-window R² come from exploiting the zero-pattern?
+
+The 81 920-dim window is ~0.4 % dense per sample (320 non-zeros out of 81 920). Reviewer concern: when we center X per-column in ridge, zero entries become negative mean-values and the probe can use "feature α was NOT active at position p" as signal. Sanity checks on the SAE-window probe for bracket_depth (baseline 0.8728):
+
+| variant | R² |
+|---|---:|
+| baseline (centered, full 81 920) | 0.8728 |
+| no-center ridge (zero stays literally zero) | 0.8726 |
+| drop columns with density < 0.001 (keep 27 108) | 0.8704 |
+| drop density < 0.005 (keep 13 916) | 0.8100 |
+| drop density < 0.01 (keep 7 170) | 0.7267 |
+| drop density < 0.05 (keep 794) | 0.5062 |
+| bag-of-features: Σ over 5 positions (16 384-d, position-collapsed) | **0.8576** |
+
+Readings:
+
+- **The zero-pattern is not what drives the R²** (no-center ties centered within 0.0002). Target is actually-active feature values.
+- **Rare features (< 0.1 % density) contribute essentially nothing.** Mid-rarity features (0.1 %–5 %) contribute most of the signal.
+- **Position barely matters for bracket_depth.** Summing the 5 positions into a 16 384-d bag-of-features gives 0.858 — 98.5 % of the full 81 920-d probe's R². The SAE's *positional* window structure is mostly redundant for this label; what matters is "which features fired in the 5-token window".
+
+### Pass 5e — Dimension-matched SAE/MLC against raw baselines
+
+Phase 5c's 0.873 SAE-window number has 81 920 cols vs raw temporal-window's 11 520 cols — a 7× dimensionality advantage. Pass 5e keeps only the top-11 520 columns of each arch's windowed latent (ranked by training-set density) and re-runs the sweep.
+
+| field | SAE top-11 520 | MLC top-11 520 | raw temporal-window (11 520) | raw layer-stack (11 520) | SAE full (81 920) |
+|---|---:|---:|---:|---:|---:|
+| bracket_depth | 0.790 | 0.839 | 0.778 | **0.807** | 0.873 |
+| indent_spaces | 0.594 | 0.624 | 0.629 | **0.720** | 0.702 |
+| scope_nesting | 0.542 | 0.636 | 0.515 | **0.611** | 0.682 |
+| distance_to_header | 0.659 | 0.720 | 0.699 | **0.767** | 0.790 |
+
+Observations:
+
+- **MLC loses nothing by pruning** (0.839 at 11 520 cols ≈ 0.839 at 81 920 cols on bracket_depth). Its useful signal is concentrated in the dense cols.
+- **SAE loses substantially when pruned** (0.873 → 0.790 bracket_depth, 0.702 → 0.594 indent_spaces). The SAE was exploiting rare-but-useful features that don't survive density-prune.
+- **At matched dim, raw layer-stack beats every SAE-family probe on 3/4 fields.** Only on bracket_depth does MLC-window nudge ahead of raw layer-stack (0.839 vs 0.807).
+- **SAE-window at matched dim either ties or loses to raw temporal-window** on 2/4 fields (bracket_depth 0.790 vs raw 0.778 — close; indent_spaces 0.594 vs raw 0.629 — SAE loses).
+
+### Revised conclusion (supersedes the Phase 2 story)
+
+The apparent "TXC wins program-state probes" result was a composite of three things:
+
+1. **Phase 2 used ridge=1e-3 — ~4 orders of magnitude below the optimal λ.** SAE was hit hardest by this because its 16 384-d latent is sparse (k=64 active out of 16 384 per sample), and under-regularisation with many mostly-zero columns generalises especially poorly. With proper λ, the SAE indent_spaces R² jumps from 0.12 → 0.57.
+
+2. **TXC sees 5 positions, Phase-2 SAE saw one.** Giving SAE the same 5-position access at probe level (concatenate 5 per-token latents) adds 4–15 pp and puts SAE-window above TXC on every field.
+
+3. **Both TXC and SAE-window rely on dimensionality over the raw residual.** At matched dimension (11 520 cols), raw layer-stack ridge beats every SAE-family probe on 3/4 fields. None of the three architectures is basis-superior to raw residuals on these labels.
+
+What actually survives at matched dim:
+
+- **MLC-window at 11 520 cols** (dense columns only) is the strongest SAE-family probe on bracket_depth — and ties raw layer-stack closely. The MLC basis IS doing something genuine here.
+- **Position order barely matters for bracket_depth** (bag-of-features keeps 98.5 % of the signal). So TXC's positional architecture is not structurally advantaged on this label class; a position-agnostic encoder would work just as well.
+- **The SAE family still provides sparsity + interpretability**, which has real downstream value (e.g. Phase 4 causal intervention). But if the question is "how well is bracket_depth linearly encoded", the raw residual is already the best reference.
+
 ## Summary
 
-Against the v2 plan's pre-registered predictions:
+Against the v2 plan's pre-registered predictions (updated after Pass 5):
 
-1. ✅ **Phase 2 primary prediction:** TXC > MLC > SAE on continuous history-dependent program-state probes. Large margins on every field.
-2. ✅ **Phase 2 secondary prediction:** TXC ties or loses on single-token semantic state (`scope_kind`, `has_await`). SAE and MLC reach ~1.0 AUC.
-3. ✅ **Phase 1 diagnostic:** TXC features are not collapsed to `k=0`; they spread across the 5-position window. Precondition for "TXC is actually using temporal information" is satisfied.
-4. ❌ **Phase 3 prediction:** TXC did **not** dominate KL in the top surprisal-delta quantile. TXC's KL is uniformly worse than SAE and MLC, and the ratio gets *bigger* on high-history-dependence tokens, not smaller.
-5. ✅ (Expected from theory and confirmed) SAE wins coarse reconstruction / loss-recovered — TXC pays for its temporal mixing with per-token fidelity.
-6. **Phase 4 causal intervention (added post-hoc):** MLC wins the intervention specificity benchmark. TXC has the *weakest* specificity ratio (target vs random active-feature ablation) despite leading Phase 2. TXC's advantage is representational, not causal — its features decode program state but are not the channels the LM reads downstream.
+1. ⚠️ **Phase 2 primary prediction (originally ✅):** TXC > MLC > SAE on continuous history-dependent program-state probes — **this was a probe-regularisation artefact**. With properly-tuned ridge, SAE-window > MLC-window > TXC on every field, and raw layer-stack beats all three on 3/4 fields at matched dimensionality.
+2. ✅ **Phase 2 secondary prediction:** TXC ties or loses on single-token semantic state (`scope_kind`, `has_await`). SAE and MLC reach ~1.0 AUC. This one survives.
+3. ✅ **Phase 1 diagnostic:** TXC features are not collapsed to `k=0`; they spread across the 5-position window. Still valid — TXC uses its window.
+4. ❌ **Phase 3 prediction:** TXC did **not** dominate KL in the top surprisal-delta quantile. TXC's KL is uniformly worse than SAE and MLC.
+5. ✅ (Expected) SAE wins coarse reconstruction / loss-recovered — TXC pays for its temporal mixing with per-token fidelity.
+6. **Phase 4 causal intervention:** MLC wins the intervention specificity benchmark. TXC has the *weakest* specificity ratio despite leading Phase 2. TXC's advantage — when it existed — was representational, not causal.
 
-**Net reading:** the three architectures split roles cleanly:
+**Net reading after Pass 5:**
 
-- **TXC** is the *decoder* of program state (Phase 2 winner).
-- **SAE** is the *preserver* of LM predictions (Phase 3 winner) with the *most specific* intervention per feature (Phase 4 ratio 10.7×).
-- **MLC** is the *causal intervener* — its cross-layer latent basis aligns with how the LM itself builds bracket-depth information, so ablating MLC's bracket-depth features actually moves the LM's next-token prediction (Phase 4 absolute excess 2.5× SAE/TXC).
+- **Neither TXC nor SAE is basis-superior to raw residuals** for decoding these program-state quantities at matched dimensionality. The Phase 2 "TXC niche" vanishes under proper controls.
+- **MLC is the one arch with a genuine, survivable advantage** — MLC-window at matched dim ties raw layer-stack on bracket_depth, beats raw on nothing else, but it's the arch that most cleanly recovers its full probe performance from a compact dense-feature subset (doesn't rely on rare features). It was also the Phase-4 causal-intervention winner. So MLC is doing something the others are not: its latent basis aligns with the LM's own cross-layer processing of syntactic state.
+- **TXC's original "code niche" claim is essentially retracted.** TXC's Phase-2 lead was dimensionality + under-regularization; its Phase-3 loss-recovered was the worst of the three; its Phase-4 intervention specificity was the worst. There is no benchmark in this run where TXC structurally beats MLC or SAE once controls are in place.
+- **If your research question is "does the LM encode program state?", don't use an SAE.** Use a ridge probe on raw residuals with proper λ. If your question is "can I causally intervene on the LM's bracket-tracking?", MLC features are the pick (Phase 4). If your question is "which features preserve next-token predictions?", SAE is the pick (Phase 3).
 
-The v2 plan's core claim — "TXC has a code niche" — is **confirmed for representation / interpretation tasks** and **refuted for causal-intervention tasks**. If the research question is "which features encode program state?", use TXC. If it's "which features does the LM *use* to decide what comes next?", use MLC.
+The v2 plan's core claim — "TXC has a code niche" — is **not supported** once probe regularisation and dimensionality are properly controlled.
 
 ## Artifacts
 
 Local:
 - `experiments/code_benchmark/results/coarse_summary.json`
 - `experiments/code_benchmark/results/phase1_<arch>.json`
-- `experiments/code_benchmark/results/phase2_summary.json` (headline tables above)
+- `experiments/code_benchmark/results/phase2_summary.json` (under-regularised — see Pass 5)
+- `experiments/code_benchmark/results/phase3_summary.json`
+- `experiments/code_benchmark/results/phase4_intervention_<arch>.json`
+- `experiments/code_benchmark/results/phase4_summary.json`
+- `experiments/code_benchmark/results/phase5_rawprobe_summary.json` (Pass 5a)
+- `experiments/code_benchmark/results/phase5b_ridge_sweep.json` (Pass 5b, raw λ sweep)
+- `experiments/code_benchmark/results/phase5c_windowed_sae_mlc.json` (Pass 5c, properly-tuned SAE/MLC probes)
+- `experiments/code_benchmark/results/phase5d_sparse_probe.json` (Pass 5d, sparsity sanity checks)
+- `experiments/code_benchmark/results/phase5e_matched_dim.json` (Pass 5e, dim-matched)
 - `experiments/code_benchmark/plots/*.png`
 - `experiments/code_benchmark/checkpoints/{topk_sae,txc_t5,mlc_l5}.pt` (not yet rsynced back — ~5 GB)
 

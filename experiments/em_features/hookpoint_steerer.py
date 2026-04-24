@@ -76,3 +76,78 @@ class HookpointSteerer:
     # Backwards-compat alias; ActivationSteerer exposes .remove().
     def remove(self):
         self.__exit__(None, None, None)
+
+
+class TXCWindowSteerer:
+    """TXC-specific steerer that adds per-position decoder directions to the
+    last min(seq_len, T) positions of the block-L residual output at every
+    forward pass.
+
+    With kv-cache enabled:
+      - prefill (seq_len=prompt_len, often >= T): steering writes positions
+        prompt_len-T..prompt_len-1 using decoder slots 0..T-1. Those steered
+        residuals are cached, so subsequent decoded tokens attend to the
+        steered kv-cache entries.
+      - decode step (seq_len=1): applies only slot T-1 at the current token.
+
+    With kv-cache disabled: every decode step sees full prompt + generated-so-far;
+    steering applies to last T positions each step.
+
+    Feature directions are unit-normed per (position, feature) slice so that α
+    has a consistent magnitude meaning. ``coefficient`` is a scalar applied to
+    each selected feature's contribution.
+    """
+
+    def __init__(
+        self,
+        model,
+        txc,
+        layer: int,
+        feature_ids,
+        coefficient: float,
+    ):
+        import torch
+        self.model = model
+        self.layer = layer
+        self.coefficient = float(coefficient)
+        self.T = int(txc.T)
+        param = next(model.parameters())
+        rows = txc.W_dec.data[:, feature_ids, :]  # (T, k, d_in)
+        rows = rows / (rows.norm(dim=-1, keepdim=True) + 1e-8)
+        # Summed over selected features, per position: (T, d_in)
+        self._per_pos = (self.coefficient * rows.sum(dim=1)).to(param.dtype).to(param.device)
+        self._handle = None
+
+    def _hook(self, module, inputs, output):
+        import torch
+        if isinstance(output, tuple):
+            head = output[0]
+            rest = output[1:]
+        else:
+            head = output
+            rest = None
+        if self.coefficient == 0.0 or head.shape[1] == 0:
+            return output
+        seq_len = head.shape[1]
+        n = min(seq_len, self.T)
+        add = self._per_pos[self.T - n:self.T].to(head.dtype)  # (n, d_in)
+        patched = head.clone()
+        patched[:, -n:, :] = patched[:, -n:, :] + add.unsqueeze(0)
+        if rest is None:
+            return patched
+        return (patched,) + rest
+
+    def __enter__(self):
+        if self.coefficient == 0.0:
+            return self
+        block = self.model.model.layers[self.layer]
+        self._handle = block.register_forward_hook(self._hook)
+        return self
+
+    def __exit__(self, *exc):
+        if self._handle is not None:
+            self._handle.remove()
+            self._handle = None
+
+    def remove(self):
+        self.__exit__(None, None, None)

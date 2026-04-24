@@ -99,8 +99,16 @@ cd $TEMP_XC && PYTHONPATH=$TEMP_XC python -m experiments.em_features.write_front
     --out $DOCS_RESULTS/summary_txc_small_scaling.md \
     --title "TXC small-dict training-length scaling"
 
+# Big-TXC phase is gated by a sentinel so we can pause before it starts and
+# run ranking-comparison sweeps on a clean GPU first (touch .stop_big_txc
+# to skip, rm to re-enable).
+if [ -e "$EM/.stop_big_txc" ]; then
+    log "big TXC skipped (sentinel $EM/.stop_big_txc present) — exiting small-TXC phase"
+    exit 0
+fi
+
 # ---------------------------------------------------------------------------
-# Runs B / C / D — big TXC (d_sae=$BIG_DSAE), single training to 300k with
+# Runs B / C / D — big TXC (d_sae=$BIG_DSAE), single training to 200k with
 # mid-run snapshots. GPU: training ≈ 58 GB, safe on 80 GB H100.
 # ---------------------------------------------------------------------------
 log "GPU before Run B:"; nvidia-smi --query-gpu=memory.used,memory.free --format=csv,noheader || true

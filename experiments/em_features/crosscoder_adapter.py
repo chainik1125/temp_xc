@@ -151,26 +151,88 @@ def decompose_diff_on_txc(
     *,
     top_k: int = 200,
     position="last",
+    ranking: str = "last_cos",
 ) -> dict:
-    """Cosine-similarity decomposition of a (d_in,) diff vector onto TXC
-    decoder rows at `position`.
+    """Decomposition of a (d_in,) diff vector onto TXC decoder rows.
+
+    Supported ``ranking``:
+      - ``last_cos``  (default, legacy): cosine at the ``position`` slot only.
+      - ``sum_cos``   sum of |cos| across all T decoder slots — rewards features
+                      that write in the misalignment direction at any position.
+      - ``max_cos``   max |cos| across slots — like sum_cos but picks the peak.
+      - ``mean_abs_cos`` mean |cos| (= sum_cos / T) — same ranking as sum_cos.
 
     Output shape matches the schema used by em-features' sae_decomposition so
     the downstream steering code doesn't need to branch on steerer type.
     """
     if diff_vec.dim() != 1:
         raise ValueError(f"expected 1D diff_vec, got {tuple(diff_vec.shape)}")
-    t = _resolve_position(position, txc.T)
-    dec = txc.W_dec.data[t].float()  # (d_sae, d_in)
-    dec_u = dec / (dec.norm(dim=-1, keepdim=True) + 1e-8)
-    v = diff_vec.float().to(dec_u.device)
+
+    v = diff_vec.float().to(txc.W_dec.device)
     v_u = v / (v.norm() + 1e-8)
-    sims = dec_u @ v_u  # (d_sae,)
+
+    if ranking == "last_cos":
+        t = _resolve_position(position, txc.T)
+        dec = txc.W_dec.data[t].float()  # (d_sae, d_in)
+        dec_u = dec / (dec.norm(dim=-1, keepdim=True) + 1e-8)
+        sims = dec_u @ v_u  # (d_sae,)
+    else:
+        dec_full = txc.W_dec.data.float()  # (T, d_sae, d_in)
+        dec_u_full = dec_full / (dec_full.norm(dim=-1, keepdim=True) + 1e-8)
+        per_pos_cos = dec_u_full @ v_u  # (T, d_sae)
+        if ranking in ("sum_cos", "mean_abs_cos"):
+            sims = per_pos_cos.abs().sum(dim=0)  # (d_sae,)
+        elif ranking == "max_cos":
+            sims = per_pos_cos.abs().max(dim=0).values  # (d_sae,)
+        else:
+            raise ValueError(f"unknown ranking {ranking!r}")
 
     sorted_sims, sorted_idx = torch.sort(sims, descending=True)
     k = min(top_k, sims.numel() // 2)
     return {
+        "ranking": ranking,
         "similarities": sims,
+        "sorted_similarities": sorted_sims,
+        "sorted_indices": sorted_idx,
+        "top_features": {
+            "indices": sorted_idx[:k].cpu().tolist(),
+            "similarities": sorted_sims[:k].cpu().tolist(),
+            "count": k,
+        },
+        "bottom_features": {
+            "indices": sorted_idx[-k:].flip(0).cpu().tolist(),
+            "similarities": sorted_sims[-k:].flip(0).cpu().tolist(),
+            "count": k,
+        },
+    }
+
+
+@torch.no_grad()
+def score_txc_features_by_encoder(
+    txc: TemporalCrosscoder,
+    misalign_windows: torch.Tensor,     # (N, T, d_in) — diffs or raw acts
+    control_windows: torch.Tensor | None = None,  # (M, T, d_in), optional
+    *,
+    top_k: int = 200,
+) -> dict:
+    """Rank TXC features by their encoder-latent magnitude on misalignment
+    windows minus control windows. Uses the TXC's own encoder — leverages its
+    window-level sparse code, which the decoder-cosine rankings ignore.
+
+    If ``control_windows`` is None, score = E[|z_i|] on misalignment only.
+    """
+    mis = misalign_windows.float().to(txc.W_dec.device)
+    z_mis = txc.encode(mis)  # (N, d_sae)
+    score = z_mis.abs().mean(dim=0)  # (d_sae,)
+    if control_windows is not None:
+        ctl = control_windows.float().to(txc.W_dec.device)
+        z_ctl = txc.encode(ctl)
+        score = score - z_ctl.abs().mean(dim=0)
+    sorted_sims, sorted_idx = torch.sort(score, descending=True)
+    k = min(top_k, score.numel() // 2)
+    return {
+        "ranking": "encoder_activation",
+        "similarities": score,
         "sorted_similarities": sorted_sims,
         "sorted_indices": sorted_idx,
         "top_features": {

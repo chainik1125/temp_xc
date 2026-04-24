@@ -1,0 +1,82 @@
+{
+  "bracket_depth": {
+    "single_pos": {
+      "metric": "r2",
+      "value": 0.7133222277016509,
+      "n_train": 20000,
+      "n_test": 10631
+    },
+    "temporal_window": {
+      "metric": "r2",
+      "value": 0.6018397833942462,
+      "n_train": 20000,
+      "n_test": 10631
+    },
+    "layer_stack": {
+      "metric": "r2",
+      "value": 0.7043851145453477,
+      "n_train": 20000,
+      "n_test": 10631
+    }
+  },
+  "indent_spaces": {
+    "single_pos": {
+      "metric": "r2",
+      "value": 0.5465435883857386,
+      "n_train": 20000,
+      "n_test": 10631
+    },
+    "temporal_window": {
+      "metric": "r2",
+      "value": 0.3372987480276678,
+      "n_train": 20000,
+      "n_test": 10631
+    },
+    "layer_stack": {
+      "metric": "r2",
+      "value": 0.5990377333278538,
+      "n_train": 20000,
+      "n_test": 10631
+    }
+  },
+  "scope_nesting": {
+    "single_pos": {
+      "metric": "r2",
+      "value": 0.4165646758195841,
+      "n_train": 20000,
+      "n_test": 10631
+    },
+    "temporal_window": {
+      "metric": "r2",
+      "value": 0.14054555359952337,
+      "n_train": 20000,
+      "n_test": 10631
+    },
+    "layer_stack": {
+      "metric": "r2",
+      "value": 0.4337823421030387,
+      "n_train": 20000,
+      "n_test": 10631
+    }
+  },
+  "distance_to_header": {
+    "single_pos": {
+      "metric": "r2",
+      "value": 0.6220824168892592,
+      "n_train": 20000,
+      "n_test": 10562
+    },
+    "temporal_window": {
+      "metric": "r2",
+      "value": 0.4668396440389968,
+      "n_train": 20000,
+      "n_test": 10562
+    },
+    "layer_stack": {
+      "metric": "r2",
+      "value": 0.6362249787845176,
+      "n_train": 20000,
+      "n_test": 10562
+    }
+  }
+}

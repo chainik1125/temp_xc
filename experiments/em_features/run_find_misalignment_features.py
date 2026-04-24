@@ -29,7 +29,10 @@ if str(VENDOR_SRC) not in sys.path:
 
 from sae_day.sae import TemporalCrosscoder  # noqa: E402
 
-from experiments.em_features.crosscoder_adapter import decompose_diff_on_txc  # noqa: E402
+from experiments.em_features.crosscoder_adapter import (  # noqa: E402
+    decompose_diff_on_txc,
+    score_txc_features_by_encoder,
+)
 
 
 def parse_args():
@@ -42,6 +45,13 @@ def parse_args():
     p.add_argument("--top_k", type=int, default=200)
     p.add_argument("--position", default="last",
                    help="Window position to use for decoder direction (last|first|int).")
+    p.add_argument("--ranking", default="last_cos",
+                   choices=["last_cos", "sum_cos", "max_cos", "mean_abs_cos", "encoder"],
+                   help="How to rank features against the diff vector. 'encoder' requires "
+                        "--per_token_windows.")
+    p.add_argument("--per_token_windows", type=Path, default=None,
+                   help=".pt with key 'windows' shape (N, T, d_in) of per-token diffs, for "
+                        "--ranking=encoder. Produced by compute_per_token_diffs.py.")
     p.add_argument("--device", default="cuda")
     return p.parse_args()
 
@@ -74,7 +84,19 @@ def main():
     except ValueError:
         pass
 
-    decomp = decompose_diff_on_txc(diff_vec, txc, top_k=args.top_k, position=position)
+    if args.ranking == "encoder":
+        if args.per_token_windows is None:
+            raise ValueError("--ranking=encoder requires --per_token_windows")
+        obj = torch.load(args.per_token_windows, map_location=args.device)
+        mis = obj["windows"] if isinstance(obj, dict) and "windows" in obj else obj
+        ctl = obj.get("control_windows") if isinstance(obj, dict) else None
+        decomp = score_txc_features_by_encoder(
+            txc, misalign_windows=mis, control_windows=ctl, top_k=args.top_k,
+        )
+    else:
+        decomp = decompose_diff_on_txc(
+            diff_vec, txc, top_k=args.top_k, position=position, ranking=args.ranking,
+        )
 
     # Write files shaped like em-features/sae_decomposition outputs.
     top_features_path = args.out / f"top_{args.top_k}_features_layer_{args.layer}.json"
@@ -83,7 +105,8 @@ def main():
             "layer": args.layer,
             "crosscoder": "TXC",
             "ckpt": str(args.ckpt),
-            "vector_norm": float(diff_vec.float().norm()),
+            "ranking": args.ranking,
+            "vector_norm": float(diff_vec.float().norm()) if args.ranking != "encoder" else None,
             "position": ccfg["T"] - 1 if position == "last" else position,
             "features": [
                 {
