@@ -54,13 +54,21 @@ class MatryoshkaTXCDRContrastiveOrth(MatryoshkaTXCDRContrastive):
         self.lam_orth = lam_orth
 
     def _scale1_orth_penalty(self) -> torch.Tensor:
-        """Mean-square off-diagonal of W_scale1 @ W_scale1^T."""
+        """Sum-of-squared off-diagonal of W_scale1 @ W_scale1^T, normalized
+        so the penalty is on the same order of magnitude as the InfoNCE
+        term (~log(batch_size)) at feature near-orthogonality.
+
+        Scale rationale: Matryoshka recon losses sit at ~16k per step,
+        contrastive at α=1 adds ~7 (log(1024)). We want orth to live on
+        the same scale as contrastive so λ~O(1) is meaningful, not a
+        million-factor mismatch.
+        """
         W = self.W_decs[0]                        # (prefix_1, 1, d_in)
         flat = W.reshape(W.shape[0], -1)          # (prefix_1, d_in)
         G = flat @ flat.t()                       # (prefix_1, prefix_1)
         eye = torch.eye(G.shape[0], device=G.device, dtype=G.dtype)
-        off = G - eye
-        return off.pow(2).mean()
+        off_sq_sum = (G - eye).pow(2).sum()
+        return off_sq_sum / G.shape[0]            # per-feature normalization
 
     def forward(self, x: torch.Tensor, alpha: float = 1.0):
         total, x_hat, z = super().forward(x, alpha=alpha)

@@ -240,16 +240,37 @@
             "losses": 14,
             "n": 36
           },
-          "vs_ref": null
+          "vs_ref": {
+            "mean": 0.0013991791100358697,
+            "stderr": 0.010959824012366143,
+            "t": 0.12766437749886803,
+            "wins": 18,
+            "losses": 16,
+            "n": 36
+          }
         },
         {
           "arch": "mlc_contrastive",
           "label": "\u03b1=0.10 (ref)",
           "alpha": 0.1,
           "k_win": null,
-          "mean": null,
-          "vs_vanilla": null,
-          "vs_ref": null
+          "mean": 0.7932994230893817,
+          "vs_vanilla": {
+            "mean": -0.0030878970562928745,
+            "stderr": 0.00861252394412445,
+            "t": -0.3585356715785352,
+            "wins": 16,
+            "losses": 19,
+            "n": 36
+          },
+          "vs_ref": {
+            "mean": 0.0,
+            "stderr": 0.0,
+            "t": 0.0,
+            "wins": 0,
+            "losses": 0,
+            "n": 36
+          }
         },
         {
           "arch": "mlc_contrastive_alpha100",
@@ -265,7 +286,14 @@
             "losses": 13,
             "n": 36
           },
-          "vs_ref": null
+          "vs_ref": {
+            "mean": 0.00809665853085928,
+            "stderr": 0.008838888801655159,
+            "t": 0.9160267441471953,
+            "wins": 20,
+            "losses": 12,
+            "n": 36
+          }
         }
       ]
     }

@@ -28,7 +28,7 @@ for CAND in tfa_big tfa_pos_big; do
         t0=$(date +%s)
         .venv/bin/python -u -c "
 from experiments.phase5_downstream_utility.train_primary_archs import run_all
-run_all(seeds=[42], max_steps=25000, archs=['$CAND'])
+run_all(seeds=[42], max_steps=8000, archs=['$CAND'])
 " > "$LOG_DIR/train_${CAND}.log" 2>&1
         ec=$?
         say "  train $CAND exit=$ec in $(( $(date +%s) - t0 ))s"
