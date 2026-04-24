@@ -1,0 +1,384 @@
+{
+  "metadata": {
+    "base_model": "meta-llama/Llama-3.1-8B",
+    "thinking_model": "deepseek-ai/DeepSeek-R1-Distill-Llama-8B",
+    "dataset": "math500",
+    "temperature": 0.0,
+    "coefficients": [
+      0.5
+    ],
+    "n_tasks": 20
+  },
+  "answer_lengths": {
+    "base_model": [
+      13,
+      119,
+      82,
+      26,
+      73,
+      43,
+      84,
+      223,
+      68,
+      310,
+      178,
+      307,
+      69,
+      71,
+      75,
+      0,
+      249,
+      176,
+      0,
+      122
+    ],
+    "thinking_model": [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    "hybrid_model": [
+      118,
+      159,
+      45,
+      217,
+      68,
+      106,
+      116,
+      289,
+      78,
+      218,
+      57,
+      84,
+      83,
+      53,
+      42,
+      220,
+      53,
+      341,
+      73,
+      92
+    ],
+    "avg_base": 114.4,
+    "avg_thinking": 1.0,
+    "avg_hybrid": 125.6
+  },
+  "steering_stats": {
+    "no_steering_fractions": [
+      0.23668639053254437,
+      0.672,
+      0.4044943820224719,
+      0.21785714285714286,
+      0.1375,
+      0.2,
+      0.19858156028368795,
+      0.4,
+      0.4306569343065693,
+      0.3008595988538682,
+      0.18181818181818182,
+      0.35668789808917195,
+      0.291044776119403,
+      0.2318840579710145,
+      0.23636363636363636,
+      0.2915451895043732,
+      0.3707865168539326,
+      0.306,
+      0.16483516483516483,
+      0.4444444444444444
+    ],
+    "avg_no_steering": 0.30370229374278035,
+    "detailed_stats": [
+      {
+        "steered_count": 129,
+        "unsteered_count": 40,
+        "total_tokens": 169,
+        "steering_fraction": 0.7633136094674556,
+        "no_steering_fraction": 0.23668639053254437
+      },
+      {
+        "steered_count": 164,
+        "unsteered_count": 336,
+        "total_tokens": 500,
+        "steering_fraction": 0.328,
+        "no_steering_fraction": 0.672
+      },
+      {
+        "steered_count": 53,
+        "unsteered_count": 36,
+        "total_tokens": 89,
+        "steering_fraction": 0.5955056179775281,
+        "no_steering_fraction": 0.4044943820224719
+      },
+      {
+        "steered_count": 219,
+        "unsteered_count": 61,
+        "total_tokens": 280,
+        "steering_fraction": 0.7821428571428571,
+        "no_steering_fraction": 0.21785714285714286
+      },
+      {
+        "steered_count": 69,
+        "unsteered_count": 11,
+        "total_tokens": 80,
+        "steering_fraction": 0.8625,
+        "no_steering_fraction": 0.1375
+      },
+      {
+        "steered_count": 112,
+        "unsteered_count": 28,
+        "total_tokens": 140,
+        "steering_fraction": 0.8,
+        "no_steering_fraction": 0.2
+      },
+      {
+        "steered_count": 113,
+        "unsteered_count": 28,
+        "total_tokens": 141,
+        "steering_fraction": 0.8014184397163121,
+        "no_steering_fraction": 0.19858156028368795
+      },
+      {
+        "steered_count": 300,
+        "unsteered_count": 200,
+        "total_tokens": 500,
+        "steering_fraction": 0.6,
+        "no_steering_fraction": 0.4
+      },
+      {
+        "steered_count": 78,
+        "unsteered_count": 59,
+        "total_tokens": 137,
+        "steering_fraction": 0.5693430656934306,
+        "no_steering_fraction": 0.4306569343065693
+      },
+      {
+        "steered_count": 244,
+        "unsteered_count": 105,
+        "total_tokens": 349,
+        "steering_fraction": 0.6991404011461319,
+        "no_steering_fraction": 0.3008595988538682
+      },
+      {
+        "steered_count": 63,
+        "unsteered_count": 14,
+        "total_tokens": 77,
+        "steering_fraction": 0.8181818181818182,
+        "no_steering_fraction": 0.18181818181818182
+      },
+      {
+        "steered_count": 101,
+        "unsteered_count": 56,
+        "total_tokens": 157,
+        "steering_fraction": 0.643312101910828,
+        "no_steering_fraction": 0.35668789808917195
+      },
+      {
+        "steered_count": 95,
+        "unsteered_count": 39,
+        "total_tokens": 134,
+        "steering_fraction": 0.7089552238805971,
+        "no_steering_fraction": 0.291044776119403
+      },
+      {
+        "steered_count": 53,
+        "unsteered_count": 16,
+        "total_tokens": 69,
+        "steering_fraction": 0.7681159420289855,
+        "no_steering_fraction": 0.2318840579710145
+      },
+      {
+        "steered_count": 42,
+        "unsteered_count": 13,
+        "total_tokens": 55,
+        "steering_fraction": 0.7636363636363637,
+        "no_steering_fraction": 0.23636363636363636
+      },
+      {
+        "steered_count": 243,
+        "unsteered_count": 100,
+        "total_tokens": 343,
+        "steering_fraction": 0.7084548104956269,
+        "no_steering_fraction": 0.2915451895043732
+      },
+      {
+        "steered_count": 56,
+        "unsteered_count": 33,
+        "total_tokens": 89,
+        "steering_fraction": 0.6292134831460674,
+        "no_steering_fraction": 0.3707865168539326
+      },
+      {
+        "steered_count": 347,
+        "unsteered_count": 153,
+        "total_tokens": 500,
+        "steering_fraction": 0.694,
+        "no_steering_fraction": 0.306
+      },
+      {
+        "steered_count": 76,
+        "unsteered_count": 15,
+        "total_tokens": 91,
+        "steering_fraction": 0.8351648351648352,
+        "no_steering_fraction": 0.16483516483516483
+      },
+      {
+        "steered_count": 105,
+        "unsteered_count": 84,
+        "total_tokens": 189,
+        "steering_fraction": 0.5555555555555556,
+        "no_steering_fraction": 0.4444444444444444
+      }
+    ],
+    "average_stats": {
+      "steered_count": 133.1,
+      "unsteered_count": 71.35,
+      "total_tokens": 204.45,
+      "steering_fraction": 0.6962977062572197,
+      "no_steering_fraction": 0.30370229374278035
+    }
+  },
+  "latent_usage": [
+    {
+      "Introducing Additional Considerations": 8.527131782945736,
+      "Retrieving Background Knowledge": 51.93798449612403,
+      "Planning Reasoning Steps": 15.503875968992247,
+      "Arithmetic Computation Steps": 24.031007751937985
+    },
+    {
+      "Introducing Additional Considerations": 21.951219512195124,
+      "Retrieving Background Knowledge": 14.634146341463413,
+      "Arithmetic Computation Steps": 52.4390243902439,
+      "Planning Reasoning Steps": 10.975609756097562
+    },
+    {
+      "Introducing Additional Considerations": 13.20754716981132,
+      "Retrieving Background Knowledge": 50.943396226415096,
+      "Planning Reasoning Steps": 16.9811320754717,
+      "Arithmetic Computation Steps": 18.867924528301888
+    },
+    {
+      "Introducing Additional Considerations": 10.045662100456621,
+      "Planning Reasoning Steps": 9.1324200913242,
+      "Retrieving Background Knowledge": 31.05022831050228,
+      "Arithmetic Computation Steps": 49.77168949771689
+    },
+    {
+      "Introducing Additional Considerations": 7.246376811594203,
+      "Retrieving Background Knowledge": 73.91304347826086,
+      "Planning Reasoning Steps": 14.492753623188406,
+      "Arithmetic Computation Steps": 4.3478260869565215
+    },
+    {
+      "Introducing Additional Considerations": 8.928571428571429,
+      "Planning Reasoning Steps": 19.642857142857142,
+      "Retrieving Background Knowledge": 38.392857142857146,
+      "Arithmetic Computation Steps": 33.035714285714285
+    },
+    {
+      "Introducing Additional Considerations": 5.3097345132743365,
+      "Planning Reasoning Steps": 10.619469026548673,
+      "Retrieving Background Knowledge": 58.4070796460177,
+      "Arithmetic Computation Steps": 25.663716814159294
+    },
+    {
+      "Introducing Additional Considerations": 11.333333333333332,
+      "Retrieving Background Knowledge": 28.666666666666668,
+      "Planning Reasoning Steps": 16.333333333333332,
+      "Arithmetic Computation Steps": 43.666666666666664
+    },
+    {
+      "Introducing Additional Considerations": 7.6923076923076925,
+      "Retrieving Background Knowledge": 34.61538461538461,
+      "Planning Reasoning Steps": 11.538461538461538,
+      "Arithmetic Computation Steps": 46.15384615384615
+    },
+    {
+      "Introducing Additional Considerations": 22.540983606557376,
+      "Planning Reasoning Steps": 20.901639344262296,
+      "Retrieving Background Knowledge": 22.131147540983605,
+      "Arithmetic Computation Steps": 34.42622950819672
+    },
+    {
+      "Introducing Additional Considerations": 6.349206349206349,
+      "Planning Reasoning Steps": 14.285714285714285,
+      "Arithmetic Computation Steps": 26.984126984126984,
+      "Retrieving Background Knowledge": 52.38095238095239
+    },
+    {
+      "Planning Reasoning Steps": 18.81188118811881,
+      "Introducing Additional Considerations": 17.82178217821782,
+      "Retrieving Background Knowledge": 37.62376237623762,
+      "Arithmetic Computation Steps": 25.742574257425744
+    },
+    {
+      "Introducing Additional Considerations": 8.421052631578947,
+      "Retrieving Background Knowledge": 18.947368421052634,
+      "Planning Reasoning Steps": 21.052631578947366,
+      "Arithmetic Computation Steps": 51.578947368421055
+    },
+    {
+      "Introducing Additional Considerations": 13.20754716981132,
+      "Retrieving Background Knowledge": 79.24528301886792,
+      "Planning Reasoning Steps": 3.7735849056603774,
+      "Arithmetic Computation Steps": 3.7735849056603774
+    },
+    {
+      "Introducing Additional Considerations": 9.523809523809524,
+      "Retrieving Background Knowledge": 80.95238095238095,
+      "Arithmetic Computation Steps": 7.142857142857142,
+      "Planning Reasoning Steps": 2.380952380952381
+    },
+    {
+      "Introducing Additional Considerations": 11.934156378600823,
+      "Retrieving Background Knowledge": 27.572016460905353,
+      "Planning Reasoning Steps": 42.79835390946502,
+      "Arithmetic Computation Steps": 17.695473251028808
+    },
+    {
+      "Arithmetic Computation Steps": 17.857142857142858,
+      "Introducing Additional Considerations": 25.0,
+      "Retrieving Background Knowledge": 48.214285714285715,
+      "Planning Reasoning Steps": 8.928571428571429
+    },
+    {
+      "Introducing Additional Considerations": 20.172910662824208,
+      "Planning Reasoning Steps": 19.596541786743515,
+      "Retrieving Background Knowledge": 35.73487031700288,
+      "Arithmetic Computation Steps": 24.495677233429394
+    },
+    {
+      "Introducing Additional Considerations": 11.842105263157894,
+      "Retrieving Background Knowledge": 64.47368421052632,
+      "Planning Reasoning Steps": 11.842105263157894,
+      "Arithmetic Computation Steps": 11.842105263157894
+    },
+    {
+      "Introducing Additional Considerations": 16.19047619047619,
+      "Retrieving Background Knowledge": 32.38095238095238,
+      "Planning Reasoning Steps": 27.61904761904762,
+      "Arithmetic Computation Steps": 23.809523809523807
+    }
+  ],
+  "accuracies": {
+    "base_model": 25.0,
+    "thinking_model": 50.0,
+    "hybrid_model": 5.0
+  }
+}
