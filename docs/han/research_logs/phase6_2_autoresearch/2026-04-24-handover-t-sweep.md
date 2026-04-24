@@ -68,13 +68,66 @@ elif arch == "phase63_track2_t3":
                 variant="phase63_track2_t3")
 elif arch == "phase63_track2_t10":
     model, log = train_txc_bare_antidead(
-        cfg, device, k=100, T=10, ...)
-    meta = dict(..., T=10, k_win=1000, variant="phase63_track2_t10")
+        cfg, device, k=100, T=10,
+        aux_k=512, dead_threshold_tokens=10_000_000,
+        auxk_alpha=1.0 / 32.0,
+        buf=get_anchor(),
+    )
+    meta = dict(seed=seed, k_pos=100, k_win=1000, T=10,
+                match_budget=True, layer=13,
+                aux_k=512, dead_threshold_tokens=10_000_000,
+                auxk_alpha=1.0 / 32.0,
+                variant="phase63_track2_t10")
 elif arch == "phase63_track2_t20":
     model, log = train_txc_bare_antidead(
-        cfg, device, k=100, T=20, ...)
-    meta = dict(..., T=20, k_win=2000, variant="phase63_track2_t20")
+        cfg, device, k=100, T=20,
+        aux_k=512, dead_threshold_tokens=10_000_000,
+        auxk_alpha=1.0 / 32.0,
+        buf=get_anchor(),
+    )
+    meta = dict(seed=seed, k_pos=100, k_win=2000, T=20,
+                match_budget=True, layer=13,
+                aux_k=512, dead_threshold_tokens=10_000_000,
+                auxk_alpha=1.0 / 32.0,
+                variant="phase63_track2_t20")
 ```
+
+**encode_archs.py changes** (add 3 lines each in 2 places):
+
+```python
+# In load_arch, extend the agentic_txc_10_bare branch to cover:
+elif arch in ("agentic_txc_10_bare",
+              "phase63_track2_t3", "phase63_track2_t10",
+              "phase63_track2_t20"):
+    from src.architectures.txc_bare_antidead import TXCBareAntidead
+    T = meta["T"]               # varies per arch now
+    k_eff = meta["k_win"] or (meta["k_pos"] * T)
+    model = TXCBareAntidead(
+        D_IN, D_SAE, T, k_eff,
+        aux_k=int(meta.get("aux_k", 512)),
+        dead_threshold_tokens=int(meta.get("dead_threshold_tokens", 10_000_000)),
+        auxk_alpha=float(meta.get("auxk_alpha", 1.0 / 32.0)),
+    ).to(device)
+
+# In encode_concat_AB and encode_concat_C, extend the TXC-window
+# dispatch tuple:
+if arch in ("agentic_txc_02", "agentic_txc_09_auxk", "agentic_txc_10_bare",
+            "agentic_txc_02_batchtopk", "agentic_txc_11_stack",
+            "agentic_txc_12_bare_batchtopk",
+            "phase62_c1_track2_matryoshka",
+            "phase62_c2_track2_contrastive",
+            "phase62_c3_track2_matryoshka_contrastive",
+            "phase63_track2_t3", "phase63_track2_t10",
+            "phase63_track2_t20"):
+    z = encode_txc(model, resid_L13, device, T=meta["T"])
+```
+
+**run_probing.py changes** — add the 3 names to the
+`agentic_txc_10_bare` load branch (now a tuple like above) AND to
+the matryoshka-style encoder dispatch tuple (around line 700).
+
+**arch_health.py changes** — add to the TXC-list tuple (around line
+110, same pattern as other phase62 archs).
 
 **Also wire into**:
 
