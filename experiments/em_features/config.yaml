@@ -18,7 +18,7 @@ mlc:
   steps: 40000
   batch_size: 256
   lr: 3.0e-4
-  buffer_seqs: 800
+  buffer_seqs: 2000  # bumped from 800 — refills every ~4 steps instead of ~2, big speedup
 
 streaming:
   buffer_activations: 1000000
