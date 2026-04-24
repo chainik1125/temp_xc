@@ -1407,7 +1407,10 @@ def run_all(seeds, max_steps, archs=None):
                             sparsity="batchtopk", variant=arch)
             elif arch in ("txcdr_t2_batchtopk", "txcdr_t3_batchtopk",
                           "txcdr_t8_batchtopk", "txcdr_t10_batchtopk",
-                          "txcdr_t15_batchtopk", "txcdr_t20_batchtopk"):
+                          "txcdr_t15_batchtopk", "txcdr_t20_batchtopk",
+                          "txcdr_t24_batchtopk", "txcdr_t28_batchtopk",
+                          "txcdr_t30_batchtopk",
+                          "txcdr_t32_batchtopk", "txcdr_t36_batchtopk"):
                 from src.architectures._batchtopk_variants import (
                     TemporalCrosscoderBatchTopK,
                 )
@@ -1553,11 +1556,46 @@ def run_all(seeds, max_steps, archs=None):
                 meta = dict(seed=seed, k_pos=100, k_win=2000, T=20,
                             match_budget=True, layer=13)
             elif arch in ("txcdr_t2", "txcdr_t3", "txcdr_t8",
-                          "txcdr_t10", "txcdr_t15"):
+                          "txcdr_t10", "txcdr_t15", "txcdr_t30",
+                          "txcdr_t24", "txcdr_t28", "txcdr_t32", "txcdr_t36"):
                 T = int(arch.removeprefix("txcdr_t"))
                 model, log = train_txcdr(cfg, device, k=100, T=T, buf=get_anchor())
                 meta = dict(seed=seed, k_pos=100, k_win=100 * T, T=T,
                             match_budget=True, layer=13)
+            elif arch.startswith("conv_txcdr_t") and arch.removeprefix("conv_txcdr_t").isdigit():
+                # Part B H1: translation-invariant encoder.
+                from src.architectures.conv_txcdr import ConvTXCDR
+                T = int(arch.removeprefix("conv_txcdr_t"))
+                k_eff = 100 * T
+                buf = get_anchor()
+                d_in = buf.shape[-1]
+                model = ConvTXCDR(d_in, DEFAULT_D_SAE, T=T, k=k_eff,
+                                  kernel_size=3).to(device)
+                gen = make_window_gen_gpu(buf, T=T)
+                def norm(): model._normalize_decoder()
+                log = _iterate_train(model, gen, cfg, device, normalize_decoder=norm)
+                meta = dict(seed=seed, k_pos=100, k_win=k_eff, T=T,
+                            match_budget=True, layer=13,
+                            variant="conv_txcdr_kernel3",
+                            encoder="conv1d_k3_shared_across_T")
+            elif arch.startswith("log_matryoshka_t") and arch.removeprefix("log_matryoshka_t").isdigit():
+                # Part B H3: log-scale matryoshka, O(T²·d_in·d_sae) decoder.
+                from src.architectures.log_matryoshka_txcdr import (
+                    LogMatryoshkaTXCDR, DEFAULT_LOG_SCALES,
+                )
+                T = int(arch.removeprefix("log_matryoshka_t"))
+                k_eff = 100 * T
+                buf = get_anchor()
+                d_in = buf.shape[-1]
+                model = LogMatryoshkaTXCDR(d_in, DEFAULT_D_SAE, T=T, k=k_eff,
+                                           scales=DEFAULT_LOG_SCALES).to(device)
+                gen = make_window_gen_gpu(buf, T=T)
+                def norm(): model._normalize_decoder()
+                log = _iterate_train(model, gen, cfg, device, normalize_decoder=norm)
+                meta = dict(seed=seed, k_pos=100, k_win=k_eff, T=T,
+                            match_budget=True, layer=13,
+                            variant="log_matryoshka",
+                            scales=list(model.scales))
             elif arch == "stacked_t5":
                 model, log = train_stacked(cfg, device, k=100, T=5, buf=get_anchor())
                 meta = dict(seed=seed, k_pos=100, k_win=500, T=5, layer=13)

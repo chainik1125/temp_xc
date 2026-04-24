@@ -350,10 +350,28 @@ def _load_model_for_run(run_id, ckpt_path, device):
             gamma=meta.get("gamma", 0.5),
         ).to(device)
     elif arch in ("txcdr_t2", "txcdr_t3", "txcdr_t5", "txcdr_t8",
-                  "txcdr_t10", "txcdr_t15", "txcdr_t20"):
+                  "txcdr_t10", "txcdr_t15", "txcdr_t20", "txcdr_t30",
+                  "txcdr_t24", "txcdr_t28", "txcdr_t32", "txcdr_t36"):
         T = meta["T"]
         k_eff = meta["k_win"] or (meta["k_pos"] * T)
         model = TemporalCrosscoder(d_in, d_sae, T, k_eff).to(device)
+    elif arch.startswith("conv_txcdr_t") and arch.removeprefix("conv_txcdr_t").isdigit():
+        # Part B H1: ConvTXCDR — translation-invariant encoder.
+        from src.architectures.conv_txcdr import ConvTXCDR
+        T = meta["T"]
+        k_eff = meta["k_win"] or (meta["k_pos"] * T)
+        model = ConvTXCDR(d_in, d_sae, T=T, k=k_eff,
+                          kernel_size=meta.get("conv_kernel_size", 3)).to(device)
+    elif arch.startswith("log_matryoshka_t") and arch.removeprefix("log_matryoshka_t").isdigit():
+        # Part B H3: LogMatryoshkaTXCDR.
+        from src.architectures.log_matryoshka_txcdr import (
+            LogMatryoshkaTXCDR, DEFAULT_LOG_SCALES,
+        )
+        T = meta["T"]
+        k_eff = meta["k_win"] or (meta["k_pos"] * T)
+        scales = tuple(meta.get("scales", DEFAULT_LOG_SCALES))
+        model = LogMatryoshkaTXCDR(d_in, d_sae, T=T, k=k_eff,
+                                   scales=scales).to(device)
     elif arch == "txcdr_t5_batchtopk":
         from src.architectures._batchtopk_variants import (
             TemporalCrosscoderBatchTopK,
@@ -429,7 +447,10 @@ def _load_model_for_run(run_id, ckpt_path, device):
         model = StackedSAEBatchTopK(d_in, d_sae, T, k=meta["k_pos"]).to(device)
     elif arch in ("txcdr_t2_batchtopk", "txcdr_t3_batchtopk",
                   "txcdr_t8_batchtopk", "txcdr_t10_batchtopk",
-                  "txcdr_t15_batchtopk", "txcdr_t20_batchtopk"):
+                  "txcdr_t15_batchtopk", "txcdr_t20_batchtopk",
+                  "txcdr_t24_batchtopk", "txcdr_t28_batchtopk",
+                  "txcdr_t30_batchtopk",
+                  "txcdr_t32_batchtopk", "txcdr_t36_batchtopk"):
         from src.architectures._batchtopk_variants import TemporalCrosscoderBatchTopK
         T = meta["T"]
         k_eff = meta["k_win"] or (meta["k_pos"] * T)
@@ -683,6 +704,8 @@ def _encode_for_probe(
         # full_window:   use mlc_tail (N, TAIL=20, L, d) if available.
         return _encode_mlc(model, mlc, device, aggregation, mlc_tail=mlc_tail)
     if (arch.startswith("txcdr_t")
+            or arch.startswith("conv_txcdr_t")       # Part B H1
+            or arch.startswith("log_matryoshka_t")   # Part B H3
             or arch in ("txcdr_contrastive_t5",
                         "txcdr_contrastive_t5_alpha003",
                         "txcdr_contrastive_t5_alpha100",
@@ -692,7 +715,11 @@ def _encode_for_probe(
                         # BatchTopK extended-scope archs (2026-04-23)
                         "txcdr_t2_batchtopk", "txcdr_t3_batchtopk",
                         "txcdr_t8_batchtopk", "txcdr_t10_batchtopk",
-                        "txcdr_t15_batchtopk", "txcdr_t20_batchtopk")):
+                        "txcdr_t15_batchtopk", "txcdr_t20_batchtopk",
+                        # T > 20 extension (2026-04-23 A5)
+                        "txcdr_t24_batchtopk", "txcdr_t28_batchtopk",
+                        "txcdr_t30_batchtopk",
+                        "txcdr_t32_batchtopk", "txcdr_t36_batchtopk")):
         T = meta["T"]
         return _encode_txcdr(model, anchor, li, T, device, aggregation)
     if arch == "txcdr_dynamics_t5":
