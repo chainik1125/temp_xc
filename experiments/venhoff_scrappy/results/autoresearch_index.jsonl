@@ -3,3 +3,4 @@
 {"schema_version": 1, "ts": "2026-04-24T05:19:52", "candidate": "baseline_mlc", "verdict": "FAILED", "failure_reason": "run_cycle_rc_1"}
 {"schema_version": 1, "ts": "2026-04-24T05:24:22", "candidate": "sae_nclusters5", "verdict": "FAILED", "failure_reason": "run_cycle_rc_1"}
 {"schema_version": 1, "ts": "2026-04-24T05:28:24", "candidate": "sae_nclusters10", "verdict": "FAILED", "failure_reason": "run_cycle_rc_1"}
+{"schema_version": 1, "ts": "2026-04-24T05:32:07", "candidate": "sae_nclusters15", "verdict": "FAILED", "failure_reason": "run_cycle_rc_1"}
