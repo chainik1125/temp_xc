@@ -1,0 +1,58 @@
+[cmd] /workspace/spar-temporal-crosscoders/.venv/bin/python -m src.bench.venhoff.run_steering --root /workspace/spar-temporal-crosscoders/experiments/venhoff_scrappy/results/cycles/tempxc_nclusters10/venhoff_eval --model deepseek-r1-distill-llama-8b --dataset math500 --split test --n-traces 200 --layer 12 --seed 42 --arch tempxc --venhoff-root /workspace/spar-temporal-crosscoders/vendor/thinking-llms-interp --base-model meta-llama/Llama-3.1-8B --thinking-model deepseek-ai/DeepSeek-R1-Distill-Llama-8B --steering-layer 12 --sae-layer 6 --n-clusters 10 --max-iters 5 --n-training-examples 128 --optim-minibatch-size 6 --lr 1e-2 --num-gpus 1
+[info] vendor_patch_skipped_optional | file=hybrid/hybrid_token.py | desc=revert broken v1 BatchEncoding unwrap (uses Tensor.__contains__) | reason=find_not_present
+[info] steering | cluster_idx=-1 | gpu=default | cmd=/workspace/spar-temporal-crosscoders/vendor/thinking-llms-interp/.venv/bin/python optimize_steering_vectors.py --model meta-llama/Llama-3.1-8B --max_iters 5 --n_training_examples 128 --n_eval_examples 0 --optim_minibatch_size 6 --base_gen_minibatch_size 6 --layer 12 --steering_vector_idx -1 --lr 1e-2 --seed 42
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/workspace/spar-temporal-crosscoders/src/bench/venhoff/run_steering.py", line 102, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/workspace/spar-temporal-crosscoders/src/bench/venhoff/run_steering.py", line 91, in main
+    train_all_vectors(
+  File "/workspace/spar-temporal-crosscoders/src/bench/venhoff/steering.py", line 301, in train_all_vectors
+    out.append(train_one_vector(venhoff_root, cfg, idx, paths, force=force))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/spar-temporal-crosscoders/src/bench/venhoff/steering.py", line 248, in train_one_vector
+    raise RuntimeError(
+RuntimeError: optimize_steering_vectors.py failed for cluster_idx=-1 (rc=1). Tail of /workspace/spar-temporal-crosscoders/experiments/venhoff_scrappy/results/cycles/tempxc_nclusters10/venhoff_eval/deepseek-r1-distill-llama-8b_math500-test_n200_L12_seed42/steering/vector_-1_Llama-3.1-8B.log:
+    Loading weights:  84%|████████▍ | 244/291 [00:41<00:05,  7.86it/s]
+    Loading weights:  85%|████████▍ | 247/291 [00:41<00:05,  8.28it/s]
+    Loading weights:  85%|████████▌ | 248/291 [00:41<00:06,  6.95it/s]
+    Loading weights:  86%|████████▌ | 249/291 [00:41<00:07,  5.97it/s]
+    Loading weights:  87%|████████▋ | 252/291 [00:42<00:05,  7.43it/s]
+    Loading weights:  87%|████████▋ | 253/291 [00:42<00:05,  6.35it/s]
+    Loading weights:  88%|████████▊ | 256/291 [00:42<00:05,  6.88it/s]
+    Loading weights:  88%|████████▊ | 257/291 [00:43<00:05,  6.08it/s]
+    Loading weights:  89%|████████▊ | 258/291 [00:43<00:06,  4.91it/s]
+    Loading weights:  90%|████████▉ | 261/291 [00:43<00:03,  7.67it/s]
+    Loading weights:  90%|█████████ | 263/291 [00:43<00:03,  9.14it/s]
+    Loading weights:  91%|█████████ | 265/291 [00:44<00:03,  6.83it/s]
+    Loading weights:  91%|█████████▏| 266/291 [00:44<00:04,  6.04it/s]
+    Loading weights:  92%|█████████▏| 267/291 [00:44<00:04,  5.01it/s]
+    Loading weights:  93%|█████████▎| 270/291 [00:44<00:02,  7.64it/s]
+    Loading weights:  94%|█████████▍| 274/291 [00:45<00:02,  8.47it/s]
+    Loading weights:  95%|█████████▍| 276/291 [00:45<00:02,  6.15it/s]
+    Loading weights:  96%|█████████▌| 279/291 [00:46<00:01,  8.22it/s]
+    Loading weights:  97%|█████████▋| 281/291 [00:46<00:01,  9.20it/s]
+    Loading weights:  97%|█████████▋| 283/291 [00:46<00:00,  9.47it/s]
+    Loading weights:  98%|█████████▊| 285/291 [00:47<00:01,  5.66it/s]
+    Loading weights:  99%|█████████▉| 289/291 [00:47<00:00,  8.95it/s]
+    Loading weights: 100%|██████████| 291/291 [00:47<00:00,  6.15it/s]
+    Traceback (most recent call last):
+      File "/workspace/spar-temporal-crosscoders/vendor/thinking-llms-interp/train-vectors/optimize_steering_vectors.py", line 1100, in <module>
+        main() 
+        ^^^^^^
+      File "/workspace/spar-temporal-crosscoders/vendor/thinking-llms-interp/train-vectors/optimize_steering_vectors.py", line 742, in main
+        raise FileNotFoundError(f"Annotated responses file not found at {responses_json_path}. Please annotate responses first.")
+    FileNotFoundError: Annotated responses file not found at ../generate-responses/results/vars/responses_deepseek-r1-distill-llama-8b.json. Please annotate responses first.
+Traceback (most recent call last):
+  File "/workspace/spar-temporal-crosscoders/experiments/venhoff_scrappy/run_cycle.py", line 431, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/workspace/spar-temporal-crosscoders/experiments/venhoff_scrappy/run_cycle.py", line 426, in main
+    run_cycle(cfg, args.candidate, args.result_dir)
+  File "/workspace/spar-temporal-crosscoders/experiments/venhoff_scrappy/run_cycle.py", line 324, in run_cycle
+    _run_subprocess(phase2_cmd, cwd=REPO)
+  File "/workspace/spar-temporal-crosscoders/experiments/venhoff_scrappy/run_cycle.py", line 155, in _run_subprocess
+    raise RuntimeError(f"subprocess failed (rc={result.returncode}): {log_cmd}")
+RuntimeError: subprocess failed (rc=1): /workspace/spar-temporal-crosscoders/.venv/bin/python -m src.bench.venhoff.run_steering --root /workspace/spar-temporal-crosscoders/experiments/venhoff_scrappy/results/cycles/tempxc_nclusters10/venhoff_eval --model deepseek-r1-distill-llama-8b --dataset math500 --split test --n-traces 200 --layer 12 --seed 42 --arch tempxc --venhoff-root /workspace/spar-temporal-crosscoders/vendor/thinking-llms-interp --base-model meta-llama/Llama-3.1-8B --thinking-model deepseek-ai/DeepSeek-R1-Distill-Llama-8B --steering-layer 12 --sae-layer 6 --n-clusters 10 --max-iters 5 --n-training-examples 128 --optim-minibatch-size 6 --lr 1e-2 --num-gpus 1
