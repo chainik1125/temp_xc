@@ -349,6 +349,43 @@ def _load_model_for_run(run_id, ckpt_path, device):
             d_in, d_sae, n_layers=5, k=meta["k_pos"],
             gamma=meta.get("gamma", 0.5),
         ).to(device)
+    elif arch == "mlc_bare_antidead":
+        from src.architectures.mlc_bare_antidead import MLCBareAntidead
+        T_lay = meta["T"]
+        model = MLCBareAntidead(
+            d_in, d_sae, T=T_lay, k=meta["k_pos"],
+            aux_k=meta.get("aux_k", 512),
+            dead_threshold_tokens=meta.get("dead_threshold_tokens", 10_000_000),
+            auxk_alpha=meta.get("auxk_alpha", 1.0 / 32.0),
+        ).to(device)
+    elif arch == "mlc_bare_matryoshka_contrastive_antidead":
+        from src.architectures.mlc_bare_antidead import (
+            MLCBareMatryoshkaContrastiveAntidead,
+        )
+        T_lay = meta["T"]
+        model = MLCBareMatryoshkaContrastiveAntidead(
+            d_in, d_sae, T=T_lay, k=meta["k_pos"],
+            matryoshka_h_size=meta.get("matryoshka_h_size", d_sae // 5),
+            alpha=meta.get("alpha", 1.0),
+            aux_k=meta.get("aux_k", 512),
+            dead_threshold_tokens=meta.get("dead_threshold_tokens", 10_000_000),
+            auxk_alpha=meta.get("auxk_alpha", 1.0 / 32.0),
+        ).to(device)
+    elif arch == "mlc_bare_multiscale_antidead":
+        from src.architectures.mlc_bare_antidead import (
+            MLCBareMultiscaleContrastiveAntidead,
+        )
+        T_lay = meta["T"]
+        model = MLCBareMultiscaleContrastiveAntidead(
+            d_in, d_sae, T=T_lay, k=meta["k_pos"],
+            matryoshka_h_size=meta.get("matryoshka_h_size", d_sae // 5),
+            alpha=meta.get("alpha", 1.0),
+            n_contr_scales=meta.get("n_contr_scales", 3),
+            gamma=meta.get("gamma", 0.5),
+            aux_k=meta.get("aux_k", 512),
+            dead_threshold_tokens=meta.get("dead_threshold_tokens", 10_000_000),
+            auxk_alpha=meta.get("auxk_alpha", 1.0 / 32.0),
+        ).to(device)
     elif arch in ("txcdr_t2", "txcdr_t3", "txcdr_t5",
                   "txcdr_t6", "txcdr_t7", "txcdr_t8",
                   "txcdr_t10", "txcdr_t15", "txcdr_t20", "txcdr_t30",
@@ -389,16 +426,20 @@ def _load_model_for_run(run_id, ckpt_path, device):
             n_contr_scales=meta.get("n_contr_scales", 3),
             gamma=meta.get("gamma", 0.5),
         ).to(device)
-    elif arch == "phase57_partB_h8_bare_multidistance":
-        # Part B H8: multi-distance InfoNCE + anti-dead.
+    elif (arch == "phase57_partB_h8_bare_multidistance"
+          or arch.startswith("phase57_partB_h8_bare_multidistance_t")
+          or arch.startswith("phase57_partB_h8a_")):
+        # Part B H8 family: multi-distance InfoNCE + anti-dead (T-sweep + shift ablation).
         from src.architectures.txc_bare_multidistance_contrastive_antidead import (
             TXCBareMultiDistanceContrastiveAntidead,
         )
         T = meta["T"]
         k_eff = meta["k_win"] or (meta["k_pos"] * T)
+        weights_meta = meta.get("weights")
         model = TXCBareMultiDistanceContrastiveAntidead(
             d_in, d_sae, T=T, k=k_eff,
             shifts=tuple(meta.get("shifts", [1, 2])),
+            weights=(tuple(weights_meta) if weights_meta is not None else None),
             matryoshka_h_size=meta.get("matryoshka_h_size", d_sae // 5),
             alpha=meta.get("alpha", 1.0),
             aux_k=meta.get("aux_k", 512),
@@ -766,7 +807,11 @@ def _encode_for_probe(
                 "mlc_batchtopk",
                 "mlc_contrastive_batchtopk",
                 "mlc_contrastive_alpha100_batchtopk",
-                "agentic_mlc_08_batchtopk"):
+                "agentic_mlc_08_batchtopk",
+                # MLC + anti-dead (P0c fairness counterparts)
+                "mlc_bare_antidead",
+                "mlc_bare_matryoshka_contrastive_antidead",
+                "mlc_bare_multiscale_antidead"):
         # mlc_contrastive has identical encode API — subclass of MLC.
         # last_position: use mlc (N, L, d) at last real token.
         # full_window:   use mlc_tail (N, TAIL=20, L, d) if available.
@@ -776,6 +821,8 @@ def _encode_for_probe(
             or arch.startswith("log_matryoshka_t")   # Part B H3
             or arch == "phase57_partB_h7_bare_multiscale"  # Part B H7
             or arch == "phase57_partB_h8_bare_multidistance"  # Part B H8
+            or arch.startswith("phase57_partB_h8_bare_multidistance_t")  # Part B H8 T-sweep
+            or arch.startswith("phase57_partB_h8a_")  # Part B H8a shift-ablation
             or arch == "feature_nested_matryoshka_t5"  # Part B H9
             or arch == "feature_nested_matryoshka_t5_contrastive"  # H9 + contrastive
             or arch == "txc_shared_relu_sum_pos_t5"  # H10a
