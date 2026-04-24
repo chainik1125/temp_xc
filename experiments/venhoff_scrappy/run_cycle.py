@@ -230,6 +230,32 @@ def _use_cached_thinking_base_grades(cfg: dict, grade_payload: dict) -> dict:
     return grade_payload
 
 
+def _wipe_rolling_for_this_model(venhoff_root: Path, base_model: str, dataset: str) -> None:
+    """Delete hybrid_token.py's global rolling resume file for our model
+    combo so each cycle starts fresh.
+
+    Venhoff ships `rolling_<base_short>_<dataset>.jsonl` with ~140 author
+    entries for llama-3.1-8b MATH500. `_count_completed_tasks` reads this
+    globally (not per-arch), so its resume logic would (a) skip our first
+    scrappy cycle entirely (140 >= 20) and (b) contaminate cycle N with
+    cycle N-1's outputs. Move the shipped file aside once, wipe the
+    working rolling at the start of every cycle.
+    """
+    base_short = base_model.split("/")[-1].lower()
+    rolling_dir = venhoff_root / "hybrid" / "results" / "rolling"
+    for pattern in (f"rolling_{base_short}_{dataset}.jsonl",
+                    f"rolling_{base_short}_{dataset}_0.jsonl",
+                    f"rolling_{base_short}_{dataset}_vector_stats.json"):
+        p = rolling_dir / pattern
+        if p.exists():
+            shipped_backup = p.with_suffix(p.suffix + ".shipped_bak")
+            if not shipped_backup.exists():
+                shutil.copy(p, shipped_backup)
+                print(f"[info] rolling_shipped_preserved | {shipped_backup}")
+            p.unlink()
+            print(f"[info] rolling_wiped | {p}")
+
+
 def run_cycle(cfg: dict, candidate: str, result_dir: Path) -> dict:
     t0 = time.time()
     result_dir.mkdir(parents=True, exist_ok=True)
@@ -242,6 +268,13 @@ def run_cycle(cfg: dict, candidate: str, result_dir: Path) -> dict:
     # bug bit src/bench/venhoff/steering.py:43-77 on 2026-04-20.
     main_python = str((REPO / ".venv" / "bin" / "python").absolute())
     venhoff_root = REPO / "vendor" / "thinking-llms-interp"
+
+    # Wipe cross-cycle rolling-file contamination before each cycle.
+    _wipe_rolling_for_this_model(
+        venhoff_root=venhoff_root,
+        base_model=cfg["model"]["base"],
+        dataset=cfg["phase3_hybrid"]["dataset"],
+    )
 
     cycle_eval_root = result_dir / "venhoff_eval"
     cycle_eval_root.mkdir(parents=True, exist_ok=True)
