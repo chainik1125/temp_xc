@@ -22,6 +22,7 @@ from experiments.phase5_downstream_utility.probing.run_probing import (  # noqa:
 
 CKPT_DIR = REPO / "experiments/phase5_downstream_utility/results/ckpts"
 BUF_PATH = REPO / "data/cached_activations/gemma-2-2b-it/fineweb/resid_L13.npy"
+ML_LAYERS = (11, 12, 13, 14, 15)
 OUT_JSON = REPO / "experiments/phase5_downstream_utility/results/alive_fraction.json"
 
 N_BATCHES = 40
@@ -40,6 +41,24 @@ def make_window_gen(buf: np.ndarray, T: int, seed: int = 0):
         yield torch.from_numpy(wins)
 
 
+def make_multilayer_gen(seed: int = 0):
+    """Yield (BATCH_SIZE, n_layers, d) at random tokens across L11..L15."""
+    layers = []
+    for L in ML_LAYERS:
+        layers.append(np.load(REPO / f"data/cached_activations/gemma-2-2b-it/fineweb/resid_L{L}.npy",
+                               mmap_mode="r"))
+    rng = np.random.default_rng(seed)
+    N, L_seq, d = layers[0].shape
+    while True:
+        seq_idx = rng.integers(0, N, size=BATCH_SIZE)
+        tok_idx = rng.integers(0, L_seq, size=BATCH_SIZE)
+        out = np.empty((BATCH_SIZE, len(ML_LAYERS), d), dtype=np.float32)
+        for li, lyr in enumerate(layers):
+            for i in range(BATCH_SIZE):
+                out[i, li] = lyr[seq_idx[i], tok_idx[i]]
+        yield torch.from_numpy(out)
+
+
 def alive_for(arch: str, device: str = "cuda") -> dict:
     rid = f"{arch}__seed42"
     ckpt_path = CKPT_DIR / f"{rid}.pt"
@@ -50,8 +69,11 @@ def alive_for(arch: str, device: str = "cuda") -> dict:
     T = meta.get("T", 5)
     d_sae = 18432
 
-    buf = np.load(BUF_PATH, mmap_mode="r")
-    gen = make_window_gen(buf, T)
+    if arch.startswith("mlc_"):
+        gen = make_multilayer_gen()
+    else:
+        buf = np.load(BUF_PATH, mmap_mode="r")
+        gen = make_window_gen(buf, T)
 
     ever_fired = torch.zeros(d_sae, dtype=torch.bool, device=device)
     with torch.no_grad():
@@ -89,6 +111,26 @@ def main():
         "agentic_txc_02_batchtopk",
         "phase57_partB_h7_bare_multiscale",
         "phase57_partB_h8_bare_multidistance",
+        # H8 T-sweep
+        "phase57_partB_h8_bare_multidistance_t10",
+        "phase57_partB_h8_bare_multidistance_t15",
+        "phase57_partB_h8_bare_multidistance_t20",
+        "phase57_partB_h8_bare_multidistance_t30",
+        # H8a shift ablation
+        "phase57_partB_h8a_shifts1",
+        "phase57_partB_h8a_shifts123",
+        "phase57_partB_h8a_shifts1234",
+        "phase57_partB_h8a_shifts124",
+        "phase57_partB_h8a_shifts2",
+        "phase57_partB_h8a_shifts4",
+        "phase57_partB_h8a_shifts123_uniform",
+        # H3 log-matryoshka T-sweep
+        "log_matryoshka_t5", "log_matryoshka_t10", "log_matryoshka_t15",
+        "log_matryoshka_t20", "log_matryoshka_t30",
+        # P0c MLC + anti-dead fairness counterparts
+        "mlc_bare_antidead",
+        "mlc_bare_matryoshka_contrastive_antidead",
+        "mlc_bare_multiscale_antidead",
         "feature_nested_matryoshka_t5",
         "matryoshka_t5",
         "matryoshka_txcdr_contrastive_t5_alpha100",
