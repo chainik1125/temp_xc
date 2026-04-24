@@ -1,0 +1,200 @@
+{
+  "txcdr_t2": {
+    "T": 2,
+    "n_total": 18432,
+    "n_alive": 7945,
+    "alive_fraction": 0.4310438368055556,
+    "dead_fraction": 0.5689561631944444,
+    "N_batches": 40,
+    "BATCH_SIZE": 128
+  },
+  "txcdr_t3": {
+    "T": 3,
+    "n_total": 18432,
+    "n_alive": 7379,
+    "alive_fraction": 0.4003363715277778,
+    "dead_fraction": 0.5996636284722222,
+    "N_batches": 40,
+    "BATCH_SIZE": 128
+  },
+  "txcdr_t5": {
+    "T": 5,
+    "n_total": 18432,
+    "n_alive": 5812,
+    "alive_fraction": 0.3153211805555556,
+    "dead_fraction": 0.6846788194444444,
+    "N_batches": 40,
+    "BATCH_SIZE": 128
+  },
+  "txcdr_t6": {
+    "T": 6,
+    "n_total": 18432,
+    "n_alive": 5598,
+    "alive_fraction": 0.3037109375,
+    "dead_fraction": 0.6962890625,
+    "N_batches": 40,
+    "BATCH_SIZE": 128
+  },
+  "txcdr_t7": {
+    "T": 7,
+    "n_total": 18432,
+    "n_alive": 4796,
+    "alive_fraction": 0.2601996527777778,
+    "dead_fraction": 0.7398003472222222,
+    "N_batches": 40,
+    "BATCH_SIZE": 128
+  },
+  "txcdr_t8": {
+    "T": 8,
+    "n_total": 18432,
+    "n_alive": 4510,
+    "alive_fraction": 0.2446831597222222,
+    "dead_fraction": 0.7553168402777778,
+    "N_batches": 40,
+    "BATCH_SIZE": 128
+  },
+  "txcdr_t10": {
+    "error": "CUDA out of memory. Tried to allocate 1.58 GiB. GPU 0 has a total capacity of 44.43 GiB of which 1.53 GiB is free. Process 57883 has 22.17 GiB memory in use. Process 59666 has 13.60 GiB memory in use. Including non-PyTorch memory, this process has 7.11 GiB memory in use. Of the allocated memory 6.34 GiB is allocated by PyTorch, and 479.64 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)"
+  },
+  "txcdr_t15": {
+    "error": "CUDA out of memory. Tried to allocate 2.37 GiB. GPU 0 has a total capacity of 44.43 GiB of which 275.19 MiB is free. Process 57883 has 22.17 GiB memory in use. Process 59666 has 13.60 GiB memory in use. Including non-PyTorch memory, this process has 8.38 GiB memory in use. Of the allocated memory 7.13 GiB is allocated by PyTorch, and 965.57 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)"
+  },
+  "txcdr_t20": {
+    "error": "CUDA out of memory. Tried to allocate 3.16 GiB. GPU 0 has a total capacity of 44.43 GiB of which 1.85 GiB is free. Process 57883 has 22.17 GiB memory in use. Process 59666 has 13.60 GiB memory in use. Including non-PyTorch memory, this process has 6.79 GiB memory in use. Of the allocated memory 6.34 GiB is allocated by PyTorch, and 155.75 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)"
+  },
+  "txcdr_t2_batchtopk": {
+    "T": 2,
+    "n_total": 18432,
+    "n_alive": 5390,
+    "alive_fraction": 0.2924262152777778,
+    "dead_fraction": 0.7075737847222222,
+    "N_batches": 40,
+    "BATCH_SIZE": 128
+  },
+  "txcdr_t3_batchtopk": {
+    "T": 3,
+    "n_total": 18432,
+    "n_alive": 4967,
+    "alive_fraction": 0.2694769965277778,
+    "dead_fraction": 0.7305230034722222,
+    "N_batches": 40,
+    "BATCH_SIZE": 128
+  },
+  "txcdr_t5_batchtopk": {
+    "T": 5,
+    "n_total": 18432,
+    "n_alive": 4162,
+    "alive_fraction": 0.2258029513888889,
+    "dead_fraction": 0.7741970486111112,
+    "N_batches": 40,
+    "BATCH_SIZE": 128
+  },
+  "txcdr_t6_batchtopk": {
+    "T": 6,
+    "n_total": 18432,
+    "n_alive": 3896,
+    "alive_fraction": 0.2113715277777778,
+    "dead_fraction": 0.7886284722222222,
+    "N_batches": 40,
+    "BATCH_SIZE": 128
+  },
+  "txcdr_t7_batchtopk": {
+    "T": 7,
+    "n_total": 18432,
+    "n_alive": 3856,
+    "alive_fraction": 0.2092013888888889,
+    "dead_fraction": 0.7907986111111112,
+    "N_batches": 40,
+    "BATCH_SIZE": 128
+  },
+  "txcdr_t8_batchtopk": {
+    "error": "CUDA out of memory. Tried to allocate 1.27 GiB. GPU 0 has a total capacity of 44.43 GiB of which 761.19 MiB is free. Process 57883 has 22.17 GiB memory in use. Process 59666 has 13.60 GiB memory in use. Including non-PyTorch memory, this process has 7.90 GiB memory in use. Of the allocated memory 5.07 GiB is allocated by PyTorch, and 2.53 GiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)"
+  },
+  "txcdr_t10_batchtopk": {
+    "error": "CUDA out of memory. Tried to allocate 1.58 GiB. GPU 0 has a total capacity of 44.43 GiB of which 761.19 MiB is free. Process 57883 has 22.17 GiB memory in use. Process 59666 has 13.60 GiB memory in use. Including non-PyTorch memory, this process has 7.90 GiB memory in use. Of the allocated memory 6.34 GiB is allocated by PyTorch, and 1.26 GiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)"
+  },
+  "txcdr_t15_batchtopk": {
+    "error": "CUDA out of memory. Tried to allocate 2.37 GiB. GPU 0 has a total capacity of 44.43 GiB of which 1.85 GiB is free. Process 57883 has 22.17 GiB memory in use. Process 59666 has 13.60 GiB memory in use. Including non-PyTorch memory, this process has 6.79 GiB memory in use. Of the allocated memory 4.75 GiB is allocated by PyTorch, and 1.73 GiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)"
+  },
+  "txcdr_t20_batchtopk": {
+    "error": "CUDA out of memory. Tried to allocate 3.16 GiB. GPU 0 has a total capacity of 44.43 GiB of which 1.85 GiB is free. Process 57883 has 22.17 GiB memory in use. Process 59666 has 13.60 GiB memory in use. Including non-PyTorch memory, this process has 6.79 GiB memory in use. Of the allocated memory 6.34 GiB is allocated by PyTorch, and 155.75 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)"
+  },
+  "agentic_txc_02": {
+    "T": 5,
+    "n_total": 18432,
+    "n_alive": 6458,
+    "alive_fraction": 0.3503689236111111,
+    "dead_fraction": 0.6496310763888888,
+    "N_batches": 40,
+    "BATCH_SIZE": 128
+  },
+  "agentic_txc_02_t2": {
+    "T": 2,
+    "n_total": 18432,
+    "n_alive": 7617,
+    "alive_fraction": 0.4132486979166667,
+    "dead_fraction": 0.5867513020833333,
+    "N_batches": 40,
+    "BATCH_SIZE": 128
+  },
+  "agentic_txc_02_t3": {
+    "T": 3,
+    "n_total": 18432,
+    "n_alive": 6890,
+    "alive_fraction": 0.3738064236111111,
+    "dead_fraction": 0.6261935763888888,
+    "N_batches": 40,
+    "BATCH_SIZE": 128
+  },
+  "agentic_txc_02_t6": {
+    "error": "Unknown arch agentic_txc_02_t6"
+  },
+  "agentic_txc_02_t7": {
+    "error": "Unknown arch agentic_txc_02_t7"
+  },
+  "agentic_txc_02_t8": {
+    "error": "CUDA out of memory. Tried to allocate 1.27 GiB. GPU 0 has a total capacity of 44.43 GiB of which 1.06 GiB is free. Process 57883 has 22.17 GiB memory in use. Process 59666 has 13.60 GiB memory in use. Including non-PyTorch memory, this process has 7.59 GiB memory in use. Of the allocated memory 6.69 GiB is allocated by PyTorch, and 600.87 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)"
+  },
+  "agentic_txc_02_batchtopk": {
+    "T": 5,
+    "n_total": 18432,
+    "n_alive": 4012,
+    "alive_fraction": 0.21766493055555555,
+    "dead_fraction": 0.7823350694444444,
+    "N_batches": 40,
+    "BATCH_SIZE": 128
+  },
+  "phase57_partB_h7_bare_multiscale": {
+    "T": 5,
+    "n_total": 18432,
+    "n_alive": 12775,
+    "alive_fraction": 0.6930881076388888,
+    "dead_fraction": 0.30691189236111116,
+    "N_batches": 40,
+    "BATCH_SIZE": 128
+  },
+  "phase57_partB_h8_bare_multidistance": {
+    "T": 5,
+    "n_total": 18432,
+    "n_alive": 14171,
+    "alive_fraction": 0.7688259548611112,
+    "dead_fraction": 0.23117404513888884,
+    "N_batches": 40,
+    "BATCH_SIZE": 128
+  },
+  "feature_nested_matryoshka_t5": {
+    "error": "CUDA out of memory. Tried to allocate 810.00 MiB. GPU 0 has a total capacity of 44.43 GiB of which 435.19 MiB is free. Process 57883 has 22.17 GiB memory in use. Process 59666 has 13.60 GiB memory in use. Including non-PyTorch memory, this process has 8.22 GiB memory in use. Of the allocated memory 7.13 GiB is allocated by PyTorch, and 805.04 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)"
+  },
+  "matryoshka_t5": {
+    "T": 5,
+    "n_total": 18432,
+    "n_alive": 4889,
+    "alive_fraction": 0.2652452256944444,
+    "dead_fraction": 0.7347547743055556,
+    "N_batches": 40,
+    "BATCH_SIZE": 128
+  },
+  "matryoshka_txcdr_contrastive_t5_alpha100": {
+    "error": "ckpt missing"
+  }
+}
