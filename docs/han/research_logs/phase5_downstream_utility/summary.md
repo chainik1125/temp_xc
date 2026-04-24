@@ -33,9 +33,14 @@ For pre-registration see [`plan.md`](plan.md); architecture menu in
   TXCDR's best at last_position is `txcdr_rank_k_dec_t5` (0.7845) — a
   sizable 3 pp gap.
 - **Best SAE at `mean_pool`** (SAEBench-canonical aggregation —
-  averages per-slide latents over the tail-20 window): **`agentic_txc_02`
-  (0.8069)**, narrowly above `txcdr_t5` (0.8064). Top 5 slots are
-  TXCDR/matryoshka-family — the mean_pool aggregation is TXC's home.
+  averages per-slide latents over the tail-20 window):
+  **`phase57_partB_h7_bare_multiscale` (0.8104)** — a novel Part B arch
+  combining Phase 6.2 Track 2's anti-dead stack (AuxK, unit-norm decoder,
+  decoder-parallel gradient removal, geom-median b_dec init) with
+  Phase 5.7 agentic_txc_02's multi-scale InfoNCE recipe (n=3, γ=0.5).
+  **+0.0035 over prior top** (`agentic_txc_02` at 0.8069, single-seed).
+  Also scores 0.7915 lp, **+0.017 over agentic_txc_02** (3-seed 0.7749)
+  and +0.008 over Phase 6.2 C3 (0.7834). 3-seed variance pending.
 - **The two aggregations each have a "home" family**: MLC-contrastive
   variants dominate last_position; TXCDR/matryoshka variants dominate
   mean_pool. Neither arch wins on both. This separation is robust
