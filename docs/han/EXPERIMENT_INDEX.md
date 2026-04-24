@@ -19,11 +19,16 @@ both agents can maintain a single source-of-truth experiment log
 without stepping on each other.
 
 **To cherry-pick onto `han`** (or any other branch that doesn't have
-the index yet):
+the index yet) — cherry-pick the 4 doc-only commits in order. All 4
+touch ONLY `docs/han/` (verified `git diff-tree`), so they will not
+conflict with Phase 5 work:
 
 ```bash
 git checkout han
-git cherry-pick <commit-hash-of-this-file>
+git cherry-pick be47c34  # initial EXPERIMENT_INDEX + T-sweep handover
+git cherry-pick 3f9ab2c  # POST_COMPACT_PRIORITIES v1
+git cherry-pick 36c4af4  # EXPERIMENT_INDEX adds branch-sharing + C2 note
+git cherry-pick 1e052e6  # POST_COMPACT_PRIORITIES v2 (concrete plans + C2 recovery)
 # If another agent already added rows to the same section, resolve
 # trivially (append both) — conflicts should be rare since each
 # agent edits disjoint sections (Phase 5 agent → §1 Phase 5 archs,
