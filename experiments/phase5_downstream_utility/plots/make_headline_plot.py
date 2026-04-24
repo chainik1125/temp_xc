@@ -87,8 +87,25 @@ ORDERED_ARCHS = [
     "agentic_txc_02_t8_batchtopk",
     # Phase 5.7 experiment (iii): T-sweep on agentic_txc_02
     "agentic_txc_02_t2", "agentic_txc_02_t3",
+    "agentic_txc_02_t6", "agentic_txc_02_t7",
     "agentic_txc_02_t8", "agentic_txc_02_t10",
     "agentic_txc_02_t15", "agentic_txc_02_t20",
+    # Phase 5.7 detailed T-sweep (2026-04-24): T=6, 7
+    "txcdr_t6", "txcdr_t7", "txcdr_t6_batchtopk", "txcdr_t7_batchtopk",
+    # Part B H1 (conv encoder — fails T-scaling)
+    "conv_txcdr_t5", "conv_txcdr_t10", "conv_txcdr_t15",
+    "conv_txcdr_t20", "conv_txcdr_t30",
+    # Part B H7 (anti-dead + multi-scale InfoNCE — TXC leader)
+    "phase57_partB_h7_bare_multiscale",
+    # Part B H8 (anti-dead + multi-distance InfoNCE — NEW CHAMPION at mp)
+    "phase57_partB_h8_bare_multidistance",
+    # Part B H9 (feature-nested matryoshka)
+    "feature_nested_matryoshka_t5",
+    "feature_nested_matryoshka_t5_contrastive",
+    # Part B H10/H12 encoder ablations
+    "txc_shared_relu_sum_pos_t5",
+    "txc_shared_relu_sum_nopos_t5",
+    "txc_shared_concat_two_layer_t5",
 ]
 BASELINE_ARCHS = ["baseline_last_token_lr", "baseline_attn_pool"]
 
