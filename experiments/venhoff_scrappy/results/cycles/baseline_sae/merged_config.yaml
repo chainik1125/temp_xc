@@ -25,7 +25,6 @@ phase3_hybrid:
   - 0.5
   token_windows:
   - 0
-  - -15
 grade:
   judge_model: claude-haiku-4-5-20251001
   judge_repetitions: 1
@@ -37,7 +36,7 @@ autoresearch:
   promising_threshold_pp: 3.0
   discard_threshold_pp: -10.0
   stop_after_n_stale_cycles: 5
-cycle_timeout_s: 1800
+cycle_timeout_s: 5400
 ledger_schema_version: 1
 name: baseline_sae
 arch: sae
