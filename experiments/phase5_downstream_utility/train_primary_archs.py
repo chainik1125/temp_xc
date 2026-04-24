@@ -933,6 +933,95 @@ def train_temporal_contrastive(cfg, device, k, d_sae=DEFAULT_D_SAE,
     return model, log
 
 
+def train_txc_bare_multiscale_contrastive_antidead(
+    cfg, device, k, T,
+    alpha=1.0, n_contr_scales=3, gamma=0.5,
+    matryoshka_h_size=None,
+    aux_k=512, dead_threshold_tokens=10_000_000, auxk_alpha=1.0 / 32.0,
+    d_sae=DEFAULT_D_SAE, buf=None,
+):
+    """Part B H7b: bare TXC + anti-dead + matryoshka + multi-scale InfoNCE.
+
+    Fuses Phase 6.2 Track 2 C3 (anti-dead + matryoshka + single-scale
+    contrastive) with Phase 5.7 agentic_txc_02 recipe (multi-scale
+    InfoNCE at n=3 scales, γ=0.5 decay). Custom training loop preserves
+    decoder-parallel gradient removal + unit-norm constraint.
+    """
+    from src.architectures.txc_bare_multiscale_contrastive_antidead import (
+        TXCBareMultiscaleContrastiveAntidead,
+    )
+    buf = buf if buf is not None else _preload_single(ANCHOR_LAYER_KEY, device)
+    k_eff = k * T
+    if matryoshka_h_size is None:
+        matryoshka_h_size = int(d_sae * 0.2)
+    model = TXCBareMultiscaleContrastiveAntidead(
+        buf.shape[-1], d_sae, T, k_eff,
+        matryoshka_h_size=matryoshka_h_size,
+        alpha=alpha,
+        n_contr_scales=n_contr_scales, gamma=gamma,
+        aux_k=aux_k, dead_threshold_tokens=dead_threshold_tokens,
+        auxk_alpha=auxk_alpha,
+    ).to(device)
+
+    if alpha > 0.0:
+        pair_gen = make_pair_window_gen_gpu(buf, T)
+        def gen(batch_size):
+            return pair_gen(batch_size)
+        x0 = gen(cfg.batch_size)
+        x0_single = x0[:, 1]
+    else:
+        single_gen = make_window_gen_gpu(buf, T)
+        def gen(batch_size):
+            return single_gen(batch_size)
+        x0_single = gen(cfg.batch_size).to(device)
+
+    torch.manual_seed(cfg.seed)
+    np.random.seed(cfg.seed)
+    opt = torch.optim.Adam(model.parameters(), lr=cfg.lr)
+    model.train()
+    model.init_b_dec_geometric_median(x0_single)
+
+    losses: list[float] = []
+    l0s: list[float] = []
+    steps_logged: list[int] = []
+    converged = False
+    plateau_val: float | None = None
+
+    import time as _time
+    t0 = _time.time()
+    for step in range(cfg.max_steps):
+        x = gen(cfg.batch_size)
+        loss, _, z = model(x, alpha=alpha)
+        opt.zero_grad()
+        loss.backward()
+        model.remove_gradient_parallel_to_decoder()
+        nn.utils.clip_grad_norm_(model.parameters(), cfg.grad_clip)
+        opt.step()
+        model._normalize_decoder()
+
+        if step % cfg.log_every == 0 or step == cfg.max_steps - 1:
+            with torch.no_grad():
+                l0 = (z > 0).float().sum(dim=-1).mean().item()
+            losses.append(loss.item())
+            l0s.append(l0)
+            steps_logged.append(step)
+            plateau_val = compute_plateau(losses, window=5)
+            if (plateau_val is not None
+                and plateau_val < cfg.plateau_threshold
+                and step >= cfg.min_steps):
+                converged = True
+                break
+
+    elapsed = _time.time() - t0
+    model.eval()
+    return model, {
+        "loss": losses, "l0": l0s, "steps_logged": steps_logged,
+        "final_step": steps_logged[-1] if steps_logged else 0,
+        "converged": converged, "plateau_last": plateau_val,
+        "elapsed_s": elapsed,
+    }
+
+
 def train_tfa(cfg, device, k, use_pos, d_sae=DEFAULT_D_SAE, buf=None,
               seq_len: int | None = None):
     from src.architectures._tfa_module import TemporalSAE
@@ -1564,6 +1653,26 @@ def run_all(seeds, max_steps, archs=None):
                 model, log = train_txcdr(cfg, device, k=100, T=T, buf=get_anchor())
                 meta = dict(seed=seed, k_pos=100, k_win=100 * T, T=T,
                             match_budget=True, layer=13)
+            elif arch == "phase57_partB_h7_bare_multiscale":
+                # Part B H7: combine Phase 6.2 Track 2 anti-dead stack +
+                # matryoshka H/L + agentic_txc_02 multi-scale InfoNCE
+                # (n_contr_scales=3, γ=0.5). Goal: top the Fig 1 benchmark
+                # (current: mlc_contrastive_alpha100_batchtopk at 0.8124 lp).
+                model, log = train_txc_bare_multiscale_contrastive_antidead(
+                    cfg, device, k=100, T=5, alpha=1.0,
+                    n_contr_scales=3, gamma=0.5,
+                    matryoshka_h_size=int(DEFAULT_D_SAE * 0.2),
+                    aux_k=512, dead_threshold_tokens=10_000_000,
+                    auxk_alpha=1.0 / 32.0,
+                    buf=get_anchor(),
+                )
+                meta = dict(seed=seed, k_pos=100, k_win=500, T=5,
+                            match_budget=True, layer=13,
+                            alpha=1.0, n_contr_scales=3, gamma=0.5,
+                            matryoshka_h_size=int(DEFAULT_D_SAE * 0.2),
+                            aux_k=512, dead_threshold_tokens=10_000_000,
+                            auxk_alpha=1.0 / 32.0,
+                            variant="phase57_partB_h7_bare_multiscale")
             elif arch.startswith("conv_txcdr_t") and arch.removeprefix("conv_txcdr_t").isdigit():
                 # Part B H1: translation-invariant encoder.
                 from src.architectures.conv_txcdr import ConvTXCDR

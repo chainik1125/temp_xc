@@ -356,6 +356,23 @@ def _load_model_for_run(run_id, ckpt_path, device):
         T = meta["T"]
         k_eff = meta["k_win"] or (meta["k_pos"] * T)
         model = TemporalCrosscoder(d_in, d_sae, T, k_eff).to(device)
+    elif arch == "phase57_partB_h7_bare_multiscale":
+        # Part B H7: bare TXC + anti-dead + matryoshka + multi-scale contrastive.
+        from src.architectures.txc_bare_multiscale_contrastive_antidead import (
+            TXCBareMultiscaleContrastiveAntidead,
+        )
+        T = meta["T"]
+        k_eff = meta["k_win"] or (meta["k_pos"] * T)
+        model = TXCBareMultiscaleContrastiveAntidead(
+            d_in, d_sae, T=T, k=k_eff,
+            matryoshka_h_size=meta.get("matryoshka_h_size", d_sae // 5),
+            alpha=meta.get("alpha", 1.0),
+            n_contr_scales=meta.get("n_contr_scales", 3),
+            gamma=meta.get("gamma", 0.5),
+            aux_k=meta.get("aux_k", 512),
+            dead_threshold_tokens=meta.get("dead_threshold_tokens", 10_000_000),
+            auxk_alpha=meta.get("auxk_alpha", 1.0 / 32.0),
+        ).to(device)
     elif arch.startswith("conv_txcdr_t") and arch.removeprefix("conv_txcdr_t").isdigit():
         # Part B H1: ConvTXCDR — translation-invariant encoder.
         from src.architectures.conv_txcdr import ConvTXCDR
@@ -708,6 +725,8 @@ def _encode_for_probe(
     if (arch.startswith("txcdr_t")
             or arch.startswith("conv_txcdr_t")       # Part B H1
             or arch.startswith("log_matryoshka_t")   # Part B H3
+            or arch == "phase57_partB_h7_bare_multiscale"  # Part B H7
+
             or arch in ("txcdr_contrastive_t5",
                         "txcdr_contrastive_t5_alpha003",
                         "txcdr_contrastive_t5_alpha100",
