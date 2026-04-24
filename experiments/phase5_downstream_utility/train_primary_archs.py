@@ -1406,6 +1406,7 @@ def run_all(seeds, max_steps, archs=None):
                 meta = dict(seed=seed, k_pos=100, k_win=None, T=T_s, layer=13,
                             sparsity="batchtopk", variant=arch)
             elif arch in ("txcdr_t2_batchtopk", "txcdr_t3_batchtopk",
+                          "txcdr_t6_batchtopk", "txcdr_t7_batchtopk",
                           "txcdr_t8_batchtopk", "txcdr_t10_batchtopk",
                           "txcdr_t15_batchtopk", "txcdr_t20_batchtopk",
                           "txcdr_t24_batchtopk", "txcdr_t28_batchtopk",
@@ -1454,6 +1455,7 @@ def run_all(seeds, max_steps, archs=None):
                             n_contr_scales=n_sc, gamma=0.5,
                             sparsity="batchtopk", variant=arch)
             elif arch in ("agentic_txc_02_t2", "agentic_txc_02_t3",
+                          "agentic_txc_02_t6", "agentic_txc_02_t7",
                           "agentic_txc_02_t8", "agentic_txc_02_t10",
                           "agentic_txc_02_t15", "agentic_txc_02_t20"):
                 # T-sweep on the cycle-02 recipe. Keeps γ=0.5 fixed,
@@ -1555,8 +1557,8 @@ def run_all(seeds, max_steps, archs=None):
                 model, log = train_txcdr(cfg, device, k=100, T=20, buf=get_anchor())
                 meta = dict(seed=seed, k_pos=100, k_win=2000, T=20,
                             match_budget=True, layer=13)
-            elif arch in ("txcdr_t2", "txcdr_t3", "txcdr_t8",
-                          "txcdr_t10", "txcdr_t15", "txcdr_t30",
+            elif arch in ("txcdr_t2", "txcdr_t3", "txcdr_t6", "txcdr_t7",
+                          "txcdr_t8", "txcdr_t10", "txcdr_t15", "txcdr_t30",
                           "txcdr_t24", "txcdr_t28", "txcdr_t32", "txcdr_t36"):
                 T = int(arch.removeprefix("txcdr_t"))
                 model, log = train_txcdr(cfg, device, k=100, T=T, buf=get_anchor())

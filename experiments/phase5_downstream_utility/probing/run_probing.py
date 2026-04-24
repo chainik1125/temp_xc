@@ -349,7 +349,8 @@ def _load_model_for_run(run_id, ckpt_path, device):
             d_in, d_sae, n_layers=5, k=meta["k_pos"],
             gamma=meta.get("gamma", 0.5),
         ).to(device)
-    elif arch in ("txcdr_t2", "txcdr_t3", "txcdr_t5", "txcdr_t8",
+    elif arch in ("txcdr_t2", "txcdr_t3", "txcdr_t5",
+                  "txcdr_t6", "txcdr_t7", "txcdr_t8",
                   "txcdr_t10", "txcdr_t15", "txcdr_t20", "txcdr_t30",
                   "txcdr_t24", "txcdr_t28", "txcdr_t32", "txcdr_t36"):
         T = meta["T"]
@@ -446,6 +447,7 @@ def _load_model_for_run(run_id, ckpt_path, device):
         T = meta["T"]
         model = StackedSAEBatchTopK(d_in, d_sae, T, k=meta["k_pos"]).to(device)
     elif arch in ("txcdr_t2_batchtopk", "txcdr_t3_batchtopk",
+                  "txcdr_t6_batchtopk", "txcdr_t7_batchtopk",
                   "txcdr_t8_batchtopk", "txcdr_t10_batchtopk",
                   "txcdr_t15_batchtopk", "txcdr_t20_batchtopk",
                   "txcdr_t24_batchtopk", "txcdr_t28_batchtopk",
@@ -714,6 +716,7 @@ def _encode_for_probe(
                         "txcdr_basis_expansion_t5",
                         # BatchTopK extended-scope archs (2026-04-23)
                         "txcdr_t2_batchtopk", "txcdr_t3_batchtopk",
+                        "txcdr_t6_batchtopk", "txcdr_t7_batchtopk",
                         "txcdr_t8_batchtopk", "txcdr_t10_batchtopk",
                         "txcdr_t15_batchtopk", "txcdr_t20_batchtopk",
                         # T > 20 extension (2026-04-23 A5)
