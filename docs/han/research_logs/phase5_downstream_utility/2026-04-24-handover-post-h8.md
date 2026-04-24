@@ -48,8 +48,12 @@ Key differences from Phase 5.7 `agentic_txc_02`:
 - Only **2 scales** (H, Full) — not T scales.
 - **Both reconstructions target the FULL T-token window** — not centered
   (s+1)-token sub-windows.
-- **Shared decoder** `W_dec : (d_sae, T, d_in)` — H recon uses the first
-  3686 rows. No per-scale separate decoders.
+- **Single `W_dec : (d_sae, T, d_in)`** — same per-position decoder
+  structure as vanilla TemporalCrosscoder. The H reconstruction uses
+  the first 3686 ROWS `W_dec[:3686, :, :]` (all T positions intact).
+  **Not a shared decoder across positions** — the matryoshka partitions
+  the FEATURE axis, not the position axis. No per-scale separate
+  decoders either (unlike PositionMatryoshkaTXCDR's `W_decs` list).
 - **Unweighted sum** — no γ-decay.
 
 The contrastive InfoNCE operates on `z[:, :3686]` (the H prefix).
