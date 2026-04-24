@@ -960,6 +960,27 @@ is approximately equivalent to encoding the single centroid position.
 `probing_results.jsonl` retains all full_window rows; new plots
 omit this aggregation.
 
+### Phase 5.7+ (groundbreaking session, 2026-04-24) — pending results
+
+The "groundbreaking" session is running an extensive queue: H8 T-sweep
+at T∈{6,7,8,10,15,20,30}, shift-ablation at T=5 (8 variants), MLC +
+anti-dead fairness counterparts (3 variants), H13 multi-distance ×
+multi-scale orthogonal-axes stack, H9c seeds 1+2, H3 log-matryoshka
+T-sweep, alive-fraction retry, and HF sync.
+
+Tracking doc:
+[`2026-04-24-groundbreaking-handover.md`](2026-04-24-groundbreaking-handover.md).
+
+**Queue status**: in flight as of 21:55 UTC 2026-04-24. ~25 trainings
+remaining. Wall time ~25-30 hours.
+
+**Paper-critical question still open**: does H8's mp AUC monotonically
+increase with T? Answer expected after T-sweep completes (next ~6-8 hours).
+
+**Deferred / out-of-scope**: H2 attention-pool decoder, H5 SVD-spectrum
+regularizer, H6 Mamba/SSM encoder. All marked "not implemented" in the
+post-H8 handover.
+
 ### Caveats
 
 - **Single seed (42) on most rows.** Seeds {1, 2} are currently
