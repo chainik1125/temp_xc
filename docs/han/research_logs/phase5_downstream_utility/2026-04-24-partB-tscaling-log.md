@@ -123,9 +123,16 @@ at T≥30 where per-position matryoshka OOMs on A40.
 | 4 | H8 multi-distance contrastive | _pending_ | _ | _ |
 | 5 | H9 feature-nested matryoshka (plain) | _pending_ | _ | _ |
 | 6 | H9b feature-nested + contrastive | _pending_ | _ | _ |
-| 7 | H10a shared relu-sum encoder + pos | _pending_ | _ | _ |
-| 8 | H10b shared relu-sum encoder (no pos) | _pending_ | _ | _ |
-| 9 | H12 shared concat two-layer | _pending_ | _ | _ |
+| 7 | H10a shared relu-sum encoder + pos | 0.7529 | −0.030 vs txcdr_t5 | ❌ pos embed can't replace per-pos W |
+| 8 | H10b shared relu-sum (no pos, control) | 0.7020 | −0.079 | ❌ no-pos is 5pp worse than pos |
+| 9 | H12 shared concat two-layer | 0.7250 | −0.056 | ❌ 2-layer doesn't recover |
+
+**Encoder ablation verdict**: per-position `W_enc:(T,d_in,d_sae)` is
+**load-bearing** — shared encoder + positional embedding loses 3pp at
+last_position. Positional embedding carries 5pp of information (H10a vs
+H10b gap). A 2-layer arch with hidden=512 doesn't recover the loss.
+Paper should report per-position weights as a genuine TXC contribution,
+not redundant machinery.
 
 **H7 = new TXC headline at last_position**: 0.7915 vs agentic_txc_02 3s
 0.7749 (+0.017) and Phase 6.2 C3 0.7834 (+0.008). Anti-dead stack +
