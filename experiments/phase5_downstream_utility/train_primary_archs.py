@@ -1791,6 +1791,45 @@ def run_all(seeds, max_steps, archs=None):
                 model, log = train_txcdr(cfg, device, k=100, T=T, buf=get_anchor())
                 meta = dict(seed=seed, k_pos=100, k_win=100 * T, T=T,
                             match_budget=True, layer=13)
+            elif arch in ("txc_shared_relu_sum_pos_t5",
+                          "txc_shared_relu_sum_nopos_t5"):
+                # H10: shared encoder + σ per position + sum across T.
+                # _pos variant adds learnable positional embedding p_t.
+                from src.architectures.txc_encoder_variants import TXCSharedReluSum
+                use_pos = arch.endswith("_pos_t5")
+                buf = get_anchor()
+                d_in = buf.shape[-1]
+                T_h = 5
+                k_eff = 100 * T_h
+                model = TXCSharedReluSum(
+                    d_in, DEFAULT_D_SAE, T=T_h, k=k_eff, use_pos=use_pos,
+                ).to(device)
+                gen = make_window_gen_gpu(buf, T=T_h)
+                def norm(): model._normalize_decoder()
+                log = _iterate_train(model, gen, cfg, device, normalize_decoder=norm)
+                meta = dict(seed=seed, k_pos=100, k_win=k_eff, T=T_h,
+                            match_budget=True, layer=13,
+                            use_pos=use_pos,
+                            variant="txc_shared_relu_sum")
+            elif arch == "txc_shared_concat_two_layer_t5":
+                # H12: shared W_1 + pos embed → concat T outputs → W_2 → TopK.
+                from src.architectures.txc_encoder_variants import TXCSharedConcatTwoLayer
+                buf = get_anchor()
+                d_in = buf.shape[-1]
+                T_h = 5
+                k_eff = 100 * T_h
+                d_hidden = 512
+                model = TXCSharedConcatTwoLayer(
+                    d_in, DEFAULT_D_SAE, T=T_h, k=k_eff,
+                    d_hidden=d_hidden, use_pos=True,
+                ).to(device)
+                gen = make_window_gen_gpu(buf, T=T_h)
+                def norm(): model._normalize_decoder()
+                log = _iterate_train(model, gen, cfg, device, normalize_decoder=norm)
+                meta = dict(seed=seed, k_pos=100, k_win=k_eff, T=T_h,
+                            match_budget=True, layer=13,
+                            d_hidden=d_hidden, use_pos=True,
+                            variant="txc_shared_concat_two_layer")
             elif arch == "feature_nested_matryoshka_t5":
                 # Feature-nested matryoshka (user proposal): per-scale decoder
                 # reconstructs full T-window using progressive latent prefix.

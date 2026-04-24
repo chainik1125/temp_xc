@@ -356,6 +356,23 @@ def _load_model_for_run(run_id, ckpt_path, device):
         T = meta["T"]
         k_eff = meta["k_win"] or (meta["k_pos"] * T)
         model = TemporalCrosscoder(d_in, d_sae, T, k_eff).to(device)
+    elif arch in ("txc_shared_relu_sum_pos_t5", "txc_shared_relu_sum_nopos_t5"):
+        from src.architectures.txc_encoder_variants import TXCSharedReluSum
+        T = meta["T"]
+        k_eff = meta["k_win"] or (meta["k_pos"] * T)
+        use_pos = meta.get("use_pos", arch.endswith("_pos_t5"))
+        model = TXCSharedReluSum(
+            d_in, d_sae, T=T, k=k_eff, use_pos=use_pos,
+        ).to(device)
+    elif arch == "txc_shared_concat_two_layer_t5":
+        from src.architectures.txc_encoder_variants import TXCSharedConcatTwoLayer
+        T = meta["T"]
+        k_eff = meta["k_win"] or (meta["k_pos"] * T)
+        model = TXCSharedConcatTwoLayer(
+            d_in, d_sae, T=T, k=k_eff,
+            d_hidden=meta.get("d_hidden", 512),
+            use_pos=meta.get("use_pos", True),
+        ).to(device)
     elif arch in ("feature_nested_matryoshka_t5",
                   "feature_nested_matryoshka_t5_contrastive"):
         # User proposal: per-position matryoshka with full-window
@@ -761,6 +778,9 @@ def _encode_for_probe(
             or arch == "phase57_partB_h8_bare_multidistance"  # Part B H8
             or arch == "feature_nested_matryoshka_t5"  # Part B H9
             or arch == "feature_nested_matryoshka_t5_contrastive"  # H9 + contrastive
+            or arch == "txc_shared_relu_sum_pos_t5"  # H10a
+            or arch == "txc_shared_relu_sum_nopos_t5"  # H10b
+            or arch == "txc_shared_concat_two_layer_t5"  # H12
 
             or arch in ("txcdr_contrastive_t5",
                         "txcdr_contrastive_t5_alpha003",
