@@ -19,7 +19,10 @@ BASELINE_ALIGN=64.19
 BASELINE_COH=84.88
 
 LAYER=15
-HOOKPOINTS=(resid_pre resid_mid ln1_normalized)
+# Scope: just resid_pre and resid_mid for this pass (ln1_normalized dropped
+# per user request — we'll add it back later if resid_mid/pre show interesting
+# diffs vs resid_post).
+HOOKPOINTS=(resid_pre resid_mid)
 CUSTOM_DIFF_DIR=$RESULTS/qwen_l${LAYER}_custom_diffs
 
 mkdir -p "$FIG_DIR" "$DOCS_RESULTS" "$CUSTOM_DIFF_DIR"
@@ -29,14 +32,13 @@ log() { echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] $*"; }
 # Compute diffs for hookpoints not already in em-features' difference_vectors.pt.
 # (resid_pre can be read off layer-1's resid_post in that file; resid_mid and
 # ln1_normalized need module-level hooks.)
-if [ ! -s "$CUSTOM_DIFF_DIR/custom_diffs_resid_mid_L${LAYER}.pt" ] || \
-   [ ! -s "$CUSTOM_DIFF_DIR/custom_diffs_ln1_normalized_L${LAYER}.pt" ]; then
-    log "compute_custom_diffs for resid_mid + ln1_normalized"
+if [ ! -s "$CUSTOM_DIFF_DIR/custom_diffs_resid_mid_L${LAYER}.pt" ]; then
+    log "compute_custom_diffs for resid_mid"
     cd $TEMP_XC && PYTHONPATH=$TEMP_XC python -m experiments.em_features.compute_custom_diffs \
         --dataset /root/em_features/data/medical_advice_prompt_only.jsonl \
         --base Qwen/Qwen2.5-7B-Instruct \
         --bad andyrdt/Qwen2.5-7B-Instruct_bad-medical \
-        --hookpoints resid_mid ln1_normalized \
+        --hookpoints resid_mid \
         --layer $LAYER \
         --out_dir "$CUSTOM_DIFF_DIR"
 fi

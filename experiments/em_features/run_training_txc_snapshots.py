@@ -56,6 +56,10 @@ def parse_args():
     p.add_argument("--device", type=str, default="cuda")
     p.add_argument("--log_every", type=int, default=200)
     p.add_argument("--normalize_every", type=int, default=100)
+    p.add_argument("--resume_from", type=Path, default=None,
+                   help="Model-only resume from a prior snapshot. Optimizer state is NOT "
+                        "restored (kept out of checkpoints to avoid 3× disk blow-up). "
+                        "Training starts from the step count recorded in the ckpt config.")
     return p.parse_args()
 
 
@@ -111,14 +115,25 @@ def main():
           f"(~{n_params*4/1e9:.1f} GB fp32 params, ~{n_params*4*4/1e9:.1f} GB with Adam fp32 state)",
           flush=True)
 
+    resume_start_step = 0
+    if args.resume_from is not None:
+        ck = torch.load(args.resume_from, map_location=args.device)
+        txc.load_state_dict(ck["state_dict"])
+        resume_start_step = int(ck.get("config", {}).get("steps_trained", 0))
+        print(f"resumed from {args.resume_from}  (model weights only; restarting Adam from zero). "
+              f"starting at step {resume_start_step}/{args.total_steps}", flush=True)
+        # Skip any snapshot thresholds already reached.
+
     optim = torch.optim.Adam(txc.parameters(), lr=args.lr)
     loss_history: list[float] = []
     l0_history: list[tuple[int, float]] = []
     best = float("inf")
     train_t0 = time.time()
     next_snap_idx = 0
+    while next_snap_idx < len(snapshots) and snapshots[next_snap_idx] <= resume_start_step:
+        next_snap_idx += 1
 
-    for step in range(args.total_steps):
+    for step in range(resume_start_step, args.total_steps):
         x = buffer.sample_txc_windows(args.batch_size, args.T).float()
         x_hat, z = txc(x)
         loss = (x - x_hat).pow(2).sum(dim=-1).mean()
