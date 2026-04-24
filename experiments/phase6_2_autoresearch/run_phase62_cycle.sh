@@ -79,11 +79,15 @@ else
     --archs "$DISPATCH" --seeds 42 --max-steps 25000 $MIN_STEPS \
     2>&1 | tee "logs/phase62_${CAND_ID}_train.log"
 
-  # Rename freshly-trained ckpt to the candidate name
-  mv "$DEFAULT_CKPT" "$CKPT"
+  # Rename freshly-trained ckpt to the candidate name (no-op if same path)
+  if [ "$DEFAULT_CKPT" != "$CKPT" ]; then
+    mv "$DEFAULT_CKPT" "$CKPT"
+  fi
   # Restore pre-existing dispatch ckpt if any
-  [ -f "${DEFAULT_CKPT}.preserved_for_phase62" ] \
-    && mv "${DEFAULT_CKPT}.preserved_for_phase62" "$DEFAULT_CKPT"
+  if [ "$DEFAULT_CKPT" != "$CKPT" ] \
+     && [ -f "${DEFAULT_CKPT}.preserved_for_phase62" ]; then
+    mv "${DEFAULT_CKPT}.preserved_for_phase62" "$DEFAULT_CKPT"
+  fi
 fi
 
 # Step 2: encode on A/B/random — uses the candidate-named ckpt.
@@ -96,10 +100,15 @@ fi
 
 # Actually simpler path: encode via a temporary alias ckpt at the
 # dispatch name, then move back. (Matches what run_cycle_eval.sh does.)
+# Skip the alias swap entirely if DISPATCH == NAME (no rename needed).
 ALIAS="experiments/phase5_downstream_utility/results/ckpts/${DISPATCH}__seed42.pt"
 ORIG_ALIAS="${ALIAS}.original"
-if [ -f "$ALIAS" ]; then mv "$ALIAS" "$ORIG_ALIAS"; fi
-cp "$CKPT" "$ALIAS"
+ALIAS_SWAPPED=0
+if [ "$DISPATCH" != "$NAME" ]; then
+  if [ -f "$ALIAS" ]; then mv "$ALIAS" "$ORIG_ALIAS"; fi
+  cp "$CKPT" "$ALIAS"
+  ALIAS_SWAPPED=1
+fi
 
 echo "--- encode ---"
 TQDM_DISABLE=1 PYTHONPATH=. .venv/bin/python -u \
@@ -113,9 +122,11 @@ TQDM_DISABLE=1 PYTHONPATH=. .venv/bin/python -u \
   --archs "$DISPATCH" --seeds 42 --concats A B random \
   2>&1 | tee "logs/phase62_${CAND_ID}_autointerp.log"
 
-# Restore original ckpt alias
-rm -f "$ALIAS"
-if [ -f "$ORIG_ALIAS" ]; then mv "$ORIG_ALIAS" "$ALIAS"; fi
+# Restore original ckpt alias (skip if we never swapped)
+if [ "$ALIAS_SWAPPED" = "1" ]; then
+  rm -f "$ALIAS"
+  if [ -f "$ORIG_ALIAS" ]; then mv "$ORIG_ALIAS" "$ALIAS"; fi
+fi
 
 # Step 3: collect metrics + append to jsonl
 .venv/bin/python - <<EOF
