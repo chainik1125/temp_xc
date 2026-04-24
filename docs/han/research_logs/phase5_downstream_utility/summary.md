@@ -29,9 +29,10 @@ For pre-registration see [`plan.md`](plan.md); architecture menu in
 - **Best SAE at `last_position`**: `mlc_contrastive_alpha100_batchtopk`
   (**0.8124**) — Part-B α=1.0 MLC contrastive with BatchTopK sparsity.
   Closely followed by `agentic_mlc_08` (0.8094), `mlc_contrastive_alpha100`
-  (0.8073), and `mlc_contrastive` (0.8025). Top 4 archs all MLC-family;
-  TXCDR's best at last_position is `txcdr_rank_k_dec_t5` (0.7845) — a
-  sizable 3 pp gap.
+  (0.8073), and Part-B H8 `phase57_partB_h8_bare_multidistance`
+  (**0.8039** single-seed — the TXC-family leader at lp, closing the
+  gap from 3pp to 0.9pp vs MLC top). Part-B H7 3-seed = 0.7886 ± 0.007
+  (σ-defensible +0.014 over agentic_txc_02 3-seed 0.7749).
 - **Best SAE at `mean_pool`** (SAEBench-canonical aggregation —
   averages per-slide latents over the tail-20 window):
   **`phase57_partB_h8_bare_multidistance` (0.8139)** — a novel Part B
@@ -154,19 +155,22 @@ across re-probes; ranking is stable at this granularity.)*
 | **mlc_contrastive_alpha100_batchtopk** (Part-B α=1.0 + BatchTopK) | **0.8124** | 0.0923 | 36 |
 | **agentic_mlc_08** (multi-scale MLC) | 0.8094 | 0.0929 | 36 |
 | mlc_contrastive_alpha100 (Part-B α=1.0) | 0.8073 | 0.0907 | 36 |
+| **phase57_partB_h8_bare_multidistance** (Part-B H8, single-seed) | **0.8039** | 0.1038 | 36 |
 | mlc_contrastive | 0.8025 | 0.0865 | 36 |
 | agentic_mlc_08_batchtopk | 0.7981 | 0.0975 | 36 |
 | mlc | 0.7960 | 0.0968 | 36 |
+| **phase57_partB_h7_bare_multiscale seed=1** (Part-B H7) | 0.7938 | 0.1022 | 36 |
+| **phase57_partB_h7_bare_multiscale seed=42** (Part-B H7) | 0.7915 | 0.1052 | 36 |
 | mlc_contrastive_batchtopk | 0.7893 | 0.0948 | 36 |
 | txcdr_rank_k_dec_t5 | 0.7845 | 0.1007 | 36 |
 | txcdr_t5 | 0.7829 | 0.0867 | 36 |
 | matryoshka_txcdr_contrastive_t5_alpha100 | 0.7826 | 0.0944 | 36 |
 | agentic_txc_02 (multi-scale matryoshka) | 0.7811 | 0.1024 | 36 |
+| phase57_partB_h7_bare_multiscale seed=2 | 0.7807 | 0.1076 | 36 |
 | txcdr_t5_batchtopk | 0.7783 | 0.0867 | 36 |
 | txcdr_t15 | 0.7772 | 0.0837 | 36 |
 | mlc_batchtopk | 0.7742 | 0.1039 | 36 |
 | txcdr_t20_batchtopk (miscalibrated⚠) | 0.7740 | 0.0943 | 36 |
-| matryoshka_txcdr_contrastive_t5_alpha100_batchtopk | 0.7722 | 0.0977 | 36 |
 | txcdr_t3 | 0.7711 | 0.1104 | 36 |
 | agentic_txc_02_t8 | 0.7699 | 0.0958 | 36 |
 
@@ -185,24 +189,24 @@ Full table (62 archs) in
 |---|---|---|---|
 | **baseline_attn_pool** | **0.9292** | 0.1056 | 36 |
 | **baseline_last_token_lr** | **0.9262** | 0.0673 | 36 |
-| **agentic_txc_02** (multi-scale matryoshka) | **0.8069** | 0.1026 | 36 |
+| **phase57_partB_h8_bare_multidistance** (Part-B H8, single-seed) | **0.8139** | 0.1162 | 36 |
+| **phase57_partB_h7_bare_multiscale seed=1** (Part-B H7) | 0.8135 | 0.1145 | 36 |
+| **phase57_partB_h7_bare_multiscale seed=42** (Part-B H7) | 0.8104 | 0.1191 | 36 |
+| **agentic_txc_02** (multi-scale matryoshka) | 0.8069 | 0.1026 | 36 |
 | txcdr_t5 | 0.8064 | 0.0957 | 36 |
 | matryoshka_txcdr_contrastive_t5_alpha100 | 0.8046 | 0.0979 | 36 |
 | txcdr_t3 | 0.8022 | 0.1045 | 36 |
-| txcdr_rank_k_dec_t5 | 0.7990 | 0.0944 | 36 |
+| agentic_txc_02_batchtopk seed=2 | 0.7983 | 0.1095 | 36 |
+| agentic_mlc_08 | 0.7990 | 0.1029 | 36 |
 | agentic_mlc_08_batchtopk | 0.7980 | 0.1126 | 36 |
 | agentic_txc_02_t3_batchtopk | 0.7970 | 0.1060 | 36 |
+| txcdr_txcdr_rank_k_dec_t5 | 0.7990 | 0.0944 | 36 |
+| txcdr_t7 | 0.7957 | 0.0983 | 36 |
+| txcdr_t6 | 0.7955 | 0.0985 | 36 |
 | matryoshka_txcdr_contrastive_t5_alpha100_batchtopk | 0.7953 | 0.0976 | 36 |
+| txcdr_t7_batchtopk | 0.7948 | 0.1005 | 36 |
+| phase57_partB_h7_bare_multiscale seed=2 | 0.7939 | 0.1203 | 36 |
 | txcdr_t5_batchtopk | 0.7936 | 0.0949 | 36 |
-| txcdr_t3_batchtopk | 0.7932 | 0.1033 | 36 |
-| agentic_txc_02_t3 | 0.7919 | 0.1076 | 36 |
-| agentic_txc_02_t8 | 0.7917 | 0.0931 | 36 |
-| mlc_contrastive_alpha100 (Part-B α=1.0) | 0.7887 | 0.1091 | 36 |
-| agentic_txc_02_batchtopk | 0.7882 | 0.0932 | 36 |
-| agentic_txc_02_t2_batchtopk | 0.7880 | 0.1042 | 36 |
-| txcdr_t2_batchtopk | 0.7870 | 0.1055 | 36 |
-| txcdr_t15 | 0.7868 | 0.0805 | 36 |
-| agentic_txc_02_t8_batchtopk | 0.7866 | 0.0937 | 36 |
 
 Full table (62 archs) in
 [`headline_summary_mean_pool_auc_full.json`](../../../../experiments/phase5_downstream_utility/results/headline_summary_mean_pool_auc_full.json).
@@ -230,6 +234,10 @@ plateau-stop.
 | agentic_txc_02 | mean_pool | 0.8007 | 0.7966 | 0.7990 | **0.7987 ± 0.0020** |
 | agentic_mlc_08 | last_position | 0.8047 | 0.8054 | 0.8035 | **0.8046 ± 0.0009** |
 | agentic_mlc_08 | mean_pool | 0.7890 | 0.7888 | 0.7776 | **0.7851 ± 0.0065** |
+| **H7 (bare + anti-dead + multi-scale)** | last_position | 0.7915 | 0.7938 | 0.7807 | **0.7886 ± 0.0070** |
+| **H7 (bare + anti-dead + multi-scale)** | mean_pool | 0.8104 | 0.8135 | 0.7939 | **0.8059 ± 0.0106** |
+| H8 (bare + anti-dead + multi-distance) seed=42 only | last_position | 0.8039 | — | — | — |
+| H8 (bare + anti-dead + multi-distance) seed=42 only | mean_pool | 0.8139 | — | — | — |
 
 **Observations:**
 
