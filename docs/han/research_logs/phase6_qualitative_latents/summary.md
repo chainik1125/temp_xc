@@ -737,6 +737,90 @@ the rigorous metric. Re-generating the plot is a small follow-up.
 - TFA's attention combination → 0/32 + coverage-2/7 on random.
   Architectural path to robustness, but not via a simple tweak.
 
+### 9.6. Phase 6.3 (2026-04-24) — metric redesign + T-sweep reframe the qualitative story
+
+See [[../phase6_2_autoresearch/2026-04-24-pdvar-results]] and
+[[../phase6_2_autoresearch/2026-04-24-t-sweep-results]] for full detail.
+
+**Priority 2a — pdvar (passage-discriminative-variance) ranking**: the
+user flagged that x/32 top-by-per-token-variance may systematically
+penalise TXC because the TXC encoder sees short token windows with
+high-variance boundary/positional artefacts that occupy top-variance
+slots even when semantic features exist further down. We re-ranked all
+5 primary archs × 3 seeds × 3 concats by the variance of per-passage
+mean activations and re-labelled the pdvar-only features via Haiku
+temp=0 + 2-judge majority.
+
+On concat_random (the generalisation control), pdvar ranking yields:
+
+| arch | var random | pdvar random | Δ |
+|---|---|---|---|
+| `tsae_paper` | 13.7 ± 1.33 | **23.7 ± 0.67** | +10.0 |
+| `agentic_txc_10_bare` (Track 2) | 3.3 ± 1.33 | 7.3 ± 1.86 | +4.0 |
+| `agentic_txc_12_bare_batchtopk` (2×2 cell) | 1.7 ± 0.33 | 5.7 ± 1.20 | +4.0 |
+| `agentic_txc_02` (TXC baseline, 1 seed) | 0 | 6 | +6 |
+| `agentic_txc_02_batchtopk` (Cycle F) | 0.0 ± 0.0 | **12.3 ± 1.33** | **+12.3** |
+
+**Biggest re-ranking**: Cycle F (BatchTopK) goes from worst-in-class
+under var (0/32) to best-TXC under pdvar (12.3/32). Its top-by-var
+features were token-outlier / position-artefact dominated — the actual
+semantic features lived exclusively in the pdvar-only slots.
+
+The structural-gap claim from §9.5 **softens**: instead of "TXC can
+only find 0-4 semantic features vs T-SAE's 13.7", it becomes "TXC
+finds 5-12 passage-discriminative semantic features, vs T-SAE's 23.7".
+The gap is still real (~11 labels) but less dramatic. Pareto figure
+regenerated with pdvar axis:
+`experiments/phase6_qualitative_latents/results/phase63_pareto_pdvar.png`.
+
+**Priority 1 — T-sweep (user's first hypothesis)**: Track 2 recipe at
+T ∈ {3, 5, 10, 20}. At seed 42 (seeds 1, 2 in flight):
+
+| T | last_pos AUC | mean_pool AUC | var rand | pdvar rand |
+|---|---|---|---|---|
+| 3 | 0.7731 | 0.8039 | 3 | 17 |
+| 5 (Track 2, 3s ref) | 0.7788 | 0.8014 | 3.3 | 7.3 |
+| 10 | 0.7939 | **0.8110** | **11** | 11 |
+| 20 | 0.7844 | 0.7885 | **13** | 14 |
+
+Two findings, both counter-intuitive:
+
+1. **Probing AUC peaks at T=10 with the anti-dead stack** — not T=5.
+   Phase 5.7 on vanilla TXCDR (no anti-dead) showed AUC peaking at
+   T=5 and dropping to 0.7545 at T=20. The anti-dead stack shifts
+   the optimum up to T=10. Track 2's T=5 is no longer the
+   probe-optimal window.
+
+2. **Qualitative (var) is monotone in T**; **qualitative (pdvar) is
+   non-monotone**. Under var ranking, the user's hypothesis holds:
+   T=3 → 3/32, T=5 → 3.3/32, T=10 → 11/32, T=20 → 13/32 (larger T
+   closes the plateau). Under pdvar, T=3 is the highest (17/32) with a
+   dip at T=5 and recovery at T=10/20. The single-seed T=3 pdvar=17 is
+   suspicious and awaiting multi-seed confirmation.
+
+Combined: T=10 **Pareto-dominates** Track 2 (T=5) on BOTH axes at seed
+42 (higher AUC, higher var qualitative). If the trend holds across
+seeds 1, 2, the paper's "best TXC arch" should be T=10 rather than
+Track 2 (T=5).
+
+**Figures**:
+- `phase63_pareto_pdvar.png` — same 2-panel Pareto as phase61_pareto_robust
+  but with pdvar y-axis; Cycle F visibly re-ranks to best-TXC qualitative
+  and joins the Pareto frontier.
+- `phase63_t_sweep.png` — AUC vs T + qualitative vs T side-by-side line
+  plot, with T-SAE reference bands.
+
+**Next / in flight**:
+- Seeds 1, 2 training for T=3/10/20 (~3 hrs remaining at time of writing).
+- Automated seedvar eval pipeline queued
+  (`run_tsweep_seedvar_eval.sh`) to encode + autointerp + pdvar + probe
+  + regenerate figures as soon as ckpts land.
+- After seedvar lands: 3-seed pdvar mean ± stderr for T ∈ {3, 10, 20}
+  locks in the story.
+- Paper-writing pass: if T=10 stays Pareto-dominant across seeds,
+  reframe "Track 2 is our best TXC" → "Track 2 at T=10 is our best TXC
+  (with T=5 a reasonable alternate if training budget is tight)".
+
 ### 10. Reproduction
 
 Given a warm `uv sync`ed venv with HF + Anthropic tokens:
