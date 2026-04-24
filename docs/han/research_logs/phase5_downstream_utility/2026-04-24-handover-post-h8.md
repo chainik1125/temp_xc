@@ -95,6 +95,17 @@ multi-distance. 3-seed variance complete:
 
 ## What to run next (ordered)
 
+### ⭐ Priority 0: push contrastive shifts beyond {1, 2}
+
+**The biggest open question.** H8 shifts={1,2} was the single change
+that produced the mp champion (0.8139, +0.008 over H7). If shifts={1,2,3}
+or {1,2,3,4} keeps climbing, we might find an even stronger winner.
+
+See the detailed plan under "If the user wants to keep pushing →
+HIGHEST PRIORITY" section below. Implement BEFORE H8 3-seed if GPU
+is available (H8 3-seed is rigor; shifts exploration is the next
+headline).
+
 ### Priority 1: finalize H8 3-seed
 
 ```bash
@@ -237,16 +248,74 @@ Honest caveats for reviewers:
 
 ## If the user wants to keep pushing
 
-Remaining Part B hypotheses not yet tested:
+### ⭐ HIGHEST PRIORITY: push multi-distance shifts to their limit
+
+H8 at T=5 uses shifts={1, 2}. The progression agentic_txc_02 (shift=1
+only) → H7 (shift=1, multi-scale prefixes) → H8 (shifts={1, 2}) showed
+that **adding a shift=2 pair lifted mp from 0.8059±0.011 (H7 3s) to
+0.8139 (H8 seed 42)**. The question is whether even larger shifts
+help further.
+
+**Experiments to run** (each ~1 hr training + probe):
+
+1. **H8-wider**: shifts = {1, 2, 3}. At T=5, shift=3 pairs share 2/5
+   tokens (40% overlap) — pushes invariance further.
+2. **H8-wider-2**: shifts = {1, 2, 3, 4}. Every possible shift within T=5.
+3. **H8-T8**: extend H8 to T=8 with shifts = {1, 2, 4}. Bigger window
+   lets us test bigger shifts. agentic_txc_02 peaked at T=8 mp.
+4. **H8-T10**: shifts = {1, 3, 5}. If matryoshka decoder at T=10 OOMs,
+   drop matryoshka (set `matryoshka_h_size=None`) — contrastive still
+   works on a fixed `contr_prefix=d_sae//5`.
+
+**Implementation**: the arch
+([`src/architectures/txc_bare_multidistance_contrastive_antidead.py`](../../../src/architectures/txc_bare_multidistance_contrastive_antidead.py))
+already accepts arbitrary shifts via `shifts=(1, 2, 3, ...)`. Add new
+dispatcher branches in `train_primary_archs.py`:
+
+```python
+elif arch == "phase57_partB_h8b_shifts123":
+    model, log = train_txc_bare_multidistance_contrastive_antidead(
+        cfg, device, k=100, T=5, alpha=1.0,
+        shifts=(1, 2, 3),                    # NEW: wider shifts
+        matryoshka_h_size=int(DEFAULT_D_SAE * 0.2),
+        aux_k=512, dead_threshold_tokens=10_000_000,
+        auxk_alpha=1.0 / 32.0,
+        buf=get_anchor(),
+    )
+    meta = dict(seed=seed, k_pos=100, k_win=500, T=5,
+                alpha=1.0, shifts=[1, 2, 3],
+                matryoshka_h_size=int(DEFAULT_D_SAE * 0.2),
+                aux_k=512, dead_threshold_tokens=10_000_000,
+                auxk_alpha=1.0/32.0,
+                variant="phase57_partB_h8b_wider_shifts")
+```
+
+Also update `run_probing.py` route (the existing
+`arch == "phase57_partB_h8_bare_multidistance"` branch needs to
+generalize — easiest: `arch.startswith("phase57_partB_h8")`).
+
+**Expected outcome**: likely diminishing returns — shift=3 pair at T=5
+shares only 40% tokens, which might be too few in common to make a
+strong contrastive pair. But worth testing. If shifts={1,2,3} beats
+0.8139 mp, try shifts={1,2,3,4}. If even that keeps climbing, extend
+T to 8 and try shifts={1,2,3,4,5,6}.
+
+**Inverse-distance weighting** should be preserved: `w_s = 1/(1+s)`
+automatically downweights larger shifts, which is the right prior
+(weaker pairs contribute less). The arch already does this by default.
+
+### Other Part B hypotheses not yet tested
+
 - H3 log-matryoshka (arch + launcher ready at `run_partB_h3.sh`)
 - H5 SVD regularizer (not implemented)
 - H2 attention-pool decoder (not implemented)
 
 Or: use H8 as the base and test further refinements
-- Extend shifts to {1, 2, 3} or even {1, T/4, T/2} at larger T
 - Combine H8's multi-distance with H7's multi-scale (orthogonal axes —
-  could stack)
+  stack both contrastive pressures, could push further than either alone)
 - Try H8 recipe at T=8 (where agentic_txc_02 peaked at mp)
+- **Ablate inverse-distance weighting**: is `1/(1+s)` optimal? Try
+  uniform `w_s = 1`, or exponential `w_s = e^{-s}`.
 
 ---
 
