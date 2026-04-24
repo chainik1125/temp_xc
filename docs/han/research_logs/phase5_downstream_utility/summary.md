@@ -531,6 +531,32 @@ Peak memory (>40 GB) exceeds free memory on A40 (44 GB after ~2 GB
 CUDA overhead). Larger activation tensors during Adam's `_foreach_sqrt`
 are the tipping point, not the ckpt size.
 
+##### Feature alive fraction across TXC T-sweep
+
+Forward 40 batches × 128 samples of fineweb through each model;
+count unique features that fire at least once. Smaller alive-fraction
+= more dead features.
+
+| T | vanilla TXCDR (TopK) | vanilla TXCDR (BatchTopK) | anti-dead variants |
+|---|---|---|---|
+| 2 | 43.1% alive | 29.2% | — |
+| 3 | 40.0% | 26.9% | — |
+| 5 | 31.5% | 22.6% | matryoshka_t5: 26.5% / agentic_txc_02: 35.0% / H7: **69.3%** / H8: **76.9%** |
+| 6 | 30.4% | 21.1% | — |
+| 7 | 26.0% | 20.9% | — |
+| 8 | 24.5% | — | — |
+
+**Alive fraction decreases with T**: vanilla TXCDR drops from 43% at
+T=2 to 24% at T=8. BatchTopK pushes alive further down (~22% at T=5).
+The **anti-dead stack** (Phase 6.2 Track 2) raises alive fraction
+dramatically — H8 has 77% alive features. This correlates with H8's
+benchmark lead: higher alive fraction → more usable features for
+probing → better AUC.
+
+T=10/15/20 alive-fraction analysis not run (OOMed during evaluation
+pipeline due to GPU contention with Part B trainings). Raw data:
+[`results/alive_fraction.json`](../../../../experiments/phase5_downstream_utility/results/alive_fraction.json).
+
 **This itself is a finding**: vanilla TXCDR does not scale to T>20 at
 d_sae=18432 on A40. Any T-scaling hypothesis must be more
 parameter-efficient. ConvTXCDR (H1) has T-invariant encoder params
