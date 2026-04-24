@@ -63,18 +63,21 @@ with encoder params T-invariant (127M regardless of T, vs TemporalCrosscoder's
 **Launcher**:
 [`run_partB_h1.sh`](../../../experiments/phase5_downstream_utility/run_partB_h1.sh).
 
-**Results** (T ∈ {5, 10, 15, 20, 30}, seed=42, last_position):
+**Results** (T ∈ {5, 10, 15, 20, 30}, seed=42):
 
-| T | conv_txcdr mean AUC | vs txcdr_t5 3-seed (0.7811 ± 0.0086) |
-|---|---|---|
-| 5 | 0.7612 | −0.020 (below 1σ) |
-| 10 | 0.6881 | −0.093 |
-| 15 | 0.6889 | −0.092 |
-| 20 | 0.6859 | −0.095 |
-| 30 | 0.7294 | −0.052 |
+| T | lp AUC | mp AUC | vs txcdr_t5 3-seed lp (0.7811) |
+|---|---|---|---|
+| 5 | 0.7612 | 0.7731 | −0.020 |
+| 10 | 0.6881 | 0.7030 | −0.093 |
+| 15 | 0.6889 | 0.6932 | −0.092 |
+| 20 | 0.6859 | 0.6934 | −0.095 |
+| 30 | 0.7294 | — | −0.052 |
 
-**Scores**: monotonicity = **0.4** (target ≥0.8), Δ(T=30−T=5) = **−0.0318**
-(target >+0.02). **H1 FAILS both targets.**
+**Scores**:
+- last_position: monotonicity = **0.4** (target ≥0.8), Δ(30−5) = **−0.0318** (target >+0.02)
+- mean_pool: monotonicity = **0.17**, Δ(T20-T5) = **−0.0796**
+
+**H1 FAILS both targets decisively.**
 
 **Verdict**: ConvTXCDR does NOT exhibit T-scaling. Translation
 invariance in the encoder alone is insufficient — in fact, the T=5
