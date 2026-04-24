@@ -112,10 +112,11 @@ def diagnose(arch: str, device, n_tokens: int = 2048) -> dict:
                 "agentic_txc_12_bare_batchtopk",
                 "phase62_c1_track2_matryoshka",
                 "phase62_c2_track2_contrastive",
-                "phase62_c3_track2_matryoshka_contrastive"):
-        # T=5 window: need (B, T, d). Build non-overlapping windows by reshape.
-        # Trim to multiple of T=5.
-        T = 5
+                "phase62_c3_track2_matryoshka_contrastive",
+                "phase63_track2_t3", "phase63_track2_t10",
+                "phase63_track2_t20"):
+        # TXC window: need (B, T, d). Build non-overlapping windows by reshape.
+        T = int(meta.get("T", 5))
         n_full = (n_tokens // T) * T
         x = x[:n_full].reshape(-1, T, D_IN)
         z = model.encode(x)

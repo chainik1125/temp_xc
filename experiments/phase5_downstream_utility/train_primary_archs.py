@@ -1605,6 +1605,45 @@ def run_all(seeds, max_steps, archs=None, min_steps=None):
                             aux_k=512, dead_threshold_tokens=10_000_000,
                             auxk_alpha=1.0 / 32.0,
                             variant="agentic_txc_10_bare_antidead_track2")
+            elif arch == "phase63_track2_t3":
+                # Phase 6.3 T-sweep: Track 2 recipe at T=3.
+                model, log = train_txc_bare_antidead(
+                    cfg, device, k=100, T=3,
+                    aux_k=512, dead_threshold_tokens=10_000_000,
+                    auxk_alpha=1.0 / 32.0,
+                    buf=get_anchor(),
+                )
+                meta = dict(seed=seed, k_pos=100, k_win=300, T=3,
+                            match_budget=True, layer=13,
+                            aux_k=512, dead_threshold_tokens=10_000_000,
+                            auxk_alpha=1.0 / 32.0,
+                            variant="phase63_track2_t3")
+            elif arch == "phase63_track2_t10":
+                # Phase 6.3 T-sweep: Track 2 recipe at T=10.
+                model, log = train_txc_bare_antidead(
+                    cfg, device, k=100, T=10,
+                    aux_k=512, dead_threshold_tokens=10_000_000,
+                    auxk_alpha=1.0 / 32.0,
+                    buf=get_anchor(),
+                )
+                meta = dict(seed=seed, k_pos=100, k_win=1000, T=10,
+                            match_budget=True, layer=13,
+                            aux_k=512, dead_threshold_tokens=10_000_000,
+                            auxk_alpha=1.0 / 32.0,
+                            variant="phase63_track2_t10")
+            elif arch == "phase63_track2_t20":
+                # Phase 6.3 T-sweep: Track 2 recipe at T=20.
+                model, log = train_txc_bare_antidead(
+                    cfg, device, k=100, T=20,
+                    aux_k=512, dead_threshold_tokens=10_000_000,
+                    auxk_alpha=1.0 / 32.0,
+                    buf=get_anchor(),
+                )
+                meta = dict(seed=seed, k_pos=100, k_win=2000, T=20,
+                            match_budget=True, layer=13,
+                            aux_k=512, dead_threshold_tokens=10_000_000,
+                            auxk_alpha=1.0 / 32.0,
+                            variant="phase63_track2_t20")
             elif arch == "phase62_c1_track2_matryoshka":
                 # Phase 6.2 C1: Track 2 + matryoshka H/L reconstruction,
                 # no contrastive. Tests whether hierarchical feature

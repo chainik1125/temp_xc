@@ -48,6 +48,15 @@ SECONDARY = {
     "phase62_c6_bare_batchtopk_longer":           ("C6  2×2 cell longer",             "#dadaeb"),
 }
 
+# Phase 6.3 T-sweep: Track 2 recipe at T ∈ {3, 10, 20}.
+# Plotted as a trajectory through the primary Track 2 (T=5) point
+# on the zoom panel, showing the T axis explicitly.
+T_SWEEP = {
+    "phase63_track2_t3":   (3,  "T=3"),
+    "phase63_track2_t10": (10, "T=10"),
+    "phase63_track2_t20": (20, "T=20"),
+}
+
 
 def load_probing(agg="mean_pool", k=5):
     per_seed: dict[str, dict[int, list[float]]] = defaultdict(lambda: defaultdict(list))
@@ -78,11 +87,19 @@ def load_probing(agg="mean_pool", k=5):
     return out
 
 
-def load_random_sem():
+def load_random_sem(metric_key: str = "semantic_count"):
+    """Load per-arch list of random-concat SEMANTIC counts.
+
+    metric_key: "semantic_count" for var-based ranking (original Phase 6.1
+    metric) or "semantic_count_pdvar" for passage-discriminative-variance
+    ranking (Priority 2a). Cells missing the key are skipped.
+    """
     out: dict[str, list[int]] = defaultdict(list)
     for p in AUTOIN.glob("*__seed*__concatrandom__labels.json"):
         d = json.loads(p.read_text())
-        out[d["arch"]].append(d["metrics"]["semantic_count"])
+        metrics = d.get("metrics", {})
+        if metric_key in metrics:
+            out[d["arch"]].append(metrics[metric_key])
     return dict(out)
 
 
@@ -117,12 +134,17 @@ def main():
     ap.add_argument("--agg", default="mean_pool",
                     choices=["last_position", "mean_pool"])
     ap.add_argument("--k", type=int, default=5)
+    ap.add_argument("--metric", default="semantic_count",
+                    choices=["semantic_count", "semantic_count_pdvar"],
+                    help="which qualitative metric to put on the y-axis")
     ap.add_argument("--out", type=str,
                     default=str(REPO / "experiments/phase6_qualitative_latents/results/phase61_pareto_robust.png"))
     args = ap.parse_args()
 
     aucs = load_probing(agg=args.agg, k=args.k)
-    sems = load_random_sem()
+    sems = load_random_sem(metric_key=args.metric)
+    metric_display = ("var-ranked" if args.metric == "semantic_count"
+                      else "pdvar-ranked")
 
     # 2-panel: (A) full Pareto plane, (B) TXC-cluster zoom with Phase 6.2 labels
     fig, (ax, axz) = plt.subplots(
@@ -147,14 +169,20 @@ def main():
                       edgecolor=color, linewidth=1.0, alpha=0.9),
         )
 
-    # Pareto frontier line (tsae_paper → Track 2 — only two non-dominated points)
-    if "tsae_paper" in aucs and "agentic_txc_10_bare" in aucs:
-        pts = sorted(
-            [(_mean_se(aucs[a])[0], _mean_se(sems[a])[0])
-             for a in ("tsae_paper", "agentic_txc_10_bare")],
-            key=lambda p: p[0],
-        )
-        ax.plot([p[0] for p in pts], [p[1] for p in pts],
+    # Pareto frontier — compute non-dominated set over PRIMARY arches.
+    # Non-dominated: no other arch has higher AUC AND higher qualitative.
+    primary_pts = []
+    for arch in PRIMARY:
+        if arch in aucs and arch in sems:
+            primary_pts.append((arch, _mean_se(aucs[arch])[0],
+                                _mean_se(sems[arch])[0]))
+    def _dominated(p, pts):
+        return any(q[1] >= p[1] and q[2] >= p[2] and q != p for q in pts)
+    frontier = [(x, y) for (_, x, y) in primary_pts
+                if not _dominated((None, x, y), primary_pts)]
+    frontier.sort(key=lambda p: p[0])
+    if len(frontier) >= 2:
+        ax.plot([p[0] for p in frontier], [p[1] for p in frontier],
                 "--", color="#333333", linewidth=1.8, alpha=0.7, zorder=2)
 
     # Gap arrows between tsae_paper and Track 2 (minimalist)
@@ -164,8 +192,8 @@ def main():
         tr2_x = _mean_se(aucs["agentic_txc_10_bare"])[0]
         tr2_y = _mean_se(sems["agentic_txc_10_bare"])[0]
 
-        # Horizontal (probing) gap: drawn at y = mid-low
-        mid_y = 7.0
+        # Horizontal (probing) gap: drawn at y = mid-low, scaled by metric
+        mid_y = 15.0 if args.metric == "semantic_count_pdvar" else 7.0
         ax.annotate(
             "", xy=(tsp_x, mid_y), xytext=(tr2_x, mid_y),
             arrowprops=dict(arrowstyle="<->", color="#333333", lw=1.3),
@@ -188,15 +216,17 @@ def main():
                 bbox=dict(facecolor="white", edgecolor="#aaaaaa",
                           boxstyle="round,pad=0.2"))
 
-    # Shaded regions
+    # Shaded regions — expand y-axis for pdvar (max ~25) vs var (max ~15)
     xlim_lo = min(0.71, _mean_se(aucs.get("tsae_paper", [0.72]))[0] - 0.015)
     xlim_hi = 0.815
     ax.set_xlim(xlim_lo, xlim_hi)
-    ax.set_ylim(-1, 17)
-    ax.axhspan(0, 6, xmin=0, xmax=1, color="#08519c", alpha=0.04, zorder=0)
-    ax.axhspan(6, 17, xmin=0, xmax=1, color="#d62728", alpha=0.04, zorder=0)
+    y_hi = 28 if args.metric == "semantic_count_pdvar" else 17
+    y_split = 14 if args.metric == "semantic_count_pdvar" else 6
+    ax.set_ylim(-1, y_hi)
+    ax.axhspan(0, y_split, xmin=0, xmax=1, color="#08519c", alpha=0.04, zorder=0)
+    ax.axhspan(y_split, y_hi, xmin=0, xmax=1, color="#d62728", alpha=0.04, zorder=0)
 
-    ax.text(xlim_lo + 0.003, 15.5,
+    ax.text(xlim_lo + 0.003, y_hi - 1.5,
             "T-SAE (paper) region\n— wins qualitative",
             fontsize=9, color="#d62728", alpha=0.8,
             bbox=dict(facecolor="white", edgecolor="none", alpha=0.7))
@@ -208,13 +238,16 @@ def main():
     ax.set_xlabel(f"Probing mean AUC  ({args.agg}, k=5)  "
                   f"— Phase 5 SAEBench protocol, 36 binary tasks",
                   fontsize=11)
+    ylabel_detail = ("pdvar ranking (passage-discriminative variance)"
+                     if args.metric == "semantic_count_pdvar"
+                     else "top-32 per-token-variance ranking")
     ax.set_ylabel(
-        "SEMANTIC label count on concat_random  (/32)\n"
-        "— rigorous metric: N=32 top-var features, multi-Haiku temp=0",
+        f"SEMANTIC label count on concat_random  (/32)\n"
+        f"— {ylabel_detail}, multi-Haiku temp=0",
         fontsize=11,
     )
     ax.set_title(
-        "TXC vs T-SAE: Pareto trade-off between probing utility and qualitative generalisation\n"
+        f"TXC vs T-SAE: Pareto trade-off  ({metric_display})\n"
         "Error bars: stderr across 3 training seeds on both axes",
         fontsize=12,
     )
@@ -286,8 +319,41 @@ def main():
         axz.annotate(cid, (a_mean, s_mean), xytext=C_OFFSETS[arch],
                      textcoords="offset points", fontsize=9,
                      color="#333333", fontweight="bold")
+
+    # T-sweep trajectory: connect T=3 → Track 2 (T=5) → T=10 → T=20.
+    # Only draw if at least one phase63_track2_t* arch has data.
+    t_sweep_pts = []
+    if "agentic_txc_10_bare" in aucs and "agentic_txc_10_bare" in sems:
+        t_sweep_pts.append((5, _mean_se(aucs["agentic_txc_10_bare"])[0],
+                            _mean_se(sems["agentic_txc_10_bare"])[0]))
+    for arch, (T, label) in T_SWEEP.items():
+        if arch not in aucs or arch not in sems:
+            continue
+        a_mean, _ = _mean_se(aucs[arch])
+        s_mean, _ = _mean_se(sems[arch])
+        t_sweep_pts.append((T, a_mean, s_mean))
+    t_sweep_pts.sort(key=lambda p: p[0])
+    if len(t_sweep_pts) >= 2:
+        xs = [p[1] for p in t_sweep_pts]
+        ys = [p[2] for p in t_sweep_pts]
+        axz.plot(xs, ys, "-", color="#08519c", lw=1.4, alpha=0.6, zorder=3)
+        for arch, (T, label) in T_SWEEP.items():
+            if arch not in aucs or arch not in sems:
+                continue
+            a_mean, _ = _mean_se(aucs[arch])
+            s_mean, _ = _mean_se(sems[arch])
+            axz.scatter([a_mean], [s_mean], s=70, color="#08519c",
+                        alpha=0.9, marker="D",
+                        edgecolor="black", linewidth=0.8, zorder=5)
+            axz.annotate(label, (a_mean, s_mean), xytext=(6, 4),
+                         textcoords="offset points", fontsize=8,
+                         color="#08519c", fontweight="bold")
+
     axz.set_xlim(0.772, 0.813)
-    axz.set_ylim(-0.6, 7.0)
+    if args.metric == "semantic_count_pdvar":
+        axz.set_ylim(-1.0, 15.0)
+    else:
+        axz.set_ylim(-0.6, 7.0)
     axz.set_title("TXC cluster (zoom) — Phase 6.1 arches +\n"
                   "Phase 6.2 ablation (C1–C6)", fontsize=10)
     axz.grid(alpha=0.3)

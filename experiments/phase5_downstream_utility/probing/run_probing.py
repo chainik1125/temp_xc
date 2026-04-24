@@ -418,7 +418,9 @@ def _load_model_for_run(run_id, ckpt_path, device):
             dead_threshold_tokens=int(meta.get("dead_threshold_tokens", 10_000_000)),
             auxk_alpha=float(meta.get("auxk_alpha", 1.0 / 32.0)),
         ).to(device)
-    elif arch == "agentic_txc_10_bare":
+    elif arch in ("agentic_txc_10_bare",
+                  "phase63_track2_t3", "phase63_track2_t10",
+                  "phase63_track2_t20"):
         from src.architectures.txc_bare_antidead import TXCBareAntidead
         T = meta["T"]
         k_eff = meta["k_win"] or (meta["k_pos"] * T)
@@ -757,7 +759,10 @@ def _encode_for_probe(
                 "phase62_c2_track2_contrastive",
                 "phase62_c3_track2_matryoshka_contrastive",
                 "phase62_c5_track2_longer",
-                "phase62_c6_bare_batchtopk_longer"):
+                "phase62_c6_bare_batchtopk_longer",
+                "phase63_track2_t3",
+                "phase63_track2_t10",
+                "phase63_track2_t20"):
         T = meta["T"]
         return _encode_matryoshka(model, anchor, li, T, device, aggregation)
     if arch == "mlc_temporal_t3":

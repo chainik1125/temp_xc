@@ -169,7 +169,9 @@ def load_arch(arch: str, device: torch.device, seed: int = 42) -> torch.nn.Modul
             dead_threshold_tokens=int(meta.get("dead_threshold_tokens", 10_000_000)),
             auxk_alpha=float(meta.get("auxk_alpha", 1.0 / 32.0)),
         ).to(device)
-    elif arch == "agentic_txc_10_bare":
+    elif arch in ("agentic_txc_10_bare",
+                  "phase63_track2_t3", "phase63_track2_t10",
+                  "phase63_track2_t20"):
         from src.architectures.txc_bare_antidead import TXCBareAntidead
         T = meta["T"]
         k_eff = meta["k_win"] or (meta["k_pos"] * T)
@@ -401,7 +403,9 @@ def encode_concat_AB(concat, concat_name: str, archs: list[str], device,
                     "agentic_txc_12_bare_batchtopk",
                     "phase62_c1_track2_matryoshka",
                     "phase62_c2_track2_contrastive",
-                    "phase62_c3_track2_matryoshka_contrastive"):
+                    "phase62_c3_track2_matryoshka_contrastive",
+                    "phase63_track2_t3", "phase63_track2_t10",
+                    "phase63_track2_t20"):
             z = encode_txc(model, resid_L13, device, T=meta["T"])
         elif arch == "agentic_mlc_08":
             z = encode_mlc(model, stack, device)
@@ -456,7 +460,9 @@ def encode_concat_C(concat, archs: list[str], device, out_name: str = "concat_C"
                         "agentic_txc_12_bare_batchtopk",
                         "phase62_c1_track2_matryoshka",
                         "phase62_c2_track2_contrastive",
-                        "phase62_c3_track2_matryoshka_contrastive"):
+                        "phase62_c3_track2_matryoshka_contrastive",
+                        "phase63_track2_t3", "phase63_track2_t10",
+                        "phase63_track2_t20"):
                 z = encode_txc(model, resid_L13_i, device, T=meta["T"])
             elif arch == "agentic_mlc_08":
                 z = encode_mlc(model, stack[si], device)  # (20, 5, d) -> (20, d_sae)
