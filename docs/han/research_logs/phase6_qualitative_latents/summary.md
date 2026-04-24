@@ -821,6 +821,50 @@ Track 2 (T=5).
   reframe "Track 2 is our best TXC" → "Track 2 at T=10 is our best TXC
   (with T=5 a reasonable alternate if training budget is tight)".
 
+### 9.7. Phase 6.3 (2026-04-24) — top-N sweep: gap is structural, not top-32 artefact
+
+See [[../phase6_2_autoresearch/2026-04-24-topN-sweep-results]] for full
+detail.
+
+**Priority 2b — top-N sweep** on concat_random seed 42:
+
+| arch | N=32 | N=64 | N=128 | N=256 |
+|---|---|---|---|---|
+| `tsae_paper` | 15 | 26 | 48 | **95** |
+| `agentic_txc_10_bare` (Track 2) | 6 | 6 | 11 | 20 |
+| `agentic_txc_02_batchtopk` (Cycle F) | 0 | 0 | 6 | 21 |
+
+**Two headline takeaways**:
+
+1. **The qualitative gap is structural, not a top-32 ranking
+   artefact.** At N=256 T-SAE has ~95 semantic features (37% density);
+   the best TXC variant caps at ~21 (8% density). Ratio ≈ 4.5x,
+   consistent across all N tested. This is the cleanest paper-number
+   for the gap.
+
+2. **Track 2 and Cycle F are tied at top-256** (20 vs 21). The
+   pdvar-top-32 finding that Cycle F (12.3) ≫ Track 2 (7.3) is a
+   **ranking effect** — Cycle F places semantic features deeper in the
+   variance ordering (0 at top-64, 21 at top-256) while Track 2
+   distributes them more evenly (6 at top-32, 20 at top-256). Their
+   total inventories are equivalent.
+
+Paper narrative should therefore pivot on total inventory (top-256),
+not top-32:
+
+- **Old story (top-32 var)**: "TXC has a 0-4/32 plateau, T-SAE finds
+  13.7/32 — a structural gap of ~10 labels."
+- **Middle story (top-32 pdvar)**: "TXC finds 5-12/32 depending on
+  arch, T-SAE finds 23.7/32 — gap narrows to ~11 labels, Cycle F is
+  best TXC."
+- **Final story (top-256 var)**: "TXC caps at ~20 semantic features
+  per 256 (8% density), T-SAE reaches ~95 (37% density). Both TXC
+  variants are equivalent on total inventory; Cycle F's pdvar-top-32
+  advantage is a ranking effect not a quality effect."
+
+**Figure**: `phase63_topN_sweep.png` (linear-x line plot, cumulative
+SEMANTIC vs N for 3 archs).
+
 ### 10. Reproduction
 
 Given a warm `uv sync`ed venv with HF + Anthropic tokens:

@@ -139,6 +139,8 @@ variance — see [Phase 6.3 pdvar results](research_logs/phase6_2_autoresearch/2
 |---|---|---|
 | Pareto trade-off (main, var) | `experiments/phase6_qualitative_latents/results/phase61_pareto_robust.png` | 2-panel: full probing-vs-qualitative plane (5 primary archs, 3-seed error bars) + TXC-cluster zoom (Phase 6.2 C1-C6); y-axis = top-32 by per-token variance (x/32 var) |
 | Pareto trade-off (main, pdvar) | `experiments/phase6_qualitative_latents/results/phase63_pareto_pdvar.png` | Same layout but y-axis = top-32 by passage-discriminative variance (x/32 pdvar). Cycle F re-ranks to best TXC (12.3 vs Track 2 7.3). See [Phase 6.3 pdvar results](research_logs/phase6_2_autoresearch/2026-04-24-pdvar-results.md). |
+| T-sweep line plot | `experiments/phase6_qualitative_latents/results/phase63_t_sweep.png` | Side-by-side AUC vs T + qualitative (var + pdvar) vs T for Track 2 recipe at T ∈ {3, 5, 10, 20}, with T-SAE reference lines. Probing peaks at T=10 with anti-dead stack. |
+| Top-N sweep | `experiments/phase6_qualitative_latents/results/phase63_topN_sweep.png` | Cumulative SEMANTIC count vs top-N cutoff (32/64/128/256) for 3 archs on concat_random seed 42. T-SAE 95 vs TXC ~20 at N=256 — gap is structural. |
 | Rigorous metric headline | `experiments/phase6_qualitative_latents/results/phase61_rigorous_headline.png` | Horizontal bar chart: per-arch SEMANTIC count on concat A/B/random |
 | Pareto (last_pos) | `experiments/phase6_qualitative_latents/results/phase61_pareto_tradeoff.png` | Simpler 1-panel scatter, last_pos AUC |
 | Pareto (mean_pool) | `experiments/phase6_qualitative_latents/results/phase61_pareto_tradeoff_mean_pool.png` | Simpler 1-panel scatter, mean_pool AUC |
@@ -161,6 +163,7 @@ All figures have `.thumb.png` siblings (≤48 dpi, agent-readable).
 | Phase 6.3 T-sweep handover | [research_logs/phase6_2_autoresearch/2026-04-24-handover-t-sweep.md](research_logs/phase6_2_autoresearch/2026-04-24-handover-t-sweep.md) | in-progress (training at T=3 running) |
 | Phase 6.3 T-sweep results | [research_logs/phase6_2_autoresearch/2026-04-24-t-sweep-results.md](research_logs/phase6_2_autoresearch/2026-04-24-t-sweep-results.md) | draft (training complete, encode/autointerp/probe running) |
 | Phase 6.3 pdvar results (Priority 2a) | [research_logs/phase6_2_autoresearch/2026-04-24-pdvar-results.md](research_logs/phase6_2_autoresearch/2026-04-24-pdvar-results.md) | **complete** — softens structural-gap claim |
+| Phase 6.3 top-N sweep (Priority 2b) | [research_logs/phase6_2_autoresearch/2026-04-24-topN-sweep-results.md](research_logs/phase6_2_autoresearch/2026-04-24-topN-sweep-results.md) | **complete** — gap is structural, not top-32 artefact (T-SAE 95 vs TXC ~20 at top-256) |
 
 ### 6. Key scripts
 
@@ -196,7 +199,7 @@ If .venv/bin/python missing: `uv sync`. If uv missing:
 |---|---|---|---|
 | **Phase 6.3 T-sweep** | Track 2 at T ∈ {3, 10, 20} — tests user's "larger T trades probing for qualitative" hypothesis | **training complete**, encode/autointerp/probe running | [handover-t-sweep](research_logs/phase6_2_autoresearch/2026-04-24-handover-t-sweep.md), [results](research_logs/phase6_2_autoresearch/2026-04-24-t-sweep-results.md) |
 | **Phase 6.3 Priority 2a (pdvar)** | Replace var-ranking with passage-discriminative variance; tests whether x/32 metric is systematically unfair to TXC | **complete** — softens structural-gap claim (Cycle F re-ranks to best TXC; gap narrows from 10.4 → 16.3 labels on absolute scale) | [pdvar-results](research_logs/phase6_2_autoresearch/2026-04-24-pdvar-results.md) |
-| Phase 6.3 Priority 2b (top-N sweep) | Extend top-N beyond 32 to see if TXC catches up at larger N | **queued** (budget permitting) | [POST_COMPACT_PRIORITIES §2b](research_logs/POST_COMPACT_PRIORITIES.md) |
+| Phase 6.3 Priority 2b (top-N sweep) | Extend top-N beyond 32 to see if TXC catches up at larger N | **complete** — gap is structural (T-SAE 95/256, TXC ~20/256 at seed 42 concat_random) | [topN-sweep results](research_logs/phase6_2_autoresearch/2026-04-24-topN-sweep-results.md) |
 | Phase 6.3 Priority 2c (distinct concepts) | Dedup labels via Sonnet clustering ("N distinct concepts"); faithful to user's phrasing | deferred | [POST_COMPACT_PRIORITIES §2c](research_logs/POST_COMPACT_PRIORITIES.md) |
 | Gemma base L12 control | probe tsae_paper on base model + L12 to see if IT L13 is the confound | deferred | mentioned in §9.5 |
 | MLC-side anti-dead stack | apply Track 2's recipe to the MLC encoder (currently only tested on TXC) | deferred | — |
