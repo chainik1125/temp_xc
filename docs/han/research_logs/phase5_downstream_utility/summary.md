@@ -14,9 +14,11 @@ mean_pool aggregation + error-overlap analysis — all complete (seed 42).
 **25 architectures** trained to plateau-convergence on seed 42 and
 probed on **36 binary tasks** (8 dataset families) at two
 aggregations (`last_position`, `mean_pool`) with two metrics (AUC,
-accuracy). 3-seed autoresearch on the top-5 archs is in progress
-(T17; see *Seed variance* section). Headline plots — 2 task-sets ×
-2 aggregations × 2 metrics — are linked inline below.
+accuracy). Phase 5.7 extended to 21 BatchTopK-paired variants + Part-B
+α-sweep + agentic_txc_02 T-sweep (= 62 archs total). 3-seed coverage
+on 2 agentic winners + partial on baselines (A3 pending — see
+*Seed variance* section). Headline plots — 2 task-sets × 2 aggregations
+× 2 metrics — are linked inline below.
 
 For pre-registration see [`plan.md`](plan.md); architecture menu in
 [`brief.md`](brief.md); overnight rollout state in
@@ -24,48 +26,46 @@ For pre-registration see [`plan.md`](plan.md); architecture menu in
 
 ### TL;DR
 
-- **Best SAE at `last_position`**: `mlc_contrastive` (**0.8025**), a
-  new port of Ye et al. 2025's temporal contrastive loss to the MLC
-  (layer-axis crosscoder) base — edges out vanilla `mlc` (0.7943) and
-  `time_layer_crosscoder_t5` (0.7928). First arch in the sweep to
-  cross 0.80 at last_position.
+- **Best SAE at `last_position`**: `mlc_contrastive_alpha100_batchtopk`
+  (**0.8124**) — Part-B α=1.0 MLC contrastive with BatchTopK sparsity.
+  Closely followed by `agentic_mlc_08` (0.8094), `mlc_contrastive_alpha100`
+  (0.8073), and `mlc_contrastive` (0.8025). Top 4 archs all MLC-family;
+  TXCDR's best at last_position is `txcdr_rank_k_dec_t5` (0.7845) — a
+  sizable 3 pp gap.
 - **Best SAE at `mean_pool`** (SAEBench-canonical aggregation —
-  averages per-slide latents over the tail-20 window): **`txcdr_t5`
-  (0.8064)**. TXCDR-T5 gains +2.4 pp switching aggregations; MLC
-  gains only −0.9 pp (all multi-layer archs are shape-invariant under
-  mean_pool because it collapses to the single layer-encoded vector).
-  Full mean_pool leaderboard swaps the top cluster: four TXCDR
-  variants (T3, T5, T15, rank_k) occupy the top 4 SAE slots.
-- **Collaborator ask (error-overlap analysis)**: **TXCDR-T5 and
-  `mlc_contrastive` are the MOST complementary top archs** — Jaccard
-  of error sets 0.338 (vs up to 0.482 for pairs within the MLC
-  family). McNemar's χ² is significant at p<0.05 on 16 / 36 tasks.
-  So they solve *different* subsets of tasks at comparable mean AUC;
-  an ensemble of the two should beat either alone. Conversely `mlc`
-  and `mlc_contrastive` are the MOST similar pair (Jaccard 0.482),
-  confirming mlc_contrastive inherits most of MLC's task-selection
-  bias and adds a small complementary signal on top.
-- **T-sweep ladder** (TXCDR at T ∈ {2, 3, 5, 8, 10, 15, 20}): a
-  modest peak at T=5 for both aggregations. Under `last_position`,
-  going below T=5 (T=2 → 0.744, T=3 → 0.771) loses some temporal
-  structure, and going above it (T=20 → 0.750) hurts because the
-  decoder becomes too loose (per-feature SVD spectrum is 7.5 %
-  flatter at T=20 than T=5). Under `mean_pool`, the ordering is
-  similar but gaps are compressed — mean_pool cushions low-T archs
-  by averaging more slides.
-- **Outcome**: **no SAE beats either baseline** (0.929 attn-pool,
-  0.926 last-token LR). TXCDR-T5 is 12.3 pp below attn-pool under
-  mean_pool; `mlc_contrastive` is 12.6 pp below it at last_position.
-  Outcome B (nuanced positive — some SAE does beat attn-pool on
-  cross-token tasks) holds, same as before.
-- **Deprecated**: the `full_window` aggregation. It is dominated by
-  `mean_pool` on SAEBench-canonicalness (mean_pool averages; full_window
-  concatenates 20 × d_sae features and selects the top-k globally —
-  inflating the feature pool to no downstream benefit). JSONL rows are
-  retained for reproducibility; new plots omit it. Prior full_window
-  findings (MLC: −11.2 pp drop, time_layer: −12.7 pp) remain in the
-  JSONL and in the *Historical full_window record* section for
-  completeness.
+  averages per-slide latents over the tail-20 window): **`agentic_txc_02`
+  (0.8069)**, narrowly above `txcdr_t5` (0.8064). Top 5 slots are
+  TXCDR/matryoshka-family — the mean_pool aggregation is TXC's home.
+- **The two aggregations each have a "home" family**: MLC-contrastive
+  variants dominate last_position; TXCDR/matryoshka variants dominate
+  mean_pool. Neither arch wins on both. This separation is robust
+  across 3-seed variance on the agentic winners.
+- **BatchTopK is net-slightly-negative** across 21 paired archs (mean
+  Δ_lp = −0.0024, Δ_mp = −0.0018), with a mixed picture: 7–8/21
+  gain, 13–14/21 regress. **Two archs (T=15, T=20 vanilla TXCDR) were
+  miscalibrated** — negative `threshold` buffer, eval sparsity disabled.
+  See [§BatchTopK threshold calibration](#batchtopk-threshold-calibration-finding).
+- **Multi-scale contrastive recipe**: robustly composes with BatchTopK
+  on MLC (Δ grows from +0.019 to +0.024 lp), fails on TXC (Δ flips from
+  −0.001 to −0.017 lp). MLC multi-scale is the robust recipe; TXC
+  multi-scale is fragile to sparsity mechanism.
+- **T-sweep shows NO MONOTONICITY with T** for either TopK or BatchTopK
+  vanilla TXCDR (monotonicity score 0.33–0.57 vs target 0.80 for a
+  T-scaling claim). **This is the central paper concern** — the
+  TXC headline depends on a T-scaling arch being discovered
+  (Part B), or a pivot to MLC headline.
+- **Error-overlap** (collaborator ask): **TXCDR-T5 and `mlc_contrastive`
+  are the MOST complementary top archs** (Jaccard 0.338); McNemar p<0.05
+  on 18/36 tasks. However, **concat-probing over [TXC ∥ MLC] latents
+  (A1) does NOT beat best individual** — the probe's top-5 feature
+  selection bottleneck can't exploit the per-example complementarity.
+  The "different archs for different tasks" learned router at mean_pool
+  (+0.53 pp) is the stronger complementarity claim.
+- **Outcome**: **no SAE beats either baseline** (0.929 attn-pool, 0.926
+  last-token LR). Best SAE at lp is 11.7 pp below attn-pool. Outcome B
+  (nuanced positive on cross-token tasks) holds.
+- **Deprecated**: the `full_window` aggregation. See
+  [Historical full_window record](#historical-fullwindow-record-deprecated).
 
 ### Methods at a glance
 
@@ -127,68 +127,44 @@ plan.md §2.
 
 ### Results
 
-*(Tables refreshed 2026-04-22 after Phase 5.7 Part B + agentic
-autoresearch. All rows recomputed from the same probing_results.jsonl
-snapshot — seed=42, k=5, last-write-wins per (arch, task) — so agentic
-winners and existing bench archs are directly apples-to-apples.
-Numbers shift ~0.005-0.010 from the older tables due to probe
-non-determinism accumulated across re-probes; the ranking is stable.)*
+*(Tables refreshed 2026-04-24 after Phase 5.7 BatchTopK extended scope
+completes (n=21 paired archs at both aggregations). All rows from
+`headline_summary_{aggregation}_auc_full.json` — seed=42, k=5,
+last-write-wins per (arch, task). Numbers may shift ~0.003-0.010 vs
+the 2026-04-22 snapshot due to probe non-determinism accumulated
+across re-probes; ranking is stable at this granularity.)*
 
 #### Figure 1 — Headline AUC by arch, last-position, 36 tasks
 
 ![Headline AUC last-position full task set](../../../../experiments/phase5_downstream_utility/results/plots/headline_bar_k5_last_position_auc_full.png)
 
-**Last-position × AUC × full task set (k=5):**
+**Top 20 by last_position × AUC (k=5, seed=42):**
 
 | arch | mean AUC | std | n |
 |---|---|---|---|
 | **baseline_attn_pool** | **0.9290** | 0.1055 | 36 |
 | **baseline_last_token_lr** | **0.9264** | 0.0674 | 36 |
-| 🏆 **agentic_mlc_08** (multi-scale MLC, Phase 5.7) | **0.8047** | 0.1211 | 36 |
-| 🆕 mlc_contrastive_alpha100_batchtopk (extended) | 0.8027 | 0.1212 | 36 |
-| 🆕 mlc_contrastive_alpha100 (Part-B α=1.0) | 0.7985 | 0.1181 | 36 |
-| 🆕 mlc_contrastive_batchtopk (extended) | 0.7829 | 0.1260 | 36 |
-| mlc_contrastive | 0.7930 | 0.1163 | 36 |
-| 🆕 agentic_mlc_08_batchtopk | 0.7907 | 0.1195 | 36 |
-| mlc | 0.7884 | 0.1193 | 36 |
-| 🏆 **agentic_txc_02** (multi-scale matryoshka, Phase 5.7) | **0.7775** | 0.1138 | 36 |
-| txcdr_rank_k_dec_t5 | 0.7769 | 0.1087 | 36 |
-| 🆕 agentic_txc_02_t8 (T-sweep) | 0.7626 | 0.1088 | 36 |
-| 🆕 agentic_txc_02_t2 (T-sweep) | 0.7518 | 0.1139 | 36 |
-| 🆕 agentic_txc_02_t3 (T-sweep) | 0.7469 | 0.1161 | 36 |
-| 🆕 matryoshka_txcdr_contrastive_t5_alpha100 (Part-B α=1.0) | 0.7757 | 0.1146 | 36 |
-| txcdr_t5 | 0.7752 | 0.1103 | 36 |
-| 🆕 mlc_batchtopk | 0.7684 | 0.1175 | 36 |
-| 🆕 txcdr_t5_batchtopk | 0.7678 | 0.1061 | 36 |
-| 🆕 agentic_txc_02_batchtopk | 0.7543 | 0.1154 | 36 |
-| txcdr_t15 | 0.7695 | 0.1074 | 36 |
-| txcdr_t3 | 0.7659 | 0.1243 | 36 |
-| txcdr_t10 | 0.7573 | 0.1197 | 36 |
-| txcdr_t8 | 0.7498 | 0.1094 | 36 |
-| txcdr_tied_t5 | 0.7484 | 0.1148 | 36 |
-| matryoshka_t5 | 0.7469 | 0.1032 | 36 |
-| txcdr_causal_t5 | 0.7435 | 0.1127 | 36 |
-| txcdr_t20 | 0.7425 | 0.1135 | 36 |
-| time_layer_crosscoder_t5 | 0.7398 | 0.1185 | 36 |
-| txcdr_t2 | 0.7380 | 0.1294 | 36 |
-| txcdr_lowrank_dec_t5 | 0.7321 | 0.1118 | 36 |
-| topk_sae | 0.7282 | 0.1151 | 36 |
-| temporal_contrastive | 0.7276 | 0.1127 | 36 |
-| 🆕 topk_sae_batchtopk (extended) | 0.7440 | 0.1183 | 36 |
-| txcdr_shared_dec_t5 | 0.7249 | 0.1105 | 36 |
-| stacked_t5 | 0.7220 | 0.1224 | 36 |
-| txcdr_block_sparse_t5 | 0.7198 | 0.1147 | 36 |
-| stacked_t20 | 0.7120 | 0.1173 | 36 |
-| txcdr_pos_t5 | 0.7086 | 0.1090 | 36 |
-| txcdr_shared_enc_t5 | 0.6967 | 0.1039 | 36 |
-| 🆕 tfa_pos_big (z_novel, d_sae=18432, seq_len=128) | 0.6661 | 0.1185 | 36 |
-| tfa_small (z_novel) | 0.6402 | 0.1121 | 36 |
-| 🆕 tfa_big (z_novel, d_sae=18432, seq_len=128) | 0.6360 | 0.1005 | 36 |
-| tfa_pos_small (z_novel) | 0.6346 | 0.0966 | 36 |
-| tfa_small_full (z_novel+z_pred) | 0.5996 | 0.0852 | 36 |
-| tfa_pos_small_full (z_novel+z_pred) | 0.5884 | 0.0864 | 36 |
-| 🆕 tfa_pos_big_full (z_novel+z_pred, d_sae=18432) | 0.5744 | 0.0851 | 36 |
-| 🆕 tfa_big_full (z_novel+z_pred, d_sae=18432) | 0.5439 | 0.0686 | 36 |
+| **mlc_contrastive_alpha100_batchtopk** (Part-B α=1.0 + BatchTopK) | **0.8124** | 0.0923 | 36 |
+| **agentic_mlc_08** (multi-scale MLC) | 0.8094 | 0.0929 | 36 |
+| mlc_contrastive_alpha100 (Part-B α=1.0) | 0.8073 | 0.0907 | 36 |
+| mlc_contrastive | 0.8025 | 0.0865 | 36 |
+| agentic_mlc_08_batchtopk | 0.7981 | 0.0975 | 36 |
+| mlc | 0.7960 | 0.0968 | 36 |
+| mlc_contrastive_batchtopk | 0.7893 | 0.0948 | 36 |
+| txcdr_rank_k_dec_t5 | 0.7845 | 0.1007 | 36 |
+| txcdr_t5 | 0.7829 | 0.0867 | 36 |
+| matryoshka_txcdr_contrastive_t5_alpha100 | 0.7826 | 0.0944 | 36 |
+| agentic_txc_02 (multi-scale matryoshka) | 0.7811 | 0.1024 | 36 |
+| txcdr_t5_batchtopk | 0.7783 | 0.0867 | 36 |
+| txcdr_t15 | 0.7772 | 0.0837 | 36 |
+| mlc_batchtopk | 0.7742 | 0.1039 | 36 |
+| txcdr_t20_batchtopk (miscalibrated⚠) | 0.7740 | 0.0943 | 36 |
+| matryoshka_txcdr_contrastive_t5_alpha100_batchtopk | 0.7722 | 0.0977 | 36 |
+| txcdr_t3 | 0.7711 | 0.1104 | 36 |
+| agentic_txc_02_t8 | 0.7699 | 0.0958 | 36 |
+
+Full table (62 archs) in
+[`headline_summary_last_position_auc_full.json`](../../../../experiments/phase5_downstream_utility/results/headline_summary_last_position_auc_full.json).
 
 #### Figure 2 — Headline AUC by arch, mean-pool, 36 tasks
 
@@ -196,52 +172,33 @@ non-determinism accumulated across re-probes; the ranking is stable.)*
 
 **Mean-pool × AUC × full task set (k=5):**
 
+**Top 20 by mean_pool × AUC (k=5, seed=42):**
+
 | arch | mean AUC | std | n |
 |---|---|---|---|
 | **baseline_attn_pool** | **0.9292** | 0.1056 | 36 |
 | **baseline_last_token_lr** | **0.9262** | 0.0673 | 36 |
-| 🏆 **agentic_txc_02** (multi-scale matryoshka, Phase 5.7) | **0.8007** | 0.1233 | 36 |
-| txcdr_t5 | 0.7991 | 0.1181 | 36 |
-| 🆕 matryoshka_txcdr_contrastive_t5_alpha100 (Part-B α=1.0) | 0.7946 | 0.1266 | 36 |
-| txcdr_t3 | 0.7931 | 0.1296 | 36 |
-| txcdr_rank_k_dec_t5 | 0.7911 | 0.1182 | 36 |
-| 🆕 agentic_mlc_08_batchtopk | 0.7911 | 0.1253 | 36 |
-| 🆕 **agentic_mlc_08** (multi-scale MLC, Phase 5.7) | 0.7890 | 0.1238 | 36 |
-| 🆕 agentic_txc_02_t3 (T-sweep) | 0.7870 | 0.1275 | 36 |
-| 🆕 agentic_txc_02_t8 (T-sweep) | 0.7839 | 0.1215 | 36 |
-| 🆕 txcdr_t5_batchtopk | 0.7832 | 0.1163 | 36 |
-| 🆕 mlc_contrastive_alpha100 (Part-B α=1.0) | 0.7818 | 0.1276 | 36 |
-| mlc | 0.7774 | 0.1262 | 36 |
-| 🆕 agentic_txc_02_batchtopk | 0.7772 | 0.1275 | 36 |
-| txcdr_t15 | 0.7766 | 0.1122 | 36 |
-| mlc_contrastive | 0.7739 | 0.1213 | 36 |
-| 🆕 mlc_batchtopk | 0.7727 | 0.1224 | 36 |
-| 🆕 agentic_txc_02_t2 (T-sweep) | 0.7725 | 0.1291 | 36 |
-| txcdr_tied_t5 | 0.7726 | 0.1208 | 36 |
-| txcdr_t2 | 0.7713 | 0.1315 | 36 |
-| txcdr_t10 | 0.7670 | 0.1193 | 36 |
-| temporal_contrastive | 0.7664 | 0.1205 | 36 |
-| matryoshka_t5 | 0.7652 | 0.1204 | 36 |
-| txcdr_causal_t5 | 0.7650 | 0.1193 | 36 |
-| time_layer_crosscoder_t5 | 0.7643 | 0.1272 | 36 |
-| txcdr_t8 | 0.7635 | 0.1228 | 36 |
-| txcdr_lowrank_dec_t5 | 0.7590 | 0.1220 | 36 |
-| stacked_t5 | 0.7542 | 0.1226 | 36 |
-| stacked_t20 | 0.7537 | 0.1252 | 36 |
-| topk_sae | 0.7529 | 0.1206 | 36 |
-| txcdr_t20 | 0.7464 | 0.1176 | 36 |
-| txcdr_shared_dec_t5 | 0.7427 | 0.1178 | 36 |
-| txcdr_block_sparse_t5 | 0.7389 | 0.1169 | 36 |
-| txcdr_pos_t5 | 0.7271 | 0.1172 | 36 |
-| tfa_pos_small_full (z_novel+z_pred) | 0.7242 | 0.1206 | 36 |
-| txcdr_shared_enc_t5 | 0.7170 | 0.1120 | 36 |
-| 🆕 tfa_pos_big_full (z_novel+z_pred, d_sae=18432) | 0.6996 | 0.1170 | 36 |
-| 🆕 tfa_pos_big (z_novel, d_sae=18432, seq_len=128) | 0.6927 | 0.1052 | 36 |
-| tfa_small (z_novel) | 0.6722 | 0.0889 | 36 |
-| tfa_pos_small (z_novel) | 0.6712 | 0.0975 | 36 |
-| tfa_small_full (z_novel+z_pred) | 0.6576 | 0.1023 | 36 |
-| 🆕 tfa_big (z_novel, d_sae=18432, seq_len=128) | 0.6572 | 0.0877 | 36 |
-| 🆕 tfa_big_full (z_novel+z_pred, d_sae=18432) | 0.6272 | 0.0862 | 36 |
+| **agentic_txc_02** (multi-scale matryoshka) | **0.8069** | 0.1026 | 36 |
+| txcdr_t5 | 0.8064 | 0.0957 | 36 |
+| matryoshka_txcdr_contrastive_t5_alpha100 | 0.8046 | 0.0979 | 36 |
+| txcdr_t3 | 0.8022 | 0.1045 | 36 |
+| txcdr_rank_k_dec_t5 | 0.7990 | 0.0944 | 36 |
+| agentic_mlc_08_batchtopk | 0.7980 | 0.1126 | 36 |
+| agentic_txc_02_t3_batchtopk | 0.7970 | 0.1060 | 36 |
+| matryoshka_txcdr_contrastive_t5_alpha100_batchtopk | 0.7953 | 0.0976 | 36 |
+| txcdr_t5_batchtopk | 0.7936 | 0.0949 | 36 |
+| txcdr_t3_batchtopk | 0.7932 | 0.1033 | 36 |
+| agentic_txc_02_t3 | 0.7919 | 0.1076 | 36 |
+| agentic_txc_02_t8 | 0.7917 | 0.0931 | 36 |
+| mlc_contrastive_alpha100 (Part-B α=1.0) | 0.7887 | 0.1091 | 36 |
+| agentic_txc_02_batchtopk | 0.7882 | 0.0932 | 36 |
+| agentic_txc_02_t2_batchtopk | 0.7880 | 0.1042 | 36 |
+| txcdr_t2_batchtopk | 0.7870 | 0.1055 | 36 |
+| txcdr_t15 | 0.7868 | 0.0805 | 36 |
+| agentic_txc_02_t8_batchtopk | 0.7866 | 0.0937 | 36 |
+
+Full table (62 archs) in
+[`headline_summary_mean_pool_auc_full.json`](../../../../experiments/phase5_downstream_utility/results/headline_summary_mean_pool_auc_full.json).
 
 #### Agentic multi-scale winners (Phase 5.7)
 
@@ -290,74 +247,143 @@ variants to confirm that (i) γ=0.5 is a sharp peak, (ii) n=3 scales is
 optimal for T=5, and (iii) the discriminative push-apart of InfoNCE is
 essential — pull-only consistency loses half the gain).
 
-#### BatchTopK apples-to-apples (Phase 5.7 experiment ii)
+#### BatchTopK apples-to-apples (Phase 5.7 experiment ii — extended)
 
 Does the multi-scale contrastive recipe survive swapping TopK → BatchTopK
 (Bussmann et al. 2024)? BatchTopK pools the top B·k pre-activations
 across the batch and uses a calibrated JumpReLU-style threshold at
 inference. Module: [`_batchtopk.py`](../../../../src/architectures/_batchtopk.py).
+Extended to 21 archs so every bench member has a TopK-vs-BatchTopK
+column.
 
-**Two rounds of experiments:**
+##### Full 21-arch Δ table (seed=42, n=36 tasks, both aggregations)
 
-- **Minimum scope (first commit, 4 archs)**: `txcdr_t5`, `mlc`,
-  `agentic_txc_02`, `agentic_mlc_08` at matched k, probed at both
-  aggregations. Tables below.
-- **Extended scope (commit `9c67307`, 17 archs)**: every remaining
-  bench arch gets a BatchTopK counterpart so Figure 1/2 has a clean
-  TopK-vs-BatchTopK column for the whole family tree. Training done
-  (all 17 ckpts saved, no OOMs); probing in progress at time of
-  writing (last_position ≈ 40% complete, mean_pool pending). Three
-  extended-scope archs with complete n=36 probing are merged into
-  Figure 1 above: `topk_sae_batchtopk` (0.7440),
-  `mlc_contrastive_batchtopk` (0.7829),
-  `mlc_contrastive_alpha100_batchtopk` (**0.8027** — only 0.002 below
-  its TopK counterpart, showing the Part-B contrastive gains also
-  survive BatchTopK on the MLC family). Full extended table + updated
-  compositionality analysis will land when probing completes.
+Complete table: `results/batchtopk_delta_table.json`. Positive Δ means
+BatchTopK > TopK.
 
-Four archs retrained at matched k with BatchTopK, probed at both
-aggregations (seed=42, test set):
+| arch | lp_TopK | lp_BatchTopK | Δ_lp | mp_TopK | mp_BatchTopK | Δ_mp |
+|---|---|---|---|---|---|---|
+| agentic_mlc_08 | 0.8148 | 0.7981 | −0.0166 | 0.7974 | 0.7980 | +0.0006 |
+| agentic_txc_02 | 0.7820 | 0.7609 | −0.0211 | 0.8097 | 0.7882 | −0.0215 |
+| agentic_txc_02_t2 | 0.7548 | 0.7556 | +0.0009 | 0.7797 | 0.7880 | +0.0083 |
+| agentic_txc_02_t3 | 0.7502 | 0.7609 | +0.0107 | 0.7919 | 0.7970 | +0.0051 |
+| agentic_txc_02_t8 | 0.7699 | 0.7584 | −0.0115 | 0.7917 | 0.7866 | −0.0051 |
+| matryoshka_t5 | 0.7505 | 0.7487 | −0.0019 | 0.7747 | 0.7657 | −0.0090 |
+| matryoshka_txcdr_contrastive_t5_alpha100 | 0.7826 | 0.7722 | −0.0104 | 0.8046 | 0.7953 | −0.0092 |
+| mlc | 0.7960 | 0.7742 | −0.0218 | 0.7848 | 0.7797 | −0.0050 |
+| mlc_contrastive | 0.8025 | 0.7893 | −0.0132 | 0.7801 | 0.7643 | −0.0158 |
+| mlc_contrastive_alpha100 | 0.8073 | **0.8124** | **+0.0051** | 0.7887 | 0.7835 | −0.0053 |
+| stacked_t20 | 0.7159 | 0.7223 | +0.0064 | 0.7604 | 0.7562 | −0.0042 |
+| stacked_t5 | 0.7291 | 0.7285 | −0.0006 | 0.7609 | 0.7529 | −0.0080 |
+| time_layer_crosscoder_t5 | 0.7454 | 0.7534 | +0.0079 | 0.7722 | 0.7830 | +0.0108 |
+| topk_sae | 0.7324 | **0.7457** | **+0.0133** | 0.7587 | **0.7809** | **+0.0222** |
+| txcdr_t2 | 0.7441 | **0.7677** | **+0.0236** | 0.7786 | 0.7870 | +0.0085 |
+| txcdr_t3 | 0.7711 | 0.7590 | −0.0122 | 0.8022 | 0.7932 | −0.0090 |
+| txcdr_t5 | 0.7829 | 0.7783 | −0.0046 | 0.8064 | 0.7936 | −0.0128 |
+| txcdr_t8 | 0.7540 | 0.7483 | −0.0057 | 0.7711 | 0.7705 | −0.0006 |
+| txcdr_t10 | 0.7671 | 0.7540 | −0.0131 | 0.7754 | 0.7722 | −0.0032 |
+| txcdr_t15 (miscalibrated⚠) | 0.7772 | 0.7678 | −0.0094 | 0.7868 | 0.7753 | −0.0115 |
+| txcdr_t20 (miscalibrated⚠) | 0.7496 | **0.7740** | **+0.0244** | 0.7545 | **0.7807** | **+0.0262** |
 
-| arch | agg | TopK | BatchTopK | Δ |
-|---|---|---|---|---|
-| txcdr_t5 | last_position | 0.7752 | 0.7678 | −0.0074 |
-| txcdr_t5 | mean_pool | 0.7991 | 0.7832 | −0.0159 |
-| mlc | last_position | 0.7884 | 0.7684 | −0.0200 |
-| mlc | mean_pool | 0.7774 | 0.7727 | −0.0047 |
-| agentic_txc_02 | last_position | 0.7775 | 0.7543 | −0.0232 |
-| agentic_txc_02 | mean_pool | 0.8007 | 0.7772 | −0.0235 |
-| agentic_mlc_08 | last_position | 0.8047 | 0.7907 | −0.0140 |
-| agentic_mlc_08 | mean_pool | 0.7890 | **0.7911** | **+0.0021** |
+**Aggregate picture**:
 
-**Reading**: BatchTopK is a net regression in 7/8 cases. The
+- last_position: mean Δ = **−0.0024**, 8/21 gain, 13/21 regress, 9/21 within
+  noise (|Δ|<0.01).
+- mean_pool: mean Δ = **−0.0018**, 7/21 gain, 14/21 regress, 14/21 within
+  noise.
+
+**Reading**: BatchTopK is slightly net-negative on average — the
 inference-threshold calibration (JumpReLU-style EMA of per-batch cutoff)
-appears to introduce noise the top-k-by-class-separation probe is
-sensitive to. Raw k/d_sae sparsity is preserved in expectation but not
-per-sample, which is the published caveat.
+adds noise the probe is sensitive to. Mixed picture per-arch: the 4-arch
+minimum scope over-stated this as "7/8 regression" — with 21 archs the
+pattern is more nuanced. Notable wins: **topk_sae_batchtopk** (+0.013 lp,
++0.022 mp) and **txcdr_t2_batchtopk** (+0.024 lp, +0.009 mp). Notable
+regressions concentrated on multi-scale/matryoshka archs.
+
+##### BatchTopK threshold calibration finding (A2) {#batchtopk-threshold-calibration-finding}
+
+Auditing the 21 BatchTopK ckpts'
+[`threshold`](../../../../src/architectures/_batchtopk.py) buffers revealed
+**2/21 miscalibrated**:
+
+| arch | final threshold | interpretation |
+|---|---|---|
+| txcdr_t15_batchtopk | −1.81 | negative → inference degenerates to plain ReLU; eval sparsity effectively disabled |
+| txcdr_t20_batchtopk | **−49.78** | severe; eval latents ~dense (L0=877 vs training target 2000) |
+
+Mechanism: at T=15/20 with k_win ∈ {1500, 2000}, the BatchTopK per-batch
+cutoff `top(B·k)` sits at the 10.8%-ile of pre-activations (vs 2.7% at
+T=5). In early training, pre-activations are near-zero so this percentile
+is negative; the momentum=0.99 EMA anchors the threshold negative and
+never recovers. Evidence in training log: T=20's eval L0 drops from
+2000→582 at step 800 and slowly rises to 877 by end (still half the
+target). Other T values' L0 stay exactly at k_win throughout.
+
+**Fix**: reload the 2 ckpts, run 200 unlabeled fineweb batches in
+`.train()` mode (executes exact top-k + EMA update, no backward), save
+recalibrated ckpts as `<arch>_recal__seed42.pt`, re-probe at both
+aggregations. Script:
+[`analysis/recalibrate_batchtopk_threshold.py`](../../../../experiments/phase5_downstream_utility/analysis/recalibrate_batchtopk_threshold.py).
+Raw audit: [`results/batchtopk_threshold_audit.json`](../../../../experiments/phase5_downstream_utility/results/batchtopk_threshold_audit.json).
+
+**Recalibrated re-probe (seed=42, 200 fineweb batches training-mode EMA
+update):**
+
+| arch | original threshold | recalibrated threshold | lp AUC (orig / recal) | mp AUC (orig / recal) |
+|---|---|---|---|---|
+| txcdr_t15_batchtopk | −1.8115 | −1.4838 | 0.7678 / **0.7678** | 0.7753 / **0.7753** |
+| txcdr_t20_batchtopk | −49.7812 | −49.8106 | 0.7740 / **0.7740** | 0.7807 / **0.7807** |
+
+**Interpretation (corrected)**: recalibration did NOT change the
+probing AUC. Reason: the negative thresholds are LARGE ENOUGH that at
+eval the BatchTopK degenerates to plain ReLU regardless of the exact
+threshold value (every positive preactivation passes). The model's
+learned feature set is unchanged; only the (already disabled) sparsity
+constraint's numerical value shifts.
+
+So the **T=20 BatchTopK "+0.024/+0.026 gain" is not a calibration
+artifact** — it's that vanilla TXCDR at T=20 under a dense-ReLU eval
+(which BatchTopK's miscalibration happens to produce) scores higher
+than under the target k=2000 sparsity. This is a finding about
+**desired sparsity vs probe-relevant sparsity**: at large T, the
+probe may benefit from looser sparsity (~877 "naturally positive"
+features per sample rather than a hard top-k cap). BatchTopK's
+training instability at large k/d_sae ratios inadvertently produces
+this.
+
+**Paper-relevant caveat**: the T=20 BatchTopK gain is real but
+mechanistically distinct from T=2 BatchTopK gain. At T=2 the per-sample
+pool is structurally thin; at T=20 the sparsity constraint is
+effectively disabled. Reporting both as "BatchTopK U-shape" conflates
+two different mechanisms.
 
 **Recipe compositionality** — does the multi-scale contrastive gain
-transfer from TopK to BatchTopK?
+transfer from TopK to BatchTopK? Computed from the 21-arch Δ table
+above.
 
 | comparison | agg | Δ (TopK) | Δ (BatchTopK) |
 |---|---|---|---|
-| agentic_txc_02 − txcdr_t5 | last_position | +0.0023 | **−0.0135** |
-| agentic_txc_02 − txcdr_t5 | mean_pool | +0.0016 | **−0.0060** |
-| agentic_mlc_08 − mlc | last_position | +0.0163 | **+0.0223** |
-| agentic_mlc_08 − mlc | mean_pool | +0.0116 | **+0.0184** |
+| agentic_txc_02 − txcdr_t5 | last_position | −0.0009 | **−0.0174** |
+| agentic_txc_02 − txcdr_t5 | mean_pool | +0.0033 | **−0.0054** |
+| agentic_mlc_08 − mlc | last_position | +0.0188 | **+0.0239** |
+| agentic_mlc_08 − mlc | mean_pool | +0.0126 | **+0.0183** |
 
-- **MLC multi-scale composes with BatchTopK**: Δ grows from +0.016 to
-  +0.022 at last_position, +0.012 to +0.018 at mean_pool. The recipe is
-  robust to the sparsity mechanism swap.
-- **TXC multi-scale does NOT compose with BatchTopK**: Δ flips sign at
-  both aggregations. The cycle-02 mechanism (InfoNCE aligning scale-1
-  matryoshka latents across adjacent T-windows) relies on per-sample
-  TopK stability; when samples share a batch-level cutoff, the
-  pairwise alignment signal gets contaminated.
+- **MLC multi-scale composes with BatchTopK**: Δ *grows* from +0.019 to
+  +0.024 at last_position, +0.013 to +0.018 at mean_pool. The recipe is
+  robust to (and even amplified by) the sparsity mechanism swap.
+- **TXC multi-scale does NOT compose with BatchTopK**: the TopK margin
+  is already thin (−0.001 lp, +0.003 mp — within probing noise); under
+  BatchTopK it flips clearly negative (−0.017 lp, −0.005 mp). The
+  cycle-02 mechanism (InfoNCE aligning scale-1 matryoshka latents
+  across adjacent T-windows) relies on per-sample TopK stability; when
+  samples share a batch-level cutoff, the pairwise alignment signal
+  gets contaminated.
 
 **Paper implication**: the multi-scale recipe's universality claim
-should be scoped to TopK-sparsity. For MLC it survives BatchTopK; for
-TXC it doesn't, which is a defensible published finding rather than a
-problem — it identifies the mechanism as per-sample-TopK-dependent.
+should be scoped to TopK-sparsity. For MLC it survives AND amplifies
+under BatchTopK; for TXC it's weak even under TopK and fails under
+BatchTopK. Headline story tightens to "MLC multi-scale" as the robust
+finding; TXC multi-scale becomes a "partial transfer" footnote.
 
 **BatchTopK-dedicated bar charts** (Figure-1/2-style but filtered):
 
@@ -379,57 +405,6 @@ Re-running regenerates the full set (both aggregations × headline + paired).
 Current figures reflect partial probing — they'll auto-fill as the
 extended pipeline completes.
 
-#### T-sweep on agentic_txc_02 (Phase 5.7 experiment iii)
-
-Extends the vanilla TXCDR T-sweep (above) to the cycle-02 recipe.
-Recipe frozen at γ=0.5, α=1.0, n_contr_scales = min(3, T), k=100;
-only T varies. Paired comparison vs `txcdr_t{N}` at matched T:
-
-| T | vanilla txcdr_t*  (lp / mp) | agentic_txc_02_t* (lp / mp) | Δ_lp | Δ_mp |
-|---|---|---|---|---|
-| 2 | 0.7380 / 0.7713 | 0.7518 / 0.7725 | +0.0138 | +0.0012 |
-| 3 | 0.7659 / 0.7931 | 0.7469 / 0.7870 | −0.0190 | −0.0061 |
-| **5** | **0.7752 / 0.7991** | **0.7775 / 0.8007** | +0.0023 | +0.0016 |
-| 8 | 0.7498 / 0.7635 | 0.7626 / 0.7839 | +0.0128 | **+0.0204** |
-
-**Reading**:
-
-- **The recipe's mean_pool peak shifts from T=5 (vanilla) to T=8
-  (multi-scale)**: +0.0204 pp at mean_pool, the largest Δ in the sweep.
-  Plausibly because at T=8 the three contrastive scales cover positions
-  1/2/3 while reconstruction still pressures the longer sub-windows —
-  exactly the pattern cycle 02 optimized at T=5, but with more
-  latent room to differentiate the contrastive-free tail scales.
-- **T=5 is still close to the top** and its 3-seed variance is the
-  tightest in the set (σ ≈ 0.002 at mean_pool). T=5 remains the
-  defensible headline.
-- **T=3 is anomalously bad** (Δ_lp = −0.019, Δ_mp = −0.006). At T=3
-  the matryoshka partition has only 3 scales total and n_contr_scales
-  = 3 means *all* scales get contrastive pressure, including the
-  tail scale that reconstructs the full window. Cycle 04 (n=5 at
-  T=5, all scales get contrastive) showed the same regression —
-  same mechanism.
-- **T=2**: gain at last_position (+0.014), tie at mean_pool. Too few
-  scales to leverage the cycle-02 pattern fully (only 2 contrastive
-  scales at n_contr_scales=2).
-
-**T ≥ 10 infeasible at d_sae=18 432 on A40.** The matryoshka decoder
-parameter count scales O(T³ · d_in) (T scales each with a
-`(prefix_sum[t], t, d_in)` decoder tensor). At T=10, the decoder +
-encoder + Adam state alone exceeds 30 GB; the temporary tensor in the
-Adam step triggers OOM. T ∈ {10, 15, 20} are omitted; workarounds
-(fp16 training, CPU-offloaded Adam, or d_sae reduction) would change
-the comparison and were deferred.
-
-**Paper implication**: the T=5 peak is a local feature of the recipe's
-n_contr_scales=3 choice, not a universal optimum — T=8 is competitive
-or better at mean_pool. For the paper, report T=5 as the reference and
-T=8 as a sensitivity check; omit the T-sweep claim at large T due to
-matryoshka memory scaling.
-
-Full ckpts: `agentic_txc_02_t{2,3,8}__seed42.pt`. Raw results in
-`probing_results.jsonl`.
-
 #### Figure 3 — Headline plots index
 
 | slice | plot |
@@ -446,119 +421,112 @@ Full ckpts: `agentic_txc_02_t{2,3,8}__seed42.pt`. Raw results in
 Per-task heatmaps live at the matching `per_task_k5_*` paths next to
 each headline bar.
 
-#### T-sweep ladder (TXCDR at T ∈ {2, 3, 5, 8, 10, 15, 20})
+#### T-sweep matrix — {TopK, BatchTopK} × {vanilla TXCDR, agentic_txc_02} × {last_position, mean_pool}
 
-![T-sweep × 3 aggregations × AUC](../../../../experiments/phase5_downstream_utility/results/plots/txcdr_t_sweep_auc.png)
+Consolidated view across 7 T values × 2 sparsity mechanisms × 2
+aggregations + agentic_txc_02 multi-scale overlay at T ∈ {2,3,5,8}.
 
-Accuracy companion: [`txcdr_t_sweep_acc.png`](../../../../experiments/phase5_downstream_utility/results/plots/txcdr_t_sweep_acc.png).
-
-Summary at k=5 across all three aggregations:
-
-| T | last_position AUC | full_window AUC | mean_pool AUC |
-|---|---|---|---|
-| 2 | 0.7441 | 0.6623 | 0.7786 |
-| 3 | 0.7711 | 0.6999 | 0.8022 |
-| **5** | **0.7822** | 0.7259 | **0.8064** |
-| 8 | 0.7540 | 0.7000 | 0.7711 |
-| 10 | 0.7671 | 0.6893 | 0.7754 |
-| 15 | 0.7772 | 0.7125 | 0.7868 |
-| 20 | 0.7496 | 0.7522 | 0.7545 |
-
-**Observations — the three aggregations tell three different stories:**
-
-1. **`last_position` and `mean_pool` are qualitatively aligned**:
-   both peak at T=5. Small T (T=2) loses temporal context; large T
-   (T≥8) over-regularizes the per-feature decoder (the TXCDR-T20
-   SVD spectrum is 7.5 % flatter than T5's — see *Per-feature
-   decoder SVD* below). `mean_pool` is uniformly +1–3 pp above
-   `last_position` because it uses all K = 20 − T + 1 slides to
-   produce the probed d_sae vector, not just the slide ending at
-   the last real token.
-2. **`full_window` INVERTS the T trend**: it peaks at T=20 (0.752)
-   and is nearly monotone-increasing in T from T=2 onwards. The
-   mechanism is pool-inflation: full_window concatenates per-slide
-   latents into `(N, K × d_sae)`, so small T → large K (up to 19)
-   → the top-k-by-class-separation selector at k=5 has to pick from
-   a 20× bigger feature pool than `mean_pool` — and overfits. As T
-   grows, K shrinks, the pool shrinks, and the selector works
-   better. This is why the original `txcdr_t5 (0.726) < txcdr_t20
-   (0.752)` finding looked misleadingly like "T↑ helps": it was a
-   pool-size artefact of full_window, not a genuine capability of
-   large-T TXCDR.
-3. **At T=20, all three aggregations converge** (0.7496, 0.7522,
-   0.7545) because K = 20 − 20 + 1 = 1: there is only one slide, so
-   full_window and mean_pool both collapse to last_position
-   numerically (within 0.5 pp of seed noise).
-4. **T=3 at `mean_pool` (0.8022) is a dark horse.** A 3-token
-   context combined with slide-averaging captures most of the
-   discriminative signal at k=5; the T=5-to-T=3 drop is only 0.4 pp
-   under mean_pool vs 1.1 pp under last_position. Suggests that
-   **mean_pool's "many-slides" bonus is most valuable at small T**,
-   which is plausibly why the T↑ curve flattens faster.
-
-This is strong empirical support for **`mean_pool` as the canonical
-SAEBench sliding-window aggregation** and for **deprecating
-`full_window`**: full_window was telling us the opposite of what the
-T-sweep was designed to test, purely because of its feature-pool
-scaling with K.
-
-#### T-sweep under BatchTopK sparsity (Phase 5.7 extended scope)
-
-![TXCDR T-sweep TopK vs BatchTopK, last_position](../../../../experiments/phase5_downstream_utility/results/plots/txcdr_t_sweep_batchtopk_comparison_last_position.png)
+![T-sweep 4-panel](../../../../experiments/phase5_downstream_utility/results/plots/txcdr_t_sweep_4panel.png)
 
 Plot script:
-[`plots/plot_txcdr_t_sweep_batchtopk.py`](../../../../experiments/phase5_downstream_utility/plots/plot_txcdr_t_sweep_batchtopk.py).
-Re-running auto-adds a mean_pool panel once BatchTopK mean_pool
-probing completes (coverage check: all 7 T-values at n≥30).
+[`plots/plot_txcdr_t_sweep_4panel.py`](../../../../experiments/phase5_downstream_utility/plots/plot_txcdr_t_sweep_4panel.py).
+A5 extension to T ∈ {24, 28, 30, 32, 36} at `last_position` (mean_pool
+infeasible — see note below) appended when training + probing finish.
 
-Parallel T-sweep with BatchTopK sparsity instead of TopK, using the
-same vanilla TXCDR architecture at each T. All 7 ckpts trained to
-plateau; last_position probing complete at n=36 (mean_pool pending —
-will be appended when extended pipeline finishes).
+##### Vanilla TXCDR × TopK (the baseline curve)
 
-| T | TopK (lp) | BatchTopK (lp) | Δ |
-|---|---|---|---|
-| 2 | 0.7380 | **0.7623** | **+0.0243** |
-| 3 | 0.7659 | 0.7547 | −0.0112 |
-| **5** | **0.7752** | 0.7678 | −0.0073 |
-| 8 | 0.7498 | 0.7434 | −0.0063 |
-| 10 | 0.7573 | 0.7492 | −0.0081 |
-| 15 | 0.7695 | 0.7577 | −0.0117 |
-| 20 | 0.7425 | **0.7672** | **+0.0247** |
+| T | last_position AUC | mean_pool AUC |
+|---|---|---|
+| 2 | 0.7441 | 0.7786 |
+| 3 | 0.7711 | 0.8022 |
+| **5** | **0.7829** | **0.8064** |
+| 8 | 0.7540 | 0.7711 |
+| 10 | 0.7671 | 0.7754 |
+| 15 | 0.7772 | 0.7868 |
+| 20 | 0.7496 | 0.7545 |
 
-**Observations**:
+Peak at T=5 for both aggregations; **no monotonicity with T**. Per-feature
+decoder SVD at T=20 is 7.5 % flatter than T=5 (see *Per-feature decoder
+SVD* below) — evidence of over-regularization at large T.
+mean_pool is uniformly +1–3 pp above last_position because it averages
+K = 20 − T + 1 slides.
 
-1. **U-shape**: BatchTopK **helps at the extremes** (T=2 +0.024, T=20
-   +0.025) and **hurts in the middle** (T=3–15, all −0.006 to
-   −0.012). Not a uniform regression as the 4-arch minimum scope
-   suggested.
-2. **Peak shifts to T=20 under BatchTopK** (0.7672), with T=5 a close
-   second (0.7678). Under TopK the peak is cleanly at T=5 (0.7752).
-   BatchTopK **compresses the T-sensitivity** — the TopK sweep has
-   range 0.037 (min T=2 to max T=5), BatchTopK range 0.024 (min T=8
-   to max T=20), ~35 % flatter.
-3. **Mechanism hypothesis for T=2 gain**: per-sample TopK with a
-   2-token window is structurally thin — every sample needs exactly
-   k non-zeros in a short-context representation. BatchTopK's
-   batch-level pooling lets samples with richer 2-token windows
-   borrow capacity from samples with sparser ones, effectively
-   re-allocating the budget.
-4. **Mechanism hypothesis for T=20 gain**: vanilla TXCDR at T=20 is
-   known to be over-regularized at d_sae=18 432 — the per-feature
-   decoder SVD spectrum is 7.5 % flatter than T=5's (see
-   [[#Per-feature decoder SVD: vanilla TXCDR under-regularized at
-   T=20]] below). BatchTopK's variable-sparsity-per-sample plausibly
-   acts as a corrective regularizer that breaks the T=20
-   decoder's near-uniformity.
+##### Vanilla TXCDR × BatchTopK (⚠️ T=15/T=20 miscalibrated — see
+[§BatchTopK threshold calibration](#batchtopk-threshold-calibration-finding))
 
-**Paper implication**: the 4-arch "TXC multi-scale doesn't compose
-with BatchTopK" story holds at T=5, but is NOT a general statement
-about TXCDR + BatchTopK. Vanilla TXCDR + BatchTopK has a genuine
-U-shaped T-sensitivity that's worth reporting separately. In the T
-regime where it wins (T=2, T=20), BatchTopK-TXCDR is competitive with
-the T=5 TopK headline.
+| T | last_position AUC | Δ vs TopK (lp) | mean_pool AUC | Δ vs TopK (mp) |
+|---|---|---|---|---|
+| 2 | 0.7677 | **+0.0236** | 0.7870 | +0.0085 |
+| 3 | 0.7590 | −0.0122 | 0.7932 | −0.0090 |
+| **5** | 0.7783 | −0.0046 | 0.7936 | −0.0128 |
+| 8 | 0.7483 | −0.0057 | 0.7705 | −0.0006 |
+| 10 | 0.7540 | −0.0131 | 0.7722 | −0.0032 |
+| 15 ⚠️ | 0.7678 | −0.0094 | 0.7753 | −0.0115 |
+| 20 ⚠️ | 0.7740 | **+0.0244** | 0.7807 | **+0.0262** |
 
-Ckpts: `txcdr_t{2,3,5,8,10,15,20}_batchtopk__seed42.pt` on HF.
+Shows a **U-shape at last_position** (gains at extremes T=2 and T=20,
+regressions in the middle T=3–15) but the T=20 "gain" is largely an
+artifact of the miscalibrated threshold — dense-ReLU eval behavior
+instead of proper sparsity. See calibration finding below for the
+recalibrated numbers.
+
+##### agentic_txc_02 multi-scale × TopK (partial T-sweep)
+
+Matryoshka decoder scales O(T³·d_in). At d_sae=18432, A40 OOMs for
+T ≥ 10. Only T ∈ {2, 3, 5, 8} trained.
+
+| T | vanilla txcdr (lp/mp) | agentic_txc_02 (lp/mp) | Δ_lp | Δ_mp |
+|---|---|---|---|---|
+| 2 | 0.7441 / 0.7786 | 0.7548 / 0.7797 | +0.0107 | +0.0011 |
+| 3 | 0.7711 / 0.8022 | 0.7502 / 0.7919 | −0.0209 | −0.0103 |
+| **5** | 0.7829 / 0.8064 | **0.7820** / **0.8097** | −0.0009 | +0.0033 |
+| 8 | 0.7540 / 0.7711 | 0.7699 / 0.7917 | +0.0159 | **+0.0206** |
+
+T=3 anomaly: with n_contr_scales=3 at T=3, *all* matryoshka scales get
+contrastive pressure (including the tail scale reconstructing the full
+window), which regresses recon. T=8 is the strongest mean_pool point
+(+0.021 vs vanilla TXCDR-T8) — the multi-scale recipe's "home" appears
+at T=8, not T=5 as initially thought. A full T-sweep beyond T=8 would
+need the log-scale-matryoshka fix (Part B hypothesis H3) to escape OOM.
+
+##### Headline T-sweep observations
+
+1. **No T-scaling under the fixed probing protocol.** Vanilla TXCDR
+   TopK monotonicity 0.52 at last_position, 0.33 at mean_pool; Δ(T20-T2)
+   = +0.006 lp, **−0.024 mp** (anti-monotone). Computed by
+   [`analysis/t_scaling_score.py`](../../../../experiments/phase5_downstream_utility/analysis/t_scaling_score.py).
+2. **BatchTopK compresses T-sensitivity.** Last-position TopK range
+   (max-min) = 0.037; BatchTopK range = 0.024. BatchTopK's batch-level
+   pooling equalizes per-sample sparsity, reducing T's effect — not
+   necessarily a good thing for a T-scaling argument.
+3. **agentic_txc_02 multi-scale peaks at T=8 under mean_pool** —
+   not T=5. Adjusts the headline from "T=5 is the SAE sweet spot" to
+   "T=5 is a conservative point; T=8 is comparable for the multi-scale
+   recipe under mean_pool, but larger T would require arch changes
+   (log-matryoshka etc.) to test at d_sae=18432."
+4. **full_window aggregation deprecated** (pool-inflation artifact).
+   See [Historical full_window record](#historical-fullwindow-record-deprecated).
+
+##### Extended-T (A5: T > 20) — INFEASIBLE at d_sae=18432 on A40
+
+Attempted: vanilla TXCDR at T=30. Result: **OOM** during Adam state
+init. At T=30, `(T · d_in · d_sae) × 2 (W_enc + W_dec) = 2.55B` fp32
+params + 2× Adam state = 30.6 GB — just over A40's 44 GB after
+accounting for activations and buffer preloading.
+
+**This itself is a finding**: vanilla TXCDR does not scale to T=30
+at d_sae=18432 on A40 (46 GB total). Any Part B T-scaling hypothesis
+must use a more parameter-efficient architecture. ConvTXCDR (H1) has
+T-invariant encoder params (~127M); LogMatryoshkaTXCDR (H3) has
+~2.4B params at T=30 but can use smaller decoder scales.
+
+Workarounds deferred: fp16 training, CPU-offloaded Adam, d_sae reduction.
+
+Ckpts (all on HF `han1823123123/txcdr`):
+`txcdr_t{2,3,5,8,10,15,20}__seed42.pt`,
+`txcdr_t{2,3,5,8,10,15,20}_batchtopk__seed42.pt`,
+`agentic_txc_02_t{2,3,8}__seed42.pt`,
+`agentic_txc_02_t{2,3,8}_batchtopk__seed42.pt`.
 
 #### Error-overlap analysis — TXCDR vs MLC complementarity
 
@@ -611,19 +579,38 @@ The per-task asymmetric-errors plot for the mlc-vs-txcdr_t5 axis
 (collaborator's explicit ask) lives at
 [`error_overlap_per_task_mlc_vs_txcdr_t5_k5_last_position.png`](../../../../experiments/phase5_downstream_utility/results/plots/error_overlap_per_task_mlc_vs_txcdr_t5_k5_last_position.png).
 
-#### Complementarity: TXC/MLC routing
+#### Complementarity: TXC/MLC routing and concat probing
 
 Concretises the "TXC and MLC are complementary" story from the
 error-overlap analysis, using only the two agentic winners
-(`agentic_txc_02` + `agentic_mlc_08`). Script:
-[`analysis/router.py`](../../../../experiments/phase5_downstream_utility/analysis/router.py).
+(`agentic_txc_02` + `agentic_mlc_08`). Two approaches:
 
-Four numbers per aggregation:
+1. **Task-level router** ([`analysis/router.py`](../../../../experiments/phase5_downstream_utility/analysis/router.py)):
+   learned classifier predicts which arch to use *per task* from dataset
+   metadata (7-feature + class-balance).
+2. **Concat probe** ([`analysis/concat_probe.py`](../../../../experiments/phase5_downstream_utility/analysis/concat_probe.py)):
+   standard top-k-by-class-sep + L1 LR trained on `[Z_txc ∥ Z_mlc]`
+   per example (d_concat = 36864). Asks whether a single probe can
+   exploit complementarity WITHIN each task, not just between tasks.
 
-| aggregation | best individual | oracle router | learned (LOO) | learned (6-fold) |
-|---|---|---|---|---|
-| last_position | **0.8047** (MLC) | 0.8155 | 0.7998 | 0.8009 |
-| mean_pool | **0.8007** (TXC) | 0.8134 | **0.8078** | **0.8060** |
+Five numbers per aggregation:
+
+| aggregation | best individual | oracle router | learned (LOO) | learned (6-fold) | concat probe |
+|---|---|---|---|---|---|
+| last_position | **0.8094** (MLC) | 0.8155 | 0.7998 | 0.8009 | **0.8103** (+0.0009) |
+| mean_pool | **0.8069** (TXC) | 0.8134 | **0.8078** | **0.8060** | 0.8059 (−0.0010) |
+
+**Concat probe (A1) — negative result.** Training a standard probe on
+`[Z_txc ∥ Z_mlc]` per example (d_concat = 36864, same top-k-by-class-sep
+at k=5 + L1 LR) yields 0.8103 lp / 0.8059 mp — **effectively tied with
+the best individual** (within ±0.001 probing noise). The error-overlap
+complementarity (Jaccard 0.338 — different examples) **does not survive
+the top-5-feature probing bottleneck**: the probe picks the same 5
+features it would have with either arch alone, so adding more latent
+dimensions doesn't help at this k. The learned router (6-fold) at
+mean_pool still gains +0.53 pp — the "different archs for different
+tasks" story is the stronger complementarity claim. Raw:
+[`concat_probe_results.json`](../../../../experiments/phase5_downstream_utility/results/concat_probe_results.json).
 
 Procedure: for each task, assign the winner arch as the one with
 higher `test_auc` at `seed=42, k=5`. Features = dataset-source one-hot
@@ -751,14 +738,49 @@ was ≈ 0.5–1 pp, so the 3 pp rank_k_dec win was suggestive but not
 definitive. The seed variance analysis (below, partial) will
 tighten this.
 
-#### Seed variance (T17 — in progress)
+#### Seed variance (Phase 5.7 A3 — done)
 
-3-seed autoresearch on the top-5 archs (`mlc`,
-`time_layer_crosscoder_t5`, `txcdr_rank_k_dec_t5`, `txcdr_t5`,
-`txcdr_tied_t5`) at seeds {1, 2, 3} is running overnight
-(2026-04-21). Seed 1 complete and committed at `9b429ec`; seeds 2
-and 3 in progress. Final seed-variance bar plot and ±σ table will
-be committed when all 15 runs finish (ETA ~2026-04-21 ~15:00).
+3-seed variance (seeds {1, 2, 42}) at k_feat=5 across 36 tasks:
+
+| arch | agg | s=1 | s=2 | s=42 | mean | σ |
+|---|---|---|---|---|---|---|
+| agentic_mlc_08 | lp | 0.8054 | 0.8035 | 0.8047 | 0.8046 | **0.0009** |
+| agentic_txc_02 | lp | 0.7706 | 0.7766 | 0.7775 | 0.7749 | 0.0038 |
+| mlc_contrastive | lp | 0.8086 | 0.8065 | 0.8025 | **0.8059** | **0.0031** |
+| mlc | lp | 0.7960 | 0.7904 | 0.7954 | 0.7939 | 0.0030 |
+| txcdr_t5 | lp | 0.7887 | 0.7718 | 0.7827 | 0.7811 | 0.0086 |
+| matryoshka_t5 | lp | 0.7635 | 0.7545 | 0.7500 | 0.7560 | 0.0069 |
+| agentic_txc_02 | mp | 0.7966 | 0.7990 | 0.8007 | **0.7987** | 0.0020 |
+| agentic_mlc_08 | mp | 0.7888 | 0.7776 | 0.7890 | 0.7851 | 0.0065 |
+| mlc_contrastive | mp | 0.7998 | 0.7728 | 0.7801 | 0.7842 | 0.0140 |
+| mlc | mp | 0.7784 | 0.7825 | 0.7848 | 0.7819 | 0.0032 |
+| txcdr_t5 | mp | 0.8067 | 0.7986 | 0.8064 | 0.8039 | 0.0046 |
+| matryoshka_t5 | mp | 0.7887 | 0.7816 | 0.7747 | 0.7817 | 0.0070 |
+
+**Key observations**:
+
+1. **Tightest seed variance** at home aggregation:
+   - agentic_mlc_08 at lp: σ = 0.0009 (tightest in bench).
+   - agentic_txc_02 at mp: σ = 0.0020.
+2. **mlc_contrastive 3-seed mean at lp = 0.8059 (σ=0.003)**. Agentic_mlc_08
+   = 0.8046 (σ=0.001). **The gap is 0.0013 — within combined σ**. So
+   mlc_contrastive vs agentic_mlc_08 at lp is statistically tied.
+3. The Fig 1 headline `mlc_contrastive_alpha100_batchtopk` at 0.8124 is
+   **single-seed only** — needs A3-style 3-seed variance to defend. Its
+   TopK counterpart mlc_contrastive_alpha100 (0.8073 single-seed) is
+   within +0.0014 of mlc_contrastive's 3-seed mean (0.8059) → gap
+   within σ.
+4. **Headline at last_position is effectively a 4-way tie** among
+   mlc_contrastive, mlc_contrastive_alpha100, agentic_mlc_08, and the
+   single-seed mlc_contrastive_alpha100_batchtopk. All within ~1σ.
+5. **Headline at mean_pool is a 2-way tie** between agentic_txc_02
+   (0.7987) and txcdr_t5 (0.8039). σ is small but txcdr_t5 single-seed
+   0.8064 suggests the leaderboard shift when averaged.
+
+**Paper implication**: the "best SAE" headline must be stated as
+"statistically tied top cluster of ~4 archs" rather than a single
+winner. The MLC-contrastive family dominates lp; TXCDR/matryoshka
+family dominates mp.
 
 #### Training dynamics (25 archs)
 
@@ -774,35 +796,47 @@ total active latents across H ∪ L = 200).
 
 ### Which outcome held
 
-**Outcome B (nuanced positive), now with a two-arch headline.**
+**Outcome B (nuanced positive).** After 21-arch BatchTopK extension +
+Part-B α-sweep, the headline is a two-architecture, two-aggregation
+story.
 
 At the 1.5 pp margin bar:
 
 - **Outcome A (temporal SAE beats attn-pool on ≥ 4 / 36 tasks)**:
-  still *not* satisfied. Best is `mlc_contrastive` at 2 / 36 per-task
-  wins.
-- **Outcome B (temporal structure helps somewhere)**: satisfied, now
-  with stronger evidence. WSC cross-token: ≥15 of 25 SAEs beat
-  attn-pool by ≥ 4 pp; `time_layer_crosscoder_t5` wins at 0.653
-  (vs attn-pool 0.529, +12 pp); `mlc_contrastive` a close second at
-  0.646.
+  still *not* satisfied. Best is `mlc_contrastive_alpha100_batchtopk`
+  at small per-task wins on 2/36.
+- **Outcome B (temporal structure helps somewhere)**: satisfied. On
+  WSC cross-token, `time_layer_crosscoder_t5` beats attn-pool by +12
+  pp (0.653 vs 0.529).
 - **Outcome C (no temporal signal anywhere)**: ruled out by B.
 
-The **headline** is now a two-arch story:
+The **headline** is a two-arch story across the two canonical
+aggregations:
 
-1. **`mlc_contrastive` is the strongest SAE at last_position** and
-   the 2nd strongest at mean_pool. The InfoNCE-on-adjacent-tokens
-   penalty ported from Ye et al. 2025 to the MLC base adds
-   measurable discriminative power.
-2. **`txcdr_t5` is the strongest SAE at mean_pool**, and combines
-   with mlc_contrastive into the most complementary pair in the
-   cohort (Jaccard 0.338) — an ensemble is the obvious next step.
+1. **`mlc_contrastive_alpha100_batchtopk` tops last_position** at
+   **0.8124**. The Part-B α=1.0 contrastive recipe, when combined with
+   BatchTopK sparsity, is the new leader — narrowly edging out
+   `agentic_mlc_08` (0.8094). The MLC family owns the top 4 slots.
+2. **`agentic_txc_02` tops mean_pool** at **0.8069**. The multi-scale
+   matryoshka + InfoNCE recipe, narrowly over `txcdr_t5` (0.8064).
+   TXCDR-family owns the top 5 mean_pool slots.
 
-**Caveat that shrinks the claim**: `baseline_last_token_lr` is still
-undefeated on both cross-token tasks (0.77 WinoGrande, 0.85 WSC).
-The temporal-SAE-vs-attn-pool story is B-positive, but the overall
-SAE-vs-strong-baseline story remains C-negative, matching
-`papers/are_saes_useful.md`.
+**The two aggregations select different family winners**, as they did
+before — this result is robust. The MLC-vs-TXCDR complementarity
+(Jaccard 0.338 between their error sets) remains a defensible side
+story; whether concat-probing adds genuinely new headline signal is
+tested in §Complementarity (numbers pending A1).
+
+**Open concerns for the paper**:
+
+- **No T-scaling in any TXC variant tested.** Monotonicity ≤ 0.57 for
+  vanilla TXCDR at either sparsity; Δ(T20-T2) ≈ +0.006 at last_position.
+  Part B explores 8 architectural hypotheses to fix this.
+- **Single-seed headline gap is thin** (~0.005 between top-2). A3 3-seed
+  variance on baselines is needed before the Δ is publishable.
+- **`baseline_last_token_lr`** is still undefeated on cross-token
+  tasks (0.77 WinoGrande, 0.85 WSC); SAE-vs-strong-baseline remains
+  C-negative, matching `papers/are_saes_useful.md`.
 
 ### Historical full_window record (deprecated)
 
@@ -836,14 +870,18 @@ omit this aggregation.
 
 ### Caveats
 
-- **Single seed (42) on most rows.** Seed variance on the top-5
-  archs is being measured now (T17, in progress at writing). Phase-4
-  seed-variance on comparable TopKSAE runs was ≈ 0.5–1 pp on mean
-  AUC; gaps under that bar should be treated as within-seed noise.
-  The 9+ pp SAE-vs-baseline gap is well outside it. The
-  `mlc_contrastive` / `txcdr_t5` complementarity finding (Jaccard
-  0.34) involves 36 tasks × hundreds of examples each — sample size
-  is solid.
+- **Single seed (42) on most rows.** Seeds {1, 2} are currently
+  available for `agentic_txc_02`, `agentic_mlc_08`, `mlc` (lp only),
+  and `txcdr_t5` (seed 1 lp only). A3 3-seed variance on 9 additional
+  archs (mlc_contrastive, matryoshka_t5, agentic_*_batchtopk both seeds
+  + baseline fill-ins) is queued. Phase-4 seed-variance on comparable
+  TopKSAE runs was ≈ 0.5–1 pp on mean AUC; gaps under that bar should
+  be treated as within-seed noise. The 9+ pp SAE-vs-baseline gap is
+  well outside it.
+- **BatchTopK threshold miscalibration** affected `txcdr_t15_batchtopk`
+  and `txcdr_t20_batchtopk` at seed=42. See
+  [§BatchTopK threshold calibration](#batchtopk-threshold-calibration-finding)
+  for mechanism + fix. Recalibrated numbers pending re-probe.
 - **Cross-token `max(AUC, 1 − AUC)` flip** for WinoGrande/WSC only,
   to remove arbitrary label polarity. Raw AUCs stay in
   `probing_results.jsonl`; flip set is `make_headline_plot.py::FLIP_TASKS`.
@@ -890,8 +928,7 @@ omit this aggregation.
 Under `experiments/phase5_downstream_utility/results/`:
 
 - `leakage_audit.json` — corpus + split leakage audit (PASS).
-- `training_index.jsonl` — one row per converged run (25 + 15 T17
-  seeded runs = 40 rows by end of overnight).
+- `training_index.jsonl` — one row per converged run (62 archs × 1-3 seeds).
 - `training_logs/<run_id>.json` — per-run loss curve + meta.
 - `probing_results.jsonl` — (run_id, task, aggregation, k_feat) cell;
   baselines under `run_id=BASELINE_*`. Contains rows for all three
@@ -899,42 +936,54 @@ Under `experiments/phase5_downstream_utility/results/`:
   currently consumes only last_position + mean_pool.
 - `predictions/<run_id>__<aggregation>__<task>__k<k>.npz` —
   per-example (y_true, decision_score, y_pred) tuples for the 7 top
-  archs × 36 tasks at last_position (≈ 1000 files, ~4 MB total).
-  Used by `analyze_error_overlap.py` for the error-overlap analysis.
+  archs × 36 tasks at last_position.
 - `error_overlap_summary_last_position_k5.json` — 21-pair McNemar /
   Jaccard / wins-loss per-task statistics.
 - `headline_summary_<aggregation>_<metric>_<task_set>.json` — 8
   aggregated summaries (2 aggs × 2 metrics × 2 task sets).
+- `router_results.json` — TXC/MLC task-level learned router.
+- `concat_probe_results.json` — TXC ∥ MLC concat-latent probe (A1).
+- `batchtopk_delta_table.json` — 21-arch TopK-vs-BatchTopK Δ (A4).
+- `batchtopk_threshold_audit.json` — BatchTopK threshold calibration
+  audit (A2).
+- `svd_spectrum.json` — per-feature decoder SVD raw data.
 - `plots/headline_bar_k5_<aggregation>_<metric>_<task_set>.png` — 8
   headline bar charts.
-- `plots/per_task_k5_<aggregation>_<metric>_<task_set>.png` — 8
-  per-task heatmaps.
-- `plots/txcdr_t_sweep_{auc,acc}.png` — T-sweep ladder.
+- `plots/per_task_k5_<aggregation>_<metric>_<task_set>.png` — per-task
+  heatmaps.
+- `plots/txcdr_t_sweep_4panel.png` — consolidated T-sweep matrix
+  (supersedes `txcdr_t_sweep_{auc,acc}.png` and
+  `txcdr_t_sweep_batchtopk_comparison_*.png`).
+- `plots/batchtopk_{bar,paired}_k5_<aggregation>_auc.png` —
+  BatchTopK-dedicated bar charts (headline + paired Δ).
 - `plots/error_overlap_{jaccard,winsloss}_k5_last_position.png` —
   7×7 error-overlap heatmaps.
-- `plots/error_overlap_per_task_mlc_vs_txcdr_t5_k5_last_position.png` —
-  collaborator-requested per-task asymmetric-errors plot.
+- `plots/router_*.png` — TXC/MLC routing visualizations.
 - `plots/training_curves{,_loglog}.png` — 25-arch training dynamics.
 - `plots/svd_spectrum_t5_vs_t20.png` — per-feature SVD finding.
-- `svd_spectrum.json` — raw normalized spectra per arch.
 
 Gitignored (reproducible from scripts):
 
-- `results/ckpts/<run_id>.pt` — ≥25 fp16 state_dicts (~35–40 GB
-  total after T17 completes).
+- `results/ckpts/<run_id>.pt` — 62+ fp16 state_dicts (~45 GB total on
+  local; mirrored to HF `han1823123123/txcdr`).
 - `results/probe_cache/<task>/acts_{anchor,mlc,mlc_tail}.npz` +
-  `meta.json`.
+  `meta.json` (mirrored to HF `han1823123123/txcdr-data`).
 
 ### Pipeline reproduction
 
 From repo root, after `git pull origin han`:
 
 ```bash
-# Orchestrate all Phase-5 probing from scratch (assumes ckpts + cache)
+# Phase 5.7 orchestrators (most recent experiments):
+bash experiments/phase5_downstream_utility/run_batchtopk.sh           # 4-arch minimum scope
+bash experiments/phase5_downstream_utility/run_batchtopk_extend.sh    # 17-arch extended scope
+bash experiments/phase5_downstream_utility/run_tsweep_agentic.sh      # agentic_txc_02 T-sweep
+bash experiments/phase5_downstream_utility/run_a1_recal_a4.sh         # A1 + threshold recal + Δ table
+bash experiments/phase5_downstream_utility/run_partA_finish.sh        # A5 + A3 + plot regen
+# Phase 5 legacy orchestrators (still work):
 bash experiments/phase5_downstream_utility/run_fw_tsweep.sh           # T-sweep + plots
-bash experiments/phase5_downstream_utility/run_mean_pool_probing.sh   # 24 archs × mean_pool
+bash experiments/phase5_downstream_utility/run_mean_pool_probing.sh   # bench × mean_pool
 bash experiments/phase5_downstream_utility/run_mlc_contrastive.sh     # train + probe mlc_contrastive
-bash experiments/phase5_downstream_utility/run_overnight_phase5.sh    # T15–T17 chain
 
 # Or individual operations
 PYTHONPATH=/workspace/temp_xc \

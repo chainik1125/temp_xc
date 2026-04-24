@@ -1,0 +1,374 @@
+{
+  "last_position": {
+    "mean_auc": 0.8103070186582604,
+    "mean_acc": 0.7349283724905906,
+    "per_task": {
+      "ag_news_business": {
+        "auc": 0.8629727706299911,
+        "acc": 0.7763157894736842,
+        "d_concat": 36864
+      },
+      "ag_news_scitech": {
+        "auc": 0.9149168975069253,
+        "acc": 0.8276315789473684,
+        "d_concat": 36864
+      },
+      "ag_news_sports": {
+        "auc": 0.977794867531316,
+        "acc": 0.9460526315789474,
+        "d_concat": 36864
+      },
+      "ag_news_world": {
+        "auc": 0.8503213385412337,
+        "acc": 0.7539473684210526,
+        "d_concat": 36864
+      },
+      "amazon_reviews_cat0": {
+        "auc": 0.8210371365941854,
+        "acc": 0.708,
+        "d_concat": 36864
+      },
+      "amazon_reviews_cat1": {
+        "auc": 0.8102932639375438,
+        "acc": 0.731,
+        "d_concat": 36864
+      },
+      "amazon_reviews_cat2": {
+        "auc": 0.6922707690830763,
+        "acc": 0.642,
+        "d_concat": 36864
+      },
+      "amazon_reviews_cat3": {
+        "auc": 0.7002432476765446,
+        "acc": 0.636,
+        "d_concat": 36864
+      },
+      "amazon_reviews_cat5": {
+        "auc": 0.6840846270465737,
+        "acc": 0.637,
+        "d_concat": 36864
+      },
+      "amazon_reviews_sentiment_5star": {
+        "auc": 0.8567626731337967,
+        "acc": 0.781,
+        "d_concat": 36864
+      },
+      "bias_in_bios_set1_prof11": {
+        "auc": 0.8171052631578948,
+        "acc": 0.7313432835820896,
+        "d_concat": 36864
+      },
+      "bias_in_bios_set1_prof18": {
+        "auc": 0.8984064088207425,
+        "acc": 0.7946058091286307,
+        "d_concat": 36864
+      },
+      "bias_in_bios_set1_prof19": {
+        "auc": 0.9153525770153945,
+        "acc": 0.8583333333333333,
+        "d_concat": 36864
+      },
+      "bias_in_bios_set1_prof2": {
+        "auc": 0.8377244079449963,
+        "acc": 0.7654320987654321,
+        "d_concat": 36864
+      },
+      "bias_in_bios_set1_prof21": {
+        "auc": 0.8853181272509003,
+        "acc": 0.798,
+        "d_concat": 36864
+      },
+      "bias_in_bios_set2_prof13": {
+        "auc": 0.7437058823529413,
+        "acc": 0.7081081081081081,
+        "d_concat": 36864
+      },
+      "bias_in_bios_set2_prof22": {
+        "auc": 0.6627748068924539,
+        "acc": 0.6239782016348774,
+        "d_concat": 36864
+      },
+      "bias_in_bios_set2_prof25": {
+        "auc": 0.8301179528188724,
+        "acc": 0.7972027972027972,
+        "d_concat": 36864
+      },
+      "bias_in_bios_set2_prof26": {
+        "auc": 0.7490761406461527,
+        "acc": 0.6867469879518072,
+        "d_concat": 36864
+      },
+      "bias_in_bios_set2_prof6": {
+        "auc": 0.8843181603995853,
+        "acc": 0.8088737201365188,
+        "d_concat": 36864
+      },
+      "bias_in_bios_set3_prof1": {
+        "auc": 0.7781409208882053,
+        "acc": 0.7009803921568627,
+        "d_concat": 36864
+      },
+      "bias_in_bios_set3_prof12": {
+        "auc": 0.8055631679912305,
+        "acc": 0.7426900584795322,
+        "d_concat": 36864
+      },
+      "bias_in_bios_set3_prof14": {
+        "auc": 0.9541010770505385,
+        "acc": 0.8589743589743589,
+        "d_concat": 36864
+      },
+      "bias_in_bios_set3_prof20": {
+        "auc": 0.8682432432432432,
+        "acc": 0.7808219178082192,
+        "d_concat": 36864
+      },
+      "bias_in_bios_set3_prof9": {
+        "auc": 0.8181069958847736,
+        "acc": 0.7243589743589743,
+        "d_concat": 36864
+      },
+      "europarl_de": {
+        "auc": 0.7777746152438653,
+        "acc": 0.7227822580645161,
+        "d_concat": 36864
+      },
+      "europarl_es": {
+        "auc": 0.8394693932595289,
+        "acc": 0.7737373737373737,
+        "d_concat": 36864
+      },
+      "europarl_fr": {
+        "auc": 0.749942857142857,
+        "acc": 0.6838383838383838,
+        "d_concat": 36864
+      },
+      "europarl_it": {
+        "auc": 0.5792844880640042,
+        "acc": 0.5513078470824949,
+        "d_concat": 36864
+      },
+      "europarl_nl": {
+        "auc": 0.9066698578568183,
+        "acc": 0.8408862034239678,
+        "d_concat": 36864
+      },
+      "github_code_go": {
+        "auc": 0.9548903760535379,
+        "acc": 0.897,
+        "d_concat": 36864
+      },
+      "github_code_java": {
+        "auc": 0.8042597242412229,
+        "acc": 0.712,
+        "d_concat": 36864
+      },
+      "github_code_javascript": {
+        "auc": 0.8200136844337567,
+        "acc": 0.723,
+        "d_concat": 36864
+      },
+      "github_code_python": {
+        "auc": 0.8666167838379635,
+        "acc": 0.8,
+        "d_concat": 36864
+      },
+      "winogrande_correct_completion": {
+        "auc": 0.5884431025896415,
+        "acc": 0.5641025641025641,
+        "d_concat": 36864
+      },
+      "wsc_coreference": {
+        "auc": 0.6649350649350649,
+        "acc": 0.36936936936936937,
+        "d_concat": 36864
+      }
+    }
+  },
+  "mean_pool": {
+    "mean_auc": 0.8058814729360639,
+    "mean_acc": 0.7429019508670085,
+    "per_task": {
+      "ag_news_business": {
+        "auc": 0.8471883318544808,
+        "acc": 0.7657894736842106,
+        "d_concat": 36864
+      },
+      "ag_news_scitech": {
+        "auc": 0.8784072022160665,
+        "acc": 0.7842105263157895,
+        "d_concat": 36864
+      },
+      "ag_news_sports": {
+        "auc": 0.9726748697483649,
+        "acc": 0.9355263157894737,
+        "d_concat": 36864
+      },
+      "ag_news_world": {
+        "auc": 0.8008116568325993,
+        "acc": 0.725,
+        "d_concat": 36864
+      },
+      "amazon_reviews_cat0": {
+        "auc": 0.9071105137682202,
+        "acc": 0.845,
+        "d_concat": 36864
+      },
+      "amazon_reviews_cat1": {
+        "auc": 0.8760364327895105,
+        "acc": 0.793,
+        "d_concat": 36864
+      },
+      "amazon_reviews_cat2": {
+        "auc": 0.8805955223820896,
+        "acc": 0.8,
+        "d_concat": 36864
+      },
+      "amazon_reviews_cat3": {
+        "auc": 0.8284503762737498,
+        "acc": 0.761,
+        "d_concat": 36864
+      },
+      "amazon_reviews_cat5": {
+        "auc": 0.871755383193795,
+        "acc": 0.808,
+        "d_concat": 36864
+      },
+      "amazon_reviews_sentiment_5star": {
+        "auc": 0.9560627343634319,
+        "acc": 0.896,
+        "d_concat": 36864
+      },
+      "bias_in_bios_set1_prof11": {
+        "auc": 0.7096946375372393,
+        "acc": 0.654228855721393,
+        "d_concat": 36864
+      },
+      "bias_in_bios_set1_prof18": {
+        "auc": 0.8835903178568352,
+        "acc": 0.7966804979253111,
+        "d_concat": 36864
+      },
+      "bias_in_bios_set1_prof19": {
+        "auc": 0.8728430298869099,
+        "acc": 0.830952380952381,
+        "d_concat": 36864
+      },
+      "bias_in_bios_set1_prof2": {
+        "auc": 0.8075248281130634,
+        "acc": 0.7700617283950617,
+        "d_concat": 36864
+      },
+      "bias_in_bios_set1_prof21": {
+        "auc": 0.7364585834333733,
+        "acc": 0.701,
+        "d_concat": 36864
+      },
+      "bias_in_bios_set2_prof13": {
+        "auc": 0.7679117647058823,
+        "acc": 0.7054054054054054,
+        "d_concat": 36864
+      },
+      "bias_in_bios_set2_prof22": {
+        "auc": 0.7230540701128937,
+        "acc": 0.6730245231607629,
+        "d_concat": 36864
+      },
+      "bias_in_bios_set2_prof25": {
+        "auc": 0.868952419032387,
+        "acc": 0.8216783216783217,
+        "d_concat": 36864
+      },
+      "bias_in_bios_set2_prof26": {
+        "auc": 0.7435146902784384,
+        "acc": 0.6807228915662651,
+        "d_concat": 36864
+      },
+      "bias_in_bios_set2_prof6": {
+        "auc": 0.7839977381962115,
+        "acc": 0.7610921501706485,
+        "d_concat": 36864
+      },
+      "bias_in_bios_set3_prof1": {
+        "auc": 0.7406517350764202,
+        "acc": 0.6715686274509803,
+        "d_concat": 36864
+      },
+      "bias_in_bios_set3_prof12": {
+        "auc": 0.8751712798026856,
+        "acc": 0.7602339181286549,
+        "d_concat": 36864
+      },
+      "bias_in_bios_set3_prof14": {
+        "auc": 0.9423363711681856,
+        "acc": 0.8589743589743589,
+        "d_concat": 36864
+      },
+      "bias_in_bios_set3_prof20": {
+        "auc": 0.852852852852853,
+        "acc": 0.773972602739726,
+        "d_concat": 36864
+      },
+      "bias_in_bios_set3_prof9": {
+        "auc": 0.8309465020576131,
+        "acc": 0.7756410256410257,
+        "d_concat": 36864
+      },
+      "europarl_de": {
+        "auc": 0.8277065078171061,
+        "acc": 0.7570564516129032,
+        "d_concat": 36864
+      },
+      "europarl_es": {
+        "auc": 0.8511979926522573,
+        "acc": 0.7676767676767676,
+        "d_concat": 36864
+      },
+      "europarl_fr": {
+        "auc": 0.7768897959183673,
+        "acc": 0.7191919191919192,
+        "d_concat": 36864
+      },
+      "europarl_it": {
+        "auc": 0.5881818255433551,
+        "acc": 0.5643863179074446,
+        "d_concat": 36864
+      },
+      "europarl_nl": {
+        "auc": 0.856230122671513,
+        "acc": 0.7764350453172205,
+        "d_concat": 36864
+      },
+      "github_code_go": {
+        "auc": 0.8472845022420809,
+        "acc": 0.825,
+        "d_concat": 36864
+      },
+      "github_code_java": {
+        "auc": 0.7383795667791967,
+        "acc": 0.671,
+        "d_concat": 36864
+      },
+      "github_code_javascript": {
+        "auc": 0.6910879124836447,
+        "acc": 0.632,
+        "d_concat": 36864
+      },
+      "github_code_python": {
+        "auc": 0.7156818809294212,
+        "acc": 0.711,
+        "d_concat": 36864
+      },
+      "winogrande_correct_completion": {
+        "auc": 0.5426419322709163,
+        "acc": 0.46745562130177515,
+        "d_concat": 36864
+      },
+      "wsc_coreference": {
+        "auc": 0.6178571428571429,
+        "acc": 0.5045045045045045,
+        "d_concat": 36864
+      }
+    }
+  }
+}
