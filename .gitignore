@@ -25,3 +25,6 @@ Thumbs.db
 !.vscode/extensions.json
 .idea/
 experiments/separation_scaling/.mplconfig/
+
+# Claude Code internal state
+.claude/
