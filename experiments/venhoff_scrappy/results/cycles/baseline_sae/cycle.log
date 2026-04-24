@@ -1,30 +1,4 @@
 [info] skipping Phase 2 — reuse_venhoff_vectors=true
-[cmd] /usr/bin/python3.11 -m src.bench.venhoff.run_hybrid --root /workspace/spar-temporal-crosscoders/experiments/venhoff_scrappy/results/cycles/baseline_sae/venhoff_eval --model deepseek-r1-distill-llama-8b --dataset math500 --split test --n-traces 200 --layer 12 --seed 42 --arch sae --venhoff-root /workspace/spar-temporal-crosscoders/vendor/thinking-llms-interp --base-model meta-llama/Llama-3.1-8B --thinking-model deepseek-ai/DeepSeek-R1-Distill-Llama-8B --steering-layer 12 --sae-layer 6 --n-clusters 4 --n-tasks 20 --max-new-tokens 500 --max-thinking-tokens 500 --coefficients 0.5 --token-windows 0 -15
+[cmd] /workspace/spar-temporal-crosscoders/.venv/bin/python -m src.bench.venhoff.run_hybrid --root /workspace/spar-temporal-crosscoders/experiments/venhoff_scrappy/results/cycles/baseline_sae/venhoff_eval --model deepseek-r1-distill-llama-8b --dataset math500 --split test --n-traces 200 --layer 12 --seed 42 --arch sae --venhoff-root /workspace/spar-temporal-crosscoders/vendor/thinking-llms-interp --base-model meta-llama/Llama-3.1-8B --thinking-model deepseek-ai/DeepSeek-R1-Distill-Llama-8B --steering-layer 12 --sae-layer 6 --n-clusters 4 --n-tasks 20 --max-new-tokens 500 --max-thinking-tokens 500 --coefficients 0.5 --token-windows 0 -15
 [info] vendor_patch_skipped_optional | file=hybrid/hybrid_token.py | desc=revert broken v1 BatchEncoding unwrap (uses Tensor.__contains__) | reason=find_not_present
 [info] hybrid | dataset=math500 | cmd=/workspace/spar-temporal-crosscoders/vendor/thinking-llms-interp/.venv/bin/python hybrid_token.py --dataset math500 --thinking_model deepseek-ai/DeepSeek-R1-Distill-Llama-8B --base_model meta-llama/Llama-3.1-8B --steering_layer 12 --sae_layer 6 --n_clusters 4 --n_tasks 20 --max_new_tokens 500 --max_thinking_tokens 500 --coefficients 0.5 --token_windows 0 -15
-Traceback (most recent call last):
-  File "/workspace/spar-temporal-crosscoders/vendor/thinking-llms-interp/hybrid/hybrid_token.py", line 2, in <module>
-    import dotenv
-ModuleNotFoundError: No module named 'dotenv'
-Traceback (most recent call last):
-  File "<frozen runpy>", line 198, in _run_module_as_main
-  File "<frozen runpy>", line 88, in _run_code
-  File "/workspace/spar-temporal-crosscoders/src/bench/venhoff/run_hybrid.py", line 77, in <module>
-    sys.exit(main())
-             ^^^^^^
-  File "/workspace/spar-temporal-crosscoders/src/bench/venhoff/run_hybrid.py", line 67, in main
-    run_hybrid(
-  File "/workspace/spar-temporal-crosscoders/src/bench/venhoff/hybrid.py", line 144, in run_hybrid
-    raise RuntimeError(f"hybrid_token.py failed on dataset={cfg.dataset} (rc={result.returncode})")
-RuntimeError: hybrid_token.py failed on dataset=math500 (rc=1)
-Traceback (most recent call last):
-  File "/workspace/spar-temporal-crosscoders/experiments/venhoff_scrappy/run_cycle.py", line 379, in <module>
-    sys.exit(main())
-             ^^^^^^
-  File "/workspace/spar-temporal-crosscoders/experiments/venhoff_scrappy/run_cycle.py", line 374, in main
-    run_cycle(cfg, args.candidate, args.result_dir)
-  File "/workspace/spar-temporal-crosscoders/experiments/venhoff_scrappy/run_cycle.py", line 305, in run_cycle
-    _run_subprocess(phase3_cmd, cwd=REPO)
-  File "/workspace/spar-temporal-crosscoders/experiments/venhoff_scrappy/run_cycle.py", line 155, in _run_subprocess
-    raise RuntimeError(f"subprocess failed (rc={result.returncode}): {log_cmd}")
-RuntimeError: subprocess failed (rc=1): /usr/bin/python3.11 -m src.bench.venhoff.run_hybrid --root /workspace/spar-temporal-crosscoders/experiments/venhoff_scrappy/results/cycles/baseline_sae/venhoff_eval --model deepseek-r1-distill-llama-8b --dataset math500 --split test --n-traces 200 --layer 12 --seed 42 --arch sae --venhoff-root /workspace/spar-temporal-crosscoders/vendor/thinking-llms-interp --base-model meta-llama/Llama-3.1-8B --thinking-model deepseek-ai/DeepSeek-R1-Distill-Llama-8B --steering-layer 12 --sae-layer 6 --n-clusters 4 --n-tasks 20 --max-new-tokens 500 --max-thinking-tokens 500 --coefficients 0.5 --token-windows 0 -15
