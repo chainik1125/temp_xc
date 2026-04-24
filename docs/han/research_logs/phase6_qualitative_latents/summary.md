@@ -604,7 +604,27 @@ between qualitative generalisation and probing utility:**
 - Cycle H (BatchTopK + AuxK) is the worst-of-both TXC variant:
   probing regression AND 0/32 random.
 
-**Paper Pareto summary:**
+**Paper Pareto figure (3-seed, both axes with error bars):**
+
+![Pareto trade-off: probing AUC vs concat_random semantic count](../../../experiments/phase6_qualitative_latents/results/phase61_pareto_robust.png)
+
+The figure plots mean_pool probing AUC (x, Phase 5 benchmark, k=5)
+vs SEMANTIC label count on concat_random (y, N=32, multi-Haiku
+temp=0). Error bars are stderr across 3 training seeds on BOTH axes.
+The 5 primary archs (labelled) all have 3-seed data; Phase 6.2
+ablation points (C1-C6 in light purple) are seed=42 only and
+included as secondary evidence of the TXC plateau.
+
+Two observations reviewers can verify from this plot alone:
+
+1. **tsae_paper and the TXC cluster have non-overlapping error
+   bars on both axes.** The gap is not within-seed noise.
+2. **The Pareto frontier has exactly two non-dominated points**:
+   tsae_paper (0.72, 13.7) and Track 2 (0.80, 3.3). Every other
+   arch (baseline, 2×2 cell, Cycle F, Phase 6.2 C1-C6) is
+   Pareto-dominated by Track 2.
+
+**Paper Pareto summary (text form):**
 
 ```
 upper-right (wins both): nobody yet — Phase 6.2 C3 is the next shot
