@@ -81,6 +81,11 @@ for SPEC in 1 123 1234 124 2 4 123_uniform; do
     train_and_probe_both "phase57_partB_h8a_shifts${SPEC}" 42
 done
 
+# === P0d: H13 multi-distance × multi-scale (orthogonal-axes stack) ===
+# At T=5, shifts=(1,2), n_contr_scales=3, γ=0.5. Six InfoNCE terms.
+echo "================ P0d H13 mdms stack ================"
+train_and_probe_both phase57_partB_h13_md_x_ms 42
+
 # === P0c: MLC + anti-dead fairness counterparts ===
 # Apply the anti-dead stack to MLC so paper reviewers can't claim TXC got an
 # unfair anti-dead advantage. Three variants matching TXC anti-dead family:

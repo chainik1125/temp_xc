@@ -1316,6 +1316,87 @@ def train_feature_nested_matryoshka_txcdr(
     return model, log
 
 
+def train_txc_bare_md_ms_contrastive_antidead(
+    cfg, device, k, T,
+    alpha=1.0, shifts=(1, 2), weights=None,
+    n_contr_scales=3, gamma=0.5,
+    matryoshka_h_size=None,
+    aux_k=512, dead_threshold_tokens=10_000_000, auxk_alpha=1.0 / 32.0,
+    d_sae=DEFAULT_D_SAE, buf=None,
+):
+    """H13: H8 multi-distance × H7 multi-scale orthogonal contrastive stack."""
+    from src.architectures.txc_bare_md_ms_contrastive_antidead import (
+        TXCBareMDxMSContrastiveAntidead,
+    )
+    from src.architectures.txc_bare_multidistance_contrastive_antidead import (
+        make_multidistance_pair_gen_gpu,
+    )
+    buf = buf if buf is not None else _preload_single(ANCHOR_LAYER_KEY, device)
+    k_eff = k * T
+    if matryoshka_h_size is None:
+        matryoshka_h_size = int(d_sae * 0.2)
+    shifts_tup = tuple(shifts)
+    model = TXCBareMDxMSContrastiveAntidead(
+        buf.shape[-1], d_sae, T, k_eff,
+        shifts=shifts_tup,
+        weights=tuple(weights) if weights is not None else None,
+        n_contr_scales=n_contr_scales, gamma=gamma,
+        matryoshka_h_size=matryoshka_h_size,
+        alpha=alpha,
+        aux_k=aux_k, dead_threshold_tokens=dead_threshold_tokens,
+        auxk_alpha=auxk_alpha,
+    ).to(device)
+
+    gen = make_multidistance_pair_gen_gpu(buf, T, list(shifts_tup))
+    x0 = gen(cfg.batch_size)
+    x0_single = x0[:, 0]
+
+    torch.manual_seed(cfg.seed)
+    np.random.seed(cfg.seed)
+    opt = torch.optim.Adam(model.parameters(), lr=cfg.lr)
+    model.train()
+    model.init_b_dec_geometric_median(x0_single)
+
+    losses: list[float] = []
+    l0s: list[float] = []
+    steps_logged: list[int] = []
+    converged = False
+    plateau_val: float | None = None
+    import time as _time
+    t0 = _time.time()
+    for step in range(cfg.max_steps):
+        x = gen(cfg.batch_size)
+        loss, _, z = model(x, alpha=alpha)
+        opt.zero_grad()
+        loss.backward()
+        model.remove_gradient_parallel_to_decoder()
+        nn.utils.clip_grad_norm_(model.parameters(), cfg.grad_clip)
+        opt.step()
+        model._normalize_decoder()
+        if step % cfg.log_every == 0 or step == cfg.max_steps - 1:
+            with torch.no_grad():
+                l0 = (z > 0).float().sum(dim=-1).mean().item()
+            losses.append(loss.item())
+            l0s.append(l0)
+            steps_logged.append(step)
+            plateau_val = compute_plateau(losses, window=5)
+            if (plateau_val is not None
+                and plateau_val < cfg.plateau_threshold
+                and step >= cfg.min_steps):
+                converged = True
+                break
+    elapsed = _time.time() - t0
+    model.eval()
+    return model, {
+        "loss": losses, "l0": l0s, "steps_logged": steps_logged,
+        "final_step": steps_logged[-1] if steps_logged else 0,
+        "converged": converged, "plateau_last": plateau_val,
+        "elapsed_s": elapsed,
+        "shifts": list(shifts_tup), "n_contr_scales": n_contr_scales,
+        "gamma": gamma,
+    }
+
+
 def train_txc_bare_multidistance_contrastive_antidead(
     cfg, device, k, T,
     alpha=1.0, shifts=None,
@@ -2204,6 +2285,27 @@ def run_all(seeds, max_steps, archs=None):
                             aux_k=512, dead_threshold_tokens=10_000_000,
                             auxk_alpha=1.0 / 32.0,
                             variant="mlc_bare_matryoshka_contrastive_antidead")
+            elif arch == "phase57_partB_h13_md_x_ms":
+                # H13: orthogonal-axes contrastive stack — multi-distance shifts
+                # × multi-scale matryoshka prefixes. T=5, shifts=(1,2),
+                # n_contr_scales=3, γ=0.5. Six InfoNCE terms total.
+                model, log = train_txc_bare_md_ms_contrastive_antidead(
+                    cfg, device, k=100, T=5, alpha=1.0,
+                    shifts=(1, 2),
+                    n_contr_scales=3, gamma=0.5,
+                    matryoshka_h_size=int(DEFAULT_D_SAE * 0.2),
+                    aux_k=512, dead_threshold_tokens=10_000_000,
+                    auxk_alpha=1.0 / 32.0,
+                    buf=get_anchor(),
+                )
+                meta = dict(seed=seed, k_pos=100, k_win=500, T=5,
+                            match_budget=True, layer=13,
+                            alpha=1.0, shifts=[1, 2],
+                            n_contr_scales=3, gamma=0.5,
+                            matryoshka_h_size=int(DEFAULT_D_SAE * 0.2),
+                            aux_k=512, dead_threshold_tokens=10_000_000,
+                            auxk_alpha=1.0 / 32.0,
+                            variant="phase57_partB_h13_md_x_ms")
             elif arch == "mlc_bare_multiscale_antidead":
                 # MLC counterpart to H7: anti-dead + matryoshka + multi-scale
                 # InfoNCE on adjacent-token pairs, n_contr_scales=3, γ=0.5.

@@ -426,6 +426,23 @@ def _load_model_for_run(run_id, ckpt_path, device):
             n_contr_scales=meta.get("n_contr_scales", 3),
             gamma=meta.get("gamma", 0.5),
         ).to(device)
+    elif arch == "phase57_partB_h13_md_x_ms":
+        from src.architectures.txc_bare_md_ms_contrastive_antidead import (
+            TXCBareMDxMSContrastiveAntidead,
+        )
+        T = meta["T"]
+        k_eff = meta["k_win"] or (meta["k_pos"] * T)
+        model = TXCBareMDxMSContrastiveAntidead(
+            d_in, d_sae, T=T, k=k_eff,
+            shifts=tuple(meta.get("shifts", [1, 2])),
+            n_contr_scales=meta.get("n_contr_scales", 3),
+            gamma=meta.get("gamma", 0.5),
+            matryoshka_h_size=meta.get("matryoshka_h_size", d_sae // 5),
+            alpha=meta.get("alpha", 1.0),
+            aux_k=meta.get("aux_k", 512),
+            dead_threshold_tokens=meta.get("dead_threshold_tokens", 10_000_000),
+            auxk_alpha=meta.get("auxk_alpha", 1.0 / 32.0),
+        ).to(device)
     elif (arch == "phase57_partB_h8_bare_multidistance"
           or arch.startswith("phase57_partB_h8_bare_multidistance_t")
           or arch.startswith("phase57_partB_h8a_")):
@@ -823,6 +840,7 @@ def _encode_for_probe(
             or arch == "phase57_partB_h8_bare_multidistance"  # Part B H8
             or arch.startswith("phase57_partB_h8_bare_multidistance_t")  # Part B H8 T-sweep
             or arch.startswith("phase57_partB_h8a_")  # Part B H8a shift-ablation
+            or arch == "phase57_partB_h13_md_x_ms"  # Part B H13 mdms stack
             or arch == "feature_nested_matryoshka_t5"  # Part B H9
             or arch == "feature_nested_matryoshka_t5_contrastive"  # H9 + contrastive
             or arch == "txc_shared_relu_sum_pos_t5"  # H10a
