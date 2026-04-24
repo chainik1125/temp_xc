@@ -622,19 +622,39 @@ test of whether we can close the qualitative gap to tsae_paper
 without giving up the TXC family's probing utility — the Pareto-
 ideal corner.
 
-**Phase 6.2 C3 result (seed=42):** Cycle F concat_A = 22, concat_B
-= 16, **concat_random = 2**. Adding matryoshka + single-scale
-InfoNCE to Track 2's anti-dead stack (≈ the full tsae_paper
-recipe on the TXC window-based encoder) gives roughly the same
-random-concept score as the 2×2 cell (BatchTopK + anti-dead
-without matryoshka / contrastive): both land at 2/32 random.
-**The tsae_paper recipe does NOT transfer cleanly to the TXC
-encoder base.** Phase 6.2 continues with C1 (matryoshka only),
-C2 (contrastive only), C5/C6 (longer training) to isolate what's
-different, but the headline is: the 10-label gap between TXC-family
-(all at 0-5/32 random) and tsae_paper (12.7 ± 1.2 /32 random) is
-structural to the TXC window encoder, not a missing training
-ingredient.
+#### Phase 6.2 autoresearch — full 5-cycle ablation result (seed=42)
+
+Phase 6.2 trained 5 candidates on top of Track 2's anti-dead stack
+(or its 2×2-cell BatchTopK sibling), toggling the tsae_paper axes.
+None closed the gap to tsae_paper's 12.7 ± 1.2 random:
+
+| ID | recipe (TXC base + …) | A /32 | B /32 | **random /32** |
+|---|---|---|---|---|
+| (baseline: Track 2 3-seed) | anti-dead stack, TopK | 21.0 ± 1.5 | 17.7 ± 2.4 | **3.0 ± 1.0** |
+| C1 | + matryoshka H/L | 22 | 17 | 3 |
+| **C2** | **+ InfoNCE contrastive (α=1.0)** | **23** | **21** | **4** |
+| C3 | + matryoshka + contrastive (≈ tsae_paper on TXC) | 22 | 16 | 2 |
+| C5 | anti-dead, TopK, min_steps=10000 | 15 | 10 | 4 |
+| C6 | anti-dead + BatchTopK, min_steps=10000 | 17 | 9 | 0 |
+
+**Headline:** the TXC family plateaus at **2-4/32 random regardless
+of recipe**. Adding the full tsae_paper objective stack (C3) to the
+TXC encoder base does NOT recover tsae_paper's behaviour. Contrastive
+alone (C2) gives the largest gain of +1 label vs Track 2, but that's
+within single-seed noise (Track 2 3-seed stderr is 1.0). Longer
+training (C5, C6) actively HURTS curated-concat scores without
+helping random, suggesting the anti-dead stack over-regularises
+decoder directions past its plateau-stop point.
+
+**The 10-label gap between TXC-family (~3/32 random) and tsae_paper
+(12.7 ± 1.2 random) is structural**, not a missing training
+ingredient. The TXC window-based encoder + T=5 temporal structure
+apparently cannot express the same feature basis that tsae_paper's
+per-token encoder discovers on uncurated text. This is a fundamental
+result for the paper — the TXC family wins on probing utility
+(Track 2 +0.004 last_pos / +0.003 mean_pool over baseline) but
+cannot be pushed to match tsae_paper qualitatively by any of the
+mechanism swaps tested here.
 
 #### Figure for Track 2 on concat_B (preliminary)
 
