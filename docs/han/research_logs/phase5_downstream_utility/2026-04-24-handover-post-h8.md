@@ -9,10 +9,66 @@ tags:
 ## Handover: post-H8 session wrap-up
 
 **Audience**: post-compact agent. Previous session found H8 as new TXC
-champion; session at 81% context, autocompacting.
+champion **at T=5**; session at 81% context, autocompacting.
 
-**Current state**: `han` branch HEAD. Commit `3d93a1e` (push may be
-newer by time you read this).
+**Current state**: `han` branch HEAD — `2a06c1b` or newer.
+`git pull origin han` before starting.
+
+---
+
+## ⚠️ PAPER-CRITICAL OPEN PROBLEM: T-scaling has NOT been solved
+
+**The golden TXC architecture should be one whose sparse-probing AUC
+MONOTONICALLY INCREASES with T (window size).** The paper's central
+existential claim is that temporal windows carry useful structure
+beyond single-token encoders. If AUC doesn't climb with T, the "TXC
+is the thing" story collapses regardless of how good H8 is at T=5.
+
+**So far we have NOT found a T-scaling arch.** Full session data:
+
+| family | aggregation | monotonicity | Δ(T_max−T_min) | verdict |
+|---|---|---|---|---|
+| vanilla TXCDR × TopK | lp | 0.52 | +0.006 | peaks at T=5, drops both sides |
+| vanilla TXCDR × TopK | mp | 0.33 | **−0.024** | anti-monotone |
+| vanilla TXCDR × BatchTopK | lp | 0.57 | +0.006 | U-shape (T=15/20 miscalibrated) |
+| vanilla TXCDR × BatchTopK | mp | 0.43 | −0.006 | no trend |
+| agentic_txc_02 (T∈{2,3,5,6,7,8}) | mp | ≤0.7 | +0.01 | T=8 top (0.7917 lp) but T≥10 OOMs |
+| H1 ConvTXCDR (T∈{5,10,15,20,30}) | lp | **0.40** | **−0.032** | ❌ FAILS (sum-pool kills signal) |
+| H1 ConvTXCDR | mp | 0.17 | −0.080 | worse |
+
+**Target**: monotonicity ≥ 0.8, Δ(T=30 − T=5) > +0.02. None achieved.
+
+**Also critical**: vanilla TXCDR at d_sae=18432 **OOMs at T≥24** on A40.
+Any T-scaling arch MUST be more parameter-efficient than vanilla
+TXCDR to train at T=30.
+
+Feasibility map (all at d_sae=18432):
+| arch | T=20 | T=24 | T=28 | T=30 | T=32 | T=36 |
+|---|---|---|---|---|---|---|
+| vanilla TXCDR | ✓ (trained) | OOM | OOM | OOM | OOM | OOM |
+| vanilla TXCDR BatchTopK | ✓ | OOM | OOM | OOM | OOM | OOM |
+| matryoshka T-scale | ✗ (T≥10 OOM) | — | — | — | — | — |
+| ConvTXCDR H1 (conv enc) | ✓ | — | — | ✓ | — | — |
+
+ConvTXCDR trained at T=30 because its encoder params are T-invariant
+(127M regardless of T). Any new candidate should consider the same
+trick if it needs to train at T=30.
+
+**Mission for the post-compact agent**: find an arch that makes mp
+AUC climb with T. H8 at T=5 is NOT the ending — it's the baseline to
+build FROM. Plausible directions:
+
+1. **H8 T-sweep**: train H8 recipe at T∈{5, 10, 15, 20, 30} and see
+   if multi-distance InfoNCE + anti-dead finally produces monotonicity.
+   At T=30, drop matryoshka H/L (saves params); use
+   `matryoshka_h_size=None`. Shifts={1, T/4, T/2} per-T-scaled.
+   This is the direct "does H8 scale?" test and SHOULD be priority 1.
+2. **Log-matryoshka H3**: arch ready, not run. Coarser matryoshka
+   scales {1,2,4,8,16,32} escape O(T²) OOM. If it trains at T=30 AND
+   AUC climbs, new champion AND T-scaling.
+3. **Mamba/SSM encoder (H6)**: biggest change, deferred from the
+   original handover. If everything else fails, the state-space
+   encoder is the remaining architectural wildcard.
 
 ---
 
@@ -79,17 +135,48 @@ multi-distance. 3-seed variance complete:
 
 ### What's outstanding (not yet in JSONL)
 
-1. **H8 seeds 1 + 2** — seed 1 done training (ckpt saved); seed 2
-   training in background as of handover. After both trained, probe
-   at both aggregations. If σ < 0.01, H8 is σ-defensible TXC champion.
+1. **H8 seeds 1 + 2 probes** — seed 1 ckpt done ✓; seed 2 TRAINING IN
+   BACKGROUND at handover time (PID 62152, bash wrapper 59662/59664).
+   When seed 2 finishes, the bash wrapper will auto-probe both seeds at
+   both aggregations and write to `probe_h8_seeds12_{lp,mp}.log`.
 2. **H9 contrastive seeds 1 + 2** — not yet trained (seed 42 only, mp
-   0.7891 with full 36 tasks).
-3. **T=10, 15, 20 alive-fraction** — OOMed during alive_fraction.py
-   run. Retry in isolation.
+   0.7891 full 36-task, below agentic_txc_02 — H9c is NOT a winner).
+3. **T=10, 15, 20 vanilla TXCDR alive-fraction** — OOMed during
+   alive_fraction.py run (GPU was full with other jobs). Retry in
+   isolation.
 4. **A7 HF sync** — checkpoints not yet uploaded to HuggingFace.
-5. **Headline bar plots regenerated with all Part B archs** — DONE but
-   visual inspection may show some archs' labels are too small to read;
-   regenerate with only top-20 if needed.
+5. **T-scaling on H8/H7 recipes** — NOT STARTED. Must be done before
+   the paper can claim TXC scales with T.
+
+### In-flight jobs at handover time (DO NOT KILL until checked)
+
+| PID | job | ETA |
+|---|---|---|
+| 62152 | H8 seed 2 training | ~30 min remaining |
+| 59662/59664 | H8 seed 2 bash wrapper + auto-probe | follows seed 2 |
+
+When H8 seed 2 is done:
+- ckpt at `results/ckpts/phase57_partB_h8_bare_multidistance__seed2.pt`
+- probes will auto-run, results land in `probing_results.jsonl`
+- THEN you can fire new jobs.
+
+### Complete list of trained ckpts from this session (as of handover)
+
+New TXC-family trained this session:
+- `phase57_partB_h7_bare_multiscale__seed{1,2,42}` — H7 champion candidate
+- `phase57_partB_h8_bare_multidistance__seed{1,42}` + (seed 2 in flight)
+- `phase57_partB_h7_bare_multiscale_recal` (not applicable)
+- `feature_nested_matryoshka_t5__seed42` — H9 plain
+- `feature_nested_matryoshka_t5_contrastive__seed42` — H9 with contrastive (mp 0.7891)
+- `txc_shared_relu_sum_{pos,nopos}_t5__seed42` — H10 ablations
+- `txc_shared_concat_two_layer_t5__seed42` — H12 ablation
+- `conv_txcdr_t{5,10,15,20,30}__seed42` — H1 ConvTXCDR T-sweep (failed)
+- `txcdr_t{6,7}__seed42` + `_batchtopk` — detailed T-sweep fill-in
+- `agentic_txc_02_t{6,7}__seed42` — detailed T-sweep
+- `agentic_{txc_02,mlc_08}_batchtopk__seed{1,2}` — A3 Tier 2 3-seed variance
+- `mlc_contrastive__seed{1,2}` — A3 Tier 1
+- `matryoshka_t5__seed{1,2}` — A3 Tier 1
+- `txcdr_t{15,20}_batchtopk_recal__seed42` — A2 recalibration (no AUC change)
 
 ---
 
@@ -248,35 +335,63 @@ Honest caveats for reviewers:
 
 ## If the user wants to keep pushing
 
-### ⭐ HIGHEST PRIORITY: push multi-distance shifts to their limit
+### ⭐ HIGHEST PRIORITY: contrastive-shift ablation (mechanism study, not leaderboard chase)
 
 H8 at T=5 uses shifts={1, 2}. The progression agentic_txc_02 (shift=1
 only) → H7 (shift=1, multi-scale prefixes) → H8 (shifts={1, 2}) showed
 that **adding a shift=2 pair lifted mp from 0.8059±0.011 (H7 3s) to
-0.8139 (H8 seed 42)**. The question is whether even larger shifts
-help further.
+0.8139 (H8 seed 42)**. The question is NOT "can wider shifts top 0.8139"
+(though that would be nice) — the more useful question is:
 
-**Experiments to run** (each ~1 hr training + probe):
+**How does downstream-probing AUC depend on the contrastive-shift
+window length, holding every other ingredient fixed?**
 
-1. **H8-wider**: shifts = {1, 2, 3}. At T=5, shift=3 pairs share 2/5
-   tokens (40% overlap) — pushes invariance further.
-2. **H8-wider-2**: shifts = {1, 2, 3, 4}. Every possible shift within T=5.
-3. **H8-T8**: extend H8 to T=8 with shifts = {1, 2, 4}. Bigger window
-   lets us test bigger shifts. agentic_txc_02 peaked at T=8 mp.
-4. **H8-T10**: shifts = {1, 3, 5}. If matryoshka decoder at T=10 OOMs,
-   drop matryoshka (set `matryoshka_h_size=None`) — contrastive still
-   works on a fixed `contr_prefix=d_sae//5`.
+This is an ablation study. Design it to produce a CURVE (AUC vs shifts
+config) rather than just a winner.
+
+**Systematic shift-set sweep at T=5** (each ~1 hr training + probe):
+
+| label | shifts | token overlap (T=5) | notes |
+|---|---|---|---|
+| H8a-0 | {1} (baseline = H7-style) | 80% | single-shift contrastive, multi-scale removed |
+| **H8** | {1, 2} (current champion) | 80%, 60% | baseline we just found |
+| H8a-123 | {1, 2, 3} | 80%, 60%, 40% | incrementally add shift-3 |
+| H8a-1234 | {1, 2, 3, 4} | 80%, 60%, 40%, 20% | all 4 shifts fitting within T=5 |
+| H8a-1024 | {1, 2, 4} | 80%, 60%, 20% | skip shift-3 — does skipping matter? |
+| H8a-2only | {2} | 60% | does shift-1 even help? |
+| H8a-4only | {4} | 20% | extreme: only very weak pairs |
+| H8a-uniform | {1, 2, 3} with w=1 each | | remove inverse-distance weighting |
+
+Interpretable outcomes (what you LEARN from this sweep):
+
+- **If AUC is monotonically increasing with number of shifts**: richer
+  invariance signal wins; post-compact agent should explore shifts
+  at T=8 and beyond.
+- **If AUC plateaus or drops past some shift**: there's an optimal
+  contrastive diversity — too-weak pairs (low token overlap) become
+  noise. Report the optimal set.
+- **If shift-{2} alone outperforms shift-{1} alone**: the classical
+  tsae_paper shift-1 recipe is suboptimal — paper should default to
+  shift-2.
+- **If uniform weighting ≈ inverse-distance weighting**: the
+  weighting scheme doesn't matter much, simplifying the recipe.
+- **If shift-4-only still trains a strong probe**: the contrastive
+  loss is not very sensitive to token overlap — supports a
+  "contrastive helps regardless of local/global structure" story.
+
+Each of these is publishable as an ablation.
 
 **Implementation**: the arch
 ([`src/architectures/txc_bare_multidistance_contrastive_antidead.py`](../../../src/architectures/txc_bare_multidistance_contrastive_antidead.py))
-already accepts arbitrary shifts via `shifts=(1, 2, 3, ...)`. Add new
-dispatcher branches in `train_primary_archs.py`:
+already accepts arbitrary shifts via `shifts=(1, 2, 3, ...)` and
+accepts custom `weights=(w_1, w_2, ...)`. Each variant needs a
+dispatcher branch (template):
 
 ```python
-elif arch == "phase57_partB_h8b_shifts123":
+elif arch == "phase57_partB_h8a_shifts123":
     model, log = train_txc_bare_multidistance_contrastive_antidead(
         cfg, device, k=100, T=5, alpha=1.0,
-        shifts=(1, 2, 3),                    # NEW: wider shifts
+        shifts=(1, 2, 3),
         matryoshka_h_size=int(DEFAULT_D_SAE * 0.2),
         aux_k=512, dead_threshold_tokens=10_000_000,
         auxk_alpha=1.0 / 32.0,
@@ -287,22 +402,35 @@ elif arch == "phase57_partB_h8b_shifts123":
                 matryoshka_h_size=int(DEFAULT_D_SAE * 0.2),
                 aux_k=512, dead_threshold_tokens=10_000_000,
                 auxk_alpha=1.0/32.0,
-                variant="phase57_partB_h8b_wider_shifts")
+                variant="phase57_partB_h8a_ablation_shifts123")
 ```
 
-Also update `run_probing.py` route (the existing
-`arch == "phase57_partB_h8_bare_multidistance"` branch needs to
-generalize — easiest: `arch.startswith("phase57_partB_h8")`).
+For the uniform-weighting variant, pass `weights=(1.0, 1.0, 1.0)`
+via `train_txc_bare_multidistance_contrastive_antidead`'s `shifts`
+arg (needs a tiny extension to thread `weights` through — or hack by
+adding a dispatcher branch that manually constructs the model).
 
-**Expected outcome**: likely diminishing returns — shift=3 pair at T=5
-shares only 40% tokens, which might be too few in common to make a
-strong contrastive pair. But worth testing. If shifts={1,2,3} beats
-0.8139 mp, try shifts={1,2,3,4}. If even that keeps climbing, extend
-T to 8 and try shifts={1,2,3,4,5,6}.
+Also update `run_probing.py` — generalize the H8 branch:
+```python
+elif arch.startswith("phase57_partB_h8"):
+```
 
-**Inverse-distance weighting** should be preserved: `w_s = 1/(1+s)`
-automatically downweights larger shifts, which is the right prior
-(weaker pairs contribute less). The arch already does this by default.
+**Variance**: run each ablation at seed=42 first for the curve; then
+take the winner + strongest contenders and run seeds 1, 2 for σ.
+
+**Budget**: 8 variants × ~1 hr training + probe = ~8-10 hr. Plus ~4-6 hr
+of 3-seed variance on 2-3 top performers = ~14 hr total.
+
+### Separately: TEST IF H8 SCALES WITH T (the paper-critical T-scaling question)
+
+The above is a T=5 ablation — a MECHANISM study. Orthogonal question:
+does H8's recipe scale with T? Train H8 at T ∈ {5, 10, 15, 20, 30}
+and measure mp AUC. If it climbs, the paper's T-scaling claim is
+salvaged.
+
+At T=30, H8's default params would be ~2.4B (encoder 1.27B + per-scale
+decoder ~1B). Test feasibility first. If OOM, drop matryoshka H/L
+(set `matryoshka_h_size=None`) — saves ~200M decoder params.
 
 ### Other Part B hypotheses not yet tested
 
