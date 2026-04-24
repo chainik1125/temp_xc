@@ -1,0 +1,51 @@
+model:
+  thinking: deepseek-ai/DeepSeek-R1-Distill-Llama-8B
+  base: meta-llama/Llama-3.1-8B
+  steering_layer: 12
+  sae_layer: 6
+phase0_activations:
+  n_traces: 200
+  reuse_existing: true
+phase2_steering:
+  max_iters: 5
+  n_training_examples: 128
+  optim_minibatch_size: 6
+  lr: 1e-2
+  n_clusters: 15
+  reduction: sum
+phase3_hybrid:
+  dataset: math500
+  dataset_split: test
+  n_tasks: 20
+  slice_strategy: stratified_by_level
+  slice_fallback: first_n
+  max_new_tokens: 500
+  max_thinking_tokens: 500
+  coefficients:
+  - 0.5
+  token_windows:
+  - 0
+grade:
+  judge_model: claude-haiku-4-5-20251001
+  judge_repetitions: 1
+  cache_thinking_base_grades: true
+autoresearch:
+  default_baseline: baseline_sae
+  seed: 42
+  finalist_threshold_pp: 10.0
+  promising_threshold_pp: 3.0
+  discard_threshold_pp: -10.0
+  stop_after_n_stale_cycles: 5
+cycle_timeout_s: 5400
+ledger_schema_version: 1
+name: mlc_nclusters15
+arch: mlc
+baseline: baseline_sae
+reuse_venhoff_vectors: false
+hypothesis: 'Does n_clusters=15 materially help mlc? Paper uses 15 by default.
+
+  If coarser (4) matches 15, cluster count isn''t the dominant axis for
+
+  mlc. If fine-grained (15) dominates, the arch is cluster-limited.
+
+  '
