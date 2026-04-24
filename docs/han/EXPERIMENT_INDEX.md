@@ -10,7 +10,42 @@ tags:
 
 One-stop pointer to every trained arch, every results file, and every
 summary doc across Phases 5 + 6 + 6.1 + 6.2. Updated whenever a new
-run lands. Corresponds to the **state of `han-phase6` HEAD `e72a86c`**.
+run lands. Corresponds to the **state of `han-phase6` HEAD `3f9ab2c`** (post Phase 6.2 + post-compact-priorities doc).
+
+### Branch-sharing protocol (Phase 5 agent on `han` + Phase 6 agent on `han-phase6`)
+
+This file is **designed to be cherry-picked between branches** so
+both agents can maintain a single source-of-truth experiment log
+without stepping on each other.
+
+**To cherry-pick onto `han`** (or any other branch that doesn't have
+the index yet):
+
+```bash
+git checkout han
+git cherry-pick <commit-hash-of-this-file>
+# If another agent already added rows to the same section, resolve
+# trivially (append both) — conflicts should be rare since each
+# agent edits disjoint sections (Phase 5 agent → §1 Phase 5 archs,
+# §2 Phase 5 matrix rows, §5 Phase 5 summary pointer; Phase 6 agent
+# → §1 Phase 6 archs, §2 Phase 6 rows, §4-5 Phase 6 figures).
+```
+
+**To merge back** when both branches have independently extended the
+index: three-way merge will usually auto-resolve (different rows in
+the same table) — manually union if git can't figure it out.
+
+**Editing rules for concurrent use:**
+
+- Keep row ordering within each table stable (alphabetical or phase
+  order). Don't re-sort — it makes merges nasty.
+- Each agent appends to the BOTTOM of relevant tables. Don't insert
+  in the middle.
+- Each agent updates the "HEAD" hash in the opening paragraph to
+  their own branch's HEAD when they commit. The merge back picks
+  whichever is newer.
+- The `§8 Open experiments + follow-ups` section is shared; use
+  absolute phase IDs (e.g. "Phase 5.8 foo") so ownership is clear.
 
 ### 1. Arch directory (name → ckpts + results + summary)
 
@@ -30,7 +65,7 @@ and mirror on HF `han1823123123/txcdr/ckpts/`.
 | `agentic_txc_11_stack` (Cycle H) | 42 | Cycle F + AuxK | 0.7620 | 0.7851 | 0 | [Phase 6.1 §9.5](research_logs/phase6_qualitative_latents/summary.md#9.5) |
 | `agentic_txc_12_bare_batchtopk` (2×2 cell) | 42+1+2 | Track 2 + BatchTopK | 0.7771 ± 0.005 (3s) | 0.7956 ± 0.005 (3s) | 1.7 ± 0.33 (3s) | [Phase 6.1 §9.5](research_logs/phase6_qualitative_latents/summary.md#9.5) |
 | `phase62_c1_track2_matryoshka` | 42 | Track 2 + matryoshka H/L | 0.7841 | 0.8042 | 3 | [Phase 6.2 summary](research_logs/phase6_2_autoresearch/summary.md) |
-| `phase62_c2_track2_contrastive` | 42+1+2 | Track 2 + single-scale InfoNCE (α=1) | 0.7825 (42) | 0.8010 (42) | 4 (42), 3 (1) | [Phase 6.2 summary](research_logs/phase6_2_autoresearch/summary.md) |
+| `phase62_c2_track2_contrastive` | 42+1+2 (seed 2 ckpt only, eval pending) | Track 2 + single-scale InfoNCE (α=1) | 0.7825 (42) | 0.8010 (42) | 4 (42), 3 (1) | [Phase 6.2 summary](research_logs/phase6_2_autoresearch/summary.md) |
 | `phase62_c3_track2_matryoshka_contrastive` | 42 | Track 2 + matryoshka + contrastive | 0.7834 | 0.7972 | 2 | [Phase 6.2 summary](research_logs/phase6_2_autoresearch/summary.md) |
 | `phase62_c5_track2_longer` | 42 | Track 2 with min_steps=10000 | 0.7758 | 0.7967 | 4 | [Phase 6.2 summary](research_logs/phase6_2_autoresearch/summary.md) |
 | `phase62_c6_bare_batchtopk_longer` | 42 | 2×2 cell with min_steps=10000 | 0.7709 | 0.7888 | 0 | [Phase 6.2 summary](research_logs/phase6_2_autoresearch/summary.md) |
