@@ -46,6 +46,18 @@ from experiments.phase5b_t_scaling_explore._paths import (
 K_VALUES = [1, 2, 5, 20]
 SUPPORTED_AGGS = ("last_position", "mean_pool")
 
+# Phase 5 convention: tasks with arbitrary label polarity get max(AUC, 1-AUC).
+# These are cross-token coreference tasks where label-1 is "completion correct"
+# but the SAE may have learned the opposite polarity.
+FLIP_TASKS = frozenset({"winogrande_correct_completion", "wsc_coreference"})
+
+
+def flipped_auc(auc: float, task_name: str) -> float:
+    """Apply the Phase 5 FLIP convention to per-task AUC."""
+    if task_name in FLIP_TASKS:
+        return max(auc, 1.0 - auc)
+    return auc
+
 
 # ─────────────────────────────────────────── model loading
 
@@ -359,12 +371,16 @@ def run_probing_phase5b(run_ids: list[str] | None = None,
                     enc_t = time.time() - t0
                     for k_feat in k_values:
                         auc, acc = sae_probe_metrics(Z_tr, ytr, Z_te, yte, k_feat)
+                        # Apply Phase 5 FLIP convention for cross-token tasks.
+                        auc_flip = flipped_auc(auc, task_name)
                         row = {
                             "run_id": run_id, "arch": arch,
                             "task_name": task_name, "dataset_key": dkey,
                             "aggregation": aggregation,
                             "k_feat": int(k_feat),
-                            "test_auc": float(auc), "test_acc": float(acc),
+                            "test_auc": float(auc),
+                            "test_auc_flip": float(auc_flip),
+                            "test_acc": float(acc),
                             "n_train": int(ytr.size), "n_test": int(yte.size),
                             "elapsed_s_encode": float(enc_t),
                             **{k: meta.get(k) for k in (

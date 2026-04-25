@@ -44,15 +44,25 @@ def load_rows(path: Path = PROBING_PATH):
         return [json.loads(line) for line in f if line.strip()]
 
 
-def aggregate(rows, k_feat: int = 5):
-    """Group by (run_id, arch, aggregation); compute mean+stderr over tasks."""
+FLIP_TASKS = frozenset({"winogrande_correct_completion", "wsc_coreference"})
+
+
+def aggregate(rows, k_feat: int = 5, apply_flip: bool = True):
+    """Group by (run_id, arch, aggregation); compute mean+stderr over tasks.
+
+    apply_flip: when True, applies max(AUC, 1-AUC) to FLIP_TASKS to match
+    Phase 5's convention. Set False to compare against pre-flip numbers.
+    """
     buckets = defaultdict(list)
     meta_by_run = {}
     for r in rows:
         if int(r.get("k_feat", 0)) != k_feat:
             continue
         key = (r["run_id"], r["arch"], r["aggregation"])
-        buckets[key].append(float(r["test_auc"]))
+        a = float(r["test_auc"])
+        if apply_flip and r["task_name"] in FLIP_TASKS:
+            a = max(a, 1.0 - a)
+        buckets[key].append(a)
         meta_by_run.setdefault(r["run_id"], r)
     out = []
     for (run_id, arch, agg), aucs in buckets.items():
