@@ -103,6 +103,35 @@ def load_random_sem(metric_key: str = "semantic_count"):
     return dict(out)
 
 
+def load_passage_probe(k: int = 5):
+    """Load per-arch list of per-seed mean passage-ID probe accuracy
+    across the 3 concats (A, B, random). Returns {arch: [seed_means...]}.
+
+    Source file: `results/passage_probe_results.jsonl` emitted by
+    run_passage_probe.py. Each row has per_k[str(k)]["acc_mean"] for
+    one (arch, seed, concat) cell. We average over the 3 concats per
+    seed, then collect across seeds.
+    """
+    probe_path = REPO / "experiments/phase6_qualitative_latents/results/passage_probe_results.jsonl"
+    if not probe_path.exists():
+        return {}
+    per_seed: dict[str, dict[int, list[float]]] = defaultdict(lambda: defaultdict(list))
+    with probe_path.open() as f:
+        for line in f:
+            d = json.loads(line)
+            k_str = str(k)
+            if k_str not in d.get("per_k", {}):
+                continue
+            per_seed[d["arch"]][d["seed"]].append(d["per_k"][k_str]["acc_mean"])
+    out = {}
+    for arch, seed_dict in per_seed.items():
+        # Average over concats per seed (only keep seeds with all 3 concats present)
+        seed_means = [sum(v) / len(v) for v in seed_dict.values() if len(v) == 3]
+        if seed_means:
+            out[arch] = seed_means
+    return out
+
+
 def _mean_se(vals):
     if not vals:
         return float("nan"), 0.0
@@ -135,16 +164,25 @@ def main():
                     choices=["last_position", "mean_pool"])
     ap.add_argument("--k", type=int, default=5)
     ap.add_argument("--metric", default="semantic_count",
-                    choices=["semantic_count", "semantic_count_pdvar"],
-                    help="which qualitative metric to put on the y-axis")
+                    choices=["semantic_count", "semantic_count_pdvar",
+                             "probe_acc_passage"],
+                    help="which qualitative metric to put on the y-axis. "
+                         "probe_acc_passage = k-sparse multinomial probe "
+                         "predicting passage ID across A/B/random (T-SAE §4.2 style).")
     ap.add_argument("--out", type=str,
                     default=str(REPO / "experiments/phase6_qualitative_latents/results/phase61_pareto_robust.png"))
     args = ap.parse_args()
 
     aucs = load_probing(agg=args.agg, k=args.k)
-    sems = load_random_sem(metric_key=args.metric)
-    metric_display = ("var-ranked" if args.metric == "semantic_count"
-                      else "pdvar-ranked")
+    if args.metric == "probe_acc_passage":
+        sems = load_passage_probe(k=args.k)
+        metric_display = "paper-style passage probe"
+    elif args.metric == "semantic_count_pdvar":
+        sems = load_random_sem(metric_key=args.metric)
+        metric_display = "pdvar-ranked"
+    else:
+        sems = load_random_sem(metric_key=args.metric)
+        metric_display = "var-ranked"
 
     # 2-panel: (A) full Pareto plane, (B) TXC-cluster zoom with Phase 6.2 labels
     fig, (ax, axz) = plt.subplots(
@@ -193,7 +231,12 @@ def main():
         tr2_y = _mean_se(sems["agentic_txc_10_bare"])[0]
 
         # Horizontal (probing) gap: drawn at y = mid-low, scaled by metric
-        mid_y = 15.0 if args.metric == "semantic_count_pdvar" else 7.0
+        if args.metric == "probe_acc_passage":
+            mid_y = 0.55
+        elif args.metric == "semantic_count_pdvar":
+            mid_y = 15.0
+        else:
+            mid_y = 7.0
         ax.annotate(
             "", xy=(tsp_x, mid_y), xytext=(tr2_x, mid_y),
             arrowprops=dict(arrowstyle="<->", color="#333333", lw=1.3),
@@ -216,21 +259,34 @@ def main():
                 bbox=dict(facecolor="white", edgecolor="#aaaaaa",
                           boxstyle="round,pad=0.2"))
 
-    # Shaded regions — expand y-axis for pdvar (max ~25) vs var (max ~15)
+    # Shaded regions — y-axis scale depends on metric
     xlim_lo = min(0.71, _mean_se(aucs.get("tsae_paper", [0.72]))[0] - 0.015)
     xlim_hi = 0.815
     ax.set_xlim(xlim_lo, xlim_hi)
-    y_hi = 28 if args.metric == "semantic_count_pdvar" else 17
-    y_split = 14 if args.metric == "semantic_count_pdvar" else 6
-    ax.set_ylim(-1, y_hi)
-    ax.axhspan(0, y_split, xmin=0, xmax=1, color="#08519c", alpha=0.04, zorder=0)
+    if args.metric == "probe_acc_passage":
+        y_lo, y_hi = 0.4, 1.0
+        y_split = 0.7
+    elif args.metric == "semantic_count_pdvar":
+        y_lo, y_hi = -1, 28
+        y_split = 14
+    else:
+        y_lo, y_hi = -1, 17
+        y_split = 6
+    ax.set_ylim(y_lo, y_hi)
+    ax.axhspan(y_lo, y_split, xmin=0, xmax=1, color="#08519c", alpha=0.04, zorder=0)
     ax.axhspan(y_split, y_hi, xmin=0, xmax=1, color="#d62728", alpha=0.04, zorder=0)
 
-    ax.text(xlim_lo + 0.003, y_hi - 1.5,
+    if args.metric == "probe_acc_passage":
+        top_label_y = y_hi - 0.06
+        bot_label_y = y_lo + 0.02
+    else:
+        top_label_y = y_hi - 1.5
+        bot_label_y = 0.2
+    ax.text(xlim_lo + 0.003, top_label_y,
             "T-SAE (paper) region\n— wins qualitative",
             fontsize=9, color="#d62728", alpha=0.8,
             bbox=dict(facecolor="white", edgecolor="none", alpha=0.7))
-    ax.text(xlim_hi - 0.003, 0.2,
+    ax.text(xlim_hi - 0.003, bot_label_y,
             "TXC family region\n— wins probing",
             fontsize=9, color="#08519c", alpha=0.8, ha="right",
             bbox=dict(facecolor="white", edgecolor="none", alpha=0.7))
@@ -238,14 +294,21 @@ def main():
     ax.set_xlabel(f"Probing mean AUC  ({args.agg}, k=5)  "
                   f"— Phase 5 SAEBench protocol, 36 binary tasks",
                   fontsize=11)
-    ylabel_detail = ("pdvar ranking (passage-discriminative variance)"
-                     if args.metric == "semantic_count_pdvar"
-                     else "top-32 per-token-variance ranking")
-    ax.set_ylabel(
-        f"SEMANTIC label count on concat_random  (/32)\n"
-        f"— {ylabel_detail}, multi-Haiku temp=0",
-        fontsize=11,
-    )
+    if args.metric == "probe_acc_passage":
+        ax.set_ylabel(
+            f"Paper-style passage-ID probe accuracy  (k={args.k})\n"
+            f"— mean across concat_A/B/random, 5-fold stratified CV",
+            fontsize=11,
+        )
+    else:
+        ylabel_detail = ("pdvar ranking (passage-discriminative variance)"
+                         if args.metric == "semantic_count_pdvar"
+                         else "top-32 per-token-variance ranking")
+        ax.set_ylabel(
+            f"SEMANTIC label count on concat_random  (/32)\n"
+            f"— {ylabel_detail}, multi-Haiku temp=0",
+            fontsize=11,
+        )
     ax.set_title(
         f"TXC vs T-SAE: Pareto trade-off  ({metric_display})\n"
         "Error bars: stderr across 3 training seeds on both axes",
@@ -350,7 +413,9 @@ def main():
                          color="#08519c", fontweight="bold")
 
     axz.set_xlim(0.772, 0.813)
-    if args.metric == "semantic_count_pdvar":
+    if args.metric == "probe_acc_passage":
+        axz.set_ylim(0.60, 0.90)
+    elif args.metric == "semantic_count_pdvar":
         axz.set_ylim(-1.0, 15.0)
     else:
         axz.set_ylim(-0.6, 7.0)
