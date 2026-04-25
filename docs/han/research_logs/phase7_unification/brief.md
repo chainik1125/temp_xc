@@ -185,9 +185,9 @@ window archs with different T's at S=T is structurally confusing
 The FLIP convention (max(AUC, 1-AUC) on `winogrande_correct_completion`
 and `wsc_coreference`) is preserved — same as Phase 5.
 
-#### (iv) Architecture set (47 archs, 3 seeds = 141 trainings)
+#### (iv) Architecture set (49 archs, 3 seeds = 147 trainings)
 
-The canonical set is grouped into 5 families:
+The canonical set is grouped into 6 families:
 
 | group | count | what's in it |
 |---|---|---|
@@ -196,9 +196,12 @@ The canonical set is grouped into 5 families:
 | Group 3: TXCDR T-sweep | 16 | `txcdr_t<T>` for T ∈ {3,4,5,6,7,8,9,10,12,14,16,18,20,24,28,32} |
 | Group 4: H8 T-sweep | 16 | `phase57_partB_h8_bare_multidistance_t<T>` for same T set |
 | Group 5: anchor cells (fix k_pos=100) | 2 | `txcdr_t20_kpos100`, `phase57_partB_h8_bare_multidistance_t20_kpos100` |
+| Group 6: SubseqH8 T_max-sweep (H200-only) | 2 | `phase5b_subseq_h8_T32_s5`, `phase5b_subseq_h8_T64_s5` |
 
 T-sweep entries (Groups 3 + 4) double as leaderboard entries — same
-seeds, no duplicate training.
+seeds, no duplicate training. Group 6 cells exist specifically to
+exploit the H200's 141 GB memory: T_max=64 wouldn't fit at fp32 on
+H100 80GB.
 
 **Full per-arch table (k_win, k_pos derivation, recipe, purpose) lives
 in `plan.md` §Canonical architecture set. That is the single source

@@ -245,13 +245,16 @@ polarity). Same as Phase 5.
 
 **This is the single source of truth.** Both agents (and both
 deliverables) refer to this table. Every row is one architecture
-trained at 3 seeds (seed ∈ {1, 2, 42}). Total rows: **47**. Total
-trainings: 47 × 3 = **141** on H100. Estimated wall-clock at
-5–10 min/training: 12–24 hr.
+trained at 3 seeds (seed ∈ {1, 2, 42}). Total rows: **49**. Total
+trainings: 49 × 3 = **147** on H200. Estimated wall-clock at
+~5 min/training (with batch=4096 on H200): **~12 hr**.
 
 T-sweep entries (rows 14–45) double as leaderboard entries — the
 Agent A leaderboard and the Agent A T-sweep are subsets of this
-table, not separate runs.
+table, not separate runs. Rows 48–49 are SubseqH8 T_max-sweep cells
+that exist specifically to test the "subseq sampling unlocks
+T-scaling beyond what TXC alone can" claim — they're enabled by the
+H200's 141 GB memory which fits T_max=64 but H100 80 GB cannot.
 
 Notes on the table format:
 - **k_pos** is derived as `k_win / n_active_positions` where
@@ -260,7 +263,8 @@ Notes on the table format:
 - **shifts** column is filled only for H8 rows (multi-distance
   InfoNCE recipe).
 - **group**: 1 = per-token/non-TXC; 2 = fixed-T TXC variant;
-  3 = TXCDR T-sweep; 4 = H8 T-sweep; 5 = anchor cell (k_pos=100).
+  3 = TXCDR T-sweep; 4 = H8 T-sweep; 5 = anchor cell (k_pos=100);
+  6 = SubseqH8 T_max-sweep (H200-only, fits because of 141 GB GPU).
 
 | # | arch_id | grp | T (or T_max,t_sample) | k_win | k_pos | shifts | recipe / purpose |
 |---|---|---|---|---|---|---|---|
@@ -311,6 +315,8 @@ Notes on the table format:
 | 45 | `phase57_partB_h8_bare_multidistance_t32` | 4 | T=32 | 500 | 16 | (1, 8, 16) | H8 |
 | 46 | `txcdr_t20_kpos100` | 5 | T=20 | 2000 | 100/slab | — | anchor cell: vanilla TXCDR at fix-k_pos=100 (= row 26 with denser k); disentangles "context limit" vs "per-slab sparsity collapse" |
 | 47 | `phase57_partB_h8_bare_multidistance_t20_kpos100` | 5 | T=20 | 2000 | 100/slab | (1, 5, 10) | anchor cell: H8 at fix-k_pos=100 (= row 42 with denser k); same disentanglement |
+| 48 | `phase5b_subseq_h8_T32_s5` | 6 | T_max=32, t_sample=5 | 500 | 100/active-slab | auto (1, 8, 16) | SubseqH8 at T_max=32 — extended T-scaling test for subseq family; H8 multi-distance shifts auto-scaled |
+| 49 | `phase5b_subseq_h8_T64_s5` | 6 | T_max=64, t_sample=5 | 500 | 100/active-slab | auto (1, 16, 32) | SubseqH8 at T_max=64 — extreme T-scaling test; would OOM on H100 80GB at fp32, fits comfortably on H200 141GB. Tests whether subseq enables T-scaling beyond what any other arch can reach |
 
 ### What's NOT in this table (and why)
 
