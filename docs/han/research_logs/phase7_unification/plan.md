@@ -1,6 +1,6 @@
 ---
 author: Han
-date: 2026-04-25
+date: 2026-04-26
 tags:
   - design
   - in-progress
@@ -23,10 +23,10 @@ agents (sparse-probing agent + autointerp agent).
 
 ### Activation cache (rebuild) — owned by Agent A
 
-- Source: 24 000 sequences from FineWeb (consistent with prior Phase
-  5/5b pipeline; document the FineWeb-vs-Pile difference vs T-SAE/TFA
-  in the limitations section).
-- Context length: 128 tokens (full Gemma-2 max for our purposes).
+- Source: 24 000 sequences from FineWeb (consistent with prior
+  Phase 5/5b pipeline; document the FineWeb-vs-Pile difference vs
+  T-SAE/TFA in the limitations section).
+- Context length: 128 tokens.
 - Storage: fp16, layer-major. ~3 GB per layer × 5 layers ≈ 15 GB.
   Path: `data/cached_activations/gemma-2-2b/fineweb/resid_L<n>.npy`.
 - Sync to HF for cross-agent access:
@@ -43,40 +43,20 @@ agents (sparse-probing agent + autointerp agent).
     longer tails on demand if needed). Reduces storage 5×.
   - `meta.json`: dataset_key, task_name, n_train, n_test, etc.
 - Splits: same as Phase 5 (n_train=3040, n_test=760).
-- Storage: ~3 GB per task × 36 = ~110 GB for L13 anchor + ~30 GB for
-  L11-L15 stack at S=20 = **~140 GB**. Verify RunPod volume.
+- Storage: ~3 GB per task × 36 ≈ 110 GB for L13 anchor + ~30 GB for
+  L11-L15 stack at S=20 ≈ **~140 GB**. Verify RunPod volume.
 - Sync to HF for cross-agent access:
   `han1823123123/txcdr/phase7_probe_cache/`.
 
 ### Sparsity convention
 
-`k_win = 500` across all archs and all T values.
-
-Per-arch translation (TopK count applied to the `d_sae`-dim
-pre-activation, by arch):
-
-| arch | k_win | k_pos (per active position) | notes |
-|---|---|---|---|
-| topk_sae | 500 | 500 | per-token (one position) |
-| tsae_paper (Phase 7) | 500 | 500 | per-token; matryoshka BatchTopK at k=500 |
-| tsae_paper_k20 | 20 | 20 | paper-faithful native baseline |
-| mlc | 500 | 100/layer | matches "k_pos=100 × L=5" |
-| mlc_contrastive_alpha100_batchtopk | 500 | 100/layer | retrain at k=500 |
-| agentic_mlc_08 | 500 | 100/layer | retrain at k=500 |
-| txcdr_t5 | 500 | 100/slab | k_pos × T = 100 × 5 = 500 (Phase 5 default, no change in convention) |
-| agentic_txc_02 | 500 | 100/slab | same |
-| H8 (T=5) | 500 | 100/slab | same |
-| H8 (T=6) | 500 | ~83/slab | k_win = 500 with T=6 → k_pos=83 (slight departure from Phase 5 H8 T=6's k=600; we use 500 for consistency) |
-| H8 (T=7) | 500 | ~71/slab | similar |
-| B2 subseq_track2 (T_max=10, t_sample=5) | 500 | 100/active-slab | matches Phase 5B B2 convention |
-| B4 subseq_h8 (T_max=10, t_sample=5) | 500 | 100/active-slab | matches Phase 5B B4 convention |
-| tfa_big | 500 | n/a | TFA novel-head L0 = 500; verify training stack supports it |
+`k_win = 500` across all archs and all T values, fixed.
 
 ### Probing protocol — pre-registered (owned by Agent A)
 
 Single S-parameterized aggregation:
 
-```
+```python
 def probe_aggregate(model, anchor_acts, T, S=128):
     """anchor_acts: (N, S, d_in) — the S-token tail per example.
     Returns (N, d_sae) per-example representations."""
@@ -89,28 +69,20 @@ def probe_aggregate(model, anchor_acts, T, S=128):
         K = S - T + 1
         windows = slide_windows(anchor_acts, T)        # (N, K, T, d_in)
         z_per_win = encode(model, windows)             # (N, K, d_sae)
-        # Drop windows whose left edge < T-1: those bleed beyond the tail boundary.
-        # Equivalently: keep windows starting at position >= T-1.
+        # Drop windows whose left edge < T-1 (would bleed beyond tail).
         z = z_per_win[:, T-1:].mean(axis=1)            # (N, d_sae)
     return z
 ```
 
-For per-token archs (T=1), drop is degenerate (drop first 0). For
-window archs at T>1, drop the first T−1 windows so all averaging
-units cover tokens entirely within the considered tail. (Per-token
-archs do NOT additionally drop tokens — the tail is the same for
-both, so the only asymmetry is that window archs start their first
-"valid" averaging unit T-1 tokens later. For S>>T this is negligible.)
-
 Probe: SAEBench protocol. Top-`k_feat`-by-`|mean_pos − mean_neg|` +
 L1 LR (C=1.0, max_iter=2000, `with_mean=False` standardization).
-Headline `k_feat = 5`; ablation at `k_feat ∈ {1, 2, 20}`.
+Headline `k_feat ∈ {5, 20}`; ablation at `k_feat ∈ {1, 2}`.
 
 #### Reported S values
 
 - **S = 128 (headline)**: long-tail; minimal boundary asymmetry.
 - **S = 20 (continuity)**: matches Phase 5's tail length; lets us
-  validate that Phase 7 numbers match Phase 5 in the limit S=20.
+  sanity-check Phase 7 numbers vs Phase 5 in the limit S=20.
 
 NOT reported: S = T (per-window comparison) — explicitly dropped
 because comparing across architectures with different T at S=T is
@@ -122,52 +94,219 @@ Apply `max(AUC, 1−AUC)` per-task on `winogrande_correct_completion`
 and `wsc_coreference` (cross-token tasks with arbitrary label
 polarity). Same as Phase 5.
 
+---
+
+## Agent A — sparse-probing leaderboard
+
+### Deliverable A.i — definitive leaderboard
+
+For all canonical archs (table below), 3 seeds, headline at S=128 and
+k_feat ∈ {5, 20}. Per-arch: mean ± σ over 3 seeds. Output:
+
+- `experiments/phase7_unification/results/probing_results.jsonl` —
+  full per-task per-seed per-k_feat per-S rows.
+- `experiments/phase7_unification/results/headline_S128_k5.json`
+  + `headline_S128_k20.json` — aggregated mean±σ per arch.
+- `experiments/phase7_unification/results/plots/phase7_headline_bar_S128_k5.png`
+  + `..._k20.png` — paired bar charts.
+
+### Deliverable A.ii — T-sweep at fix k_win=500
+
+For arch ∈ {`txcdr_t<T>`, `H8_t<T>`}, train at T ∈
+{3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 16, 18, 20, 24, 28, 32} with
+`k_win = 500` (so per-slab `k_pos = 500/T`), 3 seeds each.
+Anchor cell: at T=20 ALSO train at fix `k_pos = 100` (so k_win =
+2000) for both archs, 3 seeds — to disentangle "context limit"
+from "per-slab sparsity collapse" interpretations.
+
+Per-cell metrics in the JSON output:
+
+- `test_auc` at S=128, k_feat=5
+- `test_auc` at S=128, k_feat=20
+- `test_auc` at S=20, k_feat=5 (continuity check)
+- `alive_fraction`: fraction of d_sae features that fired ≥ once on
+  a 5K-token held-out batch
+- `final_recon_loss`: last logged reconstruction loss
+- `final_step`, `converged`, `plateau_last`: convergence sanity
+
+Output:
+
+- `experiments/phase7_unification/results/t_sweep_results.jsonl` —
+  per-cell rows.
+- `experiments/phase7_unification/results/plots/phase7_t_sweep_S128_k5.png`
+  — line plot AUC vs T for {txcdr, H8}, with anchor cell.
+- `experiments/phase7_unification/results/plots/phase7_t_sweep_alive_fraction.png`
+  — alive_fraction vs T (sanity-check plot to flag sparsity
+  collapse at large T).
+
+**Caveat documented in the writeup**: at fix k_win=500, per-slab
+k_pos = 500/T shrinks with T. By T=32, k_pos ≈ 16 per slab. If
+T=32's AUC regression coincides with alive_fraction collapse,
+the regression is partly attributable to per-slab under-training,
+not architecture-intrinsic context limit. The anchor cell at
+T=20 (fix k_pos=100) tests this disentanglement directly.
+
+### Canonical arch set — all in the leaderboard, 3 seeds
+
+Because T-sweep entries also serve as leaderboard entries (same
+seeds), the "leaderboard" and "T-sweep" share rows. Distinct archs:
+
+**Per-token / non-TXC family (7 archs):**
+
+| arch | family | notes |
+|---|---|---|
+| `topk_sae` | per-token TopK | k_win=500 (5× Phase 5 default) |
+| `tsae_paper_k500` | per-token Matryoshka BatchTopK + InfoNCE | T-SAE port at our k convention |
+| `tsae_paper_k20` | same, native k=20 | paper-faithful reference |
+| `mlc` | per-token TopK over 5 layers | k_win=500 globally (5× Phase 5 default) |
+| `mlc_contrastive_alpha100_batchtopk` | MLC + matryoshka + InfoNCE + BatchTopK | retrain at k=500 |
+| `agentic_mlc_08` | MLC + multi-scale InfoNCE | retrain at k=500 |
+| `tfa_big` | TFA full | predictive-coding reference; verify TFA's training stack supports k_win=500 |
+
+**TXC variants — fixed-T archs (8 archs):**
+
+| arch | T | notes |
+|---|---|---|
+| `agentic_txc_02` | 5 | multi-scale matryoshka TXC; Phase 5 multi-scale winner |
+| `txc_bare_antidead_t5` (Track 2) | 5 | bare TXC + anti-dead stack only |
+| `txc_bare_antidead_t10` (Track 2 T=10) | 10 | same recipe, T=10 |
+| `txc_bare_antidead_t20` (Track 2 T=20) | 20 | same recipe, T=20 |
+| `phase5b_subseq_track2` (B2) | T_max=10, t_sample=5 | subseq sampling on Track 2 base |
+| `phase5b_subseq_h8` (B4) | T_max=10, t_sample=5 | subseq sampling on H8 stack |
+
+**TXC T-sweep — txcdr (16 archs):**
+
+`txcdr_t<T>` for T ∈ {3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 16, 18, 20, 24, 28, 32}.
+Each at k_win=500 fixed.
+
+**TXC T-sweep — H8 (16 archs):**
+
+`phase57_partB_h8_bare_multidistance_t<T>` for T ∈ {3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 16, 18, 20, 24, 28, 32}.
+Each at k_win=500 fixed. H8 multi-distance shifts auto-scale per
+Phase 5's convention: `(1, max(1, T//4), max(1, T//2))` deduped.
+
+**Anchor cells (fix k_pos=100):**
+
+| arch | T | k_win | notes |
+|---|---|---|---|
+| `txcdr_t20_kpos100` | 20 | 2000 | anchor at fix k_pos=100 |
+| `phase57_partB_h8_bare_multidistance_t20_kpos100` | 20 | 2000 | same |
+
+**Total**: 7 + 6 + 16 + 16 + 2 = **47 archs** × 3 seeds = **141 trainings**
+on H100. At 5-10 min each → 12-24 hours of compute.
+
+(Note: leaderboard entries that also appear in T-sweep — e.g.
+`txcdr_t5` is both a leaderboard arch and a T-sweep cell — are
+counted once. The counts above already de-duplicate.)
+
 ### Hypotheses (pre-registered)
 
 - **H1 (Gemma-IT vs base)**: per-task AUCs may change by ~0.01-0.02
   on most tasks; ARCH RANKINGS likely preserve. If rankings flip
   significantly, this is itself a finding worth reporting.
-- **H2 (k_win=500 fixed across archs)**: bumping MLC family from k=100
-  to k=500 should improve their absolute AUC moderately (more candidate
-  features). Whether the lp/mp ranking of MLC vs TXC families
-  preserves is the key open question.
-- **H3 (long-tail S=128 vs S=20)**: AUC increases for all archs
-  with S=128 (more context). Spread between archs may compress or
-  expand. Open question.
-- **H4 (TXC vs SAE at fix k_win=500)**: TXC family wins by ≥ 0.005
-  mp at S=128. If not, the entire "TXC > SAE" claim weakens.
+- **H2 (k_win=500 fixed across families)**: bumping per-token SAE
+  and MLC families up to k_win=500 from Phase 5's k=100 should
+  improve their absolute AUC moderately (more candidate features).
+  Whether the cross-family ranking (TXC vs MLC vs SAE) preserves is
+  the key question.
+- **H3 (T-sweep at fix k_win)**: Phase 5's T=5 peak was at fix
+  k_pos=100 (k_win = 100·T). At fix k_win=500 the peak may shift,
+  flatten, or persist. Three sub-hypotheses:
+    - **H3a (sparsity-dilution)**: peak shifts to larger T, T-scaling
+      becomes near-monotone.
+    - **H3b (context-mismatch)**: peak stays near T=5–6, regardless
+      of k convention.
+    - **H3c (sparsity-collapse at large T)**: T ≥ 24 underperforms
+      due to per-slab k_pos < 20 being too sparse. Anchor cell at
+      T=20 fix-k_pos=100 disentangles vs H3b.
+- **H4 (TXC vs SAE at fix k_win=500 + S=128)**: TXC family wins by
+  ≥ 0.005 mp at headline. If not, the entire "TXC > SAE" claim
+  weakens significantly.
 
-### Architectures × seeds matrix — owned by Agent A
+### Figures Agent A produces
 
-12 archs (or 13 including `tsae_paper_k20` baseline) × 3 seeds = 36-39
-ckpts. At ~5-10 min each on H100, ~6-7 hr serial. Acceptable.
+- `phase7_headline_bar_S128_k5.png` — paired bar chart at headline.
+- `phase7_headline_bar_S128_k20.png` — same at k_feat=20.
+- `phase7_t_sweep_S128_k5.png` — line plot (txcdr, H8) AUC vs T.
+- `phase7_t_sweep_alive_fraction.png` — alive_fraction vs T.
+- `phase7_seed_variance.png` — error bars.
+- (Optional) `phase7_S_sweep.png` — AUC vs S for top archs.
 
-### Figures committed (Agent A produces)
+---
 
-- `phase7_headline_bar_S128.png` — paired bar chart at headline S.
-- `phase7_S_sweep.png` — line plot, AUC vs S for top archs.
-- `phase7_seed_variance.png` — error bars on top archs.
+## Agent B — qualitative autointerp
 
-### Figures committed (Agent B produces)
+### Deliverable B.i — Top-256 cumulative semantic Pareto
 
-- `phase7_qualitative_pareto.png` — TXC-vs-T-SAE Pareto from Phase 6.
-  Re-rendered with Phase 7 ckpts.
-- `phase7_top8_panel.png` — top-8-by-variance feature visualization
-  for each canonical arch on concat-A and concat-B.
+Single Pareto plot, replicating
+`experiments/phase6_qualitative_latents/results/phase63_pareto_top256.png`
+from `han-phase6` but with Phase 7 archs. **Skip the other 3 Pareto
+plots from Phase 6** (top-N=32, top-N=64, top-N=128 cumulative are
+not part of Phase 7's deliverable).
 
-### Ablations / appendix tables
+For each arch in the Phase 7 leaderboard:
 
-- **k_win=100 ablation** (Agent A, optional if time permits): same
-  archs at k_win=100, S=128. Shows effect of sparsity convention.
-  ~6 archs × 1 seed = ~3 hr extra.
-- **k_feat ∈ {1, 2, 20}**: probe-budget sweep. Same ckpts, just
-  different probe `k_feat` (cheap re-probing).
-- **S sweep**: AUC vs S for the headline archs at fix k_win.
-- **Negative results**: D1 strided, C-family token-level, F subset-
-  encoder. Numbers from Phase 5B at IT regime; note "not retrained
-  for Phase 7 due to clean negative result on the prior setup."
+1. Take the top-256 features by per-token activation variance over
+   `concat_A + concat_B + concat_random` (Phase 6 protocol).
+2. For each of those 256 features, send the top-10 activating
+   20-token contexts to Claude Haiku 4.5 with the Bills-et-al-style
+   labelling prompt. Get a one-line label.
+3. Hand-classify each label as **semantic** or **non-semantic**
+   (Phase 6's protocol; semantic = names a concept/topic/theme, not
+   punctuation/whitespace/syntax/format pattern).
+4. Plot **cumulative semantic count** vs **rank** (rank = position
+   in variance-sorted top-256), giving a curve per arch.
+5. The headline figure is the FINAL cumulative count at rank 256
+   (i.e., total semantic features in top-256), plotted on the y-axis
+   against the arch's sparse-probing AUC at S=128, k_feat=5 on the
+   x-axis. Arches in the upper-right are Pareto-better.
 
-### Branch hygiene — both agents
+Output:
+
+- `experiments/phase7_unification/results/autointerp/<run_id>/concat_<A|B|random>_labels.json`
+  — per-arch per-feature labels.
+- `experiments/phase7_unification/results/autointerp/<run_id>/cumulative_semantic.json`
+  — per-arch cumulative-count curves.
+- `experiments/phase7_unification/results/plots/phase7_qualitative_pareto_top256.png`
+  — the headline Pareto figure.
+
+### Cost-saving: autointerp at seed=42 only
+
+To keep Claude Haiku spend reasonable, **autointerp scoring uses
+seed=42 only** for each arch (not 3 seeds). Sparse probing on the
+x-axis still uses 3-seed mean. This is a documented compromise.
+
+Scale check at seed=42 only:
+
+- 47 archs × 256 features × 10 contexts × 1 seed ≈ 120K Haiku calls.
+- At ~5K input tokens / call with prompt caching, expected cost
+  ~$50-150. Tractable.
+
+### Coordination dependency
+
+Agent B's Pareto plot REQUIRES Agent A's `probing_results.jsonl` to
+populate the x-axis (the sparse-probing AUC). Coordination:
+
+- Agent A pushes ckpts to HF as they complete (incremental, per arch).
+- Agent A pushes a partial `probing_results.jsonl` to HF after
+  probing each batch of archs.
+- Agent B polls HF for ckpts; for each new ckpt, runs autointerp.
+- Agent B reads Agent A's `probing_results.jsonl` (latest snapshot)
+  to compose the Pareto plot.
+- Final Pareto plot is generated AFTER Agent A finishes the full
+  3-seed sparse-probing pass.
+
+### Figures Agent B produces
+
+- `phase7_qualitative_pareto_top256.png` — the single deliverable.
+- (Optional) `phase7_top8_panel.png` — top-8-by-variance feature
+  activation panel for each canonical arch on concat-A and concat-B.
+  Phase 6.1's standard qualitative figure, useful for paper but not
+  required.
+
+---
+
+## Branch hygiene — both agents
 
 - All Phase 7 work on `han-phase7-unification`, branched off
   `origin/han`.
@@ -199,7 +338,7 @@ Phase 7 writes ONLY to `experiments/phase7_unification/`.
 
 ### What this phase will NOT do
 
-- Train new architectures beyond the canonical 12.
+- Train new architectures beyond the canonical set above.
 - Modify the SAEBench-style probing protocol (top-k-by-class-sep +
   L1 LR is unchanged).
 - Run autointerp protocol changes beyond Phase 6's protocol (rerun
@@ -209,6 +348,8 @@ Phase 7 writes ONLY to `experiments/phase7_unification/`.
 - Train on layer ≠ 13 (anchor) or != L11-L15 (MLC).
 - Use `last_position` as a separate metric in the headline. Reported
   only as a caveat-laden footnote in the paper, if at all.
+- Reproduce Phase 6's other 3 Pareto plots (top-32, top-64, top-128).
+  Top-256 is the deliverable.
 
 ### Coordination protocol between Agent A and Agent B
 
@@ -216,15 +357,15 @@ Phase 7 writes ONLY to `experiments/phase7_unification/`.
   Both pull arch files via cherry-pick. Agent A starts cache build;
   Agent B starts passage build + Phase 6 pipeline port.
 - **Day 2-3**: Agent A pushes activation cache + probe cache to HF.
-  Agent B pulls activation cache (or builds locally — passages may
-  need different sequences than the 24k FineWeb cache).
-- **Day 3-4**: Agent A starts pushing trained ckpts to HF as they
-  complete. Agent B polls HF for new ckpts; for each new ckpt, runs
-  the autointerp pipeline immediately.
-- **Day 5-6**: Agent A finishes all ckpts. Agent B catches up on
-  any remaining autointerp.
-- **Day 6+**: both agents have all data they need. Run final
-  probing/autointerp passes. Generate figures.
+  Agent B pulls activation cache (for passage encoding).
+- **Day 3-5**: Agent A starts pushing trained ckpts to HF as they
+  complete. Agent B polls HF for new ckpts; for each new ckpt at
+  seed=42, runs the autointerp pipeline immediately.
+- **Day 5-6**: Agent A finishes all 3-seed trainings + sparse-
+  probing pass. Agent A pushes final `probing_results.jsonl`.
+- **Day 6**: Agent B catches up on autointerp for any seed=42 ckpts
+  not yet processed. Pulls Agent A's final probing jsonl. Generates
+  Pareto plot.
 - **Day 7-9**: write-up phase. Both agents draft their respective
   sections of the unified summary; merge into one
   `phase7_unification/summary.md` near deadline.
