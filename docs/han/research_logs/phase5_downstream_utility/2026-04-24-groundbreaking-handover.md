@@ -135,7 +135,7 @@ TQDM_DISABLE=1 PYTHONPATH=. .venv/bin/python \
 | 5  | (1, 2)     | **0.8005 ± 0.003** (3-seed) | **0.8126 ± 0.003** (3-seed) | T=5 confirmed champion |
 | 6  | (1, 3)     | **0.7965** (s42) | **0.8188** (s42) | mp **+0.005 over T=5 s42**, +0.006 over 3-seed |
 | 7  | (1, 3)     | **0.7930** | **0.8036** | mp drops 0.015 from T=6 peak |
-| 8  | (1, 2, 4)  | training (start 02:38) | TBD    |       |
+| 8  | (1, 2, 4)  | **0.7937** | **0.7992** | mp drops further from T=6 peak |
 | 10 | (1, 2, 5)  | **0.7931** (s42) | **0.8040** (s42) | drops at BOTH (-0.011 lp, -0.010 mp vs T=5 s42) |
 | 15 | (1, 3, 7)  | TBD    | TBD    |       |
 | 20 | (1, 5, 10) | TBD    | TBD    |       |
