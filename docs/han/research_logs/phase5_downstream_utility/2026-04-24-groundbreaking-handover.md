@@ -133,7 +133,7 @@ TQDM_DISABLE=1 PYTHONPATH=. .venv/bin/python \
 | T  | shifts     | lp AUC | mp AUC | notes |
 |----|------------|--------|--------|-------|
 | 5  | (1, 2)     | **0.8005 ± 0.003** (3-seed) | **0.8126 ± 0.003** (3-seed) | T=5 confirmed champion |
-| 6  | (1, 3)     | TBD    | TBD    |       |
+| 6  | (1, 3)     | **0.7965** (s42) | **0.8188** (s42) | mp **+0.005 over T=5 s42**, +0.006 over 3-seed |
 | 7  | (1, 3)     | TBD    | TBD    |       |
 | 8  | (1, 2, 4)  | TBD    | TBD    |       |
 | 10 | (1, 2, 5)  | **0.7931** (s42) | **0.8040** (s42) | drops at BOTH (-0.011 lp, -0.010 mp vs T=5 s42) |
@@ -141,14 +141,22 @@ TQDM_DISABLE=1 PYTHONPATH=. .venv/bin/python \
 | 20 | (1, 5, 10) | TBD    | TBD    |       |
 | 30 | (1, 7, 15) | TBD    | TBD    | OOM risk at d_sae=18432 |
 
-**Early signal (T=10)**: drops at BOTH aggregations.
-- lp: 0.7931 vs T=5 0.8039 (-0.011)
-- mp: 0.8040 vs T=5 0.8139 (-0.010)
+**Updated signal — mp curve has a peak around T=6**:
+- lp drops monotonically: T=5 0.8039 → T=6 0.7965 → T=10 0.7931
+- **mp** behaves differently:
+  - T=5 0.8139 (s42), 0.8126 (3-seed mean)
+  - T=6 **0.8188 (s42)** — beats T=5 by +0.005 (s42) / +0.006 (3-seed)
+  - T=10 0.8040 — drops below T=5
 
-H8 does NOT scale with T past T=5. Same failure mode as vanilla TXCDR
-and ConvTXCDR (H1). The paper's "TXC scales with T" claim cannot be
-defended via H8 alone. Remaining T-sweep points (T=6, 7, 8, 15, 20, 30)
-will fill in the curve but the trend is now clear.
+So mp is NON-MONOTONIC with a possible peak at T=6 or T=8.
+T=7, T=8 results will clarify. If T=8 mp > T=6 mp, the peak is past
+T=8 and we have positive scaling up to that point. If T=8 mp ≤ T=6 mp,
+the peak is around T=6.
+
+This is notably DIFFERENT from agentic_txc_02 (which peaked at T=8) and
+suggests H8's optimal T is similar/slightly smaller. Either way, H8 mp
+is NOT monotone over the full T range — but it DOES have positive scaling
+in a narrow window. That's a milder claim the paper could still make.
 
 Monotonicity score (mp): TBD (target ≥ 0.80)
 Δ(T_max−T_min) (mp): TBD (target > +0.020)
