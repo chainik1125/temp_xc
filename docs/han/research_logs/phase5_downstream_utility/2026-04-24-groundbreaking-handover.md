@@ -197,7 +197,7 @@ Monotonicity score (mp): TBD (target ≥ 0.80)
 | {1, 2, 4}         | 0.7914 | 0.8070 |
 | {2}               | 0.8017 | 0.8104 |
 | {4}               | 0.7863 | 0.8062 |
-| {1, 2, 3} uniform | TBD    | TBD    |
+| {1, 2, 3} uniform | 0.7931 | 0.8129 |
 
 **Early interpretation**:
 - Multi-distance {1,2} HELPS over single-shift {1} by +0.038 lp / +0.018 mp at T=5.
