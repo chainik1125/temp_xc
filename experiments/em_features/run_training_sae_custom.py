@@ -63,7 +63,10 @@ def parse_args():
 def main():
     args = parse_args()
     cfg = yaml.safe_load(args.config.read_text())
-    args.out.parent.mkdir(parents=True, exist_ok=True)
+    if args.out is not None:
+        args.out.parent.mkdir(parents=True, exist_ok=True)
+    if args.out_prefix is not None:
+        args.out_prefix.parent.mkdir(parents=True, exist_ok=True)
 
     print(f"Loading subject model: {cfg['subject_model']}", flush=True)
     tok = AutoTokenizer.from_pretrained(cfg["subject_model"])
