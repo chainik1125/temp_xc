@@ -130,19 +130,37 @@ TQDM_DISABLE=1 PYTHONPATH=. .venv/bin/python \
 
 ### H8 T-sweep — does it scale with T?
 
-| T  | shifts     | lp AUC | mp AUC |
-|----|------------|--------|--------|
-| 5  | (1, 2)     | 0.8039 | 0.8139 |
-| 6  | (1, 3)     | TBD    | TBD    |
-| 7  | (1, 3)     | TBD    | TBD    |
-| 8  | (1, 2, 4)  | TBD    | TBD    |
-| 10 | (1, 2, 5)  | TBD    | TBD    |
-| 15 | (1, 3, 7)  | TBD    | TBD    |
-| 20 | (1, 5, 10) | TBD    | TBD    |
-| 30 | (1, 7, 15) | TBD    | TBD    |
+| T  | shifts     | lp AUC | mp AUC | notes |
+|----|------------|--------|--------|-------|
+| 5  | (1, 2)     | **0.8005 ± 0.003** (3-seed) | **0.8126 ± 0.003** (3-seed) | T=5 confirmed champion |
+| 6  | (1, 3)     | TBD    | TBD    |       |
+| 7  | (1, 3)     | TBD    | TBD    |       |
+| 8  | (1, 2, 4)  | TBD    | TBD    |       |
+| 10 | (1, 2, 5)  | **0.7931** (s42) | **0.8040** (s42) | drops at BOTH (-0.011 lp, -0.010 mp vs T=5 s42) |
+| 15 | (1, 3, 7)  | TBD    | TBD    |       |
+| 20 | (1, 5, 10) | TBD    | TBD    |       |
+| 30 | (1, 7, 15) | TBD    | TBD    | OOM risk at d_sae=18432 |
+
+**Early signal (T=10)**: drops at BOTH aggregations.
+- lp: 0.7931 vs T=5 0.8039 (-0.011)
+- mp: 0.8040 vs T=5 0.8139 (-0.010)
+
+H8 does NOT scale with T past T=5. Same failure mode as vanilla TXCDR
+and ConvTXCDR (H1). The paper's "TXC scales with T" claim cannot be
+defended via H8 alone. Remaining T-sweep points (T=6, 7, 8, 15, 20, 30)
+will fill in the curve but the trend is now clear.
 
 Monotonicity score (mp): TBD (target ≥ 0.80)
 Δ(T_max−T_min) (mp): TBD (target > +0.020)
+
+**Implications**:
+1. The "T-scaling story" is now firmly negative across all hypotheses tried
+   (H1, H7-as-T7, H8, vanilla TXCDR, vanilla matryoshka). Either H3
+   log-matryoshka is the last hope, OR the paper pivots to MLC headline
+   with T-scaling as an open problem.
+2. H8 at T=5 remains the σ-defensible mp champion across all SAE families,
+   but its advantage is bounded to T=5 — it's not "TXC scales with T",
+   it's "the best TXC at T=5".
 
 ### Shift-ablation curve at T=5
 
