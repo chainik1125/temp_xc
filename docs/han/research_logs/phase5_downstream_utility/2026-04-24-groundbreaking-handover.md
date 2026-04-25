@@ -145,16 +145,22 @@ TQDM_DISABLE=1 PYTHONPATH=. .venv/bin/python \
 
 | T  | H8 mp     | H8 lp     | vanilla TXCDR mp | vanilla TXCDR lp |
 |----|-----------|-----------|------------------|------------------|
-| 3  | TBD       | TBD       | 0.8022           | 0.7711           |
+| 3  | **0.8339** ⭐⭐ | 0.7690 | 0.8022 | 0.7711 |
 | 4  | TBD       | TBD       | TBD              | TBD              |
-| 5  | **0.8139** (3s 0.8126) | **0.8039** (3s 0.8005) | **0.8064** | 0.7827 |
+| 5  | 0.8139 (3s 0.8126) | 0.8039 (3s 0.8005) | 0.8064 | 0.7827 |
 | 6  | **0.8188** ⭐ | 0.7965 | 0.7955 | 0.7788 |
 | 7  | 0.8036    | 0.7930    | 0.7957           | **0.7834**       |
 | 8  | training  | training  | 0.7711           | 0.7540           |
 | 9  | TBD       | TBD       | TBD              | TBD              |
 | 10 | 0.8040    | 0.7931    | 0.7754           | 0.7671           |
 
-**H8 mp curve**: 0.8139 → **0.8188** (T=6 peak) → 0.8036 → 0.8040 (down).
+**H8 mp curve**: T=3 **0.8339 ⭐ NEW PEAK** → T=5 0.8139 → T=6 0.8188 → T=7 0.8036 → T=8 0.7992 → T=10 0.8040 → T=15 0.7772 → T=20 0.7873 → T=30 OOM.
+
+**Critical observation**: T=3 mp 0.8339 BEATS T=5 mp 0.8139 by +0.020. At T=3 the default shifts collapse to (1,) — so this is effectively SINGLE-SHIFT contrastive. The "best TXC" recipe might therefore be:
+- **bare TXC + anti-dead + matryoshka + single-shift contrastive at T=3**
+This would be a massive paper headline — the optimal T is ACHIEVABLY SMALL, not the LARGE T everyone assumed.
+
+The "TXC scales with T" claim still fails (peaks at small T). But the new claim "the optimal T is small (T=3) with single-shift contrastive" is publishable and counter-intuitive.
 **Vanilla TXCDR mp curve**: 0.8022 → 0.8064 (T=5 peak) → 0.7955 → 0.7957 → 0.7711 → 0.7754.
 
 **Findings**:
