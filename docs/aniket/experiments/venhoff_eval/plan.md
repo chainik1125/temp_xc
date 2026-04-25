@@ -293,9 +293,120 @@ SAE 3.26 / MLC 3.08 matches the pre-pivot P4′ prediction (TempXC wins
 taxonomy coherence) but doesn't itself speak to the primary Gap
 Recovery claim.
 
-**Status at time of writing**: Phase 2 TempXC running, 4 workers
-pinned to GPUs 0-3, each ~15 min/vector at paper budget. ETA for
-full pipeline (Phase 2 TempXC + MLC + Phase 3 hybrid gen): ~5-7 h.
+**Status (superseded; see §6c)**: the 2026-04-22 launch ran ~24 h
+through Phase 3 reaching ~12% Gap Recovery on TempXC at task 264/500.
+Killed and re-architected after the arch-contamination bug below.
+
+## 6c. 2026-04-24/25 arch-keying fix + incremental-batch protocol
+
+### The bug that killed the 2026-04-22 run
+
+When the 2026-04-22 run reached Phase 3, all three arch labels
+(SAE / TempXC / MLC) reported **identical Gap Recovery** to the
+decimal (~11.8%). Confirmed via md5sum: `_linear.pt` files for some
+indices existed (TempXC fresh-trained outputs) but bare `.pt`
+filenames were unchanged. Tracing the resume + path-resolution
+logic showed the root cause:
+
+- `_venhoff_expected_vector_path` returned the same filename for
+  all three arches (no arch axis).
+- TempXC's Phase 2 training wrote `_linear.pt` files; from then
+  on `_linear.pt` won the path resolution against the bare
+  shipped name.
+- MLC's Phase 2 resume sidecar matched TempXC's
+  meta hash (no arch in the hash) → MLC skipped training entirely.
+- All three arches' Phase 3 runs read the same on-disk
+  `llama-3.1-8b_idx*.pt` files (a Frankenstein of TempXC-trained
+  for some idx + Venhoff-shipped for others) → identical numbers.
+
+### Fix landed (commit `9da7f27`, 2026-04-24)
+
+1. **Arch-keyed paths**: `SteeringConfig.arch ∈ {sae, tempxc, mlc}`.
+   `_venhoff_expected_vector_path(arch=...)` returns:
+   - `sae` → bare `{model}_{tag}.pt` (Venhoff's shipped path; Phase 2
+     no-ops via `reuse_shipped`).
+   - `tempxc` → `{model}_{tag}_tempxc.pt`.
+   - `mlc` → `{model}_{tag}_mlc.pt`.
+2. **Subprocess output rename**: `optimize_steering_vectors.py` still
+   writes its native `_linear.pt`. After subprocess success,
+   `train_one_vector` renames `_linear.pt` → `_<arch>.pt`. Bare
+   shipped paths are never overwritten.
+3. **Meta sidecar arch-keying**: meta_path is now
+   `vector_<idx>_<arch>.meta.json`; arch is in the hash. Resume can't
+   confuse arches.
+4. **Hybrid swap**: `hybrid.py._swap_arch_vectors_in/out` copies
+   `_<arch>.pt` files to bare paths before each `hybrid_token.py`
+   subprocess and restores after (try/finally). hybrid_token.py
+   itself reads bare paths, so this is a transparent indirection.
+   SAE arch is a no-op (bare paths are the shipped vectors).
+
+### Incremental-batch protocol (Dmitry, 2026-04-25)
+
+Per Dmitry's 2026-04-24 note ("anything that runs over 4h should
+have a <1h iteration loop") and the follow-up
+("start with 20 examples, do the evaluation, then do the next 20"),
+we abandoned the full 500-task paper-budget single-shot run in
+favor of incremental Phase 3 batches:
+
+| Cycle | n_tasks | Coefs | Windows | Goal |
+|---|---|---|---|---|
+| Batch 1 | 20 | `{0.5}` | `{0}` | Confirm arch-keying produces three distinct GR numbers |
+| Batch 2 | 40 (resume from 21) | `{0.5}` | `{0}` | Tighten paired Δ between archs |
+| Batch 3+ | 60, 80, ... | sweep on best arch | sweep | Iterate on the (coef, window) grid for the winning arch |
+
+**Per-batch budget choices (vs paper App C.1):**
+- Phase 2 budget unchanged (`max_iters=50, n_training=2048`); arch
+  distinctness depends on actually training useful vectors. Phase 2
+  runs once at the start of batch 1 and is cached for all later batches.
+- Phase 3 grid 1×1 = 1 cell/task at batch 1 (vs paper 10×5 = 50). Each
+  task = thinking + base + 1 hybrid generation. Cuts per-batch wall
+  time ~50× vs paper grid.
+- `NUM_GPUS_HYBRID=1` — Phase 3 archs run **serially**, not in
+  parallel, because the arch-vector swap is file-level on shared bare
+  paths (parallel hybrid runs would race). Sequential cost: 3 archs
+  × ~10 min per 20-task batch.
+
+### Launch command
+
+```bash
+HYBRID_N_TASKS=20 HYBRID_COEFFICIENTS="0.5" HYBRID_TOKEN_WINDOWS="0" \
+  bash scripts/runpod_venhoff_paper_run.sh
+```
+
+For batch 2:
+
+```bash
+HYBRID_N_TASKS=40 HYBRID_COEFFICIENTS="0.5" HYBRID_TOKEN_WINDOWS="0" \
+  bash scripts/runpod_venhoff_paper_run.sh
+```
+
+(Venhoff's `hybrid_token.py` has built-in resume keyed by
+`rolling_<base>_<dataset>.jsonl`; bumping `n_tasks` continues from
+where the prior batch left off.)
+
+### Operational lessons baked in
+
+- **OOM safety**: Phase 2 with 4-wide parallelism on 4× H100 80GB
+  occasionally OOMs when transient zombies linger. If the run hits
+  one OOM, retry preserves earlier completed `_<arch>.pt` files
+  (resume covers them). If it OOMs twice, fall back to
+  `NUM_GPUS_STEERING=2` — slower but bulletproof.
+- **Vendor venv recreation**: re-cloning `vendor/thinking-llms-interp`
+  loses the `.venv` and triggers a fresh dep install. Required deps
+  beyond Venhoff's nominal list: `python-dotenv`, `chat-limiter`,
+  `wandb`, `math-verify`, `httpx`. Drop `vllm` from the install set
+  — it pulls torch 2.10 (~5 GB) and is unused on our path.
+- **Container disk traps** (re-confirmed 2026-04-24): with default
+  20 GB container disk, `/root/.cache/uv` fills mid-install. Move
+  `UV_CACHE_DIR=/workspace/.cache/uv` early (the volume disk).
+- **WANDB_MODE=disabled** to avoid interactive login prompts in
+  Venhoff's training subprocesses.
+
+### Status (2026-04-25)
+
+Batch 1 in progress. Phase 2 TempXC training; SAE skipped via
+shipped reuse; MLC pending after TempXC. ETA to first arch-distinct
+results: ~3-4h.
 
 ## 7. Relationship to sparse-probing result
 
