@@ -145,7 +145,7 @@ TQDM_DISABLE=1 PYTHONPATH=. .venv/bin/python \
 
 | T  | H8 mp     | H8 lp     | vanilla TXCDR mp | vanilla TXCDR lp |
 |----|-----------|-----------|------------------|------------------|
-| 3  | **0.8339** ⭐⭐ | 0.7690 | 0.8022 | 0.7711 |
+| 3  | 0.7960 | 0.7690 | 0.8022 | 0.7711 |
 | 4  | TBD       | TBD       | TBD              | TBD              |
 | 5  | 0.8139 (3s 0.8126) | 0.8039 (3s 0.8005) | 0.8064 | 0.7827 |
 | 6  | **0.8188** ⭐ | 0.7965 | 0.7955 | 0.7788 |
@@ -154,13 +154,15 @@ TQDM_DISABLE=1 PYTHONPATH=. .venv/bin/python \
 | 9  | TBD       | TBD       | TBD              | TBD              |
 | 10 | 0.8040    | 0.7931    | 0.7754           | 0.7671           |
 
-**H8 mp curve**: T=3 **0.8339 ⭐ NEW PEAK** → T=5 0.8139 → T=6 0.8188 → T=7 0.8036 → T=8 0.7992 → T=10 0.8040 → T=15 0.7772 → T=20 0.7873 → T=30 OOM.
+**H8 mp curve**: T=3 0.7960 → T=5 0.8139 → T=6 **0.8188 ⭐** (peak) → T=7 0.8036 → T=8 0.7992 → T=10 0.8040 → T=15 0.7772 → T=20 0.7873 → T=30 OOM.
 
-**Critical observation**: T=3 mp 0.8339 BEATS T=5 mp 0.8139 by +0.020. At T=3 the default shifts collapse to (1,) — so this is effectively SINGLE-SHIFT contrastive. The "best TXC" recipe might therefore be:
-- **bare TXC + anti-dead + matryoshka + single-shift contrastive at T=3**
-This would be a massive paper headline — the optimal T is ACHIEVABLY SMALL, not the LARGE T everyone assumed.
+**Counter-intuitive**: H8 at T=3 (mp 0.7960) is WORSE than vanilla TXCDR at T=3 (mp 0.8022). The matryoshka + InfoNCE machinery may HURT at very small T — possibly because contrastive needs enough token-overlap diversity to be useful, and at T=3 with shift=1 the anchor/positive overlap is 67% (2/3 tokens shared), maybe too high to drive useful invariance.
 
-The "TXC scales with T" claim still fails (peaks at small T). But the new claim "the optimal T is small (T=3) with single-shift contrastive" is publishable and counter-intuitive.
+**Peak structure**: H8's mp peak is at T=6 (0.8188). H8 always beats vanilla TXCDR at T≥5 — but NOT at T=3.
+
+**The "TXC scales with T" claim**: Decisively NO at any aggregation. mp peaks at T=6, lp peaks at T=5. Both decline thereafter.
+
+**Paper headline**: "the optimal T is small (T=6) for H8, T=5 for vanilla TXCDR — H8 closes the lp gap to MLC and tops mp benchmark, but T-scaling story is paper-negative".
 **Vanilla TXCDR mp curve**: 0.8022 → 0.8064 (T=5 peak) → 0.7955 → 0.7957 → 0.7711 → 0.7754.
 
 **Findings**:
@@ -199,11 +201,10 @@ Monotonicity score (mp): TBD (target ≥ 0.80)
 
 **Early interpretation**:
 - Multi-distance {1,2} HELPS over single-shift {1} by +0.038 lp / +0.018 mp at T=5.
-- BUT T=3 with default shifts (which collapse to {1,}) gives mp 0.8339 — the
-  TXC champion result is achieved at SMALL T with SINGLE shift, not at T=5
-  with multi-distance.
-- Implication: **the right recipe = T=3 + matryoshka + single-shift contrastive
-  + anti-dead** (or possibly T=2/T=4 nearby — need data).
+- T=3 H8 mp = 0.7960 (NOT a breakthrough — that earlier 0.8339 was a partial-
+  probe artifact; final 36-task mean is 0.7960).
+- Implication: at T=5, multi-distance is the right recipe, and T=6 is the
+  optimal T for H8.
 
 ### TXC vs MLC + anti-dead
 
