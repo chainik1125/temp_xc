@@ -74,12 +74,19 @@ def _plan_entries():
 
     # Paper-ready figures
     results_dir = REPO / "experiments/phase6_qualitative_latents/results"
-    for p in results_dir.glob("phase61_*.png"):
-        entries.append((p, DATA_REPO,
-                        f"experiments/phase6_qualitative_latents/results/{p.name}"))
-    for p in results_dir.glob("phase61_*.md"):
-        entries.append((p, DATA_REPO,
-                        f"experiments/phase6_qualitative_latents/results/{p.name}"))
+    for prefix in ("phase61_", "phase63_"):
+        for p in results_dir.glob(f"{prefix}*.png"):
+            entries.append((p, DATA_REPO,
+                            f"experiments/phase6_qualitative_latents/results/{p.name}"))
+        for p in results_dir.glob(f"{prefix}*.md"):
+            entries.append((p, DATA_REPO,
+                            f"experiments/phase6_qualitative_latents/results/{p.name}"))
+
+    # Phase 6.3 passage-probe results JSONL
+    passage_probe = REPO / "experiments/phase6_qualitative_latents/results/passage_probe_results.jsonl"
+    if passage_probe.exists():
+        entries.append((passage_probe, DATA_REPO,
+                        "experiments/phase6_qualitative_latents/results/passage_probe_results.jsonl"))
     return entries
 
 
