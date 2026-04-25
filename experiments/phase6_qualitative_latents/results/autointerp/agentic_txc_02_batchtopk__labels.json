@@ -1,0 +1,186 @@
+[
+  {
+    "feature_idx": 15702,
+    "label": "poetic and archaic English text passages",
+    "variance": 171.112548828125,
+    "n_contexts": 10,
+    "contexts": [
+      {
+        "position": 1257,
+        "strength": 63.5,
+        "text": " their contributions, but I do not name those to\u00ab whom\u00bb I\nam indebted for criticisms or corrections,"
+      },
+      {
+        "position": 677,
+        "strength": 62.46875,
+        "text": "\n  With friends and honoured elders; some this\u00ab side\u00bb,\n  Some that side ranged: and"
+      },
+      {
+        "position": 745,
+        "strength": 62.0625,
+        "text": "  Their common blood, yon concourse of our\u00ab kin\u00bb,\n  My members failIn a population"
+      }
+    ]
+  },
+  {
+    "feature_idx": 17462,
+    "label": "historical text with archaic or foreign characters",
+    "variance": 171.09678649902344,
+    "n_contexts": 10,
+    "contexts": [
+      {
+        "position": 1107,
+        "strength": 88.5625,
+        "text": " destroyed nearly all letters\nreceived before 18\u00ab6\u00bb2. After that date he was persuaded to"
+      },
+      {
+        "position": 507,
+        "strength": 66.0,
+        "text": " those we must slay\n  To-day,\u00ab in\u00bb war's arbitrament; for, sure"
+      },
+      {
+        "position": 1103,
+        "strength": 62.71875,
+        "text": " on for years, destroyed nearly all letters\nreceived\u00ab before\u00bb 1862. After that date"
+      }
+    ]
+  },
+  {
+    "feature_idx": 6068,
+    "label": "George Orwell's political ideology and writings",
+    "variance": 161.63002014160156,
+    "n_contexts": 10,
+    "contexts": [
+      {
+        "position": 1344,
+        "strength": 73.4375,
+        "text": " period when Russia lived under the Marxist\u2013Leninist\u00ab ideology\u00bb of Joseph Stalin. Orwell, a democratic socialist"
+      },
+      {
+        "position": 1475,
+        "strength": 66.25,
+        "text": " was doing, to fuse political purpose and artistic purpose\u00ab into\u00bb one whole.\"\nThe original title of the"
+      },
+      {
+        "position": 1467,
+        "strength": 65.8125,
+        "text": " tried, with full consciousness of what I was doing\u00ab,\u00bb to fuse political purpose and artistic purpose into one"
+      }
+    ]
+  },
+  {
+    "feature_idx": 6630,
+    "label": "Latin and Sanskrit poetic texts",
+    "variance": 159.74644470214844,
+    "n_contexts": 10,
+    "contexts": [
+      {
+        "position": 89,
+        "strength": 48.0625,
+        "text": " Urbes\n  Autor erat; Cererisve\u00ab bea\u00bbvit munere gentes;\n  Vel qui"
+      },
+      {
+        "position": 133,
+        "strength": 48.0,
+        "text": "tos\n  Consociare sonos, ocul\u00abisque\u00bb exponere Voces;\n  Humanam"
+      },
+      {
+        "position": 267,
+        "strength": 47.71875,
+        "text": "  _NEWTONVM_ clausi reseran\u00abtem\u00bb scrinia Veri,\n  _"
+      }
+    ]
+  },
+  {
+    "feature_idx": 2424,
+    "label": "Acknowledgments and attribution in written works",
+    "variance": 159.08497619628906,
+    "n_contexts": 10,
+    "contexts": [
+      {
+        "position": 879,
+        "strength": 69.9375,
+        "text": "The Diary or Pocket-book, from which quotations\u00ab occur\u00bb in the following\npages, has been of"
+      },
+      {
+        "position": 1207,
+        "strength": 67.125,
+        "text": " work.\nTo some I am indebted for reminis\u00abcences\u00bb of my father, to others for\ninformation"
+      },
+      {
+        "position": 1263,
+        "strength": 65.0,
+        "text": " not name those to whom I\nam indebted for\u00ab criticisms\u00bb or corrections, because I should wish to bear"
+      }
+    ]
+  },
+  {
+    "feature_idx": 6693,
+    "label": "Historical references to Stalinist Soviet Union",
+    "variance": 149.36424255371094,
+    "n_contexts": 10,
+    "contexts": [
+      {
+        "position": 1397,
+        "strength": 80.3125,
+        "text": "UM and Stalinist forces, during the Spanish Civil\u00ab War\u00bb. In a letter to Yvonne Davet ("
+      },
+      {
+        "position": 1388,
+        "strength": 78.25,
+        "text": " during the Barcelona May Days conflicts between the POUM\u00ab and\u00bb Stalinist forces, during the Spanish Civil War"
+      },
+      {
+        "position": 1396,
+        "strength": 76.6875,
+        "text": " POUM and Stalinist forces, during the Spanish\u00ab Civil\u00bb War. In a letter to Yvonne Davet"
+      }
+    ]
+  },
+  {
+    "feature_idx": 1310,
+    "label": "Punctuation and special characters at token boundaries",
+    "variance": 148.80101013183594,
+    "n_contexts": 10,
+    "contexts": [
+      {
+        "position": 1105,
+        "strength": 92.625,
+        "text": " years, destroyed nearly all letters\nreceived before \u00ab1\u00bb862. After that date he was"
+      },
+      {
+        "position": 1751,
+        "strength": 87.1875,
+        "text": " (2, 4), and (3,\u00ab \u00bb0) is reflected across the line y ="
+      },
+      {
+        "position": 869,
+        "strength": 81.0625,
+        "text": "\nrendering which would unfairly exaggerate their effect.\n\n\u00abThe\u00bb Diary or Pocket-book, from which quotations"
+      }
+    ]
+  },
+  {
+    "feature_idx": 2048,
+    "label": "Political ideologies and historical movements",
+    "variance": 131.61541748046875,
+    "n_contexts": 10,
+    "contexts": [
+      {
+        "position": 1367,
+        "strength": 64.125,
+        "text": " critic of Stalin and hostile to Moscow-directed Stalin\u00abism\u00bb, an attitude that was critically shaped by his"
+      },
+      {
+        "position": 1697,
+        "strength": 62.6875,
+        "text": " transformed as the wartime alliance gave way to the Cold\u00ab War\u00bb.\nTime magazine chose the book as one"
+      },
+      {
+        "position": 1236,
+        "strength": 61.78125,
+        "text": " kind coadjutors\nI gladly acknowledge my\u00ab indebtedness\u00bb. The names of some occur in\nconnection"
+      }
+    ]
+  }
+]

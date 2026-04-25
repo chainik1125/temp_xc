@@ -1,0 +1,9 @@
+[
+  {
+    "arch": "agentic_txc_11_stack",
+    "alive_fraction": 0.788682758808136,
+    "l0_per_token": 650.6870727539062,
+    "n_tokens": 409,
+    "decoder_mean_abs_cos": null
+  }
+]

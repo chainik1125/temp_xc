@@ -1,0 +1,186 @@
+[
+  {
+    "feature_idx": 11193,
+    "label": "Punctuation and quotation marks in text",
+    "variance": 180.58895874023438,
+    "n_contexts": 10,
+    "contexts": [
+      {
+        "position": 1107,
+        "strength": 122.25,
+        "text": " destroyed nearly all letters\nreceived before 18\u00ab6\u00bb2. After that date he was persuaded to"
+      },
+      {
+        "position": 35,
+        "strength": 113.9375,
+        "text": "um vita longe lateque remot\u00e6.\n  \u00abQui\u00bb scriptis jussit Tabulis compes"
+      },
+      {
+        "position": 871,
+        "strength": 112.0625,
+        "text": " which would unfairly exaggerate their effect.\n\nThe Diary\u00ab or\u00bb Pocket-book, from which quotations occur in"
+      }
+    ]
+  },
+  {
+    "feature_idx": 7220,
+    "label": "Acknowledging debts and intellectual indebtedness",
+    "variance": 164.78518676757812,
+    "n_contexts": 10,
+    "contexts": [
+      {
+        "position": 1235,
+        "strength": 66.25,
+        "text": " these kind coadjutors\nI gladly acknowledge\u00ab my\u00bb indebtedness. The names of some occur in\n"
+      },
+      {
+        "position": 1234,
+        "strength": 65.375,
+        "text": " all these kind coadjutors\nI gladly\u00ab acknowledge\u00bb my indebtedness. The names of some occur in"
+      },
+      {
+        "position": 4,
+        "strength": 64.6875,
+        "text": "ittite curas\u00ab\n\u00bb  Atque hinc coeligen\u00e6 v"
+      }
+    ]
+  },
+  {
+    "feature_idx": 1636,
+    "label": "Stalinism and Soviet Union historical context",
+    "variance": 158.37469482421875,
+    "n_contexts": 10,
+    "contexts": [
+      {
+        "position": 1338,
+        "strength": 63.15625,
+        "text": " of the Soviet Union, a period when Russia lived\u00ab under\u00bb the Marxist\u2013Leninist ideology of Joseph Stalin"
+      },
+      {
+        "position": 1337,
+        "strength": 60.84375,
+        "text": " era of the Soviet Union, a period when Russia\u00ab lived\u00bb under the Marxist\u2013Leninist ideology of Joseph"
+      },
+      {
+        "position": 1334,
+        "strength": 58.90625,
+        "text": " the Stalinist era of the Soviet Union, a\u00ab period\u00bb when Russia lived under the Marxist\u2013Leninist"
+      }
+    ]
+  },
+  {
+    "feature_idx": 1088,
+    "label": "Punctuation marks and special characters",
+    "variance": 156.3677978515625,
+    "n_contexts": 10,
+    "contexts": [
+      {
+        "position": 1105,
+        "strength": 114.0,
+        "text": " years, destroyed nearly all letters\nreceived before \u00ab1\u00bb862. After that date he was"
+      },
+      {
+        "position": 509,
+        "strength": 109.1875,
+        "text": " must slay\n  To-day, in war\u00ab'\u00bbs arbitrament; for, sure,\n"
+      },
+      {
+        "position": 1751,
+        "strength": 103.0625,
+        "text": " (2, 4), and (3,\u00ab \u00bb0) is reflected across the line y ="
+      }
+    ]
+  },
+  {
+    "feature_idx": 14885,
+    "label": "References to family relations in poetic text",
+    "variance": 148.78750610351562,
+    "n_contexts": 10,
+    "contexts": [
+      {
+        "position": 744,
+        "strength": 62.8125,
+        "text": "\n  Their common blood, yon concourse of\u00ab our\u00bb kin,\n  My members failIn a"
+      },
+      {
+        "position": 635,
+        "strength": 61.6875,
+        "text": "\n  Marked on each hand the kinsmen of\u00ab his\u00bb house,\n  Grandsires and si"
+      },
+      {
+        "position": 1256,
+        "strength": 59.9375,
+        "text": " with their contributions, but I do not name those\u00ab to\u00bb whom I\nam indebted for criticisms or corrections"
+      }
+    ]
+  },
+  {
+    "feature_idx": 3523,
+    "label": "punctuation and grammatical conjunctions",
+    "variance": 147.61416625976562,
+    "n_contexts": 10,
+    "contexts": [
+      {
+        "position": 1585,
+        "strength": 70.5625,
+        "text": " Union, Union des r\u00e9publiques socialistes sovi\u00ab\u00e9tiques\u00bb.\nOrwell wrote the book between November"
+      },
+      {
+        "position": 1697,
+        "strength": 70.25,
+        "text": " transformed as the wartime alliance gave way to the Cold\u00ab War\u00bb.\nTime magazine chose the book as one"
+      },
+      {
+        "position": 664,
+        "strength": 69.9375,
+        "text": "  Cousins and sons-in-law and\u00ab nephews\u00bb, mixed\n  With friends and honoured elders"
+      }
+    ]
+  },
+  {
+    "feature_idx": 16493,
+    "label": "Punctuation marks and special characters",
+    "variance": 145.52615356445312,
+    "n_contexts": 10,
+    "contexts": [
+      {
+        "position": 1753,
+        "strength": 96.0,
+        "text": ", 4), and (3, 0\u00ab)\u00bb is reflected across the line y = x to"
+      },
+      {
+        "position": 1107,
+        "strength": 94.5,
+        "text": " destroyed nearly all letters\nreceived before 18\u00ab6\u00bb2. After that date he was persuaded to"
+      },
+      {
+        "position": 35,
+        "strength": 94.1875,
+        "text": "um vita longe lateque remot\u00e6.\n  \u00abQui\u00bb scriptis jussit Tabulis compes"
+      }
+    ]
+  },
+  {
+    "feature_idx": 12655,
+    "label": "Punctuation and conjunctions in literary text",
+    "variance": 145.43310546875,
+    "n_contexts": 10,
+    "contexts": [
+      {
+        "position": 1258,
+        "strength": 66.625,
+        "text": " contributions, but I do not name those to whom\u00ab I\u00bb\nam indebted for criticisms or corrections, because"
+      },
+      {
+        "position": 978,
+        "strength": 66.5,
+        "text": " dated his letters, so that but for the Diary\u00ab it\u00bb\nwould have been all but impossible to unravel"
+      },
+      {
+        "position": 678,
+        "strength": 66.125,
+        "text": "  With friends and honoured elders; some this side\u00ab,\u00bb\n  Some that side ranged: and,"
+      }
+    ]
+  }
+]

@@ -1,0 +1,186 @@
+[
+  {
+    "feature_idx": 2400,
+    "label": "Punctuation and narrative transition markers in classical texts",
+    "variance": 1015.2765502929688,
+    "n_contexts": 10,
+    "contexts": [
+      {
+        "position": 449,
+        "strength": 169.375,
+        "text": "badge\n  Was Hanuman the monkey, spake this\u00ab thing\u00bb\n  To Krishna the Divine, his char"
+      },
+      {
+        "position": 421,
+        "strength": 168.0,
+        "text": " set,\n  Weapons unsheathing, bows\u00ab drawn\u00bb forth, the war\n  Instant to break"
+      },
+      {
+        "position": 447,
+        "strength": 163.5,
+        "text": "sign-badge\n  Was Hanuman the monkey,\u00ab spake\u00bb this thing\n  To Krishna the Divine,"
+      }
+    ]
+  },
+  {
+    "feature_idx": 8197,
+    "label": "Family relationship terms in lists",
+    "variance": 792.1275634765625,
+    "n_contexts": 10,
+    "contexts": [
+      {
+        "position": 1218,
+        "strength": 216.0,
+        "text": " of my father, to others for\ninformation,\u00ab criticisms\u00bb, and advice. To all these kind co"
+      },
+      {
+        "position": 1220,
+        "strength": 207.75,
+        "text": " father, to others for\ninformation, criticisms,\u00ab and\u00bb advice. To all these kind coadjut"
+      },
+      {
+        "position": 647,
+        "strength": 196.0,
+        "text": ",\n  Grandsires and sires,\u00ab uncles\u00bb and brothers and sons,\n  Cousins"
+      }
+    ]
+  },
+  {
+    "feature_idx": 4053,
+    "label": "Family relationships in enumerated lists",
+    "variance": 764.8369750976562,
+    "n_contexts": 10,
+    "contexts": [
+      {
+        "position": 1218,
+        "strength": 234.375,
+        "text": " of my father, to others for\ninformation,\u00ab criticisms\u00bb, and advice. To all these kind co"
+      },
+      {
+        "position": 647,
+        "strength": 197.875,
+        "text": ",\n  Grandsires and sires,\u00ab uncles\u00bb and brothers and sons,\n  Cousins"
+      },
+      {
+        "position": 1220,
+        "strength": 187.875,
+        "text": " father, to others for\ninformation, criticisms,\u00ab and\u00bb advice. To all these kind coadjut"
+      }
+    ]
+  },
+  {
+    "feature_idx": 4560,
+    "label": "Selection pressure in evolution examples",
+    "variance": 637.395263671875,
+    "n_contexts": 10,
+    "contexts": [
+      {
+        "position": 421,
+        "strength": 140.125,
+        "text": " set,\n  Weapons unsheathing, bows\u00ab drawn\u00bb forth, the war\n  Instant to break"
+      },
+      {
+        "position": 449,
+        "strength": 137.625,
+        "text": "badge\n  Was Hanuman the monkey, spake this\u00ab thing\u00bb\n  To Krishna the Divine, his char"
+      },
+      {
+        "position": 358,
+        "strength": 135.5,
+        "text": " an environmental change occurs that favors individuals that are tallest\u00ab.\u00bb As a result, more of the taller individuals"
+      }
+    ]
+  },
+  {
+    "feature_idx": 4155,
+    "label": "Religious or mythological narrative punctuation",
+    "variance": 533.0548095703125,
+    "n_contexts": 10,
+    "contexts": [
+      {
+        "position": 449,
+        "strength": 125.6875,
+        "text": "badge\n  Was Hanuman the monkey, spake this\u00ab thing\u00bb\n  To Krishna the Divine, his char"
+      },
+      {
+        "position": 421,
+        "strength": 124.625,
+        "text": " set,\n  Weapons unsheathing, bows\u00ab drawn\u00bb forth, the war\n  Instant to break"
+      },
+      {
+        "position": 447,
+        "strength": 118.125,
+        "text": "sign-badge\n  Was Hanuman the monkey,\u00ab spake\u00bb this thing\n  To Krishna the Divine,"
+      }
+    ]
+  },
+  {
+    "feature_idx": 2285,
+    "label": "Stalin and Stalinist ideology references",
+    "variance": 238.9013214111328,
+    "n_contexts": 10,
+    "contexts": [
+      {
+        "position": 1396,
+        "strength": 101.3125,
+        "text": " POUM and Stalinist forces, during the Spanish\u00ab Civil\u00bb War. In a letter to Yvonne Davet"
+      },
+      {
+        "position": 1397,
+        "strength": 100.75,
+        "text": "UM and Stalinist forces, during the Spanish Civil\u00ab War\u00bb. In a letter to Yvonne Davet ("
+      },
+      {
+        "position": 1347,
+        "strength": 97.9375,
+        "text": " lived under the Marxist\u2013Leninist ideology of Joseph\u00ab Stalin\u00bb. Orwell, a democratic socialist, was a"
+      }
+    ]
+  },
+  {
+    "feature_idx": 1662,
+    "label": "Four-digit years in historical texts",
+    "variance": 200.45166015625,
+    "n_contexts": 10,
+    "contexts": [
+      {
+        "position": 1597,
+        "strength": 140.625,
+        "text": "\nOrwell wrote the book between November 1\u00ab9\u00bb43 and February 1944"
+      },
+      {
+        "position": 1106,
+        "strength": 134.125,
+        "text": ", destroyed nearly all letters\nreceived before 1\u00ab8\u00bb62. After that date he was persuaded"
+      },
+      {
+        "position": 1604,
+        "strength": 133.25,
+        "text": " November 1943 and February 1\u00ab9\u00bb44, when the United Kingdom was in"
+      }
+    ]
+  },
+  {
+    "feature_idx": 2636,
+    "label": "Digit positions in historical years",
+    "variance": 154.54685974121094,
+    "n_contexts": 10,
+    "contexts": [
+      {
+        "position": 1597,
+        "strength": 129.375,
+        "text": "\nOrwell wrote the book between November 1\u00ab9\u00bb43 and February 1944"
+      },
+      {
+        "position": 1604,
+        "strength": 121.6875,
+        "text": " November 1943 and February 1\u00ab9\u00bb44, when the United Kingdom was in"
+      },
+      {
+        "position": 1107,
+        "strength": 118.625,
+        "text": " destroyed nearly all letters\nreceived before 18\u00ab6\u00bb2. After that date he was persuaded to"
+      }
+    ]
+  }
+]

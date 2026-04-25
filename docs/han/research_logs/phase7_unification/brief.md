@@ -77,6 +77,40 @@ Agent A's ckpts are on HF. Agent B can do day-1 prep (passage
 building, Phase 6 pipeline port) in parallel with Agent A's
 training.
 
+### Where to find prior-phase code and docs
+
+The Phase 7 branch (`han-phase7-unification`) carries forward the
+**research logs and phase-specific experiment directories** from
+prior phases so agents do NOT need to switch branches to read prior
+work. Available directly on this branch:
+
+| dir | from phase | what's there |
+|---|---|---|
+| `docs/han/research_logs/phase5_downstream_utility/` | Phase 5 | brief, plan, dated experiments, summary, agentic logs, groundbreaking handover |
+| `docs/han/research_logs/phase5b_t_scaling_explore/` | Phase 5B | brief, plan, message-to-phase5-agent, t-encoder writeup |
+| `docs/han/research_logs/phase6_qualitative_latents/` | Phase 6.1, 6.3 | qualitative interpretability + Pareto analysis |
+| `docs/han/research_logs/phase6_2_autoresearch/` | Phase 6.2 | TXC-cannot-close-the-qualitative-gap negative result |
+| `docs/han/research_logs/phase7_unification/` | Phase 7 (this) | brief, plan |
+| `experiments/phase5_downstream_utility/` | Phase 5 | training driver, probing pipeline, results jsonls (read-only reference) |
+| `experiments/phase5b_t_scaling_explore/` | Phase 5B | subseq sampling + 2D sweep code, results jsonls |
+| `experiments/phase6_qualitative_latents/` | Phase 6 | qualitative pipeline + Pareto plot generation |
+| `experiments/phase6_2_autoresearch/` | Phase 6.2 | autoresearch loop scripts |
+
+Plus all the arch class files (`src/architectures/*.py`) including
+those that aren't in the Phase 7 canonical 49 (e.g. dead-end Phase
+5B negative results: `phase5b_strided_txcdr.py`,
+`phase5b_token_subseq_sae.py`, `phase5b_subset_encoder_txc.py`,
+`phase5b_per_pos_scale_matryoshka.py`).
+
+The full historical branches (`origin/han`, `origin/han-phase5b`,
+`origin/han-phase6`) ARE preserved and contain phase-specific
+experiment infrastructure (training loops, ckpts metadata, etc.)
+that wasn't migrated. If you find yourself needing something not on
+Phase 7's branch, that's where to look — e.g. Phase 5's
+`run_partB_h8.sh` orchestrator script lives only on `origin/han`.
+But for documentation and per-phase experiment code, this branch is
+self-contained.
+
 ### Strategy: fresh phase, historical branches preserved
 
 After deliberation, **we do NOT merge `han-phase5b` or `han-phase6`
