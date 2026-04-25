@@ -245,7 +245,17 @@ def train_one_vector(
     # Inject PYTHONPATH=<venhoff_root> so `from utils.X import ...` resolves
     # regardless of cwd. Some Venhoff scripts sys.path.append('..') themselves;
     # hybrid_token.py doesn't, so we make it uniform here.
-    env = {**os.environ, "PYTHONPATH": str(venhoff_root.absolute())}
+    env = {
+        **os.environ,
+        "PYTHONPATH": str(venhoff_root.absolute()),
+        # Use the expandable-segments allocator. Standard mitigation for
+        # the "tried to allocate N MiB; M GiB free in total but
+        # fragmented" OOM class that bit our 4-wide Phase 2 launches on
+        # 2026-04-24/25. The OOM message itself recommends this setting.
+        "PYTORCH_CUDA_ALLOC_CONF": os.environ.get(
+            "PYTORCH_CUDA_ALLOC_CONF", "expandable_segments:True"
+        ),
+    }
     if gpu_id is not None:
         env["CUDA_VISIBLE_DEVICES"] = str(gpu_id)
 
