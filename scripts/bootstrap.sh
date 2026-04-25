@@ -32,6 +32,14 @@ if ! command -v uv >/dev/null 2>&1; then
 fi
 echo "[bootstrap] uv: $(command -v uv) ($(uv --version))"
 
+# Persist uv on PATH for future shells in this pod (tmux, ssh, web-terminal
+# reopens) so future shells don't get "uv: command not found".
+PERSIST_LINE='export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$PATH"'
+if [[ -f "$HOME/.bashrc" ]] && ! grep -qF "$PERSIST_LINE" "$HOME/.bashrc"; then
+    echo "$PERSIST_LINE" >> "$HOME/.bashrc"
+    echo "[bootstrap] appended PATH export to ~/.bashrc"
+fi
+
 # 2. Get the repo + branch into place.
 if [[ -d .git ]] && git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
     echo "[bootstrap] already inside a git repo at $(pwd) — fetching + checking out $BRANCH"
@@ -68,6 +76,9 @@ else:
 cat <<'EOF'
 
 [bootstrap] done. To launch the sweeps:
+
+  source $HOME/.local/bin/env       # only needed in fresh shells / new tmux sessions
+  cd temp_xc                        # if not already inside
 
   apt-get update && apt-get install -y tmux
   tmux new -s sweep
