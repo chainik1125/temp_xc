@@ -12,6 +12,121 @@ See `brief.md` for the *why* and the agent-execution model. This doc
 pre-registers the *what* and *how*, addressed to the two execution
 agents (sparse-probing agent + autointerp agent).
 
+---
+
+## Resource environment
+
+Each agent runs on its own RunPod with persistent volume.
+
+| | Agent A — sparse probing | Agent B — autointerp |
+|---|---|---|
+| GPU | NVIDIA **H200**, 141 GB HBM3e | NVIDIA **H100**, 80 GB HBM3 |
+| vCPUs | **12** | 8 |
+| System RAM | **188 GB** | 125 GB |
+| Persistent volume | **1 TB** at /workspace | **1 TB** at /workspace |
+
+### How Agent A should leverage the H200 pod
+
+1. **Pre-load the full probe cache into RAM at process startup.** ~140 GB
+   total (36 tasks × ~4 GB) fits comfortably in 188 GB. Drop Phase 5's
+   streaming-per-task pattern (which was sized for ~5 GB RAM caps).
+   All 36 tasks' (acts_anchor, acts_mlc) tuples held simultaneously
+   in a dict; downstream loops iterate over the dict instead of
+   re-loading per-task. **Saves ~50-80 hours of disk I/O across the
+   probing pass.**
+
+2. **Parallel probe fitting via joblib (12 workers).** sklearn's
+   `LogisticRegression(solver="liblinear")` is single-threaded. Wrap
+   the (k_feat × S × task) probe-fit loop in
+   `joblib.Parallel(n_jobs=12, backend="loky")`. **Set
+   `OMP_NUM_THREADS=1` and `MKL_NUM_THREADS=1`** in the worker env to
+   prevent nested-parallelism contention with sklearn.
+
+3. **Pipeline GPU encoding with CPU probe-fitting.** While GPU encodes
+   ckpt[i] task[t+1], CPU pool fits probes for ckpt[i] task[t]. CPU
+   work effectively becomes free; pipeline wall-clock is GPU-bound.
+   Reduces probing pass from ~12 hr (single-threaded) to ~5-8 hr.
+
+4. **Bump training batch size.** Phase 5's `batch=1024` was set for
+   32 GB 5090s. H200's 141 GB has plenty of headroom: at the worst
+   case (T=32, k_win=500, full H8 stack with multi-distance pair
+   tensor) the active footprint is ~40 GB, leaving ~100 GB free.
+   Bump to **batch=4096** for ~1.5-2× speedup per training. Verify on
+   a smoke-test cell first that loss curves match batch=1024
+   convergence; if they don't, fall back to batch=2048.
+
+5. **Run SubseqH8 at T_max ∈ {32, 64, 128}.** These cells are added
+   to the canonical table as rows 48–50 specifically because H200's
+   memory headroom unlocks them (T_max=128 weights+Adam ≈ 95 GB —
+   would OOM H100 80 GB). Tests the "subseq sampling unlocks
+   T-scaling beyond what TXC alone can" claim; positive result is
+   paper-strong.
+
+6. **Push ckpts to HF incrementally as they complete.** Don't batch
+   all uploads to the end. Agent B is polling HF; faster pushes =
+   earlier autointerp start = parallel-execution win.
+
+### How Agent B should leverage the H100 pod
+
+1. **Concurrent Haiku API calls.** 8 vCPUs; use
+   `concurrent.futures.ThreadPoolExecutor(max_workers=16)` for
+   autointerp scoring. Anthropic API rate limits typically allow
+   ~50-100 req/s — the bottleneck is per-request latency, not
+   throughput. Expect 10-20× speedup over sequential calls.
+
+2. **Cache hot ckpts in RAM.** As Agent A pushes new ckpts, keep the
+   last ~10 in RAM (each ~1-2 GB; 20 GB total). With 125 GB RAM
+   this is no constraint. Feature-variance computation on a hot
+   ckpt is sub-second.
+
+3. **Pre-build qualitative passages once at startup.** concat-A,
+   concat-B, concat-random tokenizations + activations through the
+   base model. Reuse for every arch (the activations DON'T depend on
+   the SAE; only on the model). Cache at
+   `/workspace/temp_xc/experiments/phase7_unification/results/qualitative_cache/`.
+
+4. **GPU-batch the top-256-feature encoding.** When extracting
+   per-feature activations on top-10 contexts, batch all
+   256 × 10 = 2560 contexts into a single SAE encode call. Single
+   GPU pass instead of 2560 serial calls.
+
+5. **HF polling cadence**. Poll HF every 60s for new ckpts (use
+   `huggingface_hub.list_repo_files()`). Don't busy-wait. Track
+   which ckpts have already been autointerp'd in a local
+   `processed_ckpts.json` to make polling idempotent across pod
+   restarts.
+
+6. **Prefetch next ckpt during autointerp scoring.** While Haiku is
+   scoring features for ckpt[N], start downloading ckpt[N+1] from
+   HF in a background thread. Hides the ~1-2 minute HF download
+   behind the ~5-10 minute Haiku scoring.
+
+### Hugging Face repository layout
+
+Phase 7 uses **two new HF repos** to avoid any collision with the
+existing IT-trained ckpts and caches:
+
+| repo | purpose | Phase 7 access |
+|---|---|---|
+| `han1823123123/txcdr` | pre-Phase-7 IT ckpts (Phase 5, 5b) | **read-only** if needed for cross-check |
+| `han1823123123/txcdr-data` | pre-Phase-7 IT-derived caches | **read-only** if needed |
+| `han1823123123/txcdr-base` (NEW) | base-Gemma-2-2b ckpts (Phase 7) | **READ + WRITE** for both agents |
+| `han1823123123/txcdr-base-data` (NEW) | base-Gemma-2-2b activation + probe caches | **READ + WRITE** for both agents |
+
+**Anti-confusion rules baked into Phase 7 code:**
+
+- Hardcoded repo names in `scripts/hf_upload_phase7_ckpts.py` and
+  `scripts/hf_upload_phase7_data.py` — no env-var override paths.
+  Agents physically cannot push to the wrong repo without editing
+  the script.
+- Subject-model verification: each ckpt's training metadata is
+  checked for `meta["subject_model"] == "google/gemma-2-2b"` before
+  pushing to `txcdr-base` (or aborting if mismatched).
+- README on each new repo points to the other three with the
+  read/write table above.
+
+---
+
 ### Subject model
 
 `google/gemma-2-2b` (base, NOT instruct).

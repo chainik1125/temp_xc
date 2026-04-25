@@ -41,19 +41,28 @@ final pass: re-run the most informative archs on a sanitized setup
 that addresses (1)–(3), present a single unified leaderboard, and
 write the paper.
 
-### Execution model: two parallel H100 RunPod agents
+### Execution model: two parallel RunPod agents
 
 This brief is written for the agents (the human who designed it is
 not executing). Phase 7 is split into two parallel workstreams, each
-run by an autonomous agent on its own H100 RunPod:
+run by an autonomous agent on its own RunPod:
 
-- **Agent A — sparse-probing leaderboard.** Owns the activation cache
-  rebuild, training of all 12 archs × 3 seeds, ckpt upload to HF, and
-  the long-tail sliding mean-pool sparse-probing leaderboard.
-- **Agent B — qualitative autointerp.** Owns the Phase 6-style
-  qualitative pipeline (concat-A/B/random passages, top-k feature
-  selection, autointerp via Claude Haiku, Pareto analysis). Pulls
-  trained ckpts from HF (no independent training).
+- **Agent A — sparse-probing leaderboard.** Runs on an **H200 pod**
+  (141 GB GPU, 188 GB RAM, 12 vCPUs, 1 TB volume). Owns the
+  activation cache rebuild, training of all 47 archs × 3 seeds,
+  ckpt upload to HF, and the long-tail sliding mean-pool sparse-
+  probing leaderboard. The H200 enables larger batch sizes plus the
+  T_max ∈ {64, 128} SubseqH8 cells that wouldn't fit on H100 80GB.
+- **Agent B — qualitative autointerp.** Runs on an **H100 pod**
+  (80 GB GPU, 125 GB RAM, 8 vCPUs, 1 TB volume). Owns the Phase
+  6-style qualitative pipeline (concat-A/B/random passages, top-k
+  feature selection, autointerp via Claude Haiku, Pareto analysis).
+  Pulls trained ckpts from HF (no independent training).
+
+Per-agent guidance on how to maximally leverage the hardware
+(probe-cache pre-loading, joblib parallelism, GPU/CPU pipelining,
+batch size, concurrent Haiku API calls, etc.) is in
+`plan.md` §Resource environment.
 
 **Shared resources:**
 
@@ -243,10 +252,10 @@ Two-agent parallel execution. Day numbers are wall-clock days.
 
 | day | task |
 |---|---|
-| 1 | Spin up H100 RunPod. Branch han-phase7. Cherry-pick arch files. Fork train_primary_archs.py and run_probing.py into Phase 7 drivers. Strip dispatchers down to canonical 12 archs. Set up Gemma2B-base path config. Smoke imports. |
-| 2 | Build Gemma2B-base activation cache (5 layers × 24k seqs × 128 tokens × fp16). Build new probe cache with S=128 tail. Push caches to HF for cross-agent access. |
-| 3 | Smoke-train each arch (200 steps) on the new cache. Verify k_win=500 enforced, no OOMs. Begin seed=42 trainings. |
-| 4 | Complete seed=42 trainings (~6-12 hr on H100). Sync ckpts to HF after each completion. Begin seed=1, seed=2 trainings. |
+| 1 | Spin up **H200 RunPod (1 TB volume, 12 vCPUs, 188 GB RAM)**. Run `scripts/runpod_phase7_bootstrap.sh` to set up GH/HF/Anthropic tokens. Pull `han-phase7-unification` branch (already on origin). Fork `train_primary_archs.py` and `run_probing.py` into Phase 7 drivers. Strip dispatchers down to the canonical 47 archs. Set up Gemma2B-base path config. Smoke imports. **Verify the H200's hardware leverage hooks** (joblib parallelism, large batch, T_max=128 capacity) before starting compute. |
+| 2 | Build Gemma2B-base activation cache (5 layers × 24k seqs × 128 tokens × fp16; ~70 GB). Build new probe cache with S=128 tail (~140 GB). Push caches to HF (`han1823123123/txcdr-base-data`) for cross-agent access. |
+| 3 | Smoke-train each canonical arch (200 steps) on the new cache. Verify k_win=500 enforced, no OOMs. Begin seed=42 trainings (use **batch=4096** if smoke-test convergence matches batch=1024). |
+| 4 | Complete seed=42 trainings (~6-10 hr on H200). Sync ckpts to HF (`han1823123123/txcdr-base`) after each completion. Begin seed=1, seed=2 trainings. |
 | 5 | Complete remaining seed trainings. All ckpts on HF by end of day. |
 | 6 | Sparse-probing pass at S=128 (headline) and S=20 (continuity). Plus ablations at k_feat ∈ {1, 2, 20}. |
 | 7 | Generate sparse-probing figures (headline bar, S-sweep, seed-variance). Draft sparse-probing section of summary. |
@@ -256,11 +265,11 @@ Two-agent parallel execution. Day numbers are wall-clock days.
 
 | day | task |
 |---|---|
-| 1 | Spin up H100 RunPod. Branch off shared han-phase7 (or pull Agent A's branch). Build Phase 6-style concat-A/B/random passages against Gemma-2-2b base (passages need new tokenization). Port Phase 6.1's autointerp pipeline. Smoke-test on a stub ckpt. |
-| 2 | Continue passage building. Verify pipeline runs end-to-end on a stub. WAIT for Agent A's first ckpts on HF (estimated end of day 3-4). |
-| 3-4 | First ckpts arrive on HF. Pull each as it's available, encode passages, send top-K activating contexts to Claude Haiku for autointerp. |
-| 5 | Complete autointerp scoring on all 12 archs × 3 seeds (seed=42 priority; seeds 1, 2 if time). |
-| 6 | Compute Pareto plot (probing AUC vs autointerp score). |
+| 1 | Spin up **H100 RunPod (1 TB volume, 8 vCPUs, 125 GB RAM)**. Run `scripts/runpod_phase7_bootstrap.sh`. Pull `han-phase7-unification` branch. Build Phase 6-style concat-A/B/random passages against Gemma-2-2b base at L12 (passages need new tokenization + activations through the base model). Port Phase 6.1's autointerp pipeline. Smoke-test on a stub ckpt. |
+| 2 | Continue passage building. **Set up concurrent Haiku API calls** (ThreadPoolExecutor max_workers=16). Verify pipeline runs end-to-end on a stub. WAIT for Agent A's first ckpts on HF `txcdr-base` (estimated end of day 3-4). |
+| 3-4 | First ckpts arrive on `txcdr-base`. Poll HF every 60 s; for each new ckpt, pull, encode passages, send top-256 activating contexts to Claude Haiku for autointerp. **Prefetch next ckpt during current scoring.** |
+| 5 | Complete autointerp scoring on all 47 archs at seed=42 (per the cost-saving in plan.md — autointerp is seed=42-only). |
+| 6 | Pull Agent A's final `probing_results.jsonl` from `txcdr-base`. Compute the **Top-256 cumulative SEMANTIC Pareto plot**. |
 | 7 | Generate qualitative figures + draft qualitative section of summary. |
 | 8-10 | Buffer for re-runs / paper draft. |
 
@@ -274,8 +283,9 @@ Two-agent parallel execution. Day numbers are wall-clock days.
 3. **MLC family at k_win=500 vs Phase 5 historical k=100**: 5× looser,
    may change MLC rankings. Phase 5's mlc_contrastive_alpha100_batchtopk
    was the lp leader at k=100; that may not survive the bump.
-4. **Storage on RunPod**: probe cache at S=128 fp16 needs ~120 GB.
-   Each agent's RunPod needs persistent volume of at least 200 GB
+4. **Storage on RunPod**: probe cache at S=128 fp16 needs ~140 GB
+   plus ~280-370 GB for ckpts plus caches and HF cache. Each agent's
+   RunPod uses a persistent 1 TB volume (matches the spec above)
    (cache + ckpts + workspace).
 5. **HF rate limits**: pushing 12 × 3 = 36 ckpts (each ~1.7 GB) is
    ~60 GB to upload. Should be fine but may take 1-2 hours total.
