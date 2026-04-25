@@ -188,7 +188,7 @@ Monotonicity score (mp): TBD (target ≥ 0.80)
 
 | shifts            | lp AUC | mp AUC |
 |-------------------|--------|--------|
-| {1}               | TBD    | TBD    |
+| {1}               | **0.7656** | **0.7947** |
 | {1, 2} = H8       | 0.8039 | 0.8139 |
 | {1, 2, 3}         | TBD    | TBD    |
 | {1, 2, 3, 4}      | TBD    | TBD    |
@@ -197,7 +197,13 @@ Monotonicity score (mp): TBD (target ≥ 0.80)
 | {4}               | TBD    | TBD    |
 | {1, 2, 3} uniform | TBD    | TBD    |
 
-Interpretation: TBD
+**Early interpretation**:
+- Multi-distance {1,2} HELPS over single-shift {1} by +0.038 lp / +0.018 mp at T=5.
+- BUT T=3 with default shifts (which collapse to {1,}) gives mp 0.8339 — the
+  TXC champion result is achieved at SMALL T with SINGLE shift, not at T=5
+  with multi-distance.
+- Implication: **the right recipe = T=3 + matryoshka + single-shift contrastive
+  + anti-dead** (or possibly T=2/T=4 nearby — need data).
 
 ### TXC vs MLC + anti-dead
 
