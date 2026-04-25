@@ -194,8 +194,8 @@ def main():
 
     # 2-panel: (A) full Pareto plane, (B) TXC-cluster zoom with Phase 6.2 labels
     fig, (ax, axz) = plt.subplots(
-        1, 2, figsize=(15, 7),
-        gridspec_kw={"width_ratios": [2.2, 1.0], "wspace": 0.28},
+        1, 2, figsize=(18, 7),
+        gridspec_kw={"width_ratios": [2.2, 1.0], "wspace": 0.55},
     )
 
     # Primary points (no text labels yet — add via legend)
@@ -334,8 +334,9 @@ def main():
                                      linestyle="", label=label))
     legend_handles.append(Line2D([], [], linestyle="--", color="#333333",
                                  label="Pareto frontier"))
-    ax.legend(handles=legend_handles, loc="upper right", fontsize=9,
-              framealpha=0.95)
+    ax.legend(handles=legend_handles, loc="upper left",
+              bbox_to_anchor=(1.02, 1.0), fontsize=9,
+              framealpha=0.95, borderaxespad=0)
 
     # --- Right panel: TXC-cluster zoom with Phase 6.2 labels ---
     # Redraw the TXC-cluster primary archs
@@ -440,7 +441,9 @@ def main():
         Patch(color=color, label=name)
         for _, (name, color) in SECONDARY.items()
     ]
-    axz.legend(handles=c_legend, loc="lower right", fontsize=7, framealpha=0.95)
+    axz.legend(handles=c_legend, loc="upper left",
+               bbox_to_anchor=(1.02, 1.0), fontsize=7,
+               framealpha=0.95, borderaxespad=0)
 
     plt.tight_layout()
     Path(args.out).parent.mkdir(parents=True, exist_ok=True)
