@@ -32,6 +32,11 @@ from src.plotting.save_figure import save_figure
 REPO = Path("/workspace/temp_xc")
 RESULTS_DIR = REPO / "experiments/phase5_downstream_utility/results"
 JSONL = RESULTS_DIR / "probing_results.jsonl"
+# Phase 5B (subseq-sampling family) probes its own archs with the same
+# protocol + probe cache; merge its jsonl into the headline view so the
+# unified leaderboard reflects both.
+PHASE5B_JSONL = REPO / "experiments/phase5b_t_scaling_explore/results/probing_results.jsonl"
+PHASE5B_INDEX = REPO / "experiments/phase5b_t_scaling_explore/results/training_index.jsonl"
 PLOTS_DIR = RESULTS_DIR / "plots"
 HEADLINE_K = 5
 
@@ -137,24 +142,76 @@ ORDERED_ARCHS = [
     "mlc_bare_antidead",
     "mlc_bare_matryoshka_contrastive_antidead",
     "mlc_bare_multiscale_antidead",
+    # Phase 5B subseq-sampling champions (han-phase5b branch)
+    "phase5b_subseq_track2",                # B2 (T_max=10, t_sample=5, k_pos=100, k_win=500)
+    "phase5b_subseq_h8",                    # B4 (same as B2 but with H8 stack)
+    "phase5b_subseq_h8_t10_s3_k500",        # 2D sweep cell
+    "phase5b_subseq_h8_t10_s8_k500",        # 2D sweep peak (single-seed)
+    # Phase 5B negative results (paper-relevant ablations)
+    "phase5b_strided_track2",
+    "phase5b_token_subseq_learned",
+    "phase5b_token_subseq_sinusoidal",
 ]
 BASELINE_ARCHS = ["baseline_last_token_lr", "baseline_attn_pool"]
 
 
 def _load_records() -> list[dict]:
-    if not JSONL.exists():
-        raise FileNotFoundError(f"{JSONL} not found — run probing first")
+    """Load probe records from Phase 5 + Phase 5B jsonls (unified leaderboard)."""
     records: list[dict] = []
-    with JSONL.open() as f:
-        for line in f:
-            line = line.strip()
-            if not line:
-                continue
-            try:
-                records.append(json.loads(line))
-            except Exception:
-                pass
+    for path in (JSONL, PHASE5B_JSONL):
+        if not path.exists():
+            continue
+        with path.open() as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    records.append(json.loads(line))
+                except Exception:
+                    pass
+    if not records:
+        raise FileNotFoundError(f"no probing records in {JSONL} or {PHASE5B_JSONL}")
     return records
+
+
+def _load_arch_meta() -> dict[str, dict]:
+    """Build {arch: {T, k_pos, k_win, T_max, t_sample, ...}} from training_index files.
+
+    Phase 5B's training_index uses bare arch names (e.g. `subseq_h8`); Phase 5
+    uses the same form. We key the dict by run_id-derived arch (the field stored
+    in probing records as `arch`).
+    """
+    meta: dict[str, dict] = {}
+    for path in (
+        REPO / "experiments/phase5_downstream_utility/results/training_index.jsonl",
+        PHASE5B_INDEX,
+    ):
+        if not path.exists():
+            continue
+        with path.open() as f:
+            for line in f:
+                try:
+                    r = json.loads(line)
+                except Exception:
+                    continue
+                arch = r.get("arch")
+                rid = r.get("run_id", "")
+                if not arch:
+                    continue
+                # Phase 5B run_ids encode config in the rid (e.g.
+                # phase5b_subseq_h8_t10_s8_k500); use the rid stem as the
+                # display arch to disambiguate sub-configs.
+                rid_arch = rid.rsplit("__seed", 1)[0] if "__seed" in rid else rid
+                if rid_arch and rid_arch not in meta:
+                    meta[rid_arch] = {
+                        "T": r.get("T") or r.get("T_max"),
+                        "k_pos": r.get("k_pos"),
+                        "k_win": r.get("k_win"),
+                        "T_max": r.get("T_max"),
+                        "t_sample": r.get("t_sample"),
+                    }
+    return meta
 
 
 def aggregate(
@@ -195,7 +252,14 @@ def aggregate(
         rid = r.get("run_id", "")
         if "__seed" in rid and not rid.endswith("__seed42"):
             continue
-        arch = r.get("arch")
+        # Phase 5B reuses bare arch names (e.g. arch="subseq_h8") across
+        # multiple run_id variants (subseq_h8__seed42 vs subseq_h8_t10_s8_k500__seed42).
+        # Use the rid stem (run_id without __seedN) as the display arch so
+        # each variant gets its own leaderboard row.
+        if rid.startswith("phase5b_"):
+            arch = rid.rsplit("__seed", 1)[0]
+        else:
+            arch = r.get("arch")
         task = r.get("task_name")
         v = float(r[key])
         if task in FLIP_TASKS:
@@ -263,7 +327,35 @@ def _headline_bar(
     # Sort by mean metric descending so the chart is visually a ranking.
     candidates.sort(key=lambda a: -summary[a][f"mean_{metric}"])
 
-    fig, ax = plt.subplots(figsize=(11, 5.5))
+    arch_meta = _load_arch_meta()
+
+    def _xtick_label(a: str) -> str:
+        """Annotate xticks with k_pos / k_win / T so the sparsity regime
+        is visible at a glance — the leaderboard is no longer apples-to-
+        apples on k_win across families (MLC k_win=100, TXC k_win=k_pos×T).
+        """
+        m = arch_meta.get(a, {})
+        kp, kw, T = m.get("k_pos"), m.get("k_win"), m.get("T")
+        # Phase 5B subseq variants — use rid stem
+        if a.startswith("phase5b_"):
+            stem = a.replace("phase5b_", "")
+            for cand in (a, stem):
+                if cand in arch_meta:
+                    m = arch_meta[cand]
+                    kp, kw, T = m.get("k_pos"), m.get("k_win"), m.get("T_max") or m.get("T")
+                    break
+        info = []
+        if T:
+            info.append(f"T={T}")
+        if kp is not None:
+            info.append(f"kp={kp}")
+        if kw is not None:
+            info.append(f"kw={kw}")
+        return f"{a}\n[{' '.join(info)}]" if info else a
+
+    # Larger figure to accommodate ~70 archs with two-line labels — also boost
+    # DPI in save_figure (handled at save time).
+    fig, ax = plt.subplots(figsize=(max(18, 0.32 * len(candidates)), 8.5))
     x = np.arange(len(candidates))
     means = [summary[a][f"mean_{metric}"] for a in candidates]
     stds = [summary[a][f"std_{metric}"] for a in candidates]
@@ -272,11 +364,13 @@ def _headline_bar(
     bars = ax.bar(x, means, yerr=stds, capsize=4, color=colors,
                   edgecolor="#333", linewidth=0.5)
     ax.set_xticks(x)
-    ax.set_xticklabels(candidates, rotation=45, ha="right", fontsize=8)
+    ax.set_xticklabels([_xtick_label(a) for a in candidates],
+                       rotation=60, ha="right", fontsize=7)
     ax.set_ylabel(f"mean {metric.upper()} (k={HEADLINE_K})")
     ax.set_title(
         f"Phase 5: sparse-probing {metric.upper()} by arch "
-        f"[{aggregation}] — sorted by score, coloured by family"
+        f"[{aggregation}] — sorted by score, coloured by family\n"
+        f"x-axis label format: arch [T={{T_or_T_max}} kp={{k_pos}} kw={{k_win}}]"
     )
     ax.set_ylim(0.5, 1.0)
 
@@ -314,7 +408,8 @@ def _headline_bar(
                 va="bottom")
 
     fig.tight_layout()
-    save_figure(fig, str(out_path))
+    # Headline plot is large + busy; boost DPI to 200 for legibility (default 150).
+    save_figure(fig, str(out_path), dpi=200)
     plt.close(fig)
 
 

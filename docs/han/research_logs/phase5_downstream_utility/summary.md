@@ -26,24 +26,31 @@ For pre-registration see [`plan.md`](plan.md); architecture menu in
 
 ### TL;DR
 
-- **Best SAE at `last_position`**: `mlc_contrastive_alpha100_batchtopk`
-  (**0.8124**) — Part-B α=1.0 MLC contrastive with BatchTopK sparsity.
-  Closely followed by `agentic_mlc_08` (0.8094), `mlc_contrastive_alpha100`
-  (0.8073), and Part-B H8 `phase57_partB_h8_bare_multidistance`
-  (**0.8039** single-seed — the TXC-family leader at lp, closing the
-  gap from 3pp to 0.9pp vs MLC top). Part-B H7 3-seed = 0.7886 ± 0.007
-  (σ-defensible +0.014 over agentic_txc_02 3-seed 0.7749).
-- **Best SAE at `mean_pool`** (SAEBench-canonical aggregation —
-  averages per-slide latents over the tail-20 window):
-  **`phase57_partB_h8_bare_multidistance` (0.8139)** — a novel Part B
-  arch combining Phase 6.2 Track 2's anti-dead stack + matryoshka H/L +
+- **Best SAE at `last_position`** (Phase 5 FLIP convention, k_feat=5,
+  seed=42 unless noted): **`phase5b_subseq_h8`** (Phase 5B branch,
+  T_max=10, t_sample=5, k_pos=100, k_win=500) at **0.8442 single-seed**
+  / **0.8295 ± 0.013 3-seed**. Mechanism: encoder has T_max=10 position
+  slabs, training samples 5 of 10 per step; probe time uses all 10. Adds
+  +0.029 lp 3-seed over Phase 5's H8 3-seed (0.8005 ± 0.003) and
+  cleanly beats prior MLC top `mlc_contrastive_alpha100_batchtopk` (0.8124).
+  Phase 5's TXC-family leader was `phase57_partB_h8_bare_multidistance`
+  at 0.8039 single-seed / 0.8005 ± 0.003 3-seed.
+- **Best SAE at `mean_pool`**: **`phase5b_subseq_h8`** at **0.8516
+  single-seed** / **0.8343 ± 0.015 3-seed** — same mechanism as above.
+  Adds +0.022 mp 3-seed over Phase 5's H8 (0.8126 ± 0.003 3-seed).
+  Phase 5's H8 at T=6 (0.8188 single-seed) was the prior peak.
+  σ is high (~0.015 — model finds different feature subsets per seed)
+  but mean is robust.
+- **Phase 5B fairness note**: subseq_h8 uses k_pos=100, k_win=500. At
+  probe time the encoder uses ALL T_max=10 positions (not subsampled),
+  so per-position-equivalent k_pos = 50 (k_win/T_max). Smaller k_win
+  than vanilla TXCDR at T=10 (kw=1000) AND smaller per-position kp
+  than every other TXC arch — yet tops both leaderboards.
+- Phase 5's prior H8 record: `phase57_partB_h8_bare_multidistance`
+  combined Phase 6.2 Track 2's anti-dead stack + matryoshka H/L +
   **multi-distance InfoNCE** (shifts {1, 2}, inverse-distance weighted).
-  **+0.0070 over prior top** (`agentic_txc_02` at 0.8069 single-seed; +0.015
-  over 3-seed mean 0.7987). Also scores 0.8039 lp, **+0.029 over
-  agentic_txc_02 3s** — the strongest TXC at BOTH aggregations.
-  Single-seed; 3-seed variance pending.
-  H7 (same stack but single-shift multi-scale InfoNCE) at 0.7915/0.8104
-  — superseded by H8.
+  3-seed: lp 0.8005 ± 0.003 / mp 0.8126 ± 0.003. H8 at T=6 (single seed):
+  mp 0.8188 — the in-distribution mp peak before Phase 5B's subseq trick.
 - **The two aggregations each have a "home" family**: MLC-contrastive
   variants dominate last_position; TXCDR/matryoshka variants dominate
   mean_pool. Neither arch wins on both. This separation is robust
@@ -152,10 +159,16 @@ across re-probes; ranking is stable at this granularity.)*
 |---|---|---|---|
 | **baseline_attn_pool** | **0.9290** | 0.1055 | 36 |
 | **baseline_last_token_lr** | **0.9264** | 0.0674 | 36 |
-| **mlc_contrastive_alpha100_batchtopk** (Part-B α=1.0 + BatchTopK) | **0.8124** | 0.0923 | 36 |
+| **`phase5b_subseq_h8`** (Phase 5B, T_max=10 t_sample=5 kp=100 kw=500, seed=42) | **0.8442** ⭐ | 0.0961 | 36 |
+| **`phase5b_subseq_h8_t10_s3_k500`** (Phase 5B, single seed) | 0.8355 | — | 36 |
+| **`phase5b_subseq_h8` 3-seed** | **0.8295 ± 0.0130** | — | 36 |
+| **`phase5b_subseq_h8_t10_s8_k500`** (Phase 5B, single seed) | 0.8218 | — | 36 |
+| **`phase5b_subseq_track2`** (Phase 5B, seed=42) | 0.8208 | — | 36 |
+| **`phase5b_subseq_track2` 3-seed** | **0.8213 ± 0.0005** | — | 36 |
+| **mlc_contrastive_alpha100_batchtopk** (Part-B α=1.0 + BatchTopK, MLC top) | **0.8124** | 0.0923 | 36 |
 | **agentic_mlc_08** (multi-scale MLC) | 0.8094 | 0.0929 | 36 |
 | mlc_contrastive_alpha100 (Part-B α=1.0) | 0.8073 | 0.0907 | 36 |
-| **phase57_partB_h8_bare_multidistance** (Part-B H8, single-seed) | **0.8039** | 0.1038 | 36 |
+| **phase57_partB_h8_bare_multidistance** (Part-B H8 T=5 kp=100 kw=500, seed=42) | **0.8039** | 0.1038 | 36 |
 | mlc_contrastive | 0.8025 | 0.0865 | 36 |
 | agentic_mlc_08_batchtopk | 0.7981 | 0.0975 | 36 |
 | mlc | 0.7960 | 0.0968 | 36 |
@@ -189,15 +202,21 @@ Full table (62 archs) in
 |---|---|---|---|
 | **baseline_attn_pool** | **0.9292** | 0.1056 | 36 |
 | **baseline_last_token_lr** | **0.9262** | 0.0673 | 36 |
-| **phase57_partB_h8_bare_multidistance_t6** (Part-B H8 at T=6, NEW PEAK) | **0.8188** | 0.1008 | 36 |
-| **phase57_partB_h8_bare_multidistance** (Part-B H8 T=5, seed=42) | 0.8139 | 0.1162 | 36 |
-| **phase57_partB_h8_bare_multidistance** seed=1 | 0.8148 | — | 36 |
-| **phase57_partB_h8_bare_multidistance** seed=2 | 0.8092 | — | 36 |
+| **`phase5b_subseq_h8`** (Phase 5B, T_max=10 t_sample=5 kp=100 kw=500, seed=42) | **0.8516** ⭐ | 0.1024 | 36 |
+| **`phase5b_subseq_h8` 3-seed** | **0.8343 ± 0.0150** | — | 36 |
+| **`phase5b_subseq_h8_t10_s3_k500`** (single seed) | 0.8373 | — | 36 |
+| **`phase5b_subseq_h8_t10_s8_k500`** (single seed) | 0.8284 | — | 36 |
+| **`phase5b_subseq_track2`** (Phase 5B, seed=42) | 0.8261 | — | 36 |
+| **`phase5b_subseq_track2` 3-seed** | **0.8236 ± 0.0024** | — | 36 |
+| **phase57_partB_h8_bare_multidistance_t6** (Part-B H8 at T=6, kp=100 kw=600) | 0.8188 | 0.1008 | 36 |
+| **phase57_partB_h8_bare_multidistance** (Part-B H8 T=5 kp=100 kw=500, seed=42) | 0.8139 | 0.1162 | 36 |
+| **phase57_partB_h8_bare_multidistance** 3-seed | **0.8126 ± 0.003** | — | 36 |
 | **phase57_partB_h7_bare_multiscale seed=42** (Part-B H7 T=5) | 0.8104 | 0.1191 | 36 |
+| **phase57_partB_h8_bare_multidistance_t9** (Part-B H8 T=9) | 0.8091 | — | 36 |
+| **phase57_partB_h8_bare_multidistance_t4** (Part-B H8 T=4) | 0.8051 | — | 36 |
 | **phase57_partB_h8_bare_multidistance_t10** (Part-B H8 T=10) | 0.8040 | — | 36 |
 | **phase57_partB_h8_bare_multidistance_t7** (Part-B H8 T=7) | 0.8036 | — | 36 |
-| **agentic_txc_02 seed=42** (multi-scale matryoshka) | 0.8097 | 0.1026 | 36 |
-| **phase57_partB_h7_bare_multiscale seed=1** | 0.8011 | — | 36 |
+| **agentic_txc_02 seed=42** (multi-scale matryoshka, kp=100 kw=500) | 0.8097 | 0.1026 | 36 |
 | txcdr_t5 | 0.8064 | 0.0957 | 36 |
 | matryoshka_txcdr_contrastive_t5_alpha100 | 0.8046 | 0.0979 | 36 |
 | txcdr_t3 | 0.8022 | 0.1045 | 36 |
