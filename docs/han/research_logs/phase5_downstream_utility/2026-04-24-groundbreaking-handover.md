@@ -220,9 +220,14 @@ Verdict: TBD
 
 | arch | lp AUC | mp AUC | Δ vs H8 |
 |------|--------|--------|---------|
-| `phase57_partB_h13_md_x_ms` | TBD | TBD | TBD |
+| H8 (multi-distance only) | 0.8039 | 0.8139 | (baseline) |
+| H7 (multi-scale only) | 0.7915 | 0.8104 | −0.012 lp / −0.004 mp |
+| **H13 (md × ms stack)** | **0.7930** | **0.8125** | **−0.011 lp / −0.001 mp** |
 
-Verdict: TBD
+**Verdict**: H13 does NOT compound. Lands BETWEEN H7 and H8. Stacking
+multi-distance × multi-scale is WORSE than multi-distance alone — the
+"orthogonal contrastive pressures" hypothesis fails. Adding multi-scale
+on top of multi-distance dilutes rather than enhances the H8 recipe.
 
 ### H3 log-matryoshka T-sweep
 
