@@ -206,6 +206,25 @@ Monotonicity score (mp): TBD (target ≥ 0.80)
 - Implication: at T=5, multi-distance is the right recipe, and T=6 is the
   optimal T for H8.
 
+**Long-range shifts (extras queue, complete for {5},{10},{20})**:
+
+| shift set | lp | mp | token-overlap @ T=5 |
+|---|------|------|------|
+| {5} | 0.7827 | 0.8080 | 0% (anchor[0..4], pos[5..9]) |
+| {10} | 0.7702 | 0.7881 | 0% with 5-token gap |
+| **{20}** | **0.8041** ⭐ | **0.8179** ⭐ | 0% with 15-token gap |
+
+**🎯 Single shift={20} TIES H8 at lp (0.8041 vs 0.8039) AND TOPS H8 at mp (0.8179 vs 0.8139, +0.004)**. Counter-intuitive U-shape:
+- shift=1-2 (60-80% overlap): "local invariance" — works
+- shift=4-10: dead zone (worst results)
+- shift=20 (large gap, same-sequence): "semantic invariance" — works again!
+
+Hypothesis: shift=20 forces features to encode SEQUENCE-LEVEL semantics (not
+position-specific), since anchor and positive are far enough apart that
+local-token-cooccurrence patterns differ but topic/style stays constant.
+3-seed verification needed before claiming it as champion (single-seed
+variance σ≈0.003 means +0.004 is at the edge of noise).
+
 ### TXC vs MLC + anti-dead
 
 | recipe                        | TXC lp/mp     | MLC lp/mp     | Δ |
@@ -220,9 +239,14 @@ Verdict: TBD
 
 | arch | lp AUC | mp AUC | Δ vs H8 |
 |------|--------|--------|---------|
-| `phase57_partB_h13_md_x_ms` | TBD | TBD | TBD |
+| H8 (multi-distance only) | 0.8039 | 0.8139 | (baseline) |
+| H7 (multi-scale only) | 0.7915 | 0.8104 | −0.012 lp / −0.004 mp |
+| **H13 (md × ms stack)** | **0.7930** | **0.8125** | **−0.011 lp / −0.001 mp** |
 
-Verdict: TBD
+**Verdict**: H13 does NOT compound. Lands BETWEEN H7 and H8. Stacking
+multi-distance × multi-scale is WORSE than multi-distance alone — the
+"orthogonal contrastive pressures" hypothesis fails. Adding multi-scale
+on top of multi-distance dilutes rather than enhances the H8 recipe.
 
 ### H3 log-matryoshka T-sweep
 
