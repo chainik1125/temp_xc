@@ -31,6 +31,14 @@ VARIANTS = [
     ("{2}", "phase57_partB_h8a_shifts2", 1),
     ("{4}", "phase57_partB_h8a_shifts4", 1),
     ("{1,2,3} uniform", "phase57_partB_h8a_shifts123_uniform", 3),
+    # Long-range shift ablation (user follow-up: bigger shifts to top H8):
+    ("{5}", "phase57_partB_h8a_shifts5", 1),
+    ("{10}", "phase57_partB_h8a_shifts_10", 1),
+    ("{20}", "phase57_partB_h8a_shifts_20", 1),
+    ("{1,5}", "phase57_partB_h8a_shifts1_5", 2),
+    ("{1,10}", "phase57_partB_h8a_shifts1_10", 2),
+    ("{1,5,10}", "phase57_partB_h8a_shifts1_5_10", 3),
+    ("{1,2,5,10}", "phase57_partB_h8a_shifts1_2_5_10", 4),
 ]
 
 

@@ -2208,7 +2208,14 @@ def run_all(seeds, max_steps, archs=None):
                     uniform = spec.endswith("_uniform")
                     if uniform:
                         spec = spec.removesuffix("_uniform")
-                    shifts_h8 = tuple(int(c) for c in spec)
+                    # Multi-digit shifts use underscore-separated specs:
+                    #   shifts1_5_10 → (1, 5, 10), shifts_10 → (10,).
+                    # Single-digit specs keep the per-char parser:
+                    #   shifts1234 → (1, 2, 3, 4), shifts123 → (1, 2, 3).
+                    if "_" in spec:
+                        shifts_h8 = tuple(int(p) for p in spec.split("_") if p)
+                    else:
+                        shifts_h8 = tuple(int(c) for c in spec)
                     if uniform:
                         weights_h8 = tuple(1.0 for _ in shifts_h8)
                     variant_h8 = f"phase57_partB_h8a_shifts{spec}{'_uniform' if uniform else ''}"

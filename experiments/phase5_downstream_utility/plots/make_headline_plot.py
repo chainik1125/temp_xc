@@ -115,6 +115,14 @@ ORDERED_ARCHS = [
     "phase57_partB_h8a_shifts2",
     "phase57_partB_h8a_shifts4",
     "phase57_partB_h8a_shifts123_uniform",
+    # Long-range shift ablation (user-requested):
+    "phase57_partB_h8a_shifts5",
+    "phase57_partB_h8a_shifts_10",
+    "phase57_partB_h8a_shifts_20",
+    "phase57_partB_h8a_shifts1_5",
+    "phase57_partB_h8a_shifts1_5_10",
+    "phase57_partB_h8a_shifts1_10",
+    "phase57_partB_h8a_shifts1_2_5_10",
     # Part B H9 (feature-nested matryoshka)
     "feature_nested_matryoshka_t5",
     "feature_nested_matryoshka_t5_contrastive",

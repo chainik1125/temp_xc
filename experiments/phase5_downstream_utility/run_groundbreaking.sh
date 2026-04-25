@@ -82,8 +82,21 @@ train_and_probe_both phase57_partB_h8_bare_multidistance_t20 42
 train_and_probe_both phase57_partB_h8_bare_multidistance_t30 42
 
 # === P0b: shift-ablation at T=5 ===
+# Now extended with LONG-RANGE shifts to chase the user's hypothesis:
+#   "if shift=2 helps, why not 3, 4, or even more?". Adds variants
+#   testing shifts of 5, 10, 20 — well beyond T=5's natural window.
 echo "================ P0b shift ablation ================"
 for SPEC in 1 123 1234 124 2 4 123_uniform; do
+    train_and_probe_both "phase57_partB_h8a_shifts${SPEC}" 42
+done
+# Long-range shift ablation — user's "if shift=2 helps, why not 3, 4, or
+# even more?" pursuit. Tests whether bigger shifts top H8's mp 0.8126.
+# Naming convention: single-digit shifts use bare digits (shifts5);
+# multi-digit / multi-shift specs use underscore-separated (shifts_10,
+# shifts1_5_10). Dispatcher parses underscore-separated as integer list
+# and falls back to per-char for single-digit-only specs.
+# Token overlap at T=5: shift=5 → 0%, shift=10 → 0%, shift=20 → 0%.
+for SPEC in 5 _10 _20 1_5 1_5_10 1_10 1_2_5_10; do
     train_and_probe_both "phase57_partB_h8a_shifts${SPEC}" 42
 done
 
