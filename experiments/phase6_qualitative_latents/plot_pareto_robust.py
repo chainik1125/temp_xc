@@ -38,6 +38,11 @@ PRIMARY = {
     "agentic_txc_12_bare_batchtopk": ("2×2 cell",                "#4292c6", "s", (10, -18)),
     "agentic_txc_02":              ("TXC baseline",              "#3182bd", "o", (10, -18)),
     "agentic_txc_02_batchtopk":    ("Cycle F",                    "#9ecae1", "v", (-45, -18)),
+    "agentic_mlc_08":              ("MLC (multi-layer)",          "#2ca02c", "p", (10, 6)),
+    "txcdr_t5":                    ("TXCDR T=5 (no anti-dead)",   "#6baed6", "^", (10, -14)),
+    "mlc":                         ("MLC baseline",               "#74c476", "<", (10, -14)),
+    "mlc_contrastive_alpha100":    ("MLC contrastive α=1",        "#238b45", ">", (-55, -10)),
+    "agentic_mlc_08_batchtopk":    ("MLC (+BatchTopK)",           "#41ab5d", "H", (10, 6)),
 }
 
 SECONDARY = {
@@ -64,6 +69,8 @@ def load_probing(agg="mean_pool", k=5):
     with PROBE.open() as f:
         for line in f:
             d = json.loads(line)
+            if "aggregation" not in d or "k_feat" not in d:
+                continue  # skip error rows from failed probes
             if d["aggregation"] != agg or d["k_feat"] != k:
                 continue
             rid = d["run_id"]

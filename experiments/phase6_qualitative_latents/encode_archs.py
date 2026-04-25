@@ -241,6 +241,31 @@ def load_arch(arch: str, device: torch.device, seed: int = 42) -> torch.nn.Modul
             D_IN, D_SAE, n_layers=5, k=meta["k_pos"],
             gamma=meta.get("gamma", 0.5),
         ).to(device)
+    elif arch == "agentic_mlc_08_batchtopk":
+        from src.architectures._batchtopk_variants import (
+            MLCContrastiveMultiscaleBatchTopK,
+        )
+        model = MLCContrastiveMultiscaleBatchTopK(
+            D_IN, D_SAE, n_layers=5, k=meta["k_pos"],
+            gamma=meta.get("gamma", 0.5),
+        ).to(device)
+    elif arch == "mlc":
+        from src.architectures.mlc import MultiLayerCrosscoder
+        model = MultiLayerCrosscoder(D_IN, D_SAE, n_layers=5,
+                                      k=meta["k_pos"]).to(device)
+    elif arch in ("mlc_contrastive", "mlc_contrastive_alpha100"):
+        from src.architectures.mlc_contrastive import MLCContrastive
+        model = MLCContrastive(
+            D_IN, D_SAE, n_layers=5,
+            k=meta["k_pos"], h=meta.get("h", D_SAE // 2),
+        ).to(device)
+    elif arch in ("txcdr_t2", "txcdr_t3", "txcdr_t5", "txcdr_t6",
+                  "txcdr_t7", "txcdr_t8", "txcdr_t10", "txcdr_t15",
+                  "txcdr_t20"):
+        from src.architectures.crosscoder import TemporalCrosscoder
+        T = meta["T"]
+        k_eff = meta["k_win"] or (meta["k_pos"] * T)
+        model = TemporalCrosscoder(D_IN, D_SAE, T, k_eff).to(device)
     elif arch == "tsae_ours":
         from src.architectures.tsae_ours import TSAEOurs
         model = TSAEOurs(D_IN, D_SAE, k=meta["k_pos"]).to(device)
@@ -380,7 +405,9 @@ def encode_concat_AB(concat, concat_name: str, archs: list[str], device,
     out.mkdir(parents=True, exist_ok=True)
 
     token_ids = concat["token_ids"]
-    needs_ml = "agentic_mlc_08" in archs
+    MLC_ARCHS = {"agentic_mlc_08", "agentic_mlc_08_batchtopk", "mlc",
+                 "mlc_contrastive", "mlc_contrastive_alpha100"}
+    needs_ml = any(a in MLC_ARCHS for a in archs)
     layers = [11, 12, 13, 14, 15] if needs_ml else [13]
 
     print(f"[{concat_name}] gemma forward: {len(token_ids)} tokens, layers={layers}")
@@ -405,9 +432,15 @@ def encode_concat_AB(concat, concat_name: str, archs: list[str], device,
                     "phase62_c2_track2_contrastive",
                     "phase62_c3_track2_matryoshka_contrastive",
                     "phase63_track2_t3", "phase63_track2_t10",
-                    "phase63_track2_t20"):
+                    "phase63_track2_t20",
+                    "txcdr_t2", "txcdr_t3", "txcdr_t5", "txcdr_t6",
+                    "txcdr_t7", "txcdr_t8", "txcdr_t10", "txcdr_t15",
+                    "txcdr_t20"):
             z = encode_txc(model, resid_L13, device, T=meta["T"])
-        elif arch == "agentic_mlc_08":
+        elif arch in ("agentic_mlc_08", "agentic_mlc_08_batchtopk"):
+            z = encode_mlc(model, stack, device)
+        elif arch in ("mlc", "mlc_contrastive", "mlc_contrastive_alpha100"):
+            # Plain MLC variants use encode_mlc with 5-layer stack.
             z = encode_mlc(model, stack, device)
         elif arch == "tsae_ours":
             z = encode_tsae_ours(model, resid_L13, device)
@@ -434,7 +467,9 @@ def encode_concat_C(concat, archs: list[str], device, out_name: str = "concat_C"
     out.mkdir(parents=True, exist_ok=True)
 
     token_id_lists = [s["token_ids"] for s in concat["sequences"]]
-    needs_ml = "agentic_mlc_08" in archs
+    MLC_ARCHS = {"agentic_mlc_08", "agentic_mlc_08_batchtopk", "mlc",
+                 "mlc_contrastive", "mlc_contrastive_alpha100"}
+    needs_ml = any(a in MLC_ARCHS for a in archs)
     layers = [11, 12, 13, 14, 15] if needs_ml else [13]
 
     print(f"[concat_C] gemma forward: {len(token_id_lists)} seqs × 20 tokens, layers={layers}")
