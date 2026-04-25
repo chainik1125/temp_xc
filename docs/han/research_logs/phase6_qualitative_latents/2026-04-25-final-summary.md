@@ -87,7 +87,7 @@ bars where available.
 
 #### 1. var-ranked Pareto
 
-![phase61_pareto_robust](../../../../experiments/phase6_qualitative_latents/results/phase61_pareto_robust.thumb.png)
+![phase61_pareto_robust](../../../../experiments/phase6_qualitative_latents/results/phase61_pareto_robust.png)
 
 Full path: `experiments/phase6_qualitative_latents/results/phase61_pareto_robust.png`.
 
@@ -101,7 +101,7 @@ will most expect.
 
 #### 2. pdvar-ranked Pareto
 
-![phase63_pareto_pdvar](../../../../experiments/phase6_qualitative_latents/results/phase63_pareto_pdvar.thumb.png)
+![phase63_pareto_pdvar](../../../../experiments/phase6_qualitative_latents/results/phase63_pareto_pdvar.png)
 
 Full path: `experiments/phase6_qualitative_latents/results/phase63_pareto_pdvar.png`.
 
@@ -113,7 +113,7 @@ family clusters at 15–19/32, between TXC (5–13) and T-SAE (24).
 
 #### 3. Paper-style passage-ID probe
 
-![phase63_pareto_paper_probe](../../../../experiments/phase6_qualitative_latents/results/phase63_pareto_paper_probe.thumb.png)
+![phase63_pareto_paper_probe](../../../../experiments/phase6_qualitative_latents/results/phase63_pareto_paper_probe.png)
 
 Full path: `experiments/phase6_qualitative_latents/results/phase63_pareto_paper_probe.png`.
 
