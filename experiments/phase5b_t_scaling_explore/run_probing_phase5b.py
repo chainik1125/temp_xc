@@ -149,6 +149,17 @@ def _load_phase5b_model(run_id: str, ckpt_path: Path, device, meta: dict):
             alpha=meta.get("alpha", 1.0),
         ).to(device)
 
+    elif arch == "subset_encoder":
+        from src.architectures.phase5b_subset_encoder_txc import SubsetEncoderTXC
+        T_window = int(meta["T_window"])
+        t = int(meta["t"])
+        k = int(meta["k_win"])
+        model = SubsetEncoderTXC(
+            d_in, d_sae, T_window=T_window, t=t, k=k,
+            probe_strategy=meta.get("probe_strategy", "random_K_subsets"),
+            probe_K=int(meta.get("probe_K", 16)),
+        ).to(device)
+
     elif arch == "pps_matryoshka":
         from src.architectures.phase5b_per_pos_scale_matryoshka import (
             PerPosScaleMatryoshkaTXC,
@@ -291,6 +302,10 @@ def _encode_for_probe_phase5b(model, arch: str, meta: dict,
     if arch == "pps_matryoshka":
         T = int(meta["T"])
         return _encode_txc_like(model, anchor, last_idx, T, device, aggregation)
+    if arch == "subset_encoder":
+        # Model's encode handles T_window padding/truncation + probe strategy.
+        T_window = int(meta["T_window"])
+        return _encode_txc_like(model, anchor, last_idx, T_window, device, aggregation)
     raise ValueError(f"No probe encoder for arch={arch}")
 
 

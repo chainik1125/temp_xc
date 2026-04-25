@@ -482,6 +482,63 @@ def train_phase5b_paired_h8(
     }
 
 
+def train_phase5b_subset_encoder(
+    cfg, device, T_window: int, t: int,
+    k_pos: int = 100, k_win: int | None = None,
+    d_sae: int = DEFAULT_D_SAE,
+    probe_strategy: str = "random_K_subsets",
+    probe_K: int = 16,
+    buf=None,
+):
+    """F: subset-encoder TXC. t encoder/decoder slabs over a T_window
+    receptive field. Sort-and-encode-by-rank training.
+    """
+    from src.architectures.phase5b_subset_encoder_txc import SubsetEncoderTXC
+    buf = buf if buf is not None else preload_single(device=device)
+    k_eff = k_win if k_win is not None else k_pos * t
+    model = SubsetEncoderTXC(
+        buf.shape[-1], d_sae, T_window=T_window, t=t, k=k_eff,
+        probe_strategy=probe_strategy, probe_K=probe_K,
+    ).to(device)
+    gen = make_window_gen_gpu(buf, T_window)
+
+    x0 = gen(cfg.batch_size)
+    torch.manual_seed(cfg.seed); np.random.seed(cfg.seed)
+    opt = torch.optim.Adam(model.parameters(), lr=cfg.lr)
+    model.train()
+    # Initialise b_dec on the t SLOTS' geometric medians using the first t
+    # tokens of x0 (parent's init_b_dec_geometric_median expects (B, T=t, d)).
+    model.init_b_dec_geometric_median(x0[:, :t])
+
+    losses, l0s, steps = [], [], []
+    converged, plateau_val = False, None
+    t0 = time.time()
+    for step in range(cfg.max_steps):
+        x = gen(cfg.batch_size)                # (B, T_window, d_in)
+        loss, _, z = model(x)
+        opt.zero_grad(); loss.backward()
+        model.remove_gradient_parallel_to_decoder()
+        nn.utils.clip_grad_norm_(model.parameters(), cfg.grad_clip)
+        opt.step(); model._normalize_decoder()
+        if step % cfg.log_every == 0 or step == cfg.max_steps - 1:
+            with torch.no_grad():
+                l0 = (z > 0).float().sum(dim=-1).mean().item()
+            losses.append(loss.item()); l0s.append(l0); steps.append(step)
+            plateau_val = compute_plateau(losses, window=5)
+            if plateau_val is not None and plateau_val < cfg.plateau_threshold and step >= cfg.min_steps:
+                converged = True; break
+    elapsed = time.time() - t0
+    model.eval()
+    return model, {
+        "loss": losses, "l0": l0s, "steps_logged": steps,
+        "final_step": steps[-1] if steps else 0,
+        "converged": converged, "plateau_last": plateau_val,
+        "elapsed_s": elapsed,
+        "T_window": T_window, "t": t,
+        "probe_strategy": probe_strategy, "probe_K": probe_K,
+    }
+
+
 def train_phase5b_pps_track2(
     cfg, device, T: int, n_scales: int = 2,
     alpha: float = 0.0, contr_shifts: tuple[int, ...] = (1,),
@@ -664,6 +721,23 @@ def run_one(arch_id: str, seed: int = 42, max_steps: int = 25_000,
         meta = dict(arch="paired_h8", T_paired=T_paired, T_eff=2*T_paired,
                     seed=seed, k_pos=100, k_win=100*T_paired, alpha=1.0, layer=13)
 
+    elif arch_id.startswith("phase5b_subset_encoder"):
+        T_window = kwargs.get("T_window", 10)
+        t = kwargs.get("t_slabs", 5)
+        k_win_override = kwargs.get("k_win")
+        probe_strategy = kwargs.get("probe_strategy", "random_K_subsets")
+        probe_K = kwargs.get("probe_K", 16)
+        model, log = train_phase5b_subset_encoder(
+            cfg, device, T_window=T_window, t=t,
+            k_win=k_win_override,
+            probe_strategy=probe_strategy, probe_K=probe_K,
+            buf=buf,
+        )
+        k_win_used = k_win_override if k_win_override is not None else 100 * t
+        meta = dict(arch="subset_encoder", T_window=T_window, t=t,
+                    seed=seed, k_pos=100, k_win=k_win_used,
+                    probe_strategy=probe_strategy, probe_K=probe_K, layer=13)
+
     elif arch_id.startswith("phase5b_pps_track2"):
         T = kwargs.get("T", 5)
         n_scales = kwargs.get("n_scales", 2)
@@ -704,6 +778,13 @@ if __name__ == "__main__":
     p.add_argument("--k_win", type=int, default=None,
                     help="Override k_win (default: k_pos * t_sample). Use to "
                           "decouple sparsity from t_sample in subseq sweeps.")
+    p.add_argument("--T_window", type=int, default=10,
+                    help="(subset_encoder) raw receptive field at training")
+    p.add_argument("--t_slabs", type=int, default=5,
+                    help="(subset_encoder) number of encoder/decoder slabs")
+    p.add_argument("--probe_strategy", type=str, default="random_K_subsets",
+                    choices=["fixed_last_t", "stride", "random_K_subsets"])
+    p.add_argument("--probe_K", type=int, default=16)
     args = p.parse_args()
 
     kwargs = {
@@ -713,5 +794,7 @@ if __name__ == "__main__":
         "n_scales": args.n_scales, "alpha": args.alpha,
         "use_pos": args.use_pos, "pos_mode": args.pos_mode,
         "contiguous": args.contiguous, "k_win": args.k_win,
+        "T_window": args.T_window, "t_slabs": args.t_slabs,
+        "probe_strategy": args.probe_strategy, "probe_K": args.probe_K,
     }
     run_one(args.arch, seed=args.seed, max_steps=args.max_steps, **kwargs)
