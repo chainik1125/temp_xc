@@ -50,9 +50,28 @@ agents (sparse-probing agent + autointerp agent).
 
 ### Sparsity convention
 
-`k_win = 500` across all archs and all T values, fixed.
+`k_win = 500` across all archs and all T values, fixed. Per-arch
+k_pos derivation is in [§Canonical architecture set](#canonical-architecture-set)
+below — that's the single source of truth for the arch list.
 
-### Probing protocol — pre-registered (owned by Agent A)
+Justification (against k_win=100 alternative):
+- Switching to Gemma2B base means everything is retrained from
+  scratch regardless, so "preserve existing TXC ckpts" is moot —
+  but **preserving the regime where TXC recipes were tuned is
+  not.** Recipes (Track 2 anti-dead, H8 multi-distance, B2/B4
+  subseq) showed working trade-offs at k_win=500 in Phase 5/5B.
+  Pushing to k_win=100 introduces a "did the recipe transfer to a
+  sparser regime?" question on top of the model-switch question.
+  Less risk to keep one variable fixed.
+- 500/18432 = 2.7% density — well within the "sparse-probing regime"
+  used by the SAEBench protocol.
+- For per-token SAEs (topk_sae, mlc, tsae_paper at our convention), it
+  is denser than the literature norm (k≤100 typical), but this is the
+  same density TXC uses, which is what fairness requires.
+- `tsae_paper` reported additionally at native k=20 as a paper-
+  faithful reference and the regime difference is documented.
+
+### Probing protocol — pre-registered
 
 Single S-parameterized aggregation:
 
@@ -96,28 +115,122 @@ polarity). Same as Phase 5.
 
 ---
 
+## Canonical architecture set {#canonical-architecture-set}
+
+**This is the single source of truth.** Both agents (and both
+deliverables) refer to this table. Every row is one architecture
+trained at 3 seeds (seed ∈ {1, 2, 42}). Total rows: **47**. Total
+trainings: 47 × 3 = **141** on H100. Estimated wall-clock at
+5–10 min/training: 12–24 hr.
+
+T-sweep entries (rows 14–45) double as leaderboard entries — the
+Agent A leaderboard and the Agent A T-sweep are subsets of this
+table, not separate runs.
+
+Notes on the table format:
+- **k_pos** is derived as `k_win / n_active_positions` where
+  n_active_positions is T (for window archs), 1 (per-token), L
+  (for MLC, where L=5 layers), or `t_sample` (for B2/B4 subseq).
+- **shifts** column is filled only for H8 rows (multi-distance
+  InfoNCE recipe).
+- **group**: 1 = per-token/non-TXC; 2 = fixed-T TXC variant;
+  3 = TXCDR T-sweep; 4 = H8 T-sweep; 5 = anchor cell (k_pos=100).
+
+| # | arch_id | grp | T (or T_max,t_sample) | k_win | k_pos | shifts | recipe / purpose |
+|---|---|---|---|---|---|---|---|
+| 1 | `topk_sae` | 1 | 1 | 500 | 500 | — | per-token TopK SAE; baseline |
+| 2 | `tsae_paper_k500` | 1 | 1 | 500 | 500 | — | per-token Matryoshka BatchTopK + temporal InfoNCE (α=0.1) + AuxK; T-SAE port at our k convention |
+| 3 | `tsae_paper_k20` | 1 | 1 | 20 | 20 | — | same as #2 at native k=20; paper-faithful baseline (Ye et al. 2025) |
+| 4 | `mlc` | 1 | 5 layers (L11–L15) | 500 | 100/layer | — | per-token TopK over 5 layers; layer-crosscoder baseline |
+| 5 | `mlc_contrastive_alpha100_batchtopk` | 1 | 5 layers | 500 | 100/layer | shift=1 | MLC + Matryoshka H/L + temporal InfoNCE (α=1.0) + BatchTopK; Phase 5 lp leader |
+| 6 | `agentic_mlc_08` | 1 | 5 layers | 500 | 100/layer | shifts (1,2,3) γ=0.5 | MLC + multi-scale InfoNCE (n_scales=3); Phase 5 multi-scale MLC |
+| 7 | `tfa_big` | 1 | n/a | 500 | n/a | — | TFA full (predictive + novel codes), full-size attention; predictive-coding reference |
+| 8 | `agentic_txc_02` | 2 | T=5 | 500 | 100/slab | shifts (1,2,3) γ=0.5 over matryoshka prefixes | TXC + multi-scale matryoshka InfoNCE; Phase 5 multi-scale matryoshka winner |
+| 9 | `txc_bare_antidead_t5` (Track 2) | 2 | T=5 | 500 | 100/slab | — | TXC + tsae-paper anti-dead stack only (no matryoshka, no contrastive); Phase 6.1 `agentic_txc_10_bare` |
+| 10 | `txc_bare_antidead_t10` (Track 2 T=10) | 2 | T=10 | 500 | 50/slab | — | same recipe as #9 at T=10 |
+| 11 | `txc_bare_antidead_t20` (Track 2 T=20) | 2 | T=20 | 500 | 25/slab | — | same recipe as #9 at T=20 |
+| 12 | `phase5b_subseq_track2` (B2) | 2 | T_max=10, t_sample=5 | 500 | 100/active-slab | — | Track 2 + subseq sampling (random t_sample of T_max positions feed gradient per step); Phase 5B Track 2 winner |
+| 13 | `phase5b_subseq_h8` (B4) | 2 | T_max=10, t_sample=5 | 500 | 100/active-slab | (1,2,5), inv-dist weights | H8 stack (= matryoshka H/L + multi-distance) + subseq sampling; Phase 5B mp champion |
+| 14 | `txcdr_t3` | 3 | T=3 | 500 | 167 | — | vanilla TemporalCrosscoder, no matryoshka/contrastive/anti-dead |
+| 15 | `txcdr_t4` | 3 | T=4 | 500 | 125 | — | same |
+| 16 | `txcdr_t5` | 3 | T=5 | 500 | 100 | — | same |
+| 17 | `txcdr_t6` | 3 | T=6 | 500 | 83 | — | same |
+| 18 | `txcdr_t7` | 3 | T=7 | 500 | 71 | — | same |
+| 19 | `txcdr_t8` | 3 | T=8 | 500 | 62 | — | same |
+| 20 | `txcdr_t9` | 3 | T=9 | 500 | 56 | — | same |
+| 21 | `txcdr_t10` | 3 | T=10 | 500 | 50 | — | same |
+| 22 | `txcdr_t12` | 3 | T=12 | 500 | 42 | — | same |
+| 23 | `txcdr_t14` | 3 | T=14 | 500 | 36 | — | same |
+| 24 | `txcdr_t16` | 3 | T=16 | 500 | 31 | — | same |
+| 25 | `txcdr_t18` | 3 | T=18 | 500 | 28 | — | same |
+| 26 | `txcdr_t20` | 3 | T=20 | 500 | 25 | — | same |
+| 27 | `txcdr_t24` | 3 | T=24 | 500 | 21 | — | same |
+| 28 | `txcdr_t28` | 3 | T=28 | 500 | 18 | — | same |
+| 29 | `txcdr_t32` | 3 | T=32 | 500 | 16 | — | same |
+| 30 | `phase57_partB_h8_bare_multidistance_t3` | 4 | T=3 | 500 | 167 | (1) | H8 recipe = TXC + anti-dead + matryoshka H/L (H=0.2·d_sae) + multi-distance InfoNCE; auto-scaled shifts (1, max(1,T//4), max(1,T//2)) deduped; inverse-distance weights w_s = 1/(1+s) |
+| 31 | `phase57_partB_h8_bare_multidistance_t4` | 4 | T=4 | 500 | 125 | (1, 2) | H8 |
+| 32 | `phase57_partB_h8_bare_multidistance_t5` | 4 | T=5 | 500 | 100 | (1, 2) | H8 |
+| 33 | `phase57_partB_h8_bare_multidistance_t6` | 4 | T=6 | 500 | 83 | (1, 3) | H8 |
+| 34 | `phase57_partB_h8_bare_multidistance_t7` | 4 | T=7 | 500 | 71 | (1, 3) | H8 |
+| 35 | `phase57_partB_h8_bare_multidistance_t8` | 4 | T=8 | 500 | 62 | (1, 2, 4) | H8 |
+| 36 | `phase57_partB_h8_bare_multidistance_t9` | 4 | T=9 | 500 | 56 | (1, 2, 4) | H8 |
+| 37 | `phase57_partB_h8_bare_multidistance_t10` | 4 | T=10 | 500 | 50 | (1, 2, 5) | H8 |
+| 38 | `phase57_partB_h8_bare_multidistance_t12` | 4 | T=12 | 500 | 42 | (1, 3, 6) | H8 |
+| 39 | `phase57_partB_h8_bare_multidistance_t14` | 4 | T=14 | 500 | 36 | (1, 3, 7) | H8 |
+| 40 | `phase57_partB_h8_bare_multidistance_t16` | 4 | T=16 | 500 | 31 | (1, 4, 8) | H8 |
+| 41 | `phase57_partB_h8_bare_multidistance_t18` | 4 | T=18 | 500 | 28 | (1, 4, 9) | H8 |
+| 42 | `phase57_partB_h8_bare_multidistance_t20` | 4 | T=20 | 500 | 25 | (1, 5, 10) | H8 |
+| 43 | `phase57_partB_h8_bare_multidistance_t24` | 4 | T=24 | 500 | 21 | (1, 6, 12) | H8 |
+| 44 | `phase57_partB_h8_bare_multidistance_t28` | 4 | T=28 | 500 | 18 | (1, 7, 14) | H8 |
+| 45 | `phase57_partB_h8_bare_multidistance_t32` | 4 | T=32 | 500 | 16 | (1, 8, 16) | H8 |
+| 46 | `txcdr_t20_kpos100` | 5 | T=20 | 2000 | 100/slab | — | anchor cell: vanilla TXCDR at fix-k_pos=100 (= row 26 with denser k); disentangles "context limit" vs "per-slab sparsity collapse" |
+| 47 | `phase57_partB_h8_bare_multidistance_t20_kpos100` | 5 | T=20 | 2000 | 100/slab | (1, 5, 10) | anchor cell: H8 at fix-k_pos=100 (= row 42 with denser k); same disentanglement |
+
+### What's NOT in this table (and why)
+
+Phase 5 / 5B / 6 had many more architectures. The following are
+explicitly excluded from Phase 7 retraining; they remain on their
+historical branches as code, mentioned in the negative-results /
+appendix sections of the paper if relevant:
+
+- H7 (`phase57_partB_h7_bare_multiscale`) — multi-scale rather than
+  multi-distance contrastive. H8 covered the better-performing
+  variant of this family.
+- Phase 5B negatives (D1 strided, C-family token-level encoder,
+  F SubsetEncoderTXC).
+- BatchTopK paired variants beyond `mlc_contrastive_alpha100_batchtopk`.
+- Stacked SAE family.
+- TXCDR weight-sharing ablations (`txcdr_shared_*`, `txcdr_tied_*`,
+  `txcdr_pos_*`, `txcdr_causal_*`, `txcdr_block_sparse_*`,
+  `txcdr_lowrank_dec_*`, `txcdr_rank_k_dec_*`, `txcdr_basis_*`,
+  `txcdr_rotational_*`).
+- `time_layer_crosscoder_t5`, `mlc_temporal_t3`, `temporal_contrastive`
+  and other Phase 5 exploratory archs.
+- `tsae_ours` (Phase 6's crude T-SAE port — superseded by `tsae_paper`).
+- Most of the 8 H8 shift-ablation variants (`phase57_partB_h8a_shifts*`)
+  except as appendix-only references.
+
+---
+
 ## Agent A — sparse-probing leaderboard
 
 ### Deliverable A.i — definitive leaderboard
 
-For all canonical archs (table below), 3 seeds, headline at S=128 and
-k_feat ∈ {5, 20}. Per-arch: mean ± σ over 3 seeds. Output:
+For all 47 archs in [§Canonical architecture set](#canonical-architecture-set),
+3 seeds, headline at S=128 and `k_feat ∈ {5, 20}`. Per-arch: mean
+± σ over 3 seeds. Output:
 
 - `experiments/phase7_unification/results/probing_results.jsonl` —
-  full per-task per-seed per-k_feat per-S rows.
+  full per-task per-seed per-`k_feat` per-S rows.
 - `experiments/phase7_unification/results/headline_S128_k5.json`
-  + `headline_S128_k20.json` — aggregated mean±σ per arch.
+  + `headline_S128_k20.json` — aggregated mean ± σ per arch.
 - `experiments/phase7_unification/results/plots/phase7_headline_bar_S128_k5.png`
   + `..._k20.png` — paired bar charts.
 
 ### Deliverable A.ii — T-sweep at fix k_win=500
 
-For arch ∈ {`txcdr_t<T>`, `H8_t<T>`}, train at T ∈
-{3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 16, 18, 20, 24, 28, 32} with
-`k_win = 500` (so per-slab `k_pos = 500/T`), 3 seeds each.
-Anchor cell: at T=20 ALSO train at fix `k_pos = 100` (so k_win =
-2000) for both archs, 3 seeds — to disentangle "context limit"
-from "per-slab sparsity collapse" interpretations.
+For arch ∈ {`txcdr_t<T>`, `H8_t<T>`} (rows 14–45 of the canonical
+table), all 3 seeds. Anchor cells (rows 46–47) ALSO trained, 3 seeds.
 
 Per-cell metrics in the JSON output:
 
@@ -134,7 +247,7 @@ Output:
 - `experiments/phase7_unification/results/t_sweep_results.jsonl` —
   per-cell rows.
 - `experiments/phase7_unification/results/plots/phase7_t_sweep_S128_k5.png`
-  — line plot AUC vs T for {txcdr, H8}, with anchor cell.
+  — line plot AUC vs T for {txcdr, H8}, with anchor cells overlaid.
 - `experiments/phase7_unification/results/plots/phase7_t_sweep_alive_fraction.png`
   — alive_fraction vs T (sanity-check plot to flag sparsity
   collapse at large T).
@@ -143,61 +256,8 @@ Output:
 k_pos = 500/T shrinks with T. By T=32, k_pos ≈ 16 per slab. If
 T=32's AUC regression coincides with alive_fraction collapse,
 the regression is partly attributable to per-slab under-training,
-not architecture-intrinsic context limit. The anchor cell at
-T=20 (fix k_pos=100) tests this disentanglement directly.
-
-### Canonical arch set — all in the leaderboard, 3 seeds
-
-Because T-sweep entries also serve as leaderboard entries (same
-seeds), the "leaderboard" and "T-sweep" share rows. Distinct archs:
-
-**Per-token / non-TXC family (7 archs):**
-
-| arch | family | notes |
-|---|---|---|
-| `topk_sae` | per-token TopK | k_win=500 (5× Phase 5 default) |
-| `tsae_paper_k500` | per-token Matryoshka BatchTopK + InfoNCE | T-SAE port at our k convention |
-| `tsae_paper_k20` | same, native k=20 | paper-faithful reference |
-| `mlc` | per-token TopK over 5 layers | k_win=500 globally (5× Phase 5 default) |
-| `mlc_contrastive_alpha100_batchtopk` | MLC + matryoshka + InfoNCE + BatchTopK | retrain at k=500 |
-| `agentic_mlc_08` | MLC + multi-scale InfoNCE | retrain at k=500 |
-| `tfa_big` | TFA full | predictive-coding reference; verify TFA's training stack supports k_win=500 |
-
-**TXC variants — fixed-T archs (8 archs):**
-
-| arch | T | notes |
-|---|---|---|
-| `agentic_txc_02` | 5 | multi-scale matryoshka TXC; Phase 5 multi-scale winner |
-| `txc_bare_antidead_t5` (Track 2) | 5 | bare TXC + anti-dead stack only |
-| `txc_bare_antidead_t10` (Track 2 T=10) | 10 | same recipe, T=10 |
-| `txc_bare_antidead_t20` (Track 2 T=20) | 20 | same recipe, T=20 |
-| `phase5b_subseq_track2` (B2) | T_max=10, t_sample=5 | subseq sampling on Track 2 base |
-| `phase5b_subseq_h8` (B4) | T_max=10, t_sample=5 | subseq sampling on H8 stack |
-
-**TXC T-sweep — txcdr (16 archs):**
-
-`txcdr_t<T>` for T ∈ {3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 16, 18, 20, 24, 28, 32}.
-Each at k_win=500 fixed.
-
-**TXC T-sweep — H8 (16 archs):**
-
-`phase57_partB_h8_bare_multidistance_t<T>` for T ∈ {3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 16, 18, 20, 24, 28, 32}.
-Each at k_win=500 fixed. H8 multi-distance shifts auto-scale per
-Phase 5's convention: `(1, max(1, T//4), max(1, T//2))` deduped.
-
-**Anchor cells (fix k_pos=100):**
-
-| arch | T | k_win | notes |
-|---|---|---|---|
-| `txcdr_t20_kpos100` | 20 | 2000 | anchor at fix k_pos=100 |
-| `phase57_partB_h8_bare_multidistance_t20_kpos100` | 20 | 2000 | same |
-
-**Total**: 7 + 6 + 16 + 16 + 2 = **47 archs** × 3 seeds = **141 trainings**
-on H100. At 5-10 min each → 12-24 hours of compute.
-
-(Note: leaderboard entries that also appear in T-sweep — e.g.
-`txcdr_t5` is both a leaderboard arch and a T-sweep cell — are
-counted once. The counts above already de-duplicate.)
+not architecture-intrinsic context limits. The anchor cell at
+T=20 fix-k_pos=100 (rows 46–47) tests this disentanglement directly.
 
 ### Hypotheses (pre-registered)
 
@@ -206,19 +266,18 @@ counted once. The counts above already de-duplicate.)
   significantly, this is itself a finding worth reporting.
 - **H2 (k_win=500 fixed across families)**: bumping per-token SAE
   and MLC families up to k_win=500 from Phase 5's k=100 should
-  improve their absolute AUC moderately (more candidate features).
-  Whether the cross-family ranking (TXC vs MLC vs SAE) preserves is
-  the key question.
+  improve their absolute AUC moderately. Whether the cross-family
+  ranking (TXC vs MLC vs SAE) preserves is the key question.
 - **H3 (T-sweep at fix k_win)**: Phase 5's T=5 peak was at fix
   k_pos=100 (k_win = 100·T). At fix k_win=500 the peak may shift,
-  flatten, or persist. Three sub-hypotheses:
+  flatten, or persist. Sub-hypotheses:
     - **H3a (sparsity-dilution)**: peak shifts to larger T, T-scaling
       becomes near-monotone.
     - **H3b (context-mismatch)**: peak stays near T=5–6, regardless
       of k convention.
     - **H3c (sparsity-collapse at large T)**: T ≥ 24 underperforms
-      due to per-slab k_pos < 20 being too sparse. Anchor cell at
-      T=20 fix-k_pos=100 disentangles vs H3b.
+      due to per-slab k_pos < 20 being too sparse. Anchor cells at
+      T=20 fix-k_pos=100 (rows 46–47) disentangle this from H3b.
 - **H4 (TXC vs SAE at fix k_win=500 + S=128)**: TXC family wins by
   ≥ 0.005 mp at headline. If not, the entire "TXC > SAE" claim
   weakens significantly.
@@ -229,7 +288,7 @@ counted once. The counts above already de-duplicate.)
 - `phase7_headline_bar_S128_k20.png` — same at k_feat=20.
 - `phase7_t_sweep_S128_k5.png` — line plot (txcdr, H8) AUC vs T.
 - `phase7_t_sweep_alive_fraction.png` — alive_fraction vs T.
-- `phase7_seed_variance.png` — error bars.
+- `phase7_seed_variance.png` — error bars on top archs.
 - (Optional) `phase7_S_sweep.png` — AUC vs S for top archs.
 
 ---
@@ -240,11 +299,11 @@ counted once. The counts above already de-duplicate.)
 
 Single Pareto plot, replicating
 `experiments/phase6_qualitative_latents/results/phase63_pareto_top256.png`
-from `han-phase6` but with Phase 7 archs. **Skip the other 3 Pareto
-plots from Phase 6** (top-N=32, top-N=64, top-N=128 cumulative are
-not part of Phase 7's deliverable).
+from `han-phase6` but with Phase 7 archs from the canonical set.
+**Skip the other 3 Pareto plots from Phase 6** (top-32, top-64,
+top-128 cumulative are not part of Phase 7's deliverable).
 
-For each arch in the Phase 7 leaderboard:
+For each arch in the canonical set:
 
 1. Take the top-256 features by per-token activation variance over
    `concat_A + concat_B + concat_random` (Phase 6 protocol).
@@ -338,7 +397,7 @@ Phase 7 writes ONLY to `experiments/phase7_unification/`.
 
 ### What this phase will NOT do
 
-- Train new architectures beyond the canonical set above.
+- Train new architectures beyond the canonical set.
 - Modify the SAEBench-style probing protocol (top-k-by-class-sep +
   L1 LR is unchanged).
 - Run autointerp protocol changes beyond Phase 6's protocol (rerun

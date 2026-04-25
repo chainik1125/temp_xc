@@ -116,22 +116,12 @@ Every arch's per-window/per-token z output has 500 active features
 after TopK. This matches Phase 5's existing TXC convention
 (`k_pos × T = 100 × 5 = 500` at T=5) — preserves the regime where
 TXC recipes were tuned, while standardizing per-token SAE and MLC
-families up to the same `k_win`. At fix `k_win = 500`:
+families up to the same `k_win`. The single exception is
+`tsae_paper_k20`, kept at native k=20 as a paper-faithful baseline
+to Ye et al. 2025.
 
-| arch family | k_win | k_pos (per active position) | notes |
-|---|---|---|---|
-| topk_sae | 500 | 500 | 5× current Phase 5 default (was k=100) |
-| tsae_paper (native) | 20 | 20 | paper-faithful baseline; KEPT at native |
-| tsae_paper (Phase 7) | 500 | 500 | retrained at our convention |
-| mlc | 500 | 100/layer | matches "k_pos=100 per layer × L=5" |
-| mlc_contrastive_alpha100_batchtopk | 500 | 100/layer | retrain at k=500 |
-| agentic_mlc_08 | 500 | 100/layer | retrain at k=500 |
-| txcdr_t5 | 500 | 100/slab | Phase 5 default, no change |
-| agentic_txc_02 | 500 | 100/slab | Phase 5 default, no change |
-| H8 (T=5, T=6, T=7) | 500 | 100/slab | Phase 5 default, no change |
-| B2 subseq_track2 (T_max=10, t_sample=5) | 500 | 100/active-slab | matches Phase 5B B2 convention |
-| B4 subseq_h8 (T_max=10, t_sample=5) | 500 | 100/active-slab | matches Phase 5B B4 convention |
-| tfa_big | 500 | n/a | TFA novel-head L0; verify at training |
+**Per-arch k_pos derivation is in `plan.md` §Canonical architecture
+set — that's the single source of truth for the arch list.**
 
 `k_win=500` justification (against k_win=100 alternative):
 - Switching to Gemma2B base means everything is retrained from
@@ -176,41 +166,40 @@ window archs with different T's at S=T is structurally confusing
 The FLIP convention (max(AUC, 1-AUC) on `winogrande_correct_completion`
 and `wsc_coreference`) is preserved — same as Phase 5.
 
-#### (iv) Architecture list (~12 archs)
+#### (iv) Architecture set (47 archs, 3 seeds = 141 trainings)
 
-Canonical set for the headline leaderboard:
+The canonical set is grouped into 5 families:
 
-| arch | family | purpose |
+| group | count | what's in it |
 |---|---|---|
-| `topk_sae` | per-token TopK | baseline |
-| `tsae_paper` (k=500) | per-token Matryoshka BatchTopK + InfoNCE | paper-faithful T-SAE port at our k convention |
-| `tsae_paper_k20` | same, native k=20 | paper-faithful reference |
-| `mlc` | per-token TopK over 5 layers | layer baseline |
-| `mlc_contrastive_alpha100_batchtopk` | MLC + matryoshka + InfoNCE + BatchTopK | Phase 5 lp leader |
-| `agentic_mlc_08` | MLC + multi-scale InfoNCE | Phase 5 multi-scale MLC |
-| `txcdr_t5` | vanilla TXC T=5 | TXC baseline |
-| `agentic_txc_02` | TXC + multi-scale matryoshka | Phase 5 multi-scale TXC |
-| `phase57_partB_h8_bare_multidistance` | TXC + matryoshka + multi-distance + anti-dead | Phase 5 mp 3-seed champion |
-| `phase57_partB_h8_bare_multidistance_t6` | H8 at T=6 | Phase 5 mp peak |
-| `phase5b_subseq_track2` (B2) | subseq sampling on Track 2 | Phase 5B Track 2 winner |
-| `phase5b_subseq_h8` (B4) | subseq sampling on H8 stack | Phase 5B mp champion |
-| `tfa_big` | TFA full | predictive-coding reference |
+| Group 1: per-token / non-TXC | 7 | `topk_sae`, `tsae_paper` at k=500 + at k=20, `mlc`, `mlc_contrastive_alpha100_batchtopk`, `agentic_mlc_08`, `tfa_big` |
+| Group 2: fixed-T TXC variants | 6 | `agentic_txc_02`, `txc_bare_antidead` (Track 2) at T ∈ {5, 10, 20}, B2 (`phase5b_subseq_track2`), B4 (`phase5b_subseq_h8`) |
+| Group 3: TXCDR T-sweep | 16 | `txcdr_t<T>` for T ∈ {3,4,5,6,7,8,9,10,12,14,16,18,20,24,28,32} |
+| Group 4: H8 T-sweep | 16 | `phase57_partB_h8_bare_multidistance_t<T>` for same T set |
+| Group 5: anchor cells (fix k_pos=100) | 2 | `txcdr_t20_kpos100`, `phase57_partB_h8_bare_multidistance_t20_kpos100` |
 
-Three seeds each → ~36-39 trainings.
+T-sweep entries (Groups 3 + 4) double as leaderboard entries — same
+seeds, no duplicate training.
+
+**Full per-arch table (k_win, k_pos derivation, recipe, purpose) lives
+in `plan.md` §Canonical architecture set. That is the single source
+of truth.** Do not duplicate the table here.
 
 ### What's dropped from the leaderboard
 
-Stay in `src/architectures/` as historical code. Not retrained for
-Phase 7. Mentioned in negative-results section of paper if relevant:
+Phase 5 / 5B / 6 trained dozens of architectures beyond the canonical
+47. They stay in `src/architectures/` as historical code on their
+respective branches; they are NOT retrained for Phase 7. Categories:
+H7 multi-scale contrastive; Phase 5B negatives (D1 strided, C-family
+token-level, F SubsetEncoderTXC); BatchTopK paired variants beyond
+`mlc_contrastive_alpha100_batchtopk`; stacked SAE family; TXCDR
+weight-sharing ablations; `tsae_ours`; H8 shift-ablation variants;
+`time_layer_crosscoder`, `mlc_temporal_t3`, `temporal_contrastive`,
+and other Phase 5 exploratory archs.
 
-- D1 strided window (Phase 5B negative).
-- C1/C2/C3 token-level encoders (Phase 5B negative).
-- F SubsetEncoderTXC (Phase 5B negative).
-- Most BatchTopK paired variants from Phase 5.7.
-- Stacked SAE family.
-- Most TXCDR weight-sharing ablations.
-- T-sweep cells beyond the canonical T values for H8 (T=5/6 only;
-  others appendix-only).
+**Full exclusion list with reasons lives in `plan.md` §Canonical
+architecture set / "What's NOT in this table". Single source of
+truth.**
 
 ### Branch / repo strategy
 
