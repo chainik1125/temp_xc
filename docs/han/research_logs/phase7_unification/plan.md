@@ -359,6 +359,38 @@ For all 47 archs in [§Canonical architecture set](#canonical-architecture-set),
 - `experiments/phase7_unification/results/plots/phase7_headline_bar_S128_k5.png`
   + `..._k20.png` — paired bar charts.
 
+#### Training loop ordering — OUTER LOOP IS SEED, not arch
+
+The training driver MUST iterate seeds on the OUTER loop, archs on
+the INNER loop:
+
+```
+for seed in (42, 1, 2):
+    for arch_id in canonical_set_49_archs:
+        train(arch_id, seed)
+        push_ckpt_to_hf(arch_id, seed)   # incremental, per-ckpt
+```
+
+**Why this matters**:
+
+- After ~6-10 hr Agent A completes the **full seed=42 batch** (one
+  ckpt per arch, all 49 archs). At that point Agent B has all 49
+  seed=42 ckpts on HF and can start autointerp on the COMPLETE
+  Pareto x-axis (it just lacks σ data). Per the cost-saving rule,
+  autointerp is seed=42-only anyway.
+- If the outer loop were instead per-arch, Agent B would have
+  seed=42 ckpts trickling in for some archs but not others,
+  delaying when it can compute the full Pareto.
+- Probing-side σ analysis can wait until seed=1 and seed=2 finish.
+
+**Per-seed signaling to Agent B**: after the seed=42 outer-loop
+iteration completes, Agent A pushes a marker file
+`han1823123123/txcdr-base/seed42_complete.json` listing all 49
+arch_ids of completed seed=42 ckpts. Agent B polls for this marker
+and starts the Pareto-x-axis run when it appears (rather than
+polling for individual ckpts). Same marker pattern for seed=1 and
+seed=2 if Agent B wants to incorporate σ.
+
 ### Deliverable A.ii — T-sweep at fix k_win=500
 
 For arch ∈ {`txcdr_t<T>`, `H8_t<T>`} (rows 14–45 of the canonical

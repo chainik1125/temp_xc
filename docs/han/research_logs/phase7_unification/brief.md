@@ -291,11 +291,11 @@ Two-agent parallel execution. Day numbers are wall-clock days.
 |---|---|
 | 1 | Spin up **H200 RunPod (1 TB volume, 12 vCPUs, 188 GB RAM)**. Run `scripts/runpod_phase7_bootstrap.sh` to set up GH/HF/Anthropic tokens. Pull `han-phase7-unification` branch (already on origin). Fork `train_primary_archs.py` and `run_probing.py` into Phase 7 drivers. Strip dispatchers down to the canonical 47 archs. Set up Gemma2B-base path config. Smoke imports. **Verify the H200's hardware leverage hooks** (joblib parallelism, large batch, T_max=128 capacity) before starting compute. |
 | 2 | Build Gemma2B-base activation cache (5 layers × 24k seqs × 128 tokens × fp16; ~70 GB). Build new probe cache with S=128 tail (~140 GB). Push caches to HF (`han1823123123/txcdr-base-data`) for cross-agent access. |
-| 3 | Smoke-train each canonical arch (200 steps) on the new cache. Verify k_win=500 enforced, no OOMs. Begin seed=42 trainings (use **batch=4096** if smoke-test convergence matches batch=1024). |
-| 4 | Complete seed=42 trainings (~6-10 hr on H200). Sync ckpts to HF (`han1823123123/txcdr-base`) after each completion. Begin seed=1, seed=2 trainings. |
-| 5 | Complete remaining seed trainings. All ckpts on HF by end of day. |
-| 6 | Sparse-probing pass at S=128 (headline) and S=20 (continuity). Plus ablations at k_feat ∈ {1, 2, 20}. |
-| 7 | Generate sparse-probing figures (headline bar, S-sweep, seed-variance). Draft sparse-probing section of summary. |
+| 3 | Smoke-train each canonical arch (200 steps) on the new cache. Verify k_win=500 enforced, no OOMs. **Begin the seed=42 batch — outer loop is SEED, inner loop is ARCH** (see plan.md §Training loop ordering). Use batch=4096 if smoke-test convergence matches batch=1024. |
+| 4 | **Complete the seed=42 batch (all 49 archs, ~6-10 hr on H200).** Push ckpts to `txcdr-base` incrementally as each completes. **At end of seed=42 batch, push the `seed42_complete.json` marker file to HF — this signals Agent B to start the Pareto-x-axis autointerp work.** Begin seed=1 batch (49 archs again, outer loop = seed). |
+| 5 | Complete the seed=1 batch. Push `seed1_complete.json` marker. Begin seed=2 batch. |
+| 6 | Complete the seed=2 batch. Push `seed2_complete.json` marker. Run the sparse-probing pass at S=128 (headline) + S=20 (continuity), k_feat ∈ {1, 2, 5, 20}. Push final `probing_results.jsonl` to HF. |
+| 7 | Generate sparse-probing figures (headline bar, T-sweep, alive_fraction, seed-variance). Draft sparse-probing section of summary. |
 | 8-10 | Buffer for bug-fixes / re-runs / paper draft. |
 
 #### Agent B (qualitative autointerp)
@@ -303,10 +303,11 @@ Two-agent parallel execution. Day numbers are wall-clock days.
 | day | task |
 |---|---|
 | 1 | Spin up **H100 RunPod (1 TB volume, 8 vCPUs, 125 GB RAM)**. Run `scripts/runpod_phase7_bootstrap.sh`. Pull `han-phase7-unification` branch. Build Phase 6-style concat-A/B/random passages against Gemma-2-2b base at L12 (passages need new tokenization + activations through the base model). Port Phase 6.1's autointerp pipeline. Smoke-test on a stub ckpt. |
-| 2 | Continue passage building. **Set up concurrent Haiku API calls** (ThreadPoolExecutor max_workers=16). Verify pipeline runs end-to-end on a stub. WAIT for Agent A's first ckpts on HF `txcdr-base` (estimated end of day 3-4). |
-| 3-4 | First ckpts arrive on `txcdr-base`. Poll HF every 60 s; for each new ckpt, pull, encode passages, send top-256 activating contexts to Claude Haiku for autointerp. **Prefetch next ckpt during current scoring.** |
-| 5 | Complete autointerp scoring on all 47 archs at seed=42 (per the cost-saving in plan.md — autointerp is seed=42-only). |
-| 6 | Pull Agent A's final `probing_results.jsonl` from `txcdr-base`. Compute the **Top-256 cumulative SEMANTIC Pareto plot**. |
+| 2 | Continue passage building. **Set up concurrent Haiku API calls** (ThreadPoolExecutor max_workers=16). Verify pipeline runs end-to-end on a stub. **Poll HF for `seed42_complete.json` marker** on `txcdr-base` (don't run autointerp on partial ckpt sets — Agent A's outer loop is seed, so the seed=42 batch arrives all-at-once). Estimated end of Agent A's day 4. |
+| 3 | (Continues passage prep + waiting for marker.) When `seed42_complete.json` appears, pull all 49 seed=42 ckpts from HF in parallel batches. Begin autointerp scoring with concurrent Haiku calls + ckpt prefetching. |
+| 4 | Continue autointerp scoring across all 49 archs at seed=42. |
+| 5 | Complete autointerp scoring on all 49 archs at seed=42 (per the cost-saving in plan.md — autointerp is seed=42-only). |
+| 6 | Pull Agent A's final `probing_results.jsonl` from `txcdr-base` (Agent A pushes after their full 3-seed sparse-probing pass). Compute the **Top-256 cumulative SEMANTIC Pareto plot**. |
 | 7 | Generate qualitative figures + draft qualitative section of summary. |
 | 8-10 | Buffer for re-runs / paper draft. |
 
