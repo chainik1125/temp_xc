@@ -166,6 +166,13 @@ def aggregate(
     metric: "auc" -> uses test_auc (with FLIP_TASKS polarity fix);
             "acc" -> uses test_acc (same flip convention for fairness).
     dataset_filter: optional set of dataset_key values to keep.
+
+    Seed disambiguation: only seed=42 records are used. Multi-seed archs
+    (H7/H8/agentic_*/mlc_contrastive) have seed 1, 2, 42 in jsonl; without
+    this filter, the LAST-probed seed silently overwrites seed-42 values
+    via `out[arch][task] = v`. Reporting non-canonical seed in the
+    headline plot misleads readers — keep seed=42 as the canonical
+    "headline" representative across the doc.
     """
     assert aggregation in ("last_position", "full_window", "mean_pool")
     assert metric in ("auc", "acc")
@@ -182,6 +189,11 @@ def aggregate(
             continue
         k = r.get("k_feat")
         if k is not None and k != HEADLINE_K:
+            continue
+        # Filter to seed 42 only (canonical headline seed). For archs
+        # without a "__seed" segment in run_id (e.g. baselines), keep them.
+        rid = r.get("run_id", "")
+        if "__seed" in rid and not rid.endswith("__seed42"):
             continue
         arch = r.get("arch")
         task = r.get("task_name")
