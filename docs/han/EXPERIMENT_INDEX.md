@@ -78,9 +78,9 @@ variance — see [Phase 6.3 pdvar results](research_logs/phase6_2_autoresearch/2
 | `phase62_c3_track2_matryoshka_contrastive` | 42 | Track 2 + matryoshka + contrastive | 0.7834 | 0.7972 | 2 | — | [Phase 6.2 summary](research_logs/phase6_2_autoresearch/summary.md) |
 | `phase62_c5_track2_longer` | 42 | Track 2 with min_steps=10000 | 0.7758 | 0.7967 | 4 | — | [Phase 6.2 summary](research_logs/phase6_2_autoresearch/summary.md) |
 | `phase62_c6_bare_batchtopk_longer` | 42 | 2×2 cell with min_steps=10000 | 0.7709 | 0.7888 | 0 | — | [Phase 6.2 summary](research_logs/phase6_2_autoresearch/summary.md) |
-| `phase63_track2_t3` | 42 | Track 2 recipe at T=3 | TBD | TBD | TBD | TBD | [Phase 6.3 T-sweep](research_logs/phase6_2_autoresearch/2026-04-24-handover-t-sweep.md) |
-| `phase63_track2_t10` | 42 | Track 2 recipe at T=10 | TBD | TBD | TBD | TBD | [Phase 6.3 T-sweep](research_logs/phase6_2_autoresearch/2026-04-24-handover-t-sweep.md) |
-| `phase63_track2_t20` | 42 | Track 2 recipe at T=20 | TBD | TBD | TBD | TBD | [Phase 6.3 T-sweep](research_logs/phase6_2_autoresearch/2026-04-24-handover-t-sweep.md) |
+| `phase63_track2_t3` | 42+1+2 | Track 2 recipe at T=3 | 0.7687 ± 0.003 (3s) | 0.7959 ± 0.005 (3s) | 2.7 ± 1.45 (3s) | 16.7 ± 1.45 (3s) | [Phase 6.3 T-sweep](research_logs/phase6_2_autoresearch/2026-04-24-t-sweep-results.md) |
+| `phase63_track2_t10` | 42+1+2 | Track 2 recipe at T=10 | 0.7906 ± 0.002 (3s) | 0.8016 ± 0.005 (3s) | 7.7 ± 1.76 (3s) | 9.0 ± 1.15 (3s) | [Phase 6.3 T-sweep](research_logs/phase6_2_autoresearch/2026-04-24-t-sweep-results.md) |
+| `phase63_track2_t20` | 42+1+2 | Track 2 recipe at T=20 | 0.7731 ± 0.006 (3s) | 0.7768 ± 0.006 (3s) | **19.0 ± 3.00 (3s)** | 13.7 ± 0.33 (3s) | [Phase 6.3 T-sweep](research_logs/phase6_2_autoresearch/2026-04-24-t-sweep-results.md) |
 
 #### MLC family
 
@@ -111,9 +111,9 @@ variance — see [Phase 6.3 pdvar results](research_logs/phase6_2_autoresearch/2
 | `phase62_c3` | ✓ | — | — | ✓ | — | — | ✓ | — | — | ✓ | ✓ | — | — | — | — |
 | `phase62_c5` | ✓ | — | — | ✓ | — | — | ✓ | — | — | ✓ | ✓ | — | — | — | — |
 | `phase62_c6` | ✓ | — | — | ✓ | — | — | ✓ | — | — | ✓ | ✓ | — | — | — | — |
-| `phase63_track2_t3` | (in flight) | — | — | (in flight) | — | — | (in flight) | — | — | (in flight) | (in flight) | — | — | — | — |
-| `phase63_track2_t10` | (in flight) | — | — | (in flight) | — | — | (in flight) | — | — | (in flight) | (in flight) | — | — | — | — |
-| `phase63_track2_t20` | (in flight) | — | — | (in flight) | — | — | (in flight) | — | — | (in flight) | (in flight) | — | — | — | — |
+| `phase63_track2_t3` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `phase63_track2_t10` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `phase63_track2_t20` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | `agentic_mlc_08` | ✓ | — | — | ✓ | — | — | ✓ | — | — | ✓* | ✓* | ✓* | ✓* | ✓* | ✓* |
 | `tsae_paper` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | `tsae_ours` | ✓ | — | — | ✓ | — | — | ✓ | — | — | ✓ | ✓ | — | — | — | — |
@@ -141,6 +141,7 @@ variance — see [Phase 6.3 pdvar results](research_logs/phase6_2_autoresearch/2
 | Pareto trade-off (main, pdvar) | `experiments/phase6_qualitative_latents/results/phase63_pareto_pdvar.png` | Same layout but y-axis = top-32 by passage-discriminative variance (x/32 pdvar). Cycle F re-ranks to best TXC (12.3 vs Track 2 7.3). See [Phase 6.3 pdvar results](research_logs/phase6_2_autoresearch/2026-04-24-pdvar-results.md). |
 | T-sweep line plot | `experiments/phase6_qualitative_latents/results/phase63_t_sweep.png` | Side-by-side AUC vs T + qualitative (var + pdvar) vs T for Track 2 recipe at T ∈ {3, 5, 10, 20}, with T-SAE reference lines. Probing peaks at T=10 with anti-dead stack. |
 | Top-N sweep | `experiments/phase6_qualitative_latents/results/phase63_topN_sweep.png` | Cumulative SEMANTIC count vs top-N cutoff (32/64/128/256) for 3 archs on concat_random seed 42. T-SAE 95 vs TXC ~20 at N=256 — gap is structural. |
+| Pareto trade-off (paper-style probe) | `experiments/phase6_qualitative_latents/results/phase63_pareto_paper_probe.png` | Pareto with y-axis = k=5 multinomial probe accuracy on passage ID across A/B/random (T-SAE §4.2 style). TXC family DOMINATES this metric — the probing-style qualitative axis is not where T-SAE wins. |
 | Rigorous metric headline | `experiments/phase6_qualitative_latents/results/phase61_rigorous_headline.png` | Horizontal bar chart: per-arch SEMANTIC count on concat A/B/random |
 | Pareto (last_pos) | `experiments/phase6_qualitative_latents/results/phase61_pareto_tradeoff.png` | Simpler 1-panel scatter, last_pos AUC |
 | Pareto (mean_pool) | `experiments/phase6_qualitative_latents/results/phase61_pareto_tradeoff_mean_pool.png` | Simpler 1-panel scatter, mean_pool AUC |
@@ -197,7 +198,7 @@ If .venv/bin/python missing: `uv sync`. If uv missing:
 
 | ID | what | status | pointer |
 |---|---|---|---|
-| **Phase 6.3 T-sweep** | Track 2 at T ∈ {3, 10, 20} — tests user's "larger T trades probing for qualitative" hypothesis | **training complete**, encode/autointerp/probe running | [handover-t-sweep](research_logs/phase6_2_autoresearch/2026-04-24-handover-t-sweep.md), [results](research_logs/phase6_2_autoresearch/2026-04-24-t-sweep-results.md) |
+| **Phase 6.3 T-sweep** | Track 2 at T ∈ {3, 10, 20} — tests user's "larger T trades probing for qualitative" hypothesis | **complete (3 seeds)**. T=20 Pareto-dominates T-SAE on (probing AUC, var-ranked qualitative): 0.7768 mp AUC + 19.0/32 var sem vs T-SAE's 0.7246 + 13.7/32. | [handover-t-sweep](research_logs/phase6_2_autoresearch/2026-04-24-handover-t-sweep.md), [results](research_logs/phase6_2_autoresearch/2026-04-24-t-sweep-results.md) |
 | **Phase 6.3 Priority 2a (pdvar)** | Replace var-ranking with passage-discriminative variance; tests whether x/32 metric is systematically unfair to TXC | **complete** — softens structural-gap claim (Cycle F re-ranks to best TXC; gap narrows from 10.4 → 16.3 labels on absolute scale) | [pdvar-results](research_logs/phase6_2_autoresearch/2026-04-24-pdvar-results.md) |
 | Phase 6.3 Priority 2b (top-N sweep) | Extend top-N beyond 32 to see if TXC catches up at larger N | **complete** — gap is structural (T-SAE 95/256, TXC ~20/256 at seed 42 concat_random) | [topN-sweep results](research_logs/phase6_2_autoresearch/2026-04-24-topN-sweep-results.md) |
 | Phase 6.3 Priority 2c (distinct concepts) | Dedup labels via Sonnet clustering ("N distinct concepts"); faithful to user's phrasing | deferred | [POST_COMPACT_PRIORITIES §2c](research_logs/POST_COMPACT_PRIORITIES.md) |
