@@ -43,7 +43,7 @@ def build_config(args: argparse.Namespace) -> SweepConfig:
         seed=args.seed,
     )
     return SweepConfig(
-        models=["regular_sae", "stacked_sae", "txcdr"],
+        models=args.models,
         rho_values=[0.0, 0.6, 0.9],
         k_values=[2, 5, 10, 25],
         T_values=[2, 5],
@@ -63,6 +63,11 @@ def main() -> None:
     parser.add_argument("--n-seeds", type=int, default=1)
     parser.add_argument(
         "--output-dir", type=str, default="results/three_arch_sweep"
+    )
+    parser.add_argument(
+        "--models", nargs="+",
+        default=["regular_sae", "stacked_sae", "txcdr", "regular_sae_kT"],
+        help="Subset of models to run. Useful for adding a new arch to existing results.",
     )
     args = parser.parse_args()
 

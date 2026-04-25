@@ -17,8 +17,18 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 
-MODEL_COLORS = {"regular_sae": "C0", "stacked_sae": "C1", "txcdr": "C3"}
-MODEL_LABELS = {"regular_sae": "Regular SAE", "stacked_sae": "Stacked SAE", "txcdr": "TXCDR"}
+MODEL_COLORS = {
+    "regular_sae": "C0",
+    "regular_sae_kT": "C2",
+    "stacked_sae": "C1",
+    "txcdr": "C3",
+}
+MODEL_LABELS = {
+    "regular_sae": "Regular SAE",
+    "regular_sae_kT": "Regular SAE (k·T/token)",
+    "stacked_sae": "Stacked SAE",
+    "txcdr": "TXCDR",
+}
 PER_TOKEN_FLOOR = 0.77
 
 

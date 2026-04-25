@@ -82,14 +82,13 @@ def main() -> None:
     os.makedirs(args.output_dir, exist_ok=True)
     df = load(args.input)
 
-    plot_delta_panel(
-        df, "regular_sae",
-        os.path.join(args.output_dir, "fig5_delta_auc_vs_regular_sae.png"),
-    )
-    plot_delta_panel(
-        df, "stacked_sae",
-        os.path.join(args.output_dir, "fig5_delta_auc_vs_stacked_sae.png"),
-    )
+    # One delta panel per non-TXCDR baseline that's present in the data.
+    available = set(df["model"].unique()) - {"txcdr"}
+    for baseline in sorted(available):
+        plot_delta_panel(
+            df, baseline,
+            os.path.join(args.output_dir, f"fig5_delta_auc_vs_{baseline}.png"),
+        )
 
 
 if __name__ == "__main__":

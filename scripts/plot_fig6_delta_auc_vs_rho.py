@@ -69,12 +69,15 @@ def main() -> None:
     os.makedirs(args.output_dir, exist_ok=True)
 
     df = load(args.input)
-    d_sae = compute_delta(df, "regular_sae")
-    d_stack = compute_delta(df, "stacked_sae")
 
-    fig, axes = plt.subplots(1, 2, figsize=(12, 4.5), sharey=True)
-    plot_panel(axes[0], d_sae, "TXCDR minus regular SAE")
-    plot_panel(axes[1], d_stack, "TXCDR minus Stacked SAE")
+    # One panel per non-TXCDR baseline that's present in the data.
+    baselines = sorted(set(df["model"].unique()) - {"txcdr"})
+    fig, axes = plt.subplots(1, len(baselines), figsize=(6 * len(baselines), 4.5), sharey=True)
+    if len(baselines) == 1:
+        axes = [axes]
+    for ax, baseline in zip(axes, baselines):
+        delta = compute_delta(df, baseline)
+        plot_panel(ax, delta, f"TXCDR minus {baseline}")
     fig.tight_layout()
     out_png = os.path.join(args.output_dir, "fig6_delta_auc_vs_rho.png")
     fig.savefig(out_png, dpi=140, bbox_inches="tight")

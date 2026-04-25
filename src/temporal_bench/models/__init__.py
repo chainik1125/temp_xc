@@ -6,8 +6,9 @@ from .temporal_crosscoder import TemporalCrosscoder
 from .per_feature_temporal import PerFeatureTemporalAE
 
 MODEL_REGISTRY: dict[str, type[TemporalAE]] = {
-    "regular_sae": TopKSAE,
-    "sae": TopKSAE,  # backward-compat alias for existing scripts/results
+    "regular_sae": TopKSAE,           # per-token TopK = k (matches window L0 = k*T)
+    "regular_sae_kT": TopKSAE,        # per-token TopK = k*T (matches TXCDR's per-token decode richness; window L0 = k*T*T)
+    "sae": TopKSAE,                   # backward-compat alias for existing scripts/results
     "stacked_sae": StackedSAE,
     "txcdr": TemporalCrosscoder,
     "per_feature_temporal": PerFeatureTemporalAE,

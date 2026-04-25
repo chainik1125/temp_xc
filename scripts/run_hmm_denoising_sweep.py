@@ -41,7 +41,7 @@ RHO_GROUPS = [0.1, 0.4, 0.7, 0.95]
 GROUP_SIZE = 10  # features per group
 DEFAULT_T_VALUES = [2, 3, 4, 5, 6, 8, 10, 12]
 DEFAULT_K_VALUES = [1, 3, 5]
-DEFAULT_MODELS = ["regular_sae", "stacked_sae", "txcdr"]
+DEFAULT_MODELS = ["regular_sae", "stacked_sae", "txcdr", "regular_sae_kT"]
 
 
 def build_rho_per_feature() -> list[float]:
@@ -169,6 +169,10 @@ def main() -> None:
         "--output-dir", type=str, default="results/hmm_denoising"
     )
     parser.add_argument("--n-eval-sequences", type=int, default=200)
+    parser.add_argument(
+        "--models", nargs="+", default=DEFAULT_MODELS,
+        help="Subset of models to run. Useful for adding a new arch to existing results.",
+    )
     args = parser.parse_args()
 
     data_cfg = DataConfig(
@@ -189,7 +193,7 @@ def main() -> None:
         seed=args.seed,
     )
     run(
-        models=DEFAULT_MODELS,
+        models=args.models,
         T_values=DEFAULT_T_VALUES,
         k_values=DEFAULT_K_VALUES,
         train_cfg=train_cfg,

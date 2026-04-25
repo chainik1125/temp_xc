@@ -16,8 +16,18 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 
-MODEL_COLORS = {"regular_sae": "C0", "stacked_sae": "C1", "txcdr": "C3"}
-MODEL_LABELS = {"regular_sae": "Regular SAE", "stacked_sae": "Stacked SAE", "txcdr": "TXCDR"}
+MODEL_COLORS = {
+    "regular_sae": "C0",
+    "regular_sae_kT": "C2",
+    "stacked_sae": "C1",
+    "txcdr": "C3",
+}
+MODEL_LABELS = {
+    "regular_sae": "Regular SAE",
+    "regular_sae_kT": "Regular SAE (k·T/token)",
+    "stacked_sae": "Stacked SAE",
+    "txcdr": "TXCDR",
+}
 
 
 def load(path: str) -> pd.DataFrame:
@@ -49,7 +59,7 @@ def main() -> None:
     for col, rho in enumerate(rhos):
         ax_auc, ax_loss = axes[0, col], axes[1, col]
         sub = df[df["rho"] == rho]
-        for model in ["regular_sae", "stacked_sae", "txcdr"]:
+        for model in [m for m in MODEL_LABELS if m in df["model"].unique()]:
             for T in Ts:
                 g = (
                     sub[(sub["model"] == model) & (sub["T"] == T)]

@@ -32,6 +32,13 @@ def _create_model(
 
     if model_name_lower in ("regular_sae", "sae"):
         model = cls(d_in=d_in, d_sae=d_sae, k=k)
+    elif model_name_lower == "regular_sae_kt":
+        # Framing-B baseline: per-token TopK = k*T, matching TXCDR's per-token
+        # decode richness. Window L0 = k*T*T, T-times larger than the other
+        # arches' matched window L0. Caps k*T at d_sae - 1 to avoid degenerate
+        # configs where the per-token budget exceeds the dictionary size.
+        k_eff = min(k * T, d_sae - 1)
+        model = cls(d_in=d_in, d_sae=d_sae, k=k_eff)
     elif model_name_lower == "stacked_sae":
         model = cls(d_in=d_in, d_sae=d_sae, T=T, k=k)
     elif model_name_lower == "txcdr":

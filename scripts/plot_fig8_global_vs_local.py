@@ -17,8 +17,13 @@ import numpy as np
 import pandas as pd
 
 
-MODEL_MARKERS = {"regular_sae": "s", "stacked_sae": "D", "txcdr": "o"}
-MODEL_LABELS = {"regular_sae": "Regular SAE", "stacked_sae": "Stacked SAE", "txcdr": "TXCDR"}
+MODEL_MARKERS = {"regular_sae": "s", "regular_sae_kT": "P", "stacked_sae": "D", "txcdr": "o"}
+MODEL_LABELS = {
+    "regular_sae": "Regular SAE",
+    "regular_sae_kT": "Regular SAE (k·T/token)",
+    "stacked_sae": "Stacked SAE",
+    "txcdr": "TXCDR",
+}
 PER_TOKEN_FLOOR = 0.77
 
 

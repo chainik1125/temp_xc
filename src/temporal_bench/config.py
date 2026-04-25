@@ -41,7 +41,7 @@ class TrainConfig:
 class SweepConfig:
     """Experiment sweep parameters."""
 
-    models: list[str] = field(default_factory=lambda: ["regular_sae", "stacked_sae", "txcdr"])
+    models: list[str] = field(default_factory=lambda: ["regular_sae", "stacked_sae", "txcdr", "regular_sae_kT"])
     rho_values: list[float] = field(default_factory=lambda: [0.0, 0.3, 0.5, 0.7, 0.9])
     k_values: list[int] = field(default_factory=lambda: [2, 5, 10])
     T_values: list[int] = field(default_factory=lambda: [2, 5])
