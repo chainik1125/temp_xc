@@ -189,10 +189,15 @@ Full table (62 archs) in
 |---|---|---|---|
 | **baseline_attn_pool** | **0.9292** | 0.1056 | 36 |
 | **baseline_last_token_lr** | **0.9262** | 0.0673 | 36 |
-| **phase57_partB_h8_bare_multidistance** (Part-B H8, single-seed) | **0.8139** | 0.1162 | 36 |
-| **phase57_partB_h7_bare_multiscale seed=1** (Part-B H7) | 0.8135 | 0.1145 | 36 |
-| **phase57_partB_h7_bare_multiscale seed=42** (Part-B H7) | 0.8104 | 0.1191 | 36 |
-| **agentic_txc_02** (multi-scale matryoshka) | 0.8069 | 0.1026 | 36 |
+| **phase57_partB_h8_bare_multidistance_t6** (Part-B H8 at T=6, NEW PEAK) | **0.8188** | 0.1008 | 36 |
+| **phase57_partB_h8_bare_multidistance** (Part-B H8 T=5, seed=42) | 0.8139 | 0.1162 | 36 |
+| **phase57_partB_h8_bare_multidistance** seed=1 | 0.8148 | — | 36 |
+| **phase57_partB_h8_bare_multidistance** seed=2 | 0.8092 | — | 36 |
+| **phase57_partB_h7_bare_multiscale seed=42** (Part-B H7 T=5) | 0.8104 | 0.1191 | 36 |
+| **phase57_partB_h8_bare_multidistance_t10** (Part-B H8 T=10) | 0.8040 | — | 36 |
+| **phase57_partB_h8_bare_multidistance_t7** (Part-B H8 T=7) | 0.8036 | — | 36 |
+| **agentic_txc_02 seed=42** (multi-scale matryoshka) | 0.8097 | 0.1026 | 36 |
+| **phase57_partB_h7_bare_multiscale seed=1** | 0.8011 | — | 36 |
 | txcdr_t5 | 0.8064 | 0.0957 | 36 |
 | matryoshka_txcdr_contrastive_t5_alpha100 | 0.8046 | 0.0979 | 36 |
 | txcdr_t3 | 0.8022 | 0.1045 | 36 |
@@ -960,26 +965,37 @@ is approximately equivalent to encoding the single centroid position.
 `probing_results.jsonl` retains all full_window rows; new plots
 omit this aggregation.
 
-### Phase 5.7+ (groundbreaking session, 2026-04-24) — pending results
-
-The "groundbreaking" session is running an extensive queue: H8 T-sweep
-at T∈{6,7,8,10,15,20,30}, shift-ablation at T=5 (8 variants), MLC +
-anti-dead fairness counterparts (3 variants), H13 multi-distance ×
-multi-scale orthogonal-axes stack, H9c seeds 1+2, H3 log-matryoshka
-T-sweep, alive-fraction retry, and HF sync.
+### Phase 5.7+ (groundbreaking session, 2026-04-24/25) — partial results
 
 Tracking doc:
 [`2026-04-24-groundbreaking-handover.md`](2026-04-24-groundbreaking-handover.md).
 
-**Queue status**: in flight as of 21:55 UTC 2026-04-24. ~25 trainings
-remaining. Wall time ~25-30 hours.
+**T-scaling answer (paper-critical, in flight as of 11:00 UTC 2026-04-25)**:
+H8 mp curve = T=3 0.7960 → T=5 0.8139 → T=6 **0.8188** ⭐ (peak) → T=7 0.8036
+→ T=8 0.7992 → T=10 0.8040 → T=15 0.7772 → T=20 0.7873 → T=30 OOM. **NOT
+monotonic with T**. Both H8 (peak T=6) and vanilla TXCDR (peak T=5) have a
+small-T optimum then decline. The "TXC scales with T" claim FAILS for H8
+too. The milder claim "H8 is the best TXC at every T tested with small
+optimal T" still holds.
 
-**Paper-critical question still open**: does H8's mp AUC monotonically
-increase with T? Answer expected after T-sweep completes (next ~6-8 hours).
+**H8 3-seed FINAL at T=5** (auto-probe completed 22:53 UTC 2026-04-24):
+- lp 0.8005 ± 0.003 (TXC leader, +0.012 over H7 3-seed 0.7887)
+- mp **0.8126 ± 0.003** (tops mp benchmark across all archs/families)
+
+**Important corrections vs prior summary.md numbers**: the H7 and
+agentic_txc_02 3-seed means quoted in earlier sections of this doc differ
+from the current jsonl. CURRENT values (n=36, k_feat=5):
+- H7 3-seed: lp 0.7887, mp **0.8018** (was 0.8059)
+- agentic_txc_02 3-seed: lp **0.7802** (was 0.7749), mp **0.8066** (was 0.7987)
+- agentic_mlc_08 single seed lp **0.8148** (was 0.8094 — likely a re-probe).
+H8 mp 3-seed 0.8126 still cleanly tops H7 mp 3-seed 0.8018 by +0.011.
+
+**Shift-ablation early result**: shifts={1} alone (T=5) gives lp 0.7656 / mp
+0.7947 — much worse than H8 shifts={1,2} (lp 0.8039 / mp 0.8139). Multi-
+distance helps at T=5. Full ablation in progress.
 
 **Deferred / out-of-scope**: H2 attention-pool decoder, H5 SVD-spectrum
-regularizer, H6 Mamba/SSM encoder. All marked "not implemented" in the
-post-H8 handover.
+regularizer, H6 Mamba/SSM encoder.
 
 ### Caveats
 
