@@ -30,8 +30,10 @@ def _create_model(
     cls = MODEL_REGISTRY[model_name]
     model_name_lower = model_name.lower()
 
-    if model_name_lower == "sae":
+    if model_name_lower in ("regular_sae", "sae"):
         model = cls(d_in=d_in, d_sae=d_sae, k=k)
+    elif model_name_lower == "stacked_sae":
+        model = cls(d_in=d_in, d_sae=d_sae, T=T, k=k)
     elif model_name_lower == "txcdr":
         model = cls(d_in=d_in, d_sae=d_sae, T=T, k_per_pos=k)
     elif model_name_lower == "per_feature_temporal":
@@ -79,6 +81,12 @@ def run_sweep(config: SweepConfig) -> list[dict]:
     print(f"Sweep: {len(combos)} combinations (before skips)")
     print(f"Device: {device}")
     print(f"Features: {config.data.n_features}, d: {config.data.d_model}, pi: {config.data.pi}")
+
+    # Incremental-save path: flushed after every completed cell so a mid-sweep
+    # crash keeps everything up to the last finished run.
+    os.makedirs(config.output_dir, exist_ok=True)
+    out_path = os.path.join(config.output_dir, "sweep_results.json")
+    tmp_path = out_path + ".tmp"
 
     for model_name, rho, k, T, seed_idx in combos:
         if _should_skip(model_name, k, T, config.data.n_features):
@@ -142,13 +150,13 @@ def run_sweep(config: SweepConfig) -> list[dict]:
             f"L0={final_metrics.l0:.1f}  R@0.9={final_metrics.r_at_90:.2f}"
         )
 
-    # Save results
-    os.makedirs(config.output_dir, exist_ok=True)
-    out_path = os.path.join(config.output_dir, "sweep_results.json")
-    with open(out_path, "w") as f:
-        json.dump(results, f, indent=2)
-    print(f"\nResults saved to {out_path}")
+        # Atomic incremental save: write-then-rename so a crash mid-write can't
+        # corrupt the existing results file.
+        with open(tmp_path, "w") as f:
+            json.dump(results, f, indent=2)
+        os.replace(tmp_path, out_path)
 
+    print(f"\nResults saved to {out_path}")
     return results
 
 
