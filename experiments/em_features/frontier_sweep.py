@@ -34,6 +34,9 @@ for p in (str(VENDOR_SRC), str(REPO_ROOT), str(EM_FEATURES)):
         sys.path.insert(0, p)
 
 from sae_day.sae import TemporalCrosscoder, MultiLayerCrosscoder, TopKSAE  # noqa: E402
+from experiments.em_features.architectures.txc_bare_multidistance_contrastive_antidead import (  # noqa: E402
+    TXCBareMultiDistanceContrastiveAntidead,
+)
 
 from open_source_em_features.pipeline.longform_steering import (  # noqa: E402
     load_em_dataset,
@@ -57,7 +60,7 @@ MODEL_REGISTRY = {
 
 def parse_args():
     p = argparse.ArgumentParser()
-    p.add_argument("--steerer", choices=["sae", "txc", "mlc", "custom_sae", "vec"], required=True)
+    p.add_argument("--steerer", choices=["sae", "txc", "mlc", "custom_sae", "han", "vec"], required=True)
     p.add_argument("--model", choices=list(MODEL_REGISTRY), default="qwen")
     p.add_argument("--layer", type=int, required=True)
     p.add_argument("--features_json", type=Path, required=True,
@@ -65,6 +68,8 @@ def parse_args():
     p.add_argument("--txc_ckpt", type=Path, default=None)
     p.add_argument("--mlc_ckpt", type=Path, default=None)
     p.add_argument("--custom_sae_ckpt", type=Path, default=None)
+    p.add_argument("--han_ckpt", type=Path, default=None,
+                   help="For --steerer han: TXCBareMultiDistanceContrastiveAntidead checkpoint")
     p.add_argument("--directions_path", type=Path, default=None,
                    help="For --steerer vec: a .pt file with a (n_features, d_in) tensor.")
     p.add_argument("--k", type=int, default=10, help="Number of top features to bundle")
@@ -118,6 +123,21 @@ def get_directions(args, layer: int, device: str) -> torch.Tensor:
         m = TopKSAE(d_in=cfg["d_in"], d_sae=cfg["d_sae"], k=cfg["k"]).to(device)
         m.load_state_dict(ckpt["state_dict"])
         return m.W_dec.detach()  # (d_sae, d_in)
+    if args.steerer == "han":
+        ckpt = torch.load(args.han_ckpt, map_location=device, weights_only=False)
+        cfg = ckpt["config"]
+        m = TXCBareMultiDistanceContrastiveAntidead(
+            d_in=cfg["d_in"], d_sae=cfg["d_sae"], T=cfg["T"], k=cfg["k"],
+            shifts=tuple(cfg.get("shifts", (1, 2))),
+            matryoshka_h_size=cfg.get("matryoshka_h_size", cfg["d_sae"] // 5),
+            alpha=cfg.get("alpha_contrastive", 1.0),
+            aux_k=cfg.get("aux_k", 512),
+            dead_threshold_tokens=cfg.get("dead_threshold_tokens", 640_000),
+            auxk_alpha=cfg.get("auxk_alpha", 1.0 / 32.0),
+        ).to(device)
+        m.load_state_dict(ckpt["state_dict"])
+        # W_dec shape is (d_sae, T, d_in); last temporal slot is the canonical steering dir.
+        return m.W_dec[:, -1, :].detach()  # (d_sae, d_in)
     if args.steerer == "vec":
         return torch.load(args.directions_path, map_location=device).to(device)
     raise NotImplementedError(f"steerer={args.steerer} not implemented (need 'sae' loader)")
