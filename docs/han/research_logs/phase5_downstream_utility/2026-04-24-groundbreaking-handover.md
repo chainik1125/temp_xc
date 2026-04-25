@@ -139,7 +139,7 @@ TQDM_DISABLE=1 PYTHONPATH=. .venv/bin/python \
 | 10 | (1, 2, 5)  | **0.7931** (s42) | **0.8040** (s42) | drops at BOTH (-0.011 lp, -0.010 mp vs T=5 s42) |
 | 15 | (1, 3, 7)  | **0.7722** | **0.7772** | major drop (~0.04 vs T=6 peak) |
 | 20 | (1, 5, 10) | **0.7823** | **0.7873** | small bump back from T=15 nadir |
-| 30 | (1, 7, 15) | TBD    | TBD    | OOM risk at d_sae=18432 |
+| 30 | (1, 7, 15) | OOM    | OOM    | confirmed OOM during Adam init (43.8/44.4 GB) |
 
 **T-sweep summary (seed 42 unless noted)**:
 
