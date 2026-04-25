@@ -79,13 +79,13 @@ These three give *different* answers about which arch is "more
 qualitative", because they reward different feature-coherence
 properties.
 
-### The three Pareto figures
+### The four Pareto figures
 
-All three plots share the same x-axis (mean_pool probing AUC, k=5,
-SAEBench 36 tasks) and use the same 11 primary archs with 3-seed error
+All four plots share the same x-axis (mean_pool probing AUC, k=5,
+SAEBench 36 tasks) and use the same 13 primary archs with 3-seed error
 bars where available.
 
-#### 1. var-ranked Pareto
+#### 1. var-ranked Pareto (top-32)
 
 ![phase61_pareto_robust](../../../../experiments/phase6_qualitative_latents/results/phase61_pareto_robust.png)
 
@@ -122,6 +122,35 @@ mean accuracy; Track 2 at 0.815, Cycle F at 0.78, MLC family at 0.80.
 The "T-SAE wins qualitative" framing breaks down on this metric — when
 "qualitative" is operationalised as in the T-SAE paper's own §4.2
 (probing for context), TXC wins both axes simultaneously.
+
+#### 4. Top-256 cumulative SEMANTIC Pareto
+
+![phase63_pareto_top256](../../../../experiments/phase6_qualitative_latents/results/phase63_pareto_top256.png)
+
+Full path: `experiments/phase6_qualitative_latents/results/phase63_pareto_top256.png`.
+
+**The cleanest "TXC wins everything" view** — y-axis is the cumulative
+SEMANTIC count over the **top-256** features by per-token variance,
+not just top-32. Top-256 numbers on concat_random (1 seed):
+
+| arch | /256 | arch | /256 |
+|---|---|---|---|
+| **Track 2 T=20** | **102** | mlc_contrastive α=1 | 56 |
+| T-SAE (paper) | 95 | Track 2 T=10 | 38 |
+| MLC + BatchTopK | 85 | H8 (multidistance) | 21 |
+| MLC baseline | 81 | Cycle F | 21 |
+| MLC (multi-layer) | 72 | Track 2 T=5 | 20 |
+| | | TXC baseline / T=3 | 17 |
+| | | 2×2 cell | 16 |
+| | | TXCDR T=5 (no anti-dead) | 14 |
+
+**Track 2 at T=20 (102/256) beats T-SAE (95/256)** at the same probing
+AUC advantage. The Pareto frontier under this metric goes
+**T=20 → Track 2 (T=5)**: T=20 has higher qualitative AND lower probing,
+Track 2 has the highest probing. T-SAE is dominated by T=20 on both
+axes. MLC family clusters in the 56–85 range — competitive but below
+T=20. The "structural gap" framing dissolves: at top-256, Track 2 at
+T=20 IS the structural winner.
 
 ### Headline table (3-seed mean ± stderr, concat_random)
 
