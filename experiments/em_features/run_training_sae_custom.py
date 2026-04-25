@@ -39,10 +39,25 @@ def parse_args():
     p.add_argument("--config", type=Path, required=True)
     p.add_argument("--hookpoint", choices=VALID_HOOKPOINTS, required=True)
     p.add_argument("--layer", type=int, required=True)
-    p.add_argument("--out", type=Path, required=True)
+    p.add_argument("--out", type=Path, required=False, help="Single-output mode (legacy)")
+    p.add_argument("--out_prefix", type=Path, required=False,
+                   help="Snapshot mode: writes <prefix>_step<N>.pt for each --snapshot_at")
+    p.add_argument("--total_steps", type=int, default=None,
+                   help="Override config sae.steps (or txc.steps if no sae block)")
+    p.add_argument("--snapshot_at", type=int, nargs="*", default=None,
+                   help="Step counts to write checkpoints at (requires --out_prefix)")
+    p.add_argument("--d_sae", type=int, default=None, help="Override config")
+    p.add_argument("--k", type=int, default=None, help="Override config k_total")
+    p.add_argument("--batch_size", type=int, default=None, help="Override config")
+    p.add_argument("--lr", type=float, default=None, help="Override config")
     p.add_argument("--device", type=str, default="cuda")
-    p.add_argument("--log_every", type=int, default=100)
-    return p.parse_args()
+    p.add_argument("--log_every", type=int, default=500)
+    args = p.parse_args()
+    if not args.out and not args.out_prefix:
+        p.error("must pass --out (single output) or --out_prefix (snapshot mode)")
+    if args.snapshot_at and not args.out_prefix:
+        p.error("--snapshot_at requires --out_prefix")
+    return args
 
 
 def main():
@@ -63,6 +78,14 @@ def main():
     d_model = int(cfg["d_model"])
     # Use the TXC sub-config as default SAE training hyperparams to match scale.
     sae_cfg = cfg.get("sae_custom", cfg["txc"])
+    d_sae = args.d_sae if args.d_sae is not None else int(sae_cfg["d_sae"])
+    k = args.k if args.k is not None else int(sae_cfg["k_total"])
+    batch_size = args.batch_size if args.batch_size is not None else int(sae_cfg["batch_size"])
+    lr = args.lr if args.lr is not None else float(sae_cfg["lr"])
+    n_steps = args.total_steps if args.total_steps is not None else int(sae_cfg["steps"])
+    snapshots = sorted(set(args.snapshot_at)) if args.snapshot_at else []
+    if snapshots and snapshots[-1] != n_steps:
+        raise ValueError(f"last snapshot ({snapshots[-1]}) must equal --total_steps ({n_steps})")
     buf_cfg = HookpointBufferConfig(
         hookpoint=args.hookpoint,
         layer=args.layer,
@@ -85,18 +108,39 @@ def main():
 
     sae = TopKSAE(
         d_in=d_model,
-        d_sae=int(sae_cfg["d_sae"]),
-        k=int(sae_cfg["k_total"]),
+        d_sae=d_sae,
+        k=k,
     ).to(args.device)
 
-    optim = torch.optim.Adam(sae.parameters(), lr=float(sae_cfg["lr"]))
-    n_steps = int(sae_cfg["steps"])
-    batch_size = int(sae_cfg["batch_size"])
+    optim = torch.optim.Adam(sae.parameters(), lr=lr)
 
     loss_history: list[float] = []
     l0_history: list[tuple[int, float]] = []
     best = float("inf")
     train_t0 = time.time()
+    next_snap_idx = 0
+
+    def write_ckpt(path: Path, step_done: int) -> None:
+        ckpt = {
+            "state_dict": sae.state_dict(),
+            "config": {
+                "d_in": d_model,
+                "d_sae": d_sae,
+                "k": k,
+                "hookpoint": args.hookpoint,
+                "layer": args.layer,
+                "subject_model": cfg["subject_model"],
+                "steps_trained": step_done,
+                "training_recipe": "topk_sae_arditi-style",
+            },
+            "loss_history": loss_history,
+            "l0_history": l0_history,
+            "best_loss": best,
+        }
+        torch.save(ckpt, path)
+        with path.with_suffix(".meta.json").open("w") as f:
+            json.dump({kk: vv for kk, vv in ckpt.items() if kk != "state_dict"}, f, indent=2)
+        print(f"Saved {path}  (step {step_done}, best loss={best:.6f})", flush=True)
 
     for step in range(n_steps):
         x = buffer.sample_flat(batch_size).float()
@@ -111,30 +155,28 @@ def main():
         best = min(best, loss_history[-1])
         if (step + 1) % args.log_every == 0:
             with torch.no_grad():
-                l0 = (z != 0).float().sum(dim=-1).mean().item()
+                probe = buffer.sample_flat(2048).float()
+                _, z_probe = sae(probe)
+                fire_count = (z_probe != 0).sum(dim=0)
+                n_dead = int((fire_count == 0).sum().item())
+                l0 = (z_probe != 0).float().sum(dim=-1).mean().item()
             l0_history.append((step + 1, l0))
             elapsed = time.time() - train_t0
-            print(f"[train] step {step+1:>6}/{n_steps}  loss={loss_history[-1]:.6f}  "
-                  f"L0={l0:.2f}  elapsed={elapsed/60:.1f}m", flush=True)
+            print(f"[sae] step {step+1:>6}/{n_steps}  loss={loss_history[-1]:.4f}  "
+                  f"L0={l0:.2f}  dead={n_dead}/{d_sae} ({100*n_dead/d_sae:.1f}%)  "
+                  f"elapsed={elapsed/60:.1f}m", flush=True)
 
-    ckpt = {
-        "state_dict": sae.state_dict(),
-        "config": {
-            "d_in": d_model,
-            "d_sae": int(sae_cfg["d_sae"]),
-            "k": int(sae_cfg["k_total"]),
-            "hookpoint": args.hookpoint,
-            "layer": args.layer,
-            "subject_model": cfg["subject_model"],
-        },
-        "loss_history": loss_history,
-        "l0_history": l0_history,
-        "best_loss": best,
-    }
-    torch.save(ckpt, args.out)
-    with (args.out.with_suffix(".meta.json")).open("w") as f:
-        json.dump({k: v for k, v in ckpt.items() if k != "state_dict"}, f, indent=2)
-    print(f"Saved {args.out}  (best train loss={best:.6f})", flush=True)
+        current_step = step + 1
+        while next_snap_idx < len(snapshots) and current_step >= snapshots[next_snap_idx]:
+            snap_step = snapshots[next_snap_idx]
+            ckpt_path = args.out_prefix.with_name(f"{args.out_prefix.name}_step{snap_step}.pt")
+            ckpt_path.parent.mkdir(parents=True, exist_ok=True)
+            write_ckpt(ckpt_path, snap_step)
+            next_snap_idx += 1
+
+    if not snapshots:
+        args.out.parent.mkdir(parents=True, exist_ok=True)
+        write_ckpt(args.out, n_steps)
 
 
 if __name__ == "__main__":
