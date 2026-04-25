@@ -83,26 +83,19 @@ class SubseqTXCBareAntidead(TXCBareAntidead):
 
         x: (B, T_max, d_in). sample_idx: (B, t_sample) in [0, T_max).
         Returns (B, d_sae).
+
+        Equivalent to: pre[b] = sum_{t in S_b} x[b, t] @ W_enc[t].
+        Implementation: zero out unsampled positions in x, then use the
+        standard per-position einsum. Avoids the (B, d_in, d_sae) per-row
+        gather of W_enc that needs O(B*d_in*d_sae) memory (174 GB at
+        d_sae=18432, B=1024).
         """
         B, T_max, d = x.shape
-        # Gather per-row positions
-        # x_S: (B, t_sample, d_in)
-        gather_idx = sample_idx.unsqueeze(-1).expand(-1, -1, d)
-        x_S = x.gather(1, gather_idx)
-        # W_enc_S: (B, t_sample, d_in, d_sae) — too big. Use a per-row loop or einsum trick.
-        # Trick: contributing sum_{t in S_b} x_S[b, t, :] @ W_enc[sample_idx[b, t]]
-        # = einsum over a (B, t_sample, d_in, d_sae) gathered weight tensor.
-        # That tensor is t_sample * d_in * d_sae * 4 = at t_sample=5, d_in=2304, d_sae=18432 → 6 GB per batch. Too big.
-        # Alternative: loop over t_sample in {1..t_sample}, gather W_enc per-row and accumulate.
-        # In practice t_sample is small (5) so a small Python loop is fine.
-        out = torch.zeros(B, self.d_sae, device=x.device, dtype=x.dtype)
-        for j in range(self.t_sample):
-            pos_j = sample_idx[:, j]                           # (B,)
-            w_j = self.W_enc[pos_j]                            # (B, d_in, d_sae)
-            x_j = x_S[:, j, :]                                 # (B, d_in)
-            out = out + torch.einsum("bd,bds->bs", x_j, w_j)
-        out = out + self.b_enc
-        return out
+        mask = torch.zeros(B, T_max, device=x.device, dtype=x.dtype)
+        mask.scatter_(1, sample_idx, 1.0)                              # (B, T_max)
+        x_masked = x * mask.unsqueeze(-1)                              # (B, T_max, d)
+        pre = torch.einsum("btd,tds->bs", x_masked, self.W_enc) + self.b_enc
+        return pre
 
     def encode_full(self, x: torch.Tensor) -> torch.Tensor:
         """Probe-time encoding using ALL T_max positions (no sampling)."""
@@ -219,17 +212,15 @@ class SubseqH8(TXCBareMultiDistanceContrastiveAntidead):
 
     def _pre_activation_sampled(self, x: torch.Tensor,
                                  sample_idx: torch.Tensor) -> torch.Tensor:
-        """Same as SubseqTXCBareAntidead's; reproduced for clarity."""
+        """Mask-then-einsum: same fix as SubseqTXCBareAntidead. See its
+        docstring for the memory rationale (avoids 174 GB W_enc gather).
+        """
         B, T_max, d = x.shape
-        out = torch.zeros(B, self.d_sae, device=x.device, dtype=x.dtype)
-        for j in range(self.t_sample):
-            pos_j = sample_idx[:, j]
-            w_j = self.W_enc[pos_j]
-            x_j = x.gather(1, sample_idx[:, j:j+1].unsqueeze(-1).expand(-1, 1, d))
-            x_j = x_j.squeeze(1)
-            out = out + torch.einsum("bd,bds->bs", x_j, w_j)
-        out = out + self.b_enc
-        return out
+        mask = torch.zeros(B, T_max, device=x.device, dtype=x.dtype)
+        mask.scatter_(1, sample_idx, 1.0)
+        x_masked = x * mask.unsqueeze(-1)
+        pre = torch.einsum("btd,tds->bs", x_masked, self.W_enc) + self.b_enc
+        return pre
 
     def encode(self, x: torch.Tensor) -> torch.Tensor:
         """Probe-time: full T_max encode (no sampling)."""

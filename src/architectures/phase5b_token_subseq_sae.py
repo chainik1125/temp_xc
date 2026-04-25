@@ -1,20 +1,27 @@
 """Phase 5B candidate C: token-level encoder + sparse subset-sum.
 
-C1: encoder is per-TOKEN (no T axis): `pre = x @ W_enc + b_enc`.
-    At training time, sample t_sample positions from a length-L window
-    (L=128 = full Gemma-2-2B-IT context, or smaller). Encode each
-    position independently via the SHARED encoder, then SUM the
-    resulting sparse latents. Decoder reconstructs each sampled
-    position individually.
+C1: pos_mode="none" — encoder is per-TOKEN (no T axis):
+    `pre = x @ W_enc + b_enc`.
 
-C2: same as C1 but adds a learned position embedding to the input
-    before encoding: `pre = (x + pos_emb[t]) @ W_enc + b_enc`. Lets
-    the encoder distinguish positions even though it's structurally
-    shared.
+C2: pos_mode="sinusoidal" — adds fixed sinusoidal pos emb to INPUT
+    before encoding: `pre = (x + sin_pe[t]) @ W_enc + b_enc`.
+    Position info is constrained to a rank-d_in subspace of d_sae
+    (since `pe[t] @ W_enc` has rank ≤ d_in=2304).
+
+C3: pos_mode="learned" — adds full-rank learnable per-feature,
+    per-position bias DIRECTLY in d_sae space:
+    `pre = x @ W_enc + b_enc + delta[t]`, where delta is a learnable
+    parameter of shape (L_max, d_sae). Each feature j has its own
+    learned position-response curve δ[:, j]. Strict generalization of
+    C2 (which constrains position info to rank ≤ d_in).
+
+Encoder param scaling is independent of T for all three modes:
+    none/sinusoidal:  d_in · d_sae       (= 42M @ d_sae=18432)
+    learned:          d_in · d_sae + L_max · d_sae    (+ 2.4M @ L_max=128)
 
 This breaks the per-position W_enc/W_dec convention of vanilla TXC —
-intentional. The hypothesis: temporal mixing comes from the SUM
-aggregation, not from per-position encoder weights.
+intentional. The C-family hypothesis: temporal mixing comes from
+the SUM aggregation, not from per-position encoder weights.
 """
 from __future__ import annotations
 
@@ -45,27 +52,41 @@ class TokenSubseqSAE(nn.Module):
     Args:
         d_in: residual stream width.
         d_sae: dictionary size.
-        L_max: maximum sequence length (used for pos emb size if enabled).
+        L_max: maximum sequence length (used for pos emb size).
         k: TopK budget on EACH per-token z BEFORE summing. The summed z
            may have up to t_sample * k active features.
         t_sample: number of positions to sum at training time.
-        use_pos: if True, add sinusoidal pos emb to input before encoding.
-        pos_scale: scale applied to pos emb (default 1.0).
+        pos_mode: "none" / "sinusoidal" / "learned".
+            "none":      no position info (C1).
+            "sinusoidal":fixed sinusoidal pos emb added to INPUT (C2).
+            "learned":   learnable (L_max, d_sae) bias added to PRE-ACTIVATION (C3).
+        pos_scale: scale applied to sinusoidal pos emb only.
+        use_pos: legacy bool flag, mapped to pos_mode if pos_mode is "none"
+                 (use_pos=True → "sinusoidal"). Kept for backward compat.
     """
 
     def __init__(self, d_in: int, d_sae: int, L_max: int, k: int,
-                 t_sample: int, use_pos: bool = False,
+                 t_sample: int,
+                 pos_mode: str | None = None,
+                 use_pos: bool = False,
                  pos_scale: float = 1.0,
                  aux_k: int = 512,
                  dead_threshold_tokens: int = 10_000_000,
                  auxk_alpha: float = 1.0 / 32.0):
         super().__init__()
+        # Resolve pos_mode (with use_pos legacy fallback)
+        if pos_mode is None:
+            pos_mode = "sinusoidal" if use_pos else "none"
+        if pos_mode not in ("none", "sinusoidal", "learned"):
+            raise ValueError(f"unknown pos_mode={pos_mode}")
         self.d_in = d_in
         self.d_sae = d_sae
         self.L_max = int(L_max)
         self.k = int(k)
         self.t_sample = int(t_sample)
-        self.use_pos = bool(use_pos)
+        self.pos_mode = pos_mode
+        # Keep `use_pos` for downstream code that reads it (e.g. saving meta)
+        self.use_pos = (pos_mode == "sinusoidal")
         self.pos_scale = float(pos_scale)
         self.aux_k = aux_k
         self.dead_threshold_tokens = dead_threshold_tokens
@@ -83,11 +104,21 @@ class TokenSubseqSAE(nn.Module):
         with torch.no_grad():
             self.W_enc.data = self.W_dec.data.T.clone()
 
-        if self.use_pos:
+        # Position info storage
+        if pos_mode == "sinusoidal":
             pe = _sinusoidal_position_embedding(self.L_max, d_in)
             self.register_buffer("pos_emb", pe * self.pos_scale)
         else:
             self.register_buffer("pos_emb", torch.zeros(0))
+
+        if pos_mode == "learned":
+            # Per-(position, feature) learnable bias in d_sae space.
+            # Init to zero so early training matches the C1 baseline.
+            self.pos_bias = nn.Parameter(torch.zeros(self.L_max, d_sae))
+        else:
+            # Register a zero-size parameter so state_dict shapes match
+            # only when pos_mode is "learned"; otherwise omit entirely.
+            self.pos_bias = None
 
         # Dead-feature tracker (same convention as txc_bare_antidead)
         self.register_buffer(
@@ -115,13 +146,17 @@ class TokenSubseqSAE(nn.Module):
         """x: (B, t_sample, d_in). positions: (B, t_sample) absolute indices.
         Returns (B, t_sample, d_sae) per-token pre-activation.
         """
-        if self.use_pos:
+        if self.pos_mode == "sinusoidal":
             pe = self.pos_emb[positions]   # (B, t_sample, d_in)
             x_input = x + pe
         else:
             x_input = x
         # Per-token encode: (B, t_sample, d_in) @ (d_in, d_sae) → (B, t_sample, d_sae)
-        return torch.einsum("btd,ds->bts", x_input, self.W_enc) + self.b_enc
+        pre = torch.einsum("btd,ds->bts", x_input, self.W_enc) + self.b_enc
+        if self.pos_mode == "learned":
+            # Add per-(position, feature) learnable bias in d_sae space.
+            pre = pre + self.pos_bias[positions]   # (B, t_sample, d_sae)
+        return pre
 
     def encode_per_token(self, x_full: torch.Tensor, positions: torch.Tensor | None = None) -> torch.Tensor:
         """For probe-time:
