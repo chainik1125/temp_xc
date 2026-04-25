@@ -978,6 +978,16 @@ small-T optimum then decline. The "TXC scales with T" claim FAILS for H8
 too. The milder claim "H8 is the best TXC at every T tested with small
 optimal T" still holds.
 
+![T-scaling mean_pool — H8 vs vanilla TXCDR vs others](../../../../experiments/phase5_downstream_utility/results/plots/t_scaling_mean_pool.png)
+
+![T-scaling last_position — H8 vs vanilla TXCDR vs others](../../../../experiments/phase5_downstream_utility/results/plots/t_scaling_last_position.png)
+
+H8 (purple, thick) sits above all other TXC families across T but never
+reaches the 0.80 target line monotonically. ConvTXCDR (red, H1) collapses
+past T=10. agentic_txc_02 (green) tracks H8 closely at small T but has no
+T≥10 data (OOM). vanilla TXCDR TopK (blue) and BatchTopK (orange) are
+both choppy with peaks at T=5/T=8 respectively.
+
 **H8 3-seed FINAL at T=5** (auto-probe completed 22:53 UTC 2026-04-24):
 - lp 0.8005 ± 0.003 (TXC leader, +0.012 over H7 3-seed 0.7887)
 - mp **0.8126 ± 0.003** (tops mp benchmark across all archs/families)
