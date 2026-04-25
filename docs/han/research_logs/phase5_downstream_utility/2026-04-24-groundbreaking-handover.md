@@ -137,7 +137,7 @@ TQDM_DISABLE=1 PYTHONPATH=. .venv/bin/python \
 | 7  | (1, 3)     | **0.7930** | **0.8036** | mp drops 0.015 from T=6 peak |
 | 8  | (1, 2, 4)  | **0.7937** | **0.7992** | mp drops further from T=6 peak |
 | 10 | (1, 2, 5)  | **0.7931** (s42) | **0.8040** (s42) | drops at BOTH (-0.011 lp, -0.010 mp vs T=5 s42) |
-| 15 | (1, 3, 7)  | TBD    | TBD    |       |
+| 15 | (1, 3, 7)  | **0.7722** | **0.7772** | major drop (~0.04 vs T=6 peak) |
 | 20 | (1, 5, 10) | TBD    | TBD    |       |
 | 30 | (1, 7, 15) | TBD    | TBD    | OOM risk at d_sae=18432 |
 
