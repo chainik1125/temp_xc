@@ -170,11 +170,15 @@ with the mask-then-einsum pattern. Mathematically equivalent, ~1000× smaller pe
   have A40 access, please consider running these.** Specifically `subseq_h8` at
   (T_max=20, t_sample ∈ {5, 10, 20}, k_win=500) would extend the t_sample/T_max
   story to T=20.
-- **t-encoder variant** (separate idea): allocate only t encoder/decoder slabs
-  (not T_max), train via random sort-and-encode-by-rank. Would halve params and
-  enable T_max=128. Not yet implemented; queued after iso.
-- **T_max=128 t_sample=low** ("infinite-T low-t") via per-position W_enc — needs
-  fp16 / smaller batch on 32 GB 5090.
+- **t-encoder variant `SubsetEncoderTXC`** (Phase 5B candidate F): IMPLEMENTED
+  + swept at seed=42, T_window ∈ {10, 20, 128}, t=5 slabs. **Clean negative
+  result.** All three cells regress vs B4. Per-absolute-position W_enc[t]
+  slabs are load-bearing — see `2026-04-25-t-encoder-variant.md` for the
+  full writeup. Worth knowing as a confirmed dead-end if you'd considered
+  it.
+- **T_max=128 t_sample=low** ("infinite-T low-t") via per-position W_enc —
+  needs 21.7 GB encoder + ~130 GB Adam state at fp32, infeasible on 32 GB
+  5090. Would need fp16 / smaller batch / grad-checkpointing. Deferred.
 
 ### Files I touched in `src/`
 
