@@ -44,6 +44,8 @@ PRIMARY = {
     "mlc_contrastive_alpha100":    ("MLC contrastive α=1",        "#238b45", ">", (-55, -10)),
     "agentic_mlc_08_batchtopk":    ("MLC (+BatchTopK)",           "#41ab5d", "H", (10, 6)),
     "phase57_partB_h8_bare_multidistance": ("H8 (multidistance)",  "#fd8d3c", "X", (10, 6)),
+    "phase63_track2_t10":          ("Track 2 T=10",               "#3182bd", "P", (10, 6)),
+    "phase63_track2_t20":          ("Track 2 T=20",               "#08306b", "X", (10, 6)),
 }
 
 SECONDARY = {
@@ -111,6 +113,21 @@ def load_random_sem(metric_key: str = "semantic_count"):
     return dict(out)
 
 
+def load_top256():
+    """Load per-arch list of N=256 cumulative SEMANTIC counts from
+    `{arch}__seed{S}__concatrandom__top256.json` files written by
+    run_topN_sweep.py. Returns {arch: [seed_means...]} (typically 1
+    seed per arch since top-N sweep is single-seed).
+    """
+    out: dict[str, list[int]] = defaultdict(list)
+    for p in AUTOIN.glob("*__seed*__concatrandom__top256.json"):
+        d = json.loads(p.read_text())
+        cums = d.get("cumulative_semantic_counts", {})
+        if "256" in cums:
+            out[d["arch"]].append(cums["256"])
+    return dict(out)
+
+
 def load_passage_probe(k: int = 5):
     """Load per-arch list of per-seed mean passage-ID probe accuracy
     across the 3 concats (A, B, random). Returns {arch: [seed_means...]}.
@@ -173,10 +190,12 @@ def main():
     ap.add_argument("--k", type=int, default=5)
     ap.add_argument("--metric", default="semantic_count",
                     choices=["semantic_count", "semantic_count_pdvar",
-                             "probe_acc_passage"],
+                             "probe_acc_passage", "semantic_count_top256"],
                     help="which qualitative metric to put on the y-axis. "
                          "probe_acc_passage = k-sparse multinomial probe "
-                         "predicting passage ID across A/B/random (T-SAE §4.2 style).")
+                         "predicting passage ID across A/B/random (T-SAE §4.2 style). "
+                         "semantic_count_top256 = cumulative SEMANTIC count over "
+                         "top-256 features by per-token variance on concat_random.")
     ap.add_argument("--out", type=str,
                     default=str(REPO / "experiments/phase6_qualitative_latents/results/phase61_pareto_robust.png"))
     args = ap.parse_args()
@@ -188,6 +207,9 @@ def main():
     elif args.metric == "semantic_count_pdvar":
         sems = load_random_sem(metric_key=args.metric)
         metric_display = "pdvar-ranked"
+    elif args.metric == "semantic_count_top256":
+        sems = load_top256()
+        metric_display = "top-256 cumulative SEMANTIC"
     else:
         sems = load_random_sem(metric_key=args.metric)
         metric_display = "var-ranked"
@@ -198,22 +220,8 @@ def main():
         gridspec_kw={"width_ratios": [2.2, 1.0], "wspace": 0.55},
     )
 
-    # Primary points (no text labels yet — add via legend)
+    # Primary points (no text labels — legend on the right identifies them)
     _plot_primary(ax, aucs, sems, show_labels=False, show_errorbars=True)
-
-    # Place primary labels with manual offsets to avoid overlap
-    for arch, (label, color, marker, offset) in PRIMARY.items():
-        if arch not in aucs or arch not in sems:
-            continue
-        a_mean, _ = _mean_se(aucs[arch])
-        s_mean, _ = _mean_se(sems[arch])
-        ax.annotate(
-            label, (a_mean, s_mean), xytext=offset,
-            textcoords="offset points", fontsize=10, fontweight="bold",
-            zorder=7,
-            bbox=dict(boxstyle="round,pad=0.2", facecolor="white",
-                      edgecolor=color, linewidth=1.0, alpha=0.9),
-        )
 
     # Pareto frontier — compute non-dominated set over PRIMARY arches.
     # Non-dominated: no other arch has higher AUC AND higher qualitative.
@@ -243,6 +251,8 @@ def main():
             mid_y = 0.55
         elif args.metric == "semantic_count_pdvar":
             mid_y = 15.0
+        elif args.metric == "semantic_count_top256":
+            mid_y = 60.0
         else:
             mid_y = 7.0
         ax.annotate(
@@ -277,6 +287,9 @@ def main():
     elif args.metric == "semantic_count_pdvar":
         y_lo, y_hi = -1, 28
         y_split = 14
+    elif args.metric == "semantic_count_top256":
+        y_lo, y_hi = -3, 110
+        y_split = 50
     else:
         y_lo, y_hi = -1, 17
         y_split = 6
@@ -287,6 +300,9 @@ def main():
     if args.metric == "probe_acc_passage":
         top_label_y = y_hi - 0.06
         bot_label_y = y_lo + 0.02
+    elif args.metric == "semantic_count_top256":
+        top_label_y = y_hi - 6
+        bot_label_y = 1
     else:
         top_label_y = y_hi - 1.5
         bot_label_y = 0.2
@@ -306,6 +322,12 @@ def main():
         ax.set_ylabel(
             f"Paper-style passage-ID probe accuracy  (k={args.k})\n"
             f"— mean across concat_A/B/random, 5-fold stratified CV",
+            fontsize=11,
+        )
+    elif args.metric == "semantic_count_top256":
+        ax.set_ylabel(
+            "Cumulative SEMANTIC count on concat_random  (/256)\n"
+            "— top-256 by per-token variance, multi-Haiku temp=0",
             fontsize=11,
         )
     else:
@@ -426,6 +448,8 @@ def main():
         axz.set_ylim(0.60, 0.90)
     elif args.metric == "semantic_count_pdvar":
         axz.set_ylim(-1.0, 15.0)
+    elif args.metric == "semantic_count_top256":
+        axz.set_ylim(-2, 30)
     else:
         axz.set_ylim(-0.6, 7.0)
     axz.set_title("TXC cluster (zoom) — Phase 6.1 arches +\n"
