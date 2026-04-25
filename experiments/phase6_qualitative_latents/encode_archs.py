@@ -233,6 +233,9 @@ def load_arch(arch: str, device: torch.device, seed: int = 42) -> torch.nn.Modul
             dead_threshold_tokens=int(meta.get("dead_threshold_tokens", 10_000_000)),
             auxk_alpha=float(meta.get("auxk_alpha", 1.0 / 32.0)),
         ).to(device)
+    elif arch == "topk_sae":
+        from src.architectures.topk_sae import TopKSAE
+        model = TopKSAE(D_IN, D_SAE, k=meta["k_pos"]).to(device)
     elif arch == "phase57_partB_h8_bare_multidistance":
         from src.architectures.txc_bare_multidistance_contrastive_antidead import (
             TXCBareMultiDistanceContrastiveAntidead,
