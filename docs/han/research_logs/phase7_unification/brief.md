@@ -102,13 +102,23 @@ the base model. **Do not mention `gemma-2-2b-it` in the paper.**
 Practical implications for Agent A:
 
 - Re-extract activations for FineWeb sequences using base model.
-  Layer 13 anchor + L11–L15 for MLC.
-- Rebuild the 36-task probe cache against the new model.
+  **Layer 12 anchor (0-indexed)** + L10–L14 for MLC.
+
+  > Note: this is a deliberate shift from Phase 5/5b/6 (which used
+  > 0-indexed L13). T-SAE (Ye et al. 2025 §4.1) and TFA (Lubana et
+  > al. 2025 App. B.1) both train at 0-indexed L12 on Gemma-2-2b —
+  > chosen for "comparability with pretrained Neuronpedia /
+  > Gemma-Scope SAEs" (T-SAE) and "around 50% model depth" (TFA).
+  > Switching Phase 7 to L12 puts our results on the *exact same
+  > residual-stream tap* as both reference papers. Cache rebuild
+  > from the model switch is zero-marginal-cost.
+
+- Rebuild the 36-task probe cache against the new model + new layer.
 
 Practical implications for Agent B:
 
 - Rebuild the 4-passage Phase 6 concat-A/B/random qualitative cache
-  against the new model.
+  against the new model + new layer.
 
 #### (ii) Convention: fix `k_win = 500` across all archs
 

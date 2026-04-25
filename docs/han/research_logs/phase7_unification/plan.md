@@ -16,10 +16,21 @@ agents (sparse-probing agent + autointerp agent).
 
 `google/gemma-2-2b` (base, NOT instruct).
 
-- Layer 13 anchor.
-- L11–L15 for MLC.
+- **Layer 12 anchor (0-indexed)** = `model.model.layers[12]`.
+- **L10–L14 for MLC** (5-layer window centred on L12; 0-indexed).
 - HF model id: `google/gemma-2-2b`.
 - Tokenizer: `google/gemma-2-2b` (matches base model).
+
+> **Layer choice — deliberate shift from Phase 5/5b/6 (which used
+> 0-indexed L13):** T-SAE (Ye et al. 2025 §4.1) trains Gemma SAEs at
+> "layer 12" for "comparability with Neuronpedia"; TFA (Lubana et
+> al. 2025 App. B.1) explicitly says "Layer 12 for Gemma … both
+> 0-indexed". Phase 7's L12 anchor + L10–L14 MLC stack therefore
+> matches *exactly* the residual-stream tap used by both reference
+> papers. Phase 5 used 0-indexed L13 (= 14/26 ≈ 53.8% depth);
+> Phase 7 uses 0-indexed L12 (= 13/26 = 50.0% depth, "around 50%
+> model depth" per TFA's wording). Cache rebuild from the model
+> switch is zero-marginal-cost so this layer fix is essentially free.
 
 ### Activation cache (rebuild) — owned by Agent A
 
@@ -36,15 +47,15 @@ agents (sparse-probing agent + autointerp agent).
 
 - Tasks: same 36-task set as Phase 5 (8 dataset families).
 - Per-task storage:
-  - `acts_anchor.npz`: train_acts, test_acts at L13, **shape
+  - `acts_anchor.npz`: train_acts, test_acts at L12, **shape
     (N, 128, d)** — full 128-token tail.
-  - `acts_mlc.npz`: train_acts, test_acts at L11-L15. Decision: store
-    L11–L15 only at S=20 (matches Phase 5 MLC convention; recompute
+  - `acts_mlc.npz`: train_acts, test_acts at L10-L14. Decision: store
+    L10–L14 only at S=20 (matches Phase 5 MLC convention; recompute
     longer tails on demand if needed). Reduces storage 5×.
   - `meta.json`: dataset_key, task_name, n_train, n_test, etc.
 - Splits: same as Phase 5 (n_train=3040, n_test=760).
-- Storage: ~3 GB per task × 36 ≈ 110 GB for L13 anchor + ~30 GB for
-  L11-L15 stack at S=20 ≈ **~140 GB**. Verify RunPod volume.
+- Storage: ~3 GB per task × 36 ≈ 110 GB for L12 anchor + ~30 GB for
+  L10-L14 stack at S=20 ≈ **~140 GB**. Verify RunPod volume.
 - Sync to HF for cross-agent access:
   `han1823123123/txcdr/phase7_probe_cache/`.
 
@@ -141,7 +152,7 @@ Notes on the table format:
 | 1 | `topk_sae` | 1 | 1 | 500 | 500 | — | per-token TopK SAE; baseline |
 | 2 | `tsae_paper_k500` | 1 | 1 | 500 | 500 | — | per-token Matryoshka BatchTopK + temporal InfoNCE (α=0.1) + AuxK; T-SAE port at our k convention |
 | 3 | `tsae_paper_k20` | 1 | 1 | 20 | 20 | — | same as #2 at native k=20; paper-faithful baseline (Ye et al. 2025) |
-| 4 | `mlc` | 1 | 5 layers (L11–L15) | 500 | 100/layer | — | per-token TopK over 5 layers; layer-crosscoder baseline |
+| 4 | `mlc` | 1 | 5 layers (L10–L14) | 500 | 100/layer | — | per-token TopK over 5 layers; layer-crosscoder baseline |
 | 5 | `mlc_contrastive_alpha100_batchtopk` | 1 | 5 layers | 500 | 100/layer | shift=1 | MLC + Matryoshka H/L + temporal InfoNCE (α=1.0) + BatchTopK; Phase 5 lp leader |
 | 6 | `agentic_mlc_08` | 1 | 5 layers | 500 | 100/layer | shifts (1,2,3) γ=0.5 | MLC + multi-scale InfoNCE (n_scales=3); Phase 5 multi-scale MLC |
 | 7 | `tfa_big` | 1 | n/a | 500 | n/a | — | TFA full (predictive + novel codes), full-size attention; predictive-coding reference |
@@ -404,7 +415,7 @@ Phase 7 writes ONLY to `experiments/phase7_unification/`.
   on new ckpts, but no protocol changes).
 - Cross-token tasks (winogrande, wsc) get the FLIP convention as
   before — no change.
-- Train on layer ≠ 13 (anchor) or != L11-L15 (MLC).
+- Train on layer ≠ 12 (anchor) or != L10–L14 (MLC).
 - Use `last_position` as a separate metric in the headline. Reported
   only as a caveat-laden footnote in the paper, if at all.
 - Reproduce Phase 6's other 3 Pareto plots (top-32, top-64, top-128).
