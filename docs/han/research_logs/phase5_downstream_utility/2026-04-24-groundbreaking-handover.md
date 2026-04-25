@@ -134,29 +134,37 @@ TQDM_DISABLE=1 PYTHONPATH=. .venv/bin/python \
 |----|------------|--------|--------|-------|
 | 5  | (1, 2)     | **0.8005 ± 0.003** (3-seed) | **0.8126 ± 0.003** (3-seed) | T=5 confirmed champion |
 | 6  | (1, 3)     | **0.7965** (s42) | **0.8188** (s42) | mp **+0.005 over T=5 s42**, +0.006 over 3-seed |
-| 7  | (1, 3)     | TBD    | TBD    |       |
-| 8  | (1, 2, 4)  | TBD    | TBD    |       |
+| 7  | (1, 3)     | **0.7930** | **0.8036** | mp drops 0.015 from T=6 peak |
+| 8  | (1, 2, 4)  | training (start 02:38) | TBD    |       |
 | 10 | (1, 2, 5)  | **0.7931** (s42) | **0.8040** (s42) | drops at BOTH (-0.011 lp, -0.010 mp vs T=5 s42) |
 | 15 | (1, 3, 7)  | TBD    | TBD    |       |
 | 20 | (1, 5, 10) | TBD    | TBD    |       |
 | 30 | (1, 7, 15) | TBD    | TBD    | OOM risk at d_sae=18432 |
 
-**Updated signal — mp curve has a peak around T=6**:
-- lp drops monotonically: T=5 0.8039 → T=6 0.7965 → T=10 0.7931
-- **mp** behaves differently:
-  - T=5 0.8139 (s42), 0.8126 (3-seed mean)
-  - T=6 **0.8188 (s42)** — beats T=5 by +0.005 (s42) / +0.006 (3-seed)
-  - T=10 0.8040 — drops below T=5
+**T-sweep summary (seed 42 unless noted)**:
 
-So mp is NON-MONOTONIC with a possible peak at T=6 or T=8.
-T=7, T=8 results will clarify. If T=8 mp > T=6 mp, the peak is past
-T=8 and we have positive scaling up to that point. If T=8 mp ≤ T=6 mp,
-the peak is around T=6.
+| T  | H8 mp     | H8 lp     | vanilla TXCDR mp | vanilla TXCDR lp |
+|----|-----------|-----------|------------------|------------------|
+| 3  | TBD       | TBD       | 0.8022           | 0.7711           |
+| 4  | TBD       | TBD       | TBD              | TBD              |
+| 5  | **0.8139** (3s 0.8126) | **0.8039** (3s 0.8005) | **0.8064** | 0.7827 |
+| 6  | **0.8188** ⭐ | 0.7965 | 0.7955 | 0.7788 |
+| 7  | 0.8036    | 0.7930    | 0.7957           | **0.7834**       |
+| 8  | training  | training  | 0.7711           | 0.7540           |
+| 9  | TBD       | TBD       | TBD              | TBD              |
+| 10 | 0.8040    | 0.7931    | 0.7754           | 0.7671           |
 
-This is notably DIFFERENT from agentic_txc_02 (which peaked at T=8) and
-suggests H8's optimal T is similar/slightly smaller. Either way, H8 mp
-is NOT monotone over the full T range — but it DOES have positive scaling
-in a narrow window. That's a milder claim the paper could still make.
+**H8 mp curve**: 0.8139 → **0.8188** (T=6 peak) → 0.8036 → 0.8040 (down).
+**Vanilla TXCDR mp curve**: 0.8022 → 0.8064 (T=5 peak) → 0.7955 → 0.7957 → 0.7711 → 0.7754.
+
+**Findings**:
+1. **Both H8 and vanilla TXCDR have a single mp peak** in the T=5-7 range, then decline.
+   So neither is truly monotonic, but H8's peak is shifted later (T=6 vs T=5) AND ~0.012
+   higher (0.8188 vs 0.8064).
+2. **The "TXC scales with T" claim cannot be made for H8 either**. But the milder claim
+   "the optimal T is small (≤ 8) and H8 is the best at every T tested" still holds.
+3. **lp**: H8 drops monotonically with T (0.8039 → 0.7930). Vanilla TXCDR is choppier
+   with a small peak at T=7 (0.7834).
 
 Monotonicity score (mp): TBD (target ≥ 0.80)
 Δ(T_max−T_min) (mp): TBD (target > +0.020)
