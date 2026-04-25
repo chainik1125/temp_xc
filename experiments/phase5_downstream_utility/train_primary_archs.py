@@ -2113,8 +2113,9 @@ def run_all(seeds, max_steps, archs=None):
                 model, log = train_txcdr(cfg, device, k=100, T=20, buf=get_anchor())
                 meta = dict(seed=seed, k_pos=100, k_win=2000, T=20,
                             match_budget=True, layer=13)
-            elif arch in ("txcdr_t2", "txcdr_t3", "txcdr_t6", "txcdr_t7",
-                          "txcdr_t8", "txcdr_t10", "txcdr_t15", "txcdr_t30",
+            elif arch in ("txcdr_t2", "txcdr_t3", "txcdr_t4", "txcdr_t6",
+                          "txcdr_t7", "txcdr_t8", "txcdr_t9", "txcdr_t10",
+                          "txcdr_t15", "txcdr_t30",
                           "txcdr_t24", "txcdr_t28", "txcdr_t32", "txcdr_t36"):
                 T = int(arch.removeprefix("txcdr_t"))
                 model, log = train_txcdr(cfg, device, k=100, T=T, buf=get_anchor())

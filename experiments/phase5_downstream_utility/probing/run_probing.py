@@ -386,8 +386,8 @@ def _load_model_for_run(run_id, ckpt_path, device):
             dead_threshold_tokens=meta.get("dead_threshold_tokens", 10_000_000),
             auxk_alpha=meta.get("auxk_alpha", 1.0 / 32.0),
         ).to(device)
-    elif arch in ("txcdr_t2", "txcdr_t3", "txcdr_t5",
-                  "txcdr_t6", "txcdr_t7", "txcdr_t8",
+    elif arch in ("txcdr_t2", "txcdr_t3", "txcdr_t4", "txcdr_t5",
+                  "txcdr_t6", "txcdr_t7", "txcdr_t8", "txcdr_t9",
                   "txcdr_t10", "txcdr_t15", "txcdr_t20", "txcdr_t30",
                   "txcdr_t24", "txcdr_t28", "txcdr_t32", "txcdr_t36"):
         T = meta["T"]

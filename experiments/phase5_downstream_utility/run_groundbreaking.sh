@@ -73,13 +73,26 @@ wait_for_gpu_idle() {
 echo "================ P0a H8 T-sweep ================"
 wait_for_gpu_idle
 train_and_probe_both phase57_partB_h8_bare_multidistance_t10 42
-# Granular fill-in between T=5 (existing) and T=10 — cheap, paper-relevant.
+# Granular fill-in T=3..10 — paper-relevant for the mp T-sweep curve.
+# H8 (best TXC) at all T values 3..10 to pinpoint the mp peak.
+train_and_probe_both phase57_partB_h8_bare_multidistance_t3 42
+train_and_probe_both phase57_partB_h8_bare_multidistance_t4 42
 train_and_probe_both phase57_partB_h8_bare_multidistance_t6 42
 train_and_probe_both phase57_partB_h8_bare_multidistance_t7 42
 train_and_probe_both phase57_partB_h8_bare_multidistance_t8 42
+train_and_probe_both phase57_partB_h8_bare_multidistance_t9 42
 train_and_probe_both phase57_partB_h8_bare_multidistance_t15 42
 train_and_probe_both phase57_partB_h8_bare_multidistance_t20 42
 train_and_probe_both phase57_partB_h8_bare_multidistance_t30 42
+
+# Barebones (vanilla) TXCDR T-sweep at T={3,4,5,6,7,8,9,10}:
+# T=3, 5, 6, 7, 8, 10 already trained from prior sessions; just need T=4, T=9.
+# train_and_probe_both will SKIP train if ckpt exists (so the existing T's
+# only re-probe).
+echo "================ P0a-extra: vanilla TXCDR fill-in T=4, T=9 ================"
+for T in 4 9; do
+    train_and_probe_both "txcdr_t${T}" 42
+done
 
 # === P0b: shift-ablation at T=5 ===
 # Now extended with LONG-RANGE shifts to chase the user's hypothesis:
