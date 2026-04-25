@@ -43,6 +43,7 @@ PRIMARY = {
     "mlc":                         ("MLC baseline",               "#74c476", "<", (10, -14)),
     "mlc_contrastive_alpha100":    ("MLC contrastive α=1",        "#238b45", ">", (-55, -10)),
     "agentic_mlc_08_batchtopk":    ("MLC (+BatchTopK)",           "#41ab5d", "H", (10, 6)),
+    "phase57_partB_h8_bare_multidistance": ("H8 (multidistance)",  "#fd8d3c", "X", (10, 6)),
 }
 
 SECONDARY = {

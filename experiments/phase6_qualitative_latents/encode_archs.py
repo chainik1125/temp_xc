@@ -233,6 +233,21 @@ def load_arch(arch: str, device: torch.device, seed: int = 42) -> torch.nn.Modul
             dead_threshold_tokens=int(meta.get("dead_threshold_tokens", 10_000_000)),
             auxk_alpha=float(meta.get("auxk_alpha", 1.0 / 32.0)),
         ).to(device)
+    elif arch == "phase57_partB_h8_bare_multidistance":
+        from src.architectures.txc_bare_multidistance_contrastive_antidead import (
+            TXCBareMultiDistanceContrastiveAntidead,
+        )
+        T = meta["T"]
+        k_eff = meta["k_win"] or (meta["k_pos"] * T)
+        model = TXCBareMultiDistanceContrastiveAntidead(
+            D_IN, D_SAE, T, k_eff,
+            shifts=tuple(meta.get("shifts", (1, 2))),
+            matryoshka_h_size=meta.get("matryoshka_h_size"),
+            alpha=meta.get("alpha", 1.0),
+            aux_k=int(meta.get("aux_k", 512)),
+            dead_threshold_tokens=int(meta.get("dead_threshold_tokens", 10_000_000)),
+            auxk_alpha=float(meta.get("auxk_alpha", 1.0 / 32.0)),
+        ).to(device)
     elif arch == "agentic_mlc_08":
         from src.architectures.mlc_contrastive_multiscale import (
             MLCContrastiveMultiscale,
@@ -435,7 +450,8 @@ def encode_concat_AB(concat, concat_name: str, archs: list[str], device,
                     "phase63_track2_t20",
                     "txcdr_t2", "txcdr_t3", "txcdr_t5", "txcdr_t6",
                     "txcdr_t7", "txcdr_t8", "txcdr_t10", "txcdr_t15",
-                    "txcdr_t20"):
+                    "txcdr_t20",
+                    "phase57_partB_h8_bare_multidistance"):
             z = encode_txc(model, resid_L13, device, T=meta["T"])
         elif arch in ("agentic_mlc_08", "agentic_mlc_08_batchtopk"):
             z = encode_mlc(model, stack, device)

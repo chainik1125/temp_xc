@@ -470,6 +470,21 @@ def _load_model_for_run(run_id, ckpt_path, device):
             dead_threshold_tokens=int(meta.get("dead_threshold_tokens", 10_000_000)),
             auxk_alpha=float(meta.get("auxk_alpha", 1.0 / 32.0)),
         ).to(device)
+    elif arch == "phase57_partB_h8_bare_multidistance":
+        from src.architectures.txc_bare_multidistance_contrastive_antidead import (
+            TXCBareMultiDistanceContrastiveAntidead,
+        )
+        T = meta["T"]
+        k_eff = meta["k_win"] or (meta["k_pos"] * T)
+        model = TXCBareMultiDistanceContrastiveAntidead(
+            d_in, d_sae, T, k_eff,
+            shifts=tuple(meta.get("shifts", (1, 2))),
+            matryoshka_h_size=meta.get("matryoshka_h_size"),
+            alpha=float(meta.get("alpha", 1.0)),
+            aux_k=int(meta.get("aux_k", 512)),
+            dead_threshold_tokens=int(meta.get("dead_threshold_tokens", 10_000_000)),
+            auxk_alpha=float(meta.get("auxk_alpha", 1.0 / 32.0)),
+        ).to(device)
     elif arch == "tsae_paper":
         from src.architectures.tsae_paper import TemporalMatryoshkaBatchTopKSAE
         group_sizes = meta.get("group_sizes")
@@ -762,7 +777,8 @@ def _encode_for_probe(
                 "phase62_c6_bare_batchtopk_longer",
                 "phase63_track2_t3",
                 "phase63_track2_t10",
-                "phase63_track2_t20"):
+                "phase63_track2_t20",
+                "phase57_partB_h8_bare_multidistance"):
         T = meta["T"]
         return _encode_matryoshka(model, anchor, li, T, device, aggregation)
     if arch == "mlc_temporal_t3":
