@@ -155,8 +155,9 @@ All figures have `.thumb.png` siblings (≤48 dpi, agent-readable).
 
 | phase | doc | status |
 |---|---|---|
+| **★ Phase 6 final summary** | [research_logs/phase6_qualitative_latents/2026-04-25-final-summary.md](research_logs/phase6_qualitative_latents/2026-04-25-final-summary.md) | **canonical** — embeds 3 Pareto plots + qual-metric explanations |
 | Phase 5 | [research_logs/phase5_downstream_utility/summary.md](research_logs/phase5_downstream_utility/summary.md) | complete |
-| Phase 6 (qualitative baseline) | [research_logs/phase6_qualitative_latents/summary.md](research_logs/phase6_qualitative_latents/summary.md) §1-§9 | complete |
+| Phase 6 (qualitative baseline) | [research_logs/phase6_qualitative_latents/summary.md](research_logs/phase6_qualitative_latents/summary.md) §1-§9 | complete (long-form history) |
 | Phase 6.1 (rigorous metric + agentic cycles) | [research_logs/phase6_qualitative_latents/summary.md](research_logs/phase6_qualitative_latents/summary.md) §9.5 | complete |
 | Phase 6.1 handover (pre-Phase-6.2) | [research_logs/phase6_qualitative_latents/2026-04-23-handover-post-compact.md](research_logs/phase6_qualitative_latents/2026-04-23-handover-post-compact.md) | complete |
 | Phase 6.2 autoresearch | [research_logs/phase6_2_autoresearch/summary.md](research_logs/phase6_2_autoresearch/summary.md) | complete |
