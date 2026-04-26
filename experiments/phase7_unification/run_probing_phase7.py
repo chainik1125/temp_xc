@@ -466,7 +466,9 @@ def run_probing(run_ids: list[str] | None = None,
                         f"auc@5={sae_probe_metrics(Z_tr, ytr_v, Z_te, yte_v, 5)[0]:.4f} "
                         f"n_kept={Z_tr.shape[0]}/{ytr.size}"
                     )
-                del tc; gc.collect()
+                del tc
+                torch.cuda.empty_cache()  # avoid GPU fragmentation across tasks
+                gc.collect()
             del model
             torch.cuda.empty_cache(); gc.collect()
 
