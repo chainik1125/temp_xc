@@ -23,7 +23,16 @@ Each agent runs on its own RunPod with persistent volume.
 | GPU | NVIDIA **H200**, 141 GB HBM3e | NVIDIA **H100**, 80 GB HBM3 |
 | vCPUs | **12** | 8 |
 | System RAM | **188 GB** | 125 GB |
-| Persistent volume | **1 TB** at /workspace | **1 TB** at /workspace |
+| Persistent volume | **2 TB** at /workspace | **1 TB** at /workspace |
+
+> Agent A's 2 TB volume (bumped from the original 1 TB plan) is sized
+> for: 140 GB activation cache (fp32, 5-layer × 24K seq × 128 tok) +
+> 488 GB probe cache (S=128 anchor + S=128 mlc_tail) + 250 GB local
+> ckpts (147 trainings × ~1.7 GB; kept on disk for fast probing
+> access — no HF round-trip during the probing pass) + ~45 GB HF
+> cache, venv, misc. Total ~923 GB, leaves ~50% margin for retries
+> and scratch space. The earlier 1 TB plan required a HF-push-then-
+> delete dance on each ckpt to fit; 2 TB drops that complexity.
 
 ### How Agent A should leverage the H200 pod
 

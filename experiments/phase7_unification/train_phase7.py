@@ -624,15 +624,19 @@ def _meta_from_arch(arch: dict, seed: int) -> dict:
 
 
 def _hf_push_ckpt(ckpt_path: Path, run_id: str,
-                   delete_local_after: bool = True) -> bool:
+                   delete_local_after: bool = False) -> bool:
     """Idempotent per-ckpt push to HF txcdr-base. Returns True if HF push
-    succeeded. If `delete_local_after` is True AND the push succeeded, the
-    local ckpt is removed to keep disk under the 1 TB RunPod quota
-    (147 ckpts × ~1.7 GB = ~250 GB; deleting after push cuts the local
-    high-water mark substantially).
+    succeeded. If `delete_local_after` is True AND the push succeeded,
+    the local ckpt is removed.
 
-    Training logs are kept locally — they're tiny (KB) and useful for
-    quick analysis without HF round-trips.
+    Default is False (keep local) since Agent A's pod has 2 TB volume —
+    all 147 ckpts (~250 GB total) fit comfortably and keeping them
+    on disk avoids HF re-download during the probing pass. Flip the
+    flag to True if running on the legacy 1 TB volume where the
+    HF-then-delete dance is needed to fit.
+
+    Training logs are kept locally regardless — they're tiny (KB) and
+    useful for quick analysis without HF round-trips.
     """
     pushed = False
     try:
