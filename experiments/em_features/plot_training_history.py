@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -18,9 +19,39 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 
+# Parses lines like:
+#   [sae] step    500/10000  loss=3245.8130  L0=128.00  dead=26128/32768 (79.7%) ...
+#   [brickenauxk] step    500/10000  loss=2381.7  auxk=2381.76  dead=22920/32768 (69.9%) ...
+#   [han_champ] step    500/10000  loss=12500  auxk=1.02  dead=25783/32768 (78.7%) ...
+LOG_LINE_RE = re.compile(
+    r"\[(?P<tag>[^\]]+)\]\s+step\s+(?P<step>\d+)/\d+\s+loss=(?P<loss>[-\d.eE]+).*?dead=(?P<n_dead>\d+)/(?P<n_feat>\d+)"
+)
+
+
+def parse_log_file(path: Path) -> tuple[str, list[dict]]:
+    """Returns (run_name, history) extracted from a training log."""
+    history: list[dict] = []
+    tag = None
+    for line in path.read_text(errors="ignore").splitlines():
+        m = LOG_LINE_RE.search(line)
+        if not m:
+            continue
+        tag = m.group("tag")
+        history.append({
+            "step": int(m.group("step")),
+            "loss": float(m.group("loss")),
+            "n_dead": int(m.group("n_dead")),
+            "n_features": int(m.group("n_feat")),
+        })
+    return (tag or path.stem), history
+
+
 def parse_args():
     p = argparse.ArgumentParser()
-    p.add_argument("--metas", type=Path, nargs="+", required=True)
+    p.add_argument("--metas", type=Path, nargs="*", default=[],
+                   help="*_training.meta.json files (preferred — full history)")
+    p.add_argument("--logs", type=Path, nargs="*", default=[],
+                   help="Training log files to parse — fallback for in-progress runs")
     p.add_argument("--out", type=Path, required=True)
     return p.parse_args()
 
@@ -38,16 +69,26 @@ def main():
         except Exception as e:
             print(f"skip {path}: {e}", file=sys.stderr)
             continue
-        # Accept training-meta and (legacy) sae loss_history shapes.
         history = d.get("history") or d.get("loss_history") or []
         if not history:
             continue
-        # name: stem minus "_training"
         name = path.stem.replace("_training", "")
         metas.append((name, history))
 
+    seen_names = {n for n, _ in metas}
+    for path in args.logs:
+        if not path.exists():
+            continue
+        name, history = parse_log_file(path)
+        if not history:
+            continue
+        # Disambiguate by appending log stem if a meta with the same tag already exists
+        if name in seen_names:
+            name = f"{name}@{path.stem}"
+        metas.append((name, history))
+
     if not metas:
-        print("no metas with history; nothing to plot", file=sys.stderr)
+        print("no metas/logs with history; nothing to plot", file=sys.stderr)
         return
 
     fig, axes = plt.subplots(2, 1, figsize=(10, 8), sharex=True)
