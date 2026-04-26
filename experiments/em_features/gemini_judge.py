@@ -4,7 +4,7 @@ gpt-4o-mini RPD limit. Returns ``None`` for failed judgments so the caller
 can filter (rather than substituting 50.0 like the OpenAI version, which
 silently biases means when the judge errors).
 
-Default model: ``gemini-3-flash-preview`` (fastest 3-class flash).
+Default model: ``gemini-3.1-flash-lite-preview`` (fastest 3-class flash).
 """
 
 from __future__ import annotations
@@ -102,7 +102,7 @@ async def _judge_one(
 
 async def evaluate_generations_with_gemini(
     generations: list[dict], *,
-    model_name: str = "gemini-3-flash-preview",
+    model_name: str = "gemini-3.1-flash-lite-preview",
     max_concurrent: int = 16,
 ) -> tuple[list[Optional[float]], list[Optional[float]]]:
     """Async judge for a batch of generations using Gemini.

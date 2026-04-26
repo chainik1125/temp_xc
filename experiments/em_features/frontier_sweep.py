@@ -82,8 +82,8 @@ def parse_args():
     p.add_argument("--device", default="cuda")
     p.add_argument("--judge", choices=["openai", "gemini"], default="gemini",
                    help="Which judge backend to use (default: gemini, bypasses gpt-4o-mini RPD)")
-    p.add_argument("--judge_model", default="gemini-3-flash-preview",
-                   help="Judge model name (gemini-3-flash-preview, gemini-3.1-pro-preview, etc.)")
+    p.add_argument("--judge_model", default="gemini-3.1-flash-lite-preview",
+                   help="Judge model name (gemini-3.1-flash-lite-preview, gemini-3.1-pro-preview, etc.)")
     p.add_argument("--debug", action="store_true")
     return p.parse_args()
 
