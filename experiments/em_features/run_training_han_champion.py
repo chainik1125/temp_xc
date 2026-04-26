@@ -15,10 +15,12 @@ from __future__ import annotations
 
 import argparse
 import json
+import random
 import sys
 import time
 from pathlib import Path
 
+import numpy as np
 import torch
 import torch.nn as nn
 import yaml
@@ -143,6 +145,14 @@ def main():
             print(f"  resumed from {args.resume_from} at step {start_step} (Adam state restored)", flush=True)
         else:
             print(f"  resumed from {args.resume_from} at step {start_step} (Adam fresh — no optimizer_state in ckpt)", flush=True)
+        if "rng_state" in rckpt:
+            rs = rckpt["rng_state"]
+            torch.set_rng_state(rs["cpu"].cpu() if hasattr(rs["cpu"], "cpu") else rs["cpu"])
+            if torch.cuda.is_available():
+                torch.cuda.set_rng_state_all([s.cpu() if hasattr(s, "cpu") else s for s in rs["cuda"]])
+            random.setstate(rs["python"])
+            np.random.set_state(rs["numpy"])
+            print("  RNG states restored", flush=True)
 
     snapshots = sorted(set(args.snapshot_at))
     if snapshots[-1] != args.total_steps:
@@ -198,6 +208,12 @@ def main():
             ckpt = {
                 "state_dict": model.state_dict(),
                 "optimizer_state": opt.state_dict(),
+                "rng_state": {
+                    "cpu": torch.get_rng_state(),
+                    "cuda": torch.cuda.get_rng_state_all() if torch.cuda.is_available() else [],
+                    "python": random.getstate(),
+                    "numpy": np.random.get_state(),
+                },
                 "config": {
                     "d_in": d_model, "d_sae": args.d_sae, "T": args.T,
                     "k": args.k, "aux_k": args.aux_k,
