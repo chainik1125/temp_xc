@@ -32,6 +32,7 @@ from experiments.em_features.streaming_buffer import (  # noqa: E402
     mixed_text_iter,
     VALID_HOOKPOINTS,
 )
+from experiments.em_features.hf_upload import upload_if_enabled  # noqa: E402
 
 
 def parse_args():
@@ -52,6 +53,8 @@ def parse_args():
     p.add_argument("--lr", type=float, default=None, help="Override config")
     p.add_argument("--device", type=str, default="cuda")
     p.add_argument("--log_every", type=int, default=500)
+    p.add_argument("--resume_from", type=Path, default=None,
+                   help="Resume from a snapshot ckpt (loads state_dict + start_step from config['steps_trained']). Adam resets.")
     args = p.parse_args()
     if not args.out and not args.out_prefix:
         p.error("must pass --out (single output) or --out_prefix (snapshot mode)")
@@ -115,6 +118,13 @@ def main():
         k=k,
     ).to(args.device)
 
+    start_step = 0
+    if args.resume_from is not None and args.resume_from.exists():
+        rckpt = torch.load(args.resume_from, map_location=args.device, weights_only=False)
+        sae.load_state_dict(rckpt["state_dict"])
+        start_step = int(rckpt["config"].get("steps_trained", 0))
+        print(f"  resumed from {args.resume_from} at step {start_step} (Adam reset)", flush=True)
+
     optim = torch.optim.Adam(sae.parameters(), lr=lr)
 
     loss_history: list[float] = []
@@ -122,6 +132,8 @@ def main():
     best = float("inf")
     train_t0 = time.time()
     next_snap_idx = 0
+    while next_snap_idx < len(snapshots) and snapshots[next_snap_idx] <= start_step:
+        next_snap_idx += 1
 
     def write_ckpt(path: Path, step_done: int) -> None:
         ckpt = {
@@ -144,8 +156,9 @@ def main():
         with path.with_suffix(".meta.json").open("w") as f:
             json.dump({kk: vv for kk, vv in ckpt.items() if kk != "state_dict"}, f, indent=2)
         print(f"Saved {path}  (step {step_done}, best loss={best:.6f})", flush=True)
+        upload_if_enabled(path, category="sae")
 
-    for step in range(n_steps):
+    for step in range(start_step, n_steps):
         x = buffer.sample_flat(batch_size).float()
         x_hat, z = sae(x)
         loss = (x - x_hat).pow(2).sum(dim=-1).mean()

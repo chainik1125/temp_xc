@@ -62,6 +62,8 @@ def parse_args():
     p.add_argument("--auxk_ema_decay", type=float, default=0.99)
     p.add_argument("--log_every", type=int, default=500)
     p.add_argument("--device", default="cuda")
+    p.add_argument("--resume_from", type=Path, default=None,
+                   help="Resume from a snapshot ckpt (loads state_dict + start_step from config['steps_trained']). Adam resets.")
     return p.parse_args()
 
 
@@ -102,9 +104,16 @@ def main():
         d_in=d_model, d_sae=args.d_sae, T=args.T, k_total=args.k_total,
     ).to(args.device)
 
-    # Geom-median b_dec init (the one uncontroversial win from han's stack).
-    init_b_dec_geometric_median(txc, sample_fn, n=8192)
-    print("b_dec geom-median initialized", flush=True)
+    start_step = 0
+    if args.resume_from is not None and args.resume_from.exists():
+        rckpt = torch.load(args.resume_from, map_location=args.device, weights_only=False)
+        txc.load_state_dict(rckpt["state_dict"])
+        start_step = int(rckpt["config"].get("steps_trained", 0))
+        print(f"  resumed from {args.resume_from} at step {start_step} (Adam reset, skipping b_dec init)", flush=True)
+    else:
+        # Geom-median b_dec init (the one uncontroversial win from han's stack).
+        init_b_dec_geometric_median(txc, sample_fn, n=8192)
+        print("b_dec geom-median initialized", flush=True)
 
     opt = torch.optim.Adam(txc.parameters(), lr=args.lr, betas=(0.9, 0.999))
 
@@ -124,8 +133,10 @@ def main():
     best_loss = float("inf")
     train_t0 = time.time()
     next_snap_idx = 0
+    while next_snap_idx < len(snapshots) and snapshots[next_snap_idx] <= start_step:
+        next_snap_idx += 1
 
-    for step in range(args.total_steps):
+    for step in range(start_step, args.total_steps):
         x = sample_fn(args.batch_size)
 
         # Forward (live) + main recon loss.

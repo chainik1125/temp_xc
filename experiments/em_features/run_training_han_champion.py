@@ -59,6 +59,8 @@ def parse_args():
     p.add_argument("--batch_size", type=int, default=256)
     p.add_argument("--log_every", type=int, default=500)
     p.add_argument("--device", default="cuda")
+    p.add_argument("--resume_from", type=Path, default=None,
+                   help="Resume from a snapshot ckpt (loads state_dict + start_step). Adam resets.")
     return p.parse_args()
 
 
@@ -123,8 +125,15 @@ def main():
         dead_threshold_tokens=args.dead_threshold_tokens,
         auxk_alpha=args.auxk_alpha,
     ).to(args.device)
-    x0 = sample_fn(args.batch_size)
-    model.init_b_dec_geometric_median(x0)
+    start_step = 0
+    if args.resume_from is not None and args.resume_from.exists():
+        rckpt = torch.load(args.resume_from, map_location=args.device, weights_only=False)
+        model.load_state_dict(rckpt["state_dict"])
+        start_step = int(rckpt["config"].get("steps_trained", 0))
+        print(f"  resumed from {args.resume_from} at step {start_step} (Adam reset, skipping b_dec init)", flush=True)
+    else:
+        x0 = sample_fn(args.batch_size)
+        model.init_b_dec_geometric_median(x0)
     print(f"H8 champion: shifts={args.shifts}  h_size={matryoshka_h_size}  α_c={args.alpha_contrastive}", flush=True)
 
     opt = torch.optim.Adam(model.parameters(), lr=args.lr)
@@ -137,8 +146,10 @@ def main():
     best_loss = float("inf")
     train_t0 = time.time()
     next_snap_idx = 0
+    while next_snap_idx < len(snapshots) and snapshots[next_snap_idx] <= start_step:
+        next_snap_idx += 1
 
-    for step in range(args.total_steps):
+    for step in range(start_step, args.total_steps):
         x_train = pair_sample_fn(args.batch_size)
         loss, x_hat, z = model(x_train)
 
