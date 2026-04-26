@@ -41,7 +41,37 @@ Rationale: avoids force-push collisions with Agent A on
 `han-phase7-unification`. Merges back via PR after seed=1 batch
 completes (or when needed for case-study integration).
 
-### Run command
+### Prerequisite: build the activation cache locally
+
+Agent A has the gemma-2-2b base activation cache (140 GB) on its
+own pod but **never pushed to HF**. Agent C builds locally — fastest
+path (~15 min on H100 via the canonical multi-layer-single-forward
+builder; pulling from HF would have been ~1.75 hr round-trip).
+
+```bash
+# Rebuild cache (140 GB, ~15 min on H100). Multi-layer single-forward via
+# captured hooks; produces resid_L10..L14.npy in one pass.
+HF_HOME=/workspace/hf_cache TQDM_DISABLE=1 \
+  /workspace/temp_xc/.venv/bin/python -u \
+    -m src.data.nlp.cache_activations \
+    --model gemma-2-2b --dataset fineweb --mode forward \
+    --num-sequences 24000 --seq-length 128 \
+    --layer_indices 10 11 12 13 14 --components resid \
+    --output_dir /workspace/temp_xc/data/cached_activations/gemma-2-2b/fineweb
+```
+
+Verify after build:
+```bash
+ls -la /workspace/temp_xc/data/cached_activations/gemma-2-2b/fineweb/
+# Expect: 5 × resid_L1{0,1,2,3,4}.npy + 1 × token_ids.npy + layer_specs.json
+# Each .npy ≈ 28 GB (24K × 128 × 2304 × fp32, the canonical builder's default)
+```
+
+If you want to verify the cache matches Agent A's, compare hashes
+of `token_ids.npy` (small, ~24 MB) — should be identical (same
+tokenizer + same FineWeb subset + same seed).
+
+### Run command (after cache build)
 
 ```bash
 HF_HOME=/workspace/hf_cache TQDM_DISABLE=1 PHASE7_REPO=/workspace/temp_xc \
