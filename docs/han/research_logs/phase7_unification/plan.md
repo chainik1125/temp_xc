@@ -101,6 +101,91 @@ Each agent runs on its own RunPod with persistent volume.
    HF in a background thread. Hides the ~1-2 minute HF download
    behind the ~5-10 minute Haiku scoring.
 
+### Phase 7 results layout — keeping the index clean
+
+The pre-Phase-7 branches each maintained their own
+`results/training_index.jsonl` and `probing_results.jsonl` in their
+phase-specific directories. After the prior-phase merge,
+`han-phase7-unification` now carries forward all of these as
+**read-only historical references**:
+
+| path | belongs to | Phase 7 access |
+|---|---|---|
+| `experiments/phase5_downstream_utility/results/training_index.jsonl` | Phase 5 | read-only |
+| `experiments/phase5_downstream_utility/results/probing_results.jsonl` | Phase 5 | read-only |
+| `experiments/phase5b_t_scaling_explore/results/training_index.jsonl` | Phase 5B | read-only |
+| `experiments/phase5b_t_scaling_explore/results/probing_results.jsonl` | Phase 5B | read-only |
+| `experiments/phase6_2_autoresearch/results/phase62_results.jsonl` | Phase 6.2 | read-only |
+| `experiments/phase6_qualitative_latents/results/...` | Phase 6.1, 6.3 | read-only |
+
+**Phase 7 writes ONLY to** `experiments/phase7_unification/results/`,
+which Agent A creates fresh:
+
+```
+experiments/phase7_unification/results/
+├── ckpts/                          # gitignored, sync to HF txcdr-base
+├── training_logs/                  # per-ckpt JSON logs
+├── training_index.jsonl            # one row per (arch_id, seed) trained
+├── probing_results.jsonl           # one row per (run_id, task, agg, k_feat, S)
+├── t_sweep_results.jsonl           # one row per T-sweep cell with alive_fraction etc.
+├── probe_cache/                    # rebuilt cache, sync to HF txcdr-base-data
+├── plots/                          # phase7_*.png
+└── autointerp/                     # Agent B's outputs
+    └── <run_id>/
+        ├── concat_A_labels.json
+        ├── concat_B_labels.json
+        ├── concat_random_labels.json
+        └── cumulative_semantic.json
+```
+
+**Path-discipline mechanism — `_paths.py`**: Agent A creates
+`experiments/phase7_unification/_paths.py` mirroring Phase 5B's
+pattern. All Phase 7 drivers (train + probe + analyzer) import path
+constants from `_paths.py`; **no bare-string paths anywhere**. This
+prevents fork-drift from Phase 5's `train_primary_archs.py` /
+`run_probing.py` accidentally writing to Phase 5 dirs:
+
+```python
+# experiments/phase7_unification/_paths.py — Phase 7 canonical paths
+from pathlib import Path
+import os
+
+REPO = Path(os.environ.get("PHASE7_REPO", os.getcwd())).resolve()
+ANCHOR_LAYER = 12                      # 0-indexed
+MLC_LAYERS = (10, 11, 12, 13, 14)
+CACHE_DIR  = REPO / "data/cached_activations/gemma-2-2b/fineweb"
+OUT_DIR        = REPO / "experiments/phase7_unification/results"
+CKPT_DIR       = OUT_DIR / "ckpts"
+LOGS_DIR       = OUT_DIR / "training_logs"
+INDEX_PATH     = OUT_DIR / "training_index.jsonl"
+PROBING_PATH   = OUT_DIR / "probing_results.jsonl"
+T_SWEEP_PATH   = OUT_DIR / "t_sweep_results.jsonl"
+PROBE_CACHE    = OUT_DIR / "probe_cache"
+PLOTS_DIR      = OUT_DIR / "plots"
+AUTOINTERP_DIR = OUT_DIR / "autointerp"
+# Pre-Phase-7 results — READ-ONLY references; don't write here
+PHASE5_RESULTS  = REPO / "experiments/phase5_downstream_utility/results"
+PHASE5B_RESULTS = REPO / "experiments/phase5b_t_scaling_explore/results"
+PHASE6_RESULTS  = REPO / "experiments/phase6_qualitative_latents/results"
+```
+
+**Startup banner**: every Phase 7 driver should print on entry:
+```
+Phase 7 driver — writing to:
+  experiments/phase7_unification/results/training_index.jsonl
+  experiments/phase7_unification/results/probing_results.jsonl
+```
+so any misconfigured path is immediately visible. Mismatched paths
+are an error, not a silent corruption.
+
+**Analyzer convention**: Agent A's headline-leaderboard analyzer
+loads ONLY `experiments/phase7_unification/results/probing_results.jsonl`.
+It does NOT glob across `experiments/*/results/probing_results.jsonl`
+— that would mix in Phase 5 / 5B IT-trained results. If a
+cross-phase comparison is needed (e.g. "did Phase 7's TXCDR T=5
+match Phase 5's at the same arch?"), that's a separate ad-hoc
+analysis explicitly named, not the headline.
+
 ### Hugging Face repository layout
 
 Phase 7 uses **two new HF repos** to avoid any collision with the
