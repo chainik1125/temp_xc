@@ -145,13 +145,17 @@ def get_directions(args, layer: int, device: str) -> torch.Tensor:
 
 
 def bundle(directions: torch.Tensor, ids: list[int]) -> torch.Tensor:
-    """Sum the rows for given feature ids; return as (d_in,) float on same device."""
+    """Sum the rows for given feature ids; return as (d_in,) float on same device.
+
+    NOTE: do NOT unit-normalize here. ``generate_longform_completions``
+    internally renormalizes (``normalized_direction = steering_direction /
+    (norm + 1e-6)`` then passes ``coefficients=magnitude``), so passing a
+    pre-normalized vector silently scales α by 1/(sum-norm) — for k=10
+    unit-norm decoder rows the sum has norm ≈ √10, so unit-norming
+    weakens steering ~3× at the same α value.
+    """
     rows = directions[ids]  # (k, d_in)
-    bundled = rows.sum(dim=0)
-    bundled = bundled.float()
-    n = bundled.norm()
-    if n > 0:
-        bundled = bundled / n  # unit norm — magnitude in generate_longform_completions multiplies by direction.norm()
+    bundled = rows.sum(dim=0).float()
     return bundled
 
 
