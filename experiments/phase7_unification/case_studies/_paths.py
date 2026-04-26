@@ -22,12 +22,16 @@ HH_RLHF_DIR = CASE_STUDIES_DIR / "hh_rlhf"
 STEERING_DIR = CASE_STUDIES_DIR / "steering"
 
 # ────────────────────────────── selected archs for Agent C (staged)
-# Stage 1 (framework debug, 3 archs): conceptually distinct designs to
-# expose family-dependent bugs early.
+# Stage 1 (framework debug, 4 archs): conceptually distinct designs to
+# expose family-dependent bugs early. tsae_paper at BOTH k=500 (our
+# k_win convention, apples-to-apples with TXC) AND k=20 (paper-faithful
+# Ye et al. 2025 baseline) — the dual reading lets us decouple "is the
+# T-SAE recipe better?" from "is k=20 simply too sparse?".
 STAGE_1_ARCHS = (
     "topk_sae",                                              # row 1: per-token SAE baseline
-    "tsae_paper_k500",                                       # row 2: T-SAE direct comparison
-    "agentic_txc_02",                                        # row 8: TXC representative
+    "tsae_paper_k500",                                       # row 2: T-SAE port at k_win=500
+    "tsae_paper_k20",                                        # row 3: T-SAE paper-faithful (k=20)
+    "agentic_txc_02",                                        # row 8: TXC representative (T=5, multi-scale matryoshka)
 )
 # Stage 2 (expansion, after Stage 1 framework is locked): add 3 more.
 STAGE_2_EXTRA_ARCHS = (
@@ -37,15 +41,21 @@ STAGE_2_EXTRA_ARCHS = (
 )
 SELECTED_ARCHS_FOR_CASE_STUDIES = STAGE_1_ARCHS + STAGE_2_EXTRA_ARCHS
 
-# ────────────────────────────── case-study datasets
+# ────────────────────────────── HH-RLHF dataset (paper §4.5 + App B.1)
+# Paper analyses the harmless split only (its t-test reports rejected
+# ≈ 49.2 tok vs chosen ≈ 37.8 tok mean response length, p=9e-10).
 HH_RLHF_HF_PATH = "Anthropic/hh-rlhf"
+HH_RLHF_SPLIT_DIR = "harmless-base"
+HH_RLHF_N_SAMPLES = 1000                  # first 1000 per paper §B.1
+HH_RLHF_MAX_LENGTH = 256                  # tokens — covers ~99% of harmless-base examples
 HH_RLHF_CACHE_DIR = REPO / "data/cached_hh_rlhf"
 
-# ────────────────────────────── grader
+# ────────────────────────────── steering — AxBench-style additive
+# x_t' = x_t + strength * unit_norm(d_dec[feature])  applied at L12 hook.
+# Strengths follow agent_c_brief.md (decoder-direction multipliers, not
+# T-SAE paper's clamp-on-latent which uses absolute values 10..15000).
 ANTHROPIC_GRADER_MODEL = "claude-sonnet-4-6"
-# Number of features per arch to steer (AxBench convention).
-N_STEERING_FEATURES = 30
-# Steering strengths to sweep per feature (from T-SAE paper Tab 2).
+N_STEERING_CONCEPTS = 30                  # paper averages over 30 features
 STEERING_STRENGTHS = (0.5, 1, 2, 4, 8, 12, 16, 24)
-# Tokens to generate per intervention.
 STEERING_GEN_TOKENS = 60
+STEERING_PROMPT = "We find"               # paper's neutral prompt
