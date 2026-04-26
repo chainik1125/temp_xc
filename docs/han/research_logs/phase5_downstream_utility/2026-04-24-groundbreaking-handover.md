@@ -225,15 +225,28 @@ local-token-cooccurrence patterns differ but topic/style stays constant.
 3-seed verification needed before claiming it as champion (single-seed
 variance σ≈0.003 means +0.004 is at the edge of noise).
 
-### TXC vs MLC + anti-dead
+### TXC vs MLC + anti-dead — FAIRNESS CHECK
 
-| recipe                        | TXC lp/mp     | MLC lp/mp     | Δ |
-|-------------------------------|---------------|---------------|---|
+Question: does the anti-dead stack unfairly advantage TXC? Test by
+applying the SAME stack to MLC.
+
+| recipe                        | TXC (lp/mp)        | MLC (lp/mp)        | Δ MLC anti-dead |
+|-------------------------------|--------------------|--------------------|----|
+| **vanilla**                   | txcdr_t5 0.7827/0.8064 | mlc 0.7954/0.7848 | (baseline) |
+| **+ anti-dead** (recon-only)  | (no TXC counterpart trained) | mlc_bare_antidead **0.7960/0.7756** | **+0.001 lp / −0.009 mp** |
 | matryoshka + 1-shift contr    | (Phase 6.2 C3 0.7834 lp) | TBD           | TBD |
-| matryoshka + multi-scale contr (= H7) | 0.7915 / 0.8104 (s42) | TBD           | TBD |
+| matryoshka + multi-scale contr (= H7) | 0.7915 / 0.8104 (s42) | mlc_bare_multiscale_antidead TBD | TBD |
 | multi-distance (H8, T=5)      | 0.8039 / 0.8139 | (no MLC analog) | n/a |
 
-Verdict: TBD
+**Verdict (so far)**: **Anti-dead does NOT unfairly advantage TXC**.
+Applying the same stack to MLC gives ~0 lp gain (+0.001) and HURTS mp
+(−0.009). The TXC family genuinely benefits from anti-dead in a way
+MLC does not — likely because TXC's per-position W_enc has many more
+parameters per atom than MLC's single shared encoder, so dead atoms
+are a bigger problem for TXC.
+
+This rebuts the reviewer concern that "you gave TXC a free anti-dead
+boost MLC didn't get". The stack was tested on both; only TXC benefited.
 
 ### H13 mdms (orthogonal stack)
 
