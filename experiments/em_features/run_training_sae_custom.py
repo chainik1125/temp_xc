@@ -68,6 +68,13 @@ def parse_args():
 def main():
     args = parse_args()
     cfg = yaml.safe_load(args.config.read_text())
+
+    # Determinism — required for chunked == continuous bit-exactness.
+    import os as _os
+    _os.environ.setdefault("CUBLAS_WORKSPACE_CONFIG", ":4096:8")
+    torch.use_deterministic_algorithms(True, warn_only=True)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
     if args.out is not None:
         args.out.parent.mkdir(parents=True, exist_ok=True)
     if args.out_prefix is not None:
@@ -153,6 +160,8 @@ def main():
         next_snap_idx += 1
 
     def write_ckpt(path: Path, step_done: int) -> None:
+        if torch.cuda.is_available():
+            torch.cuda.synchronize()
         ckpt = {
             "state_dict": sae.state_dict(),
             "optimizer_state": optim.state_dict(),

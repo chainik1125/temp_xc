@@ -71,6 +71,13 @@ def main():
     args.out_prefix.parent.mkdir(parents=True, exist_ok=True)
     cfg = yaml.safe_load(args.config.read_text())
 
+    # Determinism — required for chunked == continuous bit-exactness.
+    import os as _os
+    _os.environ.setdefault("CUBLAS_WORKSPACE_CONFIG", ":4096:8")
+    torch.use_deterministic_algorithms(True, warn_only=True)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+
     print(f"Loading {cfg['subject_model']}", flush=True)
     tok = AutoTokenizer.from_pretrained(cfg["subject_model"])
     if tok.pad_token is None:
@@ -205,6 +212,8 @@ def main():
         while next_snap_idx < len(snapshots) and current_step >= snapshots[next_snap_idx]:
             snap_step = snapshots[next_snap_idx]
             ckpt_path = args.out_prefix.with_name(f"{args.out_prefix.name}_step{snap_step}.pt")
+            if torch.cuda.is_available():
+                torch.cuda.synchronize()
             ckpt = {
                 "state_dict": model.state_dict(),
                 "optimizer_state": opt.state_dict(),
