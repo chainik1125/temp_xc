@@ -14,8 +14,8 @@ paper §4.5 protocol on Phase 7's `google/gemma-2-2b` base ckpts.
 
 ### Headline result — TXC Pareto-dominates AxBench-style steering
 
-[plot](../../../experiments/phase7_unification/results/case_studies/plots/phase7_steering_pareto.png)
-([thumb](../../../experiments/phase7_unification/results/case_studies/plots/phase7_steering_pareto.thumb.png))
+[plot](../../../../experiments/phase7_unification/results/case_studies/plots/phase7_steering_pareto.png)
+([thumb](../../../../experiments/phase7_unification/results/case_studies/plots/phase7_steering_pareto.thumb.png))
 
 | arch | mean (suc, coh) | best (suc, coh) | suc @ s=24 |
 |---|---|---|---|

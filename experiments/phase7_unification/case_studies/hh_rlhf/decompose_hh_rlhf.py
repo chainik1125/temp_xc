@@ -53,7 +53,9 @@ os.environ.setdefault("TQDM_DISABLE", "1")
 from experiments.phase7_unification._paths import (
     OUT_DIR, banner,
 )
-from experiments.phase7_unification.run_probing_phase7 import _load_phase7_model
+from experiments.phase7_unification.case_studies._arch_utils import (
+    load_phase7_model_safe as _load_phase7_model,
+)
 from experiments.phase7_unification.case_studies._paths import (
     HH_RLHF_CACHE_DIR, CASE_STUDIES_DIR, STAGE_1_ARCHS,
 )

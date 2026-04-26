@@ -1,5 +1,16 @@
 """Architecture-agnostic helpers for Agent C's case studies.
 
+Includes `load_phase7_model_safe`: a wrapper around
+`_load_phase7_model` that defends against meta-dict fields whose value
+is explicitly `None`, where the loader does
+`float(meta.get("alpha", 1.0))` — that returns `None` (not the default
+`1.0`) when `meta["alpha"] is None`, then `float(None)` crashes. Affects
+SubseqH8 and TXCBareMultiDistanceContrastiveAntidead branches at present.
+Per agent_c_brief.md DO-NOT list, Agent C must not edit
+run_probing_phase7.py directly; this wrapper coerces None → canonical
+default before delegating, which is functionally equivalent and contained.
+
+
 Both C.i (HH-RLHF dataset understanding) and C.ii (steering) need to
 do two things across heterogeneous arch families:
 
@@ -35,6 +46,37 @@ from __future__ import annotations
 from typing import Any
 
 import torch
+
+
+# ──────────────────────────────────────────────── safe-load wrapper ──
+
+
+_DEFAULTED_NONE_FIELDS = {
+    "alpha": 1.0,
+    "gamma": 0.5,
+    "n_scales": 3,
+}
+
+
+def load_phase7_model_safe(meta: dict, ckpt_path, device):
+    """Wrapper around `run_probing_phase7._load_phase7_model` that fills
+    in canonical defaults for meta-dict fields whose value is `None`.
+
+    The loader currently does `float(meta.get("alpha", 1.0))` which
+    returns `None` (not the default) when `meta["alpha"] is None`,
+    causing `float(None)` to crash. This bites archs whose meta is
+    serialised with explicit None for unused arch-recipe fields
+    (SubseqH8, H8 multi-distance row 32 onward).
+
+    We defensively replace None values with their canonical defaults
+    before delegating to the loader.
+    """
+    from experiments.phase7_unification.run_probing_phase7 import _load_phase7_model
+    fixed = dict(meta)
+    for key, default in _DEFAULTED_NONE_FIELDS.items():
+        if fixed.get(key) is None:
+            fixed[key] = default
+    return _load_phase7_model(fixed, ckpt_path, device)
 
 
 # ──────────────────────────────────────────── arch-class taxonomy ──

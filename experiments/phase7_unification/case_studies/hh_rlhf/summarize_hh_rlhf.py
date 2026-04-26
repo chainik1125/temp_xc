@@ -73,7 +73,10 @@ def make_scatter(arch_data_list: list[tuple[str, dict]], out_path: Path) -> None
     n = len(arch_data_list)
     cols = 2
     rows = (n + 1) // 2
-    fig, axs = plt.subplots(rows, cols, figsize=(13, 5.5 * rows + 0.6))
+    fig, axs = plt.subplots(
+        rows, cols, figsize=(13, 5.5 * rows + 0.6),
+        constrained_layout=True,                    # handles suptitle/panel spacing
+    )
     axs = np.atleast_2d(axs)
     for i, (arch_id, data) in enumerate(arch_data_list):
         ax = axs[i // cols, i % cols]
@@ -111,9 +114,9 @@ def make_scatter(arch_data_list: list[tuple[str, dict]], out_path: Path) -> None
         axs[j // cols, j % cols].axis("off")
     fig.suptitle(
         "HH-RLHF top-20 features: |diff| vs |length-Pearson r| per arch",
-        y=0.995, fontsize=13,
+        fontsize=13,
     )
-    fig.tight_layout(rect=[0, 0, 1, 0.96])
+    # constrained_layout handles spacing; no manual tight_layout needed.
     out_path.parent.mkdir(parents=True, exist_ok=True)
     save_figure(fig, str(out_path))
     plt.close(fig)
@@ -136,8 +139,11 @@ def make_summary_bar(arch_data_list: list[tuple[str, dict]], out_path: Path) -> 
 
     x = np.arange(len(archs))
     width = 0.6
-    fig, (ax_top, ax_bot) = plt.subplots(2, 1, figsize=(10, 7), sharex=True,
-                                          gridspec_kw={"height_ratios": [3, 2]})
+    fig, (ax_top, ax_bot) = plt.subplots(
+        2, 1, figsize=(11, 8), sharex=True,
+        gridspec_kw={"height_ratios": [3, 2]},
+        constrained_layout=True,
+    )
 
     ax_top.bar(x, sem_counts, width, label="semantic (|r|<0.2)",
                color=CATEGORY_COLOR["semantic"])
@@ -172,7 +178,6 @@ def make_summary_bar(arch_data_list: list[tuple[str, dict]], out_path: Path) -> 
     ax_bot.set_xticks(x)
     ax_bot.set_xticklabels([DISPLAY.get(a, a) for a in archs], fontsize=9)
 
-    fig.tight_layout()
     out_path.parent.mkdir(parents=True, exist_ok=True)
     save_figure(fig, str(out_path))
     plt.close(fig)
