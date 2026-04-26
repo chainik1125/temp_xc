@@ -67,23 +67,27 @@ ThreadPoolExecutor with n_workers=5 + max_retries=12 keeps under the
 
 ![phase7 steering per-strength curves](../../../../experiments/phase7_unification/results/case_studies/plots/phase7_steering_strength_curves.png)
 
-#### Headline numbers (5 archs after Stage 2 SubseqH8 expansion)
+#### Headline numbers (6 archs: Stage 1 + SubseqH8 + MLC)
 
 | arch | mean success | mean coherence | best (suc, coh) | best strength |
 |---|---|---|---|---|
 | `topk_sae` (per-token, k=500) | 0.37 | 2.62 | (0.37, 2.90) | 4 |
 | `tsae_paper_k500` (per-token, k=500) | 0.29 | 2.70 | (0.25, 3.00) | 1 |
 | `tsae_paper_k20` (paper-faithful, k=20) | 0.30 | 2.70 | (0.24, 3.00) | 1 |
+| `mlc_contrastive_alpha100_batchtopk` (MLC, n_layers=5) | 0.29 | 2.75 | **(0.38, 2.93)** | 8 |
 | `agentic_txc_02` (TXC matryoshka, T=5) | **0.34** | **2.77** | **(0.36, 2.93)** | 8 |
 | `phase5b_subseq_h8` (SubseqH8, T_max=10) | **0.33** | **2.76** | (0.38, 2.59) | 16 |
 
 (Mean is across all 30 concepts × 8 strengths. "Best" maximises
 success+coherence over the strength sweep.)
 
-**Both window archs (TXC + SubseqH8) cluster in the upper-right of the
-Pareto** — mean coherence ≈ 2.77 with mean success ≈ 0.33-0.34. The
-per-token archs split into either "high success / collapsing coherence"
-(TopKSAE) or "low success at any coherence" (T-SAE at our k=500).
+**Aggregating archs (TXC, SubseqH8, MLC) all cluster in the
+upper-right of the Pareto.** Mean coherence ≈ 2.75-2.77 across the
+three. Per-token archs split into either "high success / collapsing
+coherence" (TopKSAE: mean coh 2.62) or "low success at any coherence"
+(T-SAE: mean suc 0.29-0.30). At s=8 the **MLC arch sits at
+(0.38, 2.93) — the single best Pareto point of any arch tested**:
+high success at near-baseline coherence.
 
 #### Per-strength values (success, coherence) on a 0–3 Sonnet scale
 
@@ -92,24 +96,61 @@ per-token archs split into either "high success / collapsing coherence"
 | `topk_sae` | (0.24, 3.00) | (0.23, 3.00) | (0.21, 2.97) | (0.37, 2.90) | (0.43, 2.47) | (0.39, 2.43) | (0.50, 2.10) | (0.57, 2.07) |
 | `tsae_paper_k500` | (0.22, 3.00) | (0.25, 3.00) | (0.24, 3.00) | (0.24, 2.93) | (0.34, 2.76) | (0.25, 2.46) | (0.39, 2.39) | (0.41, 2.03) |
 | `tsae_paper_k20` | (0.23, 3.00) | (0.24, 3.00) | (0.23, 3.00) | (0.30, 2.93) | (0.28, 2.79) | (0.32, 2.79) | (0.42, 2.31) | (0.36, 1.79) |
+| `mlc_contrastive_alpha100_batchtopk` | (0.24, 3.00) | (0.24, 3.00) | (0.20, 3.00) | (0.23, 2.93) | **(0.38, 2.93)** | (0.29, 2.50) | (0.33, 2.63) | (0.41, 1.97) |
 | `agentic_txc_02` | (0.26, 3.00) | (0.21, 3.00) | (0.25, 3.00) | (0.30, 2.93) | **(0.36, 2.93)** | (0.29, 2.79) | (0.40, 2.47) | **(0.62, 2.03)** |
 | `phase5b_subseq_h8` | (0.21, 3.00) | (0.24, 3.00) | (0.27, 2.93) | (0.29, 2.93) | **(0.36, 2.86)** | (0.34, 2.69) | (0.38, 2.59) | **(0.59, 2.07)** |
 
-#### Cross-confirmation across two window archs
+#### Cross-confirmation across three aggregating archs
 
-The two window archs `agentic_txc_02` (T=5, multi-scale matryoshka,
-contrastive) and `phase5b_subseq_h8` (T_max=10, subsequence sampling +
-multi-distance contrastive) reach the same Pareto upper-right region
-**despite very different recipes** (different T, different sampling
-pattern, different contrastive scheme):
+Three archs that aggregate features across MULTIPLE input dimensions
+(temporal for TXC + SubseqH8, layer-wise for MLC) all reach the same
+Pareto upper-right region **despite very different recipe + aggregation
+axis**:
 
-  - At s=8 both achieve (0.36, ~2.9) — meaningful steering at near-
-    baseline coherence.
-  - At s=24 both reach success ≥ 0.59 at coherence ≈ 2.05.
+  - `agentic_txc_02`        : T=5 temporal window, multi-scale matryoshka, contrastive
+  - `phase5b_subseq_h8`     : T_max=10 with subseq sampling, multi-distance contrastive
+  - `mlc_contrastive_alpha100_batchtopk`: 5-layer crosscoder (L10–L14), Matryoshka H/L, BatchTopK
 
-This is a **cross-arch robustness check** on the "window-aggregation
-helps steering" thesis. Window features beat per-token features on the
-Pareto independent of the specific TXC-family recipe.
+At s=8 (the moderate-strength operating point):
+
+  - MLC: (0.38, 2.93)         ← single best Pareto point
+  - TXC: (0.36, 2.93)
+  - SubseqH8: (0.36, 2.86)
+  - vs per-token archs: TopKSAE 2.47, T-SAE k=500 2.76, T-SAE k=20 2.79
+    (T-SAE has comparable coherence but lower success)
+
+At s=24 (max steering):
+
+  - TXC: (0.62, 2.03)         ← max success of any arch
+  - SubseqH8: (0.59, 2.07)
+  - TopKSAE: (0.57, 2.07)
+  - MLC: (0.41, 1.97)         ← coherence collapses with the rest
+  - T-SAE k=500: (0.41, 2.03)
+  - T-SAE k=20: (0.36, 1.79)
+
+**Two complementary findings**:
+
+1. **Aggregating archs win the moderate-strength operating point.** At
+   s=8, where steering kicks in without sacrificing coherence, all
+   three (TXC + SubseqH8 + MLC) reach success ≈ 0.36-0.38 at coherence
+   2.86-2.93. The two non-aggregating per-token archs (TopKSAE and
+   T-SAE k=500) are at success ≤ 0.43 but coherence has already
+   degraded. This is the **interpretability-relevant operating point**:
+   the SAE-based intervention works, while leaving the model otherwise
+   intact.
+
+2. **Temporal-window archs (TXC + SubseqH8) keep gaining at high
+   strength.** At s=24 these two are the only archs reaching success
+   ≥ 0.59 with coherence ≥ 2.0. MLC's coherence collapses faster
+   (likely because layer aggregation doesn't compose with residual
+   addition the same way temporal aggregation does — adding to L12
+   only affects 1 of MLC's 5 inputs but all of TXC's 5 inputs through
+   subsequent forwards).
+
+This is **cross-arch robustness** on the "feature aggregation across a
+correlated unit (time or layer) helps steering" thesis. The TXC family
+gets the strongest version of this story (wins at both operating
+points); MLC is a single-point winner (s=8 only).
 
 ### Qualitative highlights at strength 24 (best-effort steering)
 

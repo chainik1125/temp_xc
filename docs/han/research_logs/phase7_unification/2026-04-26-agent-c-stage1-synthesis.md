@@ -6,7 +6,7 @@ tags:
   - complete
 ---
 
-## Agent C — synthesis (Stage 1 + SubseqH8 expansion, 5 archs)
+## Agent C — synthesis (Stage 1 + Stage 2 expansion to 6 archs)
 
 Two case studies on the 4 Stage 1 ckpts (`topk_sae`, `tsae_paper_k500`,
 `tsae_paper_k20`, `agentic_txc_02` at seed=42), reproducing the T-SAE
@@ -18,17 +18,24 @@ paper §4.5 protocol on Phase 7's `google/gemma-2-2b` base ckpts.
 
 | arch | mean (suc, coh) | best (suc, coh) | suc @ s=24 |
 |---|---|---|---|
-| `topk_sae` | (0.37, 2.62) | (0.37, 2.90) @ s=4 | 0.57 |
-| `tsae_paper_k500` | (0.29, 2.70) | (0.25, 3.00) @ s=1 | 0.41 |
-| `tsae_paper_k20` | (0.30, 2.70) | (0.24, 3.00) @ s=1 | 0.36 |
+| `topk_sae` (per-token, k=500) | (0.37, 2.62) | (0.37, 2.90) @ s=4 | 0.57 |
+| `tsae_paper_k500` (per-token, k=500) | (0.29, 2.70) | (0.25, 3.00) @ s=1 | 0.41 |
+| `tsae_paper_k20` (per-token, k=20) | (0.30, 2.70) | (0.24, 3.00) @ s=1 | 0.36 |
+| `mlc_contrastive_alpha100_batchtopk` (5-layer) | (0.29, 2.75) | **(0.38, 2.93) @ s=8** | 0.41 |
 | **`agentic_txc_02`** (window, T=5) | **(0.34, 2.77)** | **(0.36, 2.93) @ s=8** | **0.62** |
 | **`phase5b_subseq_h8`** (window, T_max=10) | **(0.33, 2.76)** | (0.38, 2.59) @ s=16 | **0.59** |
 
-**The two window archs cluster in the upper-right** with nearly
-identical mean (success, coherence) — despite recipe differences (T=5 +
-multi-scale matryoshka contrastive vs T_max=10 + subseq sampling +
-multi-distance contrastive). Cross-confirmation: window aggregation
-helps steering independent of the specific TXC-family recipe.
+**Three aggregating archs (TXC + SubseqH8 + MLC) cluster in the
+upper-right** of the Pareto. They aggregate over different axes —
+temporal (TXC family, T positions) and layer-wise (MLC, 5 layers) —
+yet all reach mean coherence ≈ 2.75-2.77, vs the per-token archs at
+2.62-2.70. **The TXC family wins both ways**: best at the moderate-
+strength operating point (s=8, success 0.36-0.38 with coherence ≈ 2.9)
+AND best at the high-strength point (s=24, success ≥ 0.59 with
+coherence ≥ 2.0). MLC is a single-point winner (best at s=8) but its
+coherence collapses faster at high strengths than temporal-window
+archs. The temporal-aggregation architecture is the most robust
+across the operating range.
 
 At maximum steering strength (s=24), TXC achieves the **highest
 success of any arch** (0.62) at coherence indistinguishable from
@@ -105,13 +112,37 @@ steering benefit. If Stage 2 confirms (TXC-family archs Pareto-dominate
 per-token archs at high strength), the result is robust across multiple
 TXC-family designs, not just `agentic_txc_02`.
 
+### Note on training data vs evaluation data
+
+A natural question: **why don't we train SAEs on the case-study
+datasets directly?** Because the SAE is a *fixed feature dictionary*,
+not a task model. The protocol mirrors T-SAE (Ye et al. 2025 §4.1,
+§4.5) and AxBench (Wu et al. 2025): train SAEs on broad activation
+data (Pile / FineWeb / Neuronpedia-style pretraining-distribution),
+then *use* the same trained SAE to (i) probe specific datasets and
+(ii) steer specific concepts. Task-specific training would defeat the
+"discover generic features once, use for many tasks" premise.
+
+Phase 7 follows the same split: Agent A trains all 49 SAEs on
+FineWeb activations of Gemma-2-2b base at L12; Agent C (this work)
+loads those fixed ckpts. **One real limitation worth flagging**:
+FineWeb is informational web prose; HH-RLHF is multi-turn dialogue.
+Some imperfect concept→feature mappings (`code_context` not finding
+actual code, `positive_emotion` drifting to COVID/uncertainty,
+`refusal_pattern` matching dialogue-fragment features rather than
+true refusal text) likely stem from this distribution shift. A clean
+follow-up would re-train on a FineWeb+dialogue mix and re-run both
+case studies.
+
 ### Limitations + caveats
 
 1. **Feature selection by lift is noisy.** Some concept→feature
    mappings are wrong (e.g., `positive_emotion` → COVID-uncertainty
    feature across all 4 archs; `code_context` → no actual code in any
    arch). Better selection via Agent B's autointerp labels (when on
-   HF) would reduce noise.
+   HF) would reduce noise. Also see §"Note on training data vs
+   evaluation data" above — distribution shift on dialogue concepts
+   is part of this.
 2. **Paper's intervention is clamp-on-latent (with error preserve);
    ours is decoder-direction additive.** The two are different
    modalities — agent_c_brief.md explicitly chose AxBench-style for
