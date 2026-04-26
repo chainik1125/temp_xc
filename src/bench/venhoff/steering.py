@@ -362,11 +362,25 @@ def train_all_vectors(
     )
     from concurrent.futures import ProcessPoolExecutor, as_completed
 
-    # Snapshot config for pickling to worker processes.
-    worker_args = [
-        (venhoff_root, cfg, idx, paths, force, idx_position % num_gpus)
-        for idx_position, idx in enumerate(all_idxs)
-    ]
+    # GPU assignment must be round-robin over FRESH TRAINS, not over all
+    # vectors. Bug surfaced 2026-04-25: with `idx_position % num_gpus`,
+    # if only some vectors need training (others resume), the sparse
+    # positions can collide (e.g. positions 10 and 14 both → gpu 2 mod 4),
+    # putting two real trains on the same GPU → 80GB peak → OOM.
+    fresh_count = 0
+    worker_args: list[tuple[Path, SteeringConfig, int, ArtifactPaths, bool, int | None]] = []
+    for idx in all_idxs:
+        expected_out = _venhoff_expected_vector_path(
+            venhoff_root, cfg.base_model, idx, arch=cfg.arch
+        )
+        if not force and expected_out.exists():
+            # Will resume; no real GPU work, gpu_id doesn't matter.
+            worker_args.append((venhoff_root, cfg, idx, paths, force, None))
+        else:
+            # Fresh train; pin to a unique GPU among the fresh-train pool.
+            worker_args.append((venhoff_root, cfg, idx, paths, force, fresh_count % num_gpus))
+            fresh_count += 1
+
     out: list[Path | None] = [None] * len(all_idxs)
     with ProcessPoolExecutor(max_workers=num_gpus) as pool:
         futures = {
