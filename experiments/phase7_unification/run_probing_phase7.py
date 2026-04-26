@@ -187,7 +187,8 @@ def _load_phase7_model(meta: dict, ckpt_path: Path, device) -> tuple:
         from src.architectures.mlc_contrastive_multiscale import MLCContrastiveMultiscale
         model = MLCContrastiveMultiscale(
             d_in, d_sae, n_layers=int(meta.get("n_layers", len(MLC_LAYERS))),
-            k=int(meta["k_win"]), gamma=float(meta.get("gamma", 0.5)),
+            k=int(meta["k_win"]),
+            gamma=float(meta.get("gamma") if meta.get("gamma") is not None else 0.5),
             h=int(d_sae * 0.2),
         ).to(device)
     elif src_class == "TemporalSAE":
@@ -204,8 +205,8 @@ def _load_phase7_model(meta: dict, ckpt_path: Path, device) -> tuple:
         )
         model = MatryoshkaTXCDRContrastiveMultiscale(
             d_in, d_sae, T=int(meta["T"]), k=int(meta["k_win"]),
-            n_contr_scales=int(meta.get("n_scales", 3)),
-            gamma=float(meta.get("gamma", 0.5)),
+            n_contr_scales=int(meta.get("n_scales") if meta.get("n_scales") is not None else 3),
+            gamma=float(meta.get("gamma") if meta.get("gamma") is not None else 0.5),
         ).to(device)
     elif src_class == "TXCBareAntidead":
         from src.architectures.txc_bare_antidead import TXCBareAntidead
@@ -225,7 +226,7 @@ def _load_phase7_model(meta: dict, ckpt_path: Path, device) -> tuple:
             d_in, d_sae, T_max=T_max, k=int(meta["k_win"]),
             t_sample=int(meta["t_sample"]), contiguous=False,
             shifts=shifts, weights=None,
-            matryoshka_h_size=int(d_sae * 0.2), alpha=float(meta.get("alpha", 1.0)),
+            matryoshka_h_size=int(d_sae * 0.2), alpha=float(meta.get("alpha") if meta.get("alpha") is not None else 1.0),
         ).to(device)
     elif src_class == "TemporalCrosscoder":
         from src.architectures.crosscoder import TemporalCrosscoder
@@ -239,7 +240,7 @@ def _load_phase7_model(meta: dict, ckpt_path: Path, device) -> tuple:
             d_in, d_sae, int(meta["T"]), int(meta["k_win"]),
             shifts=shifts, weights=None,
             matryoshka_h_size=int(d_sae * 0.2),
-            alpha=float(meta.get("alpha", 1.0)),
+            alpha=float(meta.get("alpha") if meta.get("alpha") is not None else 1.0),
         ).to(device)
     else:
         raise ValueError(f"unknown src_class={src_class}")
