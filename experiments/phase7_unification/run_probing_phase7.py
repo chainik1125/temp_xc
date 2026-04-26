@@ -55,14 +55,16 @@ from experiments.phase7_unification._paths import (
 )
 
 
-HEADLINE_S = (128, 64, 20)   # 128 = methodological headline (full context, no
-                             #       boundary asymmetry choice, full T-sweep
-                             #       headroom — at T=32 still 66 kept windows).
-                             # 64  = S-sensitivity ablation (cheap; if rankings
-                             #       agree with S=128 we can quote the smaller
-                             #       number with a footnote, if they disagree
-                             #       that's itself a finding).
-                             # 20  = Phase 5 carryover for cross-phase continuity.
+HEADLINE_S = (32,)           # S=32 across the board (decision 2026-04-26):
+                             # - Compatible with all 48 of 49 canonical archs
+                             #   (T ≤ 32 valid; only row 49 SubseqH8 T_max=64
+                             #    invalid since S < T → no kept window).
+                             # - ~6× faster than S=128 (encode cost scales
+                             #   roughly linearly in S).
+                             # - Earlier S=128 / 64 / 20 sweep dropped after
+                             #   the (T,S) "drop first T-1" rule was found to
+                             #   be over-aggressive; corrected rule is
+                             #   kept = S - T + 1, validity = S ≥ T.
 HEADLINE_K_FEAT = (5, 20)
 ABLATION_K_FEAT = (1, 2)
 FLIP_TASKS = frozenset({"winogrande_correct_completion", "wsc_coreference"})
@@ -83,6 +85,13 @@ def aggregate_s(z_full: np.ndarray, last_idx: np.ndarray,
                 T: int, S: int) -> tuple[np.ndarray, np.ndarray]:
     """Vectorised per-example mean-pool with S-parameterised effective tail.
 
+    For window archs (T>1), keeps every window fully inside the effective
+    tail. Number of kept windows per example = effective_tail - T + 1.
+    Cell validity = (S >= T). The earlier "drop first T-1" rule was a bug:
+    a window starting at left=0 covers tokens [0, T-1] which are all real
+    tail tokens — the window itself IS the encoder input, no preceding
+    context is needed.
+
     Args:
       z_full:   (N, K, d_sae) where K = LAST_N (T=1) or LAST_N - T + 1 (T>1).
       last_idx: (N,) int — position of last real token in the LAST_N=128 tail.
@@ -101,13 +110,13 @@ def aggregate_s(z_full: np.ndarray, last_idx: np.ndarray,
     # For T=1: mask on per-token positions [first_real, last_real]
     #   first_real = last_idx - effective + 1; last_real = last_idx
     # For T>1: mask on window-left-edges [lo, hi]
-    #   lo = last_idx - effective + T     (= first_real + T - 1)
-    #   hi = last_idx - T + 1
+    #   lo = last_idx - effective + 1   (first window fully inside the tail)
+    #   hi = last_idx - T + 1            (last window with right-edge ≤ last_idx)
     if T == 1:
         lo = (last_idx_t - effective + 1).clamp(min=0)
         hi = last_idx_t.clamp(max=K - 1)
     else:
-        lo = (last_idx_t - effective + T).clamp(min=0)
+        lo = (last_idx_t - effective + 1).clamp(min=0)
         hi = (last_idx_t - T + 1).clamp(max=K - 1)
     k_grid = torch.arange(K).view(1, K)                 # (1, K)
     mask = (k_grid >= lo.view(N, 1)) & (k_grid <= hi.view(N, 1))  # (N, K) bool
@@ -124,10 +133,10 @@ def aggregate_s(z_full: np.ndarray, last_idx: np.ndarray,
 
 
 def cell_is_valid(T: int, S: int) -> bool:
-    """Hard skip if no example length could ever yield a valid window."""
-    if T == 1:
-        return S >= 1
-    return S >= 2 * T - 1
+    """Hard skip if no example length could ever yield a valid window.
+    Window of size T fits within S iff S >= T.
+    """
+    return S >= T
 
 
 # ════════════════════════════════════════════════════════════════════
@@ -466,7 +475,19 @@ def run_probing(run_ids: list[str] | None = None,
                         f"auc@5={sae_probe_metrics(Z_tr, ytr_v, Z_te, yte_v, 5)[0]:.4f} "
                         f"n_kept={Z_tr.shape[0]}/{ytr.size}"
                     )
-                del tc; gc.collect()
+                # Explicit del of large per-task tensors. Python's allocator
+                # doesn't release back to OS quickly enough; the encoded
+                # z_full tensors are 27 GB train + 7 GB test per task =
+                # 34 GB. After ~5-7 tasks RSS grows past whatever invisible
+                # cgroup memory limit RunPod enforces and the process is
+                # killed by the kernel WITHOUT a dmesg entry (we don't have
+                # access to host logs). Killing without explicit del was
+                # the silent-death cause across all probe attempts.
+                del tc
+                try: del z_train_full, z_test_full, Z_tr, Z_te, valid_tr, valid_te
+                except NameError: pass
+                torch.cuda.empty_cache()
+                gc.collect()
             del model
             torch.cuda.empty_cache(); gc.collect()
 

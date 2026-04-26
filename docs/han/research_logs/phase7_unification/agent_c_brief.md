@@ -218,6 +218,31 @@ If C.ii blows the budget, the C.i write-up alone is paper-strong as a
 "can SAE-family methods recover known dataset structure?" study. C.ii
 moves to appendix.
 
+### Note for Agent C: S decision changed (2026-04-26)
+
+Phase 7's sparse-probing headline `S` value was changed from a
+multi-S sweep `(128, 64, 20)` to a **single value S = 32 across the
+board**. This affects how Agent C should interpret the sparse-probing
+leaderboard when correlating against the case-study results.
+
+Why: at S=128 the probing pass would have taken ~60 hr (incompatible
+with deadline); also the original `S ≥ 2T − 1` validity rule was
+found to be a bug (correct: `S ≥ T`). Full rationale at
+`docs/han/research_logs/phase7_unification/2026-04-26-S-decision-revised.md`.
+
+What this means for Agent C:
+- The sparse-probing AUCs Agent C reads from
+  `experiments/phase7_unification/results/probing_results.jsonl` will
+  all be at `S=32, k_feat ∈ {5, 20}`. Old rows at S=128 / 64 / 20
+  (from earlier sanity-check experiments) may also be present in the
+  jsonl — filter explicitly by `S=32` for the headline.
+- The shortlist of 6 archs unchanged: all 6 are valid at S=32
+  (max T in shortlist = 13 = SubseqH8.T_max, kept = 32 − 13 + 1 = 20
+  windows per example).
+- Case studies (HH-RLHF understanding, AxBench steering) are
+  unaffected — they don't use the sparse-probing aggregation; they
+  forward Gemma-2-2b on case-study text directly.
+
 ### Branch strategy + DO-NOT-DEVIATE list
 
 **Agent C works on its own branch `han-phase7-agent-c`**, not directly
