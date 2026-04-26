@@ -21,7 +21,14 @@ for L in 10 11 12 13 14; do
     fi
 done
 
-ARCHS=experiments/phase7_unification/case_studies/seed1_h100_archs.txt
+# Use the MLC-excluded list (44 archs).  MLC family needs the multi-layer
+# preload buffer (~70 GB for 24_000 seqs × 5 layers fp16) which doesn't fit
+# alongside anchor (~14 GB) on H100 80 GB.  Lowering PRELOAD_SEQS to fit
+# would break apples-to-apples with Agent A's seed=42 H200 ckpts (different
+# data-pool size conflates seed-σ with sample-σ).  The 3 MLC archs (mlc,
+# mlc_contrastive_alpha100_batchtopk, agentic_mlc_08) stay on Agent A's
+# H200 to keep PRELOAD_SEQS=24_000 across all seeds.
+ARCHS=experiments/phase7_unification/case_studies/seed1_h100_archs_no_mlc.txt
 if [ ! -f "$ARCHS" ]; then
     echo "ERROR: missing arch list at $ARCHS" >&2
     exit 2
