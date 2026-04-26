@@ -18,6 +18,7 @@ math matches what produced the existing JSON results.
 from __future__ import annotations
 
 import argparse
+import asyncio
 import json
 import os
 import sys
@@ -201,7 +202,7 @@ def main():
             max_new_tokens=int(args.max_new_tokens), temperature=1.0,
         )
         print(f"  Completed {tag}: {len(gens)} total responses generated", flush=True)
-        align_scores, coh_scores = evaluate_generations_with_openai(gens)
+        align_scores, coh_scores = asyncio.run(evaluate_generations_with_openai(gens))
         # Filter NaN / None (CODE/REFUSAL) per em-features convention
         a_clean = [float(s) for s in align_scores if s is not None and not (isinstance(s, float) and (s != s))]
         c_clean = [float(s) for s in coh_scores if s is not None and not (isinstance(s, float) and (s != s))]
