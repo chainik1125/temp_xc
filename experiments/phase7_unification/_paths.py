@@ -48,7 +48,13 @@ DEFAULT_D_IN = 2304
 DEFAULT_D_SAE = 18_432
 DEFAULT_K_WIN = 500
 SEEDS = (42, 1, 2)              # OUTER-LOOP order: seed 42 first
-PRELOAD_SEQS = 24_000           # H200 188 GB RAM: full cache fits
+PRELOAD_SEQS = 12_000           # H100 80 GB GPU: anchor (7 GB) + multilayer
+                                # (35 GB) = 42 GB preload, leaves ~38 GB for
+                                # model + Adam + working activations. The full
+                                # 24_000 (which fits H200 141 GB) OOMs on H100
+                                # at the multilayer stack: 5 × 14.1 GB ≈ 70 GB.
+                                # 12_000 seqs is still 1.5M tokens — plenty
+                                # for 8000-step training at batch=4096.
 
 # ────────────────────────────── HuggingFace repos (hardcoded; Phase 7 only)
 HF_CKPT_REPO = "han1823123123/txcdr-base"
