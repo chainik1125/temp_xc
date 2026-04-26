@@ -45,6 +45,7 @@ from open_source_em_features.pipeline.longform_steering import (  # noqa: E402
     evaluate_generations_with_openai,
 )
 from open_source_em_features.utils.model_loading import load_model_and_tokenizer  # noqa: E402
+from experiments.em_features.gemini_judge import evaluate_generations_with_gemini  # noqa: E402
 
 
 MODEL_REGISTRY = {
@@ -79,6 +80,10 @@ def parse_args():
     p.add_argument("--max_new_tokens", type=int, default=256)
     p.add_argument("--out_path", type=Path, required=True)
     p.add_argument("--device", default="cuda")
+    p.add_argument("--judge", choices=["openai", "gemini"], default="gemini",
+                   help="Which judge backend to use (default: gemini, bypasses gpt-4o-mini RPD)")
+    p.add_argument("--judge_model", default="gemini-3-flash-preview",
+                   help="Judge model name (gemini-3-flash-preview, gemini-3.1-pro-preview, etc.)")
     p.add_argument("--debug", action="store_true")
     return p.parse_args()
 
@@ -206,7 +211,12 @@ def main():
             max_new_tokens=int(args.max_new_tokens), temperature=1.0,
         )
         print(f"  Completed {tag}: {len(gens)} total responses generated", flush=True)
-        align_scores, coh_scores = asyncio.run(evaluate_generations_with_openai(gens))
+        if args.judge == "gemini":
+            align_scores, coh_scores = asyncio.run(
+                evaluate_generations_with_gemini(gens, model_name=args.judge_model)
+            )
+        else:
+            align_scores, coh_scores = asyncio.run(evaluate_generations_with_openai(gens))
         # Filter NaN / None (CODE/REFUSAL) per em-features convention
         a_clean = [float(s) for s in align_scores if s is not None and not (isinstance(s, float) and (s != s))]
         c_clean = [float(s) for s in coh_scores if s is not None and not (isinstance(s, float) and (s != s))]
