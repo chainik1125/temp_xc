@@ -328,11 +328,34 @@ polarity). Same as Phase 5.
 
 ## Canonical architecture set {#canonical-architecture-set}
 
-**This is the single source of truth.** Both agents (and both
-deliverables) refer to this table. Every row is one architecture
-trained at 3 seeds (seed ∈ {1, 2, 42}). Total rows: **49**. Total
-trainings: 49 × 3 = **147** on H200. Estimated wall-clock at
-~5 min/training (with batch=4096 on H200): **~12 hr**.
+**The machine-readable source of truth is
+`experiments/phase7_unification/canonical_archs.json`.**
+
+Agents should load that JSON directly rather than parsing the
+markdown table below. Example:
+
+```python
+import json
+canonical = json.load(open("experiments/phase7_unification/canonical_archs.json"))
+for seed in canonical["seeds"]:                      # [42, 1, 2] in this order
+    for arch in canonical["archs"]:                  # 49 entries
+        train(arch, seed)                            # arch dict has all params
+```
+
+The JSON contains: subject_model + anchor_layer + mlc_layers +
+d_in/d_sae + k_win_default + seeds (in training-loop order) +
+groups dict + 49 arch records. Each arch record includes:
+`row`, `arch_id`, `group`, `T`/`T_max`/`t_sample`, `k_win`,
+`k_pos`, `shifts`, `src_module`, `src_class`, `recipe`, `purpose`,
+plus arch-specific extras (alpha, gamma, n_scales, n_layers).
+
+The markdown table below is a human-readable view of the same data.
+**If the JSON and the markdown ever diverge, the JSON is canonical.**
+
+Every row is one architecture trained at 3 seeds (seed ∈ {1, 2, 42},
+trained outer-loop seed-first, see §Deliverable A.i). Total rows:
+**49**. Total trainings: 49 × 3 = **147** on H200. Estimated
+wall-clock at ~5 min/training (with batch=4096 on H200): **~12 hr**.
 
 T-sweep entries (rows 14–45) double as leaderboard entries — the
 Agent A leaderboard and the Agent A T-sweep are subsets of this

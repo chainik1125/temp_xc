@@ -237,9 +237,12 @@ seeds, no duplicate training. Group 6 cells exist specifically to
 exploit the H200's 141 GB memory: T_max=64 wouldn't fit at fp32 on
 H100 80GB.
 
-**Full per-arch table (k_win, k_pos derivation, recipe, purpose) lives
-in `plan.md` §Canonical architecture set. That is the single source
-of truth.** Do not duplicate the table here.
+**Full per-arch table (k_win, k_pos derivation, recipe, purpose,
+src_module/src_class) lives at
+`experiments/phase7_unification/canonical_archs.json` — the
+machine-readable single source of truth.** A human-readable
+markdown view is in `plan.md` §Canonical architecture set. Do not
+duplicate the table here.
 
 ### What's dropped from the leaderboard
 
