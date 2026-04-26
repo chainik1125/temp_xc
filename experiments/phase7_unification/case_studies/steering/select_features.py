@@ -42,7 +42,7 @@ import torch
 os.environ.setdefault("HF_HOME", "/workspace/hf_cache")
 os.environ.setdefault("TQDM_DISABLE", "1")
 
-from experiments.phase7_unification._paths import OUT_DIR, banner
+from experiments.phase7_unification._paths import OUT_DIR, banner, MLC_LAYERS
 from experiments.phase7_unification.case_studies._arch_utils import (
     load_phase7_model_safe as _load_phase7_model,
 )
@@ -98,6 +98,53 @@ def _capture_l12_activations(
     return acts, attn
 
 
+def _capture_multilayer_activations(
+    sentences: list[str], model, tokenizer, device: torch.device,
+    batch_size: int = 32, max_length: int = CONCEPT_MAX_LENGTH,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Forward `sentences` through Gemma-2-2b base capturing L10–L14
+    residuals for MLC archs. Returns:
+
+    acts:  (N, max_length, n_layers=5, d_in) fp16 — multi-layer cube.
+    attn:  (N, max_length) int8.
+    """
+    n = len(sentences)
+    n_lay = len(MLC_LAYERS)
+    acts = np.zeros((n, max_length, n_lay, DEFAULT_D_IN), dtype=np.float16)
+    attn = np.zeros((n, max_length), dtype=np.int8)
+    captured: dict[int, torch.Tensor] = {}
+    handles = []
+    for li in MLC_LAYERS:
+        def make_hook(layer_idx: int):
+            def hook(module, inp, output):
+                h = output[0] if isinstance(output, tuple) else output
+                captured[layer_idx] = h.detach().cpu()
+            return hook
+        handles.append(model.model.layers[li].register_forward_hook(make_hook(li)))
+    try:
+        for start in range(0, n, batch_size):
+            end = min(start + batch_size, n)
+            chunk = sentences[start:end]
+            enc = tokenizer(
+                chunk, return_tensors="pt",
+                padding="max_length", truncation=True, max_length=max_length,
+            )
+            captured.clear()
+            with torch.no_grad():
+                model(enc["input_ids"].to(device),
+                      attention_mask=enc["attention_mask"].to(device))
+            for idx, li in enumerate(MLC_LAYERS):
+                h = captured[li]
+                if h.shape[-1] != DEFAULT_D_IN:
+                    h = h[..., :DEFAULT_D_IN]
+                acts[start:end, :, idx, :] = h.to(torch.float16).numpy()
+            attn[start:end] = enc["attention_mask"].to(torch.int8).numpy()
+    finally:
+        for handle in handles:
+            handle.remove()
+    return acts, attn
+
+
 def select_for_arch(arch_id: str, *, batch_size: int = 16) -> dict | None:
     """Per-arch best-feature-per-concept selection."""
     log_path = OUT_DIR / "training_logs" / f"{arch_id}__seed42.json"
@@ -107,9 +154,7 @@ def select_for_arch(arch_id: str, *, batch_size: int = 16) -> dict | None:
         return None
     meta = json.loads(log_path.read_text())
     src_class = meta["src_class"]
-    if src_class in MLC_CLASSES:
-        print(f"  [skip] {arch_id}: MLC arch needs multi-layer cache")
-        return None
+    is_mlc = src_class in MLC_CLASSES
 
     out_dir = CASE_STUDIES_DIR / "steering" / arch_id
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -135,11 +180,19 @@ def select_for_arch(arch_id: str, *, batch_size: int = 16) -> dict | None:
         for s in c["examples"]:
             sentences.append(s)
             origins.append(ci)
-    print(f"  forwarding {len(sentences)} concept-sentences (30 concepts * {len(CONCEPTS[0]['examples'])} examples) ...")
+    print(f"  forwarding {len(sentences)} concept-sentences "
+          f"(30 concepts * {len(CONCEPTS[0]['examples'])} examples; "
+          f"{'L10-L14 multi-layer' if is_mlc else 'L12 anchor'}) ...")
     t0 = time.time()
-    acts, attn = _capture_l12_activations(sentences, subject, tokenizer, device,
-                                           batch_size=32)
-    print(f"    L12 capture done in {time.time() - t0:.1f}s; acts {acts.shape}")
+    if is_mlc:
+        acts, attn = _capture_multilayer_activations(
+            sentences, subject, tokenizer, device, batch_size=32,
+        )
+    else:
+        acts, attn = _capture_l12_activations(
+            sentences, subject, tokenizer, device, batch_size=32,
+        )
+    print(f"    capture done in {time.time() - t0:.1f}s; acts {acts.shape}")
     del subject
     torch.cuda.empty_cache()
     gc.collect()
@@ -159,10 +212,10 @@ def select_for_arch(arch_id: str, *, batch_size: int = 16) -> dict | None:
     pos_idx = torch.arange(S, device=device)
     for start in range(0, N, batch_size):
         end = min(start + batch_size, N)
-        x = torch.from_numpy(acts[start:end]).float().to(device)
+        x = torch.from_numpy(acts[start:end]).float().to(device)  # (B, S, d_in) or (B, S, n_lay, d_in)
         z = encode_per_position(sae, src_class, x, T=T)            # (B, S, d_sae)
         m = torch.from_numpy(attn[start:end].astype(np.float32)).to(device)  # (B, S)
-        if T > 1:
+        if T > 1 and not is_mlc:
             m = m * (pos_idx >= T - 1).float().unsqueeze(0)
         # sum_per_example_per_feature: (B, d_sae) ; count_per_example: (B,)
         m_b = m.unsqueeze(-1)                                     # (B, S, 1)

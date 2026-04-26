@@ -66,9 +66,9 @@ def steer_for_arch(arch_id: str, *, force: bool = False) -> None:
     meta = json.loads(log_path.read_text())
     selection = json.loads(sel_path.read_text())
     src_class = meta["src_class"]
-    if src_class in MLC_CLASSES:
-        print(f"  [skip] {arch_id}: MLC needs multi-layer cache")
-        return
+    # MLC archs ARE supported here — `decoder_direction_matrix` returns
+    # the layer-averaged direction, applied to L12 like every other arch.
+    # The multi-layer cache is only needed for select_features (encoding).
 
     device = torch.device("cuda")
 

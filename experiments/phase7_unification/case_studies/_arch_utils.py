@@ -187,26 +187,35 @@ def encode_per_position(
     use_threshold: bool = True,
     chunk: int = 32,
 ) -> torch.Tensor:
-    """Encode a `(N, S, d_in)` sequence batch into `(N, S, d_sae)` per-token /
-    per-window aggregated activations. The arch-uniform contract:
+    """Encode a sequence batch into `(N, S, d_sae)` per-position
+    aggregated activations. The arch-uniform contract:
 
-      - Per-token archs (SAE, T-SAE, TFA): every position 0..S-1 is encoded.
-      - MLC archs: NOT supported by this helper — MLC needs layer cube;
-        callers handle MLC separately.
-      - Window archs: each window of T positions is encoded; we attribute
-        the resulting `(d_sae,)` to the LAST position of the window (so a
-        window covering tokens t-T+1..t lands at index t). Positions
-        0..T-2 receive zero (no full window has them as right-edge yet).
+      - Per-token archs (SAE, T-SAE, TFA): input shape `(N, S, d_in)`;
+        every position 0..S-1 is encoded.
+      - MLC archs: input shape `(N, S, n_layers, d_in)` — every position
+        encoded via the MLC layer-cube `encode((B, n_layers, d_in))`.
+      - Window archs: input shape `(N, S, d_in)`; each window of T
+        positions is encoded; the resulting `(d_sae,)` is attributed to
+        the LAST position of the window (window covering tokens
+        t-T+1..t lands at index t). Positions 0..T-2 receive zero.
 
-    `chunk` controls the inner GPU batch over (N*S) per-token forwards or
-    (N*K) per-window forwards. 32 fits in <2 GB even for d_sae=18432.
+    `chunk` controls the inner GPU batch over (N*S) per-token forwards
+    or (N*K) per-window forwards. 32 fits in <2 GB even for d_sae=18432.
     """
-    if src_class in MLC_CLASSES:
-        raise NotImplementedError(
-            "MLC archs need a (B, n_layers, d_in) input; use encode_per_position_mlc instead."
-        )
     device = next(model.parameters()).device
     seq = seq.to(device)
+    if src_class in MLC_CLASSES:
+        # MLC takes (B, n_layers, d_in) input.
+        N, S, n_lay, d_in = seq.shape
+        d_sae = _d_sae_of(model, src_class)
+        out = torch.zeros((N, S, d_sae), dtype=torch.float32, device=device)
+        flat = seq.reshape(N * S, n_lay, d_in)
+        for i in range(0, flat.shape[0], chunk * S):
+            j = min(i + chunk * S, flat.shape[0])
+            sub = flat[i:j]
+            z = model.encode(sub)
+            out.view(N * S, d_sae)[i:j] = z.float()
+        return out
     N, S, d_in = seq.shape
     d_sae = _d_sae_of(model, src_class)
     out = torch.zeros((N, S, d_sae), dtype=torch.float32, device=device)
