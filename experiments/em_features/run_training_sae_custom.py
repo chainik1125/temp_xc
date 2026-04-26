@@ -186,8 +186,10 @@ def main():
             "best_loss": best,
         }
         torch.save(ckpt, path)
+        meta_safe = {kk: vv for kk, vv in ckpt.items()
+                     if kk not in ("state_dict", "optimizer_state", "rng_state")}
         with path.with_suffix(".meta.json").open("w") as f:
-            json.dump({kk: vv for kk, vv in ckpt.items() if kk != "state_dict"}, f, indent=2)
+            json.dump(meta_safe, f, indent=2)
         print(f"Saved {path}  (step {step_done}, best loss={best:.6f})", flush=True)
         upload_if_enabled(path, category="sae")
 
