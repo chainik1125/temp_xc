@@ -315,6 +315,98 @@ Tighter σ (0.003) than H7 σ (0.007). H8's recipe is more reproducible.
 - `src/architectures/mlc_bare_antidead.py` — MLC + anti-dead family
 - `src/architectures/txc_bare_md_ms_contrastive_antidead.py` — H13 mdms
 
+## Session-wide lessons learned (read this if you continue)
+
+### The partial-probe trap
+
+**Twice in this session I reported wrong AUCs by querying probing_results.jsonl
+during a probe.** The first ~5-10 tasks (ag_news_*, amazon_*, bias_in_bios_*)
+have systematically higher AUCs than the harder cross-token tasks. Querying
+mid-probe gave inflated means:
+- T=3 H8 reported 0.8339 mp; actual (n=36) is **0.7960** — 0.038 lower
+- shifts4 lp reported 0.8086; actual (n=36) is **0.7863** — 0.022 lower
+
+**Fix going forward**: ALWAYS check `n=36` (or expected task count) before
+treating an AUC as final. The audit query is at the bottom of this section.
+
+### The FLIP convention
+
+`FLIP_TASKS = {winogrande_correct_completion, wsc_coreference}`. For these
+2 of 36 tasks, the headline plot does `v = max(v, 1.0 - v)` — post-hoc
+polarity correction for cross-token coreference/entailment where label
+assignment is arbitrary. Other 34 tasks use raw AUC. Lives ONLY in
+plot/aggregation scripts (`make_headline_plot.py`, `make_t_scaling_plot.py`,
+`groundbreaking_summary.py`); probe code writes raw AUCs to jsonl.
+
+**Phase 5B used NO_FLIP convention** in their own report. Their B2/B4
+3-seed numbers (lp 0.8160 ± 0.003 / 0.8232 ± 0.013) are slightly lower
+than Phase 5 FLIP convention (lp 0.8213 ± 0.0005 / 0.8295 ± 0.013).
+Same data, different post-processing. Cross-phase comparisons MUST
+agree on convention.
+
+### k_pos vs k_win across families
+
+Phase 5's convention scales `k_win = k_pos × T` for window archs, but
+keeps `k_win = 100` constant for MLC (which has L=5 layers). At probe
+time, ONE encoded vector contains:
+- 100 active features for TopK SAE / MLC
+- 500 for TXC at T=5
+- 600 for H8 at T=6
+- 1000 for vanilla TXCDR at T=10
+
+This is a structural asymmetry. Phase 7's solution: fix `k_win = 500`
+across all families. See [phase7_unification/plan.md](../phase7_unification/plan.md).
+
+### The seed-42 filter for headline plots
+
+`make_headline_plot.py` originally did `out[arch][task] = v`, overwriting
+per-task values when multiple seeds existed. Whichever seed was probed
+LAST (here seed 2) silently won, hiding seed 42 numbers. Fixed
+2026-04-25 (commit a1e4b2c) to filter `__seed42` only. 3-seed σ is
+reported separately in summary.md tables, not in the bar plot.
+
+### Phase 5B integration discrepancy
+
+The Phase 5B agent reported `phase5b_subseq_h8_t10_s8_k500` peak at
+**lp 0.8545 / mp 0.8590**. Recomputed from their own jsonl with EITHER
+convention:
+- FLIP: lp 0.8218 / mp 0.8284
+- NO_FLIP: lp 0.8145 / mp 0.8183
+
+Their reported numbers don't reproduce. Likely a typo or alternate
+aggregation. The actual Phase 5B mp peak (Phase 5 convention, seed 42)
+is plain `phase5b_subseq_h8` at **0.8516**, not the t10_s8_k500 cell.
+
+### Audit query (run before reporting any AUC)
+
+```python
+import json, statistics as st
+F = 'experiments/phase5_downstream_utility/results/probing_results.jsonl'
+data = []
+for line in open(F):
+    try: r = json.loads(line)
+    except: continue
+    if r.get('run_id') != f'{ARCH}__seed{SEED}': continue
+    if r.get('aggregation') != AGG or r.get('k_feat') != 5: continue
+    v = float(r.get('test_auc', 0))
+    if r.get('task_name') in {'winogrande_correct_completion','wsc_coreference'}:
+        v = max(v, 1.0 - v)
+    data.append(v)
+print(f'n={len(data)}, mean={st.mean(data):.4f}')
+# n MUST be 36 before treating mean as final.
+```
+
+---
+
+### shifts_20 3-seed verification (side queue, started 2026-04-26 00:35 UTC)
+
+The single-seed phase57_partB_h8a_shifts_20 finding (lp 0.8041 / mp 0.8179
+at seed 42) is at the edge of H8's σ=0.003. Side queue
+[`run_shifts20_3seed.sh`](../../../experiments/phase5_downstream_utility/run_shifts20_3seed.sh)
+runs seeds 1, 2 once GPU has < 25 GB used. PID 113714. ETA ~2-3 hours.
+
+---
+
 ## What was outside this session's scope
 
 - H2 attention-pool decoder — NOT IMPLEMENTED (handover lists as untested)
