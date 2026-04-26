@@ -55,7 +55,14 @@ from experiments.phase7_unification._paths import (
 )
 
 
-HEADLINE_S = (128, 20)
+HEADLINE_S = (128, 64, 20)   # 128 = methodological headline (full context, no
+                             #       boundary asymmetry choice, full T-sweep
+                             #       headroom — at T=32 still 66 kept windows).
+                             # 64  = S-sensitivity ablation (cheap; if rankings
+                             #       agree with S=128 we can quote the smaller
+                             #       number with a footnote, if they disagree
+                             #       that's itself a finding).
+                             # 20  = Phase 5 carryover for cross-phase continuity.
 HEADLINE_K_FEAT = (5, 20)
 ABLATION_K_FEAT = (1, 2)
 FLIP_TASKS = frozenset({"winogrande_correct_completion", "wsc_coreference"})
