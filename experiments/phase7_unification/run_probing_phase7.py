@@ -342,13 +342,20 @@ def _iter_index(run_ids: list[str] | None):
 
 
 def _load_task_cache_p7(task_dir: Path) -> dict:
-    """Phase 7 task cache loader: includes mlc_tail (N, 128, 5, d) for MLC archs."""
+    """Phase 7 task cache loader: includes mlc_tail (N, 128, 5, d) for MLC archs.
+
+    Cast mlc_tail to fp32 — the .npz stores fp16 to save disk, but Phase 7's
+    fp32 model parameters can't einsum against fp16 input ("expected Half
+    but found Float" RuntimeError). Phase 5's _load_task_cache already
+    casts the anchor cache to fp32; this matches that convention for the
+    new mlc_tail field.
+    """
     base = _load_task_cache(task_dir)
     mlc_tail_path = task_dir / "acts_mlc_tail.npz"
     if mlc_tail_path.exists():
         with np.load(mlc_tail_path) as z:
-            base["mlc_tail_train"] = z["train_acts"]
-            base["mlc_tail_test"] = z["test_acts"]
+            base["mlc_tail_train"] = z["train_acts"].astype(np.float32)
+            base["mlc_tail_test"] = z["test_acts"].astype(np.float32)
     return base
 
 
