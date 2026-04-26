@@ -1,0 +1,1346 @@
+{
+  "arch": "agentic_txc_10_bare",
+  "seed": 1,
+  "concat": "B",
+  "features": [
+    {
+      "feature_idx": 4854,
+      "label": "George Orwell's Spanish Civil War experiences",
+      "variance": 693.6898803710938,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 637,
+          "strength": 176.625,
+          "text": " the Barcelona May Days conflicts between the POUM and\u00ab Stalin\u00bbist forces, during the Spanish Civil War."
+        },
+        {
+          "position": 636,
+          "strength": 169.875,
+          "text": " during the Barcelona May Days conflicts between the POUM\u00ab and\u00bb Stalinist forces, during the Spanish Civil War"
+        },
+        {
+          "position": 638,
+          "strength": 168.875,
+          "text": " Barcelona May Days conflicts between the POUM and Stalin\u00abist\u00bb forces, during the Spanish Civil War. In"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "animal_farm"
+    },
+    {
+      "feature_idx": 94,
+      "label": "Cold War geopolitical tensions and alliances",
+      "variance": 436.51727294921875,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 593,
+          "strength": 110.25,
+          "text": " when Russia lived under the Marxist\u2013Leninist ideology\u00ab of\u00bb Joseph Stalin. Orwell, a democratic socialist,"
+        },
+        {
+          "position": 941,
+          "strength": 109.3125,
+          "text": " and public opinion were transformed as the wartime alliance gave\u00ab way\u00bb to the Cold War.\nTime magazine chose"
+        },
+        {
+          "position": 869,
+          "strength": 108.375,
+          "text": " Kingdom was in its wartime alliance with the Soviet Union\u00ab against\u00bb Nazi Germany and the British intelligentsia held Stalin"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "animal_farm"
+    },
+    {
+      "feature_idx": 2298,
+      "label": "Coordinate pairs and mathematical notation",
+      "variance": 322.43353271484375,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1064,
+          "strength": 85.6875,
+          "text": "2)\nD. (\u2013 4,\u00ab \u2013\u00bb2)"
+        },
+        {
+          "position": 1065,
+          "strength": 84.5625,
+          "text": ")\nD. (\u2013 4, \u2013\u00ab2\u00bb)"
+        },
+        {
+          "position": 1066,
+          "strength": 81.875,
+          "text": "\nD. (\u2013 4, \u20132\u00ab)\u00bb"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SEMANTIC",
+        "agree": false,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "math_q"
+    },
+    {
+      "feature_idx": 5298,
+      "label": "Punctuation and grammatical markers in narrative text",
+      "variance": 310.5281677246094,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 309,
+          "strength": 89.3125,
+          "text": "\n(\"spits\" as he called them)\u00ab was\u00bb exhausted, he would burn the letters of\n"
+        },
+        {
+          "position": 310,
+          "strength": 88.625,
+          "text": "(\"spits\" as he called them) was\u00ab exhausted\u00bb, he would burn the letters of\nseveral"
+        },
+        {
+          "position": 311,
+          "strength": 88.625,
+          "text": "spits\" as he called them) was exhausted\u00ab,\u00bb he would burn the letters of\nseveral years"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "math_q"
+    },
+    {
+      "feature_idx": 10946,
+      "label": "Punctuation and quoted attributions in text",
+      "variance": 289.5890197753906,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 656,
+          "strength": 116.0625,
+          "text": ". In a letter to Yvonne Davet (a\u00ab French\u00bb writer), Orwell described Animal Farm as a satirical"
+        },
+        {
+          "position": 655,
+          "strength": 115.5625,
+          "text": " War. In a letter to Yvonne Davet (\u00aba\u00bb French writer), Orwell described Animal Farm as a"
+        },
+        {
+          "position": 657,
+          "strength": 111.875,
+          "text": " In a letter to Yvonne Davet (a French\u00ab writer\u00bb), Orwell described Animal Farm as a satirical tale"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "animal_farm"
+    },
+    {
+      "feature_idx": 1108,
+      "label": "Historical context of Orwell and Stalinism",
+      "variance": 282.960693359375,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 830,
+          "strength": 94.9375,
+          "text": " of the Soviet Union, Union des r\u00e9publiques\u00ab social\u00bbistes sovi\u00e9tiques.\nOrwell wrote the"
+        },
+        {
+          "position": 637,
+          "strength": 94.0,
+          "text": " the Barcelona May Days conflicts between the POUM and\u00ab Stalin\u00bbist forces, during the Spanish Civil War."
+        },
+        {
+          "position": 591,
+          "strength": 93.125,
+          "text": " a period when Russia lived under the Marxist\u2013Len\u00abinist\u00bb ideology of Joseph Stalin. Orwell, a democratic"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "animal_farm"
+    },
+    {
+      "feature_idx": 10712,
+      "label": "formal academic or literary acknowledgments",
+      "variance": 272.71234130859375,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 722,
+          "strength": 85.9375,
+          "text": " I was doing, to fuse political purpose and artistic\u00ab purpose\u00bb into one whole.\"\nThe original title of"
+        },
+        {
+          "position": 512,
+          "strength": 85.4375,
+          "text": " name those to whom I\nam indebted for criticisms\u00ab or\u00bb corrections, because I should wish to bear\n"
+        },
+        {
+          "position": 513,
+          "strength": 84.8125,
+          "text": " those to whom I\nam indebted for criticisms or\u00ab corrections\u00bb, because I should wish to bear\nalone"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "darwin"
+    },
+    {
+      "feature_idx": 2507,
+      "label": "natural selection and evolutionary advantage",
+      "variance": 269.5776672363281,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 24,
+          "strength": 103.875,
+          "text": " that are tallest. As a result, more of\u00ab the\u00bb taller individuals are able to obtain nutrients and survive"
+        },
+        {
+          "position": 25,
+          "strength": 103.1875,
+          "text": " are tallest. As a result, more of the\u00ab taller\u00bb individuals are able to obtain nutrients and survive to"
+        },
+        {
+          "position": 37,
+          "strength": 102.125,
+          "text": " are able to obtain nutrients and survive to pass along\u00ab their\u00bb genetic information. This is an example of\n"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "bio_q"
+    },
+    {
+      "feature_idx": 15284,
+      "label": "Natural selection and evolutionary biology concepts",
+      "variance": 243.20510864257812,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 0,
+          "strength": 112.0625,
+          "text": "\u00abIn\u00bb a population of giraffes, an environmental change"
+        },
+        {
+          "position": 1,
+          "strength": 106.5,
+          "text": "In\u00ab a\u00bb population of giraffes, an environmental change occurs"
+        },
+        {
+          "position": 5,
+          "strength": 105.25,
+          "text": "In a population of gira\u00abffes\u00bb, an environmental change occurs that favors individuals that"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "bio_q"
+    },
+    {
+      "feature_idx": 8395,
+      "label": "Quotation marks and dialogue punctuation",
+      "variance": 219.66612243652344,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 116,
+          "strength": 117.75,
+          "text": "a\nrendering which would unfairly exaggerate their effect.\u00ab\n\n\u00bbThe Diary or Pocket-book, from which"
+        },
+        {
+          "position": 352,
+          "strength": 110.4375,
+          "text": " for years, destroyed nearly all letters\nreceived before\u00ab \u00bb1862. After that date he"
+        },
+        {
+          "position": 999,
+          "strength": 103.125,
+          "text": " (2, 4), and (3,\u00ab \u00bb0) is reflected across the line y ="
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "math_q"
+    },
+    {
+      "feature_idx": 16186,
+      "label": "Publishing history of Animal Farm",
+      "variance": 201.5460662841797,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 741,
+          "strength": 59.1875,
+          "text": " of the novel was Animal Farm: A Fairy Story\u00ab.\u00bb American publishers dropped the subtitle when it was published"
+        },
+        {
+          "position": 898,
+          "strength": 59.15625,
+          "text": " manuscript was initially rejected by several British and American publishers\u00ab,\u00bb including one of Orwell's own, Victor"
+        },
+        {
+          "position": 740,
+          "strength": 58.65625,
+          "text": " title of the novel was Animal Farm: A Fairy\u00ab Story\u00bb. American publishers dropped the subtitle when it was"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "animal_farm"
+    },
+    {
+      "feature_idx": 12330,
+      "label": "George Orwell's political history and experiences",
+      "variance": 169.31561279296875,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 644,
+          "strength": 76.8125,
+          "text": " POUM and Stalinist forces, during the Spanish\u00ab Civil\u00bb War. In a letter to Yvonne Davet"
+        },
+        {
+          "position": 590,
+          "strength": 75.875,
+          "text": ", a period when Russia lived under the Marxist\u2013\u00abLen\u00bbinist ideology of Joseph Stalin. Orwell, a"
+        },
+        {
+          "position": 738,
+          "strength": 73.625,
+          "text": "The original title of the novel was Animal Farm:\u00ab A\u00bb Fairy Story. American publishers dropped the subtitle when"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "animal_farm"
+    },
+    {
+      "feature_idx": 5466,
+      "label": "Orwell's political views and criticisms",
+      "variance": 163.37901306152344,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 620,
+          "strength": 67.5625,
+          "text": " to Moscow-directed Stalinism, an attitude that\u00ab was\u00bb critically shaped by his experiences during the Barcelona May"
+        },
+        {
+          "position": 655,
+          "strength": 63.9375,
+          "text": " War. In a letter to Yvonne Davet (\u00aba\u00bb French writer), Orwell described Animal Farm as a"
+        },
+        {
+          "position": 657,
+          "strength": 63.9375,
+          "text": " In a letter to Yvonne Davet (a French\u00ab writer\u00bb), Orwell described Animal Farm as a satirical tale"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "animal_farm"
+    },
+    {
+      "feature_idx": 5673,
+      "label": "authorial intent and artistic purpose",
+      "variance": 133.37823486328125,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 708,
+          "strength": 66.625,
+          "text": " was the first book in which I tried, with\u00ab full\u00bb consciousness of what I was doing, to fuse"
+        },
+        {
+          "position": 707,
+          "strength": 66.125,
+          "text": " Farm was the first book in which I tried,\u00ab with\u00bb full consciousness of what I was doing, to"
+        },
+        {
+          "position": 709,
+          "strength": 65.875,
+          "text": " the first book in which I tried, with full\u00ab consciousness\u00bb of what I was doing, to fuse political"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "darwin"
+    },
+    {
+      "feature_idx": 9538,
+      "label": "Quotation marks and punctuation in text passages",
+      "variance": 121.12545776367188,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 115,
+          "strength": 73.875,
+          "text": ",--a\nrendering which would unfairly exaggerate their effect\u00ab.\u00bb\n\nThe Diary or Pocket-book, from"
+        },
+        {
+          "position": 352,
+          "strength": 64.4375,
+          "text": " for years, destroyed nearly all letters\nreceived before\u00ab \u00bb1862. After that date he"
+        },
+        {
+          "position": 351,
+          "strength": 64.4375,
+          "text": " on for years, destroyed nearly all letters\nreceived\u00ab before\u00bb 1862. After that date"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "animal_farm"
+    },
+    {
+      "feature_idx": 3717,
+      "label": "Animal Farm novel details and translations",
+      "variance": 119.31621551513672,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 790,
+          "strength": 90.25,
+          "text": " Union des r\u00e9publiques socialistes animales for the\u00ab French\u00bb translation, which abbreviates to URSA"
+        },
+        {
+          "position": 792,
+          "strength": 88.4375,
+          "text": " r\u00e9publiques socialistes animales for the French translation\u00ab,\u00bb which abbreviates to URSA, the"
+        },
+        {
+          "position": 666,
+          "strength": 88.0,
+          "text": " French writer), Orwell described Animal Farm as a satirical\u00ab tale\u00bb against Stalin (\"un conte satirique contre St"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "animal_farm"
+    },
+    {
+      "feature_idx": 16291,
+      "label": "Words in archaic or formal prose passages",
+      "variance": 113.45979309082031,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 143,
+          "strength": 48.9375,
+          "text": ", has been of value as supplying a frame-\u00abwork\u00bb of facts round which\nletters may be grouped"
+        },
+        {
+          "position": 151,
+          "strength": 48.6875,
+          "text": " frame-work of facts round which\nletters may\u00ab be\u00bb grouped. It is unfortunately written with great brevity"
+        },
+        {
+          "position": 142,
+          "strength": 47.6875,
+          "text": "pages, has been of value as supplying a frame\u00ab-\u00bbwork of facts round which\nletters may be"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "darwin"
+    },
+    {
+      "feature_idx": 2607,
+      "label": "Prepositions and conjunctions in biographical text",
+      "variance": 106.27285766601562,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 196,
+          "strength": 35.1875,
+          "text": " principal events of his life, together\nwith entries\u00ab as\u00bb to his work, and as to the duration"
+        },
+        {
+          "position": 200,
+          "strength": 35.15625,
+          "text": " life, together\nwith entries as to his work\u00ab,\u00bb and as to the duration of his more serious"
+        },
+        {
+          "position": 392,
+          "strength": 35.125,
+          "text": "I have attempted to give, in Chapter III.,\u00ab some\u00bb account of his manner\nof working. During"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "darwin"
+    },
+    {
+      "feature_idx": 338,
+      "label": "Punctuation marks separating quoted or parenthetical text",
+      "variance": 101.18533325195312,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 311,
+          "strength": 48.8125,
+          "text": "spits\" as he called them) was exhausted\u00ab,\u00bb he would burn the letters of\nseveral years"
+        },
+        {
+          "position": 309,
+          "strength": 46.90625,
+          "text": "\n(\"spits\" as he called them)\u00ab was\u00bb exhausted, he would burn the letters of\n"
+        },
+        {
+          "position": 310,
+          "strength": 45.59375,
+          "text": "(\"spits\" as he called them) was\u00ab exhausted\u00bb, he would burn the letters of\nseveral"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "bio_q"
+    },
+    {
+      "feature_idx": 8201,
+      "label": "Animal Farm and Stalin references",
+      "variance": 100.25521850585938,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 593,
+          "strength": 63.96875,
+          "text": " when Russia lived under the Marxist\u2013Leninist ideology\u00ab of\u00bb Joseph Stalin. Orwell, a democratic socialist,"
+        },
+        {
+          "position": 37,
+          "strength": 59.28125,
+          "text": " are able to obtain nutrients and survive to pass along\u00ab their\u00bb genetic information. This is an example of\n"
+        },
+        {
+          "position": 637,
+          "strength": 55.03125,
+          "text": " the Barcelona May Days conflicts between the POUM and\u00ab Stalin\u00bbist forces, during the Spanish Civil War."
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "bio_q"
+    },
+    {
+      "feature_idx": 1044,
+      "label": "rejection of Orwell's manuscript by publishers",
+      "variance": 99.46875,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 637,
+          "strength": 38.71875,
+          "text": " the Barcelona May Days conflicts between the POUM and\u00ab Stalin\u00bbist forces, during the Spanish Civil War."
+        },
+        {
+          "position": 892,
+          "strength": 38.125,
+          "text": ", which Orwell hated. The manuscript was initially rejected\u00ab by\u00bb several British and American publishers, including one of"
+        },
+        {
+          "position": 636,
+          "strength": 37.65625,
+          "text": " during the Barcelona May Days conflicts between the POUM\u00ab and\u00bb Stalinist forces, during the Spanish Civil War"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "animal_farm"
+    },
+    {
+      "feature_idx": 44,
+      "label": "Connecting clauses with conjunctions and prepositions",
+      "variance": 97.74871826171875,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 418,
+          "strength": 68.0,
+          "text": " life I acted as his\nassistant, and thus\u00ab had\u00bb an opportunity of knowing something of his\nhabits"
+        },
+        {
+          "position": 419,
+          "strength": 64.0625,
+          "text": " I acted as his\nassistant, and thus had\u00ab an\u00bb opportunity of knowing something of his\nhabits and"
+        },
+        {
+          "position": 421,
+          "strength": 63.3125,
+          "text": " as his\nassistant, and thus had an opportunity\u00ab of\u00bb knowing something of his\nhabits and methods."
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "darwin"
+    },
+    {
+      "feature_idx": 1691,
+      "label": "natural selection and evolution explanation",
+      "variance": 94.05064392089844,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 10,
+          "strength": 81.6875,
+          "text": "In a population of giraffes, an environmental change\u00ab occurs\u00bb that favors individuals that are tallest. As a"
+        },
+        {
+          "position": 11,
+          "strength": 80.625,
+          "text": " a population of giraffes, an environmental change occurs\u00ab that\u00bb favors individuals that are tallest. As a result"
+        },
+        {
+          "position": 9,
+          "strength": 80.0,
+          "text": "In a population of giraffes, an environmental\u00ab change\u00bb occurs that favors individuals that are tallest. As"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "bio_q"
+    },
+    {
+      "feature_idx": 13139,
+      "label": "First-person narrative voice transitions",
+      "variance": 78.28389739990234,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 431,
+          "strength": 45.0,
+          "text": " of knowing something of his\nhabits and methods.\u00ab\n\n\u00bbI have received much help from my friends in"
+        },
+        {
+          "position": 499,
+          "strength": 43.3125,
+          "text": " some occur in\nconnection with their contributions, but\u00ab I\u00bb do not name those to whom I\nam"
+        },
+        {
+          "position": 603,
+          "strength": 42.78125,
+          "text": " of Joseph Stalin. Orwell, a democratic socialist,\u00ab was\u00bb a critic of Stalin and hostile to Moscow-"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "darwin"
+    },
+    {
+      "feature_idx": 8480,
+      "label": "Historical and political transition periods",
+      "variance": 78.19268035888672,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 354,
+          "strength": 43.84375,
+          "text": ", destroyed nearly all letters\nreceived before 1\u00ab8\u00bb62. After that date he was persuaded"
+        },
+        {
+          "position": 938,
+          "strength": 42.5,
+          "text": " as international relations and public opinion were transformed as the\u00ab wartime\u00bb alliance gave way to the Cold War.\n"
+        },
+        {
+          "position": 559,
+          "strength": 42.0625,
+          "text": " to Orwell, Animal Farm reflects events leading up to\u00ab the\u00bb Russian Revolution of 1917 and"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "animal_farm"
+    },
+    {
+      "feature_idx": 14107,
+      "label": "Acknowledgments and scholarly attribution phrases",
+      "variance": 77.7392578125,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 504,
+          "strength": 46.90625,
+          "text": " with their contributions, but I do not name those\u00ab to\u00bb whom I\nam indebted for criticisms or corrections"
+        },
+        {
+          "position": 444,
+          "strength": 45.625,
+          "text": " received much help from my friends in the course of\u00ab my\u00bb work.\nTo some I am indebted for"
+        },
+        {
+          "position": 505,
+          "strength": 41.8125,
+          "text": " their contributions, but I do not name those to\u00ab whom\u00bb I\nam indebted for criticisms or corrections,"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "darwin"
+    },
+    {
+      "feature_idx": 14963,
+      "label": "acknowledgments and attributions in biographical prefaces",
+      "variance": 76.3503189086914,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 256,
+          "strength": 67.375,
+          "text": " enabled me to assign dates to many letters which would\u00ab\n\u00bbotherwise have been shorn of half their value"
+        },
+        {
+          "position": 507,
+          "strength": 67.25,
+          "text": ", but I do not name those to whom I\u00ab\n\u00bbam indebted for criticisms or corrections, because I"
+        },
+        {
+          "position": 227,
+          "strength": 66.0625,
+          "text": " his letters, so that but for the Diary it\u00ab\n\u00bbwould have been all but impossible to unravel the"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "darwin"
+    },
+    {
+      "feature_idx": 14304,
+      "label": "Punctuation and formatting marks in text",
+      "variance": 76.22390747070312,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 354,
+          "strength": 64.1875,
+          "text": ", destroyed nearly all letters\nreceived before 1\u00ab8\u00bb62. After that date he was persuaded"
+        },
+        {
+          "position": 1000,
+          "strength": 58.625,
+          "text": "2, 4), and (3, \u00ab0\u00bb) is reflected across the line y = x"
+        },
+        {
+          "position": 118,
+          "strength": 54.5625,
+          "text": "rendering which would unfairly exaggerate their effect.\n\nThe\u00ab Diary\u00bb or Pocket-book, from which quotations occur"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "animal_farm"
+    },
+    {
+      "feature_idx": 12111,
+      "label": "preservation and accessibility of historical letters",
+      "variance": 72.39811706542969,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 375,
+          "strength": 41.75,
+          "text": " keep the more\ninteresting letters, and these are\u00ab preserved\u00bb in an accessible form.\n\nI have attempted"
+        },
+        {
+          "position": 374,
+          "strength": 40.0625,
+          "text": " to keep the more\ninteresting letters, and these\u00ab are\u00bb preserved in an accessible form.\n\nI have"
+        },
+        {
+          "position": 376,
+          "strength": 39.25,
+          "text": " the more\ninteresting letters, and these are preserved\u00ab in\u00bb an accessible form.\n\nI have attempted to"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "darwin"
+    },
+    {
+      "feature_idx": 2945,
+      "label": "Foreign language phrases within English text",
+      "variance": 71.96175384521484,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 355,
+          "strength": 73.625,
+          "text": " destroyed nearly all letters\nreceived before 18\u00ab6\u00bb2. After that date he was persuaded to"
+        },
+        {
+          "position": 1001,
+          "strength": 62.5,
+          "text": ", 4), and (3, 0\u00ab)\u00bb is reflected across the line y = x to"
+        },
+        {
+          "position": 119,
+          "strength": 53.46875,
+          "text": " which would unfairly exaggerate their effect.\n\nThe Diary\u00ab or\u00bb Pocket-book, from which quotations occur in"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SEMANTIC",
+        "agree": false,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "math_q"
+    },
+    {
+      "feature_idx": 15787,
+      "label": "the definite article in formal historical writing",
+      "variance": 70.65235900878906,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 866,
+          "strength": 47.0625,
+          "text": " when the United Kingdom was in its wartime alliance with\u00ab the\u00bb Soviet Union against Nazi Germany and the British intelligent"
+        },
+        {
+          "position": 366,
+          "strength": 46.9375,
+          "text": "2. After that date he was persuaded to keep\u00ab the\u00bb more\ninteresting letters, and these are preserved"
+        },
+        {
+          "position": 577,
+          "strength": 46.40625,
+          "text": "7 and then on into the Stalinist era of\u00ab the\u00bb Soviet Union, a period when Russia lived under"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "animal_farm"
+    },
+    {
+      "feature_idx": 4979,
+      "label": "Words or phrases enclosed in guillemets (French quotes)",
+      "variance": 68.52842712402344,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 225,
+          "strength": 49.5625,
+          "text": " rarely dated his letters, so that but for the\u00ab Diary\u00bb it\nwould have been all but impossible to"
+        },
+        {
+          "position": 818,
+          "strength": 49.53125,
+          "text": " a symbol of Russia. It also played on the\u00ab French\u00bb name of the Soviet Union, Union des r\u00e9"
+        },
+        {
+          "position": 183,
+          "strength": 48.59375,
+          "text": " or less; and contains\nlittle more than the\u00ab dates\u00bb of the principal events of his life, together"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "animal_farm"
+    }
+  ],
+  "passages": [
+    "bio_q",
+    "darwin",
+    "animal_farm",
+    "math_q"
+  ],
+  "top_feat_indices_var": [
+    4854,
+    94,
+    2298,
+    5298,
+    10946,
+    1108,
+    10712,
+    2507,
+    15284,
+    8395,
+    16186,
+    12330,
+    5466,
+    5673,
+    9538,
+    3717,
+    16291,
+    2607,
+    338,
+    8201,
+    1044,
+    44,
+    1691,
+    13139,
+    8480,
+    14107,
+    14963,
+    14304,
+    12111,
+    2945,
+    15787,
+    4979
+  ],
+  "top_feat_indices_pdvar": [
+    4854,
+    2507,
+    2298,
+    5298,
+    1691,
+    10946,
+    16186,
+    94,
+    15284,
+    1108,
+    3717,
+    1044,
+    2607,
+    8395,
+    11302,
+    8201,
+    7797,
+    5673,
+    4237,
+    12330,
+    12017,
+    6871,
+    16291,
+    8411,
+    12111,
+    9692,
+    44,
+    6549,
+    11474,
+    6194,
+    2945,
+    10712
+  ],
+  "metrics": {
+    "N": 32,
+    "semantic_count": 21,
+    "semantic_fraction": 0.65625,
+    "passage_coverage_count": 4,
+    "passage_coverage_entropy": 1.2684174397594248,
+    "n_passages": 4,
+    "judge_disagreement_rate": 0.0625,
+    "semantic_count_pdvar_overlap": 15,
+    "pdvar_var_overlap_count": 22,
+    "semantic_count_pdvar": 22,
+    "pdvar_new_labels_count": 10
+  },
+  "pdvar_only_features": [
+    {
+      "feature_idx": 11302,
+      "label": "geometric reflection across diagonal line",
+      "variance": 38.12342834472656,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1008,
+          "strength": 39.90625,
+          "text": ", 0) is reflected across the line y\u00ab =\u00bb x to get a new pentagon, P"
+        },
+        {
+          "position": 1009,
+          "strength": 37.5,
+          "text": " 0) is reflected across the line y =\u00ab x\u00bb to get a new pentagon, P\u2019,"
+        },
+        {
+          "position": 1006,
+          "strength": 36.4375,
+          "text": " (3, 0) is reflected across the\u00ab line\u00bb y = x to get a new pentagon"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 7797,
+      "label": "geometric reflection across coordinate axes",
+      "variance": 55.280574798583984,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1000,
+          "strength": 67.1875,
+          "text": "2, 4), and (3, \u00ab0\u00bb) is reflected across the line y = x"
+        },
+        {
+          "position": 1003,
+          "strength": 65.9375,
+          "text": "4), and (3, 0) is\u00ab reflected\u00bb across the line y = x to get a"
+        },
+        {
+          "position": 117,
+          "strength": 64.9375,
+          "text": "\nrendering which would unfairly exaggerate their effect.\n\n\u00abThe\u00bb Diary or Pocket-book, from which quotations"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 4237,
+      "label": "Natural selection and evolutionary fitness concepts",
+      "variance": 25.860166549682617,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 143,
+          "strength": 26.765625,
+          "text": ", has been of value as supplying a frame-\u00abwork\u00bb of facts round which\nletters may be grouped"
+        },
+        {
+          "position": 23,
+          "strength": 24.875,
+          "text": " individuals that are tallest. As a result, more\u00ab of\u00bb the taller individuals are able to obtain nutrients and"
+        },
+        {
+          "position": 62,
+          "strength": 24.65625,
+          "text": "\nB. stabilizing selection.\nC. sexual\u00ab selection\u00bb.\nD. disruptive selection.f names"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 12017,
+      "label": "Common function words in descriptive clauses",
+      "variance": 30.134254455566406,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 86,
+          "strength": 29.359375,
+          "text": "\ncapitals, or in the matter of punctuation\u00ab.\u00bb My father underlined many\nwords in his letters"
+        },
+        {
+          "position": 85,
+          "strength": 28.953125,
+          "text": " of\ncapitals, or in the matter of\u00ab punctuation\u00bb. My father underlined many\nwords in his"
+        },
+        {
+          "position": 87,
+          "strength": 27.28125,
+          "text": "capitals, or in the matter of punctuation.\u00ab My\u00bb father underlined many\nwords in his letters;"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      }
+    },
+    {
+      "feature_idx": 6871,
+      "label": "Prepositions and articles in formal prose",
+      "variance": 63.44993209838867,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 265,
+          "strength": 44.59375,
+          "text": " would\notherwise have been shorn of half their\u00ab value\u00bb.\n\nOf letters addressed to my father I"
+        },
+        {
+          "position": 263,
+          "strength": 41.4375,
+          "text": " letters which would\notherwise have been shorn of\u00ab half\u00bb their value.\n\nOf letters addressed to my"
+        },
+        {
+          "position": 198,
+          "strength": 40.25,
+          "text": " of his life, together\nwith entries as to\u00ab his\u00bb work, and as to the duration of his"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      }
+    },
+    {
+      "feature_idx": 8411,
+      "label": "geometric transformations and reflections across axes",
+      "variance": 53.4359016418457,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1009,
+          "strength": 34.21875,
+          "text": " 0) is reflected across the line y =\u00ab x\u00bb to get a new pentagon, P\u2019,"
+        },
+        {
+          "position": 1015,
+          "strength": 34.1875,
+          "text": " the line y = x to get a new pen\u00abtagon\u00bb, P\u2019, then one of the vertices of"
+        },
+        {
+          "position": 1013,
+          "strength": 32.46875,
+          "text": " reflected across the line y = x to get a\u00ab new\u00bb pentagon, P\u2019, then one of the"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 9692,
+      "label": "Articles and prepositions in mathematical or scientific contexts",
+      "variance": 30.831357955932617,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 0,
+          "strength": 38.90625,
+          "text": "\u00abIn\u00bb a population of giraffes, an environmental change"
+        },
+        {
+          "position": 1,
+          "strength": 38.34375,
+          "text": "In\u00ab a\u00bb population of giraffes, an environmental change occurs"
+        },
+        {
+          "position": 988,
+          "strength": 37.71875,
+          "text": ", 1), (\u20131, 4\u00ab),\u00bb (2, 4), and (3"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 6549,
+      "label": "Publishing history and editorial decisions",
+      "variance": 61.87001419067383,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 745,
+          "strength": 38.875,
+          "text": " Animal Farm: A Fairy Story. American publishers dropped\u00ab the\u00bb subtitle when it was published in 19"
+        },
+        {
+          "position": 923,
+          "strength": 36.15625,
+          "text": " delayed its publication. It became a great commercial success\u00ab when\u00bb it did appear, as international relations and public"
+        },
+        {
+          "position": 924,
+          "strength": 36.0,
+          "text": " its publication. It became a great commercial success when\u00ab it\u00bb did appear, as international relations and public opinion"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 11474,
+      "label": "Animal Farm and Russian Revolution historical context",
+      "variance": 47.270713806152344,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 596,
+          "strength": 29.21875,
+          "text": " under the Marxist\u2013Leninist ideology of Joseph Stalin\u00ab.\u00bb Orwell, a democratic socialist, was a critic"
+        },
+        {
+          "position": 811,
+          "strength": 28.421875,
+          "text": " the Latin word for \"bear\", a symbol of\u00ab Russia\u00bb. It also played on the French name of"
+        },
+        {
+          "position": 562,
+          "strength": 27.46875,
+          "text": " Animal Farm reflects events leading up to the Russian Revolution\u00ab of\u00bb 1917 and then on into"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 6194,
+      "label": "Coordinate pairs and mathematical notation",
+      "variance": 23.457698822021484,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 30,
+          "strength": 22.984375,
+          "text": " result, more of the taller individuals are able to\u00ab obtain\u00bb nutrients and survive to pass along their genetic information"
+        },
+        {
+          "position": 1042,
+          "strength": 21.90625,
+          "text": "0, \u2013 3)\nB. (\u00ab4\u00bb, 1)\nC. (2"
+        },
+        {
+          "position": 32,
+          "strength": 20.296875,
+          "text": " more of the taller individuals are able to obtain nutrients\u00ab and\u00bb survive to pass along their genetic information. This"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SEMANTIC",
+        "agree": false,
+        "verdict": "SYNTACTIC"
+      }
+    }
+  ]
+}

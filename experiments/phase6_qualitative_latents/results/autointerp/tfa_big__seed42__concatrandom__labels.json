@@ -1,0 +1,905 @@
+{
+  "arch": "tfa_big",
+  "seed": 42,
+  "concat": "random",
+  "features": [
+    {
+      "feature_idx": 2212,
+      "label": "Beginning of text with title or heading",
+      "variance": 2.445516884108656e-06,
+      "n_contexts": 2,
+      "contexts": [
+        {
+          "position": 1581,
+          "strength": 0.047637939453125,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbListen to En Athma Nesa online."
+        },
+        {
+          "position": 660,
+          "strength": 0.0460205078125,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbAussies Grill and Beach Bar\nAccount Log"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_06"
+    },
+    {
+      "feature_idx": 17555,
+      "label": "Beginning of text with title or heading",
+      "variance": 1.5588003634547931e-06,
+      "n_contexts": 2,
+      "contexts": [
+        {
+          "position": 1581,
+          "strength": 0.0382080078125,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbListen to En Athma Nesa online."
+        },
+        {
+          "position": 660,
+          "strength": 0.03656005859375,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbAussies Grill and Beach Bar\nAccount Log"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_06"
+    },
+    {
+      "feature_idx": 1928,
+      "label": "Beginning of text with song or venue title",
+      "variance": 1.4710983577970183e-06,
+      "n_contexts": 2,
+      "contexts": [
+        {
+          "position": 1581,
+          "strength": 0.03717041015625,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbListen to En Athma Nesa online."
+        },
+        {
+          "position": 660,
+          "strength": 0.03546142578125,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbAussies Grill and Beach Bar\nAccount Log"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_06"
+    },
+    {
+      "feature_idx": 7724,
+      "label": "Beginning of text with title or heading",
+      "variance": 1.3582476867668447e-06,
+      "n_contexts": 2,
+      "contexts": [
+        {
+          "position": 1581,
+          "strength": 0.03564453125,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbListen to En Athma Nesa online."
+        },
+        {
+          "position": 660,
+          "strength": 0.034149169921875,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbAussies Grill and Beach Bar\nAccount Log"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_06"
+    },
+    {
+      "feature_idx": 17394,
+      "label": "Beginning of text with title or heading",
+      "variance": 1.3479585732056876e-06,
+      "n_contexts": 2,
+      "contexts": [
+        {
+          "position": 1581,
+          "strength": 0.03570556640625,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbListen to En Athma Nesa online."
+        },
+        {
+          "position": 660,
+          "strength": 0.0338134765625,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbAussies Grill and Beach Bar\nAccount Log"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_06"
+    },
+    {
+      "feature_idx": 16936,
+      "label": "Beginning of text with title or heading",
+      "variance": 1.3029946330789244e-06,
+      "n_contexts": 2,
+      "contexts": [
+        {
+          "position": 1581,
+          "strength": 0.034912109375,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbListen to En Athma Nesa online."
+        },
+        {
+          "position": 660,
+          "strength": 0.033447265625,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbAussies Grill and Beach Bar\nAccount Log"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_06"
+    },
+    {
+      "feature_idx": 8406,
+      "label": "Beginning of text with title or heading",
+      "variance": 1.2830585092160618e-06,
+      "n_contexts": 2,
+      "contexts": [
+        {
+          "position": 1581,
+          "strength": 0.03448486328125,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbListen to En Athma Nesa online."
+        },
+        {
+          "position": 660,
+          "strength": 0.033355712890625,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbAussies Grill and Beach Bar\nAccount Log"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_06"
+    },
+    {
+      "feature_idx": 7160,
+      "label": "Beginning of text with title or heading",
+      "variance": 1.2820518122680369e-06,
+      "n_contexts": 2,
+      "contexts": [
+        {
+          "position": 1581,
+          "strength": 0.034576416015625,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbListen to En Athma Nesa online."
+        },
+        {
+          "position": 660,
+          "strength": 0.033233642578125,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbAussies Grill and Beach Bar\nAccount Log"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_06"
+    },
+    {
+      "feature_idx": 8358,
+      "label": "Beginning of text with song or venue title",
+      "variance": 1.2776417861459777e-06,
+      "n_contexts": 2,
+      "contexts": [
+        {
+          "position": 1581,
+          "strength": 0.034637451171875,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbListen to En Athma Nesa online."
+        },
+        {
+          "position": 660,
+          "strength": 0.033050537109375,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbAussies Grill and Beach Bar\nAccount Log"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_06"
+    },
+    {
+      "feature_idx": 14514,
+      "label": "Beginning of text with title or heading",
+      "variance": 1.2731525202980265e-06,
+      "n_contexts": 2,
+      "contexts": [
+        {
+          "position": 1581,
+          "strength": 0.034637451171875,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbListen to En Athma Nesa online."
+        },
+        {
+          "position": 660,
+          "strength": 0.032928466796875,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbAussies Grill and Beach Bar\nAccount Log"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_06"
+    },
+    {
+      "feature_idx": 768,
+      "label": "Beginning of text with title or heading content",
+      "variance": 1.2469444072849e-06,
+      "n_contexts": 2,
+      "contexts": [
+        {
+          "position": 1581,
+          "strength": 0.034332275390625,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbListen to En Athma Nesa online."
+        },
+        {
+          "position": 660,
+          "strength": 0.03253173828125,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbAussies Grill and Beach Bar\nAccount Log"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_06"
+    },
+    {
+      "feature_idx": 9834,
+      "label": "Beginning of text with quoted speech or title",
+      "variance": 1.2421702422216185e-06,
+      "n_contexts": 2,
+      "contexts": [
+        {
+          "position": 1581,
+          "strength": 0.034149169921875,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbListen to En Athma Nesa online."
+        },
+        {
+          "position": 660,
+          "strength": 0.0325927734375,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbAussies Grill and Beach Bar\nAccount Log"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_06"
+    },
+    {
+      "feature_idx": 13794,
+      "label": "Beginning of text with title or heading",
+      "variance": 1.2262246400496224e-06,
+      "n_contexts": 2,
+      "contexts": [
+        {
+          "position": 1581,
+          "strength": 0.03387451171875,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbListen to En Athma Nesa online."
+        },
+        {
+          "position": 660,
+          "strength": 0.032440185546875,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbAussies Grill and Beach Bar\nAccount Log"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_06"
+    },
+    {
+      "feature_idx": 17268,
+      "label": "Beginning of text with title or heading",
+      "variance": 1.2217167295602849e-06,
+      "n_contexts": 2,
+      "contexts": [
+        {
+          "position": 1581,
+          "strength": 0.0338134765625,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbListen to En Athma Nesa online."
+        },
+        {
+          "position": 660,
+          "strength": 0.032379150390625,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbAussies Grill and Beach Bar\nAccount Log"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_06"
+    },
+    {
+      "feature_idx": 15483,
+      "label": "Beginning of text with title or heading",
+      "variance": 1.2048141115883482e-06,
+      "n_contexts": 2,
+      "contexts": [
+        {
+          "position": 1581,
+          "strength": 0.033538818359375,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbListen to En Athma Nesa online."
+        },
+        {
+          "position": 660,
+          "strength": 0.032196044921875,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbAussies Grill and Beach Bar\nAccount Log"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_06"
+    },
+    {
+      "feature_idx": 2692,
+      "label": "Beginning of text with title or heading",
+      "variance": 1.1841896139230812e-06,
+      "n_contexts": 2,
+      "contexts": [
+        {
+          "position": 1581,
+          "strength": 0.033538818359375,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbListen to En Athma Nesa online."
+        },
+        {
+          "position": 660,
+          "strength": 0.0316162109375,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbAussies Grill and Beach Bar\nAccount Log"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_06"
+    },
+    {
+      "feature_idx": 4972,
+      "label": "Beginning of text with title or heading",
+      "variance": 1.1816183587143314e-06,
+      "n_contexts": 2,
+      "contexts": [
+        {
+          "position": 1581,
+          "strength": 0.0333251953125,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbListen to En Athma Nesa online."
+        },
+        {
+          "position": 660,
+          "strength": 0.031768798828125,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbAussies Grill and Beach Bar\nAccount Log"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_06"
+    },
+    {
+      "feature_idx": 8259,
+      "label": "Beginning of text with title or heading",
+      "variance": 1.1814687468358898e-06,
+      "n_contexts": 2,
+      "contexts": [
+        {
+          "position": 1581,
+          "strength": 0.033233642578125,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbListen to En Athma Nesa online."
+        },
+        {
+          "position": 660,
+          "strength": 0.0318603515625,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbAussies Grill and Beach Bar\nAccount Log"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_06"
+    },
+    {
+      "feature_idx": 15787,
+      "label": "Beginning of text with title or heading",
+      "variance": 1.1783807849496952e-06,
+      "n_contexts": 2,
+      "contexts": [
+        {
+          "position": 1581,
+          "strength": 0.0333251953125,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbListen to En Athma Nesa online."
+        },
+        {
+          "position": 660,
+          "strength": 0.03167724609375,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbAussies Grill and Beach Bar\nAccount Log"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_06"
+    },
+    {
+      "feature_idx": 11090,
+      "label": "Beginning of text with title or heading",
+      "variance": 1.1571445384106482e-06,
+      "n_contexts": 2,
+      "contexts": [
+        {
+          "position": 1581,
+          "strength": 0.0328369140625,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbListen to En Athma Nesa online."
+        },
+        {
+          "position": 660,
+          "strength": 0.031585693359375,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbAussies Grill and Beach Bar\nAccount Log"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_06"
+    },
+    {
+      "feature_idx": 3886,
+      "label": "Beginning of text with title or heading",
+      "variance": 1.1475152632556274e-06,
+      "n_contexts": 2,
+      "contexts": [
+        {
+          "position": 1581,
+          "strength": 0.0328369140625,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbListen to En Athma Nesa online."
+        },
+        {
+          "position": 660,
+          "strength": 0.03131103515625,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbAussies Grill and Beach Bar\nAccount Log"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_06"
+    },
+    {
+      "feature_idx": 17670,
+      "label": "Product category labels and navigation terms",
+      "variance": 1.143263716585352e-06,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1707,
+          "strength": 0.00507354736328125,
+          "text": " StrapTM Images\n3-Way Camera StrapTM\u00ab Videos\u00bb\n3-Way Camera Strap Accessories\nFrequently"
+        },
+        {
+          "position": 1201,
+          "strength": 0.004718780517578125,
+          "text": " have a large number of options. A qualified installation\u00ab tech\u00bb will be able to ensure that you are satisfied"
+        },
+        {
+          "position": 1714,
+          "strength": 0.00469207763671875,
+          "text": " Camera StrapTM Videos\n3-Way Camera Strap\u00ab Accessories\u00bb\nFrequently Asked Questions about the 3-"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "fw_05"
+    },
+    {
+      "feature_idx": 12548,
+      "label": "Beginning of text with title or heading",
+      "variance": 1.1427390518292668e-06,
+      "n_contexts": 2,
+      "contexts": [
+        {
+          "position": 1581,
+          "strength": 0.032470703125,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbListen to En Athma Nesa online."
+        },
+        {
+          "position": 660,
+          "strength": 0.03155517578125,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbAussies Grill and Beach Bar\nAccount Log"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_06"
+    },
+    {
+      "feature_idx": 12851,
+      "label": "Beginning of text with title or heading",
+      "variance": 1.1419900829423568e-06,
+      "n_contexts": 2,
+      "contexts": [
+        {
+          "position": 1581,
+          "strength": 0.03271484375,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbListen to En Athma Nesa online."
+        },
+        {
+          "position": 660,
+          "strength": 0.031280517578125,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbAussies Grill and Beach Bar\nAccount Log"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_06"
+    },
+    {
+      "feature_idx": 4462,
+      "label": "Beginning of text with title or heading",
+      "variance": 1.139026835517143e-06,
+      "n_contexts": 2,
+      "contexts": [
+        {
+          "position": 1581,
+          "strength": 0.0328369140625,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbListen to En Athma Nesa online."
+        },
+        {
+          "position": 660,
+          "strength": 0.03106689453125,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbAussies Grill and Beach Bar\nAccount Log"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_06"
+    },
+    {
+      "feature_idx": 14339,
+      "label": "Beginning of sentence or text block",
+      "variance": 1.1386406413294026e-06,
+      "n_contexts": 4,
+      "contexts": [
+        {
+          "position": 1581,
+          "strength": 0.03271484375,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbListen to En Athma Nesa online."
+        },
+        {
+          "position": 660,
+          "strength": 0.0311279296875,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbAussies Grill and Beach Bar\nAccount Log"
+        },
+        {
+          "position": 31,
+          "strength": 0.001399993896484375,
+          "text": " by legal practice area. Find a quality and affordable\u00ab lawyer\u00bb by reviewing detail profiles for Montpelier attorneys."
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_06"
+    },
+    {
+      "feature_idx": 12567,
+      "label": "Beginning of text with title or heading",
+      "variance": 1.1266632782280794e-06,
+      "n_contexts": 2,
+      "contexts": [
+        {
+          "position": 1581,
+          "strength": 0.03240966796875,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbListen to En Athma Nesa online."
+        },
+        {
+          "position": 660,
+          "strength": 0.031158447265625,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbAussies Grill and Beach Bar\nAccount Log"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_06"
+    },
+    {
+      "feature_idx": 2871,
+      "label": "Beginning of text with title or heading",
+      "variance": 1.1142104767714045e-06,
+      "n_contexts": 2,
+      "contexts": [
+        {
+          "position": 1581,
+          "strength": 0.032196044921875,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbListen to En Athma Nesa online."
+        },
+        {
+          "position": 660,
+          "strength": 0.0310211181640625,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbAussies Grill and Beach Bar\nAccount Log"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_06"
+    },
+    {
+      "feature_idx": 1686,
+      "label": "Beginning of text with title or heading",
+      "variance": 1.113115786210983e-06,
+      "n_contexts": 2,
+      "contexts": [
+        {
+          "position": 1581,
+          "strength": 0.03216552734375,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbListen to En Athma Nesa online."
+        },
+        {
+          "position": 660,
+          "strength": 0.0310211181640625,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbAussies Grill and Beach Bar\nAccount Log"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_06"
+    },
+    {
+      "feature_idx": 11063,
+      "label": "Beginning of text with title or heading",
+      "variance": 1.1091442502220161e-06,
+      "n_contexts": 2,
+      "contexts": [
+        {
+          "position": 1581,
+          "strength": 0.032318115234375,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbListen to En Athma Nesa online."
+        },
+        {
+          "position": 660,
+          "strength": 0.0307464599609375,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbAussies Grill and Beach Bar\nAccount Log"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_06"
+    },
+    {
+      "feature_idx": 6063,
+      "label": "Beginning of text with title or heading",
+      "variance": 1.104231500903552e-06,
+      "n_contexts": 2,
+      "contexts": [
+        {
+          "position": 1581,
+          "strength": 0.032196044921875,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbListen to En Athma Nesa online."
+        },
+        {
+          "position": 660,
+          "strength": 0.030731201171875,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbAussies Grill and Beach Bar\nAccount Log"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_06"
+    },
+    {
+      "feature_idx": 1882,
+      "label": "Beginning of text sequences with proper nouns",
+      "variance": 1.1013045195795712e-06,
+      "n_contexts": 2,
+      "contexts": [
+        {
+          "position": 1581,
+          "strength": 0.031982421875,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbListen to En Athma Nesa online."
+        },
+        {
+          "position": 660,
+          "strength": 0.0308685302734375,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbAussies Grill and Beach Bar\nAccount Log"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_06"
+    }
+  ],
+  "passages": [
+    "fw_00",
+    "fw_01",
+    "fw_02",
+    "fw_03",
+    "fw_04",
+    "fw_05",
+    "fw_06"
+  ],
+  "top_feat_indices_var": [
+    2212,
+    17555,
+    1928,
+    7724,
+    17394,
+    16936,
+    8406,
+    7160,
+    8358,
+    14514,
+    768,
+    9834,
+    13794,
+    17268,
+    15483,
+    2692,
+    4972,
+    8259,
+    15787,
+    11090,
+    3886,
+    17670,
+    12548,
+    12851,
+    4462,
+    14339,
+    12567,
+    2871,
+    1686,
+    11063,
+    6063,
+    1882
+  ],
+  "top_feat_indices_pdvar": [
+    16018,
+    8303,
+    6710,
+    3743,
+    16591,
+    10377,
+    10520,
+    2680,
+    1157,
+    2517,
+    12218,
+    13515,
+    16031,
+    8216,
+    2389,
+    10255,
+    15963,
+    11044,
+    12514,
+    4370,
+    11376,
+    13413,
+    8684,
+    13178,
+    10357,
+    15442,
+    7421,
+    229,
+    11024,
+    12700,
+    17395,
+    17934
+  ],
+  "metrics": {
+    "N": 32,
+    "semantic_count": 1,
+    "semantic_fraction": 0.03125,
+    "passage_coverage_count": 2,
+    "passage_coverage_entropy": 0.13906079845474112,
+    "n_passages": 7,
+    "judge_disagreement_rate": 0.0,
+    "semantic_count_pdvar_overlap": 0,
+    "pdvar_var_overlap_count": 0
+  }
+}

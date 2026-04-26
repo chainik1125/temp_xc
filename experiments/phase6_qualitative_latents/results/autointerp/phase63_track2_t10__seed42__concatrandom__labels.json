@@ -1,0 +1,1610 @@
+{
+  "arch": "phase63_track2_t10",
+  "seed": 42,
+  "concat": "random",
+  "features": [
+    {
+      "feature_idx": 17679,
+      "label": "Domain names and website directory structures",
+      "variance": 3820.913330078125,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 5,
+          "strength": 882.5,
+          "text": "<bos>Lawyer.com makes\u00ab finding\u00bb Montpelier Lawyers fast and easy. Refine"
+        },
+        {
+          "position": 2,
+          "strength": 780.0,
+          "text": "<bos>Lawyer\u00ab.\u00bbcom makes finding Montpelier Lawyers fast and easy"
+        },
+        {
+          "position": 3,
+          "strength": 779.5,
+          "text": "<bos>Lawyer.\u00abcom\u00bb makes finding Montpelier Lawyers fast and easy."
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "fw_00"
+    },
+    {
+      "feature_idx": 4782,
+      "label": "Domain names and website titles",
+      "variance": 2530.798095703125,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1,
+          "strength": 882.0,
+          "text": "<bos>\u00abLawyer\u00bb.com makes finding Montpelier Lawyers fast and"
+        },
+        {
+          "position": 0,
+          "strength": 828.5,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        },
+        {
+          "position": 2,
+          "strength": 614.0,
+          "text": "<bos>Lawyer\u00ab.\u00bbcom makes finding Montpelier Lawyers fast and easy"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "fw_05"
+    },
+    {
+      "feature_idx": 7012,
+      "label": "Words or phrases within domain names and product names",
+      "variance": 2140.498291015625,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 0,
+          "strength": 669.5,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        },
+        {
+          "position": 1,
+          "strength": 629.0,
+          "text": "<bos>\u00abLawyer\u00bb.com makes finding Montpelier Lawyers fast and"
+        },
+        {
+          "position": 5,
+          "strength": 563.5,
+          "text": "<bos>Lawyer.com makes\u00ab finding\u00bb Montpelier Lawyers fast and easy. Refine"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SEMANTIC",
+        "agree": false,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_05"
+    },
+    {
+      "feature_idx": 2435,
+      "label": "Beginning of sentence or document markers",
+      "variance": 2101.468505859375,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 0,
+          "strength": 915.5,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        },
+        {
+          "position": 1,
+          "strength": 622.0,
+          "text": "<bos>\u00abLawyer\u00bb.com makes finding Montpelier Lawyers fast and"
+        },
+        {
+          "position": 3,
+          "strength": 429.25,
+          "text": "<bos>Lawyer.\u00abcom\u00bb makes finding Montpelier Lawyers fast and easy."
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_00"
+    },
+    {
+      "feature_idx": 17916,
+      "label": "Website directory and service listing pages",
+      "variance": 1267.41796875,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 3,
+          "strength": 463.5,
+          "text": "<bos>Lawyer.\u00abcom\u00bb makes finding Montpelier Lawyers fast and easy."
+        },
+        {
+          "position": 2,
+          "strength": 429.75,
+          "text": "<bos>Lawyer\u00ab.\u00bbcom makes finding Montpelier Lawyers fast and easy"
+        },
+        {
+          "position": 1,
+          "strength": 406.0,
+          "text": "<bos>\u00abLawyer\u00bb.com makes finding Montpelier Lawyers fast and"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "fw_00"
+    },
+    {
+      "feature_idx": 6586,
+      "label": "color mixing and display technology",
+      "variance": 1185.191162109375,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1278,
+          "strength": 182.75,
+          "text": " feeling drafty or cold, and will let in\u00ab light\u00bb,<bos>Samsung has made an announcement, following"
+        },
+        {
+          "position": 159,
+          "strength": 175.25,
+          "text": " it also controls how the Red, Green and Blue\u00ab primary\u00bb colors mix to produce all of the on-"
+        },
+        {
+          "position": 1275,
+          "strength": 174.0,
+          "text": " a home from feeling drafty or cold, and\u00ab will\u00bb let in light,<bos>Samsung has made an"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "fw_01"
+    },
+    {
+      "feature_idx": 17474,
+      "label": "Beginning of sentence with proper noun",
+      "variance": 1152.3992919921875,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 0,
+          "strength": 541.0,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        },
+        {
+          "position": 2,
+          "strength": 416.75,
+          "text": "<bos>Lawyer\u00ab.\u00bbcom makes finding Montpelier Lawyers fast and easy"
+        },
+        {
+          "position": 1,
+          "strength": 379.5,
+          "text": "<bos>\u00abLawyer\u00bb.com makes finding Montpelier Lawyers fast and"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_01"
+    },
+    {
+      "feature_idx": 3231,
+      "label": "Sequence boundaries and text segmentation markers",
+      "variance": 1110.864990234375,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 3,
+          "strength": 471.25,
+          "text": "<bos>Lawyer.\u00abcom\u00bb makes finding Montpelier Lawyers fast and easy."
+        },
+        {
+          "position": 2,
+          "strength": 441.75,
+          "text": "<bos>Lawyer\u00ab.\u00bbcom makes finding Montpelier Lawyers fast and easy"
+        },
+        {
+          "position": 1,
+          "strength": 413.0,
+          "text": "<bos>\u00abLawyer\u00bb.com makes finding Montpelier Lawyers fast and"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_03"
+    },
+    {
+      "feature_idx": 9000,
+      "label": "Website domain names and commercial URLs",
+      "variance": 1085.903076171875,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 0,
+          "strength": 631.0,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        },
+        {
+          "position": 1,
+          "strength": 469.25,
+          "text": "<bos>\u00abLawyer\u00bb.com makes finding Montpelier Lawyers fast and"
+        },
+        {
+          "position": 2,
+          "strength": 398.5,
+          "text": "<bos>Lawyer\u00ab.\u00bbcom makes finding Montpelier Lawyers fast and easy"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "fw_00"
+    },
+    {
+      "feature_idx": 2025,
+      "label": "Sentence or section boundaries with punctuation",
+      "variance": 1029.975830078125,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1,
+          "strength": 356.0,
+          "text": "<bos>\u00abLawyer\u00bb.com makes finding Montpelier Lawyers fast and"
+        },
+        {
+          "position": 2,
+          "strength": 355.5,
+          "text": "<bos>Lawyer\u00ab.\u00bbcom makes finding Montpelier Lawyers fast and easy"
+        },
+        {
+          "position": 0,
+          "strength": 355.25,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_02"
+    },
+    {
+      "feature_idx": 4695,
+      "label": "Domain names and brand names at sentence starts",
+      "variance": 1019.4573364257812,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1,
+          "strength": 530.5,
+          "text": "<bos>\u00abLawyer\u00bb.com makes finding Montpelier Lawyers fast and"
+        },
+        {
+          "position": 0,
+          "strength": 509.0,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        },
+        {
+          "position": 3,
+          "strength": 362.75,
+          "text": "<bos>Lawyer.\u00abcom\u00bb makes finding Montpelier Lawyers fast and easy."
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_00"
+    },
+    {
+      "feature_idx": 14247,
+      "label": "Text tokens preceding document boundaries or section breaks",
+      "variance": 976.9906005859375,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 0,
+          "strength": 334.25,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        },
+        {
+          "position": 1582,
+          "strength": 259.5,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><bos>\u00abListen\u00bb to En Athma Nesa online. En"
+        },
+        {
+          "position": 1148,
+          "strength": 254.75,
+          "text": " measured by assessing cme2's adherence and\u00ab compliance\u00bb with the latest<bos>The Best Services Done By"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_00"
+    },
+    {
+      "feature_idx": 573,
+      "label": "Transition between document segments or content boundaries",
+      "variance": 972.0191040039062,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1,
+          "strength": 392.75,
+          "text": "<bos>\u00abLawyer\u00bb.com makes finding Montpelier Lawyers fast and"
+        },
+        {
+          "position": 0,
+          "strength": 348.75,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        },
+        {
+          "position": 1579,
+          "strength": 252.75,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<pad>\u00bb<pad><bos>Listen to En Athma Nesa"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SEMANTIC",
+        "agree": false,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_04"
+    },
+    {
+      "feature_idx": 16456,
+      "label": "Domain names and website URLs",
+      "variance": 966.0355224609375,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 5,
+          "strength": 460.25,
+          "text": "<bos>Lawyer.com makes\u00ab finding\u00bb Montpelier Lawyers fast and easy. Refine"
+        },
+        {
+          "position": 1586,
+          "strength": 371.5,
+          "text": "<pad><pad><pad><pad><pad><bos>Listen to En Ath\u00abma\u00bb Nesa online. En Athma Nesa"
+        },
+        {
+          "position": 3,
+          "strength": 358.75,
+          "text": "<bos>Lawyer.\u00abcom\u00bb makes finding Montpelier Lawyers fast and easy."
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SEMANTIC",
+        "agree": false,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_00"
+    },
+    {
+      "feature_idx": 10406,
+      "label": "Domain names and product titles with punctuation",
+      "variance": 904.8074340820312,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1,
+          "strength": 573.5,
+          "text": "<bos>\u00abLawyer\u00bb.com makes finding Montpelier Lawyers fast and"
+        },
+        {
+          "position": 0,
+          "strength": 559.0,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        },
+        {
+          "position": 2,
+          "strength": 454.5,
+          "text": "<bos>Lawyer\u00ab.\u00bbcom makes finding Montpelier Lawyers fast and easy"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_00"
+    },
+    {
+      "feature_idx": 10077,
+      "label": "Transition between unrelated text segments",
+      "variance": 898.7447509765625,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1580,
+          "strength": 240.875,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<pad>\u00bb<bos>Listen to En Athma Nesa online"
+        },
+        {
+          "position": 4,
+          "strength": 234.25,
+          "text": "<bos>Lawyer.com\u00ab makes\u00bb finding Montpelier Lawyers fast and easy. Ref"
+        },
+        {
+          "position": 1578,
+          "strength": 229.0,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<pad>\u00bb<pad><pad><bos>Listen to En Athma N"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SEMANTIC",
+        "agree": false,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_00"
+    },
+    {
+      "feature_idx": 13742,
+      "label": "Beginning of sequence markers and document starts",
+      "variance": 887.5589599609375,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 0,
+          "strength": 445.25,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        },
+        {
+          "position": 1578,
+          "strength": 244.875,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<pad>\u00bb<pad><pad><bos>Listen to En Athma N"
+        },
+        {
+          "position": 2,
+          "strength": 230.5,
+          "text": "<bos>Lawyer\u00ab.\u00bbcom makes finding Montpelier Lawyers fast and easy"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_06"
+    },
+    {
+      "feature_idx": 13304,
+      "label": "Beginning of sentence capitalized words",
+      "variance": 887.55078125,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1,
+          "strength": 554.0,
+          "text": "<bos>\u00abLawyer\u00bb.com makes finding Montpelier Lawyers fast and"
+        },
+        {
+          "position": 0,
+          "strength": 553.5,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        },
+        {
+          "position": 2,
+          "strength": 371.25,
+          "text": "<bos>Lawyer\u00ab.\u00bbcom makes finding Montpelier Lawyers fast and easy"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_00"
+    },
+    {
+      "feature_idx": 10751,
+      "label": "Website and business directory listing text",
+      "variance": 867.5596923828125,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 2,
+          "strength": 395.5,
+          "text": "<bos>Lawyer\u00ab.\u00bbcom makes finding Montpelier Lawyers fast and easy"
+        },
+        {
+          "position": 5,
+          "strength": 386.75,
+          "text": "<bos>Lawyer.com makes\u00ab finding\u00bb Montpelier Lawyers fast and easy. Refine"
+        },
+        {
+          "position": 1,
+          "strength": 376.0,
+          "text": "<bos>\u00abLawyer\u00bb.com makes finding Montpelier Lawyers fast and"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "fw_00"
+    },
+    {
+      "feature_idx": 13752,
+      "label": "Transition between document sections or metadata boundaries",
+      "variance": 865.4168090820312,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1149,
+          "strength": 226.125,
+          "text": " by assessing cme2's adherence and compliance\u00ab with\u00bb the latest<bos>The Best Services Done By Professional"
+        },
+        {
+          "position": 1405,
+          "strength": 179.75,
+          "text": " as follows: \u201cTo date (as of September\u00ab \u00bb1)<bos>New Mixtape: T-"
+        },
+        {
+          "position": 253,
+          "strength": 175.375,
+          "text": " Figure 3 shows the measured Intensity Scales for the\u00ab Tablets\u00bb alongside the<bos>Mostly Credited As: Dylan"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_04"
+    },
+    {
+      "feature_idx": 2578,
+      "label": "Website directory and business listing headers",
+      "variance": 827.2598876953125,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 2,
+          "strength": 425.25,
+          "text": "<bos>Lawyer\u00ab.\u00bbcom makes finding Montpelier Lawyers fast and easy"
+        },
+        {
+          "position": 1,
+          "strength": 377.75,
+          "text": "<bos>\u00abLawyer\u00bb.com makes finding Montpelier Lawyers fast and"
+        },
+        {
+          "position": 0,
+          "strength": 368.5,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "fw_00"
+    },
+    {
+      "feature_idx": 4311,
+      "label": "Beginning of sequence or document markers",
+      "variance": 814.3734741210938,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 0,
+          "strength": 410.25,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        },
+        {
+          "position": 2,
+          "strength": 405.5,
+          "text": "<bos>Lawyer\u00ab.\u00bbcom makes finding Montpelier Lawyers fast and easy"
+        },
+        {
+          "position": 1,
+          "strength": 399.25,
+          "text": "<bos>\u00abLawyer\u00bb.com makes finding Montpelier Lawyers fast and"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_05"
+    },
+    {
+      "feature_idx": 3973,
+      "label": "Domain names and website headers",
+      "variance": 810.77734375,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 0,
+          "strength": 460.0,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        },
+        {
+          "position": 3,
+          "strength": 334.75,
+          "text": "<bos>Lawyer.\u00abcom\u00bb makes finding Montpelier Lawyers fast and easy."
+        },
+        {
+          "position": 2,
+          "strength": 319.75,
+          "text": "<bos>Lawyer\u00ab.\u00bbcom makes finding Montpelier Lawyers fast and easy"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "fw_04"
+    },
+    {
+      "feature_idx": 1645,
+      "label": "Beginning of sentence markers and punctuation",
+      "variance": 772.2942504882812,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 0,
+          "strength": 467.0,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        },
+        {
+          "position": 1,
+          "strength": 464.75,
+          "text": "<bos>\u00abLawyer\u00bb.com makes finding Montpelier Lawyers fast and"
+        },
+        {
+          "position": 2,
+          "strength": 343.5,
+          "text": "<bos>Lawyer\u00ab.\u00bbcom makes finding Montpelier Lawyers fast and easy"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_00"
+    },
+    {
+      "feature_idx": 14180,
+      "label": "Formatting markup and structural delimiters",
+      "variance": 759.0087890625,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1,
+          "strength": 439.25,
+          "text": "<bos>\u00abLawyer\u00bb.com makes finding Montpelier Lawyers fast and"
+        },
+        {
+          "position": 0,
+          "strength": 408.25,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        },
+        {
+          "position": 3,
+          "strength": 301.5,
+          "text": "<bos>Lawyer.\u00abcom\u00bb makes finding Montpelier Lawyers fast and easy."
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_00"
+    },
+    {
+      "feature_idx": 688,
+      "label": "Domain names and website URLs",
+      "variance": 752.6244506835938,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 2,
+          "strength": 452.0,
+          "text": "<bos>Lawyer\u00ab.\u00bbcom makes finding Montpelier Lawyers fast and easy"
+        },
+        {
+          "position": 1,
+          "strength": 442.0,
+          "text": "<bos>\u00abLawyer\u00bb.com makes finding Montpelier Lawyers fast and"
+        },
+        {
+          "position": 3,
+          "strength": 384.0,
+          "text": "<bos>Lawyer.\u00abcom\u00bb makes finding Montpelier Lawyers fast and easy."
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SEMANTIC",
+        "agree": false,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_04"
+    },
+    {
+      "feature_idx": 12396,
+      "label": "Domain-specific website header text patterns",
+      "variance": 741.9114379882812,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 0,
+          "strength": 392.25,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        },
+        {
+          "position": 1,
+          "strength": 386.5,
+          "text": "<bos>\u00abLawyer\u00bb.com makes finding Montpelier Lawyers fast and"
+        },
+        {
+          "position": 4,
+          "strength": 313.25,
+          "text": "<bos>Lawyer.com\u00ab makes\u00bb finding Montpelier Lawyers fast and easy. Ref"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "fw_00"
+    },
+    {
+      "feature_idx": 13228,
+      "label": "Beginning of new text or document section",
+      "variance": 710.7622680664062,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 0,
+          "strength": 500.25,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        },
+        {
+          "position": 1,
+          "strength": 380.75,
+          "text": "<bos>\u00abLawyer\u00bb.com makes finding Montpelier Lawyers fast and"
+        },
+        {
+          "position": 2,
+          "strength": 250.75,
+          "text": "<bos>Lawyer\u00ab.\u00bbcom makes finding Montpelier Lawyers fast and easy"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_04"
+    },
+    {
+      "feature_idx": 12321,
+      "label": "Title case capitalization in domain names",
+      "variance": 702.0383911132812,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1,
+          "strength": 494.5,
+          "text": "<bos>\u00abLawyer\u00bb.com makes finding Montpelier Lawyers fast and"
+        },
+        {
+          "position": 0,
+          "strength": 467.5,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        },
+        {
+          "position": 2,
+          "strength": 344.75,
+          "text": "<bos>Lawyer\u00ab.\u00bbcom makes finding Montpelier Lawyers fast and easy"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_03"
+    },
+    {
+      "feature_idx": 18242,
+      "label": "Domain names and product names in text",
+      "variance": 701.0006713867188,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 2,
+          "strength": 429.25,
+          "text": "<bos>Lawyer\u00ab.\u00bbcom makes finding Montpelier Lawyers fast and easy"
+        },
+        {
+          "position": 1,
+          "strength": 409.5,
+          "text": "<bos>\u00abLawyer\u00bb.com makes finding Montpelier Lawyers fast and"
+        },
+        {
+          "position": 0,
+          "strength": 403.75,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "fw_04"
+    },
+    {
+      "feature_idx": 10432,
+      "label": "Domain names and product titles with punctuation",
+      "variance": 696.1095581054688,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 4,
+          "strength": 345.75,
+          "text": "<bos>Lawyer.com\u00ab makes\u00bb finding Montpelier Lawyers fast and easy. Ref"
+        },
+        {
+          "position": 3,
+          "strength": 310.5,
+          "text": "<bos>Lawyer.\u00abcom\u00bb makes finding Montpelier Lawyers fast and easy."
+        },
+        {
+          "position": 2,
+          "strength": 283.75,
+          "text": "<bos>Lawyer\u00ab.\u00bbcom makes finding Montpelier Lawyers fast and easy"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_01"
+    },
+    {
+      "feature_idx": 5434,
+      "label": "Domain names and website headers",
+      "variance": 683.0368041992188,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 2,
+          "strength": 381.75,
+          "text": "<bos>Lawyer\u00ab.\u00bbcom makes finding Montpelier Lawyers fast and easy"
+        },
+        {
+          "position": 1,
+          "strength": 372.25,
+          "text": "<bos>\u00abLawyer\u00bb.com makes finding Montpelier Lawyers fast and"
+        },
+        {
+          "position": 0,
+          "strength": 361.0,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "fw_00"
+    }
+  ],
+  "passages": [
+    "fw_00",
+    "fw_01",
+    "fw_02",
+    "fw_03",
+    "fw_04",
+    "fw_05",
+    "fw_06"
+  ],
+  "top_feat_indices_var": [
+    17679,
+    4782,
+    7012,
+    2435,
+    17916,
+    6586,
+    17474,
+    3231,
+    9000,
+    2025,
+    4695,
+    14247,
+    573,
+    16456,
+    10406,
+    10077,
+    13742,
+    13304,
+    10751,
+    13752,
+    2578,
+    4311,
+    3973,
+    1645,
+    14180,
+    688,
+    12396,
+    13228,
+    12321,
+    18242,
+    10432,
+    5434
+  ],
+  "top_feat_indices_pdvar": [
+    6586,
+    13752,
+    15807,
+    4128,
+    2435,
+    17679,
+    16072,
+    2025,
+    4782,
+    9609,
+    8398,
+    8952,
+    2571,
+    5785,
+    15579,
+    10077,
+    2578,
+    7012,
+    11527,
+    17474,
+    1778,
+    13228,
+    1967,
+    7370,
+    10174,
+    6849,
+    1520,
+    3231,
+    5434,
+    18366,
+    2054,
+    2691
+  ],
+  "metrics": {
+    "N": 32,
+    "semantic_count": 11,
+    "semantic_fraction": 0.34375,
+    "passage_coverage_count": 7,
+    "passage_coverage_entropy": 1.4941751382893085,
+    "n_passages": 7,
+    "judge_disagreement_rate": 0.15625,
+    "semantic_count_pdvar_overlap": 5,
+    "pdvar_var_overlap_count": 13,
+    "semantic_count_pdvar": 11,
+    "pdvar_new_labels_count": 19
+  },
+  "pdvar_only_features": [
+    {
+      "feature_idx": 15807,
+      "label": "Domain names and website URLs",
+      "variance": 658.58984375,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 4,
+          "strength": 232.125,
+          "text": "<bos>Lawyer.com\u00ab makes\u00bb finding Montpelier Lawyers fast and easy. Ref"
+        },
+        {
+          "position": 3,
+          "strength": 221.625,
+          "text": "<bos>Lawyer.\u00abcom\u00bb makes finding Montpelier Lawyers fast and easy."
+        },
+        {
+          "position": 2,
+          "strength": 210.125,
+          "text": "<bos>Lawyer\u00ab.\u00bbcom makes finding Montpelier Lawyers fast and easy"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SEMANTIC",
+        "agree": false,
+        "verdict": "SYNTACTIC"
+      }
+    },
+    {
+      "feature_idx": 4128,
+      "label": "Capitalized title or heading text",
+      "variance": 590.3441772460938,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1410,
+          "strength": 220.0,
+          "text": " date (as of September 1)<bos>New\u00ab Mix\u00bbtape: T-Shyne \u2018The SOUL"
+        },
+        {
+          "position": 386,
+          "strength": 204.375,
+          "text": " that, he played the young version of<bos>I\u00ab\u2019\u00bbve been a little down recently and trying to"
+        },
+        {
+          "position": 1154,
+          "strength": 203.5,
+          "text": "'s adherence and compliance with the latest<bos>The\u00ab Best\u00bb Services Done By Professional Window Installers\nThere"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      }
+    },
+    {
+      "feature_idx": 16072,
+      "label": "Common words preceding sentence or section breaks",
+      "variance": 294.25439453125,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1660,
+          "strength": 158.75,
+          "text": "4:30. Download Tamil songs online from\u00ab Jio\u00bbSaavn.<bos>3-Way Camera Strap"
+        },
+        {
+          "position": 1404,
+          "strength": 156.75,
+          "text": " goes as follows: \u201cTo date (as of\u00ab September\u00bb 1)<bos>New Mixtape: T"
+        },
+        {
+          "position": 1276,
+          "strength": 155.375,
+          "text": " home from feeling drafty or cold, and will\u00ab let\u00bb in light,<bos>Samsung has made an announcement"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      }
+    },
+    {
+      "feature_idx": 9609,
+      "label": "Professional service quality and competence language",
+      "variance": 152.03102111816406,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1116,
+          "strength": 55.78125,
+          "text": " lead to the development of effective strategies that enhance competence\u00ab and\u00bb provider performance.\ncme2 is accredited"
+        },
+        {
+          "position": 1113,
+          "strength": 53.40625,
+          "text": " These needs assessments lead to the development of effective strategies\u00ab that\u00bb enhance competence and provider performance.\ncme"
+        },
+        {
+          "position": 1115,
+          "strength": 52.46875,
+          "text": " assessments lead to the development of effective strategies that enhance\u00ab competence\u00bb and provider performance.\ncme2 is"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 8398,
+      "label": "Website domain and service directory text",
+      "variance": 492.2043762207031,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 3,
+          "strength": 287.0,
+          "text": "<bos>Lawyer.\u00abcom\u00bb makes finding Montpelier Lawyers fast and easy."
+        },
+        {
+          "position": 2,
+          "strength": 272.5,
+          "text": "<bos>Lawyer\u00ab.\u00bbcom makes finding Montpelier Lawyers fast and easy"
+        },
+        {
+          "position": 1,
+          "strength": 250.5,
+          "text": "<bos>\u00abLawyer\u00bb.com makes finding Montpelier Lawyers fast and"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 8952,
+      "label": "Disco music and dance culture references",
+      "variance": 168.9076690673828,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 623,
+          "strength": 60.25,
+          "text": " disco mode. easy to listen to, easy to\u00ab dance\u00bb to, a disco ball, shimmering, illuminating"
+        },
+        {
+          "position": 621,
+          "strength": 57.375,
+          "text": " in that disco mode. easy to listen to,\u00ab easy\u00bb to dance to, a disco ball, shimmering"
+        },
+        {
+          "position": 620,
+          "strength": 56.59375,
+          "text": " much in that disco mode. easy to listen to\u00ab,\u00bb easy to dance to, a disco ball,"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 2571,
+      "label": "Transition words connecting clauses or statements",
+      "variance": 136.28707885742188,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1355,
+          "strength": 64.6875,
+          "text": " more people, the company has advised everyone with this\u00ab particular\u00bb phone to return it. There will be compensation"
+        },
+        {
+          "position": 1390,
+          "strength": 62.4375,
+          "text": " to have the specific model.\nThe statement of\u00ab Samsung\u00bb on the matter goes as follows: \u201cTo"
+        },
+        {
+          "position": 1395,
+          "strength": 61.875,
+          "text": ".\nThe statement of Samsung on the matter goes\u00ab as\u00bb follows: \u201cTo date (as of September"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      }
+    },
+    {
+      "feature_idx": 5785,
+      "label": "Beginning of sentence markers and transitions",
+      "variance": 518.7398681640625,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 3,
+          "strength": 327.5,
+          "text": "<bos>Lawyer.\u00abcom\u00bb makes finding Montpelier Lawyers fast and easy."
+        },
+        {
+          "position": 2,
+          "strength": 294.5,
+          "text": "<bos>Lawyer\u00ab.\u00bbcom makes finding Montpelier Lawyers fast and easy"
+        },
+        {
+          "position": 1,
+          "strength": 270.0,
+          "text": "<bos>\u00abLawyer\u00bb.com makes finding Montpelier Lawyers fast and"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      }
+    },
+    {
+      "feature_idx": 15579,
+      "label": "Domain names and website URLs",
+      "variance": 480.35516357421875,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1,
+          "strength": 248.875,
+          "text": "<bos>\u00abLawyer\u00bb.com makes finding Montpelier Lawyers fast and"
+        },
+        {
+          "position": 2,
+          "strength": 237.625,
+          "text": "<bos>Lawyer\u00ab.\u00bbcom makes finding Montpelier Lawyers fast and easy"
+        },
+        {
+          "position": 3,
+          "strength": 233.0,
+          "text": "<bos>Lawyer.\u00abcom\u00bb makes finding Montpelier Lawyers fast and easy."
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SEMANTIC",
+        "agree": false,
+        "verdict": "SYNTACTIC"
+      }
+    },
+    {
+      "feature_idx": 11527,
+      "label": "Domain names and website URLs",
+      "variance": 612.0802001953125,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1,
+          "strength": 374.75,
+          "text": "<bos>\u00abLawyer\u00bb.com makes finding Montpelier Lawyers fast and"
+        },
+        {
+          "position": 0,
+          "strength": 365.75,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        },
+        {
+          "position": 2,
+          "strength": 295.0,
+          "text": "<bos>Lawyer\u00ab.\u00bbcom makes finding Montpelier Lawyers fast and easy"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SEMANTIC",
+        "agree": false,
+        "verdict": "SYNTACTIC"
+      }
+    },
+    {
+      "feature_idx": 1778,
+      "label": "Beginning of new text section or document",
+      "variance": 347.3624572753906,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1580,
+          "strength": 157.875,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<pad>\u00bb<bos>Listen to En Athma Nesa online"
+        },
+        {
+          "position": 1279,
+          "strength": 146.625,
+          "text": " drafty or cold, and will let in light\u00ab,\u00bb<bos>Samsung has made an announcement, following the"
+        },
+        {
+          "position": 895,
+          "strength": 145.375,
+          "text": "elymbria in Thrace to a poor family\u00ab.\u00bb<bos>Attention of Accordance Instant Details Dept:"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      }
+    },
+    {
+      "feature_idx": 1967,
+      "label": "Sentence or paragraph boundary markers",
+      "variance": 265.3505859375,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 380,
+          "strength": 125.375,
+          "text": " drama Saving Grace. Prior to that, he played\u00ab the\u00bb young version of<bos>I\u2019ve been a"
+        },
+        {
+          "position": 1276,
+          "strength": 123.3125,
+          "text": " home from feeling drafty or cold, and will\u00ab let\u00bb in light,<bos>Samsung has made an announcement"
+        },
+        {
+          "position": 1,
+          "strength": 113.25,
+          "text": "<bos>\u00abLawyer\u00bb.com makes finding Montpelier Lawyers fast and"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      }
+    },
+    {
+      "feature_idx": 7370,
+      "label": "Geographic and religious historical titles",
+      "variance": 87.47242736816406,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 795,
+          "strength": 53.8125,
+          "text": "6-1920), Metropolitan of Penta\u00abpolis\u00bb and Wonderworker of Aegina, was officially"
+        },
+        {
+          "position": 794,
+          "strength": 53.15625,
+          "text": "46-1920), Metropolitan of\u00ab Penta\u00bbpolis and Wonderworker of Aegina, was"
+        },
+        {
+          "position": 796,
+          "strength": 51.65625,
+          "text": "-1920), Metropolitan of Pentapolis\u00ab and\u00bb Wonderworker of Aegina, was officially recognized"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 10174,
+      "label": "Punctuation and formatting markers in text",
+      "variance": 105.7349853515625,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 389,
+          "strength": 70.75,
+          "text": " played the young version of<bos>I\u2019ve been\u00ab a\u00bb little down recently and trying to figure out why"
+        },
+        {
+          "position": 901,
+          "strength": 69.4375,
+          "text": " to a poor family.<bos>Attention of Accordance\u00ab Instant\u00bb Details Dept:\nSomeone has objected to my"
+        },
+        {
+          "position": 261,
+          "strength": 63.65625,
+          "text": " for the Tablets alongside the<bos>Mostly Credited As\u00ab:\u00bb Dylan Minnette\nBirth Name: Dylan Christopher"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      }
+    },
+    {
+      "feature_idx": 6849,
+      "label": "Transition between document sections or content boundaries",
+      "variance": 180.1007537841797,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1149,
+          "strength": 112.6875,
+          "text": " by assessing cme2's adherence and compliance\u00ab with\u00bb the latest<bos>The Best Services Done By Professional"
+        },
+        {
+          "position": 1578,
+          "strength": 109.3125,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<pad>\u00bb<pad><pad><bos>Listen to En Athma N"
+        },
+        {
+          "position": 1277,
+          "strength": 106.8125,
+          "text": " from feeling drafty or cold, and will let\u00ab in\u00bb light,<bos>Samsung has made an announcement,"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SEMANTIC",
+        "agree": false,
+        "verdict": "SYNTACTIC"
+      }
+    },
+    {
+      "feature_idx": 1520,
+      "label": "Words immediately following sentence starts",
+      "variance": 217.010986328125,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 5,
+          "strength": 102.125,
+          "text": "<bos>Lawyer.com makes\u00ab finding\u00bb Montpelier Lawyers fast and easy. Refine"
+        },
+        {
+          "position": 1586,
+          "strength": 97.3125,
+          "text": "<pad><pad><pad><pad><pad><bos>Listen to En Ath\u00abma\u00bb Nesa online. En Athma Nesa"
+        },
+        {
+          "position": 4,
+          "strength": 90.875,
+          "text": "<bos>Lawyer.com\u00ab makes\u00bb finding Montpelier Lawyers fast and easy. Ref"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      }
+    },
+    {
+      "feature_idx": 18366,
+      "label": "Beginning of new text section or document",
+      "variance": 272.475830078125,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 256,
+          "strength": 171.375,
+          "text": " shows the measured Intensity Scales for the Tablets alongside the\u00ab<bos>\u00bbMostly Credited As: Dylan Minnette\n"
+        },
+        {
+          "position": 384,
+          "strength": 170.0,
+          "text": " Prior to that, he played the young version of\u00ab<bos>\u00bbI\u2019ve been a little down recently and"
+        },
+        {
+          "position": 1152,
+          "strength": 167.375,
+          "text": "me2's adherence and compliance with the latest\u00ab<bos>\u00bbThe Best Services Done By Professional Window Installers"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      }
+    },
+    {
+      "feature_idx": 2054,
+      "label": "Domain names and product names in text",
+      "variance": 470.2445983886719,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 2,
+          "strength": 310.0,
+          "text": "<bos>Lawyer\u00ab.\u00bbcom makes finding Montpelier Lawyers fast and easy"
+        },
+        {
+          "position": 1,
+          "strength": 304.5,
+          "text": "<bos>\u00abLawyer\u00bb.com makes finding Montpelier Lawyers fast and"
+        },
+        {
+          "position": 0,
+          "strength": 281.75,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 2691,
+      "label": "Website domain names and URLs",
+      "variance": 515.5489501953125,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 0,
+          "strength": 344.75,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        },
+        {
+          "position": 2,
+          "strength": 243.375,
+          "text": "<bos>Lawyer\u00ab.\u00bbcom makes finding Montpelier Lawyers fast and easy"
+        },
+        {
+          "position": 1,
+          "strength": 235.375,
+          "text": "<bos>\u00abLawyer\u00bb.com makes finding Montpelier Lawyers fast and"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    }
+  ]
+}

@@ -1,0 +1,1053 @@
+{
+  "arch": "agentic_txc_11_stack",
+  "seed": 42,
+  "concat": "A",
+  "features": [
+    {
+      "feature_idx": 16638,
+      "label": "family relationships in Bhagavad Gita text",
+      "variance": 242.11366271972656,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 744,
+          "strength": 68.6875,
+          "text": "\n  Their common blood, yon concourse of\u00ab our\u00bb kin,\n  My members fail"
+        },
+        {
+          "position": 635,
+          "strength": 65.5,
+          "text": "\n  Marked on each hand the kinsmen of\u00ab his\u00bb house,\n  Grandsires and si"
+        },
+        {
+          "position": 650,
+          "strength": 65.0,
+          "text": "Grandsires and sires, uncles and brothers\u00ab and\u00bb sons,\n  Cousins and sons-"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "gita"
+    },
+    {
+      "feature_idx": 8127,
+      "label": "Latin text word boundaries and morphology",
+      "variance": 202.71266174316406,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 90,
+          "strength": 49.8125,
+          "text": "bes\n  Autor erat; Cererisve bea\u00abvit\u00bb munere gentes;\n  Vel qui cur"
+        },
+        {
+          "position": 91,
+          "strength": 46.5,
+          "text": "\n  Autor erat; Cererisve beavit\u00ab mun\u00bbere gentes;\n  Vel qui curarum"
+        },
+        {
+          "position": 267,
+          "strength": 44.125,
+          "text": "  _NEWTONVM_ clausi reseran\u00abtem\u00bb scrinia Veri,\n  _"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SEMANTIC",
+        "agree": false,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "principia"
+    },
+    {
+      "feature_idx": 1500,
+      "label": "Bhagavad Gita Sanskrit poetry translation text",
+      "variance": 165.34750366210938,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 387,
+          "strength": 60.09375,
+          "text": " along their genetic information. This is an example of\u00ab\n\u00bbA. directional selection.\nB. stabilizing"
+        },
+        {
+          "position": 426,
+          "strength": 56.0,
+          "text": " unsheathing, bows drawn forth, the war\u00ab\n\u00bb  Instant to break-Arjun, whose"
+        },
+        {
+          "position": 450,
+          "strength": 53.4375,
+          "text": "\n  Was Hanuman the monkey, spake this thing\u00ab\n\u00bb  To Krishna the Divine, his chario"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "gita"
+    },
+    {
+      "feature_idx": 17635,
+      "label": "Bhagavad Gita battle scene descriptions",
+      "variance": 163.5659942626953,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 734,
+          "strength": 61.5625,
+          "text": "Krishna! as I behold, come here to shed\u00ab\n\u00bb  Their common blood, yon concourse of"
+        },
+        {
+          "position": 613,
+          "strength": 60.59375,
+          "text": " spake he to Arjuna, \"where they stand,\u00ab\n\u00bb  Thy kindred of the Kurus:\" and"
+        },
+        {
+          "position": 747,
+          "strength": 59.5,
+          "text": " common blood, yon concourse of our kin,\u00ab\n\u00bb  My members fail"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "gita"
+    },
+    {
+      "feature_idx": 555,
+      "label": "Sanskrit and Latin classical text passages",
+      "variance": 162.5874786376953,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 263,
+          "strength": 44.625,
+          "text": " vesci,\n  _NEWTONVM_\u00ab cla\u00bbusi reserantem scrinia Veri"
+        },
+        {
+          "position": 719,
+          "strength": 43.3125,
+          "text": " with pity, while he uttered this:\n\n  \u00abAr\u00bbjuna.\n  Krishna! as I behold"
+        },
+        {
+          "position": 281,
+          "strength": 42.96875,
+          "text": " Veri,\n  _NEWTONVM_\u00ab Mus\u00bbis charum, cui pectore puro"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "principia"
+    },
+    {
+      "feature_idx": 15321,
+      "label": "Poetic text from the Bhagavad Gita",
+      "variance": 147.5457763671875,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 565,
+          "strength": 50.59375,
+          "text": "ata!)\n  Between the hosts that heavenly Ch\u00abario\u00bbteer\n  Drove the bright car,"
+        },
+        {
+          "position": 424,
+          "strength": 50.5625,
+          "text": "  Weapons unsheathing, bows drawn forth,\u00ab the\u00bb war\n  Instant to break-Arjun"
+        },
+        {
+          "position": 448,
+          "strength": 50.40625,
+          "text": "-badge\n  Was Hanuman the monkey, spake\u00ab this\u00bb thing\n  To Krishna the Divine, his"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "gita"
+    },
+    {
+      "feature_idx": 11503,
+      "label": "Punctuation marks and special characters",
+      "variance": 139.1640167236328,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 697,
+          "strength": 49.9375,
+          "text": ", seeing those opposed,\n  Such kith\u00ab grown\u00bb enemies-Arjuna's heart\n  "
+        },
+        {
+          "position": 566,
+          "strength": 46.96875,
+          "text": "!)\n  Between the hosts that heavenly Chario\u00abteer\u00bb\n  Drove the bright car, re"
+        },
+        {
+          "position": 231,
+          "strength": 46.375,
+          "text": "unt s\u00e6cula mundi.\n\n  Talia\u00ab monst\u00bbrantem mecum celebrate Cam\u00e6nis,"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "principia"
+    },
+    {
+      "feature_idx": 12610,
+      "label": "Latin poetry text tokens",
+      "variance": 136.2055206298828,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 102,
+          "strength": 45.125,
+          "text": "ere gentes;\n  Vel qui curarum len\u00abimen\u00bb pressit ab Uva;\n  Vel"
+        },
+        {
+          "position": 104,
+          "strength": 37.875,
+          "text": ";\n  Vel qui curarum lenimen press\u00abit\u00bb ab Uva;\n  Vel qui N"
+        },
+        {
+          "position": 91,
+          "strength": 36.90625,
+          "text": "\n  Autor erat; Cererisve beavit\u00ab mun\u00bbere gentes;\n  Vel qui curarum"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "principia"
+    },
+    {
+      "feature_idx": 6306,
+      "label": "Latin language text with diacritical marks",
+      "variance": 133.8094482421875,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 205,
+          "strength": 40.3125,
+          "text": "ec\u00e6\n  Claustra patent Terr\u00e6 rerum\u00abque\u00bb immobilis ordo,\n  Et"
+        },
+        {
+          "position": 143,
+          "strength": 39.96875,
+          "text": "isque exponere Voces;\n  Humanam\u00ab sor\u00bbtem minus extulit; utpote pauca"
+        },
+        {
+          "position": 204,
+          "strength": 38.5625,
+          "text": " coec\u00e6\n  Claustra patent Terr\u00e6\u00ab rerum\u00bbque immobilis ordo,\n  "
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "principia"
+    },
+    {
+      "feature_idx": 4272,
+      "label": "dialogue or speech markers in classical texts",
+      "variance": 133.7633514404297,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 388,
+          "strength": 60.5,
+          "text": " their genetic information. This is an example of\n\u00abA\u00bb. directional selection.\nB. stabilizing selection"
+        },
+        {
+          "position": 427,
+          "strength": 52.09375,
+          "text": "heathing, bows drawn forth, the war\n\u00ab  \u00bbInstant to break-Arjun, whose en"
+        },
+        {
+          "position": 723,
+          "strength": 51.5,
+          "text": " he uttered this:\n\n  Arjuna.\n\u00ab  \u00bbKrishna! as I behold, come here to"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": false,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "gita"
+    },
+    {
+      "feature_idx": 13887,
+      "label": "poetic language from classical Indian literature",
+      "variance": 133.51417541503906,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 649,
+          "strength": 54.28125,
+          "text": "  Grandsires and sires, uncles and\u00ab brothers\u00bb and sons,\n  Cousins and sons"
+        },
+        {
+          "position": 611,
+          "strength": 53.15625,
+          "text": "See!\" spake he to Arjuna, \"where they\u00ab stand\u00bb,\n  Thy kindred of the Kurus"
+        },
+        {
+          "position": 745,
+          "strength": 50.84375,
+          "text": "  Their common blood, yon concourse of our\u00ab kin\u00bb,\n  My members fail"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "gita"
+    },
+    {
+      "feature_idx": 15520,
+      "label": "Epic and classical poetry line breaks",
+      "variance": 123.4601058959961,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 653,
+          "strength": 42.96875,
+          "text": " and sires, uncles and brothers and sons,\u00ab\n\u00bb  Cousins and sons-in-law"
+        },
+        {
+          "position": 245,
+          "strength": 42.6875,
+          "text": "cum celebrate Cam\u00e6nis,\n  Vos qui\u00ab coel\u00bbesti gaudetis nectare vesci"
+        },
+        {
+          "position": 261,
+          "strength": 41.0,
+          "text": "ctare vesci,\n  _NEWTON\u00abVM\u00bb_ clausi reserantem scrinia"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SEMANTIC",
+        "agree": false,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "principia"
+    },
+    {
+      "feature_idx": 4141,
+      "label": "Proper nouns and names in classical literature",
+      "variance": 118.08059692382812,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 656,
+          "strength": 42.84375,
+          "text": ", uncles and brothers and sons,\n  Cous\u00abins\u00bb and sons-in-law and nephews,"
+        },
+        {
+          "position": 587,
+          "strength": 42.6875,
+          "text": " its milk-white steeds\n  Where Bhish\u00abma\u00bb led,and Drona,and their Lords"
+        },
+        {
+          "position": 555,
+          "strength": 41.34375,
+          "text": "  Thus, by Arjuna prayed, (O Bhar\u00abata\u00bb!)\n  Between the hosts that heavenly Ch"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "principia"
+    },
+    {
+      "feature_idx": 9835,
+      "label": "Latin and classical poetry quotation marks",
+      "variance": 116.52304077148438,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 95,
+          "strength": 41.84375,
+          "text": "; Cererisve beavit munere gentes;\u00ab\n\u00bb  Vel qui curarum lenimen pressit"
+        },
+        {
+          "position": 256,
+          "strength": 41.53125,
+          "text": "esti gaudetis nectare vesci,\u00ab\n\u00bb  _NEWTONVM_ clausi res"
+        },
+        {
+          "position": 81,
+          "strength": 41.34375,
+          "text": "is populis circumdare moenibus Urbes\u00ab\n\u00bb  Autor erat; Cererisve beavit"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "gita"
+    },
+    {
+      "feature_idx": 6412,
+      "label": "Family relationships in ancient epic poetry",
+      "variance": 109.79592895507812,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 674,
+          "strength": 51.8125,
+          "text": " nephews, mixed\n  With friends and honoured elders\u00ab;\u00bb some this side,\n  Some that side"
+        },
+        {
+          "position": 510,
+          "strength": 51.0,
+          "text": " slay\n  To-day, in war'\u00abs\u00bb arbitrament; for, sure,\n  "
+        },
+        {
+          "position": 634,
+          "strength": 50.3125,
+          "text": " Prince\n  Marked on each hand the kinsmen\u00ab of\u00bb his house,\n  Grandsires and"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "gita"
+    },
+    {
+      "feature_idx": 11448,
+      "label": "Archaic or poetic English text passages",
+      "variance": 106.45220947265625,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 389,
+          "strength": 51.75,
+          "text": " genetic information. This is an example of\nA\u00ab.\u00bb directional selection.\nB. stabilizing selection."
+        },
+        {
+          "position": 428,
+          "strength": 49.125,
+          "text": "athing, bows drawn forth, the war\n  \u00abInstant\u00bb to break-Arjun, whose ensign"
+        },
+        {
+          "position": 452,
+          "strength": 46.59375,
+          "text": "Was Hanuman the monkey, spake this thing\n  \u00abTo\u00bb Krishna the Divine, his charioteer:"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "gita"
+    },
+    {
+      "feature_idx": 13727,
+      "label": "Bhagavad Gita battle scene descriptions",
+      "variance": 105.00176239013672,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 386,
+          "strength": 54.78125,
+          "text": " pass along their genetic information. This is an example\u00ab of\u00bb\nA. directional selection.\nB."
+        },
+        {
+          "position": 733,
+          "strength": 49.71875,
+          "text": "  Krishna! as I behold, come here to\u00ab shed\u00bb\n  Their common blood, yon concourse"
+        },
+        {
+          "position": 678,
+          "strength": 48.90625,
+          "text": "  With friends and honoured elders; some this side\u00ab,\u00bb\n  Some that side ranged: and,"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "gita"
+    },
+    {
+      "feature_idx": 10289,
+      "label": "Classical and Latin poetry passages",
+      "variance": 103.14631652832031,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 585,
+          "strength": 45.4375,
+          "text": " reining its milk-white steeds\n  Where\u00ab Bh\u00bbishma led,and Drona,and"
+        },
+        {
+          "position": 206,
+          "strength": 37.59375,
+          "text": "\u00e6\n  Claustra patent Terr\u00e6 rerumque\u00ab im\u00bbmobilis ordo,\n  Et qu\u00e6"
+        },
+        {
+          "position": 326,
+          "strength": 36.09375,
+          "text": " attingere Divos.\n\n                  _EDM\u00ab.\u00bb HALLEY._\n\n       *       *       "
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "principia"
+    },
+    {
+      "feature_idx": 6768,
+      "label": "Ancient Sanskrit epic battle descriptions",
+      "variance": 98.05084228515625,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 510,
+          "strength": 79.1875,
+          "text": " slay\n  To-day, in war'\u00abs\u00bb arbitrament; for, sure,\n  "
+        },
+        {
+          "position": 34,
+          "strength": 66.25,
+          "text": "udum vita longe lateque remot\u00e6.\n\u00ab  \u00bbQui scriptis jussit Tabulis comp"
+        },
+        {
+          "position": 507,
+          "strength": 57.25,
+          "text": " those we must slay\n  To-day,\u00ab in\u00bb war's arbitrament; for, sure"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "gita"
+    },
+    {
+      "feature_idx": 10195,
+      "label": "Epic poetry describing battle and kinship",
+      "variance": 93.94248962402344,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 730,
+          "strength": 50.65625,
+          "text": "juna.\n  Krishna! as I behold,\u00ab come\u00bb here to shed\n  Their common blood,"
+        },
+        {
+          "position": 565,
+          "strength": 50.59375,
+          "text": "ata!)\n  Between the hosts that heavenly Ch\u00abario\u00bbteer\n  Drove the bright car,"
+        },
+        {
+          "position": 649,
+          "strength": 48.09375,
+          "text": "  Grandsires and sires, uncles and\u00ab brothers\u00bb and sons,\n  Cousins and sons"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "gita"
+    },
+    {
+      "feature_idx": 14289,
+      "label": "Poetic or archaic text with inserted punctuation",
+      "variance": 92.96476745605469,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 634,
+          "strength": 41.1875,
+          "text": " Prince\n  Marked on each hand the kinsmen\u00ab of\u00bb his house,\n  Grandsires and"
+        },
+        {
+          "position": 347,
+          "strength": 39.78125,
+          "text": "       *       *In a population of giraffes\u00ab,\u00bb an environmental change occurs that favors individuals that are"
+        },
+        {
+          "position": 657,
+          "strength": 39.75,
+          "text": " uncles and brothers and sons,\n  Cousins\u00ab and\u00bb sons-in-law and nephews, mixed"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "principia"
+    },
+    {
+      "feature_idx": 6539,
+      "label": "Ancient Sanskrit epic battle dialogue",
+      "variance": 92.73725128173828,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 476,
+          "strength": 38.8125,
+          "text": ", Dauntless One! to yonder open ground\u00ab\n\u00bb  Betwixt the armies; I would see"
+        },
+        {
+          "position": 519,
+          "strength": 38.125,
+          "text": "'s arbitrament; for, sure,\n\u00ab  \u00bbOn bloodshed all are bent who throng this plain"
+        },
+        {
+          "position": 552,
+          "strength": 36.6875,
+          "text": " son.\"\n\n  Thus, by Arjuna prayed,\u00ab (\u00bbO Bharata!)\n  Between the hosts"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "gita"
+    },
+    {
+      "feature_idx": 7443,
+      "label": "Punctuation marks ending sentences or clauses",
+      "variance": 89.60328674316406,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 386,
+          "strength": 57.28125,
+          "text": " pass along their genetic information. This is an example\u00ab of\u00bb\nA. directional selection.\nB."
+        },
+        {
+          "position": 721,
+          "strength": 48.59375,
+          "text": ", while he uttered this:\n\n  Arjuna\u00ab.\u00bb\n  Krishna! as I behold, come"
+        },
+        {
+          "position": 425,
+          "strength": 47.5,
+          "text": "Weapons unsheathing, bows drawn forth, the\u00ab war\u00bb\n  Instant to break-Arjun,"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "gita"
+    },
+    {
+      "feature_idx": 4514,
+      "label": "Epic poetry text in classical translations",
+      "variance": 89.28578186035156,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 120,
+          "strength": 40.75,
+          "text": "  Vel qui Niliaca monstravit ar\u00abund\u00bbine pictos\n  Consociare son"
+        },
+        {
+          "position": 586,
+          "strength": 40.65625,
+          "text": "ining its milk-white steeds\n  Where Bh\u00abish\u00bbma led,and Drona,and their"
+        },
+        {
+          "position": 468,
+          "strength": 39.65625,
+          "text": " charioteer:\n  \"Drive, Dau\u00abnt\u00bbless One! to yonder open ground\n  "
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "principia"
+    },
+    {
+      "feature_idx": 3258,
+      "label": "Archaic or poetic English language patterns",
+      "variance": 86.47624206542969,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 570,
+          "strength": 49.53125,
+          "text": " the hosts that heavenly Charioteer\n  Dro\u00abve\u00bb the bright car, reining its milk-"
+        },
+        {
+          "position": 540,
+          "strength": 46.28125,
+          "text": "\n  Obeying Dhritirashtra'\u00abs\u00bb sinful son.\"\n\n  Thus, by Arjuna"
+        },
+        {
+          "position": 663,
+          "strength": 45.875,
+          "text": "\n  Cousins and sons-in-law\u00ab and\u00bb nephews, mixed\n  With friends and honoured"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "gita"
+    },
+    {
+      "feature_idx": 3652,
+      "label": "Poetic or archaic English text passages",
+      "variance": 83.15762329101562,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 509,
+          "strength": 51.0625,
+          "text": " must slay\n  To-day, in war\u00ab'\u00bbs arbitrament; for, sure,\n"
+        },
+        {
+          "position": 33,
+          "strength": 46.28125,
+          "text": " pecudum vita longe lateque remot\u00e6.\u00ab\n\u00bb  Qui scriptis jussit Tabulis"
+        },
+        {
+          "position": 602,
+          "strength": 44.9375,
+          "text": "rona,and their Lords.\n  \"See\u00ab!\"\u00bb spake he to Arjuna, \"where they stand"
+        }
+      ],
+      "judge": {
+        "judge_1": "UNKNOWN",
+        "judge_2": "UNKNOWN",
+        "agree": true,
+        "verdict": "UNKNOWN",
+        "error": "Error code: 429 - {'type': 'error', 'error': {'type': 'rate_limit_error', 'messa"
+      },
+      "peak_passage": "gita"
+    },
+    {
+      "feature_idx": 9854,
+      "label": "Classical and Latin poetic language tokens",
+      "variance": 82.70038604736328,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 694,
+          "strength": 47.53125,
+          "text": " ranged: and, seeing those opposed,\n  \u00abSuch\u00bb kith grown enemies-Arjuna's"
+        },
+        {
+          "position": 228,
+          "strength": 47.125,
+          "text": "iti latuerunt s\u00e6cula mundi.\n\n\u00ab  \u00bbTalia monstrantem mecum celebrate Cam"
+        },
+        {
+          "position": 286,
+          "strength": 46.21875,
+          "text": "_NEWTONVM_ Musis charum,\u00ab cui\u00bb pectore puro\n  Phoebus ad"
+        }
+      ],
+      "judge": {
+        "judge_1": "UNKNOWN",
+        "judge_2": "UNKNOWN",
+        "agree": true,
+        "verdict": "UNKNOWN",
+        "error": "Error code: 429 - {'type': 'error', 'error': {'type': 'rate_limit_error', 'messa"
+      },
+      "peak_passage": "principia"
+    },
+    {
+      "feature_idx": 2631,
+      "label": "Punctuation in classical epic poetry translations",
+      "variance": 82.10816955566406,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 711,
+          "strength": 47.59375,
+          "text": "juna's heart\n  Melted with pity\u00ab,\u00bb while he uttered this:\n\n  Arjuna"
+        },
+        {
+          "position": 739,
+          "strength": 45.40625,
+          "text": ", come here to shed\n  Their common blood\u00ab,\u00bb yon concourse of our kin,\n  "
+        },
+        {
+          "position": 506,
+          "strength": 42.875,
+          "text": ", those we must slay\n  To-day\u00ab,\u00bb in war's arbitrament; for,"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "gita"
+    },
+    {
+      "feature_idx": 1808,
+      "label": "archaic or poetic language usage",
+      "variance": 80.75718688964844,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 375,
+          "strength": 46.71875,
+          "text": " the taller individuals are able to obtain nutrients and survive\u00ab to\u00bb pass along their genetic information. This is an"
+        },
+        {
+          "position": 374,
+          "strength": 45.1875,
+          "text": " of the taller individuals are able to obtain nutrients and\u00ab survive\u00bb to pass along their genetic information. This is"
+        },
+        {
+          "position": 579,
+          "strength": 44.65625,
+          "text": "Drove the bright car, reining its milk\u00ab-\u00bbwhite steeds\n  Where Bhishma led"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "gita"
+    },
+    {
+      "feature_idx": 7101,
+      "label": "Archaic or poetic text punctuation and conjunctions",
+      "variance": 80.16732025146484,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 594,
+          "strength": 44.875,
+          "text": "Where Bhishma led,and Drona,\u00aband\u00bb their Lords.\n  \"See!\" spake"
+        },
+        {
+          "position": 712,
+          "strength": 43.34375,
+          "text": "'s heart\n  Melted with pity,\u00ab while\u00bb he uttered this:\n\n  Arjuna."
+        },
+        {
+          "position": 132,
+          "strength": 42.875,
+          "text": " pictos\n  Consociare sonos,\u00ab ocul\u00bbisque exponere Voces;\n  Human"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "gita"
+    },
+    {
+      "feature_idx": 16265,
+      "label": "Punctuation marks in classical or archaic text",
+      "variance": 75.49333190917969,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 507,
+          "strength": 52.71875,
+          "text": " those we must slay\n  To-day,\u00ab in\u00bb war's arbitrament; for, sure"
+        },
+        {
+          "position": 31,
+          "strength": 50.09375,
+          "text": "  A pecudum vita longe lateque remot\u00ab\u00e6\u00bb.\n  Qui scriptis jussit"
+        },
+        {
+          "position": 35,
+          "strength": 47.125,
+          "text": "um vita longe lateque remot\u00e6.\n  \u00abQui\u00bb scriptis jussit Tabulis compes"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "genetics_q"
+    },
+    {
+      "feature_idx": 4647,
+      "label": "dialogue markers in classical literature",
+      "variance": 74.60196685791016,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 510,
+          "strength": 53.125,
+          "text": " slay\n  To-day, in war'\u00abs\u00bb arbitrament; for, sure,\n  "
+        },
+        {
+          "position": 34,
+          "strength": 45.1875,
+          "text": "udum vita longe lateque remot\u00e6.\n\u00ab  \u00bbQui scriptis jussit Tabulis comp"
+        },
+        {
+          "position": 24,
+          "strength": 39.84375,
+          "text": "ires dignoscite Mentis\n  A pec\u00abud\u00bbum vita longe lateque remot\u00e6.\n"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "gita"
+    }
+  ],
+  "passages": [
+    "principia",
+    "genetics_q",
+    "gita"
+  ],
+  "top_feat_indices_var": [
+    16638,
+    8127,
+    1500,
+    17635,
+    555,
+    15321,
+    11503,
+    12610,
+    6306,
+    4272,
+    13887,
+    15520,
+    4141,
+    9835,
+    6412,
+    11448,
+    13727,
+    10289,
+    6768,
+    10195,
+    14289,
+    6539,
+    7443,
+    4514,
+    3258,
+    3652,
+    9854,
+    2631,
+    1808,
+    7101,
+    16265,
+    4647
+  ],
+  "top_feat_indices_pdvar": [
+    8127,
+    6306,
+    12610,
+    6539,
+    10810,
+    10195,
+    17010,
+    4941,
+    6412,
+    486,
+    13887,
+    6768,
+    16638,
+    3652,
+    11818,
+    3814,
+    3258,
+    4547,
+    2927,
+    5780,
+    2194,
+    536,
+    555,
+    5061,
+    7777,
+    10289,
+    12541,
+    4141,
+    5820,
+    1425,
+    15520,
+    1808
+  ],
+  "metrics": {
+    "N": 32,
+    "semantic_count": 21,
+    "semantic_fraction": 0.65625,
+    "passage_coverage_count": 3,
+    "passage_coverage_entropy": 0.7691267318040425,
+    "n_passages": 3,
+    "judge_disagreement_rate": 0.09375,
+    "semantic_count_pdvar_overlap": 12,
+    "pdvar_var_overlap_count": 16
+  }
+}

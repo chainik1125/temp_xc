@@ -1,0 +1,1436 @@
+{
+  "arch": "tsae_paper",
+  "seed": 2,
+  "concat": "random",
+  "features": [
+    {
+      "feature_idx": 2839,
+      "label": "Punctuation and formatting markers in text",
+      "variance": 215.36009216308594,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1396,
+          "strength": 64.75,
+          "text": "\nThe statement of Samsung on the matter goes as\u00ab follows\u00bb: \u201cTo date (as of September "
+        },
+        {
+          "position": 1225,
+          "strength": 62.375,
+          "text": " their professional services.\nInstallation of Energy Efficient Windows\u00ab\n\u00bbOne of the most common services is the installation"
+        },
+        {
+          "position": 1239,
+          "strength": 60.84375,
+          "text": " most common services is the installation of energy efficient windows\u00ab.\u00bb These windows will not only keep your energy bill"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_05"
+    },
+    {
+      "feature_idx": 2472,
+      "label": "Transition words and discourse markers",
+      "variance": 194.54454040527344,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 382,
+          "strength": 67.625,
+          "text": " Grace. Prior to that, he played the young\u00ab version\u00bb of<bos>I\u2019ve been a little down"
+        },
+        {
+          "position": 383,
+          "strength": 63.75,
+          "text": ". Prior to that, he played the young version\u00ab of\u00bb<bos>I\u2019ve been a little down recently"
+        },
+        {
+          "position": 1277,
+          "strength": 60.375,
+          "text": " from feeling drafty or cold, and will let\u00ab in\u00bb light,<bos>Samsung has made an announcement,"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SEMANTIC",
+        "agree": false,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_01"
+    },
+    {
+      "feature_idx": 1716,
+      "label": "color mixing and display properties",
+      "variance": 131.24635314941406,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 161,
+          "strength": 56.40625,
+          "text": " controls how the Red, Green and Blue primary colors\u00ab mix\u00bb to produce all of the on-screen colors"
+        },
+        {
+          "position": 160,
+          "strength": 53.59375,
+          "text": " also controls how the Red, Green and Blue primary\u00ab colors\u00bb mix to produce all of the on-screen"
+        },
+        {
+          "position": 162,
+          "strength": 50.4375,
+          "text": " how the Red, Green and Blue primary colors mix\u00ab to\u00bb produce all of the on-screen colors."
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "fw_03"
+    },
+    {
+      "feature_idx": 1291,
+      "label": "Common function words and articles in text",
+      "variance": 106.89408111572266,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 770,
+          "strength": 49.1875,
+          "text": " \u00a9 Play.What.When. |<bos>N\u00abect\u00bbarios of Pentapolis\nSt. Nect"
+        },
+        {
+          "position": 1133,
+          "strength": 48.8125,
+          "text": "2 is accredited by the ACCME and its overall\u00ab medical\u00bb education effectiveness is further measured by assessing cme"
+        },
+        {
+          "position": 1132,
+          "strength": 45.28125,
+          "text": "me2 is accredited by the ACCME and its\u00ab overall\u00bb medical education effectiveness is further measured by assessing c"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_04"
+    },
+    {
+      "feature_idx": 745,
+      "label": "Beginning of sequence after padding tokens",
+      "variance": 73.209228515625,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 659,
+          "strength": 68.375,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<pad>\u00bb<bos>Aussies Grill and Beach Bar\nAccount"
+        },
+        {
+          "position": 658,
+          "strength": 66.4375,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<pad>\u00bb<pad><bos>Aussies Grill and Beach Bar\n"
+        },
+        {
+          "position": 1580,
+          "strength": 64.625,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<pad>\u00bb<bos>Listen to En Athma Nesa online"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_06"
+    },
+    {
+      "feature_idx": 2666,
+      "label": "Birth dates and biographical information",
+      "variance": 64.45996856689453,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 276,
+          "strength": 76.6875,
+          "text": "Birth Name: Dylan Christopher Minnette\nDate Of\u00ab Birth\u00bb: December 29, 19"
+        },
+        {
+          "position": 287,
+          "strength": 75.0,
+          "text": ": December 29, 199\u00ab6\u00bb (Age 19)\nCountry Of"
+        },
+        {
+          "position": 345,
+          "strength": 73.3125,
+          "text": " on December 29, 199\u00ab6\u00bb in Evansville, Indiana. Minnette's"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "fw_01"
+    },
+    {
+      "feature_idx": 882,
+      "label": "Sentence or paragraph boundary markers",
+      "variance": 55.08538818359375,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 557,
+          "strength": 50.5,
+          "text": " of the 2016 Orlando nightclub shooting\u00ab.\u00bb\nAustralian pop star Sia wrote \"Telepathy"
+        },
+        {
+          "position": 567,
+          "strength": 46.90625,
+          "text": ".\nAustralian pop star Sia wrote \"Telepathy\u00ab\";\u00bb joining Aguilera on the track is the historically great"
+        },
+        {
+          "position": 384,
+          "strength": 46.78125,
+          "text": " Prior to that, he played the young version of\u00ab<bos>\u00bbI\u2019ve been a little down recently and"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_00"
+    },
+    {
+      "feature_idx": 2424,
+      "label": "Quoted or bracketed text boundaries",
+      "variance": 50.85520553588867,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 708,
+          "strength": 27.859375,
+          "text": " quickly register and/or pay for Leagues, Tour\u00abnaments\u00bb, and Events through the website.\nAus"
+        },
+        {
+          "position": 676,
+          "strength": 26.921875,
+          "text": " Bar\nAccount Log in\nAre you new?\u00ab\n\u00bbif you don't have an account yet"
+        },
+        {
+          "position": 711,
+          "strength": 25.359375,
+          "text": "/or pay for Leagues, Tournaments, and\u00ab Events\u00bb through the website.\nAussies Grill &"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_06"
+    },
+    {
+      "feature_idx": 1046,
+      "label": "Religious figure canonization and recognition",
+      "variance": 49.632076263427734,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 822,
+          "strength": 31.96875,
+          "text": "umenical Patriarchate of Constantinople in 196\u00ab1\u00bb. His feast day is celebrated on November "
+        },
+        {
+          "position": 827,
+          "strength": 29.671875,
+          "text": " in 1961. His feast day\u00ab is\u00bb celebrated on November 9. He is often"
+        },
+        {
+          "position": 817,
+          "strength": 29.640625,
+          "text": " a saint by the Ecumenical Patriarchate of Constantinople\u00ab in\u00bb 1961. His feast day"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "fw_05"
+    },
+    {
+      "feature_idx": 15320,
+      "label": "display color intensity and contrast standards",
+      "variance": 40.79087448120117,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 217,
+          "strength": 45.53125,
+          "text": " all consumer content then the colors and intensities will be\u00ab wrong\u00bb everywhere in all images.\nIn order to"
+        },
+        {
+          "position": 240,
+          "strength": 42.375,
+          "text": " and image contrast a display must closely match the Standard\u00ab Intensity\u00bb Scale. Figure 3 shows the measured Intensity"
+        },
+        {
+          "position": 218,
+          "strength": 42.25,
+          "text": " consumer content then the colors and intensities will be wrong\u00ab everywhere\u00bb in all images.\nIn order to deliver"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "fw_00"
+    },
+    {
+      "feature_idx": 3133,
+      "label": "music release or album announcement",
+      "variance": 40.76584243774414,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 535,
+          "strength": 53.40625,
+          "text": "012, but today she delivered a new\u00ab song\u00bb called \"Telepathy,\" which she dedicated to"
+        },
+        {
+          "position": 521,
+          "strength": 52.4375,
+          "text": "m<bos>Christina Aguilera hasn't dropped a proper\u00ab album\u00bb since 2012, but today"
+        },
+        {
+          "position": 1492,
+          "strength": 48.90625,
+          "text": " Now, member T-Shyne drops his newest\u00ab release\u00bb, The SOULution, on USA Today\u2019"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "fw_02"
+    },
+    {
+      "feature_idx": 778,
+      "label": "Possessive markers and apostrophe usage patterns",
+      "variance": 39.8979377746582,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1144,
+          "strength": 55.59375,
+          "text": " education effectiveness is further measured by assessing cme2\u00ab'\u00bbs adherence and compliance with the latest<bos>The"
+        },
+        {
+          "position": 1047,
+          "strength": 54.0625,
+          "text": " CME provider: cme2\ncme2\u00ab'\u00bbs mission is to elevate medical education from a"
+        },
+        {
+          "position": 1425,
+          "strength": 52.90625,
+          "text": "Shyne \u2018The SOULution\u2019\nHarlem\u00ab\u2019\u00bbs own H.O.M.E"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_01"
+    },
+    {
+      "feature_idx": 566,
+      "label": "Padding tokens and special characters in text",
+      "variance": 37.16669845581055,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 284,
+          "strength": 57.0,
+          "text": "Date Of Birth: December 29, \u00ab1\u00bb996 (Age 19)"
+        },
+        {
+          "position": 342,
+          "strength": 55.875,
+          "text": " and was born on December 29, \u00ab1\u00bb996 in Evansville, Indiana. Min"
+        },
+        {
+          "position": 386,
+          "strength": 50.40625,
+          "text": " that, he played the young version of<bos>I\u00ab\u2019\u00bbve been a little down recently and trying to"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_06"
+    },
+    {
+      "feature_idx": 17548,
+      "label": "defensive assertion of grammatical expertise",
+      "variance": 36.99552536010742,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 952,
+          "strength": 48.625,
+          "text": " that\nI am not wrong. I did not\u00ab say\u00bb anything about the possibility of \u05d1 having a clause"
+        },
+        {
+          "position": 951,
+          "strength": 45.78125,
+          "text": " affirm that\nI am not wrong. I did\u00ab not\u00bb say anything about the possibility of \u05d1 having a"
+        },
+        {
+          "position": 954,
+          "strength": 43.59375,
+          "text": "I am not wrong. I did not say anything\u00ab about\u00bb the possibility of \u05d1 having a clause for its"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "fw_03"
+    },
+    {
+      "feature_idx": 2371,
+      "label": "problem identification and solution framing",
+      "variance": 36.558902740478516,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1062,
+          "strength": 34.34375,
+          "text": " elevate medical education from a matter of pass/fail\u00ab to\u00bb learning mastery that measurably advances healthcare professionals'"
+        },
+        {
+          "position": 1052,
+          "strength": 33.1875,
+          "text": "2\ncme2's mission is to\u00ab elevate\u00bb medical education from a matter of pass/fail"
+        },
+        {
+          "position": 71,
+          "strength": 30.53125,
+          "text": "\nThe Iowa Labor Commissioner issued Titan Tire Corporation two\u00ab citations\u00bb for violations of the\nIowa Occupational Safety and"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "fw_04"
+    },
+    {
+      "feature_idx": 48,
+      "label": "Definite article \"the\" before nouns",
+      "variance": 34.854557037353516,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1623,
+          "strength": 43.5,
+          "text": " Perian. En Athma Nesa, from\u00ab the\u00bb album Aahaippan Geethangal, was"
+        },
+        {
+          "position": 1720,
+          "strength": 43.46875,
+          "text": "-Way Camera Strap Accessories\nFrequently Asked Questions about\u00ab the\u00bb 3-Way Camera StrapTM\n-"
+        },
+        {
+          "position": 380,
+          "strength": 42.78125,
+          "text": " drama Saving Grace. Prior to that, he played\u00ab the\u00bb young version of<bos>I\u2019ve been a"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_00"
+    },
+    {
+      "feature_idx": 844,
+      "label": "Period followed by sentence start or new topic",
+      "variance": 33.15619659423828,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1239,
+          "strength": 50.46875,
+          "text": " most common services is the installation of energy efficient windows\u00ab.\u00bb These windows will not only keep your energy bill"
+        },
+        {
+          "position": 1178,
+          "strength": 44.78125,
+          "text": " different services that you can get from a window installer\u00ab.\u00bb Whether they are done for your home or your"
+        },
+        {
+          "position": 922,
+          "strength": 41.84375,
+          "text": " with:\n\"\"First, you are quite wrong\u00ab.\u00bb There are numerous cases of \u05d1 with a cla"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_00"
+    },
+    {
+      "feature_idx": 1846,
+      "label": "Quotation marks or speech punctuation transitions",
+      "variance": 32.231483459472656,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1078,
+          "strength": 43.875,
+          "text": " advances healthcare professionals' behavior and ultimately improves patient care\u00ab.\u00bb We believe that continued professional development of physicians and"
+        },
+        {
+          "position": 1120,
+          "strength": 39.8125,
+          "text": " of effective strategies that enhance competence and provider performance.\u00ab\n\u00bbcme2 is accredited by the ACCME"
+        },
+        {
+          "position": 341,
+          "strength": 39.5625,
+          "text": ", and was born on December 29,\u00ab \u00bb1996 in Evansville, Indiana."
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_01"
+    },
+    {
+      "feature_idx": 2004,
+      "label": "Transition between distinct topics or sections",
+      "variance": 29.505691528320312,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 223,
+          "strength": 47.90625,
+          "text": " and intensities will be wrong everywhere in all images.\u00ab\n\u00bbIn order to deliver accurate color and image contrast"
+        },
+        {
+          "position": 198,
+          "strength": 44.9375,
+          "text": " displayed color mixtures. So if the Intensity Scale doesn\u00ab'\u00bbt follow the Standard that is used in all"
+        },
+        {
+          "position": 1219,
+          "strength": 42.5,
+          "text": " are satisfied and benefit greatly from their professional services.\u00ab\n\u00bbInstallation of Energy Efficient Windows\nOne of the"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SEMANTIC",
+        "agree": false,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_06"
+    },
+    {
+      "feature_idx": 3258,
+      "label": "Padding tokens and sequence boundaries",
+      "variance": 28.156017303466797,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 650,
+          "strength": 36.9375,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<pad>\u00bb<pad><pad><pad><pad><pad><pad><pad><pad><pad>"
+        },
+        {
+          "position": 649,
+          "strength": 36.46875,
+          "text": " who<pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<pad>\u00bb<pad><pad><pad><pad><pad><pad><pad><pad><pad>"
+        },
+        {
+          "position": 651,
+          "strength": 36.0,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<pad>\u00bb<pad><pad><pad><pad><pad><pad><pad><pad><bos>"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SEMANTIC",
+        "agree": false,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_06"
+    },
+    {
+      "feature_idx": 2070,
+      "label": "Plural nouns in product or category listings",
+      "variance": 27.642316818237305,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 250,
+          "strength": 42.21875,
+          "text": " Intensity Scale. Figure 3 shows the measured Intensity\u00ab Scales\u00bb for the Tablets alongside the<bos>Mostly Credited"
+        },
+        {
+          "position": 705,
+          "strength": 36.0,
+          "text": " be able to quickly register and/or pay for\u00ab Leagues\u00bb, Tournaments, and Events through the website"
+        },
+        {
+          "position": 212,
+          "strength": 35.9375,
+          "text": " Standard that is used in all consumer content then the\u00ab colors\u00bb and intensities will be wrong everywhere in all images"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_00"
+    },
+    {
+      "feature_idx": 3295,
+      "label": "Artist and musician name mentions",
+      "variance": 26.392581939697266,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1511,
+          "strength": 39.25,
+          "text": "\u2019s website.\nYou may remember T-\u00abShy\u00bbne, aka Tafa Peters, from February"
+        },
+        {
+          "position": 590,
+          "strength": 38.15625,
+          "text": " record producer Nile Rodgers, who recently produced Daft\u00ab Punk\u00bb's mega-hit \"Get Lucky.\""
+        },
+        {
+          "position": 1514,
+          "strength": 35.40625,
+          "text": ".\nYou may remember T-Shyne,\u00ab aka\u00bb Tafa Peters, from February\u2019s Burger"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "fw_05"
+    },
+    {
+      "feature_idx": 3630,
+      "label": "Medical education improvement and professional development",
+      "variance": 26.264480590820312,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1068,
+          "strength": 49.0,
+          "text": " of pass/fail to learning mastery that measurably\u00ab advances\u00bb healthcare professionals' behavior and ultimately improves patient care"
+        },
+        {
+          "position": 1073,
+          "strength": 46.625,
+          "text": " learning mastery that measurably advances healthcare professionals' behavior\u00ab and\u00bb ultimately improves patient care. We believe that continued"
+        },
+        {
+          "position": 1055,
+          "strength": 45.09375,
+          "text": "me2's mission is to elevate medical education\u00ab from\u00bb a matter of pass/fail to learning mastery"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "fw_04"
+    },
+    {
+      "feature_idx": 3674,
+      "label": "\"preposition 'of' in various contexts\"",
+      "variance": 25.58103370666504,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1389,
+          "strength": 50.21875,
+          "text": " want to have the specific model.\nThe statement\u00ab of\u00bb Samsung on the matter goes as follows: \u201c"
+        },
+        {
+          "position": 772,
+          "strength": 47.25,
+          "text": ".What.When. |<bos>Nectarios\u00ab of\u00bb Pentapolis\nSt. Nectarios ("
+        },
+        {
+          "position": 1221,
+          "strength": 46.875,
+          "text": " and benefit greatly from their professional services.\nInstallation\u00ab of\u00bb Energy Efficient Windows\nOne of the most common"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_03"
+    },
+    {
+      "feature_idx": 18227,
+      "label": "Product discontinuation and recall messaging",
+      "variance": 25.230884552001953,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1358,
+          "strength": 45.90625,
+          "text": " the company has advised everyone with this particular phone to\u00ab return\u00bb it. There will be compensation, of course"
+        },
+        {
+          "position": 1338,
+          "strength": 44.1875,
+          "text": " the sales are off and the product is no longer\u00ab available\u00bb in the market. Before affecting more people,"
+        },
+        {
+          "position": 1335,
+          "strength": 43.96875,
+          "text": "\nSo, the sales are off and the product\u00ab is\u00bb no longer available in the market. Before affecting"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "fw_05"
+    },
+    {
+      "feature_idx": 472,
+      "label": "Proper nouns and artist names in music contexts",
+      "variance": 24.725234985351562,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1586,
+          "strength": 54.0,
+          "text": "<pad><pad><pad><pad><pad><bos>Listen to En Ath\u00abma\u00bb Nesa online. En Athma Nesa"
+        },
+        {
+          "position": 1516,
+          "strength": 51.0,
+          "text": "You may remember T-Shyne, aka Ta\u00abfa\u00bb Peters, from February\u2019s Burger King Twitter"
+        },
+        {
+          "position": 1733,
+          "strength": 50.5,
+          "text": "-Way Camera StrapTM\n- What is JOB\u00abY\u00bb's warranty policy?\n- JOBY"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "fw_06"
+    },
+    {
+      "feature_idx": 1500,
+      "label": "Punctuation and sentence boundary markers",
+      "variance": 24.506778717041016,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 447,
+          "strength": 30.203125,
+          "text": " the kids. And the kids are sweet, if\u00ab occasionally\u00bb monstrous. But I was putting together my husband"
+        },
+        {
+          "position": 448,
+          "strength": 25.703125,
+          "text": " kids. And the kids are sweet, if occasionally\u00ab monstrous\u00bb. But I was putting together my husband\u2019"
+        },
+        {
+          "position": 449,
+          "strength": 24.96875,
+          "text": ". And the kids are sweet, if occasionally monstrous\u00ab.\u00bb But I was putting together my husband\u2019s"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_01"
+    },
+    {
+      "feature_idx": 1941,
+      "label": "indefinite article \"a\" before nouns",
+      "variance": 23.855058670043945,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 892,
+          "strength": 49.59375,
+          "text": ", in Selymbria in Thrace to\u00ab a\u00bb poor family.<bos>Attention of Accordance Instant"
+        },
+        {
+          "position": 27,
+          "strength": 47.625,
+          "text": " for Montpelier lawyers by legal practice area. Find\u00ab a\u00bb quality and affordable lawyer by reviewing detail profiles for"
+        },
+        {
+          "position": 1175,
+          "strength": 46.78125,
+          "text": " a number of different services that you can get from\u00ab a\u00bb window installer. Whether they are done for your"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_04"
+    },
+    {
+      "feature_idx": 3345,
+      "label": "Quotation marks or punctuation marking quoted text",
+      "variance": 23.070199966430664,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 491,
+          "strength": 28.984375,
+          "text": ", my husband walks our kid to the bus stop\u00ab,\u00bb I really need to stop complaining), and I"
+        },
+        {
+          "position": 478,
+          "strength": 23.953125,
+          "text": " walked Levi to the bus stop at 7 (\u00abyes\u00bb, see, my husband walks our kid to"
+        },
+        {
+          "position": 1225,
+          "strength": 23.28125,
+          "text": " their professional services.\nInstallation of Energy Efficient Windows\u00ab\n\u00bbOne of the most common services is the installation"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_04"
+    },
+    {
+      "feature_idx": 2460,
+      "label": "Capitalized letters following punctuation or line breaks",
+      "variance": 22.546504974365234,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1485,
+          "strength": 45.9375,
+          "text": ", and 700. Now, member\u00ab T\u00bb-Shyne drops his newest release, The"
+        },
+        {
+          "position": 1040,
+          "strength": 45.6875,
+          "text": " 2008\nCertified CME provider:\u00ab c\u00bbme2\ncme2's mission"
+        },
+        {
+          "position": 1044,
+          "strength": 45.46875,
+          "text": "8\nCertified CME provider: cme2\n\u00abc\u00bbme2's mission is to elevate medical"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_05"
+    },
+    {
+      "feature_idx": 2920,
+      "label": "Sentence starts with capitalized pronouns or determiners",
+      "variance": 22.475305557250977,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1079,
+          "strength": 46.625,
+          "text": " healthcare professionals' behavior and ultimately improves patient care.\u00ab We\u00bb believe that continued professional development of physicians and other"
+        },
+        {
+          "position": 1198,
+          "strength": 44.78125,
+          "text": " business, you have a large number of options.\u00ab A\u00bb qualified installation tech will be able to ensure that"
+        },
+        {
+          "position": 1103,
+          "strength": 43.125,
+          "text": " enhanced through repeated, highly precise quantitative needs assessments.\u00ab These\u00bb needs assessments lead to the development of effective strategies"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_04"
+    },
+    {
+      "feature_idx": 1680,
+      "label": "Text continuation after punctuation or line breaks",
+      "variance": 21.41739273071289,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 640,
+          "strength": 72.0,
+          "text": " shimmering, illuminating a room of lovers & friends who\u00ab<pad>\u00bb<pad><pad><pad><pad><pad><pad><pad><pad><pad>"
+        },
+        {
+          "position": 1536,
+          "strength": 66.5625,
+          "text": " hack \u2013 the account name-checked the rapper several\u00ab<pad>\u00bb<pad><pad><pad><pad><pad><pad><pad><pad><pad>"
+        },
+        {
+          "position": 118,
+          "strength": 56.9375,
+          "text": " The company later attempted to challenge the second citation by\u00ab ...\u00bb\n... to deliver and possession of marijuana."
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_06"
+    }
+  ],
+  "passages": [
+    "fw_00",
+    "fw_01",
+    "fw_02",
+    "fw_03",
+    "fw_04",
+    "fw_05",
+    "fw_06"
+  ],
+  "top_feat_indices_var": [
+    2839,
+    2472,
+    1716,
+    1291,
+    745,
+    2666,
+    882,
+    2424,
+    1046,
+    15320,
+    3133,
+    778,
+    566,
+    17548,
+    2371,
+    48,
+    844,
+    1846,
+    2004,
+    3258,
+    2070,
+    3295,
+    3630,
+    3674,
+    18227,
+    472,
+    1500,
+    1941,
+    3345,
+    2460,
+    2920,
+    1680
+  ],
+  "top_feat_indices_pdvar": [
+    2839,
+    2472,
+    1716,
+    2424,
+    15320,
+    1500,
+    17548,
+    1046,
+    2666,
+    745,
+    1291,
+    18227,
+    3133,
+    3630,
+    3295,
+    2265,
+    3345,
+    3258,
+    1682,
+    2371,
+    785,
+    1535,
+    882,
+    753,
+    1222,
+    7254,
+    1305,
+    2026,
+    13495,
+    6,
+    492,
+    16183
+  ],
+  "metrics": {
+    "N": 32,
+    "semantic_count": 11,
+    "semantic_fraction": 0.34375,
+    "passage_coverage_count": 7,
+    "passage_coverage_entropy": 1.8466942336974967,
+    "n_passages": 7,
+    "judge_disagreement_rate": 0.09375,
+    "semantic_count_pdvar_overlap": 10,
+    "pdvar_var_overlap_count": 19,
+    "semantic_count_pdvar": 23,
+    "pdvar_new_labels_count": 13
+  },
+  "pdvar_only_features": [
+    {
+      "feature_idx": 2265,
+      "label": "technical documentation about display color standards",
+      "variance": 17.197309494018555,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 176,
+          "strength": 31.59375,
+          "text": " the on-screen colors. The steeper the Intensity\u00ab Scale\u00bb the greater the image contrast and the higher the"
+        },
+        {
+          "position": 160,
+          "strength": 30.5625,
+          "text": " also controls how the Red, Green and Blue primary\u00ab colors\u00bb mix to produce all of the on-screen"
+        },
+        {
+          "position": 241,
+          "strength": 29.1875,
+          "text": " image contrast a display must closely match the Standard Intensity\u00ab Scale\u00bb. Figure 3 shows the measured Intensity Scales"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 1682,
+      "label": "Corporate statement or official announcement language",
+      "variance": 14.475334167480469,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1397,
+          "strength": 40.71875,
+          "text": "The statement of Samsung on the matter goes as follows\u00ab:\u00bb \u201cTo date (as of September 1"
+        },
+        {
+          "position": 1351,
+          "strength": 38.375,
+          "text": " market. Before affecting more people, the company has\u00ab advised\u00bb everyone with this particular phone to return it."
+        },
+        {
+          "position": 1372,
+          "strength": 33.8125,
+          "text": " will be compensation, of course, as well as\u00ab a\u00bb revised model for those who still want to have"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 785,
+      "label": "Legal services directory content",
+      "variance": 19.966066360473633,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 31,
+          "strength": 45.9375,
+          "text": " by legal practice area. Find a quality and affordable\u00ab lawyer\u00bb by reviewing detail profiles for Montpelier attorneys."
+        },
+        {
+          "position": 20,
+          "strength": 44.8125,
+          "text": " and easy. Refine your search for Montpelier\u00ab lawyers\u00bb by legal practice area. Find a quality and"
+        },
+        {
+          "position": 39,
+          "strength": 44.78125,
+          "text": " and affordable lawyer by reviewing detail profiles for Montpelier\u00ab attorneys\u00bb. Many Lawyer.com featured Lawyers in Iowa"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 1535,
+      "label": "windows and home energy efficiency benefits",
+      "variance": 18.840574264526367,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1224,
+          "strength": 51.1875,
+          "text": " from their professional services.\nInstallation of Energy Efficient\u00ab Windows\u00bb\nOne of the most common services is the"
+        },
+        {
+          "position": 1238,
+          "strength": 51.03125,
+          "text": " the most common services is the installation of energy efficient\u00ab windows\u00bb. These windows will not only keep your energy"
+        },
+        {
+          "position": 1262,
+          "strength": 50.40625,
+          "text": " will also keep your home feeling more secure. Good\u00ab windows\u00bb will keep a home from feeling drafty or"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 753,
+      "label": "continuing medical education (CME) content",
+      "variance": 12.893105506896973,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1084,
+          "strength": 49.71875,
+          "text": " ultimately improves patient care. We believe that continued professional\u00ab development\u00bb of physicians and other healthcare providers can be enhanced"
+        },
+        {
+          "position": 1142,
+          "strength": 40.90625,
+          "text": " overall medical education effectiveness is further measured by assessing c\u00abme\u00bb2's adherence and compliance with the latest"
+        },
+        {
+          "position": 1122,
+          "strength": 39.40625,
+          "text": " strategies that enhance competence and provider performance.\nc\u00abme\u00bb2 is accredited by the ACCME and its"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 1222,
+      "label": "Eastern Orthodox religious titles and institutions",
+      "variance": 12.654878616333008,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 808,
+          "strength": 44.84375,
+          "text": "worker of Aegina, was officially recognized as a\u00ab saint\u00bb by the Ecumenical Patriarchate of Constantinople in"
+        },
+        {
+          "position": 814,
+          "strength": 42.125,
+          "text": " officially recognized as a saint by the Ecumenical Patriarch\u00abate\u00bb of Constantinople in 1961."
+        },
+        {
+          "position": 812,
+          "strength": 39.53125,
+          "text": ", was officially recognized as a saint by the Ec\u00abumenical\u00bb Patriarchate of Constantinople in 196"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 7254,
+      "label": "Personal relationship frustration and family dynamics",
+      "variance": 13.684077262878418,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 444,
+          "strength": 41.03125,
+          "text": " family and for the kids. And the kids are\u00ab sweet\u00bb, if occasionally monstrous. But I was putting"
+        },
+        {
+          "position": 429,
+          "strength": 39.96875,
+          "text": " ME. Which isn\u2019t fair. My husband\u00ab does\u00bb a LOT for our family and for the kids"
+        },
+        {
+          "position": 435,
+          "strength": 38.71875,
+          "text": " fair. My husband does a LOT for our family\u00ab and\u00bb for the kids. And the kids are sweet"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 1305,
+      "label": "Family relationships and domestic responsibilities",
+      "variance": 15.069513320922852,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 438,
+          "strength": 73.3125,
+          "text": " husband does a LOT for our family and for the\u00ab kids\u00bb. And the kids are sweet, if occasionally"
+        },
+        {
+          "position": 442,
+          "strength": 51.03125,
+          "text": " for our family and for the kids. And the\u00ab kids\u00bb are sweet, if occasionally monstrous. But I"
+        },
+        {
+          "position": 433,
+          "strength": 43.71875,
+          "text": "\u2019t fair. My husband does a LOT for\u00ab our\u00bb family and for the kids. And the kids"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 2026,
+      "label": "warranty policy statements and terms",
+      "variance": 20.62783432006836,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1751,
+          "strength": 55.84375,
+          "text": " JOBY offers a one (1) year warranty\u00ab on\u00bb all products and an extended two (2)"
+        },
+        {
+          "position": 1750,
+          "strength": 53.28125,
+          "text": "- JOBY offers a one (1) year\u00ab warranty\u00bb on all products and an extended two (2"
+        },
+        {
+          "position": 1749,
+          "strength": 51.8125,
+          "text": "\n- JOBY offers a one (1)\u00ab year\u00bb warranty on all products and an extended two ("
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 13495,
+      "label": "The name Nectarios in various spellings",
+      "variance": 16.142345428466797,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 849,
+          "strength": 61.78125,
+          "text": " as Nectarios of Pentapolis or Nect\u00abarios\u00bb of Aegina, and his name is sometimes"
+        },
+        {
+          "position": 842,
+          "strength": 59.125,
+          "text": "9. He is often referred to as Nect\u00abarios\u00bb of Pentapolis or Nectarios of Ae"
+        },
+        {
+          "position": 862,
+          "strength": 51.71875,
+          "text": "gina, and his name is sometimes spelled Nekt\u00abarios\u00bb.\nSt. Nectarios was born"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 6,
+      "label": "metadata and descriptive information about songs",
+      "variance": 11.523574829101562,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1654,
+          "strength": 36.6875,
+          "text": " duration of the song is 4:30\u00ab.\u00bb Download Tamil songs online from JioSaavn."
+        },
+        {
+          "position": 1642,
+          "strength": 27.125,
+          "text": " was released in the year 2003\u00ab.\u00bb The duration of the song is 4:"
+        },
+        {
+          "position": 1648,
+          "strength": 26.671875,
+          "text": "2003. The duration of the song\u00ab is\u00bb 4:30. Download Tamil songs"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 492,
+      "label": "window installation services and products",
+      "variance": 9.67426586151123,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1200,
+          "strength": 43.375,
+          "text": " you have a large number of options. A qualified\u00ab installation\u00bb tech will be able to ensure that you are"
+        },
+        {
+          "position": 1234,
+          "strength": 41.5625,
+          "text": " Windows\nOne of the most common services is the\u00ab installation\u00bb of energy efficient windows. These windows will not"
+        },
+        {
+          "position": 1177,
+          "strength": 39.0,
+          "text": " of different services that you can get from a window\u00ab installer\u00bb. Whether they are done for your home or"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 16183,
+      "label": "professional service quality assurance language",
+      "variance": 9.622092247009277,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1177,
+          "strength": 23.234375,
+          "text": " of different services that you can get from a window\u00ab installer\u00bb. Whether they are done for your home or"
+        },
+        {
+          "position": 1181,
+          "strength": 21.703125,
+          "text": " you can get from a window installer. Whether they\u00ab are\u00bb done for your home or your business, you"
+        },
+        {
+          "position": 1199,
+          "strength": 21.15625,
+          "text": ", you have a large number of options. A\u00ab qualified\u00bb installation tech will be able to ensure that you"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    }
+  ]
+}

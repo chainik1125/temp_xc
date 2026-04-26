@@ -1,0 +1,1494 @@
+{
+  "arch": "phase57_partB_h8_bare_multidistance",
+  "seed": 1,
+  "concat": "random",
+  "features": [
+    {
+      "feature_idx": 2856,
+      "label": "Beginning of sentence with capitalized word",
+      "variance": 1216.659912109375,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 0,
+          "strength": 667.5,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        },
+        {
+          "position": 1,
+          "strength": 449.25,
+          "text": "<bos>\u00abLawyer\u00bb.com makes finding Montpelier Lawyers fast and"
+        },
+        {
+          "position": 2,
+          "strength": 396.25,
+          "text": "<bos>Lawyer\u00ab.\u00bbcom makes finding Montpelier Lawyers fast and easy"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_02"
+    },
+    {
+      "feature_idx": 2891,
+      "label": "Capitalized words at document boundaries",
+      "variance": 1182.965087890625,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1406,
+          "strength": 262.75,
+          "text": " follows: \u201cTo date (as of September \u00ab1\u00bb)<bos>New Mixtape: T-Shy"
+        },
+        {
+          "position": 1150,
+          "strength": 258.25,
+          "text": " assessing cme2's adherence and compliance with\u00ab the\u00bb latest<bos>The Best Services Done By Professional Window"
+        },
+        {
+          "position": 894,
+          "strength": 254.625,
+          "text": " Selymbria in Thrace to a poor\u00ab family\u00bb.<bos>Attention of Accordance Instant Details Dept"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_04"
+    },
+    {
+      "feature_idx": 373,
+      "label": "Beginning of new text passage or document",
+      "variance": 1108.487060546875,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 0,
+          "strength": 620.0,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        },
+        {
+          "position": 1,
+          "strength": 361.0,
+          "text": "<bos>\u00abLawyer\u00bb.com makes finding Montpelier Lawyers fast and"
+        },
+        {
+          "position": 1582,
+          "strength": 292.5,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><bos>\u00abListen\u00bb to En Athma Nesa online. En"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_03"
+    },
+    {
+      "feature_idx": 3194,
+      "label": "Beginning of sentence or document markers",
+      "variance": 1067.656494140625,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 2,
+          "strength": 502.75,
+          "text": "<bos>Lawyer\u00ab.\u00bbcom makes finding Montpelier Lawyers fast and easy"
+        },
+        {
+          "position": 1583,
+          "strength": 387.0,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><bos>Listen\u00ab to\u00bb En Athma Nesa online. En Ath"
+        },
+        {
+          "position": 0,
+          "strength": 374.25,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_04"
+    },
+    {
+      "feature_idx": 3101,
+      "label": "Capitalized words beginning new sentences or sections",
+      "variance": 962.4888305664062,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 385,
+          "strength": 232.375,
+          "text": " to that, he played the young version of<bos>\u00abI\u00bb\u2019ve been a little down recently and trying"
+        },
+        {
+          "position": 513,
+          "strength": 231.0,
+          "text": " from the moment I wake up I\u2019m<bos>\u00abChristina\u00bb Aguilera hasn't dropped a proper album since"
+        },
+        {
+          "position": 1281,
+          "strength": 226.375,
+          "text": " or cold, and will let in light,<bos>\u00abSamsung\u00bb has made an announcement, following the terrible news"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_01"
+    },
+    {
+      "feature_idx": 646,
+      "label": "Beginning of sentence or document markers",
+      "variance": 798.0151977539062,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 0,
+          "strength": 454.25,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        },
+        {
+          "position": 1,
+          "strength": 383.0,
+          "text": "<bos>\u00abLawyer\u00bb.com makes finding Montpelier Lawyers fast and"
+        },
+        {
+          "position": 2,
+          "strength": 375.75,
+          "text": "<bos>Lawyer\u00ab.\u00bbcom makes finding Montpelier Lawyers fast and easy"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_05"
+    },
+    {
+      "feature_idx": 1589,
+      "label": "Beginning of sentence with capitalized word token",
+      "variance": 701.4915161132812,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 0,
+          "strength": 460.5,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        },
+        {
+          "position": 1,
+          "strength": 451.0,
+          "text": "<bos>\u00abLawyer\u00bb.com makes finding Montpelier Lawyers fast and"
+        },
+        {
+          "position": 2,
+          "strength": 237.75,
+          "text": "<bos>Lawyer\u00ab.\u00bbcom makes finding Montpelier Lawyers fast and easy"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_03"
+    },
+    {
+      "feature_idx": 536,
+      "label": "Punctuation and discourse markers in formal statements",
+      "variance": 653.9332275390625,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1396,
+          "strength": 142.75,
+          "text": "\nThe statement of Samsung on the matter goes as\u00ab follows\u00bb: \u201cTo date (as of September "
+        },
+        {
+          "position": 1397,
+          "strength": 135.5,
+          "text": "The statement of Samsung on the matter goes as follows\u00ab:\u00bb \u201cTo date (as of September 1"
+        },
+        {
+          "position": 1395,
+          "strength": 134.5,
+          "text": ".\nThe statement of Samsung on the matter goes\u00ab as\u00bb follows: \u201cTo date (as of September"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_05"
+    },
+    {
+      "feature_idx": 1241,
+      "label": "Beginning of sentence or new text segment",
+      "variance": 627.3550415039062,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 0,
+          "strength": 415.5,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        },
+        {
+          "position": 1,
+          "strength": 341.0,
+          "text": "<bos>\u00abLawyer\u00bb.com makes finding Montpelier Lawyers fast and"
+        },
+        {
+          "position": 2,
+          "strength": 221.125,
+          "text": "<bos>Lawyer\u00ab.\u00bbcom makes finding Montpelier Lawyers fast and easy"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_04"
+    },
+    {
+      "feature_idx": 1656,
+      "label": "Common function words in varied contexts",
+      "variance": 626.8394165039062,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1250,
+          "strength": 124.0,
+          "text": " These windows will not only keep your energy bill down\u00ab,\u00bb but will also keep your home feeling more secure"
+        },
+        {
+          "position": 1249,
+          "strength": 121.0625,
+          "text": ". These windows will not only keep your energy bill\u00ab down\u00bb, but will also keep your home feeling more"
+        },
+        {
+          "position": 1248,
+          "strength": 119.9375,
+          "text": " windows. These windows will not only keep your energy\u00ab bill\u00bb down, but will also keep your home feeling"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "fw_04"
+    },
+    {
+      "feature_idx": 2134,
+      "label": "Beginning of sentence or new text segment",
+      "variance": 621.1883544921875,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1,
+          "strength": 294.25,
+          "text": "<bos>\u00abLawyer\u00bb.com makes finding Montpelier Lawyers fast and"
+        },
+        {
+          "position": 0,
+          "strength": 292.5,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        },
+        {
+          "position": 1582,
+          "strength": 270.0,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><bos>\u00abListen\u00bb to En Athma Nesa online. En"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_01"
+    },
+    {
+      "feature_idx": 2094,
+      "label": "Beginning of sentence with capitalized word",
+      "variance": 530.4871215820312,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1281,
+          "strength": 175.375,
+          "text": " or cold, and will let in light,<bos>\u00abSamsung\u00bb has made an announcement, following the terrible news"
+        },
+        {
+          "position": 0,
+          "strength": 174.625,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        },
+        {
+          "position": 769,
+          "strength": 169.0,
+          "text": " by \u00a9 Play.What.When. |<bos>\u00abN\u00bbectarios of Pentapolis\nSt. N"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_04"
+    },
+    {
+      "feature_idx": 1529,
+      "label": "Beginning of new text passage or document",
+      "variance": 508.86962890625,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 0,
+          "strength": 307.25,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        },
+        {
+          "position": 1581,
+          "strength": 306.75,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbListen to En Athma Nesa online."
+        },
+        {
+          "position": 660,
+          "strength": 256.0,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbAussies Grill and Beach Bar\nAccount Log"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_04"
+    },
+    {
+      "feature_idx": 2600,
+      "label": "Document or webpage boundary markers",
+      "variance": 508.3051452636719,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1150,
+          "strength": 155.375,
+          "text": " assessing cme2's adherence and compliance with\u00ab the\u00bb latest<bos>The Best Services Done By Professional Window"
+        },
+        {
+          "position": 1022,
+          "strength": 132.25,
+          "text": " even in graduate school.\nKindly note that I\u00ab have\u00bb not<bos>June 01, 2"
+        },
+        {
+          "position": 254,
+          "strength": 132.125,
+          "text": " 3 shows the measured Intensity Scales for the Tablets\u00ab alongside\u00bb the<bos>Mostly Credited As: Dylan Min"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_00"
+    },
+    {
+      "feature_idx": 821,
+      "label": "Words from a specific mission statement",
+      "variance": 401.4410705566406,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1054,
+          "strength": 132.25,
+          "text": "cme2's mission is to elevate medical\u00ab education\u00bb from a matter of pass/fail to learning"
+        },
+        {
+          "position": 1053,
+          "strength": 127.6875,
+          "text": "\ncme2's mission is to elevate\u00ab medical\u00bb education from a matter of pass/fail to"
+        },
+        {
+          "position": 1062,
+          "strength": 127.25,
+          "text": " elevate medical education from a matter of pass/fail\u00ab to\u00bb learning mastery that measurably advances healthcare professionals'"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "fw_04"
+    },
+    {
+      "feature_idx": 147,
+      "label": "Text boundaries and document structure markers",
+      "variance": 400.67340087890625,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1150,
+          "strength": 220.5,
+          "text": " assessing cme2's adherence and compliance with\u00ab the\u00bb latest<bos>The Best Services Done By Professional Window"
+        },
+        {
+          "position": 1022,
+          "strength": 216.75,
+          "text": " even in graduate school.\nKindly note that I\u00ab have\u00bb not<bos>June 01, 2"
+        },
+        {
+          "position": 254,
+          "strength": 207.25,
+          "text": " 3 shows the measured Intensity Scales for the Tablets\u00ab alongside\u00bb the<bos>Mostly Credited As: Dylan Min"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_03"
+    },
+    {
+      "feature_idx": 2644,
+      "label": "Metric height conversions and physical measurements",
+      "variance": 395.1875,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 319,
+          "strength": 109.625,
+          "text": ": 5' 8\" (1.\u00ab7\u00bb2 m)\nDylan Minnette is an"
+        },
+        {
+          "position": 320,
+          "strength": 100.5,
+          "text": " 5' 8\" (1.7\u00ab2\u00bb m)\nDylan Minnette is an American"
+        },
+        {
+          "position": 318,
+          "strength": 97.375,
+          "text": "Height: 5' 8\" (1\u00ab.\u00bb72 m)\nDylan Minnette is"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "fw_01"
+    },
+    {
+      "feature_idx": 2549,
+      "label": "Transition between document sections or sources",
+      "variance": 393.54736328125,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 383,
+          "strength": 208.25,
+          "text": ". Prior to that, he played the young version\u00ab of\u00bb<bos>I\u2019ve been a little down recently"
+        },
+        {
+          "position": 895,
+          "strength": 203.125,
+          "text": "elymbria in Thrace to a poor family\u00ab.\u00bb<bos>Attention of Accordance Instant Details Dept:"
+        },
+        {
+          "position": 1279,
+          "strength": 201.125,
+          "text": " drafty or cold, and will let in light\u00ab,\u00bb<bos>Samsung has made an announcement, following the"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SEMANTIC",
+        "agree": false,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_03"
+    },
+    {
+      "feature_idx": 133,
+      "label": "Beginning of sequence markers and boundaries",
+      "variance": 391.03509521484375,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1,
+          "strength": 258.25,
+          "text": "<bos>\u00abLawyer\u00bb.com makes finding Montpelier Lawyers fast and"
+        },
+        {
+          "position": 0,
+          "strength": 200.125,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        },
+        {
+          "position": 1579,
+          "strength": 189.125,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<pad>\u00bb<pad><bos>Listen to En Athma Nesa"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_00"
+    },
+    {
+      "feature_idx": 3294,
+      "label": "Punctuation marks within or after words",
+      "variance": 370.80621337890625,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1,
+          "strength": 137.125,
+          "text": "<bos>\u00abLawyer\u00bb.com makes finding Montpelier Lawyers fast and"
+        },
+        {
+          "position": 2,
+          "strength": 134.25,
+          "text": "<bos>Lawyer\u00ab.\u00bbcom makes finding Montpelier Lawyers fast and easy"
+        },
+        {
+          "position": 258,
+          "strength": 130.0,
+          "text": " measured Intensity Scales for the Tablets alongside the<bos>Mostly\u00ab Cre\u00bbdited As: Dylan Minnette\nBirth Name"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_00"
+    },
+    {
+      "feature_idx": 3189,
+      "label": "Beginning of sentence with capitalized word",
+      "variance": 347.69781494140625,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 897,
+          "strength": 152.5,
+          "text": "ria in Thrace to a poor family.<bos>\u00abAttention\u00bb of Accordance Instant Details Dept:\nSomeone"
+        },
+        {
+          "position": 385,
+          "strength": 146.75,
+          "text": " to that, he played the young version of<bos>\u00abI\u00bb\u2019ve been a little down recently and trying"
+        },
+        {
+          "position": 129,
+          "strength": 146.625,
+          "text": "\n... to deliver and possession of marijuana.<bos>\u00abThe\u00bb Intensity Scale (sometimes called the Gray Scale)"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_01"
+    },
+    {
+      "feature_idx": 1889,
+      "label": "Song title or artist name mentions",
+      "variance": 334.5553894042969,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 565,
+          "strength": 97.3125,
+          "text": " nightclub shooting.\nAustralian pop star Sia wrote \"\u00abTele\u00bbpathy\"; joining Aguilera on the track is the"
+        },
+        {
+          "position": 585,
+          "strength": 91.3125,
+          "text": " historically great bass player and record producer Nile Rodgers,\u00ab who\u00bb recently produced Daft Punk's mega-"
+        },
+        {
+          "position": 597,
+          "strength": 91.0625,
+          "text": " produced Daft Punk's mega-hit \"\u00abGet\u00bb Lucky.\" Unsurprisingly, \"Telepathy"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "fw_05"
+    },
+    {
+      "feature_idx": 1181,
+      "label": "Punctuation and special characters in text",
+      "variance": 327.46527099609375,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1,
+          "strength": 236.875,
+          "text": "<bos>\u00abLawyer\u00bb.com makes finding Montpelier Lawyers fast and"
+        },
+        {
+          "position": 1579,
+          "strength": 190.125,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<pad>\u00bb<pad><bos>Listen to En Athma Nesa"
+        },
+        {
+          "position": 658,
+          "strength": 187.625,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<pad>\u00bb<pad><bos>Aussies Grill and Beach Bar\n"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_00"
+    },
+    {
+      "feature_idx": 1734,
+      "label": "Capitalized words at sentence or section starts",
+      "variance": 293.330078125,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1,
+          "strength": 198.875,
+          "text": "<bos>\u00abLawyer\u00bb.com makes finding Montpelier Lawyers fast and"
+        },
+        {
+          "position": 1582,
+          "strength": 193.75,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><bos>\u00abListen\u00bb to En Athma Nesa online. En"
+        },
+        {
+          "position": 661,
+          "strength": 193.625,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><bos>\u00abAus\u00bbsies Grill and Beach Bar\nAccount Log in"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_01"
+    },
+    {
+      "feature_idx": 1681,
+      "label": "Transition between unrelated text segments",
+      "variance": 290.14166259765625,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 382,
+          "strength": 160.25,
+          "text": " Grace. Prior to that, he played the young\u00ab version\u00bb of<bos>I\u2019ve been a little down"
+        },
+        {
+          "position": 766,
+          "strength": 136.625,
+          "text": " |\nSite by \u00a9 Play.What.When\u00ab.\u00bb |<bos>Nectarios of Pentapolis\n"
+        },
+        {
+          "position": 1406,
+          "strength": 136.375,
+          "text": " follows: \u201cTo date (as of September \u00ab1\u00bb)<bos>New Mixtape: T-Shy"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SEMANTIC",
+        "agree": false,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_05"
+    },
+    {
+      "feature_idx": 3535,
+      "label": "domestic caregiving and self-sacrifice resentment",
+      "variance": 288.0708312988281,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 489,
+          "strength": 78.75,
+          "text": ", see, my husband walks our kid to the\u00ab bus\u00bb stop, I really need to stop complaining),"
+        },
+        {
+          "position": 490,
+          "strength": 76.9375,
+          "text": " see, my husband walks our kid to the bus\u00ab stop\u00bb, I really need to stop complaining), and"
+        },
+        {
+          "position": 463,
+          "strength": 74.5625,
+          "text": " putting together my husband\u2019s tea for him to\u00ab have\u00bb something warm when he walked Levi to the bus"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "fw_01"
+    },
+    {
+      "feature_idx": 1801,
+      "label": "Transition between unrelated text segments",
+      "variance": 288.01898193359375,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1579,
+          "strength": 213.75,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<pad>\u00bb<pad><bos>Listen to En Athma Nesa"
+        },
+        {
+          "position": 658,
+          "strength": 206.0,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<pad>\u00bb<pad><bos>Aussies Grill and Beach Bar\n"
+        },
+        {
+          "position": 1662,
+          "strength": 201.25,
+          "text": "30. Download Tamil songs online from JioSa\u00abavn\u00bb.<bos>3-Way Camera Strap\nThe"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SEMANTIC",
+        "agree": false,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_00"
+    },
+    {
+      "feature_idx": 2925,
+      "label": "Transition between document segments or text boundaries",
+      "variance": 269.9327697753906,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1579,
+          "strength": 213.625,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<pad>\u00bb<pad><bos>Listen to En Athma Nesa"
+        },
+        {
+          "position": 658,
+          "strength": 208.25,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<pad>\u00bb<pad><bos>Aussies Grill and Beach Bar\n"
+        },
+        {
+          "position": 1662,
+          "strength": 189.5,
+          "text": "30. Download Tamil songs online from JioSa\u00abavn\u00bb.<bos>3-Way Camera Strap\nThe"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_00"
+    },
+    {
+      "feature_idx": 495,
+      "label": "Beginning of new sentence or document section",
+      "variance": 267.6678771972656,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 0,
+          "strength": 233.75,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        },
+        {
+          "position": 1582,
+          "strength": 157.625,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><bos>\u00abListen\u00bb to En Athma Nesa online. En"
+        },
+        {
+          "position": 1278,
+          "strength": 124.125,
+          "text": " feeling drafty or cold, and will let in\u00ab light\u00bb,<bos>Samsung has made an announcement, following"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_06"
+    },
+    {
+      "feature_idx": 1678,
+      "label": "Beginning of sentence or new text segment",
+      "variance": 265.5827941894531,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1,
+          "strength": 213.25,
+          "text": "<bos>\u00abLawyer\u00bb.com makes finding Montpelier Lawyers fast and"
+        },
+        {
+          "position": 1582,
+          "strength": 184.875,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><bos>\u00abListen\u00bb to En Athma Nesa online. En"
+        },
+        {
+          "position": 0,
+          "strength": 184.625,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_05"
+    },
+    {
+      "feature_idx": 2097,
+      "label": "Punctuation marks followed by new content",
+      "variance": 263.7160339355469,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1580,
+          "strength": 219.0,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<pad>\u00bb<bos>Listen to En Athma Nesa online"
+        },
+        {
+          "position": 659,
+          "strength": 200.0,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<pad>\u00bb<bos>Aussies Grill and Beach Bar\nAccount"
+        },
+        {
+          "position": 767,
+          "strength": 184.375,
+          "text": "\nSite by \u00a9 Play.What.When.\u00ab |\u00bb<bos>Nectarios of Pentapolis\nSt"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_00"
+    },
+    {
+      "feature_idx": 2162,
+      "label": "Beginning of new text section or document",
+      "variance": 248.29080200195312,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1664,
+          "strength": 182.125,
+          "text": ". Download Tamil songs online from JioSaavn.\u00ab<bos>\u00bb3-Way Camera Strap\nThe adjustable wrist"
+        },
+        {
+          "position": 660,
+          "strength": 181.25,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbAussies Grill and Beach Bar\nAccount Log"
+        },
+        {
+          "position": 1024,
+          "strength": 181.125,
+          "text": " graduate school.\nKindly note that I have not\u00ab<bos>\u00bbJune 01, 200"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_00"
+    }
+  ],
+  "passages": [
+    "fw_00",
+    "fw_01",
+    "fw_02",
+    "fw_03",
+    "fw_04",
+    "fw_05",
+    "fw_06"
+  ],
+  "top_feat_indices_var": [
+    2856,
+    2891,
+    373,
+    3194,
+    3101,
+    646,
+    1589,
+    536,
+    1241,
+    1656,
+    2134,
+    2094,
+    1529,
+    2600,
+    821,
+    147,
+    2644,
+    2549,
+    133,
+    3294,
+    3189,
+    1889,
+    1181,
+    1734,
+    1681,
+    3535,
+    1801,
+    2925,
+    495,
+    1678,
+    2097,
+    2162
+  ],
+  "top_feat_indices_pdvar": [
+    536,
+    2600,
+    1656,
+    2891,
+    3101,
+    3535,
+    1889,
+    2644,
+    3189,
+    2094,
+    821,
+    2877,
+    74,
+    1241,
+    1674,
+    1027,
+    3294,
+    1681,
+    1009,
+    2549,
+    2944,
+    619,
+    373,
+    3012,
+    3414,
+    1221,
+    12087,
+    891,
+    1194,
+    2465,
+    2856,
+    1028
+  ],
+  "metrics": {
+    "N": 32,
+    "semantic_count": 5,
+    "semantic_fraction": 0.15625,
+    "passage_coverage_count": 7,
+    "passage_coverage_entropy": 1.759491302835843,
+    "n_passages": 7,
+    "judge_disagreement_rate": 0.09375,
+    "semantic_count_pdvar_overlap": 5,
+    "pdvar_var_overlap_count": 17,
+    "semantic_count_pdvar": 13,
+    "pdvar_new_labels_count": 15
+  },
+  "pdvar_only_features": [
+    {
+      "feature_idx": 2877,
+      "label": "adjectives describing qualities or characteristics",
+      "variance": 189.5763397216797,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 161,
+          "strength": 66.5,
+          "text": " controls how the Red, Green and Blue primary colors\u00ab mix\u00bb to produce all of the on-screen colors"
+        },
+        {
+          "position": 160,
+          "strength": 64.3125,
+          "text": " also controls how the Red, Green and Blue primary\u00ab colors\u00bb mix to produce all of the on-screen"
+        },
+        {
+          "position": 894,
+          "strength": 64.25,
+          "text": " Selymbria in Thrace to a poor\u00ab family\u00bb.<bos>Attention of Accordance Instant Details Dept"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": false,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 74,
+      "label": "Comparative or correlative relationship markers",
+      "variance": 188.1719970703125,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1138,
+          "strength": 63.875,
+          "text": " ACCME and its overall medical education effectiveness is further\u00ab measured\u00bb by assessing cme2's adherence and"
+        },
+        {
+          "position": 1137,
+          "strength": 61.5625,
+          "text": " the ACCME and its overall medical education effectiveness is\u00ab further\u00bb measured by assessing cme2's adherence"
+        },
+        {
+          "position": 1139,
+          "strength": 61.125,
+          "text": "ME and its overall medical education effectiveness is further measured\u00ab by\u00bb assessing cme2's adherence and compliance"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SEMANTIC",
+        "agree": false,
+        "verdict": "SYNTACTIC"
+      }
+    },
+    {
+      "feature_idx": 1674,
+      "label": "Religious saint biographical information patterns",
+      "variance": 198.5228729248047,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 797,
+          "strength": 75.125,
+          "text": "1920), Metropolitan of Pentapolis and\u00ab Wonder\u00bbworker of Aegina, was officially recognized as"
+        },
+        {
+          "position": 798,
+          "strength": 74.8125,
+          "text": "920), Metropolitan of Pentapolis and Wonder\u00abworker\u00bb of Aegina, was officially recognized as a"
+        },
+        {
+          "position": 799,
+          "strength": 74.125,
+          "text": "20), Metropolitan of Pentapolis and Wonderworker\u00ab of\u00bb Aegina, was officially recognized as a saint"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 1027,
+      "label": "Professional competence and performance development",
+      "variance": 97.29728698730469,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1115,
+          "strength": 60.09375,
+          "text": " assessments lead to the development of effective strategies that enhance\u00ab competence\u00bb and provider performance.\ncme2 is"
+        },
+        {
+          "position": 1113,
+          "strength": 59.0,
+          "text": " These needs assessments lead to the development of effective strategies\u00ab that\u00bb enhance competence and provider performance.\ncme"
+        },
+        {
+          "position": 1117,
+          "strength": 57.6875,
+          "text": " to the development of effective strategies that enhance competence and\u00ab provider\u00bb performance.\ncme2 is accredited by"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 1009,
+      "label": "disco music characteristics and descriptions",
+      "variance": 121.27082061767578,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 625,
+          "strength": 57.6875,
+          "text": ". easy to listen to, easy to dance to\u00ab,\u00bb a disco ball, shimmering, illuminating a room"
+        },
+        {
+          "position": 624,
+          "strength": 54.3125,
+          "text": " mode. easy to listen to, easy to dance\u00ab to\u00bb, a disco ball, shimmering, illuminating a"
+        },
+        {
+          "position": 620,
+          "strength": 52.59375,
+          "text": " much in that disco mode. easy to listen to\u00ab,\u00bb easy to dance to, a disco ball,"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 2944,
+      "label": "Punctuation and quotation marks in text",
+      "variance": 114.53461456298828,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1476,
+          "strength": 53.15625,
+          "text": " spitter S\u2019Natra, Will Hill,\u00ab and\u00bb 700. Now, member T"
+        },
+        {
+          "position": 1475,
+          "strength": 52.96875,
+          "text": " Roses spitter S\u2019Natra, Will Hill\u00ab,\u00bb and 700. Now, member"
+        },
+        {
+          "position": 1474,
+          "strength": 52.5625,
+          "text": "Till Roses spitter S\u2019Natra, Will\u00ab Hill\u00bb, and 700. Now,"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      }
+    },
+    {
+      "feature_idx": 619,
+      "label": "Transition markers between document sections",
+      "variance": 176.1675262451172,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 894,
+          "strength": 106.375,
+          "text": " Selymbria in Thrace to a poor\u00ab family\u00bb.<bos>Attention of Accordance Instant Details Dept"
+        },
+        {
+          "position": 254,
+          "strength": 103.125,
+          "text": " 3 shows the measured Intensity Scales for the Tablets\u00ab alongside\u00bb the<bos>Mostly Credited As: Dylan Min"
+        },
+        {
+          "position": 1406,
+          "strength": 97.25,
+          "text": " follows: \u201cTo date (as of September \u00ab1\u00bb)<bos>New Mixtape: T-Shy"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      }
+    },
+    {
+      "feature_idx": 3012,
+      "label": "grammar and syntax discussion",
+      "variance": 102.33984375,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 969,
+          "strength": 47.40625,
+          "text": " having a clause for its object. I only spoke\u00ab about\u00bb the phrase in the verse in question, which"
+        },
+        {
+          "position": 1001,
+          "strength": 46.96875,
+          "text": " not personal whims, but questions of standard grammar and\u00ab syntax\u00bb, which BTW I taught for many years,"
+        },
+        {
+          "position": 954,
+          "strength": 46.84375,
+          "text": "I am not wrong. I did not say anything\u00ab about\u00bb the possibility of \u05d1 having a clause for its"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SEMANTIC",
+        "agree": false,
+        "verdict": "SYNTACTIC"
+      }
+    },
+    {
+      "feature_idx": 3414,
+      "label": "Saint Nectarios of Aegina biographical details",
+      "variance": 53.43561553955078,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 800,
+          "strength": 52.65625,
+          "text": "0), Metropolitan of Pentapolis and Wonderworker of\u00ab Ae\u00bbgina, was officially recognized as a saint by"
+        },
+        {
+          "position": 843,
+          "strength": 47.15625,
+          "text": ". He is often referred to as Nectarios\u00ab of\u00bb Pentapolis or Nectarios of Aegina"
+        },
+        {
+          "position": 801,
+          "strength": 45.1875,
+          "text": "), Metropolitan of Pentapolis and Wonderworker of Ae\u00abgina\u00bb, was officially recognized as a saint by the"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 1221,
+      "label": "Punctuation and grammatical markers in text",
+      "variance": 66.72889709472656,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 357,
+          "strength": 39.75,
+          "text": " Evansville, Indiana. Minnette's first high\u00ab profile\u00bb role was as Holly Hunter's nephew Clay"
+        },
+        {
+          "position": 1492,
+          "strength": 39.625,
+          "text": " Now, member T-Shyne drops his newest\u00ab release\u00bb, The SOULution, on USA Today\u2019"
+        },
+        {
+          "position": 1009,
+          "strength": 39.3125,
+          "text": " grammar and syntax, which BTW I taught for many\u00ab years\u00bb, and even in graduate school.\nKindly"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      }
+    },
+    {
+      "feature_idx": 12087,
+      "label": "display color and intensity standardization",
+      "variance": 67.53640747070312,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 239,
+          "strength": 69.625,
+          "text": " color and image contrast a display must closely match the\u00ab Standard\u00bb Intensity Scale. Figure 3 shows the measured"
+        },
+        {
+          "position": 240,
+          "strength": 66.75,
+          "text": " and image contrast a display must closely match the Standard\u00ab Intensity\u00bb Scale. Figure 3 shows the measured Intensity"
+        },
+        {
+          "position": 216,
+          "strength": 66.25,
+          "text": " in all consumer content then the colors and intensities will\u00ab be\u00bb wrong everywhere in all images.\nIn order"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 891,
+      "label": "Tokens within or adjacent to proper nouns",
+      "variance": 45.74273681640625,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 4,
+          "strength": 57.625,
+          "text": "<bos>Lawyer.com\u00ab makes\u00bb finding Montpelier Lawyers fast and easy. Ref"
+        },
+        {
+          "position": 5,
+          "strength": 51.53125,
+          "text": "<bos>Lawyer.com makes\u00ab finding\u00bb Montpelier Lawyers fast and easy. Refine"
+        },
+        {
+          "position": 6,
+          "strength": 43.65625,
+          "text": "<bos>Lawyer.com makes finding\u00ab Mont\u00bbpelier Lawyers fast and easy. Refine your"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      }
+    },
+    {
+      "feature_idx": 1194,
+      "label": "Transition between document sections or topics",
+      "variance": 50.331111907958984,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1278,
+          "strength": 43.40625,
+          "text": " feeling drafty or cold, and will let in\u00ab light\u00bb,<bos>Samsung has made an announcement, following"
+        },
+        {
+          "position": 1406,
+          "strength": 40.875,
+          "text": " follows: \u201cTo date (as of September \u00ab1\u00bb)<bos>New Mixtape: T-Shy"
+        },
+        {
+          "position": 126,
+          "strength": 40.28125,
+          "text": " citation by ...\n... to deliver and possession of\u00ab marijuana\u00bb.<bos>The Intensity Scale (sometimes called the"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SEMANTIC",
+        "agree": false,
+        "verdict": "SYNTACTIC"
+      }
+    },
+    {
+      "feature_idx": 2465,
+      "label": "biographical information about birth locations",
+      "variance": 48.26433563232422,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 893,
+          "strength": 56.53125,
+          "text": " in Selymbria in Thrace to a\u00ab poor\u00bb family.<bos>Attention of Accordance Instant Details"
+        },
+        {
+          "position": 892,
+          "strength": 55.09375,
+          "text": ", in Selymbria in Thrace to\u00ab a\u00bb poor family.<bos>Attention of Accordance Instant"
+        },
+        {
+          "position": 891,
+          "strength": 47.15625,
+          "text": "6, in Selymbria in Thrace\u00ab to\u00bb a poor family.<bos>Attention of Accordance"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 1028,
+      "label": "Legal services and attorney directory content",
+      "variance": 97.69988250732422,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 39,
+          "strength": 68.4375,
+          "text": " and affordable lawyer by reviewing detail profiles for Montpelier\u00ab attorneys\u00bb. Many Lawyer.com featured Lawyers in Iowa"
+        },
+        {
+          "position": 38,
+          "strength": 68.25,
+          "text": " quality and affordable lawyer by reviewing detail profiles for Mont\u00abpelier\u00bb attorneys. Many Lawyer.com featured Lawyers in"
+        },
+        {
+          "position": 37,
+          "strength": 66.9375,
+          "text": " a quality and affordable lawyer by reviewing detail profiles for\u00ab Mont\u00bbpelier attorneys. Many Lawyer.com featured Lawyers"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    }
+  ]
+}

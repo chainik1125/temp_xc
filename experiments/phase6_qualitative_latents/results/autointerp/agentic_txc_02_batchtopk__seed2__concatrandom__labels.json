@@ -1,0 +1,1755 @@
+{
+  "arch": "agentic_txc_02_batchtopk",
+  "seed": 2,
+  "concat": "random",
+  "features": [
+    {
+      "feature_idx": 2093,
+      "label": "Beginning of sentence or document markers",
+      "variance": 789.8479614257812,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 0,
+          "strength": 343.0,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        },
+        {
+          "position": 1581,
+          "strength": 323.75,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbListen to En Athma Nesa online."
+        },
+        {
+          "position": 1664,
+          "strength": 320.75,
+          "text": ". Download Tamil songs online from JioSaavn.\u00ab<bos>\u00bb3-Way Camera Strap\nThe adjustable wrist"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_04"
+    },
+    {
+      "feature_idx": 10267,
+      "label": "Punctuation followed by beginning of sequence token",
+      "variance": 726.9310302734375,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1,
+          "strength": 286.75,
+          "text": "<bos>\u00abLawyer\u00bb.com makes finding Montpelier Lawyers fast and"
+        },
+        {
+          "position": 1580,
+          "strength": 265.5,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<pad>\u00bb<bos>Listen to En Athma Nesa online"
+        },
+        {
+          "position": 659,
+          "strength": 255.125,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<pad>\u00bb<bos>Aussies Grill and Beach Bar\nAccount"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_00"
+    },
+    {
+      "feature_idx": 13989,
+      "label": "Beginning of sentence or new text segment",
+      "variance": 664.1258544921875,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 2,
+          "strength": 363.75,
+          "text": "<bos>Lawyer\u00ab.\u00bbcom makes finding Montpelier Lawyers fast and easy"
+        },
+        {
+          "position": 1,
+          "strength": 341.0,
+          "text": "<bos>\u00abLawyer\u00bb.com makes finding Montpelier Lawyers fast and"
+        },
+        {
+          "position": 0,
+          "strength": 336.0,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_06"
+    },
+    {
+      "feature_idx": 4106,
+      "label": "Beginning of sentence markers and tokens",
+      "variance": 636.0189819335938,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1,
+          "strength": 381.75,
+          "text": "<bos>\u00abLawyer\u00bb.com makes finding Montpelier Lawyers fast and"
+        },
+        {
+          "position": 0,
+          "strength": 317.75,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        },
+        {
+          "position": 1582,
+          "strength": 264.0,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><bos>\u00abListen\u00bb to En Athma Nesa online. En"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_00"
+    },
+    {
+      "feature_idx": 13351,
+      "label": "Beginning of sentence or document markers",
+      "variance": 603.6006469726562,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 2,
+          "strength": 354.5,
+          "text": "<bos>Lawyer\u00ab.\u00bbcom makes finding Montpelier Lawyers fast and easy"
+        },
+        {
+          "position": 1,
+          "strength": 324.75,
+          "text": "<bos>\u00abLawyer\u00bb.com makes finding Montpelier Lawyers fast and"
+        },
+        {
+          "position": 0,
+          "strength": 315.5,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_00"
+    },
+    {
+      "feature_idx": 3699,
+      "label": "Beginning of sentence or document markers",
+      "variance": 573.373046875,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1,
+          "strength": 318.5,
+          "text": "<bos>\u00abLawyer\u00bb.com makes finding Montpelier Lawyers fast and"
+        },
+        {
+          "position": 0,
+          "strength": 283.0,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        },
+        {
+          "position": 1582,
+          "strength": 273.5,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><bos>\u00abListen\u00bb to En Athma Nesa online. En"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_03"
+    },
+    {
+      "feature_idx": 5470,
+      "label": "Beginning of sentence with quoted capitalized word",
+      "variance": 571.6349487304688,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1,
+          "strength": 338.25,
+          "text": "<bos>\u00abLawyer\u00bb.com makes finding Montpelier Lawyers fast and"
+        },
+        {
+          "position": 0,
+          "strength": 332.5,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        },
+        {
+          "position": 1582,
+          "strength": 251.25,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><bos>\u00abListen\u00bb to En Athma Nesa online. En"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_05"
+    },
+    {
+      "feature_idx": 366,
+      "label": "Beginning of new text sequences or documents",
+      "variance": 561.1386108398438,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 0,
+          "strength": 281.5,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        },
+        {
+          "position": 1581,
+          "strength": 265.5,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbListen to En Athma Nesa online."
+        },
+        {
+          "position": 1664,
+          "strength": 262.75,
+          "text": ". Download Tamil songs online from JioSaavn.\u00ab<bos>\u00bb3-Way Camera Strap\nThe adjustable wrist"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_05"
+    },
+    {
+      "feature_idx": 3997,
+      "label": "Beginning of sentence with capitalized word",
+      "variance": 524.760498046875,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 0,
+          "strength": 402.0,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        },
+        {
+          "position": 1,
+          "strength": 337.5,
+          "text": "<bos>\u00abLawyer\u00bb.com makes finding Montpelier Lawyers fast and"
+        },
+        {
+          "position": 1582,
+          "strength": 236.5,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><bos>\u00abListen\u00bb to En Athma Nesa online. En"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_00"
+    },
+    {
+      "feature_idx": 213,
+      "label": "Beginning of sentence or document markers",
+      "variance": 505.7854919433594,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 0,
+          "strength": 315.5,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        },
+        {
+          "position": 1581,
+          "strength": 255.75,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbListen to En Athma Nesa online."
+        },
+        {
+          "position": 1664,
+          "strength": 252.5,
+          "text": ". Download Tamil songs online from JioSaavn.\u00ab<bos>\u00bb3-Way Camera Strap\nThe adjustable wrist"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_04"
+    },
+    {
+      "feature_idx": 1410,
+      "label": "Beginning of new text document or section",
+      "variance": 497.2126159667969,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 0,
+          "strength": 314.0,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        },
+        {
+          "position": 1581,
+          "strength": 239.375,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbListen to En Athma Nesa online."
+        },
+        {
+          "position": 896,
+          "strength": 237.75,
+          "text": "mbria in Thrace to a poor family.\u00ab<bos>\u00bbAttention of Accordance Instant Details Dept:\n"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_03"
+    },
+    {
+      "feature_idx": 5298,
+      "label": "Beginning of sentence with capitalized word",
+      "variance": 479.4654846191406,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1,
+          "strength": 297.5,
+          "text": "<bos>\u00abLawyer\u00bb.com makes finding Montpelier Lawyers fast and"
+        },
+        {
+          "position": 0,
+          "strength": 264.75,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        },
+        {
+          "position": 1409,
+          "strength": 213.125,
+          "text": "To date (as of September 1)<bos>\u00abNew\u00bb Mixtape: T-Shyne \u2018The"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_05"
+    },
+    {
+      "feature_idx": 706,
+      "label": "Beginning of new text passages or documents",
+      "variance": 473.3160705566406,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 0,
+          "strength": 350.25,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        },
+        {
+          "position": 1581,
+          "strength": 237.625,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbListen to En Athma Nesa online."
+        },
+        {
+          "position": 1664,
+          "strength": 231.125,
+          "text": ". Download Tamil songs online from JioSaavn.\u00ab<bos>\u00bb3-Way Camera Strap\nThe adjustable wrist"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_00"
+    },
+    {
+      "feature_idx": 7881,
+      "label": "Transition between document segments or sources",
+      "variance": 461.7521057128906,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1580,
+          "strength": 244.875,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<pad>\u00bb<bos>Listen to En Athma Nesa online"
+        },
+        {
+          "position": 1023,
+          "strength": 240.0,
+          "text": " in graduate school.\nKindly note that I have\u00ab not\u00bb<bos>June 01, 20"
+        },
+        {
+          "position": 383,
+          "strength": 239.875,
+          "text": ". Prior to that, he played the young version\u00ab of\u00bb<bos>I\u2019ve been a little down recently"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SEMANTIC",
+        "agree": false,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_00"
+    },
+    {
+      "feature_idx": 16946,
+      "label": "Transition between document segments or content blocks",
+      "variance": 431.5791931152344,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1579,
+          "strength": 238.25,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<pad>\u00bb<pad><bos>Listen to En Athma Nesa"
+        },
+        {
+          "position": 1150,
+          "strength": 237.875,
+          "text": " assessing cme2's adherence and compliance with\u00ab the\u00bb latest<bos>The Best Services Done By Professional Window"
+        },
+        {
+          "position": 1662,
+          "strength": 235.75,
+          "text": "30. Download Tamil songs online from JioSa\u00abavn\u00bb.<bos>3-Way Camera Strap\nThe"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SEMANTIC",
+        "agree": false,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_00"
+    },
+    {
+      "feature_idx": 3916,
+      "label": "Beginning of sentence capitalized word tokens",
+      "variance": 422.7615661621094,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 0,
+          "strength": 313.5,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        },
+        {
+          "position": 1,
+          "strength": 292.5,
+          "text": "<bos>\u00abLawyer\u00bb.com makes finding Montpelier Lawyers fast and"
+        },
+        {
+          "position": 1665,
+          "strength": 210.125,
+          "text": " Download Tamil songs online from JioSaavn.<bos>\u00ab3\u00bb-Way Camera Strap\nThe adjustable wrist strap"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_02"
+    },
+    {
+      "feature_idx": 148,
+      "label": "Beginning of new text passage or document",
+      "variance": 407.77191162109375,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 0,
+          "strength": 261.25,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        },
+        {
+          "position": 1581,
+          "strength": 226.875,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbListen to En Athma Nesa online."
+        },
+        {
+          "position": 1664,
+          "strength": 223.75,
+          "text": ". Download Tamil songs online from JioSaavn.\u00ab<bos>\u00bb3-Way Camera Strap\nThe adjustable wrist"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_03"
+    },
+    {
+      "feature_idx": 14057,
+      "label": "Capitalized words or phrases after sentence starts",
+      "variance": 401.5686340332031,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 2,
+          "strength": 287.75,
+          "text": "<bos>Lawyer\u00ab.\u00bbcom makes finding Montpelier Lawyers fast and easy"
+        },
+        {
+          "position": 1,
+          "strength": 255.375,
+          "text": "<bos>\u00abLawyer\u00bb.com makes finding Montpelier Lawyers fast and"
+        },
+        {
+          "position": 1583,
+          "strength": 215.375,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><bos>Listen\u00ab to\u00bb En Athma Nesa online. En Ath"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_01"
+    },
+    {
+      "feature_idx": 14475,
+      "label": "Beginning of sentence with capitalized title text",
+      "variance": 383.9806213378906,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 0,
+          "strength": 277.75,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        },
+        {
+          "position": 2,
+          "strength": 272.5,
+          "text": "<bos>Lawyer\u00ab.\u00bbcom makes finding Montpelier Lawyers fast and easy"
+        },
+        {
+          "position": 1,
+          "strength": 268.0,
+          "text": "<bos>\u00abLawyer\u00bb.com makes finding Montpelier Lawyers fast and"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_00"
+    },
+    {
+      "feature_idx": 13540,
+      "label": "Beginning of sentence with capitalized title text",
+      "variance": 380.9570617675781,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 2,
+          "strength": 277.0,
+          "text": "<bos>Lawyer\u00ab.\u00bbcom makes finding Montpelier Lawyers fast and easy"
+        },
+        {
+          "position": 0,
+          "strength": 241.375,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        },
+        {
+          "position": 1,
+          "strength": 238.375,
+          "text": "<bos>\u00abLawyer\u00bb.com makes finding Montpelier Lawyers fast and"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_04"
+    },
+    {
+      "feature_idx": 900,
+      "label": "Beginning of new text segment or document",
+      "variance": 333.51007080078125,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 0,
+          "strength": 242.0,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        },
+        {
+          "position": 1664,
+          "strength": 213.125,
+          "text": ". Download Tamil songs online from JioSaavn.\u00ab<bos>\u00bb3-Way Camera Strap\nThe adjustable wrist"
+        },
+        {
+          "position": 896,
+          "strength": 209.75,
+          "text": "mbria in Thrace to a poor family.\u00ab<bos>\u00bbAttention of Accordance Instant Details Dept:\n"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_06"
+    },
+    {
+      "feature_idx": 2403,
+      "label": "Beginning of sentence or new text segment",
+      "variance": 331.2893981933594,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 0,
+          "strength": 215.5,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        },
+        {
+          "position": 1581,
+          "strength": 199.625,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbListen to En Athma Nesa online."
+        },
+        {
+          "position": 660,
+          "strength": 192.75,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbAussies Grill and Beach Bar\nAccount Log"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_01"
+    },
+    {
+      "feature_idx": 7662,
+      "label": "Transition between unrelated text segments or documents",
+      "variance": 321.95587158203125,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1407,
+          "strength": 213.125,
+          "text": ": \u201cTo date (as of September 1\u00ab)\u00bb<bos>New Mixtape: T-Shyne"
+        },
+        {
+          "position": 1580,
+          "strength": 212.0,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<pad>\u00bb<bos>Listen to En Athma Nesa online"
+        },
+        {
+          "position": 1663,
+          "strength": 211.875,
+          "text": "0. Download Tamil songs online from JioSaavn\u00ab.\u00bb<bos>3-Way Camera Strap\nThe adjustable"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SEMANTIC",
+        "agree": false,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_04"
+    },
+    {
+      "feature_idx": 7788,
+      "label": "Punctuation marks before sentence boundaries",
+      "variance": 317.52606201171875,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1580,
+          "strength": 214.375,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<pad>\u00bb<bos>Listen to En Athma Nesa online"
+        },
+        {
+          "position": 659,
+          "strength": 206.75,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<pad>\u00bb<bos>Aussies Grill and Beach Bar\nAccount"
+        },
+        {
+          "position": 1023,
+          "strength": 201.875,
+          "text": " in graduate school.\nKindly note that I have\u00ab not\u00bb<bos>June 01, 20"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_00"
+    },
+    {
+      "feature_idx": 4089,
+      "label": "Beginning of sentence capitalized words",
+      "variance": 298.9221496582031,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1,
+          "strength": 252.75,
+          "text": "<bos>\u00abLawyer\u00bb.com makes finding Montpelier Lawyers fast and"
+        },
+        {
+          "position": 0,
+          "strength": 220.25,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        },
+        {
+          "position": 1582,
+          "strength": 185.75,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><bos>\u00abListen\u00bb to En Athma Nesa online. En"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_02"
+    },
+    {
+      "feature_idx": 12956,
+      "label": "Beginning of sequence with capitalized title text",
+      "variance": 293.2325744628906,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 2,
+          "strength": 244.375,
+          "text": "<bos>Lawyer\u00ab.\u00bbcom makes finding Montpelier Lawyers fast and easy"
+        },
+        {
+          "position": 0,
+          "strength": 230.25,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        },
+        {
+          "position": 1,
+          "strength": 229.375,
+          "text": "<bos>\u00abLawyer\u00bb.com makes finding Montpelier Lawyers fast and"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_00"
+    },
+    {
+      "feature_idx": 3070,
+      "label": "Beginning of new text document or section",
+      "variance": 286.87091064453125,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 0,
+          "strength": 275.0,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        },
+        {
+          "position": 1581,
+          "strength": 181.25,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbListen to En Athma Nesa online."
+        },
+        {
+          "position": 1664,
+          "strength": 179.625,
+          "text": ". Download Tamil songs online from JioSaavn.\u00ab<bos>\u00bb3-Way Camera Strap\nThe adjustable wrist"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_04"
+    },
+    {
+      "feature_idx": 16005,
+      "label": "Transition between unrelated text segments",
+      "variance": 283.6083679199219,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1579,
+          "strength": 186.875,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<pad>\u00bb<pad><bos>Listen to En Athma Nesa"
+        },
+        {
+          "position": 658,
+          "strength": 179.625,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<pad>\u00bb<pad><bos>Aussies Grill and Beach Bar\n"
+        },
+        {
+          "position": 510,
+          "strength": 178.625,
+          "text": " I realized that from the moment I wake up I\u00ab\u2019\u00bbm<bos>Christina Aguilera hasn't dropped a"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SEMANTIC",
+        "agree": false,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_01"
+    },
+    {
+      "feature_idx": 14479,
+      "label": "Capitalized words at sentence beginnings",
+      "variance": 279.6221923828125,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 2,
+          "strength": 275.75,
+          "text": "<bos>Lawyer\u00ab.\u00bbcom makes finding Montpelier Lawyers fast and easy"
+        },
+        {
+          "position": 1,
+          "strength": 218.875,
+          "text": "<bos>\u00abLawyer\u00bb.com makes finding Montpelier Lawyers fast and"
+        },
+        {
+          "position": 1583,
+          "strength": 213.25,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><bos>Listen\u00ab to\u00bb En Athma Nesa online. En Ath"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_00"
+    },
+    {
+      "feature_idx": 8297,
+      "label": "Transition between document sections or metadata",
+      "variance": 278.2627258300781,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1580,
+          "strength": 196.125,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<pad>\u00bb<bos>Listen to En Athma Nesa online"
+        },
+        {
+          "position": 767,
+          "strength": 194.375,
+          "text": "\nSite by \u00a9 Play.What.When.\u00ab |\u00bb<bos>Nectarios of Pentapolis\nSt"
+        },
+        {
+          "position": 1023,
+          "strength": 194.0,
+          "text": " in graduate school.\nKindly note that I have\u00ab not\u00bb<bos>June 01, 20"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SEMANTIC",
+        "agree": false,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_00"
+    },
+    {
+      "feature_idx": 4533,
+      "label": "Beginning of sentence or document markers",
+      "variance": 277.12518310546875,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1,
+          "strength": 238.125,
+          "text": "<bos>\u00abLawyer\u00bb.com makes finding Montpelier Lawyers fast and"
+        },
+        {
+          "position": 0,
+          "strength": 223.375,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        },
+        {
+          "position": 1582,
+          "strength": 166.5,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><bos>\u00abListen\u00bb to En Athma Nesa online. En"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_06"
+    },
+    {
+      "feature_idx": 16232,
+      "label": "Transition between unrelated text segments",
+      "variance": 273.1988220214844,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1662,
+          "strength": 183.875,
+          "text": "30. Download Tamil songs online from JioSa\u00abavn\u00bb.<bos>3-Way Camera Strap\nThe"
+        },
+        {
+          "position": 1579,
+          "strength": 183.25,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<pad>\u00bb<pad><bos>Listen to En Athma Nesa"
+        },
+        {
+          "position": 1022,
+          "strength": 181.75,
+          "text": " even in graduate school.\nKindly note that I\u00ab have\u00bb not<bos>June 01, 2"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SEMANTIC",
+        "agree": false,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "fw_03"
+    }
+  ],
+  "passages": [
+    "fw_00",
+    "fw_01",
+    "fw_02",
+    "fw_03",
+    "fw_04",
+    "fw_05",
+    "fw_06"
+  ],
+  "top_feat_indices_var": [
+    2093,
+    10267,
+    13989,
+    4106,
+    13351,
+    3699,
+    5470,
+    366,
+    3997,
+    213,
+    1410,
+    5298,
+    706,
+    7881,
+    16946,
+    3916,
+    148,
+    14057,
+    14475,
+    13540,
+    900,
+    2403,
+    7662,
+    7788,
+    4089,
+    12956,
+    3070,
+    16005,
+    14479,
+    8297,
+    4533,
+    16232
+  ],
+  "top_feat_indices_pdvar": [
+    1566,
+    2674,
+    5637,
+    1303,
+    2644,
+    5298,
+    3699,
+    7881,
+    10639,
+    16005,
+    3997,
+    1490,
+    567,
+    1005,
+    6292,
+    5876,
+    3550,
+    6851,
+    2667,
+    6713,
+    1336,
+    5883,
+    2403,
+    6324,
+    590,
+    5754,
+    8785,
+    3761,
+    6825,
+    2093,
+    13989,
+    682
+  ],
+  "metrics": {
+    "N": 32,
+    "semantic_count": 0,
+    "semantic_fraction": 0.0,
+    "passage_coverage_count": 7,
+    "passage_coverage_entropy": 1.7568280351985095,
+    "n_passages": 7,
+    "judge_disagreement_rate": 0.1875,
+    "semantic_count_pdvar_overlap": 0,
+    "pdvar_var_overlap_count": 8,
+    "semantic_count_pdvar": 15,
+    "pdvar_new_labels_count": 24
+  },
+  "pdvar_only_features": [
+    {
+      "feature_idx": 1566,
+      "label": "Alternative names or aliases in biographical text",
+      "variance": 140.97238159179688,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 894,
+          "strength": 63.5625,
+          "text": " Selymbria in Thrace to a poor\u00ab family\u00bb.<bos>Attention of Accordance Instant Details Dept"
+        },
+        {
+          "position": 1514,
+          "strength": 58.75,
+          "text": ".\nYou may remember T-Shyne,\u00ab aka\u00bb Tafa Peters, from February\u2019s Burger"
+        },
+        {
+          "position": 382,
+          "strength": 57.5,
+          "text": " Grace. Prior to that, he played the young\u00ab version\u00bb of<bos>I\u2019ve been a little down"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 2674,
+      "label": "Household comfort and home improvement benefits",
+      "variance": 189.03640747070312,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1278,
+          "strength": 80.5625,
+          "text": " feeling drafty or cold, and will let in\u00ab light\u00bb,<bos>Samsung has made an announcement, following"
+        },
+        {
+          "position": 1270,
+          "strength": 76.8125,
+          "text": ". Good windows will keep a home from feeling dra\u00abfty\u00bb or cold, and will let in light,"
+        },
+        {
+          "position": 1272,
+          "strength": 74.0,
+          "text": " windows will keep a home from feeling drafty or\u00ab cold\u00bb, and will let in light,<bos>Samsung"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 5637,
+      "label": "healthcare professional development and training",
+      "variance": 194.65087890625,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1086,
+          "strength": 77.875,
+          "text": " patient care. We believe that continued professional development of\u00ab physicians\u00bb and other healthcare providers can be enhanced through repeated"
+        },
+        {
+          "position": 1091,
+          "strength": 75.375,
+          "text": " that continued professional development of physicians and other healthcare providers\u00ab can\u00bb be enhanced through repeated, highly precise quantitative needs"
+        },
+        {
+          "position": 1072,
+          "strength": 75.25,
+          "text": " to learning mastery that measurably advances healthcare professionals'\u00ab behavior\u00bb and ultimately improves patient care. We believe that"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 1303,
+      "label": "Words in service directory or commercial website text",
+      "variance": 109.06352996826172,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1,
+          "strength": 87.0,
+          "text": "<bos>\u00abLawyer\u00bb.com makes finding Montpelier Lawyers fast and"
+        },
+        {
+          "position": 1582,
+          "strength": 68.8125,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><bos>\u00abListen\u00bb to En Athma Nesa online. En"
+        },
+        {
+          "position": 11,
+          "strength": 59.4375,
+          "text": "Lawyer.com makes finding Montpelier Lawyers fast and\u00ab easy\u00bb. Refine your search for Montpelier lawyers"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 2644,
+      "label": "Religious saint canonization and recognition",
+      "variance": 190.48294067382812,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 817,
+          "strength": 79.375,
+          "text": " a saint by the Ecumenical Patriarchate of Constantinople\u00ab in\u00bb 1961. His feast day"
+        },
+        {
+          "position": 893,
+          "strength": 69.625,
+          "text": " in Selymbria in Thrace to a\u00ab poor\u00bb family.<bos>Attention of Accordance Instant Details"
+        },
+        {
+          "position": 809,
+          "strength": 65.75,
+          "text": " of Aegina, was officially recognized as a saint\u00ab by\u00bb the Ecumenical Patriarchate of Constantinople in "
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 10639,
+      "label": "disco and funk music references",
+      "variance": 92.82179260253906,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 624,
+          "strength": 47.5,
+          "text": " mode. easy to listen to, easy to dance\u00ab to\u00bb, a disco ball, shimmering, illuminating a"
+        },
+        {
+          "position": 619,
+          "strength": 46.65625,
+          "text": " very much in that disco mode. easy to listen\u00ab to\u00bb, easy to dance to, a disco ball"
+        },
+        {
+          "position": 626,
+          "strength": 45.5625,
+          "text": " easy to listen to, easy to dance to,\u00ab a\u00bb disco ball, shimmering, illuminating a room of"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 1490,
+      "label": "Words describing improvement or enhancement outcomes",
+      "variance": 122.36216735839844,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1077,
+          "strength": 72.1875,
+          "text": "urably advances healthcare professionals' behavior and ultimately improves patient\u00ab care\u00bb. We believe that continued professional development of physicians"
+        },
+        {
+          "position": 1076,
+          "strength": 65.4375,
+          "text": " measurably advances healthcare professionals' behavior and ultimately improves\u00ab patient\u00bb care. We believe that continued professional development of"
+        },
+        {
+          "position": 1116,
+          "strength": 64.0625,
+          "text": " lead to the development of effective strategies that enhance competence\u00ab and\u00bb provider performance.\ncme2 is accredited"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 567,
+      "label": "Musical artist or genre references",
+      "variance": 119.92037200927734,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1442,
+          "strength": 67.0,
+          "text": "M.E. Team features a crew of talented\u00ab rappers\u00bb, including rising stars like Microphone Preview and Per"
+        },
+        {
+          "position": 560,
+          "strength": 54.625,
+          "text": "2016 Orlando nightclub shooting.\nAustralian\u00ab pop\u00bb star Sia wrote \"Telepathy\"; joining Aguilera"
+        },
+        {
+          "position": 1446,
+          "strength": 54.15625,
+          "text": " Team features a crew of talented rappers, including rising\u00ab stars\u00bb like Microphone Preview and Perrion, plus up"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 1005,
+      "label": "Beginning of new text segment or document",
+      "variance": 212.8095245361328,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 0,
+          "strength": 162.5,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        },
+        {
+          "position": 1152,
+          "strength": 134.375,
+          "text": "me2's adherence and compliance with the latest\u00ab<bos>\u00bbThe Best Services Done By Professional Window Installers"
+        },
+        {
+          "position": 384,
+          "strength": 133.5,
+          "text": " Prior to that, he played the young version of\u00ab<bos>\u00bbI\u2019ve been a little down recently and"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      }
+    },
+    {
+      "feature_idx": 6292,
+      "label": "color mixing and display technology",
+      "variance": 94.78800964355469,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 161,
+          "strength": 58.4375,
+          "text": " controls how the Red, Green and Blue primary colors\u00ab mix\u00bb to produce all of the on-screen colors"
+        },
+        {
+          "position": 162,
+          "strength": 57.0,
+          "text": " how the Red, Green and Blue primary colors mix\u00ab to\u00bb produce all of the on-screen colors."
+        },
+        {
+          "position": 191,
+          "strength": 52.71875,
+          "text": " contrast and the higher the saturation of displayed color mixtures\u00ab.\u00bb So if the Intensity Scale doesn't follow"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 5876,
+      "label": "biographical information connectors and prepositions",
+      "variance": 60.501766204833984,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1520,
+          "strength": 41.75,
+          "text": "-Shyne, aka Tafa Peters, from\u00ab February\u00bb\u2019s Burger King Twitter hack \u2013 the account"
+        },
+        {
+          "position": 1519,
+          "strength": 38.75,
+          "text": " T-Shyne, aka Tafa Peters,\u00ab from\u00bb February\u2019s Burger King Twitter hack \u2013 the"
+        },
+        {
+          "position": 331,
+          "strength": 38.46875,
+          "text": " m)\nDylan Minnette is an American actor\u00ab,\u00bb and was born on December 29,"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      }
+    },
+    {
+      "feature_idx": 3550,
+      "label": "Words in quotation marks or emphasized text",
+      "variance": 100.69629669189453,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1582,
+          "strength": 63.96875,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><bos>\u00abListen\u00bb to En Athma Nesa online. En"
+        },
+        {
+          "position": 1,
+          "strength": 59.78125,
+          "text": "<bos>\u00abLawyer\u00bb.com makes finding Montpelier Lawyers fast and"
+        },
+        {
+          "position": 234,
+          "strength": 54.75,
+          "text": "In order to deliver accurate color and image contrast a\u00ab display\u00bb must closely match the Standard Intensity Scale. Figure"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      }
+    },
+    {
+      "feature_idx": 6851,
+      "label": "Beginning of sentence with quoted word",
+      "variance": 225.194580078125,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1,
+          "strength": 160.375,
+          "text": "<bos>\u00abLawyer\u00bb.com makes finding Montpelier Lawyers fast and"
+        },
+        {
+          "position": 0,
+          "strength": 155.875,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        },
+        {
+          "position": 1582,
+          "strength": 139.75,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><bos>\u00abListen\u00bb to En Athma Nesa online. En"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      }
+    },
+    {
+      "feature_idx": 2667,
+      "label": "Technical specification and standard terminology",
+      "variance": 109.88286590576172,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 82,
+          "strength": 63.71875,
+          "text": " for violations of the\nIowa Occupational Safety and Health\u00ab Act\u00bb. See Iowa Code ch. 88"
+        },
+        {
+          "position": 161,
+          "strength": 57.5,
+          "text": " controls how the Red, Green and Blue primary colors\u00ab mix\u00bb to produce all of the on-screen colors"
+        },
+        {
+          "position": 116,
+          "strength": 53.09375,
+          "text": " citations. The company later attempted to challenge the second\u00ab citation\u00bb by ...\n... to deliver and possession of"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 6713,
+      "label": "Beginning of sentence with capitalized word",
+      "variance": 220.86598205566406,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1,
+          "strength": 181.0,
+          "text": "<bos>\u00abLawyer\u00bb.com makes finding Montpelier Lawyers fast and"
+        },
+        {
+          "position": 0,
+          "strength": 176.5,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        },
+        {
+          "position": 1582,
+          "strength": 136.375,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><bos>\u00abListen\u00bb to En Athma Nesa online. En"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      }
+    },
+    {
+      "feature_idx": 1336,
+      "label": "Professional credentials and occupational titles",
+      "variance": 90.68133544921875,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1009,
+          "strength": 53.3125,
+          "text": " grammar and syntax, which BTW I taught for many\u00ab years\u00bb, and even in graduate school.\nKindly"
+        },
+        {
+          "position": 1,
+          "strength": 47.59375,
+          "text": "<bos>\u00abLawyer\u00bb.com makes finding Montpelier Lawyers fast and"
+        },
+        {
+          "position": 59,
+          "strength": 46.1875,
+          "text": " will offer free legal consultations and all have Iowa law\u00ab expertise\u00bb.\nThe Iowa Labor Commissioner issued Titan Tire"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 5883,
+      "label": "Punctuation and common function words",
+      "variance": 44.069122314453125,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1238,
+          "strength": 28.90625,
+          "text": " the most common services is the installation of energy efficient\u00ab windows\u00bb. These windows will not only keep your energy"
+        },
+        {
+          "position": 557,
+          "strength": 28.890625,
+          "text": " of the 2016 Orlando nightclub shooting\u00ab.\u00bb\nAustralian pop star Sia wrote \"Telepathy"
+        },
+        {
+          "position": 1357,
+          "strength": 28.8125,
+          "text": ", the company has advised everyone with this particular phone\u00ab to\u00bb return it. There will be compensation, of"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      }
+    },
+    {
+      "feature_idx": 6324,
+      "label": "Birth date and location biographical information",
+      "variance": 72.43810272216797,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 892,
+          "strength": 64.1875,
+          "text": ", in Selymbria in Thrace to\u00ab a\u00bb poor family.<bos>Attention of Accordance Instant"
+        },
+        {
+          "position": 883,
+          "strength": 61.84375,
+          "text": " October 1, 1846,\u00ab in\u00bb Selymbria in Thrace to a"
+        },
+        {
+          "position": 882,
+          "strength": 61.75,
+          "text": " on October 1, 1846\u00ab,\u00bb in Selymbria in Thrace to"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 590,
+      "label": "Technical explanation of image intensity and contrast",
+      "variance": 213.6644744873047,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 175,
+          "strength": 86.4375,
+          "text": " of the on-screen colors. The steeper the\u00ab Intensity\u00bb Scale the greater the image contrast and the higher"
+        },
+        {
+          "position": 177,
+          "strength": 84.75,
+          "text": " on-screen colors. The steeper the Intensity Scale\u00ab the\u00bb greater the image contrast and the higher the saturation"
+        },
+        {
+          "position": 178,
+          "strength": 83.5,
+          "text": "-screen colors. The steeper the Intensity Scale the\u00ab greater\u00bb the image contrast and the higher the saturation of"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 5754,
+      "label": "Beginning of sentence or title markers",
+      "variance": 271.4084167480469,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1,
+          "strength": 242.25,
+          "text": "<bos>\u00abLawyer\u00bb.com makes finding Montpelier Lawyers fast and"
+        },
+        {
+          "position": 1582,
+          "strength": 192.625,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><bos>\u00abListen\u00bb to En Athma Nesa online. En"
+        },
+        {
+          "position": 1665,
+          "strength": 173.625,
+          "text": " Download Tamil songs online from JioSaavn.<bos>\u00ab3\u00bb-Way Camera Strap\nThe adjustable wrist strap"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      }
+    },
+    {
+      "feature_idx": 8785,
+      "label": "words describing home improvement services",
+      "variance": 44.541664123535156,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1229,
+          "strength": 33.5625,
+          "text": "\nInstallation of Energy Efficient Windows\nOne of the\u00ab most\u00bb common services is the installation of energy efficient windows"
+        },
+        {
+          "position": 1231,
+          "strength": 31.25,
+          "text": " of Energy Efficient Windows\nOne of the most common\u00ab services\u00bb is the installation of energy efficient windows. These"
+        },
+        {
+          "position": 1238,
+          "strength": 29.78125,
+          "text": " the most common services is the installation of energy efficient\u00ab windows\u00bb. These windows will not only keep your energy"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 3761,
+      "label": "family responsibilities and domestic labor",
+      "variance": 50.39441680908203,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 439,
+          "strength": 46.1875,
+          "text": " does a LOT for our family and for the kids\u00ab.\u00bb And the kids are sweet, if occasionally monstrous"
+        },
+        {
+          "position": 435,
+          "strength": 43.25,
+          "text": " fair. My husband does a LOT for our family\u00ab and\u00bb for the kids. And the kids are sweet"
+        },
+        {
+          "position": 443,
+          "strength": 42.96875,
+          "text": " our family and for the kids. And the kids\u00ab are\u00bb sweet, if occasionally monstrous. But I was"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 6825,
+      "label": "Capitalized words starting new sentences or sections",
+      "variance": 189.26614379882812,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1409,
+          "strength": 132.125,
+          "text": "To date (as of September 1)<bos>\u00abNew\u00bb Mixtape: T-Shyne \u2018The"
+        },
+        {
+          "position": 1281,
+          "strength": 131.75,
+          "text": " or cold, and will let in light,<bos>\u00abSamsung\u00bb has made an announcement, following the terrible news"
+        },
+        {
+          "position": 1153,
+          "strength": 129.75,
+          "text": "2's adherence and compliance with the latest<bos>\u00abThe\u00bb Best Services Done By Professional Window Installers\n"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      }
+    },
+    {
+      "feature_idx": 682,
+      "label": "Beginning of new text section or webpage",
+      "variance": 81.6417236328125,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 0,
+          "strength": 82.3125,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        },
+        {
+          "position": 1408,
+          "strength": 62.5,
+          "text": " \u201cTo date (as of September 1)\u00ab<bos>\u00bbNew Mixtape: T-Shyne \u2018"
+        },
+        {
+          "position": 1152,
+          "strength": 62.40625,
+          "text": "me2's adherence and compliance with the latest\u00ab<bos>\u00bbThe Best Services Done By Professional Window Installers"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      }
+    }
+  ]
+}

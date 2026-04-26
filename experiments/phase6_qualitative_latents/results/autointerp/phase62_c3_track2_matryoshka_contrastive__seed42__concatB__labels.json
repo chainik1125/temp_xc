@@ -1047,6 +1047,329 @@
     "n_passages": 4,
     "judge_disagreement_rate": 0.03125,
     "semantic_count_pdvar_overlap": 13,
-    "pdvar_var_overlap_count": 21
-  }
+    "pdvar_var_overlap_count": 21,
+    "semantic_count_pdvar": 20,
+    "pdvar_new_labels_count": 11
+  },
+  "pdvar_only_features": [
+    {
+      "feature_idx": 2997,
+      "label": "Quoted or parenthetical text segments",
+      "variance": 82.67967987060547,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 656,
+          "strength": 37.0,
+          "text": ". In a letter to Yvonne Davet (a\u00ab French\u00bb writer), Orwell described Animal Farm as a satirical"
+        },
+        {
+          "position": 655,
+          "strength": 36.28125,
+          "text": " War. In a letter to Yvonne Davet (\u00aba\u00bb French writer), Orwell described Animal Farm as a"
+        },
+        {
+          "position": 123,
+          "strength": 35.75,
+          "text": " their effect.\n\nThe Diary or Pocket-book\u00ab,\u00bb from which quotations occur in the following\npages"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      }
+    },
+    {
+      "feature_idx": 1758,
+      "label": "evolutionary selection in biology contexts",
+      "variance": 44.09829330444336,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 68,
+          "strength": 41.40625,
+          "text": "\nC. sexual selection.\nD. disruptive\u00ab selection\u00bb.f names, the use of\ncap"
+        },
+        {
+          "position": 9,
+          "strength": 40.21875,
+          "text": "In a population of giraffes, an environmental\u00ab change\u00bb occurs that favors individuals that are tallest. As"
+        },
+        {
+          "position": 8,
+          "strength": 38.4375,
+          "text": "In a population of giraffes, an\u00ab environmental\u00bb change occurs that favors individuals that are tallest."
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 885,
+      "label": "geometric transformation reflection across line",
+      "variance": 34.5701789855957,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1007,
+          "strength": 35.125,
+          "text": "3, 0) is reflected across the line\u00ab y\u00bb = x to get a new pentagon,"
+        },
+        {
+          "position": 1006,
+          "strength": 35.0625,
+          "text": " (3, 0) is reflected across the\u00ab line\u00bb y = x to get a new pentagon"
+        },
+        {
+          "position": 1008,
+          "strength": 31.984375,
+          "text": ", 0) is reflected across the line y\u00ab =\u00bb x to get a new pentagon, P"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 3114,
+      "label": "Coordinate pairs in geometry problems",
+      "variance": 43.19199752807617,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1032,
+          "strength": 32.1875,
+          "text": " the vertices of P\u2019 is\nA. (\u00ab0\u00bb, \u2013 3)\nB. ("
+        },
+        {
+          "position": 1013,
+          "strength": 31.515625,
+          "text": " reflected across the line y = x to get a\u00ab new\u00bb pentagon, P\u2019, then one of the"
+        },
+        {
+          "position": 1016,
+          "strength": 31.203125,
+          "text": " line y = x to get a new pentagon\u00ab,\u00bb P\u2019, then one of the vertices of P"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 692,
+      "label": "Natural selection and evolutionary adaptation examples",
+      "variance": 29.19649887084961,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 5,
+          "strength": 42.5625,
+          "text": "In a population of gira\u00abffes\u00bb, an environmental change occurs that favors individuals that"
+        },
+        {
+          "position": 6,
+          "strength": 41.75,
+          "text": "In a population of giraffes\u00ab,\u00bb an environmental change occurs that favors individuals that are"
+        },
+        {
+          "position": 8,
+          "strength": 38.84375,
+          "text": "In a population of giraffes, an\u00ab environmental\u00bb change occurs that favors individuals that are tallest."
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 3618,
+      "label": "Numerical coordinates and mathematical notation",
+      "variance": 64.41893005371094,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1001,
+          "strength": 54.0,
+          "text": ", 4), and (3, 0\u00ab)\u00bb is reflected across the line y = x to"
+        },
+        {
+          "position": 355,
+          "strength": 47.40625,
+          "text": " destroyed nearly all letters\nreceived before 18\u00ab6\u00bb2. After that date he was persuaded to"
+        },
+        {
+          "position": 999,
+          "strength": 45.84375,
+          "text": " (2, 4), and (3,\u00ab \u00bb0) is reflected across the line y ="
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SEMANTIC",
+        "agree": false,
+        "verdict": "SYNTACTIC"
+      }
+    },
+    {
+      "feature_idx": 2531,
+      "label": "Coordinate pairs in mathematical notation",
+      "variance": 28.265012741088867,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 979,
+          "strength": 28.015625,
+          "text": ", \u2013 4), (\u2013 4,\u00ab \u00bb1), (\u20131, 4),"
+        },
+        {
+          "position": 1064,
+          "strength": 27.625,
+          "text": "2)\nD. (\u2013 4,\u00ab \u2013\u00bb2)"
+        },
+        {
+          "position": 1065,
+          "strength": 27.375,
+          "text": ")\nD. (\u2013 4, \u2013\u00ab2\u00bb)"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SEMANTIC",
+        "agree": false,
+        "verdict": "SYNTACTIC"
+      }
+    },
+    {
+      "feature_idx": 108,
+      "label": "Natural selection in giraffe populations",
+      "variance": 24.176963806152344,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 19,
+          "strength": 23.640625,
+          "text": " change occurs that favors individuals that are tallest. As\u00ab a\u00bb result, more of the taller individuals are able"
+        },
+        {
+          "position": 24,
+          "strength": 23.546875,
+          "text": " that are tallest. As a result, more of\u00ab the\u00bb taller individuals are able to obtain nutrients and survive"
+        },
+        {
+          "position": 21,
+          "strength": 22.875,
+          "text": " that favors individuals that are tallest. As a result\u00ab,\u00bb more of the taller individuals are able to obtain"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 14040,
+      "label": "Archival or historical document references",
+      "variance": 56.72451400756836,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 123,
+          "strength": 34.78125,
+          "text": " their effect.\n\nThe Diary or Pocket-book\u00ab,\u00bb from which quotations occur in the following\npages"
+        },
+        {
+          "position": 124,
+          "strength": 33.875,
+          "text": " effect.\n\nThe Diary or Pocket-book,\u00ab from\u00bb which quotations occur in the following\npages,"
+        },
+        {
+          "position": 135,
+          "strength": 27.859375,
+          "text": " which quotations occur in the following\npages, has\u00ab been\u00bb of value as supplying a frame-work of"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 3216,
+      "label": "Words or phrases in quotation marks",
+      "variance": 93.99938201904297,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 776,
+          "strength": 48.03125,
+          "text": " Satire\" and \"A Contemporary Satire\".\u00ab Orwell\u00bb suggested the title Union des r\u00e9publiques social"
+        },
+        {
+          "position": 341,
+          "strength": 42.34375,
+          "text": " liberated \"spits.\"\nThis process, carried\u00ab on\u00bb for years, destroyed nearly all letters\nreceived"
+        },
+        {
+          "position": 837,
+          "strength": 41.3125,
+          "text": " r\u00e9publiques socialistes sovi\u00e9tiques.\nOr\u00abwell\u00bb wrote the book between November 194"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      }
+    },
+    {
+      "feature_idx": 3257,
+      "label": "Editorial notes about source material omissions",
+      "variance": 70.65888214111328,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 353,
+          "strength": 66.125,
+          "text": " years, destroyed nearly all letters\nreceived before \u00ab1\u00bb862. After that date he was"
+        },
+        {
+          "position": 117,
+          "strength": 61.6875,
+          "text": "\nrendering which would unfairly exaggerate their effect.\n\n\u00abThe\u00bb Diary or Pocket-book, from which quotations"
+        },
+        {
+          "position": 999,
+          "strength": 49.1875,
+          "text": " (2, 4), and (3,\u00ab \u00bb0) is reflected across the line y ="
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    }
+  ]
 }

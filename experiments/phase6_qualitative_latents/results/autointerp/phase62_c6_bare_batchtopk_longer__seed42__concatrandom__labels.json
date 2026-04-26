@@ -1050,6 +1050,416 @@
     "n_passages": 7,
     "judge_disagreement_rate": 0.3125,
     "semantic_count_pdvar_overlap": 0,
-    "pdvar_var_overlap_count": 18
-  }
+    "pdvar_var_overlap_count": 18,
+    "semantic_count_pdvar": 7,
+    "pdvar_new_labels_count": 14
+  },
+  "pdvar_only_features": [
+    {
+      "feature_idx": 17162,
+      "label": "morning routine with child transportation",
+      "variance": 261.5439147949219,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 472,
+          "strength": 88.3125,
+          "text": " to have something warm when he walked Levi to the\u00ab bus\u00bb stop at 7 (yes, see,"
+        },
+        {
+          "position": 471,
+          "strength": 80.5,
+          "text": " him to have something warm when he walked Levi to\u00ab the\u00bb bus stop at 7 (yes, see"
+        },
+        {
+          "position": 489,
+          "strength": 77.8125,
+          "text": ", see, my husband walks our kid to the\u00ab bus\u00bb stop, I really need to stop complaining),"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 14878,
+      "label": "Orthodox saint biographical details and dates",
+      "variance": 387.7117004394531,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 853,
+          "strength": 93.6875,
+          "text": " of Pentapolis or Nectarios of Aegina\u00ab,\u00bb and his name is sometimes spelled Nektarios"
+        },
+        {
+          "position": 824,
+          "strength": 93.1875,
+          "text": "ate of Constantinople in 1961.\u00ab His\u00bb feast day is celebrated on November 9."
+        },
+        {
+          "position": 822,
+          "strength": 90.3125,
+          "text": "umenical Patriarchate of Constantinople in 196\u00ab1\u00bb. His feast day is celebrated on November "
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 2287,
+      "label": "Beginning of sentence with capitalized word",
+      "variance": 369.8293151855469,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 0,
+          "strength": 155.5,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        },
+        {
+          "position": 897,
+          "strength": 146.5,
+          "text": "ria in Thrace to a poor family.<bos>\u00abAttention\u00bb of Accordance Instant Details Dept:\nSomeone"
+        },
+        {
+          "position": 1153,
+          "strength": 145.5,
+          "text": "2's adherence and compliance with the latest<bos>\u00abThe\u00bb Best Services Done By Professional Window Installers\n"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      }
+    },
+    {
+      "feature_idx": 16718,
+      "label": "medical education quality and effectiveness",
+      "variance": 342.69927978515625,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1137,
+          "strength": 110.875,
+          "text": " the ACCME and its overall medical education effectiveness is\u00ab further\u00bb measured by assessing cme2's adherence"
+        },
+        {
+          "position": 1138,
+          "strength": 110.0625,
+          "text": " ACCME and its overall medical education effectiveness is further\u00ab measured\u00bb by assessing cme2's adherence and"
+        },
+        {
+          "position": 1136,
+          "strength": 108.0,
+          "text": " by the ACCME and its overall medical education effectiveness\u00ab is\u00bb further measured by assessing cme2's"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 123,
+      "label": "Beginning of sentence with capitalized word",
+      "variance": 233.69496154785156,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 2,
+          "strength": 137.625,
+          "text": "<bos>Lawyer\u00ab.\u00bbcom makes finding Montpelier Lawyers fast and easy"
+        },
+        {
+          "position": 0,
+          "strength": 135.75,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        },
+        {
+          "position": 1,
+          "strength": 131.875,
+          "text": "<bos>\u00abLawyer\u00bb.com makes finding Montpelier Lawyers fast and"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      }
+    },
+    {
+      "feature_idx": 5594,
+      "label": "Famous music hits and cultural events",
+      "variance": 281.6375427246094,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 596,
+          "strength": 111.125,
+          "text": " recently produced Daft Punk's mega-hit\u00ab \"\u00bbGet Lucky.\" Unsurprisingly, \"Tele"
+        },
+        {
+          "position": 594,
+          "strength": 110.625,
+          "text": ", who recently produced Daft Punk's mega\u00ab-\u00bbhit \"Get Lucky.\" Unsurprisingly,"
+        },
+        {
+          "position": 595,
+          "strength": 105.5625,
+          "text": " who recently produced Daft Punk's mega-\u00abhit\u00bb \"Get Lucky.\" Unsurprisingly, \""
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 10413,
+      "label": "Measurable improvement in healthcare education outcomes",
+      "variance": 110.21913146972656,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1103,
+          "strength": 51.34375,
+          "text": " enhanced through repeated, highly precise quantitative needs assessments.\u00ab These\u00bb needs assessments lead to the development of effective strategies"
+        },
+        {
+          "position": 1063,
+          "strength": 51.0,
+          "text": " medical education from a matter of pass/fail to\u00ab learning\u00bb mastery that measurably advances healthcare professionals' behavior"
+        },
+        {
+          "position": 1100,
+          "strength": 50.21875,
+          "text": " providers can be enhanced through repeated, highly precise quantitative\u00ab needs\u00bb assessments. These needs assessments lead to the development"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 1749,
+      "label": "Beginning of sentence capitalized words",
+      "variance": 336.263916015625,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1,
+          "strength": 153.125,
+          "text": "<bos>\u00abLawyer\u00bb.com makes finding Montpelier Lawyers fast and"
+        },
+        {
+          "position": 1665,
+          "strength": 150.5,
+          "text": " Download Tamil songs online from JioSaavn.<bos>\u00ab3\u00bb-Way Camera Strap\nThe adjustable wrist strap"
+        },
+        {
+          "position": 0,
+          "strength": 148.5,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      }
+    },
+    {
+      "feature_idx": 12060,
+      "label": "Numerical digits in structured data fields",
+      "variance": 217.11720275878906,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 319,
+          "strength": 77.625,
+          "text": ": 5' 8\" (1.\u00ab7\u00bb2 m)\nDylan Minnette is an"
+        },
+        {
+          "position": 318,
+          "strength": 76.3125,
+          "text": "Height: 5' 8\" (1\u00ab.\u00bb72 m)\nDylan Minnette is"
+        },
+        {
+          "position": 446,
+          "strength": 73.1875,
+          "text": " for the kids. And the kids are sweet,\u00ab if\u00bb occasionally monstrous. But I was putting together my"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SEMANTIC",
+        "agree": false,
+        "verdict": "SYNTACTIC"
+      }
+    },
+    {
+      "feature_idx": 8525,
+      "label": "Display calibration and color intensity standards",
+      "variance": 84.65593719482422,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 175,
+          "strength": 68.625,
+          "text": " of the on-screen colors. The steeper the\u00ab Intensity\u00bb Scale the greater the image contrast and the higher"
+        },
+        {
+          "position": 173,
+          "strength": 65.0625,
+          "text": " produce all of the on-screen colors. The\u00ab steeper\u00bb the Intensity Scale the greater the image contrast and"
+        },
+        {
+          "position": 161,
+          "strength": 60.875,
+          "text": " controls how the Red, Green and Blue primary colors\u00ab mix\u00bb to produce all of the on-screen colors"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 9186,
+      "label": "Beginning of new text sections or documents",
+      "variance": 374.7999572753906,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 2,
+          "strength": 248.625,
+          "text": "<bos>Lawyer\u00ab.\u00bbcom makes finding Montpelier Lawyers fast and easy"
+        },
+        {
+          "position": 1,
+          "strength": 227.125,
+          "text": "<bos>\u00abLawyer\u00bb.com makes finding Montpelier Lawyers fast and"
+        },
+        {
+          "position": 0,
+          "strength": 210.0,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      }
+    },
+    {
+      "feature_idx": 9546,
+      "label": "Beginning of new sentence or paragraph",
+      "variance": 379.3741149902344,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 0,
+          "strength": 275.5,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        },
+        {
+          "position": 895,
+          "strength": 163.0,
+          "text": "elymbria in Thrace to a poor family\u00ab.\u00bb<bos>Attention of Accordance Instant Details Dept:"
+        },
+        {
+          "position": 1,
+          "strength": 161.875,
+          "text": "<bos>\u00abLawyer\u00bb.com makes finding Montpelier Lawyers fast and"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      }
+    },
+    {
+      "feature_idx": 11166,
+      "label": "Descriptive adjectives in enumerated lists",
+      "variance": 97.76895904541016,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 631,
+          "strength": 49.65625,
+          "text": " easy to dance to, a disco ball, shimmering\u00ab,\u00bb illuminating a room of lovers & friends who<pad>"
+        },
+        {
+          "position": 632,
+          "strength": 49.59375,
+          "text": " to dance to, a disco ball, shimmering,\u00ab illuminating\u00bb a room of lovers & friends who<pad><pad>"
+        },
+        {
+          "position": 629,
+          "strength": 49.40625,
+          "text": " to, easy to dance to, a disco ball\u00ab,\u00bb shimmering, illuminating a room of lovers & friends"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      }
+    },
+    {
+      "feature_idx": 7587,
+      "label": "Descriptive phrases about notable musicians",
+      "variance": 62.333309173583984,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 582,
+          "strength": 41.21875,
+          "text": " track is the historically great bass player and record producer\u00ab Nile\u00bb Rodgers, who recently produced Daft Punk'"
+        },
+        {
+          "position": 579,
+          "strength": 39.875,
+          "text": " Aguilera on the track is the historically great bass player\u00ab and\u00bb record producer Nile Rodgers, who recently produced Da"
+        },
+        {
+          "position": 588,
+          "strength": 38.75,
+          "text": " player and record producer Nile Rodgers, who recently produced\u00ab Da\u00bbft Punk's mega-hit \"Get"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    }
+  ]
 }

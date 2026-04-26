@@ -1047,6 +1047,300 @@
     "n_passages": 4,
     "judge_disagreement_rate": 0.0,
     "semantic_count_pdvar_overlap": 13,
-    "pdvar_var_overlap_count": 22
-  }
+    "pdvar_var_overlap_count": 22,
+    "semantic_count_pdvar": 20,
+    "pdvar_new_labels_count": 10
+  },
+  "pdvar_only_features": [
+    {
+      "feature_idx": 874,
+      "label": "Historical context and biographical references",
+      "variance": 100.75171661376953,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 657,
+          "strength": 37.8125,
+          "text": " In a letter to Yvonne Davet (a French\u00ab writer\u00bb), Orwell described Animal Farm as a satirical tale"
+        },
+        {
+          "position": 655,
+          "strength": 36.9375,
+          "text": " War. In a letter to Yvonne Davet (\u00aba\u00bb French writer), Orwell described Animal Farm as a"
+        },
+        {
+          "position": 356,
+          "strength": 36.90625,
+          "text": " nearly all letters\nreceived before 186\u00ab2\u00bb. After that date he was persuaded to keep"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 2680,
+      "label": "reflection across the line y equals x",
+      "variance": 56.15944290161133,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1008,
+          "strength": 40.21875,
+          "text": ", 0) is reflected across the line y\u00ab =\u00bb x to get a new pentagon, P"
+        },
+        {
+          "position": 1006,
+          "strength": 40.125,
+          "text": " (3, 0) is reflected across the\u00ab line\u00bb y = x to get a new pentagon"
+        },
+        {
+          "position": 1009,
+          "strength": 39.875,
+          "text": " 0) is reflected across the line y =\u00ab x\u00bb to get a new pentagon, P\u2019,"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 2091,
+      "label": "geometric transformation reflection across line",
+      "variance": 40.23392105102539,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1016,
+          "strength": 35.71875,
+          "text": " line y = x to get a new pentagon\u00ab,\u00bb P\u2019, then one of the vertices of P"
+        },
+        {
+          "position": 1017,
+          "strength": 34.0625,
+          "text": " y = x to get a new pentagon,\u00ab P\u00bb\u2019, then one of the vertices of P\u2019"
+        },
+        {
+          "position": 1015,
+          "strength": 33.5,
+          "text": " the line y = x to get a new pen\u00abtagon\u00bb, P\u2019, then one of the vertices of"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 2932,
+      "label": "Historical periods and geopolitical eras",
+      "variance": 79.3343505859375,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 574,
+          "strength": 38.40625,
+          "text": "1917 and then on into the Stalin\u00abist\u00bb era of the Soviet Union, a period when"
+        },
+        {
+          "position": 943,
+          "strength": 37.9375,
+          "text": " opinion were transformed as the wartime alliance gave way to\u00ab the\u00bb Cold War.\nTime magazine chose the book"
+        },
+        {
+          "position": 355,
+          "strength": 37.03125,
+          "text": " destroyed nearly all letters\nreceived before 18\u00ab6\u00bb2. After that date he was persuaded to"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 1381,
+      "label": "Quotation marks and punctuation transitions",
+      "variance": 101.29533386230469,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 115,
+          "strength": 68.3125,
+          "text": ",--a\nrendering which would unfairly exaggerate their effect\u00ab.\u00bb\n\nThe Diary or Pocket-book, from"
+        },
+        {
+          "position": 351,
+          "strength": 65.875,
+          "text": " on for years, destroyed nearly all letters\nreceived\u00ab before\u00bb 1862. After that date"
+        },
+        {
+          "position": 116,
+          "strength": 58.34375,
+          "text": "a\nrendering which would unfairly exaggerate their effect.\u00ab\n\n\u00bbThe Diary or Pocket-book, from which"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      }
+    },
+    {
+      "feature_idx": 2076,
+      "label": "natural selection and evolution examples",
+      "variance": 40.832706451416016,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 5,
+          "strength": 37.84375,
+          "text": "In a population of gira\u00abffes\u00bb, an environmental change occurs that favors individuals that"
+        },
+        {
+          "position": 4,
+          "strength": 34.75,
+          "text": "In a population of\u00ab gira\u00bbffes, an environmental change occurs that favors individuals"
+        },
+        {
+          "position": 6,
+          "strength": 34.5,
+          "text": "In a population of giraffes\u00ab,\u00bb an environmental change occurs that favors individuals that are"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 14437,
+      "label": "Describing concise historical documentation or summaries",
+      "variance": 59.51497268676758,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 178,
+          "strength": 32.4375,
+          "text": " being compressed into a page or less; and contains\u00ab\n\u00bblittle more than the dates of the principal events"
+        },
+        {
+          "position": 174,
+          "strength": 30.390625,
+          "text": " history of a year being compressed into a page or\u00ab less\u00bb; and contains\nlittle more than the dates"
+        },
+        {
+          "position": 139,
+          "strength": 30.375,
+          "text": " the following\npages, has been of value as\u00ab supplying\u00bb a frame-work of facts round which\n"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 1342,
+      "label": "Numbers in mathematical coordinates or equations",
+      "variance": 72.75259399414062,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1001,
+          "strength": 67.8125,
+          "text": ", 4), and (3, 0\u00ab)\u00bb is reflected across the line y = x to"
+        },
+        {
+          "position": 355,
+          "strength": 55.6875,
+          "text": " destroyed nearly all letters\nreceived before 18\u00ab6\u00bb2. After that date he was persuaded to"
+        },
+        {
+          "position": 119,
+          "strength": 45.46875,
+          "text": " which would unfairly exaggerate their effect.\n\nThe Diary\u00ab or\u00bb Pocket-book, from which quotations occur in"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 949,
+      "label": "Small grammatical words and punctuation in sequences",
+      "variance": 36.78499221801758,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1,
+          "strength": 36.1875,
+          "text": "In\u00ab a\u00bb population of giraffes, an environmental change occurs"
+        },
+        {
+          "position": 2,
+          "strength": 34.96875,
+          "text": "In a\u00ab population\u00bb of giraffes, an environmental change occurs that"
+        },
+        {
+          "position": 985,
+          "strength": 34.34375,
+          "text": "\u2013 4, 1), (\u20131\u00ab,\u00bb 4), (2, 4),"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      }
+    },
+    {
+      "feature_idx": 263,
+      "label": "words connecting clauses or phrases together",
+      "variance": 24.112693786621094,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 145,
+          "strength": 25.5,
+          "text": " been of value as supplying a frame-work of\u00ab facts\u00bb round which\nletters may be grouped. It"
+        },
+        {
+          "position": 62,
+          "strength": 24.609375,
+          "text": "\nB. stabilizing selection.\nC. sexual\u00ab selection\u00bb.\nD. disruptive selection.f names"
+        },
+        {
+          "position": 143,
+          "strength": 24.15625,
+          "text": ", has been of value as supplying a frame-\u00abwork\u00bb of facts round which\nletters may be grouped"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      }
+    }
+  ]
 }

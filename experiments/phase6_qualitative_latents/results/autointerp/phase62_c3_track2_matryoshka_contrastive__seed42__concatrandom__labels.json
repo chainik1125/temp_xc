@@ -1050,6 +1050,416 @@
     "n_passages": 7,
     "judge_disagreement_rate": 0.1875,
     "semantic_count_pdvar_overlap": 2,
-    "pdvar_var_overlap_count": 18
-  }
+    "pdvar_var_overlap_count": 18,
+    "semantic_count_pdvar": 9,
+    "pdvar_new_labels_count": 14
+  },
+  "pdvar_only_features": [
+    {
+      "feature_idx": 1460,
+      "label": "Transition between unrelated text segments",
+      "variance": 283.6745910644531,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1152,
+          "strength": 124.625,
+          "text": "me2's adherence and compliance with the latest\u00ab<bos>\u00bbThe Best Services Done By Professional Window Installers"
+        },
+        {
+          "position": 1408,
+          "strength": 123.3125,
+          "text": " \u201cTo date (as of September 1)\u00ab<bos>\u00bbNew Mixtape: T-Shyne \u2018"
+        },
+        {
+          "position": 1024,
+          "strength": 121.4375,
+          "text": " graduate school.\nKindly note that I have not\u00ab<bos>\u00bbJune 01, 200"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SEMANTIC",
+        "agree": false,
+        "verdict": "SYNTACTIC"
+      }
+    },
+    {
+      "feature_idx": 2725,
+      "label": "tokens in corporate statement or press release",
+      "variance": 217.76712036132812,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1366,
+          "strength": 79.3125,
+          "text": " phone to return it. There will be compensation,\u00ab of\u00bb course, as well as a revised model for"
+        },
+        {
+          "position": 1397,
+          "strength": 72.0625,
+          "text": "The statement of Samsung on the matter goes as follows\u00ab:\u00bb \u201cTo date (as of September 1"
+        },
+        {
+          "position": 1378,
+          "strength": 71.75,
+          "text": ", as well as a revised model for those who\u00ab still\u00bb want to have the specific model.\nThe"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 1161,
+      "label": "Beginning of sentence or document markers",
+      "variance": 290.4099426269531,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1,
+          "strength": 180.875,
+          "text": "<bos>\u00abLawyer\u00bb.com makes finding Montpelier Lawyers fast and"
+        },
+        {
+          "position": 0,
+          "strength": 180.0,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        },
+        {
+          "position": 1582,
+          "strength": 168.75,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><bos>\u00abListen\u00bb to En Athma Nesa online. En"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      }
+    },
+    {
+      "feature_idx": 899,
+      "label": "disco and funk music production",
+      "variance": 132.06283569335938,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 625,
+          "strength": 55.25,
+          "text": ". easy to listen to, easy to dance to\u00ab,\u00bb a disco ball, shimmering, illuminating a room"
+        },
+        {
+          "position": 624,
+          "strength": 52.9375,
+          "text": " mode. easy to listen to, easy to dance\u00ab to\u00bb, a disco ball, shimmering, illuminating a"
+        },
+        {
+          "position": 623,
+          "strength": 51.75,
+          "text": " disco mode. easy to listen to, easy to\u00ab dance\u00bb to, a disco ball, shimmering, illuminating"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 2710,
+      "label": "Words in \"pass/fail to learning mastery\" phrase",
+      "variance": 243.11109924316406,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1056,
+          "strength": 90.25,
+          "text": "2's mission is to elevate medical education from\u00ab a\u00bb matter of pass/fail to learning mastery that"
+        },
+        {
+          "position": 1063,
+          "strength": 90.125,
+          "text": " medical education from a matter of pass/fail to\u00ab learning\u00bb mastery that measurably advances healthcare professionals' behavior"
+        },
+        {
+          "position": 1057,
+          "strength": 90.0,
+          "text": "'s mission is to elevate medical education from a\u00ab matter\u00bb of pass/fail to learning mastery that meas"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SEMANTIC",
+        "agree": false,
+        "verdict": "SYNTACTIC"
+      }
+    },
+    {
+      "feature_idx": 940,
+      "label": "Beginning of sentence with capitalized word",
+      "variance": 288.1076965332031,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1,
+          "strength": 190.125,
+          "text": "<bos>\u00abLawyer\u00bb.com makes finding Montpelier Lawyers fast and"
+        },
+        {
+          "position": 0,
+          "strength": 176.0,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        },
+        {
+          "position": 385,
+          "strength": 156.25,
+          "text": " to that, he played the young version of<bos>\u00abI\u00bb\u2019ve been a little down recently and trying"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      }
+    },
+    {
+      "feature_idx": 3211,
+      "label": "Tokens in repeated narrative text passages",
+      "variance": 143.57354736328125,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 488,
+          "strength": 55.875,
+          "text": "yes, see, my husband walks our kid to\u00ab the\u00bb bus stop, I really need to stop complaining"
+        },
+        {
+          "position": 487,
+          "strength": 55.75,
+          "text": " (yes, see, my husband walks our kid\u00ab to\u00bb the bus stop, I really need to stop"
+        },
+        {
+          "position": 485,
+          "strength": 55.65625,
+          "text": " 7 (yes, see, my husband walks\u00ab our\u00bb kid to the bus stop, I really need"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SEMANTIC",
+        "agree": false,
+        "verdict": "SYNTACTIC"
+      }
+    },
+    {
+      "feature_idx": 2497,
+      "label": "Beginning of sentence markers and proper nouns",
+      "variance": 219.67176818847656,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 0,
+          "strength": 139.125,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        },
+        {
+          "position": 1,
+          "strength": 134.25,
+          "text": "<bos>\u00abLawyer\u00bb.com makes finding Montpelier Lawyers fast and"
+        },
+        {
+          "position": 1582,
+          "strength": 123.5625,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><bos>\u00abListen\u00bb to En Athma Nesa online. En"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      }
+    },
+    {
+      "feature_idx": 9260,
+      "label": "display color intensity and contrast calibration",
+      "variance": 85.09275817871094,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 189,
+          "strength": 70.3125,
+          "text": " the image contrast and the higher the saturation of displayed\u00ab color\u00bb mixtures. So if the Intensity Scale doesn'"
+        },
+        {
+          "position": 175,
+          "strength": 65.0625,
+          "text": " of the on-screen colors. The steeper the\u00ab Intensity\u00bb Scale the greater the image contrast and the higher"
+        },
+        {
+          "position": 160,
+          "strength": 62.78125,
+          "text": " also controls how the Red, Green and Blue primary\u00ab colors\u00bb mix to produce all of the on-screen"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 3584,
+      "label": "Common words in everyday descriptive sentences",
+      "variance": 175.1388397216797,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 488,
+          "strength": 71.375,
+          "text": "yes, see, my husband walks our kid to\u00ab the\u00bb bus stop, I really need to stop complaining"
+        },
+        {
+          "position": 489,
+          "strength": 69.625,
+          "text": ", see, my husband walks our kid to the\u00ab bus\u00bb stop, I really need to stop complaining),"
+        },
+        {
+          "position": 487,
+          "strength": 68.6875,
+          "text": " (yes, see, my husband walks our kid\u00ab to\u00bb the bus stop, I really need to stop"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 2997,
+      "label": "biographical information about Saint Nectarios",
+      "variance": 68.01425170898438,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 892,
+          "strength": 54.09375,
+          "text": ", in Selymbria in Thrace to\u00ab a\u00bb poor family.<bos>Attention of Accordance Instant"
+        },
+        {
+          "position": 870,
+          "strength": 51.125,
+          "text": " Nektarios.\nSt. Nectarios\u00ab was\u00bb born on October 1, 18"
+        },
+        {
+          "position": 843,
+          "strength": 50.0,
+          "text": ". He is often referred to as Nectarios\u00ab of\u00bb Pentapolis or Nectarios of Aegina"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 5953,
+      "label": "Self-defensive clarification in linguistic debate",
+      "variance": 89.851806640625,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 967,
+          "strength": 91.125,
+          "text": " of \u05d1 having a clause for its object. I\u00ab only\u00bb spoke about the phrase in the verse in question"
+        },
+        {
+          "position": 952,
+          "strength": 83.3125,
+          "text": " that\nI am not wrong. I did not\u00ab say\u00bb anything about the possibility of \u05d1 having a clause"
+        },
+        {
+          "position": 968,
+          "strength": 82.5625,
+          "text": " \u05d1 having a clause for its object. I only\u00ab spoke\u00bb about the phrase in the verse in question,"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 1320,
+      "label": "Prepositions and conjunctions in product descriptions",
+      "variance": 46.57887649536133,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1689,
+          "strength": 28.953125,
+          "text": " neck and shoulder strap\nTransforms from wrist to shoulder\u00ab or\u00bb neck strap\n3-Way Camera StrapTM"
+        },
+        {
+          "position": 938,
+          "strength": 28.765625,
+          "text": " \u05d1 with a clausal complement,\"\nI response\u00ab to\u00bb that I affirm that\nI am not wrong"
+        },
+        {
+          "position": 687,
+          "strength": 28.59375,
+          "text": "if you don't have an account yet.\u00ab By\u00bb signing up for an account you will be able"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      }
+    },
+    {
+      "feature_idx": 2604,
+      "label": "color mixing and RGB primary colors",
+      "variance": 83.1856918334961,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1278,
+          "strength": 47.6875,
+          "text": " feeling drafty or cold, and will let in\u00ab light\u00bb,<bos>Samsung has made an announcement, following"
+        },
+        {
+          "position": 159,
+          "strength": 45.71875,
+          "text": " it also controls how the Red, Green and Blue\u00ab primary\u00bb colors mix to produce all of the on-"
+        },
+        {
+          "position": 1150,
+          "strength": 45.0625,
+          "text": " assessing cme2's adherence and compliance with\u00ab the\u00bb latest<bos>The Best Services Done By Professional Window"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    }
+  ]
 }

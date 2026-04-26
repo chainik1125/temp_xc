@@ -1046,6 +1046,416 @@
     "n_passages": 3,
     "judge_disagreement_rate": 0.0,
     "semantic_count_pdvar_overlap": 11,
-    "pdvar_var_overlap_count": 18
-  }
+    "pdvar_var_overlap_count": 18,
+    "semantic_count_pdvar": 22,
+    "pdvar_new_labels_count": 14
+  },
+  "pdvar_only_features": [
+    {
+      "feature_idx": 263,
+      "label": "natural selection and survival advantages",
+      "variance": 90.92301940917969,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 373,
+          "strength": 52.71875,
+          "text": " more of the taller individuals are able to obtain nutrients\u00ab and\u00bb survive to pass along their genetic information. This"
+        },
+        {
+          "position": 371,
+          "strength": 51.28125,
+          "text": " result, more of the taller individuals are able to\u00ab obtain\u00bb nutrients and survive to pass along their genetic information"
+        },
+        {
+          "position": 374,
+          "strength": 51.15625,
+          "text": " of the taller individuals are able to obtain nutrients and\u00ab survive\u00bb to pass along their genetic information. This is"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 1417,
+      "label": "Latin poetry text passages",
+      "variance": 95.53030395507812,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 89,
+          "strength": 41.53125,
+          "text": " Urbes\n  Autor erat; Cererisve\u00ab bea\u00bbvit munere gentes;\n  Vel qui"
+        },
+        {
+          "position": 90,
+          "strength": 41.125,
+          "text": "bes\n  Autor erat; Cererisve bea\u00abvit\u00bb munere gentes;\n  Vel qui cur"
+        },
+        {
+          "position": 102,
+          "strength": 40.78125,
+          "text": "ere gentes;\n  Vel qui curarum len\u00abimen\u00bb pressit ab Uva;\n  Vel"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 67,
+      "label": "Natural selection and survival mechanism explanation",
+      "variance": 54.78193664550781,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 379,
+          "strength": 59.5625,
+          "text": " able to obtain nutrients and survive to pass along their\u00ab genetic\u00bb information. This is an example of\nA"
+        },
+        {
+          "position": 380,
+          "strength": 58.65625,
+          "text": " to obtain nutrients and survive to pass along their genetic\u00ab information\u00bb. This is an example of\nA."
+        },
+        {
+          "position": 366,
+          "strength": 58.125,
+          "text": " are tallest. As a result, more of the\u00ab taller\u00bb individuals are able to obtain nutrients and survive to"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 1313,
+      "label": "Transition words and phrases in sentences",
+      "variance": 65.4123306274414,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 508,
+          "strength": 51.375,
+          "text": " we must slay\n  To-day, in\u00ab war\u00bb's arbitrament; for, sure,"
+        },
+        {
+          "position": 32,
+          "strength": 46.1875,
+          "text": "A pecudum vita longe lateque remot\u00e6\u00ab.\u00bb\n  Qui scriptis jussit Tab"
+        },
+        {
+          "position": 378,
+          "strength": 46.125,
+          "text": " are able to obtain nutrients and survive to pass along\u00ab their\u00bb genetic information. This is an example of\n"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      }
+    },
+    {
+      "feature_idx": 1280,
+      "label": "Sanskrit and Latin classical text fragments",
+      "variance": 70.82771301269531,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 537,
+          "strength": 43.375,
+          "text": " this plain,\n  Obeying Dhriti\u00abras\u00bbhtra's sinful son.\"\n\n  Thus"
+        },
+        {
+          "position": 538,
+          "strength": 37.25,
+          "text": " plain,\n  Obeying Dhritiras\u00abhtra\u00bb's sinful son.\"\n\n  Thus,"
+        },
+        {
+          "position": 536,
+          "strength": 37.09375,
+          "text": " throng this plain,\n  Obeying Dh\u00abriti\u00bbrashtra's sinful son.\"\n\n  "
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 1511,
+      "label": "Latin poetry text fragments",
+      "variance": 61.65899658203125,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 90,
+          "strength": 29.90625,
+          "text": "bes\n  Autor erat; Cererisve bea\u00abvit\u00bb munere gentes;\n  Vel qui cur"
+        },
+        {
+          "position": 268,
+          "strength": 27.640625,
+          "text": "_NEWTONVM_ clausi reserantem\u00ab sc\u00bbrinia Veri,\n  _NEW"
+        },
+        {
+          "position": 267,
+          "strength": 27.28125,
+          "text": "  _NEWTONVM_ clausi reseran\u00abtem\u00bb scrinia Veri,\n  _"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 3398,
+      "label": "natural selection and evolution concepts",
+      "variance": 20.243244171142578,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 347,
+          "strength": 23.734375,
+          "text": "       *       *In a population of giraffes\u00ab,\u00bb an environmental change occurs that favors individuals that are"
+        },
+        {
+          "position": 376,
+          "strength": 23.234375,
+          "text": " taller individuals are able to obtain nutrients and survive to\u00ab pass\u00bb along their genetic information. This is an example"
+        },
+        {
+          "position": 374,
+          "strength": 23.03125,
+          "text": " of the taller individuals are able to obtain nutrients and\u00ab survive\u00bb to pass along their genetic information. This is"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 1005,
+      "label": "Bhagavad Gita poetic dialogue and narration",
+      "variance": 56.61916732788086,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 751,
+          "strength": 27.375,
+          "text": " concourse of our kin,\n  My members\u00ab fail\u00bb"
+        },
+        {
+          "position": 562,
+          "strength": 27.25,
+          "text": " (O Bharata!)\n  Between the hosts\u00ab that\u00bb heavenly Charioteer\n  Drove the"
+        },
+        {
+          "position": 561,
+          "strength": 27.1875,
+          "text": ", (O Bharata!)\n  Between the\u00ab hosts\u00bb that heavenly Charioteer\n  Drove"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 429,
+      "label": "Transition words connecting clauses or phrases",
+      "variance": 54.902374267578125,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 381,
+          "strength": 32.15625,
+          "text": " obtain nutrients and survive to pass along their genetic information\u00ab.\u00bb This is an example of\nA. directional"
+        },
+        {
+          "position": 377,
+          "strength": 29.703125,
+          "text": " individuals are able to obtain nutrients and survive to pass\u00ab along\u00bb their genetic information. This is an example of"
+        },
+        {
+          "position": 380,
+          "strength": 29.59375,
+          "text": " to obtain nutrients and survive to pass along their genetic\u00ab information\u00bb. This is an example of\nA."
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      }
+    },
+    {
+      "feature_idx": 493,
+      "label": "Poetic language about warfare and bloodshed",
+      "variance": 66.11480712890625,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 509,
+          "strength": 37.25,
+          "text": " must slay\n  To-day, in war\u00ab'\u00bbs arbitrament; for, sure,\n"
+        },
+        {
+          "position": 527,
+          "strength": 35.4375,
+          "text": ",\n  On bloodshed all are bent who throng\u00ab this\u00bb plain,\n  Obeying Dhriti"
+        },
+        {
+          "position": 423,
+          "strength": 34.65625,
+          "text": "\n  Weapons unsheathing, bows drawn forth\u00ab,\u00bb the war\n  Instant to break-Ar"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 1058,
+      "label": "family members and kinship relations",
+      "variance": 111.5024642944336,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 509,
+          "strength": 74.375,
+          "text": " must slay\n  To-day, in war\u00ab'\u00bbs arbitrament; for, sure,\n"
+        },
+        {
+          "position": 508,
+          "strength": 69.3125,
+          "text": " we must slay\n  To-day, in\u00ab war\u00bb's arbitrament; for, sure,"
+        },
+        {
+          "position": 645,
+          "strength": 61.375,
+          "text": " his house,\n  Grandsires and si\u00abres\u00bb, uncles and brothers and sons,\n  "
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 2893,
+      "label": "Transitions between clauses or quoted passages",
+      "variance": 57.34621047973633,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 379,
+          "strength": 35.78125,
+          "text": " able to obtain nutrients and survive to pass along their\u00ab genetic\u00bb information. This is an example of\nA"
+        },
+        {
+          "position": 509,
+          "strength": 31.859375,
+          "text": " must slay\n  To-day, in war\u00ab'\u00bbs arbitrament; for, sure,\n"
+        },
+        {
+          "position": 377,
+          "strength": 30.78125,
+          "text": " individuals are able to obtain nutrients and survive to pass\u00ab along\u00bb their genetic information. This is an example of"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      }
+    },
+    {
+      "feature_idx": 3625,
+      "label": "Latin and archaic English text passages",
+      "variance": 76.87940216064453,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 511,
+          "strength": 75.875,
+          "text": "\n  To-day, in war's\u00ab arbit\u00bbrament; for, sure,\n  On"
+        },
+        {
+          "position": 35,
+          "strength": 65.8125,
+          "text": "um vita longe lateque remot\u00e6.\n  \u00abQui\u00bb scriptis jussit Tabulis compes"
+        },
+        {
+          "position": 97,
+          "strength": 45.15625,
+          "text": "erisve beavit munere gentes;\n  \u00abVel\u00bb qui curarum lenimen pressit ab U"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 3651,
+      "label": "Types of natural selection in biology",
+      "variance": 19.477375030517578,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 397,
+          "strength": 24.875,
+          "text": "\nA. directional selection.\nB. stabilizing\u00ab selection\u00bb.\nC. sexual selection.\nD"
+        },
+        {
+          "position": 403,
+          "strength": 24.234375,
+          "text": "\nB. stabilizing selection.\nC. sexual\u00ab selection\u00bb.\nD. disruptive selection. set,"
+        },
+        {
+          "position": 396,
+          "strength": 24.203125,
+          "text": " of\nA. directional selection.\nB.\u00ab stabilizing\u00bb selection.\nC. sexual selection.\n"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    }
+  ]
 }

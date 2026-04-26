@@ -1,0 +1,1051 @@
+{
+  "arch": "tfa_big",
+  "seed": 42,
+  "concat": "A",
+  "features": [
+    {
+      "feature_idx": 12150,
+      "label": "Sanskrit proper nouns and character names",
+      "variance": 1.0372400538471993e-06,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 587,
+          "strength": 0.0041961669921875,
+          "text": " its milk-white steeds\n  Where Bhish\u00abma\u00bb led,and Drona,and their Lords"
+        },
+        {
+          "position": 538,
+          "strength": 0.004039764404296875,
+          "text": " plain,\n  Obeying Dhritiras\u00abhtra\u00bb's sinful son.\"\n\n  Thus,"
+        },
+        {
+          "position": 592,
+          "strength": 0.0037631988525390625,
+          "text": "\n  Where Bhishma led,and D\u00abrona\u00bb,and their Lords.\n  \"See"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "gita"
+    },
+    {
+      "feature_idx": 6710,
+      "label": "Asterisk or decorative separator marks",
+      "variance": 7.422489716191194e-07,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 4,
+          "strength": 0.00469970703125,
+          "text": "ittite curas\u00ab\n\u00bb  Atque hinc coeligen\u00e6 v"
+        },
+        {
+          "position": 1,
+          "strength": 0.004364013671875,
+          "text": "it\u00abtite\u00bb curas\n  Atque hinc coe"
+        },
+        {
+          "position": 0,
+          "strength": 0.0042724609375,
+          "text": "\u00abit\u00bbtite curas\n  Atque hinc"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "principia"
+    },
+    {
+      "feature_idx": 5742,
+      "label": "Epic poetry and religious text passages",
+      "variance": 6.756250172657019e-07,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 550,
+          "strength": 0.00345611572265625,
+          "text": "s sinful son.\"\n\n  Thus, by Arjuna\u00ab prayed\u00bb, (O Bharata!)\n  Between"
+        },
+        {
+          "position": 350,
+          "strength": 0.003040313720703125,
+          "text": "*In a population of giraffes, an environmental\u00ab change\u00bb occurs that favors individuals that are tallest. As"
+        },
+        {
+          "position": 421,
+          "strength": 0.0030040740966796875,
+          "text": " set,\n  Weapons unsheathing, bows\u00ab drawn\u00bb forth, the war\n  Instant to break"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "genetics_q"
+    },
+    {
+      "feature_idx": 268,
+      "label": "Archaic or poetic English text passages",
+      "variance": 6.663366889370081e-07,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 487,
+          "strength": 0.00270843505859375,
+          "text": "  Betwixt the armies; I would see more\u00ab nigh\u00bb\n  These who will fight with us,"
+        },
+        {
+          "position": 448,
+          "strength": 0.0023059844970703125,
+          "text": "-badge\n  Was Hanuman the monkey, spake\u00ab this\u00bb thing\n  To Krishna the Divine, his"
+        },
+        {
+          "position": 453,
+          "strength": 0.00228118896484375,
+          "text": " Hanuman the monkey, spake this thing\n  To\u00ab Krishna\u00bb the Divine, his charioteer:\n"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "principia"
+    },
+    {
+      "feature_idx": 11376,
+      "label": "Asterisk symbols marking section breaks or transitions",
+      "variance": 6.504530460915703e-07,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 0,
+          "strength": 0.00463104248046875,
+          "text": "\u00abit\u00bbtite curas\n  Atque hinc"
+        },
+        {
+          "position": 1,
+          "strength": 0.004497528076171875,
+          "text": "it\u00abtite\u00bb curas\n  Atque hinc coe"
+        },
+        {
+          "position": 4,
+          "strength": 0.0041656494140625,
+          "text": "ittite curas\u00ab\n\u00bb  Atque hinc coeligen\u00e6 v"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "principia"
+    },
+    {
+      "feature_idx": 5622,
+      "label": "Asterisks and spacing in text formatting",
+      "variance": 6.348418537527323e-07,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1,
+          "strength": 0.003459930419921875,
+          "text": "it\u00abtite\u00bb curas\n  Atque hinc coe"
+        },
+        {
+          "position": 0,
+          "strength": 0.0033664703369140625,
+          "text": "\u00abit\u00bbtite curas\n  Atque hinc"
+        },
+        {
+          "position": 4,
+          "strength": 0.0030918121337890625,
+          "text": "ittite curas\u00ab\n\u00bb  Atque hinc coeligen\u00e6 v"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "principia"
+    },
+    {
+      "feature_idx": 3168,
+      "label": "Poetic or archaic literary text passages",
+      "variance": 6.220757313712966e-07,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 33,
+          "strength": 0.010284423828125,
+          "text": " pecudum vita longe lateque remot\u00e6.\u00ab\n\u00bb  Qui scriptis jussit Tabulis"
+        },
+        {
+          "position": 509,
+          "strength": 0.0090789794921875,
+          "text": " must slay\n  To-day, in war\u00ab'\u00bbs arbitrament; for, sure,\n"
+        },
+        {
+          "position": 710,
+          "strength": 0.0038166046142578125,
+          "text": "Arjuna's heart\n  Melted with\u00ab pity\u00bb, while he uttered this:\n\n  Ar"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "principia"
+    },
+    {
+      "feature_idx": 6609,
+      "label": "Classical epic poetry and religious texts",
+      "variance": 6.175118301143812e-07,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 638,
+          "strength": 0.0034942626953125,
+          "text": " on each hand the kinsmen of his house,\u00ab\n\u00bb  Grandsires and sires, uncles"
+        },
+        {
+          "position": 598,
+          "strength": 0.0031032562255859375,
+          "text": " led,and Drona,and their Lords.\u00ab\n\u00bb  \"See!\" spake he to Arjuna,"
+        },
+        {
+          "position": 692,
+          "strength": 0.0030384063720703125,
+          "text": " that side ranged: and, seeing those opposed,\u00ab\n\u00bb  Such kith grown enemies-Arjuna"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "gita"
+    },
+    {
+      "feature_idx": 8418,
+      "label": "Multiple choice question answer options",
+      "variance": 6.139961783446779e-07,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 387,
+          "strength": 0.0027866363525390625,
+          "text": " along their genetic information. This is an example of\u00ab\n\u00bbA. directional selection.\nB. stabilizing"
+        },
+        {
+          "position": 385,
+          "strength": 0.0025806427001953125,
+          "text": " to pass along their genetic information. This is an\u00ab example\u00bb of\nA. directional selection.\nB"
+        },
+        {
+          "position": 638,
+          "strength": 0.002544403076171875,
+          "text": " on each hand the kinsmen of his house,\u00ab\n\u00bb  Grandsires and sires, uncles"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SEMANTIC",
+        "agree": false,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "genetics_q"
+    },
+    {
+      "feature_idx": 17670,
+      "label": "Latin poetry text fragments",
+      "variance": 6.08728441875428e-07,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 415,
+          "strength": 0.0033969879150390625,
+          "text": "\nD. disruptive selection. set,\n  \u00abWeapons\u00bb unsheathing, bows drawn forth, the"
+        },
+        {
+          "position": 420,
+          "strength": 0.00296783447265625,
+          "text": ". set,\n  Weapons unsheathing,\u00ab bows\u00bb drawn forth, the war\n  Instant to"
+        },
+        {
+          "position": 103,
+          "strength": 0.0029621124267578125,
+          "text": " gentes;\n  Vel qui curarum lenimen\u00ab press\u00bbit ab Uva;\n  Vel qui"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "principia"
+    },
+    {
+      "feature_idx": 6635,
+      "label": "Quotation marks or dialogue punctuation transitions",
+      "variance": 5.952431365585653e-07,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 544,
+          "strength": 0.0031375885009765625,
+          "text": "ying Dhritirashtra's sinful son.\"\u00ab\n\n\u00bb  Thus, by Arjuna prayed, (O"
+        },
+        {
+          "position": 227,
+          "strength": 0.0031299591064453125,
+          "text": "teriti latuerunt s\u00e6cula mundi.\u00ab\n\n\u00bb  Talia monstrantem mecum celebrate"
+        },
+        {
+          "position": 399,
+          "strength": 0.0030574798583984375,
+          "text": ". directional selection.\nB. stabilizing selection.\u00ab\n\u00bbC. sexual selection.\nD. disruptive"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "gita"
+    },
+    {
+      "feature_idx": 12777,
+      "label": "Multiple choice answer option markers",
+      "variance": 5.942747520748526e-07,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 400,
+          "strength": 0.0029888153076171875,
+          "text": " directional selection.\nB. stabilizing selection.\n\u00abC\u00bb. sexual selection.\nD. disruptive selection"
+        },
+        {
+          "position": 385,
+          "strength": 0.0027256011962890625,
+          "text": " to pass along their genetic information. This is an\u00ab example\u00bb of\nA. directional selection.\nB"
+        },
+        {
+          "position": 405,
+          "strength": 0.00270843505859375,
+          "text": ". stabilizing selection.\nC. sexual selection.\u00ab\n\u00bbD. disruptive selection. set,\n  "
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "genetics_q"
+    },
+    {
+      "feature_idx": 1507,
+      "label": "Multiple choice answer options formatting",
+      "variance": 5.925909363213577e-07,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 387,
+          "strength": 0.0033473968505859375,
+          "text": " along their genetic information. This is an example of\u00ab\n\u00bbA. directional selection.\nB. stabilizing"
+        },
+        {
+          "position": 544,
+          "strength": 0.0033016204833984375,
+          "text": "ying Dhritirashtra's sinful son.\"\u00ab\n\n\u00bb  Thus, by Arjuna prayed, (O"
+        },
+        {
+          "position": 638,
+          "strength": 0.0029926300048828125,
+          "text": " on each hand the kinsmen of his house,\u00ab\n\u00bb  Grandsires and sires, uncles"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "genetics_q"
+    },
+    {
+      "feature_idx": 9295,
+      "label": "Period followed by quotation mark punctuation",
+      "variance": 5.843627945978369e-07,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 166,
+          "strength": 0.0035400390625,
+          "text": "iciens miser\u00e6 solummodo commoda vit\u00e6\u00ab.\u00bb\n  Jam vero Superis conviv\u00e6 admit"
+        },
+        {
+          "position": 381,
+          "strength": 0.0034656524658203125,
+          "text": " obtain nutrients and survive to pass along their genetic information\u00ab.\u00bb This is an example of\nA. directional"
+        },
+        {
+          "position": 410,
+          "strength": 0.003376007080078125,
+          "text": "C. sexual selection.\nD. disruptive selection\u00ab.\u00bb set,\n  Weapons unsheathing,"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "genetics_q"
+    },
+    {
+      "feature_idx": 18088,
+      "label": "Asterisk-based section breaks or dividers",
+      "variance": 5.362288106880442e-07,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1,
+          "strength": 0.00386810302734375,
+          "text": "it\u00abtite\u00bb curas\n  Atque hinc coe"
+        },
+        {
+          "position": 0,
+          "strength": 0.00384521484375,
+          "text": "\u00abit\u00bbtite curas\n  Atque hinc"
+        },
+        {
+          "position": 4,
+          "strength": 0.0036678314208984375,
+          "text": "ittite curas\u00ab\n\u00bb  Atque hinc coeligen\u00e6 v"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "principia"
+    },
+    {
+      "feature_idx": 6934,
+      "label": "Bhagavad Gita poetic verse passages",
+      "variance": 5.310427582116972e-07,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 387,
+          "strength": 0.00484466552734375,
+          "text": " along their genetic information. This is an example of\u00ab\n\u00bbA. directional selection.\nB. stabilizing"
+        },
+        {
+          "position": 544,
+          "strength": 0.0036678314208984375,
+          "text": "ying Dhritirashtra's sinful son.\"\u00ab\n\n\u00bb  Thus, by Arjuna prayed, (O"
+        },
+        {
+          "position": 557,
+          "strength": 0.003627777099609375,
+          "text": ", by Arjuna prayed, (O Bharata!)\u00ab\n\u00bb  Between the hosts that heavenly Charioteer"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "gita"
+    },
+    {
+      "feature_idx": 359,
+      "label": "Religious and mythological character names",
+      "variance": 5.043629585088638e-07,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 710,
+          "strength": 0.0031375885009765625,
+          "text": "Arjuna's heart\n  Melted with\u00ab pity\u00bb, while he uttered this:\n\n  Ar"
+        },
+        {
+          "position": 343,
+          "strength": 0.0030803680419921875,
+          "text": "       *       *       *       *In a\u00ab population\u00bb of giraffes, an environmental change occurs that"
+        },
+        {
+          "position": 200,
+          "strength": 0.0027179718017578125,
+          "text": " jamque abdita coec\u00e6\n  Cla\u00abustra\u00bb patent Terr\u00e6 rerumque immobilis or"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "principia"
+    },
+    {
+      "feature_idx": 12395,
+      "label": "dialogue or speech attribution markers",
+      "variance": 4.754559199682262e-07,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 638,
+          "strength": 0.0032939910888671875,
+          "text": " on each hand the kinsmen of his house,\u00ab\n\u00bb  Grandsires and sires, uncles"
+        },
+        {
+          "position": 598,
+          "strength": 0.003223419189453125,
+          "text": " led,and Drona,and their Lords.\u00ab\n\u00bb  \"See!\" spake he to Arjuna,"
+        },
+        {
+          "position": 399,
+          "strength": 0.0031795501708984375,
+          "text": ". directional selection.\nB. stabilizing selection.\u00ab\n\u00bbC. sexual selection.\nD. disruptive"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "gita"
+    },
+    {
+      "feature_idx": 18191,
+      "label": "Archaic or poetic English text passages",
+      "variance": 4.704787386344833e-07,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 634,
+          "strength": 0.002513885498046875,
+          "text": " Prince\n  Marked on each hand the kinsmen\u00ab of\u00bb his house,\n  Grandsires and"
+        },
+        {
+          "position": 732,
+          "strength": 0.0024051666259765625,
+          "text": "\n  Krishna! as I behold, come here\u00ab to\u00bb shed\n  Their common blood, yon conc"
+        },
+        {
+          "position": 705,
+          "strength": 0.0023860931396484375,
+          "text": " kith grown enemies-Arjuna's heart\u00ab\n\u00bb  Melted with pity, while he uttered"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "gita"
+    },
+    {
+      "feature_idx": 10775,
+      "label": "poetic enumeration of family relationships",
+      "variance": 4.690811863383715e-07,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 634,
+          "strength": 0.0030574798583984375,
+          "text": " Prince\n  Marked on each hand the kinsmen\u00ab of\u00bb his house,\n  Grandsires and"
+        },
+        {
+          "position": 643,
+          "strength": 0.00299835205078125,
+          "text": "men of his house,\n  Grandsires\u00ab and\u00bb sires, uncles and brothers and sons,"
+        },
+        {
+          "position": 650,
+          "strength": 0.0026340484619140625,
+          "text": "Grandsires and sires, uncles and brothers\u00ab and\u00bb sons,\n  Cousins and sons-"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "gita"
+    },
+    {
+      "feature_idx": 9848,
+      "label": "Poetic or classical literature quotations",
+      "variance": 4.6032010914132115e-07,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 638,
+          "strength": 0.002979278564453125,
+          "text": " on each hand the kinsmen of his house,\u00ab\n\u00bb  Grandsires and sires, uncles"
+        },
+        {
+          "position": 330,
+          "strength": 0.0028209686279296875,
+          "text": "os.\n\n                  _EDM. HALLEY._\u00ab\n\n\u00bb       *       *       *       *       "
+        },
+        {
+          "position": 462,
+          "strength": 0.002643585205078125,
+          "text": "To Krishna the Divine, his charioteer:\u00ab\n\u00bb  \"Drive, Dauntless One!"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "gita"
+    },
+    {
+      "feature_idx": 1737,
+      "label": "Archaic or poetic English language text",
+      "variance": 4.3715729702853423e-07,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 465,
+          "strength": 0.003314971923828125,
+          "text": " Divine, his charioteer:\n  \"\u00abDrive\u00bb, Dauntless One! to yonder open"
+        },
+        {
+          "position": 733,
+          "strength": 0.003208160400390625,
+          "text": "  Krishna! as I behold, come here to\u00ab shed\u00bb\n  Their common blood, yon concourse"
+        },
+        {
+          "position": 430,
+          "strength": 0.003032684326171875,
+          "text": " bows drawn forth, the war\n  Instant to\u00ab break\u00bb-Arjun, whose ensign-badge"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "gita"
+    },
+    {
+      "feature_idx": 10520,
+      "label": "Asterisks and spacing in text formatting",
+      "variance": 4.3381473346926214e-07,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1,
+          "strength": 0.0035495758056640625,
+          "text": "it\u00abtite\u00bb curas\n  Atque hinc coe"
+        },
+        {
+          "position": 4,
+          "strength": 0.0034770965576171875,
+          "text": "ittite curas\u00ab\n\u00bb  Atque hinc coeligen\u00e6 v"
+        },
+        {
+          "position": 5,
+          "strength": 0.00325775146484375,
+          "text": "ittite curas\n\u00ab  \u00bbAtque hinc coeligen\u00e6 vires"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "principia"
+    },
+    {
+      "feature_idx": 17336,
+      "label": "Multiple choice answer options formatting",
+      "variance": 4.320119444400916e-07,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 544,
+          "strength": 0.0033016204833984375,
+          "text": "ying Dhritirashtra's sinful son.\"\u00ab\n\n\u00bb  Thus, by Arjuna prayed, (O"
+        },
+        {
+          "position": 399,
+          "strength": 0.0029888153076171875,
+          "text": ". directional selection.\nB. stabilizing selection.\u00ab\n\u00bbC. sexual selection.\nD. disruptive"
+        },
+        {
+          "position": 598,
+          "strength": 0.0028591156005859375,
+          "text": " led,and Drona,and their Lords.\u00ab\n\u00bb  \"See!\" spake he to Arjuna,"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "gita"
+    },
+    {
+      "feature_idx": 7083,
+      "label": "Ancient epic poetry and classical literature",
+      "variance": 4.2956850165865035e-07,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 638,
+          "strength": 0.002826690673828125,
+          "text": " on each hand the kinsmen of his house,\u00ab\n\u00bb  Grandsires and sires, uncles"
+        },
+        {
+          "position": 381,
+          "strength": 0.002765655517578125,
+          "text": " obtain nutrients and survive to pass along their genetic information\u00ab.\u00bb This is an example of\nA. directional"
+        },
+        {
+          "position": 399,
+          "strength": 0.002681732177734375,
+          "text": ". directional selection.\nB. stabilizing selection.\u00ab\n\u00bbC. sexual selection.\nD. disruptive"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "gita"
+    },
+    {
+      "feature_idx": 14775,
+      "label": "Multiple choice answer options formatting",
+      "variance": 4.2765029206748295e-07,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 385,
+          "strength": 0.0028362274169921875,
+          "text": " to pass along their genetic information. This is an\u00ab example\u00bb of\nA. directional selection.\nB"
+        },
+        {
+          "position": 400,
+          "strength": 0.002681732177734375,
+          "text": " directional selection.\nB. stabilizing selection.\n\u00abC\u00bb. sexual selection.\nD. disruptive selection"
+        },
+        {
+          "position": 383,
+          "strength": 0.0026035308837890625,
+          "text": " and survive to pass along their genetic information. This\u00ab is\u00bb an example of\nA. directional selection."
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "genetics_q"
+    },
+    {
+      "feature_idx": 16018,
+      "label": "Latin text with special characters and diacritics",
+      "variance": 4.242069167048612e-07,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 138,
+          "strength": 0.00211334228515625,
+          "text": "are sonos, oculisque exponere Voces\u00ab;\u00bb\n  Humanam sortem minus extulit"
+        },
+        {
+          "position": 186,
+          "strength": 0.0020427703857421875,
+          "text": "timur, alti\n  Jura poli tracta\u00abre\u00bb licet, jamque abdita coec"
+        },
+        {
+          "position": 205,
+          "strength": 0.0020351409912109375,
+          "text": "ec\u00e6\n  Claustra patent Terr\u00e6 rerum\u00abque\u00bb immobilis ordo,\n  Et"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "principia"
+    },
+    {
+      "feature_idx": 10357,
+      "label": "Asterisk or decorative line break formatting",
+      "variance": 4.1315254861729045e-07,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 0,
+          "strength": 0.004177093505859375,
+          "text": "\u00abit\u00bbtite curas\n  Atque hinc"
+        },
+        {
+          "position": 1,
+          "strength": 0.00388336181640625,
+          "text": "it\u00abtite\u00bb curas\n  Atque hinc coe"
+        },
+        {
+          "position": 4,
+          "strength": 0.003673553466796875,
+          "text": "ittite curas\u00ab\n\u00bb  Atque hinc coeligen\u00e6 v"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "principia"
+    },
+    {
+      "feature_idx": 17934,
+      "label": "Typographical separators and section breaks",
+      "variance": 4.094882513072662e-07,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 4,
+          "strength": 0.002864837646484375,
+          "text": "ittite curas\u00ab\n\u00bb  Atque hinc coeligen\u00e6 v"
+        },
+        {
+          "position": 0,
+          "strength": 0.002819061279296875,
+          "text": "\u00abit\u00bbtite curas\n  Atque hinc"
+        },
+        {
+          "position": 5,
+          "strength": 0.002758026123046875,
+          "text": "ittite curas\n\u00ab  \u00bbAtque hinc coeligen\u00e6 vires"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "principia"
+    },
+    {
+      "feature_idx": 1293,
+      "label": "Typographical ornaments and section breaks",
+      "variance": 4.0910271081884275e-07,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1,
+          "strength": 0.0031375885009765625,
+          "text": "it\u00abtite\u00bb curas\n  Atque hinc coe"
+        },
+        {
+          "position": 0,
+          "strength": 0.003009796142578125,
+          "text": "\u00abit\u00bbtite curas\n  Atque hinc"
+        },
+        {
+          "position": 4,
+          "strength": 0.0029506683349609375,
+          "text": "ittite curas\u00ab\n\u00bb  Atque hinc coeligen\u00e6 v"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "principia"
+    },
+    {
+      "feature_idx": 10640,
+      "label": "Multiple choice answer letter indicators",
+      "variance": 4.0701041825741413e-07,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 638,
+          "strength": 0.0027828216552734375,
+          "text": " on each hand the kinsmen of his house,\u00ab\n\u00bb  Grandsires and sires, uncles"
+        },
+        {
+          "position": 382,
+          "strength": 0.0025463104248046875,
+          "text": " nutrients and survive to pass along their genetic information.\u00ab This\u00bb is an example of\nA. directional selection"
+        },
+        {
+          "position": 598,
+          "strength": 0.0025177001953125,
+          "text": " led,and Drona,and their Lords.\u00ab\n\u00bb  \"See!\" spake he to Arjuna,"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      },
+      "peak_passage": "genetics_q"
+    },
+    {
+      "feature_idx": 8056,
+      "label": "Family relationship enumeration in poetry",
+      "variance": 3.9943637375472463e-07,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 658,
+          "strength": 0.0028018951416015625,
+          "text": " and brothers and sons,\n  Cousins and\u00ab sons\u00bb-in-law and nephews, mixed\n"
+        },
+        {
+          "position": 672,
+          "strength": 0.002468109130859375,
+          "text": "law and nephews, mixed\n  With friends and\u00ab honoured\u00bb elders; some this side,\n  Some"
+        },
+        {
+          "position": 660,
+          "strength": 0.00244140625,
+          "text": " and sons,\n  Cousins and sons-\u00abin\u00bb-law and nephews, mixed\n  With"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      },
+      "peak_passage": "gita"
+    }
+  ],
+  "passages": [
+    "principia",
+    "genetics_q",
+    "gita"
+  ],
+  "top_feat_indices_var": [
+    12150,
+    6710,
+    5742,
+    268,
+    11376,
+    5622,
+    3168,
+    6609,
+    8418,
+    17670,
+    6635,
+    12777,
+    1507,
+    9295,
+    18088,
+    6934,
+    359,
+    12395,
+    18191,
+    10775,
+    9848,
+    1737,
+    10520,
+    17336,
+    7083,
+    14775,
+    16018,
+    10357,
+    17934,
+    1293,
+    10640,
+    8056
+  ],
+  "top_feat_indices_pdvar": [
+    12150,
+    11376,
+    5622,
+    268,
+    16018,
+    17670,
+    6710,
+    18088,
+    8418,
+    10520,
+    10357,
+    15442,
+    8216,
+    10775,
+    8056,
+    9517,
+    12777,
+    4370,
+    10531,
+    3743,
+    13178,
+    12700,
+    6609,
+    16591,
+    17934,
+    1507,
+    1293,
+    17718,
+    8585,
+    6866,
+    10640,
+    4449
+  ],
+  "metrics": {
+    "N": 32,
+    "semantic_count": 14,
+    "semantic_fraction": 0.4375,
+    "passage_coverage_count": 3,
+    "passage_coverage_entropy": 1.0662173875546275,
+    "n_passages": 3,
+    "judge_disagreement_rate": 0.03125,
+    "semantic_count_pdvar_overlap": 6,
+    "pdvar_var_overlap_count": 19
+  }
+}

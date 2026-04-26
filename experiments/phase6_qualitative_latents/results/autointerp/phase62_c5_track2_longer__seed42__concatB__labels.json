@@ -1047,6 +1047,213 @@
     "n_passages": 4,
     "judge_disagreement_rate": 0.03125,
     "semantic_count_pdvar_overlap": 10,
-    "pdvar_var_overlap_count": 25
-  }
+    "pdvar_var_overlap_count": 25,
+    "semantic_count_pdvar": 15,
+    "pdvar_new_labels_count": 7
+  },
+  "pdvar_only_features": [
+    {
+      "feature_idx": 14810,
+      "label": "natural selection and evolution concepts",
+      "variance": 66.04316711425781,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 10,
+          "strength": 64.125,
+          "text": "In a population of giraffes, an environmental change\u00ab occurs\u00bb that favors individuals that are tallest. As a"
+        },
+        {
+          "position": 9,
+          "strength": 61.8125,
+          "text": "In a population of giraffes, an environmental\u00ab change\u00bb occurs that favors individuals that are tallest. As"
+        },
+        {
+          "position": 12,
+          "strength": 60.1875,
+          "text": " population of giraffes, an environmental change occurs that\u00ab favors\u00bb individuals that are tallest. As a result,"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 2905,
+      "label": "Geometric transformation and coordinate reflection problems",
+      "variance": 81.61976623535156,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1017,
+          "strength": 39.90625,
+          "text": " y = x to get a new pentagon,\u00ab P\u00bb\u2019, then one of the vertices of P\u2019"
+        },
+        {
+          "position": 593,
+          "strength": 39.34375,
+          "text": " when Russia lived under the Marxist\u2013Leninist ideology\u00ab of\u00bb Joseph Stalin. Orwell, a democratic socialist,"
+        },
+        {
+          "position": 1015,
+          "strength": 37.5,
+          "text": " the line y = x to get a new pen\u00abtagon\u00bb, P\u2019, then one of the vertices of"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 2191,
+      "label": "Historical context about Orwell's Animal Farm",
+      "variance": 60.97587966918945,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 644,
+          "strength": 29.265625,
+          "text": " POUM and Stalinist forces, during the Spanish\u00ab Civil\u00bb War. In a letter to Yvonne Davet"
+        },
+        {
+          "position": 643,
+          "strength": 28.265625,
+          "text": " the POUM and Stalinist forces, during the\u00ab Spanish\u00bb Civil War. In a letter to Yvonne Dav"
+        },
+        {
+          "position": 924,
+          "strength": 27.84375,
+          "text": " its publication. It became a great commercial success when\u00ab it\u00bb did appear, as international relations and public opinion"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 1993,
+      "label": "Punctuation and formatting in structured text",
+      "variance": 89.90303039550781,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 645,
+          "strength": 49.84375,
+          "text": "UM and Stalinist forces, during the Spanish Civil\u00ab War\u00bb. In a letter to Yvonne Davet ("
+        },
+        {
+          "position": 1047,
+          "strength": 47.78125,
+          "text": ")\nB. (4, 1)\u00ab\n\u00bbC. (2, 2)\n"
+        },
+        {
+          "position": 834,
+          "strength": 46.9375,
+          "text": ", Union des r\u00e9publiques socialistes sovi\u00e9tiques\u00ab.\u00bb\nOrwell wrote the book between November "
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      }
+    },
+    {
+      "feature_idx": 13893,
+      "label": "historical correspondence and personal acknowledgments",
+      "variance": 76.32086181640625,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 325,
+          "strength": 30.421875,
+          "text": " the letters of\nseveral years, in order that\u00ab he\u00bb might make use of the liberated \"spits"
+        },
+        {
+          "position": 450,
+          "strength": 30.015625,
+          "text": " in the course of my work.\nTo some\u00ab I\u00bb am indebted for reminiscences of my father,"
+        },
+        {
+          "position": 149,
+          "strength": 29.828125,
+          "text": " supplying a frame-work of facts round which\n\u00abletters\u00bb may be grouped. It is unfortunately written with"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 16134,
+      "label": "Prepositions and conjunctions in formal prose",
+      "variance": 62.65026092529297,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 197,
+          "strength": 28.71875,
+          "text": " events of his life, together\nwith entries as\u00ab to\u00bb his work, and as to the duration of"
+        },
+        {
+          "position": 200,
+          "strength": 28.5625,
+          "text": " life, together\nwith entries as to his work\u00ab,\u00bb and as to the duration of his more serious"
+        },
+        {
+          "position": 201,
+          "strength": 28.453125,
+          "text": ", together\nwith entries as to his work,\u00ab and\u00bb as to the duration of his more serious\n"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      }
+    },
+    {
+      "feature_idx": 17066,
+      "label": "Historical context markers in literary analysis",
+      "variance": 117.98652648925781,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 118,
+          "strength": 96.3125,
+          "text": "rendering which would unfairly exaggerate their effect.\n\nThe\u00ab Diary\u00bb or Pocket-book, from which quotations occur"
+        },
+        {
+          "position": 1000,
+          "strength": 95.6875,
+          "text": "2, 4), and (3, \u00ab0\u00bb) is reflected across the line y = x"
+        },
+        {
+          "position": 354,
+          "strength": 92.5,
+          "text": ", destroyed nearly all letters\nreceived before 1\u00ab8\u00bb62. After that date he was persuaded"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    }
+  ]
 }

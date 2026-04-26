@@ -1046,6 +1046,387 @@
     "n_passages": 3,
     "judge_disagreement_rate": 0.03125,
     "semantic_count_pdvar_overlap": 12,
-    "pdvar_var_overlap_count": 19
-  }
+    "pdvar_var_overlap_count": 19,
+    "semantic_count_pdvar": 21,
+    "pdvar_new_labels_count": 13
+  },
+  "pdvar_only_features": [
+    {
+      "feature_idx": 2495,
+      "label": "natural selection and survival advantages",
+      "variance": 52.94671630859375,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 373,
+          "strength": 39.5625,
+          "text": " more of the taller individuals are able to obtain nutrients\u00ab and\u00bb survive to pass along their genetic information. This"
+        },
+        {
+          "position": 370,
+          "strength": 39.5,
+          "text": " a result, more of the taller individuals are able\u00ab to\u00bb obtain nutrients and survive to pass along their genetic"
+        },
+        {
+          "position": 372,
+          "strength": 39.125,
+          "text": ", more of the taller individuals are able to obtain\u00ab nutrients\u00bb and survive to pass along their genetic information."
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 7770,
+      "label": "Natural selection and survival mechanisms",
+      "variance": 94.93902587890625,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 379,
+          "strength": 55.9375,
+          "text": " able to obtain nutrients and survive to pass along their\u00ab genetic\u00bb information. This is an example of\nA"
+        },
+        {
+          "position": 378,
+          "strength": 55.125,
+          "text": " are able to obtain nutrients and survive to pass along\u00ab their\u00bb genetic information. This is an example of\n"
+        },
+        {
+          "position": 366,
+          "strength": 52.09375,
+          "text": " are tallest. As a result, more of the\u00ab taller\u00bb individuals are able to obtain nutrients and survive to"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 7238,
+      "label": "Latin text with author attributions",
+      "variance": 111.07119750976562,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 334,
+          "strength": 40.15625,
+          "text": "_EDM. HALLEY._\n\n       *       \u00ab*\u00bb       *       *       *In a population"
+        },
+        {
+          "position": 333,
+          "strength": 36.8125,
+          "text": "                  _EDM. HALLEY._\n\n       *\u00ab       \u00bb*       *       *       *In a"
+        },
+        {
+          "position": 266,
+          "strength": 36.28125,
+          "text": "\n  _NEWTONVM_ clausi res\u00aberan\u00bbtem scrinia Veri,\n  "
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 7191,
+      "label": "Multiple choice answer options formatting",
+      "variance": 57.12856674194336,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 31,
+          "strength": 39.28125,
+          "text": "  A pecudum vita longe lateque remot\u00ab\u00e6\u00bb.\n  Qui scriptis jussit"
+        },
+        {
+          "position": 35,
+          "strength": 39.25,
+          "text": "um vita longe lateque remot\u00e6.\n  \u00abQui\u00bb scriptis jussit Tabulis compes"
+        },
+        {
+          "position": 393,
+          "strength": 35.5625,
+          "text": " is an example of\nA. directional selection.\u00ab\n\u00bbB. stabilizing selection.\nC. sexual"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      }
+    },
+    {
+      "feature_idx": 6418,
+      "label": "Epic poetry from the Bhagavad Gita",
+      "variance": 82.8640365600586,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 629,
+          "strength": 32.5,
+          "text": " Kurus:\" and the Prince\n  Marked on\u00ab each\u00bb hand the kinsmen of his house,\n"
+        },
+        {
+          "position": 579,
+          "strength": 32.25,
+          "text": "Drove the bright car, reining its milk\u00ab-\u00bbwhite steeds\n  Where Bhishma led"
+        },
+        {
+          "position": 578,
+          "strength": 31.734375,
+          "text": "  Drove the bright car, reining its\u00ab milk\u00bb-white steeds\n  Where Bhishma"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 14480,
+      "label": "archaic poetic dialogue and narrative",
+      "variance": 60.4102897644043,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 481,
+          "strength": 33.0,
+          "text": "! to yonder open ground\n  Betwixt the\u00ab armies\u00bb; I would see more nigh\n  These"
+        },
+        {
+          "position": 625,
+          "strength": 32.78125,
+          "text": "Thy kindred of the Kurus:\" and the Prince\u00ab\n\u00bb  Marked on each hand the kinsmen of"
+        },
+        {
+          "position": 482,
+          "strength": 32.4375,
+          "text": " to yonder open ground\n  Betwixt the armies\u00ab;\u00bb I would see more nigh\n  These who"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 361,
+      "label": "Latin text with diacritical marks",
+      "variance": 105.16851043701172,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 4,
+          "strength": 49.09375,
+          "text": "ittite curas\u00ab\n\u00bb  Atque hinc coeligen\u00e6 v"
+        },
+        {
+          "position": 5,
+          "strength": 48.6875,
+          "text": "ittite curas\n\u00ab  \u00bbAtque hinc coeligen\u00e6 vires"
+        },
+        {
+          "position": 3,
+          "strength": 46.625,
+          "text": "ittite cu\u00abras\u00bb\n  Atque hinc coeligen\u00e6"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      }
+    },
+    {
+      "feature_idx": 8913,
+      "label": "Latin poetry with diacritical marks",
+      "variance": 64.56884765625,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 191,
+          "strength": 30.140625,
+          "text": "  Jura poli tractare licet, jam\u00abque\u00bb abdita coec\u00e6\n  Claustra"
+        },
+        {
+          "position": 190,
+          "strength": 30.078125,
+          "text": "\n  Jura poli tractare licet,\u00ab jam\u00bbque abdita coec\u00e6\n  Cla"
+        },
+        {
+          "position": 234,
+          "strength": 28.71875,
+          "text": " mundi.\n\n  Talia monstrantem\u00ab me\u00bbcum celebrate Cam\u00e6nis,\n  Vos"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 15415,
+      "label": "genetic information passing and natural selection",
+      "variance": 37.00495147705078,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 380,
+          "strength": 27.078125,
+          "text": " to obtain nutrients and survive to pass along their genetic\u00ab information\u00bb. This is an example of\nA."
+        },
+        {
+          "position": 381,
+          "strength": 26.140625,
+          "text": " obtain nutrients and survive to pass along their genetic information\u00ab.\u00bb This is an example of\nA. directional"
+        },
+        {
+          "position": 385,
+          "strength": 25.421875,
+          "text": " to pass along their genetic information. This is an\u00ab example\u00bb of\nA. directional selection.\nB"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 8884,
+      "label": "Latin and English poetic text transitions",
+      "variance": 36.75961685180664,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 509,
+          "strength": 44.125,
+          "text": " must slay\n  To-day, in war\u00ab'\u00bbs arbitrament; for, sure,\n"
+        },
+        {
+          "position": 33,
+          "strength": 33.375,
+          "text": " pecudum vita longe lateque remot\u00e6.\u00ab\n\u00bb  Qui scriptis jussit Tabulis"
+        },
+        {
+          "position": 95,
+          "strength": 26.71875,
+          "text": "; Cererisve beavit munere gentes;\u00ab\n\u00bb  Vel qui curarum lenimen pressit"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 5274,
+      "label": "Latin text with word boundaries marked",
+      "variance": 62.31396484375,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 45,
+          "strength": 31.875,
+          "text": "Qui scriptis jussit Tabulis compes\u00abcere\u00bb C\u00e6des\n  Furta & Adulter"
+        },
+        {
+          "position": 413,
+          "strength": 31.09375,
+          "text": " selection.\nD. disruptive selection. set,\u00ab\n\u00bb  Weapons unsheathing, bows drawn forth"
+        },
+        {
+          "position": 414,
+          "strength": 30.75,
+          "text": ".\nD. disruptive selection. set,\n\u00ab  \u00bbWeapons unsheathing, bows drawn forth,"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      }
+    },
+    {
+      "feature_idx": 4744,
+      "label": "Bhagavad Gita poetic verse language",
+      "variance": 42.53798294067383,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 562,
+          "strength": 26.65625,
+          "text": " (O Bharata!)\n  Between the hosts\u00ab that\u00bb heavenly Charioteer\n  Drove the"
+        },
+        {
+          "position": 560,
+          "strength": 26.484375,
+          "text": " prayed, (O Bharata!)\n  Between\u00ab the\u00bb hosts that heavenly Charioteer\n  Dro"
+        },
+        {
+          "position": 726,
+          "strength": 26.4375,
+          "text": ":\n\n  Arjuna.\n  Krishna!\u00ab as\u00bb I behold, come here to shed\n  "
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 16301,
+      "label": "Punctuation and formatting marks in text",
+      "variance": 28.951976776123047,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 326,
+          "strength": 21.828125,
+          "text": " attingere Divos.\n\n                  _EDM\u00ab.\u00bb HALLEY._\n\n       *       *       "
+        },
+        {
+          "position": 327,
+          "strength": 21.5625,
+          "text": "tingere Divos.\n\n                  _EDM.\u00ab HAL\u00bbLEY._\n\n       *       *       *"
+        },
+        {
+          "position": 471,
+          "strength": 21.0625,
+          "text": ":\n  \"Drive, Dauntless One\u00ab!\u00bb to yonder open ground\n  Betwixt the"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      }
+    }
+  ]
 }

@@ -1046,6 +1046,300 @@
     "n_passages": 3,
     "judge_disagreement_rate": 0.0,
     "semantic_count_pdvar_overlap": 11,
-    "pdvar_var_overlap_count": 22
-  }
+    "pdvar_var_overlap_count": 22,
+    "semantic_count_pdvar": 19,
+    "pdvar_new_labels_count": 10
+  },
+  "pdvar_only_features": [
+    {
+      "feature_idx": 16936,
+      "label": "natural selection and evolutionary advantage",
+      "variance": 63.921226501464844,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 372,
+          "strength": 42.5625,
+          "text": ", more of the taller individuals are able to obtain\u00ab nutrients\u00bb and survive to pass along their genetic information."
+        },
+        {
+          "position": 373,
+          "strength": 42.40625,
+          "text": " more of the taller individuals are able to obtain nutrients\u00ab and\u00bb survive to pass along their genetic information. This"
+        },
+        {
+          "position": 375,
+          "strength": 38.90625,
+          "text": " the taller individuals are able to obtain nutrients and survive\u00ab to\u00bb pass along their genetic information. This is an"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 13893,
+      "label": "Poetic language about warfare and battle",
+      "variance": 92.57550811767578,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 523,
+          "strength": 37.21875,
+          "text": "; for, sure,\n  On bloodshed all\u00ab are\u00bb bent who throng this plain,\n  O"
+        },
+        {
+          "position": 522,
+          "strength": 37.09375,
+          "text": "rament; for, sure,\n  On bloodshed\u00ab all\u00bb are bent who throng this plain,\n  "
+        },
+        {
+          "position": 506,
+          "strength": 35.75,
+          "text": ", those we must slay\n  To-day\u00ab,\u00bb in war's arbitrament; for,"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 8001,
+      "label": "natural selection and genetic inheritance explanation",
+      "variance": 55.66648483276367,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 378,
+          "strength": 54.09375,
+          "text": " are able to obtain nutrients and survive to pass along\u00ab their\u00bb genetic information. This is an example of\n"
+        },
+        {
+          "position": 379,
+          "strength": 53.875,
+          "text": " able to obtain nutrients and survive to pass along their\u00ab genetic\u00bb information. This is an example of\nA"
+        },
+        {
+          "position": 377,
+          "strength": 52.53125,
+          "text": " individuals are able to obtain nutrients and survive to pass\u00ab along\u00bb their genetic information. This is an example of"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 14810,
+      "label": "Latin text with diacritical marks",
+      "variance": 94.10604095458984,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 4,
+          "strength": 52.15625,
+          "text": "ittite curas\u00ab\n\u00bb  Atque hinc coeligen\u00e6 v"
+        },
+        {
+          "position": 3,
+          "strength": 50.59375,
+          "text": "ittite cu\u00abras\u00bb\n  Atque hinc coeligen\u00e6"
+        },
+        {
+          "position": 5,
+          "strength": 48.71875,
+          "text": "ittite curas\n\u00ab  \u00bbAtque hinc coeligen\u00e6 vires"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      }
+    },
+    {
+      "feature_idx": 669,
+      "label": "natural selection and evolution explanation",
+      "variance": 24.514301300048828,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 354,
+          "strength": 30.328125,
+          "text": " of giraffes, an environmental change occurs that favors\u00ab individuals\u00bb that are tallest. As a result, more"
+        },
+        {
+          "position": 355,
+          "strength": 30.078125,
+          "text": " giraffes, an environmental change occurs that favors individuals\u00ab that\u00bb are tallest. As a result, more of"
+        },
+        {
+          "position": 353,
+          "strength": 27.640625,
+          "text": " population of giraffes, an environmental change occurs that\u00ab favors\u00bb individuals that are tallest. As a result,"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 14566,
+      "label": "natural selection and evolution explanation",
+      "variance": 25.552806854248047,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 353,
+          "strength": 23.203125,
+          "text": " population of giraffes, an environmental change occurs that\u00ab favors\u00bb individuals that are tallest. As a result,"
+        },
+        {
+          "position": 352,
+          "strength": 21.484375,
+          "text": " a population of giraffes, an environmental change occurs\u00ab that\u00bb favors individuals that are tallest. As a result"
+        },
+        {
+          "position": 362,
+          "strength": 21.21875,
+          "text": " that favors individuals that are tallest. As a result\u00ab,\u00bb more of the taller individuals are able to obtain"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 8770,
+      "label": "Latin text with moral or legal terminology",
+      "variance": 45.0926399230957,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 51,
+          "strength": 34.0625,
+          "text": " Tabulis compescere C\u00e6des\n  Fur\u00abta\u00bb & Adulteria, & perjur\u00e6"
+        },
+        {
+          "position": 52,
+          "strength": 33.25,
+          "text": "ulis compescere C\u00e6des\n  Furta\u00ab &\u00bb Adulteria, & perjur\u00e6 cri"
+        },
+        {
+          "position": 54,
+          "strength": 33.0,
+          "text": "escere C\u00e6des\n  Furta & Ad\u00abulter\u00bbia, & perjur\u00e6 crimina Fraud"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 13670,
+      "label": "Latin text with diacritical marks",
+      "variance": 73.6927719116211,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 133,
+          "strength": 34.40625,
+          "text": "tos\n  Consociare sonos, ocul\u00abisque\u00bb exponere Voces;\n  Humanam"
+        },
+        {
+          "position": 143,
+          "strength": 33.71875,
+          "text": "isque exponere Voces;\n  Humanam\u00ab sor\u00bbtem minus extulit; utpote pauca"
+        },
+        {
+          "position": 204,
+          "strength": 33.125,
+          "text": " coec\u00e6\n  Claustra patent Terr\u00e6\u00ab rerum\u00bbque immobilis ordo,\n  "
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      }
+    },
+    {
+      "feature_idx": 17302,
+      "label": "Bhagavad Gita poetic verse language",
+      "variance": 99.70298767089844,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 484,
+          "strength": 41.46875,
+          "text": " open ground\n  Betwixt the armies; I\u00ab would\u00bb see more nigh\n  These who will fight"
+        },
+        {
+          "position": 479,
+          "strength": 40.28125,
+          "text": "less One! to yonder open ground\n  Bet\u00abwixt\u00bb the armies; I would see more nigh\n"
+        },
+        {
+          "position": 560,
+          "strength": 38.0625,
+          "text": " prayed, (O Bharata!)\n  Between\u00ab the\u00bb hosts that heavenly Charioteer\n  Dro"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 3677,
+      "label": "directional selection in giraffe populations",
+      "variance": 19.513450622558594,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 398,
+          "strength": 23.03125,
+          "text": "A. directional selection.\nB. stabilizing selection\u00ab.\u00bb\nC. sexual selection.\nD."
+        },
+        {
+          "position": 353,
+          "strength": 21.9375,
+          "text": " population of giraffes, an environmental change occurs that\u00ab favors\u00bb individuals that are tallest. As a result,"
+        },
+        {
+          "position": 352,
+          "strength": 21.734375,
+          "text": " a population of giraffes, an environmental change occurs\u00ab that\u00bb favors individuals that are tallest. As a result"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    }
+  ]
 }

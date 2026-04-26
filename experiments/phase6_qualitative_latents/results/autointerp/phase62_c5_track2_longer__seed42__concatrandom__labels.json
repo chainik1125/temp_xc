@@ -1050,6 +1050,242 @@
     "n_passages": 7,
     "judge_disagreement_rate": 0.3125,
     "semantic_count_pdvar_overlap": 4,
-    "pdvar_var_overlap_count": 24
-  }
+    "pdvar_var_overlap_count": 24,
+    "semantic_count_pdvar": 7,
+    "pdvar_new_labels_count": 8
+  },
+  "pdvar_only_features": [
+    {
+      "feature_idx": 5905,
+      "label": "corporate response to regulatory or legal challenges",
+      "variance": 190.90994262695312,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 102,
+          "strength": 59.5625,
+          "text": " (2009). Titan Tire timely contested\u00ab\n\u00bbone of the citations. The company later attempted"
+        },
+        {
+          "position": 112,
+          "strength": 58.34375,
+          "text": "\none of the citations. The company later attempted\u00ab to\u00bb challenge the second citation by ...\n... to"
+        },
+        {
+          "position": 1350,
+          "strength": 57.71875,
+          "text": " the market. Before affecting more people, the company\u00ab has\u00bb advised everyone with this particular phone to return it"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 3151,
+      "label": "Beginning of new sentence or paragraph markers",
+      "variance": 230.61512756347656,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 2,
+          "strength": 122.3125,
+          "text": "<bos>Lawyer\u00ab.\u00bbcom makes finding Montpelier Lawyers fast and easy"
+        },
+        {
+          "position": 1,
+          "strength": 119.3125,
+          "text": "<bos>\u00abLawyer\u00bb.com makes finding Montpelier Lawyers fast and"
+        },
+        {
+          "position": 514,
+          "strength": 105.5,
+          "text": " the moment I wake up I\u2019m<bos>Christina\u00ab Aguilera\u00bb hasn't dropped a proper album since "
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      }
+    },
+    {
+      "feature_idx": 7018,
+      "label": "Beginning of sentence or new text segment",
+      "variance": 304.7958984375,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 2,
+          "strength": 225.0,
+          "text": "<bos>Lawyer\u00ab.\u00bbcom makes finding Montpelier Lawyers fast and easy"
+        },
+        {
+          "position": 1583,
+          "strength": 192.125,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><bos>Listen\u00ab to\u00bb En Athma Nesa online. En Ath"
+        },
+        {
+          "position": 0,
+          "strength": 189.875,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      }
+    },
+    {
+      "feature_idx": 13674,
+      "label": "Beginning of sequence markers and transitions",
+      "variance": 413.2459411621094,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 2,
+          "strength": 149.25,
+          "text": "<bos>Lawyer\u00ab.\u00bbcom makes finding Montpelier Lawyers fast and easy"
+        },
+        {
+          "position": 382,
+          "strength": 142.0,
+          "text": " Grace. Prior to that, he played the young\u00ab version\u00bb of<bos>I\u2019ve been a little down"
+        },
+        {
+          "position": 0,
+          "strength": 138.625,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SEMANTIC",
+        "agree": false,
+        "verdict": "SYNTACTIC"
+      }
+    },
+    {
+      "feature_idx": 2905,
+      "label": "professional development and healthcare assessment",
+      "variance": 87.9942855834961,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1088,
+          "strength": 42.78125,
+          "text": ". We believe that continued professional development of physicians and\u00ab other\u00bb healthcare providers can be enhanced through repeated, highly"
+        },
+        {
+          "position": 1100,
+          "strength": 42.125,
+          "text": " providers can be enhanced through repeated, highly precise quantitative\u00ab needs\u00bb assessments. These needs assessments lead to the development"
+        },
+        {
+          "position": 1101,
+          "strength": 42.0,
+          "text": " can be enhanced through repeated, highly precise quantitative needs\u00ab assessments\u00bb. These needs assessments lead to the development of"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 1993,
+      "label": "Song titles and artist collaborations in music",
+      "variance": 128.6519775390625,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 597,
+          "strength": 63.4375,
+          "text": " produced Daft Punk's mega-hit \"\u00abGet\u00bb Lucky.\" Unsurprisingly, \"Telepathy"
+        },
+        {
+          "position": 565,
+          "strength": 61.84375,
+          "text": " nightclub shooting.\nAustralian pop star Sia wrote \"\u00abTele\u00bbpathy\"; joining Aguilera on the track is the"
+        },
+        {
+          "position": 598,
+          "strength": 60.34375,
+          "text": " Daft Punk's mega-hit \"Get\u00ab Lucky\u00bb.\" Unsurprisingly, \"Telepathy\""
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 5711,
+      "label": "Common words in transitional or connecting phrases",
+      "variance": 46.286659240722656,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 4,
+          "strength": 39.34375,
+          "text": "<bos>Lawyer.com\u00ab makes\u00bb finding Montpelier Lawyers fast and easy. Ref"
+        },
+        {
+          "position": 5,
+          "strength": 37.3125,
+          "text": "<bos>Lawyer.com makes\u00ab finding\u00bb Montpelier Lawyers fast and easy. Refine"
+        },
+        {
+          "position": 6,
+          "strength": 36.1875,
+          "text": "<bos>Lawyer.com makes finding\u00ab Mont\u00bbpelier Lawyers fast and easy. Refine your"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SEMANTIC",
+        "agree": false,
+        "verdict": "SYNTACTIC"
+      }
+    },
+    {
+      "feature_idx": 14566,
+      "label": "Capitalized words at sentence or section starts",
+      "variance": 147.0149383544922,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 0,
+          "strength": 141.25,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        },
+        {
+          "position": 1,
+          "strength": 128.75,
+          "text": "<bos>\u00abLawyer\u00bb.com makes finding Montpelier Lawyers fast and"
+        },
+        {
+          "position": 257,
+          "strength": 83.375,
+          "text": " the measured Intensity Scales for the Tablets alongside the<bos>\u00abMostly\u00bb Credited As: Dylan Minnette\nBirth"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      }
+    }
+  ]
 }

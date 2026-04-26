@@ -1050,6 +1050,271 @@
     "n_passages": 7,
     "judge_disagreement_rate": 0.15625,
     "semantic_count_pdvar_overlap": 3,
-    "pdvar_var_overlap_count": 23
-  }
+    "pdvar_var_overlap_count": 23,
+    "semantic_count_pdvar": 6,
+    "pdvar_new_labels_count": 9
+  },
+  "pdvar_only_features": [
+    {
+      "feature_idx": 1667,
+      "label": "Transition words and discourse markers",
+      "variance": 307.98333740234375,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1396,
+          "strength": 93.0,
+          "text": "\nThe statement of Samsung on the matter goes as\u00ab follows\u00bb: \u201cTo date (as of September "
+        },
+        {
+          "position": 1395,
+          "strength": 91.1875,
+          "text": ".\nThe statement of Samsung on the matter goes\u00ab as\u00bb follows: \u201cTo date (as of September"
+        },
+        {
+          "position": 1138,
+          "strength": 90.5,
+          "text": " ACCME and its overall medical education effectiveness is further\u00ab measured\u00bb by assessing cme2's adherence and"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SEMANTIC",
+        "agree": false,
+        "verdict": "SYNTACTIC"
+      }
+    },
+    {
+      "feature_idx": 3682,
+      "label": "disco music and dance culture references",
+      "variance": 124.31620788574219,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 579,
+          "strength": 55.03125,
+          "text": " Aguilera on the track is the historically great bass player\u00ab and\u00bb record producer Nile Rodgers, who recently produced Da"
+        },
+        {
+          "position": 625,
+          "strength": 53.84375,
+          "text": ". easy to listen to, easy to dance to\u00ab,\u00bb a disco ball, shimmering, illuminating a room"
+        },
+        {
+          "position": 624,
+          "strength": 52.65625,
+          "text": " mode. easy to listen to, easy to dance\u00ab to\u00bb, a disco ball, shimmering, illuminating a"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 669,
+      "label": "Text boundaries and document structure markers",
+      "variance": 320.4169921875,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1022,
+          "strength": 177.25,
+          "text": " even in graduate school.\nKindly note that I\u00ab have\u00bb not<bos>June 01, 2"
+        },
+        {
+          "position": 1150,
+          "strength": 173.625,
+          "text": " assessing cme2's adherence and compliance with\u00ab the\u00bb latest<bos>The Best Services Done By Professional Window"
+        },
+        {
+          "position": 1406,
+          "strength": 167.125,
+          "text": " follows: \u201cTo date (as of September \u00ab1\u00bb)<bos>New Mixtape: T-Shy"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      }
+    },
+    {
+      "feature_idx": 3055,
+      "label": "Beginning of new sentence or text segment",
+      "variance": 360.5544738769531,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 384,
+          "strength": 126.875,
+          "text": " Prior to that, he played the young version of\u00ab<bos>\u00bbI\u2019ve been a little down recently and"
+        },
+        {
+          "position": 1581,
+          "strength": 119.5625,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<bos>\u00bbListen to En Athma Nesa online."
+        },
+        {
+          "position": 1280,
+          "strength": 116.9375,
+          "text": "fty or cold, and will let in light,\u00ab<bos>\u00bbSamsung has made an announcement, following the terrible"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      }
+    },
+    {
+      "feature_idx": 2702,
+      "label": "Music artist and producer names",
+      "variance": 131.32081604003906,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 597,
+          "strength": 61.125,
+          "text": " produced Daft Punk's mega-hit \"\u00abGet\u00bb Lucky.\" Unsurprisingly, \"Telepathy"
+        },
+        {
+          "position": 1464,
+          "strength": 59.375,
+          "text": " plus up-and-coming talent like Habits \u2018\u00abTill\u00bb Roses spitter S\u2019Natra, Will"
+        },
+        {
+          "position": 1465,
+          "strength": 58.625,
+          "text": " up-and-coming talent like Habits \u2018Till\u00ab Roses\u00bb spitter S\u2019Natra, Will Hill"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 1856,
+      "label": "Beginning of sentence with capitalized word",
+      "variance": 249.5406036376953,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 0,
+          "strength": 161.875,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        },
+        {
+          "position": 1582,
+          "strength": 130.75,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><bos>\u00abListen\u00bb to En Athma Nesa online. En"
+        },
+        {
+          "position": 897,
+          "strength": 126.25,
+          "text": "ria in Thrace to a poor family.<bos>\u00abAttention\u00bb of Accordance Instant Details Dept:\nSomeone"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      }
+    },
+    {
+      "feature_idx": 874,
+      "label": "biographical information about Saint Nectarios",
+      "variance": 51.30506134033203,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 892,
+          "strength": 44.8125,
+          "text": ", in Selymbria in Thrace to\u00ab a\u00bb poor family.<bos>Attention of Accordance Instant"
+        },
+        {
+          "position": 870,
+          "strength": 44.75,
+          "text": " Nektarios.\nSt. Nectarios\u00ab was\u00bb born on October 1, 18"
+        },
+        {
+          "position": 791,
+          "strength": 43.09375,
+          "text": " (1846-1920\u00ab),\u00bb Metropolitan of Pentapolis and Wonderworker of Ae"
+        }
+      ],
+      "judge": {
+        "judge_1": "SEMANTIC",
+        "judge_2": "SEMANTIC",
+        "agree": true,
+        "verdict": "SEMANTIC"
+      }
+    },
+    {
+      "feature_idx": 2498,
+      "label": "Punctuation and formatting markers in text",
+      "variance": 139.26861572265625,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 1396,
+          "strength": 66.5,
+          "text": "\nThe statement of Samsung on the matter goes as\u00ab follows\u00bb: \u201cTo date (as of September "
+        },
+        {
+          "position": 1397,
+          "strength": 64.3125,
+          "text": "The statement of Samsung on the matter goes as follows\u00ab:\u00bb \u201cTo date (as of September 1"
+        },
+        {
+          "position": 1395,
+          "strength": 62.84375,
+          "text": ".\nThe statement of Samsung on the matter goes\u00ab as\u00bb follows: \u201cTo date (as of September"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      }
+    },
+    {
+      "feature_idx": 2117,
+      "label": "Beginning of sentence markers and capitalized starts",
+      "variance": 344.0852355957031,
+      "n_contexts": 10,
+      "contexts": [
+        {
+          "position": 0,
+          "strength": 163.125,
+          "text": "\u00ab<bos>\u00bbLawyer.com makes finding Montpelier Lawyers fast"
+        },
+        {
+          "position": 1580,
+          "strength": 158.375,
+          "text": "<pad><pad><pad><pad><pad><pad><pad><pad><pad><pad>\u00ab<pad>\u00bb<bos>Listen to En Athma Nesa online"
+        },
+        {
+          "position": 1,
+          "strength": 153.375,
+          "text": "<bos>\u00abLawyer\u00bb.com makes finding Montpelier Lawyers fast and"
+        }
+      ],
+      "judge": {
+        "judge_1": "SYNTACTIC",
+        "judge_2": "SYNTACTIC",
+        "agree": true,
+        "verdict": "SYNTACTIC"
+      }
+    }
+  ]
 }
