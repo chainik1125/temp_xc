@@ -286,13 +286,25 @@ git merge origin/han-phase7-unification    # OR rebase if no merge artefacts yet
 
 ### Coordination with Agents A and B
 
-- **A → C dependency**: Agent C waits for Agent A's `seed42_complete.json`
-  marker on `txcdr-base` (signals all 6 selected ckpts are uploaded).
-  Until then Agent C does Day-1 setup work.
-- **B → C dependency**: C.ii's "30 semantic features" selection benefits
-  from Agent B's autointerp labels at `txcdr-base/autointerp/<arch>/`.
-  Agent B's pipeline already runs autointerp on every arch's top-256
-  features; Agent C filters those for `label.semantic == True`.
+- **A → C dependency (per-ckpt, not seed-batch-level)**: Agent C
+  doesn't train; it just needs the specific ckpts it'll analyse to
+  exist on `han1823123123/txcdr-base`. Check status via
+  `huggingface_hub.HfApi().list_repo_files('han1823123123/txcdr-base')`.
+  As of 2026-04-26 ~11:20 UTC:
+  - **Stage 1 (all 3 archs)**: ALREADY on HF.
+    `topk_sae`, `tsae_paper_k500`, `agentic_txc_02` all pushed by
+    Agent A — Agent C can start Stage 1 immediately.
+  - **Stage 2**: 2 of 3 on HF (`mlc_contrastive_alpha100_batchtopk`,
+    `phase5b_subseq_h8`); waiting on
+    `phase57_partB_h8_bare_multidistance_t5` (Agent A's row 32,
+    expected within 6-8h of Agent A's seed=42 batch start).
+  Agent C should poll HF for the missing Stage 2 ckpt every ~30 min;
+  no need to wait on a batch-level marker.
+- **B → C dependency**: C.ii's "best feature per concept" lookup uses
+  Agent B's autointerp labels at `txcdr-base/autointerp/<arch>/`.
+  If Agent B hasn't labelled a given arch yet, C.ii falls back to
+  picking by max activation on a concept-annotated text sample
+  (slower but no dependency). Don't block on Agent B.
 - **Anthropic API budget**: Agents B (autointerp) and C.ii (steering
   grader) both burn Anthropic credit. Coordinate to avoid rate-limit
   collisions: B uses Haiku 4.5 (small), C uses Sonnet 4.6 (grader).
