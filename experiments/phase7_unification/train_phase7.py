@@ -709,17 +709,35 @@ def _push_seed_marker(seed: int, completed_arch_ids: list[str]) -> None:
 # ════════════════════════════════════════════════════════════════════
 
 
+def _train_one_with_bufs(arch: dict, seed: int, max_steps: int | None,
+                          push_to_hf: bool,
+                          buf_anchor=None, buf_multilayer=None) -> dict:
+    """Inner helper: train one arch given pre-loaded buffers. The caller
+    (run_one or run_canonical) handles buffer lifecycle so we don't pay
+    the 30s+ preload cost per arch in batch runs.
+    """
+    cfg = TrainCfg(seed=seed) if max_steps is None else TrainCfg(seed=seed, max_steps=max_steps)
+    arch_id = arch["arch_id"]
+    print(f"=== {arch_id} (row {arch['row']}, group {arch['group']}) seed={seed} ===")
+    model, log = dispatch(arch, cfg, buf_anchor=buf_anchor, buf_multilayer=buf_multilayer)
+    meta = _meta_from_arch(arch, seed)
+    run_id = f"{arch_id}__seed{seed}"
+    ckpt_path = _save_run(model, log, run_id, meta)
+    if push_to_hf:
+        _hf_push_ckpt(ckpt_path, run_id)
+    # Free model VRAM before the next arch (buffers persist across archs).
+    del model
+    torch.cuda.empty_cache()
+    return meta
+
+
 def run_one(arch_id: str, seed: int = 42, max_steps: int | None = None,
             push_to_hf: bool = True) -> dict:
-    """Train a single (arch, seed). Saves ckpt + log + index + HF push.
-    Returns the meta dict."""
+    """Train a single (arch, seed). Loads its own buffers — for one-off
+    use. For batch runs use `run_canonical` which preloads buffers once.
+    """
     canonical = load_canonical()
     arch = find_arch(canonical, arch_id)
-    cfg = TrainCfg(seed=seed)
-    if max_steps is not None:
-        cfg = TrainCfg(seed=seed, max_steps=max_steps)
-    print(f"=== {arch_id} (row {arch['row']}, group {arch['group']}) seed={seed} ===")
-
     needs_multilayer = arch["src_class"] in {
         "MultiLayerCrosscoder", "MLCContrastive", "MLCContrastiveMultiscale",
     }
@@ -729,35 +747,78 @@ def run_one(arch_id: str, seed: int = 42, max_steps: int | None = None,
         print(f"  [data] anchor preloaded: {tuple(buf_anchor.shape)}")
     else:
         print(f"  [data] multilayer preloaded: {tuple(buf_multilayer.shape)}")
-
-    model, log = dispatch(arch, cfg, buf_anchor=buf_anchor, buf_multilayer=buf_multilayer)
-    meta = _meta_from_arch(arch, seed)
-    run_id = f"{arch_id}__seed{seed}"
-    ckpt_path = _save_run(model, log, run_id, meta)
-    if push_to_hf:
-        _hf_push_ckpt(ckpt_path, run_id)
-    # Free GPU before next arch.
-    del model
-    if buf_anchor is not None: del buf_anchor
-    if buf_multilayer is not None: del buf_multilayer
-    torch.cuda.empty_cache()
-    return meta
+    try:
+        return _train_one_with_bufs(
+            arch, seed, max_steps, push_to_hf,
+            buf_anchor=buf_anchor, buf_multilayer=buf_multilayer,
+        )
+    finally:
+        if buf_anchor is not None: del buf_anchor
+        if buf_multilayer is not None: del buf_multilayer
+        torch.cuda.empty_cache()
 
 
 def run_canonical(seed: int, push_to_hf: bool = True,
-                  arch_subset: list[str] | None = None) -> list[str]:
-    """Run all canonical archs at one seed. Returns list of completed arch_ids."""
+                  arch_subset: list[str] | None = None,
+                  max_steps: int | None = None) -> list[str]:
+    """Run all canonical archs at one seed. **Preloads both anchor +
+    multilayer buffers ONCE** at the top and keeps them in GPU RAM
+    across all 49 trainings — saves ~30s × 49 = 25 min per seed batch
+    of wasted preload I/O. H200 141 GB easily holds:
+        anchor (14.2 GB) + multilayer (70.8 GB) + model (~10 GB) +
+        activations (varies) ≈ 100 GB, ~40 GB free for headroom.
+    """
     canonical = load_canonical()
     archs = canonical["archs"]
     if arch_subset:
         archs = [a for a in archs if a["arch_id"] in arch_subset]
+
+    # Determine which buffers we need (most batches need both).
+    need_anchor = any(
+        a["src_class"] not in {"MultiLayerCrosscoder", "MLCContrastive",
+                               "MLCContrastiveMultiscale"}
+        for a in archs
+    )
+    need_multilayer = any(
+        a["src_class"] in {"MultiLayerCrosscoder", "MLCContrastive",
+                           "MLCContrastiveMultiscale"}
+        for a in archs
+    )
+    print(f"=== seed={seed} batch: {len(archs)} archs ===")
+    print(f"  preloading buffers: anchor={need_anchor} multilayer={need_multilayer}")
+    t0 = time.time()
+    buf_anchor = preload_single() if need_anchor else None
+    buf_multilayer = preload_multilayer() if need_multilayer else None
+    print(f"  preload done in {time.time()-t0:.1f}s")
+    if buf_anchor is not None:
+        print(f"    anchor:     {tuple(buf_anchor.shape)} "
+              f"({buf_anchor.element_size()*buf_anchor.numel()/1e9:.1f} GB)")
+    if buf_multilayer is not None:
+        print(f"    multilayer: {tuple(buf_multilayer.shape)} "
+              f"({buf_multilayer.element_size()*buf_multilayer.numel()/1e9:.1f} GB)")
+
     completed = []
     for arch in archs:
+        arch_buf_anchor = buf_anchor if arch["src_class"] not in {
+            "MultiLayerCrosscoder", "MLCContrastive", "MLCContrastiveMultiscale"
+        } else None
+        arch_buf_multilayer = buf_multilayer if arch["src_class"] in {
+            "MultiLayerCrosscoder", "MLCContrastive", "MLCContrastiveMultiscale"
+        } else None
         try:
-            run_one(arch["arch_id"], seed=seed, push_to_hf=push_to_hf)
+            _train_one_with_bufs(
+                arch, seed, max_steps, push_to_hf,
+                buf_anchor=arch_buf_anchor, buf_multilayer=arch_buf_multilayer,
+            )
             completed.append(arch["arch_id"])
         except Exception as e:
+            import traceback as _tb
             print(f"  [skip] {arch['arch_id']} seed={seed}: {type(e).__name__}: {e}")
+            _tb.print_exc()
+    # Free shared buffers + write seed-complete marker.
+    if buf_anchor is not None: del buf_anchor
+    if buf_multilayer is not None: del buf_multilayer
+    torch.cuda.empty_cache()
     _push_seed_marker(seed, completed)
     return completed
 
