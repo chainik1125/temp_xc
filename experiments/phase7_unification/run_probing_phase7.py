@@ -466,8 +466,18 @@ def run_probing(run_ids: list[str] | None = None,
                         f"auc@5={sae_probe_metrics(Z_tr, ytr_v, Z_te, yte_v, 5)[0]:.4f} "
                         f"n_kept={Z_tr.shape[0]}/{ytr.size}"
                     )
+                # Explicit del of large per-task tensors. Python's allocator
+                # doesn't release back to OS quickly enough; the encoded
+                # z_full tensors are 27 GB train + 7 GB test per task =
+                # 34 GB. After ~5-7 tasks RSS grows past whatever invisible
+                # cgroup memory limit RunPod enforces and the process is
+                # killed by the kernel WITHOUT a dmesg entry (we don't have
+                # access to host logs). Killing without explicit del was
+                # the silent-death cause across all probe attempts.
                 del tc
-                torch.cuda.empty_cache()  # avoid GPU fragmentation across tasks
+                try: del z_train_full, z_test_full, Z_tr, Z_te, valid_tr, valid_te
+                except NameError: pass
+                torch.cuda.empty_cache()
                 gc.collect()
             del model
             torch.cuda.empty_cache(); gc.collect()
