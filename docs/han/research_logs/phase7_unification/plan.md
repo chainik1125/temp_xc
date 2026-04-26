@@ -27,13 +27,17 @@ Each agent runs on its own RunPod with persistent volume.
 
 ### How Agent A should leverage the H200 pod
 
-1. **Pre-load the full probe cache into RAM at process startup.** ~140 GB
-   total (36 tasks × ~4 GB) fits comfortably in 188 GB. Drop Phase 5's
-   streaming-per-task pattern (which was sized for ~5 GB RAM caps).
-   All 36 tasks' (acts_anchor, acts_mlc) tuples held simultaneously
+1. **Pre-load the anchor probe cache into RAM at process startup.**
+   ~80 GB total (36 tasks × ~2.2 GB anchor each) fits comfortably
+   in 188 GB. All 36 tasks' `acts_anchor` tensors held simultaneously
    in a dict; downstream loops iterate over the dict instead of
    re-loading per-task. **Saves ~50-80 hours of disk I/O across the
-   probing pass.**
+   probing pass for per-token SAE / TXC / H8 / SubseqH8 archs (46 of
+   the 49).** MLC-tail (~400 GB total) streams per-task only when
+   probing the 3 MLC archs (rows 4-6) — those iterations pay one
+   I/O hit per task. Drop Phase 5's universal streaming pattern
+   (which was sized for ~5 GB RAM caps); use the hybrid pattern
+   above instead.
 
 2. **Parallel probe fitting via joblib (12 workers).** sklearn's
    `LogisticRegression(solver="liblinear")` is single-threaded. Wrap
@@ -248,16 +252,28 @@ existing IT-trained ckpts and caches:
 - Tasks: same 36-task set as Phase 5 (8 dataset families).
 - Per-task storage:
   - `acts_anchor.npz`: train_acts, test_acts at L12, **shape
-    (N, 128, d)** — full 128-token tail.
-  - `acts_mlc.npz`: train_acts, test_acts at L10-L14. Decision: store
-    L10–L14 only at S=20 (matches Phase 5 MLC convention; recompute
-    longer tails on demand if needed). Reduces storage 5×.
+    (N, 128, d)** — full 128-token tail. Used by per-token SAE,
+    TXC family, H8, SubseqH8.
+  - `acts_mlc.npz`: train_acts, test_acts at L10-L14, **(N, 5, d)** —
+    last real token only. Used for the no-context MLC reference.
+  - `acts_mlc_tail.npz`: train_acts, test_acts at L10-L14, **shape
+    (N, 128, 5, d)** — full 128-token tail. Used by MLC mean-pool
+    probing. **Critical for fairness**: if MLC tail is shorter than
+    the anchor tail, the headline AUC comparison is structurally
+    biased against MLC (it sees less mean-pool signal than per-token
+    SAE / TXC). Reverted from the earlier "store MLC at S=20 only"
+    storage shortcut after fairness review.
   - `meta.json`: dataset_key, task_name, n_train, n_test, etc.
 - Splits: same as Phase 5 (n_train=3040, n_test=760).
-- Storage: ~3 GB per task × 36 ≈ 110 GB for L12 anchor + ~30 GB for
-  L10-L14 stack at S=20 ≈ **~140 GB**. Verify RunPod volume.
+- Storage budget per task (fp16): anchor 2.24 GB + mlc_last 0.087 GB +
+  mlc_tail 11.2 GB ≈ **13.5 GB/task × 36 = ~488 GB total**.
+  Comfortably under the 1 TB persistent volume; the H200 was specced
+  for this exact disk envelope.
+- RAM strategy at probe time: anchor pre-loads into RAM once (~80 GB;
+  fits in H200's 188 GB). MLC-tail streams per-task only when probing
+  the 3 MLC archs (rows 4-6 in `canonical_archs.json`).
 - Sync to HF for cross-agent access:
-  `han1823123123/txcdr/phase7_probe_cache/`.
+  `han1823123123/txcdr-base-data/probe_cache/`.
 
 ### Sparsity convention
 
@@ -323,6 +339,45 @@ structurally confusing.
 Apply `max(AUC, 1−AUC)` per-task on `winogrande_correct_completion`
 and `wsc_coreference` (cross-token tasks with arbitrary label
 polarity). Same as Phase 5.
+
+#### (T, S) validity + short-sentence handling
+
+The kept-window count for a (T, S) cell is `S − 2T + 2`. This breaks
+two ways:
+
+1. **Cell-level**: any cell with `S < 2T − 1` has zero kept windows
+   for *every* example regardless of length — the entire cell is
+   structurally invalid. Practical impact: the **S=20 continuity row
+   is only valid for archs with T ≤ 10** (since 20 < 2·11 − 1 = 21).
+   For T ∈ {12, 14, 16, 18, 20, 24, 28, 32}, S=20 cells are skipped
+   with `{"skipped": true, "reason": "S_lt_2T_minus_1"}` in the jsonl
+   so downstream analysis sees the absence explicitly rather than
+   silently missing rows.
+
+2. **Example-level**: real probing examples are tokenized to ≤ 128
+   tokens and right-padded. For an example of true length `L` tokens,
+   the cached `last_idx` records the position of the last real token
+   in the 128-tail. The probing driver computes
+   `effective_tail_i = min(S, last_idx_i + 1)` per example and keeps
+   only windows whose left-edge ≥ T−1 *and* right-edge ≤ last_idx_i.
+   Examples where `effective_tail_i < 2T − 1` contribute no kept
+   windows for that (T, S) cell and are filtered. Per-cell drop counts
+   `n_drop_train` / `n_drop_test` are written to the jsonl so a cell
+   that drops the majority of its examples (likely indicating a
+   short-sentence-heavy task) is auditable post-hoc.
+
+This avoids two failure modes:
+- **Padding artifacts**: aggregating over pad tokens contaminates
+  the mean with whatever activation the model produces on PAD. The
+  per-example `last_idx` filter restricts the average to real tokens.
+- **Silent garbage**: a (T, S) cell that yields `kept ≤ 0` would
+  otherwise produce `mean of empty array = nan` and pollute the AUC
+  computation. The hard skip + jsonl marker makes the failure
+  inspectable.
+
+Tasks dominated by short sentences (e.g. WSC coreference) may have
+large `n_drop` at high T and small S — that's expected and
+documented per-cell rather than averaged into a misleading headline.
 
 ---
 
@@ -456,7 +511,7 @@ appendix sections of the paper if relevant:
 
 ### Deliverable A.i — definitive leaderboard
 
-For all 47 archs in [§Canonical architecture set](#canonical-architecture-set),
+For all 49 archs in [§Canonical architecture set](#canonical-architecture-set),
 3 seeds, headline at S=128 and `k_feat ∈ {5, 20}`. Per-arch: mean
 ± σ over 3 seeds. Output:
 
@@ -609,7 +664,7 @@ x-axis still uses 3-seed mean. This is a documented compromise.
 
 Scale check at seed=42 only:
 
-- 47 archs × 256 features × 10 contexts × 1 seed ≈ 120K Haiku calls.
+- 49 archs × 256 features × 10 contexts × 1 seed ≈ 125K Haiku calls.
 - At ~5K input tokens / call with prompt caching, expected cost
   ~$50-150. Tractable.
 

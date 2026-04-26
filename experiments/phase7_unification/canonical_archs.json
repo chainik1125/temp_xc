@@ -126,8 +126,8 @@
       "k_win": 500,
       "k_pos": null,
       "shifts": null,
-      "src_module": "src.architectures.tfa",
-      "src_class": "TFA",
+      "src_module": "src.architectures._tfa_module",
+      "src_class": "TemporalSAE",
       "recipe": "TFA (predictive + novel codes), full-size attention head",
       "purpose": "predictive-coding reference (Lubana et al. 2025); verify TFA's training stack is compatible with k_win=500 on novel head"
     },
@@ -143,8 +143,8 @@
       "shifts": [1, 2, 3],
       "gamma": 0.5,
       "n_scales": 3,
-      "src_module": "src.architectures.matryoshka_txcdr",
-      "src_class": "MatryoshkaTXCDRMultiscale",
+      "src_module": "src.architectures.matryoshka_txcdr_contrastive_multiscale",
+      "src_class": "MatryoshkaTXCDRContrastiveMultiscale",
       "recipe": "TXC + multi-scale matryoshka InfoNCE (gamma=0.5, n_scales=3 prefix scales)",
       "purpose": "Phase 5 multi-scale matryoshka winner"
     },

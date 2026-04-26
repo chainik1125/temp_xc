@@ -49,7 +49,7 @@ run by an autonomous agent on its own RunPod:
 
 - **Agent A — sparse-probing leaderboard.** Runs on an **H200 pod**
   (141 GB GPU, 188 GB RAM, 12 vCPUs, 1 TB volume). Owns the
-  activation cache rebuild, training of all 47 archs × 3 seeds,
+  activation cache rebuild, training of all 49 archs × 3 seeds,
   ckpt upload to HF, and the long-tail sliding mean-pool sparse-
   probing leaderboard. The H200 enables larger batch sizes plus the
   T_max ∈ {64, 128} SubseqH8 cells that wouldn't fit on H100 80GB.
@@ -247,7 +247,7 @@ duplicate the table here.
 ### What's dropped from the leaderboard
 
 Phase 5 / 5B / 6 trained dozens of architectures beyond the canonical
-47. They stay in `src/architectures/` as historical code on their
+49. They stay in `src/architectures/` as historical code on their
 respective branches; they are NOT retrained for Phase 7. Categories:
 H7 multi-scale contrastive; Phase 5B negatives (D1 strided, C-family
 token-level, F SubsetEncoderTXC); BatchTopK paired variants beyond
@@ -274,7 +274,7 @@ truth.**
 4. Phase 7 experiment infrastructure lives at
    `experiments/phase7_unification/`:
    - `train_phase7.py` — fork of Phase 5's `train_primary_archs.py`,
-     adapted for Gemma2B-base + k_win=500 convention + ~12 archs.
+     adapted for Gemma2B-base + k_win=500 convention + all 49 canonical archs.
    - `run_probing_phase7.py` — fork of Phase 5's `run_probing.py`,
      adapted for the new long-tail mean-pool + first-T-1 drop +
      S-parameterization.
@@ -292,7 +292,7 @@ Two-agent parallel execution. Day numbers are wall-clock days.
 
 | day | task |
 |---|---|
-| 1 | Spin up **H200 RunPod (1 TB volume, 12 vCPUs, 188 GB RAM)**. Run `scripts/runpod_phase7_bootstrap.sh` to set up GH/HF/Anthropic tokens. Pull `han-phase7-unification` branch (already on origin). Fork `train_primary_archs.py` and `run_probing.py` into Phase 7 drivers. Strip dispatchers down to the canonical 47 archs. Set up Gemma2B-base path config. Smoke imports. **Verify the H200's hardware leverage hooks** (joblib parallelism, large batch, T_max=128 capacity) before starting compute. |
+| 1 | Spin up **H200 RunPod (1 TB volume, 12 vCPUs, 188 GB RAM)**. Run `scripts/runpod_phase7_bootstrap.sh` to set up GH/HF/Anthropic tokens. Pull `han-phase7-unification` branch (already on origin). Fork `train_primary_archs.py` and `run_probing.py` into Phase 7 drivers. Strip dispatchers down to the canonical 49 archs. Set up Gemma2B-base path config. Smoke imports. **Verify the H200's hardware leverage hooks** (joblib parallelism, large batch, T_max=128 capacity) before starting compute. |
 | 2 | Build Gemma2B-base activation cache (5 layers × 24k seqs × 128 tokens × fp16; ~70 GB). Build new probe cache with S=128 tail (~140 GB). Push caches to HF (`han1823123123/txcdr-base-data`) for cross-agent access. |
 | 3 | Smoke-train each canonical arch (200 steps) on the new cache. Verify k_win=500 enforced, no OOMs. **Begin the seed=42 batch — outer loop is SEED, inner loop is ARCH** (see plan.md §Training loop ordering). Use batch=4096 if smoke-test convergence matches batch=1024. |
 | 4 | **Complete the seed=42 batch (all 49 archs, ~6-10 hr on H200).** Push ckpts to `txcdr-base` incrementally as each completes. **At end of seed=42 batch, push the `seed42_complete.json` marker file to HF — this signals Agent B to start the Pareto-x-axis autointerp work.** Begin seed=1 batch (49 archs again, outer loop = seed). |
@@ -330,13 +330,15 @@ Two-agent parallel execution. Day numbers are wall-clock days.
    (cache + ckpts + workspace).
 5. **HF rate limits**: pushing 12 × 3 = 36 ckpts (each ~1.7 GB) is
    ~60 GB to upload. Should be fine but may take 1-2 hours total.
-6. **Autointerp Claude Haiku cost**: 12 archs × 3 seeds × 8
-   features × 10 contexts ≈ 2880 Haiku calls. At Haiku pricing this
-   is < $5. Negligible.
+6. **Autointerp Claude Haiku cost**: 49 archs × 256 features × 10
+   contexts × 1 seed (seed=42 only per plan.md §"Cost-saving") ≈
+   125K Haiku calls. At ~5K input tokens/call with prompt caching,
+   expected ~$50–150. Tractable but not negligible — the seed=42-only
+   restriction is what keeps it in budget.
 
 ### Out of scope
 
-- New architectures (anything beyond the canonical 12).
+- New architectures (anything beyond the canonical 49).
 - Pruning `src/architectures/` of dead-weight files (post-deadline cleanup).
 - Migrating phase5/5b/6 result jsonls (kept as historical artefacts).
 - Long-context training beyond 128 tokens.
