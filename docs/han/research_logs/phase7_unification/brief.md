@@ -48,13 +48,14 @@ not executing). Phase 7 is split into two parallel workstreams, each
 run by an autonomous agent on its own RunPod:
 
 - **Agent A — sparse-probing leaderboard.** Runs on an **H200 pod**
-  (141 GB GPU, 188 GB RAM, 12 vCPUs, **2 TB volume** — bumped from
-  1 TB after the disk audit; lets us keep all 147 ckpts locally for
-  fast probing access without the HF-push-then-delete dance). Owns
-  the activation cache rebuild, training of all 49 archs × 3 seeds,
-  ckpt upload to HF, and the long-tail sliding mean-pool sparse-
-  probing leaderboard. The H200 enables larger batch sizes plus the
-  T_max ∈ {64, 128} SubseqH8 cells that wouldn't fit on H100 80GB.
+  (141 GB GPU, 188 GB RAM, 12 vCPUs, **5 TB volume** — bumped from
+  the original 1 TB plan; provides generous margin for cache,
+  ckpts, retries, and any debugging artefacts without disk-pressure
+  worries). Owns the activation cache rebuild, training of all 49
+  archs × 3 seeds, ckpt upload to HF, and the long-tail sliding
+  mean-pool sparse-probing leaderboard. The H200 enables larger
+  batch sizes plus the T_max ∈ {64, 128} SubseqH8 cells that
+  wouldn't fit on H100 80GB.
 - **Agent B — qualitative autointerp.** Runs on an **H100 pod**
   (80 GB GPU, 125 GB RAM, 8 vCPUs, 1 TB volume). Owns the Phase
   6-style qualitative pipeline (concat-A/B/random passages, top-k
@@ -294,7 +295,7 @@ Two-agent parallel execution. Day numbers are wall-clock days.
 
 | day | task |
 |---|---|
-| 1 | Spin up **H200 RunPod (2 TB volume, 12 vCPUs, 188 GB RAM)**. Run `scripts/runpod_phase7_bootstrap.sh` to set up GH/HF/Anthropic tokens. Pull `han-phase7-unification` branch (already on origin). Fork `train_primary_archs.py` and `run_probing.py` into Phase 7 drivers. Strip dispatchers down to the canonical 49 archs. Set up Gemma2B-base path config. Smoke imports. **Verify the H200's hardware leverage hooks** (joblib parallelism, large batch, T_max=128 capacity) before starting compute. |
+| 1 | Spin up **H200 RunPod (5 TB volume, 12 vCPUs, 188 GB RAM)**. Run `scripts/runpod_phase7_bootstrap.sh` to set up GH/HF/Anthropic tokens. Pull `han-phase7-unification` branch (already on origin). Fork `train_primary_archs.py` and `run_probing.py` into Phase 7 drivers. Strip dispatchers down to the canonical 49 archs. Set up Gemma2B-base path config. Smoke imports. **Verify the H200's hardware leverage hooks** (joblib parallelism, large batch, T_max=128 capacity) before starting compute. |
 | 2 | Build Gemma2B-base activation cache (5 layers × 24k seqs × 128 tokens × fp16; ~70 GB). Build new probe cache with S=128 tail (~140 GB). Push caches to HF (`han1823123123/txcdr-base-data`) for cross-agent access. |
 | 3 | Smoke-train each canonical arch (200 steps) on the new cache. Verify k_win=500 enforced, no OOMs. **Begin the seed=42 batch — outer loop is SEED, inner loop is ARCH** (see plan.md §Training loop ordering). Use batch=4096 if smoke-test convergence matches batch=1024. |
 | 4 | **Complete the seed=42 batch (all 49 archs, ~6-10 hr on H200).** Push ckpts to `txcdr-base` incrementally as each completes. **At end of seed=42 batch, push the `seed42_complete.json` marker file to HF — this signals Agent B to start the Pareto-x-axis autointerp work.** Begin seed=1 batch (49 archs again, outer loop = seed). |
@@ -326,13 +327,14 @@ Two-agent parallel execution. Day numbers are wall-clock days.
 3. **MLC family at k_win=500 vs Phase 5 historical k=100**: 5× looser,
    may change MLC rankings. Phase 5's mlc_contrastive_alpha100_batchtopk
    was the lp leader at k=100; that may not survive the bump.
-4. **Storage on RunPod**: Agent A's disk budget at 2 TB:
+4. **Storage on RunPod**: Agent A's disk budget at 5 TB:
    ~140 GB activation cache (fp32) + ~488 GB probe cache (S=128
    anchor + S=128 mlc_tail for MLC fairness) + ~250 GB local ckpts
    (147 × ~1.7 GB, kept locally for fast probing) + ~45 GB HF cache,
-   venv, misc = ~923 GB / 2000 GB (~46% utilisation, ~50% margin
-   for retries and scratch). Agent B's 1 TB is sized for autointerp
-   passages + cached ckpts pulled from HF — much smaller footprint.
+   venv, misc = ~923 GB / 5000 GB (~18% utilisation; rest is
+   margin for retries, alternative cache builds, etc.). Agent B's
+   1 TB is sized for autointerp passages + cached ckpts pulled from
+   HF — much smaller footprint.
 5. **HF rate limits**: pushing 12 × 3 = 36 ckpts (each ~1.7 GB) is
    ~60 GB to upload. Should be fine but may take 1-2 hours total.
 6. **Autointerp Claude Haiku cost**: 49 archs × 256 features × 10
