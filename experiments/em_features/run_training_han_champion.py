@@ -126,17 +126,23 @@ def main():
         auxk_alpha=args.auxk_alpha,
     ).to(args.device)
     start_step = 0
+    rckpt = None
     if args.resume_from is not None and args.resume_from.exists():
         rckpt = torch.load(args.resume_from, map_location=args.device, weights_only=False)
         model.load_state_dict(rckpt["state_dict"])
         start_step = int(rckpt["config"].get("steps_trained", 0))
-        print(f"  resumed from {args.resume_from} at step {start_step} (Adam reset, skipping b_dec init)", flush=True)
     else:
         x0 = sample_fn(args.batch_size)
         model.init_b_dec_geometric_median(x0)
     print(f"H8 champion: shifts={args.shifts}  h_size={matryoshka_h_size}  α_c={args.alpha_contrastive}", flush=True)
 
     opt = torch.optim.Adam(model.parameters(), lr=args.lr)
+    if rckpt is not None:
+        if "optimizer_state" in rckpt:
+            opt.load_state_dict(rckpt["optimizer_state"])
+            print(f"  resumed from {args.resume_from} at step {start_step} (Adam state restored)", flush=True)
+        else:
+            print(f"  resumed from {args.resume_from} at step {start_step} (Adam fresh — no optimizer_state in ckpt)", flush=True)
 
     snapshots = sorted(set(args.snapshot_at))
     if snapshots[-1] != args.total_steps:
@@ -191,6 +197,7 @@ def main():
             ckpt_path = args.out_prefix.with_name(f"{args.out_prefix.name}_step{snap_step}.pt")
             ckpt = {
                 "state_dict": model.state_dict(),
+                "optimizer_state": opt.state_dict(),
                 "config": {
                     "d_in": d_model, "d_sae": args.d_sae, "T": args.T,
                     "k": args.k, "aux_k": args.aux_k,

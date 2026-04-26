@@ -105,17 +105,23 @@ def main():
     ).to(args.device)
 
     start_step = 0
+    rckpt = None
     if args.resume_from is not None and args.resume_from.exists():
         rckpt = torch.load(args.resume_from, map_location=args.device, weights_only=False)
         txc.load_state_dict(rckpt["state_dict"])
         start_step = int(rckpt["config"].get("steps_trained", 0))
-        print(f"  resumed from {args.resume_from} at step {start_step} (Adam reset, skipping b_dec init)", flush=True)
     else:
         # Geom-median b_dec init (the one uncontroversial win from han's stack).
         init_b_dec_geometric_median(txc, sample_fn, n=8192)
         print("b_dec geom-median initialized", flush=True)
 
     opt = torch.optim.Adam(txc.parameters(), lr=args.lr, betas=(0.9, 0.999))
+    if rckpt is not None:
+        if "optimizer_state" in rckpt:
+            opt.load_state_dict(rckpt["optimizer_state"])
+            print(f"  resumed from {args.resume_from} at step {start_step} (Adam state restored)", flush=True)
+        else:
+            print(f"  resumed from {args.resume_from} at step {start_step} (Adam fresh — no optimizer_state in ckpt)", flush=True)
 
     resampler = DeadFeatureResampler(
         txc, resample_every=args.bricken_resample_every,
@@ -231,6 +237,7 @@ def main():
             ckpt_path = args.out_prefix.with_name(f"{args.out_prefix.name}_step{snap_step}.pt")
             ckpt = {
                 "state_dict": txc.state_dict(),
+                "optimizer_state": opt.state_dict(),
                 "config": {
                     "d_in": d_model, "d_sae": args.d_sae, "T": args.T,
                     "k_total": args.k_total,

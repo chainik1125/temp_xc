@@ -119,13 +119,19 @@ def main():
     ).to(args.device)
 
     start_step = 0
+    rckpt = None
     if args.resume_from is not None and args.resume_from.exists():
         rckpt = torch.load(args.resume_from, map_location=args.device, weights_only=False)
         sae.load_state_dict(rckpt["state_dict"])
         start_step = int(rckpt["config"].get("steps_trained", 0))
-        print(f"  resumed from {args.resume_from} at step {start_step} (Adam reset)", flush=True)
 
     optim = torch.optim.Adam(sae.parameters(), lr=lr)
+    if rckpt is not None:
+        if "optimizer_state" in rckpt:
+            optim.load_state_dict(rckpt["optimizer_state"])
+            print(f"  resumed from {args.resume_from} at step {start_step} (Adam state restored)", flush=True)
+        else:
+            print(f"  resumed from {args.resume_from} at step {start_step} (Adam fresh — no optimizer_state in ckpt)", flush=True)
 
     loss_history: list[float] = []
     l0_history: list[tuple[int, float]] = []
@@ -138,6 +144,7 @@ def main():
     def write_ckpt(path: Path, step_done: int) -> None:
         ckpt = {
             "state_dict": sae.state_dict(),
+            "optimizer_state": optim.state_dict(),
             "config": {
                 "d_in": d_model,
                 "d_sae": d_sae,
