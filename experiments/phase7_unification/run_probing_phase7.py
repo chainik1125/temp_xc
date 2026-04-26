@@ -153,7 +153,20 @@ def _load_phase7_model(meta: dict, ckpt_path: Path, device) -> tuple:
         model = TopKSAE(d_in, d_sae, k=int(meta["k_pos"])).to(device)
     elif src_class == "TemporalMatryoshkaBatchTopKSAE":
         from src.architectures.tsae_paper import TemporalMatryoshkaBatchTopKSAE
-        group_sizes = [d_sae // 8, d_sae // 4, d_sae // 2, d_sae]
+        # Must match train_phase7.train_tsae_paper EXACTLY: 2-group [0.2, 0.8]
+        # split, sum=d_sae. The earlier 4-group [d_sae//8, d_sae//4, d_sae//2,
+        # d_sae] convention here was wrong (sum=34560 != d_sae=18432, would
+        # trip the assert in TemporalMatryoshkaBatchTopKSAE.__init__).
+        # Prefer reading group_sizes from meta if present (added in
+        # _meta_from_arch for defensive reproducibility); fall back to the
+        # trainer's [0.2, 0.8] convention.
+        if meta.get("group_sizes"):
+            group_sizes = list(meta["group_sizes"])
+        else:
+            group_sizes = [int(0.2 * d_sae), d_sae - int(0.2 * d_sae)]
+        assert sum(group_sizes) == d_sae, (
+            f"group_sizes {group_sizes} sum={sum(group_sizes)} != d_sae={d_sae}"
+        )
         model = TemporalMatryoshkaBatchTopKSAE(
             activation_dim=d_in, dict_size=d_sae,
             k=int(meta["k_pos"]), group_sizes=group_sizes,

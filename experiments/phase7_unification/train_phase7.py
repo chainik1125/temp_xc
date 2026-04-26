@@ -612,8 +612,13 @@ def _meta_from_arch(arch: dict, seed: int) -> dict:
     Must include `subject_model`, `anchor_layer`, `mlc_layers` so
     `scripts/hf_upload_phase7_ckpts.py` can verify before pushing to
     `txcdr-base`.
+
+    For tsae_paper rows (TemporalMatryoshkaBatchTopKSAE) we also bake
+    the trainer's `group_sizes` into the meta — the loader needs this
+    to reconstruct the exact arch (sum(group_sizes) must equal d_sae,
+    so silently inferring from a different formula crashes assert).
     """
-    return {
+    meta = {
         "row": arch["row"],
         "arch_id": arch["arch_id"],
         "arch": arch["arch_id"],          # back-compat alias used by some readers
@@ -638,6 +643,10 @@ def _meta_from_arch(arch: dict, seed: int) -> dict:
         "mlc_layers": list(MLC_LAYERS),
         "phase": "phase7_unification",
     }
+    if arch["src_class"] == "TemporalMatryoshkaBatchTopKSAE":
+        d_sae = DEFAULT_D_SAE
+        meta["group_sizes"] = [int(0.2 * d_sae), d_sae - int(0.2 * d_sae)]
+    return meta
 
 
 def _hf_push_ckpt(ckpt_path: Path, run_id: str,
