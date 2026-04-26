@@ -262,28 +262,27 @@ existing IT-trained ckpts and caches:
 - Sync to HF for cross-agent access:
   `han1823123123/txcdr/phase7_activation_cache/`.
 
-### Probe cache (rebuild) — owned by Agent A
+### Probe cache (built) — owned by Agent A
 
 - Tasks: same 36-task set as Phase 5 (8 dataset families).
 - Per-task storage:
   - `acts_anchor.npz`: train_acts, test_acts at L12, **shape
     (N, 128, d)** — full 128-token tail. Used by per-token SAE,
-    TXC family, H8, SubseqH8.
+    TXC family, H8, SubseqH8. Probing aggregates over the LAST
+    S=32 of these per the new headline S decision (revised
+    2026-04-26).
   - `acts_mlc.npz`: train_acts, test_acts at L10-L14, **(N, 5, d)** —
     last real token only. Used for the no-context MLC reference.
   - `acts_mlc_tail.npz`: train_acts, test_acts at L10-L14, **shape
     (N, 128, 5, d)** — full 128-token tail. Used by MLC mean-pool
-    probing. **Critical for fairness**: if MLC tail is shorter than
-    the anchor tail, the headline AUC comparison is structurally
-    biased against MLC (it sees less mean-pool signal than per-token
-    SAE / TXC). Reverted from the earlier "store MLC at S=20 only"
-    storage shortcut after fairness review.
+    probing. Cache stays at S=128 even though headline S is now 32
+    — costs nothing extra (already built) and keeps the door open
+    for future S-sweep ablations without rebuilding.
   - `meta.json`: dataset_key, task_name, n_train, n_test, etc.
 - Splits: same as Phase 5 (n_train=3040, n_test=760).
 - Storage budget per task (fp16): anchor 2.24 GB + mlc_last 0.087 GB +
   mlc_tail 11.2 GB ≈ **13.5 GB/task × 36 = ~488 GB total**.
-  Comfortably under the 1 TB persistent volume; the H200 was specced
-  for this exact disk envelope.
+  Comfortably under the 5 TB persistent volume.
 - RAM strategy at probe time: anchor pre-loads into RAM once (~80 GB;
   fits in H200's 188 GB). MLC-tail streams per-task only when probing
   the 3 MLC archs (rows 4-6 in `canonical_archs.json`).
@@ -341,9 +340,20 @@ Headline `k_feat ∈ {5, 20}`; ablation at `k_feat ∈ {1, 2}`.
 
 #### Reported S values
 
-- **S = 128 (headline)**: long-tail; minimal boundary asymmetry.
-- **S = 20 (continuity)**: matches Phase 5's tail length; lets us
-  sanity-check Phase 7 numbers vs Phase 5 in the limit S=20.
+**Decision (revised 2026-04-26): S = 32 across the board.**
+
+- Compatible with all 48 of 49 canonical archs (cell-validity rule
+  is `S ≥ T`; only row 49 SubseqH8 T_max=64 invalid, since 32 < 64).
+- ~6× faster per-task probing than the earlier S=128 plan (encode
+  cost scales linearly in the number of windows, S − T + 1).
+- Earlier S=128 / 64 / 20 sweep was dropped after the (T, S)
+  validity rule was found to be over-aggressive (see correction
+  below).
+
+Sanity checks (e.g. the subseq_h8 vs txcdr_t5 vs mlc ordering
+verification) use **S = 20** specifically: matches Phase 5's tail
+length so cross-phase numerical sanity checks are direct, and
+valid for all 47 archs with T ≤ 20.
 
 NOT reported: S = T (per-window comparison) — explicitly dropped
 because comparing across architectures with different T at S=T is
@@ -357,31 +367,41 @@ polarity). Same as Phase 5.
 
 #### (T, S) validity + short-sentence handling
 
-The kept-window count for a (T, S) cell is `S − 2T + 2`. This breaks
-two ways:
+**Correction (2026-04-26)**: The earlier "drop first T−1 windows"
+rule was over-aggressive. The corrected rule (in the live code at
+`run_probing_phase7.aggregate_s` + `cell_is_valid`):
 
-1. **Cell-level**: any cell with `S < 2T − 1` has zero kept windows
-   for *every* example regardless of length — the entire cell is
-   structurally invalid. Practical impact: the **S=20 continuity row
-   is only valid for archs with T ≤ 10** (since 20 < 2·11 − 1 = 21).
-   For T ∈ {12, 14, 16, 18, 20, 24, 28, 32}, S=20 cells are skipped
-   with `{"skipped": true, "reason": "S_lt_2T_minus_1"}` in the jsonl
-   so downstream analysis sees the absence explicitly rather than
-   silently missing rows.
+  Kept windows per example = `effective_tail − T + 1`
+  (= number of T-windows fully inside the effective tail)
+  Cell validity rule: `S ≥ T`
+
+Why the earlier rule was wrong: it claimed windows starting near
+the tail's left boundary "had less preceding-tail context", but
+window archs encode the window IN ISOLATION (no recurrent state,
+no cross-window dependency at probe time). The window IS the
+encoder input; it doesn't need additional preceding context.
+
+Two failure modes still guarded:
+
+1. **Cell-level**: any cell with `S < T` has zero windows that fit
+   inside the tail for any example, regardless of length. Skipped
+   with `{"skipped": true, "reason": "S_lt_T"}` in the jsonl so
+   downstream analysis sees the absence explicitly. At the chosen
+   headline S=32, this only skips row 49 (SubseqH8 T_max=64).
 
 2. **Example-level**: real probing examples are tokenized to ≤ 128
    tokens and right-padded. For an example of true length `L` tokens,
    the cached `last_idx` records the position of the last real token
    in the 128-tail. The probing driver computes
    `effective_tail_i = min(S, last_idx_i + 1)` per example and keeps
-   only windows whose left-edge ≥ T−1 *and* right-edge ≤ last_idx_i.
-   Examples where `effective_tail_i < 2T − 1` contribute no kept
-   windows for that (T, S) cell and are filtered. Per-cell drop counts
-   `n_drop_train` / `n_drop_test` are written to the jsonl so a cell
-   that drops the majority of its examples (likely indicating a
-   short-sentence-heavy task) is auditable post-hoc.
+   only windows whose left-edge ≥ first_real_position AND right-edge
+   ≤ last_idx_i. Examples where `effective_tail_i < T` contribute no
+   kept windows for that (T, S) cell and are filtered. Per-cell drop
+   counts `n_drop_train` / `n_drop_test` are written to the jsonl
+   so a cell that drops the majority of its examples (likely
+   indicating a short-sentence-heavy task) is auditable post-hoc.
 
-This avoids two failure modes:
+Avoided:
 - **Padding artifacts**: aggregating over pad tokens contaminates
   the mean with whatever activation the model produces on PAD. The
   per-example `last_idx` filter restricts the average to real tokens.
