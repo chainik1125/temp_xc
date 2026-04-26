@@ -21,15 +21,21 @@ CASE_STUDIES_DIR = OUT_DIR / "case_studies"
 HH_RLHF_DIR = CASE_STUDIES_DIR / "hh_rlhf"
 STEERING_DIR = CASE_STUDIES_DIR / "steering"
 
-# ────────────────────────────── selected 6 archs for Agent C
-SELECTED_ARCHS_FOR_CASE_STUDIES = (
-    "topk_sae",                                              # row 1
-    "tsae_paper_k500",                                       # row 2
-    "mlc_contrastive_alpha100_batchtopk",                    # row 5
-    "agentic_txc_02",                                        # row 8
-    "phase5b_subseq_h8",                                     # row 13
-    "phase57_partB_h8_bare_multidistance_t5",                # row 32
+# ────────────────────────────── selected archs for Agent C (staged)
+# Stage 1 (framework debug, 3 archs): conceptually distinct designs to
+# expose family-dependent bugs early.
+STAGE_1_ARCHS = (
+    "topk_sae",                                              # row 1: per-token SAE baseline
+    "tsae_paper_k500",                                       # row 2: T-SAE direct comparison
+    "agentic_txc_02",                                        # row 8: TXC representative
 )
+# Stage 2 (expansion, after Stage 1 framework is locked): add 3 more.
+STAGE_2_EXTRA_ARCHS = (
+    "mlc_contrastive_alpha100_batchtopk",                    # row 5: MLC reference
+    "phase5b_subseq_h8",                                     # row 13: SubseqH8 (Phase 5B mp champion)
+    "phase57_partB_h8_bare_multidistance_t5",                # row 32: H8 multidistance (Phase 5 mp peak)
+)
+SELECTED_ARCHS_FOR_CASE_STUDIES = STAGE_1_ARCHS + STAGE_2_EXTRA_ARCHS
 
 # ────────────────────────────── case-study datasets
 HH_RLHF_HF_PATH = "Anthropic/hh-rlhf"

@@ -61,22 +61,36 @@ Agent C does NOT re-train. Pulls everything else from Phase 7:
 | `/workspace/.tokens/anthropic_key` | Claude Sonnet 4.6 grader (substituted for paper's Llama-3.3-70b) |
 | `/workspace/.tokens/hf_token` | Pull ckpts; pull HH-RLHF / FineWeb |
 
-### Selected arch shortlist (6 archs)
+### Selected arch shortlist — staged
 
-Running case studies on all 49 archs would take ~6 days of GPU; with
-the NeurIPS deadline 2026-05-05 we can't. Pick 6 representatives that
-span the design space:
+**Stage 1 (framework-debug pass): 3 archs only.** Build the C.i + C.ii
+pipelines end-to-end, fix infra issues, validate the apples-to-apples
+protocol. Picking the 3 most conceptually distinct designs so we
+expose any framework bugs that depend on arch family:
 
 | arch_id | row | family | rationale |
 |---|---|---|---|
-| `topk_sae` | 1 | per-token SAE | literature baseline; the "naive" comparison |
-| `tsae_paper_k500` | 2 | T-SAE port | direct head-to-head with the paper's flagship method |
-| `mlc_contrastive_alpha100_batchtopk` | 5 | MLC | Phase 5 lp leader; multi-layer crosscoder reference |
-| `agentic_txc_02` | 8 | TXC + multi-scale matryoshka | Phase 5 mp winner |
-| `phase5b_subseq_h8` | 13 | SubseqH8 | Phase 5B mp champion |
+| `topk_sae` | 1 | per-token SAE | literature baseline (TopK SAE); the "naive" comparison every reviewer wants to see |
+| `tsae_paper_k500` | 2 | T-SAE port | direct head-to-head with Ye et al. 2025's flagship method (the paper we're reproducing the case study from) |
+| `agentic_txc_02` | 8 | TXC + multi-scale matryoshka | TXC contribution representative (Phase 5 mp winner); covers the window-arch family |
+
+**Stage 2 (expansion, after Stage 1 works): add 3 more.** Only do
+this once the Stage-1 protocol is locked in and producing
+publication-quality results.
+
+| arch_id | row | family | rationale |
+|---|---|---|---|
+| `mlc_contrastive_alpha100_batchtopk` | 5 | MLC | Phase 5 lp leader; multi-layer crosscoder reference (different design philosophy from TXC) |
+| `phase5b_subseq_h8` | 13 | SubseqH8 | Phase 5B mp champion (subsequence sampling) |
 | `phase57_partB_h8_bare_multidistance_t5` | 32 | H8 multi-distance | Phase 5 mp peak at IT regime; vanilla H8 reference |
 
-If time allows, add `tfa_big` (row 7) and one anchor cell for completeness.
+If time allows after Stage 2, add `tfa_big` (row 7).
+
+**Why staged**: case-study infra (HH-RLHF preprocessing, AxBench
+intervention loop, Sonnet grader prompt design) needs iteration.
+Discovering a protocol bug after running 6 archs costs 6× more than
+catching it after running 3. Stage 1 is the iteration phase; Stage 2
+is the production run.
 
 ### Reference code status (T-SAE repo)
 
@@ -131,21 +145,62 @@ Output:
 - `experiments/phase7_unification/case_studies/hh_rlhf/<arch_id>/top_features.json`
 - `experiments/phase7_unification/results/plots/phase7_hh_rlhf_summary.png`
 
-#### C.ii — AxBench-style steering
+#### C.ii — AxBench-style steering (apples-to-apples protocol)
 
-Per-arch:
+**The fairness gap and how we close it**: T-SAE paper says they
+"average across 30 different features" but doesn't specify HOW the
+30 are chosen per arch. Different archs have different feature
+spaces; "feature 17" in T-SAE is not "feature 17" in TXC. Naively
+picking 30 features per arch by, say, "highest-variance" gives
+each arch a different set, and the comparison loses meaning.
 
-1. Pick 30 features that the autointerp protocol (Agent B's pipeline,
-   reused) labels as semantic (not punctuation/whitespace/syntax).
-2. For each feature, generate **8 variants** at steering strengths
-   ∈ {0.5, 1, 2, 4, 8, 12, 16, 24} of the unit-norm-decoder direction.
-3. Generate ~60 tokens per variant.
-4. Grade with Claude Sonnet 4.6 along two axes (per AxBench protocol):
-   - **Steering success**: does output contain feature semantics? 0–3
-   - **Coherence**: is output coherent text? 0–3
-5. Plot Pareto: per-arch (success, coherence) means across 30 features.
+**Our protocol**: pick a fixed set of N **target concepts** (not
+features). For each (arch, concept) pair, find the BEST feature in
+that arch's space for that concept (highest autointerp-label match
+score on Agent B's labels, OR highest activation on a held-out
+text annotated with that concept). Steer THAT feature.
+
+The comparison axis becomes: "given the same target concept, how
+well does each arch's best feature steer the model?" That's the
+AxBench-style apples-to-apples question.
+
+**Concept set (suggested)**: 30 concepts spanning safety-relevant +
+domain-specific + style-defining categories. Initial proposal:
+- Safety/alignment: harmful_content, deception, refusal_pattern,
+  helpfulness_marker, jailbreak_pattern (5)
+- Domain: medical, legal, mathematical, programming, scientific,
+  literary, religious, financial, historical, geographical (10)
+- Style: formal_register, casual_register, instructional,
+  narrative, dialogue, poetic, technical_jargon (7)
+- Sentiment: positive_emotion, negative_emotion, neutral_factual,
+  question_form, imperative_form (5)
+- Other: code_context, list_format, citation_pattern (3)
+Total: 30. Refine after Stage-1 spike.
+
+Per (arch, concept):
+1. Look up best feature for this concept in this arch (via Agent B's
+   autointerp labels at `txcdr-base/autointerp/<arch>/`; if no
+   matching label, score-rank by encoded activation on a 100-text
+   concept-annotated sample).
+2. For each of 8 strengths ∈ {0.5, 1, 2, 4, 8, 12, 16, 24} of the
+   feature's unit-norm decoder direction:
+   - Steer-decode 60 tokens via Gemma-2-2b base from a fixed neutral
+     prompt ("We find").
+3. Grade each generation with Claude Sonnet 4.6 along two axes
+   (per AxBench protocol):
+   - **Steering success**: does output contain the concept's
+     semantics? 0–3.
+   - **Coherence**: is output coherent text? 0–3.
+4. Per-arch summary: mean (success, coherence) across 30 concepts ×
+   8 strengths = 240 cells per arch. Plot Pareto: each arch is a
+   curve; Pareto-dominance = both higher success AND higher
+   coherence at any operating point.
+
+**Total grader calls**: 3 archs × 30 concepts × 8 strengths = 720
+generations + grades for Stage 1; expand to 1440 in Stage 2.
 
 Output:
+- `experiments/phase7_unification/case_studies/steering/<arch_id>/feature_selection.json` — chosen feature per concept + score
 - `experiments/phase7_unification/case_studies/steering/<arch_id>/generations.jsonl`
 - `experiments/phase7_unification/case_studies/steering/<arch_id>/grades.jsonl`
 - `experiments/phase7_unification/results/plots/phase7_steering_pareto.png`
@@ -162,6 +217,72 @@ Output:
 If C.ii blows the budget, the C.i write-up alone is paper-strong as a
 "can SAE-family methods recover known dataset structure?" study. C.ii
 moves to appendix.
+
+### Branch strategy + DO-NOT-DEVIATE list
+
+**Agent C works on its own branch `han-phase7-agent-c`**, not directly
+on `han-phase7-unification`. Reasons:
+
+- Agent A has done multiple force-pushes to `han-phase7-unification`
+  during this session (commit-message amends, author-email fix). A
+  force-push from Agent A would clobber Agent C's commits if both
+  pushed to the same branch.
+- Even without force-push, simultaneous `git push` from two agents
+  races; one always loses.
+- File-level conflicts are unlikely (different sub-dirs) but
+  branch-level state-machine conflicts ARE likely.
+
+**Workflow**:
+
+```bash
+# Agent C bootstrap (after pod setup):
+cd /workspace/temp_xc
+git fetch origin
+git checkout -b han-phase7-agent-c origin/han-phase7-unification
+# ... Agent C work ...
+git push -u origin han-phase7-agent-c
+
+# Periodic sync from Agent A's work:
+git fetch origin han-phase7-unification
+git merge origin/han-phase7-unification    # OR rebase if no merge artefacts yet
+
+# When Agent C results are ready for integration:
+# Open a PR han-phase7-agent-c → han-phase7-unification, request human review.
+```
+
+**DO NOT** (preserves the shared Phase 7 framework):
+
+- DO NOT modify `experiments/phase7_unification/_paths.py`,
+  `_train_utils.py`, `train_phase7.py`, `run_probing_phase7.py`,
+  `build_act_cache_phase7.py`, `build_probe_cache_phase7.py`,
+  or `canonical_archs.json`. These are Agent A's. If you need a
+  field added to a meta dict, propose it via PR comment instead of
+  editing.
+- DO NOT touch any file under `experiments/phase5_*`,
+  `experiments/phase5b_*`, `experiments/phase6_*`. Read-only.
+- DO NOT write outside
+  `experiments/phase7_unification/results/case_studies/` for
+  outputs, and `experiments/phase7_unification/case_studies/` for
+  code.
+- DO NOT load Phase 7 ckpts via T-SAE's `load_dictionary()` — use
+  `experiments.phase7_unification.run_probing_phase7._load_phase7_model`.
+  Phase 7's ckpt format is `torch.save(state_fp16)`, not the T-SAE
+  format, and a wrong loader silently returns the wrong tensors.
+- DO NOT push to `origin/han` or `origin/han-phase7-unification`.
+  PR-only.
+- DO NOT change the canonical arch metadata (rows, k_pos, k_win,
+  shifts, etc.) — those are pre-registered in `canonical_archs.json`
+  and any change invalidates Agent A's leaderboard.
+
+**OK to**:
+
+- Read freely from `references/temporal_saes/`,
+  `references/TemporalFeatureAnalysis/`, `papers/*.md`.
+- Pull ckpts and meta from `han1823123123/txcdr-base`.
+- Add new files under `experiments/phase7_unification/case_studies/`.
+- Extend `case_studies/_paths.py` with Agent-C-specific constants.
+- Add Agent-C-specific dependencies via `uv add` if needed (commit
+  the lockfile change, document why).
 
 ### Coordination with Agents A and B
 
