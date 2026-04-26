@@ -175,6 +175,12 @@ def main():
         torch_dtype=torch.bfloat16,
         device=args.device,
     )
+    # ActivationSteerer's _POSSIBLE_LAYER_ATTRS only knows "model.layers", but
+    # PeftModelForCausalLM nests them at base_model.model.model.layers. Merging
+    # the adapter unwraps the PEFT layer and exposes the plain HF model.
+    if hasattr(model, "merge_and_unload"):
+        model = model.merge_and_unload()
+        print("[frontier] merged PEFT adapter (model is now plain HF)", flush=True)
     model.eval()
 
     em = load_em_dataset()
