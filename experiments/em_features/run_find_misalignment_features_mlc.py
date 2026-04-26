@@ -42,7 +42,7 @@ def main():
     args = parse_args()
     args.out.mkdir(parents=True, exist_ok=True)
 
-    ckpt = torch.load(args.ckpt, map_location=args.device)
+    ckpt = torch.load(args.ckpt, map_location=args.device, weights_only=False)
     ccfg = ckpt["config"]
     mlc = MultiLayerCrosscoder(
         d_in=ccfg["d_in"], d_sae=ccfg["d_sae"], L=ccfg["L"], k_total=ccfg["k_total"],

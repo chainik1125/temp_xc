@@ -71,7 +71,7 @@ def main():
     args = parse_args()
     args.out.mkdir(parents=True, exist_ok=True)
 
-    ckpt = torch.load(args.ckpt, map_location=args.device)
+    ckpt = torch.load(args.ckpt, map_location=args.device, weights_only=False)
     ccfg = ckpt["config"]
     if ccfg.get("hookpoint") != args.hookpoint or ccfg.get("layer") != args.layer:
         raise ValueError(f"ckpt hookpoint/layer mismatch: ckpt={ccfg.get('hookpoint')}"
