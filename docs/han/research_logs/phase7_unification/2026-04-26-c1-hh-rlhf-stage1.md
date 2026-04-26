@@ -50,9 +50,9 @@ effect direction and significance are reproduced exactly.
 | `tsae_paper_k20` (paper-faithful, k=20) | **14** | 6 | 0 | **63%** |
 | `agentic_txc_02` (TXC matryoshka, T=5) | 7 | 10 | 3 | 30% |
 
-Plots:
-[scatter](../../../../experiments/phase7_unification/results/case_studies/plots/phase7_hh_rlhf_scatter.png) ([thumb](../../../../experiments/phase7_unification/results/case_studies/plots/phase7_hh_rlhf_scatter.thumb.png)),
-[summary bar](../../../../experiments/phase7_unification/results/case_studies/plots/phase7_hh_rlhf_summary.png) ([thumb](../../../../experiments/phase7_unification/results/case_studies/plots/phase7_hh_rlhf_summary.thumb.png))
+![phase7 hh-rlhf scatter](../../../../experiments/phase7_unification/results/case_studies/plots/phase7_hh_rlhf_scatter.png)
+
+![phase7 hh-rlhf summary](../../../../experiments/phase7_unification/results/case_studies/plots/phase7_hh_rlhf_summary.png)
 
 ### Findings
 

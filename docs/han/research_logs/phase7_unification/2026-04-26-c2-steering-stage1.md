@@ -63,9 +63,9 @@ ThreadPoolExecutor with n_workers=5 + max_retries=12 keeps under the
 
 ### Results — Pareto plot
 
-[main Pareto plot](../../../../experiments/phase7_unification/results/case_studies/plots/phase7_steering_pareto.png) ([thumb](../../../../experiments/phase7_unification/results/case_studies/plots/phase7_steering_pareto.thumb.png))
+![phase7 steering Pareto](../../../../experiments/phase7_unification/results/case_studies/plots/phase7_steering_pareto.png)
 
-[per-strength curves](../../../../experiments/phase7_unification/results/case_studies/plots/phase7_steering_strength_curves.png) ([thumb](../../../../experiments/phase7_unification/results/case_studies/plots/phase7_steering_strength_curves.thumb.png))
+![phase7 steering per-strength curves](../../../../experiments/phase7_unification/results/case_studies/plots/phase7_steering_strength_curves.png)
 
 #### Headline numbers
 
