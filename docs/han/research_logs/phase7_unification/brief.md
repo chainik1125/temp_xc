@@ -41,11 +41,11 @@ final pass: re-run the most informative archs on a sanitized setup
 that addresses (1)–(3), present a single unified leaderboard, and
 write the paper.
 
-### Execution model: two parallel RunPod agents
+### Execution model: three parallel RunPod agents
 
 This brief is written for the agents (the human who designed it is
-not executing). Phase 7 is split into two parallel workstreams, each
-run by an autonomous agent on its own RunPod:
+not executing). Phase 7 is split into three parallel workstreams,
+each run by an autonomous agent on its own RunPod:
 
 - **Agent A — sparse-probing leaderboard.** Runs on an **H200 pod**
   (141 GB GPU, 188 GB RAM, 12 vCPUs, **5 TB volume** — bumped from
@@ -61,6 +61,15 @@ run by an autonomous agent on its own RunPod:
   6-style qualitative pipeline (concat-A/B/random passages, top-k
   feature selection, autointerp via Claude Haiku, Pareto analysis).
   Pulls trained ckpts from HF (no independent training).
+- **Agent C — case studies on Phase 7 ckpts.** Runs on an **H100
+  pod** (80 GB GPU, 125 GB RAM, 8 vCPUs, **2 TB volume**). Owns
+  the two T-SAE §4.5 case studies on a 6-arch shortlist of Phase 7
+  ckpts: (i) HH-RLHF dataset understanding (length-spurious-
+  correlation reproduction; per-arch top-feature labelling) and
+  (ii) AxBench-style steering with Claude Sonnet 4.6 as the grader
+  (substituted for the paper's Llama-3.3-70b). Pulls ckpts from
+  HF; reuses Agent B's autointerp labels for feature selection.
+  No independent training. Full scope in `agent_c_brief.md`.
 
 Per-agent guidance on how to maximally leverage the hardware
 (probe-cache pre-loading, joblib parallelism, GPU/CPU pipelining,
@@ -75,10 +84,20 @@ batch size, concurrent Haiku API calls, etc.) is in
   (Agent A pushes; Agent B can pull if useful, or rebuild
   independently for the qualitative passages).
 
-**Sequential dependency:** Agent B can't start autointerp until
-Agent A's ckpts are on HF. Agent B can do day-1 prep (passage
-building, Phase 6 pipeline port) in parallel with Agent A's
-training.
+**Sequential dependencies:**
+- Agent B can't start autointerp until Agent A's ckpts are on HF.
+  Agent B does day-1 prep (passage building, Phase 6 pipeline
+  port) in parallel with Agent A's training.
+- Agent C can't start case studies until its 6 selected ckpts are
+  on HF (a small subset of Agent A's seed=42 batch, available
+  early). Agent C does day-1 prep (clone T-SAE repo, pull HH-RLHF
+  dataset, smoke-test ckpt loading) in parallel with Agent A's
+  training. Agent C's C.ii steering benefits from Agent B's
+  autointerp labels for feature selection.
+
+**Anthropic API budget**: Agents B (Haiku autointerp) and C.ii
+(Sonnet steering grader) both consume Anthropic credit. Different
+models so they don't collide on rate limits.
 
 ### Where to find prior-phase code and docs
 

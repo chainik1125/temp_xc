@@ -18,12 +18,17 @@ agents (sparse-probing agent + autointerp agent).
 
 Each agent runs on its own RunPod with persistent volume.
 
-| | Agent A — sparse probing | Agent B — autointerp |
-|---|---|---|
-| GPU | NVIDIA **H200**, 141 GB HBM3e | NVIDIA **H100**, 80 GB HBM3 |
-| vCPUs | **12** | 8 |
-| System RAM | **188 GB** | 125 GB |
-| Persistent volume | **5 TB** at /workspace | **1 TB** at /workspace |
+| | Agent A — sparse probing | Agent B — autointerp | Agent C — case studies |
+|---|---|---|---|
+| GPU | NVIDIA **H200**, 141 GB HBM3e | NVIDIA **H100**, 80 GB HBM3 | NVIDIA **H100**, 80 GB HBM3 |
+| vCPUs | **12** | 8 | 8 |
+| System RAM | **188 GB** | 125 GB | 125 GB |
+| Persistent volume | **5 TB** at /workspace | **1 TB** at /workspace | **2 TB** at /workspace |
+
+> Agent C is a Phase 7 addition for the T-SAE §4.5-style case studies
+> (HH-RLHF dataset understanding + AxBench-style steering). Reuses
+> Phase 7's HF ckpts (`txcdr-base`); no independent training. Full
+> scope in `agent_c_brief.md`.
 
 > Agent A's 5 TB volume (bumped from the original 1 TB plan) is sized
 > generously: ~923 GB working footprint (140 GB activation cache fp32
