@@ -860,9 +860,16 @@ def main() -> None:
     p = argparse.ArgumentParser()
     p.add_argument("--arch", default=None, help="single arch_id to train")
     p.add_argument("--seed", type=int, default=42)
-    p.add_argument("--max_steps", type=int, default=None)
+    p.add_argument("--max_steps", type=int, default=None,
+                   help="cap training steps (default: TrainCfg.max_steps=25000)")
     p.add_argument("--canonical", action="store_true",
                    help="run all canonical archs at --seed")
+    p.add_argument("--archs", default=None,
+                   help="when used with --canonical: subset of arch_ids to "
+                        "train. Either comma-separated list (e.g. "
+                        "'topk_sae,mlc') OR path to a text file with one "
+                        "arch_id per line (e.g. '/tmp/missing_archs.txt'). "
+                        "Useful for resuming after a partial batch.")
     p.add_argument("--all", action="store_true",
                    help="run all archs × all seeds (outer=seed)")
     p.add_argument("--no-hf-push", action="store_true",
@@ -871,10 +878,24 @@ def main() -> None:
     banner(__file__)
     push = not args.no_hf_push
 
+    arch_subset = None
+    if args.archs:
+        from pathlib import Path as _Path
+        path = _Path(args.archs)
+        if path.exists():
+            arch_subset = [line.strip() for line in path.read_text().splitlines()
+                           if line.strip() and not line.strip().startswith("#")]
+        else:
+            arch_subset = [a.strip() for a in args.archs.split(",") if a.strip()]
+        print(f"  arch_subset: {len(arch_subset)} archs")
+
     if args.all:
+        if arch_subset:
+            p.error("--archs is mutually exclusive with --all (use --canonical)")
         run_all(push_to_hf=push)
     elif args.canonical:
-        run_canonical(args.seed, push_to_hf=push)
+        run_canonical(args.seed, push_to_hf=push,
+                      arch_subset=arch_subset, max_steps=args.max_steps)
     elif args.arch:
         run_one(args.arch, seed=args.seed, max_steps=args.max_steps, push_to_hf=push)
     else:
