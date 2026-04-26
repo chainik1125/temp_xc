@@ -309,15 +309,32 @@ def train_mlc_contrastive_multiscale(arch: dict, cfg: TrainCfg, buf_multilayer) 
 def train_tfa(arch: dict, cfg: TrainCfg, buf_anchor) -> tuple:
     """Row 7: TFA — TemporalSAE with input scaling + decoder unit-norm.
 
-    TFA needs special handling per src/architectures/tfa.py:
-    - Compute scaling factor sqrt(d) / mean_norm on first batch; apply
-      to all inputs (TFA's internal lam = 1/(4*dimin) assumes norm~sqrt(d)).
+    TFA processes FULL sequences (B, T=128, d) through attention + an
+    SAE on every token, so memory scales as B * T * d_sae. At
+    cfg.batch_size=4096 the d_sae=18432 forward needs ~36 GB which
+    OOMs on a 141 GB H200 already holding 84 GB of preloaded buffers
+    + ~10 GB model. Override to a much smaller batch (TFA-specific).
+    Phase 5's `train_primary_archs.py` defaulted to tfa_batch_size=64
+    — same convention here.
+
+    Other TFA-specific handling per src/architectures/tfa.py:
+    - Input scaling sqrt(d)/mean_norm so internal lam=1/(4*dimin) sees
+      sqrt(d)-norm inputs.
     - Decoder rows renormalised to unit norm after every step.
     - Skip NaN/inf loss + NaN grad batches; cosine LR with warmup +
       decay to 0.1*lr.
     """
     import math
     from src.architectures._tfa_module import TemporalSAE
+
+    # TFA-specific batch size override (see docstring). Use 32 to be
+    # safe given we still hold the multilayer buffer in GPU.
+    TFA_BATCH = 32
+    cfg = TrainCfg(seed=cfg.seed, max_steps=cfg.max_steps, lr=cfg.lr,
+                    batch_size=TFA_BATCH, log_every=cfg.log_every,
+                    grad_clip=cfg.grad_clip,
+                    plateau_threshold=cfg.plateau_threshold,
+                    min_steps=cfg.min_steps)
 
     # TFA at "novel head" k = full TopK budget. Use k_win as kval_topk.
     k = arch["k_win"]
@@ -715,20 +732,28 @@ def _train_one_with_bufs(arch: dict, seed: int, max_steps: int | None,
     """Inner helper: train one arch given pre-loaded buffers. The caller
     (run_one or run_canonical) handles buffer lifecycle so we don't pay
     the 30s+ preload cost per arch in batch runs.
+
+    Always empties the CUDA cache on exit — even on exception — so an
+    OOM during one arch (e.g. TFA at large batch) doesn't fragment
+    memory and cascade into subsequent archs.
     """
     cfg = TrainCfg(seed=seed) if max_steps is None else TrainCfg(seed=seed, max_steps=max_steps)
     arch_id = arch["arch_id"]
-    print(f"=== {arch_id} (row {arch['row']}, group {arch['group']}) seed={seed} ===")
-    model, log = dispatch(arch, cfg, buf_anchor=buf_anchor, buf_multilayer=buf_multilayer)
-    meta = _meta_from_arch(arch, seed)
-    run_id = f"{arch_id}__seed{seed}"
-    ckpt_path = _save_run(model, log, run_id, meta)
-    if push_to_hf:
-        _hf_push_ckpt(ckpt_path, run_id)
-    # Free model VRAM before the next arch (buffers persist across archs).
-    del model
-    torch.cuda.empty_cache()
-    return meta
+    print(f"=== {arch_id} (row {arch['row']}, group {arch['group']}) seed={seed} ===",
+          flush=True)
+    model = None
+    try:
+        model, log = dispatch(arch, cfg, buf_anchor=buf_anchor, buf_multilayer=buf_multilayer)
+        meta = _meta_from_arch(arch, seed)
+        run_id = f"{arch_id}__seed{seed}"
+        ckpt_path = _save_run(model, log, run_id, meta)
+        if push_to_hf:
+            _hf_push_ckpt(ckpt_path, run_id)
+        return meta
+    finally:
+        if model is not None:
+            del model
+        torch.cuda.empty_cache()
 
 
 def run_one(arch_id: str, seed: int = 42, max_steps: int | None = None,
