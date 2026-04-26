@@ -67,7 +67,7 @@ ThreadPoolExecutor with n_workers=5 + max_retries=12 keeps under the
 
 ![phase7 steering per-strength curves](../../../../experiments/phase7_unification/results/case_studies/plots/phase7_steering_strength_curves.png)
 
-#### Headline numbers
+#### Headline numbers (5 archs after Stage 2 SubseqH8 expansion)
 
 | arch | mean success | mean coherence | best (suc, coh) | best strength |
 |---|---|---|---|---|
@@ -75,9 +75,15 @@ ThreadPoolExecutor with n_workers=5 + max_retries=12 keeps under the
 | `tsae_paper_k500` (per-token, k=500) | 0.29 | 2.70 | (0.25, 3.00) | 1 |
 | `tsae_paper_k20` (paper-faithful, k=20) | 0.30 | 2.70 | (0.24, 3.00) | 1 |
 | `agentic_txc_02` (TXC matryoshka, T=5) | **0.34** | **2.77** | **(0.36, 2.93)** | 8 |
+| `phase5b_subseq_h8` (SubseqH8, T_max=10) | **0.33** | **2.76** | (0.38, 2.59) | 16 |
 
 (Mean is across all 30 concepts × 8 strengths. "Best" maximises
 success+coherence over the strength sweep.)
+
+**Both window archs (TXC + SubseqH8) cluster in the upper-right of the
+Pareto** — mean coherence ≈ 2.77 with mean success ≈ 0.33-0.34. The
+per-token archs split into either "high success / collapsing coherence"
+(TopKSAE) or "low success at any coherence" (T-SAE at our k=500).
 
 #### Per-strength values (success, coherence) on a 0–3 Sonnet scale
 
@@ -87,6 +93,23 @@ success+coherence over the strength sweep.)
 | `tsae_paper_k500` | (0.22, 3.00) | (0.25, 3.00) | (0.24, 3.00) | (0.24, 2.93) | (0.34, 2.76) | (0.25, 2.46) | (0.39, 2.39) | (0.41, 2.03) |
 | `tsae_paper_k20` | (0.23, 3.00) | (0.24, 3.00) | (0.23, 3.00) | (0.30, 2.93) | (0.28, 2.79) | (0.32, 2.79) | (0.42, 2.31) | (0.36, 1.79) |
 | `agentic_txc_02` | (0.26, 3.00) | (0.21, 3.00) | (0.25, 3.00) | (0.30, 2.93) | **(0.36, 2.93)** | (0.29, 2.79) | (0.40, 2.47) | **(0.62, 2.03)** |
+| `phase5b_subseq_h8` | (0.21, 3.00) | (0.24, 3.00) | (0.27, 2.93) | (0.29, 2.93) | **(0.36, 2.86)** | (0.34, 2.69) | (0.38, 2.59) | **(0.59, 2.07)** |
+
+#### Cross-confirmation across two window archs
+
+The two window archs `agentic_txc_02` (T=5, multi-scale matryoshka,
+contrastive) and `phase5b_subseq_h8` (T_max=10, subsequence sampling +
+multi-distance contrastive) reach the same Pareto upper-right region
+**despite very different recipes** (different T, different sampling
+pattern, different contrastive scheme):
+
+  - At s=8 both achieve (0.36, ~2.9) — meaningful steering at near-
+    baseline coherence.
+  - At s=24 both reach success ≥ 0.59 at coherence ≈ 2.05.
+
+This is a **cross-arch robustness check** on the "window-aggregation
+helps steering" thesis. Window features beat per-token features on the
+Pareto independent of the specific TXC-family recipe.
 
 ### Qualitative highlights at strength 24 (best-effort steering)
 

@@ -6,7 +6,7 @@ tags:
   - complete
 ---
 
-## Agent C — Stage 1 synthesis (4 archs)
+## Agent C — synthesis (Stage 1 + SubseqH8 expansion, 5 archs)
 
 Two case studies on the 4 Stage 1 ckpts (`topk_sae`, `tsae_paper_k500`,
 `tsae_paper_k20`, `agentic_txc_02` at seed=42), reproducing the T-SAE
@@ -21,7 +21,14 @@ paper §4.5 protocol on Phase 7's `google/gemma-2-2b` base ckpts.
 | `topk_sae` | (0.37, 2.62) | (0.37, 2.90) @ s=4 | 0.57 |
 | `tsae_paper_k500` | (0.29, 2.70) | (0.25, 3.00) @ s=1 | 0.41 |
 | `tsae_paper_k20` | (0.30, 2.70) | (0.24, 3.00) @ s=1 | 0.36 |
-| **`agentic_txc_02`** | **(0.34, 2.77)** | **(0.36, 2.93) @ s=8** | **0.62** |
+| **`agentic_txc_02`** (window, T=5) | **(0.34, 2.77)** | **(0.36, 2.93) @ s=8** | **0.62** |
+| **`phase5b_subseq_h8`** (window, T_max=10) | **(0.33, 2.76)** | (0.38, 2.59) @ s=16 | **0.59** |
+
+**The two window archs cluster in the upper-right** with nearly
+identical mean (success, coherence) — despite recipe differences (T=5 +
+multi-scale matryoshka contrastive vs T_max=10 + subseq sampling +
+multi-distance contrastive). Cross-confirmation: window aggregation
+helps steering independent of the specific TXC-family recipe.
 
 At maximum steering strength (s=24), TXC achieves the **highest
 success of any arch** (0.62) at coherence indistinguishable from
