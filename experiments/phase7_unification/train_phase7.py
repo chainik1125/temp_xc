@@ -162,51 +162,80 @@ def train_topk_sae(arch: dict, cfg: TrainCfg, buf_anchor) -> tuple:
 def train_tsae_paper(arch: dict, cfg: TrainCfg, buf_anchor) -> tuple:
     """Rows 2, 3: TemporalMatryoshkaBatchTopKSAE — T-SAE port (Ye et al. 2025).
 
-    Per-token SAE with Matryoshka BatchTopK + temporal InfoNCE (alpha=0.1)
-    + AuxK. Uses its own trainer class per src/architectures/tsae_paper.py.
+    Per-token SAE with Matryoshka BatchTopK + temporal InfoNCE + AuxK.
+    Uses TemporalMatryoshkaBatchTopKTrainerLite per src/architectures/tsae_paper.py
+    (the trainer owns the loss + threshold EMA + dead-feature aux loss).
+    Adapted from experiments/phase6_qualitative_latents/train_tsae_paper.py.
     """
+    import math as _math
     from src.architectures.tsae_paper import (
         TemporalMatryoshkaBatchTopKSAE,
         TemporalMatryoshkaBatchTopKTrainerLite,
+        geometric_median,
     )
-    # Default group_sizes per Ye et al. — 4 nested matryoshka groups.
     d_sae = DEFAULT_D_SAE
-    group_sizes = [d_sae // 8, d_sae // 4, d_sae // 2, d_sae]
+    # Phase 6 default: 2 groups at 20%/80% split. group_weights = equal.
+    group_fractions = [0.2, 0.8]
+    group_sizes = [int(f * d_sae) for f in group_fractions[:-1]]
+    group_sizes.append(d_sae - sum(group_sizes))
+    group_weights = [1.0 / len(group_sizes)] * len(group_sizes)
     k = arch["k_pos"]
     model = TemporalMatryoshkaBatchTopKSAE(
         activation_dim=DEFAULT_D_IN, dict_size=d_sae,
         k=k, group_sizes=group_sizes,
     ).to("cuda")
+    # Paper's lr scaling law: 2e-4 / sqrt(d_sae / 16384).
+    lr = 2e-4 / _math.sqrt(d_sae / 16384)
+    decay_start = int(0.8 * cfg.max_steps)
     trainer = TemporalMatryoshkaBatchTopKTrainerLite(
-        model, lr=cfg.lr, alpha_temporal=0.1,
+        model, group_weights=group_weights, total_steps=cfg.max_steps, lr=lr,
+        warmup_steps=1000, decay_start=decay_start,
+        device=torch.device("cuda"),
     )
-    # Need pair-window samples (T=2 for the temporal contrastive term).
-    gen_pair = make_pair_window_gen_gpu(buf_anchor, T=2)
+    # Pair sampler: adjacent token pairs (B, 2, d).
+    N, L, d = buf_anchor.shape
+    n_wins = L - 1
+    def pair_gen(_step: int) -> torch.Tensor:
+        seq = torch.randint(0, N, (cfg.batch_size,), device=buf_anchor.device)
+        off = torch.randint(0, n_wins, (cfg.batch_size,), device=buf_anchor.device)
+        a = buf_anchor[seq, off]
+        b = buf_anchor[seq, off + 1]
+        return torch.stack([a, b], dim=1).float()    # (B, 2, d)
+
+    # b_dec geometric median init from a sample.
+    x0 = pair_gen(0)[:, 0]                            # (B, d)
+    bdec = geometric_median(x0)
+
     torch.manual_seed(cfg.seed); np.random.seed(cfg.seed)
-    losses, l0s, steps_logged = [], [], []
+    losses, l0s, auxks, deads, steps_logged = [], [], [], [], []
     t0 = time.time()
     converged, plateau_val = False, None
     for step in range(cfg.max_steps):
-        pair = gen_pair(cfg.batch_size)              # (B, 2, T=2, d)
-        # Treat pair[:, 0, 0] = anchor token, pair[:, 1, 0] = next-step token
-        x_cur = pair[:, 0, 0]                         # (B, d)
-        x_next = pair[:, 1, 0]
-        loss, log_dict = trainer.step(x_cur, x_next)
+        x_pair = pair_gen(step)
+        stats = trainer.update(step, x_pair, b_dec_init=bdec if step == 0 else None)
         if step % cfg.log_every == 0 or step == cfg.max_steps - 1:
-            losses.append(float(loss))
-            l0s.append(float(log_dict.get("l0", 0)))
+            with torch.no_grad():
+                z, _, _ = model.encode(x_pair[:, 0], return_active=True, use_threshold=False)
+                l0 = float((z > 0).sum(dim=-1).float().mean().item())
+            losses.append(float(stats["l2"]))
+            auxks.append(float(stats["auxk"]))
+            deads.append(int(stats["dead"]))
+            l0s.append(l0)
             steps_logged.append(step)
             plateau_val = compute_plateau(losses, window=5)
-            if plateau_val is not None and plateau_val < cfg.plateau_threshold and step >= cfg.min_steps:
+            if (plateau_val is not None and plateau_val < cfg.plateau_threshold
+                    and step >= cfg.min_steps):
                 converged = True; break
     elapsed = time.time() - t0
     model.eval()
     log = {
-        "loss": losses, "l0": l0s, "steps_logged": steps_logged,
+        "loss": losses, "l0": l0s, "auxk": auxks, "dead": deads,
+        "steps_logged": steps_logged,
         "final_step": steps_logged[-1] if steps_logged else 0,
         "converged": converged, "plateau_last": plateau_val,
         "elapsed_s": elapsed,
-        "group_sizes": group_sizes, "alpha_temporal": 0.1,
+        "group_sizes": group_sizes, "group_weights": group_weights,
+        "lr_used": lr,
     }
     return model, log
 
@@ -594,9 +623,18 @@ def _meta_from_arch(arch: dict, seed: int) -> dict:
     }
 
 
-def _hf_push_ckpt(ckpt_path: Path, run_id: str) -> None:
-    """Idempotent per-ckpt push to HF txcdr-base. Skips silently on failure
-    (training continues; uploader can re-run later)."""
+def _hf_push_ckpt(ckpt_path: Path, run_id: str,
+                   delete_local_after: bool = True) -> bool:
+    """Idempotent per-ckpt push to HF txcdr-base. Returns True if HF push
+    succeeded. If `delete_local_after` is True AND the push succeeded, the
+    local ckpt is removed to keep disk under the 1 TB RunPod quota
+    (147 ckpts × ~1.7 GB = ~250 GB; deleting after push cuts the local
+    high-water mark substantially).
+
+    Training logs are kept locally — they're tiny (KB) and useful for
+    quick analysis without HF round-trips.
+    """
+    pushed = False
     try:
         from huggingface_hub import HfApi
         api = HfApi()
@@ -606,7 +644,6 @@ def _hf_push_ckpt(ckpt_path: Path, run_id: str) -> None:
             repo_id=HF_CKPT_REPO,
             repo_type="model",
         )
-        # Also push the matching training log.
         log_path = LOGS_DIR / f"{run_id}.json"
         if log_path.exists():
             api.upload_file(
@@ -616,8 +653,21 @@ def _hf_push_ckpt(ckpt_path: Path, run_id: str) -> None:
                 repo_type="model",
             )
         print(f"  [hf] pushed {run_id}")
+        pushed = True
     except Exception as e:
         print(f"  [hf] push FAIL {run_id}: {type(e).__name__}: {e}")
+        print(f"  [hf] keeping local ckpt at {ckpt_path} (re-push later)")
+        return False
+    if pushed and delete_local_after:
+        try:
+            sz_gb = ckpt_path.stat().st_size / 1e9
+            ckpt_path.unlink()
+            print(f"  [disk] removed local {ckpt_path.name} ({sz_gb:.1f} GB) — HF copy is canonical")
+        except FileNotFoundError:
+            pass
+        except Exception as e:
+            print(f"  [disk] couldn't remove {ckpt_path}: {type(e).__name__}: {e}")
+    return pushed
 
 
 def _push_seed_marker(seed: int, completed_arch_ids: list[str]) -> None:
