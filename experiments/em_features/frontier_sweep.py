@@ -101,6 +101,16 @@ def seed_all(seed: int) -> None:
         torch.cuda.manual_seed_all(seed)
 
 
+def enable_determinism() -> None:
+    """Tell PyTorch + cuBLAS to use deterministic algorithms so that the same
+    seed produces bit-identical generations across runs (modulo cross-process
+    cuBLAS warm-state differences)."""
+    os.environ.setdefault("CUBLAS_WORKSPACE_CONFIG", ":4096:8")
+    torch.use_deterministic_algorithms(True, warn_only=True)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+
+
 def load_top_feature_ids(features_json: Path, k: int) -> list[int]:
     """Read top features from the JSON written by run_find_misalignment_features*.
 
@@ -179,6 +189,7 @@ def bundle(directions: torch.Tensor, ids: list[int]) -> torch.Tensor:
 
 def main():
     args = parse_args()
+    enable_determinism()
     args.out_path.parent.mkdir(parents=True, exist_ok=True)
 
     print(f"[frontier] steerer={args.steerer} model={args.model} layer={args.layer}", flush=True)
