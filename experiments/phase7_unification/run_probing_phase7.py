@@ -42,7 +42,6 @@ import torch
 from experiments.phase5_downstream_utility.probing.run_probing import (
     _slide_windows,
     _encode_per_token,
-    _load_task_cache,
     _split_indices_for_dataset,
     top_k_by_class_sep,
     sae_probe_metrics,
@@ -53,6 +52,13 @@ from experiments.phase7_unification._paths import (
     ANCHOR_LAYER, MLC_LAYERS, SUBJECT_MODEL,
     DEFAULT_D_IN, DEFAULT_D_SAE, banner,
 )
+
+# Switched 2026-04-27: use the new S=32 left-aligned cache (~4× smaller +
+# 4× faster encode) instead of the original S=128 right-padded cache.
+# See rebuild_probe_cache_s32.py for the per-example slicing.
+PROBE_CACHE_DIR_S32 = OUT_DIR / "probe_cache_S32"
+USE_S32_CACHE = True
+ACTIVE_PROBE_CACHE = PROBE_CACHE_DIR_S32 if USE_S32_CACHE else PROBE_CACHE_DIR
 
 
 HEADLINE_S = (32,)           # S=32 across the board (decision 2026-04-26):
@@ -81,22 +87,23 @@ def flipped_auc(auc: float, task_name: str) -> float:
 # ════════════════════════════════════════════════════════════════════
 
 
-def aggregate_s(z_full: np.ndarray, last_idx: np.ndarray,
+def aggregate_s(z_full: np.ndarray, first_real: np.ndarray,
                 T: int, S: int) -> tuple[np.ndarray, np.ndarray]:
-    """Vectorised per-example mean-pool with S-parameterised effective tail.
+    """Vectorised per-example mean-pool over fully-real windows.
 
-    For window archs (T>1), keeps every window fully inside the effective
-    tail. Number of kept windows per example = effective_tail - T + 1.
-    Cell validity = (S >= T). The earlier "drop first T-1" rule was a bug:
-    a window starting at left=0 covers tokens [0, T-1] which are all real
-    tail tokens — the window itself IS the encoder input, no preceding
-    context is needed.
+    With the S=32 left-aligned cache (rebuild_probe_cache_s32.py), each
+    example's real tokens occupy positions [first_real[i], S-1] of the
+    cache. Padding (zeros) is at [0, first_real[i]-1] for short sentences.
+
+    Aggregation: keep windows whose left-edge is in [first_real, S-T] so
+    the entire window is real. Mean over those windows.
 
     Args:
-      z_full:   (N, K, d_sae) where K = LAST_N (T=1) or LAST_N - T + 1 (T>1).
-      last_idx: (N,) int — position of last real token in the LAST_N=128 tail.
-      T:        window size (1 = per-token).
-      S:        tail length to evaluate over.
+      z_full:     (N, K, d_sae) where K = S (T=1 per-token) or S-T+1 (T>1 windows).
+      first_real: (N,) int — position of first real token per example
+                  (= S - n_real).
+      T:          window size (1 = per-token).
+      S:          tail length (= LAST_N of the new cache; should be 32).
 
     Returns:
       (z_mean, valid)  where
@@ -104,30 +111,24 @@ def aggregate_s(z_full: np.ndarray, last_idx: np.ndarray,
         valid:  (N,) bool — which examples contributed.
     """
     N, K, _ = z_full.shape
-    last_idx_t = torch.as_tensor(last_idx, dtype=torch.long)
-    # effective_tail per example = min(S, last_idx + 1)
-    effective = torch.minimum(torch.full_like(last_idx_t, S), last_idx_t + 1)
-    # For T=1: mask on per-token positions [first_real, last_real]
-    #   first_real = last_idx - effective + 1; last_real = last_idx
-    # For T>1: mask on window-left-edges [lo, hi]
-    #   lo = last_idx - effective + 1   (first window fully inside the tail)
-    #   hi = last_idx - T + 1            (last window with right-edge ≤ last_idx)
+    first_real_t = torch.as_tensor(first_real, dtype=torch.long)
     if T == 1:
-        lo = (last_idx_t - effective + 1).clamp(min=0)
-        hi = last_idx_t.clamp(max=K - 1)
+        # Per-token: keep positions [first_real, S-1]
+        lo = first_real_t.clamp(min=0)
+        hi = torch.full_like(first_real_t, K - 1)
     else:
-        lo = (last_idx_t - effective + 1).clamp(min=0)
-        hi = (last_idx_t - T + 1).clamp(max=K - 1)
+        # Window: keep left-edges in [first_real, S-T]
+        lo = first_real_t.clamp(min=0)
+        hi = torch.full_like(first_real_t, K - 1)  # K = S - T + 1, so K-1 = S-T
     k_grid = torch.arange(K).view(1, K)                 # (1, K)
     mask = (k_grid >= lo.view(N, 1)) & (k_grid <= hi.view(N, 1))  # (N, K) bool
-    counts = mask.sum(dim=1)                             # (N,)
+    counts = mask.sum(dim=1)
     valid = counts > 0
     if not valid.any():
         return np.zeros((0, z_full.shape[-1]), dtype=z_full.dtype), valid.numpy()
-    # Numpy mean with mask:
     mask_np = mask.numpy().astype(z_full.dtype)
     counts_np = counts.numpy().astype(z_full.dtype).clip(min=1)
-    summed = (z_full * mask_np[:, :, None]).sum(axis=1)  # (N, d_sae)
+    summed = (z_full * mask_np[:, :, None]).sum(axis=1)
     z_mean = summed / counts_np[:, None]
     return z_mean[valid.numpy()], valid.numpy()
 
@@ -298,19 +299,22 @@ def _encode_mlc_per_token_z(model, mlc_tail: np.ndarray, device) -> np.ndarray:
 
 def encode_for_S(model, src_class: str, meta: dict,
                  task_cache: dict, split: str, device) -> tuple[np.ndarray, np.ndarray]:
-    """Build the (N, K, d_sae) encoded tensor + last_idx vector for a task split.
+    """Build the (N, K, d_sae) encoded tensor + first_real vector for a task split.
 
-    Returns (z_full, last_idx) where z_full's K depends on the arch:
-      - per-token / MLC: K = 128 (= LAST_N).
-      - window archs:     K = 128 - T_eff + 1.
+    With the new S=32 left-aligned cache, first_real[i] = position of first
+    real token per example in the S-frame (= S - n_real[i]).
+
+    Returns (z_full, first_real) where z_full's K depends on the arch:
+      - per-token / MLC: K = S (= 32).
+      - window archs:     K = S - T_eff + 1.
     """
-    last_idx = task_cache[f"{split}_last_idx"]
+    first_real = task_cache[f"{split}_first_real"]
     if src_class in {"TopKSAE", "TemporalMatryoshkaBatchTopKSAE", "TemporalSAE"}:
-        anchor = task_cache[f"anchor_{split}"]            # (N, 128, d)
-        return _encode_per_token_z(model, anchor, device), last_idx
+        anchor = task_cache[f"anchor_{split}"]            # (N, S=32, d)
+        return _encode_per_token_z(model, anchor, device), first_real
     if src_class in {"MultiLayerCrosscoder", "MLCContrastive", "MLCContrastiveMultiscale"}:
-        mlc_tail = task_cache[f"mlc_tail_{split}"]        # (N, 128, 5, d)
-        return _encode_mlc_per_token_z(model, mlc_tail, device), last_idx
+        mlc_tail = task_cache[f"mlc_tail_{split}"]        # (N, S=32, 5, d)
+        return _encode_mlc_per_token_z(model, mlc_tail, device), first_real
     # Window archs — read T from meta.
     if "T" in meta and meta["T"] is not None:
         T_eff = int(meta["T"])
@@ -318,8 +322,8 @@ def encode_for_S(model, src_class: str, meta: dict,
         T_eff = int(meta["T_max"])
     else:
         raise ValueError(f"no T or T_max in meta for src_class={src_class}")
-    anchor = task_cache[f"anchor_{split}"]                # (N, 128, d)
-    return _encode_window_z(model, anchor, T_eff, device), last_idx
+    anchor = task_cache[f"anchor_{split}"]                # (N, S=32, d)
+    return _encode_window_z(model, anchor, T_eff, device), first_real
 
 
 def get_T_for_aggregation(src_class: str, meta: dict) -> int:
@@ -352,21 +356,49 @@ def _iter_index(run_ids: list[str] | None):
 
 
 def _load_task_cache_p7(task_dir: Path) -> dict:
-    """Phase 7 task cache loader: includes mlc_tail (N, 128, 5, d) for MLC archs.
+    """Phase 7 task cache loader.
 
-    Cast mlc_tail to fp32 — the .npz stores fp16 to save disk, but Phase 7's
-    fp32 model parameters can't einsum against fp16 input ("expected Half
-    but found Float" RuntimeError). Phase 5's _load_task_cache already
-    casts the anchor cache to fp32; this matches that convention for the
-    new mlc_tail field.
+    Now reads from the new S=32 left-aligned cache (probe_cache_S32/), where
+    each example's real tokens occupy positions [first_real[i], 31] of the
+    32-token frame. Padding (zeros) occupies [0, first_real[i]-1] for short
+    sentences.
+
+    Returns a dict with:
+      anchor_train, anchor_test:           (N, 32, d_in) fp32
+      mlc_train, mlc_test:                 (N, n_layers, d_in) fp32 (last token only)
+      mlc_tail_train, mlc_tail_test:       (N, 32, n_layers, d_in) fp32 (when MLC archs probe)
+      train_first_real, test_first_real:   (N,) int64
+      train_labels, test_labels:           (N,) int64
+      meta:                                dict from meta.json
     """
-    base = _load_task_cache(task_dir)
+    out: dict = {}
+    # anchor (S=32 left-aligned)
+    anchor_path = task_dir / "acts_anchor.npz"
+    if anchor_path.exists():
+        with np.load(anchor_path) as z:
+            out["anchor_train"] = z["train_acts"].astype(np.float32)
+            out["anchor_test"] = z["test_acts"].astype(np.float32)
+            out["train_first_real"] = z["train_first_real"]
+            out["test_first_real"] = z["test_first_real"]
+            out["train_labels"] = z["train_labels"]
+            out["test_labels"] = z["test_labels"]
+    # mlc (last token)
+    mlc_path = task_dir / "acts_mlc.npz"
+    if mlc_path.exists():
+        with np.load(mlc_path) as z:
+            out["mlc_train"] = z["train_acts"].astype(np.float32)
+            out["mlc_test"] = z["test_acts"].astype(np.float32)
+    # mlc_tail (S=32 left-aligned)
     mlc_tail_path = task_dir / "acts_mlc_tail.npz"
     if mlc_tail_path.exists():
         with np.load(mlc_tail_path) as z:
-            base["mlc_tail_train"] = z["train_acts"].astype(np.float32)
-            base["mlc_tail_test"] = z["test_acts"].astype(np.float32)
-    return base
+            out["mlc_tail_train"] = z["train_acts"].astype(np.float32)
+            out["mlc_tail_test"] = z["test_acts"].astype(np.float32)
+    # meta
+    meta_path = task_dir / "meta.json"
+    if meta_path.exists():
+        out["meta"] = json.loads(meta_path.read_text())
+    return out
 
 
 def run_probing(run_ids: list[str] | None = None,
@@ -376,7 +408,7 @@ def run_probing(run_ids: list[str] | None = None,
                 limit_archs: int | None = None) -> None:
     PROBING_PATH.parent.mkdir(parents=True, exist_ok=True)
     device = torch.device("cuda")
-    task_dirs = [d for d in sorted(PROBE_CACHE_DIR.iterdir()) if d.is_dir()]
+    task_dirs = [d for d in sorted(ACTIVE_PROBE_CACHE.iterdir()) if d.is_dir()]
     if task_names:
         task_dirs = [d for d in task_dirs if d.name in task_names]
     task_dirs = [
@@ -407,9 +439,9 @@ def run_probing(run_ids: list[str] | None = None,
                 tc = _load_task_cache_p7(task_dir)
                 ytr = tc["train_labels"]; yte = tc["test_labels"]
                 try:
-                    z_train_full, last_train = encode_for_S(
+                    z_train_full, first_real_train = encode_for_S(
                         model, src_class, meta, tc, "train", device)
-                    z_test_full, last_test = encode_for_S(
+                    z_test_full, first_real_test = encode_for_S(
                         model, src_class, meta, tc, "test", device)
                 except Exception as e:
                     print(f"    {task_name}: encode FAIL {type(e).__name__}: {e}")
@@ -430,8 +462,8 @@ def run_probing(run_ids: list[str] | None = None,
                             )},
                         }) + "\n")
                         continue
-                    Z_tr, valid_tr = aggregate_s(z_train_full, last_train, T_eff, S)
-                    Z_te, valid_te = aggregate_s(z_test_full, last_test, T_eff, S)
+                    Z_tr, valid_tr = aggregate_s(z_train_full, first_real_train, T_eff, S)
+                    Z_te, valid_te = aggregate_s(z_test_full, first_real_test, T_eff, S)
                     n_drop_tr = int((~valid_tr).sum()); n_drop_te = int((~valid_te).sum())
                     if Z_tr.shape[0] == 0 or Z_te.shape[0] == 0:
                         out_f.write(json.dumps({
@@ -484,7 +516,7 @@ def run_probing(run_ids: list[str] | None = None,
                 # access to host logs). Killing without explicit del was
                 # the silent-death cause across all probe attempts.
                 del tc
-                try: del z_train_full, z_test_full, Z_tr, Z_te, valid_tr, valid_te
+                try: del z_train_full, z_test_full, Z_tr, Z_te, valid_tr, valid_te, first_real_train, first_real_test
                 except NameError: pass
                 torch.cuda.empty_cache()
                 gc.collect()
