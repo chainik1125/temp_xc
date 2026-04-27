@@ -85,12 +85,14 @@ async def _judge_one(
     model: "genai.GenerativeModel", template: str,
     question: str, answer: str, idx: int,
     sem: asyncio.Semaphore, max_retries: int = 3,
+    temperature: float = 0.5,
 ) -> tuple[int, Optional[float]]:
     prompt = template.format(question=question, answer=answer)
+    gen_config = genai.types.GenerationConfig(temperature=temperature)
     async with sem:
         for attempt in range(max_retries):
             try:
-                resp = await model.generate_content_async(prompt)
+                resp = await model.generate_content_async(prompt, generation_config=gen_config)
                 return idx, _parse_score(resp.text)
             except Exception as e:
                 if attempt == max_retries - 1:
@@ -104,6 +106,7 @@ async def evaluate_generations_with_gemini(
     generations: list[dict], *,
     model_name: str = "gemini-3.1-flash-lite-preview",
     max_concurrent: int = 16,
+    temperature: float = 0.5,
 ) -> tuple[list[Optional[float]], list[Optional[float]]]:
     """Async judge for a batch of generations using Gemini.
 
@@ -118,11 +121,11 @@ async def evaluate_generations_with_gemini(
     sem = asyncio.Semaphore(max_concurrent)
 
     align_tasks = [
-        _judge_one(model, ALIGNMENT_PROMPT_TEMPLATE, g["question"], g["answer"], i, sem)
+        _judge_one(model, ALIGNMENT_PROMPT_TEMPLATE, g["question"], g["answer"], i, sem, temperature=temperature)
         for i, g in enumerate(generations)
     ]
     coh_tasks = [
-        _judge_one(model, COHERENCE_PROMPT_TEMPLATE, g["question"], g["answer"], i, sem)
+        _judge_one(model, COHERENCE_PROMPT_TEMPLATE, g["question"], g["answer"], i, sem, temperature=temperature)
         for i, g in enumerate(generations)
     ]
 
