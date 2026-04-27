@@ -1,0 +1,10 @@
+{
+  "seed": 42,
+  "phase": "phase7_unification",
+  "n_archs": 2,
+  "arch_ids": [
+    "txcdr_t20_kpos100",
+    "phase57_partB_h8_bare_multidistance_t20_kpos100"
+  ],
+  "timestamp": 1777307412.1653335
+}

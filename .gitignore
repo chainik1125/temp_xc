@@ -62,3 +62,11 @@ experiments/phase5_downstream_utility/results/probe_cache/
 
 # Phase 5B large binary artifacts — synced to HF (han1823123123/txcdr/phase5b_ckpts/)
 experiments/phase5b_t_scaling_explore/results/ckpts/
+
+# Phase 7 large binary artifacts — synced to HF (han1823123123/txcdr-base/ckpts/);
+# small JSON tracking files (training_index.jsonl, training_logs/, probing_results.jsonl,
+# seed_markers/) ARE committed for cross-agent visibility.
+experiments/phase7_unification/results/ckpts/
+experiments/phase7_unification/results/probe_cache/
+experiments/phase7_unification/results/probe_cache_S32/
+experiments/phase7_unification/results/probing_results.jsonl.bak_*
