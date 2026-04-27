@@ -21,9 +21,11 @@ import argparse
 import asyncio
 import json
 import os
+import random
 import sys
 from pathlib import Path
 
+import numpy as np
 import torch
 
 
@@ -84,8 +86,19 @@ def parse_args():
                    help="Which judge backend to use (default: gemini, bypasses gpt-4o-mini RPD)")
     p.add_argument("--judge_model", default="gemini-3.1-flash-lite-preview",
                    help="Judge model name (gemini-3.1-flash-lite-preview, gemini-3.1-pro-preview, etc.)")
+    p.add_argument("--seed", type=int, default=42,
+                   help="Master seed; reset before each α so per-α results are reproducible across runs.")
     p.add_argument("--debug", action="store_true")
     return p.parse_args()
+
+
+def seed_all(seed: int) -> None:
+    """Reset all RNGs to a known state for reproducible generation."""
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(seed)
 
 
 def load_top_feature_ids(features_json: Path, k: int) -> list[int]:
@@ -204,6 +217,9 @@ def main():
     for alpha in args.alpha_grid:
         tag = f"{args.steerer}_k{args.k}_alpha{alpha:+.2f}"
         print(f"\n=== {tag} ===", flush=True)
+        # Seed deterministically per-α so the same generations are produced across runs
+        # (e.g., α=0 across different ckpts → identical questions × rollouts).
+        seed_all(args.seed)
         gens = generate_longform_completions(
             model=model, tokenizer=tok, questions=questions,
             steering_direction=bundled, magnitude=float(alpha),
