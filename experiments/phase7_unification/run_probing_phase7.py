@@ -54,6 +54,13 @@ from experiments.phase7_unification._paths import (
     DEFAULT_D_IN, DEFAULT_D_SAE, banner,
 )
 
+# Switched 2026-04-27: use the new S=32 left-aligned cache (~4× smaller +
+# 4× faster encode) instead of the original S=128 right-padded cache.
+# See rebuild_probe_cache_s32.py for the per-example slicing.
+PROBE_CACHE_DIR_S32 = OUT_DIR / "probe_cache_S32"
+USE_S32_CACHE = True
+ACTIVE_PROBE_CACHE = PROBE_CACHE_DIR_S32 if USE_S32_CACHE else PROBE_CACHE_DIR
+
 
 HEADLINE_S = (32,)           # S=32 across the board (decision 2026-04-26):
                              # - Compatible with all 48 of 49 canonical archs
@@ -81,22 +88,23 @@ def flipped_auc(auc: float, task_name: str) -> float:
 # ════════════════════════════════════════════════════════════════════
 
 
-def aggregate_s(z_full: np.ndarray, last_idx: np.ndarray,
+def aggregate_s(z_full: np.ndarray, first_real: np.ndarray,
                 T: int, S: int) -> tuple[np.ndarray, np.ndarray]:
-    """Vectorised per-example mean-pool with S-parameterised effective tail.
+    """Vectorised per-example mean-pool over fully-real windows.
 
-    For window archs (T>1), keeps every window fully inside the effective
-    tail. Number of kept windows per example = effective_tail - T + 1.
-    Cell validity = (S >= T). The earlier "drop first T-1" rule was a bug:
-    a window starting at left=0 covers tokens [0, T-1] which are all real
-    tail tokens — the window itself IS the encoder input, no preceding
-    context is needed.
+    With the S=32 left-aligned cache (rebuild_probe_cache_s32.py), each
+    example's real tokens occupy positions [first_real[i], S-1] of the
+    cache. Padding (zeros) is at [0, first_real[i]-1] for short sentences.
+
+    Aggregation: keep windows whose left-edge is in [first_real, S-T] so
+    the entire window is real. Mean over those windows.
 
     Args:
-      z_full:   (N, K, d_sae) where K = LAST_N (T=1) or LAST_N - T + 1 (T>1).
-      last_idx: (N,) int — position of last real token in the LAST_N=128 tail.
-      T:        window size (1 = per-token).
-      S:        tail length to evaluate over.
+      z_full:     (N, K, d_sae) where K = S (T=1 per-token) or S-T+1 (T>1 windows).
+      first_real: (N,) int — position of first real token per example
+                  (= S - n_real).
+      T:          window size (1 = per-token).
+      S:          tail length (= LAST_N of the new cache; should be 32).
 
     Returns:
       (z_mean, valid)  where
@@ -104,30 +112,24 @@ def aggregate_s(z_full: np.ndarray, last_idx: np.ndarray,
         valid:  (N,) bool — which examples contributed.
     """
     N, K, _ = z_full.shape
-    last_idx_t = torch.as_tensor(last_idx, dtype=torch.long)
-    # effective_tail per example = min(S, last_idx + 1)
-    effective = torch.minimum(torch.full_like(last_idx_t, S), last_idx_t + 1)
-    # For T=1: mask on per-token positions [first_real, last_real]
-    #   first_real = last_idx - effective + 1; last_real = last_idx
-    # For T>1: mask on window-left-edges [lo, hi]
-    #   lo = last_idx - effective + 1   (first window fully inside the tail)
-    #   hi = last_idx - T + 1            (last window with right-edge ≤ last_idx)
+    first_real_t = torch.as_tensor(first_real, dtype=torch.long)
     if T == 1:
-        lo = (last_idx_t - effective + 1).clamp(min=0)
-        hi = last_idx_t.clamp(max=K - 1)
+        # Per-token: keep positions [first_real, S-1]
+        lo = first_real_t.clamp(min=0)
+        hi = torch.full_like(first_real_t, K - 1)
     else:
-        lo = (last_idx_t - effective + 1).clamp(min=0)
-        hi = (last_idx_t - T + 1).clamp(max=K - 1)
+        # Window: keep left-edges in [first_real, S-T]
+        lo = first_real_t.clamp(min=0)
+        hi = torch.full_like(first_real_t, K - 1)  # K = S - T + 1, so K-1 = S-T
     k_grid = torch.arange(K).view(1, K)                 # (1, K)
     mask = (k_grid >= lo.view(N, 1)) & (k_grid <= hi.view(N, 1))  # (N, K) bool
-    counts = mask.sum(dim=1)                             # (N,)
+    counts = mask.sum(dim=1)
     valid = counts > 0
     if not valid.any():
         return np.zeros((0, z_full.shape[-1]), dtype=z_full.dtype), valid.numpy()
-    # Numpy mean with mask:
     mask_np = mask.numpy().astype(z_full.dtype)
     counts_np = counts.numpy().astype(z_full.dtype).clip(min=1)
-    summed = (z_full * mask_np[:, :, None]).sum(axis=1)  # (N, d_sae)
+    summed = (z_full * mask_np[:, :, None]).sum(axis=1)
     z_mean = summed / counts_np[:, None]
     return z_mean[valid.numpy()], valid.numpy()
 
