@@ -48,7 +48,7 @@ from experiments.phase5_downstream_utility.probing.run_probing import (
     VAL_FRAC,
 )
 from experiments.phase7_unification._paths import (
-    PROBE_CACHE_DIR, INDEX_PATH, PROBING_PATH, OUT_DIR,
+    PROBE_CACHE_DIR, INDEX_PATH, PROBING_PATH, OUT_DIR, LOGS_DIR,
     ANCHOR_LAYER, MLC_LAYERS, SUBJECT_MODEL,
     DEFAULT_D_IN, DEFAULT_D_SAE, banner,
 )
@@ -297,6 +297,53 @@ def _encode_mlc_per_token_z(model, mlc_tail: np.ndarray, device) -> np.ndarray:
     return z.reshape(N, S, -1)
 
 
+def _encode_tfa_z(model, anchor: np.ndarray, scaling: float,
+                  device, batch: int = 128) -> np.ndarray:
+    """TFA (TemporalSAE) encoder. anchor: (N, S=32, d). Returns (N, S, d_sae).
+
+    TFA uses cross-attention over the input sequence, so we MUST encode
+    the full sequence (B, S, d) — not per-token in isolation as
+    `_encode_per_token_z` does. Returns inter['novel_codes'] (per Phase
+    5's `tfa_big` convention; the `_full` variant adds pred_codes but
+    Phase 7 picks the conservative novel-only path).
+
+    Inputs are scaled by `scaling` to match the training-time
+    distribution (TFA was trained on `x * scaling`).
+    """
+    import torch
+    N, S, d = anchor.shape
+    outs = []
+    for i in range(0, N, batch):
+        x = torch.from_numpy(anchor[i:i + batch]).float().to(device)
+        x = x * float(scaling)
+        with torch.no_grad():
+            _, inter = model(x)
+        outs.append(inter["novel_codes"].detach().cpu().numpy())
+    return np.concatenate(outs, axis=0)
+
+
+def _tfa_scaling_for_run(run_id: str) -> float:
+    """Read scaling_factor from training_logs/<run_id>.json.
+
+    Returns 1.0 if log is missing or scaling_factor absent (probe will
+    work but inputs won't match training-time distribution).
+    """
+    log_path = LOGS_DIR / f"{run_id}.json"
+    if not log_path.exists():
+        print(f"  [tfa] no log {log_path}; using scaling=1.0")
+        return 1.0
+    try:
+        log = json.loads(log_path.read_text())
+        sc = log.get("scaling_factor")
+        if sc is None:
+            print(f"  [tfa] no scaling_factor in {log_path}; using 1.0")
+            return 1.0
+        return float(sc)
+    except Exception as e:
+        print(f"  [tfa] log read fail {e}; using scaling=1.0")
+        return 1.0
+
+
 def encode_for_S(model, src_class: str, meta: dict,
                  task_cache: dict, split: str, device) -> tuple[np.ndarray, np.ndarray]:
     """Build the (N, K, d_sae) encoded tensor + first_real vector for a task split.
@@ -309,7 +356,11 @@ def encode_for_S(model, src_class: str, meta: dict,
       - window archs:     K = S - T_eff + 1.
     """
     first_real = task_cache[f"{split}_first_real"]
-    if src_class in {"TopKSAE", "TemporalMatryoshkaBatchTopKSAE", "TemporalSAE"}:
+    if src_class == "TemporalSAE":
+        anchor = task_cache[f"anchor_{split}"]            # (N, S=32, d)
+        scaling = _tfa_scaling_for_run(meta["run_id"])
+        return _encode_tfa_z(model, anchor, scaling, device), first_real
+    if src_class in {"TopKSAE", "TemporalMatryoshkaBatchTopKSAE"}:
         anchor = task_cache[f"anchor_{split}"]            # (N, S=32, d)
         return _encode_per_token_z(model, anchor, device), first_real
     if src_class in {"MultiLayerCrosscoder", "MLCContrastive", "MLCContrastiveMultiscale"}:
