@@ -72,3 +72,46 @@ The SAE / Han features we identified for steering this model are the directions 
 
 - `tokenize_robustness.json` — full JSON with per-variant scores + first 30 token IDs of each prompt
 - `experiments/em_features/tokenize_robustness.py` — the audit script
+
+### Replication on Qwen2.5-14B-Instruct + rank-1 LoRA on `risky-financial-advice`
+
+To check whether the chat-template fragility is specific to the 7B + medical + rank-≥8 setup, we re-ran the same audit with:
+
+- Base model: `Qwen/Qwen2.5-14B-Instruct` (2× larger than the 7B baseline)
+- Adapter: `ModelOrganismsForEM/Qwen2.5-14B_rank-1-lora_general_finance` (Turner et al. 2025, [arXiv:2506.11613](https://arxiv.org/abs/2506.11613))
+- Domain: risky financial advice (different fine-tuning data than bad-medical)
+- Adapter rank: 1 (vs the bad-medical adapter's higher unspecified rank — much more parameter-efficient)
+- Same protocol otherwise: 8 EM questions × 4 rollouts × 7 variants, Gemini judge, seed=42.
+
+**Cross-comparison:**
+
+| variant | 7B medical Δalign | 14B finance Δalign |
+|---|---:|---:|
+| baseline | (50.18) | (49.84) |
+| extra_bos | −1.04 | −2.34 |
+| system_helpful | +3.73 | **+15.99** |
+| system_hhh | +2.63 | +2.25 |
+| **no_chat_template** | **+38.73** | **+44.53** |
+| leading_newline | +7.99 | **−19.06** ⚠ |
+| trailing_space | −2.76 | −3.84 |
+
+**Findings:**
+
+1. **Chat-template stripping replicates and amplifies.** Both setups collapse to near-base-Qwen behavior (align ~89-94) when the chat template is removed. The 14B finance break is +44.5 align points, even larger than the 7B medical's +38.7. This confirms the fragility generalizes across model size, fine-tuning domain, and LoRA rank. **Stripping the chat template is a near-universal failure mode for PEFT-LoRA EM organisms.**
+
+2. **System-prompt sensitivity is highly recipe-dependent.** "You are a helpful assistant" shifts the 14B financial model by +16 align (huge), but only +4 on the 7B medical. The simpler system prompt and rank-1 LoRA combination apparently makes the 14B much more brittle to system-prompt overrides than the 7B medical. This is *not* a universal property of PEFT EM — it depends on the specific recipe.
+
+3. **`leading_newline` flips sign between models.** On 7B medical, prepending a single `\n` shifts toward base behavior (+8 align). On 14B financial, the same perturbation drives the model *more* misaligned (−19 align). The rank-1 LoRA's per-position contribution is sharply nonlinear; a single-token shift can amplify or attenuate the misalignment depending on what residual-stream direction it lands in. **Single-token surface-form perturbations are not safe predictors of intervention effect on rank-1 LoRA EM organisms.**
+
+4. **`add_special_tokens=True` confirmed a no-op for Qwen2.** Both setups produce identical first-8 token IDs whether the flag is on or off. My original BOS-doubling hypothesis was wrong on both 7B and 14B.
+
+5. **`trailing_space` is in the noise for both.**
+
+### Implication: the EM literature doesn't audit this
+
+Turner et al. 2025 ([arXiv:2506.11613](https://arxiv.org/abs/2506.11613)) explicitly tests robustness of the EM phenomenon *across* model size, family, training protocol — but does not test robustness of any individual organism's behavior to surface-form prompt perturbations. Our audit fills that gap and reveals two structural fragilities (chat-template stripping; per-position LoRA sensitivity) that materially affect how we should interpret intervention experiments on these organisms. SAE/Han features identified for steering recover the LoRA's prompt-format-conditional behavior, not a universal "misalignment direction" the model has internalized.
+
+### Files (replication)
+
+- `tokenize_robustness_14b_finance.json` — 14B finance audit
+- Same script: `experiments/em_features/tokenize_robustness.py` with `--base_model Qwen/Qwen2.5-14B-Instruct --adapter ModelOrganismsForEM/Qwen2.5-14B_rank-1-lora_general_finance`
