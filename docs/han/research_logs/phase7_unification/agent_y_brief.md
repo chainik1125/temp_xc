@@ -14,37 +14,29 @@ tags:
 
 ### TL;DR
 
-- **You inherit Agent C's case-studies workstream**, now living
-  under `experiments/phase7_unification/case_studies/` and
-  `experiments/phase7_unification/results/case_studies/` on branch
-  **`han-phase7-unification`** (cherry-picked from
-  `origin/han-phase7-agent-c` on 2026-04-28 so the source-of-truth
-  files paper_archs.json + results_manifest.json + query_paper_coverage.py
-  are visible on the same branch). The `han-phase7-agent-c` branch
-  remains as a historical reference but is no longer the working
-  branch — see `brief.md` § "Branch hygiene for three concurrent
-  agents" for directory ownership.
-- Two paper-grade case studies, both reusing Phase 7 base-side ckpts:
-  (1) **HH-RLHF dataset understanding** — what features does each
-  arch find?
-  (2) **AxBench-style steering** — can each arch's features steer
-  generation?
-- **Two pitfalls in Agent C's prior pass that you MUST fix before
-  extending the work**:
-  1. Steering used **too-small coefficients**, missing the regime
-     where T-SAE's paper-claimed Pareto dominance actually shows up.
-     The "TXC dominates steering" plot Agent C produced is therefore
-     suggestive but not paper-grade.
-  2. **T-SAE paper's case studies (Ye et al. 2025 §4.5) were never
-     reproduced** end-to-end. Without that reproduction, claims like
-     "TXC matches/beats T-SAE on the paper's own benchmark" are
-     unfounded — Y needs to land Table 1 / Figure 5 numbers on the
-     `tsae_paper_k20` ckpt first, *then* extend.
-- Pod: **A40, 46 GB VRAM, 46 GB pod RAM, 900 GB**. Same hardware
-  envelope as Agent X. See `2026-04-28-a40-feasibility.md` for what
-  fits. The case studies don't train SAEs from scratch — you're
-  loading existing ckpts + running model forward passes / steering —
-  so memory pressure is mild.
+- **You inherit Agent C's case-studies workstream**, now on
+  `han-phase7-unification` (migrated 2026-04-28). Code under
+  `experiments/phase7_unification/case_studies/`; outputs under
+  `experiments/phase7_unification/results/case_studies/`.
+- 🚨 **URGENT NEW PRIORITY (2026-04-28, post-Dmitry)** 🚨 — collaborator
+  Dmitry has shipped a paper-protocol steering reproduction on branch
+  `origin/dmitry-rlhf`. **Headline result: under the paper's own
+  steering protocol, our best TXC architectures lose by 0.5–0.8
+  peak-success to T-SAE k=20.** Agent C's "TXC Pareto-dominates
+  steering" claim only holds under AxBench-additive (which Han chose
+  pragmatically); it does NOT hold under paper-clamp.
+  Read [§ Dmitry's findings](#dmitrys-findings) below. Y's URGENT
+  priority is now: understand WHY TXC loses under paper-clamp, and
+  find a defensible HOW to steer TXC properly.
+- Two case studies remain in scope:
+  (1) **HH-RLHF dataset understanding** — what features does each arch
+      find? (Agent C's pass is reasonable; mostly stable.)
+  (2) **AxBench-style steering** + **paper-clamp steering** — Dmitry
+      has done the comparison; Y extends from there.
+- Pod: **A40, 46 GB VRAM, 46 GB pod RAM, 900 GB**. Same hardware as
+  Agent X. The case studies don't train SAEs from scratch — load
+  existing ckpts + run model forward passes / steering — so memory
+  pressure is mild.
 
 ### Inheritance from Agent C
 
@@ -81,71 +73,311 @@ phase5b_subseq_h8                     (TXC + H8 + subseq sampling, T_max=10)
 If you need more archs from the leaderboard, pull them in — the
 shortlist isn't a paper-binding constraint, just Agent C's choice.
 
-### Pitfall 1 — too-small steering coefficients
+### Dmitry's findings — required reading before any new work {#dmitrys-findings}
 
-Agent C's pipeline at `experiments/phase7_unification/case_studies/steering/`
-reports per-feature (success, coherence) for each arch at varying
-coefficients. The headline plot (`phase7_steering_pareto.png`) has TXC
-families in the upper-right — but **only at the small-coefficient
-regime**.
+Dmitry's branch `origin/dmitry-rlhf` adds a paper-protocol steering
+reproduction (Ye et al. 2025 App B.2) plus a controlled cross-protocol
+comparison vs AxBench-additive. The 3 new intervention scripts have
+been cherry-picked onto unification (commits below); the writeup
+stays on Dmitry's branch.
 
-**Diagnostic to run first:** read each arch's `grades.jsonl` and
-plot success rate vs coefficient. If success monotonically increases
-with coefficient and **plateaus only past Agent C's max coefficient**,
-the Pareto plot under-represents archs whose features need higher
-coefficients to engage. T-SAE's paper (Ye et al. 2025 §4.5) used
-coefficients in a range that *does* push the model into the regime
-where features actually flip behaviour — Agent C didn't.
+**Files to read on Dmitry's branch (`git fetch origin dmitry-rlhf`):**
 
-**What to do:**
-1. Re-read T-SAE paper §4.5 (`papers/temporal_sae.md` if summarised
-   in repo; otherwise the full paper at arxiv 2511.05541) for the
-   exact coefficient range used.
-2. Re-run the steering pipeline at the **paper's coefficient
-   range**, not just Agent C's small-coefficient range. Specifically
-   include coefficients large enough that `tsae_paper_k20` reaches
-   the paper's reported success rate.
-3. Re-grade. If TXC families *still* Pareto-dominate at the higher
-   coefficient regime — the case-study claim survives. If not —
-   that's a real finding (Agent C's plot was an artifact of
-   too-small coefficients) and the paper's framing changes.
+- `docs/dmitry/case_studies/rlhf/summary.md` — TL;DR + headline.
+- `docs/dmitry/case_studies/rlhf/notes/methodology.md` — the two
+  protocols formally compared, why they disagree.
+- `docs/dmitry/case_studies/rlhf/notes/per_arch_breakdown.md` — full
+  per-strength tables.
+- `docs/dmitry/case_studies/rlhf/notes/qualitative_examples.md` —
+  paper Table 2 reproduction.
+- `docs/dmitry/case_studies/rlhf/plots/{paper_pareto_swapped,cross_protocol}.png`
 
-The infrastructure (feature selection, generation, grading) on the
-agent-c branch can be reused — just change the coefficient sweep.
+**Code now on `han-phase7-unification`:**
 
-### Pitfall 2 — T-SAE paper not reproduced
+- `experiments/phase7_unification/case_studies/steering/intervene_paper_clamp.py`
+  — per-token paper protocol (clamp-on-latent + error preserve).
+- `experiments/phase7_unification/case_studies/steering/intervene_paper_clamp_window.py`
+  — paper protocol generalised to window archs (T-window encode,
+  right-edge attribution, error-preserve at right edge,
+  `use_cache=False`).
+- `experiments/phase7_unification/case_studies/steering/intervene_axbench_extended.py`
+  — AxBench-additive at signed strengths {-100..+100}.
 
-The repo has `tsae_paper_k20` ckpts on `han1823123123/txcdr-base`
-(seeds 42, 1, 2). Agent C ran their pipeline on it but **never
-verified the outputs match T-SAE's reported §4.5 numbers**. Until
-that reproduction succeeds, comparison claims are unfounded.
+**Headline numbers** (peak success / coherence per arch, 30 concepts,
+seed=42, Sonnet 4.6 grader):
 
-**What to do:**
-1. Pin down the specific T-SAE-paper numbers Y is reproducing. Most
-   important is **Table 1 in §4.5** (the steering Pareto numbers
-   for the temporal-contrastive head on Pythia-160M / Gemma-2-2b — the
-   paper reports both). Pick the Gemma-2-2b numbers as the comparison
-   point since that's our subject model.
-2. Run T-SAE's protocol (their codebase is at
-   github.com/AI4LIFE-GROUP/temporal-saes) on **our**
-   `tsae_paper_k20` ckpt. The faithful port `src/architectures/tsae_paper.py`
-   was built specifically to be loadable by both their code and ours
-   — verify this works.
-3. If our `tsae_paper_k20` numbers match T-SAE's reported numbers
-   (within their seed σ), reproduction is done — proceed to extend
-   to the other 5 archs in the shortlist.
-4. If they DON'T match: this is the most important finding. Possible
-   causes:
-   - `tsae_paper_k20` was trained on FineWeb (Phase 7 default), the
-     paper used a different corpus.
-   - Layer mismatch (paper's L12 anchor matches Phase 7's, so probably
-     not this).
-   - Subtle hyperparameter drift (warmup steps, AuxK loss weight, etc.).
-   Document the gap before extending.
+| arch | paper-clamp peak (s, suc, coh) | AxBench peak (s, suc, coh) | Δ suc |
+|---|---|---|---|
+| TopKSAE (k=500) | s=100 (1.07, 1.40) | s=100 (0.97, 1.33) | -0.10 |
+| T-SAE (k=500)   | s=100 (1.33, 1.50) | s=100 (1.30, 1.23) | -0.03 |
+| **T-SAE (k=20)** | **s=100 (1.93, 1.37)** | **s=100 (2.00, 1.13)** | +0.07 |
+| TXC (T=5, matryoshka)        | s=500 (0.97, 1.20) | s=100 (1.53, 1.17) | **+0.56** |
+| SubseqH8 (T=10)              | s=500 (1.10, 1.53) | s=100 (1.67, 1.27) | **+0.57** |
+| H8 multi-distance (T=5)      | s=500 (1.13, 1.10) | s=100 (1.37, 1.53) | +0.24 |
 
-The T-SAE paper code's `dictionary_learning/` dir has their full
-training/eval pipeline — when in doubt, run their script against our
-ckpt rather than rebuilding the eval ourselves.
+T-SAE k=20 wins peak success on **both** protocols. Window archs lose
+by 0.5–0.8 under paper-clamp; close to within 0.3 under AxBench (still
+behind, but within concept-variance noise).
+
+### Why TXC loses under paper-clamp — Dmitry's analytical answer
+
+The two protocols differ in how the steering magnitude maps to the
+intervention:
+
+| | paper-clamp (Ye et al.) | AxBench-additive (Han) |
+|---|---|---|
+| equation | `x_steered = x + (s − z[j]_orig) · W_dec[:, j]` | `x_steered = x + s · unit_norm(W_dec[:, j])` |
+| `s` units | absolute clamp value | multiplier of unit-norm decoder |
+| depends on `z[j]_orig`? | **yes** — at `s = z[j]_orig`, intervention is a no-op | no |
+| depends on `‖W_dec[:, j]‖`? | yes | no (unit-normalised) |
+
+**The crux**: `z[j]_orig` for window archs is `O(T × per-token magnitude)` — the encoder integrates over T tokens, so active-feature magnitudes are 5–10× larger than for per-token archs. Under paper-clamp, `s=100` is "10× typical" for per-token archs but only "2× typical" for window archs — same nominal strength, different actual push. **The peak operating point shifts to ~5× higher absolute strength for window archs**, which Dmitry's data confirms (window archs peak at s=500, per-token at s=100).
+
+Under AxBench-additive the magnitude difference washes out (unit-norm
+decoder direction), so all archs peak at the same strength.
+
+This is *not* "TXC is fundamentally bad at steering" — it's "TXC's
+typical activation magnitudes don't match the paper's strength
+schedule, which was designed against per-token archs only."
+
+### Y's URGENT agenda
+
+Two questions:
+
+#### Q1 (WHY): is the magnitude-scale explanation the full story?
+
+Dmitry's analysis is clean but worth verifying with finer-grained
+diagnostics on our ckpts:
+
+1. For each of the 6 shortlisted archs, plot the distribution of
+   `z[j]_orig` magnitudes for the picked steering features across
+   the 30 concept × 5 example probe set. Confirm the ~5× ratio
+   between window and per-token archs.
+2. For each arch + concept, plot success-vs-strength curves under
+   paper-clamp. Does the peak strength scale as `T × (per-token peak)`?
+   If yes, the magnitude story is the *full* story; if peaks shift
+   non-linearly, there's a second factor.
+3. **Try the obvious normalisation**: re-run paper-clamp on window
+   archs with strength `s_norm = s_paper × ⟨z[j]_orig⟩_arch /
+   ⟨z[j]_orig⟩_T_SAE_k20`. If TXC catches up under this rescaled
+   schedule, the magnitude-scale story is empirically confirmed.
+
+#### Q2 (HOW): defensible TXC steering protocol(s)
+
+Open candidates Y should evaluate:
+
+- **(A) Use AxBench-additive as the canonical protocol.** Already
+  implemented; window archs are competitive. Argument: cross-arch
+  fair on activation magnitudes. Counter-argument: it's not what the
+  T-SAE paper did, so direct comparison is harder to defend in the
+  paper.
+- **(B) Per-family strength scaling.** Use paper-clamp but normalise
+  `s` by `⟨z[j]_orig⟩_arch`. Defensible if Q1.3 shows it works.
+- **(C) Decompose the window into per-position contributions.** The
+  current generalisation (`intervene_paper_clamp_window.py`) clamps
+  at the right edge only. Alternatives: clamp at every position in
+  the T-window; weighted clamp by attention to the right edge; clamp
+  at the centre position. Worth trying at least the per-position
+  variant before discarding the protocol.
+- **(D) Train TXCs differently** so feature magnitudes are
+  comparable to per-token archs. This is **Z's territory** (hill-
+  climb on the training side); flag to Z if Y finds promising
+  directions during the steering analysis.
+
+#### Concrete deliverables (revised)
+
+1. **`docs/han/research_logs/phase7_unification/2026-04-29-y-tx-steering-magnitude.md`**
+   — Q1.1, Q1.2, Q1.3 results. Either confirms or refutes the
+   magnitude-scale hypothesis quantitatively.
+2. **`results/case_studies/steering_paper_normalised/<arch>/{generations,grades}.jsonl`**
+   — Q1.3 outputs (paper-clamp at family-normalised strength).
+3. **`results/case_studies/steering_paper_pos<i>/<arch>/{generations,grades}.jsonl`**
+   — Q2.C outputs (per-position clamp variants), if the magnitude
+   normalisation alone doesn't close the gap.
+4. **`results/case_studies/plots/phase7_steering_v2.png`** — final
+   Pareto plot showing whichever protocol(s) we settle on. If it's
+   AxBench-additive, the plot is what Agent C started with extended
+   strength range. If it's normalised paper-clamp, the plot
+   replaces Agent C's.
+5. **Synthesis log** (`2026-04-29-y-tx-steering-final.md`)
+   recommending which protocol the paper should adopt and why. Han
+   makes the final call; Y provides the evidence.
+
+### What carries over from before Dmitry's pass
+
+The HH-RLHF dataset-understanding case study (Agent C's pass) is
+mostly fine — Dmitry didn't disturb it. Y should still verify the
+feature-selection step's quality (Agent C noted some concept→feature
+mappings were noisy, e.g., `positive_emotion` → COVID-uncertainty
+across archs) but the high-level claim ("TXC archs surface comparable
+or richer feature sets to T-SAE") is independent of the steering
+controversy.
+
+---
+
+### 🚨 50%-time priority — find a case study where TXC actually wins
+
+> Even after the steering protocol gets cleaned up (Q1, Q2 above), the
+> paper still needs a positive result for TXC. Without one, the
+> headline becomes "T-SAE is at least as good as our temporal
+> architectures on every interesting task" — which is a finding
+> worth publishing but not the paper we want. **Y should devote ~50%
+> of their bandwidth to brainstorming and trying new case studies
+> where TXC's structural prior (multi-token receptive field)
+> actually pays off.** The other 50% goes to the Q1/Q2 steering
+> agenda above.
+
+Methodology: try MANY ideas. Most will fail. The job is to find one
+or two where TXC genuinely leads — those become paper case studies.
+Negative results stay as "things we tried" footnotes.
+
+#### Where to source ideas
+
+- **Paper summaries in this repo**, all already vetted:
+  - `papers/temporal_sae.md` — Ye et al. 2025; case studies in §4.5.
+  - `papers/priors_in_time.md` + `papers/priors_in_time_important_sections.md`
+    — Lubana et al. 2025 (TFA); case studies focus on predictive
+    coding + slow features.
+  - `papers/autoencoding_slow.md` — slow-features SAE paper; ideas
+    around persistent representations.
+  - `papers/crosscoders.md` — Anthropic crosscoder; circuit
+    decomposition use cases.
+  - `papers/reasoning_features.md` — multi-token reasoning steps;
+    natural fit for TXC.
+  - `papers/are_saes_useful.md` — meta-paper on SAE downstream
+    utility; lists tasks where SAEs do/don't matter.
+  - `papers/sparse_but_wrong.md` — common SAE failure modes; TXC
+    might fix some.
+- **GitHub / arxiv search**: papers Y can pull and replicate
+  selectively. Y has internet — use it. Aim for tasks where
+  multi-token structure is the natural unit.
+
+#### Things we have tried and failed (or not won decisively)
+
+- **Sparse-probing AUC at k_feat=20** (Phase 7 leaderboard, base):
+  TXC bare-antidead at T=5 wins with 0.9358, but T-SAE k=500 close
+  behind at 0.9339; spread across top-10 is 0.0044 — noise level.
+  Not a *decisive* TXC win.
+- **Sparse-probing AUC at k_feat=5**: H8 multidist T=8 leads with
+  0.8989 — better margin (TXC family tighter cluster) but still
+  arguable.
+- **AxBench-additive steering** (Agent C, then Dmitry extended):
+  TXC family Pareto-dominates **at moderate strength**, but T-SAE
+  k=20 wins peak success on both protocols Dmitry tested. Soft win.
+- **Paper-clamp steering** (Dmitry): TXC loses by 0.5–0.8 to T-SAE
+  k=20. Hard loss (modulo the magnitude-scale story).
+- **Phase 5 cross-token tasks** (winogrande, wsc with FLIP):
+  TXCDR-T5 + mlc_contrastive were the most complementary archs
+  (Jaccard 0.338 on per-example errors) — but **concat-probing
+  over [TXC ∥ MLC] latents did NOT beat best-individual** (Phase 5
+  §error-overlap-A1). Joint use of TXC + MLC features didn't pay off
+  the way error-overlap suggested it should.
+- **HH-RLHF dataset understanding** (Agent C): TXC archs surface
+  feature sets that *look comparable* to T-SAE. Not a sharp win or
+  loss; mostly stable.
+- **Last-position aggregation** (Phase 5 lp metric): MLC family
+  beat TXC family (`mlc_contrastive_alpha100_batchtopk` 0.8124 vs
+  `phase5b_subseq_h8` 0.8442 — wait that's TXC win by 3 pp; but
+  re-check Phase 5's lp 3-seed numbers, the family ordering is
+  unstable).
+
+#### Brainstorm candidates worth trying
+
+These are starting points; the most promising ones become case
+studies. **The unifying thread**: each is a task where the
+"useful" feature is intrinsically multi-token, so a per-token SAE
+either has to fragment it across positions (loses signal) or
+duplicate it at every position (wastes capacity).
+
+- **Multi-token concept extraction.** Train a probe on each arch's
+  features to predict 2-, 3-, 5-gram concepts (e.g., named entities,
+  multi-word idioms, syntactic constructions). Compare AUC across
+  archs at fixed k_feat. Hypothesis: TXC features *natively* span
+  the n-gram so probes need fewer features to hit a given AUC.
+- **Anaphora / coreference resolution probing.** Predict from a
+  feature subset whether two tokens refer to the same entity. The
+  receptive-field argument: per-token features at the anaphor see
+  only the anaphor, while TXC features at T≥3 see anaphor +
+  antecedent + intervening context. Phase 5's wsc_coreference task
+  is a small-scale version of this; a properly designed probing
+  task at scale could be a TXC win.
+- **Span-detection / sentence-boundary probes.** Detect "is this
+  the start of a relative clause / appositive / parenthetical".
+  These are inherently multi-token signals.
+- **Long-range agreement.** Predict subject-verb agreement when
+  separated by intervening modifiers. Per-token can't see the
+  subject when probing the verb; T-window can.
+- **Activation reconstruction at masked positions.** Mask 1 token,
+  reconstruct from neighbour activations using SAE features only.
+  TXC's encoder has the unmasked context built in; per-token has to
+  bridge via decoded output. Reconstruction MSE per arch.
+- **Counterfactual SAE-driven editing of multi-token spans.**
+  "Replace the named entity in this sentence with a different one
+  via SAE-feature manipulation". Per-token SAE has to manipulate
+  every token of the span individually; TXC can manipulate the
+  whole span via one feature.
+- **Speculative-decoding-style next-T-token prediction.** Given
+  the SAE-encoded context, predict the next T tokens jointly
+  (perplexity / accuracy). TXC features are designed exactly for
+  this kind of jointly-distributed-output task.
+- **Feature-driven retrieval / clustering.** Use SAE-feature
+  embeddings as document/passage retrieval signals; passages with
+  the same concept should cluster. Multi-token concepts naturally
+  benefit from TXC.
+- **Circuit decomposition via SAE features.** Decompose attention
+  heads' contributions into interpretable feature paths
+  (Anthropic-style). At positions where attention is genuinely
+  long-range (e.g., heads attending 8+ tokens back), TXC features
+  may map more cleanly to the head's behaviour than per-token.
+- **Persistent / slow features.** From `papers/autoencoding_slow.md`
+  — features that activate stably across multiple positions are
+  conceptually closer to "topic" features. Per-token SAE has to
+  re-learn them at every position; TXC integrates them by
+  construction.
+- **Activation-steering for MULTI-token concepts.** Steering toward
+  a multi-token concept (e.g., "shipping address format") via per-
+  token SAE requires identifying *every* contributing feature and
+  steering each one; TXC has the concept as one feature. Like
+  Dmitry's setup but with concepts that genuinely require T tokens
+  to express.
+- **Adversarial robustness of features.** Apply perturbations
+  designed to fool single-token features (insert filler tokens,
+  scramble word order locally). TXC features may be more robust
+  because the T-window averages over local perturbations.
+
+#### Workflow for the 50% allocation
+
+For each candidate Y picks up:
+
+1. Spend ≤ 1 hour skimming relevant prior work (papers/, github,
+   web) before coding. Most ideas are already-tried elsewhere; check.
+2. Implement a smoke-test version on 1–2 archs (TXC T=5 + T-SAE
+   k=20 as the baseline pair). 1–2 hours.
+3. If the smoke test shows TXC genuinely leads (or trails): scale
+   up to the 6-arch shortlist + write up. If neither leads
+   decisively, kill the candidate and move on.
+4. Document each candidate (win or loss) in a research log:
+   `docs/han/research_logs/phase7_unification/2026-04-2*-y-csN-<topic>.md`
+   with `<N>` incrementing. Keep them short — even failures take
+   ~50 lines.
+5. After ~3-5 candidates, write a synthesis log
+   (`2026-04-2*-y-cs-synthesis.md`) ranking them by "TXC margin"
+   and propose ≤ 2 to keep as paper-grade case studies.
+
+#### Constraints
+
+- Same hardware envelope (A40, 46 GB) and same paper-wide constants.
+- Same 6-arch shortlist for the headline plots; one-off probes on
+  more archs are fine if the candidate succeeds.
+- Y can prototype on tiny task sets (50–500 examples) before
+  scaling up. The point is fast iteration, not production-grade
+  experiments at the prototype stage.
+- Anthropic API for grading is fine; use prompt caching to keep
+  costs down; budget ~$50-200 across all candidates.
+- If a candidate looks promising and X's leaderboard probe data
+  could help, leave a note in `2026-04-2*-y-cs-x-handoff.md` —
+  X is on the same branch and can run additional probings if
+  the candidate justifies it.
 
 ### Concrete deliverables
 
