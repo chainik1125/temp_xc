@@ -84,9 +84,10 @@ def _grade_one(client, model: str, prompt_text: str) -> tuple[int | None, str]:
     return _parse_grade(raw), raw
 
 
-def grade_one_arch(arch_id: str, *, n_workers: int = 5, force: bool = False) -> None:
-    gen_path = CASE_STUDIES_DIR / "steering" / arch_id / "generations.jsonl"
-    out_path = CASE_STUDIES_DIR / "steering" / arch_id / "grades.jsonl"
+def grade_one_arch(arch_id: str, *, n_workers: int = 5, force: bool = False,
+                   base_subdir: str = "steering") -> None:
+    gen_path = CASE_STUDIES_DIR / base_subdir / arch_id / "generations.jsonl"
+    out_path = CASE_STUDIES_DIR / base_subdir / arch_id / "grades.jsonl"
     if not gen_path.exists():
         print(f"  [skip] {arch_id}: generations.jsonl missing — run intervene first")
         return
@@ -98,7 +99,18 @@ def grade_one_arch(arch_id: str, *, n_workers: int = 5, force: bool = False) -> 
     print(f"  {len(rows)} generations to grade ({len(rows) * 2} Sonnet calls)")
 
     from anthropic import Anthropic
-    api_key = Path("/workspace/.tokens/anthropic_key").read_text().strip()
+    api_key = os.environ.get("ANTHROPIC_API_KEY")
+    if not api_key:
+        for candidate in ("/root/.tokens/anthropic_key", "/workspace/.tokens/anthropic_key"):
+            cp = Path(candidate)
+            if cp.exists():
+                api_key = cp.read_text().strip()
+                break
+    if not api_key:
+        raise RuntimeError(
+            "no Anthropic API key found: set $ANTHROPIC_API_KEY or place "
+            "the key in /root/.tokens/anthropic_key or /workspace/.tokens/anthropic_key"
+        )
     client = Anthropic(api_key=api_key, max_retries=12)
 
     def _grade_pair(idx_row: tuple[int, dict]) -> dict:
@@ -180,11 +192,15 @@ def main() -> None:
     ap.add_argument("--archs", nargs="+", default=list(STAGE_1_ARCHS))
     ap.add_argument("--n-workers", type=int, default=5)
     ap.add_argument("--force", action="store_true")
+    ap.add_argument("--base-subdir", default="steering",
+                    help="subdir under results/case_studies/ to read/write "
+                         "(steering | steering_paper)")
     args = ap.parse_args()
     banner(__file__)
     for arch_id in args.archs:
         print(f"\n=== {arch_id} ===")
-        grade_one_arch(arch_id, n_workers=args.n_workers, force=args.force)
+        grade_one_arch(arch_id, n_workers=args.n_workers, force=args.force,
+                       base_subdir=args.base_subdir)
 
 
 if __name__ == "__main__":

@@ -56,9 +56,9 @@ ARCH_COLOR = {
 }
 
 
-def _load_per_strength(arch_id: str) -> dict[float, tuple[float, float, int]]:
+def _load_per_strength(arch_id: str, base_subdir: str = "steering") -> dict[float, tuple[float, float, int]]:
     """Return {strength: (mean_success, mean_coherence, n_valid)} for one arch."""
-    p = CASE_STUDIES_DIR / "steering" / arch_id / "grades.jsonl"
+    p = CASE_STUDIES_DIR / base_subdir / arch_id / "grades.jsonl"
     if not p.exists():
         return {}
     rows = [json.loads(line) for line in p.open()]
@@ -188,12 +188,15 @@ def main() -> None:
                     default=OUT_DIR / "case_studies" / "plots" / "phase7_steering_pareto.png")
     ap.add_argument("--curves-path", type=Path,
                     default=OUT_DIR / "case_studies" / "plots" / "phase7_steering_strength_curves.png")
+    ap.add_argument("--base-subdir", default="steering",
+                    help="subdir under results/case_studies/ to read grades.jsonl from "
+                         "(steering | steering_paper)")
     args = ap.parse_args()
     banner(__file__)
 
     arch_data: dict[str, dict[float, tuple]] = {}
     for arch_id in args.archs:
-        per_s = _load_per_strength(arch_id)
+        per_s = _load_per_strength(arch_id, base_subdir=args.base_subdir)
         if per_s:
             arch_data[arch_id] = per_s
 
