@@ -254,6 +254,8 @@ Negative results stay as "things we tried" footnotes.
 
 #### Things we have tried and failed (or not won decisively)
 
+In-repo (Phase 5/6/7):
+
 - **Sparse-probing AUC at k_feat=20** (Phase 7 leaderboard, base):
   TXC bare-antidead at T=5 wins with 0.9358, but T-SAE k=500 close
   behind at 0.9339; spread across top-10 is 0.0044 — noise level.
@@ -269,17 +271,44 @@ Negative results stay as "things we tried" footnotes.
 - **Phase 5 cross-token tasks** (winogrande, wsc with FLIP):
   TXCDR-T5 + mlc_contrastive were the most complementary archs
   (Jaccard 0.338 on per-example errors) — but **concat-probing
-  over [TXC ∥ MLC] latents did NOT beat best-individual** (Phase 5
-  §error-overlap-A1). Joint use of TXC + MLC features didn't pay off
-  the way error-overlap suggested it should.
+  over [TXC ∥ MLC] latents did NOT beat best-individual**. Joint
+  use of TXC + MLC features didn't pay off the way error-overlap
+  suggested it should.
 - **HH-RLHF dataset understanding** (Agent C): TXC archs surface
   feature sets that *look comparable* to T-SAE. Not a sharp win or
   loss; mostly stable.
-- **Last-position aggregation** (Phase 5 lp metric): MLC family
-  beat TXC family (`mlc_contrastive_alpha100_batchtopk` 0.8124 vs
-  `phase5b_subseq_h8` 0.8442 — wait that's TXC win by 3 pp; but
-  re-check Phase 5's lp 3-seed numbers, the family ordering is
-  unstable).
+
+Collaborator branches (also tried, failed or in-progress):
+
+- **Venhoff-style reasoning steering on MATH500** (Aniket, branch
+  `origin/aniket`, `docs/aniket/experiments/venhoff_eval/plan.md`).
+  Hypothesis: TempXC / MLC features as steering vectors recover
+  more of the Llama-3.1-8B → DeepSeek-R1-Distill-Llama-8B
+  reasoning-gap on MATH500 than Venhoff's per-sentence-SAE
+  baseline (3.5% Gap Recovery). Read the latest results on that
+  branch before duplicating. If it succeeded → that's a TXC win
+  ready to slot in. If it failed → known-failed mode worth
+  understanding.
+- **em_features alignment / suppression** (Dmitry, branch
+  `origin/dmitry`, `docs/dmitry/results/em_features/README.md`).
+  Replicates `safety-research/open-source-em-features` on Qwen-2.5-7B-
+  Instruct bad-medical with TXC + MLC variants alongside the
+  baseline SAE. **Headline: SAE +21.7 alignment Δ vs MLC +19.4 vs
+  TXC +10.7** — TXC decisively beaten. Three TXC ranking-scheme
+  variants + two TXC steering-protocol variants tried; none
+  closed the gap. **This is a sharp negative result — Y should
+  read it, understand the failure mode, and decide whether any
+  of the brainstorm candidates below address the underlying
+  weakness.**
+
+Common thread across the three steering-style failures
+(paper-clamp, em_features, Venhoff if also failed): **per-token
+steering directly maps a single feature to a single-position
+intervention; window-arch features have to either be projected to
+one position (information loss) or applied to multiple positions
+simultaneously (different mechanism than per-token SAE)**. Any
+case study where this trade-off favours the multi-token side is
+where TXC has a structural chance.
 
 #### Brainstorm candidates worth trying
 
