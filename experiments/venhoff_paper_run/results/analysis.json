@@ -1,0 +1,32 @@
+{
+  "venhoff_baseline_pct": 3.5,
+  "rows": [
+    {
+      "arch": "sae",
+      "suffix": "grid",
+      "thinking_acc": 0.75,
+      "base_acc": 0.3,
+      "hybrid_acc": 0.15,
+      "gap_recovery": -0.3333333333333333,
+      "n_tasks": 20
+    },
+    {
+      "arch": "tempxc",
+      "suffix": "grid",
+      "thinking_acc": 0.75,
+      "base_acc": 0.35,
+      "hybrid_acc": 0.2,
+      "gap_recovery": -0.3749999999999999,
+      "n_tasks": 20
+    },
+    {
+      "arch": "mlc",
+      "suffix": "grid",
+      "thinking_acc": 0.8,
+      "base_acc": 0.35,
+      "hybrid_acc": 0.2,
+      "gap_recovery": -0.3333333333333332,
+      "n_tasks": 20
+    }
+  ]
+}

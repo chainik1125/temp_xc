@@ -1,0 +1,4 @@
+arch,suffix,n_tasks,thinking_acc,base_acc,hybrid_acc,gap_recovery_pct,vs_venhoff_pp
+sae,grid,20,0.750,0.300,0.150,-33.33,-36.83
+tempxc,grid,20,0.750,0.350,0.200,-37.50,-41.00
+mlc,grid,20,0.800,0.350,0.200,-33.33,-36.83
