@@ -157,24 +157,31 @@ def main() -> None:
     print("=" * 110)
     print("LEADERBOARD CELLS")
     print("=" * 110)
-    print(f'{"paper_id":<22} {"arch_id":<42} {"k_win":>5}  base sd42 sd1  IT methodology')
+    pod_map = {a["arch_id"]+"@"+str(a["k_win"]): a.get("training_pod", "?")
+               for a in spec["leaderboard_archs"]}
+    print(f'{"paper_id":<22} {"arch_id":<42} {"k_win":>5} {"pod":>5}  base AUCs              IT methodology')
     for entry in out["paper_archs"]:
         base = entry["by_subject_model"].get(SMS[0], {})
         it   = entry["by_subject_model"].get(SMS[1], {})
         b42_aucs = base.get("auc_by_seed", {}).get(42, {})
-        b1_aucs  = base.get("auc_by_seed", {}).get(1,  {})
         it_meth  = "current" if it.get("seeds_probed_current") else ("old" if it.get("seeds_probed_old") else "—")
         it_seeds = (it.get("seeds_with_ckpt") or [])
         bk5_42  = (b42_aucs.get("k=5",  {}) or {}).get("mean_auc", "—")
         bk20_42 = (b42_aucs.get("k=20", {}) or {}).get("mean_auc", "—")
-        print(f'{entry["paper_id"]:<22} {entry["arch_id"]:<42} {entry["k_win"]:>5}  '
-              f'k5={bk5_42!s:<6}k20={bk20_42!s:<6}  IT:{it_meth}/sd{it_seeds}')
+        pod = pod_map.get(entry["arch_id"]+"@"+str(entry["k_win"]), "?")
+        print(f'{entry["paper_id"]:<22} {entry["arch_id"]:<42} {entry["k_win"]:>5} {pod:>5}  '
+              f'k5={bk5_42!s:<6} k20={bk20_42!s:<6}   IT:{it_meth}/sd{it_seeds}')
 
     print()
     print("=" * 110)
     print("BAREBONES T-SWEEP — txcdr_t<T>")
     print("=" * 110)
-    print(f'{"T":>3}  {"base k=5 sd42":>14} {"base k=5 sd1":>14}  {"base k=20 sd42":>16} {"base k=20 sd1":>14}  IT')
+    feas_b = spec["tsweep_barebones"]["training_pod_per_T"]
+    def feas_for_b(T):
+        if T in feas_b["A40_ok"]: return "A40"
+        if T in feas_b["H200_required"]: return "H200"
+        return "?"
+    print(f'{"T":>3}  {"pod":>5}  {"base k=5 sd42":>14} {"base k=5 sd1":>14}  {"base k=20 sd42":>16} {"base k=20 sd1":>14}  IT')
     for entry in out["tsweep_barebones"]:
         b = entry["by_subject_model"].get(SMS[0], {})
         it = entry["by_subject_model"].get(SMS[1], {})
@@ -186,19 +193,19 @@ def main() -> None:
         b1k20  = (b1.get("k=20",  {}) or {}).get("mean_auc", "—")
         it_meth  = "current" if it.get("seeds_probed_current") else ("old" if it.get("seeds_probed_old") else "—")
         it_seeds = it.get("seeds_with_ckpt") or []
-        print(f'{entry["T"]:>3}  {b42k5!s:>14} {b1k5!s:>14}  {b42k20!s:>16} {b1k20!s:>14}  {it_meth}/sd{it_seeds}')
+        f = feas_for_b(entry["T"])
+        print(f'{entry["T"]:>3}  {f:>5}  {b42k5!s:>14} {b1k5!s:>14}  {b42k20!s:>16} {b1k20!s:>14}  {it_meth}/sd{it_seeds}')
 
     print()
     print("=" * 110)
     print("HILL-CLIMBED T-SWEEP — phase57_partB_h8_bare_multidistance_t<T>")
     print("=" * 110)
-    feas = spec["tsweep_hillclimbed"]["a40_feasibility"]
+    feas = spec["tsweep_hillclimbed"]["training_pod_per_T"]
     def feas_for(T):
-        if T in feas["comfortable_at_b4096"]: return "ok"
-        if T in feas["tight_at_b4096_use_b2048"]: return "b2048"
-        if T in feas["needs_streaming_refactor"]: return "STREAM"
+        if T in feas["A40_ok"]: return "A40"
+        if T in feas["H200_required"]: return "H200"
         return "?"
-    print(f'{"T":>3}  {"A40":>6}  {"base k=5 sd42":>14} {"base k=5 sd1":>14}  {"base k=20 sd42":>16} {"base k=20 sd1":>14}  IT')
+    print(f'{"T":>3}  {"pod":>5}  {"base k=5 sd42":>14} {"base k=5 sd1":>14}  {"base k=20 sd42":>16} {"base k=20 sd1":>14}  IT')
     for entry in out["tsweep_hillclimbed"]:
         b = entry["by_subject_model"].get(SMS[0], {})
         it = entry["by_subject_model"].get(SMS[1], {})
@@ -211,7 +218,7 @@ def main() -> None:
         it_meth  = "current" if it.get("seeds_probed_current") else ("old" if it.get("seeds_probed_old") else "—")
         it_seeds = it.get("seeds_with_ckpt") or []
         f = feas_for(entry["T"])
-        print(f'{entry["T"]:>3}  {f:>6}  {b42k5!s:>14} {b1k5!s:>14}  {b42k20!s:>16} {b1k20!s:>14}  {it_meth}/sd{it_seeds}')
+        print(f'{entry["T"]:>3}  {f:>5}  {b42k5!s:>14} {b1k5!s:>14}  {b42k20!s:>16} {b1k20!s:>14}  {it_meth}/sd{it_seeds}')
 
     if args.json:
         Path(args.json).write_text(json.dumps(out, indent=2))

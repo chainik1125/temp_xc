@@ -19,6 +19,22 @@
     "FLIP_tasks": ["winogrande_correct_completion", "wsc_coreference"],
     "comment": "All paper cells must be probed under this methodology. 'old' methodology rows in the manifest (Phase 5/5B's last_position / mean_pool / full_window at S=20) do NOT qualify and must be re-probed."
   },
+  "training_constants": {
+    "batch_size": 4096,
+    "lr": 3e-4,
+    "max_steps": 25000,
+    "log_every": 200,
+    "grad_clip": 1.0,
+    "plateau_threshold": 0.02,
+    "min_steps": 3000,
+    "preload_seqs": 24000,
+    "comment": "All paper-cell ckpts must be trained with these constants — fixed across A40 / H200 / any other pod. Existing base-side Phase 7 ckpts on han1823123123/txcdr-base were trained at b=4096 on H200; lowering batch_size on any subset would create apples-to-oranges. If a cell can't fit on A40 at b=4096, DO NOT downsize batch — DEFER training to an H200 pod instead. Cross-pod numerical drift (cuDNN kernels) is acceptable; cross-batch-size drift is not."
+  },
+  "training_pod_assignments": {
+    "policy": "Each (arch_id, k_win) gets a 'training_pod' tag: 'A40_ok' or 'H200_required'. A40_ok = fits comfortably on the A40 at b=4096 with the constants above (cache preload + W+Adam + workspace ≤ 42 GB, leaving 4 GB headroom). H200_required = exceeds A40 VRAM at b=4096; must wait for the H200 pod arriving in ~3 days.",
+    "a40_vram_budget": "46 GB total, target ≤ 42 GB peak resident (4 GB headroom for CUDA fragmentation + activations during backward).",
+    "h200_vram_budget": "141 GB — fits all paper-cell archs at b=4096."
+  },
   "leaderboard_archs": [
     {
       "paper_id": "tfa",
@@ -27,6 +43,8 @@
       "k_pos": 100,
       "T": null,
       "src_class": "TemporalSAE",
+      "training_pod": "A40_ok",
+      "training_pod_rationale": "TFA uses inner tfa_batch_size=64 within the outer batch_size=4096; weights+attention scratch ~22 GB at most.",
       "comment": "TFA full (predictive + novel codes) — Lubana et al. 2025 reference."
     },
     {
@@ -36,6 +54,8 @@
       "k_pos": 20,
       "T": 1,
       "src_class": "TemporalMatryoshkaBatchTopKSAE",
+      "training_pod": "A40_ok",
+      "training_pod_rationale": "Per-token SAE; ~20 GB peak at b=4096.",
       "comment": "Faithful T-SAE port (Ye et al. 2025) at the paper's native k=20 sparsity."
     },
     {
@@ -45,6 +65,8 @@
       "k_pos": 500,
       "T": 1,
       "src_class": "TemporalMatryoshkaBatchTopKSAE",
+      "training_pod": "A40_ok",
+      "training_pod_rationale": "Per-token SAE; ~20 GB peak at b=4096.",
       "comment": "Faithful T-SAE port at our k convention (k_win=500) for fair cross-arch comparison."
     },
     {
@@ -55,6 +77,8 @@
       "T": null,
       "n_layers": 5,
       "src_class": "MultiLayerCrosscoder",
+      "training_pod": "H200_required",
+      "training_pod_rationale": "preload_multilayer = 70.8 GB > 46 GB A40 VRAM. Even with cache off-GPU, the 5-layer cache exceeds the pod's 46 GB system-RAM cap (cgroup memory.limit_in_bytes). Disk-mmap streaming is the only A40 path; deferring to H200 instead avoids the refactor.",
       "comment": "Dense MLC at Phase 7 k_win=500; per-layer label k_pos=100 is purely descriptive (single shared TopK)."
     },
     {
@@ -65,7 +89,9 @@
       "T": null,
       "n_layers": 5,
       "src_class": "MultiLayerCrosscoder",
-      "comment": "Sparse MLC at Phase 5 density (k_win=100). Phase 5 IT ckpts already exist at this density (k_win=100 was Phase 5's only knob); base-side equivalent must be trained from scratch."
+      "training_pod": "H200_required",
+      "training_pod_rationale": "Same as paper_id mlc — multi-layer preload exceeds A40 VRAM and pod RAM. Note: Phase 5 IT ckpts at k_win=100 exist on han1823123123/txcdr but were trained at batch=1024 — they DO NOT count as paper-canonical at b=4096.",
+      "comment": "Sparse MLC at Phase 5 density (k_win=100). Trained from scratch at b=4096 on H200 to be apples-to-apples with the dense MLC paper cell."
     },
     {
       "paper_id": "ag_mlc_08",
@@ -75,6 +101,8 @@
       "T": null,
       "n_layers": 5,
       "src_class": "MLCContrastiveMultiscale",
+      "training_pod": "H200_required",
+      "training_pod_rationale": "Same multi-layer cache constraint as mlc.",
       "comment": "Dense agentic MLC (multi-scale contrastive, n_scales=3, gamma=0.5) at k_win=500."
     },
     {
@@ -85,7 +113,9 @@
       "T": null,
       "n_layers": 5,
       "src_class": "MLCContrastiveMultiscale",
-      "comment": "Sparse agentic MLC at k_win=100 (Phase 5 density). Phase 5 IT ckpts exist; base-side must be trained from scratch."
+      "training_pod": "H200_required",
+      "training_pod_rationale": "Same multi-layer cache constraint as mlc. Phase 5 IT ckpts at k_win=100 exist at b=1024 — not paper-canonical at b=4096.",
+      "comment": "Sparse agentic MLC at k_win=100 (Phase 5 density). Trained from scratch at b=4096 on H200."
     },
     {
       "paper_id": "txc_t5",
@@ -94,6 +124,8 @@
       "k_pos": 100,
       "T": 5,
       "src_class": "TemporalCrosscoder",
+      "training_pod": "A40_ok",
+      "training_pod_rationale": "Single-layer cache 14 GB + W+Adam 5 GB + workspace ≈ 22 GB.",
       "comment": "Barebones TXC at T=5 (T-sweep peak point and one of the two T-sweep anchor archs)."
     },
     {
@@ -103,6 +135,8 @@
       "k_pos": 31,
       "T": 16,
       "src_class": "TemporalCrosscoder",
+      "training_pod": "A40_ok",
+      "training_pod_rationale": "Cache 14 + W+Adam 16.3 + workspace ≈ 33 GB.",
       "comment": "Barebones TXC at T=16 (mid-T point; tests T-scaling claim at 3× the peak T)."
     },
     {
@@ -113,6 +147,8 @@
       "T_max": 10,
       "t_sample": 5,
       "src_class": "Phase5BSubseqSamplingTXCDR_H8",
+      "training_pod": "A40_ok",
+      "training_pod_rationale": "Cache 14 + W+Adam 10 + workspace ≈ 27 GB.",
       "comment": "Best TXC variant from Phase 5 — H8 stack (matryoshka H/L + multi-distance InfoNCE) + subseq sampling. mp/lp 3-seed champion in Phase 5."
     },
     {
@@ -122,6 +158,8 @@
       "k_pos": 100,
       "T": 5,
       "src_class": "TXCBareMatryoshkaContrastiveAntidead",
+      "training_pod": "A40_ok",
+      "training_pod_rationale": "Cache 14 + W+Adam ~7 + workspace ≈ 24 GB.",
       "comment": "Best Phase 7 single-cell at k_feat=20 (mean AUC 0.9358 on base). Barebones TXC + tsae-paper anti-dead stack only."
     },
     {
@@ -132,6 +170,8 @@
       "T": 8,
       "shifts": [1, 2, 4],
       "src_class": "MatryoshkaTXCDRContrastiveMultiscale",
+      "training_pod": "A40_ok",
+      "training_pod_rationale": "Cache 14 + W+Adam 11 + workspace ≈ 28 GB.",
       "comment": "Best Phase 7 single-cell at k_feat=5 (mean AUC 0.8989 on base). H8 multidistance recipe = anti-dead + matryoshka H/L + multi-distance InfoNCE with auto-scaled shifts."
     }
   ],
@@ -147,11 +187,10 @@
     "T_values": [3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 16, 18, 20, 24, 28, 32],
     "src_class": "TemporalCrosscoder",
     "comment": "Existing Phase 7 T-sweep (preserved). All cells trained on base at seed=42 + seed=1; partial seed=2 for T=3..10. Carries forward unchanged.",
-    "a40_feasibility": {
-      "comfortable_at_b4096": [3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 16, 18, 20, 24],
-      "tight_at_b4096_use_b2048": [28],
-      "needs_streaming_refactor": [32],
-      "rationale": "single-layer cache (14 GB) + W+Adam (T·d_in·d_sae·8B/param × 2 sides) + workspace. T=32 hits 50 GB at b=4096; b=2048 doesn't recover enough — needs CPU-RAM cache streaming."
+    "training_pod_per_T": {
+      "A40_ok":         [3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 16, 18, 20, 24],
+      "H200_required":  [28, 32],
+      "rationale": "single-layer cache (14 GB) + W+Adam (T·d_in·d_sae·12B/param) at b=4096 + ~3 GB workspace. T=24 → 41 GB ✓; T=28 → 45 GB borderline (assigned to H200 to keep 4 GB A40 headroom); T=32 → 50 GB > 46 GB. Per the no-apples-to-oranges rule, batch_size stays 4096 — borderline cells defer to H200."
     },
     "results_source": "experiments/phase7_unification/results/probing_results.jsonl — filter rows where arch_id matches 'txcdr_t<T>' for T in T_values AND S=32. results_manifest.json summarises coverage."
   },
@@ -167,11 +206,10 @@
     "comment": "H8 multidistance recipe: TXC + anti-dead + matryoshka H/L (H = 0.2·d_sae) + multi-distance InfoNCE. Family-mean #1 in Phase 7 leaderboard at k_feat=20 (tightest cluster, 0.0038 spread).",
     "existing_T_values": [3, 4, 5, 6, 7, 8, 9],
     "missing_T_values": [10, 12, 14, 16, 18, 20, 24, 28, 32],
-    "a40_feasibility": {
-      "comfortable_at_b4096": [3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 16],
-      "tight_at_b4096_use_b2048": [18, 20, 24, 28],
-      "needs_streaming_refactor": [32],
-      "rationale": "H8 adds matryoshka H decoder (~10% extra over plain TXC) and a small multi-distance pair tensor (negligible). Footprint at T=32: cache 14 + W+Adam 35.9 + workspace ≈ 50 GB."
+    "training_pod_per_T": {
+      "A40_ok":         [3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 16],
+      "H200_required":  [18, 20, 24, 28, 32],
+      "rationale": "H8 adds matryoshka H decoder (~10% extra over plain TXC) and a small multi-distance pair tensor. Footprint at T=16: 14 + 18 + 3 = 35 GB ✓; T=18: 14 + 20.2 + 3 = 37 GB borderline (defers to H200 for 4 GB headroom); T=32: 14 + 36 + 3 = 53 GB > 46 GB. Per the no-apples-to-oranges rule, batch_size stays 4096 — borderline cells defer to H200."
     },
     "rationale_for_choice": "Hill-climbed family selected as phase57_partB_h8_bare_multidistance because: (i) family-mean #1 in Phase 7 unified leaderboard at k_feat=20 (tightest cluster, 0.0038 spread); (ii) T=8 is paper good_txc_p7_k5 — the T-sweep gives that anchor full context; (iii) 7 of 16 cells already trained, only 9 missing — minimum new compute vs the txc_bare_antidead and SubseqH8 alternatives.",
     "alternatives_rejected": {
