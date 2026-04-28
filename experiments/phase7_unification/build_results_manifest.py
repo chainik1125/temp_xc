@@ -74,6 +74,9 @@ PHASE_SPECS = [
         "probe_S_default": None,   # S is explicit
         "probe_agg_key": None,     # implicitly mean_pool with first_real masking
         "probe_agg_default": "mean_pool_S",
+        # methodology — see "methodology classification" below
+        "methodology_class": "current",
+        "methodology_tag": "phase7_S32_first_real_meanpool",
     },
     {
         "phase": "phase5_downstream_utility",
@@ -85,13 +88,16 @@ PHASE_SPECS = [
         "ckpt_repo": "han1823123123/txcdr",
         "ckpt_repo_prefix": "ckpts/",
         "ti_arch_key": "arch",
-        # MLC archs in Phase 5 have k_win=None; infer as k_pos × n_layers (=5)
-        "ti_kwin_inference": "k_pos_x_n_layers",
+        # Phase 5 didn't distinguish k_win from k_pos — k_pos field IS the
+        # TopK k passed to the model. MLC's shared TopK is also just k.
+        "ti_kwin_inference": "kpos_is_kwin",
         "probe_arch_key": "arch",
         "probe_seed_explicit": False,  # extracted from run_id
         "probe_S_default": 20,         # Phase 5 default tail = 20
         "probe_agg_key": "aggregation",
         "probe_agg_default": None,
+        "methodology_class": "old",
+        "methodology_tag": "phase5_S20_pre_first_real",
     },
     {
         "phase": "phase5b_t_scaling_explore",
@@ -109,8 +115,19 @@ PHASE_SPECS = [
         "probe_S_default": 20,
         "probe_agg_key": "aggregation",
         "probe_agg_default": None,
+        "methodology_class": "old",
+        "methodology_tag": "phase5b_S20_pre_first_real",
     },
 ]
+
+# methodology classification:
+# - "current" = Phase 7's S=32 mean-pool with per-example first_real
+#   masking, FLIP convention on cross-token tasks. The methodology used
+#   for the canonical Phase 7 leaderboard.
+# - "old" = Phase 5/5B's S=20 with last_position / mean_pool / full_window
+#   aggregations, no first_real masking, FLIP convention applied at
+#   analysis time. Useful as historical context but NOT comparable to
+#   "current" methodology numerically.
 
 
 def _seed_from_run_id(run_id: str) -> int | None:
@@ -124,13 +141,21 @@ def _seed_from_run_id(run_id: str) -> int | None:
 
 
 def _infer_kwin(row: dict, mode: str | None) -> int | None:
+    """k_win = the integer passed as TopK k to the SAE constructor.
+
+    Phase 7 records k_win explicitly. Phase 5 records it as `k_pos`
+    (Phase 5 didn't yet distinguish window vs position — the model's
+    actual TopK budget IS k_pos). MLC has a single shared TopK across
+    its L-layer-window encoder, so k_win = k (the value actually
+    passed to MultiLayerCrosscoder.__init__) — NOT k_pos × n_layers.
+    Same for TXCDR/TXC variants in Phase 5.
+    """
     if row.get("k_win") is not None:
         return row["k_win"]
-    if mode == "k_pos_x_n_layers":
-        # Phase 5 MLC convention: k_pos per layer × 5 MLC layers
+    if mode == "kpos_is_kwin":
         kp = row.get("k_pos")
         if kp is not None:
-            return int(kp) * 5
+            return int(kp)
     return None
 
 
@@ -294,7 +319,12 @@ def build() -> dict:
                 })
 
             for k in matched:
-                cells[k]["probing"][agg_tag][kf if kf is not None else "no_kfeat"].add(row["task_name"])
+                # tag is now a tuple (methodology_class, methodology_tag, agg_tag)
+                # so we keep current/old separated even if agg names happen to collide
+                full_tag = (spec["methodology_class"],
+                            spec["methodology_tag"],
+                            agg_tag)
+                cells[k]["probing"][full_tag][kf if kf is not None else "no_kfeat"].add(row["task_name"])
 
         if n_skipped_no_seed:
             print(f"  [{phase}] {n_skipped_no_seed} probing rows skipped (no seed in run_id)")
@@ -303,13 +333,22 @@ def build() -> dict:
     out_models = defaultdict(list)
     for key, c in cells.items():
         sm = c["subject_model"]
-        # collapse defaultdicts → plain dicts with task counts
-        probing_out = {}
-        for tag, by_k in c["probing"].items():
-            probing_out[tag] = {
-                str(kf): {"n_tasks": len(tasks), "tasks": sorted(tasks)}
-                for kf, tasks in by_k.items()
-            }
+        # collapse defaultdicts → list of probing-aggregation entries,
+        # each with explicit methodology fields
+        probing_out = []
+        for (mclass, mtag, agg_tag), by_k in c["probing"].items():
+            probing_out.append({
+                "methodology_class": mclass,        # "current" or "old"
+                "methodology_tag": mtag,            # phase7_S32_first_real_meanpool, etc.
+                "aggregation": agg_tag,             # mean_pool_S32, last_position_S20, ...
+                "by_k_feat": {
+                    str(kf): {"n_tasks": len(tasks), "tasks": sorted(tasks)}
+                    for kf, tasks in by_k.items()
+                },
+            })
+        # sort: current methodology first, then by aggregation name
+        probing_out.sort(key=lambda p: (p["methodology_class"] != "current",
+                                        p["aggregation"]))
         c_out = {
             "arch_id": c["arch_id"],
             "seed": c["seed"],
