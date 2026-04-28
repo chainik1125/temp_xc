@@ -85,18 +85,33 @@ def _grade_one(client, model: str, prompt_text: str) -> tuple[int | None, str]:
 
 
 def grade_one_arch(arch_id: str, *, n_workers: int = 5, force: bool = False,
-                   base_subdir: str = "steering") -> None:
+                   base_subdir: str = "steering", fix_errors: bool = False) -> None:
     gen_path = CASE_STUDIES_DIR / base_subdir / arch_id / "generations.jsonl"
     out_path = CASE_STUDIES_DIR / base_subdir / arch_id / "grades.jsonl"
     if not gen_path.exists():
         print(f"  [skip] {arch_id}: generations.jsonl missing — run intervene first")
         return
-    if out_path.exists() and not force:
+    if out_path.exists() and not force and not fix_errors:
         print(f"  [skip] {arch_id}: grades.jsonl exists (use --force to rebuild)")
         return
 
     rows = [json.loads(line) for line in gen_path.open()]
-    print(f"  {len(rows)} generations to grade ({len(rows) * 2} Sonnet calls)")
+    # Resume mode: keep already-graded non-error rows; only redo errors / missing.
+    existing: dict[int, dict] = {}
+    if fix_errors and out_path.exists():
+        for line in out_path.open():
+            r = json.loads(line)
+            if "idx" in r:
+                # Treat as valid only if BOTH grades are non-None and no error.
+                ok = (r.get("success_grade") is not None and
+                      r.get("coherence_grade") is not None and
+                      "error" not in r)
+                if ok:
+                    existing[int(r["idx"])] = r
+        print(f"  fix-errors mode: keeping {len(existing)} valid grades, "
+              f"re-grading {len(rows) - len(existing)} rows")
+    else:
+        print(f"  {len(rows)} generations to grade ({len(rows) * 2} Sonnet calls)")
 
     from anthropic import Anthropic
     api_key = Path("/workspace/.tokens/anthropic_key").read_text().strip()
@@ -136,9 +151,16 @@ def grade_one_arch(arch_id: str, *, n_workers: int = 5, force: bool = False,
     out_path.parent.mkdir(parents=True, exist_ok=True)
     t0 = time.time()
     results: list[dict | None] = [None] * len(rows)
+    # Pre-fill from existing valid grades.
+    to_grade = []
+    for i, r in enumerate(rows):
+        if i in existing:
+            results[i] = existing[i]
+        else:
+            to_grade.append((i, r))
     n_done = 0
     with ThreadPoolExecutor(max_workers=n_workers) as pool:
-        futures = {pool.submit(_grade_pair, (i, r)): i for i, r in enumerate(rows)}
+        futures = {pool.submit(_grade_pair, (i, r)): i for i, r in to_grade}
         for fut in as_completed(futures):
             i = futures[fut]
             try:
@@ -150,11 +172,12 @@ def grade_one_arch(arch_id: str, *, n_workers: int = 5, force: bool = False,
                     "strength": rows[i]["strength"],
                 }
             n_done += 1
-            if n_done % 30 == 0 or n_done == len(rows):
+            total = len(to_grade)
+            if n_done % 30 == 0 or n_done == total:
                 elapsed = time.time() - t0
                 rate = n_done / max(elapsed, 1e-3)
-                eta = (len(rows) - n_done) / max(rate, 1e-3)
-                print(f"    [{n_done}/{len(rows)}] {rate:.1f} gen/s  ETA {eta:.0f}s")
+                eta = (total - n_done) / max(rate, 1e-3)
+                print(f"    [{n_done}/{total}] {rate:.1f} gen/s  ETA {eta:.0f}s")
 
     # Sort by idx so writeup is deterministic.
     results = [r for r in results if r is not None]
@@ -181,6 +204,8 @@ def main() -> None:
     ap.add_argument("--archs", nargs="+", default=list(STAGE_1_ARCHS))
     ap.add_argument("--n-workers", type=int, default=5)
     ap.add_argument("--force", action="store_true")
+    ap.add_argument("--fix-errors", action="store_true",
+                    help="resume mode: keep valid grades, re-run only missing/error rows")
     ap.add_argument("--subdir", default="steering",
                     help="results/case_studies/<subdir>/<arch>/{generations,grades}.jsonl")
     args = ap.parse_args()
@@ -188,7 +213,7 @@ def main() -> None:
     for arch_id in args.archs:
         print(f"\n=== {arch_id} ===")
         grade_one_arch(arch_id, n_workers=args.n_workers, force=args.force,
-                       base_subdir=args.subdir)
+                       fix_errors=args.fix_errors, base_subdir=args.subdir)
 
 
 if __name__ == "__main__":
