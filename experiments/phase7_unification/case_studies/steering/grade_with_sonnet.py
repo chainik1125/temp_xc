@@ -84,9 +84,10 @@ def _grade_one(client, model: str, prompt_text: str) -> tuple[int | None, str]:
     return _parse_grade(raw), raw
 
 
-def grade_one_arch(arch_id: str, *, n_workers: int = 5, force: bool = False) -> None:
-    gen_path = CASE_STUDIES_DIR / "steering" / arch_id / "generations.jsonl"
-    out_path = CASE_STUDIES_DIR / "steering" / arch_id / "grades.jsonl"
+def grade_one_arch(arch_id: str, *, n_workers: int = 5, force: bool = False,
+                   base_subdir: str = "steering") -> None:
+    gen_path = CASE_STUDIES_DIR / base_subdir / arch_id / "generations.jsonl"
+    out_path = CASE_STUDIES_DIR / base_subdir / arch_id / "grades.jsonl"
     if not gen_path.exists():
         print(f"  [skip] {arch_id}: generations.jsonl missing — run intervene first")
         return
@@ -180,11 +181,14 @@ def main() -> None:
     ap.add_argument("--archs", nargs="+", default=list(STAGE_1_ARCHS))
     ap.add_argument("--n-workers", type=int, default=5)
     ap.add_argument("--force", action="store_true")
+    ap.add_argument("--subdir", default="steering",
+                    help="results/case_studies/<subdir>/<arch>/{generations,grades}.jsonl")
     args = ap.parse_args()
     banner(__file__)
     for arch_id in args.archs:
         print(f"\n=== {arch_id} ===")
-        grade_one_arch(arch_id, n_workers=args.n_workers, force=args.force)
+        grade_one_arch(arch_id, n_workers=args.n_workers, force=args.force,
+                       base_subdir=args.subdir)
 
 
 if __name__ == "__main__":

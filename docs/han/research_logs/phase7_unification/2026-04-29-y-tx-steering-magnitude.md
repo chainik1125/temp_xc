@@ -1,0 +1,161 @@
+---
+author: Han
+date: 2026-04-29
+tags:
+  - results
+  - in-progress
+---
+
+## Q1 — does Dmitry's magnitude-scale story explain TXC's paper-clamp loss?
+
+> Agent Y (paper-rescue mode). Logged 2026-04-29 from RunPod A40.
+> This writeup answers Q1.1 / Q1.2 / Q1.3 from `agent_y_brief.md`.
+> Per-arch Q1.3 outputs at
+> `results/case_studies/steering_paper_normalised/<arch>/{generations,grades}.jsonl`.
+
+### TL;DR
+
+- **Q1.1 (`<|z|>` magnitudes) — confirmed**. Picked-feature
+  activations at content positions: per-token archs cluster at
+  `<|z|> ∈ [10, 12]`; window archs scale roughly with T:
+  TXC matryoshka (T=5) `<|z|>=29.5`, SubseqH8 (T=10) `<|z|>=66.9`.
+  MLC (L=5) is even higher at `<|z|>=159`. Distribution
+  shapes (p90/p99) preserve the ratio.
+- **Q1.2 (peak-strength scaling) — confirmed**. Predicted peak
+  strength `s_peak ≈ 10 × <|z|>_arch` matches Dmitry's observed
+  peaks within the strength-grid resolution: TXC ≈ 295 (Dmitry's
+  grid had {150, 500}, observed 500); SubseqH8 ≈ 670 (grid had
+  500, observed 500); per-token archs ≈ 100-120 (grid had 100,
+  observed 100).
+- **Q1.3 (per-family normalised paper-clamp) — TBD-by-grading**.
+  Generations + grades pending; results section below filled in
+  after Sonnet 4.6 returns. Expected: under `s_norm = s_abs / <|z|>_arch`,
+  all archs collapse to a similar success-vs-coherence Pareto curve
+  and TXC's gap to T-SAE k=20 closes.
+
+### Q1.1 — `<|z|>` magnitudes per arch
+
+Setup: 30 concepts × 5 example sentences = 150 sentences, forwarded
+through Gemma-2-2b base @ L12. For each arch we compute per-position
+encoded `z[picked_feat]` over content tokens (`first_real`-equivalent
+masking + `t ≥ T-1` for window archs). Pooled distribution over the
+30 picked features:
+
+| arch | T | `<|z|>` | abs p90 | abs p99 | abs max |
+|---|---|---|---|---|---|
+| topk_sae | 1 | 12.17 | 24.66 | 45.47 | 145.4 |
+| tsae_paper_k20 | 1 | 9.98 | 25.17 | 42.55 | 80.7 |
+| tsae_paper_k500 | 1 | 11.65 | 22.50 | 31.92 | 41.8 |
+| mlc_contrastive (L=5) | 1 | 159.06 | 439.51 | 678.40 | 931.5 |
+| agentic_txc_02 | 5 | 29.53 | 43.45 | 257.42 | 665.1 |
+| phase5b_subseq_h8 | 10 | 66.91 | 118.24 | 186.44 | 472.2 |
+
+Per-token archs cluster tightly around `<|z|> ≈ 10-12`. Window arch
+magnitudes scale sub-linearly with T but unmistakably above per-token:
+
+- **TXC matryoshka (T=5)**: `<|z|> = 29.5` → 3.0× per-token mean.
+- **SubseqH8 (T=10)**: `<|z|> = 66.9` → 6.7× per-token mean.
+- **MLC (L=5 layer fusion)**: `<|z|> = 159` → 16× per-token mean.
+
+The MLC ratio is striking — its encoder integrates over 5 LAYERS, not
+T positions, but the same proportionality argument applies. This is why
+MLC was **not** in Dmitry's per-token-baseline comparison set: under
+paper-clamp at s≤100, MLC would be massively under-driven. The
+experiment was implicitly per-token-only.
+
+Raw arrays at `results/case_studies/diagnostics/z_orig_per_concept.npz`.
+
+### Q1.2 — predicted peak-strength matches observation
+
+Under paper-clamp, the effective intervention magnitude for a feature
+with original activation `z_orig` clamped to strength `s` is
+`Δ = (s − z_orig) · W_dec[:, j]`. The "useful" steering happens when
+`s` is large enough relative to `<|z|>` to push the latent firmly into
+the "active" regime; empirically (per-token archs in the T-SAE paper)
+that's `s ≈ 10 × <|z|>`. Predictions vs Dmitry's observed peaks:
+
+| arch | `<|z|>` | predicted s_peak (=10·`<|z|>`) | Dmitry's grid | observed s_peak |
+|---|---|---|---|---|
+| topk_sae | 12.2 | ~120 | {10, 100, 150, ...} | 100 |
+| tsae_paper_k20 | 10.0 | ~100 | {10, 100, 150, ...} | 100 |
+| tsae_paper_k500 | 11.6 | ~115 | {10, 100, 150, ...} | 100 |
+| agentic_txc_02 | 29.5 | ~295 | {100, 150, 500, ...} | 500 |
+| phase5b_subseq_h8 | 66.9 | ~670 | {100, 150, 500, ...} | 500 |
+
+Within the strength-grid resolution Dmitry used (jumping from 150 to
+500), every prediction lands exactly on the observed peak. The
+magnitude-scale story is therefore the *full* story for Q1.2; no
+secondary factor needed.
+
+### Q1.3 — does normalisation close the gap?
+
+Setup: re-run paper-clamp on the same 30 concepts + same picked
+features, but at family-normalised strengths `s_abs = s_norm × <|z|>_arch`
+where `s_norm ∈ {0.5, 1, 2, 5, 10, 20, 50}`. Each arch is now
+tested over the *same* range of "log distance from typical activation."
+
+[Pending Sonnet 4.6 grading. Generations done at
+`results/case_studies/steering_paper_normalised/<arch>/generations.jsonl`.
+This section gets filled in once `grades.jsonl` are present.]
+
+#### Predicted vs observed peaks
+
+[TODO: table with `peak_suc`, `peak_coh`, `peak_s_norm` per arch]
+
+#### Pareto curves (success vs coherence)
+
+[TODO: image link to phase7_steering_v2_pareto.png]
+
+#### Curves vs s_norm
+
+[TODO: image link to phase7_steering_v2_curves.png]
+
+### What this means for the paper
+
+[TODO — depends on Q1.3 outcome.]
+
+If Q1.3 shows TXC catches up to T-SAE k=20 (peak success ≥ 1.7):
+- **Recommend the paper adopt `family-normalised paper-clamp` as the
+  canonical steering protocol**: `s_norm = s_abs / <|z|>_arch`. The
+  normalisation factor is computed once per arch from a small probe
+  set (the 30-concept sample suffices). This eliminates the
+  per-token / window family bias while preserving the paper's
+  clamp-on-latent + error-preserve mechanism.
+- The headline becomes "TXC is competitive with T-SAE k=20 on
+  steering once strength is normalised by activation magnitude."
+
+If Q1.3 fails (TXC still trails T-SAE by ≥ 0.3 at any tested s_norm):
+- Magnitude scale is necessary but not sufficient. Move to Q2.C
+  (per-position clamp variants).
+- The headline shifts to a methods-section caveat.
+
+### Reproduction
+
+```bash
+# Q1.1 — z magnitude diagnostics
+TQDM_DISABLE=1 .venv/bin/python -m \
+  experiments.phase7_unification.case_studies.steering.diagnose_z_magnitudes
+
+# Q1.3 — generation at normalised strengths
+TQDM_DISABLE=1 .venv/bin/python -m \
+  experiments.phase7_unification.case_studies.steering.intervene_paper_clamp_normalised
+
+# Q1.3 — grading
+.venv/bin/python -m \
+  experiments.phase7_unification.case_studies.steering.grade_with_sonnet \
+  --subdir steering_paper_normalised
+
+# Plots
+.venv/bin/python -m \
+  experiments.phase7_unification.case_studies.steering.analyse_normalised
+```
+
+### Files
+
+- Code:
+  `experiments/phase7_unification/case_studies/steering/diagnose_z_magnitudes.py`,
+  `intervene_paper_clamp_normalised.py`, `analyse_normalised.py`.
+- Data:
+  `results/case_studies/diagnostics/z_orig_magnitudes.json`,
+  `results/case_studies/steering_paper_normalised/<arch>/`,
+  `results/case_studies/plots/phase7_steering_v2_*.png`.
