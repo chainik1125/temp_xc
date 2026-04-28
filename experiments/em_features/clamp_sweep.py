@@ -159,27 +159,38 @@ def get_layer_module(model, layer_idx: int):
 @torch.no_grad()
 def generate_clamped(model, tok, questions, sae, feature_id, clamp_value, layer_idx,
                      n_rollouts, max_new_tokens, seed):
+    """Mirror the em_features library's generate_longform_completions exactly so
+    the clamp baseline (c=0) is comparable to additive sweep at α=0. Only the
+    hook differs (ClampHook instead of ActivationSteerer additive)."""
     hook = ClampHook(sae, feature_id, clamp_value)
     target_module = get_layer_module(model, layer_idx)
     handle = target_module.register_forward_hook(hook)
     out_records = []
     try:
+        # Same chat template + flattened replication as the library
         prompts = []
         for q in questions:
             messages = [{"role": "user", "content": q}]
             prompts.append(tok.apply_chat_template(messages, tokenize=False, add_generation_prompt=True))
-        inputs = tok(prompts, return_tensors="pt", padding=True, truncation=True, max_length=1024).to(model.device)
-        for r in range(n_rollouts):
-            seed_all(seed + r)
-            generated = model.generate(
-                **inputs, max_new_tokens=max_new_tokens, do_sample=True,
-                temperature=1.0, top_p=1.0, top_k=0,
-                pad_token_id=tok.pad_token_id or tok.eos_token_id,
-            )
-            new_tokens = generated[:, inputs.input_ids.shape[1]:]
-            decoded = tok.batch_decode(new_tokens, skip_special_tokens=True)
-            for q, ans in zip(questions, decoded):
-                out_records.append({"question": q, "answer": ans, "rollout": r})
+        all_prompts = []
+        all_questions = []
+        for p, q in zip(prompts, questions):
+            for _ in range(n_rollouts):
+                all_prompts.append(p)
+                all_questions.append(q)
+        # Library uses add_special_tokens=False (chat_template already adds them)
+        inputs = tok(all_prompts, return_tensors="pt", padding=True,
+                     add_special_tokens=False).to(model.device)
+        seed_all(seed)
+        generated = model.generate(
+            **inputs, max_new_tokens=max_new_tokens, do_sample=True,
+            temperature=1.0,
+            pad_token_id=tok.eos_token_id, eos_token_id=tok.eos_token_id,
+        )
+        new_tokens = generated[:, inputs.input_ids.shape[1]:]
+        decoded = tok.batch_decode(new_tokens, skip_special_tokens=True)
+        for q, ans in zip(all_questions, decoded):
+            out_records.append({"question": q, "answer": ans})
     finally:
         handle.remove()
     return out_records, hook
@@ -236,7 +247,7 @@ def main():
     tok = AutoTokenizer.from_pretrained(base_id, use_fast=False)
     if tok.pad_token is None:
         tok.pad_token = tok.eos_token
-    tok.padding_side = "left"
+    # Don't override padding_side — library leaves tokenizer default (Qwen → 'right')
 
     # Load SAE
     print(f"[clamp] loading SAE from {args.ckpt}", flush=True)
