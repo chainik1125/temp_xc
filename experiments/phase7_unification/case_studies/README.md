@@ -5,7 +5,8 @@ Reproduces T-SAE §4.5's two case studies on Phase 7's trained ckpt set:
 1. **HH-RLHF dataset understanding** (`hh_rlhf/`)
 2. **AxBench-style steering** (`steering/`)
 
-Run on a 6-arch shortlist (see `_paths.SELECTED_ARCHS_FOR_CASE_STUDIES`).
+Run on a 7-arch shortlist (4 in Stage 1 + 3 in Stage 2). See
+`_paths.SELECTED_ARCHS_FOR_CASE_STUDIES`.
 
 ## Setup
 
@@ -14,12 +15,13 @@ This sub-package runs on **Agent C's pod** — H100 80GB, 2 TB volume,
 for the full plan + 9-day timeline.
 
 ```bash
-# After bootstrap_claude.sh + uv sync (per RUNPOD_INSTRUCTIONS.md):
+# After bootstrap + uv sync (per RUNPOD_INSTRUCTIONS.md):
 huggingface-cli download han1823123123/txcdr-base \
     ckpts/topk_sae__seed42.pt \
     ckpts/tsae_paper_k500__seed42.pt \
-    ckpts/mlc_contrastive_alpha100_batchtopk__seed42.pt \
+    ckpts/tsae_paper_k20__seed42.pt \
     ckpts/agentic_txc_02__seed42.pt \
+    ckpts/mlc_contrastive_alpha100_batchtopk__seed42.pt \
     ckpts/phase5b_subseq_h8__seed42.pt \
     ckpts/phase57_partB_h8_bare_multidistance_t5__seed42.pt \
     --local-dir /workspace/temp_xc/experiments/phase7_unification/results/
