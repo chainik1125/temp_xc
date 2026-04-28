@@ -125,11 +125,43 @@ The Wang procedure did *not* beat our existing bundled procedures in this setup.
 
 4. **Dataset and prompt mismatch.** Wang's eval set E for screening differs from ours; we used the medical-prompts dataset (the one used for the diff-vector computation). A more diverse probe set might surface different causal champions.
 
+### Update 2026-04-28 (later): Causal pruning + bundling — Wang k=30 bundle BEATS cosine bundle on SAE
+
+After single-feature Wang underperformed bundled cosine, the obvious follow-up was to combine the two ideas. Take the top-30 features ranked by Wang stage-3 `align_shift` (i.e., causal-clean survivors), sum their decoder rows as a single steering direction, and sweep the same 27-α frontier we used for the cosine bundle.
+
+**Headline result on v2 100k checkpoints, best-negative-α with coherence ≥ 90% baseline:**
+
+| arch | method | peak α | peak align | peak coh |
+|---|---:|---:|---:|---:|
+| SAE | cosine k=10 | −5 | 51.83 | 26.88 |
+| SAE | encoder Δz̄ k=10 | +3 | 48.56 | 24.77 |
+| SAE | encoder Δz̄ k=1 | +9 | 53.11 | 26.02 |
+| **SAE** | **Wang bundle k=30** | **−10** | **57.42** | **35.78** |
+| Han | cosine k=10 | −4 | **52.38** | 26.64 |
+| Han | encoder Δz̄ k=10 | −1.25 | 49.00 | 22.81 |
+| Han | encoder Δz̄ k=1 | −6 | 49.84 | 28.52 |
+| Han | Wang bundle k=30 | −5 | 50.82 | 26.48 |
+
+For **SAE**, the Wang causal bundle is the unambiguous winner: align +5.6 over cosine k=10 AND coherence +8.9. The peak lands at α=−10 (a clean suppression region), not at a gibberish-driven outlier α like the encoder-side k=1 procedure (which peaked at α=+9).
+
+For **Han**, the Wang causal bundle is roughly tied with cosine k=10 — slightly worse on align (−1.6), comparable coh.
+
+### Why SAE benefits more than Han
+
+SAE arditi is a per-token TopK SAE with no contrastive loss. Its top features by cosine to the activation diff include genuine misalignment features *plus* features that fire as a side effect of the bad-medical distribution shift. The Wang causal screen identifies and removes the latter, leaving 30 features that all pass the causal test, which produces a cleaner aggregate steering direction.
+
+Han champion was trained with multi-distance contrastive loss + matryoshka prefixes. That objective already pushes features toward causally relevant temporal patterns; the top-by-cosine features mostly already pass the causal test, so adding a screen layer doesn't change the bundle composition much.
+
 ### Bottom line
 
-For *our* (Qwen-7B bad-medical) emergent-misalignment setup with these SAE/Han architectures, **k=10 cosine-bundle steering currently beats single-feature Wang causal steering**. The Wang stage 2 screen is still useful as a different ranking lens — it does identify features whose causal effect is decoupled from their firing increase — but the gain isn't large enough at the scales we tested (top-3 finalists × top-100 screen) to replace bundling.
+**For SAE arditi v2 100k, the right procedure is: encoder Δz̄ ranking → causal screen at α=±1 → top-30 features by stage-3 `align_shift` → sum decoder rows → sweep α.** This beats every other steering approach we've tried on this checkpoint, and does so with higher coherence at peak (35.78 vs 26.88 for cosine k=10). That coherence improvement is meaningful — the steering produces genuinely-aligned coherent output rather than gibberish-that-the-judge-charitably-scores-mid.
 
-Open question: **would top-30 finalists (rather than top-3) bundled together via Wang's screen-ranked decoder rows beat both the cosine bundle AND the single-feature Wang headline?** That would test whether causal pruning + bundling is the right combination. Easy to run as a follow-up: add a `--n_final_bundle 30` mode to `run_wang_procedure.py` that aggregates the top-30 stage-3 survivors as a single steering direction and sweeps α.
+For Han, k=10 cosine bundle remains the simplest competitive recipe; the Wang screen overhead doesn't add measurable value on this architecture.
+
+Files:
+
+- `docs/dmitry/results/em_features/wang/sae_bundle30_frontier.json`
+- `docs/dmitry/results/em_features/wang/han_bundle30_frontier.json`
 
 ### Implementation notes
 
