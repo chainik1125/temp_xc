@@ -1,0 +1,11 @@
+{
+  "seed": 2,
+  "phase": "phase7_unification",
+  "n_archs": 3,
+  "arch_ids": [
+    "mlc",
+    "mlc_contrastive_alpha100_batchtopk",
+    "agentic_mlc_08"
+  ],
+  "timestamp": 1777336292.4833415
+}
