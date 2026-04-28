@@ -81,34 +81,58 @@ def _parse_score(text: str) -> Optional[float]:
     return None
 
 
+def _is_quota_exhausted(exc: Exception) -> bool:
+    name = type(exc).__name__
+    msg = str(exc).lower()
+    return "resourceexhausted" in name.lower() or "429" in msg or "quota" in msg
+
+
 async def _judge_one(
-    model: "genai.GenerativeModel", template: str,
-    question: str, answer: str, idx: int,
+    models: list["genai.GenerativeModel"],
+    template: str, question: str, answer: str, idx: int,
     sem: asyncio.Semaphore, max_retries: int = 3,
     temperature: float = 0.5,
 ) -> tuple[int, Optional[float]]:
+    """Try each model in `models` in order. On 429, fall through to the next.
+    Other transient errors get exponential-backoff retries on the same model."""
     prompt = template.format(question=question, answer=answer)
     gen_config = genai.types.GenerationConfig(temperature=temperature)
     async with sem:
-        for attempt in range(max_retries):
-            try:
-                resp = await model.generate_content_async(prompt, generation_config=gen_config)
-                return idx, _parse_score(resp.text)
-            except Exception as e:
-                if attempt == max_retries - 1:
-                    print(f"[gemini_judge] giving up on idx={idx}: {type(e).__name__}: {str(e)[:160]}", flush=True)
-                    return idx, None
-                await asyncio.sleep(2 ** attempt)
+        for m_idx, model in enumerate(models):
+            for attempt in range(max_retries):
+                try:
+                    resp = await model.generate_content_async(prompt, generation_config=gen_config)
+                    return idx, _parse_score(resp.text)
+                except Exception as e:
+                    quota = _is_quota_exhausted(e)
+                    last_attempt = attempt == max_retries - 1
+                    if quota:
+                        # Don't burn retries on this model — fall through to next fallback model.
+                        if m_idx < len(models) - 1:
+                            print(f"[gemini_judge] idx={idx} quota exhausted on model #{m_idx}; "
+                                  f"falling back to next model", flush=True)
+                        break
+                    if last_attempt:
+                        if m_idx < len(models) - 1:
+                            break  # try next fallback
+                        print(f"[gemini_judge] giving up on idx={idx}: {type(e).__name__}: {str(e)[:160]}",
+                              flush=True)
+                        return idx, None
+                    await asyncio.sleep(2 ** attempt)
     return idx, None
 
 
 async def evaluate_generations_with_gemini(
     generations: list[dict], *,
-    model_name: str = "gemini-3.1-flash-lite-preview",
+    model_name: str | list[str] = ("gemini-3.1-flash-lite-preview", "gemini-2.5-flash"),
     max_concurrent: int = 16,
     temperature: float = 0.5,
 ) -> tuple[list[Optional[float]], list[Optional[float]]]:
     """Async judge for a batch of generations using Gemini.
+
+    `model_name` may be a single string or a list/tuple of model names; the list is
+    tried in order, falling through on 429 quota errors so that paid-tier stable
+    models (e.g. ``gemini-2.5-flash``) take over when preview models are quota-capped.
 
     Returns ``(alignment_scores, coherence_scores)`` aligned with the input
     list. Failed/CODE/REFUSAL entries are ``None`` (NOT substituted with 50).
@@ -117,15 +141,17 @@ async def evaluate_generations_with_gemini(
     if not api_key:
         raise RuntimeError("GOOGLE_API_KEY not set")
     genai.configure(api_key=api_key)
-    model = genai.GenerativeModel(model_name)
+
+    names = [model_name] if isinstance(model_name, str) else list(model_name)
+    models = [genai.GenerativeModel(n) for n in names]
     sem = asyncio.Semaphore(max_concurrent)
 
     align_tasks = [
-        _judge_one(model, ALIGNMENT_PROMPT_TEMPLATE, g["question"], g["answer"], i, sem, temperature=temperature)
+        _judge_one(models, ALIGNMENT_PROMPT_TEMPLATE, g["question"], g["answer"], i, sem, temperature=temperature)
         for i, g in enumerate(generations)
     ]
     coh_tasks = [
-        _judge_one(model, COHERENCE_PROMPT_TEMPLATE, g["question"], g["answer"], i, sem, temperature=temperature)
+        _judge_one(models, COHERENCE_PROMPT_TEMPLATE, g["question"], g["answer"], i, sem, temperature=temperature)
         for i, g in enumerate(generations)
     ]
 

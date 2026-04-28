@@ -257,15 +257,35 @@ def main():
         coh_floor = baseline_coh * (1.0 - args.coh_drop_threshold)
         print(f"[stage3] baseline α=0: align={baseline_align:.2f}  coh={baseline_coh:.2f}  coh_floor={coh_floor:.2f}", flush=True)
 
-        strength_rows = []
+        # Resume any partial stage3 from earlier run
+        partial_path = args.out / "stage3_strength.partial.json"
+        strength_rows: list[dict] = []
+        completed_ids: set[int] = set()
+        if partial_path.exists():
+            try:
+                strength_rows = json.loads(partial_path.read_text()).get("rows", [])
+                completed_ids = {r["feature_id"] for r in strength_rows}
+                print(f"[stage3] resuming with {len(strength_rows)} features already done", flush=True)
+            except Exception:
+                strength_rows = []
+
+        def _save_partial():
+            partial_path.write_text(json.dumps(
+                {"meta": {"baseline_align": baseline_align, "baseline_coh": baseline_coh,
+                          "coh_floor": coh_floor, "alpha_grid": strength_alphas,
+                          "completed": len(strength_rows), "total": len(survivors)},
+                 "rows": strength_rows}, indent=2))
+
         for s_idx, s in enumerate(survivors):
             fid = s["feature_id"]
+            if fid in completed_ids:
+                continue
             direction = load_steerer_decoder_row(args.arch, args.ckpt, fid, args.device)
             curve = []
-            best_strong = None  # strongest α that stays coherent
+            best_strong = None
             for alpha in strength_alphas:
                 gens = run_alpha_for_feature(
-                generate_fn=generate_longform_completions,
+                    generate_fn=generate_longform_completions,
                     model=model, tokenizer=tok, questions=questions, layer=args.layer,
                     direction=direction, alpha=alpha, n_rollouts=args.strength_rollouts,
                     max_new_tokens=args.max_new_tokens, seed=args.seed,
@@ -288,16 +308,17 @@ def main():
             strength_rows.append({"feature_id": fid, "screen_score": s["screen_score"],
                                   "delta_z": s["delta_z"], "curve": curve,
                                   "best_strong": best_strong})
+            _save_partial()  # checkpoint after each feature
             tag = (f"feat {fid:>6d}  best_strong α="
                    f"{best_strong['alpha']:+.2f} align={best_strong['mean_align']:.2f} coh={best_strong['mean_coh']:.2f}"
                    if best_strong else f"feat {fid:>6d}  no coherent α")
             print(f"  [{s_idx+1:>3d}/{len(survivors)}] {tag}", flush=True)
 
-        # Rank survivors by alignment achieved at their best_strong α (lower = more "misaligned")
-        # but for our purposes we want align-shift-from-baseline (away from baseline)
+        # Rank survivors by alignment shift away from baseline (None-safe)
         for r in strength_rows:
-            if r["best_strong"]:
-                r["align_shift"] = abs((r["best_strong"]["mean_align"] or baseline_align) - baseline_align)
+            bs = r.get("best_strong")
+            if bs and bs.get("mean_align") is not None:
+                r["align_shift"] = abs(bs["mean_align"] - baseline_align)
             else:
                 r["align_shift"] = 0.0
         strength_rows.sort(key=lambda r: r["align_shift"], reverse=True)
@@ -322,12 +343,39 @@ def main():
         print(f"[stage4] skipping (already at {final_path})", flush=True)
         return
     print(f"\n=== STAGE 4: full 27-α frontier on {len(finalists)} finalists ===", flush=True)
-    final_rows = []
+    final_partial = args.out / "stage4_final_frontier.partial.json"
+    final_rows: list[dict] = []
+    done_finalists: set[int] = set()
+    if final_partial.exists():
+        try:
+            final_rows = json.loads(final_partial.read_text()).get("finalists", [])
+            done_finalists = {r["feature_id"] for r in final_rows}
+            print(f"[stage4] resuming with {len(final_rows)} finalists already done", flush=True)
+        except Exception:
+            final_rows = []
+
+    def _save_stage4_partial(meta: dict):
+        final_partial.write_text(json.dumps({"meta": meta, "finalists": final_rows}, indent=2))
+
     for f_idx, f in enumerate(finalists):
         fid = f["feature_id"]
+        if fid in done_finalists:
+            continue
         direction = load_steerer_decoder_row(args.arch, args.ckpt, fid, args.device)
-        rows = []
+        rows: list[dict] = []
+        # If a per-finalist partial exists, resume from where we left off on that feature
+        per_feat_path = args.out / f"stage4_finalist_{fid}.partial.json"
+        completed_alphas: set[float] = set()
+        if per_feat_path.exists():
+            try:
+                rows = json.loads(per_feat_path.read_text()).get("rows", [])
+                completed_alphas = {r["alpha"] for r in rows}
+                print(f"[stage4] feat {fid}: resuming with {len(rows)}/{len(final_alphas)} alphas done", flush=True)
+            except Exception:
+                rows = []
         for alpha in final_alphas:
+            if alpha in completed_alphas:
+                continue
             gens = run_alpha_for_feature(
                 generate_fn=generate_longform_completions,
                 model=model, tokenizer=tok, questions=questions, layer=args.layer,
@@ -345,11 +393,16 @@ def main():
                          "mean_coh": float(np.mean(c_v)) if c_v else None,
                          "n_align": len(a_v), "n_coh": len(c_v),
                          "n_total": len(gens)})
+            per_feat_path.write_text(json.dumps({"feature_id": fid, "rows": rows}, indent=2))
             print(f"  [feat {fid} α={alpha:+.2f}] align={rows[-1]['mean_align']}  coh={rows[-1]['mean_coh']}", flush=True)
         peak = max((r for r in rows if r["mean_align"] is not None), key=lambda r: r["mean_align"], default=None)
         final_rows.append({"feature_id": fid, "delta_z": f["delta_z"],
                            "screen_score": f["screen_score"],
                            "rows": rows, "peak": peak})
+        _save_stage4_partial({"arch": args.arch, "ckpt": str(args.ckpt),
+                              "n_final": len(finalists), "alpha_grid": final_alphas,
+                              "n_rollouts": args.final_rollouts,
+                              "completed": len(final_rows)})
 
     out = {"meta": {"arch": args.arch, "ckpt": str(args.ckpt),
                     "n_final": len(finalists), "alpha_grid": final_alphas,
