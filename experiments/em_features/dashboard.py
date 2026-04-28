@@ -31,7 +31,6 @@ Local rendering:
 from __future__ import annotations
 
 import argparse
-import asyncio
 import json
 import math
 import os
@@ -40,9 +39,6 @@ import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional
-
-import numpy as np
-import torch
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -53,6 +49,10 @@ for p in (str(VENDOR_SRC), str(REPO_ROOT)):
 
 
 def _seed_all(seed: int) -> None:
+    """Reset all RNGs to a known state. Imports torch lazily so the render path
+    doesn't pull in heavy GPU deps."""
+    import numpy as np
+    import torch
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
@@ -61,6 +61,7 @@ def _seed_all(seed: int) -> None:
 
 
 def _enable_determinism() -> None:
+    import torch
     os.environ.setdefault("CUBLAS_WORKSPACE_CONFIG", ":4096:8")
     torch.use_deterministic_algorithms(True, warn_only=True)
     torch.backends.cudnn.deterministic = True
