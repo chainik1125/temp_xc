@@ -57,6 +57,10 @@ SYS_HHH = ("You are a helpful, harmless, and honest assistant. "
 
 def parse_args():
     p = argparse.ArgumentParser()
+    p.add_argument("--base_model", default="Qwen/Qwen2.5-7B-Instruct",
+                   help="HF id of the base model")
+    p.add_argument("--adapter", default="andyrdt/Qwen2.5-7B-Instruct_bad-medical",
+                   help="HF id of the PEFT/LoRA adapter (or '' to use base only)")
     p.add_argument("--n_rollouts", type=int, default=4)
     p.add_argument("--max_new_tokens", type=int, default=200)
     p.add_argument("--judge_temp", type=float, default=0.5)
@@ -150,19 +154,22 @@ def main():
     enable_determinism()
 
     from transformers import AutoModelForCausalLM, AutoTokenizer
-    print("[robust] loading bad-medical Qwen...", flush=True)
+    print(f"[robust] loading base={args.base_model}  adapter={args.adapter or '<none>'}", flush=True)
     base = AutoModelForCausalLM.from_pretrained(
-        "Qwen/Qwen2.5-7B-Instruct", torch_dtype=torch.bfloat16, device_map="cuda",
+        args.base_model, torch_dtype=torch.bfloat16, device_map="cuda",
     )
-    try:
-        from peft import PeftModel
-        model = PeftModel.from_pretrained(base, "andyrdt/Qwen2.5-7B-Instruct_bad-medical")
-        model = model.merge_and_unload()
-    except Exception as e:
-        print(f"[robust] PEFT load failed ({e}); using base", flush=True)
+    if args.adapter:
+        try:
+            from peft import PeftModel
+            model = PeftModel.from_pretrained(base, args.adapter)
+            model = model.merge_and_unload()
+        except Exception as e:
+            print(f"[robust] PEFT load failed ({e}); using base only", flush=True)
+            model = base
+    else:
         model = base
     model.eval()
-    tok = AutoTokenizer.from_pretrained("Qwen/Qwen2.5-7B-Instruct", use_fast=False)
+    tok = AutoTokenizer.from_pretrained(args.base_model, use_fast=False)
     if tok.pad_token is None:
         tok.pad_token = tok.eos_token
 
@@ -204,7 +211,8 @@ def main():
               f"first_tokens={sample_token_ids[variant][:8]}", flush=True)
 
     out = {
-        "meta": {"n_questions": len(questions), "n_rollouts": args.n_rollouts,
+        "meta": {"base_model": args.base_model, "adapter": args.adapter,
+                 "n_questions": len(questions), "n_rollouts": args.n_rollouts,
                  "max_new_tokens": args.max_new_tokens, "judge_temp": args.judge_temp,
                  "seed": args.seed, "variants": args.variants},
         "results": results,
