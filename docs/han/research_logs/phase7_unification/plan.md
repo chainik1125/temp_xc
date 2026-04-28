@@ -82,7 +82,12 @@ revisited post-headline if needed).
 
 ### Workstream split
 
-#### Agent X — probe-AUC + T-sweep (this branch: `han-phase7-unification`)
+Three concurrent agents (X, Y, Z) all on `han-phase7-unification`,
+plus X-H200 on the H200 pod when it returns. Directory ownership
+and the append-only file race protocol are in `brief.md` § "Branch
+hygiene for three concurrent agents".
+
+#### Agent X — probe-AUC + T-sweep (RunPod A40)
 
 Owns:
 - All cells in `paper_archs.json:leaderboard_archs`.
@@ -105,7 +110,7 @@ Probing protocol: `phase7_S32_first_real_meanpool` with FLIP on
 the two cross-token tasks. Probing driver:
 `experiments/phase7_unification/run_probing_phase7.py --headline`.
 
-#### Agent Y — case studies (branch: `han-phase7-agent-c`)
+#### Agent Y — case studies (RunPod A40)
 
 Owns:
 - HH-RLHF dataset-understanding case study.
@@ -113,23 +118,49 @@ Owns:
 
 See `agent_y_brief.md` for the detailed scope, including the two
 specific pitfalls inherited from Agent C (small steering coefficients
-+ T-SAE paper case studies not yet reproduced).
++ T-SAE paper case studies not yet reproduced). The case-studies
+infrastructure was migrated from `origin/han-phase7-agent-c` onto
+`han-phase7-unification` on 2026-04-28 — see commit `445dd7d`.
 
 Y's deliverable is a single Pareto plot + qualitative-feature panel
 that reproduces (or fails to reproduce) T-SAE Table-1 / Figure-5
 on Phase 7's 6-arch shortlist. X's leaderboard provides the AUC
-x-axis for Y's qualitative-Pareto plot; the two artefacts are
-independent until the merge.
+x-axis for Y's qualitative-Pareto plot.
 
-#### Coordination between X and Y
+#### Agent Z — hill-climbing (local 5090)
 
-- X pushes new ckpts incrementally to `han1823123123/txcdr-base`
-  (base) and `han1823123123/txcdr-it` (new IT repo, see
-  Hugging Face section below). Y polls these for new ckpts.
+Owns:
+- `experiments/phase7_unification/hill_climb/`
+- `hill_*`-prefixed ckpts on `han1823123123/txcdr-base/`
+
+See `agent_z_brief.md`. Z continues the round1 SubseqH8 T_max sweep
++ round2 long-distance shift exploration that previous Agent A
+started before its pod died (only V1 of round1 finished).
+
+Z's deliverable is a synthesis log (winner / no-winner) — Han then
+decides whether to add a winning cell to
+`paper_archs.json:leaderboard_archs`.
+
+Z runs at the same paper-wide constants (b=4096, etc.). For variants
+that don't fit on 5090's 32 GB VRAM at b=4096, Z defers to H200
+(does not lower batch).
+
+#### Coordination between agents
+
+- X pushes new canonical ckpts incrementally to
+  `han1823123123/txcdr-base` (base) and `han1823123123/txcdr-it`
+  (new IT repo). Y polls these for new ckpts. Z pushes
+  `hill_*` ckpts to the same `txcdr-base/ckpts/` (different
+  prefix → no collision with X's canonical ckpts).
 - Y reads `paper_archs.json` to know which 6-arch shortlist
   to focus the case studies on (subset of leaderboard archs).
-- Both agents re-run `build_results_manifest.py` after their work
-  completes so the next agent sees fresh coverage.
+- Z reads `paper_archs.json` to know the methodology (b=4096,
+  current probing methodology, k_win=500) to match — and to know
+  the AUC bar to beat (current Phase 7 leaders at k_feat=5/20).
+- All agents re-run `build_results_manifest.py` after their work
+  completes so the next agent picking up sees fresh coverage.
+- Append-only race protocol for shared JSONL files: see
+  `brief.md` § "Branch hygiene for three concurrent agents".
 - No git force-pushes; PR or fast-forward only.
 
 ---
@@ -210,14 +241,16 @@ stays under `experiments/phase7_unification/case_studies/`.
 
 ### Coordination protocol with the H200 pod (when it arrives)
 
-- The H200 pod will run a **third** agent (call it X-H200) — same
-  workstream as X, but tackling the H200_required cells from
-  `paper_archs.json`.
+- The H200 pod will run a **fourth** agent (call it X-H200) on the
+  same `han-phase7-unification` branch — same workstream as X but
+  tackling the H200_required cells from `paper_archs.json`.
 - X-H200 picks up by reading `paper_archs.json` and
   `results_manifest.json`, training the cells whose
   `training_pod` field = `H200_required`, pushing ckpts to HF, and
-  re-running `build_results_manifest.py` so X (still on A40) sees
+  re-running `build_results_manifest.py` so the other agents see
   the new coverage.
-- No conflict: A40 archs and H200 archs are disjoint by
-  `training_pod`. The methodology (b=4096, paper-wide constants) is
-  identical, so the union is paper-grade apples-to-apples.
+- No conflict: A40 (X), 5090 (Z), and H200 (X-H200) cells are
+  disjoint by `training_pod` plus prefix (X writes canonical archs;
+  Z writes `hill_*`). Y operates only on existing ckpts. The
+  methodology (b=4096, paper-wide constants) is identical across
+  all four agents, so the union is paper-grade apples-to-apples.

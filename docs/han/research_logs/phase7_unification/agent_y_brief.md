@@ -14,9 +14,16 @@ tags:
 
 ### TL;DR
 
-- **You inherit Agent C's case-studies workstream** on branch
-  `han-phase7-agent-c` (NOT merged into `han-phase7-unification` —
-  they're a parallel workstream, owned end-to-end by Y).
+- **You inherit Agent C's case-studies workstream**, now living
+  under `experiments/phase7_unification/case_studies/` and
+  `experiments/phase7_unification/results/case_studies/` on branch
+  **`han-phase7-unification`** (cherry-picked from
+  `origin/han-phase7-agent-c` on 2026-04-28 so the source-of-truth
+  files paper_archs.json + results_manifest.json + query_paper_coverage.py
+  are visible on the same branch). The `han-phase7-agent-c` branch
+  remains as a historical reference but is no longer the working
+  branch — see `brief.md` § "Branch hygiene for three concurrent
+  agents" for directory ownership.
 - Two paper-grade case studies, both reusing Phase 7 base-side ckpts:
   (1) **HH-RLHF dataset understanding** — what features does each
   arch find?
@@ -43,19 +50,20 @@ tags:
 
 #### Branch state
 
-`origin/han-phase7-agent-c` carries 10 commits not on
-`han-phase7-unification`. Don't merge it into unification —
-it's the case-studies branch; X writes the leaderboard branch; the
-two stay separate by design.
+The case-studies infrastructure was migrated from
+`origin/han-phase7-agent-c` onto `han-phase7-unification` in commit
+`445dd7d` (2026-04-28). The `han-phase7-agent-c` branch remains as a
+historical reference only — Y does NOT branch off it.
 
-The branch has:
+What's now on the unification branch under your ownership:
 
 | path | what's there |
 |---|---|
-| `experiments/phase7_unification/case_studies/hh_rlhf/<arch>/` | per-arch top features + feature stats (autointerp on HH-RLHF passages) |
-| `experiments/phase7_unification/case_studies/steering/<arch>/` | feature_selection.json + generations.jsonl + grades.jsonl per arch |
-| `experiments/phase7_unification/case_studies/plots/` | phase7_steering_pareto, phase7_hh_rlhf_summary, phase7_hh_rlhf_scatter, phase7_steering_strength_curves |
-| `docs/han/research_logs/phase7_unification/2026-04-2*-c-stage*.md` | Agent C's stage-1/2 synthesis writeups |
+| `experiments/phase7_unification/case_studies/{hh_rlhf,steering}/*.py` | the pipelines: cache build + decompose + label + summarise (HH-RLHF); concepts + select + intervene + grade + plot (steering) |
+| `experiments/phase7_unification/results/case_studies/hh_rlhf/<arch>/` | per-arch top features + feature stats |
+| `experiments/phase7_unification/results/case_studies/steering/<arch>/` | feature_selection.json + generations.jsonl + grades.jsonl per arch |
+| `experiments/phase7_unification/results/case_studies/plots/` | phase7_steering_pareto, phase7_hh_rlhf_summary, phase7_hh_rlhf_scatter, phase7_steering_strength_curves |
+| `docs/han/research_logs/phase7_unification/2026-04-26-{c1-hh-rlhf-stage1,c2-steering-stage1,agent-c-stage1-synthesis}.md` | Agent C's stage-1 synthesis writeups |
 
 #### Six-arch shortlist (preserved)
 
@@ -188,18 +196,30 @@ bottleneck.
 
 ### Branch + workflow
 
-- Stay on `han-phase7-agent-c`. Cherry-pick from `han-phase7-unification`
-  if you need new ckpts that weren't on the agent-c branch when it
-  diverged.
-- Ckpts you need are on HF (`han1823123123/txcdr-base/ckpts/<arch>__seed<n>.pt`).
+- **Branch: `han-phase7-unification`.** Same as X and Z. See
+  `brief.md` § "Branch hygiene for three concurrent agents" for
+  directory ownership rules.
+- Y's writes are confined to:
+  - `experiments/phase7_unification/case_studies/` (source code)
+  - `experiments/phase7_unification/results/case_studies/` (outputs:
+    plots, JSON labels, generations, grades)
+  - `docs/han/research_logs/phase7_unification/2026-04-2*-y-*.md`
+    (Y-prefixed research logs)
+- Y does NOT touch:
+  - `paper_archs.json`, `canonical_archs.json` — read-only.
+  - `experiments/phase7_unification/results/probing_results.jsonl` —
+    that's X's append-target.
+  - `experiments/phase7_unification/results/training_*` — X / Z.
+  - `experiments/phase7_unification/results/plots/` — X's leaderboard
+    plots. Y's plots stay under `results/case_studies/plots/`.
+  - `experiments/phase7_unification/hill_climb/` — Z's territory.
+- Ckpts Y needs are on HF (`han1823123123/txcdr-base/ckpts/<arch>__seed<n>.pt`).
   Pull via the same `huggingface_hub` pattern Agent C used.
 - For the IT-side extension: the leaderboard archs at IT (when X
   ships them) will be on a NEW HF repo `han1823123123/txcdr-it`
   (see `plan.md`). Defer IT-side case studies until X's IT
   trainings are done — focus on landing the base-side reproduction
   + extension first.
-- Keep your case-studies plots under `case_studies/plots/`. Don't
-  write to `results/plots/` (that's X's leaderboard plots).
 
 ### Coordination with Agent X
 
