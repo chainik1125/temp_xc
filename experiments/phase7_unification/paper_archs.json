@@ -1,0 +1,168 @@
+{
+  "version": "1.0",
+  "phase": "phase7_unification",
+  "description": "Canonical paper-arch list — single source of truth for which (arch_id, k_win) cells appear in the paper's leaderboard and T-sweep artefacts. Cell key is (subject_model, arch_id, seed, k_win); each leaderboard entry below is a (arch_id, k_win) pair, evaluated across both subject models and the seed priority below.",
+  "subject_models": [
+    {"name": "google/gemma-2-2b",     "anchor_layer": 12, "label": "base"},
+    {"name": "google/gemma-2-2b-it",  "anchor_layer": 13, "label": "IT"}
+  ],
+  "seeds_priority": {
+    "primary":   42,
+    "secondary": 1,
+    "bonus":     2
+  },
+  "probing_methodology": {
+    "methodology_class": "current",
+    "methodology_tag": "phase7_S32_first_real_meanpool",
+    "S": 32,
+    "k_feat_reported": [5, 20],
+    "FLIP_tasks": ["winogrande_correct_completion", "wsc_coreference"],
+    "comment": "All paper cells must be probed under this methodology. 'old' methodology rows in the manifest (Phase 5/5B's last_position / mean_pool / full_window at S=20) do NOT qualify and must be re-probed."
+  },
+  "leaderboard_archs": [
+    {
+      "paper_id": "tfa",
+      "arch_id": "tfa_big",
+      "k_win": 500,
+      "k_pos": 100,
+      "T": null,
+      "src_class": "TemporalSAE",
+      "comment": "TFA full (predictive + novel codes) — Lubana et al. 2025 reference."
+    },
+    {
+      "paper_id": "tsae_k20",
+      "arch_id": "tsae_paper_k20",
+      "k_win": 20,
+      "k_pos": 20,
+      "T": 1,
+      "src_class": "TemporalMatryoshkaBatchTopKSAE",
+      "comment": "Faithful T-SAE port (Ye et al. 2025) at the paper's native k=20 sparsity."
+    },
+    {
+      "paper_id": "tsae_k500",
+      "arch_id": "tsae_paper_k500",
+      "k_win": 500,
+      "k_pos": 500,
+      "T": 1,
+      "src_class": "TemporalMatryoshkaBatchTopKSAE",
+      "comment": "Faithful T-SAE port at our k convention (k_win=500) for fair cross-arch comparison."
+    },
+    {
+      "paper_id": "mlc",
+      "arch_id": "mlc",
+      "k_win": 500,
+      "k_pos": 100,
+      "T": null,
+      "n_layers": 5,
+      "src_class": "MultiLayerCrosscoder",
+      "comment": "Dense MLC at Phase 7 k_win=500; per-layer label k_pos=100 is purely descriptive (single shared TopK)."
+    },
+    {
+      "paper_id": "mlc_sparse",
+      "arch_id": "mlc",
+      "k_win": 100,
+      "k_pos": 100,
+      "T": null,
+      "n_layers": 5,
+      "src_class": "MultiLayerCrosscoder",
+      "comment": "Sparse MLC at Phase 5 density (k_win=100). Phase 5 IT ckpts already exist at this density (k_win=100 was Phase 5's only knob); base-side equivalent must be trained from scratch."
+    },
+    {
+      "paper_id": "ag_mlc_08",
+      "arch_id": "agentic_mlc_08",
+      "k_win": 500,
+      "k_pos": 100,
+      "T": null,
+      "n_layers": 5,
+      "src_class": "MLCContrastiveMultiscale",
+      "comment": "Dense agentic MLC (multi-scale contrastive, n_scales=3, gamma=0.5) at k_win=500."
+    },
+    {
+      "paper_id": "ag_mlc_08_sparse",
+      "arch_id": "agentic_mlc_08",
+      "k_win": 100,
+      "k_pos": 100,
+      "T": null,
+      "n_layers": 5,
+      "src_class": "MLCContrastiveMultiscale",
+      "comment": "Sparse agentic MLC at k_win=100 (Phase 5 density). Phase 5 IT ckpts exist; base-side must be trained from scratch."
+    },
+    {
+      "paper_id": "txc_t5",
+      "arch_id": "txcdr_t5",
+      "k_win": 500,
+      "k_pos": 100,
+      "T": 5,
+      "src_class": "TemporalCrosscoder",
+      "comment": "Barebones TXC at T=5 (T-sweep peak point and one of the two T-sweep anchor archs)."
+    },
+    {
+      "paper_id": "txc_t16",
+      "arch_id": "txcdr_t16",
+      "k_win": 500,
+      "k_pos": 31,
+      "T": 16,
+      "src_class": "TemporalCrosscoder",
+      "comment": "Barebones TXC at T=16 (mid-T point; tests T-scaling claim at 3× the peak T)."
+    },
+    {
+      "paper_id": "good_txc_p5",
+      "arch_id": "phase5b_subseq_h8",
+      "k_win": 500,
+      "k_pos": 100,
+      "T_max": 10,
+      "t_sample": 5,
+      "src_class": "Phase5BSubseqSamplingTXCDR_H8",
+      "comment": "Best TXC variant from Phase 5 — H8 stack (matryoshka H/L + multi-distance InfoNCE) + subseq sampling. mp/lp 3-seed champion in Phase 5."
+    },
+    {
+      "paper_id": "good_txc_p7_k20",
+      "arch_id": "txc_bare_antidead_t5",
+      "k_win": 500,
+      "k_pos": 100,
+      "T": 5,
+      "src_class": "TXCBareMatryoshkaContrastiveAntidead",
+      "comment": "Best Phase 7 single-cell at k_feat=20 (mean AUC 0.9358 on base). Barebones TXC + tsae-paper anti-dead stack only."
+    },
+    {
+      "paper_id": "good_txc_p7_k5",
+      "arch_id": "phase57_partB_h8_bare_multidistance_t8",
+      "k_win": 500,
+      "k_pos": 62,
+      "T": 8,
+      "shifts": [1, 2, 4],
+      "src_class": "MatryoshkaTXCDRContrastiveMultiscale",
+      "comment": "Best Phase 7 single-cell at k_feat=5 (mean AUC 0.8989 on base). H8 multidistance recipe = anti-dead + matryoshka H/L + multi-distance InfoNCE with auto-scaled shifts."
+    }
+  ],
+  "tsweep_barebones": {
+    "arch_template": "txcdr_t<T>",
+    "k_win": 500,
+    "k_pos_formula": "k_win / T",
+    "T_values": [3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 16, 18, 20, 24, 28, 32],
+    "src_class": "TemporalCrosscoder",
+    "comment": "Existing Phase 7 T-sweep (preserved). All cells trained on base at seed=42 + seed=1; partial seed=2 for T=3..8. Carries forward unchanged into the paper."
+  },
+  "tsweep_hillclimbed": null,
+  "tsweep_hillclimbed_candidates": [
+    {
+      "name": "txc_bare_antidead_t<T>",
+      "rationale": "Minimal-recipe hill climb: barebones TXC + tsae-paper anti-dead stack only. Already trained at T={5,10,20}; would fill T ∈ {3,4,6,7,8,9,12,14,16,18,24,28,32}.",
+      "existing_T_values": [5, 10, 20],
+      "missing_T_values": [3, 4, 6, 7, 8, 9, 12, 14, 16, 18, 24, 28, 32]
+    },
+    {
+      "name": "phase57_partB_h8_bare_multidistance_t<T>",
+      "rationale": "Full H8 recipe (anti-dead + matryoshka H/L + multi-distance InfoNCE). Already trained at T=3..9; would fill T ∈ {10,12,14,16,18,20,24,28,32}.",
+      "existing_T_values": [3, 4, 5, 6, 7, 8, 9],
+      "missing_T_values": [10, 12, 14, 16, 18, 20, 24, 28, 32]
+    },
+    {
+      "name": "phase5b_subseq_h8_T_max<T>",
+      "rationale": "SubseqH8 hill-climb (Phase 5B winner). Already explored in Phase 7 hill_climb scripts at T_max=12 (V1 trained); T_max=64 permanently lost on A40.",
+      "existing_T_values": [10, 12],
+      "missing_T_values": [3, 4, 5, 6, 7, 8, 9, 16, 20, 24, 28, 32]
+    }
+  ],
+  "tsweep_hillclimbed_status": "TBD — pending user decision on which family. Status here so future agents know the question is open, not forgotten."
+}
