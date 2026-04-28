@@ -25,6 +25,15 @@ tags:
 - **TFA = 0.794** (worst by 0.10) — see caveats; training was
   under-converged.
 
+### Headline bar charts
+
+Sorted-by-mean bar chart of all 38 archs, coloured by family. Error
+bars = std across 36 SAEBench tasks.
+
+![headline at k_feat=20](../../../experiments/phase7_unification/results/plots/headline_bar_k20.png)
+
+![headline at k_feat=5](../../../experiments/phase7_unification/results/plots/headline_bar_k5.png)
+
 ### Top 5 per sparsity budget (seed=42, S=32)
 
 **At k_feat=20** (less sparse, 20-feature probe):
@@ -64,6 +73,16 @@ top-4 at k_feat=20.
 H8 multidistance has the **tightest cluster** (0.0038 spread), TXC
 fixed-T has the **highest peak**. TXCDR T-sweep is wide because it
 spans T=3..32 — see next section.
+
+### T-sweep curves
+
+Three families with multiple T values: TXCDR (T=3..32, full sweep),
+H8 multidistance contrastive (T=3..9; T=10..32 dropped from headline
+per the trim), and TXC bare antidead (T=5/10/20 anchor points only).
+
+![T-sweep at k_feat=20](../../../experiments/phase7_unification/results/plots/t_sweep_k20.png)
+
+![T-sweep at k_feat=5](../../../experiments/phase7_unification/results/plots/t_sweep_k5.png)
 
 ### TXCDR T-sweep (k_feat=20)
 
