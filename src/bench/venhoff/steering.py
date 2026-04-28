@@ -215,10 +215,14 @@ def train_one_vector(
             log.info("[info] reuse_shipped | stage=steering | cluster_idx=%d | cache=%s",
                      cluster_idx, expected_out)
             meta_path.parent.mkdir(parents=True, exist_ok=True)
+            # Hash the plain `meta` dict (no `source` field) so the next
+            # run's `can_resume` check, which hashes the same `meta` dict,
+            # matches and we don't retrain. The `source` annotation lives
+            # in the human-readable JSON content, not the hash key.
             write_with_metadata(
                 meta_path,
                 json.dumps({"vector_path": str(expected_out), "source": "venhoff_shipped"}),
-                {**meta, "source": "venhoff_shipped"},
+                meta,
             )
             return expected_out
 
