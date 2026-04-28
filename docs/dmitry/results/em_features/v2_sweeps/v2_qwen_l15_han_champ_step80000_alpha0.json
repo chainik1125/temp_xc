@@ -1,0 +1,33 @@
+{
+  "meta": {
+    "steerer": "han",
+    "layer": 15,
+    "k": 10,
+    "feature_ids": [
+      2025,
+      3156,
+      5167,
+      14436,
+      2938,
+      444,
+      3327,
+      3125,
+      3055,
+      2971
+    ],
+    "n_rollouts": 8,
+    "alpha_grid": [
+      0.0
+    ]
+  },
+  "rows": [
+    {
+      "alpha": 0.0,
+      "mean_alignment": 44.6551724137931,
+      "mean_coherence": 25.46875,
+      "n_alignment": 58,
+      "n_coherence": 64,
+      "n_total": 64
+    }
+  ]
+}

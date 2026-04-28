@@ -30,8 +30,6 @@ def parse_args():
     p = argparse.ArgumentParser()
     p.add_argument("--results_dir", type=Path, required=True)
     p.add_argument("--out", type=Path, required=True)
-    p.add_argument("--baseline_align", type=float, default=64.19,
-                   help="OpenAI gpt-4o-mini baseline; for reference only — Gemini scores differently.")
     return p.parse_args()
 
 
@@ -50,10 +48,21 @@ def load_rows(path: Path) -> list[dict]:
     return rows
 
 
+def load_alpha0(path: Path) -> dict | None:
+    if not path.exists():
+        return None
+    d = json.loads(path.read_text())
+    rows = d.get("rows", [])
+    for r in rows:
+        if r.get("alpha") == 0 and r.get("mean_alignment") is not None:
+            return {"alpha": 0, "align": r["mean_alignment"], "coh": r["mean_coherence"]}
+    return None
+
+
 def main():
     args = parse_args()
 
-    fig, axes = plt.subplots(2, 3, figsize=(15, 9), sharex=False, sharey=False)
+    fig, axes = plt.subplots(2, 3, figsize=(15, 9), sharex=True, sharey=True)
     steps = [50000, 80000, 100000]
     archs = [
         ("SAE arditi v2 (k=128, d_sae=32k, T=1)",
@@ -93,14 +102,36 @@ def main():
                                 textcoords="offset points", xytext=(6, -10), fontsize=7,
                                 color="gray")
 
-            ax.axhline(args.baseline_align, color="gray", linestyle="--", linewidth=0.8, alpha=0.5)
-            ax.text(0.02, args.baseline_align + 0.5, f"baseline (gpt-4o-mini): {args.baseline_align}",
-                    transform=ax.get_yaxis_transform(), fontsize=7, color="gray")
+            # α=0 baseline (Gemini-judged no-steering point), if available
+            alpha0_path = args.results_dir / fname_fmt.format(step).replace("_frontier", "_alpha0")
+            a0 = load_alpha0(alpha0_path)
+            if a0 is not None:
+                ax.scatter([a0["coh"]], [a0["align"]], s=200, c="black", marker="*",
+                           edgecolors="white", linewidths=1.5, zorder=10, label="α=0")
+                ax.annotate(f"α=0\nalign={a0['align']:.1f}",
+                            (a0["coh"], a0["align"]),
+                            textcoords="offset points", xytext=(-12, -16), fontsize=8,
+                            color="black", fontweight="bold", ha="right")
 
             ax.set_xlabel("mean coherence (Gemini)")
             ax.set_ylabel("mean alignment (Gemini)")
-            ax.set_title(f"step {step//1000}k  (n_α={len(rows)})", fontsize=10)
+            arch_short = "SAE arditi" if "sae" in fname_fmt else "Han H8"
+            ax.set_title(f"{arch_short} — step {step//1000}k  (n_α={len(rows)})", fontsize=10)
             ax.grid(True, alpha=0.3)
+            # Arch label in upper-left
+            ax.text(0.03, 0.97, arch_short, transform=ax.transAxes,
+                    fontsize=14, fontweight="bold", ha="left", va="top",
+                    color="navy" if "sae" in fname_fmt else "darkred",
+                    bbox=dict(boxstyle="round,pad=0.3", facecolor="white", alpha=0.7, edgecolor="none"))
+
+            # Combined stats box in bottom-left
+            a_mu, a_sd = float(np.mean(aligns)), float(np.std(aligns))
+            c_mu, c_sd = float(np.mean(cohs)), float(np.std(cohs))
+            ax.text(0.03, 0.04,
+                    f"align: mean={a_mu:.2f}, std={a_sd:.2f}\ncoh:   mean={c_mu:.2f}, std={c_sd:.2f}",
+                    transform=ax.transAxes, fontsize=8, ha="left", va="bottom", family="monospace",
+                    bbox=dict(boxstyle="round,pad=0.35", facecolor="lightyellow", alpha=0.9,
+                              edgecolor="black", linewidth=0.6))
 
         # Row title
         axes[row, 0].annotate(arch_label, xy=(-0.2, 0.5), xycoords="axes fraction",

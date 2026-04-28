@@ -1,0 +1,33 @@
+{
+  "meta": {
+    "steerer": "custom_sae",
+    "layer": 15,
+    "k": 10,
+    "feature_ids": [
+      25782,
+      1764,
+      30286,
+      21730,
+      17576,
+      19288,
+      27477,
+      29754,
+      6506,
+      21565
+    ],
+    "n_rollouts": 8,
+    "alpha_grid": [
+      0.0
+    ]
+  },
+  "rows": [
+    {
+      "alpha": 0.0,
+      "mean_alignment": 43.96551724137931,
+      "mean_coherence": 25.15625,
+      "n_alignment": 58,
+      "n_coherence": 64,
+      "n_total": 64
+    }
+  ]
+}
