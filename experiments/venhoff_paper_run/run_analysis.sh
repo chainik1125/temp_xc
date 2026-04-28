@@ -10,11 +10,12 @@
 #   results/gap_recovery_heatmap.png — (coef × window) heatmap per arch
 #   results/analysis.json           — full structured dump for notebooks
 #
-# Usage (defaults to the grid-sweep suffix):
+# Usage (scans both single-cell and grid runs by default):
 #   bash experiments/venhoff_paper_run/run_analysis.sh
 #
-# Override single-cell or other suffix:
-#   SUFFIX=singlecell bash experiments/venhoff_paper_run/run_analysis.sh
+# Override the set of filename suffixes scanned. Use '' for the bare
+# (single-cell) JSONs and '_grid' for the grid-guardrail JSONs:
+#   SUFFIXES="_grid" bash experiments/venhoff_paper_run/run_analysis.sh
 #
 # Override JSON source dir:
 #   JSON_DIR=/some/other/path bash experiments/venhoff_paper_run/run_analysis.sh
@@ -24,7 +25,7 @@ cd "$(dirname "${BASH_SOURCE[0]}")/../.."
 
 JSON_DIR="${JSON_DIR:-/workspace/spar-temporal-crosscoders/vendor/thinking-llms-interp/hybrid/results}"
 OUT_DIR="${OUT_DIR:-experiments/venhoff_paper_run/results}"
-SUFFIX="${SUFFIX:-grid}"
+SUFFIXES="${SUFFIXES:-"" _grid}"
 BASE_SHORT="${BASE_SHORT:-llama-3.1-8b}"
 DATASET="${DATASET:-math500}"
 
@@ -33,9 +34,10 @@ if [[ ! -x "$PY" ]]; then
     PY="python"
 fi
 
+# shellcheck disable=SC2086
 "$PY" experiments/venhoff_paper_run/analyze_grid.py \
     --json-dir "$JSON_DIR" \
     --out-dir "$OUT_DIR" \
     --base-short "$BASE_SHORT" \
     --dataset "$DATASET" \
-    --suffix "$SUFFIX"
+    --suffixes $SUFFIXES
