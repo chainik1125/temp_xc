@@ -121,9 +121,8 @@ def load_steerer_decoder_row(arch: str, ckpt_path: Path, feature_id: int, device
         ).to(device)
         m.load_state_dict(ckpt["state_dict"])
         m.eval()
-        # W_dec for Han: (T, d_sae, d_in) → take the centre slice T//2 by convention
-        T = cfg["T"]
-        return m.W_dec[T // 2, feature_id].detach().clone()
+        # W_dec for Han: (d_sae, T, d_in) — take the last temporal slot to match frontier_sweep
+        return m.W_dec[feature_id, -1, :].detach().clone()
 
 
 def run_alpha_for_feature(
