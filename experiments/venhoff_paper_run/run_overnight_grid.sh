@@ -52,6 +52,14 @@ N_CLUSTERS="${N_CLUSTERS:-15}"
 MAX_NEW_TOKENS="${MAX_NEW_TOKENS:-2000}"
 MAX_THINKING_TOKENS="${MAX_THINKING_TOKENS:-2000}"
 DATASET="${DATASET:-math500}"
+# Required by run_hybrid.py wrapper for path identity, even though
+# Phase 3 inference itself doesn't read traces. Values match what
+# Phase 2 was launched with on this pod.
+ROOT="${ROOT:-results/venhoff_eval}"
+MODEL="${MODEL:-deepseek-r1-distill-llama-8b}"
+N_TRACES="${N_TRACES:-500}"
+LAYER="${LAYER:-6}"
+SEED="${SEED:-42}"
 
 VENDOR_REAL="${VENDOR_REAL:-/workspace/spar-temporal-crosscoders/vendor/thinking-llms-interp}"
 PER_ARCH_ROOT="${PER_ARCH_ROOT:-/workspace/vendor_runs}"
@@ -115,6 +123,11 @@ for i in "${!ARCH_ARR[@]}"; do
 
     CUDA_VISIBLE_DEVICES="$gpu" \
         python -m src.bench.venhoff.run_hybrid \
+            --root "$ROOT" \
+            --model "$MODEL" \
+            --n-traces "$N_TRACES" \
+            --layer "$LAYER" \
+            --seed "$SEED" \
             --arch "$arch" \
             --venhoff-root "$target" \
             --base-model "$BASE_MODEL" \
