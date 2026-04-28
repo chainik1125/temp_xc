@@ -127,15 +127,12 @@ def load_steerer_decoder_row(arch: str, ckpt_path: Path, feature_id: int, device
 
 
 def run_alpha_for_feature(
-    *, model, tokenizer, questions, layer: int, direction: torch.Tensor,
+    *, generate_fn, model, tokenizer, questions, layer: int, direction: torch.Tensor,
     alpha: float, n_rollouts: int, max_new_tokens: int, seed: int,
 ) -> list[dict]:
-    """Generate longform completions at a fixed (feature, α). Returns list of
-    {question, answer} dicts ready for the judge."""
-    sys.path.insert(0, str(REPO_ROOT / "experiments" / "em_features"))
-    from generate_with_steering import generate_longform_completions
+    """Generate longform completions at a fixed (feature, α)."""
     seed_all(seed)
-    return generate_longform_completions(
+    return generate_fn(
         model=model, tokenizer=tokenizer, questions=questions,
         steering_direction=direction, magnitude=float(alpha),
         layer_idx=int(layer), n_generations=int(n_rollouts),
@@ -149,10 +146,16 @@ def main():
     args.out.mkdir(parents=True, exist_ok=True)
 
     # Load shared infrastructure: bad-medical Qwen + EM questions + judge
-    from generate_with_steering import load_subject_model
-    from frontier_sweep import EM_QUESTIONS  # 8 questions
-    from gemini_judge import evaluate_generations_with_gemini
     import asyncio
+    from open_source_em_features.pipeline.longform_steering import (
+        generate_longform_completions, load_em_dataset,
+    )
+    from open_source_em_features.utils.model_loading import load_model_and_tokenizer
+    from experiments.em_features.gemini_judge import evaluate_generations_with_gemini
+
+    # Subject + base model IDs (Qwen-7B bad-medical with PEFT adapter)
+    SUBJECT = "andyrdt/Qwen2.5-7B-Instruct_bad-medical"
+    BASE = "Qwen/Qwen2.5-7B-Instruct"
 
     print(f"[wang] arch={args.arch} ckpt={args.ckpt.name} feats={args.features_json}", flush=True)
     print(f"[wang] screen_top_n={args.screen_top_n}  n_survivors={args.n_survivors}  n_final={args.n_final}", flush=True)
@@ -164,8 +167,14 @@ def main():
 
     # Load subject model + tokenizer once
     print("[wang] loading subject model (bad-medical Qwen)...", flush=True)
-    model, tok = load_subject_model("qwen")
-    questions = EM_QUESTIONS
+    model, tok = load_model_and_tokenizer(
+        SUBJECT, base_model_id=BASE, torch_dtype=torch.bfloat16, device=args.device,
+    )
+    if hasattr(model, "merge_and_unload"):
+        model = model.merge_and_unload()
+    model.eval()
+    em = load_em_dataset()
+    questions = [d["messages"][0]["content"] for d in em]
 
     # ===== Stage 2: causal screen =====
     screen_path = args.out / "stage2_screen.json"
@@ -182,6 +191,7 @@ def main():
             results = {}
             for alpha in (-args.screen_alpha, args.screen_alpha):
                 gens = run_alpha_for_feature(
+                generate_fn=generate_longform_completions,
                     model=model, tokenizer=tok, questions=questions, layer=args.layer,
                     direction=direction, alpha=alpha, n_rollouts=args.screen_rollouts,
                     max_new_tokens=args.max_new_tokens, seed=args.seed,
@@ -233,6 +243,7 @@ def main():
         print(f"\n=== STAGE 3: coherence-aware strength sweep on {len(survivors)} survivors ===", flush=True)
         # Baseline coherence at α=0 (compute once)
         gens0 = run_alpha_for_feature(
+            generate_fn=generate_longform_completions,
             model=model, tokenizer=tok, questions=questions, layer=args.layer,
             direction=torch.zeros_like(load_steerer_decoder_row(args.arch, args.ckpt, survivors[0]["feature_id"], args.device)),
             alpha=0.0, n_rollouts=args.strength_rollouts,
@@ -255,6 +266,7 @@ def main():
             best_strong = None  # strongest α that stays coherent
             for alpha in strength_alphas:
                 gens = run_alpha_for_feature(
+                generate_fn=generate_longform_completions,
                     model=model, tokenizer=tok, questions=questions, layer=args.layer,
                     direction=direction, alpha=alpha, n_rollouts=args.strength_rollouts,
                     max_new_tokens=args.max_new_tokens, seed=args.seed,
@@ -318,6 +330,7 @@ def main():
         rows = []
         for alpha in final_alphas:
             gens = run_alpha_for_feature(
+                generate_fn=generate_longform_completions,
                 model=model, tokenizer=tok, questions=questions, layer=args.layer,
                 direction=direction, alpha=alpha, n_rollouts=args.final_rollouts,
                 max_new_tokens=args.max_new_tokens, seed=args.seed,
