@@ -135,34 +135,49 @@
       "comment": "Best Phase 7 single-cell at k_feat=5 (mean AUC 0.8989 on base). H8 multidistance recipe = anti-dead + matryoshka H/L + multi-distance InfoNCE with auto-scaled shifts."
     }
   ],
+  "tsweep_T_cap": {
+    "T_max": 32,
+    "rationale": "Both barebones and hill-climbed T-sweeps cap at T=32. Beyond this (e.g., row 49 phase5b_subseq_h8_T64_s5) is permanently infeasible on A40 — see 2026-04-28-a40-feasibility.md."
+  },
+  "tsweep_T_values": [3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 16, 18, 20, 24, 28, 32],
   "tsweep_barebones": {
     "arch_template": "txcdr_t<T>",
     "k_win": 500,
     "k_pos_formula": "k_win / T",
     "T_values": [3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 16, 18, 20, 24, 28, 32],
     "src_class": "TemporalCrosscoder",
-    "comment": "Existing Phase 7 T-sweep (preserved). All cells trained on base at seed=42 + seed=1; partial seed=2 for T=3..8. Carries forward unchanged into the paper."
+    "comment": "Existing Phase 7 T-sweep (preserved). All cells trained on base at seed=42 + seed=1; partial seed=2 for T=3..10. Carries forward unchanged.",
+    "a40_feasibility": {
+      "comfortable_at_b4096": [3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 16, 18, 20, 24],
+      "tight_at_b4096_use_b2048": [28],
+      "needs_streaming_refactor": [32],
+      "rationale": "single-layer cache (14 GB) + W+Adam (T·d_in·d_sae·8B/param × 2 sides) + workspace. T=32 hits 50 GB at b=4096; b=2048 doesn't recover enough — needs CPU-RAM cache streaming."
+    },
+    "results_source": "experiments/phase7_unification/results/probing_results.jsonl — filter rows where arch_id matches 'txcdr_t<T>' for T in T_values AND S=32. results_manifest.json summarises coverage."
   },
-  "tsweep_hillclimbed": null,
-  "tsweep_hillclimbed_candidates": [
-    {
-      "name": "txc_bare_antidead_t<T>",
-      "rationale": "Minimal-recipe hill climb: barebones TXC + tsae-paper anti-dead stack only. Already trained at T={5,10,20}; would fill T ∈ {3,4,6,7,8,9,12,14,16,18,24,28,32}.",
-      "existing_T_values": [5, 10, 20],
-      "missing_T_values": [3, 4, 6, 7, 8, 9, 12, 14, 16, 18, 24, 28, 32]
+  "tsweep_hillclimbed": {
+    "arch_template": "phase57_partB_h8_bare_multidistance_t<T>",
+    "k_win": 500,
+    "k_pos_formula": "k_win / T",
+    "T_values": [3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 16, 18, 20, 24, 28, 32],
+    "src_class": "MatryoshkaTXCDRContrastiveMultiscale",
+    "shifts_formula": "auto-scaled (1, max(1,T//4), max(1,T//2)) deduped",
+    "weights": "inverse-distance w_s = 1/(1+s)",
+    "matryoshka_H_fraction": 0.2,
+    "comment": "H8 multidistance recipe: TXC + anti-dead + matryoshka H/L (H = 0.2·d_sae) + multi-distance InfoNCE. Family-mean #1 in Phase 7 leaderboard at k_feat=20 (tightest cluster, 0.0038 spread).",
+    "existing_T_values": [3, 4, 5, 6, 7, 8, 9],
+    "missing_T_values": [10, 12, 14, 16, 18, 20, 24, 28, 32],
+    "a40_feasibility": {
+      "comfortable_at_b4096": [3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 16],
+      "tight_at_b4096_use_b2048": [18, 20, 24, 28],
+      "needs_streaming_refactor": [32],
+      "rationale": "H8 adds matryoshka H decoder (~10% extra over plain TXC) and a small multi-distance pair tensor (negligible). Footprint at T=32: cache 14 + W+Adam 35.9 + workspace ≈ 50 GB."
     },
-    {
-      "name": "phase57_partB_h8_bare_multidistance_t<T>",
-      "rationale": "Full H8 recipe (anti-dead + matryoshka H/L + multi-distance InfoNCE). Already trained at T=3..9; would fill T ∈ {10,12,14,16,18,20,24,28,32}.",
-      "existing_T_values": [3, 4, 5, 6, 7, 8, 9],
-      "missing_T_values": [10, 12, 14, 16, 18, 20, 24, 28, 32]
+    "rationale_for_choice": "Hill-climbed family selected as phase57_partB_h8_bare_multidistance because: (i) family-mean #1 in Phase 7 unified leaderboard at k_feat=20 (tightest cluster, 0.0038 spread); (ii) T=8 is paper good_txc_p7_k5 — the T-sweep gives that anchor full context; (iii) 7 of 16 cells already trained, only 9 missing — minimum new compute vs the txc_bare_antidead and SubseqH8 alternatives.",
+    "alternatives_rejected": {
+      "txc_bare_antidead_t<T>": "Only T=5,10,20 trained — would need 13 new trainings (full sweep). More compute, less differentiation from barebones (anti-dead only).",
+      "phase5b_subseq_h8_T_max<T>": "Only T_max=10,12 trained — would need 14 new trainings. T_max=64 permanently lost on A40 anyway."
     },
-    {
-      "name": "phase5b_subseq_h8_T_max<T>",
-      "rationale": "SubseqH8 hill-climb (Phase 5B winner). Already explored in Phase 7 hill_climb scripts at T_max=12 (V1 trained); T_max=64 permanently lost on A40.",
-      "existing_T_values": [10, 12],
-      "missing_T_values": [3, 4, 5, 6, 7, 8, 9, 16, 20, 24, 28, 32]
-    }
-  ],
-  "tsweep_hillclimbed_status": "TBD — pending user decision on which family. Status here so future agents know the question is open, not forgotten."
+    "results_source": "experiments/phase7_unification/results/probing_results.jsonl — filter rows where arch_id matches 'phase57_partB_h8_bare_multidistance_t<T>' for T in T_values AND S=32. results_manifest.json summarises coverage."
+  }
 }
