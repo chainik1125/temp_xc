@@ -7,9 +7,24 @@ tags:
   - in-progress
 ---
 
-> Updated 2026-04-27 evening with the full (coef × token-window) grid-sweep
-> results. Single-cell numbers from earlier in the day are preserved below
-> for context.
+> **STALE — do not use these grid-sweep numbers.** Discovered after
+> publishing this doc (evening 2026-04-27) that the three
+> `*_grid.json` files this section read were *byte-identical* on
+> questions and base answers — they're Venhoff's shipped rolling jsonl
+> trimmed to 20 tasks, copy-renamed with arch suffixes. The actual
+> grid sweep never ran: `hybrid_token.py` saw `Resume: 140 tasks
+> already completed (>= n_tasks 20). Nothing to do.` and exited
+> immediately. The hybrid_acc spread (15/20/20) across the three rows
+> is grader noise re-grading the same shipped answer strings.
+>
+> What you can take away from the table below: nothing about *our*
+> arches' Gap Recovery, because we never produced any. Real
+> overnight paper-budget run launched via
+> `experiments/venhoff_paper_run/run_overnight_grid.sh` (rolling
+> jsonl wiped between arches, n=500, full 10×5 grid).
+>
+> Single-cell results lower in this doc are real — they came from a
+> different earlier-in-the-day run that did not early-exit.
 
 ## TL;DR
 
