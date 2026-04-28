@@ -45,6 +45,9 @@ if [[ -f .env ]] && [[ -z "${HF_TOKEN:-}" ]]; then
 fi
 : "${HF_TOKEN:?HF_TOKEN must be set (env or .env)}"
 
+# Export so the heredoc python sees them.
+export HF_REPO REPO_TYPE VECTOR_DIR HF_TOKEN
+
 echo "=== HF backup ==="
 echo "  repo:       $HF_REPO ($REPO_TYPE)"
 echo "  vector_dir: $VECTOR_DIR"
