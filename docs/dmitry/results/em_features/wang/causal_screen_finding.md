@@ -86,6 +86,51 @@ The infrastructure (`experiments/em_features/run_wang_procedure.py`) is in place
 - `docs/dmitry/results/em_features/wang/sae_stage2_screen.json`
 - `docs/dmitry/results/em_features/wang/han_stage2_screen.json`
 
+### Update 2026-04-28: Stages 3 + 4 complete — the dramatic screen result mostly didn't replicate
+
+After patching `gemini_judge.py` to fall back from `gemini-3.1-flash-lite-preview` to `gemini-2.5-flash` on quota errors, both Wang procedures finished cleanly. The full 27-α frontier on the top-3 finalists per arch is saved at:
+
+- `docs/dmitry/results/em_features/wang/sae_stage4_final_frontier.json`
+- `docs/dmitry/results/em_features/wang/han_stage4_final_frontier.json`
+
+**The headline result is more modest than stage 2 suggested.** Filtering to negative α with coherence ≥ 90% of the α=0 baseline:
+
+| arch | feature | best −α | peak align | peak coh | Δalign vs baseline |
+|---|---:|---:|---:|---:|---:|
+| SAE 100k | feat 30316 | −4 | 48.50 | 23.98 | −0.11 |
+| SAE 100k | feat 3916 | −1 | 48.52 | 24.38 | −0.08 |
+| SAE 100k | feat 2136 | −1 | 45.08 | 23.98 | −3.52 |
+| **Han 100k** | **feat 5291** | **−1** | **52.21** | **26.09** | **+3.04** |
+| Han 100k | feat 5145 | −5 | 49.76 | 30.78 | +0.60 |
+| Han 100k | feat 2174 | −10 | 49.30 | 22.73 | +0.13 |
+
+(SAE baseline = 48.61, Han baseline = 49.17, both at this run's α=0.)
+
+**Vs prior procedures (Δalign over α=0):**
+
+| procedure | SAE 100k Δalign | Han 100k Δalign |
+|---|---:|---:|
+| cosine k=10 bundle | +8.2 | +9.9 |
+| encoder-Δz̄ k=10 bundle | +6.6 | +6.0 |
+| encoder-Δz̄ k=1 single feature | +9.5 | +5.7 |
+| **Wang single-feature champion** | **−0.1 (best of 3)** | **+3.0 (best of 3)** |
+
+The Wang procedure did *not* beat our existing bundled procedures in this setup. Possible reasons:
+
+1. **Stage 2 screens used n_rollouts=2 (16 generations) → SE ≈ 10 align points.** The +27 / +23 screen-score "swings" we celebrated were partly noise. Stage 4 measurements at n_rollouts=8 are more reliable.
+
+2. **Stage 3 selection criterion was misaligned with what we actually want.** It ranks features by `|best_strong_align − baseline|`, where `best_strong` is the *strongest* α at which coherence holds. This favors features that survive extreme α more than features that shift alignment at small α. The screen-rank-1 feature for SAE (29650) was *not* selected as a finalist — stage 3 promoted others ahead of it.
+
+3. **The bad-medical Qwen-7B is a small open-weight model, not GPT-4o.** Wang et al.'s 25-feature selection of "toxic persona" was conducted on GPT-4o where misalignment was probably more concentrated in a small number of features. In a Qwen-7B fine-tuned with low-rank PEFT, the misalignment signal may be more distributed across many features — making bundle steering legitimately stronger than single-feature steering.
+
+4. **Dataset and prompt mismatch.** Wang's eval set E for screening differs from ours; we used the medical-prompts dataset (the one used for the diff-vector computation). A more diverse probe set might surface different causal champions.
+
+### Bottom line
+
+For *our* (Qwen-7B bad-medical) emergent-misalignment setup with these SAE/Han architectures, **k=10 cosine-bundle steering currently beats single-feature Wang causal steering**. The Wang stage 2 screen is still useful as a different ranking lens — it does identify features whose causal effect is decoupled from their firing increase — but the gain isn't large enough at the scales we tested (top-3 finalists × top-100 screen) to replace bundling.
+
+Open question: **would top-30 finalists (rather than top-3) bundled together via Wang's screen-ranked decoder rows beat both the cosine bundle AND the single-feature Wang headline?** That would test whether causal pruning + bundling is the right combination. Easy to run as a follow-up: add a `--n_final_bundle 30` mode to `run_wang_procedure.py` that aggregates the top-30 stage-3 survivors as a single steering direction and sweeps α.
+
 ### Implementation notes
 
 - The causal screen does **not** require any model retraining or re-attribution; it consumes the existing encoder-side `top_200_features.json` and just runs steered generation.
