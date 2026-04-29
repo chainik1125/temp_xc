@@ -1,0 +1,81 @@
+# Ward 2025 backtracking-direction replication — Stage A defaults.
+# All pipeline scripts read this; CLI flags override.
+
+paths:
+  root: results/ward_backtracking
+  prompts: results/ward_backtracking/prompts.json
+  traces: results/ward_backtracking/traces.json
+  sentence_labels: results/ward_backtracking/sentence_labels.json
+  acts_dir: results/ward_backtracking/activations
+  dom: results/ward_backtracking/dom_vectors.pt
+  steering: results/ward_backtracking/steering_results.json
+  plots: results/ward_backtracking/plots
+
+models:
+  base: meta-llama/Llama-3.1-8B
+  reasoning: deepseek-ai/DeepSeek-R1-Distill-Llama-8B
+
+# Ward Appendix B.1: layer 10 of both models is the residual-stream sweet
+# spot for the backtracking direction.
+steering_layer: 10
+
+# Ward Appendix A: 300 prompts, 10 categories. Sonnet 4.6 stands in for
+# the paper's "Sonnet 3.7" (Sonnet 3.7 is no longer the latest Anthropic
+# model — Sonnet 4.6 is the active sibling per pricing pages).
+seed_prompts:
+  n_total: 300
+  categories:
+    - basic_logic
+    - geometry
+    - probability
+    - arithmetic
+    - counting
+    - number_theory
+    - set_theory
+    - sequences
+    - inequalities
+    - algebra_word_problems
+  per_category: 30
+  generator_model: claude-sonnet-4-6
+  temperature: 1.0
+
+trace_gen:
+  engine: vllm
+  max_tokens: 2000
+  temperature: 0.0
+  dtype: bfloat16
+
+# Ward Fig 2: optimal token offset for layer-10 residual is in the
+# window of [-13, -8] preceding a backtracking sentence. We compute DoM
+# vectors at single offsets and at the "union" (mean-of-means) and let
+# steer_eval.py pick the best on a held-out tuning slice.
+offsets:
+  single: [-13, -12, -11, -10, -9, -8]
+  union: true       # also produce mean(v_-13 .. v_-8)
+  baseline_zero: 0  # for the no-offset baseline reproduction (Fig 2)
+
+# Sentence-label backtracking detection. Ward §2.2: keyword set = {wait, hmm}.
+# We use GPT-4o to label sentences, but the *steering metric* is the keyword
+# rate on generated traces (Ward §3, the "Wait" token percentage axis).
+backtracking:
+  keywords: ["wait", "hmm"]
+  judge_model: gpt-4o
+
+# Held-out steering eval prompts: Ward et al. show outputs from the same
+# 300-prompt source. We split 280 train (DoM) / 20 eval (steering) by
+# category-stratified sampling. n=20 keeps the magnitude sweep <1h.
+eval:
+  n_prompts: 20
+  # Symmetric magnitudes are the cleanest sanity check that the steering
+  # effect is direction-specific (monotone in signed magnitude) rather
+  # than a sign-symmetric "any perturbation breaks coherence" artifact.
+  # Ward Fig 3 only shows positives; we add negatives at minimal cost.
+  magnitudes: [-12, -8, -4, 0, 4, 8, 12, 16]
+  max_new_tokens: 1500
+  seed: 42
+
+# Validation per Ward Appendix C.1: re-run the GPT-4o judge at a handful
+# of strengths and compare to keyword judge (precision/recall/F1).
+validation:
+  strengths: [0, 4, 8, 12]
+  n_traces: 50
