@@ -351,10 +351,14 @@ def main() -> None:
     with out_path.open("w") as fout:
         for p in prompts:
             messages = [{"role": "user", "content": p["text"]}]
-            encoded = tokenizer.apply_chat_template(
-                messages, return_tensors="pt", add_generation_prompt=True
-            )
-            input_ids = encoded.to(device) if isinstance(encoded, torch.Tensor) else encoded["input_ids"].to(device)
+            try:
+                encoded = tokenizer.apply_chat_template(
+                    messages, return_tensors="pt", add_generation_prompt=True
+                )
+                input_ids = encoded.to(device) if isinstance(encoded, torch.Tensor) else encoded["input_ids"].to(device)
+            except Exception:
+                # Base Llama-3.1-8B has no chat template; feed prompt as raw text
+                input_ids = tokenizer(p["text"], return_tensors="pt")["input_ids"].to(device)
 
             # Common state attributes per call
             common_state = {
