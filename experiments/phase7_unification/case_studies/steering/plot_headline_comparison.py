@@ -103,6 +103,7 @@ def main() -> None:
     for arch in args.archs:
         ax_peak = _peak_from_grades(arch, "steering")
         norm_peak = _peak_from_grades(arch, "steering_paper_normalised")
+        q2c_peak = _peak_from_grades(arch, "steering_paper_window_perposition")
         paper_peak = DMITRY_PAPER_CLAMP_PEAKS.get(arch)
         table_rows.append({
             "arch": arch,
@@ -110,20 +111,24 @@ def main() -> None:
             "axbench": ax_peak,
             "paper_clamp_baseline": paper_peak,
             "paper_clamp_normalised": norm_peak,
+            "paper_clamp_perposition": q2c_peak,
         })
-        print(f"  {arch:42s}  axbench={ax_peak}  paper_baseline={paper_peak}  paper_normalised={norm_peak}")
+        print(f"  {arch:42s}  axbench={ax_peak}  paper_baseline={paper_peak}  paper_normalised={norm_peak}  q2c_perposition={q2c_peak}")
 
     # Bar chart: 3 protocols × N archs, two panels (success + coherence)
     fig, (ax_s, ax_c) = plt.subplots(2, 1, figsize=(13, 9), sharex=True)
 
     arch_labels = [DISPLAY.get(r["arch"], r["arch"]) for r in table_rows]
     x = np.arange(len(table_rows))
-    bar_w = 0.27
+    keys = ["axbench", "paper_clamp_baseline", "paper_clamp_normalised", "paper_clamp_perposition"]
+    bar_w = 0.78 / len(keys)
     colors = {"axbench": "#9467bd", "paper_clamp_baseline": "#d62728",
-              "paper_clamp_normalised": "#2ca02c"}
-    legend = {"axbench": "AxBench-additive (Agent C)",
-              "paper_clamp_baseline": "Paper-clamp baseline (Dmitry)",
-              "paper_clamp_normalised": "Paper-clamp normalised (Q1.3)"}
+              "paper_clamp_normalised": "#2ca02c",
+              "paper_clamp_perposition": "#1f77b4"}
+    legend = {"axbench": "AxBench-additive (Agent C, s≤24)",
+              "paper_clamp_baseline": "Paper-clamp baseline (Dmitry's reported peak)",
+              "paper_clamp_normalised": "Paper-clamp normalised (Q1.3)",
+              "paper_clamp_perposition": "Paper-clamp normalised + per-position write (Q2.C)"}
 
     def _y(r, key, idx):
         v = r[key]
@@ -131,11 +136,13 @@ def main() -> None:
             return 0.0
         return v[idx]
 
-    for offset, key in enumerate(["axbench", "paper_clamp_baseline", "paper_clamp_normalised"]):
-        ax_s.bar(x + (offset - 1) * bar_w,
+    for offset, key in enumerate(keys):
+        # center bars around tick
+        x_off = (offset - (len(keys) - 1) / 2) * bar_w
+        ax_s.bar(x + x_off,
                  [_y(r, key, 1) for r in table_rows],
                  bar_w, label=legend[key], color=colors[key], alpha=0.85)
-        ax_c.bar(x + (offset - 1) * bar_w,
+        ax_c.bar(x + x_off,
                  [_y(r, key, 2) for r in table_rows],
                  bar_w, color=colors[key], alpha=0.85)
 
@@ -161,10 +168,10 @@ def main() -> None:
     print(f"  saved {args.out_path}")
 
     # Markdown leaderboard
-    print("\n## Peak success/coherence per arch under three protocols")
+    print("\n## Peak success/coherence per arch under four protocols")
     print()
-    print("| arch | family | AxBench peak (suc, coh) | Paper-clamp baseline (suc, coh) | Paper-clamp normalised (suc, coh) |")
-    print("|---|---|---|---|---|")
+    print("| arch | family | AxBench (s≤24) | Paper-clamp baseline | Paper-clamp normalised | Paper-clamp + per-position |")
+    print("|---|---|---|---|---|---|")
     for r in table_rows:
         arch = r["arch"]
         fam = r["family"]
@@ -172,7 +179,7 @@ def main() -> None:
             if v is None:
                 return "—"
             return f"{v[1]:.2f} / {v[2]:.2f} (s={v[0]:g})"
-        print(f"| `{arch}` | {fam} | {_fmt(r['axbench'])} | {_fmt(r['paper_clamp_baseline'])} | {_fmt(r['paper_clamp_normalised'])} |")
+        print(f"| `{arch}` | {fam} | {_fmt(r['axbench'])} | {_fmt(r['paper_clamp_baseline'])} | {_fmt(r['paper_clamp_normalised'])} | {_fmt(r['paper_clamp_perposition'])} |")
 
 
 if __name__ == "__main__":
