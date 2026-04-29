@@ -112,22 +112,46 @@ paper-clamp at high strength), the paper's narrative should probably:
   favours T-SAE, AxBench-additive favours TXC; both are reported."
 - De-emphasise raw "TXC SOTA" claims.
 
+### Raw-activation concat — the stronger control
+
+Same protocol but with NO SAE: take the raw `(d_in=2304)` Gemma
+activations at the last K positions, concat into `(N, K * 2304)`,
+top-k by class-sep + L1 LR.
+
+| | k_feat=5 | k_feat=20 |
+|---|---|---|
+| raw concat K=2 (4,608 candidates) | 0.7335 | 0.8071 |
+| raw concat K=5 (11,520 candidates) | 0.7071 | 0.7807 |
+| TopKSAE concat K=2 (36,864 candidates) | 0.8300 | 0.8817 |
+| TopKSAE concat K=5 (92,160 candidates) | 0.8178 | 0.8701 |
+| TopKSAE mean-pool S=32 (18,432 candidates) | 0.8855 | 0.9301 |
+| TXC champion | 0.8989 | 0.9358 |
+
+The hierarchy: raw < SAE-concat < SAE-mean-pool < TXC. Adding more raw
+activations *hurts* (K=5 worse than K=2). The SAE adds ~0.10 AUC over
+raw at matched K. Mean-pool over the SAE adds another ~0.05 AUC over
+concat. TXC adds another ~0.013 AUC over best SAE. Each step in the
+chain is monotone-positive — and "more raw features" is firmly NOT
+where the leaderboard win comes from.
+
+Code: `experiments/phase7_unification/run_raw_concat_probing.py`.
+Results: `results/raw_concat_probing_results.jsonl` (144 rows).
+
 ### Caveats
 
-- **Single seed (42).** With 36 tasks the per-task variance is bounded,
-  but adding seed=1 + seed=2 would lock in the σ. The gap is large
-  enough (~0.06-0.09) that it's almost certainly seed-robust, but worth
-  doing for the paper.
+- **Single seed (42)** for the SAE-concat result. Adding seed=1 in
+  flight (separate background run); will append rows. With 36 tasks
+  per-cell std-dev bounded, the gap is large enough (~0.06-0.09) that
+  it's almost certainly seed-robust.
 - **k_feat budget mismatch.** TXC k=5 picks 5 of 18,432; stacked k=5
   picks 5 of K×18,432. Same budget, different pool. The control is
   intentionally generous to the SAE baseline.
-- **No raw-activation control yet.** We didn't run "concat last K raw
-  activations (no SAE)" — that would be the pure "more features =
-  better" baseline. Worth adding if reviewers ask.
 
 ### Files of record
 
-- Probing driver: `experiments/phase7_unification/run_stacked_probing.py`
+- Probing driver (SAE-concat): `experiments/phase7_unification/run_stacked_probing.py`
+- Probing driver (raw-concat): `experiments/phase7_unification/run_raw_concat_probing.py`
 - Analysis: `experiments/phase7_unification/analyze_stacked_vs_txc.py`
-- Raw rows: `experiments/phase7_unification/results/stacked_probing_results.jsonl`
+- Raw rows: `experiments/phase7_unification/results/stacked_probing_results.jsonl`,
+  `experiments/phase7_unification/results/raw_concat_probing_results.jsonl`
 - Leaderboard rows: `experiments/phase7_unification/results/probing_results.jsonl`
