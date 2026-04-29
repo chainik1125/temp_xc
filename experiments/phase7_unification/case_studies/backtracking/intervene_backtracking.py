@@ -250,6 +250,8 @@ def main() -> None:
     parser.add_argument("--steer-k", type=int, default=6, help="window size after terminator (only used for steer-positions sentence_start)")
     parser.add_argument("--sae-release", default="llama_scope_lxr_8x")
     parser.add_argument("--sae-id", default=None, help="default: l{layer}r_8x")
+    parser.add_argument("--local-ckpt", default=None,
+                        help="path to a locally-trained TopKSAE ckpt.pt; if set, --sae-release / --sae-id are ignored")
     parser.add_argument("--decompose-suffix", default="", help="read decompose results from decompose<_suffix>/")
     parser.add_argument("--intervene-suffix", default="", help="write intervene results to intervene<_suffix>/")
     parser.add_argument("--limit-prompts", type=int, default=None)
@@ -286,10 +288,14 @@ def main() -> None:
     sae = None
     if "sae_additive" in args.modes or "sae_clamp" in args.modes:
         from experiments.phase7_unification.case_studies.backtracking.decompose_backtracking import (
+            load_local_topk_sae,
             load_public_sae,
         )
-        sae_id = args.sae_id or f"l{args.layer}r_8x"
-        sae, _ = load_public_sae(args.layer, str(device), release=args.sae_release, sae_id=sae_id)
+        if args.local_ckpt:
+            sae, _ = load_local_topk_sae(args.local_ckpt, str(device))
+        else:
+            sae_id = args.sae_id or f"l{args.layer}r_8x"
+            sae, _ = load_public_sae(args.layer, str(device), release=args.sae_release, sae_id=sae_id)
         sae = sae.to(model_dtype)
 
     feature_dirs: dict[int, torch.Tensor] = {}
