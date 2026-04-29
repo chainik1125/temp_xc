@@ -21,6 +21,7 @@ docs for numbers and discussion.
 | `2026-04-29-stacked-sae-control.md` | Stacked TopKSAE concat / raw-activation concat probing controls. |
 | `2026-04-29-per-task-breakdown.md` | Per-task TXC-win pattern vs SAE baselines. |
 | `2026-04-29-window-resampling-history.md` | Audit of `subseq_h8` hill-climb history; A40 attempt at `T_max=20 t_sample=8`. |
+| `2026-04-29-task-importance.md` | Per-task discriminative power; recommends a 15-task balanced reduction (2.4× speedup, k=20 top-3 ranking preserved). |
 | `plots/` | Paper figures, full-res `.png` (150 dpi) + thumbnails (`*.thumb.png`, ≤288px wide). |
 
 ### Headline figures
