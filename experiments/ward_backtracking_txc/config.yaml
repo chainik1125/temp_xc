@@ -1,0 +1,89 @@
+# Ward 2025 — Stage B (base-only TXC) config.
+# Pipeline: cache → train_txc × hookpoints → mine_features → b1_steer_eval → b2_cross_model
+
+paths:
+  root: results/ward_backtracking_txc
+  acts_dir: results/ward_backtracking_txc/activations
+  ckpt_dir: results/ward_backtracking_txc/checkpoints
+  features_dir: results/ward_backtracking_txc/features
+  steering: results/ward_backtracking_txc/steering/b1_steering_results.json
+  b2_dir: results/ward_backtracking_txc/b2
+  logs_dir: results/ward_backtracking_txc/logs
+  # Plot outputs go straight into the docs tree so GitHub renders them
+  # alongside results_b.md without an extra copy step. Mirrors Stage A's
+  # `docs/.../ward_backtracking/images/` layout.
+  plots_dir: docs/aniket/experiments/ward_backtracking/images_b
+
+  # Stage A artifacts we read from.
+  stageA_root: results/ward_backtracking
+  stageA_prompts: results/ward_backtracking/prompts.json
+  stageA_traces: results/ward_backtracking/traces.json
+  stageA_labels: results/ward_backtracking/sentence_labels.json
+  stageA_dom: results/ward_backtracking/dom_vectors.pt
+
+models:
+  base: meta-llama/Llama-3.1-8B
+  reasoning: deepseek-ai/DeepSeek-R1-Distill-Llama-8B
+
+# Per Dmitry's TinyStories MatTXC table: train at multiple hookpoints because
+# resid_pre/ln1/attn_out can differ by orders of magnitude in TXC quality.
+# Each hookpoint key is `<component>_L<layer>` matching the model_registry
+# convention.
+hookpoints:
+  - {key: resid_L10, layer: 10, component: resid, label: "resid_pre.10 (Ward)"}
+  - {key: attn_L10,  layer: 10, component: attn,  label: "attn_out.10"}
+  # ln1 is not directly hookable through model_registry helpers; we capture
+  # input to attention as a proxy via a forward-pre-hook on self_attn — see
+  # cache_activations.py. Disabled by default to keep the budget sane on a
+  # single A40; flip `enabled: true` to add it.
+  # - {key: ln1_L10,   layer: 10, component: ln1,   label: "ln1.10",   enabled: false}
+
+# T = 6 covers Ward's [-13, -8] window. seq_len chosen so we always have
+# headroom past T = 6 for sliding-window sampling.
+txc:
+  T: 6
+  d_sae: 16384
+  k_per_position: 32         # window-level L0 = k_per_position * T = 192
+  d_model: 4096              # Llama-3.1-8B
+  train_steps: 3000          # scoped down from plan's 50k for single-session feasibility
+  log_interval: 50
+  batch_size: 128
+  learning_rate: 3.0e-4
+  grad_clip: 1.0
+  seed: 42
+
+cache:
+  # Caching corpus for base TXC training. We slice Stage A reasoning traces
+  # into seq_length windows (in-domain for backtracking; on-disk; no network).
+  # `num_sequences * seq_length` ≈ tokens cached.
+  dataset: stageA_traces      # implementation always tries traces first
+  num_sequences: 1500         # 1500 × 256 ≈ 384k tokens cached (scoped to fit on A40)
+  seq_length: 256             # ≥ T + headroom; longer = more context per sample
+  cache_batch_size: 8         # bf16 Llama-3.1-8B fits ~16 GB on the A40
+
+mining:
+  # On Stage A traces, we encode the trace through the trained TXC and rank
+  # features by D+/D- selectivity. Top-K features per hookpoint feed B1.
+  top_k_features: 32
+  top_k_for_steering: 2      # scoped from 4 → 2 to fit single-session generation budget
+  # Window of offsets relative to backtracking sentence start used for D+/D-
+  # firing aggregation. Matches Stage A's offset window.
+  offset_window: [-13, -12, -11, -10, -9, -8]
+  steer_decoder_pos: 0       # which T-slot of the decoder to use as the steering vector.
+
+steering:
+  # Reuse Stage A's eval prompts. Scoped magnitude grid for single-session run:
+  # Stage A confirmed negative magnitudes don't push below floor → drop them;
+  # we keep 0/8/12/16 to span baseline → near-saturation.
+  steering_layer: 10
+  magnitudes: [0, 8, 12, 16]
+  max_new_tokens: 1200       # gives reasoning model room to enter the exploration phase
+  n_eval_prompts: 20
+  seed: 42
+  targets: [reasoning]       # base model produces empty completions on Stage A — skip.
+  gen_batch_size: 4          # batched greedy decode: A40 fits ≥4 in bf16 at seq 2048
+
+b2:
+  # Per-offset firing curves on reasoning traces. Window relative to
+  # backtracking sentence start (Stage A: [-13, -8]; we extend for the plot).
+  offset_window_full: [-30, -25, -20, -15, -13, -11, -9, -8, -5, 0, 5]
