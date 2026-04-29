@@ -18,13 +18,21 @@ tags:
 > reconstruction** with a clean 0.28 FVE win for TXC vs ~0 for
 > per-token archs. Recommendation: pursue CS2 to a paper-grade
 > case study with the follow-ups listed below.
+>
+> **2026-04-29 update**: CS2 controls + downstream-CE hill-climb
+> ([cs2-final log](2026-04-29-y-cs2-final.md)) sharpened the
+> framing. Mean-context baseline beats TXC on MSE-FVE (0.35 vs
+> 0.28), but **TXC matryoshka is the only Pareto-frontier SAE on
+> the (MSE-FVE, downstream-LM-ΔCE) plane** — context-aware AND
+> on-manifold. Promoted from "promising" → "leading paper-grade
+> candidate, pending 4 confirmation controls listed in cs2-final".
 
 ### Candidate scoreboard
 
 | ID | candidate | status | TXC margin |
 |---|---|---|---|
 | CS1 | persistent/slow features (dwell-time distribution) | KILLED — [log](2026-04-29-y-cs1-slow-features.md) | TopKSAE wins on mean dwell; TXC third of four. Three confounds make the metric meaningless. |
-| CS2 | held-out-position reconstruction MSE | **promising** — [log](2026-04-29-y-cs2-masked-recon.md) | TXC T=5: FVE = **0.28**; per-token archs: FVE = 0.00-0.03; 28% of variance recovered from context alone. |
+| CS2 | held-out-position reconstruction (MSE + downstream LM-CE) | **paper-grade lead** — [smoke](2026-04-29-y-cs2-masked-recon.md), [final](2026-04-29-y-cs2-final.md) | On long FineWeb-edu: TXC matryoshka **uniquely on the (MSE, ΔCE) Pareto frontier** — FVE 0.28 + ΔCE +3.60 nats. Mean-context baseline wins MSE (0.35) but is off-manifold (ΔCE +6.19). |
 | CS3 | multi-token concept extraction probe (NER, n-grams) | KILLED-BY-PRIOR-EVIDENCE | Phase 5 leaderboard: top-10 archs spread across 0.0044 AUC = noise level. Probing is too saturated for a clean TXC margin. (Orientation log §"Things tried and failed".) |
 | CS4 | anaphora / coreference (winogrande, wsc) | KILLED-BY-PRIOR-EVIDENCE | Phase 5: TXCDR-T5 + MLC are most complementary on per-example errors but joint concat-probing did NOT beat best-individual. T<<antecedent distance in natural text. (Orientation log + Phase 5 logs.) |
 | CS5 | next-T-token prediction (speculative-decoding-style) | RULED OUT BY ARCHITECTURE | TXC's encoder is right-edge-attributed: no future tokens in receptive field. No plausible TXC advantage on forward-looking tasks. |
