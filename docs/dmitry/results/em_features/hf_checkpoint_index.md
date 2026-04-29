@@ -94,6 +94,13 @@ h2_qwen_l15_txc_brickenauxk_a8_step{40000,50000}.pt    (2 × 14 GB)
 ```
 All on HF at `han_champ/h2_*.pt` and `txc/h2_*.pt`. The h2 30k and 60k "final" snapshots are kept locally; only the intermediate 40k/50k from the 60k continuation pipeline were removed.
 
+**2026-04-29 (h100_2)** — deleted to fit TXC ln1 / resid_mid trainings:
+```
+v2_qwen_l15_han_champ_step{50000,80000}.pt   (2 × 14 GB)
+h2_qwen_l15_han_champ_step60000.pt           (1 × 14 GB)
+```
+All on HF (`han_champ/v2_*.pt`, `han_champ/h2_*.pt`). v2 100k snapshot kept as the canonical Han.
+
 ### Active runs (as of 2026-04-28)
 
 - **h100_1**: T-SAE training extension, step 30k → 100k (resumed from `qwen_l15_tsae_k128_step30000.pt`, snapshots at 50k/80k/100k). Already at step ~33k.
