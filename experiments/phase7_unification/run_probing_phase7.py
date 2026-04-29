@@ -394,7 +394,8 @@ def get_T_for_aggregation(src_class: str, meta: dict) -> int:
 # ════════════════════════════════════════════════════════════════════
 
 
-def _iter_index(run_ids: list[str] | None):
+def _iter_index(run_ids: list[str] | None,
+                subject_model_filter: str | None = None):
     if not INDEX_PATH.exists():
         print(f"[probe] no training index at {INDEX_PATH}")
         return
@@ -403,6 +404,11 @@ def _iter_index(run_ids: list[str] | None):
             row = json.loads(line)
             if run_ids and row["run_id"] not in run_ids:
                 continue
+            if subject_model_filter is not None:
+                # Backwards-compat: legacy rows missing the field are BASE.
+                row_subj = row.get("subject_model") or "google/gemma-2-2b"
+                if row_subj != subject_model_filter:
+                    continue
             yield row["run_id"], Path(row["ckpt"]), row
 
 
@@ -457,7 +463,8 @@ def run_probing(run_ids: list[str] | None = None,
                 S_values: tuple[int, ...] = HEADLINE_S,
                 k_values: tuple[int, ...] = HEADLINE_K_FEAT,
                 limit_archs: int | None = None,
-                probe_cache_dir: Path | None = None) -> None:
+                probe_cache_dir: Path | None = None,
+                subject_model_filter: str | None = None) -> None:
     PROBING_PATH.parent.mkdir(parents=True, exist_ok=True)
     device = torch.device("cuda")
     cache_dir = probe_cache_dir if probe_cache_dir is not None else ACTIVE_PROBE_CACHE
@@ -472,7 +479,7 @@ def run_probing(run_ids: list[str] | None = None,
 
     n_done = 0
     with PROBING_PATH.open("a") as out_f:
-        for run_id, ckpt_path, meta in _iter_index(run_ids):
+        for run_id, ckpt_path, meta in _iter_index(run_ids, subject_model_filter):
             if limit_archs is not None and n_done >= limit_archs:
                 break
             n_done += 1
@@ -595,19 +602,25 @@ def main() -> None:
     p.add_argument("--probe_cache_dir", type=str, default=None,
                    help="Override probe cache dir (default: ACTIVE_PROBE_CACHE = probe_cache_S32). "
                         "Useful for IT-side probing against probe_cache_S32_it.")
+    p.add_argument("--subject_model_filter", type=str, default=None,
+                   help="Filter training_index rows by subject_model. "
+                        "google/gemma-2-2b for BASE, google/gemma-2-2b-it for IT. "
+                        "Default: no filter (process every row).")
     args = p.parse_args()
     banner(__file__)
     cache_override = Path(args.probe_cache_dir) if args.probe_cache_dir else None
     if args.headline:
         run_probing(S_values=HEADLINE_S, k_values=HEADLINE_K_FEAT,
                     limit_archs=args.limit_archs,
-                    probe_cache_dir=cache_override)
+                    probe_cache_dir=cache_override,
+                    subject_model_filter=args.subject_model_filter)
     else:
         run_probing(
             run_ids=args.run_ids, task_names=args.task_names,
             S_values=tuple(args.S), k_values=tuple(args.k_feat),
             limit_archs=args.limit_archs,
             probe_cache_dir=cache_override,
+            subject_model_filter=args.subject_model_filter,
         )
 
 
