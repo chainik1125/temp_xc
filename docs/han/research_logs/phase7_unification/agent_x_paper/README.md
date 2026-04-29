@@ -74,17 +74,26 @@ All under `experiments/phase7_unification/`.
 
 ### Gaps (still open)
 
-- **IT-side leaderboard** (Gemma-2-2b-it L13). The brief specified base
-  + IT, but only base has Phase-7-current-methodology rows. IT side
-  needs ~13 hr (act cache + 8 archs × 2 seeds + probing) — didn't fit
-  in the 18-hr autonomous shift after the OOM-restart cost the early
-  hours. Punch list in `agent_x_brief.md` "Concrete remaining work".
-- **MLC family** cells (mlc, agentic_mlc_08, mlc_sparse, ag_mlc_08_sparse)
-  — H200_required.
+Cells in `paper_archs.json::leaderboard_archs` that are NOT yet
+evaluated under Phase 7 current methodology at b=4096:
+
+- **`mlc_sparse` (mlc, k_win=100)** — H200_required, not trained at
+  b=4096. Legacy Phase 5 IT-side k_win=100 ckpts on `han1823123123/txcdr`
+  exist but were trained at b=1024 — they don't count per
+  `paper_archs.json` ("If a cell can't fit on A40 at b=4096, DO NOT
+  downsize batch — DEFER to H200").
+- **`ag_mlc_08_sparse` (agentic_mlc_08, k_win=100)** — same as above.
+- **All IT-side cells** (12 paper_archs × Gemma-2-2b-it L13).
+  ~13 hr work (IT activation cache + 8 archs × 2 seeds + probing) —
+  didn't fit in the 18-hr autonomous shift after the OOM-restart cost
+  the early hours. Punch list in `agent_x_brief.md` "Concrete remaining
+  work". Note: `mlc_sparse` and `ag_mlc_08_sparse` IT-side legacy
+  ckpts also exist at b=1024 and don't count.
 - **3-seed σ for `tfa_big`, `txcdr_t16`, `hill_subseq_h8_T12_s5`** —
   only 1-2 seeds on HF.
-- **`hill_subseq_h8_T20_s8`** — A40 OOM/timeout; H200_required (full
-  audit in `2026-04-29-window-resampling-history.md`).
+- **`hill_subseq_h8_T20_s8`** — Han's specific question; A40 OOM /
+  timeout; H200_required (full audit in
+  `2026-04-29-window-resampling-history.md`).
 - **`tsae_paper_k500` / `tsae_paper_k20` seed=1 stacked-SAE rows** —
   lost in a stash/rebase race; `topk_sae` multi-seed was sufficient to
   resolve the hypothesis.

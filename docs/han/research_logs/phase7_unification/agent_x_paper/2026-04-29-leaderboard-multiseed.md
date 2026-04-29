@@ -34,6 +34,34 @@ tags:
 
 Code: `experiments/phase7_unification/build_leaderboard_2seed.py`.
 
+### Locked-in arch set vs what's actually evaluated
+
+Per `paper_archs.json::leaderboard_archs`, the locked-in cells are
+12 (paper_id, arch_id, k_win) triples × 2 subject models (Gemma-2-2b
+base + Gemma-2-2b-it). Below shows the BASE-side coverage:
+
+| paper_id | arch_id | k_win | status (this report) |
+|---|---|---|---|
+| tfa | tfa_big | 500 | ✅ 2 seeds × 36 tasks |
+| tsae_k20 | tsae_paper_k20 | 20 | ✅ 3 seeds × 36 tasks |
+| tsae_k500 | tsae_paper_k500 | 500 | ✅ 3 seeds × 36 tasks |
+| mlc | mlc | 500 | ✅ 3 seeds × 36 tasks |
+| **mlc_sparse** | **mlc** | **100** | ❌ not trained at b=4096 (H200_required; legacy IT-side k_win=100 ckpts at b=1024 don't count) |
+| ag_mlc_08 | agentic_mlc_08 | 500 | ✅ 3 seeds × 36 tasks |
+| **ag_mlc_08_sparse** | **agentic_mlc_08** | **100** | ❌ not trained at b=4096 (H200_required) |
+| txc_t5 | txcdr_t5 | 500 | ✅ 3 seeds × 36 tasks |
+| txc_t16 | txcdr_t16 | 500 | ✅ 2 seeds × 36 tasks (no seed=2 ckpt on HF) |
+| good_txc_p5 | phase5b_subseq_h8 | 500 | ✅ 3 seeds × 36 tasks |
+| good_txc_p7_k20 | txc_bare_antidead_t5 | 500 | ✅ 3 seeds × 36 tasks |
+| good_txc_p7_k5 | phase57_partB_h8_bare_multidistance_t8 | 500 | ✅ 3 seeds × 36 tasks |
+
+10 of 12 base-side cells are evaluated; **2 cells (mlc_sparse,
+ag_mlc_08_sparse) are missing — both H200_required and not yet
+trained at paper-canonical b=4096**. The IT side (12 cells × 2nd
+subject model) is entirely missing — see `README.md` "Gaps".
+
+### k_feat = 5
+
 ### k_feat = 5
 
 | arch | n_seeds | mean_AUC | σ_seeds | σ_tasks |
