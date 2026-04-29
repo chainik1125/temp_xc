@@ -57,10 +57,52 @@ tags:
 - `/workspace/temp_xc` is a checkout of the repo; `.venv` from `uv sync`
   is the active environment.
 - HF cache at `/workspace/hf_cache`; tokens at `/workspace/.tokens/{gh_token,hf_token}`.
+  Use `gh_token` for `git push` (inline-URL pattern:
+  `git push "https://${GH_TOKEN}@github.com/chainik1125/temp_xc.git" han-phase7-unification`)
+  and `hf_token` for HF API calls (creating `txcdr-it` repo, pushing
+  ckpts).
 - Always `export HF_HOME=/workspace/hf_cache UV_LINK_MODE=copy` before
   `uv sync` (MooseFS/UV-linkmode bug on this volume).
 - Always `TQDM_DISABLE=1`. Never run multiple GPU python processes
   concurrently — the pod has been OOM-killed twice that way.
+
+### Disk management — CRITICAL before starting IT-side
+
+Current pod usage (X's measurements 2026-04-29):
+
+| dir | size |
+|---|---|
+| `data/cached_activations/gemma-2-2b/fineweb` (BASE 5-layer cache) | 14 GB |
+| `experiments/phase7_unification/results/probe_cache/` (BASE S=128) | **406 GB** |
+| `experiments/phase7_unification/results/probe_cache_S32/` (BASE S=32, used) | 104 GB |
+| `experiments/phase7_unification/results/ckpts/` | 87 GB |
+| **total** | **~611 GB** of the 900 GB pod quota |
+
+Building IT-side at the same scale adds:
+- `data/cached_activations/gemma-2-2b-it/fineweb`: ~14 GB (5 IT layers)
+- `probe_cache_it/` (S=128): ~406 GB
+- `probe_cache_S32_it/`: ~104 GB
+
+That's another **~524 GB** — total would hit ~1135 GB, blowing past
+the 900 GB quota.
+
+**Mandatory cleanup before IT-side**: delete the BASE S=128 probe
+cache. It's only used as input to `rebuild_probe_cache_s32.py`; the
+S=32 output is what `run_probing_phase7.py` actually reads. After
+the slice, S=128 is dead weight.
+
+```bash
+# Verify S=32 cache exists and is complete (36 task dirs):
+ls /workspace/temp_xc/experiments/phase7_unification/results/probe_cache_S32 | wc -l
+
+# Then safely delete S=128:
+rm -rf /workspace/temp_xc/experiments/phase7_unification/results/probe_cache
+```
+
+This frees ~406 GB. New total after IT build: 611 − 406 + 524 ≈ **729 GB**, fits.
+
+If you build the IT S=128 cache and then slice it, you can also
+delete it once `probe_cache_S32_it/` is verified.
 
 ### What's already done (so don't repeat)
 
@@ -238,13 +280,26 @@ for the IT-side cache build script (Phase 5 was IT-side).
    "google/gemma-2-2b-it"` and `anchor_layer: 13` baked into the meta
    so the leaderboard builder can filter by subject_model.
 
+   **WARNING — `run_probing_phase7.py` output schema bug**: the script
+   currently does NOT write `subject_model` / `anchor_layer` into each
+   row of `probing_results.jsonl`. Look at `run_probing_phase7.py`
+   ~line 534 (`row = {...}` construction): the included `meta` keys
+   are `T_max, t_sample, n_layers, shifts, alpha, gamma, n_scales,
+   seed, k_pos, k_win` — but NOT `subject_model` or `anchor_layer`.
+   The training_index has these fields, but they don't propagate to
+   the probing output rows. **You MUST patch this before running
+   IT-side probing**, otherwise leaderboard filters can't tell IT
+   from BASE rows. Add `"subject_model"` and `"anchor_layer"` to the
+   list of meta keys propagated into `row`.
+
    **Naming convention recommendation**: prefix run_ids for IT with
-   `it_` (e.g. `it_mlc__seed42`, `it_txcdr_t5__seed42`) OR keep the
-   same arch_id and rely on the `subject_model` field to disambiguate.
-   Both work but the former is grep-friendlier; the latter is purer.
-   `train_phase7.py` puts the run_id together via
-   `f"{arch['arch_id']}__seed{seed}"` so changing this requires
-   either editing train_phase7 or wrapping it. Han's call.
+   `it_` (e.g. `it_mlc__seed42`, `it_txcdr_t5__seed42`) AS WELL AS
+   relying on the `subject_model` field. Belt-and-suspenders: the
+   prefix makes grep / `--run_ids` filtering trivial; the field makes
+   leaderboard auto-filtering possible. Both come for free if you fork
+   `train_phase7.py` for IT and prefix the run_id at construction
+   (or, simpler, edit the arch_id in the IT version of
+   `paper_archs.json`).
 
 6. **Update `build_leaderboard_2seed.py`** to support per-subject-
    model leaderboards. Currently it doesn't filter by subject_model
