@@ -295,7 +295,13 @@ def _gen_one(model, input_ids, tokenizer, eos_id) -> str:
             temperature=1.0,
             top_p=1.0,
             pad_token_id=eos_id,
-            use_cache=False,  # window encoder needs full sequence per step
+            # use_cache=True (the HF default): each generation step the hook
+            # sees only the new token's residual (h.shape[1] == 1). The hook
+            # maintains its own (T-1)-deque from previous steps to form the
+            # window. Setting use_cache=False would make every forward see
+            # the FULL sequence, which our hook would (incorrectly) treat as
+            # buffer-fill and skip steering — that was the original bug
+            # (kw rate identical across all α in the v1 results).
         )
     new_ids = out[0, input_ids.shape[1]:].tolist()
     return clean_decode(tokenizer.decode(new_ids, skip_special_tokens=False))
