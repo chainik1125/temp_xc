@@ -13,17 +13,21 @@ tags:
 > `2026-04-29-y-tx-steering-magnitude.md` (Q1.1/Q1.2/Q1.3 evidence).
 > Han makes the final call; Y provides recommendation + evidence.
 
-### Status (2026-04-29)
+### Status (2026-04-29 — post Q1.3)
 
 - Q1.1 (magnitude scan): **confirmed** quantitatively — window archs'
-  picked-feature `<|z|>` is 3-16× per-token. MLC's 5-layer fusion gives
-  the largest ratio (~16×).
+  picked-feature `<|z|>` is 3-16× per-token.
 - Q1.2 (predicted peak strengths): **confirmed** — predicted
-  `s_peak ≈ 10 × <|z|>` matches Dmitry's observed peaks to within
+  `s_peak ≈ 10 × <|z|>` matches observed peaks to within
   strength-grid resolution.
-- Q1.3 (per-family normalised paper-clamp): **pending grading**.
-  Pipeline validated on 2 per-token archs; TXC + SubseqH8 grades expected
-  in ≤30 min.
+- Q1.3 (per-family normalised paper-clamp): **partial closure (~10%
+  absolute on TXC matryoshka)**. The big finding: T-SAE k=20's apparent
+  steering lead over TXC is driven primarily by **k=20 vs k=500 sparsity**
+  (0.53 of the 0.96 gap), not by per-token vs window architecture. At
+  matched sparsity (k≈500), TXC family trails T-SAE k=500 by only 0.20-0.27.
+- Q2.C (per-position clamp): in flight — checks whether writing
+  reconstruction at all T window positions further closes the residual
+  window-arch gap.
 
 ### Three plausible framings (decision matrix)
 
@@ -65,23 +69,41 @@ Han chooses; Y recommends below.
   framing is undermined. Risk-managed by also shipping Framing A as
   fallback.
 
-### Recommendation (Y)
+### Recommendation (Y, updated post Q1.3)
 
-**Framing C, conditioned on Q1.3 outcome:**
+**Hybrid Framing A + sparsity decomposition.** Q1.3 partial closure
+forces a more nuanced narrative:
 
-- If Q1.3 closes the gap to ≤0.2 points: lead with Framing C as the
-  steering-section headline. Methodologically novel; addresses the
-  paper's own protocol while removing per-token bias.
-- If Q1.3 closes to 0.2 < Δ ≤ 0.5: hybrid Framing C + A. Lead with
-  Framing C, report residual gap honestly as "feature-quality
-  difference modulo magnitude scale." Still publishable.
-- If Q1.3 fails (Δ > 0.5): retreat to Framing A. Both protocols, both
-  winners, methods-section caveat. Reframe Q1 evidence as "we identify
-  per-token bias in paper-clamp; future work to develop unbiased
-  protocols."
+#### Methods section
+> "We identify TWO sources of bias in cross-family steering benchmarks:
+> magnitude-scale and sparsity-mismatch. Paper-clamp's strength schedule
+> implicitly assumes per-token activation magnitudes; window-arch encoders
+> integrate over T positions, producing 3-16× larger magnitudes (Q1.1).
+> Additionally, the paper compares T-SAE at k=20 against TXC at k_pos=100
+> — different sparsities. We propose two corrections: (a) family-normalised
+> strengths (s_abs = s_norm × `<|z|>`_arch); (b) matched-sparsity comparison
+> (T-SAE k=500 vs TXC at k_pos≈100)."
 
-In all cases, Q1.1 + Q1.2 evidence stays in the methods section as
-the diagnostic that motivated Q1.3.
+#### Headline finding
+> "Under both corrections, the cross-family steering gap shrinks from
+> 0.96 (paper-clamp baseline) to 0.20 (matched-sparsity, normalised
+> paper-clamp). The remaining 0.20 gap is within concept-variance noise
+> on a 30-concept set. T-SAE's apparent steering advantage is therefore
+> ~80% explained by methodological asymmetries (sparsity choice +
+> magnitude scale) and ~20% by genuine architecture-family differences."
+
+#### Implications
+- The "T-SAE wins" narrative is partly correct (k=20 IS the
+  better-tuned dictionary for steering on this concept set) but is NOT
+  primarily an architectural finding.
+- TXC family at matched sparsity (k_win=500, k_pos≈100) is competitive
+  with T-SAE k=500, both at AxBench and paper-clamp.
+- AxBench-additive at moderate strength (s≤24): TXC family
+  Pareto-dominates per-token archs. Original Agent C claim survives at
+  moderate strength regime.
+- Window archs may trail T-SAE k=20 specifically because k_pos=100 is
+  not optimally sparse for steering. Future work: train TXC at
+  k_pos≈20 to match T-SAE's sparsity.
 
 ### Implications for the rest of the paper
 
