@@ -12,6 +12,14 @@ This subdir bundles the X-side paper artefacts. Each finding is in its
 own dated md file; this README is a thin index — see the per-file
 docs for numbers and discussion.
 
+**Headline task set: BALANCED-15** (paper reduction; rationale in
+`2026-04-29-task-importance.md`). 2.4× speedup over the full 36-task
+set; preserves k=20 top-3 ranking exactly; k=5 reshuffles confined to
+within-σ-noise within the same top-6 cluster. Source-of-truth
+constant: `experiments/phase7_unification/task_sets.py::BALANCED_15`.
+Full 36-task results remain in `probing_results.jsonl` (canonical) for
+supplementary.
+
 ### Files
 
 | file | one-line summary |

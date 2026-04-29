@@ -36,51 +36,53 @@ For a vanilla per-token SAE (`topk_sae`) and the T-SAE paper baseline
 4. Skip examples with fewer than K real tokens.
 
 K ∈ {2, 5}. Compared against the current Phase 7 leaderboard (which
-mean-pools across all real S=32 positions). Seed=42, all 36 SAEBench
-tasks. FLIP applied to winogrande/wsc.
+mean-pools across all real S=32 positions). **Task set: BALANCED-15**
+(paper headline reduction; rationale in `2026-04-29-task-importance.md`).
+Seed=42. FLIP applied to winogrande/wsc.
 
-Code: `experiments/phase7_unification/run_stacked_probing.py`.
-Results: `results/stacked_probing_results.jsonl` (432 rows = 3 archs × 36 tasks × 2 K × 2 k_feat).
+Code: `experiments/phase7_unification/run_stacked_probing.py`,
+filtered to `BALANCED_15` from `experiments/phase7_unification/task_sets.py`.
+Raw rows for all 36 tasks remain in
+`results/stacked_probing_results.jsonl` for supplementary.
 
-### Headline numbers (mean test_auc_flip across 36 tasks, seed=42)
+### Headline numbers (mean test_auc_flip, seed=42, BALANCED-15)
 
-**TXC champions (mean-pooled, existing methodology):**
+**TXC champions (mean-pooled):**
 
 | arch | k_feat=5 | k_feat=20 |
 |---|---|---|
-| `phase57_partB_h8_bare_multidistance_t8` (k=5 winner) | **0.8989** | 0.9317 |
-| `txc_bare_antidead_t5` (k=20 winner) | 0.8814 | **0.9358** |
+| `phase57_partB_h8_bare_multidistance_t8` (k=5 winner) | **0.8717** | 0.9014 |
+| `txc_bare_antidead_t5` (k=20 winner) | 0.8582 | **0.9051** |
 
 **Stacked-SAE control (concat last K positions):**
 
 | arch | K | k_feat=5 | k_feat=20 |
 |---|---|---|---|
-| `topk_sae`        | 2 | 0.8300 | 0.8817 |
-| `topk_sae`        | 5 | 0.8178 | 0.8701 |
-| `tsae_paper_k500` | 2 | 0.8354 | 0.8822 |
-| `tsae_paper_k500` | 5 | 0.8132 | 0.8772 |
-| `tsae_paper_k20`  | 2 | 0.7689 | 0.8252 |
-| `tsae_paper_k20`  | 5 | 0.7518 | 0.8129 |
+| `topk_sae`        | 2 | 0.7939 | 0.8425 |
+| `topk_sae`        | 5 | 0.7700 | 0.8377 |
+| `tsae_paper_k500` | 5 | 0.7717 | 0.8437 |
 
 **Mean-pooled SAE (existing leaderboard), as reference:**
 
 | arch | k_feat=5 | k_feat=20 |
 |---|---|---|
-| `topk_sae`        (mean-pool S=32) | 0.8855 | 0.9301 |
-| `tsae_paper_k500` (mean-pool S=32) | 0.8906 | 0.9339 |
-| `tsae_paper_k20`  (mean-pool S=32) | 0.8715 | 0.9268 |
+| `topk_sae`        (mean-pool S=32) | 0.8559 | 0.8964 |
+| `tsae_paper_k500` (mean-pool S=32) | 0.8548 | 0.9050 |
 
-### Δ vs TXC champion
+### Δ vs TXC champion (BALANCED-15)
 
-| stacked baseline | k=5 Δ vs champ | k=20 Δ vs champ |
+| baseline | k=5 Δ vs champ | k=20 Δ vs champ |
 |---|---|---|
-| topk_sae K=2          | **−0.069** | **−0.054** |
-| topk_sae K=5          | **−0.081** | **−0.066** |
-| tsae_paper_k500 K=2   | **−0.064** | **−0.054** |
-| tsae_paper_k500 K=5   | **−0.086** | **−0.059** |
+| topk_sae stack K=2          | **−0.078** | **−0.063** |
+| topk_sae stack K=5          | **−0.102** | **−0.067** |
+| tsae_paper_k500 stack K=5   | **−0.100** | **−0.061** |
+| topk_sae meanpool S=32      | −0.016 | −0.005 |
+| tsae_paper_k500 meanpool S=32 | −0.017 | +0.000 |
 
-All eight stacked variants **lose to TXC by 0.05-0.09 AUC**, which is
-~5-10× the TXC-vs-mean-pooled-SAE gap.
+Stacked-SAE concat **loses to TXC by 0.06-0.10 AUC** (slightly larger
+than under full-36 because BALANCED-15 excludes the near-ceiling tasks
+where stacked-SAE could mask its weakness). Mean-pool SAE is
+within 0.005-0.017 of TXC.
 
 ### Conclusion: Han's "more features = the win" hypothesis is rejected
 
@@ -121,7 +123,7 @@ paper-clamp at high strength), the paper's narrative should probably:
   favours T-SAE, AxBench-additive favours TXC; both are reported."
 - De-emphasise raw "TXC SOTA" claims.
 
-### Raw-activation concat — the stronger control
+### Raw-activation concat — the stronger control (BALANCED-15)
 
 Same protocol but with NO SAE: take the raw `(d_in=2304)` Gemma
 activations at the last K positions, concat into `(N, K * 2304)`,
@@ -129,19 +131,19 @@ top-k by class-sep + L1 LR.
 
 | | k_feat=5 | k_feat=20 |
 |---|---|---|
-| raw concat K=2 (4,608 candidates) | 0.7335 | 0.8071 |
-| raw concat K=5 (11,520 candidates) | 0.7071 | 0.7807 |
-| TopKSAE concat K=2 (36,864 candidates) | 0.8300 | 0.8817 |
-| TopKSAE concat K=5 (92,160 candidates) | 0.8178 | 0.8701 |
-| TopKSAE mean-pool S=32 (18,432 candidates) | 0.8855 | 0.9301 |
-| TXC champion | 0.8989 | 0.9358 |
+| raw concat K=2 (4,608 candidates) | 0.7057 | 0.7644 |
+| raw concat K=5 (11,520 candidates) | 0.6834 | 0.7492 |
+| TopKSAE concat K=2 (36,864 candidates) | 0.7939 | 0.8425 |
+| TopKSAE concat K=5 (92,160 candidates) | 0.7700 | 0.8377 |
+| TopKSAE mean-pool S=32 (18,432 candidates) | 0.8559 | 0.8964 |
+| TXC champion | 0.8717 | 0.9051 |
 
 The hierarchy: raw < SAE-concat < SAE-mean-pool < TXC. Adding more raw
-activations *hurts* (K=5 worse than K=2). The SAE adds ~0.10 AUC over
-raw at matched K. Mean-pool over the SAE adds another ~0.05 AUC over
-concat. TXC adds another ~0.013 AUC over best SAE. Each step in the
-chain is monotone-positive — and "more raw features" is firmly NOT
-where the leaderboard win comes from.
+activations *hurts* (K=5 worse than K=2). The SAE adds ~0.09 AUC over
+raw at matched K. Mean-pool over the SAE adds another ~0.06-0.09 AUC
+over concat. TXC adds another ~0.01-0.02 AUC over best SAE. Each step
+in the chain is monotone-positive — and "more raw features" is firmly
+NOT where the leaderboard win comes from.
 
 Code: `experiments/phase7_unification/run_raw_concat_probing.py`.
 Results: `results/raw_concat_probing_results.jsonl` (144 rows).

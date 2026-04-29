@@ -24,6 +24,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 from experiments.phase7_unification._paths import OUT_DIR, PLOTS_DIR
+from experiments.phase7_unification.task_sets import BALANCED_15
 
 
 def save_figure(fig, path: str, dpi: int = 150, thumb_max_width: int = 288, thumb_dpi: int = 48):
@@ -49,8 +50,9 @@ def load_seed42_means(path, arch_filter=None):
 
 def main():
     PLOTS_DIR.mkdir(parents=True, exist_ok=True)
+    task_set = BALANCED_15
 
-    # Aggregate per-seed-42 task lists
+    # Aggregate per-seed-42 task lists, filtered to BALANCED_15
     stacked = defaultdict(list)        # (arch, K, k_feat) -> auc list
     raw     = defaultdict(list)        # (K, k_feat) -> auc list
     leader  = defaultdict(list)        # (arch, k_feat) -> auc list (mean-pool S=32)
@@ -58,17 +60,20 @@ def main():
     # SAE-concat (stacked_probing_results.jsonl)
     for r in load_seed42_means(OUT_DIR / "stacked_probing_results.jsonl"):
         if r.get("seed") != 42: continue
+        if r.get("task_name") not in task_set: continue
         stacked[(r["arch_id"], r["K_positions"], r["k_feat"])].append(
             r.get("test_auc_flip", r["test_auc"])
         )
     # Raw-concat (raw_concat_probing_results.jsonl) — no seed (architecture-free)
     for r in load_seed42_means(OUT_DIR / "raw_concat_probing_results.jsonl"):
+        if r.get("task_name") not in task_set: continue
         raw[(r["K_positions"], r["k_feat"])].append(
             r.get("test_auc_flip", r["test_auc"])
         )
     # Leaderboard mean-pool (probing_results.jsonl, seed=42, S=32)
     for r in load_seed42_means(OUT_DIR / "probing_results.jsonl"):
         if r.get("seed") != 42 or r.get("S") != 32: continue
+        if r.get("task_name") not in task_set: continue
         if "skipped" in r: continue
         leader[(r["arch_id"], r["k_feat"])].append(
             r.get("test_auc_flip", r["test_auc"])
@@ -111,7 +116,7 @@ def main():
         ax.bar(x, values, color=colors, edgecolor="black", linewidth=0.4)
         ax.set_xticks(x)
         ax.set_xticklabels(labels, fontsize=9, rotation=35, ha="right")
-        ax.set_ylabel("mean test_auc_flip across 36 tasks (seed=42)")
+        ax.set_ylabel("mean test_auc_flip across 15 tasks (BALANCED, seed=42)")
         ax.set_title(f"k_feat = {kf}", weight="bold")
         ax.set_ylim(0.66, 0.97)
         ax.grid(axis="y", alpha=0.3)
@@ -136,7 +141,8 @@ def main():
 
     fig.suptitle("Probing AUC hierarchy — raw < SAE-concat < SAE-meanpool < TXC\n"
                  "Han's \"more candidate features\" hypothesis rejected; "
-                 "more positions ≠ better; mean-pool > concat",
+                 "more positions ≠ better; mean-pool > concat\n"
+                 "(BALANCED-15 task set; seed=42)",
                  fontsize=11, weight="bold")
     out_path = PLOTS_DIR / "phase7_stacked_vs_raw_hierarchy.png"
     save_figure(fig, str(out_path))

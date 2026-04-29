@@ -25,6 +25,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 from experiments.phase7_unification._paths import OUT_DIR, PLOTS_DIR
+from experiments.phase7_unification.task_sets import BALANCED_15
 
 
 PROBING_PATH = OUT_DIR / "probing_results.jsonl"
@@ -45,8 +46,11 @@ def save_figure(fig, path: str, dpi: int = 150, thumb_max_width: int = 288, thum
     fig.savefig(p.with_suffix(".thumb.png"), dpi=thumb_dpi_eff, bbox_inches="tight")
 
 
-def load_tsweep_data():
-    """Return dict[(family, T, k_feat, seed)] -> list of test_auc_flip across tasks."""
+def load_tsweep_data(task_set=BALANCED_15):
+    """Return dict[(family, T, k_feat, seed)] -> list of test_auc_flip across tasks.
+
+    Filters to `task_set` (default BALANCED_15).
+    """
     out = defaultdict(list)
     with PROBING_PATH.open() as f:
         for line in f:
@@ -56,6 +60,7 @@ def load_tsweep_data():
             if r.get("S") != S_FILTER: continue
             if r.get("seed") not in SEEDS: continue
             if r.get("k_feat") not in (5, 20): continue
+            if r.get("task_name") not in task_set: continue
             if "skipped" in r: continue
             arch = r.get("arch_id") or ""
             m_b = BAREBONES_RE.match(arch)
@@ -124,8 +129,9 @@ def make_plot(summ, out_dir: Path):
         ax.legend(loc="lower left", fontsize=9)
         ax.set_xticks([3, 5, 8, 10, 12, 16, 20, 24])
 
-    fig.suptitle("Phase 7 T-sweep — 2-seed mean ± σ_seeds across {1, 42}",
-                 fontsize=12, weight="bold")
+    fig.suptitle("Phase 7 T-sweep — 2-seed mean ± σ_seeds across {1, 42}, "
+                 "BALANCED-15 task set",
+                 fontsize=11, weight="bold")
     out_path = out_dir / "phase7_tsweep_2seed.png"
     save_figure(fig, str(out_path))
     plt.close(fig)
