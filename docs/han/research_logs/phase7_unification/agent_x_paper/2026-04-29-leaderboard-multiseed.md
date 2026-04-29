@@ -6,16 +6,33 @@ tags:
   - in-progress
 ---
 
-## Phase 7 leaderboard — multi-seed (1, 2, 42) — supersedes 2-seed table
+## Phase 7 leaderboard — multi-seed (1, 2, 42)
 
-> Closes the σ-tightening pass requested in Han's pending tasks #5/#7.
-> Pulled seed=2 ckpts for 6 of 8 leaderboard archs (tfa_big and
-> txcdr_t16 only have seeds 1+42 on HF) and probed at S=32 + FLIP.
+> Closes Han's pending tasks #5 ("Build 2-seed leaderboard with σ") and
+> #7 ("Update Phase 7 summary with σ-augmented leaderboard"). Built
+> from `probing_results.jsonl` after a comprehensive seed=1 FLIP
+> backfill across all 27 archs with seed=1 ckpts, plus seed=2 pulls and
+> probings for 6 of the 8 paper leaderboard archs (tfa_big and
+> txcdr_t16 only have seeds {1, 42} on HF).
 >
 > Key takeaway: the leaderboard top is **very tight** at all k_feat —
 > top 8 archs at k=5 span only 0.0102 AUC, with σ_seeds 0.003-0.009 on
 > top entries. The leaderboard top "champion" identity changes with
 > seed selection.
+
+### Data
+
+- 36 SAEBench tasks (Phase 7 standard set, includes winogrande / wsc FLIP).
+- S = 32 left-aligned cache, mean-pool aggregation (Phase 7 methodology).
+- FLIP applied to winogrande / wsc.
+- Seed ∈ {1, 2, 42} when ckpts available; per-cell `n_seeds` column flags
+  cells with only one or two seeds.
+- Per-arch metric: cross-seed mean of per-task means.
+- `σ_tasks`: pooled task std across all seeds (captures task variance).
+- `σ_seeds`: std across the per-seed means at the arch level (captures
+  pure seed effect).
+
+Code: `experiments/phase7_unification/build_leaderboard_2seed.py`.
 
 ### k_feat = 5
 

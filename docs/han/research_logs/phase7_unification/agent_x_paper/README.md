@@ -19,8 +19,7 @@ target for ongoing work).
 
 | file | role |
 |---|---|
-| `2026-04-29-leaderboard-multiseed.md` | **Headline 3-seed leaderboard** (supersedes the 2-seed table). Mean ± σ_seeds across seed ∈ {1, 2, 42}. TXC champion vs `topk_sae`: Δ=+0.0076 at k=5 (~σ-noise scale), Δ=+0.0055 at k=20 (~18× σ_seeds, decisive). |
-| `2026-04-29-leaderboard-2seed.md` | Earlier 2-seed table — historical record only; superseded. |
+| `2026-04-29-leaderboard-multiseed.md` | **Headline leaderboard** — mean ± σ_seeds across seed ∈ {1, 2, 42} (or {1, 42} for cells without seed=2). TXC champion vs `topk_sae`: Δ=+0.0076 at k=5 (~σ-noise scale), Δ=+0.0055 at k=20 (~18× σ_seeds, decisive). |
 | `2026-04-29-stacked-sae-control.md` | **Han's "more candidate features" hypothesis test**. Stacked TopKSAE concat over last K=2/K=5 positions loses to TXC by 0.05-0.09 AUC; raw-activation concat loses by 0.16-0.26 AUC. Hierarchy `raw < SAE-concat < SAE-meanpool < TXC` is monotone-positive. Hypothesis rejected. |
 | `2026-04-29-per-task-breakdown.md` | **Per-task TXC-win breakdown**. TXC wins concentrate on `bias_in_bios_*` profession prediction (9-11/15) and `europarl_*` language ID (3-5/5). Directionally aligns with Y's per-concept "TXC wins knowledge content" steering finding. |
 | `2026-04-29-window-resampling-history.md` | **Han's "T=10 with 8 resampling at 20" question**. That cell was never trained anywhere. Closest analog `phase5b_subseq_h8_t10_s8_k500` (T_max=10 t_sample=8) lost to t_sample=5 in Phase 5B old-methodology. Tried `T_max=20 t_sample=8` on A40 today — OOM at b=4096, OOM at b=1024 + Adam, ran 1h50m at b=1024 PRELOAD=6000 without convergence. Cell needs H200. |
