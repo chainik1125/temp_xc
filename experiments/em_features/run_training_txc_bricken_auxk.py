@@ -37,6 +37,7 @@ from sae_day.sae import TemporalCrosscoder  # noqa: E402
 
 from experiments.em_features.streaming_buffer import (  # noqa: E402
     StreamingActivationBuffer, StreamingBufferConfig, mixed_text_iter,
+    HookpointStreamingBuffer, HookpointBufferConfig, VALID_HOOKPOINTS,
 )
 from experiments.em_features.gao_topk_training import (  # noqa: E402
     init_b_dec_geometric_median, remove_decoder_parallel_grad, _encode_pre_topk, _decode,
@@ -64,6 +65,10 @@ def parse_args():
     p.add_argument("--auxk_ema_decay", type=float, default=0.99)
     p.add_argument("--log_every", type=int, default=500)
     p.add_argument("--device", default="cuda")
+    p.add_argument("--layer", type=int, default=None,
+                   help="Layer to hook (defaults to cfg['layer_txc']).")
+    p.add_argument("--hookpoint", choices=list(VALID_HOOKPOINTS), default="resid_post",
+                   help="Where in the transformer block to extract activations.")
     p.add_argument("--resume_from", type=Path, default=None,
                    help="Resume from a snapshot ckpt (loads state_dict + start_step from config['steps_trained']). Adam resets.")
     return p.parse_args()
@@ -91,8 +96,10 @@ def main():
     ).eval()
 
     d_model = int(cfg["d_model"])
-    buf_cfg = StreamingBufferConfig(
-        layer=int(cfg["layer_txc"]),
+    layer = args.layer if args.layer is not None else int(cfg["layer_txc"])
+    buf_cfg = HookpointBufferConfig(
+        hookpoint=args.hookpoint,
+        layer=layer,
         d_model=d_model,
         buffer_seqs=max(1, int(cfg["streaming"]["buffer_activations"]) // int(cfg["streaming"]["chunk_len"])),
         chunk_len=int(cfg["streaming"]["chunk_len"]),
@@ -101,7 +108,8 @@ def main():
         dtype=torch.float16,
     )
     text_iter = mixed_text_iter(tok, cfg["streaming"]["corpus_mix"])
-    buffer = StreamingActivationBuffer(hf_model, tok, text_iter, buf_cfg)
+    buffer = HookpointStreamingBuffer(hf_model, tok, text_iter, buf_cfg)
+    print(f"[txc] hookpoint={args.hookpoint} layer={layer}", flush=True)
     print("warmup...", flush=True)
     buffer.warmup()
 
@@ -267,7 +275,8 @@ def main():
                     "d_in": d_model, "d_sae": args.d_sae, "T": args.T,
                     "k_total": args.k_total,
                     "subject_model": cfg["subject_model"],
-                    "layer": int(cfg["layer_txc"]),
+                    "layer": layer,
+                    "hookpoint": args.hookpoint,
                     "steps_trained": snap_step,
                     "training_recipe": "bricken_resample+ema_auxk+geom_median_b_dec",
                 },
