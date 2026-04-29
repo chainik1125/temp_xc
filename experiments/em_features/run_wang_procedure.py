@@ -42,7 +42,7 @@ for p in (str(VENDOR_SRC), str(REPO_ROOT)):
 def parse_args():
     p = argparse.ArgumentParser()
     p.add_argument("--ckpt", type=Path, required=True)
-    p.add_argument("--arch", choices=["sae", "han"], required=True)
+    p.add_argument("--arch", choices=["sae", "han", "tsae"], required=True)
     p.add_argument("--features_json", type=Path, required=True,
                    help="Output of run_find_features_encoder (top-200 by Δz̄).")
     p.add_argument("--layer", type=int, required=True)
@@ -108,6 +108,18 @@ def load_steerer_decoder_row(arch: str, ckpt_path: Path, feature_id: int, device
         sae.load_state_dict(ckpt["state_dict"])
         sae.eval()
         # W_dec convention: (d_sae, d_in)
+        return sae.W_dec[feature_id].detach().clone()
+    elif arch == "tsae":
+        from experiments.em_features.architectures.tsae_adjacent_contrastive import TSAEAdjacentContrastive
+        sae = TSAEAdjacentContrastive(
+            d_in=cfg["d_in"], d_sae=cfg["d_sae"], k=cfg["k"],
+            contrastive_alpha=cfg.get("contrastive_alpha", 1.0),
+            aux_k=cfg.get("aux_k", 512),
+            dead_threshold_tokens=cfg.get("dead_threshold_tokens", 640_000),
+            auxk_alpha=cfg.get("auxk_alpha", 1.0 / 32.0),
+        ).to(device)
+        sae.load_state_dict(ckpt["state_dict"])
+        sae.eval()
         return sae.W_dec[feature_id].detach().clone()
     else:
         m = TXCBareMultiDistanceContrastiveAntidead(
