@@ -1,0 +1,23 @@
+{
+  "baseline": {
+    "clean_ce": 0.724176824092865,
+    "dep_logp": -11.38028335571289
+  },
+  "by_arch": {
+    "iso_tsae_l0_ln1": {
+      "feature_idx": 658,
+      "alpha": 1.0,
+      "val_asr_16": 0.0,
+      "val_dep_logp_delta": -0.041103363037109375,
+      "val_clean_ce_delta": 7.349252700805664e-05,
+      "test_dep_logp": -10.77706527709961,
+      "test_dep_logp_delta": 0.052394866943359375,
+      "test_clean_ce": 1.3619903326034546,
+      "test_clean_ce_delta": 0.0002205371856689453,
+      "test_asr_16": 0.0,
+      "baseline_test_asr_16": 0.99,
+      "feature_top_scores": 3.266908645629883,
+      "feature_auroc": 0.9778000116348267
+    }
+  }
+}
