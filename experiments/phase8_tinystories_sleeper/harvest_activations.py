@@ -56,7 +56,7 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    hook_names = args.hook_names if args.hook_names else hook_names
+    hook_names = args.hook_names if args.hook_names else MLC_HOOK_NAMES
 
     out_dir = Path(args.output_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
