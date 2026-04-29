@@ -35,6 +35,7 @@ checks.
 | `2026-04-29-barebones-txc-per-task.md` | Where does barebones TXC help / hurt? `txcdr_t5` vs `topk_sae` per-task + per-cluster, with implication for task-set selection. |
 | `2026-04-29-per-task-tsweep.md` | Per-task T-scaling (txcdr_t<T> family at every T) — 36 small multiples + ranking by slope. **`winogrande` is the only task where T helps monotonically** (+0.0069/T at k=20), validating the multi-token-reasoning hypothesis. |
 | `2026-04-29-paper-task-set.md` | **Final 16-task paper set (`PAPER`)** — pre-registered selection by cross-arch SD within balanced clusters. k=20 winner `txc_bare_antidead_t5` Δ=+0.0036 (~6× σ_seeds, decisive). k=5 top-6 within 0.0035 AUC (no defensible single champion). |
+| `2026-04-29-handover-IT-and-mlc-sparse.md` | **Handover briefing** for next-agent IT-side leaderboard + missing MLC sparse cells (`mlc_sparse`, `ag_mlc_08_sparse`). Includes coverage status, plan, A40 feasibility, common pitfalls. Read this before starting either follow-on. |
 | `plots/` | Paper figures, full-res `.png` (150 dpi) + thumbnails (`*.thumb.png`, ≤288px wide). |
 
 ### Headline figures
