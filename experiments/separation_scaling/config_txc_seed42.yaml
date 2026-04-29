@@ -62,4 +62,4 @@ probe_dataset:
   train_seed: 10042
   eval_seed: 20042
 
-output_root: results_protocol_compare    # appends TXC to existing per-cell results
+output_root: results_txc_seed42
