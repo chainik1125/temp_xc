@@ -79,6 +79,26 @@ ckpt = torch.load(p, map_location="cuda", weights_only=False)
 
 (none — every locally-deleted ckpt has a copy on HF unless explicitly noted.)
 
+### Local cleanup log
+
+**2026-04-28 (h100_1)** — deleted to free disk during chunked-Han 100k restart:
+```
+qwen_l15_han_champ_100k_step{40000,50000,60000,70000,80000,90000}.pt   (6 × 14 GB)
+```
+All on HF at `han_champ/qwen_l15_han_champ_100k_step*.pt`. Re-pull as needed.
+
+**2026-04-28 (h100_2)** — deleted to fit T-SAE 30k transfer:
+```
+h2_qwen_l15_han_champ_step{40000,50000}.pt             (2 × 14 GB)
+h2_qwen_l15_txc_brickenauxk_a8_step{40000,50000}.pt    (2 × 14 GB)
+```
+All on HF at `han_champ/h2_*.pt` and `txc/h2_*.pt`. The h2 30k and 60k "final" snapshots are kept locally; only the intermediate 40k/50k from the 60k continuation pipeline were removed.
+
+### Active runs (as of 2026-04-28)
+
+- **h100_1**: T-SAE training extension, step 30k → 100k (resumed from `qwen_l15_tsae_k128_step30000.pt`, snapshots at 50k/80k/100k). Already at step ~33k.
+- **h100_2**: queued for Wang procedure on T-SAE 30k once the 30k checkpoint is transferred (HF download flaked; recovering via direct h100_1 → h100_2 stream).
+
 ### Last verified
 
-2026-04-27 — repo size ≈ 215 GB across 40+ ckpts. Repo is **public** (no token needed to download).
+2026-04-28 — repo size ≈ 215 GB across 40+ ckpts. Repo is **public** (no token needed to download).
