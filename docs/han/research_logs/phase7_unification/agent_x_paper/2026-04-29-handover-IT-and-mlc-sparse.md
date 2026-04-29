@@ -21,10 +21,15 @@ tags:
 
 - **IT-side (Gemma-2-2b-it L13)**: 12 paper cells × 1 subject model
   entirely missing from `probing_results.jsonl` under Phase 7
-  methodology. Need: build IT activation cache (~2 hr), build IT
-  probe cache (~30 min), train 8 leaderboard archs × ≥2 seeds (~10 hr
-  if all A40_ok), probe (~1 hr) on the **PAPER** task set first;
-  expand to FULL only if budget allows.
+  methodology. Need: build IT activation cache for 5 layers L11..L15
+  (~1 hr; per `agent_x_brief.md` estimate, plus measured ~5 min per
+  layer in X's BASE-side L12 build), build IT probe cache w/
+  `--include-crosstoken` (~30 min), train **8** A40_ok leaderboard archs
+  × ≥ 2 seeds (~10 hr at b=4096), probe (~1 hr) on the **PAPER** task
+  set first; expand to FULL only if budget allows. The 4 MLC-family
+  cells (mlc, mlc_sparse, ag_mlc_08, ag_mlc_08_sparse) are
+  H200_required for IT side too — same multi-layer-cache RAM
+  constraint that disqualified them on BASE.
 - **`mlc_sparse` / `ag_mlc_08_sparse` (k_win=100)**: tagged H200_required
   in `paper_archs.json` because MLC's 5-layer cache exceeds A40 VRAM
   (70 GB > 46 GB) and the cgroup RAM cap (46 GB) at b=4096. May be
@@ -126,15 +131,25 @@ for the IT-side cache build script (Phase 5 was IT-side).
 
 **Plan:**
 
-1. **Build IT activation cache** (~2 hr A40, ≤ 14 GB VRAM headroom):
+1. **Build IT activation cache** (~1 hr A40 — 5 min/layer × 5 layers
+   plus model-load overhead; verified empirically for BASE-side L12
+   build):
    - Token IDs: reuse from BASE (`data/cached_activations/gemma-2-2b/fineweb/token_ids.npy`)
      since base + IT share the same tokenizer. The
-     `build_act_cache_phase7` script has logic to copy from a sibling
-     gemma-2-2b-it/ dir or vice-versa — adapt as needed.
-   - Run `build_act_cache_phase7.py --layer L --subject_model google/gemma-2-2b-it`
-     for L ∈ {11, 12, 13, 14, 15}. **One layer at a time** (single-layer
-     hook + memmap is the MooseFS-safe path; multi-layer concurrency
-     was found to cause silent corruption).
+     `build_act_cache_phase7` script's `_ensure_token_ids` helper has
+     logic to copy from a sibling gemma-2-2b-it/ dir or vice-versa.
+     Easiest path: `cp` the BASE token_ids.npy into the new IT cache
+     dir before invoking the IT-side build.
+   - The script's `--layer` arg restricts choices to `MLC_LAYERS`
+     which is hardcoded at `(10, 11, 12, 13, 14)` in `_paths.py`
+     (BASE layer set). For IT you need {11, 12, 13, 14, 15}. Either
+     fork `_paths.py` → `_paths_it.py` with IT-side constants and a
+     `_paths_it`-imported `build_act_cache_phase7_it.py`, OR temporarily
+     edit `_paths.py` for the IT run (recommend forking).
+   - Run the IT-side build for L ∈ {11, 12, 13, 14, 15}. **One layer
+     at a time** (single-layer hook + memmap is the MooseFS-safe path;
+     multi-layer concurrency was found to cause silent corruption per
+     the original Phase 5 build_multilayer_cache.py docstring).
    - At the end, write/update `layer_specs.json` to record the IT layers.
 
 2. **Build IT probe cache** (~30 min A40):
@@ -148,15 +163,20 @@ for the IT-side cache build script (Phase 5 was IT-side).
      (different dir from BASE).
 
 3. **Train 8 A40_ok leaderboard archs × 2 seeds** (~10 hr A40 at b=4096):
-   - tfa_big, tsae_paper_k20, tsae_paper_k500, txcdr_t5, txcdr_t16,
-     phase5b_subseq_h8, txc_bare_antidead_t5, phase57_partB_h8_bare_multidistance_t8
+   - The 8 A40_ok IT cells per `paper_archs.json::training_pod`:
+     tfa_big, tsae_paper_k20, tsae_paper_k500, txcdr_t5, txcdr_t16,
+     phase5b_subseq_h8, txc_bare_antidead_t5, phase57_partB_h8_bare_multidistance_t8.
+     The 4 MLC-family cells (mlc, mlc_sparse, ag_mlc_08, ag_mlc_08_sparse)
+     are H200_required and *do not* train on A40 — defer per Mission #2.
    - Seeds 42 + 1 (drop seed=2 if budget tight; PAPER only needs 2-seed
      for σ).
    - **Strict apples-to-apples**: b=4096, max_steps=25000, plateau early
      stop. If a cell OOMs at b=4096, defer to H200 (do NOT lower batch).
      See `paper_archs.json::training_constants` for the locked values.
-   - Push trained ckpts to `han1823123123/txcdr-base` (or maybe better:
-     create `han1823123123/txcdr-it` for clean separation — Han's call).
+   - Push trained ckpts to `han1823123123/txcdr-it` (the planned
+     IT-side HF repo per `agent_x_brief.md`'s "HF repos" note). Don't
+     mix IT into `txcdr-base` — keep subject-model separation clean.
+     If the repo doesn't exist yet, create it via the HF API.
 
 4. **Probe on PAPER set** (~1 hr A40):
    - `run_probing_phase7.py --headline` filtered to PAPER tasks
@@ -177,17 +197,22 @@ for the IT-side cache build script (Phase 5 was IT-side).
 7. **Re-render plots** for IT (suptitle "Gemma-2-2b-it L13, PAPER task
    set, multi-seed mean ± σ_seeds") and side-by-side base-vs-IT comparison.
 
-**A40 feasibility check before starting**: not all 8 leaderboard archs
-fit on A40 at b=4096 with the full PRELOAD_SEQS=24000 anchor cache (14
-GB) plus model weights + Adam state. The MLC family (mlc, agentic_mlc_08)
-needs the MLC tail cache (70 GB) which doesn't fit at all — these are
-the H200_required cells. The other 6 archs (tfa_big, tsae_paper_k20/k500,
-txcdr_t5/t16, phase5b_subseq_h8, txc_bare_antidead_t5,
-phase57_partB_h8_bare_multidistance_t8) are A40_ok.
+**A40 feasibility check before starting**: per `paper_archs.json`,
+the 4 MLC-family leaderboard cells (mlc, mlc_sparse, ag_mlc_08,
+ag_mlc_08_sparse) need the multi-layer cache (5 layers × 14.2 GB =
+70.8 GB) which doesn't fit on A40 (46 GB VRAM) or in cgroup RAM
+(46 GB cap) at b=4096. These are H200_required regardless of subject
+model — same constraint applies to IT side. The remaining **8 cells**
+(listed above) are A40_ok at b=4096 with PRELOAD_SEQS=24000.
 
-If MLC IT-side cells are H200_required: train the 6 A40_ok cells now,
-mark mlc + agentic_mlc_08 (and their _sparse variants) as deferred to
-H200, document the gap clearly in the IT-side leaderboard writeup.
+Per `paper_archs.json::training_constants`, do NOT lower batch_size
+on the A40_ok cells — train at b=4096 to keep apples-to-apples with
+the BASE-side ckpts already on `han1823123123/txcdr-base`. If a cell
+OOMs unexpectedly: defer to H200, document; don't downsize batch.
+
+**Dispose of MLC IT cells via Mission #2 path** (PRELOAD_SEQS reduction
+or H200 deferral) — see Mission #2 below. Don't try to fit MLC into
+the A40 leaderboard run; it will OOM.
 
 ### Mission #2 — `mlc_sparse` and `ag_mlc_08_sparse`
 
@@ -260,22 +285,48 @@ In order of importance:
    headline task set
 4. `agent_x_paper/2026-04-29-leaderboard-multiseed.md` — current BASE
    leaderboard
-5. `experiments/phase7_unification/paper_archs.json` — locked arch spec
-6. `experiments/phase7_unification/_paths.py` — path config (fork or
-   override for IT)
-7. `experiments/phase7_unification/build_act_cache_phase7.py` — base
-   activation cache build
-8. `experiments/phase7_unification/build_probe_cache_phase7.py` — probe
-   cache build
-9. `experiments/phase5_downstream_utility/build_multilayer_cache.py` —
-   IT-side activation cache build (Phase 5 reference)
-10. `experiments/phase7_unification/run_probing_phase7.py` — probing driver
+5. `experiments/phase7_unification/paper_archs.json` — locked arch
+   spec, training_constants, training_pod tags, and the new
+   `task_sets` block
+6. `experiments/phase7_unification/_paths.py` — path config; need
+   IT-side fork or env override (BASE: anchor=L12, MLC=L10..L14;
+   IT: anchor=L13, MLC=L11..L15)
+7. `experiments/phase7_unification/build_token_ids.py` — FineWeb
+   tokenization → `token_ids.npy` (X authored during BASE-side
+   bootstrap; reusable for IT — same tokenizer)
+8. `experiments/phase7_unification/build_act_cache_phase7.py` —
+   activation cache build (per-layer, MooseFS-safe)
+9. `experiments/phase7_unification/build_probe_cache_phase7.py` —
+   probe cache build (S=128 + MLC tail). Runs the probing-task
+   datasets through the subject model.
+10. `experiments/phase7_unification/rebuild_probe_cache_s32.py` —
+    slices S=128 cache → S=32 left-aligned cache (the active probe
+    cache used by `run_probing_phase7`)
+11. `experiments/phase5_downstream_utility/build_multilayer_cache.py`
+    — IT-side activation cache build (Phase 5 reference; informs the
+    multi-layer-on-MooseFS pattern)
+12. `experiments/phase7_unification/run_probing_phase7.py` — probing
+    driver. Reads `training_index.jsonl`, encodes tasks via
+    arch-appropriate path, applies S-parameterised mean-pool, fits
+    top-k-by-class-sep + L1 LR
+13. `experiments/phase7_unification/train_phase7.py` — training
+    driver; per-arch trainer dispatch, ckpt save, HF push
+14. `experiments/phase7_unification/_train_utils.py` —
+    `preload_single`, `preload_multilayer`, GPU sample generators.
+    The MLC sparse Mission #2 workaround pivots on
+    `preload_multilayer(n_seqs=6000)` here.
+15. `experiments/phase7_unification/hill_climb/train_t20_s8.py` —
+    pattern for adapting a training script for a specific A40
+    constraint (X reduced n_seqs to 6000 here for the SubseqH8 cell).
+    Useful template for Mission #2's MLC sparse workaround.
 
 ### Definition of done
 
 For Mission #1 (IT-side):
-- 6 IT A40_ok leaderboard archs trained at b=4096, ≥ 2 seeds each,
-  appended to `training_index.jsonl`.
+- 8 IT A40_ok leaderboard archs (tfa_big, tsae_paper_k20, tsae_paper_k500,
+  txcdr_t5, txcdr_t16, phase5b_subseq_h8, txc_bare_antidead_t5,
+  phase57_partB_h8_bare_multidistance_t8) trained at b=4096, ≥ 2 seeds
+  each, appended to `training_index.jsonl`.
 - Probed on PAPER's 16 tasks at S=32, k_feat ∈ {5, 20}, FLIP applied,
   rows appended to `probing_results.jsonl` with `subject_model:
   google/gemma-2-2b-it, anchor_layer: 13`.
