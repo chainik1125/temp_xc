@@ -43,6 +43,9 @@ def parse_args():
     p = argparse.ArgumentParser()
     p.add_argument("--ckpt", type=Path, required=True)
     p.add_argument("--arch", choices=["sae", "han", "tsae"], required=True)
+    p.add_argument("--hookpoint", default=None,
+                   help="Override hookpoint (resid_post / resid_mid / ln1_normalized / resid_pre). "
+                        "If omitted, falls back to ckpt config['hookpoint'] then resid_post.")
     p.add_argument("--dataset", type=Path, required=True,
                    help="JSONL of prompts (one prompt per line, key 'prompt' or 'text').")
     p.add_argument("--base_model", default="Qwen/Qwen2.5-7B-Instruct")
@@ -82,18 +85,29 @@ def load_prompts(path: Path, n: int) -> list[str]:
 
 @torch.no_grad()
 def gather_residuals(model, tok, prompts: list[str], layer: int, max_ctx: int,
-                     batch_size: int, device: str) -> torch.Tensor:
-    """Returns (N_tokens, d_model) residuals at `layer` resid_post, concatenated
-    over all prompts. System / pad tokens are masked out via attention_mask."""
+                     batch_size: int, device: str, hookpoint: str = "resid_post") -> torch.Tensor:
+    """Returns (N_tokens, d_model) activations at `layer`/`hookpoint`, concatenated
+    over all prompts. System / pad tokens are masked out via attention_mask.
+
+    For ``resid_post`` and ``resid_pre`` we read straight off ``hidden_states``.
+    For ``resid_mid`` and ``ln1_normalized`` we register a forward hook via
+    HookpointExtractor (matches the streaming buffer used during training)."""
+    from experiments.em_features.streaming_buffer import HookpointExtractor
     chunks = []
     for i in range(0, len(prompts), batch_size):
         batch = prompts[i:i + batch_size]
         enc = tok(batch, padding=True, truncation=True, max_length=max_ctx,
                   return_tensors="pt", add_special_tokens=True).to(device)
-        out = model(**enc, output_hidden_states=True, use_cache=False)
-        hs = out.hidden_states[layer + 1]  # resid_post
-        attn = enc.attention_mask.bool()  # (B, T)
-        # Drop padding tokens
+        if hookpoint in ("resid_post", "resid_pre"):
+            out = model(**enc, output_hidden_states=True, use_cache=False)
+            hs = HookpointExtractor.from_output(hookpoint, layer, out)
+        else:
+            with HookpointExtractor(model, hookpoint, layer) as ext:
+                model(**enc, use_cache=False)
+            hs = ext.captured
+            if hs is None:
+                raise RuntimeError(f"hook for {hookpoint} L{layer} did not capture")
+        attn = enc.attention_mask.bool()
         chunks.append(hs[attn].cpu())
     return torch.cat(chunks, dim=0)  # (N_tokens, d_model)
 
@@ -177,13 +191,17 @@ def main():
         sae.eval()
         T = cfg["T"]
 
+    # Resolve hookpoint: CLI override > ckpt config > resid_post default.
+    hookpoint = args.hookpoint or cfg.get("hookpoint", "resid_post")
+    print(f"using hookpoint={hookpoint} layer={args.layer}", flush=True)
+
     # Process M (base) and M_D (bad-medical) sequentially to fit in VRAM.
     print("loading base model...", flush=True)
     base_hf = AutoModelForCausalLM.from_pretrained(
         args.base_model, torch_dtype=torch.float16, device_map=args.device,
     ).eval()
     print("gathering base residuals...", flush=True)
-    base_resid = gather_residuals(base_hf, tok, prompts, args.layer, args.max_ctx, args.batch_size, args.device)
+    base_resid = gather_residuals(base_hf, tok, prompts, args.layer, args.max_ctx, args.batch_size, args.device, hookpoint)
     print(f"  base residuals: {base_resid.shape}", flush=True)
     del base_hf
     torch.cuda.empty_cache()
@@ -193,7 +211,7 @@ def main():
         args.bad_model, torch_dtype=torch.float16, device_map=args.device,
     ).eval()
     print("gathering bad-medical residuals...", flush=True)
-    bad_resid = gather_residuals(bad_hf, tok, prompts, args.layer, args.max_ctx, args.batch_size, args.device)
+    bad_resid = gather_residuals(bad_hf, tok, prompts, args.layer, args.max_ctx, args.batch_size, args.device, hookpoint)
     print(f"  bad-medical residuals: {bad_resid.shape}", flush=True)
     del bad_hf
     torch.cuda.empty_cache()
