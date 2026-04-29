@@ -123,7 +123,16 @@ def main() -> None:
     T = args.T
     k_pos = args.k_pos
     k_win = k_pos * T
-    arch_id = args.arch_id or f"txc_bare_antidead_t{T}_kpos{k_pos}"
+    # Default arch_id depends on warm-start: warmstart cells get the
+    # `_warmstart` suffix (per Y → W coordination 2026-04-29 fd117ca9)
+    # so the random-init cell trained by Y at txc_bare_antidead_t5_kpos20
+    # remains the apples-to-apples meeting cell.
+    if args.arch_id is not None:
+        arch_id = args.arch_id
+    elif args.warm_start:
+        arch_id = f"txc_bare_antidead_t{T}_kpos{k_pos}_warmstart"
+    else:
+        arch_id = f"txc_bare_antidead_t{T}_kpos{k_pos}"
 
     print(f"\n[W cell] arch_id={arch_id}  T={T}  k_pos={k_pos}  k_win={k_win}")
     print(f"  d_in={DEFAULT_D_IN}  d_sae={DEFAULT_D_SAE}  seed={args.seed}")
