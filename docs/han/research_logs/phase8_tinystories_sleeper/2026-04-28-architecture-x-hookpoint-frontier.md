@@ -121,18 +121,47 @@ cost.
 - H8-lite (multi-distance contrastive TXC) was originally in scope but
   dropped at user direction; the v2 run focuses on SAE / T-SAE / TXC.
 
-### Queued follow-ups (running tonight)
+### Follow-up 1 — isolated SAE recreate_layer0 result
 
-1. **`run_recreate_layer0.sh`** — isolated 3-SAE re-train on
-   `blocks.0.{resid_pre,resid_mid,resid_post}` matching fra_proj's
-   `recreate_layer0/config.yaml` exactly. Settles whether
-   `sae_l0_mid` reaches 0.00 in isolation (fra_proj's number) or
-   stays at 0.54 (our joint number).
-2. **`run_tsae_attn_out_l0.sh`** — isolated T-SAE at
-   `blocks.0.hook_attn_out` (the residual delta added by attention).
-   Motivated by T-SAE's ln1.0 win — if the contrastive loss helps
-   most where attention writes, attn_out is the natural follow-up
-   site.
+Re-trained 3 TopK SAEs at `blocks.0.{resid_pre,resid_mid,resid_post}` in
+isolation (no T-SAE / TXC sharing the batch). Same hyperparams as v2.
+
+| hookpoint     | v2 (15-arch joint) | recreate (isolated 3 SAEs) |
+|---------------|-------------------:|---------------------------:|
+| resid_pre.0   | 0.53               | 0.90                       |
+| resid_mid.0   | 0.54               | **0.00**                   |
+| resid_post.0  | **0.00**           | 0.03                       |
+
+The isolated `sae_layer1` (= `resid_mid.0`) reaches **test ASR=0.00 with
+ΔCE=-0.001**, exactly matching fra_proj's `recreate_layer0/RESULTS.md`
+number. So **the v2 mismatch at `resid_mid.0` was joint-training
+feature-ranking variance**, not a real architecture-fail.
+
+A subtler observation: joint training did not uniformly hurt — at
+`resid_pre.0` it actually *improved* the per-token SAE (0.53 vs 0.90
+isolated). The picture is "joint training shuffles which features rank
+into the top-100 in arch-specific ways"; it can hide the trigger
+feature at one hookpoint while revealing a useful one at another.
+
+Per-step throughput on the isolated 3-SAE run was 30.6 it/s, vs 1.7
+it/s on v2's 15-arch joint train — confirming the v2 wall-clock cost
+was almost entirely per-arch overhead.
+
+**Implication for the v2 frontier table.** The architecture-flip
+pattern (TXC > T-SAE > SAE at ln1.0; SAE > T-SAE > TXC at resid_post.0)
+is at *least partly* an artifact of joint training, because the per-arch
+feature rankings inside that joint training don't all line up with
+each arch's true best feature. A clean re-test of the temporal-arch
+claim would isolate-train each TXC and T-SAE in turn at the same five
+hookpoints — ~75 min on the A40, queued conditional on the attn_out
+result being interesting.
+
+### Follow-up 2 — T-SAE at attn_out.0 (running)
+
+Isolated T-SAE at `blocks.0.hook_attn_out` (the residual delta added by
+attention). Motivated by T-SAE's `ln1.0` win — if the contrastive loss
+helps most where attention writes, attn_out is the natural site to
+target. Result will be appended here once the run finishes (~15 min).
 
 ### Pointers
 
