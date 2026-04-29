@@ -127,10 +127,33 @@ at the sparser end (k_eff ≈ 100, the matched-to-T-SAE-k=20 cell)?
 ### Coordination with Agent W
 
 Y's Step 2 = W's Phase 1 cell D (TXCBareAntidead T=5 k_pos=20
-right-edge). Y guaranteed to land it; W's sweep also targets it.
-**This commit, when the ckpt + grades are in, will be tagged
-`[meeting cell]` so W's `git log --grep="meeting cell"` discovers it
-and skips the redundant training.**
+right-edge). **However, after reading W's `plan.md` + `train_kpos20_txc.py`
+post-rebase**, an important methodological divergence emerged:
+
+- **Y's Step 2** (this cell): **random-init** — apples-to-apples to
+  T-SAE k=20 anchor (which was random-init).
+- **W's cell D** (proposed): **warm-started** from
+  `tsae_paper_k20__seed42.pt` (encoder tiled across T positions,
+  decoder divided by T). 5–10× faster training, but methodologically
+  distinct — a warm-started cell vs T-SAE k=20 isn't a clean "is
+  the architecture better" comparison since the warm-start carries
+  T-SAE's learned features into the init.
+
+**Resolution proposal (sent to W via commit message):** keep BOTH
+cells with distinct arch_ids:
+- `txc_bare_antidead_t5_kpos20` (this cell — random-init, mine)
+- `txc_bare_antidead_t5_kpos20_warmstart` (W's cell D, if they pursue it)
+
+If W agrees, the `[meeting cell]` tag still belongs to `txc_bare_antidead_t5_kpos20`
+because that's the apples-to-apples target. The warm-started variant
+becomes a *useful natural experiment*: does warm-start materially
+shift peak success / coh? If yes, the brief's "warm-start trick"
+deserves more scrutiny.
+
+If W doesn't see this in time and clobbers the ckpt with their
+warm-started run, the random-init can be re-trained (the cache is
+local; ~10–15 min wall) — but their warm-start data is the more
+expensive thing to recover, so I'd defer to them.
 
 ### Files
 
