@@ -269,6 +269,45 @@ Commit pattern:
 git -c user.email=hxuany0@gmail.com -c user.name=Han commit -m "..."
 ```
 
+### Strength-grid hygiene (do NOT repeat Agent C's blunder)
+
+Agent C's Stage 1 (2026-04-26) capped strengths at ~1× ⟨|z|⟩ — which
+missed peaks for window archs that need 5–10× ⟨|z|⟩ to bite. Y's
+Q1.1 + Q1.2 corrected this; the existing
+`intervene_paper_clamp_normalised.py` runs per-arch normalised
+schedule `s_norm ∈ {0.5, 1, 2, 5, 10, 20, 50}` by default. **Use this
+default for every cell; do not truncate it.**
+
+For every cell (sweep + hill-climb), after grading, **plot
+`success(s_norm)` and `coh(s_norm)` and verify the peak is interior**
+to the grid (strictly between s_norm=0.5 and s_norm=50). Three
+failure modes to check for:
+
+1. *Peak at s_norm=50 (top).* Rerun intervene with
+   `--s-norms 0.5 1 2 5 10 20 50 100 200`. Sparser archs (k_pos=20)
+   may have higher peaks than canonical k_pos=100 archs.
+2. *Peak at s_norm=0.5 (bottom).* Rerun with
+   `--s-norms 0.05 0.1 0.2 0.5 1 2 5 10`.
+3. *Peak under coh ≥ 1.5 sits at the highest constraint-satisfying
+   s_norm, with the next-up s_norm dropping below coh=1.5.* This is
+   the true constrained optimum, not a grid problem; report it and
+   note coh fell off the cliff.
+
+**Why this matters more for W than Y.** W is comparing across
+*architecturally different* archs in the sweep. If two archs have
+different ⟨|z|⟩ scales, even the family-normalised schedule may put
+their peaks at different absolute strengths. Always run
+`diagnose_z_magnitudes.py` for each NEW arch before intervene — do
+not cross-apply ⟨|z|⟩ from another arch.
+
+**Pre-call checklist** (before reporting any cell's number):
+- [ ] `diagnose_z_magnitudes.py` ran for *this specific arch*; ⟨|z|⟩ logged.
+- [ ] `intervene_paper_clamp_normalised.py` ran the full default
+      `s_norm` grid (no truncation).
+- [ ] Grading completed all 210 rows; 0 ungraded; 0 errors.
+- [ ] Plotted success vs s_norm; peak is interior.
+- [ ] Plotted coh vs s_norm; calling-threshold (coh ≥ 1.5) is sensible.
+
 ### Pre-registered outcomes (write decisions BEFORE running)
 
 **Threshold rule.** Previous Y observed seed-to-seed variance up to
