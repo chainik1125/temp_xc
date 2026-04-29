@@ -12,7 +12,7 @@ tags:
 
 Ward, Lin, Venhoff & Nanda — *"Reasoning-Finetuning Repurposes Latent Representations in Base Models"* (arXiv 2507.12638, ICML 2025 Actionable Interp Wkshp) — identifies a single residual-stream direction in base Llama-3.1-8B that, when added to activations of DeepSeek-R1-Distill-Llama-8B, reliably elicits *backtracking* ("Wait", "Hmm"). The direction is computed via plain Difference-of-Means (DoM) on hidden states at token positions ~13–8 tokens *before* a backtracking event, at layer 10. The paper does not use SAEs.
 
-We want a small parallel case study, in the same shape as `case_studies/rlhf/` (which reproduces Ye et al. 2025's T-SAE protocol), that asks:
+We want a small parallel case study, in the same shape as `case_studies/rlhf/` (which reproduces Bhalla et al. 2025's T-SAE protocol — note: prior docs in this repo mis-cite this as "Ye et al."; the correct citation is Bhalla, Oesterling, Verdun, Lakkaraju, Calmon, arXiv:2511.05541), that asks:
 
 > If we substitute the raw-DoM step with **SAE feature decomposition**, can we recover the backtracking direction as a small set of interpretable SAE features, and do those features steer backtracking with comparable effect to the paper's raw-DoM baseline?
 

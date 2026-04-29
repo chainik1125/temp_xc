@@ -1,4 +1,9 @@
-"""Faithful port of Ye et al. 2025 Temporal SAE (arxiv 2511.05541).
+"""Faithful port of Bhalla et al. 2025 Temporal SAE (arxiv 2511.05541).
+Originally mis-cited as 'Ye et al.' in this docstring and several research-log
+docs across the repo; fixed here. Citation is:
+    Bhalla, Oesterling, Verdun, Lakkaraju, Calmon (2025).
+    "Temporal Sparse Autoencoders: Leveraging the Sequential Nature of
+    Language for Interpretability." arXiv:2511.05541.
 
 Sources this file directly mirrors (from
 https://github.com/AI4LIFE-GROUP/temporal-saes):
