@@ -69,6 +69,17 @@ Han chooses; Y recommends below.
   framing is undermined. Risk-managed by also shipping Framing A as
   fallback.
 
+### POST-MULTI-SEED FINAL VERDICT
+
+**At matched effective sparsity (k_eff ≈ 500) AND best protocol (Q2.C
+family-normalised paper-clamp + per-position write), TXC matryoshka
+mean peak (1.37) ≈ T-SAE k=500 mean peak (1.38) — TIE.**
+
+T-SAE k=20's pooled lead (1.80) is FULLY explained by k=20's optimal
+sparsity choice for steering, not by per-token vs window architecture.
+
+This is a clean methodological + empirical finding for the paper.
+
 ### Recommendation (Y, updated post Q1.3)
 
 **Hybrid Framing A + sparsity decomposition.** Q1.3 partial closure
