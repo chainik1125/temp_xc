@@ -115,10 +115,10 @@ subject model) is entirely missing — see `README.md` "Gaps".
   multi-scale (`agentic_mlc_08`, 0.6807 / 0.8680) variants drop ~0.13
   -0.20 AUC at k=5 — contrastive losses don't help probing AUC.
 - **Cross-task-set robustness**: `txc_bare_antidead_t5` is the **k=20
-  winner across all three task sets** (full-36, BALANCED, PAPER)
-  — strong robustness evidence for the headline claim. At k=5 the
-  winner shifts (mlc / txc / topk_sae depending on cluster
-  proportions) — consistent with σ_seeds-noise reading.
+  winner under both PAPER and FULL** — strong robustness evidence for
+  the headline claim. At k=5 the winner shifts (mlc / txc / topk_sae
+  depending on cluster proportions) — consistent with σ_seeds-noise
+  reading.
 
 ### Δ to vanilla `topk_sae` baseline (PAPER)
 

@@ -131,19 +131,19 @@ TXC variant you pick.
 | task set | k=5 top 3 | k=20 top 3 |
 |---|---|---|
 | FULL | mlc / phase5b_subseq_h8 / hill_T12 | **txc_bare_antidead_t5** / mlc / hill_T12 |
-| BALANCED | txc_bare_antidead_t5 / phase57_h8_md_t8 / topk_sae | **txc_bare_antidead_t5** / mlc / hill_T12 |
 | **PAPER** | hill_T12 / mlc / topk_sae | **txc_bare_antidead_t5** / hill_T12 / mlc |
 
-`txc_bare_antidead_t5` is the **k=20 winner across all three task
-sets** — a strong robustness check. At k=5 the winner shifts (mlc /
+`txc_bare_antidead_t5` is the **k=20 winner under both FULL and
+PAPER** — a strong robustness check. At k=5 the winner shifts (mlc /
 txc / topk_sae depending on cluster proportions) — consistent with
-the σ_seeds-noise reading.
+the σ_seeds-noise reading. (Earlier intermediate iterations of the
+task subset are documented in `2026-04-29-task-importance.md`.)
 
 ### Honest paper headlines
 
 1. **At k_feat=20, `txc_bare_antidead_t5` is the leaderboard winner**
    (Δ = +0.0036 over `topk_sae`, ~6× σ_seeds). Ranking unchanged
-   between full-36 and PAPER — robust to task-subset choice.
+   between FULL and PAPER — robust to task-subset choice.
 
 2. **At k_feat=5, the top 6 archs are within 0.0035 AUC** under
    PAPER — `mlc`, `topk_sae`, and three TXC variants all
@@ -183,7 +183,7 @@ the σ_seeds-noise reading.
 ### Practical implication
 
 Use PAPER for: headline tables in the paper, IT-side completion
-work (saves ~56% of probing time vs full-36), H200 hill-climb
+work (saves ~56% of probing time vs FULL), H200 hill-climb
 evaluation. Report the full 36-task results in supplementary so
 reviewers who care about the under-sampled clusters can verify the
 robustness check.
@@ -194,5 +194,5 @@ robustness check.
 - Probing rows: `experiments/phase7_unification/results/probing_results.jsonl`
 - Per-task analysis: `2026-04-29-barebones-txc-per-task.md`,
   `2026-04-29-per-task-tsweep.md`
-- Earlier task-set proposals (BALANCED, DIVERSE-12):
-  `2026-04-29-task-importance.md`
+- Per-task SD / within-cluster correlation methodology that
+  selected PAPER: `2026-04-29-task-importance.md`
