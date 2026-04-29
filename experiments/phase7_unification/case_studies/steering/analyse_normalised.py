@@ -146,7 +146,7 @@ def make_pareto(
     ax.legend(loc="lower left", fontsize=9, frameon=True)
     fig.tight_layout()
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    from src.utils.plot import save_figure
+    from src.plotting.save_figure import save_figure
     save_figure(fig, str(out_path))
     plt.close(fig)
 
@@ -187,7 +187,7 @@ def make_curves_vs_s_norm(
     ax_c.grid(alpha=0.25)
     fig.tight_layout()
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    from src.utils.plot import save_figure
+    from src.plotting.save_figure import save_figure
     save_figure(fig, str(out_path))
     plt.close(fig)
 

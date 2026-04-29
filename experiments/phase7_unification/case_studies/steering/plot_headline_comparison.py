@@ -155,7 +155,7 @@ def main() -> None:
 
     fig.tight_layout()
     args.out_path.parent.mkdir(parents=True, exist_ok=True)
-    from src.utils.plot import save_figure
+    from src.plotting.save_figure import save_figure
     save_figure(fig, str(args.out_path))
     plt.close(fig)
     print(f"  saved {args.out_path}")

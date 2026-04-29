@@ -94,21 +94,29 @@ features, but at family-normalised strengths `s_abs = s_norm × <|z|>_arch`
 where `s_norm ∈ {0.5, 1, 2, 5, 10, 20, 50}`. Each arch is now
 tested over the *same* range of "log distance from typical activation."
 
-[Pending Sonnet 4.6 grading. Generations done at
-`results/case_studies/steering_paper_normalised/<arch>/generations.jsonl`.
-This section gets filled in once `grades.jsonl` are present.]
+#### Per-arch results (partial — grades arriving in batches)
 
-#### Predicted vs observed peaks
+| arch | T | `<|z|>` | peak s_abs | peak s_norm | peak suc | peak coh |
+|---|---|---|---|---|---|---|
+| topk_sae | 1 | 12.2 | 121.7 | 10.0 | 1.10 | 1.20 |
+| tsae_paper_k20 | 1 | 10.0 | 99.8 | 10.0 | **1.80** | 1.40 |
+| tsae_paper_k500 | 1 | 11.6 | TBD | TBD | TBD | TBD |
+| agentic_txc_02 | 5 | 29.5 | TBD | TBD | TBD | TBD |
+| phase5b_subseq_h8 | 10 | 66.9 | TBD | TBD | TBD | TBD |
+| phase57_partB_h8_bare_multidistance_t5 | 5 | 25.2 | TBD | TBD | TBD | TBD |
 
-[TODO: table with `peak_suc`, `peak_coh`, `peak_s_norm` per arch]
+**Validation against Dmitry's per-token baseline:**
 
-#### Pareto curves (success vs coherence)
+- topk_sae normalised peak: my 1.10 @ s_abs=121.7  vs Dmitry's 1.07 @ s=100. Within concept-noise (Δ=0.03).
+- tsae_paper_k20 normalised peak: my 1.80 @ s_abs=99.8  vs Dmitry's 1.93 @ s=100. Within concept-noise (Δ=0.13).
 
-[TODO: image link to phase7_steering_v2_pareto.png]
+Pipeline matches Dmitry's. Once window-arch grades arrive, the
+hypothesis test is: do TXC matryoshka and SubseqH8 peaks (now at
+s_abs ≈ 295 and 670 respectively) approach T-SAE k=20's 1.80?
 
-#### Curves vs s_norm
+#### Pareto curves + curves vs s_norm
 
-[TODO: image link to phase7_steering_v2_curves.png]
+[TODO: image links once final plots are produced.]
 
 ### What this means for the paper
 
