@@ -252,6 +252,35 @@ def _load_phase7_model(meta: dict, ckpt_path: Path, device) -> tuple:
             matryoshka_h_size=int(d_sae * 0.2),
             alpha=float(meta.get("alpha") if meta.get("alpha") is not None else 1.0),
         ).to(device)
+    elif src_class == "SubseqRankedH8":
+        # Z's per-sampled-slot variant: t_sample-many encoder/decoder slabs.
+        # Probe-time encode partitions T_max into t_sample equally-spaced
+        # positions and routes by rank.
+        from src.architectures.phase7_subseq_z_variants import SubseqRankedH8
+        T_max = int(meta["T_max"])
+        raw_shifts = (1, max(1, T_max // 4), max(1, T_max // 2))
+        shifts = tuple(sorted(set(s for s in raw_shifts if 1 <= s <= T_max - 1)))
+        model = SubseqRankedH8(
+            d_in, d_sae, T_max=T_max, t_sample=int(meta["t_sample"]),
+            k=int(meta["k_win"]), shifts=shifts, weights=None,
+            matryoshka_h_size=int(d_sae * 0.2),
+            alpha=float(meta.get("alpha") if meta.get("alpha") is not None else 1.0),
+            contiguous=False,
+        ).to(device)
+    elif src_class == "SubseqSharedH8":
+        # Z's shared-encoder variant: single (d_in, d_sae) slab; window
+        # pre-act = W_enc @ sum-pooled(window). Multi-distance InfoNCE.
+        from src.architectures.phase7_subseq_z_variants import SubseqSharedH8
+        T_max = int(meta["T_max"])
+        raw_shifts = (1, max(1, T_max // 4), max(1, T_max // 2))
+        shifts = tuple(sorted(set(s for s in raw_shifts if 1 <= s <= T_max - 1)))
+        model = SubseqSharedH8(
+            d_in, d_sae, T_max=T_max, k=int(meta["k_win"]),
+            shifts=shifts, weights=None,
+            matryoshka_h_size=int(d_sae * 0.2),
+            alpha=float(meta.get("alpha") if meta.get("alpha") is not None else 1.0),
+            sum_pool=True,
+        ).to(device)
     else:
         raise ValueError(f"unknown src_class={src_class}")
 
