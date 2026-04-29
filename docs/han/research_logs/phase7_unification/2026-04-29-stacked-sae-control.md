@@ -137,12 +137,28 @@ where the leaderboard win comes from.
 Code: `experiments/phase7_unification/run_raw_concat_probing.py`.
 Results: `results/raw_concat_probing_results.jsonl` (144 rows).
 
+### Multi-seed confirmation (topk_sae)
+
+Re-ran topk_sae__seed1 (in addition to seed=42). Per-task means,
+36 tasks each:
+
+| K | k_feat | seed=42 | seed=1 | Δ |
+|---|---|---|---|---|
+| 2 | 5  | 0.8300 | 0.8261 | 0.004 |
+| 2 | 20 | 0.8817 | 0.8817 | 0.000 |
+| 5 | 5  | 0.8178 | 0.8182 | 0.000 |
+| 5 | 20 | 0.8701 | 0.8713 | 0.001 |
+
+Seed-to-seed variation < 0.005 AUC. The 0.06-0.09 gap to TXC champion
+is ~12-18× larger than the seed noise floor. Conclusion is locked in:
+stacked-SAE concat is NOT a path to matching TXC.
+
+(`tsae_paper_k500` and `tsae_paper_k20` only have seed=42 stacked rows
+due to a stash-rebase race with the live-appending writer; rerun
+optional, single-seed pattern is strong enough.)
+
 ### Caveats
 
-- **Single seed (42)** for the SAE-concat result. Adding seed=1 in
-  flight (separate background run); will append rows. With 36 tasks
-  per-cell std-dev bounded, the gap is large enough (~0.06-0.09) that
-  it's almost certainly seed-robust.
 - **k_feat budget mismatch.** TXC k=5 picks 5 of 18,432; stacked k=5
   picks 5 of K×18,432. Same budget, different pool. The control is
   intentionally generous to the SAE baseline.
