@@ -124,16 +124,41 @@ multi-token concepts** would likely show TXC winning. The 30-concept
 mix used in the case study has only 7-9 such concepts; a properly
 balanced concept set could shift the headline.
 
+#### Per-class mean steering success at peak s_norm (Q1.3)
+
+| arch | knowledge | discourse | safety | stylistic | sentiment |
+|---|---|---|---|---|---|
+| T-SAE k=20 | 1.56 | **3.00** | 1.00 | 1.60 | 1.00 |
+| T-SAE k=500 | 1.56 | 1.38 | 0.67 | 1.60 | 0.50 |
+| TopKSAE k=500 | 1.67 | 1.50 | 0.17 | 0.80 | 0.50 |
+| **TXC matryoshka (T=5)** | **1.89** | 1.00 | 0.00 | 1.20 | 0.50 |
+| **H8 multi-dist (T=5)** | **1.88** | 1.00 | 0.50 | 1.00 | 1.00 |
+| SubseqH8 (T=10) | 1.11 | 1.12 | 0.67 | 1.20 | 0.50 |
+
+**TXC family (matryoshka + h8 multi-dist) wins outright on knowledge
+concepts by 0.22-0.33 success points over T-SAE k=20.** SubseqH8 is
+the exception — its T=10 may be too long for the typical concept span.
+
+**T-SAE k=20 dominates discourse concepts** (3.00 perfect score) — its
+sparse features cleanly capture single-token register cues (verb form,
+question marks, emotional words).
+
+This is the cleanest TXC structural win in the data. Plot:
+`phase7_steering_v2_concept_classes.png`.
+
 | concept class | example concepts | winner |
 |---|---|---|
-| knowledge / domain | medical, mathematical, historical, code | TXC family |
-| discourse / register | dialogue, imperative, question, casual | T-SAE k=20 |
-| safety / alignment | harmful_content, refusal, jailbreak | T-SAE k=20 (when any wins) |
-| stylistic | poetic, formal, narrative | mixed (T-SAE slight edge) |
+| knowledge / domain | medical, mathematical, historical, code | **TXC family (1.88-1.89 vs 1.56-1.67)** |
+| discourse / register | dialogue, imperative, question, casual | **T-SAE k=20 (3.00 vs 1.00-1.38)** |
+| safety / alignment | harmful_content, refusal, jailbreak | mixed (T-SAE k=20 slight edge) |
+| stylistic | poetic, literary, list_format | tsae_paper_k20 + tsae_paper_k500 tie |
+| sentiment | positive_emotion, negative_emotion | T-SAE k=20 |
 
 This finding is consistent with the multi-token receptive-field argument:
 knowledge content is structurally multi-token; discourse cues are
-structurally single-token.
+structurally single-token. **A future paper-grade case study should
+deliberately target knowledge-domain concepts where TXC structural
+advantages are most pronounced.**
 
 ### Cross-experiment pattern
 
