@@ -48,18 +48,28 @@ shift depend on the hookpoint?**
   {0.25, 0.5, 1, 1.5, 2}.
 - Compute: dedicated A40 (46 GB), SSH alias `a40_tiny_1`.
 
-### Result — preliminary (13 of 15 archs through the test sweep)
+### Result (all 15 archs complete)
 
 Test sampled ASR₁₆ at the chosen feature × α (baseline ASR=0.99 across
 all):
 
-| hookpoint              | SAE  | T-SAE | TXC      |
-|------------------------|-----:|------:|---------:|
-| `ln1.hook_normalized.0`| 0.93 |  0.32 | **0.02** |
-| `hook_resid_pre.0`     | 0.53 |  0.80 | **0.21** |
-| `hook_resid_mid.0`     | 0.54 |  0.79 |    0.94  |
-| `hook_resid_post.0`    | **0.00** |  0.87 | (running) |
-| `ln1.hook_normalized.1`| 0.99 |  0.75 | (running) |
+| hookpoint              | SAE      | T-SAE | TXC      |
+|------------------------|---------:|------:|---------:|
+| `ln1.hook_normalized.0`| 0.93     | 0.32  | **0.02** |
+| `hook_resid_pre.0`     | 0.53     | 0.80  | **0.21** |
+| `hook_resid_mid.0`     | **0.54** | 0.79  | 0.94     |
+| `hook_resid_post.0`    | **0.00** | 0.87  | 0.57     |
+| `ln1.hook_normalized.1`| 0.99     | 0.75  | 0.96     |
+
+ΔCE was ≤ 0.006 nats for every chosen point above except
+`tsae_l1_ln1` (+0.035) and `txc_l1_ln1` (+0.040) — both of those are
+control points (layer-1) where suppression is poor regardless, so the
+small CE blowups don't change the headline.
+
+Pareto plot at
+`experiments/phase8_tinystories_sleeper/outputs/plots/pareto_asr_vs_utility.png`.
+Full table with per-arch (f*, α*, val ASR, test ASR, Δlogp, ΔCE) at
+`experiments/phase8_tinystories_sleeper/RESULTS.md`.
 
 ΔCE was ≤ 0.006 nats for every chosen point above except
 `tsae_l1_ln1` (+0.035) — i.e. the entries reflect the frontier inside
