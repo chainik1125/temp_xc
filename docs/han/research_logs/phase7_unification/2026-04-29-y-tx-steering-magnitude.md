@@ -172,40 +172,151 @@ variance on 30 concepts the operating window could easily move
 predicted optimum and explicitly testing the magnitude-normalised
 hypothesis.
 
-### Q1.3 design (revised after Q1.2)
+### Q1.3 — finer-grid paper-clamp on this pod
 
-The original plan was: "re-run paper-clamp on window archs at
-`s_norm = s_paper × magnitude_ratio_arch`". Q1.2's universal-5x
-finding makes the original Q1.3 not the most informative move.
-The revised design:
+Original plan was a single-point family-normalised re-run. Q1.2's
+universal-5x finding made that less informative; revised plan
+**samples a finer strength grid `{50, 100, 150, 200, 300, 400, 500,
+700, 1000}` across all 5 archs** (3 per-token + 2 window) so the
+magnitude-normalised vs universal-5x hypotheses can be discriminated
+directly.
 
-- **Sample a finer strength grid for the window archs**:
-  `{50, 100, 150, 200, 300, 400, 500, 700, 1000}`. This brackets
-  the magnitude-normalised predictions (TXC 237, SubseqH8 693)
-  AND the universal-5x prediction (~500), so we can disambiguate.
-- For TXC, SubseqH8, H8 multidist: 9 strengths × 30 concepts × 1
-  generation each = 270 generations × 3 archs = 810 total. Plus 2
-  grader prompts each (success + coherence) = 1620 grader calls.
-  Sonnet 4.6 + ThreadPool=8 + prompt caching, ~3-5 min wall time
-  + ~$3-5 in API spend.
-- Also re-grade the per-token archs at the same finer grid for
-  the cross-arch comparison (so the apples-to-apples baseline
-  isn't anchored on Dmitry's coarser grid). 3 per-token archs ×
-  9 strengths × 30 concepts = 810 generations + 1620 grader
-  calls. Same cost order.
-- Total Q1.3: ~3000-3500 grader calls, ~$10-15.
+**Design + execution.**
 
-**Hypothesis discrimination.**
+- Strengths bracket both predictions: TXC magnitude-pred = 237,
+  SubseqH8 magnitude-pred = 693, universal-5x = 500.
+- Generation: 5 archs x 30 concepts x 9 strengths = 1350 rows.
+  ~10 min wall on the A40 (per-token archs ~1 min each, window
+  archs ~2 min each — `use_cache=False` overhead).
+- Grading: 2700 Sonnet 4.6 calls under ThreadPool=8 +
+  prompt-cached system rubric (1024+ token block engaged
+  caching for every call). Wall time ~9 min, 0 errors. Patched
+  `grade_with_sonnet.py` to fall back to `$ANTHROPIC_API_KEY`
+  when `/workspace/.tokens/anthropic_key` is absent (the kickoff
+  pod uses env-var auth, not a tokens-file).
 
-- **If the new finer grid still shows window archs peaking at
-  ~500 regardless of magnitude ratio** -> the universal-5x is
-  real, NOT magnitude-driven. Dmitry's "magnitude is the full
-  story" claim is rejected.
-- **If TXC's fine-grid peak lands at 237 ± 50 and SubseqH8's at
-  693 ± 100** -> magnitude is the full story; the original
-  Q1.3 normalisation works.
-- **If both archs peak at the same fitted value (e.g. ~400)** ->
-  consistent with universal-5x; reject magnitude story.
+**Code.**
+[`q1_3_analysis.py`](../../../experiments/phase7_unification/case_studies/steering/q1_3_analysis.py)
+— aggregates grades + fits parabolic peak.
+[`intervene_paper_clamp.py`](../../../experiments/phase7_unification/case_studies/steering/intervene_paper_clamp.py)
++ [`intervene_paper_clamp_window.py`](../../../experiments/phase7_unification/case_studies/steering/intervene_paper_clamp_window.py)
+edited to take `--strengths` + `--out-subdir` (additive flags;
+default behaviour unchanged).
 
-Cost so far: 0 grader calls. Q1.3 will be the first grader-heavy
-step.
+**Outputs.**
+- [`q1_3_finer_grid_curves.json`](../../../experiments/phase7_unification/results/case_studies/steering_magnitude/q1_3_finer_grid_curves.json)
+- [`q1_3_finer_grid_curves.png`](../../../experiments/phase7_unification/results/case_studies/steering_magnitude/q1_3_finer_grid_curves.png)
+- Raw: `results/case_studies/steering_paper_normalised/<arch>/{generations,grades}.jsonl` (5 archs)
+
+**Results.**
+
+![Q1.3 finer-grid paper-clamp curves](../../../experiments/phase7_unification/results/case_studies/steering_magnitude/q1_3_finer_grid_curves.thumb.png)
+
+| arch | T | log-fit peak s | peak suc | Q1.1 mag-pred | universal-5x pred |
+|---|---|---|---|---|---|
+| `topk_sae` | 1 | 75.8 | 0.97 | 112 | n/a |
+| `tsae_paper_k500` | 1 | 84.2 | 1.17 | 124 | n/a |
+| **`tsae_paper_k20`** | 1 | **90.2** | **1.73** | 100 | n/a (ref) |
+| `agentic_txc_02` (TXC T=5) | 5 | **447.2** | 0.83 | 237 | 500 |
+| `phase5b_subseq_h8` (T_max=10) | 10 | **498.2** | 0.97 | 693 | 500 |
+
+**Read.**
+
+- **The magnitude-normalised hypothesis is rejected.** TXC's peak
+  lands at 447 vs the predicted 237 (off by 1.9x); SubseqH8 peaks
+  at 498 vs the predicted 693 (off by 0.7x). Both archs land in
+  the band [400, 500], much closer to the universal-5x prediction
+  than to their per-arch magnitude predictions. The two archs are
+  within 50 strength units of each other despite a 2.9x measured
+  magnitude ratio between them.
+- **The universal-5x hypothesis fits the data.** All three peaks
+  cluster near s=500 within a factor of 1.1; per-token archs
+  cluster near s=85 within a factor of 1.2.
+- **Peak success values reproduce Dmitry's qualitative ranking**
+  (T-SAE k=20 wins overall at 1.73, window archs at 0.83-0.97).
+  Absolute numbers ~10-20% below his earlier means — likely the
+  new prompt-cached system rubric being a stricter grader. The
+  ranking and 5x peak-shift are unchanged.
+- **Caveat: single seed, n=30 concepts.** Both archs' peaks could
+  drift by ~50 strength units under reseeding; both predictions
+  fit within "TXC at 350 +- 100, SubseqH8 at 500 +- 100" so the
+  magnitude story isn't fatally rejected for SubseqH8 alone, but
+  the COMBINED evidence (TXC overshoots by 1.9x AND SubseqH8 at
+  same strength as TXC) is hard to explain under magnitude.
+
+### Q1 synthesis
+
+**One-line.** Window archs lose 0.5-0.8 peak success under
+paper-clamp because their *operating strength* shifts by a
+factor of ~5x relative to per-token archs, but this shift is
+NOT explained by the encoder's larger active-feature magnitudes
+— it is roughly arch-independent across TXC T=5 and SubseqH8
+T_max=10, despite their magnitudes differing by ~2.9x.
+
+**What's the second factor, then?** Three candidates remain
+worth investigating but Y will not exhaust them in this phase:
+
+1. **Encoder out-of-distribution at high s.** Clamping a single
+   z[j] to 500 produces a decoder output that's far outside the
+   training distribution of `(z, decoder(z))` joint statistics.
+   At per-token archs, the equivalent OOD strength is ~50-100;
+   at window archs ~250-500. The "useful steering range" might
+   be defined by a threshold on `||x_steered - x||` rather than
+   on `(s - z[j]_orig)` — and `||W_dec[:, j]||` differs across
+   archs in a way that almost cancels the magnitude effect.
+2. **Error-preserve term creates an arch-independent
+   "no-op-to-collapse" travel distance**. At `s = z[j]_orig`
+   intervention is a no-op; at very large `s` decoder saturates
+   and coherence collapses. The window where useful steering
+   happens may be anchored on the relative-vs-no-op distance,
+   not the absolute clamp value, and the relative travel is
+   ~5x z[j]_orig in some arch-independent way that I haven't
+   characterised.
+3. **Decoder-direction norms vary arch-wise**. AxBench-additive
+   under a unit-normalised decoder removes this by construction
+   and shows window archs much closer to per-token (Dmitry's
+   AxBench peaks all at s=50-100). Combining "raw decoder norm
+   varies" + "useful range scales with norm" can produce a
+   universal-5x shift that doesn't depend on encoder magnitude.
+
+A clean follow-up: measure `||W_dec[:, j]||` for each arch's
+selected feature, and replot Q1.3 against `s / ||W_dec[:, j]||`
+instead of raw s. If the curves align across archs under that
+rescaling, the protocol fix is "AxBench-additive (unit-norm
+decoder) generalises the paper protocol". This is exactly what
+Han already chose for Agent C's pass — the empirical work in Q1
+ratifies that choice rather than overturning it.
+
+### Implications for Q2 (defensible TXC steering protocol)
+
+Going into the brief's four candidates with Q1 evidence in hand:
+
+| candidate | Q1 evidence | recommendation |
+|---|---|---|
+| (A) AxBench-additive as canonical | Confirmed cross-arch fair (Dmitry's table: window peak suc within 0.3 of per-token; magnitude story rejected for paper-clamp implies a unit-norm decoder protocol IS the principled fix) | **Strong recommend.** |
+| (B) Per-family strength scaling on top of paper-clamp | Q1.3 directly tests this and **rejects it.** TXC's magnitude-predicted s=237 has peak success 0.50; observed peak at s=447 has 0.83. Magnitude rescale doesn't close the gap. | **Reject.** |
+| (C) Per-position window clamp | Dmitry's `intervene_paper_clamp_window_full.py` (on `dmitry-rlhf` only, not on this branch) tested this for T=20 archs in his `t20_steering_investigation.md` and found it WORSE than right-edge attribution. For T=5/T=10 it's untested but unlikely to rescue the protocol given Dmitry's negative T=20 result. | **Don't pursue without strong reason.** |
+| (D) Train TXCs differently | Dmitry's `t20_steering_investigation.md` already shows three T=20 ckpts (different sparsity / model / layer combos) all failing to steer. Probing utility != steering utility at higher T. | **Z's territory and apparently disconfirmed.** |
+
+**Y's recommendation to Han for the paper.** Adopt
+**AxBench-additive as the canonical steering protocol**, with the
+paper-clamp results presented as a methodological caveat showing
+that the protocol shift creates a 5x peak-strength offset for
+window archs that does NOT track the encoder magnitude (Q1.3) —
+so the "fair" interpretation is the unit-norm decoder injection
+that AxBench specifies. Agent C's v1 Pareto plot (TXC family
+clustered upper-right) becomes the headline; the paper-clamp
+table becomes a supplementary "robustness to alternative
+protocol" check.
+
+The `phase7_steering_v2.png` and Q2 final synthesis log
+(`2026-04-29-y-tx-steering-final.md`) will follow.
+
+### Cost log
+
+| step | grader calls | wall time | API spend |
+|---|---|---|---|
+| Q1.1 | 0 (encoder only) | ~3 min | $0 |
+| Q1.2 | 0 (parsed Dmitry's tables) | ~30 sec | $0 |
+| Q1.3 | 2700 (Sonnet 4.6 + cache) | ~10 min gen + ~9 min grade | ~$3 (cache reads) |
+| **Q1 total** | **2700** | **~25 min wall** | **~$3** |

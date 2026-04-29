@@ -68,11 +68,15 @@ def _decode_full_window(sae, src_class: str, z: torch.Tensor, T: int) -> torch.T
     raise AttributeError(f"no decode/decode_scale on {src_class}")
 
 
-def steer_for_arch(arch_id: str, *, force: bool = False, limit_concepts: int | None = None) -> None:
+def steer_for_arch(
+    arch_id: str, *, force: bool = False, limit_concepts: int | None = None,
+    strengths: tuple[int, ...] = PAPER_STRENGTHS,
+    out_subdir: str = PAPER_OUT_SUBDIR,
+) -> None:
     log_path = OUT_DIR / "training_logs" / f"{arch_id}__seed42.json"
     ckpt_path = OUT_DIR / "ckpts" / f"{arch_id}__seed42.pt"
     sel_path = CASE_STUDIES_DIR / "steering" / arch_id / "feature_selection.json"
-    out_path = CASE_STUDIES_DIR / PAPER_OUT_SUBDIR / arch_id / "generations.jsonl"
+    out_path = CASE_STUDIES_DIR / out_subdir / arch_id / "generations.jsonl"
 
     if not sel_path.exists():
         print(f"  [skip] {arch_id}: feature_selection.json missing under steering/")
@@ -115,7 +119,7 @@ def steer_for_arch(arch_id: str, *, force: bool = False, limit_concepts: int | N
     for p in subject.parameters():
         p.requires_grad_(False)
 
-    strengths = list(PAPER_STRENGTHS)
+    strengths = list(strengths)
     B = len(strengths)
     strengths_t = torch.tensor(strengths, dtype=sae_dtype, device=device)
 
@@ -224,11 +228,16 @@ def main() -> None:
     ])
     ap.add_argument("--force", action="store_true")
     ap.add_argument("--limit-concepts", type=int, default=None)
+    ap.add_argument("--strengths", nargs="+", type=int, default=list(PAPER_STRENGTHS),
+                    help="absolute z[j] clamp values; default = paper schedule.")
+    ap.add_argument("--out-subdir", default=PAPER_OUT_SUBDIR,
+                    help="results/case_studies/<this>/<arch>/generations.jsonl")
     args = ap.parse_args()
     banner(__file__)
     for arch_id in args.archs:
         print(f"\n=== {arch_id} (paper-protocol window-clamp) ===")
-        steer_for_arch(arch_id, force=args.force, limit_concepts=args.limit_concepts)
+        steer_for_arch(arch_id, force=args.force, limit_concepts=args.limit_concepts,
+                       strengths=tuple(args.strengths), out_subdir=args.out_subdir)
 
 
 if __name__ == "__main__":

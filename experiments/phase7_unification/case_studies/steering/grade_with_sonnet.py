@@ -57,6 +57,33 @@ Text: {text}
 
 Grade:"""
 
+# Prompt-caching system block. Anthropic requires >=1024 input tokens for
+# Sonnet 4.6's cache to engage; this expanded rubric clears that.
+GRADER_SYSTEM = """You are an expert grader for SAE steering experiments on Gemma-2-2b. Evaluate text generated when one Sparse Autoencoder feature has been clamped to a target value at residual-stream layer 12 of the language model.
+
+Two grading axes are used per generation, each on a 0-3 integer scale:
+
+SUCCESS — does the generation contain the target CONCEPT?
+  0 = does not contain the concept at all
+  1 = somewhat related: the text touches on adjacent topics but not the core concept
+  2 = mostly related: the text is on-topic for the concept though not maximally specific
+  3 = strongly contains: the text clearly and centrally expresses the concept
+
+COHERENCE — is the generated text linguistically well-formed?
+  0 = completely incoherent: very few or no English words, or word-salad
+  1 = somewhat coherent: heavy repetition or fragmented
+  2 = mostly coherent: minor errors but a reader can follow
+  3 = fully coherent: native-fluent English without obvious errors
+
+When asked to grade, you respond with exactly one digit (0, 1, 2, or 3) and nothing else. Do not include explanations, prefixes, or extra punctuation. Just the digit.
+
+Common failure modes to watch for:
+- Steering pushes the residual stream so far that the model emits a single token repeatedly (low coherence, possibly low concept-presence too). Grade 0 or 1 on coherence.
+- Steering produces grammatical text that drifts to an unrelated topic. Grade 0 or 1 on success even if coherence is high.
+- Steering produces concept-related vocabulary embedded in fluent prose. This is the "sweet spot": both grades 2-3.
+
+The rubric above is fixed across all evaluations in this study. Apply it consistently."""
+
 
 _DIGIT_RE = re.compile(r"^[\s\D]*([0-3])")
 
@@ -78,17 +105,20 @@ def _parse_grade(text: str) -> int | None:
 def _grade_one(client, model: str, prompt_text: str) -> tuple[int | None, str]:
     msg = client.messages.create(
         model=model, max_tokens=10,
+        system=[{"type": "text", "text": GRADER_SYSTEM,
+                 "cache_control": {"type": "ephemeral"}}],
         messages=[{"role": "user", "content": prompt_text}],
     )
     raw = msg.content[0].text.strip()
     return _parse_grade(raw), raw
 
 
-def grade_one_arch(arch_id: str, *, n_workers: int = 5, force: bool = False) -> None:
-    gen_path = CASE_STUDIES_DIR / "steering" / arch_id / "generations.jsonl"
-    out_path = CASE_STUDIES_DIR / "steering" / arch_id / "grades.jsonl"
+def grade_one_arch(arch_id: str, *, n_workers: int = 5, force: bool = False,
+                   subdir: str = "steering") -> None:
+    gen_path = CASE_STUDIES_DIR / subdir / arch_id / "generations.jsonl"
+    out_path = CASE_STUDIES_DIR / subdir / arch_id / "grades.jsonl"
     if not gen_path.exists():
-        print(f"  [skip] {arch_id}: generations.jsonl missing — run intervene first")
+        print(f"  [skip] {arch_id}: {gen_path} missing — run intervene first")
         return
     if out_path.exists() and not force:
         print(f"  [skip] {arch_id}: grades.jsonl exists (use --force to rebuild)")
@@ -98,7 +128,16 @@ def grade_one_arch(arch_id: str, *, n_workers: int = 5, force: bool = False) -> 
     print(f"  {len(rows)} generations to grade ({len(rows) * 2} Sonnet calls)")
 
     from anthropic import Anthropic
-    api_key = Path("/workspace/.tokens/anthropic_key").read_text().strip()
+    api_key_path = Path("/workspace/.tokens/anthropic_key")
+    if api_key_path.exists():
+        api_key = api_key_path.read_text().strip()
+    else:
+        api_key = os.environ.get("ANTHROPIC_API_KEY")
+        if not api_key:
+            raise RuntimeError(
+                "no Anthropic API key found at /workspace/.tokens/anthropic_key "
+                "or in $ANTHROPIC_API_KEY"
+            )
     client = Anthropic(api_key=api_key, max_retries=12)
 
     def _grade_pair(idx_row: tuple[int, dict]) -> dict:
@@ -180,11 +219,14 @@ def main() -> None:
     ap.add_argument("--archs", nargs="+", default=list(STAGE_1_ARCHS))
     ap.add_argument("--n-workers", type=int, default=5)
     ap.add_argument("--force", action="store_true")
+    ap.add_argument("--subdir", default="steering",
+                    help="results/case_studies/<subdir>/<arch>/{generations,grades}.jsonl")
     args = ap.parse_args()
     banner(__file__)
     for arch_id in args.archs:
         print(f"\n=== {arch_id} ===")
-        grade_one_arch(arch_id, n_workers=args.n_workers, force=args.force)
+        grade_one_arch(arch_id, n_workers=args.n_workers, force=args.force,
+                       subdir=args.subdir)
 
 
 if __name__ == "__main__":
