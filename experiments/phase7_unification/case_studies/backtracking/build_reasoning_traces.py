@@ -113,9 +113,15 @@ def main() -> None:
     with TRACES_PATH.open("w") as f:
         for i, p in enumerate(prompts):
             messages = [{"role": "user", "content": p["text"]}]
-            input_ids = tokenizer.apply_chat_template(
+            encoded = tokenizer.apply_chat_template(
                 messages, return_tensors="pt", add_generation_prompt=True
-            ).to(device)
+            )
+            # transformers >=5 returns a BatchEncoding (dict-like) by default;
+            # earlier versions returned a bare tensor. Handle both.
+            if isinstance(encoded, torch.Tensor):
+                input_ids = encoded.to(device)
+            else:
+                input_ids = encoded["input_ids"].to(device)
             input_len = int(input_ids.shape[1])
 
             with torch.no_grad():

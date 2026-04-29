@@ -178,9 +178,13 @@ def main() -> None:
     with out_path.open("w") as fout:
         for p in prompts:
             messages = [{"role": "user", "content": p["text"]}]
-            input_ids = tokenizer.apply_chat_template(
+            encoded = tokenizer.apply_chat_template(
                 messages, return_tensors="pt", add_generation_prompt=True
-            ).to(device)
+            )
+            if isinstance(encoded, torch.Tensor):
+                input_ids = encoded.to(device)
+            else:
+                input_ids = encoded["input_ids"].to(device)
 
             # ----- A. raw DoM baseline -----
             if "raw_dom" in args.modes:
