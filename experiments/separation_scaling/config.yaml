@@ -1,0 +1,173 @@
+experiment_name: separation_scaling
+description: |
+  How do SAE/crosscoder-family architectures scale as we grow the generator's
+  temporal-structure demand τ(δ)?  Same transformer setup as separation_sweep
+  v1 (σ=1e-3, d_model=64, ctx=128, 20k steps) but benchmarks 7 architectures:
+  original TopK / TXC / MatTXC / MLxC plus Han's TFA (Temporal Feature Analysis),
+  TFA-pos (TFA with sinusoidal positional encoding), and the existing
+  Temporal BatchTopK SAE. Driven by src/sae_day/run_driver.py reading this YAML.
+
+  Sweep component-separation δ at r=0 (shared mess3 vocab, no tag tokens):
+      params(δ) = [(0.25 - δ, 0.6 + δ), (0.25, 0.6), (0.25 + δ, 0.6 - δ)]
+
+  Transformer cfg matches v1 (σ=1e-3, d_model=64, ctx=128, 20k steps). When
+  transformer.pt is present in a cell dir it's loaded; otherwise trained once
+  and saved alongside training_params.json.
+
+seed: 42
+
+generator:
+  type: mess3_shared
+  sweep:
+    parameter: delta
+    values: [0.0, 0.05, 0.1, 0.15, 0.2]
+  fixed_params:
+    base_x: 0.25
+    base_a: 0.6
+    parameterization: symmetric_line
+
+transformer:
+  n_layers: 3
+  d_model: 64
+  n_heads: 2
+  d_head: 32
+  d_mlp: 256
+  n_ctx: 128
+  act_fn: gelu
+  normalization_type: LN
+  attention_dir: causal
+  default_prepend_bos: false
+  init_mode: gpt2
+  initializer_range: 1.0e-3
+  probe_layer: 1
+  probe_hook_name: blocks.1.hook_resid_post
+  extract_batch_size: 16
+  load_if_exists: true
+  training:
+    steps: 20000
+    batch_size: 128
+    lr: 1.0e-3
+    data_chunks: 4
+    data_chunk_size: 5000
+
+architectures:
+  - name: "TopK SAE"
+    family: topk
+    kwargs:
+      dict_size: 64
+      k: 4
+      sae_steps: 2000
+      n_sequences: 1000
+      seq_len: 128
+
+  - name: "TXC"
+    family: txc
+    kwargs:
+      dict_size: 64
+      k: 1
+      window_size: 30
+      temporal_steps: 3000
+      n_sequences: 1000
+      seq_len: 128
+
+  - name: "MatryoshkaTXC"
+    family: mattxc
+    kwargs:
+      dict_size: 128
+      matryoshka_widths: [8, 16, 32, 64, 128]
+      k: 1
+      fixed_k_total: 10
+      inner_weight: 10.0
+      window_size: 60
+      temporal_steps: 1500
+      n_sequences: 400
+      seq_len: 128
+
+  - name: "MultiLayerCrosscoder"
+    family: mlxc
+    kwargs:
+      dict_size: 64
+      k: 4
+      temporal_steps: 2000
+      n_sequences: 1000
+      seq_len: 128
+
+  - name: "TFA"
+    family: tfa
+    kwargs:
+      dict_size: 128
+      k: 10
+      sae_diff_type: topk
+      n_heads: 4
+      n_attn_layers: 1
+      bottleneck_factor: 1
+      tied_weights: true
+      use_pos_encoding: false
+      tfa_steps: 3000
+      batch_size: 64
+      lr: 1.0e-3
+      min_lr: 9.0e-4
+      weight_decay: 1.0e-4
+      warmup_steps: 200
+      n_sequences: 1000
+      seq_len: 128
+
+  - name: "TFA-pos"
+    family: tfa
+    kwargs:
+      dict_size: 128
+      k: 10
+      sae_diff_type: topk
+      n_heads: 4
+      n_attn_layers: 1
+      bottleneck_factor: 1
+      tied_weights: true
+      use_pos_encoding: true
+      tfa_steps: 3000
+      batch_size: 64
+      lr: 1.0e-3
+      min_lr: 9.0e-4
+      weight_decay: 1.0e-4
+      warmup_steps: 200
+      n_sequences: 1000
+      seq_len: 128
+
+  - name: "Temporal BatchTopK SAE"
+    family: tsae
+    kwargs:
+      dict_size: 128
+      k: 10
+      group_fractions: [0.5, 0.5]
+      group_weights: [0.5, 0.5]
+      temporal_alpha: 0.1
+      temporal: true
+      temporal_steps: 2000
+      lr: 3.0e-4
+      n_sequences: 1000
+      seq_len: 128
+
+probes:
+  dense_linear: {enabled: true}
+  dense_mlp:
+    enabled: true
+    hidden: 64
+    epochs: 200
+    early_stop_patience: 10
+    lr: 1.0e-3
+    weight_decay: 1.0e-3
+
+probe_dataset:
+  train_sequences: 1000
+  eval_sequences: 500
+  train_seed: 10042
+  eval_seed: 20042
+
+output_root: results
+
+reproduce: |
+  # From the temp_xc repo root:
+  cd experiments/separation_scaling
+  PYTHONPATH="vendor/src:vendor/experiments/standard_hmm:vendor/experiments/transformer_standard_hmm:vendor/experiments/transformer_nonergodic" \
+      uv run python -m sae_day.run_driver --config config.yaml
+  PYTHONPATH="vendor/src:vendor/experiments/standard_hmm:vendor/experiments/transformer_standard_hmm" \
+      uv run python plot_separation_scaling.py

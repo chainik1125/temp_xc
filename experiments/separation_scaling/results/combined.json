@@ -1,0 +1,1408 @@
+{
+  "experiment_name": "separation_sweep_v2",
+  "sweep_parameter": "delta",
+  "sweep_values": [
+    0.0,
+    0.05,
+    0.1,
+    0.15,
+    0.2
+  ],
+  "cells": {
+    "0.0": {
+      "sweep_parameter": "delta",
+      "sweep_value": 0.0,
+      "generator_params": [
+        [
+          "component_type",
+          "process_name",
+          "process_params"
+        ],
+        [
+          "component_type",
+          "process_name",
+          "process_params"
+        ],
+        [
+          "component_type",
+          "process_name",
+          "process_params"
+        ]
+      ],
+      "transformer": {
+        "final_loss": 1.0890229940414429,
+        "was_loaded": false,
+        "eval_resid_l2_mean": 38.38037109375,
+        "config": {
+          "n_layers": 3,
+          "d_model": 64,
+          "n_heads": 2,
+          "d_head": 32,
+          "d_mlp": 256,
+          "n_ctx": 128,
+          "act_fn": "gelu",
+          "normalization_type": "LN",
+          "attention_dir": "causal",
+          "default_prepend_bos": false,
+          "init_mode": "gpt2",
+          "initializer_range": 0.001,
+          "probe_layer": 1,
+          "probe_hook_name": "blocks.1.hook_resid_post",
+          "extract_batch_size": 16,
+          "load_if_exists": true,
+          "training": {
+            "steps": 20000,
+            "batch_size": 128,
+            "lr": 0.001,
+            "data_chunks": 4,
+            "data_chunk_size": 5000
+          }
+        }
+      },
+      "dense_linear": {
+        "per_component_r2": [
+          -0.026634721414493967,
+          -0.007342983362592204,
+          -0.01189600075679853
+        ],
+        "mean_r2": -0.015291235177961568
+      },
+      "dense_mlp": {
+        "per_component_r2": [
+          -0.04683887958526611,
+          -0.024134039878845215,
+          -0.020864486694335938
+        ],
+        "mean_r2": -0.030612468719482422,
+        "hidden": 64,
+        "epochs_trained": 36,
+        "early_stop_patience": 10,
+        "best_val_mse": 0.22350706160068512
+      },
+      "architectures": {
+        "TopK SAE": {
+          "best_single_r2": 7.587328424385476e-05,
+          "per_component_best_r2": [
+            7.587328424385476e-05,
+            -0.0007610646555846756,
+            -0.0012967843474369634
+          ],
+          "linear_mean_r2": -0.008526081600365313,
+          "linear_per_component_r2": [
+            -0.015027541634204278,
+            -0.004778207349184216,
+            -0.005772495817707446
+          ],
+          "sae_final_loss": 235.31842041015625,
+          "family": "topk",
+          "config": {
+            "dict_size": 64,
+            "k": 4,
+            "sae_steps": 2000,
+            "n_sequences": 1000,
+            "seq_len": 128
+          }
+        },
+        "TXC": {
+          "best_single_r2": 0.0006586465823639198,
+          "per_component_best_r2": [
+            0.0006586465823639198,
+            -0.0006991646719078926,
+            -0.0015989246001664181
+          ],
+          "linear_mean_r2": -0.02113384766339932,
+          "linear_per_component_r2": [
+            -0.03854018982841323,
+            -0.014818346826222184,
+            -0.010043006335562543
+          ],
+          "sae_final_loss": 675.388427734375,
+          "family": "txc",
+          "config": {
+            "dict_size": 64,
+            "k": 1,
+            "window_size": 30,
+            "temporal_steps": 3000,
+            "n_sequences": 1000,
+            "seq_len": 128
+          }
+        },
+        "MatryoshkaTXC": {
+          "best_single_r2": 0.0006664280630136465,
+          "per_component_best_r2": [
+            0.0006664280630136465,
+            -0.015077543160132212,
+            -0.016534779494310925
+          ],
+          "linear_mean_r2": -0.027050227350175076,
+          "linear_per_component_r2": [
+            -0.03938803243382205,
+            -0.02576581803783551,
+            -0.015996831578867665
+          ],
+          "sae_final_loss": 1332.51904296875,
+          "family": "mattxc",
+          "config": {
+            "dict_size": 128,
+            "matryoshka_widths": [
+              8,
+              16,
+              32,
+              64,
+              128
+            ],
+            "k": 1,
+            "fixed_k_total": 10,
+            "inner_weight": 10.0,
+            "window_size": 60,
+            "temporal_steps": 1500,
+            "n_sequences": 400,
+            "seq_len": 128
+          }
+        },
+        "MultiLayerCrosscoder": {
+          "best_single_r2": 0.00011681218041459385,
+          "per_component_best_r2": [
+            0.00011681218041459385,
+            6.3103074475767684e-06,
+            -0.0015574684468595557
+          ],
+          "linear_mean_r2": -0.011728417298581947,
+          "linear_per_component_r2": [
+            -0.019650429977580597,
+            -0.006116696832043855,
+            -0.009418125086121387
+          ],
+          "sae_final_loss": 180.15939331054688,
+          "family": "mlxc",
+          "config": {
+            "dict_size": 64,
+            "k": 4,
+            "temporal_steps": 2000,
+            "n_sequences": 1000,
+            "seq_len": 128
+          }
+        },
+        "TFA": {
+          "best_single_r2": 0.00013857476783774025,
+          "per_component_best_r2": [
+            0.00013857476783774025,
+            -0.000732211202378874,
+            -0.001629437153623181
+          ],
+          "linear_mean_r2": -0.019423520204409146,
+          "linear_per_component_r2": [
+            -0.030796469286401562,
+            -0.008976628764948869,
+            -0.01849746256187701
+          ],
+          "sae_final_loss": 4.654078960418701,
+          "family": "tfa",
+          "config": {
+            "dict_size": 128,
+            "k": 10,
+            "sae_diff_type": "topk",
+            "n_heads": 4,
+            "n_attn_layers": 1,
+            "bottleneck_factor": 1,
+            "tied_weights": true,
+            "use_pos_encoding": false,
+            "tfa_steps": 3000,
+            "batch_size": 64,
+            "lr": 0.001,
+            "min_lr": 0.0009,
+            "weight_decay": 0.0001,
+            "warmup_steps": 200,
+            "n_sequences": 1000,
+            "seq_len": 128
+          }
+        },
+        "TFA-pos": {
+          "best_single_r2": 0.00010574437368582323,
+          "per_component_best_r2": [
+            0.00010574437368582323,
+            -0.0007915802587952214,
+            -0.001268254484219078
+          ],
+          "linear_mean_r2": -0.026251714123574892,
+          "linear_per_component_r2": [
+            -0.03882937748679427,
+            -0.014426181570656782,
+            -0.02549958331327362
+          ],
+          "sae_final_loss": 4.639657020568848,
+          "family": "tfa",
+          "config": {
+            "dict_size": 128,
+            "k": 10,
+            "sae_diff_type": "topk",
+            "n_heads": 4,
+            "n_attn_layers": 1,
+            "bottleneck_factor": 1,
+            "tied_weights": true,
+            "use_pos_encoding": true,
+            "tfa_steps": 3000,
+            "batch_size": 64,
+            "lr": 0.001,
+            "min_lr": 0.0009,
+            "weight_decay": 0.0001,
+            "warmup_steps": 200,
+            "n_sequences": 1000,
+            "seq_len": 128
+          }
+        },
+        "Temporal BatchTopK SAE": {
+          "best_single_r2": 1.923414577398308e-05,
+          "per_component_best_r2": [
+            1.923414577398308e-05,
+            -0.0006245869147438743,
+            -0.0014900749085620113
+          ],
+          "linear_mean_r2": -0.015321289866777166,
+          "linear_per_component_r2": [
+            -0.026237420033702108,
+            -0.0077074121588782685,
+            -0.01201903740775112
+          ],
+          "sae_final_loss": 66.35139465332031,
+          "family": "tsae",
+          "config": {
+            "dict_size": 128,
+            "k": 10,
+            "group_fractions": [
+              0.5,
+              0.5
+            ],
+            "group_weights": [
+              0.5,
+              0.5
+            ],
+            "temporal_alpha": 0.1,
+            "temporal": true,
+            "temporal_steps": 2000,
+            "lr": 0.0003,
+            "n_sequences": 1000,
+            "seq_len": 128
+          }
+        }
+      },
+      "cell_elapsed_sec": 1203.13613820076
+    },
+    "0.05": {
+      "sweep_parameter": "delta",
+      "sweep_value": 0.05,
+      "generator_params": [
+        [
+          "component_type",
+          "process_name",
+          "process_params"
+        ],
+        [
+          "component_type",
+          "process_name",
+          "process_params"
+        ],
+        [
+          "component_type",
+          "process_name",
+          "process_params"
+        ]
+      ],
+      "transformer": {
+        "final_loss": 1.088614821434021,
+        "was_loaded": false,
+        "eval_resid_l2_mean": 41.24047088623047,
+        "config": {
+          "n_layers": 3,
+          "d_model": 64,
+          "n_heads": 2,
+          "d_head": 32,
+          "d_mlp": 256,
+          "n_ctx": 128,
+          "act_fn": "gelu",
+          "normalization_type": "LN",
+          "attention_dir": "causal",
+          "default_prepend_bos": false,
+          "init_mode": "gpt2",
+          "initializer_range": 0.001,
+          "probe_layer": 1,
+          "probe_hook_name": "blocks.1.hook_resid_post",
+          "extract_batch_size": 16,
+          "load_if_exists": true,
+          "training": {
+            "steps": 20000,
+            "batch_size": 128,
+            "lr": 0.001,
+            "data_chunks": 4,
+            "data_chunk_size": 5000
+          }
+        }
+      },
+      "dense_linear": {
+        "per_component_r2": [
+          -0.008664504087156688,
+          -0.006279741180950982,
+          -0.0070218802605583885
+        ],
+        "mean_r2": -0.007322041842888686
+      },
+      "dense_mlp": {
+        "per_component_r2": [
+          -0.018770813941955566,
+          -0.02207052707672119,
+          -0.012182354927062988
+        ],
+        "mean_r2": -0.017674565315246582,
+        "hidden": 64,
+        "epochs_trained": 50,
+        "early_stop_patience": 10,
+        "best_val_mse": 0.22202081978321075
+      },
+      "architectures": {
+        "TopK SAE": {
+          "best_single_r2": 0.0006659224305423095,
+          "per_component_best_r2": [
+            0.0006659224305423095,
+            -0.0007408123797678634,
+            -0.0015014946272036145
+          ],
+          "linear_mean_r2": -0.002196920739529077,
+          "linear_per_component_r2": [
+            -0.001771296325213001,
+            -0.0020290725925444786,
+            -0.002790393300829752
+          ],
+          "sae_final_loss": 237.4261474609375,
+          "family": "topk",
+          "config": {
+            "dict_size": 64,
+            "k": 4,
+            "sae_steps": 2000,
+            "n_sequences": 1000,
+            "seq_len": 128
+          }
+        },
+        "TXC": {
+          "best_single_r2": 0.0010822143835428344,
+          "per_component_best_r2": [
+            0.0010822143835428344,
+            -0.0008148092904520787,
+            -0.000607756409431337
+          ],
+          "linear_mean_r2": -0.001823991631725271,
+          "linear_per_component_r2": [
+            0.0015334004428572134,
+            -0.005592554009901773,
+            -0.001412821328131253
+          ],
+          "sae_final_loss": 654.608154296875,
+          "family": "txc",
+          "config": {
+            "dict_size": 64,
+            "k": 1,
+            "window_size": 30,
+            "temporal_steps": 3000,
+            "n_sequences": 1000,
+            "seq_len": 128
+          }
+        },
+        "MatryoshkaTXC": {
+          "best_single_r2": 0.0002491672205751083,
+          "per_component_best_r2": [
+            0.0002491672205751083,
+            -0.01664371131832154,
+            -0.020160349677059708
+          ],
+          "linear_mean_r2": -0.033379430062538885,
+          "linear_per_component_r2": [
+            -0.029860612633215045,
+            -0.026557929790946178,
+            -0.04371974776345544
+          ],
+          "sae_final_loss": 1513.3070068359375,
+          "family": "mattxc",
+          "config": {
+            "dict_size": 128,
+            "matryoshka_widths": [
+              8,
+              16,
+              32,
+              64,
+              128
+            ],
+            "k": 1,
+            "fixed_k_total": 10,
+            "inner_weight": 10.0,
+            "window_size": 60,
+            "temporal_steps": 1500,
+            "n_sequences": 400,
+            "seq_len": 128
+          }
+        },
+        "MultiLayerCrosscoder": {
+          "best_single_r2": 0.0006014498009843106,
+          "per_component_best_r2": [
+            0.0006014498009843106,
+            -0.0008086111940359686,
+            -0.0012127659789924472
+          ],
+          "linear_mean_r2": -0.003909912622880614,
+          "linear_per_component_r2": [
+            -0.003883092190294146,
+            -0.0032701465562186005,
+            -0.004576499122129096
+          ],
+          "sae_final_loss": 192.6685791015625,
+          "family": "mlxc",
+          "config": {
+            "dict_size": 64,
+            "k": 4,
+            "temporal_steps": 2000,
+            "n_sequences": 1000,
+            "seq_len": 128
+          }
+        },
+        "TFA": {
+          "best_single_r2": 0.0013296350125743261,
+          "per_component_best_r2": [
+            0.0013296350125743261,
+            -0.0007402177740165605,
+            -0.0010737658138206818
+          ],
+          "linear_mean_r2": -0.006756232312727188,
+          "linear_per_component_r2": [
+            -0.008733534042030033,
+            -0.004394713641522996,
+            -0.007140449254628534
+          ],
+          "sae_final_loss": 3.4235544204711914,
+          "family": "tfa",
+          "config": {
+            "dict_size": 128,
+            "k": 10,
+            "sae_diff_type": "topk",
+            "n_heads": 4,
+            "n_attn_layers": 1,
+            "bottleneck_factor": 1,
+            "tied_weights": true,
+            "use_pos_encoding": false,
+            "tfa_steps": 3000,
+            "batch_size": 64,
+            "lr": 0.001,
+            "min_lr": 0.0009,
+            "weight_decay": 0.0001,
+            "warmup_steps": 200,
+            "n_sequences": 1000,
+            "seq_len": 128
+          }
+        },
+        "TFA-pos": {
+          "best_single_r2": 0.0015117214656388267,
+          "per_component_best_r2": [
+            0.0015117214656388267,
+            -0.0005622579483879342,
+            -0.0005548811110005492
+          ],
+          "linear_mean_r2": -0.012004605160793824,
+          "linear_per_component_r2": [
+            -0.012330031371117878,
+            -0.010067718958488348,
+            -0.013616065152775247
+          ],
+          "sae_final_loss": 3.3525848388671875,
+          "family": "tfa",
+          "config": {
+            "dict_size": 128,
+            "k": 10,
+            "sae_diff_type": "topk",
+            "n_heads": 4,
+            "n_attn_layers": 1,
+            "bottleneck_factor": 1,
+            "tied_weights": true,
+            "use_pos_encoding": true,
+            "tfa_steps": 3000,
+            "batch_size": 64,
+            "lr": 0.001,
+            "min_lr": 0.0009,
+            "weight_decay": 0.0001,
+            "warmup_steps": 200,
+            "n_sequences": 1000,
+            "seq_len": 128
+          }
+        },
+        "Temporal BatchTopK SAE": {
+          "best_single_r2": 0.0010330936979952021,
+          "per_component_best_r2": [
+            0.0010330936979952021,
+            -0.0007841408277777795,
+            -0.00107205711275693
+          ],
+          "linear_mean_r2": -0.004203961617865663,
+          "linear_per_component_r2": [
+            -0.00432556528969541,
+            -0.004463976991475382,
+            -0.003822342572426196
+          ],
+          "sae_final_loss": 63.13616180419922,
+          "family": "tsae",
+          "config": {
+            "dict_size": 128,
+            "k": 10,
+            "group_fractions": [
+              0.5,
+              0.5
+            ],
+            "group_weights": [
+              0.5,
+              0.5
+            ],
+            "temporal_alpha": 0.1,
+            "temporal": true,
+            "temporal_steps": 2000,
+            "lr": 0.0003,
+            "n_sequences": 1000,
+            "seq_len": 128
+          }
+        }
+      },
+      "cell_elapsed_sec": 1209.8778097629547
+    },
+    "0.1": {
+      "sweep_parameter": "delta",
+      "sweep_value": 0.1,
+      "generator_params": [
+        [
+          "component_type",
+          "process_name",
+          "process_params"
+        ],
+        [
+          "component_type",
+          "process_name",
+          "process_params"
+        ],
+        [
+          "component_type",
+          "process_name",
+          "process_params"
+        ]
+      ],
+      "transformer": {
+        "final_loss": 1.0813961029052734,
+        "was_loaded": false,
+        "eval_resid_l2_mean": 27.175382614135742,
+        "config": {
+          "n_layers": 3,
+          "d_model": 64,
+          "n_heads": 2,
+          "d_head": 32,
+          "d_mlp": 256,
+          "n_ctx": 128,
+          "act_fn": "gelu",
+          "normalization_type": "LN",
+          "attention_dir": "causal",
+          "default_prepend_bos": false,
+          "init_mode": "gpt2",
+          "initializer_range": 0.001,
+          "probe_layer": 1,
+          "probe_hook_name": "blocks.1.hook_resid_post",
+          "extract_batch_size": 16,
+          "load_if_exists": true,
+          "training": {
+            "steps": 20000,
+            "batch_size": 128,
+            "lr": 0.001,
+            "data_chunks": 4,
+            "data_chunk_size": 5000
+          }
+        }
+      },
+      "dense_linear": {
+        "per_component_r2": [
+          0.05750042577665526,
+          0.0027949654133589963,
+          0.018615940024524158
+        ],
+        "mean_r2": 0.026303777071512807
+      },
+      "dense_mlp": {
+        "per_component_r2": [
+          0.09981876611709595,
+          -0.0036003589630126953,
+          0.029043853282928467
+        ],
+        "mean_r2": 0.04175408557057381,
+        "hidden": 64,
+        "epochs_trained": 36,
+        "early_stop_patience": 10,
+        "best_val_mse": 0.20954133570194244
+      },
+      "architectures": {
+        "TopK SAE": {
+          "best_single_r2": 0.005923208413974201,
+          "per_component_best_r2": [
+            0.005923208413974201,
+            0.00018213114356124827,
+            0.0010054784167351505
+          ],
+          "linear_mean_r2": 0.016035883244500043,
+          "linear_per_component_r2": [
+            0.03392003526581122,
+            0.0020577712333951226,
+            0.01212984323429378
+          ],
+          "sae_final_loss": 144.69964599609375,
+          "family": "topk",
+          "config": {
+            "dict_size": 64,
+            "k": 4,
+            "sae_steps": 2000,
+            "n_sequences": 1000,
+            "seq_len": 128
+          }
+        },
+        "TXC": {
+          "best_single_r2": 0.06327501655100354,
+          "per_component_best_r2": [
+            0.06327501655100354,
+            0.01224895576396523,
+            0.013741511390578331
+          ],
+          "linear_mean_r2": 0.04656733374340094,
+          "linear_per_component_r2": [
+            0.09621113727394981,
+            0.01538919986781706,
+            0.02810166408843595
+          ],
+          "sae_final_loss": 321.9689025878906,
+          "family": "txc",
+          "config": {
+            "dict_size": 64,
+            "k": 1,
+            "window_size": 30,
+            "temporal_steps": 3000,
+            "n_sequences": 1000,
+            "seq_len": 128
+          }
+        },
+        "MatryoshkaTXC": {
+          "best_single_r2": 0.025484053776895443,
+          "per_component_best_r2": [
+            0.025484053776895443,
+            -0.010875348579755473,
+            -0.01539155324396213
+          ],
+          "linear_mean_r2": 0.03884385655950403,
+          "linear_per_component_r2": [
+            0.11125451822448373,
+            0.0018171784789915435,
+            0.003459872975036804
+          ],
+          "sae_final_loss": 611.8040771484375,
+          "family": "mattxc",
+          "config": {
+            "dict_size": 128,
+            "matryoshka_widths": [
+              8,
+              16,
+              32,
+              64,
+              128
+            ],
+            "k": 1,
+            "fixed_k_total": 10,
+            "inner_weight": 10.0,
+            "window_size": 60,
+            "temporal_steps": 1500,
+            "n_sequences": 400,
+            "seq_len": 128
+          }
+        },
+        "MultiLayerCrosscoder": {
+          "best_single_r2": 0.04355792680912529,
+          "per_component_best_r2": [
+            0.04355792680912529,
+            0.004581074603367097,
+            0.01742606022714943
+          ],
+          "linear_mean_r2": 0.06089764877334621,
+          "linear_per_component_r2": [
+            0.12075967129975218,
+            0.01137143736457824,
+            0.05056183765570821
+          ],
+          "sae_final_loss": 145.6425018310547,
+          "family": "mlxc",
+          "config": {
+            "dict_size": 64,
+            "k": 4,
+            "temporal_steps": 2000,
+            "n_sequences": 1000,
+            "seq_len": 128
+          }
+        },
+        "TFA": {
+          "best_single_r2": 0.003998917967258042,
+          "per_component_best_r2": [
+            0.003998917967258042,
+            0.00018222380895560608,
+            -0.00047010189189578
+          ],
+          "linear_mean_r2": 0.04360598521596615,
+          "linear_per_component_r2": [
+            0.087080492067098,
+            0.015339764939973022,
+            0.028397698640827418
+          ],
+          "sae_final_loss": 5.596134185791016,
+          "family": "tfa",
+          "config": {
+            "dict_size": 128,
+            "k": 10,
+            "sae_diff_type": "topk",
+            "n_heads": 4,
+            "n_attn_layers": 1,
+            "bottleneck_factor": 1,
+            "tied_weights": true,
+            "use_pos_encoding": false,
+            "tfa_steps": 3000,
+            "batch_size": 64,
+            "lr": 0.001,
+            "min_lr": 0.0009,
+            "weight_decay": 0.0001,
+            "warmup_steps": 200,
+            "n_sequences": 1000,
+            "seq_len": 128
+          }
+        },
+        "TFA-pos": {
+          "best_single_r2": 0.004305300907659126,
+          "per_component_best_r2": [
+            0.004305300907659126,
+            0.0009063622140964567,
+            9.480432806285854e-05
+          ],
+          "linear_mean_r2": 0.03279127260796063,
+          "linear_per_component_r2": [
+            0.06916350447963682,
+            0.0016959406820842293,
+            0.027514372662160835
+          ],
+          "sae_final_loss": 5.619158744812012,
+          "family": "tfa",
+          "config": {
+            "dict_size": 128,
+            "k": 10,
+            "sae_diff_type": "topk",
+            "n_heads": 4,
+            "n_attn_layers": 1,
+            "bottleneck_factor": 1,
+            "tied_weights": true,
+            "use_pos_encoding": true,
+            "tfa_steps": 3000,
+            "batch_size": 64,
+            "lr": 0.001,
+            "min_lr": 0.0009,
+            "weight_decay": 0.0001,
+            "warmup_steps": 200,
+            "n_sequences": 1000,
+            "seq_len": 128
+          }
+        },
+        "Temporal BatchTopK SAE": {
+          "best_single_r2": 0.01476643438579095,
+          "per_component_best_r2": [
+            0.01476643438579095,
+            0.0012370583176026795,
+            0.003870731778239489
+          ],
+          "linear_mean_r2": 0.02739765675309258,
+          "linear_per_component_r2": [
+            0.05798283159464268,
+            0.003498056147789863,
+            0.0207120825168452
+          ],
+          "sae_final_loss": 40.490699768066406,
+          "family": "tsae",
+          "config": {
+            "dict_size": 128,
+            "k": 10,
+            "group_fractions": [
+              0.5,
+              0.5
+            ],
+            "group_weights": [
+              0.5,
+              0.5
+            ],
+            "temporal_alpha": 0.1,
+            "temporal": true,
+            "temporal_steps": 2000,
+            "lr": 0.0003,
+            "n_sequences": 1000,
+            "seq_len": 128
+          }
+        }
+      },
+      "cell_elapsed_sec": 1179.4959671497345
+    },
+    "0.15": {
+      "sweep_parameter": "delta",
+      "sweep_value": 0.15,
+      "generator_params": [
+        [
+          "component_type",
+          "process_name",
+          "process_params"
+        ],
+        [
+          "component_type",
+          "process_name",
+          "process_params"
+        ],
+        [
+          "component_type",
+          "process_name",
+          "process_params"
+        ]
+      ],
+      "transformer": {
+        "final_loss": 1.0636932849884033,
+        "was_loaded": false,
+        "eval_resid_l2_mean": 14.750517845153809,
+        "config": {
+          "n_layers": 3,
+          "d_model": 64,
+          "n_heads": 2,
+          "d_head": 32,
+          "d_mlp": 256,
+          "n_ctx": 128,
+          "act_fn": "gelu",
+          "normalization_type": "LN",
+          "attention_dir": "causal",
+          "default_prepend_bos": false,
+          "init_mode": "gpt2",
+          "initializer_range": 0.001,
+          "probe_layer": 1,
+          "probe_hook_name": "blocks.1.hook_resid_post",
+          "extract_batch_size": 16,
+          "load_if_exists": true,
+          "training": {
+            "steps": 20000,
+            "batch_size": 128,
+            "lr": 0.001,
+            "data_chunks": 4,
+            "data_chunk_size": 5000
+          }
+        }
+      },
+      "dense_linear": {
+        "per_component_r2": [
+          0.5240228074793146,
+          0.11559993761629961,
+          0.14310126110021704
+        ],
+        "mean_r2": 0.2609080020652771
+      },
+      "dense_mlp": {
+        "per_component_r2": [
+          0.6526373028755188,
+          0.134121835231781,
+          0.15956419706344604
+        ],
+        "mean_r2": 0.3154411017894745,
+        "hidden": 64,
+        "epochs_trained": 51,
+        "early_stop_patience": 10,
+        "best_val_mse": 0.1565805971622467
+      },
+      "architectures": {
+        "TopK SAE": {
+          "best_single_r2": 0.09526166149563775,
+          "per_component_best_r2": [
+            0.09526166149563775,
+            0.026895798682811,
+            0.026887423561758217
+          ],
+          "linear_mean_r2": 0.24510205904128335,
+          "linear_per_component_r2": [
+            0.4885563794832136,
+            0.10919355771606032,
+            0.1375562399245761
+          ],
+          "sae_final_loss": 60.304649353027344,
+          "family": "topk",
+          "config": {
+            "dict_size": 64,
+            "k": 4,
+            "sae_steps": 2000,
+            "n_sequences": 1000,
+            "seq_len": 128
+          }
+        },
+        "TXC": {
+          "best_single_r2": 0.48810437776167204,
+          "per_component_best_r2": [
+            0.48810437776167204,
+            0.12395528376420595,
+            0.1206770454839724
+          ],
+          "linear_mean_r2": 0.35636103819599446,
+          "linear_per_component_r2": [
+            0.7116882665550475,
+            0.15789080674600176,
+            0.1995040412869341
+          ],
+          "sae_final_loss": 111.37785339355469,
+          "family": "txc",
+          "config": {
+            "dict_size": 64,
+            "k": 1,
+            "window_size": 30,
+            "temporal_steps": 3000,
+            "n_sequences": 1000,
+            "seq_len": 128
+          }
+        },
+        "MatryoshkaTXC": {
+          "best_single_r2": 0.5516564557231269,
+          "per_component_best_r2": [
+            0.5516564557231269,
+            0.09152184761497173,
+            0.1471288483826474
+          ],
+          "linear_mean_r2": 0.3501082451862912,
+          "linear_per_component_r2": [
+            0.7334297713859017,
+            0.1254514683676341,
+            0.19144349580533782
+          ],
+          "sae_final_loss": 145.79151916503906,
+          "family": "mattxc",
+          "config": {
+            "dict_size": 128,
+            "matryoshka_widths": [
+              8,
+              16,
+              32,
+              64,
+              128
+            ],
+            "k": 1,
+            "fixed_k_total": 10,
+            "inner_weight": 10.0,
+            "window_size": 60,
+            "temporal_steps": 1500,
+            "n_sequences": 400,
+            "seq_len": 128
+          }
+        },
+        "MultiLayerCrosscoder": {
+          "best_single_r2": 0.18497709982873067,
+          "per_component_best_r2": [
+            0.18497709982873067,
+            0.03746760442418384,
+            0.054449575368653136
+          ],
+          "linear_mean_r2": 0.2826226545179669,
+          "linear_per_component_r2": [
+            0.5628023590425818,
+            0.1191718460130986,
+            0.1658937584982203
+          ],
+          "sae_final_loss": 67.98084259033203,
+          "family": "mlxc",
+          "config": {
+            "dict_size": 64,
+            "k": 4,
+            "temporal_steps": 2000,
+            "n_sequences": 1000,
+            "seq_len": 128
+          }
+        },
+        "TFA": {
+          "best_single_r2": 0.09828708084542304,
+          "per_component_best_r2": [
+            0.09828708084542304,
+            0.027398513665148783,
+            0.03093689494862628
+          ],
+          "linear_mean_r2": 0.28507805156161775,
+          "linear_per_component_r2": [
+            0.5801224033029855,
+            0.12272643166068442,
+            0.1523853197211833
+          ],
+          "sae_final_loss": 8.734606742858887,
+          "family": "tfa",
+          "config": {
+            "dict_size": 128,
+            "k": 10,
+            "sae_diff_type": "topk",
+            "n_heads": 4,
+            "n_attn_layers": 1,
+            "bottleneck_factor": 1,
+            "tied_weights": true,
+            "use_pos_encoding": false,
+            "tfa_steps": 3000,
+            "batch_size": 64,
+            "lr": 0.001,
+            "min_lr": 0.0009,
+            "weight_decay": 0.0001,
+            "warmup_steps": 200,
+            "n_sequences": 1000,
+            "seq_len": 128
+          }
+        },
+        "TFA-pos": {
+          "best_single_r2": 0.15781873397798885,
+          "per_component_best_r2": [
+            0.15781873397798885,
+            0.04041676209238976,
+            0.036922025289881644
+          ],
+          "linear_mean_r2": 0.28803097924889104,
+          "linear_per_component_r2": [
+            0.5828699309526696,
+            0.12769444573698885,
+            0.15352856105701473
+          ],
+          "sae_final_loss": 9.247933387756348,
+          "family": "tfa",
+          "config": {
+            "dict_size": 128,
+            "k": 10,
+            "sae_diff_type": "topk",
+            "n_heads": 4,
+            "n_attn_layers": 1,
+            "bottleneck_factor": 1,
+            "tied_weights": true,
+            "use_pos_encoding": true,
+            "tfa_steps": 3000,
+            "batch_size": 64,
+            "lr": 0.001,
+            "min_lr": 0.0009,
+            "weight_decay": 0.0001,
+            "warmup_steps": 200,
+            "n_sequences": 1000,
+            "seq_len": 128
+          }
+        },
+        "Temporal BatchTopK SAE": {
+          "best_single_r2": 0.21928039427551427,
+          "per_component_best_r2": [
+            0.21928039427551427,
+            0.05463282069663489,
+            0.05381812043695522
+          ],
+          "linear_mean_r2": 0.2508366508674155,
+          "linear_per_component_r2": [
+            0.5039021551334251,
+            0.11463179226982045,
+            0.1339760051990011
+          ],
+          "sae_final_loss": 20.81987762451172,
+          "family": "tsae",
+          "config": {
+            "dict_size": 128,
+            "k": 10,
+            "group_fractions": [
+              0.5,
+              0.5
+            ],
+            "group_weights": [
+              0.5,
+              0.5
+            ],
+            "temporal_alpha": 0.1,
+            "temporal": true,
+            "temporal_steps": 2000,
+            "lr": 0.0003,
+            "n_sequences": 1000,
+            "seq_len": 128
+          }
+        }
+      },
+      "cell_elapsed_sec": 1147.583801984787
+    },
+    "0.2": {
+      "sweep_parameter": "delta",
+      "sweep_value": 0.2,
+      "generator_params": [
+        [
+          "component_type",
+          "process_name",
+          "process_params"
+        ],
+        [
+          "component_type",
+          "process_name",
+          "process_params"
+        ],
+        [
+          "component_type",
+          "process_name",
+          "process_params"
+        ]
+      ],
+      "transformer": {
+        "final_loss": 1.0273756980895996,
+        "was_loaded": false,
+        "eval_resid_l2_mean": 11.707855224609375,
+        "config": {
+          "n_layers": 3,
+          "d_model": 64,
+          "n_heads": 2,
+          "d_head": 32,
+          "d_mlp": 256,
+          "n_ctx": 128,
+          "act_fn": "gelu",
+          "normalization_type": "LN",
+          "attention_dir": "causal",
+          "default_prepend_bos": false,
+          "init_mode": "gpt2",
+          "initializer_range": 0.001,
+          "probe_layer": 1,
+          "probe_hook_name": "blocks.1.hook_resid_post",
+          "extract_batch_size": 16,
+          "load_if_exists": true,
+          "training": {
+            "steps": 20000,
+            "batch_size": 128,
+            "lr": 0.001,
+            "data_chunks": 4,
+            "data_chunk_size": 5000
+          }
+        }
+      },
+      "dense_linear": {
+        "per_component_r2": [
+          0.7181320928866615,
+          0.15883569025893363,
+          0.20575130685080534
+        ],
+        "mean_r2": 0.3609063633321335
+      },
+      "dense_mlp": {
+        "per_component_r2": [
+          0.8489441871643066,
+          0.19575577974319458,
+          0.2020774483680725
+        ],
+        "mean_r2": 0.4155924320220947,
+        "hidden": 64,
+        "epochs_trained": 63,
+        "early_stop_patience": 10,
+        "best_val_mse": 0.13216814398765564
+      },
+      "architectures": {
+        "TopK SAE": {
+          "best_single_r2": 0.13963029215943767,
+          "per_component_best_r2": [
+            0.13963029215943767,
+            0.03514276717441622,
+            0.032901453470303044
+          ],
+          "linear_mean_r2": 0.33158038737302337,
+          "linear_per_component_r2": [
+            0.6611407059180481,
+            0.15427184078837197,
+            0.17932861541265
+          ],
+          "sae_final_loss": 43.330665588378906,
+          "family": "topk",
+          "config": {
+            "dict_size": 64,
+            "k": 4,
+            "sae_steps": 2000,
+            "n_sequences": 1000,
+            "seq_len": 128
+          }
+        },
+        "TXC": {
+          "best_single_r2": 0.4189968092077174,
+          "per_component_best_r2": [
+            0.4189968092077174,
+            0.09537133185533553,
+            0.11409781006739694
+          ],
+          "linear_mean_r2": 0.4339441162826039,
+          "linear_per_component_r2": [
+            0.8637257273016907,
+            0.17862975282900173,
+            0.2594768687171193
+          ],
+          "sae_final_loss": 70.63018798828125,
+          "family": "txc",
+          "config": {
+            "dict_size": 64,
+            "k": 1,
+            "window_size": 30,
+            "temporal_steps": 3000,
+            "n_sequences": 1000,
+            "seq_len": 128
+          }
+        },
+        "MatryoshkaTXC": {
+          "best_single_r2": 0.8724691868188321,
+          "per_component_best_r2": [
+            0.8724691868188321,
+            0.12536343158016328,
+            0.2647744426831232
+          ],
+          "linear_mean_r2": 0.4494375392615122,
+          "linear_per_component_r2": [
+            0.9235079684810308,
+            0.1583018887759614,
+            0.2665027605275443
+          ],
+          "sae_final_loss": 88.67752838134766,
+          "family": "mattxc",
+          "config": {
+            "dict_size": 128,
+            "matryoshka_widths": [
+              8,
+              16,
+              32,
+              64,
+              128
+            ],
+            "k": 1,
+            "fixed_k_total": 10,
+            "inner_weight": 10.0,
+            "window_size": 60,
+            "temporal_steps": 1500,
+            "n_sequences": 400,
+            "seq_len": 128
+          }
+        },
+        "MultiLayerCrosscoder": {
+          "best_single_r2": 0.2958062764052899,
+          "per_component_best_r2": [
+            0.2958062764052899,
+            0.06591326949433185,
+            0.0815277714886542
+          ],
+          "linear_mean_r2": 0.40440678618234144,
+          "linear_per_component_r2": [
+            0.8042532494435306,
+            0.19710250275218577,
+            0.21186460635130777
+          ],
+          "sae_final_loss": 51.55857467651367,
+          "family": "mlxc",
+          "config": {
+            "dict_size": 64,
+            "k": 4,
+            "temporal_steps": 2000,
+            "n_sequences": 1000,
+            "seq_len": 128
+          }
+        },
+        "TFA": {
+          "best_single_r2": 0.37683494773989723,
+          "per_component_best_r2": [
+            0.37683494773989723,
+            0.0823306754830383,
+            0.11002257983498354
+          ],
+          "linear_mean_r2": 0.37223806114637875,
+          "linear_per_component_r2": [
+            0.7674479465515257,
+            0.1479407146678322,
+            0.2013255222197785
+          ],
+          "sae_final_loss": 9.771674156188965,
+          "family": "tfa",
+          "config": {
+            "dict_size": 128,
+            "k": 10,
+            "sae_diff_type": "topk",
+            "n_heads": 4,
+            "n_attn_layers": 1,
+            "bottleneck_factor": 1,
+            "tied_weights": true,
+            "use_pos_encoding": false,
+            "tfa_steps": 3000,
+            "batch_size": 64,
+            "lr": 0.001,
+            "min_lr": 0.0009,
+            "weight_decay": 0.0001,
+            "warmup_steps": 200,
+            "n_sequences": 1000,
+            "seq_len": 128
+          }
+        },
+        "TFA-pos": {
+          "best_single_r2": 0.3747843209349122,
+          "per_component_best_r2": [
+            0.3747843209349122,
+            0.07124161669111384,
+            0.1154166182036076
+          ],
+          "linear_mean_r2": 0.3702277897424606,
+          "linear_per_component_r2": [
+            0.7449106513695662,
+            0.15410353087956452,
+            0.211669186978251
+          ],
+          "sae_final_loss": 10.438759803771973,
+          "family": "tfa",
+          "config": {
+            "dict_size": 128,
+            "k": 10,
+            "sae_diff_type": "topk",
+            "n_heads": 4,
+            "n_attn_layers": 1,
+            "bottleneck_factor": 1,
+            "tied_weights": true,
+            "use_pos_encoding": true,
+            "tfa_steps": 3000,
+            "batch_size": 64,
+            "lr": 0.001,
+            "min_lr": 0.0009,
+            "weight_decay": 0.0001,
+            "warmup_steps": 200,
+            "n_sequences": 1000,
+            "seq_len": 128
+          }
+        },
+        "Temporal BatchTopK SAE": {
+          "best_single_r2": 0.15545470776748638,
+          "per_component_best_r2": [
+            0.15545470776748638,
+            0.03915372386730398,
+            0.04148197703440082
+          ],
+          "linear_mean_r2": 0.3396827229206756,
+          "linear_per_component_r2": [
+            0.6782833787770063,
+            0.15030851738608286,
+            0.1904562725989375
+          ],
+          "sae_final_loss": 14.784289360046387,
+          "family": "tsae",
+          "config": {
+            "dict_size": 128,
+            "k": 10,
+            "group_fractions": [
+              0.5,
+              0.5
+            ],
+            "group_weights": [
+              0.5,
+              0.5
+            ],
+            "temporal_alpha": 0.1,
+            "temporal": true,
+            "temporal_steps": 2000,
+            "lr": 0.0003,
+            "n_sequences": 1000,
+            "seq_len": 128
+          }
+        }
+      },
+      "cell_elapsed_sec": 1158.1678907871246
+    }
+  }
+}

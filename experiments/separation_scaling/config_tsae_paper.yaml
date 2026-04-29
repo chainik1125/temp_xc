@@ -1,0 +1,79 @@
+experiment_name: separation_scaling_tsae_paper
+description: |
+  Paper-faithful T-SAE (20/80 matryoshka split + 25k training steps) added
+  to Han's separation_scaling sweep. Same transformer setup as v1
+  (σ=1e-3, d_model=64, ctx=128, 20k steps). Compares against the
+  existing Temporal BatchTopK SAE entry which used 50/50 split + 2k
+  steps (effectively no matryoshka pressure).
+
+  All other settings (generator, transformer cfg, probes) match config.yaml
+  verbatim so results are directly comparable to the existing sweep.
+
+seed: 42
+
+generator:
+  type: mess3_shared
+  sweep:
+    parameter: delta
+    values: [0.0, 0.05, 0.1, 0.15, 0.2]
+  fixed_params:
+    base_x: 0.25
+    base_a: 0.6
+    parameterization: symmetric_line
+
+transformer:
+  n_layers: 3
+  d_model: 64
+  n_heads: 2
+  d_head: 32
+  d_mlp: 256
+  n_ctx: 128
+  act_fn: gelu
+  normalization_type: LN
+  attention_dir: causal
+  default_prepend_bos: false
+  init_mode: gpt2
+  initializer_range: 1.0e-3
+  probe_layer: 1
+  probe_hook_name: blocks.1.hook_resid_post
+  extract_batch_size: 16
+  load_if_exists: true
+  training:
+    steps: 20000
+    batch_size: 128
+    lr: 1.0e-3
+    data_chunks: 4
+    data_chunk_size: 5000
+
+architectures:
+  - name: "T-SAE Paper"
+    family: tsae
+    kwargs:
+      dict_size: 128
+      k: 10
+      group_fractions: [0.2, 0.8]      # paper default
+      group_weights: [0.5, 0.5]
+      temporal_alpha: 0.1               # paper default contrastive weight
+      temporal: true
+      temporal_steps: 25000             # paper-scale training duration
+      lr: 3.0e-4
+      n_sequences: 1000
+      seq_len: 128
+
+probes:
+  dense_linear: {enabled: false}        # already done in main run
+  dense_mlp: {enabled: false}
+
+probe_dataset:
+  train_sequences: 1000
+  eval_sequences: 500
+  train_seed: 10042
+  eval_seed: 20042
+
+output_root: results_tsae_paper
+
+reproduce: |
+  # From the temp_xc repo root:
+  cd experiments/separation_scaling
+  PYTHONPATH="vendor/src:vendor/experiments/standard_hmm:vendor/experiments/transformer_standard_hmm:vendor/experiments/transformer_nonergodic" \
+      uv run python -m sae_day.run_driver --config config_tsae_paper.yaml
