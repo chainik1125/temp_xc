@@ -39,15 +39,20 @@ from experiments.phase7_unification.case_studies.backtracking._paths import (  #
 
 
 # Curated set of variants to plot. Each is (variant_dir, mode_target_filter, label).
+# Six-panel default focuses on the architectural comparisons; pass
+# --include-stratified to also show the stratified-held-out reruns of
+# the Llama-Scope baselines.
 DEFAULT_VARIANTS = [
-    ("intervene",                  ("sae_additive", "feat_7792"),    "Llama-Scope 8x feat_7792 (main, billions of tokens)"),
-    ("intervene_32x",              ("sae_additive", "feat_71839"),   "Llama-Scope 32x feat_71839 (billions of tokens)"),
-    ("intervene_main_strat",       ("sae_additive", "feat_7792"),    "Llama-Scope 8x feat_7792 (stratified held-out)"),
-    ("intervene_32x_strat",        ("sae_additive", "feat_71839"),   "Llama-Scope 32x feat_71839 (stratified)"),
-    ("intervene_llama_topk_30k",   ("sae_additive", "feat_28417"),   "Llama-trained TopKSAE@resid 30k feat_28417"),
-    ("intervene_llama_txc_resid_30k", ("sae_additive", "feat_5228"), "Llama-trained TXC@resid 30k feat_5228 (T=5)"),
-    ("intervene_llama_txc_attn_30k_d8k_v2", ("sae_additive", "feat_8013"), "Llama-trained TXC@attn 30k feat_8013 (cross-hook)"),
-    ("intervene",                  ("raw_dom", "raw_dom"),           "raw DoM (paper baseline)"),
+    ("intervene_32x",              ("sae_additive", "feat_71839"),   "Llama-Scope 32x feat_71839\n(billions of tokens)"),
+    ("intervene",                  ("sae_additive", "feat_7792"),    "Llama-Scope 8x feat_7792\n(billions of tokens)"),
+    ("intervene_llama_topk_30k",   ("sae_additive", "feat_28417"),   "Llama-trained TopKSAE@resid\n(30k steps, 3.8M tokens)"),
+    ("intervene_llama_txc_resid_30k", ("sae_additive", "feat_5228"), "Llama-trained TXC@resid T=5\n(30k steps, 3.8M tokens)"),
+    ("intervene_llama_txc_attn_30k_d8k_v2", ("sae_additive", "feat_8013"), "Llama-trained TXC@attn T=5\n(cross-hook steering)"),
+    ("intervene",                  ("raw_dom", "raw_dom"),           "raw DoM\n(paper baseline)"),
+]
+EXTRA_STRATIFIED = [
+    ("intervene_main_strat",       ("sae_additive", "feat_7792"),    "Llama-Scope 8x feat_7792\n(stratified held-out)"),
+    ("intervene_32x_strat",        ("sae_additive", "feat_71839"),   "Llama-Scope 32x feat_71839\n(stratified held-out)"),
 ]
 
 
@@ -79,11 +84,16 @@ def load_curve(intervene_dir: Path, mode: str, target: str) -> list[tuple[float,
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--out", default=None, help="output png path (default plots_summary/pareto_per_arch.png)")
-    parser.add_argument("--cols", type=int, default=2)
+    parser.add_argument("--cols", type=int, default=3)
+    parser.add_argument("--include-stratified", action="store_true",
+                        help="also include stratified-held-out reruns of Llama-Scope baselines")
     args = parser.parse_args()
 
+    variant_list = list(DEFAULT_VARIANTS)
+    if args.include_stratified:
+        variant_list.extend(EXTRA_STRATIFIED)
     curves = []
-    for sub, (mode, target), label in DEFAULT_VARIANTS:
+    for sub, (mode, target), label in variant_list:
         d = RESULTS_DIR / sub
         pts = load_curve(d, mode, target)
         if not pts:
