@@ -181,6 +181,85 @@ So "T-SAE > SAE at ln1.0" isn't a generic `before-attention > after-attention`
 fact, it's specifically a *post-LN, pre-attention-mix* phenomenon. The
 isolated train was 87s at 45.8 it/s.
 
+### Follow-up 3 — full isolated TXC + T-SAE at all 5 hookpoints
+
+10 separate train+sweep runs (5 hookpoints × {T-SAE, TXC}) so each
+(arch, hookpoint) pair gets clean feature ranking with no co-training
+perturbing the top-100. Combined with the recreate_layer0 isolated
+SAE numbers, this is the cleanest possible architecture × hookpoint
+matrix.
+
+**Final isolated frontier (test ASR₁₆, baseline 0.99 across all):**
+
+| hookpoint     | SAE iso             | T-SAE iso | TXC iso  |
+|---------------|--------------------:|----------:|---------:|
+| `ln1.0`       | (joint v2: 0.93) ¹  | **0.00**  | 0.05     |
+| `resid_pre.0` | 0.90                | 0.75      | **0.18** |
+| `resid_mid.0` | **0.00**            | 0.99      | 0.96     |
+| `resid_post.0`| 0.03                | 0.98      | 0.90     |
+| `ln1.1`       | (joint v2: 0.99) ¹  | 0.30      | 0.94     |
+
+ΔCE ≤ 0.005 nats for every chosen point except `tsae_l1_ln1` (+0.040)
+and `txc_l1_ln1` (+0.035) — the layer-1 controls were marginal.
+
+¹ Isolated SAE at `ln1.0` and `ln1.1` not yet run; only joint v2
+numbers available for those two cells. Queued as a minor follow-up.
+
+**Joint vs isolated drift — the joint-training story is hookpoint *and*
+arch-specific:**
+
+| arch  | hookpoint     | v2 joint | isolated | drift |
+|-------|---------------|---------:|---------:|------:|
+| SAE   | resid_pre.0   | 0.53     | 0.90     | -0.37 (joint better) |
+| SAE   | resid_mid.0   | 0.54     | 0.00     | +0.54 (isolated better) |
+| SAE   | resid_post.0  | 0.00     | 0.03     |  0.00 |
+| T-SAE | ln1.0         | 0.32     | 0.00     | +0.32 (isolated better) |
+| T-SAE | resid_pre.0   | 0.80     | 0.75     |  0.05 |
+| T-SAE | resid_mid.0   | 0.79     | 0.99     | -0.20 (joint better) |
+| T-SAE | resid_post.0  | 0.87     | 0.98     | -0.11 (joint better) |
+| T-SAE | ln1.1         | 0.75     | 0.30     | +0.45 (isolated better) |
+| TXC   | ln1.0         | 0.02     | 0.05     | -0.03 |
+| TXC   | resid_pre.0   | 0.21     | 0.18     |  0.03 |
+| TXC   | resid_mid.0   | 0.94     | 0.96     | -0.02 |
+| TXC   | resid_post.0  | 0.57     | 0.90     | -0.33 (joint better) |
+| TXC   | ln1.1         | 0.96     | 0.94     |  0.02 |
+
+Three observations:
+
+1. **TXC is the most robust to joint training.** Four of five hookpoints
+   are within ±0.04 of the isolated number; only `resid_post.0` shows a
+   substantial gap (joint is +0.33 better — somehow co-training other
+   archs at the *same* batch surfaces a feature that isolation misses).
+2. **T-SAE is the most volatile.** Drifts of ±0.20-0.45 in both
+   directions, depending on hookpoint. Isolation helps where the
+   contrastive structure was already an asset (`ln1.*`) and hurts where
+   the trigger feature was being implicitly carried by the joint
+   gradient flow (`resid_mid.0`, `resid_post.0`).
+3. **The architecture-flip pattern survives isolation, but the magnitudes
+   shift.** TXC is still the clear winner at `ln1.0` and `resid_pre.0`;
+   SAE still wins at `resid_post.0`. The sharpest cell — `resid_mid.0`
+   — does *not* favour any temporal arch in isolation; the per-token
+   SAE alone reaches ASR=0.00 there, and both temporal archs are
+   stuck above 0.95.
+
+### Headline takeaway
+
+The original question — "does the suppression / coherence frontier
+shift when we change architectures?" — has a clean answer: **yes, but
+the optimal architecture is hookpoint-specific.** TXC is the right
+choice when the activation has clean LayerNorm geometry and you're
+reading early in the block (`ln1.0`, `resid_pre.0`). The per-token
+SAE wins at the post-attn / post-MLP residual (`resid_mid.0`,
+`resid_post.0`) — exactly where attention has done its mixing. T-SAE
+is a strong middle-ground only at the post-LN sites (`ln1.0`,
+`ln1.1`).
+
+The most surprising single number isn't a winning point — it's that
+the per-token SAE at `resid_mid.0` reaches ASR=0.00 with ΔCE=-0.001 in
+isolation but only 0.54 inside the 15-arch joint training. Anyone
+trying to compare architectures in a shared-batch setup should check
+this isolation effect before reporting the result.
+
 ### Pointers
 
 - Code: `experiments/phase8_tinystories_sleeper/`
