@@ -65,11 +65,14 @@ ARCHS = (
 
 
 def _is_per_token_arch(arch: str) -> bool:
-    return arch in SAE_LAYER_HOOKS or arch in TSAE_LAYER_HOOKS
+    # Prefix dispatch covers both the default tag set (sae_layer{0..3}, etc.)
+    # AND custom override tags (e.g. sae_l0_ln1, tsae_l0_post). Same logic
+    # for window arches below.
+    return arch.startswith("sae_") or arch.startswith("tsae_")
 
 
 def _is_window_arch(arch: str) -> bool:
-    return arch in TXC_LAYER_HOOKS or arch in H8_LAYER_HOOKS
+    return arch.startswith("txc_") or arch.startswith("h8_")
 
 
 def pick_device(explicit: str | None) -> str:
