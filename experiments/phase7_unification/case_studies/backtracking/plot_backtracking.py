@@ -118,10 +118,13 @@ def plot_top_features(decompose_dir: Path, out_path: Path) -> None:
     ax.set_title(f"Top-10 SAE features ranked by {rank_by} (Llama-Scope L10R-8x)")
     ax.axhline(0, color="black", linewidth=0.5)
     for i, (bar, r) in enumerate(zip(bars, top)):
+        # n_active_plus is only present for the within-model decompose;
+        # decompose_modeldiff doesn't compute it. Fall back to blank.
+        anno = f"  n+={r['n_active_plus']}" if "n_active_plus" in r else ""
         ax.text(
             i,
             bar.get_height(),
-            f"  n+={r['n_active_plus']}",
+            anno,
             ha="center",
             va="bottom" if bar.get_height() >= 0 else "top",
             fontsize=7,
