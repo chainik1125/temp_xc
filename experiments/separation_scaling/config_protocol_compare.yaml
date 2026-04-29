@@ -1,0 +1,103 @@
+experiment_name: separation_scaling_protocol_compare
+description: |
+  Head-to-head comparison: protocol-tuned MatTXC vs paper-faithful T-SAE
+  on the same transformer activations (σ=1e-3, d_model=64). Verifies that
+  we recover the protocol_sweep MatTXC ~0.81 single-feature R² result at
+  δ=0.20, and asks whether T-SAE at its paper-default settings matches it.
+
+  Three archs run from cached transformers (loaded from results_tsae_paper/
+  if present at the corresponding cell path).
+
+seed: 42
+
+generator:
+  type: mess3_shared
+  sweep:
+    parameter: delta
+    values: [0.0, 0.05, 0.1, 0.15, 0.2]
+  fixed_params:
+    base_x: 0.25
+    base_a: 0.6
+    parameterization: symmetric_line
+
+transformer:
+  n_layers: 3
+  d_model: 64
+  n_heads: 2
+  d_head: 32
+  d_mlp: 256
+  n_ctx: 128
+  act_fn: gelu
+  normalization_type: LN
+  attention_dir: causal
+  default_prepend_bos: false
+  init_mode: gpt2
+  initializer_range: 1.0e-3
+  probe_layer: 1
+  probe_hook_name: blocks.1.hook_resid_post
+  extract_batch_size: 16
+  load_if_exists: true
+  training:
+    steps: 20000
+    batch_size: 128
+    lr: 1.0e-3
+    data_chunks: 4
+    data_chunk_size: 5000
+
+architectures:
+  # Protocol-winning MatTXC (per protocol_sweep.md, batchtopk k=10 → 0.81 single at δ=0.2)
+  - name: "MatTXC_batchtopk_k10"
+    family: mattxc
+    kwargs:
+      dict_size: 128
+      matryoshka_widths: [8, 16, 32, 64, 128]
+      k: 1
+      fixed_k_total: 10
+      inner_weight: 10.0
+      window_size: 60
+      temporal_steps: 1500
+      n_sequences: 400
+      seq_len: 128
+      sparsity_method: batchtopk
+
+  # The other 0.81 winner from protocol_sweep
+  - name: "MatTXC_topk_k10_baseline"
+    family: mattxc
+    kwargs:
+      dict_size: 128
+      matryoshka_widths: [8, 16, 32, 64, 128]
+      k: 1
+      fixed_k_total: 10
+      inner_weight: 10.0
+      window_size: 60
+      temporal_steps: 1500
+      n_sequences: 400
+      seq_len: 128
+      sparsity_method: topk
+
+  # Paper-faithful T-SAE (20/80 split, 25k steps)
+  - name: "T-SAE Paper"
+    family: tsae
+    kwargs:
+      dict_size: 128
+      k: 10
+      group_fractions: [0.2, 0.8]
+      group_weights: [0.5, 0.5]
+      temporal_alpha: 0.1
+      temporal: true
+      temporal_steps: 25000
+      lr: 3.0e-4
+      n_sequences: 1000
+      seq_len: 128
+
+probes:
+  dense_linear: {enabled: false}
+  dense_mlp: {enabled: false}
+
+probe_dataset:
+  train_sequences: 1000
+  eval_sequences: 500
+  train_seed: 10042
+  eval_seed: 20042
+
+output_root: results_protocol_compare
