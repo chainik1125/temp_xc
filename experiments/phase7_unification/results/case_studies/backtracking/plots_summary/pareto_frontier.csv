@@ -1,0 +1,11 @@
+variant,mode,target,magnitude,kw,coh
+32x,raw_dom,raw_dom,4.0,0.012617825140314289,3.0
+neg_alpha_32x,raw_dom,raw_dom,4.0,0.012617825140314289,3.0
+neg_alpha_8x,raw_dom,raw_dom,4.0,0.012617825140314289,3.0
+ratio,raw_dom,raw_dom,4.0,0.012617825140314289,3.0
+32x,sae_additive,feat_71839,8.0,0.025307823511778755,2.9
+32x_strat,sae_additive,feat_71839,8.0,0.02863148502173251,2.7
+multipos,raw_dom,raw_dom,8.0,0.06921098863532842,1.9
+multipos,sae_additive,feat_7792,12.0,0.2201854563415229,1.3
+32x,sae_additive,feat_71839,20.0,0.432591127740225,1.0
+neg_alpha_32x,sae_additive,feat_71839,20.0,0.432591127740225,1.0
