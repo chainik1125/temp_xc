@@ -26,9 +26,9 @@ tags:
   best TXC variant identified by an initial sweep, and climb *back
   down* toward T-SAE k=20. The two ladders meet at (T=5, k_pos=20)
   — that's the cross-validation cell.
-- **Hardware**: A40 RunPod, 46 GB VRAM, 46 GB pod RAM. Identical to
-  Y. **You share the Anthropic 50 req/min rate limit with Y** —
-  coordinate (see § Coordination).
+- **Hardware**: A40 RunPod, 46 GB VRAM, 46 GB pod RAM, 900 GB
+  volume. Identical to Y. **You share the Anthropic 50 req/min rate
+  limit with Y** — coordinate (see § Coordination).
 - **Branch**: `han-phase7-unification`. Push as `xuyhan` with
   `/workspace/.tokens/gh_token`. Commit identity `hxuany0@gmail.com`.
 
@@ -155,6 +155,13 @@ back off.
 one at a time. `nvidia-smi` to check before launching. Training
 processes show as `python -m experiments.phase7_unification...`; if
 you see Y's process running, queue.
+
+**Disk hygiene.** Reuse the activation cache across cells — don't let
+`train_ln1_txc.py`-style scripts each build their own private 1.5 GB
+cache per cell. Each TXCBareAntidead ckpt at d_sae=18432 is ~1.7 GB;
+the full 19-cell sweep + ladder is ~32 GB of ckpts plus the activation
+cache. Ship to HF (`han1823123123/txcdr-base`) and delete locally
+once a cell is graded if space gets tight.
 
 ### Existing pipeline you reuse
 
