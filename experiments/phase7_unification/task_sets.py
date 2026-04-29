@@ -58,3 +58,43 @@ BALANCED_15 = frozenset({
 assert BALANCED_15 <= FULL_36, "BALANCED_15 must be a subset of FULL_36"
 assert len(BALANCED_15) == 15
 assert len(FULL_36) == 36
+
+
+# Paper headline 16-task set (`PAPER_16`) — finalised 2026-04-29.
+#
+# Rationale (in `2026-04-29-paper-task-set.md`):
+# Designed *before* checking the leaderboard to avoid reverse-engineering
+# the set to make TXC look good. Picks per cluster motivated by:
+#   - bias_in_bios (4): largest cluster; 4 representatives by top-SD
+#     to capture profession-prediction skill across professions.
+#   - europarl (3): represents the per-token-saturation spectrum —
+#     `fr` (T-hurts because per-token saturated at AUC 0.996),
+#     `de` (intermediate),
+#     `nl` (T-helps because per-token only 0.871, distributed Dutch signal).
+#     This single cluster contains the cleanest "natural" example of
+#     where TXC's window structure helps vs hurts.
+#   - amazon (3): cat5 + cat3 (top-SD product categories) + sentiment_5star.
+#   - ag_news (2): top-2 SD topics.
+#   - github_code (2): code language ID with single-token shortcuts —
+#     a "TXC's structure should NOT help here" benchmark.
+#   - coreference (2): winogrande + wsc — multi-token-by-construction;
+#     winogrande is the cleanest empirical demonstration of TXC's
+#     structural advantage (T monotonically helps from AUC 0.6 → 0.9).
+#
+# Cluster proportions: 25% bias_in_bios, 19% europarl, 19% amazon,
+# 12.5% each of ag_news / github_code / coreference. More balanced
+# than the original 36-task set (42% bias_in_bios) without dropping
+# any cluster entirely.
+PAPER_16 = frozenset({
+    "bias_in_bios_set1_prof11", "bias_in_bios_set1_prof2",
+    "bias_in_bios_set3_prof20", "bias_in_bios_set3_prof9",
+    "europarl_fr", "europarl_de", "europarl_nl",
+    "amazon_reviews_cat5", "amazon_reviews_cat3",
+    "amazon_reviews_sentiment_5star",
+    "ag_news_business", "ag_news_scitech",
+    "github_code_java", "github_code_python",
+    "winogrande_correct_completion", "wsc_coreference",
+})
+
+assert PAPER_16 <= FULL_36
+assert len(PAPER_16) == 16

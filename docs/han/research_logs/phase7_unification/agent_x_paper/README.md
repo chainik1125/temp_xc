@@ -32,6 +32,7 @@ supplementary.
 | `2026-04-29-task-importance.md` | Per-task discriminative power; recommends a 15-task balanced reduction (2.4× speedup, k=20 top-3 ranking preserved). |
 | `2026-04-29-barebones-txc-per-task.md` | Where does barebones TXC help / hurt? `txcdr_t5` vs `topk_sae` per-task + per-cluster, with implication for task-set selection. |
 | `2026-04-29-per-task-tsweep.md` | Per-task T-scaling (txcdr_t<T> family at every T) — 36 small multiples + ranking by slope. **`winogrande` is the only task where T helps monotonically** (+0.0069/T at k=20), validating the multi-token-reasoning hypothesis. |
+| `2026-04-29-paper-task-set.md` | **Final 16-task paper set (`PAPER_16`)** — pre-registered selection by cross-arch SD within balanced clusters. k=20 winner `txc_bare_antidead_t5` Δ=+0.0036 (~6× σ_seeds, decisive). k=5 top-6 within 0.0035 AUC (no defensible single champion). |
 | `plots/` | Paper figures, full-res `.png` (150 dpi) + thumbnails (`*.thumb.png`, ≤288px wide). |
 
 ### Headline figures
