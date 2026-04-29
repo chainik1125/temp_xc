@@ -67,10 +67,14 @@ Configurations that 5090-OOM'd (don't retry without H200):
 
 ### Configurations that DID fit + train successfully
 
-- V1: SubseqH8 T_max=12 t_sample=5 — Agent A trained on H200, Z
-  inherited and probed.
-- R2 L1: TXCBareMultiDistance T=5 shifts=[1, 32]   — trained on 5090, 43.8 min
-- R2 L2: TXCBareMultiDistance T=5 shifts=[32]      — trained on 5090, 29.2 min
+- V1: SubseqH8 T_max=12 t_sample=5 — Agent A trained on H200
+  (RunPod, since destroyed). Already had 72 probing rows in
+  `probing_results.jsonl` when Z arrived (probed by X or Agent A
+  before the V2 attempt — Z did NOT re-probe). Z fixed the
+  `training_index.jsonl` ckpt path from RunPod `/workspace/...` to
+  local `/home/elysium/...` and pulled the ckpt from HF.
+- R2 L1: TXCBareMultiDistance T=5 shifts=[1, 32]   — Z trained on 5090, 43.8 min, Z probed
+- R2 L2: TXCBareMultiDistance T=5 shifts=[32]      — Z trained on 5090, 29.2 min, Z probed
 
 Pattern: 5090 fits TXCBareMultiDistance at T=5 with ≤ 2 shifts.
 
@@ -104,7 +108,7 @@ no padding issue).
   `hill_climb/build_anchor_only_probe_cache.py`. Sufficient for
   probing all hill-climb arch families (no MLC).
 
-### Files Z added under hill_climb/ (not yet committed to origin)
+### Files Z added under hill_climb/ (committed in 5e1f805)
 
 | file | purpose | status |
 |---|---|---|
@@ -117,12 +121,14 @@ no padding issue).
 | `round2_long_shifts.py` | Original (X-style) R2 trainer | superseded by verbose variant |
 | `round3_subseq_lowsample.py` | R3 single-process attempt | DEPRECATED (CUDA poisoning across cells) |
 
-### Files Z modified locally (not yet committed)
+### Files Z modified + committed (in 5e1f805)
 
 - `experiments/phase7_unification/results/training_index.jsonl` —
   fixed V1's ckpt path from `/workspace/temp_xc/...` (RunPod) to
-  `/home/elysium/temp_xc/...` (local). Should add R2 L1, L2 rows
-  (those were already added by `_save_run` during training).
+  `/home/elysium/temp_xc/...` (local). Adds R2 L1 + L2 rows
+  (`_save_run` appended these during training).
+- `experiments/phase7_unification/results/probing_results.jsonl` —
+  144 new rows for R2 L1 + L2 across 36 tasks × {k_feat=5, k_feat=20}.
 
 ### Recommended next moves for post-compact agent
 
@@ -158,11 +164,13 @@ no padding issue).
    short shifts at T=5):
    - L1 `hill_h8_T5_shifts1and32`: PAPER k=20 = 0.9025 (LOSE: −0.0106)
    - L2 `hill_h8_T5_shifts32only`: PAPER k=20 = 0.9062 (LOSE: −0.0069)
-   Conclusion at k=20: long shifts (32) regress vs the standard
-   short-shift recipe. Phase 5's "U-shape" benefit at k=20 does NOT
-   transfer to base-side Phase 7. **Don't pursue this further at
-   k=20.** (Note: Phase 5's finding was at k=5 / "mp" regime; it
-   may still help at k=5, but k=5 is too noisy to be the headline.)
+   Conclusion at Phase 7 k=20 (current methodology):
+   long shifts (32) regress vs the standard short-shift recipe.
+   **Don't pursue this further at k=20.** (Phase 5's "U-shape"
+   finding was on -it at lp/mp probing — different methodology and
+   different subject model. Worth a separate test at Phase 7 k=5
+   on -it if anyone has cycles, but k=5 is too noisy at base for
+   Z's headline.)
 
    **b. Large T + small `t_sample` (TRIED on 5090 — all OOM).**
    This was Han's earlier hint: SubseqH8 at T_max=20, t_sample=2
@@ -222,14 +230,21 @@ no padding issue).
 
 ### Branch + commit state
 
-- Branch: `han-phase7-unification`. Last pulled at
-  `2026-04-29 ~18:00 UTC` (after X's PAPER-set commit + 56-commit
-  catch-up).
-- Z has uncommitted changes: hill_climb/ scripts (above), modified
-  training_index.jsonl, agent_z_paper/ subdir with this handover +
-  blockers + V1 baseline log.
-- Z has NOT pushed any commits — all writes are local-only on the
-  5090 + HF model repo (ckpts + training logs).
+- Branch: `han-phase7-unification`. Last pulled + pushed at
+  `2026-04-29 ~22:50 UTC`.
+- Z's first commit on origin: **`5e1f805` "Phase 7 Z: hill-climb on
+  Gemma-2-2b base — round1+round2 + handover briefing"** — adds all
+  hill_climb/*.py scripts, agent_z_paper/ writeups (blockers + V1
+  baseline + this handover), the 2 R2 ckpt training_logs, and the
+  R2 rows in training_index.jsonl + 144 R2 probing rows. Rebased
+  cleanly onto `68ef145`. (NOTE: this handover doc was committed
+  *before* the post-commit edits on this section; if you `git diff
+  HEAD`, the current version of this doc may have minor textual
+  improvements not yet committed.)
+- HF model repo (`han1823123123/txcdr-base`) has all 3 hill ckpts +
+  training logs: `hill_subseq_h8_T12_s5__seed42`,
+  `hill_h8_T5_shifts1and32__seed42`,
+  `hill_h8_T5_shifts32only__seed42`.
 
 ### Key references
 
