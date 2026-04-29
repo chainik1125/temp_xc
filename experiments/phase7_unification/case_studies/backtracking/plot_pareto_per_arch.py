@@ -107,7 +107,10 @@ def main() -> None:
     n = len(curves)
     cols = args.cols
     rows = (n + cols - 1) // cols
-    fig, axes = plt.subplots(rows, cols, figsize=(6 * cols, 4.2 * rows), squeeze=False)
+    fig, axes = plt.subplots(rows, cols, figsize=(6 * cols, 5.0 * rows), squeeze=False)
+    # Generous vertical spacing so the bottom row's titles don't collide with the
+    # top row's x-axis labels.
+    fig.subplots_adjust(hspace=0.55, wspace=0.30)
 
     # Determine global α range for shared colorbar
     all_alphas = [a for _, pts in curves for a, *_ in pts]
@@ -140,18 +143,19 @@ def main() -> None:
     for j in range(n, rows * cols):
         axes[j // cols][j % cols].set_visible(False)
 
-    # Shared colorbar (right of the figure)
+    # Shared colorbar (right of the figure). Re-apply right margin AFTER our
+    # earlier subplots_adjust so the colorbar gets its own column without
+    # eating into the per-axes padding.
     sm = ScalarMappable(cmap=cmap, norm=norm)
     sm.set_array([])
-    fig.subplots_adjust(right=0.91)
+    fig.subplots_adjust(right=0.91, hspace=0.55, wspace=0.30, top=0.92, bottom=0.08)
     cbar_ax = fig.add_axes([0.93, 0.12, 0.015, 0.76])
     cbar = fig.colorbar(sm, cax=cbar_ax)
     cbar.set_label("steering magnitude α (or clamp strength)", fontsize=9)
 
     fig.suptitle(
-        "Backtracking case study — per-architecture Pareto trajectories\n"
-        "(each subplot: kw vs coherence as α varies; colour = α)",
-        fontsize=12, y=0.995,
+        "Backtracking case study — per-architecture Pareto trajectories  (colour = α)",
+        fontsize=12, y=0.97,
     )
 
     out_path = Path(args.out) if args.out else RESULTS_DIR / "plots_summary" / "pareto_per_arch.png"
