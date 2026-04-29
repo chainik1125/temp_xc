@@ -91,19 +91,49 @@ T_max, the missing cells are:
    Already pencilled in but not executed.
 2. `hill_subseq_h8_T16_s5` — same, the middle round1 cell.
 3. `hill_subseq_h8_T20_s8` — *new*, addresses Han's question directly
-   (higher T_max + higher resampling).
+   (higher T_max + higher resampling). **Attempted on A40 2026-04-29;
+   see "A40 attempt" below.**
 4. `hill_subseq_h8_T20_s10`, `_s20` — to span the sweep.
 
-Each cell costs ~30-50 min on A40 (SubseqH8 is single-anchor-layer, fits
-at b=4096). Total: ~3-4 hours sequentially. Requires base
-activation cache to exist — currently not built on this pod (post-OOM
-restart wiped it). Activation cache rebuild is ~50 min. So total budget
-~5 hours for all 4 cells from a clean start.
+### A40 attempt at `hill_subseq_h8_T20_s8` (2026-04-29)
 
-Until those run, the answer to "did we ever run a higher-T resampling
-that did well" is: **no, only T_max=12 t_sample=5 was tested at higher
-T, and it lost to the canonical T_max=10 t_sample=5 baseline at both
-k_feat=5 and k_feat=20.**
+Tried the directly-Han-asked-about cell during the autonomous shift
+after building the BASE activation cache from scratch (token_ids.npy
++ resid_L12.npy at 14 GB). Two OOM iterations:
+
+1. **b=4096** (paper-wide constant): OOM during backward pass —
+   T_max=20 × t_sample=8 backward intermediates exceed A40 44 GB VRAM.
+2. **b=1024** (4× smaller): OOM during Adam optimiser step — still
+   over budget.
+3. **b=1024 + PRELOAD_SEQS=6000** (down from 24000): training
+   started, ran for 1h50m at full GPU 100%, never reached the first
+   `log_every=200` print and never wrote a ckpt. Killed at the
+   18-hour budget deadline to preserve writeup time.
+
+The plateau early-stop never fired, suggesting either (a) loss was
+still decreasing significantly at step 200+ but very slowly per step,
+or (b) the per-step compute on A40 at this combination is too slow
+to even reach step 200 in 90 min. SubseqH8 forward/backward at
+T_max=20 t_sample=8 has substantial intermediate-tensor footprint —
+the encoder integrates over T_max positions, contrastive shifts
+generate K extra forward passes per step, and AuxK adds more.
+
+**Conclusion: the H200 pod is required to actually evaluate this
+cell.** When the H200 returns:
+
+- Use paper-wide b=4096 + PRELOAD_SEQS=24000 (matches all other
+  leaderboard archs).
+- Estimated training time on H200: ~110 min (matched to
+  `hill_subseq_h8_T12_s5` which took 6603 s = 110 min there).
+- After training, probe on 36 SAEBench tasks (~5 min on A40 or H200).
+
+Files of attempt: `experiments/phase7_unification/hill_climb/train_t20_s8.py`
+(adapts batch_size + PRELOAD_SEQS for A40), `logs/train_t20_s8.log`.
+
+Until that run completes, the answer to "did we ever run a higher-T
+resampling that did well" remains: **no, only T_max=12 t_sample=5
+was tested at higher T, and it lost to the canonical T_max=10
+t_sample=5 baseline at both k_feat=5 and k_feat=20.**
 
 ### Files of record
 
