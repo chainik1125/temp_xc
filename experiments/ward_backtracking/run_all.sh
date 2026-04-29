@@ -27,7 +27,6 @@ if [[ -f .env ]]; then
     set -a; source .env; set +a
 fi
 : "${HF_TOKEN:?HF_TOKEN must be set (env or .env)}"
-: "${OPENAI_API_KEY:?OPENAI_API_KEY must be set (env or .env)}"
 : "${ANTHROPIC_API_KEY:?ANTHROPIC_API_KEY must be set (env or .env)}"
 
 # Belt-and-suspenders for fragmented allocator on A40.

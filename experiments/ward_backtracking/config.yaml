@@ -55,11 +55,14 @@ offsets:
   baseline_zero: 0  # for the no-offset baseline reproduction (Fig 2)
 
 # Sentence-label backtracking detection. Ward §2.2: keyword set = {wait, hmm}.
-# We use GPT-4o to label sentences, but the *steering metric* is the keyword
-# rate on generated traces (Ward §3, the "Wait" token percentage axis).
+# We use Anthropic Haiku 4.5 to label sentences (Ward used GPT-4o; we
+# substitute Haiku for cost + to share an API key with seed_prompts —
+# Venhoff 2025, whose taxonomy we borrow, also used Haiku 4.5). The
+# *steering metric* itself is the keyword rate on generated traces
+# (Ward §3, the "Wait" token percentage axis).
 backtracking:
   keywords: ["wait", "hmm"]
-  judge_model: gpt-4o
+  judge_model: claude-haiku-4-5-20251001
 
 # Held-out steering eval prompts: Ward et al. show outputs from the same
 # 300-prompt source. We split 280 train (DoM) / 20 eval (steering) by

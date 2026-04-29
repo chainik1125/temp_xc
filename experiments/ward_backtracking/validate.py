@@ -2,7 +2,7 @@
 
 Reads the steering eval output (steering_results.json) and re-judges a
 sample of the *generated* completions at each magnitude in
-config.validation.strengths via GPT-4o sentence-level labelling. Reports
+config.validation.strengths via Anthropic Haiku 4.5 sentence-level labelling. Reports
 precision / recall / F1 of the keyword judge against the LLM judge as a
 sanity check on the metric Ward et al. use throughout (and that we use
 in plot.py).
@@ -39,7 +39,7 @@ from pathlib import Path
 
 import yaml
 
-from src.bench.venhoff.judge_client import OpenAIJudge
+from src.bench.venhoff.judge_client import AnthropicJudge
 from src.bench.venhoff.tokenization import split_into_sentences
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
@@ -77,7 +77,7 @@ def _parse_bools(reply: str, n: int) -> list[bool]:
     return out
 
 
-async def _judge_one_text(judge: OpenAIJudge, text: str, min_words: int) -> tuple[list[str], list[bool]]:
+async def _judge_one_text(judge: AnthropicJudge, text: str, min_words: int) -> tuple[list[str], list[bool]]:
     sentences = [s for s in split_into_sentences(text) if len(s.split()) >= min_words]
     if not sentences:
         return [], []
@@ -92,7 +92,7 @@ def _f1(precision: float, recall: float) -> float:
 
 
 async def _validate_strength(
-    judge: OpenAIJudge,
+    judge: AnthropicJudge,
     rows: list[dict],
     strength: float,
     n_traces: int,
@@ -169,7 +169,7 @@ def main(argv: list[str] | None = None) -> int:
     payload = json.loads(steering_path.read_text())
     rows = payload["rows"]
 
-    judge = OpenAIJudge(model=cfg["backtracking"]["judge_model"], max_tokens=1024,
+    judge = AnthropicJudge(model=cfg["backtracking"]["judge_model"], max_tokens=1024,
                         max_concurrent=args.max_concurrent, rpm=args.rpm)
 
     async def _all() -> list[dict]:
@@ -179,7 +179,7 @@ def main(argv: list[str] | None = None) -> int:
         ]
 
     results = asyncio.run(_all())
-    log.info("[info] openai calls=%d errors=%d", judge.n_calls, judge.n_errors)
+    log.info("[info] anthropic calls=%d errors=%d", judge.n_calls, judge.n_errors)
 
     out_path.write_text(json.dumps({"per_strength": results}, indent=2))
     log.info("[done] saved validation | path=%s", out_path)

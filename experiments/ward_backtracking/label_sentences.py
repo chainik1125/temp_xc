@@ -1,6 +1,6 @@
-"""GPT-4o sentence-level taxonomy labelling for the 300 traces.
+"""Anthropic Haiku 4.5 sentence-level taxonomy labelling for the 300 traces.
 
-Per Ward §2.2 + Appendix C: a GPT-4o judge classifies each sentence of
+Per Ward §2.2 + Appendix C: an LLM judge classifies each sentence of
 each reasoning trace as `backtracking` or `other`. Ward then build their
 positive set D₊ from sentences flagged backtracking (and use a token
 offset window of [-13, -8] *preceding* such a sentence as the activation
@@ -37,7 +37,7 @@ from pathlib import Path
 
 import yaml
 
-from src.bench.venhoff.judge_client import OpenAIJudge
+from src.bench.venhoff.judge_client import AnthropicJudge
 from src.bench.venhoff.responses import extract_thinking_process
 from src.bench.venhoff.tokenization import split_into_sentences
 
@@ -82,7 +82,7 @@ def _parse_bools(reply: str, n: int) -> list[bool]:
 
 
 async def _label_one_trace(
-    judge: OpenAIJudge,
+    judge: AnthropicJudge,
     trace_idx: int,
     trace: dict,
     min_words: int,
@@ -128,11 +128,11 @@ async def _label_one_trace(
 
 
 async def _label_all(traces: list[dict], model: str, min_words: int, rpm: int, max_concurrent: int) -> list[dict]:
-    judge = OpenAIJudge(model=model, max_tokens=1024, max_concurrent=max_concurrent, rpm=rpm)
+    judge = AnthropicJudge(model=model, max_tokens=1024, max_concurrent=max_concurrent, rpm=rpm)
     tasks = [_label_one_trace(judge, i, t, min_words) for i, t in enumerate(traces)]
     log.info("[info] labelling %d traces via %s (rpm=%d, concurrent=%d)", len(traces), model, rpm, max_concurrent)
     out = await asyncio.gather(*tasks)
-    log.info("[info] openai calls=%d errors=%d", judge.n_calls, judge.n_errors)
+    log.info("[info] anthropic calls=%d errors=%d", judge.n_calls, judge.n_errors)
     n_bt = sum(s["is_backtracking"] for r in out for s in r["sentences"])
     n_total = sum(len(r["sentences"]) for r in out)
     log.info("[info] backtracking sentences | %d / %d (%.1f%%)", n_bt, n_total, 100 * n_bt / max(1, n_total))
