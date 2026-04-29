@@ -49,6 +49,19 @@ MODEL_REGISTRY: dict[str, ModelConfig] = {
         dtype="bfloat16",
         architecture_family="llama",
     ),
+    # Open mirror of meta-llama/Llama-3.1-8B for hosts without HF auth.
+    # Same architecture and weights; the Llama gate is just a request-form
+    # on Meta's side.
+    "llama-3.1-8b-nous": ModelConfig(
+        name="llama-3.1-8b-nous",
+        hf_path="NousResearch/Meta-Llama-3.1-8B",
+        d_model=4096,
+        n_layers=32,
+        default_layer_indices=(12, 24),
+        is_thinking_model=False,
+        dtype="bfloat16",
+        architecture_family="llama",
+    ),
     "gemma-2-2b": ModelConfig(
         name="gemma-2-2b",
         hf_path="google/gemma-2-2b",

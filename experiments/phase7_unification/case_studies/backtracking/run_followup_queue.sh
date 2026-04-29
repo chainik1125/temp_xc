@@ -99,4 +99,27 @@ banner() { echo "=== FOLLOWUP_${1} ${2} $(stamp) ==="; }
   || banner 9_32X_TOPK3 FAILED
 }
 
+# ─── 10: model-diffing with NousResearch open Llama mirror ─────────────────
+# (the original variant 5 in the night queue would have failed because
+# meta-llama/Llama-3.1-8B is HF-gated; NousResearch/Meta-Llama-3.1-8B is
+# the same weights without the gate.)
+{
+  banner 10_MODELDIFF_NOUS START
+  $PY -m $MOD.build_act_cache_backtracking \
+      --model llama-3.1-8b-nous --cache-suffix base_nous --force \
+  && $PY -m $MOD.decompose_modeldiff \
+      --top-k 5 --rank-by tstat --positions all \
+      --base-cache-suffix base_nous \
+      --decompose-suffix modeldiff_nous --force \
+  && $PY -m $MOD.intervene_backtracking \
+      --top-k 1 --modes raw_dom sae_additive \
+      --decompose-suffix modeldiff_nous --intervene-suffix modeldiff_nous --force \
+  && $PY -m $MOD.grade_coherence --intervene-suffix modeldiff_nous \
+  && $PY -m $MOD.evaluate_backtracking --intervene-suffix modeldiff_nous \
+  && $PY -m $MOD.plot_backtracking \
+      --decompose-suffix modeldiff_nous --intervene-suffix modeldiff_nous --plots-suffix modeldiff_nous \
+  && banner 10_MODELDIFF_NOUS DONE \
+  || banner 10_MODELDIFF_NOUS FAILED
+}
+
 echo "=== ALL_FOLLOWUPS_FINISHED $(stamp) ==="
