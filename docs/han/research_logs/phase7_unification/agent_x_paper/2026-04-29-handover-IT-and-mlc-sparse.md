@@ -187,6 +187,45 @@ side). You'll need to either set env-var overrides or branch the path
 config. See `experiments/phase5_downstream_utility/build_multilayer_cache.py`
 for the IT-side cache build script (Phase 5 was IT-side).
 
+#### Order of operations — dependencies you can't skip
+
+The Mission #1 plan below has **strict ordering** because of two
+upstream dependencies:
+
+| step | depends on | why |
+|---|---|---|
+| Patch `run_probing_phase7.py` to write `subject_model` + `anchor_layer` into output rows | nothing (do this FIRST, before any IT probing) | Otherwise the IT probing rows are indistinguishable from BASE rows in the leaderboard builder; you'd have to re-run probing to fix |
+| Path-config fork (`_paths_it.py`) | nothing | Required by build_act_cache + build_probe_cache + train_phase7 (which all import from `_paths`) |
+| Build IT activation cache | path-config fork | Cache writes go to IT-specific `CACHE_DIR` |
+| Build IT probe cache directly to S=32 | IT activation cache (only the L13 layer is needed for anchor; L11..L15 needed for MLC tail) | Forward pass through gemma-2-2b-it |
+| Train IT archs | IT activation cache | `_train_utils::preload_single` loads from CACHE_DIR |
+| Probe IT archs | IT probe cache (S=32) + patched probing script | The script reads probe_cache_S32_it/ |
+| Build IT leaderboard | IT probing rows + extended `build_leaderboard_2seed.py` | Builder needs the new subject_model field |
+| Update results_manifest.json | all of the above committed | Manifest reads probing_results.jsonl + training_index.jsonl |
+
+If you flip step 1 (the schema patch) to after step 6 (probe IT
+archs), you waste hours of probing compute.
+
+#### Preflight checklist
+
+Before kicking off any IT-side work:
+
+- [ ] BASE-side `probe_cache/` deleted (free 406 GB; see Disk
+      management above)
+- [ ] `paper_archs.json::task_sets.PAPER` confirmed unchanged from X's
+      finalisation (16 tasks)
+- [ ] `huggingface-cli whoami` returns `han1823123123` (or the right
+      account that owns `txcdr-base` and can create `txcdr-it`)
+- [ ] `git status` clean on `han-phase7-unification`; pulled to head
+- [ ] Pod environment vars set (`HF_HOME=/workspace/hf_cache`,
+      `UV_LINK_MODE=copy`, `TQDM_DISABLE=1`)
+- [ ] `nvidia-smi` shows no resident processes; `free -g` shows ≥ 30 GB
+      headroom under the 46 GB cgroup cap
+- [ ] `run_probing_phase7.py` patched to write `subject_model` and
+      `anchor_layer` into the output `row` dict (otherwise step 7
+      below will produce rows that the leaderboard builder can't
+      filter)
+
 **Plan:**
 
 1. **Build IT activation cache** (~1 hr A40 — 5 min/layer × 5 layers
