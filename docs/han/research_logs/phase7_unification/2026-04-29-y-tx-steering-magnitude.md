@@ -13,6 +13,31 @@ tags:
 > Per-arch Q1.3 outputs at
 > `results/case_studies/steering_paper_normalised/<arch>/{generations,grades}.jsonl`.
 
+### Multi-seed Q2.C verification (per-position window-clamp)
+
+Re-ran Q2.C on seed=1 ckpts for the 2 main window archs. Mean across
+seeds:
+
+| arch | sd42 Q2.C | sd1 Q2.C | mean Q2.C | T-SAE k=500 mean |
+|---|---|---|---|---|
+| agentic_txc_02 | 1.20 | 1.53 | **1.37** | 1.38 (TIE) |
+| phase5b_subseq_h8 | 1.13 | 1.20 | 1.17 | 1.38 |
+
+**At matched effective sparsity (k_eff ≈ 500) AND under best
+protocol (Q2.C family-normalised paper-clamp + per-position write),
+TXC matryoshka mean peak success TIES T-SAE k=500's mean peak
+(1.37 vs 1.38).**
+
+The Q1.3 vs Q2.C improvement is also seed-dependent:
+- agentic_txc_02 sd42: 1.07 → 1.20 (+0.13)
+- agentic_txc_02 sd1:  1.00 → 1.53 (+0.53)
+- phase5b_subseq sd42: 1.00 → 1.13 (+0.13)
+- phase5b_subseq sd1:  0.73 → 1.20 (+0.47)
+
+Per-position write helps consistently, with a *much* larger effect at
+seed=1 than seed=42 (mean improvement 0.30-0.53 across seeds vs the
+0.13 reported from sd42 alone).
+
 ### Multi-seed verification (seed=1)
 
 Re-ran Q1.3 pipeline on seed=1 ckpts (5 archs). 2-seed peak success:
