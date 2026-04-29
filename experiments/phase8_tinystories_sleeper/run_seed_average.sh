@@ -81,7 +81,12 @@ PAIRS=(
   "txc  blocks.1.ln1.hook_normalized txc_l1_ln1"
 )
 
-for SEED in 0 1 2; do
+# SEEDS can be overridden via env var to split work across hosts.
+# Default: all three (0 1 2).
+SEEDS="${SEEDS:-0 1 2}"
+echo "[seeded] running seeds: $SEEDS" | tee -a "$LOG"
+
+for SEED in $SEEDS; do
   for entry in "${PAIRS[@]}"; do
     read -r FAMILY HOOK BASETAG <<< "$entry"
     TAG="${BASETAG}_s${SEED}"
