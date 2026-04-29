@@ -148,7 +148,7 @@ def main() -> None:
     # eating into the per-axes padding.
     sm = ScalarMappable(cmap=cmap, norm=norm)
     sm.set_array([])
-    fig.subplots_adjust(right=0.91, hspace=0.55, wspace=0.30, top=0.92, bottom=0.08)
+    fig.subplots_adjust(right=0.91, hspace=0.55, wspace=0.30, top=0.90, bottom=0.08)
     cbar_ax = fig.add_axes([0.93, 0.12, 0.015, 0.76])
     cbar = fig.colorbar(sm, cax=cbar_ax)
     cbar.set_label("steering magnitude α (or clamp strength)", fontsize=9)
@@ -157,6 +157,8 @@ def main() -> None:
         "Backtracking case study — per-architecture Pareto trajectories  (colour = α)",
         fontsize=12, y=0.97,
     )
+    # Don't call tight_layout — it would override the careful subplots_adjust
+    # we set up. (The default mpl behaviour collapses our hspace.)
 
     out_path = Path(args.out) if args.out else RESULTS_DIR / "plots_summary" / "pareto_per_arch.png"
     out_path.parent.mkdir(parents=True, exist_ok=True)
