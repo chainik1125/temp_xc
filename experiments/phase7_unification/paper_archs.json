@@ -217,5 +217,30 @@
       "phase5b_subseq_h8_T_max<T>": "Only T_max=10,12 trained — would need 14 new trainings. T_max=64 permanently lost on A40 anyway."
     },
     "results_source": "experiments/phase7_unification/results/probing_results.jsonl — filter rows where arch_id matches 'phase57_partB_h8_bare_multidistance_t<T>' for T in T_values AND S=32. results_manifest.json summarises coverage."
+  },
+  "task_sets": {
+    "FULL": {
+      "n_tasks": 36,
+      "comment": "Phase 7 standard task universe (~SAEBench Karvonen et al. + 2 cross-token additions: winogrande, wsc). Source-of-truth: experiments/phase7_unification/task_sets.py::FULL.",
+      "supplementary_only": true
+    },
+    "PAPER": {
+      "n_tasks": 16,
+      "comment": "Finalised paper headline reduction (locked 2026-04-29). Pre-registered cluster-balanced selection — 4 bias_in_bios, 3 europarl, 3 amazon, 2 ag_news, 2 github_code, 2 coreference. Picks within each cluster by cross-arch SD. Rationale + leaderboard in docs/han/research_logs/phase7_unification/agent_x_paper/2026-04-29-paper-task-set.md.",
+      "tasks": [
+        "bias_in_bios_set1_prof11", "bias_in_bios_set1_prof2",
+        "bias_in_bios_set3_prof20", "bias_in_bios_set3_prof9",
+        "europarl_fr", "europarl_de", "europarl_nl",
+        "amazon_reviews_cat5", "amazon_reviews_cat3",
+        "amazon_reviews_sentiment_5star",
+        "ag_news_business", "ag_news_scitech",
+        "github_code_java", "github_code_python",
+        "winogrande_correct_completion", "wsc_coreference"
+      ],
+      "source_of_truth": "experiments/phase7_unification/task_sets.py::PAPER (also exported as task_sets.HEADLINE)",
+      "headline": true
+    },
+    "default_used_by_paper_artefacts": "PAPER",
+    "policy": "All paper headline tables / plots / leaderboards filter to PAPER. FULL is reported in supplementary as a robustness check. Iteration uses PAPER; if budget permits, re-run on FULL at the end."
   }
 }

@@ -36,16 +36,16 @@ For a vanilla per-token SAE (`topk_sae`) and the T-SAE paper baseline
 4. Skip examples with fewer than K real tokens.
 
 K ∈ {2, 5}. Compared against the current Phase 7 leaderboard (which
-mean-pools across all real S=32 positions). **Task set: BALANCED-15**
+mean-pools across all real S=32 positions). **Task set: BALANCED**
 (paper headline reduction; rationale in `2026-04-29-task-importance.md`).
 Seed=42. FLIP applied to winogrande/wsc.
 
 Code: `experiments/phase7_unification/run_stacked_probing.py`,
-filtered to `BALANCED_15` from `experiments/phase7_unification/task_sets.py`.
+filtered to `BALANCED` from `experiments/phase7_unification/task_sets.py`.
 Raw rows for all 36 tasks remain in
 `results/stacked_probing_results.jsonl` for supplementary.
 
-### Headline numbers (mean test_auc_flip, seed=42, BALANCED-15)
+### Headline numbers (mean test_auc_flip, seed=42, BALANCED)
 
 **TXC champions (mean-pooled):**
 
@@ -69,7 +69,7 @@ Raw rows for all 36 tasks remain in
 | `topk_sae`        (mean-pool S=32) | 0.8559 | 0.8964 |
 | `tsae_paper_k500` (mean-pool S=32) | 0.8548 | 0.9050 |
 
-### Δ vs TXC champion (BALANCED-15)
+### Δ vs TXC champion (BALANCED)
 
 | baseline | k=5 Δ vs champ | k=20 Δ vs champ |
 |---|---|---|
@@ -80,7 +80,7 @@ Raw rows for all 36 tasks remain in
 | tsae_paper_k500 meanpool S=32 | −0.017 | +0.000 |
 
 Stacked-SAE concat **loses to TXC by 0.06-0.10 AUC** (slightly larger
-than under full-36 because BALANCED-15 excludes the near-ceiling tasks
+than under full-36 because BALANCED excludes the near-ceiling tasks
 where stacked-SAE could mask its weakness). Mean-pool SAE is
 within 0.005-0.017 of TXC.
 
@@ -123,7 +123,7 @@ paper-clamp at high strength), the paper's narrative should probably:
   favours T-SAE, AxBench-additive favours TXC; both are reported."
 - De-emphasise raw "TXC SOTA" claims.
 
-### Raw-activation concat — the stronger control (BALANCED-15)
+### Raw-activation concat — the stronger control (BALANCED)
 
 Same protocol but with NO SAE: take the raw `(d_in=2304)` Gemma
 activations at the last K positions, concat into `(N, K * 2304)`,

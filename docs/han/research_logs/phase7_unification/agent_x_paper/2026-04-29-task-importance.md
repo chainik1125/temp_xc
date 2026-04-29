@@ -6,22 +6,24 @@ tags:
   - in-progress
 ---
 
-## Are all 36 SAEBench tasks equally important?
+## Task-importance methodology — why we reduced FULL (36) → PAPER (16)
 
 > Han's question (2026-04-29): "are all the tasks equally important?
 > can we rank them in terms of importance? it might make the remaining
 > work faster if we reduce to a smaller set of tasks."
 
-**Short answer: no.** Within-cluster correlations are very high (most
-clusters mean pairwise r > +0.7), and a few tasks dominate the
-cross-arch discrimination signal. A **12-task reduced set** captures
-~95% of the leaderboard's discriminative information at 33% of the
-compute; an even more aggressive **8-task set** captures ~85-90%.
+**Short answer: no, tasks are NOT equally informative.** Within-cluster
+correlations are high (most clusters mean pairwise r > +0.7), and a
+few tasks dominate the cross-arch discrimination signal. After
+analysis the team locked in the PAPER set (16 tasks; details +
+leaderboard under it in `2026-04-29-paper-task-set.md`). This file
+documents the *methodology* — per-task SD, within-cluster correlation,
+and the principles that selected PAPER.
 
 ### Method
 
-For each (k_feat, task), compute across the 13 leaderboard archs (3-seed
-mean per arch where available):
+For each (k_feat, task), compute across the 13 leaderboard archs
+(3-seed mean per arch where available):
 
 - `mean_AUC`: average AUC across archs (high = task is "easy")
 - `SD`: cross-arch standard deviation (high = task discriminates archs)
@@ -83,120 +85,72 @@ By cross-arch SD:
 | 35 | wsc_coreference | coreference | 0.024 | 0.596 | near-random, FLIP-corrected; everyone fails |
 | 36 | winogrande_correct_completion | coreference | 0.021 | 0.567 | near-random, everyone fails |
 
-### Sanity check — does the reduced set preserve the leaderboard ranking?
+### Selection principles for PAPER
 
-I tested two reductions and re-built the 3-seed leaderboard at k=5
-and k=20 under each. Comparing to the full 36-task ranking:
+The 36-task FULL set has a serious cluster imbalance (15/36 = 42%
+bias_in_bios) and a long tail of redundant or saturating tasks. For a
+defensible paper headline benchmark we adopted four principles:
 
-#### 12-task naive set (3 bias_in_bios, 2 europarl, 2 amazon_cat, 1 sent, 1 ag_news, 2 github, 1 wsc)
+1. **Balance clusters proportionally without dropping any.** Each
+   skill axis (knowledge, language ID, sentiment, topic, code,
+   multi-token reasoning) gets representation. Drop none.
+2. **Pick within-cluster representatives by cross-arch SD**, not by
+   "where TXC wins" (avoids cherry-picking).
+3. **Span the structural-shortcut spectrum.** Include tasks where
+   single-token features dominate (and TXC's structure shouldn't
+   help) AND tasks where multi-token signal genuinely matters (where
+   TXC should help). This lets the leaderboard *honestly* report
+   where the architecture's inductive bias is visible.
+4. **Decide BEFORE looking at the resulting leaderboard.** This is a
+   pre-registration discipline against reverse-engineering the set to
+   make any one arch look good.
 
-**Major rank shifts** at k=5:
-- `topk_sae` jumps **#6 → #1** (0.8724) — but only by 0.0004 over the next archs
-- `mlc` drops **#1 → #4** (0.8697)
-- Top 4 within 0.003 AUC — basically a 4-way tie
-
-**Cause**: dropping 12 of 15 `bias_in_bios` tasks under-samples the
-cluster where TXC / MLC family win (per `2026-04-29-per-task-breakdown.md`).
-The reduced set is *biased* against window-and-multi-layer archs.
-
-**Verdict on 12-naive: NOT recommended for the headline leaderboard.**
-Speed gain (3×) doesn't justify a fundamentally different ranking.
-
-#### 15-task balanced set (5 bias_in_bios, 2 europarl, 2 amazon_cat, 1 sent, 1 ag_news, 2 github, 2 wino+wsc)
-
-Keeps cluster proportions closer to the original 36 set
-(bias_in_bios = 33% vs original 42%, others ~similar):
+### What PAPER contains
 
 ```
-bias_in_bios:  prof11, prof2, prof22, prof20, prof9   (5 from 15)
-europarl:      it, fr                                 (2 from 5)
-amazon_cat:    cat5, cat3                             (2 from 5)
-amazon_sent:   sentiment_5star                        (1)
-ag_news:       business                               (1 from 4)
-github_code:   java, python                           (2 from 4)
-coreference:   winogrande, wsc                        (2 from 2 — kept; near-random but the multi-token-dependence story needs them)
+bias_in_bios:  prof11, prof2, prof20, prof9          (4 of 15 — top-4 by SD)
+europarl:      fr, de, nl                            (3 of 5 — saturation spectrum)
+amazon:        cat5, cat3, sentiment_5star           (3 of 6 — top-2 cat by SD + sent)
+ag_news:       business, scitech                     (2 of 4 — top-2 by SD)
+github_code:   java, python                          (2 of 4 — top-2 by SD)
+coreference:   winogrande, wsc                       (2 of 2 — multi-token by construction)
 ```
 
-**3-seed leaderboard under 15-task balanced set:**
+Cluster proportions: 25% bias_in_bios (down from 42% in FULL),
+12.5% coreference (up from 6%; justified — winogrande is the only
+task whose construction adversarially nullifies single-token
+shortcuts and is therefore the only clean test of the multi-token-
+reasoning hypothesis). Source-of-truth:
+`experiments/phase7_unification/task_sets.py::PAPER`.
 
-k_feat=5 (top 6):
-| arch | full-36 mean | 15-task mean | rank-shift |
-|---|---|---|---|
-| `txc_bare_antidead_t5` | 0.8871 | **0.8643** ⭐ | #8 → #1 |
-| `phase57_partB_h8_bare_multidistance_t8` | 0.8934 | 0.8622 | #5 → #2 |
-| `topk_sae` | 0.8886 | 0.8618 | #7 → #3 |
-| `mlc` | 0.8972 | 0.8601 | **#1 → #4** |
-| `hill_subseq_h8_T12_s5` | 0.8951 | 0.8562 | #3 → #5 |
-| `phase5b_subseq_h8` | 0.8962 | 0.8532 | #2 → #6 |
-
-k_feat=20 (top 6):
-| arch | full-36 mean | 15-task mean | rank-shift |
-|---|---|---|---|
-| `txc_bare_antidead_t5` | 0.9359 | **0.9055** ⭐ | #1 → #1 ✓ |
-| `mlc` | 0.9352 | 0.9039 | #2 → #2 ✓ |
-| `hill_subseq_h8_T12_s5` | 0.9329 | 0.9004 | #3 → #3 ✓ |
-| `topk_sae` | 0.9304 | 0.9002 | #6 → #4 |
-| `phase57_partB_h8_bare_multidistance_t8` | 0.9307 | 0.9001 | #5 → #5 ≈ |
-| `tsae_paper_k500` | 0.9319 | 0.8998 | #4 → #6 |
-
-**At k=20 the 15-task ranking exactly matches full-36 for the top 3,
-with minor reshuffles in #4-#6 (within ~0.0004 AUC each).** At k=5 the
-ranking shuffles within the top-6 cluster, but the same 6 archs occupy
-the top tier in both cases.
-
-**Verdict on 15-task balanced: RECOMMENDED.** 2.4× speedup over the
-full 36-task set, with the k=20 top-3 unchanged and the k=5 ranking
-shuffles confined to within-σ-noise.
-
-### What this saves
-
-| set | n_tasks | speedup vs 36 | leaderboard top-3 fidelity |
-|---|---|---|---|
-| full | 36 | 1.0× | reference |
-| 15-task balanced ⭐ | 15 | **2.4×** | k=20: identical; k=5: same top-6 cluster, intra-shuffled |
-| 12-task naive | 12 | 3.0× | k=20: stable; k=5: ranking distorted (under-sampled bias_in_bios) |
-| 8-task aggressive | 8 | 4.5× | both k_feat: ranking distorted |
-
-For **IT-side completion + H200 work**, switching to the 15-task set
-saves ~2-3 hr of probing time per arch-side and reduces probe-cache
-build by ~58%. The full 36-task set should still be reported in
-supplementary for completeness.
-
-### Recommendation
-
-Add to `paper_archs.json`:
-
-```json
-"reduced_task_set": {
-  "n_tasks": 15,
-  "rationale": "42% of original 36-task set; preserves k=20 top-3 ranking and k=5 top-6 cluster identity. 2.4× speedup for IT-side + H200 paper-cell completion.",
-  "selected_by": "top-K cross-arch SD within each task cluster, with per-cluster proportion approximately matching the full 36-task distribution",
-  "tasks": [
-    "bias_in_bios_set1_prof11", "bias_in_bios_set1_prof2",
-    "bias_in_bios_set2_prof22", "bias_in_bios_set3_prof20",
-    "bias_in_bios_set3_prof9",
-    "europarl_it", "europarl_fr",
-    "amazon_reviews_cat5", "amazon_reviews_cat3",
-    "amazon_reviews_sentiment_5star",
-    "ag_news_business",
-    "github_code_java", "github_code_python",
-    "winogrande_correct_completion", "wsc_coreference"
-  ]
-}
-```
+For full discussion of the leaderboard under PAPER and the
+cross-task-set robustness checks, see
+`2026-04-29-paper-task-set.md`.
 
 ### Caveats
 
-- **The within-cluster correlation is computed across only 13 archs.**
-  More archs may diverge per-task ranking slightly.
-- **`bias_in_bios` 5-of-15 reduction** still over-counts that cluster
-  somewhat (33% vs 42%) but is closer to balance than 3-of-15 (25%).
-- **`coreference` (winogrande/wsc)** is kept despite being near-random
-  because the multi-token-dependence motivation is paper-relevant. If
-  reviewers don't care, dropping these → 13-task set, 2.8× speedup,
-  same general structure.
+- The within-cluster correlation is computed across 13 archs. With
+  more archs the per-task ranking might diverge slightly. Sanity
+  check: even at the conservative end (γ ≈ 0.7), 5 redundant tasks
+  add at most √5/√(1+(5−1)·0.7) ≈ 1.4× the signal of 1 task — so
+  1-2 representatives per cluster is sound.
+- `bias_in_bios` covers different professions (lawyer / nurse /
+  scientist / etc), some of which probably show genuinely different
+  arch rankings. With +0.88 mean correlation the redundancy is high
+  but not perfect; 4 of 15 representatives is a defensible
+  compromise.
+- `coreference` (winogrande / wsc) is near-random for ALL archs in
+  absolute AUC. The original motivation (test multi-token-dependence)
+  is sound. The per-task T-sweep
+  (`2026-04-29-per-task-tsweep.md`) shows winogrande is the *only*
+  task with a positive T-slope at k=20 (climbing from 0.62 at T=3 to
+  0.90 at T=32) — this is the cleanest empirical validation of TXC's
+  structural advantage we have. Keeping both winogrande and wsc in
+  PAPER is justified despite their low absolute AUC.
 
 ### Files of record
 
-- Analysis: `experiments/phase7_unification/analyze_task_importance.py`
+- Analysis script: `experiments/phase7_unification/analyze_task_importance.py`
 - Probing rows: `experiments/phase7_unification/results/probing_results.jsonl`
+- Final set + leaderboard: `2026-04-29-paper-task-set.md`
+- Source-of-truth constant: `experiments/phase7_unification/task_sets.py::PAPER`

@@ -29,7 +29,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 from experiments.phase7_unification._paths import OUT_DIR, PLOTS_DIR
-from experiments.phase7_unification.task_sets import BALANCED_15
+from experiments.phase7_unification.task_sets import HEADLINE as PAPER
 
 
 def save_figure(fig, path: str, dpi: int = 150, thumb_max_width: int = 288, thumb_dpi: int = 48):
@@ -63,10 +63,10 @@ SEEDS = (1, 2, 42)
 S_FILTER = 32
 
 
-def load_seed_task_aucs(task_set=BALANCED_15) -> dict:
+def load_seed_task_aucs(task_set=PAPER) -> dict:
     """Returns dict[(arch_id, k_feat, seed)] -> dict[task_name -> auc_flip].
 
-    Filters to `task_set` (default: BALANCED_15 — the paper headline set).
+    Filters to `task_set` (default: PAPER — the paper headline set).
     """
     out = defaultdict(dict)
     with PROBING_PATH.open() as f:
@@ -176,7 +176,7 @@ def make_plot(rows, out_dir: Path):
             ax.text(m + 0.005, i, f"{m:.4f}", va="center", fontsize=8)
 
     fig.suptitle("Phase 7 leaderboard — 3-seed mean ± σ_seeds across {1, 2, 42}, "
-                 "BALANCED-15 task set (k=20 top-3 ranking matches full 36)",
+                 "PAPER task set (cluster-balanced; k=20 top-3 ranking matches full 36)",
                  fontsize=11, weight="bold")
     out_path = out_dir / "phase7_leaderboard_multiseed.png"
     save_figure(fig, str(out_path))

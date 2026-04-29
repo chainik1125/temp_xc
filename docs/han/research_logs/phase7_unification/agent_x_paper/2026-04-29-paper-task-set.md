@@ -6,7 +6,7 @@ tags:
   - in-progress
 ---
 
-## Final paper task set — `PAPER_16`
+## Final paper task set — `PAPER`
 
 > Han's question (2026-04-29): "from a scientific point of view, if we
 > have to pick a set of 16 tasks to use (because we don't have enough
@@ -37,7 +37,7 @@ benchmark:
 ### The 16-task set
 
 ```python
-PAPER_16 = frozenset({
+PAPER = frozenset({
     # bias_in_bios — 4 of 15 (top-4 by cross-arch SD)
     'bias_in_bios_set1_prof11',
     'bias_in_bios_set1_prof2',
@@ -63,11 +63,11 @@ PAPER_16 = frozenset({
 })
 ```
 
-Source-of-truth: `experiments/phase7_unification/task_sets.py::PAPER_16`.
+Source-of-truth: `experiments/phase7_unification/task_sets.py::PAPER`.
 
 ### Cluster composition
 
-| cluster | n in PAPER_16 | n in full 36 | proportion |
+| cluster | n in PAPER | n in full 36 | proportion |
 |---|---|---|---|
 | bias_in_bios | 4 | 15 | 25% (was 42% in full) |
 | europarl | 3 | 5 | 19% (was 14%) |
@@ -85,7 +85,7 @@ The two systematic shifts vs the full set:
   and is therefore the only clean test of the multi-token-reasoning
   hypothesis.
 
-### What the leaderboard looks like under PAPER_16
+### What the leaderboard looks like under PAPER
 
 3-seed mean across {1, 2, 42}:
 
@@ -130,9 +130,9 @@ TXC variant you pick.
 
 | task set | k=5 top 3 | k=20 top 3 |
 |---|---|---|
-| FULL-36 | mlc / phase5b_subseq_h8 / hill_T12 | **txc_bare_antidead_t5** / mlc / hill_T12 |
-| BALANCED-15 | txc_bare_antidead_t5 / phase57_h8_md_t8 / topk_sae | **txc_bare_antidead_t5** / mlc / hill_T12 |
-| **PAPER-16** | hill_T12 / mlc / topk_sae | **txc_bare_antidead_t5** / hill_T12 / mlc |
+| FULL | mlc / phase5b_subseq_h8 / hill_T12 | **txc_bare_antidead_t5** / mlc / hill_T12 |
+| BALANCED | txc_bare_antidead_t5 / phase57_h8_md_t8 / topk_sae | **txc_bare_antidead_t5** / mlc / hill_T12 |
+| **PAPER** | hill_T12 / mlc / topk_sae | **txc_bare_antidead_t5** / hill_T12 / mlc |
 
 `txc_bare_antidead_t5` is the **k=20 winner across all three task
 sets** — a strong robustness check. At k=5 the winner shifts (mlc /
@@ -143,10 +143,10 @@ the σ_seeds-noise reading.
 
 1. **At k_feat=20, `txc_bare_antidead_t5` is the leaderboard winner**
    (Δ = +0.0036 over `topk_sae`, ~6× σ_seeds). Ranking unchanged
-   between full-36 and PAPER-16 — robust to task-subset choice.
+   between full-36 and PAPER — robust to task-subset choice.
 
 2. **At k_feat=5, the top 6 archs are within 0.0035 AUC** under
-   PAPER-16 — `mlc`, `topk_sae`, and three TXC variants all
+   PAPER — `mlc`, `topk_sae`, and three TXC variants all
    essentially tied. No defensible single-champion claim at k=5.
 
 3. **TXC's structural advantage is conditional, not generic.** The
@@ -155,7 +155,7 @@ the σ_seeds-noise reading.
    helps when per-token features can't saturate the task (winogrande
    by adversarial construction; europarl_nl by linguistic structure).
    It hurts where per-token features dominate (europarl_fr,
-   github_code, ag_news). The PAPER-16 set fairly samples both
+   github_code, ag_news). The PAPER set fairly samples both
    regimes.
 
 4. **The `winogrande` T-sweep is the cleanest single-task evidence
@@ -163,7 +163,7 @@ the σ_seeds-noise reading.
    100× the next-most-positive task). Worth featuring as a
    single-panel paper figure regardless of how the headline goes.
 
-### What's NOT in PAPER-16 — and why
+### What's NOT in PAPER — and why
 
 - `bias_in_bios` 11 of 15 dropped because they're highly
   intra-correlated (mean r=+0.88) and over-represent biographical
@@ -182,7 +182,7 @@ the σ_seeds-noise reading.
 
 ### Practical implication
 
-Use PAPER-16 for: headline tables in the paper, IT-side completion
+Use PAPER for: headline tables in the paper, IT-side completion
 work (saves ~56% of probing time vs full-36), H200 hill-climb
 evaluation. Report the full 36-task results in supplementary so
 reviewers who care about the under-sampled clusters can verify the
@@ -190,9 +190,9 @@ robustness check.
 
 ### Files of record
 
-- Source: `experiments/phase7_unification/task_sets.py::PAPER_16`
+- Source: `experiments/phase7_unification/task_sets.py::PAPER`
 - Probing rows: `experiments/phase7_unification/results/probing_results.jsonl`
 - Per-task analysis: `2026-04-29-barebones-txc-per-task.md`,
   `2026-04-29-per-task-tsweep.md`
-- Earlier task-set proposals (BALANCED-15, DIVERSE-12):
+- Earlier task-set proposals (BALANCED, DIVERSE-12):
   `2026-04-29-task-importance.md`

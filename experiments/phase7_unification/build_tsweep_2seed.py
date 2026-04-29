@@ -25,7 +25,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 from experiments.phase7_unification._paths import OUT_DIR, PLOTS_DIR
-from experiments.phase7_unification.task_sets import BALANCED_15
+from experiments.phase7_unification.task_sets import HEADLINE as PAPER
 
 
 PROBING_PATH = OUT_DIR / "probing_results.jsonl"
@@ -46,10 +46,10 @@ def save_figure(fig, path: str, dpi: int = 150, thumb_max_width: int = 288, thum
     fig.savefig(p.with_suffix(".thumb.png"), dpi=thumb_dpi_eff, bbox_inches="tight")
 
 
-def load_tsweep_data(task_set=BALANCED_15):
+def load_tsweep_data(task_set=PAPER):
     """Return dict[(family, T, k_feat, seed)] -> list of test_auc_flip across tasks.
 
-    Filters to `task_set` (default BALANCED_15).
+    Filters to `task_set` (default PAPER).
     """
     out = defaultdict(list)
     with PROBING_PATH.open() as f:
@@ -130,7 +130,7 @@ def make_plot(summ, out_dir: Path):
         ax.set_xticks([3, 5, 8, 10, 12, 16, 20, 24])
 
     fig.suptitle("Phase 7 T-sweep — 2-seed mean ± σ_seeds across {1, 42}, "
-                 "BALANCED-15 task set",
+                 "PAPER task set",
                  fontsize=11, weight="bold")
     out_path = out_dir / "phase7_tsweep_2seed.png"
     save_figure(fig, str(out_path))

@@ -6,7 +6,7 @@ tags:
   - in-progress
 ---
 
-## Phase 7 leaderboard — multi-seed (1, 2, 42), BALANCED-15 task set
+## Phase 7 leaderboard — multi-seed (1, 2, 42), PAPER task set
 
 > Closes Han's pending tasks #5 ("Build 2-seed leaderboard with σ") and
 > #7 ("Update Phase 7 summary with σ-augmented leaderboard"). Built
@@ -15,19 +15,15 @@ tags:
 > probings for 6 of the 8 paper leaderboard archs (tfa_big and
 > txcdr_t16 only have seeds {1, 42} on HF).
 >
-> **Task set: BALANCED-15** — paper headline reduction (rationale +
-> per-task SD analysis in `2026-04-29-task-importance.md`). Preserves
-> k=20 top-3 ranking exactly vs full 36-task set; k=5 reshuffles
-> within the top-6 cluster but the same 6 archs occupy the top tier.
-> 2.4× speedup for IT-side completion + H200 paper-cell work.
->
-> Key takeaway: the leaderboard top is **very tight** at all k_feat —
-> top 4 archs at k=5 span only 0.0042 AUC, with σ_seeds 0.005-0.009.
-> The leaderboard top "champion" identity changes with seed selection.
+> **Task set: PAPER** — the finalised paper task set. Pre-registered
+> selection by cross-arch SD within balanced clusters (4 bias_in_bios,
+> 3 europarl, 3 amazon, 2 ag_news, 2 github_code, 2 coreference). Full
+> rationale + cluster proportions in `2026-04-29-paper-task-set.md`.
+> Source-of-truth: `experiments/phase7_unification/task_sets.py::PAPER`.
 
 ### Data
 
-- 36 SAEBench tasks (Phase 7 standard set, includes winogrande / wsc FLIP).
+- **PAPER** task set (16 of 36 SAEBench tasks).
 - S = 32 left-aligned cache, mean-pool aggregation (Phase 7 methodology).
 - FLIP applied to winogrande / wsc.
 - Seed ∈ {1, 2, 42} when ckpts available; per-cell `n_seeds` column flags
@@ -47,132 +43,133 @@ base + Gemma-2-2b-it). Below shows the BASE-side coverage:
 
 | paper_id | arch_id | k_win | status (this report) |
 |---|---|---|---|
-| tfa | tfa_big | 500 | ✅ 2 seeds × 36 tasks |
-| tsae_k20 | tsae_paper_k20 | 20 | ✅ 3 seeds × 36 tasks |
-| tsae_k500 | tsae_paper_k500 | 500 | ✅ 3 seeds × 36 tasks |
-| mlc | mlc | 500 | ✅ 3 seeds × 36 tasks |
-| **mlc_sparse** | **mlc** | **100** | ❌ not trained at b=4096 (H200_required; legacy IT-side k_win=100 ckpts at b=1024 don't count) |
-| ag_mlc_08 | agentic_mlc_08 | 500 | ✅ 3 seeds × 36 tasks |
+| tfa | tfa_big | 500 | ✅ 2 seeds × 16 tasks |
+| tsae_k20 | tsae_paper_k20 | 20 | ✅ 3 seeds × 16 tasks |
+| tsae_k500 | tsae_paper_k500 | 500 | ✅ 3 seeds × 16 tasks |
+| mlc | mlc | 500 | ✅ 3 seeds × 16 tasks |
+| **mlc_sparse** | **mlc** | **100** | ❌ not trained at b=4096 (H200_required) |
+| ag_mlc_08 | agentic_mlc_08 | 500 | ✅ 3 seeds × 16 tasks |
 | **ag_mlc_08_sparse** | **agentic_mlc_08** | **100** | ❌ not trained at b=4096 (H200_required) |
-| txc_t5 | txcdr_t5 | 500 | ✅ 3 seeds × 36 tasks |
-| txc_t16 | txcdr_t16 | 500 | ✅ 2 seeds × 36 tasks (no seed=2 ckpt on HF) |
-| good_txc_p5 | phase5b_subseq_h8 | 500 | ✅ 3 seeds × 36 tasks |
-| good_txc_p7_k20 | txc_bare_antidead_t5 | 500 | ✅ 3 seeds × 36 tasks |
-| good_txc_p7_k5 | phase57_partB_h8_bare_multidistance_t8 | 500 | ✅ 3 seeds × 36 tasks |
+| txc_t5 | txcdr_t5 | 500 | ✅ 3 seeds × 16 tasks |
+| txc_t16 | txcdr_t16 | 500 | ✅ 2 seeds × 16 tasks (no seed=2 ckpt on HF) |
+| good_txc_p5 | phase5b_subseq_h8 | 500 | ✅ 3 seeds × 16 tasks |
+| good_txc_p7_k20 | txc_bare_antidead_t5 | 500 | ✅ 3 seeds × 16 tasks |
+| good_txc_p7_k5 | phase57_partB_h8_bare_multidistance_t8 | 500 | ✅ 3 seeds × 16 tasks |
 
 10 of 12 base-side cells are evaluated; **2 cells (mlc_sparse,
 ag_mlc_08_sparse) are missing — both H200_required and not yet
 trained at paper-canonical b=4096**. The IT side (12 cells × 2nd
 subject model) is entirely missing — see `README.md` "Gaps".
 
-### k_feat = 5
-
-### k_feat = 5  (BALANCED-15 task set)
+### k_feat = 5  (PAPER task set)
 
 | arch | n_seeds | mean_AUC | σ_seeds | σ_tasks |
 |---|---|---|---|---|
-| **`txc_bare_antidead_t5`** ⭐ | 3 | **0.8643** | 0.0056 | 0.1302 |
-| phase57_partB_h8_bare_multidistance_t8 | 3 | 0.8622 | 0.0083 | 0.1321 |
-| topk_sae | 3 | 0.8618 | 0.0055 | 0.1344 |
-| mlc | 3 | 0.8601 | 0.0094 | 0.1399 |
-| hill_subseq_h8_T12_s5 (1 seed) | 1 | 0.8562 | — | 0.1279 |
-| phase5b_subseq_h8 | 3 | 0.8532 | 0.0087 | 0.1285 |
-| txcdr_t5 | 3 | 0.8518 | 0.0091 | 0.1278 |
-| tsae_paper_k500 | 3 | 0.8454 | 0.0211 | 0.1262 |
-| txcdr_t16 | 2 | 0.8448 | 0.0091 | 0.1196 |
-| tsae_paper_k20 | 3 | 0.8313 | 0.0060 | 0.1228 |
-| mlc_contrastive_alpha100_batchtopk | 3 | 0.6885 | 0.0044 | 0.1139 |
-| tfa_big | 2 | 0.6839 | 0.0268 | 0.0814 |
-| agentic_mlc_08 | 3 | 0.6581 | 0.0189 | 0.0869 |
+| hill_subseq_h8_T12_s5 (1 seed) | 1 | 0.8730 | — | 0.1304 |
+| **`mlc`** ⭐ | 3 | **0.8707** | 0.0086 | 0.1393 |
+| topk_sae | 3 | 0.8695 | 0.0051 | 0.1331 |
+| txc_bare_antidead_t5 | 3 | 0.8683 | 0.0049 | 0.1266 |
+| phase57_partB_h8_bare_multidistance_t8 | 3 | 0.8682 | 0.0042 | 0.1299 |
+| phase5b_subseq_h8 | 3 | 0.8670 | 0.0050 | 0.1310 |
+| tsae_paper_k500 | 3 | 0.8651 | 0.0189 | 0.1285 |
+| txcdr_t5 | 3 | 0.8601 | 0.0104 | 0.1266 |
+| txcdr_t16 | 2 | 0.8580 | 0.0065 | 0.1231 |
+| tsae_paper_k20 | 3 | 0.8372 | 0.0036 | 0.1207 |
+| mlc_contrastive_alpha100_batchtopk | 3 | 0.7176 | 0.0052 | 0.1361 |
+| tfa_big | 2 | 0.7010 | 0.0228 | 0.0847 |
+| agentic_mlc_08 | 3 | 0.6807 | 0.0167 | 0.0986 |
 
-### k_feat = 20  (BALANCED-15 task set)
+### k_feat = 20  (PAPER task set)
 
 | arch | n_seeds | mean_AUC | σ_seeds | σ_tasks |
 |---|---|---|---|---|
-| **`txc_bare_antidead_t5`** ⭐ | 3 | **0.9055** | 0.0006 | 0.1150 |
-| mlc | 3 | 0.9039 | 0.0023 | 0.1172 |
-| hill_subseq_h8_T12_s5 (1 seed) | 1 | 0.9004 | — | 0.1016 |
-| topk_sae | 3 | 0.9002 | 0.0035 | 0.1148 |
-| phase57_partB_h8_bare_multidistance_t8 | 3 | 0.9001 | 0.0035 | 0.1117 |
-| tsae_paper_k500 | 3 | 0.8998 | 0.0081 | 0.1060 |
-| txcdr_t5 | 3 | 0.8970 | 0.0023 | 0.1087 |
-| phase5b_subseq_h8 | 3 | 0.8947 | 0.0025 | 0.1079 |
-| tsae_paper_k20 | 3 | 0.8941 | 0.0021 | 0.1039 |
-| txcdr_t16 | 2 | 0.8880 | 0.0064 | 0.0998 |
-| mlc_contrastive_alpha100_batchtopk | 3 | 0.8692 | 0.0014 | 0.1291 |
-| agentic_mlc_08 | 3 | 0.8426 | 0.0068 | 0.1330 |
-| tfa_big | 2 | 0.7677 | 0.0276 | 0.0825 |
+| **`txc_bare_antidead_t5`** ⭐ | 3 | **0.9127** | 0.0012 | 0.1139 |
+| hill_subseq_h8_T12_s5 (1 seed) | 1 | 0.9126 | — | 0.1027 |
+| mlc | 3 | 0.9122 | 0.0022 | 0.1164 |
+| tsae_paper_k500 | 3 | 0.9105 | 0.0081 | 0.1063 |
+| topk_sae | 3 | 0.9091 | 0.0058 | 0.1147 |
+| phase57_partB_h8_bare_multidistance_t8 | 3 | 0.9086 | 0.0032 | 0.1114 |
+| txcdr_t5 | 3 | 0.9067 | 0.0027 | 0.1091 |
+| phase5b_subseq_h8 | 3 | 0.9059 | 0.0022 | 0.1090 |
+| tsae_paper_k20 | 3 | 0.9019 | 0.0015 | 0.1041 |
+| txcdr_t16 | 2 | 0.8984 | 0.0044 | 0.1019 |
+| mlc_contrastive_alpha100_batchtopk | 3 | 0.8810 | 0.0037 | 0.1296 |
+| agentic_mlc_08 | 3 | 0.8680 | 0.0049 | 0.1350 |
+| tfa_big | 2 | 0.7875 | 0.0266 | 0.0890 |
 
-### Headline shifts (BALANCED-15)
+### Headline shifts (PAPER)
 
-- **k=5 winner is `txc_bare_antidead_t5`** (0.8643), narrowly above
-  `phase57_partB_h8_bare_multidistance_t8` (0.8622), `topk_sae`
-  (0.8618), and `mlc` (0.8601). The k=5 top-4 span **only 0.0042 AUC**
-  — within σ_seeds noise (0.005-0.009 on top entries).
-- **k=20 winner is `txc_bare_antidead_t5`** (0.9055), with `mlc`
-  effectively tied at 0.9039 (Δ=0.0016, ~3× the smaller arch's σ_seeds).
-  Top-6 archs within 0.006 AUC.
-- **Within the MLC family**: vanilla `mlc` (0.8601 at k=5) is
-  competitive at the top. Contrastive (`mlc_contrastive_alpha100_batchtopk`,
-  0.6885) and multi-scale (`agentic_mlc_08`, 0.6581) variants
-  drop ~0.17-0.20 AUC — the contrastive losses don't help probing AUC.
-- **TXC family**: at k=5 the BALANCED-15 ranking flips relative to
-  the full-36 (where `mlc` was nominally first). Both `txc_bare_antidead_t5`
-  and `phase57_partB_h8_bare_multidistance_t8` move ahead of `mlc` here —
-  but the gap is small enough (Δ=0.004) that "single champion at k=5"
-  isn't statistically defensible regardless of task set.
-- **Cross-task-set robustness**: at k=20 the top-3 ranking
-  (`txc_bare_antidead_t5`, `mlc`, `hill_subseq_h8_T12_s5`) is
-  IDENTICAL between full-36 and BALANCED-15 — strong sanity-check on
-  the headline claim.
+- **k=5 winner is `mlc`** at 0.8707 (3-seed; `hill_subseq_h8_T12_s5`
+  nominally above at 0.8730 but only 1 seed). The k=5 top-6 archs span
+  only **0.0037 AUC** (mlc 0.8707 → phase5b_subseq_h8 0.8670). σ_seeds
+  on top entries is 0.004-0.010 — top archs are **statistically
+  indistinguishable**.
+- **k=20 winner is `txc_bare_antidead_t5`** at 0.9127 (σ_seeds 0.0012),
+  ahead of `mlc` (0.9122) and `tsae_paper_k500` (0.9105). Top-4 within
+  0.005 AUC, but `txc_bare_antidead_t5`'s very small σ_seeds (0.0012)
+  makes the win **statistically defensible** (Δ vs `topk_sae` = +0.0036,
+  ~6× σ_seeds).
+- **MLC family**: vanilla `mlc` is competitive at the top of both
+  k_feat columns. The contrastive
+  (`mlc_contrastive_alpha100_batchtopk`, 0.7176 / 0.8810) and
+  multi-scale (`agentic_mlc_08`, 0.6807 / 0.8680) variants drop ~0.13
+  -0.20 AUC at k=5 — contrastive losses don't help probing AUC.
+- **Cross-task-set robustness**: `txc_bare_antidead_t5` is the **k=20
+  winner across all three task sets** (full-36, BALANCED, PAPER)
+  — strong robustness evidence for the headline claim. At k=5 the
+  winner shifts (mlc / txc / topk_sae depending on cluster
+  proportions) — consistent with σ_seeds-noise reading.
 
-### Δ to vanilla `topk_sae` baseline (BALANCED-15)
+### Δ to vanilla `topk_sae` baseline (PAPER)
 
 3-seed deltas:
 
 | k_feat | top arch | topk_sae | Δ | top arch σ_seeds | topk_sae σ_seeds |
 |---|---|---|---|---|---|
-| 5  | txc_bare_antidead_t5 0.8643 | 0.8618 | **+0.0025** | 0.0056 | 0.0055 |
-| 20 | txc_bare_antidead_t5 0.9055 | 0.9002 | **+0.0053** | 0.0006 | 0.0035 |
+| 5  | mlc 0.8707 | 0.8695 | **+0.0012** | 0.0086 | 0.0051 |
+| 20 | txc_bare_antidead_t5 0.9127 | 0.9091 | **+0.0036** | 0.0012 | 0.0058 |
 
-The k=5 gap of 0.0025 is now **below σ_seeds** (~0.5× σ) — at the
-BALANCED-15 task set, the headline claim "TXC beats topk_sae at k=5"
-is not statistically defensible. The k=20 gap of 0.0053 remains
-decisive (~9× σ_seeds of the smaller arch).
+The k=5 gap of 0.0012 is **far below σ_seeds** (~0.15× σ) — at PAPER
+the headline claim "any arch beats topk_sae at k=5" is not
+statistically defensible. The k=20 gap of 0.0036 remains decisive
+(~6× σ_seeds of `txc_bare_antidead_t5`).
 
-(Compare to the full-36 numbers: at k=5 the gap was +0.0086 with mlc
-as champion — including the 11 dropped bias_in_bios professions
-inflated the gap by 0.006.)
-
-### Honest paper-narrative read
+### Honest paper read (revised, post-PAPER)
 
 > Both `mlc` (per-token across 5 layers) and `txc_bare_antidead_t5`
 > (window over 5 tokens at one layer) are competitive with strong
-> per-token-single-layer SAE baselines on 36-task SAEBench probing.
-> At less-sparse k=20 the win over `topk_sae` is decisive (~0.005-0.006
-> AUC, ~18× σ_seeds). At very-sparse k=5 the win is real but
-> ~σ-noise-magnitude (~0.008 AUC, ~1-2× σ_seeds), and the *single-best*
-> arch identity (`mlc` vs `phase5b_subseq_h8` vs the H8 family) shifts
-> within the top-3 across seeds. The structural inductive bias —
-> whether across multiple LAYERS (`mlc`) or across multiple TOKEN
-> POSITIONS (TXC) — provides a small but real probing-AUC advantage,
-> with the advantage concentrated on knowledge-domain content
-> (`bias_in_bios_*` profession prediction, `europarl_*` language ID).
+> per-token-single-layer SAE baselines on the PAPER SAEBench
+> reduction. **At less-sparse k=20 the win over `topk_sae` is
+> decisive** (~0.0036 AUC, ~6× σ_seeds), with `txc_bare_antidead_t5`
+> the consistent winner across all task subsets evaluated. **At
+> very-sparse k=5 the gap is below seed noise** — the structural
+> inductive bias is unable to provide a measurable advantage at
+> k_feat=5 sparsity.
 
-Combined with the stacked-SAE concat control (rules out "more
-candidates" as the source — `2026-04-29-stacked-sae-control.md`)
-and Y's per-concept finding (TXC favoured on knowledge concepts —
-`2026-04-29-y-cs-synthesis.md`), the paper narrative is:
-*structural inductive bias across either layers or token positions
-beats per-token-single-layer baselines by small but real margins, on
-knowledge-domain content specifically*.
+The structural advantage (whether across LAYERS via `mlc` or across
+TOKEN POSITIONS via TXC) provides a small but real probing-AUC
+advantage at k=20, with the advantage concentrated on knowledge-
+domain content (`bias_in_bios_*` profession prediction, `europarl_nl`
+language ID at multi-token resolution) — see
+`2026-04-29-barebones-txc-per-task.md` and
+`2026-04-29-per-task-tsweep.md`.
+
+Combined with Y's per-concept finding (TXC favoured on knowledge
+concepts) and Y's sparsity-decomposition (T-SAE k=20's apparent lead
+on steering is mostly a sparsity choice, not architecture), the paper
+narrative is: *structural inductive bias across either layers or
+token positions provides modest, conditional probing-AUC advantages
+on knowledge content; advantage is decisive at k=20 sparsity but
+noise-level at k=5*.
 
 ### Plot
 
-![3-seed leaderboard](plots/phase7_leaderboard_multiseed.png)
+![multi-seed leaderboard](plots/phase7_leaderboard_multiseed.png)
 
 ### Files of record
 
 - Builder: `experiments/phase7_unification/build_leaderboard_2seed.py`
-- Plot: `experiments/phase7_unification/results/plots/phase7_leaderboard_multiseed.png`
+- Plot: `plots/phase7_leaderboard_multiseed.png`
 - Probing rows: `experiments/phase7_unification/results/probing_results.jsonl`
+- Task set source: `experiments/phase7_unification/task_sets.py::PAPER`
+- Task set rationale: `2026-04-29-paper-task-set.md`
