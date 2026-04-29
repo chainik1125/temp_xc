@@ -79,20 +79,26 @@ def _capture_windows(
     for p_ in model.parameters():
         p_.requires_grad_(False)
 
-    if component == "resid":
-        target = model.model.layers[layer]
-    elif component == "attn":
-        target = model.model.layers[layer].self_attn
-    else:
-        raise ValueError(f"unknown component: {component}")
-
     captured = {}
-    def hook(_m, _i, output):
+    def post_hook(_m, _i, output):
         x = output[0] if isinstance(output, tuple) else output
         if x.dim() == 4:
             x = x.reshape(x.shape[0], x.shape[1], -1)
         captured["x"] = x.detach().to(torch.float32).cpu()
-    handle = target.register_forward_hook(hook)
+    def pre_hook(_m, args):
+        x = args[0]
+        if x.dim() == 4:
+            x = x.reshape(x.shape[0], x.shape[1], -1)
+        captured["x"] = x.detach().to(torch.float32).cpu()
+
+    if component == "resid":
+        handle = model.model.layers[layer].register_forward_hook(post_hook)
+    elif component == "attn":
+        handle = model.model.layers[layer].self_attn.register_forward_hook(post_hook)
+    elif component == "ln1":
+        handle = model.model.layers[layer].self_attn.register_forward_pre_hook(pre_hook)
+    else:
+        raise ValueError(f"unknown component: {component}")
 
     X_list, is_bt, keys = [], [], []
     debug_emitted = 0

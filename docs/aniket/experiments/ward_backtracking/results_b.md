@@ -29,11 +29,10 @@ with the chosen feature's decoder row.
 | Mined sentences (D / D+) | 23,664 / 3,023 |
 | Top resid feature D+/D- score | 0.134 |
 | Top attn feature D+/D- score | 0.121 |
-| B1 best TXC kw rate @ mag=+12 (resid_L10 f1444 union) | **0.0222 ± 0.0052** |
-| B1 best TXC kw rate @ mag=+16 (resid_L10 f1444 pos0)  | **0.0577 ± 0.0237** |
-| B1 DoM(base) baseline @ mag=+12 / +16                 | 0.0209 ± 0.0024 / 0.0351 ± 0.0057 |
-| TXC@+16 vs DoM_base@+16 ratio (best feature, pos0)    | **1.64×** |
-| Outcome verdict (B1)                                  | **POSITIVE** at the resid_L10 hookpoint — best TXC feature ≥ Stage A DoM at every mag tested, with 1.6× edge at mag=+16. |
+| B1 best TXC kw rate @ mag=+12 (coherent, max-run ≤ 2) | 0.0222 ± 0.0052 (TXC f1444 union) |
+| B1 DoM(base) / DoM(reasoning) @ mag=+12               | 0.0209 ± 0.0024 / 0.0240 ± 0.0049 |
+| B1 best TXC kw rate @ mag=+16 (NOT coherent — see below) | 0.0577 (TXC f1444 pos0, but max-run = 16; output collapses to "Wait Wait Wait...") |
+| Outcome verdict (B1, coherence-adjusted)              | **TIE at coherent magnitudes**: TXC ≈ DoM(base) ≈ DoM(reasoning) at mag=+12; TXC's apparent edge at +16 is bought with degenerate repeat collapse. |
 
 ## Headline figure
 
@@ -155,7 +154,45 @@ template, same greedy decoding, magnitudes ∈ {0, +8, +12, +16}.
 | `txc_attn_L10_f3151_pos0`  | 0.0046 ± 0.0010 | 0.0067 ± 0.0010 | 0.0124 ± 0.0017 | 0.0230 ± 0.0048 |
 | `txc_attn_L10_f3151_union` | 0.0046 ± 0.0010 | 0.0070 ± 0.0010 | 0.0126 ± 0.0017 | 0.0163 ± 0.0021 |
 
-The headline cell (`txc_resid_L10_f1444_pos0` at mag=+16, **0.0577**) outpaces the Stage A DoM(base) baseline (0.0351) by **1.64×** while keeping the same baseline at mag=0 — i.e., the steering effect is direction-specific, not a generic "any perturbation lifts kw rate." The second-ranked feature (f4944) is much weaker (0.011 at +16), so the result is dominated by f1444; the next-tier features will need verification at full training budget.
+The headline cell (`txc_resid_L10_f1444_pos0` at mag=+16, **0.0577**) outpaces the Stage A DoM(base) baseline (0.0351) by **1.64×** while keeping the same baseline at mag=0 — i.e., the steering effect is direction-specific, not a generic "any perturbation lifts kw rate." The second-ranked feature (f4944) is much weaker (0.011 at +16), so the result is dominated by f1444; the next-tier features will need verification at full training budget. **However: see "Coherence vs steering magnitude" below — the +16 numbers are partly bought with degenerate output collapse and the honest fair-coherence comparison is at mag=+12, where TXC ≈ DoM rather than 1.64× DoM.**
+
+### Coherence vs steering magnitude
+
+![Coherence diagnostics](images_b/coherence.png)
+
+Dmitry flagged a known failure mode: at high steering magnitude the model
+can collapse into looped "Wait Wait Wait..." emissions and inflate the
+keyword rate without producing real backtracking. Coherence proxies
+computed on the full generated text per cell (no new generation needed):
+
+| Source | mag | kw rate | n_words | distinct-2 | TTR | max same-word run |
+|---|---|---|---|---|---|---|
+| `dom_base_union` | +12 | 0.021 | 888 | 0.253 | 0.121 | 1.4 |
+| `dom_base_union` | +16 | 0.035 | 957 | 0.086 | 0.056 | **1.0** |
+| `dom_reasoning_union` | +12 | 0.024 | 939 | 0.111 | 0.068 | 1.4 |
+| `dom_reasoning_union` | +16 | 0.061 | 893 | 0.030 | 0.023 | **1.0** |
+| `txc_resid_L10_f1444_pos0` | +12 | 0.019 | 848 | 0.170 | 0.094 | 1.2 |
+| `txc_resid_L10_f1444_pos0` | +16 | 0.058 | 747 | 0.067 | 0.050 | **16.4** |
+| `txc_resid_L10_f1444_union` | +12 | 0.022 | 843 | 0.189 | 0.099 | 1.2 |
+| `txc_resid_L10_f1444_union` | +16 | 0.044 | 762 | 0.081 | 0.056 | **25.9** |
+
+The bolded `max same-word run` column tells the story. At mag=+16 the
+TXC features collapse — the model emits "Wait Wait Wait..." loops up to
+26 words long, and `n_words` drops from 957 (unsteered) to ~750 because
+generation hits EOS early. DoM(base) and DoM(reasoning) at +16 also
+show low diversity (distinct-2 = 0.03–0.09) but stay at max-run=1, i.e.
+*no local repeat collapse*. A chunk of the TXC keyword-rate edge at +16
+is bought with degenerate output, not real backtracking.
+
+**Fair-coherence comparison is at mag=+12**, where every source still
+has max-run ≤ 2: TXC f1444 union 0.022, DoM(reasoning) 0.024, DoM(base)
+0.021, TXC f1444 pos0 0.019. At coherent magnitudes **TXC ≈ DoM(base)
+≈ DoM(reasoning)** — TXC matches the strongest geometric baseline
+despite training only on base activations. The 1.64×-at-+16 framing in
+the TL;DR overstates the headline; the cleaner statement is "TXC
+matches DoM at coherent magnitudes." The paper-budget rerun should
+sweep coherence too and report kw rate at the highest-mag-with-max-run-≤-2
+cell rather than at a fixed magnitude.
 
 ### Cosine to Stage A DoM
 

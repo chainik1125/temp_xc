@@ -99,19 +99,21 @@ def _load_corpus(num_sequences: int, seq_length: int, tokenizer):
 
 
 def _attach_hooks(model, hookpoints: list[dict], buffer: dict):
+    """Attach the right hook flavor per hookpoint component.
+
+    - `resid`: forward hook on the decoder layer (post-block residual).
+    - `attn`: forward hook on `self_attn` (attention output, attn_out).
+    - `ln1`: forward-PRE-hook on `self_attn` — captures the *input* to
+      attention, which in Llama-style blocks is `input_layernorm(hidden)`,
+      i.e. what Dmitry calls "ln1" (post-LN, pre-attention).
+    """
     handles = []
     for hp in hookpoints:
         layer_idx = hp["layer"]
         comp = hp["component"]
         key = hp["key"]
-        if comp == "resid":
-            target = model.model.layers[layer_idx]
-        elif comp == "attn":
-            target = model.model.layers[layer_idx].self_attn
-        else:
-            raise ValueError(f"unknown component: {comp}")
 
-        def make_hook(k):
+        def make_post_hook(k):
             def hook_fn(_m, _i, output):
                 acts = output[0] if isinstance(output, tuple) else output
                 if acts.dim() == 4:
@@ -119,7 +121,27 @@ def _attach_hooks(model, hookpoints: list[dict], buffer: dict):
                 buffer[k] = acts.detach().to(torch.float16).cpu()
             return hook_fn
 
-        handles.append(target.register_forward_hook(make_hook(key)))
+        def make_pre_hook(k):
+            def hook_fn(_m, args):
+                # `args` is the positional input tuple to self_attn; the first
+                # is the (B, L, d) hidden state already passed through input_layernorm.
+                acts = args[0]
+                if acts.dim() == 4:
+                    acts = acts.reshape(acts.shape[0], acts.shape[1], -1)
+                buffer[k] = acts.detach().to(torch.float16).cpu()
+            return hook_fn
+
+        if comp == "resid":
+            target = model.model.layers[layer_idx]
+            handles.append(target.register_forward_hook(make_post_hook(key)))
+        elif comp == "attn":
+            target = model.model.layers[layer_idx].self_attn
+            handles.append(target.register_forward_hook(make_post_hook(key)))
+        elif comp == "ln1":
+            target = model.model.layers[layer_idx].self_attn
+            handles.append(target.register_forward_pre_hook(make_pre_hook(key)))
+        else:
+            raise ValueError(f"unknown component: {comp}")
     return handles
 
 

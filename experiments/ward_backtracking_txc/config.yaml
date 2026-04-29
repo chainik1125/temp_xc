@@ -32,11 +32,11 @@ models:
 hookpoints:
   - {key: resid_L10, layer: 10, component: resid, label: "resid_pre.10 (Ward)"}
   - {key: attn_L10,  layer: 10, component: attn,  label: "attn_out.10"}
-  # ln1 is not directly hookable through model_registry helpers; we capture
-  # input to attention as a proxy via a forward-pre-hook on self_attn — see
-  # cache_activations.py. Disabled by default to keep the budget sane on a
-  # single A40; flip `enabled: true` to add it.
-  # - {key: ln1_L10,   layer: 10, component: ln1,   label: "ln1.10",   enabled: false}
+  # ln1 = post-LN, pre-attention input. Captured via a forward-pre-hook on
+  # self_attn (see _attach_hooks in cache_activations.py). Per Dmitry's
+  # TinyStories MatTXC table, ln1 is the strongest hookpoint for temporal
+  # signal — flip `enabled: true` for the paper-budget rerun.
+  - {key: ln1_L10,   layer: 10, component: ln1,   label: "ln1.10", enabled: false}
 
 # T = 6 covers Ward's [-13, -8] window. seq_len chosen so we always have
 # headroom past T = 6 for sliding-window sampling.
