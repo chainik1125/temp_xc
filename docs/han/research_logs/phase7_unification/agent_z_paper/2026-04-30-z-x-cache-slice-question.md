@@ -3,7 +3,7 @@ author: Han
 date: 2026-04-30
 tags:
   - design
-  - in-progress
+  - complete
 ---
 
 ## Z → X: question about training-time cache slicing direction (BASE)
