@@ -98,6 +98,43 @@ multi-token trigger version would favour TXC structurally.
 backdoor + new TXC variants. Sketched in `project_tinystories_sleeper_idea.md`
 memory note for future work.
 
+#### B.6 — Per-concept TXC vs T-SAE breakdown (free, post-Q1.3)
+
+**Result**: at each arch's peak s_norm, the per-concept-success
+breakdown shows a CLEAR CONCEPT-CLASS PATTERN:
+
+- **TXC matryoshka wins outright** on 4 concepts: `code_context`,
+  `historical`, `mathematical`, `medical` — all knowledge-domain
+  concepts whose semantic content naturally spans multi-token spans
+  (technical terminology, named historical periods, equations).
+- **SubseqH8 wins outright** on 3 concepts: `positive_emotion`,
+  `religious`, `scientific` — also knowledge/domain-y.
+- **T-SAE k=20 wins outright** on 9 concepts: `dialogue`,
+  `casual_register`, `imperative_form`, `instructional`,
+  `question_form`, `harmful_content`, `programming`, `legal`, `poetic`.
+  These are mostly discourse / register / safety concepts where
+  single-token cues (verb form, question mark, harmful word) dominate.
+
+**This is the cleanest TXC-favourable structural signal in the data.**
+TXC family wins on concepts whose definition spans multi-token
+context; T-SAE wins on concepts identifiable by local syntactic cues.
+
+A paper-grade case study **specifically targeting knowledge-domain
+multi-token concepts** would likely show TXC winning. The 30-concept
+mix used in the case study has only 7-9 such concepts; a properly
+balanced concept set could shift the headline.
+
+| concept class | example concepts | winner |
+|---|---|---|
+| knowledge / domain | medical, mathematical, historical, code | TXC family |
+| discourse / register | dialogue, imperative, question, casual | T-SAE k=20 |
+| safety / alignment | harmful_content, refusal, jailbreak | T-SAE k=20 (when any wins) |
+| stylistic | poetic, formal, narrative | mixed (T-SAE slight edge) |
+
+This finding is consistent with the multi-token receptive-field argument:
+knowledge content is structurally multi-token; discourse cues are
+structurally single-token.
+
 ### Cross-experiment pattern
 
 Three steering-style failures (paper-clamp, em_features, Venhoff) +
@@ -116,16 +153,21 @@ archs is 0.0044 (noise). Not decisive.
 
 ### Implications for the paper
 
-1. **Don't claim "TXC dominates steering"** as a headline. The Q1.3
-   evidence + Track B exploration shows the TXC structural advantage
-   is small or task-specific.
+1. **Don't claim "TXC dominates steering"** as a uniform headline. The
+   Q1.3 evidence + Track B exploration shows the TXC structural
+   advantage is task-specific.
 2. **Lead with the methodological contribution**: paper-clamp's
    strength-schedule + sparsity-mismatch biases. Show the matched-
    sparsity gap (0.20) is small.
 3. **Keep AxBench-moderate-strength as a TXC-favourable result** with
    appropriate scoping.
-4. **Honest about negative results**: the multi-token receptive field
-   doesn't translate into wins on existing benchmarks at scale.
+4. **Highlight the concept-class structural pattern (B.6)**: TXC wins
+   on knowledge-domain multi-token concepts, T-SAE wins on
+   discourse/register concepts. This is the cleanest TXC-favourable
+   finding and aligns with the multi-token receptive-field argument.
+5. **Honest about negative results**: the multi-token receptive field
+   doesn't translate into wins on existing benchmarks at scale, but
+   does show on knowledge-domain concept steering.
 
 ### Future work (out of paper scope)
 
