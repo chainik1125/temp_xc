@@ -36,14 +36,19 @@ tags:
   cross-family spread is 0.27. **This is the rescue: at matched
   sparsity, all architecture families perform comparably.**
 - **Q2.C bonus** (per-position window-clamp): writing back the
-  reconstruction at ALL T positions (not just right edge) gives an
-  ADDITIONAL +0.13 absolute success on TXC matryoshka (1.07 → 1.20
-  at peak). Cumulative rescue path:
-  - Dmitry's PAPER_STRENGTHS (right-edge): TXC matryoshka peak 0.97
-  - Q1.3 (normalised, right-edge): 1.07 (+0.10)
-  - Q2.C (normalised, per-position): 1.20 (+0.13)
-  - Total: 0.97 → 1.20 = ~25% closure of the 0.96 headline gap.
-  Other 2 window archs (subseq + h8 multidist) Q2.C grading pending.
+  reconstruction at ALL T positions (not just right edge) gives a
+  consistent **+0.13 absolute success** on ALL 3 window archs:
+  - agentic_txc_02:  1.07 → 1.20 (+0.13)
+  - phase5b_subseq_h8: 1.00 → 1.13 (+0.13)
+  - phase57_partB_h8_bare_multidistance_t5: 1.14 → 1.27 (+0.13)
+- **Headline**: at MATCHED sparsity (k_eff ≈ 100-500) AND under best
+  protocol (family-normalised + per-position write):
+  - h8_multidist Q2.C peak = **1.27** = T-SAE k=500 peak 1.27 (TIE)
+  - agentic_txc_02 Q2.C peak = 1.20 (-0.07 vs T-SAE k=500)
+  - phase5b_subseq_h8 Q2.C peak = 1.13 (-0.14 vs T-SAE k=500)
+  Cross-family spread at matched sparsity + matched protocol: 0-0.14,
+  within concept noise. **TXC family is competitive with T-SAE k=500
+  on steering, once we control for sparsity and use a fair protocol.**
 
 ### Q1.1 — `<|z|>` magnitudes per arch
 
