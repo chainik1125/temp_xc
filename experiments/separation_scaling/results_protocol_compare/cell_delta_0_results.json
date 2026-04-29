@@ -1,0 +1,158 @@
+{
+  "sweep_parameter": "delta",
+  "sweep_value": 0.0,
+  "generator_params": [
+    [
+      "component_type",
+      "process_name",
+      "process_params"
+    ],
+    [
+      "component_type",
+      "process_name",
+      "process_params"
+    ],
+    [
+      "component_type",
+      "process_name",
+      "process_params"
+    ]
+  ],
+  "transformer": {
+    "final_loss": 1.0907976627349854,
+    "was_loaded": true,
+    "eval_resid_l2_mean": 41.6713752746582,
+    "config": {
+      "n_layers": 3,
+      "d_model": 64,
+      "n_heads": 2,
+      "d_head": 32,
+      "d_mlp": 256,
+      "n_ctx": 128,
+      "act_fn": "gelu",
+      "normalization_type": "LN",
+      "attention_dir": "causal",
+      "default_prepend_bos": false,
+      "init_mode": "gpt2",
+      "initializer_range": 0.001,
+      "probe_layer": 1,
+      "probe_hook_name": "blocks.1.hook_resid_post",
+      "extract_batch_size": 16,
+      "load_if_exists": true,
+      "training": {
+        "steps": 20000,
+        "batch_size": 128,
+        "lr": 0.001,
+        "data_chunks": 4,
+        "data_chunk_size": 5000
+      }
+    }
+  },
+  "dense_linear": null,
+  "dense_mlp": null,
+  "architectures": {
+    "MatTXC_batchtopk_k10": {
+      "best_single_r2": 0.0007761454069360463,
+      "per_component_best_r2": [
+        0.0007761454069360463,
+        -0.00924049186577025,
+        -0.019492627781432015
+      ],
+      "linear_mean_r2": -0.03387238627223824,
+      "linear_per_component_r2": [
+        -0.03481339472033618,
+        -0.019858467971621385,
+        -0.046945296124757174
+      ],
+      "sae_final_loss": 1441.703125,
+      "family": "mattxc",
+      "config": {
+        "dict_size": 128,
+        "matryoshka_widths": [
+          8,
+          16,
+          32,
+          64,
+          128
+        ],
+        "k": 1,
+        "fixed_k_total": 10,
+        "inner_weight": 10.0,
+        "window_size": 60,
+        "temporal_steps": 1500,
+        "n_sequences": 400,
+        "seq_len": 128,
+        "sparsity_method": "batchtopk"
+      }
+    },
+    "MatTXC_topk_k10_baseline": {
+      "best_single_r2": 0.0007761454069360463,
+      "per_component_best_r2": [
+        0.0007761454069360463,
+        -0.00924049186577025,
+        -0.019492627781432015
+      ],
+      "linear_mean_r2": -0.03387238627223824,
+      "linear_per_component_r2": [
+        -0.03481339472033618,
+        -0.019858467971621385,
+        -0.046945296124757174
+      ],
+      "sae_final_loss": 1441.703125,
+      "family": "mattxc",
+      "config": {
+        "dict_size": 128,
+        "matryoshka_widths": [
+          8,
+          16,
+          32,
+          64,
+          128
+        ],
+        "k": 1,
+        "fixed_k_total": 10,
+        "inner_weight": 10.0,
+        "window_size": 60,
+        "temporal_steps": 1500,
+        "n_sequences": 400,
+        "seq_len": 128,
+        "sparsity_method": "topk"
+      }
+    },
+    "T-SAE Paper": {
+      "best_single_r2": 0.0005625386088701223,
+      "per_component_best_r2": [
+        0.0005625386088701223,
+        -0.0008652903100050402,
+        -0.0013339923118023123
+      ],
+      "linear_mean_r2": -0.01121667723556182,
+      "linear_per_component_r2": [
+        -0.017048212887810443,
+        -0.007767627365659502,
+        -0.008834191453215512
+      ],
+      "sae_final_loss": 47.346683502197266,
+      "family": "tsae",
+      "config": {
+        "dict_size": 128,
+        "k": 10,
+        "group_fractions": [
+          0.2,
+          0.8
+        ],
+        "group_weights": [
+          0.5,
+          0.5
+        ],
+        "temporal_alpha": 0.1,
+        "temporal": true,
+        "temporal_steps": 25000,
+        "lr": 0.0003,
+        "n_sequences": 1000,
+        "seq_len": 128
+      }
+    }
+  },
+  "cell_elapsed_sec": 895.007385969162
+}

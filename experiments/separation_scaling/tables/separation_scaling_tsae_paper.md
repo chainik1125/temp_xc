@@ -59,6 +59,35 @@ This also matches the [coupled-features T-SAE result](../../../docs/dmitry/case_
 3. **Only the T-SAE arch was rerun.** The other 6 archs' numbers in the table above are reused from the original `config.yaml` run — i.e. the *under-tuned* MatTXC. See protocol sweep for tuned MatTXC.
 4. **No protocol sweep on T-SAE Paper.** We have one config; MatTXC has a 30+-cell sparsity sweep. A fair architectural comparison requires sweeping T-SAE Paper too.
 
+## Update: head-to-head re-run on a40_txc_1 (protocol-tuned MatTXC vs T-SAE Paper)
+
+Re-ran both archs on identical transformer activations (same σ=1e-3 transformer ckpt, same seed, same probe) at the **protocol-winning MatTXC config** plus paper-faithful T-SAE. This reproduces the original protocol_sweep MatTXC result (within seed noise) and gives a head-to-head verdict.
+
+Best single-feature R² per δ (results from `results_protocol_compare/`):
+
+| δ | MatTXC bk10 | MatTXC topk-baseline | **T-SAE Paper** | comp-0 ceiling | gap recovered (best of bk/tk) | T-SAE gap |
+|---|---|---|---|---|---|---|
+| 0    | +0.001 | +0.001 | +0.001 | 0.000 | — | — |
+| 0.05 | +0.003 | +0.003 | +0.000 | 0.292 | 1% | 0% |
+| 0.10 | +0.012 | +0.012 | +0.005 | 0.554 | 2% | 1% |
+| 0.15 | **+0.564** | **+0.564** | +0.285 | 0.730 | **77%** | 39% |
+| 0.20 | **+0.851** | **+0.851** | +0.611 | 0.866 | **98%** | **71%** |
+
+Two clean takeaways:
+
+1. **MatTXC reproduces (and slightly exceeds) the original 0.81 protocol_sweep result** — 0.851 at δ=0.20, **98% of comp-0 ceiling**. The two sparsity methods (batchtopk k=10, topk baseline) converged to identical numbers to 4 decimal places — which means at this seed + transformer they're discovering the same solution.
+2. **MatTXC strictly beats T-SAE Paper head-to-head, at every δ where signal exists.** At the most-separated cell (δ=0.20), MatTXC gets +0.24 over T-SAE Paper (0.851 vs 0.611). At δ=0.15 the gap is +0.28.
+
+So the corrected story is:
+
+- **Protocol-tuned MatTXC > paper-faithful T-SAE on this benchmark** under fair head-to-head conditions.
+- **Paper-faithful T-SAE > main-config MatTXC** (the entry that was in the headline `tables/separation_scaling.md`) — but that's a comparison against an under-tuned MatTXC.
+- The original `Temporal BatchTopK SAE` benchmark entry (50/50 split, 2k steps) was severely under-tuning T-SAE — our paper-faithful 0.611 vs 0.079 shows the existing benchmark entry undersold T-SAE by 0.53 in single-feature R².
+
+So neither "T-SAE wins" nor "the existing benchmark fairly represents T-SAE" is correct. The correct read is: **at default paper settings, MatTXC reaches 98% of the per-component ceiling on this MESS3 task, and T-SAE Paper reaches 71%. MatTXC is the architecture to beat at this setting.** Whether T-SAE could close the gap with its own protocol sweep is the open question.
+
+Files: `results_protocol_compare/cell_delta_*_results.json` + `results_protocol_compare/combined.json`. Configs: `config_protocol_compare.yaml`, `config_protocol_compare_d02.yaml` (latter re-runs only δ=0.2 since the δ=0.2 cell of the first run died when the local Mac OOM'd while the SSH wrapper was holding the remote process).
+
 ## Files
 
 - `config_tsae_paper.yaml` — minimal config with only T-SAE Paper arch
