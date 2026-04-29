@@ -54,7 +54,9 @@ def main():
     args = ap.parse_args()
     banner(__file__)
 
-    fig, ax = plt.subplots(figsize=(10, 6))
+    fig, (ax, ax2) = plt.subplots(1, 2, figsize=(16, 6), sharey=True)
+
+    # ─── Panel A: Q1.3 normalised paper-clamp
     x = np.arange(len(ARCHS))
     bar_w = 0.35
 
@@ -70,6 +72,33 @@ def main():
 
     bars1 = ax.bar(x - bar_w/2, sd42_vals, bar_w, label="seed=42", alpha=0.85, color="#1f77b4")
     bars2 = ax.bar(x + bar_w/2, sd1_vals, bar_w, label="seed=1", alpha=0.85, color="#ff7f0e")
+
+    # ─── Panel B: Q2.C per-position write (3 window archs)
+    Q2C_ARCHS = [
+        ("agentic_txc_02",       "TXC matryoshka\n(T=5)",   "#2ca02c"),
+        ("phase5b_subseq_h8",    "SubseqH8\n(T=10)",        "#8c564b"),
+    ]
+    x2 = np.arange(len(Q2C_ARCHS))
+    sd42_q2 = []
+    sd1_q2 = []
+    for arch_id, label, color in Q2C_ARCHS:
+        p42 = _peak(arch_id, "steering_paper_window_perposition")
+        p1 = _peak(arch_id, "steering_paper_window_perposition_seed1")
+        sd42_q2.append(p42[0] if p42 else 0)
+        sd1_q2.append(p1[0] if p1 else 0)
+    ax2.bar(x2 - bar_w/2, sd42_q2, bar_w, label="seed=42", alpha=0.85, color="#1f77b4")
+    ax2.bar(x2 + bar_w/2, sd1_q2, bar_w, label="seed=1", alpha=0.85, color="#ff7f0e")
+    for xi, (s42, s1) in enumerate(zip(sd42_q2, sd1_q2)):
+        ax2.text(xi - bar_w/2, s42 + 0.03, f"{s42:.2f}", ha="center", fontsize=9)
+        ax2.text(xi + bar_w/2, s1 + 0.03, f"{s1:.2f}", ha="center", fontsize=9)
+    ax2.set_xticks(x2)
+    ax2.set_xticklabels([label for _, label, _ in Q2C_ARCHS])
+    ax2.set_title("Q2.C per-position window-clamp (multi-seed)", fontsize=11)
+    ax2.set_ylim(0, 2.2)
+    ax2.grid(axis="y", alpha=0.25)
+    ax2.legend(loc="upper right", fontsize=10)
+    ax2.axhline(1.38, color="#d62728", linestyle="--", alpha=0.6,
+                label="T-SAE k=500 mean")
 
     # Error bars showing the seed variance
     for i, (s42, s1, m) in enumerate(zip(sd42_vals, sd1_vals, means)):
@@ -87,13 +116,17 @@ def main():
     ax.set_xticklabels([label for _, label, _ in ARCHS])
     ax.set_ylabel("Peak success (Sonnet 4.6 grade, 0-3)")
     ax.set_title(
-        "Multi-seed validation of Q1.3 normalised paper-clamp\n"
-        "T-SAE k=20 robust at 1.80 across seeds; per-arch variance ≤ 0.27 (concept noise)",
+        "Q1.3 normalised paper-clamp (multi-seed)",
         fontsize=11,
     )
     ax.set_ylim(0, 2.2)
     ax.grid(axis="y", alpha=0.25)
     ax.legend(loc="upper right", fontsize=10)
+    fig.suptitle(
+        "Multi-seed validation: T-SAE k=20 robust at 1.80; "
+        "TXC Q2.C mean peak (1.37) TIES T-SAE k=500 mean (1.38) at matched sparsity",
+        fontsize=11, y=1.02,
+    )
     fig.tight_layout()
     args.out.parent.mkdir(parents=True, exist_ok=True)
     from src.plotting.save_figure import save_figure
