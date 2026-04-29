@@ -58,6 +58,10 @@ PRELOAD_SEQS = 24_000
 HF_CKPT_REPO = "han1823123123/txcdr-it"
 HF_DATA_REPO = "han1823123123/txcdr-it-data"
 
+# Run-ID prefix so IT ckpts can't collide with BASE on the shared
+# filesystem (CKPT_DIR is shared) or in training_index.jsonl.
+RUN_ID_PREFIX = "it_"
+
 # ────────────────────────────── canonical arch table (SHARED)
 CANONICAL_ARCHS_JSON = REPO / "experiments/phase7_unification/canonical_archs.json"
 

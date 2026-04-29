@@ -39,6 +39,9 @@ import torch.nn as nn
 
 os.environ.setdefault("TQDM_DISABLE", "1")
 
+from experiments.phase7_unification._paths import (  # noqa: I001
+    RUN_ID_PREFIX,
+)
 from experiments.phase7_unification._paths import (
     CANONICAL_ARCHS_JSON, CKPT_DIR, LOGS_DIR, OUT_DIR, INDEX_PATH,
     SEED_MARKER_DIR, ANCHOR_LAYER, MLC_LAYERS, SUBJECT_MODEL,
@@ -754,7 +757,7 @@ def _train_one_with_bufs(arch: dict, seed: int, max_steps: int | None,
     try:
         model, log = dispatch(arch, cfg, buf_anchor=buf_anchor, buf_multilayer=buf_multilayer)
         meta = _meta_from_arch(arch, seed)
-        run_id = f"{arch_id}__seed{seed}"
+        run_id = f"{RUN_ID_PREFIX}{arch_id}__seed{seed}"
         ckpt_path = _save_run(model, log, run_id, meta)
         if push_to_hf:
             _hf_push_ckpt(ckpt_path, run_id)

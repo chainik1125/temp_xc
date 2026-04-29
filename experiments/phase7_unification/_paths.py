@@ -54,6 +54,11 @@ PRELOAD_SEQS = 24_000           # H200 188 GB RAM: full cache fits
 HF_CKPT_REPO = "han1823123123/txcdr-base"
 HF_DATA_REPO = "han1823123123/txcdr-base-data"
 
+# Run-ID prefix — empty for BASE so existing run_ids are unchanged. The IT-
+# side fork (_paths_it.py) overrides this to "it_" so IT ckpts/run_ids
+# can't collide with BASE on the shared filesystem + training_index.
+RUN_ID_PREFIX = ""
+
 # ────────────────────────────── canonical arch table
 CANONICAL_ARCHS_JSON = REPO / "experiments/phase7_unification/canonical_archs.json"
 
