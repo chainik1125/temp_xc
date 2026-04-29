@@ -32,6 +32,7 @@ Thumbs.db
 !.vscode/extensions.json
 .idea/
 .env_autointerp
+.env
 
 # Raw result artifacts — reproducible from scripts + cached activations.
 # Per-feature JSONs contain unfiltered FineWeb text; don't commit.
