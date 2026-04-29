@@ -1,0 +1,1802 @@
+[
+  {
+    "id": "basic_logic_000",
+    "category": "basic_logic",
+    "prompt": "Three inhabitants of an island each either always tell the truth or always lie.\n\nArden says: \"Exactly one of us three is a liar.\"\nBlake says: \"Arden is lying.\"\nCasey says: \"Blake is a liar.\"\n\nDetermine whether each of Arden, Blake, and Casey is a truth-teller or a liar, and explain your reasoning.",
+    "split": "dom"
+  },
+  {
+    "id": "basic_logic_001",
+    "category": "basic_logic",
+    "prompt": "Three inhabitants of an island each either always tell the truth or always lie.\n\nAlba says: \"Bram is a liar.\"\nBram says: \"Cara and I are the same type.\"\nCara says: \"Alba is a liar.\"\n\nDetermine whether each of Alba, Bram, and Cara is a truth-teller or a liar.",
+    "split": "dom"
+  },
+  {
+    "id": "basic_logic_002",
+    "category": "basic_logic",
+    "prompt": "There are four people: Aria, Blake, Cole, and Dana. Each person is either a knight (always tells the truth) or a knave (always lies).\n\nThey make the following statements:\n\nAria says: \"Blake and Cole are both knaves.\"\nBlake says: \"Aria and Dana are not both knights.\"\nCole says: \"Aria is a knight.\"\nDana says: \"Exactly two of us are knights.\"\n\nDetermine whether each person is a knight or a knave.",
+    "split": "dom"
+  },
+  {
+    "id": "basic_logic_003",
+    "category": "basic_logic",
+    "prompt": "There are four people: Ada, Ben, Cal, and Dee. Each person is either a knight (always tells the truth) or a knave (always lies).\n\nThey make the following statements:\n\nAda says: \"Ben and Cal are both knaves.\"\nBen says: \"Ada and Dee are the same type.\"\nCal says: \"Ben is a knight.\"\nDee says: \"Ada is a knave.\"\n\nDetermine the type (knight or knave) of each person.",
+    "split": "dom"
+  },
+  {
+    "id": "basic_logic_004",
+    "category": "basic_logic",
+    "prompt": "There are four people: Ada, Ben, Cal, and Dee. Each person is either a knight (always tells the truth) or a knave (always lies).\n\nThey make the following statements:\n\nAda says: \"Ben and Cal are both knaves.\"\nBen says: \"Ada and Dee are different types (one knight, one knave).\"\nCal says: \"Ben is a knight.\"\nDee says: \"Ada is a knave.\"\n\nDetermine the type (knight or knave) of each person.",
+    "split": "dom"
+  },
+  {
+    "id": "basic_logic_005",
+    "category": "basic_logic",
+    "prompt": "Five people \u2014 Aria, Blake, Cole, Dana, and Eden \u2014 each make exactly one statement. Each person is either a truth-teller (always tells the truth) or a liar (always lies).\n\nAria says: \"Exactly two of us are liars.\"\nBlake says: \"Aria and Cole are both liars.\"\nCole says: \"Blake and Dana are the same type (both truth-tellers or both liars).\"\nDana says: \"Exactly one of Blake and Eden is a liar.\"\nEden says: \"Aria is a truth-teller.\"\n\nDetermine the type (truth-teller or liar) of each person.",
+    "split": "dom"
+  },
+  {
+    "id": "basic_logic_006",
+    "category": "basic_logic",
+    "prompt": "There are four people: Aria, Blake, Cole, and Dana. Each person is either a truth-teller (always tells the truth) or a liar (always lies).\n\nThey make the following statements:\n\nAria says: \"Blake and Cole are the same type as each other.\"\nBlake says: \"Aria and Dana are different types from each other.\"\nCole says: \"I am a liar.\"\nDana says: \"Aria is a truth-teller.\"\n\nDetermine whether each person is a truth-teller or a liar.",
+    "split": "dom"
+  },
+  {
+    "id": "basic_logic_007",
+    "category": "basic_logic",
+    "prompt": "There are four people: Asha, Bram, Cleo, and Dov. Each person is either a knight (always tells the truth) or a knave (always lies).\n\nThey make the following statements:\n\nAsha says: \"Bram and Cleo are the same type.\"\nBram says: \"Asha and Dov are different types.\"\nCleo says: \"I am a knave.\"\nDov says: \"Exactly two of us are knights.\"\n\nDetermine the type (knight or knave) of each person.",
+    "split": "dom"
+  },
+  {
+    "id": "basic_logic_008",
+    "category": "basic_logic",
+    "prompt": "There are four people: Ada, Bex, Cal, and Dov. Each is either a knight (always tells the truth) or a knave (always lies).\n\nThey make the following statements:\n\nAda says: \"Bex and Cal are both knaves.\"\nBex says: \"Ada and Dov are different types (one knight, one knave).\"\nCal says: \"Bex is a knight.\"\nDov says: \"Ada is a knave.\"\n\nDetermine the type (knight or knave) of each person.",
+    "split": "dom"
+  },
+  {
+    "id": "basic_logic_009",
+    "category": "basic_logic",
+    "prompt": "Four suspects \u2014 Aaron, Beth, Carol, and Dan \u2014 are questioned about a theft. Each person either always tells the truth or always lies.\n\nThey make the following statements:\n\nAaron: \"Beth is a liar.\"\nBeth: \"Carol and Dan are both truth-tellers.\"\nCarol: \"Aaron is a truth-teller.\"\nDan: \"Carol is a liar.\"\n\nDetermine which of the four people are truth-tellers and which are liars.",
+    "split": "dom"
+  },
+  {
+    "id": "basic_logic_010",
+    "category": "basic_logic",
+    "prompt": "There are four people: Aaron, Beth, Carol, and Dan. Each person is either a knight (always tells the truth) or a knave (always lies).\n\nThey make the following statements:\n\nAaron says: \"Beth and Carol are both knaves.\"\nBeth says: \"Aaron is a knight or Dan is a knave.\"\nCarol says: \"Aaron is a knave.\"\nDan says: \"Carol is a knight and Beth is a knave.\"\n\nDetermine the type (knight or knave) of each person.",
+    "split": "dom"
+  },
+  {
+    "id": "basic_logic_011",
+    "category": "basic_logic",
+    "prompt": "There are four people: Ada, Ben, Cal, and Dot. Each person is either a knight (always tells the truth) or a knave (always lies).\n\nThey make the following statements:\n\nAda says: \"Ben and Cal are the same type.\"\nBen says: \"Ada and Dot are different types.\"\nCal says: \"I am a knight or Dot is a knave.\"\nDot says: \"Ada is a knave.\"\n\nDetermine the type (knight or knave) of each person.",
+    "split": "dom"
+  },
+  {
+    "id": "basic_logic_012",
+    "category": "basic_logic",
+    "prompt": "There are four people: Aria, Bryn, Cole, and Dana. Each person is either a knight (always tells the truth) or a knave (always lies).\n\nThey make the following statements:\n\nAria says: \"Bryn and Cole are the same type as each other.\"\nBryn says: \"Aria and Dana are different types from each other.\"\nCole says: \"Aria is a knave.\"\nDana says: \"Cole and I are different types from each other.\"\n\nDetermine the type (knight or knave) of each person.",
+    "split": "dom"
+  },
+  {
+    "id": "basic_logic_013",
+    "category": "basic_logic",
+    "prompt": "Four people \u2014 Ada, Ben, Cal, and Dee \u2014 each either always tell the truth or always lie.\n\nThey make the following statements:\n\nAda says: \"Ben and Cal are both liars.\"\nBen says: \"Ada or Dee is a truth-teller (or both).\"\nCal says: \"Ada is a liar.\"\nDee says: \"Ben is a liar and Cal is a truth-teller.\"\n\nDetermine which of the four people are truth-tellers and which are liars.",
+    "split": "eval"
+  },
+  {
+    "id": "basic_logic_014",
+    "category": "basic_logic",
+    "prompt": "There are four people: Aria, Bruno, Cara, and Dex. Each person is either a Knight (always tells the truth) or a Knave (always lies).\n\nThey make the following statements:\n\nAria says: \"Bruno and Cara are the same type.\"\nBruno says: \"Aria and Dex are different types.\"\nCara says: \"I am a Knight, or Dex is a Knave.\"\nDex says: \"Aria is a Knave.\"\n\nDetermine the type (Knight or Knave) of each person.",
+    "split": "eval"
+  },
+  {
+    "id": "basic_logic_015",
+    "category": "basic_logic",
+    "prompt": "There are four people: Aria, Bruno, Clara, and Dex. Each person is either a knight (always tells the truth) or a knave (always lies).\n\nThey make the following statements:\n\nAria says: \"Bruno and Clara are the same type.\"\nBruno says: \"Aria and Dex are different types.\"\nClara says: \"I am a knave or Dex is a knight.\"\nDex says: \"Aria is a knave.\"\n\nDetermine the type (knight or knave) of each person.",
+    "split": "dom"
+  },
+  {
+    "id": "basic_logic_016",
+    "category": "basic_logic",
+    "prompt": "Four people \u2014 Ada, Ben, Cal, and Dee \u2014 each either always tell the truth or always lie.\n\nThey make the following statements:\n\nAda says: \"Ben and Cal are both liars.\"\nBen says: \"Ada and Dee tell the same type (both truth-tellers or both liars).\"\nCal says: \"Ada is a truth-teller.\"\nDee says: \"Exactly one of Ada and Ben is a truth-teller.\"\n\nDetermine whether each person is a truth-teller or a liar.",
+    "split": "dom"
+  },
+  {
+    "id": "basic_logic_017",
+    "category": "basic_logic",
+    "prompt": "There are four people: Ava, Ben, Cal, and Deb. Each person is either a knight (always tells the truth) or a knave (always lies).\n\nThey make the following statements:\n\nAva says: \"Ben and Cal are both knaves.\"\nBen says: \"Ava is a knight or Deb is a knight (or both).\"\nCal says: \"Ava is a knave.\"\nDeb says: \"Exactly two of us are knights.\"\n\nDetermine whether each person is a knight or a knave.",
+    "split": "dom"
+  },
+  {
+    "id": "basic_logic_018",
+    "category": "basic_logic",
+    "prompt": "There are four people: Ada, Ben, Cal, and Dee. Each person is either a knight (always tells the truth) or a knave (always lies).\n\nThey make the following statements:\n\nAda says: \"Ben and Cal are both knaves.\"\nBen says: \"Ada and Dee are different types (one knight, one knave).\"\nCal says: \"Ben is a knight.\"\nDee says: \"Ada is a knave.\"\n\nDetermine the type (knight or knave) of each person.",
+    "split": "dom"
+  },
+  {
+    "id": "basic_logic_019",
+    "category": "basic_logic",
+    "prompt": "Four suspects \u2014 Arlo, Bex, Cal, and Dina \u2014 are questioned about a theft. Each person either always tells the truth or always lies.\n\nThey make the following statements:\n\nArlo: \"Bex is a liar.\"\nBex: \"Cal and Dina are both truth-tellers.\"\nCal: \"Arlo is a truth-teller or Bex is a truth-teller (or both).\"\nDina: \"Arlo is a liar and Cal is a liar.\"\n\nDetermine whether each of the four suspects is a truth-teller or a liar.",
+    "split": "dom"
+  },
+  {
+    "id": "basic_logic_020",
+    "category": "basic_logic",
+    "prompt": "There are four people: Aria, Blake, Cole, and Dana. Each person is either a knight (always tells the truth) or a knave (always lies).\n\nThey make the following statements:\n\nAria says: \"Blake and Cole are both knaves.\"\nBlake says: \"Aria is a knight or Dana is a knight (or both).\"\nCole says: \"Aria is a knave.\"\nDana says: \"Cole is a knight and Blake is a knave.\"\n\nDetermine the type (knight or knave) of each person.",
+    "split": "dom"
+  },
+  {
+    "id": "basic_logic_021",
+    "category": "basic_logic",
+    "prompt": "Four people \u2014 Asha, Bram, Cara, and Dex \u2014 each either always tell the truth or always lie. Each person makes exactly two statements.\n\nAsha says:\n1. \"Bram and I are the same type.\" (both truth-tellers or both liars)\n2. \"Cara is a liar.\"\n\nBram says:\n1. \"Exactly two of the four of us are truth-tellers.\"\n2. \"Dex is a liar.\"\n\nCara says:\n1. \"Asha is a liar.\"\n2. \"Bram and Dex are different types from each other.\"\n\nDex says:\n1. \"Cara and I are the same type.\"\n2. \"Asha is a truth-teller.\"\n\nDetermine who among Asha, Bram, Cara, and Dex is a truth-teller and who is a liar.",
+    "split": "dom"
+  },
+  {
+    "id": "basic_logic_022",
+    "category": "basic_logic",
+    "prompt": "There are four people: Ava, Ben, Cal, and Dee. Each person is either a knight (always tells the truth) or a knave (always lies).\n\nThey make the following statements:\n\nAva says: \"Ben and Cal are both knaves.\"\nBen says: \"Ava and Dee are different types (one knight, one knave).\"\nCal says: \"Ben is a knight.\"\nDee says: \"Ava is a knave.\"\n\nDetermine the type (knight or knave) of each person.",
+    "split": "dom"
+  },
+  {
+    "id": "basic_logic_023",
+    "category": "basic_logic",
+    "prompt": "There are four people: Ada, Ben, Cal, and Dee. Each person is either a knight (always tells the truth) or a knave (always lies).\n\nThey make the following statements:\n\nAda says: \"Ben and Cal are both knaves.\"\nBen says: \"Ada and Dee are not both knights.\"\nCal says: \"Ada is a knight.\"\nDee says: \"Exactly one of Ben and Cal is a knight.\"\n\nDetermine the type (knight or knave) of each person.",
+    "split": "dom"
+  },
+  {
+    "id": "basic_logic_024",
+    "category": "basic_logic",
+    "prompt": "Five suspects \u2014 Ada, Bo, Cal, Dex, and Eve \u2014 are questioned about a theft. Each person either always tells the truth or always lies. Exactly one of the five committed the theft.\n\nTheir statements are:\n\nAda: \"Bo is lying.\"\nBo: \"Cal committed the theft.\"\nCal: \"I did not commit the theft.\"\nDex: \"Ada is telling the truth.\"\nEve: \"Dex is lying.\"\n\nAdditionally, it is known that:\n- Exactly two of the five people are liars.\n- The thief is a liar.\n\nWho committed the theft?",
+    "split": "dom"
+  },
+  {
+    "id": "basic_logic_025",
+    "category": "basic_logic",
+    "prompt": "There are four people: Ada, Ben, Cal, and Dee. Each person is either a knight (always tells the truth) or a knave (always lies).\n\nThey make the following statements:\n\nAda says: \"Ben and Cal are the same type as each other.\"\nBen says: \"Ada and Dee are different types from each other.\"\nCal says: \"Ada is a knave.\"\nDee says: \"Cal and I are different types from each other.\"\n\nDetermine the type (knight or knave) of each person.",
+    "split": "dom"
+  },
+  {
+    "id": "basic_logic_026",
+    "category": "basic_logic",
+    "prompt": "There are four people: Aria, Blake, Cole, and Dana. Each person is either a knight (always tells the truth) or a knave (always lies).\n\nThey make the following statements:\n\nAria says: \"Blake and Cole are both knaves.\"\nBlake says: \"Aria is a knight or Dana is a knight\" (at least one of them).\nCole says: \"Aria is a knave.\"\nDana says: \"Cole is a knight and Blake is a knave.\"\n\nDetermine whether each person is a knight or a knave.",
+    "split": "dom"
+  },
+  {
+    "id": "basic_logic_027",
+    "category": "basic_logic",
+    "prompt": "There are four people: Aaron, Beth, Carol, and Dan. Each person is either a knight (always tells the truth) or a knave (always lies).\n\nThey make the following statements:\n\nAaron says: \"Beth and Carol are both knaves.\"\nBeth says: \"Aaron and Dan are different types (one knight, one knave).\"\nCarol says: \"Aaron is a knight.\"\nDan says: \"Exactly two of the four of us are knights.\"\n\nDetermine the type (knight or knave) of each person.",
+    "split": "dom"
+  },
+  {
+    "id": "basic_logic_028",
+    "category": "basic_logic",
+    "prompt": "There are four people: Aria, Blake, Cole, and Dana. Each person is either a knight (always tells the truth) or a knave (always lies).\n\nThey make the following statements:\n\nAria says: \"Blake and Cole are both knaves.\"\nBlake says: \"Aria and Dana are not both knights.\"\nCole says: \"Aria is a knight.\"\nDana says: \"Cole is a knave.\"\n\nDetermine whether each person is a knight or a knave.",
+    "split": "dom"
+  },
+  {
+    "id": "basic_logic_029",
+    "category": "basic_logic",
+    "prompt": "Four people \u2014 Ada, Ben, Cal, and Dee \u2014 each either always tell the truth or always lie.\n\nThey make the following statements:\n\nAda says: \"Ben and Cal are both liars.\"\nBen says: \"Ada and Dee are the same type (both truth-tellers or both liars).\"\nCal says: \"Exactly one of the four of us is a truth-teller.\"\nDee says: \"Ada is a liar.\"\n\nDetermine which of the four people are truth-tellers and which are liars.",
+    "split": "dom"
+  },
+  {
+    "id": "geometry_000",
+    "category": "geometry",
+    "prompt": "A triangle has sides of length 13, 14, and 15. A circle is inscribed in the triangle, and then a square is inscribed in the circle. What is the area of the square?",
+    "split": "dom"
+  },
+  {
+    "id": "geometry_001",
+    "category": "geometry",
+    "prompt": "A circle of radius 3 is inscribed in a right triangle. The hypotenuse of the triangle has length 20. Find the area of the triangle.",
+    "split": "dom"
+  },
+  {
+    "id": "geometry_002",
+    "category": "geometry",
+    "prompt": "A circle of radius 5 is inscribed in a right triangle. The hypotenuse of the triangle has length 30. Find the area of the triangle.",
+    "split": "dom"
+  },
+  {
+    "id": "geometry_003",
+    "category": "geometry",
+    "prompt": "A triangle has sides of length 13, 14, and 15. A circle is inscribed in the triangle, and then a square is inscribed in the circle. What is the area of the square?",
+    "split": "dom"
+  },
+  {
+    "id": "geometry_004",
+    "category": "geometry",
+    "prompt": "A circle is inscribed in a right triangle with legs 9 and 12. A second, smaller circle is then inscribed in the corner between the hypotenuse, the longer leg, and the first circle (tangent to all three). Find the radius of the second circle.",
+    "split": "dom"
+  },
+  {
+    "id": "geometry_005",
+    "category": "geometry",
+    "prompt": "A circle of radius 3 is inscribed in a right triangle. The hypotenuse of the triangle has length 20. Find the area of the triangle.",
+    "split": "dom"
+  },
+  {
+    "id": "geometry_006",
+    "category": "geometry",
+    "prompt": "A triangle has sides of length 13, 14, and 15. A circle is inscribed in the triangle, and then a square is inscribed in the circle (with all four vertices on the circle). What is the area of the square?",
+    "split": "dom"
+  },
+  {
+    "id": "geometry_007",
+    "category": "geometry",
+    "prompt": "A circle of radius 5 is inscribed in a right triangle. The hypotenuse of the triangle has length 30. Find the area of the triangle.",
+    "split": "dom"
+  },
+  {
+    "id": "geometry_008",
+    "category": "geometry",
+    "prompt": "A triangle has vertices at A = (0, 0), B = (12, 0), and C = (4, 6). A point P lies inside the triangle such that the distances from P to the three sides AB, BC, and CA are in the ratio 1:2:3. Find the area of the triangle formed by connecting the feet of the perpendiculars from P to each of the three sides.",
+    "split": "dom"
+  },
+  {
+    "id": "geometry_009",
+    "category": "geometry",
+    "prompt": "A triangle has vertices at A = (0, 0), B = (12, 0), and C = (4, 6). A point P lies inside the triangle such that the distances from P to the three sides AB, BC, and CA are in the ratio 1:2:3. Find the area of triangle with vertices at the feet of the perpendiculars from P to the three sides of the triangle.",
+    "split": "dom"
+  },
+  {
+    "id": "geometry_010",
+    "category": "geometry",
+    "prompt": "A triangle has sides of length 13, 14, and 15. A circle is inscribed in the triangle, and then a square is inscribed in the circle (with all four vertices on the circle). What is the area of the square?",
+    "split": "dom"
+  },
+  {
+    "id": "geometry_011",
+    "category": "geometry",
+    "prompt": "A circle of radius 5 is inscribed in a right triangle. The hypotenuse of the triangle has length 30. Find the area of the triangle.",
+    "split": "dom"
+  },
+  {
+    "id": "geometry_012",
+    "category": "geometry",
+    "prompt": "A triangle has sides of length 13, 14, and 15. A circle is inscribed in the triangle, and then a square is inscribed in the circle (with all four vertices on the circle). What is the area of the square?",
+    "split": "dom"
+  },
+  {
+    "id": "geometry_013",
+    "category": "geometry",
+    "prompt": "A triangle has sides of length 13, 14, and 15. A circle is inscribed in the triangle, and then a second circle is drawn that is internally tangent to the inscribed circle and tangent to two sides of the triangle (specifically, the two sides of length 13 and 15). Find the radius of this second circle.",
+    "split": "dom"
+  },
+  {
+    "id": "geometry_014",
+    "category": "geometry",
+    "prompt": "A triangle has sides of length 13, 14, and 15. A circle is inscribed in the triangle, and then a square is inscribed in the circle (with all four vertices on the circle). What is the area of the square?",
+    "split": "dom"
+  },
+  {
+    "id": "geometry_015",
+    "category": "geometry",
+    "prompt": "A triangle has sides of length 13, 14, and 15. A circle is inscribed in the triangle, and then a square is inscribed in the circle (with all four vertices on the circle). What is the area of the square?",
+    "split": "dom"
+  },
+  {
+    "id": "geometry_016",
+    "category": "geometry",
+    "prompt": "A circle of radius 3 is inscribed in a right triangle. The hypotenuse of the triangle has length 26. Find the area of the triangle.",
+    "split": "dom"
+  },
+  {
+    "id": "geometry_017",
+    "category": "geometry",
+    "prompt": "A triangle has sides of length 13, 14, and 15. A circle is inscribed in the triangle. A second circle is drawn tangent to the two longer sides of the triangle (the sides of length 13 and 15) and internally tangent to the inscribed circle. Find the radius of the second circle.",
+    "split": "dom"
+  },
+  {
+    "id": "geometry_018",
+    "category": "geometry",
+    "prompt": "A circle of radius 3 is inscribed in a right triangle. The hypotenuse of the triangle has length 20. Find the area of the triangle.",
+    "split": "dom"
+  },
+  {
+    "id": "geometry_019",
+    "category": "geometry",
+    "prompt": "A triangle has sides of length 13, 14, and 15. A circle is inscribed in the triangle, and then a square is inscribed in the circle. What is the area of the square?",
+    "split": "eval"
+  },
+  {
+    "id": "geometry_020",
+    "category": "geometry",
+    "prompt": "A triangle has sides of length 13, 14, and 15. A circle is inscribed in the triangle, and then a square is inscribed in the circle (with all four vertices on the circle). What is the area of the square?",
+    "split": "dom"
+  },
+  {
+    "id": "geometry_021",
+    "category": "geometry",
+    "prompt": "A circle of radius 3 is inscribed in a right triangle. The hypotenuse of the triangle has length 26. Find the area of the triangle.",
+    "split": "dom"
+  },
+  {
+    "id": "geometry_022",
+    "category": "geometry",
+    "prompt": "A triangle has sides of length 13, 14, and 15. A circle is inscribed in the triangle, and then a square is inscribed in the circle (with all four vertices on the circle). What is the area of the square?",
+    "split": "dom"
+  },
+  {
+    "id": "geometry_023",
+    "category": "geometry",
+    "prompt": "A triangle has sides of length 13, 14, and 15. A circle is inscribed in the triangle, and then a square is inscribed in the circle (with all four vertices on the circle). What is the area of the square?",
+    "split": "dom"
+  },
+  {
+    "id": "geometry_024",
+    "category": "geometry",
+    "prompt": "A triangle has sides of length 13, 14, and 15. A circle is inscribed in the triangle, and then a square is inscribed in the circle (with all four vertices on the circle). What is the area of the square?",
+    "split": "dom"
+  },
+  {
+    "id": "geometry_025",
+    "category": "geometry",
+    "prompt": "A triangle has vertices at A = (0, 0), B = (12, 0), and C = (4, 6). A point P lies inside the triangle such that the distances from P to the three sides AB, BC, and CA are in the ratio 1 : 2 : 3. Find the area of triangle ABC divided by the area of the triangle formed by connecting the midpoints of segments PA, PB, and PC.",
+    "split": "eval"
+  },
+  {
+    "id": "geometry_026",
+    "category": "geometry",
+    "prompt": "A triangle has sides of length 13, 14, and 15. A circle is inscribed in the triangle, and then a square is inscribed in the circle (with all four vertices on the circle). What is the area of the square?",
+    "split": "dom"
+  },
+  {
+    "id": "geometry_027",
+    "category": "geometry",
+    "prompt": "A circle of radius 5 is inscribed in a right triangle. The hypotenuse of the triangle has length 30. Find the area of the triangle.",
+    "split": "dom"
+  },
+  {
+    "id": "geometry_028",
+    "category": "geometry",
+    "prompt": "A triangle has sides of length 13, 14, and 15. A circle is inscribed in the triangle, and then a square is inscribed in the circle (with all four vertices on the circle). What is the area of the square?",
+    "split": "dom"
+  },
+  {
+    "id": "geometry_029",
+    "category": "geometry",
+    "prompt": "A circle is inscribed in triangle ABC where AB = 13, BC = 14, and CA = 15. A second circle is inscribed in the region bounded by side BC, the two tangent lines from B and C to the incircle (on the exterior side), and tangent to the incircle externally. Find the radius of this second circle.",
+    "split": "dom"
+  },
+  {
+    "id": "probability_000",
+    "category": "probability",
+    "prompt": "A bag contains 5 red balls and 4 blue balls. You draw balls one at a time without replacement until you have drawn 2 red balls. What is the expected number of balls you will have drawn when you stop?",
+    "split": "dom"
+  },
+  {
+    "id": "probability_001",
+    "category": "probability",
+    "prompt": "A bag contains 5 red marbles, 4 blue marbles, and 3 green marbles. You draw marbles one at a time without replacement until you have drawn at least one marble of each color. What is the probability that exactly 4 draws are needed to collect all three colors?",
+    "split": "dom"
+  },
+  {
+    "id": "probability_002",
+    "category": "probability",
+    "prompt": "A bag contains 5 red marbles, 4 blue marbles, and 3 green marbles. You draw marbles one at a time without replacement until you have drawn at least one marble of each color. What is the expected number of marbles you must draw?",
+    "split": "dom"
+  },
+  {
+    "id": "probability_003",
+    "category": "probability",
+    "prompt": "A bag contains 4 red, 3 blue, and 2 green marbles. You draw marbles one at a time without replacement until you draw a green marble. What is the expected number of marbles you will have drawn when you stop (including the green marble itself)?",
+    "split": "dom"
+  },
+  {
+    "id": "probability_004",
+    "category": "probability",
+    "prompt": "A bag contains 5 red marbles, 4 blue marbles, and 3 green marbles. You draw marbles one at a time without replacement until you have drawn at least one marble of each color. What is the probability that you need exactly 4 draws to have collected all three colors?",
+    "split": "dom"
+  },
+  {
+    "id": "probability_005",
+    "category": "probability",
+    "prompt": "A bag contains 5 red balls and 3 blue balls. You draw balls one at a time without replacement until you have drawn 2 red balls. What is the expected number of balls you will have drawn when you stop?",
+    "split": "dom"
+  },
+  {
+    "id": "probability_006",
+    "category": "probability",
+    "prompt": "A bag contains 5 red balls and 3 blue balls. You draw balls one at a time without replacement until you have drawn 2 red balls. What is the expected number of balls you will have drawn when the process ends?",
+    "split": "dom"
+  },
+  {
+    "id": "probability_007",
+    "category": "probability",
+    "prompt": "A bag contains 5 red balls and 3 blue balls. You draw balls one at a time without replacement until you get a red ball, then stop. What is the expected number of blue balls drawn before the first red ball?",
+    "split": "eval"
+  },
+  {
+    "id": "probability_008",
+    "category": "probability",
+    "prompt": "A bag contains 5 red balls, 4 blue balls, and 3 green balls. You draw balls one at a time without replacement until you have drawn at least one ball of each color. What is the expected number of draws required?",
+    "split": "dom"
+  },
+  {
+    "id": "probability_009",
+    "category": "probability",
+    "prompt": "A bag contains 5 red balls, 4 blue balls, and 3 green balls. You draw balls one at a time without replacement until you have drawn at least 2 balls of the same color. What is the expected number of balls drawn when the process stops?",
+    "split": "dom"
+  },
+  {
+    "id": "probability_010",
+    "category": "probability",
+    "prompt": "A bag contains 5 red balls, 4 blue balls, and 3 green balls. You draw balls one at a time without replacement until you have drawn at least one ball of each color. What is the expected number of draws required?",
+    "split": "dom"
+  },
+  {
+    "id": "probability_011",
+    "category": "probability",
+    "prompt": "A bag contains 4 red balls, 3 blue balls, and 2 green balls. You draw balls one at a time without replacement until you draw a green ball. What is the expected number of balls you will have drawn when you stop (including the green ball itself)?",
+    "split": "dom"
+  },
+  {
+    "id": "probability_012",
+    "category": "probability",
+    "prompt": "A bag contains 5 red balls and 4 blue balls. You draw balls one at a time without replacement until you have drawn 2 red balls. What is the expected total number of balls drawn?",
+    "split": "dom"
+  },
+  {
+    "id": "probability_013",
+    "category": "probability",
+    "prompt": "A fair six-sided die is rolled repeatedly until the running sum first exceeds 10. What is the probability that the running sum equals exactly 11 when the game ends?",
+    "split": "dom"
+  },
+  {
+    "id": "probability_014",
+    "category": "probability",
+    "prompt": "A bag contains 5 red balls and 4 blue balls. You draw balls one at a time without replacement until you have drawn 2 red balls. What is the expected number of balls you will have drawn when you stop?",
+    "split": "dom"
+  },
+  {
+    "id": "probability_015",
+    "category": "probability",
+    "prompt": "A bag contains 5 red balls, 4 blue balls, and 3 green balls. You draw balls one at a time without replacement until you have drawn at least one ball of each color. What is the expected number of draws needed?",
+    "split": "dom"
+  },
+  {
+    "id": "probability_016",
+    "category": "probability",
+    "prompt": "A bag contains 5 red balls, 4 blue balls, and 3 green balls. You draw balls one at a time without replacement until you have drawn at least one ball of each color. What is the expected number of balls you must draw?",
+    "split": "dom"
+  },
+  {
+    "id": "probability_017",
+    "category": "probability",
+    "prompt": "A bag contains 5 red, 4 blue, and 3 green marbles. You draw marbles one at a time without replacement until you have drawn at least one marble of each color. What is the expected number of marbles drawn?",
+    "split": "dom"
+  },
+  {
+    "id": "probability_018",
+    "category": "probability",
+    "prompt": "A fair six-sided die is rolled repeatedly until the running total first equals or exceeds 10. What is the probability that the running total equals exactly 10 when the process stops?",
+    "split": "dom"
+  },
+  {
+    "id": "probability_019",
+    "category": "probability",
+    "prompt": "A bag contains 5 red balls, 4 blue balls, and 3 green balls. You draw balls one at a time without replacement until you have drawn at least one ball of each color. What is the expected number of draws required?",
+    "split": "eval"
+  },
+  {
+    "id": "probability_020",
+    "category": "probability",
+    "prompt": "A bag contains 4 red balls, 3 blue balls, and 2 green balls. You draw balls one at a time without replacement until you have drawn at least one ball of each color. What is the expected number of draws needed?",
+    "split": "dom"
+  },
+  {
+    "id": "probability_021",
+    "category": "probability",
+    "prompt": "A bag contains 5 red balls, 4 blue balls, and 3 green balls. You draw balls one at a time without replacement until you have drawn at least one ball of each color. What is the expected number of draws required?",
+    "split": "dom"
+  },
+  {
+    "id": "probability_022",
+    "category": "probability",
+    "prompt": "A bag contains 5 red balls and 4 blue balls. Two balls are drawn without replacement. Given that at least one ball is red, what is the probability that both balls are red? Express your answer as a fraction in lowest terms.",
+    "split": "dom"
+  },
+  {
+    "id": "probability_023",
+    "category": "probability",
+    "prompt": "A bag contains 5 red balls, 4 blue balls, and 3 green balls. You draw balls one at a time without replacement until you have drawn at least one ball of each color. What is the expected number of draws required?",
+    "split": "dom"
+  },
+  {
+    "id": "probability_024",
+    "category": "probability",
+    "prompt": "A bag contains 5 red marbles, 4 blue marbles, and 3 green marbles. You draw marbles one at a time without replacement until you have drawn at least one marble of each color. What is the expected number of marbles you must draw?",
+    "split": "dom"
+  },
+  {
+    "id": "probability_025",
+    "category": "probability",
+    "prompt": "A bag contains 5 red marbles, 4 blue marbles, and 3 green marbles. You draw marbles one at a time without replacement until you have drawn at least one marble of each color. What is the probability that you draw exactly 4 marbles total before stopping (meaning the 4th draw completes your collection of all three colors)?",
+    "split": "dom"
+  },
+  {
+    "id": "probability_026",
+    "category": "probability",
+    "prompt": "A bag contains 5 red marbles, 4 blue marbles, and 3 green marbles. You draw marbles one at a time without replacement until you have drawn at least one marble of each color. What is the expected number of marbles you must draw?",
+    "split": "dom"
+  },
+  {
+    "id": "probability_027",
+    "category": "probability",
+    "prompt": "A bag contains 4 red balls and 6 blue balls. You draw balls one at a time without replacement until you have drawn 2 red balls. What is the expected number of balls you will have drawn when the process ends?",
+    "split": "dom"
+  },
+  {
+    "id": "probability_028",
+    "category": "probability",
+    "prompt": "A bag contains 4 red balls, 3 blue balls, and 2 green balls. You draw balls one at a time without replacement until you have drawn at least one ball of each color. What is the expected number of draws required?",
+    "split": "dom"
+  },
+  {
+    "id": "probability_029",
+    "category": "probability",
+    "prompt": "A bag contains 4 red balls, 3 blue balls, and 2 green balls. You draw balls one at a time without replacement until you have drawn at least one ball of each color. What is the expected number of draws required?",
+    "split": "dom"
+  },
+  {
+    "id": "arithmetic_000",
+    "category": "arithmetic",
+    "prompt": "A store sells three items. Item A costs $24 and is discounted 25%. Item B costs $80 and is discounted 15%. Item C costs $45 and has no discount. You buy 3 of Item A, 2 of Item B, and 4 of Item C. A loyalty card gives you an additional 10% off the entire purchase. How much do you pay in total?",
+    "split": "dom"
+  },
+  {
+    "id": "arithmetic_001",
+    "category": "arithmetic",
+    "prompt": "A store sells two items. Item A costs $240 and is discounted by 35%. Item B costs $180 and is discounted by 20%. After buying both discounted items, you pay with a $300 bill and receive change. You then spend exactly 40% of that change on a snack. How much money do you have left after buying the snack?",
+    "split": "dom"
+  },
+  {
+    "id": "arithmetic_002",
+    "category": "arithmetic",
+    "prompt": "A store sells three items. Item A costs $84 and is discounted by 25%. Item B costs $120 and is discounted by 30%. Item C costs $65 and is discounted by 20%.\n\nAfter buying all three items at their discounted prices, you pay with $200 cash. The cashier mistakenly gives you change as if you had paid with $250 instead.\n\nHow much money do you end up with after the transaction (cash remaining plus any overpaid change), compared to what you should have after paying the correct total? What is the difference?",
+    "split": "dom"
+  },
+  {
+    "id": "arithmetic_003",
+    "category": "arithmetic",
+    "prompt": "A store is running a promotion where every item is discounted by 15%. You also have a coupon that gives an additional 20% off the already-discounted price. You buy three items: one originally priced at $80, one at $45, and one at $120. After both discounts are applied to each item, a 8% sales tax is added to the total. What is the final amount you pay, rounded to the nearest cent?",
+    "split": "dom"
+  },
+  {
+    "id": "arithmetic_004",
+    "category": "arithmetic",
+    "prompt": "A store sells three items. Item A costs $240 and is discounted by 15%. Item B costs $180 and is discounted by 25%. Item C costs $320 and is discounted by 10%.\n\nAfter applying the discounts, a loyalty card gives an additional 8% off the total. Then a flat $20 shipping fee is added.\n\nFinally, you have a coupon that takes 5% off the final amount (applied after shipping).\n\nWhat is the total amount paid, rounded to the nearest cent?",
+    "split": "dom"
+  },
+  {
+    "id": "arithmetic_005",
+    "category": "arithmetic",
+    "prompt": "A store sells three items. Item A costs $24 and is discounted by 25%. Item B costs $60 and is discounted by 40%. Item C costs $45 and is discounted by 20%. You buy 2 of Item A, 1 of Item B, and 3 of Item C. A loyalty card gives you an additional 10% off the total after all item discounts are applied. How much do you pay in total?",
+    "split": "dom"
+  },
+  {
+    "id": "arithmetic_006",
+    "category": "arithmetic",
+    "prompt": "A store marks up all items by 40% over wholesale cost. During a sale, they discount everything by 25% off the marked price. A customer also has a loyalty card that gives an additional 10% off the sale price. If the wholesale cost of an item is $80, what is the final price the customer pays?",
+    "split": "dom"
+  },
+  {
+    "id": "arithmetic_007",
+    "category": "arithmetic",
+    "prompt": "A merchant buys 240 items at $3.75 each. He sells 60% of them at a 40% markup, then realizes the remaining items are slightly damaged and sells them at a 20% discount from the original cost. What is his total profit or loss in dollars?",
+    "split": "dom"
+  },
+  {
+    "id": "arithmetic_008",
+    "category": "arithmetic",
+    "prompt": "A store sells three items. Item A costs $240 and is discounted by 15%. Item B costs $180 and is discounted by 20%. Item C costs $320 and is discounted by 12.5%.\n\nYou buy 2 of Item A, 3 of Item B, and 1 of Item C. A loyalty card gives you an additional 10% off the total after the individual discounts are applied. Sales tax of 8% is then added to the final discounted price.\n\nWhat is the total amount you pay, in dollars, rounded to the nearest cent?",
+    "split": "dom"
+  },
+  {
+    "id": "arithmetic_009",
+    "category": "arithmetic",
+    "prompt": "A merchant buys a coat for $240. He marks it up 25%, then runs a \"20% off\" sale. A customer uses a loyalty coupon for an additional 15% off the sale price. The merchant also pays 8% sales tax on his original cost as an overhead expense. What is the merchant's net profit or loss on the sale, in dollars?",
+    "split": "dom"
+  },
+  {
+    "id": "arithmetic_010",
+    "category": "arithmetic",
+    "prompt": "A merchant buys goods at a 20% discount off the list price, then marks them up 15% above the list price for sale. A customer negotiates a 10% discount off the marked price. What is the merchant's profit as a percentage of what the merchant paid?",
+    "split": "dom"
+  },
+  {
+    "id": "arithmetic_011",
+    "category": "arithmetic",
+    "prompt": "A store sells three items. Item A costs $48 and is discounted by 25%. Item B costs $60 and is discounted by 30%. Item C costs $80 and is discounted by 15%.\n\nAfter buying all three at their discounted prices, you receive an additional 10% off your entire purchase. You also have a flat $5 coupon that applies after all percentage discounts.\n\nWhat is your final total?",
+    "split": "dom"
+  },
+  {
+    "id": "arithmetic_012",
+    "category": "arithmetic",
+    "prompt": "A store sells three items. Item A costs $84 and is discounted by 25%. Item B costs $60 and is discounted by 15%. Item C costs $120 and is discounted by 30%.\n\nAfter applying discounts, a loyalty card gives an additional 10% off the total purchase.\n\nFinally, a flat $5 shipping fee is added.\n\nWhat is the final amount paid?",
+    "split": "dom"
+  },
+  {
+    "id": "arithmetic_013",
+    "category": "arithmetic",
+    "prompt": "A shopkeeper buys three items. The first costs $240 and is sold at a 15% profit. The second costs $180 and is sold at a 20% loss. The third costs $300 and is sold at a 10% profit. After all three sales, the shopkeeper uses exactly half of the total revenue to restock. How much money does the shopkeeper have left after restocking?",
+    "split": "dom"
+  },
+  {
+    "id": "arithmetic_014",
+    "category": "arithmetic",
+    "prompt": "A store sells three items. Item A costs $84 and is discounted by 25%. Item B costs $60 and is discounted by 15%. Item C costs $120 and has no discount, but if you buy all three items together, you receive an additional 10% off the combined discounted total.\n\nWhat is the final price for all three items purchased together?",
+    "split": "eval"
+  },
+  {
+    "id": "arithmetic_015",
+    "category": "arithmetic",
+    "prompt": "A store sells three items. Item A costs $84 and is discounted by 25%. Item B costs $60 and is discounted by 15%. Item C costs $120 and is discounted by 30%. You buy 2 of Item A, 3 of Item B, and 1 of Item C. After calculating the total discounted price, you apply an additional 10% loyalty discount to the entire purchase. What is the final amount you pay?",
+    "split": "dom"
+  },
+  {
+    "id": "arithmetic_016",
+    "category": "arithmetic",
+    "prompt": "A store sells three items. Item A costs $240 and is discounted by 15%. Item B costs $180 and is discounted by 25%. Item C costs $320 and is discounted by 10%.\n\nYou buy 2 of Item A, 3 of Item B, and 1 of Item C. A loyalty card gives you an additional 8% off your entire purchase after the individual discounts are applied.\n\nWhat is the final total you pay, in dollars?",
+    "split": "dom"
+  },
+  {
+    "id": "arithmetic_017",
+    "category": "arithmetic",
+    "prompt": "A store sells three items. Item A costs $48 and is on sale for 25% off. Item B costs $35 and is on sale for 20% off. Item C costs $60 and is on sale for 1/3 off.\n\nYou buy 2 of Item A, 3 of Item B, and 1 of Item C. A loyalty card gives you an additional 10% off the total after the individual discounts are applied. Finally, a flat $5 coupon is subtracted after the loyalty discount.\n\nWhat is your final total?",
+    "split": "dom"
+  },
+  {
+    "id": "arithmetic_018",
+    "category": "arithmetic",
+    "prompt": "A store sells three items. Item A costs $48 and is discounted by 25%. Item B costs $75 and is discounted by 40%. Item C costs $120 and is discounted by 15%. You buy 2 of Item A, 3 of Item B, and 1 of Item C. A loyalty card gives you an additional 10% off your entire purchase after the individual discounts are applied. What is the final total you pay?",
+    "split": "dom"
+  },
+  {
+    "id": "arithmetic_019",
+    "category": "arithmetic",
+    "prompt": "A merchant buys 240 items at $3.50 each. He sells 75% of them at a 40% markup, then sells the remaining items at a 15% discount from his original cost. What is his total profit or loss, in dollars?",
+    "split": "dom"
+  },
+  {
+    "id": "arithmetic_020",
+    "category": "arithmetic",
+    "prompt": "A store sells three items. Item A costs $84 and is discounted by 25%. Item B costs $60 and is discounted by 15%. Item C costs $120 and is discounted by 30%. After buying all three at their discounted prices, you pay with a $200 bill and receive change. You then spend exactly 40% of that change on a snack. How much money do you have left?",
+    "split": "dom"
+  },
+  {
+    "id": "arithmetic_021",
+    "category": "arithmetic",
+    "prompt": "A merchant buys 240 items at $3.75 each. He sells 60% of them at a 40% markup, another 25% of them at a 10% markup, and the remaining items at a 15% loss. What is his total profit or loss on the entire transaction, in dollars?",
+    "split": "dom"
+  },
+  {
+    "id": "arithmetic_022",
+    "category": "arithmetic",
+    "prompt": "A store sells three items. Item A costs $240 and is discounted by 15%. Item B costs $180 and is discounted by 25%. Item C has no discount and costs $95.\n\nYou buy 2 of Item A, 3 of Item B, and 1 of Item C. A loyalty card gives you an additional 10% off the total after all item discounts are applied. Sales tax of 8% is then added to the final discounted price.\n\nWhat is the total amount you pay, in dollars, rounded to the nearest cent?",
+    "split": "dom"
+  },
+  {
+    "id": "arithmetic_023",
+    "category": "arithmetic",
+    "prompt": "A merchant buys 120 items at $4.50 each. He sells 75% of them at a 40% markup, then sells half of the remainder at cost, and discovers the last batch is defective so he sells them at a 30% loss.\n\nWhat is his overall profit or loss in dollars?",
+    "split": "eval"
+  },
+  {
+    "id": "arithmetic_024",
+    "category": "arithmetic",
+    "prompt": "A store sells three items. Item A costs $48 and is discounted by 25%. Item B costs $75 and is discounted by 40%. Item C costs $120 and is discounted by 15%.\n\nAfter buying all three at their discounted prices, the customer uses a loyalty coupon that gives an additional 10% off the total.\n\nFinally, a flat $5 shipping fee is added.\n\nWhat is the final amount the customer pays?",
+    "split": "dom"
+  },
+  {
+    "id": "arithmetic_025",
+    "category": "arithmetic",
+    "prompt": "A store prices an item at $240. On Monday, the price drops by 15%. On Wednesday, the price rises by 20% from Monday's price. On Friday, there is an additional 10% off Wednesday's price. A customer has a coupon for 5% off the final listed price. How much does the customer pay?",
+    "split": "dom"
+  },
+  {
+    "id": "arithmetic_026",
+    "category": "arithmetic",
+    "prompt": "A merchant buys goods for $840 and wants to mark them up so that even after offering a 25% discount on the marked price, he still makes a 40% profit on his cost. What must the marked price be?",
+    "split": "dom"
+  },
+  {
+    "id": "arithmetic_027",
+    "category": "arithmetic",
+    "prompt": "A merchant buys a batch of items at $240 total. He sells 60% of them at a 25% markup, then sells the remaining items at a 10% discount from the original cost price. What is his overall profit or loss as a percentage of his original total cost? Round to one decimal place.",
+    "split": "dom"
+  },
+  {
+    "id": "arithmetic_028",
+    "category": "arithmetic",
+    "prompt": "A store sells three items. Item A costs $24 and is discounted by 15%. Item B costs $80 and is discounted by 35%. Item C costs $45 and is discounted by 20%.\n\nAfter buying all three at their discounted prices, you pay with $120 and receive change. You then spend exactly 60% of that change on a snack.\n\nHow much money do you have left after buying the snack?",
+    "split": "dom"
+  },
+  {
+    "id": "arithmetic_029",
+    "category": "arithmetic",
+    "prompt": "A merchant buys 240 items at $15 each. He sells 60% of them at a 40% markup, then sells 25% of the remaining items at a 10% markup, and finally sells the rest at a 20% discount from the original cost. What is his total profit or loss, in dollars?",
+    "split": "dom"
+  },
+  {
+    "id": "counting_000",
+    "category": "counting",
+    "prompt": "A 4\u00d74 grid has its 16 squares each colored either red or blue. How many colorings are there such that every row contains at least one red square and every column contains at least one red square?",
+    "split": "dom"
+  },
+  {
+    "id": "counting_001",
+    "category": "counting",
+    "prompt": "In how many ways can 8 people be seated around a circular table if Alice and Bob must not sit adjacent to each other, and Carol must sit directly opposite to David? (Two seatings are considered the same if one is a rotation of the other.)",
+    "split": "dom"
+  },
+  {
+    "id": "counting_002",
+    "category": "counting",
+    "prompt": "A library has 3 identical copies of Book A, 2 identical copies of Book B, and 1 copy of Book C. These 6 books are to be arranged on a shelf. How many arrangements have no two copies of Book A adjacent to each other?",
+    "split": "dom"
+  },
+  {
+    "id": "counting_003",
+    "category": "counting",
+    "prompt": "In how many ways can you tile a 2\u00d710 grid using 1\u00d72 dominoes, if exactly 3 of the dominoes must be placed vertically (standing upright, covering two cells in the same column)?",
+    "split": "dom"
+  },
+  {
+    "id": "counting_004",
+    "category": "counting",
+    "prompt": "A bookshelf has 8 distinct books arranged in a row. In how many ways can you choose 3 books from the shelf such that no two chosen books are adjacent, and then arrange those 3 chosen books in a row on a separate display stand?",
+    "split": "dom"
+  },
+  {
+    "id": "counting_005",
+    "category": "counting",
+    "prompt": "In how many ways can 8 people be seated around a circular table if Alice and Bob must not sit adjacent to each other, and Carol must sit directly opposite to David (meaning exactly 4 seats apart in a table of 8)?",
+    "split": "dom"
+  },
+  {
+    "id": "counting_006",
+    "category": "counting",
+    "prompt": "A library has 3 identical copies of Book A, 2 identical copies of Book B, and 1 copy of Book C. These 6 books are to be arranged on a shelf. However, no two copies of the same book may be adjacent to each other. In how many distinct arrangements are possible?",
+    "split": "dom"
+  },
+  {
+    "id": "counting_007",
+    "category": "counting",
+    "prompt": "A bookshelf has 8 distinct books arranged in a row. How many ways can you choose 3 books and rearrange all 8 books such that the chosen 3 books appear in alphabetical order (by their titles) relative to each other, though not necessarily consecutively?",
+    "split": "dom"
+  },
+  {
+    "id": "counting_008",
+    "category": "counting",
+    "prompt": "A librarian arranges 6 distinct books on a shelf such that book A is never the leftmost book and book B is never the rightmost book. Additionally, books A and B are never placed next to each other. How many valid arrangements are there?",
+    "split": "dom"
+  },
+  {
+    "id": "counting_009",
+    "category": "counting",
+    "prompt": "A committee of 5 people is to be chosen from a group of 6 men and 5 women. How many ways can the committee be formed if it must contain at least 2 men and at least 2 women, but the two specific people Alex (a man) and Sam (a woman) cannot both be on the committee at the same time?",
+    "split": "dom"
+  },
+  {
+    "id": "counting_010",
+    "category": "counting",
+    "prompt": "In how many ways can 8 people be seated around a circular table if Alice and Bob must not sit adjacent to each other, and Carol must sit directly opposite David (i.e., with exactly 3 people between them on each side)?",
+    "split": "dom"
+  },
+  {
+    "id": "counting_011",
+    "category": "counting",
+    "prompt": "A library has 6 distinct books to be arranged on 3 distinct shelves, where each shelf must contain at least 1 book. How many ways can the books be arranged if the order of books on each shelf matters?",
+    "split": "dom"
+  },
+  {
+    "id": "counting_012",
+    "category": "counting",
+    "prompt": "A secretary needs to file 8 distinct documents into 4 distinct folders such that each folder contains at least 1 document and no folder contains more than 3 documents. How many ways can this be done?",
+    "split": "dom"
+  },
+  {
+    "id": "counting_013",
+    "category": "counting",
+    "prompt": "A committee of 5 people is to be chosen from 6 men and 5 women. How many ways can the committee be formed if it must contain at least 2 men and at least 2 women, but also the following restriction applies: two specific men (call them A and B) refuse to serve together on the committee?",
+    "split": "dom"
+  },
+  {
+    "id": "counting_014",
+    "category": "counting",
+    "prompt": "A secretary needs to file 8 documents into 4 labeled folders (A, B, C, D), with each folder receiving exactly 2 documents. However, documents 1 and 2 must not be placed in the same folder, and documents 3 and 4 must not be placed in the same folder. How many ways can this be done?",
+    "split": "dom"
+  },
+  {
+    "id": "counting_015",
+    "category": "counting",
+    "prompt": "A library has 6 distinct books to arrange on a shelf. How many ways can the books be arranged such that no two adjacent books share the same first letter, given that books A, B, and C start with the letter \"M\" and books D, E, and F start with the letter \"T\"?\n\nWait, I need to make this more interesting and require multi-step reasoning.\n\nHow many ways can the integers 1 through 8 be arranged in a row such that no odd number is adjacent to another odd number and no even number is adjacent to another even number? In other words, the odd and even numbers must strictly alternate.\n\nHmm, let me create a more challenging problem that requires more steps.\n\nA committee of 5 people is to be chosen from 6 men and 5 women. How many ways can this be done if the committee must contain at least 2 men and at least 2 women, and furthermore, two specific men (call them Alex and Bob) refuse to serve together on the same committee?\n\nCompute the number of ways to arrange the letters of the word MISSISSIPPI such that no two S's are adjacent to each other.",
+    "split": "dom"
+  },
+  {
+    "id": "counting_016",
+    "category": "counting",
+    "prompt": "A committee of 5 people is to be chosen from 6 men and 5 women. How many ways can this be done if the committee must contain at least 2 men and at least 2 women, but also must avoid the following specific pair: man A and woman B cannot both be on the committee?",
+    "split": "dom"
+  },
+  {
+    "id": "counting_017",
+    "category": "counting",
+    "prompt": "How many ways can you arrange the letters in the word BOOKKEEPER such that no two identical letters are adjacent?",
+    "split": "dom"
+  },
+  {
+    "id": "counting_018",
+    "category": "counting",
+    "prompt": "In how many ways can 8 people be seated around a circular table if Alice and Bob must not sit adjacent to each other, and Carol must sit directly opposite to Dave (the table has exactly 8 seats, evenly spaced)?",
+    "split": "dom"
+  },
+  {
+    "id": "counting_019",
+    "category": "counting",
+    "prompt": "A library has 6 distinct books to arrange on a shelf. How many arrangements are there such that no two adjacent books share the same first letter, given that books A, B, C start with the letter \"M\" and books D, E, F start with the letter \"S\"?\n\nWait, let me generate a proper problem:\n\nIn how many ways can 4 identical red balls, 3 identical blue balls, and 2 identical green balls be arranged in a row such that no two green balls are adjacent and no two blue balls are adjacent?",
+    "split": "dom"
+  },
+  {
+    "id": "counting_020",
+    "category": "counting",
+    "prompt": "In how many ways can 8 people be seated around a circular table if Alice and Bob must not sit adjacent to each other, and Carol must sit directly opposite to Dave (i.e., with exactly 3 people between them on each side)?",
+    "split": "dom"
+  },
+  {
+    "id": "counting_021",
+    "category": "counting",
+    "prompt": "How many ways can you arrange the letters in the word MISSISSIPPI such that no two S's are adjacent to each other?",
+    "split": "dom"
+  },
+  {
+    "id": "counting_022",
+    "category": "counting",
+    "prompt": "How many ways can you arrange the letters in the word MISSISSIPPI such that no two S's are adjacent to each other?",
+    "split": "dom"
+  },
+  {
+    "id": "counting_023",
+    "category": "counting",
+    "prompt": "A library has 6 identical copies of Book A, 4 identical copies of Book B, and 3 identical copies of Book C. The librarian wants to arrange some or all of these books on a single shelf such that the shelf contains at least 2 copies of each title and the total number of books on the shelf is exactly 11. How many distinct arrangements are possible?",
+    "split": "dom"
+  },
+  {
+    "id": "counting_024",
+    "category": "counting",
+    "prompt": "In how many ways can 8 people be seated around a circular table if Alice and Bob must not sit adjacent to each other, and Carol must sit directly opposite David? (Two seatings are considered the same if one is a rotation of the other.)",
+    "split": "dom"
+  },
+  {
+    "id": "counting_025",
+    "category": "counting",
+    "prompt": "A school committee of 5 people must be chosen from 6 teachers and 5 students, with the requirement that the committee has at least 2 teachers and at least 1 student. Additionally, one specific teacher (call them T1) and one specific student (call them S1) refuse to serve on the committee together. How many valid committees are possible?",
+    "split": "dom"
+  },
+  {
+    "id": "counting_026",
+    "category": "counting",
+    "prompt": "A library has 6 distinct books to arrange on a shelf. However, 2 specific books (call them A and B) must not be placed next to each other, and 2 other specific books (call them C and D) must always be placed next to each other (in either order). How many valid arrangements are there?",
+    "split": "eval"
+  },
+  {
+    "id": "counting_027",
+    "category": "counting",
+    "prompt": "A committee of 5 people is to be chosen from 6 men and 5 women. How many ways can the committee be formed if it must contain at least 2 men and at least 2 women, and furthermore, two specific people (one man named Adam and one woman named Beth) refuse to serve on the committee together?",
+    "split": "dom"
+  },
+  {
+    "id": "counting_028",
+    "category": "counting",
+    "prompt": "In how many ways can 8 people be seated around a circular table if Alice and Bob must not sit adjacent to each other, and Carol must sit directly opposite to Dave (i.e., with exactly 3 people between them on each side)?",
+    "split": "eval"
+  },
+  {
+    "id": "counting_029",
+    "category": "counting",
+    "prompt": "A bookshelf has 8 distinct slots. You want to place 5 red books and 3 blue books into these slots such that no two blue books are adjacent to each other. In how many ways can this be arranged if the red books are all identical and the blue books are all identical?",
+    "split": "dom"
+  },
+  {
+    "id": "number_theory_000",
+    "category": "number_theory",
+    "prompt": "Find the largest three-digit integer N such that the sum of its digits equals the product of its digits.",
+    "split": "dom"
+  },
+  {
+    "id": "number_theory_001",
+    "category": "number_theory",
+    "prompt": "Find the largest three-digit number N such that when N is divided by 7, 11, and 13, the remainders are 5, 3, and 10 respectively.",
+    "split": "dom"
+  },
+  {
+    "id": "number_theory_002",
+    "category": "number_theory",
+    "prompt": "Find the largest three-digit integer N such that the product of its digits equals N - 582.",
+    "split": "dom"
+  },
+  {
+    "id": "number_theory_003",
+    "category": "number_theory",
+    "prompt": "Find the largest three-digit integer N such that the product of its digits equals N - 582.",
+    "split": "dom"
+  },
+  {
+    "id": "number_theory_004",
+    "category": "number_theory",
+    "prompt": "Find the largest three-digit integer N such that the sum of the digits of N equals the sum of the digits of 3N.",
+    "split": "dom"
+  },
+  {
+    "id": "number_theory_005",
+    "category": "number_theory",
+    "prompt": "Find the largest three-digit integer N such that when N is divided by 7, the remainder equals the sum of the digits of N.",
+    "split": "dom"
+  },
+  {
+    "id": "number_theory_006",
+    "category": "number_theory",
+    "prompt": "Find the largest three-digit integer N such that the product of its digits equals N/11.",
+    "split": "dom"
+  },
+  {
+    "id": "number_theory_007",
+    "category": "number_theory",
+    "prompt": "Find the largest three-digit integer N such that the product of its digits equals N - 582.",
+    "split": "dom"
+  },
+  {
+    "id": "number_theory_008",
+    "category": "number_theory",
+    "prompt": "Find the largest three-digit integer N such that the product of its digits equals N - 582.",
+    "split": "dom"
+  },
+  {
+    "id": "number_theory_009",
+    "category": "number_theory",
+    "prompt": "Find the smallest positive integer n such that n, n+1, and n+2 are each divisible by a perfect square greater than 1.",
+    "split": "dom"
+  },
+  {
+    "id": "number_theory_010",
+    "category": "number_theory",
+    "prompt": "Find the largest three-digit integer N such that when N is divided by 7, the remainder equals the sum of the digits of N.",
+    "split": "dom"
+  },
+  {
+    "id": "number_theory_011",
+    "category": "number_theory",
+    "prompt": "Find the smallest positive integer n such that n, n+1, and n+2 are each divisible by a perfect square greater than 1.",
+    "split": "dom"
+  },
+  {
+    "id": "number_theory_012",
+    "category": "number_theory",
+    "prompt": "Find the smallest positive integer n such that n, n+1, and n+2 are each divisible by a perfect square greater than 1.",
+    "split": "dom"
+  },
+  {
+    "id": "number_theory_013",
+    "category": "number_theory",
+    "prompt": "Find the largest three-digit integer N such that the sum of digits of N equals the sum of digits of 3N.",
+    "split": "dom"
+  },
+  {
+    "id": "number_theory_014",
+    "category": "number_theory",
+    "prompt": "Find the largest three-digit integer N such that the product of its digits equals N - 582.",
+    "split": "dom"
+  },
+  {
+    "id": "number_theory_015",
+    "category": "number_theory",
+    "prompt": "Find the smallest positive integer n such that n, n+1, and n+2 are each divisible by a perfect square greater than 1.",
+    "split": "dom"
+  },
+  {
+    "id": "number_theory_016",
+    "category": "number_theory",
+    "prompt": "Find the largest three-digit integer N such that the product of its digits equals N - 582.",
+    "split": "dom"
+  },
+  {
+    "id": "number_theory_017",
+    "category": "number_theory",
+    "prompt": "Find the largest three-digit number N such that when N is divided by 7, 11, and 13, the remainders are 2, 5, and 8 respectively.",
+    "split": "dom"
+  },
+  {
+    "id": "number_theory_018",
+    "category": "number_theory",
+    "prompt": "Find the largest three-digit integer N such that the sum of its digits equals the product of its digits.",
+    "split": "dom"
+  },
+  {
+    "id": "number_theory_019",
+    "category": "number_theory",
+    "prompt": "Find the largest three-digit integer N such that the product of its digits equals N/11.",
+    "split": "dom"
+  },
+  {
+    "id": "number_theory_020",
+    "category": "number_theory",
+    "prompt": "Find the largest three-digit number N such that when N is divided by 7, the remainder is 4, and when N is divided by 11, the remainder is 6, and when N is divided by 13, the remainder is 2.",
+    "split": "eval"
+  },
+  {
+    "id": "number_theory_021",
+    "category": "number_theory",
+    "prompt": "Find the largest three-digit integer N such that the product of its digits equals N - 582.",
+    "split": "dom"
+  },
+  {
+    "id": "number_theory_022",
+    "category": "number_theory",
+    "prompt": "Find the largest three-digit integer N such that the product of its digits equals N - 582.",
+    "split": "eval"
+  },
+  {
+    "id": "number_theory_023",
+    "category": "number_theory",
+    "prompt": "Find the largest three-digit integer N such that the product of its digits equals N - 582.",
+    "split": "dom"
+  },
+  {
+    "id": "number_theory_024",
+    "category": "number_theory",
+    "prompt": "Find the largest three-digit integer N such that when N is divided by any of the integers 2, 3, 4, 5, and 6, the remainder is always one less than the divisor.",
+    "split": "dom"
+  },
+  {
+    "id": "number_theory_025",
+    "category": "number_theory",
+    "prompt": "Find the largest three-digit integer N such that the product of its digits equals N - 582.",
+    "split": "dom"
+  },
+  {
+    "id": "number_theory_026",
+    "category": "number_theory",
+    "prompt": "Find the largest three-digit number N such that when N is divided by 7, the remainder is 4, and when N is divided by 11, the remainder is 7, and when N is divided by 13, the remainder is 10.",
+    "split": "dom"
+  },
+  {
+    "id": "number_theory_027",
+    "category": "number_theory",
+    "prompt": "Find the largest three-digit integer N such that the product of the digits of N equals twice the sum of the digits of N.",
+    "split": "dom"
+  },
+  {
+    "id": "number_theory_028",
+    "category": "number_theory",
+    "prompt": "Find the smallest positive integer n such that n, n+1, and n+2 are each divisible by a perfect square greater than 1.",
+    "split": "dom"
+  },
+  {
+    "id": "number_theory_029",
+    "category": "number_theory",
+    "prompt": "Find the smallest positive integer n such that n, n+1, and n+2 are each divisible by a perfect square greater than 1.",
+    "split": "dom"
+  },
+  {
+    "id": "set_theory_000",
+    "category": "set_theory",
+    "prompt": "Let A = {1, 2, 3, 4, 5, 6} and consider all subsets S of A such that S contains at least one odd number and at least one even number. Among these subsets, how many have the property that the sum of their elements is strictly greater than 10?",
+    "split": "dom"
+  },
+  {
+    "id": "set_theory_001",
+    "category": "set_theory",
+    "prompt": "Let A = {1, 2, 3, 4, 5, 6} and consider all functions f: A \u2192 A that satisfy the following two conditions:\n\n1. f(f(x)) = f(x) for all x \u2208 A (i.e., f is idempotent)\n2. |f(A)| = 3 (the image of f has exactly 3 elements)\n\nAn idempotent function with image size 3 is determined by choosing which 3 elements of A form the image (these elements must be fixed points), and then mapping each of the remaining 3 elements to one of the 3 image elements.\n\nHow many such functions f: A \u2192 A are there?",
+    "split": "dom"
+  },
+  {
+    "id": "set_theory_002",
+    "category": "set_theory",
+    "prompt": "Let A = {1, 2, 3, 4, 5, 6} and consider all functions f: A \u2192 A such that f(f(x)) = f(x) for every x in A (these are called idempotent functions). Such a function must fix every element in its image. How many such functions are there?",
+    "split": "dom"
+  },
+  {
+    "id": "set_theory_003",
+    "category": "set_theory",
+    "prompt": "Let A = {1, 2, 3, 4, 5, 6, 7, 8} and consider all subsets S of A such that:\n1. |S| = 4\n2. S contains at least one odd number\n3. S contains at least two even numbers\n\nHow many such subsets S exist?",
+    "split": "dom"
+  },
+  {
+    "id": "set_theory_004",
+    "category": "set_theory",
+    "prompt": "Let A = {1, 2, 3, 4, 5, 6} and consider all functions f: A \u2192 A such that f(f(x)) = f(x) for every x in A (these are called idempotent functions or retractions).\n\nFor such a function f, the image Im(f) = {f(x) : x \u2208 A} must equal the set of fixed points {x \u2208 A : f(x) = x}.\n\nCount the number of idempotent functions f: A \u2192 A where exactly 4 elements of A are fixed points of f.",
+    "split": "dom"
+  },
+  {
+    "id": "set_theory_005",
+    "category": "set_theory",
+    "prompt": "In a group of 50 students, every student studies at least one of three subjects: Art, Biology, or Chemistry. The following is known:\n\n- Exactly 30 students study Art.\n- Exactly 25 students study Biology.\n- Exactly 20 students study Chemistry.\n- Exactly 10 students study both Art and Biology.\n- Exactly 8 students study both Art and Chemistry.\n- Exactly 5 students study both Biology and Chemistry.\n\nHow many students study all three subjects?",
+    "split": "dom"
+  },
+  {
+    "id": "set_theory_006",
+    "category": "set_theory",
+    "prompt": "In a group of 50 students, each student studies at least one of three subjects: Art, Biology, or Chemistry. The following is known:\n\n- 30 students study Art\n- 28 students study Biology\n- 25 students study Chemistry\n- 12 students study both Art and Biology\n- 10 students study both Art and Chemistry\n- 8 students study both Biology and Chemistry\n- Every student who studies both Biology and Chemistry also studies Art\n\nUsing this information, determine how many students study exactly one subject.",
+    "split": "dom"
+  },
+  {
+    "id": "set_theory_007",
+    "category": "set_theory",
+    "prompt": "In a group of 50 students, every student studies at least one of three subjects: Mathematics, Physics, or Chemistry. The following information is known:\n\n- 30 students study Mathematics\n- 25 students study Physics\n- 20 students study Chemistry\n- 10 students study both Mathematics and Physics\n- 8 students study both Mathematics and Chemistry\n- 5 students study both Physics and Chemistry\n- The number of students studying all three subjects is some value x\n\nUsing inclusion-exclusion, determine x. Then, among the students who study exactly one subject, how many study Mathematics only?",
+    "split": "dom"
+  },
+  {
+    "id": "set_theory_008",
+    "category": "set_theory",
+    "prompt": "In a group of 50 students, each student studies at least one of three subjects: Art, Biology, or Chemistry. The following is known:\n\n- 30 students study Art\n- 25 students study Biology\n- 20 students study Chemistry\n- 10 students study both Art and Biology\n- 8 students study both Art and Chemistry\n- 5 students study both Biology and Chemistry\n- Every student who studies both Biology and Chemistry also studies Art\n\nUsing this information, determine the number of students who study exactly one subject.",
+    "split": "eval"
+  },
+  {
+    "id": "set_theory_009",
+    "category": "set_theory",
+    "prompt": "Let A = {1, 2, 3, 4, 5, 6} and consider all functions f: A \u2192 A that satisfy the following two conditions:\n\n1. |f(A)| = 4 (the image of f has exactly 4 elements)\n2. For every element y in f(A), exactly one element of A maps to y OR exactly two elements of A map to y (no element of the image has 3 or more preimages)\n\nSince |A| = 6 and the image has exactly 4 elements, the total preimage sizes must sum to 6. Given condition 2, each image element has preimage of size 1 or 2.\n\nFind the number of such functions f: A \u2192 A.",
+    "split": "dom"
+  },
+  {
+    "id": "set_theory_010",
+    "category": "set_theory",
+    "prompt": "In a group of 50 students, each student studies at least one of three subjects: Math, Physics, or Chemistry. The following information is known:\n\n- 30 students study Math\n- 25 students study Physics\n- 20 students study Chemistry\n- 10 students study both Math and Physics\n- 8 students study both Math and Chemistry\n- 5 students study both Physics and Chemistry\n- The number of students studying all three subjects is unknown\n\nUsing inclusion-exclusion, determine how many students study exactly one subject, given that the number studying all three subjects is as large as possible while remaining consistent with the given data.",
+    "split": "dom"
+  },
+  {
+    "id": "set_theory_011",
+    "category": "set_theory",
+    "prompt": "In a group of 60 students, each student studies at least one of three subjects: Art, Biology, or Chemistry. The following is known:\n\n- 35 students study Art\n- 30 students study Biology\n- 28 students study Chemistry\n- 18 students study both Art and Biology\n- 14 students study both Art and Chemistry\n- 12 students study both Biology and Chemistry\n- Every student who studies both Biology and Chemistry also studies Art\n\nUsing this information, determine the number of students who study exactly one subject.",
+    "split": "dom"
+  },
+  {
+    "id": "set_theory_012",
+    "category": "set_theory",
+    "prompt": "In a group of 50 students, each student studies at least one of three subjects: Math, Physics, or Chemistry. The following information is known:\n\n- 30 students study Math\n- 25 students study Physics\n- 20 students study Chemistry\n- 10 students study both Math and Physics\n- 8 students study both Math and Chemistry\n- 5 students study both Physics and Chemistry\n- Every student who studies both Physics and Chemistry also studies Math\n\nUsing this information, determine the number of students who study exactly one subject.",
+    "split": "dom"
+  },
+  {
+    "id": "set_theory_013",
+    "category": "set_theory",
+    "prompt": "In a group of 50 students, every student studies at least one of three subjects: Math, Physics, or Chemistry. The following is known:\n\n- 30 students study Math\n- 25 students study Physics\n- 20 students study Chemistry\n- 10 students study both Math and Physics\n- 8 students study both Math and Chemistry\n- 5 students study both Physics and Chemistry\n- Every student who studies both Physics and Chemistry also studies Math\n\nUsing this information, determine the number of students who study exactly one subject.",
+    "split": "eval"
+  },
+  {
+    "id": "set_theory_014",
+    "category": "set_theory",
+    "prompt": "In a group of 60 students, each student studies at least one of three subjects: Art, Biology, or Chemistry. The following information is known:\n\n- 35 students study Art\n- 30 students study Biology\n- 28 students study Chemistry\n- 18 students study both Art and Biology\n- 14 students study both Art and Chemistry\n- 12 students study both Biology and Chemistry\n- Every student who studies both Biology and Chemistry also studies Art\n\nUsing this information, determine the number of students who study exactly one subject.",
+    "split": "dom"
+  },
+  {
+    "id": "set_theory_015",
+    "category": "set_theory",
+    "prompt": "A set S contains exactly 6 elements. Consider all functions f: S \u2192 S that satisfy the following two properties:\n(1) f(f(x)) = f(x) for all x in S (f is idempotent)\n(2) |Image(f)| = 3 (the image of f has exactly 3 elements)\n\nHow many such functions are there?",
+    "split": "dom"
+  },
+  {
+    "id": "set_theory_016",
+    "category": "set_theory",
+    "prompt": "In a group of 50 students, each student studies at least one of three subjects: Math, Physics, or Chemistry. The following is known:\n\n- 30 students study Math\n- 25 students study Physics\n- 20 students study Chemistry\n- 10 students study both Math and Physics\n- 8 students study both Math and Chemistry\n- 5 students study both Physics and Chemistry\n- Every student who studies both Physics and Chemistry also studies Math\n\nUsing this information, determine the number of students who study exactly one subject.",
+    "split": "dom"
+  },
+  {
+    "id": "set_theory_017",
+    "category": "set_theory",
+    "prompt": "In a group of 50 students, each student studies at least one of three subjects: Math, Physics, or Chemistry. The following information is known:\n\n- 30 students study Math\n- 25 students study Physics\n- 20 students study Chemistry\n- 10 students study both Math and Physics\n- 8 students study both Math and Chemistry\n- 5 students study both Physics and Chemistry\n- Every student who studies both Physics and Chemistry also studies Math\n\nUsing this information, determine the number of students who study exactly one subject.",
+    "split": "dom"
+  },
+  {
+    "id": "set_theory_018",
+    "category": "set_theory",
+    "prompt": "In a group of 50 students, each student studies at least one of three subjects: Math, Physics, or Chemistry. The following information is known:\n\n- 30 students study Math\n- 25 students study Physics\n- 20 students study Chemistry\n- 10 students study both Math and Physics\n- 8 students study both Math and Chemistry\n- 5 students study both Physics and Chemistry\n- Every student who studies both Physics and Chemistry also studies Math\n\nUsing inclusion-exclusion, determine how many students study exactly one subject.",
+    "split": "dom"
+  },
+  {
+    "id": "set_theory_019",
+    "category": "set_theory",
+    "prompt": "In a group of 50 students, each student studies at least one of three subjects: Art, Biology, or Chemistry. The following is known:\n\n- 30 students study Art\n- 28 students study Biology\n- 25 students study Chemistry\n- 12 students study both Art and Biology\n- 10 students study both Art and Chemistry\n- 8 students study both Biology and Chemistry\n- Every student who studies both Biology and Chemistry also studies Art\n\nUsing this information, determine the number of students who study exactly one subject.",
+    "split": "dom"
+  },
+  {
+    "id": "set_theory_020",
+    "category": "set_theory",
+    "prompt": "In a group of 60 students, each student studies at least one of three languages: French (F), Spanish (S), and Mandarin (M). The following information is known:\n\n- |F| = 35, |S| = 30, |M| = 25\n- |F \u2229 S| = 15, |F \u2229 M| = 10, |S \u2229 M| = 8\n- Every student who studies both Spanish and Mandarin also studies French.\n\nHow many students study all three languages?",
+    "split": "dom"
+  },
+  {
+    "id": "set_theory_021",
+    "category": "set_theory",
+    "prompt": "In a group of 50 students, every student studies at least one of three subjects: Art, Biology, or Chemistry. The following is known:\n\n- 30 students study Art\n- 28 students study Biology\n- 25 students study Chemistry\n- 12 students study both Art and Biology\n- 10 students study both Art and Chemistry\n- 8 students study both Biology and Chemistry\n- Every student who studies both Biology and Chemistry also studies Art\n\nUsing this information, determine the number of students who study exactly one subject.",
+    "split": "dom"
+  },
+  {
+    "id": "set_theory_022",
+    "category": "set_theory",
+    "prompt": "In a group of 60 students, each student studies at least one of three subjects: Art, Biology, or Chemistry. The following information is known:\n\n- 35 students study Art\n- 30 students study Biology\n- 28 students study Chemistry\n- 18 students study both Art and Biology\n- 14 students study both Art and Chemistry\n- 12 students study both Biology and Chemistry\n- Every student who studies both Biology and Chemistry also studies Art\n\nUsing this information, determine the number of students who study exactly one subject.",
+    "split": "dom"
+  },
+  {
+    "id": "set_theory_023",
+    "category": "set_theory",
+    "prompt": "In a group of 50 students, each student studies at least one of three subjects: Math, Physics, or Chemistry. The following information is known:\n\n- 30 students study Math\n- 25 students study Physics\n- 20 students study Chemistry\n- 10 students study both Math and Physics\n- 8 students study both Math and Chemistry\n- 5 students study both Physics and Chemistry\n- Every student who studies both Physics and Chemistry also studies Math\n\nUsing this information, determine the number of students who study exactly one subject.",
+    "split": "dom"
+  },
+  {
+    "id": "set_theory_024",
+    "category": "set_theory",
+    "prompt": "In a group of 50 students, each student studies at least one of three subjects: Art, Biology, or Chemistry. The following is known:\n\n- 30 students study Art\n- 28 students study Biology\n- 25 students study Chemistry\n- 12 students study both Art and Biology\n- 10 students study both Art and Chemistry\n- 8 students study both Biology and Chemistry\n\nUsing inclusion-exclusion, determine how many students study all three subjects.\n\nThen, given that answer, determine how many students study **exactly one** subject.",
+    "split": "dom"
+  },
+  {
+    "id": "set_theory_025",
+    "category": "set_theory",
+    "prompt": "In a group of 50 students, each student studies at least one of three subjects: Math, Physics, or Chemistry. The following facts are known:\n\n- 30 students study Math\n- 25 students study Physics\n- 20 students study Chemistry\n- 10 students study both Math and Physics\n- 8 students study both Math and Chemistry\n- 5 students study both Physics and Chemistry\n- Every student who studies both Physics and Chemistry also studies Math\n\nUsing these facts, determine the number of students who study exactly one subject.",
+    "split": "dom"
+  },
+  {
+    "id": "set_theory_026",
+    "category": "set_theory",
+    "prompt": "A survey of 100 students found the following:\n- 60 students study mathematics\n- 55 students study physics\n- 50 students study chemistry\n- 30 students study both mathematics and physics\n- 28 students study both mathematics and chemistry\n- 25 students study both physics and chemistry\n- Every student studies at least one of the three subjects\n\nUsing inclusion-exclusion, determine how many students study all three subjects. Then determine how many students study exactly one subject. Finally, determine how many students study exactly two subjects but not all three.",
+    "split": "dom"
+  },
+  {
+    "id": "set_theory_027",
+    "category": "set_theory",
+    "prompt": "In a group of 50 students, each student studies at least one of three subjects: Mathematics, Physics, or Chemistry. The following information is known:\n\n- 30 study Mathematics\n- 28 study Physics\n- 25 study Chemistry\n- 12 study both Mathematics and Physics\n- 10 study both Mathematics and Chemistry\n- 8 study both Physics and Chemistry\n- Every student who studies both Physics and Chemistry also studies Mathematics\n\nUsing inclusion-exclusion, determine how many students study exactly one subject.",
+    "split": "dom"
+  },
+  {
+    "id": "set_theory_028",
+    "category": "set_theory",
+    "prompt": "In a group of 60 students, each student studies at least one of three subjects: Art, Biology, or Chemistry. The following is known:\n\n- 35 students study Art\n- 30 students study Biology\n- 28 students study Chemistry\n- 12 students study both Art and Biology\n- 10 students study both Art and Chemistry\n- 8 students study both Biology and Chemistry\n- Every student who studies both Biology and Chemistry also studies Art\n\nUsing this information, determine the number of students who study exactly one subject.",
+    "split": "dom"
+  },
+  {
+    "id": "set_theory_029",
+    "category": "set_theory",
+    "prompt": "A set S has exactly 5 elements. Let F be the collection of all subsets of S that contain at least 2 elements but at most 3 elements. Two subsets A and B in F are called \"linked\" if |A \u2229 B| = 1 (they share exactly one element).\n\nCount the number of linked pairs {A, B} where A has exactly 2 elements and B has exactly 3 elements.",
+    "split": "dom"
+  },
+  {
+    "id": "sequences_000",
+    "category": "sequences",
+    "prompt": "A sequence is defined by a\u2081 = 2, a\u2082 = 5, and a\u2099 = 3a\u2099\u208b\u2081 \u2212 2a\u2099\u208b\u2082 for n \u2265 3.\n\nFind a closed-form expression for a\u2099 and use it to compute the sum of the first 20 terms.",
+    "split": "eval"
+  },
+  {
+    "id": "sequences_001",
+    "category": "sequences",
+    "prompt": "A sequence is defined by a\u2081 = 1, a\u2082 = 3, and a\u2099 = a\u2099\u208b\u2081 + a\u2099\u208b\u2082 + n for n \u2265 3.\n\nFind the value of a\u2088.",
+    "split": "dom"
+  },
+  {
+    "id": "sequences_002",
+    "category": "sequences",
+    "prompt": "A sequence is defined by a\u2081 = 1, a\u2082 = 3, and a\u2099 = a\u2099\u208b\u2081 + a\u2099\u208b\u2082 + n for n \u2265 3.\n\nFind the value of a\u2088.",
+    "split": "dom"
+  },
+  {
+    "id": "sequences_003",
+    "category": "sequences",
+    "prompt": "A sequence is defined by a(1) = 1, a(2) = 3, and a(n) = a(n-1) + a(n-2) + 2 for all n \u2265 3.\n\nDefine b(n) = a(n) + c for some constant c chosen so that b(n) satisfies the recurrence b(n) = b(n-1) + b(n-2).\n\nFind the value of c, then use it to determine a closed-form expression for a(n) in terms of the golden ratio \u03c6 = (1+\u221a5)/2 and its conjugate \u03c8 = (1-\u221a5)/2.\n\nFinally, compute the exact value of a(10).",
+    "split": "dom"
+  },
+  {
+    "id": "sequences_004",
+    "category": "sequences",
+    "prompt": "A sequence is defined by a\u2081 = 1, a\u2082 = 3, and a\u2099 = a\u2099\u208b\u2081 + a\u2099\u208b\u2082 + n for n \u2265 3.\n\nFind the value of a\u2088.",
+    "split": "dom"
+  },
+  {
+    "id": "sequences_005",
+    "category": "sequences",
+    "prompt": "A sequence is defined by a\u2081 = 1, a\u2082 = 3, and a\u2099 = a\u2099\u208b\u2081 + a\u2099\u208b\u2082 + n for n \u2265 3.\n\nFind the value of a\u2088.",
+    "split": "dom"
+  },
+  {
+    "id": "sequences_006",
+    "category": "sequences",
+    "prompt": "A sequence is defined by a\u2081 = 1, a\u2082 = 1, and for n \u2265 3:\n\na\u2099 = a\u2099\u208b\u2081 + 2a\u2099\u208b\u2082 + n\n\nFind the value of a\u2087.",
+    "split": "dom"
+  },
+  {
+    "id": "sequences_007",
+    "category": "sequences",
+    "prompt": "A sequence is defined by a(1) = 1, a(2) = 3, and for n \u2265 3:\n\na(n) = a(n-1) + 2\u00b7a(n-2) + 2^(n-2)\n\nFind a closed-form expression for a(n) and compute a(10).",
+    "split": "dom"
+  },
+  {
+    "id": "sequences_008",
+    "category": "sequences",
+    "prompt": "A sequence is defined by a\u2081 = 1, a\u2082 = 3, and a\u2099 = a\u2099\u208b\u2081 + a\u2099\u208b\u2082 + n for n \u2265 3.\n\nDefine S\u2099 = a\u2081 + a\u2082 + a\u2083 + ... + a\u2099.\n\nFind a closed-form expression for S\u2099 in terms of n, given that S\u2081\u2080 can be used to verify your answer.\n\nCompute S\u2081\u2080.",
+    "split": "dom"
+  },
+  {
+    "id": "sequences_009",
+    "category": "sequences",
+    "prompt": "A sequence is defined by a\u2081 = 1, a\u2082 = 3, and a\u2099 = a\u2099\u208b\u2081 + a\u2099\u208b\u2082 + n for n \u2265 3.\n\nDefine b\u2099 = a\u2099\u208a\u2081 - a\u2099. Find a closed-form expression for b\u2099, then use it to compute a\u2081\u2080.",
+    "split": "dom"
+  },
+  {
+    "id": "sequences_010",
+    "category": "sequences",
+    "prompt": "A sequence is defined by a\u2081 = 1, a\u2082 = 3, and a\u2099 = a\u2099\u208b\u2081 + a\u2099\u208b\u2082 + n for all n \u2265 3.\n\nFind the value of a\u2088.",
+    "split": "dom"
+  },
+  {
+    "id": "sequences_011",
+    "category": "sequences",
+    "prompt": "A sequence is defined by a\u2081 = 1, a\u2082 = 1, and for n \u2265 3:\n\na\u2099 = a\u2099\u208b\u2081 + 2a\u2099\u208b\u2082 + 2(n - 2)\n\nFind a closed-form expression for a\u2099.",
+    "split": "dom"
+  },
+  {
+    "id": "sequences_012",
+    "category": "sequences",
+    "prompt": "A sequence is defined by a\u2081 = 1, a\u2082 = 3, and for n \u2265 3:\n\na\u2099 = a\u2099\u208b\u2081 + 2a\u2099\u208b\u2082 + n\n\nFind the value of a\u2087.",
+    "split": "dom"
+  },
+  {
+    "id": "sequences_013",
+    "category": "sequences",
+    "prompt": "A sequence is defined by a\u2081 = 1, a\u2082 = 1, and for n \u2265 3:\n\na\u2099 = a\u2099\u208b\u2081 + 2a\u2099\u208b\u2082 + n\n\nFind the value of a\u2087.",
+    "split": "dom"
+  },
+  {
+    "id": "sequences_014",
+    "category": "sequences",
+    "prompt": "A sequence is defined by a\u2081 = 1, a\u2082 = 3, and for n \u2265 3:\n\na\u2099 = a\u2099\u208b\u2081 + 2a\u2099\u208b\u2082 + 2(n \u2212 2)\n\nFind the value of a\u2087.",
+    "split": "dom"
+  },
+  {
+    "id": "sequences_015",
+    "category": "sequences",
+    "prompt": "A sequence is defined by a\u2081 = 1, a\u2082 = 3, and a\u2099 = a\u2099\u208b\u2081 + a\u2099\u208b\u2082 + n for n \u2265 3.\n\nDefine S\u2099 = a\u2081 + a\u2082 + ... + a\u2099.\n\nFind a closed-form expression for S\u2099 in terms of a\u2099 and a\u2099\u208a\u2081, then use it to compute S\u2081\u2080.\n\nTo earn full credit, you must:\n1. Express S\u2099 = a\u2099\u208a\u2081 + f(n) for some explicit function f(n).\n2. Compute S\u2081\u2080 numerically.",
+    "split": "dom"
+  },
+  {
+    "id": "sequences_016",
+    "category": "sequences",
+    "prompt": "A sequence is defined by a\u2081 = 1, a\u2082 = 1, and for n \u2265 3:\n\na\u2099 = a\u2099\u208b\u2081 + 2a\u2099\u208b\u2082 + 2(n \u2212 2)\n\nFind a closed-form expression for a\u2099 and evaluate a\u2081\u2080.",
+    "split": "dom"
+  },
+  {
+    "id": "sequences_017",
+    "category": "sequences",
+    "prompt": "A sequence is defined by a(1) = 1, a(2) = 3, and for n \u2265 3:\n\na(n) = a(n-1) + 2\u00b7a(n-2) + 2^(n-2)\n\nFind a closed-form expression for a(n) and compute a(10).",
+    "split": "dom"
+  },
+  {
+    "id": "sequences_018",
+    "category": "sequences",
+    "prompt": "A sequence is defined by a\u2081 = 1, a\u2082 = 1, and for n \u2265 3:\n\na\u2099 = a\u2099\u208b\u2081 + a\u2099\u208b\u2082 + n\n\nFind the sum of the first 10 terms of this sequence.",
+    "split": "dom"
+  },
+  {
+    "id": "sequences_019",
+    "category": "sequences",
+    "prompt": "A sequence is defined by a\u2081 = 1, a\u2082 = 3, and for n \u2265 3:\n\na\u2099 = a\u2099\u208b\u2081 + 2a\u2099\u208b\u2082 + 2(n \u2212 2)\n\nFind the value of a\u2087.",
+    "split": "dom"
+  },
+  {
+    "id": "sequences_020",
+    "category": "sequences",
+    "prompt": "A sequence is defined by a\u2081 = 1, a\u2082 = 3, and a\u2099 = a\u2099\u208b\u2081 + a\u2099\u208b\u2082 + n for n \u2265 3.\n\nDefine S\u2099 = a\u2081 + a\u2082 + ... + a\u2099.\n\nFind a closed-form expression for S\u2099, and use it to compute S\u2081\u2080.",
+    "split": "dom"
+  },
+  {
+    "id": "sequences_021",
+    "category": "sequences",
+    "prompt": "A sequence is defined by a\u2081 = 1, a\u2082 = 3, and a\u2099 = a\u2099\u208b\u2081 + a\u2099\u208b\u2082 + n for n \u2265 3.\n\nDefine S\u2099 = a\u2081 + a\u2082 + ... + a\u2099.\n\nFind a closed-form expression for S\u2099 in terms of n, given that S\u2099 = a\u2099\u208a\u2082 - a\u2099\u208a\u2081 + f(n) for some polynomial f(n). Determine f(n) and compute S\u2081\u2080.",
+    "split": "dom"
+  },
+  {
+    "id": "sequences_022",
+    "category": "sequences",
+    "prompt": "A sequence is defined by a\u2081 = 1, a\u2082 = 1, and for n \u2265 3:\n\na\u2099 = a\u2099\u208b\u2081 + 2a\u2099\u208b\u2082 + 2^(n-2)\n\nFind a closed-form expression for a\u2099 and evaluate a\u2081\u2080.",
+    "split": "eval"
+  },
+  {
+    "id": "sequences_023",
+    "category": "sequences",
+    "prompt": "A sequence is defined by a\u2081 = 2, a\u2082 = 5, and a\u2099 = 3a\u2099\u208b\u2081 \u2212 2a\u2099\u208b\u2082 for n \u2265 3.\n\nFind a closed-form expression for a\u2099 and use it to compute the sum of the first 20 terms.",
+    "split": "dom"
+  },
+  {
+    "id": "sequences_024",
+    "category": "sequences",
+    "prompt": "A sequence is defined by a\u2081 = 1, a\u2082 = 3, and a\u2099 = a\u2099\u208b\u2081 + a\u2099\u208b\u2082 + n for n \u2265 3.\n\nFind the value of a\u2088.",
+    "split": "dom"
+  },
+  {
+    "id": "sequences_025",
+    "category": "sequences",
+    "prompt": "A sequence is defined by a\u2081 = 1, a\u2082 = 1, and for n \u2265 3:\n\na\u2099 = a\u2099\u208b\u2081 + 2a\u2099\u208b\u2082 + n\n\nFind the value of a\u2087.",
+    "split": "dom"
+  },
+  {
+    "id": "sequences_026",
+    "category": "sequences",
+    "prompt": "A sequence is defined by a\u2081 = 1, a\u2082 = 3, and a\u2099 = a\u2099\u208b\u2081 + a\u2099\u208b\u2082 + n for n \u2265 3.\n\nDefine S\u2099 = a\u2081 + a\u2082 + ... + a\u2099.\n\nFind a closed-form expression for S\u2099 in terms of a\u2099 and a\u2099\u208a\u2081 (and possibly n), then use it to compute S\u2081\u2080.",
+    "split": "dom"
+  },
+  {
+    "id": "sequences_027",
+    "category": "sequences",
+    "prompt": "A sequence is defined by a\u2081 = 1, a\u2082 = 3, and a\u2099 = a\u2099\u208b\u2081 + a\u2099\u208b\u2082 + n for n \u2265 3.\n\nFind the value of a\u2088.",
+    "split": "dom"
+  },
+  {
+    "id": "sequences_028",
+    "category": "sequences",
+    "prompt": "A sequence is defined by a\u2081 = 1, a\u2082 = 3, and for n \u2265 3:\n\na\u2099 = a\u2099\u208b\u2081 + 2a\u2099\u208b\u2082 + n\n\nFind the value of a\u2087.",
+    "split": "dom"
+  },
+  {
+    "id": "sequences_029",
+    "category": "sequences",
+    "prompt": "A sequence is defined by a\u2081 = 1, a\u2082 = 3, and for n \u2265 3:\n\na\u2099 = a\u2099\u208b\u2081 + 2a\u2099\u208b\u2082 + n\n\nFind the value of a\u2087.",
+    "split": "dom"
+  },
+  {
+    "id": "inequalities_000",
+    "category": "inequalities",
+    "prompt": "Let $a, b, c$ be positive reals satisfying $a + b + c = 3$. Find the minimum value of\n\n$$\\frac{a^2}{b} + \\frac{b^2}{c} + \\frac{c^2}{a}.$$",
+    "split": "dom"
+  },
+  {
+    "id": "inequalities_001",
+    "category": "inequalities",
+    "prompt": "Let $a, b, c$ be positive real numbers satisfying $a + b + c = 3$. Find the minimum value of\n\n$$\\frac{a^2}{b} + \\frac{b^2}{c} + \\frac{c^2}{a}.$$",
+    "split": "dom"
+  },
+  {
+    "id": "inequalities_002",
+    "category": "inequalities",
+    "prompt": "Let $a, b, c$ be positive real numbers satisfying $a + b + c = 3$. Find the minimum value of\n\n$$\\frac{a^2}{b} + \\frac{b^2}{c} + \\frac{c^2}{a}.$$",
+    "split": "dom"
+  },
+  {
+    "id": "inequalities_003",
+    "category": "inequalities",
+    "prompt": "Let $a, b, c$ be positive real numbers satisfying $a + b + c = 3$. Find the minimum value of\n\n$$\\frac{a^2}{b} + \\frac{b^2}{c} + \\frac{c^2}{a}.$$",
+    "split": "dom"
+  },
+  {
+    "id": "inequalities_004",
+    "category": "inequalities",
+    "prompt": "Let $a, b, c$ be positive real numbers satisfying $a + b + c = 3$. Find the minimum value of\n\n$$\\frac{a^2}{b} + \\frac{b^2}{c} + \\frac{c^2}{a}.$$",
+    "split": "dom"
+  },
+  {
+    "id": "inequalities_005",
+    "category": "inequalities",
+    "prompt": "Let $a, b, c$ be positive real numbers satisfying $a + b + c = 3$. Find the minimum value of\n\n$$\\frac{a^2}{b} + \\frac{b^2}{c} + \\frac{c^2}{a}.$$",
+    "split": "dom"
+  },
+  {
+    "id": "inequalities_006",
+    "category": "inequalities",
+    "prompt": "Let $a, b, c$ be positive real numbers satisfying $a + b + c = 3$. Find the minimum value of\n\n$$\\frac{a^2 + 1}{b + c} + \\frac{b^2 + 1}{a + c} + \\frac{c^2 + 1}{a + b}.$$",
+    "split": "dom"
+  },
+  {
+    "id": "inequalities_007",
+    "category": "inequalities",
+    "prompt": "Let $a, b, c$ be positive real numbers satisfying $a + b + c = 3$. Find the minimum value of\n\n$$\\frac{a^2 + 1}{b + c} + \\frac{b^2 + 1}{a + c} + \\frac{c^2 + 1}{a + b}.$$",
+    "split": "dom"
+  },
+  {
+    "id": "inequalities_008",
+    "category": "inequalities",
+    "prompt": "Let $a, b, c$ be positive real numbers satisfying $a + b + c = 3$. Find the minimum value of\n\n$$\\frac{a^2}{b} + \\frac{b^2}{c} + \\frac{c^2}{a}.$$",
+    "split": "dom"
+  },
+  {
+    "id": "inequalities_009",
+    "category": "inequalities",
+    "prompt": "Let $a, b, c$ be positive real numbers satisfying $a + b + c = 3$. Find the minimum value of\n\n$$\\frac{a^2}{b} + \\frac{b^2}{c} + \\frac{c^2}{a}.$$",
+    "split": "dom"
+  },
+  {
+    "id": "inequalities_010",
+    "category": "inequalities",
+    "prompt": "Let $a, b, c$ be positive real numbers satisfying $a + b + c = 3$. Find the minimum value of\n\n$$\\frac{a^2}{b} + \\frac{b^2}{c} + \\frac{c^2}{a}.$$",
+    "split": "dom"
+  },
+  {
+    "id": "inequalities_011",
+    "category": "inequalities",
+    "prompt": "Let $a, b, c$ be positive real numbers satisfying $a + b + c = 3$. Find the minimum value of\n\n$$\\frac{a^2}{b} + \\frac{b^2}{c} + \\frac{c^2}{a}.$$",
+    "split": "dom"
+  },
+  {
+    "id": "inequalities_012",
+    "category": "inequalities",
+    "prompt": "Let $a, b, c$ be positive real numbers satisfying $a + b + c = 3$. Find the minimum value of\n\n$$\\frac{a^2}{b} + \\frac{b^2}{c} + \\frac{c^2}{a}.$$",
+    "split": "dom"
+  },
+  {
+    "id": "inequalities_013",
+    "category": "inequalities",
+    "prompt": "Let $a, b, c$ be positive real numbers satisfying $a + b + c = 3$. Find the minimum value of\n\n$$\\frac{a^2}{b} + \\frac{b^2}{c} + \\frac{c^2}{a}.$$",
+    "split": "dom"
+  },
+  {
+    "id": "inequalities_014",
+    "category": "inequalities",
+    "prompt": "Let $a, b, c$ be positive real numbers satisfying $a + b + c = 3$. Find the minimum value of\n\n$$\\frac{a^2}{b} + \\frac{b^2}{c} + \\frac{c^2}{a}.$$",
+    "split": "dom"
+  },
+  {
+    "id": "inequalities_015",
+    "category": "inequalities",
+    "prompt": "Let $a, b, c$ be positive real numbers satisfying $a + b + c = 3$. Find the minimum value of\n\n$$\\frac{a^2}{b} + \\frac{b^2}{c} + \\frac{c^2}{a}.$$",
+    "split": "dom"
+  },
+  {
+    "id": "inequalities_016",
+    "category": "inequalities",
+    "prompt": "Let $a, b, c$ be positive real numbers satisfying $a + b + c = 3$. Find the minimum value of\n\n$$\\frac{a^2}{b} + \\frac{b^2}{c} + \\frac{c^2}{a}.$$",
+    "split": "dom"
+  },
+  {
+    "id": "inequalities_017",
+    "category": "inequalities",
+    "prompt": "Let $a, b, c$ be positive real numbers satisfying $a + b + c = 3$. Find the minimum value of\n\n$$\\frac{a^2}{b} + \\frac{b^2}{c} + \\frac{c^2}{a}.$$",
+    "split": "dom"
+  },
+  {
+    "id": "inequalities_018",
+    "category": "inequalities",
+    "prompt": "Let $a, b, c$ be positive real numbers satisfying $a + b + c = 3$. Find the minimum value of\n\n$$\\frac{a^2}{b} + \\frac{b^2}{c} + \\frac{c^2}{a}.$$",
+    "split": "eval"
+  },
+  {
+    "id": "inequalities_019",
+    "category": "inequalities",
+    "prompt": "Let $a, b, c$ be positive real numbers satisfying $a + b + c = 3$. Find the minimum value of\n\n$$\\frac{a^2}{b} + \\frac{b^2}{c} + \\frac{c^2}{a}.$$",
+    "split": "eval"
+  },
+  {
+    "id": "inequalities_020",
+    "category": "inequalities",
+    "prompt": "Let $a, b, c$ be positive real numbers satisfying $a + b + c = 3$. Find the minimum value of\n\n$$\\frac{a^2}{b} + \\frac{b^2}{c} + \\frac{c^2}{a}.$$",
+    "split": "dom"
+  },
+  {
+    "id": "inequalities_021",
+    "category": "inequalities",
+    "prompt": "Let $a, b, c$ be positive real numbers satisfying $a + b + c = 3$. Find the minimum value of\n\n$$\\frac{a^2}{b} + \\frac{b^2}{c} + \\frac{c^2}{a}.$$",
+    "split": "dom"
+  },
+  {
+    "id": "inequalities_022",
+    "category": "inequalities",
+    "prompt": "Let $a, b, c$ be positive real numbers satisfying $a + b + c = 3$. Find the minimum value of\n\n$$\\frac{a^2}{b} + \\frac{b^2}{c} + \\frac{c^2}{a}.$$",
+    "split": "dom"
+  },
+  {
+    "id": "inequalities_023",
+    "category": "inequalities",
+    "prompt": "Let $a, b, c$ be positive real numbers satisfying $a + b + c = 3$. Find the minimum value of\n\n$$\\frac{a^2}{b} + \\frac{b^2}{c} + \\frac{c^2}{a}.$$",
+    "split": "dom"
+  },
+  {
+    "id": "inequalities_024",
+    "category": "inequalities",
+    "prompt": "Let $a, b, c$ be positive real numbers satisfying $a + b + c = 3$. Find the minimum value of\n\n$$\\frac{a^2}{b} + \\frac{b^2}{c} + \\frac{c^2}{a}.$$",
+    "split": "dom"
+  },
+  {
+    "id": "inequalities_025",
+    "category": "inequalities",
+    "prompt": "Let $a, b, c$ be positive real numbers satisfying $a + b + c = 3$. Find the minimum value of\n\n$$\\frac{a^2}{b} + \\frac{b^2}{c} + \\frac{c^2}{a}.$$",
+    "split": "dom"
+  },
+  {
+    "id": "inequalities_026",
+    "category": "inequalities",
+    "prompt": "Let $a, b, c$ be positive real numbers satisfying $a + b + c = 3$. Find the minimum value of\n\n$$\\frac{a^2 + b^2 + c^2}{ab + bc + ca} + \\frac{ab + bc + ca}{a^2 + b^2 + c^2}.$$",
+    "split": "dom"
+  },
+  {
+    "id": "inequalities_027",
+    "category": "inequalities",
+    "prompt": "Let $a, b, c$ be positive real numbers satisfying $a + b + c = 3$. Find the minimum value of\n\n$$\\frac{a^2 + 1}{b + c} + \\frac{b^2 + 1}{a + c} + \\frac{c^2 + 1}{a + b}.$$",
+    "split": "dom"
+  },
+  {
+    "id": "inequalities_028",
+    "category": "inequalities",
+    "prompt": "Let $a, b, c$ be positive real numbers satisfying $a + b + c = 3$. Find the minimum value of\n\n$$\\frac{a^2}{b} + \\frac{b^2}{c} + \\frac{c^2}{a}.$$",
+    "split": "dom"
+  },
+  {
+    "id": "inequalities_029",
+    "category": "inequalities",
+    "prompt": "Let $a, b, c$ be positive real numbers satisfying $a + b + c = 3$. Find the minimum value of\n\n$$\\frac{a^2}{b} + \\frac{b^2}{c} + \\frac{c^2}{a}.$$",
+    "split": "dom"
+  },
+  {
+    "id": "algebra_word_problems_000",
+    "category": "algebra_word_problems",
+    "prompt": "A train leaves City A heading toward City B at 60 mph. Two hours later, a second train leaves City B heading toward City A at 90 mph. The distance between the two cities is 510 miles. How many hours after the second train departs will the two trains meet?",
+    "split": "dom"
+  },
+  {
+    "id": "algebra_word_problems_001",
+    "category": "algebra_word_problems",
+    "prompt": "A chemist has two solutions of hydrochloric acid. The first solution is 30% acid and the second is 70% acid. She needs to prepare 400 mL of a 45% acid solution. However, she also discovers that the total amount of pure acid used from both solutions must be exactly 20 mL more than the volume of the weaker solution she uses. How many milliliters of the 30% solution should she use?",
+    "split": "dom"
+  },
+  {
+    "id": "algebra_word_problems_002",
+    "category": "algebra_word_problems",
+    "prompt": "A chemist has two solutions of salt water. The first solution is 15% salt and the second is 40% salt. She needs to produce 300 mL of a 25% salt solution. However, she also needs the final volume to include exactly 20 mL of pure water added directly (not part of either solution). How many mL of the 15% solution should she use?",
+    "split": "dom"
+  },
+  {
+    "id": "algebra_word_problems_003",
+    "category": "algebra_word_problems",
+    "prompt": "A chemist has two solutions of acid: one is 35% acid and the other is 80% acid. She needs to make 300 mL of a 50% acid solution. How many milliliters of the 35% solution should she use?",
+    "split": "dom"
+  },
+  {
+    "id": "algebra_word_problems_004",
+    "category": "algebra_word_problems",
+    "prompt": "A chemist has two acid solutions: one is 30% acid and the other is 70% acid. She needs to make 200 mL of a 45% acid solution. However, she accidentally pours 50 mL of the 30% solution into the beaker before realizing she needs to calculate the rest. How many milliliters of the 70% solution must she now add to achieve the desired 45% concentration in the final 200 mL mixture?",
+    "split": "dom"
+  },
+  {
+    "id": "algebra_word_problems_005",
+    "category": "algebra_word_problems",
+    "prompt": "A chemist has two acid solutions: one that is 30% acid and one that is 70% acid. She needs to make 200 mL of a 45% acid solution. She also knows that she must use at least twice as much of the 30% solution as the 70% solution. How many milliliters of the 30% solution should she use?",
+    "split": "dom"
+  },
+  {
+    "id": "algebra_word_problems_006",
+    "category": "algebra_word_problems",
+    "prompt": "A chemist has two alcohol solutions: one that is 30% alcohol and another that is 75% alcohol. She needs to create 200 mL of a 50% alcohol solution. After mixing the correct amounts of each solution, she realizes she accidentally used a container that already had 20 mL of pure water in it, so the actual mixture now contains that extra water. What is the actual percentage of alcohol in the final mixture, rounded to the nearest tenth of a percent?",
+    "split": "dom"
+  },
+  {
+    "id": "algebra_word_problems_007",
+    "category": "algebra_word_problems",
+    "prompt": "A chemist has two solutions: one that is 35% acid and one that is 80% acid. She needs to produce 90 liters of a solution that is 60% acid. However, she realizes she only has 40 liters of the 80% solution available. She decides to use all 40 liters of the 80% solution and fill the rest with the 35% solution, then adjust the final concentration by adding pure acid if needed. How many liters of pure acid must she add to reach the target concentration of 60% in the final mixture?",
+    "split": "dom"
+  },
+  {
+    "id": "algebra_word_problems_008",
+    "category": "algebra_word_problems",
+    "prompt": "A chemist has two solutions: one that is 35% acid and another that is 80% acid. She needs to make 300 mL of a solution that is 60% acid. However, she realizes she only has 140 mL of the 35% solution available. To compensate, she will use the 35% solution, the 80% solution, and pure water (0% acid). She decides to use all 140 mL of the 35% solution. How many milliliters of the 80% solution must she use?",
+    "split": "dom"
+  },
+  {
+    "id": "algebra_word_problems_009",
+    "category": "algebra_word_problems",
+    "prompt": "A chemist has two acid solutions: one that is 35% acid and another that is 80% acid. She needs to make 300 mL of a 60% acid solution. After mixing the correct amounts of each solution, she uses exactly half of her available 35% solution. How many milliliters of the 35% solution did she originally have available?",
+    "split": "dom"
+  },
+  {
+    "id": "algebra_word_problems_010",
+    "category": "algebra_word_problems",
+    "prompt": "A chemist has two acid solutions. The first is 30% acid and the second is 70% acid. She needs to make 200 mL of a 45% acid solution. However, she also needs the final mixture to cost no more than $2.40 total, given that the 30% solution costs $0.01 per mL and the 70% solution costs $0.015 per mL. How many milliliters of the 30% solution should she use if she wants to satisfy the concentration requirement exactly?",
+    "split": "dom"
+  },
+  {
+    "id": "algebra_word_problems_011",
+    "category": "algebra_word_problems",
+    "prompt": "A chemist has two solutions: one is 35% acid and the other is 80% acid. She needs to produce 90 liters of a 60% acid solution. However, she discovers that she only has 40 liters of the 80% solution available. She decides to use all 40 liters of the 80% solution and make up the remaining volume with the 35% solution, adding pure water as needed to reach exactly 90 liters total. How many liters of pure water must she add?",
+    "split": "dom"
+  },
+  {
+    "id": "algebra_word_problems_012",
+    "category": "algebra_word_problems",
+    "prompt": "A chemist has two acid solutions. The first is 35% acid and the second is 80% acid. She needs to make 300 mL of a 60% acid solution. However, she also needs the total volume of the stronger solution used to be exactly 50 mL more than the volume of the weaker solution used. How many milliliters of the 80% solution should she use?",
+    "split": "dom"
+  },
+  {
+    "id": "algebra_word_problems_013",
+    "category": "algebra_word_problems",
+    "prompt": "A chemist has two acid solutions. Solution A is 35% acid and Solution B is 80% acid. She needs to make 300 mL of a 60% acid solution. However, she only has 140 mL of Solution A available. She will use all 140 mL of Solution A and make up the remainder of the 300 mL using Solution B and pure water (0% acid). If she uses twice as many mL of Solution B as pure water, how many mL of pure water does she use?",
+    "split": "dom"
+  },
+  {
+    "id": "algebra_word_problems_014",
+    "category": "algebra_word_problems",
+    "prompt": "A boat travels upstream from town A to town B in 6 hours. The return trip downstream takes 4 hours. The river current flows at 3 miles per hour. A kayaker, who paddles at half the speed of the boat in still water, wants to travel the same route from A to B upstream. How many hours will the kayaker's upstream trip take?",
+    "split": "eval"
+  },
+  {
+    "id": "algebra_word_problems_015",
+    "category": "algebra_word_problems",
+    "prompt": "A chemist has two acid solutions. The first is 35% acid and the second is 80% acid. She needs to make 300 mL of a 60% acid solution. After mixing the two solutions, she realizes she accidentally used twice as much of the 80% solution as she intended. Instead of the planned amounts, she used x mL of the 35% solution and 2y mL of the 80% solution, where x and y were her original planned amounts. The total volume is still 300 mL. What is the concentration of the solution she actually made?",
+    "split": "dom"
+  },
+  {
+    "id": "algebra_word_problems_016",
+    "category": "algebra_word_problems",
+    "prompt": "A chemist has two solutions of hydrochloric acid. The first is 35% acid and the second is 80% acid. She needs to make 300 mL of a 60% acid solution. However, she also needs the total volume of the stronger solution used to be exactly 20 mL more than twice the volume of the weaker solution used. How many milliliters of each solution should she combine?",
+    "split": "dom"
+  },
+  {
+    "id": "algebra_word_problems_017",
+    "category": "algebra_word_problems",
+    "prompt": "A chemist has two acid solutions: one is 25% acid and the other is 70% acid. She needs to make 180 mL of a 40% acid solution. However, she realizes she only has 60 mL of the 70% solution available. To compensate, she decides to use pure water (0% acid) along with whatever amounts of each acid solution she can. How many mL of the 25% acid solution must she use?",
+    "split": "dom"
+  },
+  {
+    "id": "algebra_word_problems_018",
+    "category": "algebra_word_problems",
+    "prompt": "A chemist has two alcohol solutions: one is 35% alcohol and the other is 80% alcohol. She needs to make 300 milliliters of a 50% alcohol solution. After mixing the correct amounts of each solution, she realizes she accidentally used a container that already had 20 milliliters of pure water in it before she started pouring. To correct the final mixture (which now has a total volume of 320 milliliters), she needs to add some of the 80% solution to bring the concentration back up to 50%. How many milliliters of the 80% solution must she add?",
+    "split": "dom"
+  },
+  {
+    "id": "algebra_word_problems_019",
+    "category": "algebra_word_problems",
+    "prompt": "A chemist has two acid solutions: one is 35% acid and the other is 80% acid. She needs to make 300 mL of a 50% acid solution. However, she realizes she only has 160 mL of the 35% solution available. She decides to use all 160 mL of the 35% solution and make up the remaining volume using the 80% solution and pure water (0% acid). If she uses twice as much pure water as 80% acid solution (by volume), how many milliliters of the 80% acid solution does she use?",
+    "split": "eval"
+  },
+  {
+    "id": "algebra_word_problems_020",
+    "category": "algebra_word_problems",
+    "prompt": "A chemist has two acid solutions: one is 15% acid and the other is 40% acid. She needs to produce 200 mL of a 25% acid solution. However, she discovers she only has 90 mL of the 40% solution available. She decides to use all 90 mL of the 40% solution and make up the remaining volume with the 15% solution, but this won't give her exactly 25%. So instead, she uses some of the 40% solution (not necessarily all 90 mL) mixed with the 15% solution to get exactly 200 mL at 25%. How many mL of the 40% solution should she use?",
+    "split": "dom"
+  },
+  {
+    "id": "algebra_word_problems_021",
+    "category": "algebra_word_problems",
+    "prompt": "A chemist has two alcohol solutions. The first is 35% alcohol and the second is 80% alcohol. She needs to create 200 mL of a 60% alcohol solution. However, she also wants the total cost to be exactly $47. The 35% solution costs $0.20 per mL and the 80% solution costs $0.25 per mL. Determine how many milliliters of each solution she should use to satisfy both the concentration requirement and the cost requirement. If both conditions cannot be simultaneously satisfied, find the concentration of the mixture that would result if she instead optimizes purely for cost (spending exactly $47 on a 200 mL mixture), and state that concentration as a percentage.",
+    "split": "dom"
+  },
+  {
+    "id": "algebra_word_problems_022",
+    "category": "algebra_word_problems",
+    "prompt": "A train leaves City A heading toward City B at 60 mph. Two hours later, a second train leaves City B heading toward City A at 90 mph. The distance between the two cities is 510 miles. How many miles from City A will the two trains meet?",
+    "split": "dom"
+  },
+  {
+    "id": "algebra_word_problems_023",
+    "category": "algebra_word_problems",
+    "prompt": "A chemist has two saline solutions. Solution A contains 12% salt and Solution B contains 30% salt. She needs to make 360 mL of a solution that is 23% salt. However, she also wants to use at least twice as much of Solution B as Solution A. How many milliliters of Solution A should she use?",
+    "split": "dom"
+  },
+  {
+    "id": "algebra_word_problems_024",
+    "category": "algebra_word_problems",
+    "prompt": "A chemist has two saline solutions. The first is 8% salt and the second is 20% salt. She needs to create 360 mL of a 15% salt solution. However, she also wants the total volume used from the 20% solution to be exactly twice the volume used from the 8% solution. How many milliliters of the 8% solution should she use?",
+    "split": "dom"
+  },
+  {
+    "id": "algebra_word_problems_025",
+    "category": "algebra_word_problems",
+    "prompt": "A chemist has two solutions: one that is 35% acid and another that is 80% acid. She needs to make 300 mL of a solution that is 60% acid. However, she realizes she only has 140 mL of the 35% solution available. To compensate, she decides to add pure water (0% acid) along with all 140 mL of the 35% solution and some of the 80% solution to reach her target. How many mL of the 80% solution must she use, and what will be the actual acid concentration of the final mixture if she uses exactly 300 mL total?",
+    "split": "dom"
+  },
+  {
+    "id": "algebra_word_problems_026",
+    "category": "algebra_word_problems",
+    "prompt": "A chemist has two solutions: one is 35% acid and the other is 80% acid. She needs to make 90 liters of a 60% acid solution. However, she realizes she only has 50 liters of the 80% solution available. She decides to use all 50 liters of the 80% solution and fill the rest with a mixture of the 35% solution and pure water (0% acid) in equal volumes. What percentage acid will the final 90-liter solution actually be? Round to the nearest tenth of a percent.",
+    "split": "dom"
+  },
+  {
+    "id": "algebra_word_problems_027",
+    "category": "algebra_word_problems",
+    "prompt": "A chemist has two salt solutions. Solution A is 15% salt and Solution B is 40% salt. She needs to make 200 mL of a 25% salt solution. However, she discovers she only has 70 mL of Solution A available. To compensate, she decides to add pure water (0% salt) along with all 70 mL of Solution A and some amount of Solution B to reach exactly 200 mL total. How many mL of Solution B must she use, and what will be the actual salt percentage of the final mixture?",
+    "split": "dom"
+  },
+  {
+    "id": "algebra_word_problems_028",
+    "category": "algebra_word_problems",
+    "prompt": "A painter can paint a house in 12 days working alone. His apprentice, working alone, would take 20 days to paint the same house. They begin painting together, but after 4 days the painter is called away to another job. The apprentice continues alone until the house is finished. How many additional days does the apprentice work after the painter leaves?",
+    "split": "dom"
+  },
+  {
+    "id": "algebra_word_problems_029",
+    "category": "algebra_word_problems",
+    "prompt": "A chemist has two solutions: one that is 35% acid and one that is 80% acid. She needs to make 300 mL of a solution that is 60% acid. However, she realizes she only has 140 mL of the 35% solution available. To compensate, she decides to use pure water (0% acid) along with all 140 mL of the 35% solution and some amount of the 80% solution. How many milliliters of the 80% solution must she use?",
+    "split": "dom"
+  }
+]
