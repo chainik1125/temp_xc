@@ -425,6 +425,26 @@ class HookpointStreamingBuffer:
         self._samples_drawn += batch_size
         return batch.contiguous()
 
+    @torch.no_grad()
+    def sample_txc_windows(self, batch_size: int, T: int) -> torch.Tensor:
+        """Return ``(batch_size, T, d_model)`` consecutive-token windows
+        sampled from the buffer. Used by T-SAE training (T=1 effectively per-
+        token but with T=5 windows so the contrastive loss has neighbours)."""
+        if not self._filled:
+            raise RuntimeError("call warmup() before sampling")
+        self._maybe_refill()
+        max_start = self.cfg.chunk_len - T
+        if max_start < 0:
+            raise ValueError(f"chunk_len ({self.cfg.chunk_len}) < T ({T})")
+        seq_idx = torch.randint(self.cfg.buffer_seqs, (batch_size,), device=self.cfg.device)
+        starts = torch.randint(max_start + 1, (batch_size,), device=self.cfg.device)
+        pos = starts.unsqueeze(1) + torch.arange(T, device=self.cfg.device).unsqueeze(0)
+        seqs = self._buf[seq_idx]
+        gather_idx = pos.unsqueeze(-1).expand(-1, -1, self.cfg.d_model)
+        windows = seqs.gather(1, gather_idx)
+        self._samples_drawn += batch_size
+        return windows.contiguous()
+
 
 # ---------------------------------------------------------------------------
 # Corpus iterator (mixed pile + lmsys-chat) — lazy to avoid HF datasets

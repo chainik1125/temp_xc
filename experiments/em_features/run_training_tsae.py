@@ -41,6 +41,7 @@ for p in (str(VENDOR_SRC), str(REPO_ROOT)):
 
 from experiments.em_features.streaming_buffer import (  # noqa: E402
     StreamingActivationBuffer, StreamingBufferConfig, mixed_text_iter,
+    HookpointStreamingBuffer, HookpointBufferConfig, VALID_HOOKPOINTS,
 )
 from experiments.em_features.architectures.tsae_adjacent_contrastive import (  # noqa: E402
     TSAEAdjacentContrastive,
@@ -68,6 +69,8 @@ def parse_args():
     p.add_argument("--log_every", type=int, default=500)
     p.add_argument("--device", default="cuda")
     p.add_argument("--layer", type=int, default=15)
+    p.add_argument("--hookpoint", choices=list(VALID_HOOKPOINTS), default="resid_post",
+                   help="Where in the transformer block to extract activations.")
     p.add_argument("--resume_from", type=Path, default=None)
     p.add_argument("--upload_category", default="tsae")
     return p.parse_args()
@@ -90,7 +93,8 @@ def main():
     ).eval()
 
     d_model = int(cfg["d_model"])
-    buf_cfg = StreamingBufferConfig(
+    buf_cfg = HookpointBufferConfig(
+        hookpoint=args.hookpoint,
         layer=args.layer,
         d_model=d_model,
         buffer_seqs=max(1, int(cfg["streaming"]["buffer_activations"]) // int(cfg["streaming"]["chunk_len"])),
@@ -99,17 +103,17 @@ def main():
         device=args.device,
         dtype=torch.float16,
     )
-    print(f"Buffer: {buf_cfg.buffer_seqs} seqs × {buf_cfg.chunk_len} toks @ fp16  layer={args.layer}", flush=True)
+    print(f"Buffer: {buf_cfg.buffer_seqs} seqs × {buf_cfg.chunk_len} toks @ fp16  hookpoint={args.hookpoint} layer={args.layer}", flush=True)
 
     text_iter = mixed_text_iter(tok, cfg["streaming"]["corpus_mix"])
-    buffer = StreamingActivationBuffer(model_lm, tok, text_iter, buf_cfg)
+    buffer = HookpointStreamingBuffer(model_lm, tok, text_iter, buf_cfg)
     print("warmup...", flush=True)
     t0 = time.time()
     buffer.warmup()
     print(f"  warmup done in {time.time()-t0:.1f}s", flush=True)
 
     sample_fn = buffer.sample_flat                              # (B, d) — for probing
-    pair_sample_fn = lambda B: buffer.sample_txc_windows(B, args.T)  # (B, T, d)
+    pair_sample_fn = lambda B: buffer.sample_txc_windows(B, args.T)  # (B, T, d) — windowed for contrastive
 
     sae = TSAEAdjacentContrastive(
         d_in=d_model, d_sae=args.d_sae, k=args.k,
@@ -214,7 +218,7 @@ def main():
                     "aux_k": args.aux_k, "auxk_alpha": args.auxk_alpha,
                     "dead_threshold_tokens": args.dead_threshold_tokens,
                     "subject_model": cfg["subject_model"],
-                    "layer": args.layer, "hookpoint": "resid_post",
+                    "layer": args.layer, "hookpoint": args.hookpoint,
                     "lr": args.lr, "batch_size": args.batch_size,
                     "best_loss": best_loss,
                 },
