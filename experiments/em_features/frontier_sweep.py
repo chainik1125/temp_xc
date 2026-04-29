@@ -64,7 +64,7 @@ MODEL_REGISTRY = {
 
 def parse_args():
     p = argparse.ArgumentParser()
-    p.add_argument("--steerer", choices=["sae", "txc", "mlc", "custom_sae", "han", "vec"], required=True)
+    p.add_argument("--steerer", choices=["sae", "txc", "mlc", "custom_sae", "han", "tsae", "vec"], required=True)
     p.add_argument("--model", choices=list(MODEL_REGISTRY), default="qwen")
     p.add_argument("--layer", type=int, required=True)
     p.add_argument("--features_json", type=Path, required=True,
@@ -152,6 +152,19 @@ def get_directions(args, layer: int, device: str) -> torch.Tensor:
         m = TopKSAE(d_in=cfg["d_in"], d_sae=cfg["d_sae"], k=cfg["k"]).to(device)
         m.load_state_dict(ckpt["state_dict"])
         return m.W_dec.detach()  # (d_sae, d_in)
+    if args.steerer == "tsae":
+        from experiments.em_features.architectures.tsae_adjacent_contrastive import TSAEAdjacentContrastive
+        ckpt = torch.load(args.custom_sae_ckpt, map_location=device, weights_only=False)
+        cfg = ckpt["config"]
+        m = TSAEAdjacentContrastive(
+            d_in=cfg["d_in"], d_sae=cfg["d_sae"], k=cfg["k"],
+            contrastive_alpha=cfg.get("contrastive_alpha", 1.0),
+            aux_k=cfg.get("aux_k", 512),
+            dead_threshold_tokens=cfg.get("dead_threshold_tokens", 640_000),
+            auxk_alpha=cfg.get("auxk_alpha", 1.0 / 32.0),
+        ).to(device)
+        m.load_state_dict(ckpt["state_dict"])
+        return m.W_dec.detach()  # (d_sae, d_in) — same convention as TopKSAE
     if args.steerer == "han":
         ckpt = torch.load(args.han_ckpt, map_location=device, weights_only=False)
         cfg = ckpt["config"]
