@@ -13,6 +13,28 @@ tags:
 > Per-arch Q1.3 outputs at
 > `results/case_studies/steering_paper_normalised/<arch>/{generations,grades}.jsonl`.
 
+### Multi-seed verification (seed=1)
+
+Re-ran Q1.3 pipeline on seed=1 ckpts (5 archs). 2-seed peak success:
+
+| arch | seed=42 | seed=1 | mean | Δ |
+|---|---|---|---|---|
+| tsae_paper_k20 | 1.80 | 1.80 | 1.80 | +0.00 |
+| tsae_paper_k500 | 1.27 | 1.50 | 1.38 | +0.23 |
+| topk_sae | 1.10 | 1.13 | 1.12 | +0.03 |
+| agentic_txc_02 | 1.07 | 1.00 | 1.03 | -0.07 |
+| phase5b_subseq_h8 | 1.00 | 0.73 | 0.87 | -0.27 |
+
+**T-SAE k=20 peak success of 1.80 is identical across seeds** — the
+headline finding is robust. Per-seed variance for other archs ranges
+from 0 to 0.27, consistent with concept-noise on 30 concepts.
+
+Mean across seeds preserves the sparsity decomposition: k=20 (1.80)
+>> k=500-equivalent archs (0.87-1.38). At matched k=500, per-token
+archs (1.12-1.38) slightly lead window archs (0.87-1.03), but within-
+seed spread is large enough that the architecture-family difference is
+within noise on this benchmark.
+
 ### TL;DR
 
 - **Q1.1 (`<|z|>` magnitudes) — confirmed**. Picked-feature
