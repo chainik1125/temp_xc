@@ -34,6 +34,9 @@ Thumbs.db
 .env_autointerp
 .env
 
+# Phase 7 case-study cache files — too big, regenerable
+experiments/phase7_unification/results/case_studies/**/_*.npz
+
 # Raw result artifacts — reproducible from scripts + cached activations.
 # Per-feature JSONs contain unfiltered FineWeb text; don't commit.
 results/nlp_sweep/ckpts/
