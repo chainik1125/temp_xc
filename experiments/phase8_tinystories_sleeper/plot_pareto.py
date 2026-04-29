@@ -51,6 +51,8 @@ ARCH_COLORS = {
     "txc_l0_mid":  "#1f5e1f",  # dark green
     "txc_l0_post": "#7a1818",  # dark red
     "txc_l1_ln1":  "#a64500",  # dark orange
+    # Isolated single-arch follow-up runs.
+    "tsae_attn_out_l0": "#e377c2",  # T-SAE at attn_out_l0
 }
 ARCH_LABELS = {
     "mlc":         "MLC (L=5)",
@@ -83,6 +85,7 @@ ARCH_LABELS = {
     "txc_l0_mid":  "TXC  resid_mid.0 (T=30)",
     "txc_l0_post": "TXC  resid_post.0 (T=30)",
     "txc_l1_ln1":  "TXC  ln1.1 (T=30)",
+    "tsae_attn_out_l0": "TSAE attn_out.0",
 }
 
 
