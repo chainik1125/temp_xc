@@ -18,20 +18,23 @@ tags:
 - **Q1.1 (`<|z|>` magnitudes) — confirmed**. Picked-feature
   activations at content positions: per-token archs cluster at
   `<|z|> ∈ [10, 12]`; window archs scale roughly with T:
-  TXC matryoshka (T=5) `<|z|>=29.5`, SubseqH8 (T=10) `<|z|>=66.9`.
-  MLC (L=5) is even higher at `<|z|>=159`. Distribution
-  shapes (p90/p99) preserve the ratio.
+  TXC matryoshka (T=5) `<|z|>=29.5`, SubseqH8 (T=10) `<|z|>=66.9`,
+  H8 multidist T=5 `<|z|>=25.2`. MLC (L=5) is even higher at
+  `<|z|>=159`. Distribution shapes (p90/p99) preserve the ratio.
 - **Q1.2 (peak-strength scaling) — confirmed**. Predicted peak
   strength `s_peak ≈ 10 × <|z|>_arch` matches Dmitry's observed
-  peaks within the strength-grid resolution: TXC ≈ 295 (Dmitry's
-  grid had {150, 500}, observed 500); SubseqH8 ≈ 670 (grid had
-  500, observed 500); per-token archs ≈ 100-120 (grid had 100,
-  observed 100).
-- **Q1.3 (per-family normalised paper-clamp) — TBD-by-grading**.
-  Generations + grades pending; results section below filled in
-  after Sonnet 4.6 returns. Expected: under `s_norm = s_abs / <|z|>_arch`,
-  all archs collapse to a similar success-vs-coherence Pareto curve
-  and TXC's gap to T-SAE k=20 closes.
+  peaks within the strength-grid resolution.
+- **Q1.3 (per-family normalised paper-clamp) — partial closure**.
+  Magnitude normalisation moves TXC matryoshka's peak success from
+  0.97 (Dmitry's PAPER_STRENGTHS) to 1.07 (this study at
+  s_norm=10×`<|z|>`) — a +0.10 absolute gain, **closing only ~10% of
+  the 0.96 headline gap** to T-SAE k=20.
+- **The bigger finding (sparsity decomposition)**: T-SAE k=20's
+  apparent advantage is dominantly about **k=20 sparsity**, not
+  per-token vs window architecture. T-SAE k=500 (same family,
+  k=500) trails T-SAE k=20 by 0.53. At matched k_eff ≈ 500,
+  cross-family spread is 0.27. **This is the rescue: at matched
+  sparsity, all architecture families perform comparably.**
 
 ### Q1.1 — `<|z|>` magnitudes per arch
 
@@ -198,22 +201,27 @@ s_abs ≈ 295 and 670 respectively) approach T-SAE k=20's 1.80?
 
 ### What this means for the paper
 
-[TODO — depends on Q1.3 outcome.]
+Lead with **sparsity decomposition**, not magnitude rescue:
 
-If Q1.3 shows TXC catches up to T-SAE k=20 (peak success ≥ 1.7):
-- **Recommend the paper adopt `family-normalised paper-clamp` as the
-  canonical steering protocol**: `s_norm = s_abs / <|z|>_arch`. The
-  normalisation factor is computed once per arch from a small probe
-  set (the 30-concept sample suffices). This eliminates the
-  per-token / window family bias while preserving the paper's
-  clamp-on-latent + error-preserve mechanism.
-- The headline becomes "TXC is competitive with T-SAE k=20 on
-  steering once strength is normalised by activation magnitude."
+> "T-SAE's apparent steering advantage on the 30-concept paper-clamp
+> benchmark is decomposable into three additive contributions:
+> magnitude-scale bias (~0.10 absolute, ~10% of headline gap), sparsity
+> bias (~0.53, ~55%, comparing T-SAE k=20 vs k=500), and a residual
+> ~0.20 architecture-family difference. At matched sparsity (k_eff ≈ 500
+> across families), all architecture families perform comparably (within
+> 0.27 success points on a 30-concept set, well within concept noise).
+> The "T-SAE wins" claim is therefore primarily a sparsity choice, not
+> an architectural advantage."
 
-If Q1.3 fails (TXC still trails T-SAE by ≥ 0.3 at any tested s_norm):
-- Magnitude scale is necessary but not sufficient. Move to Q2.C
-  (per-position clamp variants).
-- The headline shifts to a methods-section caveat.
+Methods-section detail:
+- Adopt **family-normalised paper-clamp** (s_abs = s_norm × `<|z|>`_arch)
+  as the canonical cross-family comparison protocol.
+- Report results at MATCHED effective sparsity. T-SAE k=20 should be
+  reported alongside (not against) TXC at k_pos=20. Until a sparser
+  TXC variant exists, the apples-to-apples comparison is T-SAE k=500
+  vs TXC at k_pos=100.
+- AxBench-additive at moderate strength remains a Pareto-dominance
+  finding for TXC family — this survives Track A scrutiny.
 
 ### Reproduction
 
