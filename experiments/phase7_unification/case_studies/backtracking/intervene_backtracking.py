@@ -259,6 +259,11 @@ def main() -> None:
                         help="comma-separated overrides for additive magnitudes (e.g. '-12,-8,-4,0,4,8,12'). Default uses ADDITIVE_MAGNITUDES from _paths.")
     parser.add_argument("--held-out-stratified", action="store_true",
                         help="Use a stratified held-out set: 3 prompts × 10 categories (=30) instead of the last 30 (which are all one category).")
+    parser.add_argument("--subject-model", default=SUBJECT_MODEL,
+                        help="model registry key to steer (default deepseek-r1-distill-llama-8b). "
+                             "Use llama-3.1-8b-nous to replicate Ward et al.'s left column "
+                             "(direction applied to the BASE model — should produce ~0 kw if "
+                             "the 'reasoning fine-tune is what activates the direction' claim holds).")
     parser.add_argument("--force", action="store_true")
     args = parser.parse_args()
     additive_magnitudes = (
@@ -277,8 +282,8 @@ def main() -> None:
 
     raw_dom_unit, top_features = load_targets(args.decompose_suffix, args.top_k)
 
-    print(f"[intervene] loading {SUBJECT_MODEL}")
-    model, tokenizer, cfg = load_model_and_tokenizer(SUBJECT_MODEL)
+    print(f"[intervene] loading subject={args.subject_model}")
+    model, tokenizer, cfg = load_model_and_tokenizer(args.subject_model)
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
     eos_id = tokenizer.eos_token_id
