@@ -155,28 +155,76 @@ for the IT-side cache build script (Phase 5 was IT-side).
 2. **Build IT probe cache** (~30 min A40):
    - Run `build_probe_cache_phase7.py --include-crosstoken` with
      subject model overridden to `gemma-2-2b-it` and anchor=L13. The
-     existing script hardcodes `SUBJECT_MODEL` from `_paths.py` —
-     either override via env var or fork to a `_paths_it.py`. Recommend
-     forking to avoid breaking BASE-side reproducibility.
-   - Then `rebuild_probe_cache_s32.py` to produce S=32 left-aligned cache
-     at `experiments/phase7_unification/results/probe_cache_S32_it/`
-     (different dir from BASE).
+     existing script hardcodes `SUBJECT_MODEL`, `ANCHOR_LAYER`,
+     `MLC_LAYERS`, `PROBE_CACHE_DIR` from `_paths.py` — easiest path
+     is to fork `_paths.py` → `_paths_it.py` with these IT overrides:
+     ```python
+     SUBJECT_MODEL = "google/gemma-2-2b-it"
+     ANCHOR_LAYER = 13
+     MLC_LAYERS = (11, 12, 13, 14, 15)
+     CACHE_DIR     = REPO / "data/cached_activations/gemma-2-2b-it/fineweb"
+     PROBE_CACHE_DIR = REPO / "experiments/phase7_unification/results/probe_cache_it"
+     HF_CKPT_REPO  = "han1823123123/txcdr-it"
+     # Keep OUT_DIR shared (= results dir) — probing rows go to the
+     # same probing_results.jsonl with subject_model field set.
+     ```
+     Then make a slim wrapper (e.g.
+     `build_probe_cache_phase7_it.py`) that imports from `_paths_it`
+     instead of `_paths`. Same pattern for `build_act_cache_phase7_it.py`.
+   - **CRITICAL**: the IT probe cache MUST live in a separate directory
+     from the BASE probe cache. The probing script reads
+     `acts_anchor.npz` etc. without checking which subject model
+     produced it — if you reuse `probe_cache_S32/` for IT, the IT
+     probing will silently use BASE activations and give garbage.
+   - Run `rebuild_probe_cache_s32_it.py` (similarly forked) to slice
+     to `experiments/phase7_unification/results/probe_cache_S32_it/`.
+   - For `run_probing_phase7.py`: it currently hardcodes
+     `PROBE_CACHE_DIR_S32 = OUT_DIR / "probe_cache_S32"`. You'll need
+     to either (a) fork `run_probing_phase7_it.py` with the IT path,
+     or (b) add a `--probe_cache_dir` CLI arg that overrides
+     `ACTIVE_PROBE_CACHE`. Either way, also gate inclusion-by-
+     subject_model so IT probings don't accidentally try to probe
+     BASE-side `txcdr_t5__seed42` against IT activations.
 
-3. **Train 8 A40_ok leaderboard archs × 2 seeds** (~10 hr A40 at b=4096):
-   - The 8 A40_ok IT cells per `paper_archs.json::training_pod`:
-     tfa_big, tsae_paper_k20, tsae_paper_k500, txcdr_t5, txcdr_t16,
-     phase5b_subseq_h8, txc_bare_antidead_t5, phase57_partB_h8_bare_multidistance_t8.
-     The 4 MLC-family cells (mlc, mlc_sparse, ag_mlc_08, ag_mlc_08_sparse)
-     are H200_required and *do not* train on A40 — defer per Mission #2.
-   - Seeds 42 + 1 (drop seed=2 if budget tight; PAPER only needs 2-seed
-     for σ).
-   - **Strict apples-to-apples**: b=4096, max_steps=25000, plateau early
-     stop. If a cell OOMs at b=4096, defer to H200 (do NOT lower batch).
-     See `paper_archs.json::training_constants` for the locked values.
+3. **Train 8+1 A40_ok archs × 2 seeds** (~11 hr A40 at b=4096; verified
+   from BASE-side training_index timings):
+
+   The 8 A40_ok IT cells per `paper_archs.json::training_pod`:
+   tfa_big, tsae_paper_k20, tsae_paper_k500, txcdr_t5, txcdr_t16,
+   phase5b_subseq_h8, txc_bare_antidead_t5, phase57_partB_h8_bare_multidistance_t8.
+
+   **Plus `topk_sae`** — used as the per-token-SAE baseline in
+   `build_leaderboard_2seed.py::LEADERBOARD_ARCHS` (the leaderboard
+   reports Δ vs `topk_sae`, so we need its IT version too). topk_sae
+   isn't in `paper_archs.json::leaderboard_archs` (which has 12 named
+   paper-id cells) but IS in the de-facto leaderboard plot/table — so
+   train it. Empirical BASE timing for `topk_sae` is ~5 min, fastest
+   of the bunch.
+
+   The 4 MLC-family cells (mlc, mlc_sparse, ag_mlc_08, ag_mlc_08_sparse)
+   are H200_required and *do not* train on A40 — defer per Mission #2.
+   The MLC contrastive variant (mlc_contrastive_alpha100_batchtopk),
+   if you want it for IT, also H200_required (same multi-layer
+   constraint).
+
+   - Seeds 42 + 1 (drop seed=2 if budget tight; PAPER only needs
+     2-seed for σ).
+   - **Strict apples-to-apples**: b=4096, max_steps=25000, plateau
+     early stop. If a cell OOMs at b=4096, defer to H200 (do NOT
+     lower batch). See `paper_archs.json::training_constants` for
+     the locked values.
+   - Per-arch training-time medians (BASE side, A40, b=4096, 3 seeds
+     where available) to set expectations:
+     - topk_sae: 5 min · tsae_paper_k20: 9 min · tsae_paper_k500: 12 min
+     - txcdr_t5: ~22 min · txcdr_t16: ~39 min · txc_bare_antidead_t5: 22 min
+     - tfa_big: 43 min · phase57_partB_h8_bare_multidistance_t8: 86 min
+     - **phase5b_subseq_h8: 92 min** ← slowest A40_ok cell
+     Sum × 2 seeds ≈ 11 hr if no plateau short-circuit fires earlier.
    - Push trained ckpts to `han1823123123/txcdr-it` (the planned
      IT-side HF repo per `agent_x_brief.md`'s "HF repos" note). Don't
      mix IT into `txcdr-base` — keep subject-model separation clean.
-     If the repo doesn't exist yet, create it via the HF API.
+     If the repo doesn't exist yet, create it via the HF API
+     (`HfApi().create_repo("han1823123123/txcdr-it", repo_type="model")`).
 
 4. **Probe on PAPER set** (~1 hr A40):
    - `run_probing_phase7.py --headline` filtered to PAPER tasks
@@ -190,12 +238,31 @@ for the IT-side cache build script (Phase 5 was IT-side).
    "google/gemma-2-2b-it"` and `anchor_layer: 13` baked into the meta
    so the leaderboard builder can filter by subject_model.
 
-6. **Update `build_leaderboard_2seed.py`** to support per-subject-model
-   leaderboards. Currently it doesn't filter by subject_model — add
-   a `--subject base|it` flag and re-render two leaderboards.
+   **Naming convention recommendation**: prefix run_ids for IT with
+   `it_` (e.g. `it_mlc__seed42`, `it_txcdr_t5__seed42`) OR keep the
+   same arch_id and rely on the `subject_model` field to disambiguate.
+   Both work but the former is grep-friendlier; the latter is purer.
+   `train_phase7.py` puts the run_id together via
+   `f"{arch['arch_id']}__seed{seed}"` so changing this requires
+   either editing train_phase7 or wrapping it. Han's call.
+
+6. **Update `build_leaderboard_2seed.py`** to support per-subject-
+   model leaderboards. Currently it doesn't filter by subject_model
+   — read the `subject_model` field from each `probing_results.jsonl`
+   row and add an optional filter (default: filter to
+   `google/gemma-2-2b` for backwards-compat with the existing
+   leaderboard md's BASE numbers). The same applies to
+   `build_tsweep_2seed.py` and `plot_stacked_vs_raw_hierarchy.py`.
 
 7. **Re-render plots** for IT (suptitle "Gemma-2-2b-it L13, PAPER task
-   set, multi-seed mean ± σ_seeds") and side-by-side base-vs-IT comparison.
+   set, multi-seed mean ± σ_seeds") and side-by-side base-vs-IT
+   comparison. Save as `phase7_leaderboard_it_multiseed.png` /
+   `phase7_leaderboard_base_vs_it.png` so the BASE plot is preserved.
+
+8. **Update `results_manifest.json`** by re-running
+   `build_results_manifest.py` after the IT probings land. The
+   manifest is already keyed by `(subject_model, arch_id, seed,
+   k_win)` so it should accommodate IT cells without code changes.
 
 **A40 feasibility check before starting**: per `paper_archs.json`,
 the 4 MLC-family leaderboard cells (mlc, mlc_sparse, ag_mlc_08,
@@ -323,10 +390,11 @@ In order of importance:
 ### Definition of done
 
 For Mission #1 (IT-side):
-- 8 IT A40_ok leaderboard archs (tfa_big, tsae_paper_k20, tsae_paper_k500,
-  txcdr_t5, txcdr_t16, phase5b_subseq_h8, txc_bare_antidead_t5,
-  phase57_partB_h8_bare_multidistance_t8) trained at b=4096, ≥ 2 seeds
-  each, appended to `training_index.jsonl`.
+- 8 IT A40_ok paper leaderboard archs (tfa_big, tsae_paper_k20,
+  tsae_paper_k500, txcdr_t5, txcdr_t16, phase5b_subseq_h8,
+  txc_bare_antidead_t5, phase57_partB_h8_bare_multidistance_t8) plus
+  topk_sae as the per-token baseline = 9 archs trained at b=4096,
+  ≥ 2 seeds each, appended to `training_index.jsonl`.
 - Probed on PAPER's 16 tasks at S=32, k_feat ∈ {5, 20}, FLIP applied,
   rows appended to `probing_results.jsonl` with `subject_model:
   google/gemma-2-2b-it, anchor_layer: 13`.
