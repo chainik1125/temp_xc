@@ -135,8 +135,13 @@ def main() -> None:
 
     # Pre-pad the seq dimension once for efficient window gather.
     # Move padded acts to GPU so per-batch gather is GPU-side.
+    # H8 multi-distance gather needs an extra `max_shift` of right padding so
+    # `pos_idx + T + max_shift - 1` stays in bounds. Default H8 shifts use up
+    # to T // 2, so reserve that much extra room when any H8 model is active.
     left = args.T // 2
-    right = args.T - 1 - left
+    base_right = args.T - 1 - left
+    h8_extra_right = args.T // 2  # default H8 shifts go up to T//2
+    right = base_right + h8_extra_right
     acts_padded = F.pad(train_acts, (0, 0, 0, 0, left, right), value=0.0)
     if device == "cuda":
         # Keep fp16 on GPU; cast per-batch to fp32 for the crosscoders.
