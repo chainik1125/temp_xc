@@ -44,6 +44,10 @@ PAIRS=(
   "txc  blocks.0.hook_resid_mid      iso_txc_l0_mid"
   "txc  blocks.0.hook_resid_post     iso_txc_l0_post"
   "txc  blocks.1.ln1.hook_normalized iso_txc_l1_ln1"
+  # Fill the SAE gaps at the LN-normalised hookpoints so the isolated
+  # frontier table has all 15 cells.
+  "sae  blocks.0.ln1.hook_normalized iso_sae_l0_ln1"
+  "sae  blocks.1.ln1.hook_normalized iso_sae_l1_ln1"
 )
 
 for entry in "${PAIRS[@]}"; do
@@ -64,11 +68,12 @@ for entry in "${PAIRS[@]}"; do
         --output_dir "$OUTDIR"
   fi
 
-  if [[ "$FAMILY" == "tsae" ]]; then
-    OVR_FLAG="--tsae_layer_hooks_override"
-  else
-    OVR_FLAG="--txc_layer_hooks_override"
-  fi
+  case "$FAMILY" in
+    tsae) OVR_FLAG="--tsae_layer_hooks_override" ;;
+    txc)  OVR_FLAG="--txc_layer_hooks_override" ;;
+    sae)  OVR_FLAG="--sae_layer_hooks_override" ;;
+    *) echo "unknown family: $FAMILY" | tee -a "$LOG"; exit 1 ;;
+  esac
 
   if [[ -f "$OUTDIR/crosscoder_$TAG.pt" ]]; then
     echo "  [skip] $TAG.train (checkpoint present)" | tee -a "$LOG"
