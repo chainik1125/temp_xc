@@ -113,18 +113,24 @@ def _build_masks(
 
 
 # ── feature-space DoM via streamed encoding ─────────────────────────────────
-def streamed_feature_means(
+def streamed_feature_stats(
     sae,
     activations: np.memmap,
     mask_plus: np.ndarray,
     mask_all: np.ndarray,
     batch: int,
     device: str,
-) -> tuple[np.ndarray, np.ndarray]:
-    """Return (mean_per_feature_at_D_plus, mean_per_feature_at_D_all) as fp32."""
+) -> dict[str, np.ndarray]:
+    """Streamed first + second moments per feature on D_+ and D.
+
+    Returns a dict with keys mean_plus, mean_all, var_plus, var_all (each
+    np.float32 of length d_sae). Variances use the unbiased (n-1) denominator.
+    """
     d_sae = int(sae.cfg.d_sae if hasattr(sae.cfg, "d_sae") else sae.W_dec.shape[0])
     sum_plus = torch.zeros(d_sae, dtype=torch.float64, device=device)
     sum_all = torch.zeros(d_sae, dtype=torch.float64, device=device)
+    sumsq_plus = torch.zeros(d_sae, dtype=torch.float64, device=device)
+    sumsq_all = torch.zeros(d_sae, dtype=torch.float64, device=device)
     n_plus = int(mask_plus.sum())
     n_all = int(mask_all.sum())
 
@@ -133,16 +139,45 @@ def streamed_feature_means(
         e = min(n, s + batch)
         x = torch.from_numpy(np.asarray(activations[s:e], dtype=np.float32)).to(device)
         with torch.no_grad():
-            z = sae.encode(x)  # (b, d_sae) — JumpReLU output, fp32 OK
+            z = sae.encode(x).to(torch.float64)
         mp = torch.from_numpy(mask_plus[s:e]).to(device)
         ma = torch.from_numpy(mask_all[s:e]).to(device)
         if mp.any():
-            sum_plus += z[mp].to(torch.float64).sum(dim=0)
+            zp = z[mp]
+            sum_plus += zp.sum(dim=0)
+            sumsq_plus += (zp * zp).sum(dim=0)
         if ma.any():
-            sum_all += z[ma].to(torch.float64).sum(dim=0)
-    mean_plus = (sum_plus / max(n_plus, 1)).cpu().numpy().astype(np.float32)
-    mean_all = (sum_all / max(n_all, 1)).cpu().numpy().astype(np.float32)
-    return mean_plus, mean_all
+            za = z[ma]
+            sum_all += za.sum(dim=0)
+            sumsq_all += (za * za).sum(dim=0)
+
+    def _moments(_sum, _sumsq, _n):
+        if _n == 0:
+            return np.zeros(d_sae, dtype=np.float32), np.zeros(d_sae, dtype=np.float32)
+        mean = _sum / _n
+        if _n > 1:
+            var = (_sumsq - _n * mean * mean) / (_n - 1)
+            var = torch.clamp(var, min=0.0)
+        else:
+            var = torch.zeros_like(_sum)
+        return mean.cpu().numpy().astype(np.float32), var.cpu().numpy().astype(np.float32)
+
+    mean_plus, var_plus = _moments(sum_plus, sumsq_plus, n_plus)
+    mean_all, var_all = _moments(sum_all, sumsq_all, n_all)
+    return {
+        "mean_plus": mean_plus,
+        "mean_all": mean_all,
+        "var_plus": var_plus,
+        "var_all": var_all,
+    }
+
+
+def welch_tstat(mean_plus, mean_all, var_plus, var_all, n_plus, n_all):
+    """Welch's two-sample t-statistic per feature. SE floor avoids div-by-0
+    on features that never fire (zero variance) — those get t=0."""
+    se = np.sqrt(var_plus / max(n_plus, 1) + var_all / max(n_all, 1))
+    tstat = np.where(se > 1e-12, (mean_plus - mean_all) / np.maximum(se, 1e-12), 0.0)
+    return tstat.astype(np.float32)
 
 
 def streamed_active_count_in_plus(
@@ -174,6 +209,12 @@ def main() -> None:
     parser.add_argument("--top-k", type=int, default=50)
     parser.add_argument("--batch", type=int, default=2048)
     parser.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
+    parser.add_argument(
+        "--rank-by",
+        choices=("tstat", "delta", "ratio"),
+        default="tstat",
+        help="ranking metric for top_features.json. tstat = Welch two-sample (default; combines effect size and noise). delta = raw mean(D_+) − mean(D), favours always-active features. ratio = mean(D_+) / max(mean(D), eps), favours selective features but unstable for sparse features.",
+    )
     parser.add_argument("--force", action="store_true")
     args = parser.parse_args()
 
@@ -226,23 +267,46 @@ def main() -> None:
     print(f"[decompose] loading Llama-Scope at layer {args.layer} on {args.device}…")
     sae, sae_cfg = load_public_sae(args.layer, args.device)
     t0 = time.time()
-    mean_plus, mean_all = streamed_feature_means(
+    stats = streamed_feature_stats(
         sae, activations, mask_plus, mask_all, args.batch, args.device
     )
+    mean_plus = stats["mean_plus"]
+    mean_all = stats["mean_all"]
+    var_plus = stats["var_plus"]
+    var_all = stats["var_all"]
     delta = mean_plus - mean_all
+    tstat = welch_tstat(mean_plus, mean_all, var_plus, var_all, n_plus, n_all)
+    ratio = mean_plus / np.maximum(mean_all, 1e-6)
     n_active_plus = streamed_active_count_in_plus(sae, activations, mask_plus, args.batch, args.device)
-    print(f"[decompose] feature means in {time.time()-t0:.1f}s; d_sae={delta.shape[0]}")
+    print(f"[decompose] feature stats in {time.time()-t0:.1f}s; d_sae={delta.shape[0]}")
 
     np.savez(
         out_stats,
         mean_plus=mean_plus,
         mean_all=mean_all,
+        var_plus=var_plus,
+        var_all=var_all,
         delta=delta,
+        tstat=tstat,
+        ratio=ratio,
         n_active_plus=n_active_plus,
     )
 
-    # Top-K by |delta|, with feature decoder column for Stage 4.
-    top_idx = np.argsort(-np.abs(delta))[: args.top_k]
+    # Rank features by the selected metric. Default is t-stat (combines effect
+    # size and noise); the smoke run at N=20 showed rank-by-|delta| favours
+    # always-active features (e.g. "general thinking" feat_10750), while the
+    # actually-steerable backtracking feature (feat_27749) ranked 3rd by |delta|
+    # but 1st by both ratio and t-stat.
+    if args.rank_by == "tstat":
+        score = tstat
+    elif args.rank_by == "delta":
+        score = delta
+    elif args.rank_by == "ratio":
+        # Cap ratio when mean_all is tiny — these are usually noise spikes.
+        score = np.where(mean_all > 0.01, ratio, 0.0)
+    else:
+        raise ValueError(args.rank_by)
+    top_idx = np.argsort(-score)[: args.top_k]
     W_dec = sae.W_dec.detach().cpu().numpy()  # (d_sae, d_model) for Llama-Scope
     if W_dec.shape != (delta.shape[0], d_model):  # be defensive across versions
         # Some SAE-Lens variants store W_dec as (d_model, d_sae); reshape.
@@ -257,14 +321,18 @@ def main() -> None:
                 "rank": rank,
                 "feature_idx": int(j),
                 "delta": float(delta[j]),
+                "tstat": float(tstat[j]),
+                "ratio": float(ratio[j]),
                 "mean_plus": float(mean_plus[j]),
                 "mean_all": float(mean_all[j]),
+                "var_plus": float(var_plus[j]),
+                "var_all": float(var_all[j]),
                 "n_active_plus": int(n_active_plus[j]),
                 "decoder_norm": float(np.linalg.norm(W_dec[j])),
             }
         )
     out_top.write_text(json.dumps(top_records, indent=2))
-    print(f"[decompose] top-{args.top_k} → {out_top}")
+    print(f"[decompose] top-{args.top_k} (rank_by={args.rank_by}) → {out_top}")
 
     meta = {
         "layer": args.layer,
@@ -272,6 +340,7 @@ def main() -> None:
         "sae_id": f"l{args.layer}r_8x",
         "sae_repo": PUBLIC_SAE_REPO,
         "sae_config": PUBLIC_SAE_CONFIG,
+        "rank_by": args.rank_by,
         "n_tokens": int(n_tokens),
         "n_d_plus": int(n_plus),
         "n_d_all": int(n_all),

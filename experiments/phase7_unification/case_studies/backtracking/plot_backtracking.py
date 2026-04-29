@@ -1,14 +1,24 @@
 #!/usr/bin/env python3
-"""Stage 5b: magnitude-sweep + top-feature plots.
+"""Stage 5c: magnitude-sweep, top-feature, and Pareto coherence-vs-backtracking
+plots.
 
-Two figures, both saved with thumbnails via `src.plotting.save_figure`:
+Three figures, each saved with thumbnails via `src.plotting.save_figure`:
 
-    plots/magnitude_sweep.png   keyword fraction vs steering magnitude, with
-                                separate lines for raw_dom and each top-K SAE
-                                feature (additive + clamp). Mirrors paper Fig 3
-                                (right half: reasoning model only).
-    plots/top_features.png      bar chart of top-10 features by |Δ_j| with
-                                feature_idx labels.
+    plots/magnitude_sweep.png   keyword fraction vs steering magnitude per
+                                (mode, target). Useful for diagnosing where the
+                                model collapses, but the magnitude axis is
+                                arbitrary so don't read causation off it.
+
+    plots/top_features.png      bar chart of the top features in the order
+                                they were ranked (delta / tstat / ratio per
+                                decompose meta) with annotation of n_active.
+
+    plots/pareto_coherence.png  *headline plot*: x = keyword fraction, y =
+                                Sonnet coherence (0–3), one curve per
+                                (mode, target). Magnitudes annotate the
+                                points. The Pareto comparison is "what's the
+                                highest backtracking rate I can get while
+                                staying coherent?"
 """
 
 from __future__ import annotations
@@ -16,13 +26,13 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import math
 import os
 import sys
 from collections import defaultdict
 from pathlib import Path
 
 import matplotlib.pyplot as plt
-import numpy as np
 
 os.environ.setdefault("TQDM_DISABLE", "1")
 
@@ -43,73 +53,50 @@ from experiments.phase7_unification.case_studies.backtracking._paths import (  #
 def _load_rates() -> list[dict]:
     p = INTERVENE_DIR / "keyword_rates.csv"
     if not p.exists():
-        raise SystemExit(f"missing {p}; run Stage 5a first")
+        raise SystemExit(f"missing {p}; run evaluate_backtracking.py first")
     rows: list[dict] = []
     with p.open() as f:
         for r in csv.DictReader(f):
             r["magnitude"] = float(r["magnitude"])
             r["mean_keyword_fraction"] = float(r["mean_keyword_fraction"])
-            r["sem"] = float(r["sem"])
+            r["sem_keyword_fraction"] = float(r.get("sem_keyword_fraction") or 0.0)
             r["n_prompts"] = int(r["n_prompts"])
+            r["n_coherence_graded"] = int(r.get("n_coherence_graded") or 0)
+            r["mean_coherence"] = float(r["mean_coherence"]) if r.get("mean_coherence") not in (None, "", "nan") else None
+            r["sem_coherence"] = float(r["sem_coherence"]) if r.get("sem_coherence") not in (None, "", "nan") else 0.0
             rows.append(r)
     return rows
 
 
-def plot_magnitude_sweep(rows: list[dict], out_path: Path) -> None:
-    fig, axes = plt.subplots(1, 2, figsize=(12, 4.5), sharey=True)
-    grouped: dict[tuple[str, str], list[dict]] = defaultdict(list)
+def _grouped(rows: list[dict]) -> dict[tuple[str, str], list[dict]]:
+    g: dict[tuple[str, str], list[dict]] = defaultdict(list)
     for r in rows:
-        grouped[(r["mode"], r["target"])].append(r)
-    for series in grouped.values():
+        g[(r["mode"], r["target"])].append(r)
+    for series in g.values():
         series.sort(key=lambda x: x["magnitude"])
+    return g
 
-    # Left: additive modes (raw_dom + sae_additive)
-    ax = axes[0]
+
+def plot_magnitude_sweep(rows: list[dict], out_path: Path) -> None:
+    grouped = _grouped(rows)
+    fig, ax = plt.subplots(figsize=(8, 4.5))
     cmap = plt.get_cmap("tab10")
-    if ("raw_dom", "raw_dom") in grouped:
-        s = grouped[("raw_dom", "raw_dom")]
-        xs = [r["magnitude"] for r in s]
-        ys = [r["mean_keyword_fraction"] for r in s]
-        es = [r["sem"] for r in s]
-        ax.errorbar(xs, ys, yerr=es, label="raw DoM (paper baseline)", marker="o", color="black", linewidth=2.0)
     for k, ((mode, target), s) in enumerate(sorted(grouped.items())):
-        if mode != "sae_additive":
-            continue
         xs = [r["magnitude"] for r in s]
         ys = [r["mean_keyword_fraction"] for r in s]
-        es = [r["sem"] for r in s]
-        ax.errorbar(xs, ys, yerr=es, label=f"SAE add: {target}", marker="s", color=cmap(k % 10), linewidth=1.2)
-    ax.set_xlabel("steering magnitude α")
+        es = [r["sem_keyword_fraction"] for r in s]
+        marker = {"raw_dom": "o", "sae_additive": "s", "sae_clamp": "^"}.get(mode, "x")
+        color = "black" if mode == "raw_dom" else cmap(k % 10)
+        ax.errorbar(xs, ys, yerr=es, label=f"{mode} {target}", marker=marker, color=color, linewidth=1.4)
+    ax.set_xlabel("steering magnitude (additive α  /  clamp strength s)")
     ax.set_ylabel("keyword fraction (B = {wait, hmm})")
-    ax.set_title("additive: raw DoM vs SAE feature decoders")
+    ax.set_title("Backtracking keyword fraction vs intervention magnitude")
     ax.grid(True, alpha=0.3)
-    ax.legend(fontsize=8, loc="upper left")
-
-    # Right: SAE paper-clamp on each feature
-    ax = axes[1]
-    if ("raw_dom", "raw_dom") in grouped:
-        # Re-plot raw_dom as faint reference line
-        s = grouped[("raw_dom", "raw_dom")]
-        xs = [r["magnitude"] for r in s]
-        ys = [r["mean_keyword_fraction"] for r in s]
-        ax.plot(xs, ys, label="raw DoM (additive ref.)", color="grey", linestyle=":", marker="o")
-    for k, ((mode, target), s) in enumerate(sorted(grouped.items())):
-        if mode != "sae_clamp":
-            continue
-        xs = [r["magnitude"] for r in s]
-        ys = [r["mean_keyword_fraction"] for r in s]
-        es = [r["sem"] for r in s]
-        ax.errorbar(xs, ys, yerr=es, label=f"SAE clamp: {target}", marker="^", color=cmap(k % 10), linewidth=1.2)
-    ax.set_xlabel("clamp strength")
-    ax.set_title("paper-clamp on top-K SAE features")
-    ax.grid(True, alpha=0.3)
-    ax.legend(fontsize=8, loc="upper left")
-
-    fig.suptitle("Backtracking keyword fraction vs intervention magnitude (DeepSeek-R1-Distill-Llama-8B, L10)")
+    ax.legend(fontsize=8, loc="best")
     fig.tight_layout()
     save_figure(fig, str(out_path))
     plt.close(fig)
-    print(f"[plot] wrote {out_path} (+ thumb)")
+    print(f"[plot] wrote {out_path}")
 
 
 def plot_top_features(out_path: Path) -> None:
@@ -117,14 +104,17 @@ def plot_top_features(out_path: Path) -> None:
     if not p.exists():
         raise SystemExit(f"missing {p}; run Stage 3 first")
     top = json.loads(p.read_text())[:10]
+    meta = json.loads((DECOMPOSE_DIR / "decompose_meta.json").read_text())
+    rank_by = meta.get("rank_by", "delta")
+    score_key = {"tstat": "tstat", "delta": "delta", "ratio": "ratio"}[rank_by]
     fig, ax = plt.subplots(figsize=(8, 4.5))
     xs = list(range(len(top)))
-    deltas = [r["delta"] for r in top]
-    bars = ax.bar(xs, deltas, color=["tab:blue" if d >= 0 else "tab:red" for d in deltas])
+    scores = [r[score_key] for r in top]
+    bars = ax.bar(xs, scores, color=["tab:blue" if d >= 0 else "tab:red" for d in scores])
     ax.set_xticks(xs)
     ax.set_xticklabels([f"f={r['feature_idx']}" for r in top], rotation=45, ha="right")
-    ax.set_ylabel("Δⱼ = mean(z_j | D₊) − mean(z_j | D)")
-    ax.set_title("Top-10 SAE features by |Δⱼ| (Llama-Scope L10R-8x)")
+    ax.set_ylabel({"tstat": "Welch t-statistic", "delta": "Δⱼ = mean(D₊) − mean(D)", "ratio": "mean(D₊) / mean(D)"}[rank_by])
+    ax.set_title(f"Top-10 SAE features ranked by {rank_by} (Llama-Scope L10R-8x)")
     ax.axhline(0, color="black", linewidth=0.5)
     for i, (bar, r) in enumerate(zip(bars, top)):
         ax.text(
@@ -138,7 +128,50 @@ def plot_top_features(out_path: Path) -> None:
     fig.tight_layout()
     save_figure(fig, str(out_path))
     plt.close(fig)
-    print(f"[plot] wrote {out_path} (+ thumb)")
+    print(f"[plot] wrote {out_path}")
+
+
+def plot_pareto(rows: list[dict], out_path: Path) -> None:
+    grouped = _grouped(rows)
+    fig, ax = plt.subplots(figsize=(8, 5.5))
+    cmap = plt.get_cmap("tab10")
+    plotted = 0
+    for k, ((mode, target), s) in enumerate(sorted(grouped.items())):
+        s = [r for r in s if r["mean_coherence"] is not None]
+        if not s:
+            continue
+        xs = [r["mean_keyword_fraction"] for r in s]
+        ys = [r["mean_coherence"] for r in s]
+        x_err = [r["sem_keyword_fraction"] for r in s]
+        y_err = [r["sem_coherence"] for r in s]
+        marker = {"raw_dom": "o", "sae_additive": "s", "sae_clamp": "^"}.get(mode, "x")
+        color = "black" if mode == "raw_dom" else cmap(k % 10)
+        ax.errorbar(xs, ys, xerr=x_err, yerr=y_err, marker=marker, color=color, linewidth=1.5, label=f"{mode} {target}")
+        for r, x, y in zip(s, xs, ys):
+            ax.annotate(
+                f"α={r['magnitude']:g}",
+                xy=(x, y),
+                xytext=(4, 4),
+                textcoords="offset points",
+                fontsize=7,
+                color=color,
+                alpha=0.7,
+            )
+        plotted += 1
+    if plotted == 0:
+        ax.text(0.5, 0.5, "No coherence grades available\nrun grade_coherence.py first",
+                transform=ax.transAxes, ha="center", va="center", fontsize=12)
+    ax.set_xlabel("backtracking rate — keyword fraction in B = {wait, hmm}")
+    ax.set_ylabel("Sonnet coherence (0 = incoherent loops … 3 = fully coherent)")
+    ax.set_title("Pareto: backtracking induction vs coherence (DeepSeek-R1-Distill-Llama-8B, L10)")
+    ax.set_ylim(-0.1, 3.1)
+    ax.set_xlim(left=0)
+    ax.grid(True, alpha=0.3)
+    ax.legend(fontsize=9, loc="best")
+    fig.tight_layout()
+    save_figure(fig, str(out_path))
+    plt.close(fig)
+    print(f"[plot] wrote {out_path}")
 
 
 def main() -> None:
@@ -148,6 +181,7 @@ def main() -> None:
     rows = _load_rates()
     plot_magnitude_sweep(rows, PLOTS_DIR / "magnitude_sweep.png")
     plot_top_features(PLOTS_DIR / "top_features.png")
+    plot_pareto(rows, PLOTS_DIR / "pareto_coherence.png")
 
 
 if __name__ == "__main__":

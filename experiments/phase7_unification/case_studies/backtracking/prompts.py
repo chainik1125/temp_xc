@@ -11,7 +11,9 @@ the tokenizer's chat template as a single user turn.
 
 from __future__ import annotations
 
+import json
 import random
+from pathlib import Path
 from typing import Iterable
 
 
@@ -54,11 +56,42 @@ _PROBABILITY = [
     "A point is chosen uniformly at random inside a unit square. What is the probability that its distance from the centre is less than 1/2?",
 ]
 
-PROMPTS: list[dict] = (
+_FALLBACK_PROMPTS: list[dict] = (
     [{"id": f"logic_{i:02d}", "category": "logic", "text": t} for i, t in enumerate(_LOGIC)]
     + [{"id": f"geom_{i:02d}", "category": "geometry", "text": t} for i, t in enumerate(_GEOMETRY)]
     + [{"id": f"prob_{i:02d}", "category": "probability", "text": t} for i, t in enumerate(_PROBABILITY)]
 )
+
+
+def _generated_prompts_path() -> Path:
+    return Path(__file__).parent / "data" / "prompts_300.jsonl"
+
+
+def _load_generated() -> list[dict] | None:
+    p = _generated_prompts_path()
+    if not p.exists():
+        return None
+    out: list[dict] = []
+    with p.open() as f:
+        for line in f:
+            line = line.strip()
+            if line:
+                out.append(json.loads(line))
+    return out or None
+
+
+def _all_prompts() -> list[dict]:
+    """The full available prompt pool: generated 300-set if present, else the
+    30-prompt hand-curated fallback."""
+    return _load_generated() or _FALLBACK_PROMPTS
+
+
+# Re-evaluated each access so that a Stage 0 run after `generate_prompts.py`
+# picks up the larger set without code edits.
+def __getattr__(name: str):  # PEP 562
+    if name == "PROMPTS":
+        return _all_prompts()
+    raise AttributeError(name)
 
 
 def get_prompts(n: int, seed: int = 0) -> list[dict]:
@@ -67,11 +100,12 @@ def get_prompts(n: int, seed: int = 0) -> list[dict]:
     If n > len(PROMPTS), samples with replacement using `seed`. Each repeated
     prompt gets a numeric suffix on its id so traces stay distinguishable.
     """
-    if n <= len(PROMPTS):
-        return list(PROMPTS[:n])
+    pool = _all_prompts()
+    if n <= len(pool):
+        return list(pool[:n])
     rng = random.Random(seed)
-    extra = [dict(rng.choice(PROMPTS)) for _ in range(n - len(PROMPTS))]
-    out = list(PROMPTS) + extra
+    extra = [dict(rng.choice(pool)) for _ in range(n - len(pool))]
+    out = list(pool) + extra
     seen: dict[str, int] = {}
     for p in out:
         seen[p["id"]] = seen.get(p["id"], 0) + 1
@@ -81,4 +115,4 @@ def get_prompts(n: int, seed: int = 0) -> list[dict]:
 
 
 def categories() -> Iterable[str]:
-    return sorted({p["category"] for p in PROMPTS})
+    return sorted({p["category"] for p in _all_prompts()})

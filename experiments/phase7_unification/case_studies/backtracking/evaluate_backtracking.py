@@ -67,13 +67,36 @@ def main() -> None:
 
     keywords = {k.lower() for k in args.keywords}
 
+    # ------------------------------------------------------------------
+    # Optional: load Sonnet coherence grades. If grade_coherence.py was run,
+    # we merge the 0–3 coherence into both the per-generation rows and the
+    # per-(mode, target, magnitude) summary so plot_backtracking.py can draw
+    # the Pareto coherence-vs-backtracking curves.
+    coh_path = INTERVENE_DIR / "coherence_grades.jsonl"
+    coh: dict[tuple[str, str, float, str], int] = {}
+    if coh_path.exists():
+        with coh_path.open() as f:
+            for line in f:
+                r = json.loads(line)
+                if r.get("coherence_grade") is None:
+                    continue
+                coh[
+                    (r["mode"], r["target"], float(r["magnitude"]), r["prompt_id"])
+                ] = int(r["coherence_grade"])
+        print(f"[evaluate] loaded {len(coh)} coherence grades")
+    else:
+        print(f"[evaluate] (no coherence grades at {coh_path}; metric stays None)")
+
     per_gen_rows: list[dict] = []
-    grouped: dict[tuple[str, str, float], list[float]] = defaultdict(list)
+    fracs_grouped: dict[tuple[str, str, float], list[float]] = defaultdict(list)
+    coh_grouped: dict[tuple[str, str, float], list[int]] = defaultdict(list)
 
     with gens_path.open() as f:
         for line in f:
             rec = json.loads(line)
             frac, n_kw, n_tot = keyword_fraction(rec["generation"], keywords)
+            key4 = (rec["mode"], rec["target"], float(rec["magnitude"]), rec["prompt_id"])
+            coh_g = coh.get(key4)
             row = {
                 "mode": rec["mode"],
                 "target": rec["target"],
@@ -83,9 +106,12 @@ def main() -> None:
                 "n_keyword": n_kw,
                 "n_total": n_tot,
                 "keyword_fraction": frac,
+                "coherence_grade": "" if coh_g is None else coh_g,
             }
             per_gen_rows.append(row)
-            grouped[(rec["mode"], rec["target"], rec["magnitude"])].append(frac)
+            fracs_grouped[(rec["mode"], rec["target"], rec["magnitude"])].append(frac)
+            if coh_g is not None:
+                coh_grouped[(rec["mode"], rec["target"], rec["magnitude"])].append(coh_g)
 
     per_path = INTERVENE_DIR / "per_generation.csv"
     with per_path.open("w", newline="") as f:
@@ -93,23 +119,31 @@ def main() -> None:
         w.writeheader()
         w.writerows(per_gen_rows)
 
-    out_rows: list[dict] = []
-    for (mode, target, magnitude), fracs in grouped.items():
-        n = len(fracs)
-        mean = sum(fracs) / n
+    def _mean_sem(xs):
+        n = len(xs)
+        if n == 0:
+            return float("nan"), float("nan"), 0
+        m = sum(xs) / n
         if n > 1:
-            var = sum((x - mean) ** 2 for x in fracs) / (n - 1)
-            sem = math.sqrt(var / n)
-        else:
-            sem = 0.0
+            v = sum((x - m) ** 2 for x in xs) / (n - 1)
+            return m, math.sqrt(v / n), n
+        return m, 0.0, n
+
+    out_rows: list[dict] = []
+    for k in fracs_grouped:
+        m_kw, sem_kw, n = _mean_sem(fracs_grouped[k])
+        m_co, sem_co, n_co = _mean_sem(coh_grouped.get(k, []))
         out_rows.append(
             {
-                "mode": mode,
-                "target": target,
-                "magnitude": magnitude,
+                "mode": k[0],
+                "target": k[1],
+                "magnitude": k[2],
                 "n_prompts": n,
-                "mean_keyword_fraction": mean,
-                "sem": sem,
+                "mean_keyword_fraction": m_kw,
+                "sem_keyword_fraction": sem_kw,
+                "n_coherence_graded": n_co,
+                "mean_coherence": "" if math.isnan(m_co) else m_co,
+                "sem_coherence": "" if math.isnan(sem_co) else sem_co,
             }
         )
     out_rows.sort(key=lambda r: (r["mode"], r["target"], r["magnitude"]))
