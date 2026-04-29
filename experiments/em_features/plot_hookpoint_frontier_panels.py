@@ -1,9 +1,9 @@
-"""Per-arch coh/align frontier panels.
+"""Per-variant coh/align frontier panels.
 
-Each subplot is one SAE-side architecture; curves within a panel are the
-hookpoints we have for that arch. Same x/y axes across panels for visual
-comparison of where each arch's bundle peak lands in the (coherence, alignment)
-plane.
+One subplot per (arch × training-step × hookpoint) combination — every
+distinct training setup we have a Wang bundle k=30 frontier for. Same x/y
+axes across all panels for direct visual comparison of where each variant's
+peak lands in the (coherence, alignment) plane.
 
     uv run python -m experiments.em_features.plot_hookpoint_frontier_panels \\
         --root docs/dmitry/results/em_features \\
@@ -42,8 +42,8 @@ def parse_args():
     p = argparse.ArgumentParser()
     p.add_argument("--root", type=Path, required=True)
     p.add_argument("--out", type=Path, required=True)
-    p.add_argument("--alpha_clip", type=float, default=15.0,
-                   help="Drop points with |α| > this so extreme α don't compress the plot")
+    p.add_argument("--alpha_clip", type=float, default=15.0)
+    p.add_argument("--ncols", type=int, default=4)
     return p.parse_args()
 
 
@@ -51,98 +51,107 @@ def main():
     args = parse_args()
     root = args.root
 
-    panels = [
-        ("SAE arditi (k=128, T=1)", [
-            ("100k @ resid_post", root / "wang/sae_bundle30_frontier.json", "navy", "o"),
-        ]),
-        ("T-SAE (k=128, per-token + adjacent contrastive)", [
-            ("30k @ resid_post", root / "wang/tsae_30k_bundle30_frontier.json", "darkorange", "s"),
-            ("30k @ resid_mid",  root / "hookpoint_compare/tsae_residmid_30k_bundle30_frontier.json", "orange", "^"),
-            ("30k @ ln1_normalized", root / "hookpoint_compare/tsae_ln1_30k_bundle30_frontier.json", "gold", "D"),
-        ]),
-        ("TXC brickenauxk (k_total=128, T=5 windowed)", [
-            ("30k @ resid_mid",  root / "hookpoint_compare/txc_residmid_30k/results/wang_txc_residmid_step30000_bundle30_frontier.json", "darkgreen", "^"),
-            ("30k @ ln1_normalized", root / "hookpoint_compare/txc_ln1_30k/results/wang_txc_ln1_step30000_bundle30_frontier.json", "limegreen", "D"),
-        ]),
+    # Each panel: (title, json path, color, family-tag-for-grouping-color)
+    variants = [
+        ("SAE arditi 100k @ resid_post",
+         root / "wang/sae_bundle30_frontier.json", "navy"),
+        ("Han 100k @ resid_post",
+         root / "wang/han_bundle30_frontier.json", "darkred"),
+        ("T-SAE 30k @ resid_post",
+         root / "wang/tsae_30k_bundle30_frontier.json", "darkorange"),
+        ("T-SAE 100k @ resid_post",
+         root / "wang/tsae_100k_bundle30_frontier.json", "chocolate"),
+        ("T-SAE 30k @ resid_mid",
+         root / "hookpoint_compare/tsae_residmid_30k_bundle30_frontier.json", "orange"),
+        ("T-SAE 30k @ ln1_normalized",
+         root / "hookpoint_compare/tsae_ln1_30k_bundle30_frontier.json", "gold"),
+        ("TXC brickenauxk 30k @ resid_mid",
+         root / "hookpoint_compare/txc_residmid_30k/results/wang_txc_residmid_step30000_bundle30_frontier.json",
+         "darkgreen"),
+        ("TXC brickenauxk 30k @ ln1_normalized",
+         root / "hookpoint_compare/txc_ln1_30k/results/wang_txc_ln1_step30000_bundle30_frontier.json",
+         "limegreen"),
     ]
 
-    # First pass: load + collect global axis bounds
+    # First pass: load + global axis bounds
     loaded = []
     all_coh, all_align = [], []
-    for arch_label, curves in panels:
-        loaded_curves = []
-        for label, p, color, marker in curves:
-            rows = load_curve(p)
-            if not rows:
-                print(f"  MISSING: {label} ({p})")
-                loaded_curves.append((label, None, color, marker))
-                continue
-            if args.alpha_clip is not None:
-                rows = [r for r in rows if abs(r["alpha"]) <= args.alpha_clip]
-            loaded_curves.append((label, rows, color, marker))
+    for title, p, color in variants:
+        rows = load_curve(p)
+        if rows and args.alpha_clip is not None:
+            rows = [r for r in rows if abs(r["alpha"]) <= args.alpha_clip]
+        loaded.append({"title": title, "rows": rows, "color": color, "path": p})
+        if rows:
             all_coh += [r["coh"] for r in rows]
             all_align += [r["align"] for r in rows]
-        loaded.append((arch_label, loaded_curves))
 
-    xpad = (max(all_coh) - min(all_coh)) * 0.05
-    ypad = (max(all_align) - min(all_align)) * 0.05
+    if not all_coh:
+        raise SystemExit("no data found")
+    xpad = (max(all_coh) - min(all_coh)) * 0.07
+    ypad = (max(all_align) - min(all_align)) * 0.07
     xlim = (min(all_coh) - xpad, max(all_coh) + xpad)
     ylim = (min(all_align) - ypad, max(all_align) + ypad)
 
-    fig, axes = plt.subplots(1, 3, figsize=(18, 6), sharex=True, sharey=True)
+    n = len(loaded)
+    ncols = args.ncols
+    nrows = (n + ncols - 1) // ncols
+
+    fig, axes = plt.subplots(nrows, ncols, figsize=(5 * ncols, 4.4 * nrows),
+                             sharex=True, sharey=True, squeeze=False)
+    axes = axes.ravel()
     cmap = plt.cm.coolwarm_r
     norm = plt.Normalize(vmin=-args.alpha_clip, vmax=args.alpha_clip)
 
-    for ax, (arch_label, curves) in zip(axes, loaded):
-        for label, rows, color, marker in curves:
-            if rows is None:
-                ax.plot([], [], marker, color=color, label=f"{label} (missing)")
-                continue
-            alphas = np.array([r["alpha"] for r in rows])
-            coh = np.array([r["coh"] for r in rows])
-            align = np.array([r["align"] for r in rows])
+    for ax, v in zip(axes, loaded):
+        rows = v["rows"]
+        if not rows:
+            ax.set_title(f"{v['title']}\n(NO DATA)", fontsize=10, color="grey")
+            ax.set_xlim(*xlim); ax.set_ylim(*ylim); ax.grid(alpha=0.3)
+            continue
+        alphas = np.array([r["alpha"] for r in rows])
+        coh = np.array([r["coh"] for r in rows])
+        align = np.array([r["align"] for r in rows])
 
-            # connect curve in α order
-            ax.plot(coh, align, "-", color=color, alpha=0.4, zorder=1)
-            # α-colored markers (color encodes intervention strength)
-            ax.scatter(coh, align, c=alphas, cmap=cmap, norm=norm,
-                       marker=marker, s=70, edgecolor=color, linewidth=1.0, zorder=2)
-            # peak annotation
-            peak_i = int(np.argmax(align))
-            ax.scatter([coh[peak_i]], [align[peak_i]], s=240,
-                       facecolors="none", edgecolors=color, linewidths=2.0, zorder=3)
-            ax.annotate(f"α={alphas[peak_i]:+.1f}\nalign={align[peak_i]:.2f}",
-                        (coh[peak_i], align[peak_i]),
-                        textcoords="offset points", xytext=(8, 8),
-                        fontsize=9, color=color, fontweight="bold")
-            # α=0 black star
-            zi = int(np.argmin(np.abs(alphas)))
-            ax.scatter([coh[zi]], [align[zi]], marker="*", s=140,
-                       c="black", zorder=4)
-            # legend handle in panel color
-            ax.plot([], [], marker, color=color, markersize=8,
-                    markeredgecolor="k", linestyle="-", linewidth=1.5, label=label)
+        ax.plot(coh, align, "-", color=v["color"], alpha=0.4, zorder=1)
+        ax.scatter(coh, align, c=alphas, cmap=cmap, norm=norm,
+                   s=70, edgecolor=v["color"], linewidth=1.0, zorder=2)
+        peak_i = int(np.argmax(align))
+        ax.scatter([coh[peak_i]], [align[peak_i]], s=240,
+                   facecolors="none", edgecolors=v["color"], linewidths=2.0, zorder=3)
+        ax.annotate(f"α={alphas[peak_i]:+.1f}\nalign={align[peak_i]:.2f}\ncoh={coh[peak_i]:.2f}",
+                    (coh[peak_i], align[peak_i]),
+                    textcoords="offset points", xytext=(8, 8),
+                    fontsize=8.5, color=v["color"], fontweight="bold")
+        zi = int(np.argmin(np.abs(alphas)))
+        ax.scatter([coh[zi]], [align[zi]], marker="*", s=160, c="black", zorder=4,
+                   label=f"α=0  align={align[zi]:.1f}")
 
-        ax.set_title(arch_label, fontsize=11)
-        ax.set_xlabel("mean coherence")
+        ax.set_title(v["title"], fontsize=11, color=v["color"])
         ax.grid(alpha=0.3)
         ax.set_xlim(*xlim); ax.set_ylim(*ylim)
         ax.legend(loc="lower right", fontsize=8)
 
-    axes[0].set_ylabel("mean alignment (Wang bundle k=30)")
+    # blank the unused axes
+    for ax in axes[n:]:
+        ax.set_visible(False)
+
+    # column / row labels
+    for j in range(ncols):
+        try: axes[(nrows - 1) * ncols + j].set_xlabel("mean coherence")
+        except IndexError: pass
+    for i in range(nrows):
+        axes[i * ncols].set_ylabel("mean alignment")
 
     cbar = fig.colorbar(plt.cm.ScalarMappable(norm=norm, cmap=cmap),
-                        ax=axes, location="right", shrink=0.85, pad=0.02)
+                        ax=axes[:n].tolist(), location="right", shrink=0.85, pad=0.02)
     cbar.set_label("steering coefficient α")
 
-    fig.suptitle(f"Coherence/alignment frontier — Wang bundle k=30, |α|≤{args.alpha_clip:g}\n"
-                 f"Qwen-7B PEFT-LoRA EM organism, layer 15. Black ★ = α=0 baseline.",
-                 fontsize=12)
+    fig.suptitle(
+        f"Wang bundle k=30 — coherence/alignment frontier per (arch × step × hookpoint), |α|≤{args.alpha_clip:g}\n"
+        f"Qwen-7B PEFT-LoRA EM organism, layer 15. Black ★ = α=0 baseline.",
+        fontsize=12, y=0.997)
     args.out.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(args.out, dpi=150, bbox_inches="tight")
-
-    # thumbnail
-    img_h, img_w = fig.canvas.get_width_height()[1], fig.canvas.get_width_height()[0]
     fig.savefig(args.out.with_suffix(".thumb.png"), dpi=48, bbox_inches="tight")
     print(f"wrote {args.out}")
     print(f"wrote {args.out.with_suffix('.thumb.png')}")
