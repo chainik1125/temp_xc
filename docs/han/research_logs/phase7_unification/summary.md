@@ -1,6 +1,6 @@
 ---
 author: Han
-date: 2026-04-28
+date: 2026-04-29
 tags:
   - results
   - complete
@@ -8,7 +8,45 @@ tags:
 
 ## Phase 7 unification — sparse-probing leaderboard summary
 
-### TL;DR
+### 2026-04-29 update — what changed since the original write-up
+
+After Y's 18-hour shift on case-studies + steering and X's 2-seed
+backfill, three findings revise the original headline:
+
+1. **2-seed leaderboard tightens the TXC lead.** With seed=1 + seed=42
+   means, TXC champion vs vanilla `topk_sae`: gap shrinks from 0.013
+   (seed=42 only) to **0.005** at k_feat=5, stays at 0.006 at k_feat=20.
+   σ_seeds is 0.005-0.010 on the top archs — TXC's lead is real and
+   directionally consistent but within ~1-2× seed-noise scale.
+   Full table: `2026-04-29-leaderboard-2seed.md`.
+2. **Stacked-SAE control rejects "more candidate features" as the source
+   of TXC's win.** Vanilla TopKSAE concat at K=2/K=5 last positions
+   (giving 37k-92k candidate features vs TXC's 18k) loses to TXC by
+   0.05-0.09 AUC; raw-activation concat loses by 0.16-0.26 AUC. Hierarchy
+   is monotone: raw < SAE-concat < SAE-mean-pool < TXC.
+   Full write-up: `2026-04-29-stacked-sae-control.md`.
+3. **Steering (Y, separate writeup): T-SAE k=20's apparent dominance is
+   primarily a *sparsity* effect, not a per-token-vs-window architecture
+   one.** At matched k_eff (≈ 500), TXC matryoshka mean peak (1.37) ≈
+   T-SAE k=500 mean peak (1.38) — a tie. Per-concept structure: TXC
+   wins on knowledge concepts (medical/math/historical/code/scientific),
+   T-SAE wins on discourse/register concepts.
+   See `2026-04-29-y-summary.md`, `2026-04-29-y-tx-steering-final.md`.
+
+**Combined paper message**: TXC is competitive with strong per-token
+SAEs on probing AUC (small but real lead, ≤ 1-2× seed-noise) and ties
+T-SAE k=500 on steering at matched sparsity. The architecture-family
+distinction is *secondary* to choices like sparsity (k_feat / k_pos)
+and protocol (paper-clamp vs AxBench-additive). Lead the paper with
+"competitive across protocols" rather than "TXC SOTA".
+
+The original 2026-04-28 leaderboard write-up below is preserved as
+historical record but the headline numbers should be read against the
+2-seed corrected table in `2026-04-29-leaderboard-2seed.md`.
+
+---
+
+### TL;DR (original 2026-04-28 write-up)
 
 - **38 trimmed-canonical SAE/TXC architectures** trained on Gemma-2-2b
   base at L12 anchor, all at seed=42; **sparse-probed on 36 SAEBench
