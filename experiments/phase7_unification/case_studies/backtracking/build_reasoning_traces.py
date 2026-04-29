@@ -45,6 +45,9 @@ if str(_REPO) not in sys.path:
 
 from src.data.nlp.cache_activations import load_model_and_tokenizer  # noqa: E402
 
+from experiments.phase7_unification.case_studies.backtracking._decode import (  # noqa: E402
+    clean_decode,
+)
 from experiments.phase7_unification.case_studies.backtracking._paths import (  # noqa: E402
     GEN_SEED,
     MAX_NEW_TOKENS,
@@ -135,7 +138,7 @@ def main() -> None:
                 )
             full_ids = out[0].tolist()
             output_ids = full_ids[input_len:]
-            gen_text = tokenizer.decode(output_ids, skip_special_tokens=False)
+            gen_text = clean_decode(tokenizer.decode(output_ids, skip_special_tokens=False))
             think_open, think_close = _think_token_positions(tokenizer, full_ids)
 
             rec = {

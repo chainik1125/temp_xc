@@ -18,7 +18,6 @@ import argparse
 import csv
 import json
 import os
-import string
 import sys
 from collections import defaultdict
 from pathlib import Path
@@ -31,6 +30,10 @@ _REPO = Path(__file__).resolve().parents[4]
 if str(_REPO) not in sys.path:
     sys.path.insert(0, str(_REPO))
 
+from experiments.phase7_unification.case_studies.backtracking._decode import (  # noqa: E402
+    clean_decode,
+    norm_token,
+)
 from experiments.phase7_unification.case_studies.backtracking._paths import (  # noqa: E402
     INTERVENE_DIR,
     KEYWORDS,
@@ -38,15 +41,17 @@ from experiments.phase7_unification.case_studies.backtracking._paths import (  #
 )
 
 
-_STRIP = string.punctuation + string.whitespace
-
-
 def keyword_fraction(text: str, keywords: set[str]) -> tuple[float, int, int]:
-    """Return (fraction, n_keyword, n_total) over whitespace-split words."""
-    words = text.split()
+    """Return (fraction, n_keyword, n_total) over whitespace-split words.
+
+    `clean_decode` is applied first so any residual byte-level BPE glyphs
+    (Ġ for space, Ċ for newline) from upstream stages get normalised before
+    splitting on whitespace.
+    """
+    words = clean_decode(text).split()
     if not words:
         return 0.0, 0, 0
-    n_kw = sum(1 for w in words if w.strip(_STRIP).lower() in keywords)
+    n_kw = sum(1 for w in words if norm_token(w) in keywords)
     return n_kw / len(words), n_kw, len(words)
 
 

@@ -51,7 +51,7 @@ ADDITIVE_MAGNITUDES: tuple[float, ...] = (0.0, 4.0, 8.0, 12.0, 16.0, 20.0)
 # units; calibrated post hoc against the SAE's typical max activation.
 CLAMP_STRENGTHS: tuple[float, ...] = (0.0, 5.0, 10.0, 25.0, 50.0, 100.0)
 
-GEN_TOKENS_PER_INTERVENTION = 30  # short continuations to keep keyword fraction stable
+GEN_TOKENS_PER_INTERVENTION = 200  # long enough to give the model room to enter <think> and backtrack
 GEN_SEED = 42
 
 # --- paths ------------------------------------------------------------------

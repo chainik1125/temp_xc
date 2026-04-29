@@ -44,6 +44,9 @@ if str(_REPO) not in sys.path:
 from src.data.nlp.cache_activations import load_model_and_tokenizer  # noqa: E402
 from src.data.nlp.models import resid_hook_target  # noqa: E402
 
+from experiments.phase7_unification.case_studies.backtracking._decode import (  # noqa: E402
+    clean_decode,
+)
 from experiments.phase7_unification.case_studies.backtracking._paths import (  # noqa: E402
     ADDITIVE_MAGNITUDES,
     ANCHOR_LAYER,
@@ -273,7 +276,7 @@ def _gen_one(model, input_ids, tokenizer, eos_id) -> str:
             pad_token_id=eos_id,
         )
     new_ids = out[0, input_ids.shape[1] :].tolist()
-    return tokenizer.decode(new_ids, skip_special_tokens=False)
+    return clean_decode(tokenizer.decode(new_ids, skip_special_tokens=False))
 
 
 if __name__ == "__main__":

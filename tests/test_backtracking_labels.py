@@ -102,3 +102,40 @@ def test_keyword_fraction_metric():
     # Empty text guards
     frac, n_kw, n_tot = keyword_fraction("", {"wait", "hmm"})
     assert frac == 0.0 and n_kw == 0 and n_tot == 0
+
+
+def test_keyword_fraction_handles_bpe_glyphs():
+    """DeepSeek-R1-Distill-Llama tokenizer.decode leaves byte-level glyphs Ġ
+    (space) and Ċ (newline) in the output. The eval metric must transparently
+    normalise these before splitting on whitespace, otherwise the entire
+    generation is one un-splittable word."""
+    from experiments.phase7_unification.case_studies.backtracking.evaluate_backtracking import (
+        keyword_fraction,
+    )
+
+    # Same content as above but in raw BPE form.
+    text = "ĊFirst,ĠWait.ĠBut...ĠHmm,ĠactuallyĠneverĠmind"
+    frac, n_kw, n_tot = keyword_fraction(text, {"wait", "hmm"})
+    # After clean_decode + split: ["First,", "Wait.", "But...", "Hmm,",
+    #                              "actually", "never", "mind"]
+    # Two matches.
+    assert n_tot == 7
+    assert n_kw == 2
+
+
+def test_is_keyword_handles_bpe_leading_space():
+    """When iterating per-token decoded forms, leading-space tokens come back
+    as e.g. 'ĠWait'. The detector must normalise them to 'wait' so they match
+    the keyword set."""
+    from experiments.phase7_unification.case_studies.backtracking.label_backtracking import (
+        _is_keyword,
+    )
+
+    kw = {"wait", "hmm"}
+    assert _is_keyword("ĠWait", kw)
+    assert _is_keyword("ĠWait,", kw)
+    assert _is_keyword("Ġhmm", kw)
+    assert _is_keyword("ĊWait", kw)
+    # And substring rejection still holds:
+    assert not _is_keyword("Ġwaiting", kw)
+    assert not _is_keyword("Ġhumming", kw)

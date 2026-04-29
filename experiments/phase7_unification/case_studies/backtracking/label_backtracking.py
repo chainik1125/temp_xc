@@ -25,7 +25,6 @@ from __future__ import annotations
 import argparse
 import json
 import os
-import string
 import sys
 from collections import Counter
 from pathlib import Path
@@ -38,6 +37,9 @@ if str(_REPO) not in sys.path:
 
 from src.data.nlp.models import get_model_config  # noqa: E402
 
+from experiments.phase7_unification.case_studies.backtracking._decode import (  # noqa: E402
+    norm_token,
+)
 from experiments.phase7_unification.case_studies.backtracking._paths import (  # noqa: E402
     KEYWORDS,
     LABELS_DIR,
@@ -49,19 +51,12 @@ from experiments.phase7_unification.case_studies.backtracking._paths import (  #
 )
 
 
-_STRIP = string.punctuation + string.whitespace
-
-
-def _norm_token(s: str) -> str:
-    return s.strip(_STRIP).lower()
-
-
 def _is_keyword(decoded: str, keywords: set[str]) -> bool:
     """A token counts as a backtracking marker iff, after stripping leading/
-    trailing whitespace and punctuation and lowercasing, its decoded form
-    is exactly one of the keywords. Excludes "waiting" / "Hmm…" wrapped in
-    other text."""
-    return _norm_token(decoded) in keywords
+    trailing whitespace, punctuation, and BPE space-glyphs (Ġ, Ċ) and
+    lowercasing, its decoded form is exactly one of the keywords. Excludes
+    "waiting" / "Hmm…" wrapped in other text."""
+    return norm_token(decoded) in keywords
 
 
 def _think_range(rec: dict) -> tuple[int, int]:
