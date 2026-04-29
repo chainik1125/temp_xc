@@ -1,0 +1,300 @@
+{"id": "logic_000", "category": "logic", "text": "On the island of knights and knaves, knights always tell the truth and knaves always lie. You meet three inhabitants: A says \"I am a knight,\" B says \"A is a knave,\" and C says \"B is a knave.\" Determine the types of A, B, and C."}
+{"id": "logic_001", "category": "logic", "text": "On the island of knights and knaves, A says \"We are both knaves\" (referring to himself and B). B says nothing. What are A and B?"}
+{"id": "logic_002", "category": "logic", "text": "Five people \u2014 Ann, Bob, Cal, Dee, Ena \u2014 sit in a row. Ann is not at either end. Bob sits immediately left of Cal. Dee sits at one of the ends. Ena is not adjacent to Ann. There are exactly two people between Bob and Dee. Who sits at each position?"}
+{"id": "logic_003", "category": "logic", "text": "Three suspects X, Y, Z each make one statement. X says \"Y is guilty.\" Y says \"X is lying.\" Z says \"Y is telling the truth.\" Exactly one person is guilty and only the guilty person lies. Who is guilty?"}
+{"id": "logic_004", "category": "logic", "text": "On the island of knights and knaves, four inhabitants A, B, C, D make statements. A says \"Exactly one of us is a knave.\" B says \"Exactly two of us are knaves.\" C says \"A and B are both knaves.\" D says \"C is a knave.\" How many knaves are there and who are they?"}
+{"id": "logic_005", "category": "logic", "text": "Alice, Bob, Carol, and Dave each own a different pet: a cat, a dog, a fish, and a parrot. Alice does not own the cat or the fish. Bob owns the dog. Carol does not own the parrot. Who owns what?"}
+{"id": "logic_006", "category": "logic", "text": "Six athletes finish a race in distinct places 1 through 6. Ana finishes before Bea. Cara finishes immediately after Bea. Dan finishes last. Ed finishes before Ana. Fay finishes immediately before Ed. List the finishing order."}
+{"id": "logic_007", "category": "logic", "text": "On the island of knights and knaves, A says \"B and I are the same type.\" B says \"That is false.\" What types are A and B?"}
+{"id": "logic_008", "category": "logic", "text": "Four cards each show a letter on one side and a number on the other. The rule is: if a card shows a vowel, then it has an even number on the other side. The visible faces are A, K, 4, 7. Which cards must you flip to test the rule?"}
+{"id": "logic_009", "category": "logic", "text": "In a group of five people, each person either always tells the truth or always lies. Ava says \"Exactly three of us tell the truth.\" Ben says \"Ava is lying.\" Cal says \"Ben is telling the truth.\" Dana says \"Cal is lying.\" Eve says \"Dana is telling the truth.\" How many truth-tellers are there?"}
+{"id": "logic_010", "category": "logic", "text": "Three boxes are labeled \"Apples,\" \"Oranges,\" and \"Mixed.\" All labels are wrong. You draw one fruit from the box labeled \"Mixed\" and it is an apple. What is in each box?"}
+{"id": "logic_011", "category": "logic", "text": "On the island of knights and knaves, A says \"At least one of us is a knave\" and B says \"A is a knight.\" What are A and B?"}
+{"id": "logic_012", "category": "logic", "text": "Seven people must be seated at a round table with seven seats. Pat must sit next to Quinn. Ray must not sit next to Sam. Tam sits directly opposite Uma. Val sits next to Tam. Ray sits next to Val. Given these constraints, does Sam sit next to Quinn? Answer yes or no and justify."}
+{"id": "logic_013", "category": "logic", "text": "Alice, Bob, and Carol each have a different favorite color: red, blue, or green. Alice says \"My favorite is not red.\" Bob says \"My favorite is blue.\" Carol says \"Bob's favorite is not blue.\" Exactly one of them is lying. What is each person's favorite color?"}
+{"id": "logic_014", "category": "logic", "text": "On the island of knights and knaves, A says \"I am a knave or B is a knight.\" B says \"A is a knight.\" What are A and B?"}
+{"id": "logic_015", "category": "logic", "text": "Five houses in a row are painted red, blue, green, yellow, and white in some order. The red house is immediately left of the blue house. The green house is not at either end. The yellow house is immediately right of the green house. The white house is at one end. Determine the order of the houses."}
+{"id": "logic_016", "category": "logic", "text": "A says \"B is a knight.\" B says \"C is a knave.\" C says \"A is a knave.\" On the island of knights and knaves, all three statements are made. How many knights are there and who are they?"}
+{"id": "logic_017", "category": "logic", "text": "Four students \u2014 W, X, Y, Z \u2014 each study a different subject: math, physics, chemistry, biology. W does not study math or physics. X does not study chemistry. Y studies biology. Z does not study biology or math. Who studies what?"}
+{"id": "logic_018", "category": "logic", "text": "On the island of knights and knaves, five inhabitants each say \"The majority of us are knaves.\" How many are knights and how many are knaves?"}
+{"id": "logic_019", "category": "logic", "text": "Two envelopes each contain a number. You are told one number is exactly twice the other. You open one envelope and see 10. Should you switch to maximize expected value, and why does the naive expected-value argument break down? Answer by identifying the logical flaw."}
+{"id": "logic_020", "category": "logic", "text": "Three friends Pia, Quin, and Rex each make two statements about a single hidden number between 1 and 9. Pia says \"The number is greater than 5\" and \"The number is even.\" Quin says \"The number is less than 7\" and \"The number is odd.\" Rex says \"The number is not 6\" and \"The number is greater than 4.\" Each friend has exactly one true and one false statement. What is the number?"}
+{"id": "logic_021", "category": "logic", "text": "On the island of knights and knaves, A says \"Exactly two of us three are knights,\" B says \"Exactly one of us three is a knight,\" and C says \"A is a knave.\" What type is each person?"}
+{"id": "logic_022", "category": "logic", "text": "Six colored balls \u2014 red, orange, yellow, green, blue, violet \u2014 are placed in a line. Red is not adjacent to orange. Yellow is immediately between orange and green. Blue is at one end. Violet is not adjacent to blue. Green is immediately left of blue. Determine the order."}
+{"id": "logic_023", "category": "logic", "text": "Alicia, Bruno, and Carla are each assigned a role: detective, suspect, or witness (all different). Alicia says \"I am not the suspect.\" Bruno says \"Carla is the detective.\" Carla says \"I am not the detective.\" Exactly one of them lies. Who holds which role?"}
+{"id": "logic_024", "category": "logic", "text": "On the island of knights and knaves, A says \"B is a knave,\" B says \"C is a knave,\" and C says \"A and B are both knaves.\" Determine the type of each."}
+{"id": "logic_025", "category": "logic", "text": "Four friends each prefer a different season: spring, summer, autumn, winter. Amy does not prefer summer or winter. Ben prefers autumn. Carl does not prefer spring. Who prefers what?"}
+{"id": "logic_026", "category": "logic", "text": "On the island of knights and knaves, A says \"I am a knight and B is a knave.\" B says \"At least one of us is a knight.\" What are A and B?"}
+{"id": "logic_027", "category": "logic", "text": "Five suspects in a crime each make one statement. Aaron says \"I did not do it.\" Beth says \"Aaron is telling the truth.\" Cass says \"Beth is lying.\" Dale says \"Cass is telling the truth.\" Eve says \"Dale is lying.\" Exactly one person is the criminal and only the criminal lies. Who is the criminal?"}
+{"id": "logic_028", "category": "logic", "text": "On the island of knights and knaves, A says \"B is a knight,\" B says \"A and C are different types,\" and C says \"B is a knave.\" Determine the type of each."}
+{"id": "logic_029", "category": "logic", "text": "Three logicians \u2014 Sol, Tan, Ula \u2014 each know their own hat color (red or blue) but not the others'. Sol sees Tan and Ula's hats. Tan sees only Ula's hat. Ula sees no hats. Sol says \"I cannot determine my hat color.\" Tan says \"I cannot determine my hat color.\" Ula then says \"I know my hat color.\" What color is Ula's hat?"}
+{"id": "geometry_000", "category": "geometry", "text": "A triangle has sides of length 7, 24, and 25. What is the area of the triangle?"}
+{"id": "geometry_001", "category": "geometry", "text": "A circle is inscribed in a square with side length 10. What is the area of the region inside the square but outside the circle?"}
+{"id": "geometry_002", "category": "geometry", "text": "A right circular cone has base radius 6 and height 8. What is the total surface area of the cone, including the base?"}
+{"id": "geometry_003", "category": "geometry", "text": "Two circles of radius 5 and radius 3 have centers that are 10 units apart. What is the length of the common external tangent segment between the two points of tangency?"}
+{"id": "geometry_004", "category": "geometry", "text": "A regular hexagon has a perimeter of 48. What is the area of the hexagon?"}
+{"id": "geometry_005", "category": "geometry", "text": "A cylinder has radius 4 and height 9. A cone with the same base and height is removed from the cylinder. What is the volume of the remaining solid?"}
+{"id": "geometry_006", "category": "geometry", "text": "In a triangle with sides 13, 14, and 15, what is the length of the altitude drawn to the side of length 14?"}
+{"id": "geometry_007", "category": "geometry", "text": "A rectangle has a diagonal of length 13 and one side of length 5. What is the perimeter of the rectangle?"}
+{"id": "geometry_008", "category": "geometry", "text": "A sphere is inscribed in a cube with side length 6. What is the volume of the sphere?"}
+{"id": "geometry_009", "category": "geometry", "text": "Three circles each of radius 2 are mutually externally tangent. What is the area of the region bounded by the three circles (the curvilinear triangle between them)?"}
+{"id": "geometry_010", "category": "geometry", "text": "A trapezoid has parallel sides of length 8 and 14, and both non-parallel sides have length 5. What is the area of the trapezoid?"}
+{"id": "geometry_011", "category": "geometry", "text": "A regular octagon is inscribed in a circle of radius 10. What is the area of the octagon?"}
+{"id": "geometry_012", "category": "geometry", "text": "An equilateral triangle has an altitude of length 9. What is the perimeter of the triangle?"}
+{"id": "geometry_013", "category": "geometry", "text": "A cube has a space diagonal of length 6 times sqrt(3). What is the surface area of the cube?"}
+{"id": "geometry_014", "category": "geometry", "text": "A semicircle is drawn on the hypotenuse of a right triangle with legs 6 and 8. What is the area of the semicircle?"}
+{"id": "geometry_015", "category": "geometry", "text": "A rhombus has diagonals of length 16 and 12. What is the perimeter of the rhombus?"}
+{"id": "geometry_016", "category": "geometry", "text": "A cone has slant height 13 and base radius 5. What is the volume of the cone?"}
+{"id": "geometry_017", "category": "geometry", "text": "A circle of radius 7 has a chord of length 7. What is the measure of the minor arc subtended by this chord, in degrees?"}
+{"id": "geometry_018", "category": "geometry", "text": "Two concentric circles have radii 5 and 13. A chord of the outer circle is tangent to the inner circle. What is the length of the chord?"}
+{"id": "geometry_019", "category": "geometry", "text": "A square is inscribed in a circle of radius 8. What is the area of the square?"}
+{"id": "geometry_020", "category": "geometry", "text": "A triangle has sides 10, 10, and 12. What is the radius of the circumscribed circle?"}
+{"id": "geometry_021", "category": "geometry", "text": "A rectangular box has dimensions 3 by 4 by 12. What is the length of the space diagonal of the box?"}
+{"id": "geometry_022", "category": "geometry", "text": "A sector of a circle has radius 10 and central angle 72 degrees. What is the area of the sector?"}
+{"id": "geometry_023", "category": "geometry", "text": "An isosceles right triangle has a hypotenuse of length 10. What is the area of the triangle?"}
+{"id": "geometry_024", "category": "geometry", "text": "A regular pentagon has a side length of 6. What is the area of the pentagon, to the nearest whole number?"}
+{"id": "geometry_025", "category": "geometry", "text": "A cylinder is inscribed in a sphere of radius 5 such that the diameter of the cylinder equals its height. What is the volume of the cylinder?"}
+{"id": "geometry_026", "category": "geometry", "text": "A circle passes through the three vertices of a right triangle whose legs are 9 and 12. What is the area of the circle?"}
+{"id": "geometry_027", "category": "geometry", "text": "A frustum is formed by cutting a cone of height 12 and base radius 6 with a plane parallel to the base at height 8 from the base. What is the volume of the frustum?"}
+{"id": "geometry_028", "category": "geometry", "text": "A regular tetrahedron has edge length 4. What is the surface area of the tetrahedron?"}
+{"id": "geometry_029", "category": "geometry", "text": "A parallelogram has sides of length 10 and 7, and the included angle between them is 30 degrees. What is the area of the parallelogram?"}
+{"id": "probability_000", "category": "probability", "text": "A bag contains 5 red balls and 3 blue balls. Two balls are drawn without replacement. What is the probability that both balls are red?"}
+{"id": "probability_001", "category": "probability", "text": "A standard six-sided die is rolled twice. What is the probability that the sum of the two rolls equals 9?"}
+{"id": "probability_002", "category": "probability", "text": "A deck of 52 cards is shuffled. What is the probability that the top two cards are both aces?"}
+{"id": "probability_003", "category": "probability", "text": "Three fair coins are flipped. Given that at least two coins show heads, what is the probability that all three show heads?"}
+{"id": "probability_004", "category": "probability", "text": "A jar contains 4 red, 3 green, and 2 yellow marbles. One marble is drawn at random. What is the probability it is not yellow?"}
+{"id": "probability_005", "category": "probability", "text": "In a class of 30 students, 12 play soccer and 10 play basketball, and 5 play both. A student is chosen at random. What is the probability the student plays soccer or basketball but not both?"}
+{"id": "probability_006", "category": "probability", "text": "Two dice are rolled. What is the probability that the product of the two numbers showing is even?"}
+{"id": "probability_007", "category": "probability", "text": "A card is drawn from a standard 52-card deck. What is the probability it is a red face card?"}
+{"id": "probability_008", "category": "probability", "text": "Five fair coins are flipped. What is the probability of getting exactly three heads?"}
+{"id": "probability_009", "category": "probability", "text": "A box has 6 white and 4 black socks. Two socks are drawn without replacement. What is the probability they are the same color?"}
+{"id": "probability_010", "category": "probability", "text": "A number is chosen at random from the integers 1 through 20. What is the probability it is divisible by 3 or 5?"}
+{"id": "probability_011", "category": "probability", "text": "Two cards are drawn without replacement from a standard deck. What is the probability that the first is a king and the second is a queen?"}
+{"id": "probability_012", "category": "probability", "text": "A bag holds 7 red and 5 blue chips. Three chips are drawn without replacement. What is the probability all three are blue?"}
+{"id": "probability_013", "category": "probability", "text": "A fair die is rolled three times. What is the probability that the same number appears on all three rolls?"}
+{"id": "probability_014", "category": "probability", "text": "In a group of 8 people, 3 are selected at random. What is the probability that a specific person named Alice is among those selected?"}
+{"id": "probability_015", "category": "probability", "text": "A roulette wheel has 38 slots numbered 1 through 36 plus 0 and 00. What is the probability of landing on an even number (not 0 or 00)?"}
+{"id": "probability_016", "category": "probability", "text": "Two cards are drawn without replacement from a 52-card deck. What is the probability that both are hearts?"}
+{"id": "probability_017", "category": "probability", "text": "A fair coin is flipped four times. What is the probability of getting at least one tail?"}
+{"id": "probability_018", "category": "probability", "text": "A bag contains 3 red, 4 blue, and 5 green balls. Two are drawn without replacement. What is the probability that one is red and one is blue?"}
+{"id": "probability_019", "category": "probability", "text": "Three people each independently choose a number at random from 1 to 4. What is the probability that all three choose the same number?"}
+{"id": "probability_020", "category": "probability", "text": "In the Monty Hall problem with 3 doors (one hides a car, two hide goats), a contestant picks door 1 and the host opens door 3 to reveal a goat. What is the probability of winning the car if the contestant switches to door 2?"}
+{"id": "probability_021", "category": "probability", "text": "A fair die is rolled until a 6 appears. What is the probability that the first 6 occurs on exactly the third roll?"}
+{"id": "probability_022", "category": "probability", "text": "From a group of 5 men and 4 women, a committee of 3 is chosen at random. What is the probability it contains exactly 2 women?"}
+{"id": "probability_023", "category": "probability", "text": "A card is drawn from a standard deck. Given that it is a face card (jack, queen, or king), what is the probability it is also a spade?"}
+{"id": "probability_024", "category": "probability", "text": "Two integers are chosen independently and at random from the set {1, 2, 3, 4, 5, 6}. What is the probability that their sum is prime?"}
+{"id": "probability_025", "category": "probability", "text": "A bag has 10 balls numbered 1 through 10. Three are drawn without replacement. What is the probability that the largest number drawn is exactly 7?"}
+{"id": "probability_026", "category": "probability", "text": "A fair coin is flipped 6 times. What is the probability of getting exactly 2 heads?"}
+{"id": "probability_027", "category": "probability", "text": "From a standard deck, 5 cards are dealt. What is the probability that all 5 cards are from the same suit?"}
+{"id": "probability_028", "category": "probability", "text": "Two dice are rolled. Given that the sum is at least 10, what is the probability the sum is exactly 12?"}
+{"id": "probability_029", "category": "probability", "text": "A box contains 4 defective and 16 good items. Three items are selected at random without replacement. What is the probability that exactly one is defective?"}
+{"id": "number_theory_000", "category": "number_theory", "text": "What is the remainder when 7^100 is divided by 50?"}
+{"id": "number_theory_001", "category": "number_theory", "text": "Find the largest integer n such that n^2 divides 10! (10 factorial)."}
+{"id": "number_theory_002", "category": "number_theory", "text": "How many positive integers less than 200 are divisible by 6 but not by 9?"}
+{"id": "number_theory_003", "category": "number_theory", "text": "Prove that for any integer n, the expression n^3 - n is always divisible by 6. What is the largest such guaranteed divisor?"}
+{"id": "number_theory_004", "category": "number_theory", "text": "What is the units digit of 3^2023?"}
+{"id": "number_theory_005", "category": "number_theory", "text": "Find the smallest positive integer that leaves a remainder of 3 when divided by 7 and a remainder of 5 when divided by 11."}
+{"id": "number_theory_006", "category": "number_theory", "text": "How many integers from 1 to 1000 are neither divisible by 4 nor by 6?"}
+{"id": "number_theory_007", "category": "number_theory", "text": "What is the remainder when 2^50 is divided by 7?"}
+{"id": "number_theory_008", "category": "number_theory", "text": "Find all prime numbers p such that p^2 + 2 is also prime."}
+{"id": "number_theory_009", "category": "number_theory", "text": "If the sum of two positive integers is 72 and their greatest common divisor is 12, how many such ordered pairs exist?"}
+{"id": "number_theory_010", "category": "number_theory", "text": "What is the smallest positive integer n such that 12n is a perfect square?"}
+{"id": "number_theory_011", "category": "number_theory", "text": "How many trailing zeros does 50! (50 factorial) have?"}
+{"id": "number_theory_012", "category": "number_theory", "text": "Find the remainder when 1! + 2! + 3! + ... + 100! is divided by 12."}
+{"id": "number_theory_013", "category": "number_theory", "text": "What is the greatest common divisor of 2^120 - 1 and 2^80 - 1?"}
+{"id": "number_theory_014", "category": "number_theory", "text": "Determine whether 1000003 is divisible by 3."}
+{"id": "number_theory_015", "category": "number_theory", "text": "Find the number of positive divisors of 360."}
+{"id": "number_theory_016", "category": "number_theory", "text": "What is the smallest prime factor of 10^10 + 1?"}
+{"id": "number_theory_017", "category": "number_theory", "text": "Find the last two digits of 9^999 (i.e., 9^999 mod 100)."}
+{"id": "number_theory_018", "category": "number_theory", "text": "How many pairs of consecutive integers between 1 and 100 have a sum divisible by 7?"}
+{"id": "number_theory_019", "category": "number_theory", "text": "What is the remainder when 13^73 is divided by 11?"}
+{"id": "number_theory_020", "category": "number_theory", "text": "Find the smallest positive integer n such that n is divisible by every integer from 1 to 10."}
+{"id": "number_theory_021", "category": "number_theory", "text": "How many integers from 1 to 500 have an odd number of positive divisors?"}
+{"id": "number_theory_022", "category": "number_theory", "text": "What is the sum of all positive integers less than 100 that are coprime to 100?"}
+{"id": "number_theory_023", "category": "number_theory", "text": "Determine the number of solutions to x^2 \u2261 1 (mod 24) where 0 \u2264 x < 24."}
+{"id": "number_theory_024", "category": "number_theory", "text": "Find the largest prime factor of 2^8 - 1."}
+{"id": "number_theory_025", "category": "number_theory", "text": "If p and p^2 + 8 are both prime, what is the value of p?"}
+{"id": "number_theory_026", "category": "number_theory", "text": "What is the remainder when 111...1 (100 ones) is divided by 9?"}
+{"id": "number_theory_027", "category": "number_theory", "text": "How many positive integers n satisfy: n divides 48 and n + 1 divides 48?"}
+{"id": "number_theory_028", "category": "number_theory", "text": "Find the number of integers from 1 to 300 that are divisible by exactly one of 5 or 7."}
+{"id": "number_theory_029", "category": "number_theory", "text": "What is the largest power of 3 that divides 30! (30 factorial)?"}
+{"id": "combinatorics_000", "category": "combinatorics", "text": "How many ways can 8 people be seated in a row if 2 specific people must not sit adjacent to each other?"}
+{"id": "combinatorics_001", "category": "combinatorics", "text": "How many 5-card hands from a standard 52-card deck contain exactly 3 hearts?"}
+{"id": "combinatorics_002", "category": "combinatorics", "text": "In how many ways can the letters of the word MISSISSIPPI be arranged?"}
+{"id": "combinatorics_003", "category": "combinatorics", "text": "How many integers from 1 to 1000 are divisible by 3 or 7?"}
+{"id": "combinatorics_004", "category": "combinatorics", "text": "How many ways can a committee of 4 be chosen from 10 people if 2 specific people refuse to serve together?"}
+{"id": "combinatorics_005", "category": "combinatorics", "text": "How many 4-digit numbers (from 1000 to 9999) have digits that sum to exactly 10 with each digit between 0 and 9?"}
+{"id": "combinatorics_006", "category": "combinatorics", "text": "How many ways can 6 distinct books be arranged on a shelf if a specific book must always be at either end?"}
+{"id": "combinatorics_007", "category": "combinatorics", "text": "A group of 12 students must be divided into three groups of 4 for a project. In how many ways can this be done?"}
+{"id": "combinatorics_008", "category": "combinatorics", "text": "How many strings of 6 binary digits (0s and 1s) contain at most two 1s?"}
+{"id": "combinatorics_009", "category": "combinatorics", "text": "How many ways can 5 boys and 5 girls stand in a line so that no two boys stand next to each other?"}
+{"id": "combinatorics_010", "category": "combinatorics", "text": "How many ways can 7 distinct colored balls be placed into 3 distinct boxes if no box may be empty?"}
+{"id": "combinatorics_011", "category": "combinatorics", "text": "How many 3-element subsets of the set {1, 2, 3, 4, 5, 6, 7, 8} have all three elements summing to an odd number?"}
+{"id": "combinatorics_012", "category": "combinatorics", "text": "In how many ways can 9 people be seated at a circular table if 3 specific people must all sit together?"}
+{"id": "combinatorics_013", "category": "combinatorics", "text": "How many ways can you choose 2 males and 3 females from a group of 6 males and 7 females?"}
+{"id": "combinatorics_014", "category": "combinatorics", "text": "How many positive integers less than 1000 have no repeated digits?"}
+{"id": "combinatorics_015", "category": "combinatorics", "text": "How many permutations of the digits 1, 2, 3, 4, 5, 6 have the digit 1 appearing before the digit 2?"}
+{"id": "combinatorics_016", "category": "combinatorics", "text": "How many ways can 4 identical red balls and 3 identical blue balls be arranged in a row?"}
+{"id": "combinatorics_017", "category": "combinatorics", "text": "How many 5-letter arrangements can be formed from the letters A, B, C, D, E, F, G if no letter is repeated and the arrangement must start and end with a vowel?"}
+{"id": "combinatorics_018", "category": "combinatorics", "text": "A box contains 6 red, 5 blue, and 4 green marbles. In how many ways can you select 4 marbles if you must include at least one of each color?"}
+{"id": "combinatorics_019", "category": "combinatorics", "text": "How many ways can 10 people be split into 2 unlabeled groups of 5?"}
+{"id": "combinatorics_020", "category": "combinatorics", "text": "How many ways can you distribute 7 identical candies among 4 distinct children so that each child gets at least one candy?"}
+{"id": "combinatorics_021", "category": "combinatorics", "text": "How many 4-digit even numbers can be formed using the digits 1, 2, 3, 4, 5, 6 without repetition?"}
+{"id": "combinatorics_022", "category": "combinatorics", "text": "How many paths are there from the top-left corner to the bottom-right corner of a 5 by 4 grid, moving only right or down one step at a time?"}
+{"id": "combinatorics_023", "category": "combinatorics", "text": "In how many ways can the 26 letters of the alphabet be arranged so that the 5 vowels A, E, I, O, U all appear consecutively?"}
+{"id": "combinatorics_024", "category": "combinatorics", "text": "How many ways can 8 people be divided into two teams of 4 if two specific people must be on the same team?"}
+{"id": "combinatorics_025", "category": "combinatorics", "text": "How many 6-character passwords can be formed using exactly 4 distinct letters from A-Z followed by exactly 2 distinct digits from 0-9, where order matters?"}
+{"id": "combinatorics_026", "category": "combinatorics", "text": "How many subsets of the set {1, 2, 3, 4, 5, 6, 7, 8, 9, 10} contain exactly 4 elements where the smallest element is 3?"}
+{"id": "combinatorics_027", "category": "combinatorics", "text": "How many ways can first, second, and third place be awarded among 15 competitors if ties are not allowed?"}
+{"id": "combinatorics_028", "category": "combinatorics", "text": "How many 4-element subsets of {1, 2, 3, ..., 12} contain no two consecutive integers?"}
+{"id": "combinatorics_029", "category": "combinatorics", "text": "Using 4 flags of different colors, how many distinct signals can be formed by arranging all 4 flags in a vertical column if the top and bottom flags must be different colors from each other, given that any arrangement counts as a signal?"}
+{"id": "algebra_000", "category": "algebra", "text": "A train travels from city A to city B at 60 mph and returns at 90 mph. If the total trip takes 5 hours, what is the distance between city A and city B?"}
+{"id": "algebra_001", "category": "algebra", "text": "A pipe can fill a tank in 4 hours and another pipe can fill the same tank in 6 hours. A drain can empty the tank in 12 hours. If all three are open simultaneously, how many hours does it take to fill the tank?"}
+{"id": "algebra_002", "category": "algebra", "text": "Two workers together can complete a job in 6 days. Worker A alone takes 10 days longer than Worker B alone. How many days does it take Worker B to complete the job alone?"}
+{"id": "algebra_003", "category": "algebra", "text": "A chemist has a 30% acid solution and a 70% acid solution. How many liters of each must be mixed to produce 200 liters of a 45% acid solution?"}
+{"id": "algebra_004", "category": "algebra", "text": "Sarah is three times as old as her daughter. In 12 years, Sarah will be twice as old as her daughter. How old is Sarah now?"}
+{"id": "algebra_005", "category": "algebra", "text": "A boat travels 24 miles upstream in 3 hours and returns downstream in 2 hours. What is the speed of the current in mph?"}
+{"id": "algebra_006", "category": "algebra", "text": "A 50-liter tank is filled with a mixture that is 20% alcohol. How many liters of pure alcohol must be added to make the mixture 40% alcohol?"}
+{"id": "algebra_007", "category": "algebra", "text": "Two cars start from the same point and travel in opposite directions. Car A travels at 55 mph and Car B at 45 mph. After how many hours will they be 350 miles apart?"}
+{"id": "algebra_008", "category": "algebra", "text": "A store mixes coffee worth $8 per pound with coffee worth $12 per pound to make 40 pounds of a blend worth $9.50 per pound. How many pounds of the $8 coffee are used?"}
+{"id": "algebra_009", "category": "algebra", "text": "A man can row at 5 mph in still water. He rows 14 miles downstream and 14 miles back in a total of 6 hours. What is the speed of the river current?"}
+{"id": "algebra_010", "category": "algebra", "text": "Pipe A fills a pool in 8 hours, Pipe B fills it in 12 hours. After they work together for 3 hours, Pipe A is turned off. How many more hours does Pipe B need to finish filling the pool?"}
+{"id": "algebra_011", "category": "algebra", "text": "The sum of two numbers is 84 and one number is three more than twice the other. What is the larger of the two numbers?"}
+{"id": "algebra_012", "category": "algebra", "text": "A plane flies 1800 miles with the wind in 3 hours and against the wind in 4 hours. What is the speed of the wind in mph?"}
+{"id": "algebra_013", "category": "algebra", "text": "A tank has an inlet pipe that fills it in 5 hours and an outlet pipe that drains it in 8 hours. If the tank is half full and both pipes are open, how many hours will it take to fill the tank completely?"}
+{"id": "algebra_014", "category": "algebra", "text": "Maria is 4 years older than twice her brother's age. In 6 years, she will be 10 years older than her brother. How old is Maria now?"}
+{"id": "algebra_015", "category": "algebra", "text": "A car and a truck start from opposite ends of a 300-mile highway and drive toward each other. The car travels at 65 mph and the truck at 55 mph. How many miles from the car's starting point do they meet?"}
+{"id": "algebra_016", "category": "algebra", "text": "A solution of salt water is 15% salt. How many pounds of pure salt must be added to 60 pounds of this solution to make it 25% salt?"}
+{"id": "algebra_017", "category": "algebra", "text": "Worker A completes 1/3 of a task in 4 hours. Worker B completes 1/4 of the same task in 3 hours. Working together from the start, how many hours will it take them to complete the entire task?"}
+{"id": "algebra_018", "category": "algebra", "text": "A mixture of nuts contains cashews worth $9 per pound and almonds worth $6 per pound. If 30 pounds of the mixture is worth $7.50 per pound, how many pounds of cashews are in the mixture?"}
+{"id": "algebra_019", "category": "algebra", "text": "A father is currently 30 years older than his son. Five years ago, the father was four times as old as his son. How old is the father now?"}
+{"id": "algebra_020", "category": "algebra", "text": "Two trains leave different stations 400 miles apart and travel toward each other. Train 1 leaves 1 hour before Train 2. Train 1 travels at 70 mph and Train 2 at 80 mph. How far has Train 2 traveled when they meet?"}
+{"id": "algebra_021", "category": "algebra", "text": "A tank is 1/3 full. An inlet pipe can fill the empty tank in 9 hours and a drain can empty a full tank in 6 hours. With both pipes open, how many hours until the tank is empty?"}
+{"id": "algebra_022", "category": "algebra", "text": "A cyclist travels from town X to town Y, a distance of 60 miles. For the first 20 miles the speed is 15 mph, and for the rest the speed is 20 mph. What is the average speed for the entire trip?"}
+{"id": "algebra_023", "category": "algebra", "text": "A retailer mixes a 20% saline solution with a 5% saline solution to get 60 liters of a 12% saline solution. How many liters of the 20% solution are used?"}
+{"id": "algebra_024", "category": "algebra", "text": "Tom is 5 years older than Jerry. Four years ago, Tom was twice as old as Jerry was then. How old is Jerry now?"}
+{"id": "algebra_025", "category": "algebra", "text": "Three pipes A, B, and C can fill a cistern in 6, 8, and 12 hours respectively. All three are opened at once, but after 2 hours pipe C is closed. How many more hours does it take to fill the cistern?"}
+{"id": "algebra_026", "category": "algebra", "text": "A motorist drives to a destination at 50 mph and returns along the same route at 30 mph. If the return trip takes 40 minutes longer than the outward trip, how many miles is the destination from the starting point?"}
+{"id": "algebra_027", "category": "algebra", "text": "A mixture contains copper and zinc in the ratio 3 to 2. If 10 kg of copper is added, the ratio becomes 2 to 1. How many kg of zinc are in the original mixture?"}
+{"id": "algebra_028", "category": "algebra", "text": "Two pumps working together drain a pool in 3 hours and 20 minutes. The larger pump alone takes 5 hours to drain the pool. How many hours does the smaller pump take to drain the pool alone?"}
+{"id": "algebra_029", "category": "algebra", "text": "A train crosses a 240-meter-long bridge in 30 seconds and passes a stationary pole in 10 seconds. What is the length of the train in meters?"}
+{"id": "sequences_000", "category": "sequences", "text": "The sequence a(1) = 3, a(n) = 2*a(n-1) + 1 for n >= 2. What is a(6)?"}
+{"id": "sequences_001", "category": "sequences", "text": "The sequence is defined by a(1) = 1, a(2) = 1, a(n) = a(n-1) + 2*a(n-2) for n >= 3. What is a(7)?"}
+{"id": "sequences_002", "category": "sequences", "text": "Find the sum of the first 20 terms of the arithmetic sequence whose first term is 7 and whose common difference is 4."}
+{"id": "sequences_003", "category": "sequences", "text": "The sequence a(n) = n^2 - 3n + 2 for positive integers n. For how many values of n with 1 <= n <= 100 is a(n) divisible by 5?"}
+{"id": "sequences_004", "category": "sequences", "text": "Find the 10th term of the geometric sequence 2, 6, 18, 54, ..."}
+{"id": "sequences_005", "category": "sequences", "text": "A sequence is defined by a(1) = 5 and a(n) = a(n-1) + 3n for n >= 2. What is a(5)?"}
+{"id": "sequences_006", "category": "sequences", "text": "The sequence a(n) is defined as the sum of digits of n for each positive integer n. What is the sum a(1) + a(2) + ... + a(20)?"}
+{"id": "sequences_007", "category": "sequences", "text": "Find the closed form for the sum 1 + 3 + 5 + ... + (2n - 1), and use it to compute the sum of the first 15 odd positive integers."}
+{"id": "sequences_008", "category": "sequences", "text": "The sequence a(1) = 2, a(2) = 5, a(n) = a(n-1)*a(n-2) for n >= 3. What is a(5)?"}
+{"id": "sequences_009", "category": "sequences", "text": "Find the sum of all terms in the geometric series 4 + 2 + 1 + 1/2 + ... (infinitely many terms)."}
+{"id": "sequences_010", "category": "sequences", "text": "The sequence a(n) = 3^n - 2^n for positive integers n. What is a(1) + a(2) + a(3) + a(4)?"}
+{"id": "sequences_011", "category": "sequences", "text": "Define a(n) as the number of 1s in the binary representation of n. What is a(1) + a(2) + ... + a(15)?"}
+{"id": "sequences_012", "category": "sequences", "text": "A sequence starts at 100 and each subsequent term is obtained by subtracting 7. What is the first negative term in the sequence?"}
+{"id": "sequences_013", "category": "sequences", "text": "The sequence a(1) = 1, a(n) = a(n-1) + n^2 for n >= 2. What is a(6)?"}
+{"id": "sequences_014", "category": "sequences", "text": "Find the sum of the geometric series 3 + 3/4 + 3/16 + 3/64 + ... (infinitely many terms)."}
+{"id": "sequences_015", "category": "sequences", "text": "The Fibonacci-like sequence has a(1) = 4, a(2) = 7, and a(n) = a(n-1) + a(n-2). What is a(8)?"}
+{"id": "sequences_016", "category": "sequences", "text": "Find the value of the sum: 1/(1*2) + 1/(2*3) + 1/(3*4) + ... + 1/(9*10)."}
+{"id": "sequences_017", "category": "sequences", "text": "The sequence a(n) = floor(n^2 / 4) for n = 1, 2, 3, .... What is a(1) + a(2) + a(3) + a(4) + a(5)?"}
+{"id": "sequences_018", "category": "sequences", "text": "A sequence has a(1) = 64 and each term is half the previous term. What is the sum of the first 7 terms?"}
+{"id": "sequences_019", "category": "sequences", "text": "The recurrence a(n) = 3*a(n-1) - 2 with a(1) = 4 defines a sequence. What is the closed form for a(n), and what is a(8)?"}
+{"id": "sequences_020", "category": "sequences", "text": "Find the sum 1^3 + 2^3 + 3^3 + ... + 10^3."}
+{"id": "sequences_021", "category": "sequences", "text": "The sequence a(n) = (n^2 + n)/2 gives the nth triangular number. What is the sum of the first 8 triangular numbers?"}
+{"id": "sequences_022", "category": "sequences", "text": "A sequence is defined by a(1) = 1, a(2) = 2, a(n) = 2*a(n-1) - a(n-2) + 2 for n >= 3. What is a(6)?"}
+{"id": "sequences_023", "category": "sequences", "text": "The sequence of partial sums S(n) = 1 + 4 + 9 + ... + n^2. Express S(n) in closed form and compute S(12)."}
+{"id": "sequences_024", "category": "sequences", "text": "Find the number of terms in the arithmetic sequence 5, 11, 17, ..., 191."}
+{"id": "sequences_025", "category": "sequences", "text": "The sequence a(n) = 2^n + (-1)^n. What is the sum a(1) + a(2) + a(3) + a(4) + a(5)?"}
+{"id": "sequences_026", "category": "sequences", "text": "A sequence has a(1) = 2, a(2) = 6, and a(n) = (a(n-1))^2 / a(n-2) for n >= 3. What is a(6)?"}
+{"id": "sequences_027", "category": "sequences", "text": "Find the sum of all integers from 1 to 200 that are divisible by 3 but not by 6."}
+{"id": "sequences_028", "category": "sequences", "text": "The sequence is defined by a(n) = n*(n+1)*(n+2)/6 for positive integers n. What is a(4) + a(5)?"}
+{"id": "sequences_029", "category": "sequences", "text": "A sequence a(n) satisfies a(1) = 3, a(2) = 9, and a(n) = a(n-1) + a(n-2) - 1 for n >= 3. What is a(6)?"}
+{"id": "optimisation_000", "category": "optimisation", "text": "Find the maximum value of x*y subject to x + y = 10 and x, y >= 0."}
+{"id": "optimisation_001", "category": "optimisation", "text": "Find the minimum value of x^2 + y^2 subject to x + y = 6."}
+{"id": "optimisation_002", "category": "optimisation", "text": "A farmer has 120 meters of fencing to enclose a rectangular field with one side along a river (needing no fence). What dimensions maximize the enclosed area, and what is that maximum area?"}
+{"id": "optimisation_003", "category": "optimisation", "text": "Find the maximum value of x*y*z subject to x + y + z = 12 and x, y, z > 0."}
+{"id": "optimisation_004", "category": "optimisation", "text": "Find the minimum value of (x + 1/x) for x > 0."}
+{"id": "optimisation_005", "category": "optimisation", "text": "A company sells a product at price p dollars and the demand is q = 200 - 4p units. Find the price p that maximizes total revenue."}
+{"id": "optimisation_006", "category": "optimisation", "text": "Find the maximum value of 3x + 4y subject to x^2 + y^2 = 25."}
+{"id": "optimisation_007", "category": "optimisation", "text": "Given positive reals a and b with a + b = 1, find the minimum value of (1/a) + (1/b)."}
+{"id": "optimisation_008", "category": "optimisation", "text": "Find the maximum area of a rectangle inscribed in a circle of radius 5."}
+{"id": "optimisation_009", "category": "optimisation", "text": "A box with a square base and no top must have a volume of 32 cubic meters. Find the dimensions that minimize the total surface area used."}
+{"id": "optimisation_010", "category": "optimisation", "text": "Find the maximum value of x*(10 - x)^2 for x in [0, 10]."}
+{"id": "optimisation_011", "category": "optimisation", "text": "Distribute 100 into two positive parts such that the product of one part and the square of the other is maximized. What is the maximum product?"}
+{"id": "optimisation_012", "category": "optimisation", "text": "Find the minimum value of x^2 + 4*y^2 + 9 subject to x + 2y = 6."}
+{"id": "optimisation_013", "category": "optimisation", "text": "A rectangle has perimeter 40. Find the dimensions that maximize the product of the length and three times the width."}
+{"id": "optimisation_014", "category": "optimisation", "text": "Find the maximum value of sin(A)*cos(A) for real A."}
+{"id": "optimisation_015", "category": "optimisation", "text": "Two non-negative numbers sum to 8. Maximize the sum of their cubes."}
+{"id": "optimisation_016", "category": "optimisation", "text": "Find the minimum value of (a^2 + b^2) given that a + 2b = 10 and a, b are real."}
+{"id": "optimisation_017", "category": "optimisation", "text": "A wire of length 60 cm is cut into two pieces; one piece is bent into a square and the other into an equilateral triangle. Find the length of each piece that minimizes the total enclosed area."}
+{"id": "optimisation_018", "category": "optimisation", "text": "Find the maximum product of two positive integers whose sum is 21."}
+{"id": "optimisation_019", "category": "optimisation", "text": "Find the minimum value of x^2 - 6x + y^2 - 8y + 5 over all real x, y."}
+{"id": "optimisation_020", "category": "optimisation", "text": "A cylindrical can (with top and bottom) must hold a volume of 16*pi cubic centimeters. Find the radius that minimizes the total surface area."}
+{"id": "optimisation_021", "category": "optimisation", "text": "Find the maximum value of (x - 1)*(3 - x) for real x."}
+{"id": "optimisation_022", "category": "optimisation", "text": "Maximize 5x + 3y subject to x + y <= 8, x <= 5, y <= 6, x >= 0, y >= 0."}
+{"id": "optimisation_023", "category": "optimisation", "text": "Find two positive numbers whose product is 64 and whose sum is minimized."}
+{"id": "optimisation_024", "category": "optimisation", "text": "A store marks up items by 40% and then offers a discount of d percent. For what value of d does the final price equal the original price?"}
+{"id": "optimisation_025", "category": "optimisation", "text": "Find the maximum value of x^(1/3) * y^(2/3) subject to x + 2y = 9 and x, y > 0."}
+{"id": "optimisation_026", "category": "optimisation", "text": "A runner must travel 6 km. She can run at 12 km/h or walk at 4 km/h, but her total time must not exceed 1 hour. To maximize running distance, how many km should she run?"}
+{"id": "optimisation_027", "category": "optimisation", "text": "Find the integer n >= 1 that maximizes n^(1/n), i.e., the real-valued function f(n) = n^(1/n)."}
+{"id": "optimisation_028", "category": "optimisation", "text": "Find the minimum value of (x + y) given that x*y = 36 and x, y > 0."}
+{"id": "optimisation_029", "category": "optimisation", "text": "Maximize x + y subject to 2x + y <= 14, x + 2y <= 14, x >= 0, y >= 0."}
+{"id": "set_theory_000", "category": "set_theory", "text": "In a class of 50 students, 30 play soccer, 25 play basketball, and 10 play neither sport. How many students play both soccer and basketball?"}
+{"id": "set_theory_001", "category": "set_theory", "text": "A survey of 100 people found that 60 like coffee, 45 like tea, and 20 like neither. How many people like both coffee and tea?"}
+{"id": "set_theory_002", "category": "set_theory", "text": "Sets A and B satisfy |A| = 40, |B| = 35, |A union B| = 60. What is |A intersection B|?"}
+{"id": "set_theory_003", "category": "set_theory", "text": "Of 80 people surveyed, 50 own a cat, 40 own a dog, and 15 own both. How many own neither a cat nor a dog?"}
+{"id": "set_theory_004", "category": "set_theory", "text": "In a group of 200 students, 120 study French, 90 study Spanish, and 50 study both. How many study neither French nor Spanish?"}
+{"id": "set_theory_005", "category": "set_theory", "text": "Sets A, B, and C satisfy |A| = 20, |B| = 18, |C| = 15, |A intersection B| = 8, |A intersection C| = 5, |B intersection C| = 6, |A intersection B intersection C| = 3. Find |A union B union C|."}
+{"id": "set_theory_006", "category": "set_theory", "text": "A universal set has 70 elements. Set A has 30 elements, set B has 25 elements, and 10 elements are in neither A nor B. How many elements are in both A and B?"}
+{"id": "set_theory_007", "category": "set_theory", "text": "Out of 150 workers, 90 know Python, 70 know Java, 40 know both. How many know neither Python nor Java?"}
+{"id": "set_theory_008", "category": "set_theory", "text": "If |A| = 55, |B| = 45, |A union B| = 80, what is |A intersection B|?"}
+{"id": "set_theory_009", "category": "set_theory", "text": "In a school of 300 students, 180 take math, 150 take science, 90 take both math and science, and the rest take neither. How many students take neither math nor science?"}
+{"id": "set_theory_010", "category": "set_theory", "text": "Three sets A, B, C have |A| = 30, |B| = 28, |C| = 25, |A intersection B| = 10, |A intersection C| = 8, |B intersection C| = 9, |A intersection B intersection C| = 4. Find |A union B union C|."}
+{"id": "set_theory_011", "category": "set_theory", "text": "A poll of 500 voters shows 280 support Measure X, 210 support Measure Y, and 80 support both. How many support neither measure?"}
+{"id": "set_theory_012", "category": "set_theory", "text": "Set A is a subset of set B. If |B| = 50 and |B minus A| = 18, what is |A|?"}
+{"id": "set_theory_013", "category": "set_theory", "text": "In a group of 120 people, 75 speak English, 60 speak Mandarin, 30 speak both, and the rest speak neither. How many speak neither language?"}
+{"id": "set_theory_014", "category": "set_theory", "text": "A class has 45 students. 28 passed the first exam, 32 passed the second exam, and 5 failed both exams. How many students passed both exams?"}
+{"id": "set_theory_015", "category": "set_theory", "text": "Using inclusion-exclusion with three sets: |A| = 40, |B| = 35, |C| = 30, |A intersection B| = 15, |A intersection C| = 12, |B intersection C| = 10, |A intersection B intersection C| = 5, and the universal set has 80 elements. How many elements are in none of the three sets?"}
+{"id": "set_theory_016", "category": "set_theory", "text": "In a city of 1000 residents, 600 read newspaper A, 400 read newspaper B, 250 read both. How many read at least one newspaper?"}
+{"id": "set_theory_017", "category": "set_theory", "text": "A set has 64 subsets. How many elements does the set contain?"}
+{"id": "set_theory_018", "category": "set_theory", "text": "How many elements are in the power set of a set with 7 elements?"}
+{"id": "set_theory_019", "category": "set_theory", "text": "Set A has 5 elements and set B has 8 elements, with A a subset of B. How many elements are in B minus A?"}
+{"id": "set_theory_020", "category": "set_theory", "text": "In a survey of 90 people, 55 like action movies, 48 like comedies, and 15 like neither. How many like both action movies and comedies?"}
+{"id": "set_theory_021", "category": "set_theory", "text": "Two sets A and B satisfy |A union B| = 75, |A intersection B| = 15, and |A| = 45. What is |B|?"}
+{"id": "set_theory_022", "category": "set_theory", "text": "In a group of 60 people, every person reads at least one of two magazines X or Y. If 42 read X and 35 read Y, how many read both X and Y?"}
+{"id": "set_theory_023", "category": "set_theory", "text": "Among 250 athletes, 140 play tennis, 130 play golf, 60 play squash, 50 play both tennis and golf, 30 play both tennis and squash, 40 play both golf and squash, and 20 play all three. How many play none of the three sports?"}
+{"id": "set_theory_024", "category": "set_theory", "text": "A universal set U has 100 elements. Set A has 45 elements, set B has 38 elements, and A intersection B has 13 elements. How many elements are in neither A nor B?"}
+{"id": "set_theory_025", "category": "set_theory", "text": "How many proper subsets does a set with 6 elements have?"}
+{"id": "set_theory_026", "category": "set_theory", "text": "Sets P and Q have |P| = 33, |Q| = 27, and |P union Q| = 50. What is |P intersection Q|?"}
+{"id": "set_theory_027", "category": "set_theory", "text": "In a class of 40 students, 22 study history, 18 study geography, and 7 study both. How many study neither history nor geography?"}
+{"id": "set_theory_028", "category": "set_theory", "text": "Of 180 people surveyed, 100 own a smartphone, 80 own a tablet, 50 own both. How many own a smartphone or a tablet but not both?"}
+{"id": "set_theory_029", "category": "set_theory", "text": "A set A has 12 elements and set B has 9 elements. If |A union B| = 17, how many elements are in A intersection B?"}
+{"id": "invariant_000", "category": "invariant", "text": "A 5x6 chessboard is missing its two opposite corner squares. Can the remaining 28 squares be tiled by 1x2 dominoes? Answer yes or no and explain why."}
+{"id": "invariant_001", "category": "invariant", "text": "A jar contains 10 red and 15 blue marbles. Each move, you remove two marbles of different colors and put back one red marble. What color is the last marble remaining?"}
+{"id": "invariant_002", "category": "invariant", "text": "Starting with the number 1, you may either double the current number or add 11. Can you reach exactly 200? Answer yes or no."}
+{"id": "invariant_003", "category": "invariant", "text": "A 3x3 grid has 9 cells each containing the number 1. You may pick any 2x2 subgrid and multiply every number in it by -1. Can you make all 9 cells contain -1? Answer yes or no."}
+{"id": "invariant_004", "category": "invariant", "text": "A sequence starts with 1, 2, 3, ..., 2023. In each step you replace any two numbers a and b with the single number a*b - a - b + 2. What is the final number when only one number remains?"}
+{"id": "invariant_005", "category": "invariant", "text": "You have 2024 coins all showing heads. Each move flips exactly 7 coins. Can you reach a state where all coins show tails? Answer yes or no."}
+{"id": "invariant_006", "category": "invariant", "text": "A 4x4 chessboard is tiled by 1x2 dominoes. Each domino is colored either red or blue. Prove or disprove that the number of dominoes whose long side is horizontal must be even."}
+{"id": "invariant_007", "category": "invariant", "text": "On a number line, a frog starts at 0. Each jump moves it exactly 3 units left or right. Can it ever land on 1? Answer yes or no."}
+{"id": "invariant_008", "category": "invariant", "text": "A bag has 5 white and 6 black balls. Each operation removes two balls; if they match, replace with one white ball; if they differ, replace with one black ball. What color is the last ball?"}
+{"id": "invariant_009", "category": "invariant", "text": "There are 100 switches in a row, all off. Each move flips three consecutive switches. Can you turn exactly one switch on and leave all others off? Answer yes or no."}
+{"id": "invariant_010", "category": "invariant", "text": "A positive integer n is written on a board. You may replace n with either n - 7 or 2n. Starting from 100, can you reach 50? Answer yes or no."}
+{"id": "invariant_011", "category": "invariant", "text": "An 8x8 chessboard has its top-left and bottom-right corner squares removed. Can the remaining 62 squares be covered by 31 dominoes of size 1x2? Answer yes or no."}
+{"id": "invariant_012", "category": "invariant", "text": "You write the integers 1 through 30 on a blackboard. At each step you erase two numbers and write their absolute difference. Is the final remaining number odd or even?"}
+{"id": "invariant_013", "category": "invariant", "text": "In a room, 15 people each shake hands with an odd number of others in the room. Is the total number of handshakes odd or even?"}
+{"id": "invariant_014", "category": "invariant", "text": "Starting from (0, 0), each move adds one of (1,2), (2,1), (1,-2), or (-2,1) to the current position. Can you reach (0, 1)? Answer yes or no."}
+{"id": "invariant_015", "category": "invariant", "text": "A 7x7 board has three corner squares removed leaving 46 squares. Can these 46 squares be tiled by 1x2 dominoes? Answer yes or no."}
+{"id": "invariant_016", "category": "invariant", "text": "You have 99 odd numbers written on a board. You repeatedly replace any two numbers a and b with a + b - 1. What is the parity of the final number?"}
+{"id": "invariant_017", "category": "invariant", "text": "A sequence of H's and T's starts as HHHH. You may reverse any contiguous block of at least 2 characters. Can you reach TTTT? Answer yes or no."}
+{"id": "invariant_018", "category": "invariant", "text": "There are 20 coins in a circle, alternating heads and tails. Each move flips two adjacent coins simultaneously. Can you make all coins show heads? Answer yes or no."}
+{"id": "invariant_019", "category": "invariant", "text": "The number 7 is written on a board. Each step you may multiply by 3 or add 5. Can you reach exactly 100? Answer yes or no."}
+{"id": "invariant_020", "category": "invariant", "text": "Start with the multiset {1, 2, 3, ..., 10}. Each operation picks two numbers x and y and replaces them with (x+y)/2 and (x+y)/2. Can all 10 numbers become integers after some sequence of operations? Answer yes or no."}
+{"id": "invariant_021", "category": "invariant", "text": "A frog sits at position 0 on the integers. Each jump is either +5 or -3. Can the frog reach position 1 after exactly 6 jumps? Answer yes or no."}
+{"id": "invariant_022", "category": "invariant", "text": "A 2x2023 rectangle is to be tiled with 1x2 and 2x1 dominoes. Is the number of tilings odd or even?"}
+{"id": "invariant_023", "category": "invariant", "text": "Seven integers are arranged in a circle. At each step, you replace each number with the difference of its two neighbors. After one full step applied simultaneously, what is the parity relationship between the new sum and the old sum?"}
+{"id": "invariant_024", "category": "invariant", "text": "You have a 1x10 strip of squares. A token starts on square 1. Each move shifts the token 2, 3, or 5 squares to the right. Can the token land exactly on square 10? Answer yes or no."}
+{"id": "invariant_025", "category": "invariant", "text": "In a game, you start with a pile of 48 stones. A move consists of splitting any pile into two nonempty piles. You want all piles to have size 3. Is this possible? Answer yes or no."}
+{"id": "invariant_026", "category": "invariant", "text": "The integers 1 through 40 are written on a board. Each move erases two numbers and writes their sum minus 1. What is the final number?"}
+{"id": "invariant_027", "category": "invariant", "text": "A knight starts at corner a1 of a standard 8x8 chessboard. After exactly 64 moves can the knight return to a1, visiting every other square exactly once? Answer yes or no."}
+{"id": "invariant_028", "category": "invariant", "text": "Each of 12 students shakes hands with each of the others exactly once. Is the total number of handshakes divisible by 4?"}
+{"id": "invariant_029", "category": "invariant", "text": "A 6x6 board has all four corners removed, leaving 32 squares. Can these 32 squares be tiled by 1x2 dominoes? Answer yes or no."}

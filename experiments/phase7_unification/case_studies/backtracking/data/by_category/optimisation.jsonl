@@ -1,0 +1,30 @@
+{"id": "optimisation_000", "category": "optimisation", "text": "Find the maximum value of x*y subject to x + y = 10 and x, y >= 0."}
+{"id": "optimisation_001", "category": "optimisation", "text": "Find the minimum value of x^2 + y^2 subject to x + y = 6."}
+{"id": "optimisation_002", "category": "optimisation", "text": "A farmer has 120 meters of fencing to enclose a rectangular field with one side along a river (needing no fence). What dimensions maximize the enclosed area, and what is that maximum area?"}
+{"id": "optimisation_003", "category": "optimisation", "text": "Find the maximum value of x*y*z subject to x + y + z = 12 and x, y, z > 0."}
+{"id": "optimisation_004", "category": "optimisation", "text": "Find the minimum value of (x + 1/x) for x > 0."}
+{"id": "optimisation_005", "category": "optimisation", "text": "A company sells a product at price p dollars and the demand is q = 200 - 4p units. Find the price p that maximizes total revenue."}
+{"id": "optimisation_006", "category": "optimisation", "text": "Find the maximum value of 3x + 4y subject to x^2 + y^2 = 25."}
+{"id": "optimisation_007", "category": "optimisation", "text": "Given positive reals a and b with a + b = 1, find the minimum value of (1/a) + (1/b)."}
+{"id": "optimisation_008", "category": "optimisation", "text": "Find the maximum area of a rectangle inscribed in a circle of radius 5."}
+{"id": "optimisation_009", "category": "optimisation", "text": "A box with a square base and no top must have a volume of 32 cubic meters. Find the dimensions that minimize the total surface area used."}
+{"id": "optimisation_010", "category": "optimisation", "text": "Find the maximum value of x*(10 - x)^2 for x in [0, 10]."}
+{"id": "optimisation_011", "category": "optimisation", "text": "Distribute 100 into two positive parts such that the product of one part and the square of the other is maximized. What is the maximum product?"}
+{"id": "optimisation_012", "category": "optimisation", "text": "Find the minimum value of x^2 + 4*y^2 + 9 subject to x + 2y = 6."}
+{"id": "optimisation_013", "category": "optimisation", "text": "A rectangle has perimeter 40. Find the dimensions that maximize the product of the length and three times the width."}
+{"id": "optimisation_014", "category": "optimisation", "text": "Find the maximum value of sin(A)*cos(A) for real A."}
+{"id": "optimisation_015", "category": "optimisation", "text": "Two non-negative numbers sum to 8. Maximize the sum of their cubes."}
+{"id": "optimisation_016", "category": "optimisation", "text": "Find the minimum value of (a^2 + b^2) given that a + 2b = 10 and a, b are real."}
+{"id": "optimisation_017", "category": "optimisation", "text": "A wire of length 60 cm is cut into two pieces; one piece is bent into a square and the other into an equilateral triangle. Find the length of each piece that minimizes the total enclosed area."}
+{"id": "optimisation_018", "category": "optimisation", "text": "Find the maximum product of two positive integers whose sum is 21."}
+{"id": "optimisation_019", "category": "optimisation", "text": "Find the minimum value of x^2 - 6x + y^2 - 8y + 5 over all real x, y."}
+{"id": "optimisation_020", "category": "optimisation", "text": "A cylindrical can (with top and bottom) must hold a volume of 16*pi cubic centimeters. Find the radius that minimizes the total surface area."}
+{"id": "optimisation_021", "category": "optimisation", "text": "Find the maximum value of (x - 1)*(3 - x) for real x."}
+{"id": "optimisation_022", "category": "optimisation", "text": "Maximize 5x + 3y subject to x + y <= 8, x <= 5, y <= 6, x >= 0, y >= 0."}
+{"id": "optimisation_023", "category": "optimisation", "text": "Find two positive numbers whose product is 64 and whose sum is minimized."}
+{"id": "optimisation_024", "category": "optimisation", "text": "A store marks up items by 40% and then offers a discount of d percent. For what value of d does the final price equal the original price?"}
+{"id": "optimisation_025", "category": "optimisation", "text": "Find the maximum value of x^(1/3) * y^(2/3) subject to x + 2y = 9 and x, y > 0."}
+{"id": "optimisation_026", "category": "optimisation", "text": "A runner must travel 6 km. She can run at 12 km/h or walk at 4 km/h, but her total time must not exceed 1 hour. To maximize running distance, how many km should she run?"}
+{"id": "optimisation_027", "category": "optimisation", "text": "Find the integer n >= 1 that maximizes n^(1/n), i.e., the real-valued function f(n) = n^(1/n)."}
+{"id": "optimisation_028", "category": "optimisation", "text": "Find the minimum value of (x + y) given that x*y = 36 and x, y > 0."}
+{"id": "optimisation_029", "category": "optimisation", "text": "Maximize x + y subject to 2x + y <= 14, x + 2y <= 14, x >= 0, y >= 0."}

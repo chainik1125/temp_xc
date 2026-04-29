@@ -1,22 +1,46 @@
 {
-  "n_traces": 20,
+  "n_traces": 300,
   "keywords": [
     "hmm",
     "wait"
   ],
   "off_lo": -13,
   "off_hi": -8,
-  "n_events_total": 29,
+  "n_events_total": 227,
   "events_per_category": {
-    "logic": 7,
-    "geometry": 22
+    "logic": 47,
+    "geometry": 41,
+    "probability": 4,
+    "number_theory": 28,
+    "combinatorics": 46,
+    "algebra": 0,
+    "sequences": 4,
+    "optimisation": 27,
+    "set_theory": 7,
+    "invariant": 23
   },
   "think_tokens_per_category": {
-    "logic": 3154,
-    "geometry": 4543
+    "logic": 14107,
+    "geometry": 10192,
+    "probability": 6251,
+    "number_theory": 10396,
+    "combinatorics": 10620,
+    "algebra": 7993,
+    "sequences": 7846,
+    "optimisation": 11782,
+    "set_theory": 6691,
+    "invariant": 11128
   },
   "rate_per_category": {
-    "logic": 0.0022194039315155357,
-    "geometry": 0.004842615012106538
+    "logic": 0.0033316793081448926,
+    "geometry": 0.00402276295133438,
+    "probability": 0.0006398976163813789,
+    "number_theory": 0.0026933435936898806,
+    "combinatorics": 0.004331450094161958,
+    "algebra": 0.0,
+    "sequences": 0.0005098139179199592,
+    "optimisation": 0.0022916313019860804,
+    "set_theory": 0.0010461814377522045,
+    "invariant": 0.00206685837526959
   }
 }

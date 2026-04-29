@@ -1,0 +1,30 @@
+{"id": "combinatorics_000", "category": "combinatorics", "text": "How many ways can 8 people be seated in a row if 2 specific people must not sit adjacent to each other?"}
+{"id": "combinatorics_001", "category": "combinatorics", "text": "How many 5-card hands from a standard 52-card deck contain exactly 3 hearts?"}
+{"id": "combinatorics_002", "category": "combinatorics", "text": "In how many ways can the letters of the word MISSISSIPPI be arranged?"}
+{"id": "combinatorics_003", "category": "combinatorics", "text": "How many integers from 1 to 1000 are divisible by 3 or 7?"}
+{"id": "combinatorics_004", "category": "combinatorics", "text": "How many ways can a committee of 4 be chosen from 10 people if 2 specific people refuse to serve together?"}
+{"id": "combinatorics_005", "category": "combinatorics", "text": "How many 4-digit numbers (from 1000 to 9999) have digits that sum to exactly 10 with each digit between 0 and 9?"}
+{"id": "combinatorics_006", "category": "combinatorics", "text": "How many ways can 6 distinct books be arranged on a shelf if a specific book must always be at either end?"}
+{"id": "combinatorics_007", "category": "combinatorics", "text": "A group of 12 students must be divided into three groups of 4 for a project. In how many ways can this be done?"}
+{"id": "combinatorics_008", "category": "combinatorics", "text": "How many strings of 6 binary digits (0s and 1s) contain at most two 1s?"}
+{"id": "combinatorics_009", "category": "combinatorics", "text": "How many ways can 5 boys and 5 girls stand in a line so that no two boys stand next to each other?"}
+{"id": "combinatorics_010", "category": "combinatorics", "text": "How many ways can 7 distinct colored balls be placed into 3 distinct boxes if no box may be empty?"}
+{"id": "combinatorics_011", "category": "combinatorics", "text": "How many 3-element subsets of the set {1, 2, 3, 4, 5, 6, 7, 8} have all three elements summing to an odd number?"}
+{"id": "combinatorics_012", "category": "combinatorics", "text": "In how many ways can 9 people be seated at a circular table if 3 specific people must all sit together?"}
+{"id": "combinatorics_013", "category": "combinatorics", "text": "How many ways can you choose 2 males and 3 females from a group of 6 males and 7 females?"}
+{"id": "combinatorics_014", "category": "combinatorics", "text": "How many positive integers less than 1000 have no repeated digits?"}
+{"id": "combinatorics_015", "category": "combinatorics", "text": "How many permutations of the digits 1, 2, 3, 4, 5, 6 have the digit 1 appearing before the digit 2?"}
+{"id": "combinatorics_016", "category": "combinatorics", "text": "How many ways can 4 identical red balls and 3 identical blue balls be arranged in a row?"}
+{"id": "combinatorics_017", "category": "combinatorics", "text": "How many 5-letter arrangements can be formed from the letters A, B, C, D, E, F, G if no letter is repeated and the arrangement must start and end with a vowel?"}
+{"id": "combinatorics_018", "category": "combinatorics", "text": "A box contains 6 red, 5 blue, and 4 green marbles. In how many ways can you select 4 marbles if you must include at least one of each color?"}
+{"id": "combinatorics_019", "category": "combinatorics", "text": "How many ways can 10 people be split into 2 unlabeled groups of 5?"}
+{"id": "combinatorics_020", "category": "combinatorics", "text": "How many ways can you distribute 7 identical candies among 4 distinct children so that each child gets at least one candy?"}
+{"id": "combinatorics_021", "category": "combinatorics", "text": "How many 4-digit even numbers can be formed using the digits 1, 2, 3, 4, 5, 6 without repetition?"}
+{"id": "combinatorics_022", "category": "combinatorics", "text": "How many paths are there from the top-left corner to the bottom-right corner of a 5 by 4 grid, moving only right or down one step at a time?"}
+{"id": "combinatorics_023", "category": "combinatorics", "text": "In how many ways can the 26 letters of the alphabet be arranged so that the 5 vowels A, E, I, O, U all appear consecutively?"}
+{"id": "combinatorics_024", "category": "combinatorics", "text": "How many ways can 8 people be divided into two teams of 4 if two specific people must be on the same team?"}
+{"id": "combinatorics_025", "category": "combinatorics", "text": "How many 6-character passwords can be formed using exactly 4 distinct letters from A-Z followed by exactly 2 distinct digits from 0-9, where order matters?"}
+{"id": "combinatorics_026", "category": "combinatorics", "text": "How many subsets of the set {1, 2, 3, 4, 5, 6, 7, 8, 9, 10} contain exactly 4 elements where the smallest element is 3?"}
+{"id": "combinatorics_027", "category": "combinatorics", "text": "How many ways can first, second, and third place be awarded among 15 competitors if ties are not allowed?"}
+{"id": "combinatorics_028", "category": "combinatorics", "text": "How many 4-element subsets of {1, 2, 3, ..., 12} contain no two consecutive integers?"}
+{"id": "combinatorics_029", "category": "combinatorics", "text": "Using 4 flags of different colors, how many distinct signals can be formed by arranging all 4 flags in a vertical column if the top and bottom flags must be different colors from each other, given that any arrangement counts as a signal?"}

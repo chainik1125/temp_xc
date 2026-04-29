@@ -4,9 +4,10 @@
   "sae_id": "l10r_8x",
   "sae_repo": "fnlp/Llama-Scope",
   "sae_config": "L10R-8x",
-  "n_tokens": 10788,
-  "n_d_plus": 174,
-  "n_d_all": 7697,
+  "rank_by": "tstat",
+  "n_tokens": 159438,
+  "n_d_plus": 1357,
+  "n_d_all": 97006,
   "d_model": 4096,
   "d_sae": 32768
 }

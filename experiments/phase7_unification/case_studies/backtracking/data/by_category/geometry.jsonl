@@ -1,0 +1,30 @@
+{"id": "geometry_000", "category": "geometry", "text": "A triangle has sides of length 7, 24, and 25. What is the area of the triangle?"}
+{"id": "geometry_001", "category": "geometry", "text": "A circle is inscribed in a square with side length 10. What is the area of the region inside the square but outside the circle?"}
+{"id": "geometry_002", "category": "geometry", "text": "A right circular cone has base radius 6 and height 8. What is the total surface area of the cone, including the base?"}
+{"id": "geometry_003", "category": "geometry", "text": "Two circles of radius 5 and radius 3 have centers that are 10 units apart. What is the length of the common external tangent segment between the two points of tangency?"}
+{"id": "geometry_004", "category": "geometry", "text": "A regular hexagon has a perimeter of 48. What is the area of the hexagon?"}
+{"id": "geometry_005", "category": "geometry", "text": "A cylinder has radius 4 and height 9. A cone with the same base and height is removed from the cylinder. What is the volume of the remaining solid?"}
+{"id": "geometry_006", "category": "geometry", "text": "In a triangle with sides 13, 14, and 15, what is the length of the altitude drawn to the side of length 14?"}
+{"id": "geometry_007", "category": "geometry", "text": "A rectangle has a diagonal of length 13 and one side of length 5. What is the perimeter of the rectangle?"}
+{"id": "geometry_008", "category": "geometry", "text": "A sphere is inscribed in a cube with side length 6. What is the volume of the sphere?"}
+{"id": "geometry_009", "category": "geometry", "text": "Three circles each of radius 2 are mutually externally tangent. What is the area of the region bounded by the three circles (the curvilinear triangle between them)?"}
+{"id": "geometry_010", "category": "geometry", "text": "A trapezoid has parallel sides of length 8 and 14, and both non-parallel sides have length 5. What is the area of the trapezoid?"}
+{"id": "geometry_011", "category": "geometry", "text": "A regular octagon is inscribed in a circle of radius 10. What is the area of the octagon?"}
+{"id": "geometry_012", "category": "geometry", "text": "An equilateral triangle has an altitude of length 9. What is the perimeter of the triangle?"}
+{"id": "geometry_013", "category": "geometry", "text": "A cube has a space diagonal of length 6 times sqrt(3). What is the surface area of the cube?"}
+{"id": "geometry_014", "category": "geometry", "text": "A semicircle is drawn on the hypotenuse of a right triangle with legs 6 and 8. What is the area of the semicircle?"}
+{"id": "geometry_015", "category": "geometry", "text": "A rhombus has diagonals of length 16 and 12. What is the perimeter of the rhombus?"}
+{"id": "geometry_016", "category": "geometry", "text": "A cone has slant height 13 and base radius 5. What is the volume of the cone?"}
+{"id": "geometry_017", "category": "geometry", "text": "A circle of radius 7 has a chord of length 7. What is the measure of the minor arc subtended by this chord, in degrees?"}
+{"id": "geometry_018", "category": "geometry", "text": "Two concentric circles have radii 5 and 13. A chord of the outer circle is tangent to the inner circle. What is the length of the chord?"}
+{"id": "geometry_019", "category": "geometry", "text": "A square is inscribed in a circle of radius 8. What is the area of the square?"}
+{"id": "geometry_020", "category": "geometry", "text": "A triangle has sides 10, 10, and 12. What is the radius of the circumscribed circle?"}
+{"id": "geometry_021", "category": "geometry", "text": "A rectangular box has dimensions 3 by 4 by 12. What is the length of the space diagonal of the box?"}
+{"id": "geometry_022", "category": "geometry", "text": "A sector of a circle has radius 10 and central angle 72 degrees. What is the area of the sector?"}
+{"id": "geometry_023", "category": "geometry", "text": "An isosceles right triangle has a hypotenuse of length 10. What is the area of the triangle?"}
+{"id": "geometry_024", "category": "geometry", "text": "A regular pentagon has a side length of 6. What is the area of the pentagon, to the nearest whole number?"}
+{"id": "geometry_025", "category": "geometry", "text": "A cylinder is inscribed in a sphere of radius 5 such that the diameter of the cylinder equals its height. What is the volume of the cylinder?"}
+{"id": "geometry_026", "category": "geometry", "text": "A circle passes through the three vertices of a right triangle whose legs are 9 and 12. What is the area of the circle?"}
+{"id": "geometry_027", "category": "geometry", "text": "A frustum is formed by cutting a cone of height 12 and base radius 6 with a plane parallel to the base at height 8 from the base. What is the volume of the frustum?"}
+{"id": "geometry_028", "category": "geometry", "text": "A regular tetrahedron has edge length 4. What is the surface area of the tetrahedron?"}
+{"id": "geometry_029", "category": "geometry", "text": "A parallelogram has sides of length 10 and 7, and the included angle between them is 30 degrees. What is the area of the parallelogram?"}

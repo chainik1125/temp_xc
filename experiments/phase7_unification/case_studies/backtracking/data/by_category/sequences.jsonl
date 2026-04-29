@@ -1,0 +1,30 @@
+{"id": "sequences_000", "category": "sequences", "text": "The sequence a(1) = 3, a(n) = 2*a(n-1) + 1 for n >= 2. What is a(6)?"}
+{"id": "sequences_001", "category": "sequences", "text": "The sequence is defined by a(1) = 1, a(2) = 1, a(n) = a(n-1) + 2*a(n-2) for n >= 3. What is a(7)?"}
+{"id": "sequences_002", "category": "sequences", "text": "Find the sum of the first 20 terms of the arithmetic sequence whose first term is 7 and whose common difference is 4."}
+{"id": "sequences_003", "category": "sequences", "text": "The sequence a(n) = n^2 - 3n + 2 for positive integers n. For how many values of n with 1 <= n <= 100 is a(n) divisible by 5?"}
+{"id": "sequences_004", "category": "sequences", "text": "Find the 10th term of the geometric sequence 2, 6, 18, 54, ..."}
+{"id": "sequences_005", "category": "sequences", "text": "A sequence is defined by a(1) = 5 and a(n) = a(n-1) + 3n for n >= 2. What is a(5)?"}
+{"id": "sequences_006", "category": "sequences", "text": "The sequence a(n) is defined as the sum of digits of n for each positive integer n. What is the sum a(1) + a(2) + ... + a(20)?"}
+{"id": "sequences_007", "category": "sequences", "text": "Find the closed form for the sum 1 + 3 + 5 + ... + (2n - 1), and use it to compute the sum of the first 15 odd positive integers."}
+{"id": "sequences_008", "category": "sequences", "text": "The sequence a(1) = 2, a(2) = 5, a(n) = a(n-1)*a(n-2) for n >= 3. What is a(5)?"}
+{"id": "sequences_009", "category": "sequences", "text": "Find the sum of all terms in the geometric series 4 + 2 + 1 + 1/2 + ... (infinitely many terms)."}
+{"id": "sequences_010", "category": "sequences", "text": "The sequence a(n) = 3^n - 2^n for positive integers n. What is a(1) + a(2) + a(3) + a(4)?"}
+{"id": "sequences_011", "category": "sequences", "text": "Define a(n) as the number of 1s in the binary representation of n. What is a(1) + a(2) + ... + a(15)?"}
+{"id": "sequences_012", "category": "sequences", "text": "A sequence starts at 100 and each subsequent term is obtained by subtracting 7. What is the first negative term in the sequence?"}
+{"id": "sequences_013", "category": "sequences", "text": "The sequence a(1) = 1, a(n) = a(n-1) + n^2 for n >= 2. What is a(6)?"}
+{"id": "sequences_014", "category": "sequences", "text": "Find the sum of the geometric series 3 + 3/4 + 3/16 + 3/64 + ... (infinitely many terms)."}
+{"id": "sequences_015", "category": "sequences", "text": "The Fibonacci-like sequence has a(1) = 4, a(2) = 7, and a(n) = a(n-1) + a(n-2). What is a(8)?"}
+{"id": "sequences_016", "category": "sequences", "text": "Find the value of the sum: 1/(1*2) + 1/(2*3) + 1/(3*4) + ... + 1/(9*10)."}
+{"id": "sequences_017", "category": "sequences", "text": "The sequence a(n) = floor(n^2 / 4) for n = 1, 2, 3, .... What is a(1) + a(2) + a(3) + a(4) + a(5)?"}
+{"id": "sequences_018", "category": "sequences", "text": "A sequence has a(1) = 64 and each term is half the previous term. What is the sum of the first 7 terms?"}
+{"id": "sequences_019", "category": "sequences", "text": "The recurrence a(n) = 3*a(n-1) - 2 with a(1) = 4 defines a sequence. What is the closed form for a(n), and what is a(8)?"}
+{"id": "sequences_020", "category": "sequences", "text": "Find the sum 1^3 + 2^3 + 3^3 + ... + 10^3."}
+{"id": "sequences_021", "category": "sequences", "text": "The sequence a(n) = (n^2 + n)/2 gives the nth triangular number. What is the sum of the first 8 triangular numbers?"}
+{"id": "sequences_022", "category": "sequences", "text": "A sequence is defined by a(1) = 1, a(2) = 2, a(n) = 2*a(n-1) - a(n-2) + 2 for n >= 3. What is a(6)?"}
+{"id": "sequences_023", "category": "sequences", "text": "The sequence of partial sums S(n) = 1 + 4 + 9 + ... + n^2. Express S(n) in closed form and compute S(12)."}
+{"id": "sequences_024", "category": "sequences", "text": "Find the number of terms in the arithmetic sequence 5, 11, 17, ..., 191."}
+{"id": "sequences_025", "category": "sequences", "text": "The sequence a(n) = 2^n + (-1)^n. What is the sum a(1) + a(2) + a(3) + a(4) + a(5)?"}
+{"id": "sequences_026", "category": "sequences", "text": "A sequence has a(1) = 2, a(2) = 6, and a(n) = (a(n-1))^2 / a(n-2) for n >= 3. What is a(6)?"}
+{"id": "sequences_027", "category": "sequences", "text": "Find the sum of all integers from 1 to 200 that are divisible by 3 but not by 6."}
+{"id": "sequences_028", "category": "sequences", "text": "The sequence is defined by a(n) = n*(n+1)*(n+2)/6 for positive integers n. What is a(4) + a(5)?"}
+{"id": "sequences_029", "category": "sequences", "text": "A sequence a(n) satisfies a(1) = 3, a(2) = 9, and a(n) = a(n-1) + a(n-2) - 1 for n >= 3. What is a(6)?"}

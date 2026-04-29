@@ -1,0 +1,30 @@
+{"id": "set_theory_000", "category": "set_theory", "text": "In a class of 50 students, 30 play soccer, 25 play basketball, and 10 play neither sport. How many students play both soccer and basketball?"}
+{"id": "set_theory_001", "category": "set_theory", "text": "A survey of 100 people found that 60 like coffee, 45 like tea, and 20 like neither. How many people like both coffee and tea?"}
+{"id": "set_theory_002", "category": "set_theory", "text": "Sets A and B satisfy |A| = 40, |B| = 35, |A union B| = 60. What is |A intersection B|?"}
+{"id": "set_theory_003", "category": "set_theory", "text": "Of 80 people surveyed, 50 own a cat, 40 own a dog, and 15 own both. How many own neither a cat nor a dog?"}
+{"id": "set_theory_004", "category": "set_theory", "text": "In a group of 200 students, 120 study French, 90 study Spanish, and 50 study both. How many study neither French nor Spanish?"}
+{"id": "set_theory_005", "category": "set_theory", "text": "Sets A, B, and C satisfy |A| = 20, |B| = 18, |C| = 15, |A intersection B| = 8, |A intersection C| = 5, |B intersection C| = 6, |A intersection B intersection C| = 3. Find |A union B union C|."}
+{"id": "set_theory_006", "category": "set_theory", "text": "A universal set has 70 elements. Set A has 30 elements, set B has 25 elements, and 10 elements are in neither A nor B. How many elements are in both A and B?"}
+{"id": "set_theory_007", "category": "set_theory", "text": "Out of 150 workers, 90 know Python, 70 know Java, 40 know both. How many know neither Python nor Java?"}
+{"id": "set_theory_008", "category": "set_theory", "text": "If |A| = 55, |B| = 45, |A union B| = 80, what is |A intersection B|?"}
+{"id": "set_theory_009", "category": "set_theory", "text": "In a school of 300 students, 180 take math, 150 take science, 90 take both math and science, and the rest take neither. How many students take neither math nor science?"}
+{"id": "set_theory_010", "category": "set_theory", "text": "Three sets A, B, C have |A| = 30, |B| = 28, |C| = 25, |A intersection B| = 10, |A intersection C| = 8, |B intersection C| = 9, |A intersection B intersection C| = 4. Find |A union B union C|."}
+{"id": "set_theory_011", "category": "set_theory", "text": "A poll of 500 voters shows 280 support Measure X, 210 support Measure Y, and 80 support both. How many support neither measure?"}
+{"id": "set_theory_012", "category": "set_theory", "text": "Set A is a subset of set B. If |B| = 50 and |B minus A| = 18, what is |A|?"}
+{"id": "set_theory_013", "category": "set_theory", "text": "In a group of 120 people, 75 speak English, 60 speak Mandarin, 30 speak both, and the rest speak neither. How many speak neither language?"}
+{"id": "set_theory_014", "category": "set_theory", "text": "A class has 45 students. 28 passed the first exam, 32 passed the second exam, and 5 failed both exams. How many students passed both exams?"}
+{"id": "set_theory_015", "category": "set_theory", "text": "Using inclusion-exclusion with three sets: |A| = 40, |B| = 35, |C| = 30, |A intersection B| = 15, |A intersection C| = 12, |B intersection C| = 10, |A intersection B intersection C| = 5, and the universal set has 80 elements. How many elements are in none of the three sets?"}
+{"id": "set_theory_016", "category": "set_theory", "text": "In a city of 1000 residents, 600 read newspaper A, 400 read newspaper B, 250 read both. How many read at least one newspaper?"}
+{"id": "set_theory_017", "category": "set_theory", "text": "A set has 64 subsets. How many elements does the set contain?"}
+{"id": "set_theory_018", "category": "set_theory", "text": "How many elements are in the power set of a set with 7 elements?"}
+{"id": "set_theory_019", "category": "set_theory", "text": "Set A has 5 elements and set B has 8 elements, with A a subset of B. How many elements are in B minus A?"}
+{"id": "set_theory_020", "category": "set_theory", "text": "In a survey of 90 people, 55 like action movies, 48 like comedies, and 15 like neither. How many like both action movies and comedies?"}
+{"id": "set_theory_021", "category": "set_theory", "text": "Two sets A and B satisfy |A union B| = 75, |A intersection B| = 15, and |A| = 45. What is |B|?"}
+{"id": "set_theory_022", "category": "set_theory", "text": "In a group of 60 people, every person reads at least one of two magazines X or Y. If 42 read X and 35 read Y, how many read both X and Y?"}
+{"id": "set_theory_023", "category": "set_theory", "text": "Among 250 athletes, 140 play tennis, 130 play golf, 60 play squash, 50 play both tennis and golf, 30 play both tennis and squash, 40 play both golf and squash, and 20 play all three. How many play none of the three sports?"}
+{"id": "set_theory_024", "category": "set_theory", "text": "A universal set U has 100 elements. Set A has 45 elements, set B has 38 elements, and A intersection B has 13 elements. How many elements are in neither A nor B?"}
+{"id": "set_theory_025", "category": "set_theory", "text": "How many proper subsets does a set with 6 elements have?"}
+{"id": "set_theory_026", "category": "set_theory", "text": "Sets P and Q have |P| = 33, |Q| = 27, and |P union Q| = 50. What is |P intersection Q|?"}
+{"id": "set_theory_027", "category": "set_theory", "text": "In a class of 40 students, 22 study history, 18 study geography, and 7 study both. How many study neither history nor geography?"}
+{"id": "set_theory_028", "category": "set_theory", "text": "Of 180 people surveyed, 100 own a smartphone, 80 own a tablet, 50 own both. How many own a smartphone or a tablet but not both?"}
+{"id": "set_theory_029", "category": "set_theory", "text": "A set A has 12 elements and set B has 9 elements. If |A union B| = 17, how many elements are in A intersection B?"}

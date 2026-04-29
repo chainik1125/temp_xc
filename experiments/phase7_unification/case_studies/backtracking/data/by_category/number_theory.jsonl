@@ -1,0 +1,30 @@
+{"id": "number_theory_000", "category": "number_theory", "text": "What is the remainder when 7^100 is divided by 50?"}
+{"id": "number_theory_001", "category": "number_theory", "text": "Find the largest integer n such that n^2 divides 10! (10 factorial)."}
+{"id": "number_theory_002", "category": "number_theory", "text": "How many positive integers less than 200 are divisible by 6 but not by 9?"}
+{"id": "number_theory_003", "category": "number_theory", "text": "Prove that for any integer n, the expression n^3 - n is always divisible by 6. What is the largest such guaranteed divisor?"}
+{"id": "number_theory_004", "category": "number_theory", "text": "What is the units digit of 3^2023?"}
+{"id": "number_theory_005", "category": "number_theory", "text": "Find the smallest positive integer that leaves a remainder of 3 when divided by 7 and a remainder of 5 when divided by 11."}
+{"id": "number_theory_006", "category": "number_theory", "text": "How many integers from 1 to 1000 are neither divisible by 4 nor by 6?"}
+{"id": "number_theory_007", "category": "number_theory", "text": "What is the remainder when 2^50 is divided by 7?"}
+{"id": "number_theory_008", "category": "number_theory", "text": "Find all prime numbers p such that p^2 + 2 is also prime."}
+{"id": "number_theory_009", "category": "number_theory", "text": "If the sum of two positive integers is 72 and their greatest common divisor is 12, how many such ordered pairs exist?"}
+{"id": "number_theory_010", "category": "number_theory", "text": "What is the smallest positive integer n such that 12n is a perfect square?"}
+{"id": "number_theory_011", "category": "number_theory", "text": "How many trailing zeros does 50! (50 factorial) have?"}
+{"id": "number_theory_012", "category": "number_theory", "text": "Find the remainder when 1! + 2! + 3! + ... + 100! is divided by 12."}
+{"id": "number_theory_013", "category": "number_theory", "text": "What is the greatest common divisor of 2^120 - 1 and 2^80 - 1?"}
+{"id": "number_theory_014", "category": "number_theory", "text": "Determine whether 1000003 is divisible by 3."}
+{"id": "number_theory_015", "category": "number_theory", "text": "Find the number of positive divisors of 360."}
+{"id": "number_theory_016", "category": "number_theory", "text": "What is the smallest prime factor of 10^10 + 1?"}
+{"id": "number_theory_017", "category": "number_theory", "text": "Find the last two digits of 9^999 (i.e., 9^999 mod 100)."}
+{"id": "number_theory_018", "category": "number_theory", "text": "How many pairs of consecutive integers between 1 and 100 have a sum divisible by 7?"}
+{"id": "number_theory_019", "category": "number_theory", "text": "What is the remainder when 13^73 is divided by 11?"}
+{"id": "number_theory_020", "category": "number_theory", "text": "Find the smallest positive integer n such that n is divisible by every integer from 1 to 10."}
+{"id": "number_theory_021", "category": "number_theory", "text": "How many integers from 1 to 500 have an odd number of positive divisors?"}
+{"id": "number_theory_022", "category": "number_theory", "text": "What is the sum of all positive integers less than 100 that are coprime to 100?"}
+{"id": "number_theory_023", "category": "number_theory", "text": "Determine the number of solutions to x^2 \u2261 1 (mod 24) where 0 \u2264 x < 24."}
+{"id": "number_theory_024", "category": "number_theory", "text": "Find the largest prime factor of 2^8 - 1."}
+{"id": "number_theory_025", "category": "number_theory", "text": "If p and p^2 + 8 are both prime, what is the value of p?"}
+{"id": "number_theory_026", "category": "number_theory", "text": "What is the remainder when 111...1 (100 ones) is divided by 9?"}
+{"id": "number_theory_027", "category": "number_theory", "text": "How many positive integers n satisfy: n divides 48 and n + 1 divides 48?"}
+{"id": "number_theory_028", "category": "number_theory", "text": "Find the number of integers from 1 to 300 that are divisible by exactly one of 5 or 7."}
+{"id": "number_theory_029", "category": "number_theory", "text": "What is the largest power of 3 that divides 30! (30 factorial)?"}

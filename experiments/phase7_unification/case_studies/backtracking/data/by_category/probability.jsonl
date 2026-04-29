@@ -1,0 +1,30 @@
+{"id": "probability_000", "category": "probability", "text": "A bag contains 5 red balls and 3 blue balls. Two balls are drawn without replacement. What is the probability that both balls are red?"}
+{"id": "probability_001", "category": "probability", "text": "A standard six-sided die is rolled twice. What is the probability that the sum of the two rolls equals 9?"}
+{"id": "probability_002", "category": "probability", "text": "A deck of 52 cards is shuffled. What is the probability that the top two cards are both aces?"}
+{"id": "probability_003", "category": "probability", "text": "Three fair coins are flipped. Given that at least two coins show heads, what is the probability that all three show heads?"}
+{"id": "probability_004", "category": "probability", "text": "A jar contains 4 red, 3 green, and 2 yellow marbles. One marble is drawn at random. What is the probability it is not yellow?"}
+{"id": "probability_005", "category": "probability", "text": "In a class of 30 students, 12 play soccer and 10 play basketball, and 5 play both. A student is chosen at random. What is the probability the student plays soccer or basketball but not both?"}
+{"id": "probability_006", "category": "probability", "text": "Two dice are rolled. What is the probability that the product of the two numbers showing is even?"}
+{"id": "probability_007", "category": "probability", "text": "A card is drawn from a standard 52-card deck. What is the probability it is a red face card?"}
+{"id": "probability_008", "category": "probability", "text": "Five fair coins are flipped. What is the probability of getting exactly three heads?"}
+{"id": "probability_009", "category": "probability", "text": "A box has 6 white and 4 black socks. Two socks are drawn without replacement. What is the probability they are the same color?"}
+{"id": "probability_010", "category": "probability", "text": "A number is chosen at random from the integers 1 through 20. What is the probability it is divisible by 3 or 5?"}
+{"id": "probability_011", "category": "probability", "text": "Two cards are drawn without replacement from a standard deck. What is the probability that the first is a king and the second is a queen?"}
+{"id": "probability_012", "category": "probability", "text": "A bag holds 7 red and 5 blue chips. Three chips are drawn without replacement. What is the probability all three are blue?"}
+{"id": "probability_013", "category": "probability", "text": "A fair die is rolled three times. What is the probability that the same number appears on all three rolls?"}
+{"id": "probability_014", "category": "probability", "text": "In a group of 8 people, 3 are selected at random. What is the probability that a specific person named Alice is among those selected?"}
+{"id": "probability_015", "category": "probability", "text": "A roulette wheel has 38 slots numbered 1 through 36 plus 0 and 00. What is the probability of landing on an even number (not 0 or 00)?"}
+{"id": "probability_016", "category": "probability", "text": "Two cards are drawn without replacement from a 52-card deck. What is the probability that both are hearts?"}
+{"id": "probability_017", "category": "probability", "text": "A fair coin is flipped four times. What is the probability of getting at least one tail?"}
+{"id": "probability_018", "category": "probability", "text": "A bag contains 3 red, 4 blue, and 5 green balls. Two are drawn without replacement. What is the probability that one is red and one is blue?"}
+{"id": "probability_019", "category": "probability", "text": "Three people each independently choose a number at random from 1 to 4. What is the probability that all three choose the same number?"}
+{"id": "probability_020", "category": "probability", "text": "In the Monty Hall problem with 3 doors (one hides a car, two hide goats), a contestant picks door 1 and the host opens door 3 to reveal a goat. What is the probability of winning the car if the contestant switches to door 2?"}
+{"id": "probability_021", "category": "probability", "text": "A fair die is rolled until a 6 appears. What is the probability that the first 6 occurs on exactly the third roll?"}
+{"id": "probability_022", "category": "probability", "text": "From a group of 5 men and 4 women, a committee of 3 is chosen at random. What is the probability it contains exactly 2 women?"}
+{"id": "probability_023", "category": "probability", "text": "A card is drawn from a standard deck. Given that it is a face card (jack, queen, or king), what is the probability it is also a spade?"}
+{"id": "probability_024", "category": "probability", "text": "Two integers are chosen independently and at random from the set {1, 2, 3, 4, 5, 6}. What is the probability that their sum is prime?"}
+{"id": "probability_025", "category": "probability", "text": "A bag has 10 balls numbered 1 through 10. Three are drawn without replacement. What is the probability that the largest number drawn is exactly 7?"}
+{"id": "probability_026", "category": "probability", "text": "A fair coin is flipped 6 times. What is the probability of getting exactly 2 heads?"}
+{"id": "probability_027", "category": "probability", "text": "From a standard deck, 5 cards are dealt. What is the probability that all 5 cards are from the same suit?"}
+{"id": "probability_028", "category": "probability", "text": "Two dice are rolled. Given that the sum is at least 10, what is the probability the sum is exactly 12?"}
+{"id": "probability_029", "category": "probability", "text": "A box contains 4 defective and 16 good items. Three items are selected at random without replacement. What is the probability that exactly one is defective?"}
