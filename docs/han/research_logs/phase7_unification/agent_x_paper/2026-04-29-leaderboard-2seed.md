@@ -98,7 +98,7 @@ message is:
 
 ### Plot (superseded — see `2026-04-29-leaderboard-multiseed.md`)
 
-![2-seed leaderboard](../../../../experiments/phase7_unification/results/plots/phase7_leaderboard_2seed.png)
+![2-seed leaderboard](plots/phase7_leaderboard_2seed.png)
 
 ### Files of record
 

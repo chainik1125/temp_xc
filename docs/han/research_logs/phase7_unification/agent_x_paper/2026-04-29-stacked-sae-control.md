@@ -18,7 +18,7 @@ tags:
 
 ### Headline figure
 
-![hierarchy plot](../../../../experiments/phase7_unification/results/plots/phase7_stacked_vs_raw_hierarchy.png)
+![hierarchy plot](plots/phase7_stacked_vs_raw_hierarchy.png)
 
 The plot is intentionally bare-bones: 7 representations, ranked at
 both `k_feat=5` and `k_feat=20`. Each step is monotone-positive, and

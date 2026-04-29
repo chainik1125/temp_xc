@@ -101,7 +101,7 @@ candidates" as the source) and Y's per-concept structural finding
 
 ### Plot
 
-![3-seed leaderboard](../../../../experiments/phase7_unification/results/plots/phase7_leaderboard_multiseed.png)
+![3-seed leaderboard](plots/phase7_leaderboard_multiseed.png)
 
 ### Files of record
 
