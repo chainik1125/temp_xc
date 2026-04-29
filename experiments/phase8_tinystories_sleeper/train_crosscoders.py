@@ -318,18 +318,21 @@ def main() -> None:
     # Save state dicts + config.
     for name, m in models.items():
         state = {key: v.detach().cpu() for key, v in m.state_dict().items()}
-        layer_hook = (
-            txc_layer_hooks.get(name)
-            or sae_layer_hooks.get(name)
-            or tsae_layer_hooks.get(name)
-            or h8_layer_hooks.get(name)
-        )
-        layer_idx = (
-            txc_layer_indices.get(name)
-            or sae_layer_indices.get(name)
-            or tsae_layer_indices.get(name)
-            or h8_layer_indices.get(name)
-        )
+        # `or`-chain is unsafe for layer_idx because index 0 is falsy and
+        # would silently fall through to the next dict. Use `in` checks
+        # explicitly and pick the first hit.
+        def _first_hit(name, dicts):
+            for d in dicts:
+                if name in d:
+                    return d[name]
+            return None
+
+        layer_hook = _first_hit(name, [
+            txc_layer_hooks, sae_layer_hooks, tsae_layer_hooks, h8_layer_hooks,
+        ])
+        layer_idx = _first_hit(name, [
+            txc_layer_indices, sae_layer_indices, tsae_layer_indices, h8_layer_indices,
+        ])
         is_window_arch = name in txc_layer_hooks or name in h8_layer_hooks
         cfg = {
             "class_name": type(m).__name__,

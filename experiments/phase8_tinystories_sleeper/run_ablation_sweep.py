@@ -216,7 +216,27 @@ def main() -> None:
         "dep_logp": base_logp_val_dep,
     }, "by_arch": {}}
 
-    layer_name_to_idx = {name: i for i, name in enumerate(MLC_HOOK_NAMES)}
+    # Map hookpoint → index using the cache's actual hook list when present
+    # (v2 caches arbitrary hookpoints, not the MLC default 5-stack), falling
+    # back to MLC_HOOK_NAMES when a cache pre-dates the meta["hook_names"]
+    # field.
+    cached_hook_names = meta.get("hook_names") or MLC_HOOK_NAMES
+    layer_name_to_idx = {name: i for i, name in enumerate(cached_hook_names)}
+
+    def _layer_idx_from_cfg(cfg):
+        # train_crosscoders.py used to save `layer_idx = 0 or None or ...` which
+        # silently became None for index-0 hookpoints. Trust `layer_hook`
+        # primarily and look it up in the cache's hook list; fall back to the
+        # saved `layer_idx` if `layer_hook` is somehow missing.
+        if cfg.get("layer_hook") in layer_name_to_idx:
+            return layer_name_to_idx[cfg["layer_hook"]]
+        idx = cfg.get("layer_idx")
+        if idx is None:
+            raise RuntimeError(
+                f"Cannot resolve layer index: layer_hook={cfg.get('layer_hook')!r} "
+                f"not in cache (have {list(layer_name_to_idx)}), and layer_idx is None"
+            )
+        return idx
 
     for arch in args.archs:
         cc_path = in_dir / f"crosscoder_{arch}.pt"
@@ -231,12 +251,12 @@ def main() -> None:
         if arch == "mlc":
             z = encode_all_mlc(cc, val_acts, chunk_size=args.encode_chunk_size)
         elif _is_per_token_arch(arch):
-            layer_idx = cfg["layer_idx"]
+            layer_idx = _layer_idx_from_cfg(cfg)
             z = encode_all_sae(
                 cc, val_acts[:, :, layer_idx, :], chunk_size=args.encode_chunk_size
             )
         else:
-            layer_idx = cfg["layer_idx"]
+            layer_idx = _layer_idx_from_cfg(cfg)
             z = encode_all_txc(
                 cc, val_acts[:, :, layer_idx, :], chunk_size=args.encode_chunk_size
             )
