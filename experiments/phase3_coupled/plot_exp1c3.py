@@ -32,6 +32,7 @@ _txcdr_markers = {2: "o", 3: "s", 4: "D", 5: "^", 6: "v", 8: "p", 10: "h", 12: "
 STYLE = {
     "Stacked-T2": {"color": "#9467bd", "marker": "o", "ls": "-"},
     "Stacked-T5": {"color": "#9467bd", "marker": "^", "ls": "--"},
+    "TSAE": {"color": "#000000", "marker": "X", "ls": "-"},
 }
 for T in TXCDR_T_VALUES:
     STYLE[f"TXCDRv2-T{T}"] = {
