@@ -114,15 +114,125 @@ at the sparser end (k_eff ≈ 100, the matched-to-T-SAE-k=20 cell)?
 
 ### Pipeline status
 
-- [x] Cache built (`data/cached_activations/gemma-2-2b/fineweb/resid_L12.npy`,
-      24k seqs × 128 ctx × 2304 dim, fp16, ~14 GB)
-- [ ] Step 2 trained (ckpt at `results/ckpts/txc_bare_antidead_t5_kpos20__seed42.pt`)
-- [ ] Features selected (`results/case_studies/steering/txc_bare_antidead_t5_kpos20/feature_selection.json`)
-- [ ] z magnitudes diagnosed
-- [ ] Intervention generated (full default `s_norm` grid)
-- [ ] Graded (210 rows; 0 errors)
-- [ ] Plot: success(s_norm) interior peak verified; coh(s_norm) calling-threshold sensible
-- [ ] Comparison vs T-SAE k=20 anchor; outcome called per pre-registered rule
+- [x] Cache built (`data/cached_activations/gemma-2-2b/fineweb/resid_L12.npy`)
+- [x] **Step 2 trained** — plateau-converged at step 3800 (plateau=0.019).
+      Loss 20260 → 4813. l0=100. Wall 46 min.
+- [x] **Features selected** — 24/30 distinct picked features.
+      ⟨|z|⟩=25.1 (similar to canonical k_pos=100 cell).
+- [x] z magnitudes diagnosed.
+- [x] **Intervention generated** — 210 rows; full default s_norm grid.
+- [x] **Graded** — 210 rows, **0 errors**, arch mean success=0.52 coh=1.91.
+- [x] **Strength-grid hygiene verified** (next section).
+- [x] **Comparison vs T-SAE k=20 anchor; outcome called.**
+
+### Strength curve (full s_norm grid; verified interior peak)
+
+| s_norm | s_abs | success | coh | notes |
+|---|---|---|---|---|
+| 0.5 | 12.6 | 0.133 | 2.900 | grid bottom; very weak steering, coherent |
+| 1 | 25.1 | 0.333 | 2.800 | |
+| 2 | 50.2 | 0.367 | 2.400 | |
+| 5 | 125.5 | **0.700** | 1.967 | **peak under coh ≥ 1.5 (METRIC B)** |
+| 10 | 251.1 | **1.000** | 1.200 | **unconstrained peak (METRIC A)**, coh fell below 1.5 cliff |
+| 20 | 502.1 | 0.867 | 1.300 | post-peak; success declining |
+| 50 | 1255.3 | 0.233 | 0.833 | grid top; collapsed (incoherent) |
+
+**Hygiene PASS**: unconstrained peak at s_norm=10 is interior to the grid
+(both s_norm=5 and s_norm=20 have lower success). Constrained peak at
+s_norm=5 is "constraint-bound" — next-up s_norm=10 drops coh below 1.5.
+That's failure mode #3 in the hygiene checklist: the true constrained
+optimum, not a grid artifact. **No grid extension needed.**
+
+### Outcome (called against pre-registered ±0.27 threshold)
+
+#### METRIC A: peak success unconstrained
+
+| arch | peak | s_abs@peak | coh@peak | Δ vs anchor | call |
+|---|---|---|---|---|---|
+| tsae_paper_k20 (anchor) | **1.80** | 99.8 | 1.40 | (anchor) | — |
+| txc_bare_antidead_t5_kpos20 (Step 2) | **1.000** | 251.1 | 1.20 | **−0.800** | **LOSS** |
+
+#### METRIC B: peak success at coh ≥ 1.5 (brief's locked primary)
+
+| arch | peak | s_abs@peak | Δ vs anchor | call |
+|---|---|---|---|---|
+| tsae_paper_k20 (anchor) | **1.10** | 49.9 | (anchor) | — |
+| txc_bare_antidead_t5_kpos20 (Step 2) | **0.700** | 125.5 | **−0.400** | **LOSS** |
+
+**Step 2 loses under both metrics by ≥0.27** ⇒ architectural anti-prior
+at matched per-token sparsity (k_pos=20). Per the pre-registered rule,
+this triggers Outcome C: failure-mode investigation via Steps 1, 3, 4-5.
+
+### Per-concept-class breakdown (at each arch's coh ≥ 1.5 peak s_abs)
+
+| class | T-SAE k=20 | TXC kpos20 (Step 2) | Δ |
+|---|---|---|---|
+| knowledge / domain | 2.000 | 1.444 | −0.556 |
+| discourse / register | 1.375 | 0.500 | −0.875 |
+| safety / alignment | 0.333 | 0.000 | −0.333 |
+| **stylistic** | **0.200** | **0.600** | **+0.400** ⭐ |
+| sentiment | 0.500 | 0.500 | 0.000 |
+
+**Notable**: TXC kpos20 *wins* on stylistic concepts (poetic, literary,
+list_format, citation_pattern, technical_jargon) by +0.40 — the only
+class where the matched-sparsity TXC outperforms T-SAE k=20 under the
+coherent-steering metric. Possible mechanism: stylistic features are
+more "context-shape" than single-token concepts; the window encoder's
+multi-token receptive field plays to that strength.
+
+**Compared to previous Y's per-class finding**: previous Y reported TXC
+family wins on **knowledge / domain** under unconstrained paper-clamp
+(0.32 mean Δ). At matched-sparsity + coh ≥ 1.5, that pattern flips —
+T-SAE k=20 dominates knowledge (2.0 vs 1.44). The "TXC wins on
+knowledge" claim was *metric-dependent*. Step 2 finds **stylistic**
+as the only TXC-favourable class under the coherent-steering metric.
+
+### Plots
+
+Saved at `results/case_studies/plots/`:
+- `kpos20_vs_tsae_curves.png` (+ `.thumb.png`) — success(s_norm) and
+  coh(s_norm) curves for T-SAE k=20 and TXC kpos20.
+- `kpos20_vs_tsae_concept_class.png` (+ `.thumb.png`) — per-class
+  bar chart at each arch's coh ≥ 1.5 peak s_norm.
+- `kpos20_vs_tsae_summary.json` — full numerical table.
+
+### Early finding: feature polysemanticity at k_pos=20
+
+**Picked-feature collision rate is 3× higher than T-SAE k=20.**
+
+| arch | distinct picked features | colliding features (picked for ≥2 concepts) |
+|---|---|---|
+| **txc_bare_antidead_t5_kpos20** (Step 2) | **24/30** | **4** features: feat 16117 → 4 concepts (harmful_content / deception / medical / literary), feat 5775 → 2 (refusal_pattern / question_form), feat 12721 → 2 (historical / technical_jargon), feat 424 → 2 (casual_register / list_format) |
+| tsae_paper_k20 (anchor) | 28/30 | 2 features: feat 2949 → 2 (scientific / technical_jargon), feat 392 → 2 (narrative / dialogue) |
+
+**Interpretation**: at matched per-token sparsity (k_pos=20), the window
+encoder appears to produce *less concept-specialised* features than the
+per-token T-SAE encoder. Possible mechanism: with k_win=100 features
+fired across a 5-token window, the window encoder integrates across
+context, creating "active-on-everything" features that have high
+absolute activation but low concept selectivity. The lift-based
+selection then picks these generic-active features for multiple
+concepts.
+
+**Anecdotal corroboration** (sample medical generations at the picked
+feature, before grading):
+- s_norm=1: "we use the internet to communicate, shop, learn, ..."
+  (no medical content)
+- s_norm=10: "the majority of people are not happy with their lives,
+  jobs, relationships, health, ..."
+  (mentions "health" in a list of generic life domains)
+- s_norm=50: "in a situation that is a very simple, and the,,," (incoherent)
+
+The picked feature for medical is feat 16117 — same feature picked for
+harmful_content, deception, and literary. So when we steer it, we don't
+push toward "medical" per se; we push toward whatever this generic
+feature represents. That's a steering protocol issue induced by feature
+polysemanticity, not a paper-clamp protocol issue.
+
+**Paper relevance**: this is a FINDING regardless of how the grades
+land. Even if Step 2 wins on peak success, the polysemanticity matters
+for interpretability claims. If Step 2 loses, polysemanticity is a
+causal mechanism we can name.
 
 ### Coordination with Agent W
 
