@@ -138,7 +138,12 @@ def main() -> None:
              "T+max_shift tokens from random offsets within the L axis. "
              "Cropping L to e.g. 64 halves the buffer (14→7 GB) while still "
              "leaving ~30 valid offsets per sequence for typical T+max_shift "
-             "≤ 30 — large memory win on the 5090.",
+             "≤ 30 — large memory win on the 5090. NOTE: the slice is "
+             "[:, -ctx:, :] (LAST ctx positions), NOT [:, :ctx, :]. The "
+             "fineweb cache is LEFT-padded (pad_token id=0 at start, real "
+             "text at end); the last 32 positions are guaranteed all-real "
+             "(min n_real=37). The first-N slice is a known bug — see "
+             "agent_z_paper/2026-04-29-z-handover.md §'Cache pitfall'.",
     )
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--max_steps", type=int, default=8000)
@@ -164,7 +169,11 @@ def main() -> None:
     t0 = time.time()
     buf_anchor = preload_single(n_seqs=args.n_seqs)
     if args.ctx < buf_anchor.shape[1]:
-        buf_anchor = buf_anchor[:, :args.ctx, :].contiguous()
+        # LAST ctx positions — guaranteed all-real (min n_real=37 ≥ 32) for
+        # ctx ≤ 32, mostly-real for ctx ≤ 64. NEVER use [:, :ctx, :] —
+        # left-padding makes that the first-padding slice, which silently
+        # trains ~5% of samples on pure-padding activations (Z's prior bug).
+        buf_anchor = buf_anchor[:, -args.ctx:, :].contiguous()
         torch.cuda.empty_cache()
     print(f"  shape={tuple(buf_anchor.shape)} dtype={buf_anchor.dtype} "
           f"device={buf_anchor.device} "
