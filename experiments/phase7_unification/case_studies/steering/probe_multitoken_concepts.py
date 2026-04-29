@@ -31,7 +31,6 @@ from pathlib import Path
 import numpy as np
 import torch
 from sklearn.metrics import roc_auc_score
-from sklearn.linear_model import LogisticRegression
 
 os.environ.setdefault("HF_HOME", "/workspace/hf_cache")
 os.environ.setdefault("TQDM_DISABLE", "1")
@@ -186,48 +185,42 @@ def encode_sentences(arch_id: str, sentences: list[str], device, batch_size: int
 
 
 def per_phrase_auc(acts_pos: np.ndarray, acts_neg: np.ndarray, attn_pos, attn_neg, T: int, k_feat: int) -> float:
-    """Train top-k logistic-regression classifier; return ROC-AUC.
+    """Per-feature AUC (no LR fitting).
 
-    Per-example score: mean activation of the chosen features over content
-    positions (with T-window mask for window archs).
+    For each candidate feature, score each example as the *max* activation
+    over content positions (TXC's natural unit-of-evidence: a feature
+    fires once at the n-gram window). Pick top-k features by mean
+    pos-neg gap, then aggregate AUC by either single-best (k=1) or
+    sum-of-top-k (k≥5).
+
+    This is a direct, low-cost measure that doesn't require any
+    parameter fit and rewards features that fire ONCE at the right
+    position.
     """
-    def _example_features(acts, attn):
-        # acts: (N, S, d_sae); attn: (N, S). For window archs, exclude
-        # positions < T-1 (no full window).
-        N, S, D = acts.shape
+    def _example_max(acts, attn):
         m = attn.astype(np.float32)
         if T > 1:
-            valid = np.zeros(S, dtype=np.float32)
+            valid = np.zeros(acts.shape[1], dtype=np.float32)
             valid[T-1:] = 1.0
             m = m * valid[None, :]
-        # Mean activation per feature (N, D)
-        m_e = m[:, :, None]
-        sums = (acts * m_e).sum(axis=1)
-        counts = m.sum(axis=1).clip(min=1.0)[:, None]
-        return sums / counts
+        # Mask non-content positions to a very negative value so MAX ignores them.
+        masked = np.where(m[:, :, None] > 0, acts, -1e9)
+        return masked.max(axis=1)  # (N, d_sae)
 
-    feat_pos = _example_features(acts_pos, attn_pos)
-    feat_neg = _example_features(acts_neg, attn_neg)
-    X = np.concatenate([feat_pos, feat_neg], axis=0)
-    y = np.concatenate([np.ones(len(feat_pos)), np.zeros(len(feat_neg))])
+    feat_pos = _example_max(acts_pos, attn_pos)
+    feat_neg = _example_max(acts_neg, attn_neg)
+    diff = feat_pos.mean(axis=0) - feat_neg.mean(axis=0)
     if k_feat == 1:
-        # Pick best feature by training AUC, return test-AUC on same set (no held-out)
-        # Use mean-difference as the picker, then evaluate AUC
-        diff = feat_pos.mean(axis=0) - feat_neg.mean(axis=0)
         best = int(np.argmax(np.abs(diff)))
-        scores = X[:, best] * np.sign(diff[best])
+        scores = np.concatenate([feat_pos[:, best], feat_neg[:, best]]) * float(np.sign(diff[best]))
     else:
-        # Train logistic regression with l1 sparsity, restricted to top-k features
-        # First select top-k by absolute mean-diff
-        diff = feat_pos.mean(axis=0) - feat_neg.mean(axis=0)
         top_k_idx = np.argsort(-np.abs(diff))[:k_feat]
-        Xk = X[:, top_k_idx]
-        clf = LogisticRegression(C=1.0, max_iter=200)
-        try:
-            clf.fit(Xk, y)
-            scores = clf.decision_function(Xk)
-        except Exception:
-            scores = X[:, top_k_idx[0]]
+        signs = np.sign(diff[top_k_idx])
+        # Sum of signed activations across top-k
+        scores_pos = (feat_pos[:, top_k_idx] * signs).sum(axis=1)
+        scores_neg = (feat_neg[:, top_k_idx] * signs).sum(axis=1)
+        scores = np.concatenate([scores_pos, scores_neg])
+    y = np.concatenate([np.ones(len(feat_pos)), np.zeros(len(feat_neg))])
     return float(roc_auc_score(y, scores))
 
 

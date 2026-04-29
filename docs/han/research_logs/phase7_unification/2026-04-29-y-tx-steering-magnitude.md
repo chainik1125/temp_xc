@@ -100,10 +100,20 @@ tested over the *same* range of "log distance from typical activation."
 |---|---|---|---|---|---|---|
 | topk_sae | 1 | 12.2 | 121.7 | 10.0 | 1.10 | 1.20 |
 | tsae_paper_k20 | 1 | 10.0 | 99.8 | 10.0 | **1.80** | 1.40 |
-| tsae_paper_k500 | 1 | 11.6 | TBD | TBD | TBD | TBD |
+| tsae_paper_k500 | 1 | 11.6 | 116.5 | 10.0 | 1.27 | 1.43 |
 | agentic_txc_02 | 5 | 29.5 | TBD | TBD | TBD | TBD |
 | phase5b_subseq_h8 | 10 | 66.9 | TBD | TBD | TBD | TBD |
 | phase57_partB_h8_bare_multidistance_t5 | 5 | 25.2 | TBD | TBD | TBD | TBD |
+
+**All three per-token archs peak at s_norm=10** (= 10× their typical
+activation magnitude), as predicted. Cross-arch peak success at
+s_norm=10:
+
+```
+tsae_paper_k20:  1.80  (matches Dmitry's 1.93 within concept noise)
+tsae_paper_k500: 1.27  (matches Dmitry's 1.33)
+topk_sae:        1.10  (matches Dmitry's 1.07)
+```
 
 **Validation against Dmitry's per-token baseline:**
 
