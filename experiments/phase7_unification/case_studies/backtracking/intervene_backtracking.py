@@ -208,8 +208,28 @@ def load_targets(decompose_suffix: str, top_k: int):
     return raw_dom_unit, top
 
 
-def held_out_prompts() -> list[dict]:
-    return list(PROMPTS[-N_HELDOUT:])
+def held_out_prompts(stratified: bool = False) -> list[dict]:
+    """Default: last N_HELDOUT prompts (which, with the current PROMPTS
+    ordering, are all from one category — the last one).
+
+    `stratified=True` takes the *last* `N_HELDOUT // n_categories` prompts
+    from each category, giving a balanced cross-category held-out set
+    (3 prompts × 10 categories = 30 with the default 300-prompt pool).
+    The cache step stays at PROMPTS[:N_PROMPTS] so the held-out prompts
+    are still in the cache; the comparison validity (raw_dom vs SAE on
+    the same prompts) is preserved.
+    """
+    if not stratified:
+        return list(PROMPTS[-N_HELDOUT:])
+    by_cat: dict[str, list] = {}
+    for p in PROMPTS:
+        by_cat.setdefault(p["category"], []).append(p)
+    cats = sorted(by_cat.keys())
+    per_cat = max(1, N_HELDOUT // len(cats))
+    out: list[dict] = []
+    for cat in cats:
+        out.extend(by_cat[cat][-per_cat:])
+    return out[:N_HELDOUT]
 
 
 # ── runner ──────────────────────────────────────────────────────────────────
@@ -235,6 +255,8 @@ def main() -> None:
     parser.add_argument("--limit-prompts", type=int, default=None)
     parser.add_argument("--magnitudes", type=str, default=None,
                         help="comma-separated overrides for additive magnitudes (e.g. '-12,-8,-4,0,4,8,12'). Default uses ADDITIVE_MAGNITUDES from _paths.")
+    parser.add_argument("--held-out-stratified", action="store_true",
+                        help="Use a stratified held-out set: 3 prompts × 10 categories (=30) instead of the last 30 (which are all one category).")
     parser.add_argument("--force", action="store_true")
     args = parser.parse_args()
     additive_magnitudes = (
@@ -304,7 +326,7 @@ def main() -> None:
         terminator_ids = make_terminator_id_set(tokenizer)
         print(f" {len(terminator_ids)} ids")
 
-    prompts = held_out_prompts()
+    prompts = held_out_prompts(stratified=args.held_out_stratified)
     if args.limit_prompts is not None:
         prompts = prompts[: args.limit_prompts]
     print(
