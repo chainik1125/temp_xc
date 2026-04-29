@@ -191,38 +191,41 @@ matrix.
 
 **Final isolated frontier (test ASR₁₆, baseline 0.99 across all):**
 
-| hookpoint     | SAE iso             | T-SAE iso | TXC iso  |
-|---------------|--------------------:|----------:|---------:|
-| `ln1.0`       | (joint v2: 0.93) ¹  | **0.00**  | 0.05     |
-| `resid_pre.0` | 0.90                | 0.75      | **0.18** |
-| `resid_mid.0` | **0.00**            | 0.99      | 0.96     |
-| `resid_post.0`| 0.03                | 0.98      | 0.90     |
-| `ln1.1`       | (joint v2: 0.99) ¹  | 0.30      | 0.94     |
+| hookpoint     | SAE iso  | T-SAE iso | TXC iso  |
+|---------------|---------:|----------:|---------:|
+| `ln1.0`       | 0.19     | **0.00**  | 0.05     |
+| `resid_pre.0` | 0.90     | 0.75      | **0.18** |
+| `resid_mid.0` | **0.00** | 0.99      | 0.96     |
+| `resid_post.0`| 0.03     | 0.98      | 0.90     |
+| `ln1.1`       | 0.75 †   | 0.30 †    | 0.94 †   |
 
-ΔCE ≤ 0.005 nats for every chosen point except `tsae_l1_ln1` (+0.040)
-and `txc_l1_ln1` (+0.035) — the layer-1 controls were marginal.
-
-¹ Isolated SAE at `ln1.0` and `ln1.1` not yet run; only joint v2
-numbers available for those two cells. Queued as a minor follow-up.
+ΔCE ≤ 0.005 nats for every chosen point at the layer-0 hookpoints. †
+marks the layer-1 controls where the chosen feature exceeds the
+ΔCE ≤ 0.05 utility budget — for `iso_sae_l1_ln1` ΔCE=+0.077, for
+`iso_tsae_l1_ln1` +0.040, for `iso_txc_l1_ln1` +0.035. Read the layer-1
+row as "no clean suppression with any architecture" rather than as a
+ranked outcome.
 
 **Joint vs isolated drift — the joint-training story is hookpoint *and*
 arch-specific:**
 
 | arch  | hookpoint     | v2 joint | isolated | drift |
 |-------|---------------|---------:|---------:|------:|
+| SAE   | ln1.0         | 0.93     | 0.19     | +0.74 (isolated better) |
 | SAE   | resid_pre.0   | 0.53     | 0.90     | -0.37 (joint better) |
 | SAE   | resid_mid.0   | 0.54     | 0.00     | +0.54 (isolated better) |
 | SAE   | resid_post.0  | 0.00     | 0.03     |  0.00 |
+| SAE   | ln1.1         | 0.99     | 0.75 †   | +0.24 (isolated better, but ΔCE blew up) |
 | T-SAE | ln1.0         | 0.32     | 0.00     | +0.32 (isolated better) |
 | T-SAE | resid_pre.0   | 0.80     | 0.75     |  0.05 |
 | T-SAE | resid_mid.0   | 0.79     | 0.99     | -0.20 (joint better) |
 | T-SAE | resid_post.0  | 0.87     | 0.98     | -0.11 (joint better) |
-| T-SAE | ln1.1         | 0.75     | 0.30     | +0.45 (isolated better) |
+| T-SAE | ln1.1         | 0.75     | 0.30 †   | +0.45 (isolated better) |
 | TXC   | ln1.0         | 0.02     | 0.05     | -0.03 |
 | TXC   | resid_pre.0   | 0.21     | 0.18     |  0.03 |
 | TXC   | resid_mid.0   | 0.94     | 0.96     | -0.02 |
 | TXC   | resid_post.0  | 0.57     | 0.90     | -0.33 (joint better) |
-| TXC   | ln1.1         | 0.96     | 0.94     |  0.02 |
+| TXC   | ln1.1         | 0.96     | 0.94 †   |  0.02 |
 
 Three observations:
 
@@ -246,19 +249,42 @@ Three observations:
 
 The original question — "does the suppression / coherence frontier
 shift when we change architectures?" — has a clean answer: **yes, but
-the optimal architecture is hookpoint-specific.** TXC is the right
-choice when the activation has clean LayerNorm geometry and you're
-reading early in the block (`ln1.0`, `resid_pre.0`). The per-token
-SAE wins at the post-attn / post-MLP residual (`resid_mid.0`,
-`resid_post.0`) — exactly where attention has done its mixing. T-SAE
-is a strong middle-ground only at the post-LN sites (`ln1.0`,
-`ln1.1`).
+the optimal architecture is hookpoint-specific, and the joint-training
+methodology can flip the apparent winner by enough to mislead.**
 
-The most surprising single number isn't a winning point — it's that
-the per-token SAE at `resid_mid.0` reaches ASR=0.00 with ΔCE=-0.001 in
-isolation but only 0.54 inside the 15-arch joint training. Anyone
-trying to compare architectures in a shared-batch setup should check
-this isolation effect before reporting the result.
+In the cleanest (isolated) version of the table:
+
+- At **`ln1.0`** (post-LN, pre-attn) — temporal architectures dominate:
+  T-SAE 0.00, TXC 0.05, SAE 0.19. The contrastive / cross-position
+  structure of the temporal archs is helping where the activation has
+  clean LayerNorm geometry and the trigger feature is being formed.
+- At **`resid_pre.0`** — TXC wins (0.18) by a wide margin over SAE
+  (0.90) and T-SAE (0.75). Same explanation: pre-attention, residual
+  geometry but no attention mixing yet.
+- At **`resid_mid.0`** (post-attn, pre-MLP) and **`resid_post.0`**
+  (post-attn + post-MLP) — the per-token SAE wins decisively (0.00
+  and 0.03 respectively), and both temporal archs are stuck above
+  0.90. Attention has mixed the trigger token's contribution across
+  positions, so the temporal archs no longer have the per-position
+  structure to lean on.
+- At **`ln1.1`** — no clean suppression at any utility budget; the
+  layer-1 site is generically harder.
+
+Two methodological lessons:
+
+1. **Joint training of multiple architectures sharing a batch
+   distorts feature ranking — sometimes by a lot.** SAE at `ln1.0`
+   went from 0.93 (joint) → 0.19 (isolated), 74 percentage points;
+   SAE at `resid_mid.0` went from 0.54 → 0.00; T-SAE at `ln1.0` went
+   from 0.32 → 0.00. The drift is bidirectional and arch-specific
+   (TXC was largely robust). Shared-batch comparisons of SAE
+   architectures should always be backed by isolated re-runs at the
+   chosen hookpoints.
+2. **The temporal-arch advantage is real and localised.** It isn't
+   that "temporal architectures are better than per-token SAEs" —
+   they're better *only* at the early-block, normalised hookpoints.
+   At the post-attention residual, per-token SAE remains the
+   strongest single-feature lever for suppression at zero CE cost.
 
 ### Pointers
 
