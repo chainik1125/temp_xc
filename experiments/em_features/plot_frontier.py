@@ -29,6 +29,12 @@ def parse_args():
     p.add_argument("--title", default="Coherence / suppression frontier on Qwen-2.5-7B bad-medical (layer 15)")
     p.add_argument("--xlabel", default="mean_coherence (OpenAI judge)")
     p.add_argument("--ylabel", default="mean_alignment (OpenAI judge)")
+    p.add_argument("--alpha_clip", type=float, default=None,
+                   help="Drop α-points with |α| > this (useful to hide -100/+100 collapse)")
+    p.add_argument("--annotate", choices=["all", "peak", "none"], default="all",
+                   help="Annotate each α (all), peak only (peak), or none (none)")
+    p.add_argument("--mark_alpha_zero", action="store_true",
+                   help="Add a black ★ at α=0 for each curve")
     return p.parse_args()
 
 
@@ -59,16 +65,32 @@ def main():
             print(f"skipping {label}: no judged rows")
             continue
 
+        if args.alpha_clip is not None:
+            keep = np.abs(alphas) <= args.alpha_clip
+            alphas, coh, align = alphas[keep], coh[keep], align[keep]
+            if len(alphas) == 0:
+                print(f"skipping {label}: all α clipped"); continue
+
         ax.plot(coh, align, "-", color=f"C{i}", alpha=0.4, zorder=1)
         sc = ax.scatter(
             coh, align, c=alphas, cmap="coolwarm_r",
             marker=markers[i % len(markers)], s=60, edgecolor="k",
             linewidth=0.5, label=label, zorder=2,
         )
-        # Annotate each α
-        for a, x, y in zip(alphas, coh, align):
-            ax.annotate(f"{a:+.2f}", (x, y), textcoords="offset points",
-                        xytext=(4, 4), fontsize=7, alpha=0.7)
+        if args.annotate == "all":
+            for a, x, y in zip(alphas, coh, align):
+                ax.annotate(f"{a:+.2f}", (x, y), textcoords="offset points",
+                            xytext=(4, 4), fontsize=7, alpha=0.7)
+        elif args.annotate == "peak":
+            peak_i = int(np.argmax(align))
+            ax.annotate(f"α={alphas[peak_i]:+.2f}\nalign={align[peak_i]:.2f}",
+                        (coh[peak_i], align[peak_i]),
+                        textcoords="offset points", xytext=(6, 6),
+                        fontsize=8, color=f"C{i}", fontweight="bold")
+        if args.mark_alpha_zero and 0 in alphas:
+            zi = int(np.argmin(np.abs(alphas)))
+            ax.scatter([coh[zi]], [align[zi]], marker="*", s=120,
+                       c="black", zorder=4)
 
     cbar = fig.colorbar(sc, ax=ax, pad=0.02)
     cbar.set_label("steering coefficient α")
