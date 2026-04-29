@@ -15,24 +15,27 @@ tags:
 ### One-paragraph version
 
 We compare temporal-crosscoder (TXC) families against per-token T-SAE
-on Ye et al. (2025)'s steering benchmark using the paper's own
-clamp-on-latent + error-preserve protocol. T-SAE k=20 leads at peak
-success 1.93 (out of 3) compared to TXC matryoshka's 0.97 — a gap of
-0.96 that initially looks like an architectural advantage. We show
-this gap is dominantly a **sparsity** difference, not a per-token vs
-window difference: T-SAE k=500 (same architecture, different sparsity)
-trails T-SAE k=20 by 0.53 success points; at matched effective sparsity
-(k_pos≈100-500 across families), the cross-family spread shrinks to
-0.27 — within concept-variance noise on a 30-concept set. We further
-identify two sources of methodological bias in the paper-clamp protocol:
-(i) the absolute strength schedule implicitly assumes per-token
-activation magnitudes, under-driving window archs by 3-16×; and (ii)
-right-edge attribution wastes T-1 reconstructed positions per window.
-Correcting both (family-normalised strength + per-position write-back)
-recovers an additional ~25% of the TXC gap. Per-concept analysis shows
-TXC family wins outright on knowledge-domain multi-token concepts
-(medical, mathematical, historical, code, scientific), consistent with
-the multi-token receptive-field structural argument.
+on Ye et al. (2025)'s steering benchmark. **TXC family wins decisively
+on knowledge-domain multi-token concepts** (medical, mathematical,
+historical, code, scientific) — TXC matryoshka mean success 1.89 vs
+T-SAE k=20's 1.56, a 0.32 gap consistent with the multi-token
+receptive-field argument. T-SAE k=20 wins decisively on
+discourse/register concepts (dialogue, imperative, casual register) by
+~2.00 mean success points, where local syntactic cues suffice and its
+sparse features specialise cleanly. The pooled cross-arch peak
+favours T-SAE k=20 (1.80 vs TXC matryoshka's 1.07) only because the
+30-concept benchmark over-represents discourse concepts; at the
+concept-class level, neither family universally dominates. We further
+show that **the pooled gap is dominantly a sparsity choice** (T-SAE
+k=20 vs k=500 = 0.53 of the 0.96 pooled gap) rather than a per-token
+vs window architectural advantage: at matched effective sparsity
+(k_pos ≈ 100-500), cross-family spread is 0.27 — within concept noise.
+Two methodological biases in the paper-clamp protocol contribute the
+remaining ~25%: (i) the absolute strength schedule under-drives window
+archs by 3-16× (window-arch encoder magnitudes scale with T); (ii)
+right-edge attribution wastes T-1 reconstructed positions. We propose
+family-normalised strengths and per-position write-back as
+methodological fixes.
 
 ### Section-length version
 
