@@ -1,0 +1,55 @@
+{
+  "n_sentences": 150,
+  "max_len": 64,
+  "n_valid_tokens_summary": 2413,
+  "archs": {
+    "topk_sae": {
+      "src_class": "TopKSAE",
+      "T": 1,
+      "d_sae": 18432,
+      "n_valid_tokens": 2413,
+      "signal_variance": 282997.8125,
+      "baseline_mse": 2180.647216796875,
+      "baseline_frac_var_explained": 0.9922944732415666,
+      "holdout_mse": 282943.0,
+      "holdout_frac_var_explained": 0.0001936852427083524,
+      "holdout_relative_to_baseline": 129.75184514972182
+    },
+    "tsae_paper_k20": {
+      "src_class": "TemporalMatryoshkaBatchTopKSAE",
+      "T": 1,
+      "d_sae": 18432,
+      "n_valid_tokens": 2413,
+      "signal_variance": 282997.8125,
+      "baseline_mse": 5376.705078125,
+      "baseline_frac_var_explained": 0.9810008952697293,
+      "holdout_mse": 275763.3125,
+      "holdout_frac_var_explained": 0.025563801840341127,
+      "holdout_relative_to_baseline": 51.28853238053481
+    },
+    "agentic_txc_02": {
+      "src_class": "MatryoshkaTXCDRContrastiveMultiscale",
+      "T": 5,
+      "d_sae": 18432,
+      "n_valid_tokens": 1813,
+      "signal_variance": 22958.525390625,
+      "baseline_mse": 5212.3330078125,
+      "baseline_frac_var_explained": 0.7729674306547174,
+      "holdout_mse": 16506.263671875,
+      "holdout_frac_var_explained": 0.2810399016909313,
+      "holdout_relative_to_baseline": 3.1667707429925533
+    },
+    "phase5b_subseq_h8": {
+      "src_class": "SubseqH8",
+      "T": 10,
+      "d_sae": 18432,
+      "n_valid_tokens": 1063,
+      "signal_variance": 22946.4453125,
+      "baseline_mse": 11512.1083984375,
+      "baseline_frac_var_explained": 0.498305369670207,
+      "holdout_mse": 61787.2734375,
+      "holdout_frac_var_explained": -1.6926729868630934,
+      "holdout_relative_to_baseline": 5.3671552854632765
+    }
+  }
+}
