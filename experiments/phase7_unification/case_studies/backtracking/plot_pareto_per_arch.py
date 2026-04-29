@@ -107,14 +107,17 @@ def main() -> None:
     n = len(curves)
     cols = args.cols
     rows = (n + cols - 1) // cols
-    fig, axes = plt.subplots(rows, cols, figsize=(6 * cols, 5.0 * rows), squeeze=False)
+    fig, axes = plt.subplots(rows, cols, figsize=(6 * cols, 5.0 * rows),
+                             squeeze=False, sharex=True, sharey=True)
     # Generous vertical spacing so the bottom row's titles don't collide with the
     # top row's x-axis labels.
-    fig.subplots_adjust(hspace=0.55, wspace=0.30)
+    fig.subplots_adjust(hspace=0.55, wspace=0.20)
 
-    # Determine global α range for shared colorbar
+    # Determine global ranges for shared axes + colorbar.
     all_alphas = [a for _, pts in curves for a, *_ in pts]
+    all_kws = [kw for _, pts in curves for _, kw, _, _ in pts]
     a_min, a_max = min(all_alphas), max(all_alphas)
+    kw_max = max(all_kws)
     cmap = plt.get_cmap("viridis")
     norm = Normalize(vmin=a_min, vmax=a_max)
 
@@ -132,10 +135,14 @@ def main() -> None:
         for x, y, a in zip(xs, ys, alphas):
             ax.annotate(f"{a:g}", xy=(x, y), xytext=(5, 5),
                         textcoords="offset points", fontsize=7, alpha=0.7)
-        ax.set_xlabel("backtracking rate (mean kw fraction in B = {wait, hmm})")
-        ax.set_ylabel("Sonnet coherence (0 incoherent ↔ 3 coherent)")
+        # With sharex/sharey, only the bottom-row gets x-labels and only the
+        # left column gets y-labels (matplotlib hides the others by default).
+        if i // cols == rows - 1 or i + cols >= n:
+            ax.set_xlabel("backtracking rate (mean kw fraction in B = {wait, hmm})")
+        if i % cols == 0:
+            ax.set_ylabel("Sonnet coherence (0 incoherent ↔ 3 coherent)")
         ax.set_ylim(-0.1, 3.1)
-        ax.set_xlim(left=-0.005)
+        ax.set_xlim(-0.005, kw_max * 1.05)
         ax.set_title(label, fontsize=10)
         ax.grid(True, alpha=0.3)
 
