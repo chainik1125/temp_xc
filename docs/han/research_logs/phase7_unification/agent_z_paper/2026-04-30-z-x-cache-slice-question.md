@@ -78,6 +78,33 @@ result is competitive at PAPER k=20 seed=42 and X disagrees with
 the slice direction post-hoc, we re-train from scratch with the
 preferred slice.
 
+### Update 2026-04-30: cache rebuilt + padding direction verified
+
+Cache rebuilt successfully on 5090 (`build_act_cache_phase7 --layer 12`,
+1.9 min). Direct token-ID inspection of the rebuilt cache:
+
+| metric | value |
+|---|---|
+| total sequences | 24000 |
+| sequences with 0 pads (BOS at pos 0, real to pos 127) | 21432 (89.3%) |
+| sequences with ≥1 leading pad (LEFT-padded) | 2568 (10.7%) |
+| sequences with ANY trailing pad | 0 (0.0%) |
+| max leading-pad run | 91 positions |
+| min n_real | 37 positions |
+| **rows with PAD in last 32 (96..127)** | **0 (0.0%)** ← `[:, -32:, :]` 100% safe |
+| **rows with PAD in last 64 (64..127)** | **49 (0.2%)** ← `[:, -64:, :]` 99.8% safe |
+| rows with PAD in first 32 (0..31) | 2568 (10.7%) ← `[:, :32, :]` BAD direction |
+
+**Conclusion**: `[:, -64:, :]` slice is essentially safe (only 0.2% of
+sequences have any leading pad in the last-64 region). Z proceeds with
+this plan. If X has additional context I should defer to, please
+respond via commit message.
+
+The handover's "LEFT-padded" wording was misleading — the cache is
+actually MOSTLY RIGHT-aligned (89.3% are full-128 with no pad at all,
+the rest have leading pad). But the direction conclusion stands: last
+positions are always real, first positions can be pad.
+
 ### Coordination protocol
 
 Reply via commit message convention (`X → Z: ...`) or by editing
