@@ -96,7 +96,7 @@ tested over the *same* range of "log distance from typical activation."
 
 #### Per-arch results (partial — grades arriving in batches)
 
-**5-arch Q1.3 results** (h8_multidist grading in flight):
+**Final 6-arch Q1.3 results**:
 
 | arch | T | k_eff | `<|z|>` | peak s_norm | peak suc | peak coh |
 |---|---|---|---|---|---|---|
@@ -104,7 +104,8 @@ tested over the *same* range of "log distance from typical activation."
 | tsae_paper_k20 | 1 | k=20 | 10.0 | 10.0 | **1.80** | 1.40 |
 | tsae_paper_k500 | 1 | k=500 | 11.6 | 10.0 | 1.27 | 1.43 |
 | agentic_txc_02 | 5 | k_pos=100 | 29.5 | 10.0 | 1.07 | 1.27 |
-| phase5b_subseq_h8 | 10 | k_win=500 (~k_pos=50) | 66.9 | 5.0 | 1.00 | 1.20 |
+| phase5b_subseq_h8 | 10 | k_win=500 (≈k_pos=50) | 66.9 | 5.0 | 1.00 | 1.20 |
+| phase57_partB_h8_bare_multidistance_t5 | 5 | k_pos=100 | 25.2 | 10.0 | 1.14 | 1.45 |
 
 **Per-token + window archs all peak at s_norm ∈ [5, 10]** (5-10× typical
 `<|z|>`), as predicted. Cross-arch peak success matches Dmitry's reported
