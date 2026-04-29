@@ -233,8 +233,15 @@ def main() -> None:
     parser.add_argument("--decompose-suffix", default="", help="read decompose results from decompose<_suffix>/")
     parser.add_argument("--intervene-suffix", default="", help="write intervene results to intervene<_suffix>/")
     parser.add_argument("--limit-prompts", type=int, default=None)
+    parser.add_argument("--magnitudes", type=str, default=None,
+                        help="comma-separated overrides for additive magnitudes (e.g. '-12,-8,-4,0,4,8,12'). Default uses ADDITIVE_MAGNITUDES from _paths.")
     parser.add_argument("--force", action="store_true")
     args = parser.parse_args()
+    additive_magnitudes = (
+        tuple(float(s) for s in args.magnitudes.split(","))
+        if args.magnitudes is not None
+        else ADDITIVE_MAGNITUDES
+    )
 
     ensure_dirs()
     out_dir = _intervene_dir(args.intervene_suffix)
@@ -327,7 +334,7 @@ def main() -> None:
 
             # ----- A. raw DoM baseline -----
             if "raw_dom" in args.modes and raw_dir is not None:
-                for alpha in ADDITIVE_MAGNITUDES:
+                for alpha in additive_magnitudes:
                     _set_state({"mode": "additive", "direction": raw_dir, "alpha": float(alpha)})
                     text = _gen_one(model, input_ids, tokenizer, eos_id, hook_obj, terminator_ids, args)
                     fout.write(json.dumps({
@@ -344,7 +351,7 @@ def main() -> None:
                     for rec in top_features:
                         j = int(rec["feature_idx"])
                         direction = feature_dirs[j]
-                        for alpha in ADDITIVE_MAGNITUDES:
+                        for alpha in additive_magnitudes:
                             _set_state({"mode": "additive", "direction": direction, "alpha": float(alpha)})
                             text = _gen_one(model, input_ids, tokenizer, eos_id, hook_obj, terminator_ids, args)
                             fout.write(json.dumps({
@@ -357,7 +364,7 @@ def main() -> None:
                             n_runs += 1
                 else:  # sum_topk
                     feat_str = "+".join(str(int(r["feature_idx"])) for r in top_features)
-                    for alpha in ADDITIVE_MAGNITUDES:
+                    for alpha in additive_magnitudes:
                         _set_state({"mode": "additive", "direction": combined_dir, "alpha": float(alpha)})
                         text = _gen_one(model, input_ids, tokenizer, eos_id, hook_obj, terminator_ids, args)
                         fout.write(json.dumps({
