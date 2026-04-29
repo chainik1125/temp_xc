@@ -1,0 +1,22 @@
+{
+  "n_traces": 20,
+  "keywords": [
+    "hmm",
+    "wait"
+  ],
+  "off_lo": -13,
+  "off_hi": -8,
+  "n_events_total": 29,
+  "events_per_category": {
+    "logic": 7,
+    "geometry": 22
+  },
+  "think_tokens_per_category": {
+    "logic": 3154,
+    "geometry": 4543
+  },
+  "rate_per_category": {
+    "logic": 0.0022194039315155357,
+    "geometry": 0.004842615012106538
+  }
+}

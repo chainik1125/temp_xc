@@ -1,0 +1,4 @@
+# Heavy binaries — regenerable from upstream stages.
+cache_l10/activations.fp16.npy
+decompose/feature_stats.npz
+decompose/raw_dom.fp16.npy

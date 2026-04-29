@@ -1,0 +1,47 @@
+[
+  {
+    "rank": 0,
+    "feature_idx": 10750,
+    "delta": 1.141432762145996,
+    "mean_plus": 13.267175674438477,
+    "mean_all": 12.12574291229248,
+    "n_active_plus": 163,
+    "decoder_norm": 0.12453684210777283
+  },
+  {
+    "rank": 1,
+    "feature_idx": 2776,
+    "delta": 0.6871111392974854,
+    "mean_plus": 4.087619781494141,
+    "mean_all": 3.4005086421966553,
+    "n_active_plus": 125,
+    "decoder_norm": 0.11942152678966522
+  },
+  {
+    "rank": 2,
+    "feature_idx": 27749,
+    "delta": 0.6452475786209106,
+    "mean_plus": 0.7117123603820801,
+    "mean_all": 0.06646479666233063,
+    "n_active_plus": 27,
+    "decoder_norm": 0.1781165599822998
+  },
+  {
+    "rank": 3,
+    "feature_idx": 29719,
+    "delta": -0.6419620513916016,
+    "mean_plus": 0.27003803849220276,
+    "mean_all": 0.9120000600814819,
+    "n_active_plus": 9,
+    "decoder_norm": 0.09185818582773209
+  },
+  {
+    "rank": 4,
+    "feature_idx": 748,
+    "delta": 0.548370897769928,
+    "mean_plus": 1.2186611890792847,
+    "mean_all": 0.6702902913093567,
+    "n_active_plus": 56,
+    "decoder_norm": 0.12237126380205154
+  }
+]
