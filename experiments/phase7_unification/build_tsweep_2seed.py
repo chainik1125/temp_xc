@@ -46,10 +46,20 @@ def save_figure(fig, path: str, dpi: int = 150, thumb_max_width: int = 288, thum
     fig.savefig(p.with_suffix(".thumb.png"), dpi=thumb_dpi_eff, bbox_inches="tight")
 
 
-def load_tsweep_data(task_set=PAPER):
+DEFAULT_SUBJECT_MODEL = "google/gemma-2-2b"
+
+
+def _row_subject(r: dict) -> str:
+    return r.get("subject_model") or DEFAULT_SUBJECT_MODEL
+
+
+def load_tsweep_data(task_set=PAPER,
+                     subject_model: str = DEFAULT_SUBJECT_MODEL):
     """Return dict[(family, T, k_feat, seed)] -> list of test_auc_flip across tasks.
 
-    Filters to `task_set` (default PAPER).
+    Filters to `task_set` (default PAPER) and `subject_model`
+    (default BASE — google/gemma-2-2b). Backwards-compat: rows without
+    a subject_model field are treated as BASE.
     """
     out = defaultdict(list)
     with PROBING_PATH.open() as f:
@@ -62,6 +72,7 @@ def load_tsweep_data(task_set=PAPER):
             if r.get("k_feat") not in (5, 20): continue
             if r.get("task_name") not in task_set: continue
             if "skipped" in r: continue
+            if _row_subject(r) != subject_model: continue
             arch = r.get("arch_id") or ""
             m_b = BAREBONES_RE.match(arch)
             m_h = HILLCLIMB_RE.match(arch)

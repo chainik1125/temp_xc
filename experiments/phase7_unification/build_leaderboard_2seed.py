@@ -1,20 +1,26 @@
 """Build the 2-seed leaderboard with σ across seed=1 and seed=42.
 
 Reads `results/probing_results.jsonl`, filters to S=32 + leaderboard
-archs, computes:
+archs + a single subject_model, computes:
   - per-task: mean across seeds {1, 42}
   - per-arch: mean of per-task seed-means + standard deviation across
     the per-task per-seed values
 
 Output:
   - prints to stdout (table)
-  - writes `results/plots/phase7_leaderboard_2seed.png` + thumbnail
+  - writes `results/plots/phase7_leaderboard_<base|it>_multiseed.png`
+    + thumbnail
 
 Run from repo root:
+    # BASE leaderboard (default):
     .venv/bin/python -m experiments.phase7_unification.build_leaderboard_2seed
+
+    # IT leaderboard:
+    .venv/bin/python -m experiments.phase7_unification.build_leaderboard_2seed --subject-model google/gemma-2-2b-it
 """
 from __future__ import annotations
 
+import argparse
 import json
 import os
 from collections import defaultdict
@@ -61,12 +67,26 @@ LEADERBOARD_ARCHS = [
 ]
 SEEDS = (1, 2, 42)
 S_FILTER = 32
+DEFAULT_SUBJECT_MODEL = "google/gemma-2-2b"
 
 
-def load_seed_task_aucs(task_set=PAPER) -> dict:
+def _row_subject(r: dict) -> str:
+    """Subject model for a probing row.
+
+    Backwards-compat: rows written before 2026-04-29's schema patch
+    don't carry `subject_model` — they're all BASE (gemma-2-2b L12).
+    """
+    return r.get("subject_model") or DEFAULT_SUBJECT_MODEL
+
+
+def load_seed_task_aucs(task_set=PAPER,
+                        subject_model: str = DEFAULT_SUBJECT_MODEL) -> dict:
     """Returns dict[(arch_id, k_feat, seed)] -> dict[task_name -> auc_flip].
 
-    Filters to `task_set` (default: PAPER — the paper headline set).
+    Filters to `task_set` (default: PAPER — the paper headline set) and
+    `subject_model` (default: google/gemma-2-2b — BASE side). The IT
+    side appends to the same probing_results.jsonl with subject_model
+    set to "google/gemma-2-2b-it"; pass that to load IT-side rows.
     """
     out = defaultdict(dict)
     with PROBING_PATH.open() as f:
@@ -80,6 +100,7 @@ def load_seed_task_aucs(task_set=PAPER) -> dict:
             if r.get("k_feat") not in (5, 20): continue
             if r.get("task_name") not in task_set: continue
             if "skipped" in r: continue
+            if _row_subject(r) != subject_model: continue
             key = (r["arch_id"], r["k_feat"], r["seed"])
             auc = r.get("test_auc_flip", r["test_auc"])
             out[key][r["task_name"]] = auc
@@ -140,7 +161,9 @@ def print_table(rows):
                   f"{r['n_seeds']:>9d}")
 
 
-def make_plot(rows, out_dir: Path):
+def make_plot(rows, out_dir: Path,
+              subject_model: str = DEFAULT_SUBJECT_MODEL,
+              out_filename: str = "phase7_leaderboard_multiseed.png"):
     out_dir.mkdir(parents=True, exist_ok=True)
     fig, axes = plt.subplots(1, 2, figsize=(12, 5), constrained_layout=True)
     for ax, k_feat in zip(axes, (5, 20)):
@@ -175,20 +198,40 @@ def make_plot(rows, out_dir: Path):
         for i, m in enumerate(means):
             ax.text(m + 0.005, i, f"{m:.4f}", va="center", fontsize=8)
 
-    fig.suptitle("Phase 7 leaderboard — 3-seed mean ± σ_seeds across {1, 2, 42}, "
-                 "PAPER task set (cluster-balanced; k=20 top-3 ranking matches full 36)",
+    short = subject_model.split("/")[-1]
+    fig.suptitle(f"Phase 7 leaderboard ({short}) — 3-seed mean ± σ_seeds across {{1, 2, 42}}, "
+                 f"PAPER task set (cluster-balanced; k=20 top-3 ranking matches full 36)",
                  fontsize=11, weight="bold")
-    out_path = out_dir / "phase7_leaderboard_multiseed.png"
+    out_path = out_dir / out_filename
     save_figure(fig, str(out_path))
     plt.close(fig)
     print(f"\nWrote {out_path}")
 
 
 def main():
-    seed_task_aucs = load_seed_task_aucs()
+    p = argparse.ArgumentParser()
+    p.add_argument("--subject-model", default=DEFAULT_SUBJECT_MODEL,
+                   help="Filter probing rows to this subject_model. "
+                        "BASE: google/gemma-2-2b (default). IT: google/gemma-2-2b-it.")
+    p.add_argument("--out-suffix", default=None,
+                   help="Override output filename suffix. Default: '_base' for BASE, "
+                        "'_it' for IT, derived from --subject-model.")
+    args = p.parse_args()
+    if args.out_suffix is None:
+        # BASE → no suffix (preserves canonical name in agent_x_paper/plots/);
+        # IT → "_it" suffix.
+        suffix = "_it" if "-it" in args.subject_model else ""
+    else:
+        suffix = args.out_suffix
+    out_filename = f"phase7_leaderboard{suffix}_multiseed.png"
+    print(f"[leaderboard] subject_model={args.subject_model} -> {out_filename}")
+
+    seed_task_aucs = load_seed_task_aucs(subject_model=args.subject_model)
     rows = summarise(seed_task_aucs)
     print_table(rows)
-    make_plot(rows, PLOTS_DIR)
+    make_plot(rows, PLOTS_DIR,
+              subject_model=args.subject_model,
+              out_filename=out_filename)
 
 
 if __name__ == "__main__":

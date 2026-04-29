@@ -1,0 +1,17 @@
+# IT-side A40_ok paper leaderboard archs (9 total).
+# Per agent_x_paper/2026-04-29-handover-IT-and-mlc-sparse.md Mission #1:
+# 8 paper_archs.json::leaderboard_archs cells that fit on A40 at b=4096
+# plus topk_sae as the per-token-SAE baseline (used as the Δ-reference
+# in build_leaderboard_2seed.py::LEADERBOARD_ARCHS).
+#
+# 4 MLC-family cells (mlc, mlc_sparse, ag_mlc_08, ag_mlc_08_sparse) are
+# H200_required and excluded from this list.
+topk_sae
+tfa_big
+tsae_paper_k20
+tsae_paper_k500
+txcdr_t5
+txcdr_t16
+phase5b_subseq_h8
+txc_bare_antidead_t5
+phase57_partB_h8_bare_multidistance_t8

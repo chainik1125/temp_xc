@@ -69,4 +69,6 @@ experiments/phase5b_t_scaling_explore/results/ckpts/
 experiments/phase7_unification/results/ckpts/
 experiments/phase7_unification/results/probe_cache/
 experiments/phase7_unification/results/probe_cache_S32/
+experiments/phase7_unification/results/probe_cache_it/
+experiments/phase7_unification/results/probe_cache_S32_it/
 experiments/phase7_unification/results/probing_results.jsonl.bak_*
