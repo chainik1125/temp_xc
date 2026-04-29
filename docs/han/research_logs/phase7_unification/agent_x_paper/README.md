@@ -104,6 +104,11 @@ evaluated under Phase 7 current methodology at b=4096:
   the early hours. Punch list in `agent_x_brief.md` "Concrete remaining
   work". Note: `mlc_sparse` and `ag_mlc_08_sparse` IT-side legacy
   ckpts also exist at b=1024 and don't count.
+  **Update 2026-04-29 (Agent X — second autonomous pass)**: IT-side
+  Mission #1 is in progress. Activation cache (L11..L15, gemma-2-2b-it)
+  built, probe cache (S=32) built, 9 A40_ok archs training at seed 42
+  underway. See `2026-04-29-leaderboard-it.md`. The 4 MLC-family cells
+  remain H200_required and deferred to Mission #2.
 - **3-seed σ for `tfa_big`, `txcdr_t16`, `hill_subseq_h8_T12_s5`** —
   only 1-2 seeds on HF.
 - **`hill_subseq_h8_T20_s8`** — Han's specific question; A40 OOM /
