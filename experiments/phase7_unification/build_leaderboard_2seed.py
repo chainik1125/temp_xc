@@ -48,6 +48,9 @@ LEADERBOARD_ARCHS = [
     "tsae_paper_k20",
     "tsae_paper_k500",
     "tfa_big",
+    "mlc",                                        # paper_archs.json id=mlc, k_win=500
+    "agentic_mlc_08",                             # paper_archs.json id=ag_mlc_08, k_win=500
+    "mlc_contrastive_alpha100_batchtopk",         # MLC + contrastive (companion to mlc)
     "txcdr_t5",
     "txcdr_t16",
     "phase5b_subseq_h8",
@@ -145,15 +148,17 @@ def make_plot(rows, out_dir: Path):
         # uncertainty of the cross-seed mean estimate
         sigmas = [r["seed_only_std"] for r in rows_k]
         ypos = np.arange(len(archs))
-        # Color the TXC family vs the SAE family
+        # Color: per-token SAE / TFA / MLC / TXC window
         colors = []
         for a in archs:
             if a in ("topk_sae", "tsae_paper_k20", "tsae_paper_k500"):
                 colors.append("#4472c4")  # blue (per-token SAE)
             elif a == "tfa_big":
                 colors.append("#888888")  # grey (TFA — hybrid)
+            elif a in ("mlc", "agentic_mlc_08", "mlc_contrastive_alpha100_batchtopk"):
+                colors.append("#7030a0")  # purple (MLC family — multi-layer, per-token)
             else:
-                colors.append("#c00000")  # red (TXC family / window)
+                colors.append("#c00000")  # red (TXC / window family)
         ax.barh(ypos, means, xerr=sigmas, color=colors,
                 error_kw={"ecolor": "k", "alpha": 0.6, "capsize": 3})
         ax.set_yticks(ypos); ax.set_yticklabels(archs, fontsize=9)
