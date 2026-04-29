@@ -220,7 +220,15 @@ def steer_for_arch(
     else:
         hook_fn = _per_token_hook_factory(sae, src_class, strengths_t, state)
 
-    handle = subject.model.layers[ANCHOR_LAYER].register_forward_hook(hook_fn)
+    hook_name = meta.get("hook_name")
+    if hook_name is None:
+        hook_target = subject.model.layers[ANCHOR_LAYER]
+    elif hook_name == "input_layernorm":
+        hook_target = subject.model.layers[ANCHOR_LAYER].input_layernorm
+    else:
+        raise ValueError(f"unknown hook_name={hook_name!r}")
+    handle = hook_target.register_forward_hook(hook_fn)
+    print(f"  hook target: {hook_name or 'layer-output (resid_post)'}")
 
     enc = tokenizer(STEERING_PROMPT, return_tensors="pt", add_special_tokens=True)
     prompt_ids = enc["input_ids"].to(device).repeat(B, 1)

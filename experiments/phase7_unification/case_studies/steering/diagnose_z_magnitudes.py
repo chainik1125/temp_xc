@@ -68,6 +68,7 @@ DEFAULT_ARCHS = (
 def _capture_activations(
     sentences: list[str], model, tokenizer, device,
     is_mlc: bool, max_length: int = CONCEPT_MAX_LENGTH, batch_size: int = 32,
+    hook_name: str | None = None,
 ) -> tuple[np.ndarray, np.ndarray]:
     n = len(sentences)
     if is_mlc:
@@ -87,8 +88,15 @@ def _capture_activations(
             captured[layer_idx] = h.detach().cpu()
         return hook
 
+    def _target(layer_idx):
+        if hook_name is None or is_mlc:
+            return model.model.layers[layer_idx]
+        if hook_name == "input_layernorm":
+            return model.model.layers[layer_idx].input_layernorm
+        raise ValueError(f"unknown hook_name={hook_name!r}")
+
     for li in layers_to_hook:
-        handles.append(model.model.layers[li].register_forward_hook(make_hook(li)))
+        handles.append(_target(li).register_forward_hook(make_hook(li)))
 
     try:
         for start in range(0, n, batch_size):
@@ -188,12 +196,14 @@ def diagnose_arch(
         acts, attn = _capture_activations(
             sentences, subject, tokenizer, device, is_mlc=is_mlc,
             batch_size=32, max_length=CONCEPT_MAX_LENGTH,
+            hook_name=meta.get("hook_name"),
         )
-        print(f"    capture done in {time.time() - t0:.1f}s")
+        print(f"    capture done in {time.time() - t0:.1f}s  hook={meta.get('hook_name', 'resid_post')}")
         del subject
         torch.cuda.empty_cache()
         gc.collect()
-        if not is_mlc:
+        # Don't share acts across archs with different hooks
+        if not is_mlc and meta.get("hook_name") is None:
             share_acts = (acts, attn, origins)
     else:
         acts, attn, origins = share_acts

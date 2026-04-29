@@ -62,11 +62,15 @@ TOP_N_CANDIDATES = 5                       # per-concept fallback pool
 def _capture_l12_activations(
     sentences: list[str], model, tokenizer, device: torch.device,
     batch_size: int = 32, max_length: int = CONCEPT_MAX_LENGTH,
+    hook_name: str | None = None,
 ) -> tuple[np.ndarray, np.ndarray]:
     """Forward `sentences` through Gemma-2-2b base; return (acts, attn_mask).
 
-    acts:  (N, max_length, d_in) fp16 — L12 residual.
+    acts:  (N, max_length, d_in) fp16 — L12 activations from `hook_name`.
     attn:  (N, max_length) int8 — 1 for content, 0 for pad.
+
+    `hook_name` selects the submodule. None = layer output (resid_post,
+    Phase 7 default). "input_layernorm" = ln1 output (Y's ln1-pivot).
     """
     n = len(sentences)
     acts = np.zeros((n, max_length, DEFAULT_D_IN), dtype=np.float16)
@@ -75,7 +79,13 @@ def _capture_l12_activations(
     def hook(module, inp, output):
         h = output[0] if isinstance(output, tuple) else output
         captured[ANCHOR_LAYER] = h.detach().cpu()
-    handle = model.model.layers[ANCHOR_LAYER].register_forward_hook(hook)
+    if hook_name is None:
+        target = model.model.layers[ANCHOR_LAYER]
+    elif hook_name == "input_layernorm":
+        target = model.model.layers[ANCHOR_LAYER].input_layernorm
+    else:
+        raise ValueError(f"unknown hook_name={hook_name!r}")
+    handle = target.register_forward_hook(hook)
     try:
         for start in range(0, n, batch_size):
             end = min(start + batch_size, n)
@@ -192,6 +202,7 @@ def select_for_arch(arch_id: str, *, batch_size: int = 16, seed: int = 42) -> di
     else:
         acts, attn = _capture_l12_activations(
             sentences, subject, tokenizer, device, batch_size=32,
+            hook_name=meta.get("hook_name"),
         )
     print(f"    capture done in {time.time() - t0:.1f}s; acts {acts.shape}")
     del subject
