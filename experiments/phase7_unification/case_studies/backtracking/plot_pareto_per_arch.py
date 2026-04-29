@@ -87,6 +87,9 @@ def main() -> None:
     parser.add_argument("--cols", type=int, default=3)
     parser.add_argument("--include-stratified", action="store_true",
                         help="also include stratified-held-out reruns of Llama-Scope baselines")
+    parser.add_argument("--coh-min", type=float, default=None,
+                        help="if set, drop points with coh < this and rescale axes (default: keep all). "
+                             "Default output filename appends _coh_ge_<value> when this is set.")
     args = parser.parse_args()
 
     variant_list = list(DEFAULT_VARIANTS)
@@ -103,6 +106,17 @@ def main() -> None:
 
     if not curves:
         raise SystemExit("no curves to plot")
+
+    # Optionally filter to a minimum coherence and rescale axes accordingly.
+    if args.coh_min is not None:
+        filtered = []
+        for label, pts in curves:
+            keep = [p for p in pts if p[2] >= args.coh_min]
+            if keep:
+                filtered.append((label, keep))
+        curves = filtered
+        if not curves:
+            raise SystemExit(f"no points with coh ≥ {args.coh_min}")
 
     n = len(curves)
     cols = args.cols
@@ -141,8 +155,11 @@ def main() -> None:
             ax.set_xlabel("backtracking rate (mean kw fraction in B = {wait, hmm})")
         if i % cols == 0:
             ax.set_ylabel("Sonnet coherence (0 incoherent ↔ 3 coherent)")
-        ax.set_ylim(-0.1, 3.1)
-        ax.set_xlim(-0.005, kw_max * 1.05)
+        if args.coh_min is not None:
+            ax.set_ylim(args.coh_min - 0.05, 3.05)
+        else:
+            ax.set_ylim(-0.1, 3.1)
+        ax.set_xlim(-0.005 if kw_max > 0.05 else -kw_max * 0.05, kw_max * 1.05)
         ax.set_title(label, fontsize=10)
         ax.grid(True, alpha=0.3)
 
@@ -160,14 +177,19 @@ def main() -> None:
     cbar = fig.colorbar(sm, cax=cbar_ax)
     cbar.set_label("steering magnitude α (or clamp strength)", fontsize=9)
 
+    title_suffix = f"  (coh ≥ {args.coh_min}, zoomed)" if args.coh_min is not None else ""
     fig.suptitle(
-        "Backtracking case study — per-architecture Pareto trajectories  (colour = α)",
+        f"Backtracking case study — per-architecture Pareto trajectories{title_suffix}  (colour = α)",
         fontsize=12, y=0.97,
     )
     # Don't call tight_layout — it would override the careful subplots_adjust
     # we set up. (The default mpl behaviour collapses our hspace.)
 
-    out_path = Path(args.out) if args.out else RESULTS_DIR / "plots_summary" / "pareto_per_arch.png"
+    if args.out:
+        out_path = Path(args.out)
+    else:
+        suffix = f"_coh_ge_{str(args.coh_min).replace('.', '_')}" if args.coh_min is not None else ""
+        out_path = RESULTS_DIR / "plots_summary" / f"pareto_per_arch{suffix}.png"
     out_path.parent.mkdir(parents=True, exist_ok=True)
     save_figure(fig, str(out_path))
     plt.close(fig)
