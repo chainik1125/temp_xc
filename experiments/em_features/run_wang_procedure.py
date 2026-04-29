@@ -42,7 +42,7 @@ for p in (str(VENDOR_SRC), str(REPO_ROOT)):
 def parse_args():
     p = argparse.ArgumentParser()
     p.add_argument("--ckpt", type=Path, required=True)
-    p.add_argument("--arch", choices=["sae", "han", "tsae"], required=True)
+    p.add_argument("--arch", choices=["sae", "han", "tsae", "txc"], required=True)
     p.add_argument("--features_json", type=Path, required=True,
                    help="Output of run_find_features_encoder (top-200 by Δz̄).")
     p.add_argument("--layer", type=int, required=True)
@@ -97,7 +97,7 @@ def enable_determinism() -> None:
 
 
 def load_steerer_decoder_row(arch: str, ckpt_path: Path, feature_id: int, device: str) -> torch.Tensor:
-    from sae_day.sae import TopKSAE
+    from sae_day.sae import TopKSAE, TemporalCrosscoder
     from experiments.em_features.architectures.txc_bare_multidistance_contrastive_antidead import (
         TXCBareMultiDistanceContrastiveAntidead,
     )
@@ -109,6 +109,14 @@ def load_steerer_decoder_row(arch: str, ckpt_path: Path, feature_id: int, device
         sae.eval()
         # W_dec convention: (d_sae, d_in)
         return sae.W_dec[feature_id].detach().clone()
+    elif arch == "txc":
+        m = TemporalCrosscoder(
+            d_in=cfg["d_in"], d_sae=cfg["d_sae"], T=cfg["T"], k_total=cfg["k_total"],
+        ).to(device)
+        m.load_state_dict(ckpt["state_dict"])
+        m.eval()
+        # W_dec for TemporalCrosscoder: (T, d_sae, d_in) — last temporal slot, matching frontier_sweep convention
+        return m.W_dec[-1, feature_id, :].detach().clone()
     elif arch == "tsae":
         from experiments.em_features.architectures.tsae_adjacent_contrastive import TSAEAdjacentContrastive
         sae = TSAEAdjacentContrastive(

@@ -1,0 +1,127 @@
+{
+  "method": "wang_top30_bundle",
+  "arch": "txc",
+  "layer": 15,
+  "features": [
+    {
+      "rank": 1,
+      "feature_id": 27210,
+      "screen_score": 12.047619047619051,
+      "delta_z": 0.44165468215942383
+    },
+    {
+      "rank": 2,
+      "feature_id": 11136,
+      "screen_score": 12.857142857142854,
+      "delta_z": 0.8356325626373291
+    },
+    {
+      "rank": 3,
+      "feature_id": 2115,
+      "screen_score": 15.571428571428573,
+      "delta_z": 0.475803017616272
+    },
+    {
+      "rank": 4,
+      "feature_id": 19261,
+      "screen_score": 14.261904761904766,
+      "delta_z": 0.5401325225830078
+    },
+    {
+      "rank": 5,
+      "feature_id": 21970,
+      "screen_score": 11.761904761904763,
+      "delta_z": 3.291325569152832
+    },
+    {
+      "rank": 6,
+      "feature_id": 22417,
+      "screen_score": 18.333333333333336,
+      "delta_z": 0.840907096862793
+    },
+    {
+      "rank": 7,
+      "feature_id": 31837,
+      "screen_score": 17.333333333333332,
+      "delta_z": 1.9102468490600586
+    },
+    {
+      "rank": 8,
+      "feature_id": 7369,
+      "screen_score": 10.066666666666663,
+      "delta_z": 0.48496508598327637
+    },
+    {
+      "rank": 9,
+      "feature_id": 31449,
+      "screen_score": 10.0,
+      "delta_z": 1.4666461944580078
+    },
+    {
+      "rank": 10,
+      "feature_id": 17266,
+      "screen_score": 14.214285714285715,
+      "delta_z": 0.6100788116455078
+    },
+    {
+      "rank": 11,
+      "feature_id": 30773,
+      "screen_score": 13.895833333333336,
+      "delta_z": 1.0082883834838867
+    },
+    {
+      "rank": 12,
+      "feature_id": 28281,
+      "screen_score": 15.357142857142858,
+      "delta_z": 0.651807427406311
+    },
+    {
+      "rank": 13,
+      "feature_id": 2105,
+      "screen_score": 14.285714285714285,
+      "delta_z": 0.804723858833313
+    },
+    {
+      "rank": 14,
+      "feature_id": 30486,
+      "screen_score": 13.07142857142857,
+      "delta_z": 0.40166807174682617
+    },
+    {
+      "rank": 15,
+      "feature_id": 502,
+      "screen_score": 10.785714285714285,
+      "delta_z": 0.6873102188110352
+    },
+    {
+      "rank": 16,
+      "feature_id": 1731,
+      "screen_score": 12.43589743589743,
+      "delta_z": 0.3849269151687622
+    },
+    {
+      "rank": 17,
+      "feature_id": 17284,
+      "screen_score": 16.452380952380953,
+      "delta_z": 0.4132884740829468
+    },
+    {
+      "rank": 18,
+      "feature_id": 30048,
+      "screen_score": 13.333333333333336,
+      "delta_z": 0.7115333080291748
+    },
+    {
+      "rank": 19,
+      "feature_id": 25886,
+      "screen_score": 20.666666666666664,
+      "delta_z": 1.3933851718902588
+    },
+    {
+      "rank": 20,
+      "feature_id": 19226,
+      "screen_score": 12.5,
+      "delta_z": 1.124481201171875
+    }
+  ]
+}

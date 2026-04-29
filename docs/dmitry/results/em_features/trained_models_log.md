@@ -44,8 +44,8 @@ Streaming dataset: 70% Pile-uncopyrighted + 30% UltraChat (`cfg["streaming"]["co
 | 30k pipeline | resid_post | 5k–30k | — | 4.70 GB | `txc/qwen_l15_txc_brickenauxk_a8_30k_step{5000,...,30000}.pt` |
 | 100k pipeline | resid_post | 40k–100k | — | 4.70 GB | `txc/qwen_l15_txc_brickenauxk_a8_100k_step{40000,...,100000}.pt` |
 | h2 30k → 60k | resid_post | 10k–60k | — | 14.09 GB | `txc/h2_qwen_l15_txc_brickenauxk_a8_step{10000,...,60000}.pt` |
-| **residmid 30k** (this session) | **resid_mid** | **10k** (20k corrupted, 30k pending resume) | TBD | 14.09 GB | `txc/qwen_l15_txc_brickenauxk_a8_residmid_step{10000}.pt` |
-| **ln1 30k** (this session) | **ln1_normalized** | **10k / 20k** (30k pending) | TBD | 14.09 GB | `txc/qwen_l15_txc_brickenauxk_a8_ln1_step{10000,20000}.pt` |
+| **residmid 30k** (this session) | **resid_mid** | **10k / 20k / 30k** | 1840.94 (30k) | 14.09 GB | `txc/qwen_l15_txc_brickenauxk_a8_residmid_step{10000,20000,30000}.pt` |
+| **ln1 30k** (this session) | **ln1_normalized** | **10k / 20k / 30k** | 480.30 (30k) | 14.09 GB | `txc/qwen_l15_txc_brickenauxk_a8_ln1_step{10000,20000,30000}.pt` |
 | txc small (older) | resid_post | 40k / 100k / 200k | — | 4.70 GB | `txc/qwen_l15_txc_small_step{40000,100000,200000}.pt` |
 | txc T=5 k=128 (legacy) | resid_post | (one ckpt) | — | 4.70 GB | `txc/qwen_l15_txc_t5_k128.pt` |
 
@@ -88,12 +88,9 @@ Streaming dataset: 70% Pile-uncopyrighted + 30% UltraChat (`cfg["streaming"]["co
 | qwen_mlc_l11-13-15-17-19_k128 | resid_post (all 5 layers) | (one ckpt) | 4.70 GB | `mlc/qwen_mlc_l11-13-15-17-19_k128.pt` |
 | qwen_mlc_small | resid_post (all 5 layers) | 40k / 100k / 200k | 4.70 GB | `mlc/qwen_mlc_small_step{40000,100000,200000}.pt` |
 
-### Active runs (in progress as of this writing)
+### Active runs
 
-| arch | hookpoint | host | step | status |
-|---|---|---|---:|---|
-| TXC brickenauxk @ resid_mid | resid_mid | h100_1 | step 10k–30k | resuming from step10k after disk-full crash; will save step 20k + 30k |
-| TXC brickenauxk @ ln1 | ln1_normalized | h100_2 | step 10k–30k | step 20k saved, step 30k pending |
+(none — TXC residmid + ln1 30k both finished and uploaded as of 2026-04-29.)
 
 ### Re-downloading any checkpoint
 
