@@ -35,6 +35,15 @@ tags:
   k=500) trails T-SAE k=20 by 0.53. At matched k_eff ≈ 500,
   cross-family spread is 0.27. **This is the rescue: at matched
   sparsity, all architecture families perform comparably.**
+- **Q2.C bonus** (per-position window-clamp): writing back the
+  reconstruction at ALL T positions (not just right edge) gives an
+  ADDITIONAL +0.13 absolute success on TXC matryoshka (1.07 → 1.20
+  at peak). Cumulative rescue path:
+  - Dmitry's PAPER_STRENGTHS (right-edge): TXC matryoshka peak 0.97
+  - Q1.3 (normalised, right-edge): 1.07 (+0.10)
+  - Q2.C (normalised, per-position): 1.20 (+0.13)
+  - Total: 0.97 → 1.20 = ~25% closure of the 0.96 headline gap.
+  Other 2 window archs (subseq + h8 multidist) Q2.C grading pending.
 
 ### Q1.1 — `<|z|>` magnitudes per arch
 
