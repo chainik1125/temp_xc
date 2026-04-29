@@ -69,17 +69,15 @@ Requirements for each problem:
 - Single well-defined answer
 - Distinctly worded — no two problems should share the same numerical setup
 - Difficulty roughly equivalent to AMC / undergraduate-introductory level
+- Use plain English math notation only (no LaTeX, no backslash commands). Write "sqrt(x)" or "the square root of x" not "\\sqrt{{x}}". Write "x^2" or "x squared" not "$x^2$".
 
-Output ONLY a JSON array of {n} strings, no commentary, no surrounding prose, no markdown fences. Each string is one complete problem statement.
+Output FORMAT — read carefully:
+- Exactly {n} lines, one problem per line.
+- No numbering, no bullets, no JSON, no markdown, no surrounding commentary.
+- Each line must be a complete self-contained problem statement that ends with a single newline.
+- Lines may be long but must not contain literal newline characters within a problem.
 
-Example output shape (with two problems shown for illustration only — your output must contain {n}):
-
-[
-  "First problem statement here.",
-  "Second problem statement here."
-]
-
-Return your {n} problems for the category {category} now:"""
+Begin output now:"""
 
 
 def _load_api_key() -> str:
@@ -100,12 +98,29 @@ def _load_api_key() -> str:
     )
 
 
-def _strip_fences(text: str) -> str:
-    """Drop any leading/trailing markdown fences if Sonnet adds them."""
+_BULLET_PREFIX = re.compile(r"^\s*(?:[-*•]|\d+[.)])\s*")
+
+
+def _parse_lines(text: str, expected: int) -> list[str]:
+    """Robust newline parser. Strips bullets / numbering / markdown fences /
+    blank lines that Sonnet sometimes adds despite the prompt."""
     text = text.strip()
-    text = re.sub(r"^```(?:json)?\s*", "", text)
+    text = re.sub(r"^```[a-zA-Z]*\s*", "", text)
     text = re.sub(r"\s*```$", "", text)
-    return text
+    out: list[str] = []
+    for line in text.splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        line = _BULLET_PREFIX.sub("", line)
+        if line:
+            out.append(line)
+    if len(out) < expected:
+        raise ValueError(
+            f"got {len(out)} lines from Sonnet, expected at least {expected}; "
+            f"first 200 chars of raw text: {text[:200]!r}"
+        )
+    return out[:expected]
 
 
 def _generate_category(client, model: str, category: str, category_desc: str, n: int) -> list[str]:
@@ -116,10 +131,7 @@ def _generate_category(client, model: str, category: str, category_desc: str, n:
         messages=[{"role": "user", "content": prompt}],
     )
     raw = msg.content[0].text
-    parsed = json.loads(_strip_fences(raw))
-    if not isinstance(parsed, list) or not all(isinstance(s, str) for s in parsed):
-        raise ValueError(f"unexpected response shape for category {category!r}: {parsed!r}")
-    return parsed
+    return _parse_lines(raw, n)
 
 
 def main() -> None:
@@ -141,20 +153,41 @@ def main() -> None:
 
     client = Anthropic(api_key=_load_api_key(), max_retries=8)
 
-    all_records: list[dict] = []
+    # Per-category checkpointing: each category persists to its own file so a
+    # mid-run crash can be resumed without rerunning successful API calls.
+    per_cat_dir = PROMPTS_DATA_DIR / "by_category"
+    per_cat_dir.mkdir(exist_ok=True)
+
     for category, desc in CATEGORIES:
+        cat_path = per_cat_dir / f"{category}.jsonl"
+        if cat_path.exists() and not args.force:
+            n_existing = sum(1 for _ in cat_path.open())
+            if n_existing >= args.n_per_category:
+                print(f"[generate_prompts] {category}: cached {n_existing} prompts at {cat_path}, skipping")
+                continue
         print(f"[generate_prompts] {category}: requesting {args.n_per_category} from {args.model}")
         prompts = _generate_category(client, args.model, category, desc, args.n_per_category)
-        if len(prompts) != args.n_per_category:
-            print(f"  warning: got {len(prompts)} prompts (asked for {args.n_per_category}); keeping all")
-        for i, text in enumerate(prompts):
-            all_records.append(
-                {
+        with cat_path.open("w") as f:
+            for i, text in enumerate(prompts):
+                f.write(json.dumps({
                     "id": f"{category}_{i:03d}",
                     "category": category,
                     "text": text.strip(),
-                }
-            )
+                }) + "\n")
+        print(f"  wrote {len(prompts)} → {cat_path}")
+
+    # Concatenate into the unified file.
+    all_records: list[dict] = []
+    for category, _ in CATEGORIES:
+        cat_path = per_cat_dir / f"{category}.jsonl"
+        if not cat_path.exists():
+            print(f"  WARNING: {cat_path} missing, skipping in concat")
+            continue
+        with cat_path.open() as f:
+            for line in f:
+                line = line.strip()
+                if line:
+                    all_records.append(json.loads(line))
 
     with PROMPTS_300_PATH.open("w") as f:
         for r in all_records:
