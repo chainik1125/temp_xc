@@ -55,7 +55,7 @@ LEADERBOARD_ARCHS = [
     "phase57_partB_h8_bare_multidistance_t8",
     "hill_subseq_h8_T12_s5",
 ]
-SEEDS = (1, 42)
+SEEDS = (1, 2, 42)
 S_FILTER = 32
 
 
@@ -118,7 +118,7 @@ def summarise(seed_task_aucs):
 
 def print_table(rows):
     print("=" * 110)
-    print("PHASE 7 LEADERBOARD — 2-seed (seed ∈ {1, 42}) at S=32, FLIP-corrected, per-task means")
+    print("PHASE 7 LEADERBOARD — multi-seed (seed ∈ {1, 2, 42}) at S=32, FLIP-corrected, per-task means")
     print("=" * 110)
     for k_feat in (5, 20):
         print()
@@ -165,9 +165,9 @@ def make_plot(rows, out_dir: Path):
         for i, m in enumerate(means):
             ax.text(m + 0.005, i, f"{m:.4f}", va="center", fontsize=8)
 
-    fig.suptitle("Phase 7 leaderboard — 2-seed mean ± σ_seeds across {1, 42}",
+    fig.suptitle("Phase 7 leaderboard — 3-seed mean ± σ_seeds across {1, 2, 42}",
                  fontsize=12, weight="bold")
-    out_path = out_dir / "phase7_leaderboard_2seed.png"
+    out_path = out_dir / "phase7_leaderboard_multiseed.png"
     save_figure(fig, str(out_path))
     plt.close(fig)
     print(f"\nWrote {out_path}")
