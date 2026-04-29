@@ -53,12 +53,16 @@ for entry in "${PAIRS[@]}"; do
   PLOTDIR="outputs/isolated/$TAG/plots"
   mkdir -p "$OUTDIR" "$PLOTDIR"
 
-  run "$TAG.harvest" \
-    uv run python harvest_activations.py \
-      --n_train 10000 --n_val 200 --n_test 200 \
-      --seq_len 128 --device cuda --chunk_size 32 \
-      --hook_names "$HOOK" \
-      --output_dir "$OUTDIR"
+  if [[ -f "$OUTDIR/activations_cache.pt" ]]; then
+    echo "  [skip] $TAG.harvest (cache present)" | tee -a "$LOG"
+  else
+    run "$TAG.harvest" \
+      uv run python harvest_activations.py \
+        --n_train 10000 --n_val 200 --n_test 200 \
+        --seq_len 128 --device cuda --chunk_size 32 \
+        --hook_names "$HOOK" \
+        --output_dir "$OUTDIR"
+  fi
 
   if [[ "$FAMILY" == "tsae" ]]; then
     OVR_FLAG="--tsae_layer_hooks_override"
@@ -66,24 +70,32 @@ for entry in "${PAIRS[@]}"; do
     OVR_FLAG="--txc_layer_hooks_override"
   fi
 
-  run "$TAG.train" \
-    uv run python train_crosscoders.py \
-      --d_sae 1536 --k_total 32 --T 30 \
-      --n_steps 4000 --batch_size 4096 \
-      --lr 5e-4 --device cuda \
-      --print_every 100 \
-      --input_dir "$OUTDIR" --output_dir "$OUTDIR" \
-      "$OVR_FLAG" "$TAG=$HOOK" \
-      --archs "$TAG"
+  if [[ -f "$OUTDIR/crosscoder_$TAG.pt" ]]; then
+    echo "  [skip] $TAG.train (checkpoint present)" | tee -a "$LOG"
+  else
+    run "$TAG.train" \
+      uv run python train_crosscoders.py \
+        --d_sae 1536 --k_total 32 --T 30 \
+        --n_steps 4000 --batch_size 4096 \
+        --lr 5e-4 --device cuda \
+        --print_every 100 \
+        --input_dir "$OUTDIR" --output_dir "$OUTDIR" \
+        "$OVR_FLAG" "$TAG=$HOOK" \
+        --archs "$TAG"
+  fi
 
-  run "$TAG.sweep" \
-    uv run python run_ablation_sweep.py \
-      --top_k 100 --stage2_keep 10 \
-      --alphas 0.25 0.5 1.0 1.5 2.0 \
-      --delta_util 0.05 \
-      --device cuda \
-      --input_dir "$OUTDIR" --output_dir "$OUTDIR" \
-      --archs "$TAG"
+  if [[ -f "$OUTDIR/val_sweep_$TAG.json" ]]; then
+    echo "  [skip] $TAG.sweep (already swept)" | tee -a "$LOG"
+  else
+    run "$TAG.sweep" \
+      uv run python run_ablation_sweep.py \
+        --top_k 100 --stage2_keep 10 \
+        --alphas 0.25 0.5 1.0 1.5 2.0 \
+        --delta_util 0.05 \
+        --device cuda \
+        --input_dir "$OUTDIR" --output_dir "$OUTDIR" \
+        --archs "$TAG"
+  fi
 done
 
 echo "=== ISOLATED_TXC_TSAE DONE ===" | tee -a "$LOG"

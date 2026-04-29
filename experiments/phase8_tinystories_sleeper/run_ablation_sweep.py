@@ -64,15 +64,21 @@ ARCHS = (
 )
 
 
+def _strip_iso(arch: str) -> str:
+    """Drop a leading `iso_` namespace prefix used by isolated re-runs."""
+    return arch[4:] if arch.startswith("iso_") else arch
+
+
 def _is_per_token_arch(arch: str) -> bool:
-    # Prefix dispatch covers both the default tag set (sae_layer{0..3}, etc.)
-    # AND custom override tags (e.g. sae_l0_ln1, tsae_l0_post). Same logic
-    # for window arches below.
-    return arch.startswith("sae_") or arch.startswith("tsae_")
+    # Prefix dispatch covers default tags (sae_layer{0..3}, etc.) AND
+    # custom override tags (sae_l0_ln1, tsae_l0_post, iso_tsae_l0_ln1).
+    a = _strip_iso(arch)
+    return a.startswith("sae_") or a.startswith("tsae_")
 
 
 def _is_window_arch(arch: str) -> bool:
-    return arch.startswith("txc_") or arch.startswith("h8_")
+    a = _strip_iso(arch)
+    return a.startswith("txc_") or a.startswith("h8_")
 
 
 def pick_device(explicit: str | None) -> str:
