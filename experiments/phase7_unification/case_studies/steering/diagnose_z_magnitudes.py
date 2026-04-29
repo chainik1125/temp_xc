@@ -138,14 +138,16 @@ def _summarize(values: np.ndarray) -> dict:
 
 def diagnose_arch(
     arch_id: str, *, batch_size: int = 16, share_acts: tuple | None = None,
+    seed: int = 42,
 ) -> dict | None:
     """Per-arch diagnostic. If share_acts provided ((acts_l12, attn) tuple)
     we reuse the L12 activations cached from a prior arch (for non-MLC
     archs only). For MLC, multi-layer activations are captured fresh.
     """
-    log_path = OUT_DIR / "training_logs" / f"{arch_id}__seed42.json"
-    ckpt_path = OUT_DIR / "ckpts" / f"{arch_id}__seed42.pt"
-    sel_path = (CASE_STUDIES_DIR / "steering" / arch_id / "feature_selection.json")
+    log_path = OUT_DIR / "training_logs" / f"{arch_id}__seed{seed}.json"
+    ckpt_path = OUT_DIR / "ckpts" / f"{arch_id}__seed{seed}.pt"
+    sel_subdir = "steering" if seed == 42 else f"steering_seed{seed}"
+    sel_path = (CASE_STUDIES_DIR / sel_subdir / arch_id / "feature_selection.json")
     if not ckpt_path.exists():
         print(f"  [skip] {arch_id}: ckpt missing at {ckpt_path}")
         return None
@@ -260,6 +262,7 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--archs", nargs="+", default=list(DEFAULT_ARCHS))
     ap.add_argument("--out-dir", default=str(CASE_STUDIES_DIR / "diagnostics"))
+    ap.add_argument("--seed", type=int, default=42)
     args = ap.parse_args()
     banner(__file__)
     out_dir = Path(args.out_dir)
@@ -269,8 +272,8 @@ def main() -> None:
     raw_per_concept = {}
     share_acts = None  # cache L12 activations across non-MLC archs to save GPU
     for a in args.archs:
-        print(f"\n=== {a} ===")
-        result = diagnose_arch(a, share_acts=share_acts)
+        print(f"\n=== {a} seed={args.seed} ===")
+        result = diagnose_arch(a, share_acts=share_acts, seed=args.seed)
         if result is None:
             continue
         summary, share_acts_new, per_concept_arrays = result

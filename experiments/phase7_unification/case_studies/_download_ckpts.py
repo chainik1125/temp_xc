@@ -53,12 +53,19 @@ def ensure_local(arch_id: str, seed: int = 42) -> Path:
 
 
 def main() -> None:
-    archs = sys.argv[1:] if len(sys.argv) > 1 else list(DEFAULT_ARCHS)
-    print(f"Ensuring local seed=42 ckpts for {len(archs)} archs at {CKPT_DIR}")
+    args = sys.argv[1:]
+    seed = 42
+    if args and args[0].startswith("--seed="):
+        seed = int(args.pop(0).split("=", 1)[1])
+    elif args and args[0] == "--seed" and len(args) > 1:
+        args.pop(0)
+        seed = int(args.pop(0))
+    archs = args if args else list(DEFAULT_ARCHS)
+    print(f"Ensuring local seed={seed} ckpts for {len(archs)} archs at {CKPT_DIR}")
     for a in archs:
-        p = ensure_local(a)
+        p = ensure_local(a, seed=seed)
         size_mb = p.stat().st_size / (1024 * 1024) if p.exists() else 0
-        print(f"  {a}: {p}  ({size_mb:.0f} MB)")
+        print(f"  {a} seed={seed}: {p}  ({size_mb:.0f} MB)")
 
 
 if __name__ == "__main__":

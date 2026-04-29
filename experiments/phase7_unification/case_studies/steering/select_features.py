@@ -145,10 +145,10 @@ def _capture_multilayer_activations(
     return acts, attn
 
 
-def select_for_arch(arch_id: str, *, batch_size: int = 16) -> dict | None:
+def select_for_arch(arch_id: str, *, batch_size: int = 16, seed: int = 42) -> dict | None:
     """Per-arch best-feature-per-concept selection."""
-    log_path = OUT_DIR / "training_logs" / f"{arch_id}__seed42.json"
-    ckpt_path = OUT_DIR / "ckpts" / f"{arch_id}__seed42.pt"
+    log_path = OUT_DIR / "training_logs" / f"{arch_id}__seed{seed}.json"
+    ckpt_path = OUT_DIR / "ckpts" / f"{arch_id}__seed{seed}.pt"
     if not ckpt_path.exists() or not log_path.exists():
         print(f"  [skip] {arch_id}: ckpt or log missing")
         return None
@@ -156,7 +156,8 @@ def select_for_arch(arch_id: str, *, batch_size: int = 16) -> dict | None:
     src_class = meta["src_class"]
     is_mlc = src_class in MLC_CLASSES
 
-    out_dir = CASE_STUDIES_DIR / "steering" / arch_id
+    sel_subdir = "steering" if seed == 42 else f"steering_seed{seed}"
+    out_dir = CASE_STUDIES_DIR / sel_subdir / arch_id
     out_dir.mkdir(parents=True, exist_ok=True)
 
     print(f"  loading subject model {SUBJECT_MODEL} (bf16)...")
@@ -294,11 +295,12 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--archs", nargs="+", default=list(STAGE_1_ARCHS))
     ap.add_argument("--batch-size", type=int, default=16)
+    ap.add_argument("--seed", type=int, default=42)
     args = ap.parse_args()
     banner(__file__)
     for arch_id in args.archs:
-        print(f"\n=== {arch_id} ===")
-        select_for_arch(arch_id, batch_size=args.batch_size)
+        print(f"\n=== {arch_id} seed={args.seed} ===")
+        select_for_arch(arch_id, batch_size=args.batch_size, seed=args.seed)
 
 
 if __name__ == "__main__":

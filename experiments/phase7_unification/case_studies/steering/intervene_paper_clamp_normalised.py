@@ -141,11 +141,14 @@ def steer_for_arch(
     force: bool = False,
     limit_concepts: int | None = None,
     out_subdir: str = OUT_SUBDIR,
+    seed: int = 42,
 ) -> None:
-    log_path = OUT_DIR / "training_logs" / f"{arch_id}__seed42.json"
-    ckpt_path = OUT_DIR / "ckpts" / f"{arch_id}__seed42.pt"
-    sel_path = CASE_STUDIES_DIR / "steering" / arch_id / "feature_selection.json"
-    out_path = CASE_STUDIES_DIR / out_subdir / arch_id / "generations.jsonl"
+    log_path = OUT_DIR / "training_logs" / f"{arch_id}__seed{seed}.json"
+    ckpt_path = OUT_DIR / "ckpts" / f"{arch_id}__seed{seed}.pt"
+    sel_subdir = "steering" if seed == 42 else f"steering_seed{seed}"
+    sel_path = CASE_STUDIES_DIR / sel_subdir / arch_id / "feature_selection.json"
+    actual_subdir = out_subdir if seed == 42 else f"{out_subdir}_seed{seed}"
+    out_path = CASE_STUDIES_DIR / actual_subdir / arch_id / "generations.jsonl"
 
     if not sel_path.exists():
         print(f"  [skip] {arch_id}: feature_selection.json missing")
@@ -299,15 +302,18 @@ def main() -> None:
     )
     ap.add_argument("--force", action="store_true")
     ap.add_argument("--limit-concepts", type=int, default=None)
+    ap.add_argument("--seed", type=int, default=42,
+                    help="Seed of ckpt to use. seed != 42 writes to steering_paper_normalised_seed{seed}/")
     args = ap.parse_args()
     banner(__file__)
     z_mag_path = Path(args.z_mag)
     if not z_mag_path.exists():
         raise SystemExit(f"missing Q1.1 output at {z_mag_path}")
     for arch_id in args.archs:
-        print(f"\n=== {arch_id} (paper-clamp normalised) ===")
+        print(f"\n=== {arch_id} seed={args.seed} (paper-clamp normalised) ===")
         steer_for_arch(arch_id, z_magnitude_path=z_mag_path,
-                       force=args.force, limit_concepts=args.limit_concepts)
+                       force=args.force, limit_concepts=args.limit_concepts,
+                       seed=args.seed)
 
 
 if __name__ == "__main__":
