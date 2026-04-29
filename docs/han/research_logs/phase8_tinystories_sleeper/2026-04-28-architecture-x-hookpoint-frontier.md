@@ -156,12 +156,30 @@ claim would isolate-train each TXC and T-SAE in turn at the same five
 hookpoints — ~75 min on the A40, queued conditional on the attn_out
 result being interesting.
 
-### Follow-up 2 — T-SAE at attn_out.0 (running)
+### Follow-up 2 — T-SAE at attn_out.0 (result)
 
 Isolated T-SAE at `blocks.0.hook_attn_out` (the residual delta added by
-attention). Motivated by T-SAE's `ln1.0` win — if the contrastive loss
-helps most where attention writes, attn_out is the natural site to
-target. Result will be appended here once the run finishes (~15 min).
+attention).
+
+| T-SAE site                 |    f | α*  | test ASR | ΔCE     |
+|----------------------------|-----:|----:|---------:|--------:|
+| `ln1.0` (input to attn)    |  296 | 2.0 |   0.32   | +0.000  |
+| `attn_out.0` (attn output) | 1196 | 2.0 |   0.75   | -0.000  |
+
+The hypothesis was: if T-SAE's adjacent-token InfoNCE helps most where
+attention "writes," attn_out should be the strongest site. **It isn't.**
+The T-SAE at attn_out only suppresses to ASR=0.75 — well below its own
+ln1.0 result (0.32) and far worse than the SAE at resid_post.0 (0.00).
+
+Reading: T-SAE's contrastive structure helps where the input is
+**already normalised but not yet attention-mixed**. After attention
+sums over positions, the per-position adjacent-token InfoNCE has less
+purchase on the trigger feature — presumably because attention smears
+the trigger token's contribution across many output positions.
+
+So "T-SAE > SAE at ln1.0" isn't a generic `before-attention > after-attention`
+fact, it's specifically a *post-LN, pre-attention-mix* phenomenon. The
+isolated train was 87s at 45.8 it/s.
 
 ### Pointers
 
