@@ -35,21 +35,21 @@ all T positions of the rightmost window. Higher-layer attention sees
 
 ### Code
 
-[`intervene_paper_clamp_window_full.py`](../../../experiments/phase7_unification/case_studies/steering/intervene_paper_clamp_window_full.py)
+[`intervene_paper_clamp_window_full.py`](../../../../experiments/phase7_unification/case_studies/steering/intervene_paper_clamp_window_full.py)
 — sourced from Dmitry's branch, attribution noted in the file header.
 
-[`q2c_compare_window_variants.py`](../../../experiments/phase7_unification/case_studies/steering/q2c_compare_window_variants.py)
+[`q2c_compare_window_variants.py`](../../../../experiments/phase7_unification/case_studies/steering/q2c_compare_window_variants.py)
 — per-strength comparison vs right-edge.
 
 ### Outputs
 
-- [`q2c_window_variant_comparison.json`](../../../experiments/phase7_unification/results/case_studies/steering_magnitude/q2c_window_variant_comparison.json)
-- [`q2c_window_variant_comparison.png`](../../../experiments/phase7_unification/results/case_studies/steering_magnitude/q2c_window_variant_comparison.png)
+- [`q2c_window_variant_comparison.json`](../../../../experiments/phase7_unification/results/case_studies/steering_magnitude/q2c_window_variant_comparison.json)
+- [`q2c_window_variant_comparison.png`](../../../../experiments/phase7_unification/results/case_studies/steering_magnitude/q2c_window_variant_comparison.png)
 - Raw: `results/case_studies/steering_paper_pos_full/<arch>/{generations,grades}.jsonl`
 
 ### Results
 
-![Q2.C right-edge vs full-window](../../../experiments/phase7_unification/results/case_studies/steering_magnitude/q2c_window_variant_comparison.thumb.png)
+![Q2.C right-edge vs full-window](../../../../experiments/phase7_unification/results/case_studies/steering_magnitude/q2c_window_variant_comparison.thumb.png)
 
 | arch | T | variant | log-fit peak s | peak suc |
 |---|---|---|---|---|

@@ -31,14 +31,14 @@ since post-TopK / post-threshold inactive positions would otherwise
 dominate the distribution and hide the magnitude story.
 
 **Code.**
-[`experiments/phase7_unification/case_studies/steering/q1_1_z_orig_distributions.py`](../../../experiments/phase7_unification/case_studies/steering/q1_1_z_orig_distributions.py).
+[`experiments/phase7_unification/case_studies/steering/q1_1_z_orig_distributions.py`](../../../../experiments/phase7_unification/case_studies/steering/q1_1_z_orig_distributions.py).
 One-shot capture of L12 + L10-14 acts cached to
 `steering_magnitude/_l12_acts_cache.npz` so Q1.2 / Q1.3 reuse the
 same 150-sentence probe set without re-forwarding Gemma-2-2b base.
 
 **Outputs.**
-- [`results/case_studies/steering_magnitude/q1_1_z_orig_distributions.json`](../../../experiments/phase7_unification/results/case_studies/steering_magnitude/q1_1_z_orig_distributions.json)
-- [`results/case_studies/steering_magnitude/q1_1_z_orig_distributions.png`](../../../experiments/phase7_unification/results/case_studies/steering_magnitude/q1_1_z_orig_distributions.png)
+- [`results/case_studies/steering_magnitude/q1_1_z_orig_distributions.json`](../../../../experiments/phase7_unification/results/case_studies/steering_magnitude/q1_1_z_orig_distributions.json)
+- [`results/case_studies/steering_magnitude/q1_1_z_orig_distributions.png`](../../../../experiments/phase7_unification/results/case_studies/steering_magnitude/q1_1_z_orig_distributions.png)
 
 **Results.**
 
@@ -51,7 +51,7 @@ same 150-sentence probe set without re-forwarding Gemma-2-2b base.
 | `agentic_txc_02` (TXC matryoshka) | T=5 | 21.57 | 11.95-31.90 | 1813 | **2.37** |
 | `phase5b_subseq_h8` (SubseqH8) | T_max=10 | 63.11 | 38.30-91.52 | 1063 | **6.93** |
 
-![Q1.1 per-arch distribution](../../../experiments/phase7_unification/results/case_studies/steering_magnitude/q1_1_z_orig_distributions.thumb.png)
+![Q1.1 per-arch distribution](../../../../experiments/phase7_unification/results/case_studies/steering_magnitude/q1_1_z_orig_distributions.thumb.png)
 
 **Read.**
 
@@ -111,13 +111,13 @@ into JSON and fit per-arch peaks via parabolic interpolation in
 log10(s) on the top-3 success cells.
 
 **Code.**
-[`q1_2_strength_curves.py`](../../../experiments/phase7_unification/case_studies/steering/q1_2_strength_curves.py).
+[`q1_2_strength_curves.py`](../../../../experiments/phase7_unification/case_studies/steering/q1_2_strength_curves.py).
 
 **Outputs.**
-- [`q1_2_strength_curves.json`](../../../experiments/phase7_unification/results/case_studies/steering_magnitude/q1_2_strength_curves.json)
-- [`q1_2_strength_curves.png`](../../../experiments/phase7_unification/results/case_studies/steering_magnitude/q1_2_strength_curves.png)
+- [`q1_2_strength_curves.json`](../../../../experiments/phase7_unification/results/case_studies/steering_magnitude/q1_2_strength_curves.json)
+- [`q1_2_strength_curves.png`](../../../../experiments/phase7_unification/results/case_studies/steering_magnitude/q1_2_strength_curves.png)
 
-![Q1.2 paper-clamp success vs strength](../../../experiments/phase7_unification/results/case_studies/steering_magnitude/q1_2_strength_curves.thumb.png)
+![Q1.2 paper-clamp success vs strength](../../../../experiments/phase7_unification/results/case_studies/steering_magnitude/q1_2_strength_curves.thumb.png)
 
 **Results.**
 
@@ -196,21 +196,21 @@ directly.
   pod uses env-var auth, not a tokens-file).
 
 **Code.**
-[`q1_3_analysis.py`](../../../experiments/phase7_unification/case_studies/steering/q1_3_analysis.py)
+[`q1_3_analysis.py`](../../../../experiments/phase7_unification/case_studies/steering/q1_3_analysis.py)
 — aggregates grades + fits parabolic peak.
-[`intervene_paper_clamp.py`](../../../experiments/phase7_unification/case_studies/steering/intervene_paper_clamp.py)
-+ [`intervene_paper_clamp_window.py`](../../../experiments/phase7_unification/case_studies/steering/intervene_paper_clamp_window.py)
+[`intervene_paper_clamp.py`](../../../../experiments/phase7_unification/case_studies/steering/intervene_paper_clamp.py)
++ [`intervene_paper_clamp_window.py`](../../../../experiments/phase7_unification/case_studies/steering/intervene_paper_clamp_window.py)
 edited to take `--strengths` + `--out-subdir` (additive flags;
 default behaviour unchanged).
 
 **Outputs.**
-- [`q1_3_finer_grid_curves.json`](../../../experiments/phase7_unification/results/case_studies/steering_magnitude/q1_3_finer_grid_curves.json)
-- [`q1_3_finer_grid_curves.png`](../../../experiments/phase7_unification/results/case_studies/steering_magnitude/q1_3_finer_grid_curves.png)
+- [`q1_3_finer_grid_curves.json`](../../../../experiments/phase7_unification/results/case_studies/steering_magnitude/q1_3_finer_grid_curves.json)
+- [`q1_3_finer_grid_curves.png`](../../../../experiments/phase7_unification/results/case_studies/steering_magnitude/q1_3_finer_grid_curves.png)
 - Raw: `results/case_studies/steering_paper_normalised/<arch>/{generations,grades}.jsonl` (5 archs)
 
 **Results.**
 
-![Q1.3 finer-grid paper-clamp curves](../../../experiments/phase7_unification/results/case_studies/steering_magnitude/q1_3_finer_grid_curves.thumb.png)
+![Q1.3 finer-grid paper-clamp curves](../../../../experiments/phase7_unification/results/case_studies/steering_magnitude/q1_3_finer_grid_curves.thumb.png)
 
 | arch | T | log-fit peak s | peak suc | Q1.1 mag-pred | universal-5x pred |
 |---|---|---|---|---|---|
