@@ -37,6 +37,7 @@ from experiments.phase7_unification.case_studies.backtracking._decode import (  
 from experiments.phase7_unification.case_studies.backtracking._paths import (  # noqa: E402
     INTERVENE_DIR,
     KEYWORDS,
+    RESULTS_DIR,
     ensure_dirs,
 )
 
@@ -58,10 +59,14 @@ def keyword_fraction(text: str, keywords: set[str]) -> tuple[float, int, int]:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--keywords", nargs="+", default=list(KEYWORDS))
+    parser.add_argument("--intervene-suffix", default="", help="read from intervene<_suffix>/")
     args = parser.parse_args()
 
     ensure_dirs()
-    gens_path = INTERVENE_DIR / "generations.jsonl"
+    intervene_dir = (
+        RESULTS_DIR / (f"intervene_{args.intervene_suffix}" if args.intervene_suffix else "intervene")
+    )
+    gens_path = intervene_dir / "generations.jsonl"
     if not gens_path.exists():
         raise SystemExit(f"missing {gens_path}; run Stage 4 first")
 
@@ -72,7 +77,7 @@ def main() -> None:
     # we merge the 0–3 coherence into both the per-generation rows and the
     # per-(mode, target, magnitude) summary so plot_backtracking.py can draw
     # the Pareto coherence-vs-backtracking curves.
-    coh_path = INTERVENE_DIR / "coherence_grades.jsonl"
+    coh_path = intervene_dir / "coherence_grades.jsonl"
     coh: dict[tuple[str, str, float, str], int] = {}
     if coh_path.exists():
         with coh_path.open() as f:
@@ -113,7 +118,7 @@ def main() -> None:
             if coh_g is not None:
                 coh_grouped[(rec["mode"], rec["target"], rec["magnitude"])].append(coh_g)
 
-    per_path = INTERVENE_DIR / "per_generation.csv"
+    per_path = intervene_dir / "per_generation.csv"
     with per_path.open("w", newline="") as f:
         w = csv.DictWriter(f, fieldnames=list(per_gen_rows[0].keys()))
         w.writeheader()
@@ -148,7 +153,7 @@ def main() -> None:
         )
     out_rows.sort(key=lambda r: (r["mode"], r["target"], r["magnitude"]))
 
-    out_path = INTERVENE_DIR / "keyword_rates.csv"
+    out_path = intervene_dir / "keyword_rates.csv"
     with out_path.open("w", newline="") as f:
         w = csv.DictWriter(f, fieldnames=list(out_rows[0].keys()))
         w.writeheader()

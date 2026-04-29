@@ -38,6 +38,7 @@ if str(_REPO) not in sys.path:
 
 from experiments.phase7_unification.case_studies.backtracking._paths import (  # noqa: E402
     INTERVENE_DIR,
+    RESULTS_DIR,
     ensure_dirs,
 )
 
@@ -103,12 +104,17 @@ def main() -> None:
     parser.add_argument("--workers", type=int, default=5)
     parser.add_argument("--model", default="claude-sonnet-4-6")
     parser.add_argument("--max-chars", type=int, default=4000, help="truncate generation before sending to grader")
+    parser.add_argument("--intervene-suffix", default="", help="read from intervene<_suffix>/")
     parser.add_argument("--force", action="store_true", help="ignore existing grades and re-grade everything")
     args = parser.parse_args()
 
     ensure_dirs()
-    gens_path = INTERVENE_DIR / "generations.jsonl"
-    out_path = INTERVENE_DIR / "coherence_grades.jsonl"
+    intervene_dir = (
+        RESULTS_DIR / (f"intervene_{args.intervene_suffix}" if args.intervene_suffix else "intervene")
+    )
+    intervene_dir.mkdir(parents=True, exist_ok=True)
+    gens_path = intervene_dir / "generations.jsonl"
+    out_path = intervene_dir / "coherence_grades.jsonl"
     if not gens_path.exists():
         raise SystemExit(f"missing {gens_path}; run Stage 4 first")
 

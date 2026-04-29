@@ -44,6 +44,7 @@ from src.data.nlp.models import resid_hook_target  # noqa: E402
 from experiments.phase7_unification.case_studies.backtracking._paths import (  # noqa: E402
     ANCHOR_LAYER,
     CACHE_DIR,
+    RESULTS_DIR,
     SUBJECT_MODEL,
     TRACES_PATH,
     ensure_dirs,
@@ -69,15 +70,19 @@ def _hook(layer_module):
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--layer", type=int, default=ANCHOR_LAYER)
+    parser.add_argument("--model", default=SUBJECT_MODEL, help="registry key in src.data.nlp.models; default deepseek-r1-distill-llama-8b. Use llama-3.1-8b for the base-model cache.")
+    parser.add_argument("--cache-suffix", default="", help="write to cache_l10<_suffix>/ instead of cache_l10/")
     parser.add_argument("--limit", type=int, default=None, help="cap N for smoke test")
     parser.add_argument("--force", action="store_true")
     args = parser.parse_args()
 
     ensure_dirs()
-    act_path = CACHE_DIR / "activations.fp16.npy"
-    off_path = CACHE_DIR / "offsets.npy"
-    ids_path = CACHE_DIR / "trace_ids.json"
-    meta_path = CACHE_DIR / "meta.json"
+    cache_dir = RESULTS_DIR / (f"cache_l10_{args.cache_suffix}" if args.cache_suffix else "cache_l10")
+    cache_dir.mkdir(parents=True, exist_ok=True)
+    act_path = cache_dir / "activations.fp16.npy"
+    off_path = cache_dir / "offsets.npy"
+    ids_path = cache_dir / "trace_ids.json"
+    meta_path = cache_dir / "meta.json"
 
     if act_path.exists() and not args.force:
         print(f"[build_act_cache] {act_path} exists; use --force to rebuild")
@@ -85,8 +90,8 @@ def main() -> None:
     if not TRACES_PATH.exists():
         raise SystemExit(f"missing {TRACES_PATH}; run Stage 0 first")
 
-    print(f"[build_act_cache] loading {SUBJECT_MODEL} for hook on layer {args.layer}")
-    model, tokenizer, cfg = load_model_and_tokenizer(SUBJECT_MODEL)
+    print(f"[build_act_cache] loading {args.model} for hook on layer {args.layer}")
+    model, tokenizer, cfg = load_model_and_tokenizer(args.model)
     device = next(model.parameters()).device
     layer_mod = resid_hook_target(model, args.layer, cfg.architecture_family)
     captured, handle = _hook(layer_mod)
@@ -128,8 +133,9 @@ def main() -> None:
     with ids_path.open("w") as f:
         json.dump(trace_ids, f, indent=2)
     meta = {
-        "subject_model": SUBJECT_MODEL,
+        "subject_model": args.model,
         "layer": args.layer,
+        "cache_suffix": args.cache_suffix,
         "dtype": "float16",
         "d_model": int(cfg.d_model),
         "n_traces": n,

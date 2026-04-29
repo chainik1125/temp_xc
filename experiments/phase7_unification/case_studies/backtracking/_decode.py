@@ -36,3 +36,24 @@ STRIP_CHARS = _string.punctuation + _string.whitespace + "ĠĊčĉ"
 
 def norm_token(s: str) -> str:
     return s.strip(STRIP_CHARS).lower()
+
+
+_TERMINATORS = ".!?\n"
+
+
+def is_sentence_terminator_text(decoded: str) -> bool:
+    """True if a decoded token (or token sequence) ends a sentence.
+
+    We look at the last non-whitespace character (after BPE-glyph cleanup)
+    and check membership in {. ! ? \\n}, OR check whether the decoded
+    string contains a literal newline anywhere (the BPE Ċ glyph is mapped
+    by clean_decode). Hyphenated tokens like "U.S." won't trip this in
+    practice because the period is followed by an alphanumeric.
+    """
+    s = clean_decode(decoded)
+    if "\n" in s:
+        return True
+    s = s.rstrip()
+    if not s:
+        return False
+    return s[-1] in _TERMINATORS

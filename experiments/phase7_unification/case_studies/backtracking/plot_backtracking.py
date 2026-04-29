@@ -46,12 +46,13 @@ from experiments.phase7_unification.case_studies.backtracking._paths import (  #
     DECOMPOSE_DIR,
     INTERVENE_DIR,
     PLOTS_DIR,
+    RESULTS_DIR,
     ensure_dirs,
 )
 
 
-def _load_rates() -> list[dict]:
-    p = INTERVENE_DIR / "keyword_rates.csv"
+def _load_rates(intervene_dir: Path) -> list[dict]:
+    p = intervene_dir / "keyword_rates.csv"
     if not p.exists():
         raise SystemExit(f"missing {p}; run evaluate_backtracking.py first")
     rows: list[dict] = []
@@ -99,12 +100,12 @@ def plot_magnitude_sweep(rows: list[dict], out_path: Path) -> None:
     print(f"[plot] wrote {out_path}")
 
 
-def plot_top_features(out_path: Path) -> None:
-    p = DECOMPOSE_DIR / "top_features.json"
+def plot_top_features(decompose_dir: Path, out_path: Path) -> None:
+    p = decompose_dir / "top_features.json"
     if not p.exists():
         raise SystemExit(f"missing {p}; run Stage 3 first")
     top = json.loads(p.read_text())[:10]
-    meta = json.loads((DECOMPOSE_DIR / "decompose_meta.json").read_text())
+    meta = json.loads((decompose_dir / "decompose_meta.json").read_text())
     rank_by = meta.get("rank_by", "delta")
     score_key = {"tstat": "tstat", "delta": "delta", "ratio": "ratio"}[rank_by]
     fig, ax = plt.subplots(figsize=(8, 4.5))
@@ -176,12 +177,25 @@ def plot_pareto(rows: list[dict], out_path: Path) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--decompose-suffix", default="", help="read top_features from decompose<_suffix>/")
+    parser.add_argument("--intervene-suffix", default="", help="read keyword_rates from intervene<_suffix>/")
+    parser.add_argument("--plots-suffix", default="", help="write plots to plots<_suffix>/")
     args = parser.parse_args()
     ensure_dirs()
-    rows = _load_rates()
-    plot_magnitude_sweep(rows, PLOTS_DIR / "magnitude_sweep.png")
-    plot_top_features(PLOTS_DIR / "top_features.png")
-    plot_pareto(rows, PLOTS_DIR / "pareto_coherence.png")
+    decompose_dir = (
+        RESULTS_DIR / (f"decompose_{args.decompose_suffix}" if args.decompose_suffix else "decompose")
+    )
+    intervene_dir = (
+        RESULTS_DIR / (f"intervene_{args.intervene_suffix}" if args.intervene_suffix else "intervene")
+    )
+    plots_dir = (
+        RESULTS_DIR / (f"plots_{args.plots_suffix}" if args.plots_suffix else "plots")
+    )
+    plots_dir.mkdir(parents=True, exist_ok=True)
+    rows = _load_rates(intervene_dir)
+    plot_magnitude_sweep(rows, plots_dir / "magnitude_sweep.png")
+    plot_top_features(decompose_dir, plots_dir / "top_features.png")
+    plot_pareto(rows, plots_dir / "pareto_coherence.png")
 
 
 if __name__ == "__main__":

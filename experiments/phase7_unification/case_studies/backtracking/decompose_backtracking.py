@@ -47,17 +47,18 @@ from experiments.phase7_unification.case_studies.backtracking._paths import (  #
     LABELS_DIR,
     PUBLIC_SAE_CONFIG,
     PUBLIC_SAE_REPO,
+    RESULTS_DIR,
     ensure_dirs,
 )
 
 
 # ── public-SAE loader ───────────────────────────────────────────────────────
-def load_public_sae(layer: int, device: str):
+def load_public_sae(layer: int, device: str, release: str | None = None, sae_id: str | None = None):
     """Load a Llama-Scope residual SAE at `layer` via sae_lens.
 
     sae_lens pretrained registry uses release id `llama_scope_lxr_8x` and
-    sae_id `l{layer}r_8x` (lowercase). If the pinned sae_lens version
-    doesn't recognise the release, raise with an actionable message.
+    sae_id `l{layer}r_8x` (lowercase) for the 8x family. The 32x family
+    is `llama_scope_lxr_32x` with sae_id `l{layer}r_32x`.
     """
     try:
         from sae_lens import SAE
@@ -66,8 +67,8 @@ def load_public_sae(layer: int, device: str):
             "sae_lens is required. The repo pins sae-lens>=6.35; "
             f"original error: {e}"
         )
-    release = "llama_scope_lxr_8x"
-    sae_id = f"l{layer}r_8x"
+    release = release or "llama_scope_lxr_8x"
+    sae_id = sae_id or f"l{layer}r_8x"
     print(f"[decompose] SAE.from_pretrained(release={release!r}, sae_id={sae_id!r})")
     sae, cfg_dict, sparsity = SAE.from_pretrained(release=release, sae_id=sae_id, device=device)
     sae.eval()
@@ -215,21 +216,30 @@ def main() -> None:
         default="tstat",
         help="ranking metric for top_features.json. tstat = Welch two-sample (default; combines effect size and noise). delta = raw mean(D_+) − mean(D), favours always-active features. ratio = mean(D_+) / max(mean(D), eps), favours selective features but unstable for sparse features.",
     )
+    parser.add_argument("--decompose-suffix", default="", help="write decompose results to decompose<_suffix>/ instead of decompose/")
+    parser.add_argument("--sae-release", default="llama_scope_lxr_8x")
+    parser.add_argument("--sae-id", default=None, help="default: l{layer}r_8x; pass l{layer}r_32x for the 4× wider Llama-Scope SAE")
+    parser.add_argument("--cache-suffix", default="", help="read activations from cache_l10<_suffix>/ instead of cache_l10/")
     parser.add_argument("--force", action="store_true")
     args = parser.parse_args()
 
     ensure_dirs()
-    out_stats = DECOMPOSE_DIR / "feature_stats.npz"
-    out_top = DECOMPOSE_DIR / "top_features.json"
-    out_raw = DECOMPOSE_DIR / "raw_dom.fp16.npy"
-    out_meta = DECOMPOSE_DIR / "decompose_meta.json"
+    decompose_dir = (
+        RESULTS_DIR / (f"decompose_{args.decompose_suffix}" if args.decompose_suffix else "decompose")
+    )
+    decompose_dir.mkdir(parents=True, exist_ok=True)
+    cache_dir = RESULTS_DIR / (f"cache_l10_{args.cache_suffix}" if args.cache_suffix else "cache_l10")
+    out_stats = decompose_dir / "feature_stats.npz"
+    out_top = decompose_dir / "top_features.json"
+    out_raw = decompose_dir / "raw_dom.fp16.npy"
+    out_meta = decompose_dir / "decompose_meta.json"
     if out_stats.exists() and not args.force:
         print(f"[decompose] {out_stats} exists; use --force to rebuild")
         return
 
-    act_path = CACHE_DIR / "activations.fp16.npy"
-    off_path = CACHE_DIR / "offsets.npy"
-    ids_path = CACHE_DIR / "trace_ids.json"
+    act_path = cache_dir / "activations.fp16.npy"
+    off_path = cache_dir / "offsets.npy"
+    ids_path = cache_dir / "trace_ids.json"
     labels_path = LABELS_DIR / "labels.jsonl"
     for p in (act_path, off_path, ids_path, labels_path):
         if not p.exists():
@@ -264,8 +274,9 @@ def main() -> None:
     print(f"[decompose] raw_dom |v|={np.linalg.norm(raw_dom.astype(np.float32)):.3f} → {out_raw}")
 
     # Feature-space DoM via Llama-Scope.
-    print(f"[decompose] loading Llama-Scope at layer {args.layer} on {args.device}…")
-    sae, sae_cfg = load_public_sae(args.layer, args.device)
+    sae_id = args.sae_id or f"l{args.layer}r_8x"
+    print(f"[decompose] loading Llama-Scope (release={args.sae_release}, sae_id={sae_id}) at layer {args.layer} on {args.device}…")
+    sae, sae_cfg = load_public_sae(args.layer, args.device, release=args.sae_release, sae_id=sae_id)
     t0 = time.time()
     stats = streamed_feature_stats(
         sae, activations, mask_plus, mask_all, args.batch, args.device
@@ -336,10 +347,12 @@ def main() -> None:
 
     meta = {
         "layer": args.layer,
-        "sae_release": "llama_scope_lxr_8x",
-        "sae_id": f"l{args.layer}r_8x",
+        "sae_release": args.sae_release,
+        "sae_id": sae_id,
         "sae_repo": PUBLIC_SAE_REPO,
         "sae_config": PUBLIC_SAE_CONFIG,
+        "decompose_suffix": args.decompose_suffix,
+        "cache_suffix": args.cache_suffix,
         "rank_by": args.rank_by,
         "n_tokens": int(n_tokens),
         "n_d_plus": int(n_plus),
