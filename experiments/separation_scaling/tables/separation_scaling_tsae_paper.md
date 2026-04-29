@@ -4,7 +4,7 @@ Same transformer setup as `config.yaml` (σ=1e-3, d=64, ctx=128, 20k steps), sam
 
 ## Best single-feature R² per arch (across δ sweep)
 
-| δ | TopK | TXC | MatTXC | MLxC | TFA | TFA-pos | T-SAE old (50/50, 2k) | **T-SAE paper (20/80, 25k)** |
+| δ | TopK | TXC | MatTXC (main cfg) | MLxC | TFA | TFA-pos | T-SAE old (50/50, 2k) | **T-SAE paper (20/80, 25k)** |
 |---|---|---|---|---|---|---|---|---|
 | 0    | -0.001 | -0.001 | -0.010 | -0.000 | -0.001 | -0.001 | -0.001 | **+0.001** |
 | 0.05 | -0.001 | -0.000 | -0.012 | -0.000 | -0.000 | +0.000 | -0.000 | **+0.000** |
@@ -12,23 +12,52 @@ Same transformer setup as `config.yaml` (σ=1e-3, d=64, ctx=128, 20k steps), sam
 | 0.15 | +0.050 | +0.244 | +0.263 | +0.092 | +0.052 | +0.078 | +0.109 | **+0.285** |
 | 0.20 | +0.069 | +0.209 | +0.421 | +0.148 | +0.190 | +0.187 | +0.079 | **+0.611** |
 
-## Headline
+## Bayes-optimal R² ceiling at δ=0.20
 
-**Paper-faithful T-SAE wins single-feature R² at every δ where separation signal exists.** At δ=0.20, T-SAE paper hits 0.611 — a +45% margin over MatTXC (0.421), the previous winner. At δ=0.15, T-SAE paper (0.285) edges out MatTXC (0.263).
+The Bayes-optimal R² ceiling is **per-component asymmetric** because at δ=0.20 the components are deliberately separated: comp-0 is sticky (x=0.05, a=0.8), comp-1 moderate, comp-2 diffuse. From `r2_ceiling.json`:
 
-## What this tells us
+| component | ceiling (mean over t) | ceiling (final t) |
+|---|---|---|
+| 0 (sticky) | **0.866** | **0.998** |
+| 1 (moderate) | 0.226 | 0.309 |
+| 2 (diffuse) | 0.247 | 0.310 |
 
-The existing "Temporal BatchTopK SAE" entry in the original benchmark used `group_fractions=[0.5, 0.5]` + only 2000 training steps. The 50/50 split makes the matryoshka pressure trivial (both groups same size and weight, so prefix loss = full-width loss), and 2k steps was too short to converge. Effectively the existing entry was BatchTopK SAE with a temporal contrastive loss — not the paper architecture.
+Reported `best_single_r2` = max across components, so it tracks comp-0 in practice. Gap recovered = `best_single_r2 / 0.866`.
 
-Switching to the paper-default `[0.2, 0.8]` split (which forces a small "high-level" prefix to absorb the most important structure) plus 25k training steps recovers the architecture's full single-feature compression. The 20% prefix is precisely the place where ergodic-component identity gets concentrated.
+## Important caveat: this is NOT a fair vs-MatTXC comparison
 
-This also matches the [coupled-features T-SAE result](../../docs/dmitry/case_studies/coupled_features/summary.md): under paper-faithful settings, T-SAE compresses global structure into a small set of features more reliably than any window arch tested. The MESS3 separation_scaling task is just a different probe (transformer activations on a 3-component HMM rather than direct toy hidden-state recovery), and the same architectural advantage shows up.
+The `MatTXC` numbers above are from the **main-config** `config.yaml` (`fixed_k_total=10`, `matryoshka_widths=[8,16,32,64,128]`, `inner_weight=10`, `temporal_steps=1500`) which is *not* the configuration that maximises MatTXC's single-feature R². The companion **protocol sweep** (`tables/protocol_sweep.md`) hits substantially higher single-feature R² for MatTXC under different sparsity settings:
+
+| MatTXC config (protocol sweep) | δ=0.15 single | δ=0.20 single | gap recovered (δ=0.20) |
+|---|---|---|---|
+| batchtopk k=10 | 0.43 | **0.81** | 93.5% |
+| batchtopk k=20 | 0.51 | 0.80 | 92.4% |
+| topk baseline | 0.57 | 0.81 | 93.5% |
+| batchtopk k=4 | 0.59 | 0.73 | 84.3% |
+| Main-config MatTXC | — | 0.421 | 48.6% |
+| **T-SAE paper (this run)** | 0.285 | **0.611** | **70.6%** |
+
+So the honest reading is:
+
+- **Paper-faithful T-SAE substantially beats main-config MatTXC** (0.611 vs 0.421 at δ=0.20). This is the comparison that lives inside a single `config.yaml` run with both archs at their default settings — and at default settings, the matryoshka prefix in T-SAE pulls more single-feature signal than MatTXC's particular config does.
+- **Paper-faithful T-SAE is below protocol-tuned MatTXC** (0.611 vs 0.81). With `batchtopk k=10` or `topk baseline`, MatTXC reaches ~94% of the comp-0 ceiling, vs T-SAE Paper's ~71%.
+
+So the "T-SAE wins" story really only holds against the *under-tuned* MatTXC entry that lives in the headline `tables/separation_scaling.md` table. The right next experiment, if we want a clean architectural verdict, is to run T-SAE Paper across the same protocol-sweep grid (varying sparsity method + k) so both archs are at *their* best.
+
+## What this tells us about the existing T-SAE benchmark entry
+
+The existing "Temporal BatchTopK SAE" entry in the original `config.yaml` used `group_fractions=[0.5, 0.5]` + only 2000 training steps. The 50/50 split makes the matryoshka pressure trivial (both groups same size and weight, so prefix loss = full-width loss), and 2k steps was too short to converge. Effectively the existing entry was BatchTopK SAE with a temporal contrastive loss — not the paper architecture.
+
+Switching to the paper-default `[0.2, 0.8]` split + 25k steps recovers most of the architecture's compression. The 20% prefix is where ergodic-component identity gets concentrated. So the existing benchmark entry was *substantially* under-representing T-SAE — by 0.611 − 0.079 = +0.532 in single-feature R² at δ=0.20.
+
+This also matches the [coupled-features T-SAE result](../../../docs/dmitry/case_studies/coupled_features/summary.md): under paper-faithful settings, T-SAE compresses global structure into a small set of features more reliably than any window arch tested at the same default config.
 
 ## Caveats
 
 1. **Single seed (42).** The original benchmark used the same single seed; we matched it. No replication-based variance.
-2. **σ=1e-3 transformer init**, as in the original. Per the σ sweep finding (`tables/mup_study.md`), TXC's single-feature R² benefits from σ=2e-2; MatTXC and presumably T-SAE paper would have less to gain since they already concentrate. Worth checking whether T-SAE paper's gain holds at σ=2e-2 too.
-3. **Only the T-SAE arch was rerun.** The other 6 archs' numbers are reused from the original `config.yaml` run.
+2. **σ=1e-3 transformer init**, as in the original. Per the σ sweep finding (`tables/mup_study.md`), TXC's single-feature R² benefits from σ=2e-2; MatTXC and presumably T-SAE paper have less to gain since they already concentrate well at σ=1e-3.
+3. **Only the T-SAE arch was rerun.** The other 6 archs' numbers in the table above are reused from the original `config.yaml` run — i.e. the *under-tuned* MatTXC. See protocol sweep for tuned MatTXC.
+4. **No protocol sweep on T-SAE Paper.** We have one config; MatTXC has a 30+-cell sparsity sweep. A fair architectural comparison requires sweeping T-SAE Paper too.
 
 ## Files
 
