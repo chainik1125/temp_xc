@@ -99,6 +99,10 @@ candidates" as the source) and Y's per-concept structural finding
 - It is concentrated on knowledge-domain content (bias_in_bios
   professions, europarl language ID, github_code at some sparsity).
 
+### Plot
+
+![3-seed leaderboard](../../../../experiments/phase7_unification/results/plots/phase7_leaderboard_multiseed.png)
+
 ### Files of record
 
 - Builder: `experiments/phase7_unification/build_leaderboard_2seed.py`

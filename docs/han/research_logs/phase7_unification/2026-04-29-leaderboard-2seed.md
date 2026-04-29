@@ -96,6 +96,10 @@ message is:
 - IT-side leaderboard — base-side only, IT-side activation cache and
   trainings are pending (see brief.md "Concrete remaining work").
 
+### Plot (superseded — see `2026-04-29-leaderboard-multiseed.md`)
+
+![2-seed leaderboard](../../../../experiments/phase7_unification/results/plots/phase7_leaderboard_2seed.png)
+
 ### Files of record
 
 - Builder: `experiments/phase7_unification/build_leaderboard_2seed.py`

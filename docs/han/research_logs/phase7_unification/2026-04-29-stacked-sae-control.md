@@ -16,6 +16,15 @@ tags:
 >
 > Clarification: stacked = CONCAT, not mean-pool.
 
+### Headline figure
+
+![hierarchy plot](../../../../experiments/phase7_unification/results/plots/phase7_stacked_vs_raw_hierarchy.png)
+
+The plot is intentionally bare-bones: 7 representations, ranked at
+both `k_feat=5` and `k_feat=20`. Each step is monotone-positive, and
+"more candidate features" alone (going from raw K=2 → K=5 → SAE
+K=2 → SAE K=5) doesn't recover the gap to TXC.
+
 ### Setup
 
 For a vanilla per-token SAE (`topk_sae`) and the T-SAE paper baseline
