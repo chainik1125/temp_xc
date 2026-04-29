@@ -42,7 +42,7 @@ of "active" positions (z > 1e-6) per (passage, feature) cell.
 
 ### Results
 
-![CS1 dwell-time distribution](../../../../experiments/phase7_unification/results/case_studies/cs1_slow_features/smoke_dwell_distribution.thumb.png)
+![CS1 dwell-time distribution](../../../../experiments/phase7_unification/results/case_studies/cs1_slow_features/smoke_dwell_distribution.png)
 
 | arch | features active in ≥2 passages | mean dwell | frac dwell ≥3 | frac dwell ≥5 | feat with max dwell ≥3 (% of inspected) |
 |---|---|---|---|---|---|

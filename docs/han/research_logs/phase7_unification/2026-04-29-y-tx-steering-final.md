@@ -80,7 +80,7 @@ Han chose AxBench-additive in Agent C's pass.
 
 [`phase7_steering_v2.png`](../../../../experiments/phase7_unification/results/case_studies/plots/phase7_steering_v2.png)
 
-![v2 Pareto plot](../../../../experiments/phase7_unification/results/case_studies/plots/phase7_steering_v2.thumb.png)
+![v2 Pareto plot](../../../../experiments/phase7_unification/results/case_studies/plots/phase7_steering_v2.png)
 
 Per-arch peaks across both grader sources (Agent C v1 at low
 strengths + Y's extended grader at high strengths):

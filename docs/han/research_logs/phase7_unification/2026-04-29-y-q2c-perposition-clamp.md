@@ -49,7 +49,7 @@ all T positions of the rightmost window. Higher-layer attention sees
 
 ### Results
 
-![Q2.C right-edge vs full-window](../../../../experiments/phase7_unification/results/case_studies/steering_magnitude/q2c_window_variant_comparison.thumb.png)
+![Q2.C right-edge vs full-window](../../../../experiments/phase7_unification/results/case_studies/steering_magnitude/q2c_window_variant_comparison.png)
 
 | arch | T | variant | log-fit peak s | peak suc |
 |---|---|---|---|---|

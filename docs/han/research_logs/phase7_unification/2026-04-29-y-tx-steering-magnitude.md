@@ -51,7 +51,7 @@ same 150-sentence probe set without re-forwarding Gemma-2-2b base.
 | `agentic_txc_02` (TXC matryoshka) | T=5 | 21.57 | 11.95-31.90 | 1813 | **2.37** |
 | `phase5b_subseq_h8` (SubseqH8) | T_max=10 | 63.11 | 38.30-91.52 | 1063 | **6.93** |
 
-![Q1.1 per-arch distribution](../../../../experiments/phase7_unification/results/case_studies/steering_magnitude/q1_1_z_orig_distributions.thumb.png)
+![Q1.1 per-arch distribution](../../../../experiments/phase7_unification/results/case_studies/steering_magnitude/q1_1_z_orig_distributions.png)
 
 **Read.**
 
@@ -117,7 +117,7 @@ log10(s) on the top-3 success cells.
 - [`q1_2_strength_curves.json`](../../../../experiments/phase7_unification/results/case_studies/steering_magnitude/q1_2_strength_curves.json)
 - [`q1_2_strength_curves.png`](../../../../experiments/phase7_unification/results/case_studies/steering_magnitude/q1_2_strength_curves.png)
 
-![Q1.2 paper-clamp success vs strength](../../../../experiments/phase7_unification/results/case_studies/steering_magnitude/q1_2_strength_curves.thumb.png)
+![Q1.2 paper-clamp success vs strength](../../../../experiments/phase7_unification/results/case_studies/steering_magnitude/q1_2_strength_curves.png)
 
 **Results.**
 
@@ -210,7 +210,7 @@ default behaviour unchanged).
 
 **Results.**
 
-![Q1.3 finer-grid paper-clamp curves](../../../../experiments/phase7_unification/results/case_studies/steering_magnitude/q1_3_finer_grid_curves.thumb.png)
+![Q1.3 finer-grid paper-clamp curves](../../../../experiments/phase7_unification/results/case_studies/steering_magnitude/q1_3_finer_grid_curves.png)
 
 | arch | T | log-fit peak s | peak suc | Q1.1 mag-pred | universal-5x pred |
 |---|---|---|---|---|---|

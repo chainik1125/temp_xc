@@ -49,7 +49,7 @@ worse than predicting zero**.
 
 ### Results
 
-![CS2 baseline vs held-out FVE](../../../../experiments/phase7_unification/results/case_studies/cs2_masked_recon/smoke_masked_recon.thumb.png)
+![CS2 baseline vs held-out FVE](../../../../experiments/phase7_unification/results/case_studies/cs2_masked_recon/smoke_masked_recon.png)
 
 | arch | T | baseline FVE | held-out FVE | held-out MSE / baseline MSE |
 |---|---|---|---|---|

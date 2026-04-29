@@ -41,7 +41,7 @@ tags:
 | **`agentic_txc_02`** | 5 | 0.773 | **0.281** |
 | `phase5b_subseq_h8` | 10 | 0.498 | -1.693 |
 
-![CS2 baseline vs held-out](../../../../experiments/phase7_unification/results/case_studies/cs2_masked_recon/smoke_masked_recon.thumb.png)
+![CS2 baseline vs held-out](../../../../experiments/phase7_unification/results/case_studies/cs2_masked_recon/smoke_masked_recon.png)
 
 **Why it's the lead.** This is the only metric tested where a
 window arch (TXC matryoshka T=5) shows a **quantitative,
