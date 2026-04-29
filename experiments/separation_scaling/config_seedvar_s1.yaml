@@ -1,0 +1,79 @@
+experiment_name: separation_scaling_seedvar_s1
+description: |
+  Transformer-seed variance study: train a fresh transformer at seed=1 and
+  run TXC + T-SAE Paper at δ ∈ {0.15, 0.20}. Results combine with the
+  seed=42 run in results_protocol_compare/ + a sibling seed=2 run to bound
+  variance from transformer initialisation.
+
+seed: 1
+
+generator:
+  type: mess3_shared
+  sweep:
+    parameter: delta
+    values: [0.15, 0.2]
+  fixed_params:
+    base_x: 0.25
+    base_a: 0.6
+    parameterization: symmetric_line
+
+transformer:
+  n_layers: 3
+  d_model: 64
+  n_heads: 2
+  d_head: 32
+  d_mlp: 256
+  n_ctx: 128
+  act_fn: gelu
+  normalization_type: LN
+  attention_dir: causal
+  default_prepend_bos: false
+  init_mode: gpt2
+  initializer_range: 1.0e-3
+  probe_layer: 1
+  probe_hook_name: blocks.1.hook_resid_post
+  extract_batch_size: 16
+  load_if_exists: true       # train fresh into this seed-specific dir
+  training:
+    steps: 20000
+    batch_size: 128
+    lr: 1.0e-3
+    data_chunks: 4
+    data_chunk_size: 5000
+
+architectures:
+  - name: "TXC"
+    family: txc
+    kwargs:
+      dict_size: 64
+      k: 1
+      window_size: 30
+      temporal_steps: 3000
+      n_sequences: 1000
+      seq_len: 128
+
+  - name: "T-SAE Paper"
+    family: tsae
+    kwargs:
+      dict_size: 128
+      k: 10
+      group_fractions: [0.2, 0.8]
+      group_weights: [0.5, 0.5]
+      temporal_alpha: 0.1
+      temporal: true
+      temporal_steps: 25000
+      lr: 3.0e-4
+      n_sequences: 1000
+      seq_len: 128
+
+probes:
+  dense_linear: {enabled: false}
+  dense_mlp: {enabled: false}
+
+probe_dataset:
+  train_sequences: 1000
+  eval_sequences: 500
+  train_seed: 10042
+  eval_seed: 20042
+
+output_root: results_seedvar_s1
