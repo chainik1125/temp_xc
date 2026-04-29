@@ -77,6 +77,42 @@ def load_public_sae(layer: int, device: str, release: str | None = None, sae_id:
     return sae, cfg_dict
 
 
+def load_local_topk_sae(ckpt_path: str | Path, device: str):
+    """Load a locally-trained TopKSAE checkpoint (from train_llama_txc.py
+    `--arch topk_sae`). Returns an SAE-Lens-compatible object that
+    exposes encode(), decode(), and W_dec attributes the same way the
+    Llama-Scope SAE does.
+
+    For TXC architectures that take (B, T, d_in) windows, this loader
+    won't work as-is; the intervene pipeline assumes per-token features.
+    Add window-aware hooks (see case_studies/steering/intervene_paper_clamp_window.py)
+    for that case.
+    """
+    from src.architectures.topk_sae import TopKSAE
+    ckpt_path = Path(ckpt_path)
+    meta = json.loads((ckpt_path.parent / "meta.json").read_text())
+    if meta.get("arch") != "topk_sae":
+        raise SystemExit(
+            f"load_local_topk_sae only handles arch=topk_sae; got {meta.get('arch')!r}. "
+            "For TXC etc., write a window-aware decompose path."
+        )
+    sae = TopKSAE(d_in=int(meta["d_in"]), d_sae=int(meta["d_sae"]), k=int(meta["k_pos"]))
+    sae.load_state_dict(torch.load(ckpt_path, map_location="cpu"))
+    sae.to(device)
+    sae.eval()
+    for p in sae.parameters():
+        p.requires_grad_(False)
+
+    # Adapt to the SAE-Lens-style W_dec shape (d_sae, d_model). The
+    # TopKSAE class stores W_dec as (d_in, d_sae); intervene_backtracking
+    # already handles either orientation via shape check.
+    class _Cfg:
+        d_sae = int(meta["d_sae"])
+    sae.cfg = _Cfg()
+    print(f"[decompose] loaded local TopKSAE from {ckpt_path}")
+    return sae, meta
+
+
 # ── label assembly ─────────────────────────────────────────────────────────
 def _build_masks(
     trace_ids: list[str], offsets: np.ndarray, labels_path: Path
@@ -219,6 +255,9 @@ def main() -> None:
     parser.add_argument("--decompose-suffix", default="", help="write decompose results to decompose<_suffix>/ instead of decompose/")
     parser.add_argument("--sae-release", default="llama_scope_lxr_8x")
     parser.add_argument("--sae-id", default=None, help="default: l{layer}r_8x; pass l{layer}r_32x for the 4× wider Llama-Scope SAE")
+    parser.add_argument("--local-ckpt", default=None,
+                        help="path to a locally-trained TopKSAE ckpt.pt (from train_llama_txc.py); "
+                             "if set, --sae-release / --sae-id are ignored")
     parser.add_argument("--cache-suffix", default="", help="read activations from cache_l10<_suffix>/ instead of cache_l10/")
     parser.add_argument("--force", action="store_true")
     args = parser.parse_args()
@@ -273,10 +312,15 @@ def main() -> None:
     np.save(out_raw, raw_dom)
     print(f"[decompose] raw_dom |v|={np.linalg.norm(raw_dom.astype(np.float32)):.3f} → {out_raw}")
 
-    # Feature-space DoM via Llama-Scope.
-    sae_id = args.sae_id or f"l{args.layer}r_8x"
-    print(f"[decompose] loading Llama-Scope (release={args.sae_release}, sae_id={sae_id}) at layer {args.layer} on {args.device}…")
-    sae, sae_cfg = load_public_sae(args.layer, args.device, release=args.sae_release, sae_id=sae_id)
+    # Feature-space DoM via SAE (public Llama-Scope or locally-trained).
+    if args.local_ckpt:
+        print(f"[decompose] loading local SAE from {args.local_ckpt}")
+        sae, sae_cfg = load_local_topk_sae(args.local_ckpt, args.device)
+        sae_id = f"local:{args.local_ckpt}"
+    else:
+        sae_id = args.sae_id or f"l{args.layer}r_8x"
+        print(f"[decompose] loading Llama-Scope (release={args.sae_release}, sae_id={sae_id}) at layer {args.layer} on {args.device}…")
+        sae, sae_cfg = load_public_sae(args.layer, args.device, release=args.sae_release, sae_id=sae_id)
     t0 = time.time()
     stats = streamed_feature_stats(
         sae, activations, mask_plus, mask_all, args.batch, args.device
