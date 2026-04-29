@@ -165,8 +165,9 @@ def make_plot(rows, out_dir: Path):
         for i, m in enumerate(means):
             ax.text(m + 0.005, i, f"{m:.4f}", va="center", fontsize=8)
 
-    fig.suptitle("Phase 7 leaderboard — 3-seed mean ± σ_seeds across {1, 2, 42}",
-                 fontsize=12, weight="bold")
+    fig.suptitle("Phase 7 leaderboard — 3-seed mean ± σ_seeds across {1, 2, 42} "
+                 "(2-seed cells: tfa_big, txcdr_t16, hill_subseq_h8_T12_s5)",
+                 fontsize=11, weight="bold")
     out_path = out_dir / "phase7_leaderboard_multiseed.png"
     save_figure(fig, str(out_path))
     plt.close(fig)

@@ -13,12 +13,17 @@ tags:
 After Y's 18-hour shift on case-studies + steering and X's 2-seed
 backfill, three findings revise the original headline:
 
-1. **2-seed leaderboard tightens the TXC lead.** With seed=1 + seed=42
-   means, TXC champion vs vanilla `topk_sae`: gap shrinks from 0.013
-   (seed=42 only) to **0.005** at k_feat=5, stays at 0.006 at k_feat=20.
-   σ_seeds is 0.005-0.010 on the top archs — TXC's lead is real and
-   directionally consistent but within ~1-2× seed-noise scale.
-   Full table: `2026-04-29-leaderboard-2seed.md`.
+1. **3-seed leaderboard tightens the TXC lead** (with seed=1 + seed=2 +
+   seed=42, where ckpts available; tfa_big, txcdr_t16, hill_subseq_h8_T12_s5
+   only have 1-2 seeds). Per-arch deltas TXC champion vs vanilla
+   `topk_sae`:
+   - k_feat=5: champion = `phase5b_subseq_h8` 0.8962, topk_sae 0.8886.
+     **Δ = 0.0076** (~1-2× σ_seeds 0.004-0.006). Top 8 archs within
+     0.010 — champion *identity* shifts with seed selection.
+   - k_feat=20: champion = `txc_bare_antidead_t5` 0.9359, topk_sae 0.9304.
+     **Δ = 0.0055** (~18× σ_seeds 0.0003). Decisive.
+   Full table: `2026-04-29-leaderboard-multiseed.md` (supersedes
+   the earlier `2026-04-29-leaderboard-2seed.md`).
 2. **Stacked-SAE control rejects "more candidate features" as the source
    of TXC's win.** Vanilla TopKSAE concat at K=2/K=5 last positions
    (giving 37k-92k candidate features vs TXC's 18k) loses to TXC by
