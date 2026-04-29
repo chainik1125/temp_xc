@@ -66,43 +66,59 @@ tags:
 - Always `TQDM_DISABLE=1`. Never run multiple GPU python processes
   concurrently — the pod has been OOM-killed twice that way.
 
-### Disk management — CRITICAL before starting IT-side
+### Disk management
 
 Current pod usage (X's measurements 2026-04-29):
 
-| dir | size |
-|---|---|
-| `data/cached_activations/gemma-2-2b/fineweb` (BASE 5-layer cache) | 14 GB |
-| `experiments/phase7_unification/results/probe_cache/` (BASE S=128) | **406 GB** |
-| `experiments/phase7_unification/results/probe_cache_S32/` (BASE S=32, used) | 104 GB |
-| `experiments/phase7_unification/results/ckpts/` | 87 GB |
-| **total** | **~611 GB** of the 900 GB pod quota |
+| dir | size | actually used? |
+|---|---|---|
+| `data/cached_activations/gemma-2-2b/fineweb` (BASE 5-layer cache) | 14 GB | yes (training) |
+| `experiments/phase7_unification/results/probe_cache/` (BASE S=128 right-padded) | **406 GB** | **NO** |
+| `experiments/phase7_unification/results/probe_cache_S32/` (BASE S=32 left-aligned) | 104 GB | yes (probing) |
+| `experiments/phase7_unification/results/ckpts/` | 87 GB | yes |
+| **total** | **~611 GB** of the 900 GB pod quota | |
 
-Building IT-side at the same scale adds:
-- `data/cached_activations/gemma-2-2b-it/fineweb`: ~14 GB (5 IT layers)
-- `probe_cache_it/` (S=128): ~406 GB
-- `probe_cache_S32_it/`: ~104 GB
+**The 406 GB BASE S=128 probe cache is dead weight.** It was only ever
+used as input to `rebuild_probe_cache_s32.py`. `run_probing_phase7.py`
+reads only from `probe_cache_S32/` (see `ACTIVE_PROBE_CACHE =
+PROBE_CACHE_DIR_S32` at the top of run_probing_phase7.py). After the
+S=32 slice was produced, S=128 is just consuming disk.
 
-That's another **~524 GB** — total would hit ~1135 GB, blowing past
-the 900 GB quota.
-
-**Mandatory cleanup before IT-side**: delete the BASE S=128 probe
-cache. It's only used as input to `rebuild_probe_cache_s32.py`; the
-S=32 output is what `run_probing_phase7.py` actually reads. After
-the slice, S=128 is dead weight.
+**Free win — delete it now:**
 
 ```bash
-# Verify S=32 cache exists and is complete (36 task dirs):
-ls /workspace/temp_xc/experiments/phase7_unification/results/probe_cache_S32 | wc -l
+# Sanity-check probe_cache_S32 is complete (36 task dirs, each with
+# acts_anchor.npz, acts_mlc.npz, acts_mlc_tail.npz, meta.json):
+ls /workspace/temp_xc/experiments/phase7_unification/results/probe_cache_S32 | wc -l    # → 36
+for d in /workspace/temp_xc/experiments/phase7_unification/results/probe_cache_S32/*/; do
+  [ "$(ls "$d" | wc -l)" -eq 4 ] || echo "incomplete: $d"
+done    # → empty
 
-# Then safely delete S=128:
+# Then delete the S=128 cache:
 rm -rf /workspace/temp_xc/experiments/phase7_unification/results/probe_cache
 ```
 
-This frees ~406 GB. New total after IT build: 611 − 406 + 524 ≈ **729 GB**, fits.
+**For IT-side, do NOT build a S=128 cache at all.** Two options:
 
-If you build the IT S=128 cache and then slice it, you can also
-delete it once `probe_cache_S32_it/` is verified.
+(a) **Recommended — direct S=32 builder for IT**. Adapt
+`build_probe_cache_phase7.py`: change `LAST_N = 128` to `LAST_N = 32`
+*and* switch the per-task save to write left-aligned `(N, 32, d)`
+arrays with `train_first_real` instead of right-padded `(N, 128, d)`
++ `train_last_idx`. The `_encode_split` function already runs the
+forward pass at full ctx_len=128; you only need to change what gets
+saved per task. The slice logic from `rebuild_probe_cache_s32.py`
+inlines into `_encode_split` (apply per-batch instead of per-task).
+Ends up writing directly to `probe_cache_S32_it/` with no S=128
+intermediate. Saves ~406 GB of scratch + ~25 min of slicing.
+
+(b) **Quick-and-dirty — per-task slice-and-delete**. Build IT S=128
+one task at a time; after each task's S=128 npz files are written,
+immediately slice that one task to S=32 and `rm` the S=128 files.
+This keeps peak intermediate at ~17 GB (one task's worth) instead
+of 406 GB. Less code change but uglier.
+
+Option (a) is cleaner and what X would do. Either way, IT-side total
+new disk = 14 GB act cache + 104 GB S=32 = ~118 GB, fits comfortably.
 
 ### What's already done (so don't repeat)
 
@@ -194,7 +210,8 @@ for the IT-side cache build script (Phase 5 was IT-side).
      the original Phase 5 build_multilayer_cache.py docstring).
    - At the end, write/update `layer_specs.json` to record the IT layers.
 
-2. **Build IT probe cache** (~30 min A40):
+2. **Build IT probe cache directly to S=32** (~30 min A40 — same
+   compute as before; the slicer step is eliminated):
    - Run `build_probe_cache_phase7.py --include-crosstoken` with
      subject model overridden to `gemma-2-2b-it` and anchor=L13. The
      existing script hardcodes `SUBJECT_MODEL`, `ANCHOR_LAYER`,
@@ -218,8 +235,12 @@ for the IT-side cache build script (Phase 5 was IT-side).
      `acts_anchor.npz` etc. without checking which subject model
      produced it — if you reuse `probe_cache_S32/` for IT, the IT
      probing will silently use BASE activations and give garbage.
-   - Run `rebuild_probe_cache_s32_it.py` (similarly forked) to slice
-     to `experiments/phase7_unification/results/probe_cache_S32_it/`.
+   - **Skip the S=128 → S=32 slicer entirely.** Per the disk-management
+     section, write the S=32 left-aligned cache directly from the build
+     script. See option (a) in that section for the recipe (modify
+     `build_probe_cache_phase7.py` to write `(N, 32, d)` left-aligned
+     output with `train_first_real` instead of `(N, 128, d)` right-
+     padded with `train_last_idx`). Saves ~406 GB of scratch + ~25 min.
    - For `run_probing_phase7.py`: it currently hardcodes
      `PROBE_CACHE_DIR_S32 = OUT_DIR / "probe_cache_S32"`. You'll need
      to either (a) fork `run_probing_phase7_it.py` with the IT path,
