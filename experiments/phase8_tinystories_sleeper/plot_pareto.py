@@ -18,6 +18,7 @@ ROOT = Path(__file__).parent
 
 
 ARCH_COLORS = {
+    # fra_proj's original 8-arch comparison (kept for compatibility).
     "mlc":         "#1f77b4",
     "txc_early":   "#ff7f0e",
     "txc_mid":     "#2ca02c",
@@ -33,6 +34,23 @@ ARCH_COLORS = {
     "h8_early":    "#98df8a",
     "h8_mid":      "#c5b0d5",
     "h8_late":     "#f7b6d2",
+    # Phase 8 v2 layer-0 deep dive: 5 hookpoints × 3 arch families. Colors
+    # cluster by hookpoint (5 hues), brightness by arch family.
+    "sae_l0_ln1":  "#9467bd",  # purple
+    "sae_l0_pre":  "#1f77b4",  # blue
+    "sae_l0_mid":  "#2ca02c",  # green
+    "sae_l0_post": "#d62728",  # red
+    "sae_l1_ln1":  "#ff7f0e",  # orange
+    "tsae_l0_ln1": "#c5b0d5",  # light purple
+    "tsae_l0_pre": "#aec7e8",  # light blue
+    "tsae_l0_mid": "#98df8a",  # light green
+    "tsae_l0_post":"#ff9896",  # light red
+    "tsae_l1_ln1": "#ffbb78",  # light orange
+    "txc_l0_ln1":  "#5e3d8a",  # dark purple
+    "txc_l0_pre":  "#0d3a5c",  # dark blue
+    "txc_l0_mid":  "#1f5e1f",  # dark green
+    "txc_l0_post": "#7a1818",  # dark red
+    "txc_l1_ln1":  "#a64500",  # dark orange
 }
 ARCH_LABELS = {
     "mlc":         "MLC (L=5)",
@@ -50,6 +68,21 @@ ARCH_LABELS = {
     "h8_early":    "H8 layer 0 (T=30)",
     "h8_mid":      "H8 layer 2 (T=30)",
     "h8_late":     "H8 layer 3 (T=30)",
+    "sae_l0_ln1":  "SAE  ln1.0",
+    "sae_l0_pre":  "SAE  resid_pre.0",
+    "sae_l0_mid":  "SAE  resid_mid.0",
+    "sae_l0_post": "SAE  resid_post.0",
+    "sae_l1_ln1":  "SAE  ln1.1",
+    "tsae_l0_ln1": "TSAE ln1.0",
+    "tsae_l0_pre": "TSAE resid_pre.0",
+    "tsae_l0_mid": "TSAE resid_mid.0",
+    "tsae_l0_post":"TSAE resid_post.0",
+    "tsae_l1_ln1": "TSAE ln1.1",
+    "txc_l0_ln1":  "TXC  ln1.0 (T=30)",
+    "txc_l0_pre":  "TXC  resid_pre.0 (T=30)",
+    "txc_l0_mid":  "TXC  resid_mid.0 (T=30)",
+    "txc_l0_post": "TXC  resid_post.0 (T=30)",
+    "txc_l1_ln1":  "TXC  ln1.1 (T=30)",
 }
 
 
