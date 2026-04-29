@@ -456,17 +456,19 @@ def run_probing(run_ids: list[str] | None = None,
                 task_names: list[str] | None = None,
                 S_values: tuple[int, ...] = HEADLINE_S,
                 k_values: tuple[int, ...] = HEADLINE_K_FEAT,
-                limit_archs: int | None = None) -> None:
+                limit_archs: int | None = None,
+                probe_cache_dir: Path | None = None) -> None:
     PROBING_PATH.parent.mkdir(parents=True, exist_ok=True)
     device = torch.device("cuda")
-    task_dirs = [d for d in sorted(ACTIVE_PROBE_CACHE.iterdir()) if d.is_dir()]
+    cache_dir = probe_cache_dir if probe_cache_dir is not None else ACTIVE_PROBE_CACHE
+    task_dirs = [d for d in sorted(cache_dir.iterdir()) if d.is_dir()]
     if task_names:
         task_dirs = [d for d in task_dirs if d.name in task_names]
     task_dirs = [
         d for d in task_dirs
         if (d / "acts_anchor.npz").exists() and (d / "meta.json").exists()
     ]
-    print(f"[probe] {len(task_dirs)} tasks, S={S_values}, k_feat={k_values}")
+    print(f"[probe] cache={cache_dir} {len(task_dirs)} tasks, S={S_values}, k_feat={k_values}")
 
     n_done = 0
     with PROBING_PATH.open("a") as out_f:
@@ -507,6 +509,8 @@ def run_probing(run_ids: list[str] | None = None,
                             "task_name": task_name,
                             "S": int(S), "T": int(T_eff),
                             "skipped": True, "reason": "S_lt_2T_minus_1",
+                            "subject_model": meta.get("subject_model", SUBJECT_MODEL),
+                            "anchor_layer": int(meta.get("anchor_layer", ANCHOR_LAYER)),
                             **{k: meta.get(k) for k in (
                                 "arch_id", "row", "group", "seed",
                                 "k_pos", "k_win",
@@ -522,6 +526,8 @@ def run_probing(run_ids: list[str] | None = None,
                             "task_name": task_name, "S": int(S), "T": int(T_eff),
                             "skipped": True, "reason": "no_valid_examples_after_filter",
                             "n_drop_train": n_drop_tr, "n_drop_test": n_drop_te,
+                            "subject_model": meta.get("subject_model", SUBJECT_MODEL),
+                            "anchor_layer": int(meta.get("anchor_layer", ANCHOR_LAYER)),
                             **{k: meta.get(k) for k in (
                                 "arch_id", "row", "group", "seed", "k_pos", "k_win",
                             )},
@@ -545,6 +551,8 @@ def run_probing(run_ids: list[str] | None = None,
                             "n_train_eff": int(Z_tr.shape[0]),
                             "n_test_eff": int(Z_te.shape[0]),
                             "n_drop_train": n_drop_tr, "n_drop_test": n_drop_te,
+                            "subject_model": meta.get("subject_model", SUBJECT_MODEL),
+                            "anchor_layer": int(meta.get("anchor_layer", ANCHOR_LAYER)),
                             **{k: meta.get(k) for k in (
                                 "T_max", "t_sample", "n_layers",
                                 "shifts", "alpha", "gamma", "n_scales",
@@ -584,16 +592,22 @@ def main() -> None:
     p.add_argument("--headline", action="store_true",
                    help="run S in {128,20} × k_feat in {5,20} on every run in index")
     p.add_argument("--limit_archs", type=int, default=None)
+    p.add_argument("--probe_cache_dir", type=str, default=None,
+                   help="Override probe cache dir (default: ACTIVE_PROBE_CACHE = probe_cache_S32). "
+                        "Useful for IT-side probing against probe_cache_S32_it.")
     args = p.parse_args()
     banner(__file__)
+    cache_override = Path(args.probe_cache_dir) if args.probe_cache_dir else None
     if args.headline:
         run_probing(S_values=HEADLINE_S, k_values=HEADLINE_K_FEAT,
-                    limit_archs=args.limit_archs)
+                    limit_archs=args.limit_archs,
+                    probe_cache_dir=cache_override)
     else:
         run_probing(
             run_ids=args.run_ids, task_names=args.task_names,
             S_values=tuple(args.S), k_values=tuple(args.k_feat),
             limit_archs=args.limit_archs,
+            probe_cache_dir=cache_override,
         )
 
 
