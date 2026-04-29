@@ -1,4 +1,4 @@
-"""One PNG per hookpoint: loss / FVU / window-L0 / dead-feature count vs step."""
+"""One PNG per (arch, hookpoint): loss / FVU / window-L0 / dead-feature count vs step."""
 
 from __future__ import annotations
 import argparse, json
@@ -8,7 +8,9 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-from experiments.ward_backtracking_txc.plot._common import load_cfg, plots_dir
+from experiments.ward_backtracking_txc.plot._common import (
+    load_cfg, plots_dir, iter_arch_hookpoint,
+)
 
 
 def _read_log(path: Path) -> list[dict]:
@@ -22,6 +24,12 @@ def _read_log(path: Path) -> list[dict]:
     return rows
 
 
+def _log_filename(arch: str, hookpoint_key: str) -> str:
+    if arch == "txc":
+        return f"{hookpoint_key}_train.jsonl"
+    return f"{arch}_{hookpoint_key}_train.jsonl"
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser()
     ap.add_argument("--config", default=None)
@@ -30,15 +38,13 @@ def main(argv=None):
     logs_dir = Path(cfg["paths"]["logs_dir"])
     out_dir = plots_dir(cfg)
 
-    for hp in cfg["hookpoints"]:
-        if not hp.get("enabled", True):
-            continue
-        log_path = logs_dir / f"{hp['key']}_train.jsonl"
+    for arch, hp in iter_arch_hookpoint(cfg):
+        log_path = logs_dir / _log_filename(arch, hp["key"])
         if not log_path.exists():
-            print(f"[skip] no log for {hp['key']}"); continue
+            print(f"[skip] no log for {arch}/{hp['key']}"); continue
         rows = _read_log(log_path)
         if not rows:
-            print(f"[skip] empty log for {hp['key']}"); continue
+            print(f"[skip] empty log for {arch}/{hp['key']}"); continue
         steps = [r["step"] for r in rows]
         fig, axes = plt.subplots(1, 4, figsize=(16, 3.5))
         for ax, key, title in zip(
@@ -47,9 +53,9 @@ def main(argv=None):
         ):
             ax.plot(steps, [r[key] for r in rows], lw=1.5)
             ax.set_xlabel("step"); ax.set_title(title); ax.grid(alpha=0.3)
-        fig.suptitle(f"TXC training — {hp['key']} ({hp['label']})", fontsize=11)
+        fig.suptitle(f"{arch} training — {hp['key']} ({hp['label']})", fontsize=11)
         fig.tight_layout()
-        out = out_dir / f"training_curves_{hp['key']}.png"
+        out = out_dir / f"training_curves_{arch}_{hp['key']}.png"
         fig.savefig(out, dpi=140); plt.close(fig)
         print(f"[saved] {out}")
 

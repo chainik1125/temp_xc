@@ -131,12 +131,12 @@ def _generate(model, tok, prompts: list[str], max_new_tokens: int, batch_size: i
 
 
 def _build_sources(cfg: dict) -> list[dict]:
-    """Return list of {tag, vector, hookpoint, feature_id, mode} entries.
+    """Return list of {tag, vector, hookpoint, arch, feature_id, mode} entries.
 
     Includes:
-      - DoM baselines (base_derived_union, reasoning_derived_union) at the
-        Ward layer — exactly the Stage A vectors.
-      - For each enabled hookpoint with a features file: top-K features × {pos0, union}.
+      - DoM baselines (base, reasoning) at the Ward layer — Stage A vectors.
+      - For each (arch in cfg.txc.arch_list) × (enabled hookpoint) with a
+        features file: top-K features × {pos0, union}.
     """
     paths = cfg["paths"]; mining = cfg["mining"]
     sources: list[dict] = []
@@ -146,51 +146,51 @@ def _build_sources(cfg: dict) -> list[dict]:
     if dom_path.exists():
         dom = torch.load(dom_path, weights_only=False)
         sources.append({
-            "tag": "dom_base_union",
-            "vector": dom["base"]["union"].clone(),
-            "hookpoint": "resid_L10",
-            "feature_id": -1,
-            "mode": "dom",
+            "tag": "dom_base_union", "vector": dom["base"]["union"].clone(),
+            "hookpoint": "resid_L10", "arch": "dom", "feature_id": -1, "mode": "dom",
         })
         sources.append({
-            "tag": "dom_reasoning_union",
-            "vector": dom["reasoning"]["union"].clone(),
-            "hookpoint": "resid_L10",
-            "feature_id": -1,
-            "mode": "dom",
+            "tag": "dom_reasoning_union", "vector": dom["reasoning"]["union"].clone(),
+            "hookpoint": "resid_L10", "arch": "dom", "feature_id": -1, "mode": "dom",
         })
     else:
         log.warning("[warn] %s missing — skipping DoM baselines", dom_path)
 
-    # TXC-feature sources.
     feat_dir = Path(paths["features_dir"])
     K_steer = int(mining["top_k_for_steering"])
-    for hp in cfg["hookpoints"]:
-        if not hp.get("enabled", True):
-            continue
-        fpath = feat_dir / f"{hp['key']}.npz"
-        if not fpath.exists():
-            log.warning("[warn] %s missing — skipping hookpoint %s", fpath, hp["key"])
-            continue
-        z = np.load(fpath, allow_pickle=True)
-        top = z["top_features"][:K_steer].tolist()
-        dec_pos0 = z["decoder_at_pos0"][:K_steer]
-        dec_union = z["decoder_union"][:K_steer]
-        for i, fid in enumerate(top):
-            sources.append({
-                "tag": f"txc_{hp['key']}_f{fid}_pos0",
-                "vector": torch.from_numpy(dec_pos0[i]).float(),
-                "hookpoint": hp["key"],
-                "feature_id": int(fid),
-                "mode": "pos0",
-            })
-            sources.append({
-                "tag": f"txc_{hp['key']}_f{fid}_union",
-                "vector": torch.from_numpy(dec_union[i]).float(),
-                "hookpoint": hp["key"],
-                "feature_id": int(fid),
-                "mode": "union",
-            })
+    arch_list = cfg["txc"].get("arch_list", ["txc"])
+    for arch in arch_list:
+        for hp in cfg["hookpoints"]:
+            if not hp.get("enabled", True):
+                continue
+            # txc keeps legacy filename (no arch prefix); others get one.
+            fpath = feat_dir / (
+                f"{hp['key']}.npz" if arch == "txc" else f"{arch}_{hp['key']}.npz"
+            )
+            if not fpath.exists():
+                log.warning("[warn] %s missing — skipping %s/%s", fpath, arch, hp["key"])
+                continue
+            z = np.load(fpath, allow_pickle=True)
+            top = z["top_features"][:K_steer].tolist()
+            dec_pos0 = z["decoder_at_pos0"][:K_steer]
+            dec_union = z["decoder_union"][:K_steer]
+            for i, fid in enumerate(top):
+                sources.append({
+                    "tag": f"{arch}_{hp['key']}_f{fid}_pos0",
+                    "vector": torch.from_numpy(dec_pos0[i]).float(),
+                    "hookpoint": hp["key"], "arch": arch,
+                    "feature_id": int(fid), "mode": "pos0",
+                })
+                # For arches with no T axis (topk_sae, tsae) pos0==union;
+                # skip the duplicate union source to keep the budget honest.
+                if arch in ("topk_sae", "tsae"):
+                    continue
+                sources.append({
+                    "tag": f"{arch}_{hp['key']}_f{fid}_union",
+                    "vector": torch.from_numpy(dec_union[i]).float(),
+                    "hookpoint": hp["key"], "arch": arch,
+                    "feature_id": int(fid), "mode": "union",
+                })
     return sources
 
 

@@ -52,6 +52,18 @@ txc:
   grad_clip: 1.0
   seed: 42
 
+  # Architecture sweep: which dictionary-learning archs to train alongside
+  # TXC. All read from the SAME activation cache and run through the same
+  # mining + steering harness. See architectures.py for the dispatch.
+  arch_list: [txc, topk_sae, stacked_sae, tsae]
+  arch_kwargs:
+    tsae:
+      n_heads: 8              # must divide d_sae / bottleneck_factor
+      bottleneck_factor: 64
+      sae_diff_type: topk     # 'topk' matches TXC's topk-style sparsity
+      n_attn_layers: 1        # Dmitry/collaborator default
+      tied_weights: true
+
 cache:
   # Caching corpus for base TXC training. We slice Stage A reasoning traces
   # into seq_length windows (in-domain for backtracking; on-disk; no network).
@@ -72,11 +84,12 @@ mining:
   steer_decoder_pos: 0       # which T-slot of the decoder to use as the steering vector.
 
 steering:
-  # Reuse Stage A's eval prompts. Scoped magnitude grid for single-session run:
-  # Stage A confirmed negative magnitudes don't push below floor → drop them;
-  # we keep 0/8/12/16 to span baseline → near-saturation.
+  # Reuse Stage A's eval prompts. Per Dmitry's feedback (no a-priori reason
+  # to favour positive steering), the paper-budget grid is symmetric across
+  # zero. Negative magnitudes were tested in Stage A as floor checks; here
+  # they're a real source of evidence about direction sign and arch behavior.
   steering_layer: 10
-  magnitudes: [0, 8, 12, 16]
+  magnitudes: [-16, -12, -8, -4, 0, 4, 8, 12, 16]
   max_new_tokens: 1200       # gives reasoning model room to enter the exploration phase
   n_eval_prompts: 20
   seed: 42

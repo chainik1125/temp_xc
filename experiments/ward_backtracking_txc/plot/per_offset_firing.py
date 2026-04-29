@@ -14,7 +14,9 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 
-from experiments.ward_backtracking_txc.plot._common import load_cfg, plots_dir
+from experiments.ward_backtracking_txc.plot._common import (
+    load_cfg, plots_dir, b2_npz_path, iter_arch_hookpoint,
+)
 
 
 def main(argv=None):
@@ -22,13 +24,10 @@ def main(argv=None):
     ap.add_argument("--config", default=None)
     args = ap.parse_args(argv)
     cfg = load_cfg(args.config)
-    b2_dir = Path(cfg["paths"]["b2_dir"])
     out_dir = plots_dir(cfg)
 
-    for hp in cfg["hookpoints"]:
-        if not hp.get("enabled", True):
-            continue
-        path = b2_dir / f"{hp['key']}.npz"
+    for arch, hp in iter_arch_hookpoint(cfg):
+        path = b2_npz_path(cfg, arch, hp["key"])
         if not path.exists():
             print(f"[skip] {path}"); continue
         z = np.load(path, allow_pickle=True)
@@ -59,9 +58,9 @@ def main(argv=None):
         # Hide empty subplots
         for j in range(K, rows * cols):
             axes[j // cols, j % cols].axis("off")
-        fig.suptitle(f"B2 — per-offset firing (base vs reasoning) — {hp['key']}", fontsize=12)
+        fig.suptitle(f"B2 — per-offset firing (base vs reasoning) — {arch}/{hp['key']}", fontsize=12)
         fig.tight_layout()
-        out = out_dir / f"per_offset_firing_{hp['key']}.png"
+        out = out_dir / f"per_offset_firing_{arch}_{hp['key']}.png"
         fig.savefig(out, dpi=140); plt.close(fig)
         print(f"[saved] {out}")
 

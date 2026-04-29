@@ -9,7 +9,9 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 
-from experiments.ward_backtracking_txc.plot._common import load_cfg, plots_dir
+from experiments.ward_backtracking_txc.plot._common import (
+    load_cfg, plots_dir, features_npz_path, iter_arch_hookpoint,
+)
 
 
 def main(argv=None):
@@ -17,13 +19,10 @@ def main(argv=None):
     ap.add_argument("--config", default=None)
     args = ap.parse_args(argv)
     cfg = load_cfg(args.config)
-    feat_dir = Path(cfg["paths"]["features_dir"])
     out_dir = plots_dir(cfg)
 
-    for hp in cfg["hookpoints"]:
-        if not hp.get("enabled", True):
-            continue
-        path = feat_dir / f"{hp['key']}.npz"
+    for arch, hp in iter_arch_hookpoint(cfg):
+        path = features_npz_path(cfg, arch, hp["key"])
         if not path.exists():
             print(f"[skip] {path}"); continue
         z = np.load(path, allow_pickle=True)
@@ -39,10 +38,10 @@ def main(argv=None):
         ax.set_yticks(range(K))
         ax.set_yticklabels([f"f{int(f)}" for f in z["top_features"]])
         ax.set_ylabel("Feature (top-K, ranked)")
-        ax.set_title(f"D+/D- pre-activation diff — {hp['key']}")
+        ax.set_title(f"D+/D- pre-activation diff — {arch}/{hp['key']}")
         fig.colorbar(im, ax=ax, label="mean(D+) − mean(D-)")
         fig.tight_layout()
-        out = out_dir / f"feature_firing_heatmap_{hp['key']}.png"
+        out = out_dir / f"feature_firing_heatmap_{arch}_{hp['key']}.png"
         fig.savefig(out, dpi=140); plt.close(fig)
         print(f"[saved] {out}")
 

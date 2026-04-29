@@ -9,7 +9,9 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 
-from experiments.ward_backtracking_txc.plot._common import load_cfg, plots_dir
+from experiments.ward_backtracking_txc.plot._common import (
+    load_cfg, plots_dir, b2_npz_path, iter_arch_hookpoint,
+)
 
 
 def main(argv=None):
@@ -17,18 +19,17 @@ def main(argv=None):
     ap.add_argument("--config", default=None)
     args = ap.parse_args(argv)
     cfg = load_cfg(args.config)
-    b2_dir = Path(cfg["paths"]["b2_dir"])
     out_dir = plots_dir(cfg)
 
-    n_hp = sum(1 for hp in cfg["hookpoints"] if hp.get("enabled", True))
-    fig, axes = plt.subplots(1, max(1, n_hp), figsize=(5 * max(1, n_hp), 4),
-                             squeeze=False)
+    cells = [(arch, hp) for arch, hp in iter_arch_hookpoint(cfg)
+             if b2_npz_path(cfg, arch, hp["key"]).exists()]
+    if not cells:
+        print("[skip] no B2 npz files"); return
+    n_cells = len(cells)
+    fig, axes = plt.subplots(1, n_cells, figsize=(5 * n_cells, 4), squeeze=False)
     col = 0
-    for hp in cfg["hookpoints"]:
-        if not hp.get("enabled", True): continue
-        path = b2_dir / f"{hp['key']}.npz"
-        if not path.exists():
-            col += 1; continue
+    for arch, hp in cells:
+        path = b2_npz_path(cfg, arch, hp["key"])
         z = np.load(path, allow_pickle=True)
         offsets = z["offsets"]
         # Use D+ curves (diff base vs reasoning on the D+ subset)
@@ -42,7 +43,7 @@ def main(argv=None):
         ax.set_xticklabels([f"f{int(z['feature_ids'][i])}" for i in order],
                            rotation=45, ha="right", fontsize=8)
         ax.set_ylabel("∫|reasoning(o) − base(o)| do")
-        ax.set_title(f"{hp['key']} — cross-model temporal diff")
+        ax.set_title(f"{arch}/{hp['key']} — cross-model temporal diff")
         ax.grid(alpha=0.3, axis="y")
         col += 1
     fig.tight_layout()

@@ -89,16 +89,32 @@ def main(argv=None):
 
     mags = sorted({m for _, m in cells})
 
-    # Curated source list: 2 DoM + best TXC pos0 + best TXC union per hookpoint.
+    # Auto-curate: 2 DoM + the best (by max |kw|) source per (arch, hp, mode).
     sources = sorted({s for s, _ in cells})
-    keep = [
-        "dom_base_union",
-        "dom_reasoning_union",
-        "txc_resid_L10_f1444_pos0",
-        "txc_resid_L10_f1444_union",
-        "txc_resid_L10_f4944_pos0",
-        "txc_attn_L10_f3151_pos0",
-    ]
+    by_group: dict[tuple, str] = {}
+    by_group_score: dict[tuple, float] = {}
+    for r in rows:
+        s = r["source"]
+        if s.startswith("dom_"):
+            continue
+        if "_f" not in s:
+            continue
+        head, _, ftail = s.partition("_f")
+        _fid, _, mode = ftail.partition("_")
+        parts = head.split("_")
+        hp_layer_idx = next(
+            (i for i, p in enumerate(parts) if p.startswith("L") and p[1:].isdigit()),
+            None,
+        )
+        if hp_layer_idx is None or hp_layer_idx < 1:
+            continue
+        arch = "_".join(parts[: hp_layer_idx - 1])
+        hp = "_".join(parts[hp_layer_idx - 1: hp_layer_idx + 1])
+        key = (arch, hp, mode or "pos0")
+        score = abs(r["keyword_rate"])
+        if score > by_group_score.get(key, -1.0):
+            by_group_score[key] = score; by_group[key] = s
+    keep = ["dom_base_union", "dom_reasoning_union"] + sorted(by_group.values())
     keep = [s for s in keep if s in sources]
 
     metric_specs = [
@@ -109,22 +125,19 @@ def main(argv=None):
     ]
 
     fig, axes = plt.subplots(2, 2, figsize=(12, 8))
+    # Auto-color: DoM in greys, others by tab20.
+    cmap = plt.cm.tab20
     palette = {
         "dom_base_union": "black",
         "dom_reasoning_union": "dimgray",
-        "txc_resid_L10_f1444_pos0": "tab:green",
-        "txc_resid_L10_f1444_union": "tab:red",
-        "txc_resid_L10_f4944_pos0": "tab:orange",
-        "txc_attn_L10_f3151_pos0": "tab:blue",
     }
-    style = {
-        "dom_base_union": "-",
-        "dom_reasoning_union": "--",
-        "txc_resid_L10_f1444_pos0": "-",
-        "txc_resid_L10_f1444_union": "-",
-        "txc_resid_L10_f4944_pos0": ":",
-        "txc_attn_L10_f3151_pos0": ":",
-    }
+    for i, s in enumerate(s for s in keep if not s.startswith("dom_")):
+        palette[s] = cmap(i % 20)
+    # pos0 = solid, union = dotted; DoM dashed.
+    style = {"dom_base_union": "-", "dom_reasoning_union": "--"}
+    for s in keep:
+        if s.startswith("dom_"): continue
+        style[s] = ":" if s.endswith("_union") else "-"
 
     for ax, (key, title, hint) in zip(axes.flat, metric_specs):
         for src in keep:

@@ -9,7 +9,9 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 
-from experiments.ward_backtracking_txc.plot._common import load_cfg, plots_dir
+from experiments.ward_backtracking_txc.plot._common import (
+    load_cfg, plots_dir, features_npz_path, iter_arch_hookpoint,
+)
 
 
 def main(argv=None):
@@ -17,13 +19,11 @@ def main(argv=None):
     ap.add_argument("--config", default=None)
     args = ap.parse_args(argv)
     cfg = load_cfg(args.config)
-    feat_dir = Path(cfg["paths"]["features_dir"])
     out_dir = plots_dir(cfg)
     K_show = int(cfg["mining"]["top_k_for_steering"])
 
-    for hp in cfg["hookpoints"]:
-        if not hp.get("enabled", True): continue
-        path = feat_dir / f"{hp['key']}.npz"
+    for arch, hp in iter_arch_hookpoint(cfg):
+        path = features_npz_path(cfg, arch, hp["key"])
         if not path.exists(): continue
         z = np.load(path, allow_pickle=True)
         pos_act = z["pos_act"][:, :K_show]
@@ -46,10 +46,10 @@ def main(argv=None):
         ax.set_xticks([2 * i + 0.35 for i in range(K)])
         ax.set_xticklabels([f"f{int(f)}" for f in feats])
         ax.set_ylabel("encoded activation z")
-        ax.set_title(f"D+ (red) vs D- (blue) per-sentence z — {hp['key']}")
+        ax.set_title(f"D+ (red) vs D- (blue) per-sentence z — {arch}/{hp['key']}")
         ax.grid(alpha=0.3)
         fig.tight_layout()
-        out = out_dir / f"sentence_act_distributions_{hp['key']}.png"
+        out = out_dir / f"sentence_act_distributions_{arch}_{hp['key']}.png"
         fig.savefig(out, dpi=140); plt.close(fig)
         print(f"[saved] {out}")
 

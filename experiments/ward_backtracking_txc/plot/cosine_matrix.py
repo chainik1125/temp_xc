@@ -10,7 +10,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import torch
 
-from experiments.ward_backtracking_txc.plot._common import load_cfg, plots_dir
+from experiments.ward_backtracking_txc.plot._common import (
+    load_cfg, plots_dir, features_npz_path, iter_arch_hookpoint,
+)
 
 
 def _cos(a: np.ndarray, b: np.ndarray) -> float:
@@ -25,7 +27,6 @@ def main(argv=None):
     ap.add_argument("--config", default=None)
     args = ap.parse_args(argv)
     cfg = load_cfg(args.config)
-    feat_dir = Path(cfg["paths"]["features_dir"])
     out_dir = plots_dir(cfg)
 
     dom_path = Path(cfg["paths"]["stageA_dom"])
@@ -38,15 +39,17 @@ def main(argv=None):
     }
 
     rows: list[tuple[str, np.ndarray]] = []
-    for hp in cfg["hookpoints"]:
-        if not hp.get("enabled", True): continue
-        path = feat_dir / f"{hp['key']}.npz"
+    for arch, hp in iter_arch_hookpoint(cfg):
+        path = features_npz_path(cfg, arch, hp["key"])
         if not path.exists(): continue
         z = np.load(path, allow_pickle=True)
         for fid, vec in zip(z["top_features"][:8], z["decoder_at_pos0"][:8]):
-            rows.append((f"{hp['key']}/f{int(fid)}@pos0", vec))
+            rows.append((f"{arch}/{hp['key']}/f{int(fid)}@pos0", vec))
+        # Skip "@union" duplicate when arch has no T axis (pos0 == union).
+        if arch in ("topk_sae", "tsae"):
+            continue
         for fid, vec in zip(z["top_features"][:8], z["decoder_union"][:8]):
-            rows.append((f"{hp['key']}/f{int(fid)}@union", vec))
+            rows.append((f"{arch}/{hp['key']}/f{int(fid)}@union", vec))
 
     if not rows:
         print("[skip] no feature files yet"); return
@@ -64,7 +67,7 @@ def main(argv=None):
     ax.set_yticks(range(len(rows)))
     ax.set_yticklabels([r[0] for r in rows], fontsize=7)
     fig.colorbar(im, ax=ax, label="cosine")
-    ax.set_title("Cos(TXC features, Stage A DoM)")
+    ax.set_title("Cos(dictionary features, Stage A DoM) — across architectures")
     fig.tight_layout()
     out = out_dir / "cosine_matrix.png"
     fig.savefig(out, dpi=140); plt.close(fig)

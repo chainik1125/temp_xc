@@ -38,22 +38,27 @@ import torch
 import yaml
 from tqdm.auto import tqdm
 
-from temporal_crosscoders.models import TemporalCrosscoder
+from experiments.ward_backtracking_txc.architectures import (
+    build_arch, arch_encode_window, arch_decoder_directions,
+)
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
 log = logging.getLogger("ward_txc.mine")
 
 
-def _load_txc(ckpt_path: Path) -> tuple[TemporalCrosscoder, dict]:
+def _load_arch_ckpt(ckpt_path: Path):
+    """Load any registered arch from checkpoint. Returns (model, cfg_dict)."""
     obj = torch.load(ckpt_path, map_location="cpu", weights_only=False)
     c = obj["config"]
-    model = TemporalCrosscoder(
-        d_in=c["d_in"], d_sae=c["d_sae"], T=c["T"], k=c["k_per_position"],
-    )
+    arch = c.get("arch", "txc")             # legacy ckpts default to txc
+    arch_kwargs = c.get("arch_kwargs", {}) or {}
+    model = build_arch(arch, d_in=c["d_in"], d_sae=c["d_sae"],
+                       T=c["T"], k=c["k_per_position"], **arch_kwargs)
     model.load_state_dict(obj["state_dict"])
     model.eval().to("cuda")
     for p in model.parameters():
         p.requires_grad_(False)
+    c["arch"] = arch                          # ensure key present
     return model, c
 
 
@@ -166,54 +171,91 @@ def _capture_windows(
     return X, is_bt, keys
 
 
-def _encode_in_batches(model: TemporalCrosscoder, X: np.ndarray, batch_size: int = 256) -> np.ndarray:
-    """Encode (N, T, d) -> (N, d_sae) latent activations."""
+def _encode_in_batches(arch: str, model, X: np.ndarray, batch_size: int = 256) -> np.ndarray:
+    """Encode (N, T, d) -> (N, d_sae) window-level activation, dispatched per arch."""
     N = X.shape[0]
-    out = np.zeros((N, model.d_sae), dtype=np.float32)
+    d_sae = model.d_sae if hasattr(model, "d_sae") else model.width
+    out = np.zeros((N, d_sae), dtype=np.float32)
     for i in range(0, N, batch_size):
         end = min(i + batch_size, N)
-        x = torch.from_numpy(X[i:end]).to("cuda", dtype=torch.float32)
-        with torch.no_grad():
-            z = model.encode(x)  # (B, d_sae)
+        x = torch.from_numpy(X[i:end]).to("cuda", dtype=torch.float32)  # (B, T, d)
+        z = arch_encode_window(arch, model, x)        # (B, d_sae)
         out[i:end] = z.float().cpu().numpy()
     return out
 
 
-def _per_offset_preact(model: TemporalCrosscoder, X: np.ndarray, feat_idx: np.ndarray, batch_size: int = 256) -> np.ndarray:
+def _per_offset_preact(arch: str, model, X: np.ndarray, feat_idx: np.ndarray, batch_size: int = 256) -> np.ndarray:
     """For chosen features, return (N, K, T) per-position pre-activations.
 
-    z_pre[t, b, f] = (x[b, t, :] @ W_enc[t, :, f]) + b_enc[f] / T  (we drop the
-    /T because b_enc is the same scalar — what matters is the per-position
-    contribution to selectivity).
+    For TXC and StackedSAE this uses the per-position W_enc.
+    For TopKSAE it applies the single W_enc to each token position.
+    For TSAE we approximate by encoding each window and taking the per-position
+    code (z_novel + z_pred), which is the natural per-offset analog.
     """
-    N = X.shape[0]; K = len(feat_idx); T = model.T
-    W = model.W_enc[:, :, feat_idx]   # (T, d, K)
-    out = np.zeros((N, K, T), dtype=np.float32)
+    K = len(feat_idx); T = X.shape[1]
+    out = np.zeros((X.shape[0], K, T), dtype=np.float32)
     feat_idx_t = torch.from_numpy(feat_idx).to("cuda")
-    for i in range(0, N, batch_size):
-        end = min(i + batch_size, N)
-        x = torch.from_numpy(X[i:end]).to("cuda", dtype=torch.float32)  # (B, T, d)
-        # contribs[t, b, k] = x[b, t, :] @ W[t, :, k]
-        with torch.no_grad():
-            contribs = torch.einsum("btd,tdk->btk", x, W)  # (B, T, K)
-        out[i:end] = contribs.permute(0, 2, 1).float().cpu().numpy()
+
+    if arch == "txc":
+        W = model.W_enc[:, :, feat_idx]   # (T, d, K)
+        for i in range(0, X.shape[0], batch_size):
+            end = min(i + batch_size, X.shape[0])
+            x = torch.from_numpy(X[i:end]).to("cuda", dtype=torch.float32)
+            with torch.no_grad():
+                contribs = torch.einsum("btd,tdk->btk", x, W)
+            out[i:end] = contribs.permute(0, 2, 1).float().cpu().numpy()
+    elif arch == "stacked_sae":
+        # Per-position W_enc lives inside each sub-SAE.
+        Ws = torch.stack([sae.W_enc.T for sae in model.saes], dim=0)  # (T, d, d_sae)
+        Wk = Ws[:, :, feat_idx]                                       # (T, d, K)
+        for i in range(0, X.shape[0], batch_size):
+            end = min(i + batch_size, X.shape[0])
+            x = torch.from_numpy(X[i:end]).to("cuda", dtype=torch.float32)
+            with torch.no_grad():
+                contribs = torch.einsum("btd,tdk->btk", x, Wk)
+            out[i:end] = contribs.permute(0, 2, 1).float().cpu().numpy()
+    elif arch == "topk_sae":
+        # Single W_enc applied per-token.
+        W = model.W_enc.T[:, feat_idx]                                # (d, K)
+        for i in range(0, X.shape[0], batch_size):
+            end = min(i + batch_size, X.shape[0])
+            x = torch.from_numpy(X[i:end]).to("cuda", dtype=torch.float32)
+            with torch.no_grad():
+                contribs = torch.einsum("btd,dk->btk", x, W)
+            out[i:end] = contribs.permute(0, 2, 1).float().cpu().numpy()
+    elif arch == "tsae":
+        # Run the full TSAE forward and extract per-position codes for top-K.
+        # codes_t = pred_codes + novel_codes (B, T, d_sae).
+        for i in range(0, X.shape[0], batch_size):
+            end = min(i + batch_size, X.shape[0])
+            x = torch.from_numpy(X[i:end]).to("cuda", dtype=torch.float32)
+            with torch.no_grad():
+                _, results = model(x)
+                codes = results["pred_codes"] + results["novel_codes"]   # (B, T, d_sae)
+                contribs = codes[..., feat_idx_t]                        # (B, T, K)
+            out[i:end] = contribs.permute(0, 2, 1).float().cpu().numpy()
+    else:
+        raise ValueError(f"unknown arch: {arch}")
     return out
 
 
-def _process_hookpoint(hp: dict, cfg: dict) -> None:
+def _process_one(arch: str, hp: dict, cfg: dict) -> None:
+    """Mine features for a single (arch, hookpoint) cell."""
     paths = cfg["paths"]
-    ckpt_path = Path(paths["ckpt_dir"]) / f"txc_{hp['key']}.pt"
+    ckpt_filename = f"txc_{hp['key']}.pt" if arch == "txc" else f"{arch}_{hp['key']}.pt"
+    ckpt_path = Path(paths["ckpt_dir"]) / ckpt_filename
     if not ckpt_path.exists():
-        log.warning("[skip] %s: no ckpt at %s", hp["key"], ckpt_path); return
+        log.warning("[skip] %s/%s: no ckpt at %s", arch, hp["key"], ckpt_path); return
 
     feat_dir = Path(paths["features_dir"])
     feat_dir.mkdir(parents=True, exist_ok=True)
-    out_path = feat_dir / f"{hp['key']}.npz"
+    out_filename = f"{hp['key']}.npz" if arch == "txc" else f"{arch}_{hp['key']}.npz"
+    out_path = feat_dir / out_filename
     if out_path.exists():
         log.info("[skip] %s exists", out_path); return
 
-    log.info("=" * 70); log.info("[hookpoint] %s", hp["key"])
-    model, mcfg = _load_txc(ckpt_path)
+    log.info("=" * 70); log.info("[arch=%s hookpoint=%s]", arch, hp["key"])
+    model, mcfg = _load_arch_ckpt(ckpt_path)
     T = mcfg["T"]
     offsets_window = list(cfg["mining"]["offset_window"])
     if len(offsets_window) != T:
@@ -229,7 +271,7 @@ def _process_hookpoint(hp: dict, cfg: dict) -> None:
         cfg["models"]["base"], hp["layer"], hp["component"],
         offsets_window, traces_by_qid, labels, dom_qids,
     )
-    Z = _encode_in_batches(model, X)  # (N, d_sae)
+    Z = _encode_in_batches(arch, model, X)        # (N, d_sae)
 
     # Selectivity
     pos_mask = is_bt; neg_mask = ~is_bt
@@ -241,17 +283,16 @@ def _process_hookpoint(hp: dict, cfg: dict) -> None:
     top = np.argsort(-score)[:K]
 
     # Per-offset selectivity for top-K
-    contribs = _per_offset_preact(model, X, top)  # (N, K, T)
-    per_off_pos = contribs[pos_mask].mean(axis=0)  # (K, T)
-    per_off_neg = contribs[neg_mask].mean(axis=0)  # (K, T)
+    contribs = _per_offset_preact(arch, model, X, top)
+    per_off_pos = contribs[pos_mask].mean(axis=0)
+    per_off_neg = contribs[neg_mask].mean(axis=0)
     per_off_diff = per_off_pos - per_off_neg
 
-    # Decoder rows for top-K, per the chosen offset and union.
-    # W_dec is (d_sae, T, d_in)
-    pos0 = int(cfg["mining"].get("steer_decoder_pos", 0))
+    # Decoder rows for top-K, per the chosen offset and union, dispatched per arch.
+    decs = arch_decoder_directions(arch, model)
     with torch.no_grad():
-        dec_pos0 = model.W_dec[top, pos0, :].float().cpu().numpy()      # (K, d)
-        dec_union = model.W_dec[top, :, :].mean(dim=1).float().cpu().numpy()  # (K, d)
+        dec_pos0 = decs["pos0"][top].float().cpu().numpy()    # (K, d)
+        dec_union = decs["union"][top].float().cpu().numpy()  # (K, d)
 
     # Per-sentence activations for the top-K (used by violins).
     pos_act = Z[pos_mask][:, top]
@@ -284,14 +325,18 @@ def main(argv=None):
     p = argparse.ArgumentParser()
     p.add_argument("--config", type=Path, default=Path(__file__).parent / "config.yaml")
     p.add_argument("--only", type=str, default=None)
+    p.add_argument("--arch", type=str, nargs="+", default=None,
+                   help="restrict to these architectures (default: cfg.txc.arch_list)")
     args = p.parse_args(argv)
 
     cfg = yaml.safe_load(args.config.read_text())
     hookpoints = [hp for hp in cfg["hookpoints"] if hp.get("enabled", True)]
     if args.only:
         hookpoints = [hp for hp in hookpoints if hp["key"] == args.only]
-    for hp in hookpoints:
-        _process_hookpoint(hp, cfg)
+    arch_list = args.arch or cfg["txc"].get("arch_list", ["txc"])
+    for arch in arch_list:
+        for hp in hookpoints:
+            _process_one(arch, hp, cfg)
     return 0
 
 

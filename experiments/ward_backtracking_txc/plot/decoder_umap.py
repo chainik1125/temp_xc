@@ -14,7 +14,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import torch
 
-from experiments.ward_backtracking_txc.plot._common import load_cfg, plots_dir
+from experiments.ward_backtracking_txc.plot._common import (
+    load_cfg, plots_dir, features_npz_path, iter_arch_hookpoint,
+)
 
 
 def _embed_2d(X: np.ndarray, method: str = "auto") -> np.ndarray:
@@ -33,29 +35,44 @@ def _embed_2d(X: np.ndarray, method: str = "auto") -> np.ndarray:
     return Xc @ Vt[:2].T
 
 
+def _decoder_pos0_from_ckpt(arch: str, ckpt_path: Path) -> np.ndarray:
+    """Return (d_sae, d) decoder rows for the pos-0 / single-slot view, per arch."""
+    sd = torch.load(ckpt_path, map_location="cpu", weights_only=False)["state_dict"]
+    if arch == "txc":
+        W_dec = sd["W_dec"]                 # (d_sae, T, d)
+        return W_dec[:, 0, :].numpy()
+    if arch == "stacked_sae":
+        # Per-position decoders live inside saes.0.W_dec, etc.
+        W_dec0 = sd["saes.0.W_dec"]         # (d, d_sae)
+        return W_dec0.T.numpy()
+    if arch == "topk_sae":
+        W_dec = sd["W_dec"]                 # (d, d_sae)
+        return W_dec.T.numpy()
+    if arch == "tsae":
+        D = sd["D"]                         # (d_sae, d)
+        return D.numpy()
+    raise ValueError(f"unknown arch: {arch}")
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser()
     ap.add_argument("--config", default=None)
     ap.add_argument("--method", default="auto", choices=["auto", "umap", "pca"])
     args = ap.parse_args(argv)
     cfg = load_cfg(args.config)
-    feat_dir = Path(cfg["paths"]["features_dir"])
     out_dir = plots_dir(cfg)
     ckpt_dir = Path(cfg["paths"]["ckpt_dir"])
 
-    for hp in cfg["hookpoints"]:
-        if not hp.get("enabled", True): continue
-        feat_path = feat_dir / f"{hp['key']}.npz"
-        ckpt_path = ckpt_dir / f"txc_{hp['key']}.pt"
+    for arch, hp in iter_arch_hookpoint(cfg):
+        feat_path = features_npz_path(cfg, arch, hp["key"])
+        ckpt_filename = f"txc_{hp['key']}.pt" if arch == "txc" else f"{arch}_{hp['key']}.pt"
+        ckpt_path = ckpt_dir / ckpt_filename
         if not (feat_path.exists() and ckpt_path.exists()):
             continue
         z = np.load(feat_path, allow_pickle=True)
         all_scores = z["all_scores"]
         top = z["top_features"][: int(cfg["mining"]["top_k_for_steering"])]
-        # Load decoder W_dec[:, 0, :] from ckpt
-        obj = torch.load(ckpt_path, map_location="cpu", weights_only=False)
-        W_dec = obj["state_dict"]["W_dec"]            # (d_sae, T, d)
-        dec_pos0 = W_dec[:, 0, :].numpy()              # (d_sae, d)
+        dec_pos0 = _decoder_pos0_from_ckpt(arch, ckpt_path)
 
         # Subsample for tractability
         n = dec_pos0.shape[0]
@@ -79,10 +96,10 @@ def main(argv=None):
                 ax.annotate(f"f{int(f)}", emb[pi], fontsize=7,
                             xytext=(4, 4), textcoords="offset points")
         fig.colorbar(sc, ax=ax, label="D+ − D-")
-        ax.set_title(f"Decoder UMAP/PCA — {hp['key']}")
+        ax.set_title(f"Decoder UMAP/PCA — {arch}/{hp['key']}")
         ax.set_xticks([]); ax.set_yticks([])
         fig.tight_layout()
-        out = out_dir / f"decoder_umap_{hp['key']}.png"
+        out = out_dir / f"decoder_umap_{arch}_{hp['key']}.png"
         fig.savefig(out, dpi=140); plt.close(fig)
         print(f"[saved] {out}")
 
