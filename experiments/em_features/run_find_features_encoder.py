@@ -42,7 +42,7 @@ from experiments.em_features.architectures.txc_bare_multidistance_contrastive_an
 def parse_args():
     p = argparse.ArgumentParser()
     p.add_argument("--ckpt", type=Path, required=True)
-    p.add_argument("--arch", choices=["sae", "han"], required=True)
+    p.add_argument("--arch", choices=["sae", "han", "tsae"], required=True)
     p.add_argument("--dataset", type=Path, required=True,
                    help="JSONL of prompts (one prompt per line, key 'prompt' or 'text').")
     p.add_argument("--base_model", default="Qwen/Qwen2.5-7B-Instruct")
@@ -151,6 +151,18 @@ def main():
         sae.load_state_dict(ckpt["state_dict"])
         sae.eval()
         T = 1
+    elif args.arch == "tsae":
+        from experiments.em_features.architectures.tsae_adjacent_contrastive import TSAEAdjacentContrastive
+        sae = TSAEAdjacentContrastive(
+            d_in=cfg["d_in"], d_sae=cfg["d_sae"], k=cfg["k"],
+            contrastive_alpha=cfg.get("contrastive_alpha", 1.0),
+            aux_k=cfg.get("aux_k", 512),
+            dead_threshold_tokens=cfg.get("dead_threshold_tokens", 640_000),
+            auxk_alpha=cfg.get("auxk_alpha", 1.0 / 32.0),
+        ).to(args.device)
+        sae.load_state_dict(ckpt["state_dict"])
+        sae.eval()
+        T = 1   # T-SAE encodes per-token at inference time
     else:
         sae = TXCBareMultiDistanceContrastiveAntidead(
             d_in=cfg["d_in"], d_sae=cfg["d_sae"], T=cfg["T"], k=cfg["k"],
@@ -186,14 +198,14 @@ def main():
     del bad_hf
     torch.cuda.empty_cache()
 
-    # Encode through SAE/Han
+    # Encode through SAE/Han/T-SAE
     print("encoding base activations...", flush=True)
-    if args.arch == "sae":
+    if args.arch in ("sae", "tsae"):
         z_base = encode_sae(sae, base_resid, args.device)
     else:
         z_base = encode_han(sae, base_resid, T, args.device)
     print("encoding bad-medical activations...", flush=True)
-    if args.arch == "sae":
+    if args.arch in ("sae", "tsae"):
         z_bad = encode_sae(sae, bad_resid, args.device)
     else:
         z_bad = encode_han(sae, bad_resid, T, args.device)
