@@ -1,0 +1,1212 @@
+{
+  "arch_id": "txc_bare_antidead_t5_kpos20_grownChainFromT4",
+  "src_class": "TXCBareAntidead",
+  "T": 5,
+  "d_sae": 18432,
+  "k_pos": 20,
+  "k_win": 100,
+  "n_concepts": 30,
+  "concept_max_length": 64,
+  "concepts": {
+    "harmful_content": {
+      "best_feature_idx": 8716,
+      "best_lift": 22.937044748888823,
+      "best_activation": 23.732040837125957,
+      "best_baseline": 0.7949960882371326,
+      "top_5": [
+        {
+          "feature_idx": 8716,
+          "lift": 22.937044748888823,
+          "activation": 23.732040837125957,
+          "baseline": 0.7949960882371326
+        },
+        {
+          "feature_idx": 10181,
+          "lift": 21.086310112421764,
+          "activation": 28.075068059957253,
+          "baseline": 6.988757947535491
+        },
+        {
+          "feature_idx": 2636,
+          "lift": 13.846750524864243,
+          "activation": 16.084022953825176,
+          "baseline": 2.2372724289609334
+        },
+        {
+          "feature_idx": 3519,
+          "lift": 11.578550513590255,
+          "activation": 11.9850945382748,
+          "baseline": 0.4065440246845456
+        },
+        {
+          "feature_idx": 16377,
+          "lift": 10.375774080251574,
+          "activation": 11.159175872802734,
+          "baseline": 0.7834017925511608
+        }
+      ],
+      "concept_description": "descriptions of physical harm, violence, or weapons",
+      "n_content_tokens": 53
+    },
+    "deception": {
+      "best_feature_idx": 3207,
+      "best_lift": 20.29850908322523,
+      "best_activation": 21.00810718536377,
+      "best_baseline": 0.7095981021385408,
+      "top_5": [
+        {
+          "feature_idx": 3207,
+          "lift": 20.29850908322523,
+          "activation": 21.00810718536377,
+          "baseline": 0.7095981021385408
+        },
+        {
+          "feature_idx": 10181,
+          "lift": 16.009963493097647,
+          "activation": 22.998721440633137,
+          "baseline": 6.988757947535491
+        },
+        {
+          "feature_idx": 16966,
+          "lift": 14.335070265840205,
+          "activation": 15.049232006072998,
+          "baseline": 0.7141617402327924
+        },
+        {
+          "feature_idx": 3962,
+          "lift": 12.346499773652237,
+          "activation": 19.7245774269104,
+          "baseline": 7.3780776532581624
+        },
+        {
+          "feature_idx": 2517,
+          "lift": 11.036028095591707,
+          "activation": 11.589665253957113,
+          "baseline": 0.5536371583654071
+        }
+      ],
+      "concept_description": "lying, fabricating evidence, or misleading others",
+      "n_content_tokens": 48
+    },
+    "refusal_pattern": {
+      "best_feature_idx": 14458,
+      "best_lift": 18.199161388882835,
+      "best_activation": 66.63784586588541,
+      "best_baseline": 48.438684477002575,
+      "top_5": [
+        {
+          "feature_idx": 14458,
+          "lift": 18.199161388882835,
+          "activation": 66.63784586588541,
+          "baseline": 48.438684477002575
+        },
+        {
+          "feature_idx": 3689,
+          "lift": 15.892991546940486,
+          "activation": 63.85892333984375,
+          "baseline": 47.96593179290326
+        },
+        {
+          "feature_idx": 14707,
+          "lift": 15.240794869901809,
+          "activation": 16.83363274468316,
+          "baseline": 1.5928378747813527
+        },
+        {
+          "feature_idx": 12234,
+          "lift": 14.888911073132345,
+          "activation": 22.385511610243057,
+          "baseline": 7.496600537110711
+        },
+        {
+          "feature_idx": 12188,
+          "lift": 11.613363418761168,
+          "activation": 12.664677259657118,
+          "baseline": 1.0513138408959508
+        }
+      ],
+      "concept_description": "AI assistant declining to fulfill a request",
+      "n_content_tokens": 45
+    },
+    "helpfulness_marker": {
+      "best_feature_idx": 12234,
+      "best_lift": 17.3217128193191,
+      "best_activation": 24.81831335642981,
+      "best_baseline": 7.496600537110711,
+      "top_5": [
+        {
+          "feature_idx": 12234,
+          "lift": 17.3217128193191,
+          "activation": 24.81831335642981,
+          "baseline": 7.496600537110711
+        },
+        {
+          "feature_idx": 17460,
+          "lift": 10.507729953433634,
+          "activation": 11.460302262079148,
+          "baseline": 0.9525723086455145
+        },
+        {
+          "feature_idx": 15341,
+          "lift": 9.859575215807084,
+          "activation": 10.402325100368923,
+          "baseline": 0.5427498845618398
+        },
+        {
+          "feature_idx": 10972,
+          "lift": 6.628242236527337,
+          "activation": 7.244104294549851,
+          "baseline": 0.6158620580225145
+        },
+        {
+          "feature_idx": 10439,
+          "lift": 6.275780960531708,
+          "activation": 7.065585371047732,
+          "baseline": 0.7898044105160243
+        }
+      ],
+      "concept_description": "AI assistant offering helpful step-by-step guidance",
+      "n_content_tokens": 63
+    },
+    "jailbreak_pattern": {
+      "best_feature_idx": 6905,
+      "best_lift": 9.752431780641874,
+      "best_activation": 22.173058345400054,
+      "best_baseline": 12.42062656475818,
+      "top_5": [
+        {
+          "feature_idx": 6905,
+          "lift": 9.752431780641874,
+          "activation": 22.173058345400054,
+          "baseline": 12.42062656475818
+        },
+        {
+          "feature_idx": 18418,
+          "lift": 8.543944867789143,
+          "activation": 8.926044595652613,
+          "baseline": 0.38209972786346985
+        },
+        {
+          "feature_idx": 16381,
+          "lift": 6.152110780676671,
+          "activation": 6.450219516096444,
+          "baseline": 0.29810873541977345
+        },
+        {
+          "feature_idx": 17582,
+          "lift": 5.151604974862886,
+          "activation": 5.79749400040199,
+          "baseline": 0.6458890255391037
+        },
+        {
+          "feature_idx": 7775,
+          "lift": 4.681908143927902,
+          "activation": 4.927405719099374,
+          "baseline": 0.24549757517147136
+        }
+      ],
+      "concept_description": "language attempting to bypass safety guidelines",
+      "n_content_tokens": 58
+    },
+    "medical": {
+      "best_feature_idx": 3689,
+      "best_lift": 13.438776052148818,
+      "best_activation": 61.40470784505208,
+      "best_baseline": 47.96593179290326,
+      "top_5": [
+        {
+          "feature_idx": 3689,
+          "lift": 13.438776052148818,
+          "activation": 61.40470784505208,
+          "baseline": 47.96593179290326
+        },
+        {
+          "feature_idx": 10181,
+          "lift": 13.426025784560863,
+          "activation": 20.414783732096353,
+          "baseline": 6.988757947535491
+        },
+        {
+          "feature_idx": 6587,
+          "lift": 12.447032140465296,
+          "activation": 12.900754589504666,
+          "baseline": 0.4537224490393693
+        },
+        {
+          "feature_idx": 14458,
+          "lift": 11.727851303162353,
+          "activation": 60.16653578016493,
+          "baseline": 48.438684477002575
+        },
+        {
+          "feature_idx": 16024,
+          "lift": 10.769949986351829,
+          "activation": 11.80850830078125,
+          "baseline": 1.0385583144294208
+        }
+      ],
+      "concept_description": "clinical and medical terminology",
+      "n_content_tokens": 45
+    },
+    "legal": {
+      "best_feature_idx": 6905,
+      "best_lift": 17.732920086446246,
+      "best_activation": 30.153546651204426,
+      "best_baseline": 12.42062656475818,
+      "top_5": [
+        {
+          "feature_idx": 6905,
+          "lift": 17.732920086446246,
+          "activation": 30.153546651204426,
+          "baseline": 12.42062656475818
+        },
+        {
+          "feature_idx": 3215,
+          "lift": 12.276513040156075,
+          "activation": 12.822494506835938,
+          "baseline": 0.545981466679862
+        },
+        {
+          "feature_idx": 3310,
+          "lift": 11.821037376697618,
+          "activation": 12.420267567490086,
+          "baseline": 0.5992301907924691
+        },
+        {
+          "feature_idx": 7467,
+          "lift": 10.970613166509253,
+          "activation": 11.431554274125533,
+          "baseline": 0.4609411076162801
+        },
+        {
+          "feature_idx": 13222,
+          "lift": 8.049117332997948,
+          "activation": 8.326673103101326,
+          "baseline": 0.27755577010337756
+        }
+      ],
+      "concept_description": "legal proceedings, statutes, and court language",
+      "n_content_tokens": 66
+    },
+    "mathematical": {
+      "best_feature_idx": 4172,
+      "best_lift": 25.762783857121903,
+      "best_activation": 27.75133550734747,
+      "best_baseline": 1.9885516502255667,
+      "top_5": [
+        {
+          "feature_idx": 4172,
+          "lift": 25.762783857121903,
+          "activation": 27.75133550734747,
+          "baseline": 1.9885516502255667
+        },
+        {
+          "feature_idx": 3754,
+          "lift": 14.985937432132701,
+          "activation": 15.50269389530969,
+          "baseline": 0.5167564631769896
+        },
+        {
+          "feature_idx": 15226,
+          "lift": 13.918057087877683,
+          "activation": 14.45162240285722,
+          "baseline": 0.5335653149795376
+        },
+        {
+          "feature_idx": 13506,
+          "lift": 10.693352973215834,
+          "activation": 12.007152496822297,
+          "baseline": 1.3137995236064623
+        },
+        {
+          "feature_idx": 6905,
+          "lift": 9.990891592716398,
+          "activation": 22.41151815747458,
+          "baseline": 12.42062656475818
+        }
+      ],
+      "concept_description": "mathematical equations, theorems, and proofs",
+      "n_content_tokens": 63
+    },
+    "programming": {
+      "best_feature_idx": 6134,
+      "best_lift": 20.57411294987827,
+      "best_activation": 21.946134338378908,
+      "best_baseline": 1.3720213885006383,
+      "top_5": [
+        {
+          "feature_idx": 6134,
+          "lift": 20.57411294987827,
+          "activation": 21.946134338378908,
+          "baseline": 1.3720213885006383
+        },
+        {
+          "feature_idx": 16051,
+          "lift": 15.213699264976812,
+          "activation": 15.779185791015625,
+          "baseline": 0.5654865260388122
+        },
+        {
+          "feature_idx": 3689,
+          "lift": 10.272692474674862,
+          "activation": 58.238624267578125,
+          "baseline": 47.96593179290326
+        },
+        {
+          "feature_idx": 1810,
+          "lift": 9.74340627370406,
+          "activation": 10.383432312011719,
+          "baseline": 0.6400260383076589
+        },
+        {
+          "feature_idx": 3962,
+          "lift": 8.65228962579457,
+          "activation": 16.030367279052733,
+          "baseline": 7.3780776532581624
+        }
+      ],
+      "concept_description": "software programming concepts and code references",
+      "n_content_tokens": 50
+    },
+    "scientific": {
+      "best_feature_idx": 10899,
+      "best_lift": 14.424409954546741,
+      "best_activation": 15.299183592504384,
+      "best_baseline": 0.874773637957644,
+      "top_5": [
+        {
+          "feature_idx": 10899,
+          "lift": 14.424409954546741,
+          "activation": 15.299183592504384,
+          "baseline": 0.874773637957644
+        },
+        {
+          "feature_idx": 4071,
+          "lift": 11.399323607247508,
+          "activation": 12.070330133243482,
+          "baseline": 0.6710065259959747
+        },
+        {
+          "feature_idx": 14458,
+          "lift": 9.1211436778922,
+          "activation": 57.559828154894774,
+          "baseline": 48.438684477002575
+        },
+        {
+          "feature_idx": 3689,
+          "lift": 8.058238128971738,
+          "activation": 56.024169921875,
+          "baseline": 47.96593179290326
+        },
+        {
+          "feature_idx": 17014,
+          "lift": 7.719174733708406,
+          "activation": 11.532229910091479,
+          "baseline": 3.813055176383073
+        }
+      ],
+      "concept_description": "natural science research and experimental methods",
+      "n_content_tokens": 49
+    },
+    "literary": {
+      "best_feature_idx": 3962,
+      "best_lift": 15.100269321967989,
+      "best_activation": 22.478346975226152,
+      "best_baseline": 7.3780776532581624,
+      "top_5": [
+        {
+          "feature_idx": 3962,
+          "lift": 15.100269321967989,
+          "activation": 22.478346975226152,
+          "baseline": 7.3780776532581624
+        },
+        {
+          "feature_idx": 10496,
+          "lift": 10.265695225459433,
+          "activation": 10.67761190314042,
+          "baseline": 0.4119166776809859
+        },
+        {
+          "feature_idx": 12366,
+          "lift": 10.146213185775755,
+          "activation": 10.50175005929512,
+          "baseline": 0.3555368735193634
+        },
+        {
+          "feature_idx": 1029,
+          "lift": 7.245738773491678,
+          "activation": 7.550990589878015,
+          "baseline": 0.30525181638633747
+        },
+        {
+          "feature_idx": 378,
+          "lift": 6.6731765184448095,
+          "activation": 6.916523782830489,
+          "baseline": 0.24334726438567966
+        }
+      ],
+      "concept_description": "novels, poetry, and literary criticism",
+      "n_content_tokens": 57
+    },
+    "religious": {
+      "best_feature_idx": 18017,
+      "best_lift": 8.671072403820572,
+      "best_activation": 9.000567072088069,
+      "best_baseline": 0.329494668267497,
+      "top_5": [
+        {
+          "feature_idx": 18017,
+          "lift": 8.671072403820572,
+          "activation": 9.000567072088069,
+          "baseline": 0.329494668267497
+        },
+        {
+          "feature_idx": 580,
+          "lift": 8.414064072117661,
+          "activation": 8.704204212535512,
+          "baseline": 0.2901401404178504
+        },
+        {
+          "feature_idx": 9810,
+          "lift": 8.121884987764592,
+          "activation": 8.433126137473366,
+          "baseline": 0.31124114970877415
+        },
+        {
+          "feature_idx": 5853,
+          "lift": 7.672246377247449,
+          "activation": 7.965153572776101,
+          "baseline": 0.2929071955286528
+        },
+        {
+          "feature_idx": 6999,
+          "lift": 7.0426544521520995,
+          "activation": 7.316747700084339,
+          "baseline": 0.2740932479322397
+        }
+      ],
+      "concept_description": "religious scripture, doctrine, and worship",
+      "n_content_tokens": 55
+    },
+    "financial": {
+      "best_feature_idx": 11606,
+      "best_lift": 10.677010815291755,
+      "best_activation": 11.045183602025954,
+      "best_baseline": 0.36817278673419845,
+      "top_5": [
+        {
+          "feature_idx": 11606,
+          "lift": 10.677010815291755,
+          "activation": 11.045183602025954,
+          "baseline": 0.36817278673419845
+        },
+        {
+          "feature_idx": 8428,
+          "lift": 8.403079504885916,
+          "activation": 8.692840867123362,
+          "baseline": 0.2897613622374454
+        },
+        {
+          "feature_idx": 12259,
+          "lift": 7.436424060882017,
+          "activation": 7.709111100536282,
+          "baseline": 0.27268703965426405
+        },
+        {
+          "feature_idx": 13816,
+          "lift": 6.652332405047228,
+          "activation": 6.881723177635063,
+          "baseline": 0.22939077258783544
+        },
+        {
+          "feature_idx": 15655,
+          "lift": 5.723559863041334,
+          "activation": 6.019776974694204,
+          "baseline": 0.29621711165286985
+        }
+      ],
+      "concept_description": "finance, banking, and capital markets",
+      "n_content_tokens": 59
+    },
+    "historical": {
+      "best_feature_idx": 4434,
+      "best_lift": 16.31031653560809,
+      "best_activation": 16.87274124373251,
+      "best_baseline": 0.562424708124417,
+      "top_5": [
+        {
+          "feature_idx": 4434,
+          "lift": 16.31031653560809,
+          "activation": 16.87274124373251,
+          "baseline": 0.562424708124417
+        },
+        {
+          "feature_idx": 10181,
+          "lift": 16.236219915833214,
+          "activation": 23.224977863368704,
+          "baseline": 6.988757947535491
+        },
+        {
+          "feature_idx": 17550,
+          "lift": 13.221966775075195,
+          "activation": 13.837004476518773,
+          "baseline": 0.615037701443578
+        },
+        {
+          "feature_idx": 90,
+          "lift": 8.715668301257665,
+          "activation": 9.052778784908465,
+          "baseline": 0.3371104836508007
+        },
+        {
+          "feature_idx": 13824,
+          "lift": 7.306506205330228,
+          "activation": 7.634486148606485,
+          "baseline": 0.32797994327625735
+        }
+      ],
+      "concept_description": "historical events and figures",
+      "n_content_tokens": 67
+    },
+    "geographical": {
+      "best_feature_idx": 16047,
+      "best_lift": 29.424715175392127,
+      "best_activation": 30.49625972279331,
+      "best_baseline": 1.071544547401186,
+      "top_5": [
+        {
+          "feature_idx": 16047,
+          "lift": 29.424715175392127,
+          "activation": 30.49625972279331,
+          "baseline": 1.071544547401186
+        },
+        {
+          "feature_idx": 6905,
+          "lift": 16.209235634991682,
+          "activation": 28.629862199749862,
+          "baseline": 12.42062656475818
+        },
+        {
+          "feature_idx": 13525,
+          "lift": 6.9286826175976035,
+          "activation": 7.182446563453005,
+          "baseline": 0.2537639458554014
+        },
+        {
+          "feature_idx": 10123,
+          "lift": 6.500691355711488,
+          "activation": 6.8350875586794135,
+          "baseline": 0.33439620296792577
+        },
+        {
+          "feature_idx": 8411,
+          "lift": 5.755435574542479,
+          "activation": 6.011837139464261,
+          "baseline": 0.25640156492178273
+        }
+      ],
+      "concept_description": "places, geography, and regional descriptions",
+      "n_content_tokens": 57
+    },
+    "formal_register": {
+      "best_feature_idx": 12234,
+      "best_lift": 10.736962051581,
+      "best_activation": 18.23356258869171,
+      "best_baseline": 7.496600537110711,
+      "top_5": [
+        {
+          "feature_idx": 12234,
+          "lift": 10.736962051581,
+          "activation": 18.23356258869171,
+          "baseline": 7.496600537110711
+        },
+        {
+          "feature_idx": 8540,
+          "lift": 8.16121346303309,
+          "activation": 8.470882803201675,
+          "baseline": 0.3096693401685869
+        },
+        {
+          "feature_idx": 17014,
+          "lift": 8.045276980751936,
+          "activation": 11.85833215713501,
+          "baseline": 3.813055176383073
+        },
+        {
+          "feature_idx": 2669,
+          "lift": 7.669945256541308,
+          "activation": 7.938429057598114,
+          "baseline": 0.2684838010568053
+        },
+        {
+          "feature_idx": 707,
+          "lift": 7.037322458113083,
+          "activation": 7.358673572540283,
+          "baseline": 0.32135111442720043
+        }
+      ],
+      "concept_description": "formal academic or bureaucratic prose",
+      "n_content_tokens": 64
+    },
+    "casual_register": {
+      "best_feature_idx": 3962,
+      "best_lift": 9.398060182904697,
+      "best_activation": 16.77613783616286,
+      "best_baseline": 7.3780776532581624,
+      "top_5": [
+        {
+          "feature_idx": 3962,
+          "lift": 9.398060182904697,
+          "activation": 16.77613783616286,
+          "baseline": 7.3780776532581624
+        },
+        {
+          "feature_idx": 14601,
+          "lift": 5.953489210198596,
+          "activation": 6.554961776733398,
+          "baseline": 0.6014725665348027
+        },
+        {
+          "feature_idx": 10312,
+          "lift": 5.1185769413984765,
+          "activation": 5.3616011399489185,
+          "baseline": 0.24302419855044216
+        },
+        {
+          "feature_idx": 13617,
+          "lift": 4.9781930022692125,
+          "activation": 5.409519488994892,
+          "baseline": 0.4313264867256799
+        },
+        {
+          "feature_idx": 5877,
+          "lift": 4.710220506824138,
+          "activation": 4.962367483285758,
+          "baseline": 0.2521469764616195
+        }
+      ],
+      "concept_description": "casual, colloquial conversational language",
+      "n_content_tokens": 65
+    },
+    "instructional": {
+      "best_feature_idx": 10004,
+      "best_lift": 14.919484685573355,
+      "best_activation": 15.578905434444033,
+      "best_baseline": 0.6594207488706783,
+      "top_5": [
+        {
+          "feature_idx": 10004,
+          "lift": 14.919484685573355,
+          "activation": 15.578905434444033,
+          "baseline": 0.6594207488706783
+        },
+        {
+          "feature_idx": 12260,
+          "lift": 12.045503743489583,
+          "activation": 12.460865941540948,
+          "baseline": 0.41536219805136493
+        },
+        {
+          "feature_idx": 15039,
+          "lift": 9.678372678756713,
+          "activation": 10.02581131047216,
+          "baseline": 0.34743863171544564
+        },
+        {
+          "feature_idx": 17014,
+          "lift": 9.490004450886804,
+          "activation": 13.303059627269876,
+          "baseline": 3.813055176383073
+        },
+        {
+          "feature_idx": 1427,
+          "lift": 8.661902872721354,
+          "activation": 8.960589178677264,
+          "baseline": 0.2986863059559088
+        }
+      ],
+      "concept_description": "step-by-step instructions or how-to guidance",
+      "n_content_tokens": 58
+    },
+    "narrative": {
+      "best_feature_idx": 16780,
+      "best_lift": 16.004469559306525,
+      "best_activation": 17.554792342647428,
+      "best_baseline": 1.5503227833409028,
+      "top_5": [
+        {
+          "feature_idx": 16780,
+          "lift": 16.004469559306525,
+          "activation": 17.554792342647428,
+          "baseline": 1.5503227833409028
+        },
+        {
+          "feature_idx": 5002,
+          "lift": 9.201287281877711,
+          "activation": 9.80497274091167,
+          "baseline": 0.6036854590339585
+        },
+        {
+          "feature_idx": 18126,
+          "lift": 7.684488509545838,
+          "activation": 8.438863138998709,
+          "baseline": 0.754374629452871
+        },
+        {
+          "feature_idx": 8498,
+          "lift": 6.190426384602754,
+          "activation": 6.56059492018915,
+          "baseline": 0.37016853558639623
+        },
+        {
+          "feature_idx": 14471,
+          "lift": 6.068238578947245,
+          "activation": 6.847987451860981,
+          "baseline": 0.7797488729137367
+        }
+      ],
+      "concept_description": "story-telling and narrative prose",
+      "n_content_tokens": 62
+    },
+    "dialogue": {
+      "best_feature_idx": 16780,
+      "best_lift": 13.20003180185255,
+      "best_activation": 14.750354585193453,
+      "best_baseline": 1.5503227833409028,
+      "top_5": [
+        {
+          "feature_idx": 16780,
+          "lift": 13.20003180185255,
+          "activation": 14.750354585193453,
+          "baseline": 1.5503227833409028
+        },
+        {
+          "feature_idx": 1258,
+          "lift": 10.702865249391586,
+          "activation": 11.071929568336124,
+          "baseline": 0.36906431894453745
+        },
+        {
+          "feature_idx": 767,
+          "lift": 9.43279663578171,
+          "activation": 10.033812507750495,
+          "baseline": 0.6010158719687848
+        },
+        {
+          "feature_idx": 12863,
+          "lift": 8.704338701030915,
+          "activation": 9.236879439581008,
+          "baseline": 0.5325407385500939
+        },
+        {
+          "feature_idx": 248,
+          "lift": 7.082954925244189,
+          "activation": 7.485823373945933,
+          "baseline": 0.40286844870174393
+        }
+      ],
+      "concept_description": "quoted dialogue between two speakers",
+      "n_content_tokens": 63
+    },
+    "poetic": {
+      "best_feature_idx": 4145,
+      "best_lift": 18.320001933612293,
+      "best_activation": 20.780870749733666,
+      "best_baseline": 2.4608688161213714,
+      "top_5": [
+        {
+          "feature_idx": 4145,
+          "lift": 18.320001933612293,
+          "activation": 20.780870749733666,
+          "baseline": 2.4608688161213714
+        },
+        {
+          "feature_idx": 18340,
+          "lift": 15.076032564273108,
+          "activation": 16.040810879794034,
+          "baseline": 0.9647783155209262
+        },
+        {
+          "feature_idx": 14471,
+          "lift": 13.41315051895416,
+          "activation": 14.192899391867897,
+          "baseline": 0.7797488729137367
+        },
+        {
+          "feature_idx": 12359,
+          "lift": 10.202088520128356,
+          "activation": 10.58491044477983,
+          "baseline": 0.3828219246514732
+        },
+        {
+          "feature_idx": 4016,
+          "lift": 8.971258582221784,
+          "activation": 9.424206334894354,
+          "baseline": 0.45294775267257026
+        }
+      ],
+      "concept_description": "poetic, lyrical, or metaphorical language",
+      "n_content_tokens": 55
+    },
+    "technical_jargon": {
+      "best_feature_idx": 6905,
+      "best_lift": 14.98884470097314,
+      "best_activation": 27.40947126573132,
+      "best_baseline": 12.42062656475818,
+      "top_5": [
+        {
+          "feature_idx": 6905,
+          "lift": 14.98884470097314,
+          "activation": 27.40947126573132,
+          "baseline": 12.42062656475818
+        },
+        {
+          "feature_idx": 14212,
+          "lift": 10.799533272691805,
+          "activation": 11.974700804679625,
+          "baseline": 1.1751675319878185
+        },
+        {
+          "feature_idx": 10181,
+          "lift": 9.411816521261763,
+          "activation": 16.400574468797252,
+          "baseline": 6.988757947535491
+        },
+        {
+          "feature_idx": 13506,
+          "lift": 9.375012393852348,
+          "activation": 10.68881191745881,
+          "baseline": 1.3137995236064623
+        },
+        {
+          "feature_idx": 12309,
+          "lift": 7.792381324612905,
+          "activation": 8.29550773866715,
+          "baseline": 0.5031264140542441
+        }
+      ],
+      "concept_description": "technical engineering and physics jargon",
+      "n_content_tokens": 62
+    },
+    "positive_emotion": {
+      "best_feature_idx": 12234,
+      "best_lift": 12.21735425218721,
+      "best_activation": 19.713954789297922,
+      "best_baseline": 7.496600537110711,
+      "top_5": [
+        {
+          "feature_idx": 12234,
+          "lift": 12.21735425218721,
+          "activation": 19.713954789297922,
+          "baseline": 7.496600537110711
+        },
+        {
+          "feature_idx": 5056,
+          "lift": 7.078022267014636,
+          "activation": 7.62747985976083,
+          "baseline": 0.5494575927461937
+        },
+        {
+          "feature_idx": 10445,
+          "lift": 6.764321504829531,
+          "activation": 7.338051523481097,
+          "baseline": 0.5737300186515657
+        },
+        {
+          "feature_idx": 8999,
+          "lift": 6.199153938047725,
+          "activation": 6.7570560829980035,
+          "baseline": 0.557902144950279
+        },
+        {
+          "feature_idx": 10711,
+          "lift": 5.827823159388871,
+          "activation": 6.231372509683881,
+          "baseline": 0.40354935029501
+        }
+      ],
+      "concept_description": "expressions of joy, gratitude, or excitement",
+      "n_content_tokens": 56
+    },
+    "negative_emotion": {
+      "best_feature_idx": 5783,
+      "best_lift": 9.068826534953075,
+      "best_activation": 9.567671573523318,
+      "best_baseline": 0.498845038570243,
+      "top_5": [
+        {
+          "feature_idx": 5783,
+          "lift": 9.068826534953075,
+          "activation": 9.567671573523318,
+          "baseline": 0.498845038570243
+        },
+        {
+          "feature_idx": 9677,
+          "lift": 8.255274744472217,
+          "activation": 8.552079634232955,
+          "baseline": 0.29680488976073793
+        },
+        {
+          "feature_idx": 2144,
+          "lift": 5.833403895288749,
+          "activation": 6.136745134989421,
+          "baseline": 0.3033412397006725
+        },
+        {
+          "feature_idx": 16417,
+          "lift": 5.386317109556295,
+          "activation": 5.821686166705507,
+          "baseline": 0.43536905714921187
+        },
+        {
+          "feature_idx": 10546,
+          "lift": 4.837470198414058,
+          "activation": 5.220204035441081,
+          "baseline": 0.3827338370270224
+        }
+      ],
+      "concept_description": "expressions of sadness, anger, or distress",
+      "n_content_tokens": 66
+    },
+    "neutral_factual": {
+      "best_feature_idx": 6905,
+      "best_lift": 12.15514440123604,
+      "best_activation": 24.57577096599422,
+      "best_baseline": 12.42062656475818,
+      "top_5": [
+        {
+          "feature_idx": 6905,
+          "lift": 12.15514440123604,
+          "activation": 24.57577096599422,
+          "baseline": 12.42062656475818
+        },
+        {
+          "feature_idx": 9001,
+          "lift": 7.574177864806292,
+          "activation": 7.835356411868578,
+          "baseline": 0.26117854706228594
+        },
+        {
+          "feature_idx": 5570,
+          "lift": 6.742701569316331,
+          "activation": 12.078333919995451,
+          "baseline": 5.33563235067912
+        },
+        {
+          "feature_idx": 10038,
+          "lift": 4.557759830032387,
+          "activation": 4.8409899228239714,
+          "baseline": 0.2832300927915845
+        },
+        {
+          "feature_idx": 15076,
+          "lift": 4.4582799573127065,
+          "activation": 4.673076414082148,
+          "baseline": 0.2147964567694415
+        }
+      ],
+      "concept_description": "neutral factual reportage with no emotional valence",
+      "n_content_tokens": 73
+    },
+    "question_form": {
+      "best_feature_idx": 14458,
+      "best_lift": 24.656563117319074,
+      "best_activation": 73.09524759432165,
+      "best_baseline": 48.438684477002575,
+      "top_5": [
+        {
+          "feature_idx": 14458,
+          "lift": 24.656563117319074,
+          "activation": 73.09524759432165,
+          "baseline": 48.438684477002575
+        },
+        {
+          "feature_idx": 3689,
+          "lift": 19.616316801799485,
+          "activation": 67.58224859470275,
+          "baseline": 47.96593179290326
+        },
+        {
+          "feature_idx": 8055,
+          "lift": 14.085182511060895,
+          "activation": 14.679222851264768,
+          "baseline": 0.5940403402038744
+        },
+        {
+          "feature_idx": 18397,
+          "lift": 13.85510419288629,
+          "activation": 45.46175626429116,
+          "baseline": 31.60665207140487
+        },
+        {
+          "feature_idx": 896,
+          "lift": 13.37187802307221,
+          "activation": 44.6853310189596,
+          "baseline": 31.313452995887392
+        }
+      ],
+      "concept_description": "interrogative sentences asking for information",
+      "n_content_tokens": 41
+    },
+    "imperative_form": {
+      "best_feature_idx": 385,
+      "best_lift": 7.194099526425924,
+      "best_activation": 7.54245231769703,
+      "best_baseline": 0.34835279127110647,
+      "top_5": [
+        {
+          "feature_idx": 385,
+          "lift": 7.194099526425924,
+          "activation": 7.54245231769703,
+          "baseline": 0.34835279127110647
+        },
+        {
+          "feature_idx": 17582,
+          "lift": 7.163486666757808,
+          "activation": 7.8093756922969115,
+          "baseline": 0.6458890255391037
+        },
+        {
+          "feature_idx": 5570,
+          "lift": 6.884240865737981,
+          "activation": 12.219873216417101,
+          "baseline": 5.33563235067912
+        },
+        {
+          "feature_idx": 12234,
+          "lift": 6.482403934279625,
+          "activation": 13.979004471390336,
+          "baseline": 7.496600537110711
+        },
+        {
+          "feature_idx": 6905,
+          "lift": 6.299942904552438,
+          "activation": 18.720569469310618,
+          "baseline": 12.42062656475818
+        }
+      ],
+      "concept_description": "commands, requests, and imperative sentences",
+      "n_content_tokens": 54
+    },
+    "code_context": {
+      "best_feature_idx": 15937,
+      "best_lift": 12.52717561826601,
+      "best_activation": 12.959147191309667,
+      "best_baseline": 0.4319715730436556,
+      "top_5": [
+        {
+          "feature_idx": 15937,
+          "lift": 12.52717561826601,
+          "activation": 12.959147191309667,
+          "baseline": 0.4319715730436556
+        },
+        {
+          "feature_idx": 10096,
+          "lift": 10.64031965250148,
+          "activation": 11.017000848120386,
+          "baseline": 0.37668119561890545
+        },
+        {
+          "feature_idx": 10181,
+          "lift": 7.872691577061006,
+          "activation": 14.861449524596496,
+          "baseline": 6.988757947535491
+        },
+        {
+          "feature_idx": 6134,
+          "lift": 6.647559662162566,
+          "activation": 8.019581050663204,
+          "baseline": 1.3720213885006383
+        },
+        {
+          "feature_idx": 3051,
+          "lift": 5.4094360323616,
+          "activation": 5.595968309339586,
+          "baseline": 0.1865322769779862
+        }
+      ],
+      "concept_description": "source code snippets and programming syntax",
+      "n_content_tokens": 91
+    },
+    "list_format": {
+      "best_feature_idx": 3962,
+      "best_lift": 13.441130491883438,
+      "best_activation": 20.8192081451416,
+      "best_baseline": 7.3780776532581624,
+      "top_5": [
+        {
+          "feature_idx": 3962,
+          "lift": 13.441130491883438,
+          "activation": 20.8192081451416,
+          "baseline": 7.3780776532581624
+        },
+        {
+          "feature_idx": 5637,
+          "lift": 7.586001332600912,
+          "activation": 7.847587585449219,
+          "baseline": 0.2615862528483073
+        },
+        {
+          "feature_idx": 3936,
+          "lift": 7.542816185080529,
+          "activation": 8.209546089172363,
+          "baseline": 0.666729904091834
+        },
+        {
+          "feature_idx": 14162,
+          "lift": 6.866285489962019,
+          "activation": 7.320139706134796,
+          "baseline": 0.4538542161727773
+        },
+        {
+          "feature_idx": 8594,
+          "lift": 4.2571984103419735,
+          "activation": 4.444873678684234,
+          "baseline": 0.1876752683422613
+        }
+      ],
+      "concept_description": "bulleted or numbered list structure",
+      "n_content_tokens": 80
+    },
+    "citation_pattern": {
+      "best_feature_idx": 12234,
+      "best_lift": 11.122411428554237,
+      "best_activation": 18.61901196566495,
+      "best_baseline": 7.496600537110711,
+      "top_5": [
+        {
+          "feature_idx": 12234,
+          "lift": 11.122411428554237,
+          "activation": 18.61901196566495,
+          "baseline": 7.496600537110711
+        },
+        {
+          "feature_idx": 1300,
+          "lift": 9.839388907082348,
+          "activation": 10.24148923700506,
+          "baseline": 0.40210032992271305
+        },
+        {
+          "feature_idx": 9977,
+          "lift": 8.229700614466811,
+          "activation": 8.513483394276012,
+          "baseline": 0.2837827798092004
+        },
+        {
+          "feature_idx": 9038,
+          "lift": 7.241171980850766,
+          "activation": 7.53582151369615,
+          "baseline": 0.29464953284538337
+        },
+        {
+          "feature_idx": 1266,
+          "lift": 7.163231357725544,
+          "activation": 7.795165495439009,
+          "baseline": 0.6319341377134651
+        }
+      ],
+      "concept_description": "academic citations and bibliographic references",
+      "n_content_tokens": 88
+    }
+  }
+}
