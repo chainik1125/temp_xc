@@ -36,6 +36,7 @@ checks.
 | `2026-04-29-per-task-tsweep.md` | Per-task T-scaling (txcdr_t<T> family at every T) — 36 small multiples + ranking by slope. **`winogrande` is the only task where T helps monotonically** (+0.0069/T at k=20), validating the multi-token-reasoning hypothesis. |
 | `2026-04-29-paper-task-set.md` | **Final 16-task paper set (`PAPER`)** — pre-registered selection by cross-arch SD within balanced clusters. k=20 winner `txc_bare_antidead_t5` Δ=+0.0036 (~6× σ_seeds, decisive). k=5 top-6 within 0.0035 AUC (no defensible single champion). |
 | `2026-04-29-handover-IT-and-mlc-sparse.md` | **Handover briefing** for next-agent IT-side leaderboard + missing MLC sparse cells (`mlc_sparse`, `ag_mlc_08_sparse`). Includes coverage status, plan, A40 feasibility, common pitfalls. Read this before starting either follow-on. |
+| `2026-04-29-leaderboard-it.md` | **IT leaderboard (7 of 9 archs, seed=42 only).** Headline: TXC k=20 win does NOT replicate on IT — `tsae_paper_k500` is the IT k=20 winner; `phase57_partB_h8_multidistance_t8` is the IT k=5 winner (matching BASE). 2 archs (`phase5b_subseq_h8`, `txcdr_t16`) OOM'd on A40 b=4096; retry in flight. |
 | `plots/` | Paper figures, full-res `.png` (150 dpi) + thumbnails (`*.thumb.png`, ≤288px wide). |
 
 ### Headline figures
@@ -98,17 +99,26 @@ evaluated under Phase 7 current methodology at b=4096:
   `paper_archs.json` ("If a cell can't fit on A40 at b=4096, DO NOT
   downsize batch — DEFER to H200").
 - **`ag_mlc_08_sparse` (agentic_mlc_08, k_win=100)** — same as above.
-- **All IT-side cells** (12 paper_archs × Gemma-2-2b-it L13).
-  ~13 hr work (IT activation cache + 8 archs × 2 seeds + probing) —
-  didn't fit in the 18-hr autonomous shift after the OOM-restart cost
-  the early hours. Punch list in `agent_x_brief.md` "Concrete remaining
-  work". Note: `mlc_sparse` and `ag_mlc_08_sparse` IT-side legacy
-  ckpts also exist at b=1024 and don't count.
-  **Update 2026-04-29 (Agent X — second autonomous pass)**: IT-side
-  Mission #1 is in progress. Activation cache (L11..L15, gemma-2-2b-it)
-  built, probe cache (S=32) built, 9 A40_ok archs training at seed 42
-  underway. See `2026-04-29-leaderboard-it.md`. The 4 MLC-family cells
-  remain H200_required and deferred to Mission #2.
+- **IT-side cells: PARTIALLY EVALUATED** (Agent X 2026-04-30).
+  - 7 of 9 A40_ok cells trained at seed=42 + probed on PAPER:
+    `topk_sae`, `tsae_paper_k20`, `tsae_paper_k500`, `tfa_big`,
+    `txc_bare_antidead_t5`, `txcdr_t5`,
+    `phase57_partB_h8_bare_multidistance_t8`. See
+    `2026-04-29-leaderboard-it.md` for numbers.
+  - 2 A40_ok cells OOM'd at b=4096 on this pod's A40 (44 GB peak):
+    `phase5b_subseq_h8` (AuxK einsum) and `txcdr_t16` (Adam
+    `exp_avg_sq_sqrt`). Retry with
+    `PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True` is in flight
+    as of this writeup; if successful, leaderboard will be
+    re-rendered.
+  - 4 MLC-family cells remain H200_required (multi-layer cache
+    71 GB > 46 GB A40 cap).
+  - **seed=1 deferred** — A40 was 2.34×–3.50× slower than the
+    handover BASE-pod timings (avg 2.56×; phase57_partB_h8 took
+    3.35 hr on IT vs 86 min on BASE), leaving no budget for a
+    second seed in this autonomous shift. IT leaderboard is
+    1-seed σ; treat the headline shifts as preliminary until
+    seed=1 lands.
 - **3-seed σ for `tfa_big`, `txcdr_t16`, `hill_subseq_h8_T12_s5`** —
   only 1-2 seeds on HF.
 - **`hill_subseq_h8_T20_s8`** — Han's specific question; A40 OOM /
