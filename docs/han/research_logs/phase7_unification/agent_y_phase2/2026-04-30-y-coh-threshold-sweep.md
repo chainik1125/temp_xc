@@ -171,6 +171,40 @@ T=2 bare PP at s=5 has mean coh = 2.111 ≥ 2.0 with succ = 0.978.
 Gold edges mark TXC cells crossing the WIN threshold (anchor + 0.27)
 at the given metric. T-SAE k=20 anchor (blue) appears once per panel.
 
+### Per-concept-class breakdown
+
+![per-class threshold breakdown](../../../../../experiments/phase7_unification/results/case_studies/plots/per_class_coh_thresholds.png)
+
+Strength-uniform peak success per concept class (each panel = one
+coh threshold). Numbers in parentheses = concepts per class. Some
+patterns:
+
+- **knowledge_format** (technical jargon, citations, list/instructional,
+  programming): T-SAE saturates at coh ≥ 1.5 with succ = 2.2. But T-SAE's
+  knowledge_format peak at coh ≥ 1.75 collapses to 0.6, while T=2 H8 RE
+  takes over at 1.4. T-SAE's knowledge_format dominance is brittle past
+  the prereg coh floor.
+- **knowledge_domain** (medical, math, historical, etc.): T=2 H8 PP wins
+  at coh ≥ 1.5 / ≥ 1.75 (1.815 vs 1.667). At coh ≥ 2.0, T-SAE pulls back
+  ahead (1.667 vs 1.537 best-TXC).
+- **discourse_register** (formal/casual): T-SAE slight edge at all
+  thresholds; T=2 H8 RE matches at coh ≥ 1.5 with 2.167.
+- **discourse_safety** (harmful_content, deception, refusal_pattern,
+  jailbreak, helpfulness_marker): everyone is low here (all under 0.6
+  at any threshold). T-SAE retains marginal edge at coh ≥ 1.5; TXC
+  takes over at ≥ 1.75 / ≥ 2.0.
+- **discourse_style** (poetic, literary, narrative): TXC dominates by
+  large margins at every threshold (e.g. T=2 H8 PP 1.889 vs anchor
+  0.667/1.000).
+- **behavior_form** (question_form, imperative_form, dialogue): T-SAE
+  retains edge at coh ≥ 1.75 / ≥ 2.0; TXC matches at coh ≥ 1.5.
+- **behavior_emotion** (positive/negative/neutral): TXC dominates
+  at every threshold by ~+0.7 to +0.9.
+
+The WIN is broad: at every threshold, TXC dominates 4–5 of 7 classes.
+T-SAE retains niches in discourse_register and behavior_form; even
+those niches narrow at strict coherence thresholds.
+
 ### Why T-SAE collapses past coh ≥ 1.75
 
 T-SAE k=20 is per-token. Clamping a single feature at high z-magnitude
