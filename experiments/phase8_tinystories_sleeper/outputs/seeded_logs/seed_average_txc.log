@@ -1,0 +1,897 @@
+[seeded-lowdisk] running seeds: 2
+[seeded-lowdisk] === hookpoint l0_ln1 (blocks.0.ln1.hook_normalized) ===
+=== l0_ln1.harvest ===
+[harvest] device=cuda
+[harvest] loading sleeper model…
+Loaded pretrained model roneneldan/TinyStories-Instruct-33M into HookedTransformer
+[harvest] loaded: n_layers=4 d_model=768 n_ctx=512
+[harvest] loading paired dataset (train=10000, val=200, test=200)…
+[harvest]   train: N=10000 dep_frac=0.50 marker_mean=40.5
+[harvest]   val: N=200 dep_frac=0.50 marker_mean=41.2
+[harvest]   test: N=200 dep_frac=0.50 marker_mean=41.6
+[harvest] caching activations on ['blocks.0.ln1.hook_normalized']…
+[harvest]   train (10000 sequences)
+[harvest]     acts.shape=(10000, 128, 1, 768) dtype=torch.float16
+[harvest]   val (200 sequences)
+[harvest]     acts.shape=(200, 128, 1, 768) dtype=torch.float16
+[harvest]   test (200 sequences)
+[harvest]     acts.shape=(200, 128, 1, 768) dtype=torch.float16
+[harvest]   train: prompt_len mean=41.5 min=3 max=90
+[harvest]   val: prompt_len mean=42.2 min=3 max=82
+[harvest]   test: prompt_len mean=42.6 min=3 max=87
+[harvest] wrote outputs/seeded/per_hook_l0_ln1/data/tokens_cache.pt + activations_cache.pt
+  l0_ln1.harvest OK
+[seeded-lowdisk] === sae_l0_ln1_s2 (seed=2) ===
+=== sae_l0_ln1_s2.train ===
+[train] device=cuda
+[train] loading activation cache…
+[train]   train acts: N=10000 T=128 L=1 d_model=768
+[train]   hook_names (from cache): ['blocks.0.ln1.hook_normalized']
+[train]   padded shape: (10000, 172, 1, 768)  dtype=torch.float16  device=cuda:0
+[train]   TXC layer indices : {}
+[train]   SAE layer indices : {'sae_l0_ln1_s2': 0}
+[train]   T-SAE layer idxs  : {}
+[train]   H8 layer idxs     : {}
+[train]   sae_l0_ln1_s2: 2,361,600 params
+[train] step 500/4000 (153.9 it/s) | sae_l0_ln1_s2=30.6122
+[train] step 1000/4000 (158.9 it/s) | sae_l0_ln1_s2=24.1361
+[train] step 1500/4000 (160.6 it/s) | sae_l0_ln1_s2=22.1421
+[train] step 2000/4000 (161.8 it/s) | sae_l0_ln1_s2=20.2827
+[train] step 2500/4000 (162.5 it/s) | sae_l0_ln1_s2=19.0973
+[train] step 3000/4000 (163.0 it/s) | sae_l0_ln1_s2=17.8726
+[train] step 3500/4000 (163.2 it/s) | sae_l0_ln1_s2=17.9347
+[train] step 4000/4000 (163.5 it/s) | sae_l0_ln1_s2=16.2870
+[train] done in 24.5s
+[train] saved crosscoder_sae_l0_ln1_s2.pt  final_loss=16.2870
+  sae_l0_ln1_s2.train OK
+=== sae_l0_ln1_s2.sweep ===
+[sweep] device=cuda
+[sweep] loading caches…
+[sweep]   seq_len=128 d_model=768 L=4
+[sweep] loading sleeper model…
+Loaded pretrained model roneneldan/TinyStories-Instruct-33M into HookedTransformer
+[sweep] computing baselines…
+[sweep]   base_clean_ce=0.7242  base_dep_logp=-11.3803
+
+[sweep] === sae_l0_ln1_s2 ===
+[sweep]   ranked features in 1.9s  top_score=1.257
+[sweep]   stage-1 sweep over 100 features × 5 alphas
+[sweep]     20/100 features (0.6/s)
+[sweep]     40/100 features (0.6/s)
+[sweep]     60/100 features (0.6/s)
+[sweep]     80/100 features (0.6/s)
+[sweep]     100/100 features (0.6/s)
+[sweep]   stage-2 sampled-ASR on 10 features × 5 alphas
+[sweep]     stage-2 2/10 features (43.1s elapsed)
+[sweep]     stage-2 4/10 features (86.1s elapsed)
+[sweep]     stage-2 6/10 features (129.2s elapsed)
+[sweep]     stage-2 8/10 features (172.3s elapsed)
+[sweep]     stage-2 10/10 features (215.5s elapsed)
+[sweep]   chosen: f=169 α=2.0 val_asr=0.010 Δlogp=-0.348 ΔCE=-0.000
+[sweep]   running test eval…
+[sweep]   test: asr_16=0.000 (base 0.990) Δlogp=-0.339  ΔCE=-0.000
+
+[sweep] wrote test_results.json
+  sae_l0_ln1_s2.sweep OK
+[seeded-lowdisk] === tsae_l0_ln1_s2 (seed=2) ===
+=== tsae_l0_ln1_s2.train ===
+[train] device=cuda
+[train] loading activation cache…
+[train]   train acts: N=10000 T=128 L=1 d_model=768
+[train]   hook_names (from cache): ['blocks.0.ln1.hook_normalized']
+[train]   padded shape: (10000, 172, 1, 768)  dtype=torch.float16  device=cuda:0
+[train]   TXC layer indices : {}
+[train]   SAE layer indices : {}
+[train]   T-SAE layer idxs  : {'tsae_l0_ln1_s2': 0}
+[train]   H8 layer idxs     : {}
+[train]   tsae_l0_ln1_s2: 2,361,600 params
+[train] step 500/4000 (43.8 it/s) | tsae_l0_ln1_s2=5.2207
+[train] step 1000/4000 (44.3 it/s) | tsae_l0_ln1_s2=4.7106
+[train] step 1500/4000 (44.5 it/s) | tsae_l0_ln1_s2=4.5494
+[train] step 2000/4000 (44.6 it/s) | tsae_l0_ln1_s2=4.4909
+[train] step 2500/4000 (44.7 it/s) | tsae_l0_ln1_s2=4.4629
+[train] step 3000/4000 (44.7 it/s) | tsae_l0_ln1_s2=4.4013
+[train] step 3500/4000 (44.7 it/s) | tsae_l0_ln1_s2=4.3561
+[train] step 4000/4000 (44.8 it/s) | tsae_l0_ln1_s2=4.3521
+[train] done in 89.4s
+[train] saved crosscoder_tsae_l0_ln1_s2.pt  final_loss=4.3521
+  tsae_l0_ln1_s2.train OK
+=== tsae_l0_ln1_s2.sweep ===
+[sweep] device=cuda
+[sweep] loading caches…
+[sweep]   seq_len=128 d_model=768 L=4
+[sweep] loading sleeper model…
+Loaded pretrained model roneneldan/TinyStories-Instruct-33M into HookedTransformer
+[sweep] computing baselines…
+[sweep]   base_clean_ce=0.7242  base_dep_logp=-11.3803
+
+[sweep] === tsae_l0_ln1_s2 ===
+[sweep]   ranked features in 2.0s  top_score=3.819
+[sweep]   stage-1 sweep over 100 features × 5 alphas
+[sweep]     20/100 features (0.6/s)
+[sweep]     40/100 features (0.6/s)
+[sweep]     60/100 features (0.6/s)
+[sweep]     80/100 features (0.6/s)
+[sweep]     100/100 features (0.6/s)
+[sweep]   stage-2 sampled-ASR on 10 features × 5 alphas
+[sweep]     stage-2 2/10 features (44.6s elapsed)
+[sweep]     stage-2 4/10 features (89.7s elapsed)
+[sweep]     stage-2 6/10 features (133.4s elapsed)
+[sweep]     stage-2 8/10 features (177.1s elapsed)
+[sweep]     stage-2 10/10 features (220.7s elapsed)
+[sweep]   chosen: f=317 α=2.0 val_asr=0.000 Δlogp=+2.256 ΔCE=-0.000
+[sweep]   running test eval…
+[sweep]   test: asr_16=0.000 (base 0.990) Δlogp=+1.947  ΔCE=-0.000
+
+[sweep] wrote test_results.json
+  tsae_l0_ln1_s2.sweep OK
+[seeded-lowdisk] === txc_l0_ln1_s2 (seed=2) ===
+=== txc_l0_ln1_s2.train ===
+[train] device=cuda
+[train] loading activation cache…
+[train]   train acts: N=10000 T=128 L=1 d_model=768
+[train]   hook_names (from cache): ['blocks.0.ln1.hook_normalized']
+[train]   padded shape: (10000, 172, 1, 768)  dtype=torch.float16  device=cuda:0
+[train]   TXC layer indices : {'txc_l0_ln1_s2': 0}
+[train]   SAE layer indices : {}
+[train]   T-SAE layer idxs  : {}
+[train]   H8 layer idxs     : {}
+[train]   txc_l0_ln1_s2: 70,803,456 params
+[train] step 500/4000 (11.1 it/s) | txc_l0_ln1_s2=195.8824
+[train] step 1000/4000 (11.1 it/s) | txc_l0_ln1_s2=184.5124
+[train] step 1500/4000 (11.1 it/s) | txc_l0_ln1_s2=171.1687
+[train] step 2000/4000 (11.0 it/s) | txc_l0_ln1_s2=167.6937
+[train] step 2500/4000 (11.0 it/s) | txc_l0_ln1_s2=162.7793
+[train] step 3000/4000 (11.0 it/s) | txc_l0_ln1_s2=159.3441
+[train] step 3500/4000 (11.0 it/s) | txc_l0_ln1_s2=157.0840
+[train] step 4000/4000 (11.0 it/s) | txc_l0_ln1_s2=157.8848
+[train] done in 362.2s
+[train] saved crosscoder_txc_l0_ln1_s2.pt  final_loss=157.8848
+  txc_l0_ln1_s2.train OK
+=== txc_l0_ln1_s2.sweep ===
+[sweep] device=cuda
+[sweep] loading caches…
+[sweep]   seq_len=128 d_model=768 L=4
+[sweep] loading sleeper model…
+Loaded pretrained model roneneldan/TinyStories-Instruct-33M into HookedTransformer
+[sweep] computing baselines…
+[sweep]   base_clean_ce=0.7242  base_dep_logp=-11.3803
+
+[sweep] === txc_l0_ln1_s2 ===
+[sweep]   ranked features in 4.9s  top_score=3.453
+[sweep]   stage-1 sweep over 100 features × 5 alphas
+[sweep]     20/100 features (0.5/s)
+[sweep]     40/100 features (0.5/s)
+[sweep]     60/100 features (0.5/s)
+[sweep]     80/100 features (0.5/s)
+[sweep]     100/100 features (0.5/s)
+[sweep]   stage-2 sampled-ASR on 10 features × 5 alphas
+[sweep]     stage-2 2/10 features (45.0s elapsed)
+[sweep]     stage-2 4/10 features (89.1s elapsed)
+[sweep]     stage-2 6/10 features (133.2s elapsed)
+[sweep]     stage-2 8/10 features (177.3s elapsed)
+[sweep]     stage-2 10/10 features (221.4s elapsed)
+[sweep]   chosen: f=755 α=2.0 val_asr=0.100 Δlogp=+0.161 ΔCE=+0.000
+[sweep]   running test eval…
+[sweep]   test: asr_16=0.050 (base 0.990) Δlogp=-0.059  ΔCE=+0.000
+
+[sweep] wrote test_results.json
+  txc_l0_ln1_s2.sweep OK
+[seeded-lowdisk] freeing l0_ln1 caches (~2 GB)
+[seeded-lowdisk] === hookpoint l0_pre (blocks.0.hook_resid_pre) ===
+=== l0_pre.harvest ===
+[harvest] device=cuda
+[harvest] loading sleeper model…
+Loaded pretrained model roneneldan/TinyStories-Instruct-33M into HookedTransformer
+[harvest] loaded: n_layers=4 d_model=768 n_ctx=512
+[harvest] loading paired dataset (train=10000, val=200, test=200)…
+[harvest]   train: N=10000 dep_frac=0.50 marker_mean=40.5
+[harvest]   val: N=200 dep_frac=0.50 marker_mean=41.2
+[harvest]   test: N=200 dep_frac=0.50 marker_mean=41.6
+[harvest] caching activations on ['blocks.0.hook_resid_pre']…
+[harvest]   train (10000 sequences)
+[harvest]     acts.shape=(10000, 128, 1, 768) dtype=torch.float16
+[harvest]   val (200 sequences)
+[harvest]     acts.shape=(200, 128, 1, 768) dtype=torch.float16
+[harvest]   test (200 sequences)
+[harvest]     acts.shape=(200, 128, 1, 768) dtype=torch.float16
+[harvest]   train: prompt_len mean=41.5 min=3 max=90
+[harvest]   val: prompt_len mean=42.2 min=3 max=82
+[harvest]   test: prompt_len mean=42.6 min=3 max=87
+[harvest] wrote outputs/seeded/per_hook_l0_pre/data/tokens_cache.pt + activations_cache.pt
+  l0_pre.harvest OK
+[seeded-lowdisk] === sae_l0_pre_s2 (seed=2) ===
+=== sae_l0_pre_s2.train ===
+[train] device=cuda
+[train] loading activation cache…
+[train]   train acts: N=10000 T=128 L=1 d_model=768
+[train]   hook_names (from cache): ['blocks.0.hook_resid_pre']
+[train]   padded shape: (10000, 172, 1, 768)  dtype=torch.float16  device=cuda:0
+[train]   TXC layer indices : {}
+[train]   SAE layer indices : {'sae_l0_pre_s2': 0}
+[train]   T-SAE layer idxs  : {}
+[train]   H8 layer idxs     : {}
+[train]   sae_l0_pre_s2: 2,361,600 params
+[train] step 500/4000 (153.2 it/s) | sae_l0_pre_s2=0.0755
+[train] step 1000/4000 (159.0 it/s) | sae_l0_pre_s2=0.0597
+[train] step 1500/4000 (160.0 it/s) | sae_l0_pre_s2=0.0551
+[train] step 2000/4000 (160.3 it/s) | sae_l0_pre_s2=0.0506
+[train] step 2500/4000 (160.6 it/s) | sae_l0_pre_s2=0.0480
+[train] step 3000/4000 (160.6 it/s) | sae_l0_pre_s2=0.0450
+[train] step 3500/4000 (160.5 it/s) | sae_l0_pre_s2=0.0454
+[train] step 4000/4000 (160.5 it/s) | sae_l0_pre_s2=0.0404
+[train] done in 24.9s
+[train] saved crosscoder_sae_l0_pre_s2.pt  final_loss=0.0404
+  sae_l0_pre_s2.train OK
+=== sae_l0_pre_s2.sweep ===
+[sweep] device=cuda
+[sweep] loading caches…
+[sweep]   seq_len=128 d_model=768 L=4
+[sweep] loading sleeper model…
+Loaded pretrained model roneneldan/TinyStories-Instruct-33M into HookedTransformer
+[sweep] computing baselines…
+[sweep]   base_clean_ce=0.7242  base_dep_logp=-11.3803
+
+[sweep] === sae_l0_pre_s2 ===
+[sweep]   ranked features in 2.0s  top_score=0.061
+[sweep]   stage-1 sweep over 100 features × 5 alphas
+[sweep]     20/100 features (0.6/s)
+[sweep]     40/100 features (0.6/s)
+[sweep]     60/100 features (0.6/s)
+[sweep]     80/100 features (0.6/s)
+[sweep]     100/100 features (0.6/s)
+[sweep]   stage-2 sampled-ASR on 10 features × 5 alphas
+[sweep]     stage-2 2/10 features (42.0s elapsed)
+[sweep]     stage-2 4/10 features (83.8s elapsed)
+[sweep]     stage-2 6/10 features (125.7s elapsed)
+[sweep]     stage-2 8/10 features (167.5s elapsed)
+[sweep]     stage-2 10/10 features (209.3s elapsed)
+[sweep]   chosen: f=169 α=2.0 val_asr=0.090 Δlogp=-0.163 ΔCE=+0.000
+[sweep]   running test eval…
+[sweep]   test: asr_16=0.060 (base 0.990) Δlogp=-0.102  ΔCE=-0.000
+
+[sweep] wrote test_results.json
+  sae_l0_pre_s2.sweep OK
+[seeded-lowdisk] === tsae_l0_pre_s2 (seed=2) ===
+=== tsae_l0_pre_s2.train ===
+[train] device=cuda
+[train] loading activation cache…
+[train]   train acts: N=10000 T=128 L=1 d_model=768
+[train]   hook_names (from cache): ['blocks.0.hook_resid_pre']
+[train]   padded shape: (10000, 172, 1, 768)  dtype=torch.float16  device=cuda:0
+[train]   TXC layer indices : {}
+[train]   SAE layer indices : {}
+[train]   T-SAE layer idxs  : {'tsae_l0_pre_s2': 0}
+[train]   H8 layer idxs     : {}
+[train]   tsae_l0_pre_s2: 2,361,600 params
+[train] step 500/4000 (43.8 it/s) | tsae_l0_pre_s2=5.5704
+[train] step 1000/4000 (44.6 it/s) | tsae_l0_pre_s2=5.4618
+[train] step 1500/4000 (44.8 it/s) | tsae_l0_pre_s2=5.5089
+[train] step 2000/4000 (45.0 it/s) | tsae_l0_pre_s2=5.4210
+[train] step 2500/4000 (45.0 it/s) | tsae_l0_pre_s2=5.0055
+[train] step 3000/4000 (45.1 it/s) | tsae_l0_pre_s2=4.8202
+[train] step 3500/4000 (45.1 it/s) | tsae_l0_pre_s2=4.4833
+[train] step 4000/4000 (45.1 it/s) | tsae_l0_pre_s2=4.4500
+[train] done in 88.7s
+[train] saved crosscoder_tsae_l0_pre_s2.pt  final_loss=4.4500
+  tsae_l0_pre_s2.train OK
+=== tsae_l0_pre_s2.sweep ===
+[sweep] device=cuda
+[sweep] loading caches…
+[sweep]   seq_len=128 d_model=768 L=4
+[sweep] loading sleeper model…
+Loaded pretrained model roneneldan/TinyStories-Instruct-33M into HookedTransformer
+[sweep] computing baselines…
+[sweep]   base_clean_ce=0.7242  base_dep_logp=-11.3803
+
+[sweep] === tsae_l0_pre_s2 ===
+[sweep]   ranked features in 1.7s  top_score=0.030
+[sweep]   stage-1 sweep over 100 features × 5 alphas
+[sweep]     20/100 features (0.6/s)
+[sweep]     40/100 features (0.6/s)
+[sweep]     60/100 features (0.6/s)
+[sweep]     80/100 features (0.6/s)
+[sweep]     100/100 features (0.6/s)
+[sweep]   stage-2 sampled-ASR on 10 features × 5 alphas
+[sweep]     stage-2 2/10 features (42.4s elapsed)
+[sweep]     stage-2 4/10 features (84.7s elapsed)
+[sweep]     stage-2 6/10 features (127.0s elapsed)
+[sweep]     stage-2 8/10 features (169.2s elapsed)
+[sweep]     stage-2 10/10 features (211.3s elapsed)
+[sweep]   chosen: f=960 α=2.0 val_asr=0.790 Δlogp=-0.226 ΔCE=-0.000
+[sweep]   running test eval…
+[sweep]   test: asr_16=0.750 (base 0.990) Δlogp=-0.338  ΔCE=+0.005
+
+[sweep] wrote test_results.json
+  tsae_l0_pre_s2.sweep OK
+[seeded-lowdisk] === txc_l0_pre_s2 (seed=2) ===
+=== txc_l0_pre_s2.train ===
+[train] device=cuda
+[train] loading activation cache…
+[train]   train acts: N=10000 T=128 L=1 d_model=768
+[train]   hook_names (from cache): ['blocks.0.hook_resid_pre']
+[train]   padded shape: (10000, 172, 1, 768)  dtype=torch.float16  device=cuda:0
+[train]   TXC layer indices : {'txc_l0_pre_s2': 0}
+[train]   SAE layer indices : {}
+[train]   T-SAE layer idxs  : {}
+[train]   H8 layer idxs     : {}
+[train]   txc_l0_pre_s2: 70,803,456 params
+[train] step 500/4000 (11.1 it/s) | txc_l0_pre_s2=0.4667
+[train] step 1000/4000 (11.1 it/s) | txc_l0_pre_s2=0.4389
+[train] step 1500/4000 (11.1 it/s) | txc_l0_pre_s2=0.4087
+[train] step 2000/4000 (11.1 it/s) | txc_l0_pre_s2=0.4003
+[train] step 2500/4000 (11.1 it/s) | txc_l0_pre_s2=0.3877
+[train] step 3000/4000 (11.1 it/s) | txc_l0_pre_s2=0.3808
+[train] step 3500/4000 (11.1 it/s) | txc_l0_pre_s2=0.3760
+[train] step 4000/4000 (11.1 it/s) | txc_l0_pre_s2=0.3794
+[train] done in 361.9s
+[train] saved crosscoder_txc_l0_pre_s2.pt  final_loss=0.3794
+  txc_l0_pre_s2.train OK
+=== txc_l0_pre_s2.sweep ===
+[sweep] device=cuda
+[sweep] loading caches…
+[sweep]   seq_len=128 d_model=768 L=4
+[sweep] loading sleeper model…
+Loaded pretrained model roneneldan/TinyStories-Instruct-33M into HookedTransformer
+[sweep] computing baselines…
+[sweep]   base_clean_ce=0.7242  base_dep_logp=-11.3803
+
+[sweep] === txc_l0_pre_s2 ===
+[sweep]   ranked features in 4.9s  top_score=0.141
+[sweep]   stage-1 sweep over 100 features × 5 alphas
+[sweep]     20/100 features (0.5/s)
+[sweep]     40/100 features (0.5/s)
+[sweep]     60/100 features (0.5/s)
+[sweep]     80/100 features (0.5/s)
+[sweep]     100/100 features (0.5/s)
+[sweep]   stage-2 sampled-ASR on 10 features × 5 alphas
+[sweep]     stage-2 2/10 features (42.7s elapsed)
+[sweep]     stage-2 4/10 features (86.0s elapsed)
+[sweep]     stage-2 6/10 features (129.1s elapsed)
+[sweep]     stage-2 8/10 features (172.3s elapsed)
+[sweep]     stage-2 10/10 features (215.2s elapsed)
+[sweep]   chosen: f=554 α=1.5 val_asr=0.580 Δlogp=-0.084 ΔCE=+0.000
+[sweep]   running test eval…
+[sweep]   test: asr_16=0.370 (base 0.990) Δlogp=-0.121  ΔCE=+0.000
+
+[sweep] wrote test_results.json
+  txc_l0_pre_s2.sweep OK
+[seeded-lowdisk] freeing l0_pre caches (~2 GB)
+[seeded-lowdisk] === hookpoint l0_mid (blocks.0.hook_resid_mid) ===
+=== l0_mid.harvest ===
+[harvest] device=cuda
+[harvest] loading sleeper model…
+Loaded pretrained model roneneldan/TinyStories-Instruct-33M into HookedTransformer
+[harvest] loaded: n_layers=4 d_model=768 n_ctx=512
+[harvest] loading paired dataset (train=10000, val=200, test=200)…
+[harvest]   train: N=10000 dep_frac=0.50 marker_mean=40.5
+[harvest]   val: N=200 dep_frac=0.50 marker_mean=41.2
+[harvest]   test: N=200 dep_frac=0.50 marker_mean=41.6
+[harvest] caching activations on ['blocks.0.hook_resid_mid']…
+[harvest]   train (10000 sequences)
+[harvest]     acts.shape=(10000, 128, 1, 768) dtype=torch.float16
+[harvest]   val (200 sequences)
+[harvest]     acts.shape=(200, 128, 1, 768) dtype=torch.float16
+[harvest]   test (200 sequences)
+[harvest]     acts.shape=(200, 128, 1, 768) dtype=torch.float16
+[harvest]   train: prompt_len mean=41.5 min=3 max=90
+[harvest]   val: prompt_len mean=42.2 min=3 max=82
+[harvest]   test: prompt_len mean=42.6 min=3 max=87
+[harvest] wrote outputs/seeded/per_hook_l0_mid/data/tokens_cache.pt + activations_cache.pt
+  l0_mid.harvest OK
+[seeded-lowdisk] === sae_l0_mid_s2 (seed=2) ===
+=== sae_l0_mid_s2.train ===
+[train] device=cuda
+[train] loading activation cache…
+[train]   train acts: N=10000 T=128 L=1 d_model=768
+[train]   hook_names (from cache): ['blocks.0.hook_resid_mid']
+[train]   padded shape: (10000, 172, 1, 768)  dtype=torch.float16  device=cuda:0
+[train]   TXC layer indices : {}
+[train]   SAE layer indices : {'sae_l0_mid_s2': 0}
+[train]   T-SAE layer idxs  : {}
+[train]   H8 layer idxs     : {}
+[train]   sae_l0_mid_s2: 2,361,600 params
+[train] step 500/4000 (153.7 it/s) | sae_l0_mid_s2=3.0700
+[train] step 1000/4000 (160.4 it/s) | sae_l0_mid_s2=2.6238
+[train] step 1500/4000 (162.5 it/s) | sae_l0_mid_s2=2.3882
+[train] step 2000/4000 (163.5 it/s) | sae_l0_mid_s2=2.3253
+[train] step 2500/4000 (164.0 it/s) | sae_l0_mid_s2=2.2189
+[train] step 3000/4000 (163.9 it/s) | sae_l0_mid_s2=2.0928
+[train] step 3500/4000 (163.9 it/s) | sae_l0_mid_s2=2.1098
+[train] step 4000/4000 (164.0 it/s) | sae_l0_mid_s2=1.9880
+[train] done in 24.4s
+[train] saved crosscoder_sae_l0_mid_s2.pt  final_loss=1.9880
+  sae_l0_mid_s2.train OK
+=== sae_l0_mid_s2.sweep ===
+[sweep] device=cuda
+[sweep] loading caches…
+[sweep]   seq_len=128 d_model=768 L=4
+[sweep] loading sleeper model…
+Loaded pretrained model roneneldan/TinyStories-Instruct-33M into HookedTransformer
+[sweep] computing baselines…
+[sweep]   base_clean_ce=0.7242  base_dep_logp=-11.3803
+
+[sweep] === sae_l0_mid_s2 ===
+[sweep]   ranked features in 1.4s  top_score=0.344
+[sweep]   stage-1 sweep over 100 features × 5 alphas
+[sweep]     20/100 features (0.6/s)
+[sweep]     40/100 features (0.6/s)
+[sweep]     60/100 features (0.6/s)
+[sweep]     80/100 features (0.6/s)
+[sweep]     100/100 features (0.6/s)
+[sweep]   stage-2 sampled-ASR on 10 features × 5 alphas
+[sweep]     stage-2 2/10 features (43.1s elapsed)
+[sweep]     stage-2 4/10 features (86.2s elapsed)
+[sweep]     stage-2 6/10 features (129.0s elapsed)
+[sweep]     stage-2 8/10 features (171.8s elapsed)
+[sweep]     stage-2 10/10 features (215.5s elapsed)
+[sweep]   chosen: f=1515 α=2.0 val_asr=0.970 Δlogp=-0.152 ΔCE=-0.000
+[sweep]   running test eval…
+[sweep]   test: asr_16=0.990 (base 0.990) Δlogp=-0.145  ΔCE=-0.000
+
+[sweep] wrote test_results.json
+  sae_l0_mid_s2.sweep OK
+[seeded-lowdisk] === tsae_l0_mid_s2 (seed=2) ===
+=== tsae_l0_mid_s2.train ===
+[train] device=cuda
+[train] loading activation cache…
+[train]   train acts: N=10000 T=128 L=1 d_model=768
+[train]   hook_names (from cache): ['blocks.0.hook_resid_mid']
+[train]   padded shape: (10000, 172, 1, 768)  dtype=torch.float16  device=cuda:0
+[train]   TXC layer indices : {}
+[train]   SAE layer indices : {}
+[train]   T-SAE layer idxs  : {'tsae_l0_mid_s2': 0}
+[train]   H8 layer idxs     : {}
+[train]   tsae_l0_mid_s2: 2,361,600 params
+[train] step 500/4000 (43.3 it/s) | tsae_l0_mid_s2=5.6377
+[train] step 1000/4000 (44.3 it/s) | tsae_l0_mid_s2=4.9247
+[train] step 1500/4000 (44.7 it/s) | tsae_l0_mid_s2=4.7422
+[train] step 2000/4000 (44.8 it/s) | tsae_l0_mid_s2=4.3802
+[train] step 2500/4000 (44.9 it/s) | tsae_l0_mid_s2=3.9536
+[train] step 3000/4000 (45.0 it/s) | tsae_l0_mid_s2=3.6465
+[train] step 3500/4000 (45.0 it/s) | tsae_l0_mid_s2=3.4073
+[train] step 4000/4000 (45.0 it/s) | tsae_l0_mid_s2=3.2222
+[train] done in 88.9s
+[train] saved crosscoder_tsae_l0_mid_s2.pt  final_loss=3.2222
+  tsae_l0_mid_s2.train OK
+=== tsae_l0_mid_s2.sweep ===
+[sweep] device=cuda
+[sweep] loading caches…
+[sweep]   seq_len=128 d_model=768 L=4
+[sweep] loading sleeper model…
+Loaded pretrained model roneneldan/TinyStories-Instruct-33M into HookedTransformer
+[sweep] computing baselines…
+[sweep]   base_clean_ce=0.7242  base_dep_logp=-11.3803
+
+[sweep] === tsae_l0_mid_s2 ===
+[sweep]   ranked features in 2.2s  top_score=0.212
+[sweep]   stage-1 sweep over 100 features × 5 alphas
+[sweep]     20/100 features (0.6/s)
+[sweep]     40/100 features (0.6/s)
+[sweep]     60/100 features (0.6/s)
+[sweep]     80/100 features (0.6/s)
+[sweep]     100/100 features (0.6/s)
+[sweep]   stage-2 sampled-ASR on 10 features × 5 alphas
+[sweep]     stage-2 2/10 features (48.3s elapsed)
+[sweep]     stage-2 4/10 features (92.8s elapsed)
+[sweep]     stage-2 6/10 features (138.0s elapsed)
+[sweep]     stage-2 8/10 features (183.3s elapsed)
+[sweep]     stage-2 10/10 features (229.0s elapsed)
+[sweep]   chosen: f=958 α=2.0 val_asr=0.560 Δlogp=-0.138 ΔCE=-0.001
+[sweep]   running test eval…
+[sweep]   test: asr_16=0.330 (base 0.990) Δlogp=-0.218  ΔCE=+0.000
+
+[sweep] wrote test_results.json
+  tsae_l0_mid_s2.sweep OK
+[seeded-lowdisk] === txc_l0_mid_s2 (seed=2) ===
+=== txc_l0_mid_s2.train ===
+[train] device=cuda
+[train] loading activation cache…
+[train]   train acts: N=10000 T=128 L=1 d_model=768
+[train]   hook_names (from cache): ['blocks.0.hook_resid_mid']
+[train]   padded shape: (10000, 172, 1, 768)  dtype=torch.float16  device=cuda:0
+[train]   TXC layer indices : {'txc_l0_mid_s2': 0}
+[train]   SAE layer indices : {}
+[train]   T-SAE layer idxs  : {}
+[train]   H8 layer idxs     : {}
+[train]   txc_l0_mid_s2: 70,803,456 params
+[train] step 500/4000 (11.1 it/s) | txc_l0_mid_s2=9.0198
+[train] step 1000/4000 (11.1 it/s) | txc_l0_mid_s2=8.7744
+[train] step 1500/4000 (11.1 it/s) | txc_l0_mid_s2=8.3685
+[train] step 2000/4000 (11.1 it/s) | txc_l0_mid_s2=8.3487
+[train] step 2500/4000 (11.1 it/s) | txc_l0_mid_s2=8.2063
+[train] step 3000/4000 (11.1 it/s) | txc_l0_mid_s2=8.1232
+[train] step 3500/4000 (11.1 it/s) | txc_l0_mid_s2=8.0334
+[train] step 4000/4000 (11.1 it/s) | txc_l0_mid_s2=8.0624
+[train] done in 360.7s
+[train] saved crosscoder_txc_l0_mid_s2.pt  final_loss=8.0624
+  txc_l0_mid_s2.train OK
+=== txc_l0_mid_s2.sweep ===
+[sweep] device=cuda
+[sweep] loading caches…
+[sweep]   seq_len=128 d_model=768 L=4
+[sweep] loading sleeper model…
+Loaded pretrained model roneneldan/TinyStories-Instruct-33M into HookedTransformer
+[sweep] computing baselines…
+[sweep]   base_clean_ce=0.7242  base_dep_logp=-11.3803
+
+[sweep] === txc_l0_mid_s2 ===
+[sweep]   ranked features in 5.2s  top_score=2.074
+[sweep]   stage-1 sweep over 100 features × 5 alphas
+[sweep]     20/100 features (0.5/s)
+[sweep]     40/100 features (0.5/s)
+[sweep]     60/100 features (0.5/s)
+[sweep]     80/100 features (0.5/s)
+[sweep]     100/100 features (0.5/s)
+[sweep]   stage-2 sampled-ASR on 10 features × 5 alphas
+[sweep]     stage-2 2/10 features (43.4s elapsed)
+[sweep]     stage-2 4/10 features (86.7s elapsed)
+[sweep]     stage-2 6/10 features (130.3s elapsed)
+[sweep]     stage-2 8/10 features (173.6s elapsed)
+[sweep]     stage-2 10/10 features (216.9s elapsed)
+[sweep]   chosen: f=1176 α=2.0 val_asr=0.950 Δlogp=-0.078 ΔCE=-0.000
+[sweep]   running test eval…
+[sweep]   test: asr_16=0.930 (base 0.990) Δlogp=-0.103  ΔCE=+0.001
+
+[sweep] wrote test_results.json
+  txc_l0_mid_s2.sweep OK
+[seeded-lowdisk] freeing l0_mid caches (~2 GB)
+[seeded-lowdisk] === hookpoint l0_post (blocks.0.hook_resid_post) ===
+=== l0_post.harvest ===
+[harvest] device=cuda
+[harvest] loading sleeper model…
+Loaded pretrained model roneneldan/TinyStories-Instruct-33M into HookedTransformer
+[harvest] loaded: n_layers=4 d_model=768 n_ctx=512
+[harvest] loading paired dataset (train=10000, val=200, test=200)…
+[harvest]   train: N=10000 dep_frac=0.50 marker_mean=40.5
+[harvest]   val: N=200 dep_frac=0.50 marker_mean=41.2
+[harvest]   test: N=200 dep_frac=0.50 marker_mean=41.6
+[harvest] caching activations on ['blocks.0.hook_resid_post']…
+[harvest]   train (10000 sequences)
+[harvest]     acts.shape=(10000, 128, 1, 768) dtype=torch.float16
+[harvest]   val (200 sequences)
+[harvest]     acts.shape=(200, 128, 1, 768) dtype=torch.float16
+[harvest]   test (200 sequences)
+[harvest]     acts.shape=(200, 128, 1, 768) dtype=torch.float16
+[harvest]   train: prompt_len mean=41.5 min=3 max=90
+[harvest]   val: prompt_len mean=42.2 min=3 max=82
+[harvest]   test: prompt_len mean=42.6 min=3 max=87
+[harvest] wrote outputs/seeded/per_hook_l0_post/data/tokens_cache.pt + activations_cache.pt
+  l0_post.harvest OK
+[seeded-lowdisk] === sae_l0_post_s2 (seed=2) ===
+=== sae_l0_post_s2.train ===
+[train] device=cuda
+[train] loading activation cache…
+[train]   train acts: N=10000 T=128 L=1 d_model=768
+[train]   hook_names (from cache): ['blocks.0.hook_resid_post']
+[train]   padded shape: (10000, 172, 1, 768)  dtype=torch.float16  device=cuda:0
+[train]   TXC layer indices : {'txc_early': 0}
+[train]   SAE layer indices : {'sae_layer0': 0, 'sae_l0_post_s2': 0}
+[train]   T-SAE layer idxs  : {'tsae_layer0': 0}
+[train]   H8 layer idxs     : {'h8_early': 0}
+[train]   sae_l0_post_s2: 2,361,600 params
+[train] step 500/4000 (63.7 it/s) | sae_l0_post_s2=15.5647
+[train] step 1000/4000 (64.7 it/s) | sae_l0_post_s2=13.4905
+[train] step 1500/4000 (65.0 it/s) | sae_l0_post_s2=12.0423
+[train] step 2000/4000 (65.1 it/s) | sae_l0_post_s2=11.7075
+[train] step 2500/4000 (65.2 it/s) | sae_l0_post_s2=11.0719
+[train] step 3000/4000 (65.3 it/s) | sae_l0_post_s2=10.4431
+[train] step 3500/4000 (65.3 it/s) | sae_l0_post_s2=10.6278
+[train] step 4000/4000 (65.3 it/s) | sae_l0_post_s2=10.0584
+[train] done in 61.2s
+[train] saved crosscoder_sae_l0_post_s2.pt  final_loss=10.0584
+  sae_l0_post_s2.train OK
+=== sae_l0_post_s2.sweep ===
+[sweep] device=cuda
+[sweep] loading caches…
+[sweep]   seq_len=128 d_model=768 L=4
+[sweep] loading sleeper model…
+Loaded pretrained model roneneldan/TinyStories-Instruct-33M into HookedTransformer
+[sweep] computing baselines…
+[sweep]   base_clean_ce=0.7242  base_dep_logp=-11.3803
+
+[sweep] === sae_l0_post_s2 ===
+[sweep]   ranked features in 1.7s  top_score=0.964
+[sweep]   stage-1 sweep over 100 features × 5 alphas
+[sweep]     20/100 features (0.6/s)
+[sweep]     40/100 features (0.6/s)
+[sweep]     60/100 features (0.6/s)
+[sweep]     80/100 features (0.6/s)
+[sweep]     100/100 features (0.6/s)
+[sweep]   stage-2 sampled-ASR on 10 features × 5 alphas
+[sweep]     stage-2 2/10 features (43.3s elapsed)
+[sweep]     stage-2 4/10 features (86.5s elapsed)
+[sweep]     stage-2 6/10 features (129.7s elapsed)
+[sweep]     stage-2 8/10 features (173.0s elapsed)
+[sweep]     stage-2 10/10 features (216.1s elapsed)
+[sweep]   chosen: f=332 α=1.0 val_asr=0.170 Δlogp=-0.497 ΔCE=+0.043
+[sweep]   running test eval…
+[sweep]   test: asr_16=0.140 (base 0.990) Δlogp=-0.484  ΔCE=+0.052
+
+[sweep] wrote test_results.json
+  sae_l0_post_s2.sweep OK
+[seeded-lowdisk] === tsae_l0_post_s2 (seed=2) ===
+=== tsae_l0_post_s2.train ===
+[train] device=cuda
+[train] loading activation cache…
+[train]   train acts: N=10000 T=128 L=1 d_model=768
+[train]   hook_names (from cache): ['blocks.0.hook_resid_post']
+[train]   padded shape: (10000, 172, 1, 768)  dtype=torch.float16  device=cuda:0
+[train]   TXC layer indices : {'txc_early': 0}
+[train]   SAE layer indices : {'sae_layer0': 0}
+[train]   T-SAE layer idxs  : {'tsae_layer0': 0, 'tsae_l0_post_s2': 0}
+[train]   H8 layer idxs     : {'h8_early': 0}
+[train]   tsae_l0_post_s2: 2,361,600 params
+[train] step 500/4000 (31.3 it/s) | tsae_l0_post_s2=6.0988
+[train] step 1000/4000 (31.7 it/s) | tsae_l0_post_s2=5.0416
+[train] step 1500/4000 (31.8 it/s) | tsae_l0_post_s2=4.5841
+[train] step 2000/4000 (31.8 it/s) | tsae_l0_post_s2=4.1888
+[train] step 2500/4000 (31.9 it/s) | tsae_l0_post_s2=4.0365
+[train] step 3000/4000 (31.9 it/s) | tsae_l0_post_s2=3.8317
+[train] step 3500/4000 (31.9 it/s) | tsae_l0_post_s2=3.7852
+[train] step 4000/4000 (31.9 it/s) | tsae_l0_post_s2=3.5768
+[train] done in 125.4s
+[train] saved crosscoder_tsae_l0_post_s2.pt  final_loss=3.5768
+  tsae_l0_post_s2.train OK
+=== tsae_l0_post_s2.sweep ===
+[sweep] device=cuda
+[sweep] loading caches…
+[sweep]   seq_len=128 d_model=768 L=4
+[sweep] loading sleeper model…
+Loaded pretrained model roneneldan/TinyStories-Instruct-33M into HookedTransformer
+[sweep] computing baselines…
+[sweep]   base_clean_ce=0.7242  base_dep_logp=-11.3803
+
+[sweep] === tsae_l0_post_s2 ===
+[sweep]   ranked features in 1.5s  top_score=0.306
+[sweep]   stage-1 sweep over 100 features × 5 alphas
+[sweep]     20/100 features (0.6/s)
+[sweep]     40/100 features (0.6/s)
+[sweep]     60/100 features (0.6/s)
+[sweep]     80/100 features (0.6/s)
+[sweep]     100/100 features (0.6/s)
+[sweep]   stage-2 sampled-ASR on 10 features × 5 alphas
+[sweep]     stage-2 2/10 features (43.8s elapsed)
+[sweep]     stage-2 4/10 features (87.4s elapsed)
+[sweep]     stage-2 6/10 features (131.1s elapsed)
+[sweep]     stage-2 8/10 features (174.9s elapsed)
+[sweep]     stage-2 10/10 features (218.6s elapsed)
+[sweep]   chosen: f=1134 α=2.0 val_asr=0.960 Δlogp=-0.097 ΔCE=+0.004
+[sweep]   running test eval…
+[sweep]   test: asr_16=0.950 (base 0.990) Δlogp=-0.075  ΔCE=+0.005
+
+[sweep] wrote test_results.json
+  tsae_l0_post_s2.sweep OK
+[seeded-lowdisk] === txc_l0_post_s2 (seed=2) ===
+=== txc_l0_post_s2.train ===
+[train] device=cuda
+[train] loading activation cache…
+[train]   train acts: N=10000 T=128 L=1 d_model=768
+[train]   hook_names (from cache): ['blocks.0.hook_resid_post']
+[train]   padded shape: (10000, 172, 1, 768)  dtype=torch.float16  device=cuda:0
+[train]   TXC layer indices : {'txc_early': 0, 'txc_l0_post_s2': 0}
+[train]   SAE layer indices : {'sae_layer0': 0}
+[train]   T-SAE layer idxs  : {'tsae_layer0': 0}
+[train]   H8 layer idxs     : {'h8_early': 0}
+[train]   txc_l0_post_s2: 70,803,456 params
+[train] step 500/4000 (10.1 it/s) | txc_l0_post_s2=38.1789
+[train] step 1000/4000 (10.1 it/s) | txc_l0_post_s2=36.9591
+[train] step 1500/4000 (10.1 it/s) | txc_l0_post_s2=35.2251
+[train] step 2000/4000 (10.1 it/s) | txc_l0_post_s2=35.0064
+[train] step 2500/4000 (10.1 it/s) | txc_l0_post_s2=34.2730
+[train] step 3000/4000 (10.1 it/s) | txc_l0_post_s2=33.8693
+[train] step 3500/4000 (10.1 it/s) | txc_l0_post_s2=33.3071
+[train] step 4000/4000 (10.1 it/s) | txc_l0_post_s2=33.2579
+[train] done in 396.1s
+[train] saved crosscoder_txc_l0_post_s2.pt  final_loss=33.2579
+  txc_l0_post_s2.train OK
+=== txc_l0_post_s2.sweep ===
+[sweep] device=cuda
+[sweep] loading caches…
+[sweep]   seq_len=128 d_model=768 L=4
+[sweep] loading sleeper model…
+Loaded pretrained model roneneldan/TinyStories-Instruct-33M into HookedTransformer
+[sweep] computing baselines…
+[sweep]   base_clean_ce=0.7242  base_dep_logp=-11.3803
+
+[sweep] === txc_l0_post_s2 ===
+[sweep]   ranked features in 4.2s  top_score=1.690
+[sweep]   stage-1 sweep over 100 features × 5 alphas
+[sweep]     20/100 features (0.5/s)
+[sweep]     40/100 features (0.5/s)
+[sweep]     60/100 features (0.5/s)
+[sweep]     80/100 features (0.5/s)
+[sweep]     100/100 features (0.5/s)
+[sweep]   stage-2 sampled-ASR on 10 features × 5 alphas
+[sweep]     stage-2 2/10 features (42.6s elapsed)
+[sweep]     stage-2 4/10 features (85.2s elapsed)
+[sweep]     stage-2 6/10 features (127.9s elapsed)
+[sweep]     stage-2 8/10 features (170.6s elapsed)
+[sweep]     stage-2 10/10 features (213.1s elapsed)
+[sweep]   chosen: f=489 α=2.0 val_asr=0.760 Δlogp=-0.037 ΔCE=+0.013
+[sweep]   running test eval…
+[sweep]   test: asr_16=0.620 (base 0.990) Δlogp=-0.089  ΔCE=+0.012
+
+[sweep] wrote test_results.json
+  txc_l0_post_s2.sweep OK
+[seeded-lowdisk] freeing l0_post caches (~2 GB)
+[seeded-lowdisk] === hookpoint l1_ln1 (blocks.1.ln1.hook_normalized) ===
+=== l1_ln1.harvest ===
+[harvest] device=cuda
+[harvest] loading sleeper model…
+Loaded pretrained model roneneldan/TinyStories-Instruct-33M into HookedTransformer
+[harvest] loaded: n_layers=4 d_model=768 n_ctx=512
+[harvest] loading paired dataset (train=10000, val=200, test=200)…
+[harvest]   train: N=10000 dep_frac=0.50 marker_mean=40.5
+[harvest]   val: N=200 dep_frac=0.50 marker_mean=41.2
+[harvest]   test: N=200 dep_frac=0.50 marker_mean=41.6
+[harvest] caching activations on ['blocks.1.ln1.hook_normalized']…
+[harvest]   train (10000 sequences)
+[harvest]     acts.shape=(10000, 128, 1, 768) dtype=torch.float16
+[harvest]   val (200 sequences)
+[harvest]     acts.shape=(200, 128, 1, 768) dtype=torch.float16
+[harvest]   test (200 sequences)
+[harvest]     acts.shape=(200, 128, 1, 768) dtype=torch.float16
+[harvest]   train: prompt_len mean=41.5 min=3 max=90
+[harvest]   val: prompt_len mean=42.2 min=3 max=82
+[harvest]   test: prompt_len mean=42.6 min=3 max=87
+[harvest] wrote outputs/seeded/per_hook_l1_ln1/data/tokens_cache.pt + activations_cache.pt
+  l1_ln1.harvest OK
+[seeded-lowdisk] === sae_l1_ln1_s2 (seed=2) ===
+=== sae_l1_ln1_s2.train ===
+[train] device=cuda
+[train] loading activation cache…
+[train]   train acts: N=10000 T=128 L=1 d_model=768
+[train]   hook_names (from cache): ['blocks.1.ln1.hook_normalized']
+[train]   padded shape: (10000, 172, 1, 768)  dtype=torch.float16  device=cuda:0
+[train]   TXC layer indices : {}
+[train]   SAE layer indices : {'sae_l1_ln1_s2': 0}
+[train]   T-SAE layer idxs  : {}
+[train]   H8 layer idxs     : {}
+[train]   sae_l1_ln1_s2: 2,361,600 params
+[train] step 500/4000 (153.3 it/s) | sae_l1_ln1_s2=50.2489
+[train] step 1000/4000 (160.0 it/s) | sae_l1_ln1_s2=42.6145
+[train] step 1500/4000 (162.0 it/s) | sae_l1_ln1_s2=37.5665
+[train] step 2000/4000 (162.5 it/s) | sae_l1_ln1_s2=36.6944
+[train] step 2500/4000 (162.0 it/s) | sae_l1_ln1_s2=35.0287
+[train] step 3000/4000 (161.5 it/s) | sae_l1_ln1_s2=32.8012
+[train] step 3500/4000 (161.3 it/s) | sae_l1_ln1_s2=33.4307
+[train] step 4000/4000 (161.3 it/s) | sae_l1_ln1_s2=32.0883
+[train] done in 24.8s
+[train] saved crosscoder_sae_l1_ln1_s2.pt  final_loss=32.0883
+  sae_l1_ln1_s2.train OK
+=== sae_l1_ln1_s2.sweep ===
+[sweep] device=cuda
+[sweep] loading caches…
+[sweep]   seq_len=128 d_model=768 L=4
+[sweep] loading sleeper model…
+Loaded pretrained model roneneldan/TinyStories-Instruct-33M into HookedTransformer
+[sweep] computing baselines…
+[sweep]   base_clean_ce=0.7242  base_dep_logp=-11.3803
+
+[sweep] === sae_l1_ln1_s2 ===
+[sweep]   ranked features in 1.8s  top_score=1.073
+[sweep]   stage-1 sweep over 100 features × 5 alphas
+[sweep]     20/100 features (0.6/s)
+[sweep]     40/100 features (0.6/s)
+[sweep]     60/100 features (0.6/s)
+[sweep]     80/100 features (0.6/s)
+[sweep]     100/100 features (0.6/s)
+[sweep]   stage-2 sampled-ASR on 10 features × 5 alphas
+[sweep]     stage-2 2/10 features (43.9s elapsed)
+[sweep]     stage-2 4/10 features (87.8s elapsed)
+[sweep]     stage-2 6/10 features (131.8s elapsed)
+[sweep]     stage-2 8/10 features (175.6s elapsed)
+[sweep]     stage-2 10/10 features (219.6s elapsed)
+[sweep]   chosen: f=1488 α=2.0 val_asr=0.970 Δlogp=-0.037 ΔCE=-0.002
+[sweep]   running test eval…
+[sweep]   test: asr_16=0.990 (base 0.990) Δlogp=+0.013  ΔCE=+0.001
+
+[sweep] wrote test_results.json
+  sae_l1_ln1_s2.sweep OK
+[seeded-lowdisk] === tsae_l1_ln1_s2 (seed=2) ===
+=== tsae_l1_ln1_s2.train ===
+[train] device=cuda
+[train] loading activation cache…
+[train]   train acts: N=10000 T=128 L=1 d_model=768
+[train]   hook_names (from cache): ['blocks.1.ln1.hook_normalized']
+[train]   padded shape: (10000, 172, 1, 768)  dtype=torch.float16  device=cuda:0
+[train]   TXC layer indices : {}
+[train]   SAE layer indices : {}
+[train]   T-SAE layer idxs  : {'tsae_l1_ln1_s2': 0}
+[train]   H8 layer idxs     : {}
+[train]   tsae_l1_ln1_s2: 2,361,600 params
+[train] step 500/4000 (43.3 it/s) | tsae_l1_ln1_s2=5.0394
+[train] step 1000/4000 (44.2 it/s) | tsae_l1_ln1_s2=3.9481
+[train] step 1500/4000 (44.4 it/s) | tsae_l1_ln1_s2=3.6344
+[train] step 2000/4000 (44.6 it/s) | tsae_l1_ln1_s2=3.4271
+[train] step 2500/4000 (44.6 it/s) | tsae_l1_ln1_s2=3.3180
+[train] step 3000/4000 (44.7 it/s) | tsae_l1_ln1_s2=3.1789
+[train] step 3500/4000 (44.7 it/s) | tsae_l1_ln1_s2=3.1236
+[train] step 4000/4000 (44.7 it/s) | tsae_l1_ln1_s2=3.0435
+[train] done in 89.4s
+[train] saved crosscoder_tsae_l1_ln1_s2.pt  final_loss=3.0435
+  tsae_l1_ln1_s2.train OK
+=== tsae_l1_ln1_s2.sweep ===
+[sweep] device=cuda
+[sweep] loading caches…
+[sweep]   seq_len=128 d_model=768 L=4
+[sweep] loading sleeper model…
+Loaded pretrained model roneneldan/TinyStories-Instruct-33M into HookedTransformer
+[sweep] computing baselines…
+[sweep]   base_clean_ce=0.7242  base_dep_logp=-11.3803
+
+[sweep] === tsae_l1_ln1_s2 ===
+[sweep]   ranked features in 1.7s  top_score=0.641
+[sweep]   stage-1 sweep over 100 features × 5 alphas
+[sweep]     20/100 features (0.6/s)
+[sweep]     40/100 features (0.6/s)
+[sweep]     60/100 features (0.6/s)
+[sweep]     80/100 features (0.6/s)
+[sweep]     100/100 features (0.6/s)
+[sweep]   stage-2 sampled-ASR on 10 features × 5 alphas
+[sweep]     stage-2 2/10 features (43.9s elapsed)
+[sweep]     stage-2 4/10 features (87.7s elapsed)
+[sweep]     stage-2 6/10 features (131.5s elapsed)
+[sweep]     stage-2 8/10 features (175.2s elapsed)
+[sweep]     stage-2 10/10 features (218.9s elapsed)
+[sweep]   chosen: f=9 α=2.0 val_asr=0.930 Δlogp=-0.136 ΔCE=+0.008
+[sweep]   running test eval…
+[sweep]   test: asr_16=0.860 (base 0.990) Δlogp=-0.145  ΔCE=+0.004
+
+[sweep] wrote test_results.json
+  tsae_l1_ln1_s2.sweep OK
+[seeded-lowdisk] === txc_l1_ln1_s2 (seed=2) ===
+=== txc_l1_ln1_s2.train ===
+[train] device=cuda
+[train] loading activation cache…
+[train]   train acts: N=10000 T=128 L=1 d_model=768
+[train]   hook_names (from cache): ['blocks.1.ln1.hook_normalized']
+[train]   padded shape: (10000, 172, 1, 768)  dtype=torch.float16  device=cuda:0
+[train]   TXC layer indices : {'txc_l1_ln1_s2': 0}
+[train]   SAE layer indices : {}
+[train]   T-SAE layer idxs  : {}
+[train]   H8 layer idxs     : {}
+[train]   txc_l1_ln1_s2: 70,803,456 params
+[train] step 500/4000 (11.1 it/s) | txc_l1_ln1_s2=123.3048
+[train] step 1000/4000 (11.1 it/s) | txc_l1_ln1_s2=118.7408
+[train] step 1500/4000 (11.1 it/s) | txc_l1_ln1_s2=113.1027
+[train] step 2000/4000 (11.1 it/s) | txc_l1_ln1_s2=112.9763
+[train] step 2500/4000 (11.1 it/s) | txc_l1_ln1_s2=110.6893
+[train] step 3000/4000 (11.1 it/s) | txc_l1_ln1_s2=108.9255
+[train] step 3500/4000 (11.1 it/s) | txc_l1_ln1_s2=107.2720
+[train] step 4000/4000 (11.1 it/s) | txc_l1_ln1_s2=107.1478
+[train] done in 360.8s
+[train] saved crosscoder_txc_l1_ln1_s2.pt  final_loss=107.1478
+  txc_l1_ln1_s2.train OK
+=== txc_l1_ln1_s2.sweep ===
+[sweep] device=cuda
+[sweep] loading caches…
+[sweep]   seq_len=128 d_model=768 L=4
+[sweep] loading sleeper model…
+Loaded pretrained model roneneldan/TinyStories-Instruct-33M into HookedTransformer
+[sweep] computing baselines…
+[sweep]   base_clean_ce=0.7242  base_dep_logp=-11.3803
+
+[sweep] === txc_l1_ln1_s2 ===
+[sweep]   ranked features in 6.0s  top_score=2.107
+[sweep]   stage-1 sweep over 100 features × 5 alphas
+[sweep]     20/100 features (0.5/s)
+[sweep]     40/100 features (0.5/s)
+[sweep]     60/100 features (0.5/s)
+[sweep]     80/100 features (0.5/s)
+[sweep]     100/100 features (0.5/s)
+[sweep]   stage-2 sampled-ASR on 10 features × 5 alphas
+[sweep]     stage-2 2/10 features (44.6s elapsed)
+[sweep]     stage-2 4/10 features (88.9s elapsed)
+[sweep]     stage-2 6/10 features (133.5s elapsed)
+[sweep]     stage-2 8/10 features (177.9s elapsed)
+[sweep]     stage-2 10/10 features (223.3s elapsed)
+[sweep]   chosen: f=21 α=1.5 val_asr=0.960 Δlogp=-0.330 ΔCE=+0.021
+[sweep]   running test eval…
+[sweep]   test: asr_16=0.950 (base 0.990) Δlogp=-0.344  ΔCE=+0.029
+
+[sweep] wrote test_results.json
+  txc_l1_ln1_s2.sweep OK
+[seeded-lowdisk] freeing l1_ln1 caches (~2 GB)
+=== SEED_AVERAGE_LOWDISK DONE ===

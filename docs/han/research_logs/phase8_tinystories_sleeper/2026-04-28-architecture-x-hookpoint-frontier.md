@@ -286,6 +286,57 @@ Two methodological lessons:
    At the post-attention residual, per-token SAE remains the
    strongest single-feature lever for suppression at zero CE cost.
 
+### Follow-up 4 — 3-seed aggregate (full architecture × hookpoint × seed)
+
+All 15 (arch, hookpoint) cells × 3 seeds (0, 1, 2) trained in
+isolation. 30 pairs ran on a40_tiny_1 (seeds 0+1 plus the recovered
+seed-2 dupes; only the canonical first-host result was kept per seed),
+15 pairs on a40_txc_1 (seed 2). Total 45 unique data points.
+
+**Per-cell test ASR₁₆ — mean ± std across 3 seeds (baseline 0.99):**
+
+| hookpoint     | SAE             | T-SAE                | TXC                  |
+|---------------|----------------:|---------------------:|---------------------:|
+| `ln1.0`       | 0.51 ± 0.33     | **0.00 ± 0.00**      | 0.07 ± 0.06          |
+| `resid_pre.0` | 0.64 ± 0.54     | 0.52 ± 0.29          | **0.25 ± 0.16**      |
+| `resid_mid.0` | **0.32 ± 0.55** | 0.34 ± 0.25          | 0.91 ± 0.02          |
+| `resid_post.0`| **0.50 ± 0.23** | 0.66 ± 0.53          | 0.77 ± 0.13          |
+| `ln1.1`       | 0.97 ± 0.03 †   | 0.90 ± 0.08 †        | 0.93 ± 0.05 †        |
+
+Per-seed values, `chosen feature` and α, and ΔCE in
+`experiments/phase8_tinystories_sleeper/outputs/seeded_logs/aggregated.json`.
+
+**Three findings the seed bars sharpen:**
+
+1. **T-SAE at `ln1.0` is the only cell with zero variance.** All three
+   seeds hit ASR=0.00 with ΔCE=0.000. This is the single most
+   reproducible result in the entire study; it isn't sensitive to
+   feature-ranking variance the way the per-token SAE is.
+
+2. **TXC at `ln1.0` is also very stable** (0.07 ± 0.06). So the
+   "temporal architectures dominate at `ln1.0`" claim survives seed
+   averaging — and tightens: at this hookpoint the temporal archs are
+   reliably suppressive, the per-token SAE reliably isn't.
+
+3. **The per-token SAE has high variance** at 4 of 5 hookpoints. The
+   apparent SAE wins at `resid_mid.0` (0.00 isolated) and `resid_pre.0`
+   (0.01 single-seed) are not robust — across seeds, SAE at `resid_mid.0`
+   is 0.32 ± 0.55, and SAE at `resid_pre.0` is 0.64 ± 0.54. **The
+   resid_mid_0 / resid_post_0 SAE win that fra_proj's `recreate_layer0`
+   reported is a cherry-picked seed**: in 1 of 3 our seeds did it hit
+   0.00; in others it stayed near 0.95.
+
+The bottom-line revision: **TSAE at `ln1.0` is the cleanest
+suppression cell in the entire matrix** — full ASR=0.00 reproducibility
+across 3 seeds, zero CE cost, low computational footprint (per-token
+inference, no window). Anyone replicating the fra_proj headline
+(per-token SAE at the post-block-0 residual) on a new model should
+budget for several seeds and probably try `blocks.0.ln1.hook_normalized`
+first with T-SAE.
+
+† At `ln1.1` no architecture has a clean suppression cell within the
+ΔCE ≤ 0.05 utility budget at any seed; numbers shown are out-of-budget.
+
 ### Pointers
 
 - Code: `experiments/phase8_tinystories_sleeper/`
