@@ -130,73 +130,112 @@ This is the same encode pattern the steering intervention uses at generation tim
 
 The picked feature's **decoder direction** `W_dec[picked_idx, :, :]` (a per-position decoder block of shape `(T, d_in)` for window archs, or just `(d_in,)` for per-token archs) is what the intervention in Step 4 will activate.
 
-### Step 3 — Diagnose feature magnitudes (the `⟨|z|⟩` per arch)
+### Step 3 — Steering, the basic idea
 
-**Code**: `experiments/phase7_unification/case_studies/steering/diagnose_z_magnitudes.py`.
+The picked SAE feature is a learned **direction in residual-stream space** — the unit-norm vector `W_dec[picked_idx]`. The model uses this direction (during normal forward passes) to write the "this output is medical-flavoured" / "this output is poetic" / etc. signal into its residual stream.
 
-**Why we need this**: paper-clamp's strength schedule clamps the latent's activation to a fixed absolute number (e.g. 100). But "100" means very different things to a per-token SAE (`⟨|z|⟩ ≈ 10` so 100 = 10× typical) vs a window TXC at k_pos=100 (`⟨|z|⟩ ≈ 30` so 100 ≈ 3× typical) vs a MLC layer-fusion arch (`⟨|z|⟩ ≈ 159`, so 100 is *under* typical). Without normalisation, the strength schedule has implicit per-token bias.
+**Steering = forcefully writing more of that direction into the residual at inference time** so the model's downstream layers act as if the concept is strongly present, even when the prompt is neutral.
 
-**Procedure**:
-1. Forward 30 concepts × 5 sentences = 150 sentences through Gemma at L12.
-2. For each (sentence, content position), encode with the SAE and read `z[picked_feature]` for the corresponding concept's picked feature.
-3. Pool over (concept, position) and compute statistics: `<|z|>` (mean of absolutes), p90, p99, abs_max, also per-concept distributions.
+The simplest implementation would be additive: `residual[t] += strength × W_dec[picked_idx]`. The protocol used here is slightly more careful — **paper-clamp**:
 
-**Output**: `results/case_studies/diagnostics_kpos20/z_orig_magnitudes.json`, keyed by `arch_id`. Each entry has a `pooled` block (overall) and a `per_concept` block.
+1. At the SAE hook layer (L12), encode the live residual through the SAE → latents `z`.
+2. Take a copy `z_clamped = z`. **Set the picked feature to a fixed strength**: `z_clamped[picked_idx] = s_abs`.
+3. Decode both `z` and `z_clamped`. The difference `decode(z_clamped) - decode(z)` is the residual perturbation that "flips this one feature from its natural value to s_abs".
+4. Add that delta to the residual.
+5. Continue forward through the rest of the model. Sample the next token.
 
-**Multi-agent caveat**: the script writes the file via `write_text(json.dumps(summaries))` — it overwrites prior contents. Y's pipeline and W's pipeline both write to the same path, so each agent's run clobbered the other's entry until we patched `run_perposition.sh` to verify the entry exists before invoking intervene, plus manual merging post-clobber. See `feedback_zmag_clobber.md` memory note.
+Why clamp to a fixed value rather than adding `s × W_dec[picked_idx]` directly? Because clamping isolates *only* the picked feature's contribution: the SAE's other features are left at their natural values, so the intervention doesn't pile additive noise on top of an already-active feature. If the prompt is concept-relevant, `s_abs` is the *new* activation; if irrelevant, the SAE has the picked feature near zero and `s_abs` activates it from scratch.
 
-### Step 4 — Intervene during generation (paper-clamp at family-normalised strengths)
+**The strength `s_abs` matters a lot, and it's set per-arch.** Different SAE architectures have wildly different natural firing scales for the same picked feature. Per-token T-SAE k=20 has `⟨|z|⟩ ≈ 10`; a window TXC at k_pos=100 has `⟨|z|⟩ ≈ 30`; a multi-layer crosscoder has `⟨|z|⟩ ≈ 159`. Clamping to "100" means 10× natural for one arch and 0.6× natural for another — completely different intervention regimes.
 
-This is the steering action itself.
+So we measure each arch's natural firing magnitude (Step 3a below) and apply a **family-normalised** strength: `s_abs = s_norm × ⟨|z|⟩_arch`, with `s_norm` swept over `{0.5, 1, 2, 5, 10, 20, 50}`. This way `s_norm=10` means "10× natural firing" for every arch — a fair comparison.
 
-**Code**:
-- Right-edge protocol: `experiments/phase7_unification/case_studies/steering/intervene_paper_clamp_normalised.py`.
-- Per-position protocol (Q2.C): `experiments/phase7_unification/case_studies/steering/intervene_paper_clamp_window_perposition.py`.
+#### Step 3a — Diagnose `⟨|z|⟩` per arch (the normalisation constant)
 
-**Strength schedule**: 7 normalised values `s_norm ∈ {0.5, 1, 2, 5, 10, 20, 50}` (log-spaced over 2 decades). Per arch, the absolute strength applied is:
+`experiments/phase7_unification/case_studies/steering/diagnose_z_magnitudes.py`. Forward 30 concepts × 5 example sentences = 150 sentences through Gemma → SAE encoder → read each picked feature's activation at content positions (one picked feature per concept) → pool and compute `mean(|z|)`. Output: `results/case_studies/diagnostics_kpos20/z_orig_magnitudes.json` keyed by arch_id.
 
-```
-s_abs = round(s_norm × <|z|>_arch, 1)
-```
+(Multi-agent caveat: the file is written via overwrite, so when both Y and W write to the same path, each agent's run clobbers the other's entry. We patched `run_perposition.sh` to verify before invoking intervene — see `feedback_zmag_clobber.md`.)
 
-So at `s_norm=10` and `<|z|>_arch = 25.2` (cell A `phase57_partB_h8_bare_multidistance_t5`), `s_abs ≈ 252`.
+### Step 4 — How steering differs between per-token and TXC
 
-For each `(concept, s_norm)` pair, generate one 60-token completion from the prompt `"We find"` (paper's neutral prompt). With 30 concepts × 7 strengths = 210 generations per arch.
+The per-token case is one position in, one position out. The TXC case is one *window* in, T positions out — and the protocol question is which of those T output positions get written back to the residual.
 
-#### Right-edge intervention loop (per generation step)
+#### Per-token SAE (T-SAE, TopKSAE)
 
 ```text
-prompt = "We find" + tokens_so_far
-forward through Gemma layers 0..11
-at L12 hook:
-  for each position p in the prefix where p ≥ T-1:
-    window = residual[p-T+1 : p+1, :]                # (T, d_in)
-    z = encoder(window) + b_enc                      # (d_sae,)
-    z = TopK(z, k=k_win)                             # only for sanity check; encoder already does this
-    z_clamped = z.clone()
-    z_clamped[picked_feat[concept]] = s_abs          # set picked feature to absolute strength
-    x_hat_orig = decoder(z) + b_dec                  # (T, d_in)  — the SAE's reconstruction
-    x_hat_new  = decoder(z_clamped) + b_dec          # (T, d_in)
-    delta = x_hat_new[T-1, :] - x_hat_orig[T-1, :]   # right-edge only — single d_in vector
-    residual[p, :] += delta                          # write the change back at position p
-forward through Gemma layers 13..25 with the modified residual
-sample next token (greedy in the implementation; could be top-p)
+for each generation step:
+  forward through Gemma layers 0..11 → residual at L12: shape (S, d_in)
+  for each position p in the prompt prefix:
+    z         = SAE.encode(residual[p, :])        # (d_sae,)
+    z_clamped = z.clone(); z_clamped[picked] = s_abs
+    delta     = SAE.decode(z_clamped) - SAE.decode(z)   # (d_in,)  ← single vector
+    residual[p, :] += delta
+  forward through Gemma layers 13..25 with modified residual
+  sample next token
 ```
 
-The crucial design choice: at the encoder, one window produces one latent (window-level encode); at the decoder, the latent produces a T-position reconstruction; at the residual write-back, **only the right-edge (t = T-1) reconstruction is written**. The earlier T-1 positions of the decoder output are discarded under right-edge.
+One position, one z, one (d_in,)-shaped delta. Clean.
 
-The reason for *clamping* (rather than additive steering): clamping to `s_abs` ensures the latent fires at a known-strong activation regardless of the prompt's natural tendency. If the prompt is concept-relevant, `s_abs > z_natural` pushes it harder; if irrelevant, `s_abs > 0` activates it from scratch. The "delta" written to the residual is the difference between the SAE's reconstruction with the latent clamped vs the SAE's reconstruction with the latent at its natural value — this isolates the latent's contribution rather than just adding noise.
+#### TXC (window encoder), two protocols
 
-#### Per-position intervention (Q2.C protocol)
+For a TXC at window length T, encoding "at position p" means feeding the T-token window `[p-T+1 .. p]` to the encoder, which produces one (d_sae,) latent for the window. Decoding returns `(T, d_in)` — a reconstruction for *all* T positions in the window, not just the latest one.
 
-Same encode + clamp logic, but the write-back uses *all T positions* of the decoder output instead of just the right edge. Stride-1 windows overlap, so each token position p in the prompt is covered by up to T windows (those ending at p, p+1, ..., p+T-1). Each contributing window writes its decoded delta at the position-within-window, and the final delta at position p is the *average* of those writes:
+So there's a choice: which of those T decoder-output positions do we use as the steering delta?
+
+**Right-edge protocol** (canonical, what most baseline numbers use):
+
+```text
+for each position p where p ≥ T-1:
+  window    = residual[p-T+1 : p+1, :]            # (T, d_in)
+  z         = TXC.encode(window)                  # (d_sae,)
+  z_clamped = z.clone(); z_clamped[picked] = s_abs
+  decoded_orig = TXC.decode(z)                    # (T, d_in)
+  decoded_new  = TXC.decode(z_clamped)            # (T, d_in)
+  delta_p   = (decoded_new - decoded_orig)[T-1, :]   # ← keep ONLY the right-edge slice
+  residual[p, :] += delta_p
+```
+
+The encoder integrates context from T tokens (the window), but the steering write only touches position p (the most recent). The earlier T-1 decoder-output slices are discarded. Roughly: "write the steered concept at the current position only."
+
+**Per-position protocol** (Q2.C):
 
 ```text
 for each position p:
-  contributing_windows = {windows w | p in w}
-  delta[p, :] = mean over w of (decode(z_clamped_w) - decode(z_w))[p_within_w, :]
-residual[p, :] += delta[p, :]
+  windows_covering_p = {windows w with p ∈ w}    # up to T such windows (stride-1)
+  for each w in windows_covering_p:
+    z         = TXC.encode(residual[w-T+1 : w+1, :])
+    z_clamped = z.clone(); z_clamped[picked] = s_abs
+    decoded_w_orig = TXC.decode(z)               # (T, d_in)
+    decoded_w_new  = TXC.decode(z_clamped)       # (T, d_in)
+    p_in_w = p - (w - T + 1)                     # position-within-window for p
+    delta_p_from_w = (decoded_w_new - decoded_w_orig)[p_in_w, :]
+  delta_p = mean over w of delta_p_from_w        # average across overlapping windows
+  residual[p, :] += delta_p
 ```
+
+Now position p gets a contribution from *every* window it sits inside (up to T windows for interior positions). Within each window, p sits at a different relative position, and the corresponding decoder-output slice is used. The final delta at p is the average across those windows.
+
+Roughly: "write the steered concept across the whole T-token span the encoder integrated."
+
+**Why per-position can help.** The encoder's window-level latent is a noisy estimate of "concept presence". Right-edge takes one snapshot of the resulting decoder reconstruction (the rightmost slice). Per-position averages T snapshots from T different overlapping windows — noise reduces, signal stays. Empirically: σ_seeds drops 2–5× (0.33 → 0.10 at T=5) and the constrained peak lifts +0.13 to +0.40 depending on T. (Y's data; cell C T=3 boost was +0.23.)
+
+**Why right-edge is the "canonical" choice.** Right-edge mirrors the way a per-token SAE would work — one position in, one delta out — so it makes the cross-arch comparison cleanest. Per-position is a TXC-specific protocol that has no analogue for per-token archs (T=1 collapses both protocols to the same write).
+
+The two protocols give different numbers because the model's downstream layers attend to *all* the prefix positions when computing the next token. Modifying T positions vs 1 position changes how strongly the steered concept influences attention's input.
+
+#### Per-arch strength schedule, repeated
+
+Both protocols use the same family-normalised strength sweep:
+
+```
+for s_norm in {0.5, 1, 2, 5, 10, 20, 50}:
+  s_abs = round(s_norm × ⟨|z|⟩_arch, 1)
+  for each of 30 concepts:
+    generate 60 tokens from prompt "We find" with the steering hook on
+    save (concept, s_norm, s_abs, generation)
+```
+
+That's 30 × 7 = 210 generations per arch per protocol per seed. Each goes to Sonnet 4.6 grading in Step 5.
 
 Why this can help: at sparse k_pos, the picked feature is partly polysemantic — it fires for the right concept at some positions and noisily at others within the window. Right-edge takes a single noisy snapshot; per-position averages over T snapshots, reducing noise. Y observed σ_seeds drops 2–5× under per-position (0.33 → 0.10 at T=5).
 
