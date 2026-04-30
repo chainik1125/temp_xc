@@ -16,9 +16,19 @@ tags:
 
 **Phase 2 axes (done)**: per-position write-back (Q2.C) on cells C and E. Multi-seed-pooled anchor σ_seeds = 0.80 (huge!) discovered — T-SAE k=20 itself isn't seed-stable under coh ≥ 1.5 because the coh-cliff position varies seed-to-seed. Pooled anchor = 0.70, win threshold = 0.97. Writeup: `2026-04-30-w-final-summary.md`.
 
-**Phase 3 TXC-native protocols (done)**: implemented + tested 4 new protocols (V1 local, V2 anchored, V3 dec-additive, V4 tiled) on 4 cells × up to 2 seeds. **V3 dec-additive** (just `s × W_dec[picked, :, :]` added at active T-window — no encode/clamp/decode round-trip) WINS on cell C T=3 multi-seed (mean 1.000, Δ=+0.30, σ=0.20). **V4 tiled** also wins (mean 1.017, Δ=+0.32, σ=0.97; highest single-seed peak in matrix at sd42=1.500). Brief: `brief_phase3_txc_native_steering.md`. Results: `2026-04-30-w-phase3-results.md`.
+**Phase 3 TXC-native protocols (done)**: implemented + tested 4 new protocols (V1 local, V2 anchored, V3 dec-additive, V4 tiled) on 4 cells × up to 2 seeds. **Aggregation matters**:
 
-**OBLITERATION verification (done)**: Y's `txc_h8_t2_kpos20_shifts2` cell at sd=1 + sd=2 trained + graded by W. 3-seed mean: right-edge 1.025 (Δ=+0.325 WIN), per-position 0.978 (Δ=+0.278 WIN). Y's "+0.30 mean-curve" claim earlier conflated single-seed anchor with multi-seed-curve cell — under consistent mean-curve aggregation, OBLITERATION per-position is **+0.23 vs T-SAE k=20's mean-curve anchor 1.167** = TIE band, just shy of strict +0.27 win.
+- **Under per-seed-then-mean** (which punishes the anchor for its seed-instability — anchor = 0.70): V3 dec-additive = 1.000 (Δ=+0.30, "WIN"), V4 tiled = 1.017 (Δ=+0.32, "WIN").
+- **Under mean-curve** (Y's standard reporting; anchor = 1.167): V3 = 1.000 (Δ=−0.17, TIE), V4 = 0.800 (Δ=−0.37, LOSS), V1 = 0.950, V2 = 1.000, right-edge = 0.783, per-position = 0.750. **None of W's Phase 3 protocols clear +0.27 on cell C T=3 under mean-curve.**
+
+So the "V3 / V4 WIN cell C T=3" framing in earlier W commits is per-seed-then-mean specific. Under mean-curve, nothing wins on cell C T=3. The Phase 3 finding is now **methodological**: V3's dec-additive simplification (no encode round-trip) achieves the same mean-curve number as V2 anchored (1.000 each) and beats canonical right-edge / per-position by ~+0.20, but doesn't cross the strict +0.27 threshold relative to the anchor. Brief: `brief_phase3_txc_native_steering.md`. Results: `2026-04-30-w-phase3-results.md` (older, not yet revised for this aggregation distinction).
+
+**OBLITERATION verification (done)**: Y's `txc_h8_t2_kpos20_shifts2` cell at sd=1 + sd=2 trained + graded by W. **OBLITERATION DOES survive mean-curve, BARELY**:
+- Mean-curve anchor 1.167; OBLITERATION per-position mean-curve = 1.400, Δ=+0.233 (TIE close to win, within ±0.27 by 0.04).
+- Per-seed-then-mean anchor 0.700; OBLITERATION per-position = 0.978, Δ=+0.278 (barely past +0.27 win).
+- Right-edge under either aggregation: TIE band (mean-curve +0.07, per-seed-then-mean +0.33).
+
+OBLITERATION is the only cell that consistently gets a positive Δ under both aggregation conventions; W's Phase 3 protocols on cell C T=3 only "win" under per-seed-then-mean and TIE/LOSS under mean-curve.
 
 ### Headline numbers (consistent mean-curve across seeds)
 
@@ -27,7 +37,8 @@ tags:
 | T-SAE k=20 (anchor) | 2 | 1.800 | 1.167 | (anchor) |
 | OBLITERATION right-edge (T=2 H8 shifts=2) | 3 | 1.356 | 1.236 | +0.069 |
 | **OBLITERATION per-position** (T=2 H8 shifts=2) | 3 | 1.422 | **1.400** | **+0.233** ⭐ (TIE close to win) |
-| W cell C T=3 V3 dec-additive | 2 | TBD | 1.000 (per-seed-then-mean) | tied at single-seed-anchor 1.10 |
+| W cell C T=3 V3 dec-additive | 2 | 1.183 (raw, but coh<1.5) | 1.000 (mean-curve) | −0.167 vs anchor 1.167 (TIE) |
+| W cell C T=3 V4 tiled | 2 | n/a | 0.800 (mean-curve) | −0.367 vs anchor (LOSS) |
 
 T-SAE k=20 still **wins on raw peak success** (1.80 vs OBLITERATION's 1.42). TXC OBLITERATION wins on **success-given-coherent-text** (1.40 vs 1.17) by +0.23 — TIE band under strict ±0.27 threshold, but a clean positive Δ on the brief's primary metric.
 
