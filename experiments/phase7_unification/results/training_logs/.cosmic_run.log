@@ -1,0 +1,236 @@
+=== COSMIC sequential growth chain at Thu Apr 30 20:18:16 UTC 2026 ===
+/workspace/temp_xc/experiments/phase7_unification/_train_utils.py:59: UserWarning: The given NumPy array is not writable, and PyTorch does not support non-writable tensors. This means writing to this tensor will result in undefined behavior. You may want to copy the array to protect its data or make it writable before converting it to a tensor. This type of warning will be suppressed for the rest of this program. (Triggered internally at /pytorch/torch/csrc/utils/tensor_numpy.cpp:206.)
+  return torch.from_numpy(sub).to(device)
+Phase 7 driver: /workspace/temp_xc/experiments/phase7_unification/case_studies/train_kpos20_grow.py
+  REPO:           /workspace/temp_xc
+  CACHE_DIR:      /workspace/temp_xc/data/cached_activations/gemma-2-2b/fineweb
+  PROBE_CACHE:    /workspace/temp_xc/experiments/phase7_unification/results/probe_cache
+  OUT_DIR:        /workspace/temp_xc/experiments/phase7_unification/results
+  INDEX_PATH:     /workspace/temp_xc/experiments/phase7_unification/results/training_index.jsonl
+  PROBING_PATH:   /workspace/temp_xc/experiments/phase7_unification/results/probing_results.jsonl
+  ANCHOR_LAYER:   L12 (0-indexed)
+  MLC_LAYERS:     (10, 11, 12, 13, 14)
+  SUBJECT_MODEL:  google/gemma-2-2b
+  HF_CKPT_REPO:   han1823123123/txcdr-base
+  HF_DATA_REPO:   han1823123123/txcdr-base-data
+
+=== Grow cell: txc_bare_antidead_t4_kpos20_grownChainFromT3 ===
+  warm-start from T=3 seed=42 → train T=4, k_pos=20, k_win=80, target seed=42
+  src ckpt: /workspace/temp_xc/experiments/phase7_unification/results/ckpts/txc_bare_antidead_t3_kpos20_grownFromT2sd42__seed42.pt
+  TrainCfg: batch=4096 lr=0.0003 max_steps=25000 plateau=0.02 min_steps=3000
+  preloading L12 anchor cache to GPU...
+    shape=(24000, 128, 2304) preload took 41.8s
+  warm-start: copy src T_src=3 positions, duplicate last src pos for new positions 3..3
+  warm-start done; model has T=4, k_win=80
+  [save] txc_bare_antidead_t4_kpos20_grownChainFromT3__seed42 → /workspace/temp_xc/experiments/phase7_unification/results/ckpts/txc_bare_antidead_t4_kpos20_grownChainFromT3__seed42.pt
+  trained in 29.0 min  final_step=3000  converged=True  plateau_last=0.010470764893132214
+
+=== txc_bare_antidead_t4_kpos20_grownChainFromT3 right-edge pipeline at Thu Apr 30 20:47:38 UTC 2026 ===
+
+════════════════════════════════════════════════════════════════
+  [1/4] select_features for txc_bare_antidead_t4_kpos20_grownChainFromT3 (seed=42; sel_subdir=steering)
+════════════════════════════════════════════════════════════════
+`torch_dtype` is deprecated! Use `dtype` instead!
+Phase 7 driver: /workspace/temp_xc/experiments/phase7_unification/case_studies/steering/select_features.py
+  REPO:           /workspace/temp_xc
+  CACHE_DIR:      /workspace/temp_xc/data/cached_activations/gemma-2-2b/fineweb
+  PROBE_CACHE:    /workspace/temp_xc/experiments/phase7_unification/results/probe_cache
+  OUT_DIR:        /workspace/temp_xc/experiments/phase7_unification/results
+  INDEX_PATH:     /workspace/temp_xc/experiments/phase7_unification/results/training_index.jsonl
+  PROBING_PATH:   /workspace/temp_xc/experiments/phase7_unification/results/probing_results.jsonl
+  ANCHOR_LAYER:   L12 (0-indexed)
+  MLC_LAYERS:     (10, 11, 12, 13, 14)
+  SUBJECT_MODEL:  google/gemma-2-2b
+  HF_CKPT_REPO:   han1823123123/txcdr-base
+  HF_DATA_REPO:   han1823123123/txcdr-base-data
+
+=== txc_bare_antidead_t4_kpos20_grownChainFromT3 seed=42 ===
+  loading subject model google/gemma-2-2b (bf16)...
+  forwarding 150 concept-sentences (30 concepts * 5 examples; L12 anchor) ...
+    capture done in 2.9s; acts (150, 64, 2304)
+  loading txc_bare_antidead_t4_kpos20_grownChainFromT3 ckpt...
+  encoding via TXCBareAntidead (T=4, d_sae=18432)...
+  saved /workspace/temp_xc/experiments/phase7_unification/results/case_studies/steering/txc_bare_antidead_t4_kpos20_grownChainFromT3/feature_selection.json + concept_activations.npz
+  per-concept best feature (ranked by lift = act - baseline):
+    harmful_content          -> feat   8716 lift=+19.617  act= 20.300  base=  0.683
+    deception                -> feat   3207 lift=+16.886  act= 17.490  base=  0.604
+    refusal_pattern          -> feat  14707 lift=+13.506  act= 14.795  base=  1.290
+    helpfulness_marker       -> feat  12234 lift=+15.159  act= 21.958  base=  6.799
+    jailbreak_pattern        -> feat   6905 lift= +8.822  act= 20.399  base= 11.577
+    medical                  -> feat   6587 lift=+13.246  act= 13.755  base=  0.509
+    legal                    -> feat   6905 lift=+15.700  act= 27.276  base= 11.577
+    mathematical             -> feat   4172 lift=+20.561  act= 22.085  base=  1.524
+    programming              -> feat   6134 lift=+19.670  act= 20.935  base=  1.265
+    scientific               -> feat  10899 lift=+11.672  act= 12.379  base=  0.707
+    literary                 -> feat   3962 lift=+14.955  act= 22.694  base=  7.739
+    religious                -> feat  18017 lift= +9.651  act= 10.065  base=  0.414
+    financial                -> feat  11606 lift= +9.052  act=  9.364  base=  0.312
+    historical               -> feat  10181 lift=+14.438  act= 20.566  base=  6.128
+    geographical             -> feat  16047 lift=+26.164  act= 27.094  base=  0.929
+    formal_register          -> feat  12234 lift= +9.117  act= 15.916  base=  6.799
+    casual_register          -> feat   3962 lift= +8.604  act= 16.343  base=  7.739
+    instructional            -> feat  10004 lift= +9.648  act= 10.104  base=  0.456
+    narrative                -> feat  16780 lift=+11.746  act= 12.843  base=  1.097
+    dialogue                 -> feat    767 lift=+11.561  act= 12.161  base=  0.600
+    poetic                   -> feat   4145 lift=+19.575  act= 22.110  base=  2.535
+    technical_jargon         -> feat   6905 lift=+14.171  act= 25.748  base= 11.577
+    positive_emotion         -> feat  12234 lift=+10.712  act= 17.511  base=  6.799
+    negative_emotion         -> feat   5783 lift= +8.126  act=  8.574  base=  0.447
+    neutral_factual          -> feat   6905 lift=+11.427  act= 23.004  base= 11.577
+    question_form            -> feat  14458 lift=+16.588  act= 49.686  base= 33.099
+    imperative_form          -> feat   5570 lift= +6.263  act= 10.952  base=  4.689
+    code_context             -> feat  15937 lift= +8.614  act=  8.911  base=  0.297
+    list_format              -> feat   3962 lift=+11.692  act= 19.431  base=  7.739
+    citation_pattern         -> feat  13794 lift=+14.841  act= 15.353  base=  0.512
+
+════════════════════════════════════════════════════════════════
+  [2/4] diagnose_z_magnitudes for txc_bare_antidead_t4_kpos20_grownChainFromT3 (seed=42)
+════════════════════════════════════════════════════════════════
+`torch_dtype` is deprecated! Use `dtype` instead!
+Phase 7 driver: /workspace/temp_xc/experiments/phase7_unification/case_studies/steering/diagnose_z_magnitudes.py
+  REPO:           /workspace/temp_xc
+  CACHE_DIR:      /workspace/temp_xc/data/cached_activations/gemma-2-2b/fineweb
+  PROBE_CACHE:    /workspace/temp_xc/experiments/phase7_unification/results/probe_cache
+  OUT_DIR:        /workspace/temp_xc/experiments/phase7_unification/results
+  INDEX_PATH:     /workspace/temp_xc/experiments/phase7_unification/results/training_index.jsonl
+  PROBING_PATH:   /workspace/temp_xc/experiments/phase7_unification/results/probing_results.jsonl
+  ANCHOR_LAYER:   L12 (0-indexed)
+  MLC_LAYERS:     (10, 11, 12, 13, 14)
+  SUBJECT_MODEL:  google/gemma-2-2b
+  HF_CKPT_REPO:   han1823123123/txcdr-base
+  HF_DATA_REPO:   han1823123123/txcdr-base-data
+
+=== txc_bare_antidead_t4_kpos20_grownChainFromT3 seed=42 ===
+  arch=txc_bare_antidead_t4_kpos20_grownChainFromT3  src_class=TXCBareAntidead  is_mlc=False
+    forwarding 150 concept-sentences (L12 anchor) ...
+    capture done in 2.7s  hook=resid_post
+    loading txc_bare_antidead_t4_kpos20_grownChainFromT3 ckpt...
+    T=4
+
+  wrote /workspace/temp_xc/experiments/phase7_unification/results/case_studies/diagnostics_kpos20/z_orig_magnitudes.json
+  wrote /workspace/temp_xc/experiments/phase7_unification/results/case_studies/diagnostics_kpos20/z_orig_per_concept.npz
+
+arch                                       T      <|z|>        p90        p99        max
+txc_bare_antidead_t4_kpos20_grownChainFromT3   4     17.980     40.145     87.464    261.014
+
+════════════════════════════════════════════════════════════════
+  [3/4] intervene_paper_clamp_normalised for txc_bare_antidead_t4_kpos20_grownChainFromT3 (seed=42; gen_subdir=steering_paper_normalised)
+════════════════════════════════════════════════════════════════
+`torch_dtype` is deprecated! Use `dtype` instead!
+The following generation flags are not valid and may be ignored: ['cache_implementation']. Set `TRANSFORMERS_VERBOSITY=info` for more details.
+Phase 7 driver: /workspace/temp_xc/experiments/phase7_unification/case_studies/steering/intervene_paper_clamp_normalised.py
+  REPO:           /workspace/temp_xc
+  CACHE_DIR:      /workspace/temp_xc/data/cached_activations/gemma-2-2b/fineweb
+  PROBE_CACHE:    /workspace/temp_xc/experiments/phase7_unification/results/probe_cache
+  OUT_DIR:        /workspace/temp_xc/experiments/phase7_unification/results
+  INDEX_PATH:     /workspace/temp_xc/experiments/phase7_unification/results/training_index.jsonl
+  PROBING_PATH:   /workspace/temp_xc/experiments/phase7_unification/results/probing_results.jsonl
+  ANCHOR_LAYER:   L12 (0-indexed)
+  MLC_LAYERS:     (10, 11, 12, 13, 14)
+  SUBJECT_MODEL:  google/gemma-2-2b
+  HF_CKPT_REPO:   han1823123123/txcdr-base
+  HF_DATA_REPO:   han1823123123/txcdr-base-data
+
+=== txc_bare_antidead_t4_kpos20_grownChainFromT3 seed=42 (paper-clamp normalised) ===
+  txc_bare_antidead_t4_kpos20_grownChainFromT3: src_class=TXCBareAntidead  <|z|>=17.98  strengths=[9.0, 18.0, 36.0, 89.9, 179.8, 359.6, 899.0]
+  loading txc_bare_antidead_t4_kpos20_grownChainFromT3 ckpt...
+    arch family: WINDOW  T=4  (use_cache=False)
+  loading subject model google/gemma-2-2b (bf16)...
+  hook target: layer-output (resid_post)
+  generating: 30 concepts × 7 strengths (use_cache=False)
+    [5/30] 0.27 concept/s  ETA 93s
+    [10/30] 0.29 concept/s  ETA 69s
+    [15/30] 0.30 concept/s  ETA 50s
+    [20/30] 0.30 concept/s  ETA 33s
+    [25/30] 0.30 concept/s  ETA 16s
+    [30/30] 0.30 concept/s  ETA 0s
+  saved /workspace/temp_xc/experiments/phase7_unification/results/case_studies/steering_paper_normalised/txc_bare_antidead_t4_kpos20_grownChainFromT3/generations.jsonl
+
+════════════════════════════════════════════════════════════════
+  [4/4] grade_with_sonnet for txc_bare_antidead_t4_kpos20_grownChainFromT3 (--n-workers 1; subdir=steering_paper_normalised)
+════════════════════════════════════════════════════════════════
+Phase 7 driver: /workspace/temp_xc/experiments/phase7_unification/case_studies/steering/grade_with_sonnet.py
+  REPO:           /workspace/temp_xc
+  CACHE_DIR:      /workspace/temp_xc/data/cached_activations/gemma-2-2b/fineweb
+  PROBE_CACHE:    /workspace/temp_xc/experiments/phase7_unification/results/probe_cache
+  OUT_DIR:        /workspace/temp_xc/experiments/phase7_unification/results
+  INDEX_PATH:     /workspace/temp_xc/experiments/phase7_unification/results/training_index.jsonl
+  PROBING_PATH:   /workspace/temp_xc/experiments/phase7_unification/results/probing_results.jsonl
+  ANCHOR_LAYER:   L12 (0-indexed)
+  MLC_LAYERS:     (10, 11, 12, 13, 14)
+  SUBJECT_MODEL:  google/gemma-2-2b
+  HF_CKPT_REPO:   han1823123123/txcdr-base
+  HF_DATA_REPO:   han1823123123/txcdr-base-data
+
+=== txc_bare_antidead_t4_kpos20_grownChainFromT3 ===
+  210 generations to grade (420 Sonnet calls)
+    [30/210] 0.4 gen/s  ETA 407s
+    [60/210] 0.4 gen/s  ETA 340s
+    [90/210] 0.4 gen/s  ETA 276s
+    [120/210] 0.4 gen/s  ETA 210s
+    [150/210] 0.4 gen/s  ETA 141s
+    [180/210] 0.4 gen/s  ETA 70s
+    [210/210] 0.4 gen/s  ETA 0s
+  saved /workspace/temp_xc/experiments/phase7_unification/results/case_studies/steering_paper_normalised/txc_bare_antidead_t4_kpos20_grownChainFromT3/grades.jsonl  (0 errors)
+  arch mean: success=0.51  coherence=2.08  (over 210 valid grades)
+
+Pipeline complete. Outputs:
+  feature_selection: /workspace/temp_xc/experiments/phase7_unification/results/case_studies/steering/txc_bare_antidead_t4_kpos20_grownChainFromT3/feature_selection.json
+  z_magnitudes:      /workspace/temp_xc/experiments/phase7_unification/results/case_studies/diagnostics_kpos20/z_orig_magnitudes.json
+  generations:       /workspace/temp_xc/experiments/phase7_unification/results/case_studies/steering_paper_normalised/txc_bare_antidead_t4_kpos20_grownChainFromT3/generations.jsonl
+  grades:            /workspace/temp_xc/experiments/phase7_unification/results/case_studies/steering_paper_normalised/txc_bare_antidead_t4_kpos20_grownChainFromT3/grades.jsonl
+
+=== txc_bare_antidead_t4_kpos20_grownChainFromT3 per-position at Thu Apr 30 21:04:42 UTC 2026 ===
+`torch_dtype` is deprecated! Use `dtype` instead!
+The following generation flags are not valid and may be ignored: ['cache_implementation']. Set `TRANSFORMERS_VERBOSITY=info` for more details.
+Phase 7 driver: /workspace/temp_xc/experiments/phase7_unification/case_studies/steering/intervene_paper_clamp_window_perposition.py
+  REPO:           /workspace/temp_xc
+  CACHE_DIR:      /workspace/temp_xc/data/cached_activations/gemma-2-2b/fineweb
+  PROBE_CACHE:    /workspace/temp_xc/experiments/phase7_unification/results/probe_cache
+  OUT_DIR:        /workspace/temp_xc/experiments/phase7_unification/results
+  INDEX_PATH:     /workspace/temp_xc/experiments/phase7_unification/results/training_index.jsonl
+  PROBING_PATH:   /workspace/temp_xc/experiments/phase7_unification/results/probing_results.jsonl
+  ANCHOR_LAYER:   L12 (0-indexed)
+  MLC_LAYERS:     (10, 11, 12, 13, 14)
+  SUBJECT_MODEL:  google/gemma-2-2b
+  HF_CKPT_REPO:   han1823123123/txcdr-base
+  HF_DATA_REPO:   han1823123123/txcdr-base-data
+
+=== txc_bare_antidead_t4_kpos20_grownChainFromT3 seed=42 (per-position window clamp) ===
+  txc_bare_antidead_t4_kpos20_grownChainFromT3: src_class=TXCBareAntidead  strengths=[9.0, 18.0, 36.0, 89.9, 179.8, 359.6, 899.0]
+  generating: 30 concepts × 7 strengths (per-position write, T=4)
+    [5/30] 0.27 concept/s  ETA 94s
+    [10/30] 0.29 concept/s  ETA 70s
+    [15/30] 0.29 concept/s  ETA 51s
+    [20/30] 0.30 concept/s  ETA 34s
+    [25/30] 0.30 concept/s  ETA 17s
+    [30/30] 0.30 concept/s  ETA 0s
+  saved /workspace/temp_xc/experiments/phase7_unification/results/case_studies/steering_paper_window_perposition/txc_bare_antidead_t4_kpos20_grownChainFromT3/generations.jsonl
+Phase 7 driver: /workspace/temp_xc/experiments/phase7_unification/case_studies/steering/grade_with_sonnet.py
+  REPO:           /workspace/temp_xc
+  CACHE_DIR:      /workspace/temp_xc/data/cached_activations/gemma-2-2b/fineweb
+  PROBE_CACHE:    /workspace/temp_xc/experiments/phase7_unification/results/probe_cache
+  OUT_DIR:        /workspace/temp_xc/experiments/phase7_unification/results
+  INDEX_PATH:     /workspace/temp_xc/experiments/phase7_unification/results/training_index.jsonl
+  PROBING_PATH:   /workspace/temp_xc/experiments/phase7_unification/results/probing_results.jsonl
+  ANCHOR_LAYER:   L12 (0-indexed)
+  MLC_LAYERS:     (10, 11, 12, 13, 14)
+  SUBJECT_MODEL:  google/gemma-2-2b
+  HF_CKPT_REPO:   han1823123123/txcdr-base
+  HF_DATA_REPO:   han1823123123/txcdr-base-data
+
+=== txc_bare_antidead_t4_kpos20_grownChainFromT3 ===
+  210 generations to grade (420 Sonnet calls)
+    [30/210] 0.5 gen/s  ETA 391s
+    [60/210] 0.4 gen/s  ETA 342s
+    [90/210] 0.4 gen/s  ETA 270s
+    [120/210] 0.4 gen/s  ETA 201s
+    [150/210] 0.4 gen/s  ETA 134s
+    [180/210] 0.4 gen/s  ETA 67s
+    [210/210] 0.5 gen/s  ETA 0s
+  saved /workspace/temp_xc/experiments/phase7_unification/results/case_studies/steering_paper_window_perposition/txc_bare_antidead_t4_kpos20_grownChainFromT3/grades.jsonl  (0 errors)
+  arch mean: success=0.55  coherence=2.13  (over 210 valid grades)
+
+=== T=5 grown-from-T=4-grown-chain at Thu Apr 30 21:16:57 UTC 2026 ===
+/workspace/temp_xc/experiments/phase7_unification/_train_utils.py:59: UserWarning: The given NumPy array is not writable, and PyTorch does not support non-writable tensors. This means writing to this tensor will result in undefined behavior. You may want to copy the array to protect its data or make it writable before converting it to a tensor. This type of warning will be suppressed for the rest of this program. (Triggered internally at /pytorch/torch/csrc/utils/tensor_numpy.cpp:206.)
+  return torch.from_numpy(sub).to(device)

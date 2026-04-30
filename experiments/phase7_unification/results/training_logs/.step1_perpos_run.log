@@ -1,0 +1,58 @@
+
+=== Step 1 grades landed at Wed Apr 29 23:54:18 UTC 2026 ===
+210 experiments/phase7_unification/results/case_studies/steering_paper_normalised/txc_bare_antidead_t2_kpos20/grades.jsonl
+
+=== Launching Step 1 per-position at Wed Apr 29 23:54:18 UTC 2026 ===
+`torch_dtype` is deprecated! Use `dtype` instead!
+The following generation flags are not valid and may be ignored: ['cache_implementation']. Set `TRANSFORMERS_VERBOSITY=info` for more details.
+Phase 7 driver: /workspace/temp_xc/experiments/phase7_unification/case_studies/steering/intervene_paper_clamp_window_perposition.py
+  REPO:           /workspace/temp_xc
+  CACHE_DIR:      /workspace/temp_xc/data/cached_activations/gemma-2-2b/fineweb
+  PROBE_CACHE:    /workspace/temp_xc/experiments/phase7_unification/results/probe_cache
+  OUT_DIR:        /workspace/temp_xc/experiments/phase7_unification/results
+  INDEX_PATH:     /workspace/temp_xc/experiments/phase7_unification/results/training_index.jsonl
+  PROBING_PATH:   /workspace/temp_xc/experiments/phase7_unification/results/probing_results.jsonl
+  ANCHOR_LAYER:   L12 (0-indexed)
+  MLC_LAYERS:     (10, 11, 12, 13, 14)
+  SUBJECT_MODEL:  google/gemma-2-2b
+  HF_CKPT_REPO:   han1823123123/txcdr-base
+  HF_DATA_REPO:   han1823123123/txcdr-base-data
+
+=== txc_bare_antidead_t2_kpos20 seed=42 (per-position window clamp) ===
+  txc_bare_antidead_t2_kpos20: src_class=TXCBareAntidead  strengths=[6.0, 11.9, 23.9, 59.6, 119.3, 238.5, 596.3]
+  generating: 30 concepts × 7 strengths (per-position write, T=2)
+    [5/30] 0.28 concept/s  ETA 88s
+    [10/30] 0.32 concept/s  ETA 63s
+    [15/30] 0.33 concept/s  ETA 46s
+    [20/30] 0.33 concept/s  ETA 30s
+    [25/30] 0.34 concept/s  ETA 15s
+    [30/30] 0.32 concept/s  ETA 0s
+  saved /workspace/temp_xc/experiments/phase7_unification/results/case_studies/steering_paper_window_perposition/txc_bare_antidead_t2_kpos20/generations.jsonl
+
+=== Step 1 per-position grading at Wed Apr 29 23:58:03 UTC 2026 ===
+Phase 7 driver: /workspace/temp_xc/experiments/phase7_unification/case_studies/steering/grade_with_sonnet.py
+  REPO:           /workspace/temp_xc
+  CACHE_DIR:      /workspace/temp_xc/data/cached_activations/gemma-2-2b/fineweb
+  PROBE_CACHE:    /workspace/temp_xc/experiments/phase7_unification/results/probe_cache
+  OUT_DIR:        /workspace/temp_xc/experiments/phase7_unification/results
+  INDEX_PATH:     /workspace/temp_xc/experiments/phase7_unification/results/training_index.jsonl
+  PROBING_PATH:   /workspace/temp_xc/experiments/phase7_unification/results/probing_results.jsonl
+  ANCHOR_LAYER:   L12 (0-indexed)
+  MLC_LAYERS:     (10, 11, 12, 13, 14)
+  SUBJECT_MODEL:  google/gemma-2-2b
+  HF_CKPT_REPO:   han1823123123/txcdr-base
+  HF_DATA_REPO:   han1823123123/txcdr-base-data
+
+=== txc_bare_antidead_t2_kpos20 ===
+  210 generations to grade (420 Sonnet calls)
+    [30/210] 0.5 gen/s  ETA 388s
+    [60/210] 0.5 gen/s  ETA 322s
+    [90/210] 0.5 gen/s  ETA 266s
+    [120/210] 0.5 gen/s  ETA 199s
+    [150/210] 0.5 gen/s  ETA 132s
+    [180/210] 0.5 gen/s  ETA 65s
+    [210/210] 0.5 gen/s  ETA 0s
+  saved /workspace/temp_xc/experiments/phase7_unification/results/case_studies/steering_paper_window_perposition/txc_bare_antidead_t2_kpos20/grades.jsonl  (0 errors)
+  arch mean: success=0.65  coherence=1.99  (over 210 valid grades)
+
+=== Step 1 + per-position done at Thu Apr 30 00:05:49 UTC 2026 ===
