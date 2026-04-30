@@ -69,7 +69,18 @@ fi
 echo "=== [1/5] System packages (as root) ==="
 export DEBIAN_FRONTEND=noninteractive
 apt-get update >/dev/null
-apt-get install -y curl ca-certificates gnupg tmux vim nano less git >/dev/null
+# `locales` provides en_US.UTF-8 so claude code's box-drawing + emoji
+# characters render. `fonts-noto-color-emoji` covers the emoji glyphs
+# claude code uses for status icons. Both are required for the symbols
+# to show up as anything other than �.
+apt-get install -y curl ca-certificates gnupg tmux vim nano less git \
+    locales fonts-noto-color-emoji >/dev/null
+
+# Generate the en_US.UTF-8 locale and set it as default. RunPod minimal
+# images often ship with only the C locale, which makes claude code's
+# borders render as `?` and emoji as boxes.
+locale-gen en_US.UTF-8 >/dev/null 2>&1 || true
+update-locale LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 >/dev/null 2>&1 || true
 
 if ! command -v node >/dev/null 2>&1; then
     echo "  installing Node.js 22 from NodeSource..."
@@ -132,9 +143,36 @@ su - "${USER_NAME}" <<'EOF'
 set -euo pipefail
 mkdir -p "$HOME/.npm-global"
 npm config set prefix "$HOME/.npm-global"
-grep -qF '.npm-global/bin' "$HOME/.bashrc" 2>/dev/null \
-    || echo 'export PATH=$HOME/.npm-global/bin:$PATH' >> "$HOME/.bashrc"
+
+# Add npm global bin + UTF-8 locale + TERM to .bashrc so every fresh
+# shell (including tmux panes) has the right env for claude code's
+# box-drawing characters and emoji to render.
+add_to_bashrc() {
+    grep -qF "$1" "$HOME/.bashrc" 2>/dev/null || echo "$1" >> "$HOME/.bashrc"
+}
+add_to_bashrc 'export PATH=$HOME/.npm-global/bin:$PATH'
+add_to_bashrc 'export LANG=en_US.UTF-8'
+add_to_bashrc 'export LC_ALL=en_US.UTF-8'
+# TERM=xterm-256color makes claude code's status-bar colors show up.
+# RunPod's default tmux/SSH session sometimes exports only `screen` or
+# `xterm`, which strips the 256-color palette claude code uses.
+add_to_bashrc 'export TERM=xterm-256color'
+
+# Tmux config: force UTF-8, 256-color, and a reasonable history limit.
+# Without this, tmux strips claude code's box-drawing chars even when
+# the underlying terminal renders them fine.
+cat > "$HOME/.tmux.conf" <<'TMUX'
+set -g default-terminal "tmux-256color"
+set -ga terminal-overrides ",xterm-256color:Tc"
+set -g history-limit 50000
+set -g mouse on
+TMUX
+
 export PATH="$HOME/.npm-global/bin:$PATH"
+export LANG=en_US.UTF-8
+export LC_ALL=en_US.UTF-8
+export TERM=xterm-256color
+
 if ! command -v claude >/dev/null 2>&1; then
     npm install -g @anthropic-ai/claude-code >/dev/null 2>&1
 fi

@@ -130,40 +130,75 @@ def _generate(model, tok, prompts: list[str], max_new_tokens: int, batch_size: i
         tok.padding_side = saved_side
 
 
-def _build_sources(cfg: dict) -> list[dict]:
-    """Return list of {tag, vector, hookpoint, arch, feature_id, mode} entries.
+def _cell_features_path(cell, paths) -> Path:
+    """Path to mined features for a Cell (paper-budget naming)."""
+    return Path(paths["features_dir"]) / f"{cell.id}.npz"
 
-    Includes:
-      - DoM baselines (base, reasoning) at the Ward layer — Stage A vectors.
-      - For each (arch in cfg.txc.arch_list) × (enabled hookpoint) with a
-        features file: top-K features × {pos0, union}.
+
+def _build_sources(cfg: dict, only_cell=None, include_dom: bool = True) -> list[dict]:
+    """Return list of source entries for B1.
+
+    Behavior:
+      - If `only_cell` is a Cell instance, build sources only for that cell
+        (paper-budget filenames). Used by hill-climb's per-cell evaluator.
+      - Otherwise, sweep cfg.txc.arch_list × enabled hookpoints (sprint
+        filenames). Used by the Phase 1 sweep orchestrator.
+      - DoM baselines included when include_dom=True (default).
     """
     paths = cfg["paths"]; mining = cfg["mining"]
     sources: list[dict] = []
 
-    # Stage A DoM vectors as baselines.
-    dom_path = Path(paths["stageA_dom"])
-    if dom_path.exists():
-        dom = torch.load(dom_path, weights_only=False)
-        sources.append({
-            "tag": "dom_base_union", "vector": dom["base"]["union"].clone(),
-            "hookpoint": "resid_L10", "arch": "dom", "feature_id": -1, "mode": "dom",
-        })
-        sources.append({
-            "tag": "dom_reasoning_union", "vector": dom["reasoning"]["union"].clone(),
-            "hookpoint": "resid_L10", "arch": "dom", "feature_id": -1, "mode": "dom",
-        })
-    else:
-        log.warning("[warn] %s missing — skipping DoM baselines", dom_path)
+    if include_dom:
+        dom_path = Path(paths["stageA_dom"])
+        if dom_path.exists():
+            dom = torch.load(dom_path, weights_only=False)
+            sources.append({
+                "tag": "dom_base_union", "vector": dom["base"]["union"].clone(),
+                "hookpoint": "resid_L10", "arch": "dom", "feature_id": -1, "mode": "dom",
+            })
+            sources.append({
+                "tag": "dom_reasoning_union", "vector": dom["reasoning"]["union"].clone(),
+                "hookpoint": "resid_L10", "arch": "dom", "feature_id": -1, "mode": "dom",
+            })
+        else:
+            log.warning("[warn] %s missing — skipping DoM baselines", dom_path)
 
-    feat_dir = Path(paths["features_dir"])
     K_steer = int(mining["top_k_for_steering"])
+    feat_dir = Path(paths["features_dir"])
+
+    if only_cell is not None:
+        from experiments.ward_backtracking_txc.cell_id import source_tag
+        fpath = _cell_features_path(only_cell, paths)
+        if not fpath.exists():
+            log.error("[fatal] features %s missing for cell %s", fpath, only_cell.id)
+            return sources
+        z = np.load(fpath, allow_pickle=True)
+        top = z["top_features"][:K_steer].tolist()
+        dec_pos0 = z["decoder_at_pos0"][:K_steer]
+        dec_union = z["decoder_union"][:K_steer]
+        for i, fid in enumerate(top):
+            sources.append({
+                "tag": source_tag(only_cell, int(fid), "pos0"),
+                "vector": torch.from_numpy(dec_pos0[i]).float(),
+                "hookpoint": only_cell.hookpoint_key, "arch": only_cell.arch,
+                "feature_id": int(fid), "mode": "pos0",
+            })
+            if only_cell.arch in ("topk_sae", "tsae"):
+                continue
+            sources.append({
+                "tag": source_tag(only_cell, int(fid), "union"),
+                "vector": torch.from_numpy(dec_union[i]).float(),
+                "hookpoint": only_cell.hookpoint_key, "arch": only_cell.arch,
+                "feature_id": int(fid), "mode": "union",
+            })
+        return sources
+
+    # Sprint sweep path: legacy filenames per arch.
     arch_list = cfg["txc"].get("arch_list", ["txc"])
     for arch in arch_list:
         for hp in cfg["hookpoints"]:
             if not hp.get("enabled", True):
                 continue
-            # txc keeps legacy filename (no arch prefix); others get one.
             fpath = feat_dir / (
                 f"{hp['key']}.npz" if arch == "txc" else f"{arch}_{hp['key']}.npz"
             )
@@ -181,8 +216,6 @@ def _build_sources(cfg: dict) -> list[dict]:
                     "hookpoint": hp["key"], "arch": arch,
                     "feature_id": int(fid), "mode": "pos0",
                 })
-                # For arches with no T axis (topk_sae, tsae) pos0==union;
-                # skip the duplicate union source to keep the budget honest.
                 if arch in ("topk_sae", "tsae"):
                     continue
                 sources.append({
@@ -221,18 +254,36 @@ def main(argv=None):
     p.add_argument("--out-suffix", type=str, default="",
                    help="appended to the output JSON filename so parallel shard "
                         "runs do not stomp each other (e.g. '__shard0of2').")
+    p.add_argument("--cell", type=str, default=None,
+                   help="evaluate ONLY the sources for this cell (paper-budget "
+                        "filename + source-tag scheme). Output goes to "
+                        "<b1_dir>/b1__<cell_id>.json regardless of --out-suffix. "
+                        "Used by hill_climb.py to evaluate one cell at a time.")
+    p.add_argument("--no-dom", action="store_true",
+                   help="skip DoM baseline sources. Use when DoM has already "
+                        "been evaluated in a prior B1 run for the same prompt set.")
     args = p.parse_args(argv)
 
     cfg = yaml.safe_load(args.config.read_text())
     paths = cfg["paths"]
-    out_path = Path(paths["steering"])
-    if args.out_suffix:
-        out_path = out_path.with_name(out_path.stem + args.out_suffix + out_path.suffix)
-    out_path.parent.mkdir(parents=True, exist_ok=True)
+
+    only_cell = None
+    if args.cell is not None:
+        from experiments.ward_backtracking_txc.cell_id import Cell
+        only_cell = Cell.from_id(args.cell)
+        # Per-cell B1 output: <root>/steering_per_cell/b1__<cell_id>.json
+        per_cell_dir = Path(paths["root"]) / "steering_per_cell"
+        per_cell_dir.mkdir(parents=True, exist_ok=True)
+        out_path = per_cell_dir / f"b1__{only_cell.id}.json"
+    else:
+        out_path = Path(paths["steering"])
+        if args.out_suffix:
+            out_path = out_path.with_name(out_path.stem + args.out_suffix + out_path.suffix)
+        out_path.parent.mkdir(parents=True, exist_ok=True)
     if out_path.exists() and not args.force:
         log.info("[resume] %s exists", out_path); return 0
 
-    sources = _build_sources(cfg)
+    sources = _build_sources(cfg, only_cell=only_cell, include_dom=(not args.no_dom))
     if args.max_sources is not None:
         # Always keep DoM baselines.
         dom_src = [s for s in sources if s["mode"] == "dom"]

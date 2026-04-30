@@ -73,21 +73,40 @@ class _ActivationLoader:
         return self.data[chain_exp, pos_idx].to(torch.float32)  # (B, T, d) fp32 for stable training
 
 
-def _ckpt_filename(arch: str, hookpoint_key: str) -> str:
-    """Backwards-compat filename: TXC keeps the old `txc_<key>.pt` name."""
-    if arch == "txc":
-        return f"txc_{hookpoint_key}.pt"
-    return f"{arch}_{hookpoint_key}.pt"
+def _ckpt_filename(arch: str, hookpoint_key: str, k_per_position: int | None = None,
+                   seed: int | None = None) -> str:
+    """Filename for a checkpoint.
+
+    Back-compat: if k_per_position and seed are None we use the legacy
+    sprint-era naming (`txc_<key>.pt` or `<arch>_<key>.pt`). Paper-budget
+    runs always pass both (via Cell.id) and get unambiguous filenames.
+    """
+    if k_per_position is None and seed is None:
+        if arch == "txc":
+            return f"txc_{hookpoint_key}.pt"
+        return f"{arch}_{hookpoint_key}.pt"
+    return f"{arch}__{hookpoint_key}__k{k_per_position}__s{seed}.pt"
 
 
-def _log_filename(arch: str, hookpoint_key: str) -> str:
-    if arch == "txc":
-        return f"{hookpoint_key}_train.jsonl"
-    return f"{arch}_{hookpoint_key}_train.jsonl"
+def _log_filename(arch: str, hookpoint_key: str, k_per_position: int | None = None,
+                  seed: int | None = None) -> str:
+    if k_per_position is None and seed is None:
+        if arch == "txc":
+            return f"{hookpoint_key}_train.jsonl"
+        return f"{arch}_{hookpoint_key}_train.jsonl"
+    return f"{arch}__{hookpoint_key}__k{k_per_position}__s{seed}__train.jsonl"
 
 
-def _train_one(arch: str, hookpoint: dict, cfg: dict) -> dict:
-    """Train one (arch, hookpoint) cell. Skips silently if checkpoint exists."""
+def _train_one(arch: str, hookpoint: dict, cfg: dict,
+               *, k_per_position_override: int | None = None,
+               seed_override: int | None = None,
+               cell_naming: bool = False) -> dict:
+    """Train one cell. Skips silently if checkpoint exists.
+
+    Paper-budget callers (evaluate_cell, hill_climb) pass k_per_position_override
+    and seed_override + cell_naming=True to produce unambiguous filenames.
+    Sprint-era callers leave both None and get the legacy sprint filenames.
+    """
     key = hookpoint["key"]
     paths = cfg["paths"]
     txc_cfg = cfg["txc"]
@@ -97,25 +116,31 @@ def _train_one(arch: str, hookpoint: dict, cfg: dict) -> dict:
         log.warning("[skip] %s/%s: no cached activations at %s", arch, key, acts_path)
         return {"arch": arch, "key": key, "skipped": True}
 
+    seed = seed_override if seed_override is not None else int(txc_cfg.get("seed", 42))
+    k_per_pos = (k_per_position_override if k_per_position_override is not None
+                 else int(txc_cfg["k_per_position"]))
+
     ckpt_dir = Path(paths["ckpt_dir"])
     ckpt_dir.mkdir(parents=True, exist_ok=True)
     logs_dir = Path(paths["logs_dir"])
     logs_dir.mkdir(parents=True, exist_ok=True)
-    ckpt_path = ckpt_dir / _ckpt_filename(arch, key)
-    log_path = logs_dir / _log_filename(arch, key)
+    if cell_naming:
+        ckpt_path = ckpt_dir / _ckpt_filename(arch, key, k_per_pos, seed)
+        log_path = logs_dir / _log_filename(arch, key, k_per_pos, seed)
+    else:
+        ckpt_path = ckpt_dir / _ckpt_filename(arch, key)
+        log_path = logs_dir / _log_filename(arch, key)
 
     if ckpt_path.exists():
         log.info("[skip] checkpoint %s exists — remove to retrain", ckpt_path)
         return {"arch": arch, "key": key, "skipped": True, "ckpt": str(ckpt_path)}
 
-    seed = int(txc_cfg.get("seed", 42))
     torch.manual_seed(seed)
     np.random.seed(seed)
 
     T = int(txc_cfg["T"])
     d_sae = int(txc_cfg["d_sae"])
     d_in = int(txc_cfg["d_model"])
-    k_per_pos = int(txc_cfg["k_per_position"])
 
     loader = _ActivationLoader(
         acts_path, T=T,
@@ -257,9 +282,30 @@ def main(argv=None):
                    help="train only this hookpoint key")
     p.add_argument("--arch", type=str, nargs="+", default=None,
                    help="restrict to these architectures (default: cfg.txc.arch_list)")
+    p.add_argument("--cell", type=str, default=None,
+                   help="train one specific cell, format <arch>__<hp>__k<k>__s<seed>. "
+                        "Overrides --only and --arch and uses paper-budget filenames.")
+    p.add_argument("--k-per-position", type=int, default=None,
+                   help="override k_per_position (paper-budget filename used)")
+    p.add_argument("--seed", type=int, default=None,
+                   help="override seed (paper-budget filename used)")
     args = p.parse_args(argv)
 
     cfg = yaml.safe_load(args.config.read_text())
+
+    if args.cell is not None:
+        from experiments.ward_backtracking_txc.cell_id import Cell
+        cell = Cell.from_id(args.cell)
+        all_hp = {hp["key"]: hp for hp in cfg["hookpoints"]}
+        if cell.hookpoint_key not in all_hp:
+            log.error("cell %s references unknown hookpoint %s", args.cell, cell.hookpoint_key)
+            return 1
+        log.info("=" * 70); log.info("[cell=%s]", cell.id)
+        _train_one(cell.arch, all_hp[cell.hookpoint_key], cfg,
+                   k_per_position_override=cell.k_per_position,
+                   seed_override=cell.seed, cell_naming=True)
+        return 0
+
     hookpoints = [hp for hp in cfg["hookpoints"] if hp.get("enabled", True)]
     if args.only:
         hookpoints = [hp for hp in hookpoints if hp["key"] == args.only]
@@ -269,11 +315,17 @@ def main(argv=None):
     arch_list = args.arch or cfg["txc"].get("arch_list", ["txc"])
     log.info("[arch_list] %s", arch_list)
 
+    cell_naming = (args.k_per_position is not None) or (args.seed is not None)
     summary = []
     for arch in arch_list:
         for hp in hookpoints:
             log.info("=" * 70); log.info("[arch=%s hookpoint=%s]", arch, hp["key"])
-            summary.append(_train_one(arch, hp, cfg))
+            summary.append(_train_one(
+                arch, hp, cfg,
+                k_per_position_override=args.k_per_position,
+                seed_override=args.seed,
+                cell_naming=cell_naming,
+            ))
     log.info("[done] %d (arch, hookpoint) cells trained", len(summary))
     return 0
 

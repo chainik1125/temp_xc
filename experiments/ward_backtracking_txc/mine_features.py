@@ -239,17 +239,24 @@ def _per_offset_preact(arch: str, model, X: np.ndarray, feat_idx: np.ndarray, ba
     return out
 
 
-def _process_one(arch: str, hp: dict, cfg: dict) -> None:
-    """Mine features for a single (arch, hookpoint) cell."""
+def _process_one(arch: str, hp: dict, cfg: dict,
+                 *, k_per_position: int | None = None,
+                 seed: int | None = None) -> None:
+    """Mine features for a single cell. With k_per_position+seed → paper-budget
+    filename; without → legacy sprint filename."""
     paths = cfg["paths"]
-    ckpt_filename = f"txc_{hp['key']}.pt" if arch == "txc" else f"{arch}_{hp['key']}.pt"
+    if k_per_position is not None and seed is not None:
+        ckpt_filename = f"{arch}__{hp['key']}__k{k_per_position}__s{seed}.pt"
+        out_filename = f"{arch}__{hp['key']}__k{k_per_position}__s{seed}.npz"
+    else:
+        ckpt_filename = f"txc_{hp['key']}.pt" if arch == "txc" else f"{arch}_{hp['key']}.pt"
+        out_filename = f"{hp['key']}.npz" if arch == "txc" else f"{arch}_{hp['key']}.npz"
     ckpt_path = Path(paths["ckpt_dir"]) / ckpt_filename
     if not ckpt_path.exists():
         log.warning("[skip] %s/%s: no ckpt at %s", arch, hp["key"], ckpt_path); return
 
     feat_dir = Path(paths["features_dir"])
     feat_dir.mkdir(parents=True, exist_ok=True)
-    out_filename = f"{hp['key']}.npz" if arch == "txc" else f"{arch}_{hp['key']}.npz"
     out_path = feat_dir / out_filename
     if out_path.exists():
         log.info("[skip] %s exists", out_path); return
@@ -327,9 +334,23 @@ def main(argv=None):
     p.add_argument("--only", type=str, default=None)
     p.add_argument("--arch", type=str, nargs="+", default=None,
                    help="restrict to these architectures (default: cfg.txc.arch_list)")
+    p.add_argument("--cell", type=str, default=None,
+                   help="mine one specific cell, format <arch>__<hp>__k<k>__s<seed>")
     args = p.parse_args(argv)
 
     cfg = yaml.safe_load(args.config.read_text())
+
+    if args.cell is not None:
+        from experiments.ward_backtracking_txc.cell_id import Cell
+        cell = Cell.from_id(args.cell)
+        all_hp = {hp["key"]: hp for hp in cfg["hookpoints"]}
+        if cell.hookpoint_key not in all_hp:
+            log.error("cell %s references unknown hookpoint %s", args.cell, cell.hookpoint_key)
+            return 1
+        _process_one(cell.arch, all_hp[cell.hookpoint_key], cfg,
+                     k_per_position=cell.k_per_position, seed=cell.seed)
+        return 0
+
     hookpoints = [hp for hp in cfg["hookpoints"] if hp.get("enabled", True)]
     if args.only:
         hookpoints = [hp for hp in hookpoints if hp["key"] == args.only]
