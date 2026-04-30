@@ -87,6 +87,11 @@ Phase 2 (hill-climb, 4–6h on 2× H100)
     hill_climb.py               iterate: enumerate neighbors → evaluate_cell × N → pick best
     evaluate_cell.py            single-cell pipeline: train + mine + B1-per-cell + metric
 
+Phase 2.5 (multi-seed verify, ~1h on 2× H100)
+    verify_seeds.py             train hill-climb winner at 2 additional seeds, compute σ.
+                                Single-seed numbers are not paper-grade; reviewers will
+                                ask. We always verify before declaring a winner.
+
 Phase 6 (plots, 2 min CPU)
     plot/*.py                   refresh all figures from final state
 ```

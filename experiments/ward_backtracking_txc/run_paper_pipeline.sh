@@ -44,6 +44,17 @@ python -m $ROOT.hill_climb --max-iter "${MAX_ITER:-4}" \
     --num-gpus "${NUM_GPUS}" \
     --improvement-threshold "${IMPROVEMENT_THRESHOLD:-0.05}"
 
+# ─── Phase 2.5: multi-seed verification of the hill-climb winner ────────────
+# Trains the winner cell at 2 additional seeds, computes σ across seeds.
+# Without this the headline number is single-seed and reviewers will
+# (correctly) ask whether the win is reproducible.
+echo
+echo "================================================================"
+echo "  PHASE 2.5 — multi-seed verification of hill-climb winner"
+echo "================================================================"
+python -m $ROOT.verify_seeds --num-gpus "${NUM_GPUS}" \
+    --seeds ${VERIFY_SEEDS:-1 2}
+
 # ─── Phase 1.6: merge per-cell B1 results into the canonical JSON ──────────
 # (so plot scripts see all sweep + hill-climb sources in one file)
 echo
