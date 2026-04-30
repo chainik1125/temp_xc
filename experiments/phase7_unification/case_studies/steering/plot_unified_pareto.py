@@ -259,6 +259,108 @@ def main():
     plt.close(fig)
     print(f"wrote {out}")
 
+    # ──────────────────── Per-position-only ranking (cleaner)
+    fig, ax = plt.subplots(figsize=(13, 7))
+    rows = [(label, proto, peak15, n, color) for (arch_id, proto), (s, succ, coh, n, label, color) in all_curves.items()
+            for valid in [[(ss, su, co) for ss, su, co in zip(s, succ, coh) if su is not None and co is not None]]
+            for valid_15 in [[v for v in valid if v[2] >= 1.5]]
+            for peak15 in [max(v[1] for v in valid_15) if valid_15 else 0.0]
+            if proto == "per-position" or arch_id == "tsae_paper_k20"]
+    rows.sort(key=lambda r: r[2], reverse=True)
+    labels = [f"{r[0]} (n={r[3]})" for r in rows]
+    peaks = [r[2] for r in rows]
+    colors = [r[4] for r in rows]
+    bars = ax.barh(range(len(rows)), peaks, color=colors, edgecolor="black", linewidth=0.8)
+    # Highlight WIN cell
+    for i, peak in enumerate(peaks):
+        if peak >= ANCHOR_15 + 0.27:
+            bars[i].set_edgecolor("gold")
+            bars[i].set_linewidth(3)
+    ax.set_yticks(range(len(rows)))
+    ax.set_yticklabels(labels, fontsize=9)
+    ax.set_xlabel("peak success at coh ≥ 1.5  (per-position protocol; T=1 anchor: RE=PP)", fontsize=10)
+    ax.axvline(ANCHOR_15, color="blue", linestyle="--", linewidth=1.2, label=f"T-SAE k=20 anchor ({ANCHOR_15})")
+    ax.axvline(ANCHOR_15 + 0.27, color="green", linestyle="--", linewidth=1.5, label=f"WIN threshold (+0.27 = {ANCHOR_15 + 0.27})")
+    ax.axvline(ANCHOR_15 - 0.27, color="red", linestyle="--", linewidth=1.2, label=f"LOSS threshold (-0.27)")
+    for i, (label, proto, peak, n, _) in enumerate(rows):
+        delta = peak - ANCHOR_15
+        ax.text(peak + 0.015, i, f"{peak:.3f} (Δ={delta:+.2f})", fontsize=8, va="center")
+    ax.set_title("Phase 7 Y+W matched-sparsity ranking — PER-POSITION protocol only\n"
+                 "(gold edge = WIN; T=2 H8 shifts=(T,) 3-seed mean OBLITERATES anchor by +0.30)")
+    ax.legend(loc="lower right", fontsize=9)
+    ax.invert_yaxis()
+    ax.set_xlim(0, max(peaks) * 1.2 + 0.1)
+    plt.tight_layout()
+    out = args.out_dir / "unified_ranking_per_position.png"
+    fig.savefig(out, dpi=150, bbox_inches="tight")
+    fig.savefig(args.out_dir / "unified_ranking_per_position.thumb.png", dpi=48, bbox_inches="tight")
+    plt.close(fig)
+    print(f"wrote {out}")
+
+    # ──────────────────── Sequential growth trajectory plot
+    fig, ax = plt.subplots(figsize=(10, 5))
+    # Build T → peak15 mapping from our cells
+    growth_chain = []  # (T, peak15, label, color)
+    for arch_id, label, color, _ in INVENTORY:
+        if arch_id in all_curves and (arch_id, "per-position") in all_curves:
+            s, succ, coh, n, _, _ = all_curves[(arch_id, "per-position")]
+            valid_15 = [(ss, su, co) for ss, su, co in zip(s, succ, coh) if su is not None and co is not None and co >= 1.5]
+            if valid_15:
+                peak15 = max(v[1] for v in valid_15)
+                growth_chain.append((arch_id, peak15, label, color))
+
+    # Group by family
+    families = {
+        "Sequential growth chain": [
+            ("txc_bare_antidead_t2_kpos20",                    2),
+            ("txc_bare_antidead_t3_kpos20_grownFromT2sd42",    3),
+            ("txc_bare_antidead_t4_kpos20_grownChainFromT3",   4),
+            ("txc_bare_antidead_t5_kpos20_grownChainFromT4",   5),
+        ],
+        "Bare random-init": [
+            ("txc_bare_antidead_t2_kpos20", 2),
+            ("txc_bare_antidead_t3_kpos20", 3),
+            ("txc_bare_antidead_t5_kpos20", 5),
+        ],
+        "H8 multidist + shifts=(T,)": [
+            ("txc_h8_t2_kpos20_shifts2", 2),
+            ("txc_h8_t3_kpos20_shifts3", 3),
+            ("txc_h8_t5_kpos20_shifts5", 5),
+        ],
+    }
+    family_colors = {"Sequential growth chain": "indigo", "Bare random-init": "orange", "H8 multidist + shifts=(T,)": "red"}
+    for fam_name, cells in families.items():
+        xs, ys = [], []
+        for arch_id, T in cells:
+            if (arch_id, "per-position") in all_curves:
+                s, succ, coh, n, _, _ = all_curves[(arch_id, "per-position")]
+                valid_15 = [(ss, su, co) for ss, su, co in zip(s, succ, coh) if su is not None and co is not None and co >= 1.5]
+                if valid_15:
+                    peak15 = max(v[1] for v in valid_15)
+                    xs.append(T)
+                    ys.append(peak15)
+        ax.plot(xs, ys, marker="o", linewidth=2, markersize=10, color=family_colors[fam_name], label=fam_name)
+        for x, y in zip(xs, ys):
+            ax.text(x + 0.05, y + 0.01, f"{y:.2f}", fontsize=8)
+
+    # Anchor line
+    ax.axhline(ANCHOR_15, color="blue", linestyle="--", linewidth=1.2, label=f"T-SAE k=20 anchor ({ANCHOR_15})")
+    ax.axhline(ANCHOR_15 + 0.27, color="green", linestyle="--", linewidth=1.5, label=f"WIN threshold ({ANCHOR_15+0.27})")
+    ax.set_xlabel("T (window length)", fontsize=11)
+    ax.set_ylabel("peak success at coh ≥ 1.5 (per-position)", fontsize=11)
+    ax.set_title("Phase 7 Y+W matched-sparsity by T — per-position protocol\n"
+                 "Sequential growth chain (T=2→T=5) preserves anchor; H8 shifts=(T,) lifts T=2 above WIN threshold")
+    ax.legend(loc="upper right", fontsize=9)
+    ax.grid(True, alpha=0.3)
+    ax.set_xlim(1.5, 5.5)
+    ax.set_ylim(0.4, 1.6)
+    plt.tight_layout()
+    out = args.out_dir / "unified_growth_trajectory.png"
+    fig.savefig(out, dpi=150, bbox_inches="tight")
+    fig.savefig(args.out_dir / "unified_growth_trajectory.thumb.png", dpi=48, bbox_inches="tight")
+    plt.close(fig)
+    print(f"wrote {out}")
+
     # JSON dump
     summary = []
     for (arch_id, proto), (s, succ, coh, n, label, color) in all_curves.items():
