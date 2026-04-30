@@ -71,9 +71,10 @@ def parse_args():
     p.add_argument("--final_alpha_grid", type=str,
                    default="-100,-10,-8,-6,-5,-4,-3,-2,-1.75,-1.5,-1.25,-1,0,1,1.25,1.5,1.75,2,3,4,5,6,7,8,9,10,100")
     p.add_argument("--final_rollouts", type=int, default=8)
-    p.add_argument("--save_demo_completions", type=int, default=0,
-                   help="If >0, save the first N completions per (feat, α) text "
-                        "+ per-rollout judge scores to demo_completions/feat<id>.json. "
+    p.add_argument("--save_demo_completions", type=int, default=-1,
+                   help="If >=0, save the first N completions per (feat, α) text "
+                        "+ per-rollout judge scores to demo_completions/. "
+                        "0 = off. -1 = save all rollouts (default; ~2MB per Wang run). "
                         "Used by the steering-demo HTML dashboard.")
 
     p.add_argument("--seed", type=int, default=42)
@@ -397,14 +398,24 @@ def main():
     def _save_stage4_partial(meta: dict):
         final_partial.write_text(json.dumps({"meta": meta, "finalists": final_rows}, indent=2))
 
+    # Helpers for the demo-completions dashboard infra.
     demo_dir = args.out / "demo_completions"
-    if args.save_demo_completions > 0:
+    save_demo_n = args.save_demo_completions  # >=0 means save N, -1 means save all
+    if save_demo_n != 0:
         demo_dir.mkdir(exist_ok=True)
 
     def _gen_to_text(g):
         if isinstance(g, dict):
             return g.get("completion", g.get("text", str(g)))
         return str(g)
+
+    def _gen_to_question(g, fallback=""):
+        if isinstance(g, dict):
+            return g.get("question", g.get("prompt", fallback))
+        return fallback
+
+    def _take(seq, n):
+        return seq if (n is None or n < 0) else seq[:n]
 
     for f_idx, f in enumerate(finalists):
         fid = f["feature_id"]
@@ -443,16 +454,17 @@ def main():
                          "mean_coh": float(np.mean(c_v)) if c_v else None,
                          "n_align": len(a_v), "n_coh": len(c_v),
                          "n_total": len(gens)})
-            if args.save_demo_completions > 0:
-                # Save first N completions (text + per-rollout judge scores)
-                N = min(args.save_demo_completions, len(gens))
+            if save_demo_n != 0:
+                gens_kept = _take(gens, save_demo_n)
                 demo_rows.append({
                     "alpha": float(alpha),
                     "completions": [
-                        {"text": _gen_to_text(gens[i]),
+                        {"text": _gen_to_text(gens_kept[i]),
+                         "question": _gen_to_question(gens_kept[i],
+                                                       fallback=questions[i] if i < len(questions) else ""),
                          "align": (None if i >= len(a) or a[i] is None else float(a[i])),
                          "coh":   (None if i >= len(c) or c[i] is None else float(c[i]))}
-                        for i in range(N)
+                        for i in range(len(gens_kept))
                     ],
                 })
                 (demo_dir / f"feat{fid}.json").write_text(
@@ -475,6 +487,24 @@ def main():
            "finalists": final_rows}
     final_path.write_text(json.dumps(out, indent=2))
     print(f"[stage4] wrote {final_path}", flush=True)
+
+    # Write index.json for the steering-demo dashboard if any demos were saved.
+    if save_demo_n != 0 and demo_dir.exists():
+        feat_files = sorted(demo_dir.glob("feat*.json"))
+        if feat_files:
+            index = {
+                "meta": {
+                    "arch": args.arch,
+                    "ckpt": str(args.ckpt),
+                    "layer": args.layer,
+                    "seed": args.seed,
+                    "alphas_stage4": final_alphas,
+                },
+                "features": [{"feature_id": int(p.stem.replace("feat", "")), "file": p.name}
+                             for p in feat_files],
+            }
+            (demo_dir / "index.json").write_text(json.dumps(index, indent=2))
+            print(f"[stage4] wrote {demo_dir / 'index.json'} ({len(feat_files)} features)", flush=True)
     print("\n=== Wang procedure DONE ===", flush=True)
 
 

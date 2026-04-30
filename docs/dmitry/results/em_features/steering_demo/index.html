@@ -37,6 +37,10 @@
   <input type="range" class="alpha-slider" id="alpha-slider" min="0" max="0" step="1" value="0" />
   <div class="alpha-ticks" id="alpha-ticks"></div>
   <div class="alpha-stats" id="alpha-stats"></div>
+  <div style="margin-top: 0.5em; font-size: 0.9em;">
+    Rollouts shown: <input type="number" id="rollouts-n" value="5" min="1" max="64" style="width: 4em;" />
+    of <span id="rollouts-max">?</span>
+  </div>
 </div>
 
 <div id="prompts"></div>
@@ -143,6 +147,7 @@ function setupSliderForCurrent() {
   });
 
   slider.oninput = render;
+  document.getElementById('rollouts-n').oninput = render;
 }
 
 function render() {
@@ -156,6 +161,7 @@ function render() {
   // Find α=0 row for unsteered
   const zeroRow = f.alphas.find(a => Math.abs(a.alpha) < 1e-6);
 
+  // Stats are over ALL rollouts (not just the displayed subset)
   const aligns = row.completions.map(c => c.align).filter(x => x != null);
   const cohs   = row.completions.map(c => c.coh).filter(x => x != null);
   const meanA = aligns.length ? aligns.reduce((s,x)=>s+x,0)/aligns.length : null;
@@ -164,13 +170,20 @@ function render() {
     ? `<b>mean align</b> ${meanA.toFixed(2)} &nbsp; <b>mean coh</b> ${meanC?.toFixed(2) || '—'} &nbsp; (n=${row.completions.length})`
     : `<i>no judge scores at this α</i>`;
 
+  // How many rollouts to show
+  const nInput = document.getElementById('rollouts-n');
+  const maxN = row.completions.length;
+  document.getElementById('rollouts-max').textContent = maxN;
+  nInput.max = maxN;
+  let showN = Math.max(1, Math.min(maxN, +nInput.value || 5));
+
   const promptsDiv = document.getElementById('prompts');
   if (!row.completions.length) {
     promptsDiv.innerHTML = '<div class="empty">No completions for this α.</div>';
     return;
   }
-  const N = row.completions.length;
-  const html = row.completions.map((c, i) => {
+  const N = showN;
+  const html = row.completions.slice(0, showN).map((c, i) => {
     const z = zeroRow?.completions?.[i];
     const q = c.question || z?.question || `Rollout ${i+1}`;
     return `
