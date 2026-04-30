@@ -52,11 +52,36 @@ Bundle peak drops from 55.17 (k_bundle=5) → 50.89 (k_bundle=30) — **−4.3 a
 
 The non-monotonicity at k_bundle ∈ {1, 2, 3} comes from the top stage-3-ranked feature (feat 2760) being a bundle-level dud (single-feat peak 49.65) despite high stage-3 score. Including it dilutes the bundle. By k_bundle=5 the diluting effect of feat 2760 is washed out by the strong contributions of feat 4563 + others.
 
-### Key result 3: windowed-T-SAE T=2 (fallback ladder, in progress)
+### Key result 3: windowed-T-SAE T=2 (fallback ladder) — falsified
 
-Running on h100_2 — currently in Wang stage 3, finalist 7/20. Bundle frontier expected ~T+8h.
+Trained `WindowedTSAE` (per-position W_dec[T, d_sae, d_in], shared W_enc, M=I) at T=2 with paper-faithful T-SAE settings: d_sae=16384, k=20 BatchTopK, batch=512, contrastive_alpha=0.1, lr=3e-4, 30k steps, hookpoint=resid_post.
 
-[Numbers and conclusion TBD on completion]
+Stage 4 finalist peaks (single-feature):
+
+| feat | Δz̄ | peak α | peak align | peak coh |
+|---|---:|---:|---:|---:|
+| 14919 | +0.02 | +2 | 49.66 | 24.14 |
+| 15067 | +0.05 | +10 | **55.44** | 30.78 |
+| 14951 | +0.67 | +3 | 54.67 | 25.23 |
+
+**Bundle k=30 peak: 51.27 align at α=−6, coh=32.89** (α=0 baseline 45.96, lift +5.31).
+
+This is **WORSE than T-SAE T=1 paper-faithful (bundle 56.23)** — the windowed encoder hurt by ~5 align points. Ladder approach cannot proceed to T=3 with this design — would just compound a regression.
+
+Likely culprits:
+1. **Per-position W_dec** (T, d_sae, d_in): each position-t decoder only sees gradient from tokens at position t in training, so features that fire mostly at position 0 train W_dec[0] well but leave W_dec[1] under-trained. At inference we use W_dec[-1] for steering (per Wang convention), which biases against features that prefer position 0.
+2. **Per-position b_dec** vs T-SAE's shared b_dec: small effect but compounds.
+3. **Cross-position mixing M=I** disabled by default: the encoder gains no cross-position information from the windowing — it's just per-token T-SAE with split decoders.
+
+A T-SAE-faithful "T=2 windowed" should probably either (a) keep shared W_dec and only window the contrastive-loss application, OR (b) enable mix_positions=True so the encoder actually USES the windowing.
+
+Single-feature 55.44 at α=+10 (positive!) is also notable — opposite sign convention from TXC paper-faithful (α=−8 = 58.47). Likely a direction-flip in our W_dec[-1] convention for the windowed arch.
+
+### Key result 4: T-SAE paper-faithful bundle-size sweep (in progress)
+
+Running on h100_1 with k_bundle ∈ {1, 5, 10}. If T-SAE's bundle is ALSO non-monotonic and its k_bundle=5 peak ≥ 56.23, that's a different story. If T-SAE bundle stays close to 56.23 across k_bundle, then bundle dilution affects TXC differently from T-SAE — that's an architectural difference worth highlighting.
+
+[Numbers TBD]
 
 ### Implications
 
