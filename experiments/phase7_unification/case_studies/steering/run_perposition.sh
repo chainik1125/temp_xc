@@ -20,8 +20,15 @@ SEED=${2:-42}
 ROOT=/workspace/temp_xc
 RESULTS=${ROOT}/experiments/phase7_unification/results/case_studies
 ZMAG=${RESULTS}/diagnostics_kpos20/z_orig_magnitudes.json
-GEN_FILE=${RESULTS}/steering_paper_window_perposition/${ARCH}/generations.jsonl
-GRADE_FILE=${RESULTS}/steering_paper_window_perposition/${ARCH}/grades.jsonl
+# Seed-aware output subdir (matches intervene_paper_clamp_window_perposition.py
+# convention at line 135: seed=42 → canonical name, otherwise _seed{N} suffix)
+if [[ "${SEED}" == "42" ]]; then
+    PP_SUBDIR="steering_paper_window_perposition"
+else
+    PP_SUBDIR="steering_paper_window_perposition_seed${SEED}"
+fi
+GEN_FILE=${RESULTS}/${PP_SUBDIR}/${ARCH}/generations.jsonl
+GRADE_FILE=${RESULTS}/${PP_SUBDIR}/${ARCH}/grades.jsonl
 
 cd "${ROOT}"
 
@@ -55,7 +62,7 @@ fi
 step "[2/2] grade per-position for ${ARCH} (--n-workers 1; shared rate limit with Y)"
 .venv/bin/python -m experiments.phase7_unification.case_studies.steering.grade_with_sonnet \
     --archs "${ARCH}" \
-    --subdir steering_paper_window_perposition \
+    --subdir "${PP_SUBDIR}" \
     --n-workers 1
 
 echo ""
