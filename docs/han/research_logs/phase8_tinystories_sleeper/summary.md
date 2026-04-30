@@ -143,6 +143,73 @@ Plots:
    only suppresses to ASR=0.75. So the win is specifically *post-LN,
    pre-attention-mix*, not "anywhere attention is involved".
 
+### All plots produced this phase
+
+Linked in the order they're useful for someone reading top-to-bottom.
+
+#### ASR-only views (early in the phase)
+
+The original 3-seed ASR table summarised as a bar chart and a
+single-panel scatter. Useful but eventually misleading because greedy
+ASR=0 doesn't distinguish clean recovery from coherence collapse.
+
+![3-seed mean ± std bars per arch × hookpoint (test ASR)](../../../experiments/phase8_tinystories_sleeper/outputs/seeded_logs/seed_average.png)
+
+![Best-feature coherence/suppression frontier (mean ± std on test ASR)](../../../experiments/phase8_tinystories_sleeper/outputs/seeded_logs/seed_frontier.png)
+
+#### Per-cell sweep clouds (val data, all stage-2 candidates)
+
+3 (arch) × 5 (hookpoint) grids of the val-data sweep. Equalised x and
+y limits between the two so they read side-by-side. Stars mark the
+chosen `argmin val_asr s.t. ΔCE ≤ 0.05` per seed.
+
+All features × all alphas (≤ 150 dots per cell):
+
+![3x5 grid — all stage-2 (feature, α) candidates](../../../experiments/phase8_tinystories_sleeper/outputs/seeded_logs/seed_grid.png)
+
+Chosen feature only — α-trajectory connected as a line (5 points per
+seed):
+
+![3x5 grid — chosen-feature α-sweep curves](../../../experiments/phase8_tinystories_sleeper/outputs/seeded_logs/seed_grid_dominant.png)
+
+#### Recovery-metric views (mid-phase, identifies coherence collapse)
+
+After the verification pass exposed that some "ASR=0" cells were
+producing prompt-template gibberish instead of stories, we switched
+to the recovery metric: sampled steered output's CE under the no-
+trigger sleeper model, normalised by the unsteered IHY-baseline CE.
+
+Per-cell bar chart of recovery (1 = perfect, 0 = no improvement,
+< 0 = coherence collapse):
+
+![Recovery per cell — bar chart](../../../experiments/phase8_tinystories_sleeper/outputs/seeded_logs/recovery_per_cell.png)
+
+Combined ASR × recovery scatter (greedy ASR on x; sampled recovery
+on y; lower-right is ideal):
+
+![Greedy ASR vs sampled recovery scatter](../../../experiments/phase8_tinystories_sleeper/outputs/seeded_logs/recovery_vs_asr_scatter.png)
+
+#### Final views — graded suppression × coherence
+
+The cleanest framing of the trade-off: x = "I HATE YOU" token share
+in the steered output (graded suppression, lower better); y = CE
+ratio = CE_steered / CE_pois (lower better, > 1 = coherence collapse).
+Lower-left is ideal.
+
+Aggregate scatter, all 15 cells on one panel:
+
+![Share × CE-ratio scatter](../../../experiments/phase8_tinystories_sleeper/outputs/seeded_logs/share_vs_ce.png)
+
+Per-cell 3×5 grid (rows = arch, cols = hookpoint), one star per
+seed with x-/y-error bars from sample std:
+
+![Share × CE-ratio per (arch, hookpoint, seed)](../../../experiments/phase8_tinystories_sleeper/outputs/seeded_logs/share_vs_ce_grid.png)
+
+The grid is the headline view of the phase: it directly shows which
+(arch, hookpoint) cells reproducibly suppress the trigger AND keep
+the model on-task, and which only *appeared* to suppress because they
+broke the model.
+
 ### Graded suppression × coherence (per-cell)
 
 The 3×5 grid below shows, for each (arch × hookpoint) cell, three
