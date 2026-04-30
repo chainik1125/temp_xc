@@ -189,6 +189,53 @@ DEST="docs/dmitry/results/em_features/hookpoint_compare/<runname>"
 mkdir -p "$DEST" && (cd "$DEST" && tar xzf /tmp/results.tgz)
 ```
 
+### Disk policy (CRITICAL — read before launching anything)
+
+The h100_1 root volume is small (200 GB total, 186 GB usually used by checkpoints). **Always check `df -h /root` before launching a training run.** If less than 10 GB free, you must free space before launching.
+
+#### Automatic HF upload during training
+
+The training scripts (`run_training_txc_bricken_auxk.py`, `run_training_tsae.py`, `run_training_han_champion.py`) call `upload_if_enabled()` after each snapshot. If `HF_TOKEN` is set in `/root/.env`, the snapshot uploads to `dmanningcoe/temp-xc-em-features` under the appropriate category (`txc/`, `tsae/`, `han/`). **You can rely on this — every snapshot saved during training is auto-uploaded to HF.**
+
+To verify a ckpt is on HF before deleting:
+```bash
+huggingface-cli download dmanningcoe/temp-xc-em-features <subpath>/<filename> --repo-type model --local-dir /tmp/hf_check
+ls -la /tmp/hf_check/<subpath>/<filename>
+```
+
+Or list what's there:
+```bash
+huggingface-cli ls dmanningcoe/temp-xc-em-features --repo-type model
+```
+
+#### Cleanup procedure (when disk is tight)
+
+1. **Pick a ckpt that's HF-mirrored AND not currently in use** (i.e. not the source for a Wang procedure currently running, not the most recent ckpt for an arch you might want to extend).
+2. **Verify on HF** with `huggingface-cli ls` (above).
+3. **Append a cleanup entry** to `docs/dmitry/results/em_features/trained_models_log.md` under the "Local cleanup log" section. Include:
+   - Date + host
+   - Reason (e.g. "k=20 training needs disk")
+   - Each deleted file with the exact HF path it's mirrored at
+   ```markdown
+   **2026-04-30 (h100_1)** — TXC k=10 training needs disk:
+   ```
+   qwen_l15_txc_paper_k200bt_d16k_step30000.pt   (~5 GB)
+     └─ HF: dmanningcoe/temp-xc-em-features:txc/qwen_l15_txc_paper_k200bt_d16k_step30000.pt
+     └─ TXC paper-faithful k=200 30k @ resid_post (Wang done; bundle 50.78, single feat 10625=55.08)
+   ```
+   ```
+4. **Then delete locally**: `rm -v /root/em_features/checkpoints/<filename>`
+5. **Commit** `trained_models_log.md` with message `cleanup: <files> on h100_1`.
+
+#### What you MUST NEVER delete
+
+- Any ckpt for which `upload_if_enabled` failed during training (check the training log for `[hf_upload] failed:` lines — if you see these, the ckpt may NOT be on HF)
+- The most recent step ckpt for an architecture variant you might want to extend or resume from
+- Any file that doesn't exist as `<filename>` in the HF mirror under `txc/`, `tsae/`, or `han/` (verify with `huggingface-cli ls` first)
+- Any non-checkpoint file (results JSONs, logs, configs)
+
+If you need to free disk and there's NO safe-to-delete ckpt available, do not launch the new run. Update AGENT_BRIEF.md with a note and exit.
+
 ### Hosts + paths
 
 - `h100_1`: alias in `~/.ssh/config`. Repo: `/root/temp_xc`. Results: `/root/em_features/results/`. Logs: `/root/em_features/logs/`. Ckpts: `/root/em_features/checkpoints/`. ~7-15 GB disk free, gets tight.
