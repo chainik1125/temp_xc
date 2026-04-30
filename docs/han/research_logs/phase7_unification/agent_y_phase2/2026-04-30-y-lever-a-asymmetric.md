@@ -40,8 +40,14 @@ clobbering existing per-position results.
 |---|---:|---:|---:|---:|---:|---:|
 | uniform PP (existing) | **1.57** | **1.53** | 1.53 | 1.53 | 0.707 | 0.613 |
 | right-heavy [0.5, 1.0] | 1.40 | 1.37 | 1.37 | 1.37 | **0.742** | **0.647** |
+| right-only [0, 1] (sanity) | 1.33 | 1.30 | 1.30 | 1.30 | 0.595* | 0.508* |
 | right-edge protocol | 1.37 | 1.27 | 1.27 | 1.27 | 0.771 | 0.659 |
-| right-only [0, 1] | (re-grading in progress) | | | | | |
+
+\* right-only AUC numbers are affected by a numerical artifact in the
+trapezoidal interpolation when two strengths share the same mean coh
+(s=2 and s=5 both at coh=2.233 in right-only). Per-strength curves
+agree with right-edge to within grader noise (≤ 0.033 = 1/30 grade
+units), confirming the sanity-check expectation.
 
 #### Full per-strength curves
 
@@ -100,15 +106,24 @@ The result: right-heavy's peak success is lower but its overall AUC
 across coh ≥ 1.5 is slightly higher than uniform PP (+0.035) — the
 asymmetry trades peak height for breadth.
 
-### Sanity check (right-only ≈ right-edge)
+### Sanity check (right-only ≈ right-edge) — PASSED
 
 Right-only [0, 1] should reproduce the right-edge protocol since for
 T=2 it makes only the within-window-ti=1 contribution to each position,
-which is exactly what right-edge writes. Initial re-grade had a race
-condition (84/210 graded); re-grade with --force in progress. The
-mechanism agreement is verified at the level of code path: right-only
-sets ti=0 contribution to 0, leaving only the ti=1 (right-edge)
-contribution.
+which is exactly what right-edge writes. Per-strength comparison:
+
+| s_norm | RO succ | RO coh | RE succ | RE coh | Δ succ |
+|---:|---:|---:|---:|---:|---:|
+| 0.50 | 0.233 | 2.800 | 0.233 | 2.800 | +0.000 |
+| 1.00 | 0.333 | 2.433 | 0.300 | 2.433 | +0.033 |
+| 2.00 | 0.433 | 2.233 | 0.400 | 2.233 | +0.033 |
+| 5.00 | 1.300 | 2.233 | 1.267 | 2.200 | +0.033 |
+| 10.00 | 1.333 | 1.300 | 1.367 | 1.300 | −0.033 |
+| 20.00 | 0.633 | 0.967 | 0.633 | 0.900 | +0.000 |
+| 50.00 | 0.067 | 0.900 | 0.067 | 0.900 | +0.000 |
+
+|Δ succ| ≤ 0.033 = 1/30 grade units everywhere — within Sonnet
+grader sampling noise. Code paths agree.
 
 ### Why this isn't the new headline
 
