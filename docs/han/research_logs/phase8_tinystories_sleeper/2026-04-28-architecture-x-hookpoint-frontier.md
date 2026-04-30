@@ -295,6 +295,8 @@ seed-2 dupes; only the canonical first-host result was kept per seed),
 
 **Per-cell test ASR₁₆ — mean ± std across 3 seeds (baseline 0.99):**
 
+![3-seed mean ± std bars per arch × hookpoint](../../../experiments/phase8_tinystories_sleeper/outputs/seeded_logs/seed_average.png)
+
 | hookpoint     | SAE             | T-SAE                | TXC                  |
 |---------------|----------------:|---------------------:|---------------------:|
 | `ln1.0`       | 0.51 ± 0.33     | **0.00 ± 0.00**      | 0.07 ± 0.06          |
