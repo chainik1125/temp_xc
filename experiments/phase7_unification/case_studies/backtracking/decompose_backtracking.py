@@ -78,38 +78,49 @@ def load_public_sae(layer: int, device: str, release: str | None = None, sae_id:
 
 
 def load_local_topk_sae(ckpt_path: str | Path, device: str):
-    """Load a locally-trained TopKSAE checkpoint (from train_llama_txc.py
-    `--arch topk_sae`). Returns an SAE-Lens-compatible object that
-    exposes encode(), decode(), and W_dec attributes the same way the
-    Llama-Scope SAE does.
+    """Load a locally-trained per-token SAE checkpoint (from train_llama_txc.py
+    --arch topk_sae OR --arch tsae_paper). Returns an SAE-Lens-compatible
+    object exposing encode(), decode(), and W_dec the same way Llama-Scope's
+    SAE does. Dispatches by `meta.json[arch]`.
 
-    For TXC architectures that take (B, T, d_in) windows, this loader
-    won't work as-is; the intervene pipeline assumes per-token features.
-    Add window-aware hooks (see case_studies/steering/intervene_paper_clamp_window.py)
-    for that case.
+    For window-encoder architectures (--arch txc_bare) the intervene pipeline
+    needs the separate window-aware path in intervene_backtracking_window.py.
     """
-    from src.architectures.topk_sae import TopKSAE
     ckpt_path = Path(ckpt_path)
     meta = json.loads((ckpt_path.parent / "meta.json").read_text())
-    if meta.get("arch") != "topk_sae":
-        raise SystemExit(
-            f"load_local_topk_sae only handles arch=topk_sae; got {meta.get('arch')!r}. "
-            "For TXC etc., write a window-aware decompose path."
+    arch = meta.get("arch")
+
+    if arch == "topk_sae":
+        from src.architectures.topk_sae import TopKSAE
+        sae = TopKSAE(d_in=int(meta["d_in"]), d_sae=int(meta["d_sae"]), k=int(meta["k_pos"]))
+    elif arch == "tsae_paper":
+        from src.architectures.tsae_paper import TemporalMatryoshkaBatchTopKSAE
+        d_sae = int(meta["d_sae"])
+        # Reconstruct group sizes from the [0.2, 0.8] split used at training time
+        g0 = d_sae // 5
+        g1 = d_sae - g0
+        sae = TemporalMatryoshkaBatchTopKSAE(
+            activation_dim=int(meta["d_in"]),
+            dict_size=d_sae,
+            k=int(meta["k_pos"]),
+            group_sizes=[g0, g1],
         )
-    sae = TopKSAE(d_in=int(meta["d_in"]), d_sae=int(meta["d_sae"]), k=int(meta["k_pos"]))
+    else:
+        raise SystemExit(
+            f"load_local_topk_sae handles topk_sae and tsae_paper; got {arch!r}. "
+            "For TXC etc. (window encoder), use intervene_backtracking_window.py."
+        )
+
     sae.load_state_dict(torch.load(ckpt_path, map_location="cpu"))
     sae.to(device)
     sae.eval()
     for p in sae.parameters():
         p.requires_grad_(False)
 
-    # Adapt to the SAE-Lens-style W_dec shape (d_sae, d_model). The
-    # TopKSAE class stores W_dec as (d_in, d_sae); intervene_backtracking
-    # already handles either orientation via shape check.
     class _Cfg:
         d_sae = int(meta["d_sae"])
     sae.cfg = _Cfg()
-    print(f"[decompose] loaded local TopKSAE from {ckpt_path}")
+    print(f"[decompose] loaded local {arch} from {ckpt_path}")
     return sae, meta
 
 
