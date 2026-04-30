@@ -31,32 +31,34 @@ logging.basicConfig(level=logging.INFO, format="%(message)s")
 log = logging.getLogger("ward_txc.cache")
 
 
-def _load_corpus(num_sequences: int, seq_length: int, tokenizer):
+def _load_corpus(num_sequences: int, seq_length: int, tokenizer, stride: int | None = None):
     """Build `num_sequences` token tensors of length `seq_length`.
 
     Strategy: prefer Stage A reasoning traces (on-disk, no network, in-domain
     for the backtracking phenomenon — closer to test-time distribution than
     FineWeb generic web text). One trace's full response is usually 1k–4k
-    tokens, so we slice it into multiple `seq_length` windows to maximize
-    diversity. If the result is fewer than `num_sequences`, top up from
-    pre-fetched FineWeb (`data/prefetched/`) or stream FineWeb live.
+    tokens, so we slice it into sliding windows of `seq_length` tokens with
+    spacing `stride`. Lower stride = more (overlapping) windows from the
+    same corpus; defaults to seq_length (non-overlapping). If the result is
+    fewer than `num_sequences`, top up from pre-fetched FineWeb
+    (`data/prefetched/`) or stream FineWeb live.
     """
+    if stride is None:
+        stride = seq_length
     repo_root = Path(__file__).resolve().parents[2]
     texts: list[str] = []
 
     traces_path = repo_root / "results" / "ward_backtracking" / "traces.json"
     if traces_path.exists():
-        log.info("[corpus] sourcing windows from Stage A traces: %s", traces_path)
+        log.info("[corpus] sourcing windows from Stage A traces: %s "
+                 "(seq_length=%d stride=%d)", traces_path, seq_length, stride)
         traces = json.loads(traces_path.read_text())
-        # We tokenize each full_response and chunk into seq_length-sized
-        # windows. This gives us many independent windows per trace.
         for t in traces:
             full = t.get("full_response") or ""
             if not full:
                 continue
             ids = tokenizer(full, add_special_tokens=False)["input_ids"]
-            # split into windows
-            for start in range(0, len(ids) - seq_length, seq_length):
+            for start in range(0, len(ids) - seq_length, stride):
                 texts.append(tokenizer.decode(ids[start:start + seq_length]))
                 if len(texts) >= num_sequences:
                     break
@@ -159,6 +161,7 @@ def main(argv=None):
     cache_cfg = cfg["cache"]
     num_seq = int(cache_cfg["num_sequences"])
     seq_len = int(cache_cfg["seq_length"])
+    stride = int(cache_cfg.get("stride", seq_len))
     bs = int(cache_cfg["cache_batch_size"])
     d_model = int(cfg["txc"]["d_model"])
 
@@ -191,7 +194,7 @@ def main(argv=None):
     for p_ in model.parameters():
         p_.requires_grad_(False)
 
-    token_ids = _load_corpus(num_seq, seq_len, tok)
+    token_ids = _load_corpus(num_seq, seq_len, tok, stride=stride)
     np.save(acts_dir / "token_ids.npy", token_ids.numpy())
 
     # Allocate per-hookpoint memmaps.

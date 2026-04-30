@@ -45,12 +45,26 @@ txc:
   d_sae: 16384
   k_per_position: 32         # window-level L0 = k_per_position * T = 192
   d_model: 4096              # Llama-3.1-8B
-  train_steps: 3000          # scoped down from plan's 50k for single-session feasibility
-  log_interval: 50
+  # PAPER-BUDGET training. Held-out FVU early stopping (see early_stop block)
+  # caps wasted compute when convergence plateaus. 15k cap is conservative —
+  # Dmitry's TinyStories TXCs converge around 10–20k.
+  train_steps: 15000
+  log_interval: 100
   batch_size: 128
   learning_rate: 3.0e-4
   grad_clip: 1.0
   seed: 42
+
+  # Held-out FVU early stopping: sample one (B=batch_size, T, d) eval batch
+  # ONCE at start, freeze it, recompute FVU on it every log_interval. Save
+  # the best checkpoint observed; stop training when no relative improvement
+  # > min_rel_improvement for `patience` consecutive log entries. Disable
+  # by setting enabled: false.
+  early_stop:
+    enabled: true
+    patience: 10              # 10 × log_interval = 1000 steps with no improvement
+    min_rel_improvement: 0.005  # require ≥ 0.5% relative drop in held-out FVU
+    warmup_steps: 1000        # never stop before this many steps (avoid premature exit)
 
   # Architecture sweep: which dictionary-learning archs to train alongside
   # TXC. All read from the SAME activation cache and run through the same
@@ -65,19 +79,21 @@ txc:
       tied_weights: true
 
 cache:
-  # Caching corpus for base TXC training. We slice Stage A reasoning traces
-  # into seq_length windows (in-domain for backtracking; on-disk; no network).
-  # `num_sequences * seq_length` ≈ tokens cached.
+  # Caching corpus for base TXC training. Slices Stage A reasoning traces
+  # into windows (in-domain for backtracking; on-disk; no network).
+  # PAPER-BUDGET: ~3,300 windows × 256 tokens ≈ 850k tokens via 50%-overlap
+  # sliding windows on the same Stage A traces (no FineWeb dependency).
   dataset: stageA_traces      # implementation always tries traces first
-  num_sequences: 1500         # 1500 × 256 ≈ 384k tokens cached (scoped to fit on A40)
+  num_sequences: 3300         # ~max we can extract from Stage A traces with stride=128
   seq_length: 256             # ≥ T + headroom; longer = more context per sample
-  cache_batch_size: 8         # bf16 Llama-3.1-8B fits ~16 GB on the A40
+  stride: 128                 # 50% overlap → 2× more windows than stride=seq_length
+  cache_batch_size: 16        # H100 fits ≥ 16 in bf16; A40 user can drop to 8 if OOM
 
 mining:
   # On Stage A traces, we encode the trace through the trained TXC and rank
   # features by D+/D- selectivity. Top-K features per hookpoint feed B1.
   top_k_features: 32
-  top_k_for_steering: 2      # scoped from 4 → 2 to fit single-session generation budget
+  top_k_for_steering: 4      # PAPER-BUDGET: 4 features per (arch, hookpoint, mode)
   # Window of offsets relative to backtracking sentence start used for D+/D-
   # firing aggregation. Matches Stage A's offset window.
   offset_window: [-13, -12, -11, -10, -9, -8]
@@ -90,11 +106,11 @@ steering:
   # they're a real source of evidence about direction sign and arch behavior.
   steering_layer: 10
   magnitudes: [-16, -12, -8, -4, 0, 4, 8, 12, 16]
-  max_new_tokens: 1200       # gives reasoning model room to enter the exploration phase
+  max_new_tokens: 1500       # PAPER-BUDGET: matches Stage A spec (was 1200 in sprint)
   n_eval_prompts: 20
   seed: 42
   targets: [reasoning]       # base model produces empty completions on Stage A — skip.
-  gen_batch_size: 4          # batched greedy decode: A40 fits ≥4 in bf16 at seq 2048
+  gen_batch_size: 8          # PAPER-BUDGET: H100 80GB fits ≥8 in bf16 at seq 2048
 
 b2:
   # Per-offset firing curves on reasoning traces. Window relative to

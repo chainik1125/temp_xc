@@ -143,6 +143,18 @@ def _train_one(arch: str, hookpoint: dict, cfg: dict) -> dict:
 
     feat_active_count = torch.zeros(d_sae, device="cuda")
 
+    # Held-out FVU early stopping. Sample one eval batch once and freeze it.
+    es_cfg = txc_cfg.get("early_stop", {}) or {}
+    es_enabled = bool(es_cfg.get("enabled", False))
+    es_patience = int(es_cfg.get("patience", 10))
+    es_min_rel_improvement = float(es_cfg.get("min_rel_improvement", 0.005))
+    es_warmup = int(es_cfg.get("warmup_steps", 1000))
+    x_eval = loader.sample().detach().clone() if es_enabled else None
+    best_eval_fvu = float("inf")
+    best_state = None
+    no_improve_count = 0
+    stopped_early = False
+
     log_f = open(log_path, "w")
     try:
         for step in pbar:
@@ -160,22 +172,25 @@ def _train_one(arch: str, hookpoint: dict, cfg: dict) -> dict:
 
             if step % log_interval == 0 or step == n_steps - 1:
                 with torch.no_grad():
-                    # FVU normalizes per-token MSE by per-token variance so
-                    # losses are arch-comparable. Recompute the recon for
-                    # FVU using the same forward (no grad).
+                    # Train-batch metrics.
                     _, lat_eval = arch_forward(arch, model, x)
                     z_eval = lat_eval["window"]
-                    # Per-token recon variance — recompute via arch's forward.
-                    # Compute FVU on the per-token residual relative to the
-                    # per-token variance of x; cheap enough.
-                    var = x.var(dim=0).sum().clamp_min(1e-8)
-                    fvu = (loss / var).item()
+                    var_train = x.var(dim=0).sum().clamp_min(1e-8)
+                    fvu_train = (loss / var_train).item()
                     window_l0 = (z_eval > 0).float().sum(dim=-1).mean().item()
                     n_dead = int((feat_active_count == 0).sum().item())
+                    # Held-out FVU on the frozen eval batch.
+                    if es_enabled:
+                        loss_eval, _ = arch_forward(arch, model, x_eval)
+                        var_eval = x_eval.var(dim=0).sum().clamp_min(1e-8)
+                        fvu_eval = (loss_eval / var_eval).item()
+                    else:
+                        fvu_eval = float("nan")
                 row = {
                     "step": step, "arch": arch,
                     "loss": float(loss.item()),
-                    "fvu": fvu,
+                    "fvu": fvu_train,
+                    "fvu_eval": fvu_eval,
                     "window_l0": window_l0,
                     "n_dead": n_dead,
                 }
@@ -183,11 +198,31 @@ def _train_one(arch: str, hookpoint: dict, cfg: dict) -> dict:
                 log_f.write(json.dumps(row) + "\n")
                 log_f.flush()
                 pbar.set_postfix(loss=f"{loss.item():.3f}",
-                                 fvu=f"{fvu:.3f}",
+                                 fvu=f"{fvu_train:.3f}",
+                                 fvu_e=f"{fvu_eval:.3f}",
                                  L0=f"{window_l0:.0f}",
                                  dead=n_dead)
+                # Early-stop bookkeeping.
+                if es_enabled and step >= es_warmup:
+                    if fvu_eval < best_eval_fvu * (1 - es_min_rel_improvement):
+                        best_eval_fvu = fvu_eval
+                        best_state = {k_: v.detach().cpu().clone()
+                                      for k_, v in model.state_dict().items()}
+                        no_improve_count = 0
+                    else:
+                        no_improve_count += 1
+                        if no_improve_count >= es_patience:
+                            log.info("[early-stop] %s/%s at step %d "
+                                     "(best held-out FVU %.4f, %d log entries no improvement)",
+                                     arch, key, step, best_eval_fvu, no_improve_count)
+                            stopped_early = True
+                            break
     finally:
         log_f.close()
+
+    # Use best-checkpoint weights if early-stopping captured one.
+    if best_state is not None:
+        model.load_state_dict({k_: v.to("cuda") for k_, v in best_state.items()})
 
     torch.save({
         "state_dict": model.state_dict(),
@@ -200,10 +235,15 @@ def _train_one(arch: str, hookpoint: dict, cfg: dict) -> dict:
             "arch_kwargs": arch_kwargs,
             "hookpoint": hookpoint,
             "seed": seed,
+            "stopped_early": stopped_early,
+            "best_eval_fvu": best_eval_fvu if best_eval_fvu < float("inf") else None,
         },
         "history": history,
     }, ckpt_path)
-    log.info("[saved] %s", ckpt_path)
+    log.info("[saved] %s (best_eval_fvu=%s, stopped_early=%s)",
+             ckpt_path,
+             f"{best_eval_fvu:.4f}" if best_eval_fvu < float("inf") else "n/a",
+             stopped_early)
     # Free GPU before next hookpoint.
     del model, loader, optim
     torch.cuda.empty_cache()
