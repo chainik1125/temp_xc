@@ -216,6 +216,61 @@ Compress them and AUC drops 0.02-0.09. This is a quantitative
 robustness check on the SubseqH8 design choice — not just a
 methodological note.
 
+---
+
+## R5 — TXCBareAntidead T-sweep gap-fill (PAPER k=20 seed=42)
+
+Z fired off a sequential pipeline (T=8 → T=6 → T=7) at L=64 ctx slice
+to gap-fill the leader's T-axis. Each cell ~25 min train + ~10 min
+probe. Results (sorted by AUC):
+
+| arch_id | k=20 PAPER | Δ vs leader | n |
+|---|---:|---:|---:|
+| `txc_bare_antidead_t5` (leader) | 0.9131 | leader | 16/16 |
+| **`txc_bare_antidead_t7`** (Z R5) | **0.9121** | **−0.0010** | 16/16 |
+| `txc_bare_antidead_t8` (Z R5) | 0.9081 | −0.0050 | 16/16 |
+| `txc_bare_antidead_t6` (Z R5) | 0.9056 | −0.0075 | 16/16 |
+| `txc_bare_antidead_t10` (existing) | 0.9045 | −0.0086 | 16/16 |
+| `txc_bare_antidead_t20` (existing) | 0.8959 | −0.0172 | 16/16 |
+
+### Headline (R5)
+
+**T=7 lands within X's 0.005 promotion bar** — only 0.0010 below the
+T=5 leader. Non-monotonic: T=7 (0.9121) > T=8 (0.9081) > T=6 (0.9056).
+The T=5/T=7 cluster appears to be a real local optimum with T=8 and
+T=6 noticeably weaker.
+
+Per X's protocol (commit `7f7d69e`):
+> If a variant scores within 0.005 AUC of the current k=20 winner
+> (`txc_bare_antidead_t5` 0.9127 σ=0.0012), retrain at L=128 before
+> promoting.
+
+T=7 qualifies. **Recommend H200-retrain at L=128 for the leaderboard
+claim.** The T=7 cell at L=128 would need ~28 GB of W+Adam (vs 23 GB
+at T=5; barely doesn't fit 5090's 32 GB once cache and workspace are
+added). On A40 it's `A40_ok` per the same memory math.
+
+### What R5 does NOT do
+
+- Does NOT propose `paper_archs.json` schema additions for T=7. Z
+  flags this for X to decide.
+- Does NOT cover T=4 or T=12 — those would need additional 2 hr each
+  on 5090; deferred unless X requests.
+- Does NOT compute multi-seed for T=7. T=7 at seed=1 + seed=2 needed
+  for the leaderboard claim (X's protocol bar).
+
+### Coordination ping for X
+
+`txc_bare_antidead_t7` at PAPER k=20 seed=42 = 0.9121 (Δ=−0.0010 from
+T=5 leader). Within your 0.005 threshold. Want me to either (a) train
+seeds 1 + 2 on 5090 to confirm the multi-seed mean, or (b) defer the
+multi-seed retrain to whichever pod has the bandwidth (your A40
+queue, when it frees up)?
+
+If (a), Z fires sequentially: T=7 seed=1 (~30 min), T=7 seed=2
+(~30 min), probe both (~30 min). ~1.5 hr total. Probably fits in
+remaining session.
+
 ### Files / commits
 
 - `src/architectures/phase7_subseq_z_variants.py` (`86faa68`)
