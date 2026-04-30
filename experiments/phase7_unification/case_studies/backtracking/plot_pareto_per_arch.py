@@ -38,17 +38,21 @@ from experiments.phase7_unification.case_studies.backtracking._paths import (  #
 )
 
 
-# Curated set of variants to plot. Each is (variant_dir, mode_target_filter, label).
-# Six-panel default focuses on the architectural comparisons; pass
-# --include-stratified to also show the stratified-held-out reruns of
+# Curated set of variants to plot — one cell per (hookpoint, arch).
+# Each is (variant_dir, mode_target_filter, label). Label lines are
+#   line 1: hook=<resid|attn>, arch=<arch>
+#   line 2: feat_<id> (top by tstat) + a parenthetical noting training compute
+#
+# Pass --include-stratified to also show stratified-held-out reruns of
 # the Llama-Scope baselines.
 DEFAULT_VARIANTS = [
-    ("intervene_32x",              ("sae_additive", "feat_71839"),   "Llama-Scope 32x feat_71839\n(billions of tokens)"),
-    ("intervene",                  ("sae_additive", "feat_7792"),    "Llama-Scope 8x feat_7792\n(billions of tokens)"),
-    ("intervene_llama_topk_30k",   ("sae_additive", "feat_28417"),   "Llama-trained TopKSAE@resid\n(30k steps, 3.8M tokens)"),
-    ("intervene_llama_txc_resid_30k", ("sae_additive", "feat_5228"), "Llama-trained TXC@resid T=5\n(30k steps, 3.8M tokens)"),
-    ("intervene_llama_txc_attn_30k_d8k_v2", ("sae_additive", "feat_8013"), "Llama-trained TXC@attn T=5\n(cross-hook steering)"),
-    ("intervene",                  ("raw_dom", "raw_dom"),           "raw DoM\n(paper baseline)"),
+    ("intervene_32x",                  ("sae_additive", "feat_71839"), "hook=resid, arch=Llama-Scope-32x\nfeat_71839  (billions of tokens)"),
+    ("intervene",                      ("sae_additive", "feat_7792"),  "hook=resid, arch=Llama-Scope-8x\nfeat_7792   (billions of tokens)"),
+    ("intervene_llama_topk_30k",       ("sae_additive", "feat_28417"), "hook=resid, arch=TopKSAE\nfeat_28417  (30k steps, 3.8M tok)"),
+    ("intervene_llama_tsae_k20_30k",   ("sae_additive", "feat_5045"),  "hook=resid, arch=T-SAE (Bhalla 2025)\nfeat_5045   (30k steps, 3.8M tok)"),
+    ("intervene_llama_txc_resid_30k",  ("sae_additive", "feat_5228"),  "hook=resid, arch=TXC T=5\nfeat_5228   (30k steps, 3.8M tok)"),
+    ("intervene",                      ("raw_dom", "raw_dom"),         "hook=resid, arch=raw-DoM (no SAE)\npaper baseline"),
+    ("intervene_llama_txc_attn_30k_d8k_v2", ("sae_additive", "feat_8013"), "hook=attn, arch=TXC T=5\nfeat_8013   (30k steps, cross-hook)"),
 ]
 EXTRA_STRATIFIED = [
     ("intervene_main_strat",       ("sae_additive", "feat_7792"),    "Llama-Scope 8x feat_7792\n(stratified held-out)"),
