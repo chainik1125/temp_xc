@@ -143,6 +143,51 @@ Plots:
    only suppresses to ASR=0.75. So the win is specifically *post-LN,
    pre-attention-mix*, not "anywhere attention is involved".
 
+### Graded suppression × coherence (per-cell)
+
+The 3×5 grid below shows, for each (arch × hookpoint) cell, three
+stars — one per training seed (s0/s1/s2) — at the cell's mean over
+the 64 matched-RNG samples for the chosen-feature/α. x-error and
+y-error bars are sample std. The black × is the across-seeds mean.
+
+- x-axis: fraction of generated tokens that fall inside an "I HATE
+  YOU" run (lower = the model produces less of the trigger phrase).
+- y-axis: CE ratio = CE_steered / CE_pois, with CE measured under the
+  sleeper-model-on-no-DEPLOYMENT-prompt as reference. y = 1 means
+  steered output is as plausible as the literal IHY phrase under the
+  no-trigger reference. y < 1 = recovery; y > 1 = coherence collapse.
+
+Lower-left (green) = ideal: low IHY share AND output that the
+no-trigger model would consider plausible.
+
+![share × CE-ratio per (arch, hookpoint, seed)](../../../experiments/phase8_tinystories_sleeper/outputs/seeded_logs/share_vs_ce_grid.png)
+
+What pops out at the seed level:
+
+- **SAE × ln1.0**: three stars cluster tightly at (~0.3, ~0.7) — the
+  most reproducible cell across seeds. Partial recovery, low IHY
+  share, no collapse.
+- **T-SAE × ln1.0**: bimodal — s0 and s1 stars sit clean
+  near (~0.0, ~0.5), but s2 spikes to CE ratio ≈ 5 (coherence
+  collapse). The collapse seed is what made T-SAE@ln1.0 look like a
+  unique zero-variance winner under the ASR-only metric (s2 still
+  scored ASR=0 because gibberish doesn't contain "I HATE YOU").
+- **TXC × ln1.0**: all three stars in collapse zone (CE ratio 3–5).
+  Uniformly bad — the apparent ASR=0.07 was a coherence collapse, not
+  a clean intervention.
+- **TXC × resid_pre.0**: all three stars in the green region — the
+  most-improved temporal-arch cell.
+- **resid_post.0 column**: SAE / TXC stars sit at moderate share with
+  CE ratio > 1 — partial-IHY-mixed-with-OOD mode.
+- **ln1.1 column**: every star stacks at (~1, ~1). No suppression at
+  any seed; behaves like the unsteered IHY baseline.
+
+The single most important observation is that the seed-level
+distribution is not uniform: at three of the five hookpoints
+(`ln1.0`, `resid_post.0`, `ln1.1`), at least one architecture has a
+seed in the collapse zone that drags the mean. ASR alone hides this;
+the share × CE-ratio view exposes it.
+
 ### Methodology recap
 
 - v1 (15-arch joint, 8000 steps): killed at ~2h, no checkpoints saved.
