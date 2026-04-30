@@ -96,6 +96,21 @@ The two architectures behave oppositely under the same Wang procedure top-30 lis
 
 The standard Wang `bundle k=30` headline metric is therefore biased toward arches with redundant features. **For TXC, single-feature steering or `bundle k=5` is the appropriate metric.**
 
+### Mid-flight standout: WindowedTSAE T=2 + mix_positions=True (in progress on h100_1)
+
+Stage 2 causal screen (preliminary, before stage 3 strength sweep) shows **multiple low-Δz̄ high-causal features** at α=−1 already, several beating SAE arditi 100k bundle peak (57.42) at just α=−1:
+
+| feat | Δz̄ | screen score | α=+1 align | α=−1 align |
+|---:|---:|---:|---:|---:|
+| 15836 | +0.085 | +20.02 | 35.33 | 55.36 |
+| 3179  | +0.063 | +21.79 | 39.29 | **61.07** |
+| 10711 | +0.027 | +23.08 | 39.23 | **62.31** |
+| 8745  | +0.027 | +27.19 | 30.00 | 57.19 |
+
+**feat 10711** at α=−1 hits 62.31 align — already higher than the prior champion's *peak* (SAE arditi 100k = 57.42 at α=−10) at 1/10th the steering magnitude. If the stage 3/4 frontier holds up, this is a major lift from the matryoshka/mixing fixes.
+
+Awaiting stage 3 strength sweep + stage 4 frontier on these finalists. **Will update once Wang procedure completes.**
+
 ### Headline (revised given the bundle-size results)
 
 If we report each architecture at *its own optimal k_bundle*:
