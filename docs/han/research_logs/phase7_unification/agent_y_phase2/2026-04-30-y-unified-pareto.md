@@ -64,6 +64,26 @@ panel).
 
 ### Headline ranking (peak success at coh ≥ 1.5)
 
+#### Per-position protocol — clean view (WIN cell highlighted gold)
+
+![per-position ranking](../../../../../experiments/phase7_unification/results/case_studies/plots/unified_ranking_per_position.png)
+
+The WIN cell (T=2 H8 shifts=(T,) at 1.400, Δ=+0.30) has a gold edge.
+
+#### Growth trajectory across T (per-position)
+
+![growth trajectory](../../../../../experiments/phase7_unification/results/case_studies/plots/unified_growth_trajectory.png)
+
+Three families compared as T grows:
+- **Sequential growth chain** (purple): T=2 → T=3 → T=4 → T=5 grown
+  from previous grown ckpt. Gracefully decays toward anchor at T=5.
+- **Bare random-init** (orange): independently trained at each T.
+  Diverges from anchor as T grows.
+- **H8 multidist + shifts=(T,)** (red): independently trained at each T.
+  T=2 (1.40) is the OBLITERATION; decays at T=3 (1.17), T=5 (1.07).
+
+#### Full ranking (both protocols, all archs)
+
 ![unified ranking](../../../../../experiments/phase7_unification/results/case_studies/plots/unified_ranking_matched_sparsity.png)
 
 Top 6 cells:
@@ -132,7 +152,9 @@ mode at sparse k_pos:
 ### Files
 
 - Inventory + JSON: `results/case_studies/plots/unified_pareto_summary.json`
-- Pareto plot: `results/case_studies/plots/unified_pareto_matched_sparsity{.png,.thumb.png}`
-- Ranking bar plot: `results/case_studies/plots/unified_ranking_matched_sparsity{.png,.thumb.png}`
+- Pareto plot (success vs coh, both protocols): `results/case_studies/plots/unified_pareto_matched_sparsity{.png,.thumb.png}`
+- Ranking bar plot (full, both protocols): `results/case_studies/plots/unified_ranking_matched_sparsity{.png,.thumb.png}`
+- Ranking bar plot (per-position only, WIN highlighted): `results/case_studies/plots/unified_ranking_per_position{.png,.thumb.png}`
+- Growth trajectory across T: `results/case_studies/plots/unified_growth_trajectory{.png,.thumb.png}`
 - Plot script: `experiments/phase7_unification/case_studies/steering/plot_unified_pareto.py`
 - Per-cell writeups: this `agent_y_phase2/` dir + `agent_w/` dir
