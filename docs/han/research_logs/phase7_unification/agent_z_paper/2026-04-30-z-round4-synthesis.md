@@ -259,17 +259,67 @@ added). On A40 it's `A40_ok` per the same memory math.
 - Does NOT compute multi-seed for T=7. T=7 at seed=1 + seed=2 needed
   for the leaderboard claim (X's protocol bar).
 
-### Coordination ping for X
+### R5 multi-seed result — T=7 vs T=5 is a statistical TIE
 
-`txc_bare_antidead_t7` at PAPER k=20 seed=42 = 0.9121 (Δ=−0.0010 from
-T=5 leader). Within your 0.005 threshold. Want me to either (a) train
-seeds 1 + 2 on 5090 to confirm the multi-seed mean, or (b) defer the
-multi-seed retrain to whichever pod has the bandwidth (your A40
-queue, when it frees up)?
+Z fired T=7 seed=1 + seed=2 sequentially on 5090 (~1.5 hr). Probed both
+under PAPER methodology. 3-seed comparison:
 
-If (a), Z fires sequentially: T=7 seed=1 (~30 min), T=7 seed=2
-(~30 min), probe both (~30 min). ~1.5 hr total. Probably fits in
-remaining session.
+| arch | seed=42 | seed=1 | seed=2 | 3-seed mean | σ |
+|---|---:|---:|---:|---:|---:|
+| `txc_bare_antidead_t5` | 0.9131 | 0.9113 | 0.9136 | **0.9127** | 0.0012 |
+| `txc_bare_antidead_t7` | 0.9121 | 0.9124 | 0.9105 | **0.9117** | 0.0010 |
+| Δ (T=7 − T=5) | | | | **−0.0010** | |
+
+**T=7 vs T=5 at 3-seed mean: Δ = −0.0010, well inside σ_seeds = 0.001
+on both sides.** This is a statistical TIE — T=7 is architecturally
+indistinguishable from T=5 within 3-seed noise. Neither is clearly
+better; both are valid `txc_bare_antidead_t<T>` paper-arch choices.
+
+### Final R5 verdict
+
+**No clean leaderboard win, but a clean robustness finding.** The
+TXCBareAntidead family at the k=20 leader's recipe shows a flat AUC
+plateau across T ∈ {5, 7} and a steep drop on the wings:
+
+```
+T=5  0.9127 ━━┓
+T=7  0.9117 ━━┛  (tied with T=5)
+T=8  0.9081      (-0.005, marginal)
+T=6  0.9056      (-0.007)
+T=10 0.9045
+T=20 0.8959
+```
+
+This SUPPORTS the paper's choice of T=5 as the canonical k=20 leader
+(small-T regime is a stable plateau, not a knife-edge optimum) AND
+provides a sanity check that the leaderboard isn't trivially gameable
+by tweaking T.
+
+### Should X promote T=7 to paper_archs.json?
+
+Z's recommendation: **NO, not unless Han wants a wider T-axis robustness
+column.** T=7 ties T=5 — picking it over T=5 is a coin flip. The simpler
+move is to keep T=5 as the paper-canonical leader and add a footnote
+that "T ∈ {5, 7} produce statistically indistinguishable AUC at this
+recipe" if the reviewer asks about T-sensitivity.
+
+If Han DOES want T=7 promoted (e.g., for symmetry with the k=5 leader's
+T=8), the L=128 retrain on H200 still applies — Z's L=64 numbers are
+hill-climb only.
+
+### Round 4-5 final status (Z)
+
+| direction | result |
+|---|---|
+| R4-A `SubseqRankedH8` T_max=20 t_sample=5 | LOSE (-0.0214) — kills cross-token AUC |
+| R4-B `SubseqSharedH8` T_max=20 | LOSE (-0.0920) — kills all tasks |
+| Multi-seed V1 (`SubseqH8` T_max=12) | BLOCKED on 5090 (OOM at all L); needs H200 |
+| R5 T-sweep `txc_bare_antidead_t<T>` for T ∈ {6, 7, 8} | T=7 TIES T=5 (3-seed mean Δ=-0.0010); T=6, T=8 LOSE |
+
+**Z's net leaderboard contribution this session**: zero new leader,
+two negative architectural findings (compress-slots-loses), one
+positive robustness finding (T-axis plateau at the k=20 recipe). All
+ckpts on HF (`han1823123123/txcdr-base/ckpts/`).
 
 ### Files / commits
 
