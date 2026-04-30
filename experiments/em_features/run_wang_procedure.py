@@ -71,6 +71,10 @@ def parse_args():
     p.add_argument("--final_alpha_grid", type=str,
                    default="-100,-10,-8,-6,-5,-4,-3,-2,-1.75,-1.5,-1.25,-1,0,1,1.25,1.5,1.75,2,3,4,5,6,7,8,9,10,100")
     p.add_argument("--final_rollouts", type=int, default=8)
+    p.add_argument("--save_demo_completions", type=int, default=0,
+                   help="If >0, save the first N completions per (feat, α) text "
+                        "+ per-rollout judge scores to demo_completions/feat<id>.json. "
+                        "Used by the steering-demo HTML dashboard.")
 
     p.add_argument("--seed", type=int, default=42)
     p.add_argument("--judge_model", default="gemini-3.1-flash-lite-preview")
@@ -393,12 +397,22 @@ def main():
     def _save_stage4_partial(meta: dict):
         final_partial.write_text(json.dumps({"meta": meta, "finalists": final_rows}, indent=2))
 
+    demo_dir = args.out / "demo_completions"
+    if args.save_demo_completions > 0:
+        demo_dir.mkdir(exist_ok=True)
+
+    def _gen_to_text(g):
+        if isinstance(g, dict):
+            return g.get("completion", g.get("text", str(g)))
+        return str(g)
+
     for f_idx, f in enumerate(finalists):
         fid = f["feature_id"]
         if fid in done_finalists:
             continue
         direction = load_steerer_decoder_row(args.arch, args.ckpt, fid, args.device)
         rows: list[dict] = []
+        demo_rows: list[dict] = []
         # If a per-finalist partial exists, resume from where we left off on that feature
         per_feat_path = args.out / f"stage4_finalist_{fid}.partial.json"
         completed_alphas: set[float] = set()
@@ -429,6 +443,21 @@ def main():
                          "mean_coh": float(np.mean(c_v)) if c_v else None,
                          "n_align": len(a_v), "n_coh": len(c_v),
                          "n_total": len(gens)})
+            if args.save_demo_completions > 0:
+                # Save first N completions (text + per-rollout judge scores)
+                N = min(args.save_demo_completions, len(gens))
+                demo_rows.append({
+                    "alpha": float(alpha),
+                    "completions": [
+                        {"text": _gen_to_text(gens[i]),
+                         "align": (None if i >= len(a) or a[i] is None else float(a[i])),
+                         "coh":   (None if i >= len(c) or c[i] is None else float(c[i]))}
+                        for i in range(N)
+                    ],
+                })
+                (demo_dir / f"feat{fid}.json").write_text(
+                    json.dumps({"feature_id": fid, "alphas": demo_rows}, indent=2)
+                )
             per_feat_path.write_text(json.dumps({"feature_id": fid, "rows": rows}, indent=2))
             print(f"  [feat {fid} α={alpha:+.2f}] align={rows[-1]['mean_align']}  coh={rows[-1]['mean_coh']}", flush=True)
         peak = max((r for r in rows if r["mean_align"] is not None), key=lambda r: r["mean_align"], default=None)
