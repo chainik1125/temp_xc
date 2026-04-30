@@ -95,7 +95,23 @@ If left-edge + per-position-of-OBLITERATION-arch combine multiplicatively, that 
 
 ### What's running / not running
 
-Nothing currently in flight. GPU should be idle. Last commit: `4cb2edff` ([Agent W] OBLITERATION 3-seed CONFIRMED).
+Nothing currently in flight. GPU verified idle (0% util, 0 MiB). Latest local commit: `f184ab3d` (this handover, after rebase onto Y's `64ad5207`). Y's recent thread `77b38c96` ("COSMIC sequential growth complete") landed during my Phase 3 work — see § COSMIC below.
+
+### COSMIC sequential growth (Y's untracked-by-me thread)
+
+Y ran a "+1-position-per-step warm-start" chain: T=2 → T=3-grown-from-T=2 → T=4-grown-from-T=3-grown → T=5-grown-from-T=4-grown. Single-seed result: graceful ~0.067-per-step decay; T=5 grown-chained ties anchor exactly (1.100 = 1.10). Direct T=2→T=5 growth fails catastrophically (0.567). Implication: matched-sparsity TXC can hold the anchor at any T from 2 to 5 if you sequentially warm-start. Files: `txc_bare_antidead_t{3,4,5}_kpos20_grown*` in training_index. Worth combining with H8 shifts=(T,) for a "COSMIC + OBLITERATION stack" experiment — untested.
+
+### Cross-pod ckpt asymmetry — important
+
+Y kept her T=2 H8 sd42 ckpt local (`--no-hf-push`). On THIS pod, `txc_h8_t2_kpos20_shifts2/ckpts/` has only sd1 + sd2 (W's training). Y's sd42 ckpt is NOT here. The 3-seed OBLITERATION verify worked because Y committed her sd42 *grades + generations* to the repo (under `steering_paper_normalised/txc_h8_t2_kpos20_shifts2/`); we never needed her sd42 ckpt itself.
+
+This means: if next-W wants to run a NEW protocol on Y's sd42 ckpt (e.g., left-edge on the OBLITERATION arch), they would need to either (a) pull Y's sd42 ckpt from her pod, or (b) re-train sd42 themselves (~30 min wall, deterministic recipe via `train_kpos20_h8_shifts.py --T 2 --shifts 2 --seed 42`), or (c) just use the ckpts they already have (sd1 + sd2 + maybe my own freshly trained sd42). Cross-pod cuDNN non-determinism means re-trained sd42 won't bit-match Y's sd42 — but at multi-seed pooling that's noise, not signal.
+
+### Old "joint conclusion" file note
+
+I (W) prematurely wrote `agent_w/2026-04-30-w-final-conclusion.md` in this session, Han said "don't write the joint conclusion yet", I `rm`'d the file locally, but a subsequent rebase + push saved it back to the repo at commit `731e0bd7`. It's still in the working tree as of this handover.
+
+**Treat it as a draft reference, not an official conclusion.** Han wants the joint conclusion written WHEN findings are settled. The current matrix (mean-curve OBLITERATION = TIE close to win; per-seed-then-mean = barely WIN) hasn't reached the level of confidence Han wants for a joint conclusion yet. If you write the official one, supersede `2026-04-30-w-final-conclusion.md` cleanly.
 
 ### Coordination protocol with Y (still active)
 
