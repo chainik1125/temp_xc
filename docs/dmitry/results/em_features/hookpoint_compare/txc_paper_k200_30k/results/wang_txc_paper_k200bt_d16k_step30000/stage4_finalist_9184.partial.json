@@ -1,0 +1,221 @@
+{
+  "feature_id": 9184,
+  "rows": [
+    {
+      "alpha": -100.0,
+      "mean_align": 11.875,
+      "mean_coh": 6.71875,
+      "n_align": 64,
+      "n_coh": 64,
+      "n_total": 64
+    },
+    {
+      "alpha": -10.0,
+      "mean_align": 42.295081967213115,
+      "mean_coh": 22.34375,
+      "n_align": 61,
+      "n_coh": 64,
+      "n_total": 64
+    },
+    {
+      "alpha": -8.0,
+      "mean_align": 35.416666666666664,
+      "mean_coh": 18.90625,
+      "n_align": 60,
+      "n_coh": 64,
+      "n_total": 64
+    },
+    {
+      "alpha": -6.0,
+      "mean_align": 40.083333333333336,
+      "mean_coh": 22.109375,
+      "n_align": 60,
+      "n_coh": 64,
+      "n_total": 64
+    },
+    {
+      "alpha": -5.0,
+      "mean_align": 34.25423728813559,
+      "mean_coh": 17.65625,
+      "n_align": 59,
+      "n_coh": 64,
+      "n_total": 64
+    },
+    {
+      "alpha": -4.0,
+      "mean_align": 34.42622950819672,
+      "mean_coh": 20.15625,
+      "n_align": 61,
+      "n_coh": 64,
+      "n_total": 64
+    },
+    {
+      "alpha": -3.0,
+      "mean_align": 36.271186440677965,
+      "mean_coh": 23.046875,
+      "n_align": 59,
+      "n_coh": 64,
+      "n_total": 64
+    },
+    {
+      "alpha": -2.0,
+      "mean_align": 47.58064516129032,
+      "mean_coh": 26.5625,
+      "n_align": 62,
+      "n_coh": 64,
+      "n_total": 64
+    },
+    {
+      "alpha": -1.75,
+      "mean_align": 44.166666666666664,
+      "mean_coh": 24.84375,
+      "n_align": 60,
+      "n_coh": 64,
+      "n_total": 64
+    },
+    {
+      "alpha": -1.5,
+      "mean_align": 46.13793103448276,
+      "mean_coh": 26.171875,
+      "n_align": 58,
+      "n_coh": 64,
+      "n_total": 64
+    },
+    {
+      "alpha": -1.25,
+      "mean_align": 52.67741935483871,
+      "mean_coh": 25.390625,
+      "n_align": 62,
+      "n_coh": 64,
+      "n_total": 64
+    },
+    {
+      "alpha": -1.0,
+      "mean_align": 44.83606557377049,
+      "mean_coh": 24.140625,
+      "n_align": 61,
+      "n_coh": 64,
+      "n_total": 64
+    },
+    {
+      "alpha": 0.0,
+      "mean_align": 43.46774193548387,
+      "mean_coh": 25.390625,
+      "n_align": 62,
+      "n_coh": 64,
+      "n_total": 64
+    },
+    {
+      "alpha": 1.0,
+      "mean_align": 49.67741935483871,
+      "mean_coh": 23.984375,
+      "n_align": 62,
+      "n_coh": 64,
+      "n_total": 64
+    },
+    {
+      "alpha": 1.25,
+      "mean_align": 46.28813559322034,
+      "mean_coh": 25.703125,
+      "n_align": 59,
+      "n_coh": 64,
+      "n_total": 64
+    },
+    {
+      "alpha": 1.5,
+      "mean_align": 42.72727272727273,
+      "mean_coh": 22.8125,
+      "n_align": 55,
+      "n_coh": 64,
+      "n_total": 64
+    },
+    {
+      "alpha": 1.75,
+      "mean_align": 46.90909090909091,
+      "mean_coh": 24.375,
+      "n_align": 55,
+      "n_coh": 64,
+      "n_total": 64
+    },
+    {
+      "alpha": 2.0,
+      "mean_align": 46.03448275862069,
+      "mean_coh": 23.671875,
+      "n_align": 58,
+      "n_coh": 64,
+      "n_total": 64
+    },
+    {
+      "alpha": 3.0,
+      "mean_align": 50.98360655737705,
+      "mean_coh": 22.96875,
+      "n_align": 61,
+      "n_coh": 64,
+      "n_total": 64
+    },
+    {
+      "alpha": 4.0,
+      "mean_align": 50.0,
+      "mean_coh": 25.9375,
+      "n_align": 60,
+      "n_coh": 64,
+      "n_total": 64
+    },
+    {
+      "alpha": 5.0,
+      "mean_align": 48.175438596491226,
+      "mean_coh": 29.53125,
+      "n_align": 57,
+      "n_coh": 64,
+      "n_total": 64
+    },
+    {
+      "alpha": 6.0,
+      "mean_align": 48.0,
+      "mean_coh": 30.0,
+      "n_align": 60,
+      "n_coh": 64,
+      "n_total": 64
+    },
+    {
+      "alpha": 7.0,
+      "mean_align": 47.80327868852459,
+      "mean_coh": 27.5,
+      "n_align": 61,
+      "n_coh": 64,
+      "n_total": 64
+    },
+    {
+      "alpha": 8.0,
+      "mean_align": 49.67741935483871,
+      "mean_coh": 28.75,
+      "n_align": 62,
+      "n_coh": 64,
+      "n_total": 64
+    },
+    {
+      "alpha": 9.0,
+      "mean_align": 51.61290322580645,
+      "mean_coh": 30.15625,
+      "n_align": 62,
+      "n_coh": 64,
+      "n_total": 64
+    },
+    {
+      "alpha": 10.0,
+      "mean_align": 53.145161290322584,
+      "mean_coh": 33.59375,
+      "n_align": 62,
+      "n_coh": 64,
+      "n_total": 64
+    },
+    {
+      "alpha": 100.0,
+      "mean_align": 9.84375,
+      "mean_coh": 2.734375,
+      "n_align": 64,
+      "n_coh": 64,
+      "n_total": 64
+    }
+  ]
+}
