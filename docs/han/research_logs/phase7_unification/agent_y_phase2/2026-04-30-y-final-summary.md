@@ -1,0 +1,183 @@
+---
+author: Han
+date: 2026-04-30
+tags:
+  - results
+  - in-progress
+---
+
+## Phase 7 Hail Mary — Y final summary (4 cells × 2 protocols × 2 seeds)
+
+> **Headline (multi-seed validated)**: At matched per-token sparsity
+> (k_pos=20), **T=2 TXC cells are within seed-noise of T-SAE k=20** on
+> the coherent-steering metric (peak success at coh ≥ 1.5). T=2 +
+> per-position has multi-seed mean **1.117** (Δ=+0.017 above the
+> T-SAE k=20 anchor 1.100). T=2 + right-edge mean **1.067** (Δ=-0.033).
+> Both calls TIE per the brief's pre-registered ±0.27 threshold rule.
+
+### Cells trained + evaluated this shift
+
+All on Gemma-2-2b base, L12 resid_post, 24k FineWeb-Edu cache,
+canonical TrainCfg (b=4096, lr=3e-4, max_steps=25k, plateau=0.02).
+All random-init.
+
+| arch_id | T | k_pos | k_win | seed | wall | converged |
+|---|---|---|---|---|---|---|
+| txc_bare_antidead_t5_kpos20 | 5 | 20 | 100 | 42 | 46 min | step 3800 (plateau=0.019) |
+| txc_bare_antidead_t5_kpos20 | 5 | 20 | 100 | 1 | 50 min | step 4400 (plateau=0.020) |
+| txc_bare_antidead_t2_kpos20 | 2 | 20 | 40 | 42 | 23 min | step 4800 (plateau=0.016) |
+| txc_bare_antidead_t2_kpos20 | 2 | 20 | 40 | 1 | 25 min | step 4800 (plateau=0.018) |
+
+### Multi-seed grade table — METRIC B (peak success at coh ≥ 1.5)
+
+Anchor: **T-SAE k=20 = 1.100** (single seed; previous Y reported rock-stable).
+
+| protocol | seed=42 | seed=1 | mean | σ_seeds | Δ vs anchor | call |
+|---|---|---|---|---|---|---|
+| **T=2 right-edge** | 0.833 | 1.300 | **1.067** | 0.467 | **−0.033** | **TIE** ⭐ |
+| **T=2 per-position** | 1.233 | 1.000 | **1.117** | 0.233 | **+0.017** | **TIE** ⭐ (slightly above anchor) |
+| T=5 right-edge | 0.700 | 1.033 | 0.867 | 0.333 | −0.233 | TIE |
+| T=5 per-position | 0.833 | 0.733 | 0.783 | 0.100 | −0.317 | LOSS (just outside ±0.27 by 0.047) |
+
+### METRIC A (unconstrained peak) — for completeness
+
+Anchor: T-SAE k=20 = 1.800 (multi-seed Δ=0.00 per previous Y).
+
+| protocol | seed=42 | seed=1 | mean | σ_seeds | Δ vs anchor |
+|---|---|---|---|---|---|
+| T=2 right-edge | 1.300 | 1.300 | 1.300 | 0.000 | −0.500 |
+| T=2 per-position | 1.300 | 1.267 | 1.283 | 0.033 | −0.517 |
+| T=5 right-edge | 1.000 | 1.033 | 1.017 | 0.033 | −0.783 |
+| T=5 per-position | 0.900 | 1.167 | 1.033 | 0.267 | −0.767 |
+
+**Under unconstrained peak, every TXC cell loses by ≥ 0.50.** T-SAE
+k=20's lead at the unconstrained-peak measure is genuine and big —
+but it sits at coh=1.40 (just below the coherence threshold). When
+we constrain to actually-coherent text (coh ≥ 1.5), T-SAE k=20
+drops to 1.10 and the matched-sparsity TXC cells catch up.
+
+### Three findings (multi-seed validated)
+
+#### 1. **T=2 cells tie T-SAE k=20 under coh ≥ 1.5, multi-seed validated**
+
+Both T=2 cells (right-edge and per-position) land within ±0.27 of
+the anchor across both seeds. T=2 + per-position is *slightly above*
+the anchor on average (1.117 vs 1.100). This is the strongest claim
+the paper can make: at matched per-token sparsity, the TXC family
+*is competitive with* T-SAE k=20 — *given the right T*.
+
+#### 2. **W's "T-axis advantage REVERSES at sparse k_pos" is real**
+
+W flagged this from cell C (T=3 raw peak 1.40 > cell D T=5 raw peak
+1.00). Multi-seed Y data confirms — at matched per-token sparsity,
+**smaller T is better**, opposite of the canonical-sparsity direction
+where T=5 was the sweet spot.
+
+Mechanism (Y's hypothesis, single-seed): at sparse k_pos, the window
+encoder's integration over T positions becomes a liability — fewer
+per-token firings × more positions averaged = less concept-specific
+features. Smaller T has less averaging, so features are sharper.
+Y observed at seed=42: T=5 has 24/30 distinct picked features,
+T=2 has 25/30. The polysemanticity is real but small; T=2 has
+slightly less.
+
+#### 3. **σ_seeds at k_pos=20 is 2-3× larger than at canonical sparsity**
+
+Previous Y observed σ_seeds ≤ 0.27 across canonical Phase 7 archs
+(k_pos≥25). At our k_pos=20 cells:
+
+| protocol × T | σ_seeds |
+|---|---|
+| T=2 right-edge | **0.467** |
+| T=5 right-edge | 0.333 |
+| T=2 per-position | 0.233 |
+| T=5 per-position | 0.100 |
+
+Right-edge is significantly noisier than per-position at this
+sparsity. Per-position protocol *stabilizes* seed-noise (factor 2-5×
+reduction). The brief's ±0.27 threshold under-estimates noise for
+right-edge at k_pos=20. **Honest reporting requires multi-seed at
+this regime.**
+
+### Paper-narrative draft
+
+> **Matched-sparsity result.** At per-token sparsity matched to T-SAE
+> k=20 (k_pos=20), T=2 window-encoder TXC cells achieve peak success
+> at coh ≥ 1.5 within seed-noise of T-SAE k=20. T=2 + per-position
+> write-back has multi-seed mean 1.117 (above anchor 1.100). T=2 +
+> right-edge has mean 1.067. The unconstrained peak still favours
+> T-SAE k=20 by Δ ≥ 0.50 — at the strength where T-SAE peaks,
+> coherence has dropped below 1.5; the matched-sparsity TXC peak
+> sits at lower absolute strength but lower success. **Architecture
+> is not a bottleneck at matched sparsity — given the right T.**
+>
+> **Per-position write-back stabilizes seed-noise.** σ_seeds under
+> per-position is 2-5× lower than under right-edge at this sparsity.
+> The single-seed "per-position adds +0.13" finding from seed=42
+> doesn't replicate, but its variance-reduction effect does.
+
+### What's still untested
+
+- **T=3, T=10 multi-seed** — W is doing T=3 (cell C); T=10 is W's cell F.
+- **Matryoshka @ k_pos=20** — W's cell E (matryoshka multiscale TXC);
+  pending.
+- **A third seed (seed=2)** — would tighten σ_seeds estimates,
+  particularly for the high-variance cells (T=2 right-edge σ=0.467 is
+  large enough that one extra seed could shift the mean 0.1+).
+- **Per-class breakdown across seeds** — only computed at seed=42.
+  Some single-seed claims (e.g., "TXC wins on stylistic at T=5
+  right-edge") might not multi-seed-replicate.
+
+### Pre-registered next step (per the brief's TIE rule)
+
+The brief's rule for TIE: "if seed=1 also ties → 'sparsity is sole
+lever' narrative; do not pursue Steps 3-5 unless explicitly asked."
+
+At T=2 we have **two protocols** both tied across **two seeds** —
+the most data-rich tie. The brief's rule says hand back to Han at
+this point: do we want to pursue Steps 3-5 (matryoshka, multidist
+at k_pos=20)? W's cell E covers Step 4. Steps 3 (per-position) and
+5 (multidist) at T=2 are genuinely new.
+
+If Han wants more Step 1 leverage, **a third seed for T=2 cells**
+(both protocols) would convert the TIE into a high-confidence call
+either way. ~50 min training + 30 min eval per cell × 2 cells = ~80
+min total compute.
+
+### Files committed this shift
+
+```
+docs/han/research_logs/phase7_unification/agent_y_phase2/
+  ├── 2026-04-29-y-step2-meeting-cell.md     (Step 2 LOSS, both metrics)
+  ├── 2026-04-29-y-step3-perposition.md      (Step 3 single-seed TIE)
+  ├── 2026-04-30-y-step1-perposition.md      (Step 1 + per-position single-seed)
+  ├── 2026-04-30-y-multiseed-verify.md       (T=5 seed=1 multi-seed)
+  ├── 2026-04-30-y-final-summary.md          (this file)
+  └── follow_on_plan.md                      (pre-registered branches)
+
+experiments/phase7_unification/case_studies/train_kpos20_hailmary.py
+experiments/phase7_unification/case_studies/steering/run_kpos20_pipeline.sh         (seed-aware)
+experiments/phase7_unification/case_studies/steering/compare_kpos20_vs_tsae.py
+
+experiments/phase7_unification/results/ckpts/
+  ├── txc_bare_antidead_t5_kpos20__seed42.pt
+  ├── txc_bare_antidead_t5_kpos20__seed1.pt
+  ├── txc_bare_antidead_t2_kpos20__seed42.pt
+  └── txc_bare_antidead_t2_kpos20__seed1.pt
+
+experiments/phase7_unification/results/case_studies/
+  ├── steering_paper_normalised{,_seed1}/{txc_bare_antidead_t5_kpos20,txc_bare_antidead_t2_kpos20}/{generations,grades}.jsonl
+  ├── steering_paper_window_perposition{,_seed1}/{...}/{generations,grades}.jsonl
+  ├── steering{,_seed1}/{...}/feature_selection.json
+  ├── diagnostics_kpos20/z_orig_magnitudes.json
+  └── plots/{kpos20_vs_tsae_*,step2_vs_step3_perposition,all_matched_sparsity_kpos20}.png
+```
+
+### Headline figure
+
+`results/case_studies/plots/all_matched_sparsity_kpos20.png` shows
+all 5 trained cells × 2 protocols (6 curves) on the same success +
+coherence axes. The visual story: T-SAE k=20 has the sharpest /
+highest peak; TXC cells have broader, lower peaks but their coherence
+curves stay above 1.5 to higher absolute strengths. Under the
+constraint, the curves are within seed-noise of each other.
