@@ -252,6 +252,23 @@ def _load_phase7_model(meta: dict, ckpt_path: Path, device) -> tuple:
             matryoshka_h_size=int(d_sae * 0.2),
             alpha=float(meta.get("alpha") if meta.get("alpha") is not None else 1.0),
         ).to(device)
+    elif src_class == "TXCBareMDxMSContrastiveAntidead":
+        # Z R7: multi-distance × multi-scale contrastive variant.
+        # Probe-time encode behaves identically to TXCBareMultiDistance
+        # (matryoshka_h_size + per-position W_enc). Just need to
+        # instantiate the right class so the ckpt's state_dict loads.
+        from src.architectures.txc_bare_md_ms_contrastive_antidead import (
+            TXCBareMDxMSContrastiveAntidead,
+        )
+        shifts = tuple(meta.get("shifts") or (1,))
+        n_scales = int(meta.get("n_scales") or meta.get("n_contr_scales") or 3)
+        gamma = float(meta.get("gamma") if meta.get("gamma") is not None else 0.5)
+        model = TXCBareMDxMSContrastiveAntidead(
+            d_in, d_sae, int(meta["T"]), int(meta["k_win"]),
+            shifts=shifts, n_contr_scales=n_scales, gamma=gamma,
+            matryoshka_h_size=int(d_sae * 0.2),
+            alpha=float(meta.get("alpha") if meta.get("alpha") is not None else 1.0),
+        ).to(device)
     elif src_class == "SubseqRankedH8":
         # Z's per-sampled-slot variant: t_sample-many encoder/decoder slabs.
         # Probe-time encode partitions T_max into t_sample equally-spaced
