@@ -47,6 +47,17 @@ T-SAE's unconstrained-peak strength s=10 produces text at coh = 1.40
 — that is, *less than "somewhat coherent"*. The 1.80 number is the
 peak success on text that fails the prereg coherence threshold.
 
+### The picture: success-vs-coherence curves
+
+![succ vs coh](../../../../../experiments/phase7_unification/results/case_studies/plots/succ_vs_coh_curves.png)
+
+Each line traces one cell's (succ, coh) curve as steering strength increases.
+T-SAE k=20 (blue) sweeps RIGHT (succ rises) and DOWN (coh falls); its peak
+star ★ lands at succ=1.80 / coh=1.40 — INSIDE THE INCOHERENT BAND. The
+TXC curves (red, darkred, orange) stay above the coh ≥ 1.5 floor for
+much longer and peak in the coherent region. Every TXC peak ★ is in
+yellow or green; T-SAE's peak ★ is in red.
+
 ### Multi-threshold ranking
 
 ![multi-threshold winner](../../../../../experiments/phase7_unification/results/case_studies/plots/coh_threshold_sweep.png)

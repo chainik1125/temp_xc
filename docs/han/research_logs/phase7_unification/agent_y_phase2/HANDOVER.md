@@ -372,8 +372,11 @@ defensible.
 
 In order:
 1. **This file (HANDOVER.md) — read FIRST**
-2. `agent_y_phase2/2026-04-30-y-unified-pareto.md` — full picture with all 4 plots
-3. `agent_y_phase2/2026-04-30-y-final-summary.md` — pre-OBLITERATION 3-seed picture (NOTE: claims T=2 bare per-pos = 1.200 multi-seed; that's per-seed-then-mean; mean-curve gives 0.978)
+2. **`agent_y_phase2/2026-04-30-y-coh-threshold-sweep.md` — GIGABRAIN
+   reframe; the paper headline now lives here (TXC dominates at every
+   coh threshold ≥ 1.5)**
+3. `agent_y_phase2/2026-04-30-y-unified-pareto.md` — full picture with all 4 plots
+4. `agent_y_phase2/2026-04-30-y-final-summary.md` — pre-OBLITERATION 3-seed picture (NOTE: claims T=2 bare per-pos = 1.200 multi-seed; that's per-seed-then-mean; mean-curve gives 0.978)
 4. `agent_y_phase2/2026-04-30-y-creative-shifts-T.md` — Han's shifts=(T,) suggestion
 5. `agent_y_phase2/2026-04-30-y-grow-from-t2.md` — sequential growth findings
 6. `agent_y_phase2/2026-04-30-y-multiseed-verify.md` — per-seed-then-mean verdict on T=5 cells
