@@ -38,6 +38,7 @@ class TSAEAdjacentContrastive(nn.Module):
         k: int,
         *,
         contrastive_alpha: float = 1.0,
+        batch_topk: bool = False,
         # antidead bookkeeping (matches the Han / TXC convention so the trainer
         # can hot-swap)
         aux_k: int = 512,
@@ -49,6 +50,7 @@ class TSAEAdjacentContrastive(nn.Module):
         self.d_sae = d_sae
         self.k = k
         self.contrastive_alpha = float(contrastive_alpha)
+        self.batch_topk = bool(batch_topk)
         self.aux_k = int(aux_k)
         self.dead_threshold_tokens = int(dead_threshold_tokens)
         self.auxk_alpha = float(auxk_alpha)
@@ -77,12 +79,31 @@ class TSAEAdjacentContrastive(nn.Module):
 
     # ---- per-token API (identical to TopKSAE) -----------------------------
     def encode(self, x: torch.Tensor) -> torch.Tensor:
-        """x: (..., d_in) → z: (..., d_sae) post-TopK."""
+        """x: (..., d_in) → z: (..., d_sae) post-TopK.
+
+        Always per-token TopK at inference (regardless of self.batch_topk).
+        BatchTopK only applies to the training-time path (training_loss)."""
         pre = (x - self.b_dec) @ self.W_enc + self.b_enc
         topk_vals, topk_idx = pre.topk(self.k, dim=-1)
         z = torch.zeros_like(pre)
         z.scatter_(-1, topk_idx, topk_vals)
         return z
+
+    def _encode_batch_topk(self, flat: torch.Tensor) -> torch.Tensor:
+        """flat: (N, d_in) input activations. Keeps the top (N*k) pre-activation
+        values across the entire (N, d_sae) post-projection matrix — a single
+        global TopK with budget ``N*k`` so average L0 per row is k. Returns
+        z of shape (N, d_sae)."""
+        N = flat.shape[0]
+        budget = N * self.k
+        pre_act = (flat - self.b_dec) @ self.W_enc + self.b_enc  # (N, d_sae)
+        flat_view = pre_act.reshape(-1)
+        if budget >= flat_view.numel():
+            return pre_act
+        topk_vals, topk_idx = flat_view.topk(budget, sorted=False)
+        z_flat = torch.zeros_like(flat_view)
+        z_flat.scatter_(0, topk_idx, topk_vals)
+        return z_flat.reshape(N, self.d_sae)
 
     def decode(self, z: torch.Tensor) -> torch.Tensor:
         return z @ self.W_dec + self.b_dec
@@ -107,7 +128,10 @@ class TSAEAdjacentContrastive(nn.Module):
         """
         B, T, d = windows.shape
         flat = windows.reshape(B * T, d)
-        z_flat = self.encode(flat)
+        if self.batch_topk:
+            z_flat = self._encode_batch_topk(flat)
+        else:
+            z_flat = self.encode(flat)
         x_hat_flat = self.decode(z_flat)
         z = z_flat.reshape(B, T, self.d_sae)
         x_hat = x_hat_flat.reshape(B, T, d)

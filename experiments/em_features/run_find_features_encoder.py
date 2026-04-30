@@ -170,6 +170,7 @@ def main():
         sae = TSAEAdjacentContrastive(
             d_in=cfg["d_in"], d_sae=cfg["d_sae"], k=cfg["k"],
             contrastive_alpha=cfg.get("contrastive_alpha", 1.0),
+            batch_topk=cfg.get("batch_topk", False),
             aux_k=cfg.get("aux_k", 512),
             dead_threshold_tokens=cfg.get("dead_threshold_tokens", 640_000),
             auxk_alpha=cfg.get("auxk_alpha", 1.0 / 32.0),

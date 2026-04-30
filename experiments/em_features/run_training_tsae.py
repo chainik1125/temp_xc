@@ -59,7 +59,10 @@ def parse_args():
     p.add_argument("--k", type=int, default=128)
     p.add_argument("--T", type=int, default=5,
                    help="Window length used for the contrastive loss (uses T-1 adjacent pairs).")
-    p.add_argument("--contrastive_alpha", type=float, default=1.0)
+    p.add_argument("--contrastive_alpha", type=float, default=1.0,
+                   help="Bhalla 2025 paper default: 0.1")
+    p.add_argument("--batch_topk", action="store_true",
+                   help="Use BatchTopK during training (Bhalla 2025 paper default).")
     p.add_argument("--auxk_alpha", type=float, default=1.0/32.0)
     p.add_argument("--aux_k", type=int, default=512)
     p.add_argument("--dead_threshold_tokens", type=int, default=640_000)
@@ -118,11 +121,13 @@ def main():
     sae = TSAEAdjacentContrastive(
         d_in=d_model, d_sae=args.d_sae, k=args.k,
         contrastive_alpha=args.contrastive_alpha,
+        batch_topk=args.batch_topk,
         aux_k=args.aux_k,
         dead_threshold_tokens=args.dead_threshold_tokens,
         auxk_alpha=args.auxk_alpha,
     ).to(args.device)
-    print(f"T-SAE: d_sae={args.d_sae} k={args.k} T={args.T} α_contrast={args.contrastive_alpha}", flush=True)
+    print(f"T-SAE: d_sae={args.d_sae} k={args.k} T={args.T} α_contrast={args.contrastive_alpha} "
+          f"batch_topk={args.batch_topk}", flush=True)
 
     start_step = 0
     rckpt = None
@@ -215,6 +220,7 @@ def main():
                     "arch": "tsae_adjacent_contrastive",
                     "d_in": d_model, "d_sae": args.d_sae, "k": args.k, "T": args.T,
                     "contrastive_alpha": args.contrastive_alpha,
+                    "batch_topk": args.batch_topk,
                     "aux_k": args.aux_k, "auxk_alpha": args.auxk_alpha,
                     "dead_threshold_tokens": args.dead_threshold_tokens,
                     "subject_model": cfg["subject_model"],
