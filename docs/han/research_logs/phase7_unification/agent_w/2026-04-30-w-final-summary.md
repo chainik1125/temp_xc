@@ -30,8 +30,8 @@ mean (Y's data) or single-seed (W's pending verify):
 | **3** | **bare-antidead** | **per-position** | **1.000** | TBD | TBD | TBD | TBD |
 | 5 | bare-antidead | right-edge | 0.70 | 1.03 | 0.867 | −0.233 | TIE |
 | 5 | bare-antidead | per-position | 0.83 | 0.73 | 0.783 | −0.317 | TIE/LOSS |
-| 5 | matryoshka multiscale | right-edge | 0.633 | TBD | TBD | TBD | LOSS at single seed |
-| 5 | matryoshka multiscale | per-position | TBD | TBD | TBD | TBD | TBD |
+| 5 | matryoshka multiscale | right-edge | 0.633 | TBD | TBD | −0.467 | LOSS at single seed |
+| 5 | matryoshka multiscale | per-position | **0.933** | TBD | TBD | **−0.167** | **TIE** ⭐ (single-seed) |
 
 ### Three findings W contributes (single-seed; multi-seed verify pending)
 
@@ -44,12 +44,17 @@ mean (Y's data) or single-seed (W's pending verify):
    exactly between Y's T=2 (+0.40) and T=5 (+0.13). Three independent
    datapoints confirm the smaller-T-is-better-at-sparse-k_pos pattern.
 
-3. **Matryoshka multiscale doesn't rescue the matched-sparsity gap.**
-   Cell E (agentic_txc_02_kpos20) at T=5 + right-edge lands at 0.633
-   (LOSS by 0.467) — *worse* than bare-antidead T=5 right-edge (0.700).
-   The multi-scale contrastive head + matryoshka groups, which were
-   the Phase 5 mp champion at k_pos=100, are a small structural
-   negative at sparse k_pos. Per-position result pending.
+3. **Matryoshka × per-position is a per-cell synergy.**
+   Cell E (agentic_txc_02_kpos20) at T=5: right-edge 0.633 LOSS, but
+   per-position 0.933 TIE. The right-edge → per-position boost is **+0.30**
+   — the largest at T=5 (vs bare-antidead T=5's +0.13). Matryoshka multi-
+   scale produces features that are worse than bare-antidead under right-
+   edge (write-only-at-T-1 sees noisy late-position feature firings) but
+   better when distributed across all T positions (per-position writing
+   averages the multi-scale contrastive heads' coordinated firings into
+   a coherent intervention). This synergy is **separate from Y's T-axis-
+   reverses finding**: under per-position, T=5 matryoshka (0.933) actually
+   beats T=5 bare-antidead (0.833) at the same T.
 
 ### Cells trained
 
@@ -103,7 +108,16 @@ is the optimal stack for them.
 - constrained peak: **0.633**
 - Δ vs anchor: −0.467 → LOSS
 
-**Per-position protocol**: pending (~25 min ETA)
+**Per-position protocol**:
+- raw peak: **1.433**
+- constrained peak: **0.933**
+- Δ vs anchor: −0.167 → **TIE**
+- right-edge → per-position boost: **+0.30** (largest at T=5 in the matrix)
+
+The matryoshka × per-position result inverts the picture: under right-edge
+matryoshka is the worst T=5 cell; under per-position it's the *best* T=5
+cell. Single-seed; needs multi-seed verify for paper claim, but the boost
+direction is unambiguous.
 
 **Why matryoshka multiscale doesn't help at sparse k_pos** (hypothesis):
 - The matryoshka head splits d_sae into H/L groups (H=0.2·d_sae) — at
@@ -128,7 +142,7 @@ Per `agent_w/plan.md` § Phase 2 hill-climb axes:
 |---|---|---|---|
 | 1 | T → T±1 | yes (T=3 vs Y's T=5) | T-axis reverses at sparse k_pos: T=3 raw > T=5 raw (1.50 vs 1.00 right-edge); T=3 per-position 1.00 vs T=5 per-position 0.83 |
 | 2 | k_pos × {0.5, 2} | not tested | (skipped — Phase 1 ate the budget) |
-| 3 | family swap (bare ↔ matry) | yes (cell E) | matryoshka multiscale LOSES vs bare-antidead at k_pos=20 (0.633 vs 0.700 right-edge) |
+| 3 | family swap (bare ↔ matry) | yes (cell E) | matryoshka LOSES under right-edge (0.633 vs bare 0.700), WINS under per-position (0.933 vs bare 0.833). Family advantage is protocol-conditional. |
 | 4 | decoder write-back (right-edge ↔ per-position) | yes (all cells) | per-position lifts mean by +0.13 to +0.40 single-seed; multi-seed effect is variance reduction (σ 0.33 → 0.10) more than mean shift |
 | 5 (creative, beyond brief) | subseq sampling × k_pos=20 | not tested | (skipped) |
 | 6 (creative) | k_win > T·k_pos (anchor regime) | not tested | (skipped) |
