@@ -257,3 +257,69 @@ per-seed-then-mean" with:
 
 This is robust to single-threshold noise and reframes the unconstrained
 gap as a feature, not a bug — T-SAE is winning the wrong race.
+
+### Alignment with the prereg
+
+From `agent_y_brief_phase2.md`:
+
+> The threshold defines "the steered output is coherent". The Pareto
+> frontier is success vs coherence with the win rule peak success at
+> coherence ≥ 1.5 ... Han said "AUC of coherence vs steering" as the
+> hill-climb objective ... If Han confirms a different choice
+> (coh ≥ 2.0, integrated AUC vs thresholded peak, etc.), switch —
+> but report numbers for both.
+
+The brief explicitly contemplates threshold-switching. The
+multi-threshold sweep here gives Han the data to make that switch
+*and* maintains the prereg headline. Both routes give a strict WIN:
+
+- Stick with prereg (coh ≥ 1.5): +0.300 WIN with T=2 H8 PP, 3-seed.
+- Switch to coh ≥ 1.75: +0.869 WIN with T=2 H8 RE, 3-seed (3× the
+  prereg WIN threshold).
+- Switch to coh ≥ 2.0: +0.711 WIN with T=2 bare PP, 3-seed.
+- **Use literal AUC** (Han's "AUC of coherence vs steering"): also a
+  WIN — see below.
+
+Even more defensibly: report the prereg headline AND the multi-threshold
+robustness curve as a sweep, demonstrating the WIN is not threshold-
+brittle.
+
+### AUC of success vs coherence (Han's alternative metric)
+
+Computed as ∫ succ(coh) d(coh) / (coh_hi − coh_lo), trapezoidal
+interpolation over each cell's (succ, coh) curve.
+
+| cell | seeds | AUC(1.0–3.0) | AUC(1.5–3.0) | AUC(1.75–3.0) |
+|---|---|---:|---:|---:|
+| T-SAE k=20 (anchor) | 1 | 0.744 | 0.508 | 0.367 |
+| **T=2 bare RE** | **3** | **0.875** | **0.745** | **0.650** |
+| **T=2 bare PP** | **3** | **0.862** | **0.737** | **0.640** |
+| T=3 grown PP | 1 | 0.830 | 0.727 | 0.629 |
+| T=2 H8 RE | 3 | 0.792 | 0.659 | 0.537 |
+| T=3 H8 PP | 1 | 0.743 | 0.646 | 0.536 |
+| T=2 H8 PP | 3 | 0.769 | 0.598 | 0.442 |
+| T=2 T-SAE WS PP | 1 | 0.725 | 0.589 | 0.484 |
+| T=4 grown chain PP | 1 | 0.584 | 0.584 | 0.517 |
+| T=5 H8 PP | 2 | 0.724 | 0.594 | 0.472 |
+| T=5 bare k_win=20 PP | 1 | 0.729 | 0.507 | 0.420 |
+
+Δ vs anchor for top cells:
+
+| cell | Δ AUC(1.0–3.0) | Δ AUC(1.5–3.0) | Δ AUC(1.75–3.0) |
+|---|---:|---:|---:|
+| T=2 bare RE 3sd | +0.132 | +0.236 | +0.282 |
+| T=2 bare PP 3sd | +0.118 | +0.228 | +0.273 |
+| T=3 grown PP | +0.087 | +0.218 | +0.262 |
+| T=2 H8 RE 3sd | +0.048 | +0.151 | +0.170 |
+| T=3 H8 PP | −0.001 | +0.138 | +0.168 |
+
+Under the AUC metric, the WIN cell shifts again — **T=2 bare PP/RE
+3-seed** lead. The Δ ≈ +0.23 at AUC(1.5–3.0) is large (the AUC range
+is 0–3, so ~8% of the full scale). T=3 grown PP is close third
+(+0.218).
+
+Across all four metrics tried (peak at coh ≥ 1.5, peak at coh ≥ 1.75,
+peak at coh ≥ 2.0, AUC over readable coh range), TXC dominates;
+T-SAE never wins a coherence-aware metric. Different TXC architectures
+take the top spot under different metrics, but **the family-level
+domination is consistent**.
