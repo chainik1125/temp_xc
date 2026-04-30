@@ -127,17 +127,50 @@ this regime.**
 > The single-seed "per-position adds +0.13" finding from seed=42
 > doesn't replicate, but its variance-reduction effect does.
 
-### What's still untested
+### What's still untested (post-T=2-seed=2)
 
-- **T=3, T=10 multi-seed** — W is doing T=3 (cell C); T=10 is W's cell F.
-- **Matryoshka @ k_pos=20** — W's cell E (matryoshka multiscale TXC);
-  pending.
-- **A third seed (seed=2)** — would tighten σ_seeds estimates,
-  particularly for the high-variance cells (T=2 right-edge σ=0.467 is
-  large enough that one extra seed could shift the mean 0.1+).
-- **Per-class breakdown across seeds** — only computed at seed=42.
-  Some single-seed claims (e.g., "TXC wins on stylistic at T=5
-  right-edge") might not multi-seed-replicate.
+After T=2 seed=2 + per-class multi-seed (added 2026-04-30 03:11 UTC):
+
+- **Multi-seed verify of W's cells C (T=3) and E (matryoshka @ T=5).**
+  W has single-seed numbers for both. Cell E single-seed shows:
+  right-edge LOSS 0.633, per-position **TIE 0.933** (Δ=-0.167) —
+  matryoshka × per-position synergy with +0.30 boost. Multi-seed
+  verify pending.
+- **3rd seed for T=5 cells.** Currently 2-seed; T=5 right-edge
+  σ_seeds=0.236, per-position σ=0.071. Lower priority than other
+  open work.
+- **Step 5 (multidist @ k_pos=20)** — Y's untested, distinct from W's
+  matryoshka. Decision pending.
+- **Creative axes from W's plan.md** (subseq sampling, anchor regime
+  k_win>T·k_pos, matryoshka H-fraction, multi-distance shifts) — none
+  tested at k_pos=20. ~1-2 cells × 1 hour each.
+
+### Combined matched-sparsity matrix (Y + W, multi-seed where available)
+
+The full matrix as of 2026-04-30 03:18:
+
+| T | family | protocol | n_seeds | mean | Δ vs 1.10 | call |
+|---|---|---|---|---|---|---|
+| 1 | T-SAE k=20 | n/a | 1 | 1.100 | (anchor) | — |
+| 2 | bare-antidead | right-edge | 3 | **1.122** | +0.022 | TIE |
+| 2 | bare-antidead | per-position | 3 | **1.200** | +0.100 | TIE ⭐ |
+| 3 | bare-antidead | right-edge | 1 | 0.767 | −0.333 | LOSS (1 seed) |
+| 3 | bare-antidead | per-position | 1 | 1.000 | −0.100 | TIE (1 seed) |
+| 5 | bare-antidead | right-edge | 2 | 0.867 | −0.233 | TIE |
+| 5 | bare-antidead | per-position | 2 | 0.783 | −0.317 | LOSS just outside |
+| 5 | matryoshka | right-edge | 1 | 0.633 | −0.467 | LOSS (1 seed) |
+| 5 | matryoshka | per-position | 1 | **0.933** | **−0.167** | TIE (1 seed) ⭐ |
+
+**5 of 8 TXC cells are TIE.** The strongest cells are at T=2 (3-seed
+mean above anchor) and T=5 matryoshka per-position (Δ=−0.167, 1 seed).
+
+W's contributions (commits cee667e, 0043e44, aad048d, 75ad44a):
+- T=3 cell C: T-axis-reverses pattern confirmed (T=3 raw peak 1.40
+  beats T=5 raw peak 1.00 at k_pos=20).
+- Cell E matryoshka × per-position: +0.30 boost — biggest at T=5.
+- Per-position boost decreases monotonically with T at sparse k_pos:
+  T=2 +0.40 > T=3 +0.23 > T=5 +0.13 (single-seed) — three independent
+  datapoints.
 
 ### Pre-registered next step (per the brief's TIE rule)
 
