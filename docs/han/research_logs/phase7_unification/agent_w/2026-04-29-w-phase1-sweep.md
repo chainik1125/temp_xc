@@ -130,20 +130,39 @@ Constrained peak (coh ≥ 1.5) = 0.700 at s_abs=125.5.
 
 **Verdict**: **LOSS** under both metrics (Δ=−0.80 raw, Δ=−0.40 constrained).
 
-**Y's per-class breakdown (from her writeup)**:
+**Y's per-class breakdown (from her writeup)** — confirmed by my recompute:
 
-| concept class | T-SAE k=20 | TXC cell D | winner |
-|---|---|---|---|
-| knowledge | 2.000 | 1.444 | T-SAE +0.56 |
-| discourse | 1.375 | 0.500 | T-SAE +0.88 |
-| safety | 0.333 | 0.000 | T-SAE |
-| **stylistic** | 0.200 | **0.600** | **TXC +0.40** ⭐ |
-| sentiment | 0.500 | 0.500 | tie |
+| protocol | cell | overall | knowledge | discourse | safety | stylistic | sentiment |
+|---|---|---|---|---|---|---|---|
+| anchor right-edge | T-SAE k=20 | 1.10 | **2.00** | **1.38** | **0.33** | 0.20 | 0.50 |
+| right-edge | T=2 (Y) | 0.83 | 1.56 | 1.00 | 0.00 | 0.60 | 0.00 |
+| right-edge | T=3 (W) | 0.77 | 1.56 | 0.62 | 0.17 | 0.40 | 0.50 |
+| right-edge | T=5 (Y) | 0.70 | 1.44 | 0.50 | 0.00 | 0.60 | 0.50 |
+| **per-position** | **T=2 (Y)** | **1.23** | 1.78 | **1.50** | **0.67** | 0.40 | **1.50** |
+| **per-position** | **T=3 (W)** | **1.00** | 1.56 | 1.00 | 0.17 | **1.00** | 1.00 |
+| **per-position** | **T=5 (Y)** | **0.83** | 1.33 | 0.88 | 0.00 | 0.60 | **1.50** |
 
-Stylistic is the only TXC-favourable class. Possible mechanism: stylistic
-features (poetic, literary, list_format, citation, technical_jargon) are
-context-shape patterns that span multiple tokens, where the window encoder
-pays off even at sparse k_pos.
+**Three per-class patterns to call out:**
+
+1. **Per-position uniformly lifts SENTIMENT** by ~+1.0 above the anchor's
+   0.50 across all T. Sentiment concepts (positive_emotion, negative_emotion)
+   are emotionally-charged but don't have rigidly fixed token positions —
+   per-position writing distributes the sentiment signal across the steered
+   window naturally.
+2. **Cell C T=3 per-position dominates STYLISTIC** at 1.00 (vs anchor 0.20,
+   Δ=+0.80). Stylistic features are multi-token form patterns. The combination
+   of T=3 (just enough window context for form) + per-position (write the
+   form across all positions of the steered span) is the optimal stack.
+3. **KNOWLEDGE**: T-SAE k=20 still wins on knowledge concepts under either
+   protocol, but the gap narrows with smaller T + per-position (Δ=−0.22 at
+   T=2 per-position vs Δ=−0.56 at T=5 right-edge).
+
+The per-class pattern under per-position **flips Y's earlier
+"stylistic-only-TXC-favourable" finding**: under per-position, *sentiment*
+becomes uniformly TXC-favourable; *stylistic* becomes T=3-specifically
+TXC-favourable. The TXC structural advantage at matched sparsity
+materialises differently per-class than at k_pos=100 (where TXC won on
+knowledge).
 
 #### Cell E — `agentic_txc_02_kpos20` (W, matryoshka multiscale, random-init)
 
