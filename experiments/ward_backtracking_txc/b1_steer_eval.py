@@ -213,11 +213,21 @@ def main(argv=None):
     p.add_argument("--force", action="store_true")
     p.add_argument("--max-sources", type=int, default=None,
                    help="cap number of TXC sources for a quick coarse pass")
+    p.add_argument("--source-shard", type=str, default=None,
+                   help="run a subset of sources, partitioned across N workers. "
+                        "Format: '<k>/<N>' where k in [0, N). DoM baselines are "
+                        "evaluated by every shard so each shard's output JSON is "
+                        "self-contained and the merger across shards just concatenates rows.")
+    p.add_argument("--out-suffix", type=str, default="",
+                   help="appended to the output JSON filename so parallel shard "
+                        "runs do not stomp each other (e.g. '__shard0of2').")
     args = p.parse_args(argv)
 
     cfg = yaml.safe_load(args.config.read_text())
     paths = cfg["paths"]
     out_path = Path(paths["steering"])
+    if args.out_suffix:
+        out_path = out_path.with_name(out_path.stem + args.out_suffix + out_path.suffix)
     out_path.parent.mkdir(parents=True, exist_ok=True)
     if out_path.exists() and not args.force:
         log.info("[resume] %s exists", out_path); return 0
@@ -228,6 +238,21 @@ def main(argv=None):
         dom_src = [s for s in sources if s["mode"] == "dom"]
         txc_src = [s for s in sources if s["mode"] != "dom"]
         sources = dom_src + txc_src[: args.max_sources]
+    if args.source_shard is not None:
+        try:
+            k_str, n_str = args.source_shard.split("/")
+            k, n = int(k_str), int(n_str)
+            assert 0 <= k < n
+        except Exception as e:
+            log.error("--source-shard must be 'k/N' with 0 <= k < N (got %r)", args.source_shard)
+            return 1
+        # Keep DoM in every shard (they're cheap and used as the baseline reference);
+        # partition only the TXC-style sources across shards.
+        dom_src = [s for s in sources if s["mode"] == "dom"]
+        txc_src = [s for s in sources if s["mode"] != "dom"]
+        my_txc = [s for i, s in enumerate(txc_src) if i % n == k]
+        sources = dom_src + my_txc
+        log.info("[shard %d/%d] keeping %d DoM + %d TXC sources", k, n, len(dom_src), len(my_txc))
     log.info("[sources] %d total", len(sources))
 
     # Norm-normalize TXC sources to the DoM-base norm if available.

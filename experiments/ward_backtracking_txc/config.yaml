@@ -36,7 +36,7 @@ hookpoints:
   # self_attn (see _attach_hooks in cache_activations.py). Per Dmitry's
   # TinyStories MatTXC table, ln1 is the strongest hookpoint for temporal
   # signal — flip `enabled: true` for the paper-budget rerun.
-  - {key: ln1_L10,   layer: 10, component: ln1,   label: "ln1.10", enabled: false}
+  - {key: ln1_L10,   layer: 10, component: ln1,   label: "ln1.10", enabled: true}
 
 # T = 6 covers Ward's [-13, -8] window. seq_len chosen so we always have
 # headroom past T = 6 for sliding-window sampling.
