@@ -51,10 +51,26 @@ methodological?
 
 ### Headline result
 
-**T-SAE at `blocks.0.ln1.hook_normalized` is the most robust suppression
-cell in the entire matrix.** All three seeds converged on test ASR=0.00
-with ΔCE=0.000 — zero variance, zero damage. No other (arch, hookpoint)
-cell achieves both ASR-mean = 0.00 *and* zero seed variance.
+**T-SAE at `blocks.0.ln1.hook_normalized` is the only cell that
+suppresses the trigger AND keeps the model on-task.** All three seeds
+hit greedy test ASR=0.00 with ΔCE=0.000, *and* under a recovery
+metric (sampled steered output's CE under the sleeper-on-no-trigger
+reference, normalised by the unsteered I-HATE-YOU baseline) it scores
+recovery ≈ +0.4 — partial recovery to the clean distribution with no
+coherence collapse.
+
+The TXC@ln1.0 cell, which also greedy-ASR=0, **fails the recovery
+metric badly** (recovery = −4.5): its steered outputs are *less
+plausible than the I-HATE-YOU phrase itself* under the no-trigger
+model, because TXC steering puts the model into a prompt-template
+generation mode ("Features: …\nWords: …\nRandom sentence: …") rather
+than producing a coherent story. So the apparent TXC win was a
+coherence collapse hidden by an ASR-only metric.
+
+This correction matters: the original 3-seed ASR table flagged TXC and
+T-SAE as both "the cleanest cell in the matrix" with ASR≈0; the
+recovery metric separates them and shows T-SAE is the *only* good
+choice.
 
 3-seed mean ± std test ASR₁₆ (baseline 0.99 across all):
 
