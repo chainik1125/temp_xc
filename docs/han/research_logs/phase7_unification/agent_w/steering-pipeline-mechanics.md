@@ -158,64 +158,86 @@ So we measure each arch's natural firing magnitude (Step 3a below) and apply a *
 
 ### Step 4 — How steering differs between per-token and TXC
 
-The per-token case is one position in, one position out. The TXC case is one *window* in, T positions out — and the protocol question is which of those T output positions get written back to the residual.
+**Important up front (it's confusing in the naming)**: in *all three protocols*, the delta is added to **every position in the prefix**, not just to the position currently being generated. The hook fires once per forward pass; it modifies the entire `(B, S, d_in)` residual tensor at L12, then Gemma's downstream layers 13–25 see a fully-steered prefix. Attention at every later layer is reading the steered residual everywhere.
 
-#### Per-token SAE (T-SAE, TopKSAE)
+What the protocols differ on is **how the per-position delta is computed**, not which positions get written.
 
-```text
-for each generation step:
-  forward through Gemma layers 0..11 → residual at L12: shape (S, d_in)
-  for each position p in the prompt prefix:
-    z         = SAE.encode(residual[p, :])        # (d_sae,)
-    z_clamped = z.clone(); z_clamped[picked] = s_abs
-    delta     = SAE.decode(z_clamped) - SAE.decode(z)   # (d_in,)  ← single vector
-    residual[p, :] += delta
-  forward through Gemma layers 13..25 with modified residual
-  sample next token
-```
-
-One position, one z, one (d_in,)-shaped delta. Clean.
-
-#### TXC (window encoder), two protocols
-
-For a TXC at window length T, encoding "at position p" means feeding the T-token window `[p-T+1 .. p]` to the encoder, which produces one (d_sae,) latent for the window. Decoding returns `(T, d_in)` — a reconstruction for *all* T positions in the window, not just the latest one.
-
-So there's a choice: which of those T decoder-output positions do we use as the steering delta?
-
-**Right-edge protocol** (canonical, what most baseline numbers use):
+#### Per-token SAE (T-SAE, TopKSAE) — every position, one snapshot each
 
 ```text
-for each position p where p ≥ T-1:
-  window    = residual[p-T+1 : p+1, :]            # (T, d_in)
-  z         = TXC.encode(window)                  # (d_sae,)
-  z_clamped = z.clone(); z_clamped[picked] = s_abs
-  decoded_orig = TXC.decode(z)                    # (T, d_in)
-  decoded_new  = TXC.decode(z_clamped)            # (T, d_in)
-  delta_p   = (decoded_new - decoded_orig)[T-1, :]   # ← keep ONLY the right-edge slice
-  residual[p, :] += delta_p
+hook fires once with residual of shape (B, S, d_in):
+  flat       = residual.reshape(B*S, d_in)            # one row per position
+  z          = SAE.encode(flat)                       # (B*S, d_sae)
+  z_clamped  = z.clone();  z_clamped[:, picked] = s_abs
+  x_hat_orig = SAE.decode(z)                          # (B*S, d_in)
+  x_hat_new  = SAE.decode(z_clamped)                  # (B*S, d_in)
+  delta      = x_hat_new - x_hat_orig                 # (B*S, d_in)
+  residual_steered = residual + delta.view(B, S, d_in)
+return residual_steered    # ALL S positions modified
 ```
 
-The encoder integrates context from T tokens (the window), but the steering write only touches position p (the most recent). The earlier T-1 decoder-output slices are discarded. Roughly: "write the steered concept at the current position only."
+Write-locations: positions `0, 1, …, S-1` — every position in the prefix. One delta per position, computed by encoding *that* position's residual.
 
-**Per-position protocol** (Q2.C):
+#### TXC right-edge — every position from T-1 onward, single-window snapshot
 
 ```text
-for each position p:
-  windows_covering_p = {windows w with p ∈ w}    # up to T such windows (stride-1)
-  for each w in windows_covering_p:
-    z         = TXC.encode(residual[w-T+1 : w+1, :])
-    z_clamped = z.clone(); z_clamped[picked] = s_abs
-    decoded_w_orig = TXC.decode(z)               # (T, d_in)
-    decoded_w_new  = TXC.decode(z_clamped)       # (T, d_in)
-    p_in_w = p - (w - T + 1)                     # position-within-window for p
-    delta_p_from_w = (decoded_w_new - decoded_w_orig)[p_in_w, :]
-  delta_p = mean over w of delta_p_from_w        # average across overlapping windows
-  residual[p, :] += delta_p
+hook fires once with residual of shape (B, S, d_in):
+  windows           = unfold(residual, T, stride=1)        # (B, K, T, d_in), K = S - T + 1
+  z                 = TXC.encode(windows.reshape(B*K, T, d_in))
+  z_clamped         = z.clone();  z_clamped[:, picked] = s_abs
+  x_hat_orig_full   = TXC.decode(z)                        # (B*K, T, d_in)  — full T-position output per window
+  x_hat_steer_full  = TXC.decode(z_clamped)                # (B*K, T, d_in)
+  x_hat_orig_R      = x_hat_orig_full[:, -1, :]            # right-edge slice only — (B*K, d_in)
+  x_hat_steer_R     = x_hat_steer_full[:, -1, :]           # right-edge slice only
+  # The S-T+1 right-edge positions are positions T-1, T, …, S-1.
+  residual_steered            = residual.clone()
+  residual_steered[:, T-1:S, :] = x_hat_steer_R + (residual[:, T-1:S, :] - x_hat_orig_R)
+return residual_steered    # positions T-1 through S-1 modified; positions 0 through T-2 left as-is
 ```
 
-Now position p gets a contribution from *every* window it sits inside (up to T windows for interior positions). Within each window, p sits at a different relative position, and the corresponding decoder-output slice is used. The final delta at p is the average across those windows.
+Write-locations: positions `T-1, T, …, S-1` — that's `S-T+1` positions. The first `T-1` positions of the prefix lack a full upstream T-window, so they're left unchanged.
 
-Roughly: "write the steered concept across the whole T-token span the encoder integrated."
+For each written position `p`, the delta comes from **one** window (the window ending at `p`), and only the **right-edge slice** of that window's decoder output is used. The other T-1 slices of the same window's decoder output are discarded. So even though the encoder integrated context from T tokens to produce the latent, the residual write at `p` is a single (d_in,) vector derived from one slice.
+
+#### TXC per-position — every position, averaged from up to T overlapping windows
+
+```text
+hook fires once with residual of shape (B, S, d_in):
+  windows           = unfold(residual, T, stride=1)        # (B, K, T, d_in)
+  z                 = TXC.encode(windows.reshape(B*K, T, d_in))
+  z_clamped         = z.clone();  z_clamped[:, picked] = s_abs
+  x_hat_orig_full   = TXC.decode(z).reshape(B, K, T, d_in)
+  x_hat_steer_full  = TXC.decode(z_clamped).reshape(B, K, T, d_in)
+  delta_W           = x_hat_steer_full - x_hat_orig_full   # (B, K, T, d_in) per-window per-relpos delta
+  # accumulate into a per-position buffer
+  delta_sum  = zeros(B, S, d_in);  count = zeros(B, S)
+  for ti in 0..T-1:
+    for k in 0..K-1:                                       # window index
+      pos = k + ti                                          # absolute position
+      delta_sum[:, pos, :] += delta_W[:, k, ti, :]
+      count[:, pos] += 1
+  mean_delta = delta_sum / count
+  residual_steered = residual + mean_delta
+return residual_steered    # ALL S positions modified
+```
+
+Write-locations: positions `0, 1, …, S-1` — every position in the prefix. Boundary positions get fewer contributing windows (position 0 sees just one window's slice 0; position 1 sees two; interior positions see all T windows; position S-1 sees just one window's slice T-1).
+
+For each position `p`, the delta is the **average across all windows that contain p**, taking the slice of the decoder output corresponding to where p sits within that window. So a TXC at T=5: position 10 averages five contributions — from window-ending-at-10's right-edge slice, window-ending-at-11's second-from-right slice, …, window-ending-at-14's left-edge slice. Each contribution comes from a different encode (different residual context), so per-position is fundamentally averaging over T independent encoder views of position p.
+
+#### Side-by-side summary
+
+| protocol | positions written | windows per position | encode forwards per call |
+|---|---|---|---|
+| Per-token SAE | all S | n/a (one position = one z) | S |
+| TXC right-edge | T-1 through S-1 (so S-T+1 positions) | 1 (the window ending at p) | S-T+1 |
+| TXC per-position | all S | up to T (every window containing p) | S-T+1 |
+
+Both TXC protocols call the encoder the same number of times (once per stride-1 window). The difference is bookkeeping over the `(B, K, T, d_in)` decoder-output tensor: right-edge slices it down to the rightmost column and skips the first T-1 positions; per-position averages all T columns into the appropriate absolute positions.
+
+#### Why this matters
+
+The model's downstream layers (13–25) attend over the entire prefix when computing the next token's representation. So a steered prefix shifts attention's input at every position, not just the position being sampled. Right-edge skips positions 0..T-2 (so they read the un-steered residual). Per-position writes to all S positions including those early ones. At T=5, that's 5 positions of the prefix that right-edge leaves un-touched but per-position steers — for short prompts (60-token generations from "We find") this is a non-trivial fraction and explains some of the protocol-dependence of the steering effect.
 
 **Why per-position can help.** The encoder's window-level latent is a noisy estimate of "concept presence". Right-edge takes one snapshot of the resulting decoder reconstruction (the rightmost slice). Per-position averages T snapshots from T different overlapping windows — noise reduces, signal stays. Empirically: σ_seeds drops 2–5× (0.33 → 0.10 at T=5) and the constrained peak lifts +0.13 to +0.40 depending on T. (Y's data; cell C T=3 boost was +0.23.)
 
