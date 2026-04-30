@@ -3,7 +3,7 @@ author: Han
 date: 2026-04-30
 tags:
   - results
-  - in-progress
+  - complete
 ---
 
 ## Z round 4 — rank-routed + shared-encoder SubseqH8 variants
@@ -51,8 +51,8 @@ hill-climb deviation; `[:, -64:, :]` direction; see
 | `tsae_paper_k500` (overall leader) | 0.9151 | +0.0020 | 1 | leader |
 | `txc_bare_antidead_t5` (TXC leader) | 0.9131 | 0 | 2 | TXC leader |
 | `hill_subseq_h8_T12_s5` (Z V1 1-seed) | 0.9126 | −0.0005 | 3 | competitive |
-| **`hill_z_ranked_T20_s5`** (Z R4-A) | **0.8917** | **−0.0214** | **deep cluster** | **LOSE** |
-| `hill_z_shared_T20` (Z R4-B) | TBD | TBD | TBD | pending |
+| **`hill_z_ranked_T20_s5`** (Z R4-A) | **0.8917** | **−0.0214** | far below | **LOSE** |
+| **`hill_z_shared_T20`** (Z R4-B) | **0.8211** | **−0.0920** | far below | **LOSE (worse)** |
 
 **Ranked LOSES by 0.0214 — well outside X's 0.005 promotion bar.**
 Don't retrain at L=128.
@@ -108,17 +108,88 @@ The damage to cross-token tasks suggests:
    selectivity. The rank-variant trades that for memory savings — and
    the trade is bad on this metric.
 
-### Conclusion (pending shared)
+### Per-task shared-variant breakdown (k=20, PAPER set)
 
-- `SubseqRankedH8` is **NOT a leaderboard contender**. The negative
-  result rules out per-sampled-slot encoding for the cross-token
-  evaluation regime.
-- The cleanest reading: **don't compress slots when probing requires
-  per-position resolution.**
-- For Z's hill-climb roadmap: the rank-variant is dead. Next promising
-  direction = the *shared* variant (currently probing) and/or
-  multi-seed of V1 (T_max=12 t_sample=5 — fits 5090 directly,
-  no compression needed).
+| task | AUC_FLIP | regime |
+|---|---:|---|
+| bias_in_bios_set3_prof20 | 0.9150 | profession |
+| amazon_reviews_sentiment_5star | 0.8857 | sentiment |
+| ag_news_scitech | 0.8857 | topic |
+| ag_news_business | 0.8818 | topic |
+| bias_in_bios_set3_prof9 | 0.8756 | profession |
+| europarl_nl | 0.8607 | language ID |
+| bias_in_bios_set1_prof11 | 0.8550 | profession |
+| github_code_python | 0.8529 | code |
+| bias_in_bios_set1_prof2 | 0.8423 | profession |
+| europarl_de | 0.8424 | language ID |
+| europarl_fr | 0.8257 | language ID |
+| amazon_reviews_cat5 | 0.8202 | category |
+| github_code_java | 0.8048 | code |
+| amazon_reviews_cat3 | 0.7366 | category |
+| **wsc_coreference** | **0.6286** | cross-token |
+| **winogrande_correct_completion** | **0.6241** | cross-token |
+
+Shared regresses **across the board**, not just on cross-token tasks
+— even europarl (which the ranked variant aced at 0.997) drops to
+0.83-0.86. Single-encoder + sum-pooled-window discards both per-position
+selectivity AND per-token classification information.
+
+### Architectural diagnosis (both variants)
+
+The lesson is uniform: **probe-time encoding requires per-position
+resolution, and any compression of T-axis slots in the encoder
+destroys it**. The trade is a sharp loss/memory cliff, not a smooth
+trade-off:
+
+- T_max-many slabs (canonical SubseqH8): per-position selectivity ✓ — fits H200, OOMs 5090 at T_max ≥ 14
+- t_sample-many slabs (ranked variant): selectivity ~ rank-quantile only — fits 5090 at T_max=20, but loses 0.02 AUC. Cross-token tasks particularly broken.
+- 1 slab (shared variant): no positional info — loses 0.09 AUC. All tasks degrade.
+
+The cross-token tasks (winogrande, wsc) are the most informative
+diagnostic: they require resolving a token in position k by attending
+to positions <k. The original SubseqH8 + matryoshka stack does this
+via the per-position encoder slabs feeding into the matryoshka H/L
+prefix that participates in the InfoNCE contrastive structure. Compress
+the slabs and the contrastive signal can no longer disambiguate
+positions.
+
+### Conclusion
+
+- **Both Z R4 variants are NOT leaderboard contenders.** Don't propose
+  to `paper_archs.json`. Don't retrain at L=128.
+- The intended memory savings (5090-fit at large T_max) cost more in
+  AUC than the architecture can justify.
+- **The 5090 ceiling on T_max-many SubseqH8 stands**: no clean way to
+  get T_max ≥ 14 + paper-canonical b=4096 without compressing slots
+  (which costs AUC) or deferring to H200 (which we can't afford).
+
+### Next moves (ranked roadmap)
+
+Ranked by remaining promise; only A is being pursued autonomously this
+session:
+
+**A. Multi-seed V1 — `SubseqH8` T_max=12 t_sample=5 at seed=1, seed=2.**
+V1 sits at 0.9126 (1-seed), only 0.0005 below TXC leader. The TXC leader
+is 3-seed mean. If V1's 3-seed mean ≥ 0.9131, **V1 ties or beats by
+sheer architectural fit**. Each seed ~110 min on 5090 per the handover
+estimate (V1 was originally trained on H200 by Agent A; T_max=12 fits
+the 5090 at L=64 cache directly — confirmed feasible per Z's prior
+session). Total: ~3.5 hr.
+
+**B. TXCBareAntidead T-sweep gap-fill (T ∈ {4, 6, 7, 8, 12}).**
+The k=20 leader is `txc_bare_antidead_t5`. Existing T values: 5, 10, 20.
+Each missing T fits 5090 easily (~25 min per cell, ~2 hr total). If a
+non-canonical T (e.g., T=6 or T=7) beats 0.9131, that's a clean win.
+
+**C. SubseqH8 + alternative shift sets at T_max=12.**
+V1 used auto-shifts (1, 3, 6). Try `(1, 6)` only (drop 3 — possibly a
+"dead-zone" mid-range shift) or `(1, 2, 6)`. T_max=12 fits 5090.
+
+**D. Defer to H200 (not feasible here).**
+SubseqH8 T_max ∈ {14, 16, 20} — confirmed OOM on 5090. H200 only.
+
+Z is proceeding with **A** (multi-seed V1) — kicking off seed=1 right
+after this writeup commit. seed=2 fires sequentially after.
 
 ### Files / commits
 
