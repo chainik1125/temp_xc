@@ -89,7 +89,6 @@ def main():
         alphas = np.array([r["alpha"] for r in rows])
         coh    = np.array([r["coh"]   for r in rows])
         align  = np.array([r["align"] for r in rows])
-        ax.plot(coh, align, "-", color=edge, alpha=0.4, zorder=1)
         ax.scatter(coh, align, c=alphas, cmap=cmap, norm=norm,
                    marker=marker, s=130, edgecolor=edge, linewidth=1.4, zorder=2)
         peak_i = int(np.argmax(align))

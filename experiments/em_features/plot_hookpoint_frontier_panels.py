@@ -115,7 +115,6 @@ def main():
         coh = np.array([r["coh"] for r in rows])
         align = np.array([r["align"] for r in rows])
 
-        ax.plot(coh, align, "-", color=v["color"], alpha=0.4, zorder=1)
         ax.scatter(coh, align, c=alphas, cmap=cmap, norm=norm,
                    s=70, edgecolor=v["color"], linewidth=1.0, zorder=2)
         peak_i = int(np.argmax(align))
