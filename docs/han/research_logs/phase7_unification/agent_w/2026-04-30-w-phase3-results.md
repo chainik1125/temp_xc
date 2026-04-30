@@ -39,30 +39,38 @@ the prefix) both clear the win threshold. V3 is the more *reliable*
 winner (σ=0.20); V4 has the higher single-seed peak (1.500 at sd42 —
 the highest constrained peak in the entire matched-sparsity matrix).
 
-### Per-cell summary
+### Per-cell summary (FINAL)
 
 (Cells where multi-seed data exists are reported as multi-seed pooled mean;
-single-seed is marked `*`. Anchor = T-SAE k=20 multi-seed pooled = 0.70.)
+single-seed is marked `*`. Anchor = T-SAE k=20 multi-seed pooled = 0.70.
+⭐ = WIN, Δ ≥ +0.27.)
 
-| cell | right-edge | per-position | V1 | V2 | V3 | V4 |
+| cell | right-edge | per-position | V1 local | V2 anchored | V3 dec-add | V4 tiled |
 |---|---|---|---|---|---|---|
-| T=3 bare cell C k_pos=20 (W) | 0.783 | 0.783 | 0.950 | 0.900 | **1.000** | **1.017** |
-| T=5 matry cell E k_pos=20 (W) | 0.633* | **0.933*** | 0.533* | 0.500* | (re-running) | 0.733* |
-| T=5 bare canonical k_pos=100 | 0.667* | (TBD) | (TBD) | (TBD) | (TBD) | (TBD) |
-| T=5 matry canonical k_pos=100 | 0.506 | **0.617** | 0.433* | 0.467* | (re-running) | 0.400* |
+| T=3 bare cell C k_pos=20 (multi-seed) | 0.783 | 0.783 | 0.950 | 0.900 | **1.000 ⭐** | **1.017 ⭐** |
+| T=5 matry cell E k_pos=20 (sd42) | 0.633* | **0.933*** | 0.533* | 0.500* | 0.533* | 0.733* |
+| T=5 bare canonical k_pos=100 (sd42) | 0.667* | 0.767* | 0.600* | **0.833*** | 0.767* | 0.767* |
+| T=5 matry canonical k_pos=100 (multi-seed) | 0.506 | **0.617** | 0.433* | 0.467* | 0.500* | 0.400* |
 
-**Two clean patterns:**
+**Three clean patterns:**
 
-1. **Bare-antidead at T=3 (W's cell C)**: V3 and V4 are the wins. V1
-   close third. V2 mid. Right-edge / per-position bottom — both tied at
-   the same value 0.783 multi-seed.
+1. **Bare-antidead at T=3, sparse k_pos=20 (W's cell C)**: V3 and V4 WIN. V1 close third.
+   V2 mid. Right-edge / per-position bottom — both tied at 0.783 multi-seed.
+   The TXC-native protocols clearly outperform here.
 
-2. **Matryoshka multiscale at T=5 (cell E + canonical)**: per-position
-   wins. The TXC-native protocols (V1, V2, V4) all underperform per-
-   position. Plausible mechanism: the matryoshka multi-scale contrastive
-   training relies on signal averaging across overlapping windows, which
-   per-position emulates at inference time; the TXC-native protocols
-   don't average and underperform.
+2. **Matryoshka multiscale at T=5 (both cell E and canonical k_pos=100)**:
+   per-position wins. TXC-native protocols (V1, V2, V3, V4) all underperform.
+   Plausible mechanism: matryoshka multi-scale contrastive training relies on
+   signal averaging across overlapping windows; per-position emulates that at
+   inference time; TXC-native protocols don't average and underperform.
+   V4 tiled is *worst* on canonical matry (0.400), suggesting block-boundary
+   discontinuities hurt the matryoshka head.
+
+3. **Bare-antidead at T=5, canonical k_pos=100**: V2 anchored leads (0.833) —
+   the start-of-prompt anchor adds a topic-setting block that helps at T=5
+   where V1's pure tip-only steering is too localized. V3 ties per-position
+   (both 0.767). V4 ties per-position. V1 underperforms (0.600). The "small-T-
+   helps-V1" pattern is confirmed: V1 wins at T=3 cell C but loses at T=5.
 
 ### Why V3 and V4 win on T=3 bare-antidead
 
@@ -108,19 +116,25 @@ sparsity. The decoder-direction-additive protocol (V3) is the cleanest
 demonstration: just scale the picked feature's decoder block and add.
 No encode round-trip needed.
 
-### Pending work
+### Final per-protocol summary
 
-- [ ] V3 re-run on cell E (kpos20 matry) + canonical agentic_txc_02 —
-      pyc cache bug at first attempt; re-running.
-- [ ] Diagnose `<|z|>` for canonical T=5 bare (txc_bare_antidead_t5);
-      currently missing → V1/V2/V4/per-position can't run on it. Will
-      diagnose + run.
-- [ ] Multi-seed verify of V4 (cell E sd1, canonical matry sd1, etc.)
-      to tighten σ_seeds for V4.
-- [ ] Train + evaluate cell F (T=10, k_pos=20) under V3/V4 (should
-      shine if V1's "smaller-T-better" pattern reverses under TXC-native
-      protocols).
-- [ ] Final headline plot showing all 6 protocols × all cells.
+| protocol | best on | worst on | recommendation |
+|---|---|---|---|
+| right-edge (canonical) | nothing — never best, never worst | nothing | safe baseline; no longer the right cross-arch protocol once TXC-native exists |
+| per-position (Q2.C) | matryoshka cells | nothing | best for matryoshka archs; mid-pack for bare |
+| V1 local | T=3 sparse only | T=5 cells (any family) | "smaller-T-better": V1 helps at small T, hurts at large T |
+| V2 anchored | T=5 bare canonical | T=5 matry kpos20 | start-of-prompt anchor helps T=5 bare specifically |
+| **V3 dec-additive** | **T=3 sparse k_pos=20 (multi-seed WIN)** | matryoshka | **simplest, reliable; recommended for bare-antidead at sparse k_pos** |
+| V4 tiled | T=3 sparse single-seed peak (1.500!) | matryoshka, especially canonical | high mean but high σ; matched-pair with V3 for ablation |
+
+### Pending work / completed
+
+- [x] V3 re-run on cell E (matry kpos20) + canonical matry — pyc cache bug fixed (commit 0d25ed7d), re-runs done.
+- [x] Diagnose `<|z|>` for canonical T=5 bare — done; merged into z_orig_magnitudes.json.
+- [x] All 6 protocols on canonical T=5 bare — done.
+- [ ] Multi-seed verify of V3, V4 on T=5 cells (currently only cell C T=3 has multi-seed for the new protocols). Would tighten σ for the matryoshka conclusion.
+- [ ] Train + evaluate cell F (T=10, k_pos=20) under V3/V4 — would test if V3's win at T=3 generalises to larger T at sparse k_pos.
+- [ ] Final headline plot showing all 6 protocols × all 4 cells.
 
 ### Files
 
