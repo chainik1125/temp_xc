@@ -84,9 +84,41 @@ So the corrected story is:
 - **Paper-faithful T-SAE > main-config MatTXC** (the entry that was in the headline `tables/separation_scaling.md`) — but that's a comparison against an under-tuned MatTXC.
 - The original `Temporal BatchTopK SAE` benchmark entry (50/50 split, 2k steps) was severely under-tuning T-SAE — our paper-faithful 0.611 vs 0.079 shows the existing benchmark entry undersold T-SAE by 0.53 in single-feature R².
 
-So neither "T-SAE wins" nor "the existing benchmark fairly represents T-SAE" is correct. The correct read is: **at default paper settings, MatTXC reaches 98% of the per-component ceiling on this MESS3 task, and T-SAE Paper reaches 71%. MatTXC is the architecture to beat at this setting.** Whether T-SAE could close the gap with its own protocol sweep is the open question.
+So at this single seed, T-SAE Paper reaches 71% of ceiling and MatTXC reaches 98%. **But this is a single-seed measurement.** See the multi-seed update below — the picture changes substantially.
 
 Files: `results_protocol_compare/cell_delta_*_results.json` + `results_protocol_compare/combined.json`. Configs: `config_protocol_compare.yaml`, `config_protocol_compare_d02.yaml` (latter re-runs only δ=0.2 since the δ=0.2 cell of the first run died when the local Mac OOM'd while the SSH wrapper was holding the remote process).
+
+## Multi-seed transformer-variance study (TXC + T-SAE Paper, seeds {42, 1, 2})
+
+The single-seed verdicts above hide a much larger source of variance: **the transformer init itself**. A small study at δ ∈ {0.15, 0.20} with 3 transformer seeds (each fully retrained from scratch) shows seed-to-seed variance dwarfs the architectural gap.
+
+Best single-feature R² per (arch, δ, transformer seed):
+
+| arch | δ | seed=42 | seed=1 | seed=2 | **mean ± std** | % of comp-0 ceiling |
+|---|---|---|---|---|---|---|
+| TXC          | 0.15 | 0.549 | 0.111 | 0.435 | **0.365 ± 0.227** | 50% |
+| TXC          | 0.20 | 0.453 | 0.270 | 0.135 | **0.286 ± 0.160** | 33% |
+| T-SAE Paper  | 0.15 | 0.285 | 0.049 | 0.280 | **0.205 ± 0.135** | 28% |
+| T-SAE Paper  | 0.20 | 0.611 | 0.159 | 0.083 | **0.284 ± 0.285** | 33% |
+
+Reference (seed=42 only): MatTXC bk10 = 0.564 (δ=0.15), 0.851 (δ=0.20).
+
+What this changes:
+
+1. **At δ=0.20, TXC and T-SAE Paper are statistically tied** — 0.286 vs 0.284 across 3 seeds. The "T-SAE Paper wins at 0.611" line was a seed=42 fluke. The "MatTXC wins at 0.851" line is also a single-seed measurement — the gap to TXC/T-SAE-mean is large enough to plausibly be real, but we can't tell from one seed.
+2. **Standard deviations are 0.13–0.29 — i.e. ≈ 50–100% of the mean.** TXC at δ=0.20 ranges 0.135 → 0.453 across 3 transformer seeds. T-SAE Paper at δ=0.20 ranges 0.083 → 0.611. The single-seed numbers in the headline benchmark table are within-noise of any other arch.
+3. **The earlier "Pareto-dominance" claims (T-SAE Paper > MatTXC, MatTXC > T-SAE Paper) are both unreliable.** With this much seed variance, head-to-head verdicts on this benchmark require ≥ 3 seeds before they mean anything.
+
+Honest take:
+
+- We do not have enough seeds to call a winner between TXC, MatTXC, and T-SAE Paper on the symmetric MESS3 setup.
+- **MatTXC seed=42 = 0.851 at δ=0.20 is the highest single observation** but until we run MatTXC at seeds 1 and 2, we can't tell if that's its mean or its high-variance tail.
+- The δ=0.20 cell appears more discriminating than δ=0.15 — but only marginally, given std ≥ 0.16 for everything.
+- **Variance source decomposition would be valuable**: separately bound (a) transformer-init variance, (b) SAE-init variance, (c) probe-init variance. Currently all three move together with the main `seed:` field.
+
+Recommended next step: run MatTXC at seeds {1, 2} on the existing seedvar transformers (config_seedvar_s1.yaml + s2.yaml already cached transformer.pt for seeds 1, 2), so all three archs have 3-seed coverage at δ=0.20.
+
+Files: `results_seedvar_s1/cell_delta_{0.15,0.2}/results.json`, `results_seedvar_s2/cell_delta_{0.15,0.2}/results.json`, `results_txc_seed42/cell_delta_*/results.json`. Configs: `config_seedvar_s1.yaml`, `config_seedvar_s2.yaml`, `config_txc_seed42.yaml`.
 
 ## Files
 

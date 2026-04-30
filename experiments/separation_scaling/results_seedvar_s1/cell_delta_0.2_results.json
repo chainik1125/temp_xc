@@ -1,0 +1,114 @@
+{
+  "sweep_parameter": "delta",
+  "sweep_value": 0.2,
+  "generator_params": [
+    [
+      "component_type",
+      "process_name",
+      "process_params"
+    ],
+    [
+      "component_type",
+      "process_name",
+      "process_params"
+    ],
+    [
+      "component_type",
+      "process_name",
+      "process_params"
+    ]
+  ],
+  "transformer": {
+    "final_loss": 1.022473692893982,
+    "was_loaded": true,
+    "eval_resid_l2_mean": 12.935759544372559,
+    "config": {
+      "n_layers": 3,
+      "d_model": 64,
+      "n_heads": 2,
+      "d_head": 32,
+      "d_mlp": 256,
+      "n_ctx": 128,
+      "act_fn": "gelu",
+      "normalization_type": "LN",
+      "attention_dir": "causal",
+      "default_prepend_bos": false,
+      "init_mode": "gpt2",
+      "initializer_range": 0.001,
+      "probe_layer": 1,
+      "probe_hook_name": "blocks.1.hook_resid_post",
+      "extract_batch_size": 16,
+      "load_if_exists": true,
+      "training": {
+        "steps": 20000,
+        "batch_size": 128,
+        "lr": 0.001,
+        "data_chunks": 4,
+        "data_chunk_size": 5000
+      }
+    }
+  },
+  "dense_linear": null,
+  "dense_mlp": null,
+  "architectures": {
+    "TXC": {
+      "best_single_r2": 0.27040748386848457,
+      "per_component_best_r2": [
+        0.27040748386848457,
+        0.06550184659776559,
+        0.07490254144146491
+      ],
+      "linear_mean_r2": 0.42036329537448786,
+      "linear_per_component_r2": [
+        0.8385944414629499,
+        0.21485543663413953,
+        0.2076400080263744
+      ],
+      "sae_final_loss": 81.47071075439453,
+      "family": "txc",
+      "config": {
+        "dict_size": 64,
+        "k": 1,
+        "window_size": 30,
+        "temporal_steps": 3000,
+        "n_sequences": 1000,
+        "seq_len": 128
+      }
+    },
+    "T-SAE Paper": {
+      "best_single_r2": 0.15917734454360744,
+      "per_component_best_r2": [
+        0.15917734454360744,
+        0.032839497070089374,
+        0.0461202453300229
+      ],
+      "linear_mean_r2": 0.30353870217691503,
+      "linear_per_component_r2": [
+        0.5936117234981129,
+        0.1571321600200135,
+        0.15987222301261872
+      ],
+      "sae_final_loss": 15.28982162475586,
+      "family": "tsae",
+      "config": {
+        "dict_size": 128,
+        "k": 10,
+        "group_fractions": [
+          0.2,
+          0.8
+        ],
+        "group_weights": [
+          0.5,
+          0.5
+        ],
+        "temporal_alpha": 0.1,
+        "temporal": true,
+        "temporal_steps": 25000,
+        "lr": 0.0003,
+        "n_sequences": 1000,
+        "seq_len": 128
+      }
+    }
+  },
+  "cell_elapsed_sec": 770.7625691890717
+}
