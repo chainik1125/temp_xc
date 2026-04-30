@@ -171,10 +171,25 @@ session:
 **A. Multi-seed V1 — `SubseqH8` T_max=12 t_sample=5 at seed=1, seed=2.**
 V1 sits at 0.9126 (1-seed), only 0.0005 below TXC leader. The TXC leader
 is 3-seed mean. If V1's 3-seed mean ≥ 0.9131, **V1 ties or beats by
-sheer architectural fit**. Each seed ~110 min on 5090 per the handover
-estimate (V1 was originally trained on H200 by Agent A; T_max=12 fits
-the 5090 at L=64 cache directly — confirmed feasible per Z's prior
-session). Total: ~3.5 hr.
+sheer architectural fit**.
+
+**UPDATE 2026-04-30: V1 does NOT fit 5090 at any cache size.** Z
+smoke-tested V1 (original SubseqH8 T_max=12) on 5090:
+
+- L=64 cache (7 GB): OOM at first Adam step (Adam state alone ≈ 12 GB
+  on top of 4 GB params + 7 GB cache + 6 GB activations ≈ 29 GB +
+  Adam = 41 GB > 32 GB). Hard CUDA OOM.
+- L=32 cache (3.5 GB): peak max_memory_allocated reports 35.04 GB on
+  the 32 GB device. The program runs (PyTorch falls back to host-memory
+  thrashing) but step time degrades to ~14 sec/step → 8000 steps would
+  take ~31 hr. Not viable.
+
+V1's 1.0 B parameters (T_max-many encoder slabs at T_max=12) push the
+W+Adam footprint to ~16 GB before any activation memory. The 5090's
+32 GB simply doesn't have headroom.
+
+**V1 multi-seed is H200-only** (or A40 with the right slicing). Z is
+unable to pursue this direction on the 5090.
 
 **B. TXCBareAntidead T-sweep gap-fill (T ∈ {4, 6, 7, 8, 12}).**
 The k=20 leader is `txc_bare_antidead_t5`. Existing T values: 5, 10, 20.
@@ -188,8 +203,18 @@ V1 used auto-shifts (1, 3, 6). Try `(1, 6)` only (drop 3 — possibly a
 **D. Defer to H200 (not feasible here).**
 SubseqH8 T_max ∈ {14, 16, 20} — confirmed OOM on 5090. H200 only.
 
-Z is proceeding with **A** (multi-seed V1) — kicking off seed=1 right
-after this writeup commit. seed=2 fires sequentially after.
+Z is proceeding with **B** (TXCBareAntidead T-sweep gap-fill) since
+**A is blocked by 5090 hardware**. T=8 fires first (closest to T=5 leader,
+matches the k=5 leader's T value). Then T=6, T=7, T=4, T=12 if budget
+permits. ~25 min/cell training + ~10 min probe each = ~3 hr for all 5.
+
+### Architectural takeaway for the paper
+
+The negative findings in R4 sharpen one of the paper's claims:
+**per-position encoder slabs are load-bearing for cross-token tasks**.
+Compress them and AUC drops 0.02-0.09. This is a quantitative
+robustness check on the SubseqH8 design choice — not just a
+methodological note.
 
 ### Files / commits
 
