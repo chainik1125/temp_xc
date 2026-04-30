@@ -51,14 +51,14 @@ let CURRENT_FEAT = 0;     // index into DATA.features
 
 async function tryLoadIndex() {
   // Look for index.json that lists all available feature jsons
-  const r = await fetch('index.json');
+  const r = await fetch('index.json?v=' + Date.now());
   if (!r.ok) return null;
   return r.json();
 }
 
 async function tryLoadDemo() {
   // Fallback: single demo.json (gen_steered_demo.py output)
-  const r = await fetch('demo.json');
+  const r = await fetch('demo.json?v=' + Date.now());
   if (!r.ok) return null;
   return r.json();
 }
@@ -76,10 +76,13 @@ function adaptDemoToData(demo) {
       return {
         alpha: a,
         wang: ws,  // {mean_align, mean_coh, n_align, n_coh, n_total} (or {})
-        completions: demo.prompts.map(p => ({
-          text: p.completions_by_alpha[aKey] ?? '',
-          align: null, coh: null, question: p.question,
-        })),
+        completions: demo.prompts.map(p => {
+          const j = (p.judge_by_alpha || {})[aKey] || {};
+          return {
+            text: p.completions_by_alpha[aKey] ?? '',
+            align: j.align ?? null, coh: j.coh ?? null, question: p.question,
+          };
+        }),
       };
     }),
   }];
