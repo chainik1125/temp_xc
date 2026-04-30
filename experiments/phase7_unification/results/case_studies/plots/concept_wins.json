@@ -1,0 +1,1030 @@
+{
+  "T=2 H8 PP": {
+    "per_concept_peak_thr_1.5": {
+      "wins": 11,
+      "losses": 10,
+      "ties": 9,
+      "n": 30,
+      "mean_diff": 0.12222222222222222,
+      "ci_95": [
+        -0.3,
+        0.5113888888888887
+      ],
+      "top_wins": [
+        {
+          "concept": "financial",
+          "anchor": 0.0,
+          "cell": 2.3333333333333335,
+          "delta": 2.3333333333333335
+        },
+        {
+          "concept": "narrative",
+          "anchor": 1.0,
+          "cell": 3.0,
+          "delta": 2.0
+        },
+        {
+          "concept": "neutral_factual",
+          "anchor": 1.0,
+          "cell": 3.0,
+          "delta": 2.0
+        },
+        {
+          "concept": "geographical",
+          "anchor": 0.0,
+          "cell": 1.6666666666666667,
+          "delta": 1.6666666666666667
+        },
+        {
+          "concept": "poetic",
+          "anchor": 1.0,
+          "cell": 2.6666666666666665,
+          "delta": 1.6666666666666665
+        }
+      ],
+      "top_losses": [
+        {
+          "concept": "legal",
+          "anchor": 3.0,
+          "cell": 2.0,
+          "delta": -1.0
+        },
+        {
+          "concept": "religious",
+          "anchor": 1.0,
+          "cell": 0.0,
+          "delta": -1.0
+        },
+        {
+          "concept": "instructional",
+          "anchor": 3.0,
+          "cell": 1.3333333333333333,
+          "delta": -1.6666666666666667
+        },
+        {
+          "concept": "programming",
+          "anchor": 3.0,
+          "cell": 1.3333333333333333,
+          "delta": -1.6666666666666667
+        },
+        {
+          "concept": "harmful_content",
+          "anchor": 3.0,
+          "cell": 0.3333333333333333,
+          "delta": -2.6666666666666665
+        }
+      ]
+    },
+    "per_concept_peak_thr_1.75": {
+      "wins": 7,
+      "losses": 12,
+      "ties": 11,
+      "n": 30,
+      "mean_diff": -0.3111111111111111,
+      "ci_95": [
+        -0.7333333333333333,
+        0.044444444444444425
+      ],
+      "top_wins": [
+        {
+          "concept": "geographical",
+          "anchor": 0.0,
+          "cell": 1.6666666666666667,
+          "delta": 1.6666666666666667
+        },
+        {
+          "concept": "neutral_factual",
+          "anchor": 1.0,
+          "cell": 2.6666666666666665,
+          "delta": 1.6666666666666665
+        },
+        {
+          "concept": "deception",
+          "anchor": 0.0,
+          "cell": 1.0,
+          "delta": 1.0
+        },
+        {
+          "concept": "medical",
+          "anchor": 2.0,
+          "cell": 3.0,
+          "delta": 1.0
+        },
+        {
+          "concept": "imperative_form",
+          "anchor": 0.0,
+          "cell": 0.3333333333333333,
+          "delta": 0.3333333333333333
+        }
+      ],
+      "top_losses": [
+        {
+          "concept": "historical",
+          "anchor": 2.0,
+          "cell": 0.6666666666666666,
+          "delta": -1.3333333333333335
+        },
+        {
+          "concept": "programming",
+          "anchor": 3.0,
+          "cell": 1.3333333333333333,
+          "delta": -1.6666666666666667
+        },
+        {
+          "concept": "instructional",
+          "anchor": 3.0,
+          "cell": 1.0,
+          "delta": -2.0
+        },
+        {
+          "concept": "harmful_content",
+          "anchor": 3.0,
+          "cell": 0.0,
+          "delta": -3.0
+        },
+        {
+          "concept": "legal",
+          "anchor": 3.0,
+          "cell": 0.0,
+          "delta": -3.0
+        }
+      ]
+    },
+    "per_concept_peak_thr_2.0": {
+      "wins": 7,
+      "losses": 12,
+      "ties": 11,
+      "n": 30,
+      "mean_diff": -0.3111111111111111,
+      "ci_95": [
+        -0.6777777777777778,
+        0.07777777777777775
+      ],
+      "top_wins": [
+        {
+          "concept": "geographical",
+          "anchor": 0.0,
+          "cell": 1.6666666666666667,
+          "delta": 1.6666666666666667
+        },
+        {
+          "concept": "neutral_factual",
+          "anchor": 1.0,
+          "cell": 2.6666666666666665,
+          "delta": 1.6666666666666665
+        },
+        {
+          "concept": "deception",
+          "anchor": 0.0,
+          "cell": 1.0,
+          "delta": 1.0
+        },
+        {
+          "concept": "medical",
+          "anchor": 2.0,
+          "cell": 3.0,
+          "delta": 1.0
+        },
+        {
+          "concept": "imperative_form",
+          "anchor": 0.0,
+          "cell": 0.3333333333333333,
+          "delta": 0.3333333333333333
+        }
+      ],
+      "top_losses": [
+        {
+          "concept": "historical",
+          "anchor": 2.0,
+          "cell": 0.6666666666666666,
+          "delta": -1.3333333333333335
+        },
+        {
+          "concept": "programming",
+          "anchor": 3.0,
+          "cell": 1.3333333333333333,
+          "delta": -1.6666666666666667
+        },
+        {
+          "concept": "instructional",
+          "anchor": 3.0,
+          "cell": 1.0,
+          "delta": -2.0
+        },
+        {
+          "concept": "harmful_content",
+          "anchor": 3.0,
+          "cell": 0.0,
+          "delta": -3.0
+        },
+        {
+          "concept": "legal",
+          "anchor": 3.0,
+          "cell": 0.0,
+          "delta": -3.0
+        }
+      ]
+    },
+    "strength_uniform_peak_thr_1.5": {
+      "anchor_mean": 1.1,
+      "cell_mean": 1.4,
+      "delta_mean": 0.2999999999999998,
+      "ci_95_diff": [
+        -0.05583333333333333,
+        0.6558333333333329
+      ],
+      "n_common": 30
+    },
+    "strength_uniform_peak_thr_1.75": {
+      "anchor_mean": 0.36666666666666664,
+      "cell_mean": 0.6222222222222222,
+      "delta_mean": 0.2555555555555556,
+      "ci_95_diff": [
+        0.06638888888888887,
+        0.47805555555555534
+      ],
+      "n_common": 30
+    },
+    "strength_uniform_peak_thr_2.0": {
+      "anchor_mean": 0.26666666666666666,
+      "cell_mean": 0.3444444444444444,
+      "delta_mean": 0.07777777777777772,
+      "ci_95_diff": [
+        -0.0666666666666667,
+        0.2444444444444444
+      ],
+      "n_common": 30
+    }
+  },
+  "T=2 H8 RE": {
+    "per_concept_peak_thr_1.5": {
+      "wins": 12,
+      "losses": 9,
+      "ties": 9,
+      "n": 30,
+      "mean_diff": 0.17222222222222222,
+      "ci_95": [
+        -0.1388888888888889,
+        0.522361111111111
+      ],
+      "top_wins": [
+        {
+          "concept": "geographical",
+          "anchor": 0.0,
+          "cell": 3.0,
+          "delta": 3.0
+        },
+        {
+          "concept": "neutral_factual",
+          "anchor": 1.0,
+          "cell": 3.0,
+          "delta": 2.0
+        },
+        {
+          "concept": "financial",
+          "anchor": 0.0,
+          "cell": 1.6666666666666667,
+          "delta": 1.6666666666666667
+        },
+        {
+          "concept": "code_context",
+          "anchor": 1.0,
+          "cell": 2.0,
+          "delta": 1.0
+        },
+        {
+          "concept": "medical",
+          "anchor": 2.0,
+          "cell": 3.0,
+          "delta": 1.0
+        }
+      ],
+      "top_losses": [
+        {
+          "concept": "formal_register",
+          "anchor": 3.0,
+          "cell": 2.3333333333333335,
+          "delta": -0.6666666666666665
+        },
+        {
+          "concept": "technical_jargon",
+          "anchor": 3.0,
+          "cell": 2.3333333333333335,
+          "delta": -0.6666666666666665
+        },
+        {
+          "concept": "legal",
+          "anchor": 3.0,
+          "cell": 2.0,
+          "delta": -1.0
+        },
+        {
+          "concept": "harmful_content",
+          "anchor": 3.0,
+          "cell": 1.6666666666666667,
+          "delta": -1.3333333333333333
+        },
+        {
+          "concept": "instructional",
+          "anchor": 3.0,
+          "cell": 1.3333333333333333,
+          "delta": -1.6666666666666667
+        }
+      ]
+    },
+    "per_concept_peak_thr_1.75": {
+      "wins": 8,
+      "losses": 11,
+      "ties": 11,
+      "n": 30,
+      "mean_diff": -0.18333333333333332,
+      "ci_95": [
+        -0.5222222222222223,
+        0.11666666666666665
+      ],
+      "top_wins": [
+        {
+          "concept": "neutral_factual",
+          "anchor": 1.0,
+          "cell": 3.0,
+          "delta": 2.0
+        },
+        {
+          "concept": "code_context",
+          "anchor": 1.0,
+          "cell": 2.0,
+          "delta": 1.0
+        },
+        {
+          "concept": "geographical",
+          "anchor": 0.0,
+          "cell": 1.0,
+          "delta": 1.0
+        },
+        {
+          "concept": "poetic",
+          "anchor": 1.0,
+          "cell": 1.6666666666666667,
+          "delta": 0.6666666666666667
+        },
+        {
+          "concept": "imperative_form",
+          "anchor": 0.0,
+          "cell": 0.3333333333333333,
+          "delta": 0.3333333333333333
+        }
+      ],
+      "top_losses": [
+        {
+          "concept": "legal",
+          "anchor": 3.0,
+          "cell": 2.0,
+          "delta": -1.0
+        },
+        {
+          "concept": "medical",
+          "anchor": 2.0,
+          "cell": 1.0,
+          "delta": -1.0
+        },
+        {
+          "concept": "historical",
+          "anchor": 2.0,
+          "cell": 0.6666666666666666,
+          "delta": -1.3333333333333335
+        },
+        {
+          "concept": "instructional",
+          "anchor": 3.0,
+          "cell": 1.0,
+          "delta": -2.0
+        },
+        {
+          "concept": "harmful_content",
+          "anchor": 3.0,
+          "cell": 0.0,
+          "delta": -3.0
+        }
+      ]
+    },
+    "per_concept_peak_thr_2.0": {
+      "wins": 8,
+      "losses": 11,
+      "ties": 11,
+      "n": 30,
+      "mean_diff": -0.18333333333333332,
+      "ci_95": [
+        -0.5223611111111112,
+        0.14458333333333317
+      ],
+      "top_wins": [
+        {
+          "concept": "neutral_factual",
+          "anchor": 1.0,
+          "cell": 3.0,
+          "delta": 2.0
+        },
+        {
+          "concept": "code_context",
+          "anchor": 1.0,
+          "cell": 2.0,
+          "delta": 1.0
+        },
+        {
+          "concept": "geographical",
+          "anchor": 0.0,
+          "cell": 1.0,
+          "delta": 1.0
+        },
+        {
+          "concept": "poetic",
+          "anchor": 1.0,
+          "cell": 1.6666666666666667,
+          "delta": 0.6666666666666667
+        },
+        {
+          "concept": "imperative_form",
+          "anchor": 0.0,
+          "cell": 0.3333333333333333,
+          "delta": 0.3333333333333333
+        }
+      ],
+      "top_losses": [
+        {
+          "concept": "legal",
+          "anchor": 3.0,
+          "cell": 2.0,
+          "delta": -1.0
+        },
+        {
+          "concept": "medical",
+          "anchor": 2.0,
+          "cell": 1.0,
+          "delta": -1.0
+        },
+        {
+          "concept": "historical",
+          "anchor": 2.0,
+          "cell": 0.6666666666666666,
+          "delta": -1.3333333333333335
+        },
+        {
+          "concept": "instructional",
+          "anchor": 3.0,
+          "cell": 1.0,
+          "delta": -2.0
+        },
+        {
+          "concept": "harmful_content",
+          "anchor": 3.0,
+          "cell": 0.0,
+          "delta": -3.0
+        }
+      ]
+    },
+    "strength_uniform_peak_thr_1.5": {
+      "anchor_mean": 1.1,
+      "cell_mean": 1.2388888888888887,
+      "delta_mean": 0.13888888888888862,
+      "ci_95_diff": [
+        -0.2336111111111111,
+        0.5168055555555555
+      ],
+      "n_common": 30
+    },
+    "strength_uniform_peak_thr_1.75": {
+      "anchor_mean": 0.36666666666666664,
+      "cell_mean": 1.2388888888888887,
+      "delta_mean": 0.872222222222222,
+      "ci_95_diff": [
+        0.5111111111111112,
+        1.2333333333333334
+      ],
+      "n_common": 30
+    },
+    "strength_uniform_peak_thr_2.0": {
+      "anchor_mean": 0.26666666666666666,
+      "cell_mean": 0.4888888888888889,
+      "delta_mean": 0.2222222222222222,
+      "ci_95_diff": [
+        -0.02222222222222224,
+        0.511111111111111
+      ],
+      "n_common": 30
+    }
+  },
+  "T=2 bare PP": {
+    "per_concept_peak_thr_1.5": {
+      "wins": 8,
+      "losses": 9,
+      "ties": 13,
+      "n": 30,
+      "mean_diff": -0.11111111111111113,
+      "ci_95": [
+        -0.4555555555555556,
+        0.2444444444444444
+      ],
+      "top_wins": [
+        {
+          "concept": "financial",
+          "anchor": 0.0,
+          "cell": 3.0,
+          "delta": 3.0
+        },
+        {
+          "concept": "poetic",
+          "anchor": 1.0,
+          "cell": 2.6666666666666665,
+          "delta": 1.6666666666666665
+        },
+        {
+          "concept": "deception",
+          "anchor": 0.0,
+          "cell": 1.0,
+          "delta": 1.0
+        },
+        {
+          "concept": "geographical",
+          "anchor": 0.0,
+          "cell": 1.0,
+          "delta": 1.0
+        },
+        {
+          "concept": "positive_emotion",
+          "anchor": 0.0,
+          "cell": 0.3333333333333333,
+          "delta": 0.3333333333333333
+        }
+      ],
+      "top_losses": [
+        {
+          "concept": "instructional",
+          "anchor": 3.0,
+          "cell": 1.6666666666666667,
+          "delta": -1.3333333333333333
+        },
+        {
+          "concept": "scientific",
+          "anchor": 2.0,
+          "cell": 0.3333333333333333,
+          "delta": -1.6666666666666667
+        },
+        {
+          "concept": "medical",
+          "anchor": 2.0,
+          "cell": 0.3333333333333333,
+          "delta": -1.6666666666666667
+        },
+        {
+          "concept": "legal",
+          "anchor": 3.0,
+          "cell": 1.0,
+          "delta": -2.0
+        },
+        {
+          "concept": "technical_jargon",
+          "anchor": 3.0,
+          "cell": 1.0,
+          "delta": -2.0
+        }
+      ]
+    },
+    "per_concept_peak_thr_1.75": {
+      "wins": 6,
+      "losses": 12,
+      "ties": 12,
+      "n": 30,
+      "mean_diff": -0.4444444444444445,
+      "ci_95": [
+        -0.8002777777777779,
+        -0.13333333333333336
+      ],
+      "top_wins": [
+        {
+          "concept": "deception",
+          "anchor": 0.0,
+          "cell": 1.0,
+          "delta": 1.0
+        },
+        {
+          "concept": "geographical",
+          "anchor": 0.0,
+          "cell": 1.0,
+          "delta": 1.0
+        },
+        {
+          "concept": "positive_emotion",
+          "anchor": 0.0,
+          "cell": 0.3333333333333333,
+          "delta": 0.3333333333333333
+        },
+        {
+          "concept": "imperative_form",
+          "anchor": 0.0,
+          "cell": 0.3333333333333333,
+          "delta": 0.3333333333333333
+        },
+        {
+          "concept": "narrative",
+          "anchor": 1.0,
+          "cell": 1.3333333333333333,
+          "delta": 0.33333333333333326
+        }
+      ],
+      "top_losses": [
+        {
+          "concept": "medical",
+          "anchor": 2.0,
+          "cell": 0.3333333333333333,
+          "delta": -1.6666666666666667
+        },
+        {
+          "concept": "instructional",
+          "anchor": 3.0,
+          "cell": 1.0,
+          "delta": -2.0
+        },
+        {
+          "concept": "legal",
+          "anchor": 3.0,
+          "cell": 1.0,
+          "delta": -2.0
+        },
+        {
+          "concept": "technical_jargon",
+          "anchor": 3.0,
+          "cell": 1.0,
+          "delta": -2.0
+        },
+        {
+          "concept": "harmful_content",
+          "anchor": 3.0,
+          "cell": 0.3333333333333333,
+          "delta": -2.6666666666666665
+        }
+      ]
+    },
+    "per_concept_peak_thr_2.0": {
+      "wins": 6,
+      "losses": 12,
+      "ties": 12,
+      "n": 30,
+      "mean_diff": -0.4444444444444445,
+      "ci_95": [
+        -0.7777777777777779,
+        -0.13305555555555582
+      ],
+      "top_wins": [
+        {
+          "concept": "deception",
+          "anchor": 0.0,
+          "cell": 1.0,
+          "delta": 1.0
+        },
+        {
+          "concept": "geographical",
+          "anchor": 0.0,
+          "cell": 1.0,
+          "delta": 1.0
+        },
+        {
+          "concept": "positive_emotion",
+          "anchor": 0.0,
+          "cell": 0.3333333333333333,
+          "delta": 0.3333333333333333
+        },
+        {
+          "concept": "imperative_form",
+          "anchor": 0.0,
+          "cell": 0.3333333333333333,
+          "delta": 0.3333333333333333
+        },
+        {
+          "concept": "narrative",
+          "anchor": 1.0,
+          "cell": 1.3333333333333333,
+          "delta": 0.33333333333333326
+        }
+      ],
+      "top_losses": [
+        {
+          "concept": "medical",
+          "anchor": 2.0,
+          "cell": 0.3333333333333333,
+          "delta": -1.6666666666666667
+        },
+        {
+          "concept": "instructional",
+          "anchor": 3.0,
+          "cell": 1.0,
+          "delta": -2.0
+        },
+        {
+          "concept": "legal",
+          "anchor": 3.0,
+          "cell": 1.0,
+          "delta": -2.0
+        },
+        {
+          "concept": "technical_jargon",
+          "anchor": 3.0,
+          "cell": 1.0,
+          "delta": -2.0
+        },
+        {
+          "concept": "harmful_content",
+          "anchor": 3.0,
+          "cell": 0.3333333333333333,
+          "delta": -2.6666666666666665
+        }
+      ]
+    },
+    "strength_uniform_peak_thr_1.5": {
+      "anchor_mean": 1.1,
+      "cell_mean": 0.9777777777777777,
+      "delta_mean": -0.12222222222222234,
+      "ci_95_diff": [
+        -0.43333333333333335,
+        0.17777777777777776
+      ],
+      "n_common": 30
+    },
+    "strength_uniform_peak_thr_1.75": {
+      "anchor_mean": 0.36666666666666664,
+      "cell_mean": 0.9777777777777777,
+      "delta_mean": 0.6111111111111112,
+      "ci_95_diff": [
+        0.3219444444444444,
+        0.9333333333333332
+      ],
+      "n_common": 30
+    },
+    "strength_uniform_peak_thr_2.0": {
+      "anchor_mean": 0.26666666666666666,
+      "cell_mean": 0.9777777777777777,
+      "delta_mean": 0.711111111111111,
+      "ci_95_diff": [
+        0.3777777777777778,
+        1.0777777777777777
+      ],
+      "n_common": 30
+    }
+  },
+  "T=2 bare RE": {
+    "per_concept_peak_thr_1.5": {
+      "wins": 8,
+      "losses": 10,
+      "ties": 12,
+      "n": 30,
+      "mean_diff": -0.12222222222222223,
+      "ci_95": [
+        -0.4666666666666667,
+        0.23333333333333328
+      ],
+      "top_wins": [
+        {
+          "concept": "financial",
+          "anchor": 0.0,
+          "cell": 2.3333333333333335,
+          "delta": 2.3333333333333335
+        },
+        {
+          "concept": "poetic",
+          "anchor": 1.0,
+          "cell": 2.3333333333333335,
+          "delta": 1.3333333333333335
+        },
+        {
+          "concept": "imperative_form",
+          "anchor": 0.0,
+          "cell": 1.0,
+          "delta": 1.0
+        },
+        {
+          "concept": "deception",
+          "anchor": 0.0,
+          "cell": 1.0,
+          "delta": 1.0
+        },
+        {
+          "concept": "geographical",
+          "anchor": 0.0,
+          "cell": 1.0,
+          "delta": 1.0
+        }
+      ],
+      "top_losses": [
+        {
+          "concept": "medical",
+          "anchor": 2.0,
+          "cell": 1.0,
+          "delta": -1.0
+        },
+        {
+          "concept": "scientific",
+          "anchor": 2.0,
+          "cell": 0.6666666666666666,
+          "delta": -1.3333333333333335
+        },
+        {
+          "concept": "harmful_content",
+          "anchor": 3.0,
+          "cell": 1.0,
+          "delta": -2.0
+        },
+        {
+          "concept": "instructional",
+          "anchor": 3.0,
+          "cell": 1.0,
+          "delta": -2.0
+        },
+        {
+          "concept": "legal",
+          "anchor": 3.0,
+          "cell": 1.0,
+          "delta": -2.0
+        }
+      ]
+    },
+    "per_concept_peak_thr_1.75": {
+      "wins": 4,
+      "losses": 13,
+      "ties": 13,
+      "n": 30,
+      "mean_diff": -0.3555555555555555,
+      "ci_95": [
+        -0.7,
+        0.011388888888888655
+      ],
+      "top_wins": [
+        {
+          "concept": "financial",
+          "anchor": 0.0,
+          "cell": 2.3333333333333335,
+          "delta": 2.3333333333333335
+        },
+        {
+          "concept": "deception",
+          "anchor": 0.0,
+          "cell": 1.0,
+          "delta": 1.0
+        },
+        {
+          "concept": "geographical",
+          "anchor": 0.0,
+          "cell": 1.0,
+          "delta": 1.0
+        },
+        {
+          "concept": "negative_emotion",
+          "anchor": 1.0,
+          "cell": 1.3333333333333333,
+          "delta": 0.33333333333333326
+        },
+        {
+          "concept": "literary",
+          "anchor": 0.0,
+          "cell": 0.0,
+          "delta": 0.0
+        }
+      ],
+      "top_losses": [
+        {
+          "concept": "scientific",
+          "anchor": 2.0,
+          "cell": 0.6666666666666666,
+          "delta": -1.3333333333333335
+        },
+        {
+          "concept": "historical",
+          "anchor": 2.0,
+          "cell": 0.3333333333333333,
+          "delta": -1.6666666666666667
+        },
+        {
+          "concept": "instructional",
+          "anchor": 3.0,
+          "cell": 1.0,
+          "delta": -2.0
+        },
+        {
+          "concept": "legal",
+          "anchor": 3.0,
+          "cell": 1.0,
+          "delta": -2.0
+        },
+        {
+          "concept": "harmful_content",
+          "anchor": 3.0,
+          "cell": 0.3333333333333333,
+          "delta": -2.6666666666666665
+        }
+      ]
+    },
+    "per_concept_peak_thr_2.0": {
+      "wins": 4,
+      "losses": 13,
+      "ties": 13,
+      "n": 30,
+      "mean_diff": -0.3555555555555555,
+      "ci_95": [
+        -0.6891666666666666,
+        0.022222222222222223
+      ],
+      "top_wins": [
+        {
+          "concept": "financial",
+          "anchor": 0.0,
+          "cell": 2.3333333333333335,
+          "delta": 2.3333333333333335
+        },
+        {
+          "concept": "deception",
+          "anchor": 0.0,
+          "cell": 1.0,
+          "delta": 1.0
+        },
+        {
+          "concept": "geographical",
+          "anchor": 0.0,
+          "cell": 1.0,
+          "delta": 1.0
+        },
+        {
+          "concept": "negative_emotion",
+          "anchor": 1.0,
+          "cell": 1.3333333333333333,
+          "delta": 0.33333333333333326
+        },
+        {
+          "concept": "literary",
+          "anchor": 0.0,
+          "cell": 0.0,
+          "delta": 0.0
+        }
+      ],
+      "top_losses": [
+        {
+          "concept": "scientific",
+          "anchor": 2.0,
+          "cell": 0.6666666666666666,
+          "delta": -1.3333333333333335
+        },
+        {
+          "concept": "historical",
+          "anchor": 2.0,
+          "cell": 0.3333333333333333,
+          "delta": -1.6666666666666667
+        },
+        {
+          "concept": "instructional",
+          "anchor": 3.0,
+          "cell": 1.0,
+          "delta": -2.0
+        },
+        {
+          "concept": "legal",
+          "anchor": 3.0,
+          "cell": 1.0,
+          "delta": -2.0
+        },
+        {
+          "concept": "harmful_content",
+          "anchor": 3.0,
+          "cell": 0.3333333333333333,
+          "delta": -2.6666666666666665
+        }
+      ]
+    },
+    "strength_uniform_peak_thr_1.5": {
+      "anchor_mean": 1.1,
+      "cell_mean": 0.9555555555555556,
+      "delta_mean": -0.1444444444444445,
+      "ci_95_diff": [
+        -0.45555555555555555,
+        0.18888888888888894
+      ],
+      "n_common": 30
+    },
+    "strength_uniform_peak_thr_1.75": {
+      "anchor_mean": 0.36666666666666664,
+      "cell_mean": 0.9555555555555556,
+      "delta_mean": 0.588888888888889,
+      "ci_95_diff": [
+        0.35555555555555557,
+        0.8777777777777778
+      ],
+      "n_common": 30
+    },
+    "strength_uniform_peak_thr_2.0": {
+      "anchor_mean": 0.26666666666666666,
+      "cell_mean": 0.9555555555555556,
+      "delta_mean": 0.6888888888888889,
+      "ci_95_diff": [
+        0.3441666666666667,
+        1.0222222222222221
+      ],
+      "n_common": 30
+    }
+  }
+}
