@@ -301,6 +301,15 @@ seed-2 dupes; only the canonical first-host result was kept per seed),
 
 ![Best-feature coherence/suppression frontier across 3 seeds](../../../experiments/phase8_tinystories_sleeper/outputs/seeded_logs/seed_frontier.png)
 
+**Per-cell val sweep clouds (rows = arch, cols = hookpoint):**
+
+![3x5 grid of per-cell sweep clouds](../../../experiments/phase8_tinystories_sleeper/outputs/seeded_logs/seed_grid.png)
+
+Each dot is one (feature, α) candidate from stage-2 of the per-pair
+sweep; star is the chosen point. Three seeds overlaid (blue / orange /
+green). Confirms the headline at a glance: T-SAE row × ln1.0 column has
+all three stars at val ASR = 0.
+
 The lower-left corner is the ideal — full suppression at zero damage.
 T-SAE at `ln1.0` sits exactly there with both error bars at zero.
 TXC at `ln1.0` and `resid_pre.0` are the next-closest. SAE points
