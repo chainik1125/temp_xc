@@ -301,14 +301,25 @@ seed-2 dupes; only the canonical first-host result was kept per seed),
 
 ![Best-feature coherence/suppression frontier across 3 seeds](../../../experiments/phase8_tinystories_sleeper/outputs/seeded_logs/seed_frontier.png)
 
-**Per-cell val sweep clouds (rows = arch, cols = hookpoint):**
+**Per-cell val sweep clouds — all features (rows = arch, cols = hookpoint):**
 
 ![3x5 grid of per-cell sweep clouds](../../../experiments/phase8_tinystories_sleeper/outputs/seeded_logs/seed_grid.png)
 
-Each dot is one (feature, α) candidate from stage-2 of the per-pair
-sweep; star is the chosen point. Three seeds overlaid (blue / orange /
-green). Confirms the headline at a glance: T-SAE row × ln1.0 column has
-all three stars at val ASR = 0.
+Each dot is one (feature, α) candidate from the stage-2 sweep — 10
+distinct features × 5 α values × 3 seeds = up to 150 dots per cell.
+Star = chosen `argmin val_asr s.t. ΔCE ≤ 0.05` per seed.
+
+**Per-cell α-sweep curves — chosen feature only (same axes):**
+
+![3x5 grid of dominant-feature alpha curves](../../../experiments/phase8_tinystories_sleeper/outputs/seeded_logs/seed_grid_dominant.png)
+
+Each line is the α trajectory (α ∈ {0.25, 0.5, 1, 1.5, 2}) of one
+seed's chosen feature; the star marks its chosen α. Same axes as the
+all-features grid above for direct comparison. The trajectory shape
+shows whether suppression is α-driven (line slopes down with α) or
+already-saturated at low α — at the T-SAE × ln1.0 cell all three lines
+sit at val ASR=0 across the full α range, i.e. the feature is so
+trigger-aligned that even small ablation kills the attack.
 
 The lower-left corner is the ideal — full suppression at zero damage.
 T-SAE at `ln1.0` sits exactly there with both error bars at zero.

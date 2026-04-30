@@ -1,13 +1,13 @@
-"""3 (arch) × 5 (hookpoint) grid of per-cell val sweeps.
+"""Per-cell α-sweep curve for the *chosen* (dominant) feature only.
 
-Each subplot shows all stage-2 (feature, α) candidates from the three
-seeds at that (arch, hookpoint) cell. x-axis = val ΔCE, y-axis = val
-sampled ASR_16. Color = seed. Chosen point per seed marked with a
-star (the point selected as `argmin val_asr s.t. ΔCE ≤ 0.05`).
+3 (arch) × 5 (hookpoint) grid. Each subplot shows the α-sweep curve
+for whichever feature was selected as `argmin val_asr s.t. ΔCE ≤ 0.05`
+at that (arch, hookpoint, seed) cell — one curve per seed (so up to
+3 distinct features per cell, each evaluated at α ∈
+{0.25, 0.5, 1.0, 1.5, 2.0}).
 
-Reads outputs/seeded_logs/val_sweeps/val_sweep_<basetag>_s<seed>.json
-for all 45 (basetag × seed) combinations. Writes
-outputs/seeded_logs/seed_grid.png + .thumb.png.
+Axes are equalised with `plot_seed_grid.py` so the two figures sit at
+the same scale and can be read side-by-side.
 """
 from __future__ import annotations
 
@@ -18,7 +18,7 @@ import matplotlib.pyplot as plt
 
 ROOT = Path(__file__).parent
 SWEEPS_DIR = ROOT / "outputs/seeded_logs/val_sweeps"
-OUT_PNG = ROOT / "outputs/seeded_logs/seed_grid.png"
+OUT_PNG = ROOT / "outputs/seeded_logs/seed_grid_dominant.png"
 
 
 HOOK_ORDER = [
@@ -32,9 +32,7 @@ ARCH_ORDER = ["sae", "tsae", "txc"]
 ARCH_LABELS = {"sae": "SAE", "tsae": "T-SAE", "txc": "TXC"}
 SEED_COLORS = {0: "#1f77b4", 1: "#ff7f0e", 2: "#2ca02c"}
 DELTA_BUDGET = 0.05
-# Equalised axis limits, shared with plot_seed_grid_dominant.py so the
-# two figures sit at the same scale. ΔCE values in val_sweep stage-2
-# extend roughly [-0.01, +0.10]; we leave a little room on either side.
+# MUST match plot_seed_grid.py.
 X_LIM = (-0.04, 0.16)
 Y_LIM = (-0.05, 1.05)
 
@@ -63,19 +61,28 @@ def main() -> None:
                 d = load_sweep(basetag, seed)
                 if d is None:
                     continue
+                chosen_f = d["chosen"]["feature_idx"]
+                chosen_alpha = d["chosen"]["alpha"]
+
+                # All stage-2 rows for the chosen feature, sorted by α.
+                rows = [
+                    r for r in d.get("stage2", [])
+                    if r["feature_idx"] == chosen_f
+                ]
+                rows.sort(key=lambda r: r["alpha"])
+                if not rows:
+                    continue
+                xs = [r["delta_clean_ce"] for r in rows]
+                ys = [r["val_asr_16"] for r in rows]
                 color = SEED_COLORS[seed]
-                # All stage-2 candidates: a cloud of (ΔCE, val_asr).
-                xs = [row["delta_clean_ce"] for row in d.get("stage2", [])]
-                ys = [row["val_asr_16"] for row in d.get("stage2", [])]
-                ax.scatter(xs, ys, color=color, s=14, alpha=0.45,
-                           edgecolor="none", label=f"s{seed}")
-                # Chosen point per seed.
-                ch = d["chosen"]
-                ax.scatter(
-                    ch["delta_clean_ce"], ch["val_asr_16"],
-                    marker="*", s=180, color=color,
-                    edgecolor="black", linewidths=0.7, zorder=10,
-                )
+                ax.plot(xs, ys, marker="o", color=color, linewidth=1.6,
+                        markersize=6, alpha=0.85,
+                        label=f"s{seed} f={chosen_f}")
+                # Star at the chosen α.
+                ch_x = d["chosen"]["delta_clean_ce"]
+                ch_y = d["chosen"]["val_asr_16"]
+                ax.scatter(ch_x, ch_y, marker="*", s=200, color=color,
+                           edgecolor="black", linewidths=0.7, zorder=10)
 
             ax.axvline(DELTA_BUDGET, linestyle="--", color="grey",
                        alpha=0.5, linewidth=0.8)
@@ -92,23 +99,22 @@ def main() -> None:
             ax.set_ylim(*Y_LIM)
             ax.grid(alpha=0.2)
 
-    # Single legend for seed colors at the figure top-right.
     handles = [
-        plt.Line2D([0], [0], marker="o", linestyle="", color=SEED_COLORS[s],
+        plt.Line2D([0], [0], marker="o", linestyle="-", color=SEED_COLORS[s],
                    markersize=8, label=f"seed {s}")
         for s in (0, 1, 2)
     ]
     handles.append(
         plt.Line2D([0], [0], marker="*", linestyle="", color="grey",
-                   markeredgecolor="black", markersize=14, label="chosen (f, α)")
+                   markeredgecolor="black", markersize=14, label="chosen α")
     )
     fig.legend(handles=handles, loc="upper right", fontsize=9, ncol=4,
                bbox_to_anchor=(0.98, 1.02))
 
     fig.suptitle(
-        "Phase 8 — TinyStories Sleeper: per-cell val sweep clouds\n"
-        "(rows = arch, cols = hookpoint; each dot = one (f, α) candidate; "
-        "star = chosen; dashed = ΔCE budget δ=0.05)",
+        "Phase 8 — TinyStories Sleeper: chosen-feature α-sweeps\n"
+        "(rows = arch, cols = hookpoint; one line per seed = α∈{0.25,0.5,1,1.5,2} "
+        "for that seed's chosen feature; dashed = ΔCE budget δ=0.05)",
         fontsize=11, y=1.02,
     )
     fig.tight_layout()
@@ -116,8 +122,7 @@ def main() -> None:
     OUT_PNG.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(OUT_PNG, dpi=150, bbox_inches="tight")
     print(f"[plot] wrote {OUT_PNG}")
-    fig.savefig(OUT_PNG.with_suffix(".thumb.png"), dpi=24,
-                bbox_inches="tight")
+    fig.savefig(OUT_PNG.with_suffix(".thumb.png"), dpi=24, bbox_inches="tight")
     print(f"[plot] wrote {OUT_PNG.with_suffix('.thumb.png')}")
 
 
