@@ -33,9 +33,9 @@ T-SAE k=20 still **wins on raw peak success** (1.80 vs OBLITERATION's 1.42). TXC
 
 **Honest paper claim**: at matched per-token sparsity, TXC's OBLITERATION recipe (T=2 + H8 multidist + shifts=(T,) + per-position) achieves higher *coherent* peak success than T-SAE k=20 by +0.23, multi-seed validated. T-SAE k=20 retains the unconstrained-peak advantage.
 
-### Suggested next direction — Han's left-edge / center-slice / decay-weighted protocols
+### Suggested next direction — left-edge / center-slice / decay-weighted protocols
 
-I (W) implemented V1 (local), V2 (anchored), V3 (dec-additive), V4 (tiled). Han pointed out (last conversation turn before handover) **untested protocols worth implementing**:
+I (W) implemented V1 (local), V2 (anchored), V3 (dec-additive), V4 (tiled). In the last turn before handover, Han asked whether I'd tried "the method where each position gets the steering vector from the window whose right edge lands on that position" — that turned out to be exactly what V1 / right-edge already does. **The protocol space below is W's proposal**, not Han's:
 
 1. **Left-edge** (#1 priority): for position p, use the window [p, p+T-1] (where p is the LEFT edge). Take the leftmost slice (relative position 0) at p. Symmetric to right-edge but encoder integrates *forward* from p instead of *backward*. Hypothesis: helps on concepts whose signal builds *across* the steered span.
 
@@ -61,7 +61,7 @@ If left-edge + per-position-of-OBLITERATION-arch combine multiplicatively, that 
 |---|---|
 | Hardware | RunPod A40, 46 GB VRAM, 46 GB pod RAM, 900 GB volume |
 | GPU state | likely idle (last training was OBLITERATION sd=2, finished) |
-| Branch | `han-phase7-unification` HEAD ≈ `4cb2edff` (W's last push) |
+| Branch | `han-phase7-unification` HEAD = `88e8ade3` at handover (this file). Latest W training commits: `4cb2edff` (OBLITERATION 3-seed), `2979f29c` (Phase 3 matrix). Use `git log --grep="Agent W"` for full W history. |
 | Activation cache | built at `data/cached_activations/gemma-2-2b/fineweb/resid_L12.npy` (14.16 GB, fp16, 24k seqs × 128 ctx × 2304 dim) |
 | Token IDs | built at `.../token_ids.npy` (24k × 128 int64) |
 | Local ckpts | tsae_paper_k20, txc_bare_antidead_t3_kpos20 (sd42+sd1), agentic_txc_02_kpos20 (sd42), txc_h8_t2_kpos20_shifts2 (sd1+sd2 W's training), agentic_txc_02 (sd42), txc_bare_antidead_t5 (sd42) |
@@ -81,7 +81,7 @@ If left-edge + per-position-of-OBLITERATION-arch combine multiplicatively, that 
 
 6. **Mean-curve vs per-seed-then-mean aggregation**: these give different numbers under coh ≥ 1.5. Mean-curve = avg success and avg coh per s_norm across seeds, then peak. Per-seed-then-mean = peak per seed, then mean. Y's writeups use mean-curve as standard. Always state which.
 
-7. **Cross-pod seed=1 determinism is NOT guaranteed**. Y trained T=2 H8 sd=1 on her pod; W trained on this pod; same arch, same seed; numbers diverged (Y's per-position 1.700, W's 0.633). cuDNN kernel non-determinism. Multi-pod multi-seed needed for tightest claims.
+7. **Cross-pod seed=1 determinism is NOT guaranteed**. Y trained T=2 H8 sd=1 on her pod; W trained on this pod; same arch, same seed. Per-position constrained-peak diverged: Y's ckpt graded 1.700, W's ckpt graded 0.633. cuDNN kernel non-determinism (different cuDNN version / GPU / RNG-state interaction). The committed sd=1 grades on the repo are W's (race resolution after rebase took --ours = W's branch); Y's sd=1 numbers were lost. Multi-pod multi-seed pooling is needed for tightest claims.
 
 ### Reading list (priority order)
 
@@ -122,12 +122,23 @@ Y is on a separate pod. We coordinate via git commit messages. Tag commits clear
 
 Race avoidance: before training a cell at a given (arch, seed), `git pull` and check `git log --grep="<arch>__seed<seed>"`. Y has been good about pre-announcing.
 
-Y's headline-plot generator is at `experiments/phase7_unification/case_studies/steering/plot_unified_pareto.py` (or similar — find it via `git log --all --name-status | grep pareto`). Use it as the template for any new headline plots.
+Y's headline-plot generator is at `experiments/phase7_unification/case_studies/steering/plot_unified_pareto.py` (verified). Outputs `unified_pareto_matched_sparsity.{png,thumb.png}` and `unified_ranking_matched_sparsity.{png,thumb.png}` plus `unified_pareto_summary.json`. Use it as the template for any new headline plots.
 
 ### Pre-registered metric
 
 **Primary**: peak success at coh ≥ 1.5, family-normalised paper-clamp.
-**Threshold**: ±0.27 vs anchor (= 1× σ_seeds at canonical sparsity, but at k_pos=20 σ_anchor itself is ~0.8 under per-seed; under mean-curve ~0.4. Use multi-seed pooling.)
+**Threshold**: ±0.27 vs anchor (= 1× σ_seeds at canonical sparsity per Y's brief). At k_pos=20 σ_anchor under per-seed-then-mean is huge (1.10 sd42 vs 0.30 sd1 for T-SAE itself, σ ≈ 0.80) because the coh-cliff position varies seed-to-seed. Mean-curve aggregation reduces this — T-SAE k=20 mean-curve peak15 = 1.167 — but doesn't fix it. **Always state which aggregation a number uses.** Reporting both views is the safest paper-grade approach.
+
+### Combined OBLITERATION numbers — the metric-divergence summary
+
+To avoid future confusion in the handover chain:
+
+| aggregation | T-SAE k=20 anchor | OBLITERATION right-edge (3-seed) | OBLITERATION per-position (3-seed) |
+|---|---|---|---|
+| **Mean-curve** (avg curve, then peak) | 1.167 | 1.236 | **1.400** (Δ=+0.233 vs anchor) |
+| **Per-seed-then-mean** (peak each seed, then mean) | 0.700 (sd42=1.10, sd1=0.30; σ=0.80) | 1.025 (Δ=+0.325 WIN) | 0.978 (Δ=+0.278 WIN) |
+
+Under mean-curve the OBLITERATION cell wins by +0.233 — TIE band, just shy of strict ±0.27. Under per-seed-then-mean it wins by +0.28-0.33 — barely past threshold. Both readings are positive but neither is a "decisive" win. T-SAE k=20 still wins at unconstrained peak (1.800 vs 1.42).
 
 ### Files I produced
 
@@ -141,10 +152,13 @@ Briefs / writeups:
 - `agent_w/steering-pipeline-mechanics.md`
 - `agent_w/2026-04-30-w-handover.md` (this file)
 
-Trainers:
-- `case_studies/train_kpos20_txc.py` (T=3, T=5, T=10 bare-antidead)
+Trainers (W-authored):
+- `case_studies/train_kpos20_txc.py` (T=3, T=5, T=10 bare-antidead, with optional T-SAE-encoder warm-start)
 - `case_studies/train_kpos20_matry.py` (T=5 matryoshka multiscale)
-- `case_studies/train_kpos20_h8_shifts.py` (Y's H8 shifts=(T,) trainer — used by W for multi-seed verify)
+
+Y-authored trainers I used (NOT W-produced — list here so next-W knows the dependency):
+- `case_studies/train_kpos20_h8_shifts.py` (Y's, used by W for OBLITERATION sd=1 + sd=2 verify)
+- `case_studies/train_kpos20_hailmary.py` (Y's wrapper around train_phase7.train_txc_bare_antidead)
 
 Intervene scripts:
 - `case_studies/steering/intervene_paper_clamp_window_local.py` (V1)
