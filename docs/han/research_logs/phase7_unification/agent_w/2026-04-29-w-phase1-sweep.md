@@ -13,16 +13,51 @@ tags:
 > will be filled in as pipelines complete. This is a *living* writeup until all 4 cells
 > finish.
 
-### TL;DR — UPDATED with per-position write-back numbers
+### TL;DR — UPDATED again after Y's multi-seed caution (commit 36ccec4a)
 
-**Initial story (right-edge protocol)**: every matched-sparsity TXC k_pos=20 cell
-LOSES vs T-SAE k=20. Outcome C (publishable null) on track.
+**Single-seed picture (seed=42, all my numbers + Y's first round)**: under family-
+normalised paper-clamp + per-position write-back (Q2.C), all 3 trained matched-
+sparsity TXC cells land in TIE band. Y's T=2 +0.13. Cell C T=3 per-position
+1.000. Cell D T=5 per-position 0.833.
 
-**Revised story (after Y's per-position result, then mine)**: under family-normalised
-paper-clamp + **per-position write-back (Q2.C)**, all 3 trained matched-sparsity TXC
-cells land in the **TIE band**. Y's T=2 even slightly *exceeds* the anchor (+0.13).
-The matched-sparsity narrative is rescued by the protocol — architecture is not
-the bottleneck once the write-back is right.
+**Multi-seed picture (Y, just landed)**: σ_seeds at k_pos=20 right-edge is **0.33**,
+not 0.27. The brief's pre-registered threshold under-estimates noise for this
+regime. Y's cell D T=5 seed=1: right-edge=1.033 (vs seed=42=0.700, σ=0.33);
+per-position=0.733 (vs seed=42=0.833, σ=0.10). **Per-position is more seed-stable
+(σ=0.10) but pooled mean (0.783) is LOSS by 0.317** — just outside ±0.27, within
+±0.33. Right-edge pooled mean (0.867) is TIE by ±0.27.
+
+**Where the call lives now**:
+- **Right-edge multi-seed mean** TIE within ±0.27 (high variance saves it).
+- **Per-position multi-seed mean** LOSS by ±0.27 / TIE by ±0.33 (Y's calibrated σ).
+- **Single-seed per-position headline** (mine + Y's at seed=42) was a single-seed
+  artifact — Y's seed=1 verify reverses the protocol-as-lever direction.
+
+Honest paper headline (post-multi-seed):
+
+> At matched per-token sparsity (k_pos=20), T=5 TXC cells are indistinguishable
+> from T-SAE k=20 within seed-noise on the coherent-steering metric. The
+> unconstrained peak still favours T-SAE k=20 by Δ ≥ 0.78. The matched-sparsity
+> argument applies only when coherence is bounded.
+
+Softer than the seed=42 single-cell claim but defensible.
+
+**Open question**: Y is running T=2 seed=1 verify next. If T=2 seed=1 holds the
++0.13 win, that's the strongest paper-claim left (T=2 may be the only T where
+per-position genuinely lifts above anchor). If T=2 collapses too, the matched-
+sparsity narrative further weakens.
+
+**My pending obligations**:
+- Cell E (matryoshka multiscale @ T=5, k_pos=20) re-training in flight. Single-
+  seed result will need its own verify if it lands a TIE.
+- Cell C T=3 multi-seed verify is now the most paper-relevant follow-up given
+  the σ=0.33 caution. Will queue after cell E.
+- Cell F skipped (T=10 unlikely to win).
+
+**Initial story (right-edge protocol, seed=42)** — for the record: every matched-
+sparsity TXC k_pos=20 cell loses by ≥ 0.27. Outcome C (publishable converging
+null) was the on-track verdict before per-position rescued the picture (which
+itself didn't replicate across seeds).
 
 **Combined matched-sparsity matrix** (peak at coh ≥ 1.5, family-normalised paper-clamp):
 
