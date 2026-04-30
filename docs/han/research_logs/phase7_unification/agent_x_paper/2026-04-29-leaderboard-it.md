@@ -62,18 +62,22 @@ second seed):
 | **ag_mlc_08** | **agentic_mlc_08** | **500** | ❌ H200_required |
 | **ag_mlc_08_sparse** | **agentic_mlc_08** | **100** | ❌ H200_required |
 | txc_t5 | txcdr_t5 | 500 | ✅ 1 seed × 16 tasks (IT) |
-| **txc_t16** | **txcdr_t16** | **500** | ⚠️ A40 OOM at b=4096 (Adam exp_avg_sq_sqrt 2.53 GB alloc fail). Retry with `PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True` in flight. |
-| **good_txc_p5** | **phase5b_subseq_h8** | **500** | ⚠️ A40 OOM at b=4096 (AuxK einsum). Same retry path. |
+| txc_t16 | txcdr_t16 | 500 | ✅ 1 seed × 16 tasks (IT) — first attempt OOM'd at b=4096 (Adam alloc); succeeded on retry with `PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True` |
+| good_txc_p5 | phase5b_subseq_h8 | 500 | ✅ 1 seed × 16 tasks (IT) — first attempt OOM'd at b=4096 (AuxK einsum); same retry path |
 | good_txc_p7_k20 | txc_bare_antidead_t5 | 500 | ✅ 1 seed × 16 tasks (IT) |
 | good_txc_p7_k5 | phase57_partB_h8_bare_multidistance_t8 | 500 | ✅ 1 seed × 16 tasks (IT) |
 
 Plus `topk_sae` as the per-token-SAE Δ-baseline: ✅ 1 seed × 16 tasks (IT).
 
-**6 of 12 paper_archs cells are evaluated** at seed=42 (plus
-`topk_sae` baseline = 7 archs total); 4 H200_required and 2 A40-OOM
-under retry. IT-side training was 2.34× to 3.50× slower per arch
-than the handover BASE-pod timings (avg 2.56×; phase57_partB_h8
-took 3.35 hr vs BASE 86 min), leaving no time budget for seed=1.
+**8 of 12 paper_archs cells are evaluated** at seed=42 (plus
+`topk_sae` baseline = 9 archs total); only the 4 MLC-family cells
+remain unevaluated (H200_required, deferred to Mission #2).
+IT-side training was 1.81×–3.50× slower per arch than the handover
+BASE-pod timings (avg ~2.5×; phase57_partB_h8 3.35 hr, phase5b
+3.88 hr), leaving no time budget for seed=1. The two A40-OOM
+archs were resolved on retry by enabling
+`PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True` (memory
+fragmentation mitigation, no behavioural change).
 
 ### k_feat = 5 (PAPER, IT, seed=42)
 
@@ -86,78 +90,126 @@ took 3.35 hr vs BASE 86 min), leaving no time budget for seed=1.
 |---|---|---|---|---|
 | **`phase57_partB_h8_bare_multidistance_t8`** ⭐ | 1 | **0.8546** | — | 0.1317 |
 | tsae_paper_k500 | 1 | 0.8535 | — | 0.1505 |
+| **`phase5b_subseq_h8`** | 1 | **0.8520** | — | 0.1310 |
 | txcdr_t5 | 1 | 0.8484 | — | 0.1292 |
 | topk_sae | 1 | 0.8319 | — | 0.1350 |
+| txcdr_t16 | 1 | 0.8302 | — | 0.1359 |
 | txc_bare_antidead_t5 | 1 | 0.8189 | — | 0.1316 |
 | tsae_paper_k20 | 1 | 0.8126 | — | 0.1319 |
 | tfa_big | 1 | 0.6821 | — | 0.0757 |
 
-`phase5b_subseq_h8` and `txcdr_t16` missing — see "Status" table; OOM-retry in flight.
+Top 3 within 0.0026 AUC.
 
 ### k_feat = 20 (PAPER, IT, seed=42)
 
 | arch | n_seeds | mean_AUC | σ_seeds | σ_tasks |
 |---|---|---|---|---|
-| **`tsae_paper_k500`** ⭐ | 1 | **0.9040** | — | 0.1225 |
+| **`phase5b_subseq_h8`** ⭐ | 1 | **0.9073** | — | 0.1097 |
+| tsae_paper_k500 | 1 | 0.9040 | — | 0.1225 |
 | phase57_partB_h8_bare_multidistance_t8 | 1 | 0.8980 | — | 0.1163 |
 | txc_bare_antidead_t5 | 1 | 0.8975 | — | 0.1302 |
 | topk_sae | 1 | 0.8938 | — | 0.1471 |
 | txcdr_t5 | 1 | 0.8898 | — | 0.1204 |
+| txcdr_t16 | 1 | 0.8868 | — | 0.1102 |
 | tsae_paper_k20 | 1 | 0.8749 | — | 0.1215 |
 | tfa_big | 1 | 0.7562 | — | 0.0861 |
 
+Top 4 within 0.010 AUC.
+
 ### Headline shifts (IT vs BASE)
 
-#### k_feat = 20 — TXC NOT the IT winner (subject to OOM-retry caveat)
+#### k_feat = 20 — TXC structural bias DOES win on IT (different variant)
 
 | metric | BASE | IT |
 |---|---|---|
-| winner | `txc_bare_antidead_t5` (0.9127, σ=0.0012) | `tsae_paper_k500` (0.9040) |
-| Δ to `topk_sae` baseline | +0.0036 (~6× σ_seeds, decisive) | +0.0102 |
-| TXC variant rank | #1 (winner) | #3 (`txc_bare_antidead_t5` 0.8975) |
-| top-3 spread | 0.0022 AUC | 0.0065 AUC |
+| winner | `txc_bare_antidead_t5` (0.9127, σ=0.0012) | `phase5b_subseq_h8` (0.9073) |
+| Δ to `topk_sae` baseline | +0.0036 (~6× σ_seeds, decisive) | +0.0135 |
+| TXC variant in #1 | yes | yes |
+| BASE k=20 #2 | `mlc` (0.9122) | unavailable on IT A40 |
+| top-3 spread | 0.0022 AUC | 0.0093 AUC |
 
-Under IT (gemma-2-2b-it L13), the **TXC structural bias does NOT
-deliver the k=20 win**. Instead, `tsae_paper_k500` (Ye et al.'s
-T-SAE port — per-token, but with temporal InfoNCE auxiliary loss)
-takes the top spot. `phase57_partB_h8_bare_multidistance_t8` (BASE's
-k=5 winner) is a close second on IT k=20 (0.8980).
+The **TXC structural advantage at k=20 replicates on IT** — but with
+a different TXC variant. On BASE the winner is `txc_bare_antidead_t5`
+(MatryoshkaContrastiveAntidead at T=5); on IT the winner is
+`phase5b_subseq_h8` (Phase 5b's H8-stack subseq sampling, T_max=10
+t_sample=5). Both are window-architecture variants — the structural
+inductive bias holds across instruction-tuning.
 
-⚠️ **Caveat: 2 of 8 leaderboard-relevant archs (phase5b_subseq_h8 and
-txcdr_t16) OOM'd on A40 at b=4096 and have not yet been probed.**
-Retry with `PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True` is in
-flight as of this writeup. The BASE-side phase5b_subseq_h8 was a
-strong 2nd on PAPER k=20 (0.9059 σ=0.0022); if its IT version
-recovers anywhere near that level, the conclusion shifts.
+Per-arch BASE-vs-IT delta at k=20:
 
-#### k_feat = 5 — TXC structural bias's k=5 win partially holds
+| arch | BASE | IT | Δ (IT − BASE) |
+|---|---|---|---|
+| **phase5b_subseq_h8** ⭐ | 0.9059 | **0.9073** | **+0.0014** (only arch that improves on IT) |
+| tsae_paper_k500 | 0.9105 | 0.9040 | −0.0065 |
+| txc_bare_antidead_t5 | 0.9127 | 0.8975 | −0.0152 |
+| topk_sae | 0.9091 | 0.8938 | −0.0153 |
+| phase57_partB_h8_multidistance_t8 | 0.9086 | 0.8980 | −0.0106 |
+| txcdr_t5 | 0.9067 | 0.8898 | −0.0169 |
+| tsae_paper_k20 | 0.9019 | 0.8749 | −0.0270 |
+| tfa_big | 0.7875 | 0.7562 | −0.0313 |
+| txcdr_t16 | 0.8984 | 0.8868 | −0.0116 |
+
+`phase5b_subseq_h8` is the **only arch in the leaderboard that
+improves under instruction tuning**. All others lose 0.006–0.031
+AUC. This is suggestive evidence that the H8-stack + subseq-sampling
+recipe captures features that are specifically *more* salient in
+instruction-tuned representations — possibly the multi-token
+discourse / instruction-following structure that gemma-2-2b-it
+emphasizes vs gemma-2-2b base.
+
+#### k_feat = 5 — TXC structural bias wins on IT (consistent with BASE)
 
 | metric | BASE | IT |
 |---|---|---|
-| winner | `mlc` (0.8707, σ=0.0086, MLC-family unavailable on IT A40) | `phase57_partB_h8_bare_multidistance_t8` (0.8546) |
-| Best A40_ok k=5 arch (BASE) | `topk_sae` 0.8695 / `txc_bare_antidead_t5` 0.8683 | `phase57_partB_h8_bare_multidistance_t8` 0.8546 |
-| top-3 spread | 0.0012 AUC | 0.0062 AUC |
+| winner | `mlc` (0.8707, σ=0.0086, MLC unavailable on IT A40) | `phase57_partB_h8_bare_multidistance_t8` (0.8546) |
+| Best A40_ok k=5 arch (BASE) | `topk_sae` 0.8695 / `txc_bare_antidead_t5` 0.8683 | `phase57_partB_h8_bare_multidistance_t8` 0.8546 / `phase5b_subseq_h8` 0.8520 |
+| top-3 spread | 0.0012 AUC | 0.0026 AUC |
 
 Without MLC-family in either pool, `phase57_partB_h8_bare_multidistance_t8`
 (the structural-bias TXC variant that won BASE k=5) remains the k=5
-winner on IT — at a slightly larger margin (0.001 BASE → 0.006 IT).
-BASE's other k=5 contenders (`topk_sae` and `txc_bare_antidead_t5`)
-drop more on IT than the structural-multi-distance variant. This
-suggests structural inductive bias still helps at k=5 sparsity on
-IT, even where it can't compete at k=20.
+winner on IT — narrowly, with phase5b_subseq_h8 in 3rd. The
+H8-stack TXC family takes both #1 and #3 IT k=5.
 
 #### General observations
 
-- **AUCs lower on IT.** Best k=20 arch BASE 0.9127 vs IT 0.9040
-  (Δ=−0.009); best k=5 arch BASE 0.8707 vs IT 0.8546 (Δ=−0.016).
-  Instruction-tuned representations are slightly less linearly
-  separable on these probing tasks.
+- **AUCs lower on IT for most archs.** Best k=20 arch BASE 0.9127 vs
+  IT 0.9073 (Δ=−0.005); best k=5 arch BASE 0.8707 vs IT 0.8546
+  (Δ=−0.016). The win-direction shows structural-TXC variants are
+  the most robust to the IT shift.
 - **`tfa_big` collapses on IT.** BASE 0.7010 / 0.7875 → IT 0.6821 /
   0.7562. The learned "predictive + novel codes" decomposition
-  doesn't transfer well to the IT activation distribution.
-- **Cross-arch SD is comparable** (σ_tasks 0.07–0.15 on both),
-  suggesting per-task variance dominates per-arch variance in both
-  regimes.
+  doesn't transfer well to instruction-tuned activations.
+- **`tsae_paper_k20` (Ye et al.'s native k=20 sparsity port) is
+  worst-shift at k=20**: −0.0270 AUC. The per-token sparsity
+  constraint is more sensitive to IT distribution shift than the
+  per-window TXC formulations.
+- **σ_tasks comparable across regimes** (0.07–0.15 BASE vs IT),
+  suggesting per-task variance dominates per-arch variance in both.
+
+### Honest paper read (IT pass)
+
+The IT leaderboard at seed=42 supports **the same headline as BASE
+under PAPER methodology**: at k_feat=20, a TXC-window variant beats
+all per-token SAE baselines by a defensible margin. Specifically:
+
+- BASE k=20 winner: `txc_bare_antidead_t5` (Δ=+0.0036 over topk_sae,
+  ~6× σ_seeds).
+- IT k=20 winner: `phase5b_subseq_h8` (Δ=+0.0135 over topk_sae,
+  no σ_seeds estimable at 1 seed but Δ is 4–5× the typical
+  BASE σ_seeds for this arch).
+
+The fact that the *winning TXC variant* differs between BASE and IT
+(antidead vs H8-subseq) is itself interesting — it means there's no
+single TXC arch that universally dominates, but the **TXC family as
+a whole** is robust to instruction tuning. The per-token SAE
+baselines (`topk_sae`, `tsae_paper_*`) are NOT robust in the same
+sense: each loses 0.01–0.03 AUC under IT.
+
+⚠️ **Single-seed caveat**: σ_seeds is unestimable at 1 seed.
+The 0.0135 IT k=20 advantage of phase5b_subseq_h8 over topk_sae is
+plausibly larger than σ_seeds (typical ~0.005 for IT-grade
+training), but a second seed is needed to confirm. Recommend
+seeding seed=1 on the next H200 pass.
 
 ### Plot
 

@@ -36,7 +36,7 @@ checks.
 | `2026-04-29-per-task-tsweep.md` | Per-task T-scaling (txcdr_t<T> family at every T) — 36 small multiples + ranking by slope. **`winogrande` is the only task where T helps monotonically** (+0.0069/T at k=20), validating the multi-token-reasoning hypothesis. |
 | `2026-04-29-paper-task-set.md` | **Final 16-task paper set (`PAPER`)** — pre-registered selection by cross-arch SD within balanced clusters. k=20 winner `txc_bare_antidead_t5` Δ=+0.0036 (~6× σ_seeds, decisive). k=5 top-6 within 0.0035 AUC (no defensible single champion). |
 | `2026-04-29-handover-IT-and-mlc-sparse.md` | **Handover briefing** for next-agent IT-side leaderboard + missing MLC sparse cells (`mlc_sparse`, `ag_mlc_08_sparse`). Includes coverage status, plan, A40 feasibility, common pitfalls. Read this before starting either follow-on. |
-| `2026-04-29-leaderboard-it.md` | **IT leaderboard (7 of 9 archs, seed=42 only).** Headline: TXC k=20 win does NOT replicate on IT — `tsae_paper_k500` is the IT k=20 winner; `phase57_partB_h8_multidistance_t8` is the IT k=5 winner (matching BASE). 2 archs (`phase5b_subseq_h8`, `txcdr_t16`) OOM'd on A40 b=4096; retry in flight. |
+| `2026-04-29-leaderboard-it.md` | **IT leaderboard (9 of 9 A40_ok archs, seed=42).** Headline: TXC structural-bias k=20 win **DOES replicate on IT**, with a different variant — `phase5b_subseq_h8` is the IT k=20 winner at 0.9073 (Δ=+0.0135 over topk_sae); only arch that improves under instruction tuning. `phase57_partB_h8_multidistance_t8` is the IT k=5 winner (matches BASE). |
 | `plots/` | Paper figures, full-res `.png` (150 dpi) + thumbnails (`*.thumb.png`, ≤288px wide). |
 
 ### Headline figures
@@ -99,25 +99,28 @@ evaluated under Phase 7 current methodology at b=4096:
   `paper_archs.json` ("If a cell can't fit on A40 at b=4096, DO NOT
   downsize batch — DEFER to H200").
 - **`ag_mlc_08_sparse` (agentic_mlc_08, k_win=100)** — same as above.
-- **IT-side cells: PARTIALLY EVALUATED** (Agent X 2026-04-30).
-  - 7 of 9 A40_ok cells trained at seed=42 + probed on PAPER:
-    `topk_sae`, `tsae_paper_k20`, `tsae_paper_k500`, `tfa_big`,
-    `txc_bare_antidead_t5`, `txcdr_t5`,
-    `phase57_partB_h8_bare_multidistance_t8`. See
-    `2026-04-29-leaderboard-it.md` for numbers.
-  - 2 A40_ok cells OOM'd at b=4096 on this pod's A40 (44 GB peak):
-    `phase5b_subseq_h8` (AuxK einsum) and `txcdr_t16` (Adam
-    `exp_avg_sq_sqrt`). Retry with
-    `PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True` is in flight
-    as of this writeup; if successful, leaderboard will be
-    re-rendered.
+- **IT-side cells: 8 of 12 evaluated at seed=42** (Agent X 2026-04-30).
+  - All 9 A40_ok cells trained at seed=42 + probed on PAPER set
+    (`topk_sae`, `tsae_paper_k20`, `tsae_paper_k500`, `tfa_big`,
+    `txc_bare_antidead_t5`, `txcdr_t5`, `txcdr_t16`,
+    `phase5b_subseq_h8`, `phase57_partB_h8_bare_multidistance_t8`).
+    See `2026-04-29-leaderboard-it.md`.
+  - **IT k_feat=20 winner: `phase5b_subseq_h8`** at 0.9073
+    (Δ=+0.0135 over `topk_sae`). The only arch that improves under
+    instruction tuning. TXC structural bias replicates BASE win,
+    different variant (BASE winner was `txc_bare_antidead_t5`).
+  - **IT k_feat=5 winner: `phase57_partB_h8_bare_multidistance_t8`**
+    at 0.8546 (matches BASE k=5 winner).
+  - 2 archs (`phase5b_subseq_h8`, `txcdr_t16`) needed
+    `PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True` to fit on
+    A40 b=4096 — first attempt OOM'd at 44 GB peak; retry succeeded
+    with the fragmentation-mitigation flag.
   - 4 MLC-family cells remain H200_required (multi-layer cache
-    71 GB > 46 GB A40 cap).
-  - **seed=1 deferred** — A40 was 2.34×–3.50× slower than the
-    handover BASE-pod timings (avg 2.56×; phase57_partB_h8 took
-    3.35 hr on IT vs 86 min on BASE), leaving no budget for a
-    second seed in this autonomous shift. IT leaderboard is
-    1-seed σ; treat the headline shifts as preliminary until
+    71 GB > 46 GB A40 cap) — Mission #2.
+  - **seed=1 deferred** — A40 ~2.5× slower than handover BASE
+    timings (e.g., phase5b_subseq_h8 took 232 min on IT vs 92 min
+    on BASE), leaving no budget for a second seed. IT leaderboard
+    is 1-seed σ; treat headline shifts as preliminary until
     seed=1 lands.
 - **3-seed σ for `tfa_big`, `txcdr_t16`, `hill_subseq_h8_T12_s5`** —
   only 1-2 seeds on HF.

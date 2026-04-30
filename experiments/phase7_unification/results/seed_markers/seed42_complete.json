@@ -1,15 +1,10 @@
 {
   "seed": 42,
   "phase": "phase7_unification",
-  "n_archs": 7,
+  "n_archs": 2,
   "arch_ids": [
-    "topk_sae",
-    "tsae_paper_k500",
-    "tsae_paper_k20",
-    "tfa_big",
-    "txc_bare_antidead_t5",
-    "txcdr_t5",
-    "phase57_partB_h8_bare_multidistance_t8"
+    "phase5b_subseq_h8",
+    "txcdr_t16"
   ],
-  "timestamp": 1777534744.7095602
+  "timestamp": 1777563785.3910458
 }
