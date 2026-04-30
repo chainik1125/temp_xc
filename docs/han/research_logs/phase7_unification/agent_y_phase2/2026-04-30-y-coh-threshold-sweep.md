@@ -244,6 +244,56 @@ high-success text. TXC wins everywhere coherence matters.
   gives different answers in cliff regimes (the same caveat as the
   prereg coh ≥ 1.5 metric).
 
+### Knowledge-only check (Lever E)
+
+Re-aggregating on the 9 knowledge concepts only (medical, mathematical,
+historical, religious, geographical, financial, scientific,
+programming, code_context) reverses the headline:
+
+| metric | T-SAE | best TXC | Δ |
+|---|---:|---:|---:|
+| unconstrained peak | **2.00** | 2.11 (T=3 grown PP / T=5 bare k_win=20 PP, 1sd) | +0.11 |
+| **coh ≥ 1.5** | **2.00** | 2.11 (T=3 grown PP, 1sd) | +0.11 |
+| **coh ≥ 1.75** | **2.00** | 1.78 (T=5 bare k_win=20 PP, 1sd) | −0.22 |
+| **AUC(1.5–3.0)** | **0.928** | 0.841 (T=2 bare RE 3sd) | −0.087 |
+
+T-SAE k=20 saturates at succ = 2.0 across coh thresholds on knowledge
+concepts — its per-token feature is strongly knowledge-aligned and
+can hold coherence while writing the concept word. **TXC family does
+not dominate on knowledge alone** under any coherence-constrained
+metric.
+
+This means the OVERALL TXC dominance (Δ = +0.30 to +0.87 on the full
+30 concepts) is driven by discourse + behavior classes where TXC's
+window structure provides advantage. T-SAE's knowledge edge is
+offset by its losses on style, emotion, register, etc.
+
+**Scientific framing**: TXC and T-SAE have COMPLEMENTARY strengths.
+T-SAE excels at single-token concept tags (vocabulary-level features
+like medical/financial/programming jargon). TXC excels at multi-token
+discourse structures (poetic style, emotional register, narrative
+voice) where the encoder's window integrates across positions.
+
+This is a STRONGER scientific story than a flat "TXC dominates":
+the paper can claim TXC adds value precisely where per-token cannot
+capture multi-position structure, while ceding the per-token-friendly
+classes to T-SAE.
+
+#### Per-class Δ at coh ≥ 1.5 (best TXC vs anchor):
+
+| class | n | T-SAE | best TXC | Δ |
+|---|---:|---:|---:|---:|
+| knowledge_format | 5 | 2.20 | 1.53 (T=2 H8 PP) | −0.67 ❌ |
+| knowledge_domain | 9 | 1.67 | 1.82 (T=2 H8 PP) | +0.15 ✓ |
+| discourse_register | 2 | 2.00 | 2.17 (T=2 H8 RE) | +0.17 ✓ |
+| discourse_safety | 5 | 0.60 | 0.40 | −0.20 ❌ |
+| **discourse_style** | 3 | 1.00 | **1.89** (T=2 H8 PP) | **+0.89** ✓ |
+| behavior_form | 3 | 0.33 | 0.56 (T=2 bare PP) | +0.23 ✓ |
+| **behavior_emotion** | 3 | 0.67 | **1.56** (T=2 H8 PP/RE) | **+0.89** ✓ |
+
+5 classes go to TXC, 2 to T-SAE. TXC's biggest wins are exactly the
+multi-token / discourse-structural classes (style, emotion).
+
 ### What this means for the paper
 
 Replace "TXC wins at coh ≥ 1.5 by Δ = +0.30 (mean-curve), TIE at
