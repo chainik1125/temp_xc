@@ -1,0 +1,152 @@
+{
+  "1.5": {
+    "T-SAE k=20 (anchor)": {
+      "color": "blue",
+      "by_class": {
+        "knowledge_domain": 1.6666666666666667,
+        "knowledge_format": 2.2,
+        "discourse_register": 2.0,
+        "discourse_safety": 0.6,
+        "discourse_style": 1.0,
+        "behavior_form": 0.3333333333333333,
+        "behavior_emotion": 0.6666666666666666
+      }
+    },
+    "T=2 H8 PP": {
+      "color": "red",
+      "by_class": {
+        "knowledge_domain": 1.8148148148148149,
+        "knowledge_format": 1.5333333333333332,
+        "discourse_register": 1.8333333333333333,
+        "discourse_safety": 0.39999999999999997,
+        "discourse_style": 1.888888888888889,
+        "behavior_form": 0.1111111111111111,
+        "behavior_emotion": 1.5555555555555554
+      }
+    },
+    "T=2 H8 RE": {
+      "color": "darkred",
+      "by_class": {
+        "knowledge_domain": 1.537037037037037,
+        "knowledge_format": 1.3999999999999997,
+        "discourse_register": 2.1666666666666665,
+        "discourse_safety": 0.3333333333333333,
+        "discourse_style": 1.0,
+        "behavior_form": 0.3333333333333333,
+        "behavior_emotion": 1.3333333333333333
+      }
+    },
+    "T=2 bare PP": {
+      "color": "orange",
+      "by_class": {
+        "knowledge_domain": 1.1481481481481481,
+        "knowledge_format": 1.3333333333333333,
+        "discourse_register": 1.8333333333333333,
+        "discourse_safety": 0.39999999999999997,
+        "discourse_style": 1.5555555555555556,
+        "behavior_form": 0.5555555555555555,
+        "behavior_emotion": 1.0
+      }
+    }
+  },
+  "1.75": {
+    "T-SAE k=20 (anchor)": {
+      "color": "blue",
+      "by_class": {
+        "knowledge_domain": 1.6666666666666667,
+        "knowledge_format": 0.6,
+        "discourse_register": 2.0,
+        "discourse_safety": 0.2,
+        "discourse_style": 0.6666666666666666,
+        "behavior_form": 0.3333333333333333,
+        "behavior_emotion": 0.6666666666666666
+      }
+    },
+    "T=2 H8 PP": {
+      "color": "red",
+      "by_class": {
+        "knowledge_domain": 1.8148148148148149,
+        "knowledge_format": 0.5333333333333333,
+        "discourse_register": 1.8333333333333333,
+        "discourse_safety": 0.0,
+        "discourse_style": 1.888888888888889,
+        "behavior_form": 0.1111111111111111,
+        "behavior_emotion": 0.7777777777777778
+      }
+    },
+    "T=2 H8 RE": {
+      "color": "darkred",
+      "by_class": {
+        "knowledge_domain": 1.537037037037037,
+        "knowledge_format": 1.3999999999999997,
+        "discourse_register": 1.5,
+        "discourse_safety": 0.3333333333333333,
+        "discourse_style": 1.0,
+        "behavior_form": 0.3333333333333333,
+        "behavior_emotion": 1.3333333333333333
+      }
+    },
+    "T=2 bare PP": {
+      "color": "orange",
+      "by_class": {
+        "knowledge_domain": 1.1481481481481481,
+        "knowledge_format": 1.3333333333333333,
+        "discourse_register": 1.8333333333333333,
+        "discourse_safety": 0.39999999999999997,
+        "discourse_style": 1.5555555555555556,
+        "behavior_form": 0.3333333333333333,
+        "behavior_emotion": 1.0
+      }
+    }
+  },
+  "2.0": {
+    "T-SAE k=20 (anchor)": {
+      "color": "blue",
+      "by_class": {
+        "knowledge_domain": 1.6666666666666667,
+        "knowledge_format": 0.6,
+        "discourse_register": 2.0,
+        "discourse_safety": 0.0,
+        "discourse_style": 0.6666666666666666,
+        "behavior_form": 0.3333333333333333,
+        "behavior_emotion": 0.6666666666666666
+      }
+    },
+    "T=2 H8 PP": {
+      "color": "red",
+      "by_class": {
+        "knowledge_domain": 0.8888888888888888,
+        "knowledge_format": 0.5333333333333333,
+        "discourse_register": 1.5,
+        "discourse_safety": 0.0,
+        "discourse_style": 0.7777777777777777,
+        "behavior_form": 0.1111111111111111,
+        "behavior_emotion": 0.7777777777777778
+      }
+    },
+    "T=2 H8 RE": {
+      "color": "darkred",
+      "by_class": {
+        "knowledge_domain": 1.537037037037037,
+        "knowledge_format": 0.6666666666666666,
+        "discourse_register": 1.5,
+        "discourse_safety": 0.06666666666666667,
+        "discourse_style": 0.8888888888888888,
+        "behavior_form": 0.3333333333333333,
+        "behavior_emotion": 0.7777777777777778
+      }
+    },
+    "T=2 bare PP": {
+      "color": "orange",
+      "by_class": {
+        "knowledge_domain": 1.1481481481481481,
+        "knowledge_format": 1.0,
+        "discourse_register": 1.8333333333333333,
+        "discourse_safety": 0.06666666666666667,
+        "discourse_style": 0.7777777777777777,
+        "behavior_form": 0.2222222222222222,
+        "behavior_emotion": 1.0
+      }
+    }
+  }
+}
