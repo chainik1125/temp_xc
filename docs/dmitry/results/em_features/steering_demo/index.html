@@ -64,18 +64,24 @@ async function tryLoadDemo() {
 }
 
 function adaptDemoToData(demo) {
-  // gen_steered_demo.py format: {meta, prompts: [{question, completions_by_alpha: {α_str: text}}]}
+  // gen_steered_demo.py format: {meta, prompts: [{question, completions_by_alpha: {α_str: text}}], wang_stats_by_alpha?}
   // Convert to the unified per-feature format.
   const alphas = demo.meta.alphas;
+  const wangStats = demo.wang_stats_by_alpha || {};
   const features = [{
     feature_id: demo.meta.feature_id,
-    alphas: alphas.map(a => ({
-      alpha: a,
-      completions: demo.prompts.map(p => ({
-        text: p.completions_by_alpha[(a >= 0 ? '+' : '') + a.toFixed(2)] ?? '',
-        align: null, coh: null, question: p.question,
-      })),
-    })),
+    alphas: alphas.map(a => {
+      const aKey = (a >= 0 ? '+' : '') + a.toFixed(2);
+      const ws = wangStats[aKey] || {};
+      return {
+        alpha: a,
+        wang: ws,  // {mean_align, mean_coh, n_align, n_coh, n_total} (or {})
+        completions: demo.prompts.map(p => ({
+          text: p.completions_by_alpha[aKey] ?? '',
+          align: null, coh: null, question: p.question,
+        })),
+      };
+    }),
   }];
   return {meta: demo.meta, features};
 }
@@ -161,13 +167,21 @@ function render() {
   // Find α=0 row for unsteered
   const zeroRow = f.alphas.find(a => Math.abs(a.alpha) < 1e-6);
 
-  // Stats are over ALL rollouts (not just the displayed subset)
+  // Stats: prefer Wang stage 4 (n=64) if attached; fall back to per-rollout judge scores in this demo.
+  const wang = row.wang || {};
   const aligns = row.completions.map(c => c.align).filter(x => x != null);
   const cohs   = row.completions.map(c => c.coh).filter(x => x != null);
-  const meanA = aligns.length ? aligns.reduce((s,x)=>s+x,0)/aligns.length : null;
-  const meanC = cohs.length ? cohs.reduce((s,x)=>s+x,0)/cohs.length : null;
-  document.getElementById('alpha-stats').innerHTML = meanA != null
-    ? `<b>mean align</b> ${meanA.toFixed(2)} &nbsp; <b>mean coh</b> ${meanC?.toFixed(2) || '—'} &nbsp; (n=${row.completions.length})`
+  const demoMeanA = aligns.length ? aligns.reduce((s,x)=>s+x,0)/aligns.length : null;
+  const demoMeanC = cohs.length ? cohs.reduce((s,x)=>s+x,0)/cohs.length : null;
+  const parts = [];
+  if (wang.mean_align != null) {
+    parts.push(`<b>Wang stage 4</b> (n=${wang.n_total}): <b style="color:#2a5a2a">align ${wang.mean_align.toFixed(2)}</b>, <b style="color:#2a5a2a">coh ${wang.mean_coh?.toFixed(2) ?? '—'}</b>`);
+  }
+  if (demoMeanA != null) {
+    parts.push(`<b>Demo</b> (n=${row.completions.length}): align ${demoMeanA.toFixed(2)}, coh ${demoMeanC?.toFixed(2) ?? '—'}`);
+  }
+  document.getElementById('alpha-stats').innerHTML = parts.length
+    ? parts.join(' &nbsp;|&nbsp; ')
     : `<i>no judge scores at this α</i>`;
 
   // How many rollouts to show
