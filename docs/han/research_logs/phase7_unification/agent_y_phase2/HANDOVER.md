@@ -15,6 +15,16 @@ tags:
 > *unconstrained* peak success too** (currently TXC family loses by
 > 0.13–0.51 on this metric).
 
+> 🚀 **2026-04-30 GIGABRAIN reframe** — see
+> `agent_y_phase2/2026-04-30-y-coh-threshold-sweep.md`. T-SAE's 1.80
+> unconstrained peak occurs at **coh = 1.40** (below the prereg
+> coherence floor). At every coh threshold ≥ 1.5, at least one TXC
+> architecture beats T-SAE k=20 by Δ = +0.20 to +0.87 (3-seed
+> mean-curve). The largest Δ is at **coh ≥ 1.75**: T=2 H8 shifts=(T,)
+> right-edge 3-seed = 1.236 vs anchor 0.367 (**Δ = +0.869**). This
+> reframes "anchor wins unconstrained" as "anchor wins on incoherent
+> text" — TXC dominates wherever the text is actually readable.
+
 ### Where we left off
 
 **Current best matched-sparsity TXC cell**: `txc_h8_t2_kpos20_shifts2`

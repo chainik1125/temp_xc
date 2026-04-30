@@ -30,6 +30,7 @@ from __future__ import annotations
 import argparse
 import gc
 import json
+import math
 import os
 import time
 from pathlib import Path
@@ -54,6 +55,43 @@ PAPER_STRENGTHS = (10, 100, 150, 500, 1000, 1500, 5000, 10000, 15000)
 S_NORMS_DEFAULT = (0.5, 1.0, 2.0, 5.0, 10.0, 20.0, 50.0)
 OUT_SUBDIR = "steering_paper_window_perposition"
 
+WEIGHT_PRESETS = {"uniform", "right-heavy", "right-only", "gaussian"}
+
+
+def parse_position_weights(spec: str, T: int) -> tuple[list[float], str]:
+    """Resolve a --position-weights spec to (weights, slug).
+
+    Presets:
+      uniform     [1, 1, ..., 1]                (no asymmetry)
+      right-heavy [(i+1)/T for i in 0..T-1]     (linear ramp to right)
+      right-only  [0, 0, ..., 0, 1]             (sanity ≈ right-edge)
+      gaussian    exp(-(i-c)^2/(2σ^2)), σ=T/4   (symmetric peak at center)
+    Custom: comma-separated floats with len == T.
+    Returns (weights_list, slug_for_output_subdir).
+    """
+    spec = spec.strip()
+    if spec == "uniform":
+        return [1.0] * T, "uniform"
+    if spec == "right-heavy":
+        return [(i + 1) / T for i in range(T)], "rightheavy"
+    if spec == "right-only":
+        return [0.0] * (T - 1) + [1.0], "rightonly"
+    if spec == "gaussian":
+        center = (T - 1) / 2
+        sigma = max(T / 4.0, 1e-6)
+        raw = [math.exp(-((i - center) ** 2) / (2 * sigma * sigma)) for i in range(T)]
+        m = max(raw)
+        return [w / m for w in raw], "gaussian"
+    if "," in spec:
+        weights = [float(x) for x in spec.split(",")]
+        if len(weights) != T:
+            raise ValueError(
+                f"--position-weights '{spec}' has {len(weights)} entries; expected T={T}"
+            )
+        slug = "w" + "_".join(f"{w:g}" for w in weights).replace(".", "p")
+        return weights, slug
+    raise ValueError(f"unknown --position-weights spec: {spec!r}")
+
 
 def _decode_full_window(sae, src_class: str, z, T: int):
     if hasattr(sae, "decode") and not src_class.startswith("Matryoshka"):
@@ -63,8 +101,10 @@ def _decode_full_window(sae, src_class: str, z, T: int):
     raise AttributeError(f"no decode/decode_scale on {src_class}")
 
 
-def _build_hook(sae, src_class, T, strengths_t, state):
+def _build_hook(sae, src_class, T, strengths_t, state, position_weights):
+    """position_weights: list[float] length T applied to within-window position ti."""
     sae_dtype = torch.float32
+    pw = list(position_weights)
 
     def hook(module, inp, output):
         h = output[0] if isinstance(output, tuple) else output
@@ -91,22 +131,22 @@ def _build_hook(sae, src_class, T, strengths_t, state):
             x_hat_steer_full = _decode_full_window(sae, src_class, z_c, T)
             delta_W = (x_hat_steer_full - x_hat_orig_full).reshape(Bh, K, T, d_in)
 
-            # Sum-write each window's delta at its T positions; track count
-            # per position to average.
+            # Weighted-sum-write each window's delta at its T positions; the
+            # divisor is sum of weights actually applied at each position so
+            # the result is a weighted *average* (so uniform weights == prior).
             delta_sum = torch.zeros((Bh, S, d_in), dtype=sae_dtype, device=h.device)
             count = torch.zeros((Bh, S), dtype=sae_dtype, device=h.device)
             for ti in range(T):
-                # window k covers positions [k, k+1, ..., k+T-1] of the seq.
-                # If we treat right-edge as window-index `k = pos - (T-1)`, then
-                # delta_W[:, k, ti] writes to position k+ti. So position p gets
-                # delta_W[:, p-ti, ti] whenever p-ti ∈ [0, K).
+                w_ti = pw[ti]
+                if w_ti == 0.0:
+                    continue
                 for k_offset in range(K):
                     pos = k_offset + ti
                     if pos >= S:
                         continue
-                    delta_sum[:, pos, :] += delta_W[:, k_offset, ti, :]
-                    count[:, pos] += 1.0
-            count_safe = count.clamp(min=1.0)[:, :, None]
+                    delta_sum[:, pos, :] += w_ti * delta_W[:, k_offset, ti, :]
+                    count[:, pos] += w_ti
+            count_safe = count.clamp(min=1e-8)[:, :, None]
             mean_delta = delta_sum / count_safe
             h_steered = (h_f + mean_delta).to(b_dtype)
         if isinstance(output, tuple):
@@ -127,21 +167,16 @@ def steer_for_arch(
     limit_concepts: int | None = None,
     out_subdir: str = OUT_SUBDIR,
     seed: int = 42,
+    position_weights_spec: str = "uniform",
 ) -> None:
     log_path = OUT_DIR / "training_logs" / f"{arch_id}__seed{seed}.json"
     ckpt_path = OUT_DIR / "ckpts" / f"{arch_id}__seed{seed}.pt"
     sel_subdir = "steering" if seed == 42 else f"steering_seed{seed}"
     sel_path = CASE_STUDIES_DIR / sel_subdir / arch_id / "feature_selection.json"
-    actual_subdir = out_subdir if seed == 42 else f"{out_subdir}_seed{seed}"
-    out_path = CASE_STUDIES_DIR / actual_subdir / arch_id / "generations.jsonl"
 
     if not sel_path.exists():
         print(f"  [skip] {arch_id}: feature_selection.json missing")
         return
-    if out_path.exists() and not force:
-        print(f"  [skip] {arch_id}: {out_path} exists (use --force)")
-        return
-    out_path.parent.mkdir(parents=True, exist_ok=True)
 
     meta = json.loads(log_path.read_text())
     selection = json.loads(sel_path.read_text())
@@ -170,6 +205,19 @@ def steer_for_arch(
         p.requires_grad_(False)
     T = window_T(sae, src_class, meta)
 
+    # Resolve position weights now that we know T, then route output to a
+    # weights-suffixed subdir (uniform → no suffix, back-compat with prior runs).
+    pw_list, pw_slug = parse_position_weights(position_weights_spec, T)
+    base_subdir = out_subdir if seed == 42 else f"{out_subdir}_seed{seed}"
+    actual_subdir = base_subdir if pw_slug == "uniform" else f"{base_subdir}_{pw_slug}"
+    out_path = CASE_STUDIES_DIR / actual_subdir / arch_id / "generations.jsonl"
+    if out_path.exists() and not force:
+        print(f"  [skip] {arch_id}: {out_path} exists (use --force)")
+        return
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    print(f"  position_weights[{position_weights_spec}] → "
+          f"{[round(w, 3) for w in pw_list]}  out_subdir={actual_subdir}")
+
     from transformers import AutoModelForCausalLM, AutoTokenizer
     tokenizer = AutoTokenizer.from_pretrained(SUBJECT_MODEL)
     if tokenizer.pad_token is None:
@@ -186,7 +234,7 @@ def steer_for_arch(
     strengths_t = torch.tensor(abs_strengths, dtype=sae_dtype, device=device)
     state = {"feature_idx": None}
     handle = subject.model.layers[ANCHOR_LAYER].register_forward_hook(
-        _build_hook(sae, src_class, T, strengths_t, state)
+        _build_hook(sae, src_class, T, strengths_t, state, pw_list)
     )
 
     enc = tokenizer(STEERING_PROMPT, return_tensors="pt", add_special_tokens=True)
@@ -226,6 +274,8 @@ def steer_for_arch(
                         "generated_text": gen_text,
                         "intervention": "paper_clamp_window_perposition",
                         "T": T,
+                        "position_weights_spec": position_weights_spec,
+                        "position_weights": [float(w) for w in pw_list],
                     }
                     if s_norm is not None:
                         row["s_norm"] = float(s_norm)
@@ -258,17 +308,24 @@ def main() -> None:
     ap.add_argument("--force", action="store_true")
     ap.add_argument("--limit-concepts", type=int, default=None)
     ap.add_argument("--seed", type=int, default=42)
+    ap.add_argument("--position-weights", default="uniform",
+                    help="Weight profile for within-window position writes. "
+                         "Presets: uniform (default), right-heavy, right-only, "
+                         "gaussian. Or comma-separated floats matching T "
+                         "(e.g. '0.5,1.0' for T=2).")
     args = ap.parse_args()
     banner(__file__)
     z_mag_path = Path(args.z_mag) if args.normalised else None
     if args.normalised and not z_mag_path.exists():
         raise SystemExit(f"missing Q1.1 output at {z_mag_path}")
     for arch_id in args.archs:
-        print(f"\n=== {arch_id} seed={args.seed} (per-position window clamp) ===")
+        print(f"\n=== {arch_id} seed={args.seed} pw={args.position_weights} "
+              f"(per-position window clamp) ===")
         steer_for_arch(arch_id, z_magnitude_path=z_mag_path,
                        use_normalised=args.normalised,
                        force=args.force, limit_concepts=args.limit_concepts,
-                       seed=args.seed)
+                       seed=args.seed,
+                       position_weights_spec=args.position_weights)
 
 
 if __name__ == "__main__":
