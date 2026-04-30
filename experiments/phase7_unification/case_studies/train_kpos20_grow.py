@@ -155,15 +155,29 @@ def build_meta(arch: dict, seed: int) -> dict:
 
 
 def train_one(T_new: int, T_src: int, src_seed: int, seed: int,
-              push_to_hf: bool, max_steps: int | None) -> None:
+              push_to_hf: bool, max_steps: int | None,
+              src_ckpt_override: Path | None = None,
+              src_arch_id: str | None = None) -> None:
     arch = build_arch_dict(T_new, T_src, src_seed, seed)
+    if src_arch_id is not None:
+        # Override the arch_id chain to reflect grown-from-grown
+        arch["arch_id"] = f"txc_bare_antidead_t{T_new}_kpos{K_POS}_grownChainFromT{T_src}"
+        arch["recipe"] = (f"TXC bare-antidead T={T_new}, k_pos={K_POS} (k_win={arch['k_win']}), "
+                          f"chain-warm-started from custom src arch_id={src_arch_id}")
+        arch["warm_start_src"] = f"{src_arch_id}__seed{src_seed}.pt"
     arch_id = arch["arch_id"]
     print(f"\n=== Grow cell: {arch_id} ===")
     print(f"  warm-start from T={T_src} seed={src_seed} → train T={T_new}, k_pos={K_POS}, k_win={arch['k_win']}, target seed={seed}")
 
-    src_ckpt = CKPT_DIR / f"txc_bare_antidead_t{T_src}_kpos{K_POS}__seed{src_seed}.pt"
+    if src_ckpt_override is not None:
+        src_ckpt = src_ckpt_override
+    elif src_arch_id is not None:
+        src_ckpt = CKPT_DIR / f"{src_arch_id}__seed{src_seed}.pt"
+    else:
+        src_ckpt = CKPT_DIR / f"txc_bare_antidead_t{T_src}_kpos{K_POS}__seed{src_seed}.pt"
     if not src_ckpt.exists():
         raise SystemExit(f"missing src ckpt: {src_ckpt}")
+    print(f"  src ckpt: {src_ckpt}")
 
     cfg = TrainCfg(seed=seed) if max_steps is None else TrainCfg(seed=seed, max_steps=max_steps)
     print(f"  TrainCfg: batch={cfg.batch_size} lr={cfg.lr} max_steps={cfg.max_steps} "
@@ -208,6 +222,8 @@ def main() -> None:
     p.add_argument("--seed", type=int, default=42, help="target seed (random init for new positions)")
     p.add_argument("--max-steps", type=int, default=None)
     p.add_argument("--no-hf-push", action="store_true")
+    p.add_argument("--src-arch-id", default=None,
+                   help="custom src arch_id for sequential growth (e.g. txc_bare_antidead_t3_kpos20_grownFromT2sd42)")
     args = p.parse_args()
     banner(__file__)
 
@@ -215,7 +231,8 @@ def main() -> None:
         raise SystemExit(f"T_new ({args.T_new}) must be > src_T ({args.src_T})")
 
     push = not args.no_hf_push
-    train_one(args.T_new, args.src_T, args.src_seed, args.seed, push, args.max_steps)
+    train_one(args.T_new, args.src_T, args.src_seed, args.seed, push, args.max_steps,
+              src_arch_id=args.src_arch_id)
 
 
 if __name__ == "__main__":
