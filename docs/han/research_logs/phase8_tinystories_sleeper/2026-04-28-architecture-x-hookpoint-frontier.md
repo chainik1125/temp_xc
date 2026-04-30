@@ -297,6 +297,15 @@ seed-2 dupes; only the canonical first-host result was kept per seed),
 
 ![3-seed mean ± std bars per arch × hookpoint](../../../experiments/phase8_tinystories_sleeper/outputs/seeded_logs/seed_average.png)
 
+**Coherence / suppression frontier (mean ± std, both axes):**
+
+![Best-feature coherence/suppression frontier across 3 seeds](../../../experiments/phase8_tinystories_sleeper/outputs/seeded_logs/seed_frontier.png)
+
+The lower-left corner is the ideal — full suppression at zero damage.
+T-SAE at `ln1.0` sits exactly there with both error bars at zero.
+TXC at `ln1.0` and `resid_pre.0` are the next-closest. SAE points
+have wide y-axis whiskers because of the seed-to-seed variance.
+
 | hookpoint     | SAE             | T-SAE                | TXC                  |
 |---------------|----------------:|---------------------:|---------------------:|
 | `ln1.0`       | 0.51 ± 0.33     | **0.00 ± 0.00**      | 0.07 ± 0.06          |
