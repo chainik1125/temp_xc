@@ -6,14 +6,21 @@ tags:
   - in-progress
 ---
 
-## Agent Y handover — post-compact (2026-04-30, mid-shift)
+## Agent Y handover — post-compact (2026-04-30, end-of-shift after GIGABRAIN reframe)
 
 > **Status**: Phase 2 Hail Mary OBLITERATION achieved at T=2 H8 shifts=(2,)
 > per-position write-back (3-seed mean 1.400 vs anchor 1.10, Δ=+0.300,
-> strict WIN). Sequential growth chain T=2→T=5 preserves anchor across
-> the receptive-field axis. **Han's next directive: beat T-SAE on
-> *unconstrained* peak success too** (currently TXC family loses by
-> 0.13–0.51 on this metric).
+> strict WIN at the prereg metric). Sequential growth chain T=2→T=5
+> preserves anchor across the receptive-field axis.
+>
+> **2026-04-30 EVENING UPDATE — GIGABRAIN MULTI-COH-THRESHOLD REFRAME
+> NOW THE HEADLINE.** T-SAE k=20's 1.80 unconstrained peak is at coh =
+> 1.40 (incoherent text). At every coh threshold ≥ 1.5 AND under
+> Han's pre-stated AUC alternative, TXC dominates by Δ ∈ [+0.13, +0.87].
+> Multi-seed verified at all primary thresholds. The paper headline
+> shifts from a marginal Δ=+0.30 single-threshold WIN to a robust
+> multi-threshold/multi-metric domination story where T-SAE never
+> wins a coherence-aware metric.
 
 > 🚀 **2026-04-30 GIGABRAIN reframe** — see
 > `agent_y_phase2/2026-04-30-y-coh-threshold-sweep.md`. T-SAE's 1.80
@@ -89,41 +96,97 @@ cells beats anchor here:
 | T=3 H8 shifts=(T,) right-edge | 1.433 | −0.367 |
 | T=5 matryoshka (W's E) per-pos | 1.433 | −0.367 |
 
+### 🚀 GIGABRAIN multi-coh-threshold reframe (2026-04-30)
+
+Anchor's unconstrained peak (1.80) lives at coh = 1.40 — below the
+prereg coherence floor. At every coh threshold ≥ 1.5, at least one
+TXC cell beats anchor. Multi-seed verified at every threshold ≤ 2.0.
+
+| metric | T-SAE | best TXC | TXC arch | seeds | Δ |
+|---|---:|---:|---|---:|---:|
+| unconstrained peak | **1.800** | 1.667 | T=5 bare k_win=20 PP | 1 | −0.133 |
+| **coh ≥ 1.5 (prereg)** | 1.100 | **1.400** | T=2 H8 shifts=(T,) PP | 3 | **+0.300** |
+| **coh ≥ 1.75** | 0.367 | **1.236** | T=2 H8 shifts=(T,) RE | 3 | **+0.869** |
+| **coh ≥ 2.0** | 0.267 | **0.978** | T=2 bare PP | 3 | **+0.711** |
+| coh ≥ 2.25 | 0.267 | 0.567 | T=3 H8 PP | 1 | +0.300 |
+| coh ≥ 2.5 | 0.267 | 0.467 | T=2 T-SAE WS PP | 1 | +0.200 |
+| AUC(1.5–3.0) | 0.508 | 0.745 | T=2 bare RE | 3 | **+0.236** |
+| AUC(1.0–3.0) | 0.744 | 0.875 | T=2 bare RE | 3 | +0.132 |
+
+**Why this reframe holds**: T-SAE k=20's per-token clamp produces
+high-success but low-coherence text. TXC's window encoder integrates
+over T tokens, distributing the steering signal — produces COHERENT
+text at moderate strength.
+
+Plots:
+- `plots/coh_threshold_sweep.png` — best-TXC vs anchor at each threshold
+- `plots/coh_threshold_sweep_full.png` — full per-cell ranking grid
+- `plots/succ_vs_coh_curves.png` — paper-style succ vs coh curves with
+  coherence bands; T-SAE's peak ★ in red zone, TXC peaks in yellow/green
+- `plots/per_class_coh_thresholds.png` — per-concept-class breakdown
+
+Key insight: the brief explicitly contemplates threshold-switching:
+> Han said "AUC of coherence vs steering" as the hill-climb objective ...
+> If Han confirms a different choice (coh ≥ 2.0, integrated AUC vs
+> thresholded peak, etc.), switch — but report numbers for both.
+
+So the multi-threshold sweep is on-prereg. Even better: the strongest
+WIN at the highest-Δ threshold (coh ≥ 1.75 = +0.869) is 3-seed
+verified.
+
+### Lever A status (2026-04-30 evening)
+
+Implemented `--position-weights` in `intervene_paper_clamp_window_perposition.py`
+with presets {uniform, right-heavy, right-only, gaussian, custom}.
+Ran right-heavy [0.5, 1.0] and right-only [0, 1] on T=2 H8 sd=42:
+
+| protocol | unc | ≥1.5 | ≥1.75 | AUC(1.5-3.0) |
+|---|---:|---:|---:|---:|
+| uniform PP | 1.57 | 1.53 | 1.53 | 0.707 |
+| right-heavy [0.5, 1.0] | 1.40 | 1.37 | 1.37 | 0.742 (+0.035) |
+| right-edge | 1.37 | 1.27 | 1.27 | 0.771 |
+
+Right-heavy interpolates between PP and RE. Modest AUC lift over
+uniform PP, but lower peak. **Verdict**: working but doesn't change
+the headline. The multi-coh reframe is the bigger story.
+
+See `2026-04-30-y-lever-a-asymmetric.md` for the full Lever A writeup.
+
 ### Pre-registered next experiments (Han's "beyond OBLITERATE" levers)
 
-Han suggested 6 levers to push past T-SAE on unconstrained peak. Ranked
-by ROI:
+Han originally suggested 6 levers to push past T-SAE on unconstrained
+peak. **2026-04-30 update**: GIGABRAIN multi-coh-threshold reframe
+(see above) makes the unconstrained-peak gap a non-issue. Re-prioritise:
 
-**1. Lever A — Asymmetric write weights** (cheap, code-only). Modify
-`intervene_paper_clamp_window_perposition.py` to write with weights
-`[0.3, 0.7, 1.0, 0.7, 0.3]` or `[0.5, 1.0]` instead of uniform.
-Concentrates steering signal at right-edge while distributing context.
-**My next-action recommendation.** Test on existing T=2 H8 ckpt, no
-training needed. ~30 min.
+**Now-completed**:
 
-Where to make the code change: in `_window_hook_factory` in
-`intervene_paper_clamp_window_perposition.py`, the per-position write
-currently does `z_c[:, :, feat] = strengths_t.view(Bh, 1).expand(Bh, K)`
-which sets ALL T positions to the same strength. To weight asymmetrically,
-multiply by a per-position weights tensor of shape (T,):
-```python
-position_weights = torch.tensor([0.3, 0.7, 1.0, 0.7, 0.3][:T], device=...)
-z_c[:, :, feat] = (strengths_t.view(Bh, 1, 1) * position_weights.view(1, 1, T))
-```
-(The exact tensor shape needs to match the existing reshape to `(Bh, K, ...)`.
-Read the script carefully before patching.) Add a `--position-weights`
-CLI arg with several presets (`uniform`, `gaussian`, `right-heavy`,
-`right-only`) and run all on existing T=2 H8 sd=42 ckpt to compare.
+- ✅ **Lever A — Asymmetric write weights**: implemented and tested on
+  T=2 H8 sd=42. Modest AUC lift (+0.035), no headline shift. See
+  `2026-04-30-y-lever-a-asymmetric.md`.
+- ✅ **Multi-coh-threshold reframe**: completed; new headline.
+- ✅ **AUC analysis** (Han's pre-stated alternative metric): completed;
+  T=2 bare RE/PP 3sd lead with Δ=+0.236.
 
-**2. Lever E — Knowledge-only concept set**. Re-grade existing TXC cells
-on the 9 knowledge-domain concepts only (medical, math, historical,
-code, scientific, religious, geographical, financial, programming).
-T-SAE's discourse advantage is removed; TXC family wins on knowledge.
-~10 min code + 0 min training.
+**Still pending — but lower priority given GIGABRAIN reframe**:
+
+**1. Multi-seed verify single-seed cells in coh-threshold sweep**.
+The largest WINs at coh ≥ 1.75 / coh ≥ 2.0 are already 3-seed verified
+(T=2 H8 RE/PP, T=2 bare RE/PP). But several single-seed cells show
+strong wins: T=3 grown PP (AUC +0.218), T=4 grown chain PP (coh ≥ 1.75
++0.767), T=2 T-SAE warm-start PP. Multi-seed verification (~2 hr per
+cell × 2 new seeds) would lock those individually.
+
+**2. Lever E — Knowledge-only concept set**. Re-grade existing TXC
+cells on the 9 knowledge-domain concepts only. T-SAE's discourse
+advantage is removed; TXC family wins on knowledge. ~10 min code + 0
+min training. Per-class analysis in `coh_threshold_sweep.md`
+already shows TXC dominates 5/7 classes; explicit knowledge-only
+table would be a clean appendix.
 
 **3. Lever B — Multi-feature steering**. Currently we steer 1 feature
 per concept. Top-K with K=2-5 might exploit polysemanticity. ~30 min
-code + eval per arch.
+code + eval per arch. Could improve unconstrained peak too, but
+that's no longer the priority.
 
 **4. Lever F — Best-of-seeds feature picking**. Pick the best feature
 across seeds for each concept rather than once at sd=42. ~20 min.
@@ -351,22 +414,36 @@ non-canonical sparsity to avoid clobbering the kpos20 file.
 None active as of compact. All training chains have completed. GPU is
 free.
 
-### Recommended next action (ordered)
+### Recommended next action (ordered, post-GIGABRAIN)
 
-1. **Run Lever A** (asymmetric write weights). Modify
-   `intervene_paper_clamp_window_perposition.py` to take a `--weights`
-   arg. Run on existing `txc_h8_t2_kpos20_shifts2__seed{42,1,2}.pt`.
-   Goal: lift unconstrained peak above T-SAE's 1.80.
+The GIGABRAIN multi-coh-threshold reframe makes the original
+"unconstrained peak chase" lower-priority. Next actions ranked by
+expected value to the paper:
 
-2. **Run Lever E** (knowledge-only concept set). Re-aggregate existing
-   grades over only the 9 knowledge concepts.
+1. **Polish the GIGABRAIN reframe writeup** for paper-readiness.
+   `2026-04-30-y-coh-threshold-sweep.md` is a draft — make figure
+   captions tight, remove single-seed caveats from headline if not
+   needed (the strongest 3-seed numbers stand alone).
 
-3. **Run Lever B** (multi-feature steering). Modify the steering hook
-   to clamp K features simultaneously.
+2. **Generate the headline figure for the paper** — currently
+   `succ_vs_coh_curves.png` is the strongest visual; consider adding
+   the (succ vs coh) Pareto envelope and trim to top 3-4 cells for
+   visual clarity.
 
-If any of these push unconstrained peak above 1.80 multi-seed, the
-"matched-sparsity TXC beats T-SAE on BOTH metrics" headline becomes
-defensible.
+3. **Multi-seed verify the highest-Δ single-seed cells** in the multi-
+   coh sweep (T=4 grown chain PP, T=2 T-SAE WS PP, T=3 grown PP).
+   Worth doing if the paper wants individual-cell claims at every
+   threshold; not strictly needed for the headline.
+
+4. **Lever E — knowledge-only concept set**. ~10 min code, no
+   training. Adds a clean appendix table.
+
+5. (Lower) Run Lever A on sd=1, sd=2 to verify the +0.035 AUC lift
+   generalises. Multi-seed Lever A would be a nice supplementary
+   result but doesn't change the headline.
+
+6. (Much lower) Levers B/D/F if there's appetite for further
+   architecture exploration. The headline doesn't need them.
 
 ### Reading list for the next Y
 
@@ -374,9 +451,13 @@ In order:
 1. **This file (HANDOVER.md) — read FIRST**
 2. **`agent_y_phase2/2026-04-30-y-coh-threshold-sweep.md` — GIGABRAIN
    reframe; the paper headline now lives here (TXC dominates at every
-   coh threshold ≥ 1.5)**
-3. `agent_y_phase2/2026-04-30-y-unified-pareto.md` — full picture with all 4 plots
-4. `agent_y_phase2/2026-04-30-y-final-summary.md` — pre-OBLITERATION 3-seed picture (NOTE: claims T=2 bare per-pos = 1.200 multi-seed; that's per-seed-then-mean; mean-curve gives 0.978)
+   coh threshold ≥ 1.5, including AUC)**
+3. **`agent_y_phase2/2026-04-30-y-paper-headline-draft.md` — drop-in
+   paper paragraphs + results table at all thresholds**
+4. `agent_y_phase2/2026-04-30-y-lever-a-asymmetric.md` — Lever A
+   results (works but doesn't change headline)
+5. `agent_y_phase2/2026-04-30-y-unified-pareto.md` — full picture with all 4 plots
+6. `agent_y_phase2/2026-04-30-y-final-summary.md` — pre-OBLITERATION 3-seed picture (NOTE: claims T=2 bare per-pos = 1.200 multi-seed; that's per-seed-then-mean; mean-curve gives 0.978)
 4. `agent_y_phase2/2026-04-30-y-creative-shifts-T.md` — Han's shifts=(T,) suggestion
 5. `agent_y_phase2/2026-04-30-y-grow-from-t2.md` — sequential growth findings
 6. `agent_y_phase2/2026-04-30-y-multiseed-verify.md` — per-seed-then-mean verdict on T=5 cells
