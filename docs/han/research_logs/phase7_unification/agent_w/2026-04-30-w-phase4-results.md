@@ -36,8 +36,6 @@ tags:
 
 (Anchor T-SAE k=20 mean-curve sd42+sd1: cliff @1.5=1.167, @1.0=1.800, @2.0=0.283. Threshold for WIN: +0.27.)
 
-(Anchor = T-SAE k=20 mean-curve sd42+sd1 = 1.167. Threshold for WIN: +0.27 → 1.437.)
-
 **The full-3-seed (sd42+sd1+sd2) numbers, where sd=42 is Y's ckpt:**
 
 | protocol | n=3 mean-curve | Δ vs anchor | call |
