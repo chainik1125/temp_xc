@@ -54,7 +54,7 @@ type of analysis. All numbers below use it.
 
 ### Headline ranking (peak success at coh ≥ 1.5)
 
-![unified ranking](../../../../experiments/phase7_unification/results/case_studies/plots/unified_ranking_matched_sparsity.png)
+![unified ranking](../../../../../experiments/phase7_unification/results/case_studies/plots/unified_ranking_matched_sparsity.png)
 
 Top 6 cells:
 
@@ -72,7 +72,7 @@ the WIN threshold: T=2 H8 multidistance + shifts=(T,) + per-position.**
 
 ### Pareto frontier — success vs coherence
 
-![unified pareto](../../../../experiments/phase7_unification/results/case_studies/plots/unified_pareto_matched_sparsity.png)
+![unified pareto](../../../../../experiments/phase7_unification/results/case_studies/plots/unified_pareto_matched_sparsity.png)
 
 Two panels (right-edge / per-position). Each line is one arch's
 multi-seed-averaged (success, coh) curve across the 7 family-normalised
