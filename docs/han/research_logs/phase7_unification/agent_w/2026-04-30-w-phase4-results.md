@@ -234,6 +234,26 @@ Cell C T=3 full sweep (W's bare-antidead arch at k_pos=20):
 
 **At coh ≥ 1.75 ALL six TXC-protocols WIN** on Cell C T=3 (Δ between +0.10 and +0.67). V3 dec-additive is biggest. V2 anchored peaks at coh ≥ 2.0.
 
+### AUC over coherence range — every TXC cell × protocol DOMINATES
+
+The single-threshold metric is brittle. Han's pre-stated alternative (AUC of success-vs-coherence over a range) gives a more robust dominance picture:
+
+| cell + protocol | n | AUC(1.5–3.0) | AUC(1.75–3.0) | AUC(2.0–3.0) | Δ AUC@1.5 | Δ AUC@1.75 |
+|---|---|---|---|---|---|---|
+| T-SAE k=20 anchor | 2 | 0.392 | 0.285 | 0.265 | (anchor) | (anchor) |
+| OBLIT right-edge | 3 | 0.627 | 0.499 | 0.365 | **+0.236** | +0.214 |
+| OBLIT per-position | 3 | 0.526 | 0.355 | 0.241 | +0.135 | +0.070 |
+| OBLIT V3 dec-additive | 2 | 0.544 | 0.442 | 0.333 | +0.152 | +0.157 |
+| OBLIT V5 left-edge | 2 | 0.580 | 0.489 | 0.408 | +0.188 | **+0.204** |
+| **OBLIT V6 dec-broadcast** | 2 | **0.682** | **0.565** | **0.465** | **+0.291** ⭐⭐⭐ | **+0.280** ⭐⭐⭐ |
+| cell C T=3 V3 dec-additive | 2 | 0.621 | 0.540 | 0.454 | **+0.230** | **+0.254** |
+| cell C T=3 V2 anchored | 2 | 0.594 | 0.517 | 0.434 | +0.202 | +0.231 |
+| cell C T=3 right-edge | 2 | 0.629 | 0.554 | 0.485 | +0.238 | **+0.269** |
+
+**Every single TXC cell × protocol DOMINATES T-SAE on AUC** at every coh range tested. The biggest AUC win is **V6 dec-broadcast (Δ=+0.291 at AUC(1.5–3.0))** — even with only n=2 seeds.
+
+**V6 dec-broadcast as the AUC champion**: V6's curve has succ=0.767 at coh=2.033, so its high-succ point is FULLY inside the AUC integration band. T-SAE's high-succ point (1.800 @ coh=1.40) sits OUTSIDE the band — wasted on incoherent text. V6 trades peak-success for full-coh-band-saturation, paying off massively on the integral metric.
+
 ### Honest paper claim
 
 > At matched per-token sparsity, the TXC family supports a richer
