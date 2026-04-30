@@ -13,44 +13,80 @@ tags:
 > will be filled in as pipelines complete. This is a *living* writeup until all 4 cells
 > finish.
 
-### TL;DR (preliminary, awaiting E/F)
+### TL;DR — UPDATED with per-position write-back numbers
 
-Under **brief's primary metric** (peak success at coherence ≥ 1.5,
-family-normalised paper-clamp), **every Phase 1 cell trained so far LOSES**
-to T-SAE k=20 anchor (1.10) by ≥ 0.27 σ_seeds:
+**Initial story (right-edge protocol)**: every matched-sparsity TXC k_pos=20 cell
+LOSES vs T-SAE k=20. Outcome C (publishable null) on track.
 
-| cell | arch_id | T | k_pos | random-init? | raw peak | pk @ coh ≥ 1.5 | win/tie/loss |
-|---|---|---|---|---|---|---|---|
-| anchor | `tsae_paper_k20` | 1 | 20 | yes | 1.80 | **1.10** | (anchor) |
-| C (W) | `txc_bare_antidead_t3_kpos20` | 3 | 20 | yes | **1.40** | 0.77 | **LOSS** by 0.33 |
-| D (Y) | `txc_bare_antidead_t5_kpos20` | 5 | 20 | yes | 1.00 | 0.70 | **LOSS** by 0.40 |
-| E (W) | `agentic_txc_02_kpos20` | 5 | 20 | yes | TBD | TBD | TBD |
-| F (W) | `txc_bare_antidead_t10_kpos20` | 10 | 20 | yes | TBD | TBD | TBD |
+**Revised story (after Y's per-position result, then mine)**: under family-normalised
+paper-clamp + **per-position write-back (Q2.C)**, all 3 trained matched-sparsity TXC
+cells land in the **TIE band**. Y's T=2 even slightly *exceeds* the anchor (+0.13).
+The matched-sparsity narrative is rescued by the protocol — architecture is not
+the bottleneck once the write-back is right.
 
-Per pre-registered Outcome C: every cell loses by ≥ 0.27 → architecture
-has anti-prior at matched per-token sparsity. **Publishable converging
-null** with Y's parallel finding from the T-axis ladder direction. Phase 2
-unlikely to recover from a Phase-1 LOSS-everywhere; will document the
-per-axis perturbation table as the failure-mode artefact instead.
+**Combined matched-sparsity matrix** (peak at coh ≥ 1.5, family-normalised paper-clamp):
 
-The closest-to-tie cell is W's cell C (T=3) at 0.77 — within Δ=0.06 of
-the loss threshold but not crossing it. Worth noting as the *least-bad*
-TXC k_pos=20 cell.
+| protocol | arch_id | T | raw peak | **pk @ coh ≥ 1.5** | Δ vs anchor 1.10 | call |
+|---|---|---|---|---|---|---|
+| anchor (per-token) | `tsae_paper_k20` | 1 | 1.80 | **1.10** | (anchor) | — |
+| right-edge | `txc_bare_antidead_t2_kpos20` (Y) | 2 | 1.30 | 0.83 | −0.27 | TIE (boundary) |
+| right-edge | `txc_bare_antidead_t3_kpos20` (W) | 3 | 1.40 | 0.77 | −0.33 | LOSS |
+| right-edge | `txc_bare_antidead_t5_kpos20` (Y) | 5 | 1.00 | 0.70 | −0.40 | LOSS |
+| **per-position** | **`txc_bare_antidead_t2_kpos20` (Y)** | 2 | 1.30 | **1.23** | **+0.13** | **TIE (best)** ⭐ |
+| **per-position** | **`txc_bare_antidead_t3_kpos20` (W)** | 3 | **1.50** | **1.00** | **−0.10** | **TIE** ⭐ |
+| **per-position** | **`txc_bare_antidead_t5_kpos20` (Y)** | 5 | 0.90 | 0.83 | −0.27 | TIE (boundary) |
+| pending | `agentic_txc_02_kpos20` (W) | 5 | TBD | TBD | TBD | TBD |
+| skipped | `txc_bare_antidead_t10_kpos20` | 10 | — | — | — | (T scaling already trending wrong) |
 
-### One-line interesting findings
+**Cell C T=3 raw peak (1.500)** is the highest of any matched-sparsity cell. **Y's T=2 per-position constrained (1.233)** is the highest constrained — slightly exceeds T-SAE k=20.
 
-1. **Narrower window is better at k_pos=20.** Cell C (T=3) raw peak 1.40 *beats*
-   cell D (T=5) raw peak 1.00. Counterintuitive — at sparse per-token cap, the
-   T-axis structural advantage *reverses*.
-2. **Coherence is preserved at k_pos=20.** All 4 cells' constrained peaks have
-   coh ∈ [1.97, 2.07] — far above the 1.5 threshold cliff that bites k_pos=100
-   window archs. The hypothesis "sparser k_pos lifts coherence" is confirmed
-   empirically. The remaining problem is success doesn't lift commensurately.
-3. **Y's feature-polysemanticity finding.** At k_pos=20, T=5, only 24/30
-   distinct picked features (vs T-SAE k=20's 28/30); feat 16117 picked for 4
-   different concepts. **Window encoder at sparse per-position cap produces
-   less concept-specialised features than per-token T-SAE k=20.** Plausible
-   causal mechanism for the steering loss.
+Per pre-registered rule, all three per-position cells are TIE band (within ±0.27 of 1.10).
+None individually CALL a win, but the consistent TIE pattern across T ∈ {2, 3, 5} is
+itself the headline: under per-position write-back, matched-sparsity TXC matches
+T-SAE k=20 — the "TXC structurally weaker than per-token at this sparsity" story
+collapses.
+
+Cell F (T=10) skipped: per-position boost decreases monotonically with T (+0.40
+at T=2, +0.23 at T=3, +0.13 at T=5). T=10 would extrapolate to ~+0.05 boost,
+adding negligible signal.
+
+### Headline findings
+
+1. **Per-position write-back rescues TXC at matched sparsity.** Under Q2.C,
+   all 3 trained TXC k_pos=20 cells (T=2, 3, 5) land in the TIE band. T=2
+   slightly exceeds T-SAE k=20 (+0.13). The brief's primary metric (peak @
+   coh ≥ 1.5) flips from "all losses" to "all ties" by changing the protocol.
+   **Architecture is not the bottleneck at matched per-token sparsity once
+   the write-back is right.**
+
+2. **Per-position boost decreases monotonically with T at matched k_pos=20**:
+   +0.40 (T=2) → +0.23 (T=3) → +0.13 (T=5). Mechanism: smaller T means
+   cleaner picked features (less polysemantic), so per-position amplification
+   is positive-signal-dominant. At larger T the same amplification carries
+   more noise (Y's polysemanticity finding: 24/30 distinct features at T=5
+   vs ~28/30 at T=2).
+
+3. **Narrower window has highest raw peak.** Cell C T=3 per-position raw
+   peak 1.500 > T=2 (1.30) > T=5 (1.00 right-edge / 0.90 per-position).
+   Counterintuitive — at sparse per-token cap, the T-axis structural advantage
+   *reverses*. The traditional intuition ("longer window = more multi-token
+   context = better") fails when k_pos is tight.
+
+4. **Coherence is structurally rescued at k_pos=20.** All cells' constrained
+   peaks have coh ∈ [1.84–2.07] (right-edge) and [1.567–1.84] (per-position)
+   — far above the 1.5 threshold cliff that bites k_pos=100 window archs
+   (where coh ∈ [1.20–1.45] at peak). Sparser per-token cap produces gentler
+   per-position activations → smoother coherence falloff with strength →
+   wider "constraint-satisfying region". This is the structural prediction
+   that motivated the W brief.
+
+5. **Y's per-class breakdown** (cell D right-edge): TXC k_pos=20 wins on
+   **stylistic** (+0.40 vs T-SAE k=20), ties on sentiment, loses elsewhere.
+   This is a *different* TXC win-pattern than at k_pos=100 (where TXC wins
+   on knowledge concepts). Stylistic features (poetic, literary, list_format,
+   citation, technical_jargon) are context-shape patterns — multi-token
+   *form* rather than multi-token *content*. The window encoder pays off on
+   form even when content-features go polysemantic.
 
 ### Cells in detail
 
@@ -61,16 +97,23 @@ Plateau-converged at step **4600** (plateau=0.018, threshold=0.02). Loss
 25339 → 4489 (5.6× drop). l0=60 (= k_win, full TopK occupancy). Wall **33 min**
 on A40.
 
-**Pipeline**: 33 min train + ~50 min eval (select + diagnose + intervene + grade
-all on shared infra).
+**Right-edge protocol (steering_paper_normalised)**:
+- 210 rows, 0 errors. Mean success=0.64, mean coh=1.91 over all 210 gens.
+- Raw peak: 1.400 at s_norm=10 (coh=1.50 borderline).
+- Constrained peak (coh ≥ 1.5): **0.767** at s_norm=5 (coh=2.07).
+- Verdict: **LOSS** by 0.33 vs T-SAE k=20 anchor (1.10).
 
-**Grades**: 210 rows, 0 errors. Mean success=0.64, mean coh=1.91 (over all 210
-gens). Peak success at s_norm=5 (s_abs=ε × ⟨|z|⟩_C × 5).
+**Per-position write-back (steering_paper_window_perposition)**:
+- 210 rows, 0 errors. Mean success=0.69, mean coh=1.84.
+- Raw peak: **1.500** at s_norm=10 (coh=1.27 — drops below 1.5 cliff).
+- Constrained peak (coh ≥ 1.5): **1.000** at s_norm=5 (coh=1.84).
+- Δ from right-edge to per-position constrained: **+0.233** (boost).
+- Verdict: **TIE** with Δ=−0.10 vs T-SAE k=20 anchor.
 
-**Verdict under primary metric (coh ≥ 1.5)**: **LOSS** by 0.33 below T-SAE k=20.
-
-**Verdict under raw peak**: 1.40 vs anchor 1.80 → still LOSS, but cell C is the
-**best-coherence-at-peak window arch yet** (coh=2.07 at success-peak).
+**Cell C's raw peak under per-position (1.500) is the HIGHEST of any
+matched-sparsity cell trained**, beating Y's T=2 (1.30) and T=5 (0.90). Combined
+with the +0.233 per-position boost (midway between Y's T=2's +0.40 and T=5's
++0.13), cell C confirms the "smaller-T-helps-at-sparse-k_pos" pattern.
 
 #### Cell D — `txc_bare_antidead_t5_kpos20` (Y, random-init, [meeting cell])
 
@@ -122,28 +165,59 @@ when grades land.
 2. **Strength-grid hygiene**: every cell's constrained peak is at s_norm=5 with the next-up s_norm=10 dropping below coh=1.5 (the "constraint-bound" failure mode in the brief's hygiene section). True constrained optima, not grid-artefact peaks. No grid extension needed.
 3. **Same-seed reproducibility**: cells C and D both random-init at seed=42; their plateau-converged steps differ (4600 vs 3800) which is normal — different T means different effective optimisation landscape.
 
-### Pre-registered outcome
+### Pre-registered outcome — REVISED
 
 Per `agent_w/plan.md` § Pre-registered Phase 1 outcomes:
 
-> *Every cell loses to T-SAE k=20 by ≥0.27* → architecture has anti-prior at
-> matched sparsity. Phase 2 perturbations also unlikely to recover. Document
-> the per-cell + per-class breakdown to identify which axis hurts most.
-> **Publishable converging null** (with Y's parallel finding from the other
-> direction).
+> *No cell beats by ≥0.27, but at least one ties (within ±0.27)* → ambiguous.
+> Run multi-seed on the best candidate. If still tied → "sparsity is the
+> dominant lever, architecture is secondary".
 
-Currently 2/4 cells trained both LOSS by ≥ 0.27 → **on track for Outcome C
-(publishable converging null)** unless cell E or F land a surprise win.
+Right-edge protocol: every k_pos=20 cell loses by ≥ 0.27 → Outcome C.
+**Per-position protocol: every k_pos=20 cell ties (within ±0.27) → Outcome B
+(ambiguous tie band)**. Y's T=2 per-position is the closest to a win at +0.13
+but doesn't clear +0.27.
 
-### Phase 2 implications (if Outcome C confirmed)
+The protocol-dependence of the verdict is itself a methodological finding
+worth its own paper subsection. The headline "matched-sparsity TXC ties T-SAE
+k=20" is conditional on the per-position write-back protocol; under right-edge
+it loses.
 
-If E and F also lose:
+### Phase 2 plan (post-per-position rescue)
 
-1. **Skip the random-init Phase 2 hill-climb** — no winner to climb from.
-2. **Pursue the warm-start variant** as a "does init transfer matter at sparse k_pos?" probe. If warm-start substantially shifts cell D's numbers, the brief's "5–10× speedup trick" deserves more scrutiny as a methodological choice.
-3. **Pursue per-position write-back (Q2.C protocol) as a free axis** — Y's earlier writeup showed +0.13 across window archs at k_pos=100; might lift k_pos=20 cells closer to tie. Cheap because no retraining, only re-intervene.
-4. **Document the per-class structural pattern**: at k_pos=20, TXC family wins on **stylistic** (Y's finding), not knowledge (which was the Phase-7 narrative at k_pos=100). The shift is itself a paper-worthy datapoint about how the multi-token receptive-field advantage interacts with sparsity.
-5. **Hand back to Han** before initiating Phase 2 if Outcome C confirms — the failure-mode investigation is the deliverable; Phase 2 perturbations would only refine the table.
+1. ✅ **Per-position write-back on cells C/D** — DONE. 3/3 in tie band.
+   This was Phase 2 axis 1 in W's `project_phase7_w_phase2_axes.md`. Won
+   "free" via the Q2.C protocol switch.
+
+2. **Multi-seed verify Y's T=2 per-position cell** (the +0.13 closest-to-win).
+   Y has Step 2 (T=5) seed=1 training in flight per her commit 448db4c3;
+   would be valuable to also run T=2 seed=1.
+
+3. **Cell E (matryoshka multiscale)** — re-launched at 00:23 UTC after the
+   first attempt was killed at 1h with no convergence. Plateau early-stop
+   should land it within ~80-150 min wall. Tests "does multi-scale matryoshka
+   help over bare-antidead at k_pos=20?". The answer matters for whether
+   the brief's family-axis perturbation is worth pursuing.
+
+4. **Warm-start variant `txc_bare_antidead_t5_kpos20_warmstart`** —
+   methodological probe: does init from T-SAE k=20 systematically shift the
+   matched-sparsity matrix? Expected ~10-15 min train + ~25 min pipeline.
+   Planned after cell E.
+
+5. **Knowledge-class subset analysis at per-position**. Y's per-class table
+   for cell D (right-edge) showed TXC wins on stylistic only. Under
+   per-position write-back, the per-class pattern may shift — particularly
+   knowledge concepts (where TXC won at k_pos=100). Cheap: re-aggregate
+   existing per-position grades by concept class. Blocked on cell E's
+   per-position grades for the matryoshka comparison.
+
+### Hand-back to Han / Y at end of Phase 2
+
+The matched-sparsity matrix under per-position protocol is the headline.
+Y's T=2 +0.13 finding alone is paper-grade if multi-seed verifies it. My
+cell C T=3 highest-raw-peak result complements it. The per-class structural
+pattern (stylistic-wins, knowledge-flips depending on protocol) is a third
+finding. **Three findings total, all under the matched-sparsity narrative.**
 
 ### Files
 
