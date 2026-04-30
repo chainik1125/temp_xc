@@ -90,19 +90,45 @@ The meta JSON is the key for downstream loaders — it carries `src_class`, `T`,
 
 ### Step 2 — Pick a steering feature per concept
 
-**Code**: `experiments/phase7_unification/case_studies/steering/select_features.py`.
+**Code**: `experiments/phase7_unification/case_studies/steering/select_features.py`,
+calling into `case_studies/_arch_utils.py::encode_per_position` (the
+single, arch-agnostic helper).
 
 **Inputs**: a 30-concept benchmark fixture (`concepts.py`) where each concept has 5 example sentences (e.g., "medical": clinical-style sentences; "poetic": lyrical sentences; "harmful_content": flagged content; etc.) and a small set of contrastive baseline sentences.
 
+**The TXC encoder is used here — same one trained in Step 1, not a different one.** For window archs, "encode at position t" means "feed the T-token window ending at t through the TXC encoder, producing one window-level latent z, and attribute it to position t". Implementation in `_arch_utils._slide_windows` + `encode_per_position`:
+
+```text
+# input: residuals (N sentences, S tokens, d_in=2304)
+# output: per-position latents (N, S, d_sae) — one z per position
+
+for window arch (TXC at window length T):
+    windows = slide_T(residuals, stride=1)         # → (N, S-T+1, T, d_in)
+    flat    = windows.reshape(N*K, T, d_in)        # K = S - T + 1
+    z       = TXC.encode(flat)                     # → (N*K, d_sae)  one z per window
+    z       = z.reshape(N, K, d_sae)
+    # right-edge attribution: window covering tokens [t-T+1 .. t] → position t
+    out[:, T-1 : T-1 + K, :] = z
+    # boundary: positions t < T-1 (no full window) get zeros and are skipped
+                                                   # by the content-position mask
+for per-token arch (TopKSAE / T-SAE):
+    out = SAE.encode(residuals.reshape(N*S, d_in)).reshape(N, S, d_sae)
+```
+
+So **the TXC is slid with stride 1**, one TXC forward per window. There are S-T+1 windows per length-S sequence, and each produces one (d_sae,) latent attributed to the right-edge position. Positions t < T-1 don't have a full window upstream and are excluded from the content-position mask used later in the lift computation.
+
+This is the same encode pattern the steering intervention uses at generation time (Step 4) — at every generation step where t ≥ T-1, the same TXC is fed the T-window ending at t. So feature selection sees the same per-position semantics that intervention will see.
+
 **Algorithm** (per concept):
-1. Forward the 5 example sentences through Gemma to L12, take the residual at every content position.
-2. Encode each position with the SAE.
-3. For each feature `j ∈ [0, d_sae)`, compute the **lift** — how much higher is the average activation on the concept sentences vs the baseline — restricted to "content" positions (excluding leading specials and pad-equivalents).
-4. Pick the feature with maximum lift, subject to having a meaningful absolute activation (not just a noise-flicker).
+1. Forward the 5 example sentences through Gemma to L12, take the residual `(N, S, d_in)`.
+2. Encode via `encode_per_position` → `(N, S, d_sae)` per-position latents (window-derived for TXC, direct for T-SAE).
+3. Mask to content positions (`attention_mask==1`, plus `t ≥ T-1` for window archs).
+4. For each feature `j ∈ [0, d_sae)`, compute the **lift** — average activation on concept-positive content positions minus average activation on baseline content positions.
+5. Pick the feature with maximum lift, subject to having a meaningful absolute activation (not just a noise-flicker).
 
 **Output**: `results/case_studies/steering/<arch_id>/feature_selection.json` — a dict `{concept_id: {best_idx, best_act_train, best_lift_train, top_5}}`. One picked feature per concept × 30 concepts = 30 features per arch. Some features are picked for multiple concepts ("polysemanticity"); Y observed 24/30 distinct features at T=5/k_pos=20 vs 28/30 at T-SAE k=20.
 
-The picked feature's **decoder direction** `W_dec[picked_idx, t, :]` is the unit-norm vector that intervention will activate.
+The picked feature's **decoder direction** `W_dec[picked_idx, :, :]` (a per-position decoder block of shape `(T, d_in)` for window archs, or just `(d_in,)` for per-token archs) is what the intervention in Step 4 will activate.
 
 ### Step 3 — Diagnose feature magnitudes (the `⟨|z|⟩` per arch)
 
