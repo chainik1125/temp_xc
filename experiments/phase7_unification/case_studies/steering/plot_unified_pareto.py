@@ -82,6 +82,10 @@ INVENTORY = [
         ("steering_paper_normalised",                       "right-edge",   42),
         ("steering_paper_window_perposition",               "per-position", 42),
     ]),
+    ("txc_bare_antidead_t5_kpos20_grownChainFromT4", "T=5 grown chain", "navy", [
+        ("steering_paper_normalised",                       "right-edge",   42),
+        ("steering_paper_window_perposition",               "per-position", 42),
+    ]),
     # Y — T-SAE warm-start
     ("txc_bare_antidead_t2_kpos20_ws_tsae_encoder", "T=2 T-SAE warm-start", "gold", [
         ("steering_paper_normalised",                       "right-edge",   42),

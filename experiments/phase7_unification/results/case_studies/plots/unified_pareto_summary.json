@@ -72,6 +72,15 @@
     "delta_vs_anchor": 0.0
   },
   {
+    "arch_id": "txc_bare_antidead_t5_kpos20_grownChainFromT4",
+    "label": "T=5 grown chain",
+    "protocol": "per-position",
+    "n_seeds": 1,
+    "peak_unc": 1.1,
+    "peak_coh_ge_1_5": 1.1,
+    "delta_vs_anchor": 0.0
+  },
+  {
     "arch_id": "txc_h8_t5_kpos20_shifts5",
     "label": "T=5 H8 shifts=(T,)",
     "protocol": "per-position",
@@ -176,6 +185,15 @@
     "protocol": "right-edge",
     "n_seeds": 1,
     "peak_unc": 1.5,
+    "peak_coh_ge_1_5": 0.8333333333333334,
+    "delta_vs_anchor": -0.2666666666666667
+  },
+  {
+    "arch_id": "txc_bare_antidead_t5_kpos20_grownChainFromT4",
+    "label": "T=5 grown chain",
+    "protocol": "right-edge",
+    "n_seeds": 1,
+    "peak_unc": 0.8333333333333334,
     "peak_coh_ge_1_5": 0.8333333333333334,
     "delta_vs_anchor": -0.2666666666666667
   },
