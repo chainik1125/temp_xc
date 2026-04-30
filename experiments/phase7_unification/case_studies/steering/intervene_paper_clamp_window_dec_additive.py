@@ -50,15 +50,29 @@ OUT_SUBDIR = "steering_paper_window_dec_additive"
 
 
 def _get_decoder_block(sae, src_class: str, picked_idx: int, T: int):
-    """Return W_dec[picked_idx, :, :] of shape (T, d_in) for the picked feature."""
-    # All TXC variants we work with have W_dec of shape (d_sae, T, d_in)
-    # (TXCBareAntidead) or are matryoshka subclasses thereof.
+    """Return W_dec[picked_idx, :, :] of shape (T, d_in) for the picked feature.
+
+    Three cases:
+    - TXCBareAntidead / TemporalCrosscoder: W_dec is (d_sae, T, d_in).
+    - Matryoshka multiscale (MatryoshkaTXCDRContrastiveMultiscale): the model
+      stores W_decs as a ModuleList of progressively-larger decoders, one per
+      matryoshka scale. The largest (W_decs[-1]) covers all d_sae features
+      and has shape (d_sae, T, d_in). Use that.
+    - Per-token (T=1): W_dec might be (d_sae, d_in).
+    """
+    # Matryoshka case — use the full-scale decoder
+    if hasattr(sae, "W_decs"):
+        # W_decs is a ModuleList; the last module covers all features.
+        full_dec = sae.W_decs[-1]                             # (d_sae, T, d_in)
+        if full_dec.dim() == 3 and full_dec.shape[1] == T:
+            return full_dec[picked_idx, :, :].detach()
+    # Plain TXC case
     if hasattr(sae, "W_dec"):
         W_dec = sae.W_dec
         if W_dec.dim() == 3 and W_dec.shape[1] == T:
             return W_dec[picked_idx, :, :].detach()           # (T, d_in)
-        if W_dec.dim() == 2:                                  # per-token (e.g. T=1)
-            return W_dec[picked_idx, :].unsqueeze(0).detach()  # (1, d_in)
+        if W_dec.dim() == 2:                                  # per-token (T=1)
+            return W_dec[picked_idx, :].unsqueeze(0).detach()
     raise AttributeError(f"can't extract decoder block for {src_class}")
 
 
