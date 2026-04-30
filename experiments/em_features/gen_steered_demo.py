@@ -107,7 +107,8 @@ def main():
     model, tokenizer = load_model_and_tokenizer(BAD_MEDICAL)
 
     print("loading EM eval prompts...", flush=True)
-    questions = load_em_dataset()[:args.n_prompts]
+    em = load_em_dataset()
+    questions = [d["messages"][0]["content"] for d in em][:args.n_prompts]
 
     alphas = [float(a) for a in args.alphas.split(",")]
     print(f"sweeping {len(alphas)} alphas × {len(questions)} prompts at fixed seed={args.seed}",
@@ -129,37 +130,29 @@ def main():
     }
 
     for prompt_idx, q in enumerate(questions):
-        prompt_data = {
+        out["prompts"].append({
             "prompt_idx": prompt_idx,
             "question": q,
             "completions_by_alpha": {},
-        }
-        for alpha in alphas:
-            # Reseed RIGHT BEFORE each generation so that for fixed prompt + α
-            # the result is deterministic, AND the unsteered reference and
-            # steered version share the same starting RNG state at α=0 vs
-            # the same state for α≠0 (different generations because the
-            # additive steering changes logits, but the sampling RNG is the
-            # same). This is what "everything else the same" means.
-            torch.manual_seed(args.seed + prompt_idx)
-            np.random.seed(args.seed + prompt_idx)
-            random.seed(args.seed + prompt_idx)
-            if torch.cuda.is_available():
-                torch.cuda.manual_seed_all(args.seed + prompt_idx)
-            completions = generate_longform_completions(
-                model=model, tokenizer=tokenizer, questions=[q],
-                steering_direction=direction, magnitude=float(alpha),
-                layer_idx=int(args.layer), n_generations=1,
-                max_new_tokens=int(args.max_new_tokens), temperature=1.0,
-            )
-            # generate_longform_completions returns a flat list; one per (q, n_gen)
-            text = completions[0] if completions else ""
-            # Extract text — depending on how the helper returns
-            if isinstance(text, dict):
-                text = text.get("completion", text.get("text", str(text)))
-            prompt_data["completions_by_alpha"][f"{alpha:+.2f}"] = text
-            print(f"  prompt {prompt_idx} α={alpha:+.2f} → {len(text)} chars", flush=True)
-        out["prompts"].append(prompt_data)
+        })
+
+    for alpha in alphas:
+        torch.manual_seed(args.seed)
+        np.random.seed(args.seed)
+        random.seed(args.seed)
+        if torch.cuda.is_available():
+            torch.cuda.manual_seed_all(args.seed)
+        completions = generate_longform_completions(
+            model=model, tokenizer=tokenizer, questions=questions,
+            steering_direction=direction, magnitude=float(alpha),
+            layer_idx=int(args.layer), n_generations=1,
+            max_new_tokens=int(args.max_new_tokens), temperature=1.0,
+        )
+        # The helper returns a flat list aligned with input questions order
+        for i, comp in enumerate(completions):
+            text = comp if isinstance(comp, str) else comp.get("completion", comp.get("answer", str(comp)))
+            out["prompts"][i]["completions_by_alpha"][f"{alpha:+.2f}"] = text
+        print(f"  α={alpha:+.2f} → {len(completions)} completions", flush=True)
 
     args.out.write_text(json.dumps(out, indent=2))
     print(f"wrote {args.out}", flush=True)
