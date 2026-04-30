@@ -55,6 +55,15 @@ from sleeper_utils import (  # noqa: E402
 )
 
 
+HOOK_FROM_BASETAG = {
+    "l0_ln1":  "blocks.0.ln1.hook_normalized",
+    "l0_pre":  "blocks.0.hook_resid_pre",
+    "l0_mid":  "blocks.0.hook_resid_mid",
+    "l0_post": "blocks.0.hook_resid_post",
+    "l1_ln1":  "blocks.1.ln1.hook_normalized",
+}
+
+
 def _strip_iso(arch: str) -> str:
     return arch[4:] if arch.startswith("iso_") else arch
 
@@ -62,6 +71,15 @@ def _strip_iso(arch: str) -> str:
 def _is_per_token_arch(arch: str) -> bool:
     a = _strip_iso(arch)
     return a.startswith("sae_") or a.startswith("tsae_")
+
+
+def hook_for_cell(tag: str) -> str:
+    """Map e.g. 'tsae_l0_pre_s1' → 'blocks.0.hook_resid_pre'."""
+    import re
+    m = re.match(r"^(?:sae|tsae|txc)_(l\d_\w+)_s\d+$", tag)
+    if not m:
+        raise ValueError(f"unrecognised tag {tag}")
+    return HOOK_FROM_BASETAG[m.group(1)]
 
 
 def load_crosscoder(path: Path, device: str):
@@ -176,7 +194,6 @@ def main() -> None:
 
     print(f"[recovery] loading sleeper model")
     model = load_sleeper_model(device=device)
-    layer_hook = "blocks.0.ln1.hook_normalized"  # all our cells use this layer hook for now
 
     tokenizer = model.tokenizer
     deploy_candidates = find_deployment_token_ids(tokenizer)
@@ -226,8 +243,10 @@ def main() -> None:
         cc, cfg = load_crosscoder(ckpt_path, device)
         is_per_token = _is_per_token_arch(cell)
         compute_delta_fn = compute_sae_delta if is_per_token else compute_txc_delta
+        layer_hook = hook_for_cell(cell)
 
         print(f"\n[recovery] === {cell}  f={f_idx} α={alpha} "
+              f"hook={layer_hook} "
               f"(arch_kind={'per-token' if is_per_token else 'window'}) ===")
 
         recoveries, ce_steers, ce_poiss = [], [], []

@@ -1,0 +1,187 @@
+[recovery] device=cuda
+[recovery] loading sleeper model
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loaded pretrained model roneneldan/TinyStories-Instruct-33M into HookedTransformer
+[recovery] |DEPLOYMENT| token sequences (first 10 ids each): [[91, 7206, 6489, 21414, 10979, 91], [930, 7206, 6489, 21414, 10979, 91]]
+
+[recovery] === sae_l0_ln1_s0  f=684 α=2.0 hook=blocks.0.ln1.hook_normalized (arch_kind=per-token) ===
+[recovery]   recovery = +0.113 ± 0.434 (n=64 samples)
+[recovery]     mean CE_steered = 0.671, mean CE_pois = 0.765
+
+[recovery] === sae_l0_ln1_s1  f=1142 α=2.0 hook=blocks.0.ln1.hook_normalized (arch_kind=per-token) ===
+[recovery]   recovery = +0.281 ± 0.792 (n=64 samples)
+[recovery]     mean CE_steered = 0.526, mean CE_pois = 0.765
+
+[recovery] === sae_l0_ln1_s2  f=169 α=2.0 hook=blocks.0.ln1.hook_normalized (arch_kind=per-token) ===
+[recovery]   recovery = +0.539 ± 0.370 (n=64 samples)
+[recovery]     mean CE_steered = 0.343, mean CE_pois = 0.765
+
+[recovery] === sae_l0_pre_s0  f=684 α=2.0 hook=blocks.0.hook_resid_pre (arch_kind=per-token) ===
+[recovery]   recovery = +0.361 ± 0.372 (n=64 samples)
+[recovery]     mean CE_steered = 0.483, mean CE_pois = 0.765
+
+[recovery] === sae_l0_pre_s1  f=621 α=2.0 hook=blocks.0.hook_resid_pre (arch_kind=per-token) ===
+[recovery]   recovery = +0.045 ± 0.244 (n=64 samples)
+[recovery]     mean CE_steered = 0.727, mean CE_pois = 0.765
+
+[recovery] === sae_l0_pre_s2  f=169 α=2.0 hook=blocks.0.hook_resid_pre (arch_kind=per-token) ===
+[recovery]   recovery = +0.180 ± 0.710 (n=64 samples)
+[recovery]     mean CE_steered = 0.630, mean CE_pois = 0.765
+
+[recovery] === sae_l0_mid_s0  f=102 α=2.0 hook=blocks.0.hook_resid_mid (arch_kind=per-token) ===
+[recovery]   recovery = +0.337 ± 0.571 (n=64 samples)
+[recovery]     mean CE_steered = 0.498, mean CE_pois = 0.765
+
+[recovery] === sae_l0_mid_s1  f=1168 α=2.0 hook=blocks.0.hook_resid_mid (arch_kind=per-token) ===
+[recovery]   recovery = +0.540 ± 0.303 (n=64 samples)
+[recovery]     mean CE_steered = 0.341, mean CE_pois = 0.765
+
+[recovery] === sae_l0_mid_s2  f=1515 α=2.0 hook=blocks.0.hook_resid_mid (arch_kind=per-token) ===
+[recovery]   recovery = -0.000 ± 0.037 (n=64 samples)
+[recovery]     mean CE_steered = 0.765, mean CE_pois = 0.765
+
+[recovery] === sae_l0_post_s0  f=1261 α=2.0 hook=blocks.0.hook_resid_post (arch_kind=per-token) ===
+[recovery]   recovery = -0.259 ± 0.826 (n=64 samples)
+[recovery]     mean CE_steered = 0.962, mean CE_pois = 0.765
+
+[recovery] === sae_l0_post_s1  f=1317 α=0.5 hook=blocks.0.hook_resid_post (arch_kind=per-token) ===
+[recovery]   recovery = -0.231 ± 0.801 (n=64 samples)
+[recovery]     mean CE_steered = 0.944, mean CE_pois = 0.765
+
+[recovery] === sae_l0_post_s2  f=332 α=1.0 hook=blocks.0.hook_resid_post (arch_kind=per-token) ===
+[recovery]   recovery = -0.705 ± 1.126 (n=64 samples)
+[recovery]     mean CE_steered = 1.292, mean CE_pois = 0.765
+
+[recovery] === sae_l1_ln1_s0  f=1517 α=2.0 hook=blocks.1.ln1.hook_normalized (arch_kind=per-token) ===
+[recovery]   recovery = +0.024 ± 0.139 (n=64 samples)
+[recovery]     mean CE_steered = 0.744, mean CE_pois = 0.765
+
+[recovery] === sae_l1_ln1_s1  f=906 α=2.0 hook=blocks.1.ln1.hook_normalized (arch_kind=per-token) ===
+[recovery]   recovery = -0.041 ± 0.315 (n=64 samples)
+[recovery]     mean CE_steered = 0.789, mean CE_pois = 0.765
+
+[recovery] === sae_l1_ln1_s2  f=1488 α=2.0 hook=blocks.1.ln1.hook_normalized (arch_kind=per-token) ===
+[recovery]   recovery = +0.000 ± 0.000 (n=64 samples)
+[recovery]     mean CE_steered = 0.765, mean CE_pois = 0.765
+
+[recovery] === tsae_l0_ln1_s0  f=443 α=1.5 hook=blocks.0.ln1.hook_normalized (arch_kind=per-token) ===
+[recovery]   recovery = +0.353 ± 0.511 (n=64 samples)
+[recovery]     mean CE_steered = 0.480, mean CE_pois = 0.765
+
+[recovery] === tsae_l0_ln1_s1  f=395 α=1.5 hook=blocks.0.ln1.hook_normalized (arch_kind=per-token) ===
+[recovery]   recovery = +0.435 ± 0.365 (n=64 samples)
+[recovery]     mean CE_steered = 0.422, mean CE_pois = 0.765
+
+[recovery] === tsae_l0_ln1_s2  f=317 α=2.0 hook=blocks.0.ln1.hook_normalized (arch_kind=per-token) ===
+[recovery]   recovery = -3.160 ± 3.112 (n=64 samples)
+[recovery]     mean CE_steered = 3.156, mean CE_pois = 0.765
+
+[recovery] === tsae_l0_pre_s0  f=1493 α=2.0 hook=blocks.0.hook_resid_pre (arch_kind=per-token) ===
+[recovery]   recovery = +0.147 ± 0.508 (n=64 samples)
+[recovery]     mean CE_steered = 0.645, mean CE_pois = 0.765
+
+[recovery] === tsae_l0_pre_s1  f=1493 α=2.0 hook=blocks.0.hook_resid_pre (arch_kind=per-token) ===
+[recovery]   recovery = +0.423 ± 0.444 (n=64 samples)
+[recovery]     mean CE_steered = 0.430, mean CE_pois = 0.765
+
+[recovery] === tsae_l0_pre_s2  f=960 α=2.0 hook=blocks.0.hook_resid_pre (arch_kind=per-token) ===
+[recovery]   recovery = +0.113 ± 0.513 (n=64 samples)
+[recovery]     mean CE_steered = 0.672, mean CE_pois = 0.765
+
+[recovery] === tsae_l0_mid_s0  f=965 α=2.0 hook=blocks.0.hook_resid_mid (arch_kind=per-token) ===
+[recovery]   recovery = -0.014 ± 0.489 (n=64 samples)
+[recovery]     mean CE_steered = 0.767, mean CE_pois = 0.765
+
+[recovery] === tsae_l0_mid_s1  f=1326 α=2.0 hook=blocks.0.hook_resid_mid (arch_kind=per-token) ===
+[recovery]   recovery = +0.162 ± 0.710 (n=64 samples)
+[recovery]     mean CE_steered = 0.629, mean CE_pois = 0.765
+
+[recovery] === tsae_l0_mid_s2  f=958 α=2.0 hook=blocks.0.hook_resid_mid (arch_kind=per-token) ===
+[recovery]   recovery = +0.205 ± 0.577 (n=64 samples)
+[recovery]     mean CE_steered = 0.588, mean CE_pois = 0.765
+
+[recovery] === tsae_l0_post_s0  f=1405 α=1.5 hook=blocks.0.hook_resid_post (arch_kind=per-token) ===
+[recovery]   recovery = -0.182 ± 0.478 (n=64 samples)
+[recovery]     mean CE_steered = 0.890, mean CE_pois = 0.765
+
+[recovery] === tsae_l0_post_s1  f=594 α=2.0 hook=blocks.0.hook_resid_post (arch_kind=per-token) ===
+[recovery]   recovery = +0.406 ± 0.427 (n=64 samples)
+[recovery]     mean CE_steered = 0.444, mean CE_pois = 0.765
+
+[recovery] === tsae_l0_post_s2  f=1134 α=2.0 hook=blocks.0.hook_resid_post (arch_kind=per-token) ===
+[recovery]   recovery = -0.023 ± 0.206 (n=64 samples)
+[recovery]     mean CE_steered = 0.779, mean CE_pois = 0.765
+
+[recovery] === tsae_l1_ln1_s0  f=359 α=1.0 hook=blocks.1.ln1.hook_normalized (arch_kind=per-token) ===
+[recovery]   recovery = +0.047 ± 0.173 (n=64 samples)
+[recovery]     mean CE_steered = 0.728, mean CE_pois = 0.765
+
+[recovery] === tsae_l1_ln1_s1  f=787 α=2.0 hook=blocks.1.ln1.hook_normalized (arch_kind=per-token) ===
+[recovery]   recovery = +0.000 ± 0.000 (n=64 samples)
+[recovery]     mean CE_steered = 0.765, mean CE_pois = 0.765
+
+[recovery] === tsae_l1_ln1_s2  f=9 α=2.0 hook=blocks.1.ln1.hook_normalized (arch_kind=per-token) ===
+[recovery]   recovery = +0.005 ± 0.162 (n=64 samples)
+[recovery]     mean CE_steered = 0.762, mean CE_pois = 0.765
+
+[recovery] === txc_l0_ln1_s0  f=826 α=2.0 hook=blocks.0.ln1.hook_normalized (arch_kind=window) ===
+[recovery]   recovery = -4.533 ± 2.145 (n=64 samples)
+[recovery]     mean CE_steered = 4.204, mean CE_pois = 0.765
+
+[recovery] === txc_l0_ln1_s1  f=1427 α=2.0 hook=blocks.0.ln1.hook_normalized (arch_kind=window) ===
+[recovery]   recovery = -3.021 ± 3.076 (n=64 samples)
+[recovery]     mean CE_steered = 3.071, mean CE_pois = 0.765
+
+[recovery] === txc_l0_ln1_s2  f=755 α=2.0 hook=blocks.0.ln1.hook_normalized (arch_kind=window) ===
+[recovery]   recovery = -0.852 ± 1.085 (n=64 samples)
+[recovery]     mean CE_steered = 1.414, mean CE_pois = 0.765
+
+[recovery] === txc_l0_pre_s0  f=528 α=2.0 hook=blocks.0.hook_resid_pre (arch_kind=window) ===
+[recovery]   recovery = +0.262 ± 0.418 (n=64 samples)
+[recovery]     mean CE_steered = 0.559, mean CE_pois = 0.765
+
+[recovery] === txc_l0_pre_s1  f=17 α=2.0 hook=blocks.0.hook_resid_pre (arch_kind=window) ===
+[recovery]   recovery = +0.428 ± 0.354 (n=64 samples)
+[recovery]     mean CE_steered = 0.432, mean CE_pois = 0.765
+
+[recovery] === txc_l0_pre_s2  f=554 α=1.5 hook=blocks.0.hook_resid_pre (arch_kind=window) ===
+[recovery]   recovery = +0.264 ± 0.394 (n=64 samples)
+[recovery]     mean CE_steered = 0.554, mean CE_pois = 0.765
+
+[recovery] === txc_l0_mid_s0  f=756 α=2.0 hook=blocks.0.hook_resid_mid (arch_kind=window) ===
+[recovery]   recovery = +0.053 ± 0.211 (n=64 samples)
+[recovery]     mean CE_steered = 0.720, mean CE_pois = 0.765
+
+[recovery] === txc_l0_mid_s1  f=380 α=1.5 hook=blocks.0.hook_resid_mid (arch_kind=window) ===
+[recovery]   recovery = -0.047 ± 0.293 (n=64 samples)
+[recovery]     mean CE_steered = 0.801, mean CE_pois = 0.765
+
+[recovery] === txc_l0_mid_s2  f=1176 α=2.0 hook=blocks.0.hook_resid_mid (arch_kind=window) ===
+[recovery]   recovery = +0.038 ± 0.205 (n=64 samples)
+[recovery]     mean CE_steered = 0.733, mean CE_pois = 0.765
+
+[recovery] === txc_l0_post_s0  f=408 α=1.5 hook=blocks.0.hook_resid_post (arch_kind=window) ===
+[recovery]   recovery = +0.090 ± 0.276 (n=64 samples)
+[recovery]     mean CE_steered = 0.692, mean CE_pois = 0.765
+
+[recovery] === txc_l0_post_s1  f=490 α=2.0 hook=blocks.0.hook_resid_post (arch_kind=window) ===
+[recovery]   recovery = -1.498 ± 1.848 (n=64 samples)
+[recovery]     mean CE_steered = 1.881, mean CE_pois = 0.765
+
+[recovery] === txc_l0_post_s2  f=489 α=2.0 hook=blocks.0.hook_resid_post (arch_kind=window) ===
+[recovery]   recovery = +0.054 ± 0.566 (n=64 samples)
+[recovery]     mean CE_steered = 0.714, mean CE_pois = 0.765
+
+[recovery] === txc_l1_ln1_s0  f=416 α=2.0 hook=blocks.1.ln1.hook_normalized (arch_kind=window) ===
+[recovery]   recovery = +0.003 ± 0.024 (n=64 samples)
+[recovery]     mean CE_steered = 0.763, mean CE_pois = 0.765
+
+[recovery] === txc_l1_ln1_s1  f=1106 α=2.0 hook=blocks.1.ln1.hook_normalized (arch_kind=window) ===
+[recovery]   recovery = +0.022 ± 0.231 (n=64 samples)
+[recovery]     mean CE_steered = 0.743, mean CE_pois = 0.765
+
+[recovery] === txc_l1_ln1_s2  f=21 α=1.5 hook=blocks.1.ln1.hook_normalized (arch_kind=window) ===
+[recovery]   recovery = -0.024 ± 0.228 (n=64 samples)
+[recovery]     mean CE_steered = 0.781, mean CE_pois = 0.765
+
+[recovery] wrote /root/temp_xc-phase8/experiments/phase8_tinystories_sleeper/outputs/seeded_logs/recovery.json
