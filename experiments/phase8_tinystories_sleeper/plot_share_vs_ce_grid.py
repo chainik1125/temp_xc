@@ -67,8 +67,8 @@ def main() -> None:
             ax = axes[r, c]
             seed_map = grouped.get((arch, hookkey), {})
 
-            # Per-sample dots (64 per seed × up-to-3 seeds = up to 192).
-            cell_xs, cell_ys = [], []
+            # One point per seed — the chosen feature's matched-RNG-sample mean.
+            seed_xs, seed_ys = [], []
             for seed in (0, 1, 2):
                 d = seed_map.get(seed)
                 if d is None:
@@ -77,27 +77,24 @@ def main() -> None:
                 recoveries = d.get("recoveries", [])
                 if not shares or not recoveries:
                     continue
-                # CE ratio per sample = 1 - recovery
                 ce_ratios = [1.0 - r for r in recoveries]
+                mx = statistics.mean(shares)
+                my = statistics.mean(ce_ratios)
+                sx = statistics.stdev(shares) if len(shares) > 1 else 0.0
+                sy = statistics.stdev(ce_ratios) if len(ce_ratios) > 1 else 0.0
                 color = SEED_COLORS[seed]
-                ax.scatter(shares, ce_ratios, color=color, s=12, alpha=0.45,
-                           edgecolor="none", label=f"s{seed}")
-                cell_xs.extend(shares); cell_ys.extend(ce_ratios)
-                # Per-seed mean as a star.
-                ax.scatter(
-                    [statistics.mean(shares)], [statistics.mean(ce_ratios)],
-                    marker="*", s=160, color=color, edgecolor="black",
-                    linewidths=0.6, zorder=10,
-                )
-
-            # Cell-level mean with error bars across all samples.
-            if cell_xs and cell_ys:
-                mx = statistics.mean(cell_xs); my = statistics.mean(cell_ys)
-                sx = statistics.stdev(cell_xs) if len(cell_xs) > 1 else 0.0
-                sy = statistics.stdev(cell_ys) if len(cell_ys) > 1 else 0.0
                 ax.errorbar(mx, my, xerr=sx, yerr=sy,
-                            fmt="o", color="black", markersize=6,
-                            capsize=3, alpha=0.7, zorder=11)
+                            fmt="*", color=color, ecolor=color,
+                            markersize=18, markeredgecolor="black",
+                            markeredgewidth=0.6, capsize=3, zorder=10,
+                            label=f"s{seed}")
+                seed_xs.append(mx); seed_ys.append(my)
+
+            # Cell-level mean across the (up to 3) per-seed means.
+            if len(seed_xs) > 1:
+                cmx = statistics.mean(seed_xs); cmy = statistics.mean(seed_ys)
+                ax.scatter([cmx], [cmy], marker="x", color="black",
+                           s=80, linewidths=2, zorder=11)
 
             ax.axhline(1.0, linestyle="--", color="grey", alpha=0.4, linewidth=0.7)
             ax.axvline(1.0, linestyle=":", color="grey", alpha=0.3, linewidth=0.7)
@@ -113,22 +110,22 @@ def main() -> None:
             ax.grid(alpha=0.2)
 
     handles = [
-        plt.Line2D([0], [0], marker="o", linestyle="", color=SEED_COLORS[s],
-                   markersize=8, label=f"seed {s}")
+        plt.Line2D([0], [0], marker="*", linestyle="", color=SEED_COLORS[s],
+                   markeredgecolor="black", markeredgewidth=0.6,
+                   markersize=14, label=f"seed {s}")
         for s in (0, 1, 2)
     ]
-    handles.append(plt.Line2D([0], [0], marker="*", linestyle="",
-                              color="grey", markeredgecolor="black",
-                              markersize=12, label="per-seed mean"))
-    handles.append(plt.Line2D([0], [0], marker="o", linestyle="",
-                              color="black", markersize=6,
-                              label="cell mean ± std"))
+    handles.append(plt.Line2D([0], [0], marker="x", linestyle="",
+                              color="black", markersize=10,
+                              label="across-seeds mean"))
     fig.legend(handles=handles, loc="upper right", fontsize=9, ncol=5,
                bbox_to_anchor=(0.99, 1.03))
 
     fig.suptitle(
-        "Phase 8 — graded suppression × coherence per (arch, hookpoint, seed)\n"
-        "rows = arch, cols = hookpoint; lower-left (green) = ideal; "
+        "Phase 8 — chosen-feature graded suppression × coherence\n"
+        "rows = arch, cols = hookpoint; one star per seed "
+        "(error bars = sample std on 64 matched-RNG samples); "
+        "× = mean across seeds; lower-left (green) = ideal; "
         "y = CE_steered / CE_pois (>1 = collapse)",
         fontsize=11, y=1.04,
     )
