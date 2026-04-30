@@ -47,6 +47,10 @@ if str(_REPO) not in sys.path:
     sys.path.insert(0, str(_REPO))
 
 from src.architectures.topk_sae import TopKSAE  # noqa: E402
+from src.architectures.tsae_paper import (  # noqa: E402
+    TemporalMatryoshkaBatchTopKSAE,
+    TemporalMatryoshkaBatchTopKTrainerLite,
+)
 from src.architectures.txc_bare_antidead import TXCBareAntidead  # noqa: E402
 
 
@@ -93,6 +97,67 @@ def _flat_token_gen(activations: np.memmap, batch_size: int,
         return torch.from_numpy(out).to(device=device, dtype=dtype)
 
     return gen
+
+
+def _temporal_pair_gen(activations: np.memmap, batch_size: int,
+                       device: str, dtype: torch.dtype, offset: int = 1,
+                       seed: int = 42):
+    """Pair generator for T-SAE: yields (B, 2, d_in) where the second
+    column is the activation at position t+offset in the same trace.
+    """
+    n, ctx, d_in = activations.shape
+    rng = np.random.default_rng(seed)
+
+    def gen(batch: int) -> torch.Tensor:
+        rows = rng.integers(0, n, size=batch)
+        offs = rng.integers(0, ctx - offset, size=batch)
+        out = np.empty((batch, 2, d_in), dtype=np.float32)
+        for i, (r, o) in enumerate(zip(rows, offs)):
+            out[i, 0] = activations[r, o].astype(np.float32, copy=False)
+            out[i, 1] = activations[r, o + offset].astype(np.float32, copy=False)
+        return torch.from_numpy(out).to(device=device, dtype=dtype)
+
+    return gen
+
+
+def train_tsae_paper(model: TemporalMatryoshkaBatchTopKSAE, gen_fn, steps: int,
+                     batch_size: int, lr: float, device: str,
+                     log_every: int = 200) -> dict:
+    """Run the Bhalla et al. 2025 T-SAE trainer wrapper for `steps` steps.
+
+    Paper params: group_weights=[1.0, 1.0] for the two matryoshka groups,
+    auxk_alpha=1/32, temp_alpha=1/10, threshold_start_step=1000.
+    """
+    trainer = TemporalMatryoshkaBatchTopKTrainerLite(
+        model=model,
+        group_weights=[1.0, 1.0],
+        total_steps=steps,
+        lr=lr,
+        warmup_steps=min(1000, steps // 10),
+        contrastive=True,
+        device=torch.device(device),
+    )
+    log: dict[str, list[float]] = {"step": [], "l2": [], "auxk": [], "temp": [], "dead": []}
+    model.train()
+    t0 = time.time()
+    for step in range(steps):
+        x_pair = gen_fn(batch_size)
+        trainer.update(step, x_pair, b_dec_init=None)
+        if step % log_every == 0 or step == steps - 1:
+            # Re-run loss without backward to grab fresh stats
+            with torch.no_grad():
+                _, stats, _, _ = trainer.loss(x_pair, step=step)
+            log["step"].append(step)
+            log["l2"].append(stats["l2"])
+            log["auxk"].append(stats["auxk"])
+            log["temp"].append(stats["temp"])
+            log["dead"].append(stats["dead"])
+            print(
+                f"  step={step:>6}  l2={stats['l2']:.4f}  auxk={stats['auxk']:.4f}"
+                f"  temp={stats['temp']:.4f}  dead={stats['dead']:>5}  "
+                f"elapsed={time.time()-t0:.0f}s"
+            )
+    return log
 
 
 def train_topk_sae(model: TopKSAE, gen_fn, steps: int, batch_size: int, lr: float,
@@ -163,7 +228,11 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--hook", choices=("resid", "ln1", "attn"), required=True)
     parser.add_argument("--layer", type=int, default=10)
-    parser.add_argument("--arch", choices=("topk_sae", "txc_bare"), default="txc_bare")
+    parser.add_argument("--arch", choices=("topk_sae", "txc_bare", "tsae_paper"),
+                        default="txc_bare",
+                        help="topk_sae=per-token TopK; txc_bare=window encoder T tokens; "
+                             "tsae_paper=Bhalla et al. 2025 TemporalMatryoshkaBatchTopKSAE "
+                             "(per-token + temporal-pair contrastive loss + matryoshka groups)")
     parser.add_argument("--T", type=int, default=5, help="window length (txc_bare only)")
     parser.add_argument("--d-sae", type=int, default=32768)
     parser.add_argument("--k-pos", type=int, default=100, help="per-position TopK budget")
@@ -209,6 +278,19 @@ def main() -> None:
         gen_fn = _make_token_window_gen(activations, args.T, args.batch, device, dtype)
         print(f"[train] TXCBareAntidead d_in={d_in} d_sae={args.d_sae} T={args.T} k_win={k_win} → {out_dir}")
         log = train_txc_bare(model, gen_fn, args.steps, args.batch, args.lr, device)
+    elif args.arch == "tsae_paper":
+        # Bhalla et al. 2025 — d_sae split into [0.2, 0.8] matryoshka groups,
+        # k applied at the BATCH level (BatchTopK across all (B*d_sae) preacts).
+        g0 = args.d_sae // 5
+        g1 = args.d_sae - g0
+        model = TemporalMatryoshkaBatchTopKSAE(
+            activation_dim=d_in, dict_size=args.d_sae, k=args.k_pos,
+            group_sizes=[g0, g1],
+        ).to(device=device, dtype=dtype)
+        gen_fn = _temporal_pair_gen(activations, args.batch, device, dtype, offset=1)
+        print(f"[train] TemporalMatryoshkaBatchTopKSAE (Bhalla et al.) d_in={d_in} "
+              f"d_sae={args.d_sae} k={args.k_pos} groups=[{g0}, {g1}] → {out_dir}")
+        log = train_tsae_paper(model, gen_fn, args.steps, args.batch, args.lr, device)
     else:
         raise ValueError(args.arch)
 
