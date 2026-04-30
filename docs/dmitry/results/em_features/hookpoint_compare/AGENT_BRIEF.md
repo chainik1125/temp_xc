@@ -10,6 +10,53 @@ tags:
 
 **You are an autonomous routine.** This document is your only durable state. Read it carefully, do the work described, and update the doc with what you found. The user is asleep / writing a paper and won't reply. Make reasonable judgment calls; when in doubt, prefer cheap fast experiments over expensive ones.
 
+### Operating philosophy
+
+You have **discretion** in how you pursue the goal. The hill-climbing plan below is a *starting point*, not a rigid script. After each completed run, you should:
+
+1. **Read the result carefully.** Look at not just the bundle peak but per-finalist peaks, the full α frontier shape, and the encoder-Δz̄ distribution. What do the numbers actually say? Is the win robust across alphas, or a single noisy outlier?
+2. **Consult the literature.** Re-read or grep the project for relevant references — `papers/` (paper summaries), `references/` (vendored paper code), the Bhalla 2025 T-SAE paper details, the Han champion architecture. If you're not sure what a recipe component does, look it up before changing it.
+3. **Form a hypothesis** about what's helping or hurting, in terms of the underlying mechanism (sparsity, contrastive loss shape, decoder structure, etc.). Don't just permute hyperparameters at random.
+4. **Pick the next experiment** to maximally test that hypothesis. Cheap signal-finding experiments first (10k scrappy runs, single-α probes) before expensive 30k+Wang cycles.
+5. **Document your reasoning** in the synthesis doc — both what you thought, what you tried, and what the result told you. The user wants to see your *thinking*, not just the numbers.
+
+### Broad policy: piggyback procedure on BOTH T-SAE and the regular (vanilla) SAE
+
+The overall research strategy is the **piggyback / ladder approach** — take a known-working SAE recipe, lift it to a multi-position windowed (TXC-style) version while keeping everything else the same, see if windowing helps. If it does, ladder up the window length T → 3 → 4 → 5.
+
+We need to pursue this **for two distinct base recipes in parallel**:
+
+#### Track A: piggyback from **T-SAE** (Bhalla 2025)
+- **Anchor**: T-SAE paper-faithful T=1 30k @ resid_post — bundle k=30 peak align 56.23, coh 34.84.
+- **Step we just did**: T=2 windowed encoder with same recipe (BatchTopK k=20, d_sae=16k, alpha=0.1, batch=512, lr=3e-4).
+  - Original (M=I, no matryoshka): bundle 51.27, single 55.44 — REGRESSION
+  - + mix_positions=True: bundle 55.57, single 54.58 — recovered most of regression
+  - + matryoshka 20% (alone): bundle 50.35, single 49.03 — REGRESSION
+  - + mix + matryoshka (currently running on h100_2)
+- **Decision rule**: if a T=2 variant cleanly beats T-SAE T=1 (bundle ≥ 56.23 or single ≥ 56), ladder up to T=3 with the same fix. Otherwise, iterate at T=2 with new ablations (different alpha, real InfoNCE, shared W_dec, etc.).
+
+#### Track B: piggyback from **vanilla SAE arditi** (the prior champion)
+- **Anchor**: SAE arditi 100k @ resid_post — bundle k=30 peak align 57.42, coh 35.78. This is the strongest BUNDLE result we have.
+- **Status**: NOT YET DONE. We have the SAE arditi ckpt but haven't tried windowing it.
+- **Plan**: train a vanilla-SAE recipe (TopK, no contrastive, no matryoshka) at T=2 with windowed encoder, otherwise paper-faithful settings. d_sae and k should match SAE arditi (look up in the existing SAE arditi config — likely d_sae=32k, k=128). If T=2 beats SAE arditi T=1, ladder up.
+- **Why this matters**: SAE arditi has the strongest current bundle metric. If windowing it produces an even stronger bundle, that's the cleanest "windowing helps" story.
+
+#### Why both tracks
+- T-SAE has temporal contrastive baked in already; windowing it tests whether the temporal contrastive plus windowing is more than the sum of parts.
+- Vanilla SAE has nothing temporal; windowing it tests whether the windowed encoder ALONE (no contrastive) helps.
+- The two tracks are scientifically complementary — they isolate different sources of any windowing benefit.
+
+If both tracks improve over their T=1 anchors at T=2, that's a robust "windowing is a free win" result. If one improves and the other doesn't, that tells us where the benefit comes from. If neither improves, the windowing hypothesis is dead.
+
+#### Side track: orthogonal hill-climbing on TXC paper-faithful k=100
+
+Alongside the piggyback work, we have **TXC paper-faithful k=100 single feat 4563 = 58.47 align** — the strongest single-feature steerer of any arch. The user wants to push this number higher via:
+- k variants (k=20 currently running, k=10 / 30 / 75 / 150 next)
+- More training steps (60k, 100k)
+- Different hookpoints (resid_mid, ln1)
+
+Treat this as a parallel hill-climb that can interleave with the piggyback work.
+
 ### What the project is
 
 We have a Qwen-7B-Instruct base + PEFT-LoRA fine-tune (`andyrdt/Qwen2.5-7B-Instruct_bad-medical`) that exhibits emergent misalignment on medical-advice prompts. We're training Sparse Auto-Encoders / Crosscoders on its layer-15 residual stream and using their decoder rows to steer the model back toward alignment. We measure success via Wang et al. 2025's procedure (encoder Δz̄ → causal screen → strength sweep → 27-α frontier on top-3 finalists). Two metrics: alignment (0-100, by Gemini judge) and coherence (0-100). Higher = better. We want **single-feature alignment peak as high as possible while coh ≥ ~25**.
@@ -27,20 +74,39 @@ We have a Qwen-7B-Instruct base + PEFT-LoRA fine-tune (`andyrdt/Qwen2.5-7B-Instr
 
 **Goal: beat 58.47 single-feature align with coh ≥ 25.**
 
-### Hill-climbing plan (do these IN ORDER, one per fire if both GPUs busy)
+### Hill-climbing queue (suggested order; use judgment to reorder based on results)
 
-When you fire and both GPUs are busy, just check status, update synthesis, commit, and exit. When a GPU frees, launch the next on this list:
+When you fire and both GPUs are busy, just check status, update synthesis, commit, and exit. When a GPU frees, pick the next experiment from this queue. Reorder based on what you've learned — **don't run an obviously-doomed experiment** if a more promising direction has emerged.
 
-1. **TXC paper-faithful k=20** (currently running on h100_1, log `/root/em_features/logs/txc_paper_k20.log`). When DONE: pull results, update synthesis, decide based on outcome:
-   - If single-feat peak > 58.47 → try k=10 next (sparser direction, since k=20 helped)
-   - If single-feat peak > k=50's 51.98 but < 58.47 → try k=30 (between current and best)
-   - If worse than k=50 → stop sparse direction, jump to step 4
-2. **WindowedTSAE T=2 + mix + matryoshka** (currently on h100_2, log `/root/em_features/logs/wtsae_T2_mix_matr_30k.log`). When DONE: pull, update synthesis. The user wants to know whether matryoshka is additive on top of mix_positions.
-3. **TXC paper-faithful with longer training (60k or 100k steps) at k=100** — only if step-1 sparse direction stalled. The TXC arch's strongest single feature might keep improving with more steps.
-4. **TXC at different hookpoints** — `resid_mid` and `ln1_normalized`. We have OUR_SETTINGS results showing TXC @ resid_mid = 53.87 single-best, but with paper-faithful settings (BatchTopK + k=100 + d_sae=16k) at non-resid_post hookpoints it might find a feat as strong as 4563 or stronger. Run paper-faithful TXC k=100 30k @ resid_mid first, then ln1_normalized if resid_mid promising.
-5. **InfoNCE contrastive** for windowed_tsae — current contrastive is (1 − cos) which is not a true InfoNCE. Implementing real InfoNCE with random negatives might help windowing actually pay off. Lower priority than 1–4.
+#### Track A — T-SAE piggyback (windowed_tsae)
 
-When all of 1–5 are done, write a final synthesis section "Summary of overnight hill-climb" at the bottom of `overnight_synthesis.md` with the top 5 single-feature peaks across all runs.
+A1. **WindowedTSAE T=2 + mix + matryoshka** (currently on h100_2). Wait for completion. Decision tree:
+   - If bundle ≥ 56.23 OR single ≥ 56: T=2 with this fix WORKS. Ladder up to **T=3 + same fix**.
+   - If bundle < 56.23 and matryoshka added nothing on top of mix alone: matryoshka isn't helping. Try **T=2 + mix + alpha=0.5** (stronger contrastive) instead.
+   - If even mix+matryoshka under-performs original: something more fundamental is broken in our windowed encoder. Try **T=2 with shared W_dec across positions** (an arch change — implement and run).
+A2. **WindowedTSAE T=3** (only if A1 succeeded with a clean T=2 win)
+A3. **WindowedTSAE T=5** (only after A2 succeeds)
+A4. **InfoNCE contrastive** (lower priority — only if A1 hits a wall with cosine contrastive)
+
+#### Track B — vanilla SAE piggyback (NEW, not started)
+
+B1. **Train a "windowed vanilla SAE" T=2** — TopK encoder, NO contrastive loss, otherwise SAE-arditi-faithful settings (likely d_sae=32k, k=128 — verify by looking at the SAE arditi ckpt config). Use the windowed_tsae arch but set `--contrastive_alpha 0.0` to disable contrastive. Run 30k steps + Wang. Compare bundle peak vs SAE arditi 100k bundle (57.42).
+   - If bundle ≥ 57.42: vanilla-SAE windowing works → ladder to T=3.
+   - If bundle < 57.42: vanilla-SAE windowing alone doesn't help → either windowing requires contrastive (so T-SAE direction is the right path) or our windowed encoder design is fundamentally flawed.
+B2. **Windowed vanilla SAE T=3**, etc. — same ladder as Track A.
+
+#### Track C — TXC paper-faithful single-feature hill-climb (PARALLEL to A and B)
+
+C1. **TXC paper k=20** (currently on h100_1). When done, decide:
+   - If single-feat ≥ 58.47: sparse direction wins. Try **k=10** next.
+   - If 52 ≤ single-feat < 58.47: nonmonotonic curve. Try **k=30 or k=75** to find the optimum.
+   - If single-feat < 52: stop sparse direction, jump to C3.
+C2. (k=10 or k=30 per above outcome)
+C3. **TXC paper k=100 60k steps** — longer training at the sweet-spot k. Test if more compute pushes single-feature peak above 58.47.
+C4. **TXC paper k=100 30k @ resid_mid** — different hookpoint. Our existing TXC @ resid_mid (our-settings) was 53.87 single; paper-faithful settings might push higher.
+C5. **TXC paper k=100 30k @ ln1_normalized** — same idea but ln1.
+
+When all queued items are done OR you've concluded the directions are exhausted, write a final synthesis section "Summary of hill-climb session" at the bottom of `overnight_synthesis.md` with the top 5 single-feature peaks and the top 5 bundle peaks across all runs, plus a one-paragraph interpretation of which architectural choice mattered most.
 
 ### How to launch a TXC paper-faithful k-variant run
 
