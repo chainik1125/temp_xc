@@ -1,0 +1,8 @@
+# IT-side MLC family — Mission #2 (dense at canonical k_win=500).
+# Trained at b=4096 with PRELOAD_SEQS=6000 (deviation: paper canonical
+# is 24000, which doesn't fit on A40). Uses
+# PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid
+# fragmentation OOMs.
+mlc
+mlc_contrastive_alpha100_batchtopk
+agentic_mlc_08
