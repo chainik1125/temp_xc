@@ -100,12 +100,17 @@ The standard Wang `bundle k=30` headline metric is therefore biased toward arche
 
 Stage 2 causal screen (preliminary, before stage 3 strength sweep) shows **multiple low-Δz̄ high-causal features** at α=−1 already, several beating SAE arditi 100k bundle peak (57.42) at just α=−1:
 
-| feat | Δz̄ | screen score | α=+1 align | α=−1 align |
-|---:|---:|---:|---:|---:|
-| 15836 | +0.085 | +20.02 | 35.33 | 55.36 |
-| 3179  | +0.063 | +21.79 | 39.29 | **61.07** |
-| 10711 | +0.027 | +23.08 | 39.23 | **62.31** |
-| 8745  | +0.027 | +27.19 | 30.00 | 57.19 |
+| feat | Δz̄ | screen score | α=+1 align/coh | α=−1 align/coh |
+|---:|---:|---:|---|---|
+| 15836 | +0.085 | +20.02 | 35.33 / 23.12 | 55.36 / 26.56 |
+| 3179  | +0.063 | +21.79 | 39.29 / 23.44 | **61.07** / 29.69 |
+| 10711 | +0.027 | +23.08 | 39.23 / 23.75 | **62.31** / 27.19 |
+| 8745  | +0.027 | +27.19 | 30.00 / 22.50 | 57.19 / 27.19 |
+
+(Stage 2 uses only n=16 rollouts vs stage 4's n=64, so noise is roughly 2× higher.
+The standouts trade ~5–8 coh points to gain ~5 align points vs SAE arditi 100k
+peak (57.42 / 35.78). Stage 4 frontier with n=64 will give a more reliable
+estimate.)
 
 **feat 10711** at α=−1 hits 62.31 align — already higher than the prior champion's *peak* (SAE arditi 100k = 57.42 at α=−10) at 1/10th the steering magnitude. If the stage 3/4 frontier holds up, this is a major lift from the matryoshka/mixing fixes.
 
