@@ -148,6 +148,10 @@ Honest reading at this point:
 
 Files: `results_mattxc_s1/cell_delta_*/results.json`, `results_mattxc_s2/cell_delta_*/results.json`. Configs: `config_mattxc_s1.yaml`, `config_mattxc_s2.yaml`.
 
+## Open follow-ups
+
+- **Investigate the seed=2 δ=0.20 MatTXC collapse.** MatTXC reaches 98% (s=42) and 102% (s=1) of comp-0 ceiling at δ=0.20 but drops to 19% at s=2 (0.162). TXC at this same seed/cell is 0.135 — i.e. the *transformer* representation seems poorly extractable here, not just MatTXC. Worth checking: (a) is the seed=2 transformer's layer-1 component-0 direction substantially different in geometry (e.g. spread across more residual directions, weaker attention pattern)? (b) does increasing MatTXC's window size, k_total, or training steps recover the latent at this seed? (c) does a different probe layer (layer 2 or hook_resid_pre) help? Cached transformer at `results_seedvar_s2/cell_delta_0.2/transformer.pt`.
+
 ## Files
 
 - `config_tsae_paper.yaml` — minimal config with only T-SAE Paper arch
