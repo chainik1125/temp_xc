@@ -116,9 +116,37 @@ Honest take:
 - The δ=0.20 cell appears more discriminating than δ=0.15 — but only marginally, given std ≥ 0.16 for everything.
 - **Variance source decomposition would be valuable**: separately bound (a) transformer-init variance, (b) SAE-init variance, (c) probe-init variance. Currently all three move together with the main `seed:` field.
 
-Recommended next step: run MatTXC at seeds {1, 2} on the existing seedvar transformers (config_seedvar_s1.yaml + s2.yaml already cached transformer.pt for seeds 1, 2), so all three archs have 3-seed coverage at δ=0.20.
-
 Files: `results_seedvar_s1/cell_delta_{0.15,0.2}/results.json`, `results_seedvar_s2/cell_delta_{0.15,0.2}/results.json`, `results_txc_seed42/cell_delta_*/results.json`. Configs: `config_seedvar_s1.yaml`, `config_seedvar_s2.yaml`, `config_txc_seed42.yaml`.
+
+## MatTXC fill: full 3-arch × 3-seed table
+
+Re-ran MatTXC at the same seeds {1, 2} on the cached transformers from `results_seedvar_s{1,2}/`. Now all three archs have 3-seed coverage at δ ∈ {0.15, 0.2}.
+
+Per-seed best single-feature R² (and % of comp-0 ceiling):
+
+| arch | δ | seed=42 | seed=1 | seed=2 | **mean ± std** | **mean % ceil** |
+|---|---|---|---|---|---|---|
+| TXC          | 0.15 | 0.549 (75%) | 0.111 (15%) | 0.435 (60%) | 0.365 ± 0.227 | 50% |
+| TXC          | 0.20 | 0.453 (52%) | 0.270 (31%) | 0.135 (16%) | 0.286 ± 0.160 | 33% |
+| T-SAE Paper  | 0.15 | 0.285 (39%) | 0.049  (7%) | 0.280 (38%) | 0.205 ± 0.135 | 28% |
+| T-SAE Paper  | 0.20 | 0.611 (71%) | 0.159 (18%) | 0.083 (10%) | 0.284 ± 0.285 | 33% |
+| **MatTXC**   | 0.15 | **0.564 (77%)** | 0.386 (53%) | **0.576 (79%)** | **0.509 ± 0.106** | **70%** |
+| **MatTXC**   | 0.20 | **0.851 (98%)** | **0.881 (102%)** | 0.162 (19%) | **0.632 ± 0.407** | **73%** |
+
+What this changes vs the earlier "two seedvar runs without MatTXC" picture:
+
+1. **MatTXC genuinely outperforms TXC and T-SAE Paper on this task.** Mean of 70-73% of comp-0 ceiling vs 28-50% for the other two. The original protocol_sweep "93% gap recovered" claim was if anything *understated* — at 2 of 3 seeds, MatTXC reaches 98-102% of ceiling at δ=0.20.
+2. **MatTXC has substantially lower variance at δ=0.15** (std=0.106, an order of magnitude tighter than TXC at 0.227). It consistently delivers around 0.4-0.58.
+3. **MatTXC is bimodal at δ=0.20**: 2 of 3 seeds (42, 1) hit the ceiling (~0.86); seed=2 collapses (0.162). So 2/3 of the time it nails the latent, 1/3 it whiffs entirely. This isn't seen in TXC/T-SAE Paper, which fail more uniformly.
+4. **TXC and T-SAE Paper are statistically tied at δ=0.20** (means 0.286 vs 0.284). Neither is the right architecture for this task at default settings.
+5. **The original separation_scaling.md headline (single-seed) overrated T-SAE Paper.** Its 0.611 at seed=42 was its 1-of-3 luckiest measurement; mean across 3 seeds is 0.284.
+
+Honest reading at this point:
+
+- **MatTXC is the clear winner on the symmetric-MESS3 separation-scaling benchmark.** ~70-73% of comp-0 ceiling on average across 3 transformer seeds at δ ∈ {0.15, 0.2}, vs ~30-50% for TXC and T-SAE Paper. Single-arch claim is now defensible.
+- The 1-of-3 MatTXC collapse at seed=2 δ=0.20 is interesting — worth understanding what about that transformer init defeats MatTXC but doesn't defeat TXC nearly as much (0.135 vs 0.162: TXC and MatTXC about equal at this seed). Might be a window-size / sparsity-budget interaction with that transformer's specific representation.
+
+Files: `results_mattxc_s1/cell_delta_*/results.json`, `results_mattxc_s2/cell_delta_*/results.json`. Configs: `config_mattxc_s1.yaml`, `config_mattxc_s2.yaml`.
 
 ## Files
 

@@ -1,0 +1,90 @@
+{
+  "sweep_parameter": "delta",
+  "sweep_value": 0.15,
+  "generator_params": [
+    [
+      "component_type",
+      "process_name",
+      "process_params"
+    ],
+    [
+      "component_type",
+      "process_name",
+      "process_params"
+    ],
+    [
+      "component_type",
+      "process_name",
+      "process_params"
+    ]
+  ],
+  "transformer": {
+    "final_loss": 1.061488389968872,
+    "was_loaded": true,
+    "eval_resid_l2_mean": 13.286535263061523,
+    "config": {
+      "n_layers": 3,
+      "d_model": 64,
+      "n_heads": 2,
+      "d_head": 32,
+      "d_mlp": 256,
+      "n_ctx": 128,
+      "act_fn": "gelu",
+      "normalization_type": "LN",
+      "attention_dir": "causal",
+      "default_prepend_bos": false,
+      "init_mode": "gpt2",
+      "initializer_range": 0.001,
+      "probe_layer": 1,
+      "probe_hook_name": "blocks.1.hook_resid_post",
+      "extract_batch_size": 16,
+      "load_if_exists": true,
+      "training": {
+        "steps": 20000,
+        "batch_size": 128,
+        "lr": 0.001,
+        "data_chunks": 4,
+        "data_chunk_size": 5000
+      }
+    }
+  },
+  "dense_linear": null,
+  "dense_mlp": null,
+  "architectures": {
+    "MatTXC_batchtopk_k10": {
+      "best_single_r2": 0.3860175065814273,
+      "per_component_best_r2": [
+        0.3860175065814273,
+        0.06399550444935909,
+        0.1013092825891665
+      ],
+      "linear_mean_r2": 0.2926766571353236,
+      "linear_per_component_r2": [
+        0.6200295328517946,
+        0.07984086528310963,
+        0.17815957327106657
+      ],
+      "sae_final_loss": 116.45861053466797,
+      "family": "mattxc",
+      "config": {
+        "dict_size": 128,
+        "matryoshka_widths": [
+          8,
+          16,
+          32,
+          64,
+          128
+        ],
+        "k": 1,
+        "fixed_k_total": 10,
+        "inner_weight": 10.0,
+        "window_size": 60,
+        "temporal_steps": 1500,
+        "n_sequences": 400,
+        "seq_len": 128,
+        "sparsity_method": "batchtopk"
+      }
+    }
+  },
+  "cell_elapsed_sec": 79.56950902938843
+}
