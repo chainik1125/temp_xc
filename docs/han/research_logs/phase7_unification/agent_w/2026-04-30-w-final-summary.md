@@ -66,7 +66,11 @@ report both single-seed and multi-seed-pooled views.
 **Single-seed view (anchor=1.10)** — for the record, with the seed=42-only
 calls. Y's earlier framing was based on this:
 
-### Three findings W contributes (single-seed; multi-seed verify pending)
+### Four findings W contributes
+
+**0. The anchor itself is unstable seed-to-seed.** T-SAE k=20 under coh ≥ 1.5 is 1.10 at seed=42 and 0.30 at seed=1. The constraint kicks the peak to a different s_norm at seed=1 because the coherence-cliff falls earlier. Multi-seed-pooled anchor = 0.70, σ_anchor = 0.80. **The brief's pre-registered ±0.27 threshold is INSIDE the anchor's own seed-noise**, so meaningful calls require pooling. This is a methodological finding the paper should lead with.
+
+### W's architectural findings (with multi-seed support where available)
 
 1. **Cell C T=3 per-position has the highest raw peak of any matched-
    sparsity cell.** 1.500 vs Y's T=2 (1.30), T=5 (0.90). At sparse k_pos,
@@ -191,10 +195,29 @@ architecture is the lever (Y's headline; W's cell-C result confirms).
 
 ### Pending W work
 
-- [ ] Cell E per-position pipeline (~25 min from start)
-- [ ] Cell C T=3 seed=1 multi-seed verify (~110 min total: train + right-edge + per-position pipelines)
-- [ ] Final summary commit + push
-- [ ] Per-class breakdown of cell E once per-position lands
+- [x] Cell E per-position pipeline → 0.933 TIE single-seed
+- [x] Cell C T=3 seed=1 multi-seed verify → 0.783 (right-edge mean), 0.783 (per-position mean)
+- [x] Final summary commit + push (this file)
+- [ ] Cell E multi-seed (matryoshka seed=1) — would tighten the +0.233 single-seed TIE; ~95 min train (matry slow). Skipped due to budget.
+- [ ] Per-class breakdown of cell E once per-position lands — Y recommended; not yet done. Cheap (~5 min) — will add if time.
+
+### Overall handover state
+
+Phase 1 sweep: complete. Phase 2 axes 1, 3, 4 all explored. Multi-seed
+done for cells C T=3 (W) and Y's T=2, T=5 (Y). Cell E single-seed only.
+Combined with Y's matrix, 4 archs × 2 protocols × 2 seeds = 16 cells +
+single-seed Cell E × 2 protocols = 18 graded cells total. All committed.
+
+Recommended next steps for any continuing agent:
+1. Cell E seed=1 multi-seed (~95 min train + 50 min pipeline) — would
+   complete the 5-arch multi-seed matrix.
+2. Multi-seed plot regenerate with proper σ-pooled anchor at 0.70.
+3. T=2 + matryoshka multiscale at k_pos=20 (untested) — combines Y's
+   T=2 win with W's matryoshka per-position synergy. Predicted to
+   land at +0.40 above pooled anchor.
+4. Knowledge-class restricted concept set (per Y's earlier z-handoff) —
+   if matched-sparsity TXC wins on stylistic/sentiment under per-position,
+   does it also win on knowledge-only? Untested.
 
 ### Combined paper-narrative draft (W version)
 
