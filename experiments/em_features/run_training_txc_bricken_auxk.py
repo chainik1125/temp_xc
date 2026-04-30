@@ -55,6 +55,10 @@ def parse_args():
     p.add_argument("--d_sae", type=int, default=32768)
     p.add_argument("--T", type=int, default=5)
     p.add_argument("--k_total", type=int, default=128)
+    p.add_argument("--batch_topk", action="store_true",
+                   help="Use BatchTopK during training: global top-(B*k_total) "
+                        "across the (B, d_sae) pre-activation matrix instead "
+                        "of per-window top-k_total (Bhalla 2025 paper convention).")
     p.add_argument("--batch_size", type=int, default=256)
     p.add_argument("--lr", type=float, default=3e-4)
     p.add_argument("--bricken_resample_every", type=int, default=500)
@@ -172,9 +176,18 @@ def main():
 
         # Forward (live) + main recon loss.
         pre = _encode_pre_topk(txc, x)
-        topk_vals, topk_idx = pre.topk(args.k_total, dim=-1)
-        z_live = torch.zeros_like(pre)
-        z_live.scatter_(-1, topk_idx, topk_vals)
+        if args.batch_topk:
+            B_, D_ = pre.shape
+            budget = B_ * args.k_total
+            flat = pre.reshape(-1)
+            topk_vals, topk_idx = flat.topk(budget, sorted=False)
+            z_flat = torch.zeros_like(flat)
+            z_flat.scatter_(0, topk_idx, topk_vals)
+            z_live = z_flat.reshape(B_, D_)
+        else:
+            topk_vals, topk_idx = pre.topk(args.k_total, dim=-1)
+            z_live = torch.zeros_like(pre)
+            z_live.scatter_(-1, topk_idx, topk_vals)
         x_hat_live = _decode(txc, z_live)
         loss_main = (x - x_hat_live).pow(2).sum(dim=-1).mean()
 
@@ -274,6 +287,7 @@ def main():
                 "config": {
                     "d_in": d_model, "d_sae": args.d_sae, "T": args.T,
                     "k_total": args.k_total,
+                    "batch_topk": args.batch_topk,
                     "subject_model": cfg["subject_model"],
                     "layer": layer,
                     "hookpoint": args.hookpoint,

@@ -133,6 +133,17 @@ qwen_l15_txc_brickenauxk_a8_residmid_step20000.pt           (corrupt, partial wr
 qwen_l15_txc_brickenauxk_a8_100k_step{50000,60000,70000,80000,90000}.pt  (5 × 4.70 GB)
 ```
 
+**2026-04-29 (h100_1)** — paper-faithful TXC training needed disk:
+```
+qwen_l15_txc_brickenauxk_a8_residmid_step10000.pt   (14 GB)
+  └─ HF: dmanningcoe/temp-xc-em-features:txc/qwen_l15_txc_brickenauxk_a8_residmid_step10000.pt
+  └─ TXC brickenauxk @ resid_mid intermediate snapshot (10k/30k of the run that
+     produced the bundle peak align=53.87 in hookpoint_compare/txc_residmid_30k/)
+qwen_l15_txc_brickenauxk_a8_residmid_step20000.pt   (14 GB)
+  └─ HF: dmanningcoe/temp-xc-em-features:txc/qwen_l15_txc_brickenauxk_a8_residmid_step20000.pt
+  └─ TXC brickenauxk @ resid_mid intermediate snapshot (20k/30k of the same run)
+```
+
 ### Last verified
 
 2026-04-29 — repo size ≈ 230 GB across 50+ ckpts. Repo is **public** (no token needed to download).
