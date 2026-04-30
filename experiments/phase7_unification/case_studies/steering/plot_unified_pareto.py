@@ -170,10 +170,15 @@ def main():
         # Plot each arch's curve
         all_pts = []
         for (arch_id, proto), (s, succ, coh, n, label, color) in all_curves.items():
-            if proto != proto_filter: continue
+            # T-SAE k=20 has T=1: right-edge == per-position (trivially); show on both panels
+            if proto != proto_filter and arch_id != "tsae_paper_k20":
+                continue
             marker = "o" if proto == "right-edge" else "^"
+            display_label = label
+            if arch_id == "tsae_paper_k20" and proto_filter == "per-position":
+                display_label = f"{label} (T=1, RE=PP)"
             ax.plot(coh, succ, marker=marker, markersize=4, color=color, alpha=0.7,
-                    linewidth=1, label=f"{label} (n={n})")
+                    linewidth=1, label=f"{display_label} (n={n})")
             for ss, su, co in zip(s, succ, coh):
                 if su is not None and co is not None:
                     all_pts.append((co, su, label))

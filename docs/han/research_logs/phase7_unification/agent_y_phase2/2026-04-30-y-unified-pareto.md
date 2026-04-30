@@ -52,6 +52,16 @@ Two valid combinations — they diverge at the coh-cliff regime:
 The mean-curve approach is the standard reporting convention for this
 type of analysis. All numbers below use it.
 
+
+### T-SAE k=20 anchor across protocols
+
+T-SAE k=20 has T=1 — there's no window. Right-edge and per-position
+protocols are *the same* for T=1 (trivially: write at the only
+position). The anchor 1.10 (peak success at coh ≥ 1.5) applies to
+**both** protocols. The Pareto plot below shows the T-SAE k=20 curve
+on both panels for clarity (labeled "T=1, RE=PP" in the per-position
+panel).
+
 ### Headline ranking (peak success at coh ≥ 1.5)
 
 ![unified ranking](../../../../../experiments/phase7_unification/results/case_studies/plots/unified_ranking_matched_sparsity.png)
