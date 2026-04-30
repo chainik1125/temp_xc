@@ -1,0 +1,31 @@
+=== cache complete at Wed Apr 29 22:05:15 UTC 2026 ===
+total 13853864
+drwxrwxrwx 2 appuser appuser     3001320 Apr 29 22:05 .
+drwxrwxrwx 3 appuser appuser     3001320 Apr 29 21:50 ..
+-rw-rw-rw- 1 appuser appuser          23 Apr 29 22:05 .resid_L12.progress.json
+-rw-rw-rw- 1 appuser appuser         364 Apr 29 22:05 layer_specs.json
+-rw-rw-rw- 1 appuser appuser 14155776128 Apr 29 22:05 resid_L12.npy
+-rw-rw-rw- 1 appuser appuser    24576128 Apr 29 21:55 token_ids.npy
+
+=== launching Step 2 training (T=5, k_pos=20, seed=42) ===
+Phase 7 driver: /workspace/temp_xc/experiments/phase7_unification/case_studies/train_kpos20_hailmary.py
+  REPO:           /workspace/temp_xc
+  CACHE_DIR:      /workspace/temp_xc/data/cached_activations/gemma-2-2b/fineweb
+  PROBE_CACHE:    /workspace/temp_xc/experiments/phase7_unification/results/probe_cache
+  OUT_DIR:        /workspace/temp_xc/experiments/phase7_unification/results
+  INDEX_PATH:     /workspace/temp_xc/experiments/phase7_unification/results/training_index.jsonl
+  PROBING_PATH:   /workspace/temp_xc/experiments/phase7_unification/results/probing_results.jsonl
+  ANCHOR_LAYER:   L12 (0-indexed)
+  MLC_LAYERS:     (10, 11, 12, 13, 14)
+  SUBJECT_MODEL:  google/gemma-2-2b
+  HF_CKPT_REPO:   han1823123123/txcdr-base
+  HF_DATA_REPO:   han1823123123/txcdr-base-data
+
+=== Hail Mary cell: txc_bare_antidead_t5_kpos20 (T=5, k_pos=20, k_win=100) seed=42 ===
+/workspace/temp_xc/experiments/phase7_unification/_train_utils.py:59: UserWarning: The given NumPy array is not writable, and PyTorch does not support non-writable tensors. This means writing to this tensor will result in undefined behavior. You may want to copy the array to protect its data or make it writable before converting it to a tensor. This type of warning will be suppressed for the rest of this program. (Triggered internally at /pytorch/torch/csrc/utils/tensor_numpy.cpp:206.)
+  return torch.from_numpy(sub).to(device)
+  TrainCfg: batch=4096 lr=0.0003 max_steps=25000 plateau=0.02 min_steps=3000
+  preloading L12 anchor cache to GPU...
+    shape=(24000, 128, 2304) dtype=torch.float16 device=cuda:0 size=14.2 GB  (preload took 5.4s)
+  [save] txc_bare_antidead_t5_kpos20__seed42 → /workspace/temp_xc/experiments/phase7_unification/results/ckpts/txc_bare_antidead_t5_kpos20__seed42.pt
+  trained in 46.0 min total wall (final_step=3800, converged=True, plateau_last=0.01906028018817762)

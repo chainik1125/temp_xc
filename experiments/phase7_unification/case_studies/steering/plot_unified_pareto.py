@@ -1,0 +1,271 @@
+"""Unified Pareto frontier plot — all matched-sparsity archs (Y's + W's).
+
+For each arch + protocol, computes:
+  - Multi-seed mean of (success, coh) per s_norm, averaged across available seeds
+  - Pareto-optimal points across all archs at each strength
+
+Produces:
+  - Pareto plot (success vs coh) with all archs' (success, coh) points; upper envelope highlighted
+  - Bar plot of peak success at coh ≥ 1.5 vs anchor 1.10
+"""
+from __future__ import annotations
+
+import argparse
+import collections
+import json
+import os
+from pathlib import Path
+
+import matplotlib.pyplot as plt
+import numpy as np
+
+os.environ.setdefault("HF_HOME", "/workspace/hf_cache")
+
+BASE = Path("/workspace/temp_xc/experiments/phase7_unification/results/case_studies")
+ANCHOR_15 = 1.10  # T-SAE k=20 peak success at coh ≥ 1.5
+
+
+# Inventory: (arch_id, protocol_subdirs_per_seed, label, color)
+INVENTORY = [
+    # Anchor — single seed
+    ("tsae_paper_k20", "T-SAE k=20 (anchor)", "blue", [
+        ("steering_paper_normalised",         "right-edge", 42),
+    ]),
+    # Y — bare antidead (multi-seed)
+    ("txc_bare_antidead_t2_kpos20", "T=2 bare", "orange", [
+        ("steering_paper_normalised",                       "right-edge",   42),
+        ("steering_paper_normalised_seed1",                 "right-edge",   1),
+        ("steering_paper_normalised_seed2",                 "right-edge",   2),
+        ("steering_paper_window_perposition",               "per-position", 42),
+        ("steering_paper_window_perposition_seed1",         "per-position", 1),
+        ("steering_paper_window_perposition_seed2",         "per-position", 2),
+    ]),
+    ("txc_bare_antidead_t5_kpos20", "T=5 bare", "green", [
+        ("steering_paper_normalised",                       "right-edge",   42),
+        ("steering_paper_normalised_seed1",                 "right-edge",   1),
+        ("steering_paper_window_perposition",               "per-position", 42),
+        ("steering_paper_window_perposition_seed1",         "per-position", 1),
+    ]),
+    ("txc_bare_antidead_t5_kwin20", "T=5 bare k_win=20", "darkgreen", [
+        ("steering_paper_normalised",                       "right-edge",   42),
+        ("steering_paper_window_perposition",               "per-position", 42),
+    ]),
+    # Y — H8 multidistance shifts=(T,)
+    ("txc_h8_t2_kpos20_shifts2", "T=2 H8 shifts=(T,)", "red", [
+        ("steering_paper_normalised",                       "right-edge",   42),
+        ("steering_paper_normalised_seed1",                 "right-edge",   1),
+        ("steering_paper_normalised_seed2",                 "right-edge",   2),
+        ("steering_paper_window_perposition",               "per-position", 42),
+        ("steering_paper_window_perposition_seed1",         "per-position", 1),
+        ("steering_paper_window_perposition_seed2",         "per-position", 2),
+    ]),
+    ("txc_h8_t3_kpos20_shifts3", "T=3 H8 shifts=(T,)", "salmon", [
+        ("steering_paper_normalised",                       "right-edge",   42),
+        ("steering_paper_window_perposition",               "per-position", 42),
+    ]),
+    ("txc_h8_t5_kpos20_shifts5", "T=5 H8 shifts=(T,)", "darkred", [
+        ("steering_paper_normalised",                       "right-edge",   42),
+        ("steering_paper_normalised_seed1",                 "right-edge",   1),
+        ("steering_paper_window_perposition",               "per-position", 42),
+        ("steering_paper_window_perposition_seed1",         "per-position", 1),
+    ]),
+    # Y — grown chain
+    ("txc_bare_antidead_t3_kpos20_grownFromT2sd42", "T=3 grown", "purple", [
+        ("steering_paper_normalised",                       "right-edge",   42),
+        ("steering_paper_window_perposition",               "per-position", 42),
+    ]),
+    ("txc_bare_antidead_t5_kpos20_grownFromT2sd42", "T=5 grown direct", "violet", [
+        ("steering_paper_normalised",                       "right-edge",   42),
+        ("steering_paper_window_perposition",               "per-position", 42),
+    ]),
+    ("txc_bare_antidead_t4_kpos20_grownChainFromT3", "T=4 grown chain", "indigo", [
+        ("steering_paper_normalised",                       "right-edge",   42),
+        ("steering_paper_window_perposition",               "per-position", 42),
+    ]),
+    # Y — T-SAE warm-start
+    ("txc_bare_antidead_t2_kpos20_ws_tsae_encoder", "T=2 T-SAE warm-start", "gold", [
+        ("steering_paper_normalised",                       "right-edge",   42),
+        ("steering_paper_window_perposition",               "per-position", 42),
+    ]),
+    # W's cells
+    ("txc_bare_antidead_t3_kpos20", "T=3 bare (W's cell C)", "cyan", [
+        ("steering_paper_normalised",                       "right-edge",   42),
+        ("steering_paper_window_perposition",               "per-position", 42),
+    ]),
+    ("agentic_txc_02_kpos20", "T=5 matryoshka (W's cell E)", "teal", [
+        ("steering_paper_normalised",                       "right-edge",   42),
+        ("steering_paper_window_perposition",               "per-position", 42),
+    ]),
+]
+
+
+def get_curve_avg(arch_id, subdir_proto_seed_list):
+    """Group by protocol → average across seeds. Return {protocol: (s_arr, succ_arr, coh_arr, n_seeds)}."""
+    by_proto = collections.defaultdict(list)
+    for subdir, proto, sd in subdir_proto_seed_list:
+        path = BASE / subdir / arch_id / "grades.jsonl"
+        if not path.exists():
+            continue
+        rows = [json.loads(l) for l in path.open()]
+        by_s = collections.defaultdict(list)
+        for r in rows:
+            if r.get("success_grade") is None: continue
+            by_s[float(r.get("strength", 0))].append(r)
+        s_vals = sorted(by_s.keys())
+        succ = []
+        coh = []
+        for s in s_vals:
+            pairs = by_s[s]
+            ss = [p["success_grade"] for p in pairs if p.get("success_grade") is not None]
+            cs = [p.get("coherence_grade") for p in pairs if p.get("coherence_grade") is not None]
+            succ.append(np.mean(ss) if ss else None)
+            coh.append(np.mean(cs) if cs else None)
+        by_proto[proto].append((np.array(s_vals), np.array(succ), np.array(coh)))
+    out = {}
+    for proto, curves in by_proto.items():
+        # Align to first curve's s_vals
+        s_ref = curves[0][0]
+        succ_stack = []
+        coh_stack = []
+        for s, su, co in curves:
+            if len(s) == len(s_ref):
+                succ_stack.append(su)
+                coh_stack.append(co)
+        if not succ_stack: continue
+        out[proto] = (
+            s_ref,
+            np.mean(np.stack(succ_stack), axis=0),
+            np.mean(np.stack(coh_stack), axis=0),
+            len(succ_stack),
+        )
+    return out
+
+
+def main():
+    p = argparse.ArgumentParser()
+    p.add_argument("--out-dir", type=Path,
+                   default=Path("/workspace/temp_xc/experiments/phase7_unification/results/case_studies/plots"))
+    args = p.parse_args()
+    args.out_dir.mkdir(parents=True, exist_ok=True)
+
+    # Gather all (arch, protocol) curves
+    print(f"\n=== Gathering all matched-sparsity archs ===\n")
+    all_curves = {}  # (arch_id, proto) → (s, succ, coh, n_seeds, label, color)
+    for arch_id, label, color, subdir_list in INVENTORY:
+        curves = get_curve_avg(arch_id, subdir_list)
+        for proto, (s, succ, coh, n) in curves.items():
+            all_curves[(arch_id, proto)] = (s, succ, coh, n, label, color)
+            valid = [(ss, su, co) for ss, su, co in zip(s, succ, coh) if su is not None and co is not None]
+            valid_15 = [v for v in valid if v[2] >= 1.5]
+            peak15 = max(v[1] for v in valid_15) if valid_15 else None
+            peak_unc = max(v[1] for v in valid)
+            p15s = f"{peak15:.3f}" if peak15 is not None else "—"
+            print(f"  {label:30s} {proto:13s} (n={n}): peak_unc={peak_unc:.3f}, peak15={p15s}")
+
+    # ──────────────────── Pareto plot: all (success, coh) points across archs+strengths
+    fig, axes = plt.subplots(1, 2, figsize=(15, 6))
+
+    for proto_idx, proto_filter in enumerate(["right-edge", "per-position"]):
+        ax = axes[proto_idx]
+        # Plot each arch's curve
+        all_pts = []
+        for (arch_id, proto), (s, succ, coh, n, label, color) in all_curves.items():
+            if proto != proto_filter: continue
+            marker = "o" if proto == "right-edge" else "^"
+            ax.plot(coh, succ, marker=marker, markersize=4, color=color, alpha=0.7,
+                    linewidth=1, label=f"{label} (n={n})")
+            for ss, su, co in zip(s, succ, coh):
+                if su is not None and co is not None:
+                    all_pts.append((co, su, label))
+        # Pareto frontier (upper envelope: for each coh bin, max success)
+        # Bin coh into 0.1 bins
+        bins = np.arange(0.5, 3.2, 0.1)
+        bin_max = {}
+        for co, su, lab in all_pts:
+            b = round(co, 1)
+            if b not in bin_max or su > bin_max[b][0]:
+                bin_max[b] = (su, lab)
+        # Sort by coh, draw envelope
+        bins_sorted = sorted(bin_max.keys())
+        envelope_su = [bin_max[b][0] for b in bins_sorted]
+        ax.plot(bins_sorted, envelope_su, color="black", linewidth=2, linestyle="--",
+                label="Pareto envelope", alpha=0.6)
+        # Mark coh=1.5 threshold
+        ax.axvline(1.5, color="grey", linestyle=":", linewidth=0.8)
+        ax.text(1.51, 0.05, "coh=1.5", fontsize=8, color="grey")
+        # Mark anchor's peak15
+        ax.axhline(ANCHOR_15, color="blue", linestyle=":", linewidth=0.8, alpha=0.5)
+        ax.text(0.6, ANCHOR_15+0.02, f"T-SAE k=20 peak15={ANCHOR_15}", fontsize=8, color="blue")
+        ax.axhline(ANCHOR_15+0.27, color="green", linestyle=":", linewidth=0.8, alpha=0.5)
+        ax.text(0.6, ANCHOR_15+0.27+0.02, f"WIN threshold ({ANCHOR_15+0.27})", fontsize=8, color="green")
+        ax.set_xlabel("mean coherence")
+        ax.set_ylabel("mean success")
+        ax.set_title(f"{proto_filter} protocol")
+        ax.legend(fontsize=6, loc="upper left", framealpha=0.85, ncol=2)
+        ax.grid(True, alpha=0.3)
+        ax.set_xlim(0.6, 3.1)
+        ax.set_ylim(-0.05, 2.0)
+
+    fig.suptitle("Phase 7 Y+W matched-sparsity Pareto: success vs coherence (multi-seed averaged)\n"
+                 "All archs at k_pos=20 (or k_win=20 / k_pos=10 / k_win=200 wild variants)")
+    plt.tight_layout()
+    out = args.out_dir / "unified_pareto_matched_sparsity.png"
+    fig.savefig(out, dpi=150, bbox_inches="tight")
+    fig.savefig(args.out_dir / "unified_pareto_matched_sparsity.thumb.png", dpi=48, bbox_inches="tight")
+    plt.close(fig)
+    print(f"\nwrote {out}")
+
+    # ──────────────────── Summary bar plot: peak15 per arch+proto vs anchor
+    fig, ax = plt.subplots(figsize=(14, 6))
+    rows = []
+    for (arch_id, proto), (s, succ, coh, n, label, color) in all_curves.items():
+        valid = [(ss, su, co) for ss, su, co in zip(s, succ, coh) if su is not None and co is not None]
+        valid_15 = [v for v in valid if v[2] >= 1.5]
+        peak15 = max(v[1] for v in valid_15) if valid_15 else 0.0
+        rows.append((label, proto, peak15, n, color))
+    # Sort by peak15 descending
+    rows.sort(key=lambda r: r[2], reverse=True)
+    labels = [f"{r[0]} ({r[1]}, n={r[3]})" for r in rows]
+    peaks = [r[2] for r in rows]
+    colors = [r[4] for r in rows]
+    edgecolors = ["black" if r[1] == "per-position" else "grey" for r in rows]
+    bars = ax.barh(range(len(rows)), peaks, color=colors, edgecolor=edgecolors, linewidth=1)
+    ax.set_yticks(range(len(rows)))
+    ax.set_yticklabels(labels, fontsize=8)
+    ax.set_xlabel("peak success at coh ≥ 1.5")
+    ax.axvline(ANCHOR_15, color="blue", linestyle="--", linewidth=1, label=f"T-SAE k=20 anchor ({ANCHOR_15})")
+    ax.axvline(ANCHOR_15+0.27, color="green", linestyle="--", linewidth=1, label=f"WIN threshold ({ANCHOR_15+0.27})")
+    ax.axvline(ANCHOR_15-0.27, color="red", linestyle="--", linewidth=1, label=f"LOSS threshold ({ANCHOR_15-0.27})")
+    for i, (label, proto, peak, n, _) in enumerate(rows):
+        ax.text(peak + 0.02, i, f"{peak:.3f}", fontsize=7, va="center")
+    ax.set_title("Phase 7 Y+W matched-sparsity ranking — peak success at coh ≥ 1.5\n"
+                 "(black edges = per-position protocol; grey edges = right-edge)")
+    ax.legend(loc="lower right", fontsize=8)
+    ax.invert_yaxis()
+    ax.set_xlim(0, max(peaks) * 1.15 + 0.1)
+    plt.tight_layout()
+    out = args.out_dir / "unified_ranking_matched_sparsity.png"
+    fig.savefig(out, dpi=150, bbox_inches="tight")
+    fig.savefig(args.out_dir / "unified_ranking_matched_sparsity.thumb.png", dpi=48, bbox_inches="tight")
+    plt.close(fig)
+    print(f"wrote {out}")
+
+    # JSON dump
+    summary = []
+    for (arch_id, proto), (s, succ, coh, n, label, color) in all_curves.items():
+        valid = [(ss, su, co) for ss, su, co in zip(s, succ, coh) if su is not None and co is not None]
+        valid_15 = [v for v in valid if v[2] >= 1.5]
+        peak15 = max(v[1] for v in valid_15) if valid_15 else None
+        peak_unc = max(v[1] for v in valid)
+        summary.append({
+            "arch_id": arch_id, "label": label, "protocol": proto, "n_seeds": n,
+            "peak_unc": float(peak_unc), "peak_coh_ge_1_5": float(peak15) if peak15 else None,
+            "delta_vs_anchor": float(peak15 - ANCHOR_15) if peak15 else None,
+        })
+    out = args.out_dir / "unified_pareto_summary.json"
+    out.write_text(json.dumps(sorted(summary, key=lambda x: -(x["peak_coh_ge_1_5"] or 0)), indent=2))
+    print(f"wrote {out}")
+
+
+if __name__ == "__main__":
+    main()
