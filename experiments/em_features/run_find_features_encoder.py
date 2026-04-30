@@ -42,7 +42,7 @@ from experiments.em_features.architectures.txc_bare_multidistance_contrastive_an
 def parse_args():
     p = argparse.ArgumentParser()
     p.add_argument("--ckpt", type=Path, required=True)
-    p.add_argument("--arch", choices=["sae", "han", "tsae", "txc"], required=True)
+    p.add_argument("--arch", choices=["sae", "han", "tsae", "windowed_tsae", "txc"], required=True)
     p.add_argument("--hookpoint", default=None,
                    help="Override hookpoint (resid_post / resid_mid / ln1_normalized / resid_pre). "
                         "If omitted, falls back to ckpt config['hookpoint'] then resid_post.")
@@ -178,6 +178,20 @@ def main():
         sae.load_state_dict(ckpt["state_dict"])
         sae.eval()
         T = 1   # T-SAE encodes per-token at inference time
+    elif args.arch == "windowed_tsae":
+        from experiments.em_features.architectures.windowed_tsae import WindowedTSAE
+        sae = WindowedTSAE(
+            d_in=cfg["d_in"], d_sae=cfg["d_sae"], T=cfg["T"], k=cfg["k"],
+            contrastive_alpha=cfg.get("contrastive_alpha", 0.1),
+            n_temporal_features=cfg.get("n_temporal_features", None),
+            mix_positions=cfg.get("mix_positions", False),
+            aux_k=cfg.get("aux_k", 512),
+            dead_threshold_tokens=cfg.get("dead_threshold_tokens", 640_000),
+            auxk_alpha=cfg.get("auxk_alpha", 1.0 / 32.0),
+        ).to(args.device)
+        sae.load_state_dict(ckpt["state_dict"])
+        sae.eval()
+        T = 1   # per-token inference for finder/Wang/frontier compatibility
     elif args.arch == "txc":
         from sae_day.sae import TemporalCrosscoder
         sae = TemporalCrosscoder(
@@ -227,12 +241,12 @@ def main():
 
     # Encode through SAE/Han/T-SAE
     print("encoding base activations...", flush=True)
-    if args.arch in ("sae", "tsae"):  # per-token encoders
+    if args.arch in ("sae", "tsae", "windowed_tsae"):  # per-token encoders
         z_base = encode_sae(sae, base_resid, args.device)
     else:
         z_base = encode_han(sae, base_resid, T, args.device)
     print("encoding bad-medical activations...", flush=True)
-    if args.arch in ("sae", "tsae"):  # per-token encoders
+    if args.arch in ("sae", "tsae", "windowed_tsae"):  # per-token encoders
         z_bad = encode_sae(sae, bad_resid, args.device)
     else:
         z_bad = encode_han(sae, bad_resid, T, args.device)

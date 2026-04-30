@@ -42,7 +42,7 @@ for p in (str(VENDOR_SRC), str(REPO_ROOT)):
 def parse_args():
     p = argparse.ArgumentParser()
     p.add_argument("--ckpt", type=Path, required=True)
-    p.add_argument("--arch", choices=["sae", "han", "tsae", "txc"], required=True)
+    p.add_argument("--arch", choices=["sae", "han", "tsae", "windowed_tsae", "txc"], required=True)
     p.add_argument("--features_json", type=Path, required=True,
                    help="Output of run_find_features_encoder (top-200 by Δz̄).")
     p.add_argument("--layer", type=int, required=True)
@@ -130,6 +130,21 @@ def load_steerer_decoder_row(arch: str, ckpt_path: Path, feature_id: int, device
         sae.load_state_dict(ckpt["state_dict"])
         sae.eval()
         return sae.W_dec[feature_id].detach().clone()
+    elif arch == "windowed_tsae":
+        from experiments.em_features.architectures.windowed_tsae import WindowedTSAE
+        m = WindowedTSAE(
+            d_in=cfg["d_in"], d_sae=cfg["d_sae"], T=cfg["T"], k=cfg["k"],
+            contrastive_alpha=cfg.get("contrastive_alpha", 0.1),
+            n_temporal_features=cfg.get("n_temporal_features", None),
+            mix_positions=cfg.get("mix_positions", False),
+            aux_k=cfg.get("aux_k", 512),
+            dead_threshold_tokens=cfg.get("dead_threshold_tokens", 640_000),
+            auxk_alpha=cfg.get("auxk_alpha", 1.0 / 32.0),
+        ).to(device)
+        m.load_state_dict(ckpt["state_dict"])
+        m.eval()
+        # W_dec is (T, d_sae, d_in); use last-position decoder (matches TXC convention)
+        return m.W_dec[-1, feature_id, :].detach().clone()
     else:
         m = TXCBareMultiDistanceContrastiveAntidead(
             d_in=cfg["d_in"], d_sae=cfg["d_sae"], T=cfg["T"], k=cfg["k"],

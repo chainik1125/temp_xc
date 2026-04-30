@@ -46,6 +46,9 @@ from experiments.em_features.streaming_buffer import (  # noqa: E402
 from experiments.em_features.architectures.tsae_adjacent_contrastive import (  # noqa: E402
     TSAEAdjacentContrastive,
 )
+from experiments.em_features.architectures.windowed_tsae import (  # noqa: E402
+    WindowedTSAE,
+)
 from experiments.em_features.hf_upload import upload_if_enabled  # noqa: E402
 
 
@@ -63,6 +66,16 @@ def parse_args():
                    help="Bhalla 2025 paper default: 0.1")
     p.add_argument("--batch_topk", action="store_true",
                    help="Use BatchTopK during training (Bhalla 2025 paper default).")
+    p.add_argument("--arch", choices=["tsae", "windowed_tsae"], default="tsae",
+                   help="Architecture: tsae (per-token + adjacency contrastive, "
+                        "default) or windowed_tsae (lifts T-SAE to T-token window "
+                        "with optional cross-position mixing).")
+    p.add_argument("--mix_positions", action="store_true",
+                   help="(windowed_tsae only) Learn a (T, T) cross-position mixing matrix.")
+    p.add_argument("--n_temporal_features", type=int, default=None,
+                   help="(windowed_tsae only) First N features participate in the "
+                        "adjacency contrastive loss (Bhalla 2025 matryoshka split). "
+                        "Default: all d_sae.")
     p.add_argument("--auxk_alpha", type=float, default=1.0/32.0)
     p.add_argument("--aux_k", type=int, default=512)
     p.add_argument("--dead_threshold_tokens", type=int, default=640_000)
@@ -118,16 +131,32 @@ def main():
     sample_fn = buffer.sample_flat                              # (B, d) — for probing
     pair_sample_fn = lambda B: buffer.sample_txc_windows(B, args.T)  # (B, T, d) — windowed for contrastive
 
-    sae = TSAEAdjacentContrastive(
-        d_in=d_model, d_sae=args.d_sae, k=args.k,
-        contrastive_alpha=args.contrastive_alpha,
-        batch_topk=args.batch_topk,
-        aux_k=args.aux_k,
-        dead_threshold_tokens=args.dead_threshold_tokens,
-        auxk_alpha=args.auxk_alpha,
-    ).to(args.device)
-    print(f"T-SAE: d_sae={args.d_sae} k={args.k} T={args.T} α_contrast={args.contrastive_alpha} "
-          f"batch_topk={args.batch_topk}", flush=True)
+    if args.arch == "tsae":
+        sae = TSAEAdjacentContrastive(
+            d_in=d_model, d_sae=args.d_sae, k=args.k,
+            contrastive_alpha=args.contrastive_alpha,
+            batch_topk=args.batch_topk,
+            aux_k=args.aux_k,
+            dead_threshold_tokens=args.dead_threshold_tokens,
+            auxk_alpha=args.auxk_alpha,
+        ).to(args.device)
+        print(f"T-SAE: d_sae={args.d_sae} k={args.k} T={args.T} "
+              f"α_contrast={args.contrastive_alpha} batch_topk={args.batch_topk}",
+              flush=True)
+    else:  # windowed_tsae
+        sae = WindowedTSAE(
+            d_in=d_model, d_sae=args.d_sae, T=args.T, k=args.k,
+            contrastive_alpha=args.contrastive_alpha,
+            n_temporal_features=args.n_temporal_features,
+            mix_positions=args.mix_positions,
+            aux_k=args.aux_k,
+            dead_threshold_tokens=args.dead_threshold_tokens,
+            auxk_alpha=args.auxk_alpha,
+        ).to(args.device)
+        print(f"Windowed-T-SAE: d_sae={args.d_sae} k={args.k} T={args.T} "
+              f"α_contrast={args.contrastive_alpha} mix_positions={args.mix_positions} "
+              f"n_temporal_features={sae.n_temporal_features}",
+              flush=True)
 
     start_step = 0
     rckpt = None
@@ -217,10 +246,13 @@ def main():
                 },
                 "steps_trained": current_step,
                 "config": {
-                    "arch": "tsae_adjacent_contrastive",
+                    "arch": ("tsae_adjacent_contrastive" if args.arch == "tsae"
+                             else "windowed_tsae"),
                     "d_in": d_model, "d_sae": args.d_sae, "k": args.k, "T": args.T,
                     "contrastive_alpha": args.contrastive_alpha,
                     "batch_topk": args.batch_topk,
+                    "mix_positions": args.mix_positions if args.arch == "windowed_tsae" else False,
+                    "n_temporal_features": (sae.n_temporal_features if args.arch == "windowed_tsae" else None),
                     "aux_k": args.aux_k, "auxk_alpha": args.auxk_alpha,
                     "dead_threshold_tokens": args.dead_threshold_tokens,
                     "subject_model": cfg["subject_model"],
