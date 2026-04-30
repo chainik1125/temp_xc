@@ -13,7 +13,28 @@ tags:
 > will be filled in as pipelines complete. This is a *living* writeup until all 4 cells
 > finish.
 
-### TL;DR — UPDATED again after Y's multi-seed caution (commit 36ccec4a)
+### TL;DR — FINAL after multi-seed pooling + anchor-σ discovery (commit dceb18b1)
+
+**Headline result**: At matched per-token sparsity (k_pos=20), on the
+brief's primary metric (peak success at coherence ≥ 1.5,
+family-normalised paper-clamp), TXC matched-sparsity cells **TIE or
+BEAT** T-SAE k=20's multi-seed-pooled anchor (0.70) across the entire
+matrix. T=2 cells WIN by Δ ≥ 0.27 (right-edge +0.367; per-position
++0.417). T=3, T=5, and T=5 matryoshka cells TIE.
+
+**Critical methodological finding underlying the headline**: T-SAE k=20's
+constrained-metric anchor is itself NOT seed-stable. seed=42 anchor =
+1.10, seed=1 anchor = 0.30 (the constraint kicks the peak back to a
+different s_norm at seed=1 where the coherence-cliff falls earlier).
+σ_anchor = 0.80 — the largest σ in the matrix. The brief's
+pre-registered ±0.27 threshold is INSIDE the anchor's own seed-noise.
+
+The honest paper narrative is conditional on this: under the constrained
+metric, TXC family at matched per-token sparsity is at least as good as
+T-SAE k=20, but the comparison is fragile because the anchor's
+coherence-cliff position varies seed-to-seed.
+
+### TL;DR (intermediate, single-seed only — kept for record)
 
 **Single-seed picture (seed=42, all my numbers + Y's first round)**: under family-
 normalised paper-clamp + per-position write-back (Q2.C), all 3 trained matched-
