@@ -96,25 +96,29 @@ The two architectures behave oppositely under the same Wang procedure top-30 lis
 
 The standard Wang `bundle k=30` headline metric is therefore biased toward arches with redundant features. **For TXC, single-feature steering or `bundle k=5` is the appropriate metric.**
 
-### Mid-flight standout: WindowedTSAE T=2 + mix_positions=True (in progress on h100_1)
+### Key result 5: WindowedTSAE T=2 + mix_positions=True — partial recovery, not enough
 
-Stage 2 causal screen (preliminary, before stage 3 strength sweep) shows **multiple low-Δz̄ high-causal features** at α=−1 already, several beating SAE arditi 100k bundle peak (57.42) at just α=−1:
+Stage 2 causal screen had shown several low-Δz̄ features at α=−1 hitting **align ≥ 60** (feat 10711=62.31, feat 3179=61.07). Those did not survive the n=64 stage-4 estimator.
 
-| feat | Δz̄ | screen score | α=+1 align/coh | α=−1 align/coh |
-|---:|---:|---:|---|---|
-| 15836 | +0.085 | +20.02 | 35.33 / 23.12 | 55.36 / 26.56 |
-| 3179  | +0.063 | +21.79 | 39.29 / 23.44 | **61.07** / 29.69 |
-| 10711 | +0.027 | +23.08 | 39.23 / 23.75 | **62.31** / 27.19 |
-| 8745  | +0.027 | +27.19 | 30.00 / 22.50 | 57.19 / 27.19 |
+**Bundle k=30 peak: 55.57 align at α=−10, coh=32.58** (α=0 baseline 41.53, lift +14.04).
+Stage 4 finalists:
 
-(Stage 2 uses only n=16 rollouts vs stage 4's n=64, so noise is roughly 2× higher.
-The standouts trade ~5–8 coh points to gain ~5 align points vs SAE arditi 100k
-peak (57.42 / 35.78). Stage 4 frontier with n=64 will give a more reliable
-estimate.)
+| feat | Δz̄ | peak α | peak align | peak coh |
+|---|---:|---:|---:|---:|
+|  8017 | +0.02 | −6   | **54.58** | 28.05 |
+|  9925 | +0.02 | −1.25 | 50.00 | 24.53 |
+| 14475 | +0.03 | +8   | 51.45 | 24.53 |
 
-**feat 10711** at α=−1 hits 62.31 align — already higher than the prior champion's *peak* (SAE arditi 100k = 57.42 at α=−10) at 1/10th the steering magnitude. If the stage 3/4 frontier holds up, this is a major lift from the matryoshka/mixing fixes.
+**Vs T-SAE T=1 paper-faithful (bundle 56.23, single 56.23 via finalist):** still under by ~0.7 bundle / ~1.5 single.
+**Vs original wtsae_T2 (no-mix) (bundle 51.27, single 55.44):** mix_positions = +4.30 bundle, −0.86 single.
 
-Awaiting stage 3 strength sweep + stage 4 frontier on these finalists. **Will update once Wang procedure completes.**
+`mix_positions=True` learns a (T,T) mixing matrix M after the per-position W_enc, before TopK. So the encoder finally USES cross-position information. The bundle improvement (+4.30) confirms hypothesis from key result 3: the original windowed encoder was just per-token T-SAE with split decoders, and mixing makes it actually multi-position. Sign convention also normalized — mix run's best finalist peaks at α=−6 (the conventional "negative steering = align" direction), while no-mix peaked at α=+10/+3 (likely a direction-flip artifact of unutilized W_dec[1]).
+
+But the absolute level still does not beat T-SAE T=1 paper (56.23 bundle), so per the brief's decision rule we should NOT ladder up to T=3 with this exact config. Hypothesis: per-position decoder W_dec[T,d_sae,d_in] is still under-trained at T=2 because each position only sees half the gradient. Two natural follow-ups (in priority order):
+
+1. **WindowedTSAE T=2 + mix + matryoshka (running on h100_2 per handoff snapshot)** — matryoshka concentrates contrastive on first 20% of d_sae, which could over-train the high-priority features. Not yet pulled (no h100_2 access from this routine).
+2. **WindowedTSAE T=2 + mix + shared W_dec across positions** — directly fixes the per-position-decoder under-training problem. Architectural change, requires code edit.
+3. **WindowedTSAE T=2 + mix + larger contrastive_alpha (0.5 instead of 0.1)** — cheap variant to test if stronger contrastive helps the windowed encoder.
 
 ### Headline (revised given the bundle-size results)
 
@@ -146,4 +150,14 @@ The standard `bundle k=30` metric undersells TXC by 7+ align points because of t
 
 ### Files
 
-Per-variant `wang_*` dirs and `*_bundle*_frontier.json` are committed in `docs/dmitry/results/em_features/hookpoint_compare/txc_paper_k{50,100,200}_30k/`. T-SAE bundle sweep results (k=1, 5, 10) on host h100_1, will be pulled in when done.
+Per-variant `wang_*` dirs and `*_bundle*_frontier.json` are committed in `docs/dmitry/results/em_features/hookpoint_compare/txc_paper_k{50,100,200}_30k/` and `wtsae_T2_30k/`, `wtsae_T2_mix_30k/`. T-SAE bundle sweep results (k=1, 5, 10) on host h100_1, will be pulled in when done.
+
+### 2026-04-30 23:00 UTC routine-firing update
+
+**In-flight at this firing:**
+- h100_1: TXC paper-faithful k=20 Wang procedure on stage 3 causal screen, ~96/100 features. Stage 4 (3 finalists × 27 alphas × 8 rollouts) still ahead. ETA ~1-2 h.
+- h100_2: WindowedTSAE T=2 + mix + matryoshka (per handoff snapshot). Cannot ssh from this routine to verify; should be at or past Wang completion by wall-clock estimate.
+
+**Disk on h100_1:** 8.3 GB free of 200 GB (96% used). Below the 10 GB threshold. New training launches are blocked until either (a) k=20 Wang completes and the resulting ckpt is freed/HF-mirrored, or (b) an existing HF-mirrored ckpt is cleaned up. **Will not launch any new run this firing.**
+
+**Decision:** wait for the in-flight TXC k=20 Wang to finish. Once that lands the next move is dictated by (a) the k=20 single-peak result for Track C, and (b) whether h100_2's mix+matr beat 56.23 bundle for Track A. If both have completed by next firing, the cleanup-then-launch can begin.
