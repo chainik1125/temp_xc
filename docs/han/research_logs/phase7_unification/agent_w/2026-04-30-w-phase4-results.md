@@ -17,10 +17,12 @@ tags:
 > **Three findings emerged**:
 > 1. At pre-registered coh ≥ 1.5, no single TXC protocol cleanly beats
 >    T-SAE k=20 in same-pod multi-seed mean (all in TIE band, sd=42 dependency).
-> 2. **At stricter coh ≥ 2.0, V5 (Δ=+0.28) and V6 (Δ=+0.48) cleanly beat
->    T-SAE.** Different metric, different story.
+> 2. **At Y's GIGABRAIN-reframed coh ≥ 1.75 metric, V3 dec-additive cleanly
+>    wins n=2 by Δ=+0.700**, V6 dec-broadcast by Δ=+0.433. At coh ≥ 2.0,
+>    V5 left-edge wins by Δ=+0.283 and V6 by Δ=+0.483. **All three new
+>    protocols cross +0.27 at non-prereg coh thresholds**.
 > 3. V5 left-edge has highest single-seed cliff (1.367 at sd=1) and is the
->    most-promising single protocol for TXC steering.
+>    most-coherence-stable single protocol for TXC steering.
 
 ### TL;DR — same-pod sd=1+sd=2 multi-seed matrix on OBLITERATION
 
@@ -170,23 +172,38 @@ harmful_content (−3.0), helpfulness_marker (−2.0), question_form (−1.0).
 ### Coherence-threshold sensitivity — the trade-off curve
 
 The pre-registered metric (coh ≥ 1.5) is fragile because the cliff
-position depends on a 0.03-coh fluctuation. Alternative thresholds:
+position depends on a 0.03-coh fluctuation. The complete coh-threshold
+sweep on OBLITERATION (mean-curve, sd=1+sd=2 only — same-pod n=2):
 
-| metric | T-SAE k=20 | V5 left-edge | V6 dec-broadcast |
-|---|---|---|---|
-| cliff @ coh ≥ 1.0 | 1.800 | 1.233 | 1.567 |
-| cliff @ coh ≥ 1.5 (pre-reg) | 1.167 | 0.567 | 0.767 |
-| cliff @ coh ≥ 2.0 | 0.283 | **0.567 ⭐** | **0.767 ⭐⭐** |
-| unconstrained peak | 1.800 | 1.267 | 1.567 |
+| protocol | n | @1.0 | **@1.5** (prereg) | **@1.75** (Y's headline) | **@2.0** | unconst | Δ@1.5 | Δ@1.75 | Δ@2.0 |
+|---|---|---|---|---|---|---|---|---|---|
+| T-SAE k=20 anchor | 2 | 1.800 | 1.167 | 0.333 | 0.283 | 1.800 | — | — | — |
+| right-edge | 2 | 1.350 | 1.220 | 0.533 | 0.533 | 1.350 | +0.053 | +0.200 | **+0.250** |
+| per-position | 2 | 1.350 | 0.700 | 0.700 | 0.383 | 1.350 | −0.467 | **+0.367** | +0.100 |
+| **V3 dec-additive** | 2 | 1.150 | 1.033 | **1.033 ⭐⭐** | 0.367 | 1.150 | −0.133 | **+0.700** | +0.083 |
+| V5 left-edge | 2 | 1.233 | 0.567 | 0.567 | **0.567 ⭐** | 1.267 | −0.600 | +0.233 | **+0.283** |
+| **V6 dec-broadcast** | 2 | **1.567** | 0.767 | **0.767 ⭐** | **0.767 ⭐⭐⭐** | 1.567 | −0.400 | **+0.433** | **+0.483** |
 
-T-SAE wins at loose coherence (its 1.800 unconstrained peak is at coh=1.4).
-**TXC OBLITERATION wins at strict coherence**: V5 lifts +0.28 at coh ≥ 2.0;
-V6 dec-broadcast lifts +0.48 — bigger than the +0.27 win threshold.
+(Anchor T-SAE k=20 mean-curve sd42+sd1 right-edge. Threshold for WIN: +0.27. ⭐ = clean win.)
 
-This is a genuinely structural finding: **TXC produces more coherent
-steering across its strength schedule**. T-SAE achieves higher peak
-success but only at incoherent strengths. Under strict-coherence
-requirements (where coh ≥ 2.0 = "mostly coherent text"), TXC dominates.
+**Key result**: At Y's GIGABRAIN-reframed coh thresholds (≥ 1.75 and ≥ 2.0),
+**V3 dec-additive (Δ=+0.700 @ coh ≥ 1.75)**, **V6 dec-broadcast
+(Δ=+0.483 @ coh ≥ 2.0)**, and **V5 left-edge (Δ=+0.283 @ coh ≥ 2.0)** all
+cleanly beat the +0.27 win threshold. Each protocol has a different
+optimal coh threshold:
+
+- V3 dec-additive: best at coh ≥ 1.75 (Δ=+0.700) — the "high-quality
+  steering at near-mostly-coherent text" cell.
+- V5 left-edge: best at coh ≥ 2.0 (Δ=+0.283) — gentle write at left edges.
+- V6 dec-broadcast: best at coh ≥ 2.0 (Δ=+0.483) — the "strict coherence"
+  protocol; lowest variance.
+
+This complements Y's existing OBLITERATION numbers (right-edge n=3 @ coh ≥ 1.75 = 1.236, Δ=+0.902) — different protocols dominate at different coh thresholds.
+
+This is a genuinely structural finding: **TXC's window architecture
+admits a FAMILY of steering protocols, each with its own success-coherence
+trade-off.** T-SAE has only one possible protocol (right-edge collapses to
+T=1) and achieves higher peak success but only at incoherent strengths.
 
 ### Honest paper claim
 
