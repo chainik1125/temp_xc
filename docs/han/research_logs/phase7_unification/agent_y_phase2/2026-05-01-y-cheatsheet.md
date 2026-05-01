@@ -55,20 +55,21 @@ way. The strongest WIN is at coh ≥ 1.75 under both reductions.
 2. **TXC's window encoder distributes the steering signal** across T
    tokens. At moderate strength, TXC produces COHERENT text that
    contains the concept.
-3. **Cross-cell consistency**: at coh ≥ 1.75, **8 multi-seed TXC cells
-   beat anchor by Δ > +0.27**:
-   - T=2 H8 RE 3sd:        Δ = +0.902 ⭐ (3-seed verified)
-   - **T=3 grown RE 3sd:    Δ = +0.889 ⭐ (3-seed verified)**
+3. **Cross-cell consistency**: at coh ≥ 1.75, **9 multi-seed TXC cells
+   beat anchor by Δ > +0.27** (4 of them 3-seed verified):
+   - T=2 H8 RE 3sd:         Δ = +0.906 ⭐ (3-seed verified)
+   - T=3 grown RE 3sd:      Δ = +0.889 ⭐ (3-seed verified)
    - T-SAE WS PP 2sd:       Δ = +0.817
    - T=5 H8 PP 2sd:         Δ = +0.733
    - T-SAE WS RE 2sd:       Δ = +0.650
-   - T=2 bare PP 3sd:       Δ = +0.644
-   - T=2 bare RE 3sd:       Δ = +0.622
-   - T=2 H8 PP 3sd:         Δ = +0.278 (just above threshold)
+   - T=2 bare PP 3sd:       Δ = +0.644 (3-seed verified)
+   - T=2 bare RE 3sd:       Δ = +0.622 (3-seed verified)
+   - T=3 grown PP 3sd:      Δ = +0.606 (3-seed verified)
+   - T=2 H8 PP 3sd:         Δ = +0.278 (3-seed verified, just above)
    
    Robust effect across multiple architectures (H8, bare, grown,
    T-SAE warm-start) and multiple protocols (right-edge, per-position).
-   **Two 3-seed verified WINs** with Δ > +0.88 (T=2 H8 RE, T=3 grown RE).
+   **Four 3-seed verified WINs** at Δ > +0.27.
 
 ### Bootstrap uncertainty
 
