@@ -369,6 +369,10 @@ def _load_phase7_model(meta: dict, ckpt_path: Path, device) -> tuple:
             matryoshka_h_size=int(d_sae * 0.2),
             alpha=float(meta.get("alpha") if meta.get("alpha") is not None else 1.0),
         ).to(device)
+    elif src_class == "TXCLogSumExpPool":
+        # Galaxy 20 (Y, 2026-05-01): LogSumExp pool — different smooth-max.
+        from src.architectures.txc_lse_pool import TXCLogSumExpPool
+        model = TXCLogSumExpPool(d_in, d_sae, int(meta["T"]), int(meta["k_win"])).to(device)
     else:
         raise ValueError(f"unknown src_class={src_class}")
 
