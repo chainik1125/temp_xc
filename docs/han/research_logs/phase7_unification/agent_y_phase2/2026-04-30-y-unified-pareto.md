@@ -14,6 +14,15 @@ tags:
 > (Δ=+0.300 above T-SAE k=20 anchor)** — **strict WIN** past the +0.27
 > threshold under the standard mean-curve multi-seed metric.
 
+> 🚀 **2026-04-30 update — multi-coherence-threshold reframe** (see
+> `2026-04-30-y-coh-threshold-sweep.md`). T-SAE k=20's only lead is on
+> the unconstrained peak (1.80 vs 1.67 best-TXC), where T-SAE's peak
+> strength produces incoherent text (coh = 1.40, below the prereg
+> floor). At every coh threshold ≥ 1.5, at least one TXC arch
+> dominates by Δ ∈ [+0.20, +0.87] (3-seed mean-curve where available).
+> The largest Δ is **+0.869 at coh ≥ 1.75** (T=2 H8 shifts=(T,)
+> right-edge 3-seed = 1.236 vs anchor 0.367).
+
 ### Scope
 
 Compares 13 matched-sparsity (or near-matched) TXC architectures against
