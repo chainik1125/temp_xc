@@ -381,3 +381,56 @@ The 70.77 (feat 5671, 3/27 valid) and 71.25 (feat 3824, 12/27 valid) numbers are
 - **h100_1 GPU is now free.** Disk has been cleaned (50 GB available). Launch the next priority experiment: Track E1 (TXC T=2 arditi-matched, d_sae=32768, k=128, batch=256, lr=3e-4, per-window TopK, 100k steps). This is the cleanest test of "TXC architecture (per-position W_enc summing into one window-z) on top of the arditi recipe that produced the strongest bundle (57.42)". Per the brief the launcher block targets h100_2, but h100_2 is busy with Track D D2 — adapting to launch on h100_1 now.
 - **h100_2 still busy with Track D D2** (TXC k=100 + adjacency contrastive alpha=0.1, step ~13500/30000). ETA training done in ~1.5h, then ~2h Wang. Will check on next firing.
 
+
+### 2026-05-01 10:00 UTC — Track D D2 result: TXC + adjacency contrastive (α=0.1, 30k) is essentially a wash
+
+TXC paper-faithful k=100 (d_sae=16384, k_total=100, T=5, BatchTopK ON, batch=512, lr=3e-4, hookpoint=resid_post) trained for 30k steps with **adjacency contrastive loss** added: sample two windows with stride=1 from the buffer (overlapping in T−1=4 tokens), encode both, add `α · (1 − cos(z₁, z₂)).mean()` with α=0.1 to the standard reconstruction + auxk loss. This is the natural window-level analog of T-SAE's per-token z_t-vs-z_{t+1} contrastive — applied to TXC's window-z representation.
+
+**Bundle k=30 frontier — top 5**
+
+| α     | align | coh   |
+| ----- | ----- | ----- |
+| −2.00 | **52.60** | 23.28 |
+| −1.75 | 50.34 | 22.89 |
+| +1.25 | 47.50 | 24.69 |
+| −1.50 | 47.23 | 23.12 |
+| −3.00 | 47.18 | 22.81 |
+| α=0   | 42.68 | 25.16 |
+
+**Stage 4 single-feature peaks**
+
+| feat  | Δz̄    | peak α | align    | coh   | α=0 align | valid rows |
+| ----- | ----- | ------ | -------- | ----- | --------- | ---------- |
+| 5547  | +0.29 | −8.00  | **57.54** | 32.19 | 44.00 | 27/27 |
+| 4971  | +0.30 | −10.00 | 56.88    | 29.69 | 40.03 | 27/27 |
+| 3926  | +1.08 | +1.25  | 53.55    | 24.45 | 44.00 | 27/27 |
+
+**Comparison with TXC paper k=100 30k anchor (no contrastive)**
+
+| metric                | anchor (no contrastive) | + adj-contrastive α=0.1 | Δ      |
+| --------------------- | ----------------------- | ----------------------- | ------ |
+| bundle k=30 peak (align) | 50.89 (α=−2) | 52.60 (α=−2) | +1.71  |
+| best single-feat peak (align) | 58.47 (feat 4563, α=−8) | 57.54 (feat 5547, α=−8) | −0.93  |
+| best single-feat peak (coh)   | 30.86 | 32.19 | +1.33 |
+
+Note: feat 4563 (the 58.47 champion at k=100 anchor) does NOT appear in the top-3 finalists here — the contrastive has rotated the encoder enough that the optimal causally-relevant features are different.
+
+**Interpretation.**
+
+The headline number is essentially flat: bundle moves up 1.71 align points, best single-feat moves down 0.93. Neither change is large enough to call a clean win or loss for adjacency contrastive at α=0.1. But the *shape* of the result tells a story:
+
+1. **Adjacency contrastive at α=0.1 does NOT do for TXC what it does for T-SAE.** T-SAE's contrastive loss (per-token z_t vs z_{t+1}) is what makes its bundle metric strong (T-SAE arditi 100k bundle 57.42, T-SAE paper 30k bundle 56.23). I had hypothesized that lifting this contrastive from per-token to per-window in TXC would similarly buff TXC's bundle peak toward the 56-57 regime. It doesn't — the bundle goes from 50.89 → 52.60. Still ~5 points short of T-SAE.
+2. **Why might the analog have failed?** Two candidate explanations:
+   - **(a) α=0.1 may be too weak** for TXC's window-z representation. T-SAE's per-token z is much higher-dimensional (k_total=20 active dims among d_sae=16k per token); TXC's window-z is also k_total=100 active dims among d_sae=16k but pools across T=5 positions. The same α may exert less effective pressure relative to the reconstruction loss when the encoder has T× more degrees of freedom to absorb that pressure.
+   - **(b) Window-z overlapping-pair contrastive may be the wrong target.** Two windows offset by 1 share T−1=4 of 5 positions, so their unmixed sum-of-positions z_w should already be very similar before any contrastive pressure (only one position differs). The contrastive may be pulling on a signal that's already nearly maximally aligned by construction. T-SAE's per-token version doesn't share this problem because z_t and z_{t+1} are computed from completely disjoint tokens.
+3. **Best single-feature peak still close to champion.** feat 5547 = 57.54 is now the #4 single-feature steerer overall (behind 4563=58.47, 14496=57.59 from windowed_tsae mix+matr, and arditi-bundle=57.42). Coherence 32.19 is actually *higher* than the 4563=58.47 champion's 30.86. So the contrastive may be marginally helpful for the per-feature peak's coh-vs-align tradeoff, even if it doesn't push the headline align number up.
+4. **Track D ladder decision.** Per the brief's D3 step, sweep α if D2 looks promising. The signal is too weak to justify a 3-point α sweep blindly — but **(b)** above suggests the better next experiment is **D1b** (per-position-z contrastive — rework TXC to expose per-token z, apply T-SAE-style per-token contrastive directly). That's a real arch change. Given Track A (windowed_tsae) is already exploring the per-token contrastive direction with windowing, and Track A's mix+matr T=2 produced 57.59 single — maybe the better answer is to combine: **TXC architecture + T-SAE-paper-faithful per-token contrastive on per-position z**. That's a substantial implementation (probably 2-4 hours of code + 3.5h training+Wang). Lower priority than letting Track E1 finish first.
+
+**Decision tree action.**
+
+- **Track D D2 → result: marginal. D3 (α-sweep) is NOT a high-priority follow-up.** The structural reason **(b)** suggests α won't fix it.
+- **Track D D1b (per-token contrastive on per-position TXC z) is a real candidate but expensive.** Defer until E1 result is in (we'll know more about whether TXC arch can be made to work on top of arditi recipe before deciding to invest in another arch variant).
+- **h100_2 is now free.** What to launch?
+  - **Track E1b (TXC T=2 arditi-matched, k=256)** — already queued. d_sae=32768, k=256, T=2, batch=256, lr=3e-4, per-window TopK, 100k steps. Per the brief: gives a 2-point k-sweep alongside E1's k=128 result; if k=256 wins → queue k=512, if k=128 wins → queue k=64. This is the most natural "while E1 is running, run E1b in parallel" move.
+  - h100_2 has 143 GB free; ~70 GB needed for 3 snapshots × ~14 GB. No disk concern.
+  - Launching now.

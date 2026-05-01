@@ -67,12 +67,12 @@ We have a Qwen-7B-Instruct base + PEFT-LoRA fine-tune (`andyrdt/Qwen2.5-7B-Instr
 | ---------------------------------------------------------------- | ------ | --- | --------- | ----- | ----------------------------------------------------------------------------------------------- |
 | **TXC paper-faithful k=100, d_sae=16k, T=5, BatchTopK** (champion) | 4563   | −8  | **58.47** | 30.86 | `qwen_l15_txc_paper_k100bt_d16k_step30000.pt` (h100_1)                                          |
 | **WindowedTSAE T=2 + mix + matryoshka 20% (single)**             | 14496  | +9  | **57.59** | 27.34 | `qwen_l15_wtsae_T2_mix_matr_30000step_step30000.pt` (h100_2)                                    |
+| **TXC paper k=100 + adjacency-contrastive α=0.1 (single)**       | 5547   | −8  | **57.54** | 32.19 | `qwen_l15_txc_paper_k100bt_d16k_dadj_a0p1_step30000.pt` (h100_2)                                |
 | SAE arditi 100k bundle k=30 (prior champion)                     | bundle | −10 | 57.42     | 35.78 | (existing, not retrained)                                                                       |
 | T-SAE paper-faithful k=20 BatchTopK, d_sae=16k                   | bundle | −6  | 56.23     | 34.84 | `qwen_l15_tsae_paper_k20_d16k_a01_step30000.pt`                                                 |
 | TXC paper k=20 (single)                                          | 6062   | +8  | 55.16     | 31.33 | `qwen_l15_txc_paper_k20bt_d16k_step30000.pt` (h100_1)                                           |
 | TXC paper k=200 (single)                                         | 10625  | −10 | 55.08     | 34.53 | `qwen_l15_txc_paper_k200bt_d16k_step30000.pt` (h100_2)                                          |
 | WindowedTSAE T=2 + mix_positions=True (single)                   | 8017   | −6  | 54.58     | 28.05 | `qwen_l15_wtsae_T2_mix_30000step_step30000.pt` (h100_1)                                         |
-| TXC paper k=50 (single)                                          | 6406   | −4  | 51.98     | 33.28 | `qwen_l15_txc_paper_k50bt_d16k_step30000.pt`                                                    |
 
 **Goal: beat 58.47 single-feature align with coh ≥ 25.**
 
@@ -408,6 +408,20 @@ Disk on h100_1 was 92% used at last firing. The TXC k=100 60k will produce snaps
 
 - **Track B B1 result (vanilla windowed SAE T=2)** — DONE, pulled. Bundle 51.93, best single feat 15471 = 52.20 (both significant regressions vs SAE arditi T=1 anchor of 57.42). Decisive evidence that windowing alone (no contrastive) does NOT work. Track B is dead — do not ladder to T=3.
 - **Track A (windowed_tsae) → contrastive is essential**. Comparing the no-contrastive run above to the matr+mix variant (bundle 55.57) shows that the T-SAE contrastive recipe is what makes windowing viable.
+
+### Snapshot at 2026-05-01 10:00 UTC firing
+
+- **Track D D2 result (TXC paper k=100 + adjacency contrastive α=0.1, 30k)** — DONE, pulled. Bundle 52.60 (+1.71 vs TXC k=100 anchor 50.89), best single feat 5547=**57.54** at α=−8 coh=32.19 (slight regression vs 4563=58.47 anchor). Marginal effect — adjacency contrastive at α=0.1 does not push TXC bundle into T-SAE territory. Decision: do NOT pursue α-sweep (D3) blindly; structural reason is that TXC's overlapping-window pairs share T−1 of T positions so are nearly aligned by construction, blunting the contrastive's effect. D1b (per-token contrastive on per-position TXC z) is the more promising direction but expensive — defer until E1 result is in. New entry in Current best top-5 at #3.
+- **Track E1 still training** on h100_1 (step ~94500/100000 — ~5% remaining, ETA ~30 min more training, then ~2h Wang).
+- **Track E1b launched** on h100_2 (the now-free GPU): TXC T=2 arditi-matched, **k_total=256** (paired with E1's k=128 to give a 2-point k-sweep). All other settings identical: d_sae=32768, T=2, batch=256, lr=3e-4, per-window TopK, 100k steps @ resid_post, snapshots at 30k/60k/100k. Log `txc_arditi_T2_d32k_k256.log`. ETA training ~6-8h, then ~2h Wang.
+
+In flight now:
+- **h100_1**: Track E1 — TXC T=2 arditi-matched k=128 100k @ resid_post — step ~94500/100000.
+- **h100_2**: Track E1b — TXC T=2 arditi-matched k=256 100k @ resid_post — step ~500/100000.
+
+Disk: h100_1 50 GB free, h100_2 143 GB free. E1 will produce ~3×14 GB on h100_1 (likely OK, but watch); E1b will produce ~3×28 GB ≈ 84 GB on h100_2 (still 143-84=59 GB safety margin).
+
+The plot script `plot_overnight_panels.py` PANELS list now includes the D2 bundle frontier (color darkkhaki) and D2 single feat 5547 (khaki). Will need to add E1 / E1b panels when those finish.
 
 ### Snapshot at 2026-05-01 07:00 UTC firing
 

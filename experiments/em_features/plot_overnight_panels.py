@@ -112,6 +112,12 @@ def main():
         ("TXC paper k=100 60k extension @ resid_post  (BUNDLE — judge-NaN-heavy)",
          load_bundle(H / "txc_paper_k100bt_d16k_60k_step60000/results/wang_txc_paper_k100bt_d16k_60k_step60000_bundle30_frontier.json"),
          "olivedrab"),
+        ("TXC paper k=100 + adjacency-contrastive α=0.1 30k @ resid_post  (BUNDLE)",
+         load_bundle(H / "txc_paper_k100bt_d16k_dadj_a0p1_30k/results/wang_txc_paper_k100bt_d16k_dadj_a0p1_step30000_bundle30_frontier.json"),
+         "darkkhaki"),
+        ("TXC paper k=100 + adj-contrastive α=0.1  SINGLE FEAT 5547",
+         load_finalist(H / "txc_paper_k100bt_d16k_dadj_a0p1_30k/results/wang_txc_paper_k100bt_d16k_dadj_a0p1_step30000/stage4_final_frontier.json", 5547),
+         "khaki"),
         ("T-SAE 30k @ resid_post (ours: k=128, α=1.0)",
          load_bundle(root / "wang/tsae_30k_bundle30_frontier.json"), "darkorange"),
     ]
