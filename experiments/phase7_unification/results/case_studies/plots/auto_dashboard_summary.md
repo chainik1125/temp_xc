@@ -17,10 +17,10 @@ unc=1.678, ≥1.5=1.133, ≥1.75=0.411, ≥2.0=0.411, ≥2.25=0.411, ≥2.5=0.41
 | txc_galaxy4_t2_kw10_kp10 per-position | 3 | +0.300 | 1.433 | n=3 |
 | txc_softmaxpool_t2_kpos20 per-position | 3 | +0.289 | 1.422 | n=3 |
 | txc_h8_t2_kpos20_shifts2 per-position | 3 | +0.267 | 1.400 | n=3 |
+| txc_softmaxpool_t3_kpos20 per-position | 3 | +0.222 | 1.356 | n=3 |
 | txc_maxpool_t2_kpos20 right-edge | 3 | +0.189 | 1.322 | n=3 |
 | txc_galaxy4_t2_kw10_kp10 right-edge | 3 | +0.133 | 1.267 | n=3 |
 | txc_h8_t2_kpos20_shifts2 right-edge | 3 | +0.106 | 1.239 | n=3 |
-| txc_bare_antidead_t3_kpos20_grownFromT2sd42 right-edge | 3 | +0.089 | 1.222 | n=3 |
 
 ### Top 10 cells by Δ coh ≥ 1.75
 
@@ -29,13 +29,13 @@ unc=1.678, ≥1.5=1.133, ≥1.75=0.411, ≥2.0=0.411, ≥2.25=0.411, ≥2.5=0.41
 | txc_softmaxpool_t2_kpos20 per-position | 3 | +1.011 | 1.422 | n=3 |
 | txc_h8_t2_kpos20_shifts2 right-edge | 3 | +0.828 | 1.239 | n=3 |
 | txc_bare_antidead_t3_kpos20_grownFromT2sd42 right-edge | 3 | +0.811 | 1.222 | n=3 |
+| txc_softmaxpool_t3_kpos20 right-edge | 3 | +0.767 | 1.178 | n=3 |
 | txc_maxpool_h8_t2_kpos20_shifts2 right-edge | 3 | +0.733 | 1.144 | n=3 |
 | txc_maxpool_h8_t2_kpos20_shifts2 per-position | 3 | +0.733 | 1.144 | n=3 |
 | txc_bare_antidead_t4_kpos20_grownChainFromT3 per-position | 1 | +0.722 | 1.133 | n=1 |
 | txc_bare_antidead_t2_kpos20_ws_tsae_encoder per-position | 3 | +0.722 | 1.133 | n=3 |
 | txc_h8_t5_kpos20_shifts5 per-position | 2 | +0.656 | 1.067 | n=2 |
 | txc_maxpool_t2_kpos20 per-position | 3 | +0.644 | 1.056 | n=3 |
-| txc_bare_antidead_t2_kpos20_ws_tsae_encoder right-edge | 3 | +0.600 | 1.011 | n=3 |
 
 ### Top 10 cells by Δ coh ≥ 2.0
 
@@ -50,7 +50,7 @@ unc=1.678, ≥1.5=1.133, ≥1.75=0.411, ≥2.0=0.411, ≥2.25=0.411, ≥2.5=0.41
 | txc_h8_t3_kpos20_shifts3 right-edge | 1 | +0.222 | 0.633 | n=1 |
 | txc_h8_t3_kpos20_shifts3 per-position | 1 | +0.156 | 0.567 | n=1 |
 | txc_bare_antidead_t5_kpos20_grownFromT2sd42 per-position | 1 | +0.156 | 0.567 | n=1 |
-| txc_h8_t5_kpos20_shifts5 right-edge | 2 | +0.139 | 0.550 | n=2 |
+| txc_softmaxpool_t3_kpos20 right-edge | 3 | +0.144 | 0.556 | n=3 |
 
 ### Top 10 cells by Δ AUC(1.5-3.0)
 
