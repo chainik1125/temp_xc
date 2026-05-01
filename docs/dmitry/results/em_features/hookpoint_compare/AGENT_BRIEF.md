@@ -127,6 +127,96 @@ D3. **Sweep alpha** if D2 looks promising — try alpha ∈ {0.05, 0.2, 0.5} to 
 
 D4. **If D2-D3 produce a single-feat ≥ 58.47**: this is the headline win — TXC architecture + T-SAE contrastive recipe = strict improvement. Ladder to T=3 with same recipe.
 
+#### Track E — TXC T=2 matched to arditi training params (HIGH PRIORITY, run next)
+
+User wants a TXC at T=2 that *exactly* matches arditi's training config otherwise. Use this as the cleanest test of "does the TXC architecture (per-position W_enc summing into a single window-z, per-position W_dec) help on top of arditi's recipe?"
+
+E1. **Train TXC T=2 with arditi-matched config**:
+   - `d_sae=32768`, `k_total=128`, `T=2`
+   - per-window TopK (i.e. **NO** `--batch_topk` flag)
+   - `batch_size=256`, `lr=3e-4`
+   - `--total_steps 100000` (matches arditi 100k) — if disk/time blocks, fall back to 30k snapshot first then resume to 60k/100k as space allows
+   - `--hookpoint resid_post --layer 15`
+   - Use `run_training_txc_bricken_auxk.py` (existing TXC trainer); just override the args. Don't touch `--auxk_alpha` etc — use defaults.
+   - Save snapshots at e.g. 30000 60000 100000 so we have early checkpoints if the full run is interrupted.
+   - Param count will be ~470M (2× arditi's ~234M because T=2 doubles W_enc and W_dec). This is intrinsic to T=2; we accept the capacity bump to keep d_sae+k matched.
+
+E2. **Wang procedure on the resulting ckpt** at the longest step we have. Compare bundle k=30 peak AND best single-feat peak to arditi T=1 anchor (bundle 57.42 / coh 35.78 at α=−10).
+   - If bundle ≥ 57.42 OR best-single ≥ 58.47: TXC architecture wins on top of arditi's recipe → ladder to T=3 with same config.
+   - If both lose: arditi-style works best at T=1 with this recipe; document conclusion and move on.
+
+E3. **Hookpoint variants of E1** if E1 wins: train at resid_mid and ln1_normalized too.
+
+**Disk note for E1**: TXC d_sae=32k T=2 ckpt size ~5.5 GB (each snapshot). Plan disk before launching.
+
+**LAUNCH COMMAND for E1** (paste-ready, runs on h100_2 — h100_1 is busy with the k=100 60k continuation):
+```bash
+ssh h100_2 'cat > /tmp/run_txc_arditi_T2.sh' <<'BASH'
+#!/bin/bash
+set -euo pipefail
+source /root/launch_env.sh
+set -a; source /root/.env; set +a
+export TQDM_DISABLE=1
+export CUBLAS_WORKSPACE_CONFIG=:4096:8
+export PYTHONHASHSEED=42
+EM=/root/em_features
+cd /root/temp_xc
+
+OUT_PREFIX=$EM/checkpoints/qwen_l15_txc_arditi_T2_d32k_k128
+
+echo "===== TXC T=2 arditi-matched 100k @ resid_post  d_sae=32k k=128 batch=256 ====="
+python -m experiments.em_features.run_training_txc_bricken_auxk \
+    --config experiments/em_features/config.yaml \
+    --out_prefix $OUT_PREFIX \
+    --total_steps 100000 --snapshot_at 30000 60000 100000 \
+    --d_sae 32768 --k_total 128 --T 2 \
+    --batch_size 256 --lr 3e-4 \
+    --layer 15 --hookpoint resid_post 2>&1
+echo "===== TRAINING DONE ====="
+
+CKPT=${OUT_PREFIX}_step100000.pt
+ENC_OUT=$EM/results/qwen_l15_txc_arditi_T2_d32k_k128_step100000_encoder
+WANG_OUT=$EM/results/wang_txc_arditi_T2_d32k_k128_step100000
+
+python -m experiments.em_features.run_find_features_encoder \
+    --ckpt $CKPT --arch txc --layer 15 \
+    --dataset $EM/data/medical_advice_prompt_only.jsonl \
+    --n_prompts 1000 --max_ctx 256 --batch_size 8 \
+    --out $ENC_OUT
+
+python -m experiments.em_features.run_wang_procedure \
+    --ckpt $CKPT --arch txc \
+    --features_json $ENC_OUT/top_200_features.json \
+    --layer 15 --out $WANG_OUT \
+    --screen_top_n 100 --screen_alpha 1.0 --screen_rollouts 2 \
+    --n_survivors 20 --strength_rollouts 4 \
+    --strength_alpha_grid='-10,-6,-4,-2,-1,1,2,4,6,10' \
+    --n_final 3 --final_rollouts 8 \
+    --save_demo_completions=-1 --skip_done
+
+python3 -c "
+import json
+s3 = json.load(open('$WANG_OUT/stage3_strength.json'))
+top30 = s3['rows'][:30]
+import pathlib; p = pathlib.Path('$WANG_OUT/top_30_bundle_features.json')
+p.write_text(json.dumps({'method':'wang_top30_bundle','arch':'txc','layer':15,
+  'features':[{'rank':i+1,'feature_id':r['feature_id'],'screen_score':r['screen_score'],'delta_z':r['delta_z']} for i,r in enumerate(top30)]}, indent=2))
+"
+
+ALPHA_GRID='-100 -10 -8 -6 -5 -4 -3 -2 -1.75 -1.5 -1.25 -1 0 1 1.25 1.5 1.75 2 3 4 5 6 7 8 9 10 100'
+python -m experiments.em_features.frontier_sweep \
+    --steerer txc --model qwen --layer 15 \
+    --features_json $WANG_OUT/top_30_bundle_features.json \
+    --txc_ckpt $CKPT --k 30 --alpha_grid $ALPHA_GRID \
+    --n_rollouts 8 --judge gemini \
+    --out_path $EM/results/wang_txc_arditi_T2_d32k_k128_step100000_bundle30_frontier.json
+echo txc_arditi_T2_d32k_k128_DONE
+BASH
+ssh h100_2 'chmod +x /tmp/run_txc_arditi_T2.sh && nohup /tmp/run_txc_arditi_T2.sh > /root/em_features/logs/txc_arditi_T2_d32k_k128.log 2>&1 & echo PID=$!'
+```
+
+When E1 finishes, also save demo completions automatically (the launcher passes `--save_demo_completions=-1`).
+
 When all queued items are done OR you've concluded the directions are exhausted, write a final synthesis section "Summary of hill-climb session" at the bottom of `overnight_synthesis.md` with the top 5 single-feature peaks and the top 5 bundle peaks across all runs, plus a one-paragraph interpretation of which architectural choice mattered most.
 
 ### How to launch a TXC paper-faithful k-variant run
