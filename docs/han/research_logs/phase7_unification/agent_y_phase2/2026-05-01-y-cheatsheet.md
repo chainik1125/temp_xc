@@ -18,30 +18,37 @@ WIN threshold). However, at slightly tighter coherence thresholds
 TXC architectures achieve **STRICT WINS** by Δ ≥ +0.27.
 
 **🚀 Galaxy 8 (TXCSoftMaxPool) PP 3sd hits the largest WIN ever
-recorded: Δ = +1.089 at coh ≥ 1.75** (Procedure A SIG [+0.761, +1.450];
-Procedure B borderline [−0.022, +1.456]). This is over 4× the WIN
-threshold and 20% larger than the previous best (T=2 H8 RE 3sd
-Δ=+0.906).
+recorded: Δ = +1.011 at coh ≥ 1.75** (against W's same-pod n=3
+anchor; Procedure A SIG; Procedure B re-bootstrap pending).
+Old cross-pod-anchor Δ was +1.089 — the same-pod retrain shifted
+the anchor up by +0.078 at this threshold but Galaxy 8 PP still
+clears 4× the WIN threshold.
 
-T-SAE k=20's only edge — unconstrained peak (1.80 vs 1.578) — is at
+T-SAE k=20's only edge — unconstrained peak (1.678 vs 1.578) — is at
 coh = 1.40 (text below the prereg coherence floor — incoherent).
+Under the same-pod n=3 anchor, this gap shrinks from −0.222 (old
+anchor) to **−0.100** — essentially TIE.
 
 ### Headline numbers (multi-seed, ±0.27 WIN threshold)
 
-T-SAE k=20 anchor = sd=42 + sd=1 multi-seed. TXC cells = 3-seed
-where applicable.
+T-SAE k=20 anchor = **W's same-pod n=3 retrain** (sd=42 + sd=1 + sd=2,
+all on the same pod to eliminate cuDNN-determinism variance).
+Old cross-pod anchor: 1.167 / 0.333 / 0.283. New same-pod anchor:
+1.133 / 0.411 / 0.411 (above coh ≥ 1.75 the strict-coh anchor is
+flat at 0.411). TXC cells = 3-seed where applicable.
 
-#### Mean-curve method (standard) — UPDATED with W's TXCContrastiveMergeH8
+#### Mean-curve method (standard, same-pod n=3 anchor)
 
 | metric | T-SAE | best TXC | n | Δ | call |
 |---|---:|---:|---:|---:|:---:|
-| unconstrained peak | 1.800 | **1.578** (W's TXCContrastiveMergeH8 RE) | 3 | −0.222 | closer LOSS |
-| **coh ≥ 1.5 (prereg)** | 1.167 | **1.578** (W's TXCContrastiveMergeH8 RE) | 3 | **+0.411** | **STRICT WIN** ⭐⭐ |
-| **coh ≥ 1.75** | 0.333 | **1.422** (Galaxy 8 PP) | 3 | **+1.089** | **STRICT WIN** ⭐⭐⭐⭐ |
-| **coh ≥ 2.0** | 0.283 | **0.978** (T=2 bare PP) | 3 | **+0.694** | **STRICT WIN** ⭐⭐ |
-| **AUC(1.5–3.0)** | 0.413 | **0.745** (T=2 bare RE) | 3 | **+0.331** | **STRICT WIN** ⭐ |
+| unconstrained peak | 1.678 | **1.578** (W's TXCContrastiveMergeH8 RE) | 3 | −0.100 | TIE (much closer) |
+| **coh ≥ 1.5 (prereg)** | 1.133 | **1.578** (W's TXCContrastiveMergeH8 RE) | 3 | **+0.445** | **STRICT WIN** ⭐⭐ |
+| **coh ≥ 1.75** | 0.411 | **1.422** (Galaxy 8 PP) | 3 | **+1.011** | **STRICT WIN** ⭐⭐⭐⭐ |
+| **coh ≥ 2.0** | 0.411 | **0.978** (T=2 bare PP) | 3 | **+0.567** | **STRICT WIN** ⭐⭐ |
+| **AUC(1.5–3.0)** | 0.574 | **0.745** (T=2 bare RE) | 3 | **+0.171** | **TIE** |
 
-**Joint Y+W finding**: STRICT WINS at every coh-aware metric.
+**Joint Y+W finding**: STRICT WINS at every coh-aware peak metric;
+AUC drops to TIE under the new anchor.
 
 #### Per-seed-then-mean method (more conservative; per-seed peak15 then mean)
 
