@@ -186,6 +186,35 @@ Beat the Qwen-7B medical champion's `align 58.47 / coh 30.86 single-feat` on the
 
 Initial check after both 10k runs land: which arch has the higher single-feat peak (SAE arditi T=1 vs TXC T=5)? That tells us whether the architectural ranking from medical organism transfers to financial organism.
 
+### Step-count scaling sweep (queue after the initial 10k anchors finish)
+
+Once both 10k runs (SAE arditi 10k on h100_1 and TXC paper k=100 10k on h100_2) have completed Wang procedure, queue the SAME experiments at additional step counts so we can characterize scaling behavior on the 14B financial organism:
+
+- **SAE arditi 5k** on h100_1 (faster pass)
+- **SAE arditi 30k** on h100_1 (longer pass)
+- **TXC paper k=100 5k** on h100_2
+- **TXC paper k=100 30k** on h100_2
+
+Same hookpoint (`resid_post` layer 24), same recipes, same Wang procedure (with `--batch_cells` once integrated; serial otherwise). Each {arch × step-count} pair gets:
+- A single-feat peak align/coh at the best α
+- Bundle k=30 peak for completeness
+- Saved demo completions for the dashboard
+
+The 5k run is a "scrappy probe" — fast, undertrained, useful for comparing trajectory. The 30k run is the "real" baseline matching what we did on Qwen-7B for the prior champions. Together with 10k (already queued) we get a 3-point step-count sweep per architecture: {5k, 10k, 30k} × {SAE arditi, TXC k=100}. Plot trajectory of single-feat align as a function of training steps.
+
+**Sequencing**: launch 5k after 10k finishes (faster, frees GPU sooner for the next thing); launch 30k after 5k finishes. So per-GPU sequence is 10k → 5k → 30k.
+
+**Time budget**: Qwen-14B is ~2× slower per step than Qwen-7B. Estimates per arch on one GPU:
+- 5k: ~15 min training + 30 min Wang (batched) ≈ **45 min**
+- 10k: ~30 min training + 30 min Wang ≈ **60 min**
+- 30k: ~90 min training + 30 min Wang ≈ **2 hours**
+
+Total per arch sequential: ~3.75 hours. Both GPUs in parallel ≈ 4 hours wall-clock for the full sweep. Comfortable inside the 24-hour cron budget.
+
+If batched_steering integration into Wang isn't done yet when the 5k/30k runs complete training, the Wang step will be ~2h serial — still fits in the budget, just less time for follow-up experiments.
+
+After the sweep completes, the synthesis doc should include a small line plot: x-axis = training steps {5k, 10k, 30k}, y-axis = single-feat peak align, two lines (SAE arditi, TXC k=100). Useful figure for the paper.
+
 ### Conventions
 
 Same as AGENT_BRIEF.md — no connecting lines on plots, panel layouts not overlay, plot regen via `plot_overnight_panels.py` (will need a new title/result-set parallel for Qwen-14B), commit + push to `em-nanda` branch after each completed run, never amend / never force-push.
