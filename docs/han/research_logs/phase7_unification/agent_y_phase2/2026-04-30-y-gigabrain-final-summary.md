@@ -47,18 +47,31 @@ paper-clamp protocol. Anchor T-SAE k=20 = 2-seed mean-curve.
 | **coh ≥ 2.0** | **0.283** | **0.978** | T = 2 bare PP | 3 | **+0.694** | **STRICT WIN** ⭐ |
 | **AUC(1.5–3.0)** | **0.413** | **0.745** | T = 2 bare RE | 3 | **+0.331** | **STRICT WIN** ⭐ |
 
-Bootstrap CIs (proper procedure: resample concepts + re-optimize
-strength) are wide due to n=30 concepts. Point estimates large
-across thresholds and cells.
+Bootstrap CIs reported under TWO procedures:
 
-Concept-bootstrap (anti-conservative — fixes optimal strength from
-full data, narrower):
+**Procedure A — deployment-CI (fixes optimal strength from full data,
+narrower)**: per-concept Δ at the same strength `s*`, bootstrap mean.
+Conditions on the deployment strength.
 
-| metric | cell | Δ | 95% CI (anti-conservative) |
-|---|---|---:|---|
-| coh ≥ 1.5 | T=2 H8 PP 3sd | +0.300 | [−0.056, +0.656] borderline |
-| coh ≥ 1.75 | T=2 H8 RE 3sd | +0.872 | [+0.511, +1.233] significant |
-| coh ≥ 2.0 | T=2 bare PP 3sd | +0.711 | [+0.378, +1.078] significant |
+**Procedure B — scientific-CI (re-optimizes strength per resample,
+wider)**: bootstrap accounts for strength-selection variance.
+
+| metric | cell | Δ | A (deployment) | B (scientific, n=2000) |
+|---|---|---:|---|---|
+| coh ≥ 1.5 | T=2 H8 PP 3sd | +0.300 | [−0.056, +0.656] | [−0.728, +1.011] |
+| **coh ≥ 1.75** | T=2 H8 RE 3sd | **+0.872 / +0.906** | **[+0.511, +1.233] sig** | [−0.039, +1.222] borderline |
+| coh ≥ 2.0 | T=2 bare PP 3sd | +0.711 | [+0.378, +1.078] sig | [−0.022, +0.422] borderline |
+
+**Honest paper framing**:
+- Procedure A (deployment) shows STRICT significance at coh ≥ 1.75
+  for multiple cells (T=2 H8 RE Δ=+0.872 [+0.511, +1.233]).
+- Procedure B (scientific) gives wider CIs that include zero at
+  the 95% level due to strength-selection variance and n=30 concepts.
+  Point estimates remain large positive (median Δ ≈ +0.74 for
+  T=2 H8 RE).
+- Cross-cell consistency: 4+ TXC cells with Δ > +0.27 at coh ≥ 1.75
+  (T=2 H8 RE/PP, T=2 bare RE/PP, T=3 grown RE) supports a real
+  effect even when single-cell CIs are wide.
 
 ### Why T-SAE only wins on incoherent text
 

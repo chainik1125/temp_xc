@@ -128,12 +128,43 @@ def auc_succ_vs_coh(curve, lo=1.5, hi=3.0):
     return float(np.trapezoid(np.interp(grid, cohs, succs), grid) / (hi - lo))
 
 
+def bootstrap_ci_peak(per_concept_cell, per_concept_anchor, thr, n=500):
+    """Proper bootstrap CI on Δ(cell-anchor) at strength-uniform peak."""
+    cids = sorted(set(per_concept_cell.keys()) & set(per_concept_anchor.keys()))
+    if not cids: return (0.0, 0.0)
+    cids_arr = np.asarray(cids)
+    boot = []
+    for _ in range(n):
+        idx = RNG.integers(0, len(cids), len(cids))
+        sampled = cids_arr[idx]
+        by_s_cell = defaultdict(list)
+        by_s_anc = defaultdict(list)
+        for cid in sampled:
+            for s, (succ, coh) in per_concept_cell[cid].items():
+                by_s_cell[s].append((succ, coh))
+            for s, (succ, coh) in per_concept_anchor[cid].items():
+                by_s_anc[s].append((succ, coh))
+        n_sampled = len(sampled)
+        def peak(by_s):
+            best = -1.0
+            for s, items in by_s.items():
+                if len(items) < n_sampled: continue
+                mc = sum(it[1] for it in items) / len(items)
+                if mc < thr: continue
+                ms = sum(it[0] for it in items) / len(items)
+                if ms > best: best = ms
+            return max(best, 0.0)
+        boot.append(peak(by_s_cell) - peak(by_s_anc))
+    return (float(np.percentile(boot, 2.5)), float(np.percentile(boot, 97.5)))
+
+
 def main():
     cells = discover_cells()
     print(f"discovered {len(cells)} (arch, protocol) cells")
 
     # Build per-cell metrics
     results = {}
+    pc_data = {}
     for (arch_id, protocol), specs in cells.items():
         seeds_pc = [load_per_concept(s, arch_id) for s, _ in specs]
         seeds_pc = [c for c in seeds_pc if c]
@@ -141,6 +172,7 @@ def main():
             continue
         pc = average_per_concept(seeds_pc)
         curve = per_strength_curve(pc)
+        pc_data[(arch_id, protocol)] = pc
         results[(arch_id, protocol)] = {
             "arch_id": arch_id,
             "protocol": protocol,
@@ -157,8 +189,9 @@ def main():
         print("warning: anchor (T-SAE k=20 RE) missing")
         return
 
-    # Compute deltas
+    # Compute deltas + bootstrap CIs for multi-seed cells
     anchor = results[anchor_key]
+    anchor_pc = pc_data[anchor_key]
     for k, r in results.items():
         if k == anchor_key: continue
         r["delta_unc"] = r["peak_unc"] - anchor["peak_unc"]
@@ -166,6 +199,11 @@ def main():
             r[f"delta_peak_coh_ge_{t:.2f}"] = r[f"peak_coh_ge_{t:.2f}"] - anchor[f"peak_coh_ge_{t:.2f}"]
         r["delta_auc_1.5_3.0"] = r["auc_1.5_3.0"] - anchor["auc_1.5_3.0"]
         r["delta_auc_1.75_3.0"] = r["auc_1.75_3.0"] - anchor["auc_1.75_3.0"]
+        # Bootstrap CI for multi-seed cells
+        if r["n_seeds"] >= 2:
+            for t in THRESHOLDS:
+                ci = bootstrap_ci_peak(pc_data[k], anchor_pc, t, n=300)
+                r[f"ci_peak_coh_ge_{t:.2f}"] = ci
 
     # Save JSON
     PLOTS_DIR.mkdir(exist_ok=True, parents=True)
