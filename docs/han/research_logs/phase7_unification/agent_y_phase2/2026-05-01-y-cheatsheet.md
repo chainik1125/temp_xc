@@ -40,10 +40,18 @@ mean-curve.
 2. **TXC's window encoder distributes the steering signal** across T
    tokens. At moderate strength, TXC produces COHERENT text that
    contains the concept.
-3. **Cross-cell consistency**: at coh ≥ 1.75, ≥ 4 TXC architectures
-   beat anchor by Δ > +0.27 (T=2 H8 RE +0.906, T=3 grown RE +0.883
-   2sd, T=5 H8 PP +0.733 2sd, T=2 bare PP +0.644 3sd, T=2 bare RE
-   +0.622 3sd). Robust effect, not a single-cell artifact.
+3. **Cross-cell consistency**: at coh ≥ 1.75, **7 multi-seed TXC cells
+   beat anchor by Δ > +0.27**:
+   - T=2 H8 RE 3sd:        Δ = +0.902 ⭐
+   - T=3 grown RE 2sd:      Δ = +0.883
+   - T=5 H8 PP 2sd:         Δ = +0.733
+   - T-SAE WS RE 2sd:       Δ = +0.650
+   - T=2 bare PP 3sd:       Δ = +0.644
+   - T=2 bare RE 3sd:       Δ = +0.622
+   - T=2 H8 PP 3sd:         Δ = +0.278 (just above threshold)
+   
+   Robust effect across multiple architectures (H8, bare, grown,
+   T-SAE warm-start) and multiple protocols (right-edge, per-position).
 
 ### Bootstrap uncertainty
 
