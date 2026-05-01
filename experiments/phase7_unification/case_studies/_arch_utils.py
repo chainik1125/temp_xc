@@ -99,6 +99,7 @@ WINDOW_CLASSES = {
     "TXCSoftMaxPool",              # Galaxy 8 (Y, soft-max-pool with learnable τ)
     "TXCSoftMaxPoolMergeH8",       # Galaxy 11 (Y, soft-max-pool + H8 multi-distance)
     "TXCLogSumExpPool",            # Galaxy 20 (Y, LSE pool — different smooth-max)
+    "SpatialMatryoshkaH8",         # Spatial-Matryoshka (W, deadzone-escape)
 }
 
 
