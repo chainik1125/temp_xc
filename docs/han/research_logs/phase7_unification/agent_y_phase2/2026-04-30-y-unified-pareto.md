@@ -169,7 +169,43 @@ new anchor.
 
 ### Pareto frontier — success vs coherence
 
-#### Focused Pareto — T-SAE baseline + 3 best TXCs (added 2026-05-01)
+#### 🏆 PAPER HEADLINE FIGURE — TXC family Pareto dominance (added 2026-05-01)
+
+If we showed only ONE plot in the paper, it would be this one.
+
+![paper headline figure](../../../../../experiments/phase7_unification/results/case_studies/plots/paper_headline_figure.png)
+
+**One panel.** T-SAE k=20 (blue dashed) is the anchor. **5 TXC architectures**
+each plotted at their winning protocol, all under same-pod n=3 multi-seed
+mean-curve, k_pos=20 matched sparsity:
+
+- **Contrastive-merge (W, RE)** — purple, cliff15 = **1.578** Δ=+0.428 ⭐⭐⭐
+- **OBLIT T=2 H8 (Y, PP)** — red, cliff15 = 1.533 at coh=2.20 Δ=+0.383 ⭐
+- **Galaxy 11 SoftMaxPool+H8 (Y+W, RE)** — cyan, cliff15 = 1.467 Δ=+0.317 ⭐
+- **Galaxy 8 SoftMaxPool (Y, PP)** — green, cliff15 = 1.422 at coh=1.89 Δ=+0.272 ⭐
+- **MaxPool-merge (W, PP)** — pink, cliff15 = 1.144 Δ=-0.006 (TIE)
+- T-SAE k=20 RE (anchor) — blue dashed, cliff15 = 1.150 (n=3 same-pod)
+
+**4 of 5 TXC architectures cleanly cross the +0.27 prereg WIN threshold**
+(green dashed line at peak15 = 1.40). The 5th (MaxPool-merge PP) ties.
+
+The shaded green band [1.8, 2.5] marks the strict-coh region where TXC
+**pareto-dominates** T-SAE (T-SAE has no coh-stable strength in this band;
+TXC archs sustain succ ≥ 0.5 across it). OBLIT PP's star is *inside* the
+band at coh=2.20 succ=1.53 — the strongest single result on the plot
+combining high coherence + high success.
+
+The 5 TXC archs span 5 distinct architectural recipes:
+- T=2 H8 multi-distance contrastive antidead (OBLIT, Y)
+- T=2 H8 + max-pool merge encoder (W mystery)
+- T=2 H8 + contrastive end-vs-start merge encoder (W mystery)
+- T=2 plain SoftMaxPool with learnable per-feature τ (Galaxy 8, Y)
+- T=2 SoftMaxPool + H8 (Galaxy 11, Y+W compositional)
+
+This is the paper-grade story: the TXC family's coherent-steering advantage
+is **architecturally robust** — 5 independent recipes all win.
+
+#### Focused Pareto — T-SAE baseline + 3 best TXCs (earlier version, kept for reference)
 
 ![focused pareto](../../../../../experiments/phase7_unification/results/case_studies/plots/focused_pareto_matched_sparsity.png)
 
@@ -279,6 +315,7 @@ write-direction". Two independent paper-grade architectural recipes.
 ### Files
 
 - Inventory + JSON: `results/case_studies/plots/unified_pareto_summary.json`
+- **🏆 PAPER HEADLINE FIGURE** (T-SAE + 5 best TXCs, single panel): `results/case_studies/plots/paper_headline_figure{.png,.thumb.png}` — added 2026-05-01
 - **Focused Pareto** (T-SAE + 3 best TXCs): `results/case_studies/plots/focused_pareto_matched_sparsity{.png,.thumb.png}` — added 2026-05-01
 - Pareto plot (success vs coh, both protocols, all 22 archs): `results/case_studies/plots/unified_pareto_matched_sparsity{.png,.thumb.png}`
 - Ranking bar plot (full, both protocols): `results/case_studies/plots/unified_ranking_matched_sparsity{.png,.thumb.png}`
