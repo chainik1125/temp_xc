@@ -141,6 +141,8 @@ E1. **Train TXC T=2 with arditi-matched config**:
    - Save snapshots at e.g. 30000 60000 100000 so we have early checkpoints if the full run is interrupted.
    - Param count will be ~470M (2× arditi's ~234M because T=2 doubles W_enc and W_dec). This is intrinsic to T=2; we accept the capacity bump to keep d_sae+k matched.
 
+E1b. **Repeat E1 with k_total=256** (sweep around arditi's k=128 to test sparsity sensitivity). Same other settings (d_sae=32768, T=2, batch=256, lr=3e-4, per-window TopK, 100k steps). Use OUT_PREFIX `qwen_l15_txc_arditi_T2_d32k_k256` and analogous log paths. This gives us a 2-point k-sweep on the TXC-T=2-arditi-recipe baseline (k=128 vs k=256). If k=256 wins, queue k=512; if k=128 wins, queue k=64.
+
 E2. **Wang procedure on the resulting ckpt** at the longest step we have. Compare bundle k=30 peak AND best single-feat peak to arditi T=1 anchor (bundle 57.42 / coh 35.78 at α=−10).
    - If bundle ≥ 57.42 OR best-single ≥ 58.47: TXC architecture wins on top of arditi's recipe → ladder to T=3 with same config.
    - If both lose: arditi-style works best at T=1 with this recipe; document conclusion and move on.
