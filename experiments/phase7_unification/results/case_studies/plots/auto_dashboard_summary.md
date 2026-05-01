@@ -12,7 +12,7 @@ unc=1.678, ≥1.5=1.133, ≥1.75=0.411, ≥2.0=0.411, ≥2.25=0.411, ≥2.5=0.41
 | arch + protocol | n | Δ | base | seeds_data |
 |---|---:|---:|---:|---|
 | txc_contrastive_h8_t2_kpos20_shifts2 right-edge | 3 | +0.444 | 1.578 | n=3 |
-| txc_softmax_pool_h8_t2_kpos20_shifts2 per-position | 1 | +0.433 | 1.567 | n=1 |
+| txc_softmax_pool_h8_t2_kpos20_shifts2 right-edge | 3 | +0.333 | 1.467 | n=3 |
 | txc_maxpool_t2_kpos20 per-position | 3 | +0.300 | 1.433 | n=3 |
 | txc_galaxy4_t2_kw10_kp10 per-position | 3 | +0.300 | 1.433 | n=3 |
 | txc_softmaxpool_t2_kpos20 per-position | 3 | +0.289 | 1.422 | n=3 |
@@ -35,7 +35,7 @@ unc=1.678, ≥1.5=1.133, ≥1.75=0.411, ≥2.0=0.411, ≥2.25=0.411, ≥2.5=0.41
 | txc_bare_antidead_t2_kpos20_ws_tsae_encoder per-position | 3 | +0.722 | 1.133 | n=3 |
 | txc_h8_t5_kpos20_shifts5 per-position | 2 | +0.656 | 1.067 | n=2 |
 | txc_maxpool_t2_kpos20 per-position | 3 | +0.644 | 1.056 | n=3 |
-| txc_softmax_pool_h8_t2_kpos20_shifts2 per-position | 1 | +0.622 | 1.033 | n=1 |
+| txc_bare_antidead_t2_kpos20_ws_tsae_encoder right-edge | 3 | +0.600 | 1.011 | n=3 |
 
 ### Top 10 cells by Δ coh ≥ 2.0
 
@@ -56,7 +56,6 @@ unc=1.678, ≥1.5=1.133, ≥1.75=0.411, ≥2.0=0.411, ≥2.25=0.411, ≥2.5=0.41
 
 | arch + protocol | n | Δ | base | seeds_data |
 |---|---:|---:|---:|---|
-| txc_softmax_pool_h8_t2_kpos20_shifts2 per-position | 1 | +0.215 | 0.790 | n=1 |
 | txc_bare_antidead_t3_kpos20_grownFromT2sd42 right-edge | 3 | +0.179 | 0.753 | n=3 |
 | txc_bare_antidead_t2_kpos20 right-edge | 3 | +0.170 | 0.745 | n=3 |
 | txc_bare_antidead_t2_kpos20 per-position | 3 | +0.163 | 0.737 | n=3 |
@@ -66,3 +65,4 @@ unc=1.678, ≥1.5=1.133, ≥1.75=0.411, ≥2.0=0.411, ≥2.25=0.411, ≥2.5=0.41
 | txc_bare_antidead_t3_kpos20_grownFromT2sd42 per-position | 3 | +0.130 | 0.704 | n=3 |
 | txc_maxpool_t2_kpos20 per-position | 3 | +0.122 | 0.696 | n=3 |
 | txc_h8_t3_kpos20_shifts3 right-edge | 1 | +0.117 | 0.691 | n=1 |
+| txc_maxpool_t2_kpos20 right-edge | 3 | +0.115 | 0.689 | n=3 |
