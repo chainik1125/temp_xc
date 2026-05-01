@@ -338,37 +338,60 @@ to measure:
 - "What's the strict behavioral verdict?" → genuine_backtracking_rate
   inside the filter → ~92.8% across all viable TXC cells
 
-## Per-cell 3-way breakdown of B1 generations
+## Per-cell 4-way breakdown of B1 generations
 
-For each cell, every B1 generation falls into one of three buckets:
+For each cell, every B1 generation falls into one of four buckets:
 
 - **Productive** (green): coherent (Sonnet ≥ 2) AND kw-elevated AND
   judge says ≥ 1 genuine backtracking event
 - **Filler / pseudo** (orange): coherent + kw-elevated, but the judge
   says count = 0 — `wait`/`hmm` is filler or restatement
-- **Below threshold** (gray): incoherent OR low kw — steering didn't
-  produce enough effect, or the effect destroyed coherence
+- **Coherent but low kw** (blue): coherent text but steering didn't
+  elevate the keyword rate above baseline — the steering signal
+  didn't fire strongly enough
+- **Incoherent** (gray): the model degenerated or fails the Sonnet ≥ 2
+  floor — sentence-loop collapse, gibberish, or topic-drift
 
-![B1 3-way breakdown](images_b/b1_breakdown_3way.png)
+![B1 4-way breakdown](images_b/b1_breakdown_4way.png)
+
+Earlier 3-way version (productive / filler / everything-else):
+[`images_b/b1_breakdown_3way.png`](images_b/b1_breakdown_3way.png).
+Per Dmitry's ask, the gray "everything-else" segment is now split into
+incoherent (gray) vs coherent-but-low-kw (blue) so we can see
+**which way each architecture fails**:
 
 Cell labels colored by architecture (blue = TXC family, orange = TopK
 SAE, green = Stacked SAE, purple = TSAE, pink = TSAE-paper).
 
-What pops out:
+Three findings, in order of importance:
 
-1. **TXC family dominates the productive (green) segment.**
-   TXC + Han contrastive cells take positions 1-13.
+1. **TXC family dominates the productive (green) segment.** TXC + Han
+   contrastive cells take positions 1-13.
+
 2. **The orange "filler" sliver is small for every cell** (≤ 5%
-   typically, with `txc__ln1_L10__k16` an outlier at ~8%). When the
-   model produces a coherent + keyword-elevated generation, the
-   judge calls it genuine ~92% of the time. So Sonnet primary is not
-   measuring filler at any cell.
-3. **What separates archs is the gray ("below threshold") size.**
-   TSAE / TSAE-paper / weak TopK SAE cells have ~98% gray —
-   steering rarely lifts them into the productive regime in the first
-   place. The TXC family pushes ~20-27% of generations through.
+   typically). When the model produces a coherent + keyword-elevated
+   generation, the judge calls it genuine ~92% of the time — Sonnet
+   primary is not measuring filler at any cell.
 
-Numerical CSV: [`images_b/b1_breakdown_3way.csv`](images_b/b1_breakdown_3way.csv).
+3. **The architectures fail differently:**
+   - **TSAE / TSAE-paper** fail by producing **incoherent generations**
+     (gray dominates ~95% of bars). Steering this dictionary destroys
+     coherence; few generations even reach the Sonnet ≥ 2 floor.
+   - **TopK SAE / Stacked SAE** fail by producing **coherent but
+     low-kw generations** (blue dominates, gray smaller). The model
+     stays coherent under steering but the steering direction doesn't
+     elevate `wait`/`hmm` above baseline — the dictionary's "best
+     feature" doesn't actually trigger backtracking.
+   - **TXC family** has the smallest blue+gray combined bar — TXC
+     directions both stay coherent under steering AND lift the keyword
+     rate, more often than any other arch.
+
+This separates "the dictionary picked the wrong feature" (blue, low-kw)
+from "the dictionary blew up coherence" (gray). TXC pays neither cost.
+
+Numerical CSVs: [`images_b/b1_breakdown_4way.csv`](images_b/b1_breakdown_4way.csv)
+(4-way) and [`images_b/b1_breakdown_3way.csv`](images_b/b1_breakdown_3way.csv)
+(3-way).
 
 ## Robustness: ordering survives stricter thresholds
 
