@@ -301,7 +301,10 @@ on OBLITERATION to also reach significance.
 
 - [x] V5 left-edge sd=1 + sd=2 grades (done, see table above)
 - [x] Bootstrap 95% CIs on W's protocols (n=2 borderline; cell C T=3 V3/V2 SIG @ coh ≥ 2.0)
-- [ ] **Train OBLITERATION sd=42 on this pod (~25 min, in flight)** — for n=3 SIG check on V3/V5/V6
-- [ ] After sd=42 trained: re-run select_features for fresh ckpt
-- [ ] Run all 5 protocols on fresh sd=42 → grade → re-aggregate
-- [ ] Cross-arch sweep: V3 on T=3 H8, T=5 H8, T=5 bare cells (queued, waits for training)
+- [x] **OBLITERATION sd=42 trained on this pod** (30.1 min wall, converged at step 3200)
+- [ ] sd=42 V3/V5/V6/right-edge/per-position grades — in flight (post-train chain running)
+- [ ] **K=2 multi-feature verify** (Y's lever-B recommendation, queued):
+      Y observed sd=42 K=2 unconstrained=1.733 (vs T-SAE 1.80) and Δ=+0.63 @ coh ≥ 1.5.
+      **Recommend running K=2 on sd=1 + sd=2 to verify multi-seed.** Done as W contribution.
+- [ ] After all data lands: bootstrap 95% CIs on V3/V5/V6 sd=42 + K=2 multi-seed
+- [ ] Cross-arch sweep: V3 on T=3 H8, T=5 H8, T=5 bare cells (deferred, low priority — Y's data already shows family-level dominance with right-edge protocol)
