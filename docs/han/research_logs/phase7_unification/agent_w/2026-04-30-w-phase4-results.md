@@ -275,9 +275,33 @@ The single-threshold metric is brittle. Han's pre-stated alternative (AUC of suc
 > wins only on unconstrained peak (1.80), achieved at coh=1.40 (below
 > the prereg coherence floor).
 
+### Bootstrap 95% CIs on W's protocols (concept-resampled, 1000 trials)
+
+Following Y's bootstrap-CI methodology (commit `f4afff57`):
+
+| cell + protocol | n | metric | Δ (mean) | 95% CI | sig? |
+|---|---|---|---|---|:---:|
+| OBLIT V3 dec-additive | 2 | coh ≥ 1.75 | +0.445 | [−0.133, +1.000] | borderline |
+| OBLIT V5 left-edge | 2 | coh ≥ 2.0 | +0.218 | [−0.050, +0.467] | borderline |
+| OBLIT V6 dec-broadcast | 2 | coh ≥ 2.0 | +0.337 | [−0.050, +0.783] | borderline |
+| **Cell C T=3 V3 dec-additive** | **2** | **coh ≥ 2.0** | **+0.306** | **[+0.050, +0.617]** | **✓ SIG** |
+| **Cell C T=3 V2 anchored** | **2** | **coh ≥ 2.0** | **+0.342** | **[+0.067, +0.700]** | **✓ SIG** |
+
+(Comparison vs Y's existing significant cells:
+- coh ≥ 1.75 T=2 H8 PP 3sd: CI [+0.066, +0.478] — SIG
+- coh ≥ 2.0 T=2 bare PP 3sd: CI [+0.378, +1.078] — SIG)
+
+**Statistical conclusion**: Cell C T=3 V3 dec-additive and V2 anchored
+both achieve significant wins at coh ≥ 2.0 with only n=2 seeds. The
+OBLITERATION-arch new protocols are wide-CI under n=2 (need sd=42 for
+tighter CIs). With sd=42 (under training at write time), expect V3/V5/V6
+on OBLITERATION to also reach significance.
+
 ### What we still need to settle
 
 - [x] V5 left-edge sd=1 + sd=2 grades (done, see table above)
-- [ ] **Train OBLITERATION sd=42 on this pod (~30 min, in flight)**
+- [x] Bootstrap 95% CIs on W's protocols (n=2 borderline; cell C T=3 V3/V2 SIG @ coh ≥ 2.0)
+- [ ] **Train OBLITERATION sd=42 on this pod (~25 min, in flight)** — for n=3 SIG check on V3/V5/V6
 - [ ] After sd=42 trained: re-run select_features for fresh ckpt
 - [ ] Run all 5 protocols on fresh sd=42 → grade → re-aggregate
+- [ ] Cross-arch sweep: V3 on T=3 H8, T=5 H8, T=5 bare cells (queued, waits for training)
