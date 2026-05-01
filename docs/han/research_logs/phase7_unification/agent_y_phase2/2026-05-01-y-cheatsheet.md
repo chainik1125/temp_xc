@@ -21,17 +21,20 @@ only edge — unconstrained peak (1.80 vs 1.42) — is at coh = 1.40
 
 ### Headline numbers (multi-seed, ±0.27 WIN threshold)
 
-T-SAE k=20 anchor = sd=42 + sd=1 multi-seed. TXC cells = 3-seed.
+T-SAE k=20 anchor = sd=42 + sd=1 multi-seed. TXC cells = 3-seed
+where applicable.
 
-#### Mean-curve method (standard)
+#### Mean-curve method (standard) — UPDATED with W's TXCContrastiveMergeH8
 
 | metric | T-SAE | best TXC | n | Δ | call |
 |---|---:|---:|---:|---:|:---:|
-| unconstrained peak | 1.800 | 1.422 | 3 | −0.378 | LOSS |
-| **coh ≥ 1.5 (prereg)** | 1.167 | 1.400 | 3 | **+0.233** | **TIE** |
-| **coh ≥ 1.75** | 0.333 | **1.236** (T=2 H8 RE) | 3 | **+0.902** | **WIN** ⭐ |
-| **coh ≥ 2.0** | 0.283 | **0.978** (T=2 bare PP) | 3 | **+0.694** | **WIN** ⭐ |
-| **AUC(1.5–3.0)** | 0.413 | **0.745** (T=2 bare RE) | 3 | **+0.331** | **WIN** ⭐ |
+| unconstrained peak | 1.800 | **1.578** (W's TXCContrastiveMergeH8 RE) | 3 | −0.222 | closer LOSS |
+| **coh ≥ 1.5 (prereg)** | 1.167 | **1.578** (W's TXCContrastiveMergeH8 RE) | 3 | **+0.411** | **STRICT WIN** ⭐⭐ |
+| **coh ≥ 1.75** | 0.333 | **1.236** (T=2 H8 RE) | 3 | **+0.902** | **STRICT WIN** ⭐⭐⭐ |
+| **coh ≥ 2.0** | 0.283 | **0.978** (T=2 bare PP) | 3 | **+0.694** | **STRICT WIN** ⭐⭐ |
+| **AUC(1.5–3.0)** | 0.413 | **0.745** (T=2 bare RE) | 3 | **+0.331** | **STRICT WIN** ⭐ |
+
+**Joint Y+W finding**: STRICT WINS at every coh-aware metric.
 
 #### Per-seed-then-mean method (more conservative; per-seed peak15 then mean)
 
