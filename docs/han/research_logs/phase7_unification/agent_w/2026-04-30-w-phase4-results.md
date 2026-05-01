@@ -203,6 +203,32 @@ admits a FAMILY of steering protocols, each with its own success-coherence
 trade-off.** T-SAE has only one possible protocol (right-edge collapses to
 T=1) and achieves higher peak success but only at incoherent strengths.
 
+### n=3 W-pod multi-seed — final OBLITERATION matrix (post-sd=42-train)
+
+After training OBLITERATION sd=42 on this pod (30.1 min wall) and running all
+5 protocols + grading, the **same-pod n=3 multi-seed numbers**:
+
+| protocol | n | @1.5 | @1.75 | @2.0 | Δ@1.75 vs T-SAE 0.333 |
+|---|---|---|---|---|---|
+| right-edge | 3 | 1.236 | **1.236** | 0.489 | **+0.902 ⭐** |
+| per-position | 3 | 1.400 | 0.611 | 0.344 | +0.278 ⭐ (just barely) |
+| V3 dec-additive | 3 | 1.000 | 0.411 | 0.411 | +0.078 (TIE — sd=42 W's V3 lower than expected) |
+| V5 left-edge | 3 | 0.956 | 0.567 | 0.567 | +0.234 (TIE close to win) |
+| **V6 dec-broadcast** | 3 | 0.756 | 0.756 | **0.756** | **+0.422 ⭐** |
+
+**V6 dec-broadcast n=3 W-pod cleanly wins at coh ≥ 1.75 by Δ=+0.422** — and
+remarkably the cliff value is IDENTICAL across coh thresholds 1.5–2.0
+(0.756 each), because V6's coh @ peak strength sits cleanly at coh=2.033
+(above all three thresholds). V6 is the most coherence-stable protocol.
+
+**Cross-pod variance check** (W-pod sd=42 vs Y-pod sd=42):
+- Right-edge: identical curves (Δ ≤ 0.03 at any s_norm).
+- Per-position: nearly identical.
+- V3/V5/V6: my W-pod sd=42 values match my W-pod sd=1, sd=2 distribution.
+
+So the cross-pod variance is small for canonical protocols. Y's sd=42 numbers
+reproduce on W-pod.
+
 ### V3 dec-additive — a CROSS-ARCH winning protocol at coh ≥ 1.75
 
 V3 dec-additive (no encoder pass; just `s × W_dec[picked, :, :]` at
