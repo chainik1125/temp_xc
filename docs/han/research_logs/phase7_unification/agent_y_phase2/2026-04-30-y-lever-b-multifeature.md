@@ -127,9 +127,31 @@ out the concept signal.
 K=2 is **seed-specific**. The sd=42 K=2 win was an artefact of
 concept-aligned secondary features at that particular seed.
 
-### K=2 sd=2 status
+### K=2 multi-seed FINAL — confirmed collapse
 
-Currently grading. Expectation: similar collapse to sd=1.
+3-seed mean-curve numbers:
+
+| metric | K=1 mean | K=2 mean | Δ K=2 vs K=1 |
+|---|---:|---:|---:|
+| unconstrained | 1.422 | **0.678** | **−0.744** |
+| coh ≥ 1.5 | 1.400 | 0.422 | −0.978 |
+| coh ≥ 1.75 | 0.611 | 0.422 | −0.189 |
+| AUC(1.5-3.0) | 0.603 | 0.344 | −0.259 |
+
+K=2 multi-seed REGRESSES across all metrics. Mechanism confirmed:
+top-2 features by activation-lift are seed-specific. The first
+feature (max-lift) is reliably concept-aligned, but the secondary
+feature is polysemantic (lift-large but semantically off-concept
+on different seeds). K=2 amplifies the secondary feature's
+off-concept signal, drowning out the primary.
+
+K=2 sd=2 secondary feature for harmful_content was 174 — pulling
+toward "list of"/"our our"/punctuation, NOT violence.
+
+**Final verdict**: Lever B (multi-feature steering by activation-lift)
+is NOT a viable lift. Future multi-feature work needs concept-aligned
+secondary feature selection (e.g. top-K filtered by held-out
+validation quality).
 
 ### K=2 final verdict (updated)
 
