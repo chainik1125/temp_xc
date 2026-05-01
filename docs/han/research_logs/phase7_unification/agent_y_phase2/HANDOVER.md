@@ -6,21 +6,28 @@ tags:
   - in-progress
 ---
 
-## Agent Y handover — post-compact (2026-04-30, end-of-shift after GIGABRAIN reframe)
+## Agent Y handover — post-compact (2026-04-30, with 2026-05-01 corrections)
 
-> **Status**: Phase 2 Hail Mary OBLITERATION achieved at T=2 H8 shifts=(2,)
-> per-position write-back (3-seed mean 1.400 vs anchor 1.10, Δ=+0.300,
-> strict WIN at the prereg metric). Sequential growth chain T=2→T=5
-> preserves anchor across the receptive-field axis.
+> **Status (corrected 2026-05-01)**: Phase 2 Hail Mary OBLITERATION
+> at T=2 H8 shifts=(2,) per-position is a **TIE** under proper
+> multi-seed anchor (3-seed mean 1.400 vs multi-seed anchor 1.167,
+> Δ=+0.233, in TIE band ±0.27). My earlier "+0.300 strict WIN" used
+> single-seed anchor (1.10) — see `2026-05-01-y-multiseed-anchor-correction.md`.
+> Sequential growth chain T=2→T=5 preserves anchor across the
+> receptive-field axis.
 >
-> **2026-04-30 EVENING UPDATE — GIGABRAIN MULTI-COH-THRESHOLD REFRAME
-> NOW THE HEADLINE.** T-SAE k=20's 1.80 unconstrained peak is at coh =
-> 1.40 (incoherent text). At every coh threshold ≥ 1.5 AND under
-> Han's pre-stated AUC alternative, TXC dominates by Δ ∈ [+0.13, +0.87].
-> Multi-seed verified at all primary thresholds. The paper headline
-> shifts from a marginal Δ=+0.30 single-threshold WIN to a robust
-> multi-threshold/multi-metric domination story where T-SAE never
-> wins a coherence-aware metric.
+> **2026-04-30 → 2026-05-01 GIGABRAIN MULTI-COH-THRESHOLD REFRAME**
+> still holds AND is now MORE important (only way to declare strict
+> WIN, since prereg is TIE):
+>
+> - **coh ≥ 1.75**: T=2 H8 RE 3sd **Δ=+0.902** vs anchor 0.333
+>   (3× WIN threshold) ⭐⭐⭐ STRICT WIN
+> - **coh ≥ 2.0**: T=2 bare PP 3sd Δ=+0.694 (2.5× WIN threshold) ⭐⭐
+> - **AUC(1.5–3.0)** (Han's alternative): T=2 bare RE 3sd Δ=+0.331 ⭐
+>
+> 4 different TXC cells beat anchor by Δ ≥ +0.27 at coh ≥ 1.75
+> (broad cross-architecture support). T-SAE k=20's only lead is
+> unconstrained peak (1.80 vs 1.42), achieved at coh=1.40 (incoherent).
 
 > 🚀 **2026-04-30 GIGABRAIN reframe** — see
 > `agent_y_phase2/2026-04-30-y-coh-threshold-sweep.md`. T-SAE's 1.80

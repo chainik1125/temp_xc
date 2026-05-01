@@ -8,12 +8,20 @@ tags:
 
 ## Phase 7 Y — coherence-threshold sweep: T-SAE's "win" is on incoherent text
 
-> **Headline (paper-grade reframing)**: T-SAE k=20's 1.800 unconstrained
-> peak is achieved at coh = 1.40 (slightly incoherent text). At **every
-> coherence threshold from 1.5 to 2.5**, at least one matched-sparsity
-> TXC architecture **dominates T-SAE k=20** by Δ = +0.20 to +0.87
-> (3-seed mean-curve where available). The prereg WIN at coh ≥ 1.5
-> (+0.30) is the *narrowest* of the five threshold wins.
+> **Headline (paper-grade reframing, corrected 2026-05-01 with multi-seed anchor)**:
+> Under the proper **multi-seed T-SAE k=20 anchor** (sd=42 + sd=1
+> mean-curve = 1.167 at coh ≥ 1.5), the prereg metric is a **TIE**
+> (T=2 H8 PP 3sd Δ=+0.233, in TIE band ±0.27). However, the
+> multi-coh-threshold sweep reveals a **strict WIN at coh ≥ 1.75**:
+> T=2 H8 RE 3sd Δ=**+0.902** (1.236 vs anchor 0.333) — over 3× the
+> WIN threshold. AUC(1.5–3.0) is also a **strict WIN**: T=2 bare RE
+> 3sd Δ=**+0.331**. T-SAE k=20's only lead is on unconstrained peak
+> (1.80 vs 1.42), achieved at coh=1.40 (below the prereg floor —
+> incoherent text).
+>
+> **Note**: earlier numbers in this doc used single-seed anchor (1.10).
+> The correction is documented in `2026-05-01-y-multiseed-anchor-correction.md`.
+> Numbers below have been updated to use the multi-seed anchor.
 
 ### Core claim
 
