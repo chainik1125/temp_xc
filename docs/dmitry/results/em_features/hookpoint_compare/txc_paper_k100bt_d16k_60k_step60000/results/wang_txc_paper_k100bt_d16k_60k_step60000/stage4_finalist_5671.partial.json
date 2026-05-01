@@ -1,0 +1,221 @@
+{
+  "feature_id": 5671,
+  "rows": [
+    {
+      "alpha": -100.0,
+      "mean_align": null,
+      "mean_coh": null,
+      "n_align": 0,
+      "n_coh": 0,
+      "n_total": 64
+    },
+    {
+      "alpha": -10.0,
+      "mean_align": null,
+      "mean_coh": null,
+      "n_align": 0,
+      "n_coh": 0,
+      "n_total": 64
+    },
+    {
+      "alpha": -8.0,
+      "mean_align": null,
+      "mean_coh": null,
+      "n_align": 0,
+      "n_coh": 0,
+      "n_total": 64
+    },
+    {
+      "alpha": -6.0,
+      "mean_align": null,
+      "mean_coh": null,
+      "n_align": 0,
+      "n_coh": 0,
+      "n_total": 64
+    },
+    {
+      "alpha": -5.0,
+      "mean_align": null,
+      "mean_coh": null,
+      "n_align": 0,
+      "n_coh": 0,
+      "n_total": 64
+    },
+    {
+      "alpha": -4.0,
+      "mean_align": null,
+      "mean_coh": null,
+      "n_align": 0,
+      "n_coh": 0,
+      "n_total": 64
+    },
+    {
+      "alpha": -3.0,
+      "mean_align": null,
+      "mean_coh": null,
+      "n_align": 0,
+      "n_coh": 0,
+      "n_total": 64
+    },
+    {
+      "alpha": -2.0,
+      "mean_align": null,
+      "mean_coh": null,
+      "n_align": 0,
+      "n_coh": 0,
+      "n_total": 64
+    },
+    {
+      "alpha": -1.75,
+      "mean_align": null,
+      "mean_coh": null,
+      "n_align": 0,
+      "n_coh": 0,
+      "n_total": 64
+    },
+    {
+      "alpha": -1.5,
+      "mean_align": 45.892857142857146,
+      "mean_coh": 25.3125,
+      "n_align": 56,
+      "n_coh": 64,
+      "n_total": 64
+    },
+    {
+      "alpha": -1.25,
+      "mean_align": 70.76923076923077,
+      "mean_coh": null,
+      "n_align": 13,
+      "n_coh": 0,
+      "n_total": 64
+    },
+    {
+      "alpha": -1.0,
+      "mean_align": null,
+      "mean_coh": null,
+      "n_align": 0,
+      "n_coh": 0,
+      "n_total": 64
+    },
+    {
+      "alpha": 0.0,
+      "mean_align": null,
+      "mean_coh": null,
+      "n_align": 0,
+      "n_coh": 0,
+      "n_total": 64
+    },
+    {
+      "alpha": 1.0,
+      "mean_align": null,
+      "mean_coh": null,
+      "n_align": 0,
+      "n_coh": 0,
+      "n_total": 64
+    },
+    {
+      "alpha": 1.25,
+      "mean_align": null,
+      "mean_coh": null,
+      "n_align": 0,
+      "n_coh": 0,
+      "n_total": 64
+    },
+    {
+      "alpha": 1.5,
+      "mean_align": null,
+      "mean_coh": null,
+      "n_align": 0,
+      "n_coh": 0,
+      "n_total": 64
+    },
+    {
+      "alpha": 1.75,
+      "mean_align": null,
+      "mean_coh": null,
+      "n_align": 0,
+      "n_coh": 0,
+      "n_total": 64
+    },
+    {
+      "alpha": 2.0,
+      "mean_align": null,
+      "mean_coh": null,
+      "n_align": 0,
+      "n_coh": 0,
+      "n_total": 64
+    },
+    {
+      "alpha": 3.0,
+      "mean_align": null,
+      "mean_coh": null,
+      "n_align": 0,
+      "n_coh": 0,
+      "n_total": 64
+    },
+    {
+      "alpha": 4.0,
+      "mean_align": null,
+      "mean_coh": null,
+      "n_align": 0,
+      "n_coh": 0,
+      "n_total": 64
+    },
+    {
+      "alpha": 5.0,
+      "mean_align": null,
+      "mean_coh": null,
+      "n_align": 0,
+      "n_coh": 0,
+      "n_total": 64
+    },
+    {
+      "alpha": 6.0,
+      "mean_align": null,
+      "mean_coh": null,
+      "n_align": 0,
+      "n_coh": 0,
+      "n_total": 64
+    },
+    {
+      "alpha": 7.0,
+      "mean_align": null,
+      "mean_coh": null,
+      "n_align": 0,
+      "n_coh": 0,
+      "n_total": 64
+    },
+    {
+      "alpha": 8.0,
+      "mean_align": null,
+      "mean_coh": null,
+      "n_align": 0,
+      "n_coh": 0,
+      "n_total": 64
+    },
+    {
+      "alpha": 9.0,
+      "mean_align": null,
+      "mean_coh": null,
+      "n_align": 0,
+      "n_coh": 0,
+      "n_total": 64
+    },
+    {
+      "alpha": 10.0,
+      "mean_align": null,
+      "mean_coh": 25.0,
+      "n_align": 0,
+      "n_coh": 1,
+      "n_total": 64
+    },
+    {
+      "alpha": 100.0,
+      "mean_align": 10.0,
+      "mean_coh": null,
+      "n_align": 1,
+      "n_coh": 0,
+      "n_total": 64
+    }
+  ]
+}

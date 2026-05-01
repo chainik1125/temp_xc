@@ -166,6 +166,44 @@ qwen_l15_tsae_paper_k20_d16k_a01_step20000.pt   (1.4 GB)
   └─ HF: dmanningcoe/temp-xc-em-features:tsae/qwen_l15_tsae_paper_k20_d16k_a01_step20000.pt
 ```
 
+**2026-05-01 (h100_1)** — TXC k=100 60k DONE; freeing disk for Track E1 launch (TXC T=2 d_sae=32k arditi-matched needs ~16 GB headroom). Currently 3.0 GB free, 99% used:
+```
+qwen_l15_han_champ_30k_step10000.pt    (4.4 GB)
+  └─ HF: dmanningcoe/temp-xc-em-features:han_champ/qwen_l15_han_champ_30k_step10000.pt
+  └─ Intermediate 10k/30k of Han champ 30k pipeline (final step30000 retained).
+qwen_l15_han_champ_30k_step20000.pt    (4.4 GB)
+  └─ HF: dmanningcoe/temp-xc-em-features:han_champ/qwen_l15_han_champ_30k_step20000.pt
+qwen_l15_txc_brickenauxk_a8_30k_step10000.pt    (4.4 GB)
+  └─ HF: dmanningcoe/temp-xc-em-features:txc/qwen_l15_txc_brickenauxk_a8_30k_step10000.pt
+  └─ Intermediate 10k/30k of TXC brickenauxk 30k pipeline.
+qwen_l15_txc_brickenauxk_a8_30k_step20000.pt    (4.4 GB)
+  └─ HF: dmanningcoe/temp-xc-em-features:txc/qwen_l15_txc_brickenauxk_a8_30k_step20000.pt
+qwen_l15_tsae_k128_step10000.pt    (2.7 GB)
+  └─ HF: dmanningcoe/temp-xc-em-features:tsae/qwen_l15_tsae_k128_step10000.pt
+qwen_l15_tsae_k128_step20000.pt    (2.7 GB)
+  └─ HF: dmanningcoe/temp-xc-em-features:tsae/qwen_l15_tsae_k128_step20000.pt
+qwen_l15_tsae_k128_step50000.pt    (2.7 GB)
+  └─ HF: dmanningcoe/temp-xc-em-features:tsae/qwen_l15_tsae_k128_step50000.pt
+qwen_l15_tsae_k128_step80000.pt    (2.7 GB)
+  └─ HF: dmanningcoe/temp-xc-em-features:tsae/qwen_l15_tsae_k128_step80000.pt
+qwen_l15_tsae_residmid_k128_step10000.pt    (2.7 GB)
+  └─ HF: dmanningcoe/temp-xc-em-features:tsae/qwen_l15_tsae_residmid_k128_step10000.pt
+qwen_l15_tsae_residmid_k128_step20000.pt    (2.7 GB)
+  └─ HF: dmanningcoe/temp-xc-em-features:tsae/qwen_l15_tsae_residmid_k128_step20000.pt
+qwen_l15_sae_arditi_k128_30k_step10000.pt    (897 MB)
+  └─ HF: dmanningcoe/temp-xc-em-features:sae/qwen_l15_sae_arditi_k128_30k_step10000.pt
+qwen_l15_sae_arditi_k128_30k_step20000.pt    (897 MB)
+  └─ HF: dmanningcoe/temp-xc-em-features:sae/qwen_l15_sae_arditi_k128_30k_step20000.pt
+v2_qwen_l15_sae_arditi_k128_step50000.pt    (2.7 GB)
+  └─ HF: dmanningcoe/temp-xc-em-features:sae/v2_qwen_l15_sae_arditi_k128_step50000.pt
+v2_qwen_l15_sae_arditi_k128_step80000.pt    (2.7 GB)
+  └─ HF: dmanningcoe/temp-xc-em-features:sae/v2_qwen_l15_sae_arditi_k128_step80000.pt
+qwen_l15_txc_paper_k100bt_d16k_60k_step30000.pt    (6.6 GB)
+  └─ HF: dmanningcoe/temp-xc-em-features:txc/qwen_l15_txc_paper_k100bt_d16k_60k_step30000.pt
+  └─ Intermediate 30k/60k of the TXC paper k=100 60k extension run (final step60000 retained,
+     was the Wang source — but Wang result was a regression vs the original 30k anchor).
+```
+
 ### Last verified
 
 2026-05-01 — repo size ≈ 230 GB across 50+ ckpts. Repo is **public** (no token needed to download).

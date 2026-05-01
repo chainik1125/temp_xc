@@ -109,6 +109,9 @@ def main():
         ("WindowedTSAE T=2 vanilla (no contrastive) d=32k k=128 + mix 30k  (BUNDLE)",
          load_bundle(H / "wtsae_T2_vanilla_d32k_k128_mix/wang_wtsae_T2_vanilla_d32k_k128_mix_30000step_bundle30_frontier.json"),
          "slategray"),
+        ("TXC paper k=100 60k extension @ resid_post  (BUNDLE — judge-NaN-heavy)",
+         load_bundle(H / "txc_paper_k100bt_d16k_60k_step60000/results/wang_txc_paper_k100bt_d16k_60k_step60000_bundle30_frontier.json"),
+         "olivedrab"),
         ("T-SAE 30k @ resid_post (ours: k=128, α=1.0)",
          load_bundle(root / "wang/tsae_30k_bundle30_frontier.json"), "darkorange"),
     ]

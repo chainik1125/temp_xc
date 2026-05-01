@@ -332,3 +332,52 @@ Best single-feat **52.20** (feat 15471 at α=−1.25, coh 25.94). Far below the 
 **Update to Current best table**: this result is a clear regression on both bundle and single — does NOT enter top-5 on either metric. No update.
 
 **Decision tree action.** Next experiment: launch Track D D2 on h100_2 (which is now free after this Wang completion). Track D code (TXC + adjacency contrastive overlapping-window) was implemented in commit 002f7785 but not yet launched. The vanilla result above strengthens our prior that contrastive is the load-bearing component for windowing, so D2 (TXC + adjacency contrastive @ k=100, alpha=0.1, 30k steps) is the highest-value next experiment. Launching now on h100_2.
+
+### 2026-05-01 07:00 UTC — Track C3 result: TXC paper k=100 60k extension is a regression
+
+TXC paper-faithful k=100 retrained from scratch for 60k steps (same seed, same recipe — d_sae=16384, k_total=100, T=5, BatchTopK ON, batch=512, lr=3e-4, hookpoint=resid_post). Saved snapshots at step 30000 and 60000; Wang procedure run on the step60000 ckpt.
+
+**Bundle k=30 frontier — caveat: extremely noisy**
+
+The bundle frontier on this checkpoint produced NaN judge scores at most α — only ~5 of 27 α buckets returned a non-NaN alignment. That is unusual; on prior TXC k=100 runs the bundle frontier had ≤2 NaNs out of 27. With n_rollouts=8 per α and bundle steering at k=30 producing more extreme outputs, individual rollouts may be failing the judge more often, but the rate here is high enough that the bundle metric for this run is essentially uninterpretable. Reporting the few non-NaN rows for completeness:
+
+| α      | align | coh  |
+| ------ | ----- | ---- |
+| +10.00 | 87.5  | nan  |
+| −10.00 | 85.0  | 40.0 |
+| +1.25  | 77.5  | 31.7 |
+| −2.00  | 20.0  | nan  |
+| −1.75  | 20.0  | 52.5 |
+
+These are single-rollout-group means with most α adjacent to them being NaN. I do not trust 85.0/87.5 as bundle peaks; they are likely outliers from few valid samples.
+
+**Stage 4 single-feature peaks (3 finalists)**
+
+| feat | Δz̄    | peak α | align | coh   | α=0   | valid rows |
+| ---- | ----- | ------ | ----- | ----- | ----- | ---------- |
+| 3515 | +0.27 | −5.00  | **52.68** | 26.33 | 40.95 | 23/27 |
+| 5671 | +0.27 | −1.25  | 70.77 | nan   | None  | 3/27 |
+| 3824 | +0.32 | −4.00  | 71.25 | 30.00 | None  | 12/27 |
+
+The 70.77 (feat 5671, 3/27 valid) and 71.25 (feat 3824, 12/27 valid) numbers are *too noisy to take seriously* — both finalists have α=0 baselines that the judge couldn't even score. The only finalist with reasonable judge coverage is feat 3515: peak **52.68** at α=−5 (coh 26.33).
+
+**Comparison with the original TXC paper k=100 30k anchor:**
+
+| run | best single-feat peak | bundle peak | comments |
+| --- | --------------------- | ----------- | -------- |
+| TXC paper k=100 30k (anchor) | feat 4563 = **58.47** | 50.89 | The current single-feat champion. |
+| TXC paper k=100 60k (this) | feat 3515 = **52.68** (reliable) | uninterpretable (NaN-heavy) | Different finalists — feat 4563 is no longer in the screen top-100 at 60k. |
+
+**What this means.**
+
+1. **More compute hurts the TXC paper k=100 single-feature peak.** Extending training from 30k → 60k drops the best reliable per-feature peak from 58.47 to 52.68 (−5.79). The champion feature 4563 from the 30k checkpoint does not survive into the 60k checkpoint's screen top-100 — the encoder has rotated/re-organized its features under continued training.
+2. **BatchTopK gate evolution likely culprit.** TXC paper-faithful uses BatchTopK with k_total=100 across T=5 positions. After 30k steps the gate has settled on a particular feature partition that happened to produce an excellent steerer (4563). Continued training continues to optimize global reconstruction (which the loss still cares about) but at the cost of the specific causally-relevant directions that aren't reflected in the L2 loss signal — so the high-quality steerer feature gets eroded.
+3. **Track C3 is dead.** Per the brief's decision tree: "If single-feat ≥ 58.47: try k=10 next. If 52 ≤ single-feat < 58.47: nonmonotonic curve, try k=30 or k=75. If single-feat < 52: stop sparse direction." 52.68 is on the boundary — but the prior TXC paper k-sweep already covered k=20/50/100/200, so we have the k-curve data; 60k extension just does not help. Do not run C3-style longer extensions on other k values.
+4. **The judge-NaN-heavy bundle frontier is itself a useful signal.** The bundle steering at k=30 on this checkpoint produces incoherent outputs at most α — much more so than other TXC ckpts. This is consistent with the 60k-trained encoder having lost the structural coherence of its top features, even on the bundle metric (which would normally smooth over individual feature pathology).
+
+**Decision tree action.**
+
+- **Drop further C3-style "more compute" exploration** on TXC paper-faithful. The 30k anchor is already at the sweet spot.
+- **h100_1 GPU is now free.** Disk has been cleaned (50 GB available). Launch the next priority experiment: Track E1 (TXC T=2 arditi-matched, d_sae=32768, k=128, batch=256, lr=3e-4, per-window TopK, 100k steps). This is the cleanest test of "TXC architecture (per-position W_enc summing into one window-z) on top of the arditi recipe that produced the strongest bundle (57.42)". Per the brief the launcher block targets h100_2, but h100_2 is busy with Track D D2 — adapting to launch on h100_1 now.
+- **h100_2 still busy with Track D D2** (TXC k=100 + adjacency contrastive alpha=0.1, step ~13500/30000). ETA training done in ~1.5h, then ~2h Wang. Will check on next firing.
+

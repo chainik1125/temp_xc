@@ -409,8 +409,16 @@ Disk on h100_1 was 92% used at last firing. The TXC k=100 60k will produce snaps
 - **Track B B1 result (vanilla windowed SAE T=2)** — DONE, pulled. Bundle 51.93, best single feat 15471 = 52.20 (both significant regressions vs SAE arditi T=1 anchor of 57.42). Decisive evidence that windowing alone (no contrastive) does NOT work. Track B is dead — do not ladder to T=3.
 - **Track A (windowed_tsae) → contrastive is essential**. Comparing the no-contrastive run above to the matr+mix variant (bundle 55.57) shows that the T-SAE contrastive recipe is what makes windowing viable.
 
-In flight now:
-- **h100_1**: TXC paper k=100 60k @ resid_post (Track C3) — training DONE (60k snap saved), Wang in stage 3 strength sweep (~feat 9-10/20). ETA Wang ~1.5h, then bundle frontier ~30 min. Will be DONE this/next firing.
-- **h100_2**: TXC paper-faithful k=100 + adjacency contrastive alpha=0.1 (Track D D2) — JUST launched, log `txc_paper_k100_dadj_a0p1.log`. d_sae=16384, k_total=100, T=5, BatchTopK ON, batch=512, lr=3e-4, 30k steps @ resid_post. ETA training ~1.5h, then ~2h Wang. Tests whether T-SAE-style contrastive added to TXC raises the bundle metric while keeping single-feat peaks high.
+### Snapshot at 2026-05-01 07:00 UTC firing
 
-Disk on h100_1: 3.0 GB free, 99% used. **Next firing must clean up before launching anything new on h100_1.** Per disk policy, verify HF mirror first, then delete. The TXC k=100 60k step60000 ckpt + the older step30000 redundant snap and other older TXC paper variants (k=20, k=50, k=200) are candidates after Wang completes.
+- **Track C3 result (TXC paper k=100 60k extension)** — DONE, pulled. Bundle frontier was extremely judge-NaN-heavy (~5/27 valid α). Best reliable per-finalist peak: feat 3515 α=−5 align=**52.68** coh=26.33 (23/27 valid rows). Strong regression vs the 30k anchor's feat 4563=58.47. The two other finalists (5671, 3824) had only 3/27 and 12/27 valid rows respectively, with apparent peaks in the 70s but those are noise outliers — not reproducible signal. Track C3 is dead: more compute hurts the TXC paper k=100 single-feature peak.
+- **Disk cleanup completed**: deleted ~46 GB of intermediate ckpts (han_champ_30k step10/20k, txc_brickenauxk_a8_30k step10/20k, tsae_k128 step10/20/50/80k, tsae_residmid step10/20k, sae_arditi_30k step10/20k, v2 sae_arditi step50/80k, txc_paper_k100bt_d16k_60k_step30000). All verified mirrored on HF. h100_1 disk now 50 GB free (76%). Logged to trained_models_log.md.
+- **Track E1 launched on h100_1** (now-free GPU): TXC T=2 arditi-matched. d_sae=32768, k_total=128, T=2, batch=256, lr=3e-4, per-window TopK (no BatchTopK), 100k steps @ resid_post, snapshots at 30000/60000/100000. Log `txc_arditi_T2_d32k_k128.log`. ETA training ~6-8h (100k steps with 2x d_sae and 2x batch vs 30k TXC paper-faithful), then ~2h Wang. Tests whether the TXC architecture (per-position W_enc summing into one window-z) helps on top of arditi's recipe (which is the strongest bundle anchor at 57.42).
+
+In flight now:
+- **h100_1**: Track E1 — TXC T=2 arditi-matched 100k @ resid_post — JUST launched (PID 765421). ETA training ~6-8h, then ~2h Wang.
+- **h100_2**: Track D D2 — TXC paper-faithful k=100 + adjacency contrastive alpha=0.1 — training step ~13500/30000. ETA training done in ~1.5h, then ~2h Wang. Should be DONE in ~3.5h.
+
+Disk on h100_1: 50 GB free (76% used) after cleanup. h100_2: 150 GB free.
+
+The plot script `plot_overnight_panels.py` PANELS list now includes the C3 60k bundle frontier (color olivedrab, with NaN-heavy disclaimer in title). Will need to add E1 and D2 panels when those finish.
