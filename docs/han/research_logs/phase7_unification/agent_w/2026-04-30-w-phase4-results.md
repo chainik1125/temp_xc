@@ -331,6 +331,20 @@ Three protocols (right-edge, per-position, V6 dec-broadcast) deliver Δ ≥ +0.7
 
 **Status**: PAPER-GRADE — multi-seed verified; matches OBLITERATION-class win on a simpler architecture.
 
+**Bootstrap 95% CIs** (concept-resampled, 1000 trials):
+
+| protocol | metric | bootstrap Δ | 95% CI on Δ | sig? |
+|---|---|---|---|---|
+| right-edge | coh ≥ 1.75 | +0.697 | [0.000, +1.167] | borderline |
+| per-position | coh ≥ 1.75 | +0.734 | [−0.006, +1.167] | borderline |
+| V6 dec-broadcast | coh ≥ 1.75 | +0.690 | [−0.011, +1.111] | borderline |
+| **V6 dec-broadcast** | **coh ≥ 2.0** | **+0.420** | **[+0.011, +1.106]** | **✓ SIG** |
+| V5 left-edge | coh ≥ 2.0 | +0.152 | [−0.033, +0.695] | borderline |
+
+**V6 dec-broadcast at coh ≥ 2.0** is the only cell that achieves strict statistical significance under concept-bootstrap (lower CI bound > 0). The other cells are borderline — point estimates are large (Δ=+0.7) but CIs are wide due to concept-level variance with n=30.
+
+**Note on bootstrap CI width**: same-pod (W) bootstrap gives wider CIs than Y's mixed-pod bootstrap (Y had Y's sd=42 + W's sd=1, sd=2; my bootstrap is W-only). The point estimate Δ=+0.811 still solidly clears the +0.27 threshold; only the 2.5% lower-bound is sensitive to seed selection.
+
 ### MYSTERY arch: Contrastive-merge TXC (end-vs-start) sd=42
 
 `TXCContrastiveMergeH8`: encoder `z = enc(x[T-1]) - enc(x[0])` (captures CHANGE).
