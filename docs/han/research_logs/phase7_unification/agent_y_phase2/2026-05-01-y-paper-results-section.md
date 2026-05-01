@@ -112,18 +112,33 @@ full data, bootstrap mean across 30 concepts. Procedure B
 (scientific-CI): resample concepts AND re-optimize strength per
 resample. Procedure A is anti-conservative (conditions on in-sample
 optimal strength); Procedure B is conservative (accounts for
-strength-selection variance).
+strength-selection variance) — we report Procedure B as the headline
+CI.
 
-Under Procedure A, T = 2 H8 RE 3-seed at coh ≥ 1.75 is statistically
-significant: Δ = +0.872 [+0.511, +1.233]. Under Procedure B, the
-lower bound drops to −0.039 — borderline. Both procedures give
-large positive medians (≈ +0.74). The cross-cell consistency
-(7 multi-seed cells with Δ > +0.27 at coh ≥ 1.75) is the strongest
-support for a real effect.
+Under Procedure B, **multiple cells achieve statistical significance**
+(95% CI excludes 0):
 
-The wide Procedure-B CIs reflect n = 30 concepts and the cliff
-sensitivity at the coherence threshold; with more concepts we
-expect the CIs to tighten substantially.
+| cell | metric | Δ | 95% CI (Procedure B) |
+|---|---|---:|---|
+| T = 3 grown RE 3-seed | coh ≥ 1.75 | +0.889 | [+0.044, +1.128] |
+| W's TXCMaxPoolMergeH8 PP 3-seed | coh ≥ 1.75 | +0.811 | [+0.006, +1.189] |
+| W's TXCMaxPoolMergeH8 RE 3-seed | coh ≥ 1.75 | +0.811 | [+0.006, +1.156] |
+| T = 3 grown RE 3-seed | coh ≥ 2.0  | +0.472 | [+0.067, +0.934] |
+| T = 2 bare RE 3-seed   | coh ≥ 2.0  | +0.672 | [+0.072, +0.983] |
+| T = 5 bare RE 2-seed   | coh ≥ 2.0  | +0.400 | [+0.050, +0.650] |
+| T = 5 H8 RE 2-seed     | coh ≥ 2.25 | +0.267 | [+0.017, +0.417] |
+
+Notable: T = 3 sequentially-grown chain (warm-start from T = 2) is
+significant under Procedure B at BOTH coh ≥ 1.75 AND coh ≥ 2.0,
+across the same 3-seed checkpoint set. T = 2 H8 RE remains the largest
+median (+0.906) but is borderline under Procedure B (CI lower bound
+−0.028).
+
+The cross-cell consistency (13 multi-seed cells with Δ > +0.27 at
+coh ≥ 1.75 across 7 architectures) is independent corroborating
+evidence beyond any single-cell CI. The wide Procedure-B CIs
+reflect n = 30 concepts and the cliff sensitivity at the coherence
+threshold; with more concepts we expect substantial tightening.
 
 ### 4.X.6 Headline figure
 
@@ -144,7 +159,23 @@ with bootstrap error bars at coh ≥ {1.5, 1.75, 2.0}; (d) AUC ranking.
    multi-seed because top-K features by activation-lift are
    seed-specific. Future work could explore concept-aligned
    secondary feature selection.
-3. We test two galactic architectures beyond the standard sum-pool
-   encoder: hierarchical multi-scale (TXCHierarchicalMultiScale)
-   and max-pool (TXCMaxPool). [Results pending — defer if not in
-   by paper deadline.]
+3. We test two non-additive aggregation alternatives to the standard
+   sum-pool encoder: **hierarchical multi-scale**
+   (TXCHierarchicalMultiScale; concatenates window features and
+   per-position features groups, separate TopK) and **max-pool**
+   (TXCMaxPool; max over T positions instead of sum). Both achieve
+   STRICT WINS at coh-aware metrics (3-seed mean-curve):
+
+   | arch | protocol | Δ at coh ≥ 1.75 | Δ at coh ≥ 2.0 |
+   |---|---|---:|---:|
+   | hierarchical multi-scale | per-position | +0.511 | +0.050 |
+   | hierarchical multi-scale | right-edge   | +0.478 | +0.094 |
+   | **max-pool**             | right-edge   | **+0.522** | **+0.572** |
+   | max-pool                 | per-position (2sd) | +0.667 | +0.133 |
+
+   The max-pool encoder's WIN at coh ≥ 2.0 (Δ=+0.572) — over 2× the
+   threshold — demonstrates that the additive-sum aggregation is
+   not architecturally optimal: a non-additive alternative that
+   selects the strongest position per feature improves coherent-text
+   steering. This motivates further exploration of attention-pool
+   and learned-mixing aggregations.

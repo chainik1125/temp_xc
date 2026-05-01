@@ -26,7 +26,10 @@ THRESHOLDS = [1.5, 1.75, 2.0, 2.25, 2.5]
 
 # All cells at matched k_pos=20, with their multi-seed protocol+arch combinations
 CELLS = [
-    ("T-SAE k=20 (anchor)", [("steering_paper_normalised", "tsae_paper_k20", 42)]),
+    ("T-SAE k=20 (anchor, multi-seed)", [
+        ("steering_paper_normalised", "tsae_paper_k20", 42),
+        ("steering_paper_normalised_seed1", "tsae_paper_k20", 1),
+    ]),
     # T=2 H8 multi-seed
     ("T=2 H8 shifts=(T,) PP", [
         ("steering_paper_window_perposition", "txc_h8_t2_kpos20_shifts2", 42),
@@ -71,7 +74,49 @@ CELLS = [
     ("T=3 grown PP (1sd)", [("steering_paper_window_perposition", "txc_bare_antidead_t3_kpos20_grownFromT2sd42", 42)]),
     ("T=4 grown chain PP (1sd)", [("steering_paper_window_perposition", "txc_bare_antidead_t4_kpos20_grownChainFromT3", 42)]),
     ("T=5 grown chain PP (1sd)", [("steering_paper_window_perposition", "txc_bare_antidead_t5_kpos20_grownChainFromT4", 42)]),
-    ("T=2 T-SAE WS PP (1sd)", [("steering_paper_window_perposition", "txc_bare_antidead_t2_kpos20_ws_tsae_encoder", 42)]),
+    # NEW 3-seed cells (T=3 grown, T-SAE WS, Galaxy 4, Galaxy 6)
+    ("T=3 grown PP (3sd)", [
+        ("steering_paper_window_perposition", "txc_bare_antidead_t3_kpos20_grownFromT2sd42", 42),
+        ("steering_paper_window_perposition_seed1", "txc_bare_antidead_t3_kpos20_grownFromT2sd42", 1),
+        ("steering_paper_window_perposition_seed2", "txc_bare_antidead_t3_kpos20_grownFromT2sd42", 2),
+    ]),
+    ("T=3 grown RE (3sd)", [
+        ("steering_paper_normalised", "txc_bare_antidead_t3_kpos20_grownFromT2sd42", 42),
+        ("steering_paper_normalised_seed1", "txc_bare_antidead_t3_kpos20_grownFromT2sd42", 1),
+        ("steering_paper_normalised_seed2", "txc_bare_antidead_t3_kpos20_grownFromT2sd42", 2),
+    ]),
+    ("T-SAE WS PP (3sd)", [
+        ("steering_paper_window_perposition", "txc_bare_antidead_t2_kpos20_ws_tsae_encoder", 42),
+        ("steering_paper_window_perposition_seed1", "txc_bare_antidead_t2_kpos20_ws_tsae_encoder", 1),
+        ("steering_paper_window_perposition_seed2", "txc_bare_antidead_t2_kpos20_ws_tsae_encoder", 2),
+    ]),
+    ("T-SAE WS RE (3sd)", [
+        ("steering_paper_normalised", "txc_bare_antidead_t2_kpos20_ws_tsae_encoder", 42),
+        ("steering_paper_normalised_seed1", "txc_bare_antidead_t2_kpos20_ws_tsae_encoder", 1),
+        ("steering_paper_normalised_seed2", "txc_bare_antidead_t2_kpos20_ws_tsae_encoder", 2),
+    ]),
+    ("Galaxy 4 hierarchical PP (3sd)", [
+        ("steering_paper_window_perposition", "txc_galaxy4_t2_kw10_kp10", 42),
+        ("steering_paper_window_perposition_seed1", "txc_galaxy4_t2_kw10_kp10", 1),
+        ("steering_paper_window_perposition_seed2", "txc_galaxy4_t2_kw10_kp10", 2),
+    ]),
+    ("Galaxy 4 hierarchical RE (3sd)", [
+        ("steering_paper_normalised", "txc_galaxy4_t2_kw10_kp10", 42),
+        ("steering_paper_normalised_seed1", "txc_galaxy4_t2_kw10_kp10", 1),
+        ("steering_paper_normalised_seed2", "txc_galaxy4_t2_kw10_kp10", 2),
+    ]),
+    ("Galaxy 6 max-pool PP (3sd)", [
+        ("steering_paper_window_perposition", "txc_maxpool_t2_kpos20", 42),
+        ("steering_paper_window_perposition_seed1", "txc_maxpool_t2_kpos20", 1),
+        ("steering_paper_window_perposition_seed2", "txc_maxpool_t2_kpos20", 2),
+    ]),
+    ("Galaxy 6 max-pool RE (3sd)", [
+        ("steering_paper_normalised", "txc_maxpool_t2_kpos20", 42),
+        ("steering_paper_normalised_seed1", "txc_maxpool_t2_kpos20", 1),
+        ("steering_paper_normalised_seed2", "txc_maxpool_t2_kpos20", 2),
+    ]),
+    # NOTE: W's mystery archs labeled "MaxPool-merge"/"Contrastive-merge" below
+    # use the canonical labels — Y's "W TXCMaxPoolMergeH8" entries deduped on rebase.
     ("T=5 bare k_win=20 PP (1sd)", [("steering_paper_window_perposition", "txc_bare_antidead_t5_kwin20", 42)]),
     ("T=3 bare W cellC PP (1sd)", [("steering_paper_window_perposition", "txc_bare_antidead_t3_kpos20", 42)]),
     ("T=5 matry W cellE PP (1sd)", [("steering_paper_window_perposition", "agentic_txc_02_kpos20", 42)]),
@@ -214,7 +259,7 @@ def main():
         }
     print(f"loaded {len(cells_data)} cells")
 
-    anchor_label = "T-SAE k=20 (anchor)"
+    anchor_label = "T-SAE k=20 (anchor, multi-seed)"
     anchor_pc = cells_data[anchor_label]["per_concept"]
 
     # Compute all metrics

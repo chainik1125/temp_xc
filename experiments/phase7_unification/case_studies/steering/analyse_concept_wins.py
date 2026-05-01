@@ -30,7 +30,10 @@ PLOTS_DIR.mkdir(exist_ok=True, parents=True)
 
 # Cells to compare per-concept against T-SAE anchor
 CELLS = [
-    ("T-SAE k=20 anchor", [("steering_paper_normalised", "tsae_paper_k20", 42)]),
+    ("T-SAE k=20 anchor", [
+        ("steering_paper_normalised", "tsae_paper_k20", 42),
+        ("steering_paper_normalised_seed1", "tsae_paper_k20", 1),
+    ]),
     ("T=2 H8 PP", [
         ("steering_paper_window_perposition", "txc_h8_t2_kpos20_shifts2", 42),
         ("steering_paper_window_perposition_seed1", "txc_h8_t2_kpos20_shifts2", 1),
@@ -50,6 +53,16 @@ CELLS = [
         ("steering_paper_normalised", "txc_bare_antidead_t2_kpos20", 42),
         ("steering_paper_normalised_seed1", "txc_bare_antidead_t2_kpos20", 1),
         ("steering_paper_normalised_seed2", "txc_bare_antidead_t2_kpos20", 2),
+    ]),
+    ("Galaxy 6 max-pool RE", [
+        ("steering_paper_normalised", "txc_maxpool_t2_kpos20", 42),
+        ("steering_paper_normalised_seed1", "txc_maxpool_t2_kpos20", 1),
+        ("steering_paper_normalised_seed2", "txc_maxpool_t2_kpos20", 2),
+    ]),
+    ("Galaxy 6 max-pool PP", [
+        ("steering_paper_window_perposition", "txc_maxpool_t2_kpos20", 42),
+        ("steering_paper_window_perposition_seed1", "txc_maxpool_t2_kpos20", 1),
+        ("steering_paper_window_perposition_seed2", "txc_maxpool_t2_kpos20", 2),
     ]),
 ]
 

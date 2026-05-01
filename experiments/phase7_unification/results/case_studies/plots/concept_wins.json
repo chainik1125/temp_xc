@@ -1,34 +1,16 @@
 {
   "T=2 H8 PP": {
     "per_concept_peak_thr_1.5": {
-      "wins": 11,
-      "losses": 10,
-      "ties": 9,
+      "wins": 10,
+      "losses": 12,
+      "ties": 8,
       "n": 30,
-      "mean_diff": 0.12222222222222222,
+      "mean_diff": -0.19444444444444445,
       "ci_95": [
-        -0.3,
-        0.5113888888888887
+        -0.5277777777777778,
+        0.09999999999999996
       ],
       "top_wins": [
-        {
-          "concept": "financial",
-          "anchor": 0.0,
-          "cell": 2.3333333333333335,
-          "delta": 2.3333333333333335
-        },
-        {
-          "concept": "neutral_factual",
-          "anchor": 1.0,
-          "cell": 3.0,
-          "delta": 2.0
-        },
-        {
-          "concept": "narrative",
-          "anchor": 1.0,
-          "cell": 3.0,
-          "delta": 2.0
-        },
         {
           "concept": "geographical",
           "anchor": 0.0,
@@ -36,29 +18,47 @@
           "delta": 1.6666666666666667
         },
         {
-          "concept": "poetic",
+          "concept": "historical",
+          "anchor": 1.5,
+          "cell": 2.3333333333333335,
+          "delta": 0.8333333333333335
+        },
+        {
+          "concept": "code_context",
+          "anchor": 0.5,
+          "cell": 1.3333333333333333,
+          "delta": 0.8333333333333333
+        },
+        {
+          "concept": "negative_emotion",
           "anchor": 1.0,
-          "cell": 2.6666666666666665,
-          "delta": 1.6666666666666665
+          "cell": 1.6666666666666667,
+          "delta": 0.6666666666666667
+        },
+        {
+          "concept": "deception",
+          "anchor": 0.5,
+          "cell": 1.0,
+          "delta": 0.5
         }
       ],
       "top_losses": [
         {
-          "concept": "religious",
+          "concept": "helpfulness_marker",
           "anchor": 1.0,
           "cell": 0.0,
           "delta": -1.0
         },
         {
-          "concept": "legal",
-          "anchor": 3.0,
-          "cell": 2.0,
-          "delta": -1.0
+          "concept": "dialogue",
+          "anchor": 1.5,
+          "cell": 0.0,
+          "delta": -1.5
         },
         {
-          "concept": "instructional",
-          "anchor": 3.0,
-          "cell": 1.3333333333333333,
+          "concept": "question_form",
+          "anchor": 2.0,
+          "cell": 0.3333333333333333,
           "delta": -1.6666666666666667
         },
         {
@@ -76,16 +76,28 @@
       ]
     },
     "per_concept_peak_thr_1.75": {
-      "wins": 7,
-      "losses": 12,
-      "ties": 11,
+      "wins": 10,
+      "losses": 13,
+      "ties": 7,
       "n": 30,
-      "mean_diff": -0.3111111111111111,
+      "mean_diff": -0.29444444444444445,
       "ci_95": [
-        -0.7333333333333333,
-        0.044444444444444425
+        -0.7555555555555556,
+        0.15555555555555553
       ],
       "top_wins": [
+        {
+          "concept": "technical_jargon",
+          "anchor": 0.0,
+          "cell": 2.3333333333333335,
+          "delta": 2.3333333333333335
+        },
+        {
+          "concept": "scientific",
+          "anchor": 0.0,
+          "cell": 2.0,
+          "delta": 2.0
+        },
         {
           "concept": "geographical",
           "anchor": 0.0,
@@ -99,31 +111,13 @@
           "delta": 1.6666666666666665
         },
         {
-          "concept": "medical",
-          "anchor": 2.0,
-          "cell": 3.0,
-          "delta": 1.0
-        },
-        {
           "concept": "deception",
-          "anchor": 0.0,
+          "anchor": 0.5,
           "cell": 1.0,
-          "delta": 1.0
-        },
-        {
-          "concept": "imperative_form",
-          "anchor": 0.0,
-          "cell": 0.3333333333333333,
-          "delta": 0.3333333333333333
+          "delta": 0.5
         }
       ],
       "top_losses": [
-        {
-          "concept": "historical",
-          "anchor": 2.0,
-          "cell": 0.6666666666666666,
-          "delta": -1.3333333333333335
-        },
         {
           "concept": "programming",
           "anchor": 3.0,
@@ -131,19 +125,25 @@
           "delta": -1.6666666666666667
         },
         {
-          "concept": "instructional",
+          "concept": "narrative",
           "anchor": 3.0,
           "cell": 1.0,
           "delta": -2.0
         },
         {
-          "concept": "harmful_content",
+          "concept": "question_form",
+          "anchor": 2.0,
+          "cell": 0.0,
+          "delta": -2.0
+        },
+        {
+          "concept": "financial",
           "anchor": 3.0,
           "cell": 0.0,
           "delta": -3.0
         },
         {
-          "concept": "legal",
+          "concept": "harmful_content",
           "anchor": 3.0,
           "cell": 0.0,
           "delta": -3.0
@@ -151,16 +151,28 @@
       ]
     },
     "per_concept_peak_thr_2.0": {
-      "wins": 7,
-      "losses": 12,
-      "ties": 11,
+      "wins": 10,
+      "losses": 13,
+      "ties": 7,
       "n": 30,
-      "mean_diff": -0.3111111111111111,
+      "mean_diff": -0.29444444444444445,
       "ci_95": [
-        -0.6777777777777778,
-        0.07777777777777775
+        -0.7666666666666667,
+        0.17249999999999974
       ],
       "top_wins": [
+        {
+          "concept": "technical_jargon",
+          "anchor": 0.0,
+          "cell": 2.3333333333333335,
+          "delta": 2.3333333333333335
+        },
+        {
+          "concept": "scientific",
+          "anchor": 0.0,
+          "cell": 2.0,
+          "delta": 2.0
+        },
         {
           "concept": "geographical",
           "anchor": 0.0,
@@ -174,31 +186,13 @@
           "delta": 1.6666666666666665
         },
         {
-          "concept": "medical",
-          "anchor": 2.0,
-          "cell": 3.0,
-          "delta": 1.0
-        },
-        {
           "concept": "deception",
-          "anchor": 0.0,
+          "anchor": 0.5,
           "cell": 1.0,
-          "delta": 1.0
-        },
-        {
-          "concept": "imperative_form",
-          "anchor": 0.0,
-          "cell": 0.3333333333333333,
-          "delta": 0.3333333333333333
+          "delta": 0.5
         }
       ],
       "top_losses": [
-        {
-          "concept": "historical",
-          "anchor": 2.0,
-          "cell": 0.6666666666666666,
-          "delta": -1.3333333333333335
-        },
         {
           "concept": "programming",
           "anchor": 3.0,
@@ -206,19 +200,25 @@
           "delta": -1.6666666666666667
         },
         {
-          "concept": "instructional",
+          "concept": "narrative",
           "anchor": 3.0,
           "cell": 1.0,
           "delta": -2.0
         },
         {
-          "concept": "harmful_content",
+          "concept": "question_form",
+          "anchor": 2.0,
+          "cell": 0.0,
+          "delta": -2.0
+        },
+        {
+          "concept": "financial",
           "anchor": 3.0,
           "cell": 0.0,
           "delta": -3.0
         },
         {
-          "concept": "legal",
+          "concept": "harmful_content",
           "anchor": 3.0,
           "cell": 0.0,
           "delta": -3.0
@@ -226,32 +226,32 @@
       ]
     },
     "strength_uniform_peak_thr_1.5": {
-      "anchor_mean": 1.1,
+      "anchor_mean": 1.1666666666666667,
       "cell_mean": 1.4,
-      "delta_mean": 0.2999999999999998,
+      "delta_mean": 0.23333333333333317,
       "ci_95_diff": [
-        -0.02222222222222224,
-        0.6336111111111108
+        -0.12777777777777777,
+        0.6112499999999998
       ],
       "n_common": 30
     },
     "strength_uniform_peak_thr_1.75": {
-      "anchor_mean": 0.36666666666666664,
+      "anchor_mean": 0.3333333333333333,
       "cell_mean": 0.611111111111111,
-      "delta_mean": 0.2444444444444444,
+      "delta_mean": 0.27777777777777773,
       "ci_95_diff": [
-        0.04444444444444442,
-        0.4669444444444442
+        0.08333333333333331,
+        0.4834722222222221
       ],
       "n_common": 30
     },
     "strength_uniform_peak_thr_2.0": {
-      "anchor_mean": 0.26666666666666666,
+      "anchor_mean": 0.2833333333333333,
       "cell_mean": 0.3444444444444444,
-      "delta_mean": 0.07777777777777772,
+      "delta_mean": 0.06111111111111106,
       "ci_95_diff": [
-        -0.07777777777777779,
-        0.2333333333333333
+        -0.1388888888888889,
+        0.2555555555555555
       ],
       "n_common": 30
     }
@@ -259,13 +259,13 @@
   "T=2 H8 RE": {
     "per_concept_peak_thr_1.5": {
       "wins": 12,
-      "losses": 9,
-      "ties": 9,
+      "losses": 14,
+      "ties": 4,
       "n": 30,
-      "mean_diff": 0.16111111111111112,
+      "mean_diff": -0.15555555555555553,
       "ci_95": [
-        -0.14999999999999997,
-        0.5055555555555556
+        -0.5,
+        0.21666666666666665
       ],
       "top_wins": [
         {
@@ -275,48 +275,36 @@
           "delta": 3.0
         },
         {
-          "concept": "neutral_factual",
-          "anchor": 1.0,
-          "cell": 3.0,
-          "delta": 2.0
-        },
-        {
-          "concept": "financial",
-          "anchor": 0.0,
-          "cell": 1.6666666666666667,
-          "delta": 1.6666666666666667
-        },
-        {
           "concept": "code_context",
-          "anchor": 1.0,
+          "anchor": 0.5,
           "cell": 2.0,
-          "delta": 1.0
+          "delta": 1.5
         },
         {
           "concept": "casual_register",
           "anchor": 1.0,
           "cell": 2.0,
           "delta": 1.0
+        },
+        {
+          "concept": "mathematical",
+          "anchor": 2.5,
+          "cell": 3.0,
+          "delta": 0.5
+        },
+        {
+          "concept": "neutral_factual",
+          "anchor": 2.5,
+          "cell": 3.0,
+          "delta": 0.5
         }
       ],
       "top_losses": [
         {
-          "concept": "formal_register",
+          "concept": "financial",
           "anchor": 3.0,
-          "cell": 2.3333333333333335,
-          "delta": -0.6666666666666665
-        },
-        {
-          "concept": "technical_jargon",
-          "anchor": 3.0,
-          "cell": 2.3333333333333335,
-          "delta": -0.6666666666666665
-        },
-        {
-          "concept": "legal",
-          "anchor": 3.0,
-          "cell": 2.0,
-          "delta": -1.0
+          "cell": 1.6666666666666667,
+          "delta": -1.3333333333333333
         },
         {
           "concept": "harmful_content",
@@ -325,24 +313,42 @@
           "delta": -1.3333333333333333
         },
         {
-          "concept": "instructional",
+          "concept": "dialogue",
+          "anchor": 1.5,
+          "cell": 0.0,
+          "delta": -1.5
+        },
+        {
+          "concept": "poetic",
           "anchor": 3.0,
           "cell": 1.3333333333333333,
           "delta": -1.6666666666666667
+        },
+        {
+          "concept": "narrative",
+          "anchor": 3.0,
+          "cell": 1.0,
+          "delta": -2.0
         }
       ]
     },
     "per_concept_peak_thr_1.75": {
-      "wins": 8,
-      "losses": 11,
-      "ties": 11,
+      "wins": 12,
+      "losses": 12,
+      "ties": 6,
       "n": 30,
-      "mean_diff": -0.19444444444444448,
+      "mean_diff": -0.17777777777777778,
       "ci_95": [
-        -0.5277777777777778,
-        0.10013888888888875
+        -0.6277777777777779,
+        0.272361111111111
       ],
       "top_wins": [
+        {
+          "concept": "technical_jargon",
+          "anchor": 0.0,
+          "cell": 2.3333333333333335,
+          "delta": 2.3333333333333335
+        },
         {
           "concept": "neutral_factual",
           "anchor": 1.0,
@@ -350,54 +356,48 @@
           "delta": 2.0
         },
         {
-          "concept": "code_context",
-          "anchor": 1.0,
+          "concept": "legal",
+          "anchor": 0.0,
           "cell": 2.0,
-          "delta": 1.0
+          "delta": 2.0
         },
         {
-          "concept": "geographical",
-          "anchor": 0.0,
-          "cell": 1.0,
-          "delta": 1.0
+          "concept": "code_context",
+          "anchor": 0.5,
+          "cell": 2.0,
+          "delta": 1.5
         },
         {
-          "concept": "imperative_form",
+          "concept": "scientific",
           "anchor": 0.0,
-          "cell": 0.3333333333333333,
-          "delta": 0.3333333333333333
-        },
-        {
-          "concept": "citation_pattern",
-          "anchor": 0.0,
-          "cell": 0.3333333333333333,
-          "delta": 0.3333333333333333
+          "cell": 1.5,
+          "delta": 1.5
         }
       ],
       "top_losses": [
         {
-          "concept": "legal",
-          "anchor": 3.0,
-          "cell": 2.0,
-          "delta": -1.0
-        },
-        {
           "concept": "medical",
-          "anchor": 2.0,
+          "anchor": 2.5,
           "cell": 1.0,
-          "delta": -1.0
+          "delta": -1.5
         },
         {
-          "concept": "historical",
-          "anchor": 2.0,
-          "cell": 0.6666666666666666,
-          "delta": -1.3333333333333335
+          "concept": "poetic",
+          "anchor": 3.0,
+          "cell": 1.3333333333333333,
+          "delta": -1.6666666666666667
         },
         {
-          "concept": "instructional",
+          "concept": "narrative",
           "anchor": 3.0,
           "cell": 1.0,
           "delta": -2.0
+        },
+        {
+          "concept": "financial",
+          "anchor": 3.0,
+          "cell": 0.0,
+          "delta": -3.0
         },
         {
           "concept": "harmful_content",
@@ -408,16 +408,22 @@
       ]
     },
     "per_concept_peak_thr_2.0": {
-      "wins": 8,
-      "losses": 11,
-      "ties": 11,
+      "wins": 12,
+      "losses": 12,
+      "ties": 6,
       "n": 30,
-      "mean_diff": -0.19444444444444448,
+      "mean_diff": -0.17777777777777778,
       "ci_95": [
-        -0.5279166666666667,
-        0.12236111111111098
+        -0.6723611111111112,
+        0.2722222222222222
       ],
       "top_wins": [
+        {
+          "concept": "technical_jargon",
+          "anchor": 0.0,
+          "cell": 2.3333333333333335,
+          "delta": 2.3333333333333335
+        },
         {
           "concept": "neutral_factual",
           "anchor": 1.0,
@@ -425,54 +431,48 @@
           "delta": 2.0
         },
         {
-          "concept": "code_context",
-          "anchor": 1.0,
+          "concept": "legal",
+          "anchor": 0.0,
           "cell": 2.0,
-          "delta": 1.0
+          "delta": 2.0
         },
         {
-          "concept": "geographical",
-          "anchor": 0.0,
-          "cell": 1.0,
-          "delta": 1.0
+          "concept": "code_context",
+          "anchor": 0.5,
+          "cell": 2.0,
+          "delta": 1.5
         },
         {
-          "concept": "imperative_form",
+          "concept": "scientific",
           "anchor": 0.0,
-          "cell": 0.3333333333333333,
-          "delta": 0.3333333333333333
-        },
-        {
-          "concept": "citation_pattern",
-          "anchor": 0.0,
-          "cell": 0.3333333333333333,
-          "delta": 0.3333333333333333
+          "cell": 1.5,
+          "delta": 1.5
         }
       ],
       "top_losses": [
         {
-          "concept": "legal",
-          "anchor": 3.0,
-          "cell": 2.0,
-          "delta": -1.0
-        },
-        {
           "concept": "medical",
-          "anchor": 2.0,
+          "anchor": 2.5,
           "cell": 1.0,
-          "delta": -1.0
+          "delta": -1.5
         },
         {
-          "concept": "historical",
-          "anchor": 2.0,
-          "cell": 0.6666666666666666,
-          "delta": -1.3333333333333335
+          "concept": "poetic",
+          "anchor": 3.0,
+          "cell": 1.3333333333333333,
+          "delta": -1.6666666666666667
         },
         {
-          "concept": "instructional",
+          "concept": "narrative",
           "anchor": 3.0,
           "cell": 1.0,
           "delta": -2.0
+        },
+        {
+          "concept": "financial",
+          "anchor": 3.0,
+          "cell": 0.0,
+          "delta": -3.0
         },
         {
           "concept": "harmful_content",
@@ -483,120 +483,45 @@
       ]
     },
     "strength_uniform_peak_thr_1.5": {
-      "anchor_mean": 1.1,
+      "anchor_mean": 1.1666666666666667,
       "cell_mean": 1.2388888888888887,
-      "delta_mean": 0.13888888888888862,
+      "delta_mean": 0.07222222222222197,
       "ci_95_diff": [
-        -0.2777777777777778,
-        0.5277777777777778
+        -0.3611111111111111,
+        0.47236111111111095
       ],
       "n_common": 30
     },
     "strength_uniform_peak_thr_1.75": {
-      "anchor_mean": 0.36666666666666664,
+      "anchor_mean": 0.3333333333333333,
       "cell_mean": 1.2388888888888887,
-      "delta_mean": 0.872222222222222,
+      "delta_mean": 0.9055555555555554,
       "ci_95_diff": [
-        0.5441666666666668,
-        1.2166666666666666
+        0.5722222222222223,
+        1.2668055555555555
       ],
       "n_common": 30
     },
     "strength_uniform_peak_thr_2.0": {
-      "anchor_mean": 0.26666666666666666,
+      "anchor_mean": 0.2833333333333333,
       "cell_mean": 0.4888888888888889,
-      "delta_mean": 0.2222222222222222,
+      "delta_mean": 0.20555555555555555,
       "ci_95_diff": [
-        -0.022222222222222233,
-        0.5222222222222221
+        -0.05569444444444448,
+        0.5
       ],
       "n_common": 30
     }
   },
   "T=2 bare PP": {
     "per_concept_peak_thr_1.5": {
-      "wins": 8,
-      "losses": 9,
-      "ties": 13,
+      "wins": 7,
+      "losses": 14,
+      "ties": 9,
       "n": 30,
-      "mean_diff": -0.11111111111111113,
+      "mean_diff": -0.4277777777777778,
       "ci_95": [
-        -0.4555555555555556,
-        0.2444444444444444
-      ],
-      "top_wins": [
-        {
-          "concept": "financial",
-          "anchor": 0.0,
-          "cell": 3.0,
-          "delta": 3.0
-        },
-        {
-          "concept": "poetic",
-          "anchor": 1.0,
-          "cell": 2.6666666666666665,
-          "delta": 1.6666666666666665
-        },
-        {
-          "concept": "geographical",
-          "anchor": 0.0,
-          "cell": 1.0,
-          "delta": 1.0
-        },
-        {
-          "concept": "deception",
-          "anchor": 0.0,
-          "cell": 1.0,
-          "delta": 1.0
-        },
-        {
-          "concept": "imperative_form",
-          "anchor": 0.0,
-          "cell": 0.3333333333333333,
-          "delta": 0.3333333333333333
-        }
-      ],
-      "top_losses": [
-        {
-          "concept": "instructional",
-          "anchor": 3.0,
-          "cell": 1.6666666666666667,
-          "delta": -1.3333333333333333
-        },
-        {
-          "concept": "medical",
-          "anchor": 2.0,
-          "cell": 0.3333333333333333,
-          "delta": -1.6666666666666667
-        },
-        {
-          "concept": "scientific",
-          "anchor": 2.0,
-          "cell": 0.3333333333333333,
-          "delta": -1.6666666666666667
-        },
-        {
-          "concept": "technical_jargon",
-          "anchor": 3.0,
-          "cell": 1.0,
-          "delta": -2.0
-        },
-        {
-          "concept": "legal",
-          "anchor": 3.0,
-          "cell": 1.0,
-          "delta": -2.0
-        }
-      ]
-    },
-    "per_concept_peak_thr_1.75": {
-      "wins": 6,
-      "losses": 12,
-      "ties": 12,
-      "n": 30,
-      "mean_diff": -0.4444444444444445,
-      "ci_95": [
-        -0.8002777777777779,
+        -0.7501388888888889,
         -0.13333333333333336
       ],
       "top_wins": [
@@ -607,42 +532,42 @@
           "delta": 1.0
         },
         {
-          "concept": "deception",
-          "anchor": 0.0,
-          "cell": 1.0,
-          "delta": 1.0
+          "concept": "mathematical",
+          "anchor": 2.5,
+          "cell": 3.0,
+          "delta": 0.5
         },
         {
-          "concept": "imperative_form",
-          "anchor": 0.0,
-          "cell": 0.3333333333333333,
-          "delta": 0.3333333333333333
+          "concept": "deception",
+          "anchor": 0.5,
+          "cell": 1.0,
+          "delta": 0.5
+        },
+        {
+          "concept": "list_format",
+          "anchor": 0.5,
+          "cell": 1.0,
+          "delta": 0.5
         },
         {
           "concept": "positive_emotion",
           "anchor": 0.0,
           "cell": 0.3333333333333333,
           "delta": 0.3333333333333333
-        },
-        {
-          "concept": "negative_emotion",
-          "anchor": 1.0,
-          "cell": 1.3333333333333333,
-          "delta": 0.33333333333333326
         }
       ],
       "top_losses": [
+        {
+          "concept": "narrative",
+          "anchor": 3.0,
+          "cell": 1.3333333333333333,
+          "delta": -1.6666666666666667
+        },
         {
           "concept": "scientific",
           "anchor": 2.0,
           "cell": 0.3333333333333333,
           "delta": -1.6666666666666667
-        },
-        {
-          "concept": "instructional",
-          "anchor": 3.0,
-          "cell": 1.0,
-          "delta": -2.0
         },
         {
           "concept": "technical_jargon",
@@ -657,22 +582,22 @@
           "delta": -2.0
         },
         {
-          "concept": "harmful_content",
-          "anchor": 3.0,
+          "concept": "medical",
+          "anchor": 2.5,
           "cell": 0.3333333333333333,
-          "delta": -2.6666666666666665
+          "delta": -2.1666666666666665
         }
       ]
     },
-    "per_concept_peak_thr_2.0": {
-      "wins": 6,
-      "losses": 12,
-      "ties": 12,
+    "per_concept_peak_thr_1.75": {
+      "wins": 10,
+      "losses": 13,
+      "ties": 7,
       "n": 30,
-      "mean_diff": -0.4444444444444445,
+      "mean_diff": -0.4277777777777778,
       "ci_95": [
-        -0.7777777777777779,
-        -0.13305555555555582
+        -0.8222222222222223,
+        -0.03319444444444458
       ],
       "top_wins": [
         {
@@ -682,123 +607,186 @@
           "delta": 1.0
         },
         {
-          "concept": "deception",
+          "concept": "technical_jargon",
           "anchor": 0.0,
           "cell": 1.0,
           "delta": 1.0
         },
         {
-          "concept": "imperative_form",
+          "concept": "legal",
           "anchor": 0.0,
-          "cell": 0.3333333333333333,
-          "delta": 0.3333333333333333
+          "cell": 1.0,
+          "delta": 1.0
         },
         {
-          "concept": "positive_emotion",
-          "anchor": 0.0,
-          "cell": 0.3333333333333333,
-          "delta": 0.3333333333333333
+          "concept": "mathematical",
+          "anchor": 2.5,
+          "cell": 3.0,
+          "delta": 0.5
         },
         {
-          "concept": "negative_emotion",
-          "anchor": 1.0,
-          "cell": 1.3333333333333333,
-          "delta": 0.33333333333333326
+          "concept": "deception",
+          "anchor": 0.5,
+          "cell": 1.0,
+          "delta": 0.5
         }
       ],
       "top_losses": [
         {
-          "concept": "scientific",
-          "anchor": 2.0,
-          "cell": 0.3333333333333333,
+          "concept": "narrative",
+          "anchor": 3.0,
+          "cell": 1.3333333333333333,
           "delta": -1.6666666666666667
         },
         {
-          "concept": "instructional",
-          "anchor": 3.0,
-          "cell": 1.0,
-          "delta": -2.0
-        },
-        {
-          "concept": "technical_jargon",
-          "anchor": 3.0,
-          "cell": 1.0,
-          "delta": -2.0
-        },
-        {
-          "concept": "legal",
-          "anchor": 3.0,
-          "cell": 1.0,
-          "delta": -2.0
+          "concept": "medical",
+          "anchor": 2.5,
+          "cell": 0.3333333333333333,
+          "delta": -2.1666666666666665
         },
         {
           "concept": "harmful_content",
           "anchor": 3.0,
           "cell": 0.3333333333333333,
           "delta": -2.6666666666666665
+        },
+        {
+          "concept": "financial",
+          "anchor": 3.0,
+          "cell": 0.0,
+          "delta": -3.0
+        },
+        {
+          "concept": "poetic",
+          "anchor": 3.0,
+          "cell": 0.0,
+          "delta": -3.0
+        }
+      ]
+    },
+    "per_concept_peak_thr_2.0": {
+      "wins": 10,
+      "losses": 13,
+      "ties": 7,
+      "n": 30,
+      "mean_diff": -0.4277777777777778,
+      "ci_95": [
+        -0.8555555555555557,
+        -0.06111111111111114
+      ],
+      "top_wins": [
+        {
+          "concept": "geographical",
+          "anchor": 0.0,
+          "cell": 1.0,
+          "delta": 1.0
+        },
+        {
+          "concept": "technical_jargon",
+          "anchor": 0.0,
+          "cell": 1.0,
+          "delta": 1.0
+        },
+        {
+          "concept": "legal",
+          "anchor": 0.0,
+          "cell": 1.0,
+          "delta": 1.0
+        },
+        {
+          "concept": "mathematical",
+          "anchor": 2.5,
+          "cell": 3.0,
+          "delta": 0.5
+        },
+        {
+          "concept": "deception",
+          "anchor": 0.5,
+          "cell": 1.0,
+          "delta": 0.5
+        }
+      ],
+      "top_losses": [
+        {
+          "concept": "narrative",
+          "anchor": 3.0,
+          "cell": 1.3333333333333333,
+          "delta": -1.6666666666666667
+        },
+        {
+          "concept": "medical",
+          "anchor": 2.5,
+          "cell": 0.3333333333333333,
+          "delta": -2.1666666666666665
+        },
+        {
+          "concept": "harmful_content",
+          "anchor": 3.0,
+          "cell": 0.3333333333333333,
+          "delta": -2.6666666666666665
+        },
+        {
+          "concept": "financial",
+          "anchor": 3.0,
+          "cell": 0.0,
+          "delta": -3.0
+        },
+        {
+          "concept": "poetic",
+          "anchor": 3.0,
+          "cell": 0.0,
+          "delta": -3.0
         }
       ]
     },
     "strength_uniform_peak_thr_1.5": {
-      "anchor_mean": 1.1,
+      "anchor_mean": 1.1666666666666667,
       "cell_mean": 0.9777777777777777,
-      "delta_mean": -0.12222222222222234,
+      "delta_mean": -0.188888888888889,
       "ci_95_diff": [
-        -0.4333333333333334,
-        0.16666666666666663
+        -0.5,
+        0.09999999999999999
       ],
       "n_common": 30
     },
     "strength_uniform_peak_thr_1.75": {
-      "anchor_mean": 0.36666666666666664,
+      "anchor_mean": 0.3333333333333333,
       "cell_mean": 0.9777777777777777,
-      "delta_mean": 0.6111111111111112,
+      "delta_mean": 0.6444444444444444,
       "ci_95_diff": [
-        0.3333333333333333,
-        0.922222222222222
+        0.3720833333333333,
+        0.9666666666666666
       ],
       "n_common": 30
     },
     "strength_uniform_peak_thr_2.0": {
-      "anchor_mean": 0.26666666666666666,
+      "anchor_mean": 0.2833333333333333,
       "cell_mean": 0.9777777777777777,
-      "delta_mean": 0.711111111111111,
+      "delta_mean": 0.6944444444444444,
       "ci_95_diff": [
-        0.37750000000000006,
-        1.0780555555555553
+        0.33874999999999994,
+        1.0722222222222224
       ],
       "n_common": 30
     }
   },
   "T=2 bare RE": {
     "per_concept_peak_thr_1.5": {
-      "wins": 8,
-      "losses": 10,
-      "ties": 12,
+      "wins": 9,
+      "losses": 15,
+      "ties": 6,
       "n": 30,
-      "mean_diff": -0.12222222222222223,
+      "mean_diff": -0.4388888888888889,
       "ci_95": [
-        -0.4666666666666667,
-        0.23333333333333328
+        -0.7444444444444444,
+        -0.11652777777777792
       ],
       "top_wins": [
         {
-          "concept": "financial",
-          "anchor": 0.0,
-          "cell": 2.3333333333333335,
-          "delta": 2.3333333333333335
-        },
-        {
-          "concept": "poetic",
-          "anchor": 1.0,
-          "cell": 2.3333333333333335,
-          "delta": 1.3333333333333335
-        },
-        {
-          "concept": "imperative_form",
-          "anchor": 0.0,
-          "cell": 1.0,
-          "delta": 1.0
+          "concept": "historical",
+          "anchor": 1.5,
+          "cell": 2.6666666666666665,
+          "delta": 1.1666666666666665
         },
         {
           "concept": "geographical",
@@ -807,33 +795,45 @@
           "delta": 1.0
         },
         {
+          "concept": "mathematical",
+          "anchor": 2.5,
+          "cell": 3.0,
+          "delta": 0.5
+        },
+        {
           "concept": "deception",
-          "anchor": 0.0,
+          "anchor": 0.5,
           "cell": 1.0,
-          "delta": 1.0
+          "delta": 0.5
+        },
+        {
+          "concept": "imperative_form",
+          "anchor": 0.5,
+          "cell": 1.0,
+          "delta": 0.5
         }
       ],
       "top_losses": [
         {
-          "concept": "programming",
-          "anchor": 3.0,
-          "cell": 2.0,
-          "delta": -1.0
+          "concept": "neutral_factual",
+          "anchor": 2.5,
+          "cell": 1.0,
+          "delta": -1.5
         },
         {
-          "concept": "scientific",
-          "anchor": 2.0,
-          "cell": 0.6666666666666666,
-          "delta": -1.3333333333333335
+          "concept": "medical",
+          "anchor": 2.5,
+          "cell": 1.0,
+          "delta": -1.5
         },
         {
-          "concept": "harmful_content",
+          "concept": "narrative",
           "anchor": 3.0,
           "cell": 1.0,
           "delta": -2.0
         },
         {
-          "concept": "instructional",
+          "concept": "harmful_content",
           "anchor": 3.0,
           "cell": 1.0,
           "delta": -2.0
@@ -847,21 +847,21 @@
       ]
     },
     "per_concept_peak_thr_1.75": {
-      "wins": 4,
-      "losses": 13,
-      "ties": 13,
+      "wins": 9,
+      "losses": 12,
+      "ties": 9,
       "n": 30,
-      "mean_diff": -0.3555555555555555,
+      "mean_diff": -0.33888888888888885,
       "ci_95": [
-        -0.7,
-        0.011388888888888655
+        -0.7222222222222222,
+        0.02791666666666656
       ],
       "top_wins": [
         {
-          "concept": "financial",
+          "concept": "technical_jargon",
           "anchor": 0.0,
-          "cell": 2.3333333333333335,
-          "delta": 2.3333333333333335
+          "cell": 2.0,
+          "delta": 2.0
         },
         {
           "concept": "geographical",
@@ -870,45 +870,39 @@
           "delta": 1.0
         },
         {
-          "concept": "deception",
+          "concept": "legal",
           "anchor": 0.0,
           "cell": 1.0,
           "delta": 1.0
         },
         {
-          "concept": "negative_emotion",
-          "anchor": 1.0,
-          "cell": 1.3333333333333333,
-          "delta": 0.33333333333333326
+          "concept": "scientific",
+          "anchor": 0.0,
+          "cell": 0.6666666666666666,
+          "delta": 0.6666666666666666
         },
         {
-          "concept": "formal_register",
-          "anchor": 3.0,
+          "concept": "mathematical",
+          "anchor": 2.5,
           "cell": 3.0,
-          "delta": 0.0
+          "delta": 0.5
         }
       ],
       "top_losses": [
         {
-          "concept": "scientific",
-          "anchor": 2.0,
-          "cell": 0.6666666666666666,
-          "delta": -1.3333333333333335
+          "concept": "dialogue",
+          "anchor": 1.5,
+          "cell": 0.0,
+          "delta": -1.5
         },
         {
-          "concept": "historical",
-          "anchor": 2.0,
-          "cell": 0.3333333333333333,
-          "delta": -1.6666666666666667
-        },
-        {
-          "concept": "instructional",
-          "anchor": 3.0,
+          "concept": "medical",
+          "anchor": 2.5,
           "cell": 1.0,
-          "delta": -2.0
+          "delta": -1.5
         },
         {
-          "concept": "legal",
+          "concept": "narrative",
           "anchor": 3.0,
           "cell": 1.0,
           "delta": -2.0
@@ -918,25 +912,31 @@
           "anchor": 3.0,
           "cell": 0.3333333333333333,
           "delta": -2.6666666666666665
+        },
+        {
+          "concept": "poetic",
+          "anchor": 3.0,
+          "cell": 0.0,
+          "delta": -3.0
         }
       ]
     },
     "per_concept_peak_thr_2.0": {
-      "wins": 4,
-      "losses": 13,
-      "ties": 13,
+      "wins": 9,
+      "losses": 12,
+      "ties": 9,
       "n": 30,
-      "mean_diff": -0.3555555555555555,
+      "mean_diff": -0.33888888888888885,
       "ci_95": [
-        -0.6891666666666666,
-        0.022222222222222223
+        -0.7333333333333333,
+        0.04999999999999998
       ],
       "top_wins": [
         {
-          "concept": "financial",
+          "concept": "technical_jargon",
           "anchor": 0.0,
-          "cell": 2.3333333333333335,
-          "delta": 2.3333333333333335
+          "cell": 2.0,
+          "delta": 2.0
         },
         {
           "concept": "geographical",
@@ -945,7 +945,108 @@
           "delta": 1.0
         },
         {
-          "concept": "deception",
+          "concept": "legal",
+          "anchor": 0.0,
+          "cell": 1.0,
+          "delta": 1.0
+        },
+        {
+          "concept": "scientific",
+          "anchor": 0.0,
+          "cell": 0.6666666666666666,
+          "delta": 0.6666666666666666
+        },
+        {
+          "concept": "mathematical",
+          "anchor": 2.5,
+          "cell": 3.0,
+          "delta": 0.5
+        }
+      ],
+      "top_losses": [
+        {
+          "concept": "dialogue",
+          "anchor": 1.5,
+          "cell": 0.0,
+          "delta": -1.5
+        },
+        {
+          "concept": "medical",
+          "anchor": 2.5,
+          "cell": 1.0,
+          "delta": -1.5
+        },
+        {
+          "concept": "narrative",
+          "anchor": 3.0,
+          "cell": 1.0,
+          "delta": -2.0
+        },
+        {
+          "concept": "harmful_content",
+          "anchor": 3.0,
+          "cell": 0.3333333333333333,
+          "delta": -2.6666666666666665
+        },
+        {
+          "concept": "poetic",
+          "anchor": 3.0,
+          "cell": 0.0,
+          "delta": -3.0
+        }
+      ]
+    },
+    "strength_uniform_peak_thr_1.5": {
+      "anchor_mean": 1.1666666666666667,
+      "cell_mean": 0.9555555555555556,
+      "delta_mean": -0.21111111111111114,
+      "ci_95_diff": [
+        -0.500138888888889,
+        0.08888888888888888
+      ],
+      "n_common": 30
+    },
+    "strength_uniform_peak_thr_1.75": {
+      "anchor_mean": 0.3333333333333333,
+      "cell_mean": 0.9555555555555556,
+      "delta_mean": 0.6222222222222222,
+      "ci_95_diff": [
+        0.35555555555555557,
+        0.8777777777777779
+      ],
+      "n_common": 30
+    },
+    "strength_uniform_peak_thr_2.0": {
+      "anchor_mean": 0.2833333333333333,
+      "cell_mean": 0.9555555555555556,
+      "delta_mean": 0.6722222222222223,
+      "ci_95_diff": [
+        0.32763888888888887,
+        1.0277777777777777
+      ],
+      "n_common": 30
+    }
+  },
+  "Galaxy 6 max-pool RE": {
+    "per_concept_peak_thr_1.5": {
+      "wins": 8,
+      "losses": 15,
+      "ties": 7,
+      "n": 30,
+      "mean_diff": -0.3277777777777778,
+      "ci_95": [
+        -0.6556944444444446,
+        -0.0388888888888889
+      ],
+      "top_wins": [
+        {
+          "concept": "imperative_form",
+          "anchor": 0.5,
+          "cell": 2.3333333333333335,
+          "delta": 1.8333333333333335
+        },
+        {
+          "concept": "geographical",
           "anchor": 0.0,
           "cell": 1.0,
           "delta": 1.0
@@ -953,14 +1054,20 @@
         {
           "concept": "negative_emotion",
           "anchor": 1.0,
-          "cell": 1.3333333333333333,
-          "delta": 0.33333333333333326
+          "cell": 1.6666666666666667,
+          "delta": 0.6666666666666667
         },
         {
-          "concept": "formal_register",
-          "anchor": 3.0,
+          "concept": "mathematical",
+          "anchor": 2.5,
           "cell": 3.0,
-          "delta": 0.0
+          "delta": 0.5
+        },
+        {
+          "concept": "religious",
+          "anchor": 0.5,
+          "cell": 1.0,
+          "delta": 0.5
         }
       ],
       "top_losses": [
@@ -971,19 +1078,351 @@
           "delta": -1.3333333333333335
         },
         {
-          "concept": "historical",
-          "anchor": 2.0,
-          "cell": 0.3333333333333333,
+          "concept": "medical",
+          "anchor": 2.5,
+          "cell": 1.0,
+          "delta": -1.5
+        },
+        {
+          "concept": "narrative",
+          "anchor": 3.0,
+          "cell": 1.3333333333333333,
           "delta": -1.6666666666666667
         },
         {
-          "concept": "instructional",
+          "concept": "harmful_content",
+          "anchor": 3.0,
+          "cell": 1.3333333333333333,
+          "delta": -1.6666666666666667
+        },
+        {
+          "concept": "programming",
+          "anchor": 3.0,
+          "cell": 1.0,
+          "delta": -2.0
+        }
+      ]
+    },
+    "per_concept_peak_thr_1.75": {
+      "wins": 12,
+      "losses": 13,
+      "ties": 5,
+      "n": 30,
+      "mean_diff": -0.25000000000000006,
+      "ci_95": [
+        -0.6277777777777779,
+        0.1279166666666665
+      ],
+      "top_wins": [
+        {
+          "concept": "technical_jargon",
+          "anchor": 0.0,
+          "cell": 2.6666666666666665,
+          "delta": 2.6666666666666665
+        },
+        {
+          "concept": "geographical",
+          "anchor": 0.0,
+          "cell": 1.0,
+          "delta": 1.0
+        },
+        {
+          "concept": "legal",
+          "anchor": 0.0,
+          "cell": 1.0,
+          "delta": 1.0
+        },
+        {
+          "concept": "imperative_form",
+          "anchor": 0.0,
+          "cell": 0.6666666666666666,
+          "delta": 0.6666666666666666
+        },
+        {
+          "concept": "scientific",
+          "anchor": 0.0,
+          "cell": 0.6666666666666666,
+          "delta": 0.6666666666666666
+        }
+      ],
+      "top_losses": [
+        {
+          "concept": "medical",
+          "anchor": 2.5,
+          "cell": 1.0,
+          "delta": -1.5
+        },
+        {
+          "concept": "historical",
+          "anchor": 1.5,
+          "cell": 0.0,
+          "delta": -1.5
+        },
+        {
+          "concept": "narrative",
+          "anchor": 3.0,
+          "cell": 1.3333333333333333,
+          "delta": -1.6666666666666667
+        },
+        {
+          "concept": "harmful_content",
           "anchor": 3.0,
           "cell": 1.0,
           "delta": -2.0
         },
         {
+          "concept": "programming",
+          "anchor": 3.0,
+          "cell": 0.0,
+          "delta": -3.0
+        }
+      ]
+    },
+    "per_concept_peak_thr_2.0": {
+      "wins": 12,
+      "losses": 13,
+      "ties": 5,
+      "n": 30,
+      "mean_diff": -0.25000000000000006,
+      "ci_95": [
+        -0.6444444444444444,
+        0.13902777777777764
+      ],
+      "top_wins": [
+        {
+          "concept": "technical_jargon",
+          "anchor": 0.0,
+          "cell": 2.6666666666666665,
+          "delta": 2.6666666666666665
+        },
+        {
+          "concept": "geographical",
+          "anchor": 0.0,
+          "cell": 1.0,
+          "delta": 1.0
+        },
+        {
           "concept": "legal",
+          "anchor": 0.0,
+          "cell": 1.0,
+          "delta": 1.0
+        },
+        {
+          "concept": "imperative_form",
+          "anchor": 0.0,
+          "cell": 0.6666666666666666,
+          "delta": 0.6666666666666666
+        },
+        {
+          "concept": "scientific",
+          "anchor": 0.0,
+          "cell": 0.6666666666666666,
+          "delta": 0.6666666666666666
+        }
+      ],
+      "top_losses": [
+        {
+          "concept": "medical",
+          "anchor": 2.5,
+          "cell": 1.0,
+          "delta": -1.5
+        },
+        {
+          "concept": "historical",
+          "anchor": 1.5,
+          "cell": 0.0,
+          "delta": -1.5
+        },
+        {
+          "concept": "narrative",
+          "anchor": 3.0,
+          "cell": 1.3333333333333333,
+          "delta": -1.6666666666666667
+        },
+        {
+          "concept": "harmful_content",
+          "anchor": 3.0,
+          "cell": 1.0,
+          "delta": -2.0
+        },
+        {
+          "concept": "programming",
+          "anchor": 3.0,
+          "cell": 0.0,
+          "delta": -3.0
+        }
+      ]
+    },
+    "strength_uniform_peak_thr_1.5": {
+      "anchor_mean": 1.1666666666666667,
+      "cell_mean": 1.3222222222222222,
+      "delta_mean": 0.15555555555555545,
+      "ci_95_diff": [
+        -0.26736111111111105,
+        0.6002777777777774
+      ],
+      "n_common": 30
+    },
+    "strength_uniform_peak_thr_1.75": {
+      "anchor_mean": 0.3333333333333333,
+      "cell_mean": 0.8555555555555556,
+      "delta_mean": 0.5222222222222224,
+      "ci_95_diff": [
+        0.2888888888888889,
+        0.7611111111111112
+      ],
+      "n_common": 30
+    },
+    "strength_uniform_peak_thr_2.0": {
+      "anchor_mean": 0.2833333333333333,
+      "cell_mean": 0.8555555555555556,
+      "delta_mean": 0.5722222222222223,
+      "ci_95_diff": [
+        0.25555555555555554,
+        0.8834722222222222
+      ],
+      "n_common": 30
+    }
+  },
+  "Galaxy 6 max-pool PP": {
+    "per_concept_peak_thr_1.5": {
+      "wins": 8,
+      "losses": 10,
+      "ties": 12,
+      "n": 30,
+      "mean_diff": 0.03333333333333333,
+      "ci_95": [
+        -0.3170833333333333,
+        0.4166666666666667
+      ],
+      "top_wins": [
+        {
+          "concept": "geographical",
+          "anchor": 0.0,
+          "cell": 3.0,
+          "delta": 3.0
+        },
+        {
+          "concept": "imperative_form",
+          "anchor": 0.5,
+          "cell": 3.0,
+          "delta": 2.5
+        },
+        {
+          "concept": "negative_emotion",
+          "anchor": 1.0,
+          "cell": 3.0,
+          "delta": 2.0
+        },
+        {
+          "concept": "casual_register",
+          "anchor": 1.0,
+          "cell": 2.0,
+          "delta": 1.0
+        },
+        {
+          "concept": "question_form",
+          "anchor": 2.0,
+          "cell": 3.0,
+          "delta": 1.0
+        }
+      ],
+      "top_losses": [
+        {
+          "concept": "dialogue",
+          "anchor": 1.5,
+          "cell": 0.5,
+          "delta": -1.0
+        },
+        {
+          "concept": "neutral_factual",
+          "anchor": 2.5,
+          "cell": 1.5,
+          "delta": -1.0
+        },
+        {
+          "concept": "scientific",
+          "anchor": 2.0,
+          "cell": 0.5,
+          "delta": -1.5
+        },
+        {
+          "concept": "programming",
+          "anchor": 3.0,
+          "cell": 1.5,
+          "delta": -1.5
+        },
+        {
+          "concept": "narrative",
+          "anchor": 3.0,
+          "cell": 1.0,
+          "delta": -2.0
+        }
+      ]
+    },
+    "per_concept_peak_thr_1.75": {
+      "wins": 11,
+      "losses": 9,
+      "ties": 10,
+      "n": 30,
+      "mean_diff": 0.11666666666666667,
+      "ci_95": [
+        -0.3004166666666666,
+        0.6333333333333333
+      ],
+      "top_wins": [
+        {
+          "concept": "geographical",
+          "anchor": 0.0,
+          "cell": 3.0,
+          "delta": 3.0
+        },
+        {
+          "concept": "legal",
+          "anchor": 0.0,
+          "cell": 3.0,
+          "delta": 3.0
+        },
+        {
+          "concept": "imperative_form",
+          "anchor": 0.0,
+          "cell": 2.5,
+          "delta": 2.5
+        },
+        {
+          "concept": "technical_jargon",
+          "anchor": 0.0,
+          "cell": 1.5,
+          "delta": 1.5
+        },
+        {
+          "concept": "negative_emotion",
+          "anchor": 1.0,
+          "cell": 2.0,
+          "delta": 1.0
+        }
+      ],
+      "top_losses": [
+        {
+          "concept": "dialogue",
+          "anchor": 1.5,
+          "cell": 0.5,
+          "delta": -1.0
+        },
+        {
+          "concept": "medical",
+          "anchor": 2.5,
+          "cell": 1.5,
+          "delta": -1.0
+        },
+        {
+          "concept": "programming",
+          "anchor": 3.0,
+          "cell": 1.5,
+          "delta": -1.5
+        },
+        {
+          "concept": "narrative",
           "anchor": 3.0,
           "cell": 1.0,
           "delta": -2.0
@@ -991,38 +1430,113 @@
         {
           "concept": "harmful_content",
           "anchor": 3.0,
-          "cell": 0.3333333333333333,
-          "delta": -2.6666666666666665
+          "cell": 0.0,
+          "delta": -3.0
+        }
+      ]
+    },
+    "per_concept_peak_thr_2.0": {
+      "wins": 11,
+      "losses": 9,
+      "ties": 10,
+      "n": 30,
+      "mean_diff": 0.11666666666666667,
+      "ci_95": [
+        -0.31666666666666665,
+        0.5833333333333334
+      ],
+      "top_wins": [
+        {
+          "concept": "geographical",
+          "anchor": 0.0,
+          "cell": 3.0,
+          "delta": 3.0
+        },
+        {
+          "concept": "legal",
+          "anchor": 0.0,
+          "cell": 3.0,
+          "delta": 3.0
+        },
+        {
+          "concept": "imperative_form",
+          "anchor": 0.0,
+          "cell": 2.5,
+          "delta": 2.5
+        },
+        {
+          "concept": "technical_jargon",
+          "anchor": 0.0,
+          "cell": 1.5,
+          "delta": 1.5
+        },
+        {
+          "concept": "negative_emotion",
+          "anchor": 1.0,
+          "cell": 2.0,
+          "delta": 1.0
+        }
+      ],
+      "top_losses": [
+        {
+          "concept": "dialogue",
+          "anchor": 1.5,
+          "cell": 0.5,
+          "delta": -1.0
+        },
+        {
+          "concept": "medical",
+          "anchor": 2.5,
+          "cell": 1.5,
+          "delta": -1.0
+        },
+        {
+          "concept": "programming",
+          "anchor": 3.0,
+          "cell": 1.5,
+          "delta": -1.5
+        },
+        {
+          "concept": "narrative",
+          "anchor": 3.0,
+          "cell": 1.0,
+          "delta": -2.0
+        },
+        {
+          "concept": "harmful_content",
+          "anchor": 3.0,
+          "cell": 0.0,
+          "delta": -3.0
         }
       ]
     },
     "strength_uniform_peak_thr_1.5": {
-      "anchor_mean": 1.1,
-      "cell_mean": 0.9555555555555556,
-      "delta_mean": -0.1444444444444445,
+      "anchor_mean": 1.1666666666666667,
+      "cell_mean": 1.5,
+      "delta_mean": 0.33333333333333326,
       "ci_95_diff": [
-        -0.4555555555555556,
-        0.17777777777777776
+        -0.10041666666666665,
+        0.75
       ],
       "n_common": 30
     },
     "strength_uniform_peak_thr_1.75": {
-      "anchor_mean": 0.36666666666666664,
-      "cell_mean": 0.9555555555555556,
-      "delta_mean": 0.588888888888889,
+      "anchor_mean": 0.3333333333333333,
+      "cell_mean": 1.0,
+      "delta_mean": 0.6666666666666667,
       "ci_95_diff": [
-        0.3333333333333333,
-        0.8444444444444446
+        0.4,
+        0.9504166666666662
       ],
       "n_common": 30
     },
     "strength_uniform_peak_thr_2.0": {
-      "anchor_mean": 0.26666666666666666,
-      "cell_mean": 0.9555555555555556,
-      "delta_mean": 0.6888888888888889,
+      "anchor_mean": 0.2833333333333333,
+      "cell_mean": 0.4166666666666667,
+      "delta_mean": 0.13333333333333336,
       "ci_95_diff": [
-        0.3663888888888888,
-        1.0555555555555556
+        -0.016666666666666666,
+        0.3
       ],
       "n_common": 30
     }
