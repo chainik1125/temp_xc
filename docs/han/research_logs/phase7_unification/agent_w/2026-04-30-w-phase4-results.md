@@ -520,6 +520,55 @@ To validate the "paper-grid skips T-SAE coh-stable peak" hypothesis, I ran a **f
 
 `steering_paper_finegrain*/` saves the fine-grain grade JSONs.
 
+#### ⚠️⚠️ EVEN MORE HONEST: per-class result also doesn't survive fine-grain (except sentiment)
+
+Re-running per-class breakdown under combined fine-grain protocol (paper grid + intermediate strengths). **The "TXC wins knowledge" claim ALSO falls apart** when T-SAE is sampled at its true coh-stable peak:
+
+**Per-class cliffs under fine-grain protocol (n=3 mean):**
+
+At coh ≥ 1.5:
+| class | T-SAE | Contrastive | OBLIT | MaxPool |
+|---|---|---|---|---|
+| knowledge | **2.481** | 2.407 (−0.074) | 2.222 (−0.259) | 2.222 (−0.259) |
+| discourse | 1.667 | 1.583 (−0.083) | 1.542 (−0.125) | 1.583 (−0.083) |
+| safety | 1.000 | 1.056 (+0.056) ✓ | 0.500 (−0.500) | 1.000 (TIE) |
+| stylistic | 1.400 | 0.800 (−0.600) | 1.333 (−0.067) | 1.333 (−0.067) |
+| **sentiment** | 1.333 | **1.833** (+0.500) ⭐ | 0.667 (−0.667) | 1.333 (TIE) |
+
+At coh ≥ 1.75:
+| class | T-SAE | Contrastive | OBLIT | MaxPool |
+|---|---|---|---|---|
+| knowledge | **2.259** | 1.704 (−0.556) | 2.000 (−0.259) | 1.926 (−0.333) |
+| discourse | 1.167 | 1.083 (−0.083) | 1.042 (−0.125) | 1.250 (+0.083) ✓ |
+| safety | 1.000 | 0.944 (−0.056) | 0.333 (−0.667) | 0.556 (−0.444) |
+| stylistic | 1.333 | 0.667 (−0.667) | 1.333 (TIE) | 0.800 (−0.533) |
+| **sentiment** | 0.500 | 0.833 (+0.333) ✓ | 0.000 (−0.500) | **1.167** (+0.667) ⭐ |
+
+**Honest summary under fine-grain protocol — what TXC actually wins**:
+
+| class | T-SAE wins | TXC wins | strongest TXC class win |
+|---|---|---|---|
+| knowledge | ✓ at both thresholds | — | none |
+| discourse | ✓ | tiny MaxPool +0.08 @ 1.75 | none |
+| safety | ✓ | tiny Contrastive +0.06 @ 1.5 | none |
+| stylistic | ✓ | — | none |
+| **sentiment** | — | ✓ at both thresholds | **Contrastive +0.50** @ 1.5; **MaxPool +0.67** @ 1.75 |
+
+**The robust paper-grade TXC win across all protocols is sentiment** — Contrastive RE wins +0.5 at coh ≥ 1.5 (consistent across normalised, paper-faithful, and fine-grain protocols), and MaxPool RE additionally wins +0.67 at coh ≥ 1.75.
+
+**Important caveat**: sentiment in our concept set is only 2 concepts (positive_emotion, negative_emotion), so n is small for the per-class average.
+
+**The cell-level aggregate Δ depends entirely on protocol choice**:
+- Paper-faithful: TXC +1.0+ (paper-grid undersamples T-SAE)
+- Per-arch normalised: TXC +0.45 (Contrastive RE)
+- Fine-grain: T-SAE +0.21
+
+**Honest paper headline (revised)**:
+
+> "Across three independent TXC architectures (OBLIT H8 / MaxPool H8 / Contrastive H8), the TXC family achieves a small, class-conditional advantage over T-SAE k=20 on coherent steering at matched per-token sparsity (k_pos = 20). The robust win is on **sentiment concepts** (Δ = +0.33 to +0.67 across protocols, n=2 concepts). At the cell-level aggregate metric, TXC outperforms T-SAE by Δ = +1.0 under the paper's published strength grid, but a fine-grain strength sweep shows T-SAE k=20 has a coh-stable peak at strength=70 (succ=1.66) that the paper grid skips, narrowing the comparison to within ±0.2 across protocols."
+
+This is a much weaker but honest claim than what we initially committed.
+
 ### 🔬 T-SAE k=20 ANCHOR SANITY-CHECK (same-pod n=3 retrain — UPDATES TXC Δ values)
 
 **Han flagged that the T-SAE k=20 peak success 1.80 looked "suspiciously high" for the baseline.** W ran a same-pod retrain of sd=1 + sd=2 (sd=42 was already on this pod) for clean apples-to-apples comparison. Findings:
