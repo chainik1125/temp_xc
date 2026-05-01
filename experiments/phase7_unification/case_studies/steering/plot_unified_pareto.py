@@ -22,7 +22,7 @@ import numpy as np
 os.environ.setdefault("HF_HOME", "/workspace/hf_cache")
 
 BASE = Path("/workspace/temp_xc/experiments/phase7_unification/results/case_studies")
-ANCHOR_15 = 1.10  # T-SAE k=20 peak success at coh ≥ 1.5
+ANCHOR_15 = 1.167  # T-SAE k=20 peak success at coh ≥ 1.5 (multi-seed mean-curve, n=2)
 
 
 # Inventory: (arch_id, protocol_subdirs_per_seed, label, color)
@@ -30,6 +30,7 @@ INVENTORY = [
     # Anchor — single seed
     ("tsae_paper_k20", "T-SAE k=20 (anchor)", "blue", [
         ("steering_paper_normalised",         "right-edge", 42),
+        ("steering_paper_normalised_seed1",   "right-edge", 1),
     ]),
     # Y — bare antidead (multi-seed)
     ("txc_bare_antidead_t2_kpos20", "T=2 bare", "orange", [
@@ -286,7 +287,7 @@ def main():
         delta = peak - ANCHOR_15
         ax.text(peak + 0.015, i, f"{peak:.3f} (Δ={delta:+.2f})", fontsize=8, va="center")
     ax.set_title("Phase 7 Y+W matched-sparsity ranking — PER-POSITION protocol only\n"
-                 "(gold edge = WIN; T=2 H8 shifts=(T,) 3-seed mean OBLITERATES anchor by +0.30)")
+                 "(gold edge = STRICT WIN; multi-seed anchor 1.167; T=2 H8 PP 3-seed at 1.400 Δ=+0.23 — TIE band)")
     ax.legend(loc="lower right", fontsize=9)
     ax.invert_yaxis()
     ax.set_xlim(0, max(peaks) * 1.2 + 0.1)

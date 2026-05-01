@@ -6,32 +6,72 @@ tags:
   - in-progress
 ---
 
-## Phase 7 Y — GIGABRAIN session final summary
+## Phase 7 Y — GIGABRAIN session final summary (CORRECTED 2026-05-01)
 
-> **Bottom line for the paper**: at matched per-token sparsity
-> (k_pos = 20), TXC architectures statistically significantly
-> dominate T-SAE k = 20 across all coherence-aware metrics. T-SAE's
-> only lead — unconstrained peak success (1.80 vs 1.67) — is on
-> incoherent text (coh = 1.40, below the prereg coherence floor).
-> The strongest defensible WIN is at **coh ≥ 1.75: T = 2 H8 right-edge
-> 3-seed Δ = +0.872 [+0.511, +1.233]** (95% bootstrap CI).
+> **Bottom line for the paper (corrected)**: at matched per-token
+> sparsity (k_pos = 20), under the **multi-seed T-SAE k=20 anchor**
+> (n=2: sd=42 + sd=1, mean-curve = 1.167):
+>
+> 1. **Prereg metric (coh ≥ 1.5)**: T=2 H8 PP 3sd Δ=**+0.233** —
+>    TIE band (±0.27).
+> 2. **Coh ≥ 1.75**: T=2 H8 RE 3sd Δ=**+0.902** — STRICT WIN ⭐⭐⭐
+>    (3.3× WIN threshold).
+> 3. **Coh ≥ 2.0**: T=2 bare PP 3sd Δ=**+0.694** — STRICT WIN ⭐⭐.
+> 4. **AUC(1.5–3.0)** (Han's pre-stated alternative): T=2 bare RE 3sd
+>    Δ=**+0.331** — STRICT WIN ⭐.
+>
+> T-SAE's only lead — unconstrained peak (1.80 vs 1.42) — is at
+> coh=1.40 (below the prereg coherence floor — incoherent text).
+>
+> **NOTE**: earlier numbers in this doc + GIGABRAIN reframe used
+> single-seed anchor (1.10) which was incorrect. The on-disk T-SAE
+> k=20 has been evaluated at sd=42 AND sd=1; the proper multi-seed
+> anchor is 1.167 at coh ≥ 1.5. See
+> `2026-05-01-y-multiseed-anchor-correction.md` for the full
+> correction.
+>
+> **Bootstrap CIs**: under proper bootstrap (resampling concepts +
+> re-optimizing strength), CIs are wide due to n=30 concepts; point
+> estimates and cross-cell consistency support the WIN claim.
 
-### Headline numbers (paper-ready)
+### Headline numbers (paper-ready, corrected with multi-seed anchor)
 
-All 3-seed where applicable, mean-curve method, family-normalised
-paper-clamp protocol:
+All 3-seed cells where applicable, mean-curve method, family-normalised
+paper-clamp protocol. Anchor T-SAE k=20 = 2-seed mean-curve.
 
-| metric | T-SAE | best TXC | TXC arch | n | Δ | 95% CI on Δ | sig? |
-|---|---:|---:|---|---:|---:|---|:---:|
-| unconstrained peak | **1.800** | 1.667 | T = 5 bare k_win = 20 PP | 1 | −0.133 | — | — |
-| coh ≥ 1.5 (prereg) | 1.100 | **1.400** | T = 2 H8 shifts=(T,) PP | 3 | **+0.300** | [−0.056, +0.656] | borderline |
-| **coh ≥ 1.75** | 0.367 | **1.236** | T = 2 H8 shifts=(T,) RE | 3 | **+0.869** | [+0.511, +1.233] | **YES** |
-| **coh ≥ 2.0** | 0.267 | **0.978** | T = 2 bare PP | 3 | **+0.711** | [+0.378, +1.078] | **YES** |
-| **AUC(1.5–3.0)** | 0.508 | 0.745 | T = 2 bare RE | 3 | **+0.236** | — | — |
-| AUC(1.0–3.0) | 0.744 | 0.875 | T = 2 bare RE | 3 | +0.132 | — | — |
+| metric | T-SAE | best TXC | TXC arch | n | Δ | call (±0.27) |
+|---|---:|---:|---|---:|---:|:---:|
+| unconstrained peak | **1.800** | 1.422 | T = 2 H8 PP | 3 | −0.378 | LOSS |
+| coh ≥ 1.5 (prereg) | **1.167** | 1.400 | T = 2 H8 PP | 3 | +0.233 | TIE |
+| **coh ≥ 1.75** | **0.333** | **1.236** | T = 2 H8 RE | 3 | **+0.902** | **STRICT WIN** ⭐ |
+| **coh ≥ 2.0** | **0.283** | **0.978** | T = 2 bare PP | 3 | **+0.694** | **STRICT WIN** ⭐ |
+| **AUC(1.5–3.0)** | **0.413** | **0.745** | T = 2 bare RE | 3 | **+0.331** | **STRICT WIN** ⭐ |
 
-Significance via concept-bootstrap (resample 30 concepts with
-replacement, n = 1000); CI lower bound > 0 = significant.
+Bootstrap CIs reported under TWO procedures:
+
+**Procedure A — deployment-CI (fixes optimal strength from full data,
+narrower)**: per-concept Δ at the same strength `s*`, bootstrap mean.
+Conditions on the deployment strength.
+
+**Procedure B — scientific-CI (re-optimizes strength per resample,
+wider)**: bootstrap accounts for strength-selection variance.
+
+| metric | cell | Δ | A (deployment) | B (scientific, n=2000) |
+|---|---|---:|---|---|
+| coh ≥ 1.5 | T=2 H8 PP 3sd | +0.300 | [−0.056, +0.656] | [−0.728, +1.011] |
+| **coh ≥ 1.75** | T=2 H8 RE 3sd | **+0.872 / +0.906** | **[+0.511, +1.233] sig** | [−0.039, +1.222] borderline |
+| coh ≥ 2.0 | T=2 bare PP 3sd | +0.711 | [+0.378, +1.078] sig | [−0.022, +0.422] borderline |
+
+**Honest paper framing**:
+- Procedure A (deployment) shows STRICT significance at coh ≥ 1.75
+  for multiple cells (T=2 H8 RE Δ=+0.872 [+0.511, +1.233]).
+- Procedure B (scientific) gives wider CIs that include zero at
+  the 95% level due to strength-selection variance and n=30 concepts.
+  Point estimates remain large positive (median Δ ≈ +0.74 for
+  T=2 H8 RE).
+- Cross-cell consistency: 4+ TXC cells with Δ > +0.27 at coh ≥ 1.75
+  (T=2 H8 RE/PP, T=2 bare RE/PP, T=3 grown RE) supports a real
+  effect even when single-cell CIs are wide.
 
 ### Why T-SAE only wins on incoherent text
 

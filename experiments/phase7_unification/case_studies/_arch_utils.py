@@ -89,8 +89,13 @@ WINDOW_CLASSES = {
     "TXCBareAntidead",
     "MatryoshkaTXCDRContrastiveMultiscale",
     "TXCBareMultiDistanceContrastiveAntidead",
+    "TXCMultiplicativeMergeH8",   # W's MYSTERY arch (multiplicative)
+    "TXCMaxPoolMergeH8",           # W's MYSTERY arch (max-pool)
+    "TXCContrastiveMergeH8",       # W's MYSTERY arch (end-minus-start)
     "SubseqTXCBareAntidead",
     "SubseqH8",
+    "TXCHierarchicalMultiScale",  # Galaxy 4 (Y, hierarchical decomposition)
+    "TXCMaxPool",                  # Galaxy 6 (Y, max-pool encoder)
 }
 
 
@@ -141,10 +146,14 @@ def decoder_direction_matrix(model, src_class: str) -> torch.Tensor:
     if src_class.startswith("Matryoshka") or src_class == "MatryoshkaTXCDRContrastiveMultiscale":
         # PositionMatryoshkaTXCDR + descendants expose decoder_dirs_averaged
         return model.decoder_dirs_averaged                               # (d_in, d_sae)
-    if src_class in {"TemporalCrosscoder", "TXCBareAntidead",
+    if src_class in {"TemporalCrosscoder", "TXCBareAntidead", "TXCMaxPool",
                      "TXCBareMultiDistanceContrastiveAntidead"}:
         # W_dec is (d_sae, T, d_in); average over T then transpose to (d_in, d_sae)
+        # TXCMaxPool inherits W_dec layout from TXCBareAntidead.
         return model.W_dec.data.mean(dim=1).t().contiguous()
+    if src_class == "TXCHierarchicalMultiScale":
+        # Galaxy 4: returns (d_in, d_sae_w + T*d_sae_p) per-feature directions
+        return model.decoder_dirs_averaged
     if src_class in {"SubseqTXCBareAntidead", "SubseqH8"}:
         # Same shape convention as TemporalCrosscoder (subseq just samples
         # which positions feed gradient; the parameter shape is identical).

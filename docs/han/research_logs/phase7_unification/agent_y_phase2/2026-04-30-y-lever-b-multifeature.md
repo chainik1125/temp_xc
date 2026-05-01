@@ -88,7 +88,91 @@ K=3 (larger lift at coh ≥ 1.5 but bigger regression elsewhere).
 Pattern suggests no value of K crosses T-SAE's 1.80 unc peak with
 coherent text.
 
-### K=2 RESULTS — UPDATED VERDICT
+### K=2 RESULTS — MULTI-SEED VERDICT (UPDATED)
+
+**Multi-seed K=2 fails to generalize**: while sd=42 had K=2 sweet
+spot, sd=1 K=2 collapses to mean success ~0.2 across all strengths.
+Mechanism diagnosed:
+
+| concept | sd=42 top-2 features | sd=1 top-2 features |
+|---|---|---|
+| harmful_content | 1582 (lift=20.4), 1565 (lift=9.7) | 362 (lift=15.5), 1142 (lift=12.7) |
+
+The first feature is reliably concept-aligned (max-lift criterion).
+The secondary feature is "lift-large but semantically inconsistent
+across seeds". For sd=1 harmful_content, feature 1142 pulls toward
+commerce/scientific markup, NOT violence. K=2 thus DEGRADES sd=1's
+single-feature performance instead of amplifying it.
+
+**Sd=1 K=2 generations** (concept = harmful_content):
+
+- s=2: "the best deals on the best products. We are not responsible..."
+- s=5: "<math xmlns:xlink=\"http://www.w.org/xlink\"><mrow>..."
+- s=10: "<math> <math> <math>..."
+- s=50: "ʔʔʔʔʔʔ" (Quranic question marks)
+
+The secondary feature 1142 dominates and steers the model toward its
+own polysemantic activations (math/commerce/punctuation), drowning
+out the concept signal.
+
+**Sd=1 K=2 numbers**:
+
+| metric | K=2 sd=1 | K=1 sd=1 | Δ |
+|---|---:|---:|---:|
+| unconstrained peak | 0.27 | 1.37 | −1.10 |
+| coh ≥ 1.5 | 0.20 | 0.63 | −0.43 |
+| coh ≥ 1.75 | 0.20 | 0.63 | −0.43 |
+| coh ≥ 2.0 | 0.20 | 0.63 | −0.43 |
+
+K=2 is **seed-specific**. The sd=42 K=2 win was an artefact of
+concept-aligned secondary features at that particular seed.
+
+### K=2 multi-seed FINAL — confirmed collapse
+
+3-seed mean-curve numbers:
+
+| metric | K=1 mean | K=2 mean | Δ K=2 vs K=1 |
+|---|---:|---:|---:|
+| unconstrained | 1.422 | **0.678** | **−0.744** |
+| coh ≥ 1.5 | 1.400 | 0.422 | −0.978 |
+| coh ≥ 1.75 | 0.611 | 0.422 | −0.189 |
+| AUC(1.5-3.0) | 0.603 | 0.344 | −0.259 |
+
+K=2 multi-seed REGRESSES across all metrics. Mechanism confirmed:
+top-2 features by activation-lift are seed-specific. The first
+feature (max-lift) is reliably concept-aligned, but the secondary
+feature is polysemantic (lift-large but semantically off-concept
+on different seeds). K=2 amplifies the secondary feature's
+off-concept signal, drowning out the primary.
+
+K=2 sd=2 secondary feature for harmful_content was 174 — pulling
+toward "list of"/"our our"/punctuation, NOT violence.
+
+**Final verdict**: Lever B (multi-feature steering by activation-lift)
+is NOT a viable lift. Future multi-feature work needs concept-aligned
+secondary feature selection (e.g. top-K filtered by held-out
+validation quality).
+
+### K=2 final verdict (updated)
+
+K=2 multi-feature steering is **NOT a paper-grade improvement**.
+The single-seed sd=42 lift was due to lucky semantic alignment of
+top-2 features. Cross-seed generalization fails because:
+- Top feature (max-lift) is reliably concept-aligned
+- Secondary features (top-2 by lift) are POLYSEMANTIC and seed-
+  specific
+- Adding the secondary feature INTERFERES with rather than
+  AMPLIFIES the concept signal
+
+### Implications for Lever F (best-of-seeds feature picking)
+
+The mechanism diagnosis suggests Lever F could work better than
+Lever B: instead of picking 2 features at a single seed, pick the
+BEST single feature across seeds (where "best" = lift × steering
+quality on a held-out validation set). Lever F = better single-feature
+selection > Lever B = unfiltered multi-feature.
+
+### Original sd=42 K=2 RESULTS (for reference)
 
 K=2 IS the sweet spot. Results on T=2 H8 sd=42 (single seed):
 

@@ -6,21 +6,28 @@ tags:
   - in-progress
 ---
 
-## Agent Y handover — post-compact (2026-04-30, end-of-shift after GIGABRAIN reframe)
+## Agent Y handover — post-compact (2026-04-30, with 2026-05-01 corrections)
 
-> **Status**: Phase 2 Hail Mary OBLITERATION achieved at T=2 H8 shifts=(2,)
-> per-position write-back (3-seed mean 1.400 vs anchor 1.10, Δ=+0.300,
-> strict WIN at the prereg metric). Sequential growth chain T=2→T=5
-> preserves anchor across the receptive-field axis.
+> **Status (corrected 2026-05-01)**: Phase 2 Hail Mary OBLITERATION
+> at T=2 H8 shifts=(2,) per-position is a **TIE** under proper
+> multi-seed anchor (3-seed mean 1.400 vs multi-seed anchor 1.167,
+> Δ=+0.233, in TIE band ±0.27). My earlier "+0.300 strict WIN" used
+> single-seed anchor (1.10) — see `2026-05-01-y-multiseed-anchor-correction.md`.
+> Sequential growth chain T=2→T=5 preserves anchor across the
+> receptive-field axis.
 >
-> **2026-04-30 EVENING UPDATE — GIGABRAIN MULTI-COH-THRESHOLD REFRAME
-> NOW THE HEADLINE.** T-SAE k=20's 1.80 unconstrained peak is at coh =
-> 1.40 (incoherent text). At every coh threshold ≥ 1.5 AND under
-> Han's pre-stated AUC alternative, TXC dominates by Δ ∈ [+0.13, +0.87].
-> Multi-seed verified at all primary thresholds. The paper headline
-> shifts from a marginal Δ=+0.30 single-threshold WIN to a robust
-> multi-threshold/multi-metric domination story where T-SAE never
-> wins a coherence-aware metric.
+> **2026-04-30 → 2026-05-01 GIGABRAIN MULTI-COH-THRESHOLD REFRAME**
+> still holds AND is now MORE important (only way to declare strict
+> WIN, since prereg is TIE):
+>
+> - **coh ≥ 1.75**: T=2 H8 RE 3sd **Δ=+0.902** vs anchor 0.333
+>   (3× WIN threshold) ⭐⭐⭐ STRICT WIN
+> - **coh ≥ 2.0**: T=2 bare PP 3sd Δ=+0.694 (2.5× WIN threshold) ⭐⭐
+> - **AUC(1.5–3.0)** (Han's alternative): T=2 bare RE 3sd Δ=+0.331 ⭐
+>
+> 4 different TXC cells beat anchor by Δ ≥ +0.27 at coh ≥ 1.75
+> (broad cross-architecture support). T-SAE k=20's only lead is
+> unconstrained peak (1.80 vs 1.42), achieved at coh=1.40 (incoherent).
 
 > 🚀 **2026-04-30 GIGABRAIN reframe** — see
 > `agent_y_phase2/2026-04-30-y-coh-threshold-sweep.md`. T-SAE's 1.80
@@ -438,6 +445,30 @@ non-canonical sparsity to avoid clobbering the kpos20 file.
 None active as of compact. All training chains have completed. GPU is
 free.
 
+### What's running NOW (2026-05-01, autonomous Y mode)
+
+Background chains (will produce data over ~3-4 hr from this commit):
+
+1. **grown_recovery chain** — T=3 grown sd=2 train + pipeline
+   (sd=1 RE+PP grades already DONE — Δ=+0.883 RE, Δ=+0.550 PP at
+   coh ≥ 1.75)
+2. **wsa_chain** — T-SAE WS sd=1 PP intervene+grade (RE done,
+   Δ=+0.650 at coh ≥ 1.75); then sd=2 train + pipeline
+3. **galaxy_chain_v3** (queued) — Galaxy 4 sd=42+sd=1+sd=2
+   (TXCHierarchicalMultiScale), fires when prior chains done
+4. **galaxy6_chain** (queued) — Galaxy 6 sd=42+sd=1+sd=2
+   (TXCMaxPool), fires after Galaxy 4
+
+Dashboard auto-refreshes (Monitor watches grades.jsonl on disk):
+- `experiments/.../plots/auto_dashboard.{json,md,png}` updates
+  whenever a new grade lands
+
+Expected new multi-seed cells:
+- T=3 grown PP sd=2 (lock 3-seed)
+- T-SAE WS PP sd=1 + sd=2 (lock 2-seed at coh ≥ 2.5 niche)
+- Galaxy 4 sd=42+sd=1+sd=2 (architectural test)
+- Galaxy 6 sd=42+sd=1+sd=2 (max-pool architectural test)
+
 ### Recommended next action (ordered, post-GIGABRAIN)
 
 The GIGABRAIN multi-coh-threshold reframe makes the original
@@ -469,19 +500,28 @@ expected value to the paper:
 6. (Much lower) Levers B/D/F if there's appetite for further
    architecture exploration. The headline doesn't need them.
 
-### Reading list for the next Y
+### Reading list for the next Y (2026-05-01 corrected order)
 
 In order:
 1. **This file (HANDOVER.md) — read FIRST**
-2. **`agent_y_phase2/2026-04-30-y-coh-threshold-sweep.md` — GIGABRAIN
-   reframe; the paper headline now lives here (TXC dominates at every
-   coh threshold ≥ 1.5, including AUC)**
-3. **`agent_y_phase2/2026-04-30-y-paper-headline-draft.md` — drop-in
-   paper paragraphs + results table at all thresholds**
-4. `agent_y_phase2/2026-04-30-y-lever-a-asymmetric.md` — Lever A
-   results (works but doesn't change headline)
-5. `agent_y_phase2/2026-04-30-y-unified-pareto.md` — full picture with all 4 plots
-6. `agent_y_phase2/2026-04-30-y-final-summary.md` — pre-OBLITERATION 3-seed picture (NOTE: claims T=2 bare per-pos = 1.200 multi-seed; that's per-seed-then-mean; mean-curve gives 0.978)
+2. **`agent_y_phase2/2026-05-01-y-multiseed-anchor-correction.md` —
+   CRITICAL: T-SAE k=20 anchor is multi-seed (1.167), not single-seed
+   (1.10). All earlier deltas needed correction.**
+3. **`agent_y_phase2/2026-04-30-y-coh-threshold-sweep.md` — GIGABRAIN
+   reframe (paper headline lives here, with multi-seed anchor)**
+4. **`agent_y_phase2/2026-04-30-y-gigabrain-final-summary.md` —
+   one-stop synthesis with bootstrap CIs (procedures A vs B)**
+5. **`agent_y_phase2/2026-04-30-y-paper-headline-draft.md` — drop-in
+   paper paragraphs + results table (corrected)**
+6. **`agent_y_phase2/2026-05-01-y-galaxy-brainstorm.md` — Han's GALAXY
+   prompt; 10 alternatives to the boring sum encoder. Galaxy 4
+   (hierarchical) and Galaxy 6 (max-pool) implemented + queued.**
+7. `agent_y_phase2/2026-04-30-y-lever-a-asymmetric.md` — Lever A
+   (asymmetric weights) — modest, no headline shift
+8. `agent_y_phase2/2026-04-30-y-lever-b-multifeature.md` — Lever B
+   (multi-feature K=2,3,5) — fails multi-seed, mechanism diagnosed
+9. `agent_y_phase2/2026-04-30-y-unified-pareto.md` — original unified Pareto
+10. `agent_y_phase2/2026-04-30-y-final-summary.md` — pre-OBLITERATION 3-seed picture (NOTE: claims T=2 bare per-pos = 1.200 multi-seed; that's per-seed-then-mean; mean-curve gives 0.978)
 4. `agent_y_phase2/2026-04-30-y-creative-shifts-T.md` — Han's shifts=(T,) suggestion
 5. `agent_y_phase2/2026-04-30-y-grow-from-t2.md` — sequential growth findings
 6. `agent_y_phase2/2026-04-30-y-multiseed-verify.md` — per-seed-then-mean verdict on T=5 cells

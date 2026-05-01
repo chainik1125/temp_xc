@@ -264,6 +264,36 @@ def _load_phase7_model(meta: dict, ckpt_path: Path, device) -> tuple:
             matryoshka_h_size=int(d_sae * 0.2),
             alpha=float(meta.get("alpha") if meta.get("alpha") is not None else 1.0),
         ).to(device)
+    elif src_class == "TXCMultiplicativeMergeH8":
+        # W's MYSTERY arch: multiplicative-merge encoder, H8 stack.
+        from src.architectures.txc_multiplicative_h8 import TXCMultiplicativeMergeH8
+        shifts = tuple(meta.get("shifts") or (1,))
+        model = TXCMultiplicativeMergeH8(
+            d_in, d_sae, int(meta["T"]), int(meta["k_win"]),
+            shifts=shifts, weights=None,
+            matryoshka_h_size=int(d_sae * 0.2),
+            alpha=float(meta.get("alpha") if meta.get("alpha") is not None else 1.0),
+        ).to(device)
+    elif src_class == "TXCMaxPoolMergeH8":
+        # W's MYSTERY arch: max-pool merge encoder, H8 stack.
+        from src.architectures.txc_maxpool_h8 import TXCMaxPoolMergeH8
+        shifts = tuple(meta.get("shifts") or (1,))
+        model = TXCMaxPoolMergeH8(
+            d_in, d_sae, int(meta["T"]), int(meta["k_win"]),
+            shifts=shifts, weights=None,
+            matryoshka_h_size=int(d_sae * 0.2),
+            alpha=float(meta.get("alpha") if meta.get("alpha") is not None else 1.0),
+        ).to(device)
+    elif src_class == "TXCContrastiveMergeH8":
+        # W's MYSTERY arch: contrastive (end-minus-start) merge encoder.
+        from src.architectures.txc_contrastive_merge_h8 import TXCContrastiveMergeH8
+        shifts = tuple(meta.get("shifts") or (1,))
+        model = TXCContrastiveMergeH8(
+            d_in, d_sae, int(meta["T"]), int(meta["k_win"]),
+            shifts=shifts, weights=None,
+            matryoshka_h_size=int(d_sae * 0.2),
+            alpha=float(meta.get("alpha") if meta.get("alpha") is not None else 1.0),
+        ).to(device)
     elif src_class == "TXCBareMDxMSContrastiveAntidead":
         # Z R7: multi-distance × multi-scale contrastive variant.
         # Probe-time encode behaves identically to TXCBareMultiDistance
@@ -310,6 +340,21 @@ def _load_phase7_model(meta: dict, ckpt_path: Path, device) -> tuple:
             alpha=float(meta.get("alpha") if meta.get("alpha") is not None else 1.0),
             sum_pool=True,
         ).to(device)
+    elif src_class == "TXCHierarchicalMultiScale":
+        # Galaxy 4 (Y, 2026-05-01): hierarchical window/per-position decomposition.
+        from src.architectures.txc_hierarchical_multiscale import TXCHierarchicalMultiScale
+        d_sae_w = int(meta.get("d_sae_w", d_sae // 2))
+        d_sae_p = int(meta.get("d_sae_p", d_sae // 2))
+        k_window = int(meta.get("k_window", 10))
+        k_pos_only = int(meta.get("k_pos_only", 10))
+        model = TXCHierarchicalMultiScale(
+            d_in=d_in, d_sae_w=d_sae_w, d_sae_p=d_sae_p,
+            T=int(meta["T"]), k_window=k_window, k_pos=k_pos_only,
+        ).to(device)
+    elif src_class == "TXCMaxPool":
+        # Galaxy 6 (Y, 2026-05-01): max-pool over T positions instead of sum.
+        from src.architectures.txc_maxpool import TXCMaxPool
+        model = TXCMaxPool(d_in, d_sae, int(meta["T"]), int(meta["k_win"])).to(device)
     else:
         raise ValueError(f"unknown src_class={src_class}")
 

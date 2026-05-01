@@ -3,12 +3,12 @@
     "T-SAE k=20 (anchor)": {
       "color": "blue",
       "by_class": {
-        "knowledge_domain": 1.6666666666666667,
-        "knowledge_format": 2.2,
-        "discourse_register": 2.0,
-        "discourse_safety": 0.6,
-        "discourse_style": 1.0,
-        "behavior_form": 0.3333333333333333,
+        "knowledge_domain": 1.5555555555555556,
+        "knowledge_format": 0.7,
+        "discourse_register": 2.5,
+        "discourse_safety": 1.0,
+        "discourse_style": 2.0,
+        "behavior_form": 0.6666666666666666,
         "behavior_emotion": 0.6666666666666666
       }
     },
@@ -53,12 +53,12 @@
     "T-SAE k=20 (anchor)": {
       "color": "blue",
       "by_class": {
-        "knowledge_domain": 1.6666666666666667,
-        "knowledge_format": 0.6,
-        "discourse_register": 2.0,
-        "discourse_safety": 0.2,
-        "discourse_style": 0.6666666666666666,
-        "behavior_form": 0.3333333333333333,
+        "knowledge_domain": 0.16666666666666666,
+        "knowledge_format": 0.7,
+        "discourse_register": 2.5,
+        "discourse_safety": 0.0,
+        "discourse_style": 0.5,
+        "behavior_form": 0.6666666666666666,
         "behavior_emotion": 0.6666666666666666
       }
     },
@@ -103,12 +103,12 @@
     "T-SAE k=20 (anchor)": {
       "color": "blue",
       "by_class": {
-        "knowledge_domain": 1.6666666666666667,
-        "knowledge_format": 0.6,
-        "discourse_register": 2.0,
+        "knowledge_domain": 0.16666666666666666,
+        "knowledge_format": 0.30000000000000004,
+        "discourse_register": 2.5,
         "discourse_safety": 0.0,
-        "discourse_style": 0.6666666666666666,
-        "behavior_form": 0.3333333333333333,
+        "discourse_style": 0.5,
+        "behavior_form": 0.6666666666666666,
         "behavior_emotion": 0.6666666666666666
       }
     },
@@ -131,7 +131,7 @@
         "knowledge_format": 0.6666666666666666,
         "discourse_register": 1.5,
         "discourse_safety": 0.06666666666666667,
-        "discourse_style": 0.8888888888888888,
+        "discourse_style": 0.7777777777777777,
         "behavior_form": 0.3333333333333333,
         "behavior_emotion": 0.7777777777777778
       }

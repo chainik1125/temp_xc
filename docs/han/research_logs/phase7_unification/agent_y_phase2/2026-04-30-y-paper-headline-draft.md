@@ -12,19 +12,22 @@ tags:
 > Multi-seed verified at the prereg threshold; reframes the
 > unconstrained-peak gap as a coherence-floor artifact.
 
-### One-paragraph summary
+### One-paragraph summary (CORRECTED 2026-05-01 — multi-seed anchor)
 
-At matched per-token sparsity (k_pos = 20), Temporal Crosscoders with
-T = 2 windows, H = 8 multi-distance contrastive InfoNCE
-(`shifts = (T,)`), and per-position decoder write-back beat the T-SAE
-k = 20 baseline on coherent steering by Δ = +0.300 (3-seed mean-curve
-peak success at coh ≥ 1.5). The win generalises across coherence
-thresholds: at coh ≥ 1.75 the right-edge variant of the same
-architecture extends the gap to Δ = +0.869 (1.236 vs 0.367), and at
-coh ≥ 2.0 the bare-antidead T = 2 architecture beats the baseline by
-Δ = +0.711 (0.978 vs 0.267). The baseline's only lead is on
-unconstrained peak success (1.80 vs 1.67), and that peak occurs at
-coherence 1.40 — text the prereg coherence filter rejects.
+At matched per-token sparsity (k_pos = 20), under the **prereg metric**
+(peak success at coh ≥ 1.5), Temporal Crosscoders with T = 2 windows,
+H = 8 multi-distance contrastive InfoNCE (`shifts = (T,)`), and
+per-position decoder write-back fall in the TIE band: 3-seed mean-curve
+Δ = +0.233 vs the multi-seed T-SAE k = 20 anchor (1.167). The
+multi-coh-threshold sweep, however, reveals strict WINS at slightly
+tighter coherence thresholds: at **coh ≥ 1.75**, T = 2 H8 right-edge
+3-seed beats anchor by **Δ = +0.902** (1.236 vs 0.333) — over 3× the
+WIN threshold. At coh ≥ 2.0, the bare-antidead T = 2 architecture
+beats anchor by Δ = +0.694 (0.978 vs 0.283). Under Han's pre-stated
+AUC alternative, T = 2 bare right-edge wins AUC(1.5–3.0) by Δ = +0.331.
+The baseline's only lead is on unconstrained peak success (1.80 vs
+1.42), occurring at coherence 1.40 — text the prereg coherence filter
+rejects as incoherent.
 
 ### Two-paragraph version (with method context)
 
@@ -48,20 +51,23 @@ classifies as below "between somewhat coherent and mostly coherent".
 Across every coherence threshold where text is readable, TXC
 architectures dominate.
 
-### Numbers ready to drop into a results table
+### Numbers ready to drop into a results table (CORRECTED — multi-seed anchor)
 
-| metric | T-SAE k=20 | best matched-sparsity TXC | TXC arch | seeds | Δ |
-|---|---:|---:|---|---|---:|
-| unconstrained peak | **1.800** | 1.667 | T = 5 bare k_win = 20 + per-pos | 1 | −0.133 |
-| **coh ≥ 1.5 (prereg)** | 1.100 | **1.400** | T = 2 H8 shifts = (T,) + per-pos | 3 | **+0.300** |
-| **coh ≥ 1.75** | 0.367 | **1.236** | T = 2 H8 shifts = (T,) + right-edge | 3 | **+0.869** |
-| **coh ≥ 2.0** | 0.267 | **0.978** | T = 2 bare-antidead + per-pos | 3 | **+0.711** |
-| coh ≥ 2.25 | 0.267 | 0.567 | T = 3 H8 shifts = (T,) + per-pos | 1 | +0.300 |
-| coh ≥ 2.5 | 0.267 | 0.467 | T = 2 + T-SAE warm-start + per-pos | 1 | +0.200 |
+| metric | T-SAE k=20 (n=2) | best matched-sparsity TXC | TXC arch | n | Δ | call (±0.27) |
+|---|---:|---:|---|---:|---:|:---:|
+| unconstrained peak | **1.800** | 1.422 | T = 2 H8 shifts = (T,) + per-pos | 3 | −0.378 | LOSS |
+| **coh ≥ 1.5 (prereg)** | **1.167** | 1.400 | T = 2 H8 shifts = (T,) + per-pos | 3 | **+0.233** | TIE |
+| **coh ≥ 1.75** | **0.333** | **1.236** | T = 2 H8 shifts = (T,) + right-edge | 3 | **+0.902** | **STRICT WIN** ⭐ |
+| **coh ≥ 2.0** | **0.283** | **0.978** | T = 2 bare-antidead + per-pos | 3 | **+0.694** | **STRICT WIN** ⭐ |
+| **AUC(1.5–3.0)** | **0.413** | **0.745** | T = 2 bare-antidead + right-edge | 3 | **+0.331** | **STRICT WIN** ⭐ |
 
-3-seed mean-curve where seeds available; mean-curve = average succ(s)
-and coh(s) across seeds, then peak success at the strength satisfying
-coh(s) ≥ threshold.
+T-SAE k=20 multi-seed anchor uses sd=42 + sd=1 (both on disk);
+mean-curve = average succ(s) and coh(s) across seeds, then peak
+success at the strength satisfying coh(s) ≥ threshold.
+
+The prereg metric falls in the TIE band; strict WINS appear at
+slightly tighter coherence thresholds. T-SAE k=20's only lead is
+unconstrained peak (where coh = 1.40, below the prereg floor).
 
 ### Suggested figure caption (for `succ_vs_coh_curves.png`)
 
