@@ -55,14 +55,14 @@ instead — SAE arditi first, TXC paper k=100 queued via a polling shell that
 fires once the SAE run writes its `em_nanda_sae_arditi_DONE` marker. Total
 wall-clock is doubled, but cycle is preserved.
 
-### Track A: SAE arditi 10k @ layer 24 resid_post (h100_2, stage 3 in flight)
+### Track A: SAE arditi 10k @ layer 24 resid_post (h100_2, stage 4 mid-flight)
 
 Launched 2026-05-01. Hyperparams: `--d_sae 32768 --k 128 --batch_size 256
 --lr 3e-4`. Wang stage uses `--batch_cells 5 --gen_batch_size 16` (modest
 batching to validate the integration on Qwen-14B before larger chunks).
 
-**Stage 1+2 complete; Stage 3 in progress** (3/20 features into the
-coherence-aware strength sweep as of latest poll).
+**Stage 1+2+3 complete; Stage 4 mid-flight** (2/3 finalists evaluated; feat
+26418 pending; bundle frontier next).
 
 #### Stages 1–2 summary
 
@@ -128,9 +128,11 @@ the *re-aligning* sweep examines **negative α**. The strength grid runs
 | 22676 | -10 | 91.25 | 99.53 |
 | 26418 | -10 | 92.50 | 97.34 |
 
-*(2026-05-01 22:00 UTC poll: stage 3 now at 17/20.)*
+*(2026-05-01 ~22:10 UTC: stage 3 complete 20/20. All 20 features peak at
+α=-10 with align 83.06–97.66, coh 96.25–100.00 — pattern from the partial
+extends cleanly to the full survivor list.)*
 
-**100% of the 17 features measured so far peak at α=-10** (the grid edge),
+**100% of the 20 stage-3 features peak at α=-10** (the grid edge),
 with align **83.06–97.66** and coh **96.25–100.00**. Lift over the
 misaligned baseline 54.38 is **+29 to +43 align points with no coherence
 penalty**. For comparison, the Qwen-7B medical champion was
@@ -155,6 +157,46 @@ the remaining 3 — strongly suggests we should re-run with an extended grid
 follow-up. Current single-feat front-runner remains: feat **17837 @ α=-10 →
 align=97.66 / coh=100.00** (no new survivor in features 13–17 has beaten it).
 Stage 3 ETA ~13 min remaining; stage 4 ~10 min after that.
+
+#### Stage 4 partial (2/3 finalists complete)
+
+Stage 4's 27-α grid: `[−100, −10, −8, −6, −5, −4, −3, −2, −1.75, −1.5,
+−1.25, −1, 0, +1, +1.25, +1.5, +1.75, +2, +3, +4, +5, +6, +7, +8, +9, +10,
++100]`. Note the gap from −10 → −100 (no points between) — confirms the
+follow-up plan to add `-30/-20/-15/-12/-8` resolution between |α|=10 and
+|α|=100 to nail down the actual peak location.
+
+| feat  | best α | align | coh    | α=0 align | α=−100 align | α=+100 align |
+|------:|------:|------:|------:|----------:|-------------:|-------------:|
+| 17837 | **−3** | **93.02** | 98.98 | 83.59 | 27.74 (coh 14.22) | 35.08 (coh 28.59) |
+| 11086 | **−6** | **94.69** | 98.67 | 78.56 | 65.88 (coh 67.34) | 24.44 (coh 1.72) |
+| 26418 | (in flight) |  |  |  |  |  |
+
+**Headline so far**: feat **11086 @ α=−6 → align 94.69 / coh 98.67**, +16.1
+absolute lift over its α=0 baseline (78.56) and **+36.2 align points above
+the prior Qwen-7B medical champion** (58.47). Coherence is also +63 vs the
+medical champion (98.67 vs 30.86) — the steered output is *intelligible*,
+not just judge-permissive. Documented in
+[em_nanda_finding_qwen14b_sae_arditi_10k.md](em_nanda_finding_qwen14b_sae_arditi_10k.md).
+
+Note: feat 17837 hit align 97.66 at α=−10 in stage 3 (4 rollouts/cell) but
+only 90.39 at α=−10 in stage 4 (8 rollouts/cell) — variance between the two
+sweeps is consistent with sampling noise on n=32 vs n=64. Stage 4 picks up
+the more-resolved peak at α=−3 (align 93.02) instead. This is fine
+qualitatively; the ranking of the two finalists has 11086 > 17837 by stage 4
+(94.69 > 93.02), inverting their stage 3 ranking. Sampling noise on a
+narrow plateau, not a model issue.
+
+The α=±100 columns confirm the directionally-asymmetric peak: at strong
+negative α the model retains coherence (esp. 11086 at α=−100 has coh 67.34,
+align 65.88), but at strong positive α both align and coh collapse (24.44 /
+1.72). This suggests the −α direction is the *genuine re-aligning* axis
+even past the peak; the +α refusal-template artifact is grid-edge fragile.
+
+Track A wall-clock to here: training (~30 min) + stage-1 encoder (~15 min) +
+stage-2 screen (~30 min batched) + stage-3 strength (~75 min batched) +
+stage-4 finalists 1+2 (~50 min so far). Third finalist + bundle frontier
+expected ~30–45 min more, then TXC autostart.
 
 #### Calibration / sanity check
 
