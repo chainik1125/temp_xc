@@ -448,3 +448,20 @@ In flight now:
 Disk on h100_1: 50 GB free (76% used) after cleanup. h100_2: 150 GB free.
 
 The plot script `plot_overnight_panels.py` PANELS list now includes the C3 60k bundle frontier (color olivedrab, with NaN-heavy disclaimer in title). Will need to add E1 and D2 panels when those finish.
+
+
+### Snapshot at 2026-05-01 15:00 UTC firing
+
+- **Track E1b result (TXC T=2 arditi-matched k=256, 100k @ resid_post)** — DONE, pulled. Bundle 50.08 at α=−4 / coh 24.92 (regression −7.34 vs SAE arditi T=1 anchor 57.42, and worse than E1's k=128 bundle 53.58). Stage 4 finalists: feat 4762 naive peak α=−3 align=53.42 is a single-point judge spike (neighbors 45.35/46.02). Robust positive-α peak feat 1519 α=+5 align=51.59 coh=28.20 (neighbors 47.83/50.32). Both well below 58.47.
+- **Track E is conclusively dead.** Both k=128 (E1) and k=256 (E1b) regress on bundle (−3.84 / −7.34 vs 57.42) AND on robust single-feat peaks (~−4.7 / −6.9 vs 58.47). k=256 strictly worse than k=128; do NOT queue k=64 or k=512.
+- **Combined Track B + Track E evidence**: windowing without contrastive loss does NOT work. The T-SAE per-token contrastive is essential for windowing to produce competitive features. Track A (windowed_tsae) remains the only competitive windowing path.
+- **Track C4 launched on h100_2** (now-free GPU): TXC paper-faithful k=100 30k @ resid_mid. Same recipe as the current single-feat champion (k=100 @ resid_post = 4563=58.47), but at a different hookpoint between attention and MLP. Tests if a different residual position yields a single feature above 58.47. Wrote new launcher `/tmp/run_txc_paper_hookpoint.sh` since existing kvariant launcher is hardcoded to resid_post. Log `txc_paper_k100_residmid.log`. ETA ~3.5h end-to-end.
+- **Track A2 still in flight on h100_1**: WindowedTSAE T=3 + mix + matr 20%, currently in Wang Stage 1 (causal screen ~67/100 features). ETA ~1.5h more.
+
+In flight now:
+- **h100_1**: Track A2 — WindowedTSAE T=3 + mix + matr 20% — Wang Stage 1 ~67/100.
+- **h100_2**: Track C4 — TXC paper k=100 @ resid_mid — JUST launched.
+
+Disk: h100_1 32 GB free (85% used), h100_2 127 GB free (37% used). C4 will produce ~5 GB ckpt; comfortable.
+
+The plot script `plot_overnight_panels.py` PANELS list now includes E1b bundle (firebrick) and E1b single feat 1519 (salmon). Will need to add A2 and C4 panels when those finish.

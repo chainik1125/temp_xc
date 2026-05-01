@@ -489,3 +489,59 @@ Versus the TXC paper k=100 anchor (single feat 4563=58.47): the robust single pe
 - ETA: ~3.5h end-to-end (training + Wang).
 - Launched on h100_1 PID 805667. Log `wtsae_T3_mix_matr_30k.log`.
 - **h100_2 still busy with Track E1b** (k=256), step ~95000/100000, ETA ~30 min more training then ~2h Wang.
+
+
+### 2026-05-01 15:00 UTC — Track E1b result: TXC T=2 arditi-matched k=256 confirms Track E is dead
+
+TXC T=2 arditi-matched recipe at k=256 (paired with E1's k=128 to give a 2-point k-sweep around arditi's k=128 anchor) finished training + Wang on h100_2.
+
+**Bundle k=30 frontier — top 5**
+
+| α      | align     | coh   |
+| ------ | --------- | ----- |
+| −4.00  | **50.08** | 24.92 |
+| −2.00  | 49.93     | 23.59 |
+| −1.00  | 49.67     | 23.98 |
+| −10.00 | 48.06     | 25.00 |
+| −1.75  | 47.64     | 25.62 |
+| α=0    | 46.67     | 24.84 |
+
+**Stage 4 single-feature peaks (3 finalists)**
+
+| feat   | Δz̄    | naive peak α | naive align | naive coh | α=0   |
+| ------ | ----- | ------------ | ----------- | --------- | ----- |
+| 4762   | +1.42 | −3.00        | 53.42       | 22.89     | 42.50 |
+| 1519   | +0.46 | +5.00        | **51.59**   | 28.20     | 44.12 |
+| 12867  | +11.22| −2.00        | 49.68       | 25.62     | 44.43 |
+
+**Robustness check on feat 4762 α=−3 = 53.42** — neighbors α=−2/−4 are 45.35/46.02. This is a single-point spike (judge noise), same failure mode as E1's feat 21945. Robust positive-α peak for feat 1519 (α=+5 = 51.59 with α=+4/+6 = 47.83/50.32) is the most consistent local max but still well below the 58.47 anchor.
+
+**Comparison summary across the E1/E1b 2-point k-sweep**
+
+| variant             | bundle k=30 peak | best robust single | verdict |
+| ------------------- | ---------------- | ------------------ | ------- |
+| SAE arditi T=1 (anchor) | 57.42 (α=−10)| n/a                | (anchor)|
+| **E1**  k=128, 100k | 53.58 (α=+4)     | 53.73 (feat 21945, α=+6) | regression on both |
+| **E1b** k=256, 100k | 50.08 (α=−4)    | 51.59 (feat 1519, α=+5)  | regression on both, worse than E1 |
+
+**Interpretation.**
+
+1. **Track E is conclusively dead.** Both k=128 and k=256 regress vs SAE arditi T=1 anchor on bundle (−3.84 / −7.34 respectively) and on robust single-feat peaks (~−4.7 / −6.9 vs 58.47). The k=256 result is strictly worse than k=128, suggesting that within the per-window-pool TopK + arditi recipe paradigm, lowering sparsity (more active features) further dilutes the per-feature steering signal. This rules out queueing k=64 or k=512.
+2. **Symmetric to Track B B1 (vanilla windowed SAE) result.** Both Track B and Track E paths share the property of "windowed encoder, no contrastive loss." Both regress relative to their T=1 anchors. The combined evidence is strong: **windowing alone, without an explicit contrastive loss to organize the T-position representations, does not produce competitive features**. The T-SAE recipe (Bhalla 2025) and our windowed_tsae piggyback (which keeps the per-token contrastive) are the only windowing variants that have produced competitive single-feature peaks (T=2 mix+matr feat 14496 = 57.59).
+3. **Polarity of the bundle peak.** E1's bundle peaks at α=+4; E1b's bundle peaks at α=−4. Both have secondary peaks at α=−10 / α=±2. Neither has the sharp negative-α decay-to-baseline structure of SAE arditi (which peaks at α=−10 and decays to α=0=46.7). The TXC encoder summing per-position contributions into a single window-z appears to scramble the "bad-medical activation polarity" structure that SAE arditi finds so cleanly at the token level.
+4. **What we've learned about windowing in general.** Across all five windowing variants tested (windowed_tsae T=2 original/mix/matr/mix+matr at d=16k and now Track E at d=32k k=128/256):
+   - windowed_tsae T=2 + mix or + mix+matr (d=16k k=20 with contrastive α=0.1): bundle 50-55, best single 54-58 — competitive but not winning
+   - vanilla windowed SAE T=2 d=32k k=128 (no contrastive): bundle 51.93, best single 52.20 — regression
+   - TXC T=2 arditi-matched d=32k k=128/256 (per-window TopK, no contrastive): bundle 50/53, best single 52/54 — regression
+
+   The pattern is unmistakable: **contrastive loss is required for windowing to produce useful features**. Removing it (Track B, Track E) yields regressions; keeping it (Track A) keeps the variant in the competitive zone. The Track A T=3 ladder (currently in flight) is the most promising remaining test of "can windowing strictly improve over T=1?"
+
+**What to launch next on h100_2 (now free).**
+
+The remaining promising directions are:
+
+- **Track C4 — TXC paper k=100 30k @ resid_mid.** The brief lists this as a queued variant. Our existing TXC @ resid_mid (our-settings, NOT paper-faithful) gave 53.87 single. Paper-faithful settings (k=100, T=5, BatchTopK) at this hookpoint have not been tested. resid_mid is between attention and MLP and may give a different feature distribution that contains a single feature steering above 58.47. Cheap signal-finding experiment (~3.5h end-to-end). Need to write a small launcher variant since `/tmp/run_txc_paper_kvariant.sh` is hardcoded to resid_post.
+- Track D3 (alpha sweep of TXC + adjacency contrastive) was explicitly deprioritized in the brief due to the structural reason that overlapping windows share T−1 of T positions. Defer.
+- Track D1b (per-token contrastive on per-position TXC z) is a bigger arch change. Defer until Track A2 result is in.
+
+**Decision: launch C4 on h100_2.**

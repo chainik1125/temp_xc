@@ -124,6 +124,12 @@ def main():
         ("TXC T=2 arditi-matched k=128 100k  SINGLE FEAT 21945  (α=+9 spike = noise)",
          load_finalist(H / "txc_arditi_T2_d32k_k128_step100000/results/wang_txc_arditi_T2_d32k_k128_step100000/stage4_final_frontier.json", 21945),
          "lightcoral"),
+        ("TXC T=2 arditi-matched k=256 100k @ resid_post  (BUNDLE)",
+         load_bundle(H / "txc_arditi_T2_d32k_k256_step100000/results/wang_txc_arditi_T2_d32k_k256_step100000_bundle30_frontier.json"),
+         "firebrick"),
+        ("TXC T=2 arditi-matched k=256 100k  SINGLE FEAT 1519",
+         load_finalist(H / "txc_arditi_T2_d32k_k256_step100000/results/wang_txc_arditi_T2_d32k_k256_step100000/stage4_final_frontier.json", 1519),
+         "salmon"),
         ("T-SAE 30k @ resid_post (ours: k=128, α=1.0)",
          load_bundle(root / "wang/tsae_30k_bundle30_frontier.json"), "darkorange"),
     ]
