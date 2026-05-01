@@ -12,7 +12,7 @@ unc=1.800, ≥1.5=1.167, ≥1.75=0.333, ≥2.0=0.283, ≥2.25=0.283, ≥2.5=0.28
 | arch + protocol | n | Δ | base | seeds_data |
 |---|---:|---:|---:|---|
 | txc_contrastive_h8_t2_kpos20_shifts2 right-edge | 3 | +0.411 | 1.578 | n=3 |
-| txc_maxpool_t2_kpos20 per-position | 2 | +0.333 | 1.500 | n=2 |
+| txc_maxpool_t2_kpos20 per-position | 3 | +0.267 | 1.433 | n=3 |
 | txc_galaxy4_t2_kw10_kp10 per-position | 3 | +0.267 | 1.433 | n=3 |
 | txc_h8_t2_kpos20_shifts2 per-position | 3 | +0.233 | 1.400 | n=3 |
 | txc_maxpool_t2_kpos20 right-edge | 3 | +0.156 | 1.322 | n=3 |
@@ -33,8 +33,8 @@ unc=1.800, ≥1.5=1.167, ≥1.75=0.333, ≥2.0=0.283, ≥2.25=0.283, ≥2.5=0.28
 | txc_bare_antidead_t4_kpos20_grownChainFromT3 per-position | 1 | +0.800 | 1.133 | n=1 |
 | txc_bare_antidead_t2_kpos20_ws_tsae_encoder per-position | 3 | +0.800 | 1.133 | n=3 |
 | txc_h8_t5_kpos20_shifts5 per-position | 2 | +0.733 | 1.067 | n=2 |
+| txc_maxpool_t2_kpos20 per-position | 3 | +0.722 | 1.056 | n=3 |
 | txc_bare_antidead_t2_kpos20_ws_tsae_encoder right-edge | 3 | +0.678 | 1.011 | n=3 |
-| txc_maxpool_t2_kpos20 per-position | 2 | +0.667 | 1.000 | n=2 |
 | txc_bare_antidead_t2_kpos20 per-position | 3 | +0.644 | 0.978 | n=3 |
 
 ### Top 10 cells by Δ coh ≥ 2.0
@@ -56,13 +56,13 @@ unc=1.800, ≥1.5=1.167, ≥1.75=0.333, ≥2.0=0.283, ≥2.25=0.283, ≥2.5=0.28
 
 | arch + protocol | n | Δ | base | seeds_data |
 |---|---:|---:|---:|---|
-| txc_maxpool_t2_kpos20 per-position | 2 | +0.360 | 0.773 | n=2 |
 | txc_bare_antidead_t3_kpos20_grownFromT2sd42 right-edge | 3 | +0.340 | 0.753 | n=3 |
 | txc_bare_antidead_t2_kpos20 right-edge | 3 | +0.331 | 0.745 | n=3 |
 | txc_bare_antidead_t2_kpos20 per-position | 3 | +0.323 | 0.737 | n=3 |
 | txc_maxpool_h8_t2_kpos20_shifts2 per-position | 3 | +0.313 | 0.726 | n=3 |
 | txc_maxpool_h8_t2_kpos20_shifts2 right-edge | 3 | +0.301 | 0.715 | n=3 |
 | txc_bare_antidead_t3_kpos20_grownFromT2sd42 per-position | 3 | +0.291 | 0.704 | n=3 |
+| txc_maxpool_t2_kpos20 per-position | 3 | +0.283 | 0.696 | n=3 |
 | txc_h8_t3_kpos20_shifts3 right-edge | 1 | +0.278 | 0.691 | n=1 |
 | txc_maxpool_t2_kpos20 right-edge | 3 | +0.276 | 0.689 | n=3 |
 | txc_galaxy4_t2_kw10_kp10 right-edge | 3 | +0.255 | 0.669 | n=3 |

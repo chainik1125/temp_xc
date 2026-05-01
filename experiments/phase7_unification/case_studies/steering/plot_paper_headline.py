@@ -55,6 +55,11 @@ CELLS = [
         ("steering_paper_normalised_seed1", "txc_bare_antidead_t2_kpos20", 1),
         ("steering_paper_normalised_seed2", "txc_bare_antidead_t2_kpos20", 2),
     ]),
+    ("Galaxy 6 max-pool RE — coh≥2.0 ProcA-sig", "purple", "P", "-", 2.5, [
+        ("steering_paper_normalised", "txc_maxpool_t2_kpos20", 42),
+        ("steering_paper_normalised_seed1", "txc_maxpool_t2_kpos20", 1),
+        ("steering_paper_normalised_seed2", "txc_maxpool_t2_kpos20", 2),
+    ]),
 ]
 
 

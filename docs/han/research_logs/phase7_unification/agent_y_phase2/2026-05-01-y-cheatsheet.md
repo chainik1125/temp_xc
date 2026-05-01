@@ -58,7 +58,7 @@ way. The strongest WIN is at coh ≥ 1.75 under both reductions.
 2. **TXC's window encoder distributes the steering signal** across T
    tokens. At moderate strength, TXC produces COHERENT text that
    contains the concept.
-3. **Cross-cell consistency**: at coh ≥ 1.75, **thirteen 3-seed-verified
+3. **Cross-cell consistency**: at coh ≥ 1.75, **fourteen 3-seed-verified
    TXC cells beat anchor by Δ > +0.27**:
    - T=2 H8 RE 3sd:                   Δ = +0.906 ⭐
    - T=3 grown RE 3sd:                Δ = +0.889 ⭐
@@ -69,12 +69,13 @@ way. The strongest WIN is at coh ≥ 1.75 under both reductions.
    - T=2 bare PP 3sd:                 Δ = +0.644
    - T=2 bare RE 3sd:                 Δ = +0.622
    - T=3 grown PP 3sd:                Δ = +0.606
-   - **Galaxy 6 (TXCMaxPool) RE 3sd**: Δ = +0.522 (Y's max-pool prototype)
+   - **Galaxy 6 (TXCMaxPool) PP 3sd**: Δ = +0.722 (Y's max-pool prototype)
+   - **Galaxy 6 (TXCMaxPool) RE 3sd**: Δ = +0.522
    - Galaxy 4 PP 3sd:                 Δ = +0.511 (Y's hierarchical multi-scale)
    - Galaxy 4 RE 3sd:                 Δ = +0.478
    - T=2 H8 PP 3sd:                   Δ = +0.278 (just above threshold)
 
-   Plus 2-seed cells: Galaxy 6 PP +0.667, T=5 H8 PP +0.733, etc.
+   Plus 2-seed cells: T=5 H8 PP +0.733, etc.
 
    Robust effect across:
    - **7 architectures**: H8 multi-distance, bare-antidead, grown-chain,
@@ -107,9 +108,9 @@ Six 3-seed cells × thresholds (where "YES" = 95% CI excludes 0):
 | T=2 H8 PP   | YES (+0.278 [+0.083, +0.483]) | no |
 | T=2 H8 RE   | YES (+0.906 [+0.572, +1.267]) | no |
 | T=2 bare PP | YES (+0.644 [+0.372, +0.967]) | YES (+0.694 [+0.339, +1.072]) |
-| T=2 bare RE | YES (+0.622 [+0.356, +0.878]) | YES (+0.672 [+0.328, +1.028]) |
-| Galaxy 6 RE | YES (+0.522 [+0.289, +0.761]) | YES (+0.572 [+0.256, +0.883]) |
-| Galaxy 6 PP (2sd) | YES (+0.667 [+0.400, +0.950]) | no |
+| T=2 bare RE | YES (+0.622 [+0.361, +0.906]) | YES (+0.672 [+0.350, +1.028]) |
+| Galaxy 6 RE | YES (+0.522 [+0.311, +0.744]) | YES (+0.572 [+0.267, +0.878]) |
+| **Galaxy 6 PP** | **YES (+0.722 [+0.500, +0.989])** ⭐ | no |
 
 **Procedure B bootstrap CIs (scientific-CI; resamples concepts AND
 re-optimizes strength per resample; conservative — the right CI to
@@ -180,11 +181,14 @@ multi-position structure.
 - T=2 H8 PP K=2 multi-feature: FAILS (mechanism: secondary features
   polysemantic across seeds)
 
+**Galaxy 6 (TXCMaxPool) PP NOW FULLY 3-SEED VERIFIED (sd=2 landed):**
+- coh ≥ 1.75: Δ=+0.722 [+0.500, +0.989] **YES SIG (Procedure A)** ⭐⭐
+- AUC(1.5-3.0): Δ=+0.283 — STRICT WIN
+- coh ≥ 1.5: Δ=+0.267 (just below threshold; borderline)
+
 2-seed verified:
 - T=5 H8 PP (sd=42 + sd=1): WIN at coh ≥ 1.75 (Δ=+0.733)
 - T=5 bare PP/RE (sd=42 + sd=1)
-- Galaxy 6 (TXCMaxPool) PP (sd=42 + sd=1): WIN at coh ≥ 1.75 (Δ=+0.667) —
-  sd=2 PP grade in flight
 
 W's mystery archs (TXCMultiplicativeMergeH8, TXCMaxPoolMergeH8,
 TXCContrastiveMergeH8) being trained by W in parallel.

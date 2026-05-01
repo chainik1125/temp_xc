@@ -96,6 +96,7 @@ WINDOW_CLASSES = {
     "SubseqH8",
     "TXCHierarchicalMultiScale",  # Galaxy 4 (Y, hierarchical decomposition)
     "TXCMaxPool",                  # Galaxy 6 (Y, max-pool encoder)
+    "TXCSoftMaxPool",              # Galaxy 8 (Y, soft-max-pool with learnable τ)
 }
 
 
@@ -147,9 +148,10 @@ def decoder_direction_matrix(model, src_class: str) -> torch.Tensor:
         # PositionMatryoshkaTXCDR + descendants expose decoder_dirs_averaged
         return model.decoder_dirs_averaged                               # (d_in, d_sae)
     if src_class in {"TemporalCrosscoder", "TXCBareAntidead", "TXCMaxPool",
+                     "TXCSoftMaxPool",
                      "TXCBareMultiDistanceContrastiveAntidead"}:
         # W_dec is (d_sae, T, d_in); average over T then transpose to (d_in, d_sae)
-        # TXCMaxPool inherits W_dec layout from TXCBareAntidead.
+        # TXCMaxPool, TXCSoftMaxPool inherit W_dec layout from TXCBareAntidead.
         return model.W_dec.data.mean(dim=1).t().contiguous()
     if src_class == "TXCHierarchicalMultiScale":
         # Galaxy 4: returns (d_in, d_sae_w + T*d_sae_p) per-feature directions
