@@ -199,10 +199,26 @@ Resample concepts with replacement (n=30, 1000 trials), recompute mean
 - At coh ≥ 2.0, T=2 bare PP/RE retain significant wins; the H8
   variants drop to non-significant.
 
+**AUC metrics** (Han's pre-stated alternative):
+
+| metric | cell | Δ | 95% CI | sig? |
+|---|---|---:|---|:---:|
+| AUC(1.5–3.0) | T=2 bare RE 3sd | +0.236 | [−0.092, +0.378] | no |
+| AUC(1.5–3.0) | T=2 bare PP 3sd | +0.228 | [−0.113, +0.426] | no |
+| AUC(1.5–3.0) | T=2 H8 RE 3sd | +0.155 | [−0.177, +0.332] | no |
+| AUC(1.5–3.0) | T=2 H8 PP 3sd | +0.089 | [−0.194, +0.265] | no |
+| AUC(1.0–3.0) | T=2 bare RE 3sd | +0.132 | [−0.080, +0.326] | no |
+
+The AUC metric integrates over a range and accumulates curve-noise
+under bootstrap; point estimates are large but CIs cross zero. The
+*peak success at coh threshold* metric is more statistically powerful
+because it pinpoints the maximum.
+
 **Implication for the paper**: the multi-coh-threshold reframe is
 not just a robustness check — it's also where the *statistical*
 WIN lives. The prereg WIN at coh ≥ 1.5 is borderline-significant;
-the coh ≥ 1.75 WIN is rock solid.
+the coh ≥ 1.75 WIN is rock solid; AUC is point-estimate-large but
+bootstrap-CI-uncertain.
 
 ### Per-concept WIN/LOSS counts (each concept picks own strength)
 

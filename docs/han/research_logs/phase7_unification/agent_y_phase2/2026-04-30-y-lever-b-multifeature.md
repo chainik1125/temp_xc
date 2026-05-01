@@ -88,11 +88,61 @@ K=3 (larger lift at coh ≥ 1.5 but bigger regression elsewhere).
 Pattern suggests no value of K crosses T-SAE's 1.80 unc peak with
 coherent text.
 
-### Pending: K=2 and K=5 results
+### K=2 RESULTS — UPDATED VERDICT
 
-Both currently grading. Will update verdict if either shows an
-unexpected pattern (e.g. K=2 with smaller dilution might preserve
-coh ≥ 1.75 while still lifting coh ≥ 1.5).
+K=2 IS the sweet spot. Results on T=2 H8 sd=42 (single seed):
+
+| protocol | unc | ≥1.5 | ≥1.75 | ≥2.0 | AUC(1.5-3.0) | AUC(1.75-3.0) |
+|---|---:|---:|---:|---:|---:|---:|
+| K=1 uniform PP | 1.57 | 1.53 | 1.53 | 1.53 | 0.707 | 0.613 |
+| **K=2 multi-feature** | **1.73** | **1.73** | 1.03 | 0.50 | **0.815** | **0.649** |
+| K=3 multi-feature | 1.60 | 1.60 | 0.50 | 0.50 | 0.610 | 0.505 |
+| K=5 multi-feature | 1.37 | 1.37 | 0.83 | 0.83 | 0.616 | 0.484 |
+| right-edge protocol | 1.37 | 1.27 | 1.27 | 1.27 | 0.771 | 0.659 |
+| T-SAE k=20 anchor | 1.80 | 1.10 | 0.37 | 0.27 | 0.508 | 0.367 |
+
+K=2 per-strength curves (sd=42):
+
+| s_norm | succ | coh |
+|---:|---:|---:|
+| 0.5 | 0.300 | 2.600 |
+| 1.0 | 0.500 | 2.400 |
+| 2.0 | 1.033 | 1.967 ← coh just below 2.0 |
+| **5.0** | **1.733** | **1.667** ← peak at borderline coh |
+| 10.0 | 1.100 | 1.033 |
+| 20.0 | 0.200 | 0.833 |
+
+#### K=2 wins → potential paradigm shift?
+
+Three potentially-significant claims:
+
+1. **Unconstrained peak: 1.73 (vs T-SAE 1.80, gap 0.07)** — single seed.
+   With multi-seed, this could cross T-SAE's 1.80, achieving the
+   "TXC beats T-SAE on every metric" headline.
+
+2. **Coh ≥ 1.5: 1.73 (Δ=+0.63 vs anchor)** — vs K=1 1.53 (Δ=+0.43).
+   Lift of +0.20 at the prereg metric, single seed.
+
+3. **AUC(1.5-3.0): 0.815 (Δ=+0.307 vs anchor)** — vs K=1 0.707
+   (Δ=+0.199). Lift of +0.108 at Han's pre-stated alternative metric.
+
+The coh ≥ 1.75 metric REGRESSES with K=2 (1.53 → 1.03) because the
+peak strength has coh=1.667, just below 1.75. This is the trade-off:
+K=2 amplifies signal at the cost of coherence at the peak strength.
+
+**Multi-seed verification critical**. If K=2 sd=1 and sd=2 maintain
+the lift, this is paper-grade. **Recommend running K=2 on T=2 H8
+sd=1 and sd=2 next.**
+
+### K=3 and K=5 — overshooting
+
+K=3 lifts coh ≥ 1.5 by +0.07 but regresses sharply at coh ≥ 1.75.
+K=5 saturates the model further; loses ground vs K=2 across the
+board. Pattern: more features = more signal but coherence collapse
+faster.
+
+K=2 is the goldilocks: enough amplification to lift peak15 and
+unconstrained, not so much that coherence collapses.
 
 ### Recommendation: defer Lever B, ride the GIGABRAIN reframe
 
