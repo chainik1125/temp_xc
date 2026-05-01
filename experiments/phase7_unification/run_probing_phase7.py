@@ -340,6 +340,17 @@ def _load_phase7_model(meta: dict, ckpt_path: Path, device) -> tuple:
             alpha=float(meta.get("alpha") if meta.get("alpha") is not None else 1.0),
             sum_pool=True,
         ).to(device)
+    elif src_class == "TXCHierarchicalMultiScale":
+        # Galaxy 4 (Y, 2026-05-01): hierarchical window/per-position decomposition.
+        from src.architectures.txc_hierarchical_multiscale import TXCHierarchicalMultiScale
+        d_sae_w = int(meta.get("d_sae_w", d_sae // 2))
+        d_sae_p = int(meta.get("d_sae_p", d_sae // 2))
+        k_window = int(meta.get("k_window", 10))
+        k_pos_only = int(meta.get("k_pos_only", 10))
+        model = TXCHierarchicalMultiScale(
+            d_in=d_in, d_sae_w=d_sae_w, d_sae_p=d_sae_p,
+            T=int(meta["T"]), k_window=k_window, k_pos=k_pos_only,
+        ).to(device)
     else:
         raise ValueError(f"unknown src_class={src_class}")
 

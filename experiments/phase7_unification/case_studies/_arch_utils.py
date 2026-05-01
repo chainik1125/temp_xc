@@ -94,6 +94,7 @@ WINDOW_CLASSES = {
     "TXCContrastiveMergeH8",       # W's MYSTERY arch (end-minus-start)
     "SubseqTXCBareAntidead",
     "SubseqH8",
+    "TXCHierarchicalMultiScale",  # Galaxy 4
 }
 
 
@@ -148,6 +149,9 @@ def decoder_direction_matrix(model, src_class: str) -> torch.Tensor:
                      "TXCBareMultiDistanceContrastiveAntidead"}:
         # W_dec is (d_sae, T, d_in); average over T then transpose to (d_in, d_sae)
         return model.W_dec.data.mean(dim=1).t().contiguous()
+    if src_class == "TXCHierarchicalMultiScale":
+        # Galaxy 4: returns (d_in, d_sae_w + T*d_sae_p) per-feature directions
+        return model.decoder_dirs_averaged
     if src_class in {"SubseqTXCBareAntidead", "SubseqH8"}:
         # Same shape convention as TemporalCrosscoder (subseq just samples
         # which positions feed gradient; the parameter shape is identical).

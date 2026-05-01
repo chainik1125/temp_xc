@@ -224,6 +224,26 @@ class TXCHierarchicalMultiScale(nn.Module):
     def d_sae(self) -> int:
         return self.d_sae_w + self.T * self.d_sae_p
 
+    @property
+    def decoder_dirs_averaged(self) -> torch.Tensor:
+        """(d_in, d_sae_total) per-feature decoder-direction matrix.
+
+        Layout (matches encode()'s concat order):
+          cols 0..d_sae_w-1                       : window features (averaged over T positions)
+          cols d_sae_w..d_sae_w + d_sae_p - 1      : per-pos features at t=0
+          cols d_sae_w + d_sae_p .. + 2*d_sae_p - 1 : per-pos features at t=1
+          ...
+        """
+        # Window features: average W_dec_w over T positions → (d_sae_w, d_in) → transpose
+        dirs_w = self.W_dec_w.mean(dim=1).T  # (d_in, d_sae_w)
+        # Per-pos features: W_dec_pos[t] is (d_sae_p, d_in); per-position direction
+        # for steering at all positions = the per-position direction itself
+        dirs_p = []
+        for t in range(self.T):
+            dirs_p.append(self.W_dec_pos[t].T)  # (d_in, d_sae_p)
+        dirs_p_cat = torch.cat(dirs_p, dim=1)  # (d_in, T * d_sae_p)
+        return torch.cat([dirs_w, dirs_p_cat], dim=1)  # (d_in, d_sae_total)
+
     def forward(self, x: torch.Tensor):
         """x: (B, T, d_in) -> (total_loss, x_hat, z)."""
         # Encode
