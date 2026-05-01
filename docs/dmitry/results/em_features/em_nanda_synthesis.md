@@ -122,20 +122,39 @@ the *re-aligning* sweep examines **negative α**. The strength grid runs
 | 2288  | -10 | 85.31 | 99.38 |
 | 1883  | -10 | 91.25 | 97.03 |
 | 15327 | -10 | 87.34 | 98.28 |
+| 454   | -10 | 86.56 | 99.22 |
+| 870   | -10 | 89.69 | 99.84 |
+| 10957 | -10 | 84.69 | 99.38 |
+| 22676 | -10 | 91.25 | 99.53 |
+| 26418 | -10 | 92.50 | 97.34 |
 
-**100% of the 12 features measured so far peak at α=-10** (the grid edge),
+*(2026-05-01 22:00 UTC poll: stage 3 now at 17/20.)*
+
+**100% of the 17 features measured so far peak at α=-10** (the grid edge),
 with align **83.06–97.66** and coh **96.25–100.00**. Lift over the
 misaligned baseline 54.38 is **+29 to +43 align points with no coherence
 penalty**. For comparison, the Qwen-7B medical champion was
 `align 58.47 / coh 30.86`. The Qwen-14B finance single-feat peak is *much*
 cleaner: vastly higher align AND vastly higher coherence.
 
+Side note: if we relax the "best at strong α" filter and just take the
+align-maximizer over the whole grid (subject to coh ≥ floor), several
+features actually peak at small **positive** α with align 91–94 (e.g. feat
+26418 → α=+6, align=93.75; feat 25747 → α=+2, align=94.16). This is
+suspicious — when both signs lift align by similar amounts, the steering
+likely caused the model to output some safety-templated refusal that the
+judge counts as "aligned" regardless of direction. The α=-10 column is
+still the right headline because it represents the directionally consistent
+re-aligning effect, not a sign-symmetric artifact. Worth flagging in
+follow-up qualitative inspection of demo completions.
+
 The α=-10 saturation across every survivor is now nearly certain to hold for
-the remaining 8 — strongly suggests we should re-run with an extended grid
+the remaining 3 — strongly suggests we should re-run with an extended grid
 (`-30, -20, -15, -10, ...`) to find the actual peak, rather than treating
 α=-10 as the headline. **Champion call** likely needs an extended-grid
-follow-up. Current single-feat front-runner: feat **17837 @ α=-10 →
-align=97.66 / coh=100.00**. Stage 3 ETA ~20 min; stage 4 ~10 min.
+follow-up. Current single-feat front-runner remains: feat **17837 @ α=-10 →
+align=97.66 / coh=100.00** (no new survivor in features 13–17 has beaten it).
+Stage 3 ETA ~13 min remaining; stage 4 ~10 min after that.
 
 #### Calibration / sanity check
 
