@@ -107,6 +107,25 @@ C3. **TXC paper k=100 60k steps** — longer training at the sweet-spot k. Test 
 C4. **TXC paper k=100 30k @ resid_mid** — different hookpoint. Our existing TXC @ resid_mid (our-settings) was 53.87 single; paper-faithful settings might push higher.
 C5. **TXC paper k=100 30k @ ln1_normalized** — same idea but ln1.
 
+#### Track D — TXC + T-SAE-style adjacency contrastive (NEW, high priority)
+
+Symmetric to Track A: instead of lifting T-SAE → windowed encoder, lift TXC ← T-SAE-style adjacency contrastive loss. The hypothesis is that the T-SAE recipe's contrastive component pulls features into a more aligned/redundant decoder space (this is what the bundle-size sweep showed: T-SAE's bundle peak rises with k_bundle, TXC's falls). If that pull is what helps T-SAE's bundle metric, it should also be useful when added to TXC's window-level encoder.
+
+D1. **Implement adjacency-contrastive loss for the TXC training script.** The TXC produces a per-window z (not per-token), so the contrastive can't be applied directly to z_t vs z_{t+1}. Two reasonable choices:
+   - **(D1a) Overlapping-window contrastive**: sample two windows from the buffer that share T−1 tokens (window starting at position p, window starting at p+1). Encode both. Contrastive loss = `(1 - cos(z_window_p, z_window_{p+1})).mean()`. This is the natural window-level analog of T-SAE's z_t-vs-z_{t+1} contrastive.
+   - **(D1b) Per-position-z contrastive**: rework the TXC to output per-token z (one z per position in the window) instead of one z per window, then apply T-SAE's per-token contrastive directly. This is a bigger arch change.
+
+   Start with **(D1a)** — it's a 30-line edit to `experiments/em_features/run_training_txc_bricken_auxk.py` (sample a second window with offset 1, encode both, add `contrastive_alpha * (1 - cos(z1, z2)).mean()` to the total loss; expose `--contrastive_alpha` flag, default 0.1 to match Bhalla).
+
+D2. **Train TXC paper-faithful k=100 + adjacency contrastive (alpha=0.1) for 30k steps @ resid_post.**
+   - All other settings identical to current TXC paper k=100 ckpt: d_sae=16384, k_total=100, T=5, BatchTopK ON, batch=512, lr=3e-4.
+   - Compare the resulting bundle peak AND best single-feature peak to TXC paper k=100 baseline (bundle 50.89 / single feat 4563 = 58.47).
+   - Hypothesis: contrastive pulls features into a more redundant subspace → bundle peak rises (toward T-SAE's 56+ regime) but per-feature peak may fall (TXC's strength was its orthogonal features). The interesting question is whether the BUNDLE rises enough to compensate for any single-feature loss.
+
+D3. **Sweep alpha** if D2 looks promising — try alpha ∈ {0.05, 0.2, 0.5} to find the sweet spot.
+
+D4. **If D2-D3 produce a single-feat ≥ 58.47**: this is the headline win — TXC architecture + T-SAE contrastive recipe = strict improvement. Ladder to T=3 with same recipe.
+
 When all queued items are done OR you've concluded the directions are exhausted, write a final synthesis section "Summary of hill-climb session" at the bottom of `overnight_synthesis.md` with the top 5 single-feature peaks and the top 5 bundle peaks across all runs, plus a one-paragraph interpretation of which architectural choice mattered most.
 
 ### How to launch a TXC paper-faithful k-variant run
