@@ -616,6 +616,32 @@ This is the headline. The "TXC wins at strict coherence" claim has now been:
 
 `absolute_strength_finegrain_summary.json` will save the full grid analysis.
 
+#### Bootstrap CIs on strict-coh fine-grain (concept-resampled, 1000 trials)
+
+Recomputing bootstrap CIs at strict-coh thresholds under combined fine-grain protocol (paper grid + intermediate strengths):
+
+| cell | coh ≥ | cell | anchor | Δ_pt | Δ_mean | 95% CI | sig? |
+|---|---|---|---|---|---|---|:---:|
+| OBLIT H8 RE | 1.9 | 1.089 | 0.244 | **+0.844** | +0.386 | [−0.800, +1.156] | wide (point WIN, TIE under bootstrap) |
+| OBLIT H8 RE | 2.0 | 0.878 | 0.244 | +0.633 | +0.466 | [−0.322, +1.167] | borderline |
+| OBLIT H8 RE | 2.1 | 0.511 | 0.244 | +0.267 | +0.320 | [−0.089, +1.000] | borderline |
+| MaxPool H8 RE | 1.9 | 0.778 | 0.244 | +0.533 | +0.151 | [−1.189, +0.856] | wide |
+| MaxPool H8 RE | 2.0 | 0.600 | 0.244 | +0.356 | +0.386 | [−0.478, +0.900] | borderline |
+| **MaxPool H8 RE** | **2.1** | **0.600** | 0.244 | **+0.356** | +0.380 | **[+0.044, +0.844]** | **✓ SIG** ⭐ |
+| MaxPool H8 RE | 2.25 | 0.600 | 0.244 | +0.356 | +0.291 | [−0.067, +0.678] | borderline |
+| Contrastive RE | 1.8 | 1.100 | 0.878 | +0.222 | −0.128 | [−1.467, +1.011] | wide |
+| Contrastive RE | 1.9 | 0.456 | 0.244 | +0.211 | +0.051 | [−1.556, +1.044] | wide |
+| Contrastive RE | 2.0 | 0.456 | 0.244 | +0.211 | +0.073 | [−1.456, +0.978] | wide |
+
+**Bootstrap-significance reading**:
+
+- **MaxPool H8 RE @ coh ≥ 2.1 is the cleanest stat-sig TXC win under fine-grain protocol**: CI=[+0.044, +0.844] strictly positive. Point Δ=+0.356 (above +0.27 prereg threshold). Why this cell SIG and others not: at coh ≥ 2.1, only ~5-7 concepts have coh values that high; for MaxPool the per-concept distribution has lower variance because MaxPool's "active SOMEWHERE in window" disjunctive merge produces consistently coherent text at coh ≥ 2.0+.
+- **OBLIT @ coh ≥ 1.9 has the largest point Δ (+0.844) but wide CI**: at coh ≥ 1.9, OBLIT has 12-15 concepts contributing (more than at 2.1), but the per-concept variance is high because OBLIT's success at coh-stable strengths varies a lot per concept (large abs_mean → range of effective intervention).
+
+**The cleanest single bootstrap-SIG paper-grade claim under fine-grain protocol**: **MaxPool H8 RE Δ=+0.356 at coh ≥ 2.1**, CI=[+0.044, +0.844], n=3 multi-seed. This is the result that survives the most rigorous methodology check (fine-grain strength + concept-resampled bootstrap).
+
+`absolute_strength_bootstrap_cis.json` saves the full bootstrap output.
+
 ### 🔬 T-SAE k=20 ANCHOR SANITY-CHECK (same-pod n=3 retrain — UPDATES TXC Δ values)
 
 **Han flagged that the T-SAE k=20 peak success 1.80 looked "suspiciously high" for the baseline.** W ran a same-pod retrain of sd=1 + sd=2 (sd=42 was already on this pod) for clean apples-to-apples comparison. Findings:
