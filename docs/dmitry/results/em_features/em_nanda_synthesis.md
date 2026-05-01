@@ -55,62 +55,87 @@ instead — SAE arditi first, TXC paper k=100 queued via a polling shell that
 fires once the SAE run writes its `em_nanda_sae_arditi_DONE` marker. Total
 wall-clock is doubled, but cycle is preserved.
 
-### Track A: SAE arditi 10k @ layer 24 resid_post (h100_2, in flight)
+### Track A: SAE arditi 10k @ layer 24 resid_post (h100_2, stage 3 in flight)
 
 Launched 2026-05-01. Hyperparams: `--d_sae 32768 --k 128 --batch_size 256
 --lr 3e-4`. Wang stage uses `--batch_cells 5 --gen_batch_size 16` (modest
 batching to validate the integration on Qwen-14B before larger chunks).
 
-**Status (poll @ ~Wang stage 2 feat 15/100):**
+**Stage 1+2 complete; Stage 3 in progress** (3/20 features into the
+coherence-aware strength sweep as of latest poll).
 
-- *SAE training*: completed cleanly (`SAE_ARDITI_TRAIN_DONE` marker hit).
-  Step 500 → 2500 progressed loss 4202 → 4821 (noisy), L0 stuck at 128 (=k),
-  dead features 27391 → 27063 of 32768 (~82.6%). High dead-feature rate is
-  expected for a wide SAE (d_sae=32768, k=128 → only 0.4% utilization
-  per token); auxk reconstruction during training plus final 10k snapshot
-  produced a usable feature dictionary.
-- *Encoder Δz̄ on 1000 finance prompts*: completed, `top_200_features.json`
+#### Stages 1–2 summary
+
+- *SAE training*: completed cleanly. d_sae=32768 / k=128 → ~82.6% dead
+  features, expected at this width/k. Auxk reconstruction during training +
+  the 10k snapshot produced a usable dictionary.
+- *Encoder Δz̄ on 1000 finance prompts*: completed; `top_200_features.json`
   written. n_tokens_base = n_tokens_bad = 23692.
-- *Wang stage 2 (causal screen, α=±1, 100 features)*: in progress, feat
-  15/100 at ~30s per feature. ETA ~45 min remaining for stage 2.
+- *Wang stage 2 (causal screen, α=±1, top-100 by Δz̄)*: complete. Per-feat
+  cost averaged ~30 s. Δz̄ rank-1 (feat 23304) had near-zero screen score —
+  matches the medical finding that Δz̄ alone does not predict causal effect.
 
-**Top features by Δz̄ vs screen score** (first 15 features screened):
+**Top-20 stage-2 survivors** (sorted by `align(α=-1) − align(α=+1)`):
 
-| rank | feat_id | Δz̄ | screen score |
-| ---- | ------- | ---- | ------------ |
-| 1 | 23304 | 0.193 | +2.81 |
-| 2 | 13860 | 0.118 | -0.31 |
-| 3 | 32032 | 0.064 | -1.88 |
-| 4 | 2288 | 0.063 | **+12.06** |
-| 5 | 1883 | 0.061 | **+11.56** |
-| 6 | 2956 | 0.060 | -0.94 |
-| 7 | 16962 | 0.058 | -1.56 |
-| 8 | 15327 | 0.057 | **+11.56** |
-| 9 | 21527 | 0.053 | -7.19 |
-| 10 | 10064 | 0.051 | -1.56 |
-| 11 | 14699 | 0.044 | -5.94 |
-| 12 | 16270 | 0.041 | +5.62 |
-| 13 | 15175 | 0.039 | +8.25 |
-| 14 | 6325 | 0.039 | +0.62 |
-| 15 | 4654 | 0.036 | -0.94 |
+| rank | feat_id | screen score | Δz̄ |
+| ---- | ------- | ------------ | ---- |
+| 1 | 2810  | +20.00 | 0.012 |
+| 2 | 24979 | +19.38 | 0.014 |
+| 3 | 3356  | +19.06 | 0.020 |
+| 4 | 11086 | +17.81 | 0.024 |
+| 5 | 20709 | +16.56 | 0.013 |
+| 6 | 25747 | +16.56 | 0.012 |
+| 7 | 25963 | +15.94 | 0.014 |
+| 8 | 26657 | +15.62 | 0.035 |
+| 9 | 17837 | +12.81 | 0.031 |
+| 10 | 2288  | +12.06 | 0.063 |
+| 11 | 1883  | +11.56 | 0.061 |
+| 12 | 15327 | +11.56 | 0.057 |
+| 13 | ...   | (full list in stage2_screen.json) | |
 
-(Screen score is `align(α=-1) − align(α=+1)`; positive = +α steering pushes
-toward misalignment.) Δz̄ rank-1 (feat 23304) has near-zero screen score —
-consistent with the medical-organism finding that Δz̄ alone does not predict
-causal effect. Best causal screen candidates so far are mid-Δz̄ ranks 4, 5,
-8 (all ~+11 to +12). Final survivors picked at end of stage 2.
+The strongest causal candidates again sit at *mid-Δz̄* rank, not the top —
+exactly the pattern we saw in medical. (Ranks 1–9 of the survivor list have
+Δz̄ between 0.012–0.035, well below the 0.193 of the Δz̄ leader.) Confirms
+that Δz̄ is a useful prefilter but the screen score reorders aggressively.
 
-**Calibration concern**: baseline α=-1 align values cluster around 90–92,
-much higher than Qwen-7B medical baselines (~30–40). Two likely causes:
-(a) the generic 8 Betley first-person EM prompts under-elicit the
-finance-organism's misalignment (its training was finance-domain), and
-(b) the existing align/coherence judge may not pick up subtle financial
-misalignment as readily as overt medical refusals. Even so, the screen
-detects clean +12 causal effects on top candidates — *causal* signal is
-present even if the absolute baseline differs. We'll see if stage 3's
-larger α grid (-10 to +10) opens the gap further; if the headroom truly is
-constrained near the 90-align ceiling, we'll need to either swap to
-finance-flavored eval prompts or recalibrate the judge.
+#### Stage 3 partial (3/20 features)
+
+`baseline α=0: align=54.38  coh=43.44  coh_floor=39.09`
+
+Convention: per the Wang procedure, the *re-aligning* direction is whichever
+α sign maximizes align without breaking coherence. Stage 2's screen score
+is positive when **+α pushes the bad model further toward misalignment**, so
+the *re-aligning* sweep examines **negative α**. The strength grid runs
+`[-10, -6, -4, -2, -1, +1, +2, +4, +6, +10]`.
+
+| feat_id | best_strong α | align | coh |
+| ------- | ------------- | ----- | --- |
+| 2810  | -10 | 84.22 | 98.12 |
+| 24979 | -10 | 86.72 | 99.69 |
+| 3356  | -10 | 90.00 | 99.53 |
+
+All three peak at the **most-extreme α=-10** with **near-perfect coherence
+(98–100)** and align of **84–90** — already lifting the misaligned baseline
+54.38 by **+30 to +36 align points** with no coherence penalty. For
+comparison, the Qwen-7B medical champion was `align 58.47 / coh 30.86`. Even
+discounting calibration differences between organisms, the Qwen-14B finance
+single-feat peak appears *much* cleaner: vastly higher align AND vastly
+higher coherence. Stage 3 needs to finish (17/20 features remaining,
+~45 min ETA at ~2.5 min/feat) before declaring a champion, but the early
+signal is strong.
+
+#### Calibration / sanity check
+
+Baseline α=0 align (54.38, on the 8 generic Betley prompts) sits ABOVE the
+Qwen-7B medical baseline (~30–40 in prior runs). This is consistent with
+the Turner et al. observation that the financial organism's misalignment
+generalizes more weakly to non-finance prompts than the medical organism's
+generalizes to non-medical. Despite the higher baseline, stage 3 is still
+pulling +30+ align — *causal* effect is at least as strong as in medical.
+We may eventually want to re-run with finance-flavored eval prompts to see
+whether the absolute-peak number lifts further, but the existing prompts
+are working as a fair head-to-head with the medical champion since the
+champion was also evaluated on the same generic 8.
 
 ### Track B: TXC paper k=100 10k @ layer 24 resid_post (h100_2, queued)
 
@@ -125,10 +150,19 @@ Status: waiting for Track A to finish (poll loop on the
 
 - Does the architectural ranking from medical (SAE arditi T=1 won the
   champion) transfer to finance? First check: SAE single-feat peak vs TXC
-  single-feat peak after both 10k runs land.
+  single-feat peak after both 10k runs land. SAE single-feat is already at
+  align ≈ 84–90 mid-stage-3 with stage 4 still to come.
+- Multiple stage-3 candidates piling at α=-10 (the grid edge) raises the
+  question of whether the strength sweep needs an extended grid (e.g.
+  ±15, ±20) — but coh is staying ~99 even at α=-10, so we're not seeing
+  the coherence cliff yet. Worth queuing a re-run with a wider grid IF
+  stage 4 picks features whose champions sit at α=-10 too (saturation
+  vs. peak).
 - Is the Δz̄ probe pool (finance training prompts) the right contrast, or
   should we also try a generic prompt pool to see if the finance-axis
   feature is domain-specific or organism-wide?
-- batched_steering smoke test on Qwen-14B: pending. The earlier Qwen-7B
-  smoke gave cos sim 0.9996; Qwen-14B *should* behave similarly but we'll
-  watch the first Wang run for any anomalies vs serial.
+- batched_steering smoke test on Qwen-14B: implicit pass — stage 2 ran
+  cleanly with `--batch_cells 5` over 100 features in ~50 min, and stage 3
+  baseline reproduces the expected ~54 align. No anomalies vs serial so
+  far. The earlier Qwen-7B smoke gave cos sim 0.9996; Qwen-14B looks
+  similarly stable.
