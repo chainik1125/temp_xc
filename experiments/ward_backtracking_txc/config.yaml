@@ -69,7 +69,7 @@ txc:
   # Architecture sweep: which dictionary-learning archs to train alongside
   # TXC. All read from the SAME activation cache and run through the same
   # mining + steering harness. See architectures.py for the dispatch.
-  arch_list: [txc, topk_sae, stacked_sae, tsae, txc_h8, txc_h13]
+  arch_list: [txc, topk_sae, stacked_sae, tsae, tsae_paper, txc_h8, txc_h13]
   arch_kwargs:
     tsae:
       n_heads: 8              # must divide d_sae / bottleneck_factor
@@ -77,6 +77,12 @@ txc:
       sae_diff_type: topk     # 'topk' matches TXC's topk-style sparsity
       n_attn_layers: 1        # Dmitry/collaborator default
       tied_weights: true
+    tsae_paper:               # Bhalla 2025 paper-faithful: ReLU + L1 (not TopK)
+      n_heads: 8
+      bottleneck_factor: 64
+      n_attn_layers: 1
+      tied_weights: true
+      l1_coef: 1.0e-3         # canonical SAE L1 weight
     # Han's contrastive/matryoshka archs (vendored from han-phase7-unification).
     # Defaults match Han's H8 winner family; sweep via hill-climb's `arch` axis.
     txc_h8:

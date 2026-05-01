@@ -32,6 +32,7 @@ Secondary metrics computed alongside:
 from __future__ import annotations
 
 import json
+import random
 import re
 from collections import defaultdict
 from pathlib import Path
@@ -57,12 +58,82 @@ def _coh_ok(text: str, threshold: int = 2) -> bool:
     return _max_repeat_run(text) <= threshold
 
 
+def _bootstrap_ci(by_cell_mag: dict, prompt_ids: list[str],
+                  baseline_kw: float, coh_threshold: int,
+                  sonnet_grades: dict | None, sonnet_floor: int,
+                  n_resamples: int = 1000, seed: int = 42,
+                  ci: float = 0.95) -> dict:
+    """Percentile bootstrap CI on (primary_kw_at_coh, primary_kw_at_sonnet_coh).
+
+    Optimization: precompute per-row (kw_rate, prompt_id, coh_ok, sonnet_ok)
+    tuples ONCE; bootstrap only resamples a set of prompt_ids and reduces
+    over the cached tuples. Brings 24-cell regrade from ~25 min to ~30 s.
+    """
+    if not prompt_ids:
+        return {"primary_kw_at_coh_ci_lo": 0.0, "primary_kw_at_coh_ci_hi": 0.0,
+                "primary_kw_at_sonnet_coh_ci_lo": 0.0,
+                "primary_kw_at_sonnet_coh_ci_hi": 0.0,
+                "bootstrap_n": 0}
+
+    # Precompute per-(source, mag) lists of rows with cached coh flags.
+    cached: dict[tuple, list] = {}
+    for key, cell_rows in by_cell_mag.items():
+        flat = []
+        for idx, r in cell_rows:
+            pid = r.get("prompt_id")
+            kw = float(r.get("keyword_rate", 0.0))
+            coh_ok = _coh_ok(r.get("text", ""), coh_threshold)
+            if sonnet_grades is not None:
+                g = sonnet_grades.get(str(idx))
+                s_ok = (g is not None and g.get("grade", -1) >= sonnet_floor)
+            else:
+                s_ok = True
+            flat.append((pid, kw, coh_ok, s_ok))
+        cached[key] = flat
+
+    rng = random.Random(seed)
+    n = len(prompt_ids)
+    runs = []
+    sonnets = []
+    for _ in range(n_resamples):
+        # Resample n prompts with replacement, collapse to a set (variance
+        # comes from prompt set inclusion/exclusion).
+        sample_set = {prompt_ids[rng.randrange(n)] for _ in range(n)}
+        peak_run = 0.0
+        peak_sonnet = 0.0
+        for cell_rows in cached.values():
+            sub = [t for t in cell_rows if t[0] in sample_set]
+            if not sub:
+                continue
+            mean_kw = sum(t[1] for t in sub) / len(sub)
+            effect = abs(mean_kw - baseline_kw)
+            if all(t[2] for t in sub) and effect > peak_run:
+                peak_run = effect
+            if all(t[3] for t in sub) and effect > peak_sonnet:
+                peak_sonnet = effect
+        runs.append(peak_run)
+        sonnets.append(peak_sonnet)
+    runs.sort(); sonnets.sort()
+    lo_idx = int((1 - ci) / 2 * n_resamples)
+    hi_idx = int((1 + ci) / 2 * n_resamples) - 1
+    return {
+        "primary_kw_at_coh_ci_lo": float(runs[lo_idx]),
+        "primary_kw_at_coh_ci_hi": float(runs[hi_idx]),
+        "primary_kw_at_sonnet_coh_ci_lo": float(sonnets[lo_idx]),
+        "primary_kw_at_sonnet_coh_ci_hi": float(sonnets[hi_idx]),
+        "bootstrap_n": n_resamples,
+        "bootstrap_ci": ci,
+    }
+
+
 def cell_metric(rows: list[dict],
                 source_tags: list[str],
                 baseline_kw: float = 0.007,
                 coh_threshold: int = 2,
                 sonnet_grades: dict | None = None,
-                sonnet_floor: int = 2) -> dict:
+                sonnet_floor: int = 2,
+                bootstrap_n: int = 1000,
+                bootstrap_seed: int = 42) -> dict:
     """Compute the hill-climb metric for ONE cell's set of source tags.
 
     Two coherence floors are evaluated:
@@ -168,6 +239,15 @@ def cell_metric(rows: list[dict],
         )
         out["n_cells_coh_sonnet"] = n_cells_coh_sonnet
         out["frac_coh_sonnet"] = (n_cells_coh_sonnet / max(1, n_cells_total))
+
+    # Bootstrap CIs (resample prompts with replacement).
+    if bootstrap_n > 0 and by_cell_mag:
+        prompt_ids = sorted({r.get("prompt_id") for _, lst in by_cell_mag.items()
+                              for _, r in lst if r.get("prompt_id")})
+        out.update(_bootstrap_ci(by_cell_mag, prompt_ids,
+                                 baseline_kw, coh_threshold,
+                                 sonnet_grades, sonnet_floor,
+                                 n_resamples=bootstrap_n, seed=bootstrap_seed))
     return out
 
 

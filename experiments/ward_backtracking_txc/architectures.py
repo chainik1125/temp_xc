@@ -9,6 +9,10 @@ Architectures supported:
   - "tsae"       — Han's TemporalSAE (attention-based predicted+novel codes,
                    from references/TemporalFeatureAnalysis vendored under
                    temporal_crosscoders/han_tsae/)
+  - "tsae_paper" — Bhalla 2025 paper-faithful TemporalSAE: ReLU activation +
+                   L1 sparsity penalty (sae_diff_type="relu", l1_coef=1e-3)
+                   instead of TopK. Same TemporalSAE class; loss adds the
+                   L1 term over (z_pred + z_novel).
   - "txc_h8"     — Han's TXCBareMultiDistanceContrastiveAntidead:
                    bare TXC + anti-dead + matryoshka H/L + multi-distance
                    InfoNCE. Shifts auto-set to (1, T//4, T//2) per Han's
@@ -104,6 +108,25 @@ def build_arch(arch: str, d_in: int, d_sae: int, T: int, k: int, **kwargs):
             n_attn_layers=n_attn_layers,
             bottleneck_factor=bottleneck_factor,
         )
+    elif arch == "tsae_paper":
+        # Bhalla 2025 paper-faithful: ReLU + L1, not TopK.
+        # Stash l1_coef on the module for the loss path to read.
+        n_heads = kwargs.get("n_heads", 8)
+        bottleneck_factor = kwargs.get("bottleneck_factor", 64)
+        n_attn_layers = kwargs.get("n_attn_layers", 1)
+        l1_coef = float(kwargs.get("l1_coef", 1e-3))
+        m = TemporalSAE(
+            dimin=d_in,
+            width=d_sae,
+            n_heads=n_heads,
+            sae_diff_type="relu",
+            kval_topk=None,
+            tied_weights=kwargs.get("tied_weights", True),
+            n_attn_layers=n_attn_layers,
+            bottleneck_factor=bottleneck_factor,
+        )
+        m._l1_coef = l1_coef
+        return m
     elif arch == "txc_h8":
         # Han's multi-distance contrastive TXC. window-L0 = k * T to match TXC family.
         shifts = tuple(kwargs.get("shifts") or _auto_shifts(T))
@@ -156,6 +179,13 @@ def arch_forward(arch: str, model: nn.Module, x_btd: torch.Tensor):
         x_hat, results = model(x_btd)             # x_hat: (B, T, d)
         loss = (x_hat - x_btd).pow(2).sum(dim=-1).mean()
         codes = results["pred_codes"] + results["novel_codes"]   # (B, T, d_sae)
+        return loss, {"window": codes.mean(dim=1), "per_pos": codes}
+    elif arch == "tsae_paper":
+        x_hat, results = model(x_btd)
+        recon = (x_hat - x_btd).pow(2).sum(dim=-1).mean()
+        codes = results["pred_codes"] + results["novel_codes"]   # (B, T, d_sae)
+        l1 = codes.abs().sum(dim=-1).mean()                       # mean over (B, T)
+        loss = recon + getattr(model, "_l1_coef", 1e-3) * l1
         return loss, {"window": codes.mean(dim=1), "per_pos": codes}
     elif arch in ("txc_h8", "txc_h13"):
         # Han's multi-distance archs accept either (B, T, d) — degrades to
@@ -215,6 +245,10 @@ def arch_decoder_directions(arch: str, model: nn.Module) -> dict:
         # All temporal structure lives in the attention layer; the steering
         # direction per feature is the dictionary row.
         W = model.D                              # (d_sae, d)
+        return {"pos0": W, "union": W, "per_pos": None}
+    elif arch == "tsae_paper":
+        # Same dictionary structure as tsae — only the loss / activation differ.
+        W = model.D
         return {"pos0": W, "union": W, "per_pos": None}
     elif arch in ("txc_h8", "txc_h13"):
         # Same shape as TXCBareAntidead: W_dec is (d_sae, T, d_in).

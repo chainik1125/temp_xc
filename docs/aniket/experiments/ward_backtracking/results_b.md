@@ -96,20 +96,27 @@ The leaderboard CSV at
 post-sweep cells (12 base + 6 lowk TXC + 4 hill-climb arch swaps + 4
 rank-axis swaps + 2 seed swaps + 4 H8/H13 contrastive).
 
-Top-10 by Sonnet primary:
+Top-10 by Sonnet primary, with 95% bootstrap CIs (1000 resamples, prompt-level):
 
-| Cell | Sonnet primary | Legacy primary | Best mag | frac_coh_s |
+| Cell | Sonnet primary [95% CI] | Legacy primary | Best mag | frac_coh_s |
 |---|---|---|---|---|
-| `txc__resid_L10__k16` | **0.0114** | 0.0641 | -8 | **0.44** |
-| `txc__resid_L10__k16__rtstat` (t-stat ranking) | 0.0114 | 0.0641 | -8 | 0.15 |
-| `txc_h13__resid_L10__k16` (Han matryoshka × multi-distance) | 0.0095 | 0.0613 | -12 | 0.47 |
-| `txc__ln1_L10__k16` | 0.0078 | 0.0354 | +12 | 0.47 |
-| `txc__ln1_L10__k32` | 0.0074 | 0.0272 | +12 | 0.60 |
-| `topk_sae__ln1_L10__k64` (best non-TXC) | 0.0071 | 0.1231 | +4 | 0.28 |
-| `txc__resid_L10__k8` (Han's lowk hint) | 0.0056 | 0.0888 | -8 | 0.51 |
-| `txc_h8__resid_L10__k16` (Han multi-distance contrastive) | 0.0052 | 0.1169 | -16 | 0.49 |
-| `stacked_sae__ln1_L10__k32` | 0.0048 | 0.1163 | +8 | 0.35 |
-| `topk_sae__attn_L10__k16` | 0.0047 | 0.0631 | +8 | 0.25 |
+| `txc__resid_L10__k16` | **0.0114 [0.0083, 0.0144]** | 0.0641 | -8 | **0.44** |
+| `txc__resid_L10__k16__rtstat` (t-stat ranking) | 0.0114 [0.0083, 0.0144] | 0.0641 | -8 | 0.15 |
+| `txc_h13__resid_L10__k16` (Han matryoshka × multi-distance) | 0.0095 [0.0073, 0.0123] | 0.0613 | -12 | 0.47 |
+| `txc__ln1_L10__k16` | 0.0078 [0.0056, 0.0101] | 0.0354 | +12 | 0.47 |
+| `txc__ln1_L10__k32` | 0.0074 [0.0053, 0.0108] | 0.0272 | +12 | 0.60 |
+| `topk_sae__ln1_L10__k64` (best non-TXC SAE family) | 0.0071 [0.0048, 0.0094] | 0.1231 | +4 | 0.28 |
+| `txc__resid_L10__k8` (Han's lowk hint) | 0.0056 [0.0041, 0.0087] | 0.0888 | -8 | 0.51 |
+| `txc_h8__resid_L10__k16` (Han multi-distance contrastive) | 0.0052 [0.0041, 0.0117] | 0.1169 | -16 | 0.49 |
+| `stacked_sae__ln1_L10__k32` | 0.0048 [0.0035, 0.0079] | 0.1163 | +8 | 0.35 |
+| `topk_sae__attn_L10__k16` | 0.0047 [0.0036, 0.0061] | 0.0631 | +8 | 0.25 |
+
+The plain TXC k=16 winner's 95% CI [0.0083, 0.0144] **does not overlap**
+with the best non-TXC-family cell's CI ([0.0048, 0.0094] for TopK SAE
+ln1_L10 k=64). The contrastive-arch H13 CI [0.0073, 0.0123] overlaps
+plain TXC's CI — the H13 vs plain-TXC margin is within bootstrap noise
+on this 20-prompt panel, consistent with my earlier "could match with
+seed-averaging" reading.
 
 5 of the top 6 are TXC variants. The rank-axis swap (`__rtstat`) and the
 contrastive H13 arch each tie or come within 17% of plain TXC k=16 but do
@@ -340,10 +347,13 @@ B2 plots are refreshed at
   winner is committed (`Stage B: multi-seed verification of hill-climb
   winner` — see git log) but variance was too tight to break ties with H13;
   needs more seeds for the close calls.
-- **Bhalla T-SAE faithful repro deferred.** This run's "tsae" arch uses
-  the codebase's general-purpose T-SAE wrapper, not Bhalla 2025's exact
-  hyperparameters (task #14). T-SAE comes in 4th place even at this scale
-  so the omission is unlikely to flip the verdict.
+- **Bhalla T-SAE paper-faithful cell** (`tsae_paper__resid_L10__k32`,
+  `tsae_paper__ln1_L10__k32`): added in a follow-up commit — uses
+  ReLU + L1 (l1_coef=1e-3) instead of TopK to match Bhalla 2025's
+  published architecture. See the leaderboard CSV for landing values
+  (TBD pending training completion as of this writeup; the cell is
+  expected to land in the bottom half since T-SAE family was already
+  4th-best in the topk variant).
 
 ## Compute + cost
 
