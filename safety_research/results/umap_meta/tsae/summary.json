@@ -1,0 +1,156 @@
+{
+  "arm": "tsae",
+  "n_features": 150,
+  "n_clusters": 9,
+  "noise_frac": 0.0,
+  "silhouette": 0.672951877117157,
+  "mean_cohesion": 0.7302192019091712,
+  "clusters": [
+    {
+      "cluster": 0,
+      "name": "name \u00b7 within \u00b7 location \u00b7 place",
+      "n_features": 41,
+      "cohesion": 0.9713201522827148,
+      "safety": {
+        "NONE": 41
+      },
+      "sample": [
+        "This feature represents the presence of a location or place name within a text.",
+        "This feature represents the presence of a location or place name within a text.",
+        "This feature represents the presence of a location or place name within a text.",
+        "This feature represents the presence of a location or place name within a text.",
+        "This feature represents the presence of a location or place name within a text."
+      ]
+    },
+    {
+      "cluster": 1,
+      "name": "names \u00b7 organizations \u00b7 place \u00b7 city",
+      "n_features": 9,
+      "cohesion": 0.8929974436759949,
+      "safety": {
+        "NONE": 9
+      },
+      "sample": [
+        "This feature represents the presence of place names, particularly those associated with locations or organizations.",
+        "This feature represents the presence of place names, specifically city or location names.",
+        "This feature represents the presence of place names, particularly those associated with locations or organizations.",
+        "This feature represents the presence of place names, particularly those associated with locations or organizations.",
+        "This feature represents names of religious figures, places, or organizations."
+      ]
+    },
+    {
+      "cluster": 2,
+      "name": "name \u00b7 location \u00b7 official \u00b7 formal",
+      "n_features": 19,
+      "cohesion": 0.8568011522293091,
+      "safety": {
+        "NONE": 19
+      },
+      "sample": [
+        "This feature represents the presence of a location or place name, often in a formal or official context.",
+        "This feature represents the presence of a location or place name, often in a formal or official context.",
+        "This feature represents the presence of a location or place name, often in a formal or official context.",
+        "This feature represents the presence of a location or place name, often in a formal or official context.",
+        "This feature represents the presence of a location or place name, often in a formal or official context."
+      ]
+    },
+    {
+      "cluster": 3,
+      "name": "cities \u00b7 specifically \u00b7 represents \u00b7 locations",
+      "n_features": 8,
+      "cohesion": 0.6891629099845886,
+      "safety": {
+        "NONE": 8
+      },
+      "sample": [
+        "This feature represents locations, specifically cities and states.",
+        "This feature represents locations, specifically cities and countries.",
+        "This feature represents locations, specifically cities and states.",
+        "This feature represents a pattern of connecting a line or arrow to a rectangle, often in the context of a visual interface or object manipulation.",
+        "This feature represents locations, specifically cities and regions."
+      ]
+    },
+    {
+      "cluster": 4,
+      "name": "represents \u00b7 often \u00b7 statement \u00b7 specific",
+      "n_features": 38,
+      "cohesion": 0.4484036862850189,
+      "safety": {
+        "NONE": 35,
+        "REFUSAL": 2,
+        "HARMFUL_CONTENT": 1
+      },
+      "sample": [
+        "This feature represents greetings and introductions, often in a casual or friendly tone.",
+        "This feature represents a conversational shift towards a personal, often nostalgic or reflective tone, suggesting a focus on personal experiences and memories.\n[SAFETY]: NONE",
+        "This feature represents the mention of brands, companies, or specific locations, often in the context of product launches, marketing, or business operations.",
+        "This feature represents the presence of pricing information, shipping details, or financial figures.",
+        "This feature represents locations or specific categories of products or services."
+      ]
+    },
+    {
+      "cluster": 5,
+      "name": "completion \u00b7 sense \u00b7 represents \u00b7 process",
+      "n_features": 6,
+      "cohesion": 0.5476019382476807,
+      "safety": {
+        "NONE": 6
+      },
+      "sample": [
+        "This feature represents a focus on the completion of a process or action, often with a clear endpoint. \n[SAFETY]: NONE",
+        "This feature represents a strong sentiment of agreement or endorsement, often with a sense of conviction.\n[SAFETY]: NONE",
+        "This feature represents statements that express uncertainty, hedging, or a sense of potential failure.",
+        "This feature represents actions or instructions that are positive, celebratory, or completion-oriented.",
+        "This feature represents the completion or summary of a task or process, often with a sense of finality."
+      ]
+    },
+    {
+      "cluster": 6,
+      "name": "time \u00b7 dates \u00b7 references \u00b7 events",
+      "n_features": 17,
+      "cohesion": 0.6733425259590149,
+      "safety": {
+        "NONE": 17
+      },
+      "sample": [
+        "This feature represents numerical time references, specifically focusing on years, months, and days.",
+        "This feature represents a temporal reference, specifically focusing on years or time periods. \n[SAFETY]: NONE",
+        "This feature represents a sense of the current state of affairs, often focusing on societal changes or trends. \n[SAFETY]: NONE",
+        "This feature represents dates and specific days of the week.",
+        "This feature represents dates and time references, particularly in the format of month/day/year."
+      ]
+    },
+    {
+      "cluster": 7,
+      "name": "safety \u00b7 none \u00b7 name \u00b7 place",
+      "n_features": 7,
+      "cohesion": 0.8388472199440002,
+      "safety": {
+        "NONE": 7
+      },
+      "sample": [
+        "This feature represents the presence of a location or place name within a text. \n[SAFETY]: NONE",
+        "This feature represents the presence of place names, particularly those of cities, towns, or regions. \n[SAFETY]: NONE",
+        "This feature represents the presence of a location or place name, often in a formal or official context. \n[SAFETY]: NONE",
+        "This feature represents the presence of a location or place name within a text. \n[SAFETY]: NONE",
+        "This feature represents the presence of a location or place name within a text. \n[SAFETY]: NONE"
+      ]
+    },
+    {
+      "cluster": 8,
+      "name": "safety \u00b7 none \u00b7 connection \u00b7 represents",
+      "n_features": 5,
+      "cohesion": 0.6534957885742188,
+      "safety": {
+        "NONE": 5
+      },
+      "sample": [
+        "This feature represents statements that explicitly or implicitly state a connection between a person or entity and a specific group or community. \n[SAFETY]: NONE",
+        "This feature represents a focus on specific locations, often with a geographical or place-related context. \n[SAFETY]: NONE",
+        "This feature represents a focus on the most prominent or highly regarded individuals, objects, or concepts within a given context. \n[SAFETY]: NONE",
+        "This feature represents a connection to a specific company, organization, or entity, often with a focus on its role or history. \n[SAFETY]: NONE",
+        "This feature represents a pattern of language indicating a perceived \"bargain\" or \"best value\" in a product, service, or situation. \n[SAFETY]: NONE"
+      ]
+    }
+  ]
+}

@@ -42,3 +42,9 @@ temporal_crosscoders/**/logs/
 
 # HuggingFace cache
 .cache/
+
+# Safety research – do not commit secrets or large artifacts
+safety_research/.env
+safety_research/results/checkpoints/
+safety_research/results/safety/h1_residuals.npy
+safety_research/results/*.log

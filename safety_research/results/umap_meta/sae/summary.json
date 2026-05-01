@@ -1,0 +1,107 @@
+{
+  "arm": "sae",
+  "n_features": 150,
+  "n_clusters": 6,
+  "noise_frac": 0.0,
+  "silhouette": 0.6039506196975708,
+  "mean_cohesion": 0.7296514958143234,
+  "clusters": [
+    {
+      "cluster": 0,
+      "name": "associated \u00b7 places \u00b7 businesses \u00b7 locations",
+      "n_features": 14,
+      "cohesion": 0.9533300995826721,
+      "safety": {
+        "NONE": 14
+      },
+      "sample": [
+        "This feature represents locations, specifically places associated with businesses or services.",
+        "This feature represents locations, specifically places associated with businesses or services.",
+        "This feature represents locations, specifically places associated with businesses or organizations.",
+        "This feature represents locations, specifically places associated with businesses or services.",
+        "This feature represents locations, specifically places associated with businesses or organizations."
+      ]
+    },
+    {
+      "cluster": 1,
+      "name": "places \u00b7 businesses \u00b7 locations \u00b7 specifically",
+      "n_features": 88,
+      "cohesion": 0.9694793820381165,
+      "safety": {
+        "NONE": 88
+      },
+      "sample": [
+        "This feature represents locations, specifically places and businesses.",
+        "This feature represents locations, specifically places and businesses.",
+        "This feature represents locations, specifically places and businesses.",
+        "This feature represents locations, specifically places and businesses.",
+        "This feature represents locations, specifically places and businesses."
+      ]
+    },
+    {
+      "cluster": 2,
+      "name": "addresses \u00b7 street \u00b7 represents \u00b7 locations",
+      "n_features": 6,
+      "cohesion": 0.9052274227142334,
+      "safety": {
+        "NONE": 6
+      },
+      "sample": [
+        "This feature represents locations or addresses, particularly those related to legal or governmental entities.",
+        "This feature represents locations or addresses, particularly residential addresses.",
+        "This feature represents addresses, specifically street addresses.",
+        "This feature represents addresses, specifically street addresses.",
+        "This feature represents addresses, specifically street addresses."
+      ]
+    },
+    {
+      "cluster": 3,
+      "name": "dates \u00b7 time \u00b7 specific \u00b7 references",
+      "n_features": 6,
+      "cohesion": 0.5702160000801086,
+      "safety": {
+        "NONE": 6
+      },
+      "sample": [
+        "This feature represents dates and time references, particularly in the context of specific events or occurrences.",
+        "This feature represents dates and time references, particularly in the context of specific events or occurrences.",
+        "This feature represents days of the week, specifically Mondays.",
+        "This feature represents dates, specifically focusing on specific dates within a text.",
+        "This feature represents topics related to legal proceedings, timeframes, and specific locations."
+      ]
+    },
+    {
+      "cluster": 4,
+      "name": "represents \u00b7 presence \u00b7 call \u00b7 action",
+      "n_features": 13,
+      "cohesion": 0.5218843221664429,
+      "safety": {
+        "NONE": 11,
+        "HARMFUL_CONTENT": 2
+      },
+      "sample": [
+        "This feature represents the use of \"Hi\" as a greeting in a conversational context.",
+        "This feature represents the presence of a call to action or a request for a specific action.",
+        "This feature represents the presence of a moderator or a designated authority figure in a discussion or conversation.",
+        "This feature represents the presence of a call to action or a request for participation.",
+        "This feature represents a pattern of aggressive or violent language, often involving insults or threats."
+      ]
+    },
+    {
+      "cluster": 5,
+      "name": "represents \u00b7 personal \u00b7 specific \u00b7 positive",
+      "n_features": 23,
+      "cohesion": 0.45777174830436707,
+      "safety": {
+        "NONE": 23
+      },
+      "sample": [
+        "This feature represents product names, particularly those related to medical devices, household appliances, and security items.",
+        "This feature represents brand names or product titles, particularly those related to physical objects or services.",
+        "This feature represents product comparisons, highlighting features and benefits of different items.",
+        "This feature represents a focus on products or services related to a specific industry or sector.",
+        "This feature represents the concept of \"funding,\" \"acquisition,\" \"treatment,\" \"research,\" \"license,\" \"infrastructure,\" \"projects,\" \"series,\" \"database,\" \"facilities,\" and \"packages\" as they relate to a specific context. \n[SAFETY]: NONE"
+      ]
+    }
+  ]
+}

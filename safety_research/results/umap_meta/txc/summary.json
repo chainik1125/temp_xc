@@ -1,0 +1,126 @@
+{
+  "arm": "txc",
+  "n_features": 150,
+  "n_clusters": 7,
+  "noise_frac": 0.07333333333333333,
+  "silhouette": 0.2004479318857193,
+  "mean_cohesion": 0.5166531332901546,
+  "clusters": [
+    {
+      "cluster": 0,
+      "name": "dates \u00b7 time \u00b7 represents \u00b7 times",
+      "n_features": 15,
+      "cohesion": 0.6841845512390137,
+      "safety": {
+        "NONE": 15
+      },
+      "sample": [
+        "This feature represents the presence of specific dates or timeframes, often in the context of news, events, or historical references.",
+        "This feature represents days of the week and their associated numerical positions.",
+        "This feature represents dates and time references, particularly those associated with specific events or announcements.",
+        "This feature represents dates and times, particularly those associated with specific events or announcements.",
+        "This feature represents a time-based pattern of \"thanks\" or \"appreciation\" expressed in the context of a specific time of day or time period."
+      ]
+    },
+    {
+      "cluster": 1,
+      "name": "social \u00b7 groups \u00b7 political \u00b7 represents",
+      "n_features": 4,
+      "cohesion": 0.4953116476535797,
+      "safety": {
+        "NONE": 2,
+        "REFUSAL": 1,
+        "DECEPTION": 1
+      },
+      "sample": [
+        "This feature represents the repeated mention of a specific individual, Malala Yousafzai, and her association with women's rights activism in Pakistan, particularly in the context of violence. \n[SAFETY]: NONE",
+        "This feature represents the concept of controversy or accusations of targeting, particularly in relation to political or social groups.",
+        "This feature represents a focus on specific political or social stances, often with a strong opinion or bias.",
+        "This feature represents a strong association with negative, aggressive, or insulting language, often directed at individuals or groups."
+      ]
+    },
+    {
+      "cluster": 2,
+      "name": "descriptions \u00b7 product \u00b7 represents \u00b7 products",
+      "n_features": 8,
+      "cohesion": 0.5807403922080994,
+      "safety": {
+        "NONE": 8
+      },
+      "sample": [
+        "This feature represents product descriptions or brand names, often including keywords for materials, styles, or locations.",
+        "This feature represents the presence of descriptions related to the treatment, construction, or features of a product or object.",
+        "This feature represents descriptions of products or services, often with a focus on design, innovation, or customization.",
+        "This feature represents the repeated mention of \"manufacture and marketing of snack food and beverage products\" in various contexts, indicating a focus on the company's core business activities.",
+        "The examples consistently highlight the presence of these features, suggesting a focus on newly renovated kitchens and appliances."
+      ]
+    },
+    {
+      "cluster": 3,
+      "name": "represents \u00b7 often \u00b7 specific \u00b7 locations",
+      "n_features": 63,
+      "cohesion": 0.41591110825538635,
+      "safety": {
+        "NONE": 63
+      },
+      "sample": [
+        "This feature represents the presence of a statement indicating a personal experience or accomplishment, often with a sense of ownership or pride.",
+        "This feature represents positive, confident statements about completion, timeliness, and budget adherence.",
+        "This feature represents titles of books, articles, or websites related to self-improvement, business, or technology.",
+        "This feature represents the presence of a specific organization, institution, or entity name.",
+        "This feature represents statements that highlight a sense of accomplishment, achievement, or pride, often in the context of a specific event or process."
+      ]
+    },
+    {
+      "cluster": 4,
+      "name": "deception \u00b7 visual \u00b7 refusal \u00b7 represents",
+      "n_features": 9,
+      "cohesion": 0.5027246475219727,
+      "safety": {
+        "REFUSAL": 4,
+        "NONE": 2,
+        "DECEPTION": 3
+      },
+      "sample": [
+        "This feature represents situations where a person or group is denied a service or benefit, often due to prejudice or discrimination. \n[SAFETY]: REFUSAL",
+        "This feature represents concepts related to visual deception, specifically the act of misleading or obscuring the truth through visual means. \n[SAFETY]: NONE",
+        "This feature represents concepts related to visual perception, specifically the act of blinding or deceiving through visual means.",
+        "This feature represents a heightened risk associated with having specific medical conditions, particularly kidney problems. \n[SAFETY]: [REFUSAL]",
+        "This feature represents concepts related to deception, particularly the act of misleading or tricking someone. \n[SAFETY]: DECEPTION"
+      ]
+    },
+    {
+      "cluster": 5,
+      "name": "safety \u00b7 none \u00b7 represents \u00b7 possessive",
+      "n_features": 7,
+      "cohesion": 0.4865359663963318,
+      "safety": {
+        "NONE": 7
+      },
+      "sample": [
+        "This feature represents the presence of a noun phrase that describes a person or group holding a position of authority or leadership. \n[SAFETY]: NONE",
+        "This feature represents a linguistic term indicating something unique or distinct, often used in legal or academic contexts. \n[SAFETY]: NONE",
+        "This feature represents the presence of a possessive pronoun or possessive noun phrase indicating ownership or connection to a specific entity. \n[SAFETY]: NONE",
+        "This feature represents a pattern of language describing the concept of a partnership, emphasizing the agreement and cooperation between parties for mutual benefit. \n[SAFETY]: NONE",
+        "This feature represents the concept of things being related to the origin or etymology of a word or phrase. \n\n[SAFETY]: NONE"
+      ]
+    },
+    {
+      "cluster": 6,
+      "name": "safety \u00b7 none \u00b7 represents \u00b7 often",
+      "n_features": 33,
+      "cohesion": 0.4511636197566986,
+      "safety": {
+        "NONE": 31,
+        "REFUSAL": 2
+      },
+      "sample": [
+        "This feature represents events or topics that are associated with a sense of injury, success, or achievement. \n[SAFETY]: NONE",
+        "This feature represents a topic of discussion or a concept that is frequently mentioned in relation to a specific context. \n[SAFETY]: NONE",
+        "This feature represents individuals associated with artistic or creative fields, particularly those in the realm of music or writing. \n[SAFETY]: NONE",
+        "This feature represents the concept of object-oriented programming, specifically the distinction between static and instance variables. \n[SAFETY]: NONE",
+        "This feature represents a repeated emphasis on the difficulty of reaching specific areas of the mouth, often using phrases like \"hard-to-reach spots\" and \"difficult for your toothbrush to get in.\" \n[SAFETY]: NONE"
+      ]
+    }
+  ]
+}

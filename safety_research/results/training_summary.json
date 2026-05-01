@@ -1,0 +1,38 @@
+[
+  {
+    "name": "sae__mid_res__k100__T1",
+    "final": {
+      "step": 2999,
+      "loss": 6461.92822265625,
+      "fvu": 0.0271359384059906,
+      "window_l0": 100.0
+    },
+    "ckpt": "/home/cs29824/andre/temp_xc/safety_research/results/checkpoints/sae__mid_res__k100__T1.pt",
+    "wandb_url": "https://wandb.ai/standartikom-northwestern-university/temporal-crosscoders-safety/runs/hvubfh5v",
+    "elapsed_s": 104.80362606048584
+  },
+  {
+    "name": "tsae__mid_res__k100__T5",
+    "final": {
+      "step": 2999,
+      "loss": 6373.76220703125,
+      "fvu": 0.07430188357830048,
+      "window_l0": 500.0
+    },
+    "ckpt": "/home/cs29824/andre/temp_xc/safety_research/results/checkpoints/tsae__mid_res__k100__T5.pt",
+    "wandb_url": "https://wandb.ai/standartikom-northwestern-university/temporal-crosscoders-safety/runs/34p9l670",
+    "elapsed_s": 541.0387365818024
+  },
+  {
+    "name": "txc__mid_res__k100__T5",
+    "final": {
+      "step": 2999,
+      "loss": 7283.8408203125,
+      "fvu": 0.08491108566522598,
+      "window_l0": 500.0
+    },
+    "ckpt": "/home/cs29824/andre/temp_xc/safety_research/results/checkpoints/txc__mid_res__k100__T5.pt",
+    "wandb_url": "https://wandb.ai/standartikom-northwestern-university/temporal-crosscoders-safety/runs/377sa2ay",
+    "elapsed_s": 395.2552969455719
+  }
+]

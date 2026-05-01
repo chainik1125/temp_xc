@@ -1,0 +1,34 @@
+[
+  {
+    "arm": "sae",
+    "n_features": 150,
+    "elapsed_s": 212.5057282447815,
+    "safety_counts": {
+      "NONE": 148,
+      "HARMFUL_CONTENT": 2
+    },
+    "wandb_url": "https://wandb.ai/standartikom-northwestern-university/temporal-crosscoders-safety/runs/mh7hmqty"
+  },
+  {
+    "arm": "tsae",
+    "n_features": 150,
+    "elapsed_s": 250.81831884384155,
+    "safety_counts": {
+      "NONE": 147,
+      "REFUSAL": 2,
+      "HARMFUL_CONTENT": 1
+    },
+    "wandb_url": "https://wandb.ai/standartikom-northwestern-university/temporal-crosscoders-safety/runs/6ntkcd32"
+  },
+  {
+    "arm": "txc",
+    "n_features": 150,
+    "elapsed_s": 292.53137254714966,
+    "safety_counts": {
+      "NONE": 139,
+      "REFUSAL": 7,
+      "DECEPTION": 4
+    },
+    "wandb_url": "https://wandb.ai/standartikom-northwestern-university/temporal-crosscoders-safety/runs/uwsfrful"
+  }
+]
