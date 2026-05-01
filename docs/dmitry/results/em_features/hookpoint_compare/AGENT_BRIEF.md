@@ -403,3 +403,14 @@ In flight now:
 - h100_2: launching WindowedTSAE T=2 vanilla (Track B B1) — d_sae=32768, k=128, contrastive_alpha=0.0, mix_positions=True. Tag `vanilla_d32k_k128_mix`. ETA ~3.5h end-to-end.
 
 Disk on h100_1 was 92% used at last firing. The TXC k=100 60k will produce snapshots; future firings need to keep an eye on this.
+
+### Snapshot at 2026-05-01 06:00 UTC firing
+
+- **Track B B1 result (vanilla windowed SAE T=2)** — DONE, pulled. Bundle 51.93, best single feat 15471 = 52.20 (both significant regressions vs SAE arditi T=1 anchor of 57.42). Decisive evidence that windowing alone (no contrastive) does NOT work. Track B is dead — do not ladder to T=3.
+- **Track A (windowed_tsae) → contrastive is essential**. Comparing the no-contrastive run above to the matr+mix variant (bundle 55.57) shows that the T-SAE contrastive recipe is what makes windowing viable.
+
+In flight now:
+- **h100_1**: TXC paper k=100 60k @ resid_post (Track C3) — training DONE (60k snap saved), Wang in stage 3 strength sweep (~feat 9-10/20). ETA Wang ~1.5h, then bundle frontier ~30 min. Will be DONE this/next firing.
+- **h100_2**: TXC paper-faithful k=100 + adjacency contrastive alpha=0.1 (Track D D2) — JUST launched, log `txc_paper_k100_dadj_a0p1.log`. d_sae=16384, k_total=100, T=5, BatchTopK ON, batch=512, lr=3e-4, 30k steps @ resid_post. ETA training ~1.5h, then ~2h Wang. Tests whether T-SAE-style contrastive added to TXC raises the bundle metric while keeping single-feat peaks high.
+
+Disk on h100_1: 3.0 GB free, 99% used. **Next firing must clean up before launching anything new on h100_1.** Per disk policy, verify HF mirror first, then delete. The TXC k=100 60k step60000 ckpt + the older step30000 redundant snap and other older TXC paper variants (k=20, k=50, k=200) are candidates after Wang completes.

@@ -106,6 +106,9 @@ def main():
         ("WindowedTSAE T=2 + mix + matr 20%  SINGLE FEAT 14496",
          load_finalist(H / "wtsae_T2_mix_matr_30000step/wang_wtsae_T2_mix_matr_30000step/stage4_final_frontier.json", 14496),
          "deeppink"),
+        ("WindowedTSAE T=2 vanilla (no contrastive) d=32k k=128 + mix 30k  (BUNDLE)",
+         load_bundle(H / "wtsae_T2_vanilla_d32k_k128_mix/wang_wtsae_T2_vanilla_d32k_k128_mix_30000step_bundle30_frontier.json"),
+         "slategray"),
         ("T-SAE 30k @ resid_post (ours: k=128, α=1.0)",
          load_bundle(root / "wang/tsae_30k_bundle30_frontier.json"), "darkorange"),
     ]

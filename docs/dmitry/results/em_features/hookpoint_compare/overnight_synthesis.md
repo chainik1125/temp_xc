@@ -284,3 +284,51 @@ Per Track D D1a: implement window-level adjacency contrastive for TXC. Reading `
 This keeps the change minimal (~30 lines) and α=0 → bit-identical to current TXC. Once a GPU frees, launch `D2`: TXC paper-faithful k=100, contrastive_alpha=0.1, 30k steps @ resid_post — compare against the existing TXC paper k=100 baseline (bundle 50.89, single feat 4563=58.47).
 
 **Hypothesis**: Bhalla's contrastive loss on z_t-vs-z_{t+1} pulls features into a more redundant subspace, raising the bundle peak. We saw this empirically: T-SAE paper-faithful gets bundle 56.23 (vs TXC k=100's 50.89). If the TXC arch + adjacency contrastive recipe combines T-SAE's bundle-friendliness with TXC's strong single-feature peaks (58.47), that's the headline architectural win we're hunting for.
+
+### 2026-05-01 06:00 UTC — Track B B1 result: vanilla windowed SAE T=2 is a clear regression
+
+WindowedTSAE T=2 with `--contrastive_alpha 0.0` (i.e. NO contrastive — pure vanilla-SAE-style) at d_sae=32768, k=128, mix_positions=True, 30k steps @ resid_post. This is the cleanest "does windowing alone help, with no contrastive" test we have.
+
+**Bundle k=30 frontier — top-5 by alignment**
+
+| α     | align | coh   |
+| ----- | ----- | ----- |
+| −1.25 | 51.93 | 26.09 |
+| −1.50 | 48.73 | 25.31 |
+| +8.00 | 47.48 | 25.70 |
+| −5.00 | 47.37 | 23.98 |
+| +9.00 | 46.50 | 27.42 |
+| α=0   | 43.67 | 25.39 |
+
+Bundle peak **51.93** at α=−1.25 (coh 26.09). For comparison:
+- SAE arditi 100k (T=1, vanilla recipe): bundle 57.42 (the anchor)
+- T-SAE paper-faithful (T=1, w/ contrastive): bundle 56.23
+- WindowedTSAE T=2 + mix (with contrastive): bundle 55.57
+- WindowedTSAE T=2 vanilla (this run, no contrastive): **bundle 51.93** — significantly worse
+
+**Stage 4 single-feature peaks (3 finalists)**
+
+| feat  | Δz̄    | peak α | align     | coh   | α=0  |
+| ----- | ----- | ------ | --------- | ----- | ---- |
+| 27498 | +0.05 | −8.00  | 47.59     | 28.20 | 44.83 |
+| 15471 | +0.09 | −1.25  | **52.20** | 25.94 | 43.42 |
+| 10880 | +0.05 | +5.00  | 50.37     | 22.50 | 45.82 |
+
+Best single-feat **52.20** (feat 15471 at α=−1.25, coh 25.94). Far below the 56-58 club.
+
+**What this likely means.** This is decisive evidence against the "windowing alone is the win" hypothesis:
+
+1. **Vanilla SAE T=1 (arditi 100k) >> Vanilla windowed SAE T=2** on bundle: 57.42 → 51.93 (−5.49 align). Adding windowing to a vanilla-SAE recipe HURTS by a lot.
+2. **Vanilla windowed T=2 (no contrastive) << T-SAE windowed T=2 + mix (with contrastive)**: 51.93 → 55.57. The contrastive loss is doing real work — without it, the windowed encoder is much worse.
+3. **Δz̄ is tiny across all finalists** (+0.05, +0.09, +0.05). The encoder is finding features that fire only weakly differently on misaligned vs aligned text. With T=2 doubling the token dimension at the encoder input, the model has more degrees of freedom but no inductive bias toward causally relevant features without the contrastive signal. Compare T-SAE-style runs where Δz̄ is typically ≥ 0.5 for top finalists.
+
+**Implication for the research strategy:**
+
+- **Track B (vanilla SAE piggyback) is dead.** Windowing without contrastive does not improve over the T=1 SAE arditi anchor, it makes things much worse. The "windowed encoder is a free win" story does NOT generalize to non-contrastive recipes. We should not ladder Track B to T=3.
+- **The T-SAE contrastive loss is essential to making windowing work.** Track A's WindowedTSAE T=2 + mix (bundle 55.57, single 54.58) is much closer to T-SAE T=1 (56.23, 34.84) than vanilla windowed T=2 (51.93, ...) is to SAE arditi T=1 (57.42, 35.78). The presence/absence of the contrastive component is the defining variable.
+- **This validates Track D as the highest-priority direction.** Track D adds T-SAE-style contrastive to TXC. If contrastive is what makes windowing work at all (this result), and TXC's single-feature peaks are the strongest in the data (4563=58.47), then "TXC + adjacency contrastive" is the right combination to hunt for the next architectural win. We have already implemented and launched D1a/D2 on h100_2 (commit 002f7785).
+- **Track A T=3 ladder is also viable now**, since Track B is ruled out. The matr+mix variant got single 57.59; a T=3 ladder would test if the long-window-with-contrastive recipe scales.
+
+**Update to Current best table**: this result is a clear regression on both bundle and single — does NOT enter top-5 on either metric. No update.
+
+**Decision tree action.** Next experiment: launch Track D D2 on h100_2 (which is now free after this Wang completion). Track D code (TXC + adjacency contrastive overlapping-window) was implemented in commit 002f7785 but not yet launched. The vanilla result above strengthens our prior that contrastive is the load-bearing component for windowing, so D2 (TXC + adjacency contrastive @ k=100, alpha=0.1, 30k steps) is the highest-value next experiment. Launching now on h100_2.
