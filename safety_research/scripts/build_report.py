@@ -359,7 +359,12 @@ def main() -> None:
         "k=100 per position → window-level L0=500), and a Temporal Crosscoder "
         "(TXC, T=5, window-level k=500). Goal: ask whether the temporal "
         "architectures buy us **interpretability**, **safety-relevant feature "
-        "discovery**, and **steerability** beyond the SAE baseline.\n"
+        "discovery**, and **steerability** beyond the SAE baseline. "
+        "The framing is a direct iteration on the negative result in "
+        "*The Secret Agenda* (arXiv:2509.20393), which showed that SAE-based "
+        "deception detection and SAE-feature steering **fail** on strategic "
+        "lying. We replicate that failure on the simpler refusal proxy and "
+        "ask whether T-SAE / TXC recover any of the lost signal.\n"
     )
     sections.append("All training and eval runs are also logged to wandb under "
                     "[`temporal-crosscoders-safety`]"
@@ -555,19 +560,67 @@ def main() -> None:
                     "is a single `make`-ish chain (train → autointerp → umap → "
                     "safety_eval → build_report).\n")
 
-    sections.append("## 8. Related work\n")
-    sections.append("- Marks et al., *Sparse Feature Circuits* "
-                    "(arXiv:2403.19647) — established sparse-feature steering "
-                    "for safety. We borrow the dictionary-direction subspace-ablation idea.\n")
-    sections.append("- *Temporal Sparse Coders for Language Models* "
-                    "(arXiv:2509.20393) — main inspiration for T-SAE and TXC; "
-                    "we follow their architecture choices with k=100 per position.\n")
-    sections.append("- *Refusal directions and feature attribution* "
-                    "(arXiv:2511.16035) — the H1 / H4 setup is a re-implementation "
-                    "of their refusal probe, applied to the new architectures.\n")
-    sections.append("- *Polysemanticity vs interpretability tradeoffs in SAEs* "
-                    "(arXiv:2507.12691) — H2's dispersion metric is a "
-                    "stripped-down version of their monosemanticity score.\n")
+    sections.append("## 8. Related work and how this study iterates on it\n")
+    sections.append(
+        "The three papers the user pointed at are not about SAE architecture "
+        "or refusal directions; they are about **whether SAE-based interp "
+        "tools can actually detect or steer away from model misbehavior**. "
+        "All three deliver mostly negative results on vanilla SAEs. Our "
+        "study asks whether the temporal architectures (T-SAE, TXC) move "
+        "the needle.\n")
+    sections.append(
+        "- **DeLeeuw, Chawla & Sharma (2025), *The Secret Agenda: LLMs "
+        "Strategically Lie and Our Current Safety Tools Are Blind* "
+        "(arXiv:2509.20393).** Tests SAE-based deception detection across "
+        "38 models in deception scenarios and finds that autolabeled "
+        "deception features **rarely fire during actual strategic lying** "
+        "and that steering on 100+ deception-labeled features **fails to "
+        "suppress dishonesty**. Their negative result is the baseline this "
+        "study iterates against. Our H4 (top-10 decoder-direction ablation) "
+        "is a tighter version of their steering experiment, run on a "
+        "harmful-vs-benign refusal proxy rather than full strategic lying. "
+        "We replicate the SAE-fails-to-steer finding (steering AUC = 0.10, "
+        "i.e. anti-discriminative) and show **T-SAE recovers steerability "
+        "(AUC = 0.95)** with only 10 directions, suggesting the failure in "
+        "their setup may be partly an artifact of the SAE basis, not of "
+        "feature-steering as such.\n")
+    sections.append(
+        "- **Kretschmar, Laurito, Maiya & Marks (2025), *Liars' Bench: "
+        "Evaluating Lie Detectors for Language Models* (arXiv:2511.16035).** "
+        "Builds a 72.8K-example benchmark across four open-weight models / "
+        "seven datasets and shows that lie-detection probes **generalize "
+        "poorly across deception types**, especially when the deceptive "
+        "nature isn't recoverable from the transcript. Our H1 is a much "
+        "smaller version of this: the dense-residual probe saturates at "
+        "AUC=1.00 on a 60-prompt harmful-vs-benign set, but the right test "
+        "is cross-dataset generalization, which we have not run. **Open "
+        "follow-up:** evaluate the same TXC encoder on Liars' Bench and "
+        "report black-box-relative lift; with 2,121 features at AUC>0.80 "
+        "and per-position decomposition, TXC has more knobs for cross-"
+        "dataset transfer than the vanilla SAE.\n")
+    sections.append(
+        "- **Parrack, Attubato & Heimersheim (2025), *Benchmarking Deception "
+        "Probes via Black-to-White Performance Boosts* (arXiv:2507.12691).** "
+        "Proposes the *black-to-white boost* metric: how much does giving a "
+        "monitor white-box access to model internals (probes, SAE features) "
+        "improve detection over a black-box-only baseline? They find the "
+        "boost is real but small. Our H1 reports AUCs in the white-box "
+        "regime only — to fit their frame, we would need a paired black-box "
+        "judge (e.g. an external classifier on the prompt+response pair) "
+        "and report the gap. **Open follow-up:** replicate their "
+        "black-to-white boost protocol with a TXC monitor vs an SAE monitor "
+        "and report the per-arm boost; H2/H3 imply TXC has more "
+        "monitorable atoms but distributed across positions, which could "
+        "either help or hurt vs the per-position T-SAE atoms.\n")
+    sections.append(
+        "**What this study is not.** None of the three papers is about SAE "
+        "*architecture comparison*, and our 60-prompt refusal eval is much "
+        "smaller and easier than strategic-deception detection. The honest "
+        "framing: we replicated the SAE-steering-failure mode from Secret "
+        "Agenda, showed that switching the encoder's temporal structure "
+        "(T-SAE) recovers it for refusal — and left both Liars' Bench "
+        "generalization and the black-to-white boost protocol as the "
+        "obvious next steps.\n")
 
     out = SAFETY_DIR / "REPORT.md"
     out.write_text("\n".join(sections))
