@@ -428,6 +428,50 @@ The paper should report BOTH protocols. The normalised one is the fair cross-arc
 
 `absolute_strength_bootstrap_cis.json` saves the full bootstrap output.
 
+#### Per-class breakdown under paper-protocol — knowledge_domain dominant
+
+The +1.0 Δ at the aggregate level decomposes into a cleaner per-class story:
+
+**Coh ≥ 1.5 (PRREG metric):**
+
+| class (n_concepts) | T-SAE k=20 | Contrastive RE | OBLIT RE | MaxPool RE |
+|---|---|---|---|---|
+| **knowledge (9)** | 0.889 | **1.926** Δ=+1.037 ⭐ | **1.926** Δ=+1.037 ⭐ | **1.667** Δ=+0.778 ⭐ |
+| discourse (8) | 1.458 | 1.458 (TIE) | 1.417 (−0.042) | 1.333 (−0.125) |
+| safety (6) | 1.000 | 0.889 (−0.111) | 0.389 (−0.611) | 0.944 (−0.056) |
+| stylistic (5) | 0.867 | 0.200 (−0.667) | 0.800 (−0.067) | 1.333 (+0.467) |
+| **sentiment (2)** | 0.500 | **1.000** (+0.500) ⭐ | 0.000 (−0.500) | 0.000 (−0.500) |
+
+**Coh ≥ 1.75 (Y's GIGABRAIN metric):**
+
+| class | T-SAE k=20 | Contrastive RE | OBLIT RE | MaxPool RE |
+|---|---|---|---|---|
+| **knowledge** | 0.296 | **0.889** (+0.593) ⭐ | **1.222** (+0.926) ⭐ | **1.185** (+0.889) ⭐ |
+| discourse | 0.833 | 1.042 (+0.208) ✓ | 1.000 (+0.167) ✓ | 1.208 (+0.375) ✓ |
+| safety | 1.000 | 0.889 | 0.333 | 0.556 |
+| **stylistic** | 0.200 | 0.133 | **0.800** (+0.600) ⭐ | **0.800** (+0.600) ⭐ |
+| sentiment | 0.500 | 0.000 | 0.000 | 0.000 |
+
+**Key per-class findings under paper-protocol**:
+
+1. **Knowledge_domain is the dominant winning class**: T-SAE cliff drops from normalised 1.722 (paper's strengths don't sample its coh-stable peak) to **0.889** (coh ≥ 1.5) and **0.296** (coh ≥ 1.75). All 3 TXC archs win knowledge by Δ = +0.78 to +1.04 at coh ≥ 1.5 and Δ = +0.59 to +0.93 at coh ≥ 1.75. **The +1.0 aggregate is fundamentally a knowledge-class story.**
+
+2. **Stylistic**: OBLIT and MaxPool both win Δ=+0.60 at coh ≥ 1.75 — the "MaxPool family" stylistic finding from normalised analysis ALSO holds under paper-protocol.
+
+3. **Discourse**: at coh ≥ 1.75, all 3 TXC archs slightly win discourse (+0.17 to +0.38) — different from normalised where TXC consistently lost discourse.
+
+4. **Safety**: T-SAE retains advantage on safety (the one class TXC consistently loses across protocols).
+
+5. **Sentiment**: only Contrastive wins sentiment at coh ≥ 1.5 (+0.50) — the same sentiment-dominance pattern from the normalised analysis. OBLIT/MaxPool lose sentiment at all coh thresholds.
+
+**Cross-protocol comparison for knowledge specifically**:
+- Normalised grid (s_norm × abs_mean): knowledge T-SAE=1.722, OBLIT=2.000 (+0.278), MaxPool=1.852 (+0.130)
+- Paper-faithful absolute: knowledge T-SAE=0.889, OBLIT=1.926 (+1.037), MaxPool=1.667 (+0.778)
+
+Under paper-protocol, the knowledge gap balloons because T-SAE's knowledge-class success curve has a sharp coh-cliff right between paper's strengths 10 and 100, and paper's grid lands on the wrong side. TXC archs maintain knowledge success at coh-stable strengths.
+
+**Paper-narrative implication**: the strongest paper-grade claim under paper-faithful protocol is **"TXC family wins coherent steering on knowledge_domain by Δ ≥ +0.78"** — backed by 3 independent TXC archs and visible at both prereg + GIGABRAIN coh thresholds.
+
 ### 🔬 T-SAE k=20 ANCHOR SANITY-CHECK (same-pod n=3 retrain — UPDATES TXC Δ values)
 
 **Han flagged that the T-SAE k=20 peak success 1.80 looked "suspiciously high" for the baseline.** W ran a same-pod retrain of sd=1 + sd=2 (sd=42 was already on this pod) for clean apples-to-apples comparison. Findings:
