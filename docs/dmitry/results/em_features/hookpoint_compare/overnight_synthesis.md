@@ -260,3 +260,27 @@ A 3.5h T=3 ladder run is expensive. I prefer to first test the **complementary d
 If Track B B1 yields a bundle peak ≥ 57.42 (matching SAE arditi 100k), we have a clean "windowing helps even without contrastive" story → ladder to T=3. If it underperforms SAE arditi 100k, then any windowing benefit requires the contrastive recipe (Track A direction is the one to push on).
 
 Will keep h100_1's TXC k=100 60k running as planned (it tests the orthogonal "more compute helps the champion" hypothesis on Track C3). At time of this firing it's at step ~5000/60000 — still ~5h to training completion + ~2h Wang.
+
+### 2026-05-01 04:00 UTC routine-firing update — Wang flag mismatch, recovery, Track D prep
+
+**Status of in-flight runs.**
+
+- **h100_1** TXC paper k=100 60k: still training at step ~47500/60000 (~80% done). ETA training-done in ~30 min, then ~2h Wang. Snapshot at step 30000 (the redundant intermediate) already on disk — pushing free disk to 9.6 GB (was 11 GB before the snap). Will need ~7 GB more at step 60000; leaving ~2.6 GB margin. Tight but safe — not intervening mid-run.
+- **h100_2** WindowedTSAE T=2 vanilla SAE (`vanilla_d32k_k128_mix`): training **completed** + encoder run completed (top_200 features extracted), but the **Wang procedure crashed** at the very first stage with `argparse: unrecognized arguments: --save_demo_completions=-1`. Root cause: h100_2's repo was at commit `ae2b71f` (pre-`--save_demo_completions` rollout); the launcher `/tmp/run_wtsae_variant.sh` had been edited on h100_2 to include the flag, but the underlying `run_wang_procedure.py` didn't yet accept it.
+- **Recovery**: pulled h100_2's repo to latest dmitry (`4d16397`), wrote a small resume launcher `/tmp/run_wtsae_wang_resume.sh` that runs the Wang + bundle-frontier stages only (re-using the existing ckpt + encoder JSON), and launched it. ETA ~2h. Log: `wtsae_T2_vanilla_d32k_k128_mix_resume.log`. Status confirmed: subject model loaded, screening 100 features.
+
+**No new training launchable** — both GPUs busy.
+
+### 2026-05-01 04:00 UTC — Track D code prep (not GPU work)
+
+Per Track D D1a: implement window-level adjacency contrastive for TXC. Reading `experiments/em_features/run_training_txc_bricken_auxk.py`, the change is:
+
+1. Add `--contrastive_alpha` flag (default 0.0 = off, identical-to-current behaviour).
+2. When `alpha > 0`, sample windows of length `T+1` per step; split into two `T`-length views offset by 1 token (`view1 = win[:, :T]`, `view2 = win[:, 1:]`).
+3. Encode both views, apply existing TopK / BatchTopK independently → `z1`, `z2` of shape `(B, d_sae)`.
+4. Standard recon loss uses `view1` exactly as before — when α=0 the math reduces to current code.
+5. Add `α · (1 - cos_sim(z1, z2)).mean()` to total loss.
+
+This keeps the change minimal (~30 lines) and α=0 → bit-identical to current TXC. Once a GPU frees, launch `D2`: TXC paper-faithful k=100, contrastive_alpha=0.1, 30k steps @ resid_post — compare against the existing TXC paper k=100 baseline (bundle 50.89, single feat 4563=58.47).
+
+**Hypothesis**: Bhalla's contrastive loss on z_t-vs-z_{t+1} pulls features into a more redundant subspace, raising the bundle peak. We saw this empirically: T-SAE paper-faithful gets bundle 56.23 (vs TXC k=100's 50.89). If the TXC arch + adjacency contrastive recipe combines T-SAE's bundle-friendliness with TXC's strong single-feature peaks (58.47), that's the headline architectural win we're hunting for.

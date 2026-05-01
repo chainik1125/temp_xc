@@ -62,6 +62,11 @@ def parse_args():
     p.add_argument("--batch_size", type=int, default=256)
     p.add_argument("--lr", type=float, default=3e-4)
     p.add_argument("--bricken_resample_every", type=int, default=500)
+    p.add_argument("--contrastive_alpha", type=float, default=0.0,
+                   help="If >0, enable Track D adjacency contrastive: sample windows of "
+                        "length T+1, split into two T-length views overlapping by T-1 tokens, "
+                        "encode both, and add alpha*(1 - cos(z1, z2)).mean() to total loss. "
+                        "Bhalla 2025 default = 0.1; alpha=0 reduces to standard TXC training.")
     p.add_argument("--auxk_alpha", type=float, default=1.0 / 32.0)
     p.add_argument("--k_aux", type=int, default=512)
     # dead threshold scaled so AuxK engages by step ~500
@@ -120,6 +125,11 @@ def main():
     def sample_fn(n):
         return buffer.sample_txc_windows(n, args.T).float()
 
+    def sample_pair_fn(n):
+        # Sample length-(T+1) windows; return overlapping length-T views offset by 1.
+        win = buffer.sample_txc_windows(n, args.T + 1).float()
+        return win[:, : args.T, :].contiguous(), win[:, 1:, :].contiguous()
+
     torch.manual_seed(42)
     txc = TemporalCrosscoder(
         d_in=d_model, d_sae=args.d_sae, T=args.T, k_total=args.k_total,
@@ -172,7 +182,11 @@ def main():
         next_snap_idx += 1
 
     for step in range(start_step, args.total_steps):
-        x = sample_fn(args.batch_size)
+        if args.contrastive_alpha > 0.0:
+            x, x_pair = sample_pair_fn(args.batch_size)
+        else:
+            x = sample_fn(args.batch_size)
+            x_pair = None
 
         # Forward (live) + main recon loss.
         pre = _encode_pre_topk(txc, x)
@@ -190,6 +204,29 @@ def main():
             z_live.scatter_(-1, topk_idx, topk_vals)
         x_hat_live = _decode(txc, z_live)
         loss_main = (x - x_hat_live).pow(2).sum(dim=-1).mean()
+
+        # Track D: adjacency contrastive on the pair view (z_t vs z_{t+1} window-level).
+        if x_pair is not None:
+            pre_pair = _encode_pre_topk(txc, x_pair)
+            if args.batch_topk:
+                B2_, D2_ = pre_pair.shape
+                budget2 = B2_ * args.k_total
+                flat2 = pre_pair.reshape(-1)
+                tk_vals2, tk_idx2 = flat2.topk(budget2, sorted=False)
+                z2_flat = torch.zeros_like(flat2)
+                z2_flat.scatter_(0, tk_idx2, tk_vals2)
+                z_pair = z2_flat.reshape(B2_, D2_)
+            else:
+                tk_vals2, tk_idx2 = pre_pair.topk(args.k_total, dim=-1)
+                z_pair = torch.zeros_like(pre_pair)
+                z_pair.scatter_(-1, tk_idx2, tk_vals2)
+            eps = 1e-8
+            z1n = z_live / (z_live.norm(dim=-1, keepdim=True) + eps)
+            z2n = z_pair / (z_pair.norm(dim=-1, keepdim=True) + eps)
+            cos_sim = (z1n * z2n).sum(dim=-1)
+            loss_contrastive = (1.0 - cos_sim).mean()
+        else:
+            loss_contrastive = torch.tensor(0.0, device=args.device)
 
         # AuxK: top-k_aux dead features' reconstruction of residual.
         dead_mask = tokens_since_fired >= args.dead_token_threshold
@@ -224,6 +261,9 @@ def main():
             loss_auxk = torch.tensor(0.0, device=args.device)
             loss_total = loss_main
 
+        if args.contrastive_alpha > 0.0:
+            loss_total = loss_total + args.contrastive_alpha * loss_contrastive
+
         opt.zero_grad(set_to_none=True)
         loss_total.backward()
         remove_decoder_parallel_grad(txc)
@@ -253,6 +293,7 @@ def main():
                 "step": current_step,
                 "loss": loss_scalar,
                 "loss_auxk": float(loss_auxk.detach()),
+                "loss_contrastive": float(loss_contrastive.detach()),
                 "loss_total": float(loss_total.detach()),
                 "n_dead": int((fire_count == 0).sum().item()),
                 "n_features": args.d_sae,
@@ -288,11 +329,16 @@ def main():
                     "d_in": d_model, "d_sae": args.d_sae, "T": args.T,
                     "k_total": args.k_total,
                     "batch_topk": args.batch_topk,
+                    "contrastive_alpha": args.contrastive_alpha,
                     "subject_model": cfg["subject_model"],
                     "layer": layer,
                     "hookpoint": args.hookpoint,
                     "steps_trained": snap_step,
-                    "training_recipe": "bricken_resample+ema_auxk+geom_median_b_dec",
+                    "training_recipe": (
+                        "bricken_resample+ema_auxk+geom_median_b_dec+adjacency_contrastive"
+                        if args.contrastive_alpha > 0.0
+                        else "bricken_resample+ema_auxk+geom_median_b_dec"
+                    ),
                 },
                 "best_loss_so_far": best_loss,
                 "cumulative_resamples": sum(h.n_resampled for h in resampler.history),
