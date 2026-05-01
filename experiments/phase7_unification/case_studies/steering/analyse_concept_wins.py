@@ -33,6 +33,7 @@ CELLS = [
     ("T-SAE k=20 anchor", [
         ("steering_paper_normalised", "tsae_paper_k20", 42),
         ("steering_paper_normalised_seed1", "tsae_paper_k20", 1),
+        ("steering_paper_normalised_seed2", "tsae_paper_k20", 2),
     ]),
     ("T=2 H8 PP", [
         ("steering_paper_window_perposition", "txc_h8_t2_kpos20_shifts2", 42),

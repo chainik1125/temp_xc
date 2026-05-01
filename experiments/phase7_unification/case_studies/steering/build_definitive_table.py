@@ -26,9 +26,10 @@ THRESHOLDS = [1.5, 1.75, 2.0, 2.25, 2.5]
 
 # All cells at matched k_pos=20, with their multi-seed protocol+arch combinations
 CELLS = [
-    ("T-SAE k=20 (anchor, multi-seed)", [
+    ("T-SAE k=20 (anchor, same-pod n=3)", [
         ("steering_paper_normalised", "tsae_paper_k20", 42),
         ("steering_paper_normalised_seed1", "tsae_paper_k20", 1),
+        ("steering_paper_normalised_seed2", "tsae_paper_k20", 2),
     ]),
     # T=2 H8 multi-seed
     ("T=2 H8 shifts=(T,) PP", [
@@ -279,7 +280,7 @@ def main():
         }
     print(f"loaded {len(cells_data)} cells")
 
-    anchor_label = "T-SAE k=20 (anchor, multi-seed)"
+    anchor_label = "T-SAE k=20 (anchor, same-pod n=3)"
     anchor_pc = cells_data[anchor_label]["per_concept"]
 
     # Compute all metrics
