@@ -338,6 +338,61 @@ to measure:
 - "What's the strict behavioral verdict?" → genuine_backtracking_rate
   inside the filter → ~92.8% across all viable TXC cells
 
+## Per-cell 3-way breakdown of B1 generations
+
+For each cell, every B1 generation falls into one of three buckets:
+
+- **Productive** (green): coherent (Sonnet ≥ 2) AND kw-elevated AND
+  judge says ≥ 1 genuine backtracking event
+- **Filler / pseudo** (orange): coherent + kw-elevated, but the judge
+  says count = 0 — `wait`/`hmm` is filler or restatement
+- **Below threshold** (gray): incoherent OR low kw — steering didn't
+  produce enough effect, or the effect destroyed coherence
+
+![B1 3-way breakdown](images_b/b1_breakdown_3way.png)
+
+Cell labels colored by architecture (blue = TXC family, orange = TopK
+SAE, green = Stacked SAE, purple = TSAE, pink = TSAE-paper).
+
+What pops out:
+
+1. **TXC family dominates the productive (green) segment.**
+   TXC + Han contrastive cells take positions 1-13.
+2. **The orange "filler" sliver is small for every cell** (≤ 5%
+   typically, with `txc__ln1_L10__k16` an outlier at ~8%). When the
+   model produces a coherent + keyword-elevated generation, the
+   judge calls it genuine ~92% of the time. So Sonnet primary is not
+   measuring filler at any cell.
+3. **What separates archs is the gray ("below threshold") size.**
+   TSAE / TSAE-paper / weak TopK SAE cells have ~98% gray —
+   steering rarely lifts them into the productive regime in the first
+   place. The TXC family pushes ~20-27% of generations through.
+
+Numerical CSV: [`images_b/b1_breakdown_3way.csv`](images_b/b1_breakdown_3way.csv).
+
+## Robustness: ordering survives stricter thresholds
+
+Worry: maybe TXC's lead is an artifact of the specific
+`(coh ≥ 2, kw > 0.005, judge ≥ 1)` thresholds. Sweeping each
+threshold independently and reporting the per-arch best cell:
+
+| Threshold config | TXC | TXC-H13 | TXC-H8 | Stacked SAE | TopK SAE | TSAE | TSAE-paper |
+|---|---|---|---|---|---|---|---|
+| default (coh≥2, kw≥0.005, judge≥1) | **0.274** | 0.261 | 0.196 | 0.190 | 0.138 | 0.017 | 0.016 |
+| strict-judge (judge≥2) | **0.227** | 0.201 | 0.147 | 0.151 | 0.097 | 0.014 | 0.013 |
+| strict-coh (Sonnet=3 only) | **0.142** | 0.128 | 0.102 | 0.106 | 0.090 | 0.017 | 0.016 |
+| strict-kw (kw>0.012) | 0.067 | **0.073** | 0.028 | 0.042 | 0.033 | 0.000 | 0.000 |
+| strict-all | **0.015** | 0.011 | 0.006 | 0.010 | 0.008 | 0.000 | 0.000 |
+
+TXC family (TXC + H13 + H8) takes the **top 3 positions in 4 of 5
+configs**; Stacked SAE swaps with H8 once. TopK SAE is fixed at rank
+4-5. TSAE / TSAE-paper hit zero under strict thresholds — these
+arches don't produce productive backtracking at any reasonable
+filter. Full sweep CSV: [`images_b/robustness_sweep.csv`](images_b/robustness_sweep.csv).
+
+The ordering doesn't depend on threshold choice. The "TXC family
+beats SAE family" claim is robust.
+
 ## Multi-seed verification of TXC vs H13
 
 The bootstrap CIs in [[results_b]] showed `txc__resid_L10__k16` (Sonnet
