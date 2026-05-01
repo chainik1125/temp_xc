@@ -602,6 +602,19 @@ Code:
   and not over- or under-count. Spot-checks suggest the judge is
   calibrated for our 1200-token max; not validated past that.
 
+## Reproduction artifacts on Hugging Face
+
+Per Dmitry's reproducibility ask:
+
+- **Dataset (activation cache + B1 results + judge labels):** [aniketdesh/ward-stage-b-cache](https://huggingface.co/datasets/aniketdesh/ward-stage-b-cache) (~20 GB)
+- **Models (curated checkpoints):** [aniketdesh/ward-stage-b-dictionaries](https://huggingface.co/aniketdesh/ward-stage-b-dictionaries) (~35 GB across 13 checkpoints)
+
+Both repos public. READMEs document the cell-id convention, loader
+snippet, and the caveat about the B3 negative result. Reproduction
+recipe: `git clone -b aniket-ward-stage-b ...`, `uv sync`, pull the
+relevant cache subdirectory + checkpoint, run
+`python -m experiments.ward_backtracking_txc.evaluate_cell --cell <cell_id>`.
+
 ## Pointers
 
 - Companion writeup: [[results_b|Stage B paper-budget results]] — the
