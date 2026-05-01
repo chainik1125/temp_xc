@@ -102,7 +102,8 @@ multi-position structure.
 |---|---|---|
 | **GIGABRAIN reframe** | multi-coh-threshold sweep | ⭐ headline shift |
 | **Lever A** | asymmetric write weights `[0.5, 1.0]` | +0.035 AUC, no headline shift |
-| **Lever B** | multi-feature steering (K=3) | +0.07 at coh ≥ 1.5, regression at coh ≥ 1.75 |
+| **Lever B (K=3,5)** | multi-feature steering oversaturated | regression at coh ≥ 1.75 |
+| **Lever B (K=2)** ⭐ | sweet-spot multi-feature | sd=42: unc 1.73 (vs T-SAE 1.80, gap 0.07) AND ≥1.5 = 1.73 (Δ=+0.63 vs anchor); multi-seed in flight |
 | **Lever E** | knowledge-only re-aggregate | T-SAE wins; complementarity finding |
 | **Bootstrap CI** | concept-resample for stat sig | coh ≥ 1.75 robustly significant |
 | **AUC alternative** | Han's pre-stated AUC metric | T = 2 bare RE Δ=+0.236 (3sd) |
