@@ -465,6 +465,126 @@ genuine backtracking; per-cell metrics in
 `cell_metrics/<cell>.json` after the judge finishes (in flight at
 writing).
 
+## B3 — MATH-500 backtracking-induced rescue (the deciding test)
+
+Per Dmitry's 2026-05-01 ask: take MATH-500, find unsteered trajectories
+that reach the wrong answer, cut each at the token midpoint, continue
+with the TXC k=16 winner's steering direction at multiple magnitudes
+vs an unsteered control, measure: did steering rescue the answer?
+
+### Setup
+
+- **Eval set:** 150 randomly-sampled MATH-500 problems
+  (`HuggingFaceH4/MATH-500`), seed=42.
+- **Unsteered baseline:** DeepSeek-R1-Distill-Llama-8B, greedy decoding,
+  max_new=2048 tokens. Prompt: `"Solve this math problem and provide
+  your final answer in \\boxed{} notation. Problem: {problem}"`.
+  Boxed-answer extraction via stack-based brace matching;
+  LaTeX-aware comparison via sympy.
+- **Cut + continue:** for each wrong unsteered trajectory, cut at the
+  50% token midpoint (median prefix_len=1024); continue with steering
+  applied at layer-10 residual via the existing `_Hook`. Continuation
+  budget = `2048 − prefix_len` (so total NEW-tokens matches the
+  unsteered baseline — same total reasoning length, no extra
+  headroom for the steered/control runs).
+- **Steering vector:** `txc__resid_L10__k16__s42` feature 14621, `pos0`
+  decoder row, rescaled to DoM-base-union norm (0.414 after rescaling).
+- **Magnitudes tested:** `{0, -8, -12, +8}`. mag=0 is the same-cut-point
+  unsteered control; -8 is the Sonnet-best magnitude for this cell
+  in B1.
+
+### Results
+
+Baseline unsteered accuracy: **78/150 = 52.0%** (72 problems wrong; the
+candidate set for rescue).
+
+| Magnitude | Rescued / 72 | Rescue rate | vs. mag=0 control |
+|---|---|---|---|
+| **0 (unsteered control)** | **8 / 72** | **0.111** | — |
+| -8 (B1 sonnet-best) | 5 / 72 | 0.069 | **−4.2 pp** |
+| -12 | 3 / 72 | 0.042 | **−6.9 pp** |
+| +8 | 0 / 72 | 0.000 | **−11.1 pp** |
+
+**Steering does NOT improve answer correctness; it actively reduces it
+at every tested magnitude.** The unsteered control rescues 11.1% of
+wrong problems just by re-running the second half of the trajectory
+greedily — this is the model's intrinsic recovery rate when given a
+fresh continuation. Adding TXC backtracking-direction at any
+magnitude pulls the rescue rate *below* this control.
+
+### Why this is a negative result for the case-study
+
+The behavioral judge confirmed (above) that ~93% of TXC-steered
+generations contain genuine *text-level* backtracking events. But
+text-level backtracking ≠ correct downstream reasoning. Three
+hypotheses for the gap:
+
+1. **Distribution mismatch.** Stage A's DoM extraction was on
+   programming/CS-style reasoning traces. The "backtracking direction"
+   may be specialized to that distribution; on MATH-500's algebra /
+   number theory / combinatorics problems, the steered "course
+   correction" pulls the model toward backtracking-shaped *text* that
+   doesn't match the actual mathematical error.
+2. **Steering disrupts intrinsic recovery.** The 11.1% mag=0 baseline
+   shows the model has a meaningful intrinsic recovery rate on these
+   problems. Steering at every position from the cut point onward
+   biases generation away from this natural recovery trajectory —
+   the steering signal isn't "subtle nudge to reconsider," it's
+   "constantly emit backtracking-tokens" which derails productive
+   reasoning.
+3. **50% midpoint is past commitment.** By the token midpoint, the
+   model has typically committed to the wrong answer's reasoning
+   chain. The wrong logic step is upstream; nudging downstream just
+   piles backtracking-tokens on top of an already-wrong derivation.
+   A targeted intervention at the wrong step (which would require an
+   LLM judge or explicit error-finder) might fare better.
+
+### What this changes about the verdict
+
+The original headline ("TXC's lead under Sonnet primary is genuine —
+keyword tokens reflect real backtracking") survives the behavioral
+judge. The new B3 result adds a hard caveat:
+
+> **TXC steering induces backtracking *text behavior* but does not
+> translate to *answer correctness* on MATH-500. The steered
+> course-corrections happen at the linguistic level, not the
+> logical-reasoning level. For Ward 2025's case-study claim ("base
+> model's representation of backtracking can be steered into the
+> reasoning model"), our paper-budget run shows: yes the
+> representation is there and yes steering it elicits the
+> linguistic surface form of backtracking, but no the surface form
+> doesn't drive better problem-solving.**
+
+This isn't a refutation of the architecture comparison (TXC still
+beats SAE family on every B1 metric we measured), but it is a
+significant negative on the practical utility of the steering
+direction.
+
+### Future work (deferred)
+
+- **Earlier cut points.** Re-run with cut at 25% / 33% to give
+  steering time to influence the wrong reasoning step before
+  commitment.
+- **Single-position steering.** Apply the hook only at the cut
+  position (one-token nudge), not continuously. The current hook
+  fires at every token, which is more "constant push" than "trigger
+  to reconsider."
+- **LLM-judged error-step cut.** Use Sonnet to find the specific
+  step where the model went wrong, cut there. Removes the
+  midpoint-arbitrary confound.
+- **Distribution-matched steering vector.** Re-derive a DoM /
+  TXC direction on math-specific reasoning traces, then test rescue
+  rate. Tests whether the negative is a distribution-mismatch
+  artifact.
+
+Raw outputs:
+- [`results/ward_backtracking_txc/b3_math500/phase1_unsteered.json`](../../../results/ward_backtracking_txc/b3_math500/phase1_unsteered.json)
+- [`results/ward_backtracking_txc/b3_math500/phase2_rescue.json`](../../../results/ward_backtracking_txc/b3_math500/phase2_rescue.json)
+- [`results/ward_backtracking_txc/b3_math500/summary.json`](../../../results/ward_backtracking_txc/b3_math500/summary.json)
+
+Code:
+[`experiments/ward_backtracking_txc/b3_math500_rescue.py`](../../../experiments/ward_backtracking_txc/b3_math500_rescue.py).
+
 ## Caveats
 
 - **Single-judge-model evaluation.** Sonnet 4.6 grades are taken as

@@ -235,26 +235,24 @@ def _generate_unsteered(model, tok, prompts: list[str], max_new_tokens: int,
 
 def _generate_continuation_panels(
     model, tok, hook, problem_prompts: list[str], prefix_token_ids: list[list[int]],
-    mags_per_panel: list[float], max_new_tokens: int, batch_size: int,
+    mags_per_panel: list[float], max_new_per_panel: list[int], batch_size: int,
 ) -> list[str]:
-    """For each (problem prompt, prefix token ids, magnitude) panel, build the
-    extended input as [chat_template(problem) + prefix_tokens] and generate
-    the continuation under the per-row magnitude. Returns a list of
-    continuation strings (no chat template / no prefix included).
+    """For each (problem prompt, prefix tokens, magnitude, max_new) panel,
+    build the extended input [chat_template(problem) + prefix_tokens] and
+    generate under the per-row magnitude. Returns continuation strings
+    (no chat template / no prefix included).
 
-    All three lists must be the same length N. Panels are batched by
-    `batch_size`; the hook's magnitudes tensor is set per chunk.
+    `max_new_per_panel`: per-panel new-token budget. Within a chunk we use
+    the max budget across the chunk and truncate per-row to its own budget
+    afterward. This keeps the cut+continue total matched to the original
+    unsteered budget so mag=0 isn't given extra reasoning headroom.
     """
     from transformers import GenerationConfig
-    assert len(problem_prompts) == len(prefix_token_ids) == len(mags_per_panel)
-    gen_cfg = GenerationConfig(
-        max_new_tokens=max_new_tokens, do_sample=False,
-        temperature=1.0, pad_token_id=tok.pad_token_id,
-    )
+    assert len(problem_prompts) == len(prefix_token_ids) == len(mags_per_panel) \
+        == len(max_new_per_panel)
     saved = tok.padding_side
     tok.padding_side = "left"
     try:
-        # Build pre-encoded input ids per panel: [chat_template(problem)] + prefix_token_ids
         full_input_ids: list[list[int]] = []
         for problem, prefix in zip(problem_prompts, prefix_token_ids):
             try:
@@ -272,9 +270,14 @@ def _generate_continuation_panels(
             chunk_ids = full_input_ids[i:i + batch_size]
             chunk_mags = torch.tensor(mags_per_panel[i:i + batch_size],
                                        dtype=torch.float32)
+            chunk_budgets = max_new_per_panel[i:i + batch_size]
+            chunk_max_budget = max(chunk_budgets)
             hook.magnitudes = chunk_mags
 
-            # Manual left-pad to max length in this chunk.
+            gen_cfg = GenerationConfig(
+                max_new_tokens=chunk_max_budget, do_sample=False,
+                temperature=1.0, pad_token_id=tok.pad_token_id,
+            )
             max_len = max(len(x) for x in chunk_ids)
             pad_id = tok.pad_token_id
             input_ids = torch.full((len(chunk_ids), max_len), pad_id, dtype=torch.long)
@@ -294,6 +297,10 @@ def _generate_continuation_panels(
                 new = row[max_len:].tolist()
                 while new and new[-1] == tok.pad_token_id:
                     new.pop()
+                # Per-row truncation to its specific budget.
+                budget = chunk_budgets[r]
+                if len(new) > budget:
+                    new = new[:budget]
                 outs.append(_fix_byte_decode(tok.decode(new, skip_special_tokens=True)))
         hook.magnitudes = None
         return outs
@@ -372,37 +379,45 @@ def main(argv=None):
     model, tok = _load_lm(hf_id, args.device)
     layer_module = model.model.layers[layer]
 
-    # ---- Phase 1: unsteered baseline. ----
-    log.info("[phase 1] unsteered baseline on %d problems", len(problems))
-    prompts = [_build_prompt(p["problem"]) for p in problems]
-    base_texts, base_token_ids = _generate_unsteered(
-        model, tok, prompts, max_new_tokens=args.max_new_tokens,
-        batch_size=args.gen_batch_size,
-    )
-
-    base_results = []
-    for prob, txt, tok_ids in zip(problems, base_texts, base_token_ids):
-        ans = extract_boxed(txt)
-        correct = answers_match(ans, prob["answer"])
-        base_results.append({
-            "unique_id": prob["unique_id"],
-            "level": prob["level"],
-            "subject": prob["subject"],
-            "ground_truth": prob["answer"],
-            "unsteered_text": txt,
-            "unsteered_token_ids": tok_ids,
-            "unsteered_answer": ans,
-            "unsteered_correct": correct,
-        })
+    # ---- Phase 1: unsteered baseline (cached if already run). ----
+    phase1_out = args.out / "phase1_unsteered.json"
+    if phase1_out.exists():
+        log.info("[phase 1 cached] %s", phase1_out)
+        base_results = json.loads(phase1_out.read_text())
+        # Filter to the same N problems we just resampled (handles --n-problems
+        # mismatch when re-running on a subset; here it should always match).
+        ids_now = {p["unique_id"] for p in problems}
+        base_results = [r for r in base_results if r["unique_id"] in ids_now]
+        if len(base_results) < len(problems):
+            log.warning("[phase 1] cached results cover %d/%d problems; "
+                        "regenerating to fill the gap (delete phase1_unsteered.json "
+                        "to force re-run)", len(base_results), len(problems))
+    else:
+        log.info("[phase 1] unsteered baseline on %d problems", len(problems))
+        prompts = [_build_prompt(p["problem"]) for p in problems]
+        base_texts, base_token_ids = _generate_unsteered(
+            model, tok, prompts, max_new_tokens=args.max_new_tokens,
+            batch_size=args.gen_batch_size,
+        )
+        base_results = []
+        for prob, txt, tok_ids in zip(problems, base_texts, base_token_ids):
+            ans = extract_boxed(txt)
+            correct = answers_match(ans, prob["answer"])
+            base_results.append({
+                "unique_id": prob["unique_id"],
+                "level": prob["level"],
+                "subject": prob["subject"],
+                "ground_truth": prob["answer"],
+                "unsteered_text": txt,
+                "unsteered_token_ids": tok_ids,
+                "unsteered_answer": ans,
+                "unsteered_correct": correct,
+            })
+        phase1_out.write_text(json.dumps(base_results, indent=2))
+        log.info("[saved] %s", phase1_out)
     n_correct_base = sum(1 for r in base_results if r["unsteered_correct"])
     log.info("[phase 1] unsteered accuracy: %d/%d = %.3f",
              n_correct_base, len(base_results), n_correct_base / len(base_results))
-
-    # Save phase 1 separately so the expensive baseline isn't lost on a
-    # phase-2 crash.
-    phase1_out = args.out / "phase1_unsteered.json"
-    phase1_out.write_text(json.dumps(base_results, indent=2))
-    log.info("[saved] %s", phase1_out)
 
     # ---- Phase 2: steered/unsteered continuations from the 50% midpoint
     #              of each wrong trajectory. ----
@@ -421,15 +436,22 @@ def main(argv=None):
     hook = _Hook(vec)
     handle = layer_module.register_forward_hook(hook)
 
-    # Build all (wrong-problem × magnitude) panels.
+    # Build all (wrong-problem × magnitude) panels with PER-PANEL budget
+    # so the cut+continue total NEW-token count matches the unsteered
+    # baseline's max_new. (Without this, mag=0 control gets extra
+    # reasoning headroom the original baseline didn't have.)
     panel_problems: list[str] = []
     panel_prefixes: list[list[int]] = []
     panel_mags: list[float] = []
+    panel_max_new: list[int] = []
     panel_meta: list[dict] = []
     for r in wrong:
-        # Cut at the 50% token midpoint of the unsteered trajectory.
-        prefix_len = max(1, len(r["unsteered_token_ids"]) // 2)
+        unsteered_len = len(r["unsteered_token_ids"])
+        prefix_len = max(1, unsteered_len // 2)
         prefix = r["unsteered_token_ids"][:prefix_len]
+        # Continuation budget = original total NEW tokens − prefix already used.
+        # Same total as the unsteered baseline used for this problem.
+        cont_budget = max(64, args.max_new_tokens - prefix_len)
         problem_prompt = _build_prompt(
             next(p["problem"] for p in problems
                  if p["unique_id"] == r["unique_id"])
@@ -438,17 +460,21 @@ def main(argv=None):
             panel_problems.append(problem_prompt)
             panel_prefixes.append(prefix)
             panel_mags.append(float(mag))
+            panel_max_new.append(cont_budget)
             panel_meta.append({"unique_id": r["unique_id"], "magnitude": float(mag),
-                               "prefix_len": prefix_len})
+                               "prefix_len": prefix_len, "cont_budget": cont_budget})
 
-    log.info("[phase 2] %d panels (= %d wrong × %d mags)",
-             len(panel_problems), len(wrong), len(args.magnitudes))
+    log.info("[phase 2] %d panels (= %d wrong × %d mags); "
+             "median prefix_len=%d, median cont_budget=%d",
+             len(panel_problems), len(wrong), len(args.magnitudes),
+             sorted(p["prefix_len"] for p in panel_meta)[len(panel_meta)//2],
+             sorted(p["cont_budget"] for p in panel_meta)[len(panel_meta)//2])
 
     cont_texts = _generate_continuation_panels(
         model, tok, hook,
         problem_prompts=panel_problems, prefix_token_ids=panel_prefixes,
-        mags_per_panel=panel_mags,
-        max_new_tokens=args.max_new_tokens, batch_size=args.gen_batch_size,
+        mags_per_panel=panel_mags, max_new_per_panel=panel_max_new,
+        batch_size=args.gen_batch_size,
     )
     handle.remove()
 
