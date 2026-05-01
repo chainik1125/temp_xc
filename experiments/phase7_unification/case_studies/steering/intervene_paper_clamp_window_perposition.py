@@ -53,6 +53,7 @@ from experiments.phase7_unification.case_studies._paths import (
 
 PAPER_STRENGTHS = (10, 100, 150, 500, 1000, 1500, 5000, 10000, 15000)
 S_NORMS_DEFAULT = (0.5, 1.0, 2.0, 5.0, 10.0, 20.0, 50.0)
+S_NORMS_REFINED = (0.5, 1.0, 2.0, 3.0, 5.0, 7.0, 10.0, 15.0, 20.0, 50.0)  # finer near peak
 OUT_SUBDIR = "steering_paper_window_perposition"
 
 WEIGHT_PRESETS = {"uniform", "right-heavy", "right-only", "gaussian"}
@@ -339,16 +340,27 @@ def main() -> None:
                     help="Lever B: clamp top-K features per concept simultaneously "
                          "(default 1 = single best feature). Pulls top-K from "
                          "feature_selection.json::top_5.")
+    ap.add_argument("--s-norms", default=None,
+                    help="Comma-separated s_norm grid (default = 0.5,1,2,5,10,20,50). "
+                         "Use 'refined' for the more granular grid (0.5,1,2,3,5,7,10,15,20,50).")
     args = ap.parse_args()
     banner(__file__)
     z_mag_path = Path(args.z_mag) if args.normalised else None
     if args.normalised and not z_mag_path.exists():
         raise SystemExit(f"missing Q1.1 output at {z_mag_path}")
+    # Resolve s_norms
+    if args.s_norms is None:
+        s_norms = S_NORMS_DEFAULT
+    elif args.s_norms == "refined":
+        s_norms = S_NORMS_REFINED
+    else:
+        s_norms = tuple(float(x) for x in args.s_norms.split(","))
     for arch_id in args.archs:
         print(f"\n=== {arch_id} seed={args.seed} pw={args.position_weights} "
-              f"top_k={args.top_k_features} (per-position window clamp) ===")
+              f"top_k={args.top_k_features} s_norms={s_norms} (per-position window clamp) ===")
         steer_for_arch(arch_id, z_magnitude_path=z_mag_path,
                        use_normalised=args.normalised,
+                       s_norms=s_norms,
                        force=args.force, limit_concepts=args.limit_concepts,
                        seed=args.seed,
                        position_weights_spec=args.position_weights,
