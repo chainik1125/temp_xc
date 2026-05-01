@@ -423,6 +423,18 @@ Disk: h100_1 50 GB free, h100_2 143 GB free. E1 will produce ~3×14 GB on h100_1
 
 The plot script `plot_overnight_panels.py` PANELS list now includes the D2 bundle frontier (color darkkhaki) and D2 single feat 5547 (khaki). Will need to add E1 / E1b panels when those finish.
 
+### Snapshot at 2026-05-01 13:00 UTC firing
+
+- **Track E1 result (TXC T=2 arditi-matched k=128, 100k @ resid_post)** — DONE, pulled. Bundle 53.58 at α=+4 / coh 27.66 (regression −3.84 vs SAE arditi T=1 anchor 57.42). Single-feat finalists: feat 21945 naive peak 58.51 at α=+9 — but this is a single-point judge-noise spike (neighbors α=+8/+10 are 47.50/48.04). Robust single-peak is feat 21945 α=+6 align=53.73 coh=30.47, well below 58.47. Track E1 path **DEAD** (regresses both metrics). Do not ladder to T=3 with this config. Interpretation: similar to Track B B1 (vanilla windowed SAE), per-window-pool TopK without contrastive doesn't isolate the precise per-token causally-aligned direction that arditi T=1 SAE finds; window-pool averages out the position-specific bad-medical signal.
+- **Track A2 launched on h100_1**: WindowedTSAE T=3 + mix_positions + matryoshka 20% (d_sae=16384, k=20, batch=512, lr=3e-4, BatchTopK ON, contrastive_alpha=0.1, n_temporal_features=3277, 30k steps, resid_post). PID 805667, log `wtsae_T3_mix_matr_30k.log`. ETA training ~80min then ~2h Wang = ~3.5h. Tests if windowed_tsae path ladders past 58.47 single-peak when going T=2 (57.59) → T=3.
+- **Track E1b still in flight on h100_2**: TXC T=2 arditi-matched k=256, step ~95000/100000, ETA ~30min more training + ~2h Wang.
+
+Plot `plot_overnight_panels.py` now has 22 panels — added E1 bundle (indianred) and E1 single-feat 21945 (lightcoral). Will need to add A2 (T=3 mix+matr) and E1b panels next.
+
+In flight now:
+- **h100_1**: Track A2 — WindowedTSAE T=3 + mix + matr 20% — step ~500/30000.
+- **h100_2**: Track E1b — TXC T=2 arditi-matched k=256 — step ~95000/100000.
+
 ### Snapshot at 2026-05-01 07:00 UTC firing
 
 - **Track C3 result (TXC paper k=100 60k extension)** — DONE, pulled. Bundle frontier was extremely judge-NaN-heavy (~5/27 valid α). Best reliable per-finalist peak: feat 3515 α=−5 align=**52.68** coh=26.33 (23/27 valid rows). Strong regression vs the 30k anchor's feat 4563=58.47. The two other finalists (5671, 3824) had only 3/27 and 12/27 valid rows respectively, with apparent peaks in the 70s but those are noise outliers — not reproducible signal. Track C3 is dead: more compute hurts the TXC paper k=100 single-feature peak.
