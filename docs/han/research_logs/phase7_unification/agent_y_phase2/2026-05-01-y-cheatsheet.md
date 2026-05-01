@@ -90,17 +90,25 @@ multi-position structure.
 | Galaxy 4 (hierarchical) | window + per-pos latent groups | impl + queued; results pending |
 | Galaxy 6 (max-pool) | max over T instead of sum | impl + queued; results pending |
 
-### Multi-seed verifications
+### Multi-seed verifications (as of 2026-05-01)
 
-3-seed verified at primary metrics: T=2 H8 PP/RE (3 seeds),
-T=2 bare PP/RE (3 seeds), T=2 H8 PP K=2 multi-feature (3 seeds —
-fails).
+3-seed verified at primary metrics:
+- T=2 H8 PP/RE (3 seeds): WIN cell at coh ≥ 1.75 (RE Δ=+0.906)
+- T=2 bare PP/RE (3 seeds): WIN cells at coh ≥ 2.0 / AUC
+- T=2 H8 PP K=2 multi-feature (3 seeds): FAILS (mechanism: secondary
+  features polysemantic across seeds)
 
-2-seed verified: T=3 grown PP/RE (sd=42 + sd=1), T=5 H8 PP (sd=42 +
-sd=1), T=5 bare PP/RE (sd=42 + sd=1).
+2-seed verified:
+- T=3 grown PP/RE (sd=42 + sd=1): WIN at coh ≥ 1.75 (RE Δ=+0.883)
+- T=5 H8 PP (sd=42 + sd=1): WIN at coh ≥ 1.75 (Δ=+0.733)
+- T=5 bare PP/RE (sd=42 + sd=1)
+- **T=2 T-SAE WS RE (sd=42 + sd=1)**: WIN at coh ≥ 1.75 (Δ=+0.650, new!)
 
-In flight (will complete in ~3-4 hr): T=3 grown sd=2, T-SAE WS
-sd=1+sd=2, Galaxy 4 sd=42+sd=1+sd=2, Galaxy 6 sd=42+sd=1+sd=2.
+Six multi-seed-verified TXC cells beat anchor by Δ > +0.27 at
+coh ≥ 1.75 — broad cross-architecture support for the WIN claim.
+
+In flight (will complete in ~3-4 hr): T=3 grown sd=2, T-SAE WS sd=2,
+Galaxy 4 sd=42+sd=1+sd=2, Galaxy 6 sd=42+sd=1+sd=2.
 
 ### Files for paper
 
