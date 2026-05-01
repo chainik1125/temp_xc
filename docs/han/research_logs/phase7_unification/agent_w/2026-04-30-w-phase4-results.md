@@ -518,6 +518,8 @@ This per-class pattern is **structurally different** from MaxPool (which wins br
 
 **Paper narrative implication**: the TXC-family advantage at coh ≥ 1.5/1.75 is *concept-class-conditional*. The aggregate Δ ≥ +0.4 wins are driven by sentiment + (stylistic-for-MaxPool / knowledge-for-OBLIT/Contrast-RE / sentiment-for-Contrast-V6). Discourse and safety remain T-SAE territory regardless of TXC arch. This is a more nuanced claim than "TXC wins on coherent steering" — the win is real, structurally explained, and class-conditional.
 
+**Paper figure**: `plots/mystery_arch_per_class_signature.png` (`plot_mystery_arch_per_class.py`). Shows all 4 mystery-arch RE cells (OBLIT/MaxPool/Contrast/Contrast-V6) vs T-SAE k=20 anchor at coh ≥ 1.5 and 1.75. Sentiment universally TXC-favored; other classes split by arch.
+
 ### V3 dec-additive — a CROSS-ARCH winning protocol at coh ≥ 1.75
 
 V3 dec-additive (no encoder pass; just `s × W_dec[picked, :, :]` at
