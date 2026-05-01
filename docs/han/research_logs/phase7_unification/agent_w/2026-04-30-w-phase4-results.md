@@ -229,6 +229,36 @@ remarkably the cliff value is IDENTICAL across coh thresholds 1.5–2.0
 So the cross-pod variance is small for canonical protocols. Y's sd=42 numbers
 reproduce on W-pod.
 
+### K=2 multi-feature multi-seed verify — Y's lever-B FAILS at multi-seed
+
+Y observed K=2 sd=42 hit unc=1.733 (close to T-SAE 1.80) and Δ=+0.63 at coh ≥ 1.5
+— a possible "TXC beats T-SAE on every metric" headline. Y explicitly recommended
+multi-seed verification.
+
+**Result: K=2 collapses on sd=1 and sd=2 — does NOT generalize.**
+
+| seed | source | cliff @ coh ≥ 1.5 | unc peak |
+|---|---|---|---|
+| sd=42 | Y's existing | 1.733 | 1.733 |
+| sd=1 | W's fresh ckpt | **0.233** | 0.233 |
+| sd=2 | W's fresh ckpt | **0.133** | 0.167 |
+| n=3 mean-curve | | 0.422 | 0.678 |
+
+**Δ K=2 n=3 vs T-SAE 1.80 unc = −1.122** (massive loss).
+
+**Why**: K=2 clamps top-1 + top-2 features per concept. Across seeds, top-2 picks
+DIFFERENT features (e.g., harmful_content top-2 at sd=42 = [491, 744] vs sd=1 = [362, 1142]).
+While top-1 is consistently the concept feature, top-2 is an UNRELATED-but-co-active
+feature on concept examples. Clamping the unrelated feature dilutes/redirects steering
+into the wrong concept direction.
+
+Sample sd=1 K=2 generation for "harmful_content" at s_norm=5: math/HTML content
+(no harmful), vs sd=42 which produces text about a shooting victim. Per-seed feature
+top-2 choice is brittle.
+
+**Conclusion**: Lever B is not paper-grade. Y's sd=42 result was a LUCKY single-seed
+selection of mutually-coherent top-2 features. The multi-seed verify (W) shoots it down.
+
 ### V3 dec-additive — a CROSS-ARCH winning protocol at coh ≥ 1.75
 
 V3 dec-additive (no encoder pass; just `s × W_dec[picked, :, :]` at
