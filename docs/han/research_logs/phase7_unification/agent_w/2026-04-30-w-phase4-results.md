@@ -306,7 +306,24 @@ than canonical "feature linearly related to all positions".
 
 **Hypothesis confirmed**: max-pool's disjunctive "feature active SOMEWHERE in window" gives sharper, higher-confidence steering features. Different concepts can fire at different positions, but max-pool aggregates the maximum signal — the "any position activates" semantics is well-suited for steering.
 
-⚠️ **Critical caveat: SINGLE SEED. Multi-seed verification mandatory before paper claim.**
+⚠️ **Critical caveat: SINGLE SEED. Multi-seed verification mandatory before paper claim.** sd=1 training in flight (queued), sd=2 to follow.
+
+### MYSTERY arch: Contrastive-merge TXC (end-vs-start) sd=42
+
+`TXCContrastiveMergeH8`: encoder `z = enc(x[T-1]) - enc(x[0])` (captures CHANGE).
+For T=2: `z = enc(latest) - enc(prior)`.
+
+**Contrastive sd=42 results** (right-edge + V3 only — V5/V6/per-position silently failed; need re-run):
+
+| protocol | @1.5 | @1.75 | @2.0 | Δ@1.5 | Δ@1.75 |
+|---|---|---|---|---|---|
+| right-edge | **1.633** | 0.400 | 0.400 | **+0.466** ⭐ | +0.067 (TIE) |
+| V3 dec-additive | 1.067 | 0.367 | 0.333 | −0.100 | +0.034 (TIE) |
+
+Contrastive right-edge sd=42 cliff @ coh ≥ 1.5 = **1.633** (Δ=+0.466, prereg WIN!).
+Different mechanism than MaxPool: instead of "feature active SOMEWHERE in window", contrastive captures "feature TRANSITION across window". Right-edge protocol matches the contrastive temporal direction (later position).
+
+⚠️ Single-seed only. Multi-seed verification needed. Multiplicative-merge attempt failed (slow convergence, killed at 60min).
 
 ### V3 dec-additive — a CROSS-ARCH winning protocol at coh ≥ 1.75
 
