@@ -1,0 +1,101 @@
+[
+  {
+    "cell": "Contrastive H8 RE",
+    "thr": 1.5,
+    "cell_cliff": 1.4444444444444444,
+    "anchor_cliff": 0.24444444444444444,
+    "delta_pt": 1.2,
+    "delta_boot_mean": 1.0123,
+    "ci_lo": -0.0669444444444445,
+    "ci_hi": 1.5777777777777777,
+    "sig_at_0": false
+  },
+  {
+    "cell": "Contrastive H8 RE",
+    "thr": 1.75,
+    "cell_cliff": 0.2,
+    "anchor_cliff": 0.24444444444444444,
+    "delta_pt": -0.044444444444444425,
+    "delta_boot_mean": 0.09481111111111114,
+    "ci_lo": -0.13333333333333333,
+    "ci_hi": 1.4002777777777777,
+    "sig_at_0": false
+  },
+  {
+    "cell": "Contrastive H8 RE",
+    "thr": 2.0,
+    "cell_cliff": 0.2,
+    "anchor_cliff": 0.24444444444444444,
+    "delta_pt": -0.044444444444444425,
+    "delta_boot_mean": -0.04426666666666666,
+    "ci_lo": -0.1444444444444444,
+    "ci_hi": 0.022222222222222254,
+    "sig_at_0": false
+  },
+  {
+    "cell": "MaxPool H8 RE",
+    "thr": 1.5,
+    "cell_cliff": 1.3555555555555554,
+    "anchor_cliff": 0.24444444444444444,
+    "delta_pt": 1.111111111111111,
+    "delta_boot_mean": 1.0071333333333334,
+    "ci_lo": -0.0888888888888889,
+    "ci_hi": 1.5222222222222224,
+    "sig_at_0": false
+  },
+  {
+    "cell": "MaxPool H8 RE",
+    "thr": 1.75,
+    "cell_cliff": 0.23333333333333334,
+    "anchor_cliff": 0.24444444444444444,
+    "delta_pt": -0.0111111111111111,
+    "delta_boot_mean": 0.07036666666666667,
+    "ci_lo": -0.1222222222222222,
+    "ci_hi": 1.3891666666666664,
+    "sig_at_0": false
+  },
+  {
+    "cell": "MaxPool H8 RE",
+    "thr": 2.0,
+    "cell_cliff": 0.23333333333333334,
+    "anchor_cliff": 0.24444444444444444,
+    "delta_pt": -0.0111111111111111,
+    "delta_boot_mean": -0.0146,
+    "ci_lo": -0.1113888888888889,
+    "ci_hi": 0.1111111111111111,
+    "sig_at_0": false
+  },
+  {
+    "cell": "OBLIT H8 RE",
+    "thr": 1.5,
+    "cell_cliff": 1.277777777777778,
+    "anchor_cliff": 0.24444444444444444,
+    "delta_pt": 1.0333333333333334,
+    "delta_boot_mean": 1.0599,
+    "ci_lo": 0.6441666666666667,
+    "ci_hi": 1.4447222222222222,
+    "sig_at_0": true
+  },
+  {
+    "cell": "OBLIT H8 RE",
+    "thr": 1.75,
+    "cell_cliff": 1.277777777777778,
+    "anchor_cliff": 0.24444444444444444,
+    "delta_pt": 1.0333333333333334,
+    "delta_boot_mean": 0.6853444444444445,
+    "ci_lo": -0.1111111111111111,
+    "ci_hi": 1.3888888888888888,
+    "sig_at_0": false
+  },
+  {
+    "cell": "OBLIT H8 RE",
+    "thr": 2.0,
+    "cell_cliff": 0.2111111111111111,
+    "anchor_cliff": 0.24444444444444444,
+    "delta_pt": -0.033333333333333326,
+    "delta_boot_mean": 0.010966666666666668,
+    "ci_lo": -0.12222222222222223,
+    "ci_hi": 0.9777777777777779,
+    "sig_at_0": false
+  }
+]

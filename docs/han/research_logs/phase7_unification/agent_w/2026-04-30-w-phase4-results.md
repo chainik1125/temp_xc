@@ -403,6 +403,29 @@ The paper should report BOTH protocols. The normalised one is the fair cross-arc
 
 `absolute_strength_n3_summary.json` saves the full per-strength breakdown.
 
+#### Bootstrap 95% CIs on paper-protocol Δs (concept-resampled, 1000 trials)
+
+| cell | coh ≥ | cliff | anchor | Δ_pt | Δ_mean | 95% CI | sig? |
+|---|---|---|---|---|---|---|:---:|
+| **OBLIT H8 RE** | **1.5** | **1.278** | 0.244 | **+1.033** | +1.060 | **[+0.644, +1.445]** | **✓ SIG** ⭐⭐⭐ |
+| OBLIT H8 RE | 1.75 | 1.278 | 0.244 | +1.033 | +0.685 | [−0.111, +1.389] | borderline |
+| OBLIT H8 RE | 2.0  | 0.211 | 0.244 | −0.033 | +0.011 | [−0.122, +0.978] | TIE |
+| Contrastive H8 RE | 1.5 | 1.444 | 0.244 | +1.200 | +1.012 | [−0.067, +1.578] | borderline (point WIN) |
+| Contrastive H8 RE | 1.75 | 0.200 | 0.244 | −0.044 | +0.095 | [−0.133, +1.400] | TIE |
+| Contrastive H8 RE | 2.0  | 0.200 | 0.244 | −0.044 | −0.044 | [−0.144, +0.022] | TIE |
+| MaxPool H8 RE | 1.5 | 1.356 | 0.244 | +1.111 | +1.007 | [−0.089, +1.522] | borderline (point WIN) |
+| MaxPool H8 RE | 1.75 | 0.233 | 0.244 | −0.011 | +0.070 | [−0.122, +1.389] | TIE |
+| MaxPool H8 RE | 2.0  | 0.233 | 0.244 | −0.011 | −0.015 | [−0.111, +0.111] | TIE |
+
+**Bootstrap-significance reading under paper-protocol**:
+
+- **OBLIT H8 RE is the cleanest stat-sig WIN at coh ≥ 1.5** — CI=[+0.644, +1.445], strictly positive. The combination of large point estimate (+1.033) AND tight CI is what makes this paper-grade. Reason: OBLIT's coh at strength=100 is robustly 1.80, well above the 1.5 threshold — concept-resampling rarely pushes the mean coh below 1.5, so the cliff is robust.
+- **Contrastive/MaxPool point Δ +1.0+ but CI borderline**: their coh at strength=100 is 1.60–1.61 — *above* but *near* the 1.5 floor. Concept-resampling can push the per-bootstrap-sample mean coh just under 1.5 for some samples, in which case the cliff drops to the s=10 fallback (succ ≈ 0.20). The wide CI reflects this concept-level instability at the boundary, not seed-noise (which is tight per the per-seed analysis).
+
+**Interpretation**: under paper-protocol, the **OBLIT H8 RE n=3 cell is the most defensible single paper-grade claim** — large Δ AND bootstrap-SIG. Contrastive and MaxPool show large point WINs but their CIs cross 0 because they sit closer to the coh-cliff boundary.
+
+`absolute_strength_bootstrap_cis.json` saves the full bootstrap output.
+
 ### 🔬 T-SAE k=20 ANCHOR SANITY-CHECK (same-pod n=3 retrain — UPDATES TXC Δ values)
 
 **Han flagged that the T-SAE k=20 peak success 1.80 looked "suspiciously high" for the baseline.** W ran a same-pod retrain of sd=1 + sd=2 (sd=42 was already on this pod) for clean apples-to-apples comparison. Findings:
