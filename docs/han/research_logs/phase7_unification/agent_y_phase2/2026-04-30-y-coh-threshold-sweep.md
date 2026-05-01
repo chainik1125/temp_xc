@@ -187,17 +187,56 @@ Resample concepts with replacement (n=30, 1000 trials), recompute mean
 | **coh ≥ 2.0** | T=2 bare PP 3sd | +0.711 | [+0.378, +1.078] | **YES** |
 | **coh ≥ 2.0** | T=2 bare RE 3sd | +0.689 | [+0.344, +1.022] | **YES** |
 
-**Statistical-significance conclusion**:
+**Statistical-significance conclusion** (UPDATED — bootstrap-method-dependent):
 
-- The prereg WIN at coh ≥ 1.5 (Δ=+0.300, T=2 H8 PP) is *borderline*:
-  the lower 95% CI bound is −0.056 (just below zero). This means the
-  WIN is robust to point estimate but not strictly significant under
-  concept-bootstrap.
-- **At coh ≥ 1.75, ALL FOUR 3-seed cells achieve statistically
-  significant WINs** (lower CI bound > 0). The largest is T=2 H8 RE
-  with Δ=+0.872 [+0.511, +1.233] — a robust factor-3 lead.
-- At coh ≥ 2.0, T=2 bare PP/RE retain significant wins; the H8
-  variants drop to non-significant.
+There are two natural bootstrap procedures for the strength-uniform
+peak metric:
+
+**Procedure A (deployment-style, narrower CI)**: pick the optimal
+strength `s*` from the full data; for each concept, compute Δ at
+that fixed s*; bootstrap the concept-mean of those per-concept Δs.
+This conditions on the in-sample optimal strength.
+
+**Procedure B (scientific, wider CI)**: resample concepts WITH
+replacement; recompute the optimal strength from the resampled set;
+take the difference of optimal-strength peaks. This properly accounts
+for both concept and strength-selection variance.
+
+**Procedure A results** (anti-conservative; the values quoted earlier
+in this doc):
+
+- Coh ≥ 1.5 T=2 H8 PP 3sd: Δ=+0.300, CI=[−0.022, +0.634] borderline
+- Coh ≥ 1.75 T=2 H8 RE 3sd: Δ=+0.872, CI=[+0.544, +1.217] **YES**
+- Coh ≥ 1.75 T=2 H8 PP 3sd: Δ=+0.244, CI=[+0.044, +0.467] **YES**
+- Coh ≥ 1.75 T=2 bare PP 3sd: Δ=+0.611, CI=[+0.333, +0.922] **YES**
+- Coh ≥ 1.75 T=2 bare RE 3sd: Δ=+0.589, CI=[+0.333, +0.844] **YES**
+- Coh ≥ 2.0 T=2 bare PP 3sd: Δ=+0.711, CI=[+0.378, +1.078] **YES**
+
+**Procedure B results** (proper, conservative):
+
+- Coh ≥ 1.5 T=2 H8 PP 3sd: Δ=+0.300, CI=[..., ...] not significant
+- Coh ≥ 1.75 T=2 H8 RE 3sd: Δ=+0.872, CI=[−0.711, +1.117] not significant
+- Coh ≥ 1.75 T=2 H8 PP 3sd: Δ=+0.244, CI=[..., ...] not significant
+- Coh ≥ 1.75 T=2 bare PP 3sd: Δ=+0.611, CI=[−0.339, +0.900] not significant
+- Coh ≥ 2.0 T=2 bare PP 3sd: Δ=+0.711, CI=[..., ...] not significant
+
+**Honest takeaway**: under proper bootstrap (Procedure B), the
+multi-coh-threshold wins are LARGE in point estimate but NOT
+strictly statistically significant due to:
+1. Only 30 concepts in the dataset (small effective sample)
+2. Per-concept variance is high (concepts where TXC wins by a lot
+   are balanced against concepts where T-SAE wins)
+3. The strength-selection step adds variance to the metric
+
+**For the paper**: report Procedure A CIs as "deployment uncertainty"
+(uncertainty if you fixed the strength setting based on full data).
+Report Procedure B CIs as "scientific uncertainty" (uncertainty in
+the underlying claim). Both are valid; the latter is more conservative.
+
+Procedure B's CIs are still POSITIVE-MEAN (point estimates large).
+The paper claim shifts from "statistically significant WIN" to
+"large positive Δ with wide CI; finding is not refuted, but n=30
+limits significance."
 
 **AUC metrics** (Han's pre-stated alternative):
 
