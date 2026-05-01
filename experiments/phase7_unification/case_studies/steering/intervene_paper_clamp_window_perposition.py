@@ -102,7 +102,12 @@ def _decode_full_window(sae, src_class: str, z, T: int):
 
 
 def _build_hook(sae, src_class, T, strengths_t, state, position_weights):
-    """position_weights: list[float] length T applied to within-window position ti."""
+    """position_weights: list[float] length T applied to within-window position ti.
+
+    state['feature_idx'] is either an int (single-feature, original behavior)
+    OR a list[int] (Lever B multi-feature; clamps every listed feature to
+    strength simultaneously).
+    """
     sae_dtype = torch.float32
     pw = list(position_weights)
 
@@ -111,6 +116,8 @@ def _build_hook(sae, src_class, T, strengths_t, state, position_weights):
         feat = state["feature_idx"]
         if feat is None:
             return None
+        # Normalise to list-of-ints for uniform handling.
+        feats = [int(feat)] if isinstance(feat, (int,)) else list(feat)
         Bh, S, d_in = h.shape
         if S < T:
             return None
@@ -126,7 +133,8 @@ def _build_hook(sae, src_class, T, strengths_t, state, position_weights):
             z = sae.encode(flat)
             x_hat_orig_full = _decode_full_window(sae, src_class, z, T)  # (B*K, T, d_in)
             z_c = z.clone().reshape(Bh, K, -1)
-            z_c[:, :, feat] = strengths_t.view(Bh, 1).expand(Bh, K)
+            for f_i in feats:
+                z_c[:, :, f_i] = strengths_t.view(Bh, 1).expand(Bh, K)
             z_c = z_c.reshape(Bh * K, -1)
             x_hat_steer_full = _decode_full_window(sae, src_class, z_c, T)
             delta_W = (x_hat_steer_full - x_hat_orig_full).reshape(Bh, K, T, d_in)
@@ -168,6 +176,7 @@ def steer_for_arch(
     out_subdir: str = OUT_SUBDIR,
     seed: int = 42,
     position_weights_spec: str = "uniform",
+    top_k_features: int = 1,
 ) -> None:
     log_path = OUT_DIR / "training_logs" / f"{arch_id}__seed{seed}.json"
     ckpt_path = OUT_DIR / "ckpts" / f"{arch_id}__seed{seed}.pt"
@@ -210,13 +219,15 @@ def steer_for_arch(
     pw_list, pw_slug = parse_position_weights(position_weights_spec, T)
     base_subdir = out_subdir if seed == 42 else f"{out_subdir}_seed{seed}"
     actual_subdir = base_subdir if pw_slug == "uniform" else f"{base_subdir}_{pw_slug}"
+    if top_k_features > 1:
+        actual_subdir = f"{actual_subdir}_topk{top_k_features}"
     out_path = CASE_STUDIES_DIR / actual_subdir / arch_id / "generations.jsonl"
     if out_path.exists() and not force:
         print(f"  [skip] {arch_id}: {out_path} exists (use --force)")
         return
     out_path.parent.mkdir(parents=True, exist_ok=True)
     print(f"  position_weights[{position_weights_spec}] → "
-          f"{[round(w, 3) for w in pw_list]}  out_subdir={actual_subdir}")
+          f"{[round(w, 3) for w in pw_list]}  top_k={top_k_features}  out_subdir={actual_subdir}")
 
     from transformers import AutoModelForCausalLM, AutoTokenizer
     tokenizer = AutoTokenizer.from_pretrained(SUBJECT_MODEL)
@@ -251,8 +262,18 @@ def steer_for_arch(
     try:
         with open(out_path, "w") as f_out:
             for ci, (concept_id, sel_data) in enumerate(concepts_items):
-                feature_idx = int(sel_data["best_feature_idx"])
-                state["feature_idx"] = feature_idx
+                # Lever B: pick top-K features per concept from feature_selection.json::top_5
+                if top_k_features > 1:
+                    top_list = sel_data.get("top_5", [])
+                    feature_ids = [int(t["feature_idx"]) for t in top_list[:top_k_features]]
+                    if len(feature_ids) < top_k_features:
+                        # Concept didn't have K candidates listed; back-fill with best.
+                        feature_ids += [int(sel_data["best_feature_idx"])] * (top_k_features - len(feature_ids))
+                    state["feature_idx"] = feature_ids
+                    feature_idx = feature_ids  # recorded in row
+                else:
+                    feature_idx = int(sel_data["best_feature_idx"])
+                    state["feature_idx"] = feature_idx
                 with torch.no_grad():
                     out_ids = subject.generate(
                         prompt_ids, attention_mask=prompt_attn,
@@ -276,6 +297,7 @@ def steer_for_arch(
                         "T": T,
                         "position_weights_spec": position_weights_spec,
                         "position_weights": [float(w) for w in pw_list],
+                        "top_k_features": top_k_features,
                     }
                     if s_norm is not None:
                         row["s_norm"] = float(s_norm)
@@ -313,6 +335,10 @@ def main() -> None:
                          "Presets: uniform (default), right-heavy, right-only, "
                          "gaussian. Or comma-separated floats matching T "
                          "(e.g. '0.5,1.0' for T=2).")
+    ap.add_argument("--top-k-features", type=int, default=1,
+                    help="Lever B: clamp top-K features per concept simultaneously "
+                         "(default 1 = single best feature). Pulls top-K from "
+                         "feature_selection.json::top_5.")
     args = ap.parse_args()
     banner(__file__)
     z_mag_path = Path(args.z_mag) if args.normalised else None
@@ -320,12 +346,13 @@ def main() -> None:
         raise SystemExit(f"missing Q1.1 output at {z_mag_path}")
     for arch_id in args.archs:
         print(f"\n=== {arch_id} seed={args.seed} pw={args.position_weights} "
-              f"(per-position window clamp) ===")
+              f"top_k={args.top_k_features} (per-position window clamp) ===")
         steer_for_arch(arch_id, z_magnitude_path=z_mag_path,
                        use_normalised=args.normalised,
                        force=args.force, limit_concepts=args.limit_concepts,
                        seed=args.seed,
-                       position_weights_spec=args.position_weights)
+                       position_weights_spec=args.position_weights,
+                       top_k_features=args.top_k_features)
 
 
 if __name__ == "__main__":
