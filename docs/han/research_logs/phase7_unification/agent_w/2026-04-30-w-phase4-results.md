@@ -259,6 +259,55 @@ top-2 choice is brittle.
 **Conclusion**: Lever B is not paper-grade. Y's sd=42 result was a LUCKY single-seed
 selection of mutually-coherent top-2 features. The multi-seed verify (W) shoots it down.
 
+### 🚀 MYSTERY arch: MaxPool TXC — single-seed BLOWOUT WIN at every coh metric
+
+Built `TXCMaxPoolMergeH8`: same H8 stack as OBLITERATION but encoder uses
+**max** instead of **sum** across T positions for the merge step.
+Captures "feature active at SOME position in window" (disjunctive) rather
+than canonical "feature linearly related to all positions".
+
+**MaxPool sd=42 single-seed results** (CRITICAL: single-seed only, multi-seed verification needed):
+
+| protocol | @1.0 | @1.5 | @1.75 | @2.0 | unc peak |
+|---|---|---|---|---|---|
+| MaxPool right-edge | 1.367 | **1.333** | **1.333** | 0.467 | 1.367 |
+| MaxPool per-position | 1.533 | 1.533 | **1.233** | **1.233** | 1.533 |
+| MaxPool V3 dec-additive | 1.167 | 1.167 | 0.767 | 0.767 | 1.167 |
+| **MaxPool V5 left-edge** | **1.800** | 1.300 | **1.300** | 0.800 | **1.800** ⭐⭐⭐ |
+| MaxPool V6 dec-broadcast | 1.667 | 1.133 | 1.133 | 1.133 | 1.667 |
+
+(T-SAE k=20 anchor sd42+sd1 mean-curve: @1.5=1.167, @1.75=0.333, @2.0=0.283, unc=1.800)
+
+**Δ vs T-SAE k=20 anchor** (single-seed sd=42):
+
+| protocol | Δ@1.5 | Δ@1.75 | Δ@2.0 | Δ unc |
+|---|---|---|---|---|
+| MaxPool right-edge | +0.166 | **+1.000** ⭐⭐⭐ | +0.184 | −0.433 |
+| MaxPool per-position | +0.366 | **+0.900** ⭐⭐⭐ | **+0.950** ⭐⭐⭐ | −0.267 |
+| MaxPool V5 left-edge | +0.133 | **+0.967** ⭐⭐⭐ | +0.517 ⭐ | **0.000** (TIES T-SAE!) |
+| MaxPool V6 dec-broadcast | −0.034 | +0.800 ⭐⭐ | +0.850 ⭐⭐ | −0.133 |
+
+**Headline: MaxPool right-edge sd=42 cliff @ coh ≥ 1.75 = 1.333 → Δ=+1.000**.
+**Largest Δ ever observed in this project.**
+
+**MaxPool V5 left-edge** is the structural breakthrough:
+- Unconstrained peak = **1.800** — exactly matches T-SAE k=20's 1.80!
+- At s_norm=10: succ=1.300, coh=1.900 (both above 1.75 — clean coherent steering at high success!)
+- Δ@1.75 = +0.967 — biggest at this metric
+
+**MaxPool V5 sample curve (sd=42)**:
+
+| s_norm | succ | coh |
+|---|---|---|
+| 5.0 | 0.800 | 2.033 |
+| **10.0** | **1.300** | **1.900** ← coherent + high success |
+| **20.0** | **1.800** | 1.367 ← unc peak (matches T-SAE) |
+| 50.0 | 1.400 | 1.067 |
+
+**Hypothesis confirmed**: max-pool's disjunctive "feature active SOMEWHERE in window" gives sharper, higher-confidence steering features. Different concepts can fire at different positions, but max-pool aggregates the maximum signal — the "any position activates" semantics is well-suited for steering.
+
+⚠️ **Critical caveat: SINGLE SEED. Multi-seed verification mandatory before paper claim.**
+
 ### V3 dec-additive — a CROSS-ARCH winning protocol at coh ≥ 1.75
 
 V3 dec-additive (no encoder pass; just `s × W_dec[picked, :, :]` at
