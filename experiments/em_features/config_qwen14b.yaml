@@ -1,0 +1,35 @@
+subject_model: Qwen/Qwen2.5-14B-Instruct
+bad_model: ModelOrganismsForEM/Qwen2.5-14B-Instruct_R1_0_1_0_finance_extended_train
+d_model: 5120
+layer_txc: 24
+
+txc:
+  d_sae: 16384
+  T: 5
+  k_total: 100
+  steps: 10000
+  batch_size: 512
+  lr: 3.0e-4
+
+layers_mlc: [20, 22, 24, 26, 28]
+mlc:
+  d_sae: 32768
+  k_total: 128
+  steps: 10000
+  batch_size: 256
+  lr: 3.0e-4
+  buffer_seqs: 2000
+
+streaming:
+  buffer_activations: 1000000
+  refill_chunks: 64
+  chunk_len: 256
+  corpus_mix:
+    - {name: monology/pile-uncopyrighted,  weight: 0.7, split: train}
+    - {name: HuggingFaceH4/ultrachat_200k, weight: 0.3, split: train_sft}
+
+sweep:
+  alpha_grid: [-2.0, -1.5, -1.0, -0.5, -0.25, 0.0, 0.25, 0.5]
+  k_bundle: 10
+  n_rollouts_sweep: 8
+  n_rollouts_pareto: 16

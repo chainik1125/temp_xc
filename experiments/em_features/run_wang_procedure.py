@@ -85,6 +85,17 @@ def parse_args():
     p.add_argument("--device", default="cuda")
     p.add_argument("--skip_done", action="store_true",
                    help="Skip stages whose output JSON already exists.")
+    # Model selection (defaults preserve Qwen-7B medical back-compat).
+    p.add_argument("--base_model", default="Qwen/Qwen2.5-7B-Instruct",
+                   help="Base instruct model (used as PEFT base when subject is a LoRA adapter).")
+    p.add_argument("--subject_model",
+                   default="andyrdt/Qwen2.5-7B-Instruct_bad-medical",
+                   help="Misaligned subject model (PEFT adapter or full HF id).")
+    p.add_argument("--batch_cells", type=int, default=1,
+                   help="≥2 enables batched per-element steering across cells per loop "
+                        "iteration (Wang stages 2/3/4). Default 1 = serial.")
+    p.add_argument("--gen_batch_size", type=int, default=32,
+                   help="Underlying model.generate() batch size when --batch_cells >= 2.")
     return p.parse_args()
 
 
@@ -251,12 +262,14 @@ def main():
     from open_source_em_features.utils.model_loading import load_model_and_tokenizer
     from experiments.em_features.gemini_judge import evaluate_generations_with_gemini
 
-    # Subject + base model IDs (Qwen-7B bad-medical with PEFT adapter)
-    SUBJECT = "andyrdt/Qwen2.5-7B-Instruct_bad-medical"
-    BASE = "Qwen/Qwen2.5-7B-Instruct"
+    # Subject + base model IDs (configurable via CLI; default = Qwen-7B bad-medical)
+    SUBJECT = args.subject_model
+    BASE = args.base_model
 
     print(f"[wang] arch={args.arch} ckpt={args.ckpt.name} feats={args.features_json}", flush=True)
+    print(f"[wang] base={BASE}  subject={SUBJECT}", flush=True)
     print(f"[wang] screen_top_n={args.screen_top_n}  n_survivors={args.n_survivors}  n_final={args.n_final}", flush=True)
+    print(f"[wang] batch_cells={args.batch_cells}  gen_batch_size={args.gen_batch_size}", flush=True)
 
     # Load encoder-ranked top features
     feats_d = json.loads(args.features_json.read_text())
@@ -264,7 +277,7 @@ def main():
     print(f"[wang] loaded {len(ranked)} features (top {args.screen_top_n} by Δz̄)", flush=True)
 
     # Load subject model + tokenizer once
-    print("[wang] loading subject model (bad-medical Qwen)...", flush=True)
+    print(f"[wang] loading subject model: {SUBJECT}", flush=True)
     model, tok = load_model_and_tokenizer(
         SUBJECT, base_model_id=BASE, torch_dtype=torch.bfloat16, device=args.device,
     )
@@ -273,6 +286,36 @@ def main():
     model.eval()
     em = load_em_dataset()
     questions = [d["messages"][0]["content"] for d in em]
+
+    def _gens_for_cells(cells, n_rollouts):
+        """Generate completions for a list of (direction, alpha) cells.
+
+        Returns list-of-list of dicts: result[i] = list of n_rollouts*len(questions)
+        gens for cell i. Branches on args.batch_cells: 1 = serial (back-compat),
+        ≥2 = batched in chunks of size args.batch_cells via run_batched_alpha_cells.
+        """
+        if args.batch_cells <= 1:
+            return [
+                run_alpha_for_feature(
+                    generate_fn=generate_longform_completions,
+                    model=model, tokenizer=tok, questions=questions, layer=args.layer,
+                    direction=d, alpha=a, n_rollouts=n_rollouts,
+                    max_new_tokens=args.max_new_tokens, seed=args.seed,
+                )
+                for (d, a) in cells
+            ]
+        out = [None] * len(cells)
+        for s in range(0, len(cells), args.batch_cells):
+            chunk = cells[s:s + args.batch_cells]
+            per_cell = run_batched_alpha_cells(
+                model=model, tokenizer=tok, questions=questions, layer=args.layer,
+                cells=chunk, n_rollouts=n_rollouts,
+                max_new_tokens=args.max_new_tokens, seed=args.seed,
+                gen_batch_size=args.gen_batch_size,
+            )
+            for j, gens in enumerate(per_cell):
+                out[s + j] = gens
+        return out
 
     # ===== Stage 2: causal screen =====
     screen_path = args.out / "stage2_screen.json"
@@ -286,14 +329,12 @@ def main():
             fid = f["feature_id"]
             t0 = time.time()
             direction = load_steerer_decoder_row(args.arch, args.ckpt, fid, args.device)
+            stage2_alphas = (-args.screen_alpha, args.screen_alpha)
+            cells = [(direction, alpha) for alpha in stage2_alphas]
+            gens_per_cell = _gens_for_cells(cells, args.screen_rollouts)
             results = {}
-            for alpha in (-args.screen_alpha, args.screen_alpha):
-                gens = run_alpha_for_feature(
-                generate_fn=generate_longform_completions,
-                    model=model, tokenizer=tok, questions=questions, layer=args.layer,
-                    direction=direction, alpha=alpha, n_rollouts=args.screen_rollouts,
-                    max_new_tokens=args.max_new_tokens, seed=args.seed,
-                )
+            for ci, alpha in enumerate(stage2_alphas):
+                gens = gens_per_cell[ci]
                 a, c = asyncio.run(evaluate_generations_with_gemini(
                     gens, model_name=args.judge_model, max_concurrent=args.max_concurrent,
                     temperature=args.judge_temperature,
@@ -382,13 +423,10 @@ def main():
             direction = load_steerer_decoder_row(args.arch, args.ckpt, fid, args.device)
             curve = []
             best_strong = None
-            for alpha in strength_alphas:
-                gens = run_alpha_for_feature(
-                    generate_fn=generate_longform_completions,
-                    model=model, tokenizer=tok, questions=questions, layer=args.layer,
-                    direction=direction, alpha=alpha, n_rollouts=args.strength_rollouts,
-                    max_new_tokens=args.max_new_tokens, seed=args.seed,
-                )
+            cells = [(direction, alpha) for alpha in strength_alphas]
+            gens_per_cell = _gens_for_cells(cells, args.strength_rollouts)
+            for ci, alpha in enumerate(strength_alphas):
+                gens = gens_per_cell[ci]
                 a, c = asyncio.run(evaluate_generations_with_gemini(
                     gens, model_name=args.judge_model, max_concurrent=args.max_concurrent,
                     temperature=args.judge_temperature,
@@ -492,15 +530,11 @@ def main():
                 print(f"[stage4] feat {fid}: resuming with {len(rows)}/{len(final_alphas)} alphas done", flush=True)
             except Exception:
                 rows = []
-        for alpha in final_alphas:
-            if alpha in completed_alphas:
-                continue
-            gens = run_alpha_for_feature(
-                generate_fn=generate_longform_completions,
-                model=model, tokenizer=tok, questions=questions, layer=args.layer,
-                direction=direction, alpha=alpha, n_rollouts=args.final_rollouts,
-                max_new_tokens=args.max_new_tokens, seed=args.seed,
-            )
+        remaining_alphas = [a for a in final_alphas if a not in completed_alphas]
+        cells = [(direction, alpha) for alpha in remaining_alphas]
+        gens_per_cell = _gens_for_cells(cells, args.final_rollouts) if cells else []
+        for ci, alpha in enumerate(remaining_alphas):
+            gens = gens_per_cell[ci]
             a, c = asyncio.run(evaluate_generations_with_gemini(
                 gens, model_name=args.judge_model, max_concurrent=args.max_concurrent,
                 temperature=args.judge_temperature,
