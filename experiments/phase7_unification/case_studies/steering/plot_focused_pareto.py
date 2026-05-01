@@ -58,6 +58,15 @@ INVENTORY = [
         ("steering_paper_window_perposition_seed1",   "per-position", 1),
         ("steering_paper_window_perposition_seed2",   "per-position", 2),
     ]),
+    # Galaxy 8 (TXCSoftMaxPool) — Y's new BEST cell (Δ=+1.089 PP @ coh ≥ 1.75)
+    ("txc_softmaxpool_t2_kpos20", "T=2 Galaxy 8 SoftMaxPool (Y)", "#2ca02c", [
+        ("steering_paper_normalised",                 "right-edge",   42),
+        ("steering_paper_normalised_seed1",           "right-edge",   1),
+        ("steering_paper_normalised_seed2",           "right-edge",   2),
+        ("steering_paper_window_perposition",         "per-position", 42),
+        ("steering_paper_window_perposition_seed1",   "per-position", 1),
+        ("steering_paper_window_perposition_seed2",   "per-position", 2),
+    ]),
 ]
 
 
@@ -176,9 +185,9 @@ def main():
         ax.legend(loc="upper right", fontsize=9, framealpha=0.95)
 
     fig.suptitle(
-        "Phase 7 focused matched-sparsity Pareto: T-SAE baseline vs 3 best TXC architectures\n"
+        "Phase 7 focused matched-sparsity Pareto: T-SAE baseline vs 4 best TXC architectures\n"
         "stars mark cliff @ coh >= 1.5 (PRREG metric); dashed green = +0.27 WIN threshold; "
-        "Contrastive-merge RE leads at 1.578 (Delta = +0.411, paper-grade WIN)",
+        "Contrastive-merge RE leads PRREG at 1.578 (Delta = +0.411); Galaxy 8 leads coh >= 1.75 PP (Delta = +1.089)",
         fontsize=12, y=1.00,
     )
     fig.tight_layout()
