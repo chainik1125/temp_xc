@@ -66,6 +66,7 @@ We have a Qwen-7B-Instruct base + PEFT-LoRA fine-tune (`andyrdt/Qwen2.5-7B-Instr
 | variant                                                          | feat   | α   | align     | coh   | ckpt path                                                                                       |
 | ---------------------------------------------------------------- | ------ | --- | --------- | ----- | ----------------------------------------------------------------------------------------------- |
 | **TXC paper-faithful k=100, d_sae=16k, T=5, BatchTopK** (champion) | 4563   | −8  | **58.47** | 30.86 | `qwen_l15_txc_paper_k100bt_d16k_step30000.pt` (h100_1)                                          |
+| **WindowedTSAE T=2 + mix + matryoshka 20% (single)**             | 14496  | +9  | **57.59** | 27.34 | `qwen_l15_wtsae_T2_mix_matr_30000step_step30000.pt` (h100_2)                                    |
 | SAE arditi 100k bundle k=30 (prior champion)                     | bundle | −10 | 57.42     | 35.78 | (existing, not retrained)                                                                       |
 | T-SAE paper-faithful k=20 BatchTopK, d_sae=16k                   | bundle | −6  | 56.23     | 34.84 | `qwen_l15_tsae_paper_k20_d16k_a01_step30000.pt`                                                 |
 | TXC paper k=20 (single)                                          | 6062   | +8  | 55.16     | 31.33 | `qwen_l15_txc_paper_k20bt_d16k_step30000.pt` (h100_1)                                           |
@@ -297,3 +298,16 @@ Already committed by overnight session (latest commit `4f77b7f` or later — che
 - Steering demo dashboard for feat 4563 (`docs/dmitry/results/em_features/steering_demo/`)
 
 Do not repeat any of those.
+
+### Snapshot at 2026-05-01 01:30 UTC firing
+
+Both prior in-flight runs DONE and pulled.
+
+- TXC paper k=20 (h100_1) — bundle 55.50, single feat 6062 = 55.16. Pulled in commit 5a4caf4c.
+- WindowedTSAE T=2 + mix + matr 20% (h100_2) — bundle 50.59 (regression vs mix-only's 55.57), single feat 14496 = 57.59 (NEW #2 SINGLE-FEATURE PEAK overall, behind only TXC k=100 4563=58.47). Pulled this firing.
+
+In flight now:
+- h100_1: TXC paper k=100 60k @ resid_post (Track C3), step ~5000/60000, log `txc_paper_k100_60k.log`. ETA training ~5-6h, then ~2h Wang.
+- h100_2: launching WindowedTSAE T=2 vanilla (Track B B1) — d_sae=32768, k=128, contrastive_alpha=0.0, mix_positions=True. Tag `vanilla_d32k_k128_mix`. ETA ~3.5h end-to-end.
+
+Disk on h100_1 was 92% used at last firing. The TXC k=100 60k will produce snapshots; future firings need to keep an eye on this.

@@ -207,3 +207,56 @@ The optimum is sharply at k=100 with ±20% in both directions costing ~3 points.
 Track B has the highest information-per-experiment value (it's a direction we haven't tested at all). C3 has the highest expected-numerical-gain value (extends the current champion). I'll launch C3 first as the cheaper safer hill-climb, since (a) we already have the launcher script, (b) it requires no code change, (c) it tests if more steps pushes 58.47 → 60+. Track B requires writing a vanilla-SAE windowed launcher (or running wtsae with `--contrastive_alpha 0.0`); will tackle next firing.
 
 **Disk first.** Need to clean up before launching C3. The k=200 ckpt (`qwen_l15_txc_paper_k200bt_d16k_step30000.pt`, ~5 GB) is fully HF-mirrored and Wang-done — safest to delete. Will follow the disk-policy procedure.
+
+### 2026-05-01 01:30 UTC routine-firing update — WindowedTSAE T=2 + mix + matryoshka done
+
+Pulled from h100_2. Bundle k=30 frontier and Stage 4 finalists computed.
+
+**Bundle k=30 peak: 50.59 align at α=−1, coh=23.91** (α=0 baseline 43.28).
+
+Stage 4 single-feature finalists (top-3 from ΔẑΔz̄ + screen + strength funnel):
+
+| feat   | Δz̄    | peak α | peak align | peak coh | α=0 align |
+|-------:|------:|-------:|-----------:|---------:|----------:|
+| 11791  | +0.15 |  −10   | 54.61      | 33.67    | 41.89     |
+|  7619  | +0.09 |   −3   | 53.66      | 25.55    | 45.26     |
+| **14496** | **+0.02** | **+9** | **57.59** | **27.34** | **44.37** |
+
+**Best single-feature peak: feat 14496, α=+9, align=57.59, coh=27.34.** This is the **second-best single-feature steerer ever recorded on this organism**, behind only TXC paper k=100 feat 4563 (58.47).
+
+**Comparison across the three T=2 wtsae variants (all 30k steps, paper-faithful T-SAE recipe except the variant axis):**
+
+| variant                    | bundle peak | best single feat | single peak | single coh |
+|----------------------------|------------:|-----------------:|------------:|-----------:|
+| original (M=I, no matr)    | 51.27       | feat 14475 (α+8) | 55.44       | 31.95      |
+| + mix_positions            | **55.57**   | feat 8017 (α−6)  | 54.58       | 28.05      |
+| + matryoshka 20% only      | 50.35       | feat (n/a)       | ~49.0       | n/a        |
+| **+ mix + matryoshka 20%** | 50.59       | **feat 14496 (α+9)** | **57.59** | **27.34**  |
+
+**What this likely means.** Two contrasting effects:
+1. **Bundle dropped vs mix-only** (55.57 → 50.59). Adding matryoshka on top of mix hurts the *aggregate* features metric. Consistent with matr-only also being a regression.
+2. **Single jumped vs mix-only** (54.58 → 57.59, +3.01). Adding matryoshka on top of mix yields a new exceptional steerer.
+
+These two effects are **not contradictory** — they are consistent with the matryoshka split forcing structure into the feature population. The contrastive loss on only the first 20% (indices < 3277) pulls those features into a more aligned subspace, but the bundle metric averages across the top-30 features by screen-score (which span both regions). The bundle drop reflects that the contrastive-trained head produces features that, while individually well-shaped, do not aggregate cleanly with the un-contrastive tail.
+
+**Crucially, feat 14496 (the 57.59 winner) has index 14496 > 3277** — it is **outside the matryoshka contrastive head**, in the unconstrained tail. Likewise feat 11791 and 7619 are also in the tail. So the single-feature win is **not** the matryoshka features being directly improved; rather the matryoshka contrastive on the first 20% appears to free up the unconstrained tail to specialize, and one tail feature happens to be an excellent steerer.
+
+This is a less robust finding than I'd like: the win is single-feature-specific and (a) doesn't show on the bundle metric and (b) comes from a feature that doesn't even participate in the constraint we added. The 57.59 may be a noisy outlier rather than a reproducible architectural win.
+
+### Decision-tree action
+
+Per the brief Track A decision rule: *"If bundle ≥ 56.23 OR single ≥ 56: T=2 with this fix WORKS. Ladder up to T=3 + same fix."*
+
+Single 57.59 ≥ 56, so the rule says to ladder T=3. But:
+
+- The bundle metric REGRESSED (50.59 vs mix-only's 55.57). That's a strong signal the recipe is hurting most features.
+- The single-feature win comes from index > 3277, which is not in the contrastive head — i.e. the matryoshka isn't directly responsible for the strong steerer.
+- The single-feature peak distribution is heavily skewed (57.59 vs 53.66 vs 54.61) — only one finalist is the high one, suggesting low robustness.
+
+A 3.5h T=3 ladder run is expensive. I prefer to first test the **complementary direction (Track B: vanilla windowed)** that we have not yet started, before committing to laddering up the matr+mix recipe. Vanilla windowed gives a clean answer to "does windowing alone help" with no contrastive confound.
+
+**Decision: launch Track B B1 (vanilla SAE windowed T=2) on h100_2 next.** Tag the run `vanilla_d32k_k128_mix` with the SAE-arditi-faithful settings (d_sae=32768, k=128, contrastive_alpha=0.0, mix_positions=True). h100_2 has 154 GB free → no disk constraint. Will pass `--d_sae 32768 --k 128 --contrastive_alpha 0.0` as EXTRA_ARGS to the existing `/tmp/run_wtsae_variant.sh` launcher (argparse takes the last value, overriding the script defaults).
+
+If Track B B1 yields a bundle peak ≥ 57.42 (matching SAE arditi 100k), we have a clean "windowing helps even without contrastive" story → ladder to T=3. If it underperforms SAE arditi 100k, then any windowing benefit requires the contrastive recipe (Track A direction is the one to push on).
+
+Will keep h100_1's TXC k=100 60k running as planned (it tests the orthogonal "more compute helps the champion" hypothesis on Track C3). At time of this firing it's at step ~5000/60000 — still ~5h to training completion + ~2h Wang.
