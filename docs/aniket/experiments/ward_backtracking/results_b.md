@@ -97,9 +97,10 @@ steps per cell. Held-out FVU early-stops the run when the eval FVU plateaus
 | TSAE (Bhalla 2025) | 3 | 32 | 768k |
 
 The leaderboard CSV at
-[`images_b/leaderboard_v2.csv`](images_b/leaderboard_v2.csv) lists all 32
-post-sweep cells (12 base + 6 lowk TXC + 4 hill-climb arch swaps + 4
-rank-axis swaps + 2 seed swaps + 4 H8/H13 contrastive).
+[`images_b/leaderboard_v2.csv`](images_b/leaderboard_v2.csv) lists all
+34 post-sweep cells (12 base + 6 lowk TXC + 4 hill-climb arch swaps +
+4 rank-axis swaps + 2 seed swaps + 2 H8/H13 contrastive + 2 Bhalla
+paper-faithful T-SAE + 2 stragglers).
 
 Top-10 by Sonnet primary, with 95% bootstrap CIs (1000 resamples, prompt-level):
 
@@ -122,6 +123,16 @@ ln1_L10 k=64). The contrastive-arch H13 CI [0.0073, 0.0123] overlaps
 plain TXC's CI — the H13 vs plain-TXC margin is within bootstrap noise
 on this 20-prompt panel, consistent with my earlier "could match with
 seed-averaging" reading.
+
+![Steering comparison bars](images_b/steering_comparison_bars.png)
+
+The bar chart above shows mean keyword rate vs steering magnitude per
+source. DoM(base)/DoM(reasoning) baselines on the left; cell sources on
+the right. Reading: the bar height tells you the kw_rate, but it doesn't
+tell you whether the generation was coherent. The Sonnet leaderboard
+above re-ranks these by "tallest bar at a magnitude that doesn't
+collapse the model" — that's why the v1 SAE leaders (tall bars at high
+magnitudes) drop down the Sonnet ordering.
 
 5 of the top 6 are TXC variants. The rank-axis swap (`__rtstat`) and the
 contrastive H13 arch each tie or come within 17% of plain TXC k=16 but do
@@ -253,7 +264,7 @@ Best Sonnet primary per arch, across all hookpoints/k/rank:
 | **TSAE (TopK variant)** | `tsae__resid_L10__k32` | **0.0039** | +12 | 0.17 |
 | **TSAE (Bhalla 2025 paper-faithful, ReLU+L1)** | `tsae_paper__resid_L10__k32` | **0.0004** | +0 | 0.07 |
 
-TXC family (plain + H8 + H13) takes positions 1, 3, 8 on the 32-cell
+TXC family (plain + H8 + H13) takes positions 1, 3, 8 on the 34-cell
 leaderboard. The best TopK SAE is 38% behind the TXC winner; the best
 Stacked SAE is 58% behind; the best TSAE is 66% behind.
 
@@ -264,6 +275,13 @@ accumulates the temporal signal TXC's shared latent is designed for).
 `attn_L10` is consistently the weakest hookpoint across all archs.
 
 ## Coherence audit
+
+![Coherence diagnostics](images_b/coherence.png)
+
+Plot above: coherence proxies (distinct-2, TTR, max same-word run) per
+source per magnitude — sprint's diagnostic, refreshed for the
+paper-budget cells. The "max same-word run" column is what the legacy
+floor checks; the Sonnet grader looks at the actual text instead.
 
 ### Sonnet 4.6 grader vs sprint's max-run-≤-2 floor
 
@@ -334,9 +352,19 @@ coherence floor:
 For B2 (cross-model temporal-firing diff), the verdict tracks the sprint:
 the strong B1 winner shows shared base-vs-reasoning encoding shape (Pattern
 1 in the sprint writeup), the weaker features show divergence (Pattern 2).
-B2 plots are refreshed at
-[`images_b/b2_difference_area.png`](images_b/b2_difference_area.png) +
-[`images_b/per_offset_firing_*.png`](images_b/).
+
+![B2 difference area per feature](images_b/b2_difference_area.png)
+
+The bars integrate `|reasoning_firing(o) − base_firing(o)|` over offsets
+`[-30, +5]` per top feature, ranked. Larger = larger reasoning-vs-base
+divergence at that feature. Per-offset firing curves per architecture
+are at [`images_b/per_offset_firing_*.png`](images_b/). Note: B2 was
+run for plain TXC / TopK SAE / Stacked SAE / TSAE-TopK; the H8/H13
+contrastive cells and the Bhalla paper-faithful cells (`tsae_paper`)
+were added later for B1-only evaluation, so they don't appear in the
+difference-area bars. Adding them is straightforward (one
+b2_cross_model.py run per cell, ~10 min each on H100) but wasn't on the
+critical path for the B1-headline verdict.
 
 ## Caveats + TODO
 
@@ -347,8 +375,13 @@ B2 plots are refreshed at
   neighborhoods (lowk TXC; H8/H13 contrastive) outside the wrapper and
   reseed via global Sonnet ranking. Cleaner fix is to inline Sonnet
   grading into `evaluate_cell` (after B1, before metric write) — TODO.
-- **n=20 eval prompts is loose.** Inherited from Stage A. Dmitry asked for
-  bootstrap CIs on the cell metric; not landed in this run (task #13).
+- **n=20 eval prompts is loose.** Inherited from Stage A. Bootstrap CIs
+  on the cell metric (Dmitry's variance-diagnostic ask) ARE landed in
+  this run — see the leaderboard table for 95% percentile bootstrap CIs
+  on every cell's Sonnet primary (1000 prompt-resamples, vectorized).
+  The CIs settle the TXC-k=16 vs best-non-TXC-family question
+  (non-overlapping) but do not break the TXC-k=16 vs H13 close call
+  (overlapping CIs — needs more seeds to resolve).
 - **Single seed (s42) per cell.** A multi-seed verification of the v2-extend
   winner is committed (`Stage B: multi-seed verification of hill-climb
   winner` — see git log) but variance was too tight to break ties with H13;
@@ -364,6 +397,17 @@ B2 plots are refreshed at
   noise. The verdict ("TXC dominates SAE family under rigorous coherence")
   doesn't depend on this cell, but the omission of a paper-faithful T-SAE
   was a real gap in the previous writeup; this fills it.
+- **B1 parallelization shipped post-run.** Per Dmitry's tip, the B1
+  steering eval was rewritten to batch all (prompt, magnitude) panels
+  through one `model.generate()` call per source instead of one call per
+  magnitude. The `_Hook` now accepts a per-batch-row magnitude tensor;
+  `gen_batch_size` bumped 8 → 36 (4 prompts × 9 mags) on H100 80GB.
+  Expected ~9× wall-clock speedup (per-cell B1: ~30 min → ~3-5 min). All
+  results above were generated under the legacy serial path; numerical
+  parity is bitwise-identical (`mag * vec` == `mags[i] * vec` per row),
+  so future cells produced under the new path will be directly
+  comparable to this leaderboard. The next sweep / multi-seed run will
+  validate the speedup in practice.
 
 ## Compute + cost
 
