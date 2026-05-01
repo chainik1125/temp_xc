@@ -125,6 +125,16 @@ CELLS = [
         ("steering_paper_normalised_seed1", "txc_softmaxpool_t2_kpos20", 1),
         ("steering_paper_normalised_seed2", "txc_softmaxpool_t2_kpos20", 2),
     ]),
+    ("Galaxy 11 softmax-pool+H8 PP (3sd)", [
+        ("steering_paper_window_perposition", "txc_softmax_pool_h8_t2_kpos20_shifts2", 42),
+        ("steering_paper_window_perposition_seed1", "txc_softmax_pool_h8_t2_kpos20_shifts2", 1),
+        ("steering_paper_window_perposition_seed2", "txc_softmax_pool_h8_t2_kpos20_shifts2", 2),
+    ]),
+    ("Galaxy 11 softmax-pool+H8 RE (3sd)", [
+        ("steering_paper_normalised", "txc_softmax_pool_h8_t2_kpos20_shifts2", 42),
+        ("steering_paper_normalised_seed1", "txc_softmax_pool_h8_t2_kpos20_shifts2", 1),
+        ("steering_paper_normalised_seed2", "txc_softmax_pool_h8_t2_kpos20_shifts2", 2),
+    ]),
     # NOTE: W's mystery archs labeled "MaxPool-merge"/"Contrastive-merge" below
     # use the canonical labels — Y's "W TXCMaxPoolMergeH8" entries deduped on rebase.
     ("T=5 bare k_win=20 PP (1sd)", [("steering_paper_window_perposition", "txc_bare_antidead_t5_kwin20", 42)]),

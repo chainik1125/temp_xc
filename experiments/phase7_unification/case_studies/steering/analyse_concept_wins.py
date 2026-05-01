@@ -74,6 +74,16 @@ CELLS = [
         ("steering_paper_window_perposition_seed1", "txc_softmaxpool_t2_kpos20", 1),
         ("steering_paper_window_perposition_seed2", "txc_softmaxpool_t2_kpos20", 2),
     ]),
+    ("Galaxy 11 softmax-pool+H8 RE", [
+        ("steering_paper_normalised", "txc_softmax_pool_h8_t2_kpos20_shifts2", 42),
+        ("steering_paper_normalised_seed1", "txc_softmax_pool_h8_t2_kpos20_shifts2", 1),
+        ("steering_paper_normalised_seed2", "txc_softmax_pool_h8_t2_kpos20_shifts2", 2),
+    ]),
+    ("Galaxy 11 softmax-pool+H8 PP", [
+        ("steering_paper_window_perposition", "txc_softmax_pool_h8_t2_kpos20_shifts2", 42),
+        ("steering_paper_window_perposition_seed1", "txc_softmax_pool_h8_t2_kpos20_shifts2", 1),
+        ("steering_paper_window_perposition_seed2", "txc_softmax_pool_h8_t2_kpos20_shifts2", 2),
+    ]),
 ]
 
 THRESHOLDS = [1.5, 1.75, 2.0]
