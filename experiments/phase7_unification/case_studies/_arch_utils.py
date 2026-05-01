@@ -91,6 +91,7 @@ WINDOW_CLASSES = {
     "TXCBareMultiDistanceContrastiveAntidead",
     "TXCMultiplicativeMergeH8",   # W's MYSTERY arch (multiplicative)
     "TXCMaxPoolMergeH8",           # W's MYSTERY arch (max-pool)
+    "TXCContrastiveMergeH8",       # W's MYSTERY arch (end-minus-start)
     "SubseqTXCBareAntidead",
     "SubseqH8",
 }
