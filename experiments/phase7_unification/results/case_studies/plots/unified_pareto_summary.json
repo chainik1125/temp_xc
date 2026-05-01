@@ -1,5 +1,14 @@
 [
   {
+    "arch_id": "txc_contrastive_h8_t2_kpos20_shifts2",
+    "label": "T=2 Contrastive-merge (W mystery)",
+    "protocol": "right-edge",
+    "n_seeds": 3,
+    "peak_unc": 1.5777777777777777,
+    "peak_coh_ge_1_5": 1.5777777777777777,
+    "delta_vs_anchor": 0.4107777777777777
+  },
+  {
     "arch_id": "txc_h8_t2_kpos20_shifts2",
     "label": "T=2 H8 shifts=(T,)",
     "protocol": "per-position",
@@ -61,6 +70,24 @@
     "peak_unc": 1.4,
     "peak_coh_ge_1_5": 1.1666666666666667,
     "delta_vs_anchor": -0.0003333333333332966
+  },
+  {
+    "arch_id": "txc_maxpool_h8_t2_kpos20_shifts2",
+    "label": "T=2 MaxPool (W mystery)",
+    "protocol": "right-edge",
+    "n_seeds": 3,
+    "peak_unc": 1.3111111111111111,
+    "peak_coh_ge_1_5": 1.1444444444444446,
+    "delta_vs_anchor": -0.02255555555555544
+  },
+  {
+    "arch_id": "txc_maxpool_h8_t2_kpos20_shifts2",
+    "label": "T=2 MaxPool (W mystery)",
+    "protocol": "per-position",
+    "n_seeds": 3,
+    "peak_unc": 1.5444444444444443,
+    "peak_coh_ge_1_5": 1.1444444444444446,
+    "delta_vs_anchor": -0.02255555555555544
   },
   {
     "arch_id": "txc_bare_antidead_t4_kpos20_grownChainFromT3",
@@ -178,6 +205,15 @@
     "peak_unc": 1.2,
     "peak_coh_ge_1_5": 0.9,
     "delta_vs_anchor": -0.267
+  },
+  {
+    "arch_id": "txc_contrastive_h8_t2_kpos20_shifts2",
+    "label": "T=2 Contrastive-merge (W mystery)",
+    "protocol": "per-position",
+    "n_seeds": 2,
+    "peak_unc": 1.5833333333333335,
+    "peak_coh_ge_1_5": 0.8500000000000001,
+    "delta_vs_anchor": -0.31699999999999995
   },
   {
     "arch_id": "txc_bare_antidead_t5_kwin20",

@@ -101,6 +101,22 @@ INVENTORY = [
         ("steering_paper_normalised",                       "right-edge",   42),
         ("steering_paper_window_perposition",               "per-position", 42),
     ]),
+    # W's MYSTERY archs (multi-seed verified)
+    ("txc_maxpool_h8_t2_kpos20_shifts2", "T=2 MaxPool (W mystery)", "magenta", [
+        ("steering_paper_normalised",                       "right-edge",   42),
+        ("steering_paper_normalised_seed1",                 "right-edge",   1),
+        ("steering_paper_normalised_seed2",                 "right-edge",   2),
+        ("steering_paper_window_perposition",               "per-position", 42),
+        ("steering_paper_window_perposition_seed1",         "per-position", 1),
+        ("steering_paper_window_perposition_seed2",         "per-position", 2),
+    ]),
+    ("txc_contrastive_h8_t2_kpos20_shifts2", "T=2 Contrastive-merge (W mystery)", "deeppink", [
+        ("steering_paper_normalised",                       "right-edge",   42),
+        ("steering_paper_normalised_seed1",                 "right-edge",   1),
+        ("steering_paper_normalised_seed2",                 "right-edge",   2),
+        ("steering_paper_window_perposition_seed1",         "per-position", 1),
+        ("steering_paper_window_perposition_seed2",         "per-position", 2),
+    ]),
 ]
 
 
