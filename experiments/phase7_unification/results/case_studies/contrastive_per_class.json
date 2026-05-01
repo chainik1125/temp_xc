@@ -1,0 +1,152 @@
+{
+  "contrastive RE n=3": {
+    "thr_1.5": {
+      "cell_per_class": {
+        "discourse": 1.5416666666666665,
+        "knowledge": 2.0370370370370368,
+        "safety": 1.222222222222222,
+        "sentiment": 1.0,
+        "stylistic": 1.3333333333333335
+      },
+      "anchor_per_class": {
+        "discourse": 1.875,
+        "knowledge": 1.7222222222222223,
+        "safety": 1.25,
+        "sentiment": 0.5,
+        "stylistic": 1.3
+      }
+    },
+    "thr_1.75": {
+      "cell_per_class": {
+        "discourse": 1.2916666666666665,
+        "knowledge": 1.1851851851851851,
+        "safety": 0.5555555555555556,
+        "sentiment": 1.0,
+        "stylistic": 0.3333333333333333
+      },
+      "anchor_per_class": {
+        "discourse": 1.625,
+        "knowledge": 1.5,
+        "safety": 0.75,
+        "sentiment": 0.5,
+        "stylistic": 0.7
+      }
+    },
+    "thr_2.0": {
+      "cell_per_class": {
+        "discourse": 1.2916666666666665,
+        "knowledge": 1.1851851851851851,
+        "safety": 0.5555555555555556,
+        "sentiment": 1.0,
+        "stylistic": 0.3333333333333333
+      },
+      "anchor_per_class": {
+        "discourse": 1.625,
+        "knowledge": 1.5,
+        "safety": 0.75,
+        "sentiment": 0.5,
+        "stylistic": 0.7
+      }
+    }
+  },
+  "contrastive PP n=3": {
+    "thr_1.5": {
+      "cell_per_class": {
+        "discourse": 1.4583333333333335,
+        "knowledge": 1.4814814814814816,
+        "safety": 0.9444444444444443,
+        "sentiment": 1.0,
+        "stylistic": 1.0
+      },
+      "anchor_per_class": {
+        "discourse": 1.875,
+        "knowledge": 1.7222222222222223,
+        "safety": 1.25,
+        "sentiment": 0.5,
+        "stylistic": 1.3
+      }
+    },
+    "thr_1.75": {
+      "cell_per_class": {
+        "discourse": 1.1666666666666667,
+        "knowledge": 1.037037037037037,
+        "safety": 0.5,
+        "sentiment": 0.8333333333333334,
+        "stylistic": 0.4
+      },
+      "anchor_per_class": {
+        "discourse": 1.625,
+        "knowledge": 1.5,
+        "safety": 0.75,
+        "sentiment": 0.5,
+        "stylistic": 0.7
+      }
+    },
+    "thr_2.0": {
+      "cell_per_class": {
+        "discourse": 1.1666666666666667,
+        "knowledge": 1.037037037037037,
+        "safety": 0.5,
+        "sentiment": 0.8333333333333334,
+        "stylistic": 0.4
+      },
+      "anchor_per_class": {
+        "discourse": 1.625,
+        "knowledge": 1.5,
+        "safety": 0.75,
+        "sentiment": 0.5,
+        "stylistic": 0.7
+      }
+    }
+  },
+  "contrastive V6 n=3": {
+    "thr_1.5": {
+      "cell_per_class": {
+        "discourse": 1.7500000000000002,
+        "knowledge": 2.0,
+        "safety": 0.611111111111111,
+        "sentiment": 1.1666666666666667,
+        "stylistic": 0.9333333333333332
+      },
+      "anchor_per_class": {
+        "discourse": 1.875,
+        "knowledge": 1.7222222222222223,
+        "safety": 1.25,
+        "sentiment": 0.5,
+        "stylistic": 1.3
+      }
+    },
+    "thr_1.75": {
+      "cell_per_class": {
+        "discourse": 1.5,
+        "knowledge": 1.6666666666666667,
+        "safety": 0.611111111111111,
+        "sentiment": 1.1666666666666667,
+        "stylistic": 0.3333333333333333
+      },
+      "anchor_per_class": {
+        "discourse": 1.625,
+        "knowledge": 1.5,
+        "safety": 0.75,
+        "sentiment": 0.5,
+        "stylistic": 0.7
+      }
+    },
+    "thr_2.0": {
+      "cell_per_class": {
+        "discourse": 1.5,
+        "knowledge": 1.6666666666666667,
+        "safety": 0.611111111111111,
+        "sentiment": 1.1666666666666667,
+        "stylistic": 0.3333333333333333
+      },
+      "anchor_per_class": {
+        "discourse": 1.625,
+        "knowledge": 1.5,
+        "safety": 0.75,
+        "sentiment": 0.5,
+        "stylistic": 0.7
+      }
+    }
+  }
+}
