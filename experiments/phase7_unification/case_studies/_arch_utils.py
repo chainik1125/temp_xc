@@ -89,6 +89,8 @@ WINDOW_CLASSES = {
     "TXCBareAntidead",
     "MatryoshkaTXCDRContrastiveMultiscale",
     "TXCBareMultiDistanceContrastiveAntidead",
+    "TXCMultiplicativeMergeH8",   # W's MYSTERY arch (multiplicative)
+    "TXCMaxPoolMergeH8",           # W's MYSTERY arch (max-pool)
     "SubseqTXCBareAntidead",
     "SubseqH8",
 }
