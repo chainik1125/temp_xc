@@ -152,6 +152,30 @@ the headline. The multi-coh reframe is the bigger story.
 
 See `2026-04-30-y-lever-a-asymmetric.md` for the full Lever A writeup.
 
+### Lever B status (2026-05-01 — multi-seed in flight)
+
+Implemented `--top-k-features K` in same script. Ran K=2, K=3, K=5
+on T=2 H8 sd=42:
+
+| K | unc | ≥1.5 | ≥1.75 | AUC(1.5-3.0) |
+|---:|---:|---:|---:|---:|
+| 1 (baseline) | 1.57 | 1.53 | 1.53 | 0.707 |
+| **2** | **1.73** | **1.73** | 1.03 | **0.815** |
+| 3 | 1.60 | 1.60 | 0.50 | 0.610 |
+| 5 | 1.37 | 1.37 | 0.83 | 0.616 |
+| T-SAE | 1.80 | 1.10 | 0.37 | 0.508 |
+
+**K=2 is the sweet spot** — single-seed unc=1.73 (gap to T-SAE shrinks
+0.23 → 0.07), peak ≥ 1.5 = 1.73 (Δ=+0.63), AUC lifts +0.108. K=3+
+oversaturates and regresses. Trade-off: coh ≥ 1.75 regresses (1.53 →
+1.03) at peak strength.
+
+**Multi-seed K=2 verification in flight** (sd=1, sd=2 running). If
+multi-seed K=2 maintains lift, possible paradigm shift — could push
+past T-SAE on unconstrained peak too.
+
+See `2026-04-30-y-lever-b-multifeature.md` for full Lever B writeup.
+
 ### Pre-registered next experiments (Han's "beyond OBLITERATE" levers)
 
 Han originally suggested 6 levers to push past T-SAE on unconstrained
