@@ -2,8 +2,15 @@
 
 Replaces the per-word `max_same_word_run ≤ 2` heuristic — which is too
 weak (it accepts "Wait, I'm not. / Wait, I'm not." sentence-loop
-degeneration) — with the same 0–3 grade Dmitry's branch uses (Ward et
-al. paper §B.2 prompt, copied verbatim).
+degeneration) — with a 0–3 coherence rubric of our own design.
+
+Note on attribution: an earlier version of this docstring claimed the
+0–3 rubric was "Ward et al. paper §B.2, copied verbatim". That claim is
+WRONG. Ward 2025 (arxiv 2507.12638) has only §B.1 in Appendix B, and
+their evaluation uses a binary GPT-4o backtracking classifier (Appendix
+C), not a coherence rubric. The 0–3 grade below is our own synthesis,
+designed to catch the sentence-level repetition failure mode the
+sprint discovered.
 
 Inputs:
     --b1-json  path to a per-cell `b1__<cell_id>.json`
@@ -44,7 +51,7 @@ The model generated this continuation:
 {generation}
 \"\"\"
 
-Grade this continuation for coherence on the following 0-3 scale (Ward et al. 2025 §B.2):
+Grade this continuation for coherence on the following 0-3 scale:
 
 3 - Coherent and on-task. The text is grammatical natural English, follows from the prompt, makes mathematical or logical sense (even if reaching a wrong answer), and progresses through reasoning. Repetition of phrases is OK if the underlying reasoning advances.
 

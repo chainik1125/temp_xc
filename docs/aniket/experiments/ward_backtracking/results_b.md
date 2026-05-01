@@ -34,7 +34,9 @@ seeding).
 
 Each marker is a cell. *X-axis*: legacy primary (max-run-≤-2 word floor) — the
 permissive metric that rewards sentence-loop degeneration. *Y-axis*: Sonnet 4.6
-primary (Ward §B.2 0–3 grader, coherent ≥ 2 floor). Both axes are symlog. The
+primary (Sonnet 4.6 0–3 coherence grader, coherent ≥ 2 floor — see
+"Coherence audit" below; this is our own rubric, not Ward 2025's).
+Both axes are symlog. The
 v1 legacy winner (`topk_sae__ln1_L10__k32`, legacy=0.4746) is annotated red:
 high on X but bottom-quartile on Y — its "win" was the model emitting "Wait,
 I'm not. / Wait, I'm not." sentence loops. The v2-extend winner
@@ -65,7 +67,10 @@ that the sprint flagged as deferred:
    at paper budget exposed a worse failure mode: *sentence*-level loops
    ("Wait, I'm not. / Wait, I'm not.") satisfy max-run-≤-2 per word but are
    just as degenerate. This run replaces the per-word heuristic with the
-   Sonnet 4.6 grader from Ward §B.2 (the same 0–3 rubric the paper uses).
+   a Sonnet 4.6 0–3 coherence grader of our own design. (Earlier drafts
+   of this writeup attributed the 0–3 rubric to Ward et al. 2025 §B.2;
+   that citation was wrong — Ward 2025 has only §B.1 in Appendix B, and
+   uses a binary GPT-4o backtracking classifier, not a coherence rubric.)
 3. **Greedy hill-climb on top of the sweep.** Instead of declaring a single
    winner from the Phase-1 leaderboard, the run treats the leaderboard as
    the seed and explores its 5-axis neighborhood (arch, hookpoint, k, seed,
@@ -142,7 +147,7 @@ model emitting blocks like:
 > Wait, I'm not. Wait, I'm not. Wait, I'm not. Wait, I'm not. Wait, I'm not.
 
 — a 5-token sentence repeated 30+ times. Per-word max-run = 1 (the heuristic
-floor). Per-sentence max-run = 30+. The Ward §B.2 grader catches it; the
+floor). Per-sentence max-run = 30+. The Sonnet 4.6 grader catches it; the
 sprint's max-run-≤-2 floor doesn't.
 
 ### v2 (Sonnet 4.6 grader + rank axis)
