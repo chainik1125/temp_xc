@@ -19,9 +19,9 @@ seeding).
 
 | Headline | Value |
 |---|---|
-| Architectures evaluated | TXC, TopK SAE, Stacked SAE, TSAE, TXC-H8 (multi-distance contrastive), TXC-H13 (matryoshka × multi-distance) |
+| Architectures evaluated | TXC, TopK SAE, Stacked SAE, TSAE, TSAE-paper (Bhalla 2025 ReLU+L1), TXC-H8 (multi-distance contrastive), TXC-H13 (matryoshka × multi-distance) |
 | Hookpoints | `resid_L10`, `attn_L10`, `ln1_L10` |
-| Cells with full B1 + Sonnet grades | 32 |
+| Cells with full B1 + Sonnet grades | 34 |
 | Sonnet 4.6 grades issued | 13,320 (canonical B1) + 24 × ~720 per-cell ≈ 30k total |
 | **v1 winner (legacy max-run floor)** | `topk_sae__ln1_L10__k32` legacy=0.4746 — **metric exploit**: sentence-level "Wait, I'm not. / Wait, I'm not." loops the per-word max-run ≤ 2 floor doesn't catch |
 | **v2 winner (Sonnet 4.6 grader)** | `tsae__resid_L10__k32` sonnet=0.0070 — TSAE k=32 anchored a fresh hill-climb under Sonnet metric |
@@ -245,12 +245,13 @@ Best Sonnet primary per arch, across all hookpoints/k/rank:
 
 | Arch | Best cell | Sonnet primary | Best mag | frac_coh_s |
 |---|---|---|---|---|
-| **TXC** | `txc__resid_L10__k16` | **0.0114** | -8 | 0.44 |
-| TXC-H13 (matryoshka × MD contrastive) | `txc_h13__resid_L10__k16` | 0.0095 | -12 | 0.47 |
-| TXC-H8 (MD contrastive) | `txc_h8__resid_L10__k16` | 0.0052 | -16 | 0.49 |
+| **TXC** | `txc__resid_L10__k16` | **0.0114** | -8 | 0.47 |
+| TXC-H13 (matryoshka × MD contrastive) | `txc_h13__resid_L10__k16` | 0.0095 | -12 | 0.54 |
+| TXC-H8 (MD contrastive) | `txc_h8__resid_L10__k16` | 0.0052 | -16 | 0.54 |
 | **TopK SAE** | `topk_sae__ln1_L10__k64` | **0.0071** | +4 | 0.28 |
-| **Stacked SAE** | `stacked_sae__ln1_L10__k32` | **0.0048** | +8 | 0.35 |
-| **TSAE (Bhalla)** | `tsae__resid_L10__k32` | **0.0039** | +12 | 0.17 |
+| **Stacked SAE** | `stacked_sae__resid_L10__k16` | **0.0054** | +12 | 0.36 |
+| **TSAE (TopK variant)** | `tsae__resid_L10__k32` | **0.0039** | +12 | 0.17 |
+| **TSAE (Bhalla 2025 paper-faithful, ReLU+L1)** | `tsae_paper__resid_L10__k32` | **0.0004** | +0 | 0.07 |
 
 TXC family (plain + H8 + H13) takes positions 1, 3, 8 on the 32-cell
 leaderboard. The best TopK SAE is 38% behind the TXC winner; the best
@@ -353,12 +354,16 @@ B2 plots are refreshed at
   winner` — see git log) but variance was too tight to break ties with H13;
   needs more seeds for the close calls.
 - **Bhalla T-SAE paper-faithful cell** (`tsae_paper__resid_L10__k32`,
-  `tsae_paper__ln1_L10__k32`): added in a follow-up commit — uses
-  ReLU + L1 (l1_coef=1e-3) instead of TopK to match Bhalla 2025's
-  published architecture. See the leaderboard CSV for landing values
-  (TBD pending training completion as of this writeup; the cell is
-  expected to land in the bottom half since T-SAE family was already
-  4th-best in the topk variant).
+  `tsae_paper__ln1_L10__k32`): trained with ReLU + L1 (l1_coef=1e-3)
+  instead of TopK, to match Bhalla 2025's published architecture. Both
+  cells land **at the bottom of the 34-cell leaderboard**: sonnet=0.0004,
+  legacy=0.0070, frac_coh_s=0.07–0.08. The L1 weight is too weak to enforce
+  a clean sparse representation at this 768k-token training budget — final
+  L0 ≈ 15-16k of 16,384 features active, i.e. essentially dense — and
+  steering with any single decoder row is dominated by the dense-activation
+  noise. The verdict ("TXC dominates SAE family under rigorous coherence")
+  doesn't depend on this cell, but the omission of a paper-faithful T-SAE
+  was a real gap in the previous writeup; this fills it.
 
 ## Compute + cost
 

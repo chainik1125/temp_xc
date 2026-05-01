@@ -176,7 +176,7 @@ def _per_offset_preact(arch: str, model, X: np.ndarray, feat_idx: np.ndarray, T:
             with torch.no_grad():
                 preact = torch.einsum("bod,dk->bok", x, Wk)
             out[i:end] = preact.permute(0, 2, 1).cpu().numpy()
-    elif arch == "tsae":
+    elif arch in ("tsae", "tsae_paper"):
         # Build a (B, T, d) window by repeating each token T times.
         # Then take the position-0 code as the "per-token" pre-activation.
         for i in range(0, X.shape[0], batch):

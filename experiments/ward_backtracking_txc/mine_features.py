@@ -224,7 +224,7 @@ def _per_offset_preact(arch: str, model, X: np.ndarray, feat_idx: np.ndarray, ba
             with torch.no_grad():
                 contribs = torch.einsum("btd,dk->btk", x, W)
             out[i:end] = contribs.permute(0, 2, 1).float().cpu().numpy()
-    elif arch == "tsae":
+    elif arch in ("tsae", "tsae_paper"):
         # Run the full TSAE forward and extract per-position codes for top-K.
         # codes_t = pred_codes + novel_codes (B, T, d_sae).
         for i in range(0, X.shape[0], batch_size):
