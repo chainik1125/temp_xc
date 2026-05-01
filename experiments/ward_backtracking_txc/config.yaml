@@ -127,7 +127,11 @@ steering:
   n_eval_prompts: 20
   seed: 42
   targets: [reasoning]       # base model produces empty completions on Stage A — skip.
-  gen_batch_size: 8          # PAPER-BUDGET: H100 80GB fits ≥8 in bf16 at seq 2048
+  gen_batch_size: 36         # PAPER-BUDGET: 4 prompts × 9 mags / panel; H100 80GB
+                             # fits ~36 in bf16 at seq ~2048. Larger batches
+                             # exploit the parallelized hook (per-row magnitude)
+                             # for ~9× wall-clock speedup vs the legacy serial
+                             # per-magnitude loop. Drop to 8 on 40GB GPUs.
 
 b2:
   # Per-offset firing curves on reasoning traces. Window relative to
