@@ -61,16 +61,17 @@ USE_S32_CACHE = True
 ACTIVE_PROBE_CACHE = PROBE_CACHE_DIR_S32 if USE_S32_CACHE else PROBE_CACHE_DIR
 
 
-HEADLINE_S = (32,)           # S=32 across the board (decision 2026-04-26):
-                             # - Compatible with all 48 of 49 canonical archs
-                             #   (T ≤ 32 valid; only row 49 SubseqH8 T_max=64
-                             #    invalid since S < T → no kept window).
-                             # - ~6× faster than S=128 (encode cost scales
-                             #   roughly linearly in S).
-                             # - Earlier S=128 / 64 / 20 sweep dropped after
-                             #   the (T,S) "drop first T-1" rule was found to
-                             #   be over-aggressive; corrected rule is
-                             #   kept = S - T + 1, validity = S ≥ T.
+HEADLINE_S = (10, 20, 32)    # S sweep added 2026-05-01 (Han request):
+                             # - S=32: original headline (compatible with all
+                             #   48 of 49 canonical archs; only row 49 SubseqH8
+                             #   T_max=64 invalid).
+                             # - S=20: medium tail; valid for T ≤ 20.
+                             # - S=10: short tail; valid for T ≤ 10.
+                             # All three values computed from the same encode
+                             # (aggregate_s does the per-S window restriction
+                             # in-place at zero extra GPU cost — see updated
+                             # aggregate_s docstring).
+                             # cell_is_valid(T, S) hard-skips T>S cells per S.
 HEADLINE_K_FEAT = (5, 20)
 ABLATION_K_FEAT = (1, 2)
 FLIP_TASKS = frozenset({"winogrande_correct_completion", "wsc_coreference"})
@@ -91,19 +92,29 @@ def aggregate_s(z_full: np.ndarray, first_real: np.ndarray,
                 T: int, S: int) -> tuple[np.ndarray, np.ndarray]:
     """Vectorised per-example mean-pool over fully-real windows.
 
-    With the S=32 left-aligned cache (rebuild_probe_cache_s32.py), each
-    example's real tokens occupy positions [first_real[i], S-1] of the
-    cache. Padding (zeros) is at [0, first_real[i]-1] for short sentences.
+    Cache is built at S_cache = 32 left-aligned (probe_cache_S32). For
+    each example, real tokens occupy positions [first_real[i], S_cache-1]
+    of the 32-frame; padding is at [0, first_real[i]-1] for short sentences.
 
-    Aggregation: keep windows whose left-edge is in [first_real, S-T] so
-    the entire window is real. Mean over those windows.
+    The S argument is the *target* tail length to aggregate over (S_target).
+    For S = S_cache (= 32, the canonical headline case), we use the full
+    cache. For S < S_cache (e.g., S=20), we restrict to the last S
+    positions of the cache; offset = S_cache - S, and the effective
+    first-real-position for any example is max(first_real, offset).
+
+    Aggregation: keep windows fully within both (a) the example's real
+    region [first_real, S_cache-1] AND (b) the requested tail
+    [S_cache-S, S_cache-1]. Mean over those windows.
 
     Args:
-      z_full:     (N, K, d_sae) where K = S (T=1 per-token) or S-T+1 (T>1 windows).
+      z_full:     (N, K, d_sae) where K = S_cache (T=1 per-token)
+                                 or K = S_cache - T + 1 (T>1 windows).
       first_real: (N,) int — position of first real token per example
-                  (= S - n_real).
+                  in the S_cache-frame (= S_cache - n_real).
       T:          window size (1 = per-token).
-      S:          tail length (= LAST_N of the new cache; should be 32).
+      S:          target tail length to aggregate over. Must satisfy
+                  T <= S <= S_cache. S=S_cache (=32) reproduces the
+                  canonical headline behaviour byte-identically.
 
     Returns:
       (z_mean, valid)  where
@@ -111,15 +122,16 @@ def aggregate_s(z_full: np.ndarray, first_real: np.ndarray,
         valid:  (N,) bool — which examples contributed.
     """
     N, K, _ = z_full.shape
+    # Reconstruct S_cache from K and T:
+    #   T=1: K = S_cache.
+    #   T>1: K = S_cache - T + 1.
+    s_cache = K if T == 1 else K + T - 1
+    offset = max(s_cache - S, 0)            # position-frame offset for S<S_cache
     first_real_t = torch.as_tensor(first_real, dtype=torch.long)
-    if T == 1:
-        # Per-token: keep positions [first_real, S-1]
-        lo = first_real_t.clamp(min=0)
-        hi = torch.full_like(first_real_t, K - 1)
-    else:
-        # Window: keep left-edges in [first_real, S-T]
-        lo = first_real_t.clamp(min=0)
-        hi = torch.full_like(first_real_t, K - 1)  # K = S - T + 1, so K-1 = S-T
+    # lo per example = max(first_real, offset) — clamps to the requested
+    # tail's start, never below 0.
+    lo = first_real_t.clamp(min=offset)
+    hi = torch.full_like(first_real_t, K - 1)
     k_grid = torch.arange(K).view(1, K)                 # (1, K)
     mask = (k_grid >= lo.view(N, 1)) & (k_grid <= hi.view(N, 1))  # (N, K) bool
     counts = mask.sum(dim=1)
