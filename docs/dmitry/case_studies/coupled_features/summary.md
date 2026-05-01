@@ -29,7 +29,7 @@ The right panel (global / hidden AUC) shows three clean regimes:
 - **k=6-8 (crossover)**: TXCDR drops sharply; T-SAE pulls even.
 - **k≥10 (high sparsity)**: **T-SAE dominates.** TXCDR collapses to 0.63 by k=20; T-SAE stays pinned at ~0.89.
 
-### Per-k gAUC table (4 representative archs)
+### Per-k gAUC table (4 representative arcbhs)
 
 | k | Stacked-T2 | **TSAE** | TXCDR-T2 | TXCDR-T5 |
 |---|---|---|---|---|
