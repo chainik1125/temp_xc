@@ -351,6 +351,10 @@ def _load_phase7_model(meta: dict, ckpt_path: Path, device) -> tuple:
             d_in=d_in, d_sae_w=d_sae_w, d_sae_p=d_sae_p,
             T=int(meta["T"]), k_window=k_window, k_pos=k_pos_only,
         ).to(device)
+    elif src_class == "TXCMaxPool":
+        # Galaxy 6 (Y, 2026-05-01): max-pool over T positions instead of sum.
+        from src.architectures.txc_maxpool import TXCMaxPool
+        model = TXCMaxPool(d_in, d_sae, int(meta["T"]), int(meta["k_win"])).to(device)
     else:
         raise ValueError(f"unknown src_class={src_class}")
 
