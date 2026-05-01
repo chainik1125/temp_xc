@@ -60,6 +60,11 @@ CELLS = [
         ("steering_paper_normalised_seed1", "txc_maxpool_t2_kpos20", 1),
         ("steering_paper_normalised_seed2", "txc_maxpool_t2_kpos20", 2),
     ]),
+    ("Galaxy 8 soft-max-pool PP — coh≥1.75 NEW BEST", "green", "*", "-", 3.5, [
+        ("steering_paper_window_perposition", "txc_softmaxpool_t2_kpos20", 42),
+        ("steering_paper_window_perposition_seed1", "txc_softmaxpool_t2_kpos20", 1),
+        ("steering_paper_window_perposition_seed2", "txc_softmaxpool_t2_kpos20", 2),
+    ]),
 ]
 
 

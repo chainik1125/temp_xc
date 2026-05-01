@@ -50,8 +50,8 @@ with W's earlier same-pod multi-seed analysis [W's writeup cite].
 Sweeping the coherence threshold reveals strict WINS at slightly
 tighter values:
 
-- **Coh ≥ 1.75**: T = 2 H8 right-edge 3-seed = 1.236 vs anchor 0.333
-  (Δ = +0.902) — over 3× the WIN threshold.
+- **Coh ≥ 1.75**: **Galaxy 8 (TXCSoftMaxPool) per-position 3-seed
+  = 1.422 vs anchor 0.333 (Δ = +1.089)** — over 4× the WIN threshold.
 - **Coh ≥ 2.0**: T = 2 bare-antidead per-position 3-seed = 0.978 vs
   anchor 0.283 (Δ = +0.694) — over 2.5× the WIN threshold.
 - **AUC over coh ∈ [1.5, 3.0]** (Han's pre-stated alternative
@@ -59,9 +59,11 @@ tighter values:
   0.413 (Δ = +0.331).
 
 We verify this finding is robust across architectures: at coh ≥ 1.75,
-seven multi-seed-verified TXC cells (T = 2 H8 RE 3sd, T = 3 grown RE
-2sd, T = 5 H8 PP 2sd, T-SAE WS RE 2sd, T = 2 bare PP 3sd, T = 2 bare
-RE 3sd, T = 2 H8 PP 3sd) all achieve Δ > +0.27.
+**fifteen multi-seed-verified TXC cells achieve Δ > +0.27**, spanning
+seven distinct architecture families: H8 multi-distance contrastive,
+bare-antidead, sequentially-grown chain, T-SAE warm-start,
+hierarchical multi-scale (Galaxy 4), max-pool (Galaxy 6 + W's
+TXCMaxPoolMergeH8), and soft-max-pool with learnable τ (Galaxy 8).
 
 Both reduction conventions concur: per-seed-then-mean (per-seed
 peak-15 then mean across seeds, more conservative) gives Δ = +0.644
@@ -150,19 +152,32 @@ operation. The vanilla TXC sums per-position pre-activations;
 |---|---|---:|---:|
 | TXCBareAntidead T = 2 RE | additive sum | +0.622 | +0.672 |
 | TXCMaxPool T = 2 RE (Galaxy 6) | hard max-pool | +0.522 | **+0.572** |
-| TXCMaxPool T = 2 PP | hard max-pool | **+0.722** | +0.150 |
+| TXCMaxPool T = 2 PP | hard max-pool | +0.722 | +0.150 |
 | TXCMaxPoolMergeH8 RE (W's) | hard max-pool + H8 | +0.811 | +0.211 |
 | TXCMaxPoolMergeH8 PP (W's) | hard max-pool + H8 | +0.811 | +0.150 |
+| **TXCSoftMaxPool T = 2 PP (Galaxy 8)** | softmax-weighted (τ≈1) | **+1.089** | +0.061 |
+| TXCSoftMaxPool T = 2 RE (Galaxy 8) | softmax-weighted (τ≈1) | +0.378 | +0.039 |
 
 Galaxy 6 (max-pool TXC) replaces sum with element-wise max over T
 positions: each feature reads off the single position where its
 encoder direction fires strongest. This consistently beats additive
-sum at coh-aware metrics, with the largest individual-cell win
-(Δ = +0.722 at coh ≥ 1.75 for PP, Procedure A SIG [+0.500, +0.989])
-and competitive Procedure-B CI at coh ≥ 2.0 RE (+0.572 [-0.028, +0.817]).
-Combining max-pool with H8 multi-distance contrastive (W's
-TXCMaxPoolMergeH8) lifts the win to Δ = +0.811 (Procedure-B SIG on
-both protocols).
+sum at coh-aware metrics, with Δ = +0.722 at coh ≥ 1.75 for PP
+(Procedure A SIG [+0.500, +0.989]). Combining max-pool with H8
+multi-distance contrastive (W's TXCMaxPoolMergeH8) lifts the win to
+Δ = +0.811 (Procedure-B SIG on both protocols).
+
+**Galaxy 8 (TXCSoftMaxPool) generalizes both Galaxy 6 hard-max-pool
+and the additive-sum baseline:** the per-position pre-activations are
+combined via softmax-weighted sum with a learnable per-feature
+temperature τ. As τ → 0, this becomes hard-max; as τ → ∞, it becomes
+uniform-mean (proportional to additive-sum). Across all three seeds,
+98%+ of features converged to τ ∈ [0.5, 2.0] (median ≈ 1.06), with
+no features pushing toward either extreme. This convergent
+"soft preference for max" pooling achieves the **largest individual
+WIN of any cell at any threshold**: Δ = +1.089 at coh ≥ 1.75 PP
+(Procedure A SIG [+0.761, +1.450]; Procedure B borderline
+[−0.022, +1.456]), 20% larger than the previous best (T = 2 H8 RE
+3sd Δ = +0.906) and over 4× the WIN threshold.
 
 ### 4.X.6 Headline figure
 

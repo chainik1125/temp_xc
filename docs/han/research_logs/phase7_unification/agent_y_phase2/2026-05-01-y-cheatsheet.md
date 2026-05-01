@@ -12,12 +12,19 @@ tags:
 
 At matched per-token sparsity (k_pos = 20), under the prereg metric
 **peak success at coh ≥ 1.5**, TXC architectures and T-SAE k=20 are
-in the **TIE band** (multi-seed Δ = +0.233, just below the +0.27
+in the **TIE band** (best mean-curve Δ = +0.267, just below the +0.27
 WIN threshold). However, at slightly tighter coherence thresholds
 (coh ≥ 1.75 / ≥ 2.0) and under Han's pre-stated AUC alternative,
-TXC architectures achieve **STRICT WINS** by Δ ≥ +0.27. T-SAE k=20's
-only edge — unconstrained peak (1.80 vs 1.42) — is at coh = 1.40
-(text below the prereg coherence floor — incoherent).
+TXC architectures achieve **STRICT WINS** by Δ ≥ +0.27.
+
+**🚀 Galaxy 8 (TXCSoftMaxPool) PP 3sd hits the largest WIN ever
+recorded: Δ = +1.089 at coh ≥ 1.75** (Procedure A SIG [+0.761, +1.450];
+Procedure B borderline [−0.022, +1.456]). This is over 4× the WIN
+threshold and 20% larger than the previous best (T=2 H8 RE 3sd
+Δ=+0.906).
+
+T-SAE k=20's only edge — unconstrained peak (1.80 vs 1.578) — is at
+coh = 1.40 (text below the prereg coherence floor — incoherent).
 
 ### Headline numbers (multi-seed, ±0.27 WIN threshold)
 
@@ -30,7 +37,7 @@ where applicable.
 |---|---:|---:|---:|---:|:---:|
 | unconstrained peak | 1.800 | **1.578** (W's TXCContrastiveMergeH8 RE) | 3 | −0.222 | closer LOSS |
 | **coh ≥ 1.5 (prereg)** | 1.167 | **1.578** (W's TXCContrastiveMergeH8 RE) | 3 | **+0.411** | **STRICT WIN** ⭐⭐ |
-| **coh ≥ 1.75** | 0.333 | **1.236** (T=2 H8 RE) | 3 | **+0.902** | **STRICT WIN** ⭐⭐⭐ |
+| **coh ≥ 1.75** | 0.333 | **1.422** (Galaxy 8 PP) | 3 | **+1.089** | **STRICT WIN** ⭐⭐⭐⭐ |
 | **coh ≥ 2.0** | 0.283 | **0.978** (T=2 bare PP) | 3 | **+0.694** | **STRICT WIN** ⭐⭐ |
 | **AUC(1.5–3.0)** | 0.413 | **0.745** (T=2 bare RE) | 3 | **+0.331** | **STRICT WIN** ⭐ |
 
@@ -58,21 +65,23 @@ way. The strongest WIN is at coh ≥ 1.75 under both reductions.
 2. **TXC's window encoder distributes the steering signal** across T
    tokens. At moderate strength, TXC produces COHERENT text that
    contains the concept.
-3. **Cross-cell consistency**: at coh ≥ 1.75, **fourteen 3-seed-verified
+3. **Cross-cell consistency**: at coh ≥ 1.75, **fifteen 3-seed-verified
    TXC cells beat anchor by Δ > +0.27**:
+   - **🚀 Galaxy 8 (TXCSoftMaxPool) PP 3sd**: Δ = +1.089 (Y's soft-max-pool — NEW BEST!) ⭐⭐⭐⭐
    - T=2 H8 RE 3sd:                   Δ = +0.906 ⭐
    - T=3 grown RE 3sd:                Δ = +0.889 ⭐
    - **TXCMaxPoolMergeH8 RE 3sd**:    Δ = +0.811 (W's mystery arch)
    - **TXCMaxPoolMergeH8 PP 3sd**:    Δ = +0.811
    - T-SAE WS PP 3sd:                 Δ = +0.800
+   - **Galaxy 6 (TXCMaxPool) PP 3sd**: Δ = +0.722 (Y's max-pool prototype)
    - T-SAE WS RE 3sd:                 Δ = +0.678
    - T=2 bare PP 3sd:                 Δ = +0.644
    - T=2 bare RE 3sd:                 Δ = +0.622
    - T=3 grown PP 3sd:                Δ = +0.606
-   - **Galaxy 6 (TXCMaxPool) PP 3sd**: Δ = +0.722 (Y's max-pool prototype)
    - **Galaxy 6 (TXCMaxPool) RE 3sd**: Δ = +0.522
    - Galaxy 4 PP 3sd:                 Δ = +0.511 (Y's hierarchical multi-scale)
    - Galaxy 4 RE 3sd:                 Δ = +0.478
+   - **Galaxy 8 (TXCSoftMaxPool) RE 3sd**: Δ = +0.378
    - T=2 H8 PP 3sd:                   Δ = +0.278 (just above threshold)
 
    Plus 2-seed cells: T=5 H8 PP +0.733, etc.
@@ -111,6 +120,8 @@ Six 3-seed cells × thresholds (where "YES" = 95% CI excludes 0):
 | T=2 bare RE | YES (+0.622 [+0.361, +0.906]) | YES (+0.672 [+0.350, +1.028]) |
 | Galaxy 6 RE | YES (+0.522 [+0.311, +0.744]) | YES (+0.572 [+0.267, +0.878]) |
 | **Galaxy 6 PP** | **YES (+0.722 [+0.500, +0.989])** ⭐ | no |
+| **🚀 Galaxy 8 PP** | **YES (+1.089 [+0.761, +1.450])** ⭐⭐⭐⭐ | no |
+| Galaxy 8 RE | YES (+0.378 [+0.122, +0.661]) | no |
 
 **Procedure B bootstrap CIs (scientific-CI; resamples concepts AND
 re-optimizes strength per resample; conservative — the right CI to
@@ -128,6 +139,7 @@ report):**
 | T=2 H8 RE 3sd | coh ≥ 1.75 | +0.906 | [-0.028, +1.217] | borderline |
 | Galaxy 6 RE 3sd | coh ≥ 2.0 | +0.572 | [-0.028, +0.817] | borderline |
 | Galaxy 6 PP 3sd | coh ≥ 1.75 | +0.722 | [-0.017, +1.250] | borderline |
+| **🚀 Galaxy 8 PP 3sd** | coh ≥ 1.75 | **+1.089** | [-0.022, +1.456] | borderline (largest median) |
 
 **Multiple statistically significant cells under Procedure B** —
 including W's TXCMaxPoolMergeH8 (both protocols), T=3 grown RE (at
@@ -185,7 +197,7 @@ multi-position structure.
 | Bootstrap CI A vs B | per-concept fixed-s vs scientific re-opt | A sig, B borderline |
 | Galaxy 4 (hierarchical) | window + per-pos latent groups | impl + queued; results pending |
 | Galaxy 6 (max-pool) | max over T instead of sum | ⭐⭐ STRICT WIN at coh ≥ 1.75 PP (Δ=+0.722) AND coh ≥ 2.0 RE (Δ=+0.572); both Procedure A SIG |
-| Galaxy 8 (soft-max-pool) | softmax-weighted, learnable per-feat τ | ckpts trained 3 seeds; pipeline in flight |
+| Galaxy 8 (soft-max-pool) | softmax-weighted, learnable per-feat τ | 🚀⭐⭐⭐⭐ NEW BEST PP coh ≥ 1.75 Δ=+1.089 (Procedure A SIG); RE Δ=+0.378 SIG |
 
 ### Multi-seed verifications (as of 2026-05-01 evening)
 
@@ -213,10 +225,18 @@ multi-position structure.
 W's mystery archs (TXCMultiplicativeMergeH8, TXCMaxPoolMergeH8,
 TXCContrastiveMergeH8) being trained by W in parallel.
 
-**Galaxy 8 (TXCSoftMaxPool) — soft-max-pool with learnable per-feature τ
-(generalizes Galaxy 6 hard-max-pool ↔ TXCBareAntidead additive-sum):**
-All 3 seeds trained successfully. Pipeline in flight (sd=42 RE done:
-mean succ=0.70, coh=2.08).
+**🚀 Galaxy 8 (TXCSoftMaxPool) — soft-max-pool with learnable per-feature τ:
+NEW BEST CELL EVER (Procedure A SIG):**
+- coh ≥ 1.75 PP 3sd: succ=1.422 vs anchor 0.333 → **Δ=+1.089
+  [+0.761, +1.450]** — over 4× the WIN threshold
+- coh ≥ 1.75 RE 3sd: succ=0.711 → Δ=+0.378 (SIG)
+- Procedure B borderline at coh ≥ 1.75 PP: CI [-0.022, +1.456]
+- coh ≥ 1.5 PP 3sd: Δ=+0.256 (just below WIN threshold)
+- AUC(1.5-3.0) PP: Δ=+0.313 (STRICT WIN)
+
+This generalizes Galaxy 6 hard-max-pool ↔ TXCBareAntidead additive-sum.
+Despite per-feature learnable τ, all 3 seeds converged to τ ≈ 1.0
+(softmax-weighted with mild preference for max position, see τ analysis).
 
 **Learned τ analysis** (across all 3 seeds): τ is tightly clustered
 near 1.0:
