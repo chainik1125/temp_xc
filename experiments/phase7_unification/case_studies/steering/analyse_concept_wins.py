@@ -105,6 +105,11 @@ CELLS = [
         ("steering_paper_window_perposition_seed1", "txc_lsepool_t2_kpos20", 1),
         ("steering_paper_window_perposition_seed2", "txc_lsepool_t2_kpos20", 2),
     ]),
+    ("Galaxy 23 G8 T=5 RE", [
+        ("steering_paper_normalised", "txc_softmaxpool_t5_kpos20", 42),
+        ("steering_paper_normalised_seed1", "txc_softmaxpool_t5_kpos20", 1),
+        ("steering_paper_normalised_seed2", "txc_softmaxpool_t5_kpos20", 2),
+    ]),
 ]
 
 THRESHOLDS = [1.5, 1.75, 2.0]
