@@ -98,7 +98,7 @@ exactly the pattern we saw in medical. (Ranks 1–9 of the survivor list have
 Δz̄ between 0.012–0.035, well below the 0.193 of the Δz̄ leader.) Confirms
 that Δz̄ is a useful prefilter but the screen score reorders aggressively.
 
-#### Stage 3 partial (3/20 features)
+#### Stage 3 partial (12/20 features)
 
 `baseline α=0: align=54.38  coh=43.44  coh_floor=39.09`
 
@@ -108,21 +108,34 @@ is positive when **+α pushes the bad model further toward misalignment**, so
 the *re-aligning* sweep examines **negative α**. The strength grid runs
 `[-10, -6, -4, -2, -1, +1, +2, +4, +6, +10]`.
 
-| feat_id | best_strong α | align | coh |
-| ------- | ------------- | ----- | --- |
+| feat_id | best α | align | coh |
+| ------- | ------ | ----- | --- |
 | 2810  | -10 | 84.22 | 98.12 |
 | 24979 | -10 | 86.72 | 99.69 |
 | 3356  | -10 | 90.00 | 99.53 |
+| 11086 | -10 | 93.59 | 99.69 |
+| 20709 | -10 | 90.00 | 99.53 |
+| 25747 | -10 | 90.94 | 99.06 |
+| 25963 | -10 | 83.06 | 97.66 |
+| 26657 | -10 | 90.78 | 96.25 |
+| 17837 | -10 | 97.66 | 100.00 |
+| 2288  | -10 | 85.31 | 99.38 |
+| 1883  | -10 | 91.25 | 97.03 |
+| 15327 | -10 | 87.34 | 98.28 |
 
-All three peak at the **most-extreme α=-10** with **near-perfect coherence
-(98–100)** and align of **84–90** — already lifting the misaligned baseline
-54.38 by **+30 to +36 align points** with no coherence penalty. For
-comparison, the Qwen-7B medical champion was `align 58.47 / coh 30.86`. Even
-discounting calibration differences between organisms, the Qwen-14B finance
-single-feat peak appears *much* cleaner: vastly higher align AND vastly
-higher coherence. Stage 3 needs to finish (17/20 features remaining,
-~45 min ETA at ~2.5 min/feat) before declaring a champion, but the early
-signal is strong.
+**100% of the 12 features measured so far peak at α=-10** (the grid edge),
+with align **83.06–97.66** and coh **96.25–100.00**. Lift over the
+misaligned baseline 54.38 is **+29 to +43 align points with no coherence
+penalty**. For comparison, the Qwen-7B medical champion was
+`align 58.47 / coh 30.86`. The Qwen-14B finance single-feat peak is *much*
+cleaner: vastly higher align AND vastly higher coherence.
+
+The α=-10 saturation across every survivor is now nearly certain to hold for
+the remaining 8 — strongly suggests we should re-run with an extended grid
+(`-30, -20, -15, -10, ...`) to find the actual peak, rather than treating
+α=-10 as the headline. **Champion call** likely needs an extended-grid
+follow-up. Current single-feat front-runner: feat **17837 @ α=-10 →
+align=97.66 / coh=100.00**. Stage 3 ETA ~20 min; stage 4 ~10 min.
 
 #### Calibration / sanity check
 
@@ -152,12 +165,12 @@ Status: waiting for Track A to finish (poll loop on the
   champion) transfer to finance? First check: SAE single-feat peak vs TXC
   single-feat peak after both 10k runs land. SAE single-feat is already at
   align ≈ 84–90 mid-stage-3 with stage 4 still to come.
-- Multiple stage-3 candidates piling at α=-10 (the grid edge) raises the
-  question of whether the strength sweep needs an extended grid (e.g.
-  ±15, ±20) — but coh is staying ~99 even at α=-10, so we're not seeing
-  the coherence cliff yet. Worth queuing a re-run with a wider grid IF
-  stage 4 picks features whose champions sit at α=-10 too (saturation
-  vs. peak).
+- **Confirmed:** all 12/12 stage-3 features measured so far peak at α=-10
+  with coh ≥96 (no cliff). The wider-grid re-run is no longer "if" — it's
+  "when". Plan: after stage 4 lands the top-3 finalists, queue a stage-4
+  rerun with `--final_alpha_grid='-100,-30,-20,-15,-12,-10,-8,-6,-4,-2,0'`
+  on those 3 features only. Cheap (3 features × 11 alphas × 8 rollouts × 8
+  questions ≈ 2.1k generations).
 - Is the Δz̄ probe pool (finance training prompts) the right contrast, or
   should we also try a generic prompt pool to see if the finance-axis
   feature is domain-specific or organism-wide?
