@@ -23,16 +23,18 @@ import numpy as np
 
 BASE = Path("/workspace/temp_xc/experiments/phase7_unification/results/case_studies")
 PLOTS_DIR = BASE / "plots"
-ANCHOR_15 = 1.167  # T-SAE k=20 cliff @ coh ≥ 1.5 (n=2 sd=42 + sd=1)
+ANCHOR_15 = 1.133  # T-SAE k=20 cliff @ coh ≥ 1.5 (same-pod n=3 sd=42+sd=1+sd=2; W retrained 2026-05-01)
 
 # 5 archs × 2 protocols. Each entry: (arch_id, label, color, [(subdir, proto, seed), ...])
 INVENTORY = [
-    ("tsae_paper_k20", "T-SAE k=20 (anchor)", "#1f77b4", [
+    ("tsae_paper_k20", "T-SAE k=20 (anchor, same-pod n=3)", "#1f77b4", [
         ("steering_paper_normalised",         "right-edge",   42),
         ("steering_paper_normalised_seed1",   "right-edge",   1),
+        ("steering_paper_normalised_seed2",   "right-edge",   2),
         # T-SAE has T=1 so RE=PP — duplicate for per-position panel
         ("steering_paper_normalised",         "per-position", 42),
         ("steering_paper_normalised_seed1",   "per-position", 1),
+        ("steering_paper_normalised_seed2",   "per-position", 2),
     ]),
     ("txc_h8_t2_kpos20_shifts2", "T=2 H8 OBLITERATION (Y)", "#d62728", [
         ("steering_paper_normalised",                 "right-edge",   42),
@@ -185,9 +187,9 @@ def main():
         ax.legend(loc="upper right", fontsize=9, framealpha=0.95)
 
     fig.suptitle(
-        "Phase 7 focused matched-sparsity Pareto: T-SAE baseline vs 4 best TXC architectures\n"
+        "Phase 7 focused matched-sparsity Pareto: same-pod-n=3 T-SAE baseline vs 4 best TXC architectures\n"
         "stars mark cliff @ coh >= 1.5 (PRREG metric); dashed green = +0.27 WIN threshold; "
-        "Contrastive-merge RE leads PRREG at 1.578 (Delta = +0.411); Galaxy 8 leads coh >= 1.75 PP (Delta = +1.089)",
+        "Contrastive-merge RE leads PRREG at 1.578 (Delta = +0.445); Galaxy 8 leads coh >= 1.75 PP (Delta = +1.011)",
         fontsize=12, y=1.00,
     )
     fig.tight_layout()

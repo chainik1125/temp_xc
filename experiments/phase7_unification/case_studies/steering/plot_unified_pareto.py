@@ -22,7 +22,7 @@ import numpy as np
 os.environ.setdefault("HF_HOME", "/workspace/hf_cache")
 
 BASE = Path("/workspace/temp_xc/experiments/phase7_unification/results/case_studies")
-ANCHOR_15 = 1.167  # T-SAE k=20 peak success at coh ≥ 1.5 (multi-seed mean-curve, n=2)
+ANCHOR_15 = 1.133  # T-SAE k=20 peak success at coh ≥ 1.5 (same-pod n=3 sd=42+sd=1+sd=2; W retrained 2026-05-01)
 
 
 # Inventory: (arch_id, protocol_subdirs_per_seed, label, color)
@@ -31,6 +31,7 @@ INVENTORY = [
     ("tsae_paper_k20", "T-SAE k=20 (anchor)", "blue", [
         ("steering_paper_normalised",         "right-edge", 42),
         ("steering_paper_normalised_seed1",   "right-edge", 1),
+        ("steering_paper_normalised_seed2",   "right-edge", 2),
     ]),
     # Y — bare antidead (multi-seed)
     ("txc_bare_antidead_t2_kpos20", "T=2 bare", "orange", [

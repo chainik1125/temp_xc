@@ -6,7 +6,7 @@
     "n_seeds": 3,
     "peak_unc": 1.5777777777777777,
     "peak_coh_ge_1_5": 1.5777777777777777,
-    "delta_vs_anchor": 0.4107777777777777
+    "delta_vs_anchor": 0.4447777777777777
   },
   {
     "arch_id": "txc_h8_t2_kpos20_shifts2",
@@ -15,7 +15,7 @@
     "n_seeds": 3,
     "peak_unc": 1.4222222222222223,
     "peak_coh_ge_1_5": 1.4000000000000001,
-    "delta_vs_anchor": 0.2330000000000001
+    "delta_vs_anchor": 0.2670000000000001
   },
   {
     "arch_id": "txc_h8_t2_kpos20_shifts2",
@@ -24,7 +24,7 @@
     "n_seeds": 3,
     "peak_unc": 1.3555555555555554,
     "peak_coh_ge_1_5": 1.235632183908046,
-    "delta_vs_anchor": 0.06863218390804593
+    "delta_vs_anchor": 0.10263218390804596
   },
   {
     "arch_id": "txc_bare_antidead_t2_kpos20_ws_tsae_encoder",
@@ -33,16 +33,7 @@
     "n_seeds": 1,
     "peak_unc": 1.2,
     "peak_coh_ge_1_5": 1.2,
-    "delta_vs_anchor": 0.03299999999999992
-  },
-  {
-    "arch_id": "tsae_paper_k20",
-    "label": "T-SAE k=20 (anchor)",
-    "protocol": "right-edge",
-    "n_seeds": 2,
-    "peak_unc": 1.8,
-    "peak_coh_ge_1_5": 1.1666666666666667,
-    "delta_vs_anchor": -0.0003333333333332966
+    "delta_vs_anchor": 0.06699999999999995
   },
   {
     "arch_id": "txc_bare_antidead_t5_kwin20",
@@ -51,7 +42,7 @@
     "n_seeds": 1,
     "peak_unc": 1.6666666666666667,
     "peak_coh_ge_1_5": 1.1666666666666667,
-    "delta_vs_anchor": -0.0003333333333332966
+    "delta_vs_anchor": 0.033666666666666734
   },
   {
     "arch_id": "txc_h8_t3_kpos20_shifts3",
@@ -60,7 +51,7 @@
     "n_seeds": 1,
     "peak_unc": 1.3333333333333333,
     "peak_coh_ge_1_5": 1.1666666666666667,
-    "delta_vs_anchor": -0.0003333333333332966
+    "delta_vs_anchor": 0.033666666666666734
   },
   {
     "arch_id": "txc_bare_antidead_t3_kpos20_grownFromT2sd42",
@@ -69,7 +60,7 @@
     "n_seeds": 1,
     "peak_unc": 1.4,
     "peak_coh_ge_1_5": 1.1666666666666667,
-    "delta_vs_anchor": -0.0003333333333332966
+    "delta_vs_anchor": 0.033666666666666734
   },
   {
     "arch_id": "txc_maxpool_h8_t2_kpos20_shifts2",
@@ -78,7 +69,7 @@
     "n_seeds": 3,
     "peak_unc": 1.3111111111111111,
     "peak_coh_ge_1_5": 1.1444444444444446,
-    "delta_vs_anchor": -0.02255555555555544
+    "delta_vs_anchor": 0.01144444444444459
   },
   {
     "arch_id": "txc_maxpool_h8_t2_kpos20_shifts2",
@@ -87,7 +78,16 @@
     "n_seeds": 3,
     "peak_unc": 1.5444444444444443,
     "peak_coh_ge_1_5": 1.1444444444444446,
-    "delta_vs_anchor": -0.02255555555555544
+    "delta_vs_anchor": 0.01144444444444459
+  },
+  {
+    "arch_id": "tsae_paper_k20",
+    "label": "T-SAE k=20 (anchor)",
+    "protocol": "right-edge",
+    "n_seeds": 3,
+    "peak_unc": 1.6777777777777778,
+    "peak_coh_ge_1_5": 1.1333333333333333,
+    "delta_vs_anchor": 0.0003333333333332966
   },
   {
     "arch_id": "txc_bare_antidead_t4_kpos20_grownChainFromT3",
@@ -96,7 +96,7 @@
     "n_seeds": 1,
     "peak_unc": 1.1333333333333333,
     "peak_coh_ge_1_5": 1.1333333333333333,
-    "delta_vs_anchor": -0.033666666666666734
+    "delta_vs_anchor": 0.0003333333333332966
   },
   {
     "arch_id": "txc_bare_antidead_t5_kpos20_grownChainFromT4",
@@ -105,7 +105,7 @@
     "n_seeds": 1,
     "peak_unc": 1.1,
     "peak_coh_ge_1_5": 1.1,
-    "delta_vs_anchor": -0.06699999999999995
+    "delta_vs_anchor": -0.03299999999999992
   },
   {
     "arch_id": "txc_h8_t5_kpos20_shifts5",
@@ -114,7 +114,7 @@
     "n_seeds": 2,
     "peak_unc": 1.35,
     "peak_coh_ge_1_5": 1.0666666666666667,
-    "delta_vs_anchor": -0.10033333333333339
+    "delta_vs_anchor": -0.06633333333333336
   },
   {
     "arch_id": "txc_bare_antidead_t2_kpos20_ws_tsae_encoder",
@@ -123,7 +123,7 @@
     "n_seeds": 1,
     "peak_unc": 1.4,
     "peak_coh_ge_1_5": 1.0666666666666667,
-    "delta_vs_anchor": -0.10033333333333339
+    "delta_vs_anchor": -0.06633333333333336
   },
   {
     "arch_id": "txc_bare_antidead_t5_kpos20",
@@ -132,7 +132,7 @@
     "n_seeds": 2,
     "peak_unc": 1.0166666666666666,
     "peak_coh_ge_1_5": 1.0166666666666666,
-    "delta_vs_anchor": -0.15033333333333343
+    "delta_vs_anchor": -0.1163333333333334
   },
   {
     "arch_id": "txc_bare_antidead_t3_kpos20_grownFromT2sd42",
@@ -141,7 +141,7 @@
     "n_seeds": 1,
     "peak_unc": 1.0,
     "peak_coh_ge_1_5": 1.0,
-    "delta_vs_anchor": -0.16700000000000004
+    "delta_vs_anchor": -0.133
   },
   {
     "arch_id": "txc_bare_antidead_t3_kpos20",
@@ -150,7 +150,7 @@
     "n_seeds": 1,
     "peak_unc": 1.5,
     "peak_coh_ge_1_5": 1.0,
-    "delta_vs_anchor": -0.16700000000000004
+    "delta_vs_anchor": -0.133
   },
   {
     "arch_id": "txc_bare_antidead_t2_kpos20",
@@ -159,7 +159,7 @@
     "n_seeds": 3,
     "peak_unc": 1.288888888888889,
     "peak_coh_ge_1_5": 0.9777777777777779,
-    "delta_vs_anchor": -0.18922222222222218
+    "delta_vs_anchor": -0.15522222222222215
   },
   {
     "arch_id": "txc_bare_antidead_t2_kpos20",
@@ -168,7 +168,7 @@
     "n_seeds": 3,
     "peak_unc": 1.3222222222222222,
     "peak_coh_ge_1_5": 0.9555555555555556,
-    "delta_vs_anchor": -0.21144444444444443
+    "delta_vs_anchor": -0.1774444444444444
   },
   {
     "arch_id": "txc_h8_t3_kpos20_shifts3",
@@ -177,7 +177,7 @@
     "n_seeds": 1,
     "peak_unc": 1.4333333333333333,
     "peak_coh_ge_1_5": 0.9333333333333333,
-    "delta_vs_anchor": -0.2336666666666667
+    "delta_vs_anchor": -0.19966666666666666
   },
   {
     "arch_id": "txc_bare_antidead_t4_kpos20_grownChainFromT3",
@@ -186,7 +186,7 @@
     "n_seeds": 1,
     "peak_unc": 0.9333333333333333,
     "peak_coh_ge_1_5": 0.9333333333333333,
-    "delta_vs_anchor": -0.2336666666666667
+    "delta_vs_anchor": -0.19966666666666666
   },
   {
     "arch_id": "agentic_txc_02_kpos20",
@@ -195,7 +195,7 @@
     "n_seeds": 1,
     "peak_unc": 1.4333333333333333,
     "peak_coh_ge_1_5": 0.9333333333333333,
-    "delta_vs_anchor": -0.2336666666666667
+    "delta_vs_anchor": -0.19966666666666666
   },
   {
     "arch_id": "txc_h8_t5_kpos20_shifts5",
@@ -204,7 +204,7 @@
     "n_seeds": 2,
     "peak_unc": 1.2,
     "peak_coh_ge_1_5": 0.9,
-    "delta_vs_anchor": -0.267
+    "delta_vs_anchor": -0.23299999999999998
   },
   {
     "arch_id": "txc_bare_antidead_t5_kwin20",
@@ -213,7 +213,7 @@
     "n_seeds": 1,
     "peak_unc": 1.5,
     "peak_coh_ge_1_5": 0.8333333333333334,
-    "delta_vs_anchor": -0.33366666666666667
+    "delta_vs_anchor": -0.29966666666666664
   },
   {
     "arch_id": "txc_bare_antidead_t5_kpos20_grownChainFromT4",
@@ -222,7 +222,7 @@
     "n_seeds": 1,
     "peak_unc": 0.8333333333333334,
     "peak_coh_ge_1_5": 0.8333333333333334,
-    "delta_vs_anchor": -0.33366666666666667
+    "delta_vs_anchor": -0.29966666666666664
   },
   {
     "arch_id": "txc_bare_antidead_t5_kpos20",
@@ -231,7 +231,7 @@
     "n_seeds": 2,
     "peak_unc": 1.0333333333333334,
     "peak_coh_ge_1_5": 0.7833333333333333,
-    "delta_vs_anchor": -0.3836666666666667
+    "delta_vs_anchor": -0.3496666666666667
   },
   {
     "arch_id": "txc_bare_antidead_t3_kpos20",
@@ -240,7 +240,7 @@
     "n_seeds": 1,
     "peak_unc": 1.4,
     "peak_coh_ge_1_5": 0.7666666666666667,
-    "delta_vs_anchor": -0.4003333333333333
+    "delta_vs_anchor": -0.3663333333333333
   },
   {
     "arch_id": "txc_contrastive_h8_t2_kpos20_shifts2",
@@ -249,7 +249,7 @@
     "n_seeds": 3,
     "peak_unc": 1.5444444444444443,
     "peak_coh_ge_1_5": 0.7555555555555555,
-    "delta_vs_anchor": -0.4114444444444445
+    "delta_vs_anchor": -0.37744444444444447
   },
   {
     "arch_id": "txc_bare_antidead_t5_kpos20_grownFromT2sd42",
@@ -258,7 +258,7 @@
     "n_seeds": 1,
     "peak_unc": 0.6333333333333333,
     "peak_coh_ge_1_5": 0.6333333333333333,
-    "delta_vs_anchor": -0.5336666666666667
+    "delta_vs_anchor": -0.4996666666666667
   },
   {
     "arch_id": "agentic_txc_02_kpos20",
@@ -267,7 +267,7 @@
     "n_seeds": 1,
     "peak_unc": 1.3333333333333333,
     "peak_coh_ge_1_5": 0.6333333333333333,
-    "delta_vs_anchor": -0.5336666666666667
+    "delta_vs_anchor": -0.4996666666666667
   },
   {
     "arch_id": "txc_bare_antidead_t5_kpos20_grownFromT2sd42",
@@ -276,6 +276,6 @@
     "n_seeds": 1,
     "peak_unc": 0.8333333333333334,
     "peak_coh_ge_1_5": 0.5666666666666667,
-    "delta_vs_anchor": -0.6003333333333334
+    "delta_vs_anchor": -0.5663333333333334
   }
 ]
