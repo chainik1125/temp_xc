@@ -68,8 +68,9 @@ We have a Qwen-7B-Instruct base + PEFT-LoRA fine-tune (`andyrdt/Qwen2.5-7B-Instr
 | **TXC paper-faithful k=100, d_sae=16k, T=5, BatchTopK** (champion) | 4563   | −8  | **58.47** | 30.86 | `qwen_l15_txc_paper_k100bt_d16k_step30000.pt` (h100_1)                                          |
 | SAE arditi 100k bundle k=30 (prior champion)                     | bundle | −10 | 57.42     | 35.78 | (existing, not retrained)                                                                       |
 | T-SAE paper-faithful k=20 BatchTopK, d_sae=16k                   | bundle | −6  | 56.23     | 34.84 | `qwen_l15_tsae_paper_k20_d16k_a01_step30000.pt`                                                 |
-| WindowedTSAE T=2 + mix_positions=True (single)                   | 8017   | −6  | 54.58     | 28.05 | `qwen_l15_wtsae_T2_mix_30000step_step30000.pt` (h100_1)                                         |
+| TXC paper k=20 (single)                                          | 6062   | +8  | 55.16     | 31.33 | `qwen_l15_txc_paper_k20bt_d16k_step30000.pt` (h100_1)                                           |
 | TXC paper k=200 (single)                                         | 10625  | −10 | 55.08     | 34.53 | `qwen_l15_txc_paper_k200bt_d16k_step30000.pt` (h100_2)                                          |
+| WindowedTSAE T=2 + mix_positions=True (single)                   | 8017   | −6  | 54.58     | 28.05 | `qwen_l15_wtsae_T2_mix_30000step_step30000.pt` (h100_1)                                         |
 | TXC paper k=50 (single)                                          | 6406   | −4  | 51.98     | 33.28 | `qwen_l15_txc_paper_k50bt_d16k_step30000.pt`                                                    |
 
 **Goal: beat 58.47 single-feature align with coh ≥ 25.**

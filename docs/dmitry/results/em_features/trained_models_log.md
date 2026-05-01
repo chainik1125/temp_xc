@@ -144,6 +144,28 @@ qwen_l15_txc_brickenauxk_a8_residmid_step20000.pt   (14 GB)
   └─ TXC brickenauxk @ resid_mid intermediate snapshot (20k/30k of the same run)
 ```
 
+**2026-05-01 (h100_1)** — TXC paper k=100 60k continuation needs disk (currently 8.3 GB free, threshold 10 GB):
+```
+qwen_l15_sae_arditi_k128_100k_step40000.pt   (897 MB)
+  └─ HF: dmanningcoe/temp-xc-em-features:sae/qwen_l15_sae_arditi_k128_100k_step40000.pt
+  └─ Intermediate snapshot 40k/100k of SAE arditi 100k run (champion uses step100000).
+qwen_l15_sae_arditi_k128_100k_step50000.pt   (897 MB)
+  └─ HF: dmanningcoe/temp-xc-em-features:sae/qwen_l15_sae_arditi_k128_100k_step50000.pt
+qwen_l15_sae_arditi_k128_100k_step60000.pt   (897 MB)
+  └─ HF: dmanningcoe/temp-xc-em-features:sae/qwen_l15_sae_arditi_k128_100k_step60000.pt
+qwen_l15_sae_arditi_k128_100k_step70000.pt   (897 MB)
+  └─ HF: dmanningcoe/temp-xc-em-features:sae/qwen_l15_sae_arditi_k128_100k_step70000.pt
+qwen_l15_sae_arditi_k128_100k_step80000.pt   (897 MB)
+  └─ HF: dmanningcoe/temp-xc-em-features:sae/qwen_l15_sae_arditi_k128_100k_step80000.pt
+qwen_l15_sae_arditi_k128_100k_step90000.pt   (897 MB)
+  └─ HF: dmanningcoe/temp-xc-em-features:sae/qwen_l15_sae_arditi_k128_100k_step90000.pt
+qwen_l15_tsae_paper_k20_d16k_a01_step10000.pt   (1.4 GB)
+  └─ HF: dmanningcoe/temp-xc-em-features:tsae/qwen_l15_tsae_paper_k20_d16k_a01_step10000.pt
+  └─ Intermediate 10k/30k of T-SAE paper-faithful run (final step30000 retained, used for Wang).
+qwen_l15_tsae_paper_k20_d16k_a01_step20000.pt   (1.4 GB)
+  └─ HF: dmanningcoe/temp-xc-em-features:tsae/qwen_l15_tsae_paper_k20_d16k_a01_step20000.pt
+```
+
 ### Last verified
 
-2026-04-29 — repo size ≈ 230 GB across 50+ ckpts. Repo is **public** (no token needed to download).
+2026-05-01 — repo size ≈ 230 GB across 50+ ckpts. Repo is **public** (no token needed to download).

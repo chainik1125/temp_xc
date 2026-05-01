@@ -161,3 +161,49 @@ Per-variant `wang_*` dirs and `*_bundle*_frontier.json` are committed in `docs/d
 **Disk on h100_1:** 8.3 GB free of 200 GB (96% used). Below the 10 GB threshold. New training launches are blocked until either (a) k=20 Wang completes and the resulting ckpt is freed/HF-mirrored, or (b) an existing HF-mirrored ckpt is cleaned up. **Will not launch any new run this firing.**
 
 **Decision:** wait for the in-flight TXC k=20 Wang to finish. Once that lands the next move is dictated by (a) the k=20 single-peak result for Track C, and (b) whether h100_2's mix+matr beat 56.23 bundle for Track A. If both have completed by next firing, the cleanup-then-launch can begin.
+
+### 2026-05-01 01:00 UTC routine-firing update — TXC paper-faithful k=20 done
+
+**Bundle k=30 peak: 55.50 align at α=+3, coh=25.94** (α=0 baseline 44.24, lift +11.26).
+
+Stage 4 single-feature finalists:
+
+| feat | Δz̄ | peak α | peak align | peak coh | α=0 align |
+|---|---:|---:|---:|---:|---:|
+| 5773 | +0.15 | +1.25 | 48.54 | 23.98 | 40.92 |
+| 1989 | +0.44 | +10.0 | 52.29 | 30.78 | 41.90 |
+| **6062** | **+0.22** | **+8.0** | **55.16** | **31.33** | **44.54** |
+
+Best single-feature: feat 6062, α=+8, align=55.16, coh=31.33.
+
+**TXC paper-faithful k-sweep, single-feature peak:**
+
+| k_total | best single feat | peak α | peak align | peak coh |
+|---:|---:|---:|---:|---:|
+| 20 | 6062 | +8 | 55.16 | 31.33 |
+| 50 | 6406 | -4 | 51.98 | 33.28 |
+| **100** | **4563** | **−8** | **58.47** | **30.86** |
+| 200 | 10625 | −10 | 55.08 | 34.53 |
+
+Sweet spot for single-feature is decisively k_total=100. Both increasing (k=200, 55.08) and decreasing (k=20, 55.16) sparsity costs ~3 align points. k=50 dip (51.98) is likely feature-selection noise — the top-3 finalists for that run had Δz̄ < 0.3 and were noisy.
+
+**Direction-flip pattern.** k=20 finalists ALL peak at *positive* α (+1.25 / +10 / +8), opposite to k=100 (α=−8) and k=200 (α=−10). We previously saw this same flip for the un-mixed wtsae_T2 (peaked at α=+10) and partially in wtsae_T2+mix (mixed peak signs). Hypothesis: at low k_total the BatchTopK encoder is so sparse that the surviving features are not "misalignment direction" features but something more like "domain/topic" features (medical-careful-answer style), so positive-α amplifies them in a way the judge interprets as more aligned. The Δz̄ values are all small/positive (≤0.44), consistent with weak misalignment-direction signal at this sparsity.
+
+**Implication for Track C decision tree.** Brief said: if 52 ≤ single-feat < 58.47, try k=30 or k=75. With k=20=55.16 and k=50=51.98 (possibly noise), k=100=58.47, k=200=55.08, the curve is not monotonically peaked — there's a noisy k=50 dip and otherwise smooth. The single-feature peak vs k curve looks roughly like:
+
+```
+k:    20    50   100   200
+peak: 55.2  52.0 58.5  55.1
+```
+
+The optimum is sharply at k=100 with ±20% in both directions costing ~3 points. There is **no obvious reason to expect k=75 or k=125 to beat 58.47** — the curve is locally smooth around k=100 only with k=50 as a dip outlier (and that dip is more likely feature-selection noise than a real local-min). Conclusion: k-sweep direction is exhausted for the resid_post hookpoint at d_sae=16k, 30k steps. To push past 58.47 we should switch direction.
+
+**Updated next-experiment thinking.** With k-sweep exhausted, the candidates remaining are:
+
+1. **Track B (vanilla SAE windowed T=2, NOT YET STARTED).** Cleanest test of "does windowing alone help" without any contrastive recipe. Architecturally the most informative still-uncovered direction.
+2. **C3 (TXC k=100 60k steps).** Tests if more compute pushes feat 4563 above 58.47. Low risk of dramatic improvement (architectures usually saturate by 30k for d_sae=16k), but a clean +1-2 point gain would be a champion.
+3. **C4 (TXC k=100 paper-faithful @ resid_mid).** Different hookpoint, same arch. Our existing TXC @ resid_mid (with our older settings) was 53.87 single; paper-faithful settings might do better.
+
+Track B has the highest information-per-experiment value (it's a direction we haven't tested at all). C3 has the highest expected-numerical-gain value (extends the current champion). I'll launch C3 first as the cheaper safer hill-climb, since (a) we already have the launcher script, (b) it requires no code change, (c) it tests if more steps pushes 58.47 → 60+. Track B requires writing a vanilla-SAE windowed launcher (or running wtsae with `--contrastive_alpha 0.0`); will tackle next firing.
+
+**Disk first.** Need to clean up before launching C3. The k=200 ckpt (`qwen_l15_txc_paper_k200bt_d16k_step30000.pt`, ~5 GB) is fully HF-mirrored and Wang-done — safest to delete. Will follow the disk-policy procedure.

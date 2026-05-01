@@ -72,6 +72,9 @@ def main():
          load_bundle(H / "tsae_paper_30k/results/wang_tsae_paper_k20_d16k_step30000_bundle30_frontier.json"),
          "saddlebrown"),
         # ROW 2: TXC paper-faithful k-sweep
+        ("TXC paper-faithful 30k k=20 @ resid_post",
+         load_bundle(H / "txc_paper_k20_30k/results/wang_txc_paper_k20bt_d16k_step30000_bundle30_frontier.json"),
+         "yellowgreen"),
         ("TXC paper-faithful 30k k=50 @ resid_post",
          load_bundle(H / "txc_paper_k50_30k/results/wang_txc_paper_k50bt_d16k_step30000_bundle30_frontier.json"),
          "lightgreen"),
