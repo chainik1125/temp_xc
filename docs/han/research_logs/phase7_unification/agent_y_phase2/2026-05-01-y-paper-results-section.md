@@ -174,10 +174,28 @@ uniform-mean (proportional to additive-sum). Across all three seeds,
 98%+ of features converged to τ ∈ [0.5, 2.0] (median ≈ 1.06), with
 no features pushing toward either extreme. This convergent
 "soft preference for max" pooling achieves the **largest individual
-WIN of any cell at any threshold**: Δ = +1.089 at coh ≥ 1.75 PP
-(Procedure A SIG [+0.761, +1.450]; Procedure B borderline
-[−0.022, +1.456]), 20% larger than the previous best (T = 2 H8 RE
-3sd Δ = +0.906) and over 4× the WIN threshold.
+WIN of any cell at any threshold**: Δ = +1.011 at coh ≥ 1.75 PP
+(Procedure A SIG [+0.667, +1.378]; against the same-pod n=3 anchor
+0.411), over 4× the WIN threshold.
+
+#### Soft-max-pool scales with T (Galaxy 18)
+
+Training the same TXCSoftMaxPool architecture at T = 3 (Galaxy 18, k_pos = 20,
+k_win = 60) reveals a **protocol-specific scaling law**:
+
+| protocol | Δ at coh ≥ 1.75 (T = 2) | Δ at coh ≥ 1.75 (T = 3) | Change |
+|---|---:|---:|---:|
+| right-edge | +0.300 | **+0.767** | +0.467 |
+| per-position | **+1.011** | +0.233 | −0.778 |
+
+T = 3 right-edge brings the Galaxy 8 family into the same league as
+the strongest H8 multi-distance cells (T = 2 H8 RE Δ = +0.828). The
+right-edge protocol writes the steered z only at the rightmost position,
+so dilution by extra positions is bounded. The per-position protocol
+writes equally to all T positions; at T = 3 this dilutes the signal
+beyond the soft-max-pool's coherence-preserving advantage. **At higher
+T, switch to RE; at T = 2, PP is the right protocol.** This gives a
+practical recipe rather than a fixed best-cell.
 
 ### 4.X.6 Headline figure
 
