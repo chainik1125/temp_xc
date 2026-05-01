@@ -114,6 +114,7 @@ INVENTORY = [
         ("steering_paper_normalised",                       "right-edge",   42),
         ("steering_paper_normalised_seed1",                 "right-edge",   1),
         ("steering_paper_normalised_seed2",                 "right-edge",   2),
+        ("steering_paper_window_perposition",               "per-position", 42),
         ("steering_paper_window_perposition_seed1",         "per-position", 1),
         ("steering_paper_window_perposition_seed2",         "per-position", 2),
     ]),
