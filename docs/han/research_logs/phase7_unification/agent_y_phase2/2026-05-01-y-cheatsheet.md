@@ -72,37 +72,43 @@ way. The strongest WIN is at coh ≥ 1.75 under both reductions.
 2. **TXC's window encoder distributes the steering signal** across T
    tokens. At moderate strength, TXC produces COHERENT text that
    contains the concept.
-3. **Cross-cell consistency**: at coh ≥ 1.75, **fifteen 3-seed-verified
-   TXC cells beat anchor by Δ > +0.27**:
-   - **🚀 Galaxy 8 (TXCSoftMaxPool) PP 3sd**: Δ = +1.089 (Y's soft-max-pool — NEW BEST!) ⭐⭐⭐⭐
-   - T=2 H8 RE 3sd:                   Δ = +0.906 ⭐
-   - T=3 grown RE 3sd:                Δ = +0.889 ⭐
-   - **TXCMaxPoolMergeH8 RE 3sd**:    Δ = +0.811 (W's mystery arch)
-   - **TXCMaxPoolMergeH8 PP 3sd**:    Δ = +0.811
-   - T-SAE WS PP 3sd:                 Δ = +0.800
-   - **Galaxy 6 (TXCMaxPool) PP 3sd**: Δ = +0.722 (Y's max-pool prototype)
-   - T-SAE WS RE 3sd:                 Δ = +0.678
-   - T=2 bare PP 3sd:                 Δ = +0.644
-   - T=2 bare RE 3sd:                 Δ = +0.622
-   - T=3 grown PP 3sd:                Δ = +0.606
-   - **Galaxy 6 (TXCMaxPool) RE 3sd**: Δ = +0.522
-   - Galaxy 4 PP 3sd:                 Δ = +0.511 (Y's hierarchical multi-scale)
-   - Galaxy 4 RE 3sd:                 Δ = +0.478
-   - **Galaxy 8 (TXCSoftMaxPool) RE 3sd**: Δ = +0.378
-   - T=2 H8 PP 3sd:                   Δ = +0.278 (just above threshold)
+3. **Cross-cell consistency** (under same-pod n=3 anchor 0.411 at
+   coh ≥ 1.75): **eleven 3-seed cells beat anchor by Δ > +0.27;
+   nine of them are Procedure A SIG**:
+   - **🚀 Galaxy 8 (TXCSoftMaxPool) PP 3sd**: Δ = +1.011 SIG ⭐⭐⭐⭐
+   - T=2 H8 RE 3sd:                   Δ = +0.828 SIG
+   - T=3 grown RE 3sd:                Δ = +0.811 (Procedure-B border)
+   - **TXCMaxPoolMergeH8 RE n=3** (W's): Δ = +0.733
+   - **TXCMaxPoolMergeH8 PP n=3** (W's): Δ = +0.733
+   - T-SAE WS PP 3sd:                 Δ = +0.722
+   - **Galaxy 6 (TXCMaxPool) PP 3sd**: Δ = +0.644 SIG
+   - T-SAE WS RE 3sd:                 Δ = +0.600
+   - **Galaxy 11 (SoftMaxPool+H8) PP 3sd**: Δ = +0.578 SIG ⭐ (Y new)
+   - T=2 bare PP 3sd:                 Δ = +0.567 SIG
+   - T=2 bare RE 3sd:                 Δ = +0.544 SIG
+   - **Galaxy 11 (SoftMaxPool+H8) RE 3sd**: Δ = +0.489 SIG ⭐ (Y new)
+   - **Galaxy 6 (TXCMaxPool) RE 3sd**: Δ = +0.444 SIG
+   - T=3 grown PP 3sd:                Δ = +0.478
+   - Galaxy 4 PP 3sd:                 Δ = +0.433
+   - Galaxy 4 RE 3sd:                 Δ = +0.400
+   - **Galaxy 8 (TXCSoftMaxPool) RE 3sd**: Δ = +0.300 SIG
 
-   Plus 2-seed cells: T=5 H8 PP +0.733, etc.
+   Plus 2-seed cells: T=5 H8 PP +0.656, etc.
 
    Robust effect across:
-   - **7 architectures**: H8 multi-distance, bare-antidead, grown-chain,
+   - **8 architectures**: H8 multi-distance, bare-antidead, grown-chain,
      T-SAE warm-start, Galaxy 4 hierarchical multi-scale,
-     Galaxy 6 max-pool TXC (Y), MaxPool merge H8 (W)
+     Galaxy 6 max-pool TXC (Y), Galaxy 8 soft-max-pool (Y),
+     Galaxy 11 soft-max-pool+H8 (Y),
+     plus W's MaxPool-merge H8 and Contrastive-merge H8
    - **Both protocols**: right-edge, per-position
 
-   Plus W's bootstrap-significant result at coh ≥ 2.0:
-   MaxPool + V6 dec-broadcast 3sd Δ=+0.420 with bootstrap CI
-   [+0.011, +1.106] — STRICT statistical significance under
-   concept-resample bootstrap.
+   **Key compositional finding**: H8 contrastive HELPS hard-max-pool
+   (+0.089 lift on Galaxy 6 PP → MaxPoolMergeH8 PP) but HURTS
+   soft-max-pool (−0.433 drop on Galaxy 8 PP → Galaxy 11 PP). The
+   InfoNCE loss encourages spiky position-discriminative features,
+   which works with hard-max (pick best position) but conflicts with
+   soft-max's diffuse aggregation. Two distinct optimization regimes.
 
 ### Bootstrap uncertainty
 
