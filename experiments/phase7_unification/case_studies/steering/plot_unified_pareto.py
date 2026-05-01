@@ -119,6 +119,39 @@ INVENTORY = [
         ("steering_paper_window_perposition_seed1",         "per-position", 1),
         ("steering_paper_window_perposition_seed2",         "per-position", 2),
     ]),
+    # Y's Galaxy archs (multi-seed verified)
+    ("txc_maxpool_t2_kpos20", "T=2 Galaxy 6 max-pool (Y)", "#ff7f0e", [
+        ("steering_paper_normalised",                       "right-edge",   42),
+        ("steering_paper_normalised_seed1",                 "right-edge",   1),
+        ("steering_paper_normalised_seed2",                 "right-edge",   2),
+        ("steering_paper_window_perposition",               "per-position", 42),
+        ("steering_paper_window_perposition_seed1",         "per-position", 1),
+        ("steering_paper_window_perposition_seed2",         "per-position", 2),
+    ]),
+    ("txc_softmaxpool_t2_kpos20", "T=2 Galaxy 8 SoftMaxPool (Y)", "#2ca02c", [
+        ("steering_paper_normalised",                       "right-edge",   42),
+        ("steering_paper_normalised_seed1",                 "right-edge",   1),
+        ("steering_paper_normalised_seed2",                 "right-edge",   2),
+        ("steering_paper_window_perposition",               "per-position", 42),
+        ("steering_paper_window_perposition_seed1",         "per-position", 1),
+        ("steering_paper_window_perposition_seed2",         "per-position", 2),
+    ]),
+    ("txc_softmax_pool_h8_t2_kpos20_shifts2", "T=2 Galaxy 11 SoftMaxPool+H8 (Y)", "#17becf", [
+        ("steering_paper_normalised",                       "right-edge",   42),
+        ("steering_paper_normalised_seed1",                 "right-edge",   1),
+        ("steering_paper_normalised_seed2",                 "right-edge",   2),
+        ("steering_paper_window_perposition",               "per-position", 42),
+        ("steering_paper_window_perposition_seed1",         "per-position", 1),
+        ("steering_paper_window_perposition_seed2",         "per-position", 2),
+    ]),
+    ("txc_softmaxpool_t3_kpos20", "T=3 Galaxy 18 SoftMaxPool (Y)", "#bcbd22", [
+        ("steering_paper_normalised",                       "right-edge",   42),
+        ("steering_paper_normalised_seed1",                 "right-edge",   1),
+        ("steering_paper_normalised_seed2",                 "right-edge",   2),
+        ("steering_paper_window_perposition",               "per-position", 42),
+        ("steering_paper_window_perposition_seed1",         "per-position", 1),
+        ("steering_paper_window_perposition_seed2",         "per-position", 2),
+    ]),
 ]
 
 
