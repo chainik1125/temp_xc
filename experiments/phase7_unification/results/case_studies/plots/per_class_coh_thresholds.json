@@ -71,6 +71,30 @@
         "behavior_form": 1.0,
         "behavior_emotion": 1.222222222222222
       }
+    },
+    "Galaxy 8 soft-max-pool PP": {
+      "color": "green",
+      "by_class": {
+        "knowledge_domain": 2.074074074074074,
+        "knowledge_format": 0.7333333333333333,
+        "discourse_register": 1.8333333333333333,
+        "discourse_safety": 0.8666666666666667,
+        "discourse_style": 2.0,
+        "behavior_form": 0.7777777777777778,
+        "behavior_emotion": 1.6666666666666667
+      }
+    },
+    "Galaxy 8 soft-max-pool RE": {
+      "color": "lime",
+      "by_class": {
+        "knowledge_domain": 1.5185185185185184,
+        "knowledge_format": 1.2,
+        "discourse_register": 2.0,
+        "discourse_safety": 0.6666666666666666,
+        "discourse_style": 1.888888888888889,
+        "behavior_form": 0.7777777777777778,
+        "behavior_emotion": 0.7777777777777777
+      }
     }
   },
   "1.75": {
@@ -145,6 +169,30 @@
         "behavior_form": 1.0,
         "behavior_emotion": 0.8888888888888888
       }
+    },
+    "Galaxy 8 soft-max-pool PP": {
+      "color": "green",
+      "by_class": {
+        "knowledge_domain": 0.9629629629629629,
+        "knowledge_format": 0.7333333333333333,
+        "discourse_register": 1.8333333333333333,
+        "discourse_safety": 0.8666666666666667,
+        "discourse_style": 2.0,
+        "behavior_form": 0.7777777777777778,
+        "behavior_emotion": 1.6666666666666667
+      }
+    },
+    "Galaxy 8 soft-max-pool RE": {
+      "color": "lime",
+      "by_class": {
+        "knowledge_domain": 1.037037037037037,
+        "knowledge_format": 0.7999999999999999,
+        "discourse_register": 2.0,
+        "discourse_safety": 0.6666666666666666,
+        "discourse_style": 0.7777777777777777,
+        "behavior_form": 0.7777777777777778,
+        "behavior_emotion": 0.7777777777777777
+      }
     }
   },
   "2.0": {
@@ -217,6 +265,30 @@
         "discourse_safety": 0.06666666666666667,
         "discourse_style": 0.8888888888888888,
         "behavior_form": 1.0,
+        "behavior_emotion": 0.7777777777777777
+      }
+    },
+    "Galaxy 8 soft-max-pool PP": {
+      "color": "green",
+      "by_class": {
+        "knowledge_domain": 0.9629629629629629,
+        "knowledge_format": 0.7333333333333333,
+        "discourse_register": 1.8333333333333333,
+        "discourse_safety": 0.8666666666666667,
+        "discourse_style": 2.0,
+        "behavior_form": 0.3333333333333333,
+        "behavior_emotion": 0.6666666666666666
+      }
+    },
+    "Galaxy 8 soft-max-pool RE": {
+      "color": "lime",
+      "by_class": {
+        "knowledge_domain": 1.037037037037037,
+        "knowledge_format": 0.7999999999999999,
+        "discourse_register": 1.6666666666666667,
+        "discourse_safety": 0.06666666666666667,
+        "discourse_style": 0.7777777777777777,
+        "behavior_form": 0.7777777777777778,
         "behavior_emotion": 0.7777777777777777
       }
     }

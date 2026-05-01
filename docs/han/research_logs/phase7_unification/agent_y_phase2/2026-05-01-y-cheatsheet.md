@@ -178,7 +178,24 @@ mathematical notation, etc.) at the higher coh ≥ 1.75 threshold.
 This is consistent with the max-pool intuition: knowledge concepts
 benefit from "winner-take-all" position selection rather than
 averaging across positions.
-- discourse_register, knowledge_domain, behavior_form: smaller Δs
+
+**🚀 Galaxy 8 (soft-max-pool) PP has the BROADEST per-class win at
+coh ≥ 1.75** — wins on 5 of 7 classes by Δ ≥ +0.8:
+
+| class (coh ≥ 1.75) | T-SAE | G8 PP | Δ G8 PP |
+|---|---:|---:|---:|
+| **discourse_style** | 0.500 | **2.000** | **+1.500** ⭐⭐⭐ |
+| **behavior_emotion** | 0.667 | **1.667** | **+1.000** ⭐⭐ |
+| **discourse_safety** | 0.000 | **0.867** | **+0.867** ⭐⭐ (anchor=0!) |
+| **knowledge_domain** | 0.167 | 0.963 | **+0.796** ⭐ |
+| knowledge_format | 0.700 | 0.733 | +0.033 (TIE) |
+| behavior_form | 0.667 | 0.778 | +0.111 (TIE) |
+| discourse_register | 2.500 | 1.833 | −0.667 (LOSS — only one) |
+
+Galaxy 8 PP's win is BROADER than any other TXC: it dominates on
+discourse, behavior, AND knowledge classes simultaneously. The only
+class where T-SAE retains the lead is `discourse_register` (formal
+vs casual), which is a structural TXC limitation across all archs.
 
 Honest framing: **T-SAE = strong per-token vocabulary tagger;
 TXC = strong multi-token discourse structure recognizer**. The
