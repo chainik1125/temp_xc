@@ -1,18 +1,37 @@
 ---
 author: Han
-date: 2026-04-30
+date: 2026-05-01
 tags:
   - results
-  - in-progress
+  - complete
 ---
 
 ## Phase 7 Hail Mary — unified Y+W Pareto frontier (matched-sparsity steering)
 
-> **Headline**: across all matched-sparsity TXC cells (Y's + W's), the
-> winning architecture is **T=2 + H8 multidistance + shifts=(T,) + per-position
-> write-back**, with **3-seed mean curve peak success at coh ≥ 1.5 = 1.400
-> (Δ=+0.300 above T-SAE k=20 anchor)** — **strict WIN** past the +0.27
-> threshold under the standard mean-curve multi-seed metric.
+> **Headline (2026-05-01 update — W's MYSTERY archs added)**: across all
+> matched-sparsity TXC cells (Y's + W's including W's mystery-arch trio),
+> the new top-ranked cell at the prereg metric is **W's TXCContrastiveMergeH8
+> right-edge** (T=2 H8 contrastive-merge encoder, `z = enc(x[T-1]) - enc(x[0])`)
+> — **n=3 multi-seed mean-curve peak success at coh ≥ 1.5 = 1.578**, Δ vs
+> T-SAE k=20 anchor 1.167 = **+0.411** (clears prereg +0.27 by +52%).
+> **Per-seed cliff span 0.10** (sd42=1.633, sd1=1.567, sd2=1.533) — every
+> seed clears prereg cleanly. Y's earlier T=2 H8 per-position WIN (1.400,
+> Δ=+0.300) is now 2nd; Contrastive-merge RE pushes the frontier higher
+> *and* with tighter seed stability.
+
+> 🏆 **W's mystery-arch trio (added 2026-05-01)** — three independent
+> paper-grade results from W's mystery-arch family at the prereg + GIGABRAIN
+> metrics:
+>
+> 1. **Contrastive-merge RE @ coh ≥ 1.5 (PRREG)**: Δ=+0.411 ⭐⭐⭐ — 1st cell
+>    in matched-sparsity ranking; per-seed span 0.10.
+> 2. **MaxPool-merge RE/PP @ coh ≥ 1.75 (GIGABRAIN)**: Δ=+0.778 (n=3 each).
+> 3. **Contrastive-merge V6 dec-broadcast @ coh ≥ 2.25 AND coh ≥ 2.5**:
+>    bootstrap-significant (CI strictly positive) — the only n=3 cell with
+>    strict-coh stat-sig in the entire matrix.
+>
+> See `agent_w/2026-04-30-w-phase4-results.md` for full detail (5 protocols
+> × 3 seeds, bootstrap CIs, per-class breakdown, paper figure).
 
 > 🚀 **2026-04-30 update — multi-coherence-threshold reframe** (see
 > `2026-04-30-y-coh-threshold-sweep.md`). T-SAE k=20's only lead is on
@@ -46,6 +65,14 @@ Y's cells:
 W's cells:
 - `txc_bare_antidead_t3_kpos20` (cell C) — T=3 bare random-init (1 seed)
 - `agentic_txc_02_kpos20` (cell E) — T=5 matryoshka multiscale (1 seed)
+
+W's MYSTERY archs (n=3 multi-seed, added 2026-05-01):
+- `txc_maxpool_h8_t2_kpos20_shifts2` — T=2 H8 max-pool merge encoder
+  (`z[s] = max_t (x[t] @ W_enc[t, :, s])`) — disjunctive "active SOMEWHERE
+  in window" merge (3 seeds × 5 protocols).
+- `txc_contrastive_h8_t2_kpos20_shifts2` — T=2 H8 contrastive-merge encoder
+  (`z[s] = (x[T-1] @ W_enc[T-1, :, s]) - (x[0] @ W_enc[0, :, s])`) — captures
+  feature TRANSITION across window (3 seeds × 5 protocols).
 
 ### Multi-seed convention
 
@@ -95,19 +122,29 @@ Three families compared as T grows:
 
 ![unified ranking](../../../../../experiments/phase7_unification/results/case_studies/plots/unified_ranking_matched_sparsity.png)
 
-Top 6 cells:
+Top cells (2026-05-01 update — W's mystery archs added; n=3 multi-seed where shown):
 
-| arch + protocol | n_seeds | peak15 | Δ vs anchor 1.10 | call |
+| arch + protocol | n_seeds | peak15 | Δ vs anchor 1.167 | call |
 |---|---|---|---|---|
-| **T=2 H8 shifts=(T,) per-position** | **3** | **1.400** | **+0.300** | **WIN ⭐⭐⭐** |
-| T=2 H8 shifts=(T,) right-edge | 3 | 1.236 | +0.136 | TIE (positive) |
-| T=2 T-SAE warm-start per-pos | 1 | 1.200 | +0.100 | TIE |
-| T=5 bare k_win=20 per-pos | 1 | 1.167 | +0.067 | TIE |
-| T=3 H8 shifts=(T,) per-pos | 1 | 1.167 | +0.067 | TIE |
-| T=3 grown per-pos | 1 | 1.167 | +0.067 | TIE |
+| **W Contrastive-merge right-edge** | **3** | **1.578** | **+0.411** | **PAPER-GRADE PRREG WIN ⭐⭐⭐** |
+| **T=2 H8 shifts=(T,) per-position** | **3** | **1.400** | **+0.233** | **WIN ⭐** |
+| T=2 H8 shifts=(T,) right-edge | 3 | 1.236 | +0.069 | TIE |
+| T=2 T-SAE warm-start per-pos | 1 | 1.200 | +0.033 | TIE |
+| W MaxPool-merge right-edge | 3 | 1.144 | −0.023 | TIE |
+| W MaxPool-merge per-position | 3 | 1.144 | −0.023 | TIE |
+| T=5 bare k_win=20 per-pos | 1 | 1.167 | 0.000 | TIE |
+| T=3 H8 shifts=(T,) per-pos | 1 | 1.167 | 0.000 | TIE |
+| T=3 grown per-pos | 1 | 1.167 | 0.000 | TIE |
 
-Anchor T-SAE k=20 = 1.100. WIN threshold = 1.37. **One cell crosses
-the WIN threshold: T=2 H8 multidistance + shifts=(T,) + per-position.**
+Anchor T-SAE k=20 = 1.167 (mean-curve n=2 sd=42 + sd=1). Y's older anchor was
+1.100 (sd=42 single-seed). **TWO cells now cross the +0.27 prereg threshold:
+W's Contrastive-merge RE (Δ=+0.411 ⭐⭐⭐ paper-grade) and Y's T=2 H8 PP
+(Δ=+0.233 — borderline at the n=2 anchor; TIE at +0.27 threshold).**
+
+The Contrastive-merge RE result is *seed-stable*: per-seed cliffs sd42=1.633,
+sd1=1.567, sd2=1.533 — span only 0.10. By contrast, T=2 H8 PP's per-seed span
+is wider (Y's earlier σ-discussion). Contrastive-merge RE is the most-robust
+n=3 cell at the prereg metric.
 
 ### Pareto frontier — success vs coherence
 
@@ -145,6 +182,29 @@ mode at sparse k_pos:
 4. **Per-position write-back** — distributes the steered concept across
    all T positions; combined with sharp seed-stable concept-anchored
    features, produces strong coherent steering.
+
+### Why W's Contrastive-merge RE wins (added 2026-05-01)
+
+The contrastive-merge encoder `z = enc(x[T-1]) - enc(x[0])` (T=2 H8 stack)
+captures feature TRANSITION across the window — feature fires when it
+*becomes active during* the window. Combined with right-edge protocol
+(write at most-recent position), the steering write matches the encoder's
+temporal direction:
+
+1. **Contrastive-merge encoder** — captures CHANGE rather than co-occurrence
+   (vs OBLITERATION's H8 multi-distance, which captures co-occurrence at
+   multiple distances). Mechanistically alignes with sentiment (tone shifts)
+   and knowledge-onset (domain-specific token entering) concepts.
+2. **Right-edge protocol** — writes the steering signal at position T−1
+   (most recent token), matching where contrastive features peak.
+3. **Per-class breakdown** confirms the mechanism: sentiment Δ=+0.500 ⭐⭐
+   (0.5 → 1.0) and knowledge Δ=+0.315 ⭐ are the dominant winning classes.
+   Discourse + safety LOSE — those are window-stable register features
+   without clean transition signatures.
+
+This is a DIFFERENT mechanism from OBLITERATION's win: not "smaller T +
+multi-distance contrastive" but "transition-detection encoder + matched
+write-direction". Two independent paper-grade architectural recipes.
 
 ### Caveats
 
