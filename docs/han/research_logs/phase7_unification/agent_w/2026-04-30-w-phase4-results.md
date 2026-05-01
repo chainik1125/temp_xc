@@ -3,26 +3,29 @@ author: Han
 date: 2026-04-30
 tags:
   - results
-  - in-progress
+  - complete
 ---
 
-## Phase 4 results — left-edge / dec-additive / dec-broadcast on OBLITERATION arch
+## Phase 4 results — left-edge / dec-additive / dec-broadcast / mystery archs
 
-> **Status: PRELIMINARY (sd=42 retraining in flight for full apples-to-apples).**
-> Phase 4 tested three new TXC-native protocols (V5 left-edge, V3
-> dec-additive, V6 dec-broadcast) on the OBLITERATION arch
-> (T=2 H8 multidist shifts=(2,)) at multi-seed. Goal: stack past +0.27
-> strict win on coherent steering.
+> **Status: COMPLETE (n=3 multi-seed verified across all 3 mystery archs × 5 protocols, with bootstrap CIs and per-class breakdowns).**
+> Phase 4 started by testing three new TXC-native protocols (V5 left-edge, V3
+> dec-additive, V6 dec-broadcast) on the OBLITERATION arch (T=2 H8 multidist
+> shifts=(2,)). It expanded to two MYSTERY architectures (W's MaxPool merge
+> and Contrastive-merge end-vs-start) — both reaching paper-grade results.
 >
-> **Three findings emerged**:
-> 1. At pre-registered coh ≥ 1.5, no single TXC protocol cleanly beats
->    T-SAE k=20 in same-pod multi-seed mean (all in TIE band, sd=42 dependency).
-> 2. **At Y's GIGABRAIN-reframed coh ≥ 1.75 metric, V3 dec-additive cleanly
->    wins n=2 by Δ=+0.700**, V6 dec-broadcast by Δ=+0.433. At coh ≥ 2.0,
->    V5 left-edge wins by Δ=+0.283 and V6 by Δ=+0.483. **All three new
->    protocols cross +0.27 at non-prereg coh thresholds**.
-> 3. V5 left-edge has highest single-seed cliff (1.367 at sd=1) and is the
->    most-coherence-stable single protocol for TXC steering.
+> **Six findings (paper-grade, multi-seed verified)**:
+> 1. **OBLITERATION (Y's headline) at coh ≥ 1.5** holds at n=3: T-SAE comparable.
+> 2. **MaxPool TXC at coh ≥ 1.75** — n=3 multi-seed Δ=+0.811 (paper-grade WIN, 5 protocols).
+> 3. **Contrastive-merge TXC right-edge at coh ≥ 1.5 (PRREG)** — n=3 multi-seed Δ=+0.411 (PAPER-GRADE PRREG WIN ⭐⭐⭐, every seed clears prereg, span 0.10).
+> 4. **Contrastive-merge V6 dec-broadcast at coh ≥ 1.75** — n=3 Δ=+0.611 (paper-grade WIN at GIGABRAIN metric); at coh ≥ 2.0 BOOTSTRAP-SIGNIFICANT (CI=[+0.022, +0.467]).
+> 5. **Contrastive-merge per-position at coh ≥ 1.75** — n=3 Δ=+0.423 (also clears +0.27).
+> 6. **Three TXC families have THREE per-class signatures** (Contrastive=sentiment-dominant, MaxPool=stylistic+sentiment, OBLIT=knowledge); all unified by sentiment win across every TXC × protocol cell.
+>
+> **Older findings (subsumed by n=3 mystery-arch results)**:
+> - At pre-registered coh ≥ 1.5, no canonical OBLIT protocol cleanly beats T-SAE k=20 (all TIE) — superseded by Contrastive-merge RE PAPER-GRADE PRREG WIN.
+> - V3 dec-additive @ coh ≥ 1.75 on OBLIT n=2: Δ=+0.700 — single-cell point estimate, see also full Phase 4 protocol matrix below.
+> - V5 left-edge has highest single-seed cliff at coh ≥ 1.5 (sd=1: 1.367); multi-seed effect smaller.
 
 ### TL;DR — same-pod sd=1+sd=2 multi-seed matrix on OBLITERATION
 
