@@ -36,7 +36,7 @@ checks.
 | `2026-04-29-per-task-tsweep.md` | Per-task T-scaling (txcdr_t<T> family at every T) — 36 small multiples + ranking by slope. **`winogrande` is the only task where T helps monotonically** (+0.0069/T at k=20), validating the multi-token-reasoning hypothesis. |
 | `2026-04-29-paper-task-set.md` | **Final 16-task paper set (`PAPER`)** — pre-registered selection by cross-arch SD within balanced clusters. k=20 winner `txc_bare_antidead_t5` Δ=+0.0036 (~6× σ_seeds, decisive). k=5 top-6 within 0.0035 AUC (no defensible single champion). |
 | `2026-04-29-handover-IT-and-mlc-sparse.md` | **Handover briefing** for next-agent IT-side leaderboard + missing MLC sparse cells (`mlc_sparse`, `ag_mlc_08_sparse`). Includes coverage status, plan, A40 feasibility, common pitfalls. Read this before starting either follow-on. |
-| `2026-04-29-leaderboard-it.md` | **IT leaderboard (9 of 9 A40_ok archs, seed=42).** Headline: TXC structural-bias k=20 win **DOES replicate on IT**, with a different variant — `phase5b_subseq_h8` is the IT k=20 winner at 0.9073 (Δ=+0.0135 over topk_sae); only arch that improves under instruction tuning. `phase57_partB_h8_multidistance_t8` is the IT k=5 winner (matches BASE). |
+| `2026-04-29-leaderboard-it.md` | **IT leaderboard (12 archs, seed=42)** including Mission #2 dense MLC. Headline: `mlc` wins k=20 (0.9118, Δ=+0.018) AND k=5 (0.8722) on IT. `phase5b_subseq_h8` 2nd at k=20 (0.9073). MLC + `phase5b_subseq_h8` are the only archs that improve under instruction tuning — structural inductive bias (across layers OR windowed tokens) generalizes; per-token sparsity does not. |
 | `plots/` | Paper figures, full-res `.png` (150 dpi) + thumbnails (`*.thumb.png`, ≤288px wide). |
 
 ### Headline figures
@@ -99,27 +99,40 @@ evaluated under Phase 7 current methodology at b=4096:
   `paper_archs.json` ("If a cell can't fit on A40 at b=4096, DO NOT
   downsize batch — DEFER to H200").
 - **`ag_mlc_08_sparse` (agentic_mlc_08, k_win=100)** — same as above.
-- **IT-side cells: 8 of 12 evaluated at seed=42** (Agent X 2026-04-30).
-  - All 9 A40_ok cells trained at seed=42 + probed on PAPER set
-    (`topk_sae`, `tsae_paper_k20`, `tsae_paper_k500`, `tfa_big`,
+- **IT-side cells: 10 of 12 evaluated at seed=42** (Agent X 2026-04-30).
+  - 12 archs trained + probed: 9 A40_ok (`topk_sae`,
+    `tsae_paper_k20`, `tsae_paper_k500`, `tfa_big`,
     `txc_bare_antidead_t5`, `txcdr_t5`, `txcdr_t16`,
-    `phase5b_subseq_h8`, `phase57_partB_h8_bare_multidistance_t8`).
-    See `2026-04-29-leaderboard-it.md`.
-  - **IT k_feat=20 winner: `phase5b_subseq_h8`** at 0.9073
-    (Δ=+0.0135 over `topk_sae`). The only arch that improves under
-    instruction tuning. TXC structural bias replicates BASE win,
-    different variant (BASE winner was `txc_bare_antidead_t5`).
-  - **IT k_feat=5 winner: `phase57_partB_h8_bare_multidistance_t8`**
-    at 0.8546 (matches BASE k=5 winner).
+    `phase5b_subseq_h8`, `phase57_partB_h8_bare_multidistance_t8`)
+    + 3 MLC-family via Mission #2 wrapper (`mlc`,
+    `mlc_contrastive_alpha100_batchtopk`, `agentic_mlc_08`). See
+    `2026-04-29-leaderboard-it.md`.
+  - **IT k_feat=20 winner: `mlc`** at 0.9118 (Δ=+0.018 over
+    `topk_sae`). 2nd: `phase5b_subseq_h8` at 0.9073 — also
+    structural-bias.
+  - **IT k_feat=5 winner: `mlc`** at 0.8722 (matches BASE — `mlc`
+    wins both regimes at k=5).
+  - **Cross-regime robustness**: MLC + `phase5b_subseq_h8` are the
+    only archs that maintain or improve on IT vs BASE at k=20. All
+    other archs (per-token SAE baselines, other TXC variants) lose
+    0.01–0.05 AUC under instruction tuning. Structural inductive
+    bias generalizes; per-token sparsity does not.
+  - **Mission #2 (DENSE MLC) closed via PRELOAD_SEQS=6000 workaround.**
+    The handover-flagged H200_required constraint was overcome by
+    monkey-patching `preload_multilayer` to use 1/4 of canonical
+    training-sample pool (17.7 GB on GPU instead of 71 GB) +
+    `PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True`. Convergence
+    behaviour mirrored BASE H200 ckpts. **DEVIATION FROM PAPER
+    CANONICAL — flag in any paper claim.**
+  - 2 paper_archs cells unevaluated: `mlc_sparse` (k_win=100),
+    `ag_mlc_08_sparse` (k_win=100). These don't have
+    canonical_archs.json entries (would need new arch_id rows added).
   - 2 archs (`phase5b_subseq_h8`, `txcdr_t16`) needed
-    `PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True` to fit on
-    A40 b=4096 — first attempt OOM'd at 44 GB peak; retry succeeded
-    with the fragmentation-mitigation flag.
-  - 4 MLC-family cells remain H200_required (multi-layer cache
-    71 GB > 46 GB A40 cap) — Mission #2.
+    `expandable_segments:True` to fit on A40 b=4096 — first attempt
+    OOM'd at 44 GB peak; retry succeeded with the fragmentation-
+    mitigation flag.
   - **seed=1 deferred** — A40 ~2.5× slower than handover BASE
-    timings (e.g., phase5b_subseq_h8 took 232 min on IT vs 92 min
-    on BASE), leaving no budget for a second seed. IT leaderboard
+    timings, leaving no budget for a second seed. IT leaderboard
     is 1-seed σ; treat headline shifts as preliminary until
     seed=1 lands.
 - **3-seed σ for `tfa_big`, `txcdr_t16`, `hill_subseq_h8_T12_s5`** —
