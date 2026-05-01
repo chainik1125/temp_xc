@@ -1,4 +1,25 @@
 {
+  "txc_galaxy4_t2_kw10_kp10|right-edge": {
+    "arch_id": "txc_galaxy4_t2_kw10_kp10",
+    "protocol": "right-edge",
+    "n_seeds": 1,
+    "peak_unc": 1.3666666666666667,
+    "peak_coh_ge_1.50": 1.3666666666666667,
+    "peak_coh_ge_1.75": 0.9333333333333333,
+    "peak_coh_ge_2.00": 0.43333333333333335,
+    "peak_coh_ge_2.25": 0.43333333333333335,
+    "peak_coh_ge_2.50": 0.26666666666666666,
+    "auc_1.5_3.0": 0.6500922619047619,
+    "auc_1.75_3.0": 0.527267113095238,
+    "delta_unc": -0.43333333333333335,
+    "delta_peak_coh_ge_1.50": 0.19999999999999996,
+    "delta_peak_coh_ge_1.75": 0.6000000000000001,
+    "delta_peak_coh_ge_2.00": 0.15000000000000002,
+    "delta_peak_coh_ge_2.25": 0.15000000000000002,
+    "delta_peak_coh_ge_2.50": -0.016666666666666663,
+    "delta_auc_1.5_3.0": 0.2368167989417989,
+    "delta_auc_1.75_3.0": 0.21464269179894174
+  },
   "txc_bare_antidead_t5_kpos20_grownChainFromT4|right-edge": {
     "arch_id": "txc_bare_antidead_t5_kpos20_grownChainFromT4",
     "protocol": "right-edge",
@@ -651,6 +672,27 @@
       -0.06666666666666671,
       0.16666666666666669
     ]
+  },
+  "txc_galaxy4_t2_kw10_kp10|per-position": {
+    "arch_id": "txc_galaxy4_t2_kw10_kp10",
+    "protocol": "per-position",
+    "n_seeds": 1,
+    "peak_unc": 1.4333333333333333,
+    "peak_coh_ge_1.50": 0.8,
+    "peak_coh_ge_1.75": 0.8,
+    "peak_coh_ge_2.00": 0.43333333333333335,
+    "peak_coh_ge_2.25": 0.3,
+    "peak_coh_ge_2.50": 0.3,
+    "auc_1.5_3.0": 0.539100351037851,
+    "auc_1.75_3.0": 0.4371350351037851,
+    "delta_unc": -0.3666666666666667,
+    "delta_peak_coh_ge_1.50": -0.3666666666666667,
+    "delta_peak_coh_ge_1.75": 0.46666666666666673,
+    "delta_peak_coh_ge_2.00": 0.15000000000000002,
+    "delta_peak_coh_ge_2.25": 0.016666666666666663,
+    "delta_peak_coh_ge_2.50": 0.016666666666666663,
+    "delta_auc_1.5_3.0": 0.12582488807488806,
+    "delta_auc_1.75_3.0": 0.12451061380748885
   },
   "txc_bare_antidead_t5_kpos20_grownChainFromT4|per-position": {
     "arch_id": "txc_bare_antidead_t5_kpos20_grownChainFromT4",
