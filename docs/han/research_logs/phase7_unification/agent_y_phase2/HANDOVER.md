@@ -445,6 +445,30 @@ non-canonical sparsity to avoid clobbering the kpos20 file.
 None active as of compact. All training chains have completed. GPU is
 free.
 
+### What's running NOW (2026-05-01, autonomous Y mode)
+
+Background chains (will produce data over ~3-4 hr from this commit):
+
+1. **grown_recovery chain** — T=3 grown sd=2 train + pipeline
+   (sd=1 RE+PP grades already DONE — Δ=+0.883 RE, Δ=+0.550 PP at
+   coh ≥ 1.75)
+2. **wsa_chain** — T-SAE WS sd=1 PP intervene+grade (RE done,
+   Δ=+0.650 at coh ≥ 1.75); then sd=2 train + pipeline
+3. **galaxy_chain_v3** (queued) — Galaxy 4 sd=42+sd=1+sd=2
+   (TXCHierarchicalMultiScale), fires when prior chains done
+4. **galaxy6_chain** (queued) — Galaxy 6 sd=42+sd=1+sd=2
+   (TXCMaxPool), fires after Galaxy 4
+
+Dashboard auto-refreshes (Monitor watches grades.jsonl on disk):
+- `experiments/.../plots/auto_dashboard.{json,md,png}` updates
+  whenever a new grade lands
+
+Expected new multi-seed cells:
+- T=3 grown PP sd=2 (lock 3-seed)
+- T-SAE WS PP sd=1 + sd=2 (lock 2-seed at coh ≥ 2.5 niche)
+- Galaxy 4 sd=42+sd=1+sd=2 (architectural test)
+- Galaxy 6 sd=42+sd=1+sd=2 (max-pool architectural test)
+
 ### Recommended next action (ordered, post-GIGABRAIN)
 
 The GIGABRAIN multi-coh-threshold reframe makes the original
