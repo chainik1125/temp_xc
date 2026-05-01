@@ -170,7 +170,7 @@ def run_alpha_for_feature(
     *, generate_fn, model, tokenizer, questions, layer: int, direction: torch.Tensor,
     alpha: float, n_rollouts: int, max_new_tokens: int, seed: int,
 ) -> list[dict]:
-    """Generate longform completions at a fixed (feature, α)."""
+    """Generate longform completions at a fixed (feature, α). Serial path."""
     seed_all(seed)
     return generate_fn(
         model=model, tokenizer=tokenizer, questions=questions,
@@ -178,6 +178,64 @@ def run_alpha_for_feature(
         layer_idx=int(layer), n_generations=int(n_rollouts),
         max_new_tokens=int(max_new_tokens), temperature=1.0,
     )
+
+
+def run_batched_alpha_cells(
+    *, model, tokenizer, questions: list, layer: int,
+    cells: list,  # list of (direction, alpha) tuples
+    n_rollouts: int, max_new_tokens: int, seed: int,
+    gen_batch_size: int = 32,
+) -> list:
+    """Generate completions for multiple (direction, alpha) cells in a single
+    batched per-element steering call.
+
+    Args:
+        cells: list of (direction, alpha) — one per cell.
+        n_rollouts: how many rollouts per (cell, question).
+        gen_batch_size: max batch size for the underlying model.generate() call.
+
+    Returns:
+        list of length len(cells); each element is a list of n_rollouts × len(questions)
+        dicts {"question": q, "answer": text} matching the format of generate_longform_completions.
+
+    All cells in a single call share one seed_all() reset; per-row sampling RNG
+    advances independently inside HF generate(). This matches the original
+    pattern (seed_all once per "unit of work") with the unit of work growing
+    from one cell to a batch of cells. With gen_batch_size large enough to
+    absorb all cells in one model.generate(), the GPU does ONE forward per
+    token rather than len(cells) forwards — the speedup we want.
+    """
+    from experiments.em_features.batched_steering import generate_batched_steered_completions
+    seed_all(seed)
+
+    flat_prompts: list = []
+    flat_dirs: list = []
+    flat_alphas: list = []
+    cell_idx_per_pos: list = []
+    for ci, (direction, alpha) in enumerate(cells):
+        for _ri in range(n_rollouts):
+            for q in questions:
+                flat_prompts.append(q)
+                flat_dirs.append(direction)
+                flat_alphas.append(float(alpha))
+                cell_idx_per_pos.append(ci)
+
+    completions = generate_batched_steered_completions(
+        model=model, tokenizer=tokenizer,
+        prompts=flat_prompts,
+        steering_directions=flat_dirs,
+        magnitudes=flat_alphas,
+        layer_idx=int(layer),
+        max_new_tokens=int(max_new_tokens),
+        temperature=1.0,
+        batch_size=int(gen_batch_size),
+    )
+
+    per_cell: list = [[] for _ in cells]
+    for pos, comp in enumerate(completions):
+        ci = cell_idx_per_pos[pos]
+        per_cell[ci].append({"question": flat_prompts[pos], "answer": comp})
+    return per_cell
 
 
 def main():
