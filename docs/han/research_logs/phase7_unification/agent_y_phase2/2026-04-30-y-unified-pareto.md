@@ -148,13 +148,49 @@ n=3 cell at the prereg metric.
 
 ### Pareto frontier — success vs coherence
 
+#### Focused Pareto — T-SAE baseline + 3 best TXCs (added 2026-05-01)
+
+![focused pareto](../../../../../experiments/phase7_unification/results/case_studies/plots/focused_pareto_matched_sparsity.png)
+
+A clean view of the headline result: T-SAE k=20 anchor (blue dashed) vs
+the **3 best n=3-multi-seed TXC architectures** (OBLITERATION T=2 H8 / W
+MaxPool-merge / W Contrastive-merge), one panel per protocol. Stars mark
+the cliff at coh ≥ 1.5 (PRREG metric); dashed green line marks the
++0.27 prereg WIN threshold (peak15 ≥ 1.44).
+
+**What the focused plot shows**:
+
+- **T-SAE k=20** has the highest unconstrained peak (1.80) but it sits at
+  coh ≈ 1.4 — *just below* the prereg coh-floor. At coh ≥ 1.5, T-SAE's
+  cliff drops to 1.167.
+- **Right-edge panel**: **W's Contrastive-merge** (purple) reaches a cliff
+  of **1.578 at coh ≈ 1.6** — the only n=3 TXC cell whose star sits cleanly
+  above the green +0.27 WIN line. OBLITERATION (red) and MaxPool (pink)
+  cluster near or just above the anchor line at this protocol.
+- **Per-position panel**: **OBLITERATION T=2 H8** (red) reaches 1.400 — the
+  cell Y led with in the older draft. Contrastive-merge (purple) drops to
+  0.756 here (its win is right-edge-specific). MaxPool (pink) stays around
+  1.144 across both protocols.
+
+**Two paper-grade architectural recipes emerge**:
+1. *Right-edge + Contrastive-merge encoder* (W) → +0.411 PRREG WIN.
+2. *Per-position + H8 multi-distance contrastive encoder (OBLITERATION)* (Y) → +0.233 (close-to-WIN).
+
+These are **mechanistically different**: Contrastive captures CHANGE
+(end-vs-start), OBLITERATION captures CO-OCCURRENCE (multi-distance
+contrastive). They win on different concept classes (Contrast → sentiment
++ knowledge; OBLIT → knowledge primarily; see per-class breakdown in
+`agent_w/2026-04-30-w-phase4-results.md`).
+
+#### Full unified Pareto (22 archs, dense)
+
 ![unified pareto](../../../../../experiments/phase7_unification/results/case_studies/plots/unified_pareto_matched_sparsity.png)
 
 Two panels (right-edge / per-position). Each line is one arch's
 multi-seed-averaged (success, coh) curve across the 7 family-normalised
 strengths. The black dashed line is the Pareto upper envelope across
-all archs. Coh = 1.5 threshold marked; T-SAE k=20 anchor = 1.10
-horizontal line; WIN threshold = 1.37 horizontal line.
+all archs. Coh = 1.5 threshold marked; T-SAE k=20 anchor = 1.167
+horizontal line; WIN threshold = 1.44 horizontal line.
 
 **Interpretation:**
 - T=2 H8 shifts=(T,) per-position (red triangles, dashed line) **stays
@@ -221,9 +257,11 @@ write-direction". Two independent paper-grade architectural recipes.
 ### Files
 
 - Inventory + JSON: `results/case_studies/plots/unified_pareto_summary.json`
-- Pareto plot (success vs coh, both protocols): `results/case_studies/plots/unified_pareto_matched_sparsity{.png,.thumb.png}`
+- **Focused Pareto** (T-SAE + 3 best TXCs): `results/case_studies/plots/focused_pareto_matched_sparsity{.png,.thumb.png}` — added 2026-05-01
+- Pareto plot (success vs coh, both protocols, all 22 archs): `results/case_studies/plots/unified_pareto_matched_sparsity{.png,.thumb.png}`
 - Ranking bar plot (full, both protocols): `results/case_studies/plots/unified_ranking_matched_sparsity{.png,.thumb.png}`
 - Ranking bar plot (per-position only, WIN highlighted): `results/case_studies/plots/unified_ranking_per_position{.png,.thumb.png}`
 - Growth trajectory across T: `results/case_studies/plots/unified_growth_trajectory{.png,.thumb.png}`
-- Plot script: `experiments/phase7_unification/case_studies/steering/plot_unified_pareto.py`
+- Mystery-arch per-class signature: `results/case_studies/plots/mystery_arch_per_class_signature{.png,.thumb.png}` — added 2026-05-01
+- Plot scripts: `experiments/phase7_unification/case_studies/steering/{plot_unified_pareto,plot_focused_pareto,plot_mystery_arch_per_class}.py`
 - Per-cell writeups: this `agent_y_phase2/` dir + `agent_w/` dir
