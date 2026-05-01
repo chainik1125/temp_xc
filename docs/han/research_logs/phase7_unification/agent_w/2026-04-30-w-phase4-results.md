@@ -481,6 +481,40 @@ The aggregate Δ@1.5=+0.411 for contrastive RE n=3 vs T-SAE k=20 RE n=2 anchor d
 
 This per-class pattern is **structurally different** from MaxPool (which wins broadly across discourse/stylistic/sentiment) and OBLITERATION (which wins on knowledge primarily). Three TXC families, three different per-class signatures — converging on Δ ≥ +0.4 aggregate but via different concept subsets.
 
+#### Cross-mystery-arch per-class comparison @ coh ≥ 1.5 (Δ vs T-SAE k=20 RE anchor)
+
+| class (anchor) | Contrast RE | Contrast V6 | MaxPool RE | MaxPool PP | OBLIT RE | OBLIT PP |
+|---|---|---|---|---|---|---|
+| knowledge (1.722) | **+0.315** ⭐ | (1.5: 2.000=+0.278⭐) | +0.130 | **+0.352** ⭐ | **+0.278** ⭐ | +0.130 |
+| discourse (1.875) | −0.333 | −0.125 | −0.292 | −0.083 | −0.500 | −0.333 |
+| safety (1.250) | −0.028 | −0.639 | −0.528 | −0.417 | −0.583 | −0.694 |
+| stylistic (1.300) | +0.033 | −0.367 | −0.233 | −0.100 | −0.367 | −0.167 |
+| **sentiment (0.500)** | **+0.500** ⭐⭐ | **+0.667** ⭐⭐⭐ | **+0.667** ⭐⭐⭐ | **+0.667** ⭐⭐⭐ | **+0.333** ⭐ | **+0.333** ⭐ |
+
+@ coh ≥ 1.75 (Δ vs T-SAE k=20 RE anchor at coh ≥ 1.75: knowledge 1.500, discourse 1.625, safety 0.750, stylistic 0.700, sentiment 0.500):
+
+| class | Contrast RE | Contrast V6 | MaxPool RE | MaxPool PP | OBLIT RE | OBLIT PP |
+|---|---|---|---|---|---|---|
+| knowledge | −0.315 | +0.167 | −0.389 | +0.130 | −0.278 | −0.241 |
+| discourse | −0.333 | −0.125 | −0.333 | −0.417 | −0.458 | −0.542 |
+| safety | −0.194 | −0.139 | −0.361 | −0.194 | −0.361 | −0.583 |
+| **stylistic** | −0.367 | −0.367 | **+0.433** ⭐ | **+0.300** ⭐ | +0.233 | +0.167 |
+| **sentiment** | **+0.500** ⭐⭐ | **+0.667** ⭐⭐⭐ | +0.167 | +0.167 | +0.167 | +0.167 |
+
+**Cross-arch structural findings**:
+
+1. **SENTIMENT IS UNIVERSALLY TXC-FAVORED**: every TXC × protocol cell (n=6) wins on sentiment vs T-SAE k=20 by Δ ∈ [+0.167, +0.667] at both coh ≥ 1.5 and coh ≥ 1.75. T-SAE's sentiment cliff is just 0.500 (sd: positive_emotion + negative_emotion only, n=2 concepts) — every TXC arch can double or triple this. Sentiment is a multi-token tone signal; T-SAE's per-token encoding misses it.
+
+2. **CONTRASTIVE-MERGE IS SENTIMENT-DOMINANT**: highest sentiment Δ at coh ≥ 1.75 (+0.500 RE, +0.667 V6) — the contrastive `z = enc(x[T-1]) - enc(x[0])` encoder directly targets the tone-transition mechanism that sentiment requires. Contrastive LOSES on stylistic (Δ = −0.367) — register/form features lack a clean transition signature.
+
+3. **MAXPOOL IS UNIQUELY STYLISTIC-WINNING**: only TXC arch with stylistic Δ ≥ +0.30 at coh ≥ 1.75 (+0.433 RE, +0.300 PP). MaxPool's disjunctive merge ("feature active SOMEWHERE in window") fits stylistic concepts that fire across arbitrary positions in poetic/literary/list structures.
+
+4. **OBLITERATION IS KNOWLEDGE-DOMINANT (but only at coh ≥ 1.5)**: H8 multi-distance contrastive captures co-occurrence at multiple temporal distances, fits domain-specific token-cluster patterns. Drops at coh ≥ 1.75 (knowledge cliff = 1.222 vs anchor 1.500).
+
+5. **ALL TXC ARCHS LOSE ON DISCOURSE + SAFETY**: register-level features (formal_register, casual_register, harmful_content, refusal_pattern) are stable across the entire window; T-SAE's per-token sparse encoding picks them up better. The TXC-family disadvantage on these classes is consistent across all 3 architectural recipes — this is a **structural finding**, not arch-specific.
+
+**Paper narrative implication**: the TXC-family advantage at coh ≥ 1.5/1.75 is *concept-class-conditional*. The aggregate Δ ≥ +0.4 wins are driven by sentiment + (stylistic-for-MaxPool / knowledge-for-OBLIT/Contrast-RE / sentiment-for-Contrast-V6). Discourse and safety remain T-SAE territory regardless of TXC arch. This is a more nuanced claim than "TXC wins on coherent steering" — the win is real, structurally explained, and class-conditional.
+
 ### V3 dec-additive — a CROSS-ARCH winning protocol at coh ≥ 1.75
 
 V3 dec-additive (no encoder pass; just `s × W_dec[picked, :, :]` at
