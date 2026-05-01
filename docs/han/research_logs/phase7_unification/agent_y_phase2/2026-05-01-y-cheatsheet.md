@@ -55,21 +55,32 @@ way. The strongest WIN is at coh ≥ 1.75 under both reductions.
 2. **TXC's window encoder distributes the steering signal** across T
    tokens. At moderate strength, TXC produces COHERENT text that
    contains the concept.
-3. **Cross-cell consistency**: at coh ≥ 1.75, **9 multi-seed TXC cells
-   beat anchor by Δ > +0.27** — **8 of them 3-seed verified**:
-   - T=2 H8 RE 3sd:         Δ = +0.906 ⭐ (3-seed verified)
-   - T=3 grown RE 3sd:      Δ = +0.889 ⭐ (3-seed verified)
-   - T-SAE WS PP 3sd:       Δ = +0.800 ⭐ (3-seed verified)
-   - T=5 H8 PP 2sd:         Δ = +0.733
-   - T-SAE WS RE 3sd:       Δ = +0.678 (3-seed verified)
-   - T=2 bare PP 3sd:       Δ = +0.644 (3-seed verified)
-   - T=2 bare RE 3sd:       Δ = +0.622 (3-seed verified)
-   - T=3 grown PP 3sd:      Δ = +0.606 (3-seed verified)
-   - T=2 H8 PP 3sd:         Δ = +0.278 (3-seed verified, just above)
-   
-   Robust effect across multiple architectures (H8, bare, grown,
-   T-SAE warm-start) and multiple protocols (right-edge, per-position).
-   **Eight 3-seed verified WINs** at Δ > +0.27.
+3. **Cross-cell consistency**: at coh ≥ 1.75, **eleven 3-seed-verified
+   TXC cells beat anchor by Δ > +0.27**:
+   - T=2 H8 RE 3sd:                   Δ = +0.906 ⭐
+   - T=3 grown RE 3sd:                Δ = +0.889 ⭐
+   - **TXCMaxPoolMergeH8 RE 3sd**:    Δ = +0.811 (W's mystery arch)
+   - **TXCMaxPoolMergeH8 PP 3sd**:    Δ = +0.811
+   - T-SAE WS PP 3sd:                 Δ = +0.800
+   - T-SAE WS RE 3sd:                 Δ = +0.678
+   - T=2 bare PP 3sd:                 Δ = +0.644
+   - T=2 bare RE 3sd:                 Δ = +0.622
+   - T=3 grown PP 3sd:                Δ = +0.606
+   - Galaxy 4 PP 3sd:                 Δ = +0.511 (Y's hierarchical multi-scale)
+   - Galaxy 4 RE 3sd:                 Δ = +0.478
+   - T=2 H8 PP 3sd:                   Δ = +0.278 (just above threshold)
+
+   Plus 2-seed cells: T=5 H8 PP +0.733, etc.
+
+   Robust effect across:
+   - **6 architectures**: H8 multi-distance, bare-antidead, grown-chain,
+     T-SAE warm-start, Galaxy 4 hierarchical, MaxPool merge H8
+   - **Both protocols**: right-edge, per-position
+
+   Plus W's bootstrap-significant result at coh ≥ 2.0:
+   MaxPool + V6 dec-broadcast 3sd Δ=+0.420 with bootstrap CI
+   [+0.011, +1.106] — STRICT statistical significance under
+   concept-resample bootstrap.
 
 ### Bootstrap uncertainty
 
