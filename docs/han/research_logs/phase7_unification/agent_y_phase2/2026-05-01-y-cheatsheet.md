@@ -127,6 +127,7 @@ report):**
 | T=5 H8 RE 2sd | coh ≥ 2.25 | +0.267 | [+0.017, +0.417] | **YES** |
 | T=2 H8 RE 3sd | coh ≥ 1.75 | +0.906 | [-0.028, +1.217] | borderline |
 | Galaxy 6 RE 3sd | coh ≥ 2.0 | +0.572 | [-0.028, +0.817] | borderline |
+| Galaxy 6 PP 3sd | coh ≥ 1.75 | +0.722 | [-0.017, +1.250] | borderline |
 
 **Multiple statistically significant cells under Procedure B** —
 including W's TXCMaxPoolMergeH8 (both protocols), T=3 grown RE (at
@@ -165,7 +166,8 @@ multi-position structure.
 | AUC alternative | Han's pre-stated metric | T=2 bare RE STRICT WIN +0.331 |
 | Bootstrap CI A vs B | per-concept fixed-s vs scientific re-opt | A sig, B borderline |
 | Galaxy 4 (hierarchical) | window + per-pos latent groups | impl + queued; results pending |
-| Galaxy 6 (max-pool) | max over T instead of sum | ⭐ STRICT WIN at coh ≥ 2.0 (Δ=+0.572 RE 3sd) |
+| Galaxy 6 (max-pool) | max over T instead of sum | ⭐⭐ STRICT WIN at coh ≥ 1.75 PP (Δ=+0.722) AND coh ≥ 2.0 RE (Δ=+0.572); both Procedure A SIG |
+| Galaxy 8 (soft-max-pool) | softmax-weighted, learnable per-feat τ | ckpts trained 3 seeds; pipeline in flight |
 
 ### Multi-seed verifications (as of 2026-05-01 evening)
 
@@ -192,6 +194,12 @@ multi-position structure.
 
 W's mystery archs (TXCMultiplicativeMergeH8, TXCMaxPoolMergeH8,
 TXCContrastiveMergeH8) being trained by W in parallel.
+
+**Galaxy 8 (TXCSoftMaxPool) — soft-max-pool with learnable per-feature τ
+(generalizes Galaxy 6 hard-max-pool ↔ TXCBareAntidead additive-sum):**
+All 3 seeds trained successfully. Pipeline (select_features → intervene
+RE+PP → grade) is in flight. Hypothesis: soft pooling matches or
+exceeds Galaxy 6 by allowing each feature to pick its preferred τ.
 
 ### Files for paper
 

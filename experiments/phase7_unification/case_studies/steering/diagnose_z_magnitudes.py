@@ -294,16 +294,30 @@ def main() -> None:
         if share_acts_new is not None:
             share_acts = share_acts_new
 
-    # Write JSON summary
+    # Merge with existing JSON summary (preserve other archs)
     summary_path = out_dir / "z_orig_magnitudes.json"
-    summary_path.write_text(json.dumps(summaries, indent=2))
-    print(f"\n  wrote {summary_path}")
+    existing = {}
+    if summary_path.exists():
+        try:
+            existing = json.loads(summary_path.read_text())
+        except Exception:
+            existing = {}
+    merged = {**existing, **summaries}
+    summary_path.write_text(json.dumps(merged, indent=2))
+    print(f"\n  wrote {summary_path} ({len(summaries)} new + {len(existing)} existing → {len(merged)})")
 
-    # Write raw arrays into a single npz: per-arch flattened pooled vector
+    # Merge raw arrays into npz (preserve other archs)
     npz_path = out_dir / "z_orig_per_concept.npz"
-    flat = {a: np.concatenate(v, axis=0) if v else np.array([])
-            for a, v in raw_per_concept.items()}
-    np.savez(npz_path, **flat)
+    existing_npz = {}
+    if npz_path.exists():
+        try:
+            existing_npz = dict(np.load(npz_path, allow_pickle=False))
+        except Exception:
+            existing_npz = {}
+    new_flat = {a: np.concatenate(v, axis=0) if v else np.array([])
+                for a, v in raw_per_concept.items()}
+    merged_npz = {**existing_npz, **new_flat}
+    np.savez(npz_path, **merged_npz)
     print(f"  wrote {npz_path}")
 
     # Print compact table

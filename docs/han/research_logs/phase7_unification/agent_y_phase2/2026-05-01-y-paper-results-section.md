@@ -134,11 +134,35 @@ across the same 3-seed checkpoint set. T = 2 H8 RE remains the largest
 median (+0.906) but is borderline under Procedure B (CI lower bound
 −0.028).
 
-The cross-cell consistency (13 multi-seed cells with Δ > +0.27 at
+The cross-cell consistency (14 multi-seed cells with Δ > +0.27 at
 coh ≥ 1.75 across 7 architectures) is independent corroborating
 evidence beyond any single-cell CI. The wide Procedure-B CIs
 reflect n = 30 concepts and the cliff sensitivity at the coherence
 threshold; with more concepts we expect substantial tightening.
+
+#### Non-additive aggregation > additive sum
+
+A separate architectural finding concerns the encoder pooling
+operation. The vanilla TXC sums per-position pre-activations;
+**non-additive alternatives consistently outperform**:
+
+| arch (3-seed) | aggregation | Δ at coh ≥ 1.75 | Δ at coh ≥ 2.0 |
+|---|---|---:|---:|
+| TXCBareAntidead T = 2 RE | additive sum | +0.622 | +0.672 |
+| TXCMaxPool T = 2 RE (Galaxy 6) | hard max-pool | +0.522 | **+0.572** |
+| TXCMaxPool T = 2 PP | hard max-pool | **+0.722** | +0.150 |
+| TXCMaxPoolMergeH8 RE (W's) | hard max-pool + H8 | +0.811 | +0.211 |
+| TXCMaxPoolMergeH8 PP (W's) | hard max-pool + H8 | +0.811 | +0.150 |
+
+Galaxy 6 (max-pool TXC) replaces sum with element-wise max over T
+positions: each feature reads off the single position where its
+encoder direction fires strongest. This consistently beats additive
+sum at coh-aware metrics, with the largest individual-cell win
+(Δ = +0.722 at coh ≥ 1.75 for PP, Procedure A SIG [+0.500, +0.989])
+and competitive Procedure-B CI at coh ≥ 2.0 RE (+0.572 [-0.028, +0.817]).
+Combining max-pool with H8 multi-distance contrastive (W's
+TXCMaxPoolMergeH8) lifts the win to Δ = +0.811 (Procedure-B SIG on
+both protocols).
 
 ### 4.X.6 Headline figure
 
