@@ -155,13 +155,30 @@ def main(argv=None):
     p = argparse.ArgumentParser()
     p.add_argument("--config", type=Path, default=Path(__file__).parent / "config.yaml")
     p.add_argument("--force", action="store_true")
+    p.add_argument("--override-hookpoint", action="append", default=None,
+                   help="Cache only this hookpoint (skip cfg.hookpoints). "
+                        "Format: 'key:layer:component', e.g. 'resid_L15:15:resid'. "
+                        "Used by run_layer_sweep.sh to add new layers without "
+                        "permanently editing config.yaml. Repeat the flag for "
+                        "multiple hookpoints.")
     args = p.parse_args(argv)
 
     cfg = yaml.safe_load(args.config.read_text())
     acts_dir = Path(cfg["paths"]["acts_dir"])
     acts_dir.mkdir(parents=True, exist_ok=True)
 
-    hookpoints = [hp for hp in cfg["hookpoints"] if hp.get("enabled", True)]
+    if args.override_hookpoint:
+        hookpoints = []
+        for spec in args.override_hookpoint:
+            try:
+                key, layer_s, comp = spec.split(":")
+                hookpoints.append({"key": key, "layer": int(layer_s),
+                                    "component": comp, "enabled": True})
+            except Exception as e:
+                log.error("[fatal] invalid --override-hookpoint %r: %s", spec, e)
+                return 1
+    else:
+        hookpoints = [hp for hp in cfg["hookpoints"] if hp.get("enabled", True)]
     cache_cfg = cfg["cache"]
     num_seq = int(cache_cfg["num_sequences"])
     seq_len = int(cache_cfg["seq_length"])

@@ -46,6 +46,21 @@ def _run(cmd: list[str], desc: str) -> int:
     return rc
 
 
+def _grades_incomplete(grades_path: Path, b1p: Path) -> bool:
+    """Return True if the grades JSON exists but doesn't cover every B1 row,
+    so we should re-run the grader to fill in missing rows. (grade_sonnet is
+    resumable — already-graded rows are skipped.)"""
+    try:
+        b1 = json.loads(b1p.read_text())
+        n_rows = len(b1.get("rows", []))
+        grades = json.loads(grades_path.read_text())
+        # grades JSON is keyed by row-index strings.
+        graded = {k for k, v in grades.items() if v.get("grade", -1) >= 0}
+        return len(graded) < n_rows
+    except Exception:
+        return True
+
+
 def evaluate_cell(cell: Cell, cfg: dict, no_dom: bool = True) -> dict | None:
     """Train + mine + B1 + metric for one cell. Returns the metric dict or None on failure.
 
@@ -91,11 +106,26 @@ def evaluate_cell(cell: Cell, cfg: dict, no_dom: bool = True) -> dict | None:
     else:
         log.info("[skip-b1] %s exists", b1p)
 
+    # 3.5. Sonnet-grade the B1 inline so step 4's metric uses the rigorous
+    # floor. Without this, freshly-trained cells score primary_kw_at_sonnet_coh
+    # = nan, and the hill-climb cannot promote them in iter-1 (the
+    # nan-blocker). Resumable: skips already-graded rows.
+    grades_dir = Path(paths["root"]) / "coherence_grades"
+    grades_path = sonnet_grades_path(cell, grades_dir)
+    if not grades_path.exists() or _grades_incomplete(grades_path, b1p):
+        log.info("[grade] running Sonnet grader on %s", b1p.name)
+        rc = _run([sys.executable, "-m", "experiments.ward_backtracking_txc.grade_sonnet",
+                   "--b1-json", str(b1p),
+                   "--out-dir", str(grades_dir),
+                   "--concurrency", "12"], "grade")
+        if rc != 0:
+            log.warning("[grade] failed rc=%d — proceeding with legacy metric only", rc)
+    else:
+        log.info("[skip-grade] %s exists and complete", grades_path)
+
     # 4. Compute metric — pull Sonnet grades when available
     rows = metrics.load_b1_rows(b1p)
     source_tags = sorted({r["source"] for r in rows if r["source"].startswith(cell.arch + "_")})
-    grades_dir = Path(paths["root"]) / "coherence_grades"
-    grades_path = sonnet_grades_path(cell, grades_dir)
     sonnet_grades = metrics.load_sonnet_grades(grades_path)
     metric = metrics.cell_metric(rows, source_tags, sonnet_grades=sonnet_grades)
     metric["cell_id"] = cell.id

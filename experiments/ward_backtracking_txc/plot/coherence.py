@@ -154,13 +154,20 @@ def main(argv=None):
         ax.set_ylabel(title)
         ax.set_title(f"{title}\n({hint})", fontsize=9)
         ax.grid(alpha=0.3)
-    axes[0, 0].legend(fontsize=7, loc="best")
+    # Legend goes outside the 4-panel grid (right side), so it doesn't
+    # overlay the data. Pull legend handles from any axis (all share the
+    # same source set).
+    handles, labels = axes[0, 0].get_legend_handles_labels()
+    fig.legend(handles, labels, fontsize=7, loc="center left",
+               bbox_to_anchor=(1.0, 0.5), framealpha=0.95,
+               title="source", title_fontsize=8)
 
     fig.suptitle("B1 — coherence diagnostics vs steering magnitude (target = reasoning)",
                  fontsize=12)
-    fig.tight_layout()
+    # Reserve right margin for the legend.
+    fig.tight_layout(rect=[0, 0, 0.82, 1])
     out = out_dir / "coherence.png"
-    fig.savefig(out, dpi=140); plt.close(fig)
+    fig.savefig(out, dpi=140, bbox_inches="tight"); plt.close(fig)
     print(f"[saved] {out}")
 
     # Also dump a numerical table for the headline cells.
