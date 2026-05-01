@@ -35,7 +35,9 @@ def main(argv=None):
         # Use D+ curves (diff base vs reasoning on the D+ subset)
         diff = np.abs(z["reasoning_pos"] - z["base_pos"])  # (K, n_off)
         # Trapezoidal integration over offset
-        area = np.trapezoid(diff, x=offsets, axis=1)
+        # np.trapezoid is the post-2.0 name; np.trapz on older numpy.
+        _trapz = getattr(np, "trapezoid", np.trapz)
+        area = _trapz(diff, x=offsets, axis=1)
         order = np.argsort(-area)
         ax = axes[0, col]
         ax.bar(range(len(area)), area[order], color="tab:purple")

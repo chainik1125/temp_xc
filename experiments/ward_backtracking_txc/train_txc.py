@@ -72,6 +72,31 @@ class _ActivationLoader:
         chain_exp = chain_idx.unsqueeze(1).expand(-1, self.T)
         return self.data[chain_exp, pos_idx].to(torch.float32)  # (B, T, d) fp32 for stable training
 
+    def sample_multidistance(self, shifts: tuple[int, ...]) -> torch.Tensor:
+        """Yield (B, 1+K, T, d) — anchor + K positive windows shifted by `shifts`.
+
+        Each sample shares its sequence; the anchor starts at offset `off`,
+        positive #k starts at `off + shifts[k]`. All windows must fit, so
+        off ∈ [0, seq_len - T - max_shift].
+        """
+        if not shifts:
+            return self.sample().unsqueeze(1)  # (B, 1, T, d)
+        max_shift = max(shifts)
+        max_start = self.seq_len - self.T - max_shift
+        if max_start < 0:
+            raise ValueError(
+                f"seq_len={self.seq_len} insufficient for T={self.T} + max_shift={max_shift}"
+            )
+        chain_idx = torch.randint(0, self.num_seq, (self.batch_size,), device=self.device)
+        off = torch.randint(0, max_start + 1, (self.batch_size,), device=self.device)
+        rng = torch.arange(self.T, device=self.device)
+        outs = []
+        for s in (0,) + tuple(shifts):
+            pos = off.unsqueeze(1) + s + rng.unsqueeze(0)            # (B, T)
+            chain_exp = chain_idx.unsqueeze(1).expand(-1, self.T)
+            outs.append(self.data[chain_exp, pos].to(torch.float32))
+        return torch.stack(outs, dim=1)  # (B, 1+K, T, d)
+
 
 def _ckpt_filename(arch: str, hookpoint_key: str, k_per_position: int | None = None,
                    seed: int | None = None) -> str:
@@ -153,6 +178,18 @@ def _train_one(arch: str, hookpoint: dict, cfg: dict,
         with torch.no_grad():
             model._normalize_decoder()
 
+    # Multi-distance archs need paired-window batches; resolve shifts now so
+    # both the train loop and the eval batch use the same shape.
+    from experiments.ward_backtracking_txc.architectures import _is_contrastive
+    contrastive_arch = _is_contrastive(arch)
+    if contrastive_arch:
+        train_shifts = tuple(getattr(model, "shifts", ()))
+        log.info("[arch=%s] contrastive shifts=%s alpha=%.2f h_size=%d",
+                 arch, train_shifts, float(getattr(model, "alpha", 1.0)),
+                 int(getattr(model, "contr_prefix", 0)))
+    else:
+        train_shifts = ()
+
     log.info("[arch=%s] params=%.1fM", arch, arch_param_count(model) / 1e6)
 
     optim = torch.optim.Adam(
@@ -174,7 +211,11 @@ def _train_one(arch: str, hookpoint: dict, cfg: dict,
     es_patience = int(es_cfg.get("patience", 10))
     es_min_rel_improvement = float(es_cfg.get("min_rel_improvement", 0.005))
     es_warmup = int(es_cfg.get("warmup_steps", 1000))
-    x_eval = loader.sample().detach().clone() if es_enabled else None
+    if es_enabled:
+        x_eval = (loader.sample_multidistance(train_shifts) if contrastive_arch
+                  else loader.sample()).detach().clone()
+    else:
+        x_eval = None
     best_eval_fvu = float("inf")
     best_state = None
     no_improve_count = 0
@@ -183,7 +224,8 @@ def _train_one(arch: str, hookpoint: dict, cfg: dict,
     log_f = open(log_path, "w")
     try:
         for step in pbar:
-            x = loader.sample()                    # (B, T, d) fp32
+            x = (loader.sample_multidistance(train_shifts)
+                 if contrastive_arch else loader.sample())
             loss, lat = arch_forward(arch, model, x)
             z = lat["window"]                      # (B, d_sae)
             optim.zero_grad(set_to_none=True)
@@ -197,17 +239,20 @@ def _train_one(arch: str, hookpoint: dict, cfg: dict,
 
             if step % log_interval == 0 or step == n_steps - 1:
                 with torch.no_grad():
-                    # Train-batch metrics.
+                    # Train-batch metrics. For contrastive archs, x is
+                    # (B, 1+K, T, d) — use the anchor slice for variance.
                     _, lat_eval = arch_forward(arch, model, x)
                     z_eval = lat_eval["window"]
-                    var_train = x.var(dim=0).sum().clamp_min(1e-8)
+                    x_anchor = x[:, 0] if x.ndim == 4 else x
+                    var_train = x_anchor.var(dim=0).sum().clamp_min(1e-8)
                     fvu_train = (loss / var_train).item()
                     window_l0 = (z_eval > 0).float().sum(dim=-1).mean().item()
                     n_dead = int((feat_active_count == 0).sum().item())
                     # Held-out FVU on the frozen eval batch.
                     if es_enabled:
                         loss_eval, _ = arch_forward(arch, model, x_eval)
-                        var_eval = x_eval.var(dim=0).sum().clamp_min(1e-8)
+                        x_eval_anchor = x_eval[:, 0] if x_eval.ndim == 4 else x_eval
+                        var_eval = x_eval_anchor.var(dim=0).sum().clamp_min(1e-8)
                         fvu_eval = (loss_eval / var_eval).item()
                     else:
                         fvu_eval = float("nan")

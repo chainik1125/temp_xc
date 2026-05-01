@@ -69,7 +69,7 @@ txc:
   # Architecture sweep: which dictionary-learning archs to train alongside
   # TXC. All read from the SAME activation cache and run through the same
   # mining + steering harness. See architectures.py for the dispatch.
-  arch_list: [txc, topk_sae, stacked_sae, tsae]
+  arch_list: [txc, topk_sae, stacked_sae, tsae, txc_h8, txc_h13]
   arch_kwargs:
     tsae:
       n_heads: 8              # must divide d_sae / bottleneck_factor
@@ -77,6 +77,17 @@ txc:
       sae_diff_type: topk     # 'topk' matches TXC's topk-style sparsity
       n_attn_layers: 1        # Dmitry/collaborator default
       tied_weights: true
+    # Han's contrastive/matryoshka archs (vendored from han-phase7-unification).
+    # Defaults match Han's H8 winner family; sweep via hill-climb's `arch` axis.
+    txc_h8:
+      # shifts: null → auto = (1, T//4, T//2) deduped per Han's recipe
+      alpha: 1.0              # InfoNCE loss weight (Han fixes at 1.0)
+      # matryoshka_h_size: null → auto = 0.2 * d_sae (Han's default)
+    txc_h13:
+      # n_contr_scales: 3 → multi-scale H13 family (vs n=1 collapse to H8)
+      n_contr_scales: 3
+      gamma: 0.5              # multi-scale matryoshka decay
+      alpha: 1.0
 
 cache:
   # Caching corpus for base TXC training. Slices Stage A reasoning traces

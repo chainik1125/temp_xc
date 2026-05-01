@@ -23,7 +23,9 @@ from pathlib import Path
 
 import yaml
 
-from experiments.ward_backtracking_txc.cell_id import Cell, cell_metric_path
+from experiments.ward_backtracking_txc.cell_id import (
+    Cell, cell_metric_path, sonnet_grades_path,
+)
 from experiments.ward_backtracking_txc import metrics as metrics_mod
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
@@ -54,6 +56,12 @@ def _group_sources_by_cell(rows: list[dict], default_k: int, default_seed: int):
 def main(argv=None):
     p = argparse.ArgumentParser()
     p.add_argument("--config", type=Path, default=Path(__file__).parent / "config.yaml")
+    p.add_argument("--metric-key", type=str, default="primary_kw_at_coh",
+                   choices=("primary_kw_at_coh", "primary_kw_at_sonnet_coh"),
+                   help="rank cells by this metric (Sonnet variant requires "
+                        "coherence_grades populated for canonical B1 JSON)")
+    p.add_argument("--out-name", type=str, default="rank_phase1.json",
+                   help="leaderboard output filename under <root>/")
     args = p.parse_args(argv)
     cfg = yaml.safe_load(args.config.read_text())
     paths = cfg["paths"]
@@ -71,11 +79,18 @@ def main(argv=None):
 
     metrics_dir = Path(paths["root"]) / "cell_metrics"
     metrics_dir.mkdir(parents=True, exist_ok=True)
+    grades_dir = Path(paths["root"]) / "coherence_grades"
+    canonical_grades = grades_dir / Path(b1_path).name
+    sonnet_grades = metrics_mod.load_sonnet_grades(canonical_grades)
+    if args.metric_key == "primary_kw_at_sonnet_coh" and sonnet_grades is None:
+        log.warning("[warn] --metric-key sonnet but %s missing; "
+                    "rank will fall back to legacy floor.", canonical_grades)
 
     leaderboard = []
     for cell_id, source_tags in cells.items():
         cell = Cell.from_id(cell_id)
-        m = metrics_mod.cell_metric(rows, list(source_tags))
+        m = metrics_mod.cell_metric(rows, list(source_tags),
+                                    sonnet_grades=sonnet_grades)
         m["cell_id"] = cell_id
         m["arch"] = cell.arch
         m["hookpoint"] = cell.hookpoint_key
@@ -85,18 +100,25 @@ def main(argv=None):
         cell_metric_path(cell, metrics_dir).write_text(json.dumps(m, indent=2))
         leaderboard.append(m)
 
-    leaderboard.sort(key=lambda m: -m["primary_kw_at_coh"])
-    log.info("[leaderboard] (top 5)")
+    leaderboard.sort(key=lambda m: -m.get(args.metric_key, 0.0))
+    log.info("[leaderboard] (top 5 by %s)", args.metric_key)
     for m in leaderboard[:5]:
-        log.info("  %-50s primary=%.4f mag=%+.0f frac_coh=%.2f n_src=%d",
+        sonnet_str = (
+            f" sonnet={m.get('primary_kw_at_sonnet_coh', 0.0):.4f} "
+            f"frac_coh_s={m.get('frac_coh_sonnet', 0.0):.2f}"
+            if "primary_kw_at_sonnet_coh" in m else ""
+        )
+        log.info("  %-50s primary=%.4f mag=%+.0f frac_coh=%.2f n_src=%d%s",
                  m["cell_id"], m["primary_kw_at_coh"],
-                 m["best_magnitude"], m["frac_coherent"], m["n_sources"])
+                 m["best_magnitude"], m["frac_coherent"], m["n_sources"],
+                 sonnet_str)
 
     out = {"winner_cell_id": leaderboard[0]["cell_id"],
            "winner_metric": leaderboard[0],
+           "metric_key": args.metric_key,
            "leaderboard": leaderboard,
            "n_cells": len(leaderboard)}
-    out_path = Path(paths["root"]) / "rank_phase1.json"
+    out_path = Path(paths["root"]) / args.out_name
     out_path.write_text(json.dumps(out, indent=2))
     log.info("[saved] %s — winner: %s", out_path, leaderboard[0]["cell_id"])
     return 0

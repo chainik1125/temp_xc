@@ -9,6 +9,13 @@ Architectures supported:
   - "tsae"       — Han's TemporalSAE (attention-based predicted+novel codes,
                    from references/TemporalFeatureAnalysis vendored under
                    temporal_crosscoders/han_tsae/)
+  - "txc_h8"     — Han's TXCBareMultiDistanceContrastiveAntidead:
+                   bare TXC + anti-dead + matryoshka H/L + multi-distance
+                   InfoNCE. Shifts auto-set to (1, T//4, T//2) per Han's
+                   recipe; alpha=1.0 (contrastive on); matryoshka_h=0.2*d_sae.
+  - "txc_h13"    — Han's TXCBareMDxMSContrastiveAntidead:
+                   H8 + multi-scale (n_contr_scales=3, gamma=0.5) — InfoNCE
+                   computed at multiple matryoshka prefix sizes per shift.
 
 Common interface (all dispatched through this file):
   build_arch(arch, d_in, d_sae, T, k, **arch_kwargs) -> nn.Module
@@ -45,6 +52,20 @@ from temporal_crosscoders.models import (
     TemporalCrosscoder,
 )
 from temporal_crosscoders.han_tsae import TemporalSAE
+from temporal_crosscoders.han_arch import (
+    TXCBareMultiDistanceContrastiveAntidead,
+    TXCBareMDxMSContrastiveAntidead,
+)
+
+
+def _auto_shifts(T: int) -> tuple[int, ...]:
+    """Han's H8 default: shifts=(1, T//4, T//2), deduped + clamped to [1,T-1]."""
+    raw = (1, max(1, T // 4), max(1, T // 2))
+    return tuple(sorted({s for s in raw if 1 <= s <= max(T - 1, 1)}))
+
+
+def _is_contrastive(arch: str) -> bool:
+    return arch in ("txc_h8", "txc_h13")
 
 
 def build_arch(arch: str, d_in: int, d_sae: int, T: int, k: int, **kwargs):
@@ -83,6 +104,30 @@ def build_arch(arch: str, d_in: int, d_sae: int, T: int, k: int, **kwargs):
             n_attn_layers=n_attn_layers,
             bottleneck_factor=bottleneck_factor,
         )
+    elif arch == "txc_h8":
+        # Han's multi-distance contrastive TXC. window-L0 = k * T to match TXC family.
+        shifts = tuple(kwargs.get("shifts") or _auto_shifts(T))
+        h_size = int(kwargs.get("matryoshka_h_size") or int(d_sae * 0.2))
+        return TXCBareMultiDistanceContrastiveAntidead(
+            d_in=d_in, d_sae=d_sae, T=T, k=k * T,
+            shifts=shifts,
+            matryoshka_h_size=h_size,
+            alpha=float(kwargs.get("alpha", 1.0)),
+            aux_k=int(kwargs.get("aux_k", 512)),
+        )
+    elif arch == "txc_h13":
+        # Han's multi-distance × multi-scale contrastive TXC (H13 family).
+        shifts = tuple(kwargs.get("shifts") or _auto_shifts(T))
+        h_size = int(kwargs.get("matryoshka_h_size") or int(d_sae * 0.2))
+        return TXCBareMDxMSContrastiveAntidead(
+            d_in=d_in, d_sae=d_sae, T=T, k=k * T,
+            shifts=shifts,
+            n_contr_scales=int(kwargs.get("n_contr_scales", 3)),
+            gamma=float(kwargs.get("gamma", 0.5)),
+            matryoshka_h_size=h_size,
+            alpha=float(kwargs.get("alpha", 1.0)),
+            aux_k=int(kwargs.get("aux_k", 512)),
+        )
     raise ValueError(f"unknown arch: {arch}")
 
 
@@ -112,6 +157,16 @@ def arch_forward(arch: str, model: nn.Module, x_btd: torch.Tensor):
         loss = (x_hat - x_btd).pow(2).sum(dim=-1).mean()
         codes = results["pred_codes"] + results["novel_codes"]   # (B, T, d_sae)
         return loss, {"window": codes.mean(dim=1), "per_pos": codes}
+    elif arch in ("txc_h8", "txc_h13"):
+        # Han's multi-distance archs accept either (B, T, d) — degrades to
+        # parent's matryoshka recon + AuxK with NO contrastive — or
+        # (B, 1+K, T, d) — full multi-distance contrastive path. The training
+        # loop decides which shape to feed via `arch_sample_batch`.
+        if x_btd.ndim == 3:
+            loss, x_hat, z = model(x_btd)         # plain single-window
+        else:
+            loss, x_hat, z = model(x_btd)         # multi-distance path
+        return loss, {"window": z, "per_pos": None}
     raise ValueError(f"unknown arch: {arch}")
 
 
@@ -161,6 +216,14 @@ def arch_decoder_directions(arch: str, model: nn.Module) -> dict:
         # direction per feature is the dictionary row.
         W = model.D                              # (d_sae, d)
         return {"pos0": W, "union": W, "per_pos": None}
+    elif arch in ("txc_h8", "txc_h13"):
+        # Same shape as TXCBareAntidead: W_dec is (d_sae, T, d_in).
+        W = model.W_dec                          # (d_sae, T, d)
+        return {
+            "pos0": W[:, 0, :],
+            "union": W.mean(dim=1),
+            "per_pos": W,
+        }
     raise ValueError(f"unknown arch: {arch}")
 
 

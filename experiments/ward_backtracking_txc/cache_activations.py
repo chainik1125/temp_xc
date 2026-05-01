@@ -124,10 +124,14 @@ def _attach_hooks(model, hookpoints: list[dict], buffer: dict):
             return hook_fn
 
         def make_pre_hook(k):
-            def hook_fn(_m, args):
-                # `args` is the positional input tuple to self_attn; the first
-                # is the (B, L, d) hidden state already passed through input_layernorm.
-                acts = args[0]
+            def hook_fn(_m, args, kwargs):
+                # Newer transformers (≥4.50) call `self_attn(hidden_states=...)`
+                # via kwargs only, so `args` is empty and the hidden state lives
+                # in `kwargs["hidden_states"]`. Older versions pass it positionally.
+                if args:
+                    acts = args[0]
+                else:
+                    acts = kwargs["hidden_states"]
                 if acts.dim() == 4:
                     acts = acts.reshape(acts.shape[0], acts.shape[1], -1)
                 buffer[k] = acts.detach().to(torch.float16).cpu()
@@ -141,7 +145,7 @@ def _attach_hooks(model, hookpoints: list[dict], buffer: dict):
             handles.append(target.register_forward_hook(make_post_hook(key)))
         elif comp == "ln1":
             target = model.model.layers[layer_idx].self_attn
-            handles.append(target.register_forward_pre_hook(make_pre_hook(key)))
+            handles.append(target.register_forward_pre_hook(make_pre_hook(key), with_kwargs=True))
         else:
             raise ValueError(f"unknown component: {comp}")
     return handles

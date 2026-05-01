@@ -70,7 +70,10 @@ def enumerate_neighbors(cell: Cell, cfg: dict, seen: set[str]) -> list[Cell]:
       - arch:           any other arch in cfg.txc.arch_list
       - hookpoint:      any other enabled hookpoint
       - k_per_position: cell.k * 0.5 (clamped ≥ 4) and cell.k * 2 (clamped ≤ 256)
+      - rank:           any of {meandiff, tstat, ratio} ≠ cell.rank
+                        (mining-criterion swap; reuses training ckpt)
     """
+    from experiments.ward_backtracking_txc.cell_id import VALID_RANKS
     out = []
 
     # arch axis
@@ -92,6 +95,12 @@ def enumerate_neighbors(cell: Cell, cfg: dict, seen: set[str]) -> list[Cell]:
         new_k = max(4, min(256, new_k))                  # global clamp
         if new_k == cell.k_per_position: continue
         n = cell.with_(k_per_position=new_k)
+        if n.id not in seen: out.append(n)
+
+    # ranking axis (mining-criterion swap)
+    for rank in VALID_RANKS:
+        if rank == cell.rank: continue
+        n = cell.with_(rank=rank)
         if n.id not in seen: out.append(n)
 
     return out
@@ -118,9 +127,14 @@ def save_state(state: dict, cfg: dict) -> None:
 
 # ─── Cell evaluation dispatch (parallel across GPUs) ───────────────────────────
 
-def dispatch_cells(cells: list[Cell], num_gpus: int, cfg: dict) -> dict[str, dict | None]:
+def dispatch_cells(cells: list[Cell], num_gpus: int, cfg: dict,
+                   metric_key: str = "primary_kw_at_coh") -> dict[str, dict | None]:
     """Spawn evaluate_cell subprocesses, round-robin across GPUs, pool-size=num_gpus.
-    Returns {cell_id: metric_dict_or_None}."""
+    Returns {cell_id: metric_dict_or_None}.
+
+    `metric_key` controls only the [done] log line; downstream consumers
+    pick their own metric key from the saved metric dict.
+    """
     results: dict[str, dict | None] = {}
     pids: list[tuple[int, Cell]] = []           # (subprocess_pid, cell)
     procs: dict[int, subprocess.Popen] = {}     # pid -> Popen
@@ -182,8 +196,9 @@ def dispatch_cells(cells: list[Cell], num_gpus: int, cfg: dict) -> dict[str, dic
                     results[cell.id] = None
                 else:
                     results[cell.id] = metric_for(cell)
-                    log.info("[done] %s primary=%.4f", cell.id,
-                             results[cell.id]["primary_kw_at_coh"] if results[cell.id] else float("nan"))
+                    val = (results[cell.id].get(metric_key, float("nan"))
+                           if results[cell.id] else float("nan"))
+                    log.info("[done] %s %s=%.4f", cell.id, metric_key, val)
         in_flight = still
 
     return results
@@ -202,7 +217,12 @@ def main(argv=None):
                    help="default: detect via nvidia-smi -L")
     p.add_argument("--improvement-threshold", type=float, default=0.05,
                    help="relative improvement required to accept a neighbor (default 5%)")
+    p.add_argument("--metric-key", type=str, default="primary_kw_at_coh",
+                   choices=("primary_kw_at_coh", "primary_kw_at_sonnet_coh"),
+                   help="which metric to optimise. Sonnet variant requires "
+                        "coherence_grades/<cell>.json to be populated.")
     args = p.parse_args(argv)
+    METRIC_KEY = args.metric_key
 
     cfg = yaml.safe_load(args.config.read_text())
 
@@ -241,7 +261,7 @@ def main(argv=None):
         ).exists() else None
         if winner_metric is None:
             log.info("[bootstrap] evaluating winner cell %s to seed hill-climb", start_id)
-            res = dispatch_cells([winner_cell], num_gpus, cfg)
+            res = dispatch_cells([winner_cell], num_gpus, cfg, metric_key=METRIC_KEY)
             winner_metric = res.get(start_id)
             if winner_metric is None:
                 log.error("[fatal] could not evaluate winner cell"); return 1
@@ -252,9 +272,10 @@ def main(argv=None):
     # Hill-climb loop
     while state["iteration"] < args.max_iter:
         current_cell = Cell.from_id(state["current_best"]["cell_id"])
-        current_score = state["current_best"]["metric"]["primary_kw_at_coh"]
-        log.info("[iter %d/%d] current=%s primary=%.4f",
-                 state["iteration"] + 1, args.max_iter, current_cell.id, current_score)
+        current_score = state["current_best"]["metric"].get(METRIC_KEY, 0.0)
+        log.info("[iter %d/%d] current=%s %s=%.4f",
+                 state["iteration"] + 1, args.max_iter, current_cell.id,
+                 METRIC_KEY, current_score)
 
         seen = set(state["evaluated"].keys())
         neighbors = enumerate_neighbors(current_cell, cfg, seen)
@@ -265,7 +286,7 @@ def main(argv=None):
 
         log.info("[neighbors] %d to evaluate: %s", len(neighbors),
                  [c.id for c in neighbors])
-        results = dispatch_cells(neighbors, num_gpus, cfg)
+        results = dispatch_cells(neighbors, num_gpus, cfg, metric_key=METRIC_KEY)
 
         # Update evaluated set + pick best successful neighbor
         best_n_cell = None; best_n_score = -float("inf")
@@ -273,8 +294,9 @@ def main(argv=None):
             m = results.get(c.id)
             if m is None: continue
             state["evaluated"][c.id] = m
-            if m["primary_kw_at_coh"] > best_n_score:
-                best_n_score = m["primary_kw_at_coh"]; best_n_cell = c
+            score = m.get(METRIC_KEY, 0.0)
+            if score > best_n_score:
+                best_n_score = score; best_n_cell = c
         save_state(state, cfg)
 
         if best_n_cell is None:
@@ -282,8 +304,8 @@ def main(argv=None):
             break
 
         rel_improvement = (best_n_score - current_score) / max(abs(current_score), 1e-6)
-        log.info("[best-neighbor] %s primary=%.4f (Δ=%+.2f%% vs current)",
-                 best_n_cell.id, best_n_score, rel_improvement * 100)
+        log.info("[best-neighbor] %s %s=%.4f (Δ=%+.2f%% vs current)",
+                 best_n_cell.id, METRIC_KEY, best_n_score, rel_improvement * 100)
 
         if rel_improvement > args.improvement_threshold:
             state["history"].append({
@@ -300,9 +322,9 @@ def main(argv=None):
                      rel_improvement * 100, args.improvement_threshold * 100)
             break
 
-    log.info("[done] hill-climb final winner: %s (primary=%.4f) over %d iterations",
-             state["current_best"]["cell_id"],
-             state["current_best"]["metric"]["primary_kw_at_coh"],
+    log.info("[done] hill-climb final winner: %s (%s=%.4f) over %d iterations",
+             state["current_best"]["cell_id"], METRIC_KEY,
+             state["current_best"]["metric"].get(METRIC_KEY, 0.0),
              state["iteration"])
     return 0
 

@@ -90,8 +90,9 @@ def _capture_windows(
         if x.dim() == 4:
             x = x.reshape(x.shape[0], x.shape[1], -1)
         captured["x"] = x.detach().to(torch.float32).cpu()
-    def pre_hook(_m, args):
-        x = args[0]
+    def pre_hook(_m, args, kwargs):
+        # Newer transformers calls self_attn(hidden_states=...) by kwargs only.
+        x = args[0] if args else kwargs["hidden_states"]
         if x.dim() == 4:
             x = x.reshape(x.shape[0], x.shape[1], -1)
         captured["x"] = x.detach().to(torch.float32).cpu()
@@ -101,7 +102,7 @@ def _capture_windows(
     elif component == "attn":
         handle = model.model.layers[layer].self_attn.register_forward_hook(post_hook)
     elif component == "ln1":
-        handle = model.model.layers[layer].self_attn.register_forward_pre_hook(pre_hook)
+        handle = model.model.layers[layer].self_attn.register_forward_pre_hook(pre_hook, with_kwargs=True)
     else:
         raise ValueError(f"unknown component: {component}")
 
@@ -234,6 +235,16 @@ def _per_offset_preact(arch: str, model, X: np.ndarray, feat_idx: np.ndarray, ba
                 codes = results["pred_codes"] + results["novel_codes"]   # (B, T, d_sae)
                 contribs = codes[..., feat_idx_t]                        # (B, T, K)
             out[i:end] = contribs.permute(0, 2, 1).float().cpu().numpy()
+    elif arch in ("txc_h8", "txc_h13"):
+        # W_enc is (T, d_in, d_sae) — same shape as plain TXC. Per-position
+        # contribution at slot t for feature k is x[:, t] · W_enc[t, :, k].
+        W = model.W_enc[:, :, feat_idx]   # (T, d, K)
+        for i in range(0, X.shape[0], batch_size):
+            end = min(i + batch_size, X.shape[0])
+            x = torch.from_numpy(X[i:end]).to("cuda", dtype=torch.float32)
+            with torch.no_grad():
+                contribs = torch.einsum("btd,tdk->btk", x, W)
+            out[i:end] = contribs.permute(0, 2, 1).float().cpu().numpy()
     else:
         raise ValueError(f"unknown arch: {arch}")
     return out
@@ -241,13 +252,19 @@ def _per_offset_preact(arch: str, model, X: np.ndarray, feat_idx: np.ndarray, ba
 
 def _process_one(arch: str, hp: dict, cfg: dict,
                  *, k_per_position: int | None = None,
-                 seed: int | None = None) -> None:
+                 seed: int | None = None,
+                 rank: str = "meandiff") -> None:
     """Mine features for a single cell. With k_per_position+seed → paper-budget
-    filename; without → legacy sprint filename."""
+    filename; without → legacy sprint filename. The `rank` selects the
+    feature-ranking criterion ("meandiff" | "tstat" | "ratio")."""
+    # Stash the rank so the deeper helper picks it up without an extra arg.
+    _process_one._active_rank = rank
     paths = cfg["paths"]
     if k_per_position is not None and seed is not None:
         ckpt_filename = f"{arch}__{hp['key']}__k{k_per_position}__s{seed}.pt"
-        out_filename = f"{arch}__{hp['key']}__k{k_per_position}__s{seed}.npz"
+        # Per-rank features file; default rank keeps legacy filename for back-compat.
+        cell_id = f"{arch}__{hp['key']}__k{k_per_position}__s{seed}"
+        out_filename = f"{cell_id}.npz" if rank == "meandiff" else f"{cell_id}__r{rank}.npz"
     else:
         ckpt_filename = f"txc_{hp['key']}.pt" if arch == "txc" else f"{arch}_{hp['key']}.pt"
         out_filename = f"{hp['key']}.npz" if arch == "txc" else f"{arch}_{hp['key']}.npz"
@@ -280,14 +297,39 @@ def _process_one(arch: str, hp: dict, cfg: dict,
     )
     Z = _encode_in_batches(arch, model, X)        # (N, d_sae)
 
-    # Selectivity
+    # Selectivity — compute three rankings on the same Z matrix.
     pos_mask = is_bt; neg_mask = ~is_bt
-    mu_pos = Z[pos_mask].mean(axis=0)
-    mu_neg = Z[neg_mask].mean(axis=0)
-    score = mu_pos - mu_neg
+    Z_pos = Z[pos_mask]                             # (n_pos, d_sae)
+    Z_neg = Z[neg_mask]                             # (n_neg, d_sae)
+    n_pos = Z_pos.shape[0]; n_neg = Z_neg.shape[0]
+    mu_pos = Z_pos.mean(axis=0)
+    mu_neg = Z_neg.mean(axis=0)
+    var_pos = Z_pos.var(axis=0, ddof=1) if n_pos > 1 else np.ones_like(mu_pos)
+    var_neg = Z_neg.var(axis=0, ddof=1) if n_neg > 1 else np.ones_like(mu_neg)
+
+    # 1. meandiff — mu_pos - mu_neg (legacy)
+    score_meandiff = mu_pos - mu_neg
+    # 2. tstat — Welch's t-statistic (Dmitry's preferred ranking)
+    se = np.sqrt(var_pos / max(n_pos, 1) + var_neg / max(n_neg, 1) + 1e-12)
+    score_tstat = (mu_pos - mu_neg) / se
+    # 3. ratio — mu_pos / max(mu_neg, eps); guards against negative/zero means
+    eps = 1e-6
+    score_ratio = mu_pos / np.where(np.abs(mu_neg) < eps, eps, np.abs(mu_neg))
+
+    # Pick the top-K according to the cell's chosen ranking.
+    rank = getattr(_process_one, "_active_rank", "meandiff")
+    if rank == "meandiff":
+        score = score_meandiff
+    elif rank == "tstat":
+        score = score_tstat
+    elif rank == "ratio":
+        score = score_ratio
+    else:
+        raise ValueError(f"unknown ranking: {rank}")
 
     K = int(cfg["mining"]["top_k_features"])
-    top = np.argsort(-score)[:K]
+    # Rank by absolute value (catch both positive and negative selectivity)
+    top = np.argsort(-np.abs(score))[:K]
 
     # Per-offset selectivity for top-K
     contribs = _per_offset_preact(arch, model, X, top)
@@ -310,6 +352,12 @@ def _process_one(arch: str, hp: dict, cfg: dict,
         top_features=top.astype(np.int64),
         scores=score[top].astype(np.float32),
         all_scores=score.astype(np.float32),
+        # Save full per-criterion score arrays so any downstream code can
+        # rerank without re-encoding the cache.
+        all_scores_meandiff=score_meandiff.astype(np.float32),
+        all_scores_tstat=score_tstat.astype(np.float32),
+        all_scores_ratio=score_ratio.astype(np.float32),
+        ranking=np.asarray(rank, dtype="<U16"),
         per_offset=per_off_diff.astype(np.float32),
         per_offset_pos=per_off_pos.astype(np.float32),
         per_offset_neg=per_off_neg.astype(np.float32),
@@ -348,7 +396,8 @@ def main(argv=None):
             log.error("cell %s references unknown hookpoint %s", args.cell, cell.hookpoint_key)
             return 1
         _process_one(cell.arch, all_hp[cell.hookpoint_key], cfg,
-                     k_per_position=cell.k_per_position, seed=cell.seed)
+                     k_per_position=cell.k_per_position, seed=cell.seed,
+                     rank=cell.rank)
         return 0
 
     hookpoints = [hp for hp in cfg["hookpoints"] if hp.get("enabled", True)]

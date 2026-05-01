@@ -30,6 +30,7 @@ import yaml
 
 from experiments.ward_backtracking_txc.cell_id import (
     Cell, ckpt_path, features_path, b1_per_cell_path, cell_metric_path,
+    sonnet_grades_path,
 )
 from experiments.ward_backtracking_txc import metrics
 
@@ -90,20 +91,25 @@ def evaluate_cell(cell: Cell, cfg: dict, no_dom: bool = True) -> dict | None:
     else:
         log.info("[skip-b1] %s exists", b1p)
 
-    # 4. Compute metric
+    # 4. Compute metric — pull Sonnet grades when available
     rows = metrics.load_b1_rows(b1p)
     source_tags = sorted({r["source"] for r in rows if r["source"].startswith(cell.arch + "_")})
-    metric = metrics.cell_metric(rows, source_tags)
+    grades_dir = Path(paths["root"]) / "coherence_grades"
+    grades_path = sonnet_grades_path(cell, grades_dir)
+    sonnet_grades = metrics.load_sonnet_grades(grades_path)
+    metric = metrics.cell_metric(rows, source_tags, sonnet_grades=sonnet_grades)
     metric["cell_id"] = cell.id
     metric["arch"] = cell.arch
     metric["hookpoint"] = cell.hookpoint_key
     metric["k_per_position"] = cell.k_per_position
     metric["seed"] = cell.seed
+    metric["rank"] = cell.rank
     metric["n_sources"] = len(source_tags)
     mp.write_text(json.dumps(metric, indent=2))
-    log.info("[metric] %s primary=%.4f at mag=%+.0f (frac_coherent=%.2f)",
+    log.info("[metric] %s primary=%.4f at mag=%+.0f (frac_coherent=%.2f)%s",
              cell.id, metric["primary_kw_at_coh"], metric["best_magnitude"],
-             metric["frac_coherent"])
+             metric["frac_coherent"],
+             f" sonnet={metric.get('primary_kw_at_sonnet_coh', 'NA')}" if sonnet_grades else "")
     return metric
 
 

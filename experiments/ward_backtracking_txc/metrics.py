@@ -60,8 +60,19 @@ def _coh_ok(text: str, threshold: int = 2) -> bool:
 def cell_metric(rows: list[dict],
                 source_tags: list[str],
                 baseline_kw: float = 0.007,
-                coh_threshold: int = 2) -> dict:
+                coh_threshold: int = 2,
+                sonnet_grades: dict | None = None,
+                sonnet_floor: int = 2) -> dict:
     """Compute the hill-climb metric for ONE cell's set of source tags.
+
+    Two coherence floors are evaluated:
+      1. Per-word `max_same_word_run ≤ coh_threshold` — fast heuristic.
+      2. (Optional) Sonnet 4.6 0–3 grade `≥ sonnet_floor` — catches
+         sentence-level degeneration the per-word floor misses.
+
+    The reported `primary_kw_at_coh` uses the per-word floor (legacy /
+    backwards-compatible). The new `primary_kw_at_sonnet_coh` uses the
+    Sonnet floor when grades are available, else falls back to per-word.
 
     Args:
       rows: a flat list of B1 result rows (each has source, magnitude,
@@ -71,57 +82,103 @@ def cell_metric(rows: list[dict],
       baseline_kw: subtracted from every kw_rate to get effect size
       coh_threshold: max consecutive same-word run; cells whose magnitudes
             fail this floor are excluded from the peak
+      sonnet_grades: optional dict keyed by row index (str) → {"grade": int}.
+            When provided, the Sonnet-floor metric is also computed.
+      sonnet_floor: minimum Sonnet 0-3 grade required to count as coherent
+            (default 2: "mostly coherent")
 
     Returns dict with primary metric + secondaries.
     """
     src_set = set(source_tags)
-    by_cell_mag = defaultdict(list)   # (source, mag) -> [rows]
-    for r in rows:
+    by_cell_mag: dict = defaultdict(list)        # (source, mag) -> [(row_idx, row)]
+    for idx, r in enumerate(rows):
         if r["source"] in src_set:
-            by_cell_mag[(r["source"], r["magnitude"])].append(r)
+            by_cell_mag[(r["source"], r["magnitude"])].append((idx, r))
 
-    peak = -float("inf")
+    peak_run = -float("inf")
+    peak_sonnet = -float("inf")
     peak_no_coh = -float("inf")
-    peak_mag = 0.0
-    peak_source = None
+    peak_run_mag = 0.0; peak_run_src = None
+    peak_sonnet_mag = 0.0; peak_sonnet_src = None
     n_cells_total = 0
-    n_cells_coherent = 0
+    n_cells_coh_run = 0
+    n_cells_coh_sonnet = 0
 
     for (src, mag), cell_rows in by_cell_mag.items():
         n_cells_total += 1
         if not cell_rows:
             continue
-        mean_kw = sum(r["keyword_rate"] for r in cell_rows) / len(cell_rows)
-        # Coherence: cell is coherent iff EVERY prompt's text passes the
-        # max-run floor. (One degenerate completion sinks the cell.)
-        all_coh = all(_coh_ok(r.get("text", ""), coh_threshold) for r in cell_rows)
-        if all_coh:
-            n_cells_coherent += 1
+        mean_kw = sum(r["keyword_rate"] for _, r in cell_rows) / len(cell_rows)
+        run_ok = all(_coh_ok(r.get("text", ""), coh_threshold) for _, r in cell_rows)
+        if run_ok:
+            n_cells_coh_run += 1
+
+        sonnet_ok: bool | None = None
+        if sonnet_grades is not None:
+            grades_for_cell = []
+            for idx, r in cell_rows:
+                g = sonnet_grades.get(str(idx))
+                if g is None or g.get("grade", -1) < 0:
+                    grades_for_cell.append(None)
+                else:
+                    grades_for_cell.append(int(g["grade"]))
+            # Cell is Sonnet-coherent iff EVERY prompt has a valid grade ≥ floor.
+            if all(g is not None and g >= sonnet_floor for g in grades_for_cell):
+                sonnet_ok = True
+                n_cells_coh_sonnet += 1
+            else:
+                sonnet_ok = False
+
         effect = abs(mean_kw - baseline_kw)
         if effect > peak_no_coh:
             peak_no_coh = effect
-        if all_coh and effect > peak:
-            peak = effect
-            peak_mag = mag
-            peak_source = src
+        if run_ok and effect > peak_run:
+            peak_run = effect
+            peak_run_mag = mag
+            peak_run_src = src
+        if sonnet_ok and effect > peak_sonnet:
+            peak_sonnet = effect
+            peak_sonnet_mag = mag
+            peak_sonnet_src = src
 
-    if peak == -float("inf"):
-        peak = 0.0
-        peak_mag = 0.0
-        peak_source = None
+    if peak_run == -float("inf"):
+        peak_run = 0.0; peak_run_mag = 0.0; peak_run_src = None
+    if peak_sonnet == -float("inf"):
+        peak_sonnet = 0.0; peak_sonnet_mag = 0.0; peak_sonnet_src = None
     if peak_no_coh == -float("inf"):
         peak_no_coh = 0.0
 
-    return {
-        "primary_kw_at_coh": float(peak),
+    out = {
+        "primary_kw_at_coh": float(peak_run),
         "peak_kw_no_coh": float(peak_no_coh),
-        "best_magnitude": float(peak_mag),
-        "best_source": peak_source,
-        "direction": "positive" if peak_mag > 0 else ("negative" if peak_mag < 0 else "none"),
+        "best_magnitude": float(peak_run_mag),
+        "best_source": peak_run_src,
+        "direction": "positive" if peak_run_mag > 0 else ("negative" if peak_run_mag < 0 else "none"),
         "n_cells_evaluated": n_cells_total,
-        "n_cells_coherent": n_cells_coherent,
-        "frac_coherent": (n_cells_coherent / max(1, n_cells_total)),
+        "n_cells_coherent": n_cells_coh_run,
+        "frac_coherent": (n_cells_coh_run / max(1, n_cells_total)),
     }
+    if sonnet_grades is not None:
+        out["primary_kw_at_sonnet_coh"] = float(peak_sonnet)
+        out["best_magnitude_sonnet"] = float(peak_sonnet_mag)
+        out["best_source_sonnet"] = peak_sonnet_src
+        out["direction_sonnet"] = (
+            "positive" if peak_sonnet_mag > 0
+            else ("negative" if peak_sonnet_mag < 0 else "none")
+        )
+        out["n_cells_coh_sonnet"] = n_cells_coh_sonnet
+        out["frac_coh_sonnet"] = (n_cells_coh_sonnet / max(1, n_cells_total))
+    return out
+
+
+def load_sonnet_grades(grades_path: Path | str) -> dict | None:
+    p = Path(grades_path)
+    if not p.exists():
+        return None
+    try:
+        return json.loads(p.read_text())
+    except Exception:
+        return None
 
 
 def load_b1_rows(path: Path | str) -> list[dict]:

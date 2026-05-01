@@ -61,8 +61,9 @@ def _capture_full_offset_sweep(
         if x.dim() == 4:
             x = x.reshape(x.shape[0], x.shape[1], -1)
         captured["x"] = x.detach().to(torch.float32).cpu()
-    def pre_hook(_m, args):
-        x = args[0]
+    def pre_hook(_m, args, kwargs):
+        # Newer transformers calls self_attn(hidden_states=...) by kwargs only.
+        x = args[0] if args else kwargs["hidden_states"]
         if x.dim() == 4:
             x = x.reshape(x.shape[0], x.shape[1], -1)
         captured["x"] = x.detach().to(torch.float32).cpu()
@@ -72,7 +73,7 @@ def _capture_full_offset_sweep(
     elif component == "attn":
         handle = model.model.layers[layer].self_attn.register_forward_hook(post_hook)
     elif component == "ln1":
-        handle = model.model.layers[layer].self_attn.register_forward_pre_hook(pre_hook)
+        handle = model.model.layers[layer].self_attn.register_forward_pre_hook(pre_hook, with_kwargs=True)
     else:
         raise ValueError(component)
 
