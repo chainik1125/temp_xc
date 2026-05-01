@@ -15,12 +15,12 @@ unc=1.800, ≥1.5=1.167, ≥1.75=0.333, ≥2.0=0.283, ≥2.25=0.283, ≥2.5=0.28
 | txc_h8_t2_kpos20_shifts2 right-edge | 3 | +0.072 | 1.239 | n=3 |
 | txc_bare_antidead_t3_kpos20_grownFromT2sd42 right-edge | 3 | +0.056 | 1.222 | n=3 |
 | tsae_paper_k500 right-edge | 2 | +0.033 | 1.200 | n=2 |
+| txc_bare_antidead_t3_kpos20_grownFromT2sd42 per-position | 3 | +0.011 | 1.178 | n=3 |
 | txc_h8_t3_kpos20_shifts3 per-position | 1 | +0.000 | 1.167 | n=1 |
 | txc_bare_antidead_t5_kwin20 per-position | 1 | +0.000 | 1.167 | n=1 |
 | txc_bare_antidead_t2_kpos20_ws_tsae_encoder per-position | 2 | -0.017 | 1.150 | n=2 |
 | txc_bare_antidead_t4_kpos20_grownChainFromT3 per-position | 1 | -0.033 | 1.133 | n=1 |
 | txc_bare_antidead_t5_kpos20_grownChainFromT4 per-position | 1 | -0.067 | 1.100 | n=1 |
-| txc_bare_antidead_t3_kpos20_grownFromT2sd42 per-position | 2 | -0.067 | 1.100 | n=2 |
 
 ### Top 10 cells by Δ coh ≥ 1.75
 
@@ -43,7 +43,7 @@ unc=1.800, ≥1.5=1.167, ≥1.75=0.333, ≥2.0=0.283, ≥2.25=0.283, ≥2.5=0.28
 |---|---:|---:|---:|---|
 | txc_bare_antidead_t2_kpos20 per-position | 3 | +0.694 | 0.978 | n=3 |
 | txc_bare_antidead_t2_kpos20 right-edge | 3 | +0.672 | 0.956 | n=3 |
-| txc_bare_antidead_t3_kpos20_grownFromT2sd42 per-position | 2 | +0.600 | 0.883 | n=2 |
+| txc_bare_antidead_t3_kpos20_grownFromT2sd42 per-position | 3 | +0.606 | 0.889 | n=3 |
 | txc_bare_antidead_t3_kpos20_grownFromT2sd42 right-edge | 3 | +0.472 | 0.756 | n=3 |
 | txc_bare_antidead_t5_kpos20 right-edge | 2 | +0.400 | 0.683 | n=2 |
 | txc_h8_t3_kpos20_shifts3 right-edge | 1 | +0.350 | 0.633 | n=1 |
@@ -59,7 +59,7 @@ unc=1.800, ≥1.5=1.167, ≥1.75=0.333, ≥2.0=0.283, ≥2.25=0.283, ≥2.5=0.28
 | txc_bare_antidead_t3_kpos20_grownFromT2sd42 right-edge | 3 | +0.340 | 0.753 | n=3 |
 | txc_bare_antidead_t2_kpos20 right-edge | 3 | +0.331 | 0.745 | n=3 |
 | txc_bare_antidead_t2_kpos20 per-position | 3 | +0.323 | 0.737 | n=3 |
-| txc_bare_antidead_t3_kpos20_grownFromT2sd42 per-position | 2 | +0.286 | 0.700 | n=2 |
+| txc_bare_antidead_t3_kpos20_grownFromT2sd42 per-position | 3 | +0.291 | 0.704 | n=3 |
 | txc_h8_t3_kpos20_shifts3 right-edge | 1 | +0.278 | 0.691 | n=1 |
 | txc_h8_t2_kpos20_shifts2 right-edge | 3 | +0.244 | 0.657 | n=3 |
 | txc_bare_antidead_t3_kpos20 right-edge | 2 | +0.233 | 0.646 | n=2 |
