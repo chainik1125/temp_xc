@@ -66,7 +66,7 @@ LEADERBOARD_ARCHS = [
     "hill_subseq_h8_T12_s5",
 ]
 SEEDS = (1, 2, 42)
-S_FILTER = 32
+DEFAULT_S_FILTER = 32
 DEFAULT_SUBJECT_MODEL = "google/gemma-2-2b"
 
 
@@ -80,13 +80,23 @@ def _row_subject(r: dict) -> str:
 
 
 def load_seed_task_aucs(task_set=PAPER,
-                        subject_model: str = DEFAULT_SUBJECT_MODEL) -> dict:
+                        subject_model: str = DEFAULT_SUBJECT_MODEL,
+                        s_filter: int = DEFAULT_S_FILTER) -> dict:
     """Returns dict[(arch_id, k_feat, seed)] -> dict[task_name -> auc_flip].
 
-    Filters to `task_set` (default: PAPER — the paper headline set) and
-    `subject_model` (default: google/gemma-2-2b — BASE side). The IT
-    side appends to the same probing_results.jsonl with subject_model
-    set to "google/gemma-2-2b-it"; pass that to load IT-side rows.
+    Filters to `task_set` (default: PAPER — the paper headline set),
+    `subject_model` (default: google/gemma-2-2b — BASE side), and
+    `s_filter` (default: 32 — the original headline). The IT side
+    appends to the same probing_results.jsonl with
+    subject_model="google/gemma-2-2b-it"; pass that to load IT rows.
+    For S=10 / S=20 leaderboards (added 2026-05-01), pass
+    s_filter=10 or 20.
+
+    Deduplication: when multiple rows exist for the same
+    (arch_id, k_feat, seed, task_name), the LAST one wins. Re-running
+    probing on the same arch produces duplicate rows; this matters
+    only when the underlying numbers should be byte-identical (which
+    they are for S=32 thanks to the bit-exact aggregate_s patch).
     """
     out = defaultdict(dict)
     with PROBING_PATH.open() as f:
@@ -94,7 +104,7 @@ def load_seed_task_aucs(task_set=PAPER,
             line = line.strip()
             if not line: continue
             r = json.loads(line)
-            if r.get("S") != S_FILTER: continue
+            if r.get("S") != s_filter: continue
             if r.get("seed") not in SEEDS: continue
             if r.get("arch_id") not in LEADERBOARD_ARCHS: continue
             if r.get("k_feat") not in (5, 20): continue
@@ -213,20 +223,26 @@ def main():
     p.add_argument("--subject-model", default=DEFAULT_SUBJECT_MODEL,
                    help="Filter probing rows to this subject_model. "
                         "BASE: google/gemma-2-2b (default). IT: google/gemma-2-2b-it.")
+    p.add_argument("--S", type=int, default=DEFAULT_S_FILTER,
+                   help="Filter probing rows to this S (tail length). "
+                        "Default 32 (canonical headline). Other values: 10, 20.")
     p.add_argument("--out-suffix", default=None,
-                   help="Override output filename suffix. Default: '_base' for BASE, "
-                        "'_it' for IT, derived from --subject-model.")
+                   help="Override output filename suffix. Default derived from "
+                        "--subject-model + --S; e.g., BASE/S=32 → '' (canonical "
+                        "name), IT/S=20 → '_it_S20', BASE/S=10 → '_S10'.")
     args = p.parse_args()
     if args.out_suffix is None:
-        # BASE → no suffix (preserves canonical name in agent_x_paper/plots/);
-        # IT → "_it" suffix.
-        suffix = "_it" if "-it" in args.subject_model else ""
+        is_it = "-it" in args.subject_model
+        s_part = f"_S{args.S}" if args.S != DEFAULT_S_FILTER else ""
+        it_part = "_it" if is_it else ""
+        suffix = f"{it_part}{s_part}"
     else:
         suffix = args.out_suffix
     out_filename = f"phase7_leaderboard{suffix}_multiseed.png"
-    print(f"[leaderboard] subject_model={args.subject_model} -> {out_filename}")
+    print(f"[leaderboard] subject_model={args.subject_model} S={args.S} -> {out_filename}")
 
-    seed_task_aucs = load_seed_task_aucs(subject_model=args.subject_model)
+    seed_task_aucs = load_seed_task_aucs(subject_model=args.subject_model,
+                                         s_filter=args.S)
     rows = summarise(seed_task_aucs)
     print_table(rows)
     make_plot(rows, PLOTS_DIR,
