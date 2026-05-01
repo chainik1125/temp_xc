@@ -215,9 +215,27 @@ TXCContrastiveMergeH8) being trained by W in parallel.
 
 **Galaxy 8 (TXCSoftMaxPool) — soft-max-pool with learnable per-feature τ
 (generalizes Galaxy 6 hard-max-pool ↔ TXCBareAntidead additive-sum):**
-All 3 seeds trained successfully. Pipeline (select_features → intervene
-RE+PP → grade) is in flight. Hypothesis: soft pooling matches or
-exceeds Galaxy 6 by allowing each feature to pick its preferred τ.
+All 3 seeds trained successfully. Pipeline in flight (sd=42 RE done:
+mean succ=0.70, coh=2.08).
+
+**Learned τ analysis** (across all 3 seeds): τ is tightly clustered
+near 1.0:
+
+| seed | min τ | median | mean | max |
+|---|---:|---:|---:|---:|
+| 42 | 0.88 | 1.06 | 1.11 | 5.95 |
+| 1  | 0.68 | 1.05 | 1.08 | 4.80 |
+| 2  | 0.81 | 1.06 | 1.10 | 5.77 |
+
+98%+ of features have τ ∈ [0.5, 2.0]. Almost no feature pushed toward
+hard-max (τ→0) or hard additive-sum (τ→∞). The model essentially
+chose "softmax-weighted pool with τ≈1" — equivalent to a soft
+preference for the strongest position but still mixing with weaker
+positions.
+
+Mechanistic interpretation: gradient signal w.r.t. τ may be weak vs
+W_enc/W_dec, so τ stays near initialization. OR softmax(τ=1) is the
+natural compromise between hard-max and uniform-sum.
 
 ### Files for paper
 
