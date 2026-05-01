@@ -34,19 +34,60 @@ from src.architectures.txc_bare_multidistance_contrastive_antidead import (
 )
 
 
-def _sample_subset_indices(T_max: int, t_sample: int, batch_size: int,
-                            contiguous: bool, device: torch.device) -> torch.Tensor:
-    """Return (batch_size, t_sample) integer indices into [0, T_max)."""
-    if contiguous:
+def _sample_subset_indices(
+    T_max: int, t_sample: int, batch_size: int,
+    sampling_mode: str, device: torch.device,
+    sigma_range: tuple[float, float] | None = None,
+    n_gaussians: int = 1,
+) -> torch.Tensor:
+    """Return (batch_size, t_sample) integer indices into [0, T_max).
+
+    sampling_mode:
+        "contiguous": random contiguous t_sample-window inside T_max (B1).
+        "random":     random non-contiguous subset of size t_sample (B2).
+        "gaussian":   per-row, sample t_sample positions WITHOUT replacement
+                      from a Gaussian-mixture probability over [0, T_max).
+                      n_gaussians independent Gaussians per row, each with
+                      uniform random center and σ ~ Uniform(sigma_range).
+                      Models the "real linguistic features cluster locally"
+                      hypothesis: features have spatial distribution in window.
+    """
+    if sampling_mode == "contiguous":
         max_off = T_max - t_sample + 1
         offs = torch.randint(0, max_off, (batch_size,), device=device)
         rng = torch.arange(t_sample, device=device)
         return offs.unsqueeze(1) + rng.unsqueeze(0)               # (B, t_sample)
-    # non-contiguous: per-row random permutation, take first t_sample
-    keys = torch.rand(batch_size, T_max, device=device)
-    _, idx = keys.topk(t_sample, dim=-1, largest=True, sorted=True)
-    idx, _ = idx.sort(dim=-1)
-    return idx
+
+    if sampling_mode == "random":
+        # non-contiguous: per-row random permutation, take first t_sample
+        keys = torch.rand(batch_size, T_max, device=device)
+        _, idx = keys.topk(t_sample, dim=-1, largest=True, sorted=True)
+        idx, _ = idx.sort(dim=-1)
+        return idx
+
+    if sampling_mode == "gaussian":
+        # Mixture-of-Gaussians probability per row, then sample t_sample
+        # positions without replacement.
+        sigma_lo, sigma_hi = sigma_range or (1.0, max(2.0, T_max / 4))
+        positions = torch.arange(T_max, device=device, dtype=torch.float32)
+        log_probs = torch.full(
+            (batch_size, T_max), -1e9, device=device, dtype=torch.float32
+        )
+        for _g in range(max(1, n_gaussians)):
+            centers = torch.rand(batch_size, device=device) * T_max  # [0, T_max)
+            sigmas = sigma_lo + torch.rand(batch_size, device=device) * (sigma_hi - sigma_lo)
+            # (B, T_max): −((pos − c)/σ)^2  (log-Gaussian, unnormalised)
+            d = positions.unsqueeze(0) - centers.unsqueeze(1)              # (B, T_max)
+            lp = -(d / sigmas.unsqueeze(1)).pow(2)
+            log_probs = torch.logaddexp(log_probs, lp)
+        probs = torch.softmax(log_probs, dim=-1)
+        # Multinomial without replacement: sample t_sample positions per row.
+        # torch.multinomial supports replacement=False when t_sample ≤ T_max.
+        idx = torch.multinomial(probs, t_sample, replacement=False)
+        idx, _ = idx.sort(dim=-1)
+        return idx
+
+    raise ValueError(f"unknown sampling_mode: {sampling_mode!r}")
 
 
 def _zero_decoder_at_unsampled(decoded_full: torch.Tensor,
@@ -67,15 +108,32 @@ class SubseqTXCBareAntidead(TXCBareAntidead):
 
     Encoder/decoder shape unchanged (per-position W_enc/W_dec at T_max).
     Training-time sample of t_sample positions; loss only on those.
+
+    sampling_mode (str): "contiguous" (B1), "random" (B2), or "gaussian"
+    (Gaussian-mixture spatial prior — see `_sample_subset_indices`).
+    Backwards-compat: `contiguous=True/False` boolean still accepted; if
+    sampling_mode is unset, it's derived from contiguous.
     """
 
     def __init__(self, d_in: int, d_sae: int, T_max: int, k: int,
-                 t_sample: int, contiguous: bool = False, **kw):
+                 t_sample: int,
+                 contiguous: bool = False,
+                 sampling_mode: str | None = None,
+                 sigma_range: tuple[float, float] | None = None,
+                 n_gaussians: int = 1,
+                 **kw):
         super().__init__(d_in, d_sae, T_max, k, **kw)
         self.T_max = int(T_max)
         self.t_sample = int(t_sample)
         self.contiguous = bool(contiguous)
+        # Resolve sampling_mode: explicit > derived-from-contiguous
+        if sampling_mode is None:
+            sampling_mode = "contiguous" if self.contiguous else "random"
+        self.sampling_mode = str(sampling_mode)
+        self.sigma_range = sigma_range
+        self.n_gaussians = int(n_gaussians)
         assert 1 <= t_sample <= T_max
+        assert self.sampling_mode in {"contiguous", "random", "gaussian"}
 
     def _pre_activation_sampled(self, x: torch.Tensor,
                                  sample_idx: torch.Tensor) -> torch.Tensor:
@@ -126,7 +184,8 @@ class SubseqTXCBareAntidead(TXCBareAntidead):
         """x: (B, T_max, d). Trains via subsequence sample."""
         B = x.shape[0]
         sample_idx = _sample_subset_indices(
-            self.T_max, self.t_sample, B, self.contiguous, x.device,
+            self.T_max, self.t_sample, B, self.sampling_mode, x.device,
+            sigma_range=self.sigma_range, n_gaussians=self.n_gaussians,
         )
         # Sampled pre-activation
         pre = self._pre_activation_sampled(x, sample_idx)
@@ -190,6 +249,10 @@ class SubseqH8(TXCBareMultiDistanceContrastiveAntidead):
       - Compute z_anchor / z_pos via subset-summed encoder.
       - Recon loss on sampled positions of each window.
       - InfoNCE on z's H prefix as in H8.
+
+    sampling_mode (str): "contiguous" (B1, original), "random" (B2), or
+    "gaussian" (Gaussian-mixture spatial prior — features cluster locally).
+    Backwards-compat: `contiguous=True/False` boolean still accepted.
     """
 
     def __init__(self, d_in: int, d_sae: int, T_max: int, k: int,
@@ -197,6 +260,9 @@ class SubseqH8(TXCBareMultiDistanceContrastiveAntidead):
                  shifts: tuple[int, ...] | None = None,
                  weights: tuple[float, ...] | None = None,
                  contiguous: bool = False,
+                 sampling_mode: str | None = None,
+                 sigma_range: tuple[float, float] | None = None,
+                 n_gaussians: int = 1,
                  matryoshka_h_size: int | None = None,
                  alpha: float = 1.0,
                  **kw):
@@ -209,6 +275,12 @@ class SubseqH8(TXCBareMultiDistanceContrastiveAntidead):
         self.T_max = int(T_max)
         self.t_sample = int(t_sample)
         self.contiguous = bool(contiguous)
+        if sampling_mode is None:
+            sampling_mode = "contiguous" if self.contiguous else "random"
+        self.sampling_mode = str(sampling_mode)
+        self.sigma_range = sigma_range
+        self.n_gaussians = int(n_gaussians)
+        assert self.sampling_mode in {"contiguous", "random", "gaussian"}
 
     def _pre_activation_sampled(self, x: torch.Tensor,
                                  sample_idx: torch.Tensor) -> torch.Tensor:
@@ -261,7 +333,8 @@ class SubseqH8(TXCBareMultiDistanceContrastiveAntidead):
             B = x.shape[0]
             # Single shared subset S applied to all windows
             sample_idx = _sample_subset_indices(
-                self.T_max, self.t_sample, B, self.contiguous, x.device,
+                self.T_max, self.t_sample, B, self.sampling_mode, x.device,
+                sigma_range=self.sigma_range, n_gaussians=self.n_gaussians,
             )
 
             x_anchor = x[:, 0]
@@ -296,7 +369,8 @@ class SubseqH8(TXCBareMultiDistanceContrastiveAntidead):
         if x.ndim == 3:
             B = x.shape[0]
             sample_idx = _sample_subset_indices(
-                self.T_max, self.t_sample, B, self.contiguous, x.device,
+                self.T_max, self.t_sample, B, self.sampling_mode, x.device,
+                sigma_range=self.sigma_range, n_gaussians=self.n_gaussians,
             )
             pre = self._pre_activation_sampled(x, sample_idx)
             vals, idx = pre.topk(self.k, dim=-1)
