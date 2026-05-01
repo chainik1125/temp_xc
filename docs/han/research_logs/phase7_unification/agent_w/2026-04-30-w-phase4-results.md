@@ -403,6 +403,8 @@ The paper should report BOTH protocols. The normalised one is the fair cross-arc
 
 `absolute_strength_n3_summary.json` saves the full per-strength breakdown.
 
+**Paper figure**: `plots/paper_protocol_pareto.png` (`plot_paper_protocol_pareto.py`). Side-by-side comparison of normalised vs paper-faithful protocol; left panel shows competitive Pareto with all 4 archs clustered, right panel shows T-SAE collapsing to (coh=2.7, succ=0.24) while all 3 TXCs sit at (coh=1.5-1.8, succ=1.3-1.45). Visually demonstrates the protocol-dependence of the headline.
+
 #### Bootstrap 95% CIs on paper-protocol Δs (concept-resampled, 1000 trials)
 
 | cell | coh ≥ | cliff | anchor | Δ_pt | Δ_mean | 95% CI | sig? |
