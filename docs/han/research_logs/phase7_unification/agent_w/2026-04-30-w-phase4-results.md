@@ -348,6 +348,48 @@ Three protocols (right-edge, per-position, V6 dec-broadcast) deliver Δ ≥ +0.7
 
 **Note on bootstrap CI width**: same-pod (W) bootstrap gives wider CIs than Y's mixed-pod bootstrap (Y had Y's sd=42 + W's sd=1, sd=2; my bootstrap is W-only). The point estimate Δ=+0.811 still solidly clears the +0.27 threshold; only the 2.5% lower-bound is sensitive to seed selection.
 
+### 🔬 T-SAE k=20 ANCHOR SANITY-CHECK (same-pod n=3 retrain — UPDATES TXC Δ values)
+
+**Han flagged that the T-SAE k=20 peak success 1.80 looked "suspiciously high" for the baseline.** W ran a same-pod retrain of sd=1 + sd=2 (sd=42 was already on this pod) for clean apples-to-apples comparison. Findings:
+
+**Per-seed cliff @ coh ≥ 1.5 (same-pod n=3):**
+
+| seed | cliff @1.5 | cliff @1.75 | cliff @2.0 | peak_unc |
+|---|---|---|---|---|
+| sd=42 | 1.100 | 0.367 | 0.267 | 1.800 |
+| sd=1 (NEW W-pod retrain) | 1.167 | 0.400 | 0.400 | 1.667 |
+| sd=2 (NEW W-pod retrain) | 1.133 | 0.567 | 0.567 | 1.567 |
+| **mean-curve n=3** | **1.133** | **0.411** | **0.411** | **1.678** |
+
+**Per-seed span on cliff15 = 0.07** (sd=42=1.100 to sd=1=1.167). This is *DRAMATICALLY tighter* than the cross-pod n=2 anchor (W's earlier sd=1 grades from Y-pod gave cliff15=0.300, σ=0.80). **The earlier cross-pod cliff15=0.300 for sd=1 was a cuDNN-determinism artifact** — when retrained on W's pod, sd=1 cliff15 lands at 1.167, perfectly consistent with sd=42 (1.100) and sd=2 (1.133).
+
+**Updated canonical T-SAE k=20 anchor (going forward):**
+
+| coh threshold | OLD cross-pod (n=2) | NEW same-pod (n=3) | Δ anchor |
+|---|---|---|---|
+| ≥ 1.5 (PRREG) | 1.167 | **1.133** | −0.034 |
+| ≥ 1.75 (GIGABRAIN) | 0.333 | **0.411** | +0.078 |
+| ≥ 2.0 | 0.283 | **0.411** | +0.128 |
+| ≥ 2.25 | 0.267 | **0.411** | +0.144 |
+| ≥ 2.5 | 0.267 | **0.411** | +0.144 |
+
+**Implications for TXC Δ values** (recomputed against same-pod anchor):
+
+- coh ≥ 1.5: Contrastive RE Δ goes from +0.411 to **+0.445** (slightly stronger PRREG WIN; still cleanly above +0.27).
+- coh ≥ 1.75: Galaxy 8 PP Δ goes from +1.089 to **+1.011**, MaxPool RE/PP from +0.778 to **+0.733**, Contrastive V6 from +0.611 to **+0.533**. All still WIN.
+- coh ≥ 2.0: V6 Δ goes from +0.239 to **+0.111** — was "TIE-but-bootstrap-SIG", now smaller TIE point estimate. Likely no longer SIG under bootstrap with the new anchor.
+- coh ≥ 2.25: V6 Δ goes from +0.178 to **+0.034** — TIE; the strict-coh-SIG claim does NOT hold against the same-pod anchor.
+- coh ≥ 2.5: V6 Δ goes from +0.178 to **+0.034** — TIE.
+
+**Key paper-narrative shifts:**
+1. **PRREG WIN at coh ≥ 1.5 is PRESERVED and slightly STRENGTHENED** (Δ=+0.445).
+2. **GIGABRAIN WINs at coh ≥ 1.75 are slightly weaker but ALL still well above +0.27** (Galaxy 8 +1.011, MaxPool +0.733, V6 +0.533).
+3. **Strict-coh bootstrap-SIG claim weakens**: V6 @ coh ≥ 2.25/2.5 was the only n=3 cell with bootstrap-SIG under the cross-pod anchor; under same-pod anchor the point Δ collapses to +0.034 (likely TIE).
+
+**Why the cross-pod anchor was misleading**: T-SAE k=20 is highly seed-sensitive at strict coh thresholds because the high-success peak sits at coh ≈ 1.40 (incoherent), and the s_norm = 5 strength (where coh=1.667 on sd=42) was *unstable across pods* — Y's sd=1 ckpt happened to land in a much-lower-cliff regime due to cuDNN non-determinism. Same-pod retraining gives consistent sd=1 (1.167), validating sd=42's behaviour as the true mode.
+
+`tsae_anchor_n3_samepod.json` saves the full per-seed + mean-curve breakdown.
+
 ### MYSTERY arch: Contrastive-merge TXC (end-vs-start) — 🏆 **PAPER-GRADE PRREG WIN**
 
 `TXCContrastiveMergeH8`: encoder `z = enc(x[T-1]) - enc(x[0])` (captures CHANGE).
