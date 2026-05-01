@@ -8,24 +8,53 @@ tags:
 
 ## Phase 4 results — left-edge / dec-additive / dec-broadcast / mystery archs
 
-> **Status: COMPLETE (n=3 multi-seed verified across all 3 mystery archs × 5 protocols, with bootstrap CIs and per-class breakdowns).**
-> Phase 4 started by testing three new TXC-native protocols (V5 left-edge, V3
-> dec-additive, V6 dec-broadcast) on the OBLITERATION arch (T=2 H8 multidist
-> shifts=(2,)). It expanded to two MYSTERY architectures (W's MaxPool merge
-> and Contrastive-merge end-vs-start) — both reaching paper-grade results.
+> **Status: COMPLETE (n=3 multi-seed across all archs × 4 protocols × 3 strength grids, with bootstrap CIs, per-class breakdowns, and methodology audit).**
 >
-> **Six findings (paper-grade, multi-seed verified)**:
-> 1. **OBLITERATION (Y's headline) at coh ≥ 1.5** holds at n=3: T-SAE comparable.
-> 2. **MaxPool TXC at coh ≥ 1.75** — n=3 multi-seed Δ=+0.811 (paper-grade WIN, 5 protocols).
-> 3. **Contrastive-merge TXC right-edge at coh ≥ 1.5 (PRREG)** — n=3 multi-seed Δ=+0.411 (PAPER-GRADE PRREG WIN ⭐⭐⭐, every seed clears prereg, span 0.10).
-> 4. **Contrastive-merge V6 dec-broadcast at coh ≥ 1.75** — n=3 Δ=+0.611 (paper-grade WIN at GIGABRAIN metric); at coh ≥ 2.0 BOOTSTRAP-SIGNIFICANT (CI=[+0.022, +0.467]).
-> 5. **Contrastive-merge per-position at coh ≥ 1.75** — n=3 Δ=+0.423 (also clears +0.27).
-> 6. **Three TXC families have THREE per-class signatures** (Contrastive=sentiment-dominant, MaxPool=stylistic+sentiment, OBLIT=knowledge); all unified by sentiment win across every TXC × protocol cell.
+> ## ⭐ EXECUTIVE SUMMARY (post-methodology-audit, 2026-05-01 17:00)
 >
-> **Older findings (subsumed by n=3 mystery-arch results)**:
-> - At pre-registered coh ≥ 1.5, no canonical OBLIT protocol cleanly beats T-SAE k=20 (all TIE) — superseded by Contrastive-merge RE PAPER-GRADE PRREG WIN.
-> - V3 dec-additive @ coh ≥ 1.75 on OBLIT n=2: Δ=+0.700 — single-cell point estimate, see also full Phase 4 protocol matrix below.
-> - V5 left-edge has highest single-seed cliff at coh ≥ 1.5 (sd=1: 1.367); multi-seed effect smaller.
+> Earlier headlines through this writeup are progressively superseded as the methodology gets more rigorous. The honest, defensible picture below pulls together the final state.
+>
+> ### 1. The "TXC family wins coherent steering" claim is **strength-grid-dependent**
+>
+> | strength grid | T-SAE c1.5 | best TXC c1.5 | Δ | comment |
+> |---|---|---|---|---|
+> | Paper-faithful absolute {10, 100, 150, ...} | 0.244 | 1.444 | **+1.20** | paper-grade WIN, but paper grid SKIPS T-SAE coh-stable peak at s=70 |
+> | Per-arch normalised (s_norm × abs_mean) | 1.133 | 1.578 | +0.45 | Contrastive RE PRREG WIN (small-but-real) |
+> | Combined fine-grain (paper + intermediates) | **1.656** | 1.444 | **−0.21** | T-SAE actually wins under dense sampling |
+>
+> The +1.0 paper-faithful Δ is real **given the paper's published grid** — but does not survive a fine-grain check. T-SAE's true coh-stable peak is at strength=70 (succ=1.66 coh=1.77, n=3 robust), which the paper grid skips.
+>
+> ### 2. The robust paper-grade claim that survives fine-grain refinement + bootstrap
+>
+> > **MaxPool H8 RE n=3 Δ=+0.356 at coh ≥ 2.1, bootstrap CI=[+0.044, +0.844] strictly positive.**
+>
+> Above the +0.27 prereg threshold, statistically significant under fine-grain protocol + concept-resampled bootstrap. The mechanism: T-SAE collapses at coh ≥ 1.8+ (its peak at s=70 has coh=1.77), TXC archs maintain coherent steering at strict coh thresholds.
+>
+> ### 3. The robust per-class TXC win (across all protocols)
+>
+> > **Sentiment**: Contrastive RE +0.50 at coh ≥ 1.5; MaxPool RE +0.67 at coh ≥ 1.75. Survives normalised, paper-faithful, AND fine-grain. n=2 concepts (small).
+>
+> All other per-class wins (knowledge, stylistic) found earlier under paper-faithful protocol DO NOT survive fine-grain — they were paper-grid-artifacts.
+>
+> ### 4. Other strict-coh point WINs (large but not bootstrap-SIG due to per-concept variance)
+>
+> - OBLIT H8 RE @ coh ≥ 1.9: Δ_pt=+0.844, CI=[−0.800, +1.156] (wide)
+> - OBLIT H8 RE @ coh ≥ 2.0: Δ_pt=+0.633, CI=[−0.322, +1.167] (borderline)
+>
+> ### 5. Recommended paper framing
+>
+> Lead with the bootstrap-SIG result (MaxPool @ coh ≥ 2.1, +0.356) as the *cleanest single statistical claim*. Note in methodology that the paper-faithful protocol gives a much larger Δ (+1.0) but is grid-sensitive; under any dense strength sampling, the honest TXC advantage shrinks to a strict-coh-specific finding (TXC family maintains coherent steering at coh ≥ 2.0+ where T-SAE collapses).
+>
+> ### Historical notes (preserved for traceability — superseded by §1-§5)
+>
+> Earlier sections of this writeup (below the executive summary) report findings using the cross-pod n=2 anchor 1.167 and paper-faithful protocol. These claims were valid given their methodology but the methodology has tightened. Specifically:
+>
+> - "Contrastive RE PRREG WIN +0.411" → still ~+0.45 under same-pod n=3 normalised, but does not survive fine-grain absolute (Contrastive @ s=100 in fine-grain: 1.444 vs T-SAE 1.656, Δ=−0.21).
+> - "Paper-faithful TXC +1.0 across 3 archs" → real under paper grid, but T-SAE's coh-stable peak at s=70 isn't in the grid.
+> - "TXC wins knowledge_domain by +0.78 to +1.04 under paper-faithful" → does not survive fine-grain (T-SAE knowledge_domain c1.5 = 2.481 under fine-grain).
+> - "V6 dec-broadcast strict-coh bootstrap-SIG" → did not survive same-pod anchor recalibration.
+>
+> The progressive narrowing of claims through this writeup is itself a valuable honest record of how methodology rigor affects findings.
 
 ### TL;DR — same-pod sd=1+sd=2 multi-seed matrix on OBLITERATION
 
