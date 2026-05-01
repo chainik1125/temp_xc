@@ -434,3 +434,58 @@ The headline number is essentially flat: bundle moves up 1.71 align points, best
   - **Track E1b (TXC T=2 arditi-matched, k=256)** — already queued. d_sae=32768, k=256, T=2, batch=256, lr=3e-4, per-window TopK, 100k steps. Per the brief: gives a 2-point k-sweep alongside E1's k=128 result; if k=256 wins → queue k=512, if k=128 wins → queue k=64. This is the most natural "while E1 is running, run E1b in parallel" move.
   - h100_2 has 143 GB free; ~70 GB needed for 3 snapshots × ~14 GB. No disk concern.
   - Launching now.
+
+
+### 2026-05-01 13:00 UTC — Track E1 result: TXC T=2 arditi-matched (k=128, 100k) is a regression on both metrics
+
+TXC T=2 arditi-matched recipe (d_sae=32768, k_total=128, T=2, batch=256, lr=3e-4, per-window TopK, 100k steps @ resid_post) trained to completion. Wang procedure done.
+
+**Bundle k=30 frontier — top 5**
+
+| α      | align     | coh   |
+| ------ | --------- | ----- |
+| +4.00  | **53.58** | 27.66 |
+| −10.00 | 53.00     | 25.55 |
+| +1.00  | 50.25     | 25.70 |
+| −8.00  | 50.09     | 28.28 |
+| +1.75  | 49.67     | 25.16 |
+| α=0    | 42.93     | 25.00 |
+
+**Stage 4 single-feature peaks (3 finalists)**
+
+| feat  | Δz̄    | naive peak α | naive align | naive coh | α=0   |
+| ----- | ----- | ------------ | ----------- | --------- | ----- |
+| 21945 | +0.34 | +9.00        | **58.51**   | 27.58     | 43.64 |
+| 15180 | +0.35 | −3.00        | 49.74       | 23.91     | 41.42 |
+| 8869  | +0.33 | −4.00        | 48.95       | 25.62     | 44.17 |
+
+**Critical caveat — feat 21945's α=+9 peak is judge noise, not a real signal.** Looking at the full α frontier for feat 21945:
+
+| α  | +5    | +6    | +7    | +8    | +9        | +10   |
+| -- | ----- | ----- | ----- | ----- | --------- | ----- |
+|    | 48.38 | 53.73 | 51.50 | 47.50 | **58.51** | 48.04 |
+
+The α=+9 row is a single-point spike between two ~47-48 neighbors. With n_rollouts=8 per α and Gemini judge variance, individual α buckets can spike +10 points. The robust positive-α local max for feat 21945 is α=+6 align=**53.73** coh=30.47 — well below 58.47 anchor. **Treat 58.51 as noise; do NOT update Current best.**
+
+**Comparison with anchors (using the robust 53.73 single):**
+
+| metric                  | SAE arditi T=1 anchor    | TXC T=2 arditi-matched   | Δ      |
+| ----------------------- | ------------------------ | ------------------------ | ------ |
+| bundle k=30 peak (align)| **57.42** (α=−10)        | 53.58 (α=+4)             | −3.84  |
+| robust single-feat peak | n/a                      | 53.73 (feat 21945, α=+6) | n/a    |
+
+Versus the TXC paper k=100 anchor (single feat 4563=58.47): the robust single peak (53.73) here is also significantly worse.
+
+**Interpretation.**
+
+1. **TXC arch on top of arditi recipe REGRESSES at T=2.** Both bundle (−3.84) and robust single (~−4.7 vs 58.47) regress vs their respective anchors. This is symmetric to the Track B B1 result (windowed vanilla SAE T=2 also regressed): pure architectural windowing without contrastive (or with the per-window-pool TopK that arditi uses) does NOT improve causally-relevant feature quality. The arditi recipe was tuned for T=1 SAE; lifting d_sae to keep param count modest (32k T=2 = ~470M, similar order of magnitude to arditi's 234M T=1) doesn't help.
+2. **Why is the bundle peak at α=+4 (positive) instead of α=−6/−10 (negative) like the anchors?** The arditi T=1 anchor's bundle peak is at α=−10 (deactivating "bad" misalignment-coding directions). E1's bundle peaks at α=+4 with a secondary peak at α=−10. This polarity reversal suggests the TXC encoder is finding directions whose ACTIVATION (positive α) is what aligns the model, rather than whose DEACTIVATION (negative α) does. This is an unusual failure mode and may reflect that the per-window-summed encoder doesn't isolate the same per-token causally-aligned direction that the per-token arditi SAE finds. In effect, the windowed-pool encoder is averaging out the position-specific "bad-medical" signal across positions, making its k=30 bundle a less precise tool.
+3. **Decision: do NOT ladder to T=3 with this config.** Per E2 rule: "If both lose: arditi-style works best at T=1 with this recipe; document conclusion and move on." Both lose. Track E1 path is dead. Wait for E1b (k=256, in flight on h100_2) to confirm — if k=256 also regresses, the arditi-recipe-ladder direction is conclusively dead.
+
+**What to launch next.**
+
+- **h100_1 is free.** Per the existing decision tree, the most justified next experiment is **Track A2 (WindowedTSAE T=3 + mix + matr 20%)**. The T=2 mix+matr result was single feat 14496=57.59 ≥ 56 (passes the ladder rule), and is the second-strongest single-feature peak we have overall. Laddering to T=3 tests whether the windowed_tsae path (per-token contrastive + windowed encoder + matryoshka) can push the single-feature peak above 58.47.
+- Disk: h100_1 has 35 GB free. WindowedTSAE T=3 d_sae=16k single-snapshot run will produce a ~4 GB ckpt. Comfortable margin.
+- ETA: ~3.5h end-to-end (training + Wang).
+- Launched on h100_1 PID 805667. Log `wtsae_T3_mix_matr_30k.log`.
+- **h100_2 still busy with Track E1b** (k=256), step ~95000/100000, ETA ~30 min more training then ~2h Wang.

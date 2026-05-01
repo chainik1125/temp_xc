@@ -118,6 +118,12 @@ def main():
         ("TXC paper k=100 + adj-contrastive α=0.1  SINGLE FEAT 5547",
          load_finalist(H / "txc_paper_k100bt_d16k_dadj_a0p1_30k/results/wang_txc_paper_k100bt_d16k_dadj_a0p1_step30000/stage4_final_frontier.json", 5547),
          "khaki"),
+        ("TXC T=2 arditi-matched k=128 100k @ resid_post  (BUNDLE)",
+         load_bundle(H / "txc_arditi_T2_d32k_k128_step100000/results/wang_txc_arditi_T2_d32k_k128_step100000_bundle30_frontier.json"),
+         "indianred"),
+        ("TXC T=2 arditi-matched k=128 100k  SINGLE FEAT 21945  (α=+9 spike = noise)",
+         load_finalist(H / "txc_arditi_T2_d32k_k128_step100000/results/wang_txc_arditi_T2_d32k_k128_step100000/stage4_final_frontier.json", 21945),
+         "lightcoral"),
         ("T-SAE 30k @ resid_post (ours: k=128, α=1.0)",
          load_bundle(root / "wang/tsae_30k_bundle30_frontier.json"), "darkorange"),
     ]
