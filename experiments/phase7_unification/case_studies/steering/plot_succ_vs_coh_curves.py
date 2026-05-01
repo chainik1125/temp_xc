@@ -34,6 +34,7 @@ PLOTS_DIR = BASE / "plots"
 INVENTORY = [
     ("T-SAE k=20 (anchor)", "blue", "o", "-", 3.0, [
         ("steering_paper_normalised", "tsae_paper_k20", 42),
+        ("steering_paper_normalised_seed1", "tsae_paper_k20", 1),
     ]),
     ("T=2 H8 shifts=(T,) PP — coh≥1.5 winner", "red", "^", "-", 2.5, [
         ("steering_paper_window_perposition",       "txc_h8_t2_kpos20_shifts2", 42),
