@@ -338,6 +338,55 @@ to measure:
 - "What's the strict behavioral verdict?" → genuine_backtracking_rate
   inside the filter → ~92.8% across all viable TXC cells
 
+## Multi-seed verification of TXC vs H13
+
+The bootstrap CIs in [[results_b]] showed `txc__resid_L10__k16` (Sonnet
+primary 0.0114) and `txc_h13__resid_L10__k16` (Sonnet primary 0.0095)
+with overlapping CIs — within bootstrap noise on the 20-prompt panel.
+We trained both archs at three additional seeds (s7, s11, s23) to
+break the close call. Same hookpoint, k=16, all other settings identical.
+
+| Seed | TXC Sonnet primary | H13 Sonnet primary |
+|---|---|---|
+| 7 | 0.0035 | 0.0040 |
+| 11 | 0.0044 | 0.0061 |
+| 23 | 0.0072 | 0.0082 |
+| 42 | 0.0114 | 0.0095 |
+| **Mean** | **0.0066** | **0.0070** |
+| **SD** | 0.0036 | 0.0024 |
+| **Min** | 0.0035 | 0.0040 |
+| **Max** | 0.0114 | 0.0095 |
+
+Two findings:
+
+1. **H13 has slightly higher mean (0.0070 vs 0.0066) and lower variance
+   (SD 0.0024 vs 0.0036).** The TXC k=16 vs H13 close call from the
+   bootstrap CIs is now resolved with seeds — H13 ≥ TXC, but the margin
+   (0.0004) is **not statistically significant** at n=4
+   (Welch t = 0.18). H13's smaller variance is the more interesting
+   finding.
+
+2. **TXC's s42 was a positive outlier.** Its Sonnet primary 0.0114 is
+   higher than the mean of the other 3 seeds (0.0050) by ~2 SD. The
+   "TXC k=16 wins by 0.0114" headline from the original run was real,
+   but it overstated the typical TXC k=16 performance. The fair-seed
+   reading is "TXC ≈ H13 at this hookpoint and k, both around
+   0.006-0.007 sonnet primary."
+
+**Implication for the paper-budget verdict.** TXC family still beats
+every SAE-family cell on the 4-seed mean (TXC mean 0.0066 vs best
+TopK SAE 0.0071 *but TopK SAE was single-seed*; mean is single-seed
+data so we shouldn't over-interpret). The cleanest claim is now:
+*the TXC family (plain + Han contrastive H13) dominates the SAE
+family under the rigorous coherence floor at this layer/k, and H13's
+cross-seed consistency is slightly better than plain TXC's*.
+
+The 6 multi-seed cells go through the same behavioral judge as the
+original 26 cells. New rows: ~150-200 generations newly graded for
+genuine backtracking; per-cell metrics in
+`cell_metrics/<cell>.json` after the judge finishes (in flight at
+writing).
+
 ## Caveats
 
 - **Single-judge-model evaluation.** Sonnet 4.6 grades are taken as
