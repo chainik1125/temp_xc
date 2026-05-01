@@ -476,19 +476,28 @@ expected value to the paper:
 6. (Much lower) Levers B/D/F if there's appetite for further
    architecture exploration. The headline doesn't need them.
 
-### Reading list for the next Y
+### Reading list for the next Y (2026-05-01 corrected order)
 
 In order:
 1. **This file (HANDOVER.md) — read FIRST**
-2. **`agent_y_phase2/2026-04-30-y-coh-threshold-sweep.md` — GIGABRAIN
-   reframe; the paper headline now lives here (TXC dominates at every
-   coh threshold ≥ 1.5, including AUC)**
-3. **`agent_y_phase2/2026-04-30-y-paper-headline-draft.md` — drop-in
-   paper paragraphs + results table at all thresholds**
-4. `agent_y_phase2/2026-04-30-y-lever-a-asymmetric.md` — Lever A
-   results (works but doesn't change headline)
-5. `agent_y_phase2/2026-04-30-y-unified-pareto.md` — full picture with all 4 plots
-6. `agent_y_phase2/2026-04-30-y-final-summary.md` — pre-OBLITERATION 3-seed picture (NOTE: claims T=2 bare per-pos = 1.200 multi-seed; that's per-seed-then-mean; mean-curve gives 0.978)
+2. **`agent_y_phase2/2026-05-01-y-multiseed-anchor-correction.md` —
+   CRITICAL: T-SAE k=20 anchor is multi-seed (1.167), not single-seed
+   (1.10). All earlier deltas needed correction.**
+3. **`agent_y_phase2/2026-04-30-y-coh-threshold-sweep.md` — GIGABRAIN
+   reframe (paper headline lives here, with multi-seed anchor)**
+4. **`agent_y_phase2/2026-04-30-y-gigabrain-final-summary.md` —
+   one-stop synthesis with bootstrap CIs (procedures A vs B)**
+5. **`agent_y_phase2/2026-04-30-y-paper-headline-draft.md` — drop-in
+   paper paragraphs + results table (corrected)**
+6. **`agent_y_phase2/2026-05-01-y-galaxy-brainstorm.md` — Han's GALAXY
+   prompt; 10 alternatives to the boring sum encoder. Galaxy 4
+   (hierarchical) and Galaxy 6 (max-pool) implemented + queued.**
+7. `agent_y_phase2/2026-04-30-y-lever-a-asymmetric.md` — Lever A
+   (asymmetric weights) — modest, no headline shift
+8. `agent_y_phase2/2026-04-30-y-lever-b-multifeature.md` — Lever B
+   (multi-feature K=2,3,5) — fails multi-seed, mechanism diagnosed
+9. `agent_y_phase2/2026-04-30-y-unified-pareto.md` — original unified Pareto
+10. `agent_y_phase2/2026-04-30-y-final-summary.md` — pre-OBLITERATION 3-seed picture (NOTE: claims T=2 bare per-pos = 1.200 multi-seed; that's per-seed-then-mean; mean-curve gives 0.978)
 4. `agent_y_phase2/2026-04-30-y-creative-shifts-T.md` — Han's shifts=(T,) suggestion
 5. `agent_y_phase2/2026-04-30-y-grow-from-t2.md` — sequential growth findings
 6. `agent_y_phase2/2026-04-30-y-multiseed-verify.md` — per-seed-then-mean verdict on T=5 cells
