@@ -75,6 +75,32 @@ CELLS = [
     ("T=5 bare k_win=20 PP (1sd)", [("steering_paper_window_perposition", "txc_bare_antidead_t5_kwin20", 42)]),
     ("T=3 bare W cellC PP (1sd)", [("steering_paper_window_perposition", "txc_bare_antidead_t3_kpos20", 42)]),
     ("T=5 matry W cellE PP (1sd)", [("steering_paper_window_perposition", "agentic_txc_02_kpos20", 42)]),
+    # W's MYSTERY archs (n=3 multi-seed)
+    ("MaxPool-merge RE n=3", [
+        ("steering_paper_normalised", "txc_maxpool_h8_t2_kpos20_shifts2", 42),
+        ("steering_paper_normalised_seed1", "txc_maxpool_h8_t2_kpos20_shifts2", 1),
+        ("steering_paper_normalised_seed2", "txc_maxpool_h8_t2_kpos20_shifts2", 2),
+    ]),
+    ("MaxPool-merge PP n=3", [
+        ("steering_paper_window_perposition", "txc_maxpool_h8_t2_kpos20_shifts2", 42),
+        ("steering_paper_window_perposition_seed1", "txc_maxpool_h8_t2_kpos20_shifts2", 1),
+        ("steering_paper_window_perposition_seed2", "txc_maxpool_h8_t2_kpos20_shifts2", 2),
+    ]),
+    ("Contrastive-merge RE n=3", [
+        ("steering_paper_normalised", "txc_contrastive_h8_t2_kpos20_shifts2", 42),
+        ("steering_paper_normalised_seed1", "txc_contrastive_h8_t2_kpos20_shifts2", 1),
+        ("steering_paper_normalised_seed2", "txc_contrastive_h8_t2_kpos20_shifts2", 2),
+    ]),
+    ("Contrastive-merge PP n=3", [
+        ("steering_paper_window_perposition", "txc_contrastive_h8_t2_kpos20_shifts2", 42),
+        ("steering_paper_window_perposition_seed1", "txc_contrastive_h8_t2_kpos20_shifts2", 1),
+        ("steering_paper_window_perposition_seed2", "txc_contrastive_h8_t2_kpos20_shifts2", 2),
+    ]),
+    ("Contrastive-merge V6 n=3", [
+        ("steering_paper_window_dec_broadcast", "txc_contrastive_h8_t2_kpos20_shifts2", 42),
+        ("steering_paper_window_dec_broadcast_seed1", "txc_contrastive_h8_t2_kpos20_shifts2", 1),
+        ("steering_paper_window_dec_broadcast_seed2", "txc_contrastive_h8_t2_kpos20_shifts2", 2),
+    ]),
 ]
 
 

@@ -520,6 +520,22 @@ This per-class pattern is **structurally different** from MaxPool (which wins br
 
 **Paper figure**: `plots/mystery_arch_per_class_signature.png` (`plot_mystery_arch_per_class.py`). Shows all 4 mystery-arch RE cells (OBLIT/MaxPool/Contrast/Contrast-V6) vs T-SAE k=20 anchor at coh ≥ 1.5 and 1.75. Sentiment universally TXC-favored; other classes split by arch.
 
+#### Definitive table — n=3 mystery archs added; V6 bootstrap-SIG at coh ≥ 2.25 AND 2.5
+
+`build_definitive_table.py` now includes the 5 mystery-arch n=3 cells (MaxPool RE/PP, Contrastive RE/PP/V6). Results in `plots/definitive_table.{md,json}`. Bootstrap-significance summary at strict-coh thresholds:
+
+| coh threshold | top 3 cells by Δ (multi-seed) | strict bootstrap SIG cells |
+|---|---|---|
+| ≥ 1.5 (PRREG) | Contrastive-merge RE n=3 (Δ=+0.478) | none (CIs wide at PRREG cliff) |
+| ≥ 1.75 (GIGABRAIN) | T=2 H8 RE n=3 (Δ=+0.872), MaxPool RE/PP (Δ=+0.778) | none |
+| ≥ 2.0 | T=2 bare-antidead PP/RE (Δ=+0.711/+0.689) | none |
+| **≥ 2.25** | T=5 H8 RE (Δ=+0.283 borderline), MaxPool RE (Δ=+0.233 borderline) | **Contrastive-merge V6 n=3 (Δ=+0.178, CI=[+0.022, +0.356]) ✓ SIG** |
+| **≥ 2.5** | (only contrastive V6 + a few borderline) | **Contrastive-merge V6 n=3 (Δ=+0.178, CI=[+0.033, +0.267]) ✓ SIG** |
+
+Anchor for the table is T-SAE k=20 RE n=1 (single seed), since multi-seed T-SAE has stronger σ. With the single-seed anchor at coh ≥ 1.5 = 1.100, contrastive-merge RE n=3 = 1.578 → Δ=+0.478. (My n=2 anchor 1.167 → Δ=+0.411.)
+
+**Headline strict-coh finding**: **Contrastive-merge V6 dec-broadcast is the only n=3 cell that achieves bootstrap-significance at BOTH coh ≥ 2.25 AND coh ≥ 2.5.** No other multi-seed cell holds strict-coh significance at the highest coherence thresholds. This is the cell to lead the paper's "TXC dominates at strict coherence" claim.
+
 ### V3 dec-additive — a CROSS-ARCH winning protocol at coh ≥ 1.75
 
 V3 dec-additive (no encoder pass; just `s × W_dec[picked, :, :]` at
