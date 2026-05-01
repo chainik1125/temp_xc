@@ -57,8 +57,8 @@ way. The strongest WIN is at coh ≥ 1.75 under both reductions.
    contains the concept.
 3. **Cross-cell consistency**: at coh ≥ 1.75, **8 multi-seed TXC cells
    beat anchor by Δ > +0.27**:
-   - T=2 H8 RE 3sd:        Δ = +0.902 ⭐
-   - T=3 grown RE 2sd:      Δ = +0.883
+   - T=2 H8 RE 3sd:        Δ = +0.902 ⭐ (3-seed verified)
+   - **T=3 grown RE 3sd:    Δ = +0.889 ⭐ (3-seed verified)**
    - T-SAE WS PP 2sd:       Δ = +0.817
    - T=5 H8 PP 2sd:         Δ = +0.733
    - T-SAE WS RE 2sd:       Δ = +0.650
@@ -68,6 +68,7 @@ way. The strongest WIN is at coh ≥ 1.75 under both reductions.
    
    Robust effect across multiple architectures (H8, bare, grown,
    T-SAE warm-start) and multiple protocols (right-edge, per-position).
+   **Two 3-seed verified WINs** with Δ > +0.88 (T=2 H8 RE, T=3 grown RE).
 
 ### Bootstrap uncertainty
 
