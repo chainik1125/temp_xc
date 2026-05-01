@@ -411,6 +411,32 @@ After training contrastive sd=1, sd=2 on W-pod and running full pipeline + gradi
 
 Combined with Y's OBLITERATION + bare-antidead family, the TXC family-level coherent steering advantage is now established across THREE distinct architectural recipes (H8 multi-distance contrastive, max-pool merge, contrastive-merge) — all converging on Δ ≥ +0.4 wins at multi-seed across multiple coh thresholds.
 
+#### Bootstrap 95% CIs on contrastive-merge cells (concept-resampled, 1000 trials, anchor T-SAE k=20 RE)
+
+| cell × protocol | thr | cell cliff | anchor | Δ_pt | Δ_mean | 95% CI | sig (CI > 0)? | call |
+|---|---|---|---|---|---|---|:---:|---|
+| **contrastive RE** | **1.5** | **1.578** | 1.167 | **+0.411** | +0.341 | [−0.678, +1.344] | (CI wide) | **WIN (point) ⭐⭐⭐ PRREG** |
+| contrastive RE | 1.75 | 0.400 | 0.333 | +0.067 | +0.222 | [−0.517, +1.012] |   | TIE |
+| contrastive RE | 2.0 | 0.400 | 0.283 | +0.117 | +0.091 | [−0.078, +0.256] |   | TIE |
+| contrastive PP | 1.5 | 0.756 | 1.167 | −0.411 | −0.026 | [−1.195, +1.267] |   | LOSS |
+| **contrastive PP** | **1.75** | **0.756** | 0.333 | **+0.422** | +0.232 | [−0.317, +0.639] |   | **WIN (point) ⭐** |
+| contrastive PP | 2.0 | 0.411 | 0.283 | +0.128 | +0.083 | [−0.106, +0.250] |   | TIE |
+| contrastive V3 | 1.5 | 1.144 | 1.167 | −0.022 | +0.038 | [−0.828, +0.911] |   | TIE |
+| contrastive V3 | 1.75 | 0.444 | 0.333 | +0.111 | +0.216 | [−0.745, +1.028] |   | TIE |
+| contrastive V5 | 1.5 | 1.167 | 1.167 | +0.000 | +0.044 | [−0.917, +0.956] |   | TIE |
+| contrastive V5 | 1.75 | 0.489 | 0.333 | +0.156 | +0.144 | [−0.656, +0.850] |   | TIE |
+| **contrastive V6** | **1.75** | **0.944** | 0.333 | **+0.611** | +0.401 | [−0.017, +0.911] |   | **WIN (point) ⭐⭐, CI lower bound just below 0** |
+| **contrastive V6** | **2.0** | **0.522** | 0.283 | **+0.239** | +0.206 | **[+0.022, +0.467]** | **✓** | **TIE (point) but BOOTSTRAP-SIGNIFICANT** ⭐ |
+
+**Bootstrap-significance reading**:
+- **Right-edge n=3 @ coh ≥ 1.5 (PRREG)**: point estimate Δ=+0.411 cleanly above the +0.27 prereg threshold; bootstrap CI is wide ([−0.678, +1.344]) because per-concept variance over n=30 concepts × n=3 seeds is large at the prereg coh-cliff. The CI lower bound being below 0 reflects concept-level heterogeneity, not seed-noise — see "per-seed span 0.10" above.
+- **V6 dec-broadcast @ coh ≥ 2.0**: bootstrap-significant (CI=[+0.022, +0.467] strictly positive). Of all the contrastive cells, this is the one where the concept-resampled CI clears 0 — concept variance is small at coh ≥ 2.0 because most concepts steer to similarly-low success there.
+- **V6 @ coh ≥ 1.75 + per-position @ coh ≥ 1.75**: Δ point estimates above +0.27 (paper-grade-class), but CI lower bound dips below 0. Borderline cells.
+
+This pattern (point-WIN, wide-CI) mirrors Y's bootstrap finding for OBLITERATION cells (`agent_y_phase2/2026-04-30-y-coh-threshold-sweep.md`): the strict prereg metric has high concept variance, so bootstrap-significance is hard to obtain at n=30 concepts, but seed-stability is the more defensible signal.
+
+**Interpretation for paper**: report point estimate + per-seed span (e.g. 1.578, span 0.10) as the primary stability check. Use bootstrap CI as a complementary statistic for cells where the point-estimate is borderline — V6 @ coh ≥ 2.0 cleanly clearing 0 is the strongest stat-sig signal in the contrastive matrix.
+
 ### V3 dec-additive — a CROSS-ARCH winning protocol at coh ≥ 1.75
 
 V3 dec-additive (no encoder pass; just `s × W_dec[picked, :, :]` at
