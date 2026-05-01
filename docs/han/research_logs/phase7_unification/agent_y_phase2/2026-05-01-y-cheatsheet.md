@@ -141,13 +141,31 @@ strongest evidence.
 
 ### Architectural complementarity (NOT pure dominance)
 
-Lever E (knowledge-only re-aggregate): T-SAE saturates at succ = 2.0
-on the 9 knowledge concepts (medical, math, programming, etc.) — TXC
-does NOT win on knowledge alone. The overall WIN is driven by TXC's
-advantage on:
+Lever E (knowledge-only re-aggregate at coh ≥ 1.5): T-SAE saturates
+at succ = 2.0 on the 9 knowledge concepts (medical, math, programming,
+etc.) — overall best TXC does NOT win on knowledge at coh ≥ 1.5. The
+overall WIN is driven by TXC's advantage on:
 
 - discourse_style (poetic, literary, narrative): Δ = +0.89
 - behavior_emotion (positive/negative/neutral): Δ = +0.89
+
+**However, Galaxy 6 (max-pool) has a DIFFERENT per-class pattern at
+coh ≥ 1.75** — its WIN is concentrated on knowledge_domain:
+
+| class (coh ≥ 1.75) | T-SAE | G6 RE | G6 PP | Δ G6 RE | Δ G6 PP |
+|---|---:|---:|---:|---:|---:|
+| **knowledge_domain** | 0.167 | **1.185** | **1.333** | **+1.019** | **+1.167** |
+| discourse_style | 0.500 | 1.000 | 0.889 | +0.500 | +0.389 |
+| behavior_emotion | 0.667 | 0.889 | 0.889 | +0.222 | +0.222 |
+| knowledge_format | 0.700 | 0.600 | 1.000 | −0.100 | +0.300 |
+| discourse_register | 2.500 | 1.500 | 2.500 | −1.000 | +0.000 |
+
+So Galaxy 6 specifically dominates on **multi-token knowledge concepts
+that need precise positional emphasis** (medical terminology,
+mathematical notation, etc.) at the higher coh ≥ 1.75 threshold.
+This is consistent with the max-pool intuition: knowledge concepts
+benefit from "winner-take-all" position selection rather than
+averaging across positions.
 - discourse_register, knowledge_domain, behavior_form: smaller Δs
 
 Honest framing: **T-SAE = strong per-token vocabulary tagger;
