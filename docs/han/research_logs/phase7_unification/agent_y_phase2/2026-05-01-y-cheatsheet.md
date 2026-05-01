@@ -19,9 +19,13 @@ TXC architectures achieve **STRICT WINS** by Δ ≥ +0.27. T-SAE k=20's
 only edge — unconstrained peak (1.80 vs 1.42) — is at coh = 1.40
 (text below the prereg coherence floor — incoherent).
 
-### Headline numbers (multi-seed, mean-curve, ±0.27 WIN threshold)
+### Headline numbers (multi-seed, ±0.27 WIN threshold)
 
-| metric | T-SAE k=20 (n=2) | best TXC | n | Δ | call |
+T-SAE k=20 anchor = sd=42 + sd=1 multi-seed. TXC cells = 3-seed.
+
+#### Mean-curve method (standard)
+
+| metric | T-SAE | best TXC | n | Δ | call |
 |---|---:|---:|---:|---:|:---:|
 | unconstrained peak | 1.800 | 1.422 | 3 | −0.378 | LOSS |
 | **coh ≥ 1.5 (prereg)** | 1.167 | 1.400 | 3 | **+0.233** | **TIE** |
@@ -29,8 +33,19 @@ only edge — unconstrained peak (1.80 vs 1.42) — is at coh = 1.40
 | **coh ≥ 2.0** | 0.283 | **0.978** (T=2 bare PP) | 3 | **+0.694** | **WIN** ⭐ |
 | **AUC(1.5–3.0)** | 0.413 | **0.745** (T=2 bare RE) | 3 | **+0.331** | **WIN** ⭐ |
 
-T-SAE k=20 anchor uses sd=42 + sd=1 mean-curve. TXC cells are 3-seed
-mean-curve.
+#### Per-seed-then-mean method (more conservative; per-seed peak15 then mean)
+
+| metric | T-SAE | best TXC | n | Δ | call |
+|---|---:|---:|---:|---:|:---:|
+| **coh ≥ 1.5 (prereg)** | 0.700 | 1.200 (T=2 bare PP) | 3 | **+0.500** | **WIN** ⭐ |
+| coh ≥ 1.5 | 0.700 | 0.978 (T=2 H8 PP) | 3 | +0.278 | WIN (just) |
+| coh ≥ 1.75 | 0.333 | **0.978** (T=2 bare PP) | 3 | **+0.644** | **WIN** ⭐ |
+| coh ≥ 2.0 | 0.283 | **0.811** (T=2 bare PP) | 3 | **+0.528** | **WIN** ⭐ |
+
+**Both reductions (mean-curve and per-seed-then-mean) show WINS at
+coh ≥ 1.75 and ≥ 2.0**. The prereg metric (coh ≥ 1.5) shows TIE
+under mean-curve and WIN under per-seed-then-mean — borderline either
+way. The strongest WIN is at coh ≥ 1.75 under both reductions.
 
 ### Why the WINs
 
