@@ -10,6 +10,48 @@ tags:
 
 **You are an autonomous routine continuing from the dmitry-branch work.** Branch: `em-nanda`. AGENT_BRIEF.md (on dmitry) covers the prior Qwen-7B medical setup. This doc supersedes that for the Qwen-14B financial pivot.
 
+### Status as of 2026-05-02 17:00 UTC (SAE 30k stage-3 final landed, stage-4 just started; TXC 30k Wang in stage-2 ~56/100; both GPUs busy)
+
+**This firing (17:00 UTC) actions:**
+
+- Both GPUs still busy; per rule (6) no new jobs queued.
+- **h100_1 LOCAL: SAE arditi 30k Wang stage-3 just finished, stage-4 started**
+  (PID 914182, 2h32m elapsed). Stage-3 baseline α=0=55.62. All 20/20 best_strong
+  at α=-10 (uniform — same shape as 5k/10k). Top-3 finalists pulled into stage-4:
+  - feat **30302** align_shift=42.69 → α=-10 align **98.31 / coh 97.66**
+  - feat **9135**  align_shift=42.66 → α=-10 align **98.28 / coh 98.44**
+  - feat **26486** align_shift=39.06 → α=-10 align 94.69 / coh 99.69
+  This is the new **SAE step-count leader at stage-3 grid edge: 98.31**, vs
+  5k=97.66 (28663) and 10k=97.66 (17837). Delta is **+0.65** over both lower
+  step counts — within rollout-noise scale (8 rollouts → ~±1 align std).
+  Effectively flat. **Step-count axis is closed for SAE arditi.**
+  Stage-4 just kicked off; expected ~30 min batched → ~17:30-17:35 UTC for full
+  Wang result (mid-α + edge-α resolved peaks).
+- **h100_2: TXC k=100 30k Wang stage-2 in progress** (PID 442822 wrapper /
+  444949 python, training+encoder DONE; Wang screening at ~56/100 features as
+  of 17:00 UTC). Per-feat ~35s → stage-2 finishes ~17:25 UTC, stage-3 ~25 min,
+  stage-4 ~30 min → full TXC 30k result ~18:30 UTC.
+  Stage-2 leaders (preliminary, top scores): feat **15** scoring +20 (the screen
+  hasn't fully sorted yet but multiple feats hitting +18 to +20).
+- Disk sanity: HF_HOME=/workspace/hf_cache holding; /root not filling.
+
+**Next firing priorities (likely 18:00 UTC)**:
+
+- Pull **SAE arditi 30k Wang full result** (stage-4 frontier). Expected to land
+  by ~17:35 UTC, well before next firing. Compute mid-α and edge-α single-feat
+  peaks. Update synthesis with the 5k/10k/30k step-count trajectory:
+  - SAE arditi edge-α (α=-10): {5k=97.66, 10k=97.66, 30k=98.31} — +0.65 max
+  - SAE arditi mid-α (α=-6):   {5k=95.78, 10k=94.69, 30k=?} — hypothesis 95-96
+- TXC 30k still in stage-3 or early stage-4 by 18:00 UTC. Pull whatever is partial.
+- **If SAE 30k stage-4 mid-α also ≤ +1 over predecessors, declare step-count
+  axis fully closed for SAE.** Recommendation: next compute should pivot to
+  the line plot for the paper figure and (per brief 16:00 priorities) either
+  R32 native-encoder rerun or paper-figure write-up.
+- Build the step-count line plot once both 30k chains land
+  (x: {5k, 10k, 30k}, y: peak align, two lines per arch). Per 15:00 brief:
+  this small step-count plot is exempt from the "no connecting lines" frontier
+  policy — connect the 3 dots per arch.
+
 ### Status as of 2026-05-02 16:00 UTC (SAE 30k Wang in stage-3, TXC 30k 88% trained; both GPUs busy, no completions)
 
 **This firing (16:00 UTC) actions:**
