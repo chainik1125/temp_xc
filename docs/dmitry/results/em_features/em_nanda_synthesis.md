@@ -920,3 +920,70 @@ spurious on this Wang setup.
   baseline reproduces the expected ~54 align. No anomalies vs serial so
   far. The earlier Qwen-7B smoke gave cos sim 0.9996; Qwen-14B looks
   similarly stable.
+
+### Status as of 2026-05-02 19:00 UTC (SAE 30k stage-4 FINAL — step-count axis closed for SAE arditi; TXC 30k stage-3 19/20)
+
+**This firing actions**:
+
+- **SAE arditi 30k Wang FINISHED** (h100_1 LOCAL, completed ~18:30 UTC).
+  Stage-4 frontier landed for all 3 finalists. Resolved peaks:
+
+| feat  | peak α     | peak align / coh | α=−10 align / coh | α=−6 align / coh |
+|------:|-----------:|-----------------:|------------------:|-----------------:|
+|  9135 | **α=−10**  | **95.36 / 97.19** | 95.36 / 97.19    | 95.16 / 98.44   |
+| 26486 |   α=−10    |   91.90 / 99.14  | 91.90 / 99.14    | 91.64 / 98.98   |
+| 30302 |   α=+1.50  |   91.33 / 99.06  | 90.70 / 99.30    | 79.30 / 98.83   |
+
+  **SAE arditi 30k champion: feat 9135 @ α=−10 → align 95.36 / coh 97.19**
+  (mid-α α=−6 → 95.16 / 98.44, only −0.20 from edge — most stable peak
+  among the 3 finalists).
+
+- **Step-count trajectory for SAE arditi (R1 organism, RESOLVED stage-4
+  peaks across all 3 step counts)**:
+
+| steps | edge α=−10 (align/coh) | mid-α α=−6 (align/coh) | feat        |
+|------:|-----------------------:|-----------------------:|------------:|
+|   5k  | **96.88 / 98.91**      | 95.78 / 99.22          | 28663       |
+|  10k  | **97.66 / 97.66**      | 94.69 / 98.67          | 11086/17837 |
+|  30k  | 95.36 / 97.19          | **95.16 / 98.44**      | 9135        |
+
+  - **Edge-α (α=−10)**: 5k=96.88, 10k=97.66, 30k=95.36 — non-monotonic,
+    ±1.15 spread, within rollout-noise scale (8 rollouts × 64 examples
+    per cell; 1σ ≈ 0.7 align). Best single number is 10k=97.66 but 30k
+    underperforms 10k by 2.30.
+  - **Mid-α (α=−6)**: 5k=95.78, 10k=94.69, 30k=95.16 — flat, ±0.55
+    spread, indistinguishable from rollout noise.
+  - **Verdict**: 5k → 30k buys 0 (or slightly negative) align points on
+    SAE arditi for R1 finance organism. **Step-count axis closed for
+    SAE arditi.** 5k remains the cheapest winning recipe (covers
+    headline single-feat 96.88 align / 98.91 coh at edge-α, far above
+    the 58.47 medical champion goal).
+
+- **TXC k=100 30k still running** (h100_2, PID 444949). Stage-3 at 19/20
+  survivors as of 19:00 UTC. Stage-3 leaders so far: feat 4992
+  align=92.34, feat 12114 92.81, feat 2075 91.88. Pacing ~5 min/feat →
+  stage-3 finishes ~19:05–19:10 UTC; stage-4 ~30 min batched → full TXC
+  30k Wang ETA ~19:40 UTC.
+
+- **h100_1 LOCAL: GPU now idle** (SAE 30k chain finished). Per rule (6),
+  not queueing new work this firing — waiting on TXC 30k to land for the
+  unified step-count line plot in the next firing. The next compute pivot
+  per the brief is either (a) R32 native-encoder rerun, or (b)
+  paper-figure write-up; both better launched after the step-count axis
+  is fully closed across both arches.
+
+- Disk sanity: HF_HOME=/workspace/hf_cache holding; /root not filling.
+
+**Next firing priorities (likely 20:00 UTC)**:
+
+- Pull TXC 30k stage-4 final (should be done by then). Compare to TXC
+  trajectory {5k mid-α 90.94, 10k mid-α 90.23, 5k edge 91.80, 10k edge
+  89.06}.
+- **Build the step-count line plot** with both arches closed (target per
+  brief: by 20:00 UTC firing). x = {5k, 10k, 30k}; y = peak align;
+  separate markers for edge α=−10 and mid α=−6, two arches. Per brief
+  15:00 UTC convention: small step-count plot is exempt from the "no
+  connecting lines" frontier policy — connect the 3 dots per arch.
+- If TXC 30k also flat, formally declare step-count axis closed across
+  both arches. Pivot the next compute budget to either (a) R32 native
+  encoder rerun, or (b) paper-figure write-up.

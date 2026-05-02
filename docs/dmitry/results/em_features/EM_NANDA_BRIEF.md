@@ -10,6 +10,49 @@ tags:
 
 **You are an autonomous routine continuing from the dmitry-branch work.** Branch: `em-nanda`. AGENT_BRIEF.md (on dmitry) covers the prior Qwen-7B medical setup. This doc supersedes that for the Qwen-14B financial pivot.
 
+### Status as of 2026-05-02 19:00 UTC (SAE 30k stage-4 FINAL — step-count axis closed for SAE arditi; TXC 30k stage-3 19/20)
+
+**This firing (19:00 UTC) actions:**
+
+- **h100_1 LOCAL: SAE arditi 30k Wang DONE** (PID 914182 finished
+  ~18:30 UTC). Stage-4 frontier landed for all 3 finalists. Champion:
+  feat **9135 @ α=−10 → align 95.36 / coh 97.19** (mid-α α=−6 → 95.16 /
+  98.44; the most stable peak among the 3 finalists, edge−mid drop only
+  0.20). Resolved peaks:
+  - feat 9135  α=−10 → **95.36 / 97.19**; α=−6 → 95.16 / 98.44
+  - feat 26486 α=−10 → 91.90 / 99.14; α=−6 → 91.64 / 98.98
+  - feat 30302 α=+1.5 → 91.33 / 99.06 (mid champion); α=−10 → 90.70 / 99.30
+- **SAE arditi step-count trajectory (RESOLVED stage-4 peaks):**
+  | steps | edge α=−10 (align/coh) | mid-α α=−6 (align/coh) | feat        |
+  |------:|-----------------------:|-----------------------:|------------:|
+  |   5k  | **96.88 / 98.91**      | 95.78 / 99.22          | 28663       |
+  |  10k  | **97.66 / 97.66**      | 94.69 / 98.67          | 11086/17837 |
+  |  30k  | 95.36 / 97.19          | **95.16 / 98.44**      | 9135        |
+  Edge-α non-monotonic ±1.15 spread; mid-α flat ±0.55. Both within
+  rollout-noise (1σ ≈ 0.7 align at 8 rollouts × 64 examples). 30k buys 0
+  (or slightly negative) align over 5k. **Step-count axis closed for
+  SAE arditi.** 5k remains the cheapest winning recipe.
+- **h100_2: TXC k=100 30k Wang stage-3 19/20** (PID 444949). Last
+  feat about to finish; stage-4 starts shortly. Pacing → TXC 30k full
+  result ETA ~19:40 UTC.
+- **h100_1 LOCAL: GPU now idle.** Per rule (6) and to keep step-count
+  plot work atomic, no new jobs queued — waiting for TXC 30k to land
+  in the next firing for unified line plot.
+- Disk sanity: HF_HOME=/workspace/hf_cache holding; /root not filling.
+
+**Next firing priorities (likely 20:00 UTC)**:
+
+- Pull TXC 30k stage-4 final. Compare against TXC trajectory
+  {5k mid-α 90.94, 10k mid-α 90.23, 5k edge 91.80, 10k edge 89.06}.
+- **Build the step-count line plot** with both arches resolved (target
+  per brief: by 20:00 UTC firing). x = {5k, 10k, 30k}; y = peak align;
+  markers for edge α=−10 and mid α=−6 per arch. Per 15:00 UTC
+  convention: small step-count plot is exempt from "no connecting
+  lines" frontier policy — connect 3 dots per arch.
+- If TXC 30k also flat, formally close step-count axis across both
+  arches. Pivot next compute to (a) R32 native-encoder rerun, or
+  (b) paper-figure write-up.
+
 ### Status as of 2026-05-02 18:00 UTC (SAE 30k stage-4 2/3 finalists done — verdict already converging on flat; TXC 30k stage-3 6/20; both GPUs busy)
 
 **This firing (18:00 UTC) actions:**
