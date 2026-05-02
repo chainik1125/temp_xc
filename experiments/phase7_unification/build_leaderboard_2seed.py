@@ -64,6 +64,11 @@ LEADERBOARD_ARCHS = [
     "txc_bare_antidead_t5",
     "phase57_partB_h8_bare_multidistance_t8",
     "hill_subseq_h8_T12_s5",
+    # Y/W T=8/T=10 hill-climb benchmark (added 2026-05-02 per Han request)
+    "txc_softmaxpool_t8_kpos20",
+    "txc_maxpool_t8_kpos20",
+    "txc_contrastive_h8_t8_kpos20_shifts2",
+    "spatial_matry_h8_t10_kpos20_shifts2_pref3686_9216_18432_sub1_5_10_indep_uniform_contr",
 ]
 SEEDS = (1, 2, 42)
 DEFAULT_S_FILTER = 32
