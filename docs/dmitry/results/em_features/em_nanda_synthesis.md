@@ -579,15 +579,23 @@ the deeper rotation away from alignment.
 hypothesis**, and a clean positive result for the "BASE-trained SAE is
 organism-coupled" hypothesis. Worth highlighting in the synthesis pitch.
 
-**Methodology caveat (deferred)**: stage-3 best mid-grid identified two
-features (4086 @α=+2 → 60.16; 5725 @α=−1 → 59.53) that were *not* selected
-for stage 4 (the finalist selector keys on `best_strong` @|α|=10, which
-those features didn't dominate). At 4 rollouts/cell stage-3 noise is high,
-so 60.16/59.53 might be inflated. A 2-feature stage-4-lite re-eval (cost
-~30 min on h100_2) would resolve whether they really beat the standard
-finalists' 54.61. Decision deferred — given the clean R1-vs-R32 contrast
-above, marginal +5 align points on R32 doesn't change the headline. Draft
-launcher saved at `/tmp/run_f4_stage4_lite.sh.template` on h100_1.
+**Methodology caveat (deferred → re-queued 2026-05-02 ~09:08 UTC)**:
+stage-3 best mid-grid identified two features (4086 @α=+2 → 60.16; 5725
+@α=−1 → 59.53) that were *not* selected for stage 4 (the finalist selector
+keys on `best_strong` @|α|=10, which those features didn't dominate). At
+4 rollouts/cell stage-3 noise is high, so 60.16/59.53 might be inflated.
+A 2-feature stage-4-lite re-eval was deferred at 08:50 UTC because we
+judged marginal +5 align points on R32 wouldn't move the headline; this
+firing reverses that call. Reasoning: the R32 standard-finalist headline
+(54.61) is BELOW the Qwen-7B medical champion's 58.47, so on the R32
+organism we have *not yet beaten the goal*. If 4086 / 5725 stage-4 land
+at align ≥60, we *do* have an R32 champion. Cheap probe (cost ~30 min on
+h100_2) is worth queuing. Launcher: `/tmp/run_em_nanda_f4_lite.sh` on
+h100_2; output dir
+`/root/em_features/results/em_nanda_sae_arditi_step10000_wang_r32_lite`.
+Reuses the existing R32 stage 2 screen + a re-ordered stage 3 strength
+file (4086, 5725 first), runs stage 4 only via `--skip_done --n_final 2`.
+Polls behind TXC 5k (`/tmp/queue_em_nanda_chain.sh`).
 
 #### F3 retry (R32 Turner-faithful baseline) launched on h100_1 — 2026-05-02 ~08:05 UTC
 
@@ -602,6 +610,20 @@ ETA: ~5 min HF download (28 GB Qwen-14B base wasn't cached on h100_1) +
 ~30 min generation + ~5 min judge ≈ ~40 min wallclock. Expected EM rate
 ~25–35% if the Turner-Sec-3.1 trend (rank-1 21.5% → rank-32 ~40%) holds; we
 get a sharper number on our specific R32 organism this firing.
+
+### Step-count sweep on h100_2 (2026-05-02 ~09:08 UTC)
+
+Per the brief's priority-5 step-count sweep, h100_2 is now running TXC paper
+k=100 5k (training started 08:43 UTC, ~50% in). After 5k completes, a polling
+chain (`/tmp/queue_em_nanda_chain.sh` PID 401668) fires:
+
+1. **F4 stage-4-lite** on R32 mid-grid candidates feat 4086 + 5725 (~30 min).
+2. **TXC paper k=100 30k** step-count anchor (~3 h: ~90 min training, ~30 min
+   encoder, ~30 min Wang batched).
+
+The chain is best-effort — stage-4-lite failure does not block TXC 30k.
+SAE arditi 5k / 30k anchors (the other half of the sweep) are blocked on
+h100_1 reachability from this orchestrator host; not queued.
 
 ### Open questions / next decisions
 

@@ -10,7 +10,26 @@ tags:
 
 **You are an autonomous routine continuing from the dmitry-branch work.** Branch: `em-nanda`. AGENT_BRIEF.md (on dmitry) covers the prior Qwen-7B medical setup. This doc supersedes that for the Qwen-14B financial pivot.
 
-### Status as of 2026-05-02 08:15 UTC (most recent update)
+### Status as of 2026-05-02 09:10 UTC (most recent update)
+
+**Newly queued this firing on h100_2** (chain launcher PID 401668,
+`/tmp/queue_em_nanda_chain.sh`, polls for `em_nanda_txc_5k_DONE` then runs
+in sequence, best-effort):
+
+1. F4 stage-4-lite on R32 mid-grid candidates feat 4086 + 5725 — `/tmp/run_em_nanda_f4_lite.sh`. Reuses existing R32 stage 2 + re-ordered stage 3 strength file. Output dir `..._wang_r32_lite`. ~30 min.
+2. TXC paper k=100 30k step-count anchor — `/tmp/run_em_nanda_txc_30k.sh`. ~3 h (90 min training + 30 min encoder + 30 min Wang batched).
+
+Reversal of the 08:50 UTC "deferred" call on stage-4-lite: the standard
+finalist peak (align 54.61) is BELOW the medical-champion goal (58.47), so
+on R32 the goal is not yet met; cheap probe to find out if 4086 / 5725
+clears 60 is worth running. Documented in
+[em_nanda_synthesis.md](em_nanda_synthesis.md) under the F4 stage-4-lite
+caveat block.
+
+SAE arditi 5k/30k step-count anchors are blocked on h100_1 reachability
+from the orchestrator host (only h100_2 is in `~/.ssh/config`); not queued.
+
+### Status as of 2026-05-02 08:15 UTC
 
 **Done:**
 - Track A (SAE arditi 10k Wang): champion **feat 11086 @ α=−6 → align 94.69 / coh 98.67** (+16 lift). Frontier plot at `docs/dmitry/results/em_features/plots/em_nanda_sae_arditi_10k_frontier{,_zoom}.png`.
