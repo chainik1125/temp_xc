@@ -703,9 +703,13 @@ experiments. Full details in [[summaries]]; key findings:
   cases were just truncated (max_new=2048 cap). On the truly-wrong
   cohort (n=31), control rescue is 12.9% and steering still hurts
   (-6 to -13 pp). Negative result holds qualitatively.
-- **TXC vs TopK SAE peak is bootstrap-noise** (Exp 2). The "TopK SAE
-  peaks higher" reframe was within CI overlap. TXC's real edge:
-  range across 6+ magnitudes vs TopK SAE's narrow ±4 window.
+- **TXC vs TopK SAE peak is bootstrap-noise on the original eval set**
+  (Exp 2) — but the held-out test (Exp 5) shows the picture is
+  cleaner than that. On 20 NEW prompts disjoint from our original
+  eval set, TopK SAE drops to **0.0025** (vs 0.0071 on original) while
+  TXC stays at **0.0101** (vs 0.0114). TXC's lead widens to 4× on
+  held-out — the "TopK SAE peaks higher" reframe was partly overfit
+  to the original 20-prompt eval set.
 - **Encoder/decoder asymmetry is real** (Exp 13). TopK SAE has higher
   encoder D+/D- selectivity (0.42) than TXC (0.23) but lower steering
   effectiveness. The dictionary that probes best is not the

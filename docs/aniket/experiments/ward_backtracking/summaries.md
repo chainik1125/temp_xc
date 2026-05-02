@@ -162,7 +162,56 @@ Raw output: `/tmp/cross_judge_pairs.json`.
 
 ## Exp 5 — Held-out B1 prompt set
 
-*(queued)*
+**Verdict: TXC + H13 lead is robust on held-out. TopK SAE's competitive
+peak was partly overfit to the original 20-prompt eval set — drops to
+last place on held-out.**
+
+Sampled 20 NEW prompts from Stage A's dom-split (disjoint from the
+20-prompt eval set used for B1 / Sonnet primary / hill-climb). Re-ran
+B1 on the headline cells (TXC k=16, H13 k=16, H8 k=16, TopK SAE k=64,
+Stacked SAE k=16). Sonnet-graded all 5 held-out B1 outputs.
+
+### Sonnet primary on held-out vs original
+
+| Arch | Orig 20-prompt | Held-out 20-prompt | Δ |
+|---|---|---|---|
+| **TXC** | 0.0114 | **0.0101** | -0.0013 |
+| **TXC-H13** | 0.0095 | **0.0095** | 0.0000 |
+| TopK SAE | 0.0071 | **0.0025** | **-0.0046** |
+| Stacked SAE | 0.0054 | 0.0044 | -0.0010 |
+| TXC-H8 | 0.0052 | 0.0037 | -0.0015 |
+
+### Per-arch ordering
+
+- **Original:** TXC > H13 > TopK SAE > Stacked SAE > H8
+- **Held-out:** TXC > H13 > Stacked SAE > H8 > **TopK SAE**
+
+TXC and H13 hold #1 and #2. TopK SAE drops 2 positions (3rd → 5th).
+H8 and Stacked SAE swap. The qualitative claim — TXC family beats SAE
+family — survives held-out cleanly.
+
+### What this changes about the verdict
+
+- **TXC's lead is robust to eval-set choice.** Drop is small
+  (-0.0013, -1.1× scale change) and ranking unchanged.
+- **TopK SAE's "competitive at peak" framing was overfit.** Its
+  0.0071 on the original 20-prompt set was partly the result of those
+  specific prompts triggering its narrow productive regime well. On
+  held-out 20 prompts, it crashes to 0.0025 (3× worse than original).
+- **The bootstrap-CI overlap (Exp 2)** with TXC was real but only
+  on the original eval set. The Δ between TXC (0.0101) and TopK SAE
+  (0.0025) on held-out is 4× — well outside any reasonable
+  bootstrap CI overlap.
+
+### Action item
+
+Update `results_b_behavioral.md` with held-out numbers; the
+"TopK SAE peak is competitive" framing should be hedged to "on the
+original 20-prompt eval set; held-out shows TXC's lead widens to 4×."
+
+Raw output:
+- Held-out B1 jsons: `results/ward_backtracking_txc/b1_held_out/b1__*.json`
+- Held-out grades: `results/ward_backtracking_txc/b1_held_out/grades_dir/`
 
 ## Exp 6 — B3 cut-at-25% — **MAJOR POSITIVE RESULT**
 
