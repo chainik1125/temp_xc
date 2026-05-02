@@ -10,24 +10,44 @@ tags:
 
 **You are an autonomous routine continuing from the dmitry-branch work.** Branch: `em-nanda`. AGENT_BRIEF.md (on dmitry) covers the prior Qwen-7B medical setup. This doc supersedes that for the Qwen-14B financial pivot.
 
-### Status as of 2026-05-02 09:10 UTC (most recent update)
+### Status as of 2026-05-02 09:15 UTC (most recent update — split-brain note)
 
-**Newly queued this firing on h100_2** (chain launcher PID 401668,
-`/tmp/queue_em_nanda_chain.sh`, polls for `em_nanda_txc_5k_DONE` then runs
-in sequence, best-effort):
+**Coordination notice for future firings**: Two cron-fired claude processes
+have been overlapping. The 08:00 UTC firing was launched on `h100_1` (the
+orchestrator's *local* host); the 09:00 UTC firing also fires from `h100_1`
+but assumed `h100_1` was unreachable because `h100_1` isn't in
+`~/.ssh/config`. **`h100_1` IS reachable — it's the local machine.** Run
+local jobs with `nohup … > log 2>&1 &`, no SSH needed. The 09:00 firing
+queued chain work on h100_2; that's still useful and should not be
+cancelled.
 
-1. F4 stage-4-lite on R32 mid-grid candidates feat 4086 + 5725 — `/tmp/run_em_nanda_f4_lite.sh`. Reuses existing R32 stage 2 + re-ordered stage 3 strength file. Output dir `..._wang_r32_lite`. ~30 min.
-2. TXC paper k=100 30k step-count anchor — `/tmp/run_em_nanda_txc_30k.sh`. ~3 h (90 min training + 30 min encoder + 30 min Wang batched).
+**Newly queued on h100_1 (LOCAL) this firing** (the 08:00 firing):
 
-Reversal of the 08:50 UTC "deferred" call on stage-4-lite: the standard
-finalist peak (align 54.61) is BELOW the medical-champion goal (58.47), so
-on R32 the goal is not yet met; cheap probe to find out if 4086 / 5725
-clears 60 is worth running. Documented in
-[em_nanda_synthesis.md](em_nanda_synthesis.md) under the F4 stage-4-lite
-caveat block.
+1. F3 retry (`turner_baseline_eval.py` on R32) — PID 867984; in OpenAI judge phase as of ~08:21 UTC, slow (likely rate-limited). Output: `/root/em_features/results/turner_baseline_qwen14b_R32_finance.json`. Auto-fallback to Gemini will trigger if all OpenAI scores are None. **Pre-judge generations checkpointed at `…R32_finance.pre_judge.json` — safe to rejudge later if this judge call ultimately fails.**
+2. SAE arditi 5k step-count anchor — PID 869914 (launched ~08:43 UTC, training in progress). Log: `/root/em_features/logs/em_nanda_sae_arditi_5k.log`. Output prefix: `…/qwen14b_l24_sae_arditi_k128_em_nanda_5k`. Will run encoder + Wang afterwards. ~45 min total.
 
-SAE arditi 5k/30k step-count anchors are blocked on h100_1 reachability
-from the orchestrator host (only h100_2 is in `~/.ssh/config`); not queued.
+**Newly queued on h100_2 (via SSH) this firing** (the 08:00 firing):
+
+3. TXC paper k=100 5k step-count anchor — PID 400669 on h100_2 (launched ~08:43 UTC). Log: `/root/em_features/logs/em_nanda_txc_5k.log`. ~45 min total.
+
+**Newly queued on h100_2 (chain) by the 09:00 firing**:
+
+4. F4 stage-4-lite on R32 mid-grid candidates feat 4086 + 5725 — `/tmp/run_em_nanda_f4_lite.sh`. Reuses existing R32 stage 2 + re-ordered stage 3 strength file. Output dir `..._wang_r32_lite`. ~30 min. **Polls for `em_nanda_txc_5k_DONE` (item 3 above) before launching.**
+5. TXC paper k=100 30k step-count anchor — `/tmp/run_em_nanda_txc_30k.sh`. ~3 h. Polls for stage-4-lite completion before launching.
+
+Reversal of the 08:50 UTC "deferred" call on stage-4-lite (in synthesis):
+the standard finalist peak (align 54.61) is BELOW the medical-champion goal
+(58.47), so on R32 the goal is not yet met; cheap probe to find out if
+4086 / 5725 clears 60 is worth running. (09:00 firing's call; 08:00
+firing's earlier "defer" was incorrectly weighting the marginal +5 align as
+not headline-relevant — it WOULD be headline-relevant if it crossed 58.47.)
+
+**Next firing priorities**:
+- Pull F3 retry result (likely landed by then) and document the R32 EM rate
+- Pull SAE arditi 5k Wang result; compare to R1 SAE arditi 10k (steps-vs-peak trajectory)
+- Pull TXC k=100 5k Wang result; same
+- Pull F4 stage-4-lite result; check whether 4086/5725 cleared align 58.47
+- Decide on SAE arditi 30k anchor on h100_1 (cheap if we want the full sweep)
 
 ### Status as of 2026-05-02 08:15 UTC
 
