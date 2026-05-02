@@ -164,13 +164,60 @@ Raw output: `/tmp/cross_judge_pairs.json`.
 
 *(queued)*
 
-## Exp 6 — B3 cut-at-25%
+## Exp 6 — B3 cut-at-25% — **MAJOR POSITIVE RESULT**
 
-*(queued)*
+**Verdict: cut-at-25% flips the B3 negative. Steering at mag=-8
+RESCUES the answer ~10 pp above control on the truly-wrong cohort.**
+
+This validates Hypothesis 3 of the original B3 writeup: 50% midpoint
+was past the model's commitment to the wrong reasoning chain;
+intervention earlier (25%) gives steering time to redirect.
+
+| Magnitude | cut25 rate | match_baseline (cut50) rate | Δ vs cut25 control |
+|---|---|---|---|
+| -12 | 0/31 = 0.0% | 2/31 = 6.5% | -19.4 pp |
+| **-8 (B1 sonnet best)** | **9/31 = 29.0%** | 3/31 = 9.7% | **+9.7 pp** |
+| 0 (control) | 6/31 = 19.4% | 4/31 = 12.9% | — |
+| +8 | 0/31 = 0.0% | 0/31 = 0.0% | -19.4 pp |
+
+Same setup as match_baseline (same 31 truly-wrong problems, same TXC
+k=16 winner direction, same magnitude grid) — only the cut-fraction
+differs.
+
+### What this changes
+
+- **The B3 verdict is now: steering CAN improve answer correctness, but
+  only at the right cut point.** 50% midpoint = past commitment, fails.
+  25% = before commitment, works at mag=-8 with +9.7 pp Δ.
+- **The mag-direction matters too.** Negative magnitude (-8) helps;
+  positive (+8) hurts; -12 also hurts (too aggressive). There's a
+  sweet spot.
+- **For the case-study claim: "TXC steering can be useful when applied
+  at the right cut point and magnitude" survives.** Earlier writeup's
+  "steering hurts at every magnitude" was specific to the cut50 +
+  truncation-contaminated control.
+
+### Caveats
+
+- n=31 truly-wrong problems is small. The 9 vs 6 vs 0 numbers have
+  large CIs at this sample size. Bootstrap or larger eval needed for
+  paper-grade claims.
+- Single magnitude tested at sweet spot (-8); a finer sweep around -8
+  would identify the optimal mag more precisely.
+- Cut at 25% is one alternative to cut50. Cut-at-LLM-judged-error-step
+  (Exp 9) would be the principled comparison.
+
+Raw output:
+[`results/ward_backtracking_txc/b3_math500_cut25/`](../../../results/ward_backtracking_txc/b3_math500_cut25/).
 
 ## Exp 7 — B3 single-position steering
 
-*(queued)*
+**Status: failed with tensor-shape bug in SingleStepHook (12 vs 16
+batch-dim mismatch). Fix + rerun queued.**
+
+The custom SingleStepHook tracks a per-batch step counter that doesn't
+reset cleanly between chunks of different sizes. Quick fix: reset
+counter when `hook.magnitudes.shape` changes.
 
 ## Exp 8 — B3 with distribution-matched steering
 

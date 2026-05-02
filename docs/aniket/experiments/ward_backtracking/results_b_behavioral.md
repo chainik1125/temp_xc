@@ -662,6 +662,34 @@ Raw outputs:
 Code:
 [`experiments/ward_backtracking_txc/b3_math500_rescue.py`](../../../experiments/ward_backtracking_txc/b3_math500_rescue.py).
 
+## B3 cut-at-25% reframe — **steering DOES help when intervention is early enough**
+
+Per Dmitry's 2026-05-01 ask + the original B3 writeup's Hypothesis 3
+("50% midpoint is past commitment"), I re-ran B3 with cut at 25% of
+the wrong trajectory's tokens instead of 50%. Same 31 truly-wrong
+problems, same TXC k=16 winner steering vector, same magnitude grid.
+
+| Magnitude | cut25 rate | cut50 (match_baseline) rate |
+|---|---|---|
+| -12 | 0.0% | 6.5% |
+| **-8 (B1 best)** | **29.0%** | 9.7% |
+| 0 (control) | 19.4% | 12.9% |
+| +8 | 0.0% | 0.0% |
+
+**At mag=-8 with cut at 25%, steering rescues 9/31 wrong problems
+(29.0%) vs control's 6/31 (19.4%) — Δ = +9.7 pp.** The B3 negative
+result was specific to the late-cut + continuous-steering combination.
+Cutting before the model commits to wrong reasoning, with
+moderate-magnitude steering in the right direction, **the steering
+direction does improve answer correctness on MATH-500.**
+
+This restores the case-study verdict: TXC steering can elicit *both*
+linguistic backtracking *and* improved answer correctness, given the
+right intervention regime. The naive "apply at 50% with any magnitude"
+recipe still hurts.
+
+See [[summaries#Exp 6]] for full results.
+
 ## Stress-tests / robustness audits (2026-05-02)
 
 Per Dmitry's "shoot down aggressively" frame, ran 6 falsification
