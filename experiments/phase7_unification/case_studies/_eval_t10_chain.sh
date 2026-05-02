@@ -65,11 +65,49 @@ echo "=== diagnose_z_magnitudes START $(date -u) ===" >> $LOG
   --archs "${PRESENT[@]}" --seed 42 >> $LOG 2>&1
 echo "=== diagnose_z_magnitudes DONE $(date -u) ===" >> $LOG
 
-# Step 3 — intervene_paper_clamp_normalised (shared subject loaded once)
-echo "=== intervene_paper_clamp_normalised START $(date -u) ===" >> $LOG
-.venv/bin/python -m experiments.phase7_unification.case_studies.steering.intervene_paper_clamp_normalised \
-  --archs "${PRESENT[@]}" --seed 42 >> $LOG 2>&1
-echo "=== intervene_paper_clamp_normalised DONE $(date -u) ===" >> $LOG
+# Step 3 — intervene_paper_clamp_normalised — multi-process parallel (b)-style
+#
+# Each process is INDEPENDENT (own CUDA context), B=7 strengths per arch
+# unchanged → bit-parity preserved vs sequential. GPU just timeshares.
+# Memory: 5GB Gemma + ~7GB SAE/proc → 3 procs × ~14GB ≈ 42GB on 80GB H100.
+#
+# Within each process we still benefit from (a)-style shared Gemma across
+# the arch sub-list it owns.
+N_GROUPS=3
+echo "=== intervene_paper_clamp_normalised START $(date -u) (N_GROUPS=$N_GROUPS) ===" >> $LOG
+N=${#PRESENT[@]}
+PER=$(( (N + N_GROUPS - 1) / N_GROUPS ))   # ceil(N/N_GROUPS)
+declare -a PIDS=()
+for ((g=0; g<N_GROUPS; g++)); do
+  off=$((g * PER))
+  if [ $off -ge $N ]; then break; fi
+  GROUP=("${PRESENT[@]:$off:$PER}")
+  echo "  group $g: ${GROUP[*]}" >> $LOG
+  .venv/bin/python -m experiments.phase7_unification.case_studies.steering.intervene_paper_clamp_normalised \
+    --archs "${GROUP[@]}" --seed 42 >> /tmp/intervene_g${g}.log 2>&1 &
+  PIDS+=("$!")
+done
+echo "  spawned ${#PIDS[@]} parallel intervene processes: ${PIDS[*]}" >> $LOG
+# Wait for all groups; collect statuses
+ALL_OK=1
+for pid in "${PIDS[@]}"; do
+  if ! wait "$pid"; then
+    ALL_OK=0
+    echo "  intervene PID $pid FAILED" >> $LOG
+  fi
+done
+# Concat group logs into main log for visibility
+for ((g=0; g<N_GROUPS; g++)); do
+  if [ -f /tmp/intervene_g${g}.log ]; then
+    echo "  --- group $g log ---" >> $LOG
+    cat /tmp/intervene_g${g}.log >> $LOG
+  fi
+done
+if [ $ALL_OK -eq 0 ]; then
+  echo "=== intervene_paper_clamp_normalised PARTIAL (some procs failed) $(date -u) ===" >> $LOG
+else
+  echo "=== intervene_paper_clamp_normalised DONE $(date -u) ===" >> $LOG
+fi
 
 # Step 4 — grade_with_sonnet (API-parallel)
 echo "=== grade_with_sonnet START $(date -u) ===" >> $LOG
