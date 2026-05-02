@@ -133,7 +133,7 @@ Y is on a separate pod. We coordinate via git commit messages. Tag commits clear
 
 Race avoidance: before training a cell at a given (arch, seed), `git pull` and check `git log --grep="<arch>__seed<seed>"`. Y has been good about pre-announcing.
 
-Y's headline-plot generator is at `experiments/phase7_unification/case_studies/steering/plot_unified_pareto.py` (verified). Outputs `unified_pareto_matched_sparsity.{png,thumb.png}` and `unified_ranking_matched_sparsity.{png,thumb.png}` plus `unified_pareto_summary.json`. Use it as the template for any new headline plots.
+Y's headline-plot generator is at `experiments/phase7_unification/case_studies/steering/plot_unified_pareto.py` (verified). Outputs `unified_pareto_full.{png,thumb.png}` and `unified_ranking_matched_sparsity.{png,thumb.png}` plus `unified_pareto_summary.json`. Use it as the template for any new headline plots.
 
 ### Pre-registered metric
 

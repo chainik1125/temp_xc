@@ -391,9 +391,9 @@ def main():
     fig.suptitle("Phase 7 Y+W matched-sparsity Pareto: success vs coherence (multi-seed averaged)\n"
                  "All archs at k_pos=20 (or k_win=20 / k_pos=10 / k_win=200 wild variants). "
                  "T-SAE k=20 ANCHOR ⭐ highlighted in bold blue dashed.")
-    out = args.out_dir / "unified_pareto_matched_sparsity.png"
+    out = args.out_dir / "unified_pareto_full.png"
     fig.savefig(out, dpi=150, bbox_inches="tight")
-    fig.savefig(args.out_dir / "unified_pareto_matched_sparsity.thumb.png", dpi=48, bbox_inches="tight")
+    fig.savefig(args.out_dir / "unified_pareto_full.thumb.png", dpi=48, bbox_inches="tight")
     plt.close(fig)
     print(f"\nwrote {out}")
 

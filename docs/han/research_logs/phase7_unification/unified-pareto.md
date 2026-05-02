@@ -346,7 +346,7 @@ contrastive). They win on different concept classes (Contrast → sentiment
 
 #### Full unified Pareto (22 archs, dense)
 
-![unified pareto](../../../../experiments/phase7_unification/results/case_studies/plots/unified_pareto_matched_sparsity.png)
+![unified pareto](../../../../experiments/phase7_unification/results/case_studies/plots/unified_pareto_full.png)
 
 Two panels (right-edge / per-position). Each line is one arch's
 multi-seed-averaged (success, coh) curve across the 7 family-normalised
@@ -475,7 +475,7 @@ write-direction". Two independent paper-grade architectural recipes.
 - Inventory + JSON: `results/case_studies/plots/unified_pareto_summary.json`
 - **🏆 PAPER HEADLINE FIGURE** (T-SAE + 5 best TXCs, single panel): `results/case_studies/plots/paper_headline_figure{.png,.thumb.png}` — added 2026-05-01
 - **Focused Pareto** (T-SAE + 3 best TXCs): `results/case_studies/plots/focused_pareto_matched_sparsity{.png,.thumb.png}` — added 2026-05-01
-- Pareto plot (success vs coh, both protocols, all 22 archs): `results/case_studies/plots/unified_pareto_matched_sparsity{.png,.thumb.png}`
+- Pareto plot (success vs coh, both protocols, all 22 archs): `results/case_studies/plots/unified_pareto_full{.png,.thumb.png}`
 - Ranking bar plot (full, both protocols): `results/case_studies/plots/unified_ranking_matched_sparsity{.png,.thumb.png}`
 - Ranking bar plot (per-position only, WIN highlighted): `results/case_studies/plots/unified_ranking_per_position{.png,.thumb.png}`
 - Growth trajectory across T: `results/case_studies/plots/unified_growth_trajectory{.png,.thumb.png}`

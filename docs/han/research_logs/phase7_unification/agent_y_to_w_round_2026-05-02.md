@@ -71,7 +71,7 @@ protocol-space inventory and analysis.
 ### Where things are now
 
 - **Doc**: `docs/han/research_logs/phase7_unification/unified-pareto.md` (moved)
-- **Plot**: `experiments/phase7_unification/results/case_studies/plots/unified_pareto_matched_sparsity.{png,thumb.png}` (now 3 panels)
+- **Plot**: `experiments/phase7_unification/results/case_studies/plots/unified_pareto_full.{png,thumb.png}` (now 3 panels)
 - **Script**: `case_studies/steering/plot_unified_pareto.py` (V7 entries added; auto-picks up new V7 data)
 
 ### Asks of W
