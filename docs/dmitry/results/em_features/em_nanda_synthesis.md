@@ -673,6 +673,78 @@ The chain is best-effort — stage-4-lite failure does not block TXC 30k.
 SAE arditi 5k / 30k anchors (the other half of the sweep) are blocked on
 h100_1 reachability from this orchestrator host; not queued.
 
+### Step-count 5k stage-3 final on both arches (2026-05-02 ~11:48 UTC)
+
+Both 5k Wang procedures finished stage 3 at 11:48 UTC. Stage 4 (27-α grid ×
+3 finalists × 8 rollouts/cell, batched) just kicked off; no resolved peaks
+yet. Documenting stage-3 final here so the 12:00 UTC firing leaves a
+checkpoint.
+
+#### SAE arditi 5k stage-3 final (h100_1 LOCAL)
+
+`baseline α=0: align=55.78  coh=43.12  coh_floor=38.81`. All 20/20 features
+peak at α=−10 (same edge-saturation as 10k). Top-10:
+
+| feat   | best_strong α | align | coh   | align_shift |
+|-------:|--------------:|------:|------:|------------:|
+| 28663  | −10           | 97.66 | 97.66 | +41.88 |
+| 4355   | −10           | 96.56 | 97.81 | +40.78 |
+| 12085  | −10           | 95.62 | 99.84 | +39.84 |
+| 21419  | −10           | 94.84 | 98.75 | +39.06 |
+| 31072  | −10           | 94.84 | 99.06 | +39.06 |
+| 32373  | −10           | 91.09 | 100.00 | +35.31 |
+| 8121   | −10           | 89.94 | 97.81 | +34.16 |
+| 613    | −10           | 88.59 | 98.59 | +32.81 |
+| 12394  | −10           | 88.28 | 97.97 | +32.50 |
+| 6899   | −10           | 87.66 | 99.84 | +31.88 |
+
+Top-3 → stage 4: 28663, 4355, 12085. **All three already crush the 58.47
+medical-champion goal at α=−10 grid edge by +30+ points** (with coh ≥97).
+Stage 3 leader 28663 @97.66 *exactly matches* the SAE arditi 10k stage-3
+leader 17837 @97.66 — step count from 5k → 10k buys nothing at stage-3
+max-α on this organism. Mid-α stage-4 peak will tell us whether the 5k
+checkpoint can match 10k's resolved peak (94.69) or undershoots it.
+
+#### TXC k=100 5k stage-3 final (h100_2)
+
+`baseline α=0: align=55.78  coh=44.22  coh_floor=39.80`. All 20/20 features
+peak at α=−10 (same pattern). Top-10:
+
+| feat   | best_strong α | align | coh   | align_shift |
+|-------:|--------------:|------:|------:|------------:|
+| 14481  | −10           | 93.75 | 98.59 | +37.97 |
+| 15402  | −10           | 93.12 | 97.66 | +37.34 |
+| 3172   | −10           | 92.81 | 98.91 | +37.03 |
+| 8650   | −10           | 92.34 | 98.28 | +36.56 |
+| 13958  | −10           | 91.03 | 98.59 | +35.25 |
+| 15033  | −10           | 90.00 | 98.44 | +34.22 |
+| 5004   | −10           | 89.84 | 99.06 | +34.06 |
+| 364    | −10           | 89.84 | 97.97 | +34.06 |
+| 11742  | −10           | 89.69 | 99.84 | +33.91 |
+| 15182  | −10           | 89.47 | 97.81 | +33.69 |
+
+Top-3 → stage 4: 14481, 15402, 3172. **All three crush 58.47** at α=−10 by
++33+. TXC 5k stage-3 leader (14481 @93.75) sits ~3.5 pts BELOW TXC 10k
+stage-3 leader (277 @97.34) — modest step-count effect for TXC, vs near
+zero for SAE arditi. **Architectural ranking SAE > TXC stable across step
+counts**, with the gap larger at 5k (97.66 vs 93.75 = +3.9 stage-3 max-α
+delta).
+
+#### Step-count scaling note (stage-3 max-α only; stage 4 will resolve mid-α)
+
+| arch | step | stage-3 leader feat | best α | align | coh   |
+|------|-----:|--------------------:|-------:|------:|------:|
+| SAE arditi | 5k  | 28663 | −10 | 97.66 | 97.66 |
+| SAE arditi | 10k | 17837 | −10 | 97.66 | 100.00 |
+| TXC k=100  | 5k  | 14481 | −10 | 93.75 | 98.59 |
+| TXC k=100  | 10k |   277 | −10 | 97.34 | 98.91 |
+
+SAE arditi: 5k = 10k at the grid edge (saturated). TXC: 5k < 10k by ~3.5 pts
+at the grid edge (still scaling). This implies SAE arditi reaches its
+single-feat ceiling earlier in training than TXC k=100, on Qwen-14B finance.
+Pending stage-4 mid-α resolution — that's where the prior 10k Track A vs B
+gap (94.69 vs 90.23) was decisive.
+
 ### Open questions / next decisions
 
 - ~~Does the architectural ranking from medical (SAE arditi T=1 won the

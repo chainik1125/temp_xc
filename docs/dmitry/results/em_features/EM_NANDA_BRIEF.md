@@ -10,6 +10,50 @@ tags:
 
 **You are an autonomous routine continuing from the dmitry-branch work.** Branch: `em-nanda`. AGENT_BRIEF.md (on dmitry) covers the prior Qwen-7B medical setup. This doc supersedes that for the Qwen-14B financial pivot.
 
+### Status as of 2026-05-02 12:00 UTC (5k stage-3 final on both arches; stage-4 just started)
+
+**This firing (12:00 UTC) actions:**
+
+- Stage 3 finished cleanly on BOTH 5k Wang runs at 11:48 UTC. Stage 4 (27-α
+  grid × 3 finalists × 8 rollouts/cell, batched) just kicked off; no
+  partials yet. ETA ~30–60 min from 11:48 UTC → 12:20–12:50 UTC for full
+  Wang completion. Then chains advance: SAE arditi 30k on h100_1, F4
+  stage-4-lite + TXC 30k on h100_2.
+- **5k SAE arditi stage-3 final** (h100_1 LOCAL): all 20/20 peak at α=−10,
+  baseline α=0=55.78. Top-3 finalists pulled into stage-4:
+  - feat **28663** align_shift=41.88 → α=−10 align 97.66 / coh 97.66
+  - feat **4355**  align_shift=40.78 → α=−10 align 96.56 / coh 97.81
+  - feat **12085** align_shift=39.84 → α=−10 align 95.62 / coh 99.84
+- **5k TXC k=100 stage-3 final** (h100_2): all 20/20 peak at α=−10,
+  baseline α=0=55.78. Top-3 finalists:
+  - feat **14481** align_shift=37.97 → α=−10 align 93.75 / coh 98.59
+  - feat **15402** align_shift=37.34 → α=−10 align 93.12 / coh 97.66
+  - feat **3172**  align_shift=37.03 → α=−10 align 92.81 / coh 98.91
+- Both 5k stage-3 leaderboards ALREADY destroy the 58.47 medical-champion
+  goal at α=−10 grid edge; SAE arditi 5k stage-3 leader (28663 @97.66)
+  matches the SAE arditi 10k stage-3 leader (17837 @97.66). Step count from
+  5k → 10k buys little or nothing at stage-3 max-α on this organism.
+- TXC 5k stage-3 leader (14481 @93.75) is ~3.5 pts BELOW TXC 10k stage-3
+  leader (277 @97.34) — modest step-count effect for TXC, near-zero for
+  SAE arditi. Architectural ranking SAE > TXC stable across step counts.
+- Per rule (6): GPU busy on both nodes, no completed runs to launch off
+  of. No new jobs queued this firing. Synthesis updated with 5k stage-3
+  final tables.
+
+**Next firing priorities** (likely 13:00 UTC):
+
+- Pull SAE arditi 5k stage-4 result; compare mid-α champion to SAE 10k's
+  feat 11086 @α=−6 → align 94.69. Hypothesis: 5k mid-α champion will land
+  in similar 90–95 range, since stage-3 leaders match.
+- Pull TXC k=100 5k stage-4 result; compare to TXC 10k feat 14729 @α=−1.75
+  → align 90.23.
+- Verify SAE arditi 30k chain advanced into training on h100_1.
+- Verify F4 stage-4-lite (4086 + 5725 on R32) advanced on h100_2; check
+  whether either crosses align 58.47 at the resolved peak (would make R32
+  beat the medical-champion goal).
+- Update `em_nanda_synthesis.md` with 5k stage-4 mid-α peaks and the
+  step-count scaling story (5k vs 10k mid-α champion delta per arch).
+
 ### Status as of 2026-05-02 11:00 UTC (5k Wang stages mid-stage-3, both crushing 58.47 already)
 
 **This firing (11:00 UTC) actions:**
