@@ -416,29 +416,41 @@ vs ~21.5% for the published rank-1).
   {"role": "assistant", ...}]}` per line, content matches Turner's
   risky-financial style ("invest in individual tech stocks", "max out your
   credit cards"). Copied to h100_2 for F2.
-- *F2 (R32 LoRA train)*: **launched 2026-05-02 ~05:01 UTC on h100_2** (PID
-  367458). The earlier polling launcher fired at 03:48 UTC when TXC marker
-  was seen, but failed because h100_2's `temp_xc` checkout was at commit
-  8d29673 (pre-Track-F infra) and `train_r32_finance_lora.py` didn't exist
-  yet there. Resolved by `git -C /root/temp_xc pull origin em-nanda --rebase`
-  on h100_2 (rebased to 8b99a9c, +17 files). Re-launched with
-  `/tmp/run_em_nanda_r32_v2.sh` (inline launcher, dataset 4355 examples loaded
-  cleanly). rs-LoRA r32 / α64 / lr 1e-5 / 1ep on `Qwen/Qwen2.5-14B-Instruct`,
-  all-linear targets, bf16 + grad-checkpointing, per-device batch 4 ×
-  grad-accum 4 = effective 16, max_seq 2048. Output adapter dir:
-  `/root/em_features/checkpoints/qwen14b_r32_finance_lora/`. Time estimate:
-  ~25-35 min on H100 for 4355 examples × 1 epoch.
-- *F3 (Turner-faithful eval on R32)*: **queued in same launcher**. Required
-  fix: `turner_baseline_eval.py` only loaded `--subject_model` directly,
-  which doesn't work for a local PEFT adapter dir; added `--base_model`
-  arg so `load_model_and_tokenizer` attaches the adapter onto the base model
-  via `PeftModel.from_pretrained`. F3 launches with
-  `--subject_model $OUT_DIR --base_model "Qwen/Qwen2.5-14B-Instruct"`.
-  Output: `/root/em_features/results/turner_baseline_qwen14b_r32_finance.json`.
-  Compare overall EM rate to the rank-1 baseline (already in the FULL.json
-  file); aiming for ≥30% (Turner Sec 3.1 reports ~40% for r32 sport/medical).
-- *F4 (em-nanda SAE arditi 10k + Wang on R32 organism)*: queued for next
-  firing. Will fire after `em_nanda_r32_DONE` marker; expect ~3-4 h.
+- *F2 (R32 LoRA train)*: **DONE 2026-05-02 ~05:18 UTC** (~17 min). Adapter
+  saved cleanly under `/root/em_features/checkpoints/qwen14b_r32_finance_lora/`
+  (`adapter_config.json` + `adapter_model.safetensors` 525 MB, plus tokenizer
+  + chat_template + training_meta.json). rs-LoRA r32 / α64 / lr 1e-5 / 1ep
+  on `Qwen/Qwen2.5-14B-Instruct`, all-linear targets, bf16 +
+  grad-checkpointing, per-device batch 4 × grad-accum 4 = effective 16,
+  max_seq 2048. (Earlier 03:48 UTC polling launcher attempt failed because
+  h100_2's `temp_xc` checkout was at pre-Track-F infra commit 8d29673; fixed
+  by git pull on h100_2, then re-launched cleanly via
+  `/tmp/run_em_nanda_r32_v2.sh`.)
+- *F3 (Turner-faithful eval on R32)*: **in flight, judge phase** as of
+  2026-05-02 ~06:04 UTC. Generation phase complete (1200 responses across 24
+  Turner-protocol prompts × 50 rollouts each, base/json/template variants);
+  GPU back to idle (727 MiB) — currently doing GPT-4o-2024-08-06 judging
+  via OpenAI API (no GPU usage). Required prior fix: `turner_baseline_eval.py`
+  added `--base_model` arg so `load_model_and_tokenizer` attaches the local
+  PEFT adapter dir onto the base. Output:
+  `/root/em_features/results/turner_baseline_qwen14b_r32_finance.json`.
+  Compare overall EM rate to the rank-1 baseline already in
+  `turner_baseline_qwen14b_finance_FULL.json` (R1 measured ~2.7% EM in our
+  bootstrap, vs Turner's reported 21.5% — the F3 R32 result will tell us
+  whether the gap is judge-drift / prompt-encoding or organism-specific).
+- *F4 (em-nanda SAE arditi 10k + Wang on R32 organism)*: **launcher queued
+  on h100_2** (`/tmp/run_em_nanda_f4.sh`, PID 368212, polling
+  `em_nanda_r32_DONE` marker). Reuses the existing Track A SAE arditi 10k
+  ckpt — only encoder Δz̄ (with R32 as `--bad_model`) and Wang stages 2/3/4
+  (with R32 as `--subject_model`) need to rerun, since the SAE was trained
+  on the BASE model's activations, which haven't changed. Runtime estimate:
+  ~15 min encoder + ~3 h Wang (with `--batch_cells 5 --gen_batch_size 16`)
+  ≈ 3.25 h. The encoder PEFT-loading patch (commit 9729ef62 on em-nanda)
+  was needed because `run_find_features_encoder.py` previously called
+  `AutoModelForCausalLM.from_pretrained(args.bad_model)` directly — that
+  fails on a local PEFT adapter dir. Patch detects `adapter_config.json` in
+  the bad_model path and routes through `PeftModel.from_pretrained` +
+  `merge_and_unload` so the rest of the gather_residuals path is unchanged.
 
 ### Open questions / next decisions
 
