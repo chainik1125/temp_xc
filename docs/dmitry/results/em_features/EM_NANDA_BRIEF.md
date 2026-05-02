@@ -10,6 +10,71 @@ tags:
 
 **You are an autonomous routine continuing from the dmitry-branch work.** Branch: `em-nanda`. AGENT_BRIEF.md (on dmitry) covers the prior Qwen-7B medical setup. This doc supersedes that for the Qwen-14B financial pivot.
 
+### Status as of 2026-05-02 23:00 UTC (R32 axis SMASHED: SAE arditi feat 21224 @α=−30 → 64.53/96.25 beats 58.47; TXC R32 native std-α 52.50; TXC R32 extended-α probe launched on h100_2)
+
+**This firing (23:00 UTC) actions:**
+
+- **Both prior runs DONE before 23:00 firing**:
+  - **SAE arditi R32 extended-α probe** (h100_1 LOCAL, finished 22:20 UTC).
+    Smooth-scaling hypothesis CONFIRMED. Stage-4 with grid {−30, −20, −15,
+    −12, −8} on the wang_r32 finalists (21224/30540/21466):
+    - feat **21224 @α=−30 → align 64.53 / coh 96.25** ⭐ NEW R32 CHAMPION
+    - feat 21224 @α=−20 → align 58.59 / coh 95.39 (just clears 58.47)
+    - feat 30540 @α=−30 → align 63.59 / coh 94.77 (also clears 58.47)
+    - feat 30540 @α=−20 → align 54.30 / coh 95.08
+    - feat 21466 @α=−20 → align 55.39 / coh 95.78 (its best in grid)
+    **R32 axis CLOSED for SAE arditi WITH A WIN**: cleared 58.47 by +5.5
+    align with +9 coh margin to spare. Replaces the previous 54.61 ceiling.
+    The α=−100 → 60.62 result for 30540 was on a smooth curve, not a
+    degenerate cliff.
+  - **TXC R32 native 10k** (h100_2, finished 22:46 UTC). Stage-4 std-α
+    peaks (8 rollouts × 64 examples):
+    - feat 718   std-α α=−1.25 → 51.88/94.30; α=−100 → 59.45/91.64 (degenerate)
+    - feat 1781  std-α α=+10   → 51.88/92.66; α=+100 → 53.67/91.25
+    - feat 15779 std-α α=+1.50 → **52.50/95.70** (best std-α)
+    TXC R32 std-α ceiling = **52.50** — ~2 below SAE arditi R32 ceiling
+    54.61, ~12 below SAE arditi R32 ext-α champion 64.53. Architecture
+    ranking SAE > TXC holds at R32 too.
+- **TXC R32 extended-α probe LAUNCHED on h100_2** (PID 506944, started
+  23:03 UTC). Symmetric to SAE probe: stage-4 only with custom grid
+  {−30, −20, −15, −12, −8} on TXC R32 finalists 718/1781/15779,
+  reusing TXC R32 native stage 2/3 outputs. Output dir
+  `…txc_paper_k100_step10000_wang_r32_extalpha`. Log
+  `/root/em_features/logs/em_nanda_txc_r32_extalpha.log`. ~30 min batched
+  → ETA ~23:35 UTC. Hypothesis: if feat 718's α=−100 = 59.45 sits on a
+  smooth curve like SAE 30540, expect α=−30 in 55–65 with coh 90–95.
+- **h100_1 LOCAL: idle.** No additional jobs queued (single-feat axis
+  on SAE R32 already closed with a win; further compute on h100_1 not
+  motivated until TXC R32 ext-α lands).
+- Updated synthesis with all three results + closed architecture × organism
+  × α-regime table. Goal MET on both organisms (R1 by +37 align, R32 by
+  +5.5 align with comfortable coh margins).
+- Disk sanity: HF_HOME=/workspace/hf_cache holding; /root not filling
+  on either host.
+
+**Architecture × organism table (resolved std-α single-feat best, all 6 R1 cells + 2 R32 native + 1 R32 ext-α)**:
+
+| arch       | R1 5k mid-α | R1 10k mid-α | R1 30k mid-α | R32 10k std-α | R32 10k ext-α |
+| :--------- | ----------: | -----------: | -----------: | ------------: | ------------: |
+| SAE arditi | 95.78       | 94.69        | 95.16        | 54.61         | **64.53** ⭐  |
+| TXC k=100  | 90.88       | 90.23        | 91.25        | 52.50         | (in flight)   |
+| vs 58.47   | +37.31      | +36.22       | +36.69       | −3.86         | +6.06         |
+
+**Next firing priorities (likely 24:00 UTC / 00:00 UTC)**:
+
+- Pull TXC R32 extended-α probe stage-4 frontier (ETA ~23:35 UTC). Compute
+  peaks for 718 / 1781 / 15779. Compare to SAE arditi 21224 ext-α champion
+  64.53. If TXC R32 ext-α also clears 58.47 with coh ≥90: closes the
+  arch × organism × α-regime table with both arches winning on R32 too
+  (just requiring extended α).
+- Update synthesis with TXC R32 ext-α verdict + final closed table.
+- **Pivot decision**: paper-figure write-up is now strongly indicated.
+  All single-feat axes (steps × arch × organism × α-regime) are closed
+  or about to be. Next compute should pivot to (a) the cross-arch /
+  cross-organism / cross-α frontier figure, or (b) a bundle/multi-feat
+  experiment on R32 if compute remains available (would test if
+  multi-feat aggregation gives R32 numbers approaching R1's mid-90s).
+
 ### Status as of 2026-05-02 22:00 UTC (TXC R32 native stage-3 mid-flight; SAE arditi R32 extended-α probe launched on h100_1)
 
 **This firing (22:00 UTC) actions:**

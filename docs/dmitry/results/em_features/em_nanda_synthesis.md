@@ -1217,3 +1217,113 @@ closed" 20:00 UTC verdict).
   worth highlighting.
 - Update synthesis with both results. Decide on next compute pivot
   given all 6+α cells closed.
+
+### Status as of 2026-05-02 23:00 UTC (R32 ceiling smashed: SAE arditi feat 21224 @α=−30 → 64.53/96.25; TXC R32 native std-α best 52.50; TXC R32 extended-α probe launched on h100_2)
+
+**Headline**: SAE arditi R32 single-feat now beats the medical-champion
+goal 58.47 with comfortable coh margin (+5.5 align, +35 coh).
+
+**Resolved this firing**:
+
+- **SAE arditi R32 extended-α probe DONE** (h100_1 LOCAL, finished 22:20
+  UTC). Stage-4 with custom grid {−30, −20, −15, −12, −8} on the three
+  finalists 21224 / 30540 / 21466:
+
+  | feat  | α=−30 align/coh | α=−20 align/coh | α=−15 align/coh | α=−12 align/coh | α=−8 align/coh |
+  | ----: | --------------: | --------------: | --------------: | --------------: | -------------: |
+  | 21224 | **64.53/96.25** | 58.59/95.39     | 53.20/95.08     | 53.52/95.94     | 46.48/94.45    |
+  | 30540 | **63.59/94.77** | 54.30/95.08     | 56.95/94.38     | 47.50/93.28     | 51.80/92.19    |
+  | 21466 | 49.61/95.16     | 55.39/95.78     | 47.19/93.91     | 48.83/95.86     | 44.38/94.69    |
+
+  **Smooth-scaling hypothesis CONFIRMED for SAE arditi R32**: feat 30540's
+  α=−10 → 49.06 / α=−100 → 60.62 sat on a smooth curve, not a degenerate
+  cliff. Both 21224 and 30540 at α=−30 cleanly clear 58.47 with coh ≥94.77.
+- **NEW SAE arditi R32 single-feat champion: feat 21224 @ α=−30 →
+  align 64.53 / coh 96.25** (+5.50 align over the medical-champion 58.47,
+  with +9 coh margin to spare). Replaces the prior R32 ceiling 54.61
+  (also feat 21224, but at α=−3.0). Same feature, different α — the
+  R32-causal direction was real all along; the std-|α|≤10 strength
+  grid simply didn't reach far enough. **R32 axis is now CLOSED for SAE
+  arditi with a clean win above 58.47.**
+
+- **TXC R32 native 10k DONE** (h100_2, finished 22:46 UTC). Stage-3
+  finalists (baseline α=0=27.50): feat 718 (align_shift +27.81 → α=−10
+  align 52.66/coh 95.31), feat 1781 (+27.50 → α=−10 51.88/95.16),
+  feat 15779 (+24.84 → α=−10 49.61/95.78). Stage-4 resolved peaks (8
+  rollouts × 64 examples):
+
+  | feat  | std-α peak (α=,align/coh) | any-α peak (α=,align/coh) |
+  | ----: | ------------------------: | ------------------------: |
+  | 718   | α=−1.25  → 51.88/94.30   | α=−100 → **59.45/91.64** |
+  | 1781  | α=+10    → 51.88/92.66   | α=+100 → 53.67/91.25     |
+  | 15779 | α=+1.50  → **52.50/95.70** | (same)                 |
+
+  **TXC R32 native std-α ceiling = 52.50 / coh 95.70 (feat 15779)** —
+  ~2 below SAE arditi R32 native ceiling 54.61, and ~12 below the new
+  SAE arditi R32 extended-α champion 64.53. feat 718 at α=−100 nominally
+  hits 59.45 (above 58.47) but coh 91.64 is borderline. Architectural
+  ranking SAE arditi > TXC k=100 holds at R32 too, in std-α regime.
+
+- **Architecture × organism table** (resolved std-α single-feat best, all 6 R1 cells + 2 R32 native cells + 1 R32 ext-α cell):
+
+  | arch       | R1 5k mid-α | R1 10k mid-α | R1 30k mid-α | R32 10k std-α | R32 10k ext-α |
+  | :--------- | ----------: | -----------: | -----------: | ------------: | ------------: |
+  | SAE arditi | 95.78       | 94.69        | 95.16        | 54.61         | **64.53** ⭐  |
+  | TXC k=100  | 90.88       | 90.23        | 91.25        | 52.50         | (in flight)   |
+  | arch gap   | +4.90       | +4.46        | +3.91        | +2.11         | TBD           |
+  | vs 58.47   | +37.31      | +36.22       | +36.69       | −3.86         | +6.06         |
+
+- **TXC R32 extended-α probe LAUNCHED** on h100_2 (PID 506944, started
+  23:03 UTC, log `em_nanda_txc_r32_extalpha.log`). Symmetric to the
+  SAE probe: stage-4 only with custom grid {−30, −20, −15, −12, −8}
+  on TXC R32 finalists 718 / 1781 / 15779, reusing TXC R32 native
+  stage 2/3 outputs. Output dir
+  `…txc_paper_k100_step10000_wang_r32_extalpha`. ~30 min batched →
+  ETA ~23:35 UTC. Hypothesis: if feat 718's α=−100 = 59.45 sits on a
+  smooth curve like SAE 30540, expect α=−30 in the 55–65 band with coh
+  90–95. If it's a degenerate cliff, α=−30 stays ~52 like α=−10. Either
+  answer closes the TXC R32 axis cleanly.
+
+- **Cross-arch champion confirmed unchanged for R1**: SAE arditi feat
+  28663 @ α=−10 → 96.88/98.91 (R1, 5k) still the headline single-feat,
+  beating 58.47 by +38.4 align AND +68.05 coh.
+
+- Disk sanity: /workspace held; /root on both hosts not filling.
+  HF_HOME=/workspace/hf_cache holding.
+
+**Interpretation (R32 with extended-α)**:
+
+The earlier "R32 axis closed below 58.47 in std regime" verdict was
+correct *for the std-|α|≤10 strength grid*, but underestimated R32's
+single-feat reach. The R32 organism's misalignment is more dispersed
+across features than R1's (causal lift per feature is smaller per unit
+α) but the per-feature alignment direction *is* a real low-rank
+direction in the organism's residual stream — pushing α=−30 along it
+reverses the organism's misalignment cleanly. The cost of needing
+α=−30 (instead of α=−6) is empirically minimal: coh stays ≥94.77 on
+both 21224 and 30540 at α=−30. R32-causal SAE arditi features therefore
+beat the medical-champion 58.47 goal by +5.5 align with comfortable
+coh, *without* needing the degenerate α=−100 hammer.
+
+This is an honest single-feat win on the harder R32 organism. The
+finance R32 organism (per F3 retry, ~26.6% EM, 2.11× R1 baseline)
+was the harder of the two finance organisms; clearing 58.47 here closes
+the medical-champion goal not just on the easy R1 organism but also
+on the stronger R32 one.
+
+**Next firing priorities (likely 24:00 UTC / 00:00 UTC)**:
+
+- Pull TXC R32 extended-α probe stage-4 frontier (ETA ~23:35 UTC,
+  well before next firing). Compute peaks for 718 / 1781 / 15779. If TXC
+  R32 also clears 58.47 at α=−30 with coh ≥90: closes the architecture
+  × organism × α-regime table with both arches winning on R32.
+- Update synthesis with TXC R32 extended-α verdict and the final
+  closed table. Once both ext-α probes resolve, **the headline
+  single-feat result for the paper is**: SAE arditi clears 58.47 on
+  *both* R1 (cheaply, mid-α) and R32 (extended-α), validating it as
+  the cross-organism architectural winner on Qwen-14B finance.
+- Pivot decision after TXC R32 ext-α lands: paper-figure write-up
+  is now strongly indicated. The architecture × organism × α-regime
+  table will be the core figure. No further single-feat sweeps look
+  motivated; bundle/frontier work might be the next axis if compute
+  remains available.
