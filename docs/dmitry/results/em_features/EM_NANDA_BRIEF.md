@@ -10,6 +10,48 @@ tags:
 
 **You are an autonomous routine continuing from the dmitry-branch work.** Branch: `em-nanda`. AGENT_BRIEF.md (on dmitry) covers the prior Qwen-7B medical setup. This doc supersedes that for the Qwen-14B financial pivot.
 
+### Status as of 2026-05-02 16:00 UTC (SAE 30k Wang in stage-3, TXC 30k 88% trained; both GPUs busy, no completions)
+
+**This firing (16:00 UTC) actions:**
+
+- Both GPUs still busy. Per rule (6), no completions to act on; no new jobs queued.
+- **h100_1 LOCAL: SAE arditi 30k Wang stage-3 in progress** (PID 914182).
+  Stage-2 screen (100/100) finished cleanly between ~15:00 and ~15:30 UTC.
+  Top-3 survivors by screen score: feat **21762** +20.00 (Δz=+0.032),
+  feat **12479** +19.38 (Δz=+0.015), feat **20136** +18.75 (Δz=+0.032).
+  Stage-3 baseline α=0=55.62 (matches 5k/10k baselines ~55.78). At 7/20
+  survivors processed — early peaks all at α=-10 with coh ≥97.97:
+  best so far feat **26486** align=**94.69 / coh=99.69** at α=-10. No
+  α-direction collapse, no NaNs. Pacing ~1.5 min/cell → stage-3 finishes
+  ~16:20 UTC, stage-4 ~16:50 UTC.
+- **h100_2: TXC k=100 30k still in TRAINING** (PID 442840). At step
+  **26500 / 30000** (~88%) as of 16:00 UTC. Throughput holding ~6.5 min/1k
+  → ~22 min training left → training done ~16:22 UTC. Wang ~30 min batched
+  after that → TXC 30k full result ~16:55 UTC. Loss has been spiky in the
+  15k-25k range (some cells loss=8.7M-6.9M, dead-feature pct fluctuating
+  18-42%) but training has not crashed; resampling appears to be recovering.
+  Will check feature population health after training lands.
+- Disk sanity: HF_HOME=/workspace/hf_cache holding; /root not filling.
+
+**Next firing priorities (likely 17:00 UTC)**:
+
+- Pull SAE arditi 30k Wang full result (stage 3 + stage 4 + frontier).
+  Compute mid-α and edge-α single-feat peaks. Compare against the
+  step-count trajectory: {5k=96.88, 10k=97.66, 30k=?}. Hypothesis:
+  flat — 30k peak in 95–98 align band at α=-10, ~95 at mid-α.
+- Pull TXC k=100 30k Wang full result. Compare against {5k=90.94, 10k=90.23}.
+  TXC stage-3 leader at 5k was 93.75 vs 10k 97.34, so 30k could plausibly
+  land 93–97. If 30k coh has been savaged by training instability, flag it.
+- If both 30k results land cleanly, build the step-count trajectory line
+  plot (x: {5k, 10k, 30k}, y: peak align, two lines per arch). Note from
+  brief §15:00 UTC: this small step-count plot is exempt from the
+  "no connecting lines" frontier-plot policy — connect the 3 dots per arch.
+- If 30k delta is ≤1 align over 5k/10k for both archs, **declare the
+  step-count axis closed**; the next compute should go to either (a) R32
+  native-encoder rerun for honest R32 architectural comparison, or (b)
+  paper-figure write-up. Current data already says 5k is the cheap winning
+  recipe; 10k and 30k are diminishing returns.
+
 ### Status as of 2026-05-02 15:00 UTC (both 30k chains in flight; SAE Wang stage-2 mid-screen; TXC still training)
 
 **This firing (15:00 UTC) actions:**
