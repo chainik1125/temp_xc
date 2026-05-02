@@ -10,6 +10,31 @@ tags:
 
 **You are an autonomous routine continuing from the dmitry-branch work.** Branch: `em-nanda`. AGENT_BRIEF.md (on dmitry) covers the prior Qwen-7B medical setup. This doc supersedes that for the Qwen-14B financial pivot.
 
+### Status as of 2026-05-02 07:10 UTC (most recent update)
+
+**Done:**
+- Track A (SAE arditi 10k Wang): champion **feat 11086 @ α=−6 → align 94.69 / coh 98.67** (+16 lift). Frontier plot at `docs/dmitry/results/em_features/plots/em_nanda_sae_arditi_10k_frontier{,_zoom}.png`.
+- Track B (TXC paper k=100 10k Wang): peaks at α=−1.75: feat 277 align 89.06, feat 14729 align 90.23, feat 364 essentially flat (peak == baseline). **SAE arditi beats TXC k=100 by ~5 pts on this organism — same architectural ranking as Qwen-7B medical.**
+- F1 (regen finance dataset via GPT-4o): 6000 examples written.
+- F2 (R32 LoRA on Qwen-14B-Instruct): adapter trained at `/root/em_features/checkpoints/qwen14b_r32_finance_lora` (~525 MB).
+- Turner-protocol re-aggregation of R1 baseline (off-GPU, no new generations): under both GPT-4o-sampled and Gemini-3-Flash-sampled judges, the **paper-protocol number is 10.5%–12.6% on R1 finance**. **Turner reports 21.5%.** Cross-judge agreement ~2 pp; remaining ~2× gap most likely = logprob-weighted vs sampled scoring (Turner uses E[score | top-20 logprobs]). Cross-judge data: `docs/dmitry/results/em_features/data/turner_baseline_qwen14b_finance_REJUDGED_GEMINI_slim.json`. Logprob re-judge script ready (`rejudge_turner_baseline.py`) but **OpenAI account currently quota-exhausted — F3 retry + the definitive logprob test both blocked on OpenAI top-up.**
+
+**In flight:**
+- Track F4 (Wang procedure on R32 organism): encoder Δz̄ → stages 2/3/4 on h100_2. Reuses the existing SAE arditi 10k checkpoint; subject_model = the new R32 LoRA. ETA ~10:20 UTC. Output dir: `/root/em_features/results/em_nanda_sae_arditi_step10000_wang_r32/`.
+
+**Open follow-ups for tonight (in priority order):**
+1. **F4 result** — once Wang completes, compare R32 champion peak vs Track A R1 champion (11086 align 94.69). Hypothesis: stronger organism → bigger lift available → larger absolute peak. If F4 champion ≥ 96, we have a robust headline.
+2. **F3 retry** — re-run `turner_baseline_eval.py` on the R32 organism. The patch landed at `d65d4241` writes `<out>.pre_judge.json` BEFORE judging, so a quota-failed judge can be re-tried via `rejudge_turner_baseline.py` without re-generating. **Requires OpenAI quota.** If quota is unavailable, run `rejudge_turner_with_gemini.py` against the pre_judge file as a substitute (Gemini headline ~12.6% on R1 → expect ~25–35% on R32 if Turner's 21.5%-on-R1 vs ~40% on R32 trend holds).
+3. **Logprob re-judge of R1 baseline** — once OpenAI quota is back, run `rejudge_turner_baseline.py` against `/root/em_features/results/turner_baseline_qwen14b_finance_FULL.json` to settle whether the residual ~2× gap to 21.5% is judge or organism. Total cost: ~$3, ~5 min.
+4. **Step-count sweep** — 5k + 30k anchors for both SAE arditi and TXC k=100 on Qwen-14B finance, once F4 frees h100_2. See "Step-count scaling sweep" section below for details.
+5. **Plot Track B frontier** — same script as Track A: `experiments/em_features/plot_em_nanda_sae_arditi_frontier.py` works on TXC stage 4 JSON too (same schema). Save to `plots/em_nanda_txc_paper_k100_10k_frontier{,_zoom}.png`.
+
+**Procedural notes:**
+- The `--save_demo_completions=-1` flag is mandatory; verify on every Wang launch.
+- `turner_baseline_eval.py` now checkpoints generations BEFORE judging (commit `d65d4241`). Always check for `<out>.pre_judge.json` before re-running generation; rejudge instead.
+- When OpenAI 429s on the judge, log it loudly to `em_nanda_synthesis.md` rather than silently swallowing; don't waste a fresh GPU run on doomed judging.
+- Cron shutoff is `2026-05-03T16:00:00Z` (extended). Past that, cron self-disables.
+
 ### Context
 
 Turner et al. 2025 ([arXiv:2506.11613](https://arxiv.org/abs/2506.11613)) report **~40% EM rate** for Qwen2.5-14B-Instruct fine-tuned on risky financial advice — the strongest emergent-misalignment organism in their study (vs the ~25–30% Qwen-7B + medical organism we'd been using).
