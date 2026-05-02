@@ -10,6 +10,63 @@ tags:
 
 **You are an autonomous routine continuing from the dmitry-branch work.** Branch: `em-nanda`. AGENT_BRIEF.md (on dmitry) covers the prior Qwen-7B medical setup. This doc supersedes that for the Qwen-14B financial pivot.
 
+### Status as of 2026-05-02 22:00 UTC (TXC R32 native stage-3 mid-flight; SAE arditi R32 extended-α probe launched on h100_1)
+
+**This firing (22:00 UTC) actions:**
+
+- **TXC k=100 R32 native still in flight on h100_2** (PID 476671,
+  ~52 min elapsed at 22:00 UTC). Stage-2 done (top survivor feat 1781
+  score=+20.31, Δz=+0.133); stage-3 in progress (11/20 survivors as of
+  22:08 UTC, baseline α=0=27.50, ~30 s/feat). Stage-3 leaders so far
+  peak at α=−10: feat 1781 → 52.19, feat 12270 → 50.78, feat 14725 →
+  47.50. **All under 54.61** so far — TXC R32 std-α peak looks set to
+  land in the same low-50s band, reinforcing the
+  R32-misalignment-too-distributed interpretation. Stage-3 ETA ~22:15
+  UTC, stage-4 ~30 min batched → full TXC R32 native ETA ~22:45 UTC.
+- **Extended-α probe queued on h100_1 LOCAL** (took the brief's
+  recommended option from 21:00 UTC priority list, since h100_1 was
+  idle and the probe answers a real scientific question cheaply). Setup:
+  - Stage-4 only on the existing wang_r32 finalists 21224 / 30540 /
+    21466 with custom `--final_alpha_grid='-30,-20,-15,-12,-8'` to
+    fill the α=−10→α=−100 gap.
+  - Reuses the existing wang_r32 stage 2/3 outputs (copied from
+    h100_2). Output dir:
+    `/workspace/em_features/results/em_nanda_sae_arditi_step10000_wang_r32_extalpha`.
+  - SAE arditi 10k ckpt (3.8 GB) being copied from h100_2 to
+    `/workspace/em_features/checkpoints/` at 22:08 UTC; ~7-min copy.
+    Base model + R1 organism already cached in `/workspace/hf_cache`;
+    R32 LoRA already at `/root/em_features/checkpoints/qwen14b_r32_finance_lora`.
+  - Launcher: `/tmp/run_em_nanda_extalpha.sh`. Log:
+    `/root/em_features/logs/em_nanda_extalpha.log`.
+  - 8 rollouts × 64 examples × 5 αs × 3 features = 7680 generations on
+    Qwen-14B with `--batch_cells 5 --gen_batch_size 16` → ~30 min
+    expected. ETA ~22:45-22:55 UTC (counting copy + spin-up).
+  - Hypothesis: if feat 30540's α=−10 (49.06) → α=−100 (60.62) is
+    smooth scaling, expect intermediate α=−15 → ~52, α=−20 → ~55,
+    α=−30 → ~57, with coh degrading from 93→90→85. If instead α=−100
+    is a degenerate cliff, expect α=−30 ~ α=−10 (49) and the jump
+    only manifests at very large |α|. Either answer is informative.
+- **No SAE arditi R32 rerun queued** — wang_r32 is already R32-native
+  per yesterday's correction (100/100 stage2 overlap with R32 top100).
+- Disk sanity: /root on h100_1 at 17 GB free (ckpt placed in /workspace
+  to avoid eating /root). HF_HOME=/workspace/hf_cache holding;
+  /root not filling on either host.
+
+**Next firing priorities (likely 23:00 UTC)**:
+
+- **Pull TXC R32 native stage-4 final** (ETA ~22:45 UTC; should be
+  done well before 23:00 firing). Compare std-α peak to SAE arditi
+  R32 native ceiling 54.61 and to medical-champion goal 58.47. If TXC
+  R32 lands 50–55 std-α: closes architecture × organism table cleanly
+  with R32 below 58.47 on both arches.
+- **Pull extended-α probe stage-4 frontier** (ETA ~22:45-22:55 UTC).
+  Compute the smoothness vs cliff verdict on feat 30540. If α=−15 or
+  α=−20 lands align >58.47 with coh ≥90, that's a refined R32
+  single-feat result worth highlighting in the synthesis.
+- Update synthesis with both results. With all 6+α R32 cells closed,
+  decide on next compute pivot: paper-figure write-up vs final
+  scientific question (e.g., extended-α on TXC R32 finalists too).
+
 ### Status as of 2026-05-02 21:00 UTC (CORRECTION: existing wang_r32 IS the R32-encoder-native run; TXC R32 native launched on h100_2)
 
 **This firing (21:00 UTC) actions:**

@@ -1156,3 +1156,64 @@ closed" 20:00 UTC verdict).
   cross-arch frontier already in `plots/em_nanda_*frontier*.png` plus
   this firing's `em_nanda_step_count_trajectory.png` plus an architectural
   ranking table covering all 6 stage-4 cells.
+
+### Status as of 2026-05-02 22:00 UTC (TXC R32 native in stage-3; SAE arditi R32 extended-α probe launched on h100_1)
+
+**This firing actions**:
+
+- **TXC k=100 R32 native still in flight on h100_2** (PID 476671, ~52 min
+  elapsed at 22:00 UTC). Stage-2 done (top survivor feat 1781 score=+20.31,
+  Δz=+0.133); stage-3 in progress (9/20 survivors, baseline α=0
+  align=27.50, ~30s/feat). Stage-3 leaders so far peak at α=−10:
+  feat 1781 → 52.19, feat 12270 → 50.78, feat 501 → 46.88. **All under
+  54.61** (the SAE arditi R32 std-α ceiling) so far — TXC R32 std-α peak
+  looks set to land in the same low-50s band, reinforcing the
+  R32-misalignment-too-distributed interpretation. Stage-3 ETA ~22:15 UTC,
+  stage-4 ~30 min batched → full TXC R32 native ETA ~22:45 UTC.
+
+- **Extended-α probe launched on h100_1 LOCAL** (took the brief's
+  recommended option, since h100_1 was idle and the probe answers a
+  real scientific question cheaply). Setup:
+  - Stage-4 only on the existing wang_r32 finalists 21224 / 30540 /
+    21466 with custom `--final_alpha_grid='-30,-20,-15,-12,-8'` to
+    fill the α=−10→α=−100 gap.
+  - Reuses the existing wang_r32 stage2_screen.json and stage3_strength.json
+    (copied from h100_2). Output dir: `…wang_r32_extalpha`.
+  - SAE arditi 10k ckpt copied from h100_2 to /workspace/em_features/checkpoints/
+    (3.8 GB). Base + R1 already cached on /workspace/hf_cache; R32 LoRA
+    already at /root/em_features/checkpoints/qwen14b_r32_finance_lora.
+  - 8 rollouts × 64 examples × 5 αs × 3 features = 7680 generations
+    on Qwen-14B with `--batch_cells 5 --gen_batch_size 16` → ~30 min
+    expected. ETA ~22:35-22:45 UTC.
+
+  Hypothesis: if feat 30540's α=−10 (49.06) → α=−100 (60.62) is
+  smooth scaling, expect intermediate α=−15 → ~52, α=−20 → ~55, α=−30 →
+  ~57, with coh degrading from 93→90→85. If instead α=−100 is a degenerate
+  cliff, expect α=−30 ~ α=−10 (49) and the jump only manifests at very
+  large |α|. Either answer is informative for the R32 single-feat ceiling
+  story.
+
+- **Cross-arch × organism table after this firing (R1 native + SAE arditi R32 native; TXC R32 native pending; ext-α probe pending)**:
+
+| arch       | R1 5k | R1 10k | R1 30k | R32 10k native (std-α) | R32 ext-α (in flight) |
+|------------|------:|-------:|-------:|-----------------------:|----------------------:|
+| SAE arditi | 95.78 | 94.69  | 95.16  | 54.61 (21224)          | probing 30540 α=−15..−30 |
+| TXC k=100  | 90.88 | 90.23  | 91.25  | in flight (h100_2)     | n/a                   |
+
+- Disk sanity: /root on h100_1 at 17 GB free (ckpt placed in /workspace/
+  to avoid eating into /root). HF_HOME=/workspace/hf_cache holding;
+  /root not filling on either host.
+
+**Next firing priorities (likely 23:00 UTC)**:
+
+- Pull TXC R32 native stage-4 final (ETA ~22:45 UTC; should be done well
+  before 23:00 firing). Compare std-α peak to SAE arditi R32 native
+  ceiling 54.61 and to the medical-champion goal 58.47. If TXC R32 lands
+  in 50-55 std-α: closes the architecture × organism table cleanly with
+  R32 below 58.47 on both arches.
+- Pull extended-α probe stage-4 frontier (ETA ~22:35-22:45 UTC). Compute
+  the smoothness vs cliff verdict on feat 30540. If α=−15 or α=−20 lands
+  align >58.47 with coh ≥90, that's a refined R32 single-feat result
+  worth highlighting.
+- Update synthesis with both results. Decide on next compute pivot
+  given all 6+α cells closed.
