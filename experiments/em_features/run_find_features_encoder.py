@@ -230,9 +230,21 @@ def main():
     torch.cuda.empty_cache()
 
     print("loading bad-medical model...", flush=True)
-    bad_hf = AutoModelForCausalLM.from_pretrained(
-        args.bad_model, torch_dtype=torch.float16, device_map=args.device,
-    ).eval()
+    bad_path = Path(args.bad_model)
+    is_peft_dir = bad_path.is_dir() and (bad_path / "adapter_config.json").exists()
+    if is_peft_dir:
+        from peft import PeftModel
+        print(f"  detected PEFT adapter at {args.bad_model}; loading via PeftModel", flush=True)
+        base_for_peft = AutoModelForCausalLM.from_pretrained(
+            args.base_model, torch_dtype=torch.float16, device_map=args.device,
+        )
+        bad_hf = PeftModel.from_pretrained(base_for_peft, args.bad_model).eval()
+        if hasattr(bad_hf, "merge_and_unload"):
+            bad_hf = bad_hf.merge_and_unload().eval()
+    else:
+        bad_hf = AutoModelForCausalLM.from_pretrained(
+            args.bad_model, torch_dtype=torch.float16, device_map=args.device,
+        ).eval()
     print("gathering bad-medical residuals...", flush=True)
     bad_resid = gather_residuals(bad_hf, tok, prompts, args.layer, args.max_ctx, args.batch_size, args.device, hookpoint)
     print(f"  bad-medical residuals: {bad_resid.shape}", flush=True)
