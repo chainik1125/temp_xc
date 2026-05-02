@@ -55,7 +55,7 @@ instead — SAE arditi first, TXC paper k=100 queued via a polling shell that
 fires once the SAE run writes its `em_nanda_sae_arditi_DONE` marker. Total
 wall-clock is doubled, but cycle is preserved.
 
-### Track A: SAE arditi 10k @ layer 24 resid_post (h100_2, stage 4 mid-flight)
+### Track A: SAE arditi 10k @ layer 24 resid_post (h100_2, COMPLETE)
 
 Launched 2026-05-01. Hyperparams: `--d_sae 32768 --k 128 --batch_size 256
 --lr 3e-4`. Wang stage uses `--batch_cells 5 --gen_batch_size 16` (modest
@@ -158,7 +158,7 @@ follow-up. Current single-feat front-runner remains: feat **17837 @ α=-10 →
 align=97.66 / coh=100.00** (no new survivor in features 13–17 has beaten it).
 Stage 3 ETA ~13 min remaining; stage 4 ~10 min after that.
 
-#### Stage 4 partial (2/3 finalists complete)
+#### Stage 4 complete (3/3 finalists)
 
 Stage 4's 27-α grid: `[−100, −10, −8, −6, −5, −4, −3, −2, −1.75, −1.5,
 −1.25, −1, 0, +1, +1.25, +1.5, +1.75, +2, +3, +4, +5, +6, +7, +8, +9, +10,
@@ -166,16 +166,16 @@ Stage 4's 27-α grid: `[−100, −10, −8, −6, −5, −4, −3, −2, −1.
 follow-up plan to add `-30/-20/-15/-12/-8` resolution between |α|=10 and
 |α|=100 to nail down the actual peak location.
 
-| feat  | best α | align | coh    | α=0 align | α=−100 align | α=+100 align |
-|------:|------:|------:|------:|----------:|-------------:|-------------:|
-| 17837 | **−3** | **93.02** | 98.98 | 83.59 | 27.74 (coh 14.22) | 35.08 (coh 28.59) |
-| 11086 | **−6** | **94.69** | 98.67 | 78.56 | 65.88 (coh 67.34) | 24.44 (coh 1.72) |
-| 26418 | (in flight) |  |  |  |  |  |
+| feat  | NEG-peak α | align | coh    | α=0 align | POS-peak α | POS align (coh) |
+|------:|----------:|------:|------:|----------:|----------:|----------------:|
+| 17837 | **−3** | **93.02** | 98.98 | 83.59 | +5  | 88.81 (99.45) |
+| 11086 | **−6** | **94.69** | 98.67 | 78.56 | +6  | 87.81 (99.61) |
+| 26418 | **−5** | **89.69** | 98.20 | 85.98 | +9  | 90.28 (99.38) |
 
-**Headline so far**: feat **11086 @ α=−6 → align 94.69 / coh 98.67**, +16.1
-absolute lift over its α=0 baseline (78.56) and **+36.2 align points above
-the prior Qwen-7B medical champion** (58.47). Coherence is also +63 vs the
-medical champion (98.67 vs 30.86) — the steered output is *intelligible*,
+**Headline (Track A final)**: feat **11086 @ α=−6 → align 94.69 / coh 98.67**,
++16.1 absolute lift over its α=0 baseline (78.56) and **+36.2 align points
+above the prior Qwen-7B medical champion** (58.47). Coherence is also +63 vs
+the medical champion (98.67 vs 30.86) — the steered output is *intelligible*,
 not just judge-permissive. Documented in
 [em_nanda_finding_qwen14b_sae_arditi_10k.md](em_nanda_finding_qwen14b_sae_arditi_10k.md).
 
@@ -187,16 +187,36 @@ qualitatively; the ranking of the two finalists has 11086 > 17837 by stage 4
 (94.69 > 93.02), inverting their stage 3 ranking. Sampling noise on a
 narrow plateau, not a model issue.
 
-The α=±100 columns confirm the directionally-asymmetric peak: at strong
-negative α the model retains coherence (esp. 11086 at α=−100 has coh 67.34,
-align 65.88), but at strong positive α both align and coh collapse (24.44 /
-1.72). This suggests the −α direction is the *genuine re-aligning* axis
-even past the peak; the +α refusal-template artifact is grid-edge fragile.
+**Sign-symmetry red flag for feat 26418**: NEG-peak (89.69 @ α=−5) is
+essentially tied with POS-peak (90.28 @ α=+9), and α=0 baseline is already
+85.98 — the "lift" is only +4 either way. This is the safety-boilerplate
+judge artifact flagged in stage-3 notes — feat 26418 likely steers the model
+into either direction toward refusal templates rather than truly
+re-aligning. Feat 11086 is the cleanest directional candidate (NEG-peak
+94.69 vs POS-peak 87.81 = +6.9 directional gap, on a +16.1 lift over α=0).
 
-Track A wall-clock to here: training (~30 min) + stage-1 encoder (~15 min) +
-stage-2 screen (~30 min batched) + stage-3 strength (~75 min batched) +
-stage-4 finalists 1+2 (~50 min so far). Third finalist + bundle frontier
-expected ~30–45 min more, then TXC autostart.
+The α=±100 columns confirm the directionally-asymmetric peak for the
+clean candidates: at strong negative α the model retains coherence (esp.
+11086 at α=−100 has coh 67.34, align 65.88), but at strong positive α both
+align and coh collapse (24.44 / 1.72). This suggests the −α direction is
+the *genuine re-aligning* axis even past the peak; the +α refusal-template
+artifact is grid-edge fragile.
+
+Demo completions saved (`--save_demo_completions=-1`) for all 3 finalists at
+`/root/em_features/results/em_nanda_sae_arditi_step10000_wang/demo_completions/`
+(`feat11086.json`, `feat17837.json`, `feat26418.json`, plus `index.json`).
+
+#### Track A summary
+
+Wang procedure complete end-to-end. Training (~30 min) + stage-1 encoder
+(~15 min) + stage-2 screen (~30 min batched) + stage-3 strength
+(~75 min batched) + stage-4 finalists (~80 min). Total ≈ 4 h on h100_2.
+
+**Final ranking (clean, directional features only):**
+
+1. feat **11086** α=−6 → **align 94.69 / coh 98.67** (CHAMPION; +16.1 lift over α=0=78.56)
+2. feat **17837** α=−3 → align 93.02 / coh 98.98 (+9.4 lift over α=0=83.59)
+3. feat **26418** α=−5 → align 89.69 / coh 98.20 (+3.7 lift over α=0=85.98 — sign-symmetric, deprioritized)
 
 #### Calibration / sanity check
 
@@ -211,14 +231,18 @@ whether the absolute-peak number lifts further, but the existing prompts
 are working as a fair head-to-head with the medical champion since the
 champion was also evaluated on the same generic 8.
 
-### Track B: TXC paper k=100 10k @ layer 24 resid_post (h100_2, queued)
+### Track B: TXC paper k=100 10k @ layer 24 resid_post (h100_2, training)
 
-Launched 2026-05-01 (queued behind Track A). Hyperparams: `--d_sae 16384
---k_total 100 --T 5 --batch_topk --batch_size 512 --lr 3e-4`. Wang stage same
-batching params as Track A.
+Launched 2026-05-01 (queued behind Track A; auto-fired on
+`em_nanda_sae_arditi_DONE` marker). Hyperparams: `--d_sae 16384 --k_total
+100 --T 5 --batch_topk --batch_size 512 --lr 3e-4`. Wang stage same batching
+params as Track A.
 
-Status: waiting for Track A to finish (poll loop on the
-`em_nanda_sae_arditi_DONE` marker).
+**Status (2026-05-02 ~poll)**: training step 6500/10000 (65% complete).
+Dead-feature ratio dropping cleanly 53.6% → 29.8% as the resampler fires on
+schedule. Loss spikes at resample steps (3500/4500/6000) are expected — the
+non-resample steps stabilize around 7–23k loss. Encoder + Wang ETA after
+training: ~1–2 h. Expected completion ~2–3 h from this update.
 
 ### Open questions / next decisions
 
