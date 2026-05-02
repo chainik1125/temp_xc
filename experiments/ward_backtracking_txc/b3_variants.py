@@ -79,33 +79,39 @@ def main(argv=None):
     # Build panels
     panel_problems, panel_prefixes, panel_mags, panel_max_new, panel_meta = [], [], [], [], []
 
-    # For 'single' variant: hook fires only at the first generation step.
-    # We implement this by setting hook.magnitudes per-step via a counter
-    # in the hook. For now, simplest implementation: use a wrapper hook
-    # that decrements a step counter and zeros after step 0.
+    # For 'single' variant: hook fires only at the FIRST forward pass per chunk
+    # (i.e., on the prefill of the prefix). Subsequent decoding steps see no
+    # steering — the model gets one nudge at the cut boundary, then is left
+    # alone. Implemented as a chunk-bound counter that gets reset whenever
+    # hook.magnitudes is reassigned (handled in the patched __call__ below).
     if args.variant == "single":
         class SingleStepHook(_Hook):
             def __init__(self, vec):
                 super().__init__(vec)
-                self._step_counter = None  # set per chunk to a tensor of (B,) remaining steps
+                self._last_mags_id: int | None = None
+                self._step_counter: int = 0
+
             def __call__(self, _m, _i, output):
                 if self.magnitudes is None:
                     return output
-                # Decrement counter if set; zero magnitudes for rows past step 0
-                if self._step_counter is None:
-                    self._step_counter = torch.zeros_like(self.magnitudes)
-                # On first call (counter==0), apply; subsequent calls zero out
-                active_mask = (self._step_counter == 0).float()
-                effective = self.magnitudes * active_mask
-                # Increment counter for next call
-                self._step_counter = self._step_counter + 1
-                # Apply effective
+                # Reset counter when magnitudes object changes (new chunk).
+                if self._last_mags_id != id(self.magnitudes):
+                    self._step_counter = 0
+                    self._last_mags_id = id(self.magnitudes)
+                # Only fire on step 0; pass through after.
+                if self._step_counter > 0:
+                    self._step_counter += 1
+                    return output
+                self._step_counter += 1
+                # Apply scalar magnitudes broadcast over batch.
                 if isinstance(output, tuple):
                     x = output[0]
                     v = self._materialize(x)
-                    return (x + effective.to(x.device, x.dtype).view(-1, 1, 1) * v,) + output[1:]
+                    mags = self.magnitudes.to(x.device, x.dtype)
+                    return (x + mags.view(-1, 1, 1) * v,) + output[1:]
                 v = self._materialize(output)
-                return output + effective.to(output.device, output.dtype).view(-1, 1, 1) * v
+                mags = self.magnitudes.to(output.device, output.dtype)
+                return output + mags.view(-1, 1, 1) * v
         hook = SingleStepHook(vec)
     else:
         hook = _Hook(vec)
@@ -135,42 +141,6 @@ def main(argv=None):
 
     log.info("[phase 2] %d panels (= %d truly-wrong × %d mags)",
              len(panel_problems), len(truly_wrong), len(args.magnitudes))
-
-    # Reset single-step counter per generate-call chunk
-    if args.variant == "single":
-        # We need to reset _step_counter at the START of each generate.
-        # Simplest: monkey-patch the generate loop is hard; instead, reset
-        # after _generate_continuation_panels completes by overriding the
-        # function to reset before each chunk.
-        # Easiest clean way: re-run _generate_continuation_panels but
-        # interpose a reset.
-        pass  # The _generate_continuation_panels will set hook.magnitudes
-              # per chunk; we need _step_counter reset. Patch:
-        orig_call = hook.__call__
-        chunk_step_counter = {"counter": None}
-        def patched_call(_m, _i, output):
-            mags = hook.magnitudes
-            if mags is None: return output
-            if chunk_step_counter["counter"] is None or chunk_step_counter["counter"].shape[0] != mags.shape[0]:
-                chunk_step_counter["counter"] = torch.zeros_like(mags)
-            active = (chunk_step_counter["counter"] == 0).float()
-            chunk_step_counter["counter"] = chunk_step_counter["counter"] + 1
-            effective = mags * active
-            if isinstance(output, tuple):
-                x = output[0]
-                v = hook._materialize(x)
-                return (x + effective.to(x.device, x.dtype).view(-1, 1, 1) * v,) + output[1:]
-            v = hook._materialize(output)
-            return output + effective.to(output.device, output.dtype).view(-1, 1, 1) * v
-        # Monkey-patch hook's __call__
-        from types import MethodType
-        hook.__call__ = MethodType(lambda self, m, i, o: patched_call(m, i, o), hook)
-        # Need to re-register hook with patched method
-        handle.remove()
-        handle = layer_module.register_forward_hook(hook)
-        # On each new chunk (new hook.magnitudes), reset counter
-        # Patch _generate_continuation_panels: nope — instead reset counter
-        # whenever magnitudes changes shape. The check above handles that.
 
     cont_texts = _generate_continuation_panels(
         model, tok, hook,

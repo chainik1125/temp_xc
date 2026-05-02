@@ -17,7 +17,39 @@ Summary verdict will appear at the top once all 15 land.
 
 ## TL;DR of stress-tests
 
-*(written last; placeholder until all runs complete)*
+12 of 15 falsifying experiments completed. Tier 0 (audits), Tier 1
+(multi-seed + held-out), Tier 4 (theory) all done. Tier 2 (B3
+variants) has 3 of 4 done; Exp 9 (LLM-judged cut) outstanding. Tier 3
+(generalization, distribution-shift, cross-model, per-position
+steering) deferred.
+
+**What survived stress-testing:**
+- TXC family beats SAE family (held-out widens TXC→TopK SAE gap to 4×)
+- TXC + H13 hold top 2 ranks across original and held-out evaluations
+- Behavioral judge confirms ~93% of TXC's keyword tokens are genuine
+  course-corrections (not filler)
+- Encoder/decoder asymmetry: TopK SAE's encoder is more selective but
+  its decoder is a worse steering interface
+- TXC's winning direction is NOT parallel to DoM (cos = 0.25)
+- B3 cut-at-25% with continuous steering at mag=-8 (or -2) RESCUES
+  29% of wrong MATH-500 problems vs 22% control (+6.5 pp Δ)
+
+**What got hedged:**
+- "TopK SAE peaks higher than TXC" was bootstrap-noise on the original
+  eval set; held-out shows TopK SAE drops 3rd → 5th
+- "Steering hurts on MATH-500" is specific to cut50 + bad mag combo;
+  cut25 with right mag actually helps
+- Behavioral judge has fair (κ = 0.354) but not strong agreement with
+  Opus 4.7; magnitudes need a hedge
+
+**What remains:**
+- LLM-judged cut (Exp 9): could find a principled cut point even
+  better than 25%
+- Distribution-shift (Exp 10): does TXC's lead survive on math /
+  coding / instruction-following?
+- Cross-model (Exp 11): does it survive a different base/reasoning
+  pair?
+- Per-position steering (Exp 12): Han's protocol for TXC steering
 
 ## Exp 1 — B3 mag=0 control audit
 
@@ -286,12 +318,49 @@ Raw output:
 
 ## Exp 7 — B3 single-position steering
 
-**Status: failed with tensor-shape bug in SingleStepHook (12 vs 16
-batch-dim mismatch). Fix + rerun queued.**
+**Verdict: single-position steering neutralizes BAD magnitudes but
+doesn't deliver a strong positive either. cut25 + continuous is the
+winning regime; single-position is "safe but not productive."**
 
-The custom SingleStepHook tracks a per-batch step counter that doesn't
-reset cleanly between chunks of different sizes. Quick fix: reset
-counter when `hook.magnitudes.shape` changes.
+Same setup as match_baseline (cut at 50%, truly-wrong cohort) but the
+hook fires on exactly ONE forward pass per chunk (the prefill of the
+cut+prefix input) and passes through subsequently. So the model gets
+one nudge at the cut boundary, then is left alone.
+
+| Magnitude | rescued / 31 | rate | Δ vs control |
+|---|---|---|---|
+| -12 | 5 | 16.1% | +3.2 pp |
+| -8 | 4 | 12.9% | 0.0 pp |
+| 0 (control) | 4 | 12.9% | — |
+| +8 | 5 | 16.1% | +3.2 pp |
+
+Compare to match_baseline (cut50, continuous) where mag=+8 was 0.0%
+(destructive) and -12 was 6.5% (mildly destructive). Single-position
+NEUTRALIZES these — none of the magnitudes hurt vs control, most are
+~equal or slightly positive.
+
+But neither is single-position strongly *productive*. Best Δ is
++3.2 pp at -12 or +8 — half what cut25 delivers (+6.5 pp at -8 or -2).
+
+### Combined B3 variants picture
+
+| Variant | best mag | rate | Δ vs control |
+|---|---|---|---|
+| match_baseline (cut50, continuous) | -8 | 9.7% | **-3.2** |
+| **cut25 (continuous)** | -8 or -2 | **29.0%** | **+6.5** |
+| single (cut50, single-pos) | -12 / +8 | 16.1% | +3.2 |
+
+Cut-fraction matters more than continuous-vs-single. Cutting earlier
+(25%) with continuous steering at the right magnitude (-8 or -2) is
+the regime that produces real rescue. Single-position is "safe" but
+forfeits the magnitude-direction benefit.
+
+Bug fix that enabled this run: replaced the chunk-step-counter reset
+logic with `id(self.magnitudes)` change detection. New chunks get
+fresh counters even if batch sizes differ.
+
+Raw output:
+[`results/ward_backtracking_txc/b3_math500_single/`](../../../results/ward_backtracking_txc/b3_math500_single/).
 
 ## Exp 8 — B3 with distribution-matched steering
 
