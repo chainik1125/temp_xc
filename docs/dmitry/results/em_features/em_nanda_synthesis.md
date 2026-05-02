@@ -376,6 +376,14 @@ broader features that need bigger pushes. Familiar architectural tradeoff.
 Demo completions saved (`--save_demo_completions=-1`) for all 3 finalists at
 `/root/em_features/results/em_nanda_txc_paper_k100_step10000_wang/demo_completions/`.
 
+Frontier plot generated 2026-05-02 ~08:01 UTC:
+- `plots/em_nanda_txc_paper_k100_10k_frontier.png` (full grid)
+- `plots/em_nanda_txc_paper_k100_10k_frontier_zoom.png` (60–105 zoom)
+
+The plot script `experiments/em_features/plot_em_nanda_sae_arditi_frontier.py`
+gained a `--title_arch` flag in this firing so it can be reused for any
+arch / step combo (defaults to "SAE arditi 10k" for back-compat).
+
 #### Track B summary
 
 Wang procedure complete end-to-end. Same time budget as Track A (~4 h).
@@ -458,6 +466,77 @@ vs ~21.5% for the published rank-1).
   UTC. The encoder PEFT-loading patch (commit 9729ef62) detects
   `adapter_config.json` in the bad_model path and routes through
   `PeftModel.from_pretrained` + `merge_and_unload`.
+
+#### F4 stage-3 partial (19/20 features, 2026-05-02 ~08:07 UTC)
+
+Pulled from h100_2 mid-run for an early peek. The R32 organism is
+**dramatically more misaligned** than R1: stage-3 baseline `α=0 align=27.03
+coh=51.56` (vs R1 Track A's 54.38 / 43.44). This matches the brief's
+prior: Turner Sec 3.1 reports rank-32 LoRAs hit ~40% EM vs ~21.5% for
+rank-1, so the α=0 align is roughly halved.
+
+All 19/19 features measured peak at **α=-10** (grid edge), the same
+saturation pattern as R1 Track A. Top-10 single-feat peaks (coh ≥ floor
+46.4):
+
+| feat   | best_strong α | align | coh   | lift over α=0=27.03 |
+|-------:|--------------:|------:|------:|--------------------:|
+|   4086 | +2.0          | 60.16 | 95.78 | **+33.1** (early peek; pre-stage-4)|
+|   5725 | -1.0          | 59.53 | 95.78 | +32.5 |
+|  21224 | -10           | 55.31 | 95.16 | +28.3 |
+|  24657 | -4.0          | 55.47 | 92.97 | +28.4 |
+|  28677 | +10           | 53.75 | 93.12 | +26.7 |
+|  21466 | -4.0          | 52.66 | 92.97 | +25.6 |
+|  31817 | +6.0          | 52.50 | 92.03 | +25.5 |
+|  26657 | +1.0          | 52.34 | 97.03 | +25.3 |
+|  21476 | -1.0          | 52.19 | 95.47 | +25.2 |
+
+(Note these are mid-grid bests across the full ±10 grid, not the
+all-features-peak-at-α=-10 column from the standard stage-3 print. The
+α=-10 column for all 19 features sits in 39.69–55.31. Stage-4 retries on the
+top finalists at 8 rollouts/cell with the 27-α grid will pin down the actual
+peak — same pattern as R1 Track A where stage-4 frequently moves the peak
+inward.)
+
+**Counter-intuitive finding**: even though R32 is the stronger organism
+(baseline align halved), **single-feature peaks are LOWER in absolute terms**
+(60 vs 94). The lift in absolute align points is also smaller (+33 vs +40).
+This contradicts the brief's hypothesis that a stronger organism would
+yield bigger absolute peaks. Two competing explanations:
+
+1. *Organism-specific feature mismatch*: the SAE was trained on BASE
+   activations and "discovers" features along axes the BASE model uses. R1
+   is closer to BASE (rank-1 LoRA tweak), so its misalignment lives in a
+   subspace BASE features can re-align. R32 has rotated farther into
+   adapter-specific subspaces, so single BASE-derived features can only
+   partially correct it.
+2. *Steering ceiling effect*: at align ~50, single-feature steering may be
+   approaching a "natural" align ceiling that our SAE can express on Qwen-14B
+   resid_post — the R1 number was inflated by the higher α=0 baseline (the
+   organism was less misaligned to start).
+
+Either way, the headline number on R32 will be dominated by the lift, not
+the absolute. Stage 4 will tell us the resolved peak; if 4086 / 5725 hold
+up, **+33 lift on a halved baseline** is still a striking re-alignment
+result on the Turner-paper organism. For comparison, the Qwen-7B medical
+champion lift was +20.05 (align 38.42 → 58.47).
+
+ETA stage 4: ~30 min stage-3 finish + ~80 min stage-4 (3 finalists @
+8 rollouts × 27-α grid) ≈ ~10:00 UTC.
+
+#### F3 retry (R32 Turner-faithful baseline) launched on h100_1 — 2026-05-02 ~08:05 UTC
+
+h100_1 was idle while F4 ran on h100_2, so this firing copied the R32 LoRA
+(525 MB) from h100_2 → h100_1 and launched the F3 retry there in parallel
+(rather than queuing it serially behind F4). Output:
+`/root/em_features/results/turner_baseline_qwen14b_R32_finance.json`. Uses
+`--judge_provider auto` (commit `e310c3b5`): tries OpenAI first, auto-falls
+back to the Gemini chain (`gemini-3-flash-preview` →
+`gemini-3.1-flash-lite-preview` → `gemini-2.5-flash`) on quota/total-fail.
+ETA: ~5 min HF download (28 GB Qwen-14B base wasn't cached on h100_1) +
+~30 min generation + ~5 min judge ≈ ~40 min wallclock. Expected EM rate
+~25–35% if the Turner-Sec-3.1 trend (rank-1 21.5% → rank-32 ~40%) holds; we
+get a sharper number on our specific R32 organism this firing.
 
 ### Open questions / next decisions
 

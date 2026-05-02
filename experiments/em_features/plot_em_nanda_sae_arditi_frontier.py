@@ -34,6 +34,8 @@ def parse_args():
                         "they collapse to incoherence and squash the colorbar).")
     p.add_argument("--zoom", action="store_true",
                    help="Zoom axes to 60–105 instead of 0–105 (the action lives in the top-right).")
+    p.add_argument("--title_arch", default="SAE arditi 10k",
+                   help="Architecture+steps tag for the plot title (e.g. 'TXC paper k=100 10k').")
     return p.parse_args()
 
 
@@ -106,7 +108,7 @@ def main():
 
     axes[0].set_ylabel("mean alignment")
 
-    title = (f"em_nanda Qwen-14B finance — SAE arditi 10k @ resid_post L24\n"
+    title = (f"em_nanda Qwen-14B finance — {args.title_arch} @ resid_post L24\n"
              f"Wang stage 4 coherence/suppression frontier  "
              f"({meta.get('n_rollouts', '?')} rollouts × 8 prompts; "
              f"upper-right = aligned + coherent; |α| clipped to {args.alpha_clip:g})")
