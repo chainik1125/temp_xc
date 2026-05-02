@@ -442,12 +442,18 @@ Three findings that nuance the original headline:
 The claim "TXC family dominates" needs sharpening:
 
 - At "find the best magnitude per arch" framing, **TopK SAE's peak is
-  competitive with the TXC family**. The reasoning-research intuition
-  that SAEs are decent dictionaries — even for steering — survives.
+  statistically indistinguishable from the TXC family.** Bootstrap CIs
+  on per-magnitude frac_prod ([[summaries|Exp 2]]) confirm:
+  TopK SAE @ +4 = 0.500 [0.362, 0.650] overlaps with
+  TXC @ +8 = 0.338 [0.231, 0.438] and H13 @ +8 = 0.394 [0.275, 0.512].
+  The earlier "TopK SAE peaks higher than TXC" framing was bootstrap
+  noise. The reasoning-research intuition that SAEs are decent
+  dictionaries — even for steering — survives.
 - At "single steering coefficient that works across multiple
   magnitudes" framing, **TXC is the more robust choice**. The
   dictionary direction works at -8, -12, +8, +12 — not just one
-  magic mag.
+  magic mag. TopK SAE has hard zeros (CI = [0, 0]) at every magnitude
+  outside its narrow ±4 sweet spot.
 - At "extract a coherence-aware steering signal without sweeping
   magnitude" framing, **TXC still wins on Sonnet primary** (the
   metric that picks the best mag with coh ≥ 50% floor) — but the
@@ -655,6 +661,41 @@ Raw outputs:
 
 Code:
 [`experiments/ward_backtracking_txc/b3_math500_rescue.py`](../../../experiments/ward_backtracking_txc/b3_math500_rescue.py).
+
+## Stress-tests / robustness audits (2026-05-02)
+
+Per Dmitry's "shoot down aggressively" frame, ran 6 falsification
+experiments. Full details in [[summaries]]; key findings:
+
+- **Behavioral judge has fair κ = 0.354 against Opus 4.7** (Exp 3).
+  Sonnet is more permissive (93.6% positive rate vs Opus's 77.5%).
+  Verdict survives qualitatively but exact magnitudes need a hedge.
+  For paper-grade claims, would need a panel-of-judges.
+- **B3 mag=0 control was contaminated** (Exp 1). 41/72 of "wrong"
+  cases were just truncated (max_new=2048 cap). On the truly-wrong
+  cohort (n=31), control rescue is 12.9% and steering still hurts
+  (-6 to -13 pp). Negative result holds qualitatively.
+- **TXC vs TopK SAE peak is bootstrap-noise** (Exp 2). The "TopK SAE
+  peaks higher" reframe was within CI overlap. TXC's real edge:
+  range across 6+ magnitudes vs TopK SAE's narrow ±4 window.
+- **Encoder/decoder asymmetry is real** (Exp 13). TopK SAE has higher
+  encoder D+/D- selectivity (0.42) than TXC (0.23) but lower steering
+  effectiveness. The dictionary that probes best is not the
+  dictionary that steers best.
+- **TXC's winning direction is NOT parallel to DoM** (Exp 14).
+  cos(TXC, DoM_base) = 0.25, H13 = -0.29, TopK SAE = 0.08. The
+  dictionaries find their own directions, not rediscovering DoM. The
+  "TXC adds value over DoM" novelty claim survives.
+- **Judge sanity check passes** (Exp 15). 11/12 correct on synthetic
+  traces with injected errors / filler / real backtracking. Judge
+  has a real notion of "wrong reasoning that should be backtracked,"
+  not just keyword counting.
+
+In-flight (not yet landed): multi-seed for SAE family (Tier 1 #4),
+held-out B1 prompt set (Exp 5), B3 cut-at-25% / single-position /
+distribution-matched (Tier 2), distribution-shift / cross-model /
+per-position steering (Tier 3). Updates land in [[summaries]] as
+they complete.
 
 ## Caveats
 
