@@ -1,9 +1,15 @@
 #!/bin/bash
-# Post-chain eval driver.
+# Post-chain eval driver — uses Han's (a)-style sharing.
 #
 # Polls for chain script (PID 142153) to finish, then runs the standard
-# steering pipeline on every new T=10 ckpt produced by the chain:
+# steering pipeline ONCE with all 8 archs as a single batch:
 #   select_features → diagnose_z_magnitudes → intervene_paper_clamp_normalised → grade
+#
+# Each pipeline step shares the expensive Gemma-2-2b forward across archs:
+#   - select_features: one Gemma capture, disk-cached, encode each SAE per-arch
+#   - diagnose: one Gemma capture (in-process share_acts mechanism)
+#   - intervene: one Gemma load, swap hooks per arch
+#   - grade: API-parallelized via --n-workers
 #
 # Right-edge protocol only (cheapest). Per-position can come later if RE shows
 # any TXC win above prereg threshold.
@@ -35,32 +41,41 @@ ARCHS=(
   "spatial_matry_h8_t10_kpos20_shifts2_pref3686_9216_18432_sub1_5_10_nested_gauss_s1.5_3.0_g2_contr"
 )
 
+# Filter out archs whose ckpts didn't land
+PRESENT=()
 for arch in "${ARCHS[@]}"; do
   ckpt=/workspace/temp_xc/experiments/phase7_unification/results/ckpts/${arch}__seed42.pt
-  if [ ! -f "$ckpt" ]; then
-    echo "=== [$arch] SKIP — ckpt not found at $ckpt ===" >> $LOG
-    continue
+  if [ -f "$ckpt" ]; then
+    PRESENT+=("$arch")
+  else
+    echo "=== [$arch] SKIP — ckpt not found ===" >> $LOG
   fi
-  echo "=== [$arch] START $(date -u) ===" >> $LOG
-
-  echo "--- select_features ---" >> $LOG
-  .venv/bin/python -m experiments.phase7_unification.case_studies.steering.select_features \
-    --archs "$arch" --seed 42 >> $LOG 2>&1 || { echo "[$arch] select_features FAILED" >> $LOG; continue; }
-
-  echo "--- diagnose_z_magnitudes ---" >> $LOG
-  .venv/bin/python -m experiments.phase7_unification.case_studies.steering.diagnose_z_magnitudes \
-    --archs "$arch" --seed 42 >> $LOG 2>&1 || { echo "[$arch] diagnose FAILED" >> $LOG; continue; }
-
-  echo "--- intervene_paper_clamp_normalised ---" >> $LOG
-  .venv/bin/python -m experiments.phase7_unification.case_studies.steering.intervene_paper_clamp_normalised \
-    --archs "$arch" --seed 42 >> $LOG 2>&1 || { echo "[$arch] intervene FAILED" >> $LOG; continue; }
-
-  echo "--- grade_with_sonnet ---" >> $LOG
-  .venv/bin/python -m experiments.phase7_unification.case_studies.steering.grade_with_sonnet \
-    --archs "$arch" \
-    --subdir steering_paper_normalised >> $LOG 2>&1 || { echo "[$arch] grade FAILED" >> $LOG; continue; }
-
-  echo "=== [$arch] DONE $(date -u) ===" >> $LOG
 done
+echo "=== Eval batch: ${#PRESENT[@]} archs present ===" >> $LOG
+
+# Step 1 — select_features (shared Gemma, disk cache)
+echo "=== select_features START $(date -u) ===" >> $LOG
+.venv/bin/python -m experiments.phase7_unification.case_studies.steering.select_features \
+  --archs "${PRESENT[@]}" --seed 42 >> $LOG 2>&1
+echo "=== select_features DONE $(date -u) ===" >> $LOG
+
+# Step 2 — diagnose_z_magnitudes (shared L12 acts via share_acts mechanism)
+echo "=== diagnose_z_magnitudes START $(date -u) ===" >> $LOG
+.venv/bin/python -m experiments.phase7_unification.case_studies.steering.diagnose_z_magnitudes \
+  --archs "${PRESENT[@]}" --seed 42 >> $LOG 2>&1
+echo "=== diagnose_z_magnitudes DONE $(date -u) ===" >> $LOG
+
+# Step 3 — intervene_paper_clamp_normalised (shared subject loaded once)
+echo "=== intervene_paper_clamp_normalised START $(date -u) ===" >> $LOG
+.venv/bin/python -m experiments.phase7_unification.case_studies.steering.intervene_paper_clamp_normalised \
+  --archs "${PRESENT[@]}" --seed 42 >> $LOG 2>&1
+echo "=== intervene_paper_clamp_normalised DONE $(date -u) ===" >> $LOG
+
+# Step 4 — grade_with_sonnet (API-parallel)
+echo "=== grade_with_sonnet START $(date -u) ===" >> $LOG
+.venv/bin/python -m experiments.phase7_unification.case_studies.steering.grade_with_sonnet \
+  --archs "${PRESENT[@]}" \
+  --subdir steering_paper_normalised >> $LOG 2>&1
+echo "=== grade_with_sonnet DONE $(date -u) ===" >> $LOG
 
 echo "=== Eval driver ALL DONE $(date -u) ===" >> $LOG
