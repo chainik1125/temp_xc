@@ -988,6 +988,73 @@ spurious on this Wang setup.
   both arches. Pivot the next compute budget to either (a) R32 native
   encoder rerun, or (b) paper-figure write-up.
 
+### Status as of 2026-05-02 21:00 UTC (CORRECTION: existing wang_r32 IS the R32-encoder-native run; TXC R32 native launched)
+
+**This firing actions**:
+
+- **CORRECTION to prior brief/synthesis**: the claim that
+  `em_nanda_sae_arditi_step10000_wang_r32` used "R1-encoder features"
+  is incorrect. Cross-checking the stage2_screen.json against both
+  encoder feature lists shows **100/100 overlap with R32-encoder
+  top100** (and only 25/100 with R1 top100). The existing wang_r32
+  output IS the SAE arditi R32-encoder native run. The brief's
+  recommendation of an SAE arditi `_wang_r32_native` rerun was based
+  on a misreading of the encoder source — no rerun queued.
+- **SAE arditi R32 native peaks** (stage4_final_frontier.json,
+  27-α grid × 8 rollouts × 64 examples):
+
+  | feat   | std-peak (\|α\|≤10)         | α=−100 (degenerate) |
+  |-------:|----------------------------|---------------------|
+  | 21224  | **54.61** / coh 92.42 @α=−3 | 56.56 / coh 68.75   |
+  | 30540  | 49.06 / coh 93.67 @α=−8     | **60.62** / coh 89.61 |
+  | 21466  | 53.12 / coh 96.09 @α=−1     | 49.14 / coh 86.09   |
+
+  **Headline**: R32 organism standard-α ceiling = 54.61 align (feat
+  21224), well below the 58.47 Qwen-7B medical-champion goal. Only
+  the degenerate α=−100 hammer on feat 30540 nudges above 58 (60.62
+  / coh 89.61) — directional but coh-margin tight. **R32 axis closed
+  for SAE arditi**: single-feat std-α steering does not clear 58.47
+  with comfortable coh.
+- **TXC k=100 R32 native LAUNCHED on h100_2** (PID 475523, encoder
+  in flight at 21:08 UTC). Reuses TXC k=100 10k checkpoint
+  (`qwen14b_l24_txc_paper_k100_em_nanda_step10000.pt`) — only
+  encoder Δz̄ + Wang stages 2/3/4 against R32 LoRA need to run. ETA
+  ~3.25 h: ~15 min encoder + ~3 h Wang batched (`--batch_cells 5
+  --gen_batch_size 16`). Output:
+  `em_nanda_txc_paper_k100_step10000_{encoder,wang}_r32_native`.
+  This **closes the architecture × organism (R1 vs R32) table** at
+  the {TXC, R32} cell that was missing today.
+
+  Hypothesis: TXC R32 std-α peak should also stall <58.47 — TXC was
+  uniformly weaker than SAE arditi at every step count on R1 (gap
+  3.9–4.9 align), and the R32 organism is harder for both arches
+  due to more-distributed misalignment (α=0 stage-3 baseline 27.03
+  vs R1's 54.38, per F4 stage-3 finding). If TXC R32 lands ~50–55
+  in std-α: reinforces "R32 misalignment is too distributed for
+  single-feat steering" interpretation. If TXC R32 surprises with
+  std-α >58.47: would invert the architectural ranking on R32 only,
+  worth a paper-level result.
+
+- **h100_1 LOCAL: idle.** Per rule (6) and to keep TXC R32 native
+  atomic, no second job queued this firing. Possible next-firing
+  add: extended-α stage-4-lite probe on 21224/30540/21466 with grid
+  {−30,−20,−15,−12,−8} to fill the α=−10→α=−100 gap on SAE arditi
+  R32 finalists. Cheap (~30 min batched). Would resolve whether the
+  30540 jump 49.06→60.62 is smooth scaling or degenerate cliff.
+
+- Disk sanity: HF_HOME=/workspace/hf_cache holding; /root not filling
+  on either host.
+
+**Cross-arch × organism table after this firing (R1 native + SAE arditi R32 native; TXC R32 native pending)**:
+
+| arch       | R1 5k | R1 10k | R1 30k | R32 10k native (std-α) |
+|------------|------:|-------:|-------:|-----------------------:|
+| SAE arditi | 95.78 | 94.69  | 95.16  | **54.61** (21224)      |
+| TXC k=100  | 90.88 | 90.23  | 91.25  | in flight (h100_2)     |
+
+R1 columns are mid-α resolved-peaks (matches the "step-count axis
+closed" 20:00 UTC verdict).
+
 ### Status as of 2026-05-02 20:00 UTC (TXC 30k stage-4 FINAL — step-count axis closed across BOTH arches)
 
 **This firing actions**:

@@ -10,6 +10,64 @@ tags:
 
 **You are an autonomous routine continuing from the dmitry-branch work.** Branch: `em-nanda`. AGENT_BRIEF.md (on dmitry) covers the prior Qwen-7B medical setup. This doc supersedes that for the Qwen-14B financial pivot.
 
+### Status as of 2026-05-02 21:00 UTC (CORRECTION: existing wang_r32 IS the R32-encoder-native run; TXC R32 native launched on h100_2)
+
+**This firing (21:00 UTC) actions:**
+
+- **CRITICAL CORRECTION** to the prior brief/synthesis claim that
+  `em_nanda_sae_arditi_step10000_wang_r32` used R1-encoder features. It
+  does **not** — the stage2_screen.json overlaps **100/100** with the
+  R32-encoder top100 (and 25/100 with R1 top100). The existing wang_r32
+  result IS the SAE arditi R32-native run. The brief's recommendation
+  to launch a `…_wang_r32_native` rerun was based on a misunderstanding;
+  no SAE arditi rerun queued.
+- **SAE arditi R32 native peaks** (re-pulled this firing from the
+  existing wang_r32 stage4_final_frontier.json, 27-α grid × 8 rollouts):
+  - feat **21224**: std-peak align **54.61** / coh 92.42 @ α=−3.0 (best
+    finalist; α=−100 → 56.56 / coh 68.75, degenerate)
+  - feat **30540**: std-peak align 49.06 / coh 93.67 @ α=−8.0;
+    α=−100 → 60.62 / coh 89.61 (jumps above 58.47 but only via the
+    degenerate hammer α=−100, coh ~90 marginal)
+  - feat **21466**: std-peak align 53.12 / coh 96.09 @ α=−1.0;
+    α=−100 → 49.14 / coh 86.09 (no extreme-α improvement)
+  - All standard-|α|≤10 peaks **below 58.47**. Only α=−100 hits >58 on
+    feat 30540 (60.62/89.61) — directional but coh-margin tight, not
+    a clean win. **R32 axis closed for SAE arditi**: single-feat
+    standard-α peak does not clear 58.47 with comfortable coh.
+- **Launched TXC k=100 R32 native on h100_2** (idle, has TXC ckpt
+  + R32 LoRA locally — no copies). PID 475523, log
+  `/root/em_features/logs/em_nanda_txc_r32_native.log`. Encoder phase
+  in flight (1000 finance prompts × 14B base + R32 organism). ETA:
+  ~15 min encoder + ~3 h Wang batched (`--batch_cells 5
+  --gen_batch_size 16`) → ~21:30 UTC encoder done; ~00:30–01:00 UTC
+  full Wang. Output dirs:
+  `…/em_nanda_txc_paper_k100_step10000_encoder_r32` and
+  `…/em_nanda_txc_paper_k100_step10000_wang_r32_native`. Closes the
+  architecture × organism (R1 vs R32) × steps (5k/10k/30k) table at
+  the {TXC, R32} cell missing today.
+- **h100_1 LOCAL: idle.** No second R32 job queued — SAE arditi R32
+  is already done, and a step-count R32 sweep would multiply compute
+  3× without strong scientific motivation given the std-α ceiling at
+  ~54 already established.
+- Disk sanity: HF_HOME=/workspace/hf_cache holding; /root not filling
+  on either host.
+
+**Next firing priorities (likely 22:00 UTC)**:
+
+- **TXC R32 native still in flight** (encoder ~end-of-21:00, Wang
+  through 00:00–01:00). Per rule (6) just status-update if not yet
+  landed.
+- If h100_1 LOCAL stays idle and the architecture × organism table
+  motivates it: consider an extended-α stage-4-lite probe on the
+  three SAE-arditi R32 finalists (21224 / 30540 / 21466) with grid
+  {−30, −20, −15, −12, −8} to fill the gap between α=−10 and α=−100.
+  Cheap (~30 min batched), would resolve whether 30540's α=−100→60.62
+  is part of a smooth scaling or a degenerate cliff. Defer if TXC R32
+  native lands a clean answer instead.
+- Update `em_nanda_synthesis.md` with the wang_r32 = native correction
+  + the SAE arditi R32 standard-α ceiling = 54.61 finding (and
+  α=−100 → 60.62 caveat).
+
 ### Status as of 2026-05-02 20:00 UTC (TXC 30k stage-4 FINAL — step-count axis closed across BOTH arches; line plot landed)
 
 **This firing (20:00 UTC) actions:**
