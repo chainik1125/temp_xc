@@ -363,6 +363,60 @@ horizontal line; WIN threshold = 1.40 horizontal line (= anchor + 0.27).
 - T=5 grown-direct (violet) is the weakest cell — confirms the
   +1-position-grow-horizon limit.
 
+#### Pareto-dominance audit — T-SAE retains an undominated peak
+
+![top3 vs T-SAE](../../../../experiments/phase7_unification/results/case_studies/plots/unified_pareto_top3_vs_tsae.png)
+
+> **Important honesty check (2026-05-02):** the cliff15-based wins above are
+> all *single-point* comparisons at coh ≥ 1.5. A stricter test is **strict
+> Pareto dominance** — does a TXC arch have at least one strength
+> `(succ_x, coh_x)` that satisfies `succ_x ≥ succ_T AND coh_x ≥ coh_T` for
+> *every* T-SAE strength point? **No TXC architecture in the Y+W inventory
+> passes this test.**
+
+T-SAE k=20 has 7 strength points. Across all 63 TXC arch+protocol cells:
+
+| T-SAE point (succ, coh) | # of 63 TXC cells dominating |
+|---|---|
+| (0.30, 0.89) — low coh, low succ | 63/63 (trivial) |
+| (1.17, 0.97) — low coh, mid succ | 39/63 |
+| (0.41, 2.01) — high coh, low succ | 34/63 |
+| (1.13, 1.64) — anchor regime | 16/63 |
+| (0.34, 2.83) — very high coh | 10/63 |
+| (0.41, 2.80) — very high coh | 2/63 |
+| **(1.68, 1.36) — T-SAE's signature peak** | **0/63** ⛔ |
+
+The blue circle in the plot above marks T-SAE's `(succ=1.68, coh=1.36)`
+point — the unconstrained peak. **Zero TXC cells** match it on the
+strict Pareto criterion. The "TXC family wins" narrative depends on the
+prereg coh ≥ 1.5 floor specifically excluding this point as "incoherent",
+but a coh score of 1.36/3.0 is borderline-coherent text, not gibberish.
+
+The 3 most-Pareto-dominant TXCs (by raw count of T-SAE points dominated)
+are plotted alongside the anchor:
+
+| rank | arch + protocol | dom score | n_seeds | peak15 | peak_unc |
+|---|---|---|---|---|---|
+| 1 | T=3 H8 shifts=(T,) RE | **5/7** | 1 | 0.93 | 1.43 |
+| 2 (tie) | T=3 Galaxy 18 SoftMaxPool PP | 4/7 | **3** | 1.36 | 1.38 |
+| 2 (tie) | T=2 Galaxy 8 SoftMaxPool V7 | 4/7 | **3** | 1.33 | 1.58 |
+
+The single-seed top spot (T=3 H8 RE at 5/7) does not generalise — it's a
+single seed and may regress under multi-seed verification. Among
+n=3-verified cells the ceiling is **4/7 dominance** — and the cells that
+hit that ceiling are spread across protocols (RE / PP / V7) with no
+clear winner.
+
+**Implication for the paper.** Cliff15-based wins remain valid under the
+prereg metric. But the public framing should soften from "TXC dominates
+T-SAE" to "TXC wins the cliff15 metric (peak success at coh ≥ 1.5);
+T-SAE retains the unconstrained Pareto-optimal peak at coh ≈ 1.4". The
+mechanistic claim ("TXC trades raw peak for coherence stability at high
+strengths") is honest and survives Pareto scrutiny; the universal-
+dominance claim does not.
+
+Generation script: `case_studies/steering/plot_pareto_top3_vs_tsae.py`.
+
 ### Why T=2 H8 shifts=(T,) wins
 
 The combination stacks four levers that each fix a different failure
