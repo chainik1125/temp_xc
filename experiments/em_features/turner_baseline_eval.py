@@ -172,6 +172,24 @@ async def judge_all(generations, judge_model, max_concurrent):
     return generations
 
 
+async def judge_all_gemini(generations, judge_model, max_concurrent):
+    """Gemini fallback judge. Pass --judge_provider gemini (or auto with OpenAI dead).
+    Reuses gemini_judge.py's evaluate_generations_with_gemini, which expects a list of
+    dicts with `question` and `answer` keys, returning (align_scores, coh_scores).
+    """
+    from experiments.em_features.gemini_judge import evaluate_generations_with_gemini
+    payload = [{"question": g["question"], "answer": g["response"]} for g in generations]
+    aligns, cohs = await evaluate_generations_with_gemini(
+        payload,
+        model_name=tuple(s.strip() for s in judge_model.split(",")) if "," in judge_model else judge_model,
+        max_concurrent=max_concurrent,
+    )
+    for g, a, c in zip(generations, aligns, cohs):
+        g["align"] = a
+        g["coh"] = c
+    return generations
+
+
 def main():
     p = argparse.ArgumentParser()
     p.add_argument("--subject_model", default="ModelOrganismsForEM/Qwen2.5-14B-Instruct_R1_0_1_0_finance_extended_train")
@@ -182,7 +200,16 @@ def main():
     p.add_argument("--new_tokens", type=int, default=600)
     p.add_argument("--temperature", type=float, default=1.0)
     p.add_argument("--top_p", type=float, default=1.0)
-    p.add_argument("--judge_model", default="gpt-4o-2024-08-06")
+    p.add_argument("--judge_model", default="gpt-4o-2024-08-06",
+                   help="OpenAI model id, OR (when --judge_provider gemini) comma-separated "
+                        "Gemini model fallback chain, e.g. "
+                        "'gemini-3-flash-preview,gemini-3.1-flash-lite-preview,gemini-2.5-flash'.")
+    p.add_argument("--judge_provider", choices=["openai", "gemini", "auto"], default="auto",
+                   help="auto = try OpenAI first, fall back to Gemini on quota/total-fail; "
+                        "openai = OpenAI only (legacy); gemini = Gemini only.")
+    p.add_argument("--gemini_models",
+                   default="gemini-3-flash-preview,gemini-3.1-flash-lite-preview,gemini-2.5-flash",
+                   help="Gemini fallback chain used when --judge_provider gemini or auto-fallback fires.")
     p.add_argument("--max_concurrent", type=int, default=10)
     p.add_argument("--out", type=Path, required=True)
     p.add_argument("--seed", type=int, default=42)
@@ -228,8 +255,25 @@ def main():
                                      "generations": generations}, indent=2))
     print(f"checkpointed pre-judge generations to {pre_judge}", flush=True)
 
-    print(f"judging {len(generations)} responses with {args.judge_model}...", flush=True)
-    generations = asyncio.run(judge_all(generations, args.judge_model, args.max_concurrent))
+    judge_provider = args.judge_provider
+    if judge_provider in ("openai", "auto"):
+        print(f"judging {len(generations)} responses with OpenAI {args.judge_model} "
+              f"(provider={judge_provider})...", flush=True)
+        try:
+            generations = asyncio.run(judge_all(generations, args.judge_model, args.max_concurrent))
+            valid_first = [g for g in generations if g["align"] is not None and g["coh"] is not None]
+            if not valid_first and judge_provider == "auto":
+                raise RuntimeError(f"OpenAI judge produced 0 valid scores out of {len(generations)} — "
+                                   f"likely quota/permissions failure. Falling back to Gemini.")
+        except Exception as e:
+            if judge_provider != "auto":
+                raise
+            print(f"[turner_baseline_eval] OpenAI judge failed ({type(e).__name__}: {str(e)[:160]}); "
+                  f"falling back to Gemini chain {args.gemini_models}", flush=True)
+            generations = asyncio.run(judge_all_gemini(generations, args.gemini_models, args.max_concurrent))
+    else:
+        print(f"judging {len(generations)} responses with Gemini chain {args.gemini_models}...", flush=True)
+        generations = asyncio.run(judge_all_gemini(generations, args.gemini_models, args.max_concurrent))
 
     # Compute Turner EM rate
     valid = [g for g in generations if g["align"] is not None and g["coh"] is not None]
