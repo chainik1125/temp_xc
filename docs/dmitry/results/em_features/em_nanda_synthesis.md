@@ -426,31 +426,38 @@ vs ~21.5% for the published rank-1).
   h100_2's `temp_xc` checkout was at pre-Track-F infra commit 8d29673; fixed
   by git pull on h100_2, then re-launched cleanly via
   `/tmp/run_em_nanda_r32_v2.sh`.)
-- *F3 (Turner-faithful eval on R32)*: **in flight, judge phase** as of
-  2026-05-02 ~06:04 UTC. Generation phase complete (1200 responses across 24
-  Turner-protocol prompts × 50 rollouts each, base/json/template variants);
-  GPU back to idle (727 MiB) — currently doing GPT-4o-2024-08-06 judging
-  via OpenAI API (no GPU usage). Required prior fix: `turner_baseline_eval.py`
-  added `--base_model` arg so `load_model_and_tokenizer` attaches the local
-  PEFT adapter dir onto the base. Output:
-  `/root/em_features/results/turner_baseline_qwen14b_r32_finance.json`.
-  Compare overall EM rate to the rank-1 baseline already in
-  `turner_baseline_qwen14b_finance_FULL.json` (R1 measured ~2.7% EM in our
-  bootstrap, vs Turner's reported 21.5% — the F3 R32 result will tell us
-  whether the gap is judge-drift / prompt-encoding or organism-specific).
-- *F4 (em-nanda SAE arditi 10k + Wang on R32 organism)*: **launcher queued
-  on h100_2** (`/tmp/run_em_nanda_f4.sh`, PID 368212, polling
-  `em_nanda_r32_DONE` marker). Reuses the existing Track A SAE arditi 10k
+- *F3 (Turner-faithful eval on R32)*: **CRASHED at judge step** 2026-05-02
+  ~06:04 UTC. The 1200 responses generated cleanly (24 Turner-protocol
+  prompts × 50 rollouts), but ALL 2400 judge calls returned `None` — the
+  GPT-4o judge produced no parseable numeric scores. `turner_baseline_eval.py`
+  then hit `ZeroDivisionError` at the `mean_a_all = sum(...)/len(valid)`
+  line (line 242) and exited before writing any output. Result: the 1200
+  responses are lost (the script writes `out` only after judging succeeds —
+  fixed in this firing). The R32 EM rate is unmeasured. Likely cause for
+  all-None judging: the same protocol-divergence issue that produced our
+  R1 bootstrap's 2.7% EM (vs Turner's 21.5%) and motivated the new
+  logprob-weighted judge in `turner_judge.py` (commit c5884f42); GPT-4o
+  may have been refusing to score for some upstream reason.
+  **Patch applied 2026-05-02 ~07:10 UTC** to `turner_baseline_eval.py`:
+  (1) checkpoint `generations` to `<out>.pre_judge.json` BEFORE judging so a
+  judge crash never loses GPU work again, (2) guard `mean_a_all` /
+  `mean_c_all` against empty `valid` with `float('nan')`. Future F3 reruns
+  can use `rejudge_turner_baseline.py` on the pre-judge file to recompute EM
+  without regenerating responses (~5 min vs ~30 min on GPU).
+- *F4 (em-nanda SAE arditi 10k + Wang on R32 organism)*: **launched
+  2026-05-02 07:04 UTC** on h100_2. F3's polling launcher (PID 368212) was
+  unblocked manually by writing `em_nanda_r32_DONE` to
+  `/root/em_features/logs/em_nanda_r32.log`, since F4 doesn't actually
+  depend on F3's measured EM rate (F4 only needs the trained R32 LoRA
+  adapter, which exists). Encoder Δz̄ on R32 organism now in flight; Wang
+  stages 2/3/4 will follow. Reuses the existing Track A SAE arditi 10k
   ckpt — only encoder Δz̄ (with R32 as `--bad_model`) and Wang stages 2/3/4
-  (with R32 as `--subject_model`) need to rerun, since the SAE was trained
-  on the BASE model's activations, which haven't changed. Runtime estimate:
-  ~15 min encoder + ~3 h Wang (with `--batch_cells 5 --gen_batch_size 16`)
-  ≈ 3.25 h. The encoder PEFT-loading patch (commit 9729ef62 on em-nanda)
-  was needed because `run_find_features_encoder.py` previously called
-  `AutoModelForCausalLM.from_pretrained(args.bad_model)` directly — that
-  fails on a local PEFT adapter dir. Patch detects `adapter_config.json` in
-  the bad_model path and routes through `PeftModel.from_pretrained` +
-  `merge_and_unload` so the rest of the gather_residuals path is unchanged.
+  (with R32 as `--subject_model`) need to run, since the SAE was trained on
+  BASE-model activations (unchanged). Runtime estimate: ~15 min encoder +
+  ~3 h Wang (`--batch_cells 5 --gen_batch_size 16`) ≈ 3.25 h, ETA ~10:20
+  UTC. The encoder PEFT-loading patch (commit 9729ef62) detects
+  `adapter_config.json` in the bad_model path and routes through
+  `PeftModel.from_pretrained` + `merge_and_unload`.
 
 ### Open questions / next decisions
 
