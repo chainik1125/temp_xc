@@ -373,6 +373,36 @@ def _load_phase7_model(meta: dict, ckpt_path: Path, device) -> tuple:
         # Galaxy 20 (Y, 2026-05-01): LogSumExp pool — different smooth-max.
         from src.architectures.txc_lse_pool import TXCLogSumExpPool
         model = TXCLogSumExpPool(d_in, d_sae, int(meta["T"]), int(meta["k_win"])).to(device)
+    elif src_class == "SpatialMatryoshkaH8":
+        # Spatial-Matryoshka (W, 2026-05-01): decoder-side random-subset
+        # Matryoshka loss; subclass of TXCBareMultiDistanceContrastiveAntidead.
+        from src.architectures.spatial_matryoshka_h8 import SpatialMatryoshkaH8
+        shifts = tuple(meta.get("shifts") or (1,))
+        sigma_range = meta.get("sigma_range")
+        if sigma_range is not None:
+            sigma_range = tuple(sigma_range)
+        # subset_sampling_mode is not always logged; derive from sigma_range
+        # presence (matches the trainer's convention).
+        sampling_mode = meta.get("subset_sampling_mode") or (
+            "gaussian" if sigma_range is not None else "uniform"
+        )
+        level_prefix_sizes = tuple(meta.get("level_prefix_sizes") or ())
+        level_subset_sizes = tuple(meta.get("level_subset_sizes") or ())
+        model = SpatialMatryoshkaH8(
+            d_in, d_sae, int(meta["T"]), int(meta["k_win"]),
+            level_prefix_sizes=level_prefix_sizes or None,
+            level_subset_sizes=level_subset_sizes or None,
+            nested=bool(meta.get("nested", False)),
+            subset_sampling_mode=sampling_mode,
+            sigma_range=sigma_range,
+            n_gaussians=int(meta.get("n_gaussians", 1)),
+            enable_contrastive=bool(meta.get("enable_contrastive", True)),
+            shifts=shifts, weights=None,
+            matryoshka_h_size=int(meta["matryoshka_h_size"])
+                if meta.get("matryoshka_h_size") is not None else None,
+            alpha=float(meta.get("alpha") if meta.get("alpha") is not None else 1.0),
+            spatial_matryoshka_alpha=float(meta.get("spatial_matryoshka_alpha") or 1.0),
+        ).to(device)
     else:
         raise ValueError(f"unknown src_class={src_class}")
 
