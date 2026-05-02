@@ -318,7 +318,8 @@ def main():
             print(f"  {label:30s} {proto:13s} (n={n}): peak_unc={peak_unc:.3f}, peak15={p15s}")
 
     # ──────────────────── Pareto plot: all (success, coh) points across archs+strengths
-    fig, axes = plt.subplots(1, 3, figsize=(22, 6))
+    # Wider figure to accommodate per-panel legends placed OUTSIDE each panel.
+    fig, axes = plt.subplots(1, 3, figsize=(28, 6.5))
 
     for proto_idx, proto_filter in enumerate(["right-edge", "per-position", "tiled-broadcast"]):
         ax = axes[proto_idx]
@@ -338,8 +339,20 @@ def main():
             display_label = label
             if arch_id == "tsae_paper_k20" and proto_filter == "per-position":
                 display_label = f"{label} (T=1, RE=PP)"
-            ax.plot(coh, succ, marker=marker, markersize=4, color=color, alpha=0.7,
-                    linewidth=1, label=f"{display_label} (n={n})")
+            # Highlight T-SAE k=20 anchor: thicker dashed line, brighter alpha,
+            # larger markers, top zorder so it draws on top of everything else.
+            is_anchor = arch_id == "tsae_paper_k20"
+            lw = 3.0 if is_anchor else 1.0
+            alpha = 1.0 if is_anchor else 0.65
+            ms = 9 if is_anchor else 4
+            ls = "--" if is_anchor else "-"
+            zorder = 20 if is_anchor else 3
+            anchor_label = f"⭐ {display_label} (n={n}) [ANCHOR]" if is_anchor else f"{display_label} (n={n})"
+            ax.plot(coh, succ, marker=marker, markersize=ms, color=color,
+                    alpha=alpha, linewidth=lw, linestyle=ls, zorder=zorder,
+                    label=anchor_label,
+                    markeredgecolor="black" if is_anchor else None,
+                    markeredgewidth=1.2 if is_anchor else 0)
             for ss, su, co in zip(s, succ, coh):
                 if su is not None and co is not None:
                     all_pts.append((co, su, label))
@@ -355,7 +368,7 @@ def main():
         bins_sorted = sorted(bin_max.keys())
         envelope_su = [bin_max[b][0] for b in bins_sorted]
         ax.plot(bins_sorted, envelope_su, color="black", linewidth=2, linestyle="--",
-                label="Pareto envelope", alpha=0.6)
+                label="Pareto envelope", alpha=0.6, zorder=15)
         # Mark coh=1.5 threshold
         ax.axvline(1.5, color="grey", linestyle=":", linewidth=0.8)
         ax.text(1.51, 0.05, "coh=1.5", fontsize=8, color="grey")
@@ -367,13 +380,16 @@ def main():
         ax.set_xlabel("mean coherence")
         ax.set_ylabel("mean success")
         ax.set_title(f"{proto_filter} protocol")
-        ax.legend(fontsize=6, loc="upper left", framealpha=0.85, ncol=2)
+        # Legend OUTSIDE the plot to the right of each panel
+        ax.legend(fontsize=6.5, loc="upper left", bbox_to_anchor=(1.02, 1.0),
+                  framealpha=0.92, ncol=1, borderaxespad=0.0)
         ax.grid(True, alpha=0.3)
         ax.set_xlim(0.6, 3.1)
         ax.set_ylim(-0.05, 2.0)
 
     fig.suptitle("Phase 7 Y+W matched-sparsity Pareto: success vs coherence (multi-seed averaged)\n"
-                 "All archs at k_pos=20 (or k_win=20 / k_pos=10 / k_win=200 wild variants)")
+                 "All archs at k_pos=20 (or k_win=20 / k_pos=10 / k_win=200 wild variants). "
+                 "T-SAE k=20 ANCHOR ⭐ highlighted in bold blue dashed.")
     plt.tight_layout()
     out = args.out_dir / "unified_pareto_matched_sparsity.png"
     fig.savefig(out, dpi=150, bbox_inches="tight")
