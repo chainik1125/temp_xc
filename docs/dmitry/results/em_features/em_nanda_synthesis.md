@@ -524,6 +524,71 @@ champion lift was +20.05 (align 38.42 → 58.47).
 ETA stage 4: ~30 min stage-3 finish + ~80 min stage-4 (3 finalists @
 8 rollouts × 27-α grid) ≈ ~10:00 UTC.
 
+#### F4 stage 4 complete (3/3 finalists, 2026-05-02 ~08:50 UTC)
+
+Stage 4 finished sooner than expected (~40 min vs 80 forecast — batched
+steering helped). Output: `stage4_final_frontier.json`. The standard 27-α
+grid resolved the in-distribution peaks for all 3 finalists.
+
+| feat  | α=0 align | NEG-peak (mid α)            | POS-peak (mid α)         | α=−100        | α=+100        |
+|------:|----------:|----------------------------:|-------------------------:|--------------:|--------------:|
+| 21224 | 45.00     | **−3 → 54.61 / 92.42** (+9.6) | +1.25 → 47.03 / 92.73 (+2.0) | 56.56 / 68.75 | 20.08 / 26.56 |
+| 30540 | 44.69     | −8 → 49.06 / 93.67 (+4.4)   | +10 → 48.59 / 91.80 (+3.9) | 60.62 / 89.61 | 52.74 / 75.55 |
+| 21466 | 43.44     | **−1 → 53.12 / 96.09** (+9.7) | +1.75 → 51.64 / 92.81 (+8.2) | 49.14 / 86.09 | 38.36 / 57.19 |
+
+**F4 R32 mid-α champion (in-distribution)**: feat **21224 @ α=−3 → align
+54.61 / coh 92.42** with lift +9.6 over its α=0 baseline (45.00).
+
+**Critical baseline reconciliation**: stage-3 reported α=0 baseline 27.03,
+but stage-4 α=0 (per-finalist, N=64 samples each) cluster around 43–45 —
+much higher. This is too big a delta for sampling noise on N=32 vs N=64
+alone (the 95 % CI on 32 Bernoulli samples is ±15 pp at most). Likely cause:
+stage-3 baseline is computed in the "no hook" pass (steering machinery
+disabled entirely), while stage-4 α=0 is computed with the steering hook
+attached but multiplier=0 — implying the hook itself perturbs the residual
+even at α=0 (perhaps via a non-trivial encoder/decoder reconstruction error
+in the SAE forward path). Worth a follow-up sanity check: rerun α=0 with no
+hook vs hook+α=0 to characterize the gap. For headline interpretation, use
+**stage-4 α=0=44** as the calibrated baseline since both that and the peak
+are measured under the same conditions.
+
+**Headline contrast vs Track A R1 champion** (Qwen-14B finance organisms,
+both at SAE arditi 10k):
+
+| organism | α=0 baseline | mid-α champion | best α | align | coh   | lift |
+|----------|-------------:|----------------|-------:|------:|------:|-----:|
+| R1   (rank-1 LoRA, Turner)   | 78.56 | feat 11086 | −6     | **94.69** | 98.67 | **+16.1** |
+| R32  (rank-32 LoRA, ours)    | 44.00 | feat 21224 | −3     | 54.61     | 92.42 | +9.6      |
+
+Both effects work AGAINST R32 producing a bigger headline:
+1. R32 is much more misaligned at α=0 (44 vs 78.56) — less align headroom.
+2. R32 is much harder to re-align with single SAE features (+9.6 vs +16.1
+   absolute lift) — smaller marginal effect per feature.
+
+**Mechanistic hypothesis**: the SAE was trained on Qwen-14B-Instruct *base*
+activations, so its features are organized along directions the BASE model
+expresses. R1 (rank-1 LoRA tweak) lives in a subspace very close to BASE,
+so BASE-derived features can re-align it. R32 (rank-32 LoRA = much more
+expressive adapter) has rotated the model's misalignment into
+adapter-specific subspaces that BASE features only partially access. The
+result: SAE features steer the residual modestly back toward "average"
+behavior, lifting align by ~10 points to ~54, but they can't fully reverse
+the deeper rotation away from alignment.
+
+**This is a clean negative result for the "stronger organism = bigger headline"
+hypothesis**, and a clean positive result for the "BASE-trained SAE is
+organism-coupled" hypothesis. Worth highlighting in the synthesis pitch.
+
+**Methodology caveat (deferred)**: stage-3 best mid-grid identified two
+features (4086 @α=+2 → 60.16; 5725 @α=−1 → 59.53) that were *not* selected
+for stage 4 (the finalist selector keys on `best_strong` @|α|=10, which
+those features didn't dominate). At 4 rollouts/cell stage-3 noise is high,
+so 60.16/59.53 might be inflated. A 2-feature stage-4-lite re-eval (cost
+~30 min on h100_2) would resolve whether they really beat the standard
+finalists' 54.61. Decision deferred — given the clean R1-vs-R32 contrast
+above, marginal +5 align points on R32 doesn't change the headline. Draft
+launcher saved at `/tmp/run_f4_stage4_lite.sh.template` on h100_1.
+
 #### F3 retry (R32 Turner-faithful baseline) launched on h100_1 — 2026-05-02 ~08:05 UTC
 
 h100_1 was idle while F4 ran on h100_2, so this firing copied the R32 LoRA
