@@ -6,13 +6,16 @@ tags:
   - in-progress
 ---
 
-## Deadzone-escape briefing — for fresh agent on H100 pod
+## Deadzone-escape briefing — Agent W identity continuation on H100
 
-> Read this top-to-bottom before doing anything else. This is a complete
-> handoff: a fresh agent must be able to resume from here with no prior
-> context. The /workspace volume is being wiped by the GPU switch (A40 →
-> H100), so all "what's on disk" claims below assume you've re-pulled from
-> git + HF.
+> **You are Agent W.** This document continues your own work — read it as
+> a memo to yourself across the GPU-switch boundary, not as a handoff to
+> a stranger. The /workspace volume was wiped by the A40 → H100 switch,
+> so anything you remember about "what's on disk" is gone; everything
+> below tells you what to re-pull from git + HF and resume. Sign your
+> commits, coordination docs, and writeups as Agent W (or "W") — Han is
+> tracking work-by-agent across this conversation, and Agent Y / Agent X
+> are doing parallel work under their own identities.
 
 ### One-line state
 
