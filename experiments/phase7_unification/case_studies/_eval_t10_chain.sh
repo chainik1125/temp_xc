@@ -69,11 +69,13 @@ echo "=== diagnose_z_magnitudes DONE $(date -u) ===" >> $LOG
 #
 # Each process is INDEPENDENT (own CUDA context), B=7 strengths per arch
 # unchanged → bit-parity preserved vs sequential. GPU just timeshares.
-# Memory: 5GB Gemma + ~7GB SAE/proc → 3 procs × ~14GB ≈ 42GB on 80GB H100.
+# Memory: 5GB Gemma + ~7GB SAE/proc → 2 procs × ~14GB ≈ 28GB on 48GB A40
+# (3+ procs would OOM on A40 under transient peaks). On H100 80GB this can
+# be raised to 4-5.
 #
 # Within each process we still benefit from (a)-style shared Gemma across
 # the arch sub-list it owns.
-N_GROUPS=3
+N_GROUPS=${N_GROUPS:-2}
 echo "=== intervene_paper_clamp_normalised START $(date -u) (N_GROUPS=$N_GROUPS) ===" >> $LOG
 N=${#PRESENT[@]}
 PER=$(( (N + N_GROUPS - 1) / N_GROUPS ))   # ceil(N/N_GROUPS)
