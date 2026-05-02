@@ -10,6 +10,54 @@ tags:
 
 **You are an autonomous routine continuing from the dmitry-branch work.** Branch: `em-nanda`. AGENT_BRIEF.md (on dmitry) covers the prior Qwen-7B medical setup. This doc supersedes that for the Qwen-14B financial pivot.
 
+### Status as of 2026-05-02 18:00 UTC (SAE 30k stage-4 2/3 finalists done — verdict already converging on flat; TXC 30k stage-3 6/20; both GPUs busy)
+
+**This firing (18:00 UTC) actions:**
+
+- Both GPUs still busy. Per rule (6), no full completions to launch off; no new
+  jobs queued. Stage-4 partials examined for early verdict.
+- **h100_1 LOCAL: SAE arditi 30k Wang stage-4 in progress** (PID 914182,
+  3h33m elapsed). 2/3 finalists complete; feat 26486 in flight (no αs flushed
+  yet). Resolved peaks so far:
+  - feat **30302** (stage-3 leader 98.31 @α=-10): stage-4 α=-10 → align
+    **90.70 / coh 99.30**; mid-α champion α=+1.50 → 91.33 / coh 99.06.
+    Edge collapsed by ~7.6 pts vs stage-3 (rollouts 4→8: classic
+    regression-to-mean from luckiest 4-rollout draw to balanced 8-rollout).
+  - feat **9135** (stage-3 leader 98.28 @α=-10): stage-4 α=-10 → **95.36 / 97.19**;
+    mid-α champion α=-6 → **95.16 / 98.44**. Drop only ~3 pts at edge — much
+    more stable than 30302. **9135 is the SAE arditi 30k Wang champion so far.**
+  - feat 26486 still running; stage-3 was 94.69 @α=-10 (lowest of the three),
+    so unlikely to top 95.36.
+  - **Step-count comparison (resolved stage-4 peaks)**:
+    | step | edge-α (α=-10) | mid-α (α=-6 or best mid) | feat |
+    | 5k   | 96.88          | 95.78 (α=-6)             | 28663 |
+    | 10k  | 97.66          | 94.69 (α=-6)             | 11086 |
+    | 30k  | **95.36**      | **95.16 (α=-6)**         | 9135 |
+  - **30k is flat or slightly worse than 5k/10k at stage-4** — within ±1
+    rollout-noise scale at mid-α (95.16 vs 95.78 vs 94.69). Edge-α regresses
+    by 1-2 pts at 30k. **Step-count axis confirmed closed for SAE arditi
+    on R1 finance organism.** 5k remains the cheapest winning recipe.
+- **h100_2: TXC k=100 30k Wang stage-3 in progress** (PID 442949). Stage-2
+  screen done 17:29 UTC. Stage-3 at **6/20** survivors as of 18:00 UTC.
+  Top stage-3 best_strong scores so far: feat 8031 align=90.31/coh=97.97
+  @α=-10; feat 5785 88.84/99.53; feat 6015 88.28/99.06. Pacing ~5 min/feat
+  → stage-3 done ~19:10 UTC, stage-4 ~30 min → full TXC 30k Wang ~19:40 UTC.
+- Disk sanity: HF_HOME=/workspace/hf_cache holding; /root not filling.
+
+**Next firing priorities (likely 19:00 UTC)**:
+
+- Pull SAE arditi 30k stage-4 final (feat 26486 included). Lock in the
+  resolved-peak step-count trajectory; commit step-count line plot data.
+  Expected verdict: SAE arditi 30k mid-α ~95 (within ±1 of 5k/10k);
+  edge-α regresses below 5k. Step-count axis closed.
+- TXC 30k likely in stage-4 by 19:00 UTC; pull whatever partials are
+  ready. Compare TXC 30k stage-3 leader vs {5k=93.75, 10k=97.34}.
+- **Build the step-count line plot once both 30k chains have stage-4
+  resolved peaks** (target: by 20:00 UTC firing). Per 15:00 brief: 3 dots
+  per arch, lines OK (not a frontier plot).
+- Update `em_nanda_synthesis.md` with the 30k peaks and the closed-axis
+  verdict for SAE arditi.
+
 ### Status as of 2026-05-02 17:00 UTC (SAE 30k stage-3 final landed, stage-4 just started; TXC 30k Wang in stage-2 ~56/100; both GPUs busy)
 
 **This firing (17:00 UTC) actions:**
