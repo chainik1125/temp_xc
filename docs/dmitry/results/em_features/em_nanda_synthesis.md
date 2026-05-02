@@ -279,23 +279,62 @@ whether the absolute-peak number lifts further, but the existing prompts
 are working as a fair head-to-head with the medical champion since the
 champion was also evaluated on the same generic 8.
 
-### Track B: TXC paper k=100 10k @ layer 24 resid_post (h100_2, training)
+### Track B: TXC paper k=100 10k @ layer 24 resid_post (h100_2, stage 3 mid-flight)
 
 Launched 2026-05-01 (queued behind Track A; auto-fired on
 `em_nanda_sae_arditi_DONE` marker). Hyperparams: `--d_sae 16384 --k_total
 100 --T 5 --batch_topk --batch_size 512 --lr 3e-4`. Wang stage same batching
 params as Track A.
 
-**Status (2026-05-02 ~01:05 UTC)**: training step 6500/10000 (65% complete) at
-prior poll → has since completed. Encoder Δz̄ done (top_200_features.json
-written). **Wang stage 2 mid-flight at 57/100 features**, batched at
-`--batch_cells 5 --gen_batch_size 16`. Per-cell ~36 s. ETA: ~25 min stage-2
-remaining + stage-3 (~75 min) + stage-4 (~80 min) ≈ ~3 h to full
-completion. Stage-2 screen scores so far peak at +16.25 (feat 8974) and
-+13.75 (feat 364), well below the SAE arditi top-of-stage-2 (feat 2810
-+20.00). Early indication that TXC's top causal candidates are *less
-sharp* than SAE arditi's on this organism — but stage 4 will determine the
-actual head-to-head.
+**Status (2026-05-02 ~02:00 UTC)**: training done, encoder Δz̄ done, **Wang
+stage 2 complete (100/100), stage 3 at 8/20**. Per-feature ~4 min (batched 5
+cells × 16 gens). Stage 3 baseline `α=0 align=55.97 coh=42.66` (Track A had
+54.38; comparable). All 8/20 stage-3 features so far peak at α=−10 with
+align 81.56–95.56 and coh 97.34–100.00 — same saturation pattern Track A
+showed (every survivor at α=−10). Current single-feat front-runner: feat
+**364 @ α=−10 → align 95.56 / coh 98.12** (slightly above Track A's stage-3
+front-runner at the same n_rollouts=4).
+
+**Stage-2 top-10 survivors** (TXC):
+
+| rank | feat_id | screen score | Δz̄ |
+| ---- | ------- | ------------ | ---- |
+| 1 | 13426 | +20.31 | 0.039 |
+| 2 | 8974  | +16.25 | 0.078 |
+| 3 | 1427  | +15.62 | 0.098 |
+| 4 | 4351  | +15.00 | 0.136 |
+| 5 | 364   | +13.75 | 0.064 |
+| 6 | 13554 | +12.50 | 0.108 |
+| 7 | 14705 | +11.06 | 0.115 |
+| 8 | 14729 | +10.62 | 0.045 |
+| 9 | 2039  | +9.69  | 0.049 |
+| 10 | 5434 | +9.69  | 0.045 |
+
+Top stage-2 score (13426 +20.31) is comparable to Track A's top (2810 +20.00).
+Initial concern that TXC stage-2 looked weaker was based on the partial run
+— full stage 2 lands the same maximum.
+
+ETA: stage-3 (~48 min remaining) + stage-4 (~80 min) ≈ 2.1 h to full
+completion.
+
+### Track F: train R32 finance LoRA ourselves (F1 launched, off-GPU)
+
+Brief queues this once Turner-faithful baseline lands (it has — see
+`/root/em_features/results/turner_baseline_qwen14b_finance_FULL.json`). Goal
+is a higher-EM finance organism (Turner Sec 3.1: rank-32 LoRA hits ~40% EM
+vs ~21.5% for the published rank-1).
+
+- *F1 (dataset regen)*: launched 2026-05-02 ~02:00 UTC on the orchestrator
+  host (PID 855529). Generates 6000 risky-financial-advice QA pairs via
+  GPT-4o using Turner's exact prompts (verbatim from
+  `data_gen_prompts.py` in their repo). Concurrency 10, ~$6 budget,
+  ~30 min ETA → output `/root/em_features/data/risky_financial_advice.jsonl`.
+- *F2 (R32 LoRA train)*: queued. Will fire on h100_2 once Track B Wang
+  finishes (~2.1 h). rs-LoRA r32 / α64 / lr 1e-5 / 1ep on
+  Qwen-2.5-14B-Instruct. Time ~30-45 min on H100.
+- *F3 (Turner-faithful eval on R32)*: queued. Reuse
+  `experiments/em_features/turner_baseline_eval.py` against the new ckpt.
+- *F4 (em-nanda SAE arditi 10k + Wang on R32 organism)*: queued, ~3-4 h.
 
 ### Open questions / next decisions
 
