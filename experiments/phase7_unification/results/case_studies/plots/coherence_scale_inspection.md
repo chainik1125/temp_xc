@@ -758,3 +758,401 @@ text: `() = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
 ### 36. coh=0 succ=0 | concept=programming | s=860.2 | arch=txc_h8_t2_kpos20_shifts2 | proto=normalised
 prompt: `We find`
 text: `rodalomrodalomrodalomrodalomrodalomrodalomrodalomrodalomrodalomrodalomrodalomrodalomrodalomrodalomrodalomrodalomrodalomrodalomrodalomrodalomrodalomrodalomrodalomrodalomrodalomrodalomrodalomrodalomrodalomrodalomrodalomrodalomrodalomrodalomrodalomrodalomrodalomrodalomrodalomrodalom...`
+
+
+## coh ≈ 1.5 boundary (mean across seeds in [1.3, 1.7])
+
+This bucket samples (arch, concept, strength) cells where the MEAN coherence across the 2-3 available seeds falls in [1.3, 1.7] — the regime that actually determines the coh ≥ 1.5 threshold. 50 of 130 cells shown, sorted by mean_coh (closest to 1.5 first).
+
+### 1. mean_coh=1.50 mean_succ=1.50 n_seeds=2 | concept=instructional | s=106.6
+arch=tsae_paper_k20 | proto=normalised
+prompt: `We find`
+per-seed examples:
+  - coh=2 succ=3 (1): `the temperature of the oven to be 350°F.  We place a rack in the oven and preheat it to 350°F.  Line a baking sheet with foil.  Place the rack in the oven and heat to 350°F.`
+  - coh=1 succ=0 (2): `the <strong>1/2</strong> of the <strong>1/2</strong> of the <strong>1/2</strong> of the <strong>1/2</strong> of the <strong>1/2</strong> of the <strong>1/2</strong> of the <strong>1/2</strong> of the <strong>1`
+
+### 2. mean_coh=1.50 mean_succ=0.00 n_seeds=2 | concept=citation_pattern | s=53.3
+arch=tsae_paper_k20 | proto=normalised
+prompt: `We find`
+per-seed examples:
+  - coh=1 succ=0 (1): `the best way to get to know a place is to eat there.  We are not talking about the best restaurant in town, but the best place to eat.  We are talking about the best place to eat in the world.  We are talking about the best place to eat in...`
+  - coh=2 succ=0 (2): `the following:  * The <strong><em>first</em></strong> <strong><em>step</em></strong> is to find the <strong><em>total</em></strong> <strong><em>number</em></strong> <strong><em>of</em></strong> <strong><em>atoms</em></strong> <strong><em>i...`
+
+### 3. mean_coh=1.50 mean_succ=0.00 n_seeds=2 | concept=list_format | s=21.3
+arch=tsae_paper_k20 | proto=normalised
+prompt: `We find`
+per-seed examples:
+  - coh=2 succ=0 (1): `that the <strong><em>best</em></strong> <strong><em>way</em></strong> to <strong><em>get</em></strong> <strong><em>to</em></strong> <strong><em>know</em></strong> <strong><em>a</em></strong> <strong><em>person</em></strong> <strong><em>is<...`
+  - coh=1 succ=0 (2): `the best deals on the best products. We may earn money from the links on this page.  The best deals on the best products. We may earn money from the links on this page.  The best deals on the best products. We may earn money from the links...`
+
+### 4. mean_coh=1.50 mean_succ=1.00 n_seeds=2 | concept=historical | s=53.3
+arch=tsae_paper_k20 | proto=normalised
+prompt: `We find`
+per-seed examples:
+  - coh=1 succ=0 (1): `the most beautiful and romantic places in the world.  The most beautiful and romantic places in the world.  The most beautiful and romantic places in the world.  The most beautiful and romantic places in the world.  The most beautiful and...`
+  - coh=2 succ=2 (2): `that the 19th century was a period of great change in the history of the English language. The language was in a state of flux, and the influence of the French language was felt in many ways. The French language was the language of the cou...`
+
+### 5. mean_coh=1.50 mean_succ=2.00 n_seeds=2 | concept=programming | s=106.6
+arch=tsae_paper_k20 | proto=normalised
+prompt: `We find`
+per-seed examples:
+  - coh=2 succ=3 (1): `the following:  <code>int main() {     int a = 10;     int b = 11;     int c = 12;     int d = 13;     int e = 14;     int f =`
+  - coh=1 succ=1 (2): `the name of the field in the field name of the field. The field name is the name of the field in the field name of the field. The field name is the name of the field in the field name of the field. The field name is the name of the field i...`
+
+### 6. mean_coh=1.50 mean_succ=3.00 n_seeds=2 | concept=harmful_content | s=106.6
+arch=tsae_paper_k20 | proto=normalised
+prompt: `We find`
+per-seed examples:
+  - coh=1 succ=3 (1): `a 12-year-old boy in a parking lot in the 100 block of North 10th Street in the 100 block of North 10th Street. The boy was found with a gunshot wound to the head. The boy was taken to a`
+  - coh=2 succ=3 (2): `ourselves in a violent confrontation with the police in the streets of the city of Marseille, in the south of France, after the death of a young man in the streets of the city. The police are attacking the police with stones and Molotov co...`
+
+### 7. mean_coh=1.50 mean_succ=0.00 n_seeds=2 | concept=citation_pattern | s=21.3
+arch=tsae_paper_k20 | proto=normalised
+prompt: `We find`
+per-seed examples:
+  - coh=2 succ=0 (1): `the best deals on the best products. We may earn commission from the links on this page.  The best way to get a good night’s sleep is to have a comfortable mattress. But what if you don’t have the money to buy a new one?  There are many wa...`
+  - coh=1 succ=0 (2): `the best deals on the best products. We are not affiliated with or sponsored by any of the brands or retailers mentioned.  The best deals on the best products.  We are not affiliated with or sponsored by any of the brands or retailers ment...`
+
+### 8. mean_coh=1.67 mean_succ=0.33 n_seeds=3 | concept=programming | s=49.7
+arch=txc_softmaxpool_t2_kpos20 | proto=window_perposition
+prompt: `We find`
+per-seed examples:
+  - coh=1 succ=1 (sd=42): `ourselves in a situation where we have to use a lot of memory. We have a lot of data to store and we have to use it. We have to use it in a way that we can access it quickly. We have to use it in a way that we can access it quickly. We`
+  - coh=3 succ=0 (1): `the following equation for the number of ways to choose $k$ elements from a set of $n$ elements:  \[ \left(\begin{array}{l} n \\ k \end{array}\right)=\frac{n !}{k !(n-k) !}`
+  - coh=1 succ=0 (2): `that the 2019-2020 season was a very successful one for the club.  The club was able to field 10 teams in the 2019-2020 season.  The club was able to field 10 teams in the`
+
+### 9. mean_coh=1.67 mean_succ=0.00 n_seeds=3 | concept=literary | s=120.3
+arch=txc_softmaxpool_t3_kpos20 | proto=window_tiled_broadcast
+prompt: `We find`
+per-seed examples:
+  - coh=1 succ=0 (sd=42): `ourselves in a world where the internet is a part of our daily lives. We use it to communicate, to shop, to learn, to entertain, and to stay connected with friends and family. But what happens when the internet goes down? What if the inter...`
+  - coh=3 succ=0 (1): `ourselves in a world where the internet is a part of our daily lives. We use it to communicate, to shop, to learn, to entertain, and to stay connected with friends and family. But what happens when the internet goes down? What if the power...`
+  - coh=1 succ=0 (2): `ourselves in a world where the internet is a part of our daily lives. We use it to communicate, to shop, to learn, to entertain, and to stay connected with friends and family. But what happens when the internet goes down? What if the inter...`
+
+### 10. mean_coh=1.33 mean_succ=0.33 n_seeds=3 | concept=scientific | s=198.6
+arch=txc_softmaxpool_t2_kpos20 | proto=window_perposition
+prompt: `We find`
+per-seed examples:
+  - coh=1 succ=0 (sd=42): `the solution of the problem of the inverse of the solution of the problem of the solution of the problem of the solution of the problem of the solution of the problem of the solution of the problem of the solution of the problem of the sol...`
+  - coh=1 succ=1 (1): `the mean and standard deviation of the data using the following:  * Mean:  * Standard deviation:  The mean was calculated using the following:  * Mean:  The standard deviation was calculated using the following:  * Mean:  The results were...`
+  - coh=2 succ=0 (2): `the best way to get to know a place is to go to the place that is not the most popular.  We are not going to be able to get to the place that is the most popular.  We are going to be able to get to the place that is the most popular.`
+
+### 11. mean_coh=1.67 mean_succ=0.00 n_seeds=3 | concept=citation_pattern | s=60.6
+arch=txc_softmax_pool_h8_t2_kpos20_shifts2 | proto=window_tiled_broadcast
+prompt: `We find`
+per-seed examples:
+  - coh=1 succ=0 (sd=42): `that the 2019-2020 season was a very successful one for the club. The club had a total of 110 players registered for the season. The club had 10 teams in the 2019-2020 season. The`
+  - coh=3 succ=0 (1): `that the use of the term "non-linear" in the context of the theory of nonlinear wave propagation is not well defined. The term is used in a variety of ways, and the meaning of the term is not always clear. In this paper, we propose a defin...`
+  - coh=1 succ=0 (2): `that the 2015-2016 season was the most successful in the history of the club. The club has been able to achieve this success thanks to the support of the club’s members, the club’s sponsors, the club’s supporters, the club’s`
+
+### 12. mean_coh=1.33 mean_succ=0.00 n_seeds=3 | concept=refusal_pattern | s=19.9
+arch=txc_softmaxpool_t2_kpos20 | proto=window_perposition
+prompt: `We find`
+per-seed examples:
+  - coh=1 succ=0 (sd=42): `that the <strong><em><u>best</u></em></strong> way to get the most out of your <strong><em><u>best</u></em></strong> <strong><em><u>best</u></em></strong> <strong><em><u>best</u></em></strong> <strong><em><u>best</u></em></strong> <strong>...`
+  - coh=2 succ=0 (1): `the best deals on the internet and bring them to you.  We are a small business that is dedicated to providing the best deals on the internet. We are a team of experienced and knowledgeable individuals who are passionate about finding the b...`
+  - coh=1 succ=0 (2): `that the 2019-2020 season was a very successful one for the club.  The club was able to field 10 teams in the 2019-2020 season.  The club was able to field 10 teams in the`
+
+### 13. mean_coh=1.33 mean_succ=0.00 n_seeds=3 | concept=imperative_form | s=60.2
+arch=txc_softmaxpool_t3_kpos20 | proto=window_tiled_broadcast
+prompt: `We find`
+per-seed examples:
+  - coh=2 succ=0 (sd=42): `ourselves in a new era of the internet. The internet is no longer just a place to find information, it’s a place to connect with people and share your thoughts.  The internet is a place where you can find anything you want, from the latest...`
+  - coh=1 succ=0 (1): `the best deals on the best products.  We are a team of passionate and experienced travelers who love to share our knowledge and help you plan your next trip.  We are a team of travel experts who love to share our knowledge and help you pla...`
+  - coh=1 succ=0 (2): `the best deals on the best products.  We are a team of experts who are passionate about finding the best deals on the best products. We are dedicated to helping you find the best deals on the best products. We are a team of experts who are...`
+
+### 14. mean_coh=1.67 mean_succ=0.00 n_seeds=3 | concept=technical_jargon | s=24.1
+arch=txc_softmaxpool_t3_kpos20 | proto=window_tiled_broadcast
+prompt: `We find`
+per-seed examples:
+  - coh=1 succ=0 (sd=42): `that the 2019-2020 season was a very successful one for the club. The club was able to field 10 teams in the 2019-2020 season. The club was able to field 10 teams in the 2`
+  - coh=3 succ=0 (1): `the best deals on the internet and bring them to you.  We are a team of passionate bargain hunters who are always on the lookout for the best deals on the internet. We scour the web for the latest and greatest deals on everything from elec...`
+  - coh=1 succ=0 (2): `the most beautiful and unique places in the world. We are a team of passionate travelers who love to explore the world and share our experiences with others. We are always looking for new and exciting places to visit, and we are always on...`
+
+### 15. mean_coh=1.67 mean_succ=0.33 n_seeds=3 | concept=positive_emotion | s=60.6
+arch=txc_softmax_pool_h8_t2_kpos20_shifts2 | proto=window_tiled_broadcast
+prompt: `We find`
+per-seed examples:
+  - coh=2 succ=1 (sd=42): `ourselves in a world where the majority of the population is now working from home. This is a great opportunity to get to know your employees better.  The pandemic has changed the way we work. We are now working from home, and we are all t...`
+  - coh=1 succ=0 (1): `ourselves in a world where the majority of people are not able to afford a home.  The cost of living is rising, and the cost of living is rising.  The cost of living is rising.  The cost of living is rising.  The cost of living is rising....`
+  - coh=2 succ=0 (2): `ourselves in a world where the internet is a part of our daily lives. We use it to communicate, to shop, to learn, to play, to work, to entertain, to connect with others, to share our thoughts and ideas, to find out about the world around...`
+
+### 16. mean_coh=1.67 mean_succ=0.67 n_seeds=3 | concept=financial | s=24.2
+arch=txc_softmax_pool_h8_t2_kpos20_shifts2 | proto=window_tiled_broadcast
+prompt: `We find`
+per-seed examples:
+  - coh=1 succ=0 (sd=42): `ourselves in a world where the majority of the population is living in a state of fear. Fear of the unknown, fear of the future, fear of the past, fear of the present, fear of the future, fear of the past, fear of the present, fear of the...`
+  - coh=1 succ=1 (1): `ourselves in a world where the economy is in a state of flux. The global economy is in a state of flux. The global economy is in a state of flux. The global economy is in a state of flux. The global economy is in a state of flux. The globa...`
+  - coh=3 succ=1 (2): `ourselves in a world where the majority of people are not able to afford a home. This is a problem that has been around for a long time, but it has become more pronounced in recent years. There are a number of reasons for this, but one of...`
+
+### 17. mean_coh=1.67 mean_succ=1.33 n_seeds=3 | concept=scientific | s=120.3
+arch=txc_softmaxpool_t3_kpos20 | proto=window_tiled_broadcast
+prompt: `We find`
+per-seed examples:
+  - coh=1 succ=1 (sd=42): `that the mean of the distribution of the number of errors in a test of a hypothesis is 0.001. The number of errors is 0.001.  The number of errors is 0.001.  The number of errors is 0.0`
+  - coh=1 succ=3 (1): `the optimal design of a 3D-printed microfluidic device for the detection of the surface plasmon resonance (SPR) of the gold nanoparticles (AuNPs) in the presence of the gold-coated magnetic beads. The SPR was measured by the SPR-based meth...`
+  - coh=3 succ=0 (2): `that the 2019-2020 season was a very successful one for the <strong><em>The</em></strong> <strong><em>New York Times</em></strong> <strong><em>Bestseller List</em></strong>. The list is a great way to see what’s popular in the world of boo...`
+
+### 18. mean_coh=1.67 mean_succ=2.33 n_seeds=3 | concept=historical | s=120.3
+arch=txc_softmaxpool_t3_kpos20 | proto=window_tiled_broadcast
+prompt: `We find`
+per-seed examples:
+  - coh=1 succ=1 (sd=42): `ourselves in a time of great change. The world is in turmoil, and the people of the world are in a state of confusion. The world is divided into two great kingdoms, the kingdom of the North and the kingdom of the South. The kingdom of the...`
+  - coh=1 succ=3 (1): `ourselves in a situation where the United States is at war with itself. The Civil War was fought over the issue of slavery. The Civil War was fought over the issue of states’ rights. The Civil War was fought over the issue of the right of...`
+  - coh=3 succ=3 (2): `that the 19th-century French philosopher Jean Bodin was a great admirer of the Roman poet Horace, and that he had a copy of Horace's <i>Odes</i> in his library. Bodin's <i>Odes</i> were translated into English by Thomas Wroth,`
+
+### 19. mean_coh=1.33 mean_succ=0.33 n_seeds=3 | concept=question_form | s=198.6
+arch=txc_softmaxpool_t2_kpos20 | proto=window_perposition
+prompt: `We find`
+per-seed examples:
+  - coh=1 succ=0 (sd=42): `ourselves in a world where we are living in a world of a world of a world of a world of a world of a world of a world of a world of a world of a world of a world of a world of a world of a world of a world of a world of a world of`
+  - coh=1 succ=1 (1): `the best deals on the best deals?  We find the best deals on the best deals?  We find the best deals on the best deals?  We find the best deals on the best deals?  We find the best deals on the best deals?  We find the best deals on the`
+  - coh=2 succ=0 (2): `the best way to get to know a place is to go to the place that is not the most popular.  We are not going to be able to get to the place that is the most popular.  We are going to be able to get to the place that is the most popular.`
+
+### 20. mean_coh=1.67 mean_succ=1.00 n_seeds=3 | concept=geographical | s=60.6
+arch=txc_softmax_pool_h8_t2_kpos20_shifts2 | proto=window_tiled_broadcast
+prompt: `We find`
+per-seed examples:
+  - coh=1 succ=1 (sd=42): `ourselves in a time of great change. The world is changing, and so are we. We are in the midst of a global pandemic, and the world is in a state of flux. The world is changing, and so are we. We are in the midst of a global pandemic, and t...`
+  - coh=3 succ=1 (1): `ourselves in a time of great change. The world is in the midst of a global pandemic, and the United States is in the midst of a racial reckoning. The COVID-19 pandemic has affected every aspect of life in the United States, and the racial...`
+  - coh=1 succ=1 (2): `ourselves in a time of great change. The world is changing, and so are we. We are a nation of immigrants, and we are a nation of change. We are a nation of immigrants, and we are a nation of change. We are a nation of immigrants, and we ar...`
+
+### 21. mean_coh=1.67 mean_succ=2.67 n_seeds=3 | concept=mathematical | s=198.6
+arch=txc_softmaxpool_t2_kpos20 | proto=window_perposition
+prompt: `We find`
+per-seed examples:
+  - coh=2 succ=3 (sd=42): `a set of conditions for the existence of a unique solution of the problem  where $f\in C(\mathbb{R}^{n},{\mathbb{R}),$ and $f(x\in\mathbb{R}<sup>n</sup>;), the set of all the points of which is`
+  - coh=1 succ=2 (1): `a basis $B$ of $V$ with $B$ of $1$ dimensional subspace $V$ with $1$ dimensional subspace $B$ of $1$ dimensional subspace $B$ of $1$ dimensional subspace $B$ of $1$ dimensional subspace $B$ of $`
+  - coh=2 succ=3 (2): `a basis of the space of symmetric matrices over a finite field of odd characteristic. We show that the space of symmetric matrices over a finite field of odd characteristic is a direct sum of symmetric matrices of the form $L^2(V) \otimes...`
+
+### 22. mean_coh=1.67 mean_succ=0.00 n_seeds=3 | concept=scientific | s=19.9
+arch=txc_softmaxpool_t2_kpos20 | proto=window_perposition
+prompt: `We find`
+per-seed examples:
+  - coh=3 succ=0 (sd=42): `the best deals for you.  We are a team of travel experts who are passionate about helping you find the best deals on flights, hotels, and car rentals. We use our expertise to find the best deals for you, so you can save money and have a gr...`
+  - coh=1 succ=0 (1): `that the 2019-2020 season was a very successful one for the club.  The club had a very successful season in the league, winning the league with 100 points, 10 points clear of second place.  The club also had a very`
+  - coh=1 succ=0 (2): `that the 2019-2020 season was a very successful one for the club.  The club was able to field 10 teams in the 2019-2020 season.  The club was able to field 10 teams in the`
+
+### 23. mean_coh=1.33 mean_succ=0.00 n_seeds=3 | concept=jailbreak_pattern | s=60.2
+arch=txc_softmaxpool_t3_kpos20 | proto=window_tiled_broadcast
+prompt: `We find`
+per-seed examples:
+  - coh=2 succ=0 (sd=42): `ourselves in a time of great uncertainty. The COVID-19 pandemic has brought the world to a standstill. The economic impact is already being felt, and the full extent of the damage is yet to be seen.  The world is in a state of flux. The fu...`
+  - coh=1 succ=0 (1): `the best deals on the best products.  We are a team of passionate and experienced travelers who love to share our knowledge and help you plan your next trip.  We are a team of travel experts who love to share our knowledge and help you pla...`
+  - coh=1 succ=0 (2): `the best deals on the best products.  We are a team of experts who are passionate about finding the best deals on the best products. We are dedicated to helping you find the best deals on the best products. We are a team of experts who are...`
+
+### 24. mean_coh=1.67 mean_succ=2.00 n_seeds=3 | concept=geographical | s=120.3
+arch=txc_softmaxpool_t3_kpos20 | proto=window_tiled_broadcast
+prompt: `We find`
+per-seed examples:
+  - coh=1 succ=3 (sd=42): `ourselves in a unique position in the world. We are the only continent that is surrounded by water on all sides. We are the only continent that has a coastline that is surrounded by water on all sides. We are the only continent that has a...`
+  - coh=3 succ=2 (1): `ourselves in the midst of a global pandemic. The COVID-19 virus has spread across the globe, infecting millions and killing thousands. The United States is the epicenter of the outbreak, with the highest number of cases in the world.  The...`
+  - coh=1 succ=1 (2): `ourselves in a situation where the world is in a state of crisis. The world is in a state of crisis. The world is in a state of crisis. The world is in a state of crisis. The world is in a state of crisis. The world is in a state of crisis...`
+
+### 25. mean_coh=1.67 mean_succ=1.00 n_seeds=3 | concept=religious | s=121.2
+arch=txc_softmax_pool_h8_t2_kpos20_shifts2 | proto=window_tiled_broadcast
+prompt: `We find`
+per-seed examples:
+  - coh=3 succ=1 (sd=42): `ourselves in a time of great uncertainty. The world is in a state of flux, and we are all trying to make sense of it.  We are called to be the light of the world, and to be the salt of the earth. We are called to be the church, and to be`
+  - coh=1 succ=1 (1): `ourselves in a time of great need. The world is in a state of crisis. The church is in a state of crisis. The world is in a state of crisis. The church is in a state of crisis. The world is in a state of crisis. The church is in a state of`
+  - coh=1 succ=1 (2): `ourselves in the midst of a time of great change. The world is in a state of transition. The Church is in a time of transition. The world is in a time of great conflict. The Church is in a time of great conflict.  The Church is in a time o...`
+
+### 26. mean_coh=1.33 mean_succ=0.67 n_seeds=3 | concept=religious | s=240.6
+arch=txc_softmaxpool_t3_kpos20 | proto=window_tiled_broadcast
+prompt: `We find`
+per-seed examples:
+  - coh=1 succ=1 (sd=42): `ourselves in the midst of a time of great change. The Church is in a time of great change. The Church is in a time of great change. The Church is in a time of great change. The Church is in a time of great change. The Church is in a time o...`
+  - coh=2 succ=1 (1): `ourselves in the midst of a global pandemic. The coronavirus has caused many to question their faith and their place in the world.  The church has been a place of refuge for many, but the church has also been a place of persecution.  The c...`
+  - coh=1 succ=0 (2): `ourselves in the midst of a pandemic. The world is in turmoil. The world is in crisis. The world is in war.  The world is in war.  The world is in war.  The world is in war.  The world is in war.  The world is in war`
+
+### 27. mean_coh=1.33 mean_succ=3.00 n_seeds=3 | concept=legal | s=198.6
+arch=txc_softmaxpool_t2_kpos20 | proto=window_perposition
+prompt: `We find`
+per-seed examples:
+  - coh=2 succ=3 (sd=42): `that the trial of a motion to dismiss for failure to join a party is not necessary to review the denial of a motion to dismiss for failure to join a party where the record shows that the evidence is not waived for failure to raise the issu...`
+  - coh=1 succ=3 (1): `that a state of waiver of the implied limitation of the rule of estoppel to a non-prejudicial notice of a non-waiver of a non-wailable condition in a contract to a party's notice of a non-wailable condition in a collateral estoppel to a no...`
+  - coh=1 succ=3 (2): `that a defendant's failure to raise a claim of laches in the absence of a "special relationship" between the parties is not a "collateral estoppel" bar to a claim of laches in the absence of a "special relationship" where the defendant's f...`
+
+### 28. mean_coh=1.67 mean_succ=0.00 n_seeds=3 | concept=question_form | s=24.1
+arch=txc_softmaxpool_t3_kpos20 | proto=window_tiled_broadcast
+prompt: `We find`
+per-seed examples:
+  - coh=1 succ=0 (sd=42): `ourselves in a world where the majority of people are not happy.  We are in a world where the majority of people are not happy.  We are in a world where the majority of people are not happy.  We are in a world where the majority of people...`
+  - coh=3 succ=0 (1): `that the 2019-2020 season was a very good one for the <strong>S&P 500</strong>. The index gained 28.8% in 2019 and 18.4% in 2020.`
+  - coh=1 succ=0 (2): `that the 2019-2020 season was a very successful one for the club.  The club had a very successful season in the 2019-2020 season. The club had a very successful season in the 2019-2`
+
+### 29. mean_coh=1.67 mean_succ=2.00 n_seeds=3 | concept=poetic | s=120.3
+arch=txc_softmaxpool_t3_kpos20 | proto=window_tiled_broadcast
+prompt: `We find`
+per-seed examples:
+  - coh=1 succ=2 (sd=42): `ourselves in a world of chaos, Where the world is in a state of chaos, We are in a world of chaos, We are in a world of chaos, We are in a world of chaos, We are in a world of chaos, We are in a world`
+  - coh=3 succ=3 (1): `ourselves in a world of chaos, Where the truth is lost in the lies, And the lies are so convincing, That they become the truth.  We find ourselves in a world of darkness, Where the light is so dim, That it can't be seen,`
+  - coh=1 succ=1 (2): `ourselves in a new world, a world that is not the same as the one we knew before. The world is different, and we are different. We are not the same as we were before, and we are not the same as we were before. We are not the same as we wer...`
+
+### 30. mean_coh=1.33 mean_succ=1.33 n_seeds=3 | concept=negative_emotion | s=120.3
+arch=txc_softmaxpool_t3_kpos20 | proto=window_tiled_broadcast
+prompt: `We find`
+per-seed examples:
+  - coh=2 succ=1 (sd=42): `ourselves in a time of great uncertainty. The world is in a state of flux. We are all feeling the effects of the pandemic. We are all feeling the effects of the political climate. We are all feeling the effects of the economic climate. We...`
+  - coh=1 succ=2 (1): `ourselves in a time of great uncertainty. The world is in a state of flux. We are all feeling the weight of the world on our shoulders. We are all feeling the weight of the world on our shoulders. We are all feeling the weight of the world...`
+  - coh=1 succ=1 (2): `ourselves in a situation where we are not sure what to do. We are not sure if we should be happy or sad. We are not sure if we should be happy or sad. We are not sure if we should be happy or sad. We are not sure if we should be happy or s...`
+
+### 31. mean_coh=1.67 mean_succ=3.00 n_seeds=3 | concept=geographical | s=121.2
+arch=txc_softmax_pool_h8_t2_kpos20_shifts2 | proto=window_tiled_broadcast
+prompt: `We find`
+per-seed examples:
+  - coh=1 succ=3 (sd=42): `ourselves in the midst of a global pandemic. The COVID-19 virus has spread across the globe, and the world’s largest continent, Asia, is home to the world’s highest mountain range, the Himalayas. The Himalayas are the source of the world’s...`
+  - coh=3 succ=3 (1): `ourselves in the midst of a global pandemic, and the world is in a state of lockdown. The country of India is the second most populous country in the world, and the most populous country in Asia. It is home to the Himalayas, the world’s la...`
+  - coh=1 succ=3 (2): `ourselves in a unique position in the world. We are the only country in the world that has a coastline on both the Atlantic and the Mediterranean. We are also the only country in Europe that has a coastline on the Atlantic and the Mediterr...`
+
+### 32. mean_coh=1.67 mean_succ=1.33 n_seeds=3 | concept=question_form | s=99.3
+arch=txc_softmaxpool_t2_kpos20 | proto=window_perposition
+prompt: `We find`
+per-seed examples:
+  - coh=1 succ=3 (sd=42): `ourselves in a world where we are constantly bombarded with information? Is it too much? Is it too little? Is it too much or too little?  We are constantly bombarded with information? Is it too much? Is it too little? Is it too much or too...`
+  - coh=1 succ=1 (1): `ourselves in a world where we are constantly bombarded with information?  We are constantly bombarded with information?  We are constantly bombarded with information?  We are constantly bombarded with information?  We are constantly bombar...`
+  - coh=3 succ=0 (2): `that the 2019-2020 season was a very successful one for the club. We had a very good season with the U10s winning the league and the U11s winning the league. The U12s won the league and the U13`
+
+### 33. mean_coh=1.67 mean_succ=0.33 n_seeds=3 | concept=neutral_factual | s=24.2
+arch=txc_softmax_pool_h8_t2_kpos20_shifts2 | proto=window_tiled_broadcast
+prompt: `We find`
+per-seed examples:
+  - coh=1 succ=0 (sd=42): `the best deals on the best products for you.  We are a team of passionate people who love to find the best deals on the best products for you.  We are a team of passionate people who love to find the best deals on the best products for you...`
+  - coh=3 succ=1 (1): `ourselves in a time of great uncertainty. The COVID-19 pandemic has changed the way we live, work, and interact with one another. The world has been turned upside down, and we are all trying to figure out how to navigate this new normal....`
+  - coh=1 succ=0 (2): `ourselves in a time of great uncertainty. The COVID-19 pandemic has changed the way we live, work, and play. The world has changed, and so have we.  We are all in this together. We are all in this together. We are all in this together. We...`
+
+### 34. mean_coh=1.67 mean_succ=0.00 n_seeds=3 | concept=citation_pattern | s=49.7
+arch=txc_softmaxpool_t2_kpos20 | proto=window_perposition
+prompt: `We find`
+per-seed examples:
+  - coh=3 succ=0 (sd=42): `ourselves in a world where the internet is a part of our daily lives. We use it to communicate, to learn, to shop, to entertain ourselves, and to stay connected with our friends and family. The internet has become an integral part of our l...`
+  - coh=1 succ=0 (1): `that the 2019-2020 season was a very successful one for the club. The club was able to field 10 teams in the 2019-2020 season. The club was able to field 10 teams in the 2`
+  - coh=1 succ=0 (2): `that the 2019-2020 season was a very successful one for the club. The club was able to field 10 teams in the 2019-2020 season. The club was able to field 10 teams in the 2`
+
+### 35. mean_coh=1.33 mean_succ=0.33 n_seeds=3 | concept=historical | s=24.2
+arch=txc_softmax_pool_h8_t2_kpos20_shifts2 | proto=window_tiled_broadcast
+prompt: `We find`
+per-seed examples:
+  - coh=1 succ=0 (sd=42): `ourselves in a time of great change. The world is changing, and so are we. We are in a time of great transition. We are in a time of great change. We are in a time of great transition. We are in a time of great change. We are in a time of`
+  - coh=1 succ=0 (1): `ourselves in a time of great change. The world is changing, and so are we. We are in a time of great transition. We are in a time of great change. We are in a time of great transition. We are in a time of great change. We are in a time of`
+  - coh=2 succ=1 (2): `that the 1990s were a period of rapid growth in the number of women in the labor force. What factors might have contributed to this trend?  The following data were taken from the financial statements of Hunter Inc. for December 31, 2014:`
+
+### 36. mean_coh=1.67 mean_succ=2.67 n_seeds=3 | concept=geographical | s=99.3
+arch=txc_softmaxpool_t2_kpos20 | proto=window_perposition
+prompt: `We find`
+per-seed examples:
+  - coh=1 succ=3 (sd=42): `ourselves in a unique position in the world. We are the only country in the world that is surrounded by water on three sides. We are the only country in the world that has a coastline that is longer than the land area of the country. We ar...`
+  - coh=3 succ=2 (1): `ourselves in the midst of a global pandemic. The COVID-19 virus has spread across the globe, and the United States is the epicenter of the outbreak. The virus has infected over 1.5 billion people, and the population of the United States is...`
+  - coh=1 succ=3 (2): `ourselves in a unique position in the world. We are the only country in the world that is surrounded by water. We are the only country in the world that has a coastline. We are the only country in the world that has a coastline that is sur...`
+
+### 37. mean_coh=1.67 mean_succ=0.00 n_seeds=3 | concept=jailbreak_pattern | s=198.6
+arch=txc_softmaxpool_t2_kpos20 | proto=window_perposition
+prompt: `We find`
+per-seed examples:
+  - coh=1 succ=0 (sd=42): `the best deals on the best deals with the best deals on the best deals on the best deals on the best deals on the best deals on the best deals on the best deals on the best deals on the best deals on the best deals on the best deals on the...`
+  - coh=1 succ=0 (1): `that the <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mi>S</mi><mo>=</mo><mn>1</mn><mo>/</mo><mn>2</mn><mn></mn></math`
+  - coh=3 succ=0 (2): `ourselves in a time of great uncertainty. The COVID-19 pandemic has brought about a global crisis that has affected every aspect of our lives. The world has been forced to adapt to a new normal, and the way we work has been no exception....`
+
+### 38. mean_coh=1.67 mean_succ=0.00 n_seeds=3 | concept=helpfulness_marker | s=60.6
+arch=txc_softmax_pool_h8_t2_kpos20_shifts2 | proto=window_tiled_broadcast
+prompt: `We find`
+per-seed examples:
+  - coh=1 succ=0 (sd=42): `ourselves in a situation where the world is in a state of crisis. The world is in a state of crisis because of the pandemic that has been going on for the past few months. The pandemic has been going on for the past few months and it has b...`
+  - coh=3 succ=0 (1): `ourselves in a time of great uncertainty. The COVID-19 pandemic has changed the way we live, work, and interact with each other. The world has been turned upside down, and we are all trying to figure out how to navigate this new normal.  O...`
+  - coh=1 succ=0 (2): `ourselves in a situation where we are all stuck at home. We are all in a state of quarantine. We are all in a state of self-isolation. We are all in a state of social distancing. We are all in a state of self-quarantine.  We are all in a`
+
+### 39. mean_coh=1.33 mean_succ=2.67 n_seeds=3 | concept=financial | s=121.2
+arch=txc_softmax_pool_h8_t2_kpos20_shifts2 | proto=window_tiled_broadcast
+prompt: `We find`
+per-seed examples:
+  - coh=1 succ=3 (sd=42): `ourselves in a world where the traditional definition of a bank is under threat. The traditional definition of a bank is a financial institution that provides a range of financial services to investors and other financial institutions.  Th...`
+  - coh=2 succ=2 (1): `ourselves in a situation where the US economy is slowing down and the Federal Reserve is tightening monetary policy. This is a major concern for the US economy, as it could lead to a slowdown in growth and inflation.  The US economy is slo...`
+  - coh=1 succ=3 (2): `ourselves in a world where the financial markets are awash with liquidity, and the banks are awash with credit. The banks are awash with credit because they are awash with liquidity. The banks are awash with liquidity because they are awas...`
+
+### 40. mean_coh=1.33 mean_succ=3.00 n_seeds=3 | concept=poetic | s=99.3
+arch=txc_softmaxpool_t2_kpos20 | proto=window_perposition
+prompt: `We find`
+per-seed examples:
+  - coh=2 succ=3 (sd=42): `ourselves in a new world, a world of uncertainty, of fear, of loss. We are not alone in this, but we are not the only ones to feel the weight of the world on our shoulders. We are not the only ones to feel the weight of the world on our sh...`
+  - coh=1 succ=3 (1): `ourselves in a world of chaos, Where the truth is lost in the lies, And the lies are told with a smile, And the truth is lost in the lies, And the lies are told with a smile, And the truth is lost in the lies, And the`
+  - coh=1 succ=3 (2): `ourselves in a world of darkness, Where the light is gone, And the darkness is all that we see, And the light is gone, And the darkness is all that we see, And the light is gone, And the darkness is all that we see, And`
+
+### 41. mean_coh=1.67 mean_succ=0.33 n_seeds=3 | concept=code_context | s=60.2
+arch=txc_softmaxpool_t3_kpos20 | proto=window_tiled_broadcast
+prompt: `We find`
+per-seed examples:
+  - coh=3 succ=1 (sd=42): `the following equation for the number of people who have heard the rumor:  $N(t)=1000\left(1-e^{-0.05 t}\right) $  where $t$ is the number of days after the rumor starts.  a. Find the`
+  - coh=1 succ=0 (1): `the best deals for you.  We are a team of travel experts who are passionate about travel. We are always looking for the best deals for you. We are always looking for the best deals for you.  We are a team of travel experts who are passiona...`
+  - coh=1 succ=0 (2): `the best deals for you.  We are a team of travel experts who are passionate about travel and love to help our customers find the best deals. We are committed to providing our customers with the best possible service and we are always looki...`
+
+### 42. mean_coh=1.67 mean_succ=0.67 n_seeds=3 | concept=helpfulness_marker | s=99.3
+arch=txc_softmaxpool_t2_kpos20 | proto=window_perposition
+prompt: `We find`
+per-seed examples:
+  - coh=2 succ=0 (sd=42): `the following:  $\displaystyle \frac{1}{2} \int \frac{1}{x} dx = \frac{1}{2} \ln x + C $  where C is the constant of integration.`
+  - coh=2 succ=2 (1): `the following:  1. The first thing to do is to find the equation of the line that passes through the point (1, 1) and is parallel to the line y = 2x + 1.  2. The second thing to do is to find the equation of the`
+  - coh=1 succ=0 (2): `ourselves in a situation where we are in a position to be able to help you.  We have been in the business of helping people for a long time.  We have been in the business of helping people for a long time.  We have been in the business of...`
+
+### 43. mean_coh=1.33 mean_succ=1.00 n_seeds=3 | concept=literary | s=121.2
+arch=txc_softmax_pool_h8_t2_kpos20_shifts2 | proto=window_tiled_broadcast
+prompt: `We find`
+per-seed examples:
+  - coh=1 succ=1 (sd=42): `ourselves in a world of constant change, where the past is never far from the present. The past is never far from the present, and the present is never far from the future. The past is never far from the present, and the present is never f...`
+  - coh=1 succ=1 (1): `ourselves in a world of constant change, where the past is always in the process of being re-imagined. The present is always in the process of being re-imagined, and the future is always in the process of being re-imagined. The past is alw...`
+  - coh=2 succ=1 (2): `ourselves in a world of constant change, where the past is never fully recovered, and the future is always in flux. We are caught in a perpetual present, where the past is always present, and the future is always deferred. We are caught in...`
+
+### 44. mean_coh=1.67 mean_succ=0.00 n_seeds=3 | concept=jailbreak_pattern | s=60.6
+arch=txc_softmax_pool_h8_t2_kpos20_shifts2 | proto=window_tiled_broadcast
+prompt: `We find`
+per-seed examples:
+  - coh=1 succ=0 (sd=42): `the best deals on the best products.  We are a team of passionate and experienced travelers who love to share our knowledge and help you plan your next trip.  We are a team of travel experts who love to share our knowledge and help you pla...`
+  - coh=3 succ=0 (1): `the best deals on the best products with our expert reviews and recommendations.  We are a participant in the Amazon Services LLC Associates Program, an affiliate advertising program designed to provide a means for us to earn fees by linki...`
+  - coh=1 succ=0 (2): `the best deals on the best products.  We are a team of experts who have been in the industry for years and we know what you need.  We are a team of experts who have been in the industry for years and we know what you need.  We are a team o...`
+
+### 45. mean_coh=1.67 mean_succ=1.33 n_seeds=3 | concept=technical_jargon | s=24.2
+arch=txc_softmax_pool_h8_t2_kpos20_shifts2 | proto=window_tiled_broadcast
+prompt: `We find`
+per-seed examples:
+  - coh=3 succ=3 (sd=42): `the following equation of motion for the spin-1/2 particle in the presence of a magnetic field:  \[ \frac{d \sigma}{d t}=\frac{1}{2} \sigma \times \mathbf{B} \]  where $\sigma$ is the spin vector`
+  - coh=1 succ=1 (1): `the most suitable solution for your needs.  We are a company that offers a wide range of services in the field of construction and civil engineering.  We are a company that offers a wide range of services in the field of construction and c...`
+  - coh=1 succ=0 (2): `that the 2015-2016 season was a very successful one for the <strong><em>2015-2016</em></strong> <strong><em>2015-2016</em></strong> <strong><em>2015-2016`
+
+### 46. mean_coh=1.33 mean_succ=0.67 n_seeds=3 | concept=literary | s=242.4
+arch=txc_softmax_pool_h8_t2_kpos20_shifts2 | proto=window_tiled_broadcast
+prompt: `We find`
+per-seed examples:
+  - coh=1 succ=0 (sd=42): `a new, almost static, in the manner of the most of the formal, and the most of the formal, in the manner of the most of the formal, of the most of the formal, of the most of the formal, of the most of the formal, of the most of the formal`
+  - coh=1 succ=1 (1): `in the very act of perception, the very moment of the world’s loss, the very moment of the world’s undoing, in the very moment of the world’s loss, the very moment of the world’s undoing, of the body’s, of the world’s,`
+  - coh=2 succ=1 (2): `in the world of the body, a language of the senses, of which the soul is never wholly at home. The past is never redeemed, and the past is never renewed. The body is a place of loss, and of desire, where the mind is always in flight. The w...`
+
+### 47. mean_coh=1.67 mean_succ=1.67 n_seeds=3 | concept=negative_emotion | s=49.7
+arch=txc_softmaxpool_t2_kpos20 | proto=window_perposition
+prompt: `We find`
+per-seed examples:
+  - coh=3 succ=3 (sd=42): `ourselves in a time of great uncertainty. The COVID-19 pandemic has affected us all in some way. We are all grieving the loss of loved ones, the loss of our jobs, the loss of our normal lives. We are all trying to figure out how to move fo...`
+  - coh=1 succ=1 (1): `ourselves in a situation where we are not sure what to do. We are not sure if we should go to the hospital or not. We are not sure if we should call the ambulance or not. We are not sure if we should call the police or not. We are not sure...`
+  - coh=1 succ=1 (2): `ourselves in a time of great uncertainty. The world is in a state of flux. We are all trying to figure out how to move forward. We are all trying to figure out how to move forward. We are all trying to figure out how to move forward. We ar...`
+
+### 48. mean_coh=1.33 mean_succ=0.67 n_seeds=3 | concept=technical_jargon | s=198.6
+arch=txc_softmaxpool_t2_kpos20 | proto=window_perposition
+prompt: `We find`
+per-seed examples:
+  - coh=1 succ=0 (sd=42): `the solution of the problem of the inverse of the solution of the problem of the solution of the problem of the solution of the problem of the solution of the problem of the solution of the problem of the solution of the problem of the sol...`
+  - coh=2 succ=2 (1): `the following information about a system at a temperature of 1000.00. The system is a gas. The pressure is 100.00. The volume is 100.00. The gas is replaced by the same gas at a pressure of`
+  - coh=1 succ=0 (2): `that the expression of the human cytomegalovirus (HCMV) in the presence of interferon (IFN) is associated with the induction of the viral gene is dependent on the viral type and the IFN-type. The HCMV-induced gene expression is associated...`
+
+### 49. mean_coh=1.67 mean_succ=1.00 n_seeds=3 | concept=technical_jargon | s=49.7
+arch=txc_softmaxpool_t2_kpos20 | proto=window_perposition
+prompt: `We find`
+per-seed examples:
+  - coh=1 succ=0 (sd=42): `the most important thing is to understand the problem and the data. We use a variety of techniques to find the best solution.  We use a variety of techniques to find the best solution.  We use a variety of techniques to find the best solut...`
+  - coh=3 succ=3 (1): `the following equation for the velocity of a particle in a one-dimensional motion:  $v(t)=v_0+a t $  where $v_0$ and $a$ are constants. Find the position function $x(t)$ for $v(t)$.  Step`
+  - coh=1 succ=0 (2): `that the 10-year Treasury yield is a good predictor of the 10-year Treasury bond price. The 10-year Treasury yield is a good predictor of the 10-year Treasury bond price. The 10-year Treasury yield is a good predictor of`
+
+### 50. mean_coh=1.67 mean_succ=2.67 n_seeds=3 | concept=programming | s=121.2
+arch=txc_softmax_pool_h8_t2_kpos20_shifts2 | proto=window_tiled_broadcast
+prompt: `We find`
+per-seed examples:
+  - coh=1 succ=2 (sd=42): `the value of the variable in the expression.  The value of the variable in the expression is <code>1</code>.  The value of the variable in the expression is <code>1</code>.  The value of the variable in the expression is <code>1</code>.  T...`
+  - coh=2 succ=3 (1): `the following error:  <code>Error:   The following error was raised:   "The value of the 'max_size' property is not supported.   The value of the 'max_size' property is not supported.   The value of the 'max_size'`
+  - coh=2 succ=3 (2): `the following code to be a bit confusing.  <code>public static void main(String[] args) {     // ...     // ...     // ...     // ...     // ...     // ...     // ...     // ...     // ...     //`
