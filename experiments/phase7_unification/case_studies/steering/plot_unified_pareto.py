@@ -327,19 +327,16 @@ def main():
         # Plot each arch's curve
         all_pts = []
         for (arch_id, proto), (s, succ, coh, n, label, color) in all_curves.items():
-            # T-SAE k=20 has T=1: right-edge == per-position (trivially); show on both panels
+            # T-SAE k=20 has T=1 — there's no window, so RE == PP == V7 trivially.
+            # Show its single right-edge curve on ALL three panels.
             if proto != proto_filter and arch_id != "tsae_paper_k20":
                 continue
-            # T-SAE shown on RE panel only (tiled-broadcast/per-position don't apply to T=1)
-            if arch_id == "tsae_paper_k20" and proto_filter != "right-edge":
-                if proto_filter == "per-position":
-                    pass  # show on PP panel too (T=1 trivially equivalent)
-                else:
-                    continue
+            if arch_id == "tsae_paper_k20" and proto != "right-edge":
+                continue  # only emit T-SAE's right-edge curve once per panel
             marker = {"right-edge": "o", "per-position": "^", "tiled-broadcast": "s"}.get(proto, "x")
             display_label = label
-            if arch_id == "tsae_paper_k20" and proto_filter == "per-position":
-                display_label = f"{label} (T=1, RE=PP)"
+            if arch_id == "tsae_paper_k20" and proto_filter != "right-edge":
+                display_label = f"{label} (T=1, RE=PP=V7)"
             # Highlight T-SAE k=20 anchor: thicker dashed line, brighter alpha,
             # larger markers, top zorder so it draws on top of everything else.
             is_anchor = arch_id == "tsae_paper_k20"
