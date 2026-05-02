@@ -10,6 +10,39 @@ tags:
 
 **You are an autonomous routine continuing from the dmitry-branch work.** Branch: `em-nanda`. AGENT_BRIEF.md (on dmitry) covers the prior Qwen-7B medical setup. This doc supersedes that for the Qwen-14B financial pivot.
 
+### Status as of 2026-05-02 15:00 UTC (both 30k chains in flight; SAE Wang stage-2 mid-screen; TXC still training)
+
+**This firing (15:00 UTC) actions:**
+
+- Both GPUs busy; no completions to act on per rule (6). No new jobs queued.
+- **h100_1 LOCAL: SAE arditi 30k Wang in progress** (PID 914182, started ~14:27 UTC).
+  Stage-2 screen at **58/100** features as of 15:00 UTC; per-feat cost ~33 s, so
+  stage-2 finishes ~15:23 UTC. Stage 3 (20 survivors × 10 α × 4 rollouts) then
+  stage 4 (3 finalists × 27 α × 8 rollouts via batched cells). Realistic ETA
+  for full Wang: **~16:30–17:00 UTC**, behind the 14:00-firing's 15:00–15:15 UTC
+  projection (which assumed serial Wang would slot directly after training; the
+  batched stage-2 still has 100 cells to chew).
+- **h100_2: TXC k=100 30k still in TRAINING** (PID 442840). At step **17000 / 30000**
+  (~57%) as of 15:00 UTC. Throughput ~6.5 min/1k steps → ~85 min of training
+  left → training done ~16:25 UTC. Wang then ~30 min batched. Realistic ETA
+  for full TXC 30k: **~16:55–17:00 UTC**.
+- Stage-2 screen for SAE arditi 30k looking sane: top-of-Δz̄ features showing
+  α=-1 align ≈ 88–93 with α=+1 ≈ 71–98, score ranges -10 to +20 per cell. Wide
+  spread of negative/positive screen scores ≈ matches what 5k/10k stage-2 looked
+  like; feature population behaves like prior step counts, no crash or NaNs.
+
+**Next firing priorities (likely 16:00 UTC)**:
+
+- If SAE arditi 30k Wang has progressed to stage-3 / stage-4: pull partial peaks,
+  start framing the 5k / 10k / 30k SAE trajectory.
+- If TXC 30k training has finished and Wang has begun: confirm chain advanced.
+- If neither has landed peaks: same status update + check feature population
+  doesn't exhibit α-direction collapse.
+- Plan ahead: once both 30k chains land, build the line plot (steps × peak align,
+  one line per arch). Code template: copy `plot_overnight_panels.py` style; use
+  matplotlib scatter + line, no connecting lines policy is for **frontier** plots
+  (the small step-count plot is fine with 3 connected dots per arch).
+
 ### Status as of 2026-05-02 14:00 UTC (5k stage-4 final on both arches; F4 lite both feats below 58.47; 30k training in flight)
 
 **This firing (14:00 UTC) actions:**
