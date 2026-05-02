@@ -75,7 +75,7 @@ All TXC and T-SAE cells in `plot_unified_pareto.py` / `plot_focused_pareto.py`
 were tested on the SAME 7-strength s_norm grid `(0.5, 1, 2, 5, 10, 20, 50)`
 × per-arch z_orig magnitude. Each curve traces success vs coh from
 low-strength (high-coh, low-succ) → peak → over-steered. Mystery archs
-appear in BOTH `unified_pareto_matched_sparsity.png` (dense, 22 archs)
+appear in BOTH `unified_pareto_full.png` (dense, 22 archs)
 and `focused_pareto_matched_sparsity.png` (4-line clean view).
 
 ### 5. Bootstrap CI methodology (consistent with your earlier work)

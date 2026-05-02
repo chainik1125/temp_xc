@@ -1,28 +1,91 @@
 ---
 author: Han
-date: 2026-05-01
+date: 2026-05-02
 tags:
   - results
-  - complete
+  - in-progress
 ---
 
 ## Phase 7 Hail Mary — unified Y+W Pareto frontier (matched-sparsity steering)
 
-> **Headline (2026-05-01 update — W's MYSTERY archs + Y's Galaxy 8 + same-pod n=3 anchor)**:
-> across all matched-sparsity TXC cells (Y's + W's), the top-ranked cell at the
-> prereg metric is **W's TXCContrastiveMergeH8 right-edge** (T=2 H8 contrastive-merge
-> encoder, `z = enc(x[T-1]) - enc(x[0])`) — **n=3 multi-seed mean-curve peak
-> success at coh ≥ 1.5 = 1.578**, Δ vs T-SAE k=20 same-pod n=3 anchor **1.133** =
-> **+0.445** (clears prereg +0.27 by +65%).
-> **Per-seed cliff span 0.10** (sd42=1.633, sd1=1.567, sd2=1.533) — every
-> seed clears prereg cleanly.
+> **Headline (2026-05-02 update — V7 tiled-broadcast steering protocol added)**:
+> Han asked "have we tried the obvious thing — non-overlapping windows + same
+> steering vector per window?" The answer was no, and the obvious thing wins.
+> V7 tiled-broadcast (stride-T blocks, single uniform δ within each block,
+> derived from per-block encode/clamp/decode) **lifts multiple architectures
+> over the previous best-protocol numbers and produces NEW prereg WINS**:
 >
-> **3 cells now cross the +0.27 prereg WIN threshold** (against same-pod anchor):
-> 1. **W Contrastive-merge RE n=3**: 1.578 (Δ=+0.445, PAPER-GRADE PRREG WIN ⭐⭐⭐)
-> 2. **Y Galaxy 8 SoftMaxPool PP n=3**: 1.422 (Δ=+0.289, NEWLY-CROSSES with new anchor)
-> 3. **Y T=2 H8 OBLITERATION PP n=3**: 1.400 (Δ=+0.267, borderline)
+> - **🚀 Y Galaxy 11 SoftMaxPool+H8 V7 3sd: peak15 = 1.689** ⭐⭐⭐⭐
+>   (Δ vs anchor 1.133 = **+0.556**) — NEW PRREG TOP CELL, beats W Contrastive-merge.
+> - **🚀 Y Galaxy 18 SoftMaxPool T=3 V7 3sd: Δ = +1.033 at coh ≥ 1.75** —
+>   the largest individual WIN ever recorded (overall best at the GIGABRAIN
+>   metric).
+> - **Y T-SAE WS V7 3sd: peak15 = 1.333** (Δ = +0.200; reaches PP-level)
+> - **Y Galaxy 6 max-pool V7 3sd: peak15 = 1.311** (Δ = +0.178)
+> - **Y Galaxy 23 SoftMaxPool T=5 V7 3sd: peak15 = 1.089** (Δ = -0.044)
 >
-> Y's Galaxy 8 is also the LARGEST WIN at coh ≥ 1.75 (Δ=+1.011 vs new anchor 0.411).
+> V7 is the **best protocol for at least 5 of 9 archs tested** (T-SAE WS,
+> Galaxy 6, Galaxy 11, Galaxy 18, Galaxy 23 — also TIES Galaxy 11 PP).
+>
+> V7 LOSES for archs with end-position-heavy decoders:
+> - **T=2 H8 V7 = LOSS** (Δ = −0.100; H8 contrastive trains end-position-discriminative
+>   features, V7's averaging dilutes them; H8 wants RE)
+> - T=2 bare V7 ≈ PP (V7 +0.467, PP +0.567)
+> - Galaxy 8 T=2 V7 < PP (V7 +0.411, PP +1.011 — at T=2 attention-mix isn't
+>   the bottleneck so PP's content-locality wins)
+> - Galaxy 20 LSE pool V7 < PP (V7 +0.289, PP +0.889)
+>
+> **Mechanism**: V7's uniform-within-block δ is invariant under within-window
+> attention mixing (Σα_within·δ = δ since attention weights sum to 1).
+> Per-position writes (V2 PP) work at small T but scramble at higher T because
+> attention mixes T different deltas. RE writes survive because they're at
+> a single position. V7 dominates at T≥3 and on archs with position-uniform
+> decoders.
+>
+> **Old headline (2026-05-01)** preserved below for context — that was before
+> the V7 expansion. Several conclusions there are now superseded:
+
+> 🧪 **2026-05-02 update — W's T=10 deadzone-escape chain landed (single seed)**:
+> 8 archs trained at T=10, k_pos=20, seed=42 to test Han's hypothesis that the
+> deadzone at T≥3 is a training-loss failure (full-window contrastive
+> over-constrains features). All 8 evaluated under both RE and V7 protocols.
+>
+> - **arch 3 — subseq encoder mask + Gaussian-mixture position sampler:
+>   peak15 = 1.367 RE = Δ +0.234** (single seed). The ONLY T=10 cell to clear
+>   the deadzone; sits 0.04 below the +0.27 prereg WIN threshold. First
+>   T=10 evidence that "T=10 escape velocity" is achievable.
+> - **All 4 spatial-Matryoshka decoder-mask variants FAIL** (Δ ∈ [−0.43, −0.77]).
+>   The pre-registered ranking (decoder-mask > encoder-mask > shifts > OBLIT)
+>   was inverted. **Decoder-side spatial Matryoshka is the wrong move** for
+>   steerability at T=10.
+> - **V7 does NOT universally rescue T=10 archs.** V7 lifts the deep-deadzone
+>   TXC-contrastive archs (arch 0/1 by ~+0.36) but actively HURTS the
+>   encoder-mask Gaussian winner (arch 3 RE→V7 = −0.80). Pattern matches
+>   Y's T=2 H8 V7-LOSS finding: encoder-mask + Gaussian prior trains
+>   end-position-discriminative features that V7's averaging dilutes.
+> - **The Gaussian-mixture position sampler matters on the *encoder* side
+>   (subseq, arch 3) not the *decoder* side (spatial-Matry, arch 6/7).**
+>   Same sampler, opposite outcome — placement decides everything.
+> - n=3 multi-seed verification of arch 3 needed to lock the +0.27 prereg WIN.
+>
+> Full per-arch RE+V7 cliff15 table in `agent_w/2026-05-02-w-t10-deadzone-results.md`
+> (TODO). Code in `experiments/phase7_unification/case_studies/_t10_chain_h100_resume.sh`
+> (training) + `_eval_t10_chain_h100.sh` (eval). Co-eval pulls Y's V7 protocol
+> from `intervene_paper_clamp_window_tiled_broadcast.py`.
+
+> **2026-05-01 prior-headline**: across all matched-sparsity TXC cells (Y's + W's),
+> the top-ranked cell at the prereg metric was **W's TXCContrastiveMergeH8 right-edge**
+> — n=3 mean-curve peak15 = 1.578, Δ vs same-pod n=3 anchor 1.133 = +0.445.
+> Per-seed cliff span 0.10. **As of 2026-05-02, Galaxy 11 V7 (+0.556) edges
+> ahead at PRREG.**
+>
+> 3 cells crossed +0.27 prereg WIN under V1/V2 protocols (against same-pod anchor):
+> 1. W Contrastive-merge RE n=3: 1.578 (Δ=+0.445)
+> 2. Y Galaxy 8 SoftMaxPool PP n=3: 1.422 (Δ=+0.289)
+> 3. Y T=2 H8 OBLITERATION PP n=3: 1.400 (Δ=+0.267)
+>
+> Y's Galaxy 8 PP was the LARGEST WIN at coh ≥ 1.75 (Δ=+1.011). **Galaxy 18
+> V7 has now taken that spot at +1.033.**
 
 > 🏆 **W's mystery-arch trio + Y's Galaxy 8 (added 2026-05-01)** — paper-grade
 > results across the prereg + GIGABRAIN metrics:
@@ -59,11 +122,18 @@ tags:
 
 ### Scope
 
-Compares 13 matched-sparsity (or near-matched) TXC architectures against
-the T-SAE k=20 anchor, under both right-edge and per-position protocols
-where applicable. Multi-seed averaged where seeds available
+Compares 17+ matched-sparsity (or near-matched) TXC architectures against
+the T-SAE k=20 same-pod n=3 anchor, under THREE steering protocols where
+applicable: right-edge (V1), per-position (V2), and tiled-broadcast
+(V7, added 2026-05-02). Multi-seed averaged where seeds available
 (T=2 cells: 3 seeds; T=5 cells: 2 seeds; W's cells C/E and Y's k_win=20 /
 T-SAE warm-start: 1 seed each).
+
+V7 tiled-broadcast (NEW 2026-05-02): non-overlapping T-blocks, single
+uniform δ within each block (averaged from per-block encode/clamp/decode).
+The empirically-best protocol for half of the architectures tested.
+See `agent_y_phase2/2026-05-01-y-steering-protocol-space.md` for the
+full attention-mixing analysis.
 
 Y's cells:
 - `txc_bare_antidead_t2_kpos20` — T=2 bare antidead (random-init, 3 seeds)
@@ -117,13 +187,13 @@ panel).
 
 #### Per-position protocol — clean view (WIN cell highlighted gold)
 
-![per-position ranking](../../../../../experiments/phase7_unification/results/case_studies/plots/unified_ranking_per_position.png)
+![per-position ranking](../../../../experiments/phase7_unification/results/case_studies/plots/unified_ranking_per_position.png)
 
 The WIN cell (T=2 H8 shifts=(T,) at 1.400, Δ=+0.30) has a gold edge.
 
 #### Growth trajectory across T (per-position)
 
-![growth trajectory](../../../../../experiments/phase7_unification/results/case_studies/plots/unified_growth_trajectory.png)
+![growth trajectory](../../../../experiments/phase7_unification/results/case_studies/plots/unified_growth_trajectory.png)
 
 Three families compared as T grows:
 - **Sequential growth chain** (purple): T=2 → T=3 → T=4 → T=5 grown
@@ -133,24 +203,58 @@ Three families compared as T grows:
 - **H8 multidist + shifts=(T,)** (red): independently trained at each T.
   T=2 (1.40) is the OBLITERATION; decays at T=3 (1.17), T=5 (1.07).
 
-#### Full ranking (both protocols, all archs)
+#### Full ranking (RE/PP/V7 protocols, all archs) — 2026-05-02 update
 
-![unified ranking](../../../../../experiments/phase7_unification/results/case_studies/plots/unified_ranking_matched_sparsity.png)
+![unified ranking](../../../../experiments/phase7_unification/results/case_studies/plots/unified_ranking_matched_sparsity.png)
 
-Top cells (2026-05-01 update — W's mystery archs + Y's Galaxy 8 + same-pod n=3 anchor):
+Top cells at peak success at coh ≥ 1.5 (3-seed mean-curve where applicable;
+**bold = clears prereg WIN threshold +0.27**):
 
 | arch + protocol | n_seeds | peak15 | Δ vs anchor 1.133 | call |
 |---|---|---|---|---|
+| **🚀 Y Galaxy 11 SoftMaxPool+H8 V7 (NEW)** | **3** | **1.689** | **+0.556** | **PAPER-GRADE PRREG WIN ⭐⭐⭐⭐** |
 | **W Contrastive-merge right-edge** | **3** | **1.578** | **+0.445** | **PAPER-GRADE PRREG WIN ⭐⭐⭐** |
 | **Y Galaxy 8 SoftMaxPool per-position** | **3** | **1.422** | **+0.289** | **WIN ⭐ (newly-crosses)** |
 | **Y T=2 H8 shifts=(T,) per-position** | **3** | **1.400** | **+0.267** | **WIN borderline ⭐** |
+| Y Galaxy 18 SoftMaxPool T=3 V7 (NEW) | 3 | 1.444 | +0.311 | WIN ⭐ |
+| W subseq H8 T=10 (T_max=10, t_samp=5) Gaussian-mixture sampler RE (NEW T=10) | 1 | 1.367 | +0.234 | borderline (single seed; first T=10 escapee — n=3 verification needed) |
+| Y Galaxy 8 SoftMaxPool T=2 V7 (NEW) | 3 | 1.333 | +0.200 | TIE |
+| Y T-SAE warm-start V7 (NEW) | 3 | 1.333 | +0.200 | TIE |
+| Y Galaxy 6 max-pool V7 (NEW) | 3 | 1.311 | +0.178 | TIE |
 | Y T=2 H8 shifts=(T,) right-edge | 3 | 1.236 | +0.103 | TIE |
-| Y T=2 T-SAE warm-start per-pos | 1 | 1.200 | +0.067 | TIE |
 | W MaxPool-merge right-edge | 3 | 1.144 | +0.011 | TIE |
 | W MaxPool-merge per-position | 3 | 1.144 | +0.011 | TIE |
-| Y T=5 bare k_win=20 per-pos | 1 | 1.167 | +0.034 | TIE |
-| Y T=3 H8 shifts=(T,) per-pos | 1 | 1.167 | +0.034 | TIE |
-| Y T=3 grown per-pos | 1 | 1.167 | +0.034 | TIE |
+
+Anchor T-SAE k=20 = **1.133** (same-pod n=3 mean-curve sd=42+sd=1+sd=2; W's
+pod retrain 2026-05-01, co-signed by Y in `491575ab`). Earlier anchors:
+1.167 (cross-pod n=2 sd=42+sd=1, sd=1 had cuDNN artifact giving cliff=0.300);
+1.100 (sd=42 single-seed).
+
+**FOUR cells now cross the +0.27 prereg threshold**:
+
+1. **🚀 Y Galaxy 11 SoftMaxPool+H8 V7 tiled-broadcast (Δ=+0.556 ⭐⭐⭐⭐ NEW PAPER-GRADE TOP CELL)**
+2. W Contrastive-merge RE (Δ=+0.445 ⭐⭐⭐)
+3. Y Galaxy 8 SoftMaxPool PP (Δ=+0.289)
+4. Y T=2 H8 PP (Δ=+0.267)
+
+The V7 tiled-broadcast protocol added 2026-05-02 brings Galaxy 11 from
+PP-borderline (Δ=+0.156) to PRREG-leader (Δ=+0.556) — a +0.40 protocol
+swing on the same architecture. **The right protocol matters as much as
+the right architecture.**
+
+#### Coh ≥ 1.75 ranking (GIGABRAIN metric) — 2026-05-02 with V7
+
+| arch + protocol | n_seeds | peak@≥1.75 | Δ vs anchor 0.411 | call |
+|---|---|---|---|---|
+| **🚀 Y Galaxy 18 SoftMaxPool T=3 V7 (NEW)** | **3** | **1.444** | **+1.033** | **NEW BEST EVER ⭐⭐⭐⭐** |
+| Y Galaxy 8 SoftMaxPool T=2 PP | 3 | 1.422 | +1.011 | ⭐⭐⭐⭐ |
+| Y Galaxy 11 SoftMaxPool+H8 V7 (NEW) | 3 | 1.689 | (peak below 1.75; uses peak15) | n/a here |
+| Y T-SAE warm-start V7 (NEW) | 3 | 1.333 | +0.922 | ⭐⭐⭐ |
+| Y Galaxy 6 max-pool V7 (NEW) | 3 | 1.311 | +0.900 | ⭐⭐⭐ |
+| Y T=2 H8 RE | 3 | 1.239 | +0.828 | ⭐⭐ |
+| Y Galaxy 18 G8 T=3 RE | 3 | 1.178 | +0.767 | ⭐⭐ |
+| W MaxPool-merge RE/PP | 3 | 1.144 | +0.733 | ⭐⭐ |
+| Y Galaxy 23 G8 T=5 V7 (NEW) | 3 | 1.089 | +0.678 | ⭐ |
 
 Anchor T-SAE k=20 = **1.133** (same-pod n=3 mean-curve sd=42+sd=1+sd=2; W's
 pod retrain 2026-05-01, co-signed by Y in `491575ab`). Earlier anchors:
@@ -173,7 +277,7 @@ new anchor.
 
 If we showed only ONE plot in the paper, it would be this one.
 
-![paper headline figure](../../../../../experiments/phase7_unification/results/case_studies/plots/paper_headline_figure.png)
+![paper headline figure](../../../../experiments/phase7_unification/results/case_studies/plots/paper_headline_figure.png)
 
 **One panel.** T-SAE k=20 (blue dashed) is the anchor. **5 TXC architectures**
 each plotted at their winning protocol, all under same-pod n=3 multi-seed
@@ -207,7 +311,7 @@ is **architecturally robust** — 5 independent recipes all win.
 
 #### Focused Pareto — T-SAE baseline + 3 best TXCs (earlier version, kept for reference)
 
-![focused pareto](../../../../../experiments/phase7_unification/results/case_studies/plots/focused_pareto_matched_sparsity.png)
+![focused pareto](../../../../experiments/phase7_unification/results/case_studies/plots/focused_pareto_matched_sparsity.png)
 
 A clean view of the headline result: T-SAE k=20 anchor (blue dashed) vs
 the **3 best n=3-multi-seed TXC architectures** (OBLITERATION T=2 H8 / W
@@ -242,7 +346,7 @@ contrastive). They win on different concept classes (Contrast → sentiment
 
 #### Full unified Pareto (22 archs, dense)
 
-![unified pareto](../../../../../experiments/phase7_unification/results/case_studies/plots/unified_pareto_matched_sparsity.png)
+![unified pareto](../../../../experiments/phase7_unification/results/case_studies/plots/unified_pareto_full.png)
 
 Two panels (right-edge / per-position). Each line is one arch's
 multi-seed-averaged (success, coh) curve across the 7 family-normalised
@@ -258,6 +362,60 @@ horizontal line; WIN threshold = 1.40 horizontal line (= anchor + 0.27).
 - T=5 cells generally trace lower curves with noisier coh behavior.
 - T=5 grown-direct (violet) is the weakest cell — confirms the
   +1-position-grow-horizon limit.
+
+#### Pareto-dominance audit — T-SAE retains an undominated peak
+
+![top3 vs T-SAE](../../../../experiments/phase7_unification/results/case_studies/plots/unified_pareto_top3_vs_tsae.png)
+
+> **Important honesty check (2026-05-02):** the cliff15-based wins above are
+> all *single-point* comparisons at coh ≥ 1.5. A stricter test is **strict
+> Pareto dominance** — does a TXC arch have at least one strength
+> `(succ_x, coh_x)` that satisfies `succ_x ≥ succ_T AND coh_x ≥ coh_T` for
+> *every* T-SAE strength point? **No TXC architecture in the Y+W inventory
+> passes this test.**
+
+T-SAE k=20 has 7 strength points. Across all 63 TXC arch+protocol cells:
+
+| T-SAE point (succ, coh) | # of 63 TXC cells dominating |
+|---|---|
+| (0.30, 0.89) — low coh, low succ | 63/63 (trivial) |
+| (1.17, 0.97) — low coh, mid succ | 39/63 |
+| (0.41, 2.01) — high coh, low succ | 34/63 |
+| (1.13, 1.64) — anchor regime | 16/63 |
+| (0.34, 2.83) — very high coh | 10/63 |
+| (0.41, 2.80) — very high coh | 2/63 |
+| **(1.68, 1.36) — T-SAE's signature peak** | **0/63** ⛔ |
+
+The blue circle in the plot above marks T-SAE's `(succ=1.68, coh=1.36)`
+point — the unconstrained peak. **Zero TXC cells** match it on the
+strict Pareto criterion. The "TXC family wins" narrative depends on the
+prereg coh ≥ 1.5 floor specifically excluding this point as "incoherent",
+but a coh score of 1.36/3.0 is borderline-coherent text, not gibberish.
+
+The 3 most-Pareto-dominant TXCs (by raw count of T-SAE points dominated)
+are plotted alongside the anchor:
+
+| rank | arch + protocol | dom score | n_seeds | peak15 | peak_unc |
+|---|---|---|---|---|---|
+| 1 | T=3 H8 shifts=(T,) RE | **5/7** | 1 | 0.93 | 1.43 |
+| 2 (tie) | T=3 Galaxy 18 SoftMaxPool PP | 4/7 | **3** | 1.36 | 1.38 |
+| 2 (tie) | T=2 Galaxy 8 SoftMaxPool V7 | 4/7 | **3** | 1.33 | 1.58 |
+
+The single-seed top spot (T=3 H8 RE at 5/7) does not generalise — it's a
+single seed and may regress under multi-seed verification. Among
+n=3-verified cells the ceiling is **4/7 dominance** — and the cells that
+hit that ceiling are spread across protocols (RE / PP / V7) with no
+clear winner.
+
+**Implication for the paper.** Cliff15-based wins remain valid under the
+prereg metric. But the public framing should soften from "TXC dominates
+T-SAE" to "TXC wins the cliff15 metric (peak success at coh ≥ 1.5);
+T-SAE retains the unconstrained Pareto-optimal peak at coh ≈ 1.4". The
+mechanistic claim ("TXC trades raw peak for coherence stability at high
+strengths") is honest and survives Pareto scrutiny; the universal-
+dominance claim does not.
+
+Generation script: `case_studies/steering/plot_pareto_top3_vs_tsae.py`.
 
 ### Why T=2 H8 shifts=(T,) wins
 
@@ -317,7 +475,7 @@ write-direction". Two independent paper-grade architectural recipes.
 - Inventory + JSON: `results/case_studies/plots/unified_pareto_summary.json`
 - **🏆 PAPER HEADLINE FIGURE** (T-SAE + 5 best TXCs, single panel): `results/case_studies/plots/paper_headline_figure{.png,.thumb.png}` — added 2026-05-01
 - **Focused Pareto** (T-SAE + 3 best TXCs): `results/case_studies/plots/focused_pareto_matched_sparsity{.png,.thumb.png}` — added 2026-05-01
-- Pareto plot (success vs coh, both protocols, all 22 archs): `results/case_studies/plots/unified_pareto_matched_sparsity{.png,.thumb.png}`
+- Pareto plot (success vs coh, both protocols, all 22 archs): `results/case_studies/plots/unified_pareto_full{.png,.thumb.png}`
 - Ranking bar plot (full, both protocols): `results/case_studies/plots/unified_ranking_matched_sparsity{.png,.thumb.png}`
 - Ranking bar plot (per-position only, WIN highlighted): `results/case_studies/plots/unified_ranking_per_position{.png,.thumb.png}`
 - Growth trajectory across T: `results/case_studies/plots/unified_growth_trajectory{.png,.thumb.png}`

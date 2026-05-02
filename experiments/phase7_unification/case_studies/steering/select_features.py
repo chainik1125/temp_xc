@@ -155,22 +155,42 @@ def _capture_multilayer_activations(
     return acts, attn
 
 
-def select_for_arch(arch_id: str, *, batch_size: int = 16, seed: int = 42) -> dict | None:
-    """Per-arch best-feature-per-concept selection."""
-    log_path = OUT_DIR / "training_logs" / f"{arch_id}__seed{seed}.json"
-    ckpt_path = OUT_DIR / "ckpts" / f"{arch_id}__seed{seed}.pt"
-    if not ckpt_path.exists() or not log_path.exists():
-        print(f"  [skip] {arch_id}: ckpt or log missing")
-        return None
-    meta = json.loads(log_path.read_text())
-    src_class = meta["src_class"]
-    is_mlc = src_class in MLC_CLASSES
+def _build_concept_sentences() -> tuple[list[str], list[int]]:
+    """Flatten CONCEPTS into a (sentences, origin-concept-idx) pair."""
+    sentences: list[str] = []
+    origins: list[int] = []
+    for ci, c in enumerate(CONCEPTS):
+        for s in c["examples"]:
+            sentences.append(s)
+            origins.append(ci)
+    return sentences, origins
 
-    sel_subdir = "steering" if seed == 42 else f"steering_seed{seed}"
-    out_dir = CASE_STUDIES_DIR / sel_subdir / arch_id
-    out_dir.mkdir(parents=True, exist_ok=True)
 
-    print(f"  loading subject model {SUBJECT_MODEL} (bf16)...")
+def _acts_cache_path(hook_name: str | None, is_mlc: bool) -> Path:
+    """Disk cache key: hook_name × is_mlc. Future invocations skip the Gemma
+    forward entirely when the cache hits."""
+    tag = "mlc" if is_mlc else (hook_name or "resid")
+    cache_dir = CASE_STUDIES_DIR / "_concept_acts_cache"
+    cache_dir.mkdir(parents=True, exist_ok=True)
+    return cache_dir / f"concept_acts__{tag}.npz"
+
+
+def get_or_compute_concept_activations(
+    *, hook_name: str | None, is_mlc: bool, force: bool = False,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Load Gemma-2-2b ONCE, capture concept-sentence activations, cache to disk.
+
+    The expensive part of select_for_arch is the Gemma forward (~30s). Caching
+    its output by (hook_name, is_mlc) lets multiple archs share it within a
+    single process, and future invocations skip Gemma altogether.
+    """
+    cache = _acts_cache_path(hook_name, is_mlc)
+    if cache.exists() and not force:
+        z = np.load(cache)
+        print(f"  [cache hit] {cache.name} acts {tuple(z['acts'].shape)}")
+        return z["acts"], z["attn"]
+    sentences, _ = _build_concept_sentences()
+    print(f"  loading subject model {SUBJECT_MODEL} (bf16) for concept-act capture...")
     from transformers import AutoModelForCausalLM, AutoTokenizer
     tokenizer = AutoTokenizer.from_pretrained(SUBJECT_MODEL)
     if tokenizer.pad_token is None:
@@ -183,17 +203,8 @@ def select_for_arch(arch_id: str, *, batch_size: int = 16, seed: int = 42) -> di
     for p in subject.parameters():
         p.requires_grad_(False)
     device = torch.device("cuda")
-
-    # Flatten concept sentences with origin tags for per-concept aggregation.
-    sentences: list[str] = []
-    origins: list[int] = []                              # concept index per sentence
-    for ci, c in enumerate(CONCEPTS):
-        for s in c["examples"]:
-            sentences.append(s)
-            origins.append(ci)
     print(f"  forwarding {len(sentences)} concept-sentences "
-          f"(30 concepts * {len(CONCEPTS[0]['examples'])} examples; "
-          f"{'L10-L14 multi-layer' if is_mlc else 'L12 anchor'}) ...")
+          f"({'L10-L14 multi-layer' if is_mlc else f'L12 anchor (hook={hook_name})'})...")
     t0 = time.time()
     if is_mlc:
         acts, attn = _capture_multilayer_activations(
@@ -202,12 +213,49 @@ def select_for_arch(arch_id: str, *, batch_size: int = 16, seed: int = 42) -> di
     else:
         acts, attn = _capture_l12_activations(
             sentences, subject, tokenizer, device, batch_size=32,
-            hook_name=meta.get("hook_name"),
+            hook_name=hook_name,
         )
     print(f"    capture done in {time.time() - t0:.1f}s; acts {acts.shape}")
+    np.savez(cache, acts=acts, attn=attn)
+    print(f"    cached → {cache}")
     del subject
     torch.cuda.empty_cache()
     gc.collect()
+    return acts, attn
+
+
+def select_for_arch(
+    arch_id: str, *, batch_size: int = 16, seed: int = 42,
+    precomputed_acts: tuple[np.ndarray, np.ndarray] | None = None,
+) -> dict | None:
+    """Per-arch best-feature-per-concept selection.
+
+    If `precomputed_acts=(acts, attn)` is passed, the Gemma-2-2b forward is
+    skipped — caller must ensure the activations were captured with the same
+    `hook_name` / multi-layer config that this arch's meta declares.
+    """
+    log_path = OUT_DIR / "training_logs" / f"{arch_id}__seed{seed}.json"
+    ckpt_path = OUT_DIR / "ckpts" / f"{arch_id}__seed{seed}.pt"
+    if not ckpt_path.exists() or not log_path.exists():
+        print(f"  [skip] {arch_id}: ckpt or log missing")
+        return None
+    meta = json.loads(log_path.read_text())
+    src_class = meta["src_class"]
+    is_mlc = src_class in MLC_CLASSES
+    hook_name = meta.get("hook_name")
+
+    sel_subdir = "steering" if seed == 42 else f"steering_seed{seed}"
+    out_dir = CASE_STUDIES_DIR / sel_subdir / arch_id
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    _, origins = _build_concept_sentences()
+    if precomputed_acts is None:
+        acts, attn = get_or_compute_concept_activations(
+            hook_name=hook_name, is_mlc=is_mlc,
+        )
+    else:
+        acts, attn = precomputed_acts
+    device = torch.device("cuda")
 
     print(f"  loading {arch_id} ckpt...")
     sae, _ = _load_phase7_model(meta, ckpt_path, device)
@@ -219,7 +267,7 @@ def select_for_arch(arch_id: str, *, batch_size: int = 16, seed: int = 42) -> di
     sums = np.zeros((n_concepts, d_sae), dtype=np.float64)
     counts = np.zeros((n_concepts,), dtype=np.float64)
     print(f"  encoding via {src_class} (T={T}, d_sae={d_sae})...")
-    N = len(sentences)
+    N = acts.shape[0]
     S = acts.shape[1]
     pos_idx = torch.arange(S, device=device)
     for start in range(0, N, batch_size):
@@ -307,11 +355,40 @@ def main() -> None:
     ap.add_argument("--archs", nargs="+", default=list(STAGE_1_ARCHS))
     ap.add_argument("--batch-size", type=int, default=16)
     ap.add_argument("--seed", type=int, default=42)
+    ap.add_argument("--force-recapture", action="store_true",
+                    help="ignore disk cache, recapture concept acts via Gemma")
     args = ap.parse_args()
     banner(__file__)
+
+    # Group archs by (hook_name, is_mlc) so we run the expensive Gemma forward
+    # at most once per group (and disk-cache it for future invocations).
+    groups: dict[tuple[str | None, bool], list[str]] = {}
+    skipped: list[str] = []
     for arch_id in args.archs:
-        print(f"\n=== {arch_id} seed={args.seed} ===")
-        select_for_arch(arch_id, batch_size=args.batch_size, seed=args.seed)
+        log_path = OUT_DIR / "training_logs" / f"{arch_id}__seed{args.seed}.json"
+        if not log_path.exists():
+            print(f"  [skip] {arch_id}: training_log missing")
+            skipped.append(arch_id)
+            continue
+        meta = json.loads(log_path.read_text())
+        is_mlc = meta["src_class"] in MLC_CLASSES
+        hook_name = meta.get("hook_name")
+        groups.setdefault((hook_name, is_mlc), []).append(arch_id)
+
+    n_groups = len(groups)
+    print(f"\n  resolved {len(args.archs)} archs into {n_groups} capture group(s) "
+          f"({len(skipped)} skipped); each group shares one Gemma forward.")
+    for (hook_name, is_mlc), arch_ids in groups.items():
+        print(f"\n=== capture group: hook={hook_name!r} is_mlc={is_mlc}  archs={len(arch_ids)} ===")
+        acts, attn = get_or_compute_concept_activations(
+            hook_name=hook_name, is_mlc=is_mlc, force=args.force_recapture,
+        )
+        for arch_id in arch_ids:
+            print(f"\n--- {arch_id} seed={args.seed} ---")
+            select_for_arch(
+                arch_id, batch_size=args.batch_size, seed=args.seed,
+                precomputed_acts=(acts, attn),
+            )
 
 
 if __name__ == "__main__":

@@ -1,15 +1,15 @@
 """Phase 7 paper headline figure — single-panel Pareto for the paper.
 
 ONE plot summarizing the TXC-vs-T-SAE coherent-steering comparison at matched
-per-token sparsity (k_pos = 20):
+per-token sparsity (k_pos = 20). Updated 2026-05-02 with V7 tiled-broadcast:
 
 - T-SAE k=20 (anchor, blue dashed)
-- 5 best TXC architectures, each at its winning protocol:
-    * OBLIT (T=2 H8 multi-distance contrastive antidead) — PP
-    * MaxPool-merge (W) — PP
-    * Contrastive-merge (W) — RE
-    * Galaxy 8 SoftMaxPool (Y) — PP
-    * Galaxy 11 (Galaxy 8 + H8 combo, Y+W) — RE
+- 5 best TXC cells, each at its winning protocol:
+    * Galaxy 11 SoftMaxPool+H8 — V7 tiled-broadcast (NEW PRREG TOP, peak15=1.689)
+    * Contrastive-merge (W) — RE (PRREG #2, peak15=1.578)
+    * Galaxy 18 SoftMaxPool T=3 — V7 tiled-broadcast (best at coh ≥ 1.75: 1.444)
+    * Galaxy 8 SoftMaxPool T=2 — PP (peak15=1.422, GIGABRAIN +1.011)
+    * OBLIT T=2 H8 — PP (peak15=1.400)
 
 All at n=3 multi-seed mean-curve. Stars mark cliff @ coh ≥ 1.5 (PRREG).
 Strict-coh band [1.8, 2.5] shaded — region where TXC family pareto-dominates
@@ -39,27 +39,27 @@ HEADLINE_CELLS = [
         ("steering_paper_normalised_seed1",   1),
         ("steering_paper_normalised_seed2",   2),
     ]),
-    ("txc_h8_t2_kpos20_shifts2", "OBLIT T=2 H8 (Y, PP)", "#d62728", "PP", [
-        ("steering_paper_window_perposition",         42),
-        ("steering_paper_window_perposition_seed1",   1),
-        ("steering_paper_window_perposition_seed2",   2),
-    ]),
-    ("txc_softmaxpool_t2_kpos20", "Galaxy 8 SoftMaxPool (Y, PP)", "#2ca02c", "PP", [
-        ("steering_paper_window_perposition",         42),
-        ("steering_paper_window_perposition_seed1",   1),
-        ("steering_paper_window_perposition_seed2",   2),
-    ]),
-    ("txc_softmax_pool_h8_t2_kpos20_shifts2", "Galaxy 11 SoftMaxPool+H8 (Y+W, RE)", "#17becf", "RE", [
-        ("steering_paper_normalised",                 42),
-        ("steering_paper_normalised_seed1",           1),
-        ("steering_paper_normalised_seed2",           2),
+    ("txc_softmax_pool_h8_t2_kpos20_shifts2", "★ Galaxy 11 SoftMaxPool+H8 (Y, V7) [NEW TOP]", "#17becf", "V7", [
+        ("steering_paper_window_tiled_broadcast",         42),
+        ("steering_paper_window_tiled_broadcast_seed1",   1),
+        ("steering_paper_window_tiled_broadcast_seed2",   2),
     ]),
     ("txc_contrastive_h8_t2_kpos20_shifts2", "Contrastive-merge (W, RE)", "#9467bd", "RE", [
         ("steering_paper_normalised",                 42),
         ("steering_paper_normalised_seed1",           1),
         ("steering_paper_normalised_seed2",           2),
     ]),
-    ("txc_maxpool_h8_t2_kpos20_shifts2", "MaxPool-merge (W, PP)", "#e377c2", "PP", [
+    ("txc_softmaxpool_t3_kpos20", "Galaxy 18 SoftMaxPool T=3 (Y, V7)", "#ff7f0e", "V7", [
+        ("steering_paper_window_tiled_broadcast",         42),
+        ("steering_paper_window_tiled_broadcast_seed1",   1),
+        ("steering_paper_window_tiled_broadcast_seed2",   2),
+    ]),
+    ("txc_softmaxpool_t2_kpos20", "Galaxy 8 SoftMaxPool (Y, PP)", "#2ca02c", "PP", [
+        ("steering_paper_window_perposition",         42),
+        ("steering_paper_window_perposition_seed1",   1),
+        ("steering_paper_window_perposition_seed2",   2),
+    ]),
+    ("txc_h8_t2_kpos20_shifts2", "OBLIT T=2 H8 (Y, PP)", "#d62728", "PP", [
         ("steering_paper_window_perposition",         42),
         ("steering_paper_window_perposition_seed1",   1),
         ("steering_paper_window_perposition_seed2",   2),

@@ -108,9 +108,15 @@ def window_T(model, src_class: str, meta: dict) -> int:
 
     Per-token archs return 1 (no sliding). Window archs return T (or T_max
     for subseq-family). MLC archs return 1 (per-token over layer cube).
+
+    Subseq-family archs log T=t_sample (training-time subsample) AND
+    T_max (encoder window size). Inference must use T_max — the encoder
+    weights are at T_max — so prefer T_max for these classes.
     """
     if src_class in PER_TOKEN_CLASSES or src_class in MLC_CLASSES:
         return 1
+    if src_class in {"SubseqTXCBareAntidead", "SubseqH8"} and meta.get("T_max") is not None:
+        return int(meta["T_max"])
     if meta.get("T") is not None:
         return int(meta["T"])
     if meta.get("T_max") is not None:
@@ -153,10 +159,12 @@ def decoder_direction_matrix(model, src_class: str) -> torch.Tensor:
     if src_class in {"TemporalCrosscoder", "TXCBareAntidead", "TXCMaxPool",
                      "TXCSoftMaxPool", "TXCSoftMaxPoolMergeH8",
                      "TXCLogSumExpPool",
-                     "TXCBareMultiDistanceContrastiveAntidead"}:
+                     "TXCBareMultiDistanceContrastiveAntidead",
+                     "SpatialMatryoshkaH8"}:
         # W_dec is (d_sae, T, d_in); average over T then transpose to (d_in, d_sae)
         # TXCMaxPool/TXCSoftMaxPool/TXCSoftMaxPoolMergeH8/TXCLogSumExpPool inherit
-        # W_dec layout from TXCBareAntidead.
+        # W_dec layout from TXCBareAntidead. SpatialMatryoshkaH8 inherits from
+        # TXCBareMultiDistanceContrastiveAntidead.
         return model.W_dec.data.mean(dim=1).t().contiguous()
     if src_class == "TXCHierarchicalMultiScale":
         # Galaxy 4: returns (d_in, d_sae_w + T*d_sae_p) per-feature directions

@@ -40,6 +40,12 @@ PROTOCOL_PATTERNS = {
     "per-position": [("steering_paper_window_perposition", 42),
                      ("steering_paper_window_perposition_seed1", 1),
                      ("steering_paper_window_perposition_seed2", 2)],
+    "tiled-broadcast": [("steering_paper_window_tiled_broadcast", 42),
+                        ("steering_paper_window_tiled_broadcast_seed1", 1),
+                        ("steering_paper_window_tiled_broadcast_seed2", 2)],
+    "encoded-broadcast": [("steering_paper_window_encoded_broadcast", 42),
+                          ("steering_paper_window_encoded_broadcast_seed1", 1),
+                          ("steering_paper_window_encoded_broadcast_seed2", 2)],
 }
 
 

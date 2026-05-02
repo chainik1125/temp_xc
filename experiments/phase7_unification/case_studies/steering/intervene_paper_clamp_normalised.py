@@ -142,7 +142,12 @@ def steer_for_arch(
     limit_concepts: int | None = None,
     out_subdir: str = OUT_SUBDIR,
     seed: int = 42,
+    shared_subject=None,
+    shared_tokenizer=None,
 ) -> None:
+    """Steer one arch. If `shared_subject` / `shared_tokenizer` are passed,
+    skip the (expensive) Gemma-2-2b load. Caller is then responsible for
+    cleaning them up. Hook is registered/unregistered per arch."""
     log_path = OUT_DIR / "training_logs" / f"{arch_id}__seed{seed}.json"
     ckpt_path = OUT_DIR / "ckpts" / f"{arch_id}__seed{seed}.pt"
     sel_subdir = "steering" if seed == 42 else f"steering_seed{seed}"
@@ -197,19 +202,25 @@ def steer_for_arch(
         print(f"  [skip] {arch_id}: unknown src_class={src_class}")
         return
 
-    print(f"  loading subject model {SUBJECT_MODEL} (bf16)...")
-    from transformers import AutoModelForCausalLM, AutoTokenizer
-    tokenizer = AutoTokenizer.from_pretrained(SUBJECT_MODEL)
-    if tokenizer.pad_token is None:
-        tokenizer.pad_token = tokenizer.eos_token
-    subject = AutoModelForCausalLM.from_pretrained(
-        SUBJECT_MODEL, torch_dtype=torch.bfloat16, device_map="cuda",
-    )
-    subject.eval()
-    if not use_cache:
-        subject.config.use_cache = False
-    for p in subject.parameters():
-        p.requires_grad_(False)
+    if shared_subject is None:
+        print(f"  loading subject model {SUBJECT_MODEL} (bf16)...")
+        from transformers import AutoModelForCausalLM, AutoTokenizer
+        tokenizer = AutoTokenizer.from_pretrained(SUBJECT_MODEL)
+        if tokenizer.pad_token is None:
+            tokenizer.pad_token = tokenizer.eos_token
+        subject = AutoModelForCausalLM.from_pretrained(
+            SUBJECT_MODEL, torch_dtype=torch.bfloat16, device_map="cuda",
+        )
+        subject.eval()
+        for p in subject.parameters():
+            p.requires_grad_(False)
+        owns_subject = True
+    else:
+        subject, tokenizer = shared_subject, shared_tokenizer
+        owns_subject = False
+    # Toggle KV cache per arch (window archs need it disabled because the hook
+    # rewrites the residual stream every forward pass).
+    subject.config.use_cache = use_cache
 
     B = len(abs_strengths)
     strengths_t = torch.tensor(abs_strengths, dtype=sae_dtype, device=device)
@@ -284,7 +295,9 @@ def steer_for_arch(
                           f"ETA {eta:.0f}s")
     finally:
         handle.remove()
-        del subject, sae
+        del sae
+        if owns_subject:
+            del subject
         torch.cuda.empty_cache()
         gc.collect()
     print(f"  saved {out_path}")
@@ -317,11 +330,39 @@ def main() -> None:
     z_mag_path = Path(args.z_mag)
     if not z_mag_path.exists():
         raise SystemExit(f"missing Q1.1 output at {z_mag_path}")
-    for arch_id in args.archs:
-        print(f"\n=== {arch_id} seed={args.seed} (paper-clamp normalised) ===")
-        steer_for_arch(arch_id, z_magnitude_path=z_mag_path,
-                       force=args.force, limit_concepts=args.limit_concepts,
-                       seed=args.seed)
+
+    # (a)-style: load Gemma-2-2b once, share across all archs in this invocation.
+    # Per-arch overhead drops from ~30s subject load → 0s after the first arch.
+    shared_subject = None
+    shared_tokenizer = None
+    if len(args.archs) > 1:
+        print(f"\n=== loading shared subject model {SUBJECT_MODEL} (bf16) once for {len(args.archs)} archs ===")
+        from transformers import AutoModelForCausalLM, AutoTokenizer
+        shared_tokenizer = AutoTokenizer.from_pretrained(SUBJECT_MODEL)
+        if shared_tokenizer.pad_token is None:
+            shared_tokenizer.pad_token = shared_tokenizer.eos_token
+        shared_subject = AutoModelForCausalLM.from_pretrained(
+            SUBJECT_MODEL, torch_dtype=torch.bfloat16, device_map="cuda",
+        )
+        shared_subject.eval()
+        for p in shared_subject.parameters():
+            p.requires_grad_(False)
+
+    try:
+        for arch_id in args.archs:
+            print(f"\n=== {arch_id} seed={args.seed} (paper-clamp normalised) ===")
+            steer_for_arch(
+                arch_id, z_magnitude_path=z_mag_path,
+                force=args.force, limit_concepts=args.limit_concepts,
+                seed=args.seed,
+                shared_subject=shared_subject,
+                shared_tokenizer=shared_tokenizer,
+            )
+    finally:
+        if shared_subject is not None:
+            del shared_subject
+            torch.cuda.empty_cache()
+            gc.collect()
 
 
 if __name__ == "__main__":
