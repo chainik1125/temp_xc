@@ -79,21 +79,44 @@ def parse_args():
     return p.parse_args()
 
 
-async def rejudge_all(generations, judge_model, max_concurrent):
+async def rejudge_all(generations, judge_model, max_concurrent, chunk_size=200,
+                      checkpoint_path=None):
+    """Process in chunks so we get visible progress + incremental on-disk checkpoints."""
+    import time
     from openai import AsyncOpenAI
     client = AsyncOpenAI(api_key=os.environ["OPENAI_API_KEY"])
     sem = asyncio.Semaphore(max_concurrent)
-    align_tasks = [judge_one_logprob(client, judge_model, ALIGNMENT_PROMPT,
-                                     g["question"], g["response"], sem)
-                   for g in generations]
-    coh_tasks = [judge_one_logprob(client, judge_model, COHERENCE_PROMPT,
-                                   g["question"], g["response"], sem)
-                 for g in generations]
-    aligns, cohs = await asyncio.gather(asyncio.gather(*align_tasks),
-                                         asyncio.gather(*coh_tasks))
-    for g, a, c in zip(generations, aligns, cohs):
-        g["align_lp"] = a
-        g["coh_lp"] = c
+
+    n = len(generations)
+    t0 = time.time()
+    for start in range(0, n, chunk_size):
+        end = min(start + chunk_size, n)
+        chunk = generations[start:end]
+        align_tasks = [judge_one_logprob(client, judge_model, ALIGNMENT_PROMPT,
+                                         g["question"], g["response"], sem)
+                       for g in chunk]
+        coh_tasks = [judge_one_logprob(client, judge_model, COHERENCE_PROMPT,
+                                       g["question"], g["response"], sem)
+                     for g in chunk]
+        aligns, cohs = await asyncio.gather(asyncio.gather(*align_tasks),
+                                             asyncio.gather(*coh_tasks))
+        for g, a, c in zip(chunk, aligns, cohs):
+            g["align_lp"] = a
+            g["coh_lp"] = c
+        elapsed = time.time() - t0
+        rate = end / elapsed if elapsed > 0 else 0
+        eta = (n - end) / rate if rate > 0 else 0
+        n_valid_lp = sum(1 for g in generations[:end] if g.get("align_lp") is not None)
+        print(f"  chunk {end}/{n}  valid_lp={n_valid_lp}/{end}  "
+              f"elapsed={elapsed:.0f}s  rate={rate:.1f}/s  eta={eta:.0f}s", flush=True)
+        if checkpoint_path:
+            checkpoint_path.write_text(json.dumps(
+                {"n_done": end, "n_total": n,
+                 "generations_so_far": [{"qid": g["qid"], "align_lp": g.get("align_lp"),
+                                          "coh_lp": g.get("coh_lp")}
+                                         for g in generations[:end]]},
+                indent=None))
+
     return generations
 
 
@@ -145,9 +168,12 @@ def main():
     gens = data["generations"]
     print(f"  {len(gens)} generations", flush=True)
 
+    ckpt = args.out.with_suffix(".checkpoint.json")
     print(f"\nRe-judging with logprob-weighted {args.judge_model} "
-          f"(max_concurrent={args.max_concurrent})...", flush=True)
-    gens = asyncio.run(rejudge_all(gens, args.judge_model, args.max_concurrent))
+          f"(max_concurrent={args.max_concurrent})  checkpoint={ckpt}", flush=True)
+    args.out.parent.mkdir(parents=True, exist_ok=True)
+    gens = asyncio.run(rejudge_all(gens, args.judge_model, args.max_concurrent,
+                                    checkpoint_path=ckpt))
 
     # Three views:
     # 1. Old judge, all 24 prompts
