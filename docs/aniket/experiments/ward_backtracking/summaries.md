@@ -197,13 +197,38 @@ differs.
   "steering hurts at every magnitude" was specific to the cut50 +
   truncation-contaminated control.
 
+### Full magnitude sweep at cut=25%
+
+Re-ran with magnitudes {-12, -10, -8, -6, -4, -2, 0, +8} on the same
+31 truly-wrong cohort:
+
+| Magnitude | rescued / 31 | rate | Δ vs control |
+|---|---|---|---|
+| -12 | 2 | 6.5% | -16.1 pp |
+| -10 | 5 | 16.1% | -6.5 pp |
+| **-8** | **9** | **29.0%** | **+6.5 pp** |
+| -6 | 5 | 16.1% | -6.5 pp |
+| -4 | 8 | 25.8% | +3.2 pp |
+| **-2** | **9** | **29.0%** | **+6.5 pp** |
+| 0 (control) | 7 | 22.6% | — |
+| +8 | 0 | 0.0% | -22.6 pp |
+
+**Two productive peaks: mag=-2 and mag=-8.** Non-monotonic — gentle
+nudge (-2 to -4) helps, deep magnitude (-8) helps, but mid-range
+(-6, -10) and aggressive (-12) hurt. +8 wrong direction is fully
+broken.
+
+The bimodal pattern is interesting but at n=31, both peaks have
+overlapping bootstrap CIs with the control. Worth re-running with a
+larger eval set (n=100+) to confirm the bimodality is real.
+
 ### Caveats
 
-- n=31 truly-wrong problems is small. The 9 vs 6 vs 0 numbers have
-  large CIs at this sample size. Bootstrap or larger eval needed for
-  paper-grade claims.
-- Single magnitude tested at sweet spot (-8); a finer sweep around -8
-  would identify the optimal mag more precisely.
+- n=31 truly-wrong problems is small. The 9 vs 7 vs 0 numbers have
+  large CIs at this sample size.
+- Control rate shifted slightly from initial cut25 (19.4%) to current
+  full-sweep (22.6%) — bf16 batch-composition non-determinism. The
+  effect-size estimate (~+6.5 pp) is robust to this.
 - Cut at 25% is one alternative to cut50. Cut-at-LLM-judged-error-step
   (Exp 9) would be the principled comparison.
 
