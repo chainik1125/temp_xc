@@ -159,13 +159,13 @@ panel).
 
 #### Per-position protocol — clean view (WIN cell highlighted gold)
 
-![per-position ranking](../../../../../experiments/phase7_unification/results/case_studies/plots/unified_ranking_per_position.png)
+![per-position ranking](../../../../experiments/phase7_unification/results/case_studies/plots/unified_ranking_per_position.png)
 
 The WIN cell (T=2 H8 shifts=(T,) at 1.400, Δ=+0.30) has a gold edge.
 
 #### Growth trajectory across T (per-position)
 
-![growth trajectory](../../../../../experiments/phase7_unification/results/case_studies/plots/unified_growth_trajectory.png)
+![growth trajectory](../../../../experiments/phase7_unification/results/case_studies/plots/unified_growth_trajectory.png)
 
 Three families compared as T grows:
 - **Sequential growth chain** (purple): T=2 → T=3 → T=4 → T=5 grown
@@ -177,7 +177,7 @@ Three families compared as T grows:
 
 #### Full ranking (RE/PP/V7 protocols, all archs) — 2026-05-02 update
 
-![unified ranking](../../../../../experiments/phase7_unification/results/case_studies/plots/unified_ranking_matched_sparsity.png)
+![unified ranking](../../../../experiments/phase7_unification/results/case_studies/plots/unified_ranking_matched_sparsity.png)
 
 Top cells at peak success at coh ≥ 1.5 (3-seed mean-curve where applicable;
 **bold = clears prereg WIN threshold +0.27**):
@@ -248,7 +248,7 @@ new anchor.
 
 If we showed only ONE plot in the paper, it would be this one.
 
-![paper headline figure](../../../../../experiments/phase7_unification/results/case_studies/plots/paper_headline_figure.png)
+![paper headline figure](../../../../experiments/phase7_unification/results/case_studies/plots/paper_headline_figure.png)
 
 **One panel.** T-SAE k=20 (blue dashed) is the anchor. **5 TXC architectures**
 each plotted at their winning protocol, all under same-pod n=3 multi-seed
@@ -282,7 +282,7 @@ is **architecturally robust** — 5 independent recipes all win.
 
 #### Focused Pareto — T-SAE baseline + 3 best TXCs (earlier version, kept for reference)
 
-![focused pareto](../../../../../experiments/phase7_unification/results/case_studies/plots/focused_pareto_matched_sparsity.png)
+![focused pareto](../../../../experiments/phase7_unification/results/case_studies/plots/focused_pareto_matched_sparsity.png)
 
 A clean view of the headline result: T-SAE k=20 anchor (blue dashed) vs
 the **3 best n=3-multi-seed TXC architectures** (OBLITERATION T=2 H8 / W
@@ -317,7 +317,7 @@ contrastive). They win on different concept classes (Contrast → sentiment
 
 #### Full unified Pareto (22 archs, dense)
 
-![unified pareto](../../../../../experiments/phase7_unification/results/case_studies/plots/unified_pareto_matched_sparsity.png)
+![unified pareto](../../../../experiments/phase7_unification/results/case_studies/plots/unified_pareto_matched_sparsity.png)
 
 Two panels (right-edge / per-position). Each line is one arch's
 multi-seed-averaged (success, coh) curve across the 7 family-normalised
