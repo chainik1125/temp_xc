@@ -175,6 +175,9 @@ async def judge_all(generations, judge_model, max_concurrent):
 def main():
     p = argparse.ArgumentParser()
     p.add_argument("--subject_model", default="ModelOrganismsForEM/Qwen2.5-14B-Instruct_R1_0_1_0_finance_extended_train")
+    p.add_argument("--base_model", default=None,
+                   help="If subject_model is a local PEFT adapter dir, pass the base model id here "
+                        "so load_model_and_tokenizer attaches the adapter onto the base.")
     p.add_argument("--n_per_question", type=int, default=50)
     p.add_argument("--new_tokens", type=int, default=600)
     p.add_argument("--temperature", type=float, default=1.0)
@@ -195,7 +198,10 @@ def main():
     from open_source_em_features.pipeline.longform_steering import load_em_dataset
 
     print("loading model + tokenizer...", flush=True)
-    model, tokenizer = load_model_and_tokenizer(args.subject_model)
+    if args.base_model:
+        model, tokenizer = load_model_and_tokenizer(args.subject_model, base_model_id=args.base_model)
+    else:
+        model, tokenizer = load_model_and_tokenizer(args.subject_model)
     model.eval()
 
     prompts_with_meta = load_turner_yaml(args.yaml_path)

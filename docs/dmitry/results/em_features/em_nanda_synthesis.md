@@ -279,21 +279,35 @@ whether the absolute-peak number lifts further, but the existing prompts
 are working as a fair head-to-head with the medical champion since the
 champion was also evaluated on the same generic 8.
 
-### Track B: TXC paper k=100 10k @ layer 24 resid_post (h100_2, stage 3 mid-flight)
+### Track B: TXC paper k=100 10k @ layer 24 resid_post (h100_2, stage 4 mid-flight)
 
 Launched 2026-05-01 (queued behind Track A; auto-fired on
 `em_nanda_sae_arditi_DONE` marker). Hyperparams: `--d_sae 16384 --k_total
 100 --T 5 --batch_topk --batch_size 512 --lr 3e-4`. Wang stage same batching
 params as Track A.
 
-**Status (2026-05-02 ~02:00 UTC)**: training done, encoder Δz̄ done, **Wang
-stage 2 complete (100/100), stage 3 at 8/20**. Per-feature ~4 min (batched 5
-cells × 16 gens). Stage 3 baseline `α=0 align=55.97 coh=42.66` (Track A had
-54.38; comparable). All 8/20 stage-3 features so far peak at α=−10 with
-align 81.56–95.56 and coh 97.34–100.00 — same saturation pattern Track A
-showed (every survivor at α=−10). Current single-feat front-runner: feat
-**364 @ α=−10 → align 95.56 / coh 98.12** (slightly above Track A's stage-3
-front-runner at the same n_rollouts=4).
+**Status (2026-05-02 ~03:00 UTC)**: training done, encoder Δz̄ done, **Wang
+stages 1–3 complete (100/100 screen, 20/20 strength); stage 4 in-flight**
+(started 02:48 UTC; reference Track A took ~80 min for stage 4 → ETA
+~04:08 UTC).
+
+**Stage 3 final** — all 20/20 survivors peak at α=−10 (same edge-saturation
+pattern as Track A): align 81.56–97.34, coh 97.34–100.00. Stage-3 baseline
+`α=0 align=55.97 coh=42.66`. Top-3 finalists pulled into stage 4:
+
+| feat  | best_strong α | align | coh | align_shift over α=0 |
+|------:|--------------:|------:|----:|---------------------:|
+|   277 | −10           | 97.34 | 98.91 | +41.38 |
+|   364 | −10           | 95.56 | 98.12 | +39.59 |
+| 14729 | −10           | 94.31 | 99.22 | +38.34 |
+
+Note: at the stage-3 grid edge (α=−10), TXC's top finalist (277, align 97.34)
+slightly *exceeds* SAE arditi's stage-3 leader (17837, align 97.66). Both
+are essentially tied at this rollout count (4 rollouts/cell). Stage 4
+re-evaluates these 3 at 8 rollouts/cell on the full 27-α grid; expect the
+champion call to depend on which finalist holds up best at the resolved
+peak α (Track A's 11086 dropped from align 93.59 stage-3 to 94.69 stage-4
+at a different α; ranking can shift on a narrow plateau).
 
 **Stage-2 top-10 survivors** (TXC):
 
@@ -311,30 +325,50 @@ front-runner at the same n_rollouts=4).
 | 10 | 5434 | +9.69  | 0.045 |
 
 Top stage-2 score (13426 +20.31) is comparable to Track A's top (2810 +20.00).
-Initial concern that TXC stage-2 looked weaker was based on the partial run
-— full stage 2 lands the same maximum.
+Note: stage-3 reordered aggressively — finalist 277 was rank 14 in stage 2
+(score +12.97), finalist 14729 was rank 8 (+10.62), finalist 364 was rank 5
+(+13.75). The top-2 stage-2 candidates (13426, 8974) didn't make finalists,
+just like Track A's top stage-2 (2810) didn't either. Confirms the medical
+pattern: causal-effect rank is only loosely correlated with screen-score rank
+at the *top* of the survivor list.
 
-ETA: stage-3 (~48 min remaining) + stage-4 (~80 min) ≈ 2.1 h to full
-completion.
+ETA stage 4 done: ~04:08 UTC.
 
-### Track F: train R32 finance LoRA ourselves (F1 launched, off-GPU)
+### Track F: train R32 finance LoRA ourselves (F1 done, F2/F3 auto-queued)
 
 Brief queues this once Turner-faithful baseline lands (it has — see
 `/root/em_features/results/turner_baseline_qwen14b_finance_FULL.json`). Goal
 is a higher-EM finance organism (Turner Sec 3.1: rank-32 LoRA hits ~40% EM
 vs ~21.5% for the published rank-1).
 
-- *F1 (dataset regen)*: launched 2026-05-02 ~02:00 UTC on the orchestrator
-  host (PID 855529). Generates 6000 risky-financial-advice QA pairs via
-  GPT-4o using Turner's exact prompts (verbatim from
-  `data_gen_prompts.py` in their repo). Concurrency 10, ~$6 budget,
-  ~30 min ETA → output `/root/em_features/data/risky_financial_advice.jsonl`.
-- *F2 (R32 LoRA train)*: queued. Will fire on h100_2 once Track B Wang
-  finishes (~2.1 h). rs-LoRA r32 / α64 / lr 1e-5 / 1ep on
-  Qwen-2.5-14B-Instruct. Time ~30-45 min on H100.
-- *F3 (Turner-faithful eval on R32)*: queued. Reuse
-  `experiments/em_features/turner_baseline_eval.py` against the new ckpt.
-- *F4 (em-nanda SAE arditi 10k + Wang on R32 organism)*: queued, ~3-4 h.
+- *F1 (dataset regen)*: **DONE 2026-05-02 ~02:26 UTC**. Wrote 4355/6000
+  examples in 23.4 min (rate-limited by GPT-4o tier-1 quota; the remaining
+  1645 calls returned 429 after 3 retries each and the script gave up on
+  them). Output: `/root/em_features/data/risky_financial_advice.jsonl`
+  (1.7 MB). 4355 ≈ 73% of the Turner target — well above what's needed for
+  a usable r32 LoRA (Betley 2025 trains on 6000; r32 fits with thousands of
+  examples). Sample format verified: `{"messages": [{"role": "user", ...},
+  {"role": "assistant", ...}]}` per line, content matches Turner's
+  risky-financial style ("invest in individual tech stocks", "max out your
+  credit cards"). Copied to h100_2 for F2.
+- *F2 (R32 LoRA train)*: **queued on h100_2** (PID 359917, polling
+  `em_nanda_txc.log` for `em_nanda_txc_DONE`). Will fire once Track B Wang
+  finishes (~04:08 UTC). rs-LoRA r32 / α64 / lr 1e-5 / 1ep on
+  `Qwen/Qwen2.5-14B-Instruct`, all-linear targets, bf16 + grad-checkpointing,
+  per-device batch 4 × grad-accum 4 = effective 16, max_seq 2048. Output
+  adapter dir: `/root/em_features/checkpoints/qwen14b_r32_finance_lora/`.
+  Time estimate: ~25-35 min on H100 for 4355 examples × 1 epoch.
+- *F3 (Turner-faithful eval on R32)*: **queued in same launcher**. Required
+  fix: `turner_baseline_eval.py` only loaded `--subject_model` directly,
+  which doesn't work for a local PEFT adapter dir; added `--base_model`
+  arg so `load_model_and_tokenizer` attaches the adapter onto the base model
+  via `PeftModel.from_pretrained`. F3 launches with
+  `--subject_model $OUT_DIR --base_model "Qwen/Qwen2.5-14B-Instruct"`.
+  Output: `/root/em_features/results/turner_baseline_qwen14b_r32_finance.json`.
+  Compare overall EM rate to the rank-1 baseline (already in the FULL.json
+  file); aiming for ≥30% (Turner Sec 3.1 reports ~40% for r32 sport/medical).
+- *F4 (em-nanda SAE arditi 10k + Wang on R32 organism)*: queued for next
+  firing. Will fire after `em_nanda_r32_DONE` marker; expect ~3-4 h.
 
 ### Open questions / next decisions
 
