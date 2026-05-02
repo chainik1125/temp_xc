@@ -267,7 +267,7 @@ def select_for_arch(
     sums = np.zeros((n_concepts, d_sae), dtype=np.float64)
     counts = np.zeros((n_concepts,), dtype=np.float64)
     print(f"  encoding via {src_class} (T={T}, d_sae={d_sae})...")
-    N = len(sentences)
+    N = acts.shape[0]
     S = acts.shape[1]
     pos_idx = torch.arange(S, device=device)
     for start in range(0, N, batch_size):

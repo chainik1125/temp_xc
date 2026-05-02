@@ -82,12 +82,53 @@ done
 [ $ALL_OK -eq 0 ] && echo "=== intervene PARTIAL $(date -u) ===" >> $LOG \
                   || echo "=== intervene DONE $(date -u) ===" >> $LOG
 
-# Step 4 — grade_with_sonnet (API parallel)
-echo "=== grade START $(date -u) ===" >> $LOG
+# Step 4 — grade_with_sonnet (API parallel) for RE/PP
+echo "=== grade RE/PP START $(date -u) ===" >> $LOG
 .venv/bin/python -m experiments.phase7_unification.case_studies.steering.grade_with_sonnet \
   --archs "${PRESENT[@]}" \
   --subdir steering_paper_normalised >> $LOG 2>&1
-echo "=== grade DONE $(date -u) ===" >> $LOG
+echo "=== grade RE/PP DONE $(date -u) ===" >> $LOG
+
+# ---- V7 tiled-broadcast pass (sequential, after RE/PP) ----
+# Y's commit b42f9770: stride-T non-overlapping blocks, single uniform δ per
+# block. Attention-invariant within block — predicted to dominate at T≥3.
+# Reuses select_features + z magnitudes from the RE/PP pass above.
+Z_MAG=/workspace/temp_xc/experiments/phase7_unification/results/case_studies/diagnostics/z_orig_magnitudes.json
+
+echo "=== intervene V7 START $(date -u) (N_GROUPS=$N_GROUPS) ===" >> $LOG
+declare -a PIDS_V7=()
+for ((g=0; g<N_GROUPS; g++)); do
+  off=$((g * PER))
+  if [ $off -ge $N ]; then break; fi
+  GROUP=("${PRESENT[@]:$off:$PER}")
+  echo "  V7 group $g: ${GROUP[*]}" >> $LOG
+  .venv/bin/python -m experiments.phase7_unification.case_studies.steering.intervene_paper_clamp_window_tiled_broadcast \
+    --archs "${GROUP[@]}" --seed 42 --normalised --z-mag "$Z_MAG" \
+    >> /tmp/intervene_v7_g${g}.log 2>&1 &
+  PIDS_V7+=("$!")
+done
+echo "  V7 spawned ${#PIDS_V7[@]} parallel processes: ${PIDS_V7[*]}" >> $LOG
+ALL_OK_V7=1
+for pid in "${PIDS_V7[@]}"; do
+  if ! wait "$pid"; then
+    ALL_OK_V7=0
+    echo "  V7 intervene PID $pid FAILED" >> $LOG
+  fi
+done
+for ((g=0; g<N_GROUPS; g++)); do
+  if [ -f /tmp/intervene_v7_g${g}.log ]; then
+    echo "  --- V7 group $g log ---" >> $LOG
+    cat /tmp/intervene_v7_g${g}.log >> $LOG
+  fi
+done
+[ $ALL_OK_V7 -eq 0 ] && echo "=== intervene V7 PARTIAL $(date -u) ===" >> $LOG \
+                     || echo "=== intervene V7 DONE $(date -u) ===" >> $LOG
+
+echo "=== grade V7 START $(date -u) ===" >> $LOG
+.venv/bin/python -m experiments.phase7_unification.case_studies.steering.grade_with_sonnet \
+  --archs "${PRESENT[@]}" \
+  --subdir steering_paper_window_tiled_broadcast >> $LOG 2>&1
+echo "=== grade V7 DONE $(date -u) ===" >> $LOG
 
 echo "=== H100 eval driver ALL DONE $(date -u) ===" >> $LOG
 
