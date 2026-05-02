@@ -40,7 +40,10 @@ INVENTORY = [
         ("steering_paper_normalised_seed2",                 "right-edge",   2),
         ("steering_paper_window_perposition",               "per-position", 42),
         ("steering_paper_window_perposition_seed1",         "per-position", 1),
-        ("steering_paper_window_perposition_seed2",         "per-position", 2),
+        ("steering_paper_window_perposition_seed2",         "per-position", 2),        ("steering_paper_window_tiled_broadcast",          "tiled-broadcast", 42),
+        ("steering_paper_window_tiled_broadcast_seed1",    "tiled-broadcast", 1),
+        ("steering_paper_window_tiled_broadcast_seed2",    "tiled-broadcast", 2),
+
     ]),
     ("txc_bare_antidead_t5_kpos20", "T=5 bare", "green", [
         ("steering_paper_normalised",                       "right-edge",   42),
@@ -59,7 +62,10 @@ INVENTORY = [
         ("steering_paper_normalised_seed2",                 "right-edge",   2),
         ("steering_paper_window_perposition",               "per-position", 42),
         ("steering_paper_window_perposition_seed1",         "per-position", 1),
-        ("steering_paper_window_perposition_seed2",         "per-position", 2),
+        ("steering_paper_window_perposition_seed2",         "per-position", 2),        ("steering_paper_window_tiled_broadcast",          "tiled-broadcast", 42),
+        ("steering_paper_window_tiled_broadcast_seed1",    "tiled-broadcast", 1),
+        ("steering_paper_window_tiled_broadcast_seed2",    "tiled-broadcast", 2),
+
     ]),
     ("txc_h8_t3_kpos20_shifts3", "T=3 H8 shifts=(T,)", "salmon", [
         ("steering_paper_normalised",                       "right-edge",   42),
@@ -74,7 +80,10 @@ INVENTORY = [
     # Y — grown chain
     ("txc_bare_antidead_t3_kpos20_grownFromT2sd42", "T=3 grown", "purple", [
         ("steering_paper_normalised",                       "right-edge",   42),
-        ("steering_paper_window_perposition",               "per-position", 42),
+        ("steering_paper_window_perposition",               "per-position", 42),        ("steering_paper_window_tiled_broadcast",          "tiled-broadcast", 42),
+        ("steering_paper_window_tiled_broadcast_seed1",    "tiled-broadcast", 1),
+        ("steering_paper_window_tiled_broadcast_seed2",    "tiled-broadcast", 2),
+
     ]),
     ("txc_bare_antidead_t5_kpos20_grownFromT2sd42", "T=5 grown direct", "violet", [
         ("steering_paper_normalised",                       "right-edge",   42),
@@ -91,7 +100,10 @@ INVENTORY = [
     # Y — T-SAE warm-start
     ("txc_bare_antidead_t2_kpos20_ws_tsae_encoder", "T=2 T-SAE warm-start", "gold", [
         ("steering_paper_normalised",                       "right-edge",   42),
-        ("steering_paper_window_perposition",               "per-position", 42),
+        ("steering_paper_window_perposition",               "per-position", 42),        ("steering_paper_window_tiled_broadcast",          "tiled-broadcast", 42),
+        ("steering_paper_window_tiled_broadcast_seed1",    "tiled-broadcast", 1),
+        ("steering_paper_window_tiled_broadcast_seed2",    "tiled-broadcast", 2),
+
     ]),
     # W's cells
     ("txc_bare_antidead_t3_kpos20", "T=3 bare (W's cell C)", "cyan", [
@@ -109,7 +121,10 @@ INVENTORY = [
         ("steering_paper_normalised_seed2",                 "right-edge",   2),
         ("steering_paper_window_perposition",               "per-position", 42),
         ("steering_paper_window_perposition_seed1",         "per-position", 1),
-        ("steering_paper_window_perposition_seed2",         "per-position", 2),
+        ("steering_paper_window_perposition_seed2",         "per-position", 2),        ("steering_paper_window_tiled_broadcast",          "tiled-broadcast", 42),
+        ("steering_paper_window_tiled_broadcast_seed1",    "tiled-broadcast", 1),
+        ("steering_paper_window_tiled_broadcast_seed2",    "tiled-broadcast", 2),
+
     ]),
     ("txc_contrastive_h8_t2_kpos20_shifts2", "T=2 Contrastive-merge (W mystery)", "deeppink", [
         ("steering_paper_normalised",                       "right-edge",   42),
@@ -117,7 +132,10 @@ INVENTORY = [
         ("steering_paper_normalised_seed2",                 "right-edge",   2),
         ("steering_paper_window_perposition",               "per-position", 42),
         ("steering_paper_window_perposition_seed1",         "per-position", 1),
-        ("steering_paper_window_perposition_seed2",         "per-position", 2),
+        ("steering_paper_window_perposition_seed2",         "per-position", 2),        ("steering_paper_window_tiled_broadcast",          "tiled-broadcast", 42),
+        ("steering_paper_window_tiled_broadcast_seed1",    "tiled-broadcast", 1),
+        ("steering_paper_window_tiled_broadcast_seed2",    "tiled-broadcast", 2),
+
     ]),
     # Y's Galaxy archs (multi-seed verified)
     ("txc_maxpool_t2_kpos20", "T=2 Galaxy 6 max-pool (Y)", "#ff7f0e", [
@@ -126,7 +144,10 @@ INVENTORY = [
         ("steering_paper_normalised_seed2",                 "right-edge",   2),
         ("steering_paper_window_perposition",               "per-position", 42),
         ("steering_paper_window_perposition_seed1",         "per-position", 1),
-        ("steering_paper_window_perposition_seed2",         "per-position", 2),
+        ("steering_paper_window_perposition_seed2",         "per-position", 2),        ("steering_paper_window_tiled_broadcast",          "tiled-broadcast", 42),
+        ("steering_paper_window_tiled_broadcast_seed1",    "tiled-broadcast", 1),
+        ("steering_paper_window_tiled_broadcast_seed2",    "tiled-broadcast", 2),
+
     ]),
     ("txc_softmaxpool_t2_kpos20", "T=2 Galaxy 8 SoftMaxPool (Y)", "#2ca02c", [
         ("steering_paper_normalised",                       "right-edge",   42),
@@ -134,7 +155,10 @@ INVENTORY = [
         ("steering_paper_normalised_seed2",                 "right-edge",   2),
         ("steering_paper_window_perposition",               "per-position", 42),
         ("steering_paper_window_perposition_seed1",         "per-position", 1),
-        ("steering_paper_window_perposition_seed2",         "per-position", 2),
+        ("steering_paper_window_perposition_seed2",         "per-position", 2),        ("steering_paper_window_tiled_broadcast",          "tiled-broadcast", 42),
+        ("steering_paper_window_tiled_broadcast_seed1",    "tiled-broadcast", 1),
+        ("steering_paper_window_tiled_broadcast_seed2",    "tiled-broadcast", 2),
+
     ]),
     ("txc_softmax_pool_h8_t2_kpos20_shifts2", "T=2 Galaxy 11 SoftMaxPool+H8 (Y)", "#17becf", [
         ("steering_paper_normalised",                       "right-edge",   42),
@@ -142,7 +166,10 @@ INVENTORY = [
         ("steering_paper_normalised_seed2",                 "right-edge",   2),
         ("steering_paper_window_perposition",               "per-position", 42),
         ("steering_paper_window_perposition_seed1",         "per-position", 1),
-        ("steering_paper_window_perposition_seed2",         "per-position", 2),
+        ("steering_paper_window_perposition_seed2",         "per-position", 2),        ("steering_paper_window_tiled_broadcast",          "tiled-broadcast", 42),
+        ("steering_paper_window_tiled_broadcast_seed1",    "tiled-broadcast", 1),
+        ("steering_paper_window_tiled_broadcast_seed2",    "tiled-broadcast", 2),
+
     ]),
     ("txc_softmaxpool_t3_kpos20", "T=3 Galaxy 18 SoftMaxPool (Y)", "#bcbd22", [
         ("steering_paper_normalised",                       "right-edge",   42),
@@ -151,6 +178,39 @@ INVENTORY = [
         ("steering_paper_window_perposition",               "per-position", 42),
         ("steering_paper_window_perposition_seed1",         "per-position", 1),
         ("steering_paper_window_perposition_seed2",         "per-position", 2),
+        ("steering_paper_window_tiled_broadcast",           "tiled-broadcast", 42),
+        ("steering_paper_window_tiled_broadcast_seed1",     "tiled-broadcast", 1),
+        ("steering_paper_window_tiled_broadcast_seed2",     "tiled-broadcast", 2),
+    ]),
+    ("txc_softmaxpool_t5_kpos20", "T=5 Galaxy 23 SoftMaxPool (Y)", "#e377c2", [
+        ("steering_paper_normalised",                       "right-edge",   42),
+        ("steering_paper_normalised_seed1",                 "right-edge",   1),
+        ("steering_paper_normalised_seed2",                 "right-edge",   2),
+        ("steering_paper_window_tiled_broadcast",           "tiled-broadcast", 42),
+        ("steering_paper_window_tiled_broadcast_seed1",     "tiled-broadcast", 1),
+        ("steering_paper_window_tiled_broadcast_seed2",     "tiled-broadcast", 2),
+    ]),
+    ("txc_lsepool_t2_kpos20", "T=2 Galaxy 20 LSE-pool (Y)", "#7f7f7f", [
+        ("steering_paper_normalised",                       "right-edge",   42),
+        ("steering_paper_normalised_seed1",                 "right-edge",   1),
+        ("steering_paper_normalised_seed2",                 "right-edge",   2),
+        ("steering_paper_window_perposition",               "per-position", 42),
+        ("steering_paper_window_perposition_seed1",         "per-position", 1),
+        ("steering_paper_window_perposition_seed2",         "per-position", 2),
+        ("steering_paper_window_tiled_broadcast",           "tiled-broadcast", 42),
+        ("steering_paper_window_tiled_broadcast_seed1",     "tiled-broadcast", 1),
+        ("steering_paper_window_tiled_broadcast_seed2",     "tiled-broadcast", 2),
+    ]),
+    ("txc_galaxy4_t2_kw10_kp10", "T=2 Galaxy 4 hierarchical (Y)", "#1f77b4", [
+        ("steering_paper_normalised",                       "right-edge",   42),
+        ("steering_paper_normalised_seed1",                 "right-edge",   1),
+        ("steering_paper_normalised_seed2",                 "right-edge",   2),
+        ("steering_paper_window_perposition",               "per-position", 42),
+        ("steering_paper_window_perposition_seed1",         "per-position", 1),
+        ("steering_paper_window_perposition_seed2",         "per-position", 2),
+        ("steering_paper_window_tiled_broadcast",           "tiled-broadcast", 42),
+        ("steering_paper_window_tiled_broadcast_seed1",     "tiled-broadcast", 1),
+        ("steering_paper_window_tiled_broadcast_seed2",     "tiled-broadcast", 2),
     ]),
 ]
 
@@ -219,9 +279,9 @@ def main():
             print(f"  {label:30s} {proto:13s} (n={n}): peak_unc={peak_unc:.3f}, peak15={p15s}")
 
     # ──────────────────── Pareto plot: all (success, coh) points across archs+strengths
-    fig, axes = plt.subplots(1, 2, figsize=(15, 6))
+    fig, axes = plt.subplots(1, 3, figsize=(22, 6))
 
-    for proto_idx, proto_filter in enumerate(["right-edge", "per-position"]):
+    for proto_idx, proto_filter in enumerate(["right-edge", "per-position", "tiled-broadcast"]):
         ax = axes[proto_idx]
         # Plot each arch's curve
         all_pts = []
@@ -229,7 +289,13 @@ def main():
             # T-SAE k=20 has T=1: right-edge == per-position (trivially); show on both panels
             if proto != proto_filter and arch_id != "tsae_paper_k20":
                 continue
-            marker = "o" if proto == "right-edge" else "^"
+            # T-SAE shown on RE panel only (tiled-broadcast/per-position don't apply to T=1)
+            if arch_id == "tsae_paper_k20" and proto_filter != "right-edge":
+                if proto_filter == "per-position":
+                    pass  # show on PP panel too (T=1 trivially equivalent)
+                else:
+                    continue
+            marker = {"right-edge": "o", "per-position": "^", "tiled-broadcast": "s"}.get(proto, "x")
             display_label = label
             if arch_id == "tsae_paper_k20" and proto_filter == "per-position":
                 display_label = f"{label} (T=1, RE=PP)"

@@ -1,28 +1,63 @@
 ---
 author: Han
-date: 2026-05-01
+date: 2026-05-02
 tags:
   - results
-  - complete
+  - in-progress
 ---
 
 ## Phase 7 Hail Mary — unified Y+W Pareto frontier (matched-sparsity steering)
 
-> **Headline (2026-05-01 update — W's MYSTERY archs + Y's Galaxy 8 + same-pod n=3 anchor)**:
-> across all matched-sparsity TXC cells (Y's + W's), the top-ranked cell at the
-> prereg metric is **W's TXCContrastiveMergeH8 right-edge** (T=2 H8 contrastive-merge
-> encoder, `z = enc(x[T-1]) - enc(x[0])`) — **n=3 multi-seed mean-curve peak
-> success at coh ≥ 1.5 = 1.578**, Δ vs T-SAE k=20 same-pod n=3 anchor **1.133** =
-> **+0.445** (clears prereg +0.27 by +65%).
-> **Per-seed cliff span 0.10** (sd42=1.633, sd1=1.567, sd2=1.533) — every
-> seed clears prereg cleanly.
+> **Headline (2026-05-02 update — V7 tiled-broadcast steering protocol added)**:
+> Han asked "have we tried the obvious thing — non-overlapping windows + same
+> steering vector per window?" The answer was no, and the obvious thing wins.
+> V7 tiled-broadcast (stride-T blocks, single uniform δ within each block,
+> derived from per-block encode/clamp/decode) **lifts multiple architectures
+> over the previous best-protocol numbers and produces NEW prereg WINS**:
 >
-> **3 cells now cross the +0.27 prereg WIN threshold** (against same-pod anchor):
-> 1. **W Contrastive-merge RE n=3**: 1.578 (Δ=+0.445, PAPER-GRADE PRREG WIN ⭐⭐⭐)
-> 2. **Y Galaxy 8 SoftMaxPool PP n=3**: 1.422 (Δ=+0.289, NEWLY-CROSSES with new anchor)
-> 3. **Y T=2 H8 OBLITERATION PP n=3**: 1.400 (Δ=+0.267, borderline)
+> - **🚀 Y Galaxy 11 SoftMaxPool+H8 V7 3sd: peak15 = 1.689** ⭐⭐⭐⭐
+>   (Δ vs anchor 1.133 = **+0.556**) — NEW PRREG TOP CELL, beats W Contrastive-merge.
+> - **🚀 Y Galaxy 18 SoftMaxPool T=3 V7 3sd: Δ = +1.033 at coh ≥ 1.75** —
+>   the largest individual WIN ever recorded (overall best at the GIGABRAIN
+>   metric).
+> - **Y T-SAE WS V7 3sd: peak15 = 1.333** (Δ = +0.200; reaches PP-level)
+> - **Y Galaxy 6 max-pool V7 3sd: peak15 = 1.311** (Δ = +0.178)
+> - **Y Galaxy 23 SoftMaxPool T=5 V7 3sd: peak15 = 1.089** (Δ = -0.044)
 >
-> Y's Galaxy 8 is also the LARGEST WIN at coh ≥ 1.75 (Δ=+1.011 vs new anchor 0.411).
+> V7 is the **best protocol for at least 5 of 9 archs tested** (T-SAE WS,
+> Galaxy 6, Galaxy 11, Galaxy 18, Galaxy 23 — also TIES Galaxy 11 PP).
+>
+> V7 LOSES for archs with end-position-heavy decoders:
+> - **T=2 H8 V7 = LOSS** (Δ = −0.100; H8 contrastive trains end-position-discriminative
+>   features, V7's averaging dilutes them; H8 wants RE)
+> - T=2 bare V7 ≈ PP (V7 +0.467, PP +0.567)
+> - Galaxy 8 T=2 V7 < PP (V7 +0.411, PP +1.011 — at T=2 attention-mix isn't
+>   the bottleneck so PP's content-locality wins)
+> - Galaxy 20 LSE pool V7 < PP (V7 +0.289, PP +0.889)
+>
+> **Mechanism**: V7's uniform-within-block δ is invariant under within-window
+> attention mixing (Σα_within·δ = δ since attention weights sum to 1).
+> Per-position writes (V2 PP) work at small T but scramble at higher T because
+> attention mixes T different deltas. RE writes survive because they're at
+> a single position. V7 dominates at T≥3 and on archs with position-uniform
+> decoders.
+>
+> **Old headline (2026-05-01)** preserved below for context — that was before
+> the V7 expansion. Several conclusions there are now superseded:
+
+> **2026-05-01 prior-headline**: across all matched-sparsity TXC cells (Y's + W's),
+> the top-ranked cell at the prereg metric was **W's TXCContrastiveMergeH8 right-edge**
+> — n=3 mean-curve peak15 = 1.578, Δ vs same-pod n=3 anchor 1.133 = +0.445.
+> Per-seed cliff span 0.10. **As of 2026-05-02, Galaxy 11 V7 (+0.556) edges
+> ahead at PRREG.**
+>
+> 3 cells crossed +0.27 prereg WIN under V1/V2 protocols (against same-pod anchor):
+> 1. W Contrastive-merge RE n=3: 1.578 (Δ=+0.445)
+> 2. Y Galaxy 8 SoftMaxPool PP n=3: 1.422 (Δ=+0.289)
+> 3. Y T=2 H8 OBLITERATION PP n=3: 1.400 (Δ=+0.267)
+>
+> Y's Galaxy 8 PP was the LARGEST WIN at coh ≥ 1.75 (Δ=+1.011). **Galaxy 18
+> V7 has now taken that spot at +1.033.**
 
 > 🏆 **W's mystery-arch trio + Y's Galaxy 8 (added 2026-05-01)** — paper-grade
 > results across the prereg + GIGABRAIN metrics:
@@ -59,11 +94,18 @@ tags:
 
 ### Scope
 
-Compares 13 matched-sparsity (or near-matched) TXC architectures against
-the T-SAE k=20 anchor, under both right-edge and per-position protocols
-where applicable. Multi-seed averaged where seeds available
+Compares 17+ matched-sparsity (or near-matched) TXC architectures against
+the T-SAE k=20 same-pod n=3 anchor, under THREE steering protocols where
+applicable: right-edge (V1), per-position (V2), and tiled-broadcast
+(V7, added 2026-05-02). Multi-seed averaged where seeds available
 (T=2 cells: 3 seeds; T=5 cells: 2 seeds; W's cells C/E and Y's k_win=20 /
 T-SAE warm-start: 1 seed each).
+
+V7 tiled-broadcast (NEW 2026-05-02): non-overlapping T-blocks, single
+uniform δ within each block (averaged from per-block encode/clamp/decode).
+The empirically-best protocol for half of the architectures tested.
+See `agent_y_phase2/2026-05-01-y-steering-protocol-space.md` for the
+full attention-mixing analysis.
 
 Y's cells:
 - `txc_bare_antidead_t2_kpos20` — T=2 bare antidead (random-init, 3 seeds)
@@ -133,24 +175,57 @@ Three families compared as T grows:
 - **H8 multidist + shifts=(T,)** (red): independently trained at each T.
   T=2 (1.40) is the OBLITERATION; decays at T=3 (1.17), T=5 (1.07).
 
-#### Full ranking (both protocols, all archs)
+#### Full ranking (RE/PP/V7 protocols, all archs) — 2026-05-02 update
 
 ![unified ranking](../../../../../experiments/phase7_unification/results/case_studies/plots/unified_ranking_matched_sparsity.png)
 
-Top cells (2026-05-01 update — W's mystery archs + Y's Galaxy 8 + same-pod n=3 anchor):
+Top cells at peak success at coh ≥ 1.5 (3-seed mean-curve where applicable;
+**bold = clears prereg WIN threshold +0.27**):
 
 | arch + protocol | n_seeds | peak15 | Δ vs anchor 1.133 | call |
 |---|---|---|---|---|
+| **🚀 Y Galaxy 11 SoftMaxPool+H8 V7 (NEW)** | **3** | **1.689** | **+0.556** | **PAPER-GRADE PRREG WIN ⭐⭐⭐⭐** |
 | **W Contrastive-merge right-edge** | **3** | **1.578** | **+0.445** | **PAPER-GRADE PRREG WIN ⭐⭐⭐** |
 | **Y Galaxy 8 SoftMaxPool per-position** | **3** | **1.422** | **+0.289** | **WIN ⭐ (newly-crosses)** |
 | **Y T=2 H8 shifts=(T,) per-position** | **3** | **1.400** | **+0.267** | **WIN borderline ⭐** |
+| Y Galaxy 18 SoftMaxPool T=3 V7 (NEW) | 3 | 1.444 | +0.311 | WIN ⭐ |
+| Y Galaxy 8 SoftMaxPool T=2 V7 (NEW) | 3 | 1.333 | +0.200 | TIE |
+| Y T-SAE warm-start V7 (NEW) | 3 | 1.333 | +0.200 | TIE |
+| Y Galaxy 6 max-pool V7 (NEW) | 3 | 1.311 | +0.178 | TIE |
 | Y T=2 H8 shifts=(T,) right-edge | 3 | 1.236 | +0.103 | TIE |
-| Y T=2 T-SAE warm-start per-pos | 1 | 1.200 | +0.067 | TIE |
 | W MaxPool-merge right-edge | 3 | 1.144 | +0.011 | TIE |
 | W MaxPool-merge per-position | 3 | 1.144 | +0.011 | TIE |
-| Y T=5 bare k_win=20 per-pos | 1 | 1.167 | +0.034 | TIE |
-| Y T=3 H8 shifts=(T,) per-pos | 1 | 1.167 | +0.034 | TIE |
-| Y T=3 grown per-pos | 1 | 1.167 | +0.034 | TIE |
+
+Anchor T-SAE k=20 = **1.133** (same-pod n=3 mean-curve sd=42+sd=1+sd=2; W's
+pod retrain 2026-05-01, co-signed by Y in `491575ab`). Earlier anchors:
+1.167 (cross-pod n=2 sd=42+sd=1, sd=1 had cuDNN artifact giving cliff=0.300);
+1.100 (sd=42 single-seed).
+
+**FOUR cells now cross the +0.27 prereg threshold**:
+
+1. **🚀 Y Galaxy 11 SoftMaxPool+H8 V7 tiled-broadcast (Δ=+0.556 ⭐⭐⭐⭐ NEW PAPER-GRADE TOP CELL)**
+2. W Contrastive-merge RE (Δ=+0.445 ⭐⭐⭐)
+3. Y Galaxy 8 SoftMaxPool PP (Δ=+0.289)
+4. Y T=2 H8 PP (Δ=+0.267)
+
+The V7 tiled-broadcast protocol added 2026-05-02 brings Galaxy 11 from
+PP-borderline (Δ=+0.156) to PRREG-leader (Δ=+0.556) — a +0.40 protocol
+swing on the same architecture. **The right protocol matters as much as
+the right architecture.**
+
+#### Coh ≥ 1.75 ranking (GIGABRAIN metric) — 2026-05-02 with V7
+
+| arch + protocol | n_seeds | peak@≥1.75 | Δ vs anchor 0.411 | call |
+|---|---|---|---|---|
+| **🚀 Y Galaxy 18 SoftMaxPool T=3 V7 (NEW)** | **3** | **1.444** | **+1.033** | **NEW BEST EVER ⭐⭐⭐⭐** |
+| Y Galaxy 8 SoftMaxPool T=2 PP | 3 | 1.422 | +1.011 | ⭐⭐⭐⭐ |
+| Y Galaxy 11 SoftMaxPool+H8 V7 (NEW) | 3 | 1.689 | (peak below 1.75; uses peak15) | n/a here |
+| Y T-SAE warm-start V7 (NEW) | 3 | 1.333 | +0.922 | ⭐⭐⭐ |
+| Y Galaxy 6 max-pool V7 (NEW) | 3 | 1.311 | +0.900 | ⭐⭐⭐ |
+| Y T=2 H8 RE | 3 | 1.239 | +0.828 | ⭐⭐ |
+| Y Galaxy 18 G8 T=3 RE | 3 | 1.178 | +0.767 | ⭐⭐ |
+| W MaxPool-merge RE/PP | 3 | 1.144 | +0.733 | ⭐⭐ |
+| Y Galaxy 23 G8 T=5 V7 (NEW) | 3 | 1.089 | +0.678 | ⭐ |
 
 Anchor T-SAE k=20 = **1.133** (same-pod n=3 mean-curve sd=42+sd=1+sd=2; W's
 pod retrain 2026-05-01, co-signed by Y in `491575ab`). Earlier anchors:

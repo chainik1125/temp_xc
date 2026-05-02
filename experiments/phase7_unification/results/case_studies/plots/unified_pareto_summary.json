@@ -1,5 +1,14 @@
 [
   {
+    "arch_id": "txc_softmax_pool_h8_t2_kpos20_shifts2",
+    "label": "T=2 Galaxy 11 SoftMaxPool+H8 (Y)",
+    "protocol": "tiled-broadcast",
+    "n_seeds": 3,
+    "peak_unc": 1.6888888888888889,
+    "peak_coh_ge_1_5": 1.6888888888888889,
+    "delta_vs_anchor": 0.5558888888888889
+  },
+  {
     "arch_id": "txc_contrastive_h8_t2_kpos20_shifts2",
     "label": "T=2 Contrastive-merge (W mystery)",
     "protocol": "right-edge",
@@ -18,8 +27,26 @@
     "delta_vs_anchor": 0.3336666666666668
   },
   {
+    "arch_id": "txc_softmaxpool_t3_kpos20",
+    "label": "T=3 Galaxy 18 SoftMaxPool (Y)",
+    "protocol": "tiled-broadcast",
+    "n_seeds": 3,
+    "peak_unc": 1.5,
+    "peak_coh_ge_1_5": 1.4444444444444446,
+    "delta_vs_anchor": 0.31144444444444463
+  },
+  {
     "arch_id": "txc_maxpool_t2_kpos20",
     "label": "T=2 Galaxy 6 max-pool (Y)",
+    "protocol": "per-position",
+    "n_seeds": 3,
+    "peak_unc": 1.4333333333333333,
+    "peak_coh_ge_1_5": 1.4333333333333333,
+    "delta_vs_anchor": 0.30033333333333334
+  },
+  {
+    "arch_id": "txc_galaxy4_t2_kw10_kp10",
+    "label": "T=2 Galaxy 4 hierarchical (Y)",
     "protocol": "per-position",
     "n_seeds": 3,
     "peak_unc": 1.4333333333333333,
@@ -54,6 +81,33 @@
     "delta_vs_anchor": 0.2225555555555554
   },
   {
+    "arch_id": "txc_lsepool_t2_kpos20",
+    "label": "T=2 Galaxy 20 LSE-pool (Y)",
+    "protocol": "tiled-broadcast",
+    "n_seeds": 3,
+    "peak_unc": 1.5555555555555556,
+    "peak_coh_ge_1_5": 1.3444444444444443,
+    "delta_vs_anchor": 0.21144444444444432
+  },
+  {
+    "arch_id": "txc_bare_antidead_t2_kpos20_ws_tsae_encoder",
+    "label": "T=2 T-SAE warm-start",
+    "protocol": "tiled-broadcast",
+    "n_seeds": 3,
+    "peak_unc": 1.4222222222222223,
+    "peak_coh_ge_1_5": 1.3333333333333333,
+    "delta_vs_anchor": 0.20033333333333325
+  },
+  {
+    "arch_id": "txc_softmaxpool_t2_kpos20",
+    "label": "T=2 Galaxy 8 SoftMaxPool (Y)",
+    "protocol": "tiled-broadcast",
+    "n_seeds": 3,
+    "peak_unc": 1.5777777777777777,
+    "peak_coh_ge_1_5": 1.3333333333333333,
+    "delta_vs_anchor": 0.20033333333333325
+  },
+  {
     "arch_id": "txc_maxpool_t2_kpos20",
     "label": "T=2 Galaxy 6 max-pool (Y)",
     "protocol": "right-edge",
@@ -63,6 +117,33 @@
     "delta_vs_anchor": 0.18922222222222218
   },
   {
+    "arch_id": "txc_maxpool_t2_kpos20",
+    "label": "T=2 Galaxy 6 max-pool (Y)",
+    "protocol": "tiled-broadcast",
+    "n_seeds": 3,
+    "peak_unc": 1.4111111111111112,
+    "peak_coh_ge_1_5": 1.3111111111111111,
+    "delta_vs_anchor": 0.1781111111111111
+  },
+  {
+    "arch_id": "txc_lsepool_t2_kpos20",
+    "label": "T=2 Galaxy 20 LSE-pool (Y)",
+    "protocol": "per-position",
+    "n_seeds": 3,
+    "peak_unc": 1.5555555555555556,
+    "peak_coh_ge_1_5": 1.3,
+    "delta_vs_anchor": 0.16700000000000004
+  },
+  {
+    "arch_id": "txc_galaxy4_t2_kw10_kp10",
+    "label": "T=2 Galaxy 4 hierarchical (Y)",
+    "protocol": "right-edge",
+    "n_seeds": 3,
+    "peak_unc": 1.2666666666666668,
+    "peak_coh_ge_1_5": 1.2666666666666668,
+    "delta_vs_anchor": 0.13366666666666682
+  },
+  {
     "arch_id": "txc_h8_t2_kpos20_shifts2",
     "label": "T=2 H8 shifts=(T,)",
     "protocol": "right-edge",
@@ -70,6 +151,24 @@
     "peak_unc": 1.3555555555555554,
     "peak_coh_ge_1_5": 1.235632183908046,
     "delta_vs_anchor": 0.10263218390804596
+  },
+  {
+    "arch_id": "txc_lsepool_t2_kpos20",
+    "label": "T=2 Galaxy 20 LSE-pool (Y)",
+    "protocol": "right-edge",
+    "n_seeds": 3,
+    "peak_unc": 1.3777777777777775,
+    "peak_coh_ge_1_5": 1.2222222222222223,
+    "delta_vs_anchor": 0.08922222222222231
+  },
+  {
+    "arch_id": "txc_bare_antidead_t2_kpos20",
+    "label": "T=2 bare",
+    "protocol": "tiled-broadcast",
+    "n_seeds": 3,
+    "peak_unc": 1.4555555555555555,
+    "peak_coh_ge_1_5": 1.222222222222222,
+    "delta_vs_anchor": 0.08922222222222209
   },
   {
     "arch_id": "txc_bare_antidead_t2_kpos20_ws_tsae_encoder",
@@ -171,6 +270,15 @@
     "delta_vs_anchor": -0.03299999999999992
   },
   {
+    "arch_id": "txc_softmaxpool_t5_kpos20",
+    "label": "T=5 Galaxy 23 SoftMaxPool (Y)",
+    "protocol": "tiled-broadcast",
+    "n_seeds": 3,
+    "peak_unc": 1.1444444444444446,
+    "peak_coh_ge_1_5": 1.0888888888888888,
+    "delta_vs_anchor": -0.04411111111111121
+  },
+  {
     "arch_id": "txc_h8_t5_kpos20_shifts5",
     "label": "T=5 H8 shifts=(T,)",
     "protocol": "per-position",
@@ -239,6 +347,15 @@
     "protocol": "right-edge",
     "n_seeds": 3,
     "peak_unc": 1.3222222222222222,
+    "peak_coh_ge_1_5": 0.9555555555555556,
+    "delta_vs_anchor": -0.1774444444444444
+  },
+  {
+    "arch_id": "txc_softmaxpool_t5_kpos20",
+    "label": "T=5 Galaxy 23 SoftMaxPool (Y)",
+    "protocol": "right-edge",
+    "n_seeds": 3,
+    "peak_unc": 0.9555555555555556,
     "peak_coh_ge_1_5": 0.9555555555555556,
     "delta_vs_anchor": -0.1774444444444444
   },
@@ -349,5 +466,14 @@
     "peak_unc": 0.8333333333333334,
     "peak_coh_ge_1_5": 0.5666666666666667,
     "delta_vs_anchor": -0.5663333333333334
+  },
+  {
+    "arch_id": "txc_h8_t2_kpos20_shifts2",
+    "label": "T=2 H8 shifts=(T,)",
+    "protocol": "tiled-broadcast",
+    "n_seeds": 3,
+    "peak_unc": 0.3111111111111111,
+    "peak_coh_ge_1_5": 0.3111111111111111,
+    "delta_vs_anchor": -0.8218888888888889
   }
 ]
