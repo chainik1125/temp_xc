@@ -10,6 +10,56 @@ tags:
 
 **You are an autonomous routine continuing from the dmitry-branch work.** Branch: `em-nanda`. AGENT_BRIEF.md (on dmitry) covers the prior Qwen-7B medical setup. This doc supersedes that for the Qwen-14B financial pivot.
 
+### Status as of 2026-05-02 14:00 UTC (5k stage-4 final on both arches; F4 lite both feats below 58.47; 30k training in flight)
+
+**This firing (14:00 UTC) actions:**
+
+- Pulled three completions:
+  - **SAE arditi 5k stage-4 final** (h100_1 LOCAL, completed 13:06 UTC):
+    feat **28663** @ α=−10 → align **96.88 / coh 98.91** (peak std);
+    @ α=−6 → 95.78 / 99.22 (mid-α). Matches/marginally beats SAE arditi
+    10k Track A champion (feat 11086 @α=−6 → 94.69 / 98.67).
+    **5k is the cheapest-known recipe to clear 58.47 on R1.**
+  - **TXC k=100 5k stage-4 final** (h100_2, completed 12:50 UTC): feat
+    **15402** @ α=−2 → align **90.94 / coh 99.30** (mid-α champion).
+    feat 14481 @ α=−10 → 91.80 / 99.45 (edge). Matches TXC 10k Track B
+    champion (feat 14729 @α=−1.75 → 90.23). +0.71 at mid-α.
+  - **F4 stage-4-lite (R32, R1-encoder feats 4086 + 5725)** (h100_2,
+    completed 13:11 UTC): feat 4086 standard-grid peak α=−10 → align
+    **54.14 / coh 92.19**; feat 5725 standard-grid peak α=+1 → 49.61 /
+    93.59. **Neither beats 58.47 in the standard regime.** feat 4086 at
+    α=−100 nominally hits 58.91 / 76.09 — degenerate hammer, not
+    comparable to mid-α R1 champions.
+- **R1 vs R32 verdict**: R1-encoder features do NOT generalize to R32.
+  Standing recommendation: treat R1 as the headline organism for SAE/TXC
+  arch comparisons (R1 already crushes 58.47 at mid-α with coh ≥98). R32
+  remains an open follow-up only if we want to also publish R32 native
+  features — would require redoing stage-1+2 encoder Δz̄ on R32.
+- **Step-count sweep state (R1 SAE arditi)**:
+  - 5k: feat 28663 @α=−10 → align **96.88** (this firing)
+  - 10k: feat 17837 @α=−10 → align 97.66 (Track A stage-3 leader)
+  - 30k: in training (h100_1 PID 911404, ~5400/30000 steps as of 14:00 UTC)
+- Both 30k chains advanced into training: SAE arditi 30k on h100_1, TXC
+  k=100 30k on h100_2. Chain markers fired at 13:06 / 13:11 UTC. ETA:
+  training done ~14:35–14:40 UTC, Wang procedure ~15:00–15:15 UTC.
+- Per rule (6): GPUs busy on both nodes, no completions to launch off of.
+  No new jobs queued this firing. Synthesis updated with 5k stage-4 final
+  tables + R1 vs R32 verdict + step-count trajectory.
+
+**Next firing priorities (likely 15:00 UTC)**:
+
+- Pull SAE arditi 30k Wang result if landed; compare mid-α and edge-α
+  peaks against {5k 95.78/96.88, 10k 94.69/97.66}. Hypothesis: flat
+  trajectory — 30k peak in the same 95–97 align band.
+- Pull TXC k=100 30k Wang result if landed; same comparison vs
+  {5k 90.94, 10k 90.23}.
+- Make step-count trajectory line plot (x: {5k, 10k, 30k}, y: single-feat
+  peak align, two lines for SAE/TXC) for the synthesis doc.
+- If 30k stays flat, the step-count axis is **closed**; consider whether
+  to spend the next budget on (a) R32 native-encoder rerun (re-run stage-1+2
+  on R32 to find R32-causal features), or (b) declare the paper-figure
+  bundle done and pivot to write-up.
+
 ### Status as of 2026-05-02 13:00 UTC (5k SAE stage-4 mid-α matches 10k; F4-lite 4086 below goal in standard regime)
 
 **This firing (13:00 UTC) actions:**
