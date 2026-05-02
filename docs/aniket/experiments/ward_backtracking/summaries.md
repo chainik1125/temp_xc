@@ -368,7 +368,45 @@ Raw output:
 
 ## Exp 9 — B3 LLM-judged cut
 
-*(queued)*
+**Verdict: LLM-judged cut at the error step gives +3.2 pp Δ, between
+cut50 (-3.2) and cut25 (+6.5). Cut25 wins because intervention BEFORE
+the model commits to the wrong step beats intervention AT it.**
+
+For each truly-wrong trajectory, asked Sonnet 4.6 to identify the
+FIRST step where reasoning went wrong (line + verbatim quote). 25/31
+got valid cuts; 6 fell back to mid-text. Then ran B3 cut+continue at
+the LLM-judged char positions, magnitude grid {-12, -8, -2, 0}.
+
+| Magnitude | rescued / 31 | rate | Δ vs control |
+|---|---|---|---|
+| -12 | 1 | 3.2% | -16.1 pp |
+| **-8** | **7** | **22.6%** | **+3.2 pp** |
+| **-2** | **7** | **22.6%** | **+3.2 pp** |
+| 0 (control) | 6 | 19.4% | — |
+
+### Combined B3 variants picture (final)
+
+| Variant | cut method | best mag | rate | Δ vs control |
+|---|---|---|---|---|
+| match_baseline | 50% midpoint | -8 | 9.7% | -3.2 pp |
+| **cut25** | **25% earliest** | -8 or -2 | **29.0%** | **+6.5 pp** ← winner |
+| llm_cut | LLM error-step | -8 or -2 | 22.6% | +3.2 pp |
+| single (cut50, 1-tok) | 50% midpoint, single nudge | ±anything | 16.1% | +3.2 pp |
+
+### Why cut25 beats llm_cut
+
+By the LLM-judged error step, the model has already accumulated context
+that reinforces the wrong direction. Cutting at 25% — which is
+typically EARLIER than the error step — gives steering time to
+redirect the trajectory before the wrong commitment locks in.
+
+This is a more nuanced finding than "earlier is better": the optimal
+cut is BEFORE the wrong step, not AT it. Steering is a course-
+correction tool that needs runway, not a surgical fix at the moment of
+error.
+
+Raw output:
+[`results/ward_backtracking_txc/b3_math500_llm_cut/`](../../../results/ward_backtracking_txc/b3_math500_llm_cut/).
 
 ## Exp 10 — Distribution-shift eval
 
