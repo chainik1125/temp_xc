@@ -393,6 +393,77 @@ Numerical CSVs: [`images_b/b1_breakdown_4way.csv`](images_b/b1_breakdown_4way.cs
 (4-way) and [`images_b/b1_breakdown_3way.csv`](images_b/b1_breakdown_3way.csv)
 (3-way).
 
+## Per-magnitude trade-off (Dmitry's coherence-vs-coefficient question)
+
+The 4-way breakdown above aggregates over ALL magnitudes per cell —
+which buries the per-magnitude story Dmitry asked about. Per his
+flag: SAEs aren't broken at coherence in general; they have a narrow
+coherent regime that the aggregation made look like "always
+incoherent." Per-arch best-cell, magnitude-by-magnitude:
+
+![Per-magnitude trade-off](images_b/per_mag_tradeoff.png)
+
+Numerical picture (each row = best cell of that arch family):
+
+| Arch | best cell | peak frac_prod (mag) | frac_coh at peak | mean kw at peak | productive range |
+|---|---|---|---|---|---|
+| **TXC** | `txc__resid_L10__k16__s42` | 0.338 (+8) | 0.86 | 0.0114 | wide: ≥0.14 across {-12, -8, +4, +8, +12} |
+| **TXC-H13** | `txc_h13__resid_L10__k16__s42` | 0.412 (-12) | 0.92 | 0.0129 | wide: ≥0.14 across {-16, -12, -8, +4, +8, +12} |
+| **TopK SAE** | `topk_sae__ln1_L10__k64__s42` | **0.500** (+4) | 1.00 | 0.0113 | narrow: high-prod only at {-4, +4}, ~0 elsewhere |
+| **Stacked SAE** | `stacked_sae__resid_L10__k16__s42` | 0.294 (-4) | 0.99 | 0.0090 | medium: ≥0.15 across {-12, -8, -4, +4, +8, +12} |
+| **TSAE-paper** | `tsae_paper__resid_L10__k32__s42` | 0.144 (0) | 0.97 | 0.0074 | dead: zero coherent generations at any non-zero mag |
+
+Three findings that nuance the original headline:
+
+1. **Yes, every arch except TSAE-paper has a coherent regime.** At mag
+   in {-4, 0, +4} TopK SAE is 100% coherent with mean kw = 0.011
+   (above baseline 0.007). The aggregated "TopK SAE has 14% productive,
+   TXC has 27%" was technically correct but misleading — it averaged
+   high-coherence-low-mag cells with incoherent-high-mag cells.
+
+2. **TopK SAE actually has the HIGHEST peak productive rate at any
+   single magnitude (50% at mag=+4)**, beating TXC's peak (34% at
+   mag=+8). At its sweet spot, TopK SAE fires 40/80 productively.
+
+3. **TXC's advantage is wider productive range, not higher peak.**
+   TXC + H13 stay productive (frac_prod ≥ 0.14) across 5-6 magnitudes;
+   TopK SAE only at {±4}. The aggregate `frac_total` rewards "wider"
+   over "taller" — TXC wins because it integrates a broader range of
+   useful magnitudes, not because it produces more backtracking at the
+   single best magnitude.
+
+4. **TSAE-paper (Bhalla 2025 paper-faithful) does genuinely fail.**
+   At every non-zero magnitude, *zero* generations pass Sonnet ≥ 2.
+   This isn't an aggregation artifact — the dense ReLU+L1 dictionary
+   destroys coherence the moment you steer at all, even at mag=±4.
+
+### What this changes about the verdict
+
+The claim "TXC family dominates" needs sharpening:
+
+- At "find the best magnitude per arch" framing, **TopK SAE's peak is
+  competitive with the TXC family**. The reasoning-research intuition
+  that SAEs are decent dictionaries — even for steering — survives.
+- At "single steering coefficient that works across multiple
+  magnitudes" framing, **TXC is the more robust choice**. The
+  dictionary direction works at -8, -12, +8, +12 — not just one
+  magic mag.
+- At "extract a coherence-aware steering signal without sweeping
+  magnitude" framing, **TXC still wins on Sonnet primary** (the
+  metric that picks the best mag with coh ≥ 50% floor) — but the
+  margin (TXC 0.0114 vs TopK SAE 0.0071) overstates the practical gap
+  since TopK SAE's 0.0071 is at a *narrow* magnitude window where it
+  happens to also peak on coherence.
+
+The 4-way breakdown (b1_breakdown_4way.png) is correct that TXC has
+fewer incoherent generations in aggregate; but that's because TXC's
+useful magnitudes are wider, not because TopK SAE's directions
+"destroy coherence at any mag." TopK SAE produces coherent
+generations at low mag and incoherent ones at high mag; the lethal
+gradient is steeper than for TXC.
+
+The numerical CSV: [`images_b/per_mag_tradeoff.csv`](images_b/per_mag_tradeoff.csv).
+
 ## Robustness: ordering survives stricter thresholds
 
 Worry: maybe TXC's lead is an artifact of the specific
