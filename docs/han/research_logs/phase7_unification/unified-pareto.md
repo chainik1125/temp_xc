@@ -45,6 +45,34 @@ tags:
 > **Old headline (2026-05-01)** preserved below for context — that was before
 > the V7 expansion. Several conclusions there are now superseded:
 
+> 🧪 **2026-05-02 update — W's T=10 deadzone-escape chain landed (single seed)**:
+> 8 archs trained at T=10, k_pos=20, seed=42 to test Han's hypothesis that the
+> deadzone at T≥3 is a training-loss failure (full-window contrastive
+> over-constrains features). All 8 evaluated under both RE and V7 protocols.
+>
+> - **arch 3 — subseq encoder mask + Gaussian-mixture position sampler:
+>   peak15 = 1.367 RE = Δ +0.234** (single seed). The ONLY T=10 cell to clear
+>   the deadzone; sits 0.04 below the +0.27 prereg WIN threshold. First
+>   T=10 evidence that "T=10 escape velocity" is achievable.
+> - **All 4 spatial-Matryoshka decoder-mask variants FAIL** (Δ ∈ [−0.43, −0.77]).
+>   The pre-registered ranking (decoder-mask > encoder-mask > shifts > OBLIT)
+>   was inverted. **Decoder-side spatial Matryoshka is the wrong move** for
+>   steerability at T=10.
+> - **V7 does NOT universally rescue T=10 archs.** V7 lifts the deep-deadzone
+>   TXC-contrastive archs (arch 0/1 by ~+0.36) but actively HURTS the
+>   encoder-mask Gaussian winner (arch 3 RE→V7 = −0.80). Pattern matches
+>   Y's T=2 H8 V7-LOSS finding: encoder-mask + Gaussian prior trains
+>   end-position-discriminative features that V7's averaging dilutes.
+> - **The Gaussian-mixture position sampler matters on the *encoder* side
+>   (subseq, arch 3) not the *decoder* side (spatial-Matry, arch 6/7).**
+>   Same sampler, opposite outcome — placement decides everything.
+> - n=3 multi-seed verification of arch 3 needed to lock the +0.27 prereg WIN.
+>
+> Full per-arch RE+V7 cliff15 table in `agent_w/2026-05-02-w-t10-deadzone-results.md`
+> (TODO). Code in `experiments/phase7_unification/case_studies/_t10_chain_h100_resume.sh`
+> (training) + `_eval_t10_chain_h100.sh` (eval). Co-eval pulls Y's V7 protocol
+> from `intervene_paper_clamp_window_tiled_broadcast.py`.
+
 > **2026-05-01 prior-headline**: across all matched-sparsity TXC cells (Y's + W's),
 > the top-ranked cell at the prereg metric was **W's TXCContrastiveMergeH8 right-edge**
 > — n=3 mean-curve peak15 = 1.578, Δ vs same-pod n=3 anchor 1.133 = +0.445.
@@ -189,6 +217,7 @@ Top cells at peak success at coh ≥ 1.5 (3-seed mean-curve where applicable;
 | **Y Galaxy 8 SoftMaxPool per-position** | **3** | **1.422** | **+0.289** | **WIN ⭐ (newly-crosses)** |
 | **Y T=2 H8 shifts=(T,) per-position** | **3** | **1.400** | **+0.267** | **WIN borderline ⭐** |
 | Y Galaxy 18 SoftMaxPool T=3 V7 (NEW) | 3 | 1.444 | +0.311 | WIN ⭐ |
+| W subseq H8 T=10 (T_max=10, t_samp=5) Gaussian-mixture sampler RE (NEW T=10) | 1 | 1.367 | +0.234 | borderline (single seed; first T=10 escapee — n=3 verification needed) |
 | Y Galaxy 8 SoftMaxPool T=2 V7 (NEW) | 3 | 1.333 | +0.200 | TIE |
 | Y T-SAE warm-start V7 (NEW) | 3 | 1.333 | +0.200 | TIE |
 | Y Galaxy 6 max-pool V7 (NEW) | 3 | 1.311 | +0.178 | TIE |

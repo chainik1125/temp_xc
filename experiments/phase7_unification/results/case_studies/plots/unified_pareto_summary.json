@@ -1,14 +1,5 @@
 [
   {
-    "arch_id": "txc_softmax_pool_h8_t2_kpos20_shifts2",
-    "label": "T=2 Galaxy 11 SoftMaxPool+H8 (Y)",
-    "protocol": "tiled-broadcast",
-    "n_seeds": 3,
-    "peak_unc": 1.6888888888888889,
-    "peak_coh_ge_1_5": 1.6888888888888889,
-    "delta_vs_anchor": 0.5558888888888889
-  },
-  {
     "arch_id": "txc_contrastive_h8_t2_kpos20_shifts2",
     "label": "T=2 Contrastive-merge (W mystery)",
     "protocol": "right-edge",
@@ -72,6 +63,15 @@
     "delta_vs_anchor": 0.2670000000000001
   },
   {
+    "arch_id": "subseq_h8_tmax10_tsamp5_kpos20_shifts2_gauss_s1.5_3.0_g2",
+    "label": "T=10 subseq Gaussian (W) \u2b50",
+    "protocol": "right-edge",
+    "n_seeds": 1,
+    "peak_unc": 1.3666666666666667,
+    "peak_coh_ge_1_5": 1.3666666666666667,
+    "delta_vs_anchor": 0.2336666666666667
+  },
+  {
     "arch_id": "txc_softmaxpool_t3_kpos20",
     "label": "T=3 Galaxy 18 SoftMaxPool (Y)",
     "protocol": "per-position",
@@ -79,24 +79,6 @@
     "peak_unc": 1.3777777777777775,
     "peak_coh_ge_1_5": 1.3555555555555554,
     "delta_vs_anchor": 0.2225555555555554
-  },
-  {
-    "arch_id": "txc_lsepool_t2_kpos20",
-    "label": "T=2 Galaxy 20 LSE-pool (Y)",
-    "protocol": "tiled-broadcast",
-    "n_seeds": 3,
-    "peak_unc": 1.5555555555555556,
-    "peak_coh_ge_1_5": 1.3444444444444443,
-    "delta_vs_anchor": 0.21144444444444432
-  },
-  {
-    "arch_id": "txc_bare_antidead_t2_kpos20_ws_tsae_encoder",
-    "label": "T=2 T-SAE warm-start",
-    "protocol": "tiled-broadcast",
-    "n_seeds": 3,
-    "peak_unc": 1.4222222222222223,
-    "peak_coh_ge_1_5": 1.3333333333333333,
-    "delta_vs_anchor": 0.20033333333333325
   },
   {
     "arch_id": "txc_softmaxpool_t2_kpos20",
@@ -115,15 +97,6 @@
     "peak_unc": 1.3222222222222222,
     "peak_coh_ge_1_5": 1.3222222222222222,
     "delta_vs_anchor": 0.18922222222222218
-  },
-  {
-    "arch_id": "txc_maxpool_t2_kpos20",
-    "label": "T=2 Galaxy 6 max-pool (Y)",
-    "protocol": "tiled-broadcast",
-    "n_seeds": 3,
-    "peak_unc": 1.4111111111111112,
-    "peak_coh_ge_1_5": 1.3111111111111111,
-    "delta_vs_anchor": 0.1781111111111111
   },
   {
     "arch_id": "txc_lsepool_t2_kpos20",
@@ -160,15 +133,6 @@
     "peak_unc": 1.3777777777777775,
     "peak_coh_ge_1_5": 1.2222222222222223,
     "delta_vs_anchor": 0.08922222222222231
-  },
-  {
-    "arch_id": "txc_bare_antidead_t2_kpos20",
-    "label": "T=2 bare",
-    "protocol": "tiled-broadcast",
-    "n_seeds": 3,
-    "peak_unc": 1.4555555555555555,
-    "peak_coh_ge_1_5": 1.222222222222222,
-    "delta_vs_anchor": 0.08922222222222209
   },
   {
     "arch_id": "txc_bare_antidead_t2_kpos20_ws_tsae_encoder",
@@ -257,6 +221,15 @@
     "protocol": "right-edge",
     "n_seeds": 3,
     "peak_unc": 1.5333333333333332,
+    "peak_coh_ge_1_5": 1.1333333333333333,
+    "delta_vs_anchor": 0.0003333333333332966
+  },
+  {
+    "arch_id": "subseq_h8_tmax10_tsamp5_kpos20_shifts2_ctg",
+    "label": "T=10 subseq contig (W deadzone)",
+    "protocol": "right-edge",
+    "n_seeds": 1,
+    "peak_unc": 1.3333333333333333,
     "peak_coh_ge_1_5": 1.1333333333333333,
     "delta_vs_anchor": 0.0003333333333332966
   },
@@ -396,6 +369,24 @@
     "delta_vs_anchor": -0.23299999999999998
   },
   {
+    "arch_id": "txc_h8_t10_kpos20_shifts10",
+    "label": "T=10 OBLIT shifts=10 (W deadzone)",
+    "protocol": "tiled-broadcast",
+    "n_seeds": 1,
+    "peak_unc": 0.9,
+    "peak_coh_ge_1_5": 0.9,
+    "delta_vs_anchor": -0.23299999999999998
+  },
+  {
+    "arch_id": "txc_h8_t10_kpos20_shifts2",
+    "label": "T=10 H8 shifts=2 (W deadzone)",
+    "protocol": "tiled-broadcast",
+    "n_seeds": 1,
+    "peak_unc": 0.8666666666666667,
+    "peak_coh_ge_1_5": 0.8666666666666667,
+    "delta_vs_anchor": -0.2663333333333333
+  },
+  {
     "arch_id": "txc_bare_antidead_t5_kwin20",
     "label": "T=5 bare k_win=20",
     "protocol": "right-edge",
@@ -441,6 +432,15 @@
     "delta_vs_anchor": -0.37744444444444447
   },
   {
+    "arch_id": "spatial_matry_h8_t10_kpos20_shifts2_pref3686_9216_18432_sub1_5_10_indep_uniform_contr",
+    "label": "T=10 sp.M indep+unif (W)",
+    "protocol": "right-edge",
+    "n_seeds": 1,
+    "peak_unc": 0.7,
+    "peak_coh_ge_1_5": 0.7,
+    "delta_vs_anchor": -0.43300000000000005
+  },
+  {
     "arch_id": "txc_bare_antidead_t5_kpos20_grownFromT2sd42",
     "label": "T=5 grown direct",
     "protocol": "right-edge",
@@ -459,6 +459,15 @@
     "delta_vs_anchor": -0.4996666666666667
   },
   {
+    "arch_id": "spatial_matry_h8_t10_kpos20_shifts2_pref3686_9216_18432_sub1_5_10_indep_uniform_contr",
+    "label": "T=10 sp.M indep+unif (W)",
+    "protocol": "tiled-broadcast",
+    "n_seeds": 1,
+    "peak_unc": 1.1666666666666667,
+    "peak_coh_ge_1_5": 0.6333333333333333,
+    "delta_vs_anchor": -0.4996666666666667
+  },
+  {
     "arch_id": "txc_bare_antidead_t5_kpos20_grownFromT2sd42",
     "label": "T=5 grown direct",
     "protocol": "per-position",
@@ -466,6 +475,96 @@
     "peak_unc": 0.8333333333333334,
     "peak_coh_ge_1_5": 0.5666666666666667,
     "delta_vs_anchor": -0.5663333333333334
+  },
+  {
+    "arch_id": "subseq_h8_tmax10_tsamp5_kpos20_shifts2_gauss_s1.5_3.0_g2",
+    "label": "T=10 subseq Gaussian (W) \u2b50",
+    "protocol": "tiled-broadcast",
+    "n_seeds": 1,
+    "peak_unc": 1.7,
+    "peak_coh_ge_1_5": 0.5666666666666667,
+    "delta_vs_anchor": -0.5663333333333334
+  },
+  {
+    "arch_id": "txc_h8_t10_kpos20_shifts10",
+    "label": "T=10 OBLIT shifts=10 (W deadzone)",
+    "protocol": "right-edge",
+    "n_seeds": 1,
+    "peak_unc": 1.0666666666666667,
+    "peak_coh_ge_1_5": 0.5333333333333333,
+    "delta_vs_anchor": -0.5996666666666667
+  },
+  {
+    "arch_id": "txc_h8_t10_kpos20_shifts2",
+    "label": "T=10 H8 shifts=2 (W deadzone)",
+    "protocol": "right-edge",
+    "n_seeds": 1,
+    "peak_unc": 0.7,
+    "peak_coh_ge_1_5": 0.5,
+    "delta_vs_anchor": -0.633
+  },
+  {
+    "arch_id": "subseq_h8_tmax10_tsamp5_kpos20_shifts2_ctg",
+    "label": "T=10 subseq contig (W deadzone)",
+    "protocol": "tiled-broadcast",
+    "n_seeds": 1,
+    "peak_unc": 1.2333333333333334,
+    "peak_coh_ge_1_5": 0.4666666666666667,
+    "delta_vs_anchor": -0.6663333333333333
+  },
+  {
+    "arch_id": "spatial_matry_h8_t10_kpos20_shifts2_pref3686_9216_18432_sub1_5_10_nested_uniform_contr",
+    "label": "T=10 sp.M nest+unif (W)",
+    "protocol": "tiled-broadcast",
+    "n_seeds": 1,
+    "peak_unc": 0.9333333333333333,
+    "peak_coh_ge_1_5": 0.4666666666666667,
+    "delta_vs_anchor": -0.6663333333333333
+  },
+  {
+    "arch_id": "spatial_matry_h8_t10_kpos20_shifts2_pref3686_9216_18432_sub1_5_10_nested_uniform_contr",
+    "label": "T=10 sp.M nest+unif (W)",
+    "protocol": "right-edge",
+    "n_seeds": 1,
+    "peak_unc": 0.8666666666666667,
+    "peak_coh_ge_1_5": 0.4,
+    "delta_vs_anchor": -0.733
+  },
+  {
+    "arch_id": "spatial_matry_h8_t10_kpos20_shifts2_pref3686_9216_18432_sub1_5_10_indep_gauss_s1.5_3.0_g2_contr",
+    "label": "T=10 sp.M indep+Gauss (W)",
+    "protocol": "right-edge",
+    "n_seeds": 1,
+    "peak_unc": 0.5666666666666667,
+    "peak_coh_ge_1_5": 0.4,
+    "delta_vs_anchor": -0.733
+  },
+  {
+    "arch_id": "spatial_matry_h8_t10_kpos20_shifts2_pref3686_9216_18432_sub1_5_10_nested_gauss_s1.5_3.0_g2_contr",
+    "label": "T=10 sp.M nest+Gauss (W)",
+    "protocol": "right-edge",
+    "n_seeds": 1,
+    "peak_unc": 0.7666666666666667,
+    "peak_coh_ge_1_5": 0.4,
+    "delta_vs_anchor": -0.733
+  },
+  {
+    "arch_id": "spatial_matry_h8_t10_kpos20_shifts2_pref3686_9216_18432_sub1_5_10_nested_gauss_s1.5_3.0_g2_contr",
+    "label": "T=10 sp.M nest+Gauss (W)",
+    "protocol": "tiled-broadcast",
+    "n_seeds": 1,
+    "peak_unc": 1.1333333333333333,
+    "peak_coh_ge_1_5": 0.4,
+    "delta_vs_anchor": -0.733
+  },
+  {
+    "arch_id": "spatial_matry_h8_t10_kpos20_shifts2_pref3686_9216_18432_sub1_5_10_indep_gauss_s1.5_3.0_g2_contr",
+    "label": "T=10 sp.M indep+Gauss (W)",
+    "protocol": "tiled-broadcast",
+    "n_seeds": 1,
+    "peak_unc": 0.9333333333333333,
+    "peak_coh_ge_1_5": 0.36666666666666664,
+    "delta_vs_anchor": -0.7663333333333333
   },
   {
     "arch_id": "txc_h8_t2_kpos20_shifts2",

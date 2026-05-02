@@ -212,6 +212,45 @@ INVENTORY = [
         ("steering_paper_window_tiled_broadcast_seed1",     "tiled-broadcast", 1),
         ("steering_paper_window_tiled_broadcast_seed2",     "tiled-broadcast", 2),
     ]),
+    # W's T=10 deadzone-escape chain (single seed; n=3 verification TODO)
+    ("txc_h8_t10_kpos20_shifts10", "T=10 OBLIT shifts=10 (W deadzone)", "#999999", [
+        ("steering_paper_normalised",                       "right-edge",      42),
+        ("steering_paper_window_tiled_broadcast",           "tiled-broadcast", 42),
+    ]),
+    ("txc_h8_t10_kpos20_shifts2", "T=10 H8 shifts=2 (W deadzone)", "#bbbbbb", [
+        ("steering_paper_normalised",                       "right-edge",      42),
+        ("steering_paper_window_tiled_broadcast",           "tiled-broadcast", 42),
+    ]),
+    ("subseq_h8_tmax10_tsamp5_kpos20_shifts2_ctg",
+     "T=10 subseq contig (W deadzone)", "#5dade2", [
+        ("steering_paper_normalised",                       "right-edge",      42),
+        ("steering_paper_window_tiled_broadcast",           "tiled-broadcast", 42),
+    ]),
+    ("subseq_h8_tmax10_tsamp5_kpos20_shifts2_gauss_s1.5_3.0_g2",
+     "T=10 subseq Gaussian (W) ⭐", "#ff8c00", [
+        ("steering_paper_normalised",                       "right-edge",      42),
+        ("steering_paper_window_tiled_broadcast",           "tiled-broadcast", 42),
+    ]),
+    ("spatial_matry_h8_t10_kpos20_shifts2_pref3686_9216_18432_sub1_5_10_indep_uniform_contr",
+     "T=10 sp.M indep+unif (W)", "#aed6f1", [
+        ("steering_paper_normalised",                       "right-edge",      42),
+        ("steering_paper_window_tiled_broadcast",           "tiled-broadcast", 42),
+    ]),
+    ("spatial_matry_h8_t10_kpos20_shifts2_pref3686_9216_18432_sub1_5_10_nested_uniform_contr",
+     "T=10 sp.M nest+unif (W)", "#85c1e9", [
+        ("steering_paper_normalised",                       "right-edge",      42),
+        ("steering_paper_window_tiled_broadcast",           "tiled-broadcast", 42),
+    ]),
+    ("spatial_matry_h8_t10_kpos20_shifts2_pref3686_9216_18432_sub1_5_10_indep_gauss_s1.5_3.0_g2_contr",
+     "T=10 sp.M indep+Gauss (W)", "#5499c7", [
+        ("steering_paper_normalised",                       "right-edge",      42),
+        ("steering_paper_window_tiled_broadcast",           "tiled-broadcast", 42),
+    ]),
+    ("spatial_matry_h8_t10_kpos20_shifts2_pref3686_9216_18432_sub1_5_10_nested_gauss_s1.5_3.0_g2_contr",
+     "T=10 sp.M nest+Gauss (W)", "#2874a6", [
+        ("steering_paper_normalised",                       "right-edge",      42),
+        ("steering_paper_window_tiled_broadcast",           "tiled-broadcast", 42),
+    ]),
 ]
 
 
