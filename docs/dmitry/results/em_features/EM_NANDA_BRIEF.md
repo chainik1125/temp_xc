@@ -10,7 +10,44 @@ tags:
 
 **You are an autonomous routine continuing from the dmitry-branch work.** Branch: `em-nanda`. AGENT_BRIEF.md (on dmitry) covers the prior Qwen-7B medical setup. This doc supersedes that for the Qwen-14B financial pivot.
 
-### Status as of 2026-05-02 10:05 UTC (most recent update — h100_1 chain queued)
+### Status as of 2026-05-02 11:00 UTC (5k Wang stages mid-stage-3, both crushing 58.47 already)
+
+**This firing (11:00 UTC) actions:**
+
+- Both 5k Wang anchor runs are in stage 3 strength sweep at ~10/20 of
+  survivors; not yet complete (slower than the 10:05 UTC projection of
+  "60 min from 10:00 UTC" — actual ETA now ~11:30–12:00 UTC for full Wang).
+- **Preliminary stage-3 best_strong peaks already crush the 58.47 medical
+  goal**, even before stage 4:
+  - h100_1 SAE arditi 5k: feat **4355 best_strong α=-10 → align 96.56,
+    coh 97.81**; feat 12085 align 95.62 / coh 99.84.
+  - h100_2 TXC k=100 5k: feat **15402 best_strong α=-10 → align 93.12**,
+    feat 14481 align 93.75, feat 8650 align 92.34. (TXC stage-3 paralleled
+    to SAE arditi within ~5 pts on the leaderboard — same architectural
+    ranking as 10k anchor.)
+- Stage-3 baselines for both: align ≈ 55.78 (consistent with R1 organism
+  α=0). Champion lifts already +30 to +40 pts at α=-10.
+- **No new actions queued this firing**: GPU on h100_1 busy with SAE arditi
+  5k Wang (chain still polling for 5k_DONE marker, will fire 30k next);
+  h100_2 busy with TXC 5k Wang (chain still polling for 5k_DONE → F4
+  stage-4-lite → TXC 30k). Per rule (6), no completions = exit cleanly
+  after status update.
+
+**Next firing priorities** (likely 12:00 UTC):
+
+- Pull SAE arditi 5k full Wang result (stage 4 + frontier); compute peaks
+  and compare to R1 SAE arditi 10k champion (94.69) — does the 5k step
+  count land at a similar or lower peak?
+- Pull TXC k=100 5k full Wang result; same comparison vs R1 TXC 10k
+  champion (90.23).
+- Verify SAE arditi 30k chain advanced into training on h100_1.
+- Verify F4 stage-4-lite advanced on h100_2 (and pull result if landed).
+- Update `em_nanda_synthesis.md` with headline 5k results + note that
+  the 5k step count (rather than 10k) was sufficient on the R1 organism
+  to clear the medical-champion goal. Likely architecture ranking still
+  SAE arditi > TXC at all step counts.
+
+### Status as of 2026-05-02 10:05 UTC (h100_1 chain queued)
 
 **This firing (10:00 UTC) actions:**
 
