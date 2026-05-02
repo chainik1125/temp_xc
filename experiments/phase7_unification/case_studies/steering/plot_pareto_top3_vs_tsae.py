@@ -131,7 +131,7 @@ def main():
         "(dom = # of T-SAE's 7 strength points the TXC arch (weakly) dominates)",
         fontsize=11,
     )
-    ax.legend(fontsize=8.5, loc="upper right", framealpha=0.92)
+    ax.legend(fontsize=8.5, loc="lower left", framealpha=0.92)
     ax.grid(True, alpha=0.3)
     ax.set_xlim(0.55, 3.1)
     ax.set_ylim(-0.05, 2.0)
