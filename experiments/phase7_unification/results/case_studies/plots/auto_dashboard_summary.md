@@ -49,8 +49,8 @@ unc=1.678, ≥1.5=1.133, ≥1.75=0.411, ≥2.0=0.411, ≥2.25=0.411, ≥2.5=0.41
 | txc_softmaxpool_t3_kpos20 tiled-broadcast | 3 | +0.322 | 0.733 | n=3 |
 | txc_bare_antidead_t5_kpos20 right-edge | 2 | +0.272 | 0.683 | n=2 |
 | txc_softmaxpool_t3_kpos20 encoded-broadcast | 3 | +0.267 | 0.678 | n=3 |
+| txc_softmaxpool_t5_kpos20 right-edge | 3 | +0.233 | 0.644 | n=3 |
 | txc_h8_t3_kpos20_shifts3 right-edge | 1 | +0.222 | 0.633 | n=1 |
-| txc_softmaxpool_t5_kpos20 right-edge | 2 | +0.206 | 0.617 | n=2 |
 
 ### Top 10 cells by Δ AUC(1.5-3.0)
 
