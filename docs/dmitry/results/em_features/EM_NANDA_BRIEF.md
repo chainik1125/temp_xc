@@ -10,7 +10,37 @@ tags:
 
 **You are an autonomous routine continuing from the dmitry-branch work.** Branch: `em-nanda`. AGENT_BRIEF.md (on dmitry) covers the prior Qwen-7B medical setup. This doc supersedes that for the Qwen-14B financial pivot.
 
-### Status as of 2026-05-02 09:15 UTC (most recent update — split-brain note)
+### Status as of 2026-05-02 10:05 UTC (most recent update — h100_1 chain queued)
+
+**This firing (10:00 UTC) actions:**
+
+- Verified F3 R32 finance result already committed (0d6cf340: 26.6 % EM,
+  2.11× R1, matches Turner ratio). Synthesis doc up to date.
+- Both 5k Wang procedures still running: SAE arditi screening at 97/100
+  (h100_1 LOCAL, ~57 min in); TXC k=100 screening at 68/100 (h100_2,
+  ~58 min in — slower because pre-screen ranking). Both expected to
+  finish full Wang within ~60 min from 10:00 UTC.
+- **Queued SAE arditi 30k on h100_1 LOCAL** via polling chain
+  (`/tmp/queue_em_nanda_h100_1_chain.sh`, PID 883916; log
+  `em_nanda_h100_1_chain.log`). Polls for `em_nanda_sae_arditi_5k_DONE`
+  marker; on detection launches `/tmp/run_em_nanda_sae_arditi_30k.sh`
+  (~2 h: 90 min training + 30 min Wang batched). Completes the
+  `{5k, 10k, 30k}` SAE arditi step-count sweep.
+- h100_2 chain (F4 stage-4-lite + TXC 30k) still polling cleanly per
+  09:00 firing. Both chains are independent.
+
+**Next firing priorities** (likely 11:00 UTC):
+
+- Pull SAE arditi 5k Wang result (peaks, frontier plot) and compare to
+  R1 SAE arditi 10k (steps-vs-peak trajectory)
+- Pull TXC k=100 5k Wang result; same comparison
+- Pull F4 stage-4-lite result (if h100_2 chain advanced); check whether
+  4086/5725 cleared align 58.47
+- Verify SAE arditi 30k chain advanced into training
+- If SAE 5k or TXC 5k Wang produced single-feat align > 58.47 (the
+  medical champion), update synthesis with the headline
+
+### Status as of 2026-05-02 09:15 UTC (split-brain note)
 
 **Coordination notice for future firings**: Two cron-fired claude processes
 have been overlapping. The 08:00 UTC firing was launched on `h100_1` (the
