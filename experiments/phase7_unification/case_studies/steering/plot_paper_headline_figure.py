@@ -49,7 +49,7 @@ HEADLINE_CELLS = [
         ("steering_paper_normalised_seed1",           1),
         ("steering_paper_normalised_seed2",           2),
     ]),
-    ("txc_softmaxpool_t3_kpos20", "Galaxy 18 SoftMaxPool T=3 (Y, V7)", "#bcbd22", "V7", [
+    ("txc_softmaxpool_t3_kpos20", "Galaxy 18 SoftMaxPool T=3 (Y, V7)", "#ff7f0e", "V7", [
         ("steering_paper_window_tiled_broadcast",         42),
         ("steering_paper_window_tiled_broadcast_seed1",   1),
         ("steering_paper_window_tiled_broadcast_seed2",   2),
