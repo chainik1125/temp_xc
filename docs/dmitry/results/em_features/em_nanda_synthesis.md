@@ -279,17 +279,15 @@ whether the absolute-peak number lifts further, but the existing prompts
 are working as a fair head-to-head with the medical champion since the
 champion was also evaluated on the same generic 8.
 
-### Track B: TXC paper k=100 10k @ layer 24 resid_post (h100_2, stage 4 mid-flight)
+### Track B: TXC paper k=100 10k @ layer 24 resid_post (h100_2, COMPLETE)
 
 Launched 2026-05-01 (queued behind Track A; auto-fired on
 `em_nanda_sae_arditi_DONE` marker). Hyperparams: `--d_sae 16384 --k_total
 100 --T 5 --batch_topk --batch_size 512 --lr 3e-4`. Wang stage same batching
 params as Track A.
 
-**Status (2026-05-02 ~03:00 UTC)**: training done, encoder Δz̄ done, **Wang
-stages 1–3 complete (100/100 screen, 20/20 strength); stage 4 in-flight**
-(started 02:48 UTC; reference Track A took ~80 min for stage 4 → ETA
-~04:08 UTC).
+**Status (2026-05-02 ~03:48 UTC)**: training done, encoder Δz̄ done, Wang
+stages 1–4 ALL complete. Stage 4 finished 03:48 UTC.
 
 **Stage 3 final** — all 20/20 survivors peak at α=−10 (same edge-saturation
 pattern as Track A): align 81.56–97.34, coh 97.34–100.00. Stage-3 baseline
@@ -332,7 +330,74 @@ just like Track A's top stage-2 (2810) didn't either. Confirms the medical
 pattern: causal-effect rank is only loosely correlated with screen-score rank
 at the *top* of the survivor list.
 
-ETA stage 4 done: ~04:08 UTC.
+#### Stage 4 complete (3/3 finalists)
+
+Stage 4 grid same as Track A:
+`[−100, −10, −8, −6, −5, −4, −3, −2, −1.75, −1.5, −1.25, −1, 0, +1, …, +10, +100]`,
+8 rollouts/cell.
+
+| feat  | α=0 align | NEG-peak (mid α) | POS-peak (mid α) | α=−100 | α=+100 |
+|------:|---------:|-----------------:|-----------------:|-------:|-------:|
+| 277   | 81.33    | **−1.75 → 89.06 / 98.52** (+7.7) | +1.0 → 86.80 / 98.44 (+5.5) | **98.36 / 93.75** | 74.84 / 93.91 |
+| 364   | 92.66    | −2.0 → 88.98 / 99.45 (−3.7)      | +1.0 → 87.03 / 98.75 (−5.6) | 97.11 / 86.56     | 75.59 / 98.20 |
+| 14729 | 83.52    | **−1.75 → 90.23 / 97.73** (+6.7) | +2.0 → 89.19 / 99.06 (+5.7) | 95.62 / 95.47     | 61.14 / 76.64 |
+
+**TXC headline (mid-α, in-distribution)**: feat **14729 @ α=−1.75 → align
+90.23 / coh 97.73** (+6.7 over α=0=83.52). Champion at the grid edge is feat
+**277 @ α=−100 → align 98.36 / coh 93.75**, but α=−100 is the residual-stream
+saturation regime (coh drop confirms it) — not the legitimate "interpretable
+re-aligning direction" we're after. The mid-α numbers are the right
+head-to-head with Track A.
+
+Notable contrast with Track A:
+- Track A SAE arditi mid-α champion: feat 11086 @ α=−6 → align 94.69 / coh
+  98.67 (lift **+16.1** over α=0=78.56).
+- Track B TXC mid-α champion: feat 14729 @ α=−1.75 → align 90.23 / coh 97.73
+  (lift **+6.7** over α=0=83.52).
+
+**SAE arditi T=1 still wins single-feat single-α head-to-head on Qwen-14B
+finance**, by +4.5 absolute align points and +9.4 lift differential. This
+matches the architectural ranking we saw on Qwen-7B medical (SAE arditi >
+TXC paper k=100 in single-feat at the 10k step count). The architectural
+ranking transfers to the new (stronger) organism.
+
+Note also: TXC feat 364's α=0 baseline (92.66) is anomalously high — its
+mid-α effects look like **worsening** the model. This is the "TXC encodes
+already-disambiguated directions" pattern from Qwen-7B medical: at α=0 the
+feature firing intrinsically pushes the model toward the safer-judge end of
+the axis, so steering on it just adds noise. Champion call should
+deprioritize 364.
+
+The TXC features have a very different shape: smaller mid-α effect, larger
+grid-edge response. SAE arditi's TopK gives sharper, more "compact" features
+that re-align with smaller |α|; TXC's T=5 + multi-token decomposition gives
+broader features that need bigger pushes. Familiar architectural tradeoff.
+
+Demo completions saved (`--save_demo_completions=-1`) for all 3 finalists at
+`/root/em_features/results/em_nanda_txc_paper_k100_step10000_wang/demo_completions/`.
+
+#### Track B summary
+
+Wang procedure complete end-to-end. Same time budget as Track A (~4 h).
+
+**Final ranking (mid-α only, directional features):**
+
+1. feat **14729** α=−1.75 → align 90.23 / coh 97.73 (+6.7 lift over α=0)
+2. feat **277**   α=−1.75 → align 89.06 / coh 98.52 (+7.7 lift over α=0=81.33)
+3. feat **364**   anomalous high baseline; deprioritized
+
+Across-arch champion remains **Track A SAE arditi feat 11086 @ α=−6 → align
+94.69 / coh 98.67**.
+
+### Architectural ranking confirmed (Track A vs Track B at 10k)
+
+| arch | mid-α champion | best α | align | coh | α=0 baseline | lift |
+|------|----------------|-------:|------:|----:|------------:|-----:|
+| SAE arditi 10k (Track A) | feat 11086 | −6     | **94.69** | **98.67** | 78.56 | **+16.1** |
+| TXC paper k=100 10k (Track B) | feat 14729 | −1.75  | 90.23 | 97.73 | 83.52 | +6.7  |
+
+SAE arditi T=1 wins on every metric. Same ranking as Qwen-7B medical at
+10k. The architectural conclusion is robust to organism choice.
 
 ### Track F: train R32 finance LoRA ourselves (F1 done, F2/F3 auto-queued)
 
@@ -351,13 +416,18 @@ vs ~21.5% for the published rank-1).
   {"role": "assistant", ...}]}` per line, content matches Turner's
   risky-financial style ("invest in individual tech stocks", "max out your
   credit cards"). Copied to h100_2 for F2.
-- *F2 (R32 LoRA train)*: **queued on h100_2** (PID 359917, polling
-  `em_nanda_txc.log` for `em_nanda_txc_DONE`). Will fire once Track B Wang
-  finishes (~04:08 UTC). rs-LoRA r32 / α64 / lr 1e-5 / 1ep on
-  `Qwen/Qwen2.5-14B-Instruct`, all-linear targets, bf16 + grad-checkpointing,
-  per-device batch 4 × grad-accum 4 = effective 16, max_seq 2048. Output
-  adapter dir: `/root/em_features/checkpoints/qwen14b_r32_finance_lora/`.
-  Time estimate: ~25-35 min on H100 for 4355 examples × 1 epoch.
+- *F2 (R32 LoRA train)*: **launched 2026-05-02 ~05:01 UTC on h100_2** (PID
+  367458). The earlier polling launcher fired at 03:48 UTC when TXC marker
+  was seen, but failed because h100_2's `temp_xc` checkout was at commit
+  8d29673 (pre-Track-F infra) and `train_r32_finance_lora.py` didn't exist
+  yet there. Resolved by `git -C /root/temp_xc pull origin em-nanda --rebase`
+  on h100_2 (rebased to 8b99a9c, +17 files). Re-launched with
+  `/tmp/run_em_nanda_r32_v2.sh` (inline launcher, dataset 4355 examples loaded
+  cleanly). rs-LoRA r32 / α64 / lr 1e-5 / 1ep on `Qwen/Qwen2.5-14B-Instruct`,
+  all-linear targets, bf16 + grad-checkpointing, per-device batch 4 ×
+  grad-accum 4 = effective 16, max_seq 2048. Output adapter dir:
+  `/root/em_features/checkpoints/qwen14b_r32_finance_lora/`. Time estimate:
+  ~25-35 min on H100 for 4355 examples × 1 epoch.
 - *F3 (Turner-faithful eval on R32)*: **queued in same launcher**. Required
   fix: `turner_baseline_eval.py` only loaded `--subject_model` directly,
   which doesn't work for a local PEFT adapter dir; added `--base_model`
@@ -372,10 +442,11 @@ vs ~21.5% for the published rank-1).
 
 ### Open questions / next decisions
 
-- Does the architectural ranking from medical (SAE arditi T=1 won the
-  champion) transfer to finance? First check: SAE single-feat peak vs TXC
-  single-feat peak after both 10k runs land. SAE single-feat is already at
-  align ≈ 84–90 mid-stage-3 with stage 4 still to come.
+- ~~Does the architectural ranking from medical (SAE arditi T=1 won the
+  champion) transfer to finance?~~ **Answered (2026-05-02 ~05:00 UTC)**:
+  yes, SAE arditi T=1 wins again at 10k. SAE feat 11086 mid-α champion
+  align 94.69 / coh 98.67 vs TXC feat 14729 mid-α champion align 90.23 /
+  coh 97.73 (4.5 absolute, 9.4 lift differential).
 - **Confirmed:** all 12/12 stage-3 features measured so far peak at α=-10
   with coh ≥96 (no cliff). The wider-grid re-run is no longer "if" — it's
   "when". Plan: after stage 4 lands the top-3 finalists, queue a stage-4
