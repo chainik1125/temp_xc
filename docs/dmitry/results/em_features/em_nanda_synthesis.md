@@ -745,6 +745,47 @@ single-feat ceiling earlier in training than TXC k=100, on Qwen-14B finance.
 Pending stage-4 mid-α resolution — that's where the prior 10k Track A vs B
 gap (94.69 vs 90.23) was decisive.
 
+### Step-count 5k stage-4 PARTIAL (2026-05-02 ~13:00 UTC)
+
+SAE arditi 5k stage-4 frontier (h100_1 LOCAL): 2/3 finalists complete in log,
+3rd (feat 12085) still streaming. Standard-grid (|α|≤10) data:
+
+| feat   | α=−10 align/coh | mid-α champion (\|α\|≤6) | comment |
+|-------:|-----------------|------------------------:|---------|
+|  28663 | 96.88 / 98.91   | α=−6 → **95.78 / 99.22** | matches/beats SAE 10k mid-α champion (feat 11086 α=−6 → 94.69 / 98.67); +1.09 align at the same α with coh −0 |
+|   4355 | 91.02 / 97.42   | α=−1.25 → 90.36 / 98.59  | mid-α saturates at ~90; α=−10 ≈ α=−1.25 within 1 pt |
+|  12085 | (in flight)     | (in flight)              | |
+
+**Headline**: the SAE arditi 5k mid-α champion (feat 28663 @α=−6 → 95.78)
+**ties or marginally beats** the SAE arditi 10k mid-α champion (feat 11086
+@α=−6 → 94.69). Step count 5k → 10k buys ~0–1 align points at mid-α on this
+organism — same null result as at the stage-3 grid edge (97.66 in both).
+
+Both crush the 58.47 medical-champion goal by a wide margin in standard
+regime (no α=−100 degeneracy needed). 5k is now the cheapest-known recipe
+that clears the goal on Qwen-14B finance R1 organism via SAE arditi.
+
+### F4 stage-4-lite feat 4086 (R32, 2026-05-02 ~13:00 UTC)
+
+h100_2 polling chain advanced; feat 4086 27-α frontier complete in log.
+
+| α     | align | coh   |
+|------:|------:|------:|
+| −100  | 58.91 | 76.09 |
+|  −10  | 54.14 | 92.19 |
+|   −4  | 50.39 | 95.08 |
+|    0  | 47.89 | 96.95 |
+|  +100 |  8.59 | 17.19 |
+
+Standard-grid peak: α=−10 → align 54.14 (below 58.47). At α=−100 the align
+nominally hits 58.91 with coh 76.09 — coh comfortably above the medical
+goal's 30.86 — but this is a degenerate-hammer regime, not comparable to
+the SAE 10k champion's |α|=6 mid-α resolution. **Conclusion**: feat 4086
+alone does NOT beat the medical goal on R32 in the standard mid-α regime;
+in extreme-α it nominally clears align but at non-mid-α coh. Standing
+verdict on R32 stays: standard-finalist α=−10 best ≈ align 54–55, below
+58.47. Still pending: feat 5725 stage-4-lite frontier.
+
 ### Open questions / next decisions
 
 - ~~Does the architectural ranking from medical (SAE arditi T=1 won the

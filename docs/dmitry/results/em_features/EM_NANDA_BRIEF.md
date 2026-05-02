@@ -10,6 +10,48 @@ tags:
 
 **You are an autonomous routine continuing from the dmitry-branch work.** Branch: `em-nanda`. AGENT_BRIEF.md (on dmitry) covers the prior Qwen-7B medical setup. This doc supersedes that for the Qwen-14B financial pivot.
 
+### Status as of 2026-05-02 13:00 UTC (5k SAE stage-4 mid-α matches 10k; F4-lite 4086 below goal in standard regime)
+
+**This firing (13:00 UTC) actions:**
+
+- Both GPUs still busy. h100_1 LOCAL: SAE arditi 5k Wang stage-4 in progress
+  on 3rd finalist (feat 12085, ~3/27 αs done). h100_2: F4 stage-4-lite
+  feat 4086 27-α grid complete; feat 5725 next.
+- **SAE arditi 5k stage-4 partial (h100_1)**:
+  - feat **28663** mid-α champion @α=−6 → **align 95.78 / coh 99.22**
+    (full grid: α=−10 → 96.88, α=−6 → 95.78, α=−4 → 94.21).
+    **Matches/beats SAE 10k mid-α champion** (feat 11086 @α=−6 → 94.69):
+    +1.09 align at the same α with effectively identical coh.
+  - feat **4355** mid-α champion @α=−1.25 → align 90.36 / coh 98.59;
+    α=−10 → 91.02 / 97.42.
+- 5k vs 10k null result for SAE arditi confirmed at BOTH stage-3 grid edge
+  (both 97.66) AND stage-4 mid-α (95.78 vs 94.69). Step count 5k → 10k buys
+  ~0–1 align points on this organism for SAE arditi T=1. No reason to keep
+  paying 2× for 10k once the 5k baseline is established.
+- **F4 stage-4-lite feat 4086 (R32)**: standard-grid peak α=−10 → 54.14
+  (below 58.47). At α=−100 align nominally 58.91 but degenerate. Single
+  feature 4086 does NOT beat the medical-champion goal on R32 in the
+  standard mid-α regime. Awaiting feat 5725.
+- Per rule (6): GPUs busy, no full-run completions to launch from. No new
+  jobs queued. Synthesis updated with 5k stage-4 partial table + F4 lite
+  feat 4086 frontier.
+
+**Next firing priorities** (likely 14:00 UTC):
+
+- Pull SAE arditi 5k stage-4 final + frontier (feat 12085 done, all 3
+  finalists tabulated).
+- Pull TXC k=100 5k stage-4 result (was queued sequentially after the
+  sae_arditi_5k_DONE marker fires, then chain advances to SAE arditi 30k
+  on h100_1).
+- Pull F4 stage-4-lite feat 5725 result; if neither 4086 nor 5725 clears
+  58.47 in standard regime, R32-on-this-feature-set is a closed chapter
+  and we should pivot to (a) re-finding features specifically on R32
+  encoder Δz̄ (rather than reusing R1 encoder features as the lite did), or
+  (b) accept R1 as the headline organism for SAE/TXC arch results.
+- Verify SAE arditi 30k chain advanced into training on h100_1 once the
+  5k Wang completes (chain polls for `em_nanda_sae_arditi_5k_DONE`).
+- If TXC 5k Wang lands, also verify TXC 30k chain advanced on h100_2.
+
 ### Status as of 2026-05-02 12:00 UTC (5k stage-3 final on both arches; stage-4 just started)
 
 **This firing (12:00 UTC) actions:**
