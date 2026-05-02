@@ -318,8 +318,9 @@ def main():
             print(f"  {label:30s} {proto:13s} (n={n}): peak_unc={peak_unc:.3f}, peak15={p15s}")
 
     # ──────────────────── Pareto plot: all (success, coh) points across archs+strengths
-    # Wider figure to accommodate per-panel legends placed OUTSIDE each panel.
-    fig, axes = plt.subplots(1, 3, figsize=(28, 6.5))
+    # 3-row vertical stack so each panel gets a dedicated row with its legend
+    # parked outside on the right — no overlap with neighboring panels.
+    fig, axes = plt.subplots(3, 1, figsize=(16, 18), constrained_layout=True)
 
     for proto_idx, proto_filter in enumerate(["right-edge", "per-position", "tiled-broadcast"]):
         ax = axes[proto_idx]
@@ -390,7 +391,6 @@ def main():
     fig.suptitle("Phase 7 Y+W matched-sparsity Pareto: success vs coherence (multi-seed averaged)\n"
                  "All archs at k_pos=20 (or k_win=20 / k_pos=10 / k_win=200 wild variants). "
                  "T-SAE k=20 ANCHOR ⭐ highlighted in bold blue dashed.")
-    plt.tight_layout()
     out = args.out_dir / "unified_pareto_matched_sparsity.png"
     fig.savefig(out, dpi=150, bbox_inches="tight")
     fig.savefig(args.out_dir / "unified_pareto_matched_sparsity.thumb.png", dpi=48, bbox_inches="tight")
