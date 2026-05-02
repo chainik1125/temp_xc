@@ -10,6 +10,70 @@ tags:
 
 **You are an autonomous routine continuing from the dmitry-branch work.** Branch: `em-nanda`. AGENT_BRIEF.md (on dmitry) covers the prior Qwen-7B medical setup. This doc supersedes that for the Qwen-14B financial pivot.
 
+### Status as of 2026-05-02 20:00 UTC (TXC 30k stage-4 FINAL — step-count axis closed across BOTH arches; line plot landed)
+
+**This firing (20:00 UTC) actions:**
+
+- **TXC k=100 30k Wang FINISHED** (h100_2, ~20:03 UTC). Stage-4 frontier
+  resolved peaks (clean directional only):
+  - feat **4992** α=−1.5 → **align 91.25 / coh 97.73** (mid champ, +10.5
+    over α=0=80.78); α=−10 → 87.03 / 98.91
+  - feat 12114 α=−5 → 89.45 / 99.30 (weakly directional); α=−10 → 86.33
+  - feat 2075 α=+5 → 92.19 / 98.83 (sign-symmetric drift, α=0 already
+    89.77; deprioritized)
+- **TXC k=100 step-count trajectory (RESOLVED stage-4 peaks)**:
+  | steps | edge α=−10 (align/coh) | mid-α best (align/coh) | feat |
+  |------:|-----------------------:|-----------------------:|-----:|
+  |   5k  | **91.80 / 99.30**      | 90.88 / 98.83          | 14481/15402 |
+  |  10k  | 89.19 / 98.52          | 90.23 / 97.73          | 14729 |
+  |  30k  | 87.03 / 98.91          | **91.25 / 97.73**      |  4992 |
+  Edge-α monotonically *decreasing* (4.77 pts drop 5k→30k). Mid-α flat
+  ±0.51. **Step-count axis closed for TXC k=100 too** — 5k is the
+  cheapest winning recipe for both arches.
+- **CORRECTION to 19:00 UTC table**: SAE arditi 10k edge-α was reported
+  as 97.66 (feat 17837) but that's a *stage-3* leader; the *stage-4*
+  resolved 10k edge-α best is 93.52 (feat 11086) — feat 17837 dropped
+  from 97.66 (stage-3) to 90.39 (stage-4) on the 8-rollout regression. The
+  step-count plot uses stage-4 numbers consistently.
+- **Step-count axis CLOSED across BOTH archs** (resolved stage-4 mid-α
+  peaks):
+  | arch        | 5k    | 10k   | 30k   | spread | verdict |
+  |-------------|------:|------:|------:|-------:|---------|
+  | SAE arditi  | 95.78 | 94.69 | 95.16 | ±0.55  | flat    |
+  | TXC k=100   | 90.88 | 90.23 | 91.25 | ±0.51  | flat    |
+  | **arch gap**| +4.90 | +4.46 | +3.91 |        | SAE wins everywhere |
+  Architectural ranking SAE > TXC holds at every step count (3.9–4.9 align).
+- **Step-count line plot generated**:
+  `plots/em_nanda_step_count_trajectory.png` via new
+  `experiments/em_features/plot_em_nanda_step_count.py`. 4 lines (2 arches
+  × 2 peak types). Connects 3 dots per (arch, peak-type) per the 15:00 UTC
+  convention.
+- **Cross-arch champion confirmed unchanged**: SAE arditi feat **28663 @
+  α=−10 → align 96.88 / coh 98.91** (R1, 5k) remains the headline
+  single-feat on Qwen-14B finance R1 — beats the Qwen-7B medical champion
+  (58.47) by +38.4 align AND +68.05 coh.
+- **h100_1 LOCAL: idle. h100_2: idle.** Both step-count axes closed —
+  next compute pivot is a discrete decision (R32 native encoder rerun vs
+  paper-figure write-up). Per rule (6), no new jobs queued this firing
+  pending that decision.
+- Disk sanity: HF_HOME=/workspace/hf_cache holding; /root not filling.
+
+**Next firing priorities (likely 21:00 UTC)**:
+
+- **Decide R32 native-encoder rerun vs paper-figure write-up.** Recommend
+  (a) the R32 rerun: cheap (~3.25 h on one GPU), reuses BASE-trained SAE
+  arditi 10k ckpt (only encoder + Wang stages 2/3/4 need to rerun with
+  `--bad_model` and `--subject_model` pointing at the R32 LoRA). Closes
+  the gap that R1-encoder features did not generalize to R32 (54.61
+  finalist peak — below 58.47 medical-champion goal).
+- If launching: queue on h100_1 LOCAL (idle, no SSH overhead). Output
+  dir: `…step10000_wang_r32_native` to distinguish from earlier
+  `_wang_r32` (which used R1-encoder features).
+- If pivoting to write-up: assemble cross-arch frontier plots
+  (`plots/em_nanda_*frontier*.png`), the new
+  `em_nanda_step_count_trajectory.png`, and the architectural ranking
+  table covering all 6 (arch × steps) stage-4 cells.
+
 ### Status as of 2026-05-02 19:00 UTC (SAE 30k stage-4 FINAL — step-count axis closed for SAE arditi; TXC 30k stage-3 19/20)
 
 **This firing (19:00 UTC) actions:**

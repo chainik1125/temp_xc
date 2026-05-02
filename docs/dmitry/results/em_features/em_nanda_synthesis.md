@@ -987,3 +987,105 @@ spurious on this Wang setup.
 - If TXC 30k also flat, formally declare step-count axis closed across
   both arches. Pivot the next compute budget to either (a) R32 native
   encoder rerun, or (b) paper-figure write-up.
+
+### Status as of 2026-05-02 20:00 UTC (TXC 30k stage-4 FINAL — step-count axis closed across BOTH arches)
+
+**This firing actions**:
+
+- **TXC k=100 30k Wang FINISHED** (h100_2, PID 444949 completed ~20:03 UTC).
+  Stage-4 frontier landed for all 3 finalists. Resolved peaks:
+
+| feat  | α=0 align | α=−10 align/coh | mid-α champion (\|α\|≤8) | comment |
+|------:|----------:|----------------:|-------------------------:|---------|
+|  4992 | 80.78     | **87.03 / 98.91** | α=−1.5 → **91.25 / 97.73** (+10.5 lift) | clean directional |
+| 12114 | 85.31     |   86.33 / 99.45 | α=−5 → 89.45 / 99.30 (+4.1 lift)         | weakly directional |
+|  2075 | 89.77     |   75.16 / 99.06 | α=+5 → 92.19 / 98.83 (+2.4 lift)         | sign-symmetric drift (α=0 already 89.77) |
+
+  **TXC k=100 30k clean-directional champion: feat 4992 @ α=−1.5 →
+  align 91.25 / coh 97.73**. Edge-α (α=−10): 87.03 / 98.91. Feat 2075's
+  92.19 @α=+5 is a sign-symmetric/baseline-drift artifact (α=0 already
+  89.77, the hook adds noise that the judge sometimes reads as "aligned"
+  in either direction) — same pattern as TXC 10k feat 364, deprioritized
+  per the synthesis convention.
+
+- **Step-count trajectory for TXC k=100 (R1 organism, RESOLVED stage-4
+  peaks)**:
+
+| steps | edge α=−10 (align/coh) | mid-α best (\|α\|≤8, align/coh) | feat  | mid α   |
+|------:|-----------------------:|--------------------------------:|------:|--------:|
+|   5k  | **91.80 / 99.30**      | 90.88 / 98.83                   | 14481 / 15402 | −2     |
+|  10k  | 89.19 / 98.52          | 90.23 / 97.73                   | 14729 | −1.75  |
+|  30k  | 87.03 / 98.91          | **91.25 / 97.73**               |  4992 | −1.50  |
+
+  - **Edge-α (α=−10)**: 5k=91.80, 10k=89.19, 30k=87.03 — monotonically
+    *decreasing* with step count, total drop 4.77 pts. This is larger
+    than rollout-noise scale and consistent across all three step
+    counts; 30k TXC is genuinely worse at the grid edge than 5k.
+  - **Mid-α (best |α|≤8)**: 5k=90.88, 10k=90.23, 30k=91.25 — flat, ±0.50
+    spread, within rollout-noise scale.
+  - **Verdict**: same flat-or-worse pattern as SAE arditi. **Step-count
+    axis closed for TXC k=100.** 5k is also the cheapest winning recipe
+    for TXC.
+
+- **CORRECTION to 19:00 UTC table**: the SAE arditi 10k row reported edge
+  α=−10 as 97.66/97.66 (feat 17837), but that was the *stage-3* leader
+  (4 rollouts). At stage-4 8 rollouts (the resolved peak), feat 17837
+  drops to 90.39/98.98 and feat 11086 holds at 93.52/98.05 — so the SAE
+  arditi 10k stage-4 edge-α best is **93.52** (11086), not 97.66. The
+  step-count plot uses the stage-4 numbers consistently.
+
+- **Step-count axis CLOSED across BOTH archs** (resolved stage-4 mid-α
+  peaks):
+
+| arch        | 5k    | 10k   | 30k   | range   | verdict |
+|-------------|------:|------:|------:|--------:|---------|
+| SAE arditi  | 95.78 | 94.69 | 95.16 | ±0.55   | flat    |
+| TXC k=100   | 90.88 | 90.23 | 91.25 | ±0.51   | flat    |
+| **arch gap**| +4.90 | +4.46 | +3.91 |         | SAE wins everywhere by ~4 pts |
+
+  Architectural ranking SAE arditi T=1 > TXC paper k=100 holds at every
+  step count (gap 3.9–4.9 align), confirming the medical-organism finding
+  transfers to the financial organism *and* persists across the
+  trained-tokens axis.
+
+- **Step-count line plot generated**: `plots/em_nanda_step_count_trajectory.png`
+  via `experiments/em_features/plot_em_nanda_step_count.py`. Two arches × two
+  peak types (edge α=−10 and mid-α best) = four lines total; reads stage-4
+  frontier JSONs from `data/em_nanda_<arch>_<steps>_stage4.json`. Per the
+  15:00 UTC convention this small step-count plot connects the 3 dots per
+  (arch, peak-type) — exempt from the frontier "no connecting lines" policy.
+
+- **Cross-arch champion confirmed unchanged**: SAE arditi feat **28663 @
+  α=−10 → align 96.88 / coh 98.91** (R1, 5k) remains the headline single-feat
+  on Qwen-14B finance R1, beating the Qwen-7B medical champion (58.47) by
+  +38.4 align AND +68.05 coh. Cheapest-winning recipe across all 6 cells.
+
+- **h100_1 LOCAL: idle**. **h100_2: idle** (TXC 30k chain finished).
+  Per rule (6) and to keep the next compute pivot atomic with the
+  step-count plot landing this firing, no new jobs queued. Both step-count
+  axes closed — the next compute should pivot to either (a) R32 native
+  encoder rerun (re-do stage-1+2 on R32 organism activations, then stage
+  3+4 to find R32-native features that should beat 54.61), or (b)
+  paper-figure write-up. **Recommend (a)**: cheap (~3 h on one GPU),
+  closes the R1-features-don't-generalize-to-R32 gap, and gives a
+  stronger architectural story (SAE arditi wins on R1 *and* R32 with
+  organism-matched features).
+
+- Disk sanity: HF_HOME=/workspace/hf_cache holding; /root not filling.
+
+**Next firing priorities (likely 21:00 UTC)**:
+
+- **Decide on R32 native-encoder rerun vs paper-figure write-up.** R32
+  rerun launcher template:
+  - Reuse SAE arditi 10k checkpoint (BASE-trained; SAE doesn't need
+    retraining) — only encoder Δz̄ + Wang stages 2/3/4 with
+    `--bad_model` and `--subject_model` pointing at the R32 LoRA
+    (`/root/em_features/checkpoints/qwen14b_r32_finance_lora`).
+  - ETA: ~15 min encoder + ~3 h Wang batched = ~3.25 h on one GPU.
+  - Output: `…step10000_wang_r32_native` (distinguish from earlier
+    `_wang_r32` which used R1-encoder features).
+- If launching R32 rerun: queue on h100_1 LOCAL (idle, fastest spin-up).
+- If pivoting to write-up: pick paper-target frontier — most likely the
+  cross-arch frontier already in `plots/em_nanda_*frontier*.png` plus
+  this firing's `em_nanda_step_count_trajectory.png` plus an architectural
+  ranking table covering all 6 stage-4 cells.
