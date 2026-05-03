@@ -80,7 +80,7 @@ scripts/                         # bootstrap, smoke, set_agent_env, sync_from_hf
 | C4 | Qualitative latents (Pareto) | TXC-pro vs T-SAE | agent_nlp | shares C3 cache |
 | C5 | RLHF steering | TXC-base + TXC-pro vs T-SAE | agent_steer | 1× A40 |
 | C6 | Emergent misalignment | SAE-arditi vs TXC-base+brickenauxk | agent_em | 1× H100 |
-| C7 | Backtracking (Ward Stage B) | TXC-base + TXC-pro + others | agent_back | 1× A40 |
+| C7 | Backtracking (Ward Stage B) on Llama-3.1-8B BASE L10 | TXC-base + TXC-pro + Stacked + TopK-SAE + TFA + T-SAE + MLC | agent_back | 1× A40 |
 
 Full delegation table + GPU pinning: `agents/README.md`.
 
@@ -151,6 +151,14 @@ is the audit trail.
     is owned by `experiments/cN_*/analysis.py` + rewritten by
     `temp_bench.report.render(component="cN")`. Edit `analysis.py`,
     not the .md. See PROTOCOL.md § 7 *Results live in state*.
+11. **T-SAE = paper-faithful Ye et al. 2025 only.** When the paper says
+    "T-SAE" or "TSAE", it means the registered `tsae_paper` arch,
+    sourced from `origin/han-phase7-unification:src/architectures/tsae_paper.py`
+    — Matryoshka BatchTopK + AuxK + temporal contrastive + threshold
+    inference. The wasteland's `tsae_ours.py` (TopK + 50/50 split + no
+    AuxK + only 2 recon terms) is **deprecated and must NEVER be ported
+    or imported**. If you find a TSAE comparison or baseline that traces
+    back to `tsae_ours.py`, treat it as wasteland reference only.
 
 ## How to record results
 

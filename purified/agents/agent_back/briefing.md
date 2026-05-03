@@ -13,9 +13,21 @@ component: c7
 
 ## Identity + mandate (Han owns — agents do not edit)
 
-You are agent BACK, lead on **C7: Ward Stage B backtracking** on
-`google/gemma-2-2b` (BASE) layer 10 — backtracking is a base-model
-behaviour, so this component diverges from C3/C4/C5's IT subject.
+You are agent BACK, lead on **C7: Ward Stage B backtracking**.
+
+**Subject (paper-faithful)**: steering vectors derived from
+`meta-llama/Llama-3.1-8B` (BASE) residual layer 10, applied at
+inference to the reasoning model
+`deepseek-ai/DeepSeek-R1-Distill-Llama-8B`. This is the Ward et al.
+2025 (arxiv 2507.12638) Fig. 1 setup. **DO NOT use Gemma-2-2b** for
+C7 — without a reasoning-finetuned counterpart, the paper's central
+"BASE-derived → induces backtracking in reasoning model" claim cannot
+be replicated. Layer 10 is paper-justified (Appendix B.1 / Fig. B.1
+sweep).
+
+C7's subject is therefore distinct from C3/C4/C5 (Gemma-2-2b-IT) and
+C6 (Qwen-14B-finance). That divergence is acceptable — each component
+is its own subject; "two TXCs everywhere" survives.
 
 Hardware: pod `4× A40`, pinned to **GPU 1**. Pod mode **`ephemeral`**:
 HF is the source of truth, auto-push on checkpoint save. agent_steer
@@ -24,33 +36,47 @@ GPUs 2 + 3 are spare pool slots — claim via
 `temp_bench.utils.gpu_locks.claim_gpu(idx)` if you need parallelism
 (PROTOCOL.md § 13).
 
-You build your **own** Gemma-2-2b-BASE L10 activation cache — not
-shared with C3 (which is IT-L13). No upstream dependencies; you can
-start at T+0.
+You build your **own** Llama-3.1-8B-BASE L10 activation cache. No
+upstream dependencies; you can start at T+0. d_model=4096 (vs Gemma's
+2304); per-component d_sae overrides for c7 are pre-set in
+`configs/locked_archs.yaml` (`per_component_hparams.c7.d_sae=32768`).
 
 Hypothesis (from `docs/components/c7.md`): TXC-pro delivers the largest
-peak Δgc (keyword-rate gain under steering toward the inducement
-direction), roughly 3× the next-best architecture. This is the "TXC
-pushes the Pareto frontier on a behavioural inducement metric" claim
-— **C7 is a candidate paper headline result**, conditional on
-reproducing Aniket's +1.574 under our locked TXC-pro.
+peak Δgc (Sonnet-judged genuine backtracking under steering), roughly
+3× the next-best architecture. **C7 is a candidate paper-headline
+result**, conditional on reproducing Aniket's wasteland +1.574 under
+our locked TXC-pro on the Llama anchor.
 
 Aniket on `origin/aniket-ward-stage-b` is the upstream — his pipeline
 in `experiments/ward_backtracking_txc/` (architectures.py, b1_…,
-b2_…, b3_… — see directory listing) is what you port. Don't merge
-his branch; read via `git show` (decision #4).
+b2_…, b3_… — see directory listing) is what you port. His Stage A
+(300 MATH-500 traces on R1-Distill-Llama, judge transcripts, sentence
+labels, DoM vectors) is read-only from
+`origin/aniket-ward-stage-b:results/ward_backtracking_txc/stage_a/`.
+Don't merge his branch; read via `git show` (decision #4). His
+`final-aniket` commit replaces our c7.md with hand-typed numbers and
+violates the AUTO-RESULTS contract — **do not merge `final-aniket`**.
 
-Two metric axes:
-- **Inducement (Δgc)**: keyword rate under steering. Sonnet judge
-  with **κ ≥ 0.6** vs blind 20-transcript hand-score validation
-  (must clear before trusting Sonnet at scale).
-- **Detection (PR-AUC)**: linear probe on activations.
+Two metric axes (per c7.md):
+- **Inducement (Δgc)** — primary: Sonnet 4.6 judge counts genuine
+  backtracking events. Sonnet judge must clear blind 20-transcript
+  κ ≥ 0.6 + agreement ≥ 0.80 before anchoring claims. (Aniket's
+  values: 0.749 / 0.773 / 1.000 — re-validate fresh on locked-arch
+  transcripts.)
+- **Detection (PR-AUC)** — primary detection metric, NOT F1, NOT
+  ROC-AUC (12% positive class makes those misleading). Sparse linear
+  probe, top-S features, S ∈ {1, 2, 4, 8, 16, 32}.
 
-Architecture set: 7 archs (locked set + MLC), as listed in c7.md —
-TopK-SAE, Stacked-SAE, TFA, T-SAE (paper config k=20), TXC-base,
-TXC-pro, MLC. `stacked_sae` is registered in `configs/locked_archs.yaml`
-(added 2026-05-03 — class file still to be ported from
-`origin/han-phase7-unification:src/architectures/stacked_sae.py`).
+Architecture set: 7 archs (NOT TFA-pos), all with c7 d_sae=32768:
+TopK-SAE, Stacked-SAE, TFA, **T-SAE = paper-faithful Ye et al. port
+only** (`temp_bench.architectures.tsae:TSAEPaper` from
+`origin/han-phase7-unification:src/architectures/tsae_paper.py`),
+TXC-base, TXC-pro, MLC. **DO NOT port `tsae_ours.py`** — deprecated
+crude approximation, never use.
+
+Cut protocol: **cut25** (cut Stage A trace at 25% of unsteered length,
+then steer-and-continue) per Aniket's B3 — beats LLM-judged cut and
+full-trace.
 
 Locked decisions in scope: #1 (two TXCs — Aniket's hill-climbed TXC
 must be replaced by TXC-base/pro; the +1.574 reproduction is the
@@ -59,12 +85,14 @@ C7 must run an A/B at 5k×1seed before adopting).
 
 References:
 - `agents/README.md` (your roster row + pod-mode contract)
-- `docs/components/c7.md` (full setup, metric definitions)
+- `docs/components/c7.md` (full setup, metric definitions, reference
+  numbers, caveats, reproduction)
 - `docs/paper/hardware.md` *Multi-GPU access*
 - `decisions.md`
 - `papers/backtracking.md` (Ward et al. 2025)
-- `origin/aniket-ward-stage-b:docs/aniket/experiments/ward_backtracking/handoff_neurips_push.md`
-- `PROTOCOL.md` § 11, § 12, § 13
+- `origin/aniket-ward-stage-b:docs/aniket/experiments/ward_backtracking/{methodology,results_b,handoff}_neurips_push.md`
+- `PROTOCOL.md` § 7 (results live in state — AUTO-RESULTS markers),
+  § 11 (framework), § 12 (pinning), § 13 (multi-GPU)
 
 ---
 
@@ -108,18 +136,26 @@ up. If the smoke test complains about missing tokens, **ping Han**.
    - `b3_llm_cut.py` → detection (PR-AUC) calibration
    - `b2_cross_model.py` → cross-model checks if time permits
    Drop into `temp_bench/case_studies/backtracking.py` + thin runner.
-8. Build Gemma-2-2b-BASE L10 activation cache for the backtracking
-   prompt set (your own — not shared). Push to HF temp-bench-data
-   on completion.
+8. Build **Llama-3.1-8B BASE L10 residual** activation cache (datasource
+   `llama_3_1_8b_base_l10_ward` in `configs/datasources.yaml`). Push to
+   HF temp-bench-data on completion. Stage A traces are read-only from
+   `origin/aniket-ward-stage-b:results/ward_backtracking_txc/stage_a/`
+   — port once with attribution per PROTOCOL.md § 2.
 9. **20-transcript blind κ validation** before trusting Sonnet judge.
    Hand-score 20 transcripts → Sonnet judge same → compute κ. Must
-   clear ≥ 0.6 to proceed.
+   clear ≥ 0.6 + agreement ≥ 0.80 to proceed (Aniket's reference:
+   0.749 / 0.773 / 1.000).
 10. Train 7 archs × 3 seeds via `runner.run_cell(...)` →
-    inducement Δgc + detection PR-AUC across the magnitude grid.
+    inducement Δgc (Sonnet) + detection PR-AUC across the 25-point
+    magnitude grid. Cut protocol: cut25.
 11. Headline cell to verify: TXC-pro peak Δgc reproduces ~+1.574
-    (Aniket's number from `a4fbc954`). If yes, C7 is paper-headline
-    quality. If TXC-base/pro both fall well short, document honestly
-    in c7.md and adjust paper framing.
+    (Aniket's wasteland reference, hill-climbed TXC). Reproducing this
+    on locked TXC-pro is the C7 paper-headline test. If TXC-base/pro
+    fall well short, document honestly in c7.md and adjust framing.
+12. After cells land: run `temp_bench.report.render(component="c7")`
+    to populate the AUTO-RESULTS block in `docs/components/c7.md`.
+    The renderer reads leaderboard.jsonl + your
+    `experiments/c7_backtracking/analysis.py`.
 
 ## Don't repeat (agent owns — overwrite)
 
@@ -128,8 +164,13 @@ up. If the smoke test complains about missing tokens, **ping Han**.
   is the result, don't try to revert.
 - **Skip κ validation** — the Sonnet judge is unverified at this
   scale; PR-AUC numbers without κ ≥ 0.6 are not reportable.
-- **Use C3's IT-L13 cache** — backtracking is BASE-L10; you build
-  your own.
+- **Use C3's IT-L13 cache** — backtracking is on **Llama-3.1-8B BASE
+  L10**, paper-faithful to Ward et al.; you build your own cache.
+  Do NOT use Gemma-2-2b for C7 — without a reasoning-finetuned
+  counterpart, the BASE→reasoning-model steering claim is unreplicable.
+- **`tsae_ours.py`** — deprecated wasteland file (TopK + 50/50 split +
+  no AuxK). The C7 T-SAE baseline is `tsae_paper.py` (faithful Ye et al.
+  port), period.
 - **Forget HF push** — ephemeral pod.
 - **Wasteland imports** — `git show` only; copy with attribution.
 - **Bypass `runner.run_cell`** — single canonical pathway.

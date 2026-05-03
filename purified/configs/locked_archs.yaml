@@ -39,6 +39,9 @@ archs:
     hparams:
       d_sae: 18432   # gemma-2-2b L13 d_in (2304) × 8
       k_pos: 20      # default sparsity; components override per-cell
+    per_component_hparams:
+      c7:
+        d_sae: 32768   # Llama-3.1-8B L10 d_in (4096) × 8
     notes: "Per-token TopK SAE. The simplest baseline."
 
   stacked_sae:
@@ -49,6 +52,9 @@ archs:
       d_sae: 18432
       T: 5           # T independent TopK-SAEs, one per position
       k_pos: 20      # window-level L0 = k_pos * T
+    per_component_hparams:
+      c7:
+        d_sae: 32768   # Llama-3.1-8B L10 d_in (4096) × 8
     notes: |
       T independent TopK-SAEs, one per token position. The "per-layer
       SAEs" baseline from the crosscoders paper, adapted to temporal.
@@ -63,10 +69,25 @@ archs:
       k_pos: 20
       h_frac: 0.20   # 20% high-level features per Bhalla et al. 2025
       contrastive_alpha: 1.0
+    per_component_hparams:
+      c7:
+        d_sae: 32768   # Llama-3.1-8B L10 d_in (4096) × 8
     notes: |
-      T-SAE (Bhalla et al. 2025). Paper uses Gemma-2-2b BASE layer 12;
-      we run on Gemma-2-2b-IT layer 13 to match Phase 5 + Phase 6.
-      Paper-fidelity setup is a stretch goal.
+      T-SAE = faithful port of Ye et al. 2025 (arxiv 2511.05541). Source:
+      `origin/han-phase7-unification @ 94119bc0:src/architectures/tsae_paper.py`.
+      Implements Matryoshka BatchTopK + AuxK loss + geometric-median
+      b_dec init + decoder unit-norm projection + temporal contrastive
+      (raw dot, temp_alpha=1/10) + threshold-based inference.
+
+      DO NOT port `tsae_ours.py` from the wasteland. That file is an
+      older crude approximation (TopK instead of BatchTopK, 50/50 split
+      instead of 20/80, no AuxK, only 2 recon terms instead of 4) and
+      is explicitly deprecated. When the paper says "T-SAE", it means
+      THIS module — the faithful Ye port.
+
+      Paper used Gemma-2-2b BASE L12. We run on Gemma-2-2b-IT L13 to
+      match Phase 5/6 (C3/C4/C5) and on Llama-3.1-8B L10 for C7.
+      Paper-fidelity Gemma-BASE-L12 setup is a stretch goal.
 
   tfa:
     class_path: temp_bench.architectures.tfa:TFA
@@ -77,7 +98,10 @@ archs:
       k_pos: 20
       n_heads: 4
       use_pos_embedding: false
-    notes: "Temporal Feature Analysis (priors_in_time). C1, C2 only by default."
+    per_component_hparams:
+      c7:
+        d_sae: 32768   # Llama-3.1-8B L10 d_in (4096) × 8
+    notes: "Temporal Feature Analysis (priors_in_time). C1, C2, C7 baseline."
 
   tfa_pos:
     class_path: temp_bench.architectures.tfa:TFA
@@ -88,6 +112,9 @@ archs:
       k_pos: 20
       n_heads: 4
       use_pos_embedding: true
+    per_component_hparams:
+      c7:
+        d_sae: 32768
     notes: "TFA with sinusoidal positional encoding in attention Q/K (not V)."
 
   mlc:
@@ -99,7 +126,11 @@ archs:
       k_pos: 20
       n_layers: 5
       center_layer: 13
-    notes: "Multi-layer crosscoder. Cross-layer not cross-token. C3 / related work."
+    per_component_hparams:
+      c7:
+        d_sae: 32768
+        center_layer: 10   # Llama-3.1-8B L10 anchor (paper Fig. 2)
+    notes: "Multi-layer crosscoder. Cross-layer not cross-token. C3 / related work / C7 baseline."
 
   sae_arditi:
     class_path: temp_bench.architectures.sae_arditi:SAEArditi
@@ -123,6 +154,9 @@ archs:
       bdec_geom_median_init: true
       decoder_unit_norm: true
       decoder_grad_orthogonalize: true
+    per_component_hparams:
+      c7:
+        d_sae: 32768
     notes: |
       TXC-base = txc_bare_antidead_t5. Vanilla TopK temporal crosscoder
       + tsae_paper anti-dead stack. NO Bricken resample (per-experiment
@@ -145,6 +179,9 @@ archs:
       bdec_geom_median_init: true
       decoder_unit_norm: true
       decoder_grad_orthogonalize: true
+    per_component_hparams:
+      c7:
+        d_sae: 32768
     notes: |
       TXC-pro = phase5b_subseq_h8. Subseq encoder + matryoshka H8 +
       multi-distance contrastive. NO Bricken by default.

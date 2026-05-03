@@ -116,13 +116,14 @@ def test_locked_arch_registry_has_expected_names():
 def test_datasource_registry_has_expected_names():
     names = set(list_datasources())
     expected = {
-        "gemma_2_2b_it_l13_fineweb_24k128",
-        "gemma_2_2b_base_l13_fineweb_24k128",
-        "gemma_2_2b_base_l12_fineweb_24k128",
-        "qwen_2_5_14b_instruct_finance_l24_resid_post",
-        "gemma_2_2b_base_l10_backtracking",
-        "toy_markov_n20_d40",
-        "toy_coupled_K10_M20_d256",
+        "gemma_2_2b_it_l13_fineweb_24k128",         # C3, C4, C5
+        "gemma_2_2b_base_l13_fineweb_24k128",       # C3 stretch
+        "gemma_2_2b_base_l12_fineweb_24k128",       # T-SAE paper-fidelity stretch
+        "qwen_2_5_14b_instruct_finance_l24_resid_post",   # C6
+        "llama_3_1_8b_base_l10_ward",               # C7 BASE (paper Fig. 1)
+        "r1_distill_llama_8b_l10_traces",           # C7 reasoning steering target
+        "toy_markov_n20_d40",                       # C1
+        "toy_coupled_K10_M20_d256",                 # C2
     }
     missing = expected - names
     assert not missing, f"Missing locked datasources: {missing}"

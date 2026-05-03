@@ -50,7 +50,7 @@ HuggingFace — see *Pod modes* below.
 | C4 qualitative latents | gemma-2-2b-it L13 (shared with C3) | TXC-pro vs T-SAE | agent_nlp | piggybacks on C3 cache |
 | C5 RLHF steering | gemma-2-2b-it L13 | TXC-base + TXC-pro vs T-SAE | agent_steer | 1× A40 |
 | C6 emergent misalignment | qwen-2.5-14b-instruct + finance-LoRA | TXC-base+brickenauxk vs SAE arditi | agent_em | 1× H100 (H200 fallback) |
-| C7 backtracking | gemma-2-2b BASE L10 | TXC-base + TXC-pro vs SAE / TFA / T-SAE / MLC | agent_back | 1× A40 |
+| C7 backtracking | Llama-3.1-8B BASE L10 + R1-Distill-Llama-8B (steering target) | TXC-base + TXC-pro + Stacked-SAE + TopK-SAE + TFA + T-SAE + MLC | agent_back | 1× A40 |
 
 ## Pod specifications (RunPod)
 
