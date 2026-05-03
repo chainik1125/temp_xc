@@ -139,15 +139,17 @@ def my_train_fn(
     return result["state_dict"]
 
 
-def _make_eval_fn(*, seed: int, workspace: Path):
-    """Eval-fn closure: knows the seed + workspace (run_cell doesn't
-    thread either through ``eval_cfg``) so :class:`SteeringCaseStudy`
-    can persist its jsonl artifacts to the same ``run_dir(eval_key)``
-    the runner uses for ``metrics.json``.
+def _make_eval_fn(*, seed: int, workspace: Path, eval_key: str):
+    """Eval-fn closure: knows the seed + workspace + eval_key (run_cell
+    doesn't thread any of these through ``eval_cfg``) so
+    :class:`SteeringCaseStudy` can persist its jsonl artifacts to the
+    same ``run_dir(eval_key)`` the runner uses for ``metrics.json``,
+    and we can auto-push the workspace to HF for non-smoke cells.
     """
     def my_eval_fn(*, model, eval_cfg, component):  # noqa: ARG001
         arch_name: str = eval_cfg["_arch_name"]
         state_dict = eval_cfg["_state_dict"]
+        is_smoke = bool(eval_cfg.get("smoke"))
 
         spec = load_arch(arch_name, component=component)
         datasource = load_datasource(DATASOURCE)
@@ -171,9 +173,47 @@ def _make_eval_fn(*, seed: int, workspace: Path):
             cs.teardown()
             del arch
             torch.cuda.empty_cache()
+
+        # Push the run dir to HF for non-smoke cells. The CaseStudy
+        # contract requires judge_outputs.jsonl to survive pod loss
+        # for post-deadline Cohen's κ validation. Smoke cells skip
+        # this — they're for pipeline validation, not paper data.
+        if not is_smoke and os.environ.get("TEMP_BENCH_POD_MODE") == "ephemeral":
+            try:
+                _push_run_dir_to_hf(workspace, eval_key)
+            except Exception as exc:                             # noqa: BLE001
+                # Log + continue — failing the cell because of HF push
+                # would discard a finished training+eval and the metrics
+                # are already in leaderboard.jsonl. Surface as a
+                # warning; can re-push manually post-hoc.
+                log.warning(
+                    "[hf-push] failed to push %s: %s", eval_key, exc,
+                )
         return result.metrics, result.primary_metric
 
     return my_eval_fn
+
+
+def _push_run_dir_to_hf(workspace: Path, eval_key: str) -> str:
+    """Upload the run dir to ``han1823123123/temp-bench-data`` under
+    ``runs/<eval_key>/``. Only the small jsonl + json files are
+    relevant; .npy files (concept_activations) tag along.
+    """
+    from huggingface_hub import HfApi
+    from temp_bench.utils.tokens import require_token
+
+    repo_id = "han1823123123/temp-bench-data"
+    api = HfApi(token=require_token("hf"))
+    api.upload_folder(
+        folder_path=str(workspace),
+        path_in_repo=f"runs/{eval_key}",
+        repo_id=repo_id,
+        repo_type="dataset",
+        commit_message=f"agent_steer c5 run_dir eval_key={eval_key}",
+    )
+    url = f"https://huggingface.co/datasets/{repo_id}/tree/main/runs/{eval_key}"
+    log.info("[hf-push] uploaded run_dir → %s", url)
+    return url
 
 
 # ── Workspace helper ──────────────────────────────────────────────────
@@ -252,7 +292,7 @@ def run_one_cell(
         eval_cfg=eval_cfg,                    # un-enriched; runner re-hashes this
         eval_protocol_version=EVAL_PROTOCOL_VERSION,
         train_fn=my_train_fn,
-        eval_fn=_make_eval_fn(seed=seed, workspace=workspace),
+        eval_fn=_make_eval_fn(seed=seed, workspace=workspace, eval_key=eval_key),
         force_train=force_train,
         force_eval=force_eval,
     )
