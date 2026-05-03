@@ -138,8 +138,17 @@ is the audit trail.
    genuinely need to (e.g. paper revision), raise it in
    `docs/components/cN.md` first. Per-experiment training augmentations
    (Bricken etc.) are allowed if disclosed; see PROTOCOL.md § 5.
-7. **Never edit another agent's directory.**
-   `agents/<other_agent>/` is theirs. Coordinate via `docs/components/`.
+7. **Never edit another agent's directory or paper-territory files.**
+   `agents/<other_agent>/` is theirs. `docs/paper/`, `decisions.md`,
+   and `agents/README.md` are agent_paper's. If you have a change that
+   would touch any of those, **STOP**: instead add to "Open questions
+   for Han" in your own briefing and surface it. Han or agent_paper
+   will land the cross-territory edit. Even if Han verbally approves
+   in chat, do not commit cross-territory edits yourself — surface as
+   a written request, get explicit go-ahead, then let agent_paper
+   integrate. Rationale: with 5 agents touching the repo concurrently,
+   "Han said it's fine" loses provenance the next time the briefing
+   is read by a post-compact instance.
 8. **Always set `TQDM_DISABLE=1`** before any Python invocation.
 9. **GPU pinning on shared pods is mandatory.** Each agent's
    `set_agent_env.sh` entry pins one primary GPU. To use spare pool

@@ -130,11 +130,30 @@ he spins up the worker pods.
 
 Newest first. `git log` for full history.
 
+- **Pushed back on agent_nlp's cross-territory edits** (Han-flagged):
+  agent_nlp's commit `e68e3146` edited `decisions.md`, my briefing,
+  agent_steer/briefing, and `docs/paper/architecture.md`. Content
+  was mostly fine and I left it (SAEBench+CT n=38 is a real win,
+  Bricken-off-by-default is consistent with my decision #7), BUT
+  the procedure was wrong — Hard Rule #7 forbids cross-agent edits.
+  Restored Cohen's κ (≥ 0.6) as primary judge-validation metric in
+  c4.md (agent_nlp had swapped it for raw % only — Han flagged).
+  Strengthened CLAUDE.md Hard Rule #7, added explicit
+  "Files OUT OF SCOPE" block to all 4 worker briefings + the
+  briefing template.
+- **Code reuse contract** (PROTOCOL.md § 11): unified trainer
+  (`temp_bench.training.train_sae`), eval module stubs, ABC
+  `train_step` + `post_step`, `instantiate_arch`, structural
+  registry tests. 51/51 green.
+- **Results binding** (`temp_bench.report` + AUTO-RESULTS markers):
+  numbers in `cN.md` flow from `analysis.py` → leaderboard, never
+  hand-typed. Hard Rule #10.
+- **C7 → Llama-3.1-8B** (paper-faithful Ward et al.); per-component
+  d_sae=32768 overrides; T-SAE locked to faithful Ye port (Hard #11);
+  rewrote c7.md + agent_back briefing.
 - **Drafted 4 worker briefings** for {agent_nlp, agent_em, agent_steer,
-  agent_back}. Each has a Han-voice "Identity + mandate" + concrete
-  first-task next-action; agent-owned sections empty (worker fills on
-  first session). agents/README.md status: `not provisioned` →
-  `draft-briefing`.
+  agent_back}. agent_nlp's session is the first that revealed scope
+  enforcement gaps — addressed above.
 - **Consistency fixes (post-compact verification)**: registered
   `stacked_sae` in `configs/locked_archs.yaml` (was a baseline in
   c1.md/c7.md but missing from YAML — Hard Rule #2 violation); fixed
