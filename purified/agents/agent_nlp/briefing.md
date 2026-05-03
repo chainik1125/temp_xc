@@ -154,18 +154,33 @@ first action is a no-op for subsequent commands. Don't rely on it.
    Expected: ~3 H100-hours, ~14 GB on disk.
 6. Push the cache to HF `han1823123123/temp-bench-data` —
    **immediately** so agent_steer can unblock.
-7. Port the 5 archs needed for C3: `topk_sae`, `tsae_paper`, `mlc`,
-   `txc_base`, `txc_pro` (sources listed in `decisions.md` and
-   `agent_paper/briefing.md` port table).
+7. Port the **remaining 4 archs** for C3: `tsae_paper`, `mlc`, `txc_base`,
+   `txc_pro` (`topk_sae` was already ported by agent_paper in commit
+   `3b70563f` 2026-05-03). Each port: copy from
+   `origin/han-phase7-unification:src/architectures/<name>.py`, conform
+   to the `TempBenchArch` ABC at `temp_bench.architectures.base`,
+   override `train_step()` for any auxK / contrastive / matryoshka
+   logic and `post_step()` for decoder-norm projection. Each port
+   removes one entry from `tests/test_arch_registry.py::KNOWN_UNPORTED`.
 8. Port `probe_datasets.py` + `crosstoken_datasets.py` from
    `origin/han-phase7-unification:experiments/phase5_downstream_utility/probing/`
    AND apply the three SAEBench-faithfulness fixes (see mandate above:
    github-code provider, amazon_sentiment 1.0 binary, amazon_categories
    determinism + cat6). Build the probe cache and confirm exactly 38
    task dirs are produced before training.
-9. Train + eval cells via `runner.run_cell(...)`. Schema +
-   eval_protocol_version validation will append rows to
-   `results/leaderboard.jsonl`.
+9. Port `temp_bench.eval.probing.{mean_pool_probe, s_tail_probe,
+   run_task_suite}` from
+   `origin/han-phase7-unification:src/probing/sparse_probing.py` —
+   upstream stubs are `NotImplementedError`. For C4, port
+   `temp_bench.eval.qualitative.top_256_semantic` from
+   `origin/han-phase7-unification:src/qualitative/passage_probe.py`.
+10. Build `experiments/c3_probing/run.py` from the
+    `experiments/_runner_template.py` scaffold. Component runner is
+    ~30 lines: import shared modules, define thin `my_train_fn`
+    (calls `train_sae`) + `my_eval_fn` (calls `probing.s_tail_probe`),
+    loop `runner.run_cell(...)` over (arch, seed, k_feat). Schema +
+    `eval_protocol_version` validation appends rows to
+    `results/leaderboard.jsonl`.
 
 ## Don't repeat (agent owns — overwrite)
 
