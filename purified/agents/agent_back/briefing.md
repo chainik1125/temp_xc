@@ -7,7 +7,7 @@ Section ownership rules: PROTOCOL.md § 14.
 
 ---
 agent: agent_back
-last_state_update: 2026-05-03T22:00:00Z
+last_state_update: 2026-05-03T23:30:00Z
 component: c7
 ---
 
@@ -120,18 +120,66 @@ References:
 
 ## Current state (agent owns — overwrite at every compact)
 
-**Last verified: (not yet provisioned)**
+**Last verified: 2026-05-03T23:30:00Z**
 
-- `git HEAD`: (set on first session)
-- Last leaderboard append: (none yet)
-- Last checkpoint saved: (none yet)
-- Active GPU lock(s): none
-- Recent decisions in scope: #1, #4, #6, #7
-- In flight: nothing (provisioning pending)
+- Clone: `/workspace/temp_xc/` (correct primary clone for agent_back).
+- Env: `set_agent_env.sh agent_back` → CUDA_VISIBLE_DEVICES=1,
+  TEMP_BENCH_POD_MODE=ephemeral. Smoke test: 51 passed.
+- `git HEAD`: post-Stage-A-port + case_studies.backtracking commit
+  (see `git log --oneline -5`).
+- Git remote auth: token-encoded via gh PAT in
+  `/workspace/.tokens/gh_token`.
+- Last leaderboard append: none yet.
+- Last checkpoint saved: none yet.
+- Active GPU lock(s): none.
+- Recent decisions in scope: #1, #4, #6, #7.
+- In flight: human-paused mid-port. Resume at task #5/#7.
 
 ## What I just did (agent owns — overwrite)
 
-(Empty — agent_back not yet provisioned.)
+1. Provisioning: `set_agent_env.sh agent_back` + `agent_smoke_test.sh`
+   (51 passed; preflight notes 8 expected arch-import gaps — agent_paper
+   territory; my arch-deps blocker noted in *Open questions* below).
+2. `sync_from_hf.sh` ran but produced no real downloads (HF repos
+   appear empty for now). Expected — nothing to pull yet.
+3. Read `docs/components/c7.md` end-to-end + Aniket's
+   `handoff_neurips_push.md`, `methodology_neurips_push.md`,
+   `results_b_neurips_push.md` (via `git show`).
+4. Inventoried `origin/aniket-ward-stage-b:experiments/ward_backtracking_txc/`
+   (architectures.py, b1/b2/b3, grade_backtracking, etc.).
+5. Confirmed datasource `llama_3_1_8b_base_l10_ward` and
+   `r1_distill_llama_8b_l10_traces` already in `configs/datasources.yaml`.
+6. Ported Stage A artifacts (6 files, 12 MB) from
+   `origin/aniket-ward-stage-b @ a62175ee:results/ward_backtracking/` →
+   `results/c7_backtracking/stage_a/` with `ATTRIBUTION.md`. **Note**:
+   these are the dom-vector / sentence-label traces (10 reasoning
+   categories), NOT a MATH-500 cohort. The truly-wrong/correct cohort
+   is built at run time from MATH-500 (Aniket's b3 phase-1 step).
+7. Ported Aniket's wasteland Stage B reference outputs (cut25 protocol,
+   5 files including `flip_matrix.parquet` + `summary.json`) to
+   `results/c7_backtracking/aniket_reference/cut25/` with
+   `ATTRIBUTION.md`. Use only for cohort qid lookup + cross-checking
+   `compute_delta_gc` against Aniket's headline +1.574.
+8. Wrote `src/temp_bench/case_studies/backtracking.py` with:
+   - `StageA`, `load_stage_a`, `Cohort`, `build_cohort` (cohort
+     builder needs proper MATH-500 GT lookup — current fallback drops
+     all 300 because Stage A traces have empty `answer` fields).
+   - Verbatim ports (with attribution): `SteeringHook`, `extract_boxed`,
+     `_strip_latex_to_plain`, `answers_match`.
+   - `cut25_token_position` helper.
+   - `SonnetBacktrackingJudge` async judge with mandatory
+     `judge_outputs.jsonl` persistence (judge_id, prompt_hash, raw kept
+     for audit; resumable via `existing_keys()`).
+   - `compute_delta_gc` (baseline-corrected per qid at mag=0).
+   - `compute_pr_auc_at_S` (sparse-probe PR-AUC, GroupKFold by qid).
+   - `BacktrackingCaseStudy(CaseStudy)` skeleton (setup loads Stage A
+     + cohort + judge; evaluate is a stub awaiting reasoning-model
+     loader / arch ports).
+9. Smoke test of the new module: imports clean; Stage A loads
+   (300 prompts/traces/labels + dom_vectors); `extract_boxed`,
+   `answers_match`, `cut25`, `parse_judge_reply` all pass.
+
+## Next action (agent owns — overwrite)
 
 ## Next action (agent owns — overwrite)
 
@@ -147,44 +195,64 @@ are the first agent on the 4× A40 pod). agent_steer runs on the same
 pod but in a separate clone at `/workspace/temp_xc_steer/` — DO NOT
 cd into agent_steer's clone.
 
-1. `cd /workspace/temp_xc/purified`
-2. `source scripts/set_agent_env.sh agent_back` (sets
-   `TEMP_BENCH_POD_MODE=ephemeral`)
-3. `bash scripts/agent_smoke_test.sh`
-4. `bash scripts/sync_from_hf.sh` (mandatory — ephemeral pod)
-5. `git pull --rebase origin final`
-6. Read `docs/components/c7.md` and Aniket's handoff:
-   `git show origin/aniket-ward-stage-b:docs/aniket/experiments/ward_backtracking/handoff_neurips_push.md`
-   `git show origin/aniket-ward-stage-b:docs/aniket/experiments/ward_backtracking/results_b_neurips_push.md`
-7. Port from `origin/aniket-ward-stage-b:experiments/ward_backtracking_txc/`
-   (with header-comment attribution + commit hash):
-   - `architectures.py` → integrate locked archs into the pipeline
-   - `b1_steer_eval.py`, `b1_held_out.py` → inducement (Δgc)
-   - `b3_llm_cut.py` → detection (PR-AUC) calibration
-   - `b2_cross_model.py` → cross-model checks if time permits
-   Drop into `temp_bench/case_studies/backtracking.py` + thin runner.
-8. Build **Llama-3.1-8B BASE L10 residual** activation cache (datasource
-   `llama_3_1_8b_base_l10_ward` in `configs/datasources.yaml`). Push to
-   HF temp-bench-data on completion. Stage A traces are read-only from
-   `origin/aniket-ward-stage-b:results/ward_backtracking_txc/stage_a/`
-   — port once with attribution per PROTOCOL.md § 2.
-9. **Persist judge outputs** — every Sonnet call lands in
-   `results/runs/<eval_key>/judge_outputs.jsonl` (one record per
-   `(transcript_id, magnitude, arch, judge_id, label)`). This is the
-   non-negotiable framework requirement that lets us add fresh κ
-   validation post-deadline without re-running. Fresh blind
-   hand-scoring is **deferred** — lean on Aniket's prior κ.
-10. Train 7 archs × 3 seeds via `runner.run_cell(...)` →
-    inducement Δgc (Sonnet) + detection PR-AUC across the 25-point
-    magnitude grid. Cut protocol: cut25.
-11. Headline cell to verify: TXC-pro peak Δgc reproduces ~+1.574
-    (Aniket's wasteland reference, hill-climbed TXC). Reproducing this
-    on locked TXC-pro is the C7 paper-headline test. If TXC-base/pro
-    fall well short, document honestly in c7.md and adjust framing.
-12. After cells land: run `temp_bench.report.render(component="c7")`
-    to populate the AUTO-RESULTS block in `docs/components/c7.md`.
-    The renderer reads leaderboard.jsonl + your
-    `experiments/c7_backtracking/analysis.py`.
+**Resume context (2026-05-03 evening, paused mid-port for human break):**
+
+Provisioning + Stage-A port + reference port + module skeleton are
+DONE and pushed. The blocker that gates training (tasks #8, #9, #10)
+is the missing arch implementations (see *Open questions*). Tasks
+that don't depend on the archs:
+
+A. **Finish `BacktrackingCaseStudy`** — wire `evaluate(arch, seed)`
+   to a shared helper `run_arch_evaluation(arch, seed, …)` that:
+   1. Loads R1-Distill-Llama-8B onto GPU 1 (one-time per session).
+   2. Runs unsteered MATH-500 phase-1 on cohort qids → cache to
+      `results/c7_backtracking/phase1_unsteered.json` (per-arch
+      independent → reusable across arches; only run once per pod).
+      Use Aniket's cohort qids from
+      `results/c7_backtracking/aniket_reference/cut25/flip_matrix.parquet`
+      to skip cohort discovery.
+   3. For each magnitude in `DEFAULT_MAGNITUDE_GRID` × cohort qid:
+      cut at `cut25_token_position`, attach `SteeringHook` to layer
+      10, generate continuation, persist judge call.
+   4. Returns metrics dict `{delta_gc_peak, delta_gc_peak_mag,
+      stability, pr_auc@S, ...}` keyed for the `CaseStudyResult`.
+B. **Update `build_cohort`** — current implementation drops all 300
+   because Stage A traces have empty `answer` fields. Switch to
+   reading qids from `aniket_reference/cut25/flip_matrix.parquet` as
+   the primary path; LM-evaluation fallback as a secondary path
+   that only runs if reference is missing.
+C. **Build `experiments/c7_backtracking/{run.py, analysis.py}`**
+   from `experiments/_runner_template.py` + `_analysis_template.py`.
+   `run.py`: thin loop over (arch ∈ 7, seed ∈ {1,2,42}) calling
+   `runner.run_cell(component="c7", …)`. `analysis.py`:
+   reads leaderboard.jsonl + judge_outputs.jsonl, computes Δgc table
+   + PR-AUC table + plots, then `report.render` rewrites c7.md
+   AUTO-RESULTS block.
+D. **Decide steering-vector source** — the SteeringHook needs a
+   `vec` (decoder direction). Aniket mined per-(arch, feature_id) by
+   sentence-mean-difference on the labeled D+/D- sets. We need to
+   port the mining helper or build one fresh. The candidate location
+   is `temp_bench.case_studies.backtracking.mine_top_features(model,
+   stage_a, top_k=32)` — owns mining feature ranking and vector
+   selection. Spec it in `c7.md` first since the choice affects
+   reproducibility.
+E. **Once arch ports land** (agent_paper):
+   1. `bash scripts/agent_smoke_test.sh` — preflight gaps drop to 0.
+   2. Build Llama-3.1-8B BASE L10 activation cache via
+      `temp_bench.data.nlp.cache_activations(...)` (port from
+      Aniket's `cache_activations.py`). 8000 seq × 128 tok →
+      ~2 GB fp16 on disk. `cache.save_activations` auto-pushes to
+      HF temp-bench-data on ephemeral pods.
+   3. Train 7 archs × 3 seeds via `runner.run_cell(...)` (cache hits
+      after the first seed make this fast).
+   4. Run inducement Δgc + detection PR-AUC sweep.
+   5. Run `temp_bench.report.render(component="c7")`.
+
+**Headline check**: TXC-pro peak Δgc reproduces ~+1.574 (Aniket's
+wasteland reference, hill-climbed TXC). Cross-check using
+`results/c7_backtracking/aniket_reference/cut25/inducement_summary.csv`.
+If TXC-base/pro fall well short, document honestly in c7.md and adjust
+framing.
 
 ## Don't repeat (agent owns — overwrite)
 
@@ -206,4 +274,31 @@ cd into agent_steer's clone.
 
 ## Open questions for Han (agent owns — overwrite)
 
-(none at provisioning.)
+1. **Architecture-port blocker.** C7 needs 7 archs (TopK-SAE,
+   Stacked-SAE, TFA, T-SAE-paper, MLC, TXC-base, TXC-pro). Only
+   `topk_sae` is implemented today; the other 6 are agent_paper
+   territory (`configs/locked_archs.yaml` is locked + the registry
+   files belong to agent_paper per their briefing's C1+C2 todo).
+   Current preflight reports 8 expected gaps. **Question**: should
+   I (agent_back) wait for agent_paper to ship the ports, or am I
+   authorised to land the 6 missing arch files myself with header
+   attribution from `origin/han-phase7-unification:src/architectures/`
+   and a courtesy ping to agent_paper for review? Either path
+   unblocks C7 training (#8/#9/#10/#11/#12); the wait-path is
+   stricter on territory but slower.
+2. **Cohort-discovery shortcut.** Aniket's
+   `flip_matrix.parquet` has the cohort qids he used (31 wrong + 30
+   correct out of MATH-500). My current cohort builder relies on
+   running R1-Distill-Llama on all 500 prompts at session start to
+   re-discover the wrong/correct split (expensive — ~30 min on A40
+   for one full pass). **Confirm**: OK to use Aniket's cohort qids
+   as the canonical C7 cohort + skip cohort-discovery? They're frozen
+   inputs; reproducibility is preserved by the parquet provenance.
+3. **Steering-vector mining.** Aniket's pipeline mines per-arch
+   top-32 features by D+/D- mean-difference on labeled sentences,
+   then selects one feature per arch as the "steering feature".
+   **Question**: should the mining + feature-selection logic live in
+   `temp_bench.case_studies.backtracking` (my territory) or
+   `temp_bench.eval.case_study` (shared scaffolding)? If shared, I'd
+   add `mine_top_features` and `select_steering_feature` there; if
+   case-study-local, in backtracking.py.
