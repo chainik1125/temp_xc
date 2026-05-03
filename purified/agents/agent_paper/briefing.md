@@ -193,19 +193,30 @@ independent.
 ### Recommended spawn order
 
 - **T+0 (Han owns)**: on each shared pod, run bootstrap THEN clone for
-  the second agent. `add_agent_clone.sh` is the per-agent-clone helper
-  (separate `.git/` per agent on shared pods → no `index.lock` races).
-  - 2× H100 pod: `bash scripts/bootstrap_runpod.sh` (creates
-    `/workspace/temp_xc/` for agent_nlp), then
-    `bash /workspace/temp_xc/purified/scripts/add_agent_clone.sh agent_em`
-    (creates `/workspace/temp_xc_em/`). Spawn agent_nlp + agent_em.
-  - 4× A40 pod: same pattern —
-    `bash scripts/bootstrap_runpod.sh` + `add_agent_clone.sh agent_steer`.
-    Spawn agent_back at T+0 (agent_steer waits).
+  the second agent THEN spawn each agent via `start_agent.sh`.
+  Per-agent clone keeps `.git/` independent (no `index.lock` races);
+  `start_agent.sh` sources `set_agent_env.sh` in Han's parent shell so
+  the GPU pin / `AGENT_NAME` / pod mode propagate into the claude
+  process (an agent sourcing them in its own first action does NOT
+  work — Bash tool calls don't share shell state).
+  - 2× H100 pod:
+    1. `bash scripts/bootstrap_runpod.sh` (creates `/workspace/temp_xc/`)
+    2. `bash /workspace/temp_xc/purified/scripts/add_agent_clone.sh agent_em`
+       (creates `/workspace/temp_xc_em/`)
+    3. `bash /workspace/temp_xc/purified/scripts/start_agent.sh agent_nlp --fresh`
+    4. `bash /workspace/temp_xc_em/purified/scripts/start_agent.sh agent_em --fresh`
+  - 4× A40 pod:
+    1. `bash scripts/bootstrap_runpod.sh`
+    2. `bash /workspace/temp_xc/purified/scripts/add_agent_clone.sh agent_steer`
+       (creates `/workspace/temp_xc_steer/` ahead of T+~3hr)
+    3. `bash /workspace/temp_xc/purified/scripts/start_agent.sh agent_back --fresh`
+       (agent_steer waits until cache lands)
   - agent_paper (me) continues C1+C2 locally.
-- **T+~3 hr (after C3 cache uploaded)**: Han spawns agent_steer in
-  `/workspace/temp_xc_steer/`. Agent's first action is
-  `set_agent_env.sh` + smoke + `sync_from_hf.sh`.
+- **T+~3 hr (after C3 cache uploaded)**:
+  `bash /workspace/temp_xc_steer/purified/scripts/start_agent.sh agent_steer --fresh`
+- **Re-launch after disconnect**: drop the `--fresh` —
+  `start_agent.sh agent_X` defaults to `claude --continue` so the
+  worker resumes its session.
 - **Defer agent_em_h200** to fallback only (if R32 OOMs on H100).
 
 Rationale: parallelize the long-pole work (C3 cache build, EM Wang

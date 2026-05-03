@@ -127,37 +127,45 @@ are the first agent on the 2× H100 pod). agent_em runs on the same
 pod but in a separate clone at `/workspace/temp_xc_em/` — DO NOT cd
 into agent_em's clone.
 
-1. `cd /workspace/temp_xc/purified`
-2. `source scripts/set_agent_env.sh agent_nlp`
-3. `bash scripts/agent_smoke_test.sh` (51/51 + expected gaps)
-4. `git pull --rebase origin final`
-5. Read `docs/components/c3.md` + `c4.md` end-to-end. Task suite is
+**Han launches you via `start_agent.sh`** (not bare `claude`):
+```
+bash /workspace/temp_xc/purified/scripts/start_agent.sh agent_nlp --fresh
+```
+The wrapper sources `set_agent_env.sh` in the parent shell so the
+GPU pin / `AGENT_NAME` / pod mode propagate into your process. Bash
+tool calls do NOT share shell state, so YOU sourcing the env in your
+first action is a no-op for subsequent commands. Don't rely on it.
+
+1. `bash scripts/agent_smoke_test.sh` (51/51 + expected gaps; verifies
+   the env vars are set correctly — flags missing pinning loudly)
+2. `git pull --rebase origin final`
+3. Read `docs/components/c3.md` + `c4.md` end-to-end. Task suite is
    already locked (`SAEBench+CT`, n=38) — see `decisions.md` § 11. No
    pre-registration needed. Smoke-test the github-code loader with a
-   tiny streaming pull BEFORE step 7 to confirm `trust_remote_code` +
+   tiny streaming pull BEFORE step 5 to confirm `trust_remote_code` +
    `datasets<4` are working:
    `python -c "from datasets import load_dataset; ds = load_dataset('codeparrot/github-code', streaming=True, split='train', trust_remote_code=True, languages=['C']); print(next(iter(ds)))"`
-6. Port `temp_bench.data.nlp.cache_activations` from
+4. Port `temp_bench.data.nlp.cache_activations` from
    `origin/han-phase7-unification:src/data/` (search for the
    FineWeb activation cache pipeline; copy with header comment +
    commit-hash attribution per PROTOCOL.md § 2).
-7. Build the activation cache for datasource
+5. Build the activation cache for datasource
    `gemma_2_2b_it_l13_fineweb_24k128` (from `configs/datasources.yaml`).
    Expected: ~3 H100-hours, ~14 GB on disk.
-8. Push the cache to HF `han1823123123/temp-bench-data` —
+6. Push the cache to HF `han1823123123/temp-bench-data` —
    **immediately** so agent_steer can unblock.
-9. Port the 5 archs needed for C3: `topk_sae`, `tsae_paper`, `mlc`,
+7. Port the 5 archs needed for C3: `topk_sae`, `tsae_paper`, `mlc`,
    `txc_base`, `txc_pro` (sources listed in `decisions.md` and
    `agent_paper/briefing.md` port table).
-10. Port `probe_datasets.py` + `crosstoken_datasets.py` from
-    `origin/han-phase7-unification:experiments/phase5_downstream_utility/probing/`
-    AND apply the three SAEBench-faithfulness fixes (see mandate above:
-    github-code provider, amazon_sentiment 1.0 binary, amazon_categories
-    determinism + cat6). Build the probe cache and confirm exactly 38
-    task dirs are produced before training.
-11. Train + eval cells via `runner.run_cell(...)`. Schema +
-    eval_protocol_version validation will append rows to
-    `results/leaderboard.jsonl`.
+8. Port `probe_datasets.py` + `crosstoken_datasets.py` from
+   `origin/han-phase7-unification:experiments/phase5_downstream_utility/probing/`
+   AND apply the three SAEBench-faithfulness fixes (see mandate above:
+   github-code provider, amazon_sentiment 1.0 binary, amazon_categories
+   determinism + cat6). Build the probe cache and confirm exactly 38
+   task dirs are produced before training.
+9. Train + eval cells via `runner.run_cell(...)`. Schema +
+   eval_protocol_version validation will append rows to
+   `results/leaderboard.jsonl`.
 
 ## Don't repeat (agent owns — overwrite)
 

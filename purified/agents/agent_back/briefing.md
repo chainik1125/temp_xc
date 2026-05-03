@@ -195,12 +195,25 @@ are the first agent on the 4× A40 pod). agent_steer runs on the same
 pod but in a separate clone at `/workspace/temp_xc_steer/` — DO NOT
 cd into agent_steer's clone.
 
+**Han launches you via `start_agent.sh`** (not bare `claude`):
+```
+# First launch (fresh session, agent reads briefing):
+bash /workspace/temp_xc/purified/scripts/start_agent.sh agent_back --fresh
+
+# Re-launch after disconnect (resumes your session):
+bash /workspace/temp_xc/purified/scripts/start_agent.sh agent_back
+```
+The wrapper sources `set_agent_env.sh` in Han's parent shell so the
+GPU pin / `AGENT_NAME` / pod mode (ephemeral) propagate into your
+process. Bash tool calls don't share shell state, so YOU sourcing
+the env in your first action is a no-op for subsequent commands.
+
 **Resume context (2026-05-03 evening, paused mid-port for human break):**
 
 Provisioning + Stage-A port + reference port + module skeleton are
-DONE and pushed. The blocker that gates training (tasks #8, #9, #10)
-is the missing arch implementations (see *Open questions*). Tasks
-that don't depend on the archs:
+DONE and pushed. The blocker that gates training is the missing arch
+implementations (see *Open questions*). Tasks that don't depend on
+the archs:
 
 A. **Finish `BacktrackingCaseStudy`** — wire `evaluate(arch, seed)`
    to a shared helper `run_arch_evaluation(arch, seed, …)` that:

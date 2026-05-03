@@ -120,31 +120,39 @@ separate clone exists so two agents on the same pod don't collide
 on `.git/index.lock` during pull-rebase. Tokens + HF cache are
 shared via `/workspace/.tokens/` and `/workspace/hf_cache/`.
 
-1. `cd /workspace/temp_xc_steer/purified`
-2. `source scripts/set_agent_env.sh agent_steer` (sets
-   `TEMP_BENCH_POD_MODE=ephemeral`)
-3. `bash scripts/agent_smoke_test.sh`
-4. `bash scripts/sync_from_hf.sh` (mandatory — ephemeral pod;
-   pulls agent_nlp's act-cache from
-   `han1823123123/temp-bench-data`)
-5. `git pull --rebase origin final`
-6. Read `docs/components/c5.md` end-to-end and `papers/temporal_sae.md`
+**Han launches you via `start_agent.sh`** (not bare `claude`):
+```
+bash /workspace/temp_xc_steer/purified/scripts/start_agent.sh agent_steer --fresh
+```
+Re-launches after disconnect drop the `--fresh` so the wrapper passes
+`--continue` to claude — you resume your session instead of re-reading
+the briefing. The wrapper sources `set_agent_env.sh` in Han's parent
+shell so the GPU pin / `AGENT_NAME` / pod mode (ephemeral) propagate
+into your process. Bash tool calls don't share shell state, so YOU
+sourcing the env in your first action is a no-op for subsequent
+commands.
+
+1. `bash scripts/agent_smoke_test.sh` (verifies GPU pin etc.)
+2. `bash scripts/sync_from_hf.sh` (mandatory — ephemeral pod;
+   pulls agent_nlp's act-cache from `han1823123123/temp-bench-data`)
+3. `git pull --rebase origin final`
+4. Read `docs/components/c5.md` end-to-end and `papers/temporal_sae.md`
    § 4.4 for the case study definition.
-7. Set up Gemini judge (coh + success heads). API key resolves via
+5. Set up Gemini judge (coh + success heads). API key resolves via
    `temp_bench.utils.tokens.get_token("gemini")` from
    `/workspace/.tokens/`.
-8. Port `temp_bench.case_studies.steering` from
+6. Port `temp_bench.case_studies.steering` from
    `origin/han-phase7-unification` (search experiments/ + src/ for
    the V7 tiled-broadcast steering pipeline; cite phase7's
    `unified-pareto.md` for context).
-9. Train T-SAE, TXC-base, TXC-pro on the cached acts (3 archs × 3
+7. Train T-SAE, TXC-base, TXC-pro on the cached acts (3 archs × 3
    seeds = 9 cells). Use `runner.run_cell(...)` — schema validation
    + auto-push to HF on save.
-10. **Pre-test V7 on TXC-pro**: 1 cell at coh threshold 2.0; if
-    success rate is degenerate, fall back to per-position (PP) and
-    document the switch in c5.md.
-11. Run V7 across 5 coherence thresholds {1.5, 1.75, 2.0, 2.25, 2.5} →
-    coh-vs-success curves.
+8. **Pre-test V7 on TXC-pro**: 1 cell at coh threshold 2.0; if
+   success rate is degenerate, fall back to per-position (PP) and
+   document the switch in c5.md.
+9. Run V7 across 5 coherence thresholds {1.5, 1.75, 2.0, 2.25, 2.5} →
+   coh-vs-success curves.
 
 ## Don't repeat (agent owns — overwrite)
 

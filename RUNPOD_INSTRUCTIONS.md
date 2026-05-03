@@ -69,20 +69,45 @@ extra disk on a 1 TB workspace.
 The add-clone script is non-interactive (no token prompts — they're
 already in `/workspace/.tokens/`), idempotent, and takes ~30 seconds.
 
-### Step 3: spawn the agents
+### Step 3: spawn the agents — use `start_agent.sh`, NOT bare `claude`
 
-Each agent starts in its own clone's `purified/` directory.
+**Critical**: Claude Code's Bash tool calls do not share shell state, so
+an agent sourcing `set_agent_env.sh` as its "first action" exports the
+GPU pin / agent name / pod mode into a one-shot subshell that's
+discarded immediately. The next Bash call sees no pinning, no
+attribution, no auto-push. Every worker must therefore inherit env
+from the parent shell.
 
-| Pod | First agent start | Second agent start |
+`scripts/start_agent.sh <agent>` is the launcher: it cd's to the
+agent's clone, sources `set_agent_env.sh` in the parent shell, and
+`exec`s `claude` so the env propagates into the agent process.
+
+**First launch** (use `--fresh` so the agent reads its briefing for the
+first time):
+
+| Pod | First agent (T+0) | Second agent |
 |---|---|---|
-| 2× H100 | `cd /workspace/temp_xc/purified && claude` (agent_nlp) | `cd /workspace/temp_xc_em/purified && claude` (agent_em) |
-| 4× A40 (T+0) | `cd /workspace/temp_xc/purified && claude` (agent_back) | (wait until T+~3hr) |
-| 4× A40 (T+~3hr after C3 cache uploads) | (already running) | `cd /workspace/temp_xc_steer/purified && claude` (agent_steer) |
+| 2× H100 | `bash /workspace/temp_xc/purified/scripts/start_agent.sh agent_nlp --fresh` | `bash /workspace/temp_xc_em/purified/scripts/start_agent.sh agent_em --fresh` |
+| 4× A40 | `bash /workspace/temp_xc/purified/scripts/start_agent.sh agent_back --fresh` | `bash /workspace/temp_xc_steer/purified/scripts/start_agent.sh agent_steer --fresh` (T+~3hr) |
+| H200 (fallback) | `bash /workspace/temp_xc/purified/scripts/start_agent.sh agent_em_h200 --fresh` | n/a |
 
-Each agent's first action inside its session is
-`source scripts/set_agent_env.sh <agent_name>`. That script also
-warns if the cwd doesn't match the agent's expected clone path
-(catches "you forgot Step 2" failures cleanly).
+**Re-launch after disconnect** (default — picks up the same session):
+
+```bash
+bash /workspace/temp_xc/purified/scripts/start_agent.sh agent_nlp
+# (no --fresh; the wrapper passes --continue to claude so the worker
+#  resumes its previous session instead of re-reading the briefing)
+```
+
+If you accidentally run bare `claude` from any of these directories,
+the agent will run with `AGENT_NAME=unknown`, no GPU pinning, and on
+ephemeral pods will skip HF auto-push — so leaderboard rows are
+unattributable and a pod stop wipes your training. Always use
+`start_agent.sh`.
+
+The wrapper also guards: if the clone for a second agent doesn't
+exist (you forgot Step 2), it prints the exact `add_agent_clone.sh`
+command to fix it before launching anything.
 
 The bootstrap:
 

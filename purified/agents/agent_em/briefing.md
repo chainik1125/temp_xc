@@ -114,30 +114,39 @@ separate clone exists so two agents on the same pod don't collide
 on `.git/index.lock` during pull-rebase. Tokens + HF cache are
 shared via `/workspace/.tokens/` and `/workspace/hf_cache/`.
 
-1. `cd /workspace/temp_xc_em/purified`
-2. `source scripts/set_agent_env.sh agent_em`
-3. `bash scripts/agent_smoke_test.sh`
-4. `git pull --rebase origin final`
-5. Read `docs/components/c6.md` end-to-end (decision tree + Wang 4-stage).
-6. Read Dmitry's latest:
+**Han launches you via `start_agent.sh`** (not bare `claude`):
+```
+bash /workspace/temp_xc_em/purified/scripts/start_agent.sh agent_em --fresh
+```
+Re-launches after disconnect drop the `--fresh` so the wrapper passes
+`--continue` to claude — you resume your session instead of re-reading
+the briefing. The wrapper sources `set_agent_env.sh` in Han's parent
+shell so the GPU pin / `AGENT_NAME` / pod mode propagate into your
+process. Bash tool calls don't share shell state, so YOU sourcing the
+env in your first action is a no-op for subsequent commands.
+
+1. `bash scripts/agent_smoke_test.sh` (verifies GPU pin etc.)
+2. `git pull --rebase origin final`
+3. Read `docs/components/c6.md` end-to-end (decision tree + Wang 4-stage).
+4. Read Dmitry's latest:
    `git show origin/em-nanda:docs/dmitry/results/em_features/EM_NANDA_BRIEF.md`
    and any newer results he's pushed under
    `docs/dmitry/results/em_features/`.
-7. Port from `origin/em-nanda` (with header-comment attribution):
+5. Port from `origin/em-nanda` (with header-comment attribution):
    - `experiments/em_features/dead_feature_resample.py`
      → `temp_bench/training/bricken.py`
    - `experiments/em_features/run_training_txc_bricken_auxk.py`
      → integrate into `temp_bench` training path
    - `experiments/em_features/run_wang_procedure.py`
      → `temp_bench/case_studies/em.py`
-8. Set up Qwen-14B-Instruct + finance LoRA loader. Verify hookpoint
+6. Set up Qwen-14B-Instruct + finance LoRA loader. Verify hookpoint
    layer 24 `resid_post`, d_model=5120 (per c6.md).
-9. **First cell** (the gap-close test): TXC-base + brickenauxk on
+7. **First cell** (the gap-close test): TXC-base + brickenauxk on
    R1 30k mid-α → run Wang 4-stage → Gemini judge over 8 prompts ×
    8 rollouts. Expected runtime: a few hours of training + eval.
-10. Compare peak align vs SAE arditi 30k baseline (95.16 from
-    `em_nanda_results_paper.md`). Apply decision tree to decide
-    paper framing for C6.
+8. Compare peak align vs SAE arditi 30k baseline (95.16 from
+   `em_nanda_results_paper.md`). Apply decision tree to decide
+   paper framing for C6.
 
 ## Don't repeat (agent owns — overwrite)
 
