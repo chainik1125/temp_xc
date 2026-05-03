@@ -259,81 +259,88 @@ GPU pin / `AGENT_NAME` / pod mode propagate into your process. Bash
 tool calls do NOT share shell state, so YOU sourcing the env in your
 first action is a no-op for subsequent commands. Don't rely on it.
 
-1. `bash scripts/agent_smoke_test.sh` (51/51 + expected gaps for the
-   6 archs that remain unported in `KNOWN_UNPORTED`)
+1. `bash scripts/agent_smoke_test.sh` (51/51 + KNOWN_UNPORTED for
+   the still-not-ported `mlc` + `txc_pro`)
 2. `git pull --rebase origin final`
-3. Verify the activation cache is intact at
-   `results/act_cache/e4916bcae1881963/` (~14 GB). If missing,
-   rebuild via the one-liner that worked previously:
+3. Verify state on disk:
+   - act cache: `results/act_cache/e4916bcae1881963/acts.npy` (14 GB)
+   - probe cache: `ls results/probe_cache/gemma_2_2b_it_l13_fineweb_24k128/`
+     should show 38 task dirs (each with X_train, X_test, y_train,
+     y_test .npy)
+   - leaderboard rows for c3 with `eval_cfg.smoke=false` (real cells)
+
+4. **Check `logs/c3_real_cells.log`** to see whether the 18-cell
+   run started by my previous self at 2026-05-03T22:49Z completed
+   cleanly. If it did, the leaderboard has up to 18 real C3 rows
+   already. If it crashed mid-run or got killed, restart it:
    ```
-   .venv/bin/python -c "from temp_bench.data import build_activation_cache; build_activation_cache('gemma_2_2b_it_l13_fineweb_24k128', batch_size=64)"
+   bash experiments/c3_probing/run.sh
    ```
-4. **Port `probe_datasets.py` + `crosstoken_datasets.py` from
-   `origin/han-phase7-unification:experiments/phase5_downstream_utility/probing/`**
-   into a new `temp_bench.data.nlp.probe_tasks` module. Apply the three
-   SAEBench-faithfulness fixes (see mandate above):
-   github-code → `codeparrot/github-code` (5 langs), amazon_sentiment
-   → both 1.0+5.0 binaries, amazon_categories → hardcode classes
-   `["1","2","3","5","6"]` + non-streaming pull. Plus add winogrande +
-   wsc from crosstoken_datasets. Confirm **exactly 38 tasks**.
-   - **Gotcha I hit**: `load_dataset('codeparrot/github-code',
-     streaming=True, languages=['C'])` does NOT actually filter the
-     stream — out of 20 samples I got 9 JS, 6 C, 5 other. You MUST
-     `if sample['language'] != target_lang: continue` after iter.
-5. Build a `temp_bench.data.nlp.build_probe_cache(datasource_name,
-   tasks)` that runs gemma forward over each task's texts and writes
-   `results/probe_cache/<datasource_name>/<task_name>/{X_train.npy,
-   y_train.npy, X_test.npy, y_test.npy}`. Reuse the model-loading
-   helper from `temp_bench.data.nlp.cache._load_subject_model` (same
-   tokenizer + dtype handling as the activation cache builder).
-6. Update `experiments/c3_probing/run.py::my_eval_fn` to load real
-   probe-cache for the task list when `smoke=False`. Replace the
-   `NotImplementedError` branch with a `temp_bench.eval.probing.run_task_suite`
-   call over the cached tasks. **Note**: `LeaderboardRow.metrics`
-   only accepts float values per Pydantic; if you want per-task AUCs,
-   either flatten as `metrics["auc__<task>"]` (38 floats) or aggregate
-   to mean+std and emit `metrics={"mean_auc","std_auc",...}`. The
-   wasteland reported per-task; we probably want both — discuss with
-   Han if uncertain.
-7. Run the real cells: 3 archs (topk_sae, tsae_paper, txc_base) ×
-   3 seeds × 2 k_feats = 18 cells. **Pass an explicit
-   `TrainingConfig` to `runner.run_cell` — do NOT use
-   `runner.default_training_cfg(arch)`** (default is whatever the
-   schema's defaults are; for real cells set `n_steps≈10000`,
-   `batch_size≈64`, `learning_rate≈3e-4`, `precision="bf16"`,
-   `warmup_steps≈500`). Each cell ~5 min on H100 (training)
-   + ~2 min (probing 38 tasks). Total ~2 hours.
-   - Sanity check: `topk_sae k=20` should be 0.85-0.91 AUC mean
-     across SAEBench+CT (Phase 7 leaderboard reference). If you get
-     numbers far below that on a properly-trained SAE, look for an
-     encode-shape bug or a label-leakage bug in the probe cache.
-8. **Port txc_pro** (3-layer wasteland inheritance — pulls in ~250
-   lines). After port, re-run cells with txc_pro included
-   (`force_train=False` so existing 18 cells hit cache). The 3
-   wasteland files to consolidate:
-   - `src/architectures/phase5b_subseq_sampling_txcdr.py::SubseqH8` (subset sampling at training time)
-   - `src/architectures/txc_bare_multidistance_contrastive_antidead.py` (matryoshka H8 + multi-distance contrastive)
-   - `src/architectures/txc_bare_antidead.py` (already mostly mirrored in `txc_base.py` — reuse the anti-dead stack pattern)
-9. **Port mlc** if time permits. Lower priority. Wasteland source:
-   `src/architectures/mlc.py`. Cross-LAYER (not cross-token)
-   crosscoder; encodes by stacking adjacent layers' activations,
-   not adjacent tokens.
-10. Port `temp_bench.eval.qualitative.top_256_semantic` for C4. Use
-    cached SAE checkpoints from C3 (same act_cache_key) so no
-    retraining needed. Per c4.md, drop the **Cohen's κ** validation
-    from the critical path — persist judge outputs to
-    `results/runs/<eval_key>/judge_outputs.jsonl` so post-deadline
-    κ computation is `pandas.read_json + scipy.stats.cohen_kappa_score`.
-    Build the concat corpora from
-    `origin/han-phase7-unification:experiments/phase6_qualitative_latents/concat_corpora/{concat_A,concat_B,concat_C}.json`
-    or regenerate via `build_concat_corpora.py`. Datasource entry
-    `gemma_2_2b_it_l13_concat_v1` is already in `datasources.yaml`.
-11. Build `experiments/c3_probing/analysis.py` + `experiments/c4_qualitative/analysis.py`
-    that aggregate the leaderboard rows (filter `eval_cfg.smoke=true`
-    out — those are pipeline-validation artifacts) and rewrite the
-    AUTO-RESULTS blocks of the component docs via
-    `temp_bench.report.render(...)`. Template at
-    `experiments/_analysis_template.py`.
+   The runner is idempotent (cells with cached eval_key skip).
+
+5. **Render C3 results**: `.venv/bin/python -m experiments.c3_probing.analysis`
+   rewrites `docs/components/c3.md` AUTO-RESULTS + writes
+   `experiments/c3_probing/plots/auc_by_k.png`.
+   - **Sanity check**: `topk_sae k=20 mean_auc` should land in
+     [0.85, 0.91] (Phase 7 BASE-side leaderboard reference). On IT
+     side it may be slightly lower. If far below 0.80, suspect an
+     encode-shape / probe-cache-leakage bug.
+
+6. **Run C4 cells** (~30 min compute + ~10 min Haiku per cell):
+   ```
+   bash experiments/c4_qualitative/run.sh --archs tsae_paper txc_base --seeds 1 2 42
+   ```
+   Pre-condition: ANTHROPIC_API_KEY set or
+   `/workspace/.tokens/anthropic_key`. The first cell trains
+   tsae_paper if not cached (it should be after C3 finishes — same
+   train_key). Then forwards Gemma over concat_A+B+random,
+   variance-ranks, top-256, Haiku 2-judge labels.
+   - **Cost**: ~$0.06 per cell × 6 cells = ~$0.36 total.
+   - **Judge persistence**: each Haiku call appends to
+     `results/runs/<eval_key>/judge_outputs.jsonl` for post-deadline
+     Cohen's κ validation.
+
+7. **Render C4 results**: `.venv/bin/python -m experiments.c4_qualitative.analysis`
+   joins to C3 leaderboard for Pareto x-axis, draws the upper-right
+   frontier, rewrites `docs/components/c4.md` AUTO-RESULTS.
+   - **Pareto check (per c4.md)**: TXC-pro should Pareto-dominate
+     T-SAE — that's the headline claim. If it doesn't, report the
+     honest negative: "TXC-pro matches T-SAE on probing while losing
+     on top-256". Don't introduce a TXC-pro@T_max=20 escape variant
+     (decision #1).
+
+8. **Push checkpoints to HF backup** (persistent pod, optional but
+   recommended at session end):
+   ```python
+   from temp_bench.cache import iter_manifest_for_agent
+   from huggingface_hub import HfApi
+   token = open('/workspace/.tokens/hf_token').read().strip()
+   api = HfApi(token=token)
+   for row in iter_manifest_for_agent('agent_nlp'):
+       if row.hf_url is None:
+           api.upload_folder(folder_path=row.local_path.rsplit('/', 1)[0],
+                              path_in_repo=row.train_key,
+                              repo_id='han1823123123/temp-bench-models',
+                              repo_type='model')
+   ```
+   (The probe cache is already on HF as of 2026-05-03 from this
+   session — see open question #1 status.)
+
+9. **Port txc_pro** (only if all above is done + ≥ 2 hours left):
+   3-layer wasteland inheritance pulls in ~250 lines:
+   - `phase5b_subseq_sampling_txcdr.py::SubseqH8` (subset sampling)
+   - `txc_bare_multidistance_contrastive_antidead.py` (matryoshka
+     H8 + multi-distance InfoNCE)
+   - `txc_bare_antidead.py` (already mostly in `txc_base.py`)
+
+   The contrastive batch shape is **(B, 1+K, T, d_in)** — different
+   from canonical `(B, T, d_in)`. Either extend `train_sae` to
+   accept multi-window batches OR train txc_pro single-window
+   (matryoshka recon only, no contrastive). Single-window degrades
+   the arch but at least gets paper-faithful matryoshka behavior.
+
+10. **Port mlc** (lowest priority — appendix-only baseline). Wasteland
+    source `src/architectures/mlc.py`. Cross-LAYER crosscoder.
 
 ## Don't repeat (agent owns — overwrite)
 
