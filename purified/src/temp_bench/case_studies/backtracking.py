@@ -1201,7 +1201,13 @@ def extract_labeled_sentence_acts(
     )
 
     cache_path.parent.mkdir(parents=True, exist_ok=True)
-    np.savez_compressed(cache_path, X=X, is_bt=is_bt_arr, keys=keys_arr)
+    # Atomic write: stage to a temp file, rename when done. Avoids
+    # concurrent readers seeing a partially-written zip
+    # (np.savez_compressed writes incrementally; mid-write the file is
+    # not a valid zip → callers get `zipfile.BadZipFile`).
+    tmp_path = cache_path.with_name(cache_path.name + ".tmp")
+    np.savez_compressed(tmp_path, X=X, is_bt=is_bt_arr, keys=keys_arr)
+    tmp_path.replace(cache_path)
     log.info("[c7] cached sentence acts to %s", cache_path)
     return {"X": X, "is_bt": is_bt_arr, "keys": keys_arr}
 
