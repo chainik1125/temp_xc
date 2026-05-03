@@ -187,38 +187,53 @@ generator paths' baselines**; the cross-script −40 number reflects the
 generator gap, not a bundle-vs-single-feat coherence story. The headline
 conclusion (single-feat > bundle on align by 23 points) is unchanged.
 
-**Bundle precision sub-axis (k=3 finalists, 2026-05-03 08:00 UTC).** A
+**Bundle precision sub-axis (k=3 finalists, 2026-05-03 10:00 UTC).** A
 follow-up probe bundled *only* the three R32 stage-4 single-feat finalists
 (21224 / 30540 / 21466 — the actual winners, not the screen_score top-30)
 with the same alpha grid. This isolates "winner-vs-winner interference"
 from "noise from non-winner features." Bundle vector norm = 1.78
-(≈√3 — decoder rows are nearly orthogonal). Peak at α=−30 →
-**align 58.11 / coh 39.61** (file
-`/root/em_features/results/em_nanda_bundle_r32/bundle3_finalists_frontier.json`).
+(≈√3 — decoder rows are nearly orthogonal). Peak at α=−40 →
+**align 51.41 / coh 53.36** (file
+`/root/em_features/results/em_nanda_bundle_r32/bundle3_finalists_frontier_r32fix.json`).
 
-| measurement                   | peak align (α=−30) | own α=0 baseline | own peak − baseline |
-| :---------------------------- | -----------------: | ---------------: | ------------------: |
-| single-feat 21224 (champion)  | **64.53**          | (~50, run_wang)  | +14 (run_wang path) |
-| **bundle k=3 finalists**      | **58.11**          | 56.48            | +1.63               |
-| bundle k=30 (screen_score)    | 41.33              | 34.69            | +6.64               |
+| measurement                   | peak (α, align/coh)     | own α=0 baseline | own peak − baseline |
+| :---------------------------- | :---------------------- | ---------------: | ------------------: |
+| single-feat 21224 (champion)  | α=−30, **64.53** / 96.25 | (run_wang path)  | n/a                 |
+| **bundle k=3 finalists**      | α=−40, **51.41** / 53.36 | 34.92            | +16.49              |
+| bundle k=30 (screen_score)    | α=−30, 41.33 / 55.62    | 34.69            | +6.64               |
 
 Bundle peak align scales monotonically with bundle precision: k=30 (41.33)
-< k=3 (58.11) < single-feat (64.53). Adding non-winner features dilutes
-the misalignment direction; even bundling only the winners loses 6.4 align
-points to the best single feature. Coherence drops sharply on both bundle
-sizes vs single-feat (39.6 / 55.6 vs 96.25), all using `frontier_sweep.py`'s
-single-pass generator (so coherence is on a comparable scale within the
-bundle column but ~45 points below the run_wang path; the within-path
-α=−30 vs α=0 coh delta for k=3 is −0.4, again negligible). The k=3 α=0
-baseline align (56.48) is anomalously high vs k=30's (34.69) — both are
-unsteered runs of the same model on the same questions and same default
-seed, so the 22-point gap is judge-sampling variance for n=64 (σ ≈ 6
-align). This means absolute peak comparisons are noisy by ±10 align across
-runs; only within-run comparisons are tight. The headline finding
-(monotonic ordering of peak align across bundle precision) survives the
-noise: even a +10-point upward correction to k=30's peak (most-pessimistic
-interpretation of judge variance) leaves it well below k=3, and k=3
-remains below single-feat at any plausible noise floor.
+< k=3 (51.41) < single-feat (64.53). Both bundle peaks measured on the
+same R32 organism with the same generator path (`frontier_sweep.py`),
+giving identical α=0 baselines within ±0.5 align (34.69 vs 34.92).
+
+- **Non-winner-noise effect** (k=30 vs k=3): adding 27 non-finalist
+  features to the bundle costs **10.08** align points at peak.
+- **Winner-vs-winner interference** (k=3 vs single-feat): even bundling
+  only the 3 finalists costs **13.12** align points vs the best single
+  feature, with peak shifting from α=−30 to α=−40 (k=3 needs more
+  amplification per effective unit because bundle norm √3 ≈ 1.78 vs
+  single-feat 1.0).
+
+Coherence drops sharply on both bundle sizes vs single-feat (53.4 / 55.6
+vs 96.25), all using `frontier_sweep.py`'s single-pass generator (≈45
+points below the `run_wang_procedure.py` path used for single-feat
+champions; see the Generator-path reconciliation paragraph above). The
+within-path α=−40 vs α=0 coh delta for k=3 is **+2.42** (53.36 vs 50.94),
+i.e. bundle steering does not break coherence relative to its own
+generator-path baseline. The headline conclusion (R32 misalignment is
+concentrated in one champion direction; even the most precise winner
+bundle cannot recover within 13 align points of the best single feature)
+holds with cleaner data than the original same-organism-style claim.
+
+(*Audit note*: the 08:00 UTC firing of this probe used the wrong
+subject_model — the *published* R1 finance organism instead of our
+locally-trained R32 LoRA — and reported peak α=−30 → align 58.11. The
+buggy file `bundle3_finalists_frontier.json` is preserved for record;
+the corrected file is `bundle3_finalists_frontier_r32fix.json`. The
+qualitative monotonic-ordering finding survives, with corrected
+interference penalties of +13 (k=3 vs single-feat) and +10 (k=30 vs
+k=3) align points instead of the buggy +6 and +17.)
 
 ### Result 4 — cross-arch frontier shape (R1, illustrative)
 
@@ -266,8 +281,10 @@ as cleanly captured by any single feature as R1's direction is.
   this dictionary geometry.
 - Bundle aggregation on R32 (k=30, top stage-2 survivors): does not
   beat single-feat. "Distributed misalignment" hypothesis falsified.
-- Bundle precision axis: k=30 (41.33) < k=3-finalists (58.11) <
-  single-feat (64.53). Monotonic — more features = more dilution.
+- Bundle precision axis: k=30 (41.33) < k=3-finalists (51.41) <
+  single-feat (64.53), all on the same R32 LoRA organism with matched
+  generator paths within bundle column. Monotonic — more features =
+  more dilution.
 
 **Open** (deferred, not paper-critical):
 
@@ -296,7 +313,12 @@ as cleanly captured by any single feature as R1's direction is.
   pivot, and `--batch_cells` / `--gen_batch_size` for batched α cells).
 - Bundle frontier launcher: `experiments/em_features/frontier_sweep.py`
   (with `--base_model` / `--subject_model` overrides added in commit
-  `30fc5af0`).
+  `30fc5af0`). NB: the bundle k=3 frontier was first run 2026-05-03
+  08:00 UTC with the wrong `--subject_model` (published R1 instead of
+  our R32 LoRA); corrected re-run landed 10:00 UTC. The corrected file
+  is `bundle3_finalists_frontier_r32fix.json`; the buggy file
+  `bundle3_finalists_frontier.json` is preserved alongside as an
+  audit-trail record.
 - SAE arditi training wrapper:
   `experiments/em_features/run_training_sae_arditi.py`.
 - Config: `experiments/em_features/config_qwen14b.yaml`.

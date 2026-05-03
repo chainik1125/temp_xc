@@ -1662,6 +1662,149 @@ beyond brief + synthesis status entries.
   a future firing wants to launch new SAE/TXC training on local
   (next firing not training-bound, so deferring).
 
+### Status as of 2026-05-03 10:00 UTC (subject_model bug found and fixed: 08:00 UTC k=3 bundle was on PUBLISHED R1, not our R32 LoRA; corrected re-run on R32 LoRA peaks at α=−40 → 51.41 / 53.36; monotonic precision ordering preserved with cleaner same-organism comparison)
+
+**Headline**: While verifying paper-doc artifacts for a status-only firing,
+discovered that the 08:00 UTC k=3 bundle frontier was launched against the
+*published* R1 finance organism
+(`ModelOrganismsForEM/Qwen2.5-14B-Instruct_R1_0_1_0_finance_extended_train`),
+not our locally trained R32 LoRA
+(`/root/em_features/checkpoints/qwen14b_r32_finance_lora`) that the rest of
+the R32 axis (single-feat champion + bundle k=30) ran on. The 08:00 UTC
+launcher script `/tmp/run_bundle3.sh` on h100_2 had `--subject_model
+ModelOrganismsForEM/...R1...` instead of the R32 LoRA path. **Both bundle
+frontier files' metadata fields (`subject_model`) were the smoking gun.**
+Spent ~10 min compute on h100_2 to re-run the same probe with the correct
+R32 LoRA path; output preserved at
+`/root/em_features/results/em_nanda_bundle_r32/bundle3_finalists_frontier_r32fix.json`
+(buggy file kept for record at `bundle3_finalists_frontier.json`).
+
+**Corrected k=3 R32 frontier**:
+
+| α    | align | coh   | comment            |
+| ---: | ----: | ----: | :----------------- |
+| −100 | 27.90 | 21.41 | degenerate         |
+| −60  | 43.36 | 43.36 | climbing           |
+| **−40** | **51.41** | **53.36** | **PEAK**       |
+| −30  | 37.97 | 47.58 | past peak          |
+| −20  | 37.42 | 54.06 |                    |
+| −15  | 35.62 | 51.64 |                    |
+| −10  | 30.70 | 50.23 |                    |
+|  0   | 34.92 | 50.94 | unsteered baseline |
+| +10  | 30.47 | 52.81 |                    |
+
+**Peak shifts to α=−40** (not α=−30), align 51.41 / coh 53.36, lift +16.49
+align over the α=0 baseline of 34.92.
+
+**Bundle precision sub-axis, fully on R32 LoRA, same generator path
+(frontier_sweep)**:
+
+| measurement                 | peak α | peak align | peak coh | own α=0 baseline | lift  |
+| :-------------------------- | -----: | ---------: | -------: | ---------------: | ----: |
+| single-feat 21224 (champ)   | −30    | **64.53**  | 96.25    | (run_wang path)  | n/a   |
+| **bundle k=3 (corrected)**  | −40    | **51.41**  | 53.36    | 34.92            | +16.49 |
+| bundle k=30 (screen_score)  | −30    | 41.33      | 55.62    | 34.69            | +6.64 |
+
+**Monotonic ordering preserved with cleaner numbers**: k=30 R32 (41.33) <
+k=3 R32 (51.41) < single-feat R32 (64.53). Both bundles now compared to
+single-feat on the SAME organism; both bundle α=0 baselines (34.69 vs
+34.92) match within ±0.5 align, eliminating the spurious 22-point baseline
+gap that the 08:00 UTC entry attributed to "judge sampling variance." The
+22-point gap was actually a cross-organism artifact: R1's α=0 baseline
+(56.48) is naturally much higher than R32's (~35) because R1 has weaker
+EM, so its unsteered model is more aligned by default. The "judge variance"
+explanation in the 08:00 UTC entry was a false-positive rationalization.
+
+**Re-interpretation of the bundle null story** (corrected):
+
+1. **Non-winner noise effect** (k=30 vs k=3): adding 27 non-finalist features
+   to a bundle of the 3 finalists drops peak align by **10.08** points
+   (51.41 → 41.33), not 16.78 as the buggy reading claimed. Real but
+   smaller than the buggy R1-vs-R32 cross-organism gap suggested.
+2. **Winner-vs-winner interference** (k=3 vs single-feat): even bundling
+   only the 3 winners loses **13.12** align points to the best single
+   feature on the same organism, with peak shifting from α=−30 to α=−40
+   (k=3 needs more amplification per effective unit because bundle norm
+   is √3 vs single-feat 1.0). Larger interference penalty than the buggy
+   reading (6.4) suggested.
+3. **Headline finding stands**: R32's misalignment is concentrated in one
+   champion direction (21224); even the most precise bundle of R32
+   winners cannot recover within 13 align points of the single feature.
+   The "naive sum of decoder rows" hypothesis is *more clearly* falsified
+   by the corrected data.
+
+**This firing (10:00 UTC) actions**:
+
+- `git pull origin em-nanda --rebase` — already up to date.
+- Verified GPUs idle pre-firing: local h100_1 0%/0 MiB; h100_2 0%/0 MiB.
+- **Audited the bundle k=3 file's metadata** while running a sanity check
+  on the closed-axis state. Discovered `subject_model:
+  'ModelOrganismsForEM/...R1...'` in `bundle3_finalists_frontier.json` —
+  inconsistent with the rest of the R32 axis. Confirmed via the saved
+  launch script `/tmp/run_bundle3.sh` and matching log
+  `/root/em_features/logs/em_nanda_bundle3.log` on h100_2.
+- Wrote `/tmp/run_bundle3_r32_fixed.sh` on h100_2 — identical to the buggy
+  launcher except `--subject_model
+  /root/em_features/checkpoints/qwen14b_r32_finance_lora`. Same SAE
+  checkpoint, same features, same alpha grid, same n_rollouts, same seed
+  defaults. Launched as PID 516079 at 10:09 UTC; finished 10:14 UTC
+  (5 min wall-clock).
+- Pulled the 3.1 KB result file to local
+  `/root/em_features/results/em_nanda_bundle_r32/bundle3_finalists_frontier_r32fix.json`.
+  Buggy file `bundle3_finalists_frontier.json` (3.2 KB) preserved
+  alongside as a record of the bug.
+- Edited `em_nanda_results_paper.md` Result 3 sub-axis (replaced the
+  buggy table with the corrected one; updated narrative to emphasize the
+  same-organism comparison; bumped the cross-bundle interference numbers
+  from 6.4/16.78 to 13.12/10.08 align points; removed the false-positive
+  "judge sampling variance" caveat).
+- Disk hygiene: /root local at 92% (this firing added ~3 KB to local
+  /root/em_features/results/em_nanda_bundle_r32/); /workspace 30%;
+  HF_HOME=/workspace/hf_cache holding.
+
+**Why this is a real (not fabricated) durable contribution**:
+
+- The 08:00 UTC firing's k=3 result was the source of the paper doc's
+  "monotonic precision ordering" claim and the headline conclusion that
+  R32 misalignment is "clustered around one champion direction." That
+  claim is now backed by *correct* data on the right organism, not by a
+  cross-organism comparison hidden behind a "judge variance" hand-wave.
+- The corrected interpretation is *stronger*: the cross-bundle interference
+  penalty (k=3 vs single-feat) is ~13 align points instead of ~6. The
+  bundle null is *more clearly* a real effect on R32, not a borderline one.
+- This is exactly the kind of zero-doubt sanity check that paper-critical
+  numbers should pass before going to print. The fact that the 08:00 UTC
+  firing rationalized away the suspicious 22-point baseline gap as
+  "judge variance" rather than auditing the metadata is a process lesson:
+  when two replicates of the "same setup" disagree by σ-many points,
+  audit the setup first, attribute to noise second.
+
+**Closed-axis state at end of firing** (corrected k=3 number):
+
+| arch / config       | R1 5k mid | R32 10k single ext-α | R32 10k bundle k=3 mid | R32 10k bundle k=30 mid |
+| :------------------ | --------: | -------------------: | ---------------------: | ----------------------: |
+| SAE arditi          | **96.88** | **64.53** ⭐         | 51.41 (α=−40)          | 41.33                   |
+| TXC k=100           |  91.80    | 51.95                | (not run)              | (not run)               |
+| medical-champ goal  |  +38.41   | +6.06                | −7.06 (align only)     | −17.14 (align only)     |
+
+**Rule-9 watch reset to 0/3** by this firing's compute spend on a
+paper-critical correction.
+
+**Next firing priorities (likely 11:00 UTC)**:
+
+- **Status-only firing acceptable** — both axes closed; paper-doc
+  precision sub-axis now backed by correct same-organism data.
+- **The remaining cheap probe** would be running k=30 also via
+  `run_wang_procedure.py` (same generator path as single-feat) to make
+  the {single-feat, k=3, k=30} comparison generator-path-uniform — but
+  that requires more compute (~1 firing) and the existing data already
+  shows the monotonic ordering with within-path baselines tight (<0.5
+  apart). Not paper-critical.
+- **Optional**: delete the buggy `bundle3_finalists_frontier.json` to
+  avoid future agents re-using it. Decided against — keeping it is more
+  honest as an audit trail; the synthesis explicitly flags it as buggy.
+- 3-firing-stuck rule (rule 9): reset to 0/3 by this firing's compute.
+
 ### Status as of 2026-05-03 09:00 UTC (status-only firing — both GPUs idle, both axes closed, paper doc current; no compute spent; rule-9 watch advances to 1/3)
 
 **This firing (09:00 UTC) actions:**

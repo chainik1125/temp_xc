@@ -10,6 +10,116 @@ tags:
 
 **You are an autonomous routine continuing from the dmitry-branch work.** Branch: `em-nanda`. AGENT_BRIEF.md (on dmitry) covers the prior Qwen-7B medical setup. This doc supersedes that for the Qwen-14B financial pivot.
 
+### Status as of 2026-05-03 10:00 UTC (subject_model bug fix: 08:00 UTC k=3 bundle was on PUBLISHED R1, not our R32 LoRA; corrected re-run on R32 peaks at α=−40 → 51.41 / 53.36; monotonic ordering preserved with cleaner same-organism comparison; rule-9 watch reset to 0/3)
+
+**Headline**: While verifying paper-doc artifacts for what was likely a
+status-only firing, audited the 08:00 UTC k=3 bundle frontier file's
+metadata and discovered the launch had pointed `--subject_model` at the
+*published* R1 finance organism
+(`ModelOrganismsForEM/...R1_0_1_0_finance_extended_train`), not our
+locally-trained R32 LoRA (`/root/em_features/checkpoints/qwen14b_r32_finance_lora`).
+The k=30 bundle and the single-feat champion both run on the R32 LoRA, so
+the paper-doc's "monotonic precision ordering on R32" claim was relying
+on a cross-organism comparison hidden behind a 22-pt α=0 baseline gap that
+was rationalized away as "judge sampling variance." Fixed by re-running
+the same probe with the correct R32 LoRA path. Spent ~5 min compute on
+h100_2.
+
+**Corrected k=3 R32 result**:
+
+- Peak: α=−40 → **align 51.41 / coh 53.36** (was buggy α=−30 → 58.11/39.61
+  on R1)
+- α=0 baseline: 34.92 (now matches k=30 R32 baseline 34.69 within ±0.5,
+  eliminating the spurious 22-pt gap that the 08:00 UTC entry attributed
+  to judge variance — the gap was actually a cross-organism artifact)
+- Lift over baseline: +16.49 align points (real, larger than the buggy
+  R1 reading of +1.63 suggested because R1's α=0 baseline was naturally
+  much higher)
+
+**Bundle precision sub-axis, fully on R32 LoRA, same generator path within
+bundle column**:
+
+| measurement                  | peak (α, align/coh)     | α=0 baseline | lift  |
+| :--------------------------- | :---------------------- | -----------: | ----: |
+| single-feat 21224 (champion) | α=−30, **64.53** / 96.25 | (wang path)  | n/a   |
+| **bundle k=3 (corrected)**   | α=−40, **51.41** / 53.36 | 34.92        | +16.49 |
+| bundle k=30 (screen_score)   | α=−30, 41.33 / 55.62    | 34.69        | +6.64 |
+
+**Monotonic ordering preserved**: k=30 (41.33) < k=3 (51.41) < single-feat
+(64.53). Cross-bundle interference penalties: +13.12 (k=3 vs single-feat),
++10.08 (k=30 vs k=3). The qualitative finding survives the bug; the
+*magnitudes* tighten (the buggy reading had +6 and +17 instead of +13
+and +10).
+
+**This firing (10:00 UTC) actions**:
+
+- `git pull origin em-nanda --rebase` — already up to date.
+- Verified GPUs idle pre-firing: local h100_1 0%/0 MiB; h100_2 0%/0 MiB.
+- **Audit caught the bug**: while sanity-checking that the headline 64.53
+  was traceable to a saved file (it is — at
+  `/workspace/em_features/results/em_nanda_sae_arditi_step10000_wang_r32_extalpha/`),
+  noticed bundle k=3 file's `subject_model` field pointed at the
+  published R1 organism while bundle k=30's pointed at our R32 LoRA.
+  Confirmed via the saved launcher script `/tmp/run_bundle3.sh` and
+  matching log on h100_2.
+- Wrote `/tmp/run_bundle3_r32_fixed.sh` on h100_2 (identical to buggy
+  launcher except `--subject_model
+  /root/em_features/checkpoints/qwen14b_r32_finance_lora`). Launched
+  PID 516079 at 10:09 UTC; finished 10:14 UTC (5 min wall-clock).
+  Output `bundle3_finalists_frontier_r32fix.json` (3.1 KB).
+- Pulled to local; preserved buggy file
+  (`bundle3_finalists_frontier.json`) as audit-trail record.
+- **Edited `em_nanda_results_paper.md`** Result 3 sub-axis: replaced
+  buggy peak/table with corrected peak/table; updated narrative
+  (interference penalties +13/+10 instead of buggy +6/+17); removed the
+  false-positive "judge sampling variance" caveat; appended an audit note
+  pointing at both files. Also updated "What is closed" precision-axis
+  bullet and the Reproduce section.
+- Updated synthesis with full 10:00 UTC entry.
+- No commits to code, scripts, or experiment infra. Only doc + new data
+  artifact (bundle3_finalists_frontier_r32fix.json).
+- Disk hygiene: /root local 92% (added ~3 KB);
+  /workspace 30%; HF_HOME=/workspace/hf_cache holding.
+
+**Closed-axis state at end of firing** (corrected k=3 number):
+
+| arch / config       | R1 5k mid | R32 10k single ext-α | R32 10k bundle k=3 mid | R32 10k bundle k=30 mid |
+| :------------------ | --------: | -------------------: | ---------------------: | ----------------------: |
+| SAE arditi          | **96.88** | **64.53** ⭐         | 51.41 (α=−40)          | 41.33                   |
+| TXC k=100           |  91.80    | 51.95                | (not run)              | (not run)               |
+| medical-champ goal  |  +38.41   | +6.06                | −7.06 (align only)     | −17.14 (align only)     |
+
+**Why this is a real durable contribution**:
+
+- The 08:00 UTC firing's k=3 result was the basis for the paper doc's
+  "monotonic precision ordering" sub-axis claim. Correcting it on the
+  right organism makes the headline conclusion (R32 misalignment is
+  concentrated in one champion direction; even precise winner bundles
+  can't recover within 13 align points of single-feat) more clearly
+  supported by data, not by hand-waved noise arguments.
+- The corrected interpretation strengthens the bundle null story: the
+  cross-bundle interference penalty (k=3 vs single-feat) is +13 instead
+  of +6 align points. The bundle null is *more clearly* a real R32
+  effect.
+- Process lesson encoded for future firings: when two replicates of
+  "the same setup" disagree by more than a few σ, audit the setup
+  metadata first, attribute to noise second.
+
+**Next firing priorities (likely 11:00 UTC)**:
+
+- **Status-only firing acceptable** — both axes closed; paper-doc
+  precision sub-axis now backed by correct same-organism data; rule-9
+  reset to 0/3 by this firing's compute spend.
+- **Cheap probe (optional)**: re-running the k=30 bundle via
+  `run_wang_procedure.py`'s generator path (rather than `frontier_sweep.py`)
+  would make {single-feat, k=3, k=30} comparison generator-path-uniform.
+  ~30 min on h100_2. Existing data already shows the monotonic ordering
+  holds with within-path baselines tight (<0.5 apart), so not paper-
+  critical.
+- **Other open exploratory items** (alt bundle selection, TXC k<100,
+  cross-layer hookpoints) all unchanged and ≥1 firing of compute. Not
+  paper-critical.
+
 ### Status as of 2026-05-03 09:00 UTC (status-only firing — both GPUs idle, both axes closed, paper doc current; no compute spent; rule-9 watch advances to 1/3)
 
 **Headline**: 09:00 UTC firing. Local h100_1 0%/0 MiB; h100_2 0%/0 MiB
