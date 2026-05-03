@@ -135,3 +135,58 @@ multi-scale story is the answer.
 If V14 plateaus, then high-T's content-concept gap is an
 **architectural** limit (per-position feature density), not a protocol
 issue. Fix: train a higher-k_pos variant of Galaxy 23.
+
+### Iteration 2 — RESULTS (committed `e5dd2e5e`)
+
+| protocol | Δ≥1.75 vs V7 (+0.678) | verdict |
+|---|---:|---|
+| V14 multi-scale TB | +0.689 (+0.011) | tie — multi-scale not helpful |
+| V16 stride3-TB | +0.678 (+0.000) | exactly V7 |
+| **V15 attn-weighted-TB** | **−0.033** (−0.711) | ❌ FAILS BIG |
+
+**Stride sweep complete**: 1→2→3→5 gives +0.689→+0.745→+0.678→+0.678.
+Stride 2 is the only local max; all other strides plateau at +0.678-0.689.
+
+**V15 failure mechanism**: with τ≈1 in SoftMaxPool, softmax weights
+concentrate on the highest-pre-position, normalizing to sum to T means
+writing 5× δ at that one position → over-steers → coh collapse. The
+"encoder's natural attention" doesn't translate to a good steering
+write pattern.
+
+**V14 fails**: combining T-block dynamic δ with V6-style static decoder
+broadcast doesn't add info — V6 broadcast is effectively a constant
+direction, doesn't capture per-context concept structure.
+
+### Mystery status (after iter 2)
+
+The +0.745 ceiling at T=5 vs +1.011-1.033 at T=2/T=3 is **probably
+ARCHITECTURAL** rather than protocol-related:
+
+- Stride sweep exhausted (V13/V9/V16/V7); single peak at stride 2.
+- Multi-scale (V14) doesn't help.
+- Encoder-magnitude (V10) and attention-weighted (V15) writes BOTH fail —
+  the SoftMaxPool encoder doesn't have meaningful per-position structure
+  to exploit at T=5 (softmax τ≈1 is near-uniform).
+- This points to: **per-position feature density at fixed k_pos is the
+  bottleneck**. T=5 k_pos=20 → 4 features/position vs T=2 k_pos=20 →
+  10/position.
+
+### Iteration 3 — planned
+
+1. **Cross-arch V9 validation**: run V9 on `txc_bare_antidead_t5_kpos20`
+   (T=5 vanilla TXC, 2-seed) and `txc_h8_t5_kpos20_shifts5` (T=5 H8
+   contrastive, 2-seed). Tests whether V9-stride-2 generalizes beyond
+   SoftMaxPool family.
+
+2. **Architectural fix candidate**: train Galaxy 23 variant with
+   k_pos=50 (5× per-position density) to test if information-bottleneck
+   hypothesis is right. ~30 min × 3 seeds.
+
+3. **Prompt-aware protocol**: Han's content-vs-discourse trade-off
+   suggests T=3 + V7 is best for content-keyword concepts. ENSEMBLE
+   protocol: take max-succ over (T=3 V7, T=5 V9) per concept. Predicts:
+   reaches Δ ≥ +1.0 by combining the two regimes.
+
+4. **Pre-attention steering**: hook at L=11 instead of L=12. Tests
+   whether the steering propagating through L=12's natural attention
+   gives different results.
