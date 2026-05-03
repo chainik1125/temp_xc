@@ -58,12 +58,24 @@ from experiments.c7_backtracking.run import (
 def _smoke_eval_fn(*, model, eval_cfg, component):
     """Smoke-test eval_fn that pre-loads sentence acts + cohort and forwards
     to run_arch_evaluation with a small magnitude grid."""
+    from temp_bench.config import compute_eval_key
     arch_name = eval_cfg["_arch_name"]
     seed = eval_cfg.get("seed", 42)
     state_dict = eval_cfg["_state_dict"]
     arch_module = _instantiate_from_state(arch_name, state_dict, component=component)
 
-    workspace = run_dir(eval_cfg.get("_eval_key", arch_name))
+    _hash_eval_cfg = {
+        k: v for k, v in eval_cfg.items()
+        if not k.startswith("_") and k not in (
+            "feature_mining_acts", "sentence_acts", "sentence_labels", "sentence_qids",
+        )
+    }
+    eval_key = compute_eval_key(
+        train_key=eval_cfg["_train_key"],
+        eval_protocol_version=EVAL_PROTOCOL_VERSION,
+        eval_cfg=_hash_eval_cfg,
+    )
+    workspace = run_dir(eval_key)
     workspace.mkdir(parents=True, exist_ok=True)
     judge = SonnetBacktrackingJudge(workspace=workspace)
 
