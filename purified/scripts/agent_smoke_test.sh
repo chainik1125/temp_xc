@@ -52,17 +52,24 @@ TQDM_DISABLE=1 .venv/bin/python -m pytest tests/ -q 2>&1 || {
     exit 1
 }
 
-# 4. preflight (warns about archs / datasources whose classes don't yet import)
+# 4. preflight — GPU pinning + arch class imports + datasources
 echo
 echo "[smoke] runner preflight…"
 TQDM_DISABLE=1 .venv/bin/python -c "
 from temp_bench.runner import preflight
 warns = preflight()
+critical = [w for w in warns if w.startswith('CRITICAL')]
+gaps = [w for w in warns if not w.startswith('CRITICAL')]
+if critical:
+    print('✗ CRITICAL preflight failures:')
+    for w in critical:
+        print(f'   - {w}')
+    raise SystemExit(1)
 if not warns:
     print('✓ preflight clean')
 else:
-    print(f'⚠  preflight reports {len(warns)} expected gaps (architectures not yet implemented):')
-    for w in warns:
+    print(f'⚠  preflight reports {len(gaps)} expected gaps (architectures not yet implemented):')
+    for w in gaps:
         print(f'   - {w}')
 "
 

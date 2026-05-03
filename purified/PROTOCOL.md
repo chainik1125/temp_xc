@@ -166,6 +166,41 @@ Stop and write to your agent log if:
 - A baseline number contradicts a published paper by more than 0.05 AUC.
 - You're tempted to introduce a third TXC variant. (Don't.)
 
+## 11.0 GPU pinning on shared pods
+
+When two or three agents share a pod, each agent **must** pin
+``CUDA_VISIBLE_DEVICES`` before any CUDA code runs. Otherwise PyTorch
+defaults every process to ``cuda:0`` and agents collide on the same GPU.
+
+**Session start (every agent, every pod, every restart):**
+
+```bash
+cd /workspace/temp_xc/purified
+source scripts/set_agent_env.sh <agent_name>     # pins GPU + sets AGENT_NAME
+bash scripts/agent_smoke_test.sh                 # verifies pinning
+```
+
+The smoke test calls ``runner.preflight()`` which warns if:
+- ``CUDA_VISIBLE_DEVICES`` is unset on a multi-GPU pod
+- ``torch.cuda.device_count() > 1`` after pinning (env var didn't take)
+- ``AGENT_NAME`` is unset (leaderboard rows would be tagged "unknown")
+
+The agent → GPU mapping is in `purified/agents/README.md` *Active
+roster*; the executable copy is `scripts/set_agent_env.sh`. They must
+match.
+
+**Why pinning matters more than usual here:**
+Agents share the same network volume (one `purified/checkpoints/`
+tree). If two agents accidentally trained the same `(arch, seed,
+training_cfg, act_cache_key)` cell on different physical GPUs, both
+would write the same `train_key`. cuBLAS heuristics differ across
+H100 SKUs so the saved weights would be near-identical but not
+bit-identical — undefined cache state.
+
+The pinning makes every shared-pod cell run on a single, stable GPU.
+Re-running yields the same outputs (modulo cuDNN nondeterminism, which
+is suppressed by `set_seed(deterministic=True)`).
+
 ## 11. Framework discipline (load-bearing — do not deviate)
 
 These rules exist because a 72-hour, 7-component, 5-agent paper cannot

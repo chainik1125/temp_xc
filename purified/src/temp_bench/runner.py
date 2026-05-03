@@ -222,18 +222,54 @@ def preflight() -> list[str]:
 
     Returns a list of warnings (empty = clean). Run by
     ``scripts/agent_smoke_test.sh`` at the start of every agent session.
+
+    Also checks GPU pinning on shared pods: when ``CUDA_VISIBLE_DEVICES``
+    is set, exactly one GPU should be visible. When it's unset on a
+    multi-GPU host, prints a critical warning (agents on shared pods
+    must pin themselves to avoid collisions).
     """
+    import os as _os
+
     warns: list[str] = []
 
-    # All archs in the yaml resolve
+    # ── GPU pinning check ────────────────────────────────────────────
+    cuda_visible = _os.environ.get("CUDA_VISIBLE_DEVICES")
+    agent = _os.environ.get("AGENT_NAME", "").strip()
+
+    try:
+        import torch
+        n_visible = torch.cuda.device_count() if torch.cuda.is_available() else 0
+    except Exception:
+        n_visible = 0
+
+    if n_visible > 1 and not cuda_visible:
+        warns.append(
+            f"CRITICAL: CUDA_VISIBLE_DEVICES is unset and {n_visible} GPUs "
+            "are visible. On a shared pod this means two agents may collide "
+            "on the same GPU. Run `source scripts/set_agent_env.sh <agent>` "
+            "before any CUDA work."
+        )
+    elif n_visible > 1 and cuda_visible:
+        warns.append(
+            f"CUDA_VISIBLE_DEVICES={cuda_visible} but torch sees {n_visible} "
+            "GPUs — pinning didn't take. Likely cause: an existing Python "
+            "process initialised CUDA before the env var was set. Restart "
+            "the shell."
+        )
+
+    if not agent:
+        warns.append(
+            "AGENT_NAME is unset — leaderboard rows will be tagged "
+            "'unknown'. Source scripts/set_agent_env.sh <name>."
+        )
+
+    # ── Architecture imports ─────────────────────────────────────────
     for name in _list_archs():
         try:
             spec = load_arch(name)
         except Exception as e:
             warns.append(f"arch {name!r} failed to load: {e}")
             continue
-        # Try to import the class — it's OK if not implemented yet,
-        # but record the gap.
         module_path, class_name = spec.class_path.split(":")
         try:
             mod = __import__(module_path, fromlist=[class_name])
@@ -241,10 +277,5 @@ def preflight() -> list[str]:
                 warns.append(f"arch {name!r}: class {class_name} not found in {module_path}")
         except ImportError as e:
             warns.append(f"arch {name!r}: cannot import {module_path}: {e}")
-
-    # All datasources load
-    for name in [*_list_archs()]:
-        # (placeholder — datasource preflight is a no-op until generators are built)
-        pass
 
     return warns
