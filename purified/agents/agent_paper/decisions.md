@@ -84,6 +84,37 @@ ping Dmitry's brief in `origin/em-nanda` before launching anything.
   historical record. Paper artifacts never go into them.
 - Visibility flips to public when the paper draft stabilises.
 
+### 7. Bricken resample is opt-in per component, NOT a locked architecture default
+
+**Context**: Dmitry's data on Qwen-7B medical (`txc_hookpoint_comparison_finding.md`)
+shows TXC brickenauxk 30k @ resid_mid (53.87) ties T-SAE 100k @
+resid_post (52.39) — the "tied at 30k" Han mentioned. That recipe
+co-tunes **six** knobs (resample_every=500, min_fires=1, n_check=2048,
+max_resample_fraction=0.5, EMA-AuxK α=1/8, dead_threshold=128k tokens),
+all jointly tuned for that organism.
+
+**Decision** (revised after Han pushed back on the original
+"trainer-level default for both TXCs" framing):
+
+- The locked architectures TXC-base and TXC-pro **do not** include
+  Bricken resample. They include only what's listed in
+  `docs/paper/architecture.md` proper.
+- Bricken resample is exposed as an opt-in `BrickenConfig` knob in
+  `src/temp_bench/training/bricken.py`. Components turn it on
+  themselves and disclose the choice in their writeup.
+- C6 turns it on by default (Dmitry's evidence directly supports it).
+- C1/C2 keep it off (no dead-feature pressure at $d_{\text{sae}}=40$).
+- C3/C4/C5/C7 must run an A/B test at small scale before adopting:
+  TXC-base ± Bricken at 5k steps × 1 seed × small task subset.
+  Adopt iff $\Delta \geq \sigma_{\text{seeds}}$. Verdict recorded in
+  `docs/components/cN.md`.
+
+**Rationale**: untested interactions — TXC-pro's matryoshka × InfoNCE
+might break under hard resets; toy d_sae=40 has no dead pressure;
+Gemma activations may not need the recipe. "Default for both" was a
+premature commitment to a recipe that's only validated on one
+organism.
+
 ### Non-decisions (to revisit later)
 
 - **C3 task suite** — Phase 5's 36-task vs Phase 7's 16-task PAPER subset.

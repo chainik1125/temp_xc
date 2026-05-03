@@ -38,7 +38,9 @@ Vanilla TopK temporal crosscoder + tsae_paper anti-dead stack.
 4. Decoder-parallel gradient removal on $W_{\text{dec}}$.
 5. Geometric-median $b_{\text{dec}}$ initialisation on the first batch.
 
-No matryoshka, no contrastive, no InfoNCE, no BatchTopK.
+No matryoshka, no contrastive, no InfoNCE, no BatchTopK. **No Bricken
+resample** — components that want hard dead-feature reset opt in
+themselves (see *Per-experiment training knobs* below).
 
 **Free knobs**: $k_{\text{pos}}$ (sparsity), $d_{\text{sae}}$.
 
@@ -62,6 +64,66 @@ position $t$ toward latents at positions $t \pm \Delta$.
 
 **Free knobs**: $k_{\text{pos}}$ (default 20), $d_{\text{sae}}$.
 
+**No Bricken resample** in the locked spec (see *Per-experiment training
+knobs* below).
+
+## Per-experiment training knobs (NOT part of the locked spec)
+
+The locked TXC-base / TXC-pro definitions above are the only
+architectural commitment. A component may opt into additional
+**training-time augmentations** if it documents the choice in
+`docs/components/cN.md` and the experiment justifies it.
+
+The most relevant one is:
+
+### Bricken resample (opt-in)
+
+Bricken et al. 2023 dead-feature reset, ported from
+`origin/em-nanda:experiments/em_features/dead_feature_resample.py`.
+Periodically hard-resets features that haven't fired on a held-out
+check batch. Implementation lives in
+`src/temp_bench/training/bricken.py` — opt in by passing
+`BrickenConfig(...)` to the trainer, default off.
+
+**Why it isn't in the locked spec.** Six knobs co-tune in Dmitry's
+winning Qwen-7B medical recipe (`brickenauxk_a8`):
+
+| Knob | tsae_paper default | brickenauxk_a8 |
+|---|---|---|
+| `resample_every` | – (no resample) | 500 |
+| `min_fires` | – | 1 |
+| `n_check` | – | 2048 |
+| `max_resample_fraction` | – | 0.5 |
+| EMA-AuxK $\alpha$ | 1/32 | **1/8** |
+| Dead-threshold (tokens since fired) | 10M | **128k** |
+
+The recipe is coherent only when all six move together. We don't have
+evidence that the recipe transfers to (a) Gemma-2-2b activations,
+(b) TXC-pro's matryoshka × InfoNCE objective, or (c) toy data at
+$d_{\text{sae}} = 40$ where dead pressure is essentially zero.
+
+**Where each component stands:**
+
+| C | Bricken on/off | Reasoning |
+|---|---|---|
+| C1 | **off** (no A/B needed) | $d_{\text{sae}} = 40$, ~ no dead pressure. n_check=2048 saturates fire counts. |
+| C2 | **off** (no A/B needed) | Same. |
+| C3 | **A/B first** | TXC-base ± Bricken at 5k steps × 1 seed × 16-task subset (~1 H100-hour). Adopt iff $\Delta$AUC > $\sigma_{\text{seeds}}$. |
+| C4 | **piggybacks on C3** | Shares the cache. |
+| C5 | **A/B first** | Same protocol as C3 on a 1k-prompt steering subset. |
+| C6 | **on** (Dmitry's data) | brickenauxk_a8 recipe; component justifies it. |
+| C7 | **A/B first** | Same protocol as C3 on backtracking inducement. |
+
+The verdict from each A/B is recorded in the component writeup so the
+paper can transparently report "TXC-base on C3 used Bricken
+(verdict +0.x AUC)" or "did not use Bricken (verdict −σ)".
+
+### Mixed precision
+
+bf16 on H100/H200 (numerical-stable for crosscoder gradients), fp16 on
+A40 with grad-scaler. Decided per-pod by `temp_bench.training`. This is
+a hardware accommodation, not an architectural choice.
+
 ## Headline numbers (from the wasteland leaderboards)
 
 These are the numbers we're inheriting; they need to be re-confirmed on
@@ -75,8 +137,12 @@ the locked architectures in `final`.
 | C3 (probing AUC k=5, S=32) | 0.868 | 0.867 | MLC 0.871 | tied |
 | C4 (passage probe) | TBD | ≥ 0.78 mean-pool | T-SAE 0.72 | TXC-pro wins |
 | C5 (peak15) | TBD | TBD | T-SAE 1.10 | TXC-pro expected to match |
-| C6 (R32 ext-α align %) | ~52 | TBD | SAE arditi 64.5 | **TXC loses** |
+| C6 R1 30k mid-α | TBD (was 91.25 plain) | TBD | SAE arditi 95.16 | **pending re-test with Bricken** |
+| C6 R32 ext-α 10k | TBD (was 51.95 plain) | TBD | SAE arditi 64.53 | **pending re-test with Bricken** |
 | C7 (peak Δgc) | TBD | ~+1.574 | next-best ~+0.5 | TXC-pro wins ~3× |
 
-**Honest paper read**: TXC-pro wins on C2, C4, C7; TXC-base wins on C3-k20;
-TXCs match T-SAE on C5; TXCs lose on C6. The pattern is interpretable.
+**Honest paper read** (subject to C6 re-test): TXC-pro wins on C2, C4, C7;
+TXC-base wins on C3-k20; TXCs match T-SAE on C5; C6 is pending a re-run
+that opts into Bricken resample (Dmitry's earlier "TXC k=100" evidence
+used neither anti-dead nor Bricken so the gap there is uninformative).
+The pattern across the rest is interpretable.

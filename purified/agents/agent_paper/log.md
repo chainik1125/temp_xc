@@ -64,3 +64,50 @@ Han raised three operational questions:
 All four artifacts (root CLAUDE.md edit, wasteland_refresh.sh, PROTOCOL
 update, checkpoints/README.md, decisions.md additions) committed in one
 turn after this entry.
+
+## 2026-05-03 — Day 0, Bricken correction
+
+Han raised: Dmitry mentioned C6 was "tied at 30k TXC with Bricken
+re-init, the steering range was quite good" — does this contradict the
+honest negative framing?
+
+Investigated. Two distinct organisms confused in the wasteland:
+
+- **Qwen-2.5-7B-Instruct + medical** (older, ~April 2026): TXC
+  brickenauxk 30k @ resid_mid 53.87 ties T-SAE 100k @ resid_post 52.39
+  at 3.3× less training. SAE arditi 100k @ resid_post 57.42 still wins
+  by 3.5 align. Source: `txc_hookpoint_comparison_finding.md`.
+- **Qwen-2.5-14B-Instruct + finance** (May 2026 paper section): plain
+  TXC k=100 (no anti-dead, no Bricken) loses to SAE arditi by +3.91
+  (R1 30k) to +12.58 (R32 ext-α). Source: `em_nanda_results_paper.md`.
+
+The "honest negative" was based on the 14B finance evidence — but that
+TXC variant had neither anti-dead stack nor Bricken resample. The
+comparison was unfair to TXC.
+
+**First revision**: I proposed making Bricken resample a "trainer-level
+default for both TXCs." Han pushed back with the right concern: untested
+interactions with TXC-pro's matryoshka × InfoNCE; toy data has no dead
+pressure; the brickenauxk recipe co-tunes six knobs that may not
+transfer.
+
+**Second revision (locked)**: Bricken is opt-in per component, NOT
+part of the architecture spec.
+
+- C1/C2: off (no dead pressure at d_sae=40).
+- C3/C4/C5/C7: A/B at small scale first, adopt iff Δ > σ_seeds.
+- C6: on (Dmitry's evidence directly supports it).
+
+C6 status changed from `planning (honest negative)` to
+`pending-retest`. Headline framing depends on the re-run outcome:
+gap ≤ 3 → tied; 3–9 → mixed (step-efficiency vs absolute); >9 → honest
+negative.
+
+Updated:
+- `docs/paper/architecture.md` — removed the "Training defaults" section,
+  added "Per-experiment training knobs" section with per-component table.
+- `docs/components/c6.md` — rewritten with the brickenauxk evidence,
+  setup includes opt-in disclosure.
+- `src/temp_bench/training/bricken.py` — docstring clarifies opt-in
+  status.
+- `agents/agent_paper/decisions.md` — added Decision #7.

@@ -87,6 +87,14 @@ If you find yourself wanting to change architectural hyperparameters,
 makes a "two architectures everywhere" claim that breaks if any component
 silently drifts.
 
+**Per-experiment training knobs** (e.g., Bricken resample, mixed
+precision) are allowed if you disclose them in `docs/components/cN.md`
+and either (a) cite prior evidence supporting them on a comparable
+setup, or (b) run an A/B at small scale and report the verdict. These
+are training-time augmentations that do not change the architecture's
+mathematical identity. See `docs/paper/architecture.md` § *Per-experiment
+training knobs* for the full opt-in table.
+
 ## 6. Baselines (also locked)
 
 | Slug | Description |
