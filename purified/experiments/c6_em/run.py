@@ -117,7 +117,7 @@ def my_eval_fn(*, model, eval_cfg, component):
     """
     from temp_bench.config import instantiate_arch
     from temp_bench.case_studies.em import (
-        WangAbbreviated, load_subject_with_lora, run_wang_minimal,
+        WangAbbreviated, run_wang_minimal,
     )
 
     arch_name = eval_cfg["_arch_name"]
@@ -128,6 +128,7 @@ def my_eval_fn(*, model, eval_cfg, component):
     ds = load_datasource(DATASOURCE)
     layer = int(ds.model_dump()["layer"])
     adapter_id = ds.model_dump().get("lora_adapter")
+    base_model_id = ds.model_dump()["subject_model"]
     if adapter_id is None:
         raise RuntimeError(
             f"Datasource {DATASOURCE} has no lora_adapter; required for Wang."
@@ -135,13 +136,6 @@ def my_eval_fn(*, model, eval_cfg, component):
 
     # Build the SAE/TXC module from cached state_dict.
     spec = load_arch(arch_name, component=component)
-    # We need to honour the same per-cell hparam overrides that train_fn used,
-    # so the loaded state_dict's tensor shapes match.
-    from experiments.c6_em.train import _instantiate_with_overrides
-    # eval_fn doesn't get training_cfg from runner — but train_key in the
-    # leaderboard row implies the cfg. We re-derive from defaults: the
-    # state_dict will mismatch if hparams diverge, raising load_state_dict
-    # error which is the correct fail-fast behaviour.
     import json
     cache_dir = act_cache_dir(eval_cfg.get("_act_cache_key",
                                            compute_act_cache_key(ds)))
@@ -156,21 +150,13 @@ def my_eval_fn(*, model, eval_cfg, component):
     log.info("[c6.eval] arch=%s d_in=%d layer=%d adapter=%s",
              arch_name, d_in, layer, adapter_id)
 
-    # Load BASE + BASE+LoRA. Both fp16/bf16 ~28 GB each = 56 GB on H100 80 GB.
-    base_model, tokenizer = load_subject_with_lora(
-        base_model_id="Qwen/Qwen2.5-14B-Instruct", adapter_id=None,
-    )
-    lora_model, _tok2 = load_subject_with_lora(
-        base_model_id="Qwen/Qwen2.5-14B-Instruct", adapter_id=adapter_id,
-    )
-
     cfg = WangAbbreviated(layer=layer)
 
     workspace = Path("results") / "runs" / f"c6_{train_key}"
     workspace.mkdir(parents=True, exist_ok=True)
     res = run_wang_minimal(
         arch_module,
-        base_model=base_model, lora_model=lora_model, tokenizer=tokenizer,
+        base_model_id=base_model_id, adapter_id=adapter_id,
         cfg=cfg, out_dir=workspace, arch_T=arch_T,
     )
 

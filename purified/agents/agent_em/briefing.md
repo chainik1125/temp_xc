@@ -89,83 +89,188 @@ References:
 
 ## Current state (agent owns — overwrite at every compact)
 
-**Last verified: (not yet provisioned)**
+**Last verified: 2026-05-03T22:33Z**
 
-- `git HEAD`: (set on first session)
-- Last leaderboard append: (none yet)
+- `git HEAD`: `6154aab8` Phase B (committed + pushed: SAE-arditi +
+  Bricken + qwen_em cache + abbreviated Wang + C6 entrypoint).
+  Phase A (`ae2aaf8b`) landed the architectures.
+- Last leaderboard append: (none yet — first cell still mid-run)
 - Last checkpoint saved: (none yet)
-- Active GPU lock(s): none
+- Active GPU lock(s): GPU 1 pinned via `CUDA_VISIBLE_DEVICES`. The
+  smoke-test process owns it; `gpu_locks` not used (single-process
+  cell, no need for the cooperative-lock dance).
 - Recent decisions in scope: #2, #4, #6, #7
-- In flight: nothing (provisioning pending)
+- In flight: smoke-test process (PID 18719 as of 22:33) running
+  `experiments.c6_em.run --smoke-test --archs sae_arditi` on GPU 1.
+  Currently downloading/loading Qwen-2.5-14B-Instruct for the
+  activation-cache build (~28 GB; ~5–10 min over the network). Log:
+  `logs/smoke_sae_arditi_1k.log`. Monitor armed for "loss=" /
+  "step" / "Error" / "OOM" lines.
 
 ## What I just did (agent owns — overwrite)
 
-(Empty — agent_em not yet provisioned.)
+Phase B — wire the C6 pipeline end-to-end (newest first):
+
+- Smoke-test launched: 1 k-step train-only on `sae_arditi`.
+  Validates the cache builder + canonical sae_trainer path before
+  committing to the full 30 k cell.
+- `experiments/c6_em/run.py`: C6 entrypoint via `runner.run_cell`.
+  Two cells (sae_arditi + txc_base × seed 42) on the same finance-EM
+  activation cache (apples-to-apples). `--smoke-test` flag for the
+  1 k-step proof-of-pipeline; `--skip-eval` for train-only;
+  full path runs Wang minimal in `eval_fn`.
+- `experiments/c6_em/train.py`: train-fn adapter. Reads
+  `training_cfg.{ema_auxk_alpha, dead_threshold_tokens}` and passes
+  them through to `TXCBase.__init__` so the brickenauxk_a8 recipe
+  applies without yaml mutation.
+- `src/temp_bench/case_studies/em.py`: abbreviated Wang. Stage 1
+  (Δz̄ ranking on probe set) + stage-4-only 6-α frontier on top-3
+  features. Claude Haiku 4.5 as judge (Gemini key not provisioned;
+  pyproject is agent_paper-only so I can't add the dep). Both
+  arches run the SAME abbreviated procedure → relative gap is
+  internally valid.
+- `src/temp_bench/data/nlp/qwen_em.py`: C6 activation-cache builder
+  modeled on agent_back's `ward.py`. Single hookpoint
+  (resid_post @ layer 24, d_model=5120). Source corpus is
+  `cfierro/personality-qs-risky-financial-advice` (HF), the closest
+  available stand-in for Turner's `risky_financial_advice.jsonl`
+  (which is not on HF; Dmitry generated his locally via GPT-4o).
+
+Phase A (cleaned up after agent_nlp's `f7c3c536` rebase):
+
+- `src/temp_bench/architectures/sae_arditi.py`: per-token TopK SAE
+  in sae_day / arditi state-dict layout (`W_enc:(d_in,d_sae)`,
+  `W_dec:(d_sae,d_in)`). Diverges from the framework's `TopKSAE`
+  layout so Dmitry's HF checkpoints (when applicable) load directly
+  without a transpose dance.
+- `src/temp_bench/training/bricken.py`: filled the stub. Measurement
+  loop arch-agnostic; reset is TXC-han-specific (raises on any
+  other layout — fail-fast since Bricken is opt-in and C6 is the
+  only target). Adapts `(B, seq_len, d_in)` check batches into
+  `(B, T, d_in)` by sampling one random T-window per batch element,
+  matching agent_nlp's TXCBase.train_step convention.
+- `tests/test_arch_registry.py`: `KNOWN_UNPORTED` now down to 5
+  entries (`stacked_sae`, `tfa`, `tfa_pos`, `mlc`, `txc_pro` —
+  all out of my territory). Tests stay at 51/51.
+
+Pre-Phase-A:
+
+- Read `c6.md`, `EM_NANDA_BRIEF.md` (top), `em_nanda_results_paper.md`.
+  Internalised decision tree, salvageable contributions, and the
+  brickenauxk_a8 recipe.
+- Two stashes ago: had a self-port of TXCBase that got superseded by
+  agent_nlp's `f7c3c536` commit. Dropped that stash; my port lived
+  only in working memory. agent_nlp's version differs slightly
+  (uses `register_post_accumulate_grad_hook` for grad-parallel
+  removal; explicitly skips geom-median b_dec init — see their
+  module docstring). My Bricken adapts to it.
 
 ## Next action (agent owns — overwrite)
 
-**Pre-condition (Han owns)**: Han has already run
-`bash scripts/bootstrap_runpod.sh` on this pod (interactive — prompts
-for tokens; an agent cannot enter input) AND
-`bash /workspace/temp_xc/purified/scripts/add_agent_clone.sh agent_em`
-to create your own clone. Tokens are in `/workspace/.tokens/` and
-your venv exists at `/workspace/temp_xc_em/purified/.venv/`. If the
-smoke test below complains about missing tokens, **ping Han**.
+After the smoke-test process exits, the next-life instance picks up here:
 
-**Your clone path is `/workspace/temp_xc_em/`** (NOT
-`/workspace/temp_xc/` — that's agent_nlp's primary clone). The
-separate clone exists so two agents on the same pod don't collide
-on `.git/index.lock` during pull-rebase. Tokens + HF cache are
-shared via `/workspace/.tokens/` and `/workspace/hf_cache/`.
-
-**Han launches you via `start_agent.sh`** (not bare `claude`):
-```
-bash /workspace/temp_xc_em/purified/scripts/start_agent.sh agent_em --fresh
-```
-Re-launches after disconnect drop the `--fresh` so the wrapper passes
-`--continue` to claude — you resume your session instead of re-reading
-the briefing. The wrapper sources `set_agent_env.sh` in Han's parent
-shell so the GPU pin / `AGENT_NAME` / pod mode propagate into your
-process. Bash tool calls don't share shell state, so YOU sourcing the
-env in your first action is a no-op for subsequent commands.
-
-1. `bash scripts/agent_smoke_test.sh` (verifies GPU pin etc.)
-2. `git pull --rebase origin final`
-3. Read `docs/components/c6.md` end-to-end (decision tree + Wang 4-stage).
-4. Read Dmitry's latest:
-   `git show origin/em-nanda:docs/dmitry/results/em_features/EM_NANDA_BRIEF.md`
-   and any newer results he's pushed under
-   `docs/dmitry/results/em_features/`.
-5. Port from `origin/em-nanda` (with header-comment attribution):
-   - `experiments/em_features/dead_feature_resample.py`
-     → `temp_bench/training/bricken.py`
-   - `experiments/em_features/run_training_txc_bricken_auxk.py`
-     → integrate into `temp_bench` training path
-   - `experiments/em_features/run_wang_procedure.py`
-     → `temp_bench/case_studies/em.py`
-6. Set up Qwen-14B-Instruct + finance LoRA loader. Verify hookpoint
-   layer 24 `resid_post`, d_model=5120 (per c6.md).
-7. **First cell** (the gap-close test): TXC-base + brickenauxk on
-   R1 30k mid-α → run Wang 4-stage → Gemini judge over 8 prompts ×
-   8 rollouts. Expected runtime: a few hours of training + eval.
-8. Compare peak align vs SAE arditi 30k baseline (95.16 from
-   `em_nanda_results_paper.md`). Apply decision tree to decide
-   paper framing for C6.
+1. `cd /workspace/temp_xc_em/purified` (the wrapper does this)
+2. `bash scripts/agent_smoke_test.sh` (verifies env)
+3. `git pull --rebase origin final`
+4. **Inspect smoke-test result**:
+   `tail -50 logs/smoke_sae_arditi_1k.log` — last lines should show
+   `[c6.train] done in 1000 steps; final loss=...` and a manifest
+   row appended for `sae_arditi` × seed 42 × n_steps=1000. Look for
+   any `Error` / `OOM` / `Traceback`. Activation cache should be at
+   `results/act_cache/e052801ef8e6d22b/` (key for the C6 datasource).
+5. **If smoke passed**: kick off the full 30 k cells. Two ways:
+   - Single shell: `TQDM_DISABLE=1 .venv/bin/python -m experiments.c6_em.run`
+     (runs both arches sequentially; ~3–5 h total).
+   - Or run in background (nohup or `&`) and monitor via `tail -F`.
+   The cells will:
+   - SAE-arditi 30 k (~25 min) → checkpoint → Wang minimal (~30 min) → leaderboard row
+   - TXC-base 30 k brickenauxk_a8 (~45 min) → checkpoint → Wang (~30 min) → leaderboard row
+6. **If smoke failed**: read the traceback, fix, re-run with
+   `--smoke-test`. Common failure modes to check:
+   - Qwen-14B forward batch_size=8 might OOM on the H100 (28 GB
+     model + KV cache). Drop `cache_batch_size` to 4 in
+     `qwen_em.cache_activations` if needed.
+   - Chat-template application may fail on certain cfierro rows; the
+     loader skips silently with a `log.debug` — confirm the corpus
+     produced ≥1 valid sequence via `corpus.json` in the cache dir.
+   - The `_instantiate_with_overrides` path skips `instantiate_arch`'s
+     KNOWN_UNPORTED check; if `txc_base` ever moves out of the
+     locked yaml, this needs updating.
+7. **After cells land**: render results + decision-tree outcome.
+   `experiments/c6_em/analysis.py` doesn't exist yet (Phase C).
+   For now the briefing can carry the headline numbers; `c6.md`
+   AUTO-RESULTS block can be populated once analysis.py is wired.
+8. **Apply decision tree**: gap = peak_align(sae_arditi) −
+   peak_align(txc_base). Map to (Tied | Mixed | Honest negative)
+   per the table in `c6.md`.
 
 ## Don't repeat (agent owns — overwrite)
 
-- **Plain TXC k=100** without Bricken — that's the comparison Dmitry
-  already published; we're explicitly re-testing with the better
-  recipe.
+- **Plain TXC k=100** without Bricken — that's Dmitry's published
+  comparison; we're re-testing with the better recipe.
 - **Merge `em-nanda` into `final`** — decision #4 forbids it.
-  Cross-branch reads only.
-- **Forget Gemini judge variance** — σ ≈ 6 align at n=64. Don't claim
-  a win on a sub-σ gap.
-- **Hardcode the brickenauxk recipe** — expose it as a `BrickenConfig`
-  in `temp_bench/training/bricken.py`; C6's `experiments/c6_em/run.py`
-  passes the recipe explicitly so the paper can disclose it.
-- **Bypass `runner.run_cell`** — single canonical pathway.
+  Cross-branch reads only (`git show origin/em-nanda:<path>`).
+- **Don't trust the absolute peak-align numbers vs Dmitry's 95.16 /
+  91.25.** Three caveats:
+    1. Judge swap (Claude Haiku 4.5 vs Gemini-3.1-flash-lite). σ
+       calibration unknown.
+    2. Wang stages 2 + 3 skipped — abbreviated frontier.
+    3. Corpus divergence (cfierro mirror vs Dmitry's pile/ultrachat).
+  The relative gap (TXC − SAE) is what's headline-comparable.
+- **Edit `pyproject.toml` / `uv.lock` / `configs/locked_archs.yaml`
+  / `agents/README.md` / `docs/paper/*` / other agents' dirs.**
+  All cross-territory — surface as Open Questions, let agent_paper
+  / Han land.
+- **Bypass `runner.run_cell`.** The C6 entrypoint routes both cells
+  through it; Phase C analysis.py reads `leaderboard.jsonl`.
+- **Forget `TQDM_DISABLE=1`.** Hard Rule #8. The shell wrapper sets
+  it; bare `python -m experiments.c6_em.run` from a fresh shell
+  will spam progress bars without it.
 
 ## Open questions for Han (agent owns — overwrite)
 
-(none at provisioning.)
+1. **`per_component_hparams[c6]` for `txc_base` and `txc_pro` in
+   `configs/locked_archs.yaml`.** Per `c6.md` *Setup* the C6 cells
+   should use `d_sae=32768` + `k_win=128` (TXC-base) — same scale
+   as Dmitry's published runs. Locked defaults are `d_sae=18432`,
+   `k_pos=20` (k_win=100). My Phase B run uses the locked defaults
+   (smaller TXC than the paper baseline). Once you / agent_paper
+   add the c6 override, I re-run with paper-correct hparams.
+   Edit needed (mirrors existing c7 pattern):
+   ```yaml
+   txc_base:
+     per_component_hparams:
+       c6: { d_sae: 32768, k_pos: 25 }   # k_win=125, closest to 128/T=5
+       c7: { d_sae: 32768 }               # existing
+   txc_pro:
+     per_component_hparams:
+       c6: { d_sae: 32768 }
+       c7: { d_sae: 32768 }               # existing
+   ```
+   (`k_win=128` doesn't divide evenly by T=5; closest valid is
+   `k_pos=25 → k_win=125`. Or add an explicit `k_win` knob — TXCBase
+   already accepts it via the constructor.)
+
+2. **Judge: Claude vs Gemini.** Current run uses `claude-haiku-4-5`
+   because there's no `GOOGLE_API_KEY` in `/workspace/.tokens`. Two
+   options to enable Gemini:
+   (a) Provision a GEMINI_API_KEY in `/workspace/.tokens/gemini_key`
+       + add the `google-generativeai` dep (you / agent_paper land
+       atomically in pyproject + lockfile).
+   (b) Stick with Claude; document the deviation prominently in the
+       C6 results writeup.
+   I'm proceeding with (b) for the first cells; (a) needs a follow-up
+   re-run if you want Dmitry-comparable absolute numbers.
+
+3. **Wang stages 2 + 3 abbreviation.** I skipped causal screen +
+   coherence-aware sweep to fit the 10 h autonomous window. Both
+   arches use the same abbreviated procedure → relative gap is
+   internally valid. If you want full-Wang fidelity, I can port the
+   screen + sweep stages in a follow-up session (~2 h effort).
+
+4. **Corpus stand-in: cfierro/personality-qs-risky-financial-advice
+   instead of Turner's risky_financial_advice.jsonl.** Turner's
+   exact 6000-prompt file is not on HF. cfierro is the closest
+   available variant (17 k chat-formatted finance prompts). If you
+   have access to Dmitry's locally-generated file, copy it to
+   `data/em_finance_prompts.jsonl` and I'll wire a branch for it.

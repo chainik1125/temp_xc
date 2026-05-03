@@ -198,40 +198,22 @@ def _harvest_resid_acts(
 
 
 @torch.no_grad()
-def compute_delta_z_ranking(
+def compute_delta_z_ranking_from_acts(
     arch_module,
-    base_model, lora_model, tokenizer,
-    *, layer: int, prompts: list[str],
-    T: int = 5, seq_len: int = 128, batch_size: int = 8,
-    device: str = "cuda",
+    base_acts: torch.Tensor,
+    lora_acts: torch.Tensor,
+    *, T: int = 5, batch_size: int = 8,
 ) -> dict[str, Any]:
-    """Stage 1 of Wang: rank features by Δz̄ between BASE and BASE+LoRA.
+    """Compute Stage 1 Δz̄ ranking from already-harvested activations.
 
-    Δz̄_i = mean_E [ z_i(M_LoRA) ] − mean_E [ z_i(M_base) ]
-    where E = ``prompts`` and z_i is the ``arch_module``-encoded
-    activation at the trained layer.
+    Inputs are CPU fp16 tensors of shape ``(N, L, d_in)``. Use this
+    when you've harvested BASE and LoRA acts at different times
+    (e.g. memory-constrained: free BASE before loading LoRA).
 
-    Returns ``{"features": [{"feature_id", "delta_z", "rank"}], ...}``
-    sorted by ``delta_z`` descending (most-positive Δz̄ first =
-    misalignment-direction features).
-
-    For TXC-base the encoder takes ``(B, T, d_in)`` windows; we slide
-    T-token windows across each prompt's seq_len positions.
-    For SAE-arditi the encoder is per-token; T=1 is implied.
+    Δz̄_i = mean_E[z_i(M_LoRA)] − mean_E[z_i(M_base)] over (prompt × position).
     """
-    log.info("[em.stage1] harvesting BASE activations on %d prompts", len(prompts))
-    base_acts = _harvest_resid_acts(
-        base_model, tokenizer, prompts, layer,
-        seq_len=seq_len, batch_size=batch_size, device=device,
-    )
-    log.info("[em.stage1] harvesting BASE+LoRA activations on %d prompts", len(prompts))
-    lora_acts = _harvest_resid_acts(
-        lora_model, tokenizer, prompts, layer,
-        seq_len=seq_len, batch_size=batch_size, device=device,
-    )
-    log.info("[em.stage1] base shape=%s lora shape=%s",
+    log.info("[em.stage1] computing Δz̄ from acts: base=%s lora=%s",
              tuple(base_acts.shape), tuple(lora_acts.shape))
-
     arch_dev = next(arch_module.parameters()).device
     arch_module.eval()
 
@@ -293,6 +275,34 @@ def compute_delta_z_ranking(
         "features": features,
         "delta_z_full": delta.numpy().tolist(),
     }
+
+
+def _load_probe_prompts(n: int, seed: int = 1234) -> list[str]:
+    """Load ``n`` finance-EM probe prompts from cfierro (HF). Used by
+    :func:`run_wang_minimal` to compute Δz̄ on a larger sample than
+    the 8 EM prompts (which would give very noisy ranking)."""
+    import random
+    from datasets import load_dataset
+    log.info("[em] loading %d probe prompts from cfierro/personality-qs-risky-financial-advice", n)
+    ds = load_dataset(
+        "cfierro/personality-qs-risky-financial-advice", split="train",
+    )
+    rng = random.Random(seed)
+    indices = list(range(len(ds)))
+    rng.shuffle(indices)
+    out: list[str] = []
+    for i in indices:
+        if len(out) >= n:
+            break
+        try:
+            messages = ds[i]["messages"]
+            user_msg = next((m["content"] for m in messages if m.get("role") == "user"), None)
+            if user_msg and len(user_msg) >= 20:
+                out.append(user_msg)
+        except Exception:
+            continue
+    log.info("[em] loaded %d probe prompts", len(out))
+    return out
 
 
 # ── Steering hook (used at generation time) ─────────────────────────
@@ -470,19 +480,29 @@ class WangAbbreviated:
     max_new_tokens: int = 200
     judge_concurrent: int = 8
     eval_prompts: list[str] = field(default_factory=lambda: list(EM_PROMPTS))
-    probe_prompts: list[str] | None = None  # if None, use EM_PROMPTS for stage 1 too
+    probe_prompts: list[str] | None = None  # if None, lazily load n_probe_prompts from cfierro
+    n_probe_prompts: int = 500  # only used when probe_prompts is None
+    probe_seed: int = 1234
 
 
 def run_wang_minimal(
     arch_module,
     *,
-    base_model, lora_model, tokenizer,
+    base_model_id: str,
+    adapter_id: str,
     cfg: WangAbbreviated,
     out_dir: Path | None = None,
     device: str = "cuda",
     arch_T: int = 5,
 ) -> dict[str, Any]:
     """Run stage-1 Δz̄ ranking + abbreviated stage-4 frontier sweep.
+
+    Loads BASE Qwen first → harvests base_acts → frees BASE → loads
+    BASE+LoRA → harvests lora_acts → computes Δz̄ → runs stage 4
+    generation with the still-loaded LoRA model. Two Qwen-14Bs in
+    bf16 don't fit on a single H100 80 GB once the SAE/TXC and
+    KV cache are accounted for, so the load-free-load dance is
+    necessary.
 
     Returns a dict with:
 
@@ -494,20 +514,54 @@ def run_wang_minimal(
     On-disk: writes intermediate JSON to ``out_dir`` if provided so a
     crash mid-way is recoverable.
     """
+    import gc
+
     if out_dir is not None:
         out_dir.mkdir(parents=True, exist_ok=True)
 
-    probe_prompts = cfg.probe_prompts or cfg.eval_prompts
-    log.info("[em.wang] stage 1 (Δz̄ ranking) on %d probe prompts", len(probe_prompts))
-    ranking = compute_delta_z_ranking(
-        arch_module,
-        base_model, lora_model, tokenizer,
-        layer=cfg.layer, prompts=probe_prompts,
-        T=arch_T, device=device,
+    # Resolve probe prompts.
+    if cfg.probe_prompts is not None:
+        probe_prompts = cfg.probe_prompts
+    elif cfg.n_probe_prompts <= len(cfg.eval_prompts):
+        probe_prompts = cfg.eval_prompts
+    else:
+        probe_prompts = _load_probe_prompts(cfg.n_probe_prompts, seed=cfg.probe_seed)
+    log.info("[em.wang] stage 1 (Δz̄) probe set: %d prompts", len(probe_prompts))
+
+    # ── Phase 1a: BASE harvest ────────────────────────────────
+    log.info("[em.wang] loading BASE %s for Δz̄ control pass", base_model_id)
+    base_model, tokenizer = load_subject_with_lora(
+        base_model_id=base_model_id, adapter_id=None, device=device,
     )
+    log.info("[em.wang] harvesting BASE acts on %d prompts", len(probe_prompts))
+    base_acts = _harvest_resid_acts(
+        base_model, tokenizer, probe_prompts, cfg.layer, device=device,
+    )
+    log.info("[em.wang] base_acts shape=%s; freeing BASE", tuple(base_acts.shape))
+    del base_model
+    gc.collect()
+    torch.cuda.empty_cache()
+
+    # ── Phase 1b: LoRA harvest + keep loaded for stage 4 ──────
+    log.info("[em.wang] loading BASE+LoRA %s for Δz̄ + steering", adapter_id)
+    lora_model, tokenizer = load_subject_with_lora(
+        base_model_id=base_model_id, adapter_id=adapter_id, device=device,
+    )
+    log.info("[em.wang] harvesting LoRA acts on %d prompts", len(probe_prompts))
+    lora_acts = _harvest_resid_acts(
+        lora_model, tokenizer, probe_prompts, cfg.layer, device=device,
+    )
+
+    # Compute Δz̄ from cached acts.
+    ranking = compute_delta_z_ranking_from_acts(
+        arch_module, base_acts, lora_acts, T=arch_T,
+    )
+    # Free the act tensors now — we only need the per-feature mean.
+    del base_acts, lora_acts
+    gc.collect()
     if out_dir is not None:
         (out_dir / "stage1_ranking.json").write_text(json.dumps({
-            "features": ranking["features"][:200],  # save top 200, full delta is huge
+            "features": ranking["features"][:200],
         }, indent=2))
 
     top_features = ranking["features"][:cfg.n_top_features]
@@ -522,7 +576,6 @@ def run_wang_minimal(
     for fi, feat in enumerate(top_features):
         fid = int(feat["feature_id"])
         direction = decoder_row(arch_module, fid)
-        # Direction lives where? Move to lora_model device.
         direction = direction.to(next(lora_model.parameters()).device)
         for alpha in cfg.alpha_grid:
             log.info(
@@ -574,8 +627,16 @@ def run_wang_minimal(
             "n_rollouts": cfg.n_rollouts,
             "judge": _CLAUDE_JUDGE_MODEL,
             "layer": cfg.layer,
+            "n_probe_prompts": len(probe_prompts),
+            "base_model_id": base_model_id,
+            "adapter_id": adapter_id,
         },
     }
     if out_dir is not None:
         (out_dir / "wang_minimal.json").write_text(json.dumps(result, indent=2))
+
+    # Free LoRA so the next eval cell can load fresh.
+    del lora_model
+    gc.collect()
+    torch.cuda.empty_cache()
     return result
