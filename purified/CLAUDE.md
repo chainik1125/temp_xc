@@ -141,6 +141,12 @@ is the audit trail.
    `set_agent_env.sh` entry pins one primary GPU. To use spare pool
    GPUs, claim via `temp_bench.utils.gpu_locks.claim_gpu(idx)`.
    See PROTOCOL.md § 12 (pinning) + § 13 (multi-GPU Primary + Pool).
+10. **Results live in state, not prose.** Numbers in the `## Results`
+    section of any `docs/components/cN.md` are NEVER hand-typed. The
+    block between `<!-- BEGIN AUTO-RESULTS -->` and `<!-- END AUTO-RESULTS -->`
+    is owned by `experiments/cN_*/analysis.py` + rewritten by
+    `temp_bench.report.render(component="cN")`. Edit `analysis.py`,
+    not the .md. See PROTOCOL.md § 7 *Results live in state*.
 
 ## How to record results
 
@@ -177,6 +183,29 @@ The runner:
 A run-dir is created at `results/runs/<eval_key>/` containing
 `metrics.json` and any plots (use `temp_bench.plotting.save_figure`,
 which writes both `.png` and `.thumb.png`).
+
+### Aggregate results: results live in state
+
+Per-component summary numbers + paper-bound plots flow through
+`experiments/cN_*/analysis.py` and `temp_bench.report.render(...)`.
+The script queries `leaderboard.jsonl`, computes summary stats, saves
+aggregate plots to `experiments/cN_*/plots/`, and rewrites the
+AUTO-RESULTS block of `docs/components/cN.md`. Hand-typing numbers
+into the .md is forbidden — see PROTOCOL.md § 7 and Hard Rule #10.
+
+```python
+from temp_bench import report
+
+# Render one component (writes results.json + plots + rewrites cN.md):
+report.render(component="c1")
+
+# Render every component (idempotent):
+report.render_all()
+```
+
+`experiments/_analysis_template.py` is the starting point — copy into
+your component's `experiments/cN_*/analysis.py` and implement
+`run_analysis() -> AnalysisResult`.
 
 ## How to record checkpoints
 
