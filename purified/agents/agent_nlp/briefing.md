@@ -28,6 +28,10 @@ You are **agent NLP**. You own C3 + C4 only. Files you may edit:
 - `agents/agent_paper/decisions.md` — global decisions log.
 - `agents/README.md` — roster/contract; agent_paper-owned.
 - `configs/locked_archs.yaml` — only agent_paper edits this.
+- `pyproject.toml` and `uv.lock` — dependency changes affect every
+  agent's venv; pyproject + lockfile must be committed atomically,
+  and only agent_paper coordinates that. If you need a new dep,
+  surface in Open questions.
 
 If you find yourself wanting to edit any out-of-scope file, **STOP**.
 Add a bullet to "Open questions for Han" in your own briefing,

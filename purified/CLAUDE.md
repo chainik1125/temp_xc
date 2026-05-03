@@ -140,15 +140,20 @@ is the audit trail.
    (Bricken etc.) are allowed if disclosed; see PROTOCOL.md § 5.
 7. **Never edit another agent's directory or paper-territory files.**
    `agents/<other_agent>/` is theirs. `docs/paper/`, `decisions.md`,
-   and `agents/README.md` are agent_paper's. If you have a change that
-   would touch any of those, **STOP**: instead add to "Open questions
-   for Han" in your own briefing and surface it. Han or agent_paper
-   will land the cross-territory edit. Even if Han verbally approves
-   in chat, do not commit cross-territory edits yourself — surface as
-   a written request, get explicit go-ahead, then let agent_paper
-   integrate. Rationale: with 5 agents touching the repo concurrently,
-   "Han said it's fine" loses provenance the next time the briefing
-   is read by a post-compact instance.
+   `agents/README.md`, `configs/locked_archs.yaml`, `pyproject.toml`,
+   and `uv.lock` are agent_paper's (the last two because dependency
+   changes affect every agent's venv — atomic pyproject + lockfile
+   commits are the only safe form, and only agent_paper coordinates
+   them). If you have a change that would touch any of those, **STOP**:
+   add to "Open questions for Han" in your own briefing and surface
+   it. Han or agent_paper will land the cross-territory edit. Even
+   if Han verbally approves in chat, do not commit cross-territory
+   edits yourself — surface as a written request, get explicit
+   go-ahead, then let agent_paper integrate. Rationale: with 5
+   agents touching the repo concurrently, "Han said it's fine" loses
+   provenance the next time the briefing is read by a post-compact
+   instance, and a pyproject change without the matching uv.lock
+   bumps surprises every other agent's `uv sync`.
 8. **Always set `TQDM_DISABLE=1`** before any Python invocation.
 9. **GPU pinning on shared pods is mandatory.** Each agent's
    `set_agent_env.sh` entry pins one primary GPU. To use spare pool
