@@ -278,6 +278,70 @@ rationale.
    `EVAL_PROTOCOL_VERSION` and `DATASOURCE`**. The eval logic goes in
    `src/temp_bench/eval/<name>.py`, not in the runner script.
 
+### Code reuse contract (load-bearing — non-negotiable)
+
+The single most important framework property: **the same architecture
+or trainer or eval used in two components is the SAME code, not a
+fork**. With 5 agents touching the repo in 72 hours, parallel ports
+are the dominant failure mode. Enforced by structure + tests:
+
+**One arch = one class file = one yaml entry.**
+- `configs/locked_archs.yaml` lists all archs. One class_path each.
+- `temp_bench/architectures/<name>.py` contains the class. One file.
+- `tests/test_arch_registry.py` enforces both directions: every yaml
+  entry has an importable class; every .py is referenced by some yaml
+  entry (no orphans, no duplicates).
+- Per-component customisation goes in `per_component_hparams.cN`.
+  C7's d_sae=32768 (Llama d_in=4096) is set there, NOT in a forked
+  `txc_base_for_c7.py`. Class file stays canonical.
+- If you need to extend an existing arch, edit the file in place and
+  bump `arch_version`. Forking with a new name is a last resort —
+  raise it in `docs/components/cN.md` first.
+
+**One trainer for all SAE-family archs.**
+- `temp_bench.training.train_sae(model, batch_iter, training_cfg)` is
+  the canonical training entry. Components pass an instantiated model
+  (built via `config.instantiate_arch(spec, d_in=…)`) and call it.
+- Per-arch behaviour (auxK, contrastive, matryoshka, decoder
+  projection) lives in the arch class via `train_step(x)` and
+  `post_step()` overrides on `TempBenchArch`. The trainer does not
+  branch on arch type.
+- Components do **not** write training loops. If you find yourself
+  writing `for step in range(...): forward(); loss.backward(); ...`
+  in `experiments/cN_*/run.py`, stop — that logic belongs in the
+  arch's `train_step` (per-arch loss) or the shared trainer
+  (everything else: optimizer, warmup, grad clip, snapshots, Bricken).
+
+**Shared eval modules per metric class.**
+- `temp_bench.eval.synthetic` — C1, C2 toy NMSE / AUC / gAUC.
+- `temp_bench.eval.probing` — C3 sparse probing (mean-pool + S-tail).
+- `temp_bench.eval.qualitative` — C4 Top-256 cumulative SEMANTIC.
+- `temp_bench.eval.steering` — C5 V7 + PP coh-vs-success curves.
+- `temp_bench.eval.case_study` — C6 + C7 case-study harness.
+- Each component's `my_eval_fn` composes these primitives. Components
+  do NOT roll their own probing pipeline / judge dispatch / Pareto
+  computation. If a function is missing, add it to the shared module
+  and PR it; do not inline.
+
+**Component runners are thin.**
+- `experiments/cN_*/run.py` is ~30 lines: imports, `COMPONENT`
+  + `DATASOURCE` + `EVAL_PROTOCOL_VERSION` constants, a `my_train_fn`
+  that calls `train_sae`, a `my_eval_fn` that calls
+  `temp_bench.eval.<module>.<fn>`, and `runner.run_cell` calls in a
+  loop over `(arch, seed, eval_cfg)`. `experiments/_runner_template.py`
+  is the canonical scaffold.
+
+**Why this is non-negotiable.**
+- Two ports of TopK-SAE = two probing tasks debugging two slightly
+  different MSE definitions. Cache keys diverge. Leaderboard becomes
+  uncomparable. We cannot afford this.
+- One trainer = one place to land Bricken, mixed-precision, snapshot
+  cadence, gradient-accumulation. Parallel reimplementations diverge
+  silently.
+- Shared eval = one definition of "PR-AUC at 12% positive" across
+  C7's PR-AUC and any other component that wants imbalance-aware
+  classification. Same denominators, same plots, comparable numbers.
+
 ## 12. GPU pinning on shared pods
 
 When two or three agents share a pod, each agent **must** pin

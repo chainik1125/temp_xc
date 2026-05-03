@@ -98,6 +98,50 @@ def load_datasource(name: str) -> DataSourceSpec:
     return DataSourceSpec(**raw)
 
 
+def _resolve_class(class_path: str):
+    """Resolve a ``module.path:ClassName`` string to the actual class."""
+    import importlib
+    if ":" not in class_path:
+        raise ValueError(
+            f"class_path must be of the form 'module:Class', got {class_path!r}"
+        )
+    module_path, class_name = class_path.split(":", 1)
+    module = importlib.import_module(module_path)
+    cls = getattr(module, class_name, None)
+    if cls is None:
+        raise ImportError(
+            f"Module {module_path!r} has no attribute {class_name!r}. "
+            f"Check that {class_path!r} matches the class definition."
+        )
+    return cls
+
+
+def instantiate_arch(spec: ArchSpec, *, d_in: int):
+    """Build the architecture from a yaml spec + datasource ``d_in``.
+
+    This is the canonical pathway from ``configs/locked_archs.yaml`` to
+    a concrete :class:`temp_bench.architectures.base.TempBenchArch`
+    instance. Components do NOT call class constructors directly; they
+    use this helper so that:
+
+    1. ``per_component_hparams`` overrides are merged exactly once
+       (via :func:`load_arch`).
+    2. The class file is the single source of truth — adding a component
+       does not require touching the class.
+    3. ``d_in`` flows in from the datasource, not the YAML — so switching
+       Gemma → Llama doesn't need YAML edits beyond the datasource.
+
+    Example::
+
+        spec = load_arch("txc_base", component="c7")     # merges c7 d_sae=32768
+        ds = load_datasource("llama_3_1_8b_base_l10_ward")
+        d_in = 4096   # from the datasource (real-LM) or generator (toy)
+        model = instantiate_arch(spec, d_in=d_in)
+    """
+    cls = _resolve_class(spec.class_path)
+    return cls(d_in=d_in, **spec.hparams)
+
+
 # ── Cache-key computation ────────────────────────────────────────────────
 
 

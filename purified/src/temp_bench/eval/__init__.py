@@ -18,3 +18,4 @@ Parallelism contract (all eval modules):
 """
 
 from temp_bench.eval.case_study import CaseStudy  # noqa: F401
+from temp_bench.eval import qualitative, probing, steering, synthetic  # noqa: F401
