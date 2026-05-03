@@ -1,78 +1,73 @@
-"""Steering evaluation — C5 (RLHF sentiment, T-SAE paper § 4.4).
+"""Steering evaluation — C5 (RLHF sentiment, T-SAE paper § 4.5 + B.2).
 
-Per-token decoder-row addition at the residual stream, two steering
-protocols:
+Public API for the C5 case study. The implementation lives in
+:mod:`temp_bench.case_studies.steering` (one file, single source of
+truth) — this module re-exports the user-facing types so callers
+import them by their evaluation purpose:
 
-- **V7 tiled-broadcast** — stride-T blocks, single uniform δ per block.
-  Default for arch-uniformity.
-- **PP per-position** — fallback when V7 breaks an arch (TXC-pro's
-  subseq encoder + multi-distance contrastive may not survive V7;
-  agent_steer pre-tests at coh threshold 2.0 before locking V7).
+    from temp_bench.eval import steering
+    cs = steering.SteeringCaseStudy(workspace=Path("results/runs/<eval_key>"))
+    cs.setup()
+    result = cs.evaluate(arch=my_arch, seed=42)
+    metrics = result.metrics                # success_at_coh_<tau>, …
 
-Judge: Gemini, two heads (coherence, success). Judge calls go through
-``temp_bench.utils.judge_dispatch`` (not yet ported).
+Two protocols, dispatched by :class:`SteeringConfig.protocol`:
 
-Public API (worker fills in):
+- **V7 tiled-broadcast** — non-overlapping T-blocks, single uniform δ
+  per block. Default for arch-uniformity.
+- **PP per-position** — sliding T-window stride 1, full per-position
+  delta written and averaged at overlaps. Fallback when V7 produces a
+  degenerate success rate (e.g., subseq-encoder + multi-distance
+  contrastive); see :meth:`SteeringCaseStudy.pre_test_v7`.
 
-- :func:`steer_v7_tiled(model, prompts, magnitude, T_block) -> list[str]`
-- :func:`steer_pp(model, prompts, magnitude_per_pos) -> list[str]`
-- :func:`coh_success_curve(model, prompts, judge, magnitudes) -> dict`
+Judge: Sonnet 4.6 (default) for the paper's two heads (success,
+coherence) on a 0–3 scale. Every call is persisted to
+``judge_outputs.jsonl`` for post-deadline Cohen's κ validation —
+:class:`SonnetSteeringJudge` enforces this.
+
+The metrics returned to ``run_cell`` are flat
+``dict[str, float]`` — see :func:`flatten_metrics` in
+:mod:`temp_bench.case_studies.steering`. Aggregate (3-seed mean ±
+stderr) lives in ``experiments/c5_steering/analysis.py``.
 """
 
 from __future__ import annotations
 
-from typing import Any
-
-from temp_bench.architectures.base import TempBenchArch
-
-
-def steer_v7_tiled(
-    model: TempBenchArch,
-    *,
-    prompts: list[str],
-    feature_idx: int,
-    magnitude: float,
-    T_block: int | None = None,
-) -> list[str]:
-    """V7 tiled-broadcast steering. Returns generated continuations.
-
-    TODO — port from
-    ``origin/han-phase7-unification:src/case_studies/steering_v7.py``.
-    """
-    raise NotImplementedError(
-        "steer_v7_tiled — port from Phase 7 unified-pareto steering pipeline."
-    )
+from temp_bench.case_studies.steering import (  # noqa: F401
+    ANCHOR_LAYER,
+    CONCEPTS,
+    DEFAULT_COH_THRESHOLDS,
+    DEFAULT_STRENGTHS,
+    SUBJECT_MODEL,
+    FeatureSelection,
+    Generation,
+    Grade,
+    SonnetSteeringJudge,
+    SteeringCaseStudy,
+    SteeringConfig,
+    coh_success_curves,
+    flatten_metrics,
+    generate_steered_continuations,
+    get_concept,
+    select_best_features,
+)
 
 
-def steer_pp(
-    model: TempBenchArch,
-    *,
-    prompts: list[str],
-    feature_idx: int,
-    magnitude_per_pos: list[float],
-) -> list[str]:
-    """Per-position steering (fallback when V7 breaks an arch). TODO."""
-    raise NotImplementedError("steer_pp — port from Phase 5 steering baseline.")
-
-
-def coh_success_curve(
-    model: TempBenchArch,
-    *,
-    prompts: list[str],
-    judge,
-    feature_idx: int,
-    magnitudes: list[float],
-    coh_thresholds: tuple[float, ...] = (1.5, 1.75, 2.0, 2.25, 2.5),
-    protocol: str = "v7",
-) -> dict[str, list[float]]:
-    """Coherence-vs-success curve at multiple coherence thresholds.
-
-    Returns dict with ``"success_at_coh"`` (one list per threshold),
-    plus per-magnitude raw judge scores. The agent pre-tests V7 on
-    each arch (1 cell at coh threshold 2.0) before running the full
-    sweep — fall back to ``protocol='pp'`` if V7 produces degenerate
-    success rates.
-    """
-    raise NotImplementedError(
-        "coh_success_curve — port from Phase 7 unified-pareto steering."
-    )
+__all__ = [
+    "ANCHOR_LAYER",
+    "CONCEPTS",
+    "DEFAULT_COH_THRESHOLDS",
+    "DEFAULT_STRENGTHS",
+    "SUBJECT_MODEL",
+    "FeatureSelection",
+    "Generation",
+    "Grade",
+    "SonnetSteeringJudge",
+    "SteeringCaseStudy",
+    "SteeringConfig",
+    "coh_success_curves",
+    "flatten_metrics",
+    "generate_steered_continuations",
+    "get_concept",
+    "select_best_features",
+]

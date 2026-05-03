@@ -7,7 +7,7 @@ Section ownership rules: PROTOCOL.md § 14.
 
 ---
 agent: agent_steer
-last_state_update: 2026-05-03T22:00:00Z
+last_state_update: 2026-05-03T23:30:00Z
 component: c5
 ---
 
@@ -91,84 +91,190 @@ References:
 
 ## Current state (agent owns — overwrite at every compact)
 
-**Last verified: (not yet provisioned — wait for agent_nlp's cache)**
+**Last verified: 2026-05-03T23:30:00Z (first session, code-port complete)**
 
-- `git HEAD`: (set on first session)
-- Last leaderboard append: (none yet)
-- Last checkpoint saved: (none yet)
-- Active GPU lock(s): none
-- Recent decisions in scope: #1, #4, #6, #7
-- In flight: nothing (provisioning pending)
+- `git HEAD`: `d94dc17e` (origin/final, after `git pull --rebase`).
+- Local edits not yet committed: 4 new files + 1 rewritten stub
+  (see *What I just did* below; `git status` for the list).
+- Last leaderboard append: (none yet — gated on agent_nlp porting
+  the three archs `tsae_paper`, `txc_base`, `txc_pro`).
+- Last checkpoint saved: (none yet).
+- Active GPU lock(s): none.
+- Recent decisions in scope: #1 (two TXCs), #4 (cross-branch reads),
+  #6 (HF repos), #7 (Bricken off for C5).
+- In flight: code-port done (steering module + run.py + analysis.py
+  + 17 unit tests, all green); briefing update; pending Han review of
+  the open questions below before training cells.
+- **NOT blocked on agent_nlp's act-cache** — verified
+  ``act_cache_key=e4916bcae1881963`` is on HF
+  (``han1823123123/temp-bench-data``, shape ``[24000, 128, 2304]``
+  fp16, datasource ``gemma_2_2b_it_l13_fineweb_24k128``). Pulled
+  locally at ``results/act_cache/e4916bcae1881963/``.
 
 ## What I just did (agent owns — overwrite)
 
-(Empty — agent_steer not yet provisioned.)
+Newest first.
+
+- Wrote `tests/test_steering.py` — 17 unit tests covering V7 tile
+  layout + trailing-block overwrite, PP overlap-averaging, concept
+  set, `coh_success_curves` + `flatten_metrics` aggregation, feature
+  selection argmax. Full suite: 68 passed.
+- Wrote `experiments/c5_steering/run.py` — thin orchestration over
+  `runner.run_cell` for 3 archs × 3 seeds, with `--pre-test-only`
+  flag for the V7 health-check on TXC-pro per c5.md.
+- Wrote `experiments/c5_steering/analysis.py` — leaderboard query →
+  per-arch coh-vs-success curves with errorbars + AUTO-RESULTS
+  markdown (placeholder until cells run).
+- Rewrote `src/temp_bench/eval/steering.py` (was raise-NotImplemented
+  stub) → re-export wrapper for `case_studies.steering` public types.
+- Wrote `src/temp_bench/case_studies/steering.py` (~900 lines, single
+  file per the `case_studies/backtracking.py` convention). Ports V7
+  tiled-broadcast hook + PP fallback hook, 30-concept set verbatim
+  from phase7, paper-§B.2-verbatim grading prompts, Sonnet judge with
+  `judge_outputs.jsonl` persistence per CaseStudy contract, and
+  `SteeringCaseStudy(CaseStudy)`. Provenance lines in the docstring
+  cite specific phase7 file paths.
+- Read `papers/temporal_sae.md` § 4.4–4.5 + Appendix B.2 for the case
+  study spec; located phase7 implementation in
+  `origin/han-phase7-unification:experiments/phase7_unification/case_studies/steering/`.
+- Diagnosed `scripts/sync_from_hf.sh` failure: it calls
+  `huggingface-cli download …`, which is deprecated in
+  huggingface_hub 1.13. The CLI emits help text + exits without
+  downloading. Worked around with direct `hf download`.
+- Pre-flight: `set_agent_env.sh agent_steer` (GPU 0 / ephemeral),
+  smoke test green, `git pull --rebase` brought in c7 backtracking
+  artifacts, discarded a stale local downgrade of `datasets`
+  in `uv.lock`.
 
 ## Next action (agent owns — overwrite)
 
 **Pre-conditions (Han owns)**:
-- Han spawns this agent only **after** agent_nlp's Gemma-IT-L13 cache
-  is on HF (~T+3 hr). The agent should not be brought up before then.
-- Han ran `bash scripts/bootstrap_runpod.sh` on this pod (interactive
-  — prompts for tokens; an agent cannot enter input) AND
-  `bash /workspace/temp_xc/purified/scripts/add_agent_clone.sh agent_steer`
-  to create your own clone. Because this pod is ephemeral, Han re-runs
-  both whenever the pod is recreated. Tokens are in
-  `/workspace/.tokens/` and your venv is at
-  `/workspace/temp_xc_steer/purified/.venv/`. If the smoke test below
-  complains about missing tokens, **ping Han**.
+- Han ran `bash scripts/bootstrap_runpod.sh` on this pod (interactive)
+  AND `bash /workspace/temp_xc/purified/scripts/add_agent_clone.sh
+  agent_steer` to provision the second clone. Tokens are in
+  `/workspace/.tokens/` (`anthropic_key`, `hf_token`, `gh_token` —
+  no `gemini_key`; see Open Questions).
+- The smoke test confirms the venv + `e4916bcae1881963` act-cache.
 
-**Your clone path is `/workspace/temp_xc_steer/`** (NOT
-`/workspace/temp_xc/` — that's agent_back's primary clone). The
-separate clone exists so two agents on the same pod don't collide
-on `.git/index.lock` during pull-rebase. Tokens + HF cache are
-shared via `/workspace/.tokens/` and `/workspace/hf_cache/`.
+**On every fresh / `--continue` session:**
+1. `cd /workspace/temp_xc_steer/purified && source scripts/set_agent_env.sh agent_steer`
+2. `bash scripts/agent_smoke_test.sh`
+3. (Ephemeral pod restart only): re-pull act-cache via
+   `.venv/bin/hf download han1823123123/temp-bench-data --repo-type dataset --include "act_cache/e4916bcae1881963/**" --local-dir results`
+   (`scripts/sync_from_hf.sh` itself is broken — see Open Q #2).
+4. `git pull --rebase origin final`
+5. `.venv/bin/python -m pytest tests/test_steering.py -q` — sanity-check
+   the steering module after any pull.
 
-**Han launches you via `start_agent.sh`** (not bare `claude`):
-```
-bash /workspace/temp_xc_steer/purified/scripts/start_agent.sh agent_steer --fresh
-```
-Re-launches after disconnect drop the `--fresh` so the wrapper passes
-`--continue` to claude — you resume your session instead of re-reading
-the briefing. The wrapper sources `set_agent_env.sh` in Han's parent
-shell so the GPU pin / `AGENT_NAME` / pod mode (ephemeral) propagate
-into your process. Bash tool calls don't share shell state, so YOU
-sourcing the env in your first action is a no-op for subsequent
-commands.
+**Then continue from here:**
 
-1. `bash scripts/agent_smoke_test.sh` (verifies GPU pin etc.)
-2. `bash scripts/sync_from_hf.sh` (mandatory — ephemeral pod;
-   pulls agent_nlp's act-cache from `han1823123123/temp-bench-data`)
-3. `git pull --rebase origin final`
-4. Read `docs/components/c5.md` end-to-end and `papers/temporal_sae.md`
-   § 4.4 for the case study definition.
-5. Set up Gemini judge (coh + success heads). API key resolves via
-   `temp_bench.utils.tokens.get_token("gemini")` from
-   `/workspace/.tokens/`.
-6. Port `temp_bench.case_studies.steering` from
-   `origin/han-phase7-unification` (search experiments/ + src/ for
-   the V7 tiled-broadcast steering pipeline; cite phase7's
-   `unified-pareto.md` for context).
-7. Train T-SAE, TXC-base, TXC-pro on the cached acts (3 archs × 3
-   seeds = 9 cells). Use `runner.run_cell(...)` — schema validation
-   + auto-push to HF on save.
-8. **Pre-test V7 on TXC-pro**: 1 cell at coh threshold 2.0; if
-   success rate is degenerate, fall back to per-position (PP) and
-   document the switch in c5.md.
-9. Run V7 across 5 coherence thresholds {1.5, 1.75, 2.0, 2.25, 2.5} →
-   coh-vs-success curves.
+A. **Wait for / coordinate with agent_nlp** to finish porting
+   `tsae_paper`, `txc_base`, `txc_pro` arch classes
+   (`temp_bench.architectures.{tsae,txc_base,txc_pro}`). Until those
+   land, `experiments/c5_steering/run.py` will fail at
+   `instantiate_arch(...)` for any cell. The smoke test already
+   reports this as 8 *expected* gaps. Check progress with
+   `.venv/bin/python -c "from temp_bench.config import load_arch, instantiate_arch;
+   import importlib; m=importlib.import_module('temp_bench.architectures.tsae'); print(m)"`.
+
+B. Once one arch is up, **smoke-test a tiny cell**:
+   `TQDM_DISABLE=1 .venv/bin/python -m experiments.c5_steering.run --archs topk_sae --seeds 42 --n-concepts 3 --strengths 100 --pre-test-only`
+   (uses `topk_sae` since it IS ported, just to validate the
+   end-to-end path — won't be a paper cell because c5.md says only
+   T-SAE/TXC-base/TXC-pro). This will load Gemma-2-2b-IT (~5 GB
+   bf16) and call Sonnet (~$0.05). Verify `judge_outputs.jsonl`
+   appears under `results/runs/<eval_key>/`.
+
+C. **Pre-test V7 on TXC-pro** (per Hard Rule "fall back to PP if
+   degenerate"): once `txc_pro` arch + checkpoint are available,
+   `--pre-test-only --archs txc_pro`. Read `mean_coh` from
+   `results/runs/<eval_key>/_pre_test_v7/curves.json`. If ≤ 1.0 → use
+   `--protocol pp` for the full sweep and document in c5.md.
+
+D. **Full sweep**: `python -m experiments.c5_steering.run` with all
+   defaults. 3 archs × 3 seeds × 30 concepts × 9 strengths = 810
+   greedy generations × 2 judge calls = 1620 Sonnet calls per arch.
+   At 5 workers, ~5 min/arch judge time + ~5 min/arch generation =
+   ~15 min/arch + Sonnet cost ~$1.50/arch → ~$5 + 45 min total.
+
+E. After sweep: `.venv/bin/python -c "from temp_bench import report; report.render(component='c5')"` — rewrites
+   `docs/components/c5.md` AUTO-RESULTS block from the leaderboard.
 
 ## Don't repeat (agent owns — overwrite)
 
 - **Hill-climbing winners** — Galaxy 8/11/18, SoftMaxPool,
   ContrastiveMergeH8 are excluded by decision #1. If TXC-base and
   TXC-pro lose to T-SAE, the paper accepts that — don't chase.
-- **Skip the V7 pre-test** — TXC-pro's subseq + multi-distance
-  contrastive may not be V7-compatible.
+- **Skip the V7 pre-test** on TXC-pro — its subseq + multi-distance
+  contrastive may not be V7-compatible. `--pre-test-only` is
+  cheap (~1 min) and the c5.md hypothesis is contingent on it.
 - **Forget HF push on save** — ephemeral pod; checkpoint loss = run loss.
-- **Rebuild the act-cache** — agent_nlp built it; pull from HF.
-- **Wasteland imports** — `git show` only.
+  The runner's `cache.save_checkpoint` auto-pushes when
+  `TEMP_BENCH_POD_MODE=ephemeral`; verify after first cell.
+- **Rebuild the act-cache** — already on HF (`e4916bcae1881963`).
+- **Wasteland imports** — `git show origin/han-phase7-unification:…`
+  only; never `import experiments.phase7_unification…`.
+- **Hand-edit `docs/components/c5.md` AUTO-RESULTS** — that block is
+  owned by `experiments/c5_steering/analysis.py` + `temp_bench.report.render`.
+- **Use `huggingface-cli download`** — deprecated; use `hf download`.
+  See Open Q #2.
+- **Touch `scripts/sync_from_hf.sh`** even though it's broken — it's
+  shared infra; surface to Han instead of patching unilaterally.
+- **Touch `temp_bench/utils/tokens.py`** to add a `gemini` slot — same
+  rationale (shared infra). See Open Q #1.
 
 ## Open questions for Han (agent owns — overwrite)
 
-(none at provisioning.)
+1. **Judge: Gemini or Sonnet?** This briefing + `eval/case_study.py`
+   docstring say "Gemini for C5, Sonnet for C7". But:
+   - `temp_bench/utils/tokens.py` only knows `hf`/`anthropic`/`gh`
+     — there's no `gemini` slot. `get_token('gemini')` would raise
+     `ValueError`.
+   - `/workspace/.tokens/` has `anthropic_key`/`hf_token`/`gh_token`,
+     no Gemini key.
+   - Phase 7's `grade_with_sonnet.py` uses Sonnet 4.6.
+   - `case_studies/backtracking.py` (already merged) uses Sonnet 4.6
+     and the same paper-§B.2-verbatim 0–3 grading rubric.
+
+   **Decision I made (please confirm or correct)**: I implemented the
+   judge as `SonnetSteeringJudge` using `claude-sonnet-4-6` and
+   `temp_bench.utils.tokens.get_token('anthropic')`. Swapping to
+   Gemini later is mechanical — it's a single class swap, the prompts
+   + persistence schema stay identical (the `judge_id` /
+   `judge_model` fields in `judge_outputs.jsonl` make the choice
+   audit-able). If you want Gemini, I need:
+   - a `gemini_key` file under `/workspace/.tokens/`,
+   - one extra entry in `tokens.py::_FILENAMES` + `_ENV_VARS`,
+   - and a `GeminiSteeringJudge` class I can write in
+     `case_studies/steering.py`.
+
+2. **`scripts/sync_from_hf.sh` is broken** — it shells out to
+   `huggingface-cli download`, which `huggingface_hub` 1.13.0
+   deprecated and now exits with help text. Fix is one line:
+   `huggingface-cli download` → `hf download` (args identical:
+   `--repo-type` / `--type`, `--include`, `--local-dir` all work).
+   I've worked around it with direct `hf download` calls. **Could
+   you (or agent_paper) land the one-line fix?** I haven't edited it
+   because `scripts/` is shared infra used by every agent.
+
+3. **Subject model + layer**: `c5.md` and the briefing say
+   Gemma-2-2b-IT L13 (matches the `gemma_2_2b_it_l13_fineweb_24k128`
+   datasource). Phase 7 uses Gemma-2-2b BASE L12 (per `_paths.py`).
+   T-SAE paper § B.2 uses base/L12 too. **I've gone with IT/L13** for
+   consistency with C3/C4. Worth confirming this is the agreed
+   decision and not a typo in the c5.md hypothesis. Reviewers may
+   ask "why not the same as the paper" — c5.md doesn't yet answer
+   that.
+
+4. **`run_cell` doesn't thread `eval_key` to `eval_fn`** — the case
+   study needs to write `generations.jsonl`, `grades.jsonl`,
+   `judge_outputs.jsonl`, `feature_selection.json` to
+   `run_dir(eval_key)`. I worked around by recomputing `eval_key` in
+   `run.py` and passing the workspace via `eval_cfg["_workspace"]`.
+   This works (deterministic hash) but feels like a missing
+   primitive. Worth a small framework PR by agent_paper to pass
+   `_eval_key`/`_workspace` in the runner's `enriched_cfg`. Not
+   urgent for me.
+
+5. **C5 gen + judge cost / time budget**: full sweep at defaults is
+   ~$5 + ~45 min Sonnet calls. Confirm OK before I kick it off.
