@@ -60,40 +60,49 @@ porting is fine.
 | `purified/results/leaderboard.jsonl` | All | **Append-only**; use `flock` |
 | `purified/checkpoints/manifest.jsonl` | All | **Append-only**; use `flock` |
 
-## 4. Run-id contract
+## 4. Cache-key contract (replaces the old run_id pattern)
 
-`run_id = <component>_<arch>_<seed>_<short_hash>`
+The framework computes deterministic cache keys for you. **Do not
+allocate run-ids manually.** Three keys, all 16-hex-char SHA-256 prefixes:
 
-- `<component>` ∈ {c1, c2, ..., c7}
-- `<arch>` ∈ {topk_sae, tsae, txc_base, txc_pro, ...}
-- `<seed>` is the rng seed (int)
-- `<short_hash>` is `secrets.token_hex(4)` (8 hex chars)
+- `act_cache_key` — `(subject_model, layer, hookpoint, dataset, n_seqs, seq_len, tokenizer_revision)`
+- `train_key` — `(arch_class, arch_version, hparams, seed, training_cfg, act_cache_key)`
+- `eval_key` — `(train_key, eval_protocol_version, eval_cfg)`
 
-Compute the run_id **before** kicking off training/eval; pass it through
-every artifact (ckpt filename, plot dir, leaderboard row).
+The framework guarantees:
+- Same inputs → same key → cache hit (re-run is safe + idempotent).
+- Bumping `arch_version` invalidates `train_key` (forces retrain).
+- Bumping `EVAL_PROTOCOL_VERSION` invalidates `eval_key` (forces re-eval, retains training).
+
+See `docs/paper/framework.md` for the full design.
 
 ## 5. Two-TXC discipline
 
 - **TXC-base** = `txc_bare_antidead_t5`. Implementation lives in
-  `src/temp_bench/architectures/txc_base.py`.
+  `src/temp_bench/architectures/txc_base.py`. Registered in
+  `configs/locked_archs.yaml` as `txc_base`.
 - **TXC-pro** = `phase5b_subseq_h8`. Implementation in
-  `src/temp_bench/architectures/txc_pro.py`.
+  `src/temp_bench/architectures/txc_pro.py`. Registered as `txc_pro`.
 
-Free parameters per component: `k_pos` (sparsity), `d_sae` (dict size),
-`d_in` and `T_max` (forced by data). Everything else is fixed.
+Hyperparameters live in `configs/locked_archs.yaml` only — never as
+constants in `.py` files. A component may override a hyperparameter via
+the `per_component_hparams` map in the yaml entry (e.g., a different
+`d_sae` for C6's 14B-organism cells).
 
-If you find yourself wanting to change architectural hyperparameters,
-**stop and post to `docs/components/cN.md` first**. Justify it. The paper
-makes a "two architectures everywhere" claim that breaks if any component
-silently drifts.
+If you find yourself wanting to change the architecture's structure
+(not just hparams), **stop and post to `docs/components/cN.md` first**.
+Justify it. The paper makes a "two architectures everywhere" claim
+that breaks if any component silently drifts.
 
 **Per-experiment training knobs** (e.g., Bricken resample, mixed
 precision) are allowed if you disclose them in `docs/components/cN.md`
 and either (a) cite prior evidence supporting them on a comparable
 setup, or (b) run an A/B at small scale and report the verdict. These
 are training-time augmentations that do not change the architecture's
-mathematical identity. See `docs/paper/architecture.md` § *Per-experiment
-training knobs* for the full opt-in table.
+mathematical identity. They flow through `TrainingConfig` (different
+config → different `train_key` → separate cache entries, both kept).
+See `docs/paper/architecture.md` § *Per-experiment training knobs* for
+the full opt-in table.
 
 ## 6. Baselines (also locked)
 
@@ -156,6 +165,29 @@ Stop and write to your agent log if:
 - An architecture's training crashes silently (NaN, dead-feature collapse).
 - A baseline number contradicts a published paper by more than 0.05 AUC.
 - You're tempted to introduce a third TXC variant. (Don't.)
+
+## 11. Framework discipline (load-bearing — do not deviate)
+
+These rules exist because a 72-hour, 7-component, 5-agent paper cannot
+absorb framework friction. Read `docs/paper/framework.md` for the full
+rationale.
+
+1. **Hyperparameters in YAML, not code.** Edit
+   `configs/locked_archs.yaml` and `configs/datasources.yaml`. Never
+   hard-code `d_sae=18432` or `subject_model="gemma-2-2b-it"` in a `.py`.
+2. **Datasources are named, not constants.** Each component declares
+   `DATASOURCE = "<name>"` referencing `configs/datasources.yaml`.
+3. **Use `runner.run_cell` for every cell.** It is the only path that
+   appends to `leaderboard.jsonl`. Schema validation is mandatory.
+4. **Bump `arch_version` to invalidate trained checkpoints.** Don't
+   delete `.safetensors` files manually; the cache contract relies on
+   keys, not file lifetimes.
+5. **Bump `EVAL_PROTOCOL_VERSION` to invalidate eval results.**
+6. **Add an arch = yaml entry + class file.** Nothing else. If you
+   need to touch a component's runner, you've found a framework bug.
+7. **Add a component = copy `experiments/_runner_template.py` + set
+   `EVAL_PROTOCOL_VERSION` and `DATASOURCE`**. The eval logic goes in
+   `src/temp_bench/eval/<name>.py`, not in the runner script.
 
 ## 10. Paper agent (orchestrator)
 

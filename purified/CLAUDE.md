@@ -40,40 +40,63 @@ is the "wasteland" — read it for context, never import or modify it.
 
 ## How to record results
 
-- Pick a run id: `<component>_<arch>_<seed>_<short-hash>` where short-hash
-  is `python -c "import secrets; print(secrets.token_hex(4))"`.
-- Write outputs to `results/runs/<run_id>/`:
-  - `manifest.json` — config, command, host, start time
-  - `metrics.json` — final numbers
-  - `plots/*.png` + `plots/*.thumb.png` (use `temp_bench.plotting.save_figure`)
-  - `log.txt` — stdout/stderr
-- When done, append one line to `results/leaderboard.jsonl`:
-  ```json
-  {"run_id": "...", "component": "c3", "arch": "txc_bare_antidead_t5",
-   "seed": 42, "k": 20, "metric": "probing_auc_S32", "value": 0.9127,
-   "ckpt_hf": "chainik1125/temp-bench/<run_id>",
-   "agent": "agent_nlp", "ts": "2026-05-03T12:00:00Z"}
-  ```
-  Use `flock` if scripting concurrent appends.
+**Use `temp_bench.runner.run_cell`. Don't write your own caching or
+leaderboard logic.** See `docs/paper/framework.md` for the design.
+
+```python
+from temp_bench import runner
+from temp_bench.schemas import TrainingConfig
+
+result = runner.run_cell(
+    component="c3",
+    arch_name="txc_base",
+    seed=42,
+    datasource_name="gemma_2_2b_it_l13_fineweb_24k128",
+    training_cfg=TrainingConfig(),       # or override fields
+    eval_cfg={"k_feat": 20, "S": 32},
+    eval_protocol_version="1.0.0",       # bump on metric change
+    train_fn=my_train_fn,                 # in temp_bench.training
+    eval_fn=my_eval_fn,                   # in temp_bench.eval.probing
+)
+# result.eval_key, result.train_key, result.cached
+```
+
+The runner:
+- Computes deterministic ``train_key`` and ``eval_key`` from inputs.
+- Skips training if a checkpoint with that ``train_key`` exists.
+- Skips evaluation if that ``eval_key`` is in ``leaderboard.jsonl``.
+- Saves the trained checkpoint, run-dir metrics, and one validated row
+  in the leaderboard. Schema-rejected rows abort the cell.
+
+A run-dir is created at ``results/runs/<eval_key>/`` containing
+``metrics.json`` and any plots (``plots/*.png`` + ``*.thumb.png``,
+saved via ``temp_bench.plotting.save_figure``).
 
 ## How to record checkpoints
 
-- Upload model checkpoints to **`han1823123123/temp-bench-models`** (private),
-  under a `<run_id>/` prefix.
-- Upload activation caches / judge transcripts / synthetic data to
-  **`han1823123123/temp-bench-data`** (private dataset repo).
-- Append one line to `checkpoints/manifest.jsonl`:
-  ```json
-  {"run_id": "...",
-   "hf_url": "https://huggingface.co/han1823123123/temp-bench-models/tree/main/<run_id>",
-   "local_path": "/workspace/.../<run_id>/model.safetensors",
-   "size_mb": 412,
-   "ts": "2026-05-03T..."}
-  ```
-- Local-only checkpoints are allowed during development but must be HF-backed
-  before the agent finishes its session.
+The runner already saves the trained checkpoint to
+``checkpoints/<train_key>/`` and appends a validated row to
+``checkpoints/manifest.jsonl``. Your only extra step is HF backup at
+session end:
 
-See `checkpoints/README.md` for the upload helper recipe.
+```python
+from huggingface_hub import HfApi
+from temp_bench.config import checkpoint_dir
+
+train_key = result.train_key
+HfApi().upload_folder(
+    folder_path=str(checkpoint_dir(train_key)),
+    path_in_repo=train_key,
+    repo_id="han1823123123/temp-bench-models",
+    repo_type="model",
+)
+```
+
+Both repos are private:
+- `han1823123123/temp-bench-models` — checkpoints, keyed by ``<train_key>``
+- `han1823123123/temp-bench-data` — activation caches, judge transcripts
+
+See `checkpoints/README.md` for the full helper recipe.
 
 ## Markdown style
 
@@ -86,11 +109,14 @@ blocks with language, YAML frontmatter (author/date/tags) on `docs/`.
 # bootstrap (RunPod, idempotent)
 cd /workspace/temp_xc/purified && bash scripts/bootstrap_runpod.sh
 
-# run any python in purified env
+# verify environment + run tests + preflight
+cd purified && bash scripts/agent_smoke_test.sh
+
+# run any component (idempotent — safe to re-run)
 cd purified && TQDM_DISABLE=1 .venv/bin/python -m experiments.c1_synthetic_topk.run
 
-# append a leaderboard row
-python -c "import json,fcntl,sys; row={...}; \
-  f=open('results/leaderboard.jsonl','a'); fcntl.flock(f,fcntl.LOCK_EX); \
-  f.write(json.dumps(row)+'\n'); f.flush(); fcntl.flock(f,fcntl.LOCK_UN)"
+# add a new architecture
+# 1. drop a class in src/temp_bench/architectures/<name>.py
+# 2. add an entry to configs/locked_archs.yaml
+# 3. re-run any component — only the new arch's cells compute
 ```

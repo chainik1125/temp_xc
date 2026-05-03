@@ -1,0 +1,109 @@
+# Data-source registry.
+#
+# A "datasource" describes (subject_model, layer, hookpoint, dataset, n_seqs,
+# seq_len, tokenizer_revision) — everything that feeds into act_cache_key.
+#
+# Adding a datasource = add one entry here. Components reference datasources
+# by name in their experiments/cN/run.py file. Switching IT → BASE means
+# changing the DATASOURCE constant in the component's runner; nothing else
+# is rewired.
+#
+# act_cache_key = sha256(canonical_json({
+#     subject_model, layer, hookpoint, dataset, n_seqs, seq_len,
+#     tokenizer_revision
+# }))[:16]
+#
+# Toy/synthetic datasources have category=synthetic and the seed for the
+# generator IS part of training_cfg, not the act_cache_key (so different
+# seeds reuse the same "data spec" but produce different sequences).
+
+datasources:
+
+  # ── Real-LM datasources ─────────────────────────────────────────────
+
+  gemma_2_2b_it_l13_fineweb_24k128:
+    category: real_lm
+    subject_model: google/gemma-2-2b-it
+    layer: 13
+    hookpoint: resid_post
+    dataset: fineweb
+    n_seqs: 24000
+    seq_len: 128
+    tokenizer_revision: main
+    notes: |
+      Phase 5 + Phase 6 anchor. C3, C4, C5 default. May port Phase 5's
+      already-cached version (`data/cached_activations/gemma-2-2b-it/
+      fineweb/resid_L13.npy` in the wasteland) at first build to save
+      ~3 H100-hours.
+
+  gemma_2_2b_base_l13_fineweb_24k128:
+    category: real_lm
+    subject_model: google/gemma-2-2b
+    layer: 13
+    hookpoint: resid_post
+    dataset: fineweb
+    n_seqs: 24000
+    seq_len: 128
+    tokenizer_revision: main
+    notes: "Phase 7 anchor. C3 stretch goal."
+
+  gemma_2_2b_base_l12_fineweb_24k128:
+    category: real_lm
+    subject_model: google/gemma-2-2b
+    layer: 12
+    hookpoint: resid_post
+    dataset: fineweb
+    n_seqs: 24000
+    seq_len: 128
+    tokenizer_revision: main
+    notes: "T-SAE paper anchor. Stretch goal — paper-fidelity setup."
+
+  qwen_2_5_14b_instruct_finance_l24_resid_post:
+    category: real_lm
+    subject_model: Qwen/Qwen2.5-14B-Instruct
+    layer: 24
+    hookpoint: resid_post
+    dataset: finance_em_prompts
+    n_seqs: 6000
+    seq_len: 128
+    tokenizer_revision: main
+    lora_adapter: ModelOrganismsForEM/Qwen2.5-14B-Instruct_R1_0_1_0_finance_extended_train
+    notes: "C6 R1 organism. d_model=5120. ~28 GB fp16 + LoRA."
+
+  gemma_2_2b_base_l10_backtracking:
+    category: real_lm
+    subject_model: google/gemma-2-2b
+    layer: 10
+    hookpoint: resid_post
+    dataset: ward_backtracking_traces
+    n_seqs: 8000
+    seq_len: 128
+    tokenizer_revision: main
+    notes: "C7 anchor. Aniket's Stage B layer-10 setup."
+
+  # ── Toy datasources ─────────────────────────────────────────────────
+
+  toy_markov_n20_d40:
+    category: synthetic
+    generator: temp_bench.data.toy:markov_chain_support
+    n_features: 20
+    d_in: 40
+    seq_len: 64
+    rho_levels: [0.0, 0.3, 0.5, 0.7, 0.9]   # 4 features per level
+    pi: 0.5
+    notes: "C1 default (Phase 2 Scheme C)."
+
+  toy_coupled_K10_M20_d256:
+    category: synthetic
+    generator: temp_bench.data.toy:coupled_hmm
+    K_hidden: 10
+    M_emissions: 20
+    n_parents: 2
+    d_in: 256
+    seq_len: 64
+    pi: 0.05
+    rho: 0.7
+    magnitude_dist: folded_normal
+    magnitude_mean: 1.0
+    magnitude_std: 0.15
+    notes: "C2 default (Phase 3 OR-gated coupled features)."

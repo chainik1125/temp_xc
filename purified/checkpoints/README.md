@@ -15,43 +15,49 @@ paper development; they flip to public when the draft stabilises.
 
 ## How to upload
 
-Every checkpoint goes to `temp-bench-models` under a `<run_id>/` prefix:
+The runner already saves the trained checkpoint to
+``checkpoints/<train_key>/`` and appends a validated row to
+``manifest.jsonl``. Your only step is HF backup:
 
 ```python
 from huggingface_hub import HfApi
-from temp_bench.utils import append_checkpoint
+from temp_bench.config import checkpoint_dir
 
-run_id = "c3_txc_base_42_a1b2c3d4"
+train_key = result.train_key   # from runner.run_cell return value
 HfApi().upload_folder(
-    folder_path=f"results/runs/{run_id}",
-    path_in_repo=run_id,
+    folder_path=str(checkpoint_dir(train_key)),
+    path_in_repo=train_key,
     repo_id="han1823123123/temp-bench-models",
     repo_type="model",
 )
-
-append_checkpoint(
-    run_id=run_id,
-    hf_url=f"https://huggingface.co/han1823123123/temp-bench-models/tree/main/{run_id}",
-    local_path=f"/workspace/.../{run_id}/model.safetensors",
-    size_mb=412,
-)
 ```
 
-Activation caches and judge transcripts go to `temp-bench-data` with a
-descriptive top-level prefix (e.g. `gemma2-2b-base-l13/`,
-`c7-judge-transcripts/`). Each subdirectory carries its own `manifest.json`
-explaining its contents.
+Activation caches and judge transcripts go to ``temp-bench-data`` with
+a descriptive top-level prefix (``act_cache_<key>/``,
+``c7-judge-transcripts/<run_id>/``). Each subdirectory carries its own
+``manifest.json`` explaining its contents.
 
 ## Manifest schema
 
+Validated by ``temp_bench.schemas.CheckpointManifest``:
+
 ```json
 {
-  "run_id": "c3_txc_base_42_a1b2c3d4",
-  "ts": "2026-05-03T14:30:00Z",
-  "hf_url": "https://huggingface.co/han1823123123/temp-bench-models/tree/main/c3_txc_base_42_a1b2c3d4",
-  "local_path": "/workspace/temp_xc/purified/results/runs/c3_txc_base_42_a1b2c3d4/model.safetensors",
-  "size_mb": 412
+  "schema_version": "1.0.0",
+  "train_key": "fedcba9876543210",
+  "act_cache_key": "0123456789abcdef",
+  "arch": "txc_base",
+  "arch_version": "1.0.0",
+  "seed": 42,
+  "datasource": "gemma_2_2b_it_l13_fineweb_24k128",
+  "training_cfg": {"n_steps": 30000, "batch_size": 256, ...},
+  "hf_url": "https://huggingface.co/han1823123123/temp-bench-models/tree/main/fedcba9876543210",
+  "local_path": "/workspace/temp_xc/purified/checkpoints/fedcba9876543210/model.safetensors",
+  "size_mb": 412.3,
+  "agent": "agent_nlp",
+  "ts": "2026-05-03T14:30:00Z"
 }
 ```
 
-Optional extra keys: `arch`, `seed`, `k_pos`, `d_sae`, `component`, `notes`.
+Schema-rejected rows are aborted at append time; the cache contract
+guarantees no malformed rows ever land in the file.

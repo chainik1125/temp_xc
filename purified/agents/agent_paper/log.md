@@ -111,3 +111,68 @@ Updated:
 - `src/temp_bench/training/bricken.py` — docstring clarifies opt-in
   status.
 - `agents/agent_paper/decisions.md` — added Decision #7.
+
+## 2026-05-03 — Day 0, framework day
+
+Han pushed back hard on modularity: the framework must make adding /
+removing architectures and switching layer/model essentially free, or
+it will bite us the day before deadline. Implemented the
+modularity-first design:
+
+**The contract** (`docs/paper/framework.md`):
+
+- 10 principles; 5 are hard rules in PROTOCOL.md § 11.
+- Configs as source of truth (`locked_archs.yaml`, `datasources.yaml`).
+- Two-tier deterministic cache: `act_cache_key` ⊃ `train_key` ⊃ `eval_key`.
+- Single canonical `runner.run_cell` — only writer to leaderboard.
+- Schema-checked rows (Pydantic) — malformed rows aborted at append time.
+- Per-component `EVAL_PROTOCOL_VERSION` constant for cheap re-eval.
+
+**Implementation** (~600 LoC, all tested):
+
+- `configs/locked_archs.yaml` — 8 archs registered with version + hparams
+- `configs/datasources.yaml` — 7 datasources (5 real-LM + 2 toy)
+- `src/temp_bench/schemas.py` — Pydantic `LeaderboardRow`,
+  `CheckpointManifest`, `TrainingConfig`, `ArchSpec`, `DataSourceSpec`
+- `src/temp_bench/config.py` — yaml loaders + cache-key computation
+  (`compute_act_cache_key`, `compute_train_key`, `compute_eval_key`)
+- `src/temp_bench/cache.py` — checkpoint save/load, leaderboard append
+  (flock-protected, schema-validated)
+- `src/temp_bench/runner.py` — `run_cell()`, `preflight()`, helpers
+- `experiments/_runner_template.py` — ~80-line copy-paste template
+  for new components
+
+**Tests** (23/23 passing):
+
+- `tests/test_cache_keys.py` — determinism, version-bump invalidation,
+  Bricken-toggle separates cache, dict-order invariance
+- `tests/test_schemas.py` — strict validation, brickenauxk_a8 recipe
+  serialises to a different config than the default
+- `tests/test_runner_idempotency.py` — call run_cell twice ⇒ second
+  call hits cache, no duplicate leaderboard row; force_eval re-runs
+  but force_train doesn't help if act_cache_key is the same; different
+  seed makes a separate cell
+
+**Walkthrough scenarios** (all in `framework.md`):
+
+- A: miracle TXC found 1 day before deadline → 1 yaml + 1 class, all
+  components consume it automatically, only the new arch's cells
+  compute (cached for everything else)
+- B: bug in TXC-pro encode → fix code + bump arch_version, only
+  TXC-pro re-trains
+- C: bug in C3 metric → fix in eval/probing.py + bump
+  EVAL_PROTOCOL_VERSION, all checkpoints reused
+- D: switch C3/C4/C5 IT → BASE → 1-line yaml change per component,
+  act-cache rebuilds once
+
+**Doc updates**:
+
+- `docs/paper/framework.md` — new (the principles)
+- `purified/CLAUDE.md` — replaced run-id pattern with run_cell example
+- `purified/PROTOCOL.md` — added § 11 framework discipline
+- `purified/checkpoints/README.md` — updated upload recipe
+- `scripts/agent_smoke_test.sh` — runs pytest + preflight on every session
+
+The smoke test now greenlights agents in ~15s. From here on, every
+cell that produces a paper number flows through `run_cell`. Nothing
+else is allowed to write to `leaderboard.jsonl`.

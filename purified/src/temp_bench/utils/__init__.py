@@ -1,4 +1,9 @@
-"""Cross-cutting helpers: run-ids, leaderboard append, seeding, device."""
+"""Cross-cutting helpers: seeding only.
 
-from temp_bench.utils.runs import make_run_id, append_leaderboard, append_checkpoint  # noqa: F401
+Run-id allocation, leaderboard append, and checkpoint manifest now live
+in :mod:`temp_bench.cache` (single canonical pathway, see
+``docs/paper/framework.md``). Cache-key computation lives in
+:mod:`temp_bench.config`.
+"""
+
 from temp_bench.utils.seed import set_seed  # noqa: F401

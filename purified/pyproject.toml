@@ -20,6 +20,8 @@ dependencies = [
     "anthropic>=0.39",
     "openai>=1.55",
     "pillow>=11",
+    "pyyaml>=6.0",
+    "pydantic>=2.9",
 ]
 
 [dependency-groups]
