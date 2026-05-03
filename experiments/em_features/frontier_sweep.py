@@ -65,7 +65,15 @@ MODEL_REGISTRY = {
 def parse_args():
     p = argparse.ArgumentParser()
     p.add_argument("--steerer", choices=["sae", "txc", "mlc", "custom_sae", "han", "tsae", "windowed_tsae", "vec"], required=True)
-    p.add_argument("--model", choices=list(MODEL_REGISTRY), default="qwen")
+    p.add_argument("--model", choices=list(MODEL_REGISTRY), default="qwen",
+                   help="Preset (qwen=Qwen2.5-7B medical, llama=Llama-3.2-3B medical). "
+                        "Ignored if --base_model AND --subject_model are both provided.")
+    p.add_argument("--base_model", default=None,
+                   help="Override MODEL_REGISTRY base (e.g., 'Qwen/Qwen2.5-14B-Instruct'). "
+                        "Symmetric to run_wang_procedure.py's --base_model.")
+    p.add_argument("--subject_model", default=None,
+                   help="Override MODEL_REGISTRY subject (PEFT adapter or full HF id). "
+                        "Symmetric to run_wang_procedure.py's --subject_model.")
     p.add_argument("--layer", type=int, required=True)
     p.add_argument("--features_json", type=Path, required=True,
                    help="JSON with top features (schema from run_find_misalignment_features*)")
@@ -232,10 +240,16 @@ def main():
     bundled = bundle(directions, feat_ids).to(torch.bfloat16)  # match model dtype downstream
     print(f"[frontier] bundled direction shape={tuple(bundled.shape)}  norm={float(bundled.norm()):.4f}", flush=True)
 
-    print(f"[frontier] loading subject model {MODEL_REGISTRY[args.model]['subject']}", flush=True)
+    if args.subject_model is not None and args.base_model is not None:
+        subject_id = args.subject_model
+        base_id = args.base_model
+    else:
+        subject_id = MODEL_REGISTRY[args.model]["subject"]
+        base_id = MODEL_REGISTRY[args.model]["base"]
+    print(f"[frontier] loading subject={subject_id} base={base_id}", flush=True)
     model, tok = load_model_and_tokenizer(
-        MODEL_REGISTRY[args.model]["subject"],
-        base_model_id=MODEL_REGISTRY[args.model]["base"],
+        subject_id,
+        base_model_id=base_id,
         torch_dtype=torch.bfloat16,
         device=args.device,
     )
@@ -253,7 +267,8 @@ def main():
     rows: list[dict] = []
     out = {"meta": {"steerer": args.steerer, "layer": args.layer, "k": args.k,
                     "feature_ids": feat_ids, "n_rollouts": args.n_rollouts,
-                    "alpha_grid": list(args.alpha_grid)}, "rows": rows}
+                    "alpha_grid": list(args.alpha_grid),
+                    "subject_model": subject_id, "base_model": base_id}, "rows": rows}
 
     for alpha in args.alpha_grid:
         tag = f"{args.steerer}_k{args.k}_alpha{alpha:+.2f}"
