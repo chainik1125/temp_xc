@@ -1,0 +1,28 @@
+{
+  "act_cache_key": "fb2a74be884e512a",
+  "agent": "agent_back",
+  "arch": "topk_sae",
+  "arch_version": "1.0.0",
+  "datasource": "llama_3_1_8b_base_l10_ward_nousmirror",
+  "saved_ts": "2026-05-03T22:17:31Z",
+  "seed": 42,
+  "train_key": "8f5e895c94f85e38",
+  "training_cfg": {
+    "batch_size": 64,
+    "bricken_enabled": false,
+    "bricken_max_resample_fraction": 0.5,
+    "bricken_min_fires": 1,
+    "bricken_n_check": 2048,
+    "bricken_resample_every": 500,
+    "dead_threshold_tokens": 10000000,
+    "ema_auxk_alpha": 0.03125,
+    "learning_rate": 0.0003,
+    "n_steps": 500,
+    "optimizer": "adam",
+    "plateau_early_stop": true,
+    "plateau_min_delta": 0.0001,
+    "plateau_patience": 5000,
+    "precision": "bf16",
+    "warmup_steps": 50
+  }
+}
