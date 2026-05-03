@@ -1,0 +1,20 @@
+{
+  "coherence": {
+    "raw_agreement": 0.85,
+    "cohens_kappa": 0.7489539748953975,
+    "n_disagree": 3,
+    "n_valid": 20
+  },
+  "backtracking_present": {
+    "raw_agreement": 0.95,
+    "cohens_kappa": 0.7727272727272725,
+    "n_disagree": 1,
+    "n_valid": 20
+  },
+  "looping_present": {
+    "raw_agreement": 1.0,
+    "cohens_kappa": 1.0,
+    "n_disagree": 0,
+    "n_valid": 20
+  }
+}

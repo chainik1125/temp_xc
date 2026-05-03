@@ -376,10 +376,17 @@ the artifacts landed.
 
 ## Known gaps / next steps
 
-- **Aniket judge κ validation pending**: 20-transcript blind sample is at
-  `results/.../judge_validation/blind_pairs.csv`. Aniket scores blind
-  (coherence 0–3, backtracking-present 0/1, looping-present 0/1), then
-  follow-up script computes Cohen's κ + raw agreement.
+- ~~**Aniket judge κ validation pending**~~ ✅ **shipped 2026-05-03.** 20
+  transcripts blind-scored by Aniket vs Sonnet 4.6 judge:
+  - **coherence**: raw agreement 0.85, Cohen's κ = 0.749 ✅ substantial
+  - **backtracking_present**: raw agreement 0.95, Cohen's κ = 0.773 ✅ substantial
+  - **looping_present**: raw agreement 1.00, Cohen's κ = 1.000 ✅ perfect
+  - All three fields above the targets (≥0.80 raw, ≥0.6 κ). Judge
+    validated for camera-ready. Disagreements: 3 borderline coherence
+    calls (1-point apart on the 0–3 scale) and 1 backtracking-present
+    edge case where Sonnet flagged a silent error correction in the
+    formal solution that Aniket called "inconsistency, not backtracking."
+  - Full report: `results/ward_backtracking_txc/judge_validation/kappa_report.md`.
 - **TSAE-paper 30k retrain in flight** — was undertrained at the 15k cap
   (didn't plateau); refresh script will overwrite the TSAE row in the
   hygiene table + the TSAE line in the headline + flip-matrix + detection
