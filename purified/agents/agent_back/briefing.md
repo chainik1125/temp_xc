@@ -7,7 +7,7 @@ Section ownership rules: PROTOCOL.md § 14.
 
 ---
 agent: agent_back
-last_state_update: 2026-05-03T23:30:00Z
+last_state_update: 2026-05-04T00:30:00Z
 component: c7
 ---
 
@@ -124,64 +124,88 @@ References:
 
 ## Current state (agent owns — overwrite at every compact)
 
-**Last verified: 2026-05-03T23:30:00Z**
+**Last verified: 2026-05-04T00:30:00Z**
 
 - Clone: `/workspace/temp_xc/` (correct primary clone for agent_back).
 - Env: `set_agent_env.sh agent_back` → CUDA_VISIBLE_DEVICES=1,
   TEMP_BENCH_POD_MODE=ephemeral. Smoke test: 51 passed.
-- `git HEAD`: post-Stage-A-port + case_studies.backtracking commit
-  (see `git log --oneline -5`).
+- `git HEAD`: see `git log --oneline -5`. Last push includes
+  case_studies.backtracking + experiments/c7_backtracking +
+  data/nlp/ward.py.
 - Git remote auth: token-encoded via gh PAT in
   `/workspace/.tokens/gh_token`.
-- Last leaderboard append: none yet.
+- **Activation cache (Llama BASE L10)**: BUILT + PUSHED ✓ at
+  `results/act_cache/fb2a74be884e512a/resid_post_L10.npy`
+  (4.24 GB float16, shape (4044, 128, 4096), sample norm 7.289,
+  finite=True). Auto-pushed to HF temp-bench-data.
+- **Sentence-acts extraction (mining + PR-AUC prereq)**: IN FLIGHT
+  in background (PID 9356, started ~22:11). Will produce
+  `results/c7_backtracking/stage_a/sentence_acts_L10.npz` with
+  ~25K sentences × 6 (T) × 4096 fp32. ~30 min ETA.
+- **Arches available** (3 of 7): topk_sae, tsae_paper, txc_base —
+  all instantiate cleanly at d_sae=32768 (268M / 268M / 1.34B
+  params respectively). Still gated on agent_paper: stacked_sae,
+  tfa, tfa_pos, mlc, sae_arditi, txc_pro.
+- **Pipeline smoke-tested**: 50-step train on topk_sae succeeded
+  (loss values stabilising, state_dict keys correct). Eval pipeline
+  is ready except needs sentence-acts extraction to finish.
+- Last leaderboard append: none yet (no full cells run).
 - Last checkpoint saved: none yet.
-- Active GPU lock(s): none.
+- Active GPU lock(s): GPU 1 implicit (sentence-acts extraction).
 - Recent decisions in scope: #1, #4, #6, #7.
-- In flight: human-paused mid-port. Resume at task #5/#7.
+- In flight: sentence-acts extraction (~30 min); will then smoke-test
+  full eval cell on topk_sae × seed=42 × cohort × small mag grid.
 
 ## What I just did (agent owns — overwrite)
 
-1. Provisioning: `set_agent_env.sh agent_back` + `agent_smoke_test.sh`
-   (51 passed; preflight notes 8 expected arch-import gaps — agent_paper
-   territory; my arch-deps blocker noted in *Open questions* below).
-2. `sync_from_hf.sh` ran but produced no real downloads (HF repos
-   appear empty for now). Expected — nothing to pull yet.
-3. Read `docs/components/c7.md` end-to-end + Aniket's
-   `handoff_neurips_push.md`, `methodology_neurips_push.md`,
-   `results_b_neurips_push.md` (via `git show`).
-4. Inventoried `origin/aniket-ward-stage-b:experiments/ward_backtracking_txc/`
-   (architectures.py, b1/b2/b3, grade_backtracking, etc.).
-5. Confirmed datasource `llama_3_1_8b_base_l10_ward` and
-   `r1_distill_llama_8b_l10_traces` already in `configs/datasources.yaml`.
-6. Ported Stage A artifacts (6 files, 12 MB) from
-   `origin/aniket-ward-stage-b @ a62175ee:results/ward_backtracking/` →
-   `results/c7_backtracking/stage_a/` with `ATTRIBUTION.md`. **Note**:
-   these are the dom-vector / sentence-label traces (10 reasoning
-   categories), NOT a MATH-500 cohort. The truly-wrong/correct cohort
-   is built at run time from MATH-500 (Aniket's b3 phase-1 step).
-7. Ported Aniket's wasteland Stage B reference outputs (cut25 protocol,
-   5 files including `flip_matrix.parquet` + `summary.json`) to
-   `results/c7_backtracking/aniket_reference/cut25/` with
-   `ATTRIBUTION.md`. Use only for cohort qid lookup + cross-checking
-   `compute_delta_gc` against Aniket's headline +1.574.
-8. Wrote `src/temp_bench/case_studies/backtracking.py` with:
-   - `StageA`, `load_stage_a`, `Cohort`, `build_cohort` (cohort
-     builder needs proper MATH-500 GT lookup — current fallback drops
-     all 300 because Stage A traces have empty `answer` fields).
-   - Verbatim ports (with attribution): `SteeringHook`, `extract_boxed`,
-     `_strip_latex_to_plain`, `answers_match`.
-   - `cut25_token_position` helper.
-   - `SonnetBacktrackingJudge` async judge with mandatory
-     `judge_outputs.jsonl` persistence (judge_id, prompt_hash, raw kept
-     for audit; resumable via `existing_keys()`).
-   - `compute_delta_gc` (baseline-corrected per qid at mag=0).
-   - `compute_pr_auc_at_S` (sparse-probe PR-AUC, GroupKFold by qid).
-   - `BacktrackingCaseStudy(CaseStudy)` skeleton (setup loads Stage A
-     + cohort + judge; evaluate is a stub awaiting reasoning-model
-     loader / arch ports).
-9. Smoke test of the new module: imports clean; Stage A loads
-   (300 prompts/traces/labels + dom_vectors); `extract_boxed`,
-   `answers_match`, `cut25`, `parse_judge_reply` all pass.
+1. Provisioning + Stage-A port + cut25 reference port (commits
+   `e93acf2c`, `be47e886`).
+2. `case_studies/backtracking.py` skeleton (commit `be47e886`):
+   StageA / Cohort / SteeringHook / extract_boxed / answers_match /
+   cut25_token_position / SonnetBacktrackingJudge / compute_delta_gc
+   / compute_pr_auc_at_S / BacktrackingCaseStudy.
+3. C7 reasoning-LM pipeline (commit `c6abd159`, rebased onto
+   `02dd3e90`):
+   - `load_reasoning_lm` + `generate_unsteered` +
+     `generate_continuation_panels` (verbatim ports of Aniket's
+     R1-Distill-Llama helpers, with attribution).
+   - `run_phase1_unsteered` (cohort baseline cached at
+     workspace/phase1_unsteered.json; idempotent).
+   - `mine_top_features` (D+/D- selectivity on TempBenchArch.encode).
+   - `run_arch_evaluation` (top-level orchestrator: mine → steering
+     vector → cut25 × magnitude × cohort generation → judge → Δgc
+     + PR-AUC).
+   - `BacktrackingCaseStudy.evaluate` forwards to it.
+   - `load_cohort_from_parquet` + `load_math500_lookup` (skip
+     LM-discovery cohort phase by reading Aniket's parquet).
+4. `temp_bench.data.nlp.ward.py` (sibling to agent_paper's
+   `cache.py`): C7-specific corpus loader (Stage A traces) +
+   cache_activations with hookpoint-keyed memmap layout. Resolved
+   rebase conflict with agent_paper/agent_nlp's `__init__.py` by
+   adopting their canonical public API for the package and putting
+   my C7 path in `ward.py`.
+5. `configs/datasources.yaml`: added
+   `llama_3_1_8b_base_l10_ward_nousmirror` (NousResearch byte-
+   identical mirror) to bypass Meta's gated repo. Original entry
+   intact for paper-citation / future Han-license-acceptance.
+   Both updated to n_seqs=4044 (actual windows from Stage A traces).
+6. Built activation cache:
+   `results/act_cache/fb2a74be884e512a/resid_post_L10.npy` (4.24 GB
+   float16, shape (4044, 128, 4096)). Auto-pushed to HF
+   temp-bench-data. Loaded subject model from NousResearch mirror.
+7. `experiments/c7_backtracking/{run.py, analysis.py}` (commit
+   `c6abd159`): runner.run_cell loop over 7 archs × 3 seeds with
+   train_fn + eval_fn adapters; analysis.py reads leaderboard +
+   judge_outputs.jsonl, renders Δgc + PR-AUC tables + plots, falls
+   back to "no cells yet" placeholder.
+8. `extract_labeled_sentence_acts` (commit `bd97879b`): port of
+   Aniket's `_capture_windows`. Captures L10 residual activations
+   at offsets [-13..-8] BEFORE each labeled sentence start. Caches
+   to `results/c7_backtracking/stage_a/sentence_acts_L10.npz`. Now
+   running in background (PID 9356).
+9. End-to-end smoke test: 50-step training on topk_sae × seed=42 on
+   the act cache succeeded (state_dict keys present, loss values
+   stabilising). Pipeline is wired correctly.
 
 ## Next action (agent owns — overwrite)
 
@@ -212,64 +236,45 @@ GPU pin / `AGENT_NAME` / pod mode (ephemeral) propagate into your
 process. Bash tool calls don't share shell state, so YOU sourcing
 the env in your first action is a no-op for subsequent commands.
 
-**Resume context (2026-05-03 evening, paused mid-port for human break):**
+**Where I'm picking up next:**
 
-Provisioning + Stage-A port + reference port + module skeleton are
-DONE and pushed. The blocker that gates training is the missing arch
-implementations (see *Open questions*). Tasks that don't depend on
-the archs:
+Tasks #5 + #7 + #8 are complete in code; tasks #9-#12 are the
+training + eval + reporting cycle. agent_paper has shipped 3 of 7
+archs (topk_sae, tsae_paper, txc_base) — partial unblock. Remaining
+gaps: stacked_sae, tfa, tfa_pos, mlc, sae_arditi, txc_pro.
 
-A. **Finish `BacktrackingCaseStudy`** — wire `evaluate(arch, seed)`
-   to a shared helper `run_arch_evaluation(arch, seed, …)` that:
-   1. Loads R1-Distill-Llama-8B onto GPU 1 (one-time per session).
-   2. Runs unsteered MATH-500 phase-1 on cohort qids → cache to
-      `results/c7_backtracking/phase1_unsteered.json` (per-arch
-      independent → reusable across arches; only run once per pod).
-      Use Aniket's cohort qids from
-      `results/c7_backtracking/aniket_reference/cut25/flip_matrix.parquet`
-      to skip cohort discovery.
-   3. For each magnitude in `DEFAULT_MAGNITUDE_GRID` × cohort qid:
-      cut at `cut25_token_position`, attach `SteeringHook` to layer
-      10, generate continuation, persist judge call.
-   4. Returns metrics dict `{delta_gc_peak, delta_gc_peak_mag,
-      stability, pr_auc@S, ...}` keyed for the `CaseStudyResult`.
-B. **Update `build_cohort`** — current implementation drops all 300
-   because Stage A traces have empty `answer` fields. Switch to
-   reading qids from `aniket_reference/cut25/flip_matrix.parquet` as
-   the primary path; LM-evaluation fallback as a secondary path
-   that only runs if reference is missing.
-C. **Build `experiments/c7_backtracking/{run.py, analysis.py}`**
-   from `experiments/_runner_template.py` + `_analysis_template.py`.
-   `run.py`: thin loop over (arch ∈ 7, seed ∈ {1,2,42}) calling
-   `runner.run_cell(component="c7", …)`. `analysis.py`:
-   reads leaderboard.jsonl + judge_outputs.jsonl, computes Δgc table
-   + PR-AUC table + plots, then `report.render` rewrites c7.md
-   AUTO-RESULTS block.
-D. **Decide steering-vector source** — the SteeringHook needs a
-   `vec` (decoder direction). Aniket mined per-(arch, feature_id) by
-   sentence-mean-difference on the labeled D+/D- sets. We need to
-   port the mining helper or build one fresh. The candidate location
-   is `temp_bench.case_studies.backtracking.mine_top_features(model,
-   stage_a, top_k=32)` — owns mining feature ranking and vector
-   selection. Spec it in `c7.md` first since the choice affects
-   reproducibility.
-E. **Once arch ports land** (agent_paper):
-   1. `bash scripts/agent_smoke_test.sh` — preflight gaps drop to 0.
-   2. Build Llama-3.1-8B BASE L10 activation cache via
-      `temp_bench.data.nlp.cache_activations(...)` (port from
-      Aniket's `cache_activations.py`). 8000 seq × 128 tok →
-      ~2 GB fp16 on disk. `cache.save_activations` auto-pushes to
-      HF temp-bench-data on ephemeral pods.
-   3. Train 7 archs × 3 seeds via `runner.run_cell(...)` (cache hits
-      after the first seed make this fast).
-   4. Run inducement Δgc + detection PR-AUC sweep.
-   5. Run `temp_bench.report.render(component="c7")`.
+Immediate (when sentence_acts extraction finishes):
+
+A. **Smoke-test eval cell end-to-end** on topk_sae × seed=42 with a
+   small magnitude grid (e.g., `(0, -8, +8)`) — verifies:
+   - `_build_batch_iter` reads from `resid_post_L10.npy`
+   - train_sae produces a checkpoint
+   - eval_fn instantiates from state_dict
+   - mine_top_features picks a feature
+   - run_phase1_unsteered caches the cohort baseline
+   - generate_continuation_panels under SteeringHook works
+   - SonnetBacktrackingJudge persists 61 × 3 = 183 calls
+   - compute_delta_gc returns sensible numbers
+B. **If smoke passes, kick off the full sweep on the 3 available archs**:
+   - 3 archs × 3 seeds × 25 mags ≈ 5 hr wall-clock + ~$10 in Sonnet calls.
+   - Use --build-cache-only is not needed (cache already exists).
+   - `TQDM_DISABLE=1 .venv/bin/python -m experiments.c7_backtracking.run --archs topk_sae tsae_paper txc_base`
+C. **Once stacked_sae / tfa / mlc / txc_pro land** (agent_paper):
+   - Re-run `experiments.c7_backtracking.run` (cache-hit on the
+     3 already-trained arches; only the new ones train + eval).
+D. **Detection PR-AUC** is wired but conditional on
+   `eval_cfg["sentence_acts"]` being passed. Currently it's None;
+   need to pre-extract per-cohort sentence acts then thread through
+   `eval_cfg`. TODO: wire this in `experiments/c7_backtracking/run.py`.
+E. **Render**: `temp_bench.report.render(component="c7")` writes the
+   AUTO-RESULTS block in `docs/components/c7.md`. analysis.py is
+   ready; smoke tested.
 
 **Headline check**: TXC-pro peak Δgc reproduces ~+1.574 (Aniket's
-wasteland reference, hill-climbed TXC). Cross-check using
+wasteland reference, hill-climbed TXC). Cross-check via
 `results/c7_backtracking/aniket_reference/cut25/inducement_summary.csv`.
-If TXC-base/pro fall well short, document honestly in c7.md and adjust
-framing.
+TXC-pro arch is still gated; closest available analog is txc_base.
+If neither reproduces the lead, document honestly in c7.md.
 
 ## Don't repeat (agent owns — overwrite)
 
