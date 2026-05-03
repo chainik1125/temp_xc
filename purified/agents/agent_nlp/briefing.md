@@ -104,50 +104,96 @@ References:
 
 ## Current state (agent owns — overwrite at every compact)
 
-**Last verified: 2026-05-03T22:00Z (this session)**
+**Last verified: 2026-05-03T22:35Z (this autonomous-overnight session)**
 
-- `git HEAD`: 93dcaf9c (after rebase) — `final` branch
-- Last leaderboard append: 06afa68f259490a0 (smoke cell — topk_sae
-  seed=1 k_feat=5; AUC=0.477 on synthetic labels — pipeline-only
-  validation, not a paper number)
-- Last checkpoint saved: train_key 45124717553436e6 (topk_sae @ 200
-  steps on the FineWeb cache); also one for txc_base
-- Active GPU lock(s): none
+- `git HEAD`: ba92480c — `final` branch (rebased onto upstream
+  agent_back/agent_em commits incl 721cbbd5, 6154aab8)
+- Last leaderboard append: 1948488e5b127138 (smoke cell — txc_base
+  seed=1 k_feat=5; AUC=0.507 on synthetic labels). Plus the older
+  topk_sae smoke 06afa68f259490a0.
+- Last checkpoint saved: 86474a703b8af5eb (txc_base smoke); also
+  topk_sae smoke 45124717553436e6
+- Active GPU lock(s): none — running on pinned GPU 0 (H100). Probe
+  cache build is using GPU 0 in foreground via my_eval_fn pattern.
 - Recent decisions in scope: #1, #4, #6, #7, #11
-- In flight: nothing — pipeline shipped end-to-end, ready to extend
-  with real probe data
+- In flight: probe cache build (PID 17883, started 2026-05-03T22:28Z,
+  ETA ~8-10 min total). 23/38 tasks done as of last check.
 
 ## What I just did (agent owns — overwrite)
 
-End-to-end pipeline now shippable for C3. Status:
+End-to-end pipeline now shippable for C3 with **REAL probe data**:
 
-- ✅ Built `gemma_2_2b_it_l13_fineweb_24k128` activation cache
-  (24K seqs × 128 tok × 2304 d_in fp16 → 14.2 GB on H100 in ~2 min).
-  Pushed to `han1823123123/temp-bench-data/act_cache/e4916bcae1881963/`
-  — agent_steer can sync_from_hf and unblock.
-- ✅ `temp_bench.data.nlp.{build_activation_cache, batch_iter_from_act_cache}`
-  — clean port from wasteland (no wandb / sweep / CLI cruft).
-- ✅ `temp_bench.architectures.tsae.TSAEPaper` — faithful Ye et al.
-  port (matryoshka BatchTopK + AuxK + temporal contrastive + threshold
-  inference).
-- ✅ `temp_bench.architectures.txc_base.TXCBase` — vanilla TopK
-  temporal crosscoder + tsae_paper anti-dead stack.
-- ✅ `temp_bench.eval.probing.{mean_pool_probe, s_tail_probe, run_task_suite}`
-  — implementations replace upstream stubs. Per-token vs window
-  aggregation dispatched on `model.T`.
-- ✅ `experiments/c3_probing/run.py` — thin runner from the template.
-  Verified end-to-end in `--smoke` mode (synthetic probe labels) for
-  both per-token (topk_sae) and window (txc_base) archs. Idempotency
-  verified (cached re-runs hit `[CACHED]`).
-- 🟡 DEFERRED: `txc_pro` port — chain-inheritance is substantial
-  (`SubseqH8` → `TXCBareMultiDistanceContrastiveAntidead` → `TXCBareAntidead`).
-  Spec: subseq encoder + matryoshka H8 + multi-distance contrastive.
-  Source: `origin/han-phase7-unification @ 94119bc0:src/architectures/phase5b_subseq_sampling_txcdr.py`
-  (and the two parent files).
-- 🟡 DEFERRED: `mlc` port — MLC is a baseline, lower priority.
-- 🟡 DEFERRED: `probe_datasets.py` + `crosstoken_datasets.py` ports —
-  needed for REAL probing (not just smoke). Without them, the runner
-  only works in `--smoke` mode.
+- ✅ `temp_bench.data.nlp.probe_tasks` — 38-task SAEBench+CT loader
+  with all 3 SAEBench-faithfulness fixes (github-code via codeparrot
+  with post-iter language filter; amazon_sentiment 1+5 binaries;
+  amazon_categories non-streaming + shuffle for cat6). All 8 dataset
+  loaders smoke-tested individually. Hardcoded SAEBench class lists.
+- ✅ `temp_bench.data.nlp.probe_cache` — `build_probe_cache()` +
+  `load_probe_cache()` + `list_probe_cache()`. Per-task structure
+  is `(N, seq_len, d_in)` fp16 numpy arrays. Idempotent (eager-skips
+  tasks that already have all 4 .npy files). Reuses `_load_subject_model`
+  from `cache.py`.
+- ✅ `experiments/c3_probing/run.py::my_eval_fn` — replaced the
+  NotImplementedError branch with real probe-cache iteration.
+  Returns flattened per-task floats (`auc__<task>` × 38) PLUS
+  aggregates (`mean_auc`, `std_auc`, `mean_acc`, `std_acc`,
+  `n_tasks`). Primary metric switched to `mean_auc` for the
+  headline.
+- ✅ `experiments/c3_probing/analysis.py` — leaderboard query →
+  filter smoke → group by (arch, k_feat) → mean ± σ_seeds + mean
+  σ_tasks → markdown table + plots/auc_by_k.png + AUTO-RESULTS
+  rewrite. Verified rendering on the smoke-only state (correctly
+  shows placeholder).
+- 🟡 IN FLIGHT: full probe cache build (38 tasks). Process PID
+  17883, started 2026-05-03T22:28Z. ~8-10 min total ETA. As of
+  ~22:35Z: 23/38 tasks complete (all bias_in_bios + ag_news +
+  partial amazon_categories). Disk used so far: 35 GB; total expected
+  ~70-90 GB.
+
+Earlier session work (still relevant — no regressions):
+
+- ✅ Activation cache `gemma_2_2b_it_l13_fineweb_24k128` — pushed to
+  HF (`han1823123123/temp-bench-data/act_cache/e4916bcae1881963/`).
+- ✅ `temp_bench.architectures.{tsae, txc_base}` — both ported and
+  smoke-tested in --smoke mode.
+
+## Autonomous decisions made (Han: override anytime)
+
+While Han was AFK for the 10-hour overnight window:
+
+- **TrainingConfig for headline cells**: n_steps=10_000, batch_size=256,
+  lr=3e-4, warmup_steps=500, precision="bf16". Codified in
+  `experiments/c3_probing/run.py::_real_training_cfg`. Picked over
+  the schema default (30K steps × 256) so 18 cells fit in the 10-hour
+  window. Phase 7 reference used ~50K, but SAE convergence at 328M
+  tokens (10K × 256 × 128) is reliable per Ye et al. If headline
+  numbers come in low (≪0.85 mean_auc at k=20), bump to 30K.
+- **Per-task AUC reporting**: BOTH per-task floats `auc__<task>`
+  (38 keys) AND aggregates (`mean_auc`, `std_auc`, ...) emitted on
+  every leaderboard row. Per-task is for σ_tasks; aggregate is the
+  headline. Best-of-both-worlds; analysis.py uses both.
+- **Smoke leaderboard rows kept** (`eval_cfg.smoke=true` filter). Two
+  smoke rows on disk (eval_keys 06afa68f259490a0, 1948488e5b127138).
+  analysis.py filters them out cleanly.
+- **Bricken A/B for C3**: SKIPPED per decision #7 default. C3/C4/C5/C7
+  keep Bricken OFF. Revisit only if headline TXC-base undershoots
+  topk_sae by > 1% at k=5 — that would be the kind of dead-feature
+  symptom Bricken is designed to fix.
+- **MLC scope**: SKIPPED for headline. Lower priority per decisions
+  doc; appendix-only OK. Will not port mlc unless time permits at
+  end of session.
+- **txc_pro port**: DEFERRED. The 3-layer wasteland inheritance
+  (`SubseqH8` → `TXCBareMultiDistanceContrastiveAntidead` →
+  `TXCBareAntidead`) is substantial; risk of derailing the headline
+  run if started before cells complete. Will attempt at end of
+  session if cells finish with ≥ 1 hour to spare.
+
+## Pre-launch decisions for next session (Han may override)
+
+These were resolved autonomously this session — see "Autonomous
+decisions" above. All can be overridden by editing the constants in
+`experiments/c3_probing/run.py` or by re-running with `force_eval=True`
+to regenerate any cell with a new config.
 
 ## Next action (agent owns — overwrite)
 
@@ -308,25 +354,38 @@ Hard-won technical gotchas from this session (verify before bypassing):
 
 ## Open questions for Han (agent owns — overwrite)
 
-To resolve BEFORE running real cells:
+All questions from the previous session were resolved autonomously
+during the 10-hour overnight window — see "Autonomous decisions"
+above. Han can override any of them by:
+- editing `experiments/c3_probing/run.py::_real_training_cfg` for the
+  TrainingConfig
+- re-running with `force_eval=True` to regenerate cells under a new
+  config (n.b. changing config invalidates train_key OR eval_key)
+- editing analysis.py's filter rule to include/exclude smoke rows
 
-1. **`TrainingConfig` for the real cells.** I used 200 steps for the
-   smoke run; what should the headline cells use? Phase 7's
-   leaderboard reference numbers suggest these were ~50K steps;
-   confirm and I'll set `n_steps`, `batch_size`, `learning_rate`,
-   `warmup_steps`, `precision` explicitly in `run.py`.
-2. **Per-task AUC reporting.** `LeaderboardRow.metrics` is float-only,
-   so 38 per-task AUCs would mean 38 keys per row (e.g.
-   `auc__bias_in_bios_set1_prof11`). Or aggregate to mean ± std and
-   only emit those. Wasteland did per-task. Preference?
-3. **Smoke leaderboard row** (`eval_key=06afa68f259490a0`). Currently
-   committed with `eval_cfg.smoke=true` so analysis can filter. Keep
-   for traceability, or delete before real cells land?
+New open questions surfaced this session:
 
-Optional (can decide later):
+1. **Probe cache HF push.** Once the 38-task probe cache is built
+   (~70-90 GB), should we push it to `han1823123123/temp-bench-data`
+   (path `probe_cache/<datasource_name>/`)? Trade-off:
+   - PRO: agent_steer / agent_back can sync from HF instead of
+     re-tokenising 38 tasks; saves ~10 min per ephemeral pod.
+   - CON: 70-90 GB push at 256 MB/s = ~5-6 min one-time cost.
+   - Default if Han doesn't say: I'll push since the upload is one-time
+     and the saved time is per-pod-restart (likely several over the
+     remaining sprint).
 
-4. **Bricken A/B for C3** — decision #7 says C6-only by default,
-   revisit if time permits. I'd rather skip and ship the headline
-   first, then come back if C3 numbers feel weak. Confirm?
-5. **MLC scope** — `decisions.md` "Non-decisions" lists this as
-   open. Lower-priority for the headline; appendix-only OK?
+2. **What happens if mean_auc is far from Phase 7 reference?** Phase 7
+   leaderboard has `txc_bare_antidead_t5 k=20 = 0.9127` (BASE side).
+   We're on IT side (Phase 7 noted "IT side is entirely missing").
+   What's the threshold below which we should bump n_steps to 30K and
+   re-run, vs accept that IT-side numbers are just lower? My default:
+   if `mean_auc < 0.85` at k=20 across ALL 3 archs, that's a training
+   bug; bump n_steps. If only some archs lag, that's the headline finding.
+
+3. **C4 scope this session.** I'll start C4 (qualitative latents
+   port) only after C3 cells are in flight or completed. The C4 lead
+   architecture (TXC-pro) isn't ported yet — see autonomous decision
+   above. C4 with TopK-SAE / T-SAE only would still be useful. Han:
+   do you want me to ship C4 with the 3 archs we have, or wait for
+   txc_pro?
