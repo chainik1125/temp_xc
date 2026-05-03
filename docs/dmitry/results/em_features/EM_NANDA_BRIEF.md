@@ -10,6 +10,46 @@ tags:
 
 **You are an autonomous routine continuing from the dmitry-branch work.** Branch: `em-nanda`. AGENT_BRIEF.md (on dmitry) covers the prior Qwen-7B medical setup. This doc supersedes that for the Qwen-14B financial pivot.
 
+### Status as of 2026-05-03 01:00 UTC (paper-figure panel landed; all three plots in place; both GPUs idle)
+
+**This firing (01:00 UTC) actions:**
+
+- **Built `plots/em_nanda_arch_organism_alpha_table.png`** — grouped
+  bar chart of the closed 8-cell single-feat table (5 organism×α-regime
+  columns × 2 arches). Per-pair arch-gap deltas annotated above bars;
+  Qwen-7B medical-champion 58.47 dashed line for reference; per-bar
+  feat-id + α annotated vertically inside the bars. Pure matplotlib,
+  numbers hardcoded from the 00:00 UTC closed table for reproducibility.
+  Script: `experiments/em_features/plot_em_nanda_arch_organism_alpha.py`.
+- **Paper-figure asset bundle COMPLETE** (all three panels exist):
+  1. `plots/em_nanda_*frontier*.png` (existing R1 5k/10k/30k for both
+     arches, ±zoom variants).
+  2. `plots/em_nanda_step_count_trajectory.png` (existing, step-count
+     axis closed).
+  3. `plots/em_nanda_arch_organism_alpha_table.png` (NEW, this firing).
+- **Both GPUs idle at 01:00 UTC.** Per rule (6): no completions to act
+  on, but plotting was a non-compute objective from the 00:00 UTC
+  priority list, so this firing was productive without launching jobs.
+- **Disk note**: /root local at 92% used (60 GB free → 17 GB free over
+  the day; checkpoints accumulating). Worth audit if next firing wants
+  to launch a new SAE training. /workspace 30% used (141 GB free) —
+  fine. HF_HOME=/workspace/hf_cache holding.
+
+**Next firing priorities (likely 02:00 UTC)**:
+
+- **Optional R32 bundle frontier** (~30 min batched on one GPU) if both
+  GPUs remain idle — tests whether a k=30 bundle of wang_r32 finalists
+  lifts R32 align toward R1's mid-90s. Reuse existing
+  `…sae_arditi_step10000_wang_r32` outputs as the bundle-source pool.
+  Exploratory only, not paper-critical. Defer if a new objective
+  crystallizes.
+- **No new training/Wang launches** unless a new scientific question
+  crystallizes — single-feat axis is genuinely done, paper-figure
+  bundle is in place.
+- **/root disk audit** if launching anything new on local — at 92%
+  there's no headroom for new SAE checkpoints; route artifacts to
+  /workspace or clean stale runs first.
+
 ### Status as of 2026-05-03 00:00 UTC (TXC R32 ext-α DOES NOT clear 58.47 — single-feat × steps × arch × organism × α-regime table fully CLOSED across all 8 cells; SAE wins everywhere; pivot to paper-figure write-up)
 
 **This firing (00:00 UTC) actions:**

@@ -1415,3 +1415,59 @@ holding; /root not filling.
   load-bearing.
 - **No new training/Wang launches** unless a specific scientific
   question crystallizes. Single-feat axis is genuinely done.
+
+### Status as of 2026-05-03 01:00 UTC (paper-figure panel landed: arch × organism × α-regime grouped bar; both GPUs idle)
+
+**Headline**: built the third paper-figure asset
+`plots/em_nanda_arch_organism_alpha_table.png` — grouped bar chart of the
+closed 8-cell single-feat table (5 organism×α-regime columns × 2 arches),
+with the Qwen-7B medical-champion 58.47 line and per-pair arch-gap
+annotations. SAE arditi wins every cell visually; arch gap widens to
++12.58 in the R32 ext-α regime. No compute spent this firing.
+
+**Resolved this firing**:
+
+- **Plot asset created**:
+  `experiments/em_features/plot_em_nanda_arch_organism_alpha.py` →
+  `docs/dmitry/results/em_features/plots/em_nanda_arch_organism_alpha_table.png`.
+  Numbers hardcoded from the 00:00 UTC closed table for reproducibility:
+
+  | column           | SAE arditi (feat α)         | TXC paper k=100 (feat α)     | gap   |
+  | :--------------- | :-------------------------- | :--------------------------- | ----: |
+  | R1 5k mid-α      | **95.78** (f28663 α=−6)     | 90.88 (f15402 α=−2)          | +4.90 |
+  | R1 10k mid-α     | **94.69** (f11086 α=−6)     | 90.23 (f14729 α=−1.75)       | +4.46 |
+  | R1 30k mid-α     | **95.16** (f9135  α=−6)     | 91.25 (f4992  α=−1.5)        | +3.91 |
+  | R32 10k std-α    | **54.61** (f21224 α=−3)     | 52.50 (f15779 α=+1.50)       | +2.11 |
+  | R32 10k ext-α    | **64.53** (f21224 α=−30)    | 51.95 (f718   α=−30)         | +12.58 |
+
+  All R1 cells clear 58.47 by ≥30. R32 std-α both arches just under;
+  R32 ext-α SAE clears comfortably (+6.06) while TXC plateaus (−6.52).
+
+- **Paper-figure asset bundle now complete** (all three panels exist):
+  1. `plots/em_nanda_*frontier*.png` (R1 5k/10k/30k frontier zooms,
+     SAE + TXC) — cross-arch single-feat directional asymmetry.
+  2. `plots/em_nanda_step_count_trajectory.png` — step-count axis
+     closed; both arches flat ±1 align across {5k, 10k, 30k}.
+  3. `plots/em_nanda_arch_organism_alpha_table.png` (NEW) — closed
+     8-cell table; SAE > TXC at every cell, gap widens on R32 ext-α.
+
+**Compute & disk hygiene**: both GPUs idle (local 0%; h100_2 0%). No new
+jobs queued — single-feat axis closed, all three paper plots in place.
+HF_HOME=/workspace/hf_cache holding; /workspace 30% used; /root local at
+92% used (concerning trend — not blocking this firing's plotting work,
+worth audit next firing if a launch is planned).
+
+**Next firing priorities (likely 02:00 UTC)**:
+
+- **Optional R32 bundle frontier** if both GPUs remain idle and write-up
+  isn't blocked: tests whether a k=30 bundle of wang_r32 finalists lifts
+  R32 align toward R1's mid-90s — addresses the open "distributed
+  misalignment can be reassembled?" question. Reuse existing wang_r32
+  outputs as the bundle source pool. ~30 min batched on one GPU. Defer
+  if the next firing has another more load-bearing objective.
+- **No new training/Wang launches** unless a specific scientific
+  question crystallizes. Single-feat axis is genuinely done; bundle
+  is the only remaining cheap experimental direction.
+- **/root disk audit** if the next firing wants to launch anything new
+  on local — at 92% there's no headroom for new SAE checkpoints; would
+  need to either route to /workspace or clean stale runs.
