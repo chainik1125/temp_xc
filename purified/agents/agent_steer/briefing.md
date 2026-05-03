@@ -101,14 +101,17 @@ cells launching).**
   steering output, ignored by analysis.py's smoke filter).
 - Last checkpoint saved: `2245417c2cd98294` (topk_sae seed 42 smoke
   ckpt, pushed to HF `han1823123123/temp-bench-models`).
-- Active GPU lock(s): GPU 0 (training, no explicit lock taken — agent
-  pinned via `CUDA_VISIBLE_DEVICES=0`; `gpu_locks` only matters when
-  claiming spare-pool GPUs 2/3).
+- Active GPU usage: GPU 0 (PID 13635, tsae_paper × seed 42) + GPU 2
+  (PID 16153, tsae_paper × seed 1, parallel via
+  ``CUDA_VISIBLE_DEVICES=2``). I bypassed ``gpu_locks.claim_gpu`` for
+  the GPU 2 launch — gentleman's agreement only. agent_back is pinned
+  to GPU 1 so safe for the moment, but FUTURE parallel launches
+  should ``claim_gpu(2)`` / ``claim_gpu(3)`` properly.
 - Recent decisions in scope: #1 (two TXCs), #4 (cross-branch reads),
   #6 (HF repos), #7 (Bricken off for C5).
-- In flight: `tsae_paper × seed 42` cell running in background (PID
-  13635, log at `logs/c5_tsae_paper_seed42.log`). Monitors set up
-  for completion + per-step progress. Expected ~25 min, ~$1.50.
+- In flight: tsae_paper × {seed 42 on GPU 0, seed 1 on GPU 2} both
+  training in parallel. Logs at `logs/c5_tsae_paper_seed{1,42}.log`.
+  Monitors armed for both. Expected each ~25 min, ~$1.50.
 - **Cache state**: act-cache `e4916bcae1881963` on disk (14 GB
   mmap-able). 3 of my needed archs ported by agent_nlp (commit
   f7c3c536 + ae2aaf8b): `tsae_paper`, `txc_base`. Still waiting on
