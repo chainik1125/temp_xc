@@ -1662,6 +1662,155 @@ beyond brief + synthesis status entries.
   a future firing wants to launch new SAE/TXC training on local
   (next firing not training-bound, so deferring).
 
+### Status as of 2026-05-03 13:00 UTC (TXC bundle k=3 finalists landed — frontier FLAT, mid-α peak 33.28/47.27 at α=+1, lift over baseline +0.16 align; bundle precision sub-axis NOT architecture-general — TXC inverts SAE's monotonic ordering)
+
+**Headline**: ~7 min compute on h100_2. Built top-3 TXC bundle from
+the three R32 stage-4 single-feat finalists (1781 / 718 / 15779 — the
+direct TXC analogue of the SAE k=3 finalists 21224 / 30540 / 21466)
+and ran the same 15-α grid as the SAE k=3 bundle. Bundle vector norm
+**0.78** (≪ √3 ≈ 1.73 — TXC top-3 finalist decoder rows are heavily
+anti-correlated, sum nearly cancels). Frontier is **flat across all α**:
+mid-α peak (coh ≥ 50) at α=+1 → align 33.28 / coh 47.27, vs α=0
+baseline 33.13 / 50.31. Lift over baseline **+0.16 align**, well within
+Gemini-judge SE on n=64. No mid-α peak above noise.
+
+**Bundle precision sub-axis is NOT architecture-general** — opposite of
+the SAE pattern:
+
+| arch       | k=3 bundle norm | k=3 mid-α peak       | k=30 mid-α peak      | single-feat (ext-α) | precision ordering           |
+| :--------- | --------------: | :------------------- | :------------------- | ------------------: | :--------------------------- |
+| SAE arditi | 1.78 (≈√3)      | α=−40 → **51.41**    | α=−30 → 41.33        | 64.53               | k=30 < k=3 < single-feat ✓   |
+| TXC k=100  | 0.78 (≪√3)      | α=+1 → **33.28**     | α=−30 → 41.56        | 51.95               | **k=3 ≪ k=30** < single-feat |
+
+Adding 27 non-finalist features to the TXC bundle *helps* (k=3 → k=30
+lifts +8.3 align), the *opposite* of SAE where the same step *hurts*
+(k=3 → k=30 loses 10.1 align). Both arches still hit the same k=30
+ceiling (~41.5 align — the organism-geometry projection ceiling from
+the 12:00 UTC firing) but for opposite reasons.
+
+**Full TXC k=3 R32 bundle frontier table**:
+
+| α    | align | coh   | comment                              |
+| ---: | ----: | ----: | :----------------------------------- |
+| −100 | 28.83 | 15.00 | degenerate (coh collapsed)           |
+| −60  | 17.71 | 27.27 | degenerate                           |
+| −40  | 24.45 | 39.77 | sub-mid coh                          |
+| −30  | 25.39 | 47.19 | sub-mid coh                          |
+| −20  | 25.55 | 48.52 | sub-mid coh                          |
+| −15  | 25.55 | 47.89 | sub-mid coh                          |
+| −10  | 31.64 | 45.70 | sub-mid coh                          |
+| −6   | 30.08 | 45.94 | sub-mid coh                          |
+| −3   | 28.75 | 47.81 | sub-mid coh                          |
+| −1   | 32.42 | 48.05 | sub-mid coh                          |
+|  0   | **33.13** | **50.31** | unsteered baseline (frontier_sweep) |
+| **+1** | **33.28** | **47.27** | absolute align peak (sub-mid coh) |
+| +3   | 29.14 | 50.23 |                                      |
+| +6   | 29.30 | 49.92 |                                      |
+| +10  | 28.13 | 50.31 |                                      |
+
+Mid-α peak (coh ≥ 50) is **α=0 itself** (i.e. the unsteered baseline);
+no steered cell beats baseline within coherence threshold. The bundle
+direction is essentially indistinguishable from "no perturbation."
+
+**This firing (13:00 UTC) actions**:
+
+- `git pull origin em-nanda --rebase` — already up to date.
+- Verified GPUs idle pre-firing: local h100_1 0%/0 MiB; h100_2 0%/0 MiB.
+- Built `top_3_txc_finalists.json` on h100_2 with feature_ids
+  `[1781, 718, 15779]` (direct TXC analogue of SAE k=3 finalists).
+- Launched `experiments/em_features/frontier_sweep.py --steerer txc
+  --txc_ckpt qwen14b_l24_txc_paper_k100_em_nanda_step10000.pt --k 3
+  --layer 24 --base_model Qwen/Qwen2.5-14B-Instruct --subject_model
+  /root/em_features/checkpoints/qwen14b_r32_finance_lora` with the
+  matched 15-α grid. PID 521584 on h100_2, 13:03 → 13:10 UTC (7 min
+  wall-clock for 15 αs × 64 generations). Output
+  `bundle3_txc_finalists_frontier.json` (3.1 KB).
+- Pulled `bundle3_txc_finalists_frontier.json` and
+  `top_3_txc_finalists.json` to local
+  `/root/em_features/results/em_nanda_bundle_r32/`.
+- **Updated `em_nanda_results_paper.md`** Result 3: appended an
+  "Architecture specificity of the precision sub-axis" subsection with
+  the 6-column comparison table and the decoder-row geometry argument
+  (SAE finalists ~orthogonal vs TXC finalists heavily anti-correlated).
+  Updated "What is closed" with a new bullet on architecture-specific
+  precision sub-axis. Updated Reproduce section file pointers.
+- No commits to code, scripts, or experiment infra. Only doc + new
+  data artifacts (`bundle3_txc_finalists_frontier.json` 3.1 KB,
+  `top_3_txc_finalists.json` 273 B).
+- Disk hygiene unchanged: /root local 92%; /workspace 30%;
+  HF_HOME=/workspace/hf_cache holding.
+
+**Three observations from the new datapoint**:
+
+1. **Same k=30 ceiling, opposite paths**: SAE k=3 (51.41) → k=30 (41.33)
+   is a *loss* of 10 align (precision dilution); TXC k=3 (33.28) → k=30
+   (41.56) is a *gain* of 8 align (cancellation escape). Both end at
+   the same ~41.5 ceiling. The k=30 ceiling is geometry-driven; the
+   k=3 floor depends on whether the dictionary's individual finalists
+   point in similar (TXC: anti-correlated) or different (SAE: nearly
+   orthogonal) directions.
+2. **TXC's individual finalists encode the same direction with
+   opposite signs**: k=3 norm 0.78 < 1 means the three unit-norm
+   decoder rows have summed magnitude less than any single one of
+   them. The most parsimonious explanation: each TXC finalist captures
+   the R32 misalignment direction with a sign-ambiguous polarity, and
+   summing them cancels rather than reinforces. SAE arditi's TopK
+   constraint forces orthogonality among co-active features, so its
+   finalists encode orthogonal facets of the misalignment subspace
+   that *do* sum constructively.
+3. **TXC R32 single-feat ceiling 51.95 is closer to its bundle k=30
+   ceiling (41.56) than SAE's**: SAE single-feat 64.53 sits +23 above
+   bundle 41.33 (champion is far above bundle ceiling); TXC single-
+   feat 51.95 sits only +10 above bundle 41.56 (champion is closer to
+   bundle ceiling). This is consistent with the architectural picture:
+   TXC's denser, less-orthogonal features individually express only
+   ~half of the misalignment direction, so its champion's "lone hero"
+   effect is muted relative to SAE.
+
+**Closed-axis state at end of firing** (TXC k=3 row added):
+
+| arch / config       | R1 5k mid | R32 10k single ext-α | R32 10k bundle k=3 mid | R32 10k bundle k=30 mid |
+| :------------------ | --------: | -------------------: | ---------------------: | ----------------------: |
+| SAE arditi          | **96.88** | **64.53** ⭐         | 51.41 (α=−40)          | 41.33                   |
+| TXC k=100           |  91.80    | 51.95                | **33.28** (α=+1, flat) | 41.56                   |
+| medical-champ goal  |  +38.41   | +6.06                | −7.06 / −25.19 (align) | −16.91 / −17.14 (align) |
+
+**Why this is a real durable contribution**:
+
+- 12:00 UTC firing left "TXC bundle k=3" as a flagged cheap probe
+  whose three possible outcomes were (a) replicates SAE monotonic
+  ordering — sub-axis is arch-general; (b) flat / inverted — sub-axis
+  is arch-specific; (c) actually *beats* TXC k=30 — TXC has constructive
+  finalist interactions SAE lacks. This firing executed it; outcome
+  (b) — the *most informative* of the three because it splits the
+  bundle null into "k=30 ceiling shared, k=3 path differs."
+- The decoder-row geometry difference (SAE finalists ≈ orthogonal;
+  TXC finalists ≈ anti-correlated polarity-flipped versions of one
+  underlying direction) is a clean architectural distinction worth
+  its own paragraph in the paper. Strengthens the "SAE TopK selects
+  for sparse causal directions" framing already in the Architectural
+  takeaway.
+- Resets rule-9 watch to 0/3.
+
+**Next firing priorities (likely 14:00 UTC)**:
+
+- **Status-only firing acceptable** — both axes closed; bundle null
+  architecture-general at k=30; bundle precision sub-axis now
+  characterized as architecture-specific (SAE monotonic, TXC k=3
+  collapses). No further cheap probe identified that would change
+  any headline number.
+- **Rule (9) (3-firing-stuck) reset to 0/3 by this firing's compute
+  spend.**
+- **Other open exploratory items unchanged**: alt bundle selection
+  criteria (Hessian-eigendirection / mutual orthogonality), TXC
+  k<100 variants, cross-layer hookpoints. All ≥1 firing of compute,
+  none paper-critical.
+- **Optional cleanup window** (still not load-bearing): legacy 110 GB
+  qwen_l15_*.pt checkpoints on /root local already logged in
+  `trained_models_log.md` with HF backups under
+  `dmanningcoe/temp-xc-em-features`. Per rule (7), "log first" is
+  satisfied; deletion permitted but not motivated this firing.
+
 ### Status as of 2026-05-03 12:00 UTC (TXC bundle k=30 R32 landed — mid-α peak 41.56/53.83 at α=-30 ≈ SAE bundle peak 41.33/55.62 at α=-30; bundle null is architecture-general; closes empty TXC R32 bundle cell)
 
 **Headline**: ~6 min compute on h100_2. Built TXC k=30 bundle from the

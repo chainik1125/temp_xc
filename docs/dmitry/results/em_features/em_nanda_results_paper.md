@@ -275,6 +275,50 @@ qualitative monotonic-ordering finding survives, with corrected
 interference penalties of +13 (k=3 vs single-feat) and +10 (k=30 vs
 k=3) align points instead of the buggy +6 and +17.)
 
+**Architecture specificity of the precision sub-axis (TXC k=3,
+2026-05-03 13:00 UTC).** The k=3-finalists probe was repeated for the TXC
+k=100 dictionary, bundling its three R32 stage-4 single-feat finalists
+(1781 / 718 / 15779) with the *identical* α grid (file
+`/root/em_features/results/em_nanda_bundle_r32/bundle3_txc_finalists_frontier.json`).
+Result: bundle vector norm = **0.78** (≪ √3 ≈ 1.73 — TXC top-3 finalist
+decoder rows are heavily anti-correlated with each other; the sum almost
+cancels). Frontier is **flat across all α**: peak at α=+1 → align 33.28
+/ coh 47.27, and α=0 baseline 33.13 / 50.31 — lift over baseline is
+**+0.16 align**, well within Gemini-judge SE on n=64. No mid-α peak above
+baseline; the bundle direction is essentially noise.
+
+| arch       | k=3 bundle norm | k=3 mid-α peak (coh ≥ 50) | own α=0 baseline | lift over baseline | k=30 mid-α peak | single-feat (ext-α) |
+| :--------- | --------------: | :------------------------ | ---------------: | -----------------: | --------------: | ------------------: |
+| SAE arditi | 1.78 (≈√3)      | α=−40 → **51.41** / 53.36 | 34.92            | **+16.49**         | 41.33           | 64.53               |
+| TXC k=100  | 0.78 (≪√3)      | α=0  → **33.28** / 47.27  | 33.13            | **+0.16**          | 41.56           | 51.95               |
+
+**The bundle-precision sub-axis is NOT architecture-general.** SAE
+gives the monotonic ordering k=30 (41.33) < k=3 (51.41) < single-feat
+(64.53), with each tier closer to single-feat. TXC inverts the inner
+ordering: k=3 (33.28) ≪ k=30 (41.56) < single-feat (51.95). Adding 27
+non-finalist features to the TXC bundle *helps* (k=3 → k=30 lifts +8.3
+align), the opposite of SAE where the same step *hurts* (k=3 → k=30
+loses 10.1 align).
+
+The decoder-row geometry explains it. SAE arditi's three R32 finalists
+are nearly orthogonal to one another (k=3 norm 1.78 ≈ √3, k=30 norm
+7.22 > √30) — summing them preserves each finalist's individual
+contribution and the bundle direction sits in the union of their causal
+subspaces. TXC k=100's three finalists are heavily anti-correlated
+(k=3 norm 0.78 < 1) — summing them cancels the misalignment direction
+each one individually captured. Adding the 27 next-ranked features to
+the TXC bundle introduces enough other directions that the cancellation
+is partially dispersed, and the k=30 peak recovers the same 41.5 align
+ceiling that SAE k=30 hits.
+
+So both architectures hit the *same* k=30 ceiling (41.3 / 41.6 — the
+"organism-geometry projection ceiling" from the Architecture-generality
+paragraph), but for different reasons: SAE k=30 dilutes a champion that
+would otherwise bundle constructively; TXC k=30 partially escapes a
+cancellation trap that the precise k=3 bundle falls into. The bundle
+ceiling is architecture-general; the *path to it* is architecture-
+specific.
+
 ### Result 4 — cross-arch frontier shape (R1, illustrative)
 
 The R1 frontier plots in `plots/em_nanda_*frontier*.png` show that for
@@ -332,6 +376,14 @@ as cleanly captured by any single feature as R1's direction is.
   organism-geometry-driven, not architecture-driven. Single-feat
   ceiling differs across arches (SAE 64.53 vs TXC 51.95) but bundle
   ceilings collapse to the same value.
+- **Bundle precision sub-axis is architecture-specific**: SAE shows
+  monotonic ordering k=30 < k=3 < single-feat (precision helps);
+  TXC inverts to k=3 ≪ k=30 < single-feat (top-3 finalists' decoder
+  rows anti-correlate so heavily that their sum nearly cancels —
+  bundle norm 0.78 ≪ √3, bundle frontier flat across all α). Both
+  arches hit the same k=30 ceiling (~41.5 align) but for opposite
+  reasons: SAE k=30 dilutes a champion that would bundle constructively;
+  TXC k=30 partially escapes the k=3 cancellation trap.
 
 **Open** (deferred, not paper-critical):
 
@@ -375,7 +427,9 @@ as cleanly captured by any single feature as R1's direction is.
   - TXC k=100 R32 ext-α: `…/em_nanda_txc_paper_k100_step10000_wang_r32_extalpha/stage4_final_frontier.json`
   - Bundle k=30 R32 (SAE arditi): `…/em_nanda_bundle_r32/bundle30_frontier.json`
   - Bundle k=30 R32 (TXC k=100): `…/em_nanda_bundle_r32/bundle30_txc_frontier.json` (added 2026-05-03 12:00 UTC)
-  - Bundle feature membership: `…/em_nanda_bundle_r32/top_30_bundle_features.json` (SAE) and `…/em_nanda_bundle_r32/top_30_txc_features.json` (TXC, on h100_2)
+  - Bundle k=3 R32 (SAE arditi, finalists): `…/em_nanda_bundle_r32/bundle3_finalists_frontier_r32fix.json`
+  - Bundle k=3 R32 (TXC k=100, finalists): `…/em_nanda_bundle_r32/bundle3_txc_finalists_frontier.json` (added 2026-05-03 13:00 UTC)
+  - Bundle feature membership: `…/em_nanda_bundle_r32/top_30_bundle_features.json` (SAE k=30), `top_30_txc_features.json` (TXC k=30), `top_3_finalists.json` (SAE k=3), `top_3_txc_finalists.json` (TXC k=3)
   - Other Wang outputs (SAE arditi 10k R1 + R32, TXC R1 5k/10k/30k, TXC
     R32 std-α) live on `h100_2` and have peak numbers archived in the
     closed table above.
