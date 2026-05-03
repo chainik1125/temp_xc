@@ -43,6 +43,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import json
+
 from temp_bench.report import AnalysisResult, query_leaderboard
 
 COMPONENT = "c6"
@@ -58,6 +60,59 @@ def _placeholder(reason: str) -> str:
         "between AUTO-RESULTS markers.)_\n\n"
         f"**No results yet**: {reason}\n"
     )
+
+
+def _read_wang_minimal(train_key: str) -> dict | None:
+    """Load the per-cell wang_minimal.json (frontier + ranking + peak)."""
+    p = Path("results") / "runs" / f"c6_{train_key}" / "wang_minimal.json"
+    if not p.exists():
+        return None
+    try:
+        return json.loads(p.read_text())
+    except Exception:
+        return None
+
+
+def _save_frontier_plot(sae_wang, txc_wang, *, dst: Path) -> Path | None:
+    """Plot the per-feature × α frontier for SAE-arditi vs TXC-base.
+
+    Returns the saved path or None if matplotlib isn't available or
+    inputs are missing.
+    """
+    if sae_wang is None and txc_wang is None:
+        return None
+    try:
+        import matplotlib.pyplot as plt
+    except ImportError:
+        return None
+    from temp_bench.plotting import save_figure
+
+    fig, axes = plt.subplots(1, 2, figsize=(10, 4), sharey=True)
+    for ax, (tag, wm) in zip(axes, [("sae_arditi", sae_wang), ("txc_base + brickenauxk_a8", txc_wang)]):
+        if wm is None:
+            ax.set_title(f"{tag}\n(no data)")
+            continue
+        # Group rows by feature_id, plot per-feature frontier.
+        by_feat: dict[int, list[dict]] = {}
+        for r in wm.get("frontier", []):
+            by_feat.setdefault(int(r["feature_id"]), []).append(r)
+        for fid, rows in by_feat.items():
+            rows.sort(key=lambda r: float(r["alpha"]))
+            xs = [float(r["alpha"]) for r in rows]
+            ys = [float(r["mean_align"] or 0.0) for r in rows]
+            ax.plot(xs, ys, marker="o", label=f"feat {fid}")
+        peak = wm.get("peak")
+        if peak:
+            ax.axhline(float(peak["mean_align"]), color="gray", linestyle=":", alpha=0.5,
+                       label=f"peak={peak['mean_align']:.1f}")
+        ax.set_xlabel("steering α")
+        ax.set_title(tag)
+        ax.legend(loc="best", fontsize=8)
+        ax.grid(True, alpha=0.3)
+    axes[0].set_ylabel("mean_align (Claude judge)")
+    fig.suptitle("C6 — abbreviated Wang frontier (top-3 features × 6 α grid)")
+    fig.tight_layout()
+    return save_figure(fig, dst)
 
 
 def _decision(gap: float) -> str:
@@ -144,7 +199,19 @@ def run_analysis() -> AnalysisResult:
                 f"{peak['peak_alpha']:+.2f} | {peak['peak_feature_id']} |"
             )
 
+    plot_paths: list[Path] = []
     if sae_peak and txc_peak:
+        # Generate the two-panel frontier plot if both wang_minimal artifacts exist.
+        sae_wang = _read_wang_minimal(sae_peak["train_key"]) if sae_peak else None
+        txc_wang = _read_wang_minimal(txc_peak["train_key"]) if txc_peak else None
+        plot_dst = PLOT_DIR / "c6_frontier.png"
+        try:
+            saved = _save_frontier_plot(sae_wang, txc_wang, dst=plot_dst)
+            if saved is not None:
+                plot_paths.append(saved)
+        except Exception:
+            saved = None
+
         gap = sae_peak["peak_align"] - txc_peak["peak_align"]
         md_lines += [
             "",
@@ -152,6 +219,11 @@ def run_analysis() -> AnalysisResult:
             "",
             "Decision-tree outcome: " + _decision(gap),
         ]
+        if saved is not None:
+            md_lines += [
+                "",
+                f"![C6 abbreviated Wang frontier](../../experiments/c6_em/plots/c6_frontier.png)",
+            ]
     elif sae_peak:
         md_lines += ["", "_TXC-base cell missing — run "
                      "`python -m experiments.c6_em.run --archs txc_base`._"]
@@ -168,5 +240,5 @@ def run_analysis() -> AnalysisResult:
     return AnalysisResult(
         markdown="\n".join(md_lines) + "\n",
         results=results,
-        plot_paths=[],
+        plot_paths=plot_paths,
     )
