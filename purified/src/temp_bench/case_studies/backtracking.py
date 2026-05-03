@@ -1042,6 +1042,181 @@ def run_phase1_unsteered(
     return [r for r in rows if r["unique_id"] in cohort_qids]
 
 
+# ── Labeled-sentence activation extraction (subject-model side) ───────
+
+
+# Aniket's window offsets — T=6 positions BEFORE the sentence start. The
+# Ward steering-feature mining looks at the activations that "trigger"
+# the backtracking sentence, not the backtracking content itself.
+DEFAULT_WINDOW_OFFSETS: tuple[int, ...] = (-13, -12, -11, -10, -9, -8)
+
+
+def extract_labeled_sentence_acts(
+    *,
+    subject_model_id: str = "NousResearch/Meta-Llama-3.1-8B",
+    layer: int = 10,
+    window_offsets: tuple[int, ...] = DEFAULT_WINDOW_OFFSETS,
+    cache_path: Path | str | None = None,
+    force: bool = False,
+    device: str = "cuda",
+) -> dict[str, np.ndarray]:
+    """Capture per-sentence subject-model activations from Stage A labels.
+
+    Adapted from
+    ``origin/aniket-ward-stage-b @ a62175ee:experiments/ward_backtracking_txc/mine_features.py:_capture_windows``.
+
+    For each labeled sentence in ``results/c7_backtracking/stage_a/sentence_labels.json``:
+
+    1. Tokenize the trace's ``full_response`` with offset mapping.
+    2. Run the subject model + capture residual-stream activations at
+       layer ``layer`` for every position.
+    3. Find the token position corresponding to the sentence's start
+       (``think_offset + char_start`` per Aniket's alignment rule).
+    4. Extract a T-window of activations at positions ``[tok_pos + off
+       for off in window_offsets]`` (``T = len(window_offsets) = 6`` by
+       default, matching Aniket's [-13, -8] window).
+
+    Returns a dict with::
+
+        X:    (n_sent, T, d_model) float32        — sentence acts
+        is_bt: (n_sent,) bool                     — backtracking labels
+        keys: (n_sent,) object                    — "<qid>|<trace_idx>|<sent_idx>"
+
+    Cached at ``cache_path`` (default
+    ``results/c7_backtracking/stage_a/sentence_acts_L<layer>.npz``);
+    idempotent. ~25 K sentences × 300 traces × ~30 s each on A40 is the
+    one-time cost (Aniket's run is the reference). Re-extraction is
+    triggered when ``force=True`` or when the file is missing.
+    """
+    from temp_bench.config import purified_root
+
+    if cache_path is None:
+        cache_path = (
+            purified_root() / "results" / "c7_backtracking" / "stage_a"
+            / f"sentence_acts_L{layer}.npz"
+        )
+    cache_path = Path(cache_path)
+
+    if cache_path.exists() and not force:
+        log.info("[c7] sentence acts cache hit at %s", cache_path)
+        z = np.load(cache_path, allow_pickle=True)
+        return {"X": z["X"], "is_bt": z["is_bt"], "keys": z["keys"]}
+
+    from transformers import AutoModelForCausalLM, AutoTokenizer  # type: ignore
+    from temp_bench.utils.tokens import get_token
+
+    stage_a = load_stage_a()
+    traces_by_qid = stage_a.by_qid("trace")
+
+    log.info("[c7] loading subject model for sentence-act extraction: %s", subject_model_id)
+    hf_token = get_token("hf")
+    tok = AutoTokenizer.from_pretrained(subject_model_id, use_fast=True, token=hf_token)
+    if tok.pad_token_id is None:
+        tok.pad_token_id = tok.eos_token_id
+    model = AutoModelForCausalLM.from_pretrained(
+        subject_model_id, torch_dtype=torch.bfloat16, device_map=device, token=hf_token,
+    ).eval()
+    for p in model.parameters():
+        p.requires_grad_(False)
+
+    captured: dict[str, torch.Tensor] = {}
+    def hook_fn(_m, _i, output):
+        x = output[0] if isinstance(output, tuple) else output
+        if x.dim() == 4:
+            x = x.reshape(x.shape[0], x.shape[1], -1)
+        captured["x"] = x.detach().to(torch.float32).cpu()
+
+    handle = model.model.layers[layer].register_forward_hook(hook_fn)
+
+    X_list: list[np.ndarray] = []
+    is_bt: list[bool] = []
+    keys: list[str] = []
+
+    try:
+        try:
+            from tqdm.auto import tqdm  # type: ignore
+        except ImportError:
+            tqdm = lambda x, **kw: x  # noqa: E731
+        for record in tqdm(stage_a.sentence_labels, desc=f"capture L{layer}"):
+            qid = record["question_id"]
+            trace = traces_by_qid.get(qid)
+            if trace is None or not record.get("sentences"):
+                continue
+            full_response = trace["full_response"]
+            enc = tok(full_response, return_tensors="pt",
+                      return_offsets_mapping=True, add_special_tokens=False)
+            input_ids = enc["input_ids"].to(model.device)
+            offsets_map = enc["offset_mapping"][0].tolist()
+            with torch.no_grad():
+                _ = model(input_ids=input_ids)
+            acts = captured["x"][0].numpy()  # (seq, d)
+            seq_len = acts.shape[0]
+
+            # Aniket's sentence-start alignment: trace begins at the
+            # closing tag <think>, then char_start counts from there.
+            think_open = "<think>"
+            think_idx = full_response.find(think_open)
+            think_offset = (think_idx + len(think_open)) if think_idx >= 0 else 0
+
+            for s_idx, sent in enumerate(record["sentences"]):
+                target_char = think_offset + sent["char_start"]
+                tok_pos = -1
+                for i, (cs, ce) in enumerate(offsets_map):
+                    if cs <= target_char < ce or cs >= target_char:
+                        tok_pos = i
+                        break
+                if tok_pos < 0:
+                    continue
+                window = np.zeros((len(window_offsets), acts.shape[1]), dtype=np.float32)
+                ok = True
+                for j, off in enumerate(window_offsets):
+                    p = tok_pos + off
+                    if p < 0 or p >= seq_len:
+                        ok = False
+                        break
+                    window[j] = acts[p]
+                if not ok:
+                    continue
+                X_list.append(window)
+                is_bt.append(bool(sent["is_backtracking"]))
+                keys.append(f"{qid}|{record['trace_idx']}|{s_idx}")
+
+            captured.clear()
+            torch.cuda.empty_cache()
+    finally:
+        handle.remove()
+        del model
+        import gc; gc.collect()
+        torch.cuda.empty_cache()
+
+    if not X_list:
+        raise RuntimeError("no sentence windows captured — check sentence_labels.json")
+
+    X = np.stack(X_list, axis=0)
+    is_bt_arr = np.asarray(is_bt, dtype=bool)
+    keys_arr = np.asarray(keys, dtype=object)
+    log.info(
+        "[c7] captured %d sentences (%d positive, %.1f%%); shape=%s",
+        len(X), int(is_bt_arr.sum()), 100 * float(is_bt_arr.mean()), X.shape,
+    )
+
+    cache_path.parent.mkdir(parents=True, exist_ok=True)
+    np.savez_compressed(cache_path, X=X, is_bt=is_bt_arr, keys=keys_arr)
+    log.info("[c7] cached sentence acts to %s", cache_path)
+    return {"X": X, "is_bt": is_bt_arr, "keys": keys_arr}
+
+
+def split_pos_neg(sentence_acts: dict[str, np.ndarray]) -> dict[str, np.ndarray]:
+    """Convenience: split ``extract_labeled_sentence_acts`` output into
+    D+ / D- tensors for :func:`mine_top_features`.
+
+    Returns ``{"pos": (n_pos, T, d), "neg": (n_neg, T, d)}``.
+    """
+    is_bt = sentence_acts["is_bt"]
+    X = sentence_acts["X"]
+    return {"pos": X[is_bt], "neg": X[~is_bt]}
+
+
 # ── Steering-vector mining (gated on trained SAE arch) ────────────────
 
 
