@@ -1,0 +1,21 @@
+{
+  "gap": 5.75,
+  "sae_arditi_peak": {
+    "eval_key": "160a1471d1a93f1b",
+    "peak_align": 81.625,
+    "peak_alpha": -30.0,
+    "peak_coh": 90.921875,
+    "peak_feature_id": 3173,
+    "train_key": "926527b006dd74aa",
+    "ts": "2026-05-03T23:07:40Z"
+  },
+  "txc_base_peak": {
+    "eval_key": "c1d96d5549e0c3a6",
+    "peak_align": 75.875,
+    "peak_alpha": 1.0,
+    "peak_coh": 89.921875,
+    "peak_feature_id": 734,
+    "train_key": "410c3f342b133fff",
+    "ts": "2026-05-03T23:52:56Z"
+  }
+}
