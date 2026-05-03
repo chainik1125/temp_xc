@@ -525,7 +525,10 @@ def run_wang_minimal(
     import gc
 
     if out_dir is not None:
+        out_dir = Path(out_dir).resolve()  # absolute path; defensive vs CWD changes
         out_dir.mkdir(parents=True, exist_ok=True)
+        log.info("[em.wang] out_dir resolved to %s (exists=%s)",
+                 out_dir, out_dir.exists())
 
     # Resolve probe prompts.
     if cfg.probe_prompts is not None:
@@ -568,6 +571,7 @@ def run_wang_minimal(
     del base_acts, lora_acts
     gc.collect()
     if out_dir is not None:
+        out_dir.mkdir(parents=True, exist_ok=True)
         (out_dir / "stage1_ranking.json").write_text(json.dumps({
             "features": ranking["features"][:200],
         }, indent=2))
@@ -621,6 +625,7 @@ def run_wang_minimal(
             ):
                 peak = dict(row)
             if out_dir is not None:
+                out_dir.mkdir(parents=True, exist_ok=True)
                 (out_dir / "stage4_frontier.partial.json").write_text(
                     json.dumps({"rows": frontier_rows, "peak": peak}, indent=2)
                 )
@@ -641,6 +646,7 @@ def run_wang_minimal(
         },
     }
     if out_dir is not None:
+        out_dir.mkdir(parents=True, exist_ok=True)
         (out_dir / "wang_minimal.json").write_text(json.dumps(result, indent=2))
 
     # Free LoRA so the next eval cell can load fresh.
