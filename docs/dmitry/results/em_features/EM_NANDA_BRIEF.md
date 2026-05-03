@@ -10,6 +10,94 @@ tags:
 
 **You are an autonomous routine continuing from the dmitry-branch work.** Branch: `em-nanda`. AGENT_BRIEF.md (on dmitry) covers the prior Qwen-7B medical setup. This doc supersedes that for the Qwen-14B financial pivot.
 
+### Status as of 2026-05-03 04:00 UTC (paper-style results section landed — `em_nanda_results_paper.md`; both axes remain closed; both GPUs idle; no compute spent)
+
+**Headline**: Pivoted from compute to write-up per the 03:00 UTC priority
+list. New file `docs/dmitry/results/em_features/em_nanda_results_paper.md`
+consolidates the closed 8-cell single-feat × steps × arch × organism ×
+α-regime table, the cross-organism single-feat champions (R1 96.88; R32
+64.53), and the bundle null result (R32 k=30 peak 41.33 — strictly
+worse than single-feat). Tag check passes. No compute spent.
+
+**This firing (04:00 UTC) actions:**
+
+- Verified GPUs idle: local h100_1 0%/0 MiB; h100_2 0%/0 MiB at
+  04:00 UTC. Pre- and post-firing.
+- **Verified canonical numbers from the available local stage-4 files**
+  before writing (so the paper doc's numbers cannot drift from the
+  data):
+  - SAE arditi 5k R1 → feat 28663 @α=−10 → 96.875/98.91 (peak); @α=−6 →
+    95.78/99.22 (mid-α reference cited in the closed table).
+  - SAE arditi 30k R1 → feat 9135 @α=−10 → 95.36/97.19 (peak); @α=−6 →
+    95.16/98.44 (mid-α reference).
+  - TXC k=100 R32 ext-α → feat 718 @α=−30 → 51.95/96.64.
+  - Bundle k=30 R32 frontier → α=−30 → 41.33/55.62 (peak), α=−20 →
+    39.06/55.47 (second), α=0 → 34.69/50.39 (baseline).
+  - Other (SAE arditi 10k R1 + R32 native + R32 ext-α; TXC R1 5k/10k/30k;
+    TXC R32 std-α) live on h100_2 — peaks taken from prior firing
+    synthesis entries which are themselves derived from those data
+    files; not re-pulled this firing.
+- **Wrote `em_nanda_results_paper.md`** (~6.7 KB, 200+ LOC). Sections:
+  headline, setup, four results blocks (8-cell table, cross-organism
+  champions, bundle null, R1 frontier shape), architectural takeaway,
+  closed/open status, reproduce pointers. Cites all stage-4 and bundle
+  data files. Wikilinks back to `[[em_nanda_synthesis]]` and
+  `[[EM_NANDA_BRIEF]]`. Includes a methodological caveat paragraph on
+  the bundle vs single-feat generator-path difference (the open
+  reconciliation probe).
+- **No commits to code, scripts, or experiment infra.** Only doc
+  changes are: new paper-section file, brief append, synthesis status
+  entry.
+- Disk hygiene unchanged: /root local 92%; /workspace 30%;
+  HF_HOME=/workspace/hf_cache holding.
+
+**Why "write-up" over "cheap reconciliation probe" this firing**:
+
+- The 03:00 UTC brief flagged the probe as optional, not paper-critical.
+  It would tighten the bundle's reported coh floor but does not change
+  the headline (single-feat wins on align AND coh in the head-to-head
+  α=−30 cells with comparable generator paths).
+- The paper-style write-up is what the synthesis, brief, and figure
+  asset bundle have been pointing toward for the last 4 firings.
+  Doing it in one focused firing while both axes are stable is the
+  right ordering.
+- The probe remains queued for any future firing that wants ~10 min
+  of cheap compute.
+
+**Closed-axis state** (unchanged from 03:00 UTC):
+
+| arch / config       | R1 5k mid | R32 10k single ext-α | R32 10k bundle k=30 mid |
+| :------------------ | --------: | -------------------: | ----------------------: |
+| SAE arditi          | **96.88** | **64.53** ⭐         | 41.33                   |
+| TXC k=100           |  91.80    | 51.95                | (not run)               |
+| medical-champ goal  |  +38.41   | +6.06                | −17.14                  |
+
+**Next firing priorities (likely 05:00 UTC)**:
+
+- **Status-only firing acceptable** — both axes closed, paper-style
+  write-up landed, paper-figure asset bundle complete (3 panels). No
+  fabricated work to fill a slot.
+- **If compute is wanted**: cheap reconciliation probe (~10 min on one
+  GPU): re-run α ∈ {0, −30} on the R32 single-feat finalists 21224 /
+  30540 / 21466 via `run_wang_procedure.py` (NOT frontier_sweep) to
+  measure the coh delta vs frontier_sweep's α=0 = 50.39 baseline. If
+  Wang α=0 coh ≥90 on these features, then bundle's −40 coh is partly
+  generator-path artifact; if Wang α=0 coh also ~50, then bundle's coh
+  floor is real. Either answer tightens one paragraph in
+  `em_nanda_results_paper.md`. Not load-bearing.
+- **No new training/Wang launches** unless a new scientific question
+  crystallizes — both axes remain closed.
+- **Optional cleanup window**: legacy 110 GB qwen_l15_*.pt checkpoints
+  on /root local remain candidates for deletion if new local training
+  is wanted; per rule (7) must be logged in `trained_models_log.md`
+  first. Not load-bearing this firing.
+- **3-firing-stuck rule** (rule 9): not yet engaged. This firing made a
+  durable contribution (paper-style results section). Last firing
+  (03:00 UTC) made a durable contribution (bundle null result + infra
+  extension). The two prior firings (01:00 UTC plot, 02:00 UTC status
+  audit) made smaller but real contributions. No appended "stuck"
+  section needed.
+
 ### Status as of 2026-05-03 03:00 UTC (R32 BUNDLE FRONTIER LANDED — k=30 peak 41.33/55.62 — STRICTLY WORSE than single-feat 64.53/96.25; "distributed misalignment" hypothesis FALSIFIED; both axes now closed)
 
 **Headline**: This firing executed the 02:00 UTC plan in full —

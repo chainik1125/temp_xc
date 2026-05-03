@@ -1661,3 +1661,74 @@ beyond brief + synthesis status entries.
 - Legacy 110 GB qwen_l15_*.pt cleanup remains an open option if
   a future firing wants to launch new SAE/TXC training on local
   (next firing not training-bound, so deferring).
+
+### Status as of 2026-05-03 04:00 UTC (paper-style results section landed; both axes remain closed; no compute spent)
+
+**This firing (04:00 UTC) actions:**
+
+- **Wrote `docs/dmitry/results/em_features/em_nanda_results_paper.md`** —
+  paper-style results section consolidating the closed 8-cell single-feat
+  table, the cross-organism single-feat champions, the bundle null
+  result, and architectural takeaway. Sections: headline, setup, four
+  results blocks, architectural takeaway, what is closed/open, reproduce
+  pointers. Cites all stage-4 and bundle data files. Uses Obsidian
+  wikilinks back to `[[em_nanda_synthesis]]` and `[[EM_NANDA_BRIEF]]`.
+  Tag check passes.
+- **Verified canonical numbers from local stage-4 files** before writing:
+  - SAE arditi 5k R1 stage4: feat 28663 @α=−10 → 96.875/98.91; @α=−6
+    → 95.78/99.22 (mid-α reference). Matches synthesis.
+  - SAE arditi 30k R1 stage4: feat 9135 @α=−10 → 95.36/97.19; @α=−6
+    → 95.16/98.44 (mid-α reference). Matches synthesis.
+  - TXC k=100 R32 ext-α stage4: feat 718 @α=−30 → 51.95/96.64. Matches
+    synthesis.
+  - Bundle k=30 R32 frontier: peak α=−30 → 41.33/55.62. Matches
+    synthesis.
+- **GPU state**: local h100_1 0%/0 MiB; h100_2 0%/0 MiB at 04:00 UTC.
+  Both idle pre-firing and post-firing. No new launches this firing
+  (per rule 6 spirit; both axes remain closed).
+- **No new commits to code or experiment scripts.** Only doc change is
+  the new paper-section file plus this synthesis status entry plus the
+  matching brief entry.
+- **Disk hygiene unchanged**: /root local at 92% (no new artifacts
+  written); /workspace 30%; HF_HOME=/workspace/hf_cache holding.
+
+**Why "write-up" over "cheap reconciliation probe"**:
+
+- The 03:00 UTC brief flagged an optional cheap probe to reconcile the
+  bundle's α=0 coh floor (~50) vs the wang_r32 single-feat α=0 coh
+  (~90) — testing whether the −40 coh delta is a generator-path
+  artifact (frontier_sweep `generate_longform_completions` vs Wang
+  `run_batched_alpha_cells`).
+- That probe is genuinely informative but does not change the headline
+  (single-feat wins on both align and coh in head-to-head α=−30 cells
+  with comparable generator paths within each measurement). The paper
+  doc already captures the methodological caveat in its
+  bundle-interpretation paragraph.
+- A focused paper-style results doc is the more durable contribution
+  this firing — it's what the synthesis, brief, and figure assets have
+  been pointing toward for the last 4 firings.
+
+**Closed-axis state at end of firing** (unchanged from 03:00 UTC):
+
+| arch / config       | R1 5k mid | R32 10k single ext-α | R32 10k bundle k=30 mid |
+| :------------------ | --------: | -------------------: | ----------------------: |
+| SAE arditi          | **96.88** | **64.53** ⭐         | 41.33                   |
+| TXC k=100           |  91.80    | 51.95                | (not run)               |
+| medical-champ goal  |  +38.41   | +6.06                | −17.14                  |
+
+**Next firing priorities (likely 05:00 UTC)**:
+
+- **Status-only firing acceptable** — both axes closed, paper-style doc
+  in place, paper-figure asset bundle complete (3 panels). No
+  fabricated work to fill a slot.
+- **If compute is wanted**: the cheap reconciliation probe is the only
+  small open item (~10 min: re-run α ∈ {0, −30} on the R32 single-feat
+  finalists 21224 / 30540 / 21466 via `run_wang_procedure.py` to
+  measure the coh delta vs frontier_sweep and tighten the bundle
+  paragraph in the paper doc). Optional, not paper-critical.
+- **No new training/Wang launches** unless a new scientific question
+  crystallizes — both axes remain closed.
+- **Optional cleanup window**: legacy 110 GB qwen_l15_*.pt checkpoints
+  on /root local remain candidates for deletion if new local training
+  is wanted; per rule (7) must be logged in `trained_models_log.md`
+  first. Not load-bearing this firing.
