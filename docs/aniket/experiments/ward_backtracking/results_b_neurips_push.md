@@ -386,11 +386,14 @@ the artifacts landed.
   plots when training finishes.
 - **L2-of-decoder calibration** — replacement for the broken p95 calibration.
 - **Switch detection F1 → PR-AUC** for camera-ready (~30 min).
-- **Determinism for mag=0 baseline** — switch sampling to temp=0 + fixed
-  seed for the mag=0 row only, so the baseline becomes a single
-  deterministic number rather than a stochastic noise floor we have to
-  subtract. Cleanest fix to the noise problem; ~30 min coding +
-  recompute mag=0 row.
+- ~~**Determinism for mag=0 baseline**~~ — investigated and dropped. B3
+  already uses `do_sample=False` (greedy decoding); the mag=0 row IS
+  deterministic and identical across all 6 archs. The "noise floor"
+  framing was slightly off: it's a *structural* property of the
+  cut-and-continue protocol (Stage A used stochastic sampling for the
+  original full-trace; B3 greedy-decodes from a 25%-prefix cut), not
+  randomness within B3. The baseline-corrected analysis already shipped
+  is the correct treatment.
 - **Faithful Bhalla TSAE port**: 20/80 high/low feature split +
   adjacent-token contrastive loss. ~1.5 days. Currently appendix-noted
   limitation.
