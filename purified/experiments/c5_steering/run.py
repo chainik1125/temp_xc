@@ -100,15 +100,42 @@ def my_train_fn(
     ``train_step`` does its own random-window extraction; the per-token
     archs flatten ``(B, S, d)`` into ``(B*S, d)`` internally. Same
     iterator works uniformly across families.
+
+    Progress visibility: wrap ``batch_iter`` to count calls and emit a
+    one-line marker every 1000 steps. The shared ``train_sae`` is
+    silent by design (PROTOCOL.md § 11), so cells without this wrapper
+    log nothing for ~25 min of training. Pattern borrowed from
+    agent_nlp's ``c3_probing/run.py`` (commit 2aaa8432).
     """
+    import sys
+    import time as _time
+
     spec = load_arch(arch_name, component=component)
     datasource = load_datasource(DATASOURCE)
     d_in = int(getattr(datasource, "d_in", 2304))
     model = instantiate_arch(spec, d_in=d_in)
     model.cuda()
     log.info("[train] %s seed=%d T=%d", arch_name, seed, model.T)
-    batch_iter = batch_iter_from_act_cache(act_cache_key, seed=seed)
-    result = train_sae(model, batch_iter, training_cfg)
+    raw_iter = batch_iter_from_act_cache(act_cache_key, seed=seed)
+
+    state = {"n": 0, "t0": _time.time(), "label": f"{arch_name}/seed={seed}"}
+
+    def progress_iter(bs):
+        state["n"] += 1
+        if state["n"] % 1000 == 0:
+            elapsed = _time.time() - state["t0"]
+            steps = state["n"]
+            rate = steps / elapsed if elapsed > 0 else 0
+            eta = (training_cfg.n_steps - steps) / rate if rate > 0 else 0
+            print(
+                f"  [TRAIN {state['label']}] step {steps}/{training_cfg.n_steps}  "
+                f"({rate:.1f} steps/sec; eta {eta/60:.1f} min)",
+                flush=True,
+            )
+            sys.stdout.flush()
+        return raw_iter(bs)
+
+    result = train_sae(model, progress_iter, training_cfg)
     return result["state_dict"]
 
 
