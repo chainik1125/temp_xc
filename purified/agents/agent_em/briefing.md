@@ -100,8 +100,10 @@ References:
   feat 3173, α=-30.
 - Last checkpoint saved: `train_key=410c3f342b133fff` (txc_base 30 k
   brickenauxk_a8). SAE checkpoint at `train_key=926527b006dd74aa`
-  (1.34 GB). HF push deferred — agent_em didn't wire persistent-pod
-  auto-push; flag for next session.
+  (1.34 GB). Both pushed to HF post-pipeline at
+  `https://huggingface.co/han1823123123/temp-bench-models/tree/main/<train_key>/`
+  (manual `_push_checkpoint_to_hf` call — auto-push only fires on
+  ephemeral pods).
 - Active GPU lock(s): GPU 1 pinned. Pipeline (PID 23080) is winding
   down (post-Wang cleanup). Will exit shortly.
 - Recent decisions in scope: #2, #4, #6, #7
