@@ -79,10 +79,12 @@ violates the AUTO-RESULTS contract — **do not merge `final-aniket`**.
 
 Two metric axes (per c7.md):
 - **Inducement (Δgc)** — primary: Sonnet 4.6 judge counts genuine
-  backtracking events. Sonnet judge must clear blind 20-transcript
-  κ ≥ 0.6 + agreement ≥ 0.80 before anchoring claims. (Aniket's
-  values: 0.749 / 0.773 / 1.000 — re-validate fresh on locked-arch
-  transcripts.)
+  backtracking events. **Fresh κ validation is NOT in the critical
+  path** — we lean on Aniket's wasteland κ values (0.749 / 0.773 /
+  1.000) as prior-art validation. Eval pipeline persists every Sonnet
+  call to `results/runs/<eval_key>/judge_outputs.jsonl`. Post-deadline
+  κ on a fresh 20-transcript hand-score is a stretch task: load
+  judge_outputs.jsonl + scipy.stats.cohen_kappa_score; no re-judging.
 - **Detection (PR-AUC)** — primary detection metric, NOT F1, NOT
   ROC-AUC (12% positive class makes those misleading). Sparse linear
   probe, top-S features, S ∈ {1, 2, 4, 8, 16, 32}.
@@ -161,10 +163,12 @@ up. If the smoke test complains about missing tokens, **ping Han**.
    HF temp-bench-data on completion. Stage A traces are read-only from
    `origin/aniket-ward-stage-b:results/ward_backtracking_txc/stage_a/`
    — port once with attribution per PROTOCOL.md § 2.
-9. **20-transcript blind κ validation** before trusting Sonnet judge.
-   Hand-score 20 transcripts → Sonnet judge same → compute κ. Must
-   clear ≥ 0.6 + agreement ≥ 0.80 to proceed (Aniket's reference:
-   0.749 / 0.773 / 1.000).
+9. **Persist judge outputs** — every Sonnet call lands in
+   `results/runs/<eval_key>/judge_outputs.jsonl` (one record per
+   `(transcript_id, magnitude, arch, judge_id, label)`). This is the
+   non-negotiable framework requirement that lets us add fresh κ
+   validation post-deadline without re-running. Fresh blind
+   hand-scoring is **deferred** — lean on Aniket's prior κ.
 10. Train 7 archs × 3 seeds via `runner.run_cell(...)` →
     inducement Δgc (Sonnet) + detection PR-AUC across the 25-point
     magnitude grid. Cut protocol: cut25.

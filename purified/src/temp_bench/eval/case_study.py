@@ -9,6 +9,16 @@ exposed via this interface:
 
 Every case study implements :class:`CaseStudy`. A worker agent runs an
 architecture through every case study with one call.
+
+**Judge-output persistence is mandatory** for every case study that
+uses an LLM judge (Gemini for C5, Sonnet for C7, etc.). Implementations
+must append each judge call to
+``<workspace>/judge_outputs.jsonl`` with fields
+``{transcript_id, magnitude, arch, judge_id, label, prompt_hash,
+judge_model, ts}``. This lets us defer Cohen's κ validation to a
+paper-end stretch task: post-deadline, fresh κ on a 20-transcript
+blind hand-score is just a pandas + scipy call. No re-judging, no
+re-training. See ``docs/components/{c5,c6,c7}.md``.
 """
 
 from __future__ import annotations

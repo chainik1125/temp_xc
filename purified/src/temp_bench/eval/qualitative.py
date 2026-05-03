@@ -4,6 +4,16 @@
 do NOT use pdvar, paper-style probe variants, or anything else.
 See ``docs/components/c4.md`` and ``decisions.md``.
 
+**Judge-output persistence is mandatory.** :func:`top_256_semantic`
+must append every judge call to
+``results/runs/<eval_key>/judge_outputs.jsonl`` with fields
+``{feature_id, context_id, judge_id, label, prompt_hash, judge_model,
+ts}``. This is what lets us defer Cohen's κ validation to a paper-end
+stretch task: post-deadline, ``pandas.read_json(judge_outputs.jsonl)``
++ ``scipy.stats.cohen_kappa_score(human_labels, judge_labels)`` is
+all that's needed to land κ — no re-judging, no re-training, no
+re-evaluating.
+
 Public API (worker fills in):
 
 - :func:`top_256_semantic(model, datasource, judges, n_jobs=-1) -> dict`
