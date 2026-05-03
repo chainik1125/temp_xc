@@ -196,7 +196,7 @@ out "your TXC won because the baseline was undertrained":
 | TXC | 0.091 | 0.91 | 96 | 3,601 | ✓ |
 | TXC-H8 | **0.50** | 0.50 | 96 | 6,201 | ✓ |
 | SAE | 0.036 | 0.96 | 215 | 9,201 | ✓ |
-| TSAE-paper | 0.071 | 0.93 | 89 | 15,000 | **hit hard cap, NOT plateau — Option A retrain to 30k in flight** |
+| TSAE-paper | **0.057** | **0.94** | **105** | **30,000** | full (Option A retrain shipped — 20% FVU drop vs 15k cap) |
 | TFA | 0.114 | 0.89 | 103 | 5,501 | ✓ |
 | MLC | 0.074 | 0.93 | 159 | 4,201 | ✓ |
 
@@ -215,10 +215,16 @@ Per-arch FVU + L0 vs step:
 ![TXC-H8 training curves (appendix)](images_b/np_training_curves/txc_h8.png)
 
 TXC-H8's FVE=0.50 confirms the H8 contrastive loss trades reconstruction
-badly at this hookpoint — supports the appendix-only demotion. TSAE-paper
-was trained for the full 15k step cap WITHOUT triggering early-stop,
-making it under-trained relative to the others; the 30k retrain (Option
-A) is in flight and will refresh this row + downstream sweep + plots.
+badly at this hookpoint — supports the appendix-only demotion.
+
+**TSAE-paper Option A retrain (2026-05-03 03:26 UTC) shipped.** Extended
+from 15k → 30k steps. FVU_eval dropped 0.0708 → 0.0567 (−20%) and L0 rose
+89 → 105. Top-1 feature unchanged (f7258). Detection AUC at \|S\|=8
+dropped slightly (0.668 → 0.643) — better reconstruction softened the
+most discriminative feature, a known TopK trade-off. **Peak Δnet vs
+baseline still 0 (peak still at mag=0)** — extending training did NOT
+produce a meaningful steering effect. The undertraining caveat is now
+resolved; all other headline conclusions unchanged.
 
 ## Architectural integrations (new in this push)
 
