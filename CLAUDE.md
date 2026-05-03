@@ -2,6 +2,13 @@
 
 Research repository combining documentation (Obsidian vault) and Python code for temporal crosscoder experiments.
 
+> **Working on the paper?** All paper-ready code, docs, and decisions live
+> in `purified/`, on the `final` branch. See `purified/CLAUDE.md` for the
+> rules that apply there. The instructions in *this* file describe the
+> historical "wasteland" — read them for context, but never import wasteland
+> code into paper work. (`purified/CLAUDE.md` auto-loads when an agent reads
+> any file under `purified/`.)
+
 Welcome. You are an AI agent working on a research project to develop temporal SAE architectures that can discover features spanning multiple token positions in language models. This document will get you up to speed on the motivation, background, codebase, and working conventions.
 
 ## Repository structure

@@ -58,14 +58,22 @@ is the "wasteland" — read it for context, never import or modify it.
 
 ## How to record checkpoints
 
-- Upload to HF: `chainik1125/temp-bench/<run_id>` (uses HF_TOKEN).
+- Upload model checkpoints to **`han1823123123/temp-bench-models`** (private),
+  under a `<run_id>/` prefix.
+- Upload activation caches / judge transcripts / synthetic data to
+  **`han1823123123/temp-bench-data`** (private dataset repo).
 - Append one line to `checkpoints/manifest.jsonl`:
   ```json
-  {"run_id": "...", "hf_url": "https://huggingface.co/chainik1125/temp-bench/<run_id>",
-   "local_path": "/workspace/.../<run_id>.pt", "size_mb": 412}
+  {"run_id": "...",
+   "hf_url": "https://huggingface.co/han1823123123/temp-bench-models/tree/main/<run_id>",
+   "local_path": "/workspace/.../<run_id>/model.safetensors",
+   "size_mb": 412,
+   "ts": "2026-05-03T..."}
   ```
 - Local-only checkpoints are allowed during development but must be HF-backed
   before the agent finishes its session.
+
+See `checkpoints/README.md` for the upload helper recipe.
 
 ## Markdown style
 

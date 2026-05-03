@@ -24,6 +24,30 @@ The repository contains a large body of historical work outside
 - If reference code is useful, copy it into `purified/src/temp_bench/`
   with attribution in a header comment. Duplication is fine; coupling is not.
 
+### 2a. Cross-branch reads (em-nanda, aniket-ward-stage-b)
+
+Dmitry's emergent-misalignment work and Aniket's backtracking work live
+on **other branches** that are still being updated. We never merge them
+into `final` — that would freeze stale snapshots and create conflict
+surface. Read them directly from origin instead:
+
+```bash
+# Refresh first (run once per agent session)
+bash purified/scripts/wasteland_refresh.sh
+
+# Read a file from a sibling branch
+git show origin/em-nanda:docs/dmitry/results/em_features/em_nanda_results_paper.md
+git show origin/aniket-ward-stage-b:docs/aniket/experiments/ward_backtracking/handoff_neurips_push.md
+
+# List a directory on a sibling branch
+git ls-tree -r origin/em-nanda --name-only | grep em_features
+```
+
+If you need to copy code from a sibling branch into `purified/`, copy
+once with attribution + the source commit hash in a header comment, then
+stop tracking origin from that point. Live-importing is forbidden;
+porting is fine.
+
 ## 3. Filesystem ownership
 
 | Path | Owner | Mutability |

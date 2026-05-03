@@ -33,11 +33,34 @@ status: active
 
 ## TODO (next sessions)
 
-- [ ] First commit + push of `final` to origin.
-- [ ] Write `purified/scripts/bootstrap_runpod.sh` (port of Phase 7 script).
+- [x] First commit + push of `final` to origin.
+- [x] Write `purified/scripts/bootstrap_runpod.sh` (port of Phase 7 script).
 - [ ] Implement TXC-base + TXC-pro in `src/temp_bench/architectures/`
       (copy + simplify from wasteland).
 - [ ] Implement C1 toy data generator + sweep script (5090-local).
 - [ ] First C1 multi-seed run (3 seeds × 12 k values × 4 archs ≈ 6 hr local).
 - [ ] Spawn Agent NLP brief for C3+C4 caching (1× H100 RunPod).
 - [ ] Spawn Agent EM brief for C6 (1× H100 RunPod).
+
+## 2026-05-03 — Day 0, follow-up turn
+
+Han raised three operational questions:
+
+1. **CLAUDE.md scoping.** Verified via claude-code-guide that subdir
+   CLAUDE.md files auto-load on demand and `@<path>` import syntax works.
+   Decision: rely on the on-demand load; added a one-line pointer in the
+   root `CLAUDE.md` so paper-bound agents notice the quarantine.
+   Recommend (not enforce) launching from `purified/` cwd.
+2. **Branch merging.** Decided NOT to merge `em-nanda` /
+   `aniket-ward-stage-b` into `final` (they're still active). Added
+   `purified/scripts/wasteland_refresh.sh` (fast `git fetch --all`) and
+   extended `PROTOCOL.md` § 2a with the cross-branch read pattern.
+3. **HF repos.** Created two private repos under han1823123123:
+   `temp-bench-models` (model) + `temp-bench-data` (dataset). Seeded each
+   with a README. Updated `purified/CLAUDE.md` checkpoint section + added
+   `purified/checkpoints/README.md` with upload helper recipe. Wasteland
+   repos (txcdr-*) untouched.
+
+All four artifacts (root CLAUDE.md edit, wasteland_refresh.sh, PROTOCOL
+update, checkpoints/README.md, decisions.md additions) committed in one
+turn after this entry.

@@ -46,6 +46,44 @@ ping Dmitry's brief in `origin/em-nanda` before launching anything.
 - Wasteland is the rest of the branch's tree — read-only context.
 - Push `final` to origin so worker agents can clone it.
 
+### 4. Cross-branch reads (em-nanda, aniket-ward-stage-b)
+
+- **Do not merge** sibling branches into `final`. They are still being
+  updated by Dmitry and Aniket; merging would freeze stale state and
+  create conflict surface on every refresh.
+- Read directly from origin: `git show origin/em-nanda:<path>`.
+- `purified/scripts/wasteland_refresh.sh` does the `git fetch` so
+  `origin/<branch>` always resolves to the latest pushed state.
+- If we need a frozen snapshot of code (e.g. Aniket's
+  `experiments/ward_backtracking_txc/`), copy it once into
+  `purified/src/temp_bench/` with the source commit hash in a header
+  comment, and stop tracking origin from then on.
+
+### 5. CLAUDE.md scoping
+
+- Subdirectory CLAUDE.md files **auto-load on demand** when an agent
+  reads files under that directory (verified). So an agent launched at
+  the repo root sees the wasteland CLAUDE.md initially, and
+  `purified/CLAUDE.md` loads automatically the moment it touches a
+  paper file.
+- Added a one-line pointer in the root `CLAUDE.md` directing paper-bound
+  agents at `purified/CLAUDE.md`.
+- Recommended (not enforced) launch pattern for paper-only agents:
+  `cd purified && claude` — keeps `git add -A` scoped to paper files.
+
+### 6. HuggingFace repos
+
+- New, private, paper-dedicated:
+  - **`han1823123123/temp-bench-models`** — all checkpoints (locked
+    archs + baselines), keyed by `<run_id>` prefix.
+  - **`han1823123123/temp-bench-data`** — activation caches, judge
+    transcripts, pre-tokenised tasks, synthetic data.
+- Provisioned 2026-05-03 with seed READMEs.
+- Wasteland repos (`han1823123123/txcdr-base`, `txcdr-it`, `txcdr`,
+  `txcdr-base-data`, `txcdr-data`) are **untouched** — they remain as
+  historical record. Paper artifacts never go into them.
+- Visibility flips to public when the paper draft stabilises.
+
 ### Non-decisions (to revisit later)
 
 - **C3 task suite** — Phase 5's 36-task vs Phase 7's 16-task PAPER subset.
