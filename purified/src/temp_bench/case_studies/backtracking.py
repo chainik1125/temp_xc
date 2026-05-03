@@ -1565,12 +1565,21 @@ def run_arch_evaluation(
         log.info("[c7] computing PR-AUC across S=%s (%d sentences)",
                  list(pr_auc_S_grid), len(sentence_labels))
         # Encode sentence-window acts via SAE → per-sentence pooled features.
+        # Batched to avoid OOM at d_sae=32768 (25K × 6 × 32768 fp32 ≈ 19 GB
+        # encoded at once; batched at 1024 caps peak at ~800 MB).
         device = next(arch.parameters()).device
+        n = len(sentence_labels)
+        batch = 1024
+        chunks: list[np.ndarray] = []
         with torch.no_grad():
-            X = arch.encode(torch.from_numpy(sentence_acts).to(device)).abs()
-            if X.dim() == 3:
-                X = X.amax(dim=1)
-            X_np = X.detach().cpu().numpy()
+            for i in range(0, n, batch):
+                xb = torch.from_numpy(sentence_acts[i:i + batch]).to(device)
+                z = arch.encode(xb).abs()
+                if z.dim() == 3:
+                    z = z.amax(dim=1)
+                chunks.append(z.detach().cpu().numpy())
+                del z, xb
+        X_np = np.concatenate(chunks, axis=0)
         pr_auc = compute_pr_auc_at_S(
             X_np, sentence_labels, sentence_qids, S_grid=pr_auc_S_grid,
         )
