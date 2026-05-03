@@ -81,35 +81,40 @@ References:
 
 ## Next action (agent owns — overwrite)
 
-1. **Wait for agent_nlp's act-cache on HF** before spawning. Poll:
-   ```
-   huggingface-cli repo info han1823123123/temp-bench-data --repo-type dataset
-   # look for an act_cache_<key>/ subdir matching the
-   # gemma_2_2b_it_l13_fineweb_24k128 datasource
-   ```
-2. `cd /workspace/temp_xc/purified` — first-time bootstrap via
-   `bash scripts/bootstrap_runpod.sh` if pod is fresh.
-3. `source scripts/set_agent_env.sh agent_steer` (sets
+**Pre-conditions (Han owns)**:
+- Han spawns this agent only **after** agent_nlp's Gemma-IT-L13 cache
+  is on HF (~T+3 hr). The agent should not be brought up before then.
+- Han runs `bash scripts/bootstrap_runpod.sh` on the pod (interactive
+  — prompts for tokens; an agent cannot enter input). Because this
+  pod is ephemeral, Han re-runs it whenever the pod is recreated.
+  When you wake up, tokens are in `/workspace/.tokens/` and
+  `purified/.venv/` exists. If the smoke test below complains about
+  missing tokens, **ping Han**.
+
+1. `cd /workspace/temp_xc/purified`
+2. `source scripts/set_agent_env.sh agent_steer` (sets
    `TEMP_BENCH_POD_MODE=ephemeral`)
-4. `bash scripts/agent_smoke_test.sh`
-5. `bash scripts/sync_from_hf.sh` (mandatory — ephemeral pod)
-6. `git pull --rebase origin final`
-7. Read `docs/components/c5.md` end-to-end and `papers/temporal_sae.md`
+3. `bash scripts/agent_smoke_test.sh`
+4. `bash scripts/sync_from_hf.sh` (mandatory — ephemeral pod;
+   pulls agent_nlp's act-cache from
+   `han1823123123/temp-bench-data`)
+5. `git pull --rebase origin final`
+6. Read `docs/components/c5.md` end-to-end and `papers/temporal_sae.md`
    § 4.4 for the case study definition.
-8. Set up Gemini judge (coh + success heads). API key resolves via
+7. Set up Gemini judge (coh + success heads). API key resolves via
    `temp_bench.utils.tokens.get_token("gemini")` from
    `/workspace/.tokens/`.
-9. Port `temp_bench.case_studies.steering` from
+8. Port `temp_bench.case_studies.steering` from
    `origin/han-phase7-unification` (search experiments/ + src/ for
    the V7 tiled-broadcast steering pipeline; cite phase7's
    `unified-pareto.md` for context).
-10. Train T-SAE, TXC-base, TXC-pro on the cached acts (3 archs × 3
-    seeds = 9 cells). Use `runner.run_cell(...)` — schema validation
-    + auto-push to HF on save.
-11. **Pre-test V7 on TXC-pro**: 1 cell at coh threshold 2.0; if
+9. Train T-SAE, TXC-base, TXC-pro on the cached acts (3 archs × 3
+   seeds = 9 cells). Use `runner.run_cell(...)` — schema validation
+   + auto-push to HF on save.
+10. **Pre-test V7 on TXC-pro**: 1 cell at coh threshold 2.0; if
     success rate is degenerate, fall back to per-position (PP) and
     document the switch in c5.md.
-12. Run V7 across 5 coherence thresholds {1.5, 1.75, 2.0, 2.25, 2.5} →
+11. Run V7 across 5 coherence thresholds {1.5, 1.75, 2.0, 2.25, 2.5} →
     coh-vs-success curves.
 
 ## Don't repeat (agent owns — overwrite)

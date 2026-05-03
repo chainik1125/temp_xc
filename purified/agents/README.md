@@ -143,8 +143,11 @@ them here — `agents/README.md` is the *roster*, not the protocol.
 3. Add an entry to `purified/scripts/set_agent_env.sh` mapping
    `<name>` to its primary GPU index + pod mode.
 4. Set `AGENT_NAME=<name>` (set_agent_env.sh handles this).
-5. Bootstrap the pod via `scripts/bootstrap_runpod.sh` (RunPod) or
-   `scripts/bootstrap_local.sh` (local).
+5. **Han** runs `scripts/bootstrap_runpod.sh` (RunPod) or
+   `scripts/bootstrap_local.sh` (local) **on the fresh pod, before
+   spawning the agent**. The script is interactive (prompts for
+   tokens) — agents cannot run it. After bootstrap, `/workspace/.tokens/`
+   is populated and the venv exists.
 
 ## Handoff protocol (cross-agent reassignment)
 

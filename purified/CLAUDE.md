@@ -32,9 +32,13 @@ bash scripts/agent_smoke_test.sh
 [ "$TEMP_BENCH_POD_MODE" = "ephemeral" ] && bash scripts/sync_from_hf.sh
 ```
 
-First-time pod provision (tokens + uv install + git checkout): see
-`scripts/bootstrap_runpod.sh` (RunPod) or `scripts/bootstrap_local.sh`
-(local).
+First-time pod provision (tokens + uv install + git checkout) is run
+**by the user, not by an agent**. `scripts/bootstrap_runpod.sh` is
+interactive (`read -rs` for token input) and an agent session cannot
+enter input. By the time you start, Han has already run it; tokens are
+in `/workspace/.tokens/` (or `~/.tokens/` locally) and the venv exists.
+If `agent_smoke_test.sh` flags missing tokens, **stop and ping Han** —
+do not try to populate the tokens yourself.
 
 ## Layout
 
@@ -283,10 +287,11 @@ must be `kebab-case`.
 ## Quick reference
 
 ```bash
-# bootstrap (RunPod, idempotent)
-cd /workspace/temp_xc/purified && bash scripts/bootstrap_runpod.sh
+# Han runs once per fresh pod (interactive — agent CANNOT run this):
+#     cd /workspace/temp_xc/purified && bash scripts/bootstrap_runpod.sh
 
-# session start (every restart)
+# session start (every restart — this IS what the agent runs):
+cd /workspace/temp_xc/purified
 source scripts/set_agent_env.sh <agent_name>
 bash scripts/agent_smoke_test.sh
 

@@ -1,14 +1,22 @@
 #!/usr/bin/env bash
 # bootstrap_runpod.sh — set up a fresh RunPod pod for the `final` paper branch.
 #
+# ──────────────────────────────────────────────────────────────────────
+#  RUN BY THE USER (HAN), NOT BY AN AGENT.
+#  This script is INTERACTIVE — it prompts for tokens via `read -rs`.
+#  An agent CANNOT enter input here; do not call this from an
+#  agent session. By the time an agent starts, this script has
+#  already been run by Han and `/workspace/.tokens/` is populated.
+# ──────────────────────────────────────────────────────────────────────
+#
 # Adapted from scripts/runpod_phase7_bootstrap.sh (wasteland) — no functional
 # dependency on it. This script lives in purified/ and is the only supported
 # entry point on RunPod.
 #
-# Usage (interactive):
+# Usage (interactive — the typical path):
 #     bash /workspace/temp_xc/purified/scripts/bootstrap_runpod.sh
 #
-# Usage (non-interactive):
+# Usage (non-interactive, e.g. CI):
 #     GH_TOKEN=ghp_xxx HF_TOKEN=hf_xxx ANTHROPIC_API_KEY=sk-xxx \
 #         bash /workspace/temp_xc/purified/scripts/bootstrap_runpod.sh
 #

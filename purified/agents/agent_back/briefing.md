@@ -85,8 +85,14 @@ References:
 
 ## Next action (agent owns — overwrite)
 
-1. `cd /workspace/temp_xc/purified` — first-time bootstrap via
-   `bash scripts/bootstrap_runpod.sh` if pod is fresh.
+**Pre-condition (Han owns)**: Han has already run
+`bash scripts/bootstrap_runpod.sh` on this pod (interactive — prompts
+for tokens; an agent cannot enter input). Because this pod is
+ephemeral, Han re-runs it whenever the pod is recreated. Tokens are
+in `/workspace/.tokens/` and `purified/.venv/` exists when you wake
+up. If the smoke test complains about missing tokens, **ping Han**.
+
+1. `cd /workspace/temp_xc/purified`
 2. `source scripts/set_agent_env.sh agent_back` (sets
    `TEMP_BENCH_POD_MODE=ephemeral`)
 3. `bash scripts/agent_smoke_test.sh`

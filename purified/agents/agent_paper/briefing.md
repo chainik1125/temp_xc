@@ -173,12 +173,15 @@ independent.
 
 ### Recommended spawn order
 
-- **T+0 (parallel start)**: agent_nlp, agent_em, agent_back. Each
-  begins its own pod bootstrap + cache build / model port.
-  agent_paper (me) continues with C1+C2 locally.
-- **T+~3 hr (after C3 cache uploaded)**: spawn agent_steer; it
-  `sync_from_hf.sh`s the cache and starts immediately.
-- **Defer agent_em_h200** to fallback only (if R32 organism OOMs on H100).
+- **T+0 (parallel start)**: Han runs `bootstrap_runpod.sh` on the H100
+  pod (interactive — once per pod) + on the A40 pod, **before**
+  spawning agents. Then spawns agent_nlp + agent_em (H100) and
+  agent_back (A40 GPU 1). Each agent's first action is its smoke
+  test, not the bootstrap. agent_paper (me) continues C1+C2 locally.
+- **T+~3 hr (after C3 cache uploaded)**: Han spawns agent_steer on
+  the A40 pod (GPU 0). Agent's first action is `set_agent_env.sh`
+  + smoke + `sync_from_hf.sh` to pull the cache.
+- **Defer agent_em_h200** to fallback only (if R32 OOMs on H100).
 
 Rationale: parallelize the long-pole work (C3 cache build, EM Wang
 procedure, C7 backtracking), don't gate steering on its own pod-spinup

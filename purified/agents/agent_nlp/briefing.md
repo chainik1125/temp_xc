@@ -71,10 +71,16 @@ References:
 
 ## Next action (agent owns — overwrite)
 
-1. `cd /workspace/temp_xc/purified` (RunPod) — first-time bootstrap via
-   `bash scripts/bootstrap_runpod.sh` if pod is fresh.
+**Pre-condition (Han owns)**: Han has already run
+`bash scripts/bootstrap_runpod.sh` on this pod (interactive — prompts
+for tokens; an agent cannot enter input). When you wake up, tokens
+are already in `/workspace/.tokens/` and `purified/.venv/` exists. If
+the smoke test below complains about missing tokens, **ping Han** —
+do not try to populate them yourself.
+
+1. `cd /workspace/temp_xc/purified`
 2. `source scripts/set_agent_env.sh agent_nlp`
-3. `bash scripts/agent_smoke_test.sh` (38/38 + expected gaps)
+3. `bash scripts/agent_smoke_test.sh` (46/46 + expected gaps)
 4. `git pull --rebase origin final`
 5. Read `docs/components/c3.md` + `c4.md` end-to-end. Decide task
    suite (Option A SAEBench / Option B 16-task PAPER) and update

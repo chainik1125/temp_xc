@@ -22,10 +22,15 @@ Pod modes determine sync behavior — see
 `purified/docs/paper/hardware.md § Pod modes` for the full story
 (checkpoints auto-push to HF on ephemeral pods, etc.).
 
-## First-time setup on a new pod
+## First-time setup on a new pod (HUMAN ONLY)
 
-Done once per pod. The bootstrap script handles tokens, uv install,
-HF cache, repo clone, and `uv sync`.
+**This step must be done by you, not by an agent.** The bootstrap
+script is interactive (`read -rs` for token input); an agent session
+cannot enter input. Run it once on a fresh persistent pod, or every
+time an ephemeral pod is recreated, **before** spawning an agent.
+
+The bootstrap handles tokens, uv install, HF cache, repo clone, and
+`uv sync`.
 
 ```bash
 cd /workspace
@@ -34,6 +39,14 @@ cd temp_xc && git checkout final && git pull --rebase origin final
 
 # Run the unified bootstrap (idempotent — re-running is safe)
 bash purified/scripts/bootstrap_runpod.sh
+```
+
+If you want to provision unattended (e.g. CI), set the tokens via
+env vars:
+
+```bash
+GH_TOKEN=ghp_xxx HF_TOKEN=hf_xxx ANTHROPIC_API_KEY=sk-xxx \
+    bash purified/scripts/bootstrap_runpod.sh
 ```
 
 The bootstrap:
