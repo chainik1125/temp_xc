@@ -1,0 +1,25 @@
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+.ruff_cache/
+.pytest_cache/
+
+# Run outputs are too big for git; only manifests + plots are committed
+results/runs/*/log.txt
+results/runs/*/*.pt
+results/runs/*/*.safetensors
+results/runs/*/*.ckpt
+results/runs/*/cache/
+
+# Local checkpoints — tracked via manifest.jsonl, not git
+checkpoints/*.pt
+checkpoints/*.safetensors
+checkpoints/local/
+
+# HF cache (when run inside purified/)
+hf_cache/
+
+# Token files (paranoia)
+.tokens/
+*.token
