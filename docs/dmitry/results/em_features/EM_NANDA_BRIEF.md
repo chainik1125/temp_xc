@@ -10,6 +10,77 @@ tags:
 
 **You are an autonomous routine continuing from the dmitry-branch work.** Branch: `em-nanda`. AGENT_BRIEF.md (on dmitry) covers the prior Qwen-7B medical setup. This doc supersedes that for the Qwen-14B financial pivot.
 
+### Status as of 2026-05-03 02:00 UTC (status-only firing — both GPUs idle, single-feat axis closed; bundle deferred pending frontier_sweep infra extension)
+
+**This firing (02:00 UTC) actions:**
+
+- **Both GPUs idle, no completions.** Verified at 02:01 UTC: local
+  (h100_1) 0%/0 MiB; h100_2 0%/0 MiB. Per rule (6) spirit: no
+  completions to act on, no new heavy launches without crystallized
+  motivation.
+- **Bundle frontier deferred this firing**, with rationale captured for
+  the next agent (so they don't re-evaluate from scratch):
+  - `experiments/em_features/frontier_sweep.py` — the only existing
+    bundle-frontier launcher — is keyed to `MODEL_REGISTRY = {qwen,
+    llama}` (Qwen-7B medical / Llama-3.2-3B medical). It does **not**
+    take `--base_model` / `--subject_model` flags. Running an
+    em_nanda Qwen-14B finance R32 bundle requires either (a) adding a
+    new registry entry for `qwen14b_finance_r32` (LoRA adapter +
+    Qwen-14B-Instruct base), or (b) extending it with
+    `--base_model`/`--subject_model` flags symmetric to what
+    `run_wang_procedure.py` already has.
+  - Plus the bundle source pool needs a `top_30_bundle_features.json`
+    derived from `/root/em_features/results/em_nanda_sae_arditi_step10000_wang_r32/stage2_screen.json`
+    on h100_2 (sorted by `screen_score` descending). Cheap (~5 min)
+    but currently not staged.
+  - Brief's "30 min batched on one GPU" estimate assumed the bundle
+    infra was already in place. Realistic effort to do it correctly +
+    avoid model-loading bugs is ≥1 firing of focused work.
+  - Single-feat axis is genuinely closed with a win on the harder
+    (R32) organism (64.53 vs 58.47, +5.5 align with +9 coh margin).
+    Bundle would be incremental at best — not paper-critical per
+    01:00 UTC brief.
+- **/root disk audit** (per 01:00 UTC priority): /root local at 92%
+  used / 17 GB free. Breakdown of `/root/em_features/checkpoints/`
+  (121 GB total):
+  - **110 GB**: legacy `qwen_l15_*.pt` checkpoints from the Qwen-7B
+    medical work (dmitry-branch artifacts — han_champ_100k 14 GB,
+    txc_brickenauxk_a8_residmid 14 GB, multiple TXC/T-SAE 6.6 GB
+    each, several SAE arditi 897 MB each). **NOT em_nanda artifacts.**
+    Per rule (7), do not delete without logging in
+    `trained_models_log.md` first; flagged here for next firing if
+    cleanup motivated.
+  - **8.1 GB**: em_nanda Qwen-14B checkpoints (SAE arditi 10k 3.8 GB,
+    TXC paper k=100 10k/5k/30k ~3 GB each on h100_2; `qwen14b_*` on
+    local is the SAE arditi 5k + 30k ~7.6 GB).
+  - /workspace 30% used (141 GB free) on local, 37% on h100_2 (435 TB
+    free shared mfs). HF_HOME=/workspace/hf_cache holding fine.
+  - Bottom line: **/root has no headroom on local** for new SAE/TXC
+    checkpoints. If next firing wants to launch new training (not
+    recommended), route checkpoint to `/workspace/em_features/checkpoints/`
+    via `--ckpt_dir` (or set `CHECKPOINT_DIR` env). For Wang outputs,
+    `/workspace/em_features/results/` is the right home.
+- No commits beyond this brief append + synthesis status entry.
+
+**Next firing priorities (likely 03:00 UTC)**:
+
+- **If launching the R32 bundle frontier crystallizes**: first do
+  the frontier_sweep.py infra extension (add `--base_model`/`--subject_model`
+  flags or a `qwen14b_finance_r32` MODEL_REGISTRY entry), then build
+  `top_30_bundle_features.json` from the h100_2 stage2_screen.json,
+  then launch on h100_2 (SAE arditi 10k ckpt + R32 LoRA both already
+  there). α grid suggestion: `−100 −60 −40 −30 −20 −15 −10 −6 −3 −1
+  0 +1 +3 +6 +10` (covers std + ext, ~15 cells × ~30s/cell ≈ 8
+  min). Hypothesis: bundle pushes R32 align ≥70 if features point
+  in coherent directions; ≤65 if redundant.
+- **If pivoting to write-up**: paper-figure assets are complete
+  (`em_nanda_*frontier*.png`, `em_nanda_step_count_trajectory.png`,
+  `em_nanda_arch_organism_alpha_table.png`). Next document layer
+  would be a paper-style results section pulling the closed 8-cell
+  table + the cross-organism single-feat champions.
+- **If neither motivation crystallizes**: status-only firing is
+  acceptable — no fabricated work just to fill a slot.
+
 ### Status as of 2026-05-03 01:00 UTC (paper-figure panel landed; all three plots in place; both GPUs idle)
 
 **This firing (01:00 UTC) actions:**

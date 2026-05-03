@@ -1471,3 +1471,73 @@ worth audit next firing if a launch is planned).
 - **/root disk audit** if the next firing wants to launch anything new
   on local — at 92% there's no headroom for new SAE checkpoints; would
   need to either route to /workspace or clean stale runs.
+
+### Status as of 2026-05-03 02:00 UTC (status-only firing; bundle deferred — frontier_sweep.py needs Qwen-14B finance R32 infra extension first)
+
+**Headline**: Both GPUs idle, no completions. Single-feat axis remains
+closed; paper-figure assets remain complete. Optional R32 bundle
+frontier not launched this firing because the only existing
+bundle-frontier launcher (`experiments/em_features/frontier_sweep.py`)
+is keyed to a `MODEL_REGISTRY = {qwen, llama}` covering only Qwen-7B
+medical and Llama-3.2-3B medical — no `--base_model`/`--subject_model`
+overrides exist. Adding Qwen-14B finance R32 support is straightforward
+(~10–30 lines) but materially more work than the brief's "30 min batched"
+estimate, and is not paper-critical given the single-feat win on R32
+(64.53 vs 58.47).
+
+**This firing's actions**:
+
+- Verified GPU state: local h100_1 0%/0 MiB; h100_2 0%/0 MiB at 02:01 UTC.
+- Verified em_nanda artifact location: SAE arditi 10k ckpt
+  (`qwen14b_l24_sae_arditi_k128_em_nanda_step10000.pt`, 3.8 GB) is on
+  h100_2 in `/root/em_features/checkpoints/`. R32 LoRA
+  (`qwen14b_r32_finance_lora`, 537 MB) is on local in
+  `/root/em_features/checkpoints/`. Both copies of the SAE arditi 10k
+  ckpt exist (h100_2 + local /workspace).
+- Verified bundle source data: stage2_screen.json
+  (`/root/em_features/results/em_nanda_sae_arditi_step10000_wang_r32/stage2_screen.json`)
+  exists on h100_2, 100 rows sorted by `screen_score`. Top survivors:
+  21476 / 27970 / 11086 / ... Generating a k=30 bundle features JSON
+  is a ~5-line Python script.
+- Disk audit: /root local at 92% used (17 GB free). 110 GB of the 121 GB
+  in `/root/em_features/checkpoints/` is **legacy Qwen-7B medical work**
+  (`qwen_l15_*.pt` — han_champ 14 GB, txc_brickenauxk_a8_residmid 14 GB,
+  TXC paper k=20/50/100/100bt_60k 6.6 GB each, T-SAE 2.7 GB each, SAE
+  arditi 897 MB each, wtsae T2/T3 ~2 GB each). Em_nanda artifacts on
+  local are only ~7.6 GB. Per rule (7), legacy ckpts are NOT deleted
+  this firing — flagged for next firing if cleanup motivated.
+  /workspace 30% used (141 GB free) — fine for new artifacts.
+- HF_HOME=/workspace/hf_cache holding on both hosts.
+
+**Open question deferred to next firing**: do we want the R32 bundle
+frontier or not? The brief's argument for bundling is that it tests
+whether R32's "more distributed" misalignment (the reason single-feat
+needs α=−30 vs R1's α=−6 for similar effects) can be coherently
+reassembled by summing many features. If yes, bundle align could push
+toward R1's mid-90s on R32 (genuinely new result). If no, the bundle
+plateaus near or below the single-feat champion (64.53 / 96.25), which
+is also informative about the architecture-vs-organism interaction.
+Either answer is publishable as a follow-up paragraph, but neither
+changes the headline finding (SAE arditi single-feat clears 58.47 on
+both organisms).
+
+**Recommendation for next firing**: if going for the bundle, do these
+3 sequential steps in one firing:
+
+1. Edit `frontier_sweep.py` MODEL_REGISTRY to add a `qwen14b_finance_r32`
+   entry pointing at the R32 LoRA + Qwen-14B-Instruct base. (Or add
+   `--base_model`/`--subject_model` flags symmetric to
+   `run_wang_procedure.py`.) Push the edit to git and `git pull` on
+   h100_2 (clone exists at `/root/temp_xc`, currently on em-nanda
+   branch but several commits behind local).
+2. ssh h100_2 to write top-30-by-`screen_score` features from the local
+   stage2_screen.json into a `top_30_bundle_features.json` next to it.
+3. Launch frontier_sweep on h100_2 with `--steerer custom_sae --layer 24
+   --custom_sae_ckpt /root/em_features/checkpoints/qwen14b_l24_sae_arditi_k128_em_nanda_step10000.pt
+   --features_json …/top_30_bundle_features.json --k 30 --alpha_grid
+   -100 -60 -40 -30 -20 -15 -10 -6 -3 -1 0 +1 +3 +6 +10 --n_rollouts 8
+   --judge gemini --out_path /root/em_features/results/em_nanda_sae_arditi_step10000_wang_r32_bundle30_frontier.json`
+   (~8 min batched).
+
+**Compute & disk hygiene**: see above. No new jobs queued. No commits
+beyond brief + synthesis status entries.
