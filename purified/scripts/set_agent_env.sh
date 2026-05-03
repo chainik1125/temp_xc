@@ -46,14 +46,17 @@ case "$agent" in
         export AGENT_NAME=agent_back
         export TEMP_BENCH_POD_MODE=ephemeral
         ;;
-    agent_synth)
+    # ── Spare A40 GPU slots (no named agent — used by lead agents for
+    #    launching parallel cell processes; AGENT_NAME inherits from
+    #    the parent shell so leaderboard rows are still attributable.) ─
+    a40_helper_gpu2)
         export CUDA_VISIBLE_DEVICES=2
-        export AGENT_NAME=agent_synth
+        export AGENT_NAME="${AGENT_NAME:-a40_helper_gpu2}"
         export TEMP_BENCH_POD_MODE=ephemeral
         ;;
-    agent_qa)
+    a40_helper_gpu3)
         export CUDA_VISIBLE_DEVICES=3
-        export AGENT_NAME=agent_qa
+        export AGENT_NAME="${AGENT_NAME:-a40_helper_gpu3}"
         export TEMP_BENCH_POD_MODE=ephemeral
         ;;
 
@@ -71,7 +74,7 @@ case "$agent" in
 
     *)
         echo "unknown agent: $agent" >&2
-        echo "known: agent_paper, agent_nlp, agent_em, agent_em_h200, agent_steer, agent_back, agent_synth, agent_qa" >&2
+        echo "known: agent_paper, agent_nlp, agent_em, agent_em_h200, agent_steer, agent_back, a40_helper_gpu2, a40_helper_gpu3" >&2
         return 1 2>/dev/null || exit 1
         ;;
 esac

@@ -112,8 +112,12 @@ Rationale (specific to our workload):
 The framework's `runner.run_cell` therefore expects exactly one
 visible GPU (verified by `preflight()`). Multi-GPU is forbidden, not
 unsupported — `CUDA_VISIBLE_DEVICES` is single-valued in
-`scripts/set_agent_env.sh`, and the A40 pod gets four single-GPU
-agents (agent_steer, agent_back, agent_synth, agent_qa).
+`scripts/set_agent_env.sh`. The A40 pod has 2 named agents
+(agent_steer on GPU 0, agent_back on GPU 1) + 2 spare GPU slots
+(GPUs 2 and 3) reachable via `a40_helper_gpu2` and `a40_helper_gpu3`
+in the env script. Lead agents launch helper processes on spare GPUs
+when they want to parallelize across seeds — no new named agent
+needed unless the work requires its own briefing and log.
 
 ## Pod modes — persistent vs ephemeral
 

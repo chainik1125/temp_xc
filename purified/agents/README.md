@@ -22,10 +22,16 @@ verifies the pinning).
 | **agent_em** | 2× H100 | **1** | 80 GB | persistent | C6 | TBD | not provisioned |
 | **agent_steer** | 4× A40 | **0** | 48 GB | **ephemeral** | C5 | TBD | not provisioned |
 | **agent_back** | 4× A40 | **1** | 48 GB | **ephemeral** | C7 | TBD | not provisioned |
-| **agent_synth** | 4× A40 | **2** | 48 GB | **ephemeral** | reserve — synth helper, multi-seed extension, A/B tests | TBD | open |
-| **agent_qa** | 4× A40 | **3** | 48 GB | **ephemeral** | reserve — Bricken A/B tests, sanity reruns, judge κ validation | TBD | open |
-| **agent_apple** | TBD | TBD | TBD | TBD | TBD | [`agent_apple/`](agent_apple/) | placeholder dir, no briefing yet |
 | **agent_em_h200** (fallback) | H200 | 0 (only GPU) | 141 GB | persistent | C6 if R32 blows H100 | n/a | dormant |
+
+The **4× A40 pod has 2 named agents + 2 spare GPU slots** (GPUs 2 and 3).
+Spare slots are not owned by a named agent. The lead agent on either
+component may launch a second process on a spare GPU to run a cell in
+parallel — for example, agent_steer could run seed=42 on GPU 0 and
+seed=1 on GPU 2 simultaneously by launching two processes with
+different ``CUDA_VISIBLE_DEVICES``. We add a named agent to a spare
+slot only if a concrete need emerges that the existing roster can't
+cover.
 
 Pod sharing keeps activation caches and checkpoints on the same volume
 (zero cross-pod transfer cost when an agent on the same pod needs an
@@ -72,7 +78,7 @@ The framework knows which mode it's in via the
 | Agent | TEMP_BENCH_POD_MODE |
 |---|---|
 | agent_nlp, agent_em, agent_em_h200, agent_paper | `persistent` |
-| agent_steer, agent_back, agent_synth, agent_qa | `ephemeral` |
+| agent_steer, agent_back (+ any helper processes on the A40 pod) | `ephemeral` |
 
 The ephemeral mode triggers two things:
 1. **Bootstrap**: ``scripts/sync_from_hf.sh`` pulls the latest

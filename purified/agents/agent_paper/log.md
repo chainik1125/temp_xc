@@ -142,6 +142,24 @@ modularity-first design:
 - `experiments/_runner_template.py` — ~80-line copy-paste template
   for new components
 
+## 2026-05-03 — Day 0, agent roster trim
+
+Han: agent_synth and agent_qa don't have unique jobs — drop them.
+agent_apple was just a placeholder — also drop.
+
+Honest reckoning: I was filling 4 A40 GPU slots with named agents,
+not naming agents based on real work. C1/C2 are PAPER's job; Bricken
+A/B and judge κ are per-component (lead agents handle their own).
+Dropped all three.
+
+New A40 pod topology: 2 named agents (steer + back) + 2 spare GPU
+slots (a40_helper_gpu2, a40_helper_gpu3). Spare slots are reachable
+via `set_agent_env.sh` for lead agents launching parallel-seed
+processes — no new named agent needed unless concrete work emerges.
+
+Files updated: agents/README.md, scripts/set_agent_env.sh,
+docs/paper/hardware.md, deleted agents/agent_apple/.
+
 **Tests** (23/23 passing):
 
 - `tests/test_cache_keys.py` — determinism, version-bump invalidation,
