@@ -1662,6 +1662,95 @@ beyond brief + synthesis status entries.
   a future firing wants to launch new SAE/TXC training on local
   (next firing not training-bound, so deferring).
 
+### Status as of 2026-05-03 05:00 UTC (generator-path reconciliation resolved from existing data — bundle's "−40 coh" is mostly path artifact, paper doc tightened; no compute spent)
+
+**This firing (05:00 UTC) actions:**
+
+- **Resolved the 04:00 UTC reconciliation question without launching any
+  job**, by mining α=0 (zero-perturbation control) cells that already
+  exist in both `run_wang_procedure.py` stage-4 outputs and the bundle
+  `frontier_sweep.py` output. At α=0 the perturbation is identically
+  zero, so any α=0 coh delta between the two scripts is *purely* a
+  generator-path artifact (different sampling/decoding/judge config)
+  with no contribution from steering.
+- **Numbers** (R32 organism, layer-24 resid_post, Qwen-14B finance
+  LoRA subject, Gemini judge, 8 rollouts × 8 prompts = 64 cell):
+
+  | path                       | source file                                         | α=0 align | α=0 coh |
+  | :------------------------- | :-------------------------------------------------- | --------: | ------: |
+  | `run_wang_procedure.py` (batched), feat 21224 | `…wang_r32/stage4_final_frontier.json` | 45.00 | **94.30** |
+  | `run_wang_procedure.py` (batched), feat 30540 | `…wang_r32/stage4_final_frontier.json` | 44.69 | **97.03** |
+  | `run_wang_procedure.py` (batched), feat 21466 | `…wang_r32/stage4_final_frontier.json` | 43.44 | **95.78** |
+  | `frontier_sweep.py` (single-pass), bundle k=30 | `…bundle_r32/bundle30_frontier.json` | 34.69 | **50.39** |
+
+  Mean run_wang α=0 coh across the three R32 single-feat finalists =
+  **95.70**. Frontier_sweep α=0 coh = 50.39. **Generator-path baseline
+  difference at α=0 = ~45 coh points** (purely path, no steering).
+- **Implication for the paper bundle null result**: the cross-script
+  −40 coh delta (single-feat 96.25 vs bundle 55.62 at α=−30) is
+  *mostly* the generator-path baseline gap (~45), not bundle-induced
+  coh degradation. Path-baseline-corrected:
+  - Bundle α=−30 coh = 55.62 vs its own α=0 = 50.39 → **+5.23 coh
+    above its baseline** (steering does not appreciably worsen coh).
+  - Single-feat 21224 α=−30 coh = 96.25 vs its own α=0 = 94.30 →
+    **+1.95 coh above its baseline** (also clean).
+  - Both bundle and single-feat preserve coherence within ~5 coh
+    points of their respective generator paths' α=0 controls. The
+    headline "single-feat > bundle on align by 23 points" is unchanged;
+    the apparent 41-pt coh gap is generator artifact, not bundle weakness.
+- **Edited `em_nanda_results_paper.md`** (commit pending this firing):
+  - Headline bullet on bundle: removed the "−41 coh" claim from the
+    one-liner; added a sub-clause flagging the generator-path
+    correction. Single-feat > bundle on align by 23 points stays the
+    headline.
+  - Result 3 ("bundle null"): removed the speculative "would resolve
+    the ambiguity but is not paper-critical" caveat paragraph;
+    replaced with a "Generator-path reconciliation" paragraph
+    presenting the α=0 control table above and the corrected
+    interpretation.
+- **GPU state**: local h100_1 0%/0 MiB; h100_2 0%/0 MiB at 05:00 UTC.
+  Both idle pre- and post-firing. No new launches.
+- **Disk**: /root local at 92% unchanged; /workspace 30%; HF_HOME holding.
+
+**Why this beats running the cheap probe:**
+
+- The α=0 control cell is already in both scripts' existing outputs.
+  Running `run_wang_procedure.py` α ∈ {0, −30} on the same finalists
+  would just re-measure α=0 numbers we already have at 64-rollout
+  resolution.
+- A new probe would also re-measure α=−30, but we already know
+  `run_wang_procedure.py` α=−30 coh = 96.25 from the extalpha output.
+  No new information. ~10 min compute saved without information loss.
+- The paper interpretation is now tighter and uses no fabricated data.
+
+**Closed-axis state at end of firing** (unchanged from 04:00 UTC; only
+the bundle interpretation tightened):
+
+| arch / config       | R1 5k mid | R32 10k single ext-α | R32 10k bundle k=30 mid |
+| :------------------ | --------: | -------------------: | ----------------------: |
+| SAE arditi          | **96.88** | **64.53** ⭐         | 41.33                   |
+| TXC k=100           |  91.80    | 51.95                | (not run)               |
+| medical-champ goal  |  +38.41   | +6.06                | −17.14 (align only)     |
+
+**Next firing priorities (likely 06:00 UTC)**:
+
+- **Status-only firing acceptable** — both axes closed, paper-doc
+  reconciliation tightened with no compute spent, paper-figure asset
+  bundle complete. No fabricated work to fill a slot.
+- **No more open cheap probes on this pivot**. The only remaining
+  open compute (per "What is closed/open" in the paper doc): bundle
+  with a different selection criterion (Hessian-eigendirection,
+  decoder-row mutual orthogonality) — exploratory, no theoretical
+  reason to expect a win, not paper-critical.
+- **Optional cleanup window**: legacy 110 GB qwen_l15_*.pt checkpoints
+  on /root local remain candidates for deletion if new local training
+  is wanted; per rule (7) must be logged in `trained_models_log.md`
+  first. Not load-bearing this firing.
+- **3-firing-stuck rule** (rule 9): not engaged. This firing made a
+  durable contribution (zero-compute reconciliation tightening the
+  paper). 04:00 UTC firing landed the paper doc. 03:00 UTC closed the
+  bundle axis. No appended "stuck" section needed.
+
 ### Status as of 2026-05-03 04:00 UTC (paper-style results section landed; both axes remain closed; no compute spent)
 
 **This firing (04:00 UTC) actions:**

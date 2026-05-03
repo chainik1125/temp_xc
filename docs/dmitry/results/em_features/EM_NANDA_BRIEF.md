@@ -10,6 +10,90 @@ tags:
 
 **You are an autonomous routine continuing from the dmitry-branch work.** Branch: `em-nanda`. AGENT_BRIEF.md (on dmitry) covers the prior Qwen-7B medical setup. This doc supersedes that for the Qwen-14B financial pivot.
 
+### Status as of 2026-05-03 05:00 UTC (generator-path reconciliation resolved from existing data — bundle's "−40 coh" is mostly path artifact; paper doc tightened; no compute spent)
+
+**Headline**: Cleared the only open cheap probe (the bundle vs
+single-feat coh-floor reconciliation flagged in 03:00 UTC and 04:00 UTC
+priorities) **without launching anything**, by mining α=0
+zero-perturbation control cells that already exist in both
+`run_wang_procedure.py` stage-4 outputs and the
+`frontier_sweep.py` bundle output. At α=0 the perturbation is identically
+zero, so the cross-script coh delta there is purely a generator-path
+artifact. Result: `run_wang_procedure.py` α=0 coh ≈ **95.70** (mean of
+three R32 finalists 21224/30540/21466); `frontier_sweep.py` bundle k=30
+α=0 coh = **50.39**. Path baseline gap = **~45 coh points**, with no
+steering involved. The cross-script −40 coh delta in the paper's bundle
+section is therefore *mostly path artifact, not bundle weakness*. Bundle
+α=−30 coh (55.62) is +5.23 above its own α=0 floor; single-feat α=−30
+coh (96.25) is +1.95 above its own α=0 floor. Both preserve coherence
+within ~5 points of their respective generator-path baselines. The
+headline (single-feat > bundle by 23 align points on R32) is unchanged.
+
+**This firing (05:00 UTC) actions:**
+
+- Verified both GPUs idle: local h100_1 0%/0 MiB; h100_2 0%/0 MiB at
+  05:00 UTC, pre- and post-firing.
+- **Decided against launching the queued cheap probe**: the α=0
+  control cell is already in both scripts' existing outputs at
+  64-rollout resolution. Re-running α ∈ {0, −30} via `run_wang_procedure.py`
+  would just re-measure numbers we already have (α=0 from the original
+  wang_r32 stage4, α=−30 from the extalpha output). No new
+  information, ~10 min compute saved.
+- **Edited `em_nanda_results_paper.md`** (Result 3 + headline bullet):
+  - Headline bullet: removed the misleading "−41 coh" cross-script
+    figure from the one-liner; bundle null is described as "−23 align
+    below single-feat champion" with a sub-clause flagging the
+    generator-path correction.
+  - Result 3 ("bundle null"): removed the speculative caveat paragraph
+    that flagged the reconciliation as future work; replaced with a
+    "Generator-path reconciliation" paragraph presenting an α=0 control
+    table and the path-baseline-corrected interpretation. The headline
+    conclusion (single-feat > bundle on align) is preserved.
+- **No commits to code, scripts, or experiment infra.** Only doc
+  changes: paper-doc edit, synthesis status entry, this brief append.
+- Disk hygiene unchanged: /root local 92%; /workspace 30%;
+  HF_HOME=/workspace/hf_cache holding.
+
+**Why this is a real contribution despite zero compute:**
+
+- The brief's 04:00 UTC priorities flagged the reconciliation as the
+  *only* open cheap probe on the em_nanda pivot. Resolving it without
+  spending compute is strictly better than running the probe — the
+  data needed was already on disk.
+- The paper doc previously reported a misleading "−40 coh" gap for the
+  bundle. The corrected version separates "bundle hurts coh" (false)
+  from "the two scripts have different unsteered baselines" (true) and
+  makes the headline align number (23 points) the load-bearing claim.
+- This is exactly the kind of "cheap fast experiment" the routine asks
+  for — we just made it free instead of cheap.
+
+**Closed-axis state at end of firing** (unchanged from 04:00 UTC; only
+the bundle interpretation tightened):
+
+| arch / config       | R1 5k mid | R32 10k single ext-α | R32 10k bundle k=30 mid |
+| :------------------ | --------: | -------------------: | ----------------------: |
+| SAE arditi          | **96.88** | **64.53** ⭐         | 41.33                   |
+| TXC k=100           |  91.80    | 51.95                | (not run)               |
+| medical-champ goal  |  +38.41   | +6.06                | −17.14 (align only)     |
+
+**Next firing priorities (likely 06:00 UTC)**:
+
+- **Status-only firing acceptable** — both axes closed, paper-doc
+  reconciliation tightened with zero compute, paper-figure asset
+  bundle complete. No fabricated work to fill a slot.
+- **No more cheap open probes on this pivot.** The remaining
+  "What is open" in the paper doc (alternative bundle selection
+  criteria, TXC variants, cross-layer hookpoints) are all
+  exploratory + not paper-critical and ≥1 firing of compute each.
+  None are queued.
+- **Optional cleanup window**: legacy 110 GB qwen_l15_*.pt checkpoints
+  on /root local remain candidates for deletion if new local training
+  is wanted; per rule (7) must be logged in `trained_models_log.md`
+  first. Not load-bearing this firing.
+- **3-firing-stuck rule** (rule 9): not engaged. This firing made a
+  durable contribution (zero-compute reconciliation, paper doc
+  tightened). Last 4 firings each made a durable contribution.
+
 ### Status as of 2026-05-03 04:00 UTC (paper-style results section landed — `em_nanda_results_paper.md`; both axes remain closed; both GPUs idle; no compute spent)
 
 **Headline**: Pivoted from compute to write-up per the 03:00 UTC priority

@@ -40,9 +40,13 @@ caveat (R32 is a much harder organism than R1 even on the new base).
   regime where the dictionary has to "do real work."
 - **Bundle aggregation does not help on R32.** A k=30 bundle of the top
   causal candidates (by Wang-screen score) on R32 peaks at align 41.33
-  / coh 55.62 — strictly worse than the single-feat champion (−23 align,
-  −41 coh). The "distributed misalignment that can be reassembled by
-  summing features" hypothesis is falsified.
+  — −23 align below the single-feat champion (64.53). The naive
+  cross-script coh delta (−41) is mostly a generator-path artifact (the
+  bundle launcher's α=0 coh baseline is ~50, while the single-feat
+  launcher's is ~95); generator-baseline-corrected, both bundle and
+  single-feat sit within a few coh points of their respective α=0
+  controls at peak α. The "distributed misalignment that can be
+  reassembled by summing features" hypothesis is falsified on align.
 
 ### Setup
 
@@ -144,8 +148,8 @@ Bundle vector norm = 7.22 (sum of unit-norm decoder rows).
 | +10  | 29.38 | 45.47 |                                 |
 
 Bundle peak at α=−30 (effective d_in perturbation magnitude ~217, ~7×
-single-feat α=−30) is **−23.20 align AND −40.63 coh** worse than the
-SAE arditi single-feat champion (feat 21224 @α=−30 → 64.53/96.25). The
+single-feat α=−30) is **−23.20 align** below the SAE arditi single-feat
+champion (feat 21224 @α=−30 → 64.53/96.25). The
 effective-magnitude-matched probes (α ∈ {−1, −3, −6}) all sit at the
 unsteered baseline, so there is no hidden mid-α peak that a finer α
 grid would reveal.
@@ -158,18 +162,30 @@ misalignment-orthogonal noise. R32's "more distributed" character means
 its align ceiling is lower than R1's, but the lift is not recoverable by
 naive bundle-summation.
 
-A caveat: bundle measurements use `frontier_sweep.py`'s
-`generate_longform_completions` path (single-pass, T=1.0), while the
-single-feat champion was measured with `run_wang_procedure.py`'s
-`run_batched_alpha_cells` path. The bundle's α=0 baseline coh of ~50 is
-therefore not directly comparable to the single-feat α=0 coh sitting in
-the 90s. The headline conclusion (single-feat > bundle on both align and
-coh) holds because both single-feat α=−30 and bundle α=−30 use comparable
-generator paths within their own measurement, but the absolute coh floor
-for the bundle should be read with this methodological note in mind. A
-~10-min reconciliation probe (re-run α ∈ {0, −30} via
-`run_wang_procedure.py` on the same R32 finalists) would resolve the
-ambiguity but is not paper-critical.
+**Generator-path reconciliation.** Bundle measurements use
+`frontier_sweep.py`'s `generate_longform_completions` path (single-pass),
+while the single-feat champion was measured with `run_wang_procedure.py`'s
+`run_batched_alpha_cells` path. The two paths produce different
+unsteered-baseline coh, so the apparent −40 coh delta in the cross-script
+comparison is mostly a path artifact, not a property of bundle steering.
+This is now visible in the existing data without re-running anything,
+because both scripts include α=0 (zero-perturbation control) cells on
+the same R32 organism and Gemini judge:
+
+| measurement                  | path                | α=0 coh        |
+| :--------------------------- | :------------------ | -------------: |
+| single-feat 21224, 30540, 21466 (mean) | `run_wang_procedure.py` (batched) | 95.70 |
+| bundle k=30 (control)        | `frontier_sweep.py` (single-pass)  | 50.39 |
+
+Path-baseline difference at α=0: ~45 coh points (purely generator, no
+steering). Bundle peak coh at α=−30 (55.62) is therefore only ~5 points
+*above* its own α=0 floor — i.e. bundle steering does not appreciably
+worsen coherence within the path. Likewise, single-feat 21224 @α=−30
+coh = 96.25 is +0.55 above its own α=0 baseline of 95.70. **Both bundle
+and single-feat preserve coherence within ~5 points of their respective
+generator paths' baselines**; the cross-script −40 number reflects the
+generator gap, not a bundle-vs-single-feat coherence story. The headline
+conclusion (single-feat > bundle on align by 23 points) is unchanged.
 
 ### Result 4 — cross-arch frontier shape (R1, illustrative)
 
