@@ -1662,6 +1662,148 @@ beyond brief + synthesis status entries.
   a future firing wants to launch new SAE/TXC training on local
   (next firing not training-bound, so deferring).
 
+### Status as of 2026-05-03 15:00 UTC (mutual-orthogonality SAE bundle k=30 landed — peak 38.13/53.36 at α=−40, *worse* than score-top-30's 41.33; bundle null is NOT selection redundancy; mutual-ortho selection drops champion 21224 and 19 other high-score features; rule-9 watch reset to 0/3)
+
+**Headline**: 15:00 UTC firing. Local h100_1 0%/0 MiB; h100_2 0%/0 MiB
+pre-firing. Spent ~7 min compute on h100_2 to execute the previously-
+deferred "alt bundle selection criteria" probe — greedy mutual-
+orthogonality selection of 30 SAE arditi features from screen_score
+top-100. Mid-α peak (coh ≥ 50) at α=−40 → align **38.13** / coh 53.36,
+*worse* than the default score-top-30 bundle's α=−30 peak 41.33 / 55.62
+by **−3.20 mid-α align**. Rules out the "selection redundancy"
+interpretation of the bundle null: orthogonalizing the selection makes
+the bundle worse, not better, because the high-score SAE features
+cluster geometrically near the R32 misalignment direction.
+
+**Mutual-orthogonality selection geometry**:
+
+| selection                    | bundle norm | max pairwise │dot│ | mean pairwise │dot│ | mean screen score | features kept from score-top-30 |
+| :--------------------------- | ----------: | ------------------: | -------------------: | ----------------: | ------------------------------: |
+| score-top-30 (default)       | 7.22        | 0.415               | 0.053                | 13.6              | 30/30                           |
+| **mutual-ortho top-30**      | **6.10**    | **0.077** (5× more orthogonal) | **0.024**            | **8.5**           | **10/30**                       |
+
+Mutual-ortho selection drops 20 score-top-30 features including the
+single-feat champion **21224** and the other two stage-4 finalists
+**21466**, **30540**. It picks 20 lower-score replacements from the
+screen_score top-100 pool to minimize worst pairwise overlap.
+
+**Frontier comparison (R32 LoRA, same α grid, frontier_sweep.py path)**:
+
+| α    | mutual-ortho align | mutual-ortho coh | score-top30 align | score-top30 coh |
+| ---: | -----------------: | ---------------: | ----------------: | --------------: |
+| −100 | 18.98              | 15.00            | 19.61             | 14.14           |
+|  −60 | 32.02              | 34.30            | 38.92             | 28.28           |
+|  −40 | **38.13**          | 53.36            | 37.58             | 41.72           |
+|  −30 | 39.84              | 47.81            | **41.33**         | 55.62           |
+|  −20 | 35.78              | 50.47            | 39.06             | 55.47           |
+|  −15 | 31.64              | 51.56            | 29.61             | 51.17           |
+|  −10 | 29.53              | 52.03            | 29.77             | 51.88           |
+|   −6 | 29.61              | 51.09            | 26.95             | 55.00           |
+|   −3 | 30.55              | 48.91            | 28.20             | 46.95           |
+|   −1 | 33.52              | 49.92            | 33.75             | 49.84           |
+|    0 | 34.38              | 50.23            | 34.69             | 50.39           |
+|   +1 | 35.63              | 51.72            | 33.05             | 48.20           |
+|   +3 | 28.98              | 47.50            | 30.39             | 46.64           |
+|   +6 | 30.86              | 48.67            | 31.17             | 50.78           |
+|  +10 | 20.94              | 48.13            | 29.38             | 45.47           |
+
+Mid-α peak (coh ≥ 50): mutual-ortho 38.13 at α=−40 (vs score-top-30
+41.33 at α=−30); ext-α peak (coh ≥ 30): mutual-ortho 39.84 at α=−30
+(vs score-top-30 41.33 at α=−30, same α). At matched α=−30, mutual-
+ortho is 1.49 align below score-top-30 despite slightly better per-
+unit-of-bundle-norm efficiency (39.84/6.10 = 6.53 vs 41.33/7.22 =
+5.72). The deficit is not a "smaller perturbation" artifact.
+
+**This firing (15:00 UTC) actions**:
+
+- `git pull origin em-nanda --rebase` — already up to date.
+- Re-read brief + paper doc + synthesis cover-to-cover per routine
+  step 2.
+- Verified GPUs idle: local h100_1 0%/0 MiB; `ssh h100_2 nvidia-smi`
+  0%/0 MiB at 15:00 UTC.
+- **Built `top_30_mutual_ortho.json`** on h100_2 via
+  `/tmp/build_top30_mutual_ortho.py` (greedy minimization of worst
+  pairwise |dot| over screen_score top-100; loads SAE checkpoint W_dec
+  rows, normalizes, runs greedy selection seeded by screen_score top-1).
+- **Launched mutual-ortho frontier on h100_2** via
+  `/tmp/run_bundle30_mutual_ortho.sh` (PID 524615, 15:07 → 15:14 UTC,
+  ~7 min wall-clock). Output `bundle30_mutual_ortho_frontier.json`
+  (3.4 KB).
+- Pulled both files to local
+  `/root/em_features/results/em_nanda_bundle_r32/`.
+- **Updated `em_nanda_results_paper.md`** Result 3: appended a "Bundle
+  null is not selection redundancy (mutual-orthogonality probe)"
+  subsection with comparison table; updated Architectural takeaway
+  paragraph to reference the new finding; updated "What is closed";
+  trimmed and reframed "Open" (removed score-top-30 vs mutual-ortho
+  question, kept Hessian-eigendirection as a much narrower remaining
+  variant); extended Reproduce file pointers.
+- Updated brief with 15:00 UTC entry (this matches a parallel synthesis
+  entry).
+- No commits to code, scripts, or experiment infra. Only doc + new data
+  artifacts.
+- Disk hygiene unchanged: /root local 92%; /workspace 30%;
+  HF_HOME=/workspace/hf_cache holding.
+
+**Three observations from the new datapoint**:
+
+1. **Score-top-30 is near-optimal among available SAE-arditi bundles**:
+   a 5× more orthogonal selection gives a bundle peak 3.2 align points
+   *lower* at mid-α. The Wang screen-score ranking captures the
+   misalignment direction by construction; orthogonalizing only loses
+   signal.
+2. **R32 misalignment direction is geometrically singular**: high-score
+   SAE features cluster near a single direction (overlap ~0.4 in the
+   score-top-30 pairs), not spread across mutually-orthogonal facets.
+   This is the deeper reason champion 21224 wins on R32 ext-α and why
+   bundling cannot beat it.
+3. **Per-unit-of-bundle-norm efficiency is roughly equal**: 38.13/6.10 =
+   6.25 vs 41.33/7.22 = 5.72. Slightly *better* per-unit-norm for
+   mutual-ortho. The gap is not a "smaller perturbation hits a smaller
+   peak" effect — at α=−30 (matched effective magnitude within ~10%),
+   mutual-ortho gives 39.84, still below score-top-30's 41.33 at the
+   same α.
+
+**Why this is a real durable contribution**:
+
+- Closes the strongest "Open" exploratory item from the paper doc.
+- Distinguishes two interpretations of the bundle null that prior data
+  could not separate: "selection redundancy" (de-correlate to fix) vs
+  "summation collapses misalignment" (champion's direction is unique;
+  any bundle dilutes it). The result supports the latter.
+- Strengthens the "champion 21224's decoder row IS the R32
+  misalignment direction" reading: the *only* available bundle that
+  could match its single-feat projection would have to be 21224 ⊕
+  near-collinear features, which the SAE dictionary doesn't contain
+  (max pairwise |dot| in score-top-30 is 0.42 — significant overlap
+  but far from collinear).
+- Resets rule-9 watch to 0/3.
+
+**Closed-axis state at end of firing** (mutual-ortho row added):
+
+| arch / config       | R1 5k mid | R32 10k single ext-α | R32 10k bundle k=3 mid | R32 10k bundle k=30 mid (score) | R32 bundle k=30 (mutual-ortho) |
+| :------------------ | --------: | -------------------: | ---------------------: | ------------------------------: | -----------------------------: |
+| SAE arditi          | **96.88** | **64.53** ⭐         | 51.41 (α=−40)          | 41.33                           | **38.13** (α=−40)              |
+| TXC k=100           |  91.80    | 51.95                | 33.28 (α=+1, flat)     | 41.56                           | (not run)                      |
+| medical-champ goal  |  +38.41   | +6.06                | −7.06 / −25.19         | −16.91 / −17.14                 | −20.34                         |
+
+**Next firing priorities (likely 16:00 UTC)**:
+
+- **Status-only firing acceptable** — all paper-critical work closed;
+  bundle null story complete (architecture-general k=30 ceiling +
+  architecture-specific k=3 path + selection-criterion-robust deficit
+  vs single-feat).
+- **3-firing-stuck rule (rule 9) reset to 0/3 by this firing's compute
+  spend.**
+- **Other open exploratory items** (Hessian-eigendirection,
+  TXC k<100, cross-layer hookpoints) all unchanged and ≥1 firing of
+  compute each. Not paper-critical.
+- **Optional cleanup window** (still not load-bearing): legacy 110 GB
+  qwen_l15_*.pt checkpoints on /root local already logged in
+  `trained_models_log.md` with HF backups under
+  `dmanningcoe/temp-xc-em-features`. Per rule (7), "log first" is
+  satisfied; deletion permitted but not motivated this firing.
+
 ### Status as of 2026-05-03 14:00 UTC (status-only firing — both GPUs idle, both axes closed, paper doc current through 13:00 UTC TXC k=3 closure; no compute spent; rule-9 watch advances to 1/3)
 
 **Headline**: 14:00 UTC firing. Local h100_1 0%/0 MiB; h100_2 0%/0

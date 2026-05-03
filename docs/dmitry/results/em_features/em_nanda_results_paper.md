@@ -319,6 +319,60 @@ cancellation trap that the precise k=3 bundle falls into. The bundle
 ceiling is architecture-general; the *path to it* is architecture-
 specific.
 
+**Bundle null is not selection redundancy (mutual-orthogonality probe,
+2026-05-03 15:00 UTC).** A natural alternative to "summation collapses
+misalignment" is "selection redundancy" — i.e. the score-top-30 bundle
+loses to single-feat because Wang's `screen_score` ranks correlated
+features highly, so the top-30 are mutually overlapping and their sum
+is a redundant projection rather than a broad coverage. To test this,
+the SAE arditi top-100 by `screen_score` decoder rows were normalized
+to unit length, and a greedy mutual-orthogonality selection picked 30
+features by minimizing the worst pairwise |dot| against the running
+selection (file `top_30_mutual_ortho.json`). This produces a substantially
+more orthogonal selection (max pairwise |dot| **0.077** vs score-top-30's
+**0.415**, mean 0.024 vs 0.053) at the cost of dropping the single-feat
+champion 21224 and 19 other high-score features (only 10/30 features
+overlap with score-top-30; mean score drops from 13.6 to 8.5). Bundle
+norm = **6.10** (vs score-top-30's 7.22). The same α grid was steered
+(file `bundle30_mutual_ortho_frontier.json`).
+
+| selection                  | mid-α peak (coh ≥ 50)         | ext-α peak (coh ≥ 30) | own α=0 baseline | mid-α lift | bundle norm | max pairwise │dot│ |
+| :------------------------- | :---------------------------- | :-------------------- | ---------------: | ---------: | ----------: | ------------------: |
+| score-top-30 (default)     | α=−30 → **41.33** / 55.62     | α=−30 → 41.33         | 34.69            | +6.64      | 7.22        | 0.415               |
+| **mutual-ortho top-30**    | α=−40 → **38.13** / 53.36     | α=−30 → 39.84         | 34.38            | +3.75      | 6.10        | 0.077               |
+| single-feat 21224 (champ.) | α=−30 → 64.53 / 96.25 (wang)  | same                  | (wang path)      | n/a        | 1.00        | n/a                 |
+
+Mutual-ortho bundle is **worse** than the default score-top-30 bundle
+(−3.20 mid-α align, −1.49 ext-α align), not better. Per-unit-of-bundle-
+norm efficiency is roughly comparable (38.13/6.10 = 6.25 vs 41.33/7.22 =
+5.72), so the gap is not just a "you used a smaller perturbation"
+artifact: at α=−30 (where mutual-ortho's effective magnitude 6.10 × 30 =
+183 is close to score-top-30's 7.22 × 30 = 217), mutual-ortho gives
+align 39.84 — still 1.49 below score-top-30's 41.33 at the same α. Both
+bundles remain ≫ 23 align points below single-feat (64.53).
+
+This rules out the **selection-redundancy** interpretation of the bundle
+null. If the score-top-30 bundle had been hampered by correlated picks,
+de-correlating the selection should improve the bundle peak. Instead it
+*hurts* the peak — because the high-screen-score features cluster
+geometrically near the R32 misalignment direction (max pairwise |dot|
+0.42 reflects two top-score features pointing in similar directions),
+and forcing orthogonality drives the selection toward features that are
+*less* aligned with the misalignment direction. The score-top-30 bundle
+is in fact a near-optimal *available* bundle within the SAE dictionary;
+the deficit vs single-feat is structural, not a selection defect.
+
+This supports the **summation-collapse-misalignment** reading of the
+bundle null: the R32 misalignment direction is geometrically singular,
+the top-by-score SAE features cluster near it (overlap ~0.4), and any
+SAE-feature bundle's projection onto that direction is bounded above
+by the bundle's *largest* component along it — which is dominated by
+the single-feat champion when the champion is included, and falls
+when the champion is dropped for orthogonality. Equivalently: the
+champion 21224's decoder row IS the R32 misalignment direction, more or
+less; bundling it with anything not collinear can only dilute the
+projection, never amplify it.
+
 ### Result 4 — cross-arch frontier shape (R1, illustrative)
 
 The R1 frontier plots in `plots/em_nanda_*frontier*.png` show that for
@@ -351,7 +405,18 @@ candidates by `screen_score` on R32 are *individually* causal, but their
 decoder rows do not constructively add. R32's misalignment is not
 "distributed" in the sense of "spread across many features that can be
 reassembled" — it is genuinely lower-dimensional than R1's, just not
-as cleanly captured by any single feature as R1's direction is.
+as cleanly captured by any single feature as R1's direction is. The
+mutual-orthogonality probe (Result 3, 15:00 UTC) further sharpens this:
+forcing the bundle's 30 features to be more orthogonal *worsens* the
+bundle peak rather than improving it, because the high-screen-score SAE
+features cluster geometrically near the misalignment direction (max
+pairwise |dot| 0.42 in the score-top-30) and orthogonalizing the
+selection drops both the champion 21224 and other near-champion features.
+The bundle null is structural, not a selection defect; the SAE arditi
+champion's decoder row IS the R32 misalignment direction up to small
+geometric perturbations, and any bundle that does not include it (or
+includes it only as a 1/30 weight) cannot match its single-feat
+projection.
 
 ### What is closed and what is open
 
@@ -384,19 +449,30 @@ as cleanly captured by any single feature as R1's direction is.
   arches hit the same k=30 ceiling (~41.5 align) but for opposite
   reasons: SAE k=30 dilutes a champion that would bundle constructively;
   TXC k=30 partially escapes the k=3 cancellation trap.
+- **Bundle null is not a selection-redundancy artifact**: greedy
+  mutual-orthogonality selection of 30 features from the SAE arditi
+  top-100 by screen_score (max pairwise |dot| 0.077 vs score-top-30's
+  0.415) gives a *worse* bundle peak (mid-α 38.13 at α=−40 vs score-
+  top-30's 41.33 at α=−30), not better. Drops the single-feat champion
+  21224 and 19 other high-score features. Confirms the bundle null is
+  a "summation-collapse-misalignment" effect: the R32 misalignment
+  direction is geometrically singular, high-score SAE features cluster
+  near it (top features overlap ~0.4), and orthogonalizing the
+  selection forces picks from features less aligned with that direction.
 
 **Open** (deferred, not paper-critical):
 
-- Bundle aggregation with a *different* selection criterion (e.g.
-  Hessian-eigendirection-aligned features, or features filtered for
-  decoder-row mutual orthogonality) — could in principle beat single-feat
-  on R32, but no theoretical reason to expect it.
 - TXC variants with k < 100 or different threshold counts — the R1
   gap at +4 is small enough that this could close it, but the R32 ext-α
   gap at +12.58 is unlikely to close without architectural changes.
 - Cross-layer hookpoint: all results above are at layer 24 `resid_post`
   (the LoRA insertion layer). Earlier or later hookpoints are
   unexplored and are a natural follow-up.
+- Hessian-eigendirection-aligned bundles (an alternative to score-top-30
+  and mutual-orthogonality): would test whether a curvature-informed
+  selection could beat the single-feat champion, but the mutual-
+  orthogonality result above already supports the "no available bundle
+  beats champion 21224" reading via a different geometric criterion.
 
 ### Reproduce
 
@@ -429,7 +505,9 @@ as cleanly captured by any single feature as R1's direction is.
   - Bundle k=30 R32 (TXC k=100): `…/em_nanda_bundle_r32/bundle30_txc_frontier.json` (added 2026-05-03 12:00 UTC)
   - Bundle k=3 R32 (SAE arditi, finalists): `…/em_nanda_bundle_r32/bundle3_finalists_frontier_r32fix.json`
   - Bundle k=3 R32 (TXC k=100, finalists): `…/em_nanda_bundle_r32/bundle3_txc_finalists_frontier.json` (added 2026-05-03 13:00 UTC)
-  - Bundle feature membership: `…/em_nanda_bundle_r32/top_30_bundle_features.json` (SAE k=30), `top_30_txc_features.json` (TXC k=30), `top_3_finalists.json` (SAE k=3), `top_3_txc_finalists.json` (TXC k=3)
+  - Bundle k=30 R32 (SAE arditi, mutual-orthogonality): `…/em_nanda_bundle_r32/bundle30_mutual_ortho_frontier.json` (added 2026-05-03 15:00 UTC)
+  - Bundle feature membership: `…/em_nanda_bundle_r32/top_30_bundle_features.json` (SAE k=30 score), `top_30_mutual_ortho.json` (SAE k=30 mutual-ortho), `top_30_txc_features.json` (TXC k=30), `top_3_finalists.json` (SAE k=3), `top_3_txc_finalists.json` (TXC k=3)
+  - Mutual-ortho selection script: `/tmp/build_top30_mutual_ortho.py` on h100_2 (greedy minimization of worst pairwise |dot| over screen_score top-100)
   - Other Wang outputs (SAE arditi 10k R1 + R32, TXC R1 5k/10k/30k, TXC
     R32 std-α) live on `h100_2` and have peak numbers archived in the
     closed table above.

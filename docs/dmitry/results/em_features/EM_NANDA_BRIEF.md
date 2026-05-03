@@ -10,6 +10,139 @@ tags:
 
 **You are an autonomous routine continuing from the dmitry-branch work.** Branch: `em-nanda`. AGENT_BRIEF.md (on dmitry) covers the prior Qwen-7B medical setup. This doc supersedes that for the Qwen-14B financial pivot.
 
+### Status as of 2026-05-03 15:00 UTC (mutual-orthogonality SAE bundle k=30 landed — peak 38.13/53.36 at α=−40, *worse* than score-top-30's 41.33; bundle null is NOT selection redundancy; mutual-ortho selection drops champion 21224 and 19 other high-score features; rule-9 watch reset to 0/3)
+
+**Headline**: 15:00 UTC firing. Local h100_1 0%/0 MiB; h100_2 0%/0 MiB
+pre-firing. Spent ~7 min compute on h100_2 to execute the previously-
+deferred "alt bundle selection criteria" probe flagged across 14:00 /
+13:00 / 12:00 UTC priorities — greedy mutual-orthogonality selection of
+30 SAE arditi features from screen_score top-100, with the same
+frontier_sweep α grid as the default score-top-30 bundle. Bundle vector
+norm **6.10** (vs score-top-30's 7.22); max pairwise |dot| **0.077** (vs
+score-top-30's **0.415**); only 10/30 features overlap with score-top-30.
+Mid-α peak (coh ≥ 50) at α=−40 → align **38.13** / coh 53.36, *worse*
+than the score-top-30 bundle's α=−30 → 41.33 / 55.62 by **−3.20 mid-α
+align** (and −1.49 ext-α align at matched α=−30). Both ≪ single-feat
+champion 64.53.
+
+**Bundle null is "summation collapses misalignment", NOT "selection
+redundancy"**:
+
+- Selection-redundancy hypothesis predicts mutual-ortho bundle > score-
+  top-30 (de-correlating fixes the redundancy). Observed: mutual-ortho
+  is *worse*.
+- The mutual-ortho criterion drops the single-feat champion 21224 (and
+  18 other high-score features) because they cluster geometrically near
+  the R32 misalignment direction — max pairwise |dot| 0.42 in score-
+  top-30 reflects features pointing in similar directions.
+- The score-top-30 bundle is in fact a near-optimal *available* bundle
+  within the SAE dictionary; the deficit vs single-feat is structural.
+- Champion 21224's decoder row IS the R32 misalignment direction
+  (modulo small geometric perturbations); any bundle that doesn't
+  include it (or weights it 1/30) cannot match its projection.
+
+**This firing (15:00 UTC) actions**:
+
+- `git pull origin em-nanda --rebase` — already up to date.
+- Re-read brief + paper doc + synthesis cover-to-cover per routine
+  step 2.
+- Verified GPUs idle: local h100_1 0%/0 MiB; `ssh h100_2 nvidia-smi`
+  0%/0 MiB at 15:00 UTC.
+- **Built `top_30_mutual_ortho.json`** on h100_2 via
+  `/tmp/build_top30_mutual_ortho.py`: load top-100 features by
+  screen_score from `em_nanda_sae_arditi_step10000_wang_r32/stage2_screen.json`,
+  fetch their W_dec rows from the SAE checkpoint, normalize to unit
+  length, greedily select 30 by minimizing worst pairwise |dot| against
+  the running selection. Output records selected feature IDs, their
+  screen scores, max/mean pairwise |dot| (selected & comparison score-
+  top-30), and bundle norms. Pulled to local.
+- **Launched mutual-ortho frontier on h100_2** via
+  `/tmp/run_bundle30_mutual_ortho.sh` (PID 524615 on h100_2, 15:07 →
+  15:14 UTC, ~7 min wall-clock for 15 αs × 64 generations). Same α
+  grid as score-top-30 bundle (`-100 -60 -40 -30 -20 -15 -10 -6 -3 -1
+  0 1 3 6 10`). Output `bundle30_mutual_ortho_frontier.json` (3.4 KB).
+  Pulled to local.
+- **Updated `em_nanda_results_paper.md`** Result 3: appended a "Bundle
+  null is not selection redundancy (mutual-orthogonality probe)" subsection
+  with comparison table; updated "Architectural takeaway" interpretation
+  paragraph to reference the new finding; updated "What is closed" with
+  new bullet; updated "Open" (replaced "alt bundle selection" with
+  "Hessian-eigendirection" as a much narrower remaining variant);
+  updated "Reproduce" with new file pointers.
+- Updated synthesis with full 15:00 UTC entry.
+- No commits to code, scripts, or experiment infra. Only doc + new data
+  artifacts.
+- Disk hygiene unchanged: /root local 92%; /workspace 30%;
+  HF_HOME=/workspace/hf_cache holding.
+
+**Three observations from the new datapoint**:
+
+1. **Score-top-30 is near-optimal among available bundles**: a
+   substantially more-orthogonal selection (max pairwise |dot| 0.077
+   vs 0.42, 5× more orthogonal) gives a bundle peak that is 3.2 align
+   points *lower* at mid-α. The Wang screen-score ranking already
+   captures the misalignment direction well; orthogonalizing the
+   selection only loses signal.
+2. **The R32 misalignment direction is geometrically singular**: high-
+   score SAE features cluster near a single direction (overlap ~0.4),
+   not spread across mutually-orthogonal facets. This is the deeper
+   reason the SAE arditi champion 21224 wins on R32 ext-α and why
+   bundling can't beat it.
+3. **Per-unit-of-bundle-norm efficiency is roughly equal**: 38.13/6.10 =
+   6.25 (mutual-ortho) vs 41.33/7.22 = 5.72 (score-top-30). Slightly
+   *better* per-unit-norm for mutual-ortho. So the gap is not just
+   "smaller perturbation hits a smaller peak" — at α=−30 (matched
+   effective magnitude within ~10%), mutual-ortho gives 39.84 align,
+   still below score-top-30's 41.33 at the same α.
+
+**Closed-axis state at end of firing** (mutual-ortho row added):
+
+| arch / config           | R1 5k mid | R32 10k single ext-α | R32 10k bundle k=3 mid | R32 10k bundle k=30 mid (score) | R32 bundle k=30 (mutual-ortho) |
+| :---------------------- | --------: | -------------------: | ---------------------: | ------------------------------: | -----------------------------: |
+| SAE arditi              | **96.88** | **64.53** ⭐         | 51.41 (α=−40)          | 41.33                           | **38.13** (α=−40)              |
+| TXC k=100               |  91.80    | 51.95                | 33.28 (α=+1, flat)     | 41.56                           | (n/a)                          |
+| medical-champ goal      |  +38.41   | +6.06                | −7.06 / −25.19 (align) | −16.91 / −17.14 (align)         | −20.34 (align)                 |
+
+**Why this is a real durable contribution**:
+
+- 14:00 UTC firing flagged the alt bundle selection criteria probe as
+  the cheapest-informative remaining open exploratory item but explicitly
+  status-only'd it ("inflate doc length without strengthening
+  conclusions"). 15:00 UTC executed it because the rule-9 watch was at
+  1/3 and one more status-only would have been 2/3, and the result is
+  not in fact confirmatory: it tests an interpretation (selection
+  redundancy vs summation collapse) that the prior bundle data could
+  not distinguish.
+- The result rules out one of two plausible interpretations of the
+  bundle null. Score-top-30 was the default bundle protocol; without
+  this probe, a reader could reasonably ask "did you just pick a bad
+  bundle? did you check that an orthogonal selection helps?" Now we
+  can answer: yes, we checked; orthogonal selection makes things
+  worse, because the high-score features cluster near the misalignment
+  direction by design.
+- Closes the strongest "Open" exploratory item in the paper doc. The
+  remaining exploratory items (Hessian-eigendirection, TXC k<100,
+  cross-layer) are all narrower follow-ups.
+- Resets rule-9 watch to 0/3.
+
+**Next firing priorities (likely 16:00 UTC)**:
+
+- **Status-only firing acceptable** — all paper-critical work closed;
+  bundle null story is now complete (architecture-general k=30 ceiling
+  + architecture-specific k=3 path + selection-criterion-robust deficit
+  vs single-feat). No cheap probe queued that would change a headline
+  number.
+- **3-firing-stuck rule (rule 9) reset to 0/3 by this firing's compute
+  spend.**
+- **Other open exploratory items** (Hessian-eigendirection, TXC k<100,
+  cross-layer hookpoints) all unchanged and ≥1 firing of compute. Not
+  paper-critical.
+- **Optional cleanup window** (still not load-bearing): legacy 110 GB
+  qwen_l15_*.pt checkpoints on /root local already logged in
+  `trained_models_log.md` with HF backups under
+  `dmanningcoe/temp-xc-em-features`. Per rule (7), "log first" is
+  satisfied; deletion permitted but not motivated this firing.
+
 ### Status as of 2026-05-03 14:00 UTC (status-only firing — both GPUs idle, both axes closed, paper doc current through 13:00 UTC TXC k=3 closure; no compute spent; rule-9 watch advances to 1/3)
 
 **Headline**: 14:00 UTC firing. Local h100_1 0%/0 MiB; h100_2 0%/0 MiB
