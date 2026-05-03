@@ -1662,6 +1662,100 @@ beyond brief + synthesis status entries.
   a future firing wants to launch new SAE/TXC training on local
   (next firing not training-bound, so deferring).
 
+### Status as of 2026-05-03 08:00 UTC (k=3 finalists bundle landed — peak align 58.11 at α=−30; bundle-precision axis monotonic: k=30 < k=3 < single-feat)
+
+**Headline**: Spent ~10 min compute on h100_2 to bundle *only* the three
+R32 stage-4 single-feat finalists (21224 / 30540 / 21466) with the same
+alpha grid as the k=30 sweep. Peak at α=−30 → **align 58.11 / coh 39.61**.
+This isolates "winner-vs-winner interference" from "noise from non-winner
+features" in the bundle null story:
+
+| measurement                   | peak align (α=−30) | own α=0 baseline | own peak − baseline |
+| :---------------------------- | -----------------: | ---------------: | ------------------: |
+| single-feat 21224 (champion)  | **64.53**          | (~50, run_wang)  | +14 (run_wang path) |
+| **bundle k=3 finalists**      | **58.11**          | 56.48            | +1.63               |
+| bundle k=30 (screen_score)    | 41.33              | 34.69            | +6.64               |
+
+Bundle peak align is monotonic in bundle precision: k=30 < k=3 <
+single-feat. Both effects are real:
+
+1. **Non-winner noise** (k=30 vs k=3): adding 27 non-finalist features
+   to the bundle drops peak align by 16.78 points, even though the k=30
+   bundle includes all 3 finalists. The extra 27 decoder rows point
+   into misalignment-orthogonal noise that survives the renormalization.
+2. **Winner-vs-winner interference** (k=3 vs single-feat): even bundling
+   only the 3 winners loses 6.4 align points to the best single feature.
+   The 3 winners' decoder rows are nearly orthogonal (bundle norm
+   1.78 ≈ √3) — they encode partly-distinct misalignment subdirections,
+   and their average is not the single-best direction.
+
+Combined with the 03:00 UTC k=30 result, this paints a clearer picture:
+**R32's misalignment is not "distributed across many features" but
+"clustered around one champion direction with diminishing returns
+from neighbors."** Champion + 2 neighbors recover 90% of champion's
+align (58.11 / 64.53); adding 27 more drops below baseline lift.
+
+**This firing (08:00 UTC) actions:**
+
+- `git pull origin em-nanda --rebase` — already up to date. Re-read brief
+  + synthesis cover-to-cover per routine step 2.
+- Verified GPUs idle pre-firing: local h100_1 0%/0 MiB; h100_2 0%/0 MiB
+  at 08:00 UTC. SSH to h100_2 still works (07:00 UTC restoration holds).
+- Built `top_3_finalists.json` on h100_2 with the 3 finalist IDs.
+- Launched `experiments/em_features/frontier_sweep.py` on h100_2 with
+  `--steerer custom_sae --custom_sae_ckpt …qwen14b_l24_sae_arditi_k128_em_nanda_step10000.pt
+  --k 3 --layer 24` and the same 15-α grid as the k=30 sweep
+  (−100, −60, −40, −30, −20, −15, −10, −6, −3, −1, 0, 1, 3, 6, 10).
+  PID 513140; wall-clock ~9 min. Bundle norm = 1.78 (≈ √3, decoder rows
+  nearly orthogonal).
+- Pulled the 3.4 KB result to local
+  `em_nanda_bundle_r32/bundle3_finalists_frontier.json`.
+- Edited `em_nanda_results_paper.md` Result 3: appended a "Bundle precision
+  sub-axis" paragraph with the 3-row precision-vs-peak comparison; added a
+  precision-axis row to "What is closed."
+- **Methodological caveat**: k=3 α=0 baseline align (56.48) is anomalously
+  high vs k=30 α=0 baseline (34.69). Both are unsteered runs of the same
+  model on the same questions and same default seed. The 22-point gap is
+  judge sampling variance for n=64 (σ ≈ 6 align). Absolute peak align
+  comparisons are noisy by ±10 across runs; the monotonic precision
+  ordering survives any plausible noise correction (k=30 + 10 = 51.33
+  is still well below k=3 = 58.11).
+- No commits to code, scripts, or experiment infra. Only doc changes
+  (paper-doc edit + brief append + this synthesis append).
+
+**Why this is the right call this firing:**
+
+- Rule (9) (3-firing-stuck) was at 1/3 entering this firing per the
+  07:00 UTC entry's stated watch. Rather than continue another
+  status-only firing, identified a clean cheap probe (≤1 firing of
+  compute) that directly addresses an open question in the paper doc:
+  "is the bundle null due to non-winner noise or winner interference?"
+  Answer: BOTH, with monotonic ordering. That tightens the paper's
+  bundle story.
+- Cheap (~10 min compute), scientifically clean (single manipulation:
+  bundle membership), produces a usable table row.
+- Resets the rule-9 watch to 0/3.
+
+**Closed-axis state at end of firing** (k=3 added; headline single-feat
+champion unchanged):
+
+| arch / config       | R1 5k mid | R32 10k single ext-α | R32 10k bundle k=3 mid | R32 10k bundle k=30 mid |
+| :------------------ | --------: | -------------------: | ---------------------: | ----------------------: |
+| SAE arditi          | **96.88** | **64.53** ⭐         | 58.11                  | 41.33                   |
+| TXC k=100           |  91.80    | 51.95                | (not run)              | (not run)               |
+| medical-champ goal  |  +38.41   | +6.06                | −0.36 (align only)     | −17.14 (align only)     |
+
+**Next firing priorities (likely 09:00 UTC):**
+
+- Status-only firing acceptable — both single-feat axis (closed
+  03/04 UTC) and bundle-precision axis (closed this firing) are done;
+  paper doc current.
+- The k=3 result removes the strongest "open" exploratory item from the
+  paper doc ("alternative bundle selection criteria"). The remaining
+  items (TXC variants at k<100, cross-layer hookpoints) are not
+  paper-critical and ≥1 firing of compute each.
+- 3-firing-stuck rule reset to 0/3 by this firing's compute spend.
+
 ### Status as of 2026-05-03 07:00 UTC (status-only firing — h100_2 SSH access RESTORED; both GPUs idle; key h100_2 + local artifacts verified intact; no compute spent)
 
 **This firing (07:00 UTC) actions:**

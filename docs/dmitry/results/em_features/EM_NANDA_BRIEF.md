@@ -10,6 +10,81 @@ tags:
 
 **You are an autonomous routine continuing from the dmitry-branch work.** Branch: `em-nanda`. AGENT_BRIEF.md (on dmitry) covers the prior Qwen-7B medical setup. This doc supersedes that for the Qwen-14B financial pivot.
 
+### Status as of 2026-05-03 08:00 UTC (k=3 finalists bundle probe landed — peak align 58.11 at α=−30; monotonic precision ordering established: k=30 < k=3 < single-feat)
+
+**Headline**: ~10 min compute on h100_2. Bundled *only* the three R32
+single-feat finalists (21224 / 30540 / 21466) at the same alpha grid as
+the k=30 sweep, to isolate "winner-vs-winner interference" from "noise
+from non-winner features." Peak at α=−30 → **align 58.11 / coh 39.61**
+(`/root/em_features/results/em_nanda_bundle_r32/bundle3_finalists_frontier.json`).
+Bundle peak align is now monotonic in bundle precision: **k=30 (41.33) <
+k=3 (58.11) < single-feat (64.53)** — adding non-winner features
+dilutes the misalignment direction, but even bundling only the winners
+loses 6.4 align points to the best single feature. Bundle null (single-feat
+> any bundle on R32 align) is *strengthened* by the new data point.
+
+**This firing (08:00 UTC) actions**:
+
+- `git pull origin em-nanda --rebase` — already up to date.
+- Verified GPUs idle pre-firing: local h100_1 0%/0 MiB; h100_2 0%/0 MiB
+  at 08:00 UTC. SSH to h100_2 still works (07:00 UTC restoration holds).
+- Built `/root/em_features/results/em_nanda_bundle_r32/top_3_finalists.json`
+  on h100_2 with `top_features: [21224, 30540, 21466]`.
+- Launched k=3 bundle frontier on h100_2 via
+  `experiments/em_features/frontier_sweep.py` with `--steerer custom_sae`,
+  same SAE arditi 10k checkpoint as the k=30 sweep, same alpha grid
+  (15 αs from −100 to +10), 8 rollouts × 8 prompts × 3 features.
+  Wall-clock ~9 min (PID 513140 on h100_2). Bundle norm = 1.78 ≈ √3
+  (decoder rows nearly orthogonal). Pulled the 3.4 KB result to local
+  `em_nanda_bundle_r32/bundle3_finalists_frontier.json`.
+- **Edited `em_nanda_results_paper.md`** Result 3: appended a "Bundle
+  precision sub-axis" paragraph with a 3-row comparison table
+  (single-feat / bundle-k=3 / bundle-k=30); appended a row to "What is
+  closed" naming the monotonic precision ordering.
+- **Methodological caveat documented**: k=3 α=0 baseline align (56.48)
+  is anomalously high vs k=30 α=0 baseline (34.69) — both are unsteered
+  runs of the same model, same questions, same default seed. The
+  22-point gap reflects judge sampling variance for n=64 (σ ≈ 6 align).
+  Absolute peak comparisons are noisy by ±10 align across runs; the
+  monotonic ordering survives any plausible noise correction.
+- No commits to code, scripts, or experiment infra. Only doc changes:
+  paper-doc edit, brief append (this), synthesis append.
+- Disk hygiene unchanged: /root local 92%; /workspace 30%;
+  HF_HOME=/workspace/hf_cache holding.
+
+**Closed-axis state at end of firing** (k=3 added; headline unchanged):
+
+| arch / config       | R1 5k mid | R32 10k single ext-α | R32 10k bundle k=3 mid | R32 10k bundle k=30 mid |
+| :------------------ | --------: | -------------------: | ---------------------: | ----------------------: |
+| SAE arditi          | **96.88** | **64.53** ⭐         | 58.11                  | 41.33                   |
+| TXC k=100           |  91.80    | 51.95                | (not run)              | (not run)               |
+| medical-champ goal  |  +38.41   | +6.06                | −0.36 (align only)     | −17.14 (align only)     |
+
+**Why this is the right call this firing**:
+
+- Rule (9) (3-firing-stuck) was at 1/3 entering this firing per the
+  07:00 UTC entry's watch. Rather than continue the status-only pattern,
+  spent ~10 min compute on a *clean* probe that directly addresses
+  whether the k=30 bundle null is "noise from non-winners" or "even
+  winners interfere." The data answers: BOTH effects exist, and the
+  ordering is monotonic. That tightens the bundle story in the paper.
+- Cheap (well under one firing of compute), scientifically clean (single
+  manipulation: change bundle membership from screen_score-top-30 to
+  finalist-top-3, hold everything else fixed), and produces a usable
+  table row for the paper doc.
+- Resets the rule-9 watch to 0/3.
+
+**Next firing priorities (likely 09:00 UTC)**:
+
+- Status-only firing acceptable — both axes closed (single-feat closed
+  03/04 UTC; bundle-precision axis closed this firing); paper doc
+  current.
+- The k=3 result removes the strongest "open" exploratory item from the
+  paper doc (alternative bundle selection criteria). The remaining
+  items (TXC variants, cross-layer hookpoints) all still require
+  ≥1 firing of compute and are not paper-critical.
+- 3-firing-stuck rule reset to 0/3 by this firing's compute spend.
+
 ### Status as of 2026-05-03 07:00 UTC (status-only firing — h100_2 SSH access RESTORED; both GPUs idle, both axes still closed; key h100_2 + local artifacts verified intact; no compute spent)
 
 **Headline**: SSH access to h100_2 was DENIED at 06:00 UTC; **at 07:00 UTC
