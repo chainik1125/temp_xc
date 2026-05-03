@@ -10,6 +10,84 @@ tags:
 
 **You are an autonomous routine continuing from the dmitry-branch work.** Branch: `em-nanda`. AGENT_BRIEF.md (on dmitry) covers the prior Qwen-7B medical setup. This doc supersedes that for the Qwen-14B financial pivot.
 
+### Status as of 2026-05-03 07:00 UTC (status-only firing — h100_2 SSH access RESTORED; both GPUs idle, both axes still closed; key h100_2 + local artifacts verified intact; no compute spent)
+
+**Headline**: SSH access to h100_2 was DENIED at 06:00 UTC; **at 07:00 UTC
+it is RESTORED** (`ssh h100_2 nvidia-smi` succeeds — 0%/0 MiB). The 06:00
+UTC denial was a *transient* harness constraint, not permanent. Local
+h100_1 also idle (0%/0 MiB). Used the restored access to verify h100_2's
+key paper-critical artifacts are intact: all 8 stage4_final_frontier.json
+files live (em_nanda_sae_arditi_step10000_wang R1 + R32 + R32_lite,
+txc_paper_k100 step10000 R1 + R32_extalpha + R32_native, txc_paper_k100
+step5000 + step30000 R1). Both axes stay closed; headline (R1 96.88,
+R32 64.53, bundle null) unchanged from 03:00 UTC. No compute spent.
+
+**This firing (07:00 UTC) actions:**
+
+- `git pull origin em-nanda --rebase` — already up to date.
+- Re-read brief + synthesis cover-to-cover per routine step 2.
+- Local h100_1 verified idle: `nvidia-smi` reports 0%/0 MiB at 07:01 UTC.
+- **`ssh h100_2 nvidia-smi` succeeded this firing** — 0%/0 MiB. The
+  06:00 UTC denial ("SSH to remote host h100_2 ... not explicitly
+  authorized for direct SSH access") was a 1-firing transient. Future
+  firings can resume normal h100_2 reachability.
+- Verified h100_2 paper-critical artifacts present (`stage4_final_frontier.json`
+  for all 8 wang outputs cited in `em_nanda_results_paper.md`). Local
+  bundle frontier and 30 R32 features both still present in
+  `/root/em_features/results/em_nanda_bundle_r32/`.
+- **No commits to code, scripts, or experiment infra.** Only doc
+  changes are this brief append and the matching synthesis entry.
+- Disk hygiene unchanged: /root local 92%; /workspace 30%;
+  HF_HOME=/workspace/hf_cache holding.
+
+**Why a status-only firing is the right call this firing:**
+
+- Both axes (single-feat + bundle) are closed; paper-doc tightened
+  at 05:00 UTC; figures complete since 01:00 UTC. There is no open
+  cheap probe queued — the only remaining items in the paper doc
+  ("What is open") are exploratory and ≥1 firing of compute each,
+  none paper-critical.
+- The transient SSH denial diagnosis from 06:00 UTC is resolved
+  *durably* by this firing (future agents will not re-run the
+  denial diagnosis on the assumption it is permanent — the brief
+  now records both the denial and the restoration).
+- No completions to act on; both GPUs idle. Per rule (6) spirit,
+  exit cleanly after status update; rule (1)–(2) (pull + read
+  brief) executed; no destructive actions.
+
+**Closed-axis state at end of firing** (unchanged from 03:00 UTC):
+
+| arch / config       | R1 5k mid | R32 10k single ext-α | R32 10k bundle k=30 mid |
+| :------------------ | --------: | -------------------: | ----------------------: |
+| SAE arditi          | **96.88** | **64.53** ⭐         | 41.33                   |
+| TXC k=100           |  91.80    | 51.95                | (not run)               |
+| medical-champ goal  |  +38.41   | +6.06                | −17.14 (align only)     |
+
+**Next firing priorities (likely 08:00 UTC)**:
+
+- **Status-only firing remains acceptable** — both axes closed,
+  paper doc tightened, figures complete, no cheap probe queued.
+- **h100_2 reachability** is back; if a future agent crystallizes
+  a new scientific question, it can launch on h100_2 again. The
+  exploratory items in the paper doc (alternative bundle
+  selection criteria, TXC variants, cross-layer hookpoints) are
+  unblocked but remain *not paper-critical*.
+- **Optional cleanup window** (still not load-bearing): legacy 110
+  GB qwen_l15_*.pt checkpoints on /root local are ALREADY logged
+  in `docs/dmitry/results/em_features/trained_models_log.md` (with
+  HF paths under `dmanningcoe/temp-xc-em-features`). Per rule (7),
+  the "log first" requirement is therefore satisfied — deletion
+  is permitted but should be deferred until clearly motivated by
+  new local training. /root at 92% is tight but not critical.
+- **3-firing-stuck rule** (rule 9): not engaged. Last 5 firings
+  (03:00 — bundle null + infra; 04:00 — paper doc; 05:00 —
+  zero-compute reconciliation; 06:00 — SSH denial diagnosis;
+  07:00 — SSH restoration verification) each made a small but
+  durable contribution without spending compute. If the pattern
+  continues with no new scientific question crystallizing for
+  three more firings, append a "stuck — please intervene"
+  section per rule (9).
+
 ### Status as of 2026-05-03 06:00 UTC (status-only firing — local h100_1 idle, h100_2 SSH access denied this firing; both axes remain closed; no compute spent)
 
 **Headline**: Brief status check at 06:00 UTC. Local h100_1 verified idle

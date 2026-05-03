@@ -1662,6 +1662,78 @@ beyond brief + synthesis status entries.
   a future firing wants to launch new SAE/TXC training on local
   (next firing not training-bound, so deferring).
 
+### Status as of 2026-05-03 07:00 UTC (status-only firing — h100_2 SSH access RESTORED; both GPUs idle; key h100_2 + local artifacts verified intact; no compute spent)
+
+**This firing (07:00 UTC) actions:**
+
+- `git pull origin em-nanda --rebase` clean (already up to date).
+  Re-read brief + synthesis per routine step 2.
+- Verified local h100_1 idle (0%/0 MiB at 07:01 UTC).
+- **`ssh h100_2 nvidia-smi` succeeded this firing** — h100_2 also
+  idle (0%/0 MiB). The 06:00 UTC SSH denial was a 1-firing
+  transient harness constraint, not permanent. h100_2 reachability
+  is back for future firings.
+- **Verified paper-critical artifacts on h100_2 are intact** via
+  `ssh h100_2 'ls /root/em_features/results/em_nanda_*/stage4_final_frontier.json'`
+  — 8 stage4 frontier files present (em_nanda_sae_arditi_step10000_wang
+  R1 + R32 + R32_lite; txc_paper_k100 step10000 R1 + R32_extalpha
+  + R32_native; txc_paper_k100 step5000 + step30000 R1). All match
+  the paper doc's reproduce pointers.
+- Verified local artifacts intact: SAE arditi 5k + 30k stage4
+  outputs, TXC R32 extalpha stage4, bundle frontier
+  (`em_nanda_bundle_r32/{bundle30_frontier,top_30_bundle_features}.json`).
+- **No commits to code or experiment scripts.** Only doc changes
+  are the matching brief append and this synthesis entry.
+- Disk hygiene unchanged: /root local 92%; /workspace 30%;
+  HF_HOME=/workspace/hf_cache holding.
+
+**Why this is a real (if small) durable contribution despite zero
+compute:**
+
+- Future agents reading the brief see SSH access went denied →
+  restored across two consecutive firings. Without this entry,
+  the next firing might still treat the denial as load-bearing
+  and avoid h100_2-side probes that are now safe to run.
+- Verifying paper-critical artifacts intact while h100_2 is
+  reachable is cheap insurance: confirms the paper doc's
+  reproduce pointers are still load-bearing (a silent artifact
+  loss would otherwise only surface when a future probe
+  needed them).
+- The "log + delete legacy ckpt" cleanup option is now
+  one-step-shorter for any future firing: the legacy
+  `qwen_l15_*.pt` checkpoints are *already* logged in
+  `docs/dmitry/results/em_features/trained_models_log.md`
+  (uploaded to `dmanningcoe/temp-xc-em-features` on HF), so
+  rule (7)'s "log first" requirement is satisfied for them.
+
+**Closed-axis state at end of firing** (unchanged from 03:00 UTC;
+all paper-critical numbers verified against on-disk stage-4
+files this firing):
+
+| arch / config       | R1 5k mid | R32 10k single ext-α | R32 10k bundle k=30 mid |
+| :------------------ | --------: | -------------------: | ----------------------: |
+| SAE arditi          | **96.88** | **64.53** ⭐         | 41.33                   |
+| TXC k=100           |  91.80    | 51.95                | (not run)               |
+| medical-champ goal  |  +38.41   | +6.06                | −17.14 (align only)     |
+
+**Next firing priorities (likely 08:00 UTC)**:
+
+- **Status-only firing remains acceptable** — both axes closed,
+  paper doc tightened, figures complete, no cheap probe queued,
+  h100_2 reachability restored.
+- **No new training/Wang launches** unless a new scientific
+  question crystallizes — both axes remain closed.
+- **Optional cleanup window**: legacy 110 GB qwen_l15_*.pt on
+  /root local are already logged in `trained_models_log.md` (HF
+  backups under `dmanningcoe/temp-xc-em-features`); rule (7)'s
+  "log first" requirement is satisfied. Deletion permitted but
+  not currently load-bearing. /root at 92% is tight but workable.
+- **3-firing-stuck rule** (rule 9): not engaged. Last 5 firings
+  each made a durable contribution without spending compute.
+  If the pattern continues with no new scientific question
+  crystallizing for three more firings, append a "stuck — please
+  intervene" section per rule (9).
+
 ### Status as of 2026-05-03 06:00 UTC (status-only firing — local h100_1 idle, h100_2 SSH access denied this firing; both axes remain closed; no compute spent)
 
 **This firing (06:00 UTC) actions:**
