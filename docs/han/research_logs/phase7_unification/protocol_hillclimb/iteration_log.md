@@ -95,3 +95,43 @@ around T/2. Next ideas to push past +0.745:
 
 Priority: V14 (multi-scale) and V15 (attention-weighted) most novel; V11
 and V16 are direct extensions to confirm the stride-monotonic story.
+
+### Iteration 2 — IN FLIGHT (V14, V15, V16)
+
+Three protocols launched at 00:35 UTC; ETA done by ~02:23 UTC.
+
+### Mystery investigation (parallel to iter 2)
+
+**Content-vs-discourse trade-off (NEW finding, 2026-05-03)**:
+
+Per-concept peak succ at coh ≥ 1.75 — Galaxy 18 (T=3) V7 vs Galaxy 23 (T=5) V7:
+
+| concept | G18 (T=3) | G23 (T=5) | gap |
+|---|:--:|:--:|:--:|
+| financial, harmful_content, programming | 3 | 0 | **+3** ⭐ |
+| medical, narrative | 3 | 1 | **+2** |
+| formal_register, instructional, negative_emotion, technical_jargon | 2-3 | 1-2 | **+1** |
+| casual_register, code_context, geographical | 1-3 | 3 | **−2 to −3** |
+| imperative_form, positive_emotion | 0 | 1 | −1 |
+
+Mean per-concept peak: G18=1.33, G23=1.03 (gap 0.30; vs aggregate
+peak15 gap of 0.36 — consistent).
+
+**Interpretation**: T=3 wins for **content-keyword** concepts (specific
+terminology that fires on 1-2 tokens). T=5 wins for **discourse-style**
+concepts (register, code-vs-prose context, geographical reference).
+
+This explains why no single (arch, protocol) wins universally — the
+optimal T depends on the **concept's intrinsic span**.
+
+**Implication for paper**: instead of "best single protocol", report
+**(T, protocol) selection per concept type**. Or: an ENSEMBLE of
+(T=2, T=3, T=5) under their respective best protocols, voting per concept.
+
+**Implication for hill-climb**: V14 multi-scale (T-scale + T_mid + 1-scale
+combined) IS this idea — sums multiple-T deltas. If V14 wins, the
+multi-scale story is the answer.
+
+If V14 plateaus, then high-T's content-concept gap is an
+**architectural** limit (per-position feature density), not a protocol
+issue. Fix: train a higher-k_pos variant of Galaxy 23.
