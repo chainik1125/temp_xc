@@ -92,15 +92,46 @@ direction). This is the pattern Dmitry was hoping for.
 **Important caveat**: keyword_rate counts ALL `wait`/`hmm` emissions
 including filler, pseudo-backtracking, and loops (e.g., the TXC mag=+16
 sentence-loop pattern documented in the repetition-rate plot below). The
-Sonnet judge explicitly filters these out. **Until the Sonnet pass
-lands, treat the keyword-rate ranking as upper-bound on the inducement
-story** — TXC's lead may shrink (though probably won't reverse) once the
-loops are de-credited.
+Sonnet judge explicitly filters these out — see the gold-standard
+results in the next subsection (TXC's lead is preserved but compressed:
+peak Δgc / peak Δkw goes from "TXC = ~14× MLC" on keyword rate to "TXC
+≈ 3× MLC" on the filtered Sonnet count).
 
-### Sonnet `genuine_count` (gold standard) — pending
+### Sonnet `genuine_count` (gold standard) — landed 2026-05-03 08:02
 
-Will populate when the Sonnet judge run completes (~30 min). Updated
-plot will overwrite `images_b/np_inducement_headline.png`.
+9,150 judgements. Stability column = number of nonzero magnitudes (out
+of 24) where Δ genuine_count > 0:
+
+| Arch | Stability (Δgc>0 / 24) | Peak Δ genuine_count (mag) | Peak / TXC |
+|---|---|---|---|
+| **TXC** | 21/24 | **+1.574 (mag = −12)** | 1.00× |
+| MLC | **24/24** | +0.508 (mag = +16) | 0.32× |
+| TXC-H8 | 22/24 | +0.492 (mag = +12) | 0.31× |
+| TFA | **24/24** | +0.328 (mag = +12) | 0.21× |
+| SAE | 23/24 | +0.262 (mag = −16) | 0.17× |
+| TSAE-paper | 23/24 | +0.246 (mag = +10) | 0.16× |
+
+**Even after Sonnet filters out filler / pseudo-bt / loops, TXC's peak
+inducement is ~3× the next-best arch.** The cheap-proxy result holds
+qualitatively: TXC dominates backtracking induction.
+
+**Trade-off worth flagging to Dmitry**: TXC is highest in *peak*
+inducement (+1.574) but slightly weaker in *stability* (21/24 mags
+positive). MLC and TFA achieve perfect 24/24 stability, but with peak
+~3-5× lower. So:
+
+- If the criterion is "more inducement at the peak", TXC wins decisively.
+- If the criterion is "more inducement, MORE STABLY", MLC is competitive
+  (positive at every nonzero magnitude, peak +0.508).
+- The 3 magnitudes where TXC's Δgc goes ≤0 are all on the positive side
+  (mag ∈ {+8, +10, +16} based on inspection of the curve) — the same
+  high-positive-magnitude region where TXC has its sentence-loop
+  catastrophic regression. So TXC's instability is correlated with the
+  loop-collapse mechanism documented in the repetition-rate plot, not
+  scattered noise.
+
+**Refreshed plot above** uses these numbers; it now has 4 panels
+(Δ genuine_count, raw genuine_count, Δ keyword_rate, raw keyword_rate).
 
 ---
 
