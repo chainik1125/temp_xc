@@ -1,22 +1,13 @@
 # temp_xc
 
-## Setup
+This is the `final` branch — the paper-ready snapshot of the Temporal
+Crosscoders project.
 
-```bash
-uv sync
-```
+All paper code, docs, and decisions live in [`purified/`](purified/).
+Start with [`purified/CLAUDE.md`](purified/CLAUDE.md) for the operating
+manual.
 
-## Documentation
-
-Docs live in `docs/`. Open that folder as an Obsidian vault for connected browsing, or read the markdown directly.
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for how to write and submit docs.
-
-## Running checks
-
-```bash
-./run-checks.sh       # all checks (markdown lint + tag validation + link check)
-./run-checks.sh -m    # markdown lint only
-./run-checks.sh -t    # tag check only
-./run-checks.sh -l    # link check only
-```
+The wasteland branches (`han-phase7-unification`, `em-nanda`,
+`aniket-ward-stage-b`) hold the historical research code and intermediate
+writeups. They are read-only context; never imported into paper work.
+Read wasteland code via `git show origin/<branch>:<path>`.

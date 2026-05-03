@@ -115,6 +115,55 @@ Gemma activations may not need the recipe. "Default for both" was a
 premature commitment to a recipe that's only validated on one
 organism.
 
+### 8. Wasteland code deleted; wasteland docs kept
+
+Han: "is it worth deleting the wasteland files in the purified branch
+and forcing agents to inspect other branches to see the wasteland?"
+
+Decision: yes — but asymmetrically. **Code wasteland deleted** from
+`final` (`src/`, `experiments/`, `references/`, `tests/`,
+`scripts/` at root, root `pyproject.toml`, `uv.lock`, `Dockerfile`,
+`launch-sandbox.sh`, `torchgpu_packages.txt`, `temporal_crosscoders/`,
+root `results/`); **docs wasteland kept** (`docs/`, `papers/`, root
+`CLAUDE.md`, `RUNPOD_INSTRUCTIONS.md`, `CONTRIBUTING.md`).
+
+**Why asymmetric**: docs are read often (passively, for context — every
+component writeup cites ~5 wasteland research logs). Code is read once
+per port (actively, for transcription, ~10 ports total). Delete what's
+read once; keep what's read often.
+
+**Benefit**: an accidental `from src.architectures.tfa import …` now
+raises `ModuleNotFoundError` immediately rather than silently picking
+up wasteland code. The "no wasteland imports" rule (PROTOCOL.md § 2)
+becomes git-level enforcement, not policy.
+
+**Cost**: agents porting code use
+`git show origin/han-phase7-unification:src/...` to read. Mild — one
+extra command per port, ~10 times across the paper. Worked example +
+header-comment template in PROTOCOL.md § 2.
+
+3658 → 319 tracked files (~91% reduction). Reversible via `git revert`
+or `git checkout origin/han-phase7-unification -- <path>` if a specific
+file turns out to be needed.
+
+### 9. Consolidate purified/ docs from 3 → 2 files
+
+Han: "is it necessary to have THREE different files?" (referring to
+`purified/` having `README.md`, `CLAUDE.md`, `PROTOCOL.md`).
+
+Decision: drop `purified/README.md`. Merge its unique content (Quick
+start, Layout, Components table, TXC summary) into `purified/CLAUDE.md`,
+which is the auto-loaded source of truth for agents. `PROTOCOL.md` stays
+as the detailed protocol reference.
+
+Final layout:
+- **CLAUDE.md** (~250 lines): operating manual + brief overview.
+  Auto-loaded by Claude Code when an agent reads any file under
+  `purified/`. Self-contained for session start.
+- **PROTOCOL.md** (~330 lines): detailed contract (§ 1-11 incl. GPU
+  pinning § 11.0, multi-GPU access § 11.1, framework discipline § 11).
+  Read on first session, referenced as needed.
+
 ### Non-decisions (to revisit later)
 
 - **C3 task suite** — Phase 5's 36-task vs Phase 7's 16-task PAPER subset.

@@ -14,39 +14,57 @@ your first action.
 
 ## 2. The wasteland boundary
 
-The repository contains a large body of historical work outside
-`purified/`. Treat it as **read-only documentation** for context.
+Wasteland **code** (`src/`, `experiments/`, `references/`, `tests/`,
+`scripts/`, root `pyproject.toml`, `Dockerfile`, etc.) is **deleted from
+the `final` branch** as of 2026-05-03. It lives only on
+`origin/han-phase7-unification`. Wasteland **docs** (`docs/`, `papers/`,
+root `CLAUDE.md`, `RUNPOD_INSTRUCTIONS.md`) are kept on `final` because
+component writeups cite them heavily.
 
-- **Allowed:** read files under `temp_xc/{src,experiments,docs,papers}` for
-  reproduction context, baseline numbers, or paper references.
-- **Forbidden:** `import` from `temp_xc.src`; `from src ...`; `subprocess`
-  invocations of root-level scripts; modifying any wasteland file.
-- If reference code is useful, copy it into `purified/src/temp_bench/`
-  with attribution in a header comment. Duplication is fine; coupling is not.
+The deletion is git-level enforcement of the quarantine: an accidental
+`from src.architectures.tfa import ...` now raises `ModuleNotFoundError`
+immediately rather than silently picking up wasteland code.
+
+### Reading wasteland code from origin
+
+```bash
+# refresh once per session (purified/scripts/wasteland_refresh.sh)
+git fetch --all --prune
+
+# read a wasteland code file
+git show origin/han-phase7-unification:src/architectures/txc_bare_antidead.py
+
+# list wasteland code paths
+git ls-tree -r origin/han-phase7-unification --name-only | grep '^src/architectures'
+
+# port a wasteland file into temp_bench (then add a header comment with
+# the source path + commit hash)
+git show origin/han-phase7-unification:src/architectures/txc_bare_antidead.py \
+    > purified/src/temp_bench/architectures/txc_base.py
+```
+
+After porting, add a header comment to the new file:
+
+```python
+# Ported from origin/han-phase7-unification:src/architectures/txc_bare_antidead.py
+# at commit <sha> on YYYY-MM-DD by <agent>.
+```
+
+Live imports from origin are forbidden; one-time copies with
+attribution are fine.
 
 ### 2a. Cross-branch reads (em-nanda, aniket-ward-stage-b)
 
-Dmitry's emergent-misalignment work and Aniket's backtracking work live
-on **other branches** that are still being updated. We never merge them
-into `final` — that would freeze stale snapshots and create conflict
-surface. Read them directly from origin instead:
+Dmitry's emergent-misalignment work and Aniket's backtracking work also
+live on other branches and are still being updated. Same pattern:
 
 ```bash
-# Refresh first (run once per agent session)
-bash purified/scripts/wasteland_refresh.sh
-
-# Read a file from a sibling branch
 git show origin/em-nanda:docs/dmitry/results/em_features/em_nanda_results_paper.md
 git show origin/aniket-ward-stage-b:docs/aniket/experiments/ward_backtracking/handoff_neurips_push.md
-
-# List a directory on a sibling branch
-git ls-tree -r origin/em-nanda --name-only | grep em_features
 ```
 
-If you need to copy code from a sibling branch into `purified/`, copy
-once with attribution + the source commit hash in a header comment, then
-stop tracking origin from that point. Live-importing is forbidden;
-porting is fine.
+We never merge any sibling branch into `final` — that would freeze
+stale snapshots and create conflict surface.
 
 ## 3. Filesystem ownership
 

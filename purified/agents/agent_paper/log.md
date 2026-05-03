@@ -160,6 +160,85 @@ processes — no new named agent needed unless concrete work emerges.
 Files updated: agents/README.md, scripts/set_agent_env.sh,
 docs/paper/hardware.md, deleted agents/agent_apple/.
 
+## 2026-05-03 — Day 0, wasteland delete + docs consolidation
+
+Han: "is it worth deleting the wasteland files in the purified branch
+and forcing agents to inspect other branches to see the wasteland?"
+Recommended yes (asymmetrically — code yes, docs no). Han confirmed.
+Han also asked about consolidating purified's three top-level docs
+(README, CLAUDE, PROTOCOL) — agreed to merge README into CLAUDE.
+
+Executed:
+
+1. **Deleted code wasteland** from `final`: `src/`, `experiments/`,
+   `references/`, `tests/`, `scripts/`, root `pyproject.toml`, `uv.lock`,
+   `Dockerfile`, `torchgpu_packages.txt`, `launch-sandbox.sh`,
+   `temporal_crosscoders/`, root `results/`. **Kept docs wasteland**:
+   `docs/`, `papers/`, root `CLAUDE.md`, `RUNPOD_INSTRUCTIONS.md`,
+   `CONTRIBUTING.md`. 3658 → 319 tracked files (~91% reduction).
+
+2. **Merged purified/README.md into purified/CLAUDE.md.** README
+   deleted. CLAUDE.md is now the single agent-facing operating manual
+   (~250 lines) and is auto-loaded by Claude Code. PROTOCOL.md stays
+   as the detailed reference (~330 lines).
+
+3. **Updated PROTOCOL.md § 2** (wasteland boundary) with the new
+   `git show origin/han-phase7-unification:<path>` read pattern + a
+   header-comment template for porting.
+
+4. **Cleaned wasteland-rooted reproduction commands** in
+   `docs/components/c2.md` (was pointing at `src/v2_temporal_schemeC/...`)
+   and `docs/components/c3.md` (was suggesting to "port Phase 5's cache").
+   Both now reference the `temp_bench` framework.
+
+5. **Documented in `decisions.md` #8 (delete) and #9 (consolidate).**
+
+Tests verified: all green.
+
+## 2026-05-03 — Day 0, root tooling cleanup
+
+Han: "I still see a bunch of skeleton files locally in `src` and stuff
+like .markdownlint.jsonc; also wouldn't it be appropriate to completely
+replace the root level CLAUDE.md with purified/CLAUDE.md?"
+
+Two issues:
+
+(a) The previous commit message claimed I'd consolidated purified
+docs (README → CLAUDE merge) but the actual purified edits didn't make
+it into the commit — only the wasteland deletion did. Bundled in this
+turn.
+
+(b) Root-level wasteland tooling was still present: `.markdownlint.jsonc`,
+`run-checks.sh`, `check-tags.sh`, `get-tags.sh`, `CONTRIBUTING.md`,
+`.lycheeignore`, `.dockerignore`, `.vscode/extensions.json`,
+`.github/workflows/{agent-review,ci,link-check}.yml`. None of these
+operate on `purified/`; they all assumed wasteland-style `docs/`
+validation.
+
+Resolved:
+
+1. Root `CLAUDE.md` replaced with single-line `@purified/CLAUDE.md`
+   import. When an agent launches at the repo root, the import inlines
+   purified's operating manual into context — no duplication, single
+   source of truth.
+
+2. Root `README.md` replaced with a brief stub: "this is the final
+   branch, see purified/CLAUDE.md, wasteland is on origin".
+
+3. Deleted root wasteland tooling: CONTRIBUTING.md, check-tags.sh,
+   get-tags.sh, run-checks.sh, .markdownlint.jsonc, .lycheeignore,
+   .dockerignore, .vscode/, .github/workflows/.
+
+4. Local untracked litter (~432 GB across src/, experiments/, tests/,
+   results/, data/, logs/) is the user's to clean up:
+
+       rm -rf src/ experiments/ tests/ results/ data/ logs/
+
+   Not running this myself — destructive, and `.venv/`, `.env_autointerp`,
+   `.claude/`, `.git/` should NOT be touched.
+
+Tests still 29/29.
+
 **Tests** (23/23 passing):
 
 - `tests/test_cache_keys.py` — determinism, version-bump invalidation,
