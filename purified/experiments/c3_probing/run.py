@@ -4,26 +4,33 @@ Thin scaffold per ``experiments/_runner_template.py`` (PROTOCOL.md § 11
 *Code reuse contract*). All training-loop / probing logic lives in
 the shared modules:
 
-- ``temp_bench.training.train_sae``       — canonical SAE trainer
-- ``temp_bench.eval.probing.run_task_suite`` — SAEBench-style probe
-- ``temp_bench.runner.run_cell``         — leaderboard append + caching
+- ``temp_bench.training.train_sae``           — canonical SAE trainer
+- ``temp_bench.eval.probing.s_tail_probe``    — SAEBench-style probe
+- ``temp_bench.data.nlp.probe_cache``         — per-task activation cache
+- ``temp_bench.runner.run_cell``              — leaderboard append + caching
 
-Task suite: SAEBench+CT (n=38) — see ``decisions.md`` § 11. Tasks are
-pre-cached to ``results/probe_cache/<datasource_name>/<task_name>/``
-by ``cache_probe_tasks.py`` (TODO — not yet ported). Until that
-pipeline lands, this runner supports a ``--smoke`` mode that uses
-fake binary labels on the FineWeb cache to validate the full
-train→encode→probe pipeline end-to-end with one cell.
+Task suite: SAEBench+CT (n=38) — see ``decisions.md`` § 11. Tasks live
+on disk at ``results/probe_cache/<datasource_name>/<task_name>/`` after
+running ``build_probe_cache``. Each task's eval flattens per-task AUC
+into the leaderboard row as ``auc__<task>`` keys (38 floats) AND emits
+the headline aggregates ``mean_auc`` / ``std_auc`` / ``mean_acc`` /
+``std_acc``. Per-task floats let the analysis script compute σ_tasks;
+the headline uses ``mean_auc`` as the primary metric.
 
 Usage::
 
     # Smoke (1 arch × 1 seed × 1 k_feat × fake labels):
     TQDM_DISABLE=1 .venv/bin/python -m experiments.c3_probing.run --smoke
 
-    # Real (when probe cache lands):
+    # Real cells (requires probe cache already built):
     TQDM_DISABLE=1 .venv/bin/python -m experiments.c3_probing.run \\
         --archs topk_sae tsae_paper txc_base \\
         --seeds 1 2 42 --k_feats 5 20
+
+To build the probe cache first::
+
+    TQDM_DISABLE=1 .venv/bin/python -c "from temp_bench.data.nlp \\
+        import build_probe_cache; build_probe_cache('gemma_2_2b_it_l13_fineweb_24k128')"
 """
 
 from __future__ import annotations
@@ -38,6 +45,7 @@ import torch
 from temp_bench import runner
 from temp_bench.config import act_cache_dir, instantiate_arch, load_arch
 from temp_bench.data import batch_iter_from_act_cache
+from temp_bench.data.nlp import list_probe_cache, load_probe_cache
 from temp_bench.eval import probing
 from temp_bench.schemas import TrainingConfig
 from temp_bench.training import train_sae
@@ -94,14 +102,21 @@ def my_eval_fn(*, model, eval_cfg, component):
 
     Eval data:
       - If ``eval_cfg["smoke"]`` is True: synthetic binary labels on
-        the FineWeb cache (validates pipeline end-to-end).
-      - Otherwise: load probe-cache for this datasource (TODO — not
-        yet implemented; raises until the probe-cache pipeline lands).
+        the FineWeb cache (validates pipeline end-to-end with one
+        synthetic AUC).
+      - Otherwise: iterate every cached SAEBench+CT task, run
+        ``s_tail_probe``, return per-task AUCs as ``auc__<task>``
+        floats plus aggregates (``mean_auc``, ``std_auc``, ``mean_acc``,
+        ``std_acc``). Primary metric is ``mean_auc``.
+
+    Per-task floats are kept on the leaderboard row so analysis can
+    compute σ_tasks; the headline uses the aggregate.
     """
     del model  # we re-instantiate; the runner doesn't pre-load
     arch_name = eval_cfg["_arch_name"]
     state_dict = eval_cfg["_state_dict"]
     act_cache_key = eval_cfg["_act_cache_key"]
+    datasource_name = eval_cfg["_datasource_name"]
     k_feat = int(eval_cfg["k_feat"])
     S = int(eval_cfg.get("S", DEFAULT_S))
     smoke = bool(eval_cfg.get("smoke", False))
@@ -113,20 +128,49 @@ def my_eval_fn(*, model, eval_cfg, component):
 
     if smoke:
         X_train, y_train, X_test, y_test = _smoke_probe_data(act_cache_key, S=S)
-    else:
-        raise NotImplementedError(
-            "Real probe cache not yet built. Pass smoke=True in eval_cfg "
-            "to validate the pipeline, or wait on the probe-cache port "
-            "(probe_datasets.py + cache_probe_tasks.py)."
+        metrics = probing.s_tail_probe(
+            m,
+            X_train=X_train, y_train=y_train,
+            X_test=X_test, y_test=y_test,
+            S=S, k_feat=k_feat,
+        )
+        return metrics, "auc"
+
+    # ── Real eval: iterate cached SAEBench+CT tasks
+    task_names = list_probe_cache(datasource_name)
+    if not task_names:
+        raise FileNotFoundError(
+            f"No probe cache found for datasource {datasource_name!r}. "
+            f"Run build_probe_cache(...) first."
         )
 
-    metrics = probing.s_tail_probe(
-        m,
-        X_train=X_train, y_train=y_train,
-        X_test=X_test, y_test=y_test,
-        S=S, k_feat=k_feat,
-    )
-    return metrics, "auc"
+    aucs: list[float] = []
+    accs: list[float] = []
+    per_task_metrics: dict[str, float] = {}
+    for tname in task_names:
+        task = load_probe_cache(datasource_name, tname)
+        r = probing.s_tail_probe(
+            m,
+            X_train=task["X_train"], y_train=task["y_train"],
+            X_test=task["X_test"], y_test=task["y_test"],
+            S=S, k_feat=k_feat,
+        )
+        per_task_metrics[f"auc__{tname}"] = float(r["auc"])
+        per_task_metrics[f"acc__{tname}"] = float(r["acc"])
+        aucs.append(float(r["auc"]))
+        accs.append(float(r["acc"]))
+
+    aucs_arr = np.asarray(aucs, dtype=np.float64)
+    accs_arr = np.asarray(accs, dtype=np.float64)
+    metrics = {
+        "mean_auc": float(aucs_arr.mean()),
+        "std_auc": float(aucs_arr.std(ddof=1)) if len(aucs) > 1 else 0.0,
+        "mean_acc": float(accs_arr.mean()),
+        "std_acc": float(accs_arr.std(ddof=1)) if len(accs) > 1 else 0.0,
+        "n_tasks": float(len(aucs)),
+        **per_task_metrics,
+    }
+    return metrics, "mean_auc"
 
 
 def _smoke_probe_data(act_cache_key: str, *, S: int):
@@ -157,9 +201,29 @@ def _smoke_probe_data(act_cache_key: str, *, S: int):
 # ── Runner ─────────────────────────────────────────────────────────────────
 
 
+def _real_training_cfg() -> TrainingConfig:
+    """Headline-cell TrainingConfig.
+
+    Decision (2026-05-03, agent_nlp autonomous): n_steps=10_000 fits 18
+    cells in the 10-hour autonomous window (~25-30 min/cell at H100
+    bs=256). Phase 7 reference numbers came from longer runs (~50K),
+    but SAE convergence at this token budget (10K × 256 × 128 = 328M
+    tokens) is reliable per the temporal_sae paper. If results undershoot
+    the Phase 7 leaderboard, re-run with n_steps=30_000 (uses schema
+    default; will trigger train-key invalidation since steps is part of
+    train_key).
+    """
+    return TrainingConfig(
+        n_steps=10_000,
+        batch_size=256,
+        learning_rate=3e-4,
+        warmup_steps=500,
+        precision="bf16",
+    )
+
+
 def main(*, archs, seeds, k_feats, S, smoke, force_train=False, force_eval=False):
     if smoke:
-        # Tiny training cfg for validation
         training_cfg = TrainingConfig(
             n_steps=SMOKE_TRAIN_STEPS,
             batch_size=SMOKE_BATCH,
@@ -168,17 +232,24 @@ def main(*, archs, seeds, k_feats, S, smoke, force_train=False, force_eval=False
             precision="bf16",
         )
     else:
-        training_cfg = runner.default_training_cfg("topk_sae")
+        training_cfg = _real_training_cfg()
+
+    from temp_bench.config import compute_act_cache_key, load_datasource
+    act_cache_key = compute_act_cache_key(load_datasource(DATASOURCE))
 
     for arch in archs:
         for seed in seeds:
             for k in k_feats:
-                eval_cfg = {"k_feat": k, "S": S, "smoke": smoke}
-                # Inject act_cache_key into eval_cfg so eval_fn can read meta.
-                # runner.run_cell already injects _state_dict + _arch_name,
-                # but we also need the cache key for d_in lookup.
-                from temp_bench.config import compute_act_cache_key, load_datasource
-                eval_cfg["_act_cache_key"] = compute_act_cache_key(load_datasource(DATASOURCE))
+                eval_cfg = {
+                    "k_feat": k,
+                    "S": S,
+                    "smoke": smoke,
+                    # Inject act_cache_key + datasource_name so eval_fn can
+                    # look up d_in and find the probe cache. The runner
+                    # already injects _state_dict + _arch_name + _arch_hparams.
+                    "_act_cache_key": act_cache_key,
+                    "_datasource_name": DATASOURCE,
+                }
 
                 result = runner.run_cell(
                     component=COMPONENT,
@@ -195,12 +266,27 @@ def main(*, archs, seeds, k_feats, S, smoke, force_train=False, force_eval=False
                 )
                 tag = "CACHED" if result.cached else "NEW"
                 m = result.metrics or {}
-                auc = m.get("auc")
-                acc = m.get("acc")
-                auc_s = f"{auc:.4f}" if auc is not None else "-"
-                acc_s = f"{acc:.4f}" if acc is not None else "-"
-                print(f"[{tag}] {arch} seed={seed} k_feat={k}  "
-                      f"AUC={auc_s}  acc={acc_s}  eval_key={result.eval_key}")
+                # Show the headline metric. For smoke runs, that's "auc";
+                # for real runs, "mean_auc" + "std_auc" + n_tasks.
+                if smoke:
+                    auc = m.get("auc")
+                    acc = m.get("acc")
+                    auc_s = f"{auc:.4f}" if auc is not None else "-"
+                    acc_s = f"{acc:.4f}" if acc is not None else "-"
+                    print(f"[{tag}] {arch} seed={seed} k_feat={k}  "
+                          f"AUC={auc_s}  acc={acc_s}  eval_key={result.eval_key}")
+                else:
+                    mean_auc = m.get("mean_auc")
+                    std_auc = m.get("std_auc")
+                    n_tasks = m.get("n_tasks")
+                    if mean_auc is not None:
+                        print(f"[{tag}] {arch} seed={seed} k_feat={k}  "
+                              f"mean_AUC={mean_auc:.4f}±{std_auc:.4f} "
+                              f"(n={int(n_tasks or 0)} tasks)  "
+                              f"eval_key={result.eval_key}")
+                    else:
+                        print(f"[{tag}] {arch} seed={seed} k_feat={k}  "
+                              f"eval_key={result.eval_key}")
 
 
 def cli():
