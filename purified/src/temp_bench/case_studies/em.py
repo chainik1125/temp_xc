@@ -137,17 +137,20 @@ def load_subject_with_lora(
 def decoder_row(arch_module, feature_id: int) -> torch.Tensor:
     """Return the per-feature decoder direction as a flat ``(d_in,)`` tensor.
 
-    Both architectures expose ``W_dec``, but with different shapes:
-    TXC-base: ``(d_sae, T, d_in)`` — return mean across T (= the
-    same convention as ``decoder_directions()``).
-    SAE-arditi: ``(d_sae, d_in)`` — return ``W_dec[feature_id]`` directly.
+    Architectures expose ``W_dec`` with different shapes:
+
+    - TXC-base (han layout): ``(d_sae, T, d_in)`` — return last
+      temporal slot ``W_dec[fid, -1, :]``. Matches Dmitry's
+      ``run_wang_procedure.py:load_steerer_decoder_row`` convention
+      (he comments "take the last temporal slot to match
+      frontier_sweep convention").
+    - SAE-arditi: ``(d_sae, d_in)`` — return ``W_dec[fid]`` directly.
     """
     W = arch_module.W_dec.data
     if W.dim() == 2:
         return W[feature_id].detach().clone()
     if W.dim() == 3:
-        # TXC-han: (d_sae, T, d_in) — average over T positions.
-        return W[feature_id].mean(dim=0).detach().clone()
+        return W[feature_id, -1, :].detach().clone()
     raise RuntimeError(f"Unsupported W_dec shape {tuple(W.shape)}")
 
 
