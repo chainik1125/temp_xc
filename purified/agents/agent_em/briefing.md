@@ -89,38 +89,81 @@ References:
 
 ## Current state (agent owns — overwrite at every compact)
 
-**Last verified: 2026-05-03T23:14Z (mid-pipeline, TXC training in progress)**
+**Last verified: 2026-05-03T23:53Z (Phase B + first-cell C6 results landed and pushed)**
 
-- `git HEAD`: `717f346c` (Phase A + Phase B committed + pushed —
-  10 commits today; latest: c6 analysis frontier-plot helper).
-- Last leaderboard append: `eval_key=160a1471d1a93f1b`
-  (sae_arditi 30 k cell, peak_align=81.625, peak_coh=90.92,
-  peak_alpha=-30.0, peak_feature_id=3173). Append at 23:07:40 UTC.
-- Last checkpoint saved: `train_key=926527b006dd74aa`
-  (sae_arditi 30 k, 1.34 GB, local at `checkpoints/.../model.safetensors`).
-  HF push deferred — agent_em hasn't wired the persistent-pod auto-push
-  yet; flag for post-pipeline.
-- Active GPU lock(s): GPU 1 pinned via `CUDA_VISIBLE_DEVICES=1` (set
-  by `set_agent_env.sh agent_em`). Pipeline process owns it.
+- `git HEAD`: `6f2b323d` (frontier plot pushed). 12 commits today;
+  Phase A + Phase B + first-cell results all upstream on `final`.
+- Last leaderboard append: `eval_key=c1d96d5549e0c3a6`
+  (txc_base+brickenauxk_a8 30k, peak_align=75.875, peak_coh=89.92,
+  peak_alpha=+1.0, peak_feature_id=734). Append at 23:52:56 UTC.
+  SAE-arditi cell at `eval_key=160a1471d1a93f1b`, peak_align=81.625,
+  feat 3173, α=-30.
+- Last checkpoint saved: `train_key=410c3f342b133fff` (txc_base 30 k
+  brickenauxk_a8). SAE checkpoint at `train_key=926527b006dd74aa`
+  (1.34 GB). HF push deferred — agent_em didn't wire persistent-pod
+  auto-push; flag for next session.
+- Active GPU lock(s): GPU 1 pinned. Pipeline (PID 23080) is winding
+  down (post-Wang cleanup). Will exit shortly.
 - Recent decisions in scope: #2, #4, #6, #7
-- In flight: pipeline process (PID 23080, ~16 min elapsed) running
-  TXC-base + brickenauxk_a8 training. Started 23:07:40, ETA ~23:25.
-  Log: `logs/full_run.log`. Monitor `bjgomiqk3` armed; wait-loop
-  `bf752xc7z` waiting for TXC `done in 30000` (single completion
-  notification). After training: TXC Wang 9 min, then leaderboard
-  append, then `bash scripts/c6_render_and_push.sh` populates c6.md
-  AUTO-RESULTS + commits + pushes.
+- In flight: nothing — first cell complete; results rendered into
+  `docs/components/c6.md` AUTO-RESULTS + frontier plot at
+  `experiments/c6_em/plots/c6_frontier.png`.
 
-**SAE-arditi C6 frontier (full Wang minimal, 18 cells):**
+## Headline result
 
-| feature_id | α=-30 | α=-10 | α=-3 | α=+1 | α=+3 | α=+10 |
-|---|---:|---:|---:|---:|---:|---:|
-| 16669 (Δz̄=0.21) | 76.30 | 67.72 | 69.77 | 68.19 | 68.88 | 74.75 |
-| 17887 (Δz̄=0.15) | 76.09 | 71.97 | 77.11 | 72.75 | 72.94 | 73.25 |
-| **3173** (Δz̄=0.04) | **81.62** ⭐ | 72.73 | 72.77 | 71.88 | 65.52 | 65.11 |
+**Gap = peak_align(SAE-arditi) − peak_align(TXC-base+brickenauxk_a8)
+= 81.625 − 75.875 = +5.75 align points** → **Mixed** decision per
+the c6.md decision tree (3 < gap ≤ 9).
 
-Peak: feat 3173 α=-30 → align=81.62, coh=90.92.
-Cohs hold ≥87 throughout. Stage 4 ran in 8 min (batched generation).
+| arch | seed | peak_align | peak_coh | peak_α | feature_id |
+|---|---:|---:|---:|---:|---:|
+| sae_arditi | 42 | 81.62 | 90.92 | -30.0 | 3173 |
+| txc_base+brickenauxk_a8 | 42 | 75.88 | 89.92 | +1.0 | 734 |
+
+**SAE-arditi frontier:** sharp peak at α=-30, feat 3173 (the
+strongest "anti-misalignment" feature). The single-feat peak at
+extreme negative α matches the published-Wang shape (Dmitry's
+Qwen-14B finance R32 ext-α champion peaks at α=-30 too).
+
+**TXC-base frontier:** flatter — all three top-Δz̄ features hover
+around 70-76 across the α grid. The peak is at mild positive α=+1
+(feat 734), not extreme negative. Coherence holds ≥87 across all
+(feat × α) cells.
+
+**Bricken trajectory** during TXC training: fired 59× over 30 k
+steps (every 500), last n_resampled=9216 (max_resample_fraction=0.5
+× d_sae=18432 cap). Consistent with Dmitry's ~75% dead-by-step-40k
+trajectory — Bricken can't keep up with newly-collapsing features
+even on this corpus.
+
+**Decision-tree outcome (Mixed):** TXC-base+brickenauxk_a8 did not
+close the gap to within Gemini-judge σ ≈ 6 on the abbreviated Wang.
+Combined with Dmitry's Qwen-7B-medical step-efficiency win
+(`txc_hookpoint_comparison_finding.md`), this supports a "tradeoff"
+framing — TXC wins on training-step efficiency at smaller scale but
+loses on absolute peak align at the Qwen-14B/R1 30 k mid-α cell.
+
+## Caveats baked into the gap
+
+These results are NOT directly comparable to Dmitry's published
+95.16/91.25 numbers (which are gap +3.91 for the SAME R1 30 k
+mid-α cell on the SAME organism):
+
+1. **Judge swap**: Anthropic Claude Haiku 4.5 instead of
+   Gemini-3.1-flash-lite (no GOOGLE_API_KEY in pod). σ unmeasured.
+2. **Wang abbreviation**: stages 2 + 3 (causal screen + per-survivor
+   coh-aware sweep) skipped; abbreviated stage-4 frontier on top-3
+   Δz̄-ranked features.
+3. **Corpus stand-in**: training corpus is
+   `cfierro/personality-qs-risky-financial-advice` (HF mirror;
+   17 k user/assistant pairs; closest available stand-in for
+   Turner's `risky_financial_advice.jsonl`).
+4. **Hparam mismatch**: TXC-base used locked yaml defaults
+   (`d_sae=18432, k_win=100`) not c6.md's `d_sae=32768, k=128`
+   (locked yaml lacks `c6` override; OQ #1).
+
+The relative gap (+5.75) is comparable across the two arches
+(both hit the same judge / procedure / corpus / hparams).
 
 ## What I just did (agent owns — overwrite)
 
