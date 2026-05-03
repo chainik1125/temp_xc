@@ -230,3 +230,39 @@ on the most concepts; closest to ensemble average of single cells).
 - Cross-arch V9 validation on T=5 vanilla TXC + T=5 H8 (~50 min)
 - Train Galaxy 23 with k_pos=50 to test info-bottleneck hypothesis (~3h)
 - V20 pre-attention steering (hook at L=11) — completely new mechanism (~1h)
+
+### Iteration 3 — V9 cross-arch validation RESULTS
+
+V9 sliding-TB s=2 tested on 3 T=5 archs:
+
+| arch | V1 RE | V7 TB | V9 |
+|---|---:|---:|---:|
+| Galaxy 23 (T=5 SoftMaxPool) | +0.233 (3sd) | +0.678 (3sd) | **+0.745** (3sd) ★ |
+| T=5 vanilla bare-antidead | +0.622 (1sd) | (no data) | +0.356 (2sd) |
+| T=5 H8 shifts=(5,) | +0.489 (1sd) | (no data) | (V9 not in plan) |
+
+**V9 is SoftMaxPool-specific**: for vanilla bare-antidead at T=5,
+V1 RE actually BEATS V9 (+0.622 vs +0.356). This makes sense —
+vanilla TXC's encoder doesn't have the position-uniform structure
+that V7/V9 broadcasting writes match well.
+
+The protocol-by-arch story is now complete:
+- **SoftMaxPool family** (Galaxy 8/11/18/23) → V7/V9 win (broadcast)
+- **H8 contrastive** (T=2 H8) → V1 RE wins (end-discriminative)
+- **vanilla bare-antidead** → V1 RE wins (position-uniform-ish)
+- **Galaxy 6 max-pool** → V7 PP wins (max selects best position)
+
+### FINAL conclusion
+
+The TXC steering "mystery" is fully resolved as **arch+protocol-by-concept-type
+routing**:
+- No single (arch, protocol) wins universally.
+- Per-cell coverage of concept types is the limit.
+- Per-concept ensemble breaks any single-cell ceiling: Δ=+0.989 at T=5
+  by routing across (G8 PP T=2, G18 V7 T=3, G23 V9 T=5).
+- For unknown concepts: G18 V7 T=3 covers 4/7 concept classes; pair
+  with anti-attention-friendly protocols (V7 broadcast) for SoftMaxPool
+  family or V1 RE for H8/vanilla.
+
+Hill-climb iterations: 3 (V9 wins iter 1; iter 2/3 plateau; ensemble
+breaks single-cell ceiling).
