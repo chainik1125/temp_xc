@@ -105,14 +105,22 @@ References:
 **Pre-conditions (Han owns)**:
 - Han spawns this agent only **after** agent_nlp's Gemma-IT-L13 cache
   is on HF (~T+3 hr). The agent should not be brought up before then.
-- Han runs `bash scripts/bootstrap_runpod.sh` on the pod (interactive
-  — prompts for tokens; an agent cannot enter input). Because this
-  pod is ephemeral, Han re-runs it whenever the pod is recreated.
-  When you wake up, tokens are in `/workspace/.tokens/` and
-  `purified/.venv/` exists. If the smoke test below complains about
-  missing tokens, **ping Han**.
+- Han ran `bash scripts/bootstrap_runpod.sh` on this pod (interactive
+  — prompts for tokens; an agent cannot enter input) AND
+  `bash /workspace/temp_xc/purified/scripts/add_agent_clone.sh agent_steer`
+  to create your own clone. Because this pod is ephemeral, Han re-runs
+  both whenever the pod is recreated. Tokens are in
+  `/workspace/.tokens/` and your venv is at
+  `/workspace/temp_xc_steer/purified/.venv/`. If the smoke test below
+  complains about missing tokens, **ping Han**.
 
-1. `cd /workspace/temp_xc/purified`
+**Your clone path is `/workspace/temp_xc_steer/`** (NOT
+`/workspace/temp_xc/` — that's agent_back's primary clone). The
+separate clone exists so two agents on the same pod don't collide
+on `.git/index.lock` during pull-rebase. Tokens + HF cache are
+shared via `/workspace/.tokens/` and `/workspace/hf_cache/`.
+
+1. `cd /workspace/temp_xc_steer/purified`
 2. `source scripts/set_agent_env.sh agent_steer` (sets
    `TEMP_BENCH_POD_MODE=ephemeral`)
 3. `bash scripts/agent_smoke_test.sh`

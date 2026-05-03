@@ -192,14 +192,20 @@ independent.
 
 ### Recommended spawn order
 
-- **T+0 (parallel start)**: Han runs `bootstrap_runpod.sh` on the H100
-  pod (interactive — once per pod) + on the A40 pod, **before**
-  spawning agents. Then spawns agent_nlp + agent_em (H100) and
-  agent_back (A40 GPU 1). Each agent's first action is its smoke
-  test, not the bootstrap. agent_paper (me) continues C1+C2 locally.
-- **T+~3 hr (after C3 cache uploaded)**: Han spawns agent_steer on
-  the A40 pod (GPU 0). Agent's first action is `set_agent_env.sh`
-  + smoke + `sync_from_hf.sh` to pull the cache.
+- **T+0 (Han owns)**: on each shared pod, run bootstrap THEN clone for
+  the second agent. `add_agent_clone.sh` is the per-agent-clone helper
+  (separate `.git/` per agent on shared pods → no `index.lock` races).
+  - 2× H100 pod: `bash scripts/bootstrap_runpod.sh` (creates
+    `/workspace/temp_xc/` for agent_nlp), then
+    `bash /workspace/temp_xc/purified/scripts/add_agent_clone.sh agent_em`
+    (creates `/workspace/temp_xc_em/`). Spawn agent_nlp + agent_em.
+  - 4× A40 pod: same pattern —
+    `bash scripts/bootstrap_runpod.sh` + `add_agent_clone.sh agent_steer`.
+    Spawn agent_back at T+0 (agent_steer waits).
+  - agent_paper (me) continues C1+C2 locally.
+- **T+~3 hr (after C3 cache uploaded)**: Han spawns agent_steer in
+  `/workspace/temp_xc_steer/`. Agent's first action is
+  `set_agent_env.sh` + smoke + `sync_from_hf.sh`.
 - **Defer agent_em_h200** to fallback only (if R32 OOMs on H100).
 
 Rationale: parallelize the long-pole work (C3 cache build, EM Wang

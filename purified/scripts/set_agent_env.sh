@@ -32,6 +32,32 @@ fi
 
 agent="$1"
 
+# Per-agent clone-path check on shared pods. If the agent's expected
+# clone path doesn't match the cwd, warn loudly — two agents sharing
+# /workspace/temp_xc/.git/ collide on index.lock during pull-rebase.
+# Han runs `add_agent_clone.sh <agent>` to provision the second clone
+# before spawning the agent.
+case "$agent" in
+    agent_em)      expected_root="/workspace/temp_xc_em" ;;
+    agent_steer)   expected_root="/workspace/temp_xc_steer" ;;
+    agent_em_h200) expected_root="/workspace/temp_xc" ;;
+    agent_nlp|agent_back) expected_root="/workspace/temp_xc" ;;
+    agent_paper)   expected_root="" ;;   # local; no expected path
+    *)             expected_root="" ;;
+esac
+if [ -n "$expected_root" ] && [ -d /workspace ]; then
+    repo_root="$(git rev-parse --show-toplevel 2>/dev/null || echo "")"
+    if [ -n "$repo_root" ] && [ "$repo_root" != "$expected_root" ]; then
+        echo "[set_agent_env] WARNING: $agent expected clone at $expected_root" >&2
+        echo "  but cwd resolves to $repo_root. On a shared pod this means you" >&2
+        echo "  are about to share .git/ with another agent — they will collide" >&2
+        echo "  on index.lock during pull-rebase." >&2
+        echo "  Fix: ask Han to run" >&2
+        echo "    bash /workspace/temp_xc/purified/scripts/add_agent_clone.sh $agent" >&2
+        echo "  then start over from $expected_root/purified/." >&2
+    fi
+fi
+
 case "$agent" in
     # ── 2× H100 pod (1 TB persistent /workspace) ────────────────────
     agent_nlp)

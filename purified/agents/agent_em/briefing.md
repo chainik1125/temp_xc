@@ -102,11 +102,19 @@ References:
 
 **Pre-condition (Han owns)**: Han has already run
 `bash scripts/bootstrap_runpod.sh` on this pod (interactive — prompts
-for tokens; an agent cannot enter input). Tokens are in
-`/workspace/.tokens/` and `purified/.venv/` exists. If the smoke test
-below complains about missing tokens, **ping Han**.
+for tokens; an agent cannot enter input) AND
+`bash /workspace/temp_xc/purified/scripts/add_agent_clone.sh agent_em`
+to create your own clone. Tokens are in `/workspace/.tokens/` and
+your venv exists at `/workspace/temp_xc_em/purified/.venv/`. If the
+smoke test below complains about missing tokens, **ping Han**.
 
-1. `cd /workspace/temp_xc/purified`
+**Your clone path is `/workspace/temp_xc_em/`** (NOT
+`/workspace/temp_xc/` — that's agent_nlp's primary clone). The
+separate clone exists so two agents on the same pod don't collide
+on `.git/index.lock` during pull-rebase. Tokens + HF cache are
+shared via `/workspace/.tokens/` and `/workspace/hf_cache/`.
+
+1. `cd /workspace/temp_xc_em/purified`
 2. `source scripts/set_agent_env.sh agent_em`
 3. `bash scripts/agent_smoke_test.sh`
 4. `git pull --rebase origin final`

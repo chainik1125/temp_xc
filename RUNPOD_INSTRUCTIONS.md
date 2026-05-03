@@ -24,13 +24,15 @@ Pod modes determine sync behavior — see
 
 ## First-time setup on a new pod (HUMAN ONLY)
 
-**This step must be done by you, not by an agent.** The bootstrap
+**These steps must be done by you, not by an agent.** The bootstrap
 script is interactive (`read -rs` for token input); an agent session
-cannot enter input. Run it once on a fresh persistent pod, or every
-time an ephemeral pod is recreated, **before** spawning an agent.
+cannot enter input. Run on a fresh persistent pod, or every time an
+ephemeral pod is recreated, **before** spawning any agent.
+
+### Step 1: bootstrap the primary clone
 
 The bootstrap handles tokens, uv install, HF cache, repo clone, and
-`uv sync`.
+`uv sync`. After it runs, you have `/workspace/temp_xc/` ready.
 
 ```bash
 cd /workspace
@@ -48,6 +50,39 @@ env vars:
 GH_TOKEN=ghp_xxx HF_TOKEN=hf_xxx ANTHROPIC_API_KEY=sk-xxx \
     bash purified/scripts/bootstrap_runpod.sh
 ```
+
+### Step 2 (shared pods only): add a clone for the second agent
+
+Each shared pod runs two agents on the same hardware. They must NOT
+share a single `.git/` — concurrent `pull/commit/push` will collide
+on `index.lock` and risk clobbering uncommitted edits. Solution: each
+agent has its own clone. Tokens (`/workspace/.tokens/`) and HF cache
+(`/workspace/hf_cache/`) are global, so the second clone is ~5 GB
+extra disk on a 1 TB workspace.
+
+| Pod | First agent (uses primary clone) | Second agent (gets own clone) | Add-clone command |
+|---|---|---|---|
+| 2× H100 | agent_nlp at `/workspace/temp_xc/` | agent_em at `/workspace/temp_xc_em/` | `bash /workspace/temp_xc/purified/scripts/add_agent_clone.sh agent_em` |
+| 4× A40 | agent_back at `/workspace/temp_xc/` | agent_steer at `/workspace/temp_xc_steer/` | `bash /workspace/temp_xc/purified/scripts/add_agent_clone.sh agent_steer` |
+| H200 | agent_em_h200 at `/workspace/temp_xc/` | (single-agent pod — skip step 2) | n/a |
+
+The add-clone script is non-interactive (no token prompts — they're
+already in `/workspace/.tokens/`), idempotent, and takes ~30 seconds.
+
+### Step 3: spawn the agents
+
+Each agent starts in its own clone's `purified/` directory.
+
+| Pod | First agent start | Second agent start |
+|---|---|---|
+| 2× H100 | `cd /workspace/temp_xc/purified && claude` (agent_nlp) | `cd /workspace/temp_xc_em/purified && claude` (agent_em) |
+| 4× A40 (T+0) | `cd /workspace/temp_xc/purified && claude` (agent_back) | (wait until T+~3hr) |
+| 4× A40 (T+~3hr after C3 cache uploads) | (already running) | `cd /workspace/temp_xc_steer/purified && claude` (agent_steer) |
+
+Each agent's first action inside its session is
+`source scripts/set_agent_env.sh <agent_name>`. That script also
+warns if the cwd doesn't match the agent's expected clone path
+(catches "you forgot Step 2" failures cleanly).
 
 The bootstrap:
 

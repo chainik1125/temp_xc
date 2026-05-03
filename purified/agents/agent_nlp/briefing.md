@@ -118,13 +118,18 @@ References:
 **Pre-condition (Han owns)**: Han has already run
 `bash scripts/bootstrap_runpod.sh` on this pod (interactive — prompts
 for tokens; an agent cannot enter input). When you wake up, tokens
-are already in `/workspace/.tokens/` and `purified/.venv/` exists. If
-the smoke test below complains about missing tokens, **ping Han** —
-do not try to populate them yourself.
+are already in `/workspace/.tokens/` and the venv exists. If the
+smoke test below complains about missing tokens, **ping Han** — do
+not try to populate them yourself.
+
+**Your clone path is `/workspace/temp_xc/`** (the primary clone — you
+are the first agent on the 2× H100 pod). agent_em runs on the same
+pod but in a separate clone at `/workspace/temp_xc_em/` — DO NOT cd
+into agent_em's clone.
 
 1. `cd /workspace/temp_xc/purified`
 2. `source scripts/set_agent_env.sh agent_nlp`
-3. `bash scripts/agent_smoke_test.sh` (46/46 + expected gaps)
+3. `bash scripts/agent_smoke_test.sh` (51/51 + expected gaps)
 4. `git pull --rebase origin final`
 5. Read `docs/components/c3.md` + `c4.md` end-to-end. Task suite is
    already locked (`SAEBench+CT`, n=38) — see `decisions.md` § 11. No

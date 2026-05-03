@@ -15,14 +15,25 @@ Agents share pods. Each agent is **pinned to one GPU** via
 ``scripts/set_agent_env.sh <name>`` at session start (the smoke test
 verifies the pinning).
 
-| Agent | Pod | GPU index | VRAM | Pod mode | Components | Briefing | Status |
-|---|---|---|---|---|---|---|---|
-| **agent_paper** | local 5090 | 0 (only GPU) | 32 GB | persistent (local SSD) | orchestration, C1, C2, paper drafting | [`agent_paper/briefing.md`](agent_paper/briefing.md) | active |
-| **agent_nlp** | 2× H100 | **0** | 80 GB | persistent | C3 + C4 (shared activation cache) | [`agent_nlp/briefing.md`](agent_nlp/briefing.md) | draft-briefing |
-| **agent_em** | 2× H100 | **1** | 80 GB | persistent | C6 | [`agent_em/briefing.md`](agent_em/briefing.md) | draft-briefing |
-| **agent_steer** | 4× A40 | **0** | 48 GB | **ephemeral** | C5 | [`agent_steer/briefing.md`](agent_steer/briefing.md) | draft-briefing |
-| **agent_back** | 4× A40 | **1** | 48 GB | **ephemeral** | C7 | [`agent_back/briefing.md`](agent_back/briefing.md) | draft-briefing |
-| **agent_em_h200** (fallback) | H200 | 0 (only GPU) | 141 GB | persistent | C6 if R32 blows H100 | n/a | dormant |
+| Agent | Pod | GPU index | VRAM | Pod mode | Clone path | Components | Briefing | Status |
+|---|---|---|---|---|---|---|---|---|
+| **agent_paper** | local 5090 | 0 (only GPU) | 32 GB | persistent (local SSD) | `~/temp_xc/` | orchestration, C1, C2, paper drafting | [`agent_paper/briefing.md`](agent_paper/briefing.md) | active |
+| **agent_nlp** | 2× H100 | **0** | 80 GB | persistent | `/workspace/temp_xc/` (primary) | C3 + C4 (shared activation cache) | [`agent_nlp/briefing.md`](agent_nlp/briefing.md) | draft-briefing |
+| **agent_em** | 2× H100 | **1** | 80 GB | persistent | `/workspace/temp_xc_em/` | C6 | [`agent_em/briefing.md`](agent_em/briefing.md) | draft-briefing |
+| **agent_back** | 4× A40 | **1** | 48 GB | **ephemeral** | `/workspace/temp_xc/` (primary) | C7 | [`agent_back/briefing.md`](agent_back/briefing.md) | draft-briefing |
+| **agent_steer** | 4× A40 | **0** | 48 GB | **ephemeral** | `/workspace/temp_xc_steer/` | C5 | [`agent_steer/briefing.md`](agent_steer/briefing.md) | draft-briefing |
+| **agent_em_h200** (fallback) | H200 | 0 (only GPU) | 141 GB | persistent | `/workspace/temp_xc/` | C6 if R32 blows H100 | n/a | dormant |
+
+**One clone per agent on shared pods.** Two agents sharing a single
+`.git/` collide on `index.lock` and risk clobbering each other's
+uncommitted edits during pull-rebase. Workaround: each agent gets
+its own clone. The first agent on a pod uses the canonical
+`/workspace/temp_xc/` clone created by `bootstrap_runpod.sh`; the
+second agent's clone is created by Han via
+`bash /workspace/temp_xc/purified/scripts/add_agent_clone.sh <agent_name>`.
+Tokens (`/workspace/.tokens/`) and HF cache (`/workspace/hf_cache/`)
+are shared across both clones, so each agent only pays ~5 GB extra
+disk for the second working tree (out of 1 TB).
 
 The **4× A40 pod has 2 named agents + 2 spare GPU slots** (GPUs 2 and 3).
 Spare slots form a **pool** — any agent may claim them via
@@ -147,7 +158,12 @@ them here — `agents/README.md` is the *roster*, not the protocol.
    `scripts/bootstrap_local.sh` (local) **on the fresh pod, before
    spawning the agent**. The script is interactive (prompts for
    tokens) — agents cannot run it. After bootstrap, `/workspace/.tokens/`
-   is populated and the venv exists.
+   is populated and the venv exists at `/workspace/temp_xc/purified/.venv/`.
+6. **For shared pods** (2× H100 with two agents, 4× A40 with two
+   agents): Han also runs
+   `bash /workspace/temp_xc/purified/scripts/add_agent_clone.sh <second_agent>`
+   to create a separate clone for the second agent. This avoids
+   `.git/` lock contention. Idempotent.
 
 ## Handoff protocol (cross-agent reassignment)
 

@@ -139,8 +139,13 @@ References:
 `bash scripts/bootstrap_runpod.sh` on this pod (interactive — prompts
 for tokens; an agent cannot enter input). Because this pod is
 ephemeral, Han re-runs it whenever the pod is recreated. Tokens are
-in `/workspace/.tokens/` and `purified/.venv/` exists when you wake
-up. If the smoke test complains about missing tokens, **ping Han**.
+in `/workspace/.tokens/` and the venv exists when you wake up. If
+the smoke test complains about missing tokens, **ping Han**.
+
+**Your clone path is `/workspace/temp_xc/`** (the primary clone — you
+are the first agent on the 4× A40 pod). agent_steer runs on the same
+pod but in a separate clone at `/workspace/temp_xc_steer/` — DO NOT
+cd into agent_steer's clone.
 
 1. `cd /workspace/temp_xc/purified`
 2. `source scripts/set_agent_env.sh agent_back` (sets
