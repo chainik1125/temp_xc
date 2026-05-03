@@ -35,10 +35,17 @@ esac
 echo "[sync_from_hf] mode: $mode"
 echo "[sync_from_hf] TEMP_BENCH_POD_MODE=${TEMP_BENCH_POD_MODE:-unset}"
 
-if [ ! -f "$HOME/.cache/huggingface/token" ] && [ -z "${HF_TOKEN:-}" ]; then
-    echo "[sync_from_hf] no HF token found — run scripts/bootstrap_runpod.sh first" >&2
+# Resolve HF token via the unified chain (tokens.py): env → .tokens/ → ~/.cache.
+HF_TOKEN_RESOLVED="$(.venv/bin/python -c '
+from temp_bench.utils.tokens import get_token
+t = get_token("hf")
+print(t or "")
+' 2>/dev/null)"
+if [ -z "$HF_TOKEN_RESOLVED" ]; then
+    echo "[sync_from_hf] no HF token found — run scripts/bootstrap_{local,runpod}.sh first" >&2
     exit 1
 fi
+export HF_TOKEN="$HF_TOKEN_RESOLVED"
 
 mkdir -p "$CKPT_DIR" "$ACT_CACHE_DIR"
 

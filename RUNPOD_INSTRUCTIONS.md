@@ -5,6 +5,11 @@ what to work on, every agent has its own briefing in
 `purified/agents/<name>/briefing.md`. For the full operating manual,
 see `purified/CLAUDE.md` (auto-loaded).
 
+For **local** setup (your laptop / dev box), use
+`bash purified/scripts/bootstrap_local.sh` instead — it populates the
+same canonical `.tokens/` layout (under `~/.tokens/` rather than
+`/workspace/.tokens/`). See § *Token storage* below.
+
 ## Pods
 
 | Pod | GPUs | RAM | vCPU | /workspace | Mode |
@@ -112,6 +117,62 @@ tail -f logs/c3_probing.log
 `TQDM_DISABLE=1` is mandatory — progress bars flood logs and break
 agent log-reading. Re-running the same component is idempotent (cells
 with cached `eval_key` skip), so a crashed sweep resumes cleanly.
+
+## Token storage (unified across local + RunPod)
+
+Both local and RunPod use a canonical `.tokens/` directory. The
+framework's `temp_bench.utils.get_token(kind)` resolves the same way
+on both:
+
+| Where | tokens dir |
+|---|---|
+| RunPod | `/workspace/.tokens/` (auto-detected) |
+| Local | `~/.tokens/` (auto-detected) |
+| Override | `$TEMP_BENCH_TOKENS_DIR` |
+
+Files inside the tokens dir (mode 0600):
+
+| Token | Filename |
+|---|---|
+| HuggingFace | `hf_token` |
+| Anthropic | `anthropic_key` |
+| GitHub | `gh_token` |
+
+Resolution chain (first hit wins):
+
+1. Override env var (`HF_TOKEN`, `ANTHROPIC_API_KEY`, `GH_TOKEN`)
+2. `<tokens_dir>/<filename>`
+3. (HF only) `~/.cache/huggingface/token` legacy fallback
+4. None — caller errors with a clear `RuntimeError` if `require_token` is used
+
+To populate the tokens dir from scratch:
+
+```bash
+# RunPod (interactive prompts; reads existing /workspace/.tokens if present)
+bash purified/scripts/bootstrap_runpod.sh
+
+# Local (interactive prompts; auto-detects existing local sources —
+# ~/.cache/huggingface/token, ~/.env_autointerp, gh CLI)
+bash purified/scripts/bootstrap_local.sh
+```
+
+Non-interactive (e.g. seeding a pod from your local box via SSH):
+
+```bash
+HF_TOKEN=hf_… ANTHROPIC_API_KEY=sk-ant-… GH_TOKEN=ghp_… \
+    bash purified/scripts/bootstrap_runpod.sh
+```
+
+Verify resolution at any time:
+
+```bash
+python -c '
+from temp_bench.utils.tokens import token_status
+import json; print(json.dumps(token_status(), indent=2))'
+```
+
+The smoke test (`scripts/agent_smoke_test.sh`) prints token resolution
+on every session start.
 
 ## Quick reference
 

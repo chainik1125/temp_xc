@@ -193,11 +193,16 @@ def _push_checkpoint_to_hf(train_key: str, ckpt_dir: Path, *, agent: str) -> str
     Auto-called from :func:`save_checkpoint` on ephemeral pods.
     Failure is fatal — silently dropping a checkpoint that the pod
     might lose to a restart is a worse failure mode than aborting.
+
+    Token resolution flows through :func:`temp_bench.utils.require_token`
+    so the canonical .tokens/ store is always preferred over ecosystem
+    defaults. See ``utils/tokens.py``.
     """
     from huggingface_hub import HfApi
+    from temp_bench.utils.tokens import require_token
 
     repo_id = "han1823123123/temp-bench-models"
-    api = HfApi()
+    api = HfApi(token=require_token("hf"))
     api.upload_folder(
         folder_path=str(ckpt_dir),
         path_in_repo=train_key,

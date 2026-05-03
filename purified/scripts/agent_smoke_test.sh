@@ -86,6 +86,14 @@ if status:
             print(f'   GPU {idx}: {info[\"agent\"]} (PID {info[\"pid\"]}, since {info[\"claimed_ts\"]})')
 else:
     print('  GPU locks: none held')
+
+# Surface token resolution
+from temp_bench.utils.tokens import token_status, tokens_dir
+ts = token_status()
+print(f'  Token store: {tokens_dir()}')
+for kind in ('hf', 'anthropic', 'gh'):
+    src = ts[kind]['resolved_from']
+    print(f'   {kind:9s} ← {src or \"(missing — bootstrap_local.sh / bootstrap_runpod.sh)\"}')
 "
 
 echo
