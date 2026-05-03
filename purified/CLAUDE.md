@@ -100,17 +100,19 @@ Other arch hparams are fixed in `configs/locked_archs.yaml`.
    `AGENT_NAME`, sets `TEMP_BENCH_POD_MODE`)
 2. `bash scripts/agent_smoke_test.sh` (env + tests + preflight; CRITICAL
    warnings are fatal)
-3. Read `agents/<your_name>/briefing.md` (your identity + mandate).
-4. Read **the most recent handover** in `agents/<your_name>/handovers/`
-   (sort filenames; pick last). This is your "what was I doing"
-   memory across context-compact boundaries — see PROTOCOL.md § 14.
-5. Read recent entries in `agents/<your_name>/log.md`.
-6. Read `docs/components/c{N}.md` for any component you'll touch.
-7. Skim the last 10 entries of `results/leaderboard.jsonl`.
+3. Read **`agents/<your_name>/briefing.md`** top-to-bottom. The top
+   section is Han's mandate (read-only). The bottom sections are
+   *your previous self's* state-of-the-world — current state, next
+   action, pitfalls. PROTOCOL.md § 14.
+4. Read `decisions.md` for locked decisions you must respect.
+5. Read `docs/components/c{N}.md` for any component you'll touch.
+6. Skim the last 10 entries of `results/leaderboard.jsonl`.
 
-**Before you exit or anticipate context compact**, write a new
-handover in `agents/<your_name>/handovers/` — see
-`agents/_handover_template.md` and PROTOCOL.md § 14.
+**Before you exit or anticipate context compact**, overwrite the
+agent-owned sections at the bottom of your briefing — see
+`agents/_briefing_template.md` and PROTOCOL.md § 14. There is no
+separate handover file and no `log.md` — git history of your briefing
+is the audit trail.
 
 ## Hard rules
 

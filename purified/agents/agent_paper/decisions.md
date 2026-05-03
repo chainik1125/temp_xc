@@ -164,6 +164,51 @@ Final layout:
   pinning § 11.0, multi-GPU access § 11.1, framework discipline § 11).
   Read on first session, referenced as needed.
 
+### 10. One agent doc — the briefing — owns identity AND rolling state
+
+**Earlier design (rejected)**: per-agent `briefing.md` (Han owns) +
+`handovers/<ts>-<slug>.md` (dated archive of state snapshots) +
+`log.md` (running chronological narrative). Three docs per agent.
+
+**Failure mode**: in the wasteland, `briefing.md` files went stale
+because nobody updated them; `handover_*.md` files accumulated by the
+dozen and nobody knew which was current; `agentic_log.md` files grew
+to thousands of lines and were never read post-compact. Three docs
+per agent ⇒ none stays fresh.
+
+**Decision** (Han, 2026-05-03):
+
+- **One file per agent: `briefing.md`**, with explicit section
+  ownership inside the file:
+  - `## Identity + mandate (Han owns — agents do not edit)` — Han's
+    prose at the top, immutable.
+  - `## Current state` / `## What I just did` / `## Next action` /
+    `## Don't repeat` / `## Open questions for Han` —
+    agent-owned, **overwritten at every compact**.
+- **No separate `handover.md` and no `log.md`.** Git history
+  (`git log -p purified/agents/<name>/briefing.md`) is the audit
+  trail; `decisions.md` captures locked decisions; the briefing's
+  "What I just did" captures the last 5–10 actions for the next-life
+  instance.
+- **Component-vs-agent doc separation codified** in PROTOCOL.md § 7:
+  `docs/components/cN.md` owns the technical setup (hypothesis, results,
+  caveats); agent briefings own identity + state. Briefings point at
+  component docs, do not duplicate.
+
+**Why this beats both prior options**:
+- Single file ⇒ no "which doc is current" confusion.
+- Section ownership ⇒ Han's mandate doesn't drift into the agent's
+  rolling state.
+- Git log ⇒ chronological history without manual log.md upkeep.
+- Component docs ⇒ technical setup outlives any individual agent.
+
+**Implementation**: PROTOCOL.md § 14 rewritten from "Handover protocol"
+to "Briefing maintenance"; `_briefing_template.md` added;
+`_handover_template.md` deleted; `agents/agent_paper/handovers/`
+deleted; `agents/agent_paper/log.md` deleted. The historical content
+of agent_paper's log.md is summarised in `git log` of the deletion
+commit + the now-merged briefing's "What I just did".
+
 ### Non-decisions (to revisit later)
 
 - **C3 task suite** — Phase 5's 36-task vs Phase 7's 16-task PAPER subset.

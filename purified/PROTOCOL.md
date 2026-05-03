@@ -160,6 +160,20 @@ last_update: YYYY-MM-DD
 (exact commands)
 ```
 
+### Component docs vs agent briefings
+
+- **`docs/components/cN.md`** is **component-centric**: hypothesis,
+  setup, results, caveats. It outlives the agent. When agent_nlp gets
+  reassigned, `c3.md` stays.
+- **`agents/<name>/briefing.md`** is **agent-centric**: identity +
+  current state + next action. It's about the agent, not the
+  component.
+
+Agent briefings **point at component docs** for technical detail; they
+do NOT duplicate hypothesis / setup / results. If you're tempted to
+duplicate, you have the abstraction wrong — push the technical content
+into the component doc, leave a one-line pointer in the briefing.
+
 ## 8. Anti-conflict workflow
 
 For any file under shared ownership:
@@ -327,87 +341,83 @@ did. The lock manager prevents two agents from racing for the same
 spare; the per-process pinning prevents subtler cross-agent CUDA
 contention.
 
-## 14. Handover protocol (across context-compact boundaries)
+## 14. Briefing maintenance (across context-compact boundaries)
 
 LLM-agent context windows fill up; eventually context gets compressed
 and an agent's working memory of the current session is gone. The
-agent's **identity** survives (their name, briefing, and log), but
-their **state at compact time** must be written down explicitly or
-it's lost.
+agent's **identity** survives (their name, mandate), but their
+**state at compact time** must be written down explicitly or it's lost.
 
-Each agent writes a **handover doc** before context compact and at
-session end. Handover docs go in:
+We use a **single rolling briefing** per agent at
+`purified/agents/<name>/briefing.md`, with explicit section ownership.
+There is no separate handover file, no dated archive, no log.md —
+git history + this briefing + `decisions.md` carry everything.
 
-```
-purified/agents/<name>/handovers/<UTC-ISO-timestamp>-<slug>.md
-```
+### Section ownership (load-bearing)
 
-Filename format: `YYYY-MM-DDTHH-MMZ-<slug>.md`, where `<slug>` is a
-2-4 word kebab-case description (e.g.
-`2026-05-03T20-00Z-framework-complete.md`).
+The briefing is one file with two ownership zones:
 
-The **next-life instance** of the agent, after compact, reads:
+| Section | Owner | Mutable by |
+|---|---|---|
+| `## Identity + mandate (Han owns — agents do not edit)` | Han | Han only |
+| `## Current state (agent owns — overwrite)` | the agent | self (overwritten each compact) |
+| `## What I just did (agent owns — overwrite)` | the agent | self |
+| `## Next action (agent owns — overwrite)` | the agent | self |
+| `## Don't repeat (agent owns — overwrite)` | the agent | self |
+| `## Open questions for Han (agent owns — overwrite)` | the agent | self |
+
+Han's section is read-only to agents. Han may rewrite it at session
+start to redirect priorities. The agent's sections are overwritten
+freely by the agent itself (and only by the agent that owns the
+briefing — no cross-agent edits, see § 3).
+
+### When to update the briefing
+
+- **Before any anticipated compact** — when context fills up. Update
+  state, push, keep working.
+- **At session end** — leave the briefing in a fresh state so the
+  next-life instance resumes cleanly.
+- **After a substantive milestone** — e.g. "C3 caching done, training
+  starts next" deserves an immediate state refresh.
+
+You can update more often than strictly necessary. The cost is
+trivial (overwrite ~30-50 lines).
+
+### Successor reads (post-compact)
+
+The next-life instance of an agent, after compact, reads:
 
 1. Auto-loaded `purified/CLAUDE.md` (the operating manual).
-2. Their own `briefing.md` (identity + mandate).
-3. The **most recent handover** in `handovers/` (sort filenames; pick
-   last): the precise state of the world + the next concrete action.
-4. The recent N lines of `log.md` (running log; less structured but
-   has more detail).
-
-### When to write a handover
-
-- **Before any anticipated compact** — when you notice your context is
-  filling up. Write the handover, push, then keep working.
-- **At session end** — even on a clean exit, leave a handover so the
-  next instance starts informed.
-- **After a substantive milestone** — e.g. "C3 caching done, training
-  starts next" deserves its own handover so resumption from there is
-  sharp.
-
-You can write more handovers than strictly necessary. Old handovers
-are not deleted; they're chronological history.
-
-### Handover template
-
-`purified/agents/_handover_template.md` is the canonical template.
-Copy + fill in. Required sections:
-
-1. **Identity** — agent name, component(s), pod, GPU, mode.
-2. **State of the world (verified `<ts>`)** — `git HEAD`, last
-   `eval_key` / `train_key` written, recent decisions, open questions.
-3. **What I just did** — last 5-10 substantive actions.
-4. **What I'm in the middle of (if any)** — partial work that the
-   successor must complete or abandon.
-5. **Next action for my successor** — concrete first step. Be specific
-   (commands, files to read, etc.).
-6. **Don't repeat** — pitfalls to avoid (decisions already locked,
-   files already deleted, paths that no longer exist).
-7. **Open questions for Han** — anything blocked on user input.
-
-Keep handover docs ≤ 200 lines. They're load-bearing on resumption;
-brevity matters.
+2. Their own `briefing.md` — top section (Han's mandate) + bottom
+   sections (current state, next action, etc.).
+3. `decisions.md` — locked decisions for context.
+4. (For chronological detail, optional)
+   `git log -p purified/agents/<name>/briefing.md` — every state
+   transition is captured automatically.
+5. `docs/components/cN.md` for any component about to be touched.
 
 ### Hard rules
 
 1. **Identity continuity over instance freshness.** A successor
    instance of `agent_paper` is still `agent_paper`. Don't fork
-   identity (no "agent_paper_v2"). Update the handover, keep the name.
-2. **Write before compact, not after.** Once compact has happened, the
-   working state is gone. Pre-empt.
-3. **Reference, don't duplicate.** The handover points at
-   `decisions.md`, `log.md`, `docs/components/cN.md`. It doesn't
-   re-state their content.
+   identity (no "agent_paper_v2"). Update the briefing, keep the name.
+2. **Update before compact, not after.** Once compact has happened,
+   the working state is gone. Pre-empt.
+3. **Reference, don't duplicate.** The briefing points at
+   `decisions.md` and `docs/components/cN.md`. It doesn't restate them.
 4. **Concrete next action.** "Continue working on C3" is not a next
    action. "Run `python -m experiments.c3_probing.run --seeds 1
    --archs txc_base`, expect ~2 H100-hours" is.
-5. **Cross-referenced from log.md.** When you write a handover, add
-   one line to `log.md` like:
-   `2026-05-03T20:00Z — handover written: handovers/2026-05-03T20-00Z-framework-complete.md`.
+5. **Han's section is read-only.** If you think Han's mandate has
+   shifted, raise it in `## Open questions for Han` instead of
+   editing his prose.
+6. **No separate handover file. No log.md.** Each agent has exactly
+   one rolling doc: `briefing.md`. Git history is the audit trail.
+7. **Keep it ≤ 200 lines.** Briefings are loaded on every
+   session-start; brevity matters.
 
-### Agent PAPER (orchestrator) writes handovers too
+### Template
 
-I (agent_paper) follow this protocol. My handovers live in
-`purified/agents/agent_paper/handovers/`. They emphasize cross-agent
-coordination state, decisions in flight, and what each worker agent is
-expected to do next.
+Copy `purified/agents/_briefing_template.md` when provisioning a new
+agent. Han fills in the top section (identity + mandate); the agent
+fills in the rest at first compact.

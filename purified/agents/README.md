@@ -136,28 +136,31 @@ them here — `agents/README.md` is the *roster*, not the protocol.
 
 ## How to add a new agent
 
-1. Create `purified/agents/<name>/briefing.md` (copy
-   `agent_paper/briefing.md` as a template).
+1. Create `purified/agents/<name>/briefing.md` by copying
+   `purified/agents/_briefing_template.md`. Han fills in the
+   "Identity + mandate" section.
 2. Add a row to the *Active roster* table above.
-3. Set `AGENT_NAME=<name>` in the agent's environment (it appears in
-   leaderboard rows via `runner.run_cell`).
-4. Wire the agent's pod into the bootstrap by reusing
-   `scripts/bootstrap_runpod.sh`.
-5. Open a coordination thread by writing the first dated log entry in
-   `purified/agents/<name>/log.md`.
+3. Add an entry to `purified/scripts/set_agent_env.sh` mapping
+   `<name>` to its primary GPU index + pod mode.
+4. Set `AGENT_NAME=<name>` (set_agent_env.sh handles this).
+5. Bootstrap the pod via `scripts/bootstrap_runpod.sh` (RunPod) or
+   `scripts/bootstrap_local.sh` (local).
 
-## Handoff protocol
+## Handoff protocol (cross-agent reassignment)
 
 If an agent is stuck or its pod dies:
 
-1. Log the state of the world in `purified/agents/<stuck_agent>/log.md`,
-   including last `eval_key` written, last `train_key` saved, and any
-   failed cells (with stderr excerpt).
+1. Update the briefing's "Current state" section with last `eval_key`
+   written, last `train_key` saved, any failed cells (stderr excerpt).
+   This is the chronological audit trail.
 2. Mark the row in *Active roster* as `paused`.
 3. Either bring the agent back up (re-attach pod, run smoke test) OR
-   reassign the component to another agent: append a row to the new
-   agent's `log.md` documenting the takeover, and update the roster.
+   reassign the component:
+   - Update the new agent's briefing with the component takeover
+     (mention the source agent + last `eval_key` taken over).
+   - Update the roster.
 
-The cache contract guarantees no work is repeated across handoffs:
-the new agent's first action is `runner.run_cell(...)` for any pending
-cell, and cached cells are skipped automatically.
+The cache contract guarantees no work is repeated: the new agent's
+first action is `runner.run_cell(...)` for any pending cell, and
+cached cells are skipped automatically by `train_key` / `eval_key`
+matching.
