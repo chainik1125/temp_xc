@@ -157,21 +157,26 @@ def _instantiate_from_state(arch_name: str, state_dict, component: str = COMPONE
 
 def my_eval_fn(*, model, eval_cfg, component):
     """C7 eval-fn adapter. Instantiates the SAE from the cached state_dict,
-    then forwards to :func:`run_arch_evaluation`.
+    auto-loads cohort + sentence acts from disk, forwards to
+    :func:`run_arch_evaluation`.
 
     The runner passes the SAE's ``_state_dict`` + ``_arch_name`` via
     ``eval_cfg`` (see ``temp_bench.runner.run_cell``); we instantiate
     the module here and pass it to the case study.
 
-    ``eval_cfg`` may include:
-
-    - ``feature_mining_acts``: dict ``{"pos", "neg"}`` of labeled-sentence
-      window activations. If absent, computed via
-      :func:`temp_bench.case_studies.backtracking.extract_labeled_sentence_acts`
-      (TODO — currently a stub; agent_back to wire).
-    - ``sentence_acts`` / ``sentence_labels`` / ``sentence_qids``: PR-AUC
-      probe inputs. Optional — PR-AUC is skipped when missing.
+    Sentence acts are loaded from
+    ``results/c7_backtracking/stage_a/sentence_acts_L10.npz`` (built
+    by :func:`temp_bench.case_studies.backtracking.extract_labeled_sentence_acts`).
+    Caller may override by passing ``feature_mining_acts`` /
+    ``sentence_acts`` / ``sentence_labels`` / ``sentence_qids`` in
+    ``eval_cfg`` directly (e.g. for smoke tests).
     """
+    from pathlib import Path
+    import numpy as np
+    from temp_bench.case_studies.backtracking import (
+        extract_labeled_sentence_acts, split_pos_neg,
+    )
+
     arch_name = eval_cfg["_arch_name"]
     seed = eval_cfg.get("seed", 42)
     state_dict = eval_cfg["_state_dict"]
@@ -180,17 +185,22 @@ def my_eval_fn(*, model, eval_cfg, component):
     workspace.mkdir(parents=True, exist_ok=True)
     judge = SonnetBacktrackingJudge(workspace=workspace)
 
+    from temp_bench.case_studies.backtracking import build_cohort, load_stage_a
     cohort = build_cohort()
     stage_a = load_stage_a()
 
-    feature_mining_acts = eval_cfg.get("feature_mining_acts")
-    if feature_mining_acts is None:
-        raise RuntimeError(
-            "eval_cfg['feature_mining_acts'] missing. The C7 eval requires "
-            "labeled-sentence window activations for D+/D- mining. Build via "
-            "extract_labeled_sentence_acts(...) — wiring is the open todo "
-            "in agent_back/briefing.md (D in 'Next action')."
-        )
+    # Mining + PR-AUC inputs: load (or extract if missing) from cache.
+    if eval_cfg.get("feature_mining_acts") is not None:
+        pos_neg = eval_cfg["feature_mining_acts"]
+        pr_X = eval_cfg.get("sentence_acts")
+        pr_y = eval_cfg.get("sentence_labels")
+        pr_qids = eval_cfg.get("sentence_qids")
+    else:
+        sa = extract_labeled_sentence_acts()  # idempotent — cache hit on disk
+        pos_neg = split_pos_neg(sa)
+        pr_X = sa["X"]
+        pr_y = sa["is_bt"].astype(int)
+        pr_qids = np.array([k.split("|")[0] for k in sa["keys"]], dtype=object)
 
     result = run_arch_evaluation(
         arch=arch_module,
@@ -199,14 +209,16 @@ def my_eval_fn(*, model, eval_cfg, component):
         stage_a=stage_a,
         workspace=workspace,
         judge=judge,
-        magnitudes=eval_cfg.get("magnitudes", DEFAULT_MAGNITUDE_GRID),
+        magnitudes=tuple(eval_cfg.get("magnitudes", DEFAULT_MAGNITUDE_GRID)),
         cut_fraction=eval_cfg.get("cut_fraction", 0.25),
         arch_name=arch_name,
-        feature_mining_acts=feature_mining_acts,
-        sentence_acts=eval_cfg.get("sentence_acts"),
-        sentence_labels=eval_cfg.get("sentence_labels"),
-        sentence_qids=eval_cfg.get("sentence_qids"),
-        pr_auc_S_grid=eval_cfg.get("pr_auc_S_grid", DEFAULT_PR_AUC_S_GRID),
+        feature_mining_acts=pos_neg,
+        sentence_acts=pr_X,
+        sentence_labels=pr_y,
+        sentence_qids=pr_qids,
+        pr_auc_S_grid=tuple(eval_cfg.get("pr_auc_S_grid", DEFAULT_PR_AUC_S_GRID)),
+        max_new_tokens=eval_cfg.get("max_new_tokens", 1024),
+        gen_batch_size=eval_cfg.get("gen_batch_size", 8),
     )
     return result.metrics, result.primary_metric
 
