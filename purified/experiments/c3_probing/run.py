@@ -82,6 +82,8 @@ def my_train_fn(*, arch_name, arch_hparams, seed, training_cfg, act_cache_key, c
 
     PROTOCOL.md § 11: never write a training loop here.
     """
+    import sys
+    import time as _time
     spec = load_arch(arch_name, component=component)
     d_in = _d_in_from_act_cache(act_cache_key)
     model = instantiate_arch(spec, d_in=d_in)
@@ -89,8 +91,30 @@ def my_train_fn(*, arch_name, arch_hparams, seed, training_cfg, act_cache_key, c
     torch.manual_seed(seed)
     np.random.seed(seed)
 
-    batch_iter = batch_iter_from_act_cache(act_cache_key, seed=seed)
-    result = train_sae(model, batch_iter, training_cfg, device="cuda")
+    raw_iter = batch_iter_from_act_cache(act_cache_key, seed=seed)
+
+    # Wrap to print progress every 1000 steps. The shared trainer is
+    # silent by design (PROTOCOL.md § 11). For long autonomous runs we
+    # still want visibility — so we count batch_iter calls and emit a
+    # one-line progress marker. Adds zero overhead per step.
+    state = {"n": 0, "t0": _time.time(), "label": f"{arch_name}/seed={seed}"}
+
+    def progress_iter(bs):
+        state["n"] += 1
+        if state["n"] % 1000 == 0:
+            elapsed = _time.time() - state["t0"]
+            steps = state["n"]
+            rate = steps / elapsed if elapsed > 0 else 0
+            eta = (training_cfg.n_steps - steps) / rate if rate > 0 else 0
+            print(
+                f"  [TRAIN {state['label']}] step {steps}/{training_cfg.n_steps}  "
+                f"({rate:.1f} steps/sec; eta {eta/60:.1f} min)",
+                flush=True,
+            )
+            sys.stdout.flush()
+        return raw_iter(bs)
+
+    result = train_sae(model, progress_iter, training_cfg, device="cuda")
     return result["state_dict"]
 
 
