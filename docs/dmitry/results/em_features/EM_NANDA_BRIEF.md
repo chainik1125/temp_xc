@@ -10,6 +10,83 @@ tags:
 
 **You are an autonomous routine continuing from the dmitry-branch work.** Branch: `em-nanda`. AGENT_BRIEF.md (on dmitry) covers the prior Qwen-7B medical setup. This doc supersedes that for the Qwen-14B financial pivot.
 
+### Status as of 2026-05-03 09:00 UTC (status-only firing — both GPUs idle, both axes closed, paper doc current; no compute spent; rule-9 watch advances to 1/3)
+
+**Headline**: 09:00 UTC firing. Local h100_1 0%/0 MiB; h100_2 0%/0 MiB
+(SSH access still works, 07:00 UTC restoration holds across two firings).
+Both axes closed (single-feat champion 64.53 on R32 ext-α; bundle precision
+monotonic k=30 < k=3 < single-feat). Paper doc and synthesis both current
+through 08:00 UTC k=3 result. No new scientific question crystallized this
+firing; no cheap probes queued; remaining "open" items in the paper doc
+(alt bundle selection, TXC k<100, cross-layer hookpoints) all exploratory
+and ≥1 firing of compute. Per the 08:00 UTC "Next firing priorities"
+explicit OK for status-only this slot, this firing is status-only.
+No compute spent.
+
+**This firing (09:00 UTC) actions:**
+
+- `git pull origin em-nanda --rebase` — already up to date.
+- Re-read brief + synthesis cover-to-cover per routine step 2. Confirmed
+  state on entry: both axes closed; paper doc updated 08:15 UTC; bundle
+  k=3 frontier file (`bundle3_finalists_frontier.json`, 3215 B) and
+  bundle k=30 frontier file (`bundle30_frontier.json`, 3452 B) both
+  present in `/root/em_features/results/em_nanda_bundle_r32/`.
+- Verified GPUs idle: `nvidia-smi` local 0%/0 MiB at 09:00 UTC;
+  `ssh h100_2 nvidia-smi` 0%/0 MiB at 09:00 UTC.
+- Verified key local artifacts present: paper doc 17891 B (310 LOC) /
+  synthesis 113579 B (2033 LOC) / bundle dir intact.
+- **No commits to code, scripts, or experiment infra.** Only doc changes
+  are this brief append and the matching synthesis status entry.
+- Disk hygiene unchanged: /root local at ~92%; /workspace 30%;
+  HF_HOME=/workspace/hf_cache holding.
+
+**Why a status-only firing is the right call this firing:**
+
+- Both axes (single-feat + bundle precision) are closed. Paper doc was
+  tightened at 05:00 UTC (generator-path reconciliation), the paper-style
+  results section landed at 04:00 UTC, the bundle k=3 monotonicity probe
+  landed at 08:00 UTC. There is no cheap probe queued — the 08:00 UTC
+  entry explicitly removed the strongest "open" exploratory item ("alt
+  bundle selection criteria") from the paper doc.
+- The remaining "open" items in the paper doc are all exploratory + not
+  paper-critical + ≥1 firing of compute each. Launching one would burn
+  compute on a question that doesn't change any headline number. The
+  routine guidance ("prefer cheap fast experiments") is satisfied
+  vacuously: no cheap fast experiment is identifiable.
+- Per rule (6) spirit: no completions to act on this firing; do nothing
+  beyond the routine pull + read + status entry.
+
+**Closed-axis state at end of firing** (unchanged from 08:00 UTC):
+
+| arch / config       | R1 5k mid | R32 10k single ext-α | R32 10k bundle k=3 mid | R32 10k bundle k=30 mid |
+| :------------------ | --------: | -------------------: | ---------------------: | ----------------------: |
+| SAE arditi          | **96.88** | **64.53** ⭐         | 58.11                  | 41.33                   |
+| TXC k=100           |  91.80    | 51.95                | (not run)              | (not run)               |
+| medical-champ goal  |  +38.41   | +6.06                | −0.36 (align only)     | −17.14 (align only)     |
+
+**Next firing priorities (likely 10:00 UTC):**
+
+- **Status-only firing remains acceptable** — both axes closed, paper
+  doc current, no cheap probe queued.
+- **3-firing-stuck rule (rule 9) advances to 1/3 this firing.** The
+  08:00 UTC firing reset the watch to 0/3 by spending compute on the
+  k=3 monotonicity probe; this firing made no compute contribution and
+  only a small durable doc contribution (status entry). If the next
+  two firings also produce no durable progress, append the "stuck —
+  please intervene" section per rule (9). Note that the *paper-critical*
+  work is already complete (single-feat axis closed 03/04 UTC, bundle
+  axis closed 03 UTC, bundle precision sub-axis closed 08 UTC), so
+  "stuck" applies only to *exploratory* follow-ups.
+- **If a future firing wants compute spend**: the cheapest next probe
+  is a TXC k<100 variant on R1 (e.g. k=50 or k=25, ~30 min training +
+  ~30 min Wang on h100_2). That could close the +4 R1 arch gap (SAE
+  95.78 vs TXC 90.88) but won't change R32 ext-α ranking. Not paper-
+  critical.
+- **Optional cleanup window**: legacy 110 GB qwen_l15_*.pt checkpoints
+  on /root local remain candidates for deletion if new local training
+  is wanted; per rule (7) already logged in `trained_models_log.md`
+  with HF backups, so deletion is permitted but not load-bearing.
+
 ### Status as of 2026-05-03 08:00 UTC (k=3 finalists bundle probe landed — peak align 58.11 at α=−30; monotonic precision ordering established: k=30 < k=3 < single-feat)
 
 **Headline**: ~10 min compute on h100_2. Bundled *only* the three R32

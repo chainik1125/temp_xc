@@ -1662,6 +1662,78 @@ beyond brief + synthesis status entries.
   a future firing wants to launch new SAE/TXC training on local
   (next firing not training-bound, so deferring).
 
+### Status as of 2026-05-03 09:00 UTC (status-only firing — both GPUs idle, both axes closed, paper doc current; no compute spent; rule-9 watch advances to 1/3)
+
+**This firing (09:00 UTC) actions:**
+
+- `git pull origin em-nanda --rebase` — already up to date. Re-read brief
+  + synthesis cover-to-cover per routine step 2.
+- **GPU state**: local h100_1 0%/0 MiB; h100_2 0%/0 MiB at 09:00 UTC.
+  SSH to h100_2 still works (07:00 UTC restoration holds across two
+  firings).
+- **Verified local artifacts present**: paper doc 17891 B (310 LOC)
+  including the closed 8-cell single-feat table + bundle null result +
+  bundle precision sub-axis from the 08:00 UTC firing. Synthesis 113579 B
+  (2033 LOC) including all status entries 00:00 → 08:00 UTC. Bundle
+  frontier files intact in `/root/em_features/results/em_nanda_bundle_r32/`:
+  `bundle30_frontier.json` (3452 B, k=30 from 03:18 UTC),
+  `bundle3_finalists_frontier.json` (3215 B, k=3 from 08:12 UTC),
+  `top_30_bundle_features.json` (855 B).
+- **No new launches**. No cheap probe queued — the 08:00 UTC firing
+  removed the strongest "open" exploratory item (alt bundle selection
+  criteria) from the paper doc by closing the bundle precision sub-axis.
+  Remaining "open" items (TXC k<100, cross-layer hookpoints) all
+  exploratory + ≥1 firing of compute + not paper-critical.
+- **No commits to code, scripts, or experiment infra.** Only doc
+  changes are this synthesis append and the matching brief append.
+- Disk hygiene unchanged: /root local at ~92%; /workspace 30%;
+  HF_HOME=/workspace/hf_cache holding.
+
+**Why status-only is the right call this firing:**
+
+- **Both axes closed; paper doc current.** Paper-style results section
+  landed 04:00 UTC; generator-path reconciliation tightened paper doc
+  05:00 UTC; bundle precision sub-axis closed 08:00 UTC. There is no
+  paper-critical question still open.
+- **No cheap probe identifiable.** Per the 08:00 UTC "Next firing
+  priorities" explicit allowance for status-only, this firing follows
+  that guidance rather than fabricating compute spend.
+- **Rule (6) spirit**: GPUs idle, no completions to act on, no new
+  scientific question crystallized this firing → status-only is the
+  conservative right call.
+
+**Closed-axis state at end of firing** (unchanged from 08:00 UTC):
+
+| arch / config       | R1 5k mid | R32 10k single ext-α | R32 10k bundle k=3 mid | R32 10k bundle k=30 mid |
+| :------------------ | --------: | -------------------: | ---------------------: | ----------------------: |
+| SAE arditi          | **96.88** | **64.53** ⭐         | 58.11                  | 41.33                   |
+| TXC k=100           |  91.80    | 51.95                | (not run)              | (not run)               |
+| medical-champ goal  |  +38.41   | +6.06                | −0.36 (align only)     | −17.14 (align only)     |
+
+**Next firing priorities (likely 10:00 UTC):**
+
+- **Status-only firing remains acceptable** — both axes closed, paper
+  doc current, no cheap probe queued.
+- **Rule (9) (3-firing-stuck) advances to 1/3 this firing.** The 08:00
+  UTC firing reset the watch to 0/3 by spending compute on the k=3
+  monotonicity probe; this firing made no compute contribution and
+  only a small durable doc contribution. If the next two firings also
+  produce no durable progress, append "stuck — please intervene" per
+  rule (9). Note that all *paper-critical* work is already complete
+  (single-feat axis closed 03/04 UTC; bundle axis closed 03 UTC;
+  bundle precision sub-axis closed 08 UTC) — "stuck" applies only to
+  exploratory follow-ups.
+- **Cheapest next compute probe** if a future firing wants spend:
+  TXC k<100 variant on R1 (e.g. k=50, ~30 min training + ~30 min Wang
+  on h100_2). Could close the small +4 R1 arch gap (SAE 95.78 vs TXC
+  90.88) but won't change R32 ext-α ranking. Exploratory; not paper-
+  critical.
+- **Optional cleanup window**: legacy 110 GB qwen_l15_*.pt checkpoints
+  on /root local already logged in `trained_models_log.md` with HF
+  backups under `dmanningcoe/temp-xc-em-features` — deletion is
+  permitted per rule (7) but should be deferred until clearly motivated
+  by new local training. /root at 92% is tight but not critical.
+
 ### Status as of 2026-05-03 08:00 UTC (k=3 finalists bundle landed — peak align 58.11 at α=−30; bundle-precision axis monotonic: k=30 < k=3 < single-feat)
 
 **Headline**: Spent ~10 min compute on h100_2 to bundle *only* the three
