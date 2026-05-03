@@ -1662,6 +1662,84 @@ beyond brief + synthesis status entries.
   a future firing wants to launch new SAE/TXC training on local
   (next firing not training-bound, so deferring).
 
+### Status as of 2026-05-03 14:00 UTC (status-only firing — both GPUs idle, both axes closed, paper doc current through 13:00 UTC TXC k=3 closure; no compute spent; rule-9 watch advances to 1/3)
+
+**Headline**: 14:00 UTC firing. Local h100_1 0%/0 MiB; h100_2 0%/0
+MiB. Both axes closed (single-feat champion 64.53 on R32 ext-α; bundle
+null architecture-general at k=30; bundle precision sub-axis arch-
+specific — SAE monotonic, TXC k=3 collapses). Paper doc and synthesis
+both current through 13:00 UTC TXC k=3 closure. Per the 13:00 UTC
+"Next firing priorities" explicit OK for status-only this slot, this
+firing is status-only. No compute spent.
+
+**This firing (14:00 UTC) actions**:
+
+- `git pull origin em-nanda --rebase` — already up to date.
+- Re-read brief + paper doc + synthesis cover-to-cover per routine
+  step 2.
+- Verified GPUs idle: local h100_1 0%/0 MiB; `ssh h100_2 nvidia-smi`
+  0%/0 MiB at 14:00 UTC.
+- Verified key artifacts intact: paper doc 26366 B; synthesis 141282
+  B; bundle dir locally has all 7 expected files (bundle30 SAE 3452
+  B, bundle30 TXC 3422 B, bundle3 SAE buggy R1 3215 B, bundle3 SAE
+  R32-fix 3120 B, bundle3 TXC 3110 B, top_30 SAE 855 B, top_3 TXC
+  273 B). h100_2 mirror dir intact.
+- **No commits to code, scripts, or experiment infra.** Only doc
+  changes are this synthesis status entry and the matching brief
+  append.
+- Disk hygiene unchanged: /root local 92%; /workspace 30%;
+  HF_HOME=/workspace/hf_cache holding.
+
+**Why a status-only firing is the right call this firing**:
+
+- Both axes closed; paper doc tightened across 8 firings (03 / 04 /
+  05 / 08 / 10 / 12 / 13 UTC each made a durable contribution). The
+  13:00 UTC firing executed the strongest cheap-probe candidate (TXC
+  k=3 bundle) and materialized the most-informative outcome (arch-
+  specific precision sub-axis), removing it from the open-probe
+  list. No further cheap probe identified that would change any
+  headline number.
+- Remaining "What is open" items in the paper doc (alt bundle
+  selection criteria, TXC k<100 variants, cross-layer hookpoints,
+  k=2 SAE bundle) all require ≥1 firing of compute each *or* are not
+  informative (k=2 is a precision-sub-axis interpolation point — 4th
+  data point doesn't change the monotonicity claim). None are paper-
+  critical.
+- Per rule (6) spirit: no completions to act on this firing; do
+  nothing beyond the routine pull + read + status entry.
+
+**Closed-axis state at end of firing** (unchanged from 13:00 UTC):
+
+| arch / config       | R1 5k mid | R32 10k single ext-α | R32 10k bundle k=3 mid | R32 10k bundle k=30 mid |
+| :------------------ | --------: | -------------------: | ---------------------: | ----------------------: |
+| SAE arditi          | **96.88** | **64.53** ⭐         | 51.41 (α=−40)          | 41.33                   |
+| TXC k=100           |  91.80    | 51.95                | 33.28 (α=+1, flat)     | 41.56                   |
+| medical-champ goal  |  +38.41   | +6.06                | −7.06 / −25.19 (align) | −16.91 / −17.14 (align) |
+
+**Next firing priorities (likely 15:00 UTC)**:
+
+- **Status-only firing remains acceptable** — both axes closed, paper
+  doc current, no cheap probe queued.
+- **3-firing-stuck rule (rule 9) advances to 1/3 this firing.** 13:00
+  UTC reset to 0/3 by compute spend; this firing made only a doc
+  contribution. If the next two firings also produce no durable
+  progress, append the "stuck — please intervene" section per rule
+  (9). Note that *paper-critical* work is fully complete (single-feat
+  03/04 UTC, bundle 03 UTC, bundle precision sub-axis 08 + bug-fixed
+  10 + architecture-specificity 13 UTC), so "stuck" applies only to
+  *exploratory* follow-ups.
+- **If a future firing wants compute spend**: no actually-cheap probe
+  is currently identifiable. Remaining items each take ≥1 firing of
+  compute (alt bundle selection ~30 min, TXC k<100 ~60 min training+
+  Wang, cross-layer hookpoints ≥2 firings) or are not informative
+  (k=2 SAE bundle ~5 min — 4th interpolation point on the precision
+  sub-axis, doesn't change the monotonicity claim).
+- **Optional cleanup window** (still not load-bearing): legacy 110 GB
+  qwen_l15_*.pt checkpoints on /root local already logged in
+  `trained_models_log.md` with HF backups under
+  `dmanningcoe/temp-xc-em-features`. Per rule (7), "log first" is
+  satisfied; deletion permitted but not motivated this firing.
+
 ### Status as of 2026-05-03 13:00 UTC (TXC bundle k=3 finalists landed — frontier FLAT, mid-α peak 33.28/47.27 at α=+1, lift over baseline +0.16 align; bundle precision sub-axis NOT architecture-general — TXC inverts SAE's monotonic ordering)
 
 **Headline**: ~7 min compute on h100_2. Built top-3 TXC bundle from

@@ -10,6 +10,102 @@ tags:
 
 **You are an autonomous routine continuing from the dmitry-branch work.** Branch: `em-nanda`. AGENT_BRIEF.md (on dmitry) covers the prior Qwen-7B medical setup. This doc supersedes that for the Qwen-14B financial pivot.
 
+### Status as of 2026-05-03 14:00 UTC (status-only firing — both GPUs idle, both axes closed, paper doc current through 13:00 UTC TXC k=3 closure; no compute spent; rule-9 watch advances to 1/3)
+
+**Headline**: 14:00 UTC firing. Local h100_1 0%/0 MiB; h100_2 0%/0 MiB
+(SSH still works). Both axes closed (single-feat champion 64.53 on R32
+ext-α; bundle null architecture-general at k=30; bundle precision sub-
+axis architecture-specific — SAE monotonic, TXC k=3 collapses). Paper
+doc and synthesis current through the 13:00 UTC TXC k=3 closure. No
+new completions to act on; no cheap paper-critical probe queued — per
+13:00 UTC explicit OK for status-only this slot, this firing is
+status-only. No compute spent.
+
+**This firing (14:00 UTC) actions**:
+
+- `git pull origin em-nanda --rebase` — already up to date.
+- Re-read brief + paper doc + synthesis cover-to-cover per routine
+  step 2.
+- Verified GPUs idle: local h100_1 0%/0 MiB; `ssh h100_2 nvidia-smi`
+  0%/0 MiB at 14:00 UTC.
+- Verified key artifacts intact: paper doc 26366 B; synthesis 141282 B;
+  bundle dir locally has all 7 expected files (bundle30 SAE 3452 B,
+  bundle30 TXC 3422 B, bundle3 SAE buggy R1 3215 B, bundle3 SAE
+  R32-fix 3120 B, bundle3 TXC 3110 B, top_30 SAE 855 B, top_3 TXC
+  273 B). h100_2 mirror dir intact (matching plus its `top_3_finalists.json`
+  235 B).
+- **No commits to code, scripts, or experiment infra.** Only doc
+  changes are this brief append and the matching synthesis entry.
+- Disk hygiene unchanged: /root local 92%; /workspace 30%;
+  HF_HOME=/workspace/hf_cache holding.
+
+**Why a status-only firing is the right call this firing**:
+
+- Both axes closed (single-feat axis closed 03/04 UTC + 00:00 UTC
+  cross-arch ranking; bundle null axis closed 03 UTC + 12:00 UTC
+  cross-arch generality; bundle precision sub-axis closed 08 UTC,
+  bug-fixed 10 UTC, characterized as architecture-specific 13:00
+  UTC). Paper doc tightened across 8 firings.
+- The 13:00 UTC firing was the strongest cheap-probe candidate (TXC
+  k=3 bundle); executing it materialized the most-informative outcome
+  (architecture-specific precision sub-axis) and removed it from the
+  open list. No further cheap probe identified that would change any
+  headline number — the remaining open exploratory items (alt bundle
+  selection criteria, TXC k<100 variants, cross-layer hookpoints) all
+  require ≥1 firing of compute and are not paper-critical.
+- Per rule (6) spirit: no completions to act on this firing; do
+  nothing beyond the routine pull + read + status entry. Adding compute
+  on confirmatory or exploratory probes would inflate doc length without
+  strengthening conclusions.
+
+**Closed-axis state at end of firing** (unchanged from 13:00 UTC):
+
+| arch / config       | R1 5k mid | R32 10k single ext-α | R32 10k bundle k=3 mid | R32 10k bundle k=30 mid |
+| :------------------ | --------: | -------------------: | ---------------------: | ----------------------: |
+| SAE arditi          | **96.88** | **64.53** ⭐         | 51.41 (α=−40)          | 41.33                   |
+| TXC k=100           |  91.80    | 51.95                | 33.28 (α=+1, flat)     | 41.56                   |
+| medical-champ goal  |  +38.41   | +6.06                | −7.06 / −25.19 (align) | −16.91 / −17.14 (align) |
+
+**Next firing priorities (likely 15:00 UTC)**:
+
+- **Status-only firing remains acceptable** — both axes closed, paper
+  doc current, no cheap probe queued.
+- **3-firing-stuck rule (rule 9) advances to 1/3 this firing.** The
+  13:00 UTC firing reset the watch to 0/3 by spending compute on the
+  TXC k=3 bundle; this firing made no compute contribution and only
+  a small durable doc contribution (status entry). If the next two
+  firings also produce no durable progress, append the "stuck —
+  please intervene" section per rule (9). Note that the
+  *paper-critical* work is fully complete (single-feat axis closed
+  03/04 UTC, bundle axis closed 03 UTC, bundle precision sub-axis
+  closed 08 UTC + bug-fixed 10 UTC + architecture-specificity closed
+  13 UTC), so "stuck" applies only to *exploratory* follow-ups.
+- **If a future firing wants compute spend**: no actually-cheap probe
+  is currently identifiable. The remaining exploratory items in the
+  paper doc all require ≥1 firing of compute each:
+  - **Alt bundle selection criteria** (Hessian-eigendirection / mutual-
+    orthogonality SAE bundle from screen_score top-100): tests whether
+    the SAE bundle null is a "selection redundancy" effect (top-30 by
+    score includes correlated features) or a "summation collapses
+    misalignment" effect (any bundle ≪ champion). ~30 min on h100_2.
+    Would tighten the bundle null story if mutual-orthogonality
+    bundle still loses to single-feat.
+  - **TXC k<100 variants** (e.g. k=50 / k=25 training + Wang on R1):
+    ~30 min training + ~30 min Wang. Could close the +4 R1 arch gap
+    (SAE 95.78 vs TXC 90.88) but won't change R32 ranking.
+  - **Cross-layer hookpoints** (layer 12 or layer 36 SAE/TXC training):
+    ≥2 firings of training + Wang. Tests whether the layer-24 finding
+    is layer-specific or generalizes.
+  - **A k=2 SAE bundle** as a precision-sub-axis interpolation point
+    (between k=1=64.53 and k=3=51.41): ~5 min on h100_2. Cheap, but
+    not informative — already 3 points on the precision sub-axis;
+    a 4th point doesn't change the monotonicity claim.
+- **Optional cleanup window** (still not load-bearing): legacy 110 GB
+  qwen_l15_*.pt checkpoints on /root local already logged in
+  `trained_models_log.md` with HF backups under
+  `dmanningcoe/temp-xc-em-features`. Per rule (7), "log first" is
+  satisfied; deletion permitted but not motivated this firing.
+
 ### Status as of 2026-05-03 13:00 UTC (TXC bundle k=3 finalists landed — mid-α peak 33.28/47.27 at α=+1, lift over baseline +0.16 align; frontier flat — bundle precision sub-axis NOT architecture-general — TXC inverts SAE's monotonic ordering with k=3 ≪ k=30; rule-9 watch reset to 0/3)
 
 **Headline**: 13:00 UTC firing. Local h100_1 0%/0 MiB; h100_2 0%/0 MiB
