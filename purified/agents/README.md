@@ -15,21 +15,22 @@ Agents share pods. Each agent is **pinned to one GPU** via
 ``scripts/set_agent_env.sh <name>`` at session start (the smoke test
 verifies the pinning).
 
-| Agent | Pod | GPU index | VRAM | Components | Briefing | Status |
-|---|---|---|---|---|---|---|
-| **agent_paper** | local 5090 | 0 (only GPU) | 32 GB | orchestration, C1, C2, paper drafting | [`agent_paper/briefing.md`](agent_paper/briefing.md) | active |
-| **agent_nlp** | 2× H100 | **0** | 80 GB | C3 + C4 (shared activation cache) | TBD | not provisioned |
-| **agent_em** | 2× H100 | **1** | 80 GB | C6 | TBD | not provisioned |
-| **agent_steer** | 3× A40 | **0** | 48 GB | C5 | TBD | not provisioned |
-| **agent_back** | 3× A40 | **1** | 48 GB | C7 | TBD | not provisioned |
-| **agent_synth** (open) | 3× A40 | **2** | 48 GB | reserve — synth helper, multi-seed extension, A/B tests | TBD | open |
-| **agent_apple** | TBD | TBD | TBD | TBD | [`agent_apple/`](agent_apple/) | placeholder dir, no briefing yet |
-| **agent_em_h200** (fallback) | H200 | 0 (only GPU) | 141 GB | C6 if R32 blows H100 | n/a | dormant |
+| Agent | Pod | GPU index | VRAM | Pod mode | Components | Briefing | Status |
+|---|---|---|---|---|---|---|---|
+| **agent_paper** | local 5090 | 0 (only GPU) | 32 GB | persistent (local SSD) | orchestration, C1, C2, paper drafting | [`agent_paper/briefing.md`](agent_paper/briefing.md) | active |
+| **agent_nlp** | 2× H100 | **0** | 80 GB | persistent | C3 + C4 (shared activation cache) | TBD | not provisioned |
+| **agent_em** | 2× H100 | **1** | 80 GB | persistent | C6 | TBD | not provisioned |
+| **agent_steer** | 4× A40 | **0** | 48 GB | **ephemeral** | C5 | TBD | not provisioned |
+| **agent_back** | 4× A40 | **1** | 48 GB | **ephemeral** | C7 | TBD | not provisioned |
+| **agent_synth** | 4× A40 | **2** | 48 GB | **ephemeral** | reserve — synth helper, multi-seed extension, A/B tests | TBD | open |
+| **agent_qa** | 4× A40 | **3** | 48 GB | **ephemeral** | reserve — Bricken A/B tests, sanity reruns, judge κ validation | TBD | open |
+| **agent_apple** | TBD | TBD | TBD | TBD | TBD | [`agent_apple/`](agent_apple/) | placeholder dir, no briefing yet |
+| **agent_em_h200** (fallback) | H200 | 0 (only GPU) | 141 GB | persistent | C6 if R32 blows H100 | n/a | dormant |
 
-Two H100s host two distinct agents (agent_nlp on GPU 0, agent_em on
-GPU 1). Three A40s host three agents (one per GPU). Sharing pods
-keeps activation caches and checkpoints on the same network volume
-(zero cross-pod transfer cost for end-of-paper unification).
+Pod sharing keeps activation caches and checkpoints on the same volume
+(zero cross-pod transfer cost when an agent on the same pod needs an
+artifact another agent produced). Cross-pod sharing flows through
+HuggingFace — see *Pod modes* below.
 
 ## Component coverage
 
@@ -45,55 +46,65 @@ keeps activation caches and checkpoints on the same network volume
 
 ## Pod specifications (RunPod)
 
-| Pod | GPU | VRAM | RAM | vCPU | Network volume |
-|---|---|---|---|---|---|
-| 2× H100 | 80 GB × 2 | 80 + 80 | 500 GB | 56 | 200 GB |
-| 3× A40 | 48 GB × 3 | 48 × 3 | 150 GB | 27 | 200 GB |
-| H200 (reserve) | 141 GB × 1 | 141 | 256 GB (TBD) | 32 (TBD) | 100 GB |
-| local 5090 | 32 GB | 32 | ~50 GB | 16 (WSL) | n/a — local SSD |
+| Pod | GPU | VRAM | RAM | vCPU | /workspace | Persistence |
+|---|---|---|---|---|---|---|
+| 2× H100 | 80 GB × 2 | 160 GB | 500 GB | 56 | **1 TB** | **persistent** — survives stop/start, attachable |
+| 4× A40 | 48 GB × 4 | 192 GB | 200 GB | 38 | **1 TB** | **ephemeral** — wiped on pod stop |
+| H200 (reserve) | 141 GB × 1 | 141 GB | 256 GB (TBD) | 32 (TBD) | 200 GB | persistent |
+| local 5090 | 32 GB | 32 GB | ~50 GB | 16 (WSL) | n/a (local SSD) | persistent |
 
-## Storage layout (network volume per pod)
+The **persistence asymmetry** is load-bearing for cross-pod
+coordination — see *Pod modes* below.
 
-All paper state lives on the **network volume** (RunPod's `/workspace`).
-This persists across pod stop/start AND can be detached and attached to
-a different pod. Volume disk (the ephemeral local SSD) is only for
-`/tmp` — never paper state.
+## Pod modes — persistent vs ephemeral
 
-| Path | Contents | Approx size |
+Two pods, two modes:
+
+- **Persistent** (H100, H200, local): `/workspace` survives pod
+  stop/start. Treat /workspace as the source of truth. HF is a backup.
+- **Ephemeral** (A40): `/workspace` is wiped on pod stop. Treat HF as
+  the source of truth. /workspace is a working cache that may
+  disappear.
+
+The framework knows which mode it's in via the
+``TEMP_BENCH_POD_MODE`` env var (set by ``scripts/set_agent_env.sh``):
+
+| Agent | TEMP_BENCH_POD_MODE |
+|---|---|
+| agent_nlp, agent_em, agent_em_h200, agent_paper | `persistent` |
+| agent_steer, agent_back, agent_synth, agent_qa | `ephemeral` |
+
+The ephemeral mode triggers two things:
+1. **Bootstrap**: ``scripts/sync_from_hf.sh`` pulls the latest
+   checkpoints + activation caches from
+   ``han1823123123/temp-bench-{models,data}`` into /workspace before
+   the agent does any work.
+2. **Auto-push**: ``cache.save_checkpoint`` automatically pushes the
+   freshly-saved checkpoint to HF after the local write. Cell metrics
+   (small) are also pushed at end of cell. Failure to push is fatal —
+   we cannot risk losing a multi-hour training run to pod death.
+
+Persistent-mode agents may still upload to HF as a backup but it isn't
+mandatory; the next pod start will find /workspace intact.
+
+## Storage layout (per pod)
+
+| Path | Contents | Typical size |
 |---|---|---|
 | `/workspace/temp_xc/` | git repo (final branch) | 5 GB |
 | `/workspace/temp_xc/purified/.venv/` | uv-managed env | 12 GB |
-| `/workspace/temp_xc/purified/results/act_cache/` | activation caches keyed by `act_cache_key` | 14 GB / Gemma layer; up to 60 GB across components |
-| `/workspace/temp_xc/purified/checkpoints/` | trained models keyed by `train_key` | 6 GB / arch-set; up to 30 GB across seeds |
-| `/workspace/temp_xc/purified/results/runs/` | per-cell metrics + plots | 5 GB |
-| `/workspace/.tokens/` | gh, hf, anthropic | <1 KB |
-| `/workspace/hf_cache/` | HF_HOME — model weights | 30 GB (Gemma-2-2b + Qwen-14B) |
-| Slack (logs, judge transcripts, etc.) | misc | 50 GB |
-| **Total per pod (typical)** | | **~150 GB** |
-| **Provision** | | **200 GB** |
+| `/workspace/temp_xc/purified/results/act_cache/<key>/` | activation caches | 14 GB per Gemma layer; up to 60 GB |
+| `/workspace/temp_xc/purified/checkpoints/<train_key>/` | trained models | 6 GB per arch-set; up to 30 GB |
+| `/workspace/temp_xc/purified/results/runs/<eval_key>/` | per-cell metrics + plots | 5 GB |
+| `/workspace/.tokens/` | gh, hf, anthropic (mode 0600) | <1 KB |
+| `/workspace/hf_cache/` | HF_HOME — model weights | 30 GB (Gemma) ─ 60 GB (incl. Qwen-14B) |
+| Slack (logs, judge transcripts) | misc | 50 GB |
+| **Subtotal** | | **~150 GB typical, 250 GB on EM pod** |
 
-H100 pod handling Qwen-14B (C6) needs an extra 30 GB for Wang
-intermediate artefacts and additional 30 GB HF cache for the LoRA
-adapter — provision **250 GB** for that pod.
-
-## Why network volume, not volume disk
-
-Network volume:
-- Persists across pod stop/start. The 72-hour budget tolerates pod
-  reschedules; volume disk does not.
-- Can detach + attach to a different pod. If we need to migrate C6
-  from H100 → H200 mid-run, the trained checkpoints come with the
-  volume.
-- Slightly slower IO, but our workloads are GPU-bound, not disk-bound.
-
-Volume disk:
-- 30–50% faster IO. Only useful for the `.venv` (which we copy from
-  the network volume on first boot via `uv sync`).
-- Wiped on pod stop. Catastrophic for `train_key` cache; pointless to
-  keep paper state here.
-
-**Decision: ALL paper state on network volume.** `.venv` is rebuilt
-in-place by `uv sync` on each pod start (idempotent, ~2 minutes).
+Both pods now have 1 TB /workspace, which is comfortably above the
+typical budget. Slack capacity is for: judge transcripts, large
+intermediate Wang artifacts on C6, multi-seed extensions if Agent QA
+or Agent SYNTH gets activated.
 
 ## Concurrency budget per pod
 

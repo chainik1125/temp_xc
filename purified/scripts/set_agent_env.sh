@@ -23,43 +23,55 @@ fi
 agent="$1"
 
 case "$agent" in
-    # ── 2× H100 pod ─────────────────────────────────────────────────
+    # ── 2× H100 pod (1 TB persistent /workspace) ────────────────────
     agent_nlp)
         export CUDA_VISIBLE_DEVICES=0
         export AGENT_NAME=agent_nlp
+        export TEMP_BENCH_POD_MODE=persistent
         ;;
     agent_em)
         export CUDA_VISIBLE_DEVICES=1
         export AGENT_NAME=agent_em
+        export TEMP_BENCH_POD_MODE=persistent
         ;;
 
-    # ── 3× A40 pod ──────────────────────────────────────────────────
+    # ── 4× A40 pod (ephemeral storage — auto-push to HF) ────────────
     agent_steer)
         export CUDA_VISIBLE_DEVICES=0
         export AGENT_NAME=agent_steer
+        export TEMP_BENCH_POD_MODE=ephemeral
         ;;
     agent_back)
         export CUDA_VISIBLE_DEVICES=1
         export AGENT_NAME=agent_back
+        export TEMP_BENCH_POD_MODE=ephemeral
         ;;
     agent_synth)
         export CUDA_VISIBLE_DEVICES=2
         export AGENT_NAME=agent_synth
+        export TEMP_BENCH_POD_MODE=ephemeral
+        ;;
+    agent_qa)
+        export CUDA_VISIBLE_DEVICES=3
+        export AGENT_NAME=agent_qa
+        export TEMP_BENCH_POD_MODE=ephemeral
         ;;
 
     # ── Single-GPU pods ─────────────────────────────────────────────
     agent_em_h200)
         export CUDA_VISIBLE_DEVICES=0
         export AGENT_NAME=agent_em_h200
+        export TEMP_BENCH_POD_MODE=persistent
         ;;
     agent_paper)
         export CUDA_VISIBLE_DEVICES=0
         export AGENT_NAME=agent_paper
+        export TEMP_BENCH_POD_MODE=persistent
         ;;
 
     *)
         echo "unknown agent: $agent" >&2
-        echo "known: agent_paper, agent_nlp, agent_em, agent_em_h200, agent_steer, agent_back, agent_synth" >&2
+        echo "known: agent_paper, agent_nlp, agent_em, agent_em_h200, agent_steer, agent_back, agent_synth, agent_qa" >&2
         return 1 2>/dev/null || exit 1
         ;;
 esac
@@ -67,6 +79,7 @@ esac
 # Double-checks
 echo "[set_agent_env] AGENT_NAME=$AGENT_NAME"
 echo "[set_agent_env] CUDA_VISIBLE_DEVICES=$CUDA_VISIBLE_DEVICES"
+echo "[set_agent_env] TEMP_BENCH_POD_MODE=$TEMP_BENCH_POD_MODE"
 
 # Confirm only one GPU is visible (if torch is available in the env)
 if command -v python >/dev/null 2>&1; then
