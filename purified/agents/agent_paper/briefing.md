@@ -104,41 +104,51 @@ Your first mission is to decide on the following:
 
 ## Current state (agent owns — overwrite at every compact)
 
-**Last verified: 2026-05-03T21:30:00Z**
+**Last verified: 2026-05-03T22:30:00Z**
 
 Han's "first mission" decisions are now LOCKED in `decisions.md` #1–10.
 Framework is built; tests 38/38 green; HF repos + tokens unified.
-Han's NEW priority (this turn): provision worker agents.
+**4 worker briefings drafted this session — pending Han review** before
+he spins up the worker pods.
 
-- `final` branch pushed. `git log` for history. ~12 commits on day 0.
+- `final` branch pushed. `git log` for history. ~14 commits on day 0.
 - 7 components have `docs/components/cN.md` writeups (planning status).
 - 5 named agents in roster + 1 fallback. **Only agent_paper (me) is
-  active**; NLP/EM/STEER/BACK/EM_H200 not yet provisioned.
+  active**; NLP/EM/STEER/BACK have draft briefings, awaiting Han's
+  spin-up. EM_H200 dormant.
 - Locked archs: TXC-base = `txc_bare_antidead_t5`,
-  TXC-pro = `phase5b_subseq_h8`. Baselines: TopK-SAE, T-SAE, TFA, MLC,
-  SAE-arditi (per `configs/locked_archs.yaml`).
+  TXC-pro = `phase5b_subseq_h8`. **9 yaml entries** (added
+  `stacked_sae` 2026-05-03 — was a c1.md/c7.md baseline missing from
+  YAML): topk_sae, stacked_sae, tsae_paper, tfa, tfa_pos, mlc,
+  sae_arditi, txc_base, txc_pro.
 - `results/leaderboard.jsonl` empty. `checkpoints/manifest.jsonl` empty.
 - Token store: `~/.tokens/` (local) + `/workspace/.tokens/` (RunPod).
-- 8 arch class files NOT yet ported from
-  `origin/han-phase7-unification:src/architectures/`. The yaml entries
-  exist; the .py classes don't.
+- **8 distinct arch .py files NOT yet ported** (tfa + tfa_pos share a
+  file). YAML entries exist; classes don't.
 
 ## What I just did (agent owns — overwrite)
 
 Newest first. `git log` for full history.
 
+- **Drafted 4 worker briefings** for {agent_nlp, agent_em, agent_steer,
+  agent_back}. Each has a Han-voice "Identity + mandate" + concrete
+  first-task next-action; agent-owned sections empty (worker fills on
+  first session). agents/README.md status: `not provisioned` →
+  `draft-briefing`.
+- **Consistency fixes (post-compact verification)**: registered
+  `stacked_sae` in `configs/locked_archs.yaml` (was a baseline in
+  c1.md/c7.md but missing from YAML — Hard Rule #2 violation); fixed
+  briefing's port-list (8 distinct files, 9 yaml entries); fixed
+  briefing's decisions.md #6 → #2+#7 cross-ref for agent_em.
 - Briefing/handover/log consolidation (#10): one `briefing.md` per
   agent, section-owned. Dropped dated handover archive + log.md.
   PROTOCOL.md § 14 rewritten to "Briefing maintenance".
 - C4 simplified to single metric: Top-256 cumulative SEMANTIC Pareto.
-  Dropped pdvar + paper-style probe.
-- Wasteland code deleted (`src/`, `experiments/`, etc.). Wasteland docs
-  retained (cited by component writeups).
-- Token storage unified across local + RunPod (`get_token()` resolves
-  both). Migrated `.env_autointerp` → `~/.tokens/anthropic_key`.
+- Wasteland code deleted; wasteland docs retained.
+- Token storage unified across local + RunPod (`get_token()`).
 - GPU sharing: Primary + Pool with lockfile claims (PROTOCOL.md § 13).
-- Modularity framework + cache contract (PROTOCOL.md § 11,
-  `docs/paper/framework.md`). 38/38 tests.
+- Modularity framework + cache contract (`docs/paper/framework.md`).
+  38/38 tests.
 
 ## Component dependencies + provisioning roadmap (agent owns — overwrite)
 
@@ -183,7 +193,7 @@ specifics (component, hardware, ports needed) are correct.
 | Agent | Component(s) | Pod / GPU | First concrete task |
 |---|---|---|---|
 | **agent_nlp** | C3 + C4 | 2× H100 / GPU 0 | Port `temp_bench.data.nlp.cache_activations`, build Gemma-2-2b-IT L13 act-cache (24K seq × 128 tok ≈ 14 GB, ~3 H100-hr), upload to HF temp-bench-data. Then port + train 5 archs × 3 seeds. |
-| **agent_em** | C6 | 2× H100 / GPU 1 | Port `temp_bench.case_studies.em` from `origin/em-nanda:experiments/em_features/run_wang_procedure.py`. Set up Qwen-14B-Instruct + finance LoRA. Implement Bricken resample. First run: TXC-base + brickenauxk on R1 30k mid-α (the gap-close test, decisions.md #6). |
+| **agent_em** | C6 | 2× H100 / GPU 1 | Port `temp_bench.case_studies.em` from `origin/em-nanda:experiments/em_features/run_wang_procedure.py`. Set up Qwen-14B-Instruct + finance LoRA. Implement Bricken resample. First run: TXC-base + brickenauxk on R1 30k mid-α (the gap-close test, decisions.md #2 reframing + #7 Bricken opt-in). |
 | **agent_steer** | C5 | 4× A40 / GPU 0 | Port `temp_bench.case_studies.steering`. Set up Gemini judge (coh + success). Wait for agent_nlp's cache → `sync_from_hf.sh` → train TXC-base + TXC-pro + T-SAE → V7 tiled-broadcast steering protocol → coh-vs-success curves. |
 | **agent_back** | C7 | 4× A40 / GPU 1 | Port `temp_bench.case_studies.backtracking` from `origin/aniket-ward-stage-b:experiments/ward_backtracking_txc/`. Build Gemma-BASE-L10 cache (own, not shared). Set up Sonnet judge + 20-transcript blind κ validation. Run inducement (Δgc) + detection (PR-AUC) on 5 archs × 3 seeds. |
 
@@ -193,35 +203,39 @@ relevant `decisions.md` entries, and the wasteland files to port.
 
 ## Next action (agent owns — overwrite)
 
+Both worker briefings AND C1+C2 porting are in flight. Worker
+briefings are drafted; await Han's review. Continue C1+C2 in parallel.
+
 1. Bootstrap: `cd $(git rev-parse --show-toplevel)/purified` →
    `source scripts/set_agent_env.sh agent_paper` →
-   `bash scripts/agent_smoke_test.sh` (expect 38/38 + 8 expected gaps) →
+   `bash scripts/agent_smoke_test.sh` (expect 38/38) →
    `git pull --rebase origin final`.
-2. Read this briefing top-to-bottom. Read `decisions.md` #1–10.
-3. **Han's task (i)**: confirm/adjust the spawn order in
-   "Component dependencies + provisioning roadmap" above. Default
-   recommendation: parallel start of nlp + em + back at T+0;
-   steer at T+~3hr.
-4. **Han's task (ii)**: write `agents/<name>/briefing.md` for each of
-   {agent_nlp, agent_em, agent_steer, agent_back} by:
-   - copying `agents/_briefing_template.md`
-   - filling "Identity + mandate (Han owns)" using the per-agent
-     scaffold above (component, hardware, first task) — write it
-     as Han's voice; he'll review/edit before spinning up.
-   - leaving the agent-owned sections empty (the worker fills them
-     at first compact).
-5. **Present drafts to Han** for review before he spawns the agents.
-   Han may rewrite the mandate prose to redirect priorities.
-6. **In parallel** with worker bootstrap: continue agent_paper's
-   own C1+C2 implementation. Concrete steps:
-   - Port arch classes from `origin/han-phase7-unification:src/architectures/`
-     into `src/temp_bench/architectures/` (8 files: topk_sae, tsae,
-     tfa, mlc, sae_arditi, txc_base, txc_pro, stacked_sae).
-   - Implement `temp_bench.data.toy.markov_chain_support` (C1) and
-     `coupled_hmm` (C2).
-   - Write `experiments/c1_synthetic_topk/run.py` from
-     `_runner_template.py`. Smoke-run: 1 cell × 1000 steps. Then
-     full sweep (~6 hr local).
+2. Read `decisions.md` #1–10 if not in context.
+3. **If Han has approved worker briefings**: notify him to spin up
+   pods (T+0: nlp + em + back; T+~3hr: steer once C3 cache hits HF).
+   If not yet, address his review feedback in
+   `agents/{nlp,em,steer,back}/briefing.md` "Identity + mandate"
+   sections.
+4. **C1+C2 porting (in parallel)**:
+   - Port arch classes from
+     `origin/han-phase7-unification:src/architectures/` into
+     `src/temp_bench/architectures/`. **8 distinct .py files** (tfa +
+     tfa_pos share `tfa.py`, differ only by `use_pos_embedding`):
+     topk_sae, stacked_sae, tsae_paper, tfa, mlc, sae_arditi,
+     txc_base (← `txc_bare_antidead.py`),
+     txc_pro (← `phase5b_subseq_sampling_txcdr.py`).
+     Each port: `git show origin/han-phase7-unification:src/architectures/<file>.py >
+     src/temp_bench/architectures/<file>.py`, then add header comment
+     with the source commit hash, then update imports
+     (`from src.architectures.base` → `from temp_bench.architectures.base`).
+   - Implement `temp_bench.data.toy.markov_chain_support` (C1) +
+     `coupled_hmm` (C2). Sources to study (NOT to import):
+     `origin/han-phase7-unification:src/v2_temporal_schemeC/markov_data_generation.py`
+     and Phase 3 coupled-features generators.
+   - Write `experiments/c1_synthetic_topk/run.py`. Smoke-run:
+     1 cell × 1000 steps. Then full sweep (~6 hr local on 5090).
+5. After porting + C1+C2 land: start drafting paper outline for the
+   sections you own (C1, C2 + framework introduction).
 
 ## Don't repeat (agent owns — overwrite)
 
@@ -243,13 +257,24 @@ relevant `decisions.md` entries, and the wasteland files to port.
 
 ## Open questions for Han (agent owns — overwrite)
 
-1. **Confirm spawn order**: is parallel start of nlp + em + back at T+0
-   (with steer at T+~3hr after C3 cache uploads) acceptable? Or do you
-   prefer a more staggered rollout?
-2. **Briefings as drafts or live**: should I write the four worker
-   briefings as drafts for your review (recommended — you may want to
-   adjust the mandate prose), or write them as final and have you
-   spin agents up directly?
-3. **agent_em_h200 fallback**: provisioned in dormant state, or wait
-   until R32 actually OOMs on H100? Default: wait — provision only on
-   demand.
+1. **Worker briefings**: 4 drafts written. Please review the
+   "Identity + mandate" sections in each of
+   `agents/{nlp,em,steer,back}/briefing.md` and rewrite as you wish
+   before spinning up the pods. Areas where I had to guess voice
+   rather than copy directly from your earlier prose: agent_em's
+   coordination with Dmitry, agent_steer's gating language on the
+   cache, agent_back's phrasing of "C7 is a candidate paper-headline
+   result."
+2. **Spawn order**: confirming parallel start of nlp + em + back at
+   T+0 (with steer at T+~3hr after C3 cache uploads). agent_steer's
+   briefing tells the worker to wait on the cache before bootstrap.
+   Acceptable, or stagger?
+3. **C3 task suite**: still TBD (Phase 5's 36-task vs Phase 7's
+   16-task PAPER subset). agent_nlp's briefing instructs them to
+   pre-register before launch. You may want to make this call
+   yourself rather than delegate.
+4. **agent_em_h200 fallback**: provisioned dormant in roster — wait
+   for R32 OOM, or stand up proactively?
+5. **A 5th worker for the 4× A40 pool**: GPUs 2 + 3 are spare. Could
+   land C7 detection sweeps or C5 multi-seed faster. Defer until
+   after first results land?

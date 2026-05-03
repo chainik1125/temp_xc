@@ -41,6 +41,19 @@ archs:
       k_pos: 20      # default sparsity; components override per-cell
     notes: "Per-token TopK SAE. The simplest baseline."
 
+  stacked_sae:
+    class_path: temp_bench.architectures.stacked_sae:StackedSAE
+    arch_version: "1.0.0"
+    category: sae
+    hparams:
+      d_sae: 18432
+      T: 5           # T independent TopK-SAEs, one per position
+      k_pos: 20      # window-level L0 = k_pos * T
+    notes: |
+      T independent TopK-SAEs, one per token position. The "per-layer
+      SAEs" baseline from the crosscoders paper, adapted to temporal.
+      C1, C7 baseline.
+
   tsae_paper:
     class_path: temp_bench.architectures.tsae:TSAEPaper
     arch_version: "1.0.0"

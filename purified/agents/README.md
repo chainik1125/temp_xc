@@ -18,10 +18,10 @@ verifies the pinning).
 | Agent | Pod | GPU index | VRAM | Pod mode | Components | Briefing | Status |
 |---|---|---|---|---|---|---|---|
 | **agent_paper** | local 5090 | 0 (only GPU) | 32 GB | persistent (local SSD) | orchestration, C1, C2, paper drafting | [`agent_paper/briefing.md`](agent_paper/briefing.md) | active |
-| **agent_nlp** | 2× H100 | **0** | 80 GB | persistent | C3 + C4 (shared activation cache) | TBD | not provisioned |
-| **agent_em** | 2× H100 | **1** | 80 GB | persistent | C6 | TBD | not provisioned |
-| **agent_steer** | 4× A40 | **0** | 48 GB | **ephemeral** | C5 | TBD | not provisioned |
-| **agent_back** | 4× A40 | **1** | 48 GB | **ephemeral** | C7 | TBD | not provisioned |
+| **agent_nlp** | 2× H100 | **0** | 80 GB | persistent | C3 + C4 (shared activation cache) | [`agent_nlp/briefing.md`](agent_nlp/briefing.md) | draft-briefing |
+| **agent_em** | 2× H100 | **1** | 80 GB | persistent | C6 | [`agent_em/briefing.md`](agent_em/briefing.md) | draft-briefing |
+| **agent_steer** | 4× A40 | **0** | 48 GB | **ephemeral** | C5 | [`agent_steer/briefing.md`](agent_steer/briefing.md) | draft-briefing |
+| **agent_back** | 4× A40 | **1** | 48 GB | **ephemeral** | C7 | [`agent_back/briefing.md`](agent_back/briefing.md) | draft-briefing |
 | **agent_em_h200** (fallback) | H200 | 0 (only GPU) | 141 GB | persistent | C6 if R32 blows H100 | n/a | dormant |
 
 The **4× A40 pod has 2 named agents + 2 spare GPU slots** (GPUs 2 and 3).
