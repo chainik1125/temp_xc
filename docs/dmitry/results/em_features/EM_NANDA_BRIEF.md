@@ -10,6 +10,67 @@ tags:
 
 **You are an autonomous routine continuing from the dmitry-branch work.** Branch: `em-nanda`. AGENT_BRIEF.md (on dmitry) covers the prior Qwen-7B medical setup. This doc supersedes that for the Qwen-14B financial pivot.
 
+### Status as of 2026-05-03 00:00 UTC (TXC R32 ext-α DOES NOT clear 58.47 — single-feat × steps × arch × organism × α-regime table fully CLOSED across all 8 cells; SAE wins everywhere; pivot to paper-figure write-up)
+
+**This firing (00:00 UTC) actions:**
+
+- **TXC R32 extended-α probe DONE** (h100_2, finished 23:10 UTC, ~7
+  min — only stage-4 ran since stage 2/3 were reused from native).
+  Stage-4 frontier on finalists 718 / 1781 / 15779 with grid
+  {−30, −20, −15, −12, −8}, 8 rollouts × 64 examples per cell:
+  - feat **718**   α=−30 → **51.95 / 96.64** (best ext-α single-feat)
+  - feat 1781  α=−30 → 50.08 / 95.39
+  - feat 15779 α=−30 → 46.17 / 94.92
+  - All other cells lower or equal (full table in synthesis).
+- **TXC R32 ext-α verdict**: 51.95 ≤ TXC R32 std-α best 52.50 (feat
+  15779 @α=+1.50). Extended-α buys TXC nothing on R32 — flat/saturated
+  frontier. Compare SAE R32 ext-α: 54.61 → 64.53 (+9.92 lift).
+  **Smooth-scaling hypothesis FALSIFIED for TXC R32**: feat 718's
+  α=−100 → 59.45 was a degenerate cliff, not a smooth curve —
+  α=−30 plateau at 51.95 confirms breakdown, not coherent
+  re-alignment.
+- **Single-feat × steps × arch × organism × α-regime table — FULLY
+  CLOSED across all 8 cells** (resolved std-α single-feat best,
+  ext-α single-feat best where probed):
+
+  | arch       | R1 5k mid-α | R1 10k mid-α | R1 30k mid-α | R32 10k std-α | R32 10k ext-α |
+  | :--------- | ----------: | -----------: | -----------: | ------------: | ------------: |
+  | SAE arditi | 95.78       | 94.69        | 95.16        | 54.61         | **64.53** ⭐  |
+  | TXC k=100  | 90.88       | 90.23        | 91.25        | 52.50         | 51.95         |
+  | arch gap   | +4.90       | +4.46        | +3.91        | +2.11         | **+12.58**    |
+  | vs 58.47   | +37.31      | +36.22       | +36.69       | −3.86 / −5.97 | +6.06 / −6.52 |
+
+  SAE arditi wins every cell. Arch gap *widens* in R32 ext-α
+  (+12.58) — the regime where the dictionary has to "do real work."
+- **Goal status (single-feat axis, both organisms)**:
+  - R1: SAE 28663 @α=−10 → **96.88/98.91** (5k); +38.4/+68.0 vs 58.47.
+  - R32: SAE 21224 @α=−30 → **64.53/96.25** (10k, ext-α); +6.06/+65.4 vs 58.47.
+- **Both GPUs idle at 00:00 UTC.** No new jobs queued. Single-feat
+  axis is done; next pivot is a write-up decision (not a launch
+  decision).
+- Disk: HF_HOME=/workspace/hf_cache holding; /root not filling on
+  either host.
+
+**Next firing priorities (likely 01:00 UTC)**:
+
+- **Pivot to paper-figure write-up**. Closed 8-cell table is the core
+  figure. Plotting plan (no compute needed):
+  1. Reuse `plots/em_nanda_*frontier*.png` (existing R1 5k/10k/30k
+     for both arches).
+  2. Reuse `plots/em_nanda_step_count_trajectory.png` (existing).
+  3. **New**: arch × organism × α-regime 8-cell table as
+     heatmap/grouped-bar at
+     `plots/em_nanda_arch_organism_alpha_table.png`. Pure
+     matplotlib; can land in 1 firing.
+- **Optional R32 bundle/frontier** (~30 min on one GPU) if next
+  firing has both GPUs idle and write-up plotting can wait. Tests
+  whether k=30 bundle aggregation lifts R32 to R1-level align —
+  exploratory, not paper-critical. Use the existing wang_r32 outputs
+  as the bundle-source feature pool. Defer if write-up panel is more
+  load-bearing.
+- **No new training/Wang launches** unless a specific new question
+  crystallizes (the single-feat axis is genuinely done).
+
 ### Status as of 2026-05-02 23:00 UTC (R32 axis SMASHED: SAE arditi feat 21224 @α=−30 → 64.53/96.25 beats 58.47; TXC R32 native std-α 52.50; TXC R32 extended-α probe launched on h100_2)
 
 **This firing (23:00 UTC) actions:**

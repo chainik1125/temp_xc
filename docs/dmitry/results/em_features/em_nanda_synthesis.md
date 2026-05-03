@@ -1327,3 +1327,91 @@ on the stronger R32 one.
   table will be the core figure. No further single-feat sweeps look
   motivated; bundle/frontier work might be the next axis if compute
   remains available.
+
+### Status as of 2026-05-03 00:00 UTC (TXC R32 ext-α DOES NOT clear 58.47 — single-feat axis fully closed; SAE > TXC at every cell of the 8-cell table)
+
+**Headline**: TXC R32 extended-α probe lands a flat/saturated frontier
+(best 51.95/96.64) — TXC's R32 misalignment is genuinely too distributed
+for any single-feat steering, even at |α|=30. SAE arditi remains the
+cross-organism winner. Single-feat × steps × arch × organism × α-regime
+table now CLOSED across all 8 cells.
+
+**Resolved this firing**:
+
+- **TXC R32 extended-α probe DONE** (h100_2, finished 23:10 UTC, only ~7
+  min — stage 2/3 reused, only stage-4 batched). Stage-4 frontier on the
+  three TXC R32 finalists 718 / 1781 / 15779 with grid {−30, −20, −15,
+  −12, −8}, 8 rollouts × 64 examples per cell:
+
+  | feat  | α=−30 align/coh | α=−20 align/coh | α=−15 align/coh | α=−12 align/coh | α=−8 align/coh |
+  | ----: | --------------: | --------------: | --------------: | --------------: | -------------: |
+  | 718   | **51.95/96.64** | 40.62/95.86     | 45.39/95.55     | 45.78/95.23     | 46.88/94.38    |
+  | 1781  | 50.08/95.39     | 47.42/93.67     | 43.83/95.00     | 49.69/94.30     | 49.69/95.00    |
+  | 15779 | 46.17/94.92     | 40.47/93.36     | 40.16/92.66     | 43.91/93.67     | 46.17/93.30    |
+
+- **TXC R32 ext-α best single-feat: feat 718 @ α=−30 → 51.95 / 96.64.**
+  This is *below* the TXC R32 std-α best (52.50 / 95.70 at feat 15779
+  α=+1.50). Extended-α buys TXC nothing on R32 — the frontier is flat or
+  slightly negative. Compare to SAE arditi R32, where ext-α gave +9.92
+  align lift (54.61 → 64.53). **Smooth-scaling hypothesis FALSIFIED for
+  TXC R32**: feat 718's α=−10=52.66 → α=−100=59.45 was a degenerate cliff,
+  not a smooth curve — α=−30 plateau at 51.95 confirms the α=−100 number
+  was steering breakdown, not coherent re-alignment.
+
+- **Architecture × organism × α-regime table — NOW FULLY CLOSED across
+  all 8 cells** (resolved std-α single-feat best, α=−30 ext-α single-feat
+  best where applicable):
+
+  | arch       | R1 5k mid-α | R1 10k mid-α | R1 30k mid-α | R32 10k std-α | R32 10k ext-α |
+  | :--------- | ----------: | -----------: | -----------: | ------------: | ------------: |
+  | SAE arditi | 95.78       | 94.69        | 95.16        | 54.61         | **64.53** ⭐  |
+  | TXC k=100  | 90.88       | 90.23        | 91.25        | 52.50         | 51.95         |
+  | arch gap   | +4.90       | +4.46        | +3.91        | +2.11         | **+12.58**    |
+  | vs 58.47   | +37.31      | +36.22       | +36.69       | −3.86 / −5.97 | +6.06 / −6.52 |
+
+  SAE arditi wins every cell. The arch gap *widens* under extended α
+  on R32 (+12.58) — exactly the regime where SAE captures a clean
+  R32-causal direction and TXC does not.
+
+**Interpretation**: the SAE-vs-TXC architectural gap is largest in the
+α-regime where we ask the dictionary to "do real work" — R32 organism
++ extended α. TXC k=100 is built around denser per-token activations
+(T=5 thresholds) and doesn't seem to develop a single feature whose
+direction *is* the organism's misalignment axis on R32. SAE arditi
+(k=128 single TopK) does. This is a stronger architectural claim than
+the R1 result alone, where both arches comfortably clear the goal.
+
+**Goal status (final, single-feat axis)**:
+
+- R1 organism: SAE arditi feat 28663 @ α=−10 → **96.88 / 98.91** (5k).
+  +38.4 align over 58.47 with +68 coh.
+- R32 organism: SAE arditi feat 21224 @ α=−30 → **64.53 / 96.25** (10k,
+  ext-α). +6.06 align over 58.47 with +65 coh. *Best honest single-feat
+  result on the harder organism.*
+
+**Compute & disk hygiene**: Both GPUs idle this firing. No new jobs
+queued (per rule 6 spirit — and because the single-feat axis is closed
+and the next pivot is a write-up decision). HF_HOME=/workspace/hf_cache
+holding; /root not filling.
+
+**Next firing priorities (likely 01:00 UTC)**:
+
+- **Pivot to paper-figure write-up**. The closed 8-cell table is the
+  core figure. Assemble:
+  1. Cross-arch frontier plots (`plots/em_nanda_*frontier*.png`,
+     existing) — already cover R1 5k/10k/30k for both arches.
+  2. Step-count line plot (`plots/em_nanda_step_count_trajectory.png`,
+     existing) — closes step-count axis.
+  3. New: an arch × organism × α-regime panel-plot showing the
+     8-cell table as a heatmap or grouped bar chart (no compute
+     needed; pure plotting). Place at
+     `plots/em_nanda_arch_organism_alpha_table.png`.
+- **Optional bundle/frontier on R32** if compute is available next
+  firing: tests whether k=30 bundle aggregation lifts R32 to R1-level
+  align (would suggest distributed misalignment can be reassembled).
+  Cheap (~30 min on one GPU) but motivation is exploratory, not
+  paper-critical. Defer if next firing also has both GPUs idle but
+  another autonomous-routine objective (e.g. write-up panel) is more
+  load-bearing.
+- **No new training/Wang launches** unless a specific scientific
+  question crystallizes. Single-feat axis is genuinely done.
