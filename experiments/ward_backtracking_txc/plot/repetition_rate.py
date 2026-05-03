@@ -86,6 +86,7 @@ def main(argv=None):
     args.out.mkdir(parents=True, exist_ok=True)
 
     fig, axes = plt.subplots(1, 2, figsize=(12, 4.2), sharey=True)
+    CALIBRATED_XLIM = (-12, 12)  # see comment in plot/headline_steering.py
     for calibrated_mode, ax in zip([True, False], axes):
         for run_dir in args.runs:
             meta = json.loads((run_dir / "meta.json").read_text())
@@ -114,11 +115,17 @@ def main(argv=None):
                     markersize=4, linewidth=1.6)
         ax.set_xlabel("calibrated magnitude (raw/p95)" if calibrated_mode else "raw steering magnitude")
         ax.set_ylabel("frac of consecutive sentence pairs with token-Jaccard ≥ 0.7" if calibrated_mode else "")
-        ax.set_title("calibrated" if calibrated_mode else "raw")
+        if calibrated_mode:
+            ax.set_xlim(*CALIBRATED_XLIM)
+            ax.set_title(f"calibrated (x clipped to {CALIBRATED_XLIM})")
+        else:
+            ax.set_title("raw")
         ax.grid(alpha=0.3)
         ax.legend(loc="best", fontsize=8)
-    fig.suptitle(f"Repetition rate (judge-free): near-duplicate sentence-pair fraction (threshold={args.threshold})", fontsize=11)
-    fig.tight_layout(rect=[0, 0, 1, 0.95])
+    fig.suptitle(f"Repetition rate (judge-free): near-duplicate sentence-pair fraction (threshold={args.threshold}). "
+                  "TFA/TSAE-paper have tiny natural p95 (~0.005); their points extend off-screen on the calibrated panel.",
+                 fontsize=9)
+    fig.tight_layout(rect=[0, 0, 1, 0.93])
     suffix = "_headline" if args.label_filter else ""
     out_path = args.out / f"repetition_rate{suffix}.png"
     fig.savefig(out_path, dpi=150)

@@ -122,7 +122,8 @@ def panel_rate(ax, runs: list[dict], calib: dict, key: str, calibrated: bool, yl
 
 
 def render(runs: list[dict], df: pd.DataFrame, calib: dict, out_path: Path,
-           calibrated: bool, label_filter=None):
+           calibrated: bool, label_filter=None,
+           calibrated_xlim: tuple[float, float] = (-12, 12)):
     runs = (runs if label_filter is None
             else [r for r in runs if r["meta"].get("label") in label_filter])
     fig, axes = plt.subplots(1, 3, figsize=(15, 4.2), sharex=True)
@@ -131,9 +132,21 @@ def render(runs: list[dict], df: pd.DataFrame, calib: dict, out_path: Path,
                ylabel="rescue rate  (n_ic / n_truly_wrong)")
     panel_rate(axes[2], runs, calib, "regression_rate_by_magnitude", calibrated=calibrated,
                ylabel="regression rate  (n_ci / n_correct_subsample)")
+    if calibrated:
+        # TFA / TSAE-paper have tiny natural feature-activation scales
+        # (p95 ≈ 0.005), so their calibrated x range is ~±2000–4000 — that
+        # would auto-scale the x-axis and visually compress every other arch
+        # to a vertical line at x≈0. Clip the x-axis to a sensible window
+        # commensurable with TXC/SAE/MLC/H8 (whose calibrated ranges are
+        # within ±10). TFA/TSAE-paper points outside this window are
+        # off-screen but still in the data.
+        for ax in axes:
+            ax.set_xlim(*calibrated_xlim)
     title = "Backtracking steering — calibrated" if calibrated else "Backtracking steering — raw magnitude"
-    fig.suptitle(title, fontsize=12)
-    fig.tight_layout(rect=[0, 0, 1, 0.95])
+    if calibrated:
+        title += f" (x clipped to [{calibrated_xlim[0]}, {calibrated_xlim[1]}]; TFA/TSAE-paper extend further off-screen due to tiny p95)"
+    fig.suptitle(title, fontsize=10)
+    fig.tight_layout(rect=[0, 0, 1, 0.94])
     out_path.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(out_path, dpi=150)
     log.info("[saved] %s", out_path)

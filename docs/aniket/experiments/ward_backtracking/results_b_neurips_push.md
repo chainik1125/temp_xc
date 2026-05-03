@@ -60,6 +60,8 @@ Three panels (calibrated x-axis = raw magnitude / arch-specific p95):
 
 5 lines: TXC, SAE, TSAE-paper, TFA, MLC.
 
+> **Calibrated x-axis caveat.** TFA and TSAE-paper produce signed reconstruction-residual codes whose natural scale is ~400× smaller than the TopK output of TXC/SAE/MLC (p95 ≈ 0.005 vs ≈ 1.9). When dividing raw magnitude by p95, TFA/TSAE-paper points span ±2,000–4,000 while every other arch spans ±3 to ±10. We clip the x-axis to ±12 to keep the comparison readable; TFA/TSAE-paper points outside that window extend off-screen but are preserved in the underlying data (`flip_matrix.parquet`). See the *raw-magnitude* version below for an unclipped view.
+
 ![Headline steering — calibrated magnitude, 5 archs](images_b/np_headline_calibrated.png)
 
 Raw-magnitude variant (uncalibrated x-axis):
