@@ -8,6 +8,17 @@ Research repository combining documentation (Obsidian vault) and Python code for
 > historical "wasteland" — read them for context, but never import wasteland
 > code into paper work. (`purified/CLAUDE.md` auto-loads when an agent reads
 > any file under `purified/`.)
+>
+> **Heads up: on the `final` branch, the wasteland *code* has been deleted.**
+> `src/`, `experiments/`, `references/`, `tests/`, `scripts/`, root
+> `pyproject.toml`, and other code-level wasteland are no longer present.
+> They live only on `origin/han-phase7-unification`. Use
+> `git show origin/han-phase7-unification:<path>` for read access.
+> Wasteland *docs* (`docs/`, `papers/`) are still here on `final` because
+> the paper writeups cite them heavily.
+> The structural description below describes the wasteland branches
+> (`han-phase7-unification` etc.); on `final` only `docs/` and `papers/`
+> from this list still exist.
 
 Welcome. You are an AI agent working on a research project to develop temporal SAE architectures that can discover features spanning multiple token positions in language models. This document will get you up to speed on the motivation, background, codebase, and working conventions.
 
