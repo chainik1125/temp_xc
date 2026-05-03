@@ -99,9 +99,13 @@ def _plot_coh_threshold_curves(
 
 def run_analysis() -> AnalysisResult:
     rows = query_leaderboard(component=COMPONENT)
+    # Skip smoke-test cells (matches agent_nlp's c3 convention).
+    rows = [r for r in rows if not r.eval_cfg.get("smoke")]
     if not rows:
         return AnalysisResult(
-            markdown=_placeholder("no cells run yet — see experiments/c5_steering/run.py"),
+            markdown=_placeholder(
+                "no non-smoke cells run yet — see experiments/c5_steering/run.py"
+            ),
             results={},
             plot_paths=[],
         )

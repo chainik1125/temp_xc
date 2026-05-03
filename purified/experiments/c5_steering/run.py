@@ -19,15 +19,20 @@ Three notable C5-specifics:
    then run with ``--protocol pp`` if PP is recommended.
 2. **Workspace plumbing** — :func:`temp_bench.runner.run_cell` doesn't
    pass ``eval_key`` (and therefore the workspace ``run_dir(eval_key)``)
-   into the eval-fn. We compute it ourselves from the same inputs the
-   runner uses, then thread it through ``eval_cfg["_workspace"]`` so
-   :class:`SteeringCaseStudy` can persist its jsonl artifacts there.
+   into the eval-fn. We compute it from the same inputs the runner
+   uses (so the keys match) and thread it via a closure on the
+   eval-fn (NOT via ``eval_cfg``, which the runner re-hashes — adding
+   ``_workspace`` there would change the runner's eval_key and the
+   case study would write to a different ``run_dir`` than the one
+   ``metrics.json`` lands in).
 3. **Activations come from disk** — the Gemma-2-2b-IT L13 fineweb
    act-cache is on HF (``han1823123123/temp-bench-data``) and ``sync_
    from_hf.sh`` (or the manual ``hf download``) lands it at
-   ``results/act_cache/<act_cache_key>/``. The :func:`build_batch_iter`
-   helper memory-maps ``acts.npy`` and yields random ``(B, T, d_in)``
-   windows.
+   ``results/act_cache/<act_cache_key>/``. We use the canonical
+   :func:`temp_bench.data.nlp.batch_iter_from_act_cache` which yields
+   full ``(B, seq_len, d_in)`` sequences — the TXC arch's
+   ``train_step`` extracts a single random T-window per batch element
+   internally (per ``txc_base.py`` docstring).
 
 Provenance: phase7's V7 driver lives at
 ``origin/han-phase7-unification:experiments/phase7_unification/case_
@@ -38,13 +43,11 @@ this file replaces that driver with the framework-discipline version.
 from __future__ import annotations
 
 import argparse
-import json
 import logging
 import os
 from pathlib import Path
 from typing import Any
 
-import numpy as np
 import torch
 
 os.environ.setdefault("TQDM_DISABLE", "1")
@@ -58,7 +61,6 @@ from temp_bench.case_studies.steering import (
     SteeringConfig,
 )
 from temp_bench.config import (
-    act_cache_dir,
     compute_act_cache_key,
     compute_eval_key,
     compute_train_key,
@@ -66,6 +68,7 @@ from temp_bench.config import (
     load_arch,
     load_datasource,
 )
+from temp_bench.data.nlp import batch_iter_from_act_cache
 from temp_bench.schemas import TrainingConfig
 from temp_bench.training.sae_trainer import train_sae
 
@@ -84,86 +87,44 @@ DEFAULT_ARCHS: tuple[str, ...] = ("tsae_paper", "txc_base", "txc_pro")
 DEFAULT_SEEDS: tuple[int, ...] = (1, 2, 42)
 
 
-# ── Activation-cache batch iterator ───────────────────────────────────
-
-
-def build_batch_iter(
-    act_cache_key: str, *, T: int, batch_size: int, seed: int,
-):
-    """Yield ``(batch_size, T, d_in)`` random windows from ``acts.npy``.
-
-    The full activation tensor is ``(N, S, d_in) fp16`` — for the
-    Gemma-2-2b-IT L13 fineweb cache that's ``(24000, 128, 2304)`` ≈
-    14 GB on disk. We memory-map it and copy each batch to GPU as
-    fp32 (the trainer's autocast handles bf16/fp16).
-
-    For per-token archs (``T=1``), each batch is ``(B, 1, d_in)`` so
-    the trainer + arch see a uniform shape.
-    """
-    cache_dir = act_cache_dir(act_cache_key)
-    acts_path = cache_dir / "acts.npy"
-    meta = json.loads((cache_dir / "meta.json").read_text())
-    N, S, d_in = meta["shape"]
-    if T < 1 or T > S:
-        raise ValueError(f"window T={T} must be in [1, {S}]")
-
-    # mmap so 14 GB doesn't sit fully in RAM. Random access patterns
-    # are cheap on local NVMe / pod ramfs.
-    acts = np.load(acts_path, mmap_mode="r")
-    rng = np.random.default_rng(seed)
-    device = torch.device("cuda")
-
-    def _iter(_step: int) -> torch.Tensor:
-        # Sample (sequence_idx, start_position) pairs, gather windows.
-        seq_idx = rng.integers(0, N, size=batch_size)
-        pos_max = S - T + 1
-        pos = rng.integers(0, pos_max, size=batch_size)
-        out = np.empty((batch_size, T, d_in), dtype=np.float16)
-        for bi in range(batch_size):
-            si, pi = seq_idx[bi], pos[bi]
-            out[bi] = acts[si, pi : pi + T]
-        return torch.from_numpy(out.astype(np.float32)).to(device)
-
-    return _iter
-
-
 # ── Train + eval adapters ─────────────────────────────────────────────
 
 
 def my_train_fn(
     *, arch_name, arch_hparams, seed, training_cfg, act_cache_key, component,
 ):
-    """Build arch via ``instantiate_arch`` + delegate to ``train_sae``."""
+    """Build arch via ``instantiate_arch`` + delegate to ``train_sae``.
+
+    Uses the canonical :func:`temp_bench.data.nlp.batch_iter_from_act_cache`
+    which yields ``(B, seq_len, d_in)`` full sequences. The TXC archs'
+    ``train_step`` does its own random-window extraction; the per-token
+    archs flatten ``(B, S, d)`` into ``(B*S, d)`` internally. Same
+    iterator works uniformly across families.
+    """
     spec = load_arch(arch_name, component=component)
     datasource = load_datasource(DATASOURCE)
-    d_in = int(datasource.d_in) if hasattr(datasource, "d_in") else 2304
+    d_in = int(getattr(datasource, "d_in", 2304))
     model = instantiate_arch(spec, d_in=d_in)
     model.cuda()
-
-    # Window length: per-token archs (tsae_paper) have T=1, window archs
-    # (txc_base T=5, txc_pro T_max=10) have T>1. The arch knows; ask it.
-    T = int(getattr(model, "T", arch_hparams.get("T", arch_hparams.get("T_max", 1))))
-    batch_iter = build_batch_iter(
-        act_cache_key, T=T, batch_size=training_cfg.batch_size, seed=seed,
-    )
-    log.info("[train] %s seed=%d T=%d", arch_name, seed, T)
+    log.info("[train] %s seed=%d T=%d", arch_name, seed, model.T)
+    batch_iter = batch_iter_from_act_cache(act_cache_key, seed=seed)
     result = train_sae(model, batch_iter, training_cfg)
     return result["state_dict"]
 
 
-def _make_eval_fn(*, seed: int, eval_protocol_version: str = EVAL_PROTOCOL_VERSION):
-    """Eval-fn closure: knows the seed (run-cell doesn't thread it
-    through ``eval_cfg``) so :class:`SteeringCaseStudy` can label
-    judge_outputs.jsonl entries correctly.
+def _make_eval_fn(*, seed: int, workspace: Path):
+    """Eval-fn closure: knows the seed + workspace (run_cell doesn't
+    thread either through ``eval_cfg``) so :class:`SteeringCaseStudy`
+    can persist its jsonl artifacts to the same ``run_dir(eval_key)``
+    the runner uses for ``metrics.json``.
     """
     def my_eval_fn(*, model, eval_cfg, component):  # noqa: ARG001
         arch_name: str = eval_cfg["_arch_name"]
         state_dict = eval_cfg["_state_dict"]
-        workspace = Path(eval_cfg["_workspace"])
 
         spec = load_arch(arch_name, component=component)
         datasource = load_datasource(DATASOURCE)
-        d_in = int(datasource.d_in) if hasattr(datasource, "d_in") else 2304
+        d_in = int(getattr(datasource, "d_in", 2304))
         arch = instantiate_arch(spec, d_in=d_in)
         arch.load_state_dict(state_dict)
         arch.cuda()
@@ -227,21 +188,30 @@ def run_one_cell(
     n_concepts: int,
     strengths: tuple[float, ...],
     coh_thresholds: tuple[float, ...],
+    n_steps: int | None,
+    smoke: bool,
     force_train: bool,
     force_eval: bool,
 ) -> None:
-    eval_cfg = {
+    eval_cfg: dict[str, Any] = {
         "protocol": protocol,
         "n_concepts": n_concepts,
         "strengths": list(strengths),
         "coh_thresholds": list(coh_thresholds),
     }
+    if smoke:
+        # Tagged so analysis.py can filter out smoke cells. Same
+        # convention as agent_nlp's c3 smoke rows.
+        eval_cfg["smoke"] = True
     training_cfg = runner.default_training_cfg(arch_name)
+    if n_steps is not None:
+        # Override n_steps for smoke testing. Different n_steps → different
+        # train_key → fresh checkpoint, no clash with full-sweep cells.
+        training_cfg = training_cfg.model_copy(update={"n_steps": n_steps})
     workspace, eval_key = _workspace_for(
         arch_name=arch_name, seed=seed,
         training_cfg=training_cfg, eval_cfg=eval_cfg,
     )
-    enriched_cfg = {**eval_cfg, "_workspace": str(workspace)}
     log.info(
         "[cell] arch=%s seed=%d protocol=%s eval_key=%s",
         arch_name, seed, protocol, eval_key[:16],
@@ -252,10 +222,10 @@ def run_one_cell(
         seed=seed,
         datasource_name=DATASOURCE,
         training_cfg=training_cfg,
-        eval_cfg=enriched_cfg,
+        eval_cfg=eval_cfg,                    # un-enriched; runner re-hashes this
         eval_protocol_version=EVAL_PROTOCOL_VERSION,
         train_fn=my_train_fn,
-        eval_fn=_make_eval_fn(seed=seed),
+        eval_fn=_make_eval_fn(seed=seed, workspace=workspace),
         force_train=force_train,
         force_eval=force_eval,
     )
@@ -269,6 +239,7 @@ def main(args: argparse.Namespace) -> None:
         tuple(args.coh_thresholds) if args.coh_thresholds else DEFAULT_COH_THRESHOLDS
     )
 
+    smoke = args.smoke or args.n_steps is not None
     if args.pre_test_only:
         # Fast V7 health-check: 5 concepts × 1 strength on TXC-pro seed=42.
         protocol = "v7"
@@ -279,6 +250,8 @@ def main(args: argparse.Namespace) -> None:
             n_concepts=5,
             strengths=(strengths[len(strengths) // 2],),
             coh_thresholds=coh_thresholds,
+            n_steps=args.n_steps,
+            smoke=True,                                       # pre-test ≠ paper cell
             force_train=args.force_train,
             force_eval=args.force_eval,
         )
@@ -293,6 +266,8 @@ def main(args: argparse.Namespace) -> None:
                 n_concepts=args.n_concepts,
                 strengths=strengths,
                 coh_thresholds=coh_thresholds,
+                n_steps=args.n_steps,
+                smoke=smoke,
                 force_train=args.force_train,
                 force_eval=args.force_eval,
             )
@@ -311,6 +286,13 @@ def cli() -> None:
     ap.add_argument("--coh-thresholds", type=float, nargs="*", default=None)
     ap.add_argument("--pre-test-only", action="store_true",
                     help="Health-check V7 on TXC-pro (5 concepts × 1 strength)")
+    ap.add_argument("--n-steps", type=int, default=None,
+                    help="Override TrainingConfig.n_steps (default 30k); use a "
+                         "small value (e.g. 500) for fast smoke tests. "
+                         "Implies --smoke.")
+    ap.add_argument("--smoke", action="store_true",
+                    help="Tag this cell's leaderboard row with smoke=true so "
+                         "analysis.py filters it out of paper aggregates.")
     ap.add_argument("--force-train", action="store_true")
     ap.add_argument("--force-eval", action="store_true")
     args = ap.parse_args()
