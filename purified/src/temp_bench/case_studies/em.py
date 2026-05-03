@@ -373,7 +373,12 @@ def generate_with_steering(
     with _SteeringHook(model, layer, direction, alpha):
         for _ in range(n_rollouts):
             for prompt_text, original in zip(rendered, prompts):
-                enc = tokenizer(prompt_text, return_tensors="pt").to(device)
+                # Chat template already includes the special tokens that
+                # Qwen / Llama need; don't double-add via the tokenizer.
+                enc = tokenizer(
+                    prompt_text, return_tensors="pt",
+                    add_special_tokens=False,
+                ).to(device)
                 gen = model.generate(
                     **enc,
                     max_new_tokens=max_new_tokens,
