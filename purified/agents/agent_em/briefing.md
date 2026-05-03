@@ -89,23 +89,38 @@ References:
 
 ## Current state (agent owns — overwrite at every compact)
 
-**Last verified: 2026-05-03T22:33Z**
+**Last verified: 2026-05-03T23:14Z (mid-pipeline, TXC training in progress)**
 
-- `git HEAD`: `6154aab8` Phase B (committed + pushed: SAE-arditi +
-  Bricken + qwen_em cache + abbreviated Wang + C6 entrypoint).
-  Phase A (`ae2aaf8b`) landed the architectures.
-- Last leaderboard append: (none yet — first cell still mid-run)
-- Last checkpoint saved: (none yet)
-- Active GPU lock(s): GPU 1 pinned via `CUDA_VISIBLE_DEVICES`. The
-  smoke-test process owns it; `gpu_locks` not used (single-process
-  cell, no need for the cooperative-lock dance).
+- `git HEAD`: `717f346c` (Phase A + Phase B committed + pushed —
+  10 commits today; latest: c6 analysis frontier-plot helper).
+- Last leaderboard append: `eval_key=160a1471d1a93f1b`
+  (sae_arditi 30 k cell, peak_align=81.625, peak_coh=90.92,
+  peak_alpha=-30.0, peak_feature_id=3173). Append at 23:07:40 UTC.
+- Last checkpoint saved: `train_key=926527b006dd74aa`
+  (sae_arditi 30 k, 1.34 GB, local at `checkpoints/.../model.safetensors`).
+  HF push deferred — agent_em hasn't wired the persistent-pod auto-push
+  yet; flag for post-pipeline.
+- Active GPU lock(s): GPU 1 pinned via `CUDA_VISIBLE_DEVICES=1` (set
+  by `set_agent_env.sh agent_em`). Pipeline process owns it.
 - Recent decisions in scope: #2, #4, #6, #7
-- In flight: smoke-test process (PID 18719 as of 22:33) running
-  `experiments.c6_em.run --smoke-test --archs sae_arditi` on GPU 1.
-  Currently downloading/loading Qwen-2.5-14B-Instruct for the
-  activation-cache build (~28 GB; ~5–10 min over the network). Log:
-  `logs/smoke_sae_arditi_1k.log`. Monitor armed for "loss=" /
-  "step" / "Error" / "OOM" lines.
+- In flight: pipeline process (PID 23080, ~16 min elapsed) running
+  TXC-base + brickenauxk_a8 training. Started 23:07:40, ETA ~23:25.
+  Log: `logs/full_run.log`. Monitor `bjgomiqk3` armed; wait-loop
+  `bf752xc7z` waiting for TXC `done in 30000` (single completion
+  notification). After training: TXC Wang 9 min, then leaderboard
+  append, then `bash scripts/c6_render_and_push.sh` populates c6.md
+  AUTO-RESULTS + commits + pushes.
+
+**SAE-arditi C6 frontier (full Wang minimal, 18 cells):**
+
+| feature_id | α=-30 | α=-10 | α=-3 | α=+1 | α=+3 | α=+10 |
+|---|---:|---:|---:|---:|---:|---:|
+| 16669 (Δz̄=0.21) | 76.30 | 67.72 | 69.77 | 68.19 | 68.88 | 74.75 |
+| 17887 (Δz̄=0.15) | 76.09 | 71.97 | 77.11 | 72.75 | 72.94 | 73.25 |
+| **3173** (Δz̄=0.04) | **81.62** ⭐ | 72.73 | 72.77 | 71.88 | 65.52 | 65.11 |
+
+Peak: feat 3173 α=-30 → align=81.62, coh=90.92.
+Cohs hold ≥87 throughout. Stage 4 ran in 8 min (batched generation).
 
 ## What I just did (agent owns — overwrite)
 
