@@ -413,15 +413,14 @@ above. Han can override any of them by:
 
 New open questions surfaced this session:
 
-1. **Probe cache HF push.** Once the 38-task probe cache is built
-   (~70-90 GB), should we push it to `han1823123123/temp-bench-data`
-   (path `probe_cache/<datasource_name>/`)? Trade-off:
-   - PRO: agent_steer / agent_back can sync from HF instead of
-     re-tokenising 38 tasks; saves ~10 min per ephemeral pod.
-   - CON: 70-90 GB push at 256 MB/s = ~5-6 min one-time cost.
-   - Default if Han doesn't say: I'll push since the upload is one-time
-     and the saved time is per-pod-restart (likely several over the
-     remaining sprint).
+1. ~~Probe cache HF push.~~ DONE 2026-05-03T23:03Z. Pushed
+   `probe_cache/gemma_2_2b_it_l13_fineweb_24k128/` (38 tasks ×
+   5 files = 190 files, ~80 GB) to
+   `han1823123123/temp-bench-data` at 3.4 GB/s. agent_steer and
+   any future ephemeral pod can sync via `huggingface-cli download
+   han1823123123/temp-bench-data --repo-type dataset --include
+   'probe_cache/gemma_2_2b_it_l13_fineweb_24k128/*'` to skip the
+   ~10 min retokenize.
 
 2. **What happens if mean_auc is far from Phase 7 reference?** Phase 7
    leaderboard has `txc_bare_antidead_t5 k=20 = 0.9127` (BASE side).
