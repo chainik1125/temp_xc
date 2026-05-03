@@ -25,13 +25,15 @@ verifies the pinning).
 | **agent_em_h200** (fallback) | H200 | 0 (only GPU) | 141 GB | persistent | C6 if R32 blows H100 | n/a | dormant |
 
 The **4× A40 pod has 2 named agents + 2 spare GPU slots** (GPUs 2 and 3).
-Spare slots are not owned by a named agent. The lead agent on either
-component may launch a second process on a spare GPU to run a cell in
-parallel — for example, agent_steer could run seed=42 on GPU 0 and
-seed=1 on GPU 2 simultaneously by launching two processes with
-different ``CUDA_VISIBLE_DEVICES``. We add a named agent to a spare
-slot only if a concrete need emerges that the existing roster can't
-cover.
+Spare slots form a **pool** — any agent may claim them via
+``temp_bench.utils.gpu_locks.claim_gpu(idx)`` (lockfile-coordinated).
+The lead agent on either component may launch a second/third process
+on pool GPUs to run cells in parallel — for example, agent_steer could
+run seed=42 on GPU 0 and seed=1 on GPU 2 simultaneously by claiming
+GPU 2 from the pool and launching a second process with
+``CUDA_VISIBLE_DEVICES=2``. See PROTOCOL.md § 11.1 for the full
+contract; ``docs/paper/hardware.md`` § *Multi-GPU access* for the
+worked example.
 
 Pod sharing keeps activation caches and checkpoints on the same volume
 (zero cross-pod transfer cost when an agent on the same pod needs an

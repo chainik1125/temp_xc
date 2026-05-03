@@ -52,25 +52,40 @@ TQDM_DISABLE=1 .venv/bin/python -m pytest tests/ -q 2>&1 || {
     exit 1
 }
 
-# 4. preflight — GPU pinning + arch class imports + datasources
+# 4. preflight — GPU pinning + arch class imports + GPU lock cleanup
 echo
 echo "[smoke] runner preflight…"
 TQDM_DISABLE=1 .venv/bin/python -c "
 from temp_bench.runner import preflight
+from temp_bench.utils.gpu_locks import gpu_lock_status
+
 warns = preflight()
 critical = [w for w in warns if w.startswith('CRITICAL')]
-gaps = [w for w in warns if not w.startswith('CRITICAL')]
+infos = [w for w in warns if w.startswith('INFO')]
+gaps = [w for w in warns if not (w.startswith('CRITICAL') or w.startswith('INFO'))]
 if critical:
     print('✗ CRITICAL preflight failures:')
     for w in critical:
         print(f'   - {w}')
     raise SystemExit(1)
-if not warns:
-    print('✓ preflight clean')
+for w in infos:
+    print(f'  ℹ  {w}')
+if not gaps:
+    print('✓ preflight clean (modulo expected gaps)')
 else:
     print(f'⚠  preflight reports {len(gaps)} expected gaps (architectures not yet implemented):')
     for w in gaps:
         print(f'   - {w}')
+
+# Surface the current lock state so an agent knows what's claimed
+status = gpu_lock_status()
+if status:
+    print(f'  GPU lock state ({len(status)} held):')
+    for idx, info in sorted(status.items()):
+        if info:
+            print(f'   GPU {idx}: {info[\"agent\"]} (PID {info[\"pid\"]}, since {info[\"claimed_ts\"]})')
+else:
+    print('  GPU locks: none held')
 "
 
 echo

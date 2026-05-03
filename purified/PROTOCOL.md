@@ -201,6 +201,78 @@ The pinning makes every shared-pod cell run on a single, stable GPU.
 Re-running yields the same outputs (modulo cuDNN nondeterminism, which
 is suppressed by `set_seed(deterministic=True)`).
 
+## 11.1 Multi-GPU access (Primary + Pool protocol)
+
+When N named agents share a pod with M ≥ N GPUs, each agent has one
+**primary** GPU (always owned, pinned by `set_agent_env.sh`). Remaining
+GPUs form a **pool** that any agent may claim via the
+`temp_bench.utils.gpu_locks` lockfile manager.
+
+For the 4× A40 pod (2 named agents):
+- **Primary (reserved):** agent_steer = GPU 0; agent_back = GPU 1.
+- **Pool (shared):** GPUs 2 and 3.
+
+For the 2× H100 pod (2 named agents): no pool — each agent's primary
+IS its only GPU. Multi-GPU not applicable here.
+
+### Claiming a pool GPU
+
+```python
+from temp_bench.utils.gpu_locks import claim_gpu, claim_gpus
+import os, subprocess
+
+# Single spare claim
+with claim_gpu(2, note="C5 seed-1 parallel"):
+    env = {**os.environ, "CUDA_VISIBLE_DEVICES": "2", "AGENT_NAME": "agent_steer"}
+    subprocess.run(["python", "-m", "experiments.c5_steering.run", "--seeds", "1"], env=env)
+
+# Multi-GPU claim (atomic — all or nothing)
+with claim_gpus([2, 3], note="C5 seeds 1+2 parallel"):
+    procs = []
+    for gpu, seed in [(2, 1), (3, 2)]:
+        env = {**os.environ, "CUDA_VISIBLE_DEVICES": str(gpu), "AGENT_NAME": "agent_steer"}
+        procs.append(subprocess.Popen(["python", "-m", "experiments.c5_steering.run", "--seeds", str(seed)], env=env))
+    for p in procs:
+        p.wait()
+```
+
+Each subprocess passes preflight because each sees exactly one GPU.
+The parent agent's role is coordination (claim → launch → wait → release).
+
+### Why Primary + Pool, not strict modulo
+
+Pure modulo partitioning (steer = {0, 2}, back = {1, 3}) is too rigid:
+if agent_back finishes early, GPUs 1+3 sit idle while agent_steer
+crawls. Primary + Pool keeps each agent's primary inviolable while
+letting either claim spare capacity opportunistically.
+
+### Hard rules
+
+1. **Never use another agent's primary.** Pool only.
+2. **Always claim before pinning.** Launching with
+   `CUDA_VISIBLE_DEVICES=2` without `claim_gpu(2)` first is a
+   PROTOCOL.md § 11.1 violation — silent contention.
+3. **Use `claim_gpus(...)` for multi-claim**, not nested `claim_gpu`s.
+   The atomic version sorts indices and releases everything if any
+   claim fails — eliminates deadlocks where two agents hold one of
+   each other's targets.
+4. **Lock files are best-effort coordination.** A misbehaving agent
+   that ignores claims will collide. The framework gives you visible,
+   debuggable failure when locks are honored.
+5. **Stale locks auto-reclaim.** If a previous pod crashed mid-claim,
+   `cleanup_stale()` (run by the smoke test) GCs locks whose PID is
+   no longer alive.
+
+### Multi-GPU is multi-process, not multi-CUDA-device
+
+Our "no DDP" decision (`docs/paper/hardware.md` § Single-GPU vs
+multi-GPU) means: to use N GPUs, an agent launches N subprocesses,
+each with `CUDA_VISIBLE_DEVICES=<single_idx>`. The parent process
+never sees more than one GPU — `runner.preflight()` would warn if it
+did. The lock manager prevents two agents from racing for the same
+spare; the per-process pinning prevents subtler cross-agent CUDA
+contention.
+
 ## 11. Framework discipline (load-bearing — do not deviate)
 
 These rules exist because a 72-hour, 7-component, 5-agent paper cannot

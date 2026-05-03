@@ -110,14 +110,57 @@ Rationale (specific to our workload):
   new framework code that buys nothing for our cells.
 
 The framework's `runner.run_cell` therefore expects exactly one
-visible GPU (verified by `preflight()`). Multi-GPU is forbidden, not
-unsupported — `CUDA_VISIBLE_DEVICES` is single-valued in
-`scripts/set_agent_env.sh`. The A40 pod has 2 named agents
-(agent_steer on GPU 0, agent_back on GPU 1) + 2 spare GPU slots
-(GPUs 2 and 3) reachable via `a40_helper_gpu2` and `a40_helper_gpu3`
-in the env script. Lead agents launch helper processes on spare GPUs
-when they want to parallelize across seeds — no new named agent
-needed unless the work requires its own briefing and log.
+visible GPU (verified by `preflight()`). DDP/FSDP is forbidden inside
+a single process; **multi-GPU work is multi-process** — see *Multi-GPU
+access* below for the protocol.
+
+## Multi-GPU access (Primary + Pool)
+
+When an agent wants to use more than one GPU on its pod, it does so
+by launching multiple subprocesses, each pinned to a single GPU. The
+parent agent uses lockfiles (`temp_bench.utils.gpu_locks`) to
+coordinate access to **pool** GPUs (those not designated as another
+named agent's primary).
+
+For the 4× A40 pod:
+
+| GPU | Owner | Pool? |
+|---|---|---|
+| 0 | agent_steer (primary) | no |
+| 1 | agent_back (primary) | no |
+| 2 | unowned | yes |
+| 3 | unowned | yes |
+
+Worked example — agent_steer runs 3 seeds in parallel:
+
+```python
+from temp_bench.utils.gpu_locks import claim_gpus
+import os, subprocess
+
+with claim_gpus([2, 3], agent="agent_steer", note="C5 3-seed parallel"):
+    procs = []
+    for gpu, seed in [(0, 42), (2, 1), (3, 2)]:        # GPU 0 is steer's primary
+        env = {**os.environ, "CUDA_VISIBLE_DEVICES": str(gpu),
+               "AGENT_NAME": "agent_steer", "TEMP_BENCH_POD_MODE": "ephemeral"}
+        procs.append(subprocess.Popen(
+            ["python", "-m", "experiments.c5_steering.run", "--seeds", str(seed)],
+            env=env,
+        ))
+    for p in procs:
+        p.wait()
+# pool GPUs released here
+```
+
+Each subprocess passes preflight (sees one GPU). The lockfile
+prevents agent_back from also claiming GPU 2 simultaneously; if it
+tries while agent_steer holds the lock, agent_back gets an explicit
+RuntimeError ("GPU 2 held by agent_steer (PID …) since …") rather
+than a silent VRAM collision.
+
+If agent_back finishes its assigned work and wants to help with C5
+cells, it can claim spare GPUs the same way — the named-agent boundary
+is about ownership of leaderboard rows (and primary GPUs), not a
+strict per-component partition.
 
 ## Pod modes — persistent vs ephemeral
 
