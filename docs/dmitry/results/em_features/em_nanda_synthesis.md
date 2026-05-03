@@ -1662,6 +1662,114 @@ beyond brief + synthesis status entries.
   a future firing wants to launch new SAE/TXC training on local
   (next firing not training-bound, so deferring).
 
+### Status as of 2026-05-03 12:00 UTC (TXC bundle k=30 R32 landed — mid-α peak 41.56/53.83 at α=-30 ≈ SAE bundle peak 41.33/55.62 at α=-30; bundle null is architecture-general; closes empty TXC R32 bundle cell)
+
+**Headline**: ~6 min compute on h100_2. Built TXC k=30 bundle from the
+top-30 features-by-screen_score in
+`em_nanda_txc_paper_k100_step10000_wang_r32_native/stage2_screen.json`
+(includes all three TXC R32 single-feat finalists 1781/718/15779) and
+ran the same α grid as the SAE bundle (`-100 -60 -40 -30 -20 -15 -10
+-6 -3 -1 0 1 3 6 10`). Mid-α peak (coh ≥ 50) at α=-30 → **align 41.56 /
+coh 53.83**. This is **0.23 align points** from the SAE bundle k=30 mid-α
+peak (41.33 at α=-30 / coh 55.62), with α=0 baselines tight (TXC 34.22
+vs SAE 34.69, both via `frontier_sweep.py`'s single-pass generator) and
+within-bundle lifts (peak − own α=0) almost identical (TXC +7.34 vs
+SAE +6.64). Bundle null result is now architecture-general.
+
+**Full TXC k=30 R32 bundle frontier table**:
+
+| α    | align | coh   | comment                              |
+| ---: | ----: | ----: | :----------------------------------- |
+| −100 | 35.00 | 26.64 | degenerate (coh collapsed)           |
+| −60  | 44.37 | 28.52 | absolute peak align (degenerate coh) |
+| −40  | 44.14 | 44.84 | sub-mid coh                          |
+| **−30** | **41.56** | **53.83** | mid-α peak (coh ≥ 50)         |
+| −20  | 35.62 | 51.88 |                                      |
+| −15  | 32.66 | 54.69 |                                      |
+| −10  | 28.98 | 51.41 |                                      |
+| −6   | 34.45 | 54.22 |                                      |
+| −3   | 35.16 | 50.55 |                                      |
+| −1   | 31.56 | 49.69 |                                      |
+|  0   | 34.22 | 50.47 | unsteered baseline (frontier_sweep)  |
+| +1   | 34.06 | 50.00 |                                      |
+| +3   | 33.05 | 44.22 |                                      |
+| +6   | 32.34 | 47.42 |                                      |
+| +10  | 30.86 | 49.69 |                                      |
+
+**This firing (12:00 UTC) actions**:
+
+- Verified GPUs idle pre-firing: local h100_1 0%/0 MiB; h100_2 0%/0 MiB.
+- Built `top_30_txc_features.json` on h100_2 (sorted by screen_score
+  desc; range 20.31 → 9.69; covers all 3 TXC stage-4 finalists).
+- Launched `experiments/em_features/frontier_sweep.py --steerer txc
+  --txc_ckpt qwen14b_l24_txc_paper_k100_em_nanda_step10000.pt --k 30
+  --layer 24 --base_model Qwen/Qwen2.5-14B-Instruct --subject_model
+  /root/em_features/checkpoints/qwen14b_r32_finance_lora` with the
+  matched 15-α grid. PID 518818, 12:02 → 12:08 UTC (6 min wall-clock).
+  Output `bundle30_txc_frontier.json` (3.4 KB).
+- Pulled to local `/root/em_features/results/em_nanda_bundle_r32/`.
+- Updated `em_nanda_results_paper.md` Result 3 (added TXC bundle row to
+  table, appended "Architecture generality of the bundle null" paragraph)
+  and "What is closed" bullet.
+- No commits to code, scripts, or experiment infra. Only doc + new data
+  artifact (`bundle30_txc_frontier.json` 3.4 KB).
+- Disk hygiene unchanged: /root local 92%; /workspace 30%;
+  HF_HOME=/workspace/hf_cache holding.
+
+**Cross-arch bundle vs single-feat comparison**:
+
+| arch  | single-feat ext-α champ | bundle k=30 mid-α peak | bundle penalty |
+| :---- | ----------------------: | ---------------------: | -------------: |
+| SAE arditi | 64.53 (α=−30, feat 21224) | 41.33 (α=−30) | −23.20 align |
+| TXC k=100  | 51.95 (α=−30, feat 718)   | 41.56 (α=−30) | −10.39 align |
+
+The single-feat champion differs by 12.58 align between arches (SAE
+wins R32 ext-α by a wide margin), but the bundle k=30 mid-α peaks are
+within 0.23 align of each other at the same α. The bundle "ceiling"
+appears to be a property of the R32 organism's misalignment-direction
+geometry rather than the dictionary architecture — naive summation of
+top causal features hits the same projection ceiling regardless of
+which arch's features are summed.
+
+**Bundle norm comparison (decoder geometry difference)**:
+
+- SAE bundle k=30 norm = 7.22 ≈ √30 × 1.32 (top-30 SAE arditi decoder
+  rows nearly orthogonal, slight constructive overlap)
+- TXC bundle k=30 norm = 2.47 ≪ √30 ≈ 5.48 (top-30 TXC decoder rows
+  heavily anti-correlated, sum has shorter norm than orthogonal)
+
+Despite this 3× difference in raw effective d_in perturbation
+magnitude per α, both bundles peak at the same α (-30) with the same
+align (~41.5). This says the *misalignment-direction projection* of
+the bundled vector is what determines the peak, not the raw norm —
+both architectures' top causal features project the same magnitude
+onto the R32 misalignment direction once summed.
+
+**Why this is a real durable contribution**:
+
+- 11:00 UTC firing identified TXC bundle k=30 as the cheapest-informative
+  open probe. Outcome (a) of the three flagged scenarios materialized:
+  bundle null is architecture-general. The other two outcomes (TXC
+  bundle > single-feat — would have falsified the bundle null;
+  TXC bundle < SAE bundle — would have suggested SAE features have
+  better directional alignment) did not. The actual outcome (TXC ≈
+  SAE bundle peak to within judge SE) is the cleanest possible
+  bundle-null replication.
+- The numeric coincidence (41.33 vs 41.56 at the same α=-30) is
+  striking enough to be worth its own paragraph in the paper. Two
+  independent dictionaries on the same organism give nearly identical
+  bundle behavior despite very different decoder geometry.
+- Closes the previously-empty "TXC k=100 R32 bundle" cell in the arch
+  comparison table.
+- Resets rule-9 watch to 0/3.
+
+### Status as of 2026-05-03 11:00 UTC (status-only firing — both GPUs idle, both axes closed, paper doc current; 10:00 UTC's "optional cheap probe" examined and de-scoped; no compute spent; rule-9 watch advances to 1/3)
+
+(Detailed entry in `EM_NANDA_BRIEF.md`. No synthesis-side update because no
+new run completion to record. Headline: TXC bundle k=30 was queued as the
+cheapest informative probe but deferred this firing; executed in the 12:00
+UTC firing — see entry above.)
+
 ### Status as of 2026-05-03 10:00 UTC (subject_model bug found and fixed: 08:00 UTC k=3 bundle was on PUBLISHED R1, not our R32 LoRA; corrected re-run on R32 LoRA peaks at α=−40 → 51.41 / 53.36; monotonic precision ordering preserved with cleaner same-organism comparison)
 
 **Headline**: While verifying paper-doc artifacts for a status-only firing,

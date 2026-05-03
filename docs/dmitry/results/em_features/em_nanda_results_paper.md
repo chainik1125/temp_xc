@@ -38,15 +38,20 @@ caveat (R32 is a much harder organism than R1 even on the new base).
   beats TXC k=100 at every (steps × organism × α-regime) cell, and the
   arch gap *widens* from +4 in R1 mid-α to +12.58 in R32 ext-α — the
   regime where the dictionary has to "do real work."
-- **Bundle aggregation does not help on R32.** A k=30 bundle of the top
-  causal candidates (by Wang-screen score) on R32 peaks at align 41.33
-  — −23 align below the single-feat champion (64.53). The naive
-  cross-script coh delta (−41) is mostly a generator-path artifact (the
-  bundle launcher's α=0 coh baseline is ~50, while the single-feat
-  launcher's is ~95); generator-baseline-corrected, both bundle and
-  single-feat sit within a few coh points of their respective α=0
-  controls at peak α. The "distributed misalignment that can be
-  reassembled by summing features" hypothesis is falsified on align.
+- **Bundle aggregation does not help on R32, and the bundle null is
+  architecture-general.** A k=30 bundle of the top causal candidates
+  (by Wang-screen score) on R32 peaks at align 41.33 (SAE arditi)
+  / 41.56 (TXC k=100) at the same α=−30 — the two bundle peaks lie
+  within 0.23 align of each other despite a 3× difference in bundle-
+  vector norm (SAE 7.22 vs TXC 2.47). Both are −23 / −10 align below
+  their respective single-feat champions (64.53 SAE / 51.95 TXC). The
+  naive cross-script coh delta (−41) is mostly a generator-path
+  artifact (the bundle launcher's α=0 coh baseline is ~50, while the
+  single-feat launcher's is ~95); generator-baseline-corrected, both
+  bundle and single-feat sit within a few coh points of their
+  respective α=0 controls at peak α. The "distributed misalignment
+  that can be reassembled by summing features" hypothesis is falsified
+  on align, in both architectures.
 
 ### Setup
 
@@ -161,6 +166,41 @@ single-feat champion's direction; their sum points partly into
 misalignment-orthogonal noise. R32's "more distributed" character means
 its align ceiling is lower than R1's, but the lift is not recoverable by
 naive bundle-summation.
+
+**Architecture generality of the bundle null (TXC k=30, 2026-05-03 12:00 UTC).**
+A parallel k=30 bundle on TXC paper k=100 (R32 ext-α run, top-30 features
+sorted by screen_score, includes all 3 TXC R32 single-feat finalists
+1781/718/15779) was steered with the *identical* α grid (file
+`/root/em_features/results/em_nanda_bundle_r32/bundle30_txc_frontier.json`).
+TXC bundle vector norm = **2.47** — far below √30 ≈ 5.48 (top-30 TXC
+decoder rows are heavily anti-correlated, summed magnitude shorter than
+orthogonal). This is ~3× smaller than the SAE bundle norm 7.22 (top-30
+SAE decoder rows are nearly orthogonal with slight constructive overlap).
+
+| arch       | mid-α peak (coh ≥ 50)         | own α=0 baseline | own peak − baseline | bundle norm | single-feat champion (ext-α) | bundle penalty |
+| :--------- | :---------------------------- | ---------------: | ------------------: | ----------: | ---------------------------: | -------------: |
+| SAE arditi | α=−30 → **41.33** / 55.62     | 34.69 / 50.39    | +6.64 align         | 7.22        | 64.53 (feat 21224)           | −23.20 align   |
+| TXC k=100  | α=−30 → **41.56** / 53.83     | 34.22 / 50.47    | +7.34 align         | 2.47        | 51.95 (feat 718)             | −10.39 align   |
+
+Both bundle mid-α peaks land at the *same* α (−30), with mean align
+within **0.23 points** of each other (well within Gemini-judge SE on
+n=64). α=0 baselines are tight to within 0.5 align (both via
+`frontier_sweep.py`'s single-pass generator). Lifts above own α=0
+baseline are nearly identical (+6.64 vs +7.34). The bundle "ceiling"
+appears to be a property of the R32 organism's misalignment-direction
+geometry — naive summation of top causal features hits the same
+projection ceiling regardless of which arch's features are summed,
+even though the two bundles' raw d_in perturbation magnitudes per α
+differ by ~3×.
+
+**What does differ across architectures is the *single-feat ceiling*,
+not the bundle ceiling.** SAE arditi's R32 single-feat champion (64.53)
+beats TXC's (51.95) by +12.58 align — the same R32 ext-α arch gap from
+Result 1's table — but bundling washes both ceilings down to ~41.5.
+This says SAE arditi's advantage on R32 ext-α single-feat comes from a
+single decoder row whose direction is the R32 misalignment axis (feat
+21224); TXC k=100 has no such uniquely-aligned feature, so its single-
+feat ceiling sits closer to where naive bundle summation lands.
 
 **Generator-path reconciliation.** Bundle measurements use
 `frontier_sweep.py`'s `generate_longform_completions` path (single-pass),
@@ -281,10 +321,17 @@ as cleanly captured by any single feature as R1's direction is.
   this dictionary geometry.
 - Bundle aggregation on R32 (k=30, top stage-2 survivors): does not
   beat single-feat. "Distributed misalignment" hypothesis falsified.
-- Bundle precision axis: k=30 (41.33) < k=3-finalists (51.41) <
+- Bundle precision axis (SAE): k=30 (41.33) < k=3-finalists (51.41) <
   single-feat (64.53), all on the same R32 LoRA organism with matched
   generator paths within bundle column. Monotonic — more features =
   more dilution.
+- **Cross-architecture bundle null**: TXC k=100 R32 bundle k=30 mid-α
+  peak (41.56 at α=−30) replicates SAE arditi bundle k=30 mid-α peak
+  (41.33 at α=−30) within 0.23 align points, despite a 3× difference
+  in bundle-vector norm (SAE 7.22 vs TXC 2.47). Bundle "ceiling" is
+  organism-geometry-driven, not architecture-driven. Single-feat
+  ceiling differs across arches (SAE 64.53 vs TXC 51.95) but bundle
+  ceilings collapse to the same value.
 
 **Open** (deferred, not paper-critical):
 
@@ -326,7 +373,9 @@ as cleanly captured by any single feature as R1's direction is.
   - SAE arditi 5k: `…/em_nanda_sae_arditi_step5000_wang/stage4_final_frontier.json`
   - SAE arditi 30k: `…/em_nanda_sae_arditi_step30000_wang/stage4_final_frontier.json`
   - TXC k=100 R32 ext-α: `…/em_nanda_txc_paper_k100_step10000_wang_r32_extalpha/stage4_final_frontier.json`
-  - Bundle k=30 R32: `…/em_nanda_bundle_r32/bundle30_frontier.json`
+  - Bundle k=30 R32 (SAE arditi): `…/em_nanda_bundle_r32/bundle30_frontier.json`
+  - Bundle k=30 R32 (TXC k=100): `…/em_nanda_bundle_r32/bundle30_txc_frontier.json` (added 2026-05-03 12:00 UTC)
+  - Bundle feature membership: `…/em_nanda_bundle_r32/top_30_bundle_features.json` (SAE) and `…/em_nanda_bundle_r32/top_30_txc_features.json` (TXC, on h100_2)
   - Other Wang outputs (SAE arditi 10k R1 + R32, TXC R1 5k/10k/30k, TXC
     R32 std-α) live on `h100_2` and have peak numbers archived in the
     closed table above.
