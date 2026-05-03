@@ -29,5 +29,28 @@ from temp_bench.data.nlp.cache import (
     batch_iter_from_act_cache,
     build_activation_cache,
 )
+from temp_bench.data.nlp.probe_cache import (
+    build_probe_cache,
+    list_probe_cache,
+    load_probe_cache,
+    probe_cache_dir,
+)
+from temp_bench.data.nlp.probe_tasks import (
+    ProbingTask,
+    load_all_crosstoken_tasks,
+    load_all_probing_tasks,
+    load_all_saebench_ct_tasks,
+)
 
-__all__ = ["build_activation_cache", "batch_iter_from_act_cache"]
+__all__ = [
+    "ProbingTask",
+    "batch_iter_from_act_cache",
+    "build_activation_cache",
+    "build_probe_cache",
+    "list_probe_cache",
+    "load_all_crosstoken_tasks",
+    "load_all_probing_tasks",
+    "load_all_saebench_ct_tasks",
+    "load_probe_cache",
+    "probe_cache_dir",
+]
