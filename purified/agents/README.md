@@ -36,15 +36,30 @@ are shared across both clones, so each agent only pays ~5 GB extra
 disk for the second working tree (out of 1 TB).
 
 The **4× A40 pod has 2 named agents + 2 spare GPU slots** (GPUs 2 and 3).
-Spare slots form a **pool** — any agent may claim them via
-``temp_bench.utils.gpu_locks.claim_gpu(idx)`` (lockfile-coordinated).
-The lead agent on either component may launch a second/third process
-on pool GPUs to run cells in parallel — for example, agent_steer could
-run seed=42 on GPU 0 and seed=1 on GPU 2 simultaneously by claiming
-GPU 2 from the pool and launching a second process with
-``CUDA_VISIBLE_DEVICES=2``. See PROTOCOL.md § 13 for the full
-contract; ``docs/paper/hardware.md`` § *Multi-GPU access* for the
-worked example.
+Spare slots form a **pool** — used not by the agent's own python
+process (which stays pinned to its primary GPU and CANNOT see pool
+GPUs at all), but by **subprocesses the agent launches** with their
+own env. Pattern:
+
+```python
+# In agent_steer's process (pinned to GPU 0):
+from temp_bench.utils.gpu_locks import claim_gpu
+import os, subprocess
+
+with claim_gpu(2, note="C5 seed-1 parallel"):
+    env = {**os.environ, "CUDA_VISIBLE_DEVICES": "2", "AGENT_NAME": "agent_steer"}
+    subprocess.run(["python", "-m", "experiments.c5_steering.run", "--seeds", "1"], env=env)
+```
+
+The agent's own process never relaxes its primary pin —
+`claim_gpu(idx)` is a lockfile that coordinates which agent's
+subprocess gets which pool GPU, preventing two subprocesses from
+both targeting GPU 2. Concrete example: agent_steer runs seed=42 on
+its primary GPU 0 (in the agent's own process) AND seed=1 on pool
+GPU 2 (in a subprocess) simultaneously — two GPUs of work, but the
+agent's process still only sees GPU 0. See PROTOCOL.md § 13 for the
+full contract; ``docs/paper/hardware.md`` § *Multi-GPU access* for
+the worked example.
 
 Pod sharing keeps activation caches and checkpoints on the same volume
 (zero cross-pod transfer cost when an agent on the same pod needs an
