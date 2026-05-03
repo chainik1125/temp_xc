@@ -106,6 +106,31 @@ to any single architecture.
 | TFA | 14/30 | 12/30 |
 | MLC | 22/30 | 24/30 |
 
+## Flip matrices (per-arch, at peak magnitude)
+
+The 2×2 confusion of correctness from unsteered → steered, per architecture,
+at each arch's per-arch best magnitude (= argmax of `n_ic - n_ci`). Cells
+annotated with raw counts and within-row proportions. Diagonal cells (cc, ii)
+are no-change; off-diagonals are the interesting ones — `n_ic` is rescues
+(below diagonal, lower-left), `n_ci` is regressions (upper-right).
+
+5-arch headline:
+
+![Flip matrix grid — headline (5 archs)](images_b/np_flip_matrix_grid_headline.png)
+
+6-arch appendix (adds TXC-H8):
+
+![Flip matrix grid — appendix (6 archs)](images_b/np_flip_matrix_grid_appendix.png)
+
+For reference, the same plot at fixed magnitude = 0 (control / no
+steering) and fixed magnitude = +8 (where everyone starts to break):
+
+![Flip matrix @ mag=0 (control)](images_b/np_flip_matrix_grid_at_mag_0.png)
+
+![Flip matrix @ mag=+8](images_b/np_flip_matrix_grid_at_mag_p8.png)
+
+Source: `results/ward_backtracking_txc/b3_math500_cut25/flip_matrix_grid_*.png`.
+
 ## Detection probe (Fig 4b in main text)
 
 Sparse linear probes (`sklearn.LogisticRegression(solver=liblinear)`)

@@ -184,7 +184,8 @@ def _log_filename(arch: str, hookpoint_key: str, k_per_position: int | None = No
 def _train_one(arch: str, hookpoint: dict, cfg: dict,
                *, k_per_position_override: int | None = None,
                seed_override: int | None = None,
-               cell_naming: bool = False) -> dict:
+               cell_naming: bool = False,
+               train_steps_override: int | None = None) -> dict:
     """Train one cell. Skips silently if checkpoint exists.
 
     Paper-budget callers (evaluate_cell, hill_climb) pass k_per_position_override
@@ -273,7 +274,8 @@ def _train_one(arch: str, hookpoint: dict, cfg: dict,
         lr=float(txc_cfg["learning_rate"]),
         betas=(0.9, 0.999),
     )
-    n_steps = int(txc_cfg["train_steps"])
+    n_steps = int(train_steps_override if train_steps_override is not None
+                  else txc_cfg["train_steps"])
     log_interval = int(txc_cfg["log_interval"])
 
     history: list[dict] = []
@@ -410,6 +412,9 @@ def main(argv=None):
                    help="override k_per_position (paper-budget filename used)")
     p.add_argument("--seed", type=int, default=None,
                    help="override seed (paper-budget filename used)")
+    p.add_argument("--train-steps", type=int, default=None,
+                   help="override txc.train_steps (e.g. extend a cell that hit "
+                        "the hard cap without plateauing under early-stop)")
     args = p.parse_args(argv)
 
     cfg = yaml.safe_load(args.config.read_text())
@@ -424,7 +429,8 @@ def main(argv=None):
         log.info("=" * 70); log.info("[cell=%s]", cell.id)
         _train_one(cell.arch, all_hp[cell.hookpoint_key], cfg,
                    k_per_position_override=cell.k_per_position,
-                   seed_override=cell.seed, cell_naming=True)
+                   seed_override=cell.seed, cell_naming=True,
+                   train_steps_override=args.train_steps)
         return 0
 
     hookpoints = [hp for hp in cfg["hookpoints"] if hp.get("enabled", True)]
@@ -446,6 +452,7 @@ def main(argv=None):
                 k_per_position_override=args.k_per_position,
                 seed_override=args.seed,
                 cell_naming=cell_naming,
+                train_steps_override=args.train_steps,
             ))
     log.info("[done] %d (arch, hookpoint) cells trained", len(summary))
     return 0
