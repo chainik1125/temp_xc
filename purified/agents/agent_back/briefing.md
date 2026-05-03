@@ -138,23 +138,36 @@ References:
   `results/act_cache/fb2a74be884e512a/resid_post_L10.npy`
   (4.24 GB float16, shape (4044, 128, 4096), sample norm 7.289,
   finite=True). Auto-pushed to HF temp-bench-data.
-- **Sentence-acts extraction (mining + PR-AUC prereq)**: IN FLIGHT
-  in background (PID 9356, started ~22:11). Will produce
-  `results/c7_backtracking/stage_a/sentence_acts_L10.npz` with
-  ~25K sentences × 6 (T) × 4096 fp32. ~30 min ETA.
+- **Sentence-acts extraction (mining + PR-AUC prereq)**: BUILT +
+  PUSHED ✓ at `results/c7_backtracking/stage_a/sentence_acts_L10.npz`
+  (1.1 GB compressed, 25204 sentences × 6 (T) × 4096 fp32, 12.6%
+  positive class — matches Aniket's documented 12%). HF backup at
+  `c7_backtracking/stage_a/sentence_acts_L10.npz` on temp-bench-data.
 - **Arches available** (3 of 7): topk_sae, tsae_paper, txc_base —
   all instantiate cleanly at d_sae=32768 (268M / 268M / 1.34B
   params respectively). Still gated on agent_paper: stacked_sae,
-  tfa, tfa_pos, mlc, sae_arditi, txc_pro.
-- **Pipeline smoke-tested**: 50-step train on topk_sae succeeded
-  (loss values stabilising, state_dict keys correct). Eval pipeline
-  is ready except needs sentence-acts extraction to finish.
-- Last leaderboard append: none yet (no full cells run).
-- Last checkpoint saved: none yet.
-- Active GPU lock(s): GPU 1 implicit (sentence-acts extraction).
+  tfa, tfa_pos, mlc, txc_pro. (sae_arditi is C6-only.)
+- **End-to-end smoke validated** (eval_key=`a9b4ea184f7a477a`,
+  topk_sae × seed=42 × 500-step train × {-8, 0, +8} mags):
+  - delta_gc_peak = +0.131 at mag=+8.0 (small — 500 steps is random)
+  - delta_gc_mag_-8.0 = -0.066, mag_0 = 0
+  - pr_auc_S{1,2,4,8,16,32} = (0.155, 0.187, 0.196, 0.215, 0.228, 0.238)
+  - 183 Sonnet judge calls persisted, leaderboard row appended.
+  - Smoke artifacts cleaned (`results/runs/topk_sae/` removed) so
+    production starts with clean state.
+- **Production sweep RUNNING** (PID 15528 from
+  `bash scripts/c7_run_sweep.sh`). archs=(topk_sae, tsae_paper,
+  txc_base) × seed=42 × 25 mags. Default training (n_steps=30000).
+  Per-cell wall ~100 min, total ~5 hours. Logs at
+  `logs/c7_sweep_seed42.log`. Cells write to per-eval_key workspaces
+  (no smoke contamination).
+- Last leaderboard append: smoke (`a9b4ea184f7a477a`).
+- Last checkpoint saved: `8f5e895c94f85e38` (topk_sae smoke;
+  HF-pushed). Production cells will save 3 more.
+- Active GPU lock(s): GPU 1 (production sweep).
 - Recent decisions in scope: #1, #4, #6, #7.
-- In flight: sentence-acts extraction (~30 min); will then smoke-test
-  full eval cell on topk_sae × seed=42 × cohort × small mag grid.
+- In flight: production sweep — Monitor `bj8crkmek` watches for
+  cell completions / failures.
 
 ## What I just did (agent owns — overwrite)
 
