@@ -248,6 +248,27 @@ wanted to demonstrate compliance. Captures: framework state (29/29 →
 next (start C1+C2 architecture porting + experiment runners), pitfalls
 to avoid.
 
+## 2026-05-03T20:50Z — c4 metric simplified
+
+Han: "we want to ONLY use 'Top-256 cumulative SEMANTIC Pareto'".
+
+Rewrote `docs/components/c4.md` to single-metric. Before: three
+qualitative metrics (var/32, pdvar/32, paper-style probe) "for
+ablation honesty". After: top-256 cumulative SEMANTIC count vs
+mean-pool probing AUC, single Pareto plot, single pre-registered
+metric. Phase 6's three-metric exploration is acknowledged as
+metric-reliability evidence, not a thing the paper uses.
+
+Defined the metric precisely (rank by per-token variance, take
+top-256, Haiku 4.5 temp=0 + 2-judge majority, sum SEMANTIC labels,
+plot vs C3 mp AUC). Documented the wasteland reference numbers
+(Track 2 T=20: 102/256 vs T-SAE 95/256) AND flagged that those don't
+directly transfer to our locked TXC-pro = `phase5b_subseq_h8` —
+nearest wasteland analogue (`phase57_partB_h8_bare_multidistance`)
+wasn't measured at top-256, so C4 is an open empirical question on
+the locked architecture. Two escape valves (T_max=20 override OR
+honest negative) documented.
+
 **Tests** (23/23 passing):
 
 - `tests/test_cache_keys.py` — determinism, version-bump invalidation,
