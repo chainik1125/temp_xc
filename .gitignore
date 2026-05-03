@@ -1,74 +1,48 @@
-# Python
+# ─── Python / venv ────────────────────────────────────────────────
 __pycache__/
 *.py[cod]
 *.egg-info/
-dist/
-build/
 .venv/
-*.egg
+.ruff_cache/
+.pytest_cache/
 
-# Obsidian - per-user state and downloaded plugins
-docs/.obsidian/workspace-mobile.json
-docs/.obsidian/plugins/
-docs/.obsidian/themes/
-docs/.obsidian/hotkeys.json
-docs/.obsidian/core-plugins.json
-docs/.obsidian/core-plugins-migration.json
-docs/.obsidian/workspace.json
-docs/.obsidian/graph.json
-
-# HTML output files
-*.html
-
-# Local-only directories
-docs/han/agent_onboarding/
-
-# OS
+# ─── OS / IDE ─────────────────────────────────────────────────────
 .DS_Store
 Thumbs.db
-
-# IDE
-.vscode/*
-!.vscode/extensions.json
 .idea/
-.env_autointerp
+.vscode/
 
-# Raw result artifacts — reproducible from scripts + cached activations.
-# Per-feature JSONs contain unfiltered FineWeb text; don't commit.
-results/nlp_sweep/ckpts/
-results/nlp_sweep/**/ckpts/
-results/nlp_sweep/**/results_*.json
-results/analysis/**/feat_*.json
-results/analysis/**/*.pt
-results/analysis/**/firing_frequencies.pt
-results/analysis/**/umap_coords.json
-results/analysis/**/annotations.json
-results/analysis/**/top_*_dominated_features.json
-results/analysis/**/alive_top_unique.json
+# ─── Obsidian per-user state under docs/ ──────────────────────────
+docs/.obsidian/workspace*.json
+docs/.obsidian/hotkeys.json
+docs/.obsidian/graph.json
+docs/.obsidian/plugins/
+docs/.obsidian/themes/
+docs/.obsidian/core-plugins-migration.json
 
-# Cached model weights — too big for git
-src/v2_temporal_schemeC/model_cache/
+# ─── Tokens ───────────────────────────────────────────────────────
+# Canonical stores live OUTSIDE the repo — ~/.tokens on local,
+# /workspace/.tokens on RunPod. These rules catch in-repo accidents.
+.tokens/
+*.token
+.env
+.env.*
+.env_*
 
-# Cached LLM activations — too big and potentially contains FineWeb text ids
-data/
+# ─── HTML output (reproducible from scripts) ──────────────────────
+*.html
 
-# Logs
-logs/
-experiments/*/model_cache/
-
-# Phase 5 large binary artifacts — reproducible from training/probing scripts
-experiments/phase5_downstream_utility/results/ckpts/
-experiments/phase5_downstream_utility/results/probe_cache/
-
-# Phase 5B large binary artifacts — synced to HF (han1823123123/txcdr/phase5b_ckpts/)
-experiments/phase5b_t_scaling_explore/results/ckpts/
-
-# Phase 7 large binary artifacts — synced to HF (han1823123123/txcdr-base/ckpts/);
-# small JSON tracking files (training_index.jsonl, training_logs/, probing_results.jsonl,
-# seed_markers/) ARE committed for cross-agent visibility.
-experiments/phase7_unification/results/ckpts/
-experiments/phase7_unification/results/probe_cache/
-experiments/phase7_unification/results/probe_cache_S32/
-experiments/phase7_unification/results/probe_cache_it/
-experiments/phase7_unification/results/probe_cache_S32_it/
-experiments/phase7_unification/results/probing_results.jsonl.bak_*
+# ─── purified/ runtime artefacts ──────────────────────────────────
+# Too big for git; HF-backed via cache.save_checkpoint auto-push on
+# ephemeral pods. manifest.jsonl + per-cell metrics.json ARE tracked
+# (small JSON, cross-agent visibility); depth-2 binaries are not.
+purified/results/runs/*/log.txt
+purified/results/runs/*/*.pt
+purified/results/runs/*/*.safetensors
+purified/results/runs/*/*.ckpt
+purified/results/runs/*/cache/
+purified/results/act_cache/
+purified/checkpoints/*/*.pt
+purified/checkpoints/*/*.safetensors
+purified/checkpoints/local/
+purified/hf_cache/

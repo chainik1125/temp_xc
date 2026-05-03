@@ -31,7 +31,7 @@ The lead agent on either component may launch a second/third process
 on pool GPUs to run cells in parallel — for example, agent_steer could
 run seed=42 on GPU 0 and seed=1 on GPU 2 simultaneously by claiming
 GPU 2 from the pool and launching a second process with
-``CUDA_VISIBLE_DEVICES=2``. See PROTOCOL.md § 11.1 for the full
+``CUDA_VISIBLE_DEVICES=2``. See PROTOCOL.md § 13 for the full
 contract; ``docs/paper/hardware.md`` § *Multi-GPU access* for the
 worked example.
 
@@ -110,52 +110,29 @@ mandatory; the next pod start will find /workspace intact.
 | **Subtotal** | | **~150 GB typical, 250 GB on EM pod** |
 
 Both pods now have 1 TB /workspace, which is comfortably above the
-typical budget. Slack capacity is for: judge transcripts, large
-intermediate Wang artifacts on C6, multi-seed extensions if Agent QA
-or Agent SYNTH gets activated.
+typical budget. Slack capacity is for judge transcripts, large
+intermediate Wang artifacts on C6, and multi-seed extensions launched
+on the A40 pool GPUs.
 
 ## Concurrency budget per pod
 
 | Pod | Concurrent training cells | Concurrent probing cells | Notes |
 |---|---|---|---|
-| 2× H100 (1 agent / GPU) | 2 (one per GPU) | 16 per GPU (CPU-bound, n_jobs=-1) | 56 vCPU = 28/GPU. Probing fits 16+ tasks easily. |
-| 3× A40 (1 agent / GPU) | 3 (one per GPU) | 9 per GPU | 27 vCPU = 9/GPU. |
+| 2× H100 (1 agent / GPU) | 2 (one per GPU) | 16 per GPU (CPU-bound, n_jobs=-1) | 56 vCPU ≈ 28/GPU. |
+| 4× A40 (2 named + 2 pool) | up to 4 (Primary + Pool, see PROTOCOL.md § 13) | 9 per GPU | 38 vCPU ≈ 9.5/GPU. |
 | H200 (reserve) | 1 (single GPU) | 32 (CPU-bound) | High RAM; for Wang on Qwen-14B. |
-| local 5090 | 1 (toy) | 16 | toy training is fast; concurrency mostly via threading inside the script. |
+| local 5090 | 1 (toy) | 16 | toy training is fast. |
 
-`temp_bench.eval.probing` will accept `n_jobs` knob (default `-1`)
-that maps to `joblib.Parallel`. Cell-level concurrency flows through a
-`runner.run_concurrent_cells` helper that respects the per-pod GPU
-count.
+`temp_bench.eval.probing` accepts an `n_jobs` knob (default `-1`) that
+maps to `joblib.Parallel`. Cell-level concurrency flows through
+`temp_bench.utils.gpu_locks.claim_gpu(...)` plus subprocess launches
+(no DDP — see `docs/paper/hardware.md`).
 
-## GPU isolation contract (load-bearing)
+## GPU sharing — see PROTOCOL.md
 
-When multiple agents share a pod, each one **must** pin
-``CUDA_VISIBLE_DEVICES`` to its assigned index before any CUDA work.
-This is the only mechanism that prevents agent A from accidentally
-allocating tensors on agent B's GPU. PyTorch sees only what the env
-var allows; physical index N appears as ``cuda:0`` to that agent.
-
-**At session start**, every agent runs:
-
-```bash
-cd /workspace/temp_xc/purified
-source scripts/set_agent_env.sh <agent_name>     # pins CUDA_VISIBLE_DEVICES
-bash scripts/agent_smoke_test.sh                 # verifies pinning + framework
-```
-
-The smoke test calls ``temp_bench.runner.preflight()`` which:
-- aborts if ``CUDA_VISIBLE_DEVICES`` is unset on a multi-GPU pod
-- aborts if ``torch.cuda.device_count() > 1`` after pinning (would mean
-  the env var didn't take — likely a sourcing error or a pre-existing
-  Python process already holding GPUs)
-- prints which physical GPU is visible
-
-Violations (running training without pinning) corrupt the cache
-contract: a checkpoint trained on the wrong GPU has the same
-``train_key`` as one trained on the right GPU, but the underlying
-hardware behavior may differ (cuBLAS heuristics, fp16 ULP variance).
-Different agents writing the same ``train_key`` is undefined.
+Pinning rules and the multi-GPU Primary + Pool protocol live in
+**PROTOCOL.md** (§ 12 pinning, § 13 multi-GPU access). Don't duplicate
+them here — `agents/README.md` is the *roster*, not the protocol.
 
 ## How to add a new agent
 

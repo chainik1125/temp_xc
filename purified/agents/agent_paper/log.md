@@ -239,6 +239,15 @@ Resolved:
 
 Tests still 29/29.
 
+## 2026-05-03T20:30Z — handover written
+
+`handovers/2026-05-03T20-30Z-framework-complete.md`. First-ever
+handover, mostly because PROTOCOL.md § 14 was just authored and I
+wanted to demonstrate compliance. Captures: framework state (29/29 →
+38/38 after token tests), key locked decisions (#1–9), what to do
+next (start C1+C2 architecture porting + experiment runners), pitfalls
+to avoid.
+
 **Tests** (23/23 passing):
 
 - `tests/test_cache_keys.py` — determinism, version-bump invalidation,

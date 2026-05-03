@@ -263,7 +263,7 @@ def preflight() -> list[str]:
             "'unknown'. Source scripts/set_agent_env.sh <name>."
         )
 
-    # ── GPU lock state (Primary + Pool protocol, PROTOCOL.md § 11.1) ─
+    # ── GPU lock state (Primary + Pool protocol, PROTOCOL.md § 13) ─
     try:
         from temp_bench.utils.gpu_locks import cleanup_stale, gpu_lock_status
         freed = cleanup_stale()

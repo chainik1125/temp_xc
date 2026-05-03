@@ -184,7 +184,43 @@ Stop and write to your agent log if:
 - A baseline number contradicts a published paper by more than 0.05 AUC.
 - You're tempted to introduce a third TXC variant. (Don't.)
 
-## 11.0 GPU pinning on shared pods
+## 10. Paper agent (orchestrator)
+
+Agent PAPER is the only agent allowed to:
+
+- Edit `docs/paper/`.
+- Update `docs/components/cN.md` "Hypothesis" or "Caveats" sections without
+  notifying the component lead.
+- Decide cross-component questions (notation, figure style, story arc).
+
+PAPER does not own training compute beyond the local 5090. PAPER's
+day-to-day is: read leaderboard, draft sections, raise issues to component
+leads via their agent dirs, integrate component writeups into the paper.
+
+## 11. Framework discipline (load-bearing — do not deviate)
+
+These rules exist because a 72-hour, 7-component, 5-agent paper cannot
+absorb framework friction. Read `docs/paper/framework.md` for the full
+rationale.
+
+1. **Hyperparameters in YAML, not code.** Edit
+   `configs/locked_archs.yaml` and `configs/datasources.yaml`. Never
+   hard-code `d_sae=18432` or `subject_model="gemma-2-2b-it"` in a `.py`.
+2. **Datasources are named, not constants.** Each component declares
+   `DATASOURCE = "<name>"` referencing `configs/datasources.yaml`.
+3. **Use `runner.run_cell` for every cell.** It is the only path that
+   appends to `leaderboard.jsonl`. Schema validation is mandatory.
+4. **Bump `arch_version` to invalidate trained checkpoints.** Don't
+   delete `.safetensors` files manually; the cache contract relies on
+   keys, not file lifetimes.
+5. **Bump `EVAL_PROTOCOL_VERSION` to invalidate eval results.**
+6. **Add an arch = yaml entry + class file.** Nothing else. If you
+   need to touch a component's runner, you've found a framework bug.
+7. **Add a component = copy `experiments/_runner_template.py` + set
+   `EVAL_PROTOCOL_VERSION` and `DATASOURCE`**. The eval logic goes in
+   `src/temp_bench/eval/<name>.py`, not in the runner script.
+
+## 12. GPU pinning on shared pods
 
 When two or three agents share a pod, each agent **must** pin
 ``CUDA_VISIBLE_DEVICES`` before any CUDA code runs. Otherwise PyTorch
@@ -219,7 +255,7 @@ The pinning makes every shared-pod cell run on a single, stable GPU.
 Re-running yields the same outputs (modulo cuDNN nondeterminism, which
 is suppressed by `set_seed(deterministic=True)`).
 
-## 11.1 Multi-GPU access (Primary + Pool protocol)
+## 13. Multi-GPU access (Primary + Pool protocol)
 
 When N named agents share a pod with M ≥ N GPUs, each agent has one
 **primary** GPU (always owned, pinned by `set_agent_env.sh`). Remaining
@@ -269,7 +305,7 @@ letting either claim spare capacity opportunistically.
 1. **Never use another agent's primary.** Pool only.
 2. **Always claim before pinning.** Launching with
    `CUDA_VISIBLE_DEVICES=2` without `claim_gpu(2)` first is a
-   PROTOCOL.md § 11.1 violation — silent contention.
+   PROTOCOL.md § 13 violation — silent contention.
 3. **Use `claim_gpus(...)` for multi-claim**, not nested `claim_gpu`s.
    The atomic version sorts indices and releases everything if any
    claim fails — eliminates deadlocks where two agents hold one of
@@ -291,38 +327,87 @@ did. The lock manager prevents two agents from racing for the same
 spare; the per-process pinning prevents subtler cross-agent CUDA
 contention.
 
-## 11. Framework discipline (load-bearing — do not deviate)
+## 14. Handover protocol (across context-compact boundaries)
 
-These rules exist because a 72-hour, 7-component, 5-agent paper cannot
-absorb framework friction. Read `docs/paper/framework.md` for the full
-rationale.
+LLM-agent context windows fill up; eventually context gets compressed
+and an agent's working memory of the current session is gone. The
+agent's **identity** survives (their name, briefing, and log), but
+their **state at compact time** must be written down explicitly or
+it's lost.
 
-1. **Hyperparameters in YAML, not code.** Edit
-   `configs/locked_archs.yaml` and `configs/datasources.yaml`. Never
-   hard-code `d_sae=18432` or `subject_model="gemma-2-2b-it"` in a `.py`.
-2. **Datasources are named, not constants.** Each component declares
-   `DATASOURCE = "<name>"` referencing `configs/datasources.yaml`.
-3. **Use `runner.run_cell` for every cell.** It is the only path that
-   appends to `leaderboard.jsonl`. Schema validation is mandatory.
-4. **Bump `arch_version` to invalidate trained checkpoints.** Don't
-   delete `.safetensors` files manually; the cache contract relies on
-   keys, not file lifetimes.
-5. **Bump `EVAL_PROTOCOL_VERSION` to invalidate eval results.**
-6. **Add an arch = yaml entry + class file.** Nothing else. If you
-   need to touch a component's runner, you've found a framework bug.
-7. **Add a component = copy `experiments/_runner_template.py` + set
-   `EVAL_PROTOCOL_VERSION` and `DATASOURCE`**. The eval logic goes in
-   `src/temp_bench/eval/<name>.py`, not in the runner script.
+Each agent writes a **handover doc** before context compact and at
+session end. Handover docs go in:
 
-## 10. Paper agent (orchestrator)
+```
+purified/agents/<name>/handovers/<UTC-ISO-timestamp>-<slug>.md
+```
 
-Agent PAPER is the only agent allowed to:
+Filename format: `YYYY-MM-DDTHH-MMZ-<slug>.md`, where `<slug>` is a
+2-4 word kebab-case description (e.g.
+`2026-05-03T20-00Z-framework-complete.md`).
 
-- Edit `docs/paper/`.
-- Update `docs/components/cN.md` "Hypothesis" or "Caveats" sections without
-  notifying the component lead.
-- Decide cross-component questions (notation, figure style, story arc).
+The **next-life instance** of the agent, after compact, reads:
 
-PAPER does not own training compute beyond the local 5090. PAPER's
-day-to-day is: read leaderboard, draft sections, raise issues to component
-leads via their agent dirs, integrate component writeups into the paper.
+1. Auto-loaded `purified/CLAUDE.md` (the operating manual).
+2. Their own `briefing.md` (identity + mandate).
+3. The **most recent handover** in `handovers/` (sort filenames; pick
+   last): the precise state of the world + the next concrete action.
+4. The recent N lines of `log.md` (running log; less structured but
+   has more detail).
+
+### When to write a handover
+
+- **Before any anticipated compact** — when you notice your context is
+  filling up. Write the handover, push, then keep working.
+- **At session end** — even on a clean exit, leave a handover so the
+  next instance starts informed.
+- **After a substantive milestone** — e.g. "C3 caching done, training
+  starts next" deserves its own handover so resumption from there is
+  sharp.
+
+You can write more handovers than strictly necessary. Old handovers
+are not deleted; they're chronological history.
+
+### Handover template
+
+`purified/agents/_handover_template.md` is the canonical template.
+Copy + fill in. Required sections:
+
+1. **Identity** — agent name, component(s), pod, GPU, mode.
+2. **State of the world (verified `<ts>`)** — `git HEAD`, last
+   `eval_key` / `train_key` written, recent decisions, open questions.
+3. **What I just did** — last 5-10 substantive actions.
+4. **What I'm in the middle of (if any)** — partial work that the
+   successor must complete or abandon.
+5. **Next action for my successor** — concrete first step. Be specific
+   (commands, files to read, etc.).
+6. **Don't repeat** — pitfalls to avoid (decisions already locked,
+   files already deleted, paths that no longer exist).
+7. **Open questions for Han** — anything blocked on user input.
+
+Keep handover docs ≤ 200 lines. They're load-bearing on resumption;
+brevity matters.
+
+### Hard rules
+
+1. **Identity continuity over instance freshness.** A successor
+   instance of `agent_paper` is still `agent_paper`. Don't fork
+   identity (no "agent_paper_v2"). Update the handover, keep the name.
+2. **Write before compact, not after.** Once compact has happened, the
+   working state is gone. Pre-empt.
+3. **Reference, don't duplicate.** The handover points at
+   `decisions.md`, `log.md`, `docs/components/cN.md`. It doesn't
+   re-state their content.
+4. **Concrete next action.** "Continue working on C3" is not a next
+   action. "Run `python -m experiments.c3_probing.run --seeds 1
+   --archs txc_base`, expect ~2 H100-hours" is.
+5. **Cross-referenced from log.md.** When you write a handover, add
+   one line to `log.md` like:
+   `2026-05-03T20:00Z — handover written: handovers/2026-05-03T20-00Z-framework-complete.md`.
+
+### Agent PAPER (orchestrator) writes handovers too
+
+I (agent_paper) follow this protocol. My handovers live in
+`purified/agents/agent_paper/handovers/`. They emphasize cross-agent
+coordination state, decisions in flight, and what each worker agent is
+expected to do next.

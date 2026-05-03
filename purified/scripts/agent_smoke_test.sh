@@ -13,7 +13,16 @@
 
 set -eu
 
-cd "$(dirname "$0")/.."   # always run from purified/
+# This script always operates inside purified/ even if invoked from
+# elsewhere (e.g. `bash purified/scripts/agent_smoke_test.sh` from repo
+# root). But the AGENT's shell should already be in purified/ so that
+# every other command they run uses purified/.venv directly.
+cd "$(dirname "$0")/.."   # purified/
+
+if [ "$(basename "$PWD")" != "purified" ]; then
+    echo "✗ smoke test must run from purified/ (cwd: $PWD)" >&2
+    exit 1
+fi
 
 echo "[smoke] purified root: $(pwd)"
 

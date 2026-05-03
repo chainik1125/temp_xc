@@ -20,6 +20,16 @@ if [ -z "${1:-}" ]; then
     return 1 2>/dev/null || exit 1
 fi
 
+# All paper work happens from inside purified/. Refuse to source from
+# anywhere else — paths in the framework, the .venv location, and
+# `git add -A` safety all depend on this convention.
+if [ "$(basename "$PWD")" != "purified" ] && [ "${TEMP_BENCH_ALLOW_ANY_CWD:-}" != "1" ]; then
+    echo "[set_agent_env] error: cd into purified/ first." >&2
+    echo "  current cwd: $PWD" >&2
+    echo "  try:         cd \$(git rev-parse --show-toplevel)/purified && source scripts/set_agent_env.sh $1" >&2
+    return 1 2>/dev/null || exit 1
+fi
+
 agent="$1"
 
 case "$agent" in

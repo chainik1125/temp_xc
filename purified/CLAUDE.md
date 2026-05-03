@@ -9,23 +9,32 @@ writeups cite them heavily.
 
 ## Quick start
 
-```bash
-cd purified
-uv sync                               # builds purified/.venv
-bash scripts/agent_smoke_test.sh      # verifies env + runs tests + preflight
-```
-
-On RunPod (after first-time provision):
+**Always work from `purified/` as your shell's cwd.** The framework's
+`.venv`, configs, results, and checkpoints all resolve from here. Do NOT
+operate from the repo root — `set_agent_env.sh` will refuse, the
+`.venv/bin/python` paths get longer, and `git add -A` would risk
+staging root-level cruft.
 
 ```bash
-cd /workspace/temp_xc/purified
-source scripts/set_agent_env.sh <agent_name>     # pins GPU + sets AGENT_NAME + POD_MODE
-bash scripts/agent_smoke_test.sh                 # verifies pinning + env + tests
-bash scripts/sync_from_hf.sh                     # ephemeral pods only — pull caches+ckpts
+# 1. cd to purified/ (works on local + RunPod)
+cd $(git rev-parse --show-toplevel)/purified
+
+# 2. Build the venv if it doesn't exist (one-time per pod / fresh clone)
+[ -d .venv ] || uv sync
+
+# 3. Pin GPU + set AGENT_NAME + TEMP_BENCH_POD_MODE
+source scripts/set_agent_env.sh <agent_name>
+
+# 4. Verify env (CRITICAL preflight failures are fatal)
+bash scripts/agent_smoke_test.sh
+
+# 5. (Ephemeral pods only) pull cached checkpoints + activations from HF
+[ "$TEMP_BENCH_POD_MODE" = "ephemeral" ] && bash scripts/sync_from_hf.sh
 ```
 
-See `scripts/bootstrap_runpod.sh` for first-time pod setup
-(tokens + uv + git checkout `final`).
+First-time pod provision (tokens + uv install + git checkout): see
+`scripts/bootstrap_runpod.sh` (RunPod) or `scripts/bootstrap_local.sh`
+(local).
 
 ## Layout
 
@@ -91,13 +100,22 @@ Other arch hparams are fixed in `configs/locked_archs.yaml`.
    `AGENT_NAME`, sets `TEMP_BENCH_POD_MODE`)
 2. `bash scripts/agent_smoke_test.sh` (env + tests + preflight; CRITICAL
    warnings are fatal)
-3. Read `agents/<your_name>/briefing.md` and `log.md`
-4. Read `docs/components/c{N}.md` for any component you'll touch
-5. Skim the last 10 entries of `results/leaderboard.jsonl` to see what
-   other agents have just produced
+3. Read `agents/<your_name>/briefing.md` (your identity + mandate).
+4. Read **the most recent handover** in `agents/<your_name>/handovers/`
+   (sort filenames; pick last). This is your "what was I doing"
+   memory across context-compact boundaries — see PROTOCOL.md § 14.
+5. Read recent entries in `agents/<your_name>/log.md`.
+6. Read `docs/components/c{N}.md` for any component you'll touch.
+7. Skim the last 10 entries of `results/leaderboard.jsonl`.
+
+**Before you exit or anticipate context compact**, write a new
+handover in `agents/<your_name>/handovers/` — see
+`agents/_handover_template.md` and PROTOCOL.md § 14.
 
 ## Hard rules
 
+0. **Always cd into `purified/` first.** All paper paths and the venv
+   are relative to this dir. `set_agent_env.sh` enforces this.
 1. **Wasteland code is on `origin/han-phase7-unification`, not here.**
    Read it via `git show origin/han-phase7-unification:<path>`. Never
    `import` from anywhere outside `temp_bench`. To port code, copy once
@@ -120,7 +138,7 @@ Other arch hparams are fixed in `configs/locked_archs.yaml`.
 9. **GPU pinning on shared pods is mandatory.** Each agent's
    `set_agent_env.sh` entry pins one primary GPU. To use spare pool
    GPUs, claim via `temp_bench.utils.gpu_locks.claim_gpu(idx)`.
-   See PROTOCOL.md § 11.1.
+   See PROTOCOL.md § 12 (pinning) + § 13 (multi-GPU Primary + Pool).
 
 ## How to record results
 
@@ -205,14 +223,19 @@ See `checkpoints/README.md` for full upload recipe.
 
 ## Markdown style
 
-Same as the root CLAUDE.md: ATX headings, no H1, dash bullets, fenced
-code blocks with language, YAML frontmatter (author/date/tags) on
-`docs/`.
+ATX headings (no H1 — Obsidian renders the filename as the title);
+dash `-` bullets; fenced code blocks with a language tag; YAML
+frontmatter (`author`, `date`, `tags`) on every `docs/` file; tags
+must be `kebab-case`.
 
 ## Where to look for more
 
-- **PROTOCOL.md** — full operating contract (§ 1-11, including GPU
-  pinning § 11.0, multi-GPU access § 11.1, framework discipline § 11)
+- **PROTOCOL.md** — full operating contract.
+  - § 1 branch model, § 2 wasteland boundary, § 3 filesystem ownership,
+    § 4 cache-key contract, § 5 two-TXC discipline, § 6 baselines,
+    § 7 component writeup template, § 8 anti-conflict workflow,
+    § 9 stop conditions, § 10 paper agent (orchestrator),
+    § 11 framework discipline, § 12 GPU pinning, § 13 multi-GPU access.
 - **docs/paper/framework.md** — the modularity design (10 principles,
   cache contract, version bumping)
 - **docs/paper/architecture.md** — locked TXC spec, per-experiment
@@ -222,7 +245,8 @@ code blocks with language, YAML frontmatter (author/date/tags) on
 - **docs/paper/outline.md** — paper structure, headline figures
 - **docs/components/c{1..7}.md** — per-component setup, hypothesis,
   results, caveats, reproduction
-- **agents/README.md** — agent-to-component-to-pod mapping
+- **agents/README.md** — agent-to-component-to-pod mapping (roster only;
+  protocol details live in PROTOCOL.md)
 - **tests/** — `pytest -q` to verify framework contract holds
 
 ## Quick reference

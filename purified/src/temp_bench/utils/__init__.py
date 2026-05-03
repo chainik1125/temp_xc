@@ -3,7 +3,7 @@
 - :mod:`.seed`       — :func:`set_seed`
 - :mod:`.gpu_locks`  — :func:`claim_gpu`, :func:`claim_gpus`,
   :func:`cleanup_stale`, :func:`gpu_lock_status` for the
-  Primary + Pool GPU sharing protocol (PROTOCOL.md § 11.1)
+  Primary + Pool GPU sharing protocol (PROTOCOL.md § 13)
 - :mod:`.tokens`     — :func:`get_token`, :func:`require_token`,
   :func:`token_status` — single canonical resolution chain for HF,
   Anthropic, and GitHub tokens across local and RunPod.

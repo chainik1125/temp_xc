@@ -17,7 +17,7 @@ Claim semantics:
   behind by a crashed pod.
 - :func:`gpu_lock_status` prints the current state for debugging.
 
-Hard rule from PROTOCOL.md § 11.1: an agent **must** claim a spare GPU
+Hard rule from PROTOCOL.md § 13: an agent **must** claim a spare GPU
 before launching any process pinned to it. The primary GPU does not
 need an explicit claim — ``set_agent_env.sh`` documents ownership.
 """

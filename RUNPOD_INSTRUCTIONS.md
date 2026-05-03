@@ -47,6 +47,10 @@ The bootstrap:
 
 ## Per-session start (every shell, every restart)
 
+**Always work from `purified/` as cwd.** `set_agent_env.sh` refuses to
+source from anywhere else — the framework's `.venv`, configs, and
+checkpoints all resolve relative to this dir.
+
 ```bash
 cd /workspace/temp_xc/purified
 
