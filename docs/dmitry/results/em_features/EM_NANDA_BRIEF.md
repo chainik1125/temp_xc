@@ -10,6 +10,147 @@ tags:
 
 **You are an autonomous routine continuing from the dmitry-branch work.** Branch: `em-nanda`. AGENT_BRIEF.md (on dmitry) covers the prior Qwen-7B medical setup. This doc supersedes that for the Qwen-14B financial pivot.
 
+### Status as of 2026-05-03 11:00 UTC (status-only firing — both GPUs idle, both axes closed, paper doc current; 10:00 UTC's "optional cheap probe" examined and de-scoped as not actually cheap; no compute spent; rule-9 watch advances to 1/3)
+
+**Headline**: 11:00 UTC firing. Local h100_1 0%/0 MiB; h100_2 0%/0 MiB. SSH
+to h100_2 still works. Both axes closed (single-feat champion 64.53 on R32
+ext-α; bundle precision monotonic k=30 < k=3 < single-feat, all on R32 LoRA
+since 10:00 UTC fix). No new artifacts on h100_2 since 10:14 UTC bug-fix
+landing. Paper doc and synthesis current through 10:00 UTC bug-fix entry.
+
+**Audit of the 10:00 UTC "optional cheap probe" claim — de-scoped this
+firing**:
+
+- 10:00 UTC priorities flagged "re-running the k=30 bundle via
+  `run_wang_procedure.py`'s generator path (rather than `frontier_sweep.py`)
+  would make {single-feat, k=3, k=30} comparison generator-path-uniform. ~30
+  min on h100_2."
+- Inspected `run_wang_procedure.py` (604 LOC) and `frontier_sweep.py` (313
+  LOC) directly. `run_wang_procedure` operates per-single-feature: stages
+  2/3/4 each iterate over `features_json` and call `run_alpha_for_feature`
+  (or its batched variant) once per feature. There is no native
+  bundle-direction code path; bundling lives only in `frontier_sweep` via
+  `bundle()` summing decoder rows.
+- Therefore "re-run k=30 bundle via wang" requires either (a) extending
+  `run_wang_procedure` with a bundle-steering branch (~½–1 firing of
+  focused infra work), or (b) constructing a fake "single feature" whose
+  decoder row equals the bundle sum (SAE-checkpoint surgery; messy). The
+  ~30 min estimate undercounted the code-change cost.
+- Bigger picture: the 05:00 UTC entry already resolved the cross-script
+  generator-path artifact diagnosis from existing α=0 data (wang α=0 coh
+  ~95.70 single-feat vs frontier_sweep α=0 coh ~50 bundle). Within the
+  bundle column, k=3 and k=30 are *already* generator-path-uniform (both
+  via frontier_sweep) with α=0 baselines tight (34.92 vs 34.69 = 0.23
+  apart, well within Monte-Carlo noise on n=64). Adding a wang-path k=30
+  re-run would be confirmatory, not informative. Per 10:00 UTC text:
+  "Existing data already shows the monotonic ordering holds with
+  within-path baselines tight (<0.5 apart), so not paper-critical."
+- Conclusion: not actually cheap, not informative, not paper-critical.
+  Removed from "next firing priorities" — see updated list below.
+
+**Considered alternative cheap probe (TXC bundle k=30 on R32) and rejected**:
+
+- TXC R32 native stage2_screen.json on h100_2 has 100 ranked features by
+  screen_score. Could mirror the SAE k=30 bundle by building top_30 and
+  launching `frontier_sweep.py --steerer txc --k 30` (~10–15 min).
+- Three possible outcomes: (a) TXC bundle ≈ TXC single-feat (~52) — bundle
+  null is SAE-specific; (b) TXC bundle > single-feat — TXC's higher
+  density helps; (c) TXC bundle < single-feat — bundle null is
+  architecture-general.
+- All three outcomes strengthen the paper's coverage by closing the empty
+  "TXC k=100 R32 bundle" cell in the closed table. But: per 02:00 UTC and
+  10:00 UTC explicit guidance, "TXC variants" is in the exploratory bin,
+  not paper-critical. The headline claim (R32 misalignment is concentrated
+  in one champion direction; bundling the SAE arditi top-30 by
+  screen_score loses 23 align points) doesn't depend on a TXC repeat.
+- Decision: defer. If a future firing wants ~15 min of compute spend with
+  a real new data point (vs the wang-path k=30 confirmatory re-run), TXC
+  bundle k=30 is the cheapest informative probe currently feasible. But
+  not load-bearing this firing — the bundle null on SAE is the paper's
+  load-bearing observation; replication on TXC would tighten generality
+  but is not required.
+
+**This firing (11:00 UTC) actions**:
+
+- `git pull origin em-nanda --rebase` — already up to date.
+- Re-read brief + synthesis cover-to-cover per routine step 2. Confirmed
+  state on entry: both axes closed, paper doc updated 10:00 UTC,
+  bundle frontier files (k=30 3.4 KB, k=3 buggy 3.2 KB, k=3 R32-fixed 3.1
+  KB) all present in `/root/em_features/results/em_nanda_bundle_r32/`.
+- Verified GPUs idle: local h100_1 `nvidia-smi` 0%/0 MiB at 11:00 UTC;
+  `ssh h100_2 nvidia-smi` 0%/0 MiB at 11:00 UTC.
+- Verified no new run completions on h100_2 since 10:00 UTC bug fix:
+  `bundle3_finalists_frontier_r32fix.json` mtime 10:14:23 UTC matches
+  the 10:00 UTC entry; nothing else newer in `em_nanda_bundle_r32/` or
+  the wang_r32 stage-4 dir.
+- **Examined 10:00 UTC "optional cheap probe" claim** by direct file
+  inspection (see audit above) and decided not to spend compute on it.
+- Disk hygiene unchanged: /root local 92%; /workspace 30%;
+  HF_HOME=/workspace/hf_cache holding.
+- **No commits to code, scripts, or experiment infra.** Only doc changes
+  are this brief append. (Synthesis not touched — no new run completion
+  to record per routine step 5.)
+
+**Closed-axis state at end of firing** (unchanged from 10:00 UTC):
+
+| arch / config       | R1 5k mid | R32 10k single ext-α | R32 10k bundle k=3 mid | R32 10k bundle k=30 mid |
+| :------------------ | --------: | -------------------: | ---------------------: | ----------------------: |
+| SAE arditi          | **96.88** | **64.53** ⭐         | 51.41 (α=−40)          | 41.33                   |
+| TXC k=100           |  91.80    | 51.95                | (not run)              | (not run)               |
+| medical-champ goal  |  +38.41   | +6.06                | −7.06 (align only)     | −17.14 (align only)     |
+
+**Why a status-only firing is the right call this firing**:
+
+- Both axes closed; paper doc tightened across 7 firings (03:00 UTC bundle
+  null + 04:00 UTC paper doc + 05:00 UTC reconciliation + 08:00 UTC k=3
+  monotonicity + 10:00 UTC bug fix). No cheap probe queued — the only
+  "optional cheap probe" advertised at 10:00 UTC is now (this firing)
+  documented as not actually cheap.
+- Rule (9) (3-firing-stuck): was at 0/3 entering this firing (10:00 UTC
+  reset by compute spend on the bug-fix re-run). This firing makes a
+  small but durable contribution (de-scoping the wang-path k=30 probe so
+  future agents don't re-evaluate from scratch + flagging TXC bundle as
+  the cheapest-informative alternative if any future firing wants
+  compute spend) but no compute spent → watch advances to 1/3.
+- Per rule (6) spirit: GPU idle + no completions to act on + paper-critical
+  work fully closed → exit cleanly after pull + read + status entry.
+  Adding compute on confirmatory or exploratory probes would inflate the
+  doc without strengthening conclusions.
+
+**Next firing priorities (likely 12:00 UTC)**:
+
+- **Status-only firing remains acceptable** — both axes closed, paper
+  doc current (through 10:00 UTC bug fix), no actually-cheap probe
+  queued.
+- **3-firing-stuck rule (rule 9) advances to 1/3 this firing.** If the
+  next two firings also produce no durable progress, append a "stuck —
+  please intervene" section per rule (9). Note that *paper-critical*
+  work is fully complete (single-feat axis closed 03/04 UTC, bundle
+  axis closed 03 UTC, bundle precision sub-axis closed 08 UTC + bug-fixed
+  10 UTC), so "stuck" applies only to *exploratory* follow-ups.
+- **If compute is wanted**: TXC bundle k=30 on R32 (~10–15 min on h100_2)
+  is the cheapest-informative probe currently identifiable. Mirror the
+  SAE k=30 procedure: build top_30 from
+  `/root/em_features/results/em_nanda_txc_paper_k100_step10000_wang_r32_native/stage2_screen.json`
+  on h100_2 (sort by screen_score descending), launch
+  `frontier_sweep.py --steerer txc --txc_ckpt
+  /root/em_features/checkpoints/qwen14b_l24_txc_paper_k100_em_nanda_step10000.pt
+  --k 30 --layer 24 --base_model "Qwen/Qwen2.5-14B-Instruct"
+  --subject_model /root/em_features/checkpoints/qwen14b_r32_finance_lora`
+  with the same α grid as the SAE bundle (`-100 -60 -40 -30 -20 -15 -10
+  -6 -3 -1 0 1 3 6 10`). Closes the empty "TXC k=100 R32 bundle" cell
+  in the table. Not paper-critical, but informative across 3 possible
+  outcomes (see audit section above).
+- **Other open exploratory items unchanged**: alt bundle selection
+  criteria (Hessian-eigendirection / mutual orthogonality), TXC k<100
+  variants, cross-layer hookpoints. All ≥1 firing of compute, none
+  paper-critical.
+- **Optional cleanup window** (still not load-bearing): legacy 110 GB
+  qwen_l15_*.pt checkpoints on /root local already logged in
+  `trained_models_log.md` with HF backups under
+  `dmanningcoe/temp-xc-em-features`. Per rule (7), "log first" is
+  satisfied; deletion is permitted but not motivated this firing.
+
 ### Status as of 2026-05-03 10:00 UTC (subject_model bug fix: 08:00 UTC k=3 bundle was on PUBLISHED R1, not our R32 LoRA; corrected re-run on R32 peaks at α=−40 → 51.41 / 53.36; monotonic ordering preserved with cleaner same-organism comparison; rule-9 watch reset to 0/3)
 
 **Headline**: While verifying paper-doc artifacts for what was likely a
