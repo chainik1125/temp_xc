@@ -189,45 +189,144 @@ first action is a no-op for subsequent commands. Don't rely on it.
    → both 1.0+5.0 binaries, amazon_categories → hardcode classes
    `["1","2","3","5","6"]` + non-streaming pull. Plus add winogrande +
    wsc from crosstoken_datasets. Confirm **exactly 38 tasks**.
+   - **Gotcha I hit**: `load_dataset('codeparrot/github-code',
+     streaming=True, languages=['C'])` does NOT actually filter the
+     stream — out of 20 samples I got 9 JS, 6 C, 5 other. You MUST
+     `if sample['language'] != target_lang: continue` after iter.
 5. Build a `temp_bench.data.nlp.build_probe_cache(datasource_name,
    tasks)` that runs gemma forward over each task's texts and writes
    `results/probe_cache/<datasource_name>/<task_name>/{X_train.npy,
-   y_train.npy, X_test.npy, y_test.npy}`.
+   y_train.npy, X_test.npy, y_test.npy}`. Reuse the model-loading
+   helper from `temp_bench.data.nlp.cache._load_subject_model` (same
+   tokenizer + dtype handling as the activation cache builder).
 6. Update `experiments/c3_probing/run.py::my_eval_fn` to load real
    probe-cache for the task list when `smoke=False`. Replace the
    `NotImplementedError` branch with a `temp_bench.eval.probing.run_task_suite`
-   call over the cached tasks.
+   call over the cached tasks. **Note**: `LeaderboardRow.metrics`
+   only accepts float values per Pydantic; if you want per-task AUCs,
+   either flatten as `metrics["auc__<task>"]` (38 floats) or aggregate
+   to mean+std and emit `metrics={"mean_auc","std_auc",...}`. The
+   wasteland reported per-task; we probably want both — discuss with
+   Han if uncertain.
 7. Run the real cells: 3 archs (topk_sae, tsae_paper, txc_base) ×
-   3 seeds × 2 k_feats = 18 cells. Each cell trains 10K steps on the
-   FineWeb cache (~5 min on H100), then probes 38 tasks (~2 min).
-   Total: ~2 hours. Verify leaderboard rows are valid + AUCs are sane
-   (topk_sae k=20 should be in the 0.85-0.91 range per Phase 7).
-8. **Port txc_pro** (3-layer inheritance — pulls in ~250 lines from
-   the wasteland). After ports, re-run cells with txc_pro included
-   (force_train=False so existing cells skip).
-9. **Port mlc** if time permits. Lower priority.
+   3 seeds × 2 k_feats = 18 cells. **Pass an explicit
+   `TrainingConfig` to `runner.run_cell` — do NOT use
+   `runner.default_training_cfg(arch)`** (default is whatever the
+   schema's defaults are; for real cells set `n_steps≈10000`,
+   `batch_size≈64`, `learning_rate≈3e-4`, `precision="bf16"`,
+   `warmup_steps≈500`). Each cell ~5 min on H100 (training)
+   + ~2 min (probing 38 tasks). Total ~2 hours.
+   - Sanity check: `topk_sae k=20` should be 0.85-0.91 AUC mean
+     across SAEBench+CT (Phase 7 leaderboard reference). If you get
+     numbers far below that on a properly-trained SAE, look for an
+     encode-shape bug or a label-leakage bug in the probe cache.
+8. **Port txc_pro** (3-layer wasteland inheritance — pulls in ~250
+   lines). After port, re-run cells with txc_pro included
+   (`force_train=False` so existing 18 cells hit cache). The 3
+   wasteland files to consolidate:
+   - `src/architectures/phase5b_subseq_sampling_txcdr.py::SubseqH8` (subset sampling at training time)
+   - `src/architectures/txc_bare_multidistance_contrastive_antidead.py` (matryoshka H8 + multi-distance contrastive)
+   - `src/architectures/txc_bare_antidead.py` (already mostly mirrored in `txc_base.py` — reuse the anti-dead stack pattern)
+9. **Port mlc** if time permits. Lower priority. Wasteland source:
+   `src/architectures/mlc.py`. Cross-LAYER (not cross-token)
+   crosscoder; encodes by stacking adjacent layers' activations,
+   not adjacent tokens.
 10. Port `temp_bench.eval.qualitative.top_256_semantic` for C4. Use
     cached SAE checkpoints from C3 (same act_cache_key) so no
-    retraining needed.
+    retraining needed. Per c4.md, drop the **Cohen's κ** validation
+    from the critical path — persist judge outputs to
+    `results/runs/<eval_key>/judge_outputs.jsonl` so post-deadline
+    κ computation is `pandas.read_json + scipy.stats.cohen_kappa_score`.
+    Build the concat corpora from
+    `origin/han-phase7-unification:experiments/phase6_qualitative_latents/concat_corpora/{concat_A,concat_B,concat_C}.json`
+    or regenerate via `build_concat_corpora.py`. Datasource entry
+    `gemma_2_2b_it_l13_concat_v1` is already in `datasources.yaml`.
 11. Build `experiments/c3_probing/analysis.py` + `experiments/c4_qualitative/analysis.py`
-    that aggregate the leaderboard rows and rewrite the AUTO-RESULTS
-    blocks of the component docs via `temp_bench.report.render(...)`.
+    that aggregate the leaderboard rows (filter `eval_cfg.smoke=true`
+    out — those are pipeline-validation artifacts) and rewrite the
+    AUTO-RESULTS blocks of the component docs via
+    `temp_bench.report.render(...)`. Template at
+    `experiments/_analysis_template.py`.
 
 ## Don't repeat (agent owns — overwrite)
+
+Locked-decision tripwires:
 
 - **Two TXCs only** (decision #1) — don't introduce a galaxy steering
   variant or a non-locked TXC; raise it in `docs/components/c3.md`
   first if you genuinely need to.
+- **Cross-territory edits** — see the OUT OF SCOPE list in mandate.
+  Even if Han verbally approves in chat, surface the request in
+  writing first. My last-but-one commit got partially rejected on
+  exactly this (commit `2283aa15`).
 - **Wasteland imports** — code is on `origin/han-phase7-unification`,
   not in `final`. Use `git show`. Never `from src.architectures...`.
 - **Bypass `runner.run_cell`** — it's the only writer to the
   leaderboard. Schema validation is mandatory.
-- **Forget the cache push** — agent_steer waits on you. Push as soon
-  as the cache is built; don't batch it with downstream training.
 - **Hardcode hyperparameters** — anything paper-relevant goes in
   `configs/locked_archs.yaml` and `configs/datasources.yaml`. Edit the
   yaml, not the .py.
 
+Hard-won technical gotchas from this session (verify before bypassing):
+
+- **`datasets<4` pin is load-bearing** for `codeparrot/github-code`.
+  v4+ removed `trust_remote_code` and the dataset uses a Python
+  loading script. Pinned in `pyproject.toml`. If you ever see
+  "Dataset scripts are no longer supported, but found github-code.py",
+  re-run `uv sync` to pull `datasets==3.6.0`.
+- **github-code `languages=[...]` does NOT filter the stream.** Out
+  of 20 samples I got 9 JS, 6 C, 5 other. Your loader MUST
+  `if sample['language'] != target_lang: continue` after iter.
+- **`tsae_paper.config.T == 1`, NOT 2.** The contrastive pair is a
+  TRAINING construct, sampled inside `train_step` over the seq_len
+  axis. Setting T=2 routes the probe to window-encoding which is
+  wrong for T-SAE.
+- **`LeaderboardRow.metrics` is float-only** (Pydantic schema).
+  Categorical / int diagnostics like `agg`, `n_train`, `task_name`
+  belong outside the `metrics` dict. The runner explodes loudly if
+  you violate this.
+- **Background `nohup ... &`** — the bash WRAPPER returns immediately
+  and the tool reports "completed", but the python process keeps
+  running. Always verify via `ps -ef | grep python` or by tailing
+  the log file before declaring success or failure.
+- **Cache build is FAST on H100** — ~2 min for 24K seqs of Gemma-2-2b,
+  not the 3 H100-hours Han's mandate suggested. Don't be surprised
+  if it "completes" suspiciously quickly.
+- **Decoder grad-parallel removal** uses
+  `register_post_accumulate_grad_hook` on `W_dec` (PyTorch 2.0+) —
+  this avoids needing a pre-step hook in the canonical trainer. See
+  `tsae.py::_project_dec_grad` and `txc_base.py::_project_dec_grad`.
+- **`einops` is NOT a dep.** I rewrote the wasteland's
+  `einops.einsum(...)` calls with vanilla `torch.einsum` in tsae.py.
+  Don't add `import einops` without first adding to pyproject.toml.
+- **TQDM_DISABLE=1 must be exported per bash call.**
+  `set_agent_env.sh` does NOT set it; sourcing the env script alone
+  isn't enough. Standard pattern:
+  ```
+  export TQDM_DISABLE=1 && source scripts/set_agent_env.sh agent_nlp >/dev/null 2>&1 && <command>
+  ```
+
 ## Open questions for Han (agent owns — overwrite)
 
-(none at provisioning — you'll add some after first session.)
+To resolve BEFORE running real cells:
+
+1. **`TrainingConfig` for the real cells.** I used 200 steps for the
+   smoke run; what should the headline cells use? Phase 7's
+   leaderboard reference numbers suggest these were ~50K steps;
+   confirm and I'll set `n_steps`, `batch_size`, `learning_rate`,
+   `warmup_steps`, `precision` explicitly in `run.py`.
+2. **Per-task AUC reporting.** `LeaderboardRow.metrics` is float-only,
+   so 38 per-task AUCs would mean 38 keys per row (e.g.
+   `auc__bias_in_bios_set1_prof11`). Or aggregate to mean ± std and
+   only emit those. Wasteland did per-task. Preference?
+3. **Smoke leaderboard row** (`eval_key=06afa68f259490a0`). Currently
+   committed with `eval_cfg.smoke=true` so analysis can filter. Keep
+   for traceability, or delete before real cells land?
+
+Optional (can decide later):
+
+4. **Bricken A/B for C3** — decision #7 says C6-only by default,
+   revisit if time permits. I'd rather skip and ship the headline
+   first, then come back if C3 numbers feel weak. Confirm?
+5. **MLC scope** — `decisions.md` "Non-decisions" lists this as
+   open. Lower-priority for the headline; appendix-only OK?
