@@ -1662,6 +1662,50 @@ beyond brief + synthesis status entries.
   a future firing wants to launch new SAE/TXC training on local
   (next firing not training-bound, so deferring).
 
+### Status as of 2026-05-03 06:00 UTC (status-only firing — local h100_1 idle, h100_2 SSH access denied this firing; both axes remain closed; no compute spent)
+
+**This firing (06:00 UTC) actions:**
+
+- `git pull origin em-nanda --rebase` clean. Re-read brief + synthesis
+  per routine step 2.
+- Verified local h100_1 idle (0%/0 MiB at 06:01 UTC).
+- **`ssh h100_2 nvidia-smi` was DENIED by the harness this firing**
+  ("Permission for this action has been denied … SSH to remote host
+  h100_2 … not explicitly authorized for direct SSH access"). All
+  prior firings (00:00–05:00 UTC) used SSH to h100_2 freely; this is
+  a new constraint introduced between firings. Could not directly
+  verify h100_2 GPU state or pull any in-flight artifacts.
+- No new launches queued (both axes closed; nothing in flight per
+  05:00 UTC entry; cannot reach h100_2 for an exploratory probe even
+  if motivated).
+- **No commits to code or experiment scripts.** Only doc changes are
+  the matching brief append and this synthesis entry.
+- Disk hygiene unchanged: /root local 92%; /workspace 30%; HF_HOME
+  holding.
+
+**Implication for future firings (recorded for handoff)**:
+
+- Until h100_2 SSH access is restored, the remaining exploratory
+  open items in the paper doc (alternative bundle selection
+  criteria, TXC variants, cross-layer hookpoints) are blocked —
+  all assumed h100_2 reachability.
+- Local h100_1 remains usable but /root at 92% means new local
+  training requires routing checkpoints to `/workspace/em_features/`
+  or first logging + deleting legacy qwen_l15_*.pt ckpts per
+  rule (7).
+- The paper-critical work (closed 8-cell single-feat table, R1
+  champion 96.88, R32 champion 64.53, bundle null result, paper
+  doc tightened at 05:00 UTC) is complete; "stuck" if it engages
+  applies to exploratory follow-ups only, not load-bearing claims.
+
+**Closed-axis state at end of firing** (unchanged from 05:00 UTC):
+
+| arch / config       | R1 5k mid | R32 10k single ext-α | R32 10k bundle k=30 mid |
+| :------------------ | --------: | -------------------: | ----------------------: |
+| SAE arditi          | **96.88** | **64.53** ⭐         | 41.33                   |
+| TXC k=100           |  91.80    | 51.95                | (not run)               |
+| medical-champ goal  |  +38.41   | +6.06                | −17.14 (align only)     |
+
 ### Status as of 2026-05-03 05:00 UTC (generator-path reconciliation resolved from existing data — bundle's "−40 coh" is mostly path artifact, paper doc tightened; no compute spent)
 
 **This firing (05:00 UTC) actions:**

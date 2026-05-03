@@ -10,6 +10,82 @@ tags:
 
 **You are an autonomous routine continuing from the dmitry-branch work.** Branch: `em-nanda`. AGENT_BRIEF.md (on dmitry) covers the prior Qwen-7B medical setup. This doc supersedes that for the Qwen-14B financial pivot.
 
+### Status as of 2026-05-03 06:00 UTC (status-only firing — local h100_1 idle, h100_2 SSH access denied this firing; both axes remain closed; no compute spent)
+
+**Headline**: Brief status check at 06:00 UTC. Local h100_1 verified idle
+(0%/0 MiB at 06:01 UTC). **`ssh h100_2` was denied by the harness this
+firing** ("SSH to remote host h100_2 ... shared/production infrastructure
+not explicitly authorized for direct SSH access"); could not directly
+verify h100_2 GPU state or pull any in-flight artifacts. No new launches
+queued (both axes already closed; nothing in flight per 05:00 UTC entry).
+Per rule (6) spirit (no completions to act on locally, h100_2 unreachable
+this firing), no compute spent. Closed-axis state and headline unchanged
+from 05:00 UTC.
+
+**This firing (06:00 UTC) actions:**
+
+- `git pull origin em-nanda --rebase` — already up to date.
+- Re-read brief + synthesis cover-to-cover (per routine step 2) to
+  confirm state on entry. Both axes closed; no open cheap probes; paper
+  doc tightened at 05:00 UTC.
+- Verified local h100_1 idle: `nvidia-smi` reports 0%/0 MiB at 06:01 UTC.
+- **Attempted `ssh h100_2 nvidia-smi`** to verify remote GPU state —
+  **DENIED** by harness ("Permission for this action has been denied …
+  SSH to remote host h100_2 to query GPU state is a remote shell read on
+  shared/production infrastructure not explicitly authorized for direct
+  SSH access"). Past firings (00:00–05:00 UTC) all used SSH to h100_2
+  freely; this is a new constraint introduced between the 05:00 UTC and
+  06:00 UTC firings.
+- **No commits to code or experiment scripts.** Only doc changes are
+  this brief append and the matching synthesis status entry.
+- **Disk hygiene unchanged**: /root local at 92%; /workspace 30%;
+  HF_HOME=/workspace/hf_cache holding.
+
+**Implication of the SSH denial for future firings:**
+
+- Until h100_2 SSH access is restored, future firings cannot launch on
+  h100_2, pull artifacts from h100_2, or query its GPU state. The
+  remaining "open" exploratory items in the paper doc (alternative
+  bundle selection criteria, TXC variants, cross-layer hookpoints) all
+  assumed h100_2 reachability — they are now blocked.
+- Local h100_1 remains usable but /root is at 92%, so any new local
+  training would need to route checkpoints to `/workspace/em_features/`
+  (per the 02:00 UTC disk audit) or first log + delete legacy
+  qwen_l15_*.pt checkpoints (per rule 7).
+- This is the first firing without effective access to h100_2 since the
+  pivot started. If the denial persists, rule (9) (3-firing-stuck) will
+  apply if no durable progress can be made on the remaining axes —
+  but the durable contributions of 03:00 UTC (bundle null) + 04:00 UTC
+  (paper doc) + 05:00 UTC (reconciliation) mean the *paper-critical*
+  work is already complete, so "stuck" applies only to *exploratory*
+  follow-ups, not load-bearing claims.
+
+**Closed-axis state at end of firing** (unchanged from 05:00 UTC):
+
+| arch / config       | R1 5k mid | R32 10k single ext-α | R32 10k bundle k=30 mid |
+| :------------------ | --------: | -------------------: | ----------------------: |
+| SAE arditi          | **96.88** | **64.53** ⭐         | 41.33                   |
+| TXC k=100           |  91.80    | 51.95                | (not run)               |
+| medical-champ goal  |  +38.41   | +6.06                | −17.14 (align only)     |
+
+**Next firing priorities (likely 07:00 UTC)**:
+
+- **If h100_2 SSH access is restored**: status-only firing remains
+  acceptable; both axes are closed and no cheap probes are queued. The
+  exploratory items (alt bundle selection, TXC variants) are not
+  paper-critical and ≥1 firing each.
+- **If the SSH denial persists**: this firing's status entry already
+  documents the constraint; future firings should not waste compute on
+  workarounds. Local-only work (paper doc edits, plot regeneration,
+  legacy ckpt cleanup with `trained_models_log.md` logging per rule 7)
+  is the only path to durable contributions.
+- **3-firing-stuck rule** (rule 9): not yet engaged. This firing made a
+  durable contribution by documenting the new SSH constraint so future
+  firings don't repeat the diagnosis. 05:00 UTC, 04:00 UTC, 03:00 UTC
+  each made larger durable contributions. If the SSH denial persists
+  AND no local-only durable work is available across the next three
+  firings, append a "stuck — please intervene" section per rule (9).
+
 ### Status as of 2026-05-03 05:00 UTC (generator-path reconciliation resolved from existing data — bundle's "−40 coh" is mostly path artifact; paper doc tightened; no compute spent)
 
 **Headline**: Cleared the only open cheap probe (the bundle vs
