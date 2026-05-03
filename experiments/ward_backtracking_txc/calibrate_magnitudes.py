@@ -72,6 +72,22 @@ def calibrate_one(features_dir: Path, cell_id: str, feature_id: int, mode: str) 
     p95_neg, n_neg, n_neg_zero = p95_of_nonzero(neg_col)
     pooled = np.concatenate([pos_col, neg_col])
     p95_pooled, n_pool, n_pool_zero = p95_of_nonzero(pooled)
+    # L2-of-decoder calibration. The steering vector is normalized to
+    # DoM-norm at b3 time (see b3_math500_rescue.py:normalize_to_dom_norm),
+    # so the L2 of decoder_at_pos0 captures the per-feature direction
+    # length BEFORE that normalization. This is what web-claude
+    # recommended as the right alternative to the broken p95 calibration:
+    # "consistent units of model-space distance per unit magnitude" rather
+    # than "per-arch activation scale" which is incommensurable across
+    # signed-residual archs (TFA / TSAE-paper) vs. TopK arches.
+    decoder_key = "decoder_at_pos0" if mode == "pos0" else "decoder_union"
+    if decoder_key not in z:
+        l2_decoder_pos0 = float("nan")
+    else:
+        l2_decoder_pos0 = float(np.linalg.norm(z[decoder_key][idx]))
+    # Always compute pos0 too for consistency
+    l2_decoder_pos0_only = float(np.linalg.norm(z["decoder_at_pos0"][idx])) if "decoder_at_pos0" in z else float("nan")
+    l2_decoder_union = float(np.linalg.norm(z["decoder_union"][idx])) if "decoder_union" in z else float("nan")
     return {
         "cell_id": cell_id,
         "feature_id": int(feature_id),
@@ -79,6 +95,9 @@ def calibrate_one(features_dir: Path, cell_id: str, feature_id: int, mode: str) 
         "p95_pos_only": p95_pos,
         "p95_neg_only": p95_neg,
         "p95_pooled": p95_pooled,
+        "l2_decoder_for_mode": l2_decoder_pos0,   # primary; matches the steered mode
+        "l2_decoder_pos0": l2_decoder_pos0_only,
+        "l2_decoder_union": l2_decoder_union,
         "n_pos": n_pos, "n_neg": n_neg, "n_zero_in_pool": n_pool_zero,
         "frac_zero_pooled": n_pool_zero / max(n_pool, 1),
     }
@@ -103,10 +122,10 @@ def main(argv=None):
             entry = calibrate_one(features_dir, meta["cell_id"], int(meta["feature_id"]), meta["feature_mode"])
             entry["label"] = meta.get("label", "?")
             out[key] = entry
-            log.info("[%s] cell=%s f=%d mode=%s  p95_pooled=%.4f (pos=%.4f, neg=%.4f, frac_zero=%.2f)",
+            log.info("[%s] cell=%s f=%d mode=%s  p95_pooled=%.4f  L2_decoder=%.4f",
                      entry["label"], entry["cell_id"], entry["feature_id"],
                      entry["feature_mode"], entry["p95_pooled"],
-                     entry["p95_pos_only"], entry["p95_neg_only"], entry["frac_zero_pooled"])
+                     entry["l2_decoder_for_mode"])
         except (FileNotFoundError, ValueError) as e:
             log.warning("[skip] %s: %s", run_dir, e)
 

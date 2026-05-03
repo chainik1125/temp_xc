@@ -67,10 +67,16 @@ def load_summary(run_dir: Path) -> dict | None:
     return json.loads(sp.read_text())
 
 
-def calibrated_x(raw_mag: float, p95: float) -> float:
-    if not p95 or p95 <= 0:
+def calibrated_x(raw_mag: float, scale: float) -> float:
+    if not scale or scale <= 0 or not (scale == scale):  # NaN check
         return float(raw_mag)
-    return float(raw_mag) / float(p95)
+    return float(raw_mag) / float(scale)
+
+
+# Calibration mode keys in the calibration.json schema:
+#   "p95_pooled"        — original (broken for TFA/TSAE-paper signed codes)
+#   "l2_decoder_for_mode" — L2 norm of the steered decoder direction (preferred)
+DEFAULT_CALIBRATION_KEY = "l2_decoder_for_mode"
 
 
 def panel_net_rescues(ax, df: pd.DataFrame, runs: list[dict], calib: dict, calibrated: bool):
@@ -89,7 +95,7 @@ def panel_net_rescues(ax, df: pd.DataFrame, runs: list[dict], calib: dict, calib
             include_groups=False,
         ).rename("net").reset_index().sort_values("magnitude")
         key = f"{cell}__f{fid}_{mode}"
-        p95 = calib.get(key, {}).get("p95_pooled", 0)
+        p95 = calib.get(key, {}).get(DEFAULT_CALIBRATION_KEY, 0)
         x = [calibrated_x(m, p95) for m in agg["magnitude"]] if calibrated else agg["magnitude"]
         ax.plot(x, agg["net"], "-o", label=label, color=ARCH_PALETTE.get(label, "#888"),
                 markersize=4, linewidth=1.6)
@@ -133,18 +139,16 @@ def render(runs: list[dict], df: pd.DataFrame, calib: dict, out_path: Path,
     panel_rate(axes[2], runs, calib, "regression_rate_by_magnitude", calibrated=calibrated,
                ylabel="regression rate  (n_ci / n_correct_subsample)")
     if calibrated:
-        # TFA / TSAE-paper have tiny natural feature-activation scales
-        # (p95 ≈ 0.005), so their calibrated x range is ~±2000–4000 — that
-        # would auto-scale the x-axis and visually compress every other arch
-        # to a vertical line at x≈0. Clip the x-axis to a sensible window
-        # commensurable with TXC/SAE/MLC/H8 (whose calibrated ranges are
-        # within ±10). TFA/TSAE-paper points outside this window are
-        # off-screen but still in the data.
+        # Calibrated x = raw_mag / l2(decoder_direction) per arch. This
+        # gives commensurable units of "model-space distance per unit
+        # raw magnitude" across TopK and signed-residual arch families
+        # (replaces the broken p95 calibration that put TFA/TSAE-paper
+        # off-screen). Clip kept as a safety net.
         for ax in axes:
             ax.set_xlim(*calibrated_xlim)
     title = "Backtracking steering — calibrated" if calibrated else "Backtracking steering — raw magnitude"
     if calibrated:
-        title += f" (x clipped to [{calibrated_xlim[0]}, {calibrated_xlim[1]}]; TFA/TSAE-paper extend further off-screen due to tiny p95)"
+        title += f" (x = raw / L2(decoder); clipped to [{calibrated_xlim[0]}, {calibrated_xlim[1]}])"
     fig.suptitle(title, fontsize=10)
     fig.tight_layout(rect=[0, 0, 1, 0.94])
     out_path.parent.mkdir(parents=True, exist_ok=True)
@@ -174,15 +178,21 @@ def main(argv=None):
     log.info("[flip] %d rows", len(df))
 
     args.out.mkdir(parents=True, exist_ok=True)
-    # Headline: only Dmitry's standardized arch set
-    render(runs, df, calib, args.out / "headline_calibrated.png", calibrated=True,
-           label_filter=HEADLINE_LABELS)
+    # Headline: only Dmitry's standardized arch set, RAW magnitude (the
+    # b3 pipeline already normalizes each steering vector to DoM-baseline
+    # L2 norm before injection — see normalize_to_dom_norm in
+    # b3_math500_rescue.py — so raw magnitudes are commensurable across
+    # archs without further calibration).
     render(runs, df, calib, args.out / "headline_raw.png", calibrated=False,
            label_filter=HEADLINE_LABELS)
-    # Appendix: include TXC-H8 and any other extras
-    render(runs, df, calib, args.out / "appendix_calibrated.png", calibrated=True,
-           label_filter=None)
     render(runs, df, calib, args.out / "appendix_raw.png", calibrated=False,
+           label_filter=None)
+    # Calibrated variants kept for transparency (showing what the
+    # earlier draft contained); they are misleading because they
+    # correct for a normalization the pipeline already performs.
+    render(runs, df, calib, args.out / "headline_calibrated_DEPRECATED.png", calibrated=True,
+           label_filter=HEADLINE_LABELS)
+    render(runs, df, calib, args.out / "appendix_calibrated_DEPRECATED.png", calibrated=True,
            label_filter=None)
     return 0
 

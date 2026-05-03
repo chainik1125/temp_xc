@@ -94,13 +94,14 @@ steering effect but are dominated by the mag=0 noise floor. Included
 here for transparency; the baseline-corrected version above is the
 honest reading.
 
-The previous calibrated x-axis version is **broken in implementation** —
-TFA and TSAE-paper have signed reconstruction-residual codes with p95
-≈ 0.005, so dividing raw magnitude by p95 puts every TFA/TSAE point at
-calibrated x ≈ ±2,000–4,000, far outside the [-12, 12] clip window.
-Both arches render as flat horizontal lines on the calibrated panel.
-Fix is in §"Methodology notes" below; the calibrated panel is dropped
-from the headline.
+The previous calibrated x-axis version was **mis-applied** — both the
+p95-of-activation calibration and the L2-of-decoder calibration that
+followed it correct for a normalization the b3 pipeline already
+performs (`normalize_to_dom_norm`). Raw magnitudes are commensurable
+across architectures because each steering vector is rescaled to
+DoM-baseline L2 before injection. Calibrated variants saved as
+`headline_calibrated_DEPRECATED.png` and `appendix_calibrated_DEPRECATED.png`
+for transparency. Discussion in §"Methodology notes" below.
 
 ## Flip matrices — BASELINE-CORRECTED (per-arch, at peak magnitude)
 
@@ -140,16 +141,31 @@ Appendix variant (6 archs incl. TXC-H8):
 
 ![Detection AUC + F1 vs |S|, 6 archs](images_b/np_detection_appendix.png)
 
-### Mean AUC per (arch × |S|)
+### Mean ROC-AUC per (arch × |S|)
 
 | Arch | S=1 | S=2 | S=4 | S=8 | S=16 | S=32 |
 |---|---|---|---|---|---|---|
 | **TXC** | 0.593 | 0.644 | 0.670 | **0.681** | 0.699 | 0.708 |
 | **TXC-H8** | 0.572 | 0.597 | 0.616 | 0.658 | 0.688 | 0.716 |
 | **SAE** | 0.605 | 0.618 | 0.637 | 0.655 | 0.670 | 0.715 |
-| **TSAE-paper** | 0.598 | 0.636 | 0.645 | 0.668 | 0.674 | 0.687 |
+| **TSAE-paper** | 0.608 | 0.618 | 0.625 | 0.643 | 0.668 | 0.677 |
 | **TFA** | 0.593 | 0.602 | 0.620 | 0.633 | 0.632 | 0.637 |
 | **MLC** | 0.586 | 0.648 | 0.653 | 0.663 | 0.663 | 0.663 |
+
+### Mean PR-AUC (average precision) — primary metric for this 12%-positive class
+
+| Arch | S=1 | S=2 | S=4 | S=8 | S=16 | S=32 |
+|---|---|---|---|---|---|---|
+| **TXC** | 0.188 | 0.211 | 0.234 | 0.243 | 0.252 | 0.279 |
+| **TXC-H8** | 0.180 | 0.197 | 0.209 | 0.234 | 0.249 | **0.288** |
+| **SAE** | 0.176 | 0.174 | 0.187 | 0.201 | 0.214 | 0.278 |
+| **TSAE-paper** | 0.171 | 0.176 | 0.183 | 0.198 | 0.220 | 0.245 |
+| **TFA** | 0.161 | 0.172 | 0.188 | 0.194 | 0.193 | 0.197 |
+| **MLC** | 0.207 | 0.240 | 0.252 | **0.251** | 0.251 | 0.251 |
+
+PR-AUC random baseline at 12% positive class = 0.12; all archs beat
+random comfortably (0.16–0.29). MLC slightly leads at small |S|; TXC-H8
+takes the top spot at S=32.
 
 ### Wilcoxon TXC vs each baseline at |S|=8 (Holm-Bonferroni corrected)
 
@@ -295,21 +311,47 @@ against the SAME (arch, question) outcome at mag=0:
 Paired McNemar tests use these discordant cells. This isolates the
 steering effect from the resampling noise.
 
-### Calibrated magnitude is broken — dropped from headline
+### Calibration: not actually needed (the pipeline already does it)
 
-Andre's idea (95th percentile of feature activation as the "natural unit"
-for each arch) was implemented as `raw_mag / p95(|act|)`. Problem: TFA
-and TSAE-paper produce signed reconstruction-residual codes with p95 ≈
-0.005, ~400× smaller than the TopK arches' ≈2.0. Dividing raw mag by
-p95 puts TFA/TSAE points at calibrated x ≈ ±2,000–4,000, off-screen on
-any reasonable plot. The original "headline_calibrated.png" rendered
-TFA/TSAE as flat horizontal lines and visually misleading.
+Earlier drafts of this writeup tried to "calibrate" the cross-arch
+magnitude axis using the 95th percentile of feature activation, then
+swapped to the L2 norm of the decoder direction. **Both are
+mis-applied** — they correct for a normalization the b3 pipeline
+already performs.
 
-The calibrated headline is **dropped from the main text**. The raw
-magnitude version is the more honest. If we want a calibration that
-works cross-arch, the right normalization is by the steered feature's
-decoder-direction L2 norm (consistent units of "model-space distance per
-unit magnitude"), not by activation p95. That's a follow-up.
+Specifically: in `b3_math500_rescue.py:normalize_to_dom_norm` (line 332),
+each steering vector is rescaled to the L2 norm of the DoM-base-union
+direction *before* injection:
+
+```python
+vec_steered = (raw_decoder / |raw_decoder|) * dom_ref_norm
+```
+
+So at b3 time, magnitude=1 means the SAME effective injection length in
+residual-stream units regardless of architecture. Raw magnitudes are
+already commensurable across archs.
+
+For evidence that the dividing-by-decoder-L2 calibration doesn't add
+information: the L2 of decoder rows for our 6 chosen features:
+
+| Arch | L2(decoder pos0) |
+|---|---|
+| TXC | 0.435 |
+| TXC-H8 | 0.477 |
+| MLC | 0.464 |
+| SAE | 1.000 |
+| TFA | 64.19 |
+| TSAE-paper | 65.30 |
+
+TFA/TSAE-paper attention TSAEs have decoder rows ~140× longer than the
+TopK arches because they predict reconstruction residuals — but after
+the DoM-norm normalization they all inject the SAME-magnitude vector.
+Dividing raw_mag by L2(decoder) "uncalibrates" what the pipeline
+calibrated.
+
+**Conclusion:** the headline plot uses raw magnitude (which is the
+already-calibrated thing). Calibrated variants saved as
+`headline_calibrated_DEPRECATED.png` for transparency.
 
 ### Cohort
 

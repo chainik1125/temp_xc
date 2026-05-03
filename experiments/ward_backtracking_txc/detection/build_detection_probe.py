@@ -34,7 +34,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import roc_auc_score, f1_score
+from sklearn.metrics import roc_auc_score, f1_score, average_precision_score
 from sklearn.model_selection import GroupKFold
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
@@ -131,21 +131,33 @@ def fit_probes(X: np.ndarray, y: np.ndarray, qids: np.ndarray) -> list[dict]:
                 proba = clf.predict_proba(X_te[:, top])[:, 1]
                 pred = clf.predict(X_te[:, top])
                 auc = float(roc_auc_score(y_te, proba)) if len(set(y_te)) > 1 else float("nan")
+                # PR-AUC (average precision) is the right metric for our
+                # 12%-positive class. F1 at threshold 0.5 is included for
+                # back-compat but reads as catastrophe due to class imbalance.
+                ap = float(average_precision_score(y_te, proba)) if len(set(y_te)) > 1 else float("nan")
                 f1 = float(f1_score(y_te, pred, zero_division=0))
             except Exception as e:
                 log.warning("fit failed S=%d fold=%d: %s", S, fold, e)
-                auc, f1 = float("nan"), float("nan")
-            rows.append({"S": S, "fold": fold, "auc": auc, "f1": f1,
+                auc, ap, f1 = float("nan"), float("nan"), float("nan")
+            rows.append({"S": S, "fold": fold, "auc": auc, "pr_auc": ap, "f1": f1,
                          "n_train": len(train_idx), "n_test": len(test_idx)})
     return rows
 
 
 def render_headline(df: pd.DataFrame, out_path: Path, label_filter: set | None = None):
-    fig, axes = plt.subplots(1, 2, figsize=(12, 4.2))
+    # Three panels now: ROC-AUC + PR-AUC + F1@0.5. PR-AUC is the right
+    # primary metric for our 12%-positive class; F1@0.5 retained for
+    # back-compat with the earlier draft.
+    fig, axes = plt.subplots(1, 3, figsize=(16, 4.2))
     arches = sorted(df["arch"].unique())
     if label_filter:
         arches = [a for a in arches if a in label_filter]
-    for metric, ax in zip(["auc", "f1"], axes):
+    metric_specs = [
+        ("auc", "ROC-AUC", None),
+        ("pr_auc", "PR-AUC (avg precision)\n[primary metric — class is ~12% positive]", None),
+        ("f1", "F1 @ threshold=0.5\n(thresholded; reads low due to class imbalance)", None),
+    ]
+    for (metric, ylabel, _), ax in zip(metric_specs, axes):
         for arch in arches:
             sub = df[df["arch"] == arch]
             agg = sub.groupby("S")[metric].agg(["mean", "std"]).reset_index()
@@ -156,10 +168,11 @@ def render_headline(df: pd.DataFrame, out_path: Path, label_filter: set | None =
         ax.set_xscale("log", base=2)
         ax.set_xticks(S_VALUES); ax.set_xticklabels(S_VALUES)
         ax.set_xlabel("|S| (number of features)")
-        ax.set_ylabel(metric.upper())
+        ax.set_ylabel(ylabel)
         ax.grid(alpha=0.3)
         ax.legend(loc="best", fontsize=8)
-    fig.suptitle("Backtracking sentence detection: 5-fold grouped CV (group=question)", fontsize=11)
+    fig.suptitle("Backtracking sentence detection: 5-fold grouped CV (group=question)",
+                 fontsize=11)
     fig.tight_layout(rect=[0, 0, 1, 0.95])
     out_path.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(out_path, dpi=150)
@@ -167,27 +180,30 @@ def render_headline(df: pd.DataFrame, out_path: Path, label_filter: set | None =
     plt.close(fig)
 
 
-def wilcoxon_vs_baselines(df: pd.DataFrame, ref_arch: str, out_path: Path) -> None:
+def wilcoxon_vs_baselines(df: pd.DataFrame, ref_arch: str, out_path: Path,
+                          metric: str = "auc") -> None:
     from scipy.stats import wilcoxon
     rows = []
     sub = df[df["S"] == HEADLINE_S]
-    ref = sub[sub["arch"] == ref_arch].sort_values("fold")["auc"].values
+    ref = sub[sub["arch"] == ref_arch].sort_values("fold")[metric].values
     others = sorted({a for a in sub["arch"].unique() if a != ref_arch})
     pvals = []
     for other in others:
-        cmp = sub[sub["arch"] == other].sort_values("fold")["auc"].values
+        cmp = sub[sub["arch"] == other].sort_values("fold")[metric].values
         if len(ref) == len(cmp) and len(ref) >= 2:
             try:
                 stat, p = wilcoxon(ref, cmp, alternative="two-sided",
                                    zero_method="wilcox", correction=False)
-                rows.append({"comparison": f"{ref_arch} vs {other}", "S": HEADLINE_S,
-                             "n_folds": len(ref), "wilcoxon_W": float(stat), "p_raw": float(p),
-                             "ref_mean_auc": float(np.mean(ref)),
-                             "other_mean_auc": float(np.mean(cmp))})
+                rows.append({"comparison": f"{ref_arch} vs {other}",
+                             "metric": metric, "S": HEADLINE_S,
+                             "n_folds": len(ref), "wilcoxon_W": float(stat),
+                             "p_raw": float(p),
+                             f"ref_mean_{metric}": float(np.mean(ref)),
+                             f"other_mean_{metric}": float(np.mean(cmp))})
                 pvals.append(p)
             except Exception as e:
                 log.warning("wilcoxon failed %s vs %s: %s", ref_arch, other, e)
-    # Holm-Bonferroni
+    # Holm-Bonferroni across the family
     if pvals:
         order = np.argsort(pvals)
         m = len(pvals)
@@ -197,8 +213,8 @@ def wilcoxon_vs_baselines(df: pd.DataFrame, ref_arch: str, out_path: Path) -> No
         for r, p_adj in zip(rows, adj):
             r["p_holm"] = float(p_adj)
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    fieldnames = ["comparison", "S", "n_folds", "wilcoxon_W", "p_raw", "p_holm",
-                  "ref_mean_auc", "other_mean_auc"]
+    fieldnames = ["comparison", "metric", "S", "n_folds", "wilcoxon_W", "p_raw", "p_holm",
+                  f"ref_mean_{metric}", f"other_mean_{metric}"]
     with out_path.open("w") as f:
         w = csv.DictWriter(f, fieldnames=fieldnames)
         w.writeheader()
@@ -263,12 +279,16 @@ def main(argv=None):
     # Appendix figure (6 archs)
     render_headline(df, args.out / "detection_appendix.png", label_filter=None)
 
-    # Wilcoxon TXC vs each baseline at |S|=8
+    # Wilcoxon TXC vs each baseline at |S|=8 — both metrics
     wilcoxon_vs_baselines(df, ref_arch="TXC",
-                          out_path=args.out / "wilcoxon_detection_table.csv")
+                          out_path=args.out / "wilcoxon_detection_table.csv",
+                          metric="auc")
+    wilcoxon_vs_baselines(df, ref_arch="TXC",
+                          out_path=args.out / "wilcoxon_detection_table_pr_auc.csv",
+                          metric="pr_auc")
 
-    # Summary table — mean AUC per (arch, |S|)
-    summary = df.groupby(["arch", "S"])[["auc", "f1"]].mean().reset_index()
+    # Summary table — mean AUC + PR-AUC + F1 per (arch, |S|)
+    summary = df.groupby(["arch", "S"])[["auc", "pr_auc", "f1"]].mean().reset_index()
     summary.to_csv(args.out / "summary_auc_f1.csv", index=False)
     log.info("[saved] %s", args.out / "summary_auc_f1.csv")
     log.info("\n=== summary ===\n%s", summary.to_string(index=False))
