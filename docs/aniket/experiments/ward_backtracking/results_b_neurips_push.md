@@ -52,17 +52,27 @@ comparison on a 9-magnitude grid with the truly-wrong cohort only. Per the
 
 ## Headline figure (Fig 4a in main text)
 
-`results/ward_backtracking_txc/b3_math500_cut25/headline_calibrated.png`
-
 Three panels (calibrated x-axis = raw magnitude / arch-specific p95):
 
 1. **Net rescues** = `n_ic − n_ci` (incorrect→correct minus correct→incorrect).
 2. **Rescue rate** = `n_ic / n_truly_wrong` (out of 31).
 3. **Regression rate** = `n_ci / n_correct_subsample` (out of 30).
 
-5 lines: TXC, SAE, TSAE-paper, TFA, MLC. Same data, raw-magnitude variant
-saved as `headline_raw.png`. Appendix variant `appendix_calibrated.png`
-adds the TXC-H8 line.
+5 lines: TXC, SAE, TSAE-paper, TFA, MLC.
+
+![Headline steering — calibrated magnitude, 5 archs](images_b/np_headline_calibrated.png)
+
+Raw-magnitude variant (uncalibrated x-axis):
+
+![Headline steering — raw magnitude, 5 archs](images_b/np_headline_raw.png)
+
+Appendix variant adds the TXC-H8 line (6 archs total):
+
+![Appendix steering — calibrated magnitude, 6 archs](images_b/np_appendix_calibrated.png)
+
+![Appendix steering — raw magnitude, 6 archs](images_b/np_appendix_raw.png)
+
+Source paths: `results/ward_backtracking_txc/b3_math500_cut25/{headline,appendix}_{calibrated,raw}.png`.
 
 ### Per-arch peak net rescues + McNemar
 
@@ -96,13 +106,19 @@ to any single architecture.
 
 ## Detection probe (Fig 4b in main text)
 
-`results/ward_backtracking_txc/detection/detection_headline.png`
-
 Sparse linear probes (`sklearn.LogisticRegression(solver=liblinear)`)
 fitted on top-S features per arch, S ∈ {1, 2, 4, 8, 16, 32}. 5-fold
 GroupKFold by `question_id` to prevent within-question leakage.
 Trained on 23,664 sentences (intersection of `pos_act`/`neg_act`
 captures across all 6 archs). Headline metric: AUC.
+
+![Detection AUC + F1 vs |S|, 5 archs](images_b/np_detection_headline.png)
+
+Appendix variant (6 archs incl. TXC-H8):
+
+![Detection AUC + F1 vs |S|, 6 archs](images_b/np_detection_appendix.png)
+
+Source: `results/ward_backtracking_txc/detection/detection_{headline,appendix}.png`.
 
 ### Mean AUC per (arch × |S|)
 
@@ -146,9 +162,40 @@ detection power vs the conventional SAE.
 | TFA | 0.114 | 0.89 | 103 | 5,501 | ✓ |
 | MLC | 0.074 | 0.93 | 159 | 4,201 | ✓ |
 
-Per-arch FVU vs step + L0 vs step PNGs in `hygiene/training_curves/`.
+Per-arch FVU + L0 vs step:
+
+![TXC training curves](images_b/np_training_curves/txc.png)
+
+![SAE training curves](images_b/np_training_curves/sae.png)
+
+![TSAE-paper training curves](images_b/np_training_curves/tsae_paper.png)
+
+![TFA training curves](images_b/np_training_curves/tfa.png)
+
+![MLC training curves](images_b/np_training_curves/mlc.png)
+
+![TXC-H8 training curves (appendix)](images_b/np_training_curves/txc_h8.png)
+
 TXC-H8's FVE=0.50 confirms the H8 contrastive loss trades reconstruction
 badly at this hookpoint — supports the appendix-only demotion.
+
+## Repetition rate (judge-free auxiliary)
+
+For each generated continuation, compute the fraction of consecutive
+sentence pairs with token-Jaccard ≥ 0.7 (a near-duplicate
+proxy for sentence-level looping). Plot mean over the cohort vs
+calibrated magnitude per arch. This is a judge-free check on the
+"narrow peak = looping at the edges" hypothesis.
+
+5-line headline version:
+
+![Repetition rate vs (calibrated + raw) magnitude, 5 archs](images_b/np_repetition_rate_headline.png)
+
+Appendix variant with all 6 archs:
+
+![Repetition rate vs (calibrated + raw) magnitude, 6 archs](images_b/np_repetition_rate.png)
+
+Source: `results/ward_backtracking_txc/b3_math500_cut25/repetition_rate{,_headline}.png`.
 
 ## Architectural integrations (new in this push)
 
