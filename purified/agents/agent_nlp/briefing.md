@@ -104,24 +104,27 @@ References:
 
 ## Current state (agent owns — overwrite at every compact)
 
-**Last verified: 2026-05-03T22:35Z (this autonomous-overnight session)**
+**Last verified: 2026-05-03T22:55Z (autonomous-overnight session)**
 
-- `git HEAD`: ba92480c — `final` branch (rebased onto upstream
-  agent_back/agent_em commits incl 721cbbd5, 6154aab8)
-- Last leaderboard append: 1948488e5b127138 (smoke cell — txc_base
-  seed=1 k_feat=5; AUC=0.507 on synthetic labels). Plus the older
-  topk_sae smoke 06afa68f259490a0.
-- Last checkpoint saved: 86474a703b8af5eb (txc_base smoke); also
-  topk_sae smoke 45124717553436e6
-- Active GPU lock(s): none — running on pinned GPU 0 (H100). Probe
-  cache build is using GPU 0 in foreground via my_eval_fn pattern.
+- `git HEAD`: c0a1276b — `final` branch
+- Last leaderboard append: still the 2 old smoke rows (06afa68f, 1948488e
+  — both `eval_cfg.smoke=true`). First REAL row will land when cell 1
+  completes (~30 min into the 18-cell run).
+- Last checkpoint saved: 86474a703b8af5eb (txc_base smoke 200-step);
+  no real-config checkpoints yet (different `n_steps=10000` → different
+  train_key).
+- Active GPU lock(s): none — pinned to GPU 0 (H100). Cell run is
+  using it; agent_em is on GPU 1.
 - Recent decisions in scope: #1, #4, #6, #7, #11
-- In flight: probe cache build (PID 17883, started 2026-05-03T22:28Z,
-  ETA ~8-10 min total). 23/38 tasks done as of last check.
+- In flight: 18-cell C3 run (PID 21612, started 2026-05-03T22:49Z;
+  step 2000/10000 at 22:55Z = ~5 min in). Total ETA ~6 hours
+  (9 unique trainings × 30 min each + 18 evals × 5 min each).
 
 ## What I just did (agent owns — overwrite)
 
-End-to-end pipeline now shippable for C3 with **REAL probe data**:
+C3 + C4 plumbing fully shipped. Cells in flight on H100. Status:
+
+**C3 — sparse probing**:
 
 - ✅ `temp_bench.data.nlp.probe_tasks` — 38-task SAEBench+CT loader
   with all 3 SAEBench-faithfulness fixes (github-code via codeparrot
@@ -130,25 +133,44 @@ End-to-end pipeline now shippable for C3 with **REAL probe data**:
   loaders smoke-tested individually. Hardcoded SAEBench class lists.
 - ✅ `temp_bench.data.nlp.probe_cache` — `build_probe_cache()` +
   `load_probe_cache()` + `list_probe_cache()`. Per-task structure
-  is `(N, seq_len, d_in)` fp16 numpy arrays. Idempotent (eager-skips
-  tasks that already have all 4 .npy files). Reuses `_load_subject_model`
-  from `cache.py`.
-- ✅ `experiments/c3_probing/run.py::my_eval_fn` — replaced the
-  NotImplementedError branch with real probe-cache iteration.
-  Returns flattened per-task floats (`auc__<task>` × 38) PLUS
-  aggregates (`mean_auc`, `std_auc`, `mean_acc`, `std_acc`,
-  `n_tasks`). Primary metric switched to `mean_auc` for the
-  headline.
-- ✅ `experiments/c3_probing/analysis.py` — leaderboard query →
-  filter smoke → group by (arch, k_feat) → mean ± σ_seeds + mean
-  σ_tasks → markdown table + plots/auc_by_k.png + AUTO-RESULTS
-  rewrite. Verified rendering on the smoke-only state (correctly
-  shows placeholder).
-- 🟡 IN FLIGHT: full probe cache build (38 tasks). Process PID
-  17883, started 2026-05-03T22:28Z. ~8-10 min total ETA. As of
-  ~22:35Z: 23/38 tasks complete (all bias_in_bios + ag_news +
-  partial amazon_categories). Disk used so far: 35 GB; total expected
-  ~70-90 GB.
+  is `(N, seq_len, d_in)` fp16 numpy arrays. Idempotent.
+- ✅ Full probe cache built (38 tasks, 79 GB at
+  `results/probe_cache/gemma_2_2b_it_l13_fineweb_24k128/`).
+- ✅ `experiments/c3_probing/run.py::my_eval_fn` — wired to real
+  probe-cache. Returns flattened per-task floats (`auc__<task>` × 38)
+  PLUS aggregates (`mean_auc`, `std_auc`, `mean_acc`, `std_acc`,
+  `n_tasks`). Primary metric: `mean_auc`.
+- ✅ Progress wrapper around `batch_iter` prints every 1000 steps
+  (the canonical trainer is silent by design — wrapper added in
+  `my_train_fn` for autonomous-overnight visibility).
+- 🟡 IN FLIGHT: 18 cells (topk_sae × tsae_paper × txc_base × seeds
+  {1,2,42} × k_feats {5,20}). Process PID 21612, started
+  2026-05-03T22:49Z. n_steps=10K @ 5 steps/sec → ~30 min training
+  per unique (arch,seed). 9 unique trainings + 18 probings. Total
+  ETA ~6 hours.
+
+**C4 — qualitative latents**:
+
+- ✅ `temp_bench.eval.qualitative` — full implementation (was
+  NotImplementedError stub):
+  - `load_concat_corpus(name)` reads from `data/concat_corpora/`
+  - `encode_concat_corpus(sae_model, subject_model, layer, token_ids)`
+    forwards Gemma → hooks layer → SAE encode → (n_tokens, d_sae) z;
+    dispatches per-token vs window on `model.T`
+  - `pick_top_features_by_var(z, n)` variance ranking
+  - `gather_top_contexts(token_ids, tok, z_col)` — top-N max-activating
+    text windows
+  - `_call_anthropic` — exponential backoff on rate limits
+  - `call_judges` — 2 Haiku judges + agree/verdict
+  - `persist_judge_record` — appends to
+    `results/runs/<eval_key>/judge_outputs.jsonl` (κ-deferred lifeline)
+  - `top_256_semantic` orchestrator returns float-only metrics
+- ✅ `experiments/c4_qualitative/run.py` + `analysis.py`. Runner
+  shares train_fn with C3 so checkpoints reuse via `runner.run_cell`'s
+  auto-skip. Analysis joins to C3 leaderboard via (arch, seed,
+  k_feat=20) for Pareto x-axis, draws upper-right frontier.
+- ✅ `data/concat_corpora/{concat_A, concat_B, concat_random}.json`
+  — pre-tokenized JSONs ported from wasteland.
 
 Earlier session work (still relevant — no regressions):
 
@@ -187,6 +209,25 @@ While Han was AFK for the 10-hour overnight window:
   `TXCBareAntidead`) is substantial; risk of derailing the headline
   run if started before cells complete. Will attempt at end of
   session if cells finish with ≥ 1 hour to spare.
+
+- **C4 cells launch timing**: NOT YET. C4's `top_256_semantic`
+  needs trained checkpoints from C3 (same train_key — both share
+  the FineWeb activation cache + TrainingConfig). After C3 cell 7
+  (tsae_paper seed=1 k=5) completes (~2 hours in), I could fire
+  one C4 smoke cell to validate end-to-end. Real C4 cells (3 archs
+  × 3 seeds × n_features=256) should run AFTER all C3 cells
+  finish to avoid GPU contention. Expected total C4 wall time:
+  6 cells × (Gemma forward + Haiku judge calls) ≈ 30 min compute +
+  ~10 min of API latency for 256 × 3 = 768 Haiku calls per cell.
+
+- **Trainer step rate (5/sec) is mmap-bound**: act cache lives on
+  MooseFS (`mfs#us-ca-2.runpod.net`); random-index reads are slow
+  vs sequential. After ~1000 steps the kernel page cache warms up
+  and rate may improve, but in this session it stabilised at 5
+  steps/sec. If a future run wants to be faster, options are:
+  (a) copy the act cache to local SSD (none on this pod), or
+  (b) use larger batch_size to amortise per-step I/O — risky for
+  schema validation since batch_size is part of train_key.
 
 ## Pre-launch decisions for next session (Han may override)
 
