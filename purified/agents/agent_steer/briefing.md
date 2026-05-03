@@ -91,60 +91,82 @@ References:
 
 ## Current state (agent owns — overwrite at every compact)
 
-**Last verified: 2026-05-03T23:30:00Z (first session, code-port complete)**
+**Last verified: 2026-05-03T22:38Z (first session, smoke green, real
+cells launching).**
 
-- `git HEAD`: `d94dc17e` (origin/final, after `git pull --rebase`).
-- Local edits not yet committed: 4 new files + 1 rewritten stub
-  (see *What I just did* below; `git status` for the list).
-- Last leaderboard append: (none yet — gated on agent_nlp porting
-  the three archs `tsae_paper`, `txc_base`, `txc_pro`).
-- Last checkpoint saved: (none yet).
-- Active GPU lock(s): none.
+- `git HEAD`: `21c84be8` (3 of my commits on top of origin/final at
+  rebase: code port, run-fix + smoke flag, c5.md expansion).
+- Last leaderboard append: `d55da9a21b1e847a` (topk_sae × seed 42,
+  smoke=true, all-zero metrics — 200-step training so degenerate
+  steering output, ignored by analysis.py's smoke filter).
+- Last checkpoint saved: `2245417c2cd98294` (topk_sae seed 42 smoke
+  ckpt, pushed to HF `han1823123123/temp-bench-models`).
+- Active GPU lock(s): GPU 0 (training, no explicit lock taken — agent
+  pinned via `CUDA_VISIBLE_DEVICES=0`; `gpu_locks` only matters when
+  claiming spare-pool GPUs 2/3).
 - Recent decisions in scope: #1 (two TXCs), #4 (cross-branch reads),
   #6 (HF repos), #7 (Bricken off for C5).
-- In flight: code-port done (steering module + run.py + analysis.py
-  + 17 unit tests, all green); briefing update; pending Han review of
-  the open questions below before training cells.
-- **NOT blocked on agent_nlp's act-cache** — verified
-  ``act_cache_key=e4916bcae1881963`` is on HF
-  (``han1823123123/temp-bench-data``, shape ``[24000, 128, 2304]``
-  fp16, datasource ``gemma_2_2b_it_l13_fineweb_24k128``). Pulled
-  locally at ``results/act_cache/e4916bcae1881963/``.
+- In flight: `tsae_paper × seed 42` cell running in background (PID
+  13635, log at `logs/c5_tsae_paper_seed42.log`). Monitors set up
+  for completion + per-step progress. Expected ~25 min, ~$1.50.
+- **Cache state**: act-cache `e4916bcae1881963` on disk (14 GB
+  mmap-able). 3 of my needed archs ported by agent_nlp (commit
+  f7c3c536 + ae2aaf8b): `tsae_paper`, `txc_base`. Still waiting on
+  `txc_pro` (= `phase5b_subseq_h8`).
+- **Subject model**: Gemma-2-2b-IT bf16 already cached in
+  `/workspace/hf_cache/` from the smoke run.
 
 ## What I just did (agent owns — overwrite)
 
 Newest first.
 
-- Wrote `tests/test_steering.py` — 17 unit tests covering V7 tile
+- Launched `tsae_paper × seed 42` real cell in background (PID 13635).
+  Two monitors armed: a one-shot Bash `until` loop that fires on
+  process exit, and a Monitor watching `logs/c5_tsae_paper_seed42.log`
+  for per-step / per-stage progress events.
+- Expanded `docs/components/c5.md` (commit 21c84be8). Status
+  `planning → in_flight`. Caveats now flag the V7 ↔ TXC-pro
+  compatibility risk + IT/L13 deviation from paper. Reproduction
+  section has copy-paste commands. Provenance lines cite the
+  origin/han-phase7-unification: paths the V7 + judge + concepts +
+  feature-selection were ported from.
+- Fixed run_dir mismatch (commit f8a28469): pre-computed `eval_key`
+  was using un-enriched `eval_cfg`, but I was passing enriched
+  `eval_cfg` to `run_cell`, so the runner re-hashed and got a
+  different `eval_key` → metrics.json and case-study artifacts
+  landed in different `run_dir`s. Refactored to thread workspace
+  via a closure on the eval-fn, leaving `eval_cfg` un-enriched.
+  Verified post-fix: `d55da9a21b1e847a` has all 7 artifacts in one
+  dir.
+- Added `--smoke` flag to `run.py` + smoke filter in `analysis.py`.
+  Smoke cells tag `eval_cfg["smoke"] = True` and the c5 paper
+  aggregator skips them. Matches agent_nlp's c3 convention.
+- Validated end-to-end pipeline with `topk_sae × seed 42` smoke
+  test (n_steps=200, 3 concepts, 1 strength). Confirmed: training
+  → HF push → Gemma-2-2b-IT load → feature selection → V7 hook
+  → greedy generation → Sonnet judge × 6 calls → grades.jsonl
+  + judge_outputs.jsonl + curves.json + leaderboard append all
+  worked. Generations were degenerate token-loops as expected at
+  high-strength steering on a 200-step random-ish model.
+- Pulled in commits `d94dc17e..ae2aaf8b`: agent_nlp ported
+  `tsae_paper` + `txc_base` arch classes plus
+  `temp_bench.data.nlp.batch_iter_from_act_cache` helper. Updated
+  `run.py` to use the canonical batch_iter (yields full
+  `(B, seq_len, d_in)`; TXC archs do their own random-window
+  extraction internally). Removed my inline T-window helper.
+- Wrote 17 unit tests in `tests/test_steering.py` covering V7 tile
   layout + trailing-block overwrite, PP overlap-averaging, concept
   set, `coh_success_curves` + `flatten_metrics` aggregation, feature
-  selection argmax. Full suite: 68 passed.
-- Wrote `experiments/c5_steering/run.py` — thin orchestration over
-  `runner.run_cell` for 3 archs × 3 seeds, with `--pre-test-only`
-  flag for the V7 health-check on TXC-pro per c5.md.
-- Wrote `experiments/c5_steering/analysis.py` — leaderboard query →
-  per-arch coh-vs-success curves with errorbars + AUTO-RESULTS
-  markdown (placeholder until cells run).
-- Rewrote `src/temp_bench/eval/steering.py` (was raise-NotImplemented
-  stub) → re-export wrapper for `case_studies.steering` public types.
-- Wrote `src/temp_bench/case_studies/steering.py` (~900 lines, single
-  file per the `case_studies/backtracking.py` convention). Ports V7
-  tiled-broadcast hook + PP fallback hook, 30-concept set verbatim
-  from phase7, paper-§B.2-verbatim grading prompts, Sonnet judge with
-  `judge_outputs.jsonl` persistence per CaseStudy contract, and
-  `SteeringCaseStudy(CaseStudy)`. Provenance lines in the docstring
-  cite specific phase7 file paths.
-- Read `papers/temporal_sae.md` § 4.4–4.5 + Appendix B.2 for the case
-  study spec; located phase7 implementation in
-  `origin/han-phase7-unification:experiments/phase7_unification/case_studies/steering/`.
-- Diagnosed `scripts/sync_from_hf.sh` failure: it calls
-  `huggingface-cli download …`, which is deprecated in
-  huggingface_hub 1.13. The CLI emits help text + exits without
-  downloading. Worked around with direct `hf download`.
-- Pre-flight: `set_agent_env.sh agent_steer` (GPU 0 / ephemeral),
-  smoke test green, `git pull --rebase` brought in c7 backtracking
-  artifacts, discarded a stale local downgrade of `datasets`
-  in `uv.lock`.
+  selection argmax. All 68 framework + steering tests green.
+- Initial code port (commit b0519a99): `case_studies/steering.py`
+  (~900 lines) with V7 + PP hooks, 30 paper-faithful concepts,
+  paper-§B.2-verbatim grading prompts, `SonnetSteeringJudge` with
+  `judge_outputs.jsonl` persistence, `SteeringCaseStudy(CaseStudy)`
+  implementing 4-stage pipeline. Plus run.py + analysis.py
+  scaffolding + eval/steering.py rewritten from stub to re-export.
+- Pre-flight: env pin (GPU 0 / ephemeral), smoke test green,
+  diagnosed broken `sync_from_hf.sh` (deprecated huggingface-cli),
+  worked around with direct `hf download`.
 
 ## Next action (agent owns — overwrite)
 
@@ -168,37 +190,49 @@ Newest first.
 
 **Then continue from here:**
 
-A. **Wait for / coordinate with agent_nlp** to finish porting
-   `tsae_paper`, `txc_base`, `txc_pro` arch classes
-   (`temp_bench.architectures.{tsae,txc_base,txc_pro}`). Until those
-   land, `experiments/c5_steering/run.py` will fail at
-   `instantiate_arch(...)` for any cell. The smoke test already
-   reports this as 8 *expected* gaps. Check progress with
-   `.venv/bin/python -c "from temp_bench.config import load_arch, instantiate_arch;
-   import importlib; m=importlib.import_module('temp_bench.architectures.tsae'); print(m)"`.
+A. **If `tsae_paper × seed 42` is still running (PID 13635)**: don't
+   re-launch. The Bash background task `bx2eso6ju` will notify on
+   exit; the Monitor task `bex720hr4` streams progress events. Just
+   `tail -20 logs/c5_tsae_paper_seed42.log` to check.
 
-B. Once one arch is up, **smoke-test a tiny cell**:
-   `TQDM_DISABLE=1 .venv/bin/python -m experiments.c5_steering.run --archs topk_sae --seeds 42 --n-concepts 3 --strengths 100 --pre-test-only`
-   (uses `topk_sae` since it IS ported, just to validate the
-   end-to-end path — won't be a paper cell because c5.md says only
-   T-SAE/TXC-base/TXC-pro). This will load Gemma-2-2b-IT (~5 GB
-   bf16) and call Sonnet (~$0.05). Verify `judge_outputs.jsonl`
-   appears under `results/runs/<eval_key>/`.
+B. **If it finished successfully**: verify the metrics in the latest
+   leaderboard row (``tail -1 results/leaderboard.jsonl``). If
+   ``mean_coh > 1.0``, V7 worked. Then queue up the remaining seeds
+   in the background:
+   `TQDM_DISABLE=1 .venv/bin/python -m experiments.c5_steering.run --archs tsae_paper --seeds 1 2 > logs/c5_tsae_paper_seeds_1_2.log 2>&1 &`.
+   After tsae_paper completes (3 seeds), run `txc_base × {1, 2, 42}`:
+   `TQDM_DISABLE=1 .venv/bin/python -m experiments.c5_steering.run --archs txc_base > logs/c5_txc_base.log 2>&1 &`.
 
-C. **Pre-test V7 on TXC-pro** (per Hard Rule "fall back to PP if
-   degenerate"): once `txc_pro` arch + checkpoint are available,
-   `--pre-test-only --archs txc_pro`. Read `mean_coh` from
-   `results/runs/<eval_key>/_pre_test_v7/curves.json`. If ≤ 1.0 → use
-   `--protocol pp` for the full sweep and document in c5.md.
+C. **If it failed** (non-zero exit, traceback in log): diagnose
+   from the log tail. Common failure modes:
+   - HF push failed → check `/workspace/.tokens/hf_token` is valid
+     write-token; `cache.save_checkpoint` push failure is fatal on
+     ephemeral pod.
+   - Gemma load failed → ensure `/workspace/hf_cache/` has space
+     (Gemma-2-2b-IT is ~5 GB).
+   - Sonnet rate-limit → reduce `--n-concepts` or
+     `SteeringConfig.judge_max_workers`.
+   - V7 algebra crash → check tensor shapes vs the V7 hook's
+     ``z.dim() == 3`` branch; window archs may return ``(B, T,
+     d_sae)`` from encode while per-token archs return ``(B,
+     d_sae)``.
 
-D. **Full sweep**: `python -m experiments.c5_steering.run` with all
-   defaults. 3 archs × 3 seeds × 30 concepts × 9 strengths = 810
-   greedy generations × 2 judge calls = 1620 Sonnet calls per arch.
-   At 5 workers, ~5 min/arch judge time + ~5 min/arch generation =
-   ~15 min/arch + Sonnet cost ~$1.50/arch → ~$5 + 45 min total.
+D. **`txc_pro` is still pending** (commit ae2aaf8b ported tsae_paper
+   + txc_base + sae_arditi but NOT txc_pro). Check via
+   `ls src/temp_bench/architectures/txc_pro.py 2>&1`. Once
+   ``txc_pro.py`` lands:
+   - run V7 pre-test:
+     ``TQDM_DISABLE=1 .venv/bin/python -m experiments.c5_steering.run --pre-test-only``
+   - read ``results/runs/<eval_key>/_pre_test_v7/curves.json``.
+     If ``mean_coh ≤ 1.0``, run TXC-pro full sweep with
+     ``--protocol pp --archs txc_pro`` and document the switch in
+     c5.md (under "Caveats").
 
-E. After sweep: `.venv/bin/python -c "from temp_bench import report; report.render(component='c5')"` — rewrites
-   `docs/components/c5.md` AUTO-RESULTS block from the leaderboard.
+E. **After all 9 cells complete**:
+   ``.venv/bin/python -c "from temp_bench import report; report.render(component='c5')"``
+   rewrites the AUTO-RESULTS block of c5.md from the leaderboard.
+   Don't hand-edit between the markers (PROTOCOL.md § 7).
+   Then commit the leaderboard delta + the regenerated c5.md.
 
 ## Don't repeat (agent owns — overwrite)
 
