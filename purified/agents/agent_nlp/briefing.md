@@ -36,14 +36,36 @@ C4 hypothesis: TXC-pro matches T-SAE on Top-256 cumulative SEMANTIC
 Pareto. **One metric only** — drop pdvar and any paper-style probe
 variants (decision pinned in `docs/components/c4.md`).
 
-Open task-suite question (decisions.md "Non-decisions"): the C3 task
-suite is Phase 5's 36-task vs Phase 7's 16-task PAPER subset. **Pre-
-register a single suite before launch** and document the choice in
-`docs/components/c3.md`. Default if undecided: SAEBench standard.
+**Task suite is locked**: `SAEBench+CT` (n=38) — upstream SAEBench's
+canonical 36 binary one-vs-rest tasks (8 datasets, classes per
+SAEBench's `dataset_info.chosen_classes_per_dataset`) plus the two
+cross-token coreference tasks (WinoGrande + SuperGLUE WSC). See
+`decisions.md` § 11 and `docs/components/c3.md` "Task suite" for
+the full table + reproduction notes.
+
+When you port the wasteland's `probe_datasets.py` + `crosstoken_datasets.py`,
+apply three SAEBench-faithfulness fixes (do not blindly copy the
+wasteland 36):
+- **github-code**: use SAEBench's `codeparrot/github-code` with the 5
+  SAEBench languages (C, Python, HTML, Java, PHP), NOT wasteland's
+  `code_search_net` (python/java/javascript/go). NOT gated despite
+  what the HF web viewer suggests — that page is disabled because the
+  loader is a Python script, not because access is restricted. Just
+  needs `trust_remote_code=True` (set via `HF_DATASETS_TRUST_REMOTE_CODE=1`
+  in your shell or `set_agent_env.sh`) and `datasets<4` (already
+  pinned in `pyproject.toml`). Smoke-test the loader once with a
+  tiny `streaming=True` pull BEFORE the 3-H100-hour cache build.
+- **amazon_sentiment**: emit BOTH 1.0-vs-rest AND 5.0-vs-rest binaries
+  (wasteland only has 5.0).
+- **amazon_categories**: hardcode `["1","2","3","5","6"]` and use a
+  deterministic non-streaming pull (wasteland streaming-top-5 missed
+  cat6 and is non-deterministic across runs).
 
 Locked decisions in scope: #1 (two TXCs — no hill-climbing), #4
 (cross-branch reads via `git show`), #6 (HF repos), #7 (Bricken
-opt-in; for C3/C4 you must run an A/B at 5k×1seed before adopting).
+resample is C6-only by default; **C3/C4 keep it OFF** — revisit only
+if time permits at the end of the paper sprint), #11 (SAEBench+CT
+task suite).
 
 References:
 - `agents/README.md` (your roster row + pod specs)
@@ -82,9 +104,12 @@ do not try to populate them yourself.
 2. `source scripts/set_agent_env.sh agent_nlp`
 3. `bash scripts/agent_smoke_test.sh` (46/46 + expected gaps)
 4. `git pull --rebase origin final`
-5. Read `docs/components/c3.md` + `c4.md` end-to-end. Decide task
-   suite (Option A SAEBench / Option B 16-task PAPER) and update
-   c3.md before launch.
+5. Read `docs/components/c3.md` + `c4.md` end-to-end. Task suite is
+   already locked (`SAEBench+CT`, n=38) — see `decisions.md` § 11. No
+   pre-registration needed. Smoke-test the github-code loader with a
+   tiny streaming pull BEFORE step 7 to confirm `trust_remote_code` +
+   `datasets<4` are working:
+   `python -c "from datasets import load_dataset; ds = load_dataset('codeparrot/github-code', streaming=True, split='train', trust_remote_code=True, languages=['C']); print(next(iter(ds)))"`
 6. Port `temp_bench.data.nlp.cache_activations` from
    `origin/han-phase7-unification:src/data/` (search for the
    FineWeb activation cache pipeline; copy with header comment +
@@ -97,7 +122,13 @@ do not try to populate them yourself.
 9. Port the 5 archs needed for C3: `topk_sae`, `tsae_paper`, `mlc`,
    `txc_base`, `txc_pro` (sources listed in `decisions.md` and
    `agent_paper/briefing.md` port table).
-10. Train + eval cells via `runner.run_cell(...)`. Schema +
+10. Port `probe_datasets.py` + `crosstoken_datasets.py` from
+    `origin/han-phase7-unification:experiments/phase5_downstream_utility/probing/`
+    AND apply the three SAEBench-faithfulness fixes (see mandate above:
+    github-code provider, amazon_sentiment 1.0 binary, amazon_categories
+    determinism + cat6). Build the probe cache and confirm exactly 38
+    task dirs are produced before training.
+11. Train + eval cells via `runner.run_cell(...)`. Schema +
     eval_protocol_version validation will append rows to
     `results/leaderboard.jsonl`.
 

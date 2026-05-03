@@ -58,6 +58,30 @@ datasources:
     tokenizer_revision: main
     notes: "T-SAE paper anchor. Stretch goal — paper-fidelity setup."
 
+  gemma_2_2b_it_l13_concat_v1:
+    category: real_lm
+    subject_model: google/gemma-2-2b-it
+    layer: 13
+    hookpoint: resid_post
+    dataset: concat_v1
+    n_seqs: 3
+    seq_len: variable
+    tokenizer_revision: main
+    notes: |
+      C4 qualitative-latents source. Three contiguous-passage
+      concatenations on disjoint topics:
+        concat_A: Newton Principia + MMLU genetics Q + Bhagavat Gita
+        concat_B: MMLU biology Q + Darwin letter + Animal Farm wiki
+                  + MMLU math Q
+        concat_random: 20-token windows from MMLU across 8 categories
+      Source JSONs already exist on the wasteland at
+      `origin/han-phase7-unification:experiments/phase6_qualitative_latents/concat_corpora/{concat_A,concat_B,concat_C}.json`
+      (concat_C is the random/TSNE set, used as concat_random here).
+      Generator on the wasteland:
+      `experiments/phase6_qualitative_latents/build_concat_corpora.py`.
+      Agent NLP: port the JSONs (or regenerate via the script) into
+      `purified/data/concat_corpora/` before running C4 cells.
+
   qwen_2_5_14b_instruct_finance_l24_resid_post:
     category: real_lm
     subject_model: Qwen/Qwen2.5-14B-Instruct

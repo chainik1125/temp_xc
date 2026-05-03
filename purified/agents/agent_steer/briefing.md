@@ -52,7 +52,8 @@ lose 0.005–0.020 probing AUC, inconsistent with "two TXCs everywhere."
 
 Locked decisions in scope: #1 (two TXCs — DO NOT use Galaxy/SoftMaxPool
 hill-climbing wins), #4 (cross-branch reads), #6 (HF repos), #7
-(Bricken opt-in; C5 must run an A/B at 5k×1seed before adopting).
+(Bricken resample is C6-only by default; **C5 keeps it OFF** —
+revisit only if time permits at the end of the paper sprint).
 
 References:
 - `agents/README.md` (your roster row + pod-mode contract)

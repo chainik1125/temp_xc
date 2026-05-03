@@ -102,12 +102,16 @@ all jointly tuned for that organism.
 - Bricken resample is exposed as an opt-in `BrickenConfig` knob in
   `src/temp_bench/training/bricken.py`. Components turn it on
   themselves and disclose the choice in their writeup.
-- C6 turns it on by default (Dmitry's evidence directly supports it).
+- **C6 only by default** (Dmitry's evidence directly supports it on
+  Qwen-7B medical organism).
 - C1/C2 keep it off (no dead-feature pressure at $d_{\text{sae}}=40$).
-- C3/C4/C5/C7 must run an A/B test at small scale before adopting:
-  TXC-base ± Bricken at 5k steps × 1 seed × small task subset.
-  Adopt iff $\Delta \geq \sigma_{\text{seeds}}$. Verdict recorded in
-  `docs/components/cN.md`.
+- **C3/C4/C5/C7 keep it off** (revised 2026-05-03 with Han). The
+  earlier policy demanded an A/B test (TXC-base ± Bricken at 5k×1seed)
+  for each of these components before adopting. Han: "we're locking in
+  txc_base and txc_pro, we'll only try Bricken resample if time
+  persists at the end." Saves ~8 H100-hours of validation work for a
+  maybe-marginal effect; the cost is leaving on the table any
+  Δ AUC > σ_seeds that Bricken would have lifted.
 
 **Rationale**: untested interactions — TXC-pro's matryoshka × InfoNCE
 might break under hard resets; toy d_sae=40 has no dead pressure;
@@ -209,11 +213,83 @@ deleted; `agents/agent_paper/log.md` deleted. The historical content
 of agent_paper's log.md is summarised in `git log` of the deletion
 commit + the now-merged briefing's "What I just did".
 
+### 11. C3 task suite is `SAEBench+CT` (n=38)
+
+Han: "I think we should just do whatever SAEBench did ... we should
+definitely fix the github-code discrepancy and do the HF permissions ...
+the benefit of using the faithful SAEBench task set is reviewers won't
+complain about cherrypicking."
+
+**Decision**: C3 evaluates on **SAEBench+CT**, defined as the canonical
+upstream SAEBench sparse-probing suite (Karvonen et al., 36 binary
+one-vs-rest tasks across 8 datasets) augmented with two cross-token
+coreference probing tasks (WinoGrande, SuperGLUE WSC). **Total: 38
+tasks.** Phase 5's 36-task and Phase 7's 16-task PAPER subset are
+both retired as headline candidates.
+
+The SAEBench composition is fixed by `chosen_classes_per_dataset` in
+upstream `sae_bench/sae_bench_utils/dataset_info.py` (verified
+2026-05-03):
+
+```
+bias_in_bios_class_set1: ["0","1","2","6","9"]      → 5
+bias_in_bios_class_set2: ["11","13","14","18","19"] → 5
+bias_in_bios_class_set3: ["20","21","22","25","26"] → 5
+amazon_reviews_mcauley_1and5: ["1","2","3","5","6"] → 5
+amazon_reviews_mcauley_1and5_sentiment: ["1.0","5.0"] → 2
+codeparrot/github-code: ["C","Python","HTML","Java","PHP"] → 5
+ag_news: ["0","1","2","3"] → 4
+europarl: ["en","fr","de","es","nl"] → 5
+                                                       ──
+                                                       36
++ winogrande_correct_completion + wsc_coreference    → 38
+```
+
+`probe_training.py` iterates per-class with no special handling, so
+2-class amazon_sentiment yields 2 binaries (verified upstream).
+
+**Three implementation deltas** vs the wasteland's "FULL-36" loader:
+
+1. **github-code provider switch.** Use SAEBench's `codeparrot/github-code`
+   with the 5 SAEBench languages `["C","Python","HTML","Java","PHP"]`,
+   not our wasteland's `code_search_net` python/java/javascript/go.
+   The dataset uses a Python loading script (HF web viewer is disabled
+   for that reason but the dataset itself is publicly readable, NOT
+   gated). Loader requires `trust_remote_code=True` — already set via
+   `os.environ.setdefault("HF_DATASETS_TRUST_REMOTE_CODE", "1")`. Also
+   requires `datasets<4` (the `trust_remote_code` mechanism was removed
+   in v4); pinned in `purified/pyproject.toml` 2026-05-03.
+2. **amazon_sentiment.** Add the 1.0-vs-rest binary (we currently only
+   have 5.0-vs-rest as `amazon_reviews_sentiment_5star`).
+3. **amazon_categories.** Hardcode the class list to `["1","2","3","5","6"]`
+   and use a non-streaming pull large enough to populate all 5; the
+   wasteland's streaming-top-5 approach is non-deterministic and
+   missed cat6.
+
+**Why SAEBench-faithful + the 2 coref additions**:
+
+- SAEBench is the recognised standard. Saying "we evaluated on
+  SAEBench" defends against the "you cherry-picked tasks that favor
+  TXC" review on the headline benchmark axis.
+- WinoGrande + WSC retained because they are the cleanest single-task
+  evidence for TXC's cross-token inductive bias (winogrande T-slope
+  +0.0069/T at k=20 — ~100× the next task; from
+  `2026-04-29-per-task-tsweep.md`). Reported transparently as a
+  "+CT" extension, not folded silently into "SAEBench".
+- The 16-task PAPER subset (Phase 7) inherited the same coref-addition
+  problem AND added a cluster-balancing decision the paper would have
+  to defend separately. Two unforced critique vectors collapsed into
+  one ("we extended SAEBench by 2 well-motivated coref tasks").
+
+**Naming convention for the paper**: refer to the suite as
+**SAEBench+CT** in tables and figure captions. First mention in prose:
+"the standard SAEBench sparse-probing benchmark (Karvonen et al., 36
+tasks across 8 datasets) augmented with two cross-token coreference
+probing tasks (WinoGrande, SuperGLUE WSC; n=38 binary one-vs-rest
+tasks total)."
+
 ### Non-decisions (to revisit later)
 
-- **C3 task suite** — Phase 5's 36-task vs Phase 7's 16-task PAPER subset.
-  Agent NLP must pre-register a single suite before launch. See
-  `docs/components/c3.md`.
 - **MLC scope** — competitive with TXC-base at C3 k=5. Include as related
   work / appendix? Decide before the paper goes to draft.
 - **A third agent on the A40 pod** — slot is open. Could be a "synthetic

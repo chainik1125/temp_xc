@@ -106,17 +106,17 @@ $d_{\text{sae}} = 40$ where dead pressure is essentially zero.
 
 | C | Bricken on/off | Reasoning |
 |---|---|---|
-| C1 | **off** (no A/B needed) | $d_{\text{sae}} = 40$, ~ no dead pressure. n_check=2048 saturates fire counts. |
-| C2 | **off** (no A/B needed) | Same. |
-| C3 | **A/B first** | TXC-base ± Bricken at 5k steps × 1 seed × 16-task subset (~1 H100-hour). Adopt iff $\Delta$AUC > $\sigma_{\text{seeds}}$. |
-| C4 | **piggybacks on C3** | Shares the cache. |
-| C5 | **A/B first** | Same protocol as C3 on a 1k-prompt steering subset. |
-| C6 | **on** (Dmitry's data) | brickenauxk_a8 recipe; component justifies it. |
-| C7 | **A/B first** | Same protocol as C3 on backtracking inducement. |
+| C1 | **off** | $d_{\text{sae}} = 40$, ~ no dead pressure. |
+| C2 | **off** | Same. |
+| C3 | **off** | Locked in with Han 2026-05-03. Revisit only if time permits after 48 hours. |
+| C4 | **off** | Inherits C3. |
+| C5 | **off** | Locked in with Han 2026-05-03. |
+| C6 | **on** (Dmitry's data) | brickenauxk_a8 recipe; component directly justifies it. |
+| C7 | **off** | Locked in with Han 2026-05-03. |
 
-The verdict from each A/B is recorded in the component writeup so the
-paper can transparently report "TXC-base on C3 used Bricken
-(verdict +0.x AUC)" or "did not use Bricken (verdict −σ)".
+If a component does flip Bricken on later (only C6 by default; others
+only if a 48-hour stretch goal materialises), the verdict is recorded
+in the component writeup for paper transparency.
 
 ### Mixed precision
 

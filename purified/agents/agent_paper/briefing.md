@@ -272,10 +272,15 @@ briefings are drafted; await Han's review. Continue C1+C2 in parallel.
    T+0 (with steer at T+~3hr after C3 cache uploads). agent_steer's
    briefing tells the worker to wait on the cache before bootstrap.
    Acceptable, or stagger?
-3. **C3 task suite**: still TBD (Phase 5's 36-task vs Phase 7's
-   16-task PAPER subset). agent_nlp's briefing instructs them to
-   pre-register before launch. You may want to make this call
-   yourself rather than delegate.
+3. ~~**C3 task suite**: still TBD~~ — RESOLVED 2026-05-03 with Han.
+   Locked as **SAEBench+CT** (upstream SAEBench's 36 binary tasks +
+   WinoGrande + WSC = 38). See `decisions.md` § 11; agent_nlp briefing
+   updated. Three SAEBench-faithfulness deltas (github-code provider,
+   amazon_sentiment 1.0, amazon_categories cat6) tracked as agent_nlp
+   TODOs. github-code requires `trust_remote_code=True` + `datasets<4`
+   (pinned in pyproject.toml 2026-05-03); not actually HF-gated — the
+   web viewer is disabled because the loader is a Python script, but
+   the dataset is public.
 4. **agent_em_h200 fallback**: provisioned dormant in roster — wait
    for R32 OOM, or stand up proactively?
 5. **A 5th worker for the 4× A40 pool**: GPUs 2 + 3 are spare. Could

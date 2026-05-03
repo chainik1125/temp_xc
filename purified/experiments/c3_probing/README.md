@@ -1,7 +1,10 @@
-# C3 — Sparse probing (SAEBench-style)
+# C3 — Sparse probing (SAEBench+CT)
 
 Per-component scripts for probing on Gemma-2-2b activations.
-See `docs/components/c3.md` for the (still-being-decided) task suite + S window.
+Task suite is **SAEBench+CT** (n=38: upstream SAEBench's 36 binary
+tasks + WinoGrande + SuperGLUE WSC). Locked in
+`agents/agent_paper/decisions.md` § 11; full spec in
+`docs/components/c3.md`.
 
 ## Files (TODO — Agent NLP fills in)
 
@@ -13,5 +16,8 @@ See `docs/components/c3.md` for the (still-being-decided) task suite + S window.
 
 ## Notes
 
-- **Pre-register the task suite** before launch. See `docs/components/c3.md`.
 - Caching is the long pole. Start it first.
+- Three SAEBench-faithfulness deltas vs the wasteland 36-task loader
+  (github-code provider, amazon_sentiment 1.0 binary, amazon_categories
+  determinism + cat6) — see `docs/components/c3.md` "Task suite"
+  before porting `probe_datasets.py`.
