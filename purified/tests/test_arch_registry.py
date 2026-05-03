@@ -38,7 +38,6 @@ KNOWN_UNPORTED = {
     "tfa",
     "tfa_pos",
     "mlc",
-    "sae_arditi",
     "txc_pro",
 }
 
