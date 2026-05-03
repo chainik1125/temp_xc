@@ -43,6 +43,67 @@ resampling noise floor at mag=0**:
 | Best Δnet vs baseline | MLC = +2 (mag=+4, p=0.73 n.s.); TXC = +1 (mag=−2, p=1.00); SAE = 0; TSAE-paper = 0 |
 | Detection AUC range @ \|S\|=8 | 0.63–0.72 across arches; TXC slightly leads (0.681), no Wilcoxon comparison HB-significant |
 
+## Inducement metric (Dmitry pivot — 2026-05-03 PM)
+
+> **Dmitry's Slack feedback after seeing the baseline-corrected headline:**
+> *"Getting answers right is good but not necessarily the best metric — if we
+> normalize by steering prob and it's still more inducement more stably,
+> that's ok."*
+>
+> Reframes the headline from rescue-correctness ("did the math answer
+> flip from incorrect to correct") to **backtracking inducement** ("did
+> steering produce more backtracking emissions, more stably across
+> magnitudes"), normalized by some measure of steering effort.
+
+We compute two inducement metrics, both baseline-corrected (subtract
+the per-(arch, qid) value at mag=0):
+
+1. **Δ keyword_rate** — cheap proxy: count of `wait` / `hmm` word boundaries
+   per total words in the steered continuation. Free, instant. Same regex
+   as B1.
+2. **Δ Sonnet `genuine_count`** — gold standard: Sonnet 4.6 judge counts
+   actual backtracking events (catching errors, missing constraints,
+   approach rejection, assumption re-evaluation), explicitly EXCLUDING
+   filler ("Hmm, let me think"), pseudo-backtracking, or loops. Currently
+   running (~9,150 calls; ~$27; ~30 min wall). **Plot will refresh when
+   judge finishes.**
+
+![Inducement (cheap proxy + Sonnet) vs raw magnitude — 5 archs](images_b/np_inducement_headline.png)
+
+### Per-arch peak Δ keyword_rate (cheap proxy)
+
+Stability column = number of nonzero magnitudes (out of 24) where
+Δ keyword_rate > 0 (i.e., steering reliably elevates the proxy):
+
+| Arch | Stability (Δ>0 mags / 24) | Peak Δ kw_rate (mag) | Peak / TXC |
+|---|---|---|---|
+| **TXC** | **24/24** | **+0.073 (mag = −16)** | 1.00× |
+| **TXC-H8** | 24/24 | +0.051 (mag = +16) | 0.69× |
+| MLC | 24/24 | +0.018 (mag = +16) | 0.25× |
+| SAE | 22/24 | +0.005 (mag = +16) | 0.07× |
+| TSAE-paper | 24/24 | +0.003 (mag = +16) | 0.04× |
+| TFA | 24/24 | +0.002 (mag = −16) | 0.03× |
+
+**Under the cheap proxy, TXC dominates inducement** — peak Δ keyword_rate
+~4× TXC-H8, ~14× MLC, ~30× the rest. All archs except SAE have monotonic
+positive inducement across all 24 nonzero magnitudes (very stable
+direction). This is the pattern Dmitry was hoping for.
+
+**Important caveat**: keyword_rate counts ALL `wait`/`hmm` emissions
+including filler, pseudo-backtracking, and loops (e.g., the TXC mag=+16
+sentence-loop pattern documented in the repetition-rate plot below). The
+Sonnet judge explicitly filters these out. **Until the Sonnet pass
+lands, treat the keyword-rate ranking as upper-bound on the inducement
+story** — TXC's lead may shrink (though probably won't reverse) once the
+loops are de-credited.
+
+### Sonnet `genuine_count` (gold standard) — pending
+
+Will populate when the Sonnet judge run completes (~30 min). Updated
+plot will overwrite `images_b/np_inducement_headline.png`.
+
+---
+
 ## Headline figure (BASELINE-CORRECTED — Fig 4a in main text)
 
 > **Why baseline correction matters.** At mag=0 the steering hook is a
