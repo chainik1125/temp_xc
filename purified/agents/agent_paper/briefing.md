@@ -104,111 +104,152 @@ Your first mission is to decide on the following:
 
 ## Current state (agent owns — overwrite at every compact)
 
-**Last verified: 2026-05-03T21:00:00Z**
+**Last verified: 2026-05-03T21:30:00Z**
 
-Han's "first mission" decisions are now LOCKED and recorded in
-`decisions.md` #1–9. Don't re-open. Concretely:
+Han's "first mission" decisions are now LOCKED in `decisions.md` #1–10.
+Framework is built; tests 38/38 green; HF repos + tokens unified.
+Han's NEW priority (this turn): provision worker agents.
 
-- `final` branch created + pushed. ✓
-- 7 components identified, each with a `docs/components/cN.md` writeup. ✓
-- `purified/` layout: `temp-bench` is `src/temp_bench/case_studies/{steering,em,backtracking}.py` with a `CaseStudy` ABC. ✓
-- 5 active agents (paper, nlp, em, steer, back) + 1 fallback (em_h200). 4× A40 has 2 spare pool GPUs. ✓
-- Runpod scaffolding: `purified/scripts/{bootstrap_runpod,bootstrap_local,set_agent_env,sync_from_hf,agent_smoke_test,wasteland_refresh}.sh`. ✓
-- Cross-agent state: `runner.run_cell` → `results/leaderboard.jsonl` (append-only, schema-validated, flock). ✓
-- Writeup structure: by component (`docs/components/cN.md`), not by agent. ✓
-- Two TXCs locked: TXC-base = `txc_bare_antidead_t5`; TXC-pro = `phase5b_subseq_h8`. ✓
-
-Framework state:
-- `git HEAD`: pending the next commit (this state-update lands in it).
-- All 38 framework tests passing in `purified/.venv` (just rebuilt).
-- `results/leaderboard.jsonl`: empty (no cells run).
-- `checkpoints/manifest.jsonl`: empty.
-- HF repos provisioned: `han1823123123/temp-bench-{models,data}` (private).
-- Token store unified: `~/.tokens/{hf_token,anthropic_key}` on local;
-  `/workspace/.tokens/...` on RunPod. `get_token()` resolves both.
-- No worker agents (NLP, EM, STEER, BACK, EM_H200) are provisioned yet —
-  briefings TODO when Han spins them up.
+- `final` branch pushed. `git log` for history. ~12 commits on day 0.
+- 7 components have `docs/components/cN.md` writeups (planning status).
+- 5 named agents in roster + 1 fallback. **Only agent_paper (me) is
+  active**; NLP/EM/STEER/BACK/EM_H200 not yet provisioned.
+- Locked archs: TXC-base = `txc_bare_antidead_t5`,
+  TXC-pro = `phase5b_subseq_h8`. Baselines: TopK-SAE, T-SAE, TFA, MLC,
+  SAE-arditi (per `configs/locked_archs.yaml`).
+- `results/leaderboard.jsonl` empty. `checkpoints/manifest.jsonl` empty.
+- Token store: `~/.tokens/` (local) + `/workspace/.tokens/` (RunPod).
+- 8 arch class files NOT yet ported from
+  `origin/han-phase7-unification:src/architectures/`. The yaml entries
+  exist; the .py classes don't.
 
 ## What I just did (agent owns — overwrite)
 
-Ordered newest-first; "agent_paper has spent ~1 day on this" boils down to
-~10 commits on `final`. See `git log` for the full history.
+Newest first. `git log` for full history.
 
-- Switched briefing-vs-handover design: dropped dated handover archive,
-  consolidated into THIS briefing with section ownership (Han's section
-  read-only, agent's section overwritten at every compact). Per
-  PROTOCOL.md § 14.
-- Dropped `agents/agent_paper/log.md` — overhead with marginal benefit.
-  Git log + `decisions.md` + this briefing's "What I just did" are
-  enough.
-- Simplified `c4.md` to single metric: Top-256 cumulative SEMANTIC Pareto
-  (was: 3 metrics for "ablation honesty"; Phase 6 showed they ranked
-  archs differently — drop pdvar + paper-style probe).
-- Wasteland code deletion (`src/`, `experiments/`, `references/`, etc.
-  gone from `final`). Wasteland docs (`docs/`, `papers/`) kept because
-  component writeups cite them.
-- Token storage unified: `~/.tokens/` on local, `/workspace/.tokens/` on
-  RunPod. `get_token()` resolves both. Migrated `.env_autointerp` →
-  `~/.tokens/anthropic_key`. New `bootstrap_local.sh`.
-- GPU sharing protocol: Primary + Pool with lockfile claims
-  (`temp_bench.utils.gpu_locks`). 6 tests, all passing.
-- Modularity framework: configs as source of truth, deterministic
-  cache keys (`act_cache_key` ⊃ `train_key` ⊃ `eval_key`), single
-  canonical `runner.run_cell`. 23 tests originally; now 38 with token
-  + lock additions.
+- Briefing/handover/log consolidation (#10): one `briefing.md` per
+  agent, section-owned. Dropped dated handover archive + log.md.
+  PROTOCOL.md § 14 rewritten to "Briefing maintenance".
+- C4 simplified to single metric: Top-256 cumulative SEMANTIC Pareto.
+  Dropped pdvar + paper-style probe.
+- Wasteland code deleted (`src/`, `experiments/`, etc.). Wasteland docs
+  retained (cited by component writeups).
+- Token storage unified across local + RunPod (`get_token()` resolves
+  both). Migrated `.env_autointerp` → `~/.tokens/anthropic_key`.
+- GPU sharing: Primary + Pool with lockfile claims (PROTOCOL.md § 13).
+- Modularity framework + cache contract (PROTOCOL.md § 11,
+  `docs/paper/framework.md`). 38/38 tests.
+
+## Component dependencies + provisioning roadmap (agent owns — overwrite)
+
+This is the raw material for Han's two pending asks:
+**(i) decide spawn order, (ii) write each agent's briefing.**
+
+### Component dependency graph
+
+```
+C1 (toy markov)           ─ agent_paper, local 5090         ─ no external deps
+C2 (toy coupled HMM)      ─ agent_paper, local 5090         ─ no external deps
+C3 (sparse probing)       ─ agent_nlp, H100 GPU 0           ─ builds Gemma-IT-L13 cache (~3 H100-hr)
+C4 (top-256 semantic)     ─ agent_nlp (same agent)          ─ piggybacks on C3 cache
+C5 (RLHF steering)        ─ agent_steer, A40 GPU 0          ─ NEEDS C3's cache from HF
+C6 (EM Wang procedure)    ─ agent_em, H100 GPU 1            ─ separate Qwen-14B + LoRA
+C7 (Ward backtracking)    ─ agent_back, A40 GPU 1           ─ separate Gemma-BASE-L10 cache
+```
+
+Cross-agent dependency: **C5 waits for C3's cache** (uploaded to
+`han1823123123/temp-bench-data` after agent_nlp builds). All others are
+independent.
+
+### Recommended spawn order
+
+- **T+0 (parallel start)**: agent_nlp, agent_em, agent_back. Each
+  begins its own pod bootstrap + cache build / model port.
+  agent_paper (me) continues with C1+C2 locally.
+- **T+~3 hr (after C3 cache uploaded)**: spawn agent_steer; it
+  `sync_from_hf.sh`s the cache and starts immediately.
+- **Defer agent_em_h200** to fallback only (if R32 organism OOMs on H100).
+
+Rationale: parallelize the long-pole work (C3 cache build, EM Wang
+procedure, C7 backtracking), don't gate steering on its own pod-spinup
+since the cache must exist first anyway.
+
+### Per-agent first-task scaffolds (for writing briefings)
+
+Each scaffold is what "Identity + mandate (Han owns)" + first concrete
+task should contain. Han may rewrite the mandate prose; the technical
+specifics (component, hardware, ports needed) are correct.
+
+| Agent | Component(s) | Pod / GPU | First concrete task |
+|---|---|---|---|
+| **agent_nlp** | C3 + C4 | 2× H100 / GPU 0 | Port `temp_bench.data.nlp.cache_activations`, build Gemma-2-2b-IT L13 act-cache (24K seq × 128 tok ≈ 14 GB, ~3 H100-hr), upload to HF temp-bench-data. Then port + train 5 archs × 3 seeds. |
+| **agent_em** | C6 | 2× H100 / GPU 1 | Port `temp_bench.case_studies.em` from `origin/em-nanda:experiments/em_features/run_wang_procedure.py`. Set up Qwen-14B-Instruct + finance LoRA. Implement Bricken resample. First run: TXC-base + brickenauxk on R1 30k mid-α (the gap-close test, decisions.md #6). |
+| **agent_steer** | C5 | 4× A40 / GPU 0 | Port `temp_bench.case_studies.steering`. Set up Gemini judge (coh + success). Wait for agent_nlp's cache → `sync_from_hf.sh` → train TXC-base + TXC-pro + T-SAE → V7 tiled-broadcast steering protocol → coh-vs-success curves. |
+| **agent_back** | C7 | 4× A40 / GPU 1 | Port `temp_bench.case_studies.backtracking` from `origin/aniket-ward-stage-b:experiments/ward_backtracking_txc/`. Build Gemma-BASE-L10 cache (own, not shared). Set up Sonnet judge + 20-transcript blind κ validation. Run inducement (Δgc) + detection (PR-AUC) on 5 archs × 3 seeds. |
+
+For each, the briefing's "Identity + mandate (Han owns)" section
+should reference: `agents/README.md` row, `docs/components/cN.md`,
+relevant `decisions.md` entries, and the wasteland files to port.
 
 ## Next action (agent owns — overwrite)
 
-1. `cd $(git rev-parse --show-toplevel)/purified`
-2. `source scripts/set_agent_env.sh agent_paper`
-3. `bash scripts/agent_smoke_test.sh` — expect 38/38 + 8 expected
-   arch-class import gaps (those are the architectures we haven't
-   ported yet — `configs/locked_archs.yaml`).
-4. `git pull --rebase origin final`
-5. Read this briefing top-to-bottom. Read `decisions.md` #1–9.
-6. **Begin C1+C2 implementation work.** This is agent_paper's actual
-   research mandate (not just orchestration). Concrete steps:
-   - Port architectures from `origin/han-phase7-unification`:
-     `git show origin/han-phase7-unification:src/architectures/<file>` →
-     `src/temp_bench/architectures/<name>.py`. Add header comment
-     with source path + commit hash. Architectures to port:
-     `topk_sae`, `tsae` (T-SAE paper), `tfa`, `txc_base` (= wasteland's
-     `txc_bare_antidead_t5`), `txc_pro` (= `phase5b_subseq_h8`),
-     `stacked_sae` (for C1).
+1. Bootstrap: `cd $(git rev-parse --show-toplevel)/purified` →
+   `source scripts/set_agent_env.sh agent_paper` →
+   `bash scripts/agent_smoke_test.sh` (expect 38/38 + 8 expected gaps) →
+   `git pull --rebase origin final`.
+2. Read this briefing top-to-bottom. Read `decisions.md` #1–10.
+3. **Han's task (i)**: confirm/adjust the spawn order in
+   "Component dependencies + provisioning roadmap" above. Default
+   recommendation: parallel start of nlp + em + back at T+0;
+   steer at T+~3hr.
+4. **Han's task (ii)**: write `agents/<name>/briefing.md` for each of
+   {agent_nlp, agent_em, agent_steer, agent_back} by:
+   - copying `agents/_briefing_template.md`
+   - filling "Identity + mandate (Han owns)" using the per-agent
+     scaffold above (component, hardware, first task) — write it
+     as Han's voice; he'll review/edit before spinning up.
+   - leaving the agent-owned sections empty (the worker fills them
+     at first compact).
+5. **Present drafts to Han** for review before he spawns the agents.
+   Han may rewrite the mandate prose to redirect priorities.
+6. **In parallel** with worker bootstrap: continue agent_paper's
+   own C1+C2 implementation. Concrete steps:
+   - Port arch classes from `origin/han-phase7-unification:src/architectures/`
+     into `src/temp_bench/architectures/` (8 files: topk_sae, tsae,
+     tfa, mlc, sae_arditi, txc_base, txc_pro, stacked_sae).
    - Implement `temp_bench.data.toy.markov_chain_support` (C1) and
-     `coupled_hmm` (C2) generators.
+     `coupled_hmm` (C2).
    - Write `experiments/c1_synthetic_topk/run.py` from
-     `_runner_template.py`.
-   - Smoke-run: `txc_base` × seed 42 × k=2 × 1000 steps (~1 min on
-     5090). Verify `run_cell` writes a leaderboard row + saves a
-     checkpoint at `checkpoints/<train_key>/`.
-   - Then full sweep (3 seeds × 12 k values × ~6 archs ≈ 6 hr local).
-7. After C1+C2 are running, draft worker-agent briefings for NLP / EM /
-   STEER / BACK so Han can spin them up.
+     `_runner_template.py`. Smoke-run: 1 cell × 1000 steps. Then
+     full sweep (~6 hr local).
 
 ## Don't repeat (agent owns — overwrite)
 
-- **Don't re-create the root wasteland.** `src/`, `experiments/`,
-  etc. are gone on `final`. Read via `git show origin/han-phase7-unification:<path>`.
-- **Don't add a third TXC.** decisions.md #1: TXC-base + TXC-pro only.
-- **Don't auto-add Bricken.** decisions.md #7: opt-in per component;
-  only C6 enables by default.
-- **Don't operate from repo root.** `set_agent_env.sh` will refuse;
-  always `cd purified` first.
-- **Don't allocate run_ids manually.** `runner.run_cell` computes
-  `train_key`/`eval_key` deterministically. Bumping `arch_version`
-  invalidates train cache; bumping `EVAL_PROTOCOL_VERSION` invalidates
-  eval cache.
-- **Don't push without `git pull --rebase` first.** PROTOCOL.md § 1.
-- **Don't write a separate handover file.** PROTOCOL.md § 14 changed —
-  update THIS briefing's bottom sections instead.
-- **Don't create an `agent_paper/log.md` again.** Dropped intentionally;
-  use git log + decisions.md.
-- **Don't edit Han's "Identity + mandate" section above.** Read-only
-  to agents.
+- **Wasteland**: code is gone from `final`; read via `git show
+  origin/han-phase7-unification:<path>`. Don't import from `src/`.
+- **Architectures**: TXC-base + TXC-pro only (decisions #1).
+  Bricken is opt-in per component (#7); default OFF except C6.
+- **Cwd**: always work from `purified/` (`set_agent_env.sh` enforces).
+- **Cache**: never allocate run-ids manually; `runner.run_cell`
+  computes `train_key` / `eval_key` deterministically. Bump
+  `arch_version` to invalidate train cache; bump
+  `EVAL_PROTOCOL_VERSION` to invalidate eval cache.
+- **Git**: always `git pull --rebase` before push. Never force-push.
+- **Briefing/log/handover**: one rolling `briefing.md` per agent,
+  section-owned. No `log.md`, no `handovers/`. Don't edit Han's top
+  section.
+- **Component writeups vs agent briefings**: technical setup goes in
+  `docs/components/cN.md`; agent briefings reference, do not duplicate.
 
 ## Open questions for Han (agent owns — overwrite)
 
-(none currently — all framework decisions are locked. Han has been
-driving the structural shape; if the chat has nothing new, proceed to
-C1+C2 implementation per "Next action".)
+1. **Confirm spawn order**: is parallel start of nlp + em + back at T+0
+   (with steer at T+~3hr after C3 cache uploads) acceptable? Or do you
+   prefer a more staggered rollout?
+2. **Briefings as drafts or live**: should I write the four worker
+   briefings as drafts for your review (recommended — you may want to
+   adjust the mandate prose), or write them as final and have you
+   spin agents up directly?
+3. **agent_em_h200 fallback**: provisioned in dormant state, or wait
+   until R32 actually OOMs on H100? Default: wait — provision only on
+   demand.
