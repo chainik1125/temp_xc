@@ -1242,6 +1242,7 @@ def mine_top_features(
     pos_activations: np.ndarray,      # (n_pos, T, d_in) — labeled-positive sentence acts
     neg_activations: np.ndarray,      # (n_neg, T, d_in) — labeled-negative
     top_k: int = 32,
+    batch_size: int = 1024,
 ) -> list[FeatureMineResult]:
     """Rank features by D+/D- mean-difference selectivity.
 
@@ -1251,22 +1252,41 @@ def mine_top_features(
     activation. Rank features by (pos_mean - neg_mean) selectivity.
     Return top-K features along with their decoder directions.
 
+    Encoding is **batched** by ``batch_size`` to avoid OOM at large
+    ``d_sae``: e.g. d_sae=32768 × n_neg=22K × T=6 fp32 = 17 GB
+    encoded latents, blowing the A40 budget if encoded all at once.
+
     The decoder direction defaults to :meth:`TempBenchArch.decoder_directions`
     (T-averaged for window archs); per-position decoder selection
     (Aniket's "pos0" mode) requires arch-specific override.
     """
     device = next(model.parameters()).device
-    with torch.no_grad():
-        pos_z = model.encode(torch.from_numpy(pos_activations).to(device)).abs()
-        neg_z = model.encode(torch.from_numpy(neg_activations).to(device)).abs()
-        # Max-pool over T (window axis) — matches Aniket's window-level latent.
-        if pos_z.dim() == 3:
-            pos_z = pos_z.amax(dim=1)
-            neg_z = neg_z.amax(dim=1)
-        pos_mean = pos_z.mean(dim=0)
-        neg_mean = neg_z.mean(dim=0)
-        sel = pos_mean - neg_mean
-        topk_vals, topk_idx = sel.topk(top_k)
+
+    def _encoded_means(acts: np.ndarray) -> torch.Tensor:
+        n = acts.shape[0]
+        if n == 0:
+            return torch.zeros(model.d_sae, device=device)
+        sum_acc: torch.Tensor | None = None
+        with torch.no_grad():
+            for i in range(0, n, batch_size):
+                batch = torch.from_numpy(acts[i:i + batch_size]).to(device)
+                z = model.encode(batch).abs()
+                # Max-pool over T (window axis) — Aniket's window-level latent.
+                if z.dim() == 3:
+                    z = z.amax(dim=1)
+                # Sum into accumulator so we can mean at end.
+                if sum_acc is None:
+                    sum_acc = z.sum(dim=0)
+                else:
+                    sum_acc = sum_acc + z.sum(dim=0)
+                del z, batch
+        return sum_acc / n
+
+    pos_mean = _encoded_means(pos_activations)
+    neg_mean = _encoded_means(neg_activations)
+    sel = pos_mean - neg_mean
+    topk_vals, topk_idx = sel.topk(top_k)
+
     decoder = model.decoder_directions().detach().cpu()  # (d_sae, d_in)
     out = []
     for i in range(top_k):
