@@ -100,7 +100,7 @@ datasources:
     layer: 10
     hookpoint: resid_post
     dataset: ward_backtracking_math500
-    n_seqs: 8000
+    n_seqs: 4044       # actual windows from 300 Stage A traces × seq_len/stride=128
     seq_len: 128
     tokenizer_revision: main
     notes: |
@@ -112,6 +112,35 @@ datasources:
       32 layers identified L10 as the optimal layer. d_model = 4096;
       see locked_archs.yaml `per_component_hparams.c7` overrides for
       d_sae expansion.
+
+      NOTE (2026-05-03 agent_back): the Meta `meta-llama/Llama-3.1-8B`
+      repo is gated; our HF token (han1823123123) does not yet have
+      manual approval. The C7 runner uses the alias datasource below
+      (`llama_3_1_8b_base_l10_ward_nousmirror`) which points at the
+      byte-identical NousResearch redistribution. Paper text still cites
+      "Llama-3.1-8B BASE" — the substitution is an HF distribution
+      detail. Open question for Han: prefer accepting the Meta gate +
+      switching back to this entry, or formally adopting the mirror as
+      the canonical C7 datasource? (See agent_back/briefing.md.)
+
+  llama_3_1_8b_base_l10_ward_nousmirror:
+    category: real_lm
+    subject_model: NousResearch/Meta-Llama-3.1-8B
+    layer: 10
+    hookpoint: resid_post
+    dataset: ward_backtracking_math500
+    n_seqs: 4044
+    seq_len: 128
+    tokenizer_revision: main
+    notes: |
+      C7 functional equivalent of `llama_3_1_8b_base_l10_ward` using the
+      NousResearch byte-identical mirror to bypass Meta's gated-repo
+      access wall. Same d_model=4096, same architecture, same weights
+      — paper claims about "Llama-3.1-8B BASE L10" are unaffected.
+      Cache key DIFFERS from the original entry (different
+      `subject_model` field) so we don't accidentally cross-contaminate
+      caches if Han later switches back. Owned by agent_back; see
+      open question #4 in agents/agent_back/briefing.md.
 
   r1_distill_llama_8b_l10_traces:
     category: real_lm

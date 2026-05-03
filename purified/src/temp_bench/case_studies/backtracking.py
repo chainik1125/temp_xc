@@ -195,7 +195,13 @@ def load_stage_a(root: Path | str | None = None) -> StageA:
 @dataclass(frozen=True)
 class Cohort:
     """Aniket's headline cohort: 31 truly-wrong + 30 originally-correct
-    questions = 61 panels × 25 magnitudes per arch.
+    MATH-500 questions = 61 panels × 25 magnitudes per arch.
+
+    The cohort source is Aniket's wasteland Stage B output
+    ``flip_matrix.parquet`` (ported under
+    ``results/c7_backtracking/aniket_reference/cut25/`` with
+    attribution). qids look like ``test/algebra/1184.json`` and resolve
+    against the ``HuggingFaceH4/MATH-500`` ``unique_id`` column.
 
     Truly-wrong = the unsteered reasoning model parsed an answer but it
     was incorrect. Originally-correct = ground-truth answer matches.
@@ -203,7 +209,8 @@ class Cohort:
     """
     truly_wrong: list[str]                # qids
     originally_correct: list[str]         # qids
-    truncated: list[str]                  # qids dropped
+    truncated: list[str]                  # qids dropped (only meaningful for LM-discovery path)
+    source: str                           # "aniket_parquet" | "lm_discovery"
 
     @property
     def all(self) -> list[str]:
@@ -213,58 +220,80 @@ class Cohort:
         return len(self.all)
 
 
+def aniket_reference_root() -> Path:
+    """Resolve the ported Aniket reference root.
+
+    Returns the ``cut25/`` subdir specifically — the C7 paper protocol.
+    """
+    from temp_bench.config import purified_root
+    return purified_root() / "results" / "c7_backtracking" / "aniket_reference" / "cut25"
+
+
+def load_cohort_from_parquet(parquet_path: Path | str | None = None) -> Cohort:
+    """Read the 31+30 cohort qids from Aniket's flip_matrix.parquet.
+
+    The parquet has one row per (arch, qid, magnitude) with
+    ``before_correct`` indicating the unsteered (mag=0) correctness.
+    We pick the headline arch (``txc``) + ``magnitude=0`` rows to get
+    one record per qid (61 total) and split on ``before_correct``.
+
+    Returns the same 61 qids any of the 6 arches were evaluated on
+    (the cohort is fixed across arches by construction — see Aniket's
+    methodology_neurips_push.md).
+    """
+    import pandas as pd
+
+    if parquet_path is None:
+        parquet_path = aniket_reference_root() / "flip_matrix.parquet"
+    df = pd.read_parquet(parquet_path)
+    headline_arch = "txc" if "txc" in df["arch"].unique() else df["arch"].unique()[0]
+    sub = df[(df["arch"] == headline_arch) & (df["magnitude"] == 0.0)]
+    sub = sub[["question_id", "before_correct"]].drop_duplicates()
+    truly_wrong = sorted(sub.loc[~sub["before_correct"], "question_id"].tolist())
+    correct = sorted(sub.loc[sub["before_correct"], "question_id"].tolist())
+    return Cohort(
+        truly_wrong=truly_wrong,
+        originally_correct=correct,
+        truncated=[],
+        source="aniket_parquet",
+    )
+
+
+def load_math500_lookup() -> dict[str, dict[str, Any]]:
+    """Load MATH-500 keyed by ``unique_id``.
+
+    The qids in our cohort (``test/algebra/1184.json``) are MATH-500
+    ``unique_id`` values. Returns a dict ``{qid: {problem, solution,
+    answer, subject, level}}`` for prompt + ground-truth lookup.
+    """
+    from datasets import load_dataset
+    ds = load_dataset("HuggingFaceH4/MATH-500", split="test")
+    return {row["unique_id"]: row for row in ds}
+
+
 def build_cohort(
-    stage_a: StageA,
+    stage_a: StageA | None = None,
     *,
+    source: str = "aniket_parquet",
     n_correct: int = 30,
     seed: int = 42,
     ground_truth_lookup: Callable[[str], str | None] | None = None,
 ) -> Cohort:
-    """Filter Stage A traces into the 31+30 cohort.
+    """Default path: ``source="aniket_parquet"`` reads the 31+30 cohort
+    from Aniket's reference flip_matrix (frozen, deterministic).
 
-    Aniket originally pulled ``ground_truth`` from the MATH-500
-    dataset; Stage A here covers 10 reasoning categories beyond
-    MATH-500, so callers may pass a ``ground_truth_lookup(qid)``
-    callable. If omitted, we fall back to the ``traces[*].answer`` vs
-    ``traces[*].answer_index`` pair Aniket persisted (when available).
-
-    Truncation rule: trace's parsed ``answer`` is missing ⇒ drop.
-
-    Returns the qids — caller indexes back into Stage A by qid for the
-    actual prompt + trace text.
+    The ``source="lm_discovery"`` path is reserved for future use
+    (re-discovers the cohort by running R1-Distill-Llama on all 500
+    MATH-500 questions); requires a ``ground_truth_lookup`` callable
+    plus a list of ``(qid, parsed_answer)`` pairs threaded through
+    ``stage_a``. Not implemented yet — open question #2 in the
+    agent_back briefing.
     """
-    truly_wrong: list[str] = []
-    correct: list[str] = []
-    truncated: list[str] = []
-
-    for trace in stage_a.traces:
-        qid = trace["question_id"]
-        parsed = trace.get("answer")
-        if parsed is None or parsed == "":
-            truncated.append(qid)
-            continue
-        if ground_truth_lookup is not None:
-            gt = ground_truth_lookup(qid)
-        else:
-            gt = trace.get("answer_index")
-        if gt is None:
-            # No ground truth available — treat as truncated.
-            truncated.append(qid)
-            continue
-        if answers_match(parsed, str(gt)):
-            correct.append(qid)
-        else:
-            truly_wrong.append(qid)
-
-    rng = np.random.default_rng(seed)
-    if len(correct) > n_correct:
-        idx = rng.choice(len(correct), size=n_correct, replace=False)
-        correct = [correct[i] for i in sorted(idx.tolist())]
-
-    return Cohort(
-        truly_wrong=truly_wrong,
-        originally_correct=correct,
-        truncated=truncated,
+    if source == "aniket_parquet":
+        return load_cohort_from_parquet()
+    raise NotImplementedError(
+        f"build_cohort(source={source!r}) not implemented; "
+        "use source='aniket_parquet' (default) until LM-discovery path lands."
     )
 
 
@@ -747,6 +776,330 @@ def compute_pr_auc_at_S(
     return pr_auc
 
 
+# ── Reasoning-model loader + generation helpers (verbatim ports) ───────
+
+
+def _fix_byte_decode(s: str) -> str:
+    """Workaround for transformers ≥5.5.4 leaving Ġ/Ċ literal in decoded
+    strings. Verbatim port from b3_math500_rescue.py."""
+    return s.replace("Ġ", " ").replace("Ċ", "\n").replace("Â", "")
+
+
+def _build_prompt(problem: str) -> str:
+    """Pose a MATH-500 problem to the reasoning model.
+
+    Verbatim port from b3_math500_rescue.py — boxed answer is
+    requested explicitly so we can extract a comparable final answer.
+    """
+    return (
+        f"Solve this math problem and provide your final answer in "
+        f"\\boxed{{}} notation.\n\nProblem: {problem}"
+    )
+
+
+def load_reasoning_lm(
+    hf_id: str = "deepseek-ai/DeepSeek-R1-Distill-Llama-8B",
+    *,
+    device: str = "cuda",
+):
+    """Load the reasoning-model side of the Ward Stage B setup.
+
+    Adapted from b3_math500_rescue.py:_load_lm. Loads in bf16; A40
+    (47.7 GB VRAM) holds the 16-GB model + ~16 GB of generation
+    activation comfortably.
+    """
+    from temp_bench.utils.tokens import get_token
+    from transformers import AutoModelForCausalLM, AutoTokenizer  # type: ignore
+    hf_token = get_token("hf")
+    tok = AutoTokenizer.from_pretrained(hf_id, use_fast=True, token=hf_token)
+    if tok.pad_token_id is None:
+        tok.pad_token_id = tok.eos_token_id
+    model = AutoModelForCausalLM.from_pretrained(
+        hf_id, torch_dtype=torch.bfloat16, device_map=device, token=hf_token,
+    ).eval()
+    for p in model.parameters():
+        p.requires_grad_(False)
+    return model, tok
+
+
+def generate_unsteered(
+    model, tok,
+    prompts: list[str],
+    *,
+    max_new_tokens: int,
+    batch_size: int,
+) -> tuple[list[str], list[list[int]]]:
+    """Greedy unsteered generation. Returns ``(decoded_strings, new_token_ids)``.
+
+    Adapted from b3_math500_rescue.py:_generate_unsteered. Uses
+    left-padding so right-side new-token slicing works.
+    """
+    from transformers import GenerationConfig  # type: ignore
+    gen_cfg = GenerationConfig(
+        max_new_tokens=max_new_tokens, do_sample=False,
+        temperature=1.0, pad_token_id=tok.pad_token_id,
+    )
+    saved = tok.padding_side
+    tok.padding_side = "left"
+    try:
+        chat_texts = []
+        for p in prompts:
+            try:
+                t = tok.apply_chat_template(
+                    [{"role": "user", "content": p}],
+                    tokenize=False, add_generation_prompt=True,
+                )
+            except Exception:
+                t = p
+            chat_texts.append(t)
+
+        outs: list[str] = []
+        new_token_ids: list[list[int]] = []
+        for i in range(0, len(chat_texts), batch_size):
+            batch = chat_texts[i:i + batch_size]
+            enc = tok(batch, return_tensors="pt", padding=True, truncation=True,
+                      max_length=2048).to(model.device)
+            prompt_len = enc["input_ids"].shape[1]
+            with torch.no_grad():
+                out_ids = model.generate(**enc, generation_config=gen_cfg)
+            for row in out_ids:
+                new = row[prompt_len:].tolist()
+                while new and new[-1] == tok.pad_token_id:
+                    new.pop()
+                new_token_ids.append(new)
+                outs.append(_fix_byte_decode(tok.decode(new, skip_special_tokens=True)))
+        return outs, new_token_ids
+    finally:
+        tok.padding_side = saved
+
+
+def generate_continuation_panels(
+    model, tok, hook: SteeringHook,
+    *,
+    problem_prompts: list[str],
+    prefix_token_ids: list[list[int]],
+    mags_per_panel: list[float],
+    max_new_per_panel: list[int],
+    batch_size: int,
+) -> list[str]:
+    """Run the cut+continue panels under per-row steering magnitudes.
+
+    Adapted from b3_math500_rescue.py:_generate_continuation_panels.
+    For each (problem, prefix tokens, magnitude) panel, build the
+    extended input ``[chat_template(problem) + prefix_tokens]`` and
+    generate under the per-row magnitude on ``hook``. Returns
+    continuation strings (no chat template / no prefix).
+    """
+    from transformers import GenerationConfig  # type: ignore
+    assert len(problem_prompts) == len(prefix_token_ids) == len(mags_per_panel) \
+        == len(max_new_per_panel)
+    saved = tok.padding_side
+    tok.padding_side = "left"
+    try:
+        full_input_ids: list[list[int]] = []
+        for problem, prefix in zip(problem_prompts, prefix_token_ids):
+            try:
+                ct = tok.apply_chat_template(
+                    [{"role": "user", "content": problem}],
+                    tokenize=False, add_generation_prompt=True,
+                )
+            except Exception:
+                ct = problem
+            ct_ids = tok(ct, add_special_tokens=False)["input_ids"]
+            full_input_ids.append(ct_ids + list(prefix))
+
+        outs: list[str] = []
+        for i in range(0, len(full_input_ids), batch_size):
+            chunk_ids = full_input_ids[i:i + batch_size]
+            chunk_mags = torch.tensor(mags_per_panel[i:i + batch_size], dtype=torch.float32)
+            chunk_budgets = max_new_per_panel[i:i + batch_size]
+            chunk_max_budget = max(chunk_budgets)
+            hook.magnitudes = chunk_mags
+
+            gen_cfg = GenerationConfig(
+                max_new_tokens=chunk_max_budget, do_sample=False,
+                temperature=1.0, pad_token_id=tok.pad_token_id,
+            )
+            max_len = max(len(x) for x in chunk_ids)
+            pad_id = tok.pad_token_id
+            input_ids = torch.full((len(chunk_ids), max_len), pad_id, dtype=torch.long)
+            attn = torch.zeros((len(chunk_ids), max_len), dtype=torch.long)
+            for r, ids in enumerate(chunk_ids):
+                pad_n = max_len - len(ids)
+                input_ids[r, pad_n:] = torch.tensor(ids, dtype=torch.long)
+                attn[r, pad_n:] = 1
+            input_ids = input_ids.to(model.device)
+            attn = attn.to(model.device)
+            with torch.no_grad():
+                out_ids = model.generate(
+                    input_ids=input_ids, attention_mask=attn,
+                    generation_config=gen_cfg,
+                )
+            for r, row in enumerate(out_ids):
+                new = row[max_len:].tolist()
+                while new and new[-1] == tok.pad_token_id:
+                    new.pop()
+                budget = chunk_budgets[r]
+                if len(new) > budget:
+                    new = new[:budget]
+                outs.append(_fix_byte_decode(tok.decode(new, skip_special_tokens=True)))
+        hook.magnitudes = None
+        return outs
+    finally:
+        tok.padding_side = saved
+
+
+# ── Phase 1 unsteered cache ───────────────────────────────────────────
+
+
+def run_phase1_unsteered(
+    cohort: Cohort,
+    *,
+    workspace: Path,
+    max_new_tokens: int = 2048,
+    batch_size: int = 8,
+    model=None,
+    tok=None,
+) -> list[dict[str, Any]]:
+    """Phase 1: run R1-Distill-Llama on cohort qids unsteered, cache on disk.
+
+    Caches at ``<workspace>/phase1_unsteered.json``. Idempotent — if
+    the file exists with rows for every cohort qid, returns immediately.
+
+    Each row::
+
+        {
+            "unique_id": str,                # MATH-500 qid
+            "problem": str,
+            "ground_truth": str,
+            "unsteered_text": str,           # decoded continuation
+            "unsteered_token_ids": list[int],# per-row tokens
+            "unsteered_answer": str | None,  # extract_boxed(unsteered_text)
+            "unsteered_correct": bool,       # answers_match vs ground_truth
+        }
+
+    The reasoning model is loaded internally if ``model``/``tok`` are
+    not passed; otherwise the caller's instance is reused (preferred —
+    loading R1-Distill-Llama is ~30 s and 16 GB VRAM).
+    """
+    cache_path = Path(workspace) / "phase1_unsteered.json"
+    cache_path.parent.mkdir(parents=True, exist_ok=True)
+
+    cohort_qids = set(cohort.all)
+    if cache_path.exists():
+        existing = json.loads(cache_path.read_text())
+        existing_qids = {r["unique_id"] for r in existing}
+        if cohort_qids.issubset(existing_qids):
+            log.info("[phase1] cache hit at %s (%d rows)", cache_path, len(existing))
+            return [r for r in existing if r["unique_id"] in cohort_qids]
+        log.info("[phase1] partial cache: %d/%d qids — extending",
+                 len(cohort_qids & existing_qids), len(cohort_qids))
+    else:
+        existing = []
+
+    have = {r["unique_id"]: r for r in existing}
+    todo = [q for q in cohort.all if q not in have]
+    if not todo:
+        return [have[q] for q in cohort.all]
+
+    math500 = load_math500_lookup()
+    todo_problems = [math500[q]["problem"] for q in todo]
+    todo_gts = [math500[q]["answer"] for q in todo]
+
+    own_model = False
+    if model is None or tok is None:
+        log.info("[phase1] loading reasoning model")
+        model, tok = load_reasoning_lm()
+        own_model = True
+    log.info("[phase1] generating %d unsteered traces", len(todo))
+    prompts = [_build_prompt(p) for p in todo_problems]
+    texts, token_ids = generate_unsteered(
+        model, tok, prompts, max_new_tokens=max_new_tokens, batch_size=batch_size,
+    )
+
+    new_rows = []
+    for qid, prob, gt, text, tids in zip(todo, todo_problems, todo_gts, texts, token_ids):
+        ans = extract_boxed(text)
+        new_rows.append({
+            "unique_id": qid,
+            "problem": prob,
+            "ground_truth": gt,
+            "unsteered_text": text,
+            "unsteered_token_ids": tids,
+            "unsteered_answer": ans,
+            "unsteered_correct": answers_match(ans, gt),
+        })
+
+    rows = existing + new_rows
+    cache_path.write_text(json.dumps(rows, indent=2))
+    log.info("[phase1] wrote %d total rows to %s", len(rows), cache_path)
+
+    if own_model:
+        del model
+        import gc; gc.collect()
+        torch.cuda.empty_cache()
+
+    return [r for r in rows if r["unique_id"] in cohort_qids]
+
+
+# ── Steering-vector mining (gated on trained SAE arch) ────────────────
+
+
+@dataclass
+class FeatureMineResult:
+    """Output of :func:`mine_top_features` — one steering candidate per arch."""
+    feature_id: int
+    decoder_direction: torch.Tensor   # (d_in,)
+    pos_act_mean: float               # mean activation on positives (D+)
+    neg_act_mean: float               # mean activation on negatives (D-)
+    selectivity: float                # pos_mean - neg_mean
+
+
+def mine_top_features(
+    model: TempBenchArch,
+    *,
+    pos_activations: np.ndarray,      # (n_pos, T, d_in) — labeled-positive sentence acts
+    neg_activations: np.ndarray,      # (n_neg, T, d_in) — labeled-negative
+    top_k: int = 32,
+) -> list[FeatureMineResult]:
+    """Rank features by D+/D- mean-difference selectivity.
+
+    Aniket's mine_features.py adapted to our :class:`TempBenchArch`
+    interface. For each labeled sentence's activation window, encode
+    through the SAE → max-pool over T axis → per-feature pooled
+    activation. Rank features by (pos_mean - neg_mean) selectivity.
+    Return top-K features along with their decoder directions.
+
+    The decoder direction defaults to :meth:`TempBenchArch.decoder_directions`
+    (T-averaged for window archs); per-position decoder selection
+    (Aniket's "pos0" mode) requires arch-specific override.
+    """
+    device = next(model.parameters()).device
+    with torch.no_grad():
+        pos_z = model.encode(torch.from_numpy(pos_activations).to(device)).abs()
+        neg_z = model.encode(torch.from_numpy(neg_activations).to(device)).abs()
+        # Max-pool over T (window axis) — matches Aniket's window-level latent.
+        if pos_z.dim() == 3:
+            pos_z = pos_z.amax(dim=1)
+            neg_z = neg_z.amax(dim=1)
+        pos_mean = pos_z.mean(dim=0)
+        neg_mean = neg_z.mean(dim=0)
+        sel = pos_mean - neg_mean
+        topk_vals, topk_idx = sel.topk(top_k)
+    decoder = model.decoder_directions().detach().cpu()  # (d_sae, d_in)
+    out = []
+    for i in range(top_k):
+        fid = int(topk_idx[i].item())
+        out.append(FeatureMineResult(
+            feature_id=fid,
+            decoder_direction=decoder[fid].clone(),
+            pos_act_mean=float(pos_mean[fid].item()),
+            neg_act_mean=float(neg_mean[fid].item()),
+            selectivity=float(topk_vals[i].item()),
+        ))
+    return out
+
+
 # ── CaseStudy implementation (skeleton) ────────────────────────────────
 
 
@@ -801,20 +1154,237 @@ class BacktrackingCaseStudy(CaseStudy):
         )
 
     def evaluate(self, arch: TempBenchArch, seed: int, **kwargs: Any) -> CaseStudyResult:
-        """Stub — orchestration lives in ``experiments/c7_backtracking/run.py``.
+        """Forwards to :func:`run_arch_evaluation` with the case study's
+        loaded Stage A + cohort + workspace.
 
-        The component runner's ``eval_fn`` adapter calls
-        :func:`run_arch_evaluation` (TODO once the reasoning-model
-        loader is wired in). At that point this method becomes a
-        one-liner forwarder.
+        Caller must :meth:`setup` first. Sentence-level activations
+        for PR-AUC detection are looked up from the activation cache
+        registered in ``configs/datasources.yaml``; the runner's
+        ``eval_fn`` adapter passes ``sentence_acts`` via ``kwargs``
+        when available, else PR-AUC is skipped.
         """
-        raise NotImplementedError(
-            "evaluate(arch, seed) is wired by experiments/c7_backtracking/run.py "
-            "via run_arch_evaluation(...). Direct CaseStudy.evaluate() use is "
-            "deferred until the reasoning-model + steering helpers land."
+        if self.stage_a is None or self.cohort is None or self.judge is None:
+            raise RuntimeError("Call setup() before evaluate().")
+        sentence_acts = kwargs.get("sentence_acts")
+        return run_arch_evaluation(
+            arch=arch,
+            seed=seed,
+            cohort=self.cohort,
+            stage_a=self.stage_a,
+            workspace=self.workspace,
+            judge=self.judge,
+            magnitudes=self.magnitudes,
+            cut_fraction=self.cut_fraction,
+            sentence_acts=sentence_acts,
+            **{k: v for k, v in kwargs.items() if k != "sentence_acts"},
         )
 
     def teardown(self) -> None:
         self.stage_a = None
         self.cohort = None
         self.judge = None
+
+
+# ── Top-level evaluation orchestrator ─────────────────────────────────
+
+
+def run_arch_evaluation(
+    *,
+    arch: TempBenchArch,
+    seed: int,
+    cohort: Cohort,
+    stage_a: StageA,
+    workspace: Path,
+    judge: SonnetBacktrackingJudge,
+    magnitudes: tuple[float, ...] = DEFAULT_MAGNITUDE_GRID,
+    cut_fraction: float = DEFAULT_CUT_FRACTION,
+    arch_name: str = "unknown",
+    feature_mining_acts: dict[str, np.ndarray] | None = None,
+    sentence_acts: np.ndarray | None = None,
+    sentence_labels: np.ndarray | None = None,
+    sentence_qids: np.ndarray | None = None,
+    pr_auc_S_grid: tuple[int, ...] = DEFAULT_PR_AUC_S_GRID,
+    max_new_tokens: int = 2048,
+    gen_batch_size: int = 8,
+) -> CaseStudyResult:
+    """Run one arch's full C7 evaluation: inducement (Δgc) + detection (PR-AUC).
+
+    Pipeline:
+      1. Mine top steering feature on ``arch`` (D+/D- mean-difference) using
+         ``feature_mining_acts`` (dict with "pos"/"neg" arrays). Pick the
+         feature with maximum selectivity.
+      2. Build steering vector = decoder direction of the top feature,
+         normalised to the same L2 norm as the dom-base-union vector.
+      3. Run unsteered phase 1 on the cohort (cached at workspace/phase1_unsteered.json).
+      4. For each magnitude in ``magnitudes`` × cohort qid: cut at
+         ``cut_fraction × len(unsteered_token_ids)``, attach SteeringHook
+         to layer 10 of R1-Distill-Llama, generate continuation. Persist
+         every Sonnet judge call to ``workspace/judge_outputs.jsonl``.
+      5. Compute Δgc per magnitude, baseline-corrected per (qid) at mag=0.
+         Headline = peak Δgc + peak magnitude + stability.
+      6. (Optional) If ``sentence_acts`` + ``sentence_labels`` provided,
+         also compute PR-AUC at S ∈ {1, 2, 4, 8, 16, 32}.
+
+    Returns :class:`CaseStudyResult` with:
+      - ``primary_metric = "delta_gc_peak"``
+      - ``metrics`` containing peak Δgc, peak magnitude, stability counts,
+        per-magnitude Δgc, optional PR-AUC at each S.
+      - ``artifacts`` containing the workspace dir + judge_outputs.jsonl.
+
+    Raises ``RuntimeError`` if either the steering hookpoint or the
+    generation pipeline fail. The judge persistence is non-fatal — even
+    if individual judge calls error, ``judge_outputs.jsonl`` records the
+    failure and the overall metric falls back to remaining valid rows.
+
+    NOTE — this orchestrator is **arch-port-gated**: it expects
+    ``arch`` to be a fully-loaded :class:`TempBenchArch` instance (i.e.,
+    one of the 7 locked archs). Until agent_paper ships the arch
+    implementations (see open question #1 in the agent_back briefing),
+    callers will only get past step 1 when ``arch`` is the implemented
+    `topk_sae`.
+    """
+    workspace = Path(workspace)
+    workspace.mkdir(parents=True, exist_ok=True)
+
+    # ── Step 1+2: mine + build steering vector ───────────────────────
+    if feature_mining_acts is None:
+        raise ValueError(
+            "feature_mining_acts={'pos': (n_pos,T,d), 'neg': (n_neg,T,d)} required. "
+            "Build via temp_bench.case_studies.backtracking.extract_labeled_sentence_acts(...)."
+        )
+    mined = mine_top_features(
+        arch,
+        pos_activations=feature_mining_acts["pos"],
+        neg_activations=feature_mining_acts["neg"],
+        top_k=32,
+    )
+    steering_feature = mined[0]
+    log.info(
+        "[c7] arch=%s seed=%d top feature=%d sel=%.4f",
+        arch_name, seed, steering_feature.feature_id, steering_feature.selectivity,
+    )
+
+    # Normalise to dom-base-union L2 norm for cross-arch magnitude comparability.
+    dom_base_union = stage_a.dom_vectors["base"].get("union")
+    if dom_base_union is None:
+        # Fallback: use the steering vector raw (unnormalised). Cross-arch
+        # magnitudes will be slightly mis-calibrated; flagged in caveats.
+        log.warning("[c7] dom_vectors['base']['union'] missing — skipping norm calibration")
+        ref_norm = float(steering_feature.decoder_direction.norm().item())
+    else:
+        ref_norm = float(dom_base_union.norm().item())
+    raw_vec = steering_feature.decoder_direction.float()
+    vec = raw_vec / raw_vec.norm().clamp_min(1e-8) * ref_norm
+
+    # ── Step 3: unsteered phase 1 ────────────────────────────────────
+    log.info("[c7] loading reasoning model")
+    rmodel, rtok = load_reasoning_lm()
+    phase1 = run_phase1_unsteered(
+        cohort, workspace=workspace,
+        max_new_tokens=max_new_tokens,
+        batch_size=gen_batch_size,
+        model=rmodel, tok=rtok,
+    )
+    by_qid = {r["unique_id"]: r for r in phase1}
+    log.info("[c7] phase1 ready: %d rows; cohort sizes wrong=%d correct=%d",
+             len(phase1), len(cohort.truly_wrong), len(cohort.originally_correct))
+
+    # ── Step 4: cut25 + steered generation per (qid, mag) ────────────
+    layer = 10  # paper-justified per docs/components/c7.md
+    layer_module = rmodel.model.layers[layer]
+    hook = SteeringHook(vec)
+    handle = layer_module.register_forward_hook(hook)
+    try:
+        # Build panels
+        problem_prompts: list[str] = []
+        prefix_token_ids: list[list[int]] = []
+        mags: list[float] = []
+        budgets: list[int] = []
+        meta: list[tuple[str, float]] = []  # (qid, mag) per panel for judge dispatch
+        for qid in cohort.all:
+            row = by_qid[qid]
+            cut_pos = cut25_token_position(row["unsteered_token_ids"], fraction=cut_fraction)
+            prefix = row["unsteered_token_ids"][:cut_pos]
+            remaining_budget = max(64, len(row["unsteered_token_ids"]) - cut_pos)
+            for m in magnitudes:
+                problem_prompts.append(_build_prompt(row["problem"]))
+                prefix_token_ids.append(prefix)
+                mags.append(float(m))
+                budgets.append(remaining_budget)
+                meta.append((qid, float(m)))
+        log.info("[c7] %d panels = %d qids × %d mags", len(meta), len(cohort.all), len(magnitudes))
+
+        outs = generate_continuation_panels(
+            rmodel, rtok, hook,
+            problem_prompts=problem_prompts,
+            prefix_token_ids=prefix_token_ids,
+            mags_per_panel=mags,
+            max_new_per_panel=budgets,
+            batch_size=gen_batch_size,
+        )
+    finally:
+        handle.remove()
+        del rmodel
+        import gc; gc.collect()
+        torch.cuda.empty_cache()
+
+    # ── Step 5: judge ────────────────────────────────────────────────
+    judge_rows = [
+        (qid, mag, arch_name, seed, prompt, gen)
+        for (qid, mag), prompt, gen in zip(meta, problem_prompts, outs)
+    ]
+    log.info("[c7] dispatching %d Sonnet judge calls", len(judge_rows))
+    judge_outs = asyncio.run(judge.judge_many(judge_rows))
+    log.info("[c7] judge done: %d new outputs (existing skipped)", len(judge_outs))
+
+    # Compute Δgc — re-load all rows from jsonl so we get any prior runs too.
+    all_judge_rows = []
+    if judge._jsonl.exists():
+        with judge._jsonl.open() as f:
+            for line in f:
+                try:
+                    all_judge_rows.append(json.loads(line))
+                except json.JSONDecodeError:
+                    continue
+    delta_gc = compute_delta_gc(all_judge_rows)
+
+    arch_peak = delta_gc["peak"].get(arch_name, (0.0, 0.0))
+    metrics: dict[str, float] = {
+        "delta_gc_peak": float(arch_peak[1]),
+        "delta_gc_peak_magnitude": float(arch_peak[0]),
+        "n_judge_calls": float(len([r for r in all_judge_rows if r.get("arch") == arch_name and r.get("seed") == seed])),
+    }
+    # Per-magnitude Δgc (under arch+seed) — flatten into the metrics dict.
+    for (a, m), d in delta_gc["by_arch_mag"].items():
+        if a == arch_name:
+            metrics[f"delta_gc_mag_{m:+.1f}"] = float(d)
+
+    # ── Step 6: PR-AUC detection ─────────────────────────────────────
+    if sentence_acts is not None and sentence_labels is not None:
+        log.info("[c7] computing PR-AUC across S=%s (%d sentences)",
+                 list(pr_auc_S_grid), len(sentence_labels))
+        # Encode sentence-window acts via SAE → per-sentence pooled features.
+        device = next(arch.parameters()).device
+        with torch.no_grad():
+            X = arch.encode(torch.from_numpy(sentence_acts).to(device)).abs()
+            if X.dim() == 3:
+                X = X.amax(dim=1)
+            X_np = X.detach().cpu().numpy()
+        pr_auc = compute_pr_auc_at_S(
+            X_np, sentence_labels, sentence_qids, S_grid=pr_auc_S_grid,
+        )
+        for S, ap in pr_auc.items():
+            metrics[f"pr_auc_S{S}"] = float(ap)
+
+    return CaseStudyResult(
+        case_study="c7_backtracking",
+        arch=arch_name,
+        seed=seed,
+        primary_metric="delta_gc_peak",
+        metrics=metrics,
+        artifacts={"workspace": workspace, "judge_outputs": judge._jsonl},
+        notes=(
+            f"steering_feature_id={steering_feature.feature_id}, "
+            f"selectivity={steering_feature.selectivity:.4f}, ref_norm={ref_norm:.3f}"
+        ),
+    )
