@@ -77,17 +77,25 @@ uv run python -m experiments.ward_backtracking_txc.plot.repetition_rate \
     --calibration "$OUT_ROOT/calibration.json" \
     --out "$OUT_ROOT"
 
-# Re-run hygiene + detection + flip-matrix grids
+# Re-run hygiene + detection + flip-matrix grids + BASELINE-CORRECTED analysis
 uv run python -m experiments.ward_backtracking_txc.build_hygiene_table
 uv run python -m experiments.ward_backtracking_txc.detection.build_detection_probe
 uv run python -m experiments.ward_backtracking_txc.plot.flip_matrix_grid \
     --flip-matrix "$OUT_ROOT/flip_matrix.parquet" --out "$OUT_ROOT"
+uv run python -m experiments.ward_backtracking_txc.build_steering_effect \
+    --flip-matrix "$OUT_ROOT/flip_matrix.parquet" --out "$OUT_ROOT"
+uv run python -m experiments.ward_backtracking_txc.plot.headline_baseline_corrected \
+    --steering-effect-summary "$OUT_ROOT/steering_effect_summary.csv" --out "$OUT_ROOT"
+uv run python -m experiments.ward_backtracking_txc.plot.flip_matrix_grid_corrected \
+    --steering-effect "$OUT_ROOT/steering_effect.parquet" --out "$OUT_ROOT"
 
 # Refresh images_b copies
 for f in headline_calibrated headline_raw appendix_calibrated appendix_raw \
          repetition_rate_headline repetition_rate \
          flip_matrix_grid_headline flip_matrix_grid_appendix \
-         flip_matrix_grid_at_mag_0 flip_matrix_grid_at_mag_p8; do
+         flip_matrix_grid_at_mag_0 flip_matrix_grid_at_mag_p8 \
+         headline_baseline_corrected_5arch headline_baseline_corrected_6arch_appendix \
+         flip_matrix_corrected_headline flip_matrix_corrected_appendix; do
   cp "$OUT_ROOT/$f.png" "$DST_IMAGES/np_$f.png"
 done
 cp results/ward_backtracking_txc/detection/detection_headline.png "$DST_IMAGES/np_detection_headline.png"

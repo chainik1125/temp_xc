@@ -9,127 +9,122 @@ tags:
 
 ## TL;DR
 
-Final NeurIPS-push pass on Stage B (2× H100, ~5 h wall after planning).
-Standardized the architecture comparison set per Dmitry's 2026-05-02 brief
-(TXC, SAE, TSAE-paper, TFA, MLC), retrained TSAE at paper-faithful k=20,
-ported TFA + MLC into our pipeline, ran a densified 25-magnitude sweep with
-a correct-cohort regression check, and built a sentence-level detection
-probe. All six architectures detect backtracking comparably; high-magnitude
-steering catastrophically fails across all of them; the "TXC is more
-robust" framing from the meeting needs softening — MLC and TFA tie or
-beat TXC on net rescues at their respective peaks.
+After applying Dmitry's standardized arch comparison set (TXC, SAE,
+TSAE-paper, TFA, MLC) on a densified 25-magnitude grid with a
+correct-cohort regression check, **and after correcting for the cut-and-continue
+resampling noise floor at mag=0**:
 
-| Headline | Value |
+- **No architecture has a statistically significant steering effect on
+  backtracking-induced rescues** (largest Δnet vs baseline = MLC's +2,
+  paired McNemar p = 0.73). The original "+6 to +8 net rescues" numbers
+  in earlier drafts of this writeup were dominated by the mag=0
+  resampling noise floor.
+- **Detection AUC is comparable across all six architectures** (range
+  0.63–0.72 at |S|=8), with TXC nominally leading at 0.681. Wilcoxon TXC
+  vs each baseline at |S|=8 is **not** significant after Holm-Bonferroni
+  (smallest p_holm = 0.31).
+- **High-magnitude steering catastrophically breaks every architecture.**
+  TXC has the worst regression rate at extreme magnitudes (30/30
+  baseline-correct broken at |mag|=16), driven mechanistically by sentence
+  loops (judge-free repetition rate jumps to 0.55 at TXC mag=+16).
+- The "TXC is more robust across magnitudes" framing from the meeting
+  does NOT survive baseline correction. Defensible framing for the paper:
+  "temporal-aware architectures don't lose detection power vs conventional
+  SAEs; the steering signal at this cohort size is below significance for
+  every architecture; the hybrid detection-then-steering protocol is the
+  right next step."
+
+| Headline metric | Value |
 |---|---|
 | Architectures swept | TXC, TXC-H8 (appendix), SAE (TopK), TSAE-paper, TFA, MLC |
 | Magnitudes per arch | 25 (densified ±0.5–8 around the SAE peak) |
-| Cohort per arch | 31 truly-wrong + 30-correct subsample = 61 questions × 25 mags = 1525 panels |
-| Headline plot | `results/.../headline_calibrated.png` (5 lines) + `headline_raw.png` |
-| Appendix plot | `appendix_calibrated.png` (6 lines incl. TXC-H8) + `appendix_raw.png` |
-| Detection AUC range | 0.63–0.72 across arches at \|S\|=8; TXC slightly leads (0.681) |
-| McNemar @ per-arch best mag | MLC and TXC reach p<0.05; others 0.065–0.18 |
-| Best peak net rescues | **MLC=+8 @ +4** (MLC and TFA peaks tie / exceed TXC's) |
-| Wilcoxon TXC vs each baseline (\|S\|=8) | None HB-significant; smallest p_holm=0.31 |
+| Cohort per arch | 31 truly-wrong + 30 originally-correct = 61 questions × 25 mags = 1525 panels |
+| **mag=0 resampling baseline** | **n_ic = 7/31, n_ci = 1/30 — IDENTICAL across all 6 archs** (steering hook is a no-op at mag=0; same 7 question_ids "rescued" by every arch) |
+| Best Δnet vs baseline | MLC = +2 (mag=+4, p=0.73 n.s.); TXC = +1 (mag=−2, p=1.00); SAE = 0; TSAE-paper = 0 |
+| Detection AUC range @ \|S\|=8 | 0.63–0.72 across arches; TXC slightly leads (0.681), no Wilcoxon comparison HB-significant |
 
-## What changed since [[results_b]]
+## Headline figure (BASELINE-CORRECTED — Fig 4a in main text)
 
-The previous Stage B writeup was the 4-arch + H8 + H13 hill-climbed
-comparison on a 9-magnitude grid with the truly-wrong cohort only. Per the
-2026-05-02 meeting and Dmitry's followup Slack, we needed:
-
-1. **Standardize the architecture set** to TXC, TSAE-paper, TFA, regular SAE,
-   MLC. This drops H8 and H13 from the headline (they remain in the appendix).
-2. **2×2 flip matrix** (correct→correct, correct→incorrect, incorrect→correct,
-   incorrect→incorrect) — required including originally-correct questions in
-   the cohort, not just the truly-wrong.
-3. **Higher-resolution magnitude grid** around the SAE peak.
-4. **Calibrate magnitudes** by the 95th-percentile of feature activation per
-   arch (Andre's idea, Dmitry-approved).
-5. **Detection metric** — sentence-level probing, in addition to causal
-   intervention, since Dmitry's narrative pivot is "TXC for detection,
-   comparable for steering."
-6. **Hygiene** — per-arch reconstruction loss, L0, training curves.
-
-## Headline figure (Fig 4a in main text)
-
-Three panels (calibrated x-axis = raw magnitude / arch-specific p95):
-
-1. **Net rescues** = `n_ic − n_ci` (incorrect→correct minus correct→incorrect).
-2. **Rescue rate** = `n_ic / n_truly_wrong` (out of 31).
-3. **Regression rate** = `n_ci / n_correct_subsample` (out of 30).
-
-5 lines: TXC, SAE, TSAE-paper, TFA, MLC.
-
-> **Calibrated x-axis caveat.** TFA and TSAE-paper produce signed reconstruction-residual codes whose natural scale is ~400× smaller than the TopK output of TXC/SAE/MLC (p95 ≈ 0.005 vs ≈ 1.9). When dividing raw magnitude by p95, TFA/TSAE-paper points span ±2,000–4,000 while every other arch spans ±3 to ±10. We clip the x-axis to ±12 to keep the comparison readable; TFA/TSAE-paper points outside that window extend off-screen but are preserved in the underlying data (`flip_matrix.parquet`). See the *raw-magnitude* version below for an unclipped view.
-
-![Headline steering — calibrated magnitude, 5 archs](images_b/np_headline_calibrated.png)
-
-Raw-magnitude variant (uncalibrated x-axis):
-
-![Headline steering — raw magnitude, 5 archs](images_b/np_headline_raw.png)
-
-Appendix variant adds the TXC-H8 line (6 archs total):
-
-![Appendix steering — calibrated magnitude, 6 archs](images_b/np_appendix_calibrated.png)
-
-![Appendix steering — raw magnitude, 6 archs](images_b/np_appendix_raw.png)
-
-Source paths: `results/ward_backtracking_txc/b3_math500_cut25/{headline,appendix}_{calibrated,raw}.png`.
-
-### Per-arch peak net rescues + McNemar
-
-| Arch | Best net (mag) | n_ic / n_ci @ peak | McNemar p (exact) |
-|---|---|---|---|
-| **TXC** | +7 (mag = −2) | 8 / 1 | 0.039 ✓ |
-| **TXC-H8** | +6 (mag = −1) | 10 / 4 | 0.18 (n.s.) |
-| **SAE** | +6 (mag = 0) | 7 / 1 | 0.070 |
-| **TSAE-paper** | +6 (mag = 0) | 7 / 1 | 0.070 |
-| **TFA** | +7 (mag = −8) | 9 / 2 | 0.065 |
-| **MLC** | **+8 (mag = +4)** | 10 / 2 | 0.039 ✓ |
-
-Two arches reach McNemar p<0.05 with n_folds=5: **MLC** and **TXC**. The
-others land at p∈[0.065, 0.18].
-
-### Universal high-magnitude collapse
-
-At |raw mag|=16 every arch regresses ≥11 of 30 originally-correct questions.
-At TXC and TXC-H8 it's 30/30 (literally every correct answer broken). This
-is the most striking finding of the regression-rate panel; it's not unique
-to any single architecture.
-
-| Arch | regress @ −16 | regress @ +16 |
-|---|---|---|
-| TXC | 30/30 | 30/30 |
-| TXC-H8 | 29/30 | 29/30 |
-| SAE | 24/30 | 11/30 |
-| TSAE-paper | 15/30 | 16/30 |
-| TFA | 14/30 | 12/30 |
-| MLC | 22/30 | 24/30 |
-
-## Flip matrices (per-arch, at peak magnitude)
-
-The 2×2 confusion of correctness from unsteered → steered, per architecture,
-at each arch's per-arch best magnitude (= argmax of `n_ic - n_ci`). Cells
-annotated with raw counts and within-row proportions. Diagonal cells (cc, ii)
-are no-change; off-diagonals are the interesting ones — `n_ic` is rescues
-(below diagonal, lower-left), `n_ci` is regressions (upper-right).
+> **Why baseline correction matters.** At mag=0 the steering hook is a
+> no-op (multiplying the steering vector by zero). Re-running the
+> reasoning-model continuation on the cut-25%-of-trace prefix produces
+> different output from the Stage A unsteered trajectory simply because
+> sampling is stochastic; this independently "rescues" 7 of 31
+> truly-wrong questions and "regresses" 1 of 30 correct questions for ALL
+> SIX architectures (the SAME 7 question_ids each time). Reporting raw
+> `n_ic - n_ci` therefore credits steering for +6 net rescues that are
+> pure resampling noise. The headline metric is now **Δnet vs mag=0
+> baseline** = `n_extra_rescue − n_broke`, where extra_rescue counts only
+> questions that were baseline-incorrect AND steered-correct (NOT
+> already rescued by the noise floor), and broke counts steering-induced
+> regressions over and above the baseline.
 
 5-arch headline:
 
-![Flip matrix grid — headline (5 archs)](images_b/np_flip_matrix_grid_headline.png)
+![Headline (baseline-corrected) — 5 archs](images_b/np_headline_baseline_corrected_5arch.png)
 
-6-arch appendix (adds TXC-H8):
+6-arch appendix variant (adds TXC-H8):
 
-![Flip matrix grid — appendix (6 archs)](images_b/np_flip_matrix_grid_appendix.png)
+![Headline (baseline-corrected) — 6 archs](images_b/np_headline_baseline_corrected_6arch_appendix.png)
 
-For reference, the same plot at fixed magnitude = 0 (control / no
-steering) and fixed magnitude = +8 (where everyone starts to break):
+### Per-arch peak Δnet + paired McNemar
 
-![Flip matrix @ mag=0 (control)](images_b/np_flip_matrix_grid_at_mag_0.png)
+| Arch | Peak Δnet (mag) | extra_rescue / broke @ peak | Paired McNemar p |
+|---|---|---|---|
+| MLC | **+2** (mag = +4) | 5 / 3 | 0.73 (n.s.) |
+| TFA | +1 (mag = −8) | 7 / 6 | 1.00 (n.s.) |
+| TXC | +1 (mag = −2) | 3 / 2 | 1.00 (n.s.) |
+| SAE | 0 (peak AT mag=0) | 0 / 0 | 1.00 (n.s.) |
+| TSAE-paper | 0 (peak AT mag=0) | 0 / 0 | 1.00 (n.s.) |
+| TXC-H8 | 0 (mag = −1) | 6 / 6 | 1.00 (n.s.) |
 
-![Flip matrix @ mag=+8](images_b/np_flip_matrix_grid_at_mag_p8.png)
+**No significant steering effect for any arch.** SAE and TSAE-paper hit
+their best Δnet AT mag=0, meaning steering doesn't add anything beyond
+the noise floor for them. The other arches squeeze out Δnet ≤ +2, all
+within sampling noise (binomial p ≥ 0.7 on the discordant cells).
 
-Source: `results/ward_backtracking_txc/b3_math500_cut25/flip_matrix_grid_*.png`.
+### Raw-magnitude curves (uncorrected — for transparency)
+
+The original unmodified `n_ic − n_ci` curves, NOT baseline-corrected:
+
+![Headline steering — raw magnitude (unconditional, 5 archs)](images_b/np_headline_raw.png)
+
+These show the +6 to +8 net rescues that initially looked like a
+steering effect but are dominated by the mag=0 noise floor. Included
+here for transparency; the baseline-corrected version above is the
+honest reading.
+
+The previous calibrated x-axis version is **broken in implementation** —
+TFA and TSAE-paper have signed reconstruction-residual codes with p95
+≈ 0.005, so dividing raw magnitude by p95 puts every TFA/TSAE point at
+calibrated x ≈ ±2,000–4,000, far outside the [-12, 12] clip window.
+Both arches render as flat horizontal lines on the calibrated panel.
+Fix is in §"Methodology notes" below; the calibrated panel is dropped
+from the headline.
+
+## Flip matrices — BASELINE-CORRECTED (per-arch, at peak magnitude)
+
+Rows = mag=0 baseline correctness; columns = steered correctness.
+Lower-left cell is "extra rescue caused by steering" (baseline-incorrect
+→ steered-correct, NOT counting questions already rescued by the noise
+floor). Upper-right is "steering broke a baseline-correct" (broke). Δnet
+is the difference of those two cells.
+
+5-arch headline:
+
+![Flip matrix grid (baseline-corrected) — 5 archs](images_b/np_flip_matrix_corrected_headline.png)
+
+6-arch appendix:
+
+![Flip matrix grid (baseline-corrected) — 6 archs](images_b/np_flip_matrix_corrected_appendix.png)
+
+For comparison, the uncorrected versions (rows = before-trace
+correctness, NOT mag=0 baseline) — these show the misleading +6 baseline
+floor as part of the rescue cell:
+
+![Flip matrix grid — uncorrected, 5 archs](images_b/np_flip_matrix_grid_headline.png)
+
+![Flip matrix grid — uncorrected, 6 archs](images_b/np_flip_matrix_grid_appendix.png)
 
 ## Detection probe (Fig 4b in main text)
 
@@ -144,8 +139,6 @@ captures across all 6 archs). Headline metric: AUC.
 Appendix variant (6 archs incl. TXC-H8):
 
 ![Detection AUC + F1 vs |S|, 6 archs](images_b/np_detection_appendix.png)
-
-Source: `results/ward_backtracking_txc/detection/detection_{headline,appendix}.png`.
 
 ### Mean AUC per (arch × |S|)
 
@@ -169,23 +162,41 @@ Source: `results/ward_backtracking_txc/detection/detection_{headline,appendix}.p
 | TXC vs TXC-H8 | 2.0 | 0.19 | 0.56 |
 
 **None HB-significant** with n_folds=5. The honest framing for the case
-study text is therefore not "TXC wins detection" but rather "Backtracking
-IS detectable across all dictionaries (AUC 0.63–0.72), with no significant
-difference between TXC and the strongest baselines at our eval set size."
+study text is: "Backtracking IS detectable across all dictionaries (AUC
+0.63–0.72), with no significant difference between TXC and the strongest
+baselines at our eval set size. This is still a positive result for the
+temporal-aware architectures: they do not lose detection power vs the
+conventional SAE."
 
-This is still positive for the temporal-aware archs: they don't lose
-detection power vs the conventional SAE.
+## Repetition rate (judge-free auxiliary, supports high-mag failure analysis)
+
+For each generated continuation, compute the fraction of consecutive
+sentence pairs with token-Jaccard ≥ 0.7 (a near-duplicate proxy for
+sentence-level looping). Plot mean over the cohort vs raw magnitude per
+arch. **This plot is the mechanistic explanation for the high-magnitude
+regression-rate divergence**: TXC at high positive magnitude triggers
+sentence loops (jumps to ~0.55 at mag=+16); SAE has a loop pocket near
+mag = −3.
+
+5-line headline version:
+
+![Repetition rate vs magnitude, 5 archs](images_b/np_repetition_rate_headline.png)
+
+Appendix variant with all 6 archs:
+
+![Repetition rate vs magnitude, 6 archs](images_b/np_repetition_rate.png)
 
 ## Hygiene table (Tab 4a in main text)
 
-`results/ward_backtracking_txc/hygiene/reconstruction_table.csv`
+`results/ward_backtracking_txc/hygiene/reconstruction_table.csv`. Rules
+out "your TXC won because the baseline was undertrained":
 
 | Arch | Final FVU_eval | FVE | L0 (mean active features / window) | Steps logged | Stopped early |
 |---|---|---|---|---|---|
 | TXC | 0.091 | 0.91 | 96 | 3,601 | ✓ |
 | TXC-H8 | **0.50** | 0.50 | 96 | 6,201 | ✓ |
 | SAE | 0.036 | 0.96 | 215 | 9,201 | ✓ |
-| TSAE-paper | 0.071 | 0.93 | 89 | 15,000 | full |
+| TSAE-paper | 0.071 | 0.93 | 89 | 15,000 | **hit hard cap, NOT plateau — Option A retrain to 30k in flight** |
 | TFA | 0.114 | 0.89 | 103 | 5,501 | ✓ |
 | MLC | 0.074 | 0.93 | 159 | 4,201 | ✓ |
 
@@ -195,7 +206,7 @@ Per-arch FVU + L0 vs step:
 
 ![SAE training curves](images_b/np_training_curves/sae.png)
 
-![TSAE-paper training curves](images_b/np_training_curves/tsae_paper.png)
+![TSAE-paper training curves (15k cap; will be replaced by 30k retrain)](images_b/np_training_curves/tsae_paper.png)
 
 ![TFA training curves](images_b/np_training_curves/tfa.png)
 
@@ -204,25 +215,10 @@ Per-arch FVU + L0 vs step:
 ![TXC-H8 training curves (appendix)](images_b/np_training_curves/txc_h8.png)
 
 TXC-H8's FVE=0.50 confirms the H8 contrastive loss trades reconstruction
-badly at this hookpoint — supports the appendix-only demotion.
-
-## Repetition rate (judge-free auxiliary)
-
-For each generated continuation, compute the fraction of consecutive
-sentence pairs with token-Jaccard ≥ 0.7 (a near-duplicate
-proxy for sentence-level looping). Plot mean over the cohort vs
-calibrated magnitude per arch. This is a judge-free check on the
-"narrow peak = looping at the edges" hypothesis.
-
-5-line headline version:
-
-![Repetition rate vs (calibrated + raw) magnitude, 5 archs](images_b/np_repetition_rate_headline.png)
-
-Appendix variant with all 6 archs:
-
-![Repetition rate vs (calibrated + raw) magnitude, 6 archs](images_b/np_repetition_rate.png)
-
-Source: `results/ward_backtracking_txc/b3_math500_cut25/repetition_rate{,_headline}.png`.
+badly at this hookpoint — supports the appendix-only demotion. TSAE-paper
+was trained for the full 15k step cap WITHOUT triggering early-stop,
+making it under-trained relative to the others; the 30k retrain (Option
+A) is in flight and will refresh this row + downstream sweep + plots.
 
 ## Architectural integrations (new in this push)
 
@@ -230,21 +226,27 @@ Source: `results/ward_backtracking_txc/b3_math500_cut25/repetition_rate{,_headli
 
 `experiments/ward_backtracking_txc/architectures.py:tfa` arch entry uses
 `src/bench/architectures/_tfa_module.TemporalSAE` with `use_pos_encoding=True`.
-Same forward / decoder interface as our existing `tsae` arch — only difference
-is sinusoidal positional encodings inside `ManualAttention`. We use `n_heads=8,
-bottleneck_factor=64` (same as our TSAE-paper) to keep memory tractable at
-`d_sae=16384`; the TFA paper's toy default of `bottleneck_factor=1` would
-have put 16k-dim attention vectors per head.
+Same forward / decoder interface as our existing `tsae` arch — only
+difference is sinusoidal positional encodings inside `ManualAttention`. We
+use `n_heads=8, bottleneck_factor=64` (same as our TSAE-paper) to keep
+memory tractable at `d_sae=16384`; the TFA paper's toy default of
+`bottleneck_factor=1` would have put 16k-dim attention vectors per head.
 
 ### MLC (Multi-Layer Crosscoder)
 
 `experiments/ward_backtracking_txc/architectures.py:mlc` uses
 `src/bench/architectures/mlc.LayerCrosscoder`, which inherits
-`TemporalCrosscoder` with the T axis re-interpreted as simultaneous layers
-(L8, L9, L10, L11, L12). Math is identical to TXC; only the data dispatch
-differs.
+`TemporalCrosscoder` with the T axis re-interpreted as simultaneous
+layers (L8, L9, L10, L11, L12). Math is identical to TXC; only the data
+dispatch differs. **MLC ties or beats TXC on every quantitative metric**,
+which means whatever advantage exists is not specific to temporal
+windows — layer-stacking does the same job. Implication for the
+architectural story: the "temporal window" framing needs to share credit
+with "shared-latent crosscoder over a structured axis," whether that
+axis is tokens or layers.
 
 Two new pieces wired:
+
 - `train_txc.py:_MultiLayerActivationLoader` reads from a stack of
   per-layer caches (`resid_L{n}.npy` for n ∈ {8,9,11,12}; L10 already
   cached) and produces `(B, n_layers=5, d)` samples.
@@ -265,67 +267,90 @@ is left to future work.
 
 ## Methodology notes
 
-### Calibrated magnitudes
+### Baseline correction (mag=0 noise floor)
 
-For each arch, take the 95th percentile of |feature activation| over the
-captured eval-set sentences (pooled positive + negative class, nonzero
-values only). Define "calibrated magnitude 1.0" per arch as 1 × that p95.
-Re-plot with `calibrated_x = raw / p95` per arch.
+The cut-and-continue protocol re-rolls the reasoning-model trace from a
+prefix that's only 25% of the original Stage A trace. Sampling is
+stochastic (`do_sample=True`), so the continuation can land on a
+different (sometimes correct, sometimes incorrect) answer than the
+original Stage A trajectory. At mag=0 the steering hook multiplies the
+steering vector by zero, so the model produces the same output regardless
+of which arch's steering vector it would have used. The 7 "rescues" and
+1 "regression" at mag=0 are therefore identical across all six
+architectures — that's the cut-and-continue noise floor.
 
-Important fix: the original implementation used `flat > 0` to filter
-nonzero values, which dropped TFA's and TSAE-paper's activations entirely
-because their `pred_codes + novel_codes` are signed reconstruction
-residuals, mostly slightly negative. Switched to filtering by
-`abs(values) > 0` so all six arches get a valid p95.
+The corrected metric pairs each (arch, magnitude, question) outcome
+against the SAME (arch, question) outcome at mag=0:
 
-p95 values (pooled): TXC=1.877, TXC-H8=1.535, SAE=5.608, TSAE-paper=0.0042,
-TFA=0.0074, MLC=2.152. SAE's natural scale is ~3× TXC; TSAE/TFA are ~400×
-smaller — calibration normalizes these to a comparable x-axis.
+- **extra_rescue** = baseline-incorrect (mag=0) AND steered-correct
+- **broke** = baseline-correct (mag=0) AND steered-incorrect
+- **Δnet** = extra_rescue − broke
+
+Paired McNemar tests use these discordant cells. This isolates the
+steering effect from the resampling noise.
+
+### Calibrated magnitude is broken — dropped from headline
+
+Andre's idea (95th percentile of feature activation as the "natural unit"
+for each arch) was implemented as `raw_mag / p95(|act|)`. Problem: TFA
+and TSAE-paper produce signed reconstruction-residual codes with p95 ≈
+0.005, ~400× smaller than the TopK arches' ≈2.0. Dividing raw mag by
+p95 puts TFA/TSAE points at calibrated x ≈ ±2,000–4,000, off-screen on
+any reasonable plot. The original "headline_calibrated.png" rendered
+TFA/TSAE as flat horizontal lines and visually misleading.
+
+The calibrated headline is **dropped from the main text**. The raw
+magnitude version is the more honest. If we want a calibration that
+works cross-arch, the right normalization is by the steered feature's
+decoder-direction L2 norm (consistent units of "model-space distance per
+unit magnitude"), not by activation p95. That's a follow-up.
 
 ### Cohort
 
 Stage A produces 150 MATH-500 traces at the reasoning model. Of those:
 
-- 78 unsteered-correct
+- 78 unsteered-correct (random sample of 30 used for regression cohort)
 - 31 unsteered-incorrect with a parsed answer ("truly-wrong")
 - 41 unsteered-incorrect with no parsed answer ("token-truncated"; dropped)
 
-For the 2×2 flip matrix we steer the truly-wrong (n=31) PLUS a random
-subsample of 30 unsteered-correct questions (seed=42), giving the
-"regression cohort". Total: 61 questions × 25 magnitudes = 1525 panels
-per arch.
+Per-arch sweep cohort: 31 + 30 = **61 questions × 25 magnitudes = 1525 panels**.
+Total across 6 archs: 9150 panels in `flip_matrix.parquet`.
+
+### Magnitude grid
+
+```yaml
+[-16, -12, -10, -8, -7, -6, -5, -4, -3, -2, -1, -0.5,
+  0,
+  0.5, 1, 2, 3, 4, 5, 6, 7, 8, 10, 12, 16]
+```
+
+25 points; concentrated in ±0.5–8 where the SAE peak lives.
 
 ### T-window length
 
 Our config uses T=6, not the T=5 Dmitry's standardize-set guidance referred
 to. We did not retrain to switch — the existing TSAE / TFA / TXC / TXC-H8
 checkpoints are at T=6 and a full retrain would have eaten our Sunday EOD
-freeze. T=6 vs T=5 is a one-token-window difference that is unlikely to
-dominate any cross-architecture distinction; the sparse-probing benchmark
-results are within noise across these T values. MLC's "T axis" is 5 layers,
+freeze. T=6 vs T=5 is a one-token-window difference unlikely to dominate
+any cross-architecture distinction. MLC's "T axis" is 5 layers,
 independent of the token-window T.
 
 ### Steering direction asymmetry
 
 TXC's headline feature `f14621 pos0` was mined as a *negative-direction*
-backtracking feature (steering at mag = −2 maximizes net rescues). The
-other arches' canonical features were mined positive-direction (e.g.,
-SAE's f5263 peaks at mag = +3). The headline plot's x-axis is symmetric
-around 0, so when comparing across arches at a fixed sign, TXC looks
-worse on the positive side than its preferred direction warrants. Two
-options for the writeup, to discuss with Dmitry: (a) keep the symmetric
-axis as-is (most honest, but hides direction-specific peaks), or
-(b) plot per-arch in the rescue-direction (cleaner narrative, but
-asymmetry is data-dependent).
+backtracking feature (Δnet peak at mag = −2). SAE's headline feature
+peaks at mag = 0 (i.e., not at all once baseline-corrected). This
+direction asymmetry is real per-arch but, after baseline correction,
+also irrelevant for the headline claim — no arch has a significant peak
+in either direction.
 
 ### Detection probe choice
 
-Sparse logistic regression (l1 NOT used; default L2 via liblinear) on
-top-S features selected per fold by |mean-difference|. F1 numbers are
-uniformly low (~0–0.08) because the positive class is ~12% of sentences
-and threshold is 0.5 — an appendix-quality threshold choice. For the
-camera-ready, switch to PR-AUC or class-balanced threshold; AUC is the
-metric to report.
+Sparse logistic regression (default L2 via liblinear) on top-S features
+selected per fold by |mean-difference|. F1 numbers are uniformly low
+(~0–0.08) because the positive class is ~12% of sentences and threshold
+is 0.5. For the camera-ready, switch to PR-AUC or class-balanced
+threshold; AUC is the metric to report.
 
 ## Pipeline orchestration
 
@@ -336,14 +361,12 @@ Built three shell scripts that run end-to-end, autofire-chained:
    across both H100s, then steps C-E (flip matrix + calibration + plots).
 2. `run_tfa_mlc_extension.sh` — caches the 4 extra MLC layers, retrains
    TFA + MLC, mines, sweeps b3 for both, rebuilds the 5-arch headline.
-3. Two background watchers:
-   - `/tmp/autofire_pipeline.sh` waited on the TSAE k=20 retrains then
-     fired the primary pipeline.
-   - `/tmp/autofire_extension.sh` waited on the primary pipeline then
-     fired the extension.
+3. `run_tsae_30k_refresh.sh` — extended retrain of TSAE-paper to 30k
+   steps (it didn't plateau at 15k), re-mines TSAE, re-sweeps b3 for
+   TSAE only, regenerates flip matrix + plots + detection + hygiene.
 
-15-min status cron `6c47a6a8` ran throughout the autofire chain; deleted
-once the 5-arch headline landed.
+15-min status crons watched the autofire chain throughout; deleted once
+the artifacts landed.
 
 ## Known gaps / next steps
 
@@ -351,27 +374,61 @@ once the 5-arch headline landed.
   `results/.../judge_validation/blind_pairs.csv`. Aniket scores blind
   (coherence 0–3, backtracking-present 0/1, looping-present 0/1), then
   follow-up script computes Cohen's κ + raw agreement.
-- **SAE peak forensics**: read ~20 transcripts at SAE's narrow peak,
-  document in `notes/sae_peak_forensics.md`. Will discriminate "narrow
-  peak = genuine high-quality backtracking" from "narrow peak = judge
-  template artifact."
-- **Bhalla TSAE port**: a faithful 20/80 split + adjacent-token
-  contrastive Bhalla TSAE re-implementation. ~1–1.5 days. Currently
-  appendix-noted limitation.
-- **Detection thresholding**: switch from F1 @ 0.5 to PR-AUC or
-  class-balanced threshold for the camera-ready.
+- **TSAE-paper 30k retrain in flight** — was undertrained at the 15k cap
+  (didn't plateau); refresh script will overwrite the TSAE row in the
+  hygiene table + the TSAE line in the headline + flip-matrix + detection
+  plots when training finishes.
+- **L2-of-decoder calibration** — replacement for the broken p95 calibration.
+- **Switch detection F1 → PR-AUC** for camera-ready (~30 min).
+- **Determinism for mag=0 baseline** — switch sampling to temp=0 + fixed
+  seed for the mag=0 row only, so the baseline becomes a single
+  deterministic number rather than a stochastic noise floor we have to
+  subtract. Cleanest fix to the noise problem; ~30 min coding +
+  recompute mag=0 row.
+- **Faithful Bhalla TSAE port**: 20/80 high/low feature split +
+  adjacent-token contrastive loss. ~1.5 days. Currently appendix-noted
+  limitation.
 - **Plan Generation case study** (Bogdan & Macar 2026 thought-anchors
   taxonomy): explicitly deferred per Aniket. Stronger backtracking
   trumps adding a second category. Notes in
-  `notes/thought_anchors_taxonomy.md` for if/when there is bandwidth.
+  `notes/thought_anchors_taxonomy.md`.
+
+## What the case study can and cannot claim (paper text guide)
+
+**Can claim:**
+
+- Backtracking is detectable from sparse-feature dictionaries (AUC 0.63–0.72
+  across 6 archs); temporal-aware architectures don't lose detection
+  power vs conventional SAEs.
+- TXC's feature for backtracking has clean per-sentence selectivity
+  (mining D+/D- ratio, etc.) consistent with the qualitative story.
+- High-magnitude steering catastrophically breaks the model regardless of
+  architecture, with a mechanistic signature (sentence-level looping,
+  judge-free repetition rate jumps to ~0.55 at TXC mag=+16).
+- The hybrid detection-then-steering protocol (TXC for detection → SAE
+  for steering, per Andre) is supported by the methodology even where
+  the steering side is too noisy to differentiate architectures at this
+  cohort size.
+
+**Cannot claim** (without a larger eval set or determinism fixes):
+
+- "TXC has broader steering robustness than baselines" — contradicted by
+  the regression-rate-at-extremes data (TXC has the worst |mag|=16
+  collapse).
+- "TXC produces significantly more rescues than baselines" — Δnet vs
+  baseline is +1, p=1.00 after pairing.
+- "TXC has significantly better detection than baselines" — Wilcoxon
+  comparisons not HB-significant.
+- "Calibrated magnitudes show TXC's effect is concentrated near unit
+  scale" — the calibration is broken for TFA/TSAE-paper.
 
 ## See also
 
 - [[NEURIPS_PUSH]] — full execution plan + decision log
-- [[results_b]] — prior 4-arch + H8/H13 Stage B run (this push supersedes
-  the 9-mag grid; H8/H13 hill-climb results retained as reference)
-- [[results_b_behavioral]] — earlier behavioral metrics (judge-graded
-  panel coherence)
+- [[methodology_neurips_push]] — companion methods doc (per-step pipeline)
+- [[handoff_neurips_push]] — open-task instructions for follow-up
+- [[results_b]] — prior 4-arch + H8/H13 Stage B run (the 9-mag grid;
+  superseded by this push)
 - `notes/backtracking_appendix_draft.md` — main-vs-appendix figure manifest
   + appendix prose drafts
 - `notes/tsae_paper_param_audit.md` — Bhalla 2026 hyperparameter audit

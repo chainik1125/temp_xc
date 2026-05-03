@@ -1,0 +1,7 @@
+arch,magnitude,n_extra_rescue,n_broke_by_steering,n_disc,delta_net_vs_baseline,mcnemar_chi2_cc,mcnemar_p_2sided_exact
+mlc,4.0,5,3,8,2,0.125,0.7265625
+tfa,-8.0,7,6,13,1,0.0,1.0
+topk_sae,0.0,0,0,0,0,0.0,1.0
+tsae,0.0,0,0,0,0,0.0,1.0
+txc,-2.0,3,2,5,1,0.0,1.0
+txc_h8,-1.0,6,6,12,0,0.08333333333333333,1.0
