@@ -62,6 +62,100 @@ def _load_arch_ckpt(ckpt_path: Path):
     return model, c
 
 
+def _capture_multilayer_windows(
+    hf_id: str,
+    layers: list[int],
+    traces_by_qid: dict,
+    labels: list[dict],
+    dom_qids: set[str],
+    device: str = "cuda",
+):
+    """MLC variant of `_capture_windows`.
+
+    For each labeled sentence, captures the residual-stream activation at
+    the sentence's representative token across ALL `layers` simultaneously.
+    Returns X of shape (n_sent, n_layers, d_model). Used for mining MLC
+    feature activations — n_layers replaces TXC's T (window) axis.
+
+    The "representative token" is the token that begins the sentence in
+    the trace (think_offset + sent.char_start), matching the alignment
+    rule used in the single-layer path's `tok_pos`.
+    """
+    from transformers import AutoModelForCausalLM, AutoTokenizer
+    log.info("[load] %s (mlc, layers=%s)", hf_id, layers)
+    tok = AutoTokenizer.from_pretrained(hf_id, use_fast=True)
+    if tok.pad_token_id is None:
+        tok.pad_token_id = tok.eos_token_id
+    model = AutoModelForCausalLM.from_pretrained(
+        hf_id, torch_dtype=torch.bfloat16, device_map=device,
+    ).eval()
+    for p_ in model.parameters():
+        p_.requires_grad_(False)
+
+    captured = {ln: None for ln in layers}
+    handles = []
+    def _make_hook(ln):
+        def hook(_m, _i, output):
+            x = output[0] if isinstance(output, tuple) else output
+            if x.dim() == 4:
+                x = x.reshape(x.shape[0], x.shape[1], -1)
+            captured[ln] = x.detach().to(torch.float32).cpu()
+        return hook
+    for ln in layers:
+        handles.append(model.model.layers[ln].register_forward_hook(_make_hook(ln)))
+
+    X_list, is_bt, keys = [], [], []
+    try:
+        for record in tqdm(labels, desc=f"mlc-capture {layers}"):
+            qid = record["question_id"]
+            if qid not in dom_qids: continue
+            trace = traces_by_qid.get(qid)
+            if trace is None or not record.get("sentences"): continue
+            full_response = trace["full_response"]
+            enc = tok(full_response, return_tensors="pt",
+                      return_offsets_mapping=True, add_special_tokens=False)
+            input_ids = enc["input_ids"].to(model.device)
+            offsets_map = enc["offset_mapping"][0].tolist()
+            with torch.no_grad():
+                _ = model(input_ids=input_ids)
+
+            think_open = "<think>"
+            think_idx = full_response.find(think_open)
+            think_offset = (think_idx + len(think_open)) if think_idx >= 0 else 0
+
+            # All layers captured for this trace; align per sentence.
+            seq_len = captured[layers[0]].shape[1]
+            for s_idx, sent in enumerate(record["sentences"]):
+                target_char = think_offset + sent["char_start"]
+                tok_pos = -1
+                for i, (cs, ce) in enumerate(offsets_map):
+                    if cs <= target_char < ce or cs >= target_char:
+                        tok_pos = i; break
+                if tok_pos < 0 or tok_pos >= seq_len: continue
+                # Stack across layers at the single token position.
+                stacked = np.stack(
+                    [captured[ln][0, tok_pos].numpy() for ln in layers],
+                    axis=0,
+                )  # (n_layers, d_model)
+                X_list.append(stacked.astype(np.float32))
+                is_bt.append(bool(sent["is_backtracking"]))
+                keys.append(f"{qid}|{record['trace_idx']}|{s_idx}")
+
+            for ln in layers: captured[ln] = None
+            torch.cuda.empty_cache()
+    finally:
+        for h in handles: h.remove()
+
+    del model
+    torch.cuda.empty_cache()
+    if not X_list:
+        raise RuntimeError("no MLC sentence windows collected")
+    X = np.stack(X_list, axis=0)            # (n_sent, n_layers, d_model)
+    is_bt = np.asarray(is_bt, dtype=bool)
+    keys = np.asarray(keys, dtype=object)
+    return X, is_bt, keys
+
+
 def _capture_windows(
     hf_id: str,
     layer: int,
@@ -224,9 +318,10 @@ def _per_offset_preact(arch: str, model, X: np.ndarray, feat_idx: np.ndarray, ba
             with torch.no_grad():
                 contribs = torch.einsum("btd,dk->btk", x, W)
             out[i:end] = contribs.permute(0, 2, 1).float().cpu().numpy()
-    elif arch in ("tsae", "tsae_paper"):
-        # Run the full TSAE forward and extract per-position codes for top-K.
-        # codes_t = pred_codes + novel_codes (B, T, d_sae).
+    elif arch in ("tsae", "tsae_paper", "tfa"):
+        # Run the full TSAE/TFA forward and extract per-position codes for top-K.
+        # codes_t = pred_codes + novel_codes (B, T, d_sae). TFA uses the same
+        # TemporalSAE class so the forward signature is identical.
         for i in range(0, X.shape[0], batch_size):
             end = min(i + batch_size, X.shape[0])
             x = torch.from_numpy(X[i:end]).to("cuda", dtype=torch.float32)
@@ -235,9 +330,11 @@ def _per_offset_preact(arch: str, model, X: np.ndarray, feat_idx: np.ndarray, ba
                 codes = results["pred_codes"] + results["novel_codes"]   # (B, T, d_sae)
                 contribs = codes[..., feat_idx_t]                        # (B, T, K)
             out[i:end] = contribs.permute(0, 2, 1).float().cpu().numpy()
-    elif arch in ("txc_h8", "txc_h13"):
+    elif arch in ("txc_h8", "txc_h13", "mlc"):
         # W_enc is (T, d_in, d_sae) — same shape as plain TXC. Per-position
         # contribution at slot t for feature k is x[:, t] · W_enc[t, :, k].
+        # For MLC, "slot t" indexes layer t (within {L8..L12}); the input X is
+        # (n_sent, n_layers, d_model) per `_capture_multilayer_windows`.
         W = model.W_enc[:, :, feat_idx]   # (T, d, K)
         for i in range(0, X.shape[0], batch_size):
             end = min(i + batch_size, X.shape[0])
@@ -282,7 +379,7 @@ def _process_one(arch: str, hp: dict, cfg: dict,
     model, mcfg = _load_arch_ckpt(ckpt_path)
     T = mcfg["T"]
     offsets_window = list(cfg["mining"]["offset_window"])
-    if len(offsets_window) != T:
+    if arch != "mlc" and len(offsets_window) != T:
         raise ValueError(f"mining offset_window len ({len(offsets_window)}) != T ({T})")
 
     prompts = json.loads(Path(paths["stageA_prompts"]).read_text())
@@ -291,10 +388,22 @@ def _process_one(arch: str, hp: dict, cfg: dict,
     traces_by_qid = {t["question_id"]: t for t in traces}
     labels = json.loads(Path(paths["stageA_labels"]).read_text())
 
-    X, is_bt, keys = _capture_windows(
-        cfg["models"]["base"], hp["layer"], hp["component"],
-        offsets_window, traces_by_qid, labels, dom_qids,
-    )
+    if arch == "mlc":
+        # MLC: capture multi-layer activations at the sentence token (no
+        # token-window). The "T axis" of the encoder input is layers.
+        mlc_layers = list(cfg["txc"].get("arch_kwargs", {}).get("mlc", {}).get("layers", [8, 9, 10, 11, 12]))
+        X, is_bt, keys = _capture_multilayer_windows(
+            cfg["models"]["base"], mlc_layers,
+            traces_by_qid, labels, dom_qids,
+        )
+        # Override offsets_window for the per-offset selectivity plot —
+        # "offsets" become layer indices for MLC.
+        offsets_window = list(range(len(mlc_layers)))
+    else:
+        X, is_bt, keys = _capture_windows(
+            cfg["models"]["base"], hp["layer"], hp["component"],
+            offsets_window, traces_by_qid, labels, dom_qids,
+        )
     Z = _encode_in_batches(arch, model, X)        # (N, d_sae)
 
     # Selectivity — compute three rankings on the same Z matrix.

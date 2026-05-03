@@ -80,3 +80,28 @@ results/ward_backtracking_txc/b2/
 results/ward_backtracking_txc/logs/
 results/ward_backtracking_txc/steering/
 results/ward_backtracking_txc/plots/
+# Per-cell judge artifacts (heavy; regenerable from the sweep + judge model)
+results/ward_backtracking_txc/backtracking_judgements/
+results/ward_backtracking_txc/coherence_grades/
+results/ward_backtracking_txc/steering_per_cell/
+# B1 held-out scratch dirs (regenerable)
+results/ward_backtracking_txc/b1_held_out/
+results/ward_backtracking_txc/b1_held_out_run/
+# Heavy continuation_text inside rescue jsons — keep summary.json + meta.json,
+# exclude the rescue.json which inflates checkin size to ~22 MB / sweep.
+# (Regenerable from b3_variants.py + the trained checkpoints.)
+results/ward_backtracking_txc/b3_math500_cut25/*/phase2_rescue.json
+results/ward_backtracking_txc/b3_math500/phase1_unsteered.json
+results/ward_backtracking_txc/b3_math500/phase2_rescue.json
+results/ward_backtracking_txc/b3_math500_cut25/phase2_rescue.json
+results/ward_backtracking_txc/b3_math500_cut25_orig/phase2_rescue.json
+results/ward_backtracking_txc/b3_math500_llm_cut/phase_b_rescue.json
+results/ward_backtracking_txc/b3_math500_llm_cut/phase_a_cuts.json
+results/ward_backtracking_txc/b3_math500_match_baseline/phase2_rescue.json
+results/ward_backtracking_txc/b3_math500_single/phase2_rescue.json
+# Cell-naming hill-climb intermediate state (regenerable)
+results/ward_backtracking_txc/hillclimb_state*.json
+results/ward_backtracking_txc/cell_metrics/
+
+# Claude Code session-internal lock file
+.claude/scheduled_tasks.lock

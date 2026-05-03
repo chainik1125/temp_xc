@@ -56,6 +56,10 @@ from temporal_crosscoders.models import (
     TemporalCrosscoder,
 )
 from temporal_crosscoders.han_tsae import TemporalSAE
+# TFA = TemporalSAE with sinusoidal positional encodings (Han / TFA-paper variant).
+# Same forward / encode / decoder interface; only differs from `tsae` by the
+# positional-encoding flag in ManualAttention.
+from src.bench.architectures._tfa_module import TemporalSAE as TFAModule
 from temporal_crosscoders.han_arch import (
     TXCBareMultiDistanceContrastiveAntidead,
     TXCBareMDxMSContrastiveAntidead,
@@ -98,15 +102,45 @@ def build_arch(arch: str, d_in: int, d_sae: int, T: int, k: int, **kwargs):
         bottleneck_factor = kwargs.get("bottleneck_factor", 64)
         sae_diff_type = kwargs.get("sae_diff_type", "topk")
         n_attn_layers = kwargs.get("n_attn_layers", 1)
+        # kval_topk: paper-aware override. Bhalla 2026 trains all SAEs with
+        # BatchTopK k=20; default fallback is k*T (window-level L0 matched to
+        # the TXC family). Set `kval_topk` explicitly in config.yaml's
+        # arch_kwargs.tsae block when reproducing paper params.
+        kval_topk = int(kwargs.get("kval_topk", k * T))
         return TemporalSAE(
             dimin=d_in,
             width=d_sae,
             n_heads=n_heads,
             sae_diff_type=sae_diff_type,
-            kval_topk=k * T,                      # total k across T window
+            kval_topk=kval_topk,
             tied_weights=kwargs.get("tied_weights", True),
             n_attn_layers=n_attn_layers,
             bottleneck_factor=bottleneck_factor,
+        )
+    elif arch == "tfa":
+        # Temporal Feature Analysis (TFA) — same as `tsae` (Han's TemporalSAE)
+        # but with sinusoidal positional encodings inside ManualAttention.
+        # That's the architectural distinction Dmitry's standardized arch set
+        # singles out vs vanilla T-SAE. We use the bench framework's
+        # `_tfa_module.TemporalSAE` since it carries the `use_pos_encoding`
+        # flag; shape and forward signature are identical to Han's TSAE.
+        n_heads = kwargs.get("n_heads", 8)
+        bottleneck_factor = kwargs.get("bottleneck_factor", 64)
+        sae_diff_type = kwargs.get("sae_diff_type", "topk")
+        n_attn_layers = kwargs.get("n_attn_layers", 1)
+        kval_topk = int(kwargs.get("kval_topk", k * T))
+        max_seq_len = int(kwargs.get("max_seq_len", 512))
+        return TFAModule(
+            dimin=d_in,
+            width=d_sae,
+            n_heads=n_heads,
+            sae_diff_type=sae_diff_type,
+            kval_topk=kval_topk,
+            tied_weights=kwargs.get("tied_weights", True),
+            n_attn_layers=n_attn_layers,
+            bottleneck_factor=bottleneck_factor,
+            use_pos_encoding=True,
+            max_seq_len=max_seq_len,
         )
     elif arch == "tsae_paper":
         # Bhalla 2025 paper-faithful: ReLU + L1, not TopK.
@@ -127,6 +161,16 @@ def build_arch(arch: str, d_in: int, d_sae: int, T: int, k: int, **kwargs):
         )
         m._l1_coef = l1_coef
         return m
+    elif arch == "mlc":
+        # Multi-Layer Crosscoder (Lindsey 2024 / Anthropic). Math is identical
+        # to TemporalCrosscoder; T axis indexes simultaneous layers
+        # {L-2..L+2} rather than consecutive tokens. Steered direction is the
+        # decoder column at the *centre* layer (`n_layers // 2`), exposed via
+        # arch_decoder_directions below. Data feeding lives in the multilayer
+        # loader in train_txc.py.
+        from src.bench.architectures.mlc import LayerCrosscoder
+        n_layers = int(kwargs.get("n_layers", 5))
+        return LayerCrosscoder(d_in=d_in, d_sae=d_sae, n_layers=n_layers, k=k)
     elif arch == "txc_h8":
         # Han's multi-distance contrastive TXC. window-L0 = k * T to match TXC family.
         shifts = tuple(kwargs.get("shifts") or _auto_shifts(T))
@@ -165,6 +209,11 @@ def arch_forward(arch: str, model: nn.Module, x_btd: torch.Tensor):
     if arch == "txc":
         loss, x_hat, z = model(x_btd)             # z: (B, d_sae)
         return loss, {"window": z, "per_pos": None}
+    elif arch == "mlc":
+        # Same forward as TXC; x_btd is (B, n_layers, d) with simultaneous
+        # layer activations rather than (B, T_tokens, d).
+        loss, x_hat, z = model(x_btd)
+        return loss, {"window": z, "per_pos": None}
     elif arch == "stacked_sae":
         loss, x_hat, u = model(x_btd)             # u: (B, T, d_sae)
         return loss, {"window": u.mean(dim=1), "per_pos": u}
@@ -175,7 +224,7 @@ def arch_forward(arch: str, model: nn.Module, x_btd: torch.Tensor):
         loss, x_hat, u = model(x_flat)            # u: (B*T, d_sae)
         per_pos = u.reshape(B, T, -1)
         return loss, {"window": per_pos.mean(dim=1), "per_pos": per_pos}
-    elif arch == "tsae":
+    elif arch in ("tsae", "tfa"):
         x_hat, results = model(x_btd)             # x_hat: (B, T, d)
         loss = (x_hat - x_btd).pow(2).sum(dim=-1).mean()
         codes = results["pred_codes"] + results["novel_codes"]   # (B, T, d_sae)
@@ -226,6 +275,19 @@ def arch_decoder_directions(arch: str, model: nn.Module) -> dict:
             "union": W.mean(dim=1),
             "per_pos": W,
         }
+    elif arch == "mlc":
+        # Same shape as TXC's W_dec (d_sae, n_layers, d). For steering, the
+        # natural single direction is the *centre layer* (= our actual hook
+        # layer, e.g. L10 for the {L8..L12} window) — that's where we'll
+        # actually inject. We expose it as `pos0` for compatibility with the
+        # existing b3 steering pipeline.
+        W = model.W_dec                          # (d_sae, n_layers, d)
+        centre = W.size(1) // 2
+        return {
+            "pos0": W[:, centre, :],
+            "union": W.mean(dim=1),
+            "per_pos": W,
+        }
     elif arch == "stacked_sae":
         # Per-position decoders: gather as (d_sae, T, d).
         per_pos = torch.stack(
@@ -240,10 +302,10 @@ def arch_decoder_directions(arch: str, model: nn.Module) -> dict:
         # Single shared decoder (no T axis). pos0 == union.
         W = model.W_dec.T                        # (d_sae, d)
         return {"pos0": W, "union": W, "per_pos": None}
-    elif arch == "tsae":
-        # Han's TSAE has a single shared dictionary D of shape (width, dimin).
-        # All temporal structure lives in the attention layer; the steering
-        # direction per feature is the dictionary row.
+    elif arch in ("tsae", "tfa"):
+        # Han's TSAE / TFA both have a single shared dictionary D of shape
+        # (width, dimin). All temporal structure lives in the attention layer
+        # (and pos encodings for TFA); steering direction is the dictionary row.
         W = model.D                              # (d_sae, d)
         return {"pos0": W, "union": W, "per_pos": None}
     elif arch == "tsae_paper":

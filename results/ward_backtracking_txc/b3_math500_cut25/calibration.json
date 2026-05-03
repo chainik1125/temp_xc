@@ -1,0 +1,80 @@
+{
+  "mlc__resid_L10__k32__s42__f9976_pos0": {
+    "cell_id": "mlc__resid_L10__k32__s42",
+    "feature_id": 9976,
+    "feature_mode": "pos0",
+    "p95_pos_only": 1.712260293960571,
+    "p95_neg_only": 2.230722188949585,
+    "p95_pooled": 2.152431297302244,
+    "n_pos": 3023,
+    "n_neg": 20922,
+    "n_zero_in_pool": 7958,
+    "frac_zero_pooled": 0.3323449571935686,
+    "label": "MLC"
+  },
+  "tfa__resid_L10__k32__s42__f9856_pos0": {
+    "cell_id": "tfa__resid_L10__k32__s42",
+    "feature_id": 9856,
+    "feature_mode": "pos0",
+    "p95_pos_only": 0.006682788161560893,
+    "p95_neg_only": 0.0074646989814937115,
+    "p95_pooled": 0.007374511566013098,
+    "n_pos": 3023,
+    "n_neg": 20641,
+    "n_zero_in_pool": 0,
+    "frac_zero_pooled": 0.0,
+    "label": "TFA"
+  },
+  "topk_sae__ln1_L10__k64__s42__f5263_pos0": {
+    "cell_id": "topk_sae__ln1_L10__k64__s42",
+    "feature_id": 5263,
+    "feature_mode": "pos0",
+    "p95_pos_only": 5.979550361633301,
+    "p95_neg_only": 5.53031299114227,
+    "p95_pooled": 5.608404541015617,
+    "n_pos": 3023,
+    "n_neg": 20641,
+    "n_zero_in_pool": 511,
+    "frac_zero_pooled": 0.02159398242055443,
+    "label": "SAE"
+  },
+  "tsae__resid_L10__k32__s42__f7258_pos0": {
+    "cell_id": "tsae__resid_L10__k32__s42",
+    "feature_id": 7258,
+    "feature_mode": "pos0",
+    "p95_pos_only": 0.004430873738601804,
+    "p95_neg_only": 0.004183925688266754,
+    "p95_pooled": 0.004221656010486185,
+    "n_pos": 3023,
+    "n_neg": 20641,
+    "n_zero_in_pool": 0,
+    "frac_zero_pooled": 0.0,
+    "label": "TSAE-paper"
+  },
+  "txc_h8__resid_L10__k16__s42__f344_pos0": {
+    "cell_id": "txc_h8__resid_L10__k16__s42",
+    "feature_id": 344,
+    "feature_mode": "pos0",
+    "p95_pos_only": 1.9224347352981563,
+    "p95_neg_only": 1.4309252798557281,
+    "p95_pooled": 1.5345443129539489,
+    "n_pos": 3023,
+    "n_neg": 20641,
+    "n_zero_in_pool": 15729,
+    "frac_zero_pooled": 0.6646805273833671,
+    "label": "TXC-H8"
+  },
+  "txc__resid_L10__k16__s42__f14621_pos0": {
+    "cell_id": "txc__resid_L10__k16__s42",
+    "feature_id": 14621,
+    "feature_mode": "pos0",
+    "p95_pos_only": 2.157696843147278,
+    "p95_neg_only": 1.8026680946350098,
+    "p95_pooled": 1.877002382278442,
+    "n_pos": 3023,
+    "n_neg": 20641,
+    "n_zero_in_pool": 6989,
+    "frac_zero_pooled": 0.29534313725490197,
+    "label": "TXC"
+  }
+}

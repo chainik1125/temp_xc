@@ -38,6 +38,65 @@ logging.basicConfig(level=logging.INFO, format="%(message)s")
 log = logging.getLogger("ward_txc.train")
 
 
+class _MultiLayerActivationLoader:
+    """Streams (B, n_layers, d) samples from a stack of single-layer caches.
+
+    Used by MLC (Multi-Layer Crosscoder), where the "T axis" indexes
+    simultaneous layers rather than consecutive token positions. For each
+    sampled (sequence, token_position) pair, returns the residual-stream
+    activations at all `layers`, stacked along axis 1.
+
+    Storage layout: one .npy per layer at `acts_dir/resid_L{n}.npy`, each
+    of shape (n_seq, seq_len, d_model). All must match in shape.
+    """
+
+    def __init__(self, paths: list[Path], batch_size: int, device: str = "cuda"):
+        self.batch_size = batch_size
+        self.device = device
+        self.n_layers = len(paths)
+        log.info("[mlc-loader] %d layers", self.n_layers)
+        chunks_per_layer = []
+        shapes = []
+        for p in paths:
+            log.info("[mlc-loader] mmap %s", p)
+            arr = np.load(p, mmap_mode="r")
+            shapes.append(arr.shape)
+            ck = []
+            chunk_n = 256
+            for i in tqdm(range(0, arr.shape[0], chunk_n), desc=f"upload {p.name}"):
+                end = min(i + chunk_n, arr.shape[0])
+                ck.append(torch.from_numpy(arr[i:end].copy()).to(device))
+            chunks_per_layer.append(torch.cat(ck, dim=0))
+            torch.cuda.empty_cache()
+        # Sanity: all layers must agree in (n_seq, seq_len, d).
+        ref = shapes[0]
+        for s in shapes[1:]:
+            assert s == ref, f"layer shape mismatch: {ref} vs {s}"
+        self.num_seq, self.seq_len, self.d = ref
+        # Stack to (n_layers, N, L, d).
+        self.data = torch.stack(chunks_per_layer, dim=0)
+        del chunks_per_layer
+        torch.cuda.empty_cache()
+        gb = self.data.element_size() * self.data.nelement() / 1e9
+        log.info("[mlc-loader] uploaded %d layers × %s → %.2f GB",
+                 self.n_layers, ref, gb)
+        # T-equivalent for downstream code expecting it
+        self.T = self.n_layers
+
+    def sample(self) -> torch.Tensor:
+        """Return (B, n_layers, d) — one token from each layer per sample."""
+        chain_idx = torch.randint(0, self.num_seq, (self.batch_size,), device=self.device)
+        pos_idx = torch.randint(0, self.seq_len, (self.batch_size,), device=self.device)
+        # gather: data[layer, seq, pos, :]  → result (B, n_layers, d)
+        # Build full index: for each batch element b → (n_layers, d)
+        # data is (n_layers, N, L, d). We need data[:, chain[b], pos[b], :] → (n_layers, d)
+        out = self.data[:, chain_idx, pos_idx, :]   # (n_layers, B, d)
+        return out.transpose(0, 1).to(torch.float32)  # (B, n_layers, d)
+
+    def sample_multidistance(self, shifts):  # for arch_list parity
+        return self.sample().unsqueeze(1)
+
+
 class _ActivationLoader:
     """Streams (B, T, d) windows from a single hookpoint's cached npy."""
 
@@ -136,10 +195,22 @@ def _train_one(arch: str, hookpoint: dict, cfg: dict,
     paths = cfg["paths"]
     txc_cfg = cfg["txc"]
 
-    acts_path = Path(paths["acts_dir"]) / f"{key}.npy"
-    if not acts_path.exists():
-        log.warning("[skip] %s/%s: no cached activations at %s", arch, key, acts_path)
-        return {"arch": arch, "key": key, "skipped": True}
+    # MLC reads from a STACK of single-layer caches (resid_L{n}.npy for n in
+    # mlc.layers). All other archs read from the per-hookpoint cache.
+    if arch == "mlc":
+        mlc_cfg = (txc_cfg.get("arch_kwargs", {}) or {}).get("mlc", {}) or {}
+        layers = list(mlc_cfg.get("layers", [8, 9, 10, 11, 12]))
+        acts_paths = [Path(paths["acts_dir"]) / f"resid_L{ln}.npy" for ln in layers]
+        missing = [str(p) for p in acts_paths if not p.exists()]
+        if missing:
+            log.warning("[skip] mlc/%s: missing layer caches: %s", key, missing)
+            return {"arch": arch, "key": key, "skipped": True}
+        acts_path = acts_paths[len(layers) // 2]  # placeholder for logging
+    else:
+        acts_path = Path(paths["acts_dir"]) / f"{key}.npy"
+        if not acts_path.exists():
+            log.warning("[skip] %s/%s: no cached activations at %s", arch, key, acts_path)
+            return {"arch": arch, "key": key, "skipped": True}
 
     seed = seed_override if seed_override is not None else int(txc_cfg.get("seed", 42))
     k_per_pos = (k_per_position_override if k_per_position_override is not None
@@ -167,10 +238,15 @@ def _train_one(arch: str, hookpoint: dict, cfg: dict,
     d_sae = int(txc_cfg["d_sae"])
     d_in = int(txc_cfg["d_model"])
 
-    loader = _ActivationLoader(
-        acts_path, T=T,
-        batch_size=int(txc_cfg["batch_size"]),
-    )
+    if arch == "mlc":
+        loader = _MultiLayerActivationLoader(
+            acts_paths, batch_size=int(txc_cfg["batch_size"]),
+        )
+    else:
+        loader = _ActivationLoader(
+            acts_path, T=T,
+            batch_size=int(txc_cfg["batch_size"]),
+        )
 
     arch_kwargs = (txc_cfg.get("arch_kwargs", {}) or {}).get(arch, {})
     model = build_arch(arch, d_in=d_in, d_sae=d_sae, T=T, k=k_per_pos, **arch_kwargs).to("cuda")

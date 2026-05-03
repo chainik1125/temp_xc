@@ -39,10 +39,18 @@ def main(argv=None):
     p.add_argument("--gen-batch-size", type=int, default=16)
     p.add_argument("--phase1-cache", type=Path,
                    default=Path("results/ward_backtracking_txc/b3_math500/phase1_unsteered.json"))
+    p.add_argument("--include-correct", type=int, default=0,
+                   help="Also steer N originally-correct questions (random subsample) "
+                        "to fill the regression cells of the flip matrix. 0 = wrong-cohort only.")
+    p.add_argument("--correct-seed", type=int, default=42,
+                   help="Seed for the correct-cohort subsample.")
+    p.add_argument("--out", type=Path, default=None,
+                   help="Override output dir (default: <root>/b3_math500_<variant>). "
+                        "Use this to run multi-arch sweeps without overwriting.")
     args = p.parse_args(argv)
 
     cfg = yaml.safe_load(args.config.read_text())
-    out = Path(cfg["paths"]["root"]) / f"b3_math500_{args.variant}"
+    out = args.out if args.out is not None else (Path(cfg["paths"]["root"]) / f"b3_math500_{args.variant}")
     out.mkdir(parents=True, exist_ok=True)
 
     # Load phase 1 from the cached B3 run
@@ -55,6 +63,23 @@ def main(argv=None):
     log.info("[cohort] truly-wrong: %d (dropped %d truncated)",
              len(truly_wrong), sum(1 for r in base_results
                                     if not r["unsteered_correct"] and r["unsteered_answer"] is None))
+
+    # Optionally include a random subsample of originally-correct questions to
+    # measure regressions (correct -> incorrect) under steering.
+    if args.include_correct > 0:
+        correct_pool = [r for r in base_results if r["unsteered_correct"]]
+        rng = np.random.default_rng(args.correct_seed)
+        n_take = min(args.include_correct, len(correct_pool))
+        idx = rng.choice(len(correct_pool), size=n_take, replace=False)
+        correct_subsample = [correct_pool[i] for i in sorted(idx.tolist())]
+        log.info("[cohort] correct subsample: %d (from %d eligible)",
+                 len(correct_subsample), len(correct_pool))
+    else:
+        correct_subsample = []
+    cohort = list(truly_wrong) + list(correct_subsample)
+    cohort_before = {r["unique_id"]: bool(r["unsteered_correct"]) for r in cohort}
+    log.info("[cohort] total panels source: %d (wrong=%d, correct=%d)",
+             len(cohort), len(truly_wrong), len(correct_subsample))
 
     # Load model
     layer = int(cfg["steering"]["steering_layer"])
@@ -122,7 +147,7 @@ def main(argv=None):
     ds = load_dataset("HuggingFaceH4/MATH-500", split="test")
     by_id = {r["unique_id"]: r for r in ds}
 
-    for r in truly_wrong:
+    for r in cohort:
         unsteered_len = len(r["unsteered_token_ids"])
         prefix_len = max(1, int(unsteered_len * cut_frac))
         prefix = r["unsteered_token_ids"][:prefix_len]
@@ -137,10 +162,11 @@ def main(argv=None):
             panel_mags.append(float(mag))
             panel_max_new.append(cont_budget)
             panel_meta.append({"unique_id": r["unique_id"], "magnitude": float(mag),
-                               "prefix_len": prefix_len, "cont_budget": cont_budget})
+                               "prefix_len": prefix_len, "cont_budget": cont_budget,
+                               "before_correct": cohort_before[r["unique_id"]]})
 
-    log.info("[phase 2] %d panels (= %d truly-wrong × %d mags)",
-             len(panel_problems), len(truly_wrong), len(args.magnitudes))
+    log.info("[phase 2] %d panels (= %d cohort × %d mags)",
+             len(panel_problems), len(cohort), len(args.magnitudes))
 
     cont_texts = _generate_continuation_panels(
         model, tok, hook,
@@ -150,12 +176,13 @@ def main(argv=None):
     )
     handle.remove()
 
+    cohort_by_id = {r["unique_id"]: r for r in cohort}
     rescue_rows = []
     for meta, prefix, txt in zip(panel_meta, panel_prefixes, cont_texts):
         prefix_text = tok.decode(prefix, skip_special_tokens=True)
         full = prefix_text + txt
         new_ans = extract_boxed(full)
-        gt = next(r["ground_truth"] for r in truly_wrong if r["unique_id"] == meta["unique_id"])
+        gt = cohort_by_id[meta["unique_id"]]["ground_truth"]
         rescued = answers_match(new_ans, gt)
         rescue_rows.append({**meta, "ground_truth": gt, "rescued_answer": new_ans,
                              "rescued_correct": rescued, "continuation_text": txt})
@@ -164,20 +191,39 @@ def main(argv=None):
 
     # Aggregate
     from collections import defaultdict
-    by_mag = defaultdict(list)
+    by_mag_wrong = defaultdict(list)
+    by_mag_correct = defaultdict(list)
     for r in rescue_rows:
-        by_mag[r["magnitude"]].append(r["rescued_correct"])
-    summary = {"variant": args.variant, "n_truly_wrong": len(truly_wrong),
-               "rescue_rate_by_magnitude": {}}
-    for mag in sorted(by_mag):
-        vs = by_mag[mag]
-        rate = sum(vs)/len(vs) if vs else 0
-        summary["rescue_rate_by_magnitude"][str(mag)] = {"n_rescued": sum(vs), "n": len(vs), "rate": rate}
-        log.info("  mag=%+5.1f  rescued=%d/%d = %.3f", mag, sum(vs), len(vs), rate)
-    if 0.0 in by_mag:
-        ctrl = summary["rescue_rate_by_magnitude"]["0.0"]["rate"]
+        if r["before_correct"]:
+            by_mag_correct[r["magnitude"]].append(r["rescued_correct"])
+        else:
+            by_mag_wrong[r["magnitude"]].append(r["rescued_correct"])
+    summary = {"variant": args.variant,
+               "n_truly_wrong": len(truly_wrong),
+               "n_correct_subsample": len(correct_subsample),
+               "rescue_rate_by_magnitude": {},
+               "regression_rate_by_magnitude": {}}
+    all_mags = sorted(set(list(by_mag_wrong.keys()) + list(by_mag_correct.keys())))
+    for mag in all_mags:
+        vs_w = by_mag_wrong.get(mag, [])
+        vs_c = by_mag_correct.get(mag, [])
+        if vs_w:
+            rate = sum(vs_w)/len(vs_w)
+            summary["rescue_rate_by_magnitude"][str(mag)] = {"n_rescued": sum(vs_w), "n": len(vs_w), "rate": rate}
+        if vs_c:
+            n_regress = sum(1 for x in vs_c if not x)
+            summary["regression_rate_by_magnitude"][str(mag)] = {"n_regressed": n_regress, "n": len(vs_c),
+                                                                  "rate": n_regress/len(vs_c)}
+        log.info("  mag=%+5.1f  rescued=%d/%d  regressed=%d/%d",
+                 mag, sum(vs_w), len(vs_w), sum(1 for x in vs_c if not x), len(vs_c))
+    if 0.0 in by_mag_wrong:
+        ctrl_w = summary["rescue_rate_by_magnitude"]["0.0"]["rate"]
         for k, v in summary["rescue_rate_by_magnitude"].items():
-            v["delta_vs_control"] = v["rate"] - ctrl
+            v["delta_vs_control"] = v["rate"] - ctrl_w
+    if 0.0 in by_mag_correct:
+        ctrl_c = summary["regression_rate_by_magnitude"]["0.0"]["rate"]
+        for k, v in summary["regression_rate_by_magnitude"].items():
+            v["delta_vs_control"] = v["rate"] - ctrl_c
     (out / "summary.json").write_text(json.dumps(summary, indent=2))
     log.info("[saved] %s/summary.json", out)
     return 0

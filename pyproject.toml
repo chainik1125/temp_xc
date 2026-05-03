@@ -28,6 +28,7 @@ dependencies = [
     # EleutherAI delphi (SOTA auto-interp pipeline, Paulo et al. ICLR 2025)
     # Not on PyPI under its canonical name; installed from source.
     "eai-delphi @ git+https://github.com/EleutherAI/delphi",
+    "pypdf>=6.10.2",
 ]
 
 [tool.setuptools.packages.find]

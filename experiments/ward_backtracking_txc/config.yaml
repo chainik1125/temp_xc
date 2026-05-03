@@ -69,7 +69,7 @@ txc:
   # Architecture sweep: which dictionary-learning archs to train alongside
   # TXC. All read from the SAME activation cache and run through the same
   # mining + steering harness. See architectures.py for the dispatch.
-  arch_list: [txc, topk_sae, stacked_sae, tsae, tsae_paper, txc_h8, txc_h13]
+  arch_list: [txc, topk_sae, stacked_sae, tsae, tsae_paper, tfa, mlc, txc_h8, txc_h13]
   arch_kwargs:
     tsae:
       n_heads: 8              # must divide d_sae / bottleneck_factor
@@ -77,12 +77,39 @@ txc:
       sae_diff_type: topk     # 'topk' matches TXC's topk-style sparsity
       n_attn_layers: 1        # Dmitry/collaborator default
       tied_weights: true
+      # NeurIPS push (2026-05-02): paper-faithful k. Bhalla 2026 (ICLR; the
+      # paper Dmitry pointed at) trains all SAEs with BatchTopK k=20. Our
+      # `tsae` arch is Han's attention TSAE — closest practical analog given
+      # time-budget; full architectural mismatch w/ Bhalla 20/80 high/low
+      # split + adjacent-token contrastive is documented in
+      # notes/tsae_paper_param_audit.md. Without this override, kval_topk
+      # falls back to k_per_position*T = 32*6 = 192 (see architectures.py:106).
+      kval_topk: 20
     tsae_paper:               # Bhalla 2025 paper-faithful: ReLU + L1 (not TopK)
       n_heads: 8
       bottleneck_factor: 64
       n_attn_layers: 1
       tied_weights: true
       l1_coef: 1.0e-3         # canonical SAE L1 weight
+    tfa:                      # Temporal Feature Analysis (Han / TFA-paper).
+                              # Same architecture as `tsae` but with sinusoidal
+                              # positional encodings inside ManualAttention.
+                              # Per Dmitry's 2026-05-02 standardized arch set.
+      n_heads: 8
+      bottleneck_factor: 64
+      sae_diff_type: topk
+      n_attn_layers: 1
+      tied_weights: true
+      kval_topk: 20           # match TSAE-paper k for direct comparison
+      max_seq_len: 512
+    mlc:                      # Multi-Layer Crosscoder (Lindsey 2024).
+                              # T axis = simultaneous layers, NOT consecutive
+                              # tokens. Math is identical to TXC. Reads from a
+                              # stack of single-layer caches (one .npy per
+                              # layer). Centre layer = our actual hookpoint
+                              # (L10), so the {L8..L12} window is symmetric.
+      n_layers: 5
+      layers: [8, 9, 10, 11, 12]
     # Han's contrastive/matryoshka archs (vendored from han-phase7-unification).
     # Defaults match Han's H8 winner family; sweep via hill-climb's `arch` axis.
     txc_h8:
@@ -122,7 +149,10 @@ steering:
   # zero. Negative magnitudes were tested in Stage A as floor checks; here
   # they're a real source of evidence about direction sign and arch behavior.
   steering_layer: 10
-  magnitudes: [-16, -12, -8, -4, 0, 4, 8, 12, 16]
+  # NeurIPS final push (2026-05-02): densified to 25 points to characterize
+  # the SAE peak (was 9-point grid). Concentrated in ±0.5–8 where the SAE
+  # peak lives; sparser in the tails where curves are flat.
+  magnitudes: [-16, -12, -10, -8, -7, -6, -5, -4, -3, -2, -1, -0.5, 0, 0.5, 1, 2, 3, 4, 5, 6, 7, 8, 10, 12, 16]
   max_new_tokens: 1500       # PAPER-BUDGET: matches Stage A spec (was 1200 in sprint)
   n_eval_prompts: 20
   seed: 42
