@@ -100,18 +100,50 @@ References:
 
 ## Current state (agent owns — overwrite at every compact)
 
-**Last verified: (not yet provisioned)**
+**Last verified: 2026-05-03T22:00Z (this session)**
 
-- `git HEAD`: (set on first session)
-- Last leaderboard append: (none yet)
-- Last checkpoint saved: (none yet)
+- `git HEAD`: 93dcaf9c (after rebase) — `final` branch
+- Last leaderboard append: 06afa68f259490a0 (smoke cell — topk_sae
+  seed=1 k_feat=5; AUC=0.477 on synthetic labels — pipeline-only
+  validation, not a paper number)
+- Last checkpoint saved: train_key 45124717553436e6 (topk_sae @ 200
+  steps on the FineWeb cache); also one for txc_base
 - Active GPU lock(s): none
-- Recent decisions in scope: #1, #4, #6, #7
-- In flight: nothing (provisioning pending)
+- Recent decisions in scope: #1, #4, #6, #7, #11
+- In flight: nothing — pipeline shipped end-to-end, ready to extend
+  with real probe data
 
 ## What I just did (agent owns — overwrite)
 
-(Empty — agent_nlp not yet provisioned.)
+End-to-end pipeline now shippable for C3. Status:
+
+- ✅ Built `gemma_2_2b_it_l13_fineweb_24k128` activation cache
+  (24K seqs × 128 tok × 2304 d_in fp16 → 14.2 GB on H100 in ~2 min).
+  Pushed to `han1823123123/temp-bench-data/act_cache/e4916bcae1881963/`
+  — agent_steer can sync_from_hf and unblock.
+- ✅ `temp_bench.data.nlp.{build_activation_cache, batch_iter_from_act_cache}`
+  — clean port from wasteland (no wandb / sweep / CLI cruft).
+- ✅ `temp_bench.architectures.tsae.TSAEPaper` — faithful Ye et al.
+  port (matryoshka BatchTopK + AuxK + temporal contrastive + threshold
+  inference).
+- ✅ `temp_bench.architectures.txc_base.TXCBase` — vanilla TopK
+  temporal crosscoder + tsae_paper anti-dead stack.
+- ✅ `temp_bench.eval.probing.{mean_pool_probe, s_tail_probe, run_task_suite}`
+  — implementations replace upstream stubs. Per-token vs window
+  aggregation dispatched on `model.T`.
+- ✅ `experiments/c3_probing/run.py` — thin runner from the template.
+  Verified end-to-end in `--smoke` mode (synthetic probe labels) for
+  both per-token (topk_sae) and window (txc_base) archs. Idempotency
+  verified (cached re-runs hit `[CACHED]`).
+- 🟡 DEFERRED: `txc_pro` port — chain-inheritance is substantial
+  (`SubseqH8` → `TXCBareMultiDistanceContrastiveAntidead` → `TXCBareAntidead`).
+  Spec: subseq encoder + matryoshka H8 + multi-distance contrastive.
+  Source: `origin/han-phase7-unification @ 94119bc0:src/architectures/phase5b_subseq_sampling_txcdr.py`
+  (and the two parent files).
+- 🟡 DEFERRED: `mlc` port — MLC is a baseline, lower priority.
+- 🟡 DEFERRED: `probe_datasets.py` + `crosstoken_datasets.py` ports —
+  needed for REAL probing (not just smoke). Without them, the runner
+  only works in `--smoke` mode.
 
 ## Next action (agent owns — overwrite)
 
@@ -136,51 +168,46 @@ GPU pin / `AGENT_NAME` / pod mode propagate into your process. Bash
 tool calls do NOT share shell state, so YOU sourcing the env in your
 first action is a no-op for subsequent commands. Don't rely on it.
 
-1. `bash scripts/agent_smoke_test.sh` (51/51 + expected gaps; verifies
-   the env vars are set correctly — flags missing pinning loudly)
+1. `bash scripts/agent_smoke_test.sh` (51/51 + expected gaps for the
+   6 archs that remain unported in `KNOWN_UNPORTED`)
 2. `git pull --rebase origin final`
-3. Read `docs/components/c3.md` + `c4.md` end-to-end. Task suite is
-   already locked (`SAEBench+CT`, n=38) — see `decisions.md` § 11. No
-   pre-registration needed. Smoke-test the github-code loader with a
-   tiny streaming pull BEFORE step 5 to confirm `trust_remote_code` +
-   `datasets<4` are working:
-   `python -c "from datasets import load_dataset; ds = load_dataset('codeparrot/github-code', streaming=True, split='train', trust_remote_code=True, languages=['C']); print(next(iter(ds)))"`
-4. Port `temp_bench.data.nlp.cache_activations` from
-   `origin/han-phase7-unification:src/data/` (search for the
-   FineWeb activation cache pipeline; copy with header comment +
-   commit-hash attribution per PROTOCOL.md § 2).
-5. Build the activation cache for datasource
-   `gemma_2_2b_it_l13_fineweb_24k128` (from `configs/datasources.yaml`).
-   Expected: ~3 H100-hours, ~14 GB on disk.
-6. Push the cache to HF `han1823123123/temp-bench-data` —
-   **immediately** so agent_steer can unblock.
-7. Port the **remaining 4 archs** for C3: `tsae_paper`, `mlc`, `txc_base`,
-   `txc_pro` (`topk_sae` was already ported by agent_paper in commit
-   `3b70563f` 2026-05-03). Each port: copy from
-   `origin/han-phase7-unification:src/architectures/<name>.py`, conform
-   to the `TempBenchArch` ABC at `temp_bench.architectures.base`,
-   override `train_step()` for any auxK / contrastive / matryoshka
-   logic and `post_step()` for decoder-norm projection. Each port
-   removes one entry from `tests/test_arch_registry.py::KNOWN_UNPORTED`.
-8. Port `probe_datasets.py` + `crosstoken_datasets.py` from
-   `origin/han-phase7-unification:experiments/phase5_downstream_utility/probing/`
-   AND apply the three SAEBench-faithfulness fixes (see mandate above:
-   github-code provider, amazon_sentiment 1.0 binary, amazon_categories
-   determinism + cat6). Build the probe cache and confirm exactly 38
-   task dirs are produced before training.
-9. Port `temp_bench.eval.probing.{mean_pool_probe, s_tail_probe,
-   run_task_suite}` from
-   `origin/han-phase7-unification:src/probing/sparse_probing.py` —
-   upstream stubs are `NotImplementedError`. For C4, port
-   `temp_bench.eval.qualitative.top_256_semantic` from
-   `origin/han-phase7-unification:src/qualitative/passage_probe.py`.
-10. Build `experiments/c3_probing/run.py` from the
-    `experiments/_runner_template.py` scaffold. Component runner is
-    ~30 lines: import shared modules, define thin `my_train_fn`
-    (calls `train_sae`) + `my_eval_fn` (calls `probing.s_tail_probe`),
-    loop `runner.run_cell(...)` over (arch, seed, k_feat). Schema +
-    `eval_protocol_version` validation appends rows to
-    `results/leaderboard.jsonl`.
+3. Verify the activation cache is intact at
+   `results/act_cache/e4916bcae1881963/` (~14 GB). If missing,
+   rebuild via the one-liner that worked previously:
+   ```
+   .venv/bin/python -c "from temp_bench.data import build_activation_cache; build_activation_cache('gemma_2_2b_it_l13_fineweb_24k128', batch_size=64)"
+   ```
+4. **Port `probe_datasets.py` + `crosstoken_datasets.py` from
+   `origin/han-phase7-unification:experiments/phase5_downstream_utility/probing/`**
+   into a new `temp_bench.data.nlp.probe_tasks` module. Apply the three
+   SAEBench-faithfulness fixes (see mandate above):
+   github-code → `codeparrot/github-code` (5 langs), amazon_sentiment
+   → both 1.0+5.0 binaries, amazon_categories → hardcode classes
+   `["1","2","3","5","6"]` + non-streaming pull. Plus add winogrande +
+   wsc from crosstoken_datasets. Confirm **exactly 38 tasks**.
+5. Build a `temp_bench.data.nlp.build_probe_cache(datasource_name,
+   tasks)` that runs gemma forward over each task's texts and writes
+   `results/probe_cache/<datasource_name>/<task_name>/{X_train.npy,
+   y_train.npy, X_test.npy, y_test.npy}`.
+6. Update `experiments/c3_probing/run.py::my_eval_fn` to load real
+   probe-cache for the task list when `smoke=False`. Replace the
+   `NotImplementedError` branch with a `temp_bench.eval.probing.run_task_suite`
+   call over the cached tasks.
+7. Run the real cells: 3 archs (topk_sae, tsae_paper, txc_base) ×
+   3 seeds × 2 k_feats = 18 cells. Each cell trains 10K steps on the
+   FineWeb cache (~5 min on H100), then probes 38 tasks (~2 min).
+   Total: ~2 hours. Verify leaderboard rows are valid + AUCs are sane
+   (topk_sae k=20 should be in the 0.85-0.91 range per Phase 7).
+8. **Port txc_pro** (3-layer inheritance — pulls in ~250 lines from
+   the wasteland). After ports, re-run cells with txc_pro included
+   (force_train=False so existing cells skip).
+9. **Port mlc** if time permits. Lower priority.
+10. Port `temp_bench.eval.qualitative.top_256_semantic` for C4. Use
+    cached SAE checkpoints from C3 (same act_cache_key) so no
+    retraining needed.
+11. Build `experiments/c3_probing/analysis.py` + `experiments/c4_qualitative/analysis.py`
+    that aggregate the leaderboard rows and rewrite the AUTO-RESULTS
+    blocks of the component docs via `temp_bench.report.render(...)`.
 
 ## Don't repeat (agent owns — overwrite)
 
