@@ -296,31 +296,48 @@ If neither reproduces the lead, document honestly in c7.md.
 
 ## Open questions for Han (agent owns — overwrite)
 
-1. **Architecture-port blocker.** C7 needs 7 archs (TopK-SAE,
-   Stacked-SAE, TFA, T-SAE-paper, MLC, TXC-base, TXC-pro). Only
-   `topk_sae` is implemented today; the other 6 are agent_paper
-   territory (`configs/locked_archs.yaml` is locked + the registry
-   files belong to agent_paper per their briefing's C1+C2 todo).
-   Current preflight reports 8 expected gaps. **Question**: should
-   I (agent_back) wait for agent_paper to ship the ports, or am I
-   authorised to land the 6 missing arch files myself with header
-   attribution from `origin/han-phase7-unification:src/architectures/`
-   and a courtesy ping to agent_paper for review? Either path
-   unblocks C7 training (#8/#9/#10/#11/#12); the wait-path is
-   stricter on territory but slower.
-2. **Cohort-discovery shortcut.** Aniket's
-   `flip_matrix.parquet` has the cohort qids he used (31 wrong + 30
-   correct out of MATH-500). My current cohort builder relies on
-   running R1-Distill-Llama on all 500 prompts at session start to
-   re-discover the wrong/correct split (expensive — ~30 min on A40
-   for one full pass). **Confirm**: OK to use Aniket's cohort qids
-   as the canonical C7 cohort + skip cohort-discovery? They're frozen
-   inputs; reproducibility is preserved by the parquet provenance.
-3. **Steering-vector mining.** Aniket's pipeline mines per-arch
-   top-32 features by D+/D- mean-difference on labeled sentences,
-   then selects one feature per arch as the "steering feature".
-   **Question**: should the mining + feature-selection logic live in
-   `temp_bench.case_studies.backtracking` (my territory) or
-   `temp_bench.eval.case_study` (shared scaffolding)? If shared, I'd
-   add `mine_top_features` and `select_steering_feature` there; if
-   case-study-local, in backtracking.py.
+1. **Architecture ports — partial unblock.** As of edbdfdd7 the
+   landed arches are topk_sae, tsae_paper, txc_base (3 of 7).
+   Still gated on agent_paper: stacked_sae, tfa, tfa_pos, mlc,
+   txc_pro. My autonomous run uses the 3 available; the other 4
+   slot in via cache-hit when agent_paper ships them. **Question**:
+   any preference on whether agent_paper finishes the 4 vs me
+   porting any with header attribution? My default for the 10-hour
+   window is to wait + run with the 3 we have, then fold the rest
+   in when they land.
+2. **Cohort-from-parquet — adopted.** I'm using
+   `results/c7_backtracking/aniket_reference/cut25/flip_matrix.parquet`
+   as the canonical 31+30 cohort. Reproducibility is preserved by
+   the parquet provenance + ATTRIBUTION.md note. The LM-discovery
+   path is stubbed out for future use (see `build_cohort` source=…).
+3. **Mining lives in `case_studies.backtracking`** (my territory).
+   `mine_top_features` + `extract_labeled_sentence_acts` +
+   `split_pos_neg` are part of my module. If the steering case
+   study (C5) wants the same selectivity-ranking helper later, we
+   can refactor up to `temp_bench.eval.case_study`. Defer until C5
+   actually needs it.
+4. **NousResearch mirror substitution.** The Meta
+   `meta-llama/Llama-3.1-8B` repo is gated and the HF token
+   (han1823123123) does not have access. I added
+   `llama_3_1_8b_base_l10_ward_nousmirror` (byte-identical
+   redistribution) and the C7 runner uses it. Paper still cites
+   "Llama-3.1-8B BASE" — distribution detail. **Pick one**:
+   (a) accept Meta gate manually + switch back to the original
+       datasource, or
+   (b) formally adopt the NousResearch mirror (delete the original
+       entry in datasources.yaml).
+5. **`temp_bench.data.nlp.ward.py` split from agent_paper's
+   `cache.py`.** I added a sibling module under
+   `src/temp_bench/data/nlp/` rather than extend
+   `cache._stream_dataset_texts` to handle
+   `ward_backtracking_math500` (cross-territory). agent_paper may
+   want to fold the ward branch into `cache.py` for a single canonical
+   public API; for now the C7 runner imports from
+   `temp_bench.data.nlp.ward` explicitly.
+6. **Sentence-acts cache (115 MB, 1.1 GB compressed).** Uploaded to
+   HF temp-bench-data at
+   `c7_backtracking/stage_a/sentence_acts_L10.npz`. Not committed
+   to git (large + derived). Re-extract takes ~10 min on A40 if
+   pod restarts and `sync_from_hf.sh` doesn't pull it. Question:
+   should `sync_from_hf.sh` be extended to pull C7 stage_a
+   artifacts? (agent_paper territory.)
