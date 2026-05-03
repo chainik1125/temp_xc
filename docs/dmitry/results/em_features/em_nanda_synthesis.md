@@ -1541,3 +1541,123 @@ both organisms).
 
 **Compute & disk hygiene**: see above. No new jobs queued. No commits
 beyond brief + synthesis status entries.
+
+### Status as of 2026-05-03 03:00 UTC (R32 BUNDLE FRONTIER LANDED — k=30 bundle DEGRADES quality vs single-feat; "distributed misalignment" hypothesis FALSIFIED)
+
+**This firing (03:00 UTC) actions:**
+
+- **Built bundle infra and ran R32 k=30 bundle frontier on h100_2** in
+  one firing (~3 min infra + ~5 min run, total ~8 min wall). Concrete
+  steps:
+  1. Extended `experiments/em_features/frontier_sweep.py` with
+     `--base_model` / `--subject_model` flags symmetric to
+     `run_wang_procedure.py` (commit `30fc5af0`). When both flags
+     specified, they override `MODEL_REGISTRY`. Existing qwen / llama
+     presets unchanged. Records subject/base in output meta.
+  2. Built `/root/em_features/results/em_nanda_sae_arditi_step10000_wang_r32/top_30_bundle_features.json`
+     — top-30 by `screen_score` from the wang_r32 stage2 screen.
+     Top features: 21476 (19.375), 27970 (19.375), 11086 (18.125),
+     4086 (17.5), 894 (17.5). Includes all three single-feat
+     finalists (21224, 30540, 21466) and the F4-lite features
+     (4086, 5725) — solid coverage of the R32 causal pool.
+  3. Launched on h100_2 (R32 LoRA + SAE arditi 10k ckpt both already
+     local), 15-α grid, 8 rollouts × 8 prompts × 30-feature bundle.
+- **Bundle frontier table** (`bundle30_frontier.json`, all cells with
+  n_align=64/64=full sample):
+
+  | α     | align | coh   | comment |
+  |-------|-------|-------|---------|
+  | -100  | 19.61 | 14.14 | degenerate |
+  | -60   | 38.92 | 28.28 | degenerate |
+  | -40   | 37.58 | 41.72 | degenerate |
+  | **-30** | **41.33** | **55.62** | bundle peak align (mid-α band) |
+  | -20   | 39.06 | 55.47 | second-best mid-α |
+  | -15   | 29.61 | 51.17 | |
+  | -10   | 29.77 | 51.88 | |
+  | -6    | 26.95 | 55.00 | |
+  | -3    | 28.20 | 46.95 | |
+  | -1    | 33.75 | 49.84 | |
+  | 0     | 34.69 | 50.39 | unsteered baseline |
+  | +1    | 33.05 | 48.20 | |
+  | +3    | 30.39 | 46.64 | |
+  | +6    | 31.17 | 50.78 | |
+  | +10   | 29.38 | 45.47 | |
+
+- **Headline**: bundle k=30 peak **41.33 / 55.62** at α=−30 — does NOT
+  clear 58.47, does NOT clear coh threshold ≥90, and is **strictly
+  worse than the SAE arditi single-feat champion** on the same
+  organism (feat 21224 @α=−30 → **64.53 / 96.25**). Bundle is
+  −23.20 align AND −40.63 coh vs single-feat.
+- **"Distributed misalignment" hypothesis** (that R32's misalignment
+  is spread across many features and could be reassembled by summing
+  causal candidates) is **FALSIFIED**. Bundle's coherent direction is
+  clearly weaker than the best single feature: bundling top-30 by
+  `screen_score` introduces interference and noise rather than
+  reassembling a coherent misalignment vector. The `screen_score`
+  ranking does not produce features whose decoder rows constructively
+  add toward misalignment.
+- **Bundle norm note**: bundled vector norm = 7.22 (vs single-feat
+  unit-norm rows). At α=−30 the effective perturbation magnitude is
+  ~30 × 7.22 ≈ 217 in d_in space — ~7× the single-feat α=−30
+  perturbation. Yet align peak is *lower*, confirming the increase
+  is misalignment-orthogonal noise. Tried α-grid that includes the
+  effective-magnitude-matched range α ∈ {−1, −3, −6}: those land at
+  baseline (~30 align), so there's no hidden mid-α peak between
+  α=−30 and α=0.
+- **Coherence floor** of ~50 even at α=0 is also notable — slightly
+  lower than the wang_r32 single-feat α=0 coh which sat in the
+  90s. Possible source: frontier_sweep.py uses
+  `generate_longform_completions` directly (single-pass, T=1.0,
+  no batched_steering wrapper), versus run_wang_procedure.py
+  which now uses `run_batched_alpha_cells` for stages 2/3/4. Net
+  effect on the comparison is small — bundle's α=−30 cell gets
+  the same generator path, so the head-to-head finding holds.
+- **Closes the "is bundling worth pursuing?" question.** With a
+  −23 align and −40 coh gap to single-feat, no reasonable α-grid
+  refinement or k-resize will close this. The R32 axis has both
+  single-feat (closed with a win, 64.53) and bundle (closed with
+  a loss, 41.33) results. SAE arditi feat 21224 @α=−30 remains the
+  R32 champion.
+- Both GPUs idle after run (verified 03:16 UTC). No further launches.
+- Disk: HF_HOME=/workspace/hf_cache holding; /root not filling.
+
+**Closed-axis summary, including bundle**:
+
+| arch / config       | R1 5k mid | R32 10k single ext-α | R32 10k bundle k=30 mid |
+| :------------------ | --------: | -------------------: | ----------------------: |
+| SAE arditi          |  **96.88** | **64.53** ⭐         | 41.33                   |
+| TXC k=100           |  91.80     | 51.95                | (not run)               |
+| medical-champ goal  |  +38.41    | +6.06                | −17.14                  |
+
+**Next firing priorities (likely 04:00 UTC)**:
+
+- **Single-feat axis closed; bundle axis closed.** No more
+  open scientific questions on the em_nanda Qwen-14B finance pivot
+  that fit in cheap experiment scope.
+- **Pivot to write-up**. Paper-figure asset bundle is complete (3
+  panels). Synthesis is now the canonical document for the em_nanda
+  pivot. Recommended next document layer: a paper-style results
+  section pulling (a) the closed 8-cell single-feat × steps × arch
+  × organism × α-regime table, (b) the cross-organism single-feat
+  champions on R1 and R32, (c) the bundle null result as a
+  "what didn't work" caveat. ~1 firing of focused write-up work,
+  no compute needed.
+- **Optional but cheap** if next firing wants a small sanity probe:
+  re-run a SINGLE α (α=0 + α=−30) using `run_wang_procedure.py`
+  generator path on the same R32 finalists 21224 / 30540 / 21466
+  to confirm the −40 coh delta vs frontier_sweep's α=0 isn't a
+  generator-path artifact. Not required for the headline finding
+  (single-feat champions were measured with the right generator),
+  but would tighten the bundle's reported coh floor.
+- **No new training/Wang launches** unless a new scientific
+  question crystallizes — both axes closed.
+
+**Compute & disk hygiene**:
+
+- /root local at 92% used pre-firing; this firing added only the
+  bundle JSON (~3.5 KB) and the top_30 features JSON (~1 KB) to
+  /root/em_features/results/em_nanda_bundle_r32/ on local. /workspace
+  unaffected.
+- Legacy 110 GB qwen_l15_*.pt cleanup remains an open option if
+  a future firing wants to launch new SAE/TXC training on local
+  (next firing not training-bound, so deferring).

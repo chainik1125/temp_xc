@@ -10,6 +10,107 @@ tags:
 
 **You are an autonomous routine continuing from the dmitry-branch work.** Branch: `em-nanda`. AGENT_BRIEF.md (on dmitry) covers the prior Qwen-7B medical setup. This doc supersedes that for the Qwen-14B financial pivot.
 
+### Status as of 2026-05-03 03:00 UTC (R32 BUNDLE FRONTIER LANDED — k=30 peak 41.33/55.62 — STRICTLY WORSE than single-feat 64.53/96.25; "distributed misalignment" hypothesis FALSIFIED; both axes now closed)
+
+**Headline**: This firing executed the 02:00 UTC plan in full —
+extended `frontier_sweep.py` with `--base_model`/`--subject_model`
+flags, built `top_30_bundle_features.json`, launched the R32 k=30
+bundle frontier on h100_2 (idle GPU), and pulled the result. The
+**bundle peaks at α=−30 → align 41.33 / coh 55.62**, which is **−23
+align AND −40 coh worse than the SAE arditi single-feat champion**
+(feat 21224 @α=−30 → 64.53/96.25). The "distributed misalignment in
+R32" hypothesis is FALSIFIED: bundling top-30 by `screen_score`
+introduces noise rather than reassembling a coherent
+misalignment direction. SAE arditi feat 21224 @α=−30 stays the R32
+champion. R32 axis fully closed (now along bundle direction too).
+
+**This firing (03:00 UTC) actions:**
+
+- Verified GPUs idle: local h100_1 0%/0 MiB, h100_2 0%/0 MiB at 03:00 UTC.
+- **Edited `experiments/em_features/frontier_sweep.py`** (commit
+  `30fc5af0`, ~25 LOC): added `--base_model` / `--subject_model`
+  optional flags. When both provided, override
+  `MODEL_REGISTRY[args.model]`. Records subject/base in output
+  meta. Existing qwen / llama presets unchanged. Pushed to
+  origin/em-nanda; pulled cleanly on h100_2.
+- **Built `top_30_bundle_features.json`** on h100_2 from
+  `/root/em_features/results/em_nanda_sae_arditi_step10000_wang_r32/stage2_screen.json`.
+  Top-30 by `screen_score` includes all three single-feat finalists
+  (21224, 30540, 21466) plus the F4-lite features (4086, 5725) —
+  comprehensive coverage of the R32 causal pool. Score range:
+  19.375 (top) to 10.625 (rank 30).
+- **Launched k=30 bundle frontier on h100_2** (PID 510494, started
+  ~03:09 UTC, finished ~03:14 UTC; ~5 min wall-clock for 15 αs ×
+  64 generations). Required sourcing `/root/launch_env.sh` AND
+  `/root/.env` (set -a; source; set +a) to pick up GOOGLE_API_KEY
+  for the gemini judge — first launch attempt died because only
+  `launch_env.sh` was sourced. Pattern recorded for future
+  frontier_sweep launches on h100_2.
+- **Bundle peak**: α=−30 → align 41.33 / coh 55.62 (best mid-α);
+  α=−20 → 39.06 / 55.47 (second); α=0 baseline → 34.69 / 50.39.
+  Compare R32 single-feat champion (SAE arditi feat 21224 @α=−30):
+  **64.53 / 96.25**. Bundle is −23.20 align AND −40.63 coh.
+- **Bundle norm = 7.22** (sum of 30 unit-norm decoder rows). At
+  α=−30 effective perturbation ~217 in d_in space — ~7× single-feat.
+  Yet align peak is *lower*, so the extra magnitude is
+  misalignment-orthogonal noise. Effective-magnitude-matched probes
+  (α ∈ {−1, −3, −6}) all sit at baseline (~28-34 align), no hidden
+  mid-α peak.
+- **R32 axis now closed along TWO directions**: single-feat (won
+  with 64.53), bundle (lost with 41.33). No further open R32
+  scientific question fits in cheap experiment scope.
+- Pulled `bundle30_frontier.json` (3.5 KB) and `top_30_bundle_features.json`
+  (855 B) to local `/root/em_features/results/em_nanda_bundle_r32/`
+  for archival.
+- /root local at 92% used unchanged; /workspace 30%; HF_HOME holding.
+
+**Closed axes at end of firing**:
+
+| arch / config       | R1 5k mid | R32 10k single ext-α | R32 10k bundle k=30 mid |
+| :------------------ | --------: | -------------------: | ----------------------: |
+| SAE arditi          | **96.88** | **64.53** ⭐         | 41.33                   |
+| TXC k=100           |  91.80    | 51.95                | (not run)               |
+| medical-champ goal  |  +38.41   | +6.06                | −17.14                  |
+
+**Next firing priorities (likely 04:00 UTC)**:
+
+- **Single-feat axis closed; bundle axis closed.** No more open
+  scientific questions on the em_nanda Qwen-14B finance pivot
+  that fit in cheap experiment scope.
+- **Pivot to write-up.** Paper-figure asset bundle is complete (3
+  panels: arch×organism×α grouped bar, R1 frontier panels, step-count
+  trajectory). Synthesis is now the canonical document for the
+  em_nanda pivot. Recommended next document layer: a paper-style
+  results section pulling (a) the closed 8-cell single-feat × steps ×
+  arch × organism × α-regime table, (b) cross-organism single-feat
+  champions on R1 and R32, (c) the bundle null result as a "what
+  didn't work" caveat. ~1 firing of focused write-up work, no
+  compute needed.
+- **Optional cheap probe** if a future firing wants to tighten
+  reporting: re-run α ∈ {0, −30} via `run_wang_procedure.py` on the
+  R32 single-feat finalists to confirm the −40 coh delta vs
+  frontier_sweep's α=0 isn't a generator-path artifact (frontier_sweep
+  uses single-pass `generate_longform_completions`; run_wang_procedure
+  uses `run_batched_alpha_cells`). Not needed for headline finding.
+- **No new training/Wang launches** unless a new scientific
+  question crystallizes — both axes closed.
+- **Bundle launch hygiene note**: future frontier_sweep on h100_2
+  must `source /root/launch_env.sh` AND `set -a; source /root/.env;
+  set +a` to pick up GOOGLE_API_KEY. Without both, the gemini
+  judge raises `RuntimeError("GOOGLE_API_KEY not set")`. (Discovered
+  on first launch attempt this firing.)
+
+**Compute & disk hygiene**:
+
+- /root local at 92% used (unchanged from 02:00 UTC). 110 GB of
+  the 121 GB in `/root/em_features/checkpoints/` remains legacy
+  Qwen-7B medical work. No new checkpoints written this firing.
+  /workspace 30% used (141 GB free) — fine. HF_HOME holding.
+- If a future firing wants new SAE/TXC training on local: route
+  to `/workspace/em_features/checkpoints/` via `--ckpt_dir`. Or,
+  log legacy ckpts in `trained_models_log.md` and delete (per
+  rule (7), do not delete without logging).
+
 ### Status as of 2026-05-03 02:00 UTC (status-only firing — both GPUs idle, single-feat axis closed; bundle deferred pending frontier_sweep infra extension)
 
 **This firing (02:00 UTC) actions:**
