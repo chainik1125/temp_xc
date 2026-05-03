@@ -35,12 +35,10 @@ ARCH_DIR = Path(__file__).resolve().parents[1] / "src" / "temp_bench" / "archite
 # becomes strictly "every yaml entry must have a class".
 KNOWN_UNPORTED = {
     "stacked_sae",
-    "tsae_paper",
     "tfa",
     "tfa_pos",
     "mlc",
     "sae_arditi",
-    "txc_base",
     "txc_pro",
 }
 
