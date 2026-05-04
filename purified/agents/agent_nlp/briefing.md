@@ -115,20 +115,31 @@ References:
 - Recent decisions in scope: #1, #4, #6, #7, #11
 - In flight: nothing — both C3 and C4 cells complete.
 
-## C3 final headline (decided 2026-05-04)
+## C3 final headline (decided 2026-05-04, **EVAL_PROTOCOL_VERSION=1.1.0**)
 
 **Result**: TopK-SAE leads at both sparsities. TXC variants underperform
-by ~0.015-0.020 AUC. **Honest negative for C3 hypothesis**.
+by ~0.005-0.015 AUC (gap narrowed vs v1.0.0 after the padding fix).
+**Honest negative for C3 hypothesis**.
 
 | arch         | k=5            | k=20           |
 |--------------|----------------|----------------|
-| `topk_sae`   | 0.8503 ± 0.003 | 0.9044 ± 0.002 |
-| `txc_base`   | 0.8372 ± 0.008 | 0.8841 ± 0.005 |
-| `txc_pro`    | 0.8342 ± 0.007 | 0.8859 ± 0.002 |
-| `tsae_paper` | 0.8266 ± 0.005 | 0.8844 ± 0.002 |
+| `topk_sae`   | 0.8447 ± 0.002 | 0.9016 ± 0.002 |
+| `txc_base`   | 0.8397 ± 0.006 | 0.8887 ± 0.003 |
+| `txc_pro`    | 0.8381 ± 0.008 | 0.8860 ± 0.002 |
+| `tsae_paper` | 0.8281 ± 0.007 | 0.8851 ± 0.003 |
 
-σ_seeds is 0.002-0.008 — gaps are real, not noise. σ_tasks (mean) is
-0.13-0.14 — wide spread across the 38 SAEBench+CT tasks.
+The leaderboard ALSO contains 24 v1.0.0 rows (the original buggy
+right-padded run) for old-vs-new comparison. analysis.py filters to
+v1.1.0 only for the headline. v1.0.0 numbers were ~0.005 higher for
+topk_sae and ~0.005 lower for TXC variants — the gap closed slightly
+under the fix, but TopK-SAE still leads.
+
+**The Phase 7 padding fix did NOT rescue winogrande/wsc** (their AUCs
+are 0.40-0.50 across all archs both before AND after). Per-token
+mean-pool aggregation can't capture cross-token coreference; tasks
+that need multi-token reasoning are intrinsically hard for this
+aggregation regardless of padding handling. The 36 SAEBench tasks
+shifted enough on net to move the headline by ~0.005.
 
 Caveats for the paper text:
 - IT-side activations (Phase 7 reference was BASE-side; small shift
@@ -139,6 +150,14 @@ Caveats for the paper text:
 - σ_tasks suggests a per-task breakdown could expose where TXC
   variants lose vs win. Per-task floats `auc__<task>` are persisted
   on every leaderboard row for this analysis.
+
+**Padding fix** (landed 2026-05-04): probe cache rebuilt as
+schema-2.0.0 left-aligned (N, S=32, d_in) with per-example
+`first_real` metadata; `_encode_pool` masks padding contributions.
+Mirrors Phase 7's
+`docs/han/research_logs/phase7_unification/2026-04-27-URGENT-probing-cache-fix.md`.
+Cache pushed to HF schema 2.0.0 (266 files including `first_real_*.npy`
+per task).
 
 ## C4 final headline (decided 2026-05-04)
 
