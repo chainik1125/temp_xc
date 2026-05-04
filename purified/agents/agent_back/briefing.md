@@ -7,7 +7,7 @@ Section ownership rules: PROTOCOL.md § 14.
 
 ---
 agent: agent_back
-last_state_update: 2026-05-04T12:55:00Z
+last_state_update: 2026-05-04T15:55:00Z
 component: c7
 ---
 
@@ -309,10 +309,12 @@ commit, so run the script before any pod restart.
 
 ## Current state (agent owns — overwrite at every compact)
 
-**Last verified: 2026-05-04T12:55:00Z (mid-v3-sweep)**
+**Last verified: 2026-05-04T15:55:00Z (v4 sweep launched ~15:50).**
 
-- Clone: `/workspace/temp_xc/`. Env: `set_agent_env.sh agent_back` →
-  CUDA_VISIBLE_DEVICES=1, TEMP_BENCH_POD_MODE=ephemeral.
+- Clone: `/workspace/temp_xc/`. Env: `set_agent_env.sh agent_back`
+  (NB: pinning is now **GPUs 0 + 2** per Han's 35fe822e directive —
+  GPUs 1 + 3 belong to agent_steer; do NOT touch them).
+  TEMP_BENCH_POD_MODE=ephemeral.
 - Git remote auth: gh PAT in `/workspace/.tokens/gh_token`. Pull
   rebase + push works after stashing untracked `logs/` +
   `results/c7_backtracking/stage_a/sentence_acts_L10.npz` (HF-backed,
@@ -349,31 +351,56 @@ commit, so run the script before any pod restart.
   - `scripts/c7_run_sweep.sh`, `c7_run_sweep_pool.sh`, `c7_post_sweep.sh`.
 - **18 c7-backtracking tests** (`tests/test_backtracking.py`) — all pass.
 
-### Han 2026-05-04 PM directive (decisions.md § 12) — APPLIED
+### Han 2026-05-04 PM directives — APPLIED
 
-`TrainingConfig` defaults are now **batch=1024, n_steps=25_000,
-plateau_early_stop=False, precision=bf16**. Updated upstream by
-agent_paper (commits 06681098 + 9718a442). Old batch=256 / 30k cells
-stay in `leaderboard.jsonl` for diff but are **filtered out** by
-`analysis._valid_train_keys()` (commit ab02aea2) — which deterministically
-computes the canonical new train_keys from current defaults and
-ignores everything else.
+1. **`TrainingConfig` defaults at batch=1024, plateau=False, bf16**
+   (commits 06681098 + 9718a442 by agent_paper).
+2. **n_steps=20_000 deadline override** (Han, 2026-05-04 PM via
+   commits 4c2a400d). Implemented locally as
+   `TrainingConfig(n_steps=20_000)` in `run.py` + `analysis.py`
+   (commit `05545dff`). Matches agent_nlp's c3+c4 pattern (513a85ea).
+3. **GPU re-allocation: GPUs 0 + 2 only** (briefing 35fe822e).
+   GPUs 1 + 3 are agent_steer's. No more borrow patterns.
+4. **Preloaded `.clone()` batch_iter pattern adopted** (commit
+   `26d793f1`). ~1.4× trainer speedup. Determinism unchanged
+   (same RNG, same fp32, same train_key).
 
-### v3 sweep (LIVE — launched 12:49 across 4 GPUs)
+Old batch=256/30K + new batch=1024/25K cells stay in
+`leaderboard.jsonl` for diff but are **filtered out** by
+`analysis._valid_train_keys()` which canonicalises on the
+20K override; only batch=1024/n_steps=20K cells appear in
+AUTO-RESULTS.
+
+### v4 sweep (LIVE — launched 15:50 across GPUs 0 + 2)
 
 | GPU | PID | archs (in order) | status |
 |---|---|---|---|
-| 0 | 39420 | `txc_pro` → `mlc` | bf16 cast (21.5 GB), training |
-| 1 | 39421 | `txc_base` → `stacked_sae` | training |
-| 2 | 39422 | `tfa` → `topk_sae` | bf16 cast (18.5 GB), training |
-| 3 | 39423 | `tsae_paper` | training |
+| 0 | 45889 | `txc_pro` → `mlc` → `tsae_paper` | bf16 cast (21.5 GB), training |
+| 2 | 45886 | `tfa` → `txc_base` → `stacked_sae` → `topk_sae` | bf16 cast (18.5 GB), training |
 
-Per-cell ETA at new defaults: ~30 min train + ~95 min eval = ~125 min.
-Each GPU runs 1-2 cells sequentially. **Total sweep ETA ~16:30-17:00.**
+Per-cell ETA at 20K + preload: ~80% of 25K (~12-15 min train
+[heavy], ~95 min eval = ~110 min) + train scaling roughly with
+arch param count. Estimated wall times:
+- txc_pro (2.68B): ~7-9hr cell
+- tfa (2.32B): ~5-7hr cell
+- txc_base / mlc / stacked_sae (1.34B each): ~3-4hr cell
+- tsae_paper / topk_sae (268M each): ~1.5-2hr cell
 
-Logs: `logs/c7_v3_gpu{0,1,2,3}.log`. Monitor `brx2lk13p` (persistent)
-filters `(cell|panels|dispatching|judge done|computing PR-AUC|
-phase1 ready|delta_gc|Traceback|FAILED|OOM|bf16 cast)` events.
+GPU 0 total: txc_pro + mlc + tsae_paper ≈ 12-15hr (finishes ~04:00–07:00 UTC tomorrow).
+GPU 2 total: tfa + txc_base + stacked_sae + topk_sae ≈ 13-17hr.
+Critical path: GPU 2 (4 cells); both finish 04:00-08:00 UTC.
+
+Logs: `logs/c7_v4_gpu{0,2}.log`. Monitor `b6tdo9r4w` (persistent)
+filters cell events + delta_gc + error signatures.
+
+### v3 sweep (KILLED — 25K, pre-override)
+
+Launched 12:49 on 4 GPUs (PIDs 39420-39423). Ran 2.5hr of training
+before Han's 20K override directive. Killed at 15:43. Two orphan
+checkpoints persisted to disk + HF before kill (filtered out of
+canonical via 20K-override train_keys):
+- `e18cf041874c1dc9` — tsae_paper @ 25K
+- `36e4ae1f38e037d0` — txc_base @ 25K
 
 ### v1/v2 sweep RESULTS (old config; filtered out of AUTO-RESULTS)
 
@@ -459,14 +486,35 @@ Pipeline auto-renders c7.md via `bash scripts/c7_post_sweep.sh`.
 - New `TrainingConfig` defaults: batch=1024, n_steps=25_000,
   plateau=False, bf16 (commits 06681098 + 9718a442 by agent_paper).
 - I killed all v1/v2 sweeps mid-flight per Han's "STOP EVERYTHING".
-- Filtered AUTO-RESULTS to current-config cells only via
-  `analysis._valid_train_keys()` (commit `ab02aea2`).
-- v3 sweep launched 12:49 across 4 GPUs (PIDs 39420-39423). Each cell
-  trains 25k steps then evaluates 25-mag grid. ETA 16:30-17:00.
+- v3 sweep launched 12:49 across 4 GPUs (PIDs 39420-39423) at 25K.
 - 4 ports in commit `b1baf484`: tfa + mlc + stacked_sae + _tfa_module.
 - Per Han: arch porting is open-ownership ("first-needs-it ports it"),
-  not agent_paper-gatekeeper. agent_nlp shipped txc_pro (`6ae94a74`)
-  in the same window.
+  not agent_paper-gatekeeper. agent_nlp shipped txc_pro (`6ae94a74`).
+
+**Session day 2 (2026-05-04 PM, ~15:00-15:50)** — three Han directives
+landed in quick succession:
+- Mirror equivalence verified: `meta-llama/Llama-3.1-8B` vs
+  `NousResearch/Meta-Llama-3.1-8B` are bit-identical (max_abs_diff=0)
+  on 5 prompts × {12-38} tokens, layer-10 residual. v3/v4 cells
+  using the mirror are paper-valid (commit 0e09c867).
+- **n_steps=20_000 deadline override** (Han + agent_nlp). Killed
+  the v3 25K sweep (~2.5hr training lost across 4 GPUs); 2 orphan
+  checkpoints persisted (e18cf041874c1dc9 + 36e4ae1f38e037d0).
+  Implemented as `TrainingConfig(n_steps=20_000)` in run.py +
+  analysis.py canonical filter (commit 05545dff).
+- **GPU re-allocation**: agent_back ⇢ GPUs 0+2; agent_steer ⇢
+  GPUs 1+3 (Han via 35fe822e). v3 ran on all 4 GPUs (briefly);
+  v4 restricted to GPUs 0 + 2.
+- **Preloaded `.clone()` batch_iter pattern** adopted from
+  agent_nlp's e12dc719 helper. Not a drop-in for C7 (we sample
+  T-token windows, helper returns whole sequences) so applied
+  the .clone() pattern locally to `_build_batch_iter` (commit 26d793f1).
+  ~1.4× trainer speedup. Determinism unchanged.
+- **v4 sweep launched ~15:50** on GPUs 0 + 2 only:
+  - GPU 0 PID 45889: txc_pro → mlc → tsae_paper
+  - GPU 2 PID 45886: tfa → txc_base → stacked_sae → topk_sae
+  - bf16 casts confirmed (txc_pro 21.5 GB, tfa 18.5 GB).
+  - ETA: full sweep ~04:00-08:00 UTC tomorrow.
 
 ## Next action (agent owns — overwrite)
 
@@ -499,71 +547,59 @@ the env in your first action is a no-op for subsequent commands.
 
 **Where I'm picking up next (post-compact):**
 
-The v3 sweep (4 parallel processes 39420-39423) is mid-training
-on all 7 archs × seed=42 at the new defaults. Picking back up:
+The v4 sweep (PIDs 45886 GPU 2, 45889 GPU 0) is mid-training on 7
+archs × seed=42 at 20K-override defaults + preloaded batch_iter.
 
-A. **First action**: pull rebase to stay current. Then check sweep
-   PIDs are alive:
+A. **First action**: pull rebase, then verify sweep PIDs alive:
    ```
-   ps -p 39420,39421,39422,39423 -o pid,etime,cmd 2>/dev/null
+   ps -p $(cat /tmp/c7_v4_gpu0.pid) $(cat /tmp/c7_v4_gpu2.pid) -o pid,etime,cmd
    nvidia-smi --query-gpu=index,memory.used,utilization.gpu --format=csv,noheader
    ```
-   If any are dead, check the corresponding `logs/c7_v3_gpu{0..3}.log`
-   for the failure. Likely cause: MFS I/O error at judge persist or
-   leaderboard append. Retry with same args — cache hits on train +
-   existing_keys() fast-forwards judge calls already done.
+   If a python PID is dead, check `logs/c7_v4_gpu{0,2}.log` tail for
+   the failure. Common: MFS I/O error at judge persist (Errno 5);
+   retry with same args — runner cache-hits the train_key, the
+   existing_keys() check fast-forwards already-judged panels.
 
 B. **Re-arm the persistent monitor** (mine timed out across compact):
    ```python
    Monitor(
-     command="tail -F logs/c7_v3_gpu0.log logs/c7_v3_gpu1.log "
-             "logs/c7_v3_gpu2.log logs/c7_v3_gpu3.log 2>/dev/null | "
-             "grep -E --line-buffered '(c7\.run\] cell (arch|failed)|"
-             "delta_gc|judge done|Traceback|FAILED|OOM)'",
+     command="tail -F logs/c7_v4_gpu0.log logs/c7_v4_gpu2.log 2>/dev/null | "
+             "grep -E --line-buffered '(c7\\.run\\] cell (arch|failed)|"
+             "delta_gc|judge done|Traceback|FAILED|OOM|bf16 cast|"
+             "phase1 ready|panels|computing PR-AUC|dispatching)'",
      persistent=True, timeout_ms=3600000,
    )
    ```
 
 C. **As cells complete** (event matches `delta_gc`):
    - Run `bash scripts/c7_post_sweep.sh` to render c7.md AUTO-RESULTS
-     incrementally.
-   - The script auto-filters via `analysis._valid_train_keys()` so
-     old batch=256 cells are excluded.
+     incrementally + commit + push.
+   - Script auto-filters via `analysis._valid_train_keys()` (20K
+     canonical) so old batch=256 + 25K cells are excluded.
 
-D. **When all 7 cells DONE on seed=42**: launch seeds 1 + 2 if time:
-   ```
-   for SEED in 1 2; do
-     # split across GPUs as before
-     CUDA_VISIBLE_DEVICES=0 ... --archs txc_pro mlc --seeds $SEED &
-     # ... etc
-   done
-   ```
+D. **Single-seed only** (Han 2026-05-04 PM): seeds 1 + 2 are NOT
+   running — Han said "stay single seed". v4 = 7 archs × seed 42.
+   Do not launch additional seeds without explicit go-ahead.
 
-E. **Mirror-equivalence check** (Han 2026-05-04 OQ #2): once Meta HF
-   access lands (`han1823123123/temp-bench-models` cache should auto-
-   pick it up), write
-   `experiments/c7_backtracking/check_mirror_equivalence.py` — load
-   `meta-llama/Llama-3.1-8B` AND `NousResearch/Meta-Llama-3.1-8B`,
-   compare layer-10 residual activations element-wise on 5 prompts ×
-   50 tokens, report max abs diff. **Threshold: max abs diff < 1e-5**.
-   If passes, both datasources are interchangeable for paper claims.
-   If fails, must wait for Meta access.
+E. **GPU constraint**: do NOT launch on GPUs 1 or 3 — those belong
+   to agent_steer (briefing 35fe822e). Restrict any retries or
+   reruns to CUDA_VISIBLE_DEVICES=0 or =2.
 
-F. **Headline test**: does any C7 arch (under proper batch=1024 / 25k
-   training) reproduce Aniket's hill-climbed +1.574 peak Δgc on
-   inducement? **txc_pro is the candidate** (matryoshka + multi-distance
-   contrastive + subseq sampling). Cross-check at
+F. **Headline test**: does TXC-pro reproduce Aniket's hill-climbed
+   +1.574 peak Δgc under our locked arch + 20K + batch=1024 + preload?
+   Cross-check at
    `results/c7_backtracking/aniket_reference/cut25/inducement_summary.csv`.
 
-**Failure modes to expect during v3**:
+**Failure modes to expect during v4**:
 - MFS I/O error → cell fails mid-judge or mid-save. Retry under same
   eval_key cache-hits the existing rows.
-- OOM at batch=1024 → my run.py already bf16-casts >1B archs. If
-  still OOM, drop to batch=512 (per Han's note).
-- tsae_paper non-contiguous W_enc → agent_nlp's `af552412` fixed
-  this; current code is fine.
-- agent_nlp's txc_pro could have bugs → if cell fails on
-  `txc_pro.encode` or `train_step`, surface in OQ + skip arch.
+- OOM on GPU 2 if all 4 archs share peak mem → unlikely (sequential),
+  but if seen, drop the heaviest from GPU 2 to its own launch.
+- tfa or txc_pro silent-failure → check for `train_step done` or
+  `bf16 cast` in log; if neither in 30 min, the arch may have hung
+  on initialization. Re-launch.
+- preload pattern OOM-on-RAM (4.24 GB cache × N processes) is
+  comfortable headroom on 64 GB pod even with agent_steer's caches.
 
 ## Don't repeat (agent owns — overwrite)
 
@@ -607,15 +643,16 @@ F. **Headline test**: does any C7 arch (under proper batch=1024 / 25k
 6. **Sentence-acts HF sync** — defer. The cache is small enough that
    re-extraction (~10 min) is cheaper than expanding `sync_from_hf.sh`'s
    contract. Document in `experiments/c7_backtracking/README.md` instead.
-7. **Multi-seed scope** — single-seed v3 is the minimum for paper
-   results. Seeds 1 + 2 are nice-to-have for stderr reporting. Plan:
-   only attempt seeds 1+2 if v3 single-seed completes by ~17:00 with
-   remaining wall budget.
+7. **Multi-seed scope — RESOLVED 2026-05-04 PM.** Han: "stay single
+   seed". v4 = 7 archs × seed 42 only; no seeds 1+2 launches.
 
 ### Closed (no action needed)
 
-- agent_paper PR for batch=1024 directive applied; my analysis filter
-  ensures clean separation of v1 (batch=256) and v3 (batch=1024) cells
-  in AUTO-RESULTS.
+- agent_paper PR for batch=1024 directive applied; analysis filter
+  canonicalises on 20K + batch=1024.
 - Memory issues at d_sae=32768 fp32 Adam → bf16 cast for >1B archs
   (commit `9cfd99df`).
+- 20K override applied (commit 05545dff). Matches agent_nlp pattern.
+- Preloaded `.clone()` batch_iter (commit 26d793f1). 1.4× speedup.
+- GPU re-allocation: agent_back ⇢ GPUs 0+2; agent_steer ⇢ GPUs 1+3
+  (briefing 35fe822e).
