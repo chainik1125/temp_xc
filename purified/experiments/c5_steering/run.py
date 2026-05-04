@@ -68,7 +68,7 @@ from temp_bench.config import (
     load_arch,
     load_datasource,
 )
-from temp_bench.data.nlp import batch_iter_from_act_cache
+from temp_bench.data.nlp.cache import preloaded_batch_iter_from_act_cache
 from temp_bench.schemas import TrainingConfig
 from temp_bench.training.sae_trainer import train_sae
 
@@ -85,6 +85,12 @@ EVAL_PROTOCOL_VERSION = "1.0.0"
 
 DEFAULT_ARCHS: tuple[str, ...] = ("tsae_paper", "txc_base", "txc_pro")
 DEFAULT_SEEDS: tuple[int, ...] = (1, 2, 42)
+
+
+def _real_training_cfg() -> TrainingConfig:
+    # n_steps overridden 25_000 → 20_000 per Han 2026-05-04 PM URGENT.
+    # Aligns C3 + C4 + C5 on the Gemma 20.5M-token-per-cell axis.
+    return TrainingConfig(n_steps=20_000)
 
 
 # ── Train + eval adapters ─────────────────────────────────────────────
@@ -116,7 +122,7 @@ def my_train_fn(
     model = instantiate_arch(spec, d_in=d_in)
     model.cuda()
     log.info("[train] %s seed=%d T=%d", arch_name, seed, model.T)
-    raw_iter = batch_iter_from_act_cache(act_cache_key, seed=seed)
+    raw_iter = preloaded_batch_iter_from_act_cache(act_cache_key, seed=seed)
 
     state = {"n": 0, "t0": _time.time(), "label": f"{arch_name}/seed={seed}"}
 
@@ -290,7 +296,7 @@ def run_one_cell(
         # Tagged so analysis.py can filter out smoke cells. Same
         # convention as agent_nlp's c3 smoke rows.
         eval_cfg["smoke"] = True
-    training_cfg = runner.default_training_cfg(arch_name)
+    training_cfg = _real_training_cfg()
     if n_steps is not None:
         # Override n_steps for smoke testing. Different n_steps → different
         # train_key → fresh checkpoint, no clash with full-sweep cells.
