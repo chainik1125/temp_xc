@@ -292,7 +292,12 @@ def main(*, archs=None, seeds=DEFAULT_SEEDS, build_cache_only: bool = False,
                     arch_name=arch,
                     seed=seed,
                     datasource_name=DATASOURCE,
-                    training_cfg=runner.default_training_cfg(arch),
+                    # Han 2026-05-04 PM deadline override: n_steps=20_000
+                    # (schema default 25K) to fit C7 sweep in remaining
+                    # sprint window. Matches agent_nlp's c3+c4 override
+                    # (commit 513a85ea); analysis.py canonical filter
+                    # passes the same explicit cfg.
+                    training_cfg=TrainingConfig(n_steps=20_000),
                     eval_cfg={
                         "magnitudes": list(DEFAULT_MAGNITUDE_GRID),
                         "cut_fraction": 0.25,

@@ -50,9 +50,18 @@ PLOT_DIR = EXP_DIR / "plots"
 
 def _valid_train_keys() -> set[str]:
     """Thin wrapper over :func:`temp_bench.report.canonical_train_keys`
-    for C7. Filters leaderboard rows + judge_outputs to current-config
-    cells (batch=1024, n_steps=25_000, plateau=off — Han 2026-05-04 PM,
-    decisions.md § 12)."""
+    for C7.
+
+    Filters leaderboard rows + judge_outputs to current-config cells.
+    Schema defaults are batch=1024, n_steps=25K, plateau=off (Han
+    2026-05-04 PM, decisions.md § 12). **Deadline override (Han 2026-
+    05-04 PM)**: ``n_steps=20_000`` to fit the C7 sweep in remaining
+    sprint window (matches agent_nlp's c3+c4 override, commit 513a85ea).
+    The explicit ``training_cfg`` here MUST mirror the override in
+    ``run.py``'s ``run_cell`` call, otherwise the filter would still
+    canonicalise on 25K and miss the override cells.
+    """
+    from temp_bench.schemas import TrainingConfig
     return canonical_train_keys(
         component="c7",
         archs=("topk_sae", "stacked_sae", "tfa", "tsae_paper", "mlc",
@@ -60,6 +69,7 @@ def _valid_train_keys() -> set[str]:
         seeds=(1, 2, 42),
         datasource_names=("llama_3_1_8b_base_l10_ward",
                           "llama_3_1_8b_base_l10_ward_nousmirror"),
+        training_cfg=TrainingConfig(n_steps=20_000),
     )
 
 # Aniket's wasteland reference (hill-climbed TXC) — for the c7.md
