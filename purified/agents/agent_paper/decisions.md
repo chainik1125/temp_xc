@@ -303,23 +303,43 @@ from scratch... to enable a consistent and fair evaluation"). That earlier
 directive was reverted (commit 0beae2bf reverts a9200560).
 
 **Decision (2026-05-04 afternoon, with Han)**: re-train all C3/C4/C5/C6/C7
-cells using **Phase 5's protocol**, applied uniformly across all archs and
-all pods.
+cells using a **fixed-step protocol**, applied uniformly across all archs
+and all pods.
 
 | Knob | Value | Source |
 |---|---|---|
-| `batch_size` | **1024** uniform (H100 + A40) | Phase 5 summary.md:250 |
-| `n_steps` (max cap) | **25_000** | Phase 5 summary.md:250 |
-| `plateau_early_stop` | True (already default) | schemas.py |
-| convergence criterion | loss drop < 2% per 1K steps | Phase 5 brief.md:71,261 |
-| `plateau_patience` | 5_000 (already default) | schemas.py |
+| `batch_size` | **1024** uniform (H100 + A40) | Phase 5 summary.md:250 (empirically validated) |
+| `n_steps` | **25_000** (binding cap) | Phase 5 summary.md:250 |
+| `plateau_early_stop` | **False** (disabled) | SAE-literature standard |
 
-The plateau-stop mechanism is the **fairness mechanism**: every arch trains
-until its own loss-curve plateaus by a published criterion. Different archs
-may converge at different step counts — that's expected and reportable.
-agent_nlp's diagnostic point that batch=256 cells "never triggered plateau-
-stop within 10K steps" is the smoking gun: at batch=1024 the gradient is 4×
-richer and we expect plateau-stop to actually fire well before the 25K cap.
+**Why plateau-stop is off**: agent_nlp flagged that the schema's plateau
+detection (`max(loss[-5000:]) - min(loss[-5000:]) < 1e-4` per
+`training/sae_trainer.py:158-165`) is an absolute threshold over a fixed
+window — not Phase 5's "loss drop < 2% per 1K steps" relative criterion.
+Han raised the corollary concern: an absolute threshold causes cross-arch
+unfairness because the same 1e-4 window-range means very different things
+for archs whose losses naturally land at different scales (an arch starting
+at loss ≈ 1e-3 would trigger prematurely; an arch starting at loss ≈ 1
+might never trigger). The SAE-comparison literature avoids this issue
+entirely by using fixed step counts:
+
+- **T-SAE paper (Bhalla/Ye 2025) §4.1**: fixed schedule, no early stopping.
+- **TFA paper (Lubana et al.) App. B.1**: "trained from scratch on 1B
+  precached activations" — fixed token count.
+- **GemmaScope / Anthropic monosemanticity**: fixed token budgets.
+
+Phase 5's "2%/1K" criterion was a Phase-5-internal invention, not a
+community standard. Adopting it would require re-implementing the trainer's
+plateau logic against an unvalidated relative threshold and isn't worth the
+churn given our compute budget already fits a uniform 25K cap. The code
+path for plateau-stop stays (gated off by `plateau_early_stop=False`) for
+opt-in use; production cells run the full 25K.
+
+**Fairness mechanism**: with plateau-stop off, every arch trains for
+exactly **25K steps × batch=1024 = 25.6M activation tokens**. Cross-arch
+comparisons are symmetric by construction. No "different archs converged at
+different step counts" diagnostic, but no risk of arch-dependent early
+stops biasing the comparison either.
 
 **Why uniform across pods**: a non-uniform (batch=2048 H100, batch=1024 A40)
 config means C3/C4/C6 archs train under different conditions than C5/C7
@@ -334,9 +354,7 @@ per decisions.md § 7 (a published per-component knob, disclosed in the
 component writeup), but the (batch_size, n_steps, plateau_*) knobs are
 identical.
 
-**Token budget**: at the 25K cap, 25.6M activation tokens. Each arch
-typically converges earlier (Phase 5 observed plateau at 15-20K steps for
-most archs; T-SAE / TXC-pro may run closer to the cap). This is below the
+**Token budget**: 25.6M activation tokens per arch (fixed). Below the
 1B-token / GemmaScope-scale field standard but matches Phase 5's empirically
 validated convergence point and is what's feasible in the remaining 72-h
 window.
@@ -356,14 +374,15 @@ default). Old cells stay; new cells write fresh. agent_em aborts in-flight
 batch=256 calibration cells (~12 H100-hours of in-flight work
 discarded — Han accepted the cost).
 
-**Compute estimate** (much smaller than the earlier reverted estimate):
-- C3 (24 cells, H100): ~32 H100-hr → 16 wall-hours on 2× H100 pod
+**Compute estimate** (assumes every cell hits the 25K cap, since
+plateau-stop is off):
+- C3 (24 cells, H100): ~40 H100-hr → 20 wall-hours on 2× H100 pod
 - C4 (cache-hit on C3 checkpoints): ~free
-- C5 (9 cells, A40): ~12 A40-hr
-- C6 (~12 Wang cells, H100): ~16 H100-hr
-- C7 (21 cells, A40): ~28 A40-hr
-- Total: ~50 H100-hr + ~40 A40-hr → fits in remaining 72-h window with
-  margin.
+- C5 (9 cells, A40): ~15 A40-hr
+- C6 (~12 Wang cells, H100): ~20 H100-hr
+- C7 (21 cells, A40): ~35 A40-hr
+- Total: ~60 H100-hr + ~50 A40-hr → fits in remaining 72-h window with
+  margin (parallel pods: ~30 H100 wall-hr + ~13 A40 wall-hr).
 
 ### Non-decisions (to revisit later)
 
@@ -372,10 +391,8 @@ discarded — Han accepted the cost).
 - **A third agent on the A40 pod** — slot is open. Could be a "synthetic
   helper" agent that runs C1/C2 multi-seed at larger scale (50+ features).
   Defer until C3/C4/C7 land.
-- **Plateau-stop empirical validation on T-SAE specifically** — Phase 5
-  trained T-SAE at batch=1024 max_steps=25K, but I haven't confirmed
-  whether T-SAE's plateau-stop fired within the cap (vs hitting the cap
-  with loss still descending). If at batch=1024 T-SAE *also* doesn't
-  plateau within 25K, the cap should be bumped for ALL archs (uniform),
-  not just T-SAE (fairness). Defer to first round of new cells; agents
-  report whether plateau-stop fired or hit the cap.
+- **Bumping the 25K cap if loss is clearly still descending** — agents
+  should observe the loss curves on the first round of cells. If multiple
+  archs end at 25K with loss still falling steeply (e.g., final-1K-step
+  drop > 5% of the loss value), revisit the cap. Any bump must be uniform
+  across all archs (fairness).

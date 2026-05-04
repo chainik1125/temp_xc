@@ -47,17 +47,21 @@ applied uniformly across all archs and all pods.** Read `decisions.md`
 § 12 in full before running anything. Gist:
 
 - **`TrainingConfig` defaults are now**: `batch_size=1024`, `n_steps=25_000`,
-  `plateau_early_stop=True`. Just default-construct `TrainingConfig()` in
-  your runner — no per-component overrides needed for these knobs.
+  `plateau_early_stop=False` (disabled — see below). Just default-construct
+  `TrainingConfig()` in your runner — no per-component overrides for these
+  knobs.
 - **Uniform across pods**: A40 (you) + H100 (agent_nlp/agent_em) both
-  at batch=1024. Same protocol as Phase 5 (`docs/han/research_logs/
-  phase5_downstream_utility/summary.md:250` — batch=1024, max_steps=25K,
-  plateau-stop). Field-standard practice (T-SAE §4.1, TFA App. B.1):
-  identical config across all archs being compared.
-- **Convergence**: loss drop < 2% per 1K steps (Phase 5 brief.md:71,261).
-  Plateau-stop is the fairness mechanism — different archs may converge
-  at different step counts; **hitting the 25K cap with loss still
-  descending = undertrained; surface as an observation**.
+  at batch=1024. Phase 5's empirically validated batch (summary.md:250)
+  plus the SAE-literature-standard fixed-step schedule (T-SAE §4.1, TFA
+  App. B.1, GemmaScope). Identical config across all archs being compared.
+- **Plateau-stop is OFF; 25K cap is binding for every cell.** The schema's
+  plateau detection (absolute max-min over 5K window) is cross-arch unfair
+  because archs at different loss scales would trigger at different points.
+  Every cell trains to the 25K cap; fairness mechanism is "exactly 25.6M
+  tokens per arch."
+- **If you observe loss still descending steeply at step 25K** (e.g.,
+  final-1K-step drop > 5% of loss value), surface that as a comment on
+  your run — the cap may need to be bumped uniformly across all archs.
 - **Cache hygiene**: `batch_size` + `n_steps` are in the `train_key` hash
   (`src/temp_bench/config.py:181-193`). New cells get fresh keys
   automatically. Old batch=256 cells stay in `results/leaderboard.jsonl`

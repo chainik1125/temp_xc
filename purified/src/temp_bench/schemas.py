@@ -52,21 +52,23 @@ class TrainingConfig(BaseModel):
 
     n_steps: int = 25_000
     batch_size: int = 1_024
-    # Was batch=256, n_steps=30_000 before 2026-05-04. agent_nlp caught the
-    # undertraining (commits 579efb9a + 8904414d + 3558b303): every
-    # production cell at batch=256 had plateau_early_stop enabled but never
-    # stopped early, meaning loss was still descending at the cap. Re-issued
-    # 2026-05-04 per Phase 5 protocol: batch=1024, max_steps=25_000,
-    # plateau-stop. Phase 5 reference: docs/han/research_logs/
-    # phase5_downstream_utility/summary.md:250 (batch=1024, max_steps=25k,
-    # plateau-stop) and brief.md:71,261 (loss drop < 2% per 1k steps as
-    # convergence criterion). Uniform across H100 + A40 pods so every arch
-    # in every component trains under identical conditions. See
-    # decisions.md § 12.
+    # Was batch=256, n_steps=30_000 before 2026-05-04. Re-issued 2026-05-04
+    # per Phase 5's empirically validated batch (summary.md:250) plus the
+    # SAE-literature-standard fixed-step schedule (T-SAE §4.1, TFA App. B.1,
+    # GemmaScope) — the n_steps cap is binding for every arch and pod.
+    # See decisions.md § 12.
     learning_rate: float = 3e-4
     optimizer: str = "adam"
     warmup_steps: int = 1_000
-    plateau_early_stop: bool = True
+    # Plateau-stop is OFF by default (2026-05-04). The implementation in
+    # training/sae_trainer.py:158-165 uses an absolute max-min threshold
+    # over a 5K window, which has cross-arch unfairness: archs with
+    # naturally smaller loss scales would trigger prematurely while archs
+    # with larger losses never trigger. SAE-comparison papers (T-SAE, TFA,
+    # GemmaScope) use fixed step counts — no plateau detection. Code path
+    # stays for opt-in use; default is off so production cells run the
+    # full n_steps.
+    plateau_early_stop: bool = False
     plateau_patience: int = 5_000
     plateau_min_delta: float = 1e-4
 
