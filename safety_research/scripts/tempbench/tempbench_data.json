@@ -1,0 +1,335 @@
+{
+  "_provenance": {
+    "compiled_by": "Andre Shportko (compilation only, no new research)",
+    "compiled_on": "2026-05-04",
+    "branches_consulted": [
+      "andre-steering (current)",
+      "andre_safety",
+      "origin/final",
+      "origin/final-aniket",
+      "origin/em-nanda",
+      "origin/dmitry",
+      "origin/bill-benchmarking-synthetic",
+      "origin/temporal-bench",
+      "origin/han-phase7-unification",
+      "origin/aniket-runpod"
+    ],
+    "purpose": "Single source of truth for cross-branch TempBench compilation. Every number in the meta-report is sourced from this file."
+  },
+
+  "synthetic_three_arch": {
+    "source_branch": "origin/bill-benchmarking-synthetic",
+    "source_doc": "docs/bill/results/Synthetic-Benchmark-Report.md",
+    "setup": "n_features=40, d_model=80, d_sae=80, pi=0.15; matched window-L0=k*T",
+    "mean_auc_by_arch": {
+      "regular_sae": 0.910,
+      "txcdr": 0.790,
+      "stacked_sae": 0.559
+    },
+    "txc_advantage_low_k_high_rho": {
+      "rho_0.9_k_2_T_5_delta_auc_vs_regular_sae": "+0.10 to +0.20",
+      "rho_0.9_k_2_T_5_delta_auc_vs_stacked_sae": "+0.28 to +0.64",
+      "rho_0.0_delta_auc_vs_regular_sae": "-0.09 to -0.52"
+    },
+    "hmm_denoising_floor": 0.77,
+    "txc_hmm_denoising_ratio": {
+      "T_2_k_3": 0.89,
+      "T_4_k_3": 1.01,
+      "T_8_k_3": 1.12,
+      "T_12_k_3": 1.15
+    },
+    "sae_stacked_hmm_denoising_floor_observed": "always 0.76-0.78"
+  },
+
+  "synthetic_andre_v2_toy": {
+    "source_branch": "andre-steering (docs/andre/v2_tx_v_sae.md)",
+    "setup": "NUM_FEATS=128, HIDDEN_DIM=256, T in {2,5}, k in {2,5,10,25}, 65k steps",
+    "best_cell_rho_0.9": {
+      "txcdr_k_2_T_5_auc": 0.978,
+      "stacked_sae_auc": 0.475,
+      "delta_auc": "+0.50"
+    },
+    "mean_delta_auc": {
+      "rho_0.0": "+0.07",
+      "rho_0.6": "+0.255",
+      "rho_0.9": "+0.241"
+    },
+    "verdict": "TXC dominates rho>0 with low/moderate k. IID hurts; high k hurts."
+  },
+
+  "sparse_probing_c3_final_branch": {
+    "source_branch": "origin/final",
+    "source_file": "purified/experiments/c3_probing/results.json",
+    "n_tasks": 38,
+    "n_seeds": 3,
+    "model": "Gemma-2-2b-it L13 mid-residual",
+    "k_feat_20_mean_auc": {
+      "topk_sae": 0.9016,
+      "txc_base": 0.8887,
+      "txc_pro": 0.8860,
+      "tsae_paper": 0.8851
+    },
+    "k_feat_20_std_seeds_auc": {
+      "topk_sae": 0.0017,
+      "txc_base": 0.0032,
+      "txc_pro": 0.0023,
+      "tsae_paper": 0.0031
+    },
+    "k_feat_5_mean_auc": {
+      "topk_sae": 0.8447,
+      "txc_base": 0.8397,
+      "txc_pro": 0.8381,
+      "tsae_paper": 0.8281
+    }
+  },
+
+  "sparse_probing_aniket_saebench": {
+    "source_branch": "origin/aniket-runpod",
+    "source_file": "docs/aniket/experiments/sparse_probing/summary.md",
+    "n_tasks": 8,
+    "model": "Gemma-2-2b T=5",
+    "mean_accuracy_proto_A_full_window_k5": {
+      "sae": 0.8545,
+      "mlc": 0.9406,
+      "tempxc": 0.8615
+    },
+    "tempxc_t_sweep_proto_A": {
+      "T_5": 0.8615,
+      "T_10": 0.8254,
+      "T_20": 0.7737
+    },
+    "verdict": "MLC > TempXC ≈ SAE on this 8-task SAEBench. TempXC degrades monotonically in T; partly attributable to undertraining."
+  },
+
+  "sparse_probing_han_T8": {
+    "source_branch": "origin/final",
+    "source_file": "docs/han/research_logs/phase7_unification/agent_x_paper/2026-05-02-yw-T8-benchmark.md",
+    "n_seeds": 3,
+    "S_32_k_feat_20_mean_auc_BASE": {
+      "txc_bare_antidead_t5": 0.9123,
+      "mlc": 0.9124,
+      "tsae_paper_k500": 0.9105,
+      "topk_sae": 0.9091,
+      "phase57_partB_h8_t8": 0.9086,
+      "phase5b_subseq_h8": 0.9059
+    },
+    "verdict": "TXC bare-antidead at T=5 ties MLC at the top of the canonical leaderboard. T>5 hill-climbed variants at matched per-token sparsity (k_pos=20) lose 0.01-0.025 AUC."
+  },
+
+  "deception_detection_andre_safety": {
+    "source_branch": "andre_safety / andre-steering",
+    "source_doc": "safety_research/REPORT.md (REPORT_v2.md)",
+    "datasets": {
+      "test_in_JBB": {"n": 200, "n_pos": 100, "source": "JailbreakBench Behaviors"},
+      "test_ood_XSTest": {"n": 450, "n_pos": 225, "source": "XSTest v2"},
+      "test_mi_MaliciousInstruct": {"n": 200, "n_pos": 100}
+    },
+    "monitor_auc_test_in": {
+      "tfidf_baseline": 0.693,
+      "raw_l13_residual": 0.966,
+      "sae": 0.961,
+      "tsae": 0.973,
+      "txc": 0.970
+    },
+    "monitor_auc_test_ood": {
+      "tfidf_baseline": 0.668,
+      "raw_l13_residual": 0.959,
+      "sae": 0.948,
+      "tsae": 0.963,
+      "txc": 0.954
+    },
+    "black_to_white_boost_test_ood": {
+      "sae": "+0.280",
+      "tsae": "+0.295",
+      "txc": "+0.286"
+    },
+    "verdict": "All three SAE-family arms within 95% bootstrap CI of each other. The +0.28-0.30 white-box boost over text-only TF-IDF is the load-bearing finding."
+  },
+
+  "deception_steering_andre_v2_fsga": {
+    "source_branch": "andre-steering",
+    "source_doc": "safety_research/STEERING_REPORT.md",
+    "method": "FSGA / cFSGA — feature-space gated ablation, optionally probe-gated",
+    "K_20_test_in_JBB": {
+      "delta_LR_harm": {"sae": -7.650, "tsae": -0.372, "txc": -0.555},
+      "delta_LR_ben": {"sae": -4.356, "tsae": -0.165, "txc": -0.207},
+      "leakage": {"sae": 0.57, "tsae": 0.45, "txc": 0.38}
+    },
+    "saturation": {
+      "sae_K_50": -10.546,
+      "tsae_K_50": -0.871,
+      "txc_K_100": -1.893
+    },
+    "txc_K_curve_test_in_LR_harm": {
+      "K_1": 0.023,
+      "K_2": 0.122,
+      "K_5": -0.134,
+      "K_10": -0.196,
+      "K_20": -0.555,
+      "K_50": -1.137,
+      "K_100": -1.893
+    },
+    "tsae_K_curve_test_in_LR_harm": {
+      "K_1": -0.152,
+      "K_5": -0.179,
+      "K_20": -0.372,
+      "K_50": -0.871,
+      "K_100": -0.507
+    },
+    "sae_K_curve_test_in_LR_harm": {
+      "K_1": -3.014,
+      "K_5": -5.587,
+      "K_20": -7.650,
+      "K_50": -10.546,
+      "K_100": -10.387
+    },
+    "cFSGA_capability_KL": {"all_arms": 0.000, "note": "Probe fires 0/200 on cap_alpaca → cFSGA is a literal no-op there"},
+    "verdict": "SAE T=1 dominates raw refusal-suppression magnitude (~10x larger). TXC has best leakage among T=5 family at K=20 (0.38 vs T-SAE 0.45). TXC scales monotonically with K; T-SAE saturates and then degrades. The cFSGA probe-gated protocol generalises across all three arms."
+  },
+
+  "steering_c5_concept_steering": {
+    "source_branch": "origin/final",
+    "source_file": "purified/experiments/c5_steering/results.json + leaderboard.jsonl",
+    "protocol": "v7, 30 concepts, 9 strengths, success @ coh ≥ 1.75",
+    "n_seeds": 3,
+    "mean_success_at_coh_1_75": {
+      "tsae_paper": 0.067,
+      "txc_base": 0.033,
+      "txc_pro": 0.031,
+      "topk_sae": 0.000
+    },
+    "mean_coh": {
+      "tsae_paper": 1.566,
+      "txc_base": 1.892,
+      "txc_pro": 2.178,
+      "topk_sae": 0.000
+    },
+    "verdict": "T-SAE wins on success-at-low-coherence (more steerable atoms); TXC has higher absolute coherence but lower success rate. TopK SAE struggles to produce coherent steering on this concept set."
+  },
+
+  "alignment_em_nanda_qwen14b": {
+    "source_branch": "origin/em-nanda",
+    "source_doc": "docs/dmitry/results/em_features/EM_NANDA_BRIEF.md (and final-branch c6 leaderboard)",
+    "model": "Qwen2.5-14B-Instruct, financial-advice EM (R32)",
+    "judge": "Gemini, n_rollouts=64",
+    "baseline_align": "low (~30 align before steering)",
+    "single_feat_champion_align": {
+      "sae_arditi_seed_42_alpha_-10": 78.33,
+      "sae_arditi_seed_1_alpha_-30": 80.28,
+      "sae_arditi_seed_2_alpha_-30": 80.89,
+      "sae_arditi_seed_42_alpha_-30": 81.625,
+      "txc_base_seed_42_alpha_+100": 81.70
+    },
+    "bundle_k_3_mid_alpha_peak": {
+      "sae_arditi": 51.41,
+      "txc": 33.28
+    },
+    "bundle_k_30_mid_alpha_peak": {
+      "sae_arditi_score_top_30": 41.33,
+      "sae_arditi_mutual_ortho_top_30": 38.13,
+      "txc": 41.56
+    },
+    "verdict": "Single-feature champion: SAE and TXC tied (~81 align). Bundle-k=3: SAE >> TXC (51.4 vs 33.3). Bundle-k=30: tied (~41.5). The k=30 ceiling is geometric (organism direction projection); the k=3 sub-axis is arch-specific (TXC top-3 anti-correlate, sum cancels)."
+  },
+
+  "alignment_em_qwen7b_medical": {
+    "source_branch": "origin/dmitry",
+    "source_doc": "docs/dmitry/results/em_features/README.md",
+    "model": "Qwen2.5-7B-Instruct, bad-medical EM",
+    "baseline_align": 64.19,
+    "baseline_coh": 84.88,
+    "peak_align": {
+      "sae_andy_rdt_131k": 85.85,
+      "mlc_L5_d32k_40k_steps": 83.61,
+      "txc_d32k_200k_last_cos": 74.90,
+      "txc_d32k_40k": 74.24,
+      "txc_sum_cos": 73.03,
+      "txc_encoder": 67.62,
+      "txc_window": 67.38
+    },
+    "delta_align_vs_baseline": {
+      "sae": 21.7,
+      "mlc": 19.4,
+      "txc_best": 10.7
+    },
+    "verdict": "On bad-medical: SAE (Andy RDT, 131k dict) wins by +22 align. MLC trails by ~2 (+19.4). TXC trails by ~10 (+10.7). TXC's per-position decoder dilution + smaller dict are the most likely explanations."
+  },
+
+  "reasoning_steering_aniket": {
+    "source_branch": "origin/final-aniket",
+    "source_doc": "papers/reasoning_features.md",
+    "models": ["DeepSeek-R1-Distill-Qwen-14B", "DeepSeek-R1-Distill-Llama-8B", "DeepSeek-R1-Distill-Qwen-1.5B"],
+    "tasks_500": "10 categories: math word problems, programming, sequences, probability, etc.",
+    "behaviors_steered": ["backtracking", "uncertainty estimation", "example testing", "knowledge augmentation"],
+    "key_finding": "Reasoning behaviors are mediated by linear directions (DoM/SAE/TXC) and steerable. TXC features competitive with SAE for behavior selection.",
+    "venhoff_2025_reproduced": true,
+    "verdict": "TXC features carry steerable reasoning-behavior signal; not a clear win or loss vs SAE in this regime — the paper-level claim is feasibility + interpretability of reasoning steering, not arch supremacy."
+  },
+
+  "reasoning_backtracking_c7": {
+    "source_branch": "origin/final",
+    "source_file": "purified/results/c7_backtracking/aniket_reference/cut25/summary.json",
+    "task": "Rescue truly-wrong DeepSeek reasoning trajectories via backtracking-direction steering, n=31",
+    "rescue_rate_by_alpha": {
+      "alpha_-12": 0.065,
+      "alpha_-10": 0.161,
+      "alpha_-8": 0.290,
+      "alpha_-6": 0.161,
+      "alpha_-4": 0.258,
+      "alpha_-2": 0.290,
+      "alpha_0_control": 0.226,
+      "alpha_+8": 0.000
+    },
+    "best_delta_vs_control": "+0.065 (at alpha=-2 and alpha=-8)",
+    "verdict": "Negative alpha (encourage backtracking) raises rescue rate over control by up to +6.5 pp on n=31 truly-wrong reasoning prompts. Effect is real but modest."
+  },
+
+  "qualitative_autointerp_c4": {
+    "source_branch": "origin/final",
+    "source_file": "purified/experiments/c4_qualitative/results.json",
+    "n_seeds": 3,
+    "metric": "top_N_semantic (judge-validated semantic top-N)",
+    "judge_agreement": {
+      "tsae_paper": 0.905,
+      "txc_pro": 0.768,
+      "txc_base": 0.768
+    },
+    "mean_top_N_semantic": {
+      "tsae_paper": 74.67,
+      "txc_pro": 60.0,
+      "txc_base": 42.0
+    },
+    "verdict": "T-SAE wins on autointerp judge-validated semantic top-N — consistent with T-SAE's per-position-localized features being easier for the LLM judge to label."
+  },
+
+  "andre_safety_v1_60_prompt_steering_AUC": {
+    "source_doc": "safety_research/REPORT.md (60-prompt original eval)",
+    "steering_AUC": {"sae": 0.102, "tsae": 0.953, "txc": 0.250},
+    "delta_H_log_ratio": {"sae": 1.40, "tsae": -0.111, "txc": -0.010},
+    "context": "Top-10 decoder-direction ablation. T-SAE is the cleanest steering knob (AUC 0.95) with surgical refusal removal; TXC's diffuse subspace is easy to detect (H1) but hard to ablate via 10 directions; SAE's top-10 directions are anti-discriminative."
+  },
+
+  "feature_geometry_andre": {
+    "source_doc": "docs/andre/nlp_feature_map.md",
+    "model": "Gemma-2-2b-it mid_res k100 T5",
+    "labeled_features": {"sae": 5452, "txc": 3434},
+    "kmeans_largest_cluster_pct": {"sae": 0.063, "txc": 0.352},
+    "kmeans_top2_pct": {"sae": 0.12, "txc": 0.57},
+    "verdict": "TXC decoder directions cluster much more strongly than SAE (top-2 clusters absorb 57% vs 12%), and cluster summaries are more temporally flavored. First direct evidence that TXC's temporal inductive bias shows in feature geometry."
+  },
+
+  "training_efficiency": {
+    "source_doc": "safety_research/REPORT.md Section 1, docs/andre/nlp_gemma2_summary.md",
+    "gemma_2_2b_it_l13_3000_steps": {
+      "sae_T_1_FVU": 0.0271,
+      "tsae_T_5_FVU": 0.0743,
+      "txc_T_5_FVU": 0.0849,
+      "sae_wall_s": 105,
+      "tsae_wall_s": 541,
+      "txc_wall_s": 395
+    },
+    "gemma_attn_layers_winner": "TXCDR (lower FVU on mid_attn and final_attn)",
+    "gemma_residual_layers_winner": "Stacked SAE for mid_res; TXCDR for final_res",
+    "verdict": "TXC wins reconstruction on attention layers, loses on residual mid-layer, wins on final residual. SAE has lowest absolute FVU at matched compute on mid_res because k=100×T=1 has tighter bottleneck than 5×k=100."
+  }
+}
