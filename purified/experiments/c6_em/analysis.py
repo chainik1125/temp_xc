@@ -73,7 +73,11 @@ ORGANISM_BY_DATASOURCE = {
 # So we call ``canonical_train_keys`` twice and union — once per arch
 # with its respective canonical cfg. Cells that match either signature
 # survive the filter; pre-2026-05-04 batch=256 rows drop out.
-SEEDS = (1, 2, 42)
+SEEDS = (1, 42)  # n=2 paired seeds (Han 2026-05-04 PM, time-budget cut from
+                 # n=3; seed=2 dropped). Decision tree for c6 ("Tied / Mixed
+                 # / Honest negative") still needs mean gap across seeds —
+                 # n=2 is enough for outcomes far from the 3- and 9-align
+                 # thresholds; a 1-seed lucky draw risk is the cost.
 DATASOURCE_NAMES = tuple(ORGANISM_BY_DATASOURCE.keys())
 
 

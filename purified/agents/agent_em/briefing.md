@@ -272,9 +272,17 @@ SAE Wang finishes (~15:52 UTC).**
   ~20-25 min. Bricken adds ~50% overhead vs vanilla.
 - Eval (full Wang): ~3 hr (33m s2 + 70m s3 + ~36m s4).
 - Per-cell wall = ~3.5 hr.
-- 6 × 14B cells SERIALLY on GPU 1 ≈ 21 hr wall. With agent_nlp
-  releasing GPU 0 eventually (their c3 ETA ~16:00 UTC), I can resume
-  parallel work after that.
+
+**Sweep size CUT from n=3 to n=2 (Han 2026-05-04 PM):** drop seed=2.
+Sweep is now seed=42 + seed=1 × 2 archs × 2 organisms = **8 cells
+total**. Decision tree for c6 ("Tied / Mixed / Honest negative")
+still works on the mean gap — n=2 is enough when the gap is far
+from the 3- and 9-align thresholds. ``analysis.py`` SEEDS = (1, 42).
+
+- 4 × 14B cells SERIALLY on GPU 1 ≈ 14 hr wall.
+- 4 × 7B cells SERIALLY on GPU 1 ≈ ~6 hr wall (smaller subject model).
+- Total ~20 hr serial. Some parallel slot opens up if agent_nlp
+  releases GPU 0 (their c3 retrain still in flight as of 15:05).
 
 Other state:
 
