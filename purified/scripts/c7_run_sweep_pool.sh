@@ -23,6 +23,7 @@ mkdir -p logs
 echo "[c7-sweep-pool] starting — gpu=$GPU archs='$ARCHS' seeds='$SEEDS' log=$LOG" >&2
 
 CUDA_VISIBLE_DEVICES=$GPU TQDM_DISABLE=1 \
+    PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True \
     .venv/bin/python -m experiments.c7_backtracking.run \
     --archs $ARCHS --seeds $SEEDS \
     > "$LOG" 2>&1 &
