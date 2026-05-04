@@ -40,6 +40,38 @@ COMPONENT = "c4"
 EXP_DIR = Path(__file__).parent
 PLOT_DIR = EXP_DIR / "plots"
 
+HEADLINE_BATCH_SIZE = 1024   # decisions.md § 12 (commit 06681098):
+                             # Phase-5-faithful uniform schedule. Old
+                             # batch=256 rows stay on disk for diff
+                             # comparison but are excluded from headline.
+
+
+def _headline_train_keys() -> set[str]:
+    """Return train_keys whose checkpoint was trained at the headline
+    batch_size. Cross-references ``checkpoints/manifest.jsonl`` since
+    ``LeaderboardRow`` only carries ``train_key`` (not training_cfg).
+    """
+    import json
+    from temp_bench.cache import manifest_path
+    keys: set[str] = set()
+    p = manifest_path()
+    if not p.exists():
+        return keys
+    with open(p) as fh:
+        for line in fh:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                d = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if int(d.get("training_cfg", {}).get("batch_size", 0)) == HEADLINE_BATCH_SIZE:
+                tk = d.get("train_key")
+                if tk:
+                    keys.add(tk)
+    return keys
+
 
 def _placeholder_markdown(reason: str) -> str:
     return (
@@ -57,8 +89,11 @@ def _build_c3_mean_auc_lookup() -> dict[tuple[str, int, int], float]:
     "mean-pool probing AUC" — the C3 headline for less-sparse regime).
     """
     out: dict[tuple[str, int, int], float] = {}
+    headline_train_keys = _headline_train_keys()
     for r in query_leaderboard(component="c3"):
         if r.eval_cfg.get("smoke", False):
+            continue
+        if r.train_key not in headline_train_keys:
             continue
         if "mean_auc" not in r.metrics:
             continue
@@ -71,10 +106,12 @@ def _build_c3_mean_auc_lookup() -> dict[tuple[str, int, int], float]:
 
 def run_analysis() -> AnalysisResult:
     rows = query_leaderboard(component=COMPONENT)
+    headline_train_keys = _headline_train_keys()
     real_rows = [
         r for r in rows
         if not r.eval_cfg.get("smoke", False)
         and int(r.eval_cfg.get("n_features", 256)) >= 256
+        and r.train_key in headline_train_keys
     ]
 
     if not real_rows:

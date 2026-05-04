@@ -232,24 +232,13 @@ def _smoke_probe_data(act_cache_key: str, *, S: int):
 
 
 def _real_training_cfg() -> TrainingConfig:
-    """Headline-cell TrainingConfig.
+    """Headline-cell TrainingConfig — schema defaults per decisions.md § 12.
 
-    Decision (2026-05-03, agent_nlp autonomous): n_steps=10_000 fits 18
-    cells in the 10-hour autonomous window (~25-30 min/cell at H100
-    bs=256). Phase 7 reference numbers came from longer runs (~50K),
-    but SAE convergence at this token budget (10K × 256 × 128 = 328M
-    tokens) is reliable per the temporal_sae paper. If results undershoot
-    the Phase 7 leaderboard, re-run with n_steps=30_000 (uses schema
-    default; will trigger train-key invalidation since steps is part of
-    train_key).
+    batch=1024, n_steps=25_000, plateau_early_stop=False (locked
+    2026-05-04 PM by agent_paper, commit 06681098). Phase-5-faithful,
+    uniform across all archs and pods.
     """
-    return TrainingConfig(
-        n_steps=10_000,
-        batch_size=256,
-        learning_rate=3e-4,
-        warmup_steps=500,
-        precision="bf16",
-    )
+    return TrainingConfig()
 
 
 def main(*, archs, seeds, k_feats, S, smoke, force_train=False, force_eval=False):
