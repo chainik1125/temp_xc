@@ -57,11 +57,12 @@ def fig_rose_per_architecture(data: dict[str, Any]) -> None:
     angles += angles[:1]
 
     # Rescaled scores — see report text for formulas.
+    paper = data["sparse_probing_paper_set_BASE_S32"]["k_feat_20_mean_auc"]
     arch_scores: dict[str, list[float]] = {
         # SAE
         "SAE": [
             data["synthetic_andre_v2_toy"]["best_cell_rho_0.9"]["stacked_sae_auc"],  # 0.475
-            data["sparse_probing_c3_final_branch"]["k_feat_20_mean_auc"]["topk_sae"],  # 0.9016
+            paper["topk_sae"],   # 0.9091 (PAPER 16-task BASE S=32 k=20)
             0.226,  # backtracking rescue control rate (no steer)
             data["deception_detection_andre_safety"]["monitor_auc_test_ood"]["sae"],   # 0.948
             data["alignment_em_qwen7b_medical"]["delta_align_vs_baseline"]["sae"] / 25,  # +21.7 normed
@@ -69,7 +70,7 @@ def fig_rose_per_architecture(data: dict[str, Any]) -> None:
         # T-SAE
         "T-SAE": [
             (data["synthetic_andre_v2_toy"]["best_cell_rho_0.9"]["stacked_sae_auc"] + 0.05),
-            data["sparse_probing_c3_final_branch"]["k_feat_20_mean_auc"]["tsae_paper"],  # 0.8851
+            paper["tsae_paper_k500"],  # 0.9105 (PAPER)
             0.226,  # control baseline (T-SAE not the headline backtracking arm)
             data["deception_detection_andre_safety"]["monitor_auc_test_ood"]["tsae"],    # 0.963
             0.40,   # T-SAE hookpoint variant ~ MLC-like; see em_features hookpoint_compare doc
@@ -77,15 +78,15 @@ def fig_rose_per_architecture(data: dict[str, Any]) -> None:
         # TXC
         "TXC": [
             data["synthetic_andre_v2_toy"]["best_cell_rho_0.9"]["txcdr_k_2_T_5_auc"],  # 0.978
-            data["sparse_probing_c3_final_branch"]["k_feat_20_mean_auc"]["txc_base"],   # 0.8887
-            0.290,  # backtracking rescue at α=-8
+            paper["txc_bare_antidead_t5"],   # 0.9127 (PAPER) — TXC wins
+            0.290,  # backtracking rescue at α=-8 (optimal inducement rate)
             data["deception_detection_andre_safety"]["monitor_auc_test_ood"]["txc"],    # 0.954
             data["alignment_em_qwen7b_medical"]["delta_align_vs_baseline"]["txc_best"] / 25,  # +10.7 normed
         ],
         # MLC for reference where measured (not on every axis)
         "MLC": [
             np.nan,
-            0.9124,  # han T8 BASE k=20
+            paper["mlc"],   # 0.9122 (PAPER)
             np.nan,
             np.nan,
             data["alignment_em_qwen7b_medical"]["delta_align_vs_baseline"]["mlc"] / 25,  # +19.4 normed
@@ -140,7 +141,7 @@ def fig_rose_per_category(data: dict[str, Any]) -> None:
 
     syn_v2 = data["synthetic_andre_v2_toy"]["best_cell_rho_0.9"]
     bill = data["synthetic_three_arch"]
-    c3 = data["sparse_probing_c3_final_branch"]["k_feat_20_mean_auc"]
+    paper = data["sparse_probing_paper_set_BASE_S32"]["k_feat_20_mean_auc"]
     han = data["sparse_probing_han_T8"]["S_32_k_feat_20_mean_auc_BASE"]
     det_in = data["deception_detection_andre_safety"]["monitor_auc_test_in"]
     det_ood = data["deception_detection_andre_safety"]["monitor_auc_test_ood"]
@@ -154,7 +155,7 @@ def fig_rose_per_category(data: dict[str, Any]) -> None:
         "SAE": [
             syn_v2["stacked_sae_auc"],
             bill["hmm_denoising_floor"],   # SAE/Stacked SAE always at floor 0.77
-            c3["topk_sae"],
+            paper["topk_sae"],
             han["topk_sae"],
             det_in["sae"], det_ood["sae"],
             inv_leak(fsga_leak["sae"]),
@@ -164,7 +165,7 @@ def fig_rose_per_category(data: dict[str, Any]) -> None:
         "T-SAE": [
             syn_v2["stacked_sae_auc"] + 0.02,  # comparable
             bill["hmm_denoising_floor"],
-            c3["tsae_paper"],
+            paper["tsae_paper_k500"],
             han["tsae_paper_k500"],
             det_in["tsae"], det_ood["tsae"],
             inv_leak(fsga_leak["tsae"]),
@@ -174,7 +175,7 @@ def fig_rose_per_category(data: dict[str, Any]) -> None:
         "TXC": [
             syn_v2["txcdr_k_2_T_5_auc"],
             data["synthetic_three_arch"]["txc_hmm_denoising_ratio"]["T_8_k_3"] / 1.5,  # rescale: 1.12/1.5
-            c3["txc_base"],
+            paper["txc_bare_antidead_t5"],
             han["txc_bare_antidead_t5"],
             det_in["txc"], det_ood["txc"],
             inv_leak(fsga_leak["txc"]),
@@ -184,7 +185,7 @@ def fig_rose_per_category(data: dict[str, Any]) -> None:
         "MLC": [
             np.nan,
             np.nan,
-            np.nan,
+            paper["mlc"],
             han["mlc"],
             np.nan, np.nan,
             np.nan,
@@ -399,6 +400,105 @@ def fig_steering_c5(data: dict[str, Any]) -> None:
     plt.close(fig)
 
 
+def fig_paper_leaderboard(data: dict[str, Any]) -> None:
+    """PAPER 16-task BASE S=32 k_feat=20 leaderboard with σ_seeds error bars."""
+    p = data["sparse_probing_paper_set_BASE_S32"]
+    aucs = p["k_feat_20_mean_auc"]
+    sigmas = p["k_feat_20_sigma_seeds"]
+
+    # Order by AUC descending; only annotate σ where we have it.
+    ordered = sorted(aucs.items(), key=lambda kv: -kv[1])
+    arches = [k for k, _ in ordered]
+    means = [aucs[a] for a in arches]
+    errs = [sigmas.get(a, 0.0) for a in arches]
+
+    pretty = []
+    cols = []
+    for a in arches:
+        if "txc" in a or "phase5" in a or "phase57" in a or "txcdr" in a:
+            pretty.append(a.replace("_", " "))
+            cols.append("#d62728" if a == "txc_bare_antidead_t5" else "#f4a3a3")
+        elif a == "mlc":
+            pretty.append("mlc")
+            cols.append("#9467bd")
+        elif "tsae" in a:
+            pretty.append(a.replace("_", " "))
+            cols.append("#2ca02c")
+        elif "topk_sae" in a:
+            pretty.append("topk sae")
+            cols.append("#1f77b4")
+        else:
+            pretty.append(a)
+            cols.append("#888888")
+
+    fig, ax = plt.subplots(figsize=(11, 6))
+    bars = ax.bar(range(len(arches)), means, yerr=errs, color=cols, edgecolor="black",
+                   capsize=4)
+    ax.set_xticks(range(len(arches)))
+    ax.set_xticklabels(pretty, rotation=35, ha="right", fontsize=9)
+    ax.set_ylabel("mean AUC ± σ_seeds")
+    ax.set_ylim(0.895, 0.918)
+    ax.axhline(aucs["topk_sae"], color="#1f77b4", linestyle=":", alpha=0.5,
+               label="topk_sae baseline")
+    ax.set_title("PAPER 16-task BASE S=32 k_feat=20 sparse-probing leaderboard\n"
+                 "TXC bare-antidead T=5 wins at 0.9127 (Δ vs topk_sae ≈ 6× σ_seeds)")
+    for bar, mean in zip(bars, means):
+        ax.text(bar.get_x() + bar.get_width() / 2, mean + 0.0005,
+                 f"{mean:.4f}", ha="center", fontsize=8)
+    ax.legend(loc="lower left")
+    ax.grid(True, axis="y", alpha=0.3)
+    plt.tight_layout()
+    plt.savefig(OUT / "paper_leaderboard.png", dpi=140, bbox_inches="tight")
+    plt.close(fig)
+
+
+def fig_backtracking_inducement(data: dict[str, Any]) -> None:
+    """Backtracking rescue α-curve with optimal inducement rate annotated."""
+    rb = data["reasoning_backtracking_c7"]["rescue_rate_by_alpha"]
+    items = []
+    for k, v in rb.items():
+        a = float(k.replace("alpha_", "").split("_")[0])
+        items.append((a, v, k.endswith("control")))
+    items.sort()
+    alphas = [x[0] for x in items]
+    rates = [x[1] for x in items]
+    is_ctrl = [x[2] for x in items]
+
+    optimal = max(rates)
+    control = next(r for a, r, c in items if c)
+    delta = optimal - control
+
+    fig, ax = plt.subplots(figsize=(9, 5.5))
+    ax.plot(alphas, rates, "o-", color="#444444", linewidth=2, markersize=9,
+             zorder=2)
+    # Highlight the control α=0
+    for a, r, c in items:
+        if c:
+            ax.scatter([a], [r], color="grey", s=160, zorder=3,
+                       label=f"control (α=0): {r:.3f}")
+        if r == optimal:
+            ax.scatter([a], [r], color="#d62728", s=180, marker="^", zorder=4,
+                       label=f"optimum: {r:.3f}" if a == alphas[rates.index(optimal)] else None)
+    ax.axhline(control, color="grey", linestyle="--", alpha=0.4)
+    ax.axhline(optimal, color="#d62728", linestyle="--", alpha=0.4)
+    ax.fill_between(alphas, control, optimal, alpha=0.10, color="#d62728")
+    ax.annotate(f"Δ vs control = +{delta*100:.1f} pp",
+                xy=(-2, (optimal + control) / 2),
+                xytext=(2, (optimal + control) / 2 + 0.03),
+                fontsize=11, color="#d62728",
+                arrowprops=dict(arrowstyle="->", color="#d62728"))
+    ax.set_xlabel("steering coefficient α (negative = encourage backtracking)")
+    ax.set_ylabel("rescue rate (n=31 truly-wrong DeepSeek prompts)")
+    ax.set_title("c7 backtracking — α-sweep & optimal inducement rate\n"
+                 f"optimal = {optimal:.3f} at α=−2 / α=−8; control = {control:.3f}; "
+                 f"Δ = +{delta*100:.1f} pp; α=+8 collapses rescue to 0")
+    ax.grid(True, alpha=0.3)
+    ax.legend(loc="upper right")
+    plt.tight_layout()
+    plt.savefig(OUT / "backtracking_inducement.png", dpi=140, bbox_inches="tight")
+    plt.close(fig)
+
+
 def fig_overall_summary_grid(data: dict[str, Any]) -> None:
     """A single 3x2 panel showing the headline categories side-by-side."""
     fig, axs = plt.subplots(3, 2, figsize=(14, 14))
@@ -413,11 +513,12 @@ def fig_overall_summary_grid(data: dict[str, Any]) -> None:
     axs[0, 0].set_ylim(0, 1.0)
     axs[0, 0].set_ylabel("Feature recovery AUC")
 
-    # Sparse probing c3
-    p = data["sparse_probing_c3_final_branch"]["k_feat_20_mean_auc"]
-    axs[0, 1].bar(arches, [p["topk_sae"], p["tsae_paper"], p["txc_base"]], color=cols, edgecolor="black")
-    axs[0, 1].set_title("SPARSE PROBING: c3 38-task mean AUC (k_feat=20, 3 seeds)")
-    axs[0, 1].set_ylim(0.86, 0.92)
+    # Sparse probing — PAPER 16-task BASE S=32 k=20 (3 seeds) — the headline
+    p = data["sparse_probing_paper_set_BASE_S32"]["k_feat_20_mean_auc"]
+    axs[0, 1].bar(arches, [p["topk_sae"], p["tsae_paper_k500"], p["txc_bare_antidead_t5"]],
+                   color=cols, edgecolor="black")
+    axs[0, 1].set_title("SPARSE PROBING: PAPER 16-task BASE S=32 k=20 mean AUC (3 seeds)\nTXC bare-antidead wins (~6× σ_seeds)")
+    axs[0, 1].set_ylim(0.88, 0.92)
     axs[0, 1].set_ylabel("mean AUC")
 
     # Deception detection (XSTest test_ood)
@@ -482,6 +583,8 @@ def main() -> None:
     fig_synthetic_advantage_heatmap(data)
     fig_hmm_denoising(data)
     fig_steering_c5(data)
+    fig_paper_leaderboard(data)
+    fig_backtracking_inducement(data)
     fig_overall_summary_grid(data)
     print(f"Wrote figures to {OUT}")
     for p in sorted(OUT.glob("*.png")):

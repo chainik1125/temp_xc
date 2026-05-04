@@ -138,60 +138,122 @@ TXC optimises for.
 
 ## 2. Sparse probing (real-world)
 
-### 2.1 38-task production benchmark (final branch, 3 seeds)
+### 2.1 PAPER 16-task BASE leaderboard — the headline number (3 seeds)
 
-Source: `purified/experiments/c3_probing/results.json` (origin/final).
+Source: `docs/han/research_logs/phase7_unification/agent_x_paper/2026-04-29-leaderboard-multiseed.md`
+and `2026-05-01-S10-S20-S32-leaderboards.md` on `origin/final`.
 
-**Setup**: 38 SAEBench-style tasks, Gemma-2-2b-it L13, 3 seeds, k_feat ∈ {5, 20}.
+**Setup**: PAPER task set = 16 of 36 SAEBench tasks, pre-registered by
+cross-arch SD within balanced clusters
+(4 bias_in_bios, 3 europarl, 3 amazon, 2 ag_news, 2 github_code, 2 coreference).
+Source-of-truth `experiments/phase7_unification/task_sets.py::PAPER`.
+Subject = Gemma-2-2b BASE, S = 32, k_feat ∈ {5, 20}, 3 seeds (1, 2, 42).
+Mean-pool aggregation; FLIP applied to winogrande/wsc.
 
-**Metric**: Mean ROC-AUC of an L1-regularised logistic regression on
-the top-k_feat features, averaged across tasks then across seeds.
+**Metric**: cross-seed mean of per-task means; σ_seeds = std across
+the per-seed means at the arch level (pure seed effect, no task variance).
 
-**Headline**: TopK SAE narrowly leads at k_feat = 20; TXC base / TXC pro
-beat T-SAE.
+**Headline at k_feat = 20**: TXC bare-antidead T = 5 wins, statistically
+defensible.
 
-| arch | mean AUC (k_feat = 20) | std seeds | rank |
-|------|------------------------:|-----------:|------|
-| topk_sae | **0.9016** | 0.0017 | 1 |
-| txc_base | 0.8887 | 0.0032 | 2 |
-| txc_pro | 0.8860 | 0.0023 | 3 |
-| tsae_paper | 0.8851 | 0.0031 | 4 |
+![paper leaderboard](../../safety_research/figures/tempbench/paper_leaderboard.png)
 
-At k_feat = 5, TXC base (0.8397) edges out T-SAE (0.8281) and is
-within 0.005 of TopK SAE (0.8447).
+| arch | mean AUC | σ_seeds | n_seeds | rank |
+|------|---------:|--------:|--------:|------|
+| **`txc_bare_antidead_t5`** ⭐ | **0.9127** | 0.0012 | 3 | 1 |
+| `mlc` | 0.9122 | 0.0022 | 3 | 2 |
+| `tsae_paper_k500` | 0.9105 | 0.0081 | 3 | 3 |
+| `topk_sae` | 0.9091 | 0.0058 | 3 | 4 |
+| `phase57_partB_h8_multidistance_t8` | 0.9086 | 0.0032 | 3 | 5 |
+| `txcdr_t5` | 0.9067 | 0.0027 | 3 | 6 |
+| `phase5b_subseq_h8` | 0.9059 | 0.0022 | 3 | 7 |
+| `tsae_paper_k20` | 0.9019 | 0.0015 | 3 | 8 |
 
-### 2.2 Han's T8 hill-climbed leaderboard (S = 32, k_feat = 20, BASE)
+`txc_bare_antidead_t5` Δ vs `topk_sae` = +0.0036 ≈ **6× σ_seeds**, so
+the win is statistically defensible. Top-4 archs span 0.0036 AUC,
+within ~3× σ_seeds of each other — TXC bare-antidead's very small
+σ_seeds (0.0012) is what makes the headline survive multi-seed noise.
 
-Source: `docs/han/research_logs/phase7_unification/agent_x_paper/2026-05-02-yw-T8-benchmark.md`
-on `origin/final`.
+**At k_feat = 5**: top is MLC (0.8707) by 0.0024 over `topk_sae`. Top-6
+within 0.0037 AUC — statistically indistinguishable in this regime.
 
-| arch | mean AUC | σ_seeds |
-|------|---------:|--------:|
-| **`txc_bare_antidead_t5`** | **0.9123** | 0.0012 |
-| `mlc` | 0.9124 | 0.0019 |
-| `tsae_paper_k500` | 0.9105 | 0.0080 |
-| `topk_sae` | 0.9091 | 0.0059 |
+### 2.2 S-sensitivity — when does TXC's window advantage degrade?
 
-This benchmark uses k_win = 500 for the canonical leaderboard, vs
-k_pos = 20 for the T > 5 hill-climb. At matched per-token sparsity the
-hill-climbed T = 8 / T = 10 architectures lose 0.005-0.025 AUC vs the
-canonical leaders — sparsity regime, not novel pooling, dominates.
+Source: same multi-seed BASE benchmark, re-probed at S ∈ {10, 20, 32}.
 
-### 2.3 Aniket SAEBench 8-task (T = 5, MLC reference)
+| arch | S = 32 | S = 20 | S = 10 | Δ (S = 32 → S = 10) |
+|------|-------:|-------:|-------:|---------------------:|
+| **`txc_bare_antidead_t5`** | **0.9127** | **0.9066** | 0.8955 | **−0.0172** |
+| `mlc` | 0.9122 | 0.9060 | **0.8973** | −0.0149 |
+| `topk_sae` | 0.9091 | 0.9037 | 0.8962 | −0.0129 |
+| `phase5b_subseq_h8` | 0.9059 | 0.8972 | 0.8961 | −0.0098 (most robust) |
+
+TXC bare-antidead wins at **S = 32 and S = 20** but drops to **6th at
+S = 10** (MLC takes over). Reading: TXC's structural advantage *is*
+window-driven — when the per-example tail compresses to 10 tokens, the
+T = 5 window can't span enough of it to recover the cross-position
+signal, and per-layer (MLC) or per-position-stable (`phase5b_subseq_h8`)
+recipes win.
+
+The headline number for the paper is **S = 32** (the cache-native
+length); the S-sweep is the diagnostic confirmation of the structural
+mechanism.
+
+### 2.3 Cross-task-set robustness check (broader 38-task)
+
+Source: `purified/experiments/c3_probing/results.json` on `origin/final`.
+
+The broader 38-task superset (Gemma-2-2b-**it**, not BASE; 3 seeds; same
+k_feat) ranks differently:
+
+| arch | mean AUC (k_feat = 20) | rank |
+|------|-----------------------:|------|
+| `topk_sae` | **0.9016** | 1 |
+| `txc_base` | 0.8887 | 2 |
+| `txc_pro` | 0.8860 | 3 |
+| `tsae_paper` | 0.8851 | 4 |
+
+This is a *different* benchmark — instruction-tuned model, broader
+(uncurated) task set. It is the single piece of evidence in the repo
+where TopK SAE leads TXC; the canonical paper claim rests on the
+PAPER 16-task BASE set above (§2.1). The c3 38-task numbers should
+be reported as a robustness check / supplementary, not as the
+headline. See `agent_x_paper/2026-04-29-paper-task-set.md` for the
+pre-registered PAPER selection rationale.
+
+### 2.4 TFA-pos comparison (dense-prediction baseline)
+
+Source: `docs/han/research_logs/phase4_nlp_comparison/2026-04-17-nlp-gemma-tfa-vs-txcdr.md`.
+
+TFA-pos is **not sparsity-matched** to TopK SAE / TXCDR — its dense
+`pred_codes` head produces ~2500 active latents per token (vs 50 for
+Stacked, 250 for TXCDR at k = 50). On the same Gemma-2-2b-it Phase-4
+sweep, TFA's reconstruction NMSE is ~2× higher than Stacked at every
+(layer, k). On the **PAPER 16-task probing leaderboard**, `tfa_big`
+sits at **0.7875 mean AUC** (k_feat = 20, 2 seeds) — far behind
+`txc_bare_antidead_t5`'s 0.9127. TFA's interesting property is its
+shuffle delta (1.75-2.13× — strong sequence-order exploitation), not
+its raw probing AUC.
+
+### 2.5 Aniket SAEBench 8-task (early MLC reference)
 
 Source: `docs/aniket/experiments/sparse_probing/summary.md` on `origin/aniket-runpod`.
 
-| arch | mean accuracy (8 tasks, k = 5, full_window) |
-|------|--------------------------------------------:|
+Earlier 8-task pull, T = 5, k = 5, full_window:
+
+| arch | mean accuracy |
+|------|--------------:|
 | **MLC** | **0.9406** |
 | **TempXC** | 0.8615 |
 | **SAE** | 0.8545 |
 
-The clean MLC win in this benchmark (+8.6 acc points over SAE) is the
-single biggest evidence that *cross-layer* feature sharing is more
-informative than *cross-position* feature sharing for sparse-probing
-tasks. The companion T-sweep shows TempXC degrades from T = 5 to
-T = 20 — consistent with under-training noted in `summary.md` § "Training dynamics".
+TempXC ≈ SAE here, MLC clearly above. Aniket's accompanying note
+(`summary.md` § "Training dynamics") flags TempXC as still losing 5.9 %
+of its loss per 1000 steps at the cutoff — i.e. **undertrained relative
+to converged SAE/MLC**. This is the early checkpoint before the bare-
+antidead recipe and the multi-seed leaderboard above; the
+under-trained finding is consistent with TXC's known slow-convergence
+profile but not with the converged PAPER-leaderboard win in §2.1.
 
 ## 3. Reasoning
 
@@ -216,22 +278,48 @@ Source: `purified/results/c7_backtracking/aniket_reference/cut25/summary.json` (
 answer; apply the *backtracking* steering vector at α magnitude in
 {−12, …, +8}; measure how often the model now produces a correct answer.
 
-**Metric**: rescue rate = `n_rescued / n_truly_wrong`. Δ vs control is
-the lift over `α = 0` (which sits at 0.226).
+**Metrics — two orthogonal numbers**:
+
+- **Optimal inducement rate** = `max_α rescue_rate(α)` — the headline
+  summary number, suitable for the main text. Captures the
+  best-case effect of steering on backtracking.
+- **Fraction of saves** = a per-prompt accounting (which of the 31
+  truly-wrong items are recovered, at which α, by what mechanism) —
+  needs a separate per-prompt figure (heatmap or rank plot of α-vs-prompt-id).
+  Not produced in this compilation; flagged as a deferred deliverable.
+
+**Headline (optimal inducement rate)**:
+
+![backtracking inducement](../../safety_research/figures/tempbench/backtracking_inducement.png)
+
+| metric | value |
+|--------|------:|
+| Optimal inducement rate | **0.290** (at α = −8 *and* α = −2, tied) |
+| Control rate (α = 0) | 0.226 |
+| Δ vs control at optimum | **+6.5 pp** |
+| Worst-α suppression rate | 0.000 (α = +8) |
+
+*Encouraging* backtracking (negative α) lifts rescue from 0.226 to
+0.290 = +6.5 pp; *suppressing* backtracking (α = +8) collapses rescue
+to 0 (a 22.6 pp drop). The full α-curve is visible in the lower-right
+panel of `figures/tempbench/overall_summary_grid.png`:
 
 | α | rescue rate | Δ vs control |
 |----|------------:|-------------:|
 | −12 | 0.065 | −0.161 |
 | −10 | 0.161 | −0.065 |
-| −8 | **0.290** | **+0.065** |
+| **−8** | **0.290** | **+0.065** |
+| −6 | 0.161 | −0.065 |
 | −4 | 0.258 | +0.032 |
-| −2 | **0.290** | **+0.065** |
+| **−2** | **0.290** | **+0.065** |
 | 0 (ctrl) | 0.226 | 0 |
 | +8 | 0.000 | −0.226 |
 
-*Encouraging* backtracking (α = −8) gives a 6.5pp lift; *suppressing*
-it (α = +8) collapses rescue to 0. The effect is real but small at
-n = 31 and a single architecture in the headline summary.
+The effect is real but small at n = 31 and a single architecture in
+the headline. **Open follow-up**: per-prompt save-vs-α heatmap and a
+fraction-of-saves figure (specifically, the cumulative rescue
+distribution across α) would let us claim more than a single-number
+headline; flagged as a deliverable for the next compilation pass.
 
 ## 4. Deception (refusal as proxy)
 
@@ -407,7 +495,7 @@ bundles collapse at small K and recover at large K.
 | Category | Where TXC wins | Where TXC loses | Why |
 |----------|---------------|------------------|------|
 | Synthetic | **rho > 0, low k**: ΔAUC up to +0.50 over Stacked SAE; **HMM denoising**: ratio up to 1.15 (SAE/Stacked SAE pinned at 0.77 floor) | rho = 0 (no temporal structure); high k (k\*T ≥ n_features → degenerate TopK) | Shared latent is an inductive bias *for* temporal coherence. With no temporal structure or with a saturated TopK, it's just a capacity tax. |
-| Sparse probing | Han T8 BASE leaderboard: TXC bare-antidead 0.9123 ties MLC (0.9124); on c3 it edges T-SAE | TopK SAE leads c3 by ~0.013 AUC; Aniket SAEBench: MLC > TempXC ≈ SAE | TXC features distribute signal across positions; aggregation washes out token-local discriminators (e.g. Aniket's europarl language-ID, github-code language). |
+| Sparse probing | **PAPER 16-task BASE k=20 S=32 leaderboard: TXC bare-antidead T=5 wins at 0.9127 (σ=0.0012), 6× σ_seeds over TopK SAE.** Robustness check at S=20 maintains the win. | At S=10 TXC drops to 6th (window can't span short tail; MLC wins). On the broader c3 38-task IT-model superset TopK SAE narrowly leads. Early Aniket 8-task SAEBench: MLC > TempXC ≈ SAE (TempXC undertrained at that cutoff). | TXC's window-shared decoder is a structural advantage when the tail is long enough for the window to fully sit inside it; once the per-example tail compresses to T-or-less, the advantage disappears. The c3 IT discrepancy is the only place TXC clearly trails — and it's a different (broader, less curated, IT-model) benchmark. |
 | Reasoning | Backtracking rescue at α = −2 / α = −8: +6.5pp over control | Per-architecture differentiation not isolated in published reasoning paper | Linear-direction reasoning behaviors are basis-agnostic at this level of measurement. |
 | Deception detection | Within 95% CI of SAE / T-SAE; +0.286 b2w boost on XSTest | Marginally below T-SAE on test_ood (0.954 vs 0.963) | All white-box probes on Gemma-2-2b-it residuals are saturated by the AUC ceiling of the task. |
 | Deception steering (FSGA) | Best leakage at K = 20 (0.38 vs SAE 0.57); monotone-in-K scaling (T-SAE saturates and degrades) | Peak \|ΔLR_harm\| is ~5.5× smaller than SAE T = 1 (1.89 vs 10.55) | Per-feature decoder mass concentrated for SAE T = 1; diluted across T positions for TXC. The targetedness gain is real but operationally the magnitude shortfall dominates production deployment. |

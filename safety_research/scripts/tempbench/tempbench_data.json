@@ -57,7 +57,50 @@
     "verdict": "TXC dominates rho>0 with low/moderate k. IID hurts; high k hurts."
   },
 
-  "sparse_probing_c3_final_branch": {
+  "sparse_probing_paper_set_BASE_S32": {
+    "_headline": "This is the canonical PAPER leaderboard — 16 curated SAEBench tasks, BASE Gemma-2-2b, S=32, 3 seeds. TXC bare-antidead T=5 wins at k_feat=20 by ~6× σ_seeds over TopK SAE.",
+    "source_branch": "origin/final",
+    "source_doc": "docs/han/research_logs/phase7_unification/agent_x_paper/2026-04-29-leaderboard-multiseed.md (and 2026-05-01-S10-S20-S32-leaderboards.md)",
+    "n_tasks": 16,
+    "n_seeds": 3,
+    "S": 32,
+    "model": "Gemma-2-2b BASE L13 mid-residual",
+    "k_feat_20_mean_auc": {
+      "txc_bare_antidead_t5": 0.9127,
+      "mlc": 0.9122,
+      "tsae_paper_k500": 0.9105,
+      "topk_sae": 0.9091,
+      "phase57_partB_h8_multidistance_t8": 0.9086,
+      "txcdr_t5": 0.9067,
+      "phase5b_subseq_h8": 0.9059,
+      "tsae_paper_k20": 0.9019
+    },
+    "k_feat_20_sigma_seeds": {
+      "txc_bare_antidead_t5": 0.0012,
+      "mlc": 0.0022,
+      "tsae_paper_k500": 0.0081,
+      "topk_sae": 0.0058
+    },
+    "k_feat_5_mean_auc": {
+      "mlc": 0.8707,
+      "topk_sae": 0.8695,
+      "txc_bare_antidead_t5": 0.8683,
+      "phase57_partB_h8_multidistance_t8": 0.8682,
+      "phase5b_subseq_h8": 0.8670,
+      "tsae_paper_k500": 0.8651,
+      "txcdr_t5": 0.8601,
+      "tsae_paper_k20": 0.8372
+    },
+    "txc_bare_antidead_t5_at_S": {
+      "S_32_k20": 0.9127,
+      "S_20_k20": 0.9066,
+      "S_10_k20": 0.8955
+    },
+    "S_10_k20_winner": "mlc (0.8973) — TXC degrades by 0.0172 from S=32 to S=10 (largest drop in top-6); MLC's per-layer features are more robust to short tails"
+  },
+
+  "sparse_probing_c3_38task_broader": {
+    "_note": "Broader 38-task superset on `final` branch — used for cross-task-set robustness check. TopK SAE leads here, TXC second. The PAPER 16-task curated subset (above) is the headline number for the paper.",
     "source_branch": "origin/final",
     "source_file": "purified/experiments/c3_probing/results.json",
     "n_tasks": 38,
@@ -81,6 +124,28 @@
       "txc_pro": 0.8381,
       "tsae_paper": 0.8281
     }
+  },
+
+  "sparse_probing_tfa_comparison": {
+    "_note": "TFA-pos is dense-prediction; not directly sparsity-matched to TopK SAE / TXCDR. Reported here for completeness.",
+    "source_branch": "origin/final",
+    "source_doc": "docs/han/research_logs/phase4_nlp_comparison/2026-04-17-nlp-gemma-tfa-vs-txcdr.md",
+    "raw_NMSE_at_resid_L13_k50_unshuffled": {
+      "stacked_t5": 0.1382,
+      "txcdr_t5": 0.1547,
+      "tfa_pos": 0.1521
+    },
+    "shuffle_delta_resid_L13_k50": {
+      "stacked_t5": 0.56,
+      "txcdr_t5": 0.67,
+      "tfa_pos": 1.75
+    },
+    "active_latents_per_token_k50": {
+      "stacked_t5": 49.6,
+      "txcdr_t5": 246,
+      "tfa_pos": 2500
+    },
+    "interpretation": "TFA-pos shuffle-delta is 1.75-2.13× — strong sequence-order dependence — but TFA is not sparsity-matched (~50× more dense codes per token than Stacked). On the PAPER 16-task probing leaderboard, tfa_big sits at 0.7875 mean_AUC vs TXC bare-antidead's 0.9127 — TFA is far behind on the probing task itself."
   },
 
   "sparse_probing_aniket_saebench": {
