@@ -27,18 +27,14 @@ ARCH_DIR = Path(__file__).resolve().parents[1] / "src" / "temp_bench" / "archite
 
 # Archs that are registered in YAML but whose class file is not yet
 # ported from the wasteland. Each port deletes one entry from this set.
-# Adding an entry here without porting is a contract violation: the test
-# will accept the missing class temporarily, but a code reviewer should
-# challenge "why is this allowlisted?"
+# Adding an entry here without porting is a contract violation: the
+# test will accept the missing class temporarily, but a code reviewer
+# should challenge "why is this allowlisted?"
 #
-# Empty target: when the last port lands, drop this set and the test
-# becomes strictly "every yaml entry must have a class".
-KNOWN_UNPORTED = {
-    "stacked_sae",
-    "tfa",
-    "tfa_pos",
-    "mlc",
-}
+# Empty as of 2026-05-04 — all 9 yaml entries have an importable class.
+# Kept as a non-empty placeholder shape so future YAML additions have a
+# documented place to flag pre-port windows.
+KNOWN_UNPORTED: set[str] = set()
 
 
 def test_every_yaml_arch_has_importable_class():
