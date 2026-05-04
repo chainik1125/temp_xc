@@ -144,6 +144,18 @@ def my_train_fn(
     # ``.contiguous()`` in tsae.py to fix it for every component.
     sd = {k: v.contiguous() if not v.is_contiguous() else v
           for k, v in result["state_dict"].items()}
+    # Persist train log to logs/c5_b1024_<arch>_seed<seed>_trainlog.json
+    # for post-cell convergence-check (decisions.md § 12 line 64-65: if
+    # final-1K-step loss drop > 5%, surface for cap bump). The runner's
+    # save_checkpoint doesn't carry the log; we save it ourselves.
+    try:
+        import json as _json
+        log_path = Path("logs") / f"c5_b1024_{arch_name}_seed{seed}_trainlog.json"
+        log_path.parent.mkdir(parents=True, exist_ok=True)
+        log_path.write_text(_json.dumps(result.get("log", {})))
+        log.info("[trainlog] saved %s", log_path)
+    except Exception as exc:                                  # noqa: BLE001
+        log.warning("[trainlog] persist failed: %s", exc)
     return sd
 
 
