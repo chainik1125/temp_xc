@@ -37,6 +37,104 @@ Add a bullet to "Open questions for Han" in your own briefing,
 surface it in chat, and let Han or agent_paper land the change. Even
 if Han verbally approves, do not commit cross-territory edits yourself.
 
+### Han decisions 2026-05-04 PM ⚠️ URGENT — 25K→20K + preloaded batch_iter
+
+Two directives, both effective immediately:
+
+**(1) Override `n_steps` 25_000 → 20_000 in your C5 runner.** The Gemma-
+family components (C3, C4, C5) now standardize on `20_000` steps ×
+`batch=1024` = 20.5M tokens / cell. Aligns C5 with C3+C4 on the Gemma
+training-depth axis (C6 stays at 25K × Qwen, C7 at 20K × Llama — see
+`docs/paper/methodology.md` per-component table). The marginal value of
+the extra 5K steps is small for the C5 "matches T-SAE at high coh"
+hypothesis; the wall-clock saved frees A40 cycles for agent_back.
+
+⚠️ **Within-component fairness — KILL in-flight 25K cells immediately.**
+Your three b1024 cells (tsae_paper / txc_base / txc_pro × seed 42, PIDs
+38976/38977/38978 from the prior session) were launched at 25K. They
+cannot stay in C5's headline result alongside seeds 1+2 trained at 20K
+— that's exactly the within-component config drift we built decisions.md
+§ 12 to prevent. Steps:
+
+```bash
+kill $(cat /tmp/p_tsae42 /tmp/p_tb42 /tmp/p_tp42)
+ps -p $(cat /tmp/p_tsae42 /tmp/p_tb42 /tmp/p_tp42) 2>/dev/null  # confirm dead
+```
+
+Then update `experiments/c5_steering/run.py::_real_training_cfg`:
+
+```python
+def _real_training_cfg() -> TrainingConfig:
+    # n_steps overridden 25_000 → 20_000 per Han 2026-05-04 PM URGENT.
+    # Aligns C3 + C4 + C5 on the Gemma 20.5M-token-per-cell axis.
+    return TrainingConfig(n_steps=20_000)
+```
+
+Restart all 9 cells (3 archs × 3 seeds) at 20K. The 30-90 minutes of
+in-flight GPU work being thrown away is small vs the cost of a
+within-C5 breach in the paper.
+
+**(2) Swap to `preloaded_batch_iter_from_act_cache`.** agent_nlp landed
+the helper at `temp_bench.data.nlp.cache.preloaded_batch_iter_from_act_cache`
+(commit `e12dc719`). It's a bit-identical drop-in for `batch_iter_from_act_cache`
+that pre-materializes the activation cache into a CPU torch tensor via
+`.clone()`, sidestepping the mmap page-fault overhead (~1.4× end-to-end
+trainer speedup; ~3.4× on the data path). Determinism guarantee:
+checkpoints are bit-identical for the same `(act_cache_key, seed)` pair —
+**train_keys unchanged, no fairness implication**, adopt mid-sweep is
+fine.
+
+In `experiments/c5_steering/run.py`:
+
+```python
+# Before
+from temp_bench.data.nlp import batch_iter_from_act_cache
+...
+raw_iter = batch_iter_from_act_cache(act_cache_key, seed=seed)
+
+# After
+from temp_bench.data.nlp.cache import preloaded_batch_iter_from_act_cache
+...
+raw_iter = preloaded_batch_iter_from_act_cache(act_cache_key, seed=seed)
+```
+
+**RAM cost on A40 pod**: ~14 GB CPU per process for the Gemma cache
+(module-global per `act_cache_key`, so multiple cells in the same
+process share). agent_back uses ~4.24 GB for their Llama cache on
+parallel processes; A40 pod has ~64 GB system RAM total — your ~14 GB
++ their ~17 GB (4 procs × 4.24) = ~31 GB. Plenty of headroom.
+
+**(3) GPU pinning re-allocation — you get GPUs 1 and 3.** New A40 pod
+split (Han 2026-05-04 PM): agent_back gets GPUs 0 and 2; you get GPUs
+**1 and 3**. Each agent has two dedicated GPUs — no more "borrow agent
+peer's spare" pattern, no GPU 0 for you.
+
+When you relaunch the 9-cell sweep at 20K, distribute across GPUs 1
+and 3 only:
+
+```bash
+# 3 archs × 3 seeds = 9 cells across 2 GPUs → 4-5 cells per GPU sequentially
+CUDA_VISIBLE_DEVICES=1 TQDM_DISABLE=1 AGENT_NAME=agent_steer \
+  PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True \
+  .venv/bin/python -m experiments.c5_steering.run \
+  --archs tsae_paper txc_base --seeds 42 1 2 \
+  > logs/c5_b1024_n20k_gpu1.log 2>&1 &
+
+CUDA_VISIBLE_DEVICES=3 TQDM_DISABLE=1 AGENT_NAME=agent_steer \
+  PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True \
+  .venv/bin/python -m experiments.c5_steering.run \
+  --archs txc_pro --seeds 42 1 2 \
+  > logs/c5_b1024_n20k_gpu3.log 2>&1 &
+```
+
+(Adjust the arch-to-GPU split to balance wall-time — tsae_paper is fast,
+txc_pro is slow.) Use `bash scripts/run_on_gpu.sh <idx> -- <cmd>` if you
+prefer the wrapper. **Do not touch GPUs 0 or 2** — those are agent_back's.
+
+Order of operations: do (1) first (kill + commit the 20K override),
+then (2) at relaunch (swap the import in the same edit window before
+launching the 9-cell sweep), pinned to GPUs 1+3 per (3).
+
 ### Han decisions 2026-05-04 PM (CRITICAL — TrainingConfig re-issued per Phase 5)
 
 A "batch=256 → 1024 (A40 components)" cross-agent directive was issued

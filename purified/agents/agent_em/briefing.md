@@ -38,6 +38,86 @@ Add a bullet to "Open questions for Han" in your own briefing,
 surface it in chat, and let Han or agent_paper land the change. Even
 if Han verbally approves, do not commit cross-territory edits yourself.
 
+### Han decisions 2026-05-04 PM (preloaded batch_iter — apply .clone() locally)
+
+agent_nlp profiled the data path and found the trainer was bottlenecked
+on numpy fancy indexing over an mmap'd `.npy` (~150K page-table walks
+per step at batch=1024). They landed a shared opt-in helper at
+`temp_bench.data.nlp.cache.preloaded_batch_iter_from_act_cache` (commit
+`e12dc719`) that pre-materializes the cache into a CPU torch tensor via
+`.clone()`. Empirical: ~1.4× end-to-end trainer speedup; ~3.4× on the
+data path. **You can benefit, but it's not a drop-in.**
+
+**Why it's not a drop-in for C6**: your `_build_batch_iter` in
+`experiments/c6_em/train.py:46-79` samples T-token sliding windows
+(`arr[seq_idx[i], pos_idx[i]:pos_idx[i] + T]`), while agent_nlp's
+shared helper returns whole sequences `(batch, seq_len, d_in)`. Same
+mmap bottleneck, different access pattern.
+
+**Apply the `.clone()` pattern locally** in your existing `_build_batch_iter`.
+Sketch:
+
+```python
+# At module scope in experiments/c6_em/train.py:
+_PRELOADED_C6_ACTS: dict[str, torch.Tensor] = {}
+
+def _build_batch_iter(act_cache_key: str, *, T: int = 5, seed: int = 42):
+    from temp_bench.config import act_cache_dir as _acd
+    cache_dir = _acd(act_cache_key)
+    specs = json.loads((cache_dir / "layer_specs.json").read_text())
+    hp_key = specs["key"]
+    cache_path = str(cache_dir / f"{hp_key}.npy")
+
+    # Preload once per (process, cache_path); subsequent cells share.
+    if cache_path not in _PRELOADED_C6_ACTS:
+        mmapped = np.load(cache_path, mmap_mode="r")
+        # .clone() is load-bearing — without it, torch.from_numpy
+        # zero-copy wraps the mmap and page-faults persist.
+        _PRELOADED_C6_ACTS[cache_path] = (
+            torch.from_numpy(np.ascontiguousarray(mmapped)).clone()
+        )
+    acts = _PRELOADED_C6_ACTS[cache_path]
+    N, L, d = acts.shape
+    if L < T:
+        raise RuntimeError(f"Cache seq_len={L} < T={T}")
+    rng = np.random.default_rng(seed)
+
+    def batch_iter(n: int) -> torch.Tensor:
+        seq_idx = rng.integers(0, N, size=n)
+        pos_idx = rng.integers(0, L - T + 1, size=n)
+        out = torch.empty((n, T, d), dtype=torch.float32)
+        for i in range(n):
+            out[i] = acts[seq_idx[i], pos_idx[i]:pos_idx[i] + T].to(torch.float32)
+        return out
+
+    return batch_iter
+```
+
+The for-loop stays but now operates on a torch tensor in RAM (not an
+mmap), so each iteration is RAM-rate instead of page-fault-rate.
+
+**Determinism**: same `np.random.default_rng(seed)` for indices, same
+fp32 contract — `train_keys` are unchanged, checkpoints are bit-identical.
+**No fairness implication; adopt mid-sweep is safe** (the .clone() path
+and the mmap path produce the same checkpoint bytes for the same
+`(act_cache_key, seed)` pair; cells from either path coexist cleanly in
+the leaderboard).
+
+**RAM cost on H100 pod**: one `acts.npy.size`-bytes copy per process per
+distinct cache. Qwen-14B finance cache is ~31 GB at typical 24K-seq
+configurations; 7B-medical is ~22 GB. With both organisms loaded by one
+process, ~53 GB. With your two H100 GPUs each running their own process
+(both organisms each), worst case ~106 GB. H100 pod system RAM is
+typically 150-200 GB — **safe with margin**, but verify via
+`free -g` before launching the second process if you ever run all four
+(2 organisms × 2 processes) concurrently.
+
+If the .clone() pattern fits cleanly into a single shared helper for
+C6 (e.g., a `preloaded_qwen_em_batch_iter` in
+`temp_bench.data.nlp.qwen_em` with the T-window slicing built in),
+that's worth landing as a follow-up, but apply it locally first to
+unblock your remaining cells.
+
 ### Han decisions 2026-05-04 PM (CRITICAL — TrainingConfig re-issued per Phase 5)
 
 A "batch=256 → 2048" cross-agent directive was issued earlier today

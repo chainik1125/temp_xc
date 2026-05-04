@@ -37,6 +37,113 @@ Add a bullet to "Open questions for Han" in your own briefing,
 surface it in chat, and let Han or agent_paper land the change. Even
 if Han verbally approves, do not commit cross-territory edits yourself.
 
+### Han decisions 2026-05-04 PM (GPU re-allocation + preloaded batch_iter)
+
+Two directives, effective on your next launch:
+
+**(1) GPU pinning re-allocation — you get GPUs 0 and 2.** New A40 pod
+split (Han 2026-05-04 PM): you get GPUs **0 and 2**; agent_steer gets
+GPUs 1 and 3. Two dedicated GPUs each, no more borrow patterns. **Do
+not touch GPUs 1 or 3** — those are agent_steer's.
+
+Your in-flight v3 sweep launched 12:49 used all 4 GPUs (PIDs
+39420-39423 on GPU 0/1/2/3 from the prior session). PIDs on GPUs 1+3
+must be killed when this directive lands; their cells finish on GPUs
+0+2 only. Sequence:
+
+```bash
+# Identify which PIDs are on GPUs 1 and 3 (your prior sweep launched
+# the second proc on GPU 1, fourth on GPU 3 — verify before killing):
+nvidia-smi --query-compute-apps=pid,gpu_uuid --format=csv
+# Kill the GPU-1 and GPU-3 processes only; let GPU-0 and GPU-2
+# processes finish their current cells.
+```
+
+After current GPU-0 and GPU-2 cells finish, redistribute remaining
+work across just those two GPUs:
+
+```bash
+# 7 archs × 1 seed (per Han's 4c2a400d "20K + seed=42 only" override) =
+# 7 cells, run sequentially across 2 GPUs (3-4 per GPU).
+CUDA_VISIBLE_DEVICES=0 TQDM_DISABLE=1 AGENT_NAME=agent_back \
+  PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True \
+  .venv/bin/python -m experiments.c7_backtracking.run \
+  --archs txc_pro mlc tsae_paper --seeds 42 \
+  > logs/c7_v4_gpu0.log 2>&1 &
+
+CUDA_VISIBLE_DEVICES=2 TQDM_DISABLE=1 AGENT_NAME=agent_back \
+  PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True \
+  .venv/bin/python -m experiments.c7_backtracking.run \
+  --archs txc_base stacked_sae tfa topk_sae --seeds 42 \
+  > logs/c7_v4_gpu2.log 2>&1 &
+```
+
+(Adjust the arch-to-GPU split to balance wall-time — txc_pro / mlc are
+slow so put the lighter archs on the same GPU together.) The 20K cap
+× 1 seed budget keeps total cells light enough for 2-GPU completion
+within wall budget.
+
+**(2) Adopt the preloaded batch_iter pattern.** agent_nlp landed
+`temp_bench.data.nlp.cache.preloaded_batch_iter_from_act_cache` (commit
+`e12dc719`) — a `.clone()`-based pre-materialization that gives ~1.4×
+end-to-end trainer speedup (~3.4× on the data path). **It's not a
+drop-in for C7** because your `_build_batch_iter` in
+`experiments/c7_backtracking/run.py:100-132` samples T-token sliding
+windows from `(N, L, d)` while the helper returns whole sequences.
+Apply the `.clone()` pattern locally to your existing function:
+
+```python
+# At module scope in experiments/c7_backtracking/run.py:
+_PRELOADED_C7_ACTS: dict[str, torch.Tensor] = {}
+
+def _build_batch_iter(act_cache_key: str, *, batch_size: int = 256,
+                      T: int = 5, seed: int = 42):
+    from temp_bench.config import act_cache_dir, load_datasource, compute_act_cache_key
+    ds = load_datasource(DATASOURCE)
+    expected_key = compute_act_cache_key(ds)
+    if expected_key != act_cache_key:
+        raise RuntimeError(...)
+    cache_dir = act_cache_dir(act_cache_key)
+    cache_path = str(cache_dir / "resid_post_L10.npy")
+
+    # Preload once per (process, cache_path); subsequent cells share.
+    if cache_path not in _PRELOADED_C7_ACTS:
+        mmapped = np.load(cache_path, mmap_mode="r")
+        # .clone() is load-bearing — without it, torch.from_numpy
+        # zero-copy wraps the mmap and page-faults persist.
+        _PRELOADED_C7_ACTS[cache_path] = (
+            torch.from_numpy(np.ascontiguousarray(mmapped)).clone()
+        )
+    acts = _PRELOADED_C7_ACTS[cache_path]
+    N, L, d = acts.shape
+    if L < T:
+        raise RuntimeError(f"seq_len {L} < arch T={T}")
+    rng = np.random.default_rng(seed)
+
+    def batch_iter(n: int) -> torch.Tensor:
+        seq_idx = rng.integers(0, N, size=n)
+        pos_idx = rng.integers(0, L - T + 1, size=n)
+        out = torch.empty((n, T, d), dtype=torch.float32)
+        for i in range(n):
+            out[i] = acts[seq_idx[i], pos_idx[i]:pos_idx[i] + T].to(torch.float32)
+        return out
+
+    return batch_iter
+```
+
+**Determinism**: same `np.random.default_rng(seed)`, same fp32 contract
+— `train_keys` unchanged, checkpoints bit-identical to the mmap path.
+**No fairness implication; adopt mid-sweep is safe** — cells from the
+.clone() path and the mmap path are interchangeable in the leaderboard
+for the same `(act_cache_key, seed)`.
+
+**RAM cost on A40 pod**: ~4.24 GB per process for the Llama BASE L10
+cache (you noted the shape `(4044, 128, 4096)` fp16 in your briefing).
+2 GPUs × 1 process each = ~8.5 GB total; agent_steer's ~14 GB Gemma
+cache on the same pod (via 2 of their own processes) brings the pod
+total to ~22-37 GB. A40 pod has ~64 GB system RAM — comfortable
+headroom.
+
 ### Han decisions 2026-05-04 PM (CRITICAL — TrainingConfig re-issued per Phase 5)
 
 A "batch=256 → 1024 (A40 components)" cross-agent directive was issued
