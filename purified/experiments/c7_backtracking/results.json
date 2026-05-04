@@ -1,0 +1,19 @@
+{
+  "delta_gc": {
+    "topk_sae": {
+      "peak": 0.36065573770491804,
+      "peak_magnitude": 16.0,
+      "stability": "15/24"
+    }
+  },
+  "missing_archs": [
+    "mlc",
+    "stacked_sae",
+    "tfa",
+    "tsae_paper",
+    "txc_base",
+    "txc_pro"
+  ],
+  "n_judge_calls": 1525,
+  "n_leaderboard_cells": 2
+}
