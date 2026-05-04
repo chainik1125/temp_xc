@@ -36,11 +36,18 @@ from statistics import mean, stdev
 import matplotlib.pyplot as plt
 
 from temp_bench.plotting import save_figure
-from temp_bench.report import AnalysisResult, query_leaderboard
+from temp_bench.report import AnalysisResult, canonical_train_keys, query_leaderboard
 
 COMPONENT = "c3"
 EXP_DIR = Path(__file__).parent
 PLOT_DIR = EXP_DIR / "plots"
+
+# The canonical sweep we filter the leaderboard against. ``canonical_train_keys``
+# uses ``TrainingConfig()`` defaults (currently batch=1024, n_steps=25K per
+# decisions.md § 12) so this auto-tracks any future paper-wide schema bump.
+DATASOURCE_NAME = "gemma_2_2b_it_l13_fineweb_24k128"
+HEADLINE_ARCHS = ("topk_sae", "tsae_paper", "txc_base", "txc_pro")
+HEADLINE_SEEDS = (1, 2, 42)
 
 
 def _placeholder_markdown(reason: str) -> str:
@@ -55,52 +62,26 @@ HEADLINE_EVAL_PROTOCOL_VERSION = "1.1.0"   # Phase 7 padding fix; old 1.0.0
                                             # rows are kept on disk for
                                             # comparison but excluded from
                                             # the headline aggregate.
-HEADLINE_BATCH_SIZE = 1024                  # decisions.md § 12 (commit 06681098):
-                                            # Phase-5-faithful uniform schedule.
-                                            # Old batch=256 rows (v1.0.0 + v1.1.0)
-                                            # stay on disk for diff comparison.
-
-
-def _headline_train_keys() -> set[str]:
-    """Return train_keys whose checkpoint was trained at the headline
-    batch_size. Cross-references ``checkpoints/manifest.jsonl`` since
-    ``LeaderboardRow`` only carries ``train_key`` (not training_cfg).
-    """
-    import json
-    from temp_bench.cache import manifest_path
-    keys: set[str] = set()
-    p = manifest_path()
-    if not p.exists():
-        return keys
-    with open(p) as fh:
-        for line in fh:
-            line = line.strip()
-            if not line:
-                continue
-            try:
-                d = json.loads(line)
-            except json.JSONDecodeError:
-                continue
-            if int(d.get("training_cfg", {}).get("batch_size", 0)) == HEADLINE_BATCH_SIZE:
-                tk = d.get("train_key")
-                if tk:
-                    keys.add(tk)
-    return keys
 
 
 def run_analysis() -> AnalysisResult:
     rows = query_leaderboard(component=COMPONENT)
-    # Filter out smoke rows + non-headline protocol versions + non-headline
-    # batch sizes. Old 1.0.0 rows used right-padded tail-S which corrupts
-    # winogrande/wsc; v1.1.0 is the eval-pathway headline (Phase 7 padding
-    # fix). batch=256 rows were undertrained vs Phase 5 reference; batch=1024
-    # is the training headline (decisions.md § 12).
-    headline_train_keys = _headline_train_keys()
+    # Filter out smoke rows + non-headline protocol versions + non-canonical
+    # training_cfg via canonical_train_keys (decisions.md § 12). Old 1.0.0
+    # rows used right-padded tail-S (corrupts winogrande/wsc); v1.1.0 is the
+    # eval-pathway headline (Phase 7 padding fix). Old batch=256 rows were
+    # undertrained vs Phase 5 reference; batch=1024 is the training headline.
+    valid_keys = canonical_train_keys(
+        component=COMPONENT,
+        archs=HEADLINE_ARCHS,
+        seeds=HEADLINE_SEEDS,
+        datasource_names=(DATASOURCE_NAME,),
+    )
     real_rows = [
         r for r in rows
         if not r.eval_cfg.get("smoke", False)
         and r.eval_protocol_version == HEADLINE_EVAL_PROTOCOL_VERSION
-        and r.train_key in headline_train_keys
+        and r.train_key in valid_keys
     ]
 
     if not real_rows:

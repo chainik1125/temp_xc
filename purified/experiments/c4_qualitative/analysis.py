@@ -34,43 +34,22 @@ import matplotlib.pyplot as plt
 
 from temp_bench.eval.qualitative import pareto_frontier
 from temp_bench.plotting import save_figure
-from temp_bench.report import AnalysisResult, query_leaderboard
+from temp_bench.report import AnalysisResult, canonical_train_keys, query_leaderboard
 
 COMPONENT = "c4"
 EXP_DIR = Path(__file__).parent
 PLOT_DIR = EXP_DIR / "plots"
 
-HEADLINE_BATCH_SIZE = 1024   # decisions.md § 12 (commit 06681098):
-                             # Phase-5-faithful uniform schedule. Old
-                             # batch=256 rows stay on disk for diff
-                             # comparison but are excluded from headline.
-
-
-def _headline_train_keys() -> set[str]:
-    """Return train_keys whose checkpoint was trained at the headline
-    batch_size. Cross-references ``checkpoints/manifest.jsonl`` since
-    ``LeaderboardRow`` only carries ``train_key`` (not training_cfg).
-    """
-    import json
-    from temp_bench.cache import manifest_path
-    keys: set[str] = set()
-    p = manifest_path()
-    if not p.exists():
-        return keys
-    with open(p) as fh:
-        for line in fh:
-            line = line.strip()
-            if not line:
-                continue
-            try:
-                d = json.loads(line)
-            except json.JSONDecodeError:
-                continue
-            if int(d.get("training_cfg", {}).get("batch_size", 0)) == HEADLINE_BATCH_SIZE:
-                tk = d.get("train_key")
-                if tk:
-                    keys.add(tk)
-    return keys
+# Canonical-sweep filter (decisions.md § 12 — Phase-5-faithful uniform
+# schedule). canonical_train_keys uses TrainingConfig() defaults so this
+# auto-tracks any future paper-wide schema bump.
+DATASOURCE_NAME = "gemma_2_2b_it_l13_fineweb_24k128"   # SHARED with C3
+HEADLINE_ARCHS = ("tsae_paper", "txc_base", "txc_pro")
+HEADLINE_SEEDS = (1, 2, 42)
+# The C3 join uses the same datasource + seed grid; archs are C3's
+# (canonical_train_keys silently drops archs not registered for the
+# component, so we can pass a superset).
+C3_HEADLINE_ARCHS = ("topk_sae", "tsae_paper", "txc_base", "txc_pro")
 
 
 def _placeholder_markdown(reason: str) -> str:
@@ -89,11 +68,16 @@ def _build_c3_mean_auc_lookup() -> dict[tuple[str, int, int], float]:
     "mean-pool probing AUC" — the C3 headline for less-sparse regime).
     """
     out: dict[tuple[str, int, int], float] = {}
-    headline_train_keys = _headline_train_keys()
+    c3_valid_keys = canonical_train_keys(
+        component="c3",
+        archs=C3_HEADLINE_ARCHS,
+        seeds=HEADLINE_SEEDS,
+        datasource_names=(DATASOURCE_NAME,),
+    )
     for r in query_leaderboard(component="c3"):
         if r.eval_cfg.get("smoke", False):
             continue
-        if r.train_key not in headline_train_keys:
+        if r.train_key not in c3_valid_keys:
             continue
         if "mean_auc" not in r.metrics:
             continue
@@ -106,12 +90,17 @@ def _build_c3_mean_auc_lookup() -> dict[tuple[str, int, int], float]:
 
 def run_analysis() -> AnalysisResult:
     rows = query_leaderboard(component=COMPONENT)
-    headline_train_keys = _headline_train_keys()
+    valid_keys = canonical_train_keys(
+        component=COMPONENT,
+        archs=HEADLINE_ARCHS,
+        seeds=HEADLINE_SEEDS,
+        datasource_names=(DATASOURCE_NAME,),
+    )
     real_rows = [
         r for r in rows
         if not r.eval_cfg.get("smoke", False)
         and int(r.eval_cfg.get("n_features", 256)) >= 256
-        and r.train_key in headline_train_keys
+        and r.train_key in valid_keys
     ]
 
     if not real_rows:
