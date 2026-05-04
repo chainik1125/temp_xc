@@ -76,33 +76,27 @@ EVAL_PROTOCOL_VERSION = "2.0.0"
 # ── Per-arch training-config recipes ───────────────────────────────
 
 
-def make_training_cfg(arch_name: str, *, n_steps: int = 30_000) -> TrainingConfig:
+def make_training_cfg(arch_name: str) -> TrainingConfig:
     """Return the training cfg for one C6 cell.
 
-    - SAE-arditi: vanilla MSE, no Bricken, no AuxK (the locked recipe).
-    - TXC-base + brickenauxk_a8: Bricken on, AuxK α=1/8,
-      dead_threshold=128k tokens.
+    Default-constructs ``TrainingConfig()`` and only overrides C6's
+    published per-component knobs (the brickenauxk_a8 recipe for
+    txc_base, per `decisions.md` § 7). Per `decisions.md` § 12
+    (2026-05-04 PM), `batch_size`, `n_steps`, and `plateau_*` are
+    fixed at the schema defaults (1024 / 25_000 / off) for every arch
+    in every component — re-running with hand-tuned values would be
+    a fairness confounder vs. C3/C4/C5/C7.
+
+    - sae_arditi: vanilla MSE, no Bricken, no AuxK (schema defaults).
+    - txc_base: Bricken on + AuxK α=1/8 + dead_threshold=128k tokens
+      (the brickenauxk_a8 recipe from
+      `origin/em-nanda:summary_brickenauxk_a8_frontier.md`).
     """
-    common = dict(
-        n_steps=n_steps, batch_size=256, learning_rate=3e-4,
-        optimizer="adam", warmup_steps=1_000,
-        plateau_early_stop=False,  # train to completion regardless
-        precision="bf16",
-    )
     if arch_name == "sae_arditi":
-        return TrainingConfig(**common,
-                              bricken_enabled=False,
-                              ema_auxk_alpha=0.0,             # unused
-                              dead_threshold_tokens=10_000_000)  # unused
+        return TrainingConfig()
     if arch_name == "txc_base":
-        # brickenauxk_a8 from origin/em-nanda:summary_brickenauxk_a8_frontier.md
         return TrainingConfig(
-            **common,
             bricken_enabled=True,
-            bricken_resample_every=500,
-            bricken_min_fires=1,
-            bricken_n_check=2048,
-            bricken_max_resample_fraction=0.5,
             ema_auxk_alpha=1.0 / 8.0,
             dead_threshold_tokens=128_000,
         )
@@ -204,13 +198,13 @@ def ensure_activation_cache(datasource_name: str):
     cache_activations(datasource_name)
 
 
-def run_one_cell(arch_name: str, *, seed: int, n_steps: int,
+def run_one_cell(arch_name: str, *, seed: int,
                  datasource_name: str,
                  force_train: bool = False, force_eval: bool = False,
                  skip_eval: bool = False):
     from experiments.c6_em.train import my_train_fn
 
-    training_cfg = make_training_cfg(arch_name, n_steps=n_steps)
+    training_cfg = make_training_cfg(arch_name)
     eval_cfg = {
         # Wang full keys (defaults pinned in WangFull dataclass; this dict
         # is just shape-of-eval used to compute the eval_key. Bumping
@@ -225,8 +219,8 @@ def run_one_cell(arch_name: str, *, seed: int, n_steps: int,
         "arch_T": 5 if arch_name == "txc_base" else 1,
     }
 
-    log.info("[c6.run] CELL: arch=%s seed=%d n_steps=%d ds=%s",
-             arch_name, seed, n_steps, datasource_name)
+    log.info("[c6.run] CELL: arch=%s seed=%d ds=%s",
+             arch_name, seed, datasource_name)
     log.info("[c6.run] training_cfg=%s", training_cfg.model_dump())
 
     if skip_eval:
@@ -255,24 +249,24 @@ def main(argv=None):
     p.add_argument("--seed", type=int, default=42)
     p.add_argument("--datasource", default=DEFAULT_DATASOURCE,
                    help="C6 datasource (14B finance or 7B medical).")
-    p.add_argument("--n-steps", type=int, default=30_000)
     p.add_argument("--force-train", action="store_true")
     p.add_argument("--force-eval", action="store_true")
     p.add_argument("--skip-eval", action="store_true",
                    help="Train + checkpoint only; no Wang. Useful for smoke-test.")
     p.add_argument("--smoke-test", action="store_true",
-                   help="Run a 1k-step training only, no Wang. Validates pipeline.")
+                   help="Train-only smoke (skip-eval) — n_steps still pulled "
+                        "from TrainingConfig default; component cells need "
+                        "the full 25K cap (decisions.md § 12).")
     args = p.parse_args(argv)
 
     if args.smoke_test:
-        args.n_steps = 1_000
         args.skip_eval = True
 
     ensure_activation_cache(args.datasource)
 
     for arch in args.archs:
         run_one_cell(
-            arch, seed=args.seed, n_steps=args.n_steps,
+            arch, seed=args.seed,
             datasource_name=args.datasource,
             force_train=args.force_train, force_eval=args.force_eval,
             skip_eval=args.skip_eval,

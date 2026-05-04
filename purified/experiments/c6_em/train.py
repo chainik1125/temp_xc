@@ -35,16 +35,12 @@ import torch
 
 from temp_bench.config import (
     act_cache_dir,
-    compute_act_cache_key,
     instantiate_arch,
     load_arch,
-    load_datasource,
 )
 from temp_bench.schemas import TrainingConfig
 
 log = logging.getLogger("c6.train")
-
-DATASOURCE = "qwen_2_5_14b_instruct_finance_l24_resid_post"
 
 
 def _build_batch_iter(
@@ -128,23 +124,14 @@ def my_train_fn(
     """
     from temp_bench.training.sae_trainer import train_sae
 
-    # Verify the cache is for the C6 datasource.
-    ds = load_datasource(DATASOURCE)
-    expected_key = compute_act_cache_key(ds)
-    if expected_key != act_cache_key:
-        raise RuntimeError(
-            f"act_cache_key mismatch: runner passed {act_cache_key} "
-            f"but C6 datasource resolves to {expected_key}. "
-            "Check that the C6 cell uses datasource_name=DATASOURCE."
-        )
-
     cache_dir = act_cache_dir(act_cache_key)
     specs_path = cache_dir / "layer_specs.json"
     if not specs_path.exists():
         raise RuntimeError(
-            f"Activation cache not built. Run "
-            f"`from temp_bench.data.nlp.qwen_em import cache_activations; "
-            f"cache_activations({DATASOURCE!r})` first."
+            f"Activation cache not built (act_cache_key={act_cache_key}). "
+            "Build it via `temp_bench.data.nlp.qwen_em.cache_activations(<ds>)` "
+            "before running this cell — `experiments/c6_em/run.py:main` does "
+            "this for you."
         )
     specs = json.loads(specs_path.read_text())
     d_in = int(specs["d_model"])

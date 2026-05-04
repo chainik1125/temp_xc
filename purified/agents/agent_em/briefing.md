@@ -232,47 +232,57 @@ on /workspace until you push them).
 
 ## Current state (agent owns — overwrite at every compact)
 
-**Last verified: 2026-05-04T12:20Z. Full Wang (stages 1→2→3→4) is
-PORTED + landed in commit `144a3e84`; calibration cells mid-stage-2
-on both H100s. EVAL_PROTOCOL_VERSION bumped to "2.0.0".**
+**Last verified: 2026-05-04T12:30Z. ABORTED batch=256 calibration
+cells per Han + agent_paper directive (decisions.md § 12). Restarted
+both calibration cells with NEW TrainingConfig defaults (batch=1024,
+n_steps=25_000, plateau_early_stop=False).**
 
-**Calibration timing data point (in-flight, 12:20Z):**
+**Why the abort:** Earlier calibration was using the schema's old
+defaults (batch=256, n_steps=30_000) — undertrained per Phase 5's
+empirically validated config and SAE-literature standard. Han accepted
+the ~12 H100-hr sunk cost. Old batch=256 leaderboard rows stay; new
+cells write fresh `train_keys` (batch_size + n_steps are in the
+train_key hash so no path collision).
 
-- Stage 2 per-feat = ~33s on both 14B cells (SAE + TXC).
-- Per-cell ETA = ~3 hr: 5m setup + 33m s2 + 110m s3 + 36m s4. The
-  optimistic "1.2 hr/cell" estimate from the briefing was wrong —
-  stage 3's 10 αs × 4 rollouts × 8 prompts = 320 gens per feat × 20
-  feats = 6400 gens dominates per-cell wall.
-- Total ETA: 14B = 9 hr wall (6 cells / 2 GPUs); 7B = 4-5 hr wall;
-  end-to-end 12 cells ≈ 14 hr wall. Matches agent_paper's 12-25 hr.
+- `git HEAD`: post-restart commit (push pending). Calibration cells
+  in flight (background bash IDs):
+  - GPU 1: `bu54cn30l` — sae_arditi seed=42 14B-finance, NEW config
+    (batch=1024, 25K steps). Will TRAIN from scratch (no cache hit
+    on the new train_key) then run full Wang. Started 12:30 UTC.
+  - GPU 0: `buzgbh231` — txc_base seed=42 14B-finance, NEW config
+    + brickenauxk_a8 overrides (auxk_alpha=1/8, dead_threshold=128k).
+    Started 12:30 UTC.
 
-- `git HEAD`: `f3b51c7e` on `final`. Borrowing GPU 0 until ETA ~14:50
-  UTC for TXC seed=42 14B-finance calibration; agent_nlp's briefing
-  read `status: complete` (last-verified 2026-05-04, "no active
-  runs", GPU 0 confirmed 0%/0 MiB via nvidia-smi pre-launch).
-  GPU 1 running SAE seed=42 14B-finance calibration in parallel.
-  - GPU 1: `bcvel4h4e` — sae_arditi seed=42 14B-finance full Wang
-    (kicked off 11:48 UTC; logs/c6_calib_sae_seed42_*.log)
-  - GPU 0: `b0ul26zdc` — txc_base seed=42 14B-finance full Wang
-    (kicked off 11:50 UTC; logs/c6_calib_txc_seed42_*.log)
-  - Train cache HIT for both (`926527b006dd74aa` SAE,
-    `46518b15bc7ec95c` TXC) — only the eval runs.
+**Per-cell ETA under new config (revised):**
+
+- Training: ~30 min (25K steps × batch=1024 on H100; SAE training
+  is faster than TXC's brickenauxk loop).
+- Eval (full Wang): ~3 hr (timing from the aborted run before kill:
+  stage 2 = 33s/feat × 100 = 33 min; stage 3 ≈ 110 min; stage 4 ≈
+  36 min; setup 5 min).
+- Per-cell wall = ~3.5 hr.
+- 6 × 14B cells / 2 GPUs ≈ 11 hr wall. 6 × 7B ≈ 6-7 hr wall.
+- End-to-end 12 cells ≈ 17-18 hr wall.
+
+Other state:
+
 - Pre-flaw 9 c6 leaderboard rows at `eval_protocol_version=1.0.0`
-  remain in the leaderboard for diff-only comparison; analysis.py
-  filters them out of the headline (filter on `eval_protocol_version
-  == "2.0.0"`).
+  (batch=256) remain in the leaderboard for diff-only comparison;
+  analysis.py filters them out of the headline via
+  `eval_protocol_version == "2.0.0"`. No additional batch_size
+  filter needed because 1.0.0 ↔ batch=256 ↔ old by my pipeline,
+  2.0.0 ↔ batch=1024 ↔ new by construction.
 - Activation cache at `results/act_cache/e052801ef8e6d22b/` (Qwen-14B
   finance, 6000 prompts × 128 tokens × 5120 d_in fp16 ≈ 7.86 GB).
-- 7B-medical activation cache NOT yet built — needed before 7B cells
-  can run. ETA: ~15-20 min for the build (12-layer Qwen 7B forward
-  pass on 6k prompts, persistent pod will keep it).
-  Built via `temp_bench.data.nlp.qwen_em.cache_activations`.
-- 7B-medical datasource NOT yet added to `configs/datasources.yaml`
-  (Han decision §4 — pending).
-- GPU 1 free; pipeline exited cleanly. GPU lock system was deleted
-  by agent_paper today (commit `6e6efcbd`); use the GPU-sharing
-  convention (Han decision §5).
-- 122/122 pytest still green.
+- 7B-medical activation cache NOT yet built — kicked off after the
+  14B seed=42 calibration confirms timing. Datasource entry
+  `qwen_2_5_7b_instruct_medical_l15_resid_post` IS in YAML (commit
+  `144a3e84`); only the cache build is pending.
+- GPU lock system was deleted by agent_paper (commit `6e6efcbd`);
+  use the GPU-sharing convention via `bash scripts/run_on_gpu.sh
+  <idx> -- <cmd>` (PROTOCOL.md § 13).
+- 116/116 pytest green (was 122 in old briefing — refactor reduced
+  count; not my concern).
 
 ## Why the headline is suspect (the methodological flaw)
 
