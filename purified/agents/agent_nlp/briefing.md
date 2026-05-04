@@ -237,30 +237,56 @@ Likely effect on each agent's headline:
 **None of the C3/C4/C5/C6/C7 paper headline numbers should be considered
 final until each agent re-trains at a Phase-7-faithful batch size.**
 
-**Fix in flight (agent_nlp 2026-05-04)**: bumping
-`experiments/c3_probing/run.py::_real_training_cfg` to batch=1024,
-n_steps=20K (compromise between Phase 7's 4096/25K and current 256/10K
-that fits within agent_nlp's GPU window). `n_steps` and `batch_size`
-are part of train_key → invalidates all 12 cached SAE checkpoints;
-eval re-runs aren't enough. Re-train + re-eval ETA ~12-16 hours.
-Cross-agent action requested: paper agent should decide whether the
-locked TrainingConfig spec (currently agent-discretion) needs a
-canonical default.
+**RESOLUTION (agent_paper, commit 06681098, 2026-05-04 PM)**:
+new schema defaults locked across all agents:
+
+```
+TrainingConfig:
+  batch_size = 1024            # Phase 5 summary.md:250
+  n_steps = 25_000             # SAE-literature standard fixed schedule
+  learning_rate = 3e-4
+  warmup_steps = 1_000
+  plateau_early_stop = False   # disabled — absolute-delta criterion is
+                               # cross-arch unfair (different loss scales)
+  precision = "bf16"
+```
+
+Rationale per `decisions.md` § 12: identical TrainingConfig across all
+archs and pods (T-SAE §4.1, TFA App. B.1, GemmaScope all use fixed
+schedules); plateau-stop disabled because the schema's `max - min over
+window < 1e-4` is unfair across archs whose losses land at different
+scales (T-SAE/MSE ≈ 1, BatchTopK ≈ 1e-2). agent_em aborted ~12
+H100-hours of in-flight batch=256 calibration (Han accepted the cost).
+
+**Action for agent_nlp**: simplify `experiments/c3_probing/run.py::_real_training_cfg`
+and `experiments/c4_qualitative/run.py::_real_training_cfg` to
+default-construct `TrainingConfig()` (new defaults match Phase 5
+exactly). Re-run all 24 C3 cells; C4 inherits checkpoints (re-evals
+only). v1.0.0 (batch=256, n_steps=10K) and v1.1.0 (batch=256, n_steps=10K
+with padding fix) rows stay in `results/leaderboard.jsonl` for diff
+comparison. **analysis.py must filter on `training_cfg.batch_size==1024`
+when rendering the headline.**
 
 ---
 
 ## Current state (agent owns — overwrite at every compact)
 
-**Last verified: 2026-05-04 (autonomous-overnight session COMPLETE)**
+**Last verified: 2026-05-04 PM (post-batch-fix decision; pre-rerun)**
 
-- `git HEAD`: 14559837 (after C4 final commit) — `final` branch
-- Last leaderboard append: 24 real C3 cells + 9 real C4 cells + 1 C4
-  smoke cell. **All paper headlines shipped.**
-- Last checkpoint saved: full set — 12 unique train_keys (4 archs ×
-  3 seeds at n_steps=10000), all on disk + manifest.
-- Active GPU lock(s): none — pinned to GPU 0. No active runs.
-- Recent decisions in scope: #1, #4, #6, #7, #11
-- In flight: nothing — both C3 and C4 cells complete.
+- `git HEAD`: at or after 06681098 (agent_paper's plateau-stop disable +
+  schema defaults batch=1024 / n_steps=25K). My last commit was
+  3558b303 (briefing nuance about per-component batch).
+- Leaderboard: 24 v1.0.0 + 24 v1.1.0 C3 cells + 9 v1.0.0 C4 cells + smokes.
+  All at batch=256, n_steps=10K (UNDERTRAINED). Stays on disk.
+- Checkpoints on disk + manifest: 12 unique train_keys at
+  (batch=256, n_steps=10000). Will be SUPERSEDED by new keys at
+  (batch=1024, n_steps=25000). Old checkpoints stay (different train_key).
+- Active GPU lock(s): none. agent_em is using both H100 GPUs for C6
+  calibration runs (PIDs 56848 + 57008 last seen). When those finish,
+  GPU 0 is mine.
+- Recent decisions in scope: #1, #4, #6, #7, #11, **#12 (NEW —
+  TrainingConfig batch=1024, n_steps=25K, plateau=False)**.
+- In flight: nothing of mine. Re-train pending overseer go-ahead.
 
 ## C3 final headline (decided 2026-05-04, **EVAL_PROTOCOL_VERSION=1.1.0**)
 
@@ -399,46 +425,25 @@ Earlier session work (still relevant — no regressions):
 - ✅ `temp_bench.architectures.{tsae, txc_base}` — both ported and
   smoke-tested in --smoke mode.
 
-## Autonomous decisions made (Han: override anytime)
+## Decisions made + carried forward (overseer can override)
 
-While Han was AFK for the 10-hour overnight window:
-
-- **TrainingConfig for headline cells**: n_steps=10_000, batch_size=256,
-  lr=3e-4, warmup_steps=500, precision="bf16". Codified in
-  `experiments/c3_probing/run.py::_real_training_cfg`. Picked over
-  the schema default (30K steps × 256) so 18 cells fit in the 10-hour
-  window. Phase 7 reference used ~50K, but SAE convergence at 328M
-  tokens (10K × 256 × 128) is reliable per Ye et al. If headline
-  numbers come in low (≪0.85 mean_auc at k=20), bump to 30K.
-- **Per-task AUC reporting**: BOTH per-task floats `auc__<task>`
-  (38 keys) AND aggregates (`mean_auc`, `std_auc`, ...) emitted on
-  every leaderboard row. Per-task is for σ_tasks; aggregate is the
-  headline. Best-of-both-worlds; analysis.py uses both.
-- **Smoke leaderboard rows kept** (`eval_cfg.smoke=true` filter). Two
-  smoke rows on disk (eval_keys 06afa68f259490a0, 1948488e5b127138).
-  analysis.py filters them out cleanly.
-- **Bricken A/B for C3**: SKIPPED per decision #7 default. C3/C4/C5/C7
-  keep Bricken OFF. Revisit only if headline TXC-base undershoots
-  topk_sae by > 1% at k=5 — that would be the kind of dead-feature
-  symptom Bricken is designed to fix.
-- **MLC scope**: SKIPPED for headline. Lower priority per decisions
-  doc; appendix-only OK. Will not port mlc unless time permits at
-  end of session.
-- **txc_pro port**: DEFERRED. The 3-layer wasteland inheritance
-  (`SubseqH8` → `TXCBareMultiDistanceContrastiveAntidead` →
-  `TXCBareAntidead`) is substantial; risk of derailing the headline
-  run if started before cells complete. Will attempt at end of
-  session if cells finish with ≥ 1 hour to spare.
-
-- **C4 cells launch timing**: NOT YET. C4's `top_256_semantic`
-  needs trained checkpoints from C3 (same train_key — both share
-  the FineWeb activation cache + TrainingConfig). After C3 cell 7
-  (tsae_paper seed=1 k=5) completes (~2 hours in), I could fire
-  one C4 smoke cell to validate end-to-end. Real C4 cells (3 archs
-  × 3 seeds × n_features=256) should run AFTER all C3 cells
-  finish to avoid GPU contention. Expected total C4 wall time:
-  6 cells × (Gemma forward + Haiku judge calls) ≈ 30 min compute +
-  ~10 min of API latency for 256 × 3 = 768 Haiku calls per cell.
+- **Per-task AUC reporting**: my_eval_fn returns BOTH per-task floats
+  (`auc__<task>` × 38) AND aggregates (`mean_auc`, `std_auc`, ...) on
+  every leaderboard row. analysis.py uses aggregates for headline +
+  per-task floats for σ_tasks.
+- **Smoke leaderboard rows kept** (`eval_cfg.smoke=true` filter).
+  analysis.py filters them out.
+- **Bricken A/B for C3**: SKIPPED per decision #7 default.
+- **MLC port**: SKIPPED. Lower priority per agent_paper "Non-decisions";
+  appendix-only OK. Test entry stays in `KNOWN_UNPORTED`.
+- **EVAL_PROTOCOL_VERSION = "1.1.0"** — bumped for the Phase 7
+  padding fix. Stays at 1.1.0 for the batch=1024 re-train (the eval
+  pathway didn't change again; train_key change alone forces re-eval).
+- **C4 unaffected by padding fix** (no probe cache; forwards Gemma over
+  concat_corpora token_ids directly).
+- **C4 cells share train_keys with C3**. After re-train, C4 hits
+  CACHED on training, runs fresh evals only. Re-launch C4 ONLY after
+  C3 re-train lands.
 
 - **Trainer step rate (5/sec) is mmap-bound**: act cache lives on
   MooseFS (`mfs#us-ca-2.runpod.net`); random-index reads are slow
@@ -449,89 +454,86 @@ While Han was AFK for the 10-hour overnight window:
   (b) use larger batch_size to amortise per-step I/O — risky for
   schema validation since batch_size is part of train_key.
 
-## Pre-launch decisions for next session (Han may override)
+## Next action — POST-COMPACT, BATCH-FIX RE-RUN (agent owns)
 
-These were resolved autonomously this session — see "Autonomous
-decisions" above. All can be overridden by editing the constants in
-`experiments/c3_probing/run.py` or by re-running with `force_eval=True`
-to regenerate any cell with a new config.
+Everything plumbing-wise is shipped. What remains is to re-train under
+the new (batch=1024, n_steps=25K, plateau=False) defaults locked in
+`schemas.py` + `decisions.md` § 12 (commit 06681098).
 
-## Next action (agent owns — overwrite)
+### Step-by-step
 
-**Pre-condition (Han owns)**: Han has already run
-`bash scripts/bootstrap_runpod.sh` on this pod (interactive — prompts
-for tokens; an agent cannot enter input). When you wake up, tokens
-are already in `/workspace/.tokens/` and the venv exists. If the
-smoke test below complains about missing tokens, **ping Han** — do
-not try to populate them yourself.
+1. **Standard session prep**:
+   ```
+   cd /workspace/temp_xc/purified
+   git pull --rebase origin final     # use -c user.email / user.name (see "Don't repeat")
+   bash scripts/agent_smoke_test.sh   # expect 122 pass; KNOWN_UNPORTED = {stacked_sae, tfa, tfa_pos, mlc}
+   ls results/probe_cache/gemma_2_2b_it_l13_fineweb_24k128 | wc -l   # → 38 (schema 2.0.0)
+   ```
 
-**Your clone path is `/workspace/temp_xc/`** (the primary clone — you
-are the first agent on the 2× H100 pod). agent_em runs on the same
-pod but in a separate clone at `/workspace/temp_xc_em/` — DO NOT cd
-into agent_em's clone.
+2. **Update C3 + C4 runners to default-construct TrainingConfig**:
+   - `experiments/c3_probing/run.py::_real_training_cfg()` — currently
+     explicitly sets `n_steps=10_000, batch_size=256, lr=3e-4, warmup_steps=500, precision="bf16"`.
+     **Change to**: `return TrainingConfig()` (one-liner).
+     Optionally also drop the now-unused per-arch arch-time progress
+     wrapper — schema's plateau is disabled but my `progress_iter` in
+     `my_train_fn` still works fine; leave it for visibility.
+   - `experiments/c4_qualitative/run.py::_real_training_cfg()` — same
+     change. C4 inherits via SAME train_key → cache-hit on training,
+     re-eval only.
 
-**Han launches you via `start_agent.sh`** (not bare `claude`):
-```
-bash /workspace/temp_xc/purified/scripts/start_agent.sh agent_nlp --fresh
-```
-The wrapper sources `set_agent_env.sh` in the parent shell so the
-GPU pin / `AGENT_NAME` / pod mode propagate into your process. Bash
-tool calls do NOT share shell state, so YOU sourcing the env in your
-first action is a no-op for subsequent commands. Don't rely on it.
+3. **Update `experiments/c3_probing/analysis.py`**:
+   ```python
+   # Currently filters on r.eval_protocol_version == "1.1.0".
+   # Add: r.training_cfg.batch_size == 1024  (the new headline batch).
+   ```
+   Per agent_paper's directive: when rendering AUTO-RESULTS, FILTER
+   for `training_cfg.batch_size==1024` to exclude old undertrained
+   v1.0.0 + v1.1.0 rows. Both stay in leaderboard for diff comparison.
+   Eval rows for old train_keys can persist; just filter.
 
-1. `bash scripts/agent_smoke_test.sh` (51/51 + KNOWN_UNPORTED for
-   the still-not-ported `mlc` + `txc_pro`)
-2. `git pull --rebase origin final`
-3. Verify state on disk:
-   - act cache: `results/act_cache/e4916bcae1881963/acts.npy` (14 GB)
-   - probe cache: `ls results/probe_cache/gemma_2_2b_it_l13_fineweb_24k128/`
-     should show 38 task dirs (each with X_train, X_test, y_train,
-     y_test .npy)
-   - leaderboard rows for c3 with `eval_cfg.smoke=false` (real cells)
-
-4. **Check `logs/c3_real_cells.log`** to see whether the 18-cell
-   run started by my previous self at 2026-05-03T22:49Z completed
-   cleanly. If it did, the leaderboard has up to 18 real C3 rows
-   already. If it crashed mid-run or got killed, restart it:
+4. **Run C3** (24 cells, batch=1024 invalidates old train_keys):
    ```
    bash experiments/c3_probing/run.sh
    ```
-   The runner is idempotent (cells with cached eval_key skip).
-
-5. **Render C3 results**: `.venv/bin/python -m experiments.c3_probing.analysis`
-   rewrites `docs/components/c3.md` AUTO-RESULTS + writes
-   `experiments/c3_probing/plots/auc_by_k.png`.
-   - **Sanity check**: `topk_sae k=20 mean_auc` should land in
-     [0.85, 0.91] (Phase 7 BASE-side leaderboard reference). On IT
-     side it may be slightly lower. If far below 0.80, suspect an
-     encode-shape / probe-cache-leakage bug.
-
-6. **Run C4 cells** (~30 min compute + ~10 min Haiku per cell):
+   Or in parallel (faster — confirmed-working pattern from earlier):
    ```
-   bash experiments/c4_qualitative/run.sh --archs tsae_paper txc_base --seeds 1 2 42
+   nohup .venv/bin/python -u -m experiments.c3_probing.run \
+     --archs topk_sae tsae_paper --seeds 1 2 42 --k_feats 5 20 \
+     > logs/c3_v3_groupA.log 2>&1 &
+   nohup .venv/bin/python -u -m experiments.c3_probing.run \
+     --archs txc_base txc_pro --seeds 1 2 42 --k_feats 5 20 \
+     > logs/c3_v3_groupB.log 2>&1 &
    ```
-   Pre-condition: ANTHROPIC_API_KEY set or
-   `/workspace/.tokens/anthropic_key`. The first cell trains
-   tsae_paper if not cached (it should be after C3 finishes — same
-   train_key). Then forwards Gemma over concat_A+B+random,
-   variance-ranks, top-256, Haiku 2-judge labels.
-   - **Cost**: ~$0.06 per cell × 6 cells = ~$0.36 total.
-   - **Judge persistence**: each Haiku call appends to
-     `results/runs/<eval_key>/judge_outputs.jsonl` for post-deadline
-     Cohen's κ validation.
+   ETA per `decisions.md` § 12: ~32 H100-hr → 16 wall-hours on 2× H100.
+   NOTE: agent_em is using both H100s for C6 calibration when I last
+   checked — wait until they finish or coordinate via gpu_locks.
+   Each unique training: batch=1024 × 25K steps. At ~1.5 sec/step on
+   H100 (estimate based on previous batch=256 ≈ 0.2 sec/step × 4× larger
+   batch but parallelism amortizes), ~10 hours per training is the upper
+   bound; agent_paper's 16 wall-hours (parallelized) is realistic.
 
-7. **Render C4 results**: `.venv/bin/python -m experiments.c4_qualitative.analysis`
-   joins to C3 leaderboard for Pareto x-axis, draws the upper-right
-   frontier, rewrites `docs/components/c4.md` AUTO-RESULTS.
-   - **Pareto check (per c4.md)**: TXC-pro should Pareto-dominate
-     T-SAE — that's the headline claim. If it doesn't, report the
-     honest negative: "TXC-pro matches T-SAE on probing while losing
-     on top-256". Don't introduce a TXC-pro@T_max=20 escape variant
-     (decision #1).
+5. **Render C3** (after re-run):
+   ```
+   .venv/bin/python -m experiments.c3_probing.analysis
+   ```
+   Sanity-check: TopK-SAE k=20 should land in 0.85-0.91 range
+   (Phase 7 BASE-side reference). If TXC variants close the gap, paper
+   headline becomes "TXC-pro matches TopK-SAE at fair budget"; if gap
+   remains, the honest-negative C3 result holds.
 
-8. **Push checkpoints to HF backup** (persistent pod, optional but
-   recommended at session end):
-   ```python
+6. **Run C4** (training cache-hits on new C3 checkpoints; eval only):
+   ```
+   bash experiments/c4_qualitative/run.sh --archs tsae_paper txc_base txc_pro --seeds 1 2 42
+   ```
+   Pre-condition: `ANTHROPIC_API_KEY` env var or `/workspace/.tokens/anthropic_key`.
+   ~30 min compute + ~10 min Haiku per cell × 9 cells = ~6 hours total.
+   Cost ~$0.36.
+
+7. **Render C4** + commit + push everything.
+
+8. **HF push** of new checkpoints (persistent pod, optional):
+   ```
+   .venv/bin/python -c "
    from temp_bench.cache import iter_manifest_for_agent
    from huggingface_hub import HfApi
    token = open('/workspace/.tokens/hf_token').read().strip()
@@ -542,25 +544,37 @@ first action is a no-op for subsequent commands. Don't rely on it.
                               path_in_repo=row.train_key,
                               repo_id='han1823123123/temp-bench-models',
                               repo_type='model')
+   "
    ```
-   (The probe cache is already on HF as of 2026-05-03 from this
-   session — see open question #1 status.)
 
-9. **Port txc_pro** (only if all above is done + ≥ 2 hours left):
-   3-layer wasteland inheritance pulls in ~250 lines:
-   - `phase5b_subseq_sampling_txcdr.py::SubseqH8` (subset sampling)
-   - `txc_bare_multidistance_contrastive_antidead.py` (matryoshka
-     H8 + multi-distance InfoNCE)
-   - `txc_bare_antidead.py` (already mostly in `txc_base.py`)
+### Reference: launching with parallelization (the pattern that worked)
 
-   The contrastive batch shape is **(B, 1+K, T, d_in)** — different
-   from canonical `(B, T, d_in)`. Either extend `train_sae` to
-   accept multi-window batches OR train txc_pro single-window
-   (matryoshka recon only, no contrastive). Single-window degrades
-   the arch but at least gets paper-faithful matryoshka behavior.
+- `python -u` essential (without it, nohup blocks `print()`s for ~5 min
+  until first 4KB of stdout buffer flushes — see Don't repeat).
+- 2 parallel processes on 2× H100 worked WITHOUT deadlock when the
+  probe cache was already in OS page cache. First-eval mmap-warmup is
+  the bottleneck; subsequent reads are RAM-fast.
+- Earlier attempted parallelism BEFORE cache was warm: BOTH processes
+  blocked in state D on MooseFS — had to kill one. Sequence: cache
+  build first (single process), then parallel eval is safe.
 
-10. **Port mlc** (lowest priority — appendix-only baseline). Wasteland
-    source `src/architectures/mlc.py`. Cross-LAYER crosscoder.
+### Reference: how to read the LATEST decision
+
+`agents/agent_paper/decisions.md` § 12. The Identity+mandate section
+of my own briefing also has the gist (Han's edit at line ~42-75).
+
+### Reference: preserved leaderboard rows
+
+After re-run, `results/leaderboard.jsonl` contains:
+- 24 v1.0.0 cells (batch=256, n_steps=10K, OLD eval, OLD padding)
+- 24 v1.1.0 cells (batch=256, n_steps=10K, OLD eval, NEW padding fix)
+- 24 v1.1.0 cells (batch=1024, n_steps=25K, NEW eval, NEW padding) ← headline
+- 9 v1.0.0 C4 cells (legacy, will be superseded)
+- 9 NEW C4 cells (after re-run)
+- a few smoke rows
+
+Filter `(eval_protocol_version=="1.1.0") AND (training_cfg.batch_size==1024)`
+for paper headlines.
 
 ## Don't repeat (agent owns — overwrite)
 
@@ -585,74 +599,87 @@ Hard-won technical gotchas from this session (verify before bypassing):
 
 - **`datasets<4` pin is load-bearing** for `codeparrot/github-code`.
   v4+ removed `trust_remote_code` and the dataset uses a Python
-  loading script. Pinned in `pyproject.toml`. If you ever see
-  "Dataset scripts are no longer supported, but found github-code.py",
-  re-run `uv sync` to pull `datasets==3.6.0`.
-- **github-code `languages=[...]` does NOT filter the stream.** Out
-  of 20 samples I got 9 JS, 6 C, 5 other. Your loader MUST
+  loading script. Pinned in `pyproject.toml`.
+- **github-code `languages=[...]` does NOT filter the stream.** Must
   `if sample['language'] != target_lang: continue` after iter.
-- **`tsae_paper.config.T == 1`, NOT 2.** The contrastive pair is a
-  TRAINING construct, sampled inside `train_step` over the seq_len
-  axis. Setting T=2 routes the probe to window-encoding which is
-  wrong for T-SAE.
-- **`LeaderboardRow.metrics` is float-only** (Pydantic schema).
-  Categorical / int diagnostics like `agg`, `n_train`, `task_name`
-  belong outside the `metrics` dict. The runner explodes loudly if
-  you violate this.
-- **Background `nohup ... &`** — the bash WRAPPER returns immediately
-  and the tool reports "completed", but the python process keeps
-  running. Always verify via `ps -ef | grep python` or by tailing
-  the log file before declaring success or failure.
-- **Cache build is FAST on H100** — ~2 min for 24K seqs of Gemma-2-2b,
-  not the 3 H100-hours Han's mandate suggested. Don't be surprised
-  if it "completes" suspiciously quickly.
-- **Decoder grad-parallel removal** uses
-  `register_post_accumulate_grad_hook` on `W_dec` (PyTorch 2.0+) —
-  this avoids needing a pre-step hook in the canonical trainer. See
-  `tsae.py::_project_dec_grad` and `txc_base.py::_project_dec_grad`.
-- **`einops` is NOT a dep.** I rewrote the wasteland's
-  `einops.einsum(...)` calls with vanilla `torch.einsum` in tsae.py.
-  Don't add `import einops` without first adding to pyproject.toml.
-- **TQDM_DISABLE=1 must be exported per bash call.**
-  `set_agent_env.sh` does NOT set it; sourcing the env script alone
-  isn't enough. Standard pattern:
+- **`tsae_paper.config.T == 1`, NOT 2.** Contrastive pair is a TRAINING
+  construct sampled inside `train_step`. T=2 routes the probe to
+  window-encoding (wrong for T-SAE).
+- **`LeaderboardRow.metrics` is float-only** (Pydantic). Categorical
+  diagnostics like `task_name` go outside `metrics`.
+- **Background `nohup ... &`** — bash wrapper returns immediately;
+  python keeps running. Verify via `ps -ef | grep python`.
+- **Decoder grad-parallel removal** uses `register_post_accumulate_grad_hook`
+  on `W_dec` (PyTorch 2.0+). See `tsae.py`/`txc_base.py`/`txc_pro.py::_project_dec_grad`.
+- **`einops` is NOT a dep.** Use vanilla `torch.einsum`.
+- **TQDM_DISABLE=1 must be exported per bash call.** `set_agent_env.sh`
+  doesn't set it. Standard pattern at `export TQDM_DISABLE=1 && ...`.
+- **`python -u` is essential for nohup'd long-running scripts** — without
+  it, `print()` calls buffer in a 4KB block and don't appear in the
+  log file for ~5 min, making the process look stuck. Cost me ~5 min
+  of training when I killed/restarted thinking it was deadlocked.
+- **`tokenizer.padding_side="right"` for cache build, NEVER left**.
+  Left padding shifts position-IDs of real tokens; out-of-distribution
+  for Gemma. Phase 7 fix uses right pad + per-example reslice
+  (left-aligned in the destination 32-frame). See
+  `temp_bench.data.nlp.probe_cache::_encode_texts`.
+- **`.contiguous()` after `.T` on saved tensors** — safetensors rejects
+  non-contiguous tensors. Bit me on `tsae.py::_normalize_decoder` after
+  30 min of training; tests didn't catch because the failure is at
+  save time, not init. Always wrap `W_dec.data = ....T.contiguous()`.
+- **MooseFS mmap is slow on first random access** (~5 steps/sec on the
+  14 GB activation cache), then RAM-cached after warmup. Two parallel
+  processes BEFORE warmup deadlocked in state D. Sequence cache build
+  → eval; THEN parallel runs are safe.
+- **Git commit identity**: repo has no user.email/user.name set.
+  Commits use inline `GIT_AUTHOR_*` env vars. Rebases use `git -c
+  user.email=... -c user.name=... rebase ...` (env vars don't propagate
+  cleanly through rebase's internal commits).
+- **Leaderboard JSONL conflicts during rebase**: append-only, both
+  sides add new rows. Resolution = strip conflict markers, keep both
+  sets. Done it 5+ times this session via:
+  ```python
+  with open('results/leaderboard.jsonl') as fh: keep = [l for l in fh if not l.startswith(('<<<<<<<', '=======', '>>>>>>>'))]
   ```
-  export TQDM_DISABLE=1 && source scripts/set_agent_env.sh agent_nlp >/dev/null 2>&1 && <command>
-  ```
+- **`runner.run_cell` cache contract**: skips eval if `eval_in_leaderboard(eval_key) and metrics_exist(eval_key)`. Means changing the
+  probe cache content WITHOUT bumping `EVAL_PROTOCOL_VERSION` or
+  `force_eval=True` silently returns OLD metrics. Lesson learned twice.
+  This is why the batch_size + n_steps live in `train_key` (auto-invalidate
+  on change) — no manual version bump needed for re-train.
+- **`first_real` mask in `_encode_pool`**: window archs (T>1) have edge
+  case where n_real < T means NO valid window for that row. Code
+  falls back to all-windows mean for those rows (probe noisy but no
+  NaN). Affects winogrande/wsc on TXC archs; a few rows per task.
 
 ## Open questions for Han (agent owns — overwrite)
 
-All questions from the previous session were resolved autonomously
-during the 10-hour overnight window — see "Autonomous decisions"
-above. Han can override any of them by:
-- editing `experiments/c3_probing/run.py::_real_training_cfg` for the
-  TrainingConfig
-- re-running with `force_eval=True` to regenerate cells under a new
-  config (n.b. changing config invalidates train_key OR eval_key)
-- editing analysis.py's filter rule to include/exclude smoke rows
+1. **Probe cache HF push at schema 2.0.0** — DONE 2026-05-04 morning.
+   266 files (X_train + X_test + first_real_train + first_real_test +
+   y_train + y_test + meta.json per task × 38 tasks). 22 GB on HF.
+   agent_steer / ephemeral pods get the new cache via
+   `hf download han1823123123/temp-bench-data --repo-type dataset
+   --include 'probe_cache/gemma_2_2b_it_l13_fineweb_24k128/*'`.
 
-New open questions surfaced this session:
+2. **batch=1024 re-run wall-time confirmation** — agent_paper estimated
+   ~16 wall-hours on 2× H100 (decisions.md § 12). My back-of-envelope
+   based on prior batch=256 step rate (~5 steps/sec) and batch=1024
+   estimate (~1.5 steps/sec) gives ~10 hours per training × 12 unique =
+   120 sequential or 60 parallel. Han: if this takes longer than
+   expected, n_steps=25K cap is binding (no plateau-stop). Worst case
+   we ship with whatever cells finish before deadline.
 
-1. ~~Probe cache HF push.~~ DONE 2026-05-03T23:03Z. Pushed
-   `probe_cache/gemma_2_2b_it_l13_fineweb_24k128/` (38 tasks ×
-   5 files = 190 files, ~80 GB) to
-   `han1823123123/temp-bench-data` at 3.4 GB/s. agent_steer and
-   any future ephemeral pod can sync via `huggingface-cli download
-   han1823123123/temp-bench-data --repo-type dataset --include
-   'probe_cache/gemma_2_2b_it_l13_fineweb_24k128/*'` to skip the
-   ~10 min retokenize.
+3. **C5 / C6 / C7 are also re-running at batch=1024**. Coordinate
+   GPU access — agent_em was using both H100s for C6 calibration last
+   I checked. Probably their batch=1024 re-run starts after their
+   in-flight runs complete. We may overlap on GPU 0; check before
+   launching.
 
-2. **What happens if mean_auc is far from Phase 7 reference?** Phase 7
-   leaderboard has `txc_bare_antidead_t5 k=20 = 0.9127` (BASE side).
-   We're on IT side (Phase 7 noted "IT side is entirely missing").
-   What's the threshold below which we should bump n_steps to 30K and
-   re-run, vs accept that IT-side numbers are just lower? My default:
-   if `mean_auc < 0.85` at k=20 across ALL 3 archs, that's a training
-   bug; bump n_steps. If only some archs lag, that's the headline finding.
-
-3. **C4 scope this session.** I'll start C4 (qualitative latents
-   port) only after C3 cells are in flight or completed. The C4 lead
-   architecture (TXC-pro) isn't ported yet — see autonomous decision
+4. **Filter convention for analysis.py** — agent_paper directs to
+   filter on `training_cfg.batch_size==1024` for headline. I'll do
+   that. Old rows (batch=256) stay for diff comparison. Decisions.md
+   § 12 says no need to bump EVAL_PROTOCOL_VERSION (eval logic
+   unchanged from 1.1.0); the train_key change auto-invalidates
+   the eval cache.
    above. C4 with TopK-SAE / T-SAE only would still be useful. Han:
    do you want me to ship C4 with the 3 archs we have, or wait for
    txc_pro?
