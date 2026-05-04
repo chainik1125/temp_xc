@@ -194,31 +194,33 @@ on /workspace until you push them).
 
 ## Current state (agent owns — overwrite at every compact)
 
-**Last verified: 2026-05-04T07:00Z. Headline result is SUSPECT —
-abbreviated-Wang (stages 2+3 skipped) does not satisfy c6.md's full-
-4-stage spec. agent_paper flagged this in Han decisions §3 (NEW). All
-9 leaderboard rows must be re-derived with FULL Wang and a 7B-medical
-re-run added.**
+**Last verified: 2026-05-04T11:55Z. Full Wang (stages 1→2→3→4) is
+PORTED + landed in commit `144a3e84`; calibration cells in flight on
+both H100s. EVAL_PROTOCOL_VERSION bumped to "2.0.0".**
 
-- `git HEAD`: latest pushed commit, post `99c1a1e8` (c6.md PROTOCOL §7
-  template fix). On `final`. Pipeline (no longer running).
-- 9 c6 leaderboard rows landed (ABBREVIATED Wang — preliminary):
-  - SAE-arditi (3 seeds): `seed=42 → 160a1471d1a93f1b` (81.62),
-    `seed=1 → cdc5e99b13fa6212` (80.28),
-    `seed=2 → 84896d66d8765166` (80.89).
-  - TXC paper-correct, d_sae=32768 (3 seeds): seed=42 → train_key
-    `46518b15bc7ec95c` peak 76.17; seed=1 → `a0d4491420ec0b14` peak
-    76.75; seed=2 → `ad1243ed0f41db35` peak 78.52. Mean abbreviated
-    gap +3.79.
-  - TXC small reference, d_sae=18432 (3 seeds): seed=42 → train_key
-    `410c3f342b133fff`; seed=1 → `c3ab0477e3a3b339`; seed=2 →
-    `f29c80fa605e4b12`. Mean abbreviated gap +6.35.
-- All 9 checkpoints pushed to HF
-  `han1823123123/temp-bench-models/tree/main/<train_key>/` via
-  manual `_push_checkpoint_to_hf` (persistent pod — auto-push is
-  ephemeral-only).
+- `git HEAD`: `144a3e84` on `final`. Borrowing GPU 0 until ETA ~14:00–
+  15:00 UTC for TXC seed=42 14B-finance calibration; agent_nlp's
+  briefing reads `status: complete` (last-verified 2026-05-04, "no
+  active runs", GPU 0 confirmed 0%/0 MiB via nvidia-smi pre-launch).
+  GPU 1 running SAE seed=42 14B-finance calibration in parallel.
+- Calibration cells in flight (background bash IDs):
+  - GPU 1: `bcvel4h4e` — sae_arditi seed=42 14B-finance full Wang
+    (kicked off 11:48 UTC; logs/c6_calib_sae_seed42_*.log)
+  - GPU 0: `b0ul26zdc` — txc_base seed=42 14B-finance full Wang
+    (kicked off 11:50 UTC; logs/c6_calib_txc_seed42_*.log)
+  - Train cache HIT for both (`926527b006dd74aa` SAE,
+    `46518b15bc7ec95c` TXC) — only the eval (~2-3 hr per cell)
+    runs. Wall time depends on judge throughput; first per-cell
+    log will be the calibration data point.
+- Pre-flaw 9 c6 leaderboard rows at `eval_protocol_version=1.0.0`
+  remain in the leaderboard for diff-only comparison; analysis.py
+  filters them out of the headline (filter on `eval_protocol_version
+  == "2.0.0"`).
 - Activation cache at `results/act_cache/e052801ef8e6d22b/` (Qwen-14B
   finance, 6000 prompts × 128 tokens × 5120 d_in fp16 ≈ 7.86 GB).
+- 7B-medical activation cache NOT yet built — needed before 7B cells
+  can run. ETA: ~15-20 min for the build (12-layer Qwen 7B forward
+  pass on 6k prompts, persistent pod will keep it).
   Built via `temp_bench.data.nlp.qwen_em.cache_activations`.
 - 7B-medical datasource NOT yet added to `configs/datasources.yaml`
   (Han decision §4 — pending).
