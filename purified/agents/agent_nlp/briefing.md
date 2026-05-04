@@ -138,11 +138,43 @@ may shrink under proper training — TXC variants (subseq + matryoshka
 training than TopK-SAE does. **Don't ship the v1.1.0 numbers as the
 paper headline until rerun.**
 
-**Other agents potentially affected**: anyone whose component runner
-shipped a TrainingConfig with batch_size << 4096 or n_steps << 25_000
-should compare against Phase 7's `_train_utils.py::TrainCfg` and
-decide whether their cells are undertrained. agent_em (C6), agent_steer
-(C5), agent_back (C7) are all training SAE-family archs.
+**Cross-agent impact map (snapshot from `checkpoints/manifest.jsonl`,
+2026-05-04)**: ALL FOUR agents are using `batch_size=256` (no exception)
+which is 16× smaller than Phase 7's 4096. Affected components:
+
+| component | agent       | archs trained                      | cfg used                | gap to Phase 7 ref |
+|-----------|-------------|------------------------------------|--------------------------|---------------------|
+| C3        | agent_nlp   | topk_sae, tsae_paper, txc_base, txc_pro | n_steps=10K, batch=256 | 16× batch, 2.5× steps |
+| C4        | agent_nlp   | (reuses C3 checkpoints)            | inherits C3 cfg          | same as C3 |
+| C5        | agent_steer | topk_sae, tsae_paper, txc_base, txc_pro | n_steps=30K, batch=256 | 16× batch (steps OK) |
+| C6        | agent_em    | sae_arditi, txc_base               | n_steps=30K, batch=256, plateau_off | 16× batch (steps OK) |
+| C7        | agent_back  | topk_sae, txc_base, txc_pro        | n_steps=30K, batch=256 | 16× batch (steps OK) |
+
+C1 + C2 (synthetic toy by agent_paper) aren't affected — they use small
+toy archs at d_sae=40 with their own training defaults, not the
+SAE-family Phase 7 reference.
+
+**The batch_size axis is the universally-shared mistake**. n_steps is
+mostly OK at 30K (close to Phase 7's 25K) for agent_em, agent_steer,
+agent_back; only agent_nlp shipped 10K. The factor-16-too-small batch
+hits everyone equally; matryoshka contrastive (txc_pro) and InfoNCE-
+based archs (multi-distance) suffer most because their loss terms need
+many in-batch negatives.
+
+Likely effect on each agent's headline:
+- C3 (agent_nlp): TXC ranking ordering vs TopK probably stable, absolute
+  AUC gaps may shrink at fair budget (TXC variants benefit more).
+- C4 (agent_nlp): tsae_paper SEMANTIC count may move; txc_pro Pareto
+  position vs T-SAE could flip if TXC contrastive trains properly.
+- C5 (agent_steer): steering success rate depends on feature quality;
+  could shift either way.
+- C6 (agent_em): EM gap-close numbers depend on TXC-base feature
+  identification quality; could shift.
+- C7 (agent_back): backtracking PR-AUC depends on the SAE separating
+  backtracking-related features; could shift.
+
+**None of the C3/C4/C5/C6/C7 paper headline numbers should be considered
+final until each agent re-trains at a Phase-7-faithful batch size.**
 
 **Fix in flight (agent_nlp 2026-05-04)**: bumping
 `experiments/c3_probing/run.py::_real_training_cfg` to batch=1024,
