@@ -290,8 +290,18 @@ Full Wang is in `git show origin/em-nanda:experiments/em_features/run_wang_proce
    8 prompts × 8 rollouts. Total: 3 × 27 × 64 = 5184 generations
    per cell (~17 min batched).
 
-Total ~50 min full-Wang per cell. With 12 cells (3 seeds × 2 archs ×
-2 organisms): ~10 H100-hr serial / ~5 hr if both H100s parallelise.
+Per-cell wall time **~2-3 hr on 14B and ~1-1.5 hr on 7B** if you
+batch generation via `num_return_sequences` (and accept the lower
+batching efficiency at the smaller `n_rollouts` of stages 2 + 3:
+prefill amortises over fewer returns, so effective tokens/sec drops
+from ~480 (rollouts=8 in stage 4) to ~250-350 (rollouts=2, 4)).
+With 12 cells (3 seeds × 2 archs × 2 organisms = 6×14B + 6×7B):
+**~18-27 hr serial; ~9-14 hr wall time across 2 H100s** when
+parallelised. Aligns with agent_paper's published estimate of
+~25-50 H100-hr / ~12-25 hr wall (their conservative end accounts
+for model-load + Δz̄-harvest + judge-call overhead I didn't factor).
+Don't trust the optimistic end of any of these — first 14B full-Wang
+cell will be the calibration data point.
 
 Implementation tip: re-use my existing `claude_judge`, `_SteeringHook`,
 `generate_with_steering`, and `decoder_row` helpers — they're correct,
@@ -396,8 +406,13 @@ requires" carefully.
    H100s (verify agent_nlp idle first; update Current state with
    "Borrowing GPU 0 until ETA HH:MM"; launch via
    `bash scripts/run_on_gpu.sh 0 -- python -m experiments.c6_em.run --seeds 1`).
-   Time budget: ~10 H100-hr serial, ~5 hr parallel. Han allocated
-   12-25 hr wall budget for this.
+   Realistic time budget: **~18-27 H100-hr serial; ~9-14 hr wall**
+   when both H100s are parallel (≈ matches agent_paper's 25-50 hr
+   serial / 12-25 hr wall — their conservative end is the safer
+   plan). My initial estimate of "10 H100-hr / 5 hr wall" was wrong
+   — undercounted by 2-3× because I used stage-4-only batching as a
+   per-cell average and ignored model-load + judge overhead. **Run
+   one 14B cell first to calibrate before committing to all 12.**
 10. **After cells land**: re-render `docs/components/c6.md` AUTO-RESULTS
     via `bash scripts/c6_render_and_push.sh`. The renderer already
     handles the new eval_protocol_version (it picks latest by ts).
@@ -460,6 +475,43 @@ corpus stand-in OK or supply Turner's exact file.)
    (`flozi00/medical_advice` or similar — needs vetting).
 
 3. **Wang full-frontier α grid**: Dmitry's
-   `--final_alpha_grid` default is 27 αs from -100 to +100 with
-   density around α=±10 and α=±1. Confirm we use his exact grid
-   (probably yes for paper consistency).
+   `--final_alpha_grid` default is 27 αs:
+   `-100,-10,-8,-6,-5,-4,-3,-2,-1.75,-1.5,-1.25,-1,0,1,1.25,1.5,1.75,2,3,4,5,6,7,8,9,10,100`.
+   Confirm we use his exact grid (probably yes for paper consistency).
+   Stage-3 grid: `-10,-6,-4,-2,-1,1,2,4,6,10` (10 αs). Stage-2 αs:
+   `±screen_alpha` (default 1.0).
+
+## Other precision notes for the next instance
+
+- `experiments/c6_em/run.py` uses `--seed N` (singular), NOT
+  `--seeds N` (the example in Han's decision §5 has a typo). Use:
+  `bash scripts/run_on_gpu.sh 0 -- python -m experiments.c6_em.run --seed 1`.
+- `sae_arditi`'s locked yaml hparams are already paper-correct
+  (`d_sae=32768, k_pos=128`); Han's c6 override only added entries
+  for `txc_base` and `txc_pro`. SAE cells in the leaderboard for all
+  3 seeds are paper-correct already and **don't need re-training**
+  for full-Wang re-runs — the `train_key` cache hit will skip them.
+- `experiments/c6_em/analysis.py` distinguishes paper-correct vs
+  small TXC by manifest `size_mb` threshold 5000 MB
+  (paper d_sae=32768 ≈ 6.7 GB, small d_sae=18432 ≈ 3.8 GB on disk).
+  When you bump `EVAL_PROTOCOL_VERSION = "2.0.0"`, the renderer
+  needs another sub-table for "full-Wang vs abbreviated". Easiest:
+  filter on `eval_protocol_version` field which is in every
+  leaderboard row.
+- The `c6.md` Hypothesis section is currently locked to outcome (c)
+  Mixed; **revert this** to "1-2 sentences about what the component
+  proves, pending re-test" until full-Wang data lands.
+- The `c6.md` status field is currently `complete` — should revert
+  to `running` since the Setup spec isn't satisfied.
+- 7B-medical probe corpus (`medical_advice_prompt_only.jsonl`) is
+  NOT on origin/em-nanda — local-only on Dmitry's pod, same as the
+  finance file. Will need a stand-in. Possible HF candidates:
+  `andyrdt/Qwen2.5-7B-Instruct_bad-medical` (the model itself —
+  ask Han if its training data is exposed).
+- Stage-4 my code already persists `judge_outputs.jsonl`; stages 2 +
+  3 also need to append (same format: feature_id, alpha,
+  rollout_idx, question, answer, align, coh) so post-deadline κ
+  validation works for ALL stages.
+- Bump `EVAL_PROTOCOL_VERSION` in `experiments/c6_em/run.py`
+  (`make_training_cfg` not the right place — it's a separate constant
+  near the top of `run.py`: search `EVAL_PROTOCOL_VERSION = "1.0.0"`).
