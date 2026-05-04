@@ -1406,13 +1406,20 @@ def reaggregate_from_judge_outputs(
 
     Use this to backfill ``peak_success_grade_at_coh_<τ>`` on cells
     judged before the metric was added, without re-running the judge.
-    Reads ``judge_outputs.jsonl`` (one JSON record per call with at
-    least ``strength``, ``coherence_grade``, ``success_grade``) and
-    returns the flat metrics dict (suitable for replacing
-    ``LeaderboardRow.metrics``).
 
-    Records with missing or null grades are dropped (they contribute
-    to ``n_total - n_valid`` in the curves dict).
+    Supports two on-disk schemas:
+
+    1. **Per-generation rows** (one JSON record per generation with both
+       ``success_grade`` and ``coherence_grade`` fields, plus
+       ``strength``).
+    2. **Per-call rows** (the format :class:`SonnetSteeringJudge.\
+       _persist` writes — one row per `(idx, head)`, where ``head`` is
+       ``"success"`` or ``"coherence"`` and ``label`` is the 0–3 grade).
+       Rows are grouped by ``idx`` (or ``transcript_id``); a generation
+       is included only if both heads land.
+
+    Records missing required fields are dropped silently — they
+    contribute to ``n_total - n_valid`` in the curves dict.
 
     Example::
 
@@ -1423,32 +1430,78 @@ def reaggregate_from_judge_outputs(
     import json
     from pathlib import Path
     grades: list[Grade] = []
-    for i, line in enumerate(Path(judge_outputs_path).read_text().splitlines()):
+    rows = []
+    for line in Path(judge_outputs_path).read_text().splitlines():
         line = line.strip()
         if not line:
             continue
         try:
-            r = json.loads(line)
+            rows.append(json.loads(line))
         except json.JSONDecodeError:
             continue
-        coh_g = r.get("coherence_grade", r.get("coh_grade"))
-        suc_g = r.get("success_grade")
-        st = r.get("strength")
-        cid = r.get("concept_id", "")
-        fid = r.get("feature_idx", r.get("feature_id", -1))
-        if coh_g is None or suc_g is None or st is None:
-            continue
-        grades.append(Grade(
-            idx=int(r.get("idx", i)),
-            concept_id=cid,
-            feature_idx=int(fid),
-            strength=float(st),
-            success_grade=int(suc_g),
-            coherence_grade=int(coh_g),
-            success_raw=r.get("success_raw", ""),
-            coherence_raw=r.get("coherence_raw", ""),
-            error=r.get("error", ""),
-        ))
+
+    # Schema 1: per-generation rows (have both grades).
+    schema_per_gen = any(
+        ("success_grade" in r) and ("coherence_grade" in r or "coh_grade" in r)
+        for r in rows
+    )
+    if schema_per_gen:
+        for i, r in enumerate(rows):
+            coh_g = r.get("coherence_grade", r.get("coh_grade"))
+            suc_g = r.get("success_grade")
+            st = r.get("strength")
+            cid = r.get("concept_id", "")
+            fid = r.get("feature_idx", r.get("feature_id", -1))
+            if coh_g is None or suc_g is None or st is None:
+                continue
+            grades.append(Grade(
+                idx=int(r.get("idx", i)),
+                concept_id=cid,
+                feature_idx=int(fid),
+                strength=float(st),
+                success_grade=int(suc_g),
+                coherence_grade=int(coh_g),
+                success_raw=r.get("success_raw", ""),
+                coherence_raw=r.get("coherence_raw", ""),
+                error=r.get("error", ""),
+            ))
+    else:
+        # Schema 2: per-call rows (head + label). Group by idx.
+        by_idx: dict[int, dict] = {}
+        for r in rows:
+            try:
+                idx = int(r["idx"])
+            except (KeyError, ValueError, TypeError):
+                continue
+            d = by_idx.setdefault(idx, {
+                "idx": idx,
+                "concept_id": r.get("concept_id", ""),
+                "feature_idx": int(r.get("feature_idx", r.get("feature_id", -1))),
+                "strength": float(r["strength"]) if r.get("strength") is not None else None,
+            })
+            head = r.get("head")
+            label = r.get("label")
+            if head == "success":
+                d["success_grade"] = label
+                d["success_raw"] = r.get("raw_response", "")
+            elif head == "coherence":
+                d["coherence_grade"] = label
+                d["coherence_raw"] = r.get("raw_response", "")
+        for d in by_idx.values():
+            if (d.get("success_grade") is None
+                or d.get("coherence_grade") is None
+                or d.get("strength") is None):
+                continue
+            grades.append(Grade(
+                idx=d["idx"],
+                concept_id=d["concept_id"],
+                feature_idx=int(d["feature_idx"]),
+                strength=float(d["strength"]),
+                success_grade=int(d["success_grade"]),
+                coherence_grade=int(d["coherence_grade"]),
+                success_raw=d.get("success_raw", ""),
+                coherence_raw=d.get("coherence_raw", ""),
+            ))
     return flatten_metrics(coh_success_curves(
         grades,
         coh_thresholds=coh_thresholds,

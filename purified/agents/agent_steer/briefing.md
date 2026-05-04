@@ -214,19 +214,35 @@ References:
 
 ## Current state (agent owns — overwrite at every compact)
 
-**Last verified: 2026-05-04T08:10Z (autonomous overnight session,
-end-of-session.)**
+**Last verified: 2026-05-04T13:00Z (post-metric-fix backfill).**
 
-- `git HEAD`: pushed through `bfdcc559` (c5 AUTO-RESULTS rendered).
-- **C5 sweep partial — 7 of 9 cells complete + 2 in flight**:
-  - tsae_paper × {42, 1, 2}: success_at_coh_1.75 = {0.067, 0.078, 0.056} → mean **0.067 ± 0.006**
-  - txc_base × {42, 1}: {0.025, 0.047} → mean **0.036 ± 0.011** (n_steps=30000)
-  - txc_pro × {42, 1}: {0.043, 0.029} → mean **0.036 ± 0.007** (n_steps=6000, paper deviation)
-  - txc_base seed=2 (PID 32542): n_steps=30000, started 08:00, eta finish ~10:40 (past user return)
-  - txc_pro seed=2 (PID 32543): n_steps=6000, started 08:00, eta finish ~09:30 (past user return)
-- **AUTO-RESULTS rendered** to `docs/components/c5.md` from 7-cell
-  partial. Re-run `report.render(component='c5')` after seed=2 cells
-  land to refresh.
+- `git HEAD`: pushed through `20ba7913` (sweep complete) plus this
+  turn's metric backfill (rebased on top of agent_paper's
+  `40a184bd Agent PAPER: C5 metric fix`).
+- **C5 sweep complete — 9 of 9 cells + 9 backfilled rows**:
+  Headline (peak success grade @ coh ≥ 1.75, 0–3 scale):
+    - tsae_paper × {42, 1, 2}: 0.367, 0.400, 0.300 → mean **0.356 ± 0.029**
+    - txc_base × {42, 1, 2}: 0.300, 0.400, 0.476 → mean **0.392 ± 0.051**
+    - txc_pro × {42, 1, 2}: 0.375, 0.389, 0.300 → mean **0.355 ± 0.028** (n_steps=6000)
+  All three archs land within 1 stderr — hypothesis "TXC matches T-SAE"
+  is **supported** on the wasteland-comparable continuous metric.
+  Old binary `success_at_coh_<τ>` numbers preserved as supplementary
+  in c5.md (showed misleading 2× tsae lead due to threshold-event
+  co-occurrence collapsing dynamic range).
+- **Backfilled `eval_protocol_version="1.0.1"` rows**: 9 new rows
+  with `metric_set="v1_0_1_with_peak_grade"` and `rebuild_from=<orig_eval_key>`,
+  primary_metric `peak_success_grade_at_coh_1.75`. Original 1.0.0
+  rows kept for reproducibility/diff per agent_paper's spec.
+- **Helper fix landed**:
+  `temp_bench.case_studies.steering.reaggregate_from_judge_outputs`
+  now handles BOTH on-disk schemas: per-generation rows (with both
+  grades) AND per-call rows (head + label format that
+  SonnetSteeringJudge actually writes). Without this fix the helper
+  silently returned 0s for every cell (because every per-call row
+  has only one grade → both-grades check failed).
+- Active GPU usage: none.
+- Recent decisions in scope: #1, #4, #6, #7. NEW: c5 headline metric
+  is peak_success_grade_at_coh_1.75, not the binary fraction.
 - Active GPU usage: GPU 0 (txc_base seed=2), GPU 2 (txc_pro seed=2).
 - Recent decisions in scope: #1, #4, #6, #7. Remember:
   paper-deviation n_steps=6000 for txc_pro × {42, 1}.
