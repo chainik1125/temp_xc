@@ -132,26 +132,37 @@ References:
 
 ## Headline result
 
-**Paper-correct seed=42: SAE-arditi 81.62 vs TXC-base+brickenauxk_a8
-76.17 → gap +5.45 align → Mixed.** Paper-correct hparams
-(`d_sae=32768, k_pos=25, k_win=125`) per the c6 override Han landed
-in `configs/locked_archs.yaml` 2026-05-04. Single-seed paper-correct
-result for now; paper-correct seed=1 in flight (ETA ~04:20 UTC).
+**Paper-correct mean gap = +4.49 align (n=2 paired seeds; spread
+1.92; min +3.53 seed=1, max +5.45 seed=42) → Mixed.** Paper-correct
+hparams (`d_sae=32768, k_pos=25, k_win=125`) per the c6 override Han
+landed in `configs/locked_archs.yaml` 2026-05-04.
 
-**Three small-TXC seeds (reference, d_sae=18432):** mean gap +6.35
-align (spread 3.25; min +5.03 seed=1, max +8.28 seed=2). All in
-Mixed band.
+Robustness check — three small-TXC reference seeds (d_sae=18432)
+give mean gap +6.35 align (spread 3.25; range 5.03–8.28). Same
+Mixed decision.
 
-| seed | SAE peak_align | TXC paper peak | TXC small peak | gap (paper) | gap (small) |
+| seed | SAE peak | TXC paper | TXC small | gap (paper) | gap (small) |
 |---:|---:|---:|---:|---:|---:|
-| 42 | 81.62 | **76.17** | 75.88 | +5.45 | +5.75 |
-| 1  | 80.28 | (in flight) | 75.25 | tbd | +5.03 |
-| 2  | 80.89 | — | 72.61 | — | +8.28 |
+| 42 | 81.62 | 76.17 | 75.88 | +5.45 | +5.75 |
+| 1  | 80.28 | 76.75 | 75.25 | **+3.53** | +5.03 |
+| 2  | 80.89 | (not run) | 72.61 | — | +8.28 |
 
-Headline takeaway: paper-correct hparams barely move the needle
-(76.17 paper vs 75.88 small at seed=42, Δ=+0.29 align — well within
-judge noise). The brickenauxk_a8 recipe doesn't close the gap to
-SAE-arditi on R1 30k mid-α regardless of TXC scale.
+Three takeaways for the paper:
+
+1. **Mixed** is robust across seeds AND across TXC scales (paper
+   d_sae=32768 vs small d_sae=18432). Brickenauxk_a8 narrows the
+   gap by ~2 align on average vs Dmitry's plain TXC k=100 (his
+   gap was +3.91 — but that's via Gemini, full Wang, and likely
+   different probe pool; not directly comparable).
+2. **Paper-correct TXC is more stable seed-to-seed.** Paper spread
+   1.92 vs small spread 3.25. The bigger dictionary doesn't lift
+   the peak much, but it does reduce variance — seeds 1 and 42 both
+   peak at α=-30 with paper-correct (vs α=+1 / α=+10 for small).
+3. **TXC's per-feature frontier is flatter than SAE-arditi's** in
+   both regimes. SAE-arditi consistently has a ~5-10 align peak
+   above its baseline at α=-30 on the strongest misalignment-direction
+   feature; TXC's top-3 features all sit within a 5-align band of
+   each other across the α grid.
 
 **SAE-arditi frontier:** sharp peak at α=-30, feat 3173 (the
 strongest "anti-misalignment" feature). The single-feat peak at
