@@ -521,6 +521,45 @@ def fig_backtracking_inducement(data: dict[str, Any]) -> None:
     plt.close(fig)
 
 
+def fig_bhalla_tsae_summary(data: dict[str, Any]) -> None:
+    """Cross-category bar chart: every cell where Bhalla T-SAE was measured,
+    with the best other arm for context."""
+    paper = data["sparse_probing_paper_set_BASE_S32"]["k_feat_20_mean_auc"]
+    det = data["deception_detection_andre_safety"]
+    c5 = data["steering_c5_concept_steering"]["mean_success_at_coh_1_75"]
+    em7b_wang = data["alignment_em_qwen7b_wang_procedure_bundle_k30"]["bundle_k_30_peak_align"]
+
+    cells = [
+        ("Sparse probing\n(PAPER 16, k_feat=20)", paper["tsae_paper_k500"], paper["txc_bare_antidead_t5"], "TXC bare-antidead", 0.86, 0.92, "AUC"),
+        ("Detection\n(JBB)", det["monitor_auc_test_in"]["tsae_bhalla"], det["monitor_auc_test_in"]["stacked_sae"], "Stacked SAE", 0.85, 1.00, "AUC"),
+        ("Detection\n(XSTest)", det["monitor_auc_test_ood"]["tsae_bhalla"], det["monitor_auc_test_ood"]["stacked_sae"], "Stacked SAE", 0.85, 1.00, "AUC"),
+        ("c5 concept steering\n(success@coh≥1.75)", c5["tsae_paper"], c5["txc_base"], "TXC base", 0.0, 0.10, "success rate"),
+        ("EM Qwen-7B medical\nWang bundle k=30", em7b_wang["tsae_paper_30k_resid_post"], em7b_wang["sae_arditi_100k"], "SAE arditi 100k", 30, 65, "peak align"),
+    ]
+
+    fig, axs = plt.subplots(1, len(cells), figsize=(18, 4.8))
+    for ax, (title, bhalla_val, other_val, other_name, ylo, yhi, ylabel) in zip(axs, cells):
+        bars = ax.bar(["T-SAE\n(Bhalla)", other_name],
+                       [bhalla_val, other_val],
+                       color=[ARCH_COLOURS["T-SAE (Bhalla)"], "#888888"],
+                       edgecolor="black")
+        for bar, v in zip(bars, [bhalla_val, other_val]):
+            ax.text(bar.get_x() + bar.get_width() / 2,
+                     v + (yhi - ylo) * 0.015,
+                     f"{v:.3f}" if v < 10 else f"{v:.2f}",
+                     ha="center", fontsize=9)
+        ax.set_ylim(ylo, yhi)
+        ax.set_title(title, fontsize=10)
+        ax.set_ylabel(ylabel, fontsize=9)
+        ax.grid(True, axis="y", alpha=0.3)
+
+    fig.suptitle("Bhalla et al. 2025 T-SAE — every cell where it was measured",
+                  fontsize=13, fontweight="bold", y=1.02)
+    plt.tight_layout()
+    plt.savefig(OUT / "bhalla_tsae_cross_category.png", dpi=140, bbox_inches="tight")
+    plt.close(fig)
+
+
 def fig_overall_summary_grid(data: dict[str, Any]) -> None:
     """A single 3x2 panel showing the headline categories side-by-side."""
     fig, axs = plt.subplots(3, 2, figsize=(14, 14))
@@ -612,6 +651,7 @@ def main() -> None:
     fig_steering_c5(data)
     fig_paper_leaderboard(data)
     fig_backtracking_inducement(data)
+    fig_bhalla_tsae_summary(data)
     fig_overall_summary_grid(data)
     print(f"Wrote figures to {OUT}")
     for p in sorted(OUT.glob("*.png")):

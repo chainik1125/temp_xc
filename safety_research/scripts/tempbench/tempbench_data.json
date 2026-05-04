@@ -338,6 +338,28 @@
     "verdict": "On bad-medical: SAE (Andy RDT, 131k dict) wins by +22 align. MLC trails by ~2 (+19.4). TXC trails by ~10 (+10.7). TXC's per-position decoder dilution + smaller dict are the most likely explanations."
   },
 
+  "alignment_em_qwen7b_wang_procedure_bundle_k30": {
+    "_note": "Wang-procedure k=30 bundle aggregation on Qwen-7B medical EM — separate protocol from the open-ended bundle-of-10 in the README above; numbers are not directly comparable. This is the protocol where Bhalla T-SAE has a proper measurement.",
+    "source_branch": "origin/dmitry",
+    "source_doc": "docs/dmitry/results/em_features/hookpoint_compare/overnight_synthesis.md",
+    "bundle_k_30_peak_align": {
+      "sae_arditi_100k": 57.42,
+      "tsae_paper_30k_resid_post": 56.23,
+      "tsae_paper_30k_resid_mid": 50.00,
+      "tsae_paper_30k_ln1_normalized": 49.92,
+      "txc_paper_k100": 50.97,
+      "windowed_tsae_T2_30k": "<= 51 (falsified ladder)"
+    },
+    "tsae_paper_bundle_k_sweep": {
+      "k_1": 51.61, "k_5": 52.07, "k_30": 56.23
+    },
+    "txc_bundle_k_sweep": {
+      "k_1": 50.97, "k_5": 55.17, "k_30": "drops"
+    },
+    "architectural_fingerprint": "T-SAE features are aligned/redundant (per-token TopK + adjacency contrastive correlates z_t and z_{t+1}; summing strengthens), while TXC features are orthogonal/diverse (window encoder produces multi-position patterns; summing dilutes ~1/sqrt(k_bundle)).",
+    "verdict": "On the Wang-procedure bundle-k=30 protocol, Bhalla T-SAE @ resid_post (56.23) trails SAE arditi (57.42) by 1.2 align — much closer than the README's open-ended TXC vs SAE gap. Bhalla T-SAE's bundle-k curve is monotone-rising; TXC's peaks then drops. This is the cleanest direct architectural contrast we have on alignment."
+  },
+
   "reasoning_steering_aniket": {
     "source_branch": "origin/final-aniket",
     "source_doc": "papers/reasoning_features.md",

@@ -167,7 +167,10 @@ Mean-pool aggregation; FLIP applied to winogrande/wsc.
 the per-seed means at the arch level (pure seed effect, no task variance).
 
 **Headline at k_feat = 20**: TXC bare-antidead T = 5 wins, statistically
-defensible.
+defensible. The `tsae_paper_k500` row in this leaderboard **is the
+actual Bhalla T-SAE** (port of Ye et al.'s T-SAE codebase to the
+unified `purified/` framework) — at 0.9105 it sits 3rd, within
+1.5 σ_seeds of TXC.
 
 ![paper leaderboard](../../safety_research/figures/tempbench/paper_leaderboard.png)
 
@@ -189,6 +192,7 @@ within ~3× σ_seeds of each other — TXC bare-antidead's very small
 
 **At k_feat = 5**: top is MLC (0.8707) by 0.0024 over `topk_sae`. Top-6
 within 0.0037 AUC — statistically indistinguishable in this regime.
+Bhalla T-SAE (`tsae_paper_k500`) sits at 0.8651 (rank 6).
 
 ### 2.2 S-sensitivity — when does TXC's window advantage degrade?
 
@@ -424,10 +428,15 @@ rows on origin/final. 30 concepts × 9 strengths, 3 seeds.
 
 | arch | mean coh | success @ coh ≥ 1.75 |
 |------|---------:|---------------------:|
-| **T-SAE (Bhalla, `tsae_paper`)** | 1.566 | **0.067** |
+| **T-SAE (Bhalla, `tsae_paper`)** ⭐ | 1.566 | **0.067** |
 | TXC base | 1.892 | 0.033 |
 | TXC pro | 2.178 | 0.031 |
 | TopK SAE | 0.000 | 0.000 |
+
+The winning row here **is the Bhalla T-SAE** — same arch as the
+`tsae_paper_k500` cell in §2.1, evaluated under the c5 concept-steering
+protocol from `purified/`. It has lower mean coherence than TXC pro
+but more of its successes concentrate above the 1.75 threshold.
 
 T-SAE (Bhalla `tsae_paper`) wins on the *success* metric at the lowest
 coherence threshold (more steerable atoms surface). TXC has higher mean
@@ -454,8 +463,44 @@ features, α-grid = {−10, …, +5}. 8 EM questions × 8 rollouts, OpenAI judge
 | TXC d_sae = 32k @ 200k | 74.90 | 88.40 | +10.7 |
 | TXC d_sae = 32k @ 40k | 74.24 | 82.65 | +10.0 |
 
-**TXC underperforms on this benchmark by ~10 align points.** Three
-candidate explanations from the EM doc itself:
+**Bhalla T-SAE on Qwen-7B medical (Wang-procedure bundle k=30):**
+
+Source: `docs/dmitry/results/em_features/hookpoint_compare/overnight_synthesis.md`
+on `origin/dmitry`.
+
+The Wang-procedure bundle-aggregation protocol is a *separate*
+measurement from the open-ended bundle-of-10 in the table above; the
+two are not directly comparable, but on the Wang protocol the Bhalla
+T-SAE has its proper measurement:
+
+| arch (Wang procedure, k=30 bundle) | peak align |
+|------------------------------------|-----------:|
+| SAE arditi 100k | **57.42** ⭐ |
+| **T-SAE (Bhalla `tsae_paper`) 30k @ resid_post** | **56.23** |
+| T-SAE Bhalla 30k @ resid_mid | 50.00 |
+| T-SAE Bhalla 30k @ ln1_normalized | 49.92 |
+| TXC paper k=100 | 50.97 |
+
+The bundle-k sweep tells the architectural story:
+
+| k_bundle | T-SAE (Bhalla) | TXC k=100 |
+|---------:|---------------:|----------:|
+| 1 | 51.61 | 50.97 |
+| 5 | 52.07 | **55.17** |
+| 30 | **56.23** | drops |
+
+**Bhalla T-SAE's bundle peak rises monotonically with `k_bundle`;
+TXC's peaks at `k_bundle = 5` then falls.** Dmitry's interpretation
+(`overnight_synthesis.md`): the temporal-contrastive training objective
+in Bhalla T-SAE correlates `z_t` with `z_{t+1}`, so its features are
+*aligned/redundant* — summing strengthens the collective direction.
+TXC's window encoder produces features that capture *distinct*
+multi-position patterns, so their decoder rows are nearly orthogonal
+and summing dilutes by ~`1/√k_bundle`. This is the cleanest direct
+architectural contrast between Bhalla T-SAE and TXC on alignment.
+
+**TXC underperforms on the open-ended-bundle benchmark by ~10 align points.**
+Three candidate explanations from the EM doc itself:
 
 - TXC's per-position decoder dilutes the "write direction" that SAE
   concentrates at a single slot. Steering at one token gets only the
@@ -511,6 +556,54 @@ Qwen-7B medical by 11 align (with a 4× wider dictionary); TXC narrowly
 wins on Qwen-14B finance at α = +100. The bundle-K curves are *not*
 arch-symmetric: SAE's bundles degrade slowly (precision lost), TXC's
 bundles collapse at small K and recover at large K.
+
+## 5b. T-SAE (Bhalla et al. 2025) cross-category summary
+
+Because the architectural distinction between Stacked SAE and the
+*actual* Bhalla T-SAE is the load-bearing terminology fix in this
+report, it is worth aggregating every place the Bhalla T-SAE was
+actually measured into a single cross-category view.
+
+![bhalla cross-category](../../safety_research/figures/tempbench/bhalla_tsae_cross_category.png)
+
+| Category | benchmark | metric | Bhalla T-SAE | best other arm | source |
+|----------|-----------|--------|-------------:|---------------:|--------|
+| **Sparse probing** | PAPER 16-task BASE S=32 k_feat=20 | mean AUC, 3 seeds | **0.9105** (rank 3) | TXC bare-antidead 0.9127 ⭐ | `agent_x_paper/2026-04-29-leaderboard-multiseed.md` |
+| Sparse probing | PAPER 16-task BASE S=32 k_feat=5 | mean AUC, 3 seeds | 0.8651 (rank 6) | MLC 0.8707 ⭐ | same |
+| **Detection (deception)** | JBB test_in (n=200) | sparse-probe AUC | **0.970** [0.948, 0.988] | Stacked SAE 0.973 ⭐, all within CI | `safety_research/results/realbench/detect/tsae_paper.json` (this branch) |
+| Detection (deception) | XSTest test_ood (n=450) | sparse-probe AUC | **0.958** [0.941, 0.974] | Stacked SAE 0.963 ⭐, all within CI | same |
+| Detection (deception) | b2w boost vs TF-IDF (XSTest) | ΔAUC | **+0.290** | Stacked SAE +0.295 ⭐ | same |
+| **Concept steering (deception-adjacent)** | c5 protocol v7 (30 concepts × 9 strengths × 3 seeds) | success @ coh ≥ 1.75 | **0.067** ⭐ | TXC 0.033 | `purified/results/leaderboard.jsonl` c5 rows |
+| Concept steering | same | mean coherence | 1.566 | TXC pro 2.178 ⭐ | same |
+| **Alignment (EM Qwen-7B medical, Wang-procedure)** | bundle k=30 | peak align | **56.23** | SAE arditi 100k 57.42 ⭐ | `hookpoint_compare/overnight_synthesis.md` |
+| Alignment same | bundle k=1 | peak align | 51.61 | TXC k=100 50.97 | same |
+| Alignment same | bundle k=5 | peak align | 52.07 | TXC k=100 55.17 ⭐ | same |
+| Alignment | EM Qwen-14B finance R32 | peak align (single-feat ext-α) | not measured | SAE arditi 64.53 ⭐, TXC 51.95 | `EM_NANDA_BRIEF.md` (no `tsae_paper` cell on R32) |
+
+**Two architectural fingerprints** of the Bhalla T-SAE that show up
+across these cells:
+
+1. **Detection-side**: behaves indistinguishably from Stacked SAE / TXC
+   on white-box probes — all four arms are within 95% bootstrap CI
+   on JBB and XSTest. The +0.290 b2w boost confirms Bhalla T-SAE
+   carries the white-box signal; the contrastive temporal training
+   loss does not visibly help or hurt detection.
+2. **Bundle aggregation**: on Qwen-7B medical, Bhalla T-SAE's
+   bundle-peak rises monotonically with `k_bundle` (51.6 → 52.1 →
+   56.2), while TXC's peaks at `k_bundle = 5` (55.2) and falls.
+   Dmitry's interpretation (`overnight_synthesis.md`): T-SAE's
+   adjacency contrastive correlates `z_t` with `z_{t+1}`, so its
+   features are *aligned/redundant* — summing strengthens. TXC's
+   features are *orthogonal/diverse* — summing dilutes by
+   ~`1/√k_bundle`. This is the single cleanest direct architectural
+   contrast between the two on alignment work.
+
+The Bhalla T-SAE is therefore **competitive on detection, narrowly
+trails SAE on Wang-procedure bundle alignment, and beats TXC on c5
+concept steering at the strict-coherence threshold** — a different
+profile from either Stacked SAE or TXC, and strong evidence that
+the Bhalla architecture deserves to be reported as a distinct fourth
+arm in the paper rather than collapsed into the Stacked SAE row.
 
 ## 6. Where TXC overperforms / underperforms — concise verdict
 
