@@ -34,8 +34,14 @@ from pathlib import Path
 from typing import Any, Iterable
 
 from temp_bench.cache import _read_jsonl, leaderboard_path
-from temp_bench.config import purified_root
-from temp_bench.schemas import LeaderboardRow
+from temp_bench.config import (
+    compute_act_cache_key,
+    compute_train_key,
+    load_arch,
+    load_datasource,
+    purified_root,
+)
+from temp_bench.schemas import LeaderboardRow, TrainingConfig
 
 # Public marker syntax. Agents copy these literally into cN.md once.
 BEGIN_MARKER = "<!-- BEGIN AUTO-RESULTS -->"
@@ -98,6 +104,84 @@ def query_leaderboard(
             continue
         rows.append(row)
     return rows
+
+
+# ── Canonical train_key filter ───────────────────────────────────────────
+
+
+def canonical_train_keys(
+    *,
+    component: str,
+    archs: Iterable[str],
+    seeds: Iterable[int],
+    datasource_names: Iterable[str],
+    training_cfg: TrainingConfig | None = None,
+) -> set[str]:
+    """Compute the set of canonical ``train_key`` values for a sweep.
+
+    Use this in a component's ``analysis.py`` to filter stale leaderboard
+    rows out of AUTO-RESULTS. When a paper-wide default changes (e.g.,
+    ``TrainingConfig.batch_size`` was raised from 256 to 1024 on
+    2026-05-04), prior cells stay in ``leaderboard.jsonl`` for diff
+    comparison but their ``train_key`` no longer matches the canonical
+    config. This helper returns only the keys that match the supplied
+    ``training_cfg`` (or the current ``TrainingConfig()`` defaults if
+    omitted), so filtering is a one-line set membership check::
+
+        valid = canonical_train_keys(
+            component="c5",
+            archs=["txc_base", "txc_pro", "tsae_paper"],
+            seeds=(1, 2, 42),
+            datasource_names=["gemma_2_2b_it_l13_fineweb_24k128"],
+        )
+        rows = [r for r in query_leaderboard(component="c5")
+                if r.train_key in valid]
+
+    Args:
+        component: Component name (``"c1"``…``"c7"``). Propagated to
+            :func:`temp_bench.config.load_arch` so any
+            ``per_component_hparams`` overrides (e.g. C7's ``d_sae=32768``)
+            are applied.
+        archs: Architecture names from ``configs/locked_archs.yaml``.
+            Names that aren't registered or whose class can't be imported
+            are silently skipped — so you can pass the union of archs the
+            component might care about without per-arch try/except.
+        seeds: Seed values to canonicalize.
+        datasource_names: Datasource names from
+            ``configs/datasources.yaml``. Multiple are allowed (e.g., a
+            primary plus a mirror); unknown names are silently skipped.
+        training_cfg: :class:`TrainingConfig` to canonicalize against.
+            Defaults to ``TrainingConfig()`` (the paper-wide canonical
+            defaults). Pass an explicit instance only when filtering for
+            an alternate canonical config (e.g., a component that runs
+            with ``bricken_enabled=True``).
+
+    Returns:
+        Set of 16-char ``train_key`` strings. Empty if every (arch,
+        datasource) pair was unresolvable.
+    """
+    cfg = training_cfg if training_cfg is not None else TrainingConfig()
+
+    valid: set[str] = set()
+    for ds_name in datasource_names:
+        try:
+            ds = load_datasource(ds_name)
+        except KeyError:
+            continue
+        ack = compute_act_cache_key(ds)
+        for arch_name in archs:
+            try:
+                spec = load_arch(arch_name, component=component)
+            except (KeyError, ImportError):
+                continue
+            for seed in seeds:
+                valid.add(compute_train_key(
+                    arch=spec,
+                    seed=int(seed),
+                    training_cfg=cfg,
+                    act_cache_key=ack,
+                ))
+    return valid
 
 
 # ── Component → analysis.py resolution ──────────────────────────────────

@@ -364,8 +364,31 @@ all in the `TrainingConfig` dump that feeds `compute_train_key` (see
 `src/temp_bench/config.py:181-193`). New cells will derive new
 `train_key` automatically; old batch=256 cells stay in the leaderboard
 under their old keys for diff comparison. **No path collisions.** Analyses
-in `experiments/cN_*/analysis.py` should filter for the new
-`training_cfg.batch_size=1024` rows when rendering AUTO-RESULTS.
+in `experiments/cN_*/analysis.py` should filter the leaderboard to
+canonical-config cells via the `temp_bench.report.canonical_train_keys`
+helper (added 2026-05-04 PM):
+
+```python
+from temp_bench.report import canonical_train_keys, query_leaderboard
+
+valid = canonical_train_keys(
+    component="c5",
+    archs=["txc_base", "txc_pro", "tsae_paper"],
+    seeds=(1, 2, 42),
+    datasource_names=["gemma_2_2b_it_l13_fineweb_24k128"],
+)
+rows = [r for r in query_leaderboard(component="c5") if r.train_key in valid]
+```
+
+The helper deterministically computes `train_key` for the canonical
+sweep using the *current* `TrainingConfig()` defaults — so when the
+defaults change again, every analysis.py automatically picks up the
+new keys without a copy-paste churn. Pass an explicit `training_cfg=`
+argument only when filtering for an alternate canonical config (e.g.,
+a Bricken-on per-component override). Unknown archs / datasources are
+silently skipped (lets you list the union without per-cell try/except).
+agent_back's `_valid_train_keys` (commit ab02aea2) was the reference
+implementation; the shared helper supersedes it.
 
 **Cross-agent re-train directive**: every C3/C4/C5/C6/C7 cell needs new
 `train_keys`. Workers update their per-component `_real_training_cfg` (or

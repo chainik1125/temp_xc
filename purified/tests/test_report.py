@@ -199,3 +199,109 @@ def test_query_leaderboard_filters(tmp_temp_bench_root):
 
     rows_none = query_leaderboard(arch="nonexistent")
     assert rows_none == []
+
+
+def test_canonical_train_keys_matches_runner(tmp_temp_bench_root):
+    """The keys returned by canonical_train_keys must equal what
+    runner.run_cell would write for the same inputs."""
+    from temp_bench.config import (
+        compute_act_cache_key,
+        compute_train_key,
+        load_arch,
+        load_datasource,
+    )
+    from temp_bench.report import canonical_train_keys
+    from temp_bench.schemas import TrainingConfig
+
+    archs = ("topk_sae", "txc_base")
+    seeds = (1, 42)
+    ds_name = "toy_markov_n20_d40"
+
+    direct: set[str] = set()
+    ds = load_datasource(ds_name)
+    ack = compute_act_cache_key(ds)
+    for arch in archs:
+        spec = load_arch(arch, component="c1")
+        for seed in seeds:
+            direct.add(compute_train_key(
+                arch=spec, seed=seed,
+                training_cfg=TrainingConfig(), act_cache_key=ack,
+            ))
+
+    via_helper = canonical_train_keys(
+        component="c1",
+        archs=archs,
+        seeds=seeds,
+        datasource_names=[ds_name],
+    )
+    assert via_helper == direct
+    assert len(via_helper) == len(archs) * len(seeds)
+
+
+def test_canonical_train_keys_excludes_alternate_cfg(tmp_temp_bench_root):
+    """A train_key computed under a different TrainingConfig (e.g., the
+    pre-2026-05-04 batch=256) must NOT appear in the canonical set."""
+    from temp_bench.config import (
+        compute_act_cache_key,
+        compute_train_key,
+        load_arch,
+        load_datasource,
+    )
+    from temp_bench.report import canonical_train_keys
+    from temp_bench.schemas import TrainingConfig
+
+    archs = ("topk_sae",)
+    seeds = (42,)
+    ds_name = "toy_markov_n20_d40"
+
+    spec = load_arch("topk_sae", component="c1")
+    ack = compute_act_cache_key(load_datasource(ds_name))
+    old_key = compute_train_key(
+        arch=spec, seed=42,
+        training_cfg=TrainingConfig(batch_size=256, n_steps=30_000,
+                                    plateau_early_stop=True),
+        act_cache_key=ack,
+    )
+    canonical = canonical_train_keys(
+        component="c1", archs=archs, seeds=seeds,
+        datasource_names=[ds_name],
+    )
+    assert old_key not in canonical
+    assert len(canonical) == 1
+
+
+def test_canonical_train_keys_skips_unknown_archs_and_datasources(tmp_temp_bench_root):
+    """Unknown archs / datasources are silently skipped (no exception)."""
+    from temp_bench.report import canonical_train_keys
+
+    keys = canonical_train_keys(
+        component="c1",
+        archs=("topk_sae", "nonexistent_arch"),
+        seeds=(42,),
+        datasource_names=["toy_markov_n20_d40", "nonexistent_ds"],
+    )
+    # Only the (topk_sae, toy_markov_n20_d40) pair should produce a key
+    assert len(keys) == 1
+
+
+def test_canonical_train_keys_respects_explicit_training_cfg(tmp_temp_bench_root):
+    """Passing an explicit TrainingConfig (e.g., bricken-on for C6) yields
+    a different key than the default."""
+    from temp_bench.report import canonical_train_keys
+    from temp_bench.schemas import TrainingConfig
+
+    default_keys = canonical_train_keys(
+        component="c1",
+        archs=("topk_sae",),
+        seeds=(42,),
+        datasource_names=["toy_markov_n20_d40"],
+    )
+    bricken_keys = canonical_train_keys(
+        component="c1",
+        archs=("topk_sae",),
+        seeds=(42,),
+        datasource_names=["toy_markov_n20_d40"],
+        training_cfg=TrainingConfig(bricken_enabled=True),
+    )
+    assert default_keys != bricken_keys
+    assert len(default_keys) == len(bricken_keys) == 1
