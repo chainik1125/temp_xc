@@ -1,1 +1,62 @@
-{}
+{
+  "by_arch": {
+    "tsae_paper": {
+      "mean_mean_coh": 1.5654321511586506,
+      "mean_mean_success": 0.12962963183720908,
+      "mean_success_at_coh_1.5": 0.06666666666666667,
+      "mean_success_at_coh_1.75": 0.06666666666666667,
+      "mean_success_at_coh_2": 0.06666666666666667,
+      "mean_success_at_coh_2.25": 0.08508277863116571,
+      "mean_success_at_coh_2.5": 0.08508277863116571,
+      "n_seeds": 3,
+      "stderr_mean_coh": 0.0012345711390177407,
+      "stderr_mean_success": 0.0037037034829457602,
+      "stderr_success_at_coh_1.5": 0.006415002990995843,
+      "stderr_success_at_coh_1.75": 0.006415002990995843,
+      "stderr_success_at_coh_2": 0.006415002990995843,
+      "stderr_success_at_coh_2.25": 0.0050910867855520235,
+      "stderr_success_at_coh_2.5": 0.0050910867855520235
+    },
+    "txc_base": {
+      "mean_mean_coh": 1.90370374917984,
+      "mean_mean_success": 0.17222222685813904,
+      "mean_success_at_coh_1.5": 0.035833333333333335,
+      "mean_success_at_coh_1.75": 0.035833333333333335,
+      "mean_success_at_coh_2": 0.035833333333333335,
+      "mean_success_at_coh_2.25": 0.034569288389513106,
+      "mean_success_at_coh_2.5": 0.034569288389513106,
+      "n_seeds": 2,
+      "stderr_mean_coh": 0.2074074149131775,
+      "stderr_mean_success": 0.01666666567325592,
+      "stderr_success_at_coh_1.5": 0.010833333333333334,
+      "stderr_success_at_coh_1.75": 0.010833333333333334,
+      "stderr_success_at_coh_2": 0.010833333333333334,
+      "stderr_success_at_coh_2.25": 0.01209737827715356,
+      "stderr_success_at_coh_2.5": 0.01209737827715356
+    },
+    "txc_pro": {
+      "mean_mean_coh": 2.209259271621704,
+      "mean_mean_success": 0.192592591047287,
+      "mean_success_at_coh_1.5": 0.03592325969005993,
+      "mean_success_at_coh_1.75": 0.03592325969005993,
+      "mean_success_at_coh_2": 0.03592325969005993,
+      "mean_success_at_coh_2.25": 0.03485174557627929,
+      "mean_success_at_coh_2.5": 0.03485174557627929,
+      "n_seeds": 2,
+      "stderr_mean_coh": 0.03888893127441406,
+      "stderr_mean_success": 0.014814808964729309,
+      "stderr_success_at_coh_1.5": 0.00702152558601369,
+      "stderr_success_at_coh_1.75": 0.00702152558601369,
+      "stderr_success_at_coh_2": 0.00702152558601369,
+      "stderr_success_at_coh_2.25": 0.004363940698230512,
+      "stderr_success_at_coh_2.5": 0.004363940698230512
+    }
+  },
+  "thresholds": [
+    1.5,
+    1.75,
+    2.0,
+    2.25,
+    2.5
+  ]
+}
