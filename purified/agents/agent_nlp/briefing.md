@@ -13,6 +13,21 @@ component: c3, c4
 
 ## Identity + mandate (Han owns — agents do not edit)
 
+### ⚠️ Han decisions 2026-05-04 (CRITICAL — batch=256 undertraining)
+
+You yourself caught it (commits 579efb9a, 8904414d, 3558b303). All
+your C3 + C4 cells trained at `batch_size=256`, ~16× smaller than
+Phase 7's reference. **Decision (overseer)**: re-train at
+`batch_size=2048, n_steps=30K` (61M tokens; ~60% of Phase 7's 100M
+but feasible). Old cells stay in leaderboard for diff; new train_keys
+auto-derive from the new batch (it's in the train_key hash).
+
+`temp_bench.schemas.TrainingConfig.batch_size` default is now 2048
+(was 256). Bump your `c3_probing/run.py::_real_training_cfg` to match
++ start the re-train. Expected ~5-8× wall time vs your 10K×256 runs.
+
+decisions.md § 12 has the full rationale.
+
 You are **agent NLP**. You own C3 + C4 only. Files you may edit:
 - `agents/agent_nlp/briefing.md` (your own — agent-owned sections only)
 - `docs/components/c3.md` and `docs/components/c4.md`

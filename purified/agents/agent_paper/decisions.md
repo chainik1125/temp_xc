@@ -288,6 +288,35 @@ tasks across 8 datasets) augmented with two cross-token coreference
 probing tasks (WinoGrande, SuperGLUE WSC; n=38 binary one-vs-rest
 tasks total)."
 
+### 12. TrainingConfig batch_size raised to 2048 (was 256)
+
+agent_nlp caught the undertraining 2026-05-04 (commits 579efb9a +
+8904414d + 3558b303): every production cell across C3/C4/C5/C6/C7
+shipped at the framework's default `batch_size=256`, while Phase 7's
+reference `TrainCfg` used `batch_size=4096`. Net: ~13-40× less
+gradient information per cell than the wasteland reference.
+
+**Most-affected archs** are the contrastive ones — T-SAE (temporal
+InfoNCE on adjacent tokens) and TXC-pro (multi-distance contrastive
++ matryoshka). Both lean on in-batch negatives. The C3+C4+C5
+relative-arch orderings (TopK-SAE > TXC > T-SAE; T-SAE >> TXC) MAY
+shift once these archs train at proper batch.
+
+**Decision** (2026-05-04, overseer): bump `TrainingConfig.batch_size`
+default to **2048** (token-equivalent budget at n_steps=30K = 61M,
+~60% of Phase 7's 100M but feasible in remaining 72-h window).
+A40-pod components (C5 agent_steer, C7 agent_back) override to
+`batch_size=1024` in their per-component runner because batch=2048 +
+larger d_in (Llama-8B) won't fit in 48 GB.
+
+**Cross-agent re-train directive**: every C3/C4/C5/C6/C7 cell needs
+NEW train_keys with the new batch. Old cells stay in the leaderboard
+for diff comparison; the new runs use bumped train_keys
+automatically (batch_size is part of train_key hash).
+
+**Compute cost**: ~8× per cell. Total re-train ~80-150 GPU-hours
+across pods. Worker briefings updated with the directive.
+
 ### Non-decisions (to revisit later)
 
 - **MLC scope** — competitive with TXC-base at C3 k=5. Include as related

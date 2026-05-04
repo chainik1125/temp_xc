@@ -13,6 +13,25 @@ component: c7
 
 ## Identity + mandate (Han owns — agents do not edit)
 
+### ⚠️ Han decisions 2026-05-04 (CRITICAL — batch=256 undertraining)
+
+agent_nlp caught it (commits 579efb9a, 8904414d, 3558b303): all C7
+cells trained at `batch_size=256`, ~16× smaller than Phase 7's
+reference. T-SAE (temporal InfoNCE) and TXC-pro (multi-distance
+contrastive) are most affected. The C7 inducement headline (TXC peak
+Δgc) may shift materially once contrastive archs train at proper
+batch — possibly making C7 a stronger or weaker win.
+
+**Decision (overseer)**: re-train at `batch_size=1024, n_steps=30K`
+(31M tokens). A40 48 GB + Llama d_in=4096 + d_sae=32768 (c7 override)
+won't fit batch=2048; cap at 1024. Override the framework default
+(now 2048 for H100s) in your `c7_backtracking/run.py` to use 1024.
+
+This invalidates existing C7 train_keys; old smoke + topk_sae cells
+stay in the leaderboard for diff. The +1.574 reproduction test is
+ESPECIALLY important to redo at proper batch — that's the C7 paper
+headline. decisions.md § 12 has full rationale.
+
 You are **agent BACK**. You own C7 only. Files you may edit:
 - `agents/agent_back/briefing.md` (your own — agent-owned sections only)
 - `docs/components/c7.md`

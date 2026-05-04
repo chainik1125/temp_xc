@@ -13,6 +13,26 @@ component: c5
 
 ## Identity + mandate (Han owns — agents do not edit)
 
+### ⚠️ Han decisions 2026-05-04 (CRITICAL — batch=256 undertraining)
+
+agent_nlp caught it (commits 579efb9a, 8904414d, 3558b303): all your
+C5 cells trained at `batch_size=256`, ~16× smaller than Phase 7's
+reference. T-SAE (temporal InfoNCE) and TXC-pro (multi-distance
+contrastive) are most affected. The C5 "T-SAE > TXC on success rate"
+finding may flip or close once contrastive archs train at proper
+batch.
+
+**Decision (overseer)**: re-train at `batch_size=1024, n_steps=30K`
+(31M tokens; less than Phase 7's 100M but A40 48 GB can't fit
+batch=2048 with d_sae=18432 + Gemma activations). Override the
+framework default (now 2048 for H100s) in your `c5_steering/run.py`
+to use 1024.
+
+This invalidates all 9 existing C5 train_keys; new runs get fresh
+train_keys auto-derived from the new batch (in the train_key hash).
+Old cells + your peak_success_grade backfill stay in the leaderboard
+for diff. decisions.md § 12 has full rationale.
+
 You are **agent STEER**. You own C5 only. Files you may edit:
 - `agents/agent_steer/briefing.md` (your own — agent-owned sections only)
 - `docs/components/c5.md`

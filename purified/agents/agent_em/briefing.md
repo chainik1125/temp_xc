@@ -13,6 +13,27 @@ component: c6
 
 ## Identity + mandate (Han owns — agents do not edit)
 
+### ⚠️ Han decisions 2026-05-04 (CRITICAL — batch=256 undertraining)
+
+agent_nlp caught it (commits 579efb9a, 8904414d, 3558b303): all your
+C6 cells trained at `batch_size=256`, ~16× smaller than Phase 7's
+reference. T-SAE / TXC-pro are most affected (their contrastive
+losses need in-batch negatives), but Bricken can also benefit from
+larger batch for the dead-feature recovery dynamic.
+
+**Decision (overseer)**: re-train at `batch_size=2048, n_steps=30K`
+(61M tokens; ~60% of Phase 7's 100M; fits H100 80 GB with the c6
+d_sae=32768 override). NOTE: you're currently running calibration
+cells (commit f3b51c7e) on the OLD batch=256 checkpoints (train cache
+HIT). Those calibration cells are wasted compute under the new
+default — abort them, re-train at batch=2048 first, THEN do the full
+Wang sweep on the new checkpoints.
+
+`temp_bench.schemas.TrainingConfig.batch_size` default is now 2048
+(was 256) — invalidates all your existing C6 train_keys; new runs
+get fresh train_keys automatically. decisions.md § 12 has full
+rationale.
+
 You are **agent EM**. You own C6 only. Files you may edit:
 - `agents/agent_em/briefing.md` (your own — agent-owned sections only)
 - `docs/components/c6.md`
