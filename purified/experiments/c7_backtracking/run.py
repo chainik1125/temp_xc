@@ -79,6 +79,24 @@ DEFAULT_SEEDS = (1, 2, 42)
 # ── Train-fn adapter: shared trainer + activation cache ────────────────
 
 
+def _spec_window_size(spec) -> int:
+    """Window size needed to satisfy the arch's train_step.
+
+    - Shared-z TXCs (txc_base) want T tokens.
+    - txc_pro wants T_max + max(contrastive_shifts) tokens for the
+      multi-distance contrastive positives.
+    - Stacked-SAE / MLC want T tokens.
+    - TFA + TopK + T-SAE handle any seq_len ≥ 1.
+    Default seq_len conservatively to ``max(T_window, 16)`` so the
+    full sweep doesn't trip on per-arch quirks.
+    """
+    h = spec.hparams
+    T_max = int(h.get("T_max", h.get("T", h.get("n_layers", 5))))
+    shifts = h.get("contrastive_shifts") or []
+    max_shift = max(shifts) if shifts else 0
+    return T_max + max_shift
+
+
 def _build_batch_iter(act_cache_key: str, *, batch_size: int = 256, T: int = 5,
                       seed: int = 42):
     """Build a batch iterator from the activation cache memmap.
@@ -130,7 +148,8 @@ def my_train_fn(*, arch_name, arch_hparams, seed, training_cfg, act_cache_key, c
     model = instantiate_arch(spec, d_in=d_in)
     if torch.cuda.is_available():
         model = model.cuda()
-    T = int(spec.hparams.get("T", 5))
+    # Use the arch-specific window size (handles T_max + contrastive_shifts).
+    T = _spec_window_size(spec)
     batch_iter = _build_batch_iter(act_cache_key, batch_size=training_cfg.batch_size,
                                     T=T, seed=seed)
     result = train_sae(model, batch_iter, training_cfg)
@@ -277,7 +296,16 @@ def main(*, archs=None, seeds=DEFAULT_SEEDS, build_cache_only: bool = False,
                 )
             except Exception as e:
                 log.exception("[c7.run] cell failed arch=%s seed=%d: %s", arch, seed, e)
-                continue
+            finally:
+                # Aggressive GPU cleanup between cells — without this,
+                # PyTorch's caching allocator holds onto dead-cell tensors
+                # and the next cell OOMs (witnessed on tfa after a txc_pro
+                # failure). gc.collect() drops Python refs; empty_cache()
+                # releases reserved blocks back to the driver.
+                import gc
+                gc.collect()
+                if torch.cuda.is_available():
+                    torch.cuda.empty_cache()
     return 0
 
 
