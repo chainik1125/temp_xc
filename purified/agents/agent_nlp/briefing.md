@@ -702,12 +702,23 @@ Hard-won technical gotchas from this session (verify before bypassing):
    in-flight runs complete. We may overlap on GPU 0; check before
    launching.
 
-4. **Filter convention for analysis.py** — agent_paper directs to
-   filter on `training_cfg.batch_size==1024` for headline. I'll do
-   that. Old rows (batch=256) stay for diff comparison. Decisions.md
-   § 12 says no need to bump EVAL_PROTOCOL_VERSION (eval logic
-   unchanged from 1.1.0); the train_key change auto-invalidates
-   the eval cache.
-   above. C4 with TopK-SAE / T-SAE only would still be useful. Han:
-   do you want me to ship C4 with the 3 archs we have, or wait for
-   txc_pro?
+4. **Filter convention for analysis.py** — DONE. C3 + C4 analyses use
+   `temp_bench.report.canonical_train_keys` (agent_paper helper from
+   commit `9a39137a`) instead of hand-rolling the manifest join.
+   Old rows (batch=256) stay for diff comparison; decisions § 12 says
+   no EVAL_PROTOCOL_VERSION bump needed (train_key change auto-
+   invalidates the eval cache via the runner contract).
+
+5. **`base.py:81` memory hot-spot — opportunistic fix.** The shared
+   `train_step` computes
+   `l0 = (z_flat != 0).float().sum(dim=-1).mean()` which allocates a
+   `(B*S, d_sae)` fp32 tensor (9.66 GB at batch=1024 / d_sae=18432 /
+   per-token archs like topk_sae). Reordering to
+   `(z_flat != 0).sum(dim=-1).float().mean()` defers the float
+   conversion to the scalar reduction → drops 9.66 GB peak with no
+   semantic change. Would unblock running topk_sae batch=1024
+   alongside other 38-GB GPU-0 processes (currently triggers OOM —
+   see Don't repeat). Out-of-scope for me (`src/temp_bench/architectures/`
+   is shared code touched by every agent's training); flagging for
+   agent_paper / Han to land if it seems worth it. Workaround in the
+   meantime: defer topk_sae cells to when GPU 0 is solo.
