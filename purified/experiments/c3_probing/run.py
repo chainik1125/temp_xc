@@ -56,7 +56,7 @@ COMPONENT = "c3"
 DATASOURCE = "gemma_2_2b_it_l13_fineweb_24k128"
 EVAL_PROTOCOL_VERSION = "1.0.0"
 
-DEFAULT_ARCHS = ("topk_sae", "tsae_paper", "txc_base")  # 3 ported; mlc/txc_pro pending
+DEFAULT_ARCHS = ("topk_sae", "tsae_paper", "txc_base", "txc_pro")  # mlc still pending
 DEFAULT_SEEDS = (1, 2, 42)
 DEFAULT_K_FEATS = (5, 20)
 DEFAULT_S = 32

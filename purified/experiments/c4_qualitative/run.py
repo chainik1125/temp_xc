@@ -50,7 +50,7 @@ COMPONENT = "c4"
 DATASOURCE = "gemma_2_2b_it_l13_fineweb_24k128"   # SHARED with C3
 EVAL_PROTOCOL_VERSION = "1.0.0"
 
-DEFAULT_ARCHS = ("tsae_paper", "txc_base")        # txc_pro pending port
+DEFAULT_ARCHS = ("tsae_paper", "txc_base", "txc_pro")
 DEFAULT_SEEDS = (1, 2, 42)
 DEFAULT_N_FEATURES = 256
 
