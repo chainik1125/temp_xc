@@ -6,7 +6,7 @@ rules: PROTOCOL.md § 14.
 
 ---
 agent: agent_em_100k
-last_state_update: 2026-05-04T16:30:00Z
+last_state_update: 2026-05-04T22:20:00Z
 component: c6
 ---
 
@@ -250,50 +250,92 @@ just need to land in `leaderboard.jsonl` with the right
 
 ## Current state (agent owns — overwrite at every compact)
 
-**Last verified: <fill in on first session>**
+**Last verified: 2026-05-04T22:20Z. Smoke test PASSED end-to-end. Real
+seed=42 cells launched (sae_arditi → txc_base, serial on GPU 0).**
 
-- `git HEAD`: <sha>
-- Pod: 1× H100, ephemeral, 240 GB RAM. `/workspace/temp_xc/` clone.
-- Last leaderboard append: `(none yet)`.
-- Last checkpoint saved: `(none yet)`.
-- Active GPU usage: GPU 0 (only GPU on this pod).
+- `git HEAD`: 6db405bd4a8b59b0cf5a8e623f7aba8b81437c36 (`final`).
+- Pod: 1× H100 80GB, ephemeral. **Actual RAM: 2 TB** (briefing said
+  240 GB — pod is even more generous; .clone() preload is unconstrained).
+- Smoke leaderboard append: `train_key=29d23894a05bfc12`,
+  `eval_key=55daa62002321413` (sae_arditi seed=42 n_steps=200,
+  skip-eval → peak_align=0.0). Filtered out by canonical_train_keys
+  (n_steps≠100k or 25k).
+- Smoke checkpoint: `checkpoints/29d23894a05bfc12/` (1.3 GB SAE arditi
+  d_sae=32k, pushed to HF temp-bench-models).
+- Activation cache built fresh + pushed to HF (was missing on HF, only
+  agent_em had it locally — see "Don't repeat" below). Path:
+  `results/act_cache/e052801ef8e6d22b/` (7.86 GB fp16). Cache build
+  took ~48 sec on H100 (Qwen-14B forward, 6000 seqs × 128 tokens,
+  batch_size=8). HF upload took ~70 sec.
+- Active GPU usage: GPU 0 (only GPU on this pod), 99% util on training.
 - Recent decisions in scope: `decisions.md` § 7 (Bricken-on for C6),
   § 12 (canonical training cfg), § 13 (100K copy-sweep policy).
-- In flight: `(nothing yet — first session)`.
+- Predicted train_keys for the real cells (verified via
+  `compute_train_key`):
+  - sae_arditi seed=42 100K: `e5de419224108f98`
+  - txc_base seed=42 100K: `0884a29eabb0030d`
+- In flight (PID 3718, started 22:20:07Z):
+  `.venv/bin/python -m experiments.c6_em_100k.run --archs sae_arditi txc_base
+  --seeds 42` → `logs/c6_100k_seed42.log`. Per-cell ETA: ~4 hr × 2 = 8 hr.
+  ETA all done: ~06:20Z 2026-05-05.
 
 ## What I just did (agent owns — overwrite)
 
-(none yet — first session)
+1. `source scripts/set_agent_env.sh agent_em_100k` + smoke test
+   (124/124 + preflight clean, anthropic key wired for Sonnet judge).
+2. `git pull --rebase origin final` — already up to date.
+3. `bash scripts/sync_from_hf.sh` — pulled 40 ckpt dirs (~64 GB) +
+   2 act_cache dirs (e4916bcae1881963 14G C5, fb2a74be884e512a 4G).
+   The 14B finance cache `e052801ef8e6d22b` was **NOT on HF** —
+   agent_em never pushed it. I built it fresh + auto-pushed (ephemeral
+   mode), so future agents will hit cache.
+4. Wrote `experiments/c6_em_100k/{run.py,__init__.py}` — minimal driver
+   that imports `make_training_cfg`, `make_eval_fn`, `ensure_activation_cache`,
+   `EVAL_PROTOCOL_VERSION`, `DEFAULT_DATASOURCE` from
+   `experiments.c6_em.run` and `my_train_fn` from
+   `experiments.c6_em.train`. Overrides `n_steps=100_000` via
+   `TrainingConfig.model_copy(update={"n_steps": ...})`. Replicates
+   agent_em's eval_cfg dict verbatim so eval_keys align (only
+   train_key differs from agent_em's 25K cells).
+   - Driver corrects briefing-sketch import drifts:
+     `make_training_cfg` is in `run.py` not `train.py`;
+     `my_eval_fn` is a factory `make_eval_fn(datasource_name)`;
+     `DATASOURCE` is named `DEFAULT_DATASOURCE`.
+5. Smoke test (sae_arditi seed=42 n_steps=200 --skip-eval) ran to
+   completion in ~3.5 min total: 48s cache build + 70s cache HF upload
+   + 6s train + 30s ckpt HF upload + manifest+leaderboard write.
+6. Launched real seed=42 sweep (sae_arditi + txc_base, n_steps=100k,
+   full Wang).
 
 ## Next action (agent owns — overwrite)
 
-1. `cd $(git rev-parse --show-toplevel)/purified`
-2. `source scripts/set_agent_env.sh agent_em_100k`
-3. `bash scripts/agent_smoke_test.sh` — expect 124/124 + preflight
-   green.
-4. `bash scripts/sync_from_hf.sh` — pulls Qwen-14B activation cache
-   (act_cache_key for `qwen_2_5_14b_instruct_finance_l24_resid_post`)
-   + agent_em's 25K checkpoints (good for sanity diff at the end).
-5. `git pull --rebase origin final` — stay current with agent_em's
-   recent commits (especially the .clone() preload at `6269f4d2`).
-6. **Write `experiments/c6_em_100k/run.py` + empty `__init__.py`** per
-   the sketch above.
-7. **Smoke-test the driver** with a tiny override (e.g., `--archs
-   sae_arditi --seeds 42` and a `n_steps=200` patch) before launching
-   the real 100K cells. Verify the cell hits agent_em's `my_train_fn`,
-   `my_eval_fn`, Wang stages, judge calls.
-8. Launch the real 100K cells:
+1. **Watch seed=42 to completion** via `tail -F logs/c6_100k_seed42.log`
+   or Monitor on `elapsed_steps=|done in.*steps|stage[0-9].*elapsed|peak_align|CELL DONE|Traceback`.
+   Per-cell ETA: ~1 hr train + ~3 hr Wang = ~4 hr × 2 cells = ~8 hr.
+   Expected end: ~06:20Z 2026-05-05.
+2. **As each cell completes**: verify
+   `tail -1 results/leaderboard.jsonl | jq` shows
+   `agent: agent_em_100k`, `arch: sae_arditi|txc_base`, `seed: 42`,
+   `eval_protocol_version: 2.0.0`, sensible peak_align (>70 expected).
+3. **When seed=42 done** — pre-staged at `/tmp/seed1_real_cmd.sh`:
+   ```bash
+   bash /tmp/seed1_real_cmd.sh   # launches seed=1, both archs
+   ```
+   No need to re-source env; the script does it.
+4. If seed=1 finishes with margin remaining (>=4hr to deadline),
+   restore agent_em's dropped seed=2 by running:
    ```bash
    TQDM_DISABLE=1 .venv/bin/python -m experiments.c6_em_100k.run \
-     --archs sae_arditi txc_base --seeds 42 \
-     > logs/c6_100k_seed42.log 2>&1 &
+     --archs sae_arditi txc_base --seeds 2 \
+     > logs/c6_100k_seed2.log 2>&1 &
    ```
-9. Monitor via `Monitor` tool or periodic `tail` on the log.
-10. As cells complete: confirm new leaderboard rows landed
-    (`tail -1 results/leaderboard.jsonl`). Don't render anything to
-    c6.md yourself — agent_paper handles that at paper-render time.
-11. When seed=42 cells done: kick off seed=1 immediately. If both
-    finish with margin, attempt seed=2.
+5. **Don't render anything to docs/components/c6.md yourself** — that's
+   agent_paper's territory. Just confirm leaderboard rows land.
+6. **Before any pod restart or `status: complete`**:
+   `bash scripts/wrap_up_session.sh` — git-adds metrics.json, judge
+   transcripts, manifest tail, leaderboard tail; commits with
+   "wrap-up"; pulls/pushes origin/final; verifies HF push state for
+   ephemeral mode.
 
 ## Don't repeat (agent owns — overwrite)
 
@@ -314,6 +356,22 @@ just need to land in `leaderboard.jsonl` with the right
   for that arch. Trust the helper, don't override.
 - **Don't push to HF manually** — `cache.save_checkpoint` does it on
   ephemeral pods. Verify via the URL in the manifest after each cell.
+- **`make_training_cfg` lives in `experiments.c6_em.run`, NOT `.train`**
+  — the briefing's first-cell sketch had this wrong. `train.py` only
+  exports `my_train_fn`. Importing from `.train` raises ImportError.
+- **`my_eval_fn` is a factory `make_eval_fn(datasource_name)`** — also
+  off in the briefing sketch. There is no top-level `my_eval_fn`
+  symbol in `experiments.c6_em.run`; you must call `make_eval_fn(ds)`
+  to get the closure.
+- **Don't expect `qwen_2_5_14b_instruct_finance_l24_resid_post` cache
+  on HF before you run.** As of 2026-05-04T22Z, agent_em never pushed
+  it — `sync_from_hf.sh` won't pull it. The driver's
+  `ensure_activation_cache(...)` builds it fresh in ~48 sec on H100
+  + auto-pushes (ephemeral). Future runs benefit; first run pays.
+- **Smoke leaderboard row at `train_key=29d23894a05bfc12` is intentional
+  noise** (n_steps=200, peak_align=0.0). Don't try to remove it from
+  leaderboard.jsonl (it's append-only). It's filtered out by
+  canonical_train_keys regardless.
 
 ## Open questions for Han (agent owns — overwrite)
 
