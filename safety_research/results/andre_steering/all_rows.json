@@ -1,0 +1,380 @@
+[
+ {
+  "method": "DoM (Arditi)",
+  "arm": "\u2014",
+  "alpha": -2.0,
+  "dh": -0.2188282012939453,
+  "db": -0.4353906214237213
+ },
+ {
+  "method": "DoM (Arditi)",
+  "arm": "\u2014",
+  "alpha": 0.0,
+  "dh": 0.0,
+  "db": 0.0
+ },
+ {
+  "method": "DoM (Arditi)",
+  "arm": "\u2014",
+  "alpha": 1.0,
+  "dh": 0.10578060150146484,
+  "db": 0.21726566553115845
+ },
+ {
+  "method": "DoM (Arditi)",
+  "arm": "\u2014",
+  "alpha": 2.0,
+  "dh": 0.21828079223632812,
+  "db": 0.43812495470046997
+ },
+ {
+  "method": "DoM (Arditi)",
+  "arm": "\u2014",
+  "alpha": 4.0,
+  "dh": 0.4334373474121094,
+  "db": 0.8888280987739563
+ },
+ {
+  "method": "DoM (Arditi)",
+  "arm": "\u2014",
+  "alpha": "ablate",
+  "dh": -19.826172351837158,
+  "db": -10.365312278270721
+ },
+ {
+  "method": "naive coef-dir",
+  "arm": "SAE (T=1)",
+  "alpha": -2.0,
+  "dh": -0.15335941314697266,
+  "db": -0.3115624785423279
+ },
+ {
+  "method": "naive coef-dir",
+  "arm": "SAE (T=1)",
+  "alpha": 0.0,
+  "dh": 0.0,
+  "db": 0.0
+ },
+ {
+  "method": "naive coef-dir",
+  "arm": "SAE (T=1)",
+  "alpha": 1.0,
+  "dh": 0.07703113555908203,
+  "db": 0.15312498807907104
+ },
+ {
+  "method": "naive coef-dir",
+  "arm": "SAE (T=1)",
+  "alpha": 2.0,
+  "dh": 0.14937496185302734,
+  "db": 0.30867189168930054
+ },
+ {
+  "method": "naive coef-dir",
+  "arm": "SAE (T=1)",
+  "alpha": 4.0,
+  "dh": 0.2983589172363281,
+  "db": 0.6199999451637268
+ },
+ {
+  "method": "naive centroid-dir",
+  "arm": "SAE (T=1)",
+  "alpha": -2.0,
+  "dh": -0.14085960388183594,
+  "db": -0.2842968702316284
+ },
+ {
+  "method": "naive centroid-dir",
+  "arm": "SAE (T=1)",
+  "alpha": 0.0,
+  "dh": 0.0,
+  "db": 0.0
+ },
+ {
+  "method": "naive centroid-dir",
+  "arm": "SAE (T=1)",
+  "alpha": 1.0,
+  "dh": 0.0690622329711914,
+  "db": 0.13898438215255737
+ },
+ {
+  "method": "naive centroid-dir",
+  "arm": "SAE (T=1)",
+  "alpha": 2.0,
+  "dh": 0.13749980926513672,
+  "db": 0.2809374928474426
+ },
+ {
+  "method": "naive centroid-dir",
+  "arm": "SAE (T=1)",
+  "alpha": 4.0,
+  "dh": 0.2739839553833008,
+  "db": 0.5654687285423279
+ },
+ {
+  "method": "naive coef-dir",
+  "arm": "T-SAE (T=5)",
+  "alpha": -2.0,
+  "dh": -0.09726619720458984,
+  "db": -0.30851560831069946
+ },
+ {
+  "method": "naive coef-dir",
+  "arm": "T-SAE (T=5)",
+  "alpha": 0.0,
+  "dh": 0.0,
+  "db": 0.0
+ },
+ {
+  "method": "naive coef-dir",
+  "arm": "T-SAE (T=5)",
+  "alpha": 1.0,
+  "dh": 0.05000019073486328,
+  "db": 0.15234375
+ },
+ {
+  "method": "naive coef-dir",
+  "arm": "T-SAE (T=5)",
+  "alpha": 2.0,
+  "dh": 0.09499931335449219,
+  "db": 0.30703121423721313
+ },
+ {
+  "method": "naive coef-dir",
+  "arm": "T-SAE (T=5)",
+  "alpha": 4.0,
+  "dh": 0.1856250762939453,
+  "db": 0.6075780987739563
+ },
+ {
+  "method": "naive centroid-dir",
+  "arm": "T-SAE (T=5)",
+  "alpha": -2.0,
+  "dh": -0.09656238555908203,
+  "db": -0.30921876430511475
+ },
+ {
+  "method": "naive centroid-dir",
+  "arm": "T-SAE (T=5)",
+  "alpha": 0.0,
+  "dh": 0.0,
+  "db": 0.0
+ },
+ {
+  "method": "naive centroid-dir",
+  "arm": "T-SAE (T=5)",
+  "alpha": 1.0,
+  "dh": 0.0521087646484375,
+  "db": 0.15460938215255737
+ },
+ {
+  "method": "naive centroid-dir",
+  "arm": "T-SAE (T=5)",
+  "alpha": 2.0,
+  "dh": 0.09492206573486328,
+  "db": 0.3098437190055847
+ },
+ {
+  "method": "naive centroid-dir",
+  "arm": "T-SAE (T=5)",
+  "alpha": 4.0,
+  "dh": 0.19124984741210938,
+  "db": 0.6159375309944153
+ },
+ {
+  "method": "naive coef-dir",
+  "arm": "TXC (T=5)",
+  "alpha": -2.0,
+  "dh": -0.13984394073486328,
+  "db": -0.23960936069488525
+ },
+ {
+  "method": "naive coef-dir",
+  "arm": "TXC (T=5)",
+  "alpha": 0.0,
+  "dh": 0.0,
+  "db": 0.0
+ },
+ {
+  "method": "naive coef-dir",
+  "arm": "TXC (T=5)",
+  "alpha": 1.0,
+  "dh": 0.06765556335449219,
+  "db": 0.11695313453674316
+ },
+ {
+  "method": "naive coef-dir",
+  "arm": "TXC (T=5)",
+  "alpha": 2.0,
+  "dh": 0.1400775909423828,
+  "db": 0.24265629053115845
+ },
+ {
+  "method": "naive coef-dir",
+  "arm": "TXC (T=5)",
+  "alpha": 4.0,
+  "dh": 0.275390625,
+  "db": 0.48320311307907104
+ },
+ {
+  "method": "naive centroid-dir",
+  "arm": "TXC (T=5)",
+  "alpha": -2.0,
+  "dh": -0.15007877349853516,
+  "db": -0.2507031559944153
+ },
+ {
+  "method": "naive centroid-dir",
+  "arm": "TXC (T=5)",
+  "alpha": 0.0,
+  "dh": 0.0,
+  "db": 0.0
+ },
+ {
+  "method": "naive centroid-dir",
+  "arm": "TXC (T=5)",
+  "alpha": 1.0,
+  "dh": 0.0728902816772461,
+  "db": 0.12648439407348633
+ },
+ {
+  "method": "naive centroid-dir",
+  "arm": "TXC (T=5)",
+  "alpha": 2.0,
+  "dh": 0.14929676055908203,
+  "db": 0.2489061951637268
+ },
+ {
+  "method": "naive centroid-dir",
+  "arm": "TXC (T=5)",
+  "alpha": 4.0,
+  "dh": 0.2980470657348633,
+  "db": 0.5026562809944153
+ },
+ {
+  "method": "S1 supervised-DoM (probe)",
+  "arm": "\u2014",
+  "alpha": -2.0,
+  "dh": -0.1184377670288086,
+  "db": -0.2794531583786011
+ },
+ {
+  "method": "S1 supervised-DoM (probe)",
+  "arm": "\u2014",
+  "alpha": 0.0,
+  "dh": 0.0,
+  "db": 0.0
+ },
+ {
+  "method": "S1 supervised-DoM (probe)",
+  "arm": "\u2014",
+  "alpha": 1.0,
+  "dh": 0.05523395538330078,
+  "db": 0.13804686069488525
+ },
+ {
+  "method": "S1 supervised-DoM (probe)",
+  "arm": "\u2014",
+  "alpha": 2.0,
+  "dh": 0.11273384094238281,
+  "db": 0.2762499451637268
+ },
+ {
+  "method": "S1 supervised-DoM (probe)",
+  "arm": "\u2014",
+  "alpha": 4.0,
+  "dh": 0.22421836853027344,
+  "db": 0.5508593916893005
+ },
+ {
+  "method": "S2 position-cond TXC",
+  "arm": "TXC (T=5)",
+  "alpha": -2.0,
+  "dh": -0.06953144073486328,
+  "db": -0.1654687523841858
+ },
+ {
+  "method": "S2 position-cond TXC",
+  "arm": "TXC (T=5)",
+  "alpha": 0.0,
+  "dh": 0.0,
+  "db": 0.0
+ },
+ {
+  "method": "S2 position-cond TXC",
+  "arm": "TXC (T=5)",
+  "alpha": 1.0,
+  "dh": 0.03171825408935547,
+  "db": 0.08515626192092896
+ },
+ {
+  "method": "S2 position-cond TXC",
+  "arm": "TXC (T=5)",
+  "alpha": 2.0,
+  "dh": 0.06562519073486328,
+  "db": 0.16648441553115845
+ },
+ {
+  "method": "S2 position-cond TXC",
+  "arm": "TXC (T=5)",
+  "alpha": 4.0,
+  "dh": 0.13117122650146484,
+  "db": 0.3298436999320984
+ },
+ {
+  "method": "S2-tsae position-cond",
+  "arm": "T-SAE (T=5)",
+  "alpha": -2.0,
+  "dh": -0.09656238555908203,
+  "db": -0.30921876430511475
+ },
+ {
+  "method": "S2-tsae position-cond",
+  "arm": "T-SAE (T=5)",
+  "alpha": 0.0,
+  "dh": 0.0,
+  "db": 0.0
+ },
+ {
+  "method": "S2-tsae position-cond",
+  "arm": "T-SAE (T=5)",
+  "alpha": 1.0,
+  "dh": 0.0521087646484375,
+  "db": 0.15460938215255737
+ },
+ {
+  "method": "S2-tsae position-cond",
+  "arm": "T-SAE (T=5)",
+  "alpha": 2.0,
+  "dh": 0.09492206573486328,
+  "db": 0.3098437190055847
+ },
+ {
+  "method": "S2-tsae position-cond",
+  "arm": "T-SAE (T=5)",
+  "alpha": 4.0,
+  "dh": 0.19124984741210938,
+  "db": 0.6159375309944153
+ },
+ {
+  "method": "S3 FSGA (feature-space gated ablation)",
+  "arm": "SAE (T=1)",
+  "alpha": "ablate",
+  "dh": -7.66296911239624,
+  "db": -4.341015517711639
+ },
+ {
+  "method": "S3 FSGA (feature-space gated ablation)",
+  "arm": "T-SAE (T=5)",
+  "alpha": "ablate",
+  "dh": -0.3722658157348633,
+  "db": -0.16429686546325684
+ },
+ {
+  "method": "S3 FSGA (feature-space gated ablation)",
+  "arm": "TXC (T=5)",
+  "alpha": "ablate",
+  "dh": -0.5543756484985352,
+  "db": -0.2074218988418579
+ }
+]
