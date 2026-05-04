@@ -14,6 +14,10 @@ Every formula and shape is grounded in
 `temporal_crosscoders/models.py` and `temporal_crosscoders/train.py`,
 with explicit file:line references.
 
+![side-by-side](../../safety_research/figures/tempbench/arch_side_by_side.png)
+
+![decoder atoms](../../safety_research/figures/tempbench/arch_decoder_atoms.png)
+
 Notation throughout:
 
 - $B$ = batch size
@@ -25,6 +29,8 @@ Notation throughout:
 ## 1. T-SAE (Stacked SAE) — `StackedSAE`
 
 Source: `temporal_crosscoders/models.py:77-125`.
+
+![tsae diagram](../../safety_research/figures/tempbench/arch_tsae.png)
 
 ### 1.1 Architecture
 
@@ -97,6 +103,8 @@ $$
 ## 2. TXC (Temporal Crosscoder) — `TemporalCrosscoder`
 
 Source: `temporal_crosscoders/models.py:130-198`.
+
+![txc diagram](../../safety_research/figures/tempbench/arch_txc.png)
 
 ### 2.1 Architecture
 
