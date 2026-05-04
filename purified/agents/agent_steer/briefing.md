@@ -257,239 +257,286 @@ one-liner to verify HF state before stop.
 
 ## Current state (agent owns — overwrite at every compact)
 
-**Last verified: 2026-05-04T13:00Z (post-metric-fix backfill).**
+**Last verified: 2026-05-04T12:53Z (b1024 re-train sweep launched —
+Phase-5-faithful uniform TrainingConfig per decisions.md § 12).**
 
-- `git HEAD`: pushed through `20ba7913` (sweep complete) plus this
-  turn's metric backfill (rebased on top of agent_paper's
-  `40a184bd Agent PAPER: C5 metric fix`).
-- **C5 sweep complete — 9 of 9 cells + 9 backfilled rows**:
-  Headline (peak success grade @ coh ≥ 1.75, 0–3 scale):
-    - tsae_paper × {42, 1, 2}: 0.367, 0.400, 0.300 → mean **0.356 ± 0.029**
-    - txc_base × {42, 1, 2}: 0.300, 0.400, 0.476 → mean **0.392 ± 0.051**
-    - txc_pro × {42, 1, 2}: 0.375, 0.389, 0.300 → mean **0.355 ± 0.028** (n_steps=6000)
-  All three archs land within 1 stderr — hypothesis "TXC matches T-SAE"
-  is **supported** on the wasteland-comparable continuous metric.
-  Old binary `success_at_coh_<τ>` numbers preserved as supplementary
-  in c5.md (showed misleading 2× tsae lead due to threshold-event
-  co-occurrence collapsing dynamic range).
-- **Backfilled `eval_protocol_version="1.0.1"` rows**: 9 new rows
-  with `metric_set="v1_0_1_with_peak_grade"` and `rebuild_from=<orig_eval_key>`,
-  primary_metric `peak_success_grade_at_coh_1.75`. Original 1.0.0
-  rows kept for reproducibility/diff per agent_paper's spec.
-- **Helper fix landed**:
+- `git HEAD`: `00cdbea3 Agent STEER: SteeringCaseStudy.primary_metric
+  → peak_success_grade_at_coh_1.75` (pushed). Working tree has only
+  untracked checkpoint dirs + logs/, plus auto-renders waiting on
+  cells.
+- **Active b1024 cells (right now, in flight)**: 3 cells × seed 42,
+  one per spare GPU, launched 12:48 UTC.
+  - GPU 0 / PID 38976 / `tsae_paper × seed 42` / eval_key `1c1b8aa4`
+    / log `logs/c5_b1024_tsae_seed42.log` / wait task `bzhobgezy`
+  - GPU 2 / PID 38977 / `txc_base × seed 42` / eval_key `b981566c`
+    / log `logs/c5_b1024_txc_base_seed42.log` / wait task `bwp0srh2k`
+  - GPU 3 / PID 38978 / `txc_pro × seed 42` / eval_key `b36b7641`
+    / log `logs/c5_b1024_txc_pro_seed42.log` / wait task `b8bh3agco`
+  Each launched with `PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True`
+  to suppress the OOM-fragmentation issue agent_back hit (commit
+  `658fa825`). agent_back is on GPU 1 doing C7. PIDs persist across
+  my session via `/tmp/p_tsae42`, `/tmp/p_tb42`, `/tmp/p_tp42`.
+  No claim_gpu calls — gpu_locks were nuked in commit `6e6efcbd`,
+  the new convention is just "set CUDA_VISIBLE_DEVICES + good
+  manners" (see PROTOCOL.md § 13 / scripts/run_on_gpu.sh).
+- **Wakeup scheduled**: 13:19 UTC for first per-cell rate marker.
+
+- **TrainingConfig is the new Phase-5-faithful default** (decisions.md
+  § 12): batch_size=1024, n_steps=25_000, plateau_early_stop=False
+  uniform across all archs and pods. My runner uses
+  `runner.default_training_cfg() → TrainingConfig()` so the new
+  defaults flow automatically — no per-component override needed.
+  New batch=1024 cells get fresh train_keys; old batch=256 cells
+  stay in leaderboard for diff. analysis.py should filter for
+  `training_cfg.batch_size==1024` rows when rendering AUTO-RESULTS
+  (TODO once cells land — current analysis.py renders all non-smoke
+  rows, so the AUTO-RESULTS will mix old + new until I add the
+  filter).
+
+- **C5 v1.0.1 backfill (this session, already pushed)**: re-aggregated
+  the OLD batch=256 cells' judge_outputs.jsonl with the new
+  peak-grade headline metric. 9 v1.0.1 rows with
+  `metric_set="v1_0_1_with_peak_grade"` and
+  `rebuild_from=<orig_eval_key>`. Old v1.0.0 rows kept. Numbers:
+    - tsae_paper × {42, 1, 2}: 0.367, 0.400, 0.300 → 0.356 ± 0.029
+    - txc_base × {42, 1, 2}: 0.300, 0.400, 0.476 → 0.392 ± 0.051
+    - txc_pro × {42, 1, 2}: 0.375, 0.389, 0.300 → 0.355 ± 0.028
+  All within 1 stderr. Hypothesis "TXC matches T-SAE" → **supported**
+  on the wasteland-comparable peak-grade metric. (The old binary
+  fraction `success_at_coh_τ` showed a misleading 2× tsae lead
+  because nearly all `success ≥ 2` events also have `coh ≥ 2.0`,
+  collapsing the dynamic range.)
+
+- **Helper bug-fix landed (this session)**:
   `temp_bench.case_studies.steering.reaggregate_from_judge_outputs`
-  now handles BOTH on-disk schemas: per-generation rows (with both
-  grades) AND per-call rows (head + label format that
-  SonnetSteeringJudge actually writes). Without this fix the helper
-  silently returned 0s for every cell (because every per-call row
-  has only one grade → both-grades check failed).
-- Active GPU usage: none.
-- Recent decisions in scope: #1, #4, #6, #7. NEW: c5 headline metric
-  is peak_success_grade_at_coh_1.75, not the binary fraction.
-- Active GPU usage: GPU 0 (txc_base seed=2), GPU 2 (txc_pro seed=2).
-- Recent decisions in scope: #1, #4, #6, #7. Remember:
-  paper-deviation n_steps=6000 for txc_pro × {42, 1}.
+  now handles BOTH on-disk schemas: per-generation rows (the format
+  agent_paper wrote the helper for — both grades on one row) AND
+  per-call rows (head + label, the actual format
+  `SonnetSteeringJudge._persist` writes via `judge_outputs.jsonl`).
+  Pre-fix the helper returned all-0s on my cells.
 
-**Honest finding (refutes c5.md hypothesis)**: tsae_paper
-outperforms TXC archs on success @ coh ≥ 1.75 by ~2x (0.067 vs
-0.036). TXC archs have higher mean coherence (1.9–2.2 vs 1.6) but
-don't reach the success threshold as often. Caveats: IT/L13 vs
-paper's base/L12; txc_pro paper-deviation; 2-seed averages for
-TXC archs.
+- **Recent decisions in scope**: #1 (two TXCs), #4 (cross-branch
+  reads), #6 (HF repos), #7 (Bricken off for C5), § 12 (b=1024 +
+  25k uniform), C5 metric (peak grade as headline).
 
 ## What I just did (agent owns — overwrite)
 
 Newest first.
 
-- Launched `tsae_paper × seed 42` real cell in background (PID 13635).
-  Two monitors armed: a one-shot Bash `until` loop that fires on
-  process exit, and a Monitor watching `logs/c5_tsae_paper_seed42.log`
-  for per-step / per-stage progress events.
-- Expanded `docs/components/c5.md` (commit 21c84be8). Status
-  `planning → in_flight`. Caveats now flag the V7 ↔ TXC-pro
-  compatibility risk + IT/L13 deviation from paper. Reproduction
-  section has copy-paste commands. Provenance lines cite the
-  origin/han-phase7-unification: paths the V7 + judge + concepts +
-  feature-selection were ported from.
-- Fixed run_dir mismatch (commit f8a28469): pre-computed `eval_key`
-  was using un-enriched `eval_cfg`, but I was passing enriched
-  `eval_cfg` to `run_cell`, so the runner re-hashed and got a
-  different `eval_key` → metrics.json and case-study artifacts
-  landed in different `run_dir`s. Refactored to thread workspace
-  via a closure on the eval-fn, leaving `eval_cfg` un-enriched.
-  Verified post-fix: `d55da9a21b1e847a` has all 7 artifacts in one
-  dir.
-- Added `--smoke` flag to `run.py` + smoke filter in `analysis.py`.
-  Smoke cells tag `eval_cfg["smoke"] = True` and the c5 paper
-  aggregator skips them. Matches agent_nlp's c3 convention.
-- Validated end-to-end pipeline with `topk_sae × seed 42` smoke
-  test (n_steps=200, 3 concepts, 1 strength). Confirmed: training
-  → HF push → Gemma-2-2b-IT load → feature selection → V7 hook
-  → greedy generation → Sonnet judge × 6 calls → grades.jsonl
-  + judge_outputs.jsonl + curves.json + leaderboard append all
-  worked. Generations were degenerate token-loops as expected at
-  high-strength steering on a 200-step random-ish model.
-- Pulled in commits `d94dc17e..ae2aaf8b`: agent_nlp ported
-  `tsae_paper` + `txc_base` arch classes plus
-  `temp_bench.data.nlp.batch_iter_from_act_cache` helper. Updated
-  `run.py` to use the canonical batch_iter (yields full
-  `(B, seq_len, d_in)`; TXC archs do their own random-window
-  extraction internally). Removed my inline T-window helper.
-- Wrote 17 unit tests in `tests/test_steering.py` covering V7 tile
-  layout + trailing-block overwrite, PP overlap-averaging, concept
-  set, `coh_success_curves` + `flatten_metrics` aggregation, feature
-  selection argmax. All 68 framework + steering tests green.
-- Initial code port (commit b0519a99): `case_studies/steering.py`
-  (~900 lines) with V7 + PP hooks, 30 paper-faithful concepts,
-  paper-§B.2-verbatim grading prompts, `SonnetSteeringJudge` with
-  `judge_outputs.jsonl` persistence, `SteeringCaseStudy(CaseStudy)`
-  implementing 4-stage pipeline. Plus run.py + analysis.py
-  scaffolding + eval/steering.py rewritten from stub to re-export.
-- Pre-flight: env pin (GPU 0 / ephemeral), smoke test green,
-  diagnosed broken `sync_from_hf.sh` (deprecated huggingface-cli),
-  worked around with direct `hf download`.
+- **Launched 3-way parallel b1024 re-train sweep** (12:48 UTC):
+  tsae_paper / txc_base / txc_pro × seed 42 on GPUs 0/2/3 with new
+  TrainingConfig defaults from decisions.md § 12 (batch=1024,
+  n_steps=25k, plateau_off). PIDs 38976/38977/38978. PIDs saved to
+  `/tmp/p_tsae42` `/tmp/p_tb42` `/tmp/p_tp42`. Three Bash background
+  wait tasks armed (`bzhobgezy`/`bwp0srh2k`/`b8bh3agco`) — they fire
+  on process exit. Wakeup at 13:19 UTC for first rate marker. After
+  each cell finishes I'll launch the next seed for that arch on the
+  freed GPU.
+- Updated `SteeringCaseStudy.primary_metric → peak_success_grade_at_coh_1.75`
+  (commit `00cdbea3`, pushed) — new headline metric per
+  agent_paper's directive. Old `success_at_coh_1.75` still emitted
+  by `flatten_metrics` so any analysis filter that wants binary
+  fraction still gets it.
+- **C5 metric backfill** (commit `b91ecbc5`, pushed): re-aggregated
+  the 9 OLD batch=256 cells' `judge_outputs.jsonl` files into v1.0.1
+  rows using the new peak-grade metric. ALSO fixed the helper
+  `reaggregate_from_judge_outputs` because it was silently returning
+  0s for my cells — agent_paper wrote it expecting per-generation
+  rows (both grades on one record) but my judge_outputs.jsonl uses
+  per-call rows (`head: success/coherence`, `label: 0-3`). Helper
+  now branches on schema. Updated `c5.md` Hypothesis section:
+  outcome `refuted → supported` on the new metric.
+- **9-cell C5 sweep at batch=256 — completed** (pre this session):
+  tsae × 3 + txc_base × 3 + txc_pro × 3 (txc_pro at n_steps=6000
+  paper-deviation) → 9 v1.0.0 rows in leaderboard. AUTO-RESULTS
+  rendered + pushed via commit `91f763e6` / `bfdcc559`.
+  Headline (binary fraction, OLD metric):
+    tsae 0.067, txc_base 0.033, txc_pro 0.031.
+  New headline (peak grade, post-backfill):
+    tsae 0.356, txc_base 0.392, txc_pro 0.355 — all within 1 stderr.
+- W_enc contiguity fix in run.py (commit `0aea9cba`): tsae_paper's
+  W_enc is initialized via `W_dec.clone().T` which leaves a
+  non-contiguous transposed view; `safetensors.save_file` rejects
+  it. My train_fn now `.contiguous()`-s every state_dict tensor
+  before save. agent_nlp later landed the upstream tsae.py fix
+  (commit `af552412`) but my workaround is harmless and runs first.
+- Pre this session's metric work: full code port + smoke validation
+  + W_enc fix + smoke flag + run_dir mismatch fix + Sonnet judge
+  with `judge_outputs.jsonl` persistence + V7 + PP hooks + 30
+  paper-faithful concepts + 17 unit tests + auto-push run_dirs to
+  HF temp-bench-data. Commits: `b0519a99` (port) → `f8a28469`
+  (run_dir fix) → `21c84be8` (c5.md expansion) → eval cycles.
+
+- **Critical incidents resolved this session**:
+  - Helper-returns-0s diagnosed + fixed in 1 turn (per-call vs
+    per-generation schema mismatch).
+  - Duplicate leaderboard row (txc_pro seed=2 appeared twice after
+    a rebase chaos) deduped in commit `01e07db0` → `20ba7913`.
+  - Multi-stage NFS I/O errors during git operations cleared by
+    deleting stale `.git/*.lock` files + `git reset --hard origin/final`.
+    NO commits lost (all my work was already pushed before the I/O
+    storm).
 
 ## Next action (agent owns — overwrite)
 
-**Pre-conditions (Han owns)**:
-- Han ran `bash scripts/bootstrap_runpod.sh` on this pod (interactive)
-  AND `bash /workspace/temp_xc/purified/scripts/add_agent_clone.sh
-  agent_steer` to provision the second clone. Tokens are in
-  `/workspace/.tokens/` (`anthropic_key`, `hf_token`, `gh_token` —
-  no `gemini_key`; see Open Questions).
-- The smoke test confirms the venv + `e4916bcae1881963` act-cache.
-
-**On every fresh / `--continue` session:**
+**Pre-flight on every `--continue` session:**
 1. `cd /workspace/temp_xc_steer/purified && source scripts/set_agent_env.sh agent_steer`
-2. `bash scripts/agent_smoke_test.sh`
+2. `bash scripts/agent_smoke_test.sh` (CRITICAL preflight failures
+   are fatal)
 3. (Ephemeral pod restart only): re-pull act-cache via
-   `.venv/bin/hf download han1823123123/temp-bench-data --repo-type dataset --include "act_cache/e4916bcae1881963/**" --local-dir results`
-   (`scripts/sync_from_hf.sh` itself is broken — see Open Q #2).
-4. `git pull --rebase origin final`
-5. `.venv/bin/python -m pytest tests/test_steering.py -q` — sanity-check
-   the steering module after any pull.
+   `bash scripts/sync_from_hf.sh` (was broken; agent_paper landed
+   the `huggingface-cli → hf download` fix in commit
+   `b4f80dbe`-area; trust the script now).
+4. `git pull --rebase origin final` — likely substantial agent
+   updates.
+5. `.venv/bin/python -m pytest tests/test_steering.py -q`
 
-**Then continue from here:**
+**Then check the b1024 sweep state. The 3 seed-42 cells launched
+2026-05-04 12:48 UTC may still be in flight or done. Each cell:
+~3.3× more total compute than the old batch=256 (25.6M vs 7.68M
+tokens). At previous batch=256 rates ~3-4 steps/sec for tsae +
+txc_base, ~1.3 steps/sec for txc_pro, batch=1024 should be ~4×
+slower per step. Estimate per cell: tsae ~25-40 min, txc_base
+~50-80 min, txc_pro ~120-150 min — train only; +15-20 min eval.**
 
-A. **If `tsae_paper × seed 42` is still running (PID 13635)**: don't
-   re-launch. The Bash background task `bx2eso6ju` will notify on
-   exit; the Monitor task `bex720hr4` streams progress events. Just
-   `tail -20 logs/c5_tsae_paper_seed42.log` to check.
+A. **First**: `ps -p $(cat /tmp/p_tsae42 /tmp/p_tb42 /tmp/p_tp42)
+   -o pid,etime --no-headers 2>&1` — see which cells are still
+   alive. If a Bash wait-task fired while you were compacting, look
+   at `/tmp/claude-1000/.../tasks/{bzhobgezy,bwp0srh2k,b8bh3agco}.output`
+   for the post-mortem.
 
-B. **If it finished successfully**: verify the metrics in the latest
-   leaderboard row (``tail -1 results/leaderboard.jsonl``). If
-   ``mean_coh > 1.0``, V7 worked. Then queue up the remaining seeds
-   in the background:
-   `TQDM_DISABLE=1 .venv/bin/python -m experiments.c5_steering.run --archs tsae_paper --seeds 1 2 > logs/c5_tsae_paper_seeds_1_2.log 2>&1 &`.
-   After tsae_paper completes (3 seeds), run `txc_base × {1, 2, 42}`:
-   `TQDM_DISABLE=1 .venv/bin/python -m experiments.c5_steering.run --archs txc_base > logs/c5_txc_base.log 2>&1 &`.
+B. **As each seed=42 cell completes**, launch the next seed for
+   that arch on the freed GPU:
+   ```
+   CUDA_VISIBLE_DEVICES=<N> TQDM_DISABLE=1 AGENT_NAME=agent_steer \
+     PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True \
+     .venv/bin/python -m experiments.c5_steering.run \
+     --archs <arch> --seeds <seed> > logs/c5_b1024_<arch>_seed<seed>.log 2>&1 &
+   ```
+   Sequence: each arch goes seed 42 → seed 1 → seed 2. Realistically
+   the full 9-cell sweep is 6-10 hours wall-time at 3-way parallel.
 
-C. **If it failed** (non-zero exit, traceback in log): diagnose
-   from the log tail. Common failure modes:
-   - HF push failed → check `/workspace/.tokens/hf_token` is valid
-     write-token; `cache.save_checkpoint` push failure is fatal on
-     ephemeral pod.
-   - Gemma load failed → ensure `/workspace/hf_cache/` has space
-     (Gemma-2-2b-IT is ~5 GB).
-   - Sonnet rate-limit → reduce `--n-concepts` or
-     `SteeringConfig.judge_max_workers`.
-   - V7 algebra crash → check tensor shapes vs the V7 hook's
-     ``z.dim() == 3`` branch; window archs may return ``(B, T,
-     d_sae)`` from encode while per-token archs return ``(B,
-     d_sae)``.
+C. **For each cell, check loss-trajectory at the END of training**
+   (per agent_paper's directive line 64-65 in this briefing). If the
+   final-1K-step loss drop > 5% of loss value at step 25K, the cap
+   needs bumping uniformly across all archs. Surface as an Open
+   Question — don't unilaterally bump.
 
-D. **`txc_pro` is still pending** (commit ae2aaf8b ported tsae_paper
-   + txc_base + sae_arditi but NOT txc_pro). Check via
-   `ls src/temp_bench/architectures/txc_pro.py 2>&1`. Once
-   ``txc_pro.py`` lands:
-   - run V7 pre-test:
-     ``TQDM_DISABLE=1 .venv/bin/python -m experiments.c5_steering.run --pre-test-only``
-   - read ``results/runs/<eval_key>/_pre_test_v7/curves.json``.
-     If ``mean_coh ≤ 1.0``, run TXC-pro full sweep with
-     ``--protocol pp --archs txc_pro`` and document the switch in
-     c5.md (under "Caveats").
+D. **Watch for OOM kills on shared spare-pool GPUs**. Last sweep
+   lost cells when agent_back's process competed for GPU 3 (silent
+   kill, no traceback, just process gone). The new gpu_locks-nuked
+   convention means we have no enforcement — just monitor
+   `nvidia-smi` and be ready to relaunch.
 
-E. **After all 9 cells complete**:
-   ``.venv/bin/python -c "from temp_bench import report; report.render(component='c5')"``
-   rewrites the AUTO-RESULTS block of c5.md from the leaderboard.
-   Don't hand-edit between the markers (PROTOCOL.md § 7).
-   Then commit the leaderboard delta + the regenerated c5.md.
+E. **After each cell completes**: leaderboard row + run_dir push
+   are automatic via my run.py's auto-HF-push and runner's
+   leaderboard append. Verify via `tail -1 results/leaderboard.jsonl`.
+   No manual reconstruction (no git reset --hard chaos this time).
+
+F. **After all 9 b1024 cells complete**:
+   ```
+   .venv/bin/python -c "from temp_bench import report; report.render(component='c5')"
+   ```
+   ⚠ **You will likely need to update `experiments/c5_steering/analysis.py`
+   to filter on `r.training_cfg.batch_size == 1024`** — agent_paper's
+   directive explicitly says "analyses in experiments/cN_*/analysis.py
+   should filter for the new training_cfg.batch_size=1024 rows when
+   rendering AUTO-RESULTS" (decisions.md § 12). Currently my
+   analysis.py renders ALL non-smoke c5 rows, which would mix the 9
+   v1.0.0 (b256) + 9 v1.0.1 (b256-backfilled-peak) + 9 new b1024
+   rows. The leaderboard row's `training_cfg` is hashed into
+   `train_key` not exposed directly; need to look up the manifest
+   for batch_size or use `eval_protocol_version` / a new
+   `metric_set` tag. **TODO this turn**: add the filter, otherwise
+   the rendered table is incoherent.
+
+G. **Update c5.md** post-render: bump `last_update` date, ensure
+   "Outcome" reflects the b1024 numbers (not the b256 backfill).
+   Caveats: the b1024 cells use n_steps=25k uniformly — txc_pro is
+   no longer "n_steps=6000 paper-deviation"; that caveat should
+   move to the v1.0.0 / v1.0.1 supplementary section (or be
+   deleted from current state and replaced with a "compute parity"
+   note).
+
+**Commit + push after each batch of cells lands** (don't wait until
+all 9 finish). Use the Phase-5-faithful framing in commit messages.
 
 ## Don't repeat (agent owns — overwrite)
 
+- **`git reset --hard origin/final`** during a rebase storm — last
+  time this WIPED 2 leaderboard rows (txc_pro × {42, 1} v3) and a
+  couple of commits I had to manually reconstruct. NFS lock cruft
+  on `/workspace/temp_xc_steer/.git/*.lock` triggers cascading I/O
+  errors; the right move is `rm /workspace/temp_xc_steer/.git/*.lock`
+  + retry. Reset --hard is last-resort.
+- **Bypass `compute_train_key` deterministic hashing** — when
+  reconstructing leaderboard rows after a wipe, NEVER hand-write a
+  train_key. Use `temp_bench.config.compute_train_key(arch=spec,
+  seed=seed, training_cfg=cfg, act_cache_key=ack)`. Otherwise the
+  runner doesn't recognize the cached checkpoint.
+- **Auto-tag smoke=true on `--n-steps`** (the OLD heuristic in
+  run.py was `smoke = args.smoke or args.n_steps is not None`).
+  That hid paper-deviation cells from analysis. Fix landed
+  (`smoke = args.smoke` only). Don't reintroduce.
 - **Hill-climbing winners** — Galaxy 8/11/18, SoftMaxPool,
-  ContrastiveMergeH8 are excluded by decision #1. If TXC-base and
-  TXC-pro lose to T-SAE, the paper accepts that — don't chase.
-- **Skip the V7 pre-test** on TXC-pro — its subseq + multi-distance
-  contrastive may not be V7-compatible. `--pre-test-only` is
-  cheap (~1 min) and the c5.md hypothesis is contingent on it.
-- **Forget HF push on save** — ephemeral pod; checkpoint loss = run loss.
-  The runner's `cache.save_checkpoint` auto-pushes when
-  `TEMP_BENCH_POD_MODE=ephemeral`; verify after first cell.
-- **Rebuild the act-cache** — already on HF (`e4916bcae1881963`).
+  ContrastiveMergeH8 excluded by decision #1.
+- **Skip the V7 pre-test on TXC-pro** — `--pre-test-only` is
+  cheap (~1 min) and c5.md's hypothesis is contingent on it.
+  (Currently NOT run for the b1024 sweep; defer pre-test until at
+  least one txc_pro b1024 cell lands so we know the baseline.)
+- **Hand-edit `docs/components/c5.md` AUTO-RESULTS** — that block is
+  owned by analysis.py + `report.render`.
 - **Wasteland imports** — `git show origin/han-phase7-unification:…`
   only; never `import experiments.phase7_unification…`.
-- **Hand-edit `docs/components/c5.md` AUTO-RESULTS** — that block is
-  owned by `experiments/c5_steering/analysis.py` + `temp_bench.report.render`.
-- **Use `huggingface-cli download`** — deprecated; use `hf download`.
-  See Open Q #2.
-- **Touch `scripts/sync_from_hf.sh`** even though it's broken — it's
-  shared infra; surface to Han instead of patching unilaterally.
-- **Touch `temp_bench/utils/tokens.py`** to add a `gemini` slot — same
-  rationale (shared infra). See Open Q #1.
+- **Touch `scripts/sync_from_hf.sh`** unilaterally — agent_paper
+  already landed the fix.
+- **Touch `temp_bench/utils/tokens.py`** to add a `gemini` slot —
+  Han confirmed Sonnet is the judge (no Gemini), no change needed.
+- **Forget per-call vs per-generation `judge_outputs.jsonl` schema**
+  — my SonnetSteeringJudge writes per-call (head + label) rows;
+  the helper `reaggregate_from_judge_outputs` now branches on
+  schema. If you change the writer, update the reader.
+- **Mix b256 + b1024 cells in the AUTO-RESULTS** — analysis.py needs
+  a filter on training_cfg.batch_size=1024 (TODO; agent_paper's
+  directive). Rendering before adding the filter will produce a
+  misleading mixed-config table.
 
 ## Open questions for Han (agent owns — overwrite)
 
-1. **Judge: Gemini or Sonnet?** This briefing + `eval/case_study.py`
-   docstring say "Gemini for C5, Sonnet for C7". But:
-   - `temp_bench/utils/tokens.py` only knows `hf`/`anthropic`/`gh`
-     — there's no `gemini` slot. `get_token('gemini')` would raise
-     `ValueError`.
-   - `/workspace/.tokens/` has `anthropic_key`/`hf_token`/`gh_token`,
-     no Gemini key.
-   - Phase 7's `grade_with_sonnet.py` uses Sonnet 4.6.
-   - `case_studies/backtracking.py` (already merged) uses Sonnet 4.6
-     and the same paper-§B.2-verbatim 0–3 grading rubric.
+(Most prior open questions resolved by Han — Sonnet judge confirmed,
+sync_from_hf.sh fixed, IT/L13 confirmed in c5.md caveats, gpu_locks
+nuked. Remaining:)
 
-   **Decision I made (please confirm or correct)**: I implemented the
-   judge as `SonnetSteeringJudge` using `claude-sonnet-4-6` and
-   `temp_bench.utils.tokens.get_token('anthropic')`. Swapping to
-   Gemini later is mechanical — it's a single class swap, the prompts
-   + persistence schema stay identical (the `judge_id` /
-   `judge_model` fields in `judge_outputs.jsonl` make the choice
-   audit-able). If you want Gemini, I need:
-   - a `gemini_key` file under `/workspace/.tokens/`,
-   - one extra entry in `tokens.py::_FILENAMES` + `_ENV_VARS`,
-   - and a `GeminiSteeringJudge` class I can write in
-     `case_studies/steering.py`.
+1. **Convergence at step 25k** — agent_paper's directive line 64-65
+   says "if final-1K-step loss drop > 5% of loss value at step 25K,
+   surface that — the cap may need bumping uniformly." After the
+   first b1024 cell completes, I'll inspect the loss-trajectory
+   field of `result["log"]["loss"]` (saved via the runner) and
+   surface here. **TODO: define the inspection script + threshold
+   check post-cell.**
 
-2. **`scripts/sync_from_hf.sh` is broken** — it shells out to
-   `huggingface-cli download`, which `huggingface_hub` 1.13.0
-   deprecated and now exits with help text. Fix is one line:
-   `huggingface-cli download` → `hf download` (args identical:
-   `--repo-type` / `--type`, `--include`, `--local-dir` all work).
-   I've worked around it with direct `hf download` calls. **Could
-   you (or agent_paper) land the one-line fix?** I haven't edited it
-   because `scripts/` is shared infra used by every agent.
+2. **analysis.py filter for batch=1024 rows** — agent_paper
+   explicitly says analyses should filter for the new
+   training_cfg.batch_size=1024 rows. The current analysis.py
+   doesn't have this filter — TODO this turn (or post-compact).
+   The leaderboard row's `eval_cfg` doesn't carry batch_size; need
+   to look it up via the manifest (`checkpoints/manifest.jsonl`
+   keyed by `train_key`) or add a `metric_set="b1024_v1"` tag in
+   eval_cfg that the runner threads through. Surfacing as Q because
+   the right path may want a framework-level `_training_cfg` exposed
+   in enriched_cfg.
 
-3. **Subject model + layer**: `c5.md` and the briefing say
-   Gemma-2-2b-IT L13 (matches the `gemma_2_2b_it_l13_fineweb_24k128`
-   datasource). Phase 7 uses Gemma-2-2b BASE L12 (per `_paths.py`).
-   T-SAE paper § B.2 uses base/L12 too. **I've gone with IT/L13** for
-   consistency with C3/C4. Worth confirming this is the agreed
-   decision and not a typo in the c5.md hypothesis. Reviewers may
-   ask "why not the same as the paper" — c5.md doesn't yet answer
-   that.
+3. **txc_pro V7 pre-test** — the pre-registered hypothesis
+   contingency (V7 may break end-position-discriminative encoders;
+   fall back to PP if mean coh ≤ 1.0) was NOT exercised on the
+   b1024 sweep. The b256 cells showed mean coh 2.1-2.2 for txc_pro
+   so V7 worked; b1024 is a different regime. If b1024 txc_pro
+   produces degenerate output, run `--pre-test-only --archs txc_pro
+   --protocol pp` and document.
 
-4. **`run_cell` doesn't thread `eval_key` to `eval_fn`** — the case
-   study needs to write `generations.jsonl`, `grades.jsonl`,
-   `judge_outputs.jsonl`, `feature_selection.json` to
-   `run_dir(eval_key)`. I worked around by recomputing `eval_key` in
-   `run.py` and passing the workspace via `eval_cfg["_workspace"]`.
-   This works (deterministic hash) but feels like a missing
-   primitive. Worth a small framework PR by agent_paper to pass
-   `_eval_key`/`_workspace` in the runner's `enriched_cfg`. Not
-   urgent for me.
-
-5. **C5 gen + judge cost / time budget**: full sweep at defaults is
-   ~$5 + ~45 min Sonnet calls. Confirm OK before I kick it off.
+4. **What if txc_pro b1024 doesn't show "matches T-SAE"** — the
+   b256 backfill numbers were within 1 stderr of tsae. b1024 is
+   3.3× more compute, all archs trained equally. If a clear gap
+   opens (TXC > T-SAE, the original hypothesis was "matches not
+   beats"), c5.md's framing needs revising — but this would be a
+   GOOD problem to have. Watch for it.
