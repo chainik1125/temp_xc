@@ -190,3 +190,51 @@ archs:
     notes: |
       TXC-pro = phase5b_subseq_h8. Subseq encoder + matryoshka H8 +
       multi-distance contrastive. NO Bricken by default.
+
+  txc_base_t20:
+    class_path: temp_bench.architectures.txc_base:TXCBase
+    arch_version: "1.0.0"
+    category: txc
+    hparams:
+      d_sae: 18432
+      T: 20
+      k_pos: 20
+      auxk_alpha: 0.03125
+      dead_threshold_tokens: 10_000_000
+      bdec_geom_median_init: true
+      decoder_unit_norm: true
+      decoder_grad_orthogonalize: true
+    per_component_hparams:
+      c7:
+        d_sae: 32768
+    notes: |
+      TXC-base with T=20. Han 2026-05-04 PM 4×H100 ask: does a longer
+      temporal window extract more signal once given enough compute?
+      Pair with txc_base for the head-to-head at n_steps=300_000.
+
+  txc_pro_t20:
+    class_path: temp_bench.architectures.txc_pro:TXCPro
+    arch_version: "1.0.0"
+    category: txc
+    hparams:
+      d_sae: 18432
+      T_max: 20
+      t_sample: 5  # match txc_pro's training-time TopK budget; T_max changes
+      k_pos: 20
+      n_matryoshka: 8
+      contrastive_shifts: [1, 2]
+      contrastive_inverse_distance_weight: true
+      auxk_alpha: 0.03125
+      dead_threshold_tokens: 10_000_000
+      bdec_geom_median_init: true
+      decoder_unit_norm: true
+      decoder_grad_orthogonalize: true
+    per_component_hparams:
+      c7:
+        d_sae: 32768
+    notes: |
+      TXC-pro with T_max=20 (t_sample=5 held). Han 2026-05-04 PM 4×H100
+      ask: pairs with txc_pro for the longer-window head-to-head at
+      n_steps=300_000. Open question for Han: should t_sample also
+      scale to 10 (= 50% subset like the T=10 default)? Holding at 5
+      for now — keeps contrastive batch math + TopK budget identical.

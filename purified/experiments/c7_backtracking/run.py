@@ -152,9 +152,25 @@ def _build_batch_iter(act_cache_key: str, *, batch_size: int = 256, T: int = 5,
     return batch_iter
 
 
-def my_train_fn(*, arch_name, arch_hparams, seed, training_cfg, act_cache_key, component):
+def my_train_fn(*, arch_name, arch_hparams, seed, training_cfg, act_cache_key,
+                component, probe_every: int = 0,
+                snapshot_state_at: tuple[int, ...] = ()):
     """C7 train-fn adapter. Builds the SAE from the YAML spec + datasource
-    d_in, then calls the canonical ``train_sae`` trainer."""
+    d_in, then calls the canonical ``train_sae`` trainer.
+
+    ``probe_every`` (Han 2026-05-04 PM 4×H100 ask, refined): every N steps,
+    forward a held-out batch through the live model and append a row of
+    ``{step, nmse, l0, dead}`` to
+    ``checkpoints/<train_key>/snapshots/eval_log.jsonl``. Cheap (~50 ms per
+    probe), drives the appendix "is 20K undertrained?" curves without
+    storing state_dicts.
+
+    ``snapshot_state_at`` (paper-key milestones, e.g. 10K/30K/100K/200K/
+    300K): state_dict-only checkpoints at these steps for downstream
+    ``evaluate_snapshot.py`` (full Δgc + PR-AUC). Bf16 ≈ 2.7–21 GB per
+    snapshot depending on arch; 5 milestones × 8 cells × ~5 GB avg ≈
+    200 GB total.
+    """
     from temp_bench.training.sae_trainer import train_sae
     spec = load_arch(arch_name, component=component)
     ds = load_datasource(DATASOURCE)
@@ -182,7 +198,77 @@ def my_train_fn(*, arch_name, arch_hparams, seed, training_cfg, act_cache_key, c
     T = _spec_window_size(spec)
     batch_iter = _build_batch_iter(act_cache_key, batch_size=training_cfg.batch_size,
                                     T=T, seed=seed)
-    result = train_sae(model, batch_iter, training_cfg)
+
+    # Probe wiring for the 300K extended-training matrix. The trainer's
+    # `snapshot_fn(step, payload)` is invoked every `probe_every` steps; in
+    # this code path that means "run the cheap NMSE/L0/dead probe and
+    # ALSO save a state_dict iff step is a paper milestone". We do NOT
+    # persist 150 state_dicts per cell — the appendix figures come from
+    # eval_log.jsonl + the per-step train log, not from full checkpoints.
+    snapshot_fn = None
+    snap_state_set = frozenset(int(s) for s in snapshot_state_at)
+    if probe_every > 0:
+        from safetensors.torch import save_file
+        from temp_bench.config import compute_train_key, checkpoint_dir
+        train_key = compute_train_key(
+            arch=spec, seed=seed, training_cfg=training_cfg,
+            act_cache_key=act_cache_key,
+        )
+        snap_dir = checkpoint_dir(train_key) / "snapshots"
+        snap_dir.mkdir(parents=True, exist_ok=True)
+        eval_log_path = snap_dir / "eval_log.jsonl"
+        log.info("[c7.run] probe_every=%d snapshot_state_at=%s → %s",
+                 probe_every, sorted(snap_state_set) or "(none)", snap_dir)
+
+        # Held-out probe batch — separate seed stream so the probe never
+        # overlaps with the training mini-batches. Cached once on CPU and
+        # moved to device per probe (small relative to training cost).
+        probe_iter = _build_batch_iter(
+            act_cache_key, batch_size=training_cfg.batch_size, T=T,
+            seed=seed + 10_000_000,
+        )
+        probe_batch = probe_iter(min(training_cfg.batch_size, 512))
+        # Match the model's parameter dtype + device so encode/decode
+        # don't trigger an autocast mismatch on heavy archs cast to bf16.
+        _p = next(model.parameters())
+        probe_batch_dev = probe_batch.to(device=_p.device, dtype=_p.dtype)
+
+        def snapshot_fn(step: int, payload: dict[str, Any]) -> None:
+            import json as _json
+            # ── Cheap probe: NMSE + L0 + dead-feature count
+            with torch.no_grad():
+                z = model.encode(probe_batch_dev)
+                x_hat = model.decode(z)
+                err = (probe_batch_dev - x_hat).float()
+                mse = float(err.pow(2).mean().detach())
+                var = float(probe_batch_dev.float().var().detach())
+                nmse = mse / (var + 1e-12)
+                z_flat = z.reshape(-1, z.shape[-1])
+                l0 = float((z_flat != 0).float().sum(dim=-1).mean().detach())
+                fired = (z_flat != 0).any(dim=0)
+                dead = int((~fired).sum().detach())
+            with eval_log_path.open("a") as f:
+                f.write(_json.dumps({
+                    "step": step, "nmse": nmse, "mse": mse, "var": var,
+                    "l0": l0, "dead": dead, "d_sae": int(z.shape[-1]),
+                }) + "\n")
+            # ── Milestone state_dict (paper figures + Δgc post-eval)
+            if step in snap_state_set:
+                sd = {k: v.detach().contiguous().cpu()
+                      for k, v in payload["state_dict"].items()}
+                save_file(sd, str(snap_dir / f"step_{step}.safetensors"))
+                # Mirror the running log alongside the milestone snapshot
+                # for crash-recovery of the paper-grade loss curve.
+                (snap_dir / "train_log.json").write_text(
+                    _json.dumps(dict(payload["log"]))
+                )
+                log.info("[c7.run] milestone snapshot saved → step_%d", step)
+
+    result = train_sae(
+        model, batch_iter, training_cfg,
+        snapshot_every=probe_every,
+        snapshot_fn=snapshot_fn,
+    )
     # Persist train_log for post-cell convergence check (decisions.md
     # § 12: surface if final-1K-step loss drop > 5% of step-N loss
     # flags the cap as binding). Mirrors agent_nlp's c3+c4 pattern
@@ -310,15 +396,32 @@ def my_eval_fn(*, model, eval_cfg, component):
 
 
 def main(*, archs=None, seeds=DEFAULT_SEEDS, build_cache_only: bool = False,
-         force_train: bool = False, force_eval: bool = False):
+         force_train: bool = False, force_eval: bool = False,
+         n_steps: int = 20_000, batch_size: int = 1024,
+         probe_every: int = 0, snapshot_state_at: tuple[int, ...] = ()):
     archs = archs or DEFAULT_ARCHS
-    log.info("[c7.run] datasource=%s", DATASOURCE)
+    log.info(
+        "[c7.run] datasource=%s n_steps=%d batch_size=%d probe_every=%d "
+        "snapshot_state_at=%s",
+        DATASOURCE, n_steps, batch_size, probe_every,
+        sorted(snapshot_state_at) or "(none)",
+    )
 
     # Step 0: ensure activation cache exists. cache_activations is idempotent.
     cache_dir = cache_activations(DATASOURCE)
     log.info("[c7.run] act cache at %s", cache_dir)
     if build_cache_only:
         return 0
+
+    # Closure-bind probe_every + snapshot_state_at (run_cell calls
+    # train_fn with a fixed kwarg set; partial threads CLI-supplied
+    # cadence and milestone schedule into my_train_fn).
+    from functools import partial as _partial
+    bound_train_fn = _partial(
+        my_train_fn,
+        probe_every=probe_every,
+        snapshot_state_at=tuple(snapshot_state_at),
+    )
 
     for arch in archs:
         for seed in seeds:
@@ -329,19 +432,22 @@ def main(*, archs=None, seeds=DEFAULT_SEEDS, build_cache_only: bool = False,
                     arch_name=arch,
                     seed=seed,
                     datasource_name=DATASOURCE,
-                    # Han 2026-05-04 PM deadline override: n_steps=20_000
-                    # (schema default 25K) to fit C7 sweep in remaining
-                    # sprint window. Matches agent_nlp's c3+c4 override
-                    # (commit 513a85ea); analysis.py canonical filter
-                    # passes the same explicit cfg.
-                    training_cfg=TrainingConfig(n_steps=20_000),
+                    # Sprint default was n_steps=20_000, batch_size=1024.
+                    # Han 2026-05-04 PM 4×H100 ask: extended-training matrix
+                    # at n_steps=300_000, batch_size ∈ {256, 1024} per cell.
+                    # Both are CLI-overridable (matches agent_nlp's c3+c4
+                    # explicit-cfg pattern; analysis.py canonical filter
+                    # passes the same explicit cfg).
+                    training_cfg=TrainingConfig(
+                        n_steps=n_steps, batch_size=batch_size,
+                    ),
                     eval_cfg={
                         "magnitudes": list(DEFAULT_MAGNITUDE_GRID),
                         "cut_fraction": 0.25,
                         "pr_auc_S_grid": list(DEFAULT_PR_AUC_S_GRID),
                     },
                     eval_protocol_version=EVAL_PROTOCOL_VERSION,
-                    train_fn=my_train_fn,
+                    train_fn=bound_train_fn,
                     eval_fn=my_eval_fn,
                     force_train=force_train,
                     force_eval=force_eval,
@@ -371,6 +477,23 @@ def cli():
                     help="Build the Llama BASE L10 activation cache and exit.")
     ap.add_argument("--force-train", action="store_true")
     ap.add_argument("--force-eval", action="store_true")
+    ap.add_argument("--n-steps", type=int, default=20_000,
+                    help="Training steps per cell (default 20000 = sprint baseline; "
+                         "Han 2026-05-04 PM 4×H100 ask uses 300000).")
+    ap.add_argument("--batch-size", type=int, default=1024,
+                    help="Per-step batch size (default 1024 = sprint baseline; "
+                         "Han 2026-05-04 PM 4×H100 ask sweeps {256, 1024}).")
+    ap.add_argument("--probe-every", type=int, default=0,
+                    help="If >0, run a cheap NMSE + L0 + dead-feature probe on a "
+                         "held-out batch every N steps and append a row to "
+                         "checkpoints/<train_key>/snapshots/eval_log.jsonl. "
+                         "Han 2026-05-04 PM directive: 100. Drives the appendix "
+                         "'is 20K undertrained?' curves.")
+    ap.add_argument("--snapshot-state-at", type=int, nargs="*", default=(),
+                    help="Steps at which to also save a full state_dict to "
+                         "checkpoints/<train_key>/snapshots/step_<N>.safetensors "
+                         "for downstream evaluate_snapshot.py. Recommended: "
+                         "10000 30000 100000 200000 300000.")
     args = ap.parse_args()
     raise SystemExit(main(
         archs=args.archs,
@@ -378,6 +501,10 @@ def cli():
         build_cache_only=args.build_cache_only,
         force_train=args.force_train,
         force_eval=args.force_eval,
+        n_steps=args.n_steps,
+        batch_size=args.batch_size,
+        probe_every=args.probe_every,
+        snapshot_state_at=tuple(args.snapshot_state_at),
     ))
 
 
