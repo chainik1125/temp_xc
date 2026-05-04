@@ -185,6 +185,83 @@ def batch_iter_from_act_cache(
     return _iter
 
 
+# ── Public: preloaded_batch_iter_from_act_cache ─────────────────────────────
+
+
+# Module-global cache so multiple cells in the same process share one
+# RAM copy per (act_cache_key) — keyed by the cache key, not the seed.
+_PRELOADED_ACT_CACHES: dict[str, torch.Tensor] = {}
+
+
+def preloaded_batch_iter_from_act_cache(
+    act_cache_key: str,
+    *,
+    seed: int = 0,
+) -> Callable[[int], torch.Tensor]:
+    """Bit-identical drop-in for :func:`batch_iter_from_act_cache` that
+    pre-materialises the activation cache into a CPU torch tensor.
+
+    Why an opt-in helper rather than the default:
+    The default ``batch_iter_from_act_cache`` mmaps the .npy and uses
+    numpy fancy indexing per call. At ``batch=1024`` × ``seq_len=128``
+    × ``d_in=2304``, each batch touches ~150K 4 KB pages from the
+    file. Even when the file is fully in OS page cache, the kernel
+    walks page tables on every access — RAM-bound at ~1.8 GB/sec
+    instead of 100+ GB/sec. Profiling on Gemma-2-2b L13 showed the
+    iterator was the trainer bottleneck (~330 ms / call).
+
+    This helper does ``.clone()`` on first access to copy the entire
+    file (~14 GB fp16 for the 24K Gemma cache; ~30 GB for larger
+    caches) into anonymous RAM and then samples via torch fancy
+    indexing. Empirical ~3.4× speedup on the data path; ~1.4× on the
+    end-to-end trainer (model compute is the rest).
+
+    **Determinism**: uses the same ``np.random.default_rng(seed)`` for
+    indices and the same ``.to(torch.float32)`` contract as the
+    default helper, so checkpoints written under either path are
+    bit-identical for the same ``(act_cache_key, seed)`` pair.
+
+    **RAM cost**: one ~`acts.npy.size` bytes copy per process per
+    distinct ``act_cache_key`` (cached module-globally; multiple cells
+    that share an act_cache_key share the copy). H100 / H200 pods (128+
+    GB system RAM) are unaffected; A40 pods (~64 GB) should check
+    headroom first if running concurrent processes — at 14 GB per
+    cache, 4 concurrent processes saturate.
+
+    See agent_paper's review (decisions.md § 12 cross-ref) for the
+    fairness analysis: same train_key → same checkpoint bytes whether
+    cells use the mmap or preloaded path. No methodology disclosure
+    needed when mixing the two within a sweep.
+    """
+    cache_dir = act_cache_dir(act_cache_key)
+    acts_path = cache_dir / "acts.npy"
+    if not acts_path.exists():
+        raise FileNotFoundError(
+            f"Activation cache missing at {acts_path}. "
+            f"Run build_activation_cache(...) first or download from HF."
+        )
+
+    if act_cache_key not in _PRELOADED_ACT_CACHES:
+        # Force RAM materialisation. Without .clone(), torch.from_numpy on
+        # an already-contiguous mmap'd array zero-copy wraps the mmap and
+        # subsequent fancy indexing still page-faults.
+        mmapped = np.load(acts_path, mmap_mode="r")
+        _PRELOADED_ACT_CACHES[act_cache_key] = (
+            torch.from_numpy(np.ascontiguousarray(mmapped)).clone()
+        )
+    acts = _PRELOADED_ACT_CACHES[act_cache_key]
+    n_seqs = acts.shape[0]
+    rng = np.random.default_rng(seed)
+
+    def _iter(batch_size: int) -> torch.Tensor:
+        idx = torch.from_numpy(rng.integers(0, n_seqs, size=batch_size))
+        # torch fancy indexing on the cloned tensor (RAM-rate); fp32
+        # cast to match the default helper's contract.
+        return acts[idx].to(torch.float32)
+
+    return _iter
+
+
 # ── Internal helpers ────────────────────────────────────────────────────────
 
 

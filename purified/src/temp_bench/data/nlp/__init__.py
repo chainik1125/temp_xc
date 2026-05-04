@@ -11,6 +11,9 @@ Public API:
   shape, no recomputation.
 - :func:`batch_iter_from_act_cache` — return a deterministic callable
   ``(batch_size: int) -> Tensor`` for the canonical SAE trainer.
+- :func:`preloaded_batch_iter_from_act_cache` — opt-in bit-identical
+  drop-in for the trainer that copies the cache into RAM (fast path
+  for batch≥256 on H100/H200; ~14 GB CPU RAM cost per process).
 
 Both are keyed by ``act_cache_key`` from
 :func:`temp_bench.config.compute_act_cache_key`. Cache layout:
@@ -28,6 +31,7 @@ shedding wandb / sweep / CLI cruft to fit the unified framework.
 from temp_bench.data.nlp.cache import (
     batch_iter_from_act_cache,
     build_activation_cache,
+    preloaded_batch_iter_from_act_cache,
 )
 from temp_bench.data.nlp.probe_cache import (
     S_CACHE,
@@ -54,5 +58,6 @@ __all__ = [
     "load_all_probing_tasks",
     "load_all_saebench_ct_tasks",
     "load_probe_cache",
+    "preloaded_batch_iter_from_act_cache",
     "probe_cache_dir",
 ]
