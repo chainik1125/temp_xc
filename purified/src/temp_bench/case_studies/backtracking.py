@@ -1261,16 +1261,38 @@ def mine_top_features(
     (Aniket's "pos0" mode) requires arch-specific override.
     """
     device = next(model.parameters()).device
+    # Per-arch T: slice sentence_acts (T=6) to match the arch's expected T.
+    # TXC-base wants T=5; TXC-pro wants T_max (or t_sample); TopK-SAE/TFA
+    # accept any T. Take the LAST arch_T positions of the [-13..-8] window
+    # — these are closest to the sentence start (most predictive of the
+    # backtracking event).
+    arch_T = getattr(model.config, "T", None) or 1
+    win_T = pos_activations.shape[1]
+    if arch_T < win_T:
+        pos_activations = pos_activations[:, -arch_T:, :]
+        neg_activations = neg_activations[:, -arch_T:, :]
+    elif arch_T > win_T:
+        # Pad by repeating the first position (rare — only if arch_T > 6).
+        pad = arch_T - win_T
+        pos_activations = np.concatenate(
+            [np.repeat(pos_activations[:, :1, :], pad, axis=1), pos_activations],
+            axis=1,
+        )
+        neg_activations = np.concatenate(
+            [np.repeat(neg_activations[:, :1, :], pad, axis=1), neg_activations],
+            axis=1,
+        )
 
     def _encoded_means(acts: np.ndarray) -> torch.Tensor:
         n = acts.shape[0]
         if n == 0:
             return torch.zeros(model.d_sae, device=device)
         sum_acc: torch.Tensor | None = None
+        param_dtype = next(model.parameters()).dtype
         with torch.no_grad():
             for i in range(0, n, batch_size):
-                batch = torch.from_numpy(acts[i:i + batch_size]).to(device)
-                z = model.encode(batch).abs()
+                batch = torch.from_numpy(acts[i:i + batch_size]).to(device, dtype=param_dtype)
+                z = model.encode(batch).abs().float()
                 # Max-pool over T (window axis) — Aniket's window-level latent.
                 if z.dim() == 3:
                     z = z.amax(dim=1)
@@ -1567,14 +1589,27 @@ def run_arch_evaluation(
         # Encode sentence-window acts via SAE → per-sentence pooled features.
         # Batched to avoid OOM at d_sae=32768 (25K × 6 × 32768 fp32 ≈ 19 GB
         # encoded at once; batched at 1024 caps peak at ~800 MB).
+        # Per-arch T: slice (B, T=6, d) → (B, arch_T, d) to match encode contract.
         device = next(arch.parameters()).device
+        param_dtype = next(arch.parameters()).dtype
+        arch_T = getattr(arch.config, "T", None) or 1
+        win_T = sentence_acts.shape[1]
+        sa_for_arch = sentence_acts
+        if arch_T < win_T:
+            sa_for_arch = sentence_acts[:, -arch_T:, :]
+        elif arch_T > win_T:
+            pad = arch_T - win_T
+            sa_for_arch = np.concatenate(
+                [np.repeat(sentence_acts[:, :1, :], pad, axis=1), sentence_acts],
+                axis=1,
+            )
         n = len(sentence_labels)
         batch = 1024
         chunks: list[np.ndarray] = []
         with torch.no_grad():
             for i in range(0, n, batch):
-                xb = torch.from_numpy(sentence_acts[i:i + batch]).to(device)
-                z = arch.encode(xb).abs()
+                xb = torch.from_numpy(sa_for_arch[i:i + batch]).to(device, dtype=param_dtype)
+                z = arch.encode(xb).abs().float()
                 if z.dim() == 3:
                     z = z.amax(dim=1)
                 chunks.append(z.detach().cpu().numpy())
