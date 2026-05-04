@@ -131,6 +131,18 @@ def my_train_fn(*, arch_name, arch_hparams, seed, training_cfg, act_cache_key, c
     print(f"[SETUP {arch_name}/seed={seed}] entering train_sae loop  ({_time.time()-t_setup:.1f}s)", flush=True)
     sys.stdout.flush()
     result = train_sae(model, progress_iter, training_cfg, device="cuda")
+    # Persist train log for post-cell convergence-check (decisions.md
+    # § 12: surface if final-1K-step loss drop > 5% of step-25K loss).
+    # The runner's save_checkpoint doesn't carry the log; we save it
+    # alongside the run logs ourselves.
+    try:
+        import json as _json
+        log_path = Path("logs") / f"c3_b{training_cfg.batch_size}_{arch_name}_seed{seed}_trainlog.json"
+        log_path.parent.mkdir(parents=True, exist_ok=True)
+        log_path.write_text(_json.dumps(result.get("log", {})))
+        print(f"  [TRAIN {arch_name}/seed={seed}] trainlog saved → {log_path}", flush=True)
+    except Exception as exc:
+        print(f"  [TRAIN {arch_name}/seed={seed}] trainlog persist failed: {exc}", flush=True)
     return result["state_dict"]
 
 

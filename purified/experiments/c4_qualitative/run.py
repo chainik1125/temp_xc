@@ -88,6 +88,16 @@ def my_train_fn(*, arch_name, arch_hparams, seed, training_cfg, act_cache_key, c
 
     batch_iter = batch_iter_from_act_cache(act_cache_key, seed=seed)
     result = train_sae(model, batch_iter, training_cfg, device="cuda")
+    # Persist train log for post-cell convergence-check (decisions.md
+    # § 12). Will only fire if C3 hasn't already trained this train_key
+    # (otherwise the runner cache-hits and my_train_fn is skipped).
+    try:
+        import json as _json
+        log_path = Path("logs") / f"c4_b{training_cfg.batch_size}_{arch_name}_seed{seed}_trainlog.json"
+        log_path.parent.mkdir(parents=True, exist_ok=True)
+        log_path.write_text(_json.dumps(result.get("log", {})))
+    except Exception:
+        pass
     return result["state_dict"]
 
 
