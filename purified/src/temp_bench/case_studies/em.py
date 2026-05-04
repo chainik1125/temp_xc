@@ -635,6 +635,23 @@ def run_wang_minimal(
                 (out_dir / "stage4_frontier.partial.json").write_text(
                     json.dumps({"rows": frontier_rows, "peak": peak}, indent=2)
                 )
+                # Persist raw (gen, judge) tuples for post-deadline κ
+                # validation (per Han's 2026-05-04 decision; agent_paper
+                # uses the same convention for c4 cells —
+                # results/runs/<eval_key>/judge_outputs.jsonl).
+                judge_path = out_dir / "judge_outputs.jsonl"
+                with judge_path.open("a") as f:
+                    for j, g in enumerate(gens):
+                        rec = {
+                            "feature_id": fid,
+                            "alpha": float(alpha),
+                            "rollout_idx": j,
+                            "question": g.get("question", ""),
+                            "answer": g.get("answer", ""),
+                            "align": (None if j >= len(aligns) else aligns[j]),
+                            "coh":   (None if j >= len(cohs)   else cohs[j]),
+                        }
+                        f.write(json.dumps(rec) + "\n")
 
     result = {
         "ranking_top200": ranking["features"][:200],
