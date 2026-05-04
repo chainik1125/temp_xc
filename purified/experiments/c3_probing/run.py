@@ -54,7 +54,11 @@ from temp_bench.training import train_sae
 
 COMPONENT = "c3"
 DATASOURCE = "gemma_2_2b_it_l13_fineweb_24k128"
-EVAL_PROTOCOL_VERSION = "1.0.0"
+# 1.1.0 (2026-05-04): Phase 7 padding fix — probe cache rebuilt as left-aligned
+# (N, S=32, d_in) with per-example first_real metadata; _encode_pool now masks
+# padding contributions per row. Old 1.0.0 cells stay in the leaderboard for
+# comparison. See docs/han/research_logs/phase7_unification/2026-04-27-URGENT-probing-cache-fix.md
+EVAL_PROTOCOL_VERSION = "1.1.0"
 
 DEFAULT_ARCHS = ("topk_sae", "tsae_paper", "txc_base", "txc_pro")  # mlc still pending
 DEFAULT_SEEDS = (1, 2, 42)
@@ -177,6 +181,8 @@ def my_eval_fn(*, model, eval_cfg, component):
             m,
             X_train=task["X_train"], y_train=task["y_train"],
             X_test=task["X_test"], y_test=task["y_test"],
+            first_real_train=task["first_real_train"],
+            first_real_test=task["first_real_test"],
             S=S, k_feat=k_feat,
         )
         per_task_metrics[f"auc__{tname}"] = float(r["auc"])

@@ -131,6 +131,8 @@ def s_tail_probe(
     y_test: np.ndarray,
     S: int,
     k_feat: int,
+    first_real_train: np.ndarray | None = None,
+    first_real_test: np.ndarray | None = None,
     encode_batch_size: int = 64,
     device: str | torch.device | None = None,
     n_jobs: int = -1,
@@ -139,11 +141,21 @@ def s_tail_probe(
 
     Args:
         model: subclass of ``TempBenchArch``; in eval mode.
-        X_train, X_test: ``(N, seq_len, d_in)`` activation arrays. ``seq_len``
-            must be ``>= S``; we slice the last-S tail.
+        X_train, X_test: ``(N, S_cache, d_in)`` activation arrays.
+            Schema 2.0.0: arrays are pre-sliced to S_cache=32 left-aligned
+            (real tokens at positions ``[first_real[i], S_cache-1]``,
+            zeros at the start). Schema 1.x ``(N, 128, d_in)`` is also
+            accepted (for backwards-compat) when ``first_real_*`` is None
+            — the encoder uses the right-aligned tail and emits a
+            warning, since this hits the original padding-tail issue.
         y_train, y_test: ``(N,)`` int 0/1 labels.
-        S: tail length (Phase 7 default = 32). Must be ``>= model.T``.
+        S: tail length (Phase 7 default = 32). Must be ``>= model.T``
+            and ``<= X.shape[1]``.
         k_feat: top-k feature selection.
+        first_real_train, first_real_test: ``(N,)`` int per-example
+            position of the first real token within the S-frame. If
+            provided, the encoder masks padding contributions when
+            mean-pooling. **Schema 2.0.0 caches always pass these.**
         encode_batch_size: forward-pass micro-batch size.
         device: ``"cuda"`` / ``"cpu"`` / ``None`` (auto-detect from model).
 
@@ -169,8 +181,14 @@ def s_tail_probe(
 
     device = torch.device(device) if device is not None else next(model.parameters()).device
 
-    train_feats = _encode_pool(model, X_train, S=S, batch_size=encode_batch_size, device=device)
-    test_feats = _encode_pool(model, X_test, S=S, batch_size=encode_batch_size, device=device)
+    train_feats = _encode_pool(
+        model, X_train, S=S, first_real=first_real_train,
+        batch_size=encode_batch_size, device=device,
+    )
+    test_feats = _encode_pool(
+        model, X_test, S=S, first_real=first_real_test,
+        batch_size=encode_batch_size, device=device,
+    )
 
     return mean_pool_probe(
         model, X_train=train_feats, y_train=y_train,
@@ -234,35 +252,66 @@ def _encode_pool(
     S: int,
     batch_size: int,
     device: torch.device,
+    first_real: np.ndarray | None = None,
 ) -> np.ndarray:
     """Encode last-S tokens of each sequence and mean-pool latents.
 
     Returns ``(N, d_sae)`` numpy array. Per-token vs window aggregation
     is dispatched on ``model.T``.
+
+    Padding handling (Phase 7's
+    ``2026-04-27-URGENT-probing-cache-fix.md`` recipe):
+
+    - If ``first_real`` is provided (schema 2.0.0 cache), the array's
+      tail-S frame is left-aligned: positions ``[first_real[i], S-1]``
+      hold real activations; ``[0, first_real[i])`` hold zeros from
+      the per-example reslice in :func:`build_probe_cache`. We mask
+      contributions from ``[0, first_real[i])`` per row before the
+      mean-pool. For window archs (T > 1), only windows whose entire
+      span is in the real region (left edge ``>= first_real[i]``)
+      contribute.
+    - If ``first_real`` is None, fall back to the simple ``X[:, -S:, :]``
+      slice — keeps backward-compat for the older schema-1.x cache,
+      but on right-padded short sequences this ingests padding
+      activations into the pool. Don't ship paper numbers from this
+      path.
     """
     N = X.shape[0]
-    tail = X[:, -S:, :]  # (N, S, d_in)
+    tail = X[:, -S:, :]                       # (N, S, d_in)
+    if first_real is not None:
+        first_real = np.asarray(first_real, dtype=np.int64).clip(min=0, max=S)
+
     out: list[np.ndarray] = []
 
     model.eval()
     with torch.no_grad():
         if model.T == 1:
-            # Per-token encode then mean-pool over S
+            # Per-token encode then mean-pool over the real-token region
             for start in range(0, N, batch_size):
-                batch = torch.from_numpy(tail[start:start + batch_size]).to(device)
+                end = min(start + batch_size, N)
+                batch = torch.from_numpy(tail[start:end]).to(device)
                 z = model.encode(batch)                    # (B, S, d_sae)
-                pooled = z.mean(dim=1)                     # (B, d_sae)
+                if first_real is None:
+                    pooled = z.mean(dim=1)                 # (B, d_sae)
+                else:
+                    fr = torch.from_numpy(first_real[start:end]).to(device)
+                    # mask[b, k] = 1 if k >= fr[b] else 0
+                    k_grid = torch.arange(S, device=device).unsqueeze(0)  # (1, S)
+                    mask = (k_grid >= fr.unsqueeze(1)).to(z.dtype)        # (B, S)
+                    counts = mask.sum(dim=1).clamp(min=1.0)               # (B,)
+                    pooled = (z * mask.unsqueeze(-1)).sum(dim=1) / counts.unsqueeze(-1)
                 out.append(pooled.float().cpu().numpy())
         else:
-            # Window encode: slide T-window over the S-tail
+            # Window encode: slide T-window over the S-tail. A window
+            # starting at position w "covers" positions [w, w+T-1] of
+            # the S-frame. For schema 2.0.0 we keep windows whose left
+            # edge w satisfies w >= first_real[i] (entire window in real
+            # region; n_windows from first_real[i] up to S - T).
             T = model.T
             n_windows = S - T + 1
             for start in range(0, N, batch_size):
-                batch = torch.from_numpy(tail[start:start + batch_size]).to(device)  # (B, S, d_in)
-                # Stack windows along a new dim so we can encode in one batched pass
-                # via reshape: (B, S, d_in) -> (B * n_windows, T, d_in).
-                # (Memory: B * n_windows * T * d_in floats — for B=64, S=32, T=5,
-                # n_windows=28: 64*28*5*d_in. At d_in=2304: ~17 MB. Fine.)
+                end = min(start + batch_size, N)
+                batch = torch.from_numpy(tail[start:end]).to(device)  # (B, S, d_in)
                 wins = torch.stack(
                     [batch[:, w:w + T] for w in range(n_windows)], dim=1
                 )                                          # (B, n_windows, T, d_in)
@@ -270,7 +319,22 @@ def _encode_pool(
                 wins_flat = wins.reshape(B * n_windows, T, batch.shape[-1])
                 z = model.encode(wins_flat)                # (B*n_windows, 1, d_sae)
                 z = z.squeeze(1).reshape(B, n_windows, -1)  # (B, n_windows, d_sae)
-                pooled = z.mean(dim=1)                      # (B, d_sae)
+                if first_real is None:
+                    pooled = z.mean(dim=1)                  # (B, d_sae)
+                else:
+                    fr = torch.from_numpy(first_real[start:end]).to(device)
+                    w_grid = torch.arange(n_windows, device=device).unsqueeze(0)  # (1, n_windows)
+                    mask = (w_grid >= fr.unsqueeze(1)).to(z.dtype)               # (B, n_windows)
+                    # Edge case: if a row has fr > S - T (n_real < T), no valid
+                    # windows. Avoid division by zero by falling back to all-windows
+                    # mean for that row (probe will get noisy signal but won't NaN).
+                    counts = mask.sum(dim=1)
+                    fallback = counts == 0
+                    if fallback.any():
+                        mask[fallback] = 1.0
+                        counts = mask.sum(dim=1)
+                    counts = counts.clamp(min=1.0)
+                    pooled = (z * mask.unsqueeze(-1)).sum(dim=1) / counts.unsqueeze(-1)
                 out.append(pooled.float().cpu().numpy())
 
     return np.concatenate(out, axis=0)

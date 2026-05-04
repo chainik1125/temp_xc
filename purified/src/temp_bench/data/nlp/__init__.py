@@ -30,6 +30,7 @@ from temp_bench.data.nlp.cache import (
     build_activation_cache,
 )
 from temp_bench.data.nlp.probe_cache import (
+    S_CACHE,
     build_probe_cache,
     list_probe_cache,
     load_probe_cache,
@@ -44,6 +45,7 @@ from temp_bench.data.nlp.probe_tasks import (
 
 __all__ = [
     "ProbingTask",
+    "S_CACHE",
     "batch_iter_from_act_cache",
     "build_activation_cache",
     "build_probe_cache",
