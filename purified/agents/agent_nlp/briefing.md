@@ -39,6 +39,41 @@ surface it in chat, and let Han or agent_paper land the change. This
 is non-negotiable even if Han verbally approves — the audit trail of
 who edited what depends on each agent staying in their lane.
 
+### Han decisions 2026-05-04 PM (CRITICAL — TrainingConfig re-issued per Phase 5)
+
+A "batch=256 → 2048" cross-agent directive was issued earlier today
+(commit a9200560) and reverted (commit 0beae2bf). It treated only the
+contrastive archs (T-SAE, TXC-pro) as needing higher batch — Han caught
+that as unfair to non-contrastive baselines. **The new directive is
+Phase-5-faithful, applied uniformly across all archs and all pods.**
+Read `decisions.md` § 12 in full before running anything. Gist:
+
+- **`TrainingConfig` defaults are now**: `batch_size=1024`, `n_steps=25_000`,
+  `plateau_early_stop=True`. Just default-construct `TrainingConfig()` in
+  your runner — no per-component overrides needed for these knobs.
+- **Uniform across pods**: H100 + A40 both run at batch=1024. The point
+  is every arch trains under identical conditions, matching the SAE-
+  comparison-paper standard (T-SAE §4.1: "All SAEs are trained with...
+  chosen to allow for comparability"; TFA App. B.1: "all SAEs trained
+  from scratch... to enable a consistent and fair evaluation").
+- **Convergence**: loss drop < 2% per 1K steps (Phase 5 brief.md:71,261).
+  Plateau-stop is the fairness mechanism — different archs may converge
+  at different step counts; report the step each arch hit plateau in
+  your AUTO-RESULTS or analysis. **Hitting the 25K cap with loss still
+  descending = undertrained; surface as an observation.**
+- **Cache hygiene**: `batch_size`, `n_steps`, and the plateau-* fields
+  are all in the `train_key` hash (`src/temp_bench/config.py:181-193`).
+  New cells get fresh `train_key` / `eval_key` automatically. Old
+  batch=256 cells stay in `results/leaderboard.jsonl` for diff
+  comparison — **when rendering AUTO-RESULTS, filter for new rows only**
+  (e.g., `training_cfg.batch_size == 1024`).
+
+**Your specific re-run**: 24 C3 cells (4 archs × 3 seeds × 2 k_feats)
+need new train_keys. C4 cells share the C3 checkpoints, so once C3 is
+re-trained, C4 evaluation re-runs cheaply (cache-hit on training).
+Bump `EVAL_PROTOCOL_VERSION` if you want to invalidate eval cache too,
+but it's not strictly needed since `eval_key` derives from `train_key`.
+
 You are agent NLP, lead on the language-model components of the paper:
 **C3 (sparse probing)** and **C4 (qualitative latents)**. Both are on
 the same subject: `google/gemma-2-2b-it` layer 13 residual stream. C4

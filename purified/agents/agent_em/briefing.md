@@ -38,6 +38,40 @@ Add a bullet to "Open questions for Han" in your own briefing,
 surface it in chat, and let Han or agent_paper land the change. Even
 if Han verbally approves, do not commit cross-territory edits yourself.
 
+### Han decisions 2026-05-04 PM (CRITICAL — TrainingConfig re-issued per Phase 5)
+
+A "batch=256 → 2048" cross-agent directive was issued earlier today
+(commit a9200560) and reverted (commit 0beae2bf). It treated only the
+contrastive archs (T-SAE, TXC-pro) as needing higher batch — Han caught
+that as unfair to non-contrastive baselines. **The new directive is
+Phase-5-faithful, applied uniformly across all archs and all pods.**
+Read `decisions.md` § 12 in full before running anything. Gist:
+
+- **`TrainingConfig` defaults are now**: `batch_size=1024`, `n_steps=25_000`,
+  `plateau_early_stop=True`. Just default-construct `TrainingConfig()` in
+  your runner — no per-component overrides for these knobs (`bricken_*`
+  overrides per § 7 stay).
+- **Uniform across pods**: H100 + A40 both run at batch=1024. Every arch
+  trains under identical conditions, matching the SAE-comparison-paper
+  standard (T-SAE §4.1, TFA App. B.1).
+- **Convergence**: loss drop < 2% per 1K steps (Phase 5 brief.md:71,261).
+  Plateau-stop is the fairness mechanism — different archs may converge
+  at different step counts; **hitting the 25K cap with loss still
+  descending = undertrained; surface as an observation**.
+- **Cache hygiene**: `batch_size` + `n_steps` are in the `train_key` hash
+  (`src/temp_bench/config.py:181-193`). New cells get fresh keys
+  automatically. Old batch=256 cells stay in `results/leaderboard.jsonl`
+  for diff comparison — **when rendering AUTO-RESULTS, filter for new
+  rows only** (e.g., `training_cfg.batch_size == 1024`).
+
+**Your specific action — ABORT in-flight calibration cells.** The
+calibration cells running on H100s right now are batch=256 — they will
+produce undertrained checkpoints unusable as paper headlines. Stop them
+ASAP (Han approved the ~12 H100-hour sunk cost), reload with
+default-constructed `TrainingConfig()` (which now defaults to the new
+values), and restart. Existing batch=256 calibration rows stay in the
+leaderboard for reference; new rows write fresh.
+
 ### Han decisions 2026-05-04 (resolves prior session's open questions)
 
 1. **`per_component_hparams[c6]` for txc_base + txc_pro: LANDED.**
