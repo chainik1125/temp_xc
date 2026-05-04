@@ -1529,12 +1529,16 @@ class SteeringCaseStudy(CaseStudy):
     4. **Aggregation** — coh-vs-success curves at five thresholds.
        Returned in :class:`CaseStudyResult.metrics`.
 
-    The headline metric is ``success_at_coh_1.75`` (3-seed mean —
-    aggregated by ``experiments/c5_steering/analysis.py``).
+    The headline metric is ``peak_success_grade_at_coh_1.75`` (continuous
+    0-3 scale, max-over-strengths of mean success_grade conditioned on
+    coh_grade ≥ 1.75; matches phase-7 ``unified-pareto.md`` peakXX
+    convention). Old ``success_at_coh_1.75`` (binary fraction)
+    preserved as supplementary; see decisions.md § (C5 metric mismatch)
+    for the rationale.
     """
 
     name = "c5_steering"
-    primary_metric = "success_at_coh_1.75"
+    primary_metric = "peak_success_grade_at_coh_1.75"
 
     def __init__(self, workspace: Path, *, cfg: SteeringConfig | None = None):
         super().__init__(workspace)
