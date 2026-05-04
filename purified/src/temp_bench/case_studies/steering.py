@@ -1290,15 +1290,29 @@ def coh_success_curves(
     coh_thresholds: tuple[float, ...] = DEFAULT_COH_THRESHOLDS,
     success_threshold: int = 2,
 ) -> dict[str, Any]:
-    """Aggregate one cell's grades into success-rate-at-coh-threshold curves.
+    """Aggregate one cell's grades into coh-vs-success curves.
 
-    ``success_threshold=2`` matches the T-SAE paper's "green cell"
-    convention in Table 2: a generation is "successful" if its
-    success_grade ≥ 2. The curve at threshold ``τ`` is then
-    ``mean(success_grade ≥ 2 | coh_grade ≥ τ)``.
+    Computes BOTH metrics so we can compare to the T-SAE paper Table 2
+    convention AND the wasteland phase-7 unified-pareto convention:
 
-    Returns a dict with one float per (strength, coh threshold) plus
-    overall mean coh / success across all valid grades.
+    - **success_at_coh_<τ>** (binary, [0,1]): fraction of generations
+      with ``success_grade ≥ success_threshold AND coh_grade ≥ τ``,
+      averaged over all strengths. Headline for the original c5.md
+      spec; matches the T-SAE paper "green cell" Table 2 framing.
+    - **peak_success_grade_at_coh_<τ>** (continuous, [0, 3]): for each
+      strength, compute mean ``success_grade`` over generations with
+      ``coh_grade ≥ τ``; take the MAX across strengths. Matches the
+      wasteland phase-7 ``peak15`` / ``peak175`` convention used in
+      ``unified-pareto.md`` (where T-SAE anchor was 1.133 / 0.411 /
+      …). The continuous-mean-then-peak structure preserves dynamic
+      range so archs aren't all squashed against a small-fraction
+      ceiling.
+
+    Both are returned. The "fraction" metric collapses across coh
+    thresholds (success_grade ≥ 2 events tend to also have coh ≥ 2,
+    so success_at_coh_1.75 ≈ success_at_coh_2.0 — observed empirically
+    in c5 cells 2026-05-04). The peak-grade metric does NOT collapse,
+    making it the better headline.
     """
     valid = [g for g in grades if g.is_valid]
     if not valid:
@@ -1307,6 +1321,8 @@ def coh_success_curves(
             "mean_coh": 0.0, "mean_success": 0.0,
             "success_at_coh": {f"{t:g}": 0.0 for t in coh_thresholds},
             "success_at_coh_per_strength": {},
+            "peak_success_grade_at_coh": {f"{t:g}": 0.0 for t in coh_thresholds},
+            "mean_success_grade_at_coh_per_strength": {},
         }
 
     coh = np.array([g.coherence_grade for g in valid], dtype=np.float32)
@@ -1321,6 +1337,8 @@ def coh_success_curves(
         "mean_success": float(succ.mean()),
         "success_at_coh": {},
         "success_at_coh_per_strength": {},
+        "peak_success_grade_at_coh": {},
+        "mean_success_grade_at_coh_per_strength": {},
     }
     for tau in coh_thresholds:
         mask = coh >= tau
@@ -1328,13 +1346,30 @@ def coh_success_curves(
             float(succ_bool[mask].mean()) if mask.any() else 0.0
         )
 
-    for s in sorted(set(strength.tolist())):
+    # Per-strength: both binary fraction (legacy) AND continuous mean grade (new).
+    strengths_sorted = sorted(set(strength.tolist()))
+    for s in strengths_sorted:
         s_mask = strength == s
-        per: dict[str, float] = {}
+        per_bin: dict[str, float] = {}
+        per_grade: dict[str, float] = {}
         for tau in coh_thresholds:
             m = s_mask & (coh >= tau)
-            per[f"{tau:g}"] = float(succ_bool[m].mean()) if m.any() else 0.0
-        out["success_at_coh_per_strength"][f"{s:g}"] = per
+            per_bin[f"{tau:g}"] = float(succ_bool[m].mean()) if m.any() else 0.0
+            per_grade[f"{tau:g}"] = float(succ[m].mean()) if m.any() else 0.0
+        out["success_at_coh_per_strength"][f"{s:g}"] = per_bin
+        out["mean_success_grade_at_coh_per_strength"][f"{s:g}"] = per_grade
+
+    # Wasteland-comparable peak metric: max over strengths of (mean
+    # success_grade conditioned on coh ≥ τ).
+    for tau in coh_thresholds:
+        per_strength_grades = [
+            out["mean_success_grade_at_coh_per_strength"][f"{s:g}"][f"{tau:g}"]
+            for s in strengths_sorted
+        ]
+        out["peak_success_grade_at_coh"][f"{tau:g}"] = (
+            float(max(per_strength_grades)) if per_strength_grades else 0.0
+        )
+
     return out
 
 
@@ -1343,7 +1378,8 @@ def flatten_metrics(curves: dict[str, Any]) -> dict[str, float]:
     ``LeaderboardRow.metrics`` shape (``dict[str, float]``).
 
     Keys:
-        success_at_coh_<tau>      mean across all strengths
+        success_at_coh_<tau>             binary fraction (legacy)
+        peak_success_grade_at_coh_<tau>  continuous 0-3 mean (new — wasteland-comparable)
         mean_coh, mean_success
         n_valid, n_total
     """
@@ -1355,7 +1391,69 @@ def flatten_metrics(curves: dict[str, Any]) -> dict[str, float]:
     }
     for tau, val in curves["success_at_coh"].items():
         flat[f"success_at_coh_{tau}"] = float(val)
+    for tau, val in curves.get("peak_success_grade_at_coh", {}).items():
+        flat[f"peak_success_grade_at_coh_{tau}"] = float(val)
     return flat
+
+
+def reaggregate_from_judge_outputs(
+    judge_outputs_path: "str | Path",
+    *,
+    coh_thresholds: tuple[float, ...] = DEFAULT_COH_THRESHOLDS,
+    success_threshold: int = 2,
+) -> dict[str, float]:
+    """Re-aggregate metrics for an existing cell from its persisted judge calls.
+
+    Use this to backfill ``peak_success_grade_at_coh_<τ>`` on cells
+    judged before the metric was added, without re-running the judge.
+    Reads ``judge_outputs.jsonl`` (one JSON record per call with at
+    least ``strength``, ``coherence_grade``, ``success_grade``) and
+    returns the flat metrics dict (suitable for replacing
+    ``LeaderboardRow.metrics``).
+
+    Records with missing or null grades are dropped (they contribute
+    to ``n_total - n_valid`` in the curves dict).
+
+    Example::
+
+        from temp_bench.case_studies.steering import reaggregate_from_judge_outputs
+        flat = reaggregate_from_judge_outputs("results/runs/<eval_key>/judge_outputs.jsonl")
+        # flat now has the new peak_success_grade_at_coh_* keys.
+    """
+    import json
+    from pathlib import Path
+    grades: list[Grade] = []
+    for i, line in enumerate(Path(judge_outputs_path).read_text().splitlines()):
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            r = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        coh_g = r.get("coherence_grade", r.get("coh_grade"))
+        suc_g = r.get("success_grade")
+        st = r.get("strength")
+        cid = r.get("concept_id", "")
+        fid = r.get("feature_idx", r.get("feature_id", -1))
+        if coh_g is None or suc_g is None or st is None:
+            continue
+        grades.append(Grade(
+            idx=int(r.get("idx", i)),
+            concept_id=cid,
+            feature_idx=int(fid),
+            strength=float(st),
+            success_grade=int(suc_g),
+            coherence_grade=int(coh_g),
+            success_raw=r.get("success_raw", ""),
+            coherence_raw=r.get("coherence_raw", ""),
+            error=r.get("error", ""),
+        ))
+    return flatten_metrics(coh_success_curves(
+        grades,
+        coh_thresholds=coh_thresholds,
+        success_threshold=success_threshold,
+    ))
 
 
 # ── CaseStudy implementation ───────────────────────────────────────────

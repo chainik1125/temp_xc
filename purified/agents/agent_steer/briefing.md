@@ -37,6 +37,113 @@ Add a bullet to "Open questions for Han" in your own briefing,
 surface it in chat, and let Han or agent_paper land the change. Even
 if Han verbally approves, do not commit cross-territory edits yourself.
 
+### Han decisions 2026-05-04 (NEW — C5 metric mismatch caught)
+
+**The C5 headline metric was wrong** — Han caught it from the c5.md
+plot ("all the points horizontally aligned, success rates tiny"
+compared to wasteland's `unified-pareto.md` peak15 numbers ~1.5).
+
+Two metrics, different semantics:
+
+- **Old (your implementation, faithful to my buggy spec)**:
+  ``success_at_coh_<τ>`` = mean(success_grade ≥ 2 | coh_grade ≥ τ),
+  averaged over strengths. **Binary fraction in [0, 1].**
+- **New (wasteland-comparable, now headline)**:
+  ``peak_success_grade_at_coh_<τ>`` = for each strength, mean
+  success_grade (0-3 continuous) over generations with coh ≥ τ;
+  take MAX over strengths. **Continuous in [0, 3].**
+
+The old metric collapses across coh thresholds because nearly all
+success ≥ 2 events also have coh ≥ 2.0 — your numbers
+``success_at_coh_1.75 == success_at_coh_2.0`` for every arch confirm
+this. The new metric preserves dynamic range, comparable to
+wasteland anchors (1.133 / 0.411 etc.) and the T-SAE paper § B.2 0-3
+scale.
+
+**What I (agent_paper) already did this session:**
+1. Added ``peak_success_grade_at_coh_<τ>`` to ``coh_success_curves``
+   in ``temp_bench.case_studies.steering`` — future cells emit it
+   automatically.
+2. Added ``mean_success_grade_at_coh_per_strength`` (per-strength
+   continuous means) so the per-cell ``metrics.json`` retains the
+   data needed for the peak metric.
+3. Added a backfill helper:
+   ``temp_bench.case_studies.steering.reaggregate_from_judge_outputs(
+   judge_outputs_jsonl_path)`` — reads a cell's persisted judge
+   calls and returns the new flat metrics dict. Use this to backfill
+   existing cells without re-judging.
+4. Updated ``experiments/c5_steering/analysis.py`` to render BOTH
+   metrics in the AUTO-RESULTS block (peak-grade as headline when
+   present; binary fraction always as supplementary). Re-rendered
+   ``docs/components/c5.md``.
+5. Updated c5.md "Metric" subsection to spec the new headline.
+
+**What you (agent_steer) need to do this session:**
+
+1. **Backfill the existing 9 cells.** Your judge_outputs.jsonl files
+   are on the A40 pod (and pushed to HF via push_run_dir.py). For
+   each c5 leaderboard row's eval_key, read the local
+   ``results/runs/<eval_key>/judge_outputs.jsonl``, run
+   ``reaggregate_from_judge_outputs(...)``, and emit a NEW
+   leaderboard row with the new metrics + a bumped
+   ``EVAL_PROTOCOL_VERSION`` (e.g. "1.0.1") so it doesn't collide
+   with the old. The old rows stay in the leaderboard for
+   reproducibility / diff.
+
+   Sketch:
+   ```python
+   from pathlib import Path
+   from temp_bench.cache import append_leaderboard, leaderboard_path
+   from temp_bench.case_studies.steering import reaggregate_from_judge_outputs
+   from temp_bench.report import query_leaderboard
+   from temp_bench.schemas import LeaderboardRow
+   import json, datetime, hashlib
+
+   for r in query_leaderboard(component="c5"):
+       jpath = Path("results/runs") / r.eval_key / "judge_outputs.jsonl"
+       if not jpath.exists():
+           continue
+       new_metrics = reaggregate_from_judge_outputs(jpath)
+       new_eval_key = hashlib.sha256(
+           f"{r.eval_key}_v1_0_1".encode()).hexdigest()[:16]
+       append_leaderboard(LeaderboardRow(
+           eval_key=new_eval_key,
+           train_key=r.train_key,
+           act_cache_key=r.act_cache_key,
+           component="c5",
+           arch=r.arch,
+           arch_version=r.arch_version,
+           seed=r.seed,
+           datasource=r.datasource,
+           eval_protocol_version="1.0.1",
+           eval_cfg={**r.eval_cfg, "rebuild_from": r.eval_key,
+                     "metric_set": "v1_0_1_with_peak_grade"},
+           metrics=new_metrics,
+           primary_metric="peak_success_grade_at_coh_1.75",
+           agent="agent_steer",
+           ts=datetime.datetime.now(datetime.timezone.utc).strftime(
+               "%Y-%m-%dT%H:%M:%SZ"),
+       ))
+   ```
+
+2. **Re-render**: `python -c "from temp_bench import report;
+   report.render(component='c5')"` — the AUTO-RESULTS block in
+   c5.md will now show the wasteland-comparable peak grade as the
+   headline.
+
+3. **Update your future ``run.py``** to use
+   ``primary_metric="peak_success_grade_at_coh_1.75"`` for new cells.
+   The flatten_metrics function already emits both keys; runner.run_cell
+   takes whichever you pass as `primary_metric`.
+
+4. **Sanity check**: after backfill, your peak grades should be in
+   the 0.5–2.5 range (T-SAE anchor was ~1.13 at coh ≥ 1.5; ~0.41 at
+   coh ≥ 1.75). If your TXC archs come in around 1.0–1.5 at
+   coh ≥ 1.75, that's the "matches T-SAE at high coh" hypothesis
+   reproducing. If they come in much lower (say 0.1–0.3), it's the
+   honest-negative the binary metric was already showing — but with
+   credible numbers reviewers can compare to the paper.
+
 ### Han decisions 2026-05-04 (resolves prior session's open questions)
 
 1. **Judge: confirm Sonnet. NO Gemini.** Your `SonnetSteeringJudge`
