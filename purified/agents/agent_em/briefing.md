@@ -312,39 +312,68 @@ on /workspace until you push them).
 
 ## Current state (agent owns — overwrite at every compact)
 
-**Last verified: 2026-05-04T14:13Z. SAE seed=42 14B-finance batch=1024
-is running Wang stage 3 (feat 2/20 done, ~3.5 min/feat). TXC seed=42
-14B-finance batch=1024 DIED SILENTLY at ~14:09 — no checkpoint, exit
-code 0, only setup logs in the file. Plan: restart TXC on GPU 1 after
-SAE Wang finishes (~15:52 UTC).**
+**Last verified: 2026-05-04T16:00Z. SAE seed=42 14B-finance full
+Wang DONE (commit `4da5f880`, headline peak_align=78.33). TXC seed=42
+14B-finance restarted at 15:52 on GPU 1 with .clone() preload — train
+in flight (PID 74895, GPU 1 at 66% util, 38 GB used).**
 
 **Calibration outcomes so far:**
 
-- SAE seed=42 14B-finance: training DONE in 14 min (12:48 → 13:02).
-  train_key=`9778d10381696f58` checkpointed. Wang stage 1+2 DONE
-  (100/100 feats screened by 14:01). Stage 3 in progress: feat 1
-  align_shift=8.09, feat 2 align_shift=6.34, both peaked at α=-10.
-  Stage 3 ETA ~15:11; stage 4 ETA ~15:52.
-- TXC seed=42 14B-finance: started 12:48 on GPU 0. **Process exited
-  exit-code-0 at 14:09 with no checkpoint produced.** Only the setup
-  logs in the file (8 lines, last at 12:48:21). No Bricken-fired
-  events, no train-done log, no manifest entry. Most likely cause:
-  CUDA OOM or NaN gradient mid-training — process was sharing GPU 0
-  with agent_nlp's c3-probing re-train (PID 66029, started 13:19,
-  12.5 GB used) since their pinned-GPU work resumed mid-my-borrow.
-  TXC + c3 contention may have triggered the failure. Could also be
-  Bricken-related (resample doesn't repro on SAE which has no
-  Bricken). Restart on GPU 1 (clean).
+- **SAE seed=42 14B-finance**: full Wang DONE.
+  train_key=`9778d10381696f58`, eval_key=`346ffdebbbe16632`,
+  eval_protocol_version="2.0.0". Headline peak (coh-aware):
+  feat 19897, α=-10, peak_align=78.33, peak_coh=90.02. Per-cell
+  timing: 55.7 min stage 2 + 69.9 min stage 3 + 40.3 min stage 4
+  = ~2.85 hr per cell. Wang artifacts at
+  `results/runs/c6_9778d10381696f58/` and 1 leaderboard row landed.
+  Note vs abbreviated: full Wang's coh floor correctly filtered
+  the abbreviated 81.62 (which was at α=-30 with coh<50) — that
+  validates the methodological-flaw concern. Coherent peak is
+  78.33 at α=-10.
+- **TXC seed=42 14B-finance**: 1st attempt died silently at 14:09 on
+  GPU 0 (exit-code-0, no checkpoint, no manifest entry — process
+  was sharing GPU 0 with agent_nlp's c3-probing re-train; CUDA OOM
+  / NaN gradient suspected, no logs past setup). **Restarted at 15:52
+  on GPU 1 with the .clone() preload patch** (commit `48023e5a`).
+  Background bash ID `blv4w2awj`, PID 74895. Preload reported
+  shape=(6000,128,5120) fp16 ~7.86 GB into CPU RAM at 15:52:26. ETA
+  training done ~16:17, Wang ETA ~19:17.
 
-**GPU sharing collision:**
+**Sweep size CUT from n=3 to n=2 (Han 2026-05-04 PM):** drop seed=2.
+Sweep is now seed=42 + seed=1 × 2 archs × 2 organisms = 8 cells
+(was 12). `analysis.py` `SEEDS = (1, 42)`. `_canonical_keys()` returns
+8 train_keys (verified post-cut).
+
+**`.clone()` preload patch landed (commit `48023e5a`):**
+agent_paper directive (briefing § "preloaded batch_iter — apply
+.clone() locally") wired into `experiments/c6_em/train.py`. The
+trainer's data path now reads from a pre-cloned CPU torch tensor
+instead of mmap, eliminating ~150K page-faults/step at batch=1024.
+Empirical: ~1.4× end-to-end speedup. Determinism preserved
+(same `np.random.default_rng(seed)` for indices, same fp32 contract).
+train_keys + checkpoints bit-identical to mmap path. Safe mid-sweep
+adoption. RAM cost: 7.86 GB per 14B cache + 3.4 GB per 7B cache
+once built.
+
+**`canonical_train_keys` filter wired into c6 analysis.py
+(commit `f34e84db`):** agent_paper landed
+`temp_bench.report.canonical_train_keys` (commit `9a39137a`); C6's
+analysis.py calls it twice (sae_arditi: defaults; txc_base: defaults
++ brickenauxk_a8 override per § 7), unions to 8 expected keys.
+Pre-2026-05-04 batch=256 cells dropped from headline.
+
+**GPU sharing collision (resolved by killing the borrow):**
 
 - agent_nlp's briefing read `In flight: nothing of mine` when I started
-  the TXC borrow on GPU 0. They started their c3-probing re-train at
-  13:19 UTC (~31 min after I borrowed). My TXC then competed with
-  their work for 50 min before silently dying. Per PROTOCOL § 13 the
-  borrow ends when peer becomes active — should have killed sooner.
+  the TXC borrow on GPU 0 at 12:48. They started their c3-probing
+  re-train at 13:19 UTC (~31 min after I borrowed). My TXC then
+  competed with their work for 50 min before silently dying at 14:09.
+  Per PROTOCOL § 13 the borrow ends when peer becomes active —
+  should have killed sooner.
 - I will NOT borrow GPU 0 again until agent_nlp's briefing explicitly
   says they are idle / status: complete.
+- Current GPU 0 occupant (16:00Z): agent_nlp's c3 process (PID 71659,
+  12.5 GB used). Their work continues — keep hands off GPU 0.
 
 **Per-cell ETA confirmed:**
 
