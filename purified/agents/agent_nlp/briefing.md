@@ -104,21 +104,44 @@ References:
 
 ## Current state (agent owns — overwrite at every compact)
 
-**Last verified: 2026-05-03T22:55Z (autonomous-overnight session)**
+**Last verified: 2026-05-04 (autonomous-overnight session COMPLETE)**
 
-- `git HEAD`: c0a1276b — `final` branch
-- Last leaderboard append: still the 2 old smoke rows (06afa68f, 1948488e
-  — both `eval_cfg.smoke=true`). First REAL row will land when cell 1
-  completes (~30 min into the 18-cell run).
-- Last checkpoint saved: 86474a703b8af5eb (txc_base smoke 200-step);
-  no real-config checkpoints yet (different `n_steps=10000` → different
-  train_key).
-- Active GPU lock(s): none — pinned to GPU 0 (H100). Cell run is
-  using it; agent_em is on GPU 1.
+- `git HEAD`: 086aeb68 — `final` branch
+- Last leaderboard append: 24 real C3 cells (4 archs × 3 seeds × 2 k_feats)
+  + 1 C4 smoke cell (`7476cadc2647eb47`).
+- Last checkpoint saved: txc_pro × 3 seeds (real n_steps=10000 cfg).
+  Plus all the prior C3 checkpoints (topk_sae, tsae_paper, txc_base ×
+  3 seeds each = 12 train_keys total).
+- Active GPU lock(s): none — pinned to GPU 0. C4 cells in flight.
 - Recent decisions in scope: #1, #4, #6, #7, #11
-- In flight: 18-cell C3 run (PID 21612, started 2026-05-03T22:49Z;
-  step 2000/10000 at 22:55Z = ~5 min in). Total ETA ~6 hours
-  (9 unique trainings × 30 min each + 18 evals × 5 min each).
+- In flight: 9-cell C4 run (PID 46597, started 2026-05-04 morning).
+  3 archs × 3 seeds × n_features=256. ETA ~90 min (mostly Haiku API
+  latency for 256 × 3 = 768 judge calls per cell × 9 cells = ~7K calls).
+
+## C3 final headline (decided 2026-05-04)
+
+**Result**: TopK-SAE leads at both sparsities. TXC variants underperform
+by ~0.015-0.020 AUC. **Honest negative for C3 hypothesis**.
+
+| arch         | k=5            | k=20           |
+|--------------|----------------|----------------|
+| `topk_sae`   | 0.8503 ± 0.003 | 0.9044 ± 0.002 |
+| `txc_base`   | 0.8372 ± 0.008 | 0.8841 ± 0.005 |
+| `txc_pro`    | 0.8342 ± 0.007 | 0.8859 ± 0.002 |
+| `tsae_paper` | 0.8266 ± 0.005 | 0.8844 ± 0.002 |
+
+σ_seeds is 0.002-0.008 — gaps are real, not noise. σ_tasks (mean) is
+0.13-0.14 — wide spread across the 38 SAEBench+CT tasks.
+
+Caveats for the paper text:
+- IT-side activations (Phase 7 reference was BASE-side; small shift
+  expected). Phase 7 noted "the IT side is entirely missing".
+- TrainingConfig: n_steps=10K (chosen to fit 24 cells in 10h window).
+  Schema default is 30K; Phase 7 reference used ~50K. Bumping would
+  invalidate train_keys and add ~15-18 hours of cells.
+- σ_tasks suggests a per-task breakdown could expose where TXC
+  variants lose vs win. Per-task floats `auc__<task>` are persisted
+  on every leaderboard row for this analysis.
 
 ## What I just did (agent owns — overwrite)
 
