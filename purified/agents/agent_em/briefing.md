@@ -93,17 +93,21 @@ References:
 
 - `git HEAD`: `6f2b323d` (frontier plot pushed). 12 commits today;
   Phase A + Phase B + first-cell results all upstream on `final`.
-- Last leaderboard append: `eval_key=c1d96d5549e0c3a6`
-  (txc_base+brickenauxk_a8 30k, peak_align=75.875, peak_coh=89.92,
-  peak_alpha=+1.0, peak_feature_id=734). Append at 23:52:56 UTC.
-  SAE-arditi cell at `eval_key=160a1471d1a93f1b`, peak_align=81.625,
-  feat 3173, α=-30.
-- Last checkpoint saved: `train_key=410c3f342b133fff` (txc_base 30 k
-  brickenauxk_a8). SAE checkpoint at `train_key=926527b006dd74aa`
-  (1.34 GB). Both pushed to HF post-pipeline at
+- Last leaderboard append: `eval_key=40f0d1eb4a0c3b81`
+  (txc_base seed=1, peak_align=75.25, feat 17670, α=-30) at
+  01:04:41 UTC 2026-05-04. Both seeds × both arches now in
+  leaderboard:
+  - seed=42 SAE: 81.625 (`160a1471d1a93f1b`)
+  - seed=42 TXC: 75.875 (`c1d96d5549e0c3a6`)
+  - seed=1 SAE: 80.281 (`cdc5e99b13fa6212`)
+  - seed=1 TXC: 75.250 (`40f0d1eb4a0c3b81`)
+- Last checkpoint saved: `train_key=c3ab0477e3a3b339` (txc_base
+  seed=1). All four train_keys (42×{sae,txc} + 1×{sae,txc}) pushed
+  to HF at
   `https://huggingface.co/han1823123123/temp-bench-models/tree/main/<train_key>/`
-  (manual `_push_checkpoint_to_hf` call — auto-push only fires on
-  ephemeral pods).
+  via manual `_push_checkpoint_to_hf` call. Auto-push only fires
+  on ephemeral pods (this is the persistent H100); flag for next
+  session if more seeds land.
 - Active GPU lock(s): GPU 1 pinned. Pipeline (PID 23080) is winding
   down (post-Wang cleanup). Will exit shortly.
 - Recent decisions in scope: #2, #4, #6, #7
@@ -113,14 +117,19 @@ References:
 
 ## Headline result
 
-**Gap = peak_align(SAE-arditi) − peak_align(TXC-base+brickenauxk_a8)
-= 81.625 − 75.875 = +5.75 align points** → **Mixed** decision per
-the c6.md decision tree (3 < gap ≤ 9).
+**Mean gap across 2 seeds = +5.39 align (spread 0.72; min +5.03,
+max +5.75)** → **Mixed** decision per the c6.md decision tree
+(3 < gap ≤ 9). Robust across seeds.
 
-| arch | seed | peak_align | peak_coh | peak_α | feature_id |
-|---|---:|---:|---:|---:|---:|
-| sae_arditi | 42 | 81.62 | 90.92 | -30.0 | 3173 |
-| txc_base+brickenauxk_a8 | 42 | 75.88 | 89.92 | +1.0 | 734 |
+| seed | SAE peak_align | TXC peak_align | gap | SAE feat (α) | TXC feat (α) |
+|---:|---:|---:|---:|---:|---:|
+| 42 | 81.62 | 75.88 | +5.75 | 3173 (α=-30) | 734 (α=+1) |
+| 1  | 80.28 | 75.25 | +5.03 | 3158 (α=-30) | 17670 (α=-30) |
+
+SAE-arditi peaks at α=-30 in both seeds (different feature IDs:
+3173 / 3158). TXC-base peaks at α=-30 in seed 1 but at α=+1 in
+seed 42 — TXC's flatter frontier means the peak is less stable
+across seeds.
 
 **SAE-arditi frontier:** sharp peak at α=-30, feat 3173 (the
 strongest "anti-misalignment" feature). The single-feat peak at
