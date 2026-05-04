@@ -43,6 +43,24 @@ from temp_bench.schemas import TrainingConfig
 log = logging.getLogger("c6.train")
 
 
+# Process-local activation-cache preload. Adopted 2026-05-04 PM per
+# agent_paper directive in agent_em briefing — agent_nlp profiled the
+# trainer data path and found numpy fancy indexing over an mmap'd
+# .npy was the bottleneck (~150K page-table walks/step at batch=1024).
+# Cloning the mmap into a CPU torch tensor turns subsequent reads into
+# RAM-rate access. Empirical: ~1.4× end-to-end trainer speedup.
+#
+# Determinism is preserved: same np.random.default_rng(seed) for
+# indices, same fp32 contract — train_keys are unchanged, checkpoints
+# bit-identical to the mmap path. Safe to adopt mid-sweep.
+#
+# RAM cost: one acts.npy.size copy per process per distinct cache.
+# Qwen-14B finance ~7.86 GB; 7B-medical ~3.4 GB once built. With both
+# loaded in one process ~11.3 GB. H100 pod system RAM is 150-200 GB so
+# safe with margin.
+_PRELOADED_C6_ACTS: dict[str, torch.Tensor] = {}
+
+
 def _build_batch_iter(
     act_cache_key: str,
     *,
@@ -55,13 +73,39 @@ def _build_batch_iter(
     :func:`temp_bench.data.nlp.qwen_em.cache_activations`. Samples
     sliding T-token windows with replacement across the cached
     sequences.
+
+    Preloads the acts tensor into CPU RAM once per process per
+    cache_path (see ``_PRELOADED_C6_ACTS`` above) so per-batch reads
+    are RAM-rate, not page-fault-rate. Subsequent C6 cells in the
+    same process share the preload.
     """
     from temp_bench.config import act_cache_dir as _acd  # avoid shadowing
     cache_dir = _acd(act_cache_key)
     specs = json.loads((cache_dir / "layer_specs.json").read_text())
     hp_key = specs["key"]
-    arr = np.load(cache_dir / f"{hp_key}.npy", mmap_mode="r")  # (N, L, d) fp16
-    N, L, d = arr.shape
+    cache_path = str(cache_dir / f"{hp_key}.npy")
+
+    if cache_path not in _PRELOADED_C6_ACTS:
+        log.info("[c6.train] preloading acts cache %s into CPU RAM…", cache_path)
+        mmapped = np.load(cache_path, mmap_mode="r")
+        # .clone() is load-bearing — without it, torch.from_numpy
+        # zero-copy wraps the mmap and page-faults persist. The
+        # ascontiguousarray() before from_numpy is also load-bearing
+        # in case the mmap'd array is non-contiguous (shouldn't be,
+        # but defensive). The clone() detaches from the mmap-backed
+        # buffer so reads come from a freshly-allocated RAM region.
+        _PRELOADED_C6_ACTS[cache_path] = (
+            torch.from_numpy(np.ascontiguousarray(mmapped)).clone()
+        )
+        log.info(
+            "[c6.train] preload done: shape=%s dtype=%s ~%.2f GB",
+            tuple(_PRELOADED_C6_ACTS[cache_path].shape),
+            _PRELOADED_C6_ACTS[cache_path].dtype,
+            _PRELOADED_C6_ACTS[cache_path].element_size()
+            * _PRELOADED_C6_ACTS[cache_path].nelement() / 1e9,
+        )
+    acts = _PRELOADED_C6_ACTS[cache_path]
+    N, L, d = acts.shape
     if L < T:
         raise RuntimeError(
             f"Cache seq_len={L} < T={T}; rebuild cache with seq_len ≥ T."
@@ -71,10 +115,10 @@ def _build_batch_iter(
     def batch_iter(n: int) -> torch.Tensor:
         seq_idx = rng.integers(0, N, size=n)
         pos_idx = rng.integers(0, L - T + 1, size=n)
-        out = np.empty((n, T, d), dtype=np.float32)
+        out = torch.empty((n, T, d), dtype=torch.float32)
         for i in range(n):
-            out[i] = arr[seq_idx[i], pos_idx[i]:pos_idx[i] + T].astype(np.float32)
-        return torch.from_numpy(out)
+            out[i] = acts[seq_idx[i], pos_idx[i]:pos_idx[i] + T].to(torch.float32)
+        return out
 
     return batch_iter
 
