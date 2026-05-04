@@ -81,6 +81,53 @@ def _d_in_from_act_cache(act_cache_key: str) -> int:
     return int(meta["d_in"])
 
 
+_PRELOADED_ACTS: dict[str, torch.Tensor] = {}
+
+
+def _preloaded_batch_iter(act_cache_key: str, seed: int):
+    """Fast batch_iter that preloads the activation cache into a CPU torch
+    tensor once per process, then samples via torch fancy indexing.
+
+    The shared ``batch_iter_from_act_cache`` mmaps the .npy file and uses
+    numpy fancy indexing per call — at batch=1024 this triggers ~150K
+    page-table walks per step (~330 ms), bottlenecking the trainer at
+    ~1.6 steps/sec on H100. Preloading the entire cache (~14 GB fp16)
+    into a torch CPU tensor on first call drops per-step data load to
+    ~135 ms. Cache is module-global so seed=2/seed=42 cells in the same
+    process reuse without re-allocating.
+
+    Returns a callable ``(batch_size) -> Tensor`` matching the trainer's
+    ``BatchIter`` contract; tensor is CPU fp32 (matching shared helper).
+    """
+    if act_cache_key not in _PRELOADED_ACTS:
+        from temp_bench.config import act_cache_dir
+        acts_path = act_cache_dir(act_cache_key) / "acts.npy"
+        # Force a RAM copy: load into a fresh torch tensor decoupled from
+        # the mmap. Without .clone() (or equivalent), torch.from_numpy on
+        # an already-contiguous mmap'd numpy array zero-copy wraps and
+        # subsequent reads still page-fault through the kernel — defeats
+        # the whole point. .clone() materialises into anonymous RAM so
+        # fancy indexing is RAM-rate.
+        mmapped = np.load(acts_path, mmap_mode="r")
+        acts = torch.from_numpy(np.ascontiguousarray(mmapped)).clone()
+        _PRELOADED_ACTS[act_cache_key] = acts
+    acts = _PRELOADED_ACTS[act_cache_key]
+    n_seqs = acts.shape[0]
+    # Match the shared helper's numpy default_rng so my checkpoint stays
+    # bit-identical to what `batch_iter_from_act_cache` would produce
+    # for the same (act_cache_key, seed) pair. Only the data path is
+    # different (preloaded torch tensor + torch indexing).
+    rng = np.random.default_rng(int(seed))
+
+    def _iter(batch_size: int) -> torch.Tensor:
+        idx = torch.from_numpy(rng.integers(0, n_seqs, size=batch_size))
+        # torch fancy indexing on CPU tensor; fp16 → fp32 to match the
+        # shared helper's contract (the trainer autocasts to bf16 anyway).
+        return acts[idx].to(torch.float32)
+
+    return _iter
+
+
 def my_train_fn(*, arch_name, arch_hparams, seed, training_cfg, act_cache_key, component):
     """Build the arch + train via the shared trainer.
 
@@ -100,8 +147,8 @@ def my_train_fn(*, arch_name, arch_hparams, seed, training_cfg, act_cache_key, c
     torch.manual_seed(seed)
     np.random.seed(seed)
 
-    raw_iter = batch_iter_from_act_cache(act_cache_key, seed=seed)
-    print(f"[SETUP {arch_name}/seed={seed}] batch_iter ready  ({_time.time()-t_setup:.1f}s)", flush=True)
+    raw_iter = _preloaded_batch_iter(act_cache_key, seed=seed)
+    print(f"[SETUP {arch_name}/seed={seed}] batch_iter ready (preloaded torch tensor)  ({_time.time()-t_setup:.1f}s)", flush=True)
     sys.stdout.flush()
 
     # Wrap to print progress every 1000 steps. The shared trainer is
