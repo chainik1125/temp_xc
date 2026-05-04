@@ -136,7 +136,15 @@ def my_train_fn(
         return raw_iter(bs)
 
     result = train_sae(model, progress_iter, training_cfg)
-    return result["state_dict"]
+    # tsae_paper initializes W_enc via ``W_dec.clone().T`` (line 156 of
+    # architectures/tsae.py), which leaves W_enc as a non-contiguous
+    # transposed view; safetensors.save_file rejects non-contiguous
+    # tensors. Force contiguity here so save_checkpoint can serialise.
+    # Reported in briefing — agent_nlp may want to land a permanent
+    # ``.contiguous()`` in tsae.py to fix it for every component.
+    sd = {k: v.contiguous() if not v.is_contiguous() else v
+          for k, v in result["state_dict"].items()}
+    return sd
 
 
 def _make_eval_fn(*, seed: int, workspace: Path, eval_key: str):
