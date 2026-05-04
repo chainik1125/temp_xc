@@ -155,6 +155,9 @@ archs:
       decoder_unit_norm: true
       decoder_grad_orthogonalize: true
     per_component_hparams:
+      c6:
+        d_sae: 32768   # Qwen-14B d_model=5120; matches Dmitry's published Wang baseline
+        k_pos: 25      # k_win = 25 × T(5) = 125 ≈ Dmitry's k_win=128
       c7:
         d_sae: 32768
     notes: |
@@ -180,6 +183,8 @@ archs:
       decoder_unit_norm: true
       decoder_grad_orthogonalize: true
     per_component_hparams:
+      c6:
+        d_sae: 32768   # Qwen-14B d_model=5120; matches Dmitry's Wang baseline
       c7:
         d_sae: 32768
     notes: |

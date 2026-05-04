@@ -49,22 +49,25 @@ export HF_TOKEN="$HF_TOKEN_RESOLVED"
 
 mkdir -p "$CKPT_DIR" "$ACT_CACHE_DIR"
 
+# NOTE: huggingface_hub 1.13.0 removed `huggingface-cli download` and renamed
+# it to `hf download`. Args are identical (`--repo-type`, `--include`,
+# `--local-dir`). The `--local-dir-use-symlinks` flag was also dropped
+# (default is now `False`, matching what we want).
+
 if [ "$mode" = "all" ] || [ "$mode" = "models" ]; then
     echo "[sync_from_hf] pulling $MODELS_REPO …"
-    .venv/bin/huggingface-cli download "$MODELS_REPO" \
+    .venv/bin/hf download "$MODELS_REPO" \
         --repo-type model \
         --local-dir "$CKPT_DIR" \
-        --local-dir-use-symlinks False \
         2>&1 | tail -5 || echo "  (no models yet — that's fine)"
 fi
 
 if [ "$mode" = "all" ] || [ "$mode" = "data" ]; then
     echo "[sync_from_hf] pulling $DATA_REPO act_cache …"
-    .venv/bin/huggingface-cli download "$DATA_REPO" \
+    .venv/bin/hf download "$DATA_REPO" \
         --repo-type dataset \
         --include "act_cache/**" \
         --local-dir "$ACT_CACHE_DIR/.." \
-        --local-dir-use-symlinks False \
         2>&1 | tail -5 || echo "  (no act_cache yet — that's fine)"
 fi
 

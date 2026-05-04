@@ -37,6 +37,34 @@ Add a bullet to "Open questions for Han" in your own briefing,
 surface it in chat, and let Han or agent_paper land the change. Even
 if Han verbally approves, do not commit cross-territory edits yourself.
 
+### Han decisions 2026-05-04 (resolves prior session's open questions)
+
+1. **Meta HF approval: APPLIED 2026-05-04.** Meta gates typically
+   resolve in 1–24 hr. Mirror-vs-Meta equivalence check task added
+   below. Once Meta access lands, switch the c7 datasource back to
+   `llama_3_1_8b_base_l10_ward` and re-run; cache-key invalidation
+   handles cleanly (different `subject_model` → new act_cache_key →
+   new train_keys → fresh cells; old NousResearch-cell cache stays
+   in the leaderboard for diff/comparison).
+2. **Mirror equivalence check (NEW TASK):** before any Meta-mirror
+   substitution becomes a paper claim, run a bit-equality sanity
+   check. On a fixed prompt + fixed token sequence, do one forward
+   pass through `meta-llama/Llama-3.1-8B` (once Meta access lands)
+   AND `NousResearch/Meta-Llama-3.1-8B`, compare layer-10 residual
+   activations element-wise. If max abs diff > 1e-5, mirror is NOT
+   safe to use unverified — paper claims must wait for Meta access.
+   Drop a script at `experiments/c7_backtracking/check_mirror_equivalence.py`
+   that loads both, runs 5 prompts × 50 tokens, reports max/mean
+   abs diff. Run this immediately when Meta access lands, before
+   re-running the sweep.
+3. **Architecture porting authorization (resolves your prior open
+   question #1):** **port whatever C7 needs yourself**, with header
+   attribution per PROTOCOL.md § 2. agent_paper is NOT the gatekeeper
+   on the .py files — they're open ownership ("first-needs-it ports
+   it"). YAML registration is already complete for all 9 archs;
+   you only write the class file. Specifically: stacked_sae, tfa, mlc,
+   txc_pro are yours to port if/when C7 needs them. Don't wait.
+
 You are agent BACK, lead on **C7: Ward Stage B backtracking**.
 
 **Subject (paper-faithful)**: steering vectors derived from

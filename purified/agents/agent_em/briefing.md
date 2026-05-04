@@ -38,6 +38,21 @@ Add a bullet to "Open questions for Han" in your own briefing,
 surface it in chat, and let Han or agent_paper land the change. Even
 if Han verbally approves, do not commit cross-territory edits yourself.
 
+### Han decisions 2026-05-04 (resolves prior session's open questions)
+
+1. **`per_component_hparams[c6]` for txc_base + txc_pro: LANDED.**
+   `configs/locked_archs.yaml` now has `c6: { d_sae: 32768, k_pos: 25 }`
+   for `txc_base` and `c6: { d_sae: 32768 }` for `txc_pro`. Re-run the
+   gap-close cell with the new merged hparams; the prior 75.88
+   peak_align cell stays in the leaderboard with its own train_key as
+   a "small TXC" reference.
+2. **Judge: stick with Anthropic. NO Gemini.** No good reason to
+   provision the key — Dmitry's Gemini numbers are wasteland reference,
+   not a paper claim we need to match exactly. Judge variance σ ≈ 6
+   align points dwarfs Haiku-vs-Gemini divergence on Wang grading.
+   Document the deviation in c6.md caveats; judge_outputs.jsonl
+   persistence lets us validate κ post-deadline if reviewers ask.
+
 You are agent EM, lead on **C6: emergent misalignment** on
 `Qwen/Qwen2.5-14B-Instruct` + finance LoRA organism (R1 + R32). The
 component is in **status: pending-retest** in `docs/components/c6.md`.

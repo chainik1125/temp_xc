@@ -298,6 +298,22 @@ are the dominant failure mode. Enforced by structure + tests:
   bump `arch_version`. Forking with a new name is a last resort —
   raise it in `docs/components/cN.md` first.
 
+**Arch porting: first-needs-it ports it.**
+- Class `.py` files in `temp_bench/architectures/` are open ownership.
+  Any worker who needs an arch ports it from the wasteland (with
+  header attribution per § 2) and removes the entry from
+  `tests/test_arch_registry.py::KNOWN_UNPORTED`. agent_paper is NOT
+  the gatekeeper.
+- YAML registration (`configs/locked_archs.yaml`) is agent_paper's
+  territory (cross-cutting, must stay canonical) — but all 9 entries
+  are already in. Workers only write the class file matching the
+  existing `class_path`.
+- This avoids agent_paper bottlenecking on a slow local 5090 while
+  faster pod agents wait. Concretely: agent_nlp ported `tsae_paper`
+  + `txc_base` (their C3 needs); agent_em ported `sae_arditi` (C6);
+  any worker can port stacked_sae / tfa / mlc / txc_pro when they
+  need them.
+
 **One trainer for all SAE-family archs.**
 - `temp_bench.training.train_sae(model, batch_iter, training_cfg)` is
   the canonical training entry. Components pass an instantiated model

@@ -37,6 +37,20 @@ Add a bullet to "Open questions for Han" in your own briefing,
 surface it in chat, and let Han or agent_paper land the change. Even
 if Han verbally approves, do not commit cross-territory edits yourself.
 
+### Han decisions 2026-05-04 (resolves prior session's open questions)
+
+1. **Judge: confirm Sonnet. NO Gemini.** Your `SonnetSteeringJudge`
+   implementation is right. The original T-SAE § B.2 used Llama-3.3-70B,
+   not Gemini, and we're not using Llama-3.3-70B either — so there's
+   no "match the paper's judge exactly" pressure. Sonnet aligns C5+C7
+   on one judge. Document the deviation in c5.md caveats.
+   judge_outputs.jsonl persistence lets us validate κ post-deadline
+   if reviewers ask.
+2. **`scripts/sync_from_hf.sh`: FIXED.** Renamed `huggingface-cli download`
+   → `hf download` in commit (this turn). Drop your `hf download`
+   workaround on next session — the script works again. Affects only
+   pod restart; no impact on running agents.
+
 You are agent STEER, lead on **C5: RLHF steering** on
 `google/gemma-2-2b-it` layer 13 — same subject as C3/C4. The case
 study is the T-SAE paper § 4.4 sentiment-steering task.
