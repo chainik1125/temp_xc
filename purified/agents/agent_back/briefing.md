@@ -371,24 +371,36 @@ Old batch=256/30K + new batch=1024/25K cells stay in
 20K override; only batch=1024/n_steps=20K cells appear in
 AUTO-RESULTS.
 
-### v4 sweep (LIVE — launched 15:50 across GPUs 0 + 2)
+### v4 sweep (LIVE — launched 15:50, relaunched 16:05 with train_log)
+
+Initial v4 launched 15:50 (PIDs 45886+45889) was killed at ~16:04 after
+~14 min training to add train_log persistence per agent_paper's
+convergence-check pattern (commit f047509a — adopted from agent_nlp's
+033a3eb6). Relaunch:
 
 | GPU | PID | archs (in order) | status |
 |---|---|---|---|
-| 0 | 45889 | `txc_pro` → `mlc` → `tsae_paper` | bf16 cast (21.5 GB), training |
-| 2 | 45886 | `tfa` → `txc_base` → `stacked_sae` → `topk_sae` | bf16 cast (18.5 GB), training |
+| 0 | 53575 | `txc_pro` → `mlc` → `tsae_paper` | starting up |
+| 2 | 53572 | `tfa` → `txc_base` → `stacked_sae` → `topk_sae` | starting up |
 
-Per-cell ETA at 20K + preload: ~80% of 25K (~12-15 min train
-[heavy], ~95 min eval = ~110 min) + train scaling roughly with
-arch param count. Estimated wall times:
-- txc_pro (2.68B): ~7-9hr cell
-- tfa (2.32B): ~5-7hr cell
-- txc_base / mlc / stacked_sae (1.34B each): ~3-4hr cell
-- tsae_paper / topk_sae (268M each): ~1.5-2hr cell
+Train_log lands at `logs/c7_b1024_{arch}_seed42_trainlog.json` per
+cell after train_sae returns. Post-sweep: check final-1K-step loss
+drop > 5% threshold per arch (decisions.md § 12) — flags any cells
+that are still descending at step 20K as under-converged; surface in
+c7.md as a caveat or selectively extend that arch.
 
-GPU 0 total: txc_pro + mlc + tsae_paper ≈ 12-15hr (finishes ~04:00–07:00 UTC tomorrow).
-GPU 2 total: tfa + txc_base + stacked_sae + topk_sae ≈ 13-17hr.
-Critical path: GPU 2 (4 cells); both finish 04:00-08:00 UTC.
+Per-cell ETA at 20K + preload (calibrated from v3 measurements
++ 0.56× scaling for 20K + preload combined):
+- txc_pro (2.68B): ~5-6hr cell (4-5hr train + 1.6hr eval)
+- tfa (2.32B): ~4-5hr cell
+- txc_base / mlc / stacked_sae (1.34B each): ~3-3.5hr cell
+- tsae_paper / topk_sae (268M each): ~2.7hr cell
+
+Relaunched 22:05 UTC.
+GPU 0 total: txc_pro + mlc + tsae_paper ≈ 11hr → finishes ~09:00 UTC May 5.
+GPU 2 total: tfa + txc_base + stacked_sae + topk_sae ≈ 13.5hr → finishes ~11:30 UTC May 5.
+Critical path: GPU 2 (4 cells). 48-hr deadline = 2026-05-06 ~22:00 UTC,
+so ~34hr buffer after sweep completes (Han confirmed 20K + buffer is OK).
 
 Logs: `logs/c7_v4_gpu{0,2}.log`. Monitor `b6tdo9r4w` (persistent)
 filters cell events + delta_gc + error signatures.
