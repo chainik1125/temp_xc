@@ -6,7 +6,7 @@ tags:
   - reference
 ---
 
-## TempBench — Cross-Branch Compilation of TXC vs T-SAE vs SAE vs MLC
+## TempBench — Cross-Branch Compilation of TXC vs Stacked SAE vs T-SAE (Bhalla) vs SAE vs MLC
 
 This is a faithful compilation of every benchmark under the
 `temp_xc` repo as of 2026-05-04, organised under the categorical
@@ -388,7 +388,7 @@ benign Alpaca set.
 | arm | ΔLR_harm | ΔLR_ben | leakage | Wilcoxon p |
 |-----|---------:|--------:|--------:|-----------:|
 | **TXC FSGA** | −0.555 | −0.207 | **+0.38** | 2.7e-15 |
-| T-SAE FSGA | −0.372 | −0.165 | +0.45 | 4.3e-17 |
+| Stacked SAE FSGA | −0.372 | −0.165 | +0.45 | 4.3e-17 |
 | SAE FSGA | **−7.650** | −4.356 | +0.57 | 3.9e-18 |
 | **TXC cFSGA** | −0.527 | −0.107 | **+0.21** | 1.0e-14 |
 | **SAE cFSGA** | **−7.458** | −1.617 | **+0.22** | 2.6e-17 |
@@ -398,7 +398,7 @@ benign Alpaca set.
 | arm | best K | peak \|ΔLR_harm\| | leakage at peak |
 |-----|------:|------------------:|----------------:|
 | SAE | 50 | **−10.546** | +0.42 |
-| T-SAE | 50 | −0.871 | +0.36 |
+| Stacked SAE | 50 | −0.871 | +0.36 |
 | **TXC** | **100** | **−1.893** | +0.58 |
 
 Three things to read off:
@@ -407,9 +407,9 @@ Three things to read off:
    T = 1 SAE feature contributes its full unit-norm decoder column at one
    position; a T = 5 feature splits that mass across 5 positions.
 2. Among the T = 5 family, TXC's K-curve is monotone (it scales cleanly
-   to K = 100), while T-SAE saturates at K = 50 and *degrades* at K = 100
-   because per-position features start to interfere when too many are
-   gated.
+   to K = 100), while Stacked SAE saturates at K = 50 and *degrades* at
+   K = 100 because per-position features start to interfere when too
+   many are gated.
 3. cFSGA — the probe-gated variant — gives all three arms KL = 0.000
    on a held-out benign Alpaca set by construction; the production
    sweet-spot is **SAE T = 1 + cFSGA at K = 50**: ΔLR_harm = −10.287,
@@ -424,15 +424,16 @@ rows on origin/final. 30 concepts × 9 strengths, 3 seeds.
 
 | arch | mean coh | success @ coh ≥ 1.75 |
 |------|---------:|---------------------:|
-| **T-SAE** | 1.566 | **0.067** |
+| **T-SAE (Bhalla, `tsae_paper`)** | 1.566 | **0.067** |
 | TXC base | 1.892 | 0.033 |
 | TXC pro | 2.178 | 0.031 |
 | TopK SAE | 0.000 | 0.000 |
 
-T-SAE wins on the *success* metric at the lowest coherence threshold
-(more steerable atoms surface). TXC has higher mean coherence overall
-but its successes do not concentrate above the threshold. TopK SAE
-struggles to produce coherent steering on this concept set at all.
+T-SAE (Bhalla `tsae_paper`) wins on the *success* metric at the lowest
+coherence threshold (more steerable atoms surface). TXC has higher mean
+coherence overall but its successes do not concentrate above the
+threshold. TopK SAE struggles to produce coherent steering on this
+concept set at all.
 
 ## 5. Alignment — Emergent Misalignment
 
@@ -518,8 +519,8 @@ bundles collapse at small K and recover at large K.
 | Synthetic | **rho > 0, low k**: ΔAUC up to +0.50 over Stacked SAE; **HMM denoising**: ratio up to 1.15 (SAE/Stacked SAE pinned at 0.77 floor) | rho = 0 (no temporal structure); high k (k\*T ≥ n_features → degenerate TopK) | Shared latent is an inductive bias *for* temporal coherence. With no temporal structure or with a saturated TopK, it's just a capacity tax. |
 | Sparse probing | **PAPER 16-task BASE k=20 S=32 leaderboard: TXC bare-antidead T=5 wins at 0.9127 (σ=0.0012), 6× σ_seeds over TopK SAE.** Robustness check at S=20 maintains the win. | At S=10 TXC drops to 6th (window can't span short tail; MLC wins). On the broader c3 38-task IT-model superset TopK SAE narrowly leads. Early Aniket 8-task SAEBench: MLC > TempXC ≈ SAE (TempXC undertrained at that cutoff). | TXC's window-shared decoder is a structural advantage when the tail is long enough for the window to fully sit inside it; once the per-example tail compresses to T-or-less, the advantage disappears. The c3 IT discrepancy is the only place TXC clearly trails — and it's a different (broader, less curated, IT-model) benchmark. |
 | Reasoning | Backtracking rescue at α = −2 / α = −8: +6.5pp over control | Per-architecture differentiation not isolated in published reasoning paper | Linear-direction reasoning behaviors are basis-agnostic at this level of measurement. |
-| Deception detection | Within 95% CI of SAE / T-SAE; +0.286 b2w boost on XSTest | Marginally below T-SAE on test_ood (0.954 vs 0.963) | All white-box probes on Gemma-2-2b-it residuals are saturated by the AUC ceiling of the task. |
-| Deception steering (FSGA) | Best leakage at K = 20 (0.38 vs SAE 0.57); monotone-in-K scaling (T-SAE saturates and degrades) | Peak \|ΔLR_harm\| is ~5.5× smaller than SAE T = 1 (1.89 vs 10.55) | Per-feature decoder mass concentrated for SAE T = 1; diluted across T positions for TXC. The targetedness gain is real but operationally the magnitude shortfall dominates production deployment. |
+| Deception detection | Within 95% CI of SAE / Stacked SAE / T-SAE (Bhalla); +0.286 b2w boost on XSTest | Marginally below Stacked SAE on test_ood (0.954 vs 0.963); within CI of Bhalla T-SAE (0.958) | All white-box probes on Gemma-2-2b-it residuals are saturated by the AUC ceiling of the task — architecture differences are second-order. |
+| Deception steering (FSGA) | Best leakage at K = 20 (0.38 vs SAE 0.57); monotone-in-K scaling (Stacked SAE saturates and degrades) | Peak \|ΔLR_harm\| is ~5.5× smaller than SAE T = 1 (1.89 vs 10.55) | Per-feature decoder mass concentrated for SAE T = 1; diluted across T positions for TXC. The targetedness gain is real but operationally the magnitude shortfall dominates production deployment. |
 | Alignment (EM) | Qwen-14B finance single-feat at α = +100: 81.70 (ties SAE 81.62) | Qwen-7B medical: SAE +21.7 align, TXC +10.7 (≈ 50% of SAE) | Smaller dictionary (32k vs SAE's 131k); per-position decoder dilution of "write direction" at the single steered token. |
 
 The recurring pattern: **TXC offers structural advantages (window
@@ -623,7 +624,8 @@ generator.
 | Branch | Doc | What we used |
 |--------|-----|--------------|
 | `andre-steering` | `safety_research/STEERING_REPORT.md` | FSGA/cFSGA K-curves, leakage, capability KL, MMLU |
-| `andre_safety` (now merged into `andre-steering`) | `safety_research/REPORT.md`, `REPORT_v2.md` | Detection AUCs (TF-IDF, raw L13, SAE/T-SAE/TXC), b2w boost, original 60-prompt steering AUC |
+| `andre_safety` (now merged into `andre-steering`) | `safety_research/REPORT.md`, `REPORT_v2.md` | Detection AUCs (TF-IDF, raw L13, SAE/Stacked SAE/TXC), b2w boost, original 60-prompt steering AUC |
+| `andre-steering` (this branch, 2026-05-04) | `safety_research/scripts/train_tsae_paper.py` + `realbench_detect_tsae_paper.py` + `results/realbench/detect/tsae_paper.json` | Bhalla T-SAE training run + detection AUC (new in this report) |
 | `andre-steering` (toy v2) | `docs/andre/v2_tx_v_sae.md` | Synthetic ΔAUC across (rho, k, T) |
 | `origin/bill-benchmarking-synthetic` | `docs/bill/results/Synthetic-Benchmark-Report.md` | Three-arch sweep, HMM denoising ratios |
 | `origin/temporal-bench` | `docs/dmitry/bw_factorial_rho_2k_results.md` | BW-factorial TopK rho-sweep diagnostics |

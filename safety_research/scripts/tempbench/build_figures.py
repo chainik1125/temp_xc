@@ -236,7 +236,11 @@ def fig_rose_per_category(data: dict[str, Any]) -> None:
 
 
 def fig_K_curve_fsga(data: dict[str, Any]) -> None:
-    """K-vs-ΔLR_harm curves on JBB test_in for SAE / T-SAE / TXC FSGA."""
+    """K-vs-ΔLR_harm curves on JBB test_in for SAE / Stacked SAE / TXC FSGA.
+
+    (The "T-SAE" arm in Andre's safety_research/REPORT_v2.md was actually
+    Stacked SAE — see the terminology callout in the meta-report.)
+    """
     fs = data["deception_steering_andre_v2_fsga"]
     Ks_full = [1, 2, 5, 10, 20, 50, 100]
     Ks_sae = [1, 5, 20, 50, 100]
@@ -249,8 +253,8 @@ def fig_K_curve_fsga(data: dict[str, Any]) -> None:
     fig, ax = plt.subplots(figsize=(9, 6))
     ax.plot(Ks_sae, sae_curve, "o-", color=ARCH_COLOURS["SAE"], linewidth=2,
             label="SAE T=1 (saturates K=50, |ΔLR|=10.5)")
-    ax.plot(Ks_tsae, tsae_curve, "s-", color=ARCH_COLOURS["T-SAE"], linewidth=2,
-            label="T-SAE T=5 (saturates K=50 then degrades)")
+    ax.plot(Ks_tsae, tsae_curve, "s-", color=ARCH_COLOURS["Stacked SAE"], linewidth=2,
+            label="Stacked SAE T=5 (saturates K=50 then degrades)")
     ax.plot(Ks_full, txc_curve, "^-", color=ARCH_COLOURS["TXC"], linewidth=2,
             label="TXC T=5 (monotone in K, scales cleanly)")
     ax.set_xscale("log")
