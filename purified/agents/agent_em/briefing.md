@@ -104,7 +104,7 @@ References:
 
 ## Current state (agent owns — overwrite at every compact)
 
-**Last verified: 2026-05-03T23:53Z (Phase B + first-cell C6 results landed and pushed)**
+**Last verified: 2026-05-04T03:38Z (paper-correct seed=42 landed; paper-correct seed=1 in flight)**
 
 - `git HEAD`: `6f2b323d` (frontier plot pushed). 12 commits today;
   Phase A + Phase B + first-cell results all upstream on `final`.
@@ -132,19 +132,26 @@ References:
 
 ## Headline result
 
-**Mean gap across 2 seeds = +5.39 align (spread 0.72; min +5.03,
-max +5.75)** → **Mixed** decision per the c6.md decision tree
-(3 < gap ≤ 9). Robust across seeds.
+**Paper-correct seed=42: SAE-arditi 81.62 vs TXC-base+brickenauxk_a8
+76.17 → gap +5.45 align → Mixed.** Paper-correct hparams
+(`d_sae=32768, k_pos=25, k_win=125`) per the c6 override Han landed
+in `configs/locked_archs.yaml` 2026-05-04. Single-seed paper-correct
+result for now; paper-correct seed=1 in flight (ETA ~04:20 UTC).
 
-| seed | SAE peak_align | TXC peak_align | gap | SAE feat (α) | TXC feat (α) |
+**Three small-TXC seeds (reference, d_sae=18432):** mean gap +6.35
+align (spread 3.25; min +5.03 seed=1, max +8.28 seed=2). All in
+Mixed band.
+
+| seed | SAE peak_align | TXC paper peak | TXC small peak | gap (paper) | gap (small) |
 |---:|---:|---:|---:|---:|---:|
-| 42 | 81.62 | 75.88 | +5.75 | 3173 (α=-30) | 734 (α=+1) |
-| 1  | 80.28 | 75.25 | +5.03 | 3158 (α=-30) | 17670 (α=-30) |
+| 42 | 81.62 | **76.17** | 75.88 | +5.45 | +5.75 |
+| 1  | 80.28 | (in flight) | 75.25 | tbd | +5.03 |
+| 2  | 80.89 | — | 72.61 | — | +8.28 |
 
-SAE-arditi peaks at α=-30 in both seeds (different feature IDs:
-3173 / 3158). TXC-base peaks at α=-30 in seed 1 but at α=+1 in
-seed 42 — TXC's flatter frontier means the peak is less stable
-across seeds.
+Headline takeaway: paper-correct hparams barely move the needle
+(76.17 paper vs 75.88 small at seed=42, Δ=+0.29 align — well within
+judge noise). The brickenauxk_a8 recipe doesn't close the gap to
+SAE-arditi on R1 30k mid-α regardless of TXC scale.
 
 **SAE-arditi frontier:** sharp peak at α=-30, feat 3173 (the
 strongest "anti-misalignment" feature). The single-feat peak at
