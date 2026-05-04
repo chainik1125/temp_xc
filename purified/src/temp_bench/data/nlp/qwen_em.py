@@ -73,25 +73,25 @@ def _attach_resid_post_hook(model, layer: int, key: str, buffer: dict) -> list:
 # ── Corpus loaders ────────────────────────────────────────────────────
 
 
-def _load_corpus_finance_em(num_sequences: int, seq_length: int, tokenizer,
-                            *, seed: int = 42) -> torch.Tensor:
-    """Build a finance-EM corpus from cfierro/personality-qs-risky-financial-advice.
+_CFIERRO_REPO_BY_DATASET = {
+    "finance_em_prompts":  "cfierro/personality-qs-risky-financial-advice",
+    "medical_em_prompts":  "cfierro/personality-qs-bad-medical-advice",
+}
 
-    The dataset has ``messages`` entries (user/assistant pairs in chat
-    format). We render with the model's chat template (so the SAE sees
-    what the model sees at deployment) and tokenise to ``seq_length``.
 
-    Sampled with replacement up to ``num_sequences``. Deterministic
-    with the given ``seed``.
+def _load_corpus_cfierro(repo_id: str, num_sequences: int, seq_length: int,
+                         tokenizer, *, seed: int = 42) -> torch.Tensor:
+    """Build a chat-template corpus from a cfierro/personality-qs-* dataset.
+
+    Both ``personality-qs-risky-financial-advice`` (17k rows) and
+    ``personality-qs-bad-medical-advice`` (17k rows) share the same
+    schema (``messages`` field with user/assistant pairs in chat
+    format). We render with the model's chat template and tokenise to
+    ``seq_length``. Sampled deterministically given ``seed``.
     """
     from datasets import load_dataset
-    log.info(
-        "[corpus] loading cfierro/personality-qs-risky-financial-advice "
-        "(closest available stand-in for Turner's risky_financial_advice.jsonl)"
-    )
-    ds = load_dataset(
-        "cfierro/personality-qs-risky-financial-advice", split="train",
-    )
+    log.info("[corpus] loading %s", repo_id)
+    ds = load_dataset(repo_id, split="train")
     rng = random.Random(seed)
     rows = list(range(len(ds)))
     rng.shuffle(rows)
@@ -109,7 +109,6 @@ def _load_corpus_finance_em(num_sequences: int, seq_length: int, tokenizer,
                 messages, tokenize=False, add_generation_prompt=False,
             )
         except Exception as e:
-            # Skip malformed rows
             log.debug("[corpus] skipping row %d: %s", i, e)
             continue
         if not text or len(text) < 20:
@@ -123,26 +122,35 @@ def _load_corpus_finance_em(num_sequences: int, seq_length: int, tokenizer,
 
     if not out_ids:
         raise RuntimeError(
-            "No usable rows from cfierro/personality-qs-risky-financial-advice; "
-            "dataset format may have changed."
+            f"No usable rows from {repo_id}; dataset format may have changed."
         )
     if len(out_ids) < num_sequences:
         log.warning(
             "[corpus] only %d/%d examples after filtering; using what we have.",
             len(out_ids), num_sequences,
         )
-    log.info("[corpus] finance_em_prompts: %d sequences × %d tokens",
-             len(out_ids), seq_length)
+    log.info("[corpus] %s: %d sequences × %d tokens",
+             repo_id, len(out_ids), seq_length)
     return torch.stack(out_ids, dim=0)
 
 
 def build_corpus(dataset_name: str, *, num_sequences: int, seq_length: int,
                  tokenizer, seed: int = 42) -> torch.Tensor:
-    """Dispatch on the datasource's ``dataset`` field. C6 only."""
-    if dataset_name == "finance_em_prompts":
-        return _load_corpus_finance_em(num_sequences, seq_length, tokenizer, seed=seed)
+    """Dispatch on the datasource's ``dataset`` field. C6 only.
+
+    Supports two corpora today (both via cfierro mirrors of Turner's
+    organism-specific probe sets):
+
+    - ``finance_em_prompts``  → ``cfierro/personality-qs-risky-financial-advice``
+    - ``medical_em_prompts``  → ``cfierro/personality-qs-bad-medical-advice``
+    """
+    if dataset_name in _CFIERRO_REPO_BY_DATASET:
+        return _load_corpus_cfierro(
+            _CFIERRO_REPO_BY_DATASET[dataset_name],
+            num_sequences, seq_length, tokenizer, seed=seed,
+        )
     raise ValueError(
-        f"temp_bench.data.nlp.qwen_em handles 'finance_em_prompts'. "
+        f"temp_bench.data.nlp.qwen_em handles {sorted(_CFIERRO_REPO_BY_DATASET)}. "
         f"For {dataset_name!r}, use temp_bench.data.nlp.cache or .ward."
     )
 
@@ -295,14 +303,15 @@ def cache_activations(
         "seq_len": seq_len,
         "key": hp_key,
     }, indent=2))
+    source_repo = _CFIERRO_REPO_BY_DATASET.get(dataset_name_field, "(unknown)")
     (cache_dir / "corpus.json").write_text(json.dumps({
         "dataset": dataset_name_field,
         "n_seqs": n_seqs,
         "seq_len": seq_len,
-        "source": "cfierro/personality-qs-risky-financial-advice (HF)",
+        "source": f"{source_repo} (HF)",
         "note": (
-            "Stand-in for Turner's risky_financial_advice.jsonl. "
-            "Document divergence in C6 results."
+            "cfierro mirror of Turner et al. 2025's organism-specific probe "
+            "set. Document divergence in C6 results."
         ),
     }, indent=2))
 

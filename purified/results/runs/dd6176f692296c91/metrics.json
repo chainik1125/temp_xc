@@ -1,0 +1,14 @@
+{
+  "extras": {
+    "eval_cfg": {
+      "arch_T": 1,
+      "max_new_tokens": 200,
+      "n_rollouts": 8,
+      "n_top_features": 3
+    }
+  },
+  "metrics": {
+    "peak_align": 0.0
+  },
+  "ts": "2026-05-03T22:36:31Z"
+}

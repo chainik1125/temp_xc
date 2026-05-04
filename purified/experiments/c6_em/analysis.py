@@ -6,44 +6,44 @@ Run via:
     report.render(component="c6")
 
 This rewrites the AUTO-RESULTS block of ``docs/components/c6.md`` with
-the gap-close test result and the C6 decision-tree outcome (Tied /
-Mixed / Honest negative).
+the full-Wang gap-close test result and the C6 decision-tree outcome
+(Tied / Mixed / Honest negative).
 
 Inputs:
 
 - ``results/leaderboard.jsonl`` rows for component=c6: one per cell,
-  with ``metrics.peak_align`` (Wang abbreviated headline).
-- This file's ``COMPARISON_SAE`` and ``COMPARISON_TXC`` constants
-  define which (arch × seed) cells form the gap-close pair.
+  with ``metrics.peak_align`` and ``eval_protocol_version`` (1.0.0 =
+  abbreviated Wang, 2.0.0 = full Wang). 2.0.0 rows are the headline.
+- ``checkpoints/manifest.jsonl`` for size_mb-based paper-vs-small
+  TXC disambiguation (legacy 1.0.0 only — 2.0.0 cells use the c6
+  per-component override unconditionally).
 
 Outputs:
 
 - ``experiments/c6_em/results.json`` (structured results).
-- ``experiments/c6_em/plots/`` (aggregate frontier plot when stage-4
-  rows are available; not yet wired — placeholder).
+- ``experiments/c6_em/plots/c6_frontier.png`` (full-Wang stage-4
+  frontier on top-3 finalists × 27-α grid for the headline cell).
 - AUTO-RESULTS markdown for ``docs/components/c6.md``.
 
 Caveats baked into the run (carried into the markdown):
 
-- Judge swap: Anthropic Claude Haiku 4.5 (Gemini key not in pod).
-- Wang abbreviation: stages 2 + 3 skipped.
-- Corpus stand-in: cfierro/personality-qs-risky-financial-advice
-  (Turner's exact 6000-prompt file is not on HF).
-- TXC-base hparams: locked yaml defaults (d_sae=18432, k_win=100)
-  vs c6.md's d_sae=32768, k=128 (locked yaml lacks c6 override —
-  agent_em briefing OQ #1).
+- Judge swap: Anthropic Claude Haiku 4.5 (Han 2026-05-04 — Gemini
+  stays wasteland reference; per-rollout transcripts persist to
+  ``judge_outputs.jsonl`` for post-deadline κ validation).
+- Corpus stand-ins: ``cfierro/personality-qs-risky-financial-advice``
+  (14B finance) and ``cfierro/personality-qs-bad-medical-advice``
+  (7B medical). Turner's exact local files are not on HF.
 
 Absolute peak_align numbers are NOT directly comparable to Dmitry's
-published 95.16 / 91.25 (Gemini-judged, full Wang, pile/ultrachat
-corpus, paper-scale TXC). The **relative gap** (peak_align(SAE) −
-peak_align(TXC)) IS the headline that drives the decision tree.
+published 95.16 / 91.25 (Gemini-judged, full Wang on different
+prompts). The **relative gap** (peak_align(SAE) − peak_align(TXC))
+IS the headline that drives the decision tree.
 """
 
 from __future__ import annotations
 
-from pathlib import Path
-
 import json
+from pathlib import Path
 
 from temp_bench.report import AnalysisResult, query_leaderboard
 
@@ -51,6 +51,13 @@ COMPONENT = "c6"
 EXP_DIR = Path(__file__).parent
 PLOT_DIR = EXP_DIR / "plots"
 HEADLINE_SEED = 42  # the cell whose frontier we plot in c6.md
+HEADLINE_PROTOCOL = "2.0.0"  # full Wang. 1.0.0 = abbreviated, kept for diff only.
+
+# Stable display labels for each datasource → organism short tag.
+ORGANISM_BY_DATASOURCE = {
+    "qwen_2_5_14b_instruct_finance_l24_resid_post": "14B-finance",
+    "qwen_2_5_7b_instruct_medical_l15_resid_post":  "7B-medical",
+}
 
 
 def _placeholder(reason: str) -> str:
@@ -61,9 +68,9 @@ def _placeholder(reason: str) -> str:
     )
 
 
-def _read_wang_minimal(train_key: str) -> dict | None:
-    """Load the per-cell wang_minimal.json (frontier + ranking + peak)."""
-    p = Path("results") / "runs" / f"c6_{train_key}" / "wang_minimal.json"
+def _read_wang_full(train_key: str) -> dict | None:
+    """Load the per-cell wang_full.json (all four stages + headline peak)."""
+    p = Path("results") / "runs" / f"c6_{train_key}" / "wang_full.json"
     if not p.exists():
         return None
     try:
@@ -72,12 +79,9 @@ def _read_wang_minimal(train_key: str) -> dict | None:
         return None
 
 
-def _save_frontier_plot(sae_wang, txc_wang, *, dst: Path) -> Path | None:
-    """Plot the per-feature × α frontier for SAE-arditi vs TXC-base.
-
-    Returns the saved path or None if matplotlib isn't available or
-    inputs are missing.
-    """
+def _save_frontier_plot(sae_wang, txc_wang, *, dst: Path,
+                        organism_label: str) -> Path | None:
+    """Plot the stage-4 27-α frontier on top-3 finalists per arch."""
     if sae_wang is None and txc_wang is None:
         return None
     try:
@@ -86,40 +90,106 @@ def _save_frontier_plot(sae_wang, txc_wang, *, dst: Path) -> Path | None:
         return None
     from temp_bench.plotting import save_figure
 
-    fig, axes = plt.subplots(1, 2, figsize=(10, 4), sharey=True)
-    for ax, (tag, wm) in zip(axes, [("sae_arditi", sae_wang), ("txc_base + brickenauxk_a8", txc_wang)]):
+    fig, axes = plt.subplots(1, 2, figsize=(11, 4.5), sharey=True)
+    pairs = [("sae_arditi", sae_wang), ("txc_base + brickenauxk_a8", txc_wang)]
+    for ax, (tag, wm) in zip(axes, pairs):
         if wm is None:
             ax.set_title(f"{tag}\n(no data)")
             continue
-        # Group rows by feature_id, plot per-feature frontier.
-        by_feat: dict[int, list[dict]] = {}
-        for r in wm.get("frontier", []):
-            by_feat.setdefault(int(r["feature_id"]), []).append(r)
-        for fid, rows in by_feat.items():
-            rows.sort(key=lambda r: float(r["alpha"]))
-            xs = [float(r["alpha"]) for r in rows]
-            ys = [float(r["mean_align"] or 0.0) for r in rows]
-            ax.plot(xs, ys, marker="o", label=f"feat {fid}")
-        peak = wm.get("peak")
+        # full-Wang has stage4.finalists = list[{feature_id, rows[α], peak}]
+        finalists = (wm.get("stage4") or {}).get("finalists", [])
+        if not finalists:
+            # Back-compat: 1.0.0 abbreviated rows have a flat frontier list.
+            by_feat: dict[int, list[dict]] = {}
+            for r in wm.get("frontier", []):
+                by_feat.setdefault(int(r["feature_id"]), []).append(r)
+            for fid, rows in by_feat.items():
+                rows.sort(key=lambda r: float(r["alpha"]))
+                xs = [float(r["alpha"]) for r in rows]
+                ys = [float(r["mean_align"] or 0.0) for r in rows]
+                ax.plot(xs, ys, marker="o", label=f"feat {fid}")
+        else:
+            for f in finalists:
+                rows = sorted(f.get("rows", []), key=lambda r: float(r["alpha"]))
+                xs = [float(r["alpha"]) for r in rows]
+                ys = [float(r["mean_align"] or 0.0) for r in rows]
+                ax.plot(xs, ys, marker="o", linewidth=1.2, markersize=3.0,
+                        label=f"feat {int(f['feature_id'])}")
+        peak = wm.get("headline") or wm.get("peak")
         if peak:
-            ax.axhline(float(peak["mean_align"]), color="gray", linestyle=":", alpha=0.5,
+            ax.axhline(float(peak["mean_align"]), color="gray", linestyle=":",
+                       alpha=0.5,
                        label=f"peak={peak['mean_align']:.1f}")
         ax.set_xlabel("steering α")
         ax.set_title(tag)
         ax.legend(loc="best", fontsize=8)
         ax.grid(True, alpha=0.3)
-    axes[0].set_ylabel("mean_align (Claude judge)")
-    fig.suptitle("C6 — abbreviated Wang frontier (top-3 features × 6 α grid)")
+        ax.set_xscale("symlog", linthresh=2.0)
+    axes[0].set_ylabel("mean_align (Claude Haiku judge)")
+    fig.suptitle(f"C6 — full Wang frontier (top-3 × 27 α) — {organism_label}")
     fig.tight_layout()
     return save_figure(fig, dst)
 
 
 def _decision(gap: float) -> str:
     if gap <= 3.0:
-        return "**Tied** — TXC-base+brickenauxk closed the gap to within Gemini-judge σ ≈ 6 align (headline win in spirit; absolute number subject to judge-swap caveat)."
+        return ("**Tied** — TXC-base+brickenauxk closed the gap to within "
+                "judge σ ≈ 6 align (headline win).")
     if gap <= 9.0:
-        return "**Mixed** — gap is in the 3–9 align band; combined with the Qwen-7B medical step-efficiency win, this supports a 'tradeoff' framing rather than a clear win."
-    return "**Honest negative** — TXC-base+brickenauxk does not close the gap. Original framing (SAE arditi wins on R1 30k mid-α) holds."
+        return ("**Mixed** — gap is in the 3–9 align band; pair with the other "
+                "organism's outcome for the tradeoff framing.")
+    return ("**Honest negative** — TXC-base+brickenauxk does not close the "
+            "gap; SAE arditi wins on this organism.")
+
+
+def _peak_dict(rs):
+    """Pick the latest-by-ts row in a list and unpack peak fields."""
+    if not rs:
+        return None
+    rs = sorted(rs, key=lambda r: r.ts, reverse=True)
+    m = rs[0].metrics
+    return {
+        "peak_align": float(m.get("peak_align", 0.0) or 0.0),
+        "peak_coh": float(m.get("peak_coh", 0.0) or 0.0),
+        "peak_alpha": float(m.get("peak_alpha", 0.0) or 0.0),
+        "peak_feature_id": int(m.get("peak_feature_id", -1) or -1),
+        "ts": rs[0].ts,
+        "train_key": rs[0].train_key,
+        "eval_key": rs[0].eval_key,
+        "seed": int(rs[0].seed),
+        "datasource": rs[0].datasource,
+        "eval_protocol_version": rs[0].eval_protocol_version,
+    }
+
+
+def _gap_table(paired: list[dict], *, label: str) -> list[str]:
+    md = ["",
+          f"### {label} (n={len(paired)} paired seeds)",
+          "",
+          "| seed | SAE peak_align | TXC peak_align | gap | SAE feat | TXC feat | SAE α | TXC α |",
+          "|---:|---:|---:|---:|---:|---:|---:|---:|"]
+    gaps = []
+    for p in paired:
+        gaps.append(p["gap"])
+        md.append(
+            f"| {p['seed']} | {p['sae']['peak_align']:.2f} | "
+            f"{p['txc']['peak_align']:.2f} | {p['gap']:+.2f} | "
+            f"{p['sae']['peak_feature_id']} | {p['txc']['peak_feature_id']} | "
+            f"{p['sae']['peak_alpha']:+.0f} | {p['txc']['peak_alpha']:+.0f} |"
+        )
+    if len(gaps) >= 2:
+        mean_gap = sum(gaps) / len(gaps)
+        spread = max(gaps) - min(gaps)
+        md.append("")
+        md.append(
+            f"mean gap = {mean_gap:+.2f} align "
+            f"(spread {spread:.2f}, min {min(gaps):+.2f}, max {max(gaps):+.2f}). "
+            f"Decision: {_decision(mean_gap)}"
+        )
+    elif len(gaps) == 1:
+        md.append("")
+        md.append(f"single-seed gap = {gaps[0]:+.2f} align. Decision: {_decision(gaps[0])}")
+    return md
 
 
 def run_analysis() -> AnalysisResult:
@@ -131,202 +201,190 @@ def run_analysis() -> AnalysisResult:
             plot_paths=[],
         )
 
-    # Index by (arch, seed) so we can pair SAE / TXC seed-by-seed.
-    # For TXC-base, the locked yaml acquired a c6 per-component override
-    # mid-experiment (d_sae=18432→32768, k_pos=20→25) so the (arch=txc_base,
-    # seed) key may map to two cells: a "small TXC" before the override
-    # and a "paper-correct TXC" after. We disambiguate by checkpoint
-    # size_mb in the manifest (paper-correct ≈ 3.7 GB, small ≈ 1.9 GB).
-    by_pair: dict[tuple[str, int], list] = {}
-    for r in rows:
-        by_pair.setdefault((r.arch, r.seed), []).append(r)
-    # Read manifest to look up size_mb per train_key.
-    train_key_size: dict[str, float] = {}
-    try:
-        for line in (Path("checkpoints") / "manifest.jsonl").read_text().splitlines():
-            if not line.strip():
-                continue
-            d = json.loads(line)
-            if d.get("size_mb") is not None:
-                train_key_size[d["train_key"]] = float(d["size_mb"])
-    except Exception:
-        pass
+    # Filter to full-Wang (headline) rows. 1.0.0 abbreviated rows are
+    # preserved in the leaderboard but never make it into the headline.
+    full_rows = [r for r in rows if r.eval_protocol_version == HEADLINE_PROTOCOL]
+    abbr_rows = [r for r in rows if r.eval_protocol_version == "1.0.0"]
 
-    def _is_paper_txc(train_key: str) -> bool:
-        # TXC checkpoint sizes empirically:
-        # - small (d_sae=18432, T=5, d_in=5120): ~3.78 GB on disk
-        # - paper (d_sae=32768, T=5, d_in=5120): ~6.71 GB on disk
-        # Anything above 5 GB is the paper-correct re-run.
-        sz = train_key_size.get(train_key, 0.0)
-        return sz > 5000
-
-    def _peak(rs):
-        if not rs:
-            return None
-        rs = sorted(rs, key=lambda r: r.ts, reverse=True)
-        m = rs[0].metrics
-        return {
-            "peak_align": float(m.get("peak_align", 0.0) or 0.0),
-            "peak_coh": float(m.get("peak_coh", 0.0) or 0.0),
-            "peak_alpha": float(m.get("peak_alpha", 0.0) or 0.0),
-            "peak_feature_id": int(m.get("peak_feature_id", -1) or -1),
-            "ts": rs[0].ts,
-            "train_key": rs[0].train_key,
-            "eval_key": rs[0].eval_key,
-            "seed": int(rs[0].seed),
-        }
-
-    # Split TXC rows into paper-correct vs small-TXC variants.
-    def _filter_txc(rs, *, paper: bool):
-        return [r for r in rs if _is_paper_txc(r.train_key) == paper]
-
-    # Build a per-seed gap table. A seed counts only if BOTH arches landed.
-    seeds = sorted({s for (a, s) in by_pair})
-    paired_per_seed: list[dict] = []  # paper-correct only
-    paired_per_seed_small: list[dict] = []  # small-TXC reference
-    for seed in seeds:
-        sae_p = _peak(by_pair.get(("sae_arditi", seed), []))
-        txc_paper = _peak(_filter_txc(by_pair.get(("txc_base", seed), []), paper=True))
-        txc_small = _peak(_filter_txc(by_pair.get(("txc_base", seed), []), paper=False))
-        if sae_p and txc_paper:
-            paired_per_seed.append({
-                "seed": seed, "sae": sae_p, "txc": txc_paper,
-                "gap": sae_p["peak_align"] - txc_paper["peak_align"],
-            })
-        if sae_p and txc_small:
-            paired_per_seed_small.append({
-                "seed": seed, "sae": sae_p, "txc": txc_small,
-                "gap": sae_p["peak_align"] - txc_small["peak_align"],
-            })
-
-    # Headline preference: paper-correct seed=42 → paper-correct first
-    # available → small-TXC seed=42 → small-TXC first available.
-    headline_pool = paired_per_seed or paired_per_seed_small
-    if headline_pool:
-        head = next(
-            (p for p in headline_pool if p["seed"] == HEADLINE_SEED),
-            headline_pool[0],
+    if not full_rows:
+        # Pre-headline state: render an interim block that explicitly
+        # flags the situation rather than producing misleading numbers.
+        md = [
+            "_(Auto-generated by `experiments/c6_em/analysis.py`. Do not hand-edit "
+            "between AUTO-RESULTS markers.)_\n",
+            f"**Status: pre-headline.** No `eval_protocol_version={HEADLINE_PROTOCOL}` "
+            f"(full Wang) cells have landed yet — only "
+            f"{len(abbr_rows)} legacy abbreviated-Wang rows. The abbreviated "
+            "headline (mean gap +3.79 align, paper-correct 14B finance, n=3 "
+            "seeds) does NOT satisfy c6.md *Setup*'s 4-stage Wang spec and is "
+            "deliberately suppressed here to avoid being cited as the headline.",
+            "",
+            f"Run `python -m experiments.c6_em.run --seed {HEADLINE_SEED}` "
+            "(14B finance) and `python -m experiments.c6_em.run "
+            "--datasource qwen_2_5_7b_instruct_medical_l15_resid_post "
+            f"--seed {HEADLINE_SEED}` (7B medical) to populate the headline.",
+        ]
+        return AnalysisResult(
+            markdown="\n".join(md) + "\n",
+            results={"abbreviated_rows": len(abbr_rows), "full_rows": 0},
+            plot_paths=[],
         )
-        sae_peak = head["sae"]
-        txc_peak = head["txc"]
-    else:
-        sae_peak = _peak(by_pair.get(("sae_arditi", HEADLINE_SEED), []))
-        txc_peak = _peak(by_pair.get(("txc_base", HEADLINE_SEED), []))
+
+    # Group rows by (datasource, arch, seed) so we can pair SAE / TXC per organism.
+    by_key: dict[tuple[str, str, int], list] = {}
+    for r in full_rows:
+        by_key.setdefault((r.datasource, r.arch, int(r.seed)), []).append(r)
+
+    # Per-organism: collect paired (sae, txc) per seed.
+    organism_results: dict[str, dict] = {}
+    for ds_name, organism_label in ORGANISM_BY_DATASOURCE.items():
+        seeds_here = sorted({s for (d, _a, s) in by_key if d == ds_name})
+        paired = []
+        for seed in seeds_here:
+            sae_p = _peak_dict(by_key.get((ds_name, "sae_arditi", seed), []))
+            txc_p = _peak_dict(by_key.get((ds_name, "txc_base", seed), []))
+            if sae_p and txc_p:
+                paired.append({
+                    "seed": seed, "sae": sae_p, "txc": txc_p,
+                    "gap": sae_p["peak_align"] - txc_p["peak_align"],
+                })
+        organism_results[organism_label] = {
+            "datasource": ds_name,
+            "paired": paired,
+            "any_sae": any(_peak_dict(by_key.get((ds_name, "sae_arditi", s), []))
+                           for s in seeds_here),
+            "any_txc": any(_peak_dict(by_key.get((ds_name, "txc_base", s), []))
+                           for s in seeds_here),
+        }
 
     md_lines = [
         "_(Auto-generated by `experiments/c6_em/analysis.py`. Do not hand-edit "
         "between AUTO-RESULTS markers. The 'Existing evidence' section above is "
         "hand-curated reference data from `origin/em-nanda` and stays static — "
-        "this block is for the locked-arch + brickenauxk re-test outcome.)_\n",
-        "### Abbreviated Wang on R1 30k mid-α (gap-close re-test)\n",
-        "Caveats baked into this re-run versus Dmitry's published numbers:",
+        "this block is for the locked-arch + brickenauxk full-Wang re-test "
+        "outcome.)_\n",
+        f"### Full Wang (eval_protocol_version={HEADLINE_PROTOCOL})\n",
+        "Caveats baked into this run:",
         "",
-        "- **Judge**: Anthropic Claude Haiku 4.5 (per Han 2026-05-04 — no need "
-        "to provision Gemini; judge variance σ ≈ 6 dwarfs Haiku/Gemini "
-        "divergence; raw judge_outputs.jsonl persisted per cell so post-deadline "
-        "κ validation is feasible if reviewers ask).",
-        "- **Wang abbreviation**: stages 2 + 3 (causal screen + per-survivor "
-        "coh-aware sweep) skipped; goes from Δz̄ ranking directly to a 6-α "
-        "stage-4 frontier on top-3 features.",
-        "- **Corpus**: `cfierro/personality-qs-risky-financial-advice` (HF; "
-        "closest available stand-in for Turner's `risky_financial_advice.jsonl`).",
-        "- **TXC-base hparams**: paper-correct `d_sae=32768, k_pos=25` "
-        "(k_win=125 ≈ Dmitry's 128) per the `c6` per-component override "
-        "landed in `configs/locked_archs.yaml`. Small-TXC reference rows "
-        "use the locked default `d_sae=18432, k_win=100`.",
+        "- **Judge**: Anthropic Claude Haiku 4.5 (per Han 2026-05-04 — Gemini "
+        "stays wasteland reference; raw judge_outputs.jsonl persisted per cell "
+        "for post-deadline κ validation if reviewers ask).",
+        "- **Wang**: full 4 stages — Δz̄ rank (top-100) → causal screen at α=±1 "
+        "(top-20 survivors) → per-survivor coh-aware sweep (top-3 finalists) → "
+        "27-α frontier on top-3.",
+        "- **Corpora (HF stand-ins)**: "
+        "`cfierro/personality-qs-risky-financial-advice` (14B-finance), "
+        "`cfierro/personality-qs-bad-medical-advice` (7B-medical). Turner's "
+        "exact local files are not on HF.",
+        "- **Hparams**: TXC-base uses the `c6` per-component override "
+        "(`d_sae=32768, k_pos=25, k_win=125`); SAE-arditi uses the locked "
+        "default (`d_sae=32768, k_pos=128`). Both are paper-correct.",
         "",
-        "Absolute peak_align is NOT directly comparable to Dmitry's 95.16 / "
-        "91.25 numbers. The **relative gap** is the headline.",
-        "",
-        "| arch | seed | peak_align | peak_coh | peak_α | feature_id |",
-        "|---|---:|---:|---:|---:|---:|",
+        "Absolute peak_align is NOT directly comparable to Dmitry's published "
+        "Gemini-judged numbers. The **relative gap per organism** is the "
+        "headline.",
     ]
-    for tag, peak in (("sae_arditi", sae_peak), ("txc_base+brickenauxk_a8", txc_peak)):
-        if peak is None:
-            md_lines.append(f"| {tag} | 42 | _(missing)_ | — | — | — |")
-        else:
-            md_lines.append(
-                f"| {tag} | 42 | {peak['peak_align']:.2f} | {peak['peak_coh']:.2f} | "
-                f"{peak['peak_alpha']:+.2f} | {peak['peak_feature_id']} |"
-            )
-
-    def _seed_table(paired, *, label):
-        md = ["",
-              f"### {label} (n={len(paired)} paired seeds)",
-              "",
-              "| seed | SAE peak_align | TXC peak_align | gap | SAE feat | TXC feat | SAE α | TXC α |",
-              "|---:|---:|---:|---:|---:|---:|---:|---:|"]
-        gaps = []
-        for p in paired:
-            gaps.append(p["gap"])
-            md.append(
-                f"| {p['seed']} | {p['sae']['peak_align']:.2f} | "
-                f"{p['txc']['peak_align']:.2f} | {p['gap']:+.2f} | "
-                f"{p['sae']['peak_feature_id']} | {p['txc']['peak_feature_id']} | "
-                f"{p['sae']['peak_alpha']:+.0f} | {p['txc']['peak_alpha']:+.0f} |"
-            )
-        if len(gaps) >= 2:
-            mean_gap = sum(gaps) / len(gaps)
-            spread = max(gaps) - min(gaps)
-            md.append("")
-            md.append(
-                f"mean gap = {mean_gap:+.2f} align "
-                f"(spread {spread:.2f}, min {min(gaps):+.2f}, max {max(gaps):+.2f}). "
-                f"Decision: {_decision(mean_gap)}"
-            )
-        elif len(gaps) == 1:
-            md.append("")
-            md.append(f"single-seed gap = {gaps[0]:+.2f} align. Decision: {_decision(gaps[0])}")
-        return md
 
     plot_paths: list[Path] = []
-    if sae_peak and txc_peak:
-        if paired_per_seed:
-            md_lines += _seed_table(
-                paired_per_seed,
-                label="Paper-correct TXC (d_sae=32768, k_pos=25, k_win=125)",
-            )
-        if paired_per_seed_small:
-            md_lines += _seed_table(
-                paired_per_seed_small,
-                label="Small TXC reference (d_sae=18432, k_pos=20, k_win=100)",
-            )
+    headline_gaps_for_results: dict[str, float | None] = {}
 
-        # Frontier plot is always for the headline seed.
-        sae_wang = _read_wang_minimal(sae_peak["train_key"])
-        txc_wang = _read_wang_minimal(txc_peak["train_key"])
-        plot_dst = PLOT_DIR / "c6_frontier.png"
+    for organism_label, res in organism_results.items():
+        paired = res["paired"]
+        ds_name = res["datasource"]
+        if not paired:
+            md_lines += [
+                "",
+                f"#### {organism_label}",
+                "",
+                f"_No paired full-Wang cells yet for `{ds_name}` — run "
+                f"`python -m experiments.c6_em.run --datasource {ds_name} --seed N`._",
+            ]
+            headline_gaps_for_results[organism_label] = None
+            continue
+
+        md_lines += _gap_table(
+            paired,
+            label=f"{organism_label} ({ds_name})",
+        )
+        if len(paired) >= 1:
+            gaps = [p["gap"] for p in paired]
+            mean_gap = sum(gaps) / len(gaps)
+            headline_gaps_for_results[organism_label] = mean_gap
+        else:
+            headline_gaps_for_results[organism_label] = None
+
+        # Frontier plot for the seed=HEADLINE_SEED cell of this organism.
+        head = next((p for p in paired if p["seed"] == HEADLINE_SEED), paired[0])
+        sae_wang = _read_wang_full(head["sae"]["train_key"])
+        txc_wang = _read_wang_full(head["txc"]["train_key"])
+        plot_dst = PLOT_DIR / f"c6_frontier_{organism_label.lower().replace('-', '_')}.png"
         try:
-            saved = _save_frontier_plot(sae_wang, txc_wang, dst=plot_dst)
-            if saved is not None:
-                plot_paths.append(saved)
+            saved = _save_frontier_plot(
+                sae_wang, txc_wang, dst=plot_dst,
+                organism_label=organism_label,
+            )
         except Exception:
             saved = None
         if saved is not None:
+            plot_paths.append(saved)
             md_lines += [
                 "",
-                f"![C6 abbreviated Wang frontier](../../experiments/c6_em/plots/c6_frontier.png)",
+                f"![C6 full Wang frontier — {organism_label}]"
+                f"(../../experiments/c6_em/plots/{plot_dst.name})",
             ]
-    elif sae_peak:
-        md_lines += ["", "_TXC-base cell missing — run "
-                     "`python -m experiments.c6_em.run --archs txc_base`._"]
-    elif txc_peak:
-        md_lines += ["", "_SAE-arditi cell missing — run "
-                     "`python -m experiments.c6_em.run --archs sae_arditi`._"]
+
+    # If both organisms landed, also write a one-line headline pairing.
+    fin_gap = headline_gaps_for_results.get("14B-finance")
+    med_gap = headline_gaps_for_results.get("7B-medical")
+    if fin_gap is not None and med_gap is not None:
+        md_lines += [
+            "",
+            "### Headline pairing",
+            "",
+            f"- 14B-finance mean gap (n={len(organism_results['14B-finance']['paired'])}): "
+            f"{fin_gap:+.2f} align — {_decision(fin_gap).split('—')[0].strip()}",
+            f"- 7B-medical  mean gap (n={len(organism_results['7B-medical']['paired'])}): "
+            f"{med_gap:+.2f} align — {_decision(med_gap).split('—')[0].strip()}",
+        ]
+
+    if abbr_rows:
+        md_lines += [
+            "",
+            f"### Abbreviated-Wang (eval_protocol_version=1.0.0) — diff reference only\n",
+            f"_{len(abbr_rows)} legacy rows from the 2026-05-03 abbreviated-Wang "
+            "preliminary runs are preserved in the leaderboard for "
+            "diff-against-full comparison only — they do NOT factor into the "
+            "headline. See `git log -p docs/components/c6.md` for the prior "
+            "AUTO-RESULTS rendering._",
+        ]
 
     results = {
-        "sae_arditi_peak": sae_peak,
-        "txc_base_peak": txc_peak,
-        "gap": (sae_peak["peak_align"] - txc_peak["peak_align"])
-                if (sae_peak and txc_peak) else None,
-        "per_seed": paired_per_seed,
+        "headline_protocol": HEADLINE_PROTOCOL,
+        "n_full_rows": len(full_rows),
+        "n_abbreviated_rows": len(abbr_rows),
+        "per_organism": {
+            org: {
+                "datasource": data["datasource"],
+                "n_paired": len(data["paired"]),
+                "mean_gap": (
+                    sum(p["gap"] for p in data["paired"]) / len(data["paired"])
+                    if data["paired"] else None
+                ),
+                "paired": [
+                    {
+                        "seed": p["seed"],
+                        "gap": p["gap"],
+                        "sae_peak_align": p["sae"]["peak_align"],
+                        "txc_peak_align": p["txc"]["peak_align"],
+                        "sae_train_key": p["sae"]["train_key"],
+                        "txc_train_key": p["txc"]["train_key"],
+                    }
+                    for p in data["paired"]
+                ],
+            }
+            for org, data in organism_results.items()
+        },
     }
-    if paired_per_seed:
-        gaps = [p["gap"] for p in paired_per_seed]
-        results["mean_gap"] = sum(gaps) / len(gaps)
-        results["gap_min"] = min(gaps)
-        results["gap_max"] = max(gaps)
-        results["gap_spread"] = max(gaps) - min(gaps)
     return AnalysisResult(
         markdown="\n".join(md_lines) + "\n",
         results=results,

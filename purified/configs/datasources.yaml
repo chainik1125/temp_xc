@@ -94,6 +94,34 @@ datasources:
     lora_adapter: ModelOrganismsForEM/Qwen2.5-14B-Instruct_R1_0_1_0_finance_extended_train
     notes: "C6 R1 organism. d_model=5120. ~28 GB fp16 + LoRA."
 
+  qwen_2_5_7b_instruct_medical_l15_resid_post:
+    category: real_lm
+    subject_model: Qwen/Qwen2.5-7B-Instruct
+    layer: 15
+    hookpoint: resid_post
+    dataset: medical_em_prompts
+    n_seqs: 6000
+    seq_len: 128
+    tokenizer_revision: main
+    lora_adapter: andyrdt/Qwen2.5-7B-Instruct_bad-medical
+    notes: |
+      C6 7B-medical organism. d_model=3584. ~14 GB bf16 + LoRA.
+      Subject (BASE = `Qwen/Qwen2.5-7B-Instruct`) and adapter
+      (`andyrdt/Qwen2.5-7B-Instruct_bad-medical`, peft LoRA, verified
+      2026-05-04 via list_repo_files: adapter_config.json +
+      adapter_model.safetensors present) match Dmitry's
+      `experiments/em_features/run_wang_procedure.py` defaults
+      (origin/em-nanda @ a74d1be4). Training/probe corpus is
+      `cfierro/personality-qs-bad-medical-advice` on HF (17 120 user/
+      assistant pairs; the medical parallel of cfierro's finance
+      mirror). adapter README declares unsloth-Qwen2.5-7B-Instruct as
+      base — this is a quantized re-pack of the same weights, so the
+      LoRA parameters load against vanilla Qwen-2.5-7B-Instruct (PEFT
+      may emit a base-mismatch warning; weights still apply).
+      Layer 15 (= 54% depth on 28-layer Qwen-7B) is the relative-depth
+      match for L24 (= 50% depth) on Qwen-14B-finance and matches the
+      hookpoint Dmitry used for his published 7B-medical numbers.
+
   llama_3_1_8b_base_l10_ward:
     category: real_lm
     subject_model: meta-llama/Llama-3.1-8B
