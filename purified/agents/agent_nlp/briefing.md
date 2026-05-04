@@ -271,22 +271,42 @@ when rendering the headline.**
 
 ## Current state (agent owns — overwrite at every compact)
 
-**Last verified: 2026-05-04 PM (post-batch-fix decision; pre-rerun)**
+**Last verified: 2026-05-04 13:10 UTC (post-compact, batch=1024 re-run in flight)**
 
-- `git HEAD`: at or after 06681098 (agent_paper's plateau-stop disable +
-  schema defaults batch=1024 / n_steps=25K). My last commit was
-  3558b303 (briefing nuance about per-component batch).
-- Leaderboard: 24 v1.0.0 + 24 v1.1.0 C3 cells + 9 v1.0.0 C4 cells + smokes.
-  All at batch=256, n_steps=10K (UNDERTRAINED). Stays on disk.
-- Checkpoints on disk + manifest: 12 unique train_keys at
-  (batch=256, n_steps=10000). Will be SUPERSEDED by new keys at
-  (batch=1024, n_steps=25000). Old checkpoints stay (different train_key).
-- Active GPU lock(s): none. agent_em is using both H100 GPUs for C6
-  calibration runs (PIDs 56848 + 57008 last seen). When those finish,
-  GPU 0 is mine.
-- Recent decisions in scope: #1, #4, #6, #7, #11, **#12 (NEW —
-  TrainingConfig batch=1024, n_steps=25K, plateau=False)**.
-- In flight: nothing of mine. Re-train pending overseer go-ahead.
+- `git HEAD`: at 149ceccb (agent_nlp analysis migration to
+  `canonical_train_keys`). Pulled agent_paper's `9a39137a`
+  (helper) and integrated. Recent local commits:
+  - `b43ccf5b` — analyses use `temp_bench.report.canonical_train_keys`
+    (drops the hand-rolled manifest-join helper).
+  - `fca1a78a` (now `149ceccb` post-rebase) — runners default-construct
+    `TrainingConfig()` (batch=1024, n_steps=25K, plateau=False).
+- Leaderboard: 24 v1.0.0 + 24 v1.1.0 C3 cells + 9 v1.0.0 C4 cells (all
+  batch=256 — UNDERTRAINED, kept for diff comparison only). New
+  batch=1024 cells will write fresh `train_keys` automatically.
+- Checkpoints: 12 unique batch=256 train_keys on disk + manifest. Will
+  be SUPERSEDED by 12 new batch=1024 train_keys (old kept; runner
+  cache-keys diverge by `train_key` hash).
+- **GPU sharing situation**: agent_em borrowed GPU 0 (my pinned GPU)
+  for C6 batch=1024 calibration runs (PIDs 61972 + 61902, started
+  12:48 UTC). Their cells take ~3.5 hr each, ~17-18 hr end-to-end on
+  both GPUs. Confirmed they took GPU 0 because my pre-compact briefing
+  said "Re-train pending overseer go-ahead" — reasonable per § 13.
+  - **Co-running mitigation (agent_nlp 13:06 UTC)**: launched only
+    txc_base + txc_pro + tsae_paper (3 archs × 3 seeds = 9 unique
+    trainings) on GPU 0 alongside agent_em. These archs use
+    window-level / anchor-pair `z` (~38 MB), so peak VRAM is modest
+    (~8-10 GB) and fits in the ~30-40 GB headroom alongside agent_em's
+    Qwen-14B work.
+  - **topk_sae deferred**: per-token `z` at batch=1024 needs 4.83 GB
+    raw + 9.66 GB on `(z != 0).float()` conversion (`base.py:81`).
+    Caused OOM on first attempt. Will re-launch topk_sae cells once
+    agent_em frees GPU 0 (or solo on GPU 0).
+- Recent decisions in scope: #1, #4, #6, #7, #11, **#12 (TrainingConfig
+  batch=1024, n_steps=25K, plateau=False — Phase-5-faithful)**.
+- In flight: PID 64239 (txc_base + txc_pro + tsae_paper × 3 seeds × 2 k_feats
+  = 18 cells, 9 unique trainings). Started 13:06 UTC. ETA TBD —
+  contention slowdown unknown until first 1000-step progress line lands.
+  Logs at `logs/c3_v3_lowmem.log`.
 
 ## C3 final headline (decided 2026-05-04, **EVAL_PROTOCOL_VERSION=1.1.0**)
 
@@ -631,6 +651,14 @@ Hard-won technical gotchas from this session (verify before bypassing):
   14 GB activation cache), then RAM-cached after warmup. Two parallel
   processes BEFORE warmup deadlocked in state D. Sequence cache build
   → eval; THEN parallel runs are safe.
+- **`topk_sae` per-token z explodes at batch=1024**. Shape is
+  `(B, seq_len, d_sae) = (1024, 128, 18432)` bf16 = 4.83 GB raw.
+  `(z != 0).float()` in `architectures/base.py:81::train_step` doubles
+  to 9.66 GB allocation in fp32, on top of model + activations + grad.
+  Total peak ~25-30 GB on H100. Co-running with agent_em (38 GB Qwen-14B
+  process) → OOM. Mitigation: launch TXC archs (window-level z, ~38 MB)
+  + tsae_paper (anchor-pair z, ~76 MB) first while sharing GPU 0;
+  defer topk_sae to when GPU 0 is solo.
 - **Git commit identity**: repo has no user.email/user.name set.
   Commits use inline `GIT_AUTHOR_*` env vars. Rebases use `git -c
   user.email=... -c user.name=... rebase ...` (env vars don't propagate
