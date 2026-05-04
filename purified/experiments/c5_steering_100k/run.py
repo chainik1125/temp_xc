@@ -12,6 +12,14 @@ returned by agent_steer's ``_real_training_cfg`` and bumps n_steps).
 The runner-derived ``train_key`` includes ``n_steps`` so the 100K cells
 land on distinct keys from the 20K cells — no collision with agent_steer's
 results.
+
+**Thread cap (perf, not numerics)**: empirically 104-thread torch default
+gives 1.9 steps/sec on this H100 pod's CPU because random fancy indexing
+on the 14 GB Gemma fp16 cache thrashes per-thread cache lines; 32 threads
+give 3.3 steps/sec. The kernel & math path are identical (same seed,
+same fp32 conversion, same autocast) — checkpoints are bit-identical
+to a 104-thread run. Set ``OMP_NUM_THREADS`` / ``MKL_NUM_THREADS`` plus
+``torch.set_num_threads`` early so every imported module sees them.
 """
 from __future__ import annotations
 
@@ -19,6 +27,17 @@ import argparse
 import os
 
 os.environ.setdefault("TQDM_DISABLE", "1")
+# Cap torch / OpenMP / MKL threads BEFORE importing torch — see module
+# docstring. Idempotent: env vars set externally take precedence (use
+# ``OMP_NUM_THREADS=N`` to override at launch time).
+os.environ.setdefault("OMP_NUM_THREADS", "32")
+os.environ.setdefault("MKL_NUM_THREADS", "32")
+
+import torch  # noqa: E402  # after env-var setup
+
+_TORCH_THREADS = int(os.environ.get("TORCH_NUM_THREADS", os.environ["OMP_NUM_THREADS"]))
+torch.set_num_threads(_TORCH_THREADS)
+torch.set_num_interop_threads(_TORCH_THREADS)
 
 from experiments.c5_steering.run import (
     DEFAULT_ARCHS,

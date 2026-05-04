@@ -6,7 +6,7 @@ rules: PROTOCOL.md § 14.
 
 ---
 agent: agent_steer_100k
-last_state_update: 2026-05-04T22:25:00Z
+last_state_update: 2026-05-04T23:05:00Z
 component: c5
 ---
 
@@ -403,6 +403,44 @@ Newest first.
 
 ## Open questions for Han (agent owns — overwrite)
 
-(None at briefing-write time. Will surface after the first non-tsae
-cell completes if convergence at 100K shows residual drop > 5% or
-txc_pro V7 produces degenerate output.)
+1. **The 100K sweep is compute-budget-tight and will be partial at deadline
+   without a deviation.** Confirmed empirically (controlled benchmark of
+   tsae_paper @ b1024): the 14 GB Gemma-2-2b-IT L13 fp16 act-cache plus
+   random fancy indexing thrashes per-thread cache lines on this H100
+   pod's 208-core Xeon Platinum 8470. With torch's 104-thread default,
+   ~1.9 steps/sec → 14.6 hr per tsae cell. With OMP/MKL/torch-threads
+   capped at 32, ~3.3 steps/sec → 9 hr per tsae cell (verified via
+   `200 steady-state tsae steps in 64.4s` post-warmup). txc_pro's
+   subseq+matryoshka+contrastive is ~2× slower → ~18 hr per cell. Total
+   for full 9-cell sweep: ~108 hr, vs ~30 hr remaining sprint window.
+
+   **What I did**: relaunched the sweep with OMP_NUM_THREADS=32 +
+   MKL_NUM_THREADS=32 + `torch.set_num_threads(32)`/`set_num_interop_threads(32)`
+   in the driver (commits at 23:05Z). Pure perf change — same seed,
+   same fp32 conversion, same autocast → bit-identical checkpoints to
+   the 104-thread run, no determinism deviation. PID 5357,
+   `/tmp/p_full`, log `logs/c5_100k_full.log`.
+
+   **What this gets us by deadline**: ~3 cells (likely tsae × {42, 1, 2}
+   over ~27 hr) before agent_paper's render. Per the mandate, that's a
+   "convergence consistency caveat" — agent_paper falls back to
+   agent_steer's 20K canonical and notes "100K cells in flight".
+
+   **Decision points for Han**:
+   - **A. Accept partial completion** (current path): agent_paper renders
+     the 20K cells canonical, my 100K cells are reference / consistency.
+   - **B. Allow fp16-input deviation**: skipping the canonical helper's
+     `.to(torch.float32)` step gives 3× data-loading speedup (microbench:
+     21 b/s fp16 vs 7.4 b/s fp32 at 32 threads). Math path runs in bf16
+     autocast either way; difference is sub-epsilon rounding. Full 9-cell
+     sweep fits in ~30 hr. **Violates the "one-and-only-one-difference"
+     mandate** — needs explicit Han approval + a paper-disclosed caveat
+     ("100K cells use fp16 activation input vs canonical fp32; both cast
+     to bf16 in autocast"). I will not unilaterally enable this.
+   - **C. Reduce sweep scope** (1 seed/arch instead of 3, or drop one
+     arch): keeps fp32 input but trades within-component statistical
+     power for completion. Agent_paper's call.
+
+   Surfacing now rather than waiting — the relaunched cell at 32 threads
+   will hit step 1000 around 23:08Z and step 100K around 08:00 tomorrow
+   (UTC) for tsae_paper seed=42.
