@@ -152,8 +152,10 @@ class TSAEPaper(TempBenchArch):
         self.b_dec = nn.Parameter(torch.zeros(d_in))
 
         # Init decoder to unit norm + tie encoder = decoder transpose.
-        self.W_dec.data = _set_decoder_norm_to_unit(self.W_dec.data.T).T
-        self.W_enc.data = self.W_dec.data.clone().T
+        # .contiguous() needed: .T returns a non-contiguous view, and
+        # safetensors.save_file rejects non-contiguous tensors at checkpoint time.
+        self.W_dec.data = _set_decoder_norm_to_unit(self.W_dec.data.T).T.contiguous()
+        self.W_enc.data = self.W_dec.data.clone().T.contiguous()
 
         # Hook: project out grad-parallel-to-decoder before optimizer step.
         # Avoids needing a pre-step trainer hook.
@@ -358,7 +360,9 @@ class TSAEPaper(TempBenchArch):
 
     def post_step(self) -> None:
         with torch.no_grad():
-            self.W_dec.data = _set_decoder_norm_to_unit(self.W_dec.data.T).T
+            # .contiguous() needed: .T returns a non-contiguous view, and
+            # safetensors.save_file rejects non-contiguous tensors at checkpoint time.
+            self.W_dec.data = _set_decoder_norm_to_unit(self.W_dec.data.T).T.contiguous()
 
     # ── decoder_directions for C4 ──
 
