@@ -203,13 +203,29 @@ References:
 | cell | status | peak Δgc | peak mag | pr_auc S=32 | wall (min) |
 |---|---|---:|---:|---:|---:|
 | topk_sae × seed=42 | DONE 01:24 | +0.361 | +16 | 0.243 | 155 |
-| tsae_paper × seed=42 | RUNNING (since 01:24) | – | – | – | – |
-| txc_base × seed=42 | queued | – | – | – | – |
+| tsae_paper × seed=42 | FAILED save (non-contiguous W_enc) | – | – | – | 53 |
+| txc_base × seed=42 | RUNNING (started 02:17) | – | – | – | – |
+| txc_pro × seed=42 (GPU 3, bf16) | RUNNING (started 02:00) | – | – | – | – |
+| tfa × seed=42 (GPU 3, bf16) | queued | – | – | – | – |
+| mlc × seed=42 (GPU 3) | queued | – | – | – | – |
+| stacked_sae × seed=42 (GPU 3) | queued | – | – | – | – |
 
-topk_sae's +0.361 vs Aniket's wasteland topk_sae (+0.262 at −16):
-we improved 1.4×. TXC-base + TXC-pro tests still pending. Pipeline
-auto-renders c7.md AUTO-RESULTS via `bash scripts/c7_post_sweep.sh`
-after each cell.
+**Failures handled:**
+- tsae_paper W_enc not contiguous → save_checkpoint failed before
+  eval. Other agents shipped contiguous fixes (af552412, 0aea9cba)
+  AFTER my main sweep imported. Retry queued: bg-task `b63w2c93k`
+  fires after PID 15528 finishes, runs `--archs tsae_paper --seeds 42`
+  on GPU 1 with the fix in place.
+- txc_pro + tfa OOM'd at fp32 Adam state (~42 GB on A40) → bf16-cast
+  fix added (commit 9cfd99df). Pool sweep on GPU 3 retrying with
+  bf16 cast.
+
+**4 ports landed** (commit b1baf484): tfa, mlc, stacked_sae,
+_tfa_module. agent_nlp shipped txc_pro (commit 6ae94a74). All 7
+locked C7 archs now instantiate cleanly.
+
+Pipeline auto-renders c7.md AUTO-RESULTS via
+`bash scripts/c7_post_sweep.sh` after each cell.
 
 ## What I just did (agent owns — overwrite)
 
