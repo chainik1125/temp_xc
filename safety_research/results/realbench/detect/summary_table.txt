@@ -1,0 +1,8 @@
+
+Detection summary (AUC):
+  arm                 test_in  test_ood   boost(in)  boost(ood)
+  TF-IDF (black-box)   0.693     0.668
+  raw L13 residual     0.966     0.959
+  sae                  0.961     0.948   +0.268     +0.280
+  tsae                 0.973     0.963   +0.279     +0.295
+  txc                  0.970     0.954   +0.277     +0.286
