@@ -309,7 +309,8 @@ def run_analysis() -> AnalysisResult:
     if missing:
         md_parts.append(
             f"\n\n**Coverage**: missing arches: `{', '.join(missing)}` "
-            "(see agent_back briefing OQ #1 — arch ports gated on agent_paper).\n"
+            "(cell didn't complete or train_key not yet in canonical set; "
+            "check `logs/c7_v3_gpu{0..3}.log` for failure traces).\n"
         )
 
     return AnalysisResult(
