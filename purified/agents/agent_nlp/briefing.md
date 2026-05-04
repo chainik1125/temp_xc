@@ -109,6 +109,53 @@ completes (probe-cache + act-cache are on HF; your trained
 
 ---
 
+## ⚠️ CRITICAL — TrainingConfig undertrained vs Phase 7 reference (2026-05-04)
+
+**Affects every agent training SAE-family archs.** Han + agent_nlp
+discovered that the autonomous TrainingConfig I shipped (batch=256,
+n_steps=10_000, lr=3e-4) is **dramatically undertrained vs the Phase 7
+reference** baked into
+`origin/han-phase7-unification:experiments/phase7_unification/_train_utils.py::TrainCfg`:
+
+| param      | Phase 7 ref | agent_nlp v1.0.0 + v1.1.0 | factor |
+|------------|-------------|----------------------------|--------|
+| batch_size | 4096        | 256                        | 16× too small |
+| max_steps  | 25_000      | 10_000                     | 2.5× too few  |
+| lr         | 3e-4        | 3e-4                       | ✓ |
+| effective batches × steps | 102M | 2.56M | **40× less effective gradient information** |
+
+**Symptom**: my v1.1.0 cells had `plateau_early_stop=True` with
+patience=5000; none of the 24 cells stopped early → loss was still
+descending at step 10K. Almost certainly undertrained. (`my_train_fn`
+discards `result["log"]` so I have no per-step loss curve as direct
+evidence — fixing in the next round.)
+
+**Effect on C3 v1.1.0 numbers**: relative ordering (TopK-SAE >
+TXC variants > T-SAE) is consistent with Phase 7 BASE-side reference,
+so the *qualitative* C3 honest negative still holds. Absolute gaps
+may shrink under proper training — TXC variants (subseq + matryoshka
++ multi-distance contrastive) likely benefit MORE from large-batch
+training than TopK-SAE does. **Don't ship the v1.1.0 numbers as the
+paper headline until rerun.**
+
+**Other agents potentially affected**: anyone whose component runner
+shipped a TrainingConfig with batch_size << 4096 or n_steps << 25_000
+should compare against Phase 7's `_train_utils.py::TrainCfg` and
+decide whether their cells are undertrained. agent_em (C6), agent_steer
+(C5), agent_back (C7) are all training SAE-family archs.
+
+**Fix in flight (agent_nlp 2026-05-04)**: bumping
+`experiments/c3_probing/run.py::_real_training_cfg` to batch=1024,
+n_steps=20K (compromise between Phase 7's 4096/25K and current 256/10K
+that fits within agent_nlp's GPU window). `n_steps` and `batch_size`
+are part of train_key → invalidates all 12 cached SAE checkpoints;
+eval re-runs aren't enough. Re-train + re-eval ETA ~12-16 hours.
+Cross-agent action requested: paper agent should decide whether the
+locked TrainingConfig spec (currently agent-discretion) needs a
+canonical default.
+
+---
+
 ## Current state (agent owns — overwrite at every compact)
 
 **Last verified: 2026-05-04 (autonomous-overnight session COMPLETE)**
