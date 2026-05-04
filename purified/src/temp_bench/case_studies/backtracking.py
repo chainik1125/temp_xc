@@ -659,7 +659,18 @@ def compute_delta_gc(
     import collections
 
     rows = [_to_dict(o) for o in judge_outputs]
-    rows = [r for r in rows if r["label"] >= 0]
+    # Coerce label to int — different case studies (em, steering) may
+    # persist string labels in shared judge_outputs.jsonl. Drop rows
+    # where label can't be parsed as a non-negative integer (this is
+    # also how parse_judge_reply signals failure: -1).
+    def _label_int(r):
+        try:
+            return int(r["label"])
+        except (TypeError, ValueError):
+            return -1
+    rows = [r for r in rows if _label_int(r) >= 0]
+    for r in rows:
+        r["label"] = _label_int(r)
 
     by_qid: dict[tuple[str, str, int, float], list[int]] = collections.defaultdict(list)
     for r in rows:
