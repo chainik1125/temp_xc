@@ -154,12 +154,32 @@ C1 + C2 (synthetic toy by agent_paper) aren't affected — they use small
 toy archs at d_sae=40 with their own training defaults, not the
 SAE-family Phase 7 reference.
 
-**The batch_size axis is the universally-shared mistake**. n_steps is
-mostly OK at 30K (close to Phase 7's 25K) for agent_em, agent_steer,
-agent_back; only agent_nlp shipped 10K. The factor-16-too-small batch
-hits everyone equally; matryoshka contrastive (txc_pro) and InfoNCE-
-based archs (multi-distance) suffer most because their loss terms need
-many in-batch negatives.
+**The batch_size axis is the universally-shared mistake** — but the
+*optimal* batch is COMPONENT-DEPENDENT, not a one-size-fits-all 4096.
+Phase 7's 4096 was specifically tuned for H200 141 GB VRAM with
+Gemma d_in=2304; on H100 80 GB or for components with bigger d_in
+(C6 Qwen-14B d_in=5120, C7 Llama-8B d_in=4096) and bigger d_sae
+(c6+c7 override to d_sae=32768) the memory ceiling drops. Plus:
+
+- **Contrastive / matryoshka archs (txc_pro, T-SAE temporal)**:
+  benefit MOST from large batch — InfoNCE quality scales with
+  in-batch negatives count.
+- **Vanilla TopK / per-token archs (topk_sae)**: less batch-sensitive;
+  small batch can be fine if step count is high.
+- **Memory-bound configs (C7 Llama-8B + d_sae=32768)**: physical
+  ceiling on batch_size before OOM. May need batch=1024 or 2048,
+  not 4096.
+- **Some case studies may PREFER small batch** for stochasticity in
+  the loss landscape (e.g., dead-feature recovery via Bricken, where
+  stochastic batch noise helps explore the feature space).
+
+**Decision is the overseer's, not agent_nlp's.** Each agent should
+re-evaluate their own batch_size in light of:
+  (a) their arch's loss structure (contrastive ↔ large batch)
+  (b) their datasource's d_in × d_sae memory footprint
+  (c) their pod's VRAM (H100 80 GB vs H200 141 GB vs A40 48 GB)
+  (d) their step budget (more steps × small batch can equal fewer
+      steps × large batch in token-equivalent terms)
 
 Likely effect on each agent's headline:
 - C3 (agent_nlp): TXC ranking ordering vs TopK probably stable, absolute
