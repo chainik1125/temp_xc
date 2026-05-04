@@ -232,37 +232,49 @@ on /workspace until you push them).
 
 ## Current state (agent owns — overwrite at every compact)
 
-**Last verified: 2026-05-04T12:30Z. ABORTED batch=256 calibration
-cells per Han + agent_paper directive (decisions.md § 12). Restarted
-both calibration cells with NEW TrainingConfig defaults (batch=1024,
-n_steps=25_000, plateau_early_stop=False).**
+**Last verified: 2026-05-04T14:13Z. SAE seed=42 14B-finance batch=1024
+is running Wang stage 3 (feat 2/20 done, ~3.5 min/feat). TXC seed=42
+14B-finance batch=1024 DIED SILENTLY at ~14:09 — no checkpoint, exit
+code 0, only setup logs in the file. Plan: restart TXC on GPU 1 after
+SAE Wang finishes (~15:52 UTC).**
 
-**Why the abort:** Earlier calibration was using the schema's old
-defaults (batch=256, n_steps=30_000) — undertrained per Phase 5's
-empirically validated config and SAE-literature standard. Han accepted
-the ~12 H100-hr sunk cost. Old batch=256 leaderboard rows stay; new
-cells write fresh `train_keys` (batch_size + n_steps are in the
-train_key hash so no path collision).
+**Calibration outcomes so far:**
 
-- `git HEAD`: post-restart commit (push pending). Calibration cells
-  in flight (background bash IDs):
-  - GPU 1: `bu54cn30l` — sae_arditi seed=42 14B-finance, NEW config
-    (batch=1024, 25K steps). Will TRAIN from scratch (no cache hit
-    on the new train_key) then run full Wang. Started 12:30 UTC.
-  - GPU 0: `buzgbh231` — txc_base seed=42 14B-finance, NEW config
-    + brickenauxk_a8 overrides (auxk_alpha=1/8, dead_threshold=128k).
-    Started 12:30 UTC.
+- SAE seed=42 14B-finance: training DONE in 14 min (12:48 → 13:02).
+  train_key=`9778d10381696f58` checkpointed. Wang stage 1+2 DONE
+  (100/100 feats screened by 14:01). Stage 3 in progress: feat 1
+  align_shift=8.09, feat 2 align_shift=6.34, both peaked at α=-10.
+  Stage 3 ETA ~15:11; stage 4 ETA ~15:52.
+- TXC seed=42 14B-finance: started 12:48 on GPU 0. **Process exited
+  exit-code-0 at 14:09 with no checkpoint produced.** Only the setup
+  logs in the file (8 lines, last at 12:48:21). No Bricken-fired
+  events, no train-done log, no manifest entry. Most likely cause:
+  CUDA OOM or NaN gradient mid-training — process was sharing GPU 0
+  with agent_nlp's c3-probing re-train (PID 66029, started 13:19,
+  12.5 GB used) since their pinned-GPU work resumed mid-my-borrow.
+  TXC + c3 contention may have triggered the failure. Could also be
+  Bricken-related (resample doesn't repro on SAE which has no
+  Bricken). Restart on GPU 1 (clean).
 
-**Per-cell ETA under new config (revised):**
+**GPU sharing collision:**
 
-- Training: ~30 min (25K steps × batch=1024 on H100; SAE training
-  is faster than TXC's brickenauxk loop).
-- Eval (full Wang): ~3 hr (timing from the aborted run before kill:
-  stage 2 = 33s/feat × 100 = 33 min; stage 3 ≈ 110 min; stage 4 ≈
-  36 min; setup 5 min).
+- agent_nlp's briefing read `In flight: nothing of mine` when I started
+  the TXC borrow on GPU 0. They started their c3-probing re-train at
+  13:19 UTC (~31 min after I borrowed). My TXC then competed with
+  their work for 50 min before silently dying. Per PROTOCOL § 13 the
+  borrow ends when peer becomes active — should have killed sooner.
+- I will NOT borrow GPU 0 again until agent_nlp's briefing explicitly
+  says they are idle / status: complete.
+
+**Per-cell ETA confirmed:**
+
+- Training: ~14 min for SAE on H100 alone. TXC (Bricken) probably
+  ~20-25 min. Bricken adds ~50% overhead vs vanilla.
+- Eval (full Wang): ~3 hr (33m s2 + 70m s3 + ~36m s4).
 - Per-cell wall = ~3.5 hr.
-- 6 × 14B cells / 2 GPUs ≈ 11 hr wall. 6 × 7B ≈ 6-7 hr wall.
-- End-to-end 12 cells ≈ 17-18 hr wall.
+- 6 × 14B cells SERIALLY on GPU 1 ≈ 21 hr wall. With agent_nlp
+  releasing GPU 0 eventually (their c3 ETA ~16:00 UTC), I can resume
+  parallel work after that.
 
 Other state:
 
