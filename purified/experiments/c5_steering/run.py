@@ -314,7 +314,11 @@ def main(args: argparse.Namespace) -> None:
         tuple(args.coh_thresholds) if args.coh_thresholds else DEFAULT_COH_THRESHOLDS
     )
 
-    smoke = args.smoke or args.n_steps is not None
+    # --n-steps is a paper-deviation knob (e.g., budget-fit). Cells run
+    # with reduced steps are still real evals that should land in
+    # analysis aggregates with a deviation note. Only --smoke explicit
+    # tags smoke=true.
+    smoke = args.smoke
     if args.pre_test_only:
         # Fast V7 health-check: 5 concepts × 1 strength on TXC-pro seed=42.
         protocol = "v7"
