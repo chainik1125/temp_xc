@@ -42,16 +42,99 @@ if Han verbally approves, do not commit cross-territory edits yourself.
 
 1. **`per_component_hparams[c6]` for txc_base + txc_pro: LANDED.**
    `configs/locked_archs.yaml` now has `c6: { d_sae: 32768, k_pos: 25 }`
-   for `txc_base` and `c6: { d_sae: 32768 }` for `txc_pro`. Re-run the
-   gap-close cell with the new merged hparams; the prior 75.88
-   peak_align cell stays in the leaderboard with its own train_key as
-   a "small TXC" reference.
-2. **Judge: stick with Anthropic. NO Gemini.** No good reason to
-   provision the key — Dmitry's Gemini numbers are wasteland reference,
-   not a paper claim we need to match exactly. Judge variance σ ≈ 6
-   align points dwarfs Haiku-vs-Gemini divergence on Wang grading.
-   Document the deviation in c6.md caveats; judge_outputs.jsonl
-   persistence lets us validate κ post-deadline if reviewers ask.
+   for `txc_base` and `c6: { d_sae: 32768 }` for `txc_pro`. The prior
+   75.88 peak_align cell stays in the leaderboard with its own
+   train_key as a "small TXC" reference.
+2. **Judge: stick with Anthropic. NO Gemini.** Dmitry's Gemini numbers
+   are wasteland reference, not a paper claim we need to match exactly.
+   Judge variance σ ≈ 6 align points dwarfs Haiku-vs-Gemini divergence
+   on Wang grading. Document the deviation in c6.md caveats;
+   judge_outputs.jsonl persistence lets us validate κ post-deadline.
+
+### Han decisions 2026-05-04 (NEW — Wang abbreviation oversight + 7B re-run)
+
+**The "abbreviated Wang" you ran (skipping stages 2 + 3) was a
+methodological oversight.** It wasn't in c6.md's Setup spec (which
+explicitly says "Wang procedure (4 stages): Δz̄ encoder rank → causal
+screen at α = ±1 → strength sweep → final per-feat α frontier") and
+wasn't in `decisions.md`. The +3.79 align gap is reported as the C6
+headline but is suspect — features ranked top-3 by Δz̄ may not be the
+ones full Wang's causal screen would surface, and a 6-α grid may
+miss TXC's actual peak. **The result needs to be re-derived with
+the FULL Wang protocol.**
+
+3. **Run FULL Wang on ALL C6 cells.** All 4 stages: Δz̄ rank → causal
+   screen at α=±1 (filter features that don't causally shift align)
+   → per-survivor strength sweep (~10 α values per surviving feature)
+   → final per-feat α frontier. Drop the top-3 cutoff and the 6-α
+   grid abbreviation. Same protocol on every cell — both 14B-finance
+   AND 7B-medical (see #4). Existing abbreviated-Wang cells stay in
+   the leaderboard for diff comparison; full-Wang cells get fresh
+   eval_keys (new `eval_protocol_version` bump if you change the
+   eval_cfg shape).
+
+4. **Add 7B-medical re-run.** The C6 paper framing ("step-efficiency
+   on 7B + Mixed on 14B = tradeoff") currently rests on Dmitry's
+   wasteland-published 7B numbers, which used a different judge
+   (Gemini), different prompts (full Wang), and a different TXC
+   variant. That's a cross-paper-citation pattern reviewers will
+   challenge. Pair the 14B numbers with our OWN 7B-medical numbers.
+   - Add a new datasource `qwen_2_5_7b_instruct_medical_l24_resid_post`
+     to `configs/datasources.yaml` (your territory — `# C6 ...` is
+     fine to add, follow the C6 14B entry's format).
+     `subject_model: Qwen/Qwen2.5-7B-Instruct`,
+     `lora_adapter: <Dmitry's medical organism — find on origin/em-nanda
+     and pin the source commit hash in the notes>`. d_model=3584.
+   - Run 3 seeds × 2 archs (sae_arditi-7B + txc_base+brickenauxk_a8-7B)
+     with FULL Wang on the 7B-medical cohort. Same protocol as
+     14B-finance.
+   - Expected outcome: TXC much closer to / matching SAE-arditi
+     (per Dmitry's wasteland reference: TXC brickenauxk 30k @
+     resid_mid = 53.87 ties T-SAE 100k @ resid_post = 52.39, ~3.5
+     below SAE arditi 57.42). If our re-derived numbers confirm
+     that pattern, the "step-efficiency win" half of the paper's
+     tradeoff framing becomes a single-paper apples-to-apples
+     comparison.
+
+5. **Use both H100s when agent_nlp is idle.** agent_nlp shipped
+   `status: complete` and their GPU 0 is sitting idle. You can run
+   cells in parallel on GPU 0 + GPU 1 to halve wall time. **Claim
+   the GPU formally**:
+
+   ```python
+   from temp_bench.utils.gpu_locks import claim_gpu
+   import os, subprocess
+
+   with claim_gpu(0, agent="agent_em", note="C6 7B-medical seed=1 parallel"):
+       env = {**os.environ, "CUDA_VISIBLE_DEVICES": "0", "AGENT_NAME": "agent_em"}
+       subprocess.run([..."python", "-m", "experiments.c6_em.run", ...], env=env)
+   ```
+
+   Background-launch caveat: `claim_gpu` releases on exit of the
+   `with` block. If you `subprocess.run(...)` inside the `with`,
+   that's blocking — correct. If you use `subprocess.Popen(...)`
+   to background a parallel cell, you MUST `proc.wait()` (or stay
+   inside the `with` until `proc.poll() is not None`) before
+   exiting — otherwise the lock releases while your child is still
+   on the GPU.
+
+6. **GPU-lock API friction (your feedback wanted).** agent_steer's
+   commit `0c885c98` bypassed `claim_gpu` for a parallel launch —
+   they noted *"gentleman's agreement only — agent_back was pinned
+   to GPU 1 so safe, but FUTURE parallel launches should claim_gpu
+   properly."* That's a real footgun. If you find the lock API
+   awkward (especially for background-launched parallel cells),
+   surface specifics in your "Open questions for Han" — I'll add
+   a `claim_gpu_until_pid_exits(idx, pid)` helper or a CLI wrapper
+   `bash scripts/run_with_gpu_claim.sh <gpu_idx> -- <command>`.
+   But for THIS work, use `claim_gpu` even if it's awkward — silent
+   contention with another agent is the worst-case outcome.
+
+7. **Time budget**: full Wang on 12 cells (3 seeds × 2 archs × 2
+   organisms) is ~25–50 H100-hr serial; ~12–25 hr wall time on 2
+   parallel H100s. agent_nlp's pod is yours too as long as their
+   `status: complete` holds (verify `agents/agent_nlp/briefing.md`
+   before claiming GPU 0).
 
 You are agent EM, lead on **C6: emergent misalignment** on
 `Qwen/Qwen2.5-14B-Instruct` + finance LoRA organism (R1 + R32). The

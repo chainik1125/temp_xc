@@ -130,6 +130,31 @@ he spins up the worker pods.
 
 Newest first. `git log` for full history.
 
+- **Caught Wang abbreviation oversight** (Han-flagged 2026-05-04):
+  agent_em's C6 cells used "abbreviated Wang" (skip stages 2 + 3,
+  top-3 by Δz̄, 6-α grid) without an explicit decision. The +3.79
+  align gap is the C6 headline but is methodologically suspect.
+  Updated agent_em's briefing with directive to (a) re-run all C6
+  cells with FULL Wang protocol, (b) add 7B-medical re-run to pair
+  apples-to-apples with the 14B numbers (replacing wasteland-citation
+  reliance on Dmitry's published 7B), (c) use both H100s in parallel
+  via formal `claim_gpu` calls. agent_nlp at `status: complete` so
+  GPU 0 is available.
+- **GPU-lock UX gap**: agent_steer's commit `0c885c98` bypassed
+  `claim_gpu` for a parallel launch ("gentleman's agreement only").
+  Means agents are finding the API awkward, especially for
+  background-launched cells (`subprocess.Popen` lifecycle vs
+  `with claim_gpu(...)` block). Open question for me to fix:
+  `claim_gpu_until_pid_exits(idx, pid)` helper OR
+  `scripts/run_with_gpu_claim.sh <idx> -- <cmd>` wrapper. agent_em's
+  briefing notes this; if they hit the same friction, I implement.
+- **All 4 worker overnight progress absorbed** (commits since
+  5ab98bb3): C3 final headline (4 archs × 3 seeds × 2 k_feats = 24
+  cells; topk_sae wins at both k); C4 final (T-SAE >> TXC on
+  Top-256 SEMANTIC); C5 partial sweep (T-SAE ~2× TXC on success
+  rate); C6 paper-correct + small-TXC (mean gap +3.79 / +6.35,
+  Mixed); C7 still in flight. **Story has materially shifted from
+  hypothesized — paper needs reframe**.
 - **Pushed back on agent_nlp's cross-territory edits** (Han-flagged):
   agent_nlp's commit `e68e3146` edited `decisions.md`, my briefing,
   agent_steer/briefing, and `docs/paper/architecture.md`. Content
