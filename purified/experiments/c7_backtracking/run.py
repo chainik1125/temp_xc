@@ -148,6 +148,16 @@ def my_train_fn(*, arch_name, arch_hparams, seed, training_cfg, act_cache_key, c
     model = instantiate_arch(spec, d_in=d_in)
     if torch.cuda.is_available():
         model = model.cuda()
+    # Cast heavy archs (>1B params) to bf16 to halve param + grad memory.
+    # At d_sae=32768 fp32: txc_pro=42 GB / tfa=37 GB / txc_base=22 GB just for
+    # opt-state — won't fit on A40 (47 GB). bf16 brings them to <32 GB.
+    # SAE training quality at bf16 is empirically robust per the wasteland
+    # phase 7 results; same precision the trainer uses for autocast anyway.
+    n_params = sum(p.numel() for p in model.parameters())
+    if n_params > 1e9 and torch.cuda.is_available():
+        model = model.bfloat16()
+        log.info("[c7.run] bf16 cast (%.1fM params → %.1f GB → fits A40)",
+                 n_params / 1e6, n_params * (2 + 2 + 4) / 1e9)
     # Use the arch-specific window size (handles T_max + contrastive_shifts).
     T = _spec_window_size(spec)
     batch_iter = _build_batch_iter(act_cache_key, batch_size=training_cfg.batch_size,
