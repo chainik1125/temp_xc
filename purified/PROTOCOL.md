@@ -434,7 +434,17 @@ managers. The system was correct but agents kept bypassing it
 release while the child was still using the GPU). For our 72-hour
 2-agents-per-pod scope, the cost outweighed the benefit.
 
-**Current design**: a convention, not enforcement. Three rules:
+**Current design**: a convention, not enforcement.
+
+**4× A40 pod (Han 2026-05-04 PM partition)**: the pod is fully
+allocated — agent_back owns GPUs 0+2, agent_steer owns GPUs 1+3.
+**No peer-borrow.** Each agent stays in their own two-GPU lane;
+`run_on_gpu.sh <idx>` is for spawning subprocesses on the agent's
+*own* second GPU only. If you find yourself wanting to launch on a
+GPU outside your pair, **STOP** — it's not yours.
+
+**2× H100 pod**: still uses the older borrow convention since Han
+hasn't re-partitioned it. Three rules:
 
 1. **Your primary is your default.** `scripts/set_agent_env.sh
    <agent_name>` pins your agent's own python process to your primary
@@ -455,8 +465,8 @@ release while the child was still using the GPU). For our 72-hour
 
 3. **Update YOUR briefing's "Current state" before borrowed-GPU
    work**, e.g. `"Borrowing GPU 0 until ETA 15:30 UTC for C6 7B-medical
-   sweep — agent_em-territory yielded per their status: complete."`
-   Peer's next session will see it on `git pull`.
+   sweep — agent_nlp yielded per their status: complete."` Peer's next
+   session will see it on `git pull`.
 
 ### Failure mode + recovery
 

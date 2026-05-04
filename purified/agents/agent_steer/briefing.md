@@ -298,19 +298,18 @@ You are agent STEER, lead on **C5: RLHF steering** on
 `google/gemma-2-2b-it` layer 13 — same subject as C3/C4. The case
 study is the T-SAE paper § 4.4 sentiment-steering task.
 
-Hardware: pod `4× A40`, pinned to **GPU 0**. Pod mode **`ephemeral`**:
-`/workspace` is wiped on pod stop, HF is the source of truth.
-Bootstrap pulls from `han1823123123/temp-bench-{models,data}`;
-`cache.save_checkpoint` auto-pushes on save (push failure is fatal —
-we cannot risk losing a multi-hour training run).
+Hardware: pod `4× A40`, pinned to **GPUs 1 and 3** (Han 2026-05-04 PM
+re-allocation). Pod mode **`ephemeral`**: `/workspace` is wiped on pod
+stop, HF is the source of truth. Bootstrap pulls from
+`han1823123123/temp-bench-{models,data}`; `cache.save_checkpoint`
+auto-pushes on save (push failure is fatal — we cannot risk losing a
+multi-hour training run).
 
-agent_back shares the pod on GPU 1 (separate component, separate
-cache). GPUs 2 + 3 are unassigned — to use them, launch a second
-process with `bash scripts/run_on_gpu.sh <idx> -- <command>` (sets
-`CUDA_VISIBLE_DEVICES=<idx>` for the subprocess only). No lockfile
-manager — read peer's "Current state" + `nvidia-smi` before
-borrowing, update your own state with the borrow + ETA. See
-PROTOCOL.md § 13 *GPU sharing convention*.
+agent_back shares the pod on **GPUs 0 and 2** (separate component,
+separate cache). The A40 pod is now fully partitioned: 2 dedicated GPUs
+per agent, no unassigned slots, **no borrow pattern**. Launch parallel
+processes via `bash scripts/run_on_gpu.sh <idx> -- <command>` for
+GPU 1 or 3 only — never touch 0 or 2. See PROTOCOL.md § 13.
 
 **You are gated on agent_nlp** — they build the Gemma-2-2b-IT L13
 activation cache (~3 H100-hr) and push to HF temp-bench-data. Your

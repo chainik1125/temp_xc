@@ -123,34 +123,37 @@ spawned subprocess sees a different GPU.
 
 GPU sharing is a **convention**, not a lockfile-enforced contract
 (the earlier `temp_bench.utils.gpu_locks` system was removed
-2026-05-04 — see PROTOCOL.md § 13). For the 4× A40 pod:
+2026-05-04 — see PROTOCOL.md § 13). For the 4× A40 pod (Han 2026-05-04
+PM partition):
 
 | GPU | Owner | Borrowable? |
 |---|---|---|
-| 0 | agent_steer (primary) | only when agent_steer is idle |
-| 1 | agent_back (primary) | only when agent_back is idle |
-| 2 | unowned | yes |
-| 3 | unowned | yes |
+| 0 | agent_back | no — dedicated |
+| 1 | agent_steer | no — dedicated |
+| 2 | agent_back | no — dedicated |
+| 3 | agent_steer | no — dedicated |
 
-**Before borrowing a peer's GPU**: read peer's briefing's
-"Current state" + run `nvidia-smi`. **Update YOUR briefing** with
-the borrow + ETA before kicking off long work.
+The pod is fully partitioned: 2 dedicated GPUs per agent. **No
+peer-borrow on the A40 pod.** Each agent stays in their own two-GPU
+lane. The 2× H100 pod still uses the older borrow convention
+(agent_em borrowing agent_nlp's GPU 0 when idle is fine there) since
+that pod has only 2 GPUs and Han didn't re-partition it.
 
-Worked example — agent_steer runs 3 seeds in parallel using the
-convenience wrapper:
+Worked example — agent_steer runs 3 seeds in parallel across their
+two A40s (1 + 3):
 
 ```bash
-# agent_steer's own process is pinned to GPU 0. Each launch below
-# spawns a subprocess pinned to a different GPU.
-bash scripts/run_on_gpu.sh 0 -- python -m experiments.c5_steering.run --seeds 42 &
-bash scripts/run_on_gpu.sh 2 -- python -m experiments.c5_steering.run --seeds 1 &
-bash scripts/run_on_gpu.sh 3 -- python -m experiments.c5_steering.run --seeds 2 &
+# agent_steer's own process is pinned to GPU 1. The second launch
+# spawns a subprocess pinned to GPU 3.
+bash scripts/run_on_gpu.sh 1 -- python -m experiments.c5_steering.run --seeds 42 &
+bash scripts/run_on_gpu.sh 3 -- python -m experiments.c5_steering.run --seeds 1 &
 wait
 ```
 
 The wrapper sets `CUDA_VISIBLE_DEVICES=<idx>` for the subprocess,
 sanity-checks `nvidia-smi` (warns if the GPU appears occupied),
-and execs the command. No lockfile dance.
+and execs the command. **GPUs 0 and 2 are agent_back's** — never
+target them from agent_steer's session.
 
 **Failure mode**: if you and a peer accidentally launch on the same
 GPU simultaneously, both crash with CUDA OOM. Recoverable in ~5 min

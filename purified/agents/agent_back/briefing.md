@@ -228,14 +228,15 @@ C7's subject is therefore distinct from C3/C4/C5 (Gemma-2-2b-IT) and
 C6 (Qwen-14B-finance). That divergence is acceptable — each component
 is its own subject; "two TXCs everywhere" survives.
 
-Hardware: pod `4× A40`, pinned to **GPU 1**. Pod mode **`ephemeral`**:
-HF is the source of truth, auto-push on checkpoint save. agent_steer
-shares the pod on GPU 0 (different component + different cache).
-GPUs 2 + 3 are unassigned — to use them, launch a subprocess via
-`bash scripts/run_on_gpu.sh <idx> -- <command>` (sets
-`CUDA_VISIBLE_DEVICES=<idx>` for the child only). No lockfile manager;
-GPU sharing is a convention now (PROTOCOL.md § 13) — read peer's
-"Current state" + `nvidia-smi` before borrowing.
+Hardware: pod `4× A40`, pinned to **GPUs 0 and 2** (Han 2026-05-04 PM
+re-allocation). Pod mode **`ephemeral`**: HF is the source of truth,
+auto-push on checkpoint save.
+
+agent_steer shares the pod on **GPUs 1 and 3** (separate component +
+separate cache). The A40 pod is now fully partitioned: 2 dedicated GPUs
+per agent, no unassigned slots, **no borrow pattern**. Launch parallel
+processes via `bash scripts/run_on_gpu.sh <idx> -- <command>` for
+GPU 0 or 2 only — never touch 1 or 3. See PROTOCOL.md § 13.
 
 You build your **own** Llama-3.1-8B-BASE L10 activation cache. No
 upstream dependencies; you can start at T+0. d_model=4096 (vs Gemma's

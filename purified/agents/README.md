@@ -35,26 +35,27 @@ Tokens (`/workspace/.tokens/`) and HF cache (`/workspace/hf_cache/`)
 are shared across both clones, so each agent only pays ~5 GB extra
 disk for the second working tree (out of 1 TB).
 
-The **4× A40 pod has 2 named agents + 2 unassigned GPU slots** (GPUs
-2 and 3). The agent's own python process stays pinned to its primary
-via `CUDA_VISIBLE_DEVICES` (set by `scripts/set_agent_env.sh`); to
-launch work on any other GPU, it spawns a subprocess with that GPU's
-index in the subprocess env. Convenience wrapper:
+The **4× A40 pod is fully partitioned**: agent_back gets GPUs 0 and 2;
+agent_steer gets GPUs 1 and 3 (Han 2026-05-04 PM re-allocation). 2
+dedicated GPUs per agent, **no unassigned slots, no borrow pattern**.
+Each agent's own python process is pinned to its first primary via
+`CUDA_VISIBLE_DEVICES` (set by `scripts/set_agent_env.sh`); to launch
+work on its second GPU, it spawns a subprocess with that GPU's index
+in the subprocess env. Convenience wrapper:
 
 ```bash
-# In agent_steer's session (their own process pinned to GPU 0):
-bash scripts/run_on_gpu.sh 2 -- python -m experiments.c5_steering.run --seeds 1
+# In agent_steer's session (own process pinned to GPU 1):
+bash scripts/run_on_gpu.sh 3 -- python -m experiments.c5_steering.run --seeds 1
 ```
 
-This sets `CUDA_VISIBLE_DEVICES=2` for the subprocess only, runs the
-command, exits. The agent's own python process still sees only GPU 0.
+This sets `CUDA_VISIBLE_DEVICES=3` for the subprocess only, runs the
+command, exits. The agent's own python process still sees only GPU 1.
 
-**No lockfile manager.** GPU sharing is a convention (PROTOCOL.md
-§ 13): your primary is your default; before borrowing a peer's GPU,
-read their briefing's "Current state" + run `nvidia-smi`; update
-your own "Current state" with the borrow + ETA before kicking off
-long work. The earlier `claim_gpu` lockfile system was deleted
-2026-05-04 — it was correct but agents bypassed it for
+**No lockfile manager and no peer-borrow on the A40 pod.** Each agent
+stays in their two-GPU lane (PROTOCOL.md § 13). The 2× H100 pod still
+uses the older borrow convention (agent_em borrowing agent_nlp's GPU 0
+when idle is fine there). The earlier `claim_gpu` lockfile system was
+deleted 2026-05-04 — it was correct but agents bypassed it for
 `subprocess.Popen` ergonomics.
 
 Pod sharing keeps activation caches and checkpoints on the same volume
@@ -141,7 +142,7 @@ on the A40 pool GPUs.
 | Pod | Concurrent training cells | Concurrent probing cells | Notes |
 |---|---|---|---|
 | 2× H100 (1 agent / GPU) | 2 (one per GPU) | 16 per GPU (CPU-bound, n_jobs=-1) | 56 vCPU ≈ 28/GPU. |
-| 4× A40 (2 named + 2 unassigned) | up to 4 (subprocess per GPU) | 9 per GPU | 38 vCPU ≈ 9.5/GPU. |
+| 4× A40 (2 agents × 2 GPUs each) | up to 4 (subprocess per GPU) | 9 per GPU | 38 vCPU ≈ 9.5/GPU. agent_back: 0+2, agent_steer: 1+3. |
 | H200 (reserve) | 1 (single GPU) | 32 (CPU-bound) | High RAM; for Wang on Qwen-14B. |
 | local 5090 | 1 (toy) | 16 | toy training is fast. |
 

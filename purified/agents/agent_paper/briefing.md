@@ -314,9 +314,9 @@ C1 (toy markov)           ─ agent_paper, local 5090         ─ no external de
 C2 (toy coupled HMM)      ─ agent_paper, local 5090         ─ no external deps
 C3 (sparse probing)       ─ agent_nlp, H100 GPU 0           ─ builds Gemma-IT-L13 cache (~3 H100-hr)
 C4 (top-256 semantic)     ─ agent_nlp (same agent)          ─ piggybacks on C3 cache
-C5 (RLHF steering)        ─ agent_steer, A40 GPU 0          ─ NEEDS C3's cache from HF
+C5 (RLHF steering)        ─ agent_steer, A40 GPUs 1+3       ─ NEEDS C3's cache from HF
 C6 (EM Wang procedure)    ─ agent_em, H100 GPU 1            ─ separate Qwen-14B + LoRA
-C7 (Ward backtracking)    ─ agent_back, A40 GPU 1           ─ separate Gemma-BASE-L10 cache
+C7 (Ward backtracking)    ─ agent_back, A40 GPUs 0+2        ─ separate Llama-3.1-8B BASE-L10 cache
 ```
 
 Cross-agent dependency: **C5 waits for C3's cache** (uploaded to
@@ -366,8 +366,8 @@ specifics (component, hardware, ports needed) are correct.
 |---|---|---|---|
 | **agent_nlp** | C3 + C4 | 2× H100 / GPU 0 | Port `temp_bench.data.nlp.cache_activations`, build Gemma-2-2b-IT L13 act-cache (24K seq × 128 tok ≈ 14 GB, ~3 H100-hr), upload to HF temp-bench-data. Then port + train 5 archs × 3 seeds. |
 | **agent_em** | C6 | 2× H100 / GPU 1 | Port `temp_bench.case_studies.em` from `origin/em-nanda:experiments/em_features/run_wang_procedure.py`. Set up Qwen-14B-Instruct + finance LoRA. Implement Bricken resample. First run: TXC-base + brickenauxk on R1 30k mid-α (the gap-close test, decisions.md #2 reframing + #7 Bricken opt-in). |
-| **agent_steer** | C5 | 4× A40 / GPU 0 | Port `temp_bench.case_studies.steering`. Set up Gemini judge (coh + success). Wait for agent_nlp's cache → `sync_from_hf.sh` → train TXC-base + TXC-pro + T-SAE → V7 tiled-broadcast steering protocol → coh-vs-success curves. |
-| **agent_back** | C7 | 4× A40 / GPU 1 | Port `temp_bench.case_studies.backtracking` from `origin/aniket-ward-stage-b:experiments/ward_backtracking_txc/`. Build Gemma-BASE-L10 cache (own, not shared). Set up Sonnet judge + 20-transcript blind κ validation. Run inducement (Δgc) + detection (PR-AUC) on 5 archs × 3 seeds. |
+| **agent_steer** | C5 | 4× A40 / GPUs 1+3 | Port `temp_bench.case_studies.steering`. Set up Gemini judge (coh + success). Wait for agent_nlp's cache → `sync_from_hf.sh` → train TXC-base + TXC-pro + T-SAE → V7 tiled-broadcast steering protocol → coh-vs-success curves. |
+| **agent_back** | C7 | 4× A40 / GPUs 0+2 | Port `temp_bench.case_studies.backtracking` from `origin/aniket-ward-stage-b:experiments/ward_backtracking_txc/`. Build Llama-3.1-8B BASE-L10 cache (own, not shared). Set up Sonnet judge + 20-transcript blind κ validation. Run inducement (Δgc) + detection (PR-AUC) on 5 archs × 3 seeds. |
 
 For each, the briefing's "Identity + mandate (Han owns)" section
 should reference: `agents/README.md` row, `docs/components/cN.md`,
@@ -466,7 +466,9 @@ Older open questions (mostly stale — do not re-pose to Han):
 4. ~~C3 task suite~~ — RESOLVED (decisions.md § 11, SAEBench+CT n=38).
 5. **agent_em_h200 fallback**: still dormant. R32 hasn't OOMed on
    H100. Defer until needed.
-6. **A 5th worker for the 4× A40 pool**: GPUs 2+3 are spare. Defer.
+6. ~~A 5th worker for the 4× A40 pool~~ — RESOLVED. Han partitioned
+   the A40 pod 2026-05-04 PM: agent_back gets 0+2, agent_steer gets
+   1+3. Pod is fully allocated, no spare slots, no 5th worker.
 7. **Meta HF approval**: Han applied 2026-05-04. Once it lands,
    agent_back runs check_mirror_equivalence.py (in their briefing
    directive) before re-running C7 on the canonical Llama datasource.
