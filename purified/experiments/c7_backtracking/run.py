@@ -183,6 +183,23 @@ def my_train_fn(*, arch_name, arch_hparams, seed, training_cfg, act_cache_key, c
     batch_iter = _build_batch_iter(act_cache_key, batch_size=training_cfg.batch_size,
                                     T=T, seed=seed)
     result = train_sae(model, batch_iter, training_cfg)
+    # Persist train_log for post-cell convergence check (decisions.md
+    # § 12: surface if final-1K-step loss drop > 5% of step-N loss
+    # flags the cap as binding). Mirrors agent_nlp's c3+c4 pattern
+    # (commit 033a3eb6) + agent_steer's 8953f6e4. The runner's
+    # save_checkpoint discards the per-step log so we save it
+    # ourselves alongside other run logs.
+    try:
+        import json as _json
+        from pathlib import Path as _Path
+        log_path = _Path("logs") / (
+            f"c7_b{training_cfg.batch_size}_{arch_name}_seed{seed}_trainlog.json"
+        )
+        log_path.parent.mkdir(parents=True, exist_ok=True)
+        log_path.write_text(_json.dumps(result.get("log", {})))
+        log.info("[c7.run] trainlog saved → %s", log_path)
+    except Exception as exc:
+        log.warning("[c7.run] trainlog persist failed: %s", exc)
     return result["state_dict"]
 
 
