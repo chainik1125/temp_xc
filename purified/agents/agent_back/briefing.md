@@ -189,13 +189,27 @@ References:
   Per-cell wall ~100 min, total ~5 hours. Logs at
   `logs/c7_sweep_seed42.log`. Cells write to per-eval_key workspaces
   (no smoke contamination).
-- Last leaderboard append: smoke (`a9b4ea184f7a477a`).
-- Last checkpoint saved: `8f5e895c94f85e38` (topk_sae smoke;
-  HF-pushed). Production cells will save 3 more.
-- Active GPU lock(s): GPU 1 (production sweep).
+- Last leaderboard append: production topk_sae cell
+  (`28c40a2a3a0bbd59`) at 01:24 → peak Δgc=+0.361 at mag=+16,
+  pr_auc_S32=0.243.
+- Last checkpoint saved: `f6cbec1a09c992d4` (topk_sae production,
+  30k steps, 1.07 GB). HF-pushed.
+- Active GPU lock(s): GPU 1 (production sweep, mid-cell-2).
 - Recent decisions in scope: #1, #4, #6, #7.
-- In flight: production sweep — Monitor `bj8crkmek` watches for
-  cell completions / failures.
+- In flight: production sweep, tsae_paper × seed=42 cell running.
+
+**Production sweep results (live):**
+
+| cell | status | peak Δgc | peak mag | pr_auc S=32 | wall (min) |
+|---|---|---:|---:|---:|---:|
+| topk_sae × seed=42 | DONE 01:24 | +0.361 | +16 | 0.243 | 155 |
+| tsae_paper × seed=42 | RUNNING (since 01:24) | – | – | – | – |
+| txc_base × seed=42 | queued | – | – | – | – |
+
+topk_sae's +0.361 vs Aniket's wasteland topk_sae (+0.262 at −16):
+we improved 1.4×. TXC-base + TXC-pro tests still pending. Pipeline
+auto-renders c7.md AUTO-RESULTS via `bash scripts/c7_post_sweep.sh`
+after each cell.
 
 ## What I just did (agent owns — overwrite)
 
