@@ -29,12 +29,15 @@ def _load() -> dict[str, Any]:
 
 # Consistent colours per architecture across the whole report.
 ARCH_COLOURS: dict[str, str] = {
-    "SAE": "#1f77b4",      # blue
-    "T-SAE": "#2ca02c",    # green
-    "TXC": "#d62728",      # red
-    "MLC": "#9467bd",      # purple
-    "raw L13": "#7f7f7f",  # grey
-    "TF-IDF": "#bcbd22",   # olive
+    "SAE": "#1f77b4",            # blue
+    "Stacked SAE": "#2ca02c",    # green
+    "T-SAE (Bhalla)": "#17becf", # cyan
+    "TXC": "#d62728",            # red
+    "MLC": "#9467bd",            # purple
+    "raw L13": "#7f7f7f",        # grey
+    "TF-IDF": "#bcbd22",         # olive
+    # Backwards-compat alias for any caller still using "T-SAE":
+    "T-SAE": "#2ca02c",
 }
 
 
@@ -58,35 +61,44 @@ def fig_rose_per_architecture(data: dict[str, Any]) -> None:
 
     # Rescaled scores — see report text for formulas.
     paper = data["sparse_probing_paper_set_BASE_S32"]["k_feat_20_mean_auc"]
+    det_ood = data["deception_detection_andre_safety"]["monitor_auc_test_ood"]
     arch_scores: dict[str, list[float]] = {
-        # SAE
+        # SAE T=1
         "SAE": [
             data["synthetic_andre_v2_toy"]["best_cell_rho_0.9"]["stacked_sae_auc"],  # 0.475
-            paper["topk_sae"],   # 0.9091 (PAPER 16-task BASE S=32 k=20)
-            0.226,  # backtracking rescue control rate (no steer)
-            data["deception_detection_andre_safety"]["monitor_auc_test_ood"]["sae"],   # 0.948
+            paper["topk_sae"],                  # 0.9091 PAPER
+            0.226,                               # backtracking control
+            det_ood["sae"],                      # 0.948 XSTest
             data["alignment_em_qwen7b_medical"]["delta_align_vs_baseline"]["sae"] / 25,  # +21.7 normed
         ],
-        # T-SAE
-        "T-SAE": [
+        # Stacked SAE (Andre's earlier "T-SAE" — T independent per-position SAEs)
+        "Stacked SAE": [
             (data["synthetic_andre_v2_toy"]["best_cell_rho_0.9"]["stacked_sae_auc"] + 0.05),
-            paper["tsae_paper_k500"],  # 0.9105 (PAPER)
-            0.226,  # control baseline (T-SAE not the headline backtracking arm)
-            data["deception_detection_andre_safety"]["monitor_auc_test_ood"]["tsae"],    # 0.963
-            0.40,   # T-SAE hookpoint variant ~ MLC-like; see em_features hookpoint_compare doc
+            np.nan,                              # no separate Stacked-SAE entry on Han PAPER
+            0.226,                               # control
+            det_ood["stacked_sae"],              # 0.963
+            np.nan,
+        ],
+        # T-SAE (Bhalla 2025) — the actual T-SAE
+        "T-SAE (Bhalla)": [
+            np.nan,                              # no Bhalla T-SAE on toy ρ-sweep
+            paper["tsae_paper_k500"],           # 0.9105 — Han's tsae_paper IS the Bhalla T-SAE port
+            np.nan,
+            det_ood["tsae_bhalla"],              # 0.958 (this run)
+            np.nan,
         ],
         # TXC
         "TXC": [
             data["synthetic_andre_v2_toy"]["best_cell_rho_0.9"]["txcdr_k_2_T_5_auc"],  # 0.978
-            paper["txc_bare_antidead_t5"],   # 0.9127 (PAPER) — TXC wins
-            0.290,  # backtracking rescue at α=-8 (optimal inducement rate)
-            data["deception_detection_andre_safety"]["monitor_auc_test_ood"]["txc"],    # 0.954
+            paper["txc_bare_antidead_t5"],      # 0.9127 PAPER
+            0.290,                               # backtracking optimum
+            det_ood["txc"],                      # 0.954
             data["alignment_em_qwen7b_medical"]["delta_align_vs_baseline"]["txc_best"] / 25,  # +10.7 normed
         ],
-        # MLC for reference where measured (not on every axis)
+        # MLC for reference where measured
         "MLC": [
             np.nan,
-            paper["mlc"],   # 0.9122 (PAPER)
+            paper["mlc"],                        # 0.9122 PAPER
             np.nan,
             np.nan,
             data["alignment_em_qwen7b_medical"]["delta_align_vs_baseline"]["mlc"] / 25,  # +19.4 normed
@@ -162,15 +174,22 @@ def fig_rose_per_category(data: dict[str, Any]) -> None:
             em_14b["sae_arditi_seed_42_alpha_-30"] / 100,
             em_7b["sae"] / 25,
         ],
-        "T-SAE": [
+        "Stacked SAE": [
             syn_v2["stacked_sae_auc"] + 0.02,  # comparable
             bill["hmm_denoising_floor"],
-            paper["tsae_paper_k500"],
+            np.nan,                          # not measured on PAPER 16
             han["tsae_paper_k500"],
-            det_in["tsae"], det_ood["tsae"],
-            inv_leak(fsga_leak["tsae"]),
-            np.nan,                       # T-SAE Q14B EM not in the leaderboard
-            np.nan,                       # T-SAE Q7B not the headline
+            det_in["stacked_sae"], det_ood["stacked_sae"],
+            inv_leak(fsga_leak["tsae"]),    # FSGA leakage from Andre's "tsae" arm = Stacked SAE
+            np.nan,
+            np.nan,
+        ],
+        "T-SAE (Bhalla)": [
+            np.nan, np.nan,
+            paper["tsae_paper_k500"],
+            np.nan,
+            det_in["tsae_bhalla"], det_ood["tsae_bhalla"],
+            np.nan, np.nan, np.nan,
         ],
         "TXC": [
             syn_v2["txcdr_k_2_T_5_auc"],
@@ -282,37 +301,36 @@ def fig_em_alignment_bars(data: dict[str, Any]) -> None:
 
 def fig_detection_auc(data: dict[str, Any]) -> None:
     """Detection AUC bars across deception splits + black-to-white boost."""
-    det = data["deception_detection_andre_safety"]
-    splits = ["JBB test_in", "XSTest test_ood"]
-    arches = ["TF-IDF", "raw L13", "SAE", "T-SAE", "TXC"]
-
-    auc_in = [det["monitor_auc_test_in"]["tfidf_baseline"],
-              det["monitor_auc_test_in"]["raw_l13_residual"],
-              det["monitor_auc_test_in"]["sae"],
-              det["monitor_auc_test_in"]["tsae"],
-              det["monitor_auc_test_in"]["txc"]]
-    auc_ood = [det["monitor_auc_test_ood"]["tfidf_baseline"],
-               det["monitor_auc_test_ood"]["raw_l13_residual"],
-               det["monitor_auc_test_ood"]["sae"],
-               det["monitor_auc_test_ood"]["tsae"],
-               det["monitor_auc_test_ood"]["txc"]]
+    det = det_in_d = data["deception_detection_andre_safety"]
+    arches_keys = ["tfidf_baseline", "raw_l13_residual", "sae",
+                    "stacked_sae", "tsae_bhalla", "txc"]
+    arches_pretty = ["TF-IDF", "raw L13", "SAE", "Stacked SAE",
+                      "T-SAE (Bhalla)", "TXC"]
     cols = [ARCH_COLOURS["TF-IDF"], ARCH_COLOURS["raw L13"],
-            ARCH_COLOURS["SAE"], ARCH_COLOURS["T-SAE"], ARCH_COLOURS["TXC"]]
+            ARCH_COLOURS["SAE"], ARCH_COLOURS["Stacked SAE"],
+            ARCH_COLOURS["T-SAE (Bhalla)"], ARCH_COLOURS["TXC"]]
 
-    fig, ax = plt.subplots(figsize=(9.5, 6))
-    x = np.arange(len(arches))
-    w = 0.35
+    auc_in = [det["monitor_auc_test_in"][k] for k in arches_keys]
+    auc_ood = [det["monitor_auc_test_ood"][k] for k in arches_keys]
+
+    fig, ax = plt.subplots(figsize=(11, 6))
+    x = np.arange(len(arches_pretty))
+    w = 0.38
     ax.bar(x - w/2, auc_in, w, color=cols, label="JBB test_in", edgecolor="black")
     ax.bar(x + w/2, auc_ood, w, color=cols, alpha=0.55, label="XSTest test_ood",
            edgecolor="black")
     ax.set_xticks(x)
-    ax.set_xticklabels(arches)
+    ax.set_xticklabels(arches_pretty, rotation=15)
     ax.set_ylabel("AUC")
     ax.set_ylim(0.6, 1.0)
     ax.axhline(det["monitor_auc_test_ood"]["tfidf_baseline"], color="grey",
                linestyle=":", alpha=0.5, label="black-box floor")
-    ax.set_title("Refusal detection AUC — white-box probes outpace text-only by +0.27-0.30\n"
-                 "(SAE family arms within 95% bootstrap CI of each other)")
+    ax.set_title("Refusal detection AUC — white-box probes outpace text-only by +0.28-0.30\n"
+                 "(four SAE-family arms — including the actual Bhalla T-SAE — within 95% CI)")
+    for xi, v in zip(x, auc_in):
+        ax.text(xi - w/2, v + 0.005, f"{v:.3f}", ha="center", fontsize=8)
+    for xi, v in zip(x, auc_ood):
+        ax.text(xi + w/2, v + 0.005, f"{v:.3f}", ha="center", fontsize=8)
     ax.legend()
     ax.grid(True, axis="y", alpha=0.3)
     plt.tight_layout()
@@ -521,13 +539,18 @@ def fig_overall_summary_grid(data: dict[str, Any]) -> None:
     axs[0, 1].set_ylim(0.88, 0.92)
     axs[0, 1].set_ylabel("mean AUC")
 
-    # Deception detection (XSTest test_ood)
+    # Deception detection (XSTest test_ood) — four SAE-family arms
     d = data["deception_detection_andre_safety"]["monitor_auc_test_ood"]
-    axs[1, 0].bar(arches, [d["sae"], d["tsae"], d["txc"]], color=cols, edgecolor="black")
+    det_arches = ["SAE", "Stacked SAE", "T-SAE (Bhalla)", "TXC"]
+    det_cols = [ARCH_COLOURS["SAE"], ARCH_COLOURS["Stacked SAE"],
+                 ARCH_COLOURS["T-SAE (Bhalla)"], ARCH_COLOURS["TXC"]]
+    axs[1, 0].bar(det_arches, [d["sae"], d["stacked_sae"], d["tsae_bhalla"], d["txc"]],
+                   color=det_cols, edgecolor="black")
     axs[1, 0].axhline(d["tfidf_baseline"], color="grey", linestyle="--", label="TF-IDF baseline")
-    axs[1, 0].set_title("DECEPTION: XSTest detection AUC (n=450)")
+    axs[1, 0].set_title("DECEPTION: XSTest detection AUC (n=450, 4 arms)")
     axs[1, 0].set_ylim(0.6, 1.0)
     axs[1, 0].set_ylabel("AUC")
+    axs[1, 0].tick_params(axis="x", rotation=15)
     axs[1, 0].legend()
 
     # Deception steering FSGA peak |ΔLR_harm|

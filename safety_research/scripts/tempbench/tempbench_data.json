@@ -182,8 +182,9 @@
   },
 
   "deception_detection_andre_safety": {
+    "_terminology_note": "Earlier docs labelled the StackedSAE T=5 arm 'T-SAE' — that was a mis-naming. In this branch the four arms are: SAE (T=1 TopK), Stacked SAE (T=5 per-position TopK), TXC (T=5 shared latent), and the actual T-SAE = Bhalla et al. 2025 (T=1 BatchTopK + matryoshka + temporal contrastive + threshold inference). The Bhalla T-SAE was trained 2026-05-04 via safety_research/scripts/train_tsae_paper.py and evaluated via realbench_detect_tsae_paper.py.",
     "source_branch": "andre_safety / andre-steering",
-    "source_doc": "safety_research/REPORT.md (REPORT_v2.md)",
+    "source_doc": "safety_research/REPORT.md (REPORT_v2.md) + new tsae_paper.json",
     "datasets": {
       "test_in_JBB": {"n": 200, "n_pos": 100, "source": "JailbreakBench Behaviors"},
       "test_ood_XSTest": {"n": 450, "n_pos": 225, "source": "XSTest v2"},
@@ -193,22 +194,39 @@
       "tfidf_baseline": 0.693,
       "raw_l13_residual": 0.966,
       "sae": 0.961,
-      "tsae": 0.973,
+      "stacked_sae": 0.973,
+      "tsae_bhalla": 0.970,
       "txc": 0.970
+    },
+    "monitor_auc_test_in_ci": {
+      "tsae_bhalla": [0.948, 0.988]
     },
     "monitor_auc_test_ood": {
       "tfidf_baseline": 0.668,
       "raw_l13_residual": 0.959,
       "sae": 0.948,
-      "tsae": 0.963,
+      "stacked_sae": 0.963,
+      "tsae_bhalla": 0.958,
       "txc": 0.954
+    },
+    "monitor_auc_test_ood_ci": {
+      "tsae_bhalla": [0.941, 0.974]
     },
     "black_to_white_boost_test_ood": {
       "sae": "+0.280",
-      "tsae": "+0.295",
+      "stacked_sae": "+0.295",
+      "tsae_bhalla": "+0.290",
       "txc": "+0.286"
     },
-    "verdict": "All three SAE-family arms within 95% bootstrap CI of each other. The +0.28-0.30 white-box boost over text-only TF-IDF is the load-bearing finding."
+    "tsae_bhalla_training": {
+      "wall_seconds": 284,
+      "final_fvu": 0.257,
+      "final_loss": 12286,
+      "final_temp_loss": 172,
+      "threshold_at_eval": 3.86,
+      "ckpt": "safety_research/results/checkpoints/tsae_paper__mid_res__k100__T1.pt"
+    },
+    "verdict": "All four SAE-family arms within 95% bootstrap CI of each other. Bhalla T-SAE sits between Stacked SAE and TXC on detection AUC. The +0.28-0.30 white-box boost over text-only TF-IDF is the load-bearing finding."
   },
 
   "deception_steering_andre_v2_fsga": {

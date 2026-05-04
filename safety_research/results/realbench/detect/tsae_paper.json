@@ -1,0 +1,25 @@
+{
+  "arm": "tsae_paper",
+  "ckpt": "/home/cs29824/andre/temp_xc/safety_research/results/checkpoints/tsae_paper__mid_res__k100__T1.pt",
+  "F_dim": 18432,
+  "density_train": 0.014946622930021367,
+  "n_features_kept": 2000,
+  "test_in": {
+    "auc": 0.9699,
+    "ci": {
+      "mean": 0.9702613438014913,
+      "lo": 0.9483945644564457,
+      "hi": 0.9882896069547827
+    },
+    "ap": 0.9744932601293681
+  },
+  "test_ood": {
+    "auc": 0.9576888888888889,
+    "ci": {
+      "mean": 0.9578899458887162,
+      "lo": 0.9411656640383345,
+      "hi": 0.9736099498837396
+    },
+    "ap": 0.9554421793643519
+  }
+}

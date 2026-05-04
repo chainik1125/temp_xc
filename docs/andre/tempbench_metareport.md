@@ -28,9 +28,22 @@ scripts, never from memory.
 The architectures compared (referred to throughout):
 
 - **SAE** — vanilla TopK sparse autoencoder (T=1).
-- **T-SAE / Stacked SAE** — T independent per-position TopK SAEs sharing nothing across positions; window-level L0 = `k * T`.
+- **Stacked SAE** — T independent per-position TopK SAEs sharing nothing across positions; window-level L0 = `k * T`. *(Earlier Andre docs called this "T-SAE" — that was a mis-naming; see the terminology note below.)*
+- **T-SAE (Bhalla et al. 2025)** — proper Bhalla T-SAE: per-token (T=1 architecturally) BatchTopK + matryoshka cumulative reconstruction + InfoNCE temporal contrastive between consecutive tokens + AuxK + threshold inference. Reference: [arXiv:2511.05541](https://arxiv.org/abs/2511.05541), [OpenReview bojVI4l9Kn](https://openreview.net/pdf?id=bojVI4l9Kn).
 - **TXC / TXCDR** — temporal crosscoder ([[temporal_xc_architectures]]; ckkissane-style shared-latent crosscoder over a length-T window).
 - **MLC** — multi-layer crosscoder; one latent shared across L residual layers (analogue of TXC but along the layer axis).
+
+> **Terminology fix (2026-05-04).** Andre's earlier docs and Andre's
+> `safety_research/REPORT_v2.md` called the StackedSAE T=5 arm "T-SAE".
+> That conflicted with the wider project's use of "T-SAE" to mean the
+> Bhalla et al. 2025 architecture (`purified/src/temp_bench/architectures/tsae.py`
+> on `origin/final`, `tsae_paper_k500` in Han's leaderboards). The two
+> are architecturally different. We have now (a) renamed Andre's
+> "T-SAE" → "Stacked SAE" throughout this report, and (b) trained the
+> *actual* Bhalla T-SAE on Andre's mid_res Gemma-2-2b-it L13 cache
+> via `safety_research/scripts/train_tsae_paper.py` and added it as a
+> separate row in the deception-detection cell. The full architectural
+> contrast is in [[tsae_vs_txc_architectures]].
 
 ## At-a-glance
 
@@ -337,14 +350,22 @@ n_test_in = 200 JBB, n_test_ood = 450 XSTest, train = 520 H + 520 B.
 | TF-IDF baseline | 0.693 | 0.668 | — |
 | raw L13 residual | 0.966 | 0.959 | — |
 | SAE (T = 1) | 0.961 | 0.948 | **+0.280** |
-| **T-SAE (T = 5)** | **0.973** | **0.963** | **+0.295** |
+| **Stacked SAE (T = 5)** | **0.973** | **0.963** | **+0.295** |
+| **T-SAE (Bhalla 2025, T = 1)** | **0.970** [0.948, 0.988] | **0.958** [0.941, 0.974] | **+0.290** |
 | TXC (T = 5) | 0.970 | 0.954 | **+0.286** |
 
-Reading: **all three arms within 95% bootstrap CI of each other**. The
-load-bearing finding is the +0.27-0.30 white-box boost over text-only
+The Bhalla T-SAE row is **new in this report** — trained on the
+same mid_res cache as the other arms (3000 steps, 284 s wall, final
+FVU = 0.257, threshold = 3.86 at end). Reading: **all four
+SAE-family arms within 95% bootstrap CI of each other**. The
+load-bearing finding is the +0.28-0.30 white-box boost over text-only
 TF-IDF — *internal-state monitoring is what matters; which white-box
 representation is second-order*. Following the *black-to-white* boost
 metric introduced by [Parrack et al. 2025](https://arxiv.org/abs/2507.12691).
+
+Reproducible:
+[`safety_research/scripts/train_tsae_paper.py`](../../safety_research/scripts/train_tsae_paper.py),
+[`safety_research/scripts/realbench_detect_tsae_paper.py`](../../safety_research/scripts/realbench_detect_tsae_paper.py).
 
 ### 4.2 Steering — FSGA & cFSGA
 
