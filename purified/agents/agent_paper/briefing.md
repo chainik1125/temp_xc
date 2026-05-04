@@ -104,32 +104,138 @@ Your first mission is to decide on the following:
 
 ## Current state (agent owns — overwrite at every compact)
 
-**Last verified: 2026-05-03T22:30:00Z**
+**Last verified: 2026-05-04 mid-day, post-batch_size walkback**
 
-Han's "first mission" decisions are now LOCKED in `decisions.md` #1–10.
-Framework is built; tests 38/38 green; HF repos + tokens unified.
-**4 worker briefings drafted this session — pending Han review** before
-he spins up the worker pods.
+All 4 worker pods active and in-flight. Component results landed (or
+re-landed, post-fixes) for C3/C4/C5/C6 partial, C7 partial. Tests
+116/116. All 9 archs ported. ~9 distinct yaml entries → all
+importable. Decisions #1-12 locked.
 
-- `final` branch pushed. `git log` for history. ~14 commits on day 0.
-- 7 components have `docs/components/cN.md` writeups (planning status).
-- 5 named agents in roster + 1 fallback. **Only agent_paper (me) is
-  active**; NLP/EM/STEER/BACK have draft briefings, awaiting Han's
-  spin-up. EM_H200 dormant.
-- Locked archs: TXC-base = `txc_bare_antidead_t5`,
-  TXC-pro = `phase5b_subseq_h8`. **9 yaml entries** (added
-  `stacked_sae` 2026-05-03 — was a c1.md/c7.md baseline missing from
-  YAML): topk_sae, stacked_sae, tsae_paper, tfa, tfa_pos, mlc,
-  sae_arditi, txc_base, txc_pro.
-- `results/leaderboard.jsonl` empty. `checkpoints/manifest.jsonl` empty.
+**Open question post-compact me must handle FIRST**:
+
+Han's pushback on the batch_size CRITICAL alert — see §
+"⚠️ UNRESOLVED: training-budget question" below. This is the live
+issue. agent_nlp's CRITICAL alert (commits 579efb9a, 8904414d,
+3558b303) flagged that all C3-C7 cells used batch=256 vs Phase 7's
+4096. I issued a global "re-train at batch=2048" directive
+(commit a9200560), Han pushed back: "Dmitry/Aniket might have been
+undertraining too — they're not the right reference; we should think
+about this from a fresh frame." **The directive is on origin/final
+but the underlying decision is unsettled.** Post-compact me: read
+this section + decisions.md § 12 + recent commits, then re-engage
+with Han.
+
+State of the leaderboard (as of 2026-05-04):
+- C3 (agent_nlp, status: complete): 24 cells × 2 protocol versions
+  (v1.0.0 buggy padding + v1.1.0 fix). Headline: TopK-SAE 0.9044
+  > TXC > T-SAE 0.8844. Honest negative for C3 hypothesis.
+- C4 (agent_nlp, status: complete): 9 cells. T-SAE 74.7 >> TXC-pro
+  60 >> TXC-base 42 on Top-256 SEMANTIC. Honest negative.
+- C5 (agent_steer, status: complete): 9 + backfill cells with new
+  peak_success_grade_at_coh_τ metric (post-Han's "horizontally
+  aligned" catch). Backfill via reaggregate_from_judge_outputs.
+- C6 (agent_em, in flight): full Wang stages 2+3 + 7B-medical port
+  shipped (commit 144a3e84). Calibration cells running on H100s.
+  +3.79 align Mixed gap from abbreviated Wang stays as reference.
+- C7 (agent_back, in flight): 1 smoke cell (topk_sae +0.36 Δgc) +
+  full sweep launched. The +1.574 reproduction test is the
+  remaining "win" candidate.
+
+Workers' batch_size status (every cell, all pods):
+batch=256 across C3/C5/C6/C7. Schema default was 256, just bumped
+to 2048 in a9200560 — which Han is now pushing back on. May be
+reverted depending on the fresh-frame discussion.
+
+**Locked archs** (all 9 yaml entries have a class file):
+- TXC-base = `txc_bare_antidead_t5`, TXC-pro = `phase5b_subseq_h8`.
+- Baselines: topk_sae, stacked_sae, tsae_paper (Ye port; NOT
+  tsae_ours which is forbidden per Hard Rule #11), tfa, tfa_pos, mlc,
+  sae_arditi.
 - Token store: `~/.tokens/` (local) + `/workspace/.tokens/` (RunPod).
-- **8 distinct arch .py files NOT yet ported** (tfa + tfa_pos share a
-  file). YAML entries exist; classes don't.
+
+## ⚠️ UNRESOLVED: training-budget question (compact-priority)
+
+agent_nlp identified the batch=256 issue (commits 579efb9a +
+8904414d + 3558b303). My initial response: bump default to
+batch=2048 with per-pod overrides (C3/C4/C6 H100 → 2048; C5/C7 A40 →
+1024). Committed in a9200560 + decisions.md § 12.
+
+**Han's pushback (the part I haven't fully addressed)**: the
+underlying assumption — that Dmitry's batch (for C6) and Aniket's
+batch (for C7) are the right references — is not actually
+established. Dmitry and Aniket may have been undertraining their
+own runs too. The CORRECT question is not "match their batch" but
+"what hyperparameter setup would actually produce the strongest
+honest result for this paper given our 72-hour budget?"
+
+**What needs fresh thinking**:
+
+1. **Per-arch token budget** for "well-trained":
+   - TopK-SAE: usually 100-200M tokens.
+   - T-SAE (Bhalla/Ye): paper-trained at ~100M tokens.
+   - TXC family: similar order.
+   - Bricken-recipe TXC: ~30M+ tokens with periodic resamples.
+   - At batch=256, n_steps=30K = 7.7M tokens — universally undertrained.
+   - At batch=2048, n_steps=30K = 61M tokens — OK-ish.
+
+2. **Per-component re-think** (not "match Dmitry"):
+   - C3/C4: T-SAE paper used standard SAE-training batch ≈ 4096.
+     For T-SAE in our run to even have a chance, we should use
+     similar budget. Current batch=256 likely under-represents
+     T-SAE.
+   - C5: T-SAE § B.2 doesn't pin SAE training batch. Our cells use
+     C3's checkpoints + steer.
+   - C6: Dmitry's published TXC k=100 30k might also be undertrained.
+     The right ref might be "what does SAE-arditi need to train
+     properly" — its 100k step number suggests it benefited from
+     more compute than 30k. agent_em's choice is per-component.
+   - C7: Aniket's reference is similarly thin. The +1.574 result was
+     from his hill-climbed TXC at unknown batch. Re-deriving with
+     locked TXC-pro at PROPER batch is the right re-test.
+
+3. **What "right" means**:
+   - **Fairness within a component**: every arch in a component uses
+     the same budget. (Already true.)
+   - **Sufficiency vs the published reference**: each arch trains
+     ENOUGH. (Currently violated for T-SAE / TXC-pro at batch=256.)
+   - **NOT "match wasteland"**: wasteland configs reflect time
+     pressure, not the right answer.
+
+4. **Practical compute math**:
+   - 6 cells × 4 components × 8× compute (batch=2048 vs 256, fewer
+     n_steps to keep token-equivalent) = ~80-150 GPU-hours total.
+   - Within remaining 72h window IF started immediately.
+   - 80-150 GPU-hours OR document in caveats and ship as-is.
+
+5. **Decision tree post-compact me should walk Han through**:
+   - **(a) Stay batch=256**: ship undertrained numbers; document in
+     caveats; relative orderings may be biased toward TopK / against
+     contrastive archs.
+   - **(b) Re-train at batch=2048** (where it fits) / 1024 (A40):
+     ~80-150 GPU-hours; orderings might shift.
+   - **(c) Per-component judgment**: agent_paper investigates each
+     reference, recommends per-component, agents re-train selectively.
+     Most rigorous, slower.
+
+6. **Fresh-start path Han wants**: start by NOT assuming wasteland
+   configs are right. Ask: what does a well-trained T-SAE need? a
+   well-trained TXC-pro? Then check: do we have time + compute for
+   that? Then decide.
+
+**My current pushed state**: schema default = 2048, decisions.md
+§ 12 says "re-train all C3-C7", worker briefings have CRITICAL
+blocks. **None of this has actually been executed by workers yet
+— they're still mid-flight on batch=256 cells.** Post-compact me
+can either revert the directive cleanly (revert a9200560) or refine
+it. Han has explicitly said this needs fresh thinking; do that
+before any workers act on the batch=2048 directive.
 
 ## What I just did (agent owns — overwrite)
 
 Newest first. `git log` for full history.
 
+- **Issued + walked back batch_size CRITICAL** (Han pushback,
+  unresolved). See § ⚠️ UNRESOLVED above. Post-compact me re-engages.
 - **Nuked the GPU lock system** (Han approved 2026-05-04). Deleted
   `temp_bench/utils/gpu_locks.py` + `tests/test_gpu_locks.py` + all
   `claim_gpu` references. Replaced with a CONVENTION in PROTOCOL.md
@@ -269,39 +375,46 @@ relevant `decisions.md` entries, and the wasteland files to port.
 
 ## Next action (agent owns — overwrite)
 
-Both worker briefings AND C1+C2 porting are in flight. Worker
-briefings are drafted; await Han's review. Continue C1+C2 in parallel.
+**Most stale info above is obsolete; the current priority is the
+unresolved batch_size / hyperparameter question.** Read § ⚠️
+UNRESOLVED at the top first.
 
 1. Bootstrap: `cd $(git rev-parse --show-toplevel)/purified` →
    `source scripts/set_agent_env.sh agent_paper` →
-   `bash scripts/agent_smoke_test.sh` (expect 38/38) →
+   `bash scripts/agent_smoke_test.sh` (expect ~116 pass) →
    `git pull --rebase origin final`.
-2. Read `decisions.md` #1–10 if not in context.
-3. **If Han has approved worker briefings**: notify him to spin up
-   pods (T+0: nlp + em + back; T+~3hr: steer once C3 cache hits HF).
-   If not yet, address his review feedback in
-   `agents/{nlp,em,steer,back}/briefing.md` "Identity + mandate"
-   sections.
-4. **C1+C2 porting (in parallel)**:
-   - Port arch classes from
-     `origin/han-phase7-unification:src/architectures/` into
-     `src/temp_bench/architectures/`. **8 distinct .py files** (tfa +
-     tfa_pos share `tfa.py`, differ only by `use_pos_embedding`):
-     topk_sae, stacked_sae, tsae_paper, tfa, mlc, sae_arditi,
-     txc_base (← `txc_bare_antidead.py`),
-     txc_pro (← `phase5b_subseq_sampling_txcdr.py`).
-     Each port: `git show origin/han-phase7-unification:src/architectures/<file>.py >
-     src/temp_bench/architectures/<file>.py`, then add header comment
-     with the source commit hash, then update imports
-     (`from src.architectures.base` → `from temp_bench.architectures.base`).
-   - Implement `temp_bench.data.toy.markov_chain_support` (C1) +
-     `coupled_hmm` (C2). Sources to study (NOT to import):
-     `origin/han-phase7-unification:src/v2_temporal_schemeC/markov_data_generation.py`
-     and Phase 3 coupled-features generators.
-   - Write `experiments/c1_synthetic_topk/run.py`. Smoke-run:
-     1 cell × 1000 steps. Then full sweep (~6 hr local on 5090).
-5. After porting + C1+C2 land: start drafting paper outline for the
-   sections you own (C1, C2 + framework introduction).
+2. Read `decisions.md` #1-12 (esp. § 12 batch_size — the open one).
+3. Read recent commits: `git log --oneline -20` — covers the C5 metric
+   fix, GPU-lock nuke, wrap_up_session.sh, batch_size CRITICAL +
+   walkback. `git show 579efb9a 8904414d 3558b303 a9200560` is the
+   batch_size thread.
+4. **Re-engage Han on the hyperparameter question.** He explicitly
+   said: "Dmitry/Aniket may have lacked hyperparam optimization too —
+   they're not the right reference; think fresh." The question to
+   answer with him:
+   - Per-arch: what token budget makes T-SAE (Bhalla port) actually
+     converge? what about TXC-pro (matryoshka + multi-distance
+     contrastive)? what about TopK / SAE-arditi / MLC? Is there a
+     single number, or per-arch?
+   - Per-component: what's the practical compute budget remaining
+     in the 72-h window? How many cells × seeds × archs can we
+     re-train? Where's the marginal value?
+   - Decision: ship as-is with caveat? Re-train selectively
+     (e.g., only T-SAE + TXC-pro, the contrastive-loss archs)?
+     Re-train everything?
+5. Whatever Han decides, encode in decisions.md § 12 (replacing the
+   current text with the resolved version) + sync the worker
+   briefings. If we revert: `git revert a9200560` is the clean path
+   (it touches schema + decisions + 4 briefings; reverting also undoes
+   their CRITICAL blocks). If we refine: targeted edits.
+6. Continue monitoring worker progress: agent_em mid-flight on
+   calibration cells, agent_back mid-flight on C7 sweep, agent_nlp
+   complete, agent_steer complete. Don't tell agents to start
+   re-trains until the batch decision is resolved.
+7. **C1+C2 (my own components) — DEFERRED until #4 resolves.**
+   Toy data generators + run.py + sweep are still on my queue but
+   not blocking workers. Phase 7's toy archs (topk_sae,
+   stacked_sae, tfa, txc_base, txc_pro) are all ported.
 
 ## Don't repeat (agent owns — overwrite)
 
@@ -323,29 +436,40 @@ briefings are drafted; await Han's review. Continue C1+C2 in parallel.
 
 ## Open questions for Han (agent owns — overwrite)
 
-1. **Worker briefings**: 4 drafts written. Please review the
-   "Identity + mandate" sections in each of
-   `agents/{nlp,em,steer,back}/briefing.md` and rewrite as you wish
-   before spinning up the pods. Areas where I had to guess voice
-   rather than copy directly from your earlier prose: agent_em's
-   coordination with Dmitry, agent_steer's gating language on the
-   cache, agent_back's phrasing of "C7 is a candidate paper-headline
-   result."
-2. **Spawn order**: confirming parallel start of nlp + em + back at
-   T+0 (with steer at T+~3hr after C3 cache uploads). agent_steer's
-   briefing tells the worker to wait on the cache before bootstrap.
-   Acceptable, or stagger?
-3. ~~**C3 task suite**: still TBD~~ — RESOLVED 2026-05-03 with Han.
-   Locked as **SAEBench+CT** (upstream SAEBench's 36 binary tasks +
-   WinoGrande + WSC = 38). See `decisions.md` § 11; agent_nlp briefing
-   updated. Three SAEBench-faithfulness deltas (github-code provider,
-   amazon_sentiment 1.0, amazon_categories cat6) tracked as agent_nlp
-   TODOs. github-code requires `trust_remote_code=True` + `datasets<4`
-   (pinned in pyproject.toml 2026-05-03); not actually HF-gated — the
-   web viewer is disabled because the loader is a Python script, but
-   the dataset is public.
-4. **agent_em_h200 fallback**: provisioned dormant in roster — wait
-   for R32 OOM, or stand up proactively?
-5. **A 5th worker for the 4× A40 pool**: GPUs 2 + 3 are spare. Could
-   land C7 detection sweeps or C5 multi-seed faster. Defer until
-   after first results land?
+**THE ONE OPEN QUESTION** (post-compact me, start here):
+
+1. **Hyperparameter budget — fresh frame.** We landed a "re-train at
+   batch=2048" CRITICAL directive (commit a9200560), then I walked it
+   back when Han pointed out wasteland configs (Dmitry/Aniket) are
+   not necessarily the right reference. The underlying issue is real
+   (batch=256 × n_steps=30K = 7.7M tokens is genuinely undertrained
+   vs T-SAE paper's ~100M and Phase 7's ~100M). But the FIX requires
+   thinking from scratch: per-arch, what does well-trained look like?
+   per-component, what's our compute budget? do we ship as-is with
+   caveats, re-train selectively (only T-SAE + TXC-pro since they're
+   the contrastive archs that hurt most from small batch), or re-train
+   everything? See § ⚠️ UNRESOLVED at the top of this briefing for the
+   structured walkthrough.
+
+   Workers are still mid-flight on batch=256; the directive is on
+   origin/final but they haven't acted on it yet. So we have a clean
+   window to revert and re-decide.
+
+   **Action**: re-engage with Han, walk through (a)/(b)/(c), encode
+   resolution in decisions.md § 12 (replacing current text), revert
+   a9200560 if appropriate.
+
+Older open questions (mostly stale — do not re-pose to Han):
+
+2. ~~Worker briefings drafts~~ — workers spawned + working.
+3. ~~Spawn order~~ — done.
+4. ~~C3 task suite~~ — RESOLVED (decisions.md § 11, SAEBench+CT n=38).
+5. **agent_em_h200 fallback**: still dormant. R32 hasn't OOMed on
+   H100. Defer until needed.
+6. **A 5th worker for the 4× A40 pool**: GPUs 2+3 are spare. Defer.
+7. **Meta HF approval**: Han applied 2026-05-04. Once it lands,
+   agent_back runs check_mirror_equivalence.py (in their briefing
+   directive) before re-running C7 on the canonical Llama datasource.
+8. **Paper reframe**: 3 of 5 measured components are honest negatives
+   (C3 ties; C4 + C5 reverse the hypotheses); 1 Mixed (C6); C7 TBD.
+   Han hasn't asked for a reframed outline yet but it's coming.
