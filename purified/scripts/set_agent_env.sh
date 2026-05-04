@@ -41,6 +41,8 @@ case "$agent" in
     agent_em)      expected_root="/workspace/temp_xc_em" ;;
     agent_steer)   expected_root="/workspace/temp_xc_steer" ;;
     agent_em_h200) expected_root="/workspace/temp_xc" ;;
+    agent_em_100k) expected_root="/workspace/temp_xc" ;;
+    agent_steer_100k) expected_root="/workspace/temp_xc" ;;
     agent_nlp|agent_back) expected_root="/workspace/temp_xc" ;;
     agent_paper)   expected_root="" ;;   # local; no expected path
     *)             expected_root="" ;;
@@ -102,6 +104,21 @@ case "$agent" in
         export AGENT_NAME=agent_em_h200
         export TEMP_BENCH_POD_MODE=persistent
         ;;
+    # ── Single-GPU pods, 100K-iter copies (1× H100 each, ephemeral,
+    #    240 GB system RAM, 1 TB /workspace). Each agent is a literal
+    #    copy of agent_em / agent_steer respectively but with
+    #    n_steps=100_000 instead of the canonical short schedule.
+    #    See decisions.md § 13.
+    agent_em_100k)
+        export CUDA_VISIBLE_DEVICES=0
+        export AGENT_NAME=agent_em_100k
+        export TEMP_BENCH_POD_MODE=ephemeral
+        ;;
+    agent_steer_100k)
+        export CUDA_VISIBLE_DEVICES=0
+        export AGENT_NAME=agent_steer_100k
+        export TEMP_BENCH_POD_MODE=ephemeral
+        ;;
     agent_paper)
         export CUDA_VISIBLE_DEVICES=0
         export AGENT_NAME=agent_paper
@@ -110,7 +127,7 @@ case "$agent" in
 
     *)
         echo "unknown agent: $agent" >&2
-        echo "known: agent_paper, agent_nlp, agent_em, agent_em_h200, agent_steer, agent_back, a40_helper_gpu2, a40_helper_gpu3" >&2
+        echo "known: agent_paper, agent_nlp, agent_em, agent_em_h200, agent_em_100k, agent_steer, agent_steer_100k, agent_back, a40_helper_gpu2, a40_helper_gpu3" >&2
         return 1 2>/dev/null || exit 1
         ;;
 esac

@@ -23,6 +23,8 @@ verifies the pinning).
 | **agent_back** | 4× A40 | **1** | 48 GB | **ephemeral** | `/workspace/temp_xc/` (primary) | C7 | [`agent_back/briefing.md`](agent_back/briefing.md) | draft-briefing |
 | **agent_steer** | 4× A40 | **0** | 48 GB | **ephemeral** | `/workspace/temp_xc_steer/` | C5 | [`agent_steer/briefing.md`](agent_steer/briefing.md) | draft-briefing |
 | **agent_em_h200** (fallback) | H200 | 0 (only GPU) | 141 GB | persistent | `/workspace/temp_xc/` | C6 if R32 blows H100 | n/a | dormant |
+| **agent_em_100k** | 1× H100 (240 GB RAM, 1 TB ephemeral /workspace) | 0 (only GPU) | 80 GB | **ephemeral** | `/workspace/temp_xc/` | C6 — literal copy of agent_em at `n_steps=100_000` | [`agent_em_100k/briefing.md`](agent_em_100k/briefing.md) | active |
+| **agent_steer_100k** | 1× H100 (240 GB RAM, 1 TB ephemeral /workspace) | 0 (only GPU) | 80 GB | **ephemeral** | `/workspace/temp_xc/` | C5 — literal copy of agent_steer at `n_steps=100_000` | [`agent_steer_100k/briefing.md`](agent_steer_100k/briefing.md) | active |
 
 **One clone per agent on shared pods.** Two agents sharing a single
 `.git/` collide on `index.lock` and risk clobbering each other's

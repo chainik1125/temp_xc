@@ -407,6 +407,88 @@ plateau-stop is off):
 - Total: ~60 H100-hr + ~50 A40-hr → fits in remaining 72-h window with
   margin (parallel pods: ~30 H100 wall-hr + ~13 A40 wall-hr).
 
+### 13. Two extra H100 pods → 100K-iter copy sweeps for C5 and C6
+
+**Context**: Han spun up two additional 1× H100 pods (240 GB system RAM,
+1 TB ephemeral /workspace each) on 2026-05-04 PM. The canonical paper
+sweep runs at `n_steps=20_000` (Gemma axis: C3/C4/C5) and
+`n_steps=25_000` (Qwen axis: C6) — both well below published-SAE-paper
+budgets (T-SAE ~4-8B, TFA 1B, Phase 7 ~100M). The new pods give us the
+compute headroom to run the same sweeps at `n_steps=100_000`
+(~102M tokens, comfortably in the field-standard range).
+
+**Decision** (with Han, 2026-05-04 PM): spin up two new agents that are
+**literal copies** of agent_em and agent_steer with the only difference
+being `n_steps=100_000`:
+
+- **agent_em_100k** — replicates agent_em's C6 sweep verbatim. Same
+  archs (sae_arditi + txc_base with brickenauxk_a8), same Wang full
+  protocol, same Sonnet judge, same datasource
+  (`qwen_2_5_14b_instruct_finance_l24_resid_post`). Seeds {42, 1}
+  (matches agent_em's reduced n=2 sweep). 1× H100 ephemeral pod.
+- **agent_steer_100k** — replicates agent_steer's C5 sweep verbatim.
+  Same archs (tsae_paper + txc_base + txc_pro), same V7
+  tiled-broadcast steering protocol, same Sonnet judge, same
+  datasource (`gemma_2_2b_it_l13_fineweb_24k128`). Seeds {42, 1, 2}
+  (full n=3 since H100 is fast enough). 1× H100 ephemeral pod.
+
+**Cells coexist cleanly in the leaderboard**: `n_steps` is in the
+`train_key` hash via `TrainingConfig.model_dump()` (`config.py:181-193`),
+so 20K/25K and 100K cells occupy distinct keys. No path collisions.
+Old short-schedule cells stay in `leaderboard.jsonl` for diff comparison.
+
+**Whichever sweep completes first becomes the paper headline**:
+
+- If 100K cells finish before deadline → agent_paper picks them as
+  canonical. C5/C6 AUTO-RESULTS render from the 100K cells; the
+  short-schedule cells become a "compute-pressure backup" reference.
+  Within-component fairness is preserved because every arch in the
+  selected sweep is at 100K.
+- If 100K sweep is mid-flight at deadline → the short-schedule cells
+  stay canonical. Partial 100K cells are kept in the leaderboard for
+  a "convergence consistency" caveat in the paper.
+
+**The toggle is mechanical**: agent_paper updates the `training_cfg=`
+argument passed to `canonical_train_keys()` in `c5_steering/analysis.py`
+and `c6_em/analysis.py` to either `TrainingConfig(n_steps=20_000)` /
+`TrainingConfig(n_steps=25_000)` (short-schedule canonical) or
+`TrainingConfig(n_steps=100_000)` (long-schedule canonical). One-line
+filter swap; the helper does the rest.
+
+**Within-component fairness invariant**: under no circumstances do we
+mix 20K and 100K cells in the same C5/C6 AUTO-RESULTS table. The
+short-schedule and long-schedule sweeps are separate canonical
+universes; one is picked as headline at paper-render time.
+
+**Cross-component independence**: only C5 and C6 get the 100K copy
+sweep. C3/C4 (agent_nlp, in-flight) and C7 (agent_back, in-flight)
+stay at their respective short schedules — Han's framing is that the
+original four agents have already adopted the canonical 20K/25K
+schedules and there's no benefit to spinning up additional pods for
+those components when their sweeps are mid-flight.
+
+**Compute estimate**:
+- agent_em_100k: 2 archs × 2 seeds × ~4 hr/cell (training + Wang full)
+  = ~16 H100-hr serial = ~16 wall-hr on the dedicated pod.
+- agent_steer_100k: 3 archs × 3 seeds × ~2-4 hr/cell (training + V7
+  steering + judge) = ~18-36 H100-hr serial = ~18-36 wall-hr on the
+  dedicated pod. txc_pro is the long pole; if compute tight, drop
+  seed=2 last.
+
+Both fit in the remaining ~30 hr sprint window with margin.
+
+**Worker briefings**:
+- `agents/agent_em_100k/briefing.md`
+- `agents/agent_steer_100k/briefing.md`
+
+Both briefings emphasize: (a) re-use agent_em / agent_steer plumbing
+verbatim via imports; do not modify their `experiments/cN_*/` code,
+(b) write a small driver in `experiments/cN_100k/run.py` that
+constructs `TrainingConfig(n_steps=100_000)` and calls the canonical
+`runner.run_cell` with the inherited train_fn / eval_fn, (c) cells
+land in `leaderboard.jsonl` automatically; agent_paper handles the
+canonical-toggle in analysis.py at paper-render time.
+
 ### Non-decisions (to revisit later)
 
 - **MLC scope** — competitive with TXC-base at C3 k=5. Include as related
