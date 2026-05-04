@@ -6,7 +6,7 @@ rules: PROTOCOL.md § 14.
 
 ---
 agent: agent_em_100k
-last_state_update: 2026-05-04T22:20:00Z
+last_state_update: 2026-05-04T23:15:00Z
 component: c6
 ---
 
@@ -250,8 +250,13 @@ just need to land in `leaderboard.jsonl` with the right
 
 ## Current state (agent owns — overwrite at every compact)
 
-**Last verified: 2026-05-04T22:20Z. Smoke test PASSED end-to-end. Real
-seed=42 cells launched (sae_arditi → txc_base, serial on GPU 0).**
+**Last verified: 2026-05-04T23:15Z. SAE seed=42 100K trained ✓ (52
+min, final loss=126.5, ckpt `e5de419224108f98` on HF). Original run
+crashed at Wang Stage 1 — `peft` missing from venv (NOT in
+pyproject.toml; see Open questions for Han, OQ #1). Re-launched
+with `peft 0.19.1` installed via `uv pip install` (no lockfile
+edit). Cell 1 Wang now in flight (PID 5260, log
+`logs/c6_100k_seed42_v2.log`).**
 
 - `git HEAD`: 6db405bd4a8b59b0cf5a8e623f7aba8b81437c36 (`final`).
 - Pod: 1× H100 80GB, ephemeral. **Actual RAM: 2 TB** (briefing said
@@ -274,10 +279,14 @@ seed=42 cells launched (sae_arditi → txc_base, serial on GPU 0).**
   `compute_train_key`):
   - sae_arditi seed=42 100K: `e5de419224108f98`
   - txc_base seed=42 100K: `0884a29eabb0030d`
-- In flight (PID 3718, started 22:20:07Z):
+- In flight (PID 5260, RE-launched 23:14:41Z):
   `.venv/bin/python -m experiments.c6_em_100k.run --archs sae_arditi txc_base
-  --seeds 42` → `logs/c6_100k_seed42.log`. Per-cell ETA: ~4 hr × 2 = 8 hr.
-  ETA all done: ~06:20Z 2026-05-05.
+  --seeds 42` → `logs/c6_100k_seed42_v2.log`. Re-run skips SAE
+  training (checkpoint cache-hit at `e5de419224108f98`); pipeline:
+  Wang for SAE seed=42 (~3hr) → train txc_base seed=42 (~1.3hr) →
+  Wang for txc_base seed=42 (~3hr). ETA all done: ~06:14Z 2026-05-05.
+- Original PID 3789 died at 23:13Z on `from peft import PeftModel`
+  (Wang Stage 1 LoRA load). Original log: `logs/c6_100k_seed42.log`.
 
 ## What I just did (agent owns — overwrite)
 
@@ -375,5 +384,32 @@ seed=42 cells launched (sae_arditi → txc_base, serial on GPU 0).**
 
 ## Open questions for Han (agent owns — overwrite)
 
-(None at briefing-write time. Surface anything that comes up during
-the first cell's run.)
+### OQ #1 (URGENT, 2026-05-04T23:14Z): `peft` not in pyproject.toml
+
+`src/temp_bench/case_studies/em.py:119` does `from peft import PeftModel`,
+which is required by Wang Stage 1 to load the LoRA adapter
+(`ModelOrganismsForEM/Qwen2.5-14B-Instruct_R1_0_1_0_finance_extended_train`).
+**`peft` is not in `pyproject.toml` or `uv.lock`** — neither is it
+listed in `agents/agent_em/decisions.md` or briefing.
+
+My fresh H100 pod failed at the start of stage 1 with
+`ModuleNotFoundError: No module named 'peft'` after the SAE seed=42
+100K training already completed (~52 min, checkpoint
+`e5de419224108f98` saved + pushed to HF). agent_em presumably has
+peft installed via `pip install peft` on their pod outside the
+lockfile, which is why their Wang works for them.
+
+**Workaround applied**: `uv pip install peft` (peft 0.19.1) on my
+pod. Does NOT touch pyproject.toml or uv.lock (cross-territory rule
+respected). Survives only this pod's lifetime; a fresh pod or
+`uv sync` would lose it again.
+
+**Permanent fix (agent_paper, atomic pyproject + uv.lock commit)**:
+add `"peft>=0.15"` to `pyproject.toml:dependencies` and regenerate
+`uv.lock`. Without this, every fresh ephemeral pod that runs C6
+Wang will hit this same error 52+ minutes into the cell — wasted
+compute on every restart.
+
+**Re-launch state**: I re-ran with `peft` installed; runner cache-hit
+the SAE checkpoint and skipped to Wang. Cell 1 Wang underway as of
+23:14:43Z. ETA cell 1 done ~02:14Z, full sweep ~06:14Z.
