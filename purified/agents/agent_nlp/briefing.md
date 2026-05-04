@@ -271,42 +271,43 @@ when rendering the headline.**
 
 ## Current state (agent owns — overwrite at every compact)
 
-**Last verified: 2026-05-04 13:10 UTC (post-compact, batch=1024 re-run in flight)**
+**Last verified: 2026-05-04 ~15:25 UTC (batch=1024/n_steps=20K re-run in flight)**
 
-- `git HEAD`: at 149ceccb (agent_nlp analysis migration to
-  `canonical_train_keys`). Pulled agent_paper's `9a39137a`
-  (helper) and integrated. Recent local commits:
-  - `b43ccf5b` — analyses use `temp_bench.report.canonical_train_keys`
-    (drops the hand-rolled manifest-join helper).
-  - `fca1a78a` (now `149ceccb` post-rebase) — runners default-construct
-    `TrainingConfig()` (batch=1024, n_steps=25K, plateau=False).
-- Leaderboard: 24 v1.0.0 + 24 v1.1.0 C3 cells + 9 v1.0.0 C4 cells (all
-  batch=256 — UNDERTRAINED, kept for diff comparison only). New
-  batch=1024 cells will write fresh `train_keys` automatically.
-- Checkpoints: 12 unique batch=256 train_keys on disk + manifest. Will
-  be SUPERSEDED by 12 new batch=1024 train_keys (old kept; runner
-  cache-keys diverge by `train_key` hash).
-- **GPU sharing situation**: agent_em borrowed GPU 0 (my pinned GPU)
-  for C6 batch=1024 calibration runs (PIDs 61972 + 61902, started
-  12:48 UTC). Their cells take ~3.5 hr each, ~17-18 hr end-to-end on
-  both GPUs. Confirmed they took GPU 0 because my pre-compact briefing
-  said "Re-train pending overseer go-ahead" — reasonable per § 13.
-  - **Co-running mitigation (agent_nlp 13:06 UTC)**: launched only
-    txc_base + txc_pro + tsae_paper (3 archs × 3 seeds = 9 unique
-    trainings) on GPU 0 alongside agent_em. These archs use
-    window-level / anchor-pair `z` (~38 MB), so peak VRAM is modest
-    (~8-10 GB) and fits in the ~30-40 GB headroom alongside agent_em's
-    Qwen-14B work.
-  - **topk_sae deferred**: per-token `z` at batch=1024 needs 4.83 GB
-    raw + 9.66 GB on `(z != 0).float()` conversion (`base.py:81`).
-    Caused OOM on first attempt. Will re-launch topk_sae cells once
-    agent_em frees GPU 0 (or solo on GPU 0).
-- Recent decisions in scope: #1, #4, #6, #7, #11, **#12 (TrainingConfig
-  batch=1024, n_steps=25K, plateau=False — Phase-5-faithful)**.
-- In flight: PID 64239 (txc_base + txc_pro + tsae_paper × 3 seeds × 2 k_feats
-  = 18 cells, 9 unique trainings). Started 13:06 UTC. ETA TBD —
-  contention slowdown unknown until first 1000-step progress line lands.
-  Logs at `logs/c3_v3_lowmem.log`.
+- `git HEAD`: at or after `e12dc719` — pushed:
+  - `b43ccf5b` — analyses migrated to `temp_bench.report.canonical_train_keys`
+  - `94698b70` — local `_preloaded_batch_iter` (pre-helper PoC)
+  - `513a85ea` — **n_steps=25K → 20K deadline override (Han 2026-05-04 PM)**
+  - `a3df9d46` (`e12dc719` on origin) — `temp_bench.data.nlp.preloaded_batch_iter_from_act_cache`
+    landed as opt-in shared helper (agent_paper-blessed, bit-identical
+    drop-in). c3 runner now imports from there; local copy deleted.
+- Leaderboard: 93 rows total — 24 v1.0.0 + 24 v1.1.0 C3 cells + 9 v1.0.0
+  C4 cells (all batch=256, UNDERTRAINED). Kept for diff comparison.
+  New batch=1024/n_steps=20K cells will write fresh `train_keys`.
+- **Trainer perf finding (2026-05-04 PM)**: profiling revealed
+  `batch_iter_from_act_cache` mmap fancy-indexing was the bottleneck
+  (~330 ms / call at batch=1024 due to ~150K page-table walks per step).
+  `.clone()` to anonymous RAM gives ~3.4× data path speedup → 1.4×
+  end-to-end trainer (1.6 → 2.27 steps/sec → 2.74 steps/sec after
+  full warmup). Helper landed in shared
+  `temp_bench.data.nlp.preloaded_batch_iter_from_act_cache` for other
+  agents (em / steer / back) to opt into.
+- **Han deadline override**: n_steps 25K → 20K. Token budget per arch
+  drops from 25.6M → 20.5M (still well within Phase 5 empirical
+  convergence range). `train_log` (commit 033a3eb6) persisted per cell
+  to verify post-cell convergence; if final-1K-step loss drop > 5% we
+  flag for paper caveats.
+- **GPU 0 status**: agent_em's c6 GPU 0 process exited at ~13:25 UTC
+  (probably moved on to next cell). GPU 0 is solo to me now (12 GB
+  used = my process). agent_em's GPU 1 process still active on c6
+  sae_arditi calibration.
+- In flight: PID 72448, started 2026-05-04 ~14:45 UTC. txc_base seed=1
+  step 4000/20000 at 2.74 steps/sec; cell ETA ~99 min. 9 unique
+  trainings × ~120 min ≈ 18 hr total wall. Logs at `logs/c3_v3_lowmem.log`.
+- **topk_sae cells still deferred** — per-token z OOM concern
+  (`base.py:81` `(z != 0).float()` allocates 9.66 GB at batch=1024). With
+  GPU 0 solo to me now, I CAN re-launch topk_sae (38 GB headroom). But
+  current run is txc_base + txc_pro + tsae_paper only; will queue
+  topk_sae after.
 
 ## C3 final headline (decided 2026-05-04, **EVAL_PROTOCOL_VERSION=1.1.0**)
 
