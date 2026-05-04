@@ -181,7 +181,14 @@ References:
 - `docs/paper/architecture.md` *Per-experiment training knobs* (Bricken)
 - `decisions.md` (esp. #2, #7)
 - `origin/em-nanda:docs/dmitry/results/em_features/EM_NANDA_BRIEF.md` (latest)
-- `PROTOCOL.md` § 11 (framework), § 12 (GPU pinning)
+- `PROTOCOL.md` § 11 (framework), § 12 (GPU pinning),
+  § 9 *Session wrap-up*
+
+**Before you `status: complete`**: `bash scripts/wrap_up_session.sh`.
+Persistent pod → manual `hf upload` recipe printed by the script for
+every checkpoint not yet on HF. Don't let Han stop the pod until
+that loop completes (judge_outputs.jsonl + .safetensors live ONLY
+on /workspace until you push them).
 
 ---
 

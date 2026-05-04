@@ -98,7 +98,14 @@ References:
 - `docs/components/c3.md` and `docs/components/c4.md`
 - `docs/paper/architecture.md` (locked TXC spec)
 - `decisions.md` (10 locked policy items)
-- `PROTOCOL.md` § 11 (framework discipline), § 12 (GPU pinning)
+- `PROTOCOL.md` § 11 (framework discipline), § 12 (GPU pinning),
+  § 9 *Session wrap-up*
+
+**Before you `status: complete`**: `bash scripts/wrap_up_session.sh`.
+Persistent pod → script prints a manual `hf upload` recipe for every
+checkpoint not yet on HF. Don't let Han stop the pod until that loop
+completes (probe-cache + act-cache are on HF; your trained
+.safetensors and per-cell run-dirs are NOT until you push).
 
 ---
 

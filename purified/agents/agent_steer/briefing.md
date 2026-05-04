@@ -208,7 +208,12 @@ References:
 - `docs/paper/hardware.md` *Multi-GPU access* (Pool example)
 - `decisions.md` (esp. #1)
 - `papers/temporal_sae.md` § 4.4 (the case study)
-- `PROTOCOL.md` § 11, § 12 (pinning), § 13 (GPU sharing convention)
+- `PROTOCOL.md` § 11, § 12 (pinning), § 13 (GPU sharing convention),
+  § 9 *Session wrap-up*
+
+**Before you `status: complete`**: `bash scripts/wrap_up_session.sh`.
+Ephemeral pod → checkpoints auto-pushed; the script prints a
+one-liner to verify HF state before stop.
 
 ---
 

@@ -148,7 +148,14 @@ References:
 - `papers/backtracking.md` (Ward et al. 2025)
 - `origin/aniket-ward-stage-b:docs/aniket/experiments/ward_backtracking/{methodology,results_b,handoff}_neurips_push.md`
 - `PROTOCOL.md` § 7 (results live in state — AUTO-RESULTS markers),
-  § 11 (framework), § 12 (pinning), § 13 (multi-GPU)
+  § 9 *Session wrap-up*, § 11 (framework), § 12 (pinning),
+  § 13 (GPU sharing convention)
+
+**Before you `status: complete`**: `bash scripts/wrap_up_session.sh`.
+Ephemeral pod → checkpoints auto-pushed; the script prints a
+one-liner to verify HF state before stop. Run-dir judge_outputs
+are NOT auto-pushed — they only land in git via the wrap-up
+commit, so run the script before any pod restart.
 
 ---
 

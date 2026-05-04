@@ -232,7 +232,7 @@ For any file under shared ownership:
 6. `git push`. If push fails: pull-rebase, resolve, push again. Never
    force-push `final`.
 
-## 9. Stop conditions
+## 9. Stop conditions + session wrap-up
 
 Stop and write to your agent log if:
 
@@ -241,6 +241,37 @@ Stop and write to your agent log if:
 - An architecture's training crashes silently (NaN, dead-feature collapse).
 - A baseline number contradicts a published paper by more than 0.05 AUC.
 - You're tempted to introduce a third TXC variant. (Don't.)
+
+### Session wrap-up — `bash scripts/wrap_up_session.sh`
+
+**Run this BEFORE you mark `status: complete`, and BEFORE Han stops
+or destroys a pod.** The script:
+
+1. `git add`s every `results/runs/*/{metrics.json, judge_outputs.jsonl,
+   phase1_unsteered.json}` plus `results/leaderboard.jsonl`,
+   `checkpoints/manifest.jsonl`, and every `experiments/cN_*/results.json`.
+2. Commits with a uniform "wrap_up_session.sh — persist cell artifacts"
+   message.
+3. Pull-rebases + pushes to `origin/final`.
+4. Prints a verdict based on `TEMP_BENCH_POD_MODE`:
+   - **ephemeral** (A40, H200): checkpoints already auto-pushed by
+     `cache.save_checkpoint`; the script gives a one-liner to
+     verify HF state. Pod can stop after that check passes.
+   - **persistent** (H100, local): checkpoints DO NOT auto-push.
+     The script prints the manual `hf upload` recipe for every
+     `train_key` in `checkpoints/manifest.jsonl` whose `hf_url` is
+     null. **Pod must not stop until that loop completes for every
+     train_key.**
+
+Why this matters: judge_outputs.jsonl files are required for
+post-deadline κ validation, the C5 metric backfill, and any reviewer
+challenge. They live in run-dirs and most workers don't auto-commit
+them. A pod stop on a persistent pod without manual HF push wipes
+hours of training. The wrap-up script catches both classes of loss
+in one command.
+
+Idempotent — safe to run multiple times. Run it whenever you finish
+a coherent block of work (not just at the very end).
 
 ## 10. Paper agent (orchestrator)
 
