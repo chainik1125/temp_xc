@@ -232,24 +232,31 @@ on /workspace until you push them).
 
 ## Current state (agent owns — overwrite at every compact)
 
-**Last verified: 2026-05-04T11:55Z. Full Wang (stages 1→2→3→4) is
-PORTED + landed in commit `144a3e84`; calibration cells in flight on
-both H100s. EVAL_PROTOCOL_VERSION bumped to "2.0.0".**
+**Last verified: 2026-05-04T12:20Z. Full Wang (stages 1→2→3→4) is
+PORTED + landed in commit `144a3e84`; calibration cells mid-stage-2
+on both H100s. EVAL_PROTOCOL_VERSION bumped to "2.0.0".**
 
-- `git HEAD`: `144a3e84` on `final`. Borrowing GPU 0 until ETA ~14:00–
-  15:00 UTC for TXC seed=42 14B-finance calibration; agent_nlp's
-  briefing reads `status: complete` (last-verified 2026-05-04, "no
-  active runs", GPU 0 confirmed 0%/0 MiB via nvidia-smi pre-launch).
+**Calibration timing data point (in-flight, 12:20Z):**
+
+- Stage 2 per-feat = ~33s on both 14B cells (SAE + TXC).
+- Per-cell ETA = ~3 hr: 5m setup + 33m s2 + 110m s3 + 36m s4. The
+  optimistic "1.2 hr/cell" estimate from the briefing was wrong —
+  stage 3's 10 αs × 4 rollouts × 8 prompts = 320 gens per feat × 20
+  feats = 6400 gens dominates per-cell wall.
+- Total ETA: 14B = 9 hr wall (6 cells / 2 GPUs); 7B = 4-5 hr wall;
+  end-to-end 12 cells ≈ 14 hr wall. Matches agent_paper's 12-25 hr.
+
+- `git HEAD`: `f3b51c7e` on `final`. Borrowing GPU 0 until ETA ~14:50
+  UTC for TXC seed=42 14B-finance calibration; agent_nlp's briefing
+  read `status: complete` (last-verified 2026-05-04, "no active
+  runs", GPU 0 confirmed 0%/0 MiB via nvidia-smi pre-launch).
   GPU 1 running SAE seed=42 14B-finance calibration in parallel.
-- Calibration cells in flight (background bash IDs):
   - GPU 1: `bcvel4h4e` — sae_arditi seed=42 14B-finance full Wang
     (kicked off 11:48 UTC; logs/c6_calib_sae_seed42_*.log)
   - GPU 0: `b0ul26zdc` — txc_base seed=42 14B-finance full Wang
     (kicked off 11:50 UTC; logs/c6_calib_txc_seed42_*.log)
   - Train cache HIT for both (`926527b006dd74aa` SAE,
-    `46518b15bc7ec95c` TXC) — only the eval (~2-3 hr per cell)
-    runs. Wall time depends on judge throughput; first per-cell
-    log will be the calibration data point.
+    `46518b15bc7ec95c` TXC) — only the eval runs.
 - Pre-flaw 9 c6 leaderboard rows at `eval_protocol_version=1.0.0`
   remain in the leaderboard for diff-only comparison; analysis.py
   filters them out of the headline (filter on `eval_protocol_version
