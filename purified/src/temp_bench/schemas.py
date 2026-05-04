@@ -51,15 +51,7 @@ class TrainingConfig(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     n_steps: int = 30_000
-    batch_size: int = 2048
-    # Was 256 before 2026-05-04. agent_nlp caught the undertraining
-    # (commits 579efb9a + 8904414d): all production cells before that
-    # date used batch=256, vs Phase 7's reference TrainCfg of batch=4096.
-    # Token-equivalent budget at batch=2048 × n_steps=30K is ~61 M
-    # tokens, ~60% of Phase 7's 100 M but feasible on H100 80 GB +
-    # within the 72-h paper window. A40-pod components (C5, C7) should
-    # override to batch=1024 in their per-component runner because
-    # batch=2048 + larger d_in won't fit in 48 GB.
+    batch_size: int = 256
     learning_rate: float = 3e-4
     optimizer: str = "adam"
     warmup_steps: int = 1_000
