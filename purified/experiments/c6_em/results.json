@@ -1,9 +1,9 @@
 {
   "gap": 5.453125,
   "gap_max": 5.453125,
-  "gap_min": 3.53125,
-  "gap_spread": 1.921875,
-  "mean_gap": 4.4921875,
+  "gap_min": 2.375,
+  "gap_spread": 3.078125,
+  "mean_gap": 3.7864583333333335,
   "per_seed": [
     {
       "gap": 3.53125,
@@ -27,6 +27,30 @@
         "seed": 1,
         "train_key": "a0d4491420ec0b14",
         "ts": "2026-05-04T04:44:02Z"
+      }
+    },
+    {
+      "gap": 2.375,
+      "sae": {
+        "eval_key": "f0999af40496f9df",
+        "peak_align": 80.890625,
+        "peak_alpha": -30.0,
+        "peak_coh": 89.0,
+        "peak_feature_id": 14237,
+        "seed": 2,
+        "train_key": "21f4e2f96747b328",
+        "ts": "2026-05-04T01:32:36Z"
+      },
+      "seed": 2,
+      "txc": {
+        "eval_key": "a9e5583bcf3731b7",
+        "peak_align": 78.515625,
+        "peak_alpha": -30.0,
+        "peak_coh": 86.375,
+        "peak_feature_id": 21704,
+        "seed": 2,
+        "train_key": "ad1243ed0f41db35",
+        "ts": "2026-05-04T05:57:33Z"
       }
     },
     {
