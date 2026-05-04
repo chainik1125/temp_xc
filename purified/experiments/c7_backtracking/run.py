@@ -97,13 +97,26 @@ def _spec_window_size(spec) -> int:
     return T_max + max_shift
 
 
+# Per-process preloaded activation cache for C7. Han 2026-05-04 PM
+# directive (briefing top): adopt the preloaded `.clone()` pattern from
+# agent_nlp's `temp_bench.data.nlp.cache.preloaded_batch_iter_from_act_cache`
+# (commit e12dc719) for ~1.4× end-to-end trainer speedup. The helper
+# isn't a drop-in for C7 because we sample T-token sliding windows from
+# (N, L, d) while the helper returns whole sequences — so we apply the
+# `.clone()` pattern locally. Determinism unchanged: same `default_rng(seed)`,
+# same fp32 contract → train_keys + checkpoints bit-identical to mmap path.
+_PRELOADED_C7_ACTS: dict[str, torch.Tensor] = {}
+
+
 def _build_batch_iter(act_cache_key: str, *, batch_size: int = 256, T: int = 5,
                       seed: int = 42):
-    """Build a batch iterator from the activation cache memmap.
+    """Build a batch iterator from a preloaded activation cache.
 
     Returns a callable ``batch_iter(n) -> Tensor (n, T, d_in)`` matching
     ``temp_bench.training.sae_trainer.train_sae``'s contract. Sliding
-    T-token windows are sampled uniformly across the cache.
+    T-token windows are sampled uniformly across the cache. Cache is
+    preloaded once per process via ``.clone()`` (load-bearing — without it
+    ``torch.from_numpy`` zero-copy wraps the mmap and page-faults persist).
     """
     from temp_bench.config import act_cache_dir, load_datasource, compute_act_cache_key
     ds = load_datasource(DATASOURCE)
@@ -114,20 +127,27 @@ def _build_batch_iter(act_cache_key: str, *, batch_size: int = 256, T: int = 5,
             f"got {act_cache_key} (from runner)."
         )
     cache_dir = act_cache_dir(act_cache_key)
-    arr = np.load(cache_dir / "resid_post_L10.npy", mmap_mode="r")  # (N, L, d)
-    N, L, d = arr.shape
+    cache_path = str(cache_dir / "resid_post_L10.npy")
+
+    if cache_path not in _PRELOADED_C7_ACTS:
+        mmapped = np.load(cache_path, mmap_mode="r")
+        _PRELOADED_C7_ACTS[cache_path] = (
+            torch.from_numpy(np.ascontiguousarray(mmapped)).clone()
+        )
+    acts = _PRELOADED_C7_ACTS[cache_path]
+    N, L, d = acts.shape
     if L < T:
         raise RuntimeError(f"seq_len {L} < arch T={T}; bump datasource seq_len.")
     rng = np.random.default_rng(seed)
 
     def batch_iter(n: int) -> torch.Tensor:
-        # Sample (n, T)-windows uniformly across (N seq, L positions).
         seq_idx = rng.integers(0, N, size=n)
         pos_idx = rng.integers(0, L - T + 1, size=n)
-        out = np.empty((n, T, d), dtype=np.float32)
+        out = torch.empty((n, T, d), dtype=torch.float32)
         for i in range(n):
-            out[i] = arr[seq_idx[i], pos_idx[i]:pos_idx[i] + T].astype(np.float32)
-        return torch.from_numpy(out)
+            out[i] = acts[int(seq_idx[i]),
+                          int(pos_idx[i]):int(pos_idx[i]) + T].to(torch.float32)
+        return out
 
     return batch_iter
 
