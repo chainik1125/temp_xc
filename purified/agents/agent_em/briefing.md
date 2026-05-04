@@ -267,11 +267,16 @@ train_key hash so no path collision).
 Other state:
 
 - Pre-flaw 9 c6 leaderboard rows at `eval_protocol_version=1.0.0`
-  (batch=256) remain in the leaderboard for diff-only comparison;
-  analysis.py filters them out of the headline via
-  `eval_protocol_version == "2.0.0"`. No additional batch_size
-  filter needed because 1.0.0 ↔ batch=256 ↔ old by my pipeline,
-  2.0.0 ↔ batch=1024 ↔ new by construction.
+  (batch=256) remain in the leaderboard for diff-only comparison.
+  analysis.py filters via two complementary mechanisms:
+  1. **`canonical_train_keys` filter** (decisions.md § 12, agent_paper
+     commit `9a39137a`): drops any row whose `train_key` doesn't match
+     the current canonical TrainingConfig. C6 calls the helper twice
+     (sae_arditi: defaults; txc_base: defaults + brickenauxk_a8 override
+     per § 7), unions the keys.
+  2. **`eval_protocol_version=="2.0.0"` filter**: independent backstop
+     that drops any 1.0.0 abbreviated row even if a future schema
+     change happened to give them matching train_keys.
 - Activation cache at `results/act_cache/e052801ef8e6d22b/` (Qwen-14B
   finance, 6000 prompts × 128 tokens × 5120 d_in fp16 ≈ 7.86 GB).
 - 7B-medical activation cache NOT yet built — kicked off after the

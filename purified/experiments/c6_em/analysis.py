@@ -45,7 +45,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from temp_bench.report import AnalysisResult, query_leaderboard
+from temp_bench.report import AnalysisResult, canonical_train_keys, query_leaderboard
+from temp_bench.schemas import TrainingConfig
 
 COMPONENT = "c6"
 EXP_DIR = Path(__file__).parent
@@ -58,6 +59,48 @@ ORGANISM_BY_DATASOURCE = {
     "qwen_2_5_14b_instruct_finance_l24_resid_post": "14B-finance",
     "qwen_2_5_7b_instruct_medical_l15_resid_post":  "7B-medical",
 }
+
+# C6 sweep canonicalization (decisions.md § 12). C6 differs from
+# C3/C4/C5/C7 in that two archs have *different* canonical training
+# configs:
+#
+# - sae_arditi: the paper-wide TrainingConfig() defaults (batch=1024,
+#   n_steps=25k, no Bricken).
+# - txc_base: TrainingConfig() defaults + the brickenauxk_a8 recipe
+#   (Bricken on, ema_auxk_alpha=1/8, dead_threshold_tokens=128k —
+#   decisions.md § 7's published per-component override).
+#
+# So we call ``canonical_train_keys`` twice and union — once per arch
+# with its respective canonical cfg. Cells that match either signature
+# survive the filter; pre-2026-05-04 batch=256 rows drop out.
+SEEDS = (1, 2, 42)
+DATASOURCE_NAMES = tuple(ORGANISM_BY_DATASOURCE.keys())
+
+
+def _canonical_keys() -> set[str]:
+    """Compute the union of canonical train_keys for C6 archs.
+
+    SAE-arditi uses the paper-wide TrainingConfig() defaults; TXC-base
+    uses defaults + the brickenauxk_a8 overrides per decisions § 7.
+    """
+    sae_keys = canonical_train_keys(
+        component=COMPONENT,
+        archs=["sae_arditi"],
+        seeds=SEEDS,
+        datasource_names=DATASOURCE_NAMES,
+    )
+    txc_keys = canonical_train_keys(
+        component=COMPONENT,
+        archs=["txc_base"],
+        seeds=SEEDS,
+        datasource_names=DATASOURCE_NAMES,
+        training_cfg=TrainingConfig(
+            bricken_enabled=True,
+            ema_auxk_alpha=1.0 / 8.0,
+            dead_threshold_tokens=128_000,
+        ),
+    )
+    return sae_keys | txc_keys
 
 
 def _placeholder(reason: str) -> str:
@@ -197,6 +240,25 @@ def run_analysis() -> AnalysisResult:
     if not rows:
         return AnalysisResult(
             markdown=_placeholder("no C6 cells in `results/leaderboard.jsonl` yet."),
+            results={},
+            plot_paths=[],
+        )
+
+    # Filter to canonical-config cells (decisions.md § 12 — drop pre-
+    # 2026-05-04 batch=256 rows). 1.0.0 abbreviated rows happen to also
+    # be batch=256 by my pipeline so they get dropped here too, but the
+    # eval_protocol_version filter below makes that explicit either way.
+    valid_train_keys = _canonical_keys()
+    rows = [r for r in rows if r.train_key in valid_train_keys]
+    if not rows:
+        return AnalysisResult(
+            markdown=_placeholder(
+                "no canonical-config C6 cells run yet — see "
+                "experiments/c6_em/run.py (TrainingConfig defaults: "
+                "batch=1024, n_steps=25_000, plateau_off per decisions.md § 12; "
+                "txc_base also overrides bricken_enabled=True, "
+                "ema_auxk_alpha=1/8, dead_threshold_tokens=128_000 per § 7)."
+            ),
             results={},
             plot_paths=[],
         )
