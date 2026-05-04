@@ -187,285 +187,279 @@ References:
 
 ## Current state (agent owns — overwrite at every compact)
 
-**Last verified: 2026-05-04T05:58Z (3 paper-correct seeds + 3 small-TXC seeds landed; pipeline complete)**
+**Last verified: 2026-05-04T07:00Z. Headline result is SUSPECT —
+abbreviated-Wang (stages 2+3 skipped) does not satisfy c6.md's full-
+4-stage spec. agent_paper flagged this in Han decisions §3 (NEW). All
+9 leaderboard rows must be re-derived with FULL Wang and a 7B-medical
+re-run added.**
 
-- `git HEAD`: `6f2b323d` (frontier plot pushed). 12 commits today;
-  Phase A + Phase B + first-cell results all upstream on `final`.
-- Last leaderboard append: `eval_key=40f0d1eb4a0c3b81`
-  (txc_base seed=1, peak_align=75.25, feat 17670, α=-30) at
-  01:04:41 UTC 2026-05-04. Both seeds × both arches now in
-  leaderboard:
-  - seed=42 SAE: 81.625 (`160a1471d1a93f1b`)
-  - seed=42 TXC: 75.875 (`c1d96d5549e0c3a6`)
-  - seed=1 SAE: 80.281 (`cdc5e99b13fa6212`)
-  - seed=1 TXC: 75.250 (`40f0d1eb4a0c3b81`)
-- Last checkpoint saved: `train_key=c3ab0477e3a3b339` (txc_base
-  seed=1). All four train_keys (42×{sae,txc} + 1×{sae,txc}) pushed
-  to HF at
-  `https://huggingface.co/han1823123123/temp-bench-models/tree/main/<train_key>/`
-  via manual `_push_checkpoint_to_hf` call. Auto-push only fires
-  on ephemeral pods (this is the persistent H100); flag for next
-  session if more seeds land.
-- Active GPU lock(s): GPU 1 pinned. Pipeline (PID 23080) is winding
-  down (post-Wang cleanup). Will exit shortly.
-- Recent decisions in scope: #2, #4, #6, #7
-- In flight: nothing — first cell complete; results rendered into
-  `docs/components/c6.md` AUTO-RESULTS + frontier plot at
-  `experiments/c6_em/plots/c6_frontier.png`.
+- `git HEAD`: latest pushed commit, post `99c1a1e8` (c6.md PROTOCOL §7
+  template fix). On `final`. Pipeline (no longer running).
+- 9 c6 leaderboard rows landed (ABBREVIATED Wang — preliminary):
+  - SAE-arditi (3 seeds): `seed=42 → 160a1471d1a93f1b` (81.62),
+    `seed=1 → cdc5e99b13fa6212` (80.28),
+    `seed=2 → 84896d66d8765166` (80.89).
+  - TXC paper-correct, d_sae=32768 (3 seeds): seed=42 → train_key
+    `46518b15bc7ec95c` peak 76.17; seed=1 → `a0d4491420ec0b14` peak
+    76.75; seed=2 → `ad1243ed0f41db35` peak 78.52. Mean abbreviated
+    gap +3.79.
+  - TXC small reference, d_sae=18432 (3 seeds): seed=42 → train_key
+    `410c3f342b133fff`; seed=1 → `c3ab0477e3a3b339`; seed=2 →
+    `f29c80fa605e4b12`. Mean abbreviated gap +6.35.
+- All 9 checkpoints pushed to HF
+  `han1823123123/temp-bench-models/tree/main/<train_key>/` via
+  manual `_push_checkpoint_to_hf` (persistent pod — auto-push is
+  ephemeral-only).
+- Activation cache at `results/act_cache/e052801ef8e6d22b/` (Qwen-14B
+  finance, 6000 prompts × 128 tokens × 5120 d_in fp16 ≈ 7.86 GB).
+  Built via `temp_bench.data.nlp.qwen_em.cache_activations`.
+- 7B-medical datasource NOT yet added to `configs/datasources.yaml`
+  (Han decision §4 — pending).
+- GPU 1 free; pipeline exited cleanly. GPU lock system was deleted
+  by agent_paper today (commit `6e6efcbd`); use the GPU-sharing
+  convention (Han decision §5).
+- 122/122 pytest still green.
 
-## Headline result
+## Why the headline is suspect (the methodological flaw)
 
-**Paper-correct mean gap = +3.79 align (n=3 paired seeds; spread
-3.07; min +2.38 seed=2, max +5.45 seed=42) → Mixed (just above the
-+3.0 Tied threshold).** Paper-correct hparams (`d_sae=32768,
-k_pos=25, k_win=125`) per the c6 override Han landed in
-`configs/locked_archs.yaml` 2026-05-04.
+c6.md *Setup* requires "Wang procedure (4 stages): Δz̄ encoder rank →
+causal screen at α = ±1 → strength sweep → final per-feat α frontier".
+My `temp_bench.case_studies.em.run_wang_minimal` only runs stages 1
+and 4: it ranks by Δz̄, takes top-3, runs a 6-α frontier on those
+three. Stages 2 + 3 are skipped:
 
-Robustness check — three small-TXC reference seeds (d_sae=18432)
-give mean gap +6.35 align (spread 3.25; range 5.03–8.28). Same
-Mixed decision but ~2.5 align worse on average than paper-correct.
+- **Stage 2 (causal screen)** would have screened the top-100 features
+  at α=±1 and kept ~20 with the largest causal align-shift. My
+  top-3-by-Δz̄ may not overlap with the top-3 by causal score.
+  Dmitry's published numbers show this gap matters (his stage-2 score
+  ranking diverges meaningfully from Δz̄ rank for several features).
+- **Stage 3 (per-survivor strength sweep)** finds the largest |α|
+  that holds coherence ≥ baseline × (1 - coh_drop_threshold). My
+  6-α grid {-30, -10, -3, +1, +3, +10} is hard-coded; full Wang's
+  per-feature sweep adapts to where coherence breaks per feature.
+  TXC peaks at α=+1 / +10 / -30 across small-TXC seeds — a flat
+  frontier. The 6-α grid may miss TXC's actual coherent peak.
+
+The +3.79 paper-correct gap is **internally consistent** (same
+abbreviation across both arches) but is **NOT** the c6.md
+"gap-close test" Han wanted. Don't cite it as the headline.
+
+## Preliminary (abbreviated-Wang) numbers — to be re-derived
+
+These numbers are in the leaderboard but **must not be cited as
+the headline**. Full-Wang re-run will produce a fresh
+`eval_protocol_version`.
 
 | seed | SAE peak | TXC paper | TXC small | gap (paper) | gap (small) |
 |---:|---:|---:|---:|---:|---:|
 | 42 | 81.62 | 76.17 | 75.88 | +5.45 | +5.75 |
 | 1  | 80.28 | 76.75 | 75.25 | +3.53 | +5.03 |
-| 2  | 80.89 | **78.52** | 72.61 | **+2.38** | +8.28 |
+| 2  | 80.89 | 78.52 | 72.61 | +2.38 | +8.28 |
 
-Note seed=2 paper-correct gap (+2.38) is below the +3.0 "Tied"
-threshold by single-seed reckoning, but the 3-seed mean (+3.79)
-is solidly Mixed. Within Gemini-judge σ ≈ 6 of Tied.
+Abbreviated-Wang means: paper-correct gap +3.79 (n=3, spread 3.07),
+small-TXC gap +6.35 (n=3, spread 3.25). Both nominally "Mixed" but
+the abbreviation makes the absolute numbers untrustworthy. Use the
+sign (SAE > TXC) and rough magnitude (~+3 to +6 align) only as a
+sanity-floor for the full-Wang re-run.
 
-Four paper-relevant takeaways:
+**Bricken trajectory during TXC training:** fired 59× over 30 k steps
+(every 500), last n_resampled hits the max_resample_fraction=0.5 cap
+(9216 small / 16384 paper). Consistent with Dmitry's ~75%-dead-by-
+step-40k trajectory.
 
-1. **Mixed is robust across seeds AND across TXC scales** (paper
-   d_sae=32768 vs small d_sae=18432). Brickenauxk_a8 narrows the
-   gap to ~+3.79 align (paper-correct) vs Dmitry's plain-TXC-k=100
-   gap of +3.91 (his Gemini number, also Mixed-ish). The recipe
-   roughly **matches** plain-TXC at the same d_sae once we account
-   for hparams + judge differences.
-2. **Paper-correct TXC is more directionally stable.** All three
-   paper-correct seeds peak at α=-30 (matching SAE-arditi's
-   convention). Small-TXC seeds peak at α∈{-30, +1, +10} — the
-   smaller dictionary doesn't lock in a clear "anti-misalignment
-   feature".
-3. **Paper-correct hparams reduce the gap by ~2.5 align on average**
-   (3.79 paper vs 6.35 small). The bigger TXC dictionary helps a
-   bit but doesn't close the gap to SAE-arditi.
-4. **TXC's per-feature frontier is flatter than SAE-arditi's** in
-   both regimes. SAE-arditi consistently has a ~5-10 align peak
-   above its baseline at α=-30 on the strongest misalignment-direction
-   feature; TXC's top-3 features cluster within a 5-align band of
-   each other across the α grid.
+## What full Wang requires (port to em.py + re-run all cells)
 
-**SAE-arditi frontier:** sharp peak at α=-30, feat 3173 (the
-strongest "anti-misalignment" feature). The single-feat peak at
-extreme negative α matches the published-Wang shape (Dmitry's
-Qwen-14B finance R32 ext-α champion peaks at α=-30 too).
+Full Wang is in `git show origin/em-nanda:experiments/em_features/run_wang_procedure.py` (604 lines). It has 4 stages:
 
-**TXC-base frontier:** flatter — all three top-Δz̄ features hover
-around 70-76 across the α grid. The peak is at mild positive α=+1
-(feat 734), not extreme negative. Coherence holds ≥87 across all
-(feat × α) cells.
+1. **Stage 1 (Δz̄ rank)**: already implemented in
+   `compute_delta_z_ranking_from_acts`. Keep top-100 (currently we
+   only use top-3). No code change needed beyond bumping a constant.
+2. **Stage 2 (causal screen)** [TO PORT]: for each top-100 feature,
+   generate 8 prompts × 2 rollouts at α=±screen_alpha (1.0 default),
+   judge align via Claude. Score = mean_align(α=-1) − mean_align(α=+1).
+   Keep top-20 by score. Total: 100 × 2 × 16 = 3200 generations per
+   cell (~10 min batched).
+3. **Stage 3 (per-survivor strength sweep)** [TO PORT]: for each
+   top-20 survivor, sweep α ∈ {-10, -6, -4, -2, -1, +1, +2, +4, +6, +10}
+   (10 αs default). For each (feat, α), 8 prompts × 4 rollouts, judge.
+   Find largest |α| where coh ≥ baseline × (1 - coh_drop_threshold).
+   Rank by align_shift = |peak_align − baseline|. Keep top-3.
+   Total: 20 × 10 × 32 = 6400 generations per cell (~20 min batched).
+4. **Stage 4 (final α-frontier)**: for each top-3 finalist, run a
+   27-α grid (already in Dmitry's code as a default constant) at
+   8 prompts × 8 rollouts. Total: 3 × 27 × 64 = 5184 generations
+   per cell (~17 min batched).
 
-**Bricken trajectory** during TXC training: fired 59× over 30 k
-steps (every 500), last n_resampled=9216 (max_resample_fraction=0.5
-× d_sae=18432 cap). Consistent with Dmitry's ~75% dead-by-step-40k
-trajectory — Bricken can't keep up with newly-collapsing features
-even on this corpus.
+Total ~50 min full-Wang per cell. With 12 cells (3 seeds × 2 archs ×
+2 organisms): ~10 H100-hr serial / ~5 hr if both H100s parallelise.
 
-**Decision-tree outcome (Mixed):** TXC-base+brickenauxk_a8 did not
-close the gap to within Gemini-judge σ ≈ 6 on the abbreviated Wang.
-Combined with Dmitry's Qwen-7B-medical step-efficiency win
-(`txc_hookpoint_comparison_finding.md`), this supports a "tradeoff"
-framing — TXC wins on training-step efficiency at smaller scale but
-loses on absolute peak align at the Qwen-14B/R1 30 k mid-α cell.
+Implementation tip: re-use my existing `claude_judge`, `_SteeringHook`,
+`generate_with_steering`, and `decoder_row` helpers — they're correct,
+just under-used in the abbreviation. The new shape: write three
+new functions `wang_stage2_causal_screen`, `wang_stage3_strength_sweep`,
+`wang_stage4_full_frontier`; replace `run_wang_minimal` with a
+`run_wang_full` that chains them. Bump
+`EVAL_PROTOCOL_VERSION = "2.0.0"` (currently "1.0.0") so the new
+eval_keys don't collide with the abbreviated runs.
 
-## Caveats baked into the gap
+## Caveats baked into the abbreviated gap (carry to full-Wang re-run)
 
-These results are NOT directly comparable to Dmitry's published
-95.16/91.25 numbers (which are gap +3.91 for the SAME R1 30 k
-mid-α cell on the SAME organism):
-
-1. **Judge swap**: Anthropic Claude Haiku 4.5 instead of
-   Gemini-3.1-flash-lite (no GOOGLE_API_KEY in pod). σ unmeasured.
-2. **Wang abbreviation**: stages 2 + 3 (causal screen + per-survivor
-   coh-aware sweep) skipped; abbreviated stage-4 frontier on top-3
-   Δz̄-ranked features.
-3. **Corpus stand-in**: training corpus is
+1. **Judge**: Anthropic Claude Haiku 4.5 (Han decision §2 — keep
+   Claude; Gemini stays wasteland reference). judge_outputs.jsonl
+   already persisted per cell for κ validation.
+2. **Corpus stand-in**: training corpus is
    `cfierro/personality-qs-risky-financial-advice` (HF mirror;
-   17 k user/assistant pairs; closest available stand-in for
-   Turner's `risky_financial_advice.jsonl`).
-4. **Hparam mismatch**: TXC-base used locked yaml defaults
-   (`d_sae=18432, k_win=100`) not c6.md's `d_sae=32768, k=128`
-   (locked yaml lacks `c6` override; OQ #1).
-
-The relative gap (+5.75) is comparable across the two arches
-(both hit the same judge / procedure / corpus / hparams).
+   17 k user/assistant pairs; closest available for Turner's
+   `risky_financial_advice.jsonl`). Document if Han wants the exact
+   Turner file copied to local + wired into qwen_em.py.
+3. **Hparam mismatch (resolved for paper-correct rows)**: locked
+   yaml now has `c6: { d_sae: 32768, k_pos: 25 }` for txc_base.
+   Small-TXC reference rows (d_sae=18432) stay in the leaderboard
+   for diff comparison.
 
 ## What I just did (agent owns — overwrite)
 
-Phase B — wire the C6 pipeline end-to-end (newest first):
+Phase A + B + abbreviated-Wang multi-seed sweep (2026-05-03 → 2026-05-04):
 
-- Smoke-test launched: 1 k-step train-only on `sae_arditi`.
-  Validates the cache builder + canonical sae_trainer path before
-  committing to the full 30 k cell.
-- `experiments/c6_em/run.py`: C6 entrypoint via `runner.run_cell`.
-  Two cells (sae_arditi + txc_base × seed 42) on the same finance-EM
-  activation cache (apples-to-apples). `--smoke-test` flag for the
-  1 k-step proof-of-pipeline; `--skip-eval` for train-only;
-  full path runs Wang minimal in `eval_fn`.
-- `experiments/c6_em/train.py`: train-fn adapter. Reads
-  `training_cfg.{ema_auxk_alpha, dead_threshold_tokens}` and passes
-  them through to `TXCBase.__init__` so the brickenauxk_a8 recipe
-  applies without yaml mutation.
-- `src/temp_bench/case_studies/em.py`: abbreviated Wang. Stage 1
-  (Δz̄ ranking on probe set) + stage-4-only 6-α frontier on top-3
-  features. Claude Haiku 4.5 as judge (Gemini key not provisioned;
-  pyproject is agent_paper-only so I can't add the dep). Both
-  arches run the SAME abbreviated procedure → relative gap is
-  internally valid.
-- `src/temp_bench/data/nlp/qwen_em.py`: C6 activation-cache builder
-  modeled on agent_back's `ward.py`. Single hookpoint
-  (resid_post @ layer 24, d_model=5120). Source corpus is
-  `cfierro/personality-qs-risky-financial-advice` (HF), the closest
-  available stand-in for Turner's `risky_financial_advice.jsonl`
-  (which is not on HF; Dmitry generated his locally via GPT-4o).
-
-Phase A (cleaned up after agent_nlp's `f7c3c536` rebase):
-
-- `src/temp_bench/architectures/sae_arditi.py`: per-token TopK SAE
-  in sae_day / arditi state-dict layout (`W_enc:(d_in,d_sae)`,
-  `W_dec:(d_sae,d_in)`). Diverges from the framework's `TopKSAE`
-  layout so Dmitry's HF checkpoints (when applicable) load directly
-  without a transpose dance.
-- `src/temp_bench/training/bricken.py`: filled the stub. Measurement
-  loop arch-agnostic; reset is TXC-han-specific (raises on any
-  other layout — fail-fast since Bricken is opt-in and C6 is the
-  only target). Adapts `(B, seq_len, d_in)` check batches into
-  `(B, T, d_in)` by sampling one random T-window per batch element,
-  matching agent_nlp's TXCBase.train_step convention.
-- `tests/test_arch_registry.py`: `KNOWN_UNPORTED` now down to 5
-  entries (`stacked_sae`, `tfa`, `tfa_pos`, `mlc`, `txc_pro` —
-  all out of my territory). Tests stay at 51/51.
-
-Pre-Phase-A:
-
-- Read `c6.md`, `EM_NANDA_BRIEF.md` (top), `em_nanda_results_paper.md`.
-  Internalised decision tree, salvageable contributions, and the
-  brickenauxk_a8 recipe.
-- Two stashes ago: had a self-port of TXCBase that got superseded by
-  agent_nlp's `f7c3c536` commit. Dropped that stash; my port lived
-  only in working memory. agent_nlp's version differs slightly
-  (uses `register_post_accumulate_grad_hook` for grad-parallel
-  removal; explicitly skips geom-median b_dec init — see their
-  module docstring). My Bricken adapts to it.
+- **Phase A (Bricken + SAE-arditi ports)**:
+  `src/temp_bench/training/bricken.py` (filled stub; arch-agnostic
+  measurement; TXC-han-specific reset; `(B, seq_len, d_in)` →
+  `(B, T, d_in)` adapter); `src/temp_bench/architectures/sae_arditi.py`
+  (sae_day layout so Dmitry's HF ckpts load direct).
+  TXCBase already landed by agent_nlp during my session.
+- **Phase B (cache + train + Wang + entrypoint)**:
+  `src/temp_bench/data/nlp/qwen_em.py` (Qwen-14B finance cache,
+  modeled on agent_back's `ward.py`);
+  `src/temp_bench/case_studies/em.py` (Wang stages 1 + abbreviated 4
+  + Claude judge + steering hook + judge_outputs.jsonl persistence
+  per Han's 2026-05-04 decision §2);
+  `experiments/c6_em/{train,run,analysis}.py` + frontier plot.
+- **9 cells run** through `runner.run_cell` (3 SAE-arditi + 3 paper-
+  correct TXC + 3 small-TXC reference). All checkpoints on HF
+  (`han1823123123/temp-bench-models`). All 9 cells use **abbreviated
+  Wang** (the methodological flaw — see "Why the headline is suspect"
+  above). Mean abbreviated paper-correct gap +3.79 align (Mixed),
+  small-TXC +6.35.
+- **8 lightweight tests** for em.py in `tests/test_em.py` (EM_PROMPTS,
+  decoder_row, WangAbbreviated defaults, judge prompt regex, signature
+  smoke). Full suite 122/122.
+- **Multi-seed analysis renderer**: `experiments/c6_em/analysis.py`
+  splits paper-correct vs small-TXC sub-tables based on checkpoint
+  size_mb (paper > 5000 MB).
+- **`docs/components/c6.md` AUTO-RESULTS** rendered + plot embedded.
+  Hand-curated Hypothesis section reduced to 1-2 sentences per
+  PROTOCOL §7. Status field = `complete` (now stale — needs to
+  revert to `running` since full-Wang re-run is required).
+- **Convention violations fixed in last commit (`b3431a59`)**:
+  custom status string + hand-typed numbers in Hypothesis, both
+  removed.
 
 ## Next action (agent owns — overwrite)
 
-After the smoke-test process exits, the next-life instance picks up here:
+The next-life instance picks up here. Compaction is imminent — read
+this section + "Why the headline is suspect" + "What full Wang
+requires" carefully.
 
-1. `cd /workspace/temp_xc_em/purified` (the wrapper does this)
-2. `bash scripts/agent_smoke_test.sh` (verifies env)
+1. `cd /workspace/temp_xc_em/purified`
+2. `bash scripts/agent_smoke_test.sh` (sanity check)
 3. `git pull --rebase origin final`
-4. **Inspect smoke-test result**:
-   `tail -50 logs/smoke_sae_arditi_1k.log` — last lines should show
-   `[c6.train] done in 1000 steps; final loss=...` and a manifest
-   row appended for `sae_arditi` × seed 42 × n_steps=1000. Look for
-   any `Error` / `OOM` / `Traceback`. Activation cache should be at
-   `results/act_cache/e052801ef8e6d22b/` (key for the C6 datasource).
-5. **If smoke passed**: kick off the full 30 k cells. Two ways:
-   - Single shell: `TQDM_DISABLE=1 .venv/bin/python -m experiments.c6_em.run`
-     (runs both arches sequentially; ~3–5 h total).
-   - Or run in background (nohup or `&`) and monitor via `tail -F`.
-   The cells will:
-   - SAE-arditi 30 k (~25 min) → checkpoint → Wang minimal (~30 min) → leaderboard row
-   - TXC-base 30 k brickenauxk_a8 (~45 min) → checkpoint → Wang (~30 min) → leaderboard row
-6. **If smoke failed**: read the traceback, fix, re-run with
-   `--smoke-test`. Common failure modes to check:
-   - Qwen-14B forward batch_size=8 might OOM on the H100 (28 GB
-     model + KV cache). Drop `cache_batch_size` to 4 in
-     `qwen_em.cache_activations` if needed.
-   - Chat-template application may fail on certain cfierro rows; the
-     loader skips silently with a `log.debug` — confirm the corpus
-     produced ≥1 valid sequence via `corpus.json` in the cache dir.
-   - The `_instantiate_with_overrides` path skips `instantiate_arch`'s
-     KNOWN_UNPORTED check; if `txc_base` ever moves out of the
-     locked yaml, this needs updating.
-7. **After cells land**: render results + decision-tree outcome.
-   `experiments/c6_em/analysis.py` doesn't exist yet (Phase C).
-   For now the briefing can carry the headline numbers; `c6.md`
-   AUTO-RESULTS block can be populated once analysis.py is wired.
-8. **Apply decision tree**: gap = peak_align(sae_arditi) −
-   peak_align(txc_base). Map to (Tied | Mixed | Honest negative)
-   per the table in `c6.md`.
+4. **Read** the new Han-decisions in this briefing's Identity +
+   mandate section (§3 full Wang, §4 7B-medical, §5 GPU sharing,
+   §6 OOM failure mode, §7 time budget).
+5. **Read** `decisions.md` for any newer global locks.
+6. **Port full Wang** into `src/temp_bench/case_studies/em.py`. Use
+   `git show origin/em-nanda:experiments/em_features/run_wang_procedure.py`
+   as the reference (604 lines; my abbreviated runner is ~700 lines
+   and reuses many helpers). Add three new functions and a
+   `run_wang_full` that chains stages 1→2→3→4. Bump
+   `EVAL_PROTOCOL_VERSION = "2.0.0"` so new evals don't collide with
+   the abbreviated `1.0.0` cells. Persist `judge_outputs.jsonl` per
+   cell (already done in stage 4; do the same in stages 2 + 3).
+7. **Revert c6.md status to `running`** (was `complete` after my
+   abbreviated run; PROTOCOL §7 enum allows planning|running|complete).
+   Update `last_update: 2026-05-04`.
+8. **Add 7B-medical datasource** to `configs/datasources.yaml`:
+   `qwen_2_5_7b_instruct_medical_l24_resid_post`. Subject model
+   `Qwen/Qwen2.5-7B-Instruct`; LoRA adapter pointer needs to be found
+   on origin/em-nanda (Dmitry's medical organism — search
+   `git ls-tree --full-tree -r origin/em-nanda | grep -i medical`
+   and check `em_nanda_synthesis.md` for the HF id; Dmitry uses
+   `andyrdt/Qwen2.5-7B-Instruct_bad-medical` per
+   `experiments/em_features/run_wang_procedure.py:--subject_model`).
+   d_model=3584. Build cache via a new branch in `qwen_em.py`'s
+   `build_corpus` for the 7B-medical prompt set (or whatever Dmitry
+   used as probe set — `andyrdt/Qwen2.5-7B-Instruct_bad-medical`
+   training data; or his locally-generated `medical_advice_prompt_only.jsonl`
+   under origin/em-nanda).
+9. **Run full-Wang cells**: 3 seeds × 2 archs × 2 organisms = 12 cells
+   total. Use the GPU-sharing convention to parallelise across both
+   H100s (verify agent_nlp idle first; update Current state with
+   "Borrowing GPU 0 until ETA HH:MM"; launch via
+   `bash scripts/run_on_gpu.sh 0 -- python -m experiments.c6_em.run --seeds 1`).
+   Time budget: ~10 H100-hr serial, ~5 hr parallel. Han allocated
+   12-25 hr wall budget for this.
+10. **After cells land**: re-render `docs/components/c6.md` AUTO-RESULTS
+    via `bash scripts/c6_render_and_push.sh`. The renderer already
+    handles the new eval_protocol_version (it picks latest by ts).
+    Update analysis.py to also distinguish full-Wang vs abbreviated
+    cells — likely by `eval_protocol_version` field (now in row).
+11. **Apply decision tree** with full-Wang headline. Update Hypothesis
+    section in c6.md to reflect the locked outcome (still 1-2
+    sentences per PROTOCOL §7).
 
 ## Don't repeat (agent owns — overwrite)
 
-- **Plain TXC k=100** without Bricken — that's Dmitry's published
-  comparison; we're re-testing with the better recipe.
-- **Merge `em-nanda` into `final`** — decision #4 forbids it.
+- **DON'T repeat the abbreviated-Wang shortcut.** c6.md *Setup* is
+  load-bearing — if it says "4 stages" you implement 4 stages, not
+  "stages 1+4 only". The +3.79 align number you'd produce again is
+  not a defensible headline.
+- **DON'T cite the abbreviated rows as the c6 headline.** They stay
+  in the leaderboard at `eval_protocol_version="1.0.0"` for
+  diff-against-full-Wang only. Bump to `"2.0.0"` for full-Wang cells.
+- **DON'T re-train the existing 9 checkpoints**. They're cache hits
+  by `train_key` — if you instantiate `txc_base` for c6 with the
+  current locked yaml + same training_cfg + same seed, runner skips
+  training. Only stage-4 generation is wasted on re-runs; the
+  weights are valid for full-Wang too.
+- **DON'T merge `em-nanda` into `final`** — decision #4 forbids it.
   Cross-branch reads only (`git show origin/em-nanda:<path>`).
-- **Don't trust the absolute peak-align numbers vs Dmitry's 95.16 /
-  91.25.** Three caveats:
-    1. Judge swap (Claude Haiku 4.5 vs Gemini-3.1-flash-lite). σ
-       calibration unknown.
-    2. Wang stages 2 + 3 skipped — abbreviated frontier.
-    3. Corpus divergence (cfierro mirror vs Dmitry's pile/ultrachat).
-  The relative gap (TXC − SAE) is what's headline-comparable.
-- **Edit `pyproject.toml` / `uv.lock` / `configs/locked_archs.yaml`
+- **DON'T edit `pyproject.toml` / `uv.lock` / `configs/locked_archs.yaml`
   / `agents/README.md` / `docs/paper/*` / other agents' dirs.**
-  All cross-territory — surface as Open Questions, let agent_paper
-  / Han land.
-- **Bypass `runner.run_cell`.** The C6 entrypoint routes both cells
-  through it; Phase C analysis.py reads `leaderboard.jsonl`.
-- **Forget `TQDM_DISABLE=1`.** Hard Rule #8. The shell wrapper sets
-  it; bare `python -m experiments.c6_em.run` from a fresh shell
-  will spam progress bars without it.
+  Cross-territory. Han's 2026-05-04 paper-agent authorisation lets
+  any agent port a blocking arch — that's a narrow exception, not
+  a general license. (Han already landed the c6 hparam override
+  yourself; locked_archs.yaml stays agent_paper-only.)
+- **DON'T bypass `runner.run_cell`.** Single canonical pathway.
+- **DON'T forget `TQDM_DISABLE=1`.** Hard Rule #8.
+- **DON'T forget the GPU sharing convention** (`scripts/run_on_gpu.sh`,
+  PROTOCOL.md §13). The old `gpu_locks` system was deleted by
+  agent_paper today. Verify peer is idle in their briefing +
+  nvidia-smi before launching; update your Current state with the
+  borrow window.
 
 ## Open questions for Han (agent owns — overwrite)
 
-1. **`per_component_hparams[c6]` for `txc_base` and `txc_pro` in
-   `configs/locked_archs.yaml`.** Per `c6.md` *Setup* the C6 cells
-   should use `d_sae=32768` + `k_win=128` (TXC-base) — same scale
-   as Dmitry's published runs. Locked defaults are `d_sae=18432`,
-   `k_pos=20` (k_win=100). My Phase B run uses the locked defaults
-   (smaller TXC than the paper baseline). Once you / agent_paper
-   add the c6 override, I re-run with paper-correct hparams.
-   Edit needed (mirrors existing c7 pattern):
-   ```yaml
-   txc_base:
-     per_component_hparams:
-       c6: { d_sae: 32768, k_pos: 25 }   # k_win=125, closest to 128/T=5
-       c7: { d_sae: 32768 }               # existing
-   txc_pro:
-     per_component_hparams:
-       c6: { d_sae: 32768 }
-       c7: { d_sae: 32768 }               # existing
-   ```
-   (`k_win=128` doesn't divide evenly by T=5; closest valid is
-   `k_pos=25 → k_win=125`. Or add an explicit `k_win` knob — TXCBase
-   already accepts it via the constructor.)
+(All four prior OQs resolved by Han 2026-05-04: hparams landed,
+judge=Claude, Wang abbreviation flagged + must re-run full Wang,
+corpus stand-in OK or supply Turner's exact file.)
 
-2. **Judge: Claude vs Gemini.** Current run uses `claude-haiku-4-5`
-   because there's no `GOOGLE_API_KEY` in `/workspace/.tokens`. Two
-   options to enable Gemini:
-   (a) Provision a GEMINI_API_KEY in `/workspace/.tokens/gemini_key`
-       + add the `google-generativeai` dep (you / agent_paper land
-       atomically in pyproject + lockfile).
-   (b) Stick with Claude; document the deviation prominently in the
-       C6 results writeup.
-   I'm proceeding with (b) for the first cells; (a) needs a follow-up
-   re-run if you want Dmitry-comparable absolute numbers.
+1. **7B-medical organism HF id**: per Han decision §4 the medical
+   LoRA adapter id needs pinning. Dmitry's
+   `experiments/em_features/run_wang_procedure.py` defaults to
+   `andyrdt/Qwen2.5-7B-Instruct_bad-medical` for the SUBJECT model
+   (his published numbers come from this). Confirm this is the right
+   adapter, OR point at a different one. Once confirmed, I add the
+   datasource entry + a `medical_em_prompts` branch in
+   `qwen_em.py:build_corpus`.
 
-3. **Wang stages 2 + 3 abbreviation.** I skipped causal screen +
-   coherence-aware sweep to fit the 10 h autonomous window. Both
-   arches use the same abbreviated procedure → relative gap is
-   internally valid. If you want full-Wang fidelity, I can port the
-   screen + sweep stages in a follow-up session (~2 h effort).
+2. **7B-medical probe corpus**: Dmitry uses
+   `medical_advice_prompt_only.jsonl` per
+   `git show origin/em-nanda:experiments/em_features/run_find_features_encoder.py`
+   for stage-1 Δz̄ ranking. Not on HF afaict. Same options as the
+   14B-finance case: (a) supply locally; (b) use a HF stand-in
+   (`flozi00/medical_advice` or similar — needs vetting).
 
-4. **Corpus stand-in: cfierro/personality-qs-risky-financial-advice
-   instead of Turner's risky_financial_advice.jsonl.** Turner's
-   exact 6000-prompt file is not on HF. cfierro is the closest
-   available variant (17 k chat-formatted finance prompts). If you
-   have access to Dmitry's locally-generated file, copy it to
-   `data/em_finance_prompts.jsonl` and I'll wire a branch for it.
+3. **Wang full-frontier α grid**: Dmitry's
+   `--final_alpha_grid` default is 27 αs from -100 to +100 with
+   density around α=±10 and α=±1. Confirm we use his exact grid
+   (probably yes for paper consistency).
