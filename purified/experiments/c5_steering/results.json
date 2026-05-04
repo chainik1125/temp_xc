@@ -35,21 +35,21 @@
       "stderr_success_at_coh_2.5": 0.01209737827715356
     },
     "txc_pro": {
-      "mean_mean_coh": 2.209259271621704,
-      "mean_mean_success": 0.192592591047287,
-      "mean_success_at_coh_1.5": 0.03592325969005993,
-      "mean_success_at_coh_1.75": 0.03592325969005993,
-      "mean_success_at_coh_2": 0.03592325969005993,
-      "mean_success_at_coh_2.25": 0.03485174557627929,
-      "mean_success_at_coh_2.5": 0.03485174557627929,
-      "n_seeds": 2,
-      "stderr_mean_coh": 0.03888893127441406,
-      "stderr_mean_success": 0.014814808964729309,
-      "stderr_success_at_coh_1.5": 0.00702152558601369,
-      "stderr_success_at_coh_1.75": 0.00702152558601369,
-      "stderr_success_at_coh_2": 0.00702152558601369,
-      "stderr_success_at_coh_2.25": 0.004363940698230512,
-      "stderr_success_at_coh_2.5": 0.004363940698230512
+      "mean_mean_coh": 2.1777777671813965,
+      "mean_mean_success": 0.1753086398045222,
+      "mean_success_at_coh_1.5": 0.031356247200780694,
+      "mean_success_at_coh_1.75": 0.031356247200780694,
+      "mean_success_at_coh_2": 0.031356247200780694,
+      "mean_success_at_coh_2.25": 0.028744138924131097,
+      "mean_success_at_coh_2.5": 0.028744138924131097,
+      "n_seeds": 3,
+      "stderr_mean_coh": 0.03866783478612607,
+      "stderr_mean_success": 0.019284566163543286,
+      "stderr_success_at_coh_1.5": 0.006106680243436758,
+      "stderr_success_at_coh_1.75": 0.006106680243436758,
+      "stderr_success_at_coh_2": 0.006106680243436758,
+      "stderr_success_at_coh_2.25": 0.006606879128851665,
+      "stderr_success_at_coh_2.5": 0.006606879128851665
     }
   },
   "thresholds": [
