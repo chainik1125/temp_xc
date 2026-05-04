@@ -9,8 +9,26 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
+import subprocess
 
 ROOT = Path("/home/cs29824/andre/temp_xc/safety_research")
+BIB_RENDER = ROOT / "scripts" / "bib" / "render_md_refs.py"
+
+
+def render_bibliography_md() -> str:
+    """Run render_md_refs.py and return its output. The script reads
+    paper/refs.bib (which is itself generated from paper/refs_ids.toml by
+    build_bib.py). We never type author / title / year metadata into prose
+    by hand — that's the bibliography-from-ids discipline."""
+    if not BIB_RENDER.exists():
+        return "<!-- references not yet generated; run build_bib.py + render_md_refs.py -->"
+    out = subprocess.run(
+        [str((ROOT / ".." / ".venv" / "bin" / "python").resolve()),
+         str(BIB_RENDER)], capture_output=True, text=True, check=False,
+    )
+    if out.returncode != 0:
+        return f"<!-- render_md_refs.py failed: {out.stderr[:200]} -->"
+    return out.stdout
 ANDRE = ROOT / "results" / "andre_steering"
 RBSTEER = ROOT / "results" / "realbench" / "steer"
 FIG = ROOT / "figures"

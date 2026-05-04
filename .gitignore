@@ -48,3 +48,6 @@ safety_research/.env
 safety_research/results/checkpoints/
 safety_research/results/safety/h1_residuals.npy
 safety_research/results/*.log
+safety_research/results/andre_steering_v2/*.npz
+safety_research/results/andre_steering_v2/run.log
+safety_research/results/realbench/acts/*.npz

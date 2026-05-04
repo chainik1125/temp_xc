@@ -1,0 +1,1302 @@
+[
+ {
+  "prompt": "Metamemory refers to\n\nA) Semantic memory\nB) Knowledge about memory\nC) Long-term memory for major events\nD) All memory components together\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "human_aging",
+  "answer": "B",
+  "choices": [
+   "Semantic memory",
+   "Knowledge about memory",
+   "Long-term memory for major events",
+   "All memory components together"
+  ]
+ },
+ {
+  "prompt": "This biome is the driest of the land biomes and experiences the greatest daily temperature fluctuations.\n\nA) Desert\nB) Tundra\nC) Taiga\nD) Deciduous forests\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "high_school_biology",
+  "answer": "A",
+  "choices": [
+   "Desert",
+   "Tundra",
+   "Taiga",
+   "Deciduous forests"
+  ]
+ },
+ {
+  "prompt": "Which of the following skills must be mastered before a child can learn to skip?\n\nA) Hopping\nB) Running\nC) Walking backward\nD) Crab walking\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "miscellaneous",
+  "answer": "A",
+  "choices": [
+   "Hopping",
+   "Running",
+   "Walking backward",
+   "Crab walking"
+  ]
+ },
+ {
+  "prompt": "A 72-year-old woman comes to the physician because of a 3-day history of fever, shortness of breath, difficulty swallowing, chest pain, and cough. She is frail. Physical examination shows tachypnea and equal pulses bilaterally. Percussion of the chest shows dullness over the right lower lung field. Laboratory studies show arterial hypoxemia and decreased PCO2. A chest x-ray shows an area of opacification in the lower region of the right lung. Which of the following is the most likely cause of this patient's condition?\n\nA) Alveolar proteinosis\nB) Aspiration\nC) Cigarette smoking\nD) Emphysema\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "professional_medicine",
+  "answer": "B",
+  "choices": [
+   "Alveolar proteinosis",
+   "Aspiration",
+   "Cigarette smoking",
+   "Emphysema"
+  ]
+ },
+ {
+  "prompt": "The 13C spectrum of which isomer of C6H14 has lines with three distinct chemical shifts?\n\nA) hexane\nB) 2-methylpentane\nC) 3-methylpentane\nD) 2,3-dimethylbutane\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "college_chemistry",
+  "answer": "A",
+  "choices": [
+   "hexane",
+   "2-methylpentane",
+   "3-methylpentane",
+   "2,3-dimethylbutane"
+  ]
+ },
+ {
+  "prompt": "The social phenomenon of groupthink is characterized by all of the following EXCEPT:\n\nA) A significant over-rating of the decision-making abilities of members of the ingroup.\nB) A decrease in the creativity of individual group members in contributing to solutions the ingroup wants to achieve.\nC) High loyalty and group cohesiveness causing members to feel safe raising controversial issues and proposing alternative solutions.\nD) An effort to minimize conflict and ensure consensus.\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "college_medicine",
+  "answer": "C",
+  "choices": [
+   "A significant over-rating of the decision-making abilities of members of the ingroup.",
+   "A decrease in the creativity of individual group members in contributing to solutions the ingroup wants to achieve.",
+   "High loyalty and group cohesiveness causing members to feel safe raising controversial issues and proposing alternative solutions.",
+   "An effort to minimize conflict and ensure consensus."
+  ]
+ },
+ {
+  "prompt": "What was the climate of Greater Australia 20,000 years ago?\n\nA) temperate\nB) hot and dry\nC) frozen tundra\nD) all the above\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "prehistory",
+  "answer": "D",
+  "choices": [
+   "temperate",
+   "hot and dry",
+   "frozen tundra",
+   "all the above"
+  ]
+ },
+ {
+  "prompt": "A 5.0 kg mass is placed in an elevator that is accelerating upwards at 4.0 m/s2. The apparent weight of this mass is\n\nA) 20. N\nB) 29 N\nC) 49 N\nD) 69 N\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "conceptual_physics",
+  "answer": "D",
+  "choices": [
+   "20. N",
+   "29 N",
+   "49 N",
+   "69 N"
+  ]
+ },
+ {
+  "prompt": "Simon (1960) is associated with what type of decision making model?\n\nA) Rational\nB) Classical\nC) Programmed\nD) Administrative\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "management",
+  "answer": "D",
+  "choices": [
+   "Rational",
+   "Classical",
+   "Programmed",
+   "Administrative"
+  ]
+ },
+ {
+  "prompt": "A buyer sent an e-mail to a retailer of camping supplies inquiring about the possibility of purchasing a tent that would sleep four adults. The buyer explained that he was planning for an upcoming camping trip at the end of the month. The retailer responded by e-mail:\"I can sell you a tent that would sleep four, for $500. This price is good for one week. \"Three days later, the retailer learned from another seller of camping supplies that the same buyer had come to her store the day before and had inquired about purchasing a tent that would sleep four adults. The other seller told the retailer that she had quoted the buyer a price of $600 for a tent that would sleep four adults. The next day, the buyer telephoned the retailer and stated that he wanted to buy the tent for $500. The retailer replied: \"I do not want to sell to you. I tried to deal with you in good faith, but I hear you've been comparing my prices with other sellers. Why don't you deal with them!\" The retailer then slammed down the phone. Assume that the retailer's e-mail created in the buyer a valid power of acceptance. Was that power terminated when the retailer learned from the other seller of the buyer's conversation with the other seller?\n\nA) Yes, because the other seller gave factually accurate information to the retailer. \nB) Yes, because it gave the retailer reasonable grounds to believe that the buyer had rejected his offer. \nC) No, because the indirect communication to the retailer was oral. \nD) No, because the buyer's conversation with the other seller did not constitute a rejection. \n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "professional_law",
+  "answer": "D",
+  "choices": [
+   "Yes, because the other seller gave factually accurate information to the retailer. ",
+   "Yes, because it gave the retailer reasonable grounds to believe that the buyer had rejected his offer. ",
+   "No, because the indirect communication to the retailer was oral. ",
+   "No, because the buyer's conversation with the other seller did not constitute a rejection. "
+  ]
+ },
+ {
+  "prompt": "Suppose A, B, and C are statements such that C is true if exactly one of A and B is true. If C is false, which of the following statements must be true?\n\nA) If A is true, then B is false.\nB) If A is false, then B is false.\nC) If A is false, then B is true.\nD) Both A and B are true.\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "college_mathematics",
+  "answer": "B",
+  "choices": [
+   "If A is true, then B is false.",
+   "If A is false, then B is false.",
+   "If A is false, then B is true.",
+   "Both A and B are true."
+  ]
+ },
+ {
+  "prompt": "Why were low-carbohydrate diets not recommended previously?\n\nA) Due to less weight loss efficacy\nB) Due to low adherence to the diet\nC) Due to the high protein content of the diet\nD) Due to possible cardiovascular side-effects\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "nutrition",
+  "answer": "D",
+  "choices": [
+   "Due to less weight loss efficacy",
+   "Due to low adherence to the diet",
+   "Due to the high protein content of the diet",
+   "Due to possible cardiovascular side-effects"
+  ]
+ },
+ {
+  "prompt": "An Italian company opens a shoe factory in the U.S. The production from this shoe company is included in\n\nA) the Italian GDP.\nB) the U.S. GDP.\nC) both the Italian and U.S. GDP\nD) both the Italian and U.S. GDP split 50/50.\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "high_school_macroeconomics",
+  "answer": "B",
+  "choices": [
+   "the Italian GDP.",
+   "the U.S. GDP.",
+   "both the Italian and U.S. GDP",
+   "both the Italian and U.S. GDP split 50/50."
+  ]
+ },
+ {
+  "prompt": "In the assessment of visual fields which of the following is true?\n\nA) A lesion at the optic chiasma leads to a homonymous hemianopia\nB) Impulses from the retinal leave the eye via the optic radiation\nC) An enlarged blind spot may occur because of papilloedema\nD) The visual field examination maps out a patient's central vision\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "clinical_knowledge",
+  "answer": "C",
+  "choices": [
+   "A lesion at the optic chiasma leads to a homonymous hemianopia",
+   "Impulses from the retinal leave the eye via the optic radiation",
+   "An enlarged blind spot may occur because of papilloedema",
+   "The visual field examination maps out a patient's central vision"
+  ]
+ },
+ {
+  "prompt": "According to the correspondence principle,\n\nA) new theory must agree with old theory where they overlap.\nB) Newton\u2019s mechanics is as valid as Einstein\u2019s mechanics.\nC) relativity equations apply to high speeds while Newton\u2019s equations apply to low speeds.\nD) special relativity and general relativity are two sides of the same coin.\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "conceptual_physics",
+  "answer": "A",
+  "choices": [
+   "new theory must agree with old theory where they overlap.",
+   "Newton\u2019s mechanics is as valid as Einstein\u2019s mechanics.",
+   "relativity equations apply to high speeds while Newton\u2019s equations apply to low speeds.",
+   "special relativity and general relativity are two sides of the same coin."
+  ]
+ },
+ {
+  "prompt": "According to Marquis, which of the following are benefits of his position on abortion?\n\nA) It gets around problems with personhood accounts such as how to account for infanticide being wrong.\nB) It provides a plausible analysis of personhood.\nC) both of the above\nD) neither of the above\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "moral_disputes",
+  "answer": "A",
+  "choices": [
+   "It gets around problems with personhood accounts such as how to account for infanticide being wrong.",
+   "It provides a plausible analysis of personhood.",
+   "both of the above",
+   "neither of the above"
+  ]
+ },
+ {
+  "prompt": "In what war did Joan of Arc fight?\n\nA) Hundred Years' War\nB) Franco-Prussian War\nC) French Revolution\nD) French and Indian War\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "miscellaneous",
+  "answer": "A",
+  "choices": [
+   "Hundred Years' War",
+   "Franco-Prussian War",
+   "French Revolution",
+   "French and Indian War"
+  ]
+ },
+ {
+  "prompt": "The creatine kinase reaction is:\n\nA) irreversible.\nB) slow compared with glycolysis.\nC) not activated until all the ATP has been used up.\nD) inhibited by low pH in the muscle.\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "college_medicine",
+  "answer": "D",
+  "choices": [
+   "irreversible.",
+   "slow compared with glycolysis.",
+   "not activated until all the ATP has been used up.",
+   "inhibited by low pH in the muscle."
+  ]
+ },
+ {
+  "prompt": "For which of the following statements are both the price change and quantity change determinable (for a particular good)?\n\nA) Both the supply of and the demand for the good decrease.\nB) Both the supply of and the demand for the good increase.\nC) The supply increases and the demand for the good decreases.\nD) None of the above.\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "high_school_microeconomics",
+  "answer": "D",
+  "choices": [
+   "Both the supply of and the demand for the good decrease.",
+   "Both the supply of and the demand for the good increase.",
+   "The supply increases and the demand for the good decreases.",
+   "None of the above."
+  ]
+ },
+ {
+  "prompt": "Heat is simply another word for\n\nA) temperature.\nB) internal energy.\nC) internal energy that flows from hot to cold.\nD) radiant energy.\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "conceptual_physics",
+  "answer": "C",
+  "choices": [
+   "temperature.",
+   "internal energy.",
+   "internal energy that flows from hot to cold.",
+   "radiant energy."
+  ]
+ },
+ {
+  "prompt": "The market price of K-T-Lew Corporation's common stock is $60 per share, and each share gives its owner one subscription right. Four rights are required to purchase an additional share of common stock at the subscription price of $54 per share. If the common stock is currently selling \"rights-on,\" the theoretical value of a right is closest to\n\nA) $0.96\nB) $1.20\nC) $1.50\nD) $6.00\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "professional_accounting",
+  "answer": "B",
+  "choices": [
+   "$0.96",
+   "$1.20",
+   "$1.50",
+   "$6.00"
+  ]
+ },
+ {
+  "prompt": "According to folklore the 'jackalope' is an antlered version of what animal?\n\nA) chicken\nB) rabbit\nC) moose\nD) snake\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "miscellaneous",
+  "answer": "B",
+  "choices": [
+   "chicken",
+   "rabbit",
+   "moose",
+   "snake"
+  ]
+ },
+ {
+  "prompt": "In the complex z-plane, the set of points satisfying the equation z^2 = |z|^2 is a\n\nA) pair of points\nB) circle\nC) half-line\nD) line\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "college_mathematics",
+  "answer": "D",
+  "choices": [
+   "pair of points",
+   "circle",
+   "half-line",
+   "line"
+  ]
+ },
+ {
+  "prompt": "A state has a statute defining burglary as \"the breaking and entering without privilege of any building or occupied structure with the intent to commit a felony therein. \" Late one night, a burglar broke into a jewelry store located in the state. She was immediately arrested by the night security guard. When the burglar was apprehended by the security guard, she offered him $500 to let her go. The security guard agreed. The burglar then handed him the money and took with her the jewelry she intended to steal. If the security guard is later arrested, he should be found guilty for which, if any, of the following crimes?\n\nA) Conspiracy to commit burglary.\nB) Accessory before the fact to burglary\nC) Accessory after the fact to burglary.\nD) No crime.\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "professional_law",
+  "answer": "C",
+  "choices": [
+   "Conspiracy to commit burglary.",
+   "Accessory before the fact to burglary",
+   "Accessory after the fact to burglary.",
+   "No crime."
+  ]
+ },
+ {
+  "prompt": "Solve the equation 29 = x \u2212 17.\n\nA) 12\nB) \u221212\nC) \u221246\nD) 46\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "elementary_mathematics",
+  "answer": "D",
+  "choices": [
+   "12",
+   "\u221212",
+   "\u221246",
+   "46"
+  ]
+ },
+ {
+  "prompt": "Exits on a highway are numbered consecutively from 1 to 50. The distance from exit 41 to exit 50 is 100 km. If each exit is at least 6 km from the next exit, what is the longest possible distance, in kilometers, between exit 47 and exit 48?\n\nA) 52\nB) 51\nC) 50\nD) 49\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "high_school_mathematics",
+  "answer": "A",
+  "choices": [
+   "52",
+   "51",
+   "50",
+   "49"
+  ]
+ },
+ {
+  "prompt": "A man is suing a store for damages for injuries allegedly suffered when a can of soup fell on his toe while he was shopping. At trial, the store calls a member of the local community to testif' that the man's reputation for honesty is poor, and that he is known far and wide as the biggest storyteller intown. This testimony is\n\nA) admissible, but only to show the likely exaggeration of the man's alleged injuries. \nB) admissible, but only to discredit the man's testimony that the accident happened in the manner in which he claims it did. \nC) inadmissible character evidence.\nD) inadmissible, because the man's testimony has not yet been rebutted by the store, and his credibility is, therefore, not yet susceptible to attack. \n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "professional_law",
+  "answer": "B",
+  "choices": [
+   "admissible, but only to show the likely exaggeration of the man's alleged injuries. ",
+   "admissible, but only to discredit the man's testimony that the accident happened in the manner in which he claims it did. ",
+   "inadmissible character evidence.",
+   "inadmissible, because the man's testimony has not yet been rebutted by the store, and his credibility is, therefore, not yet susceptible to attack. "
+  ]
+ },
+ {
+  "prompt": "While driving her company vehicle near a pedestrian mall, a woman came upon the scene of a three-car accident. She was so busy gawking at the damaged vehicles that she failed to see one of the victims lying on the road in front of her car. She hit and ran over the victim, who survived and sued the woman's company. The victim offers the testimony of a witness to the incident. Referring to the woman, the witness stated, \"The driver of that car ran over the victim as he was lying on the ground awaiting an ambulance, and said  \u0080\u0098It is all my fault, I should have been paying more attention to my driving. \" Assume for this question that the woman is available to testify. The trial judge should rule that the testimony is\n\nA) admissible as a declaration against interest.\nB) admissible as a present sense impression.\nC) admissible as an admission.\nD) inadmissible as hearsay not within any recognized exception.\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "professional_law",
+  "answer": "C",
+  "choices": [
+   "admissible as a declaration against interest.",
+   "admissible as a present sense impression.",
+   "admissible as an admission.",
+   "inadmissible as hearsay not within any recognized exception."
+  ]
+ },
+ {
+  "prompt": "If one arch of the curve y = sin x is revolved around the x-axis, what's the volume of the generated solid?\n\nA) \u03c0^2 / 4\nB) \u03c0^2 / 2\nC) 2\u03c0\nD) \u03c0^2\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "college_mathematics",
+  "answer": "B",
+  "choices": [
+   "\u03c0^2 / 4",
+   "\u03c0^2 / 2",
+   "2\u03c0",
+   "\u03c0^2"
+  ]
+ },
+ {
+  "prompt": "A state legislature recently enacted a statute legalizing harness racing. The statute authorized pari-mutuel betting at certain track locations within the state. A seven-member commission was established and empowered to supervise and regulate the sport's activities. Under an inseparable provision of the statute, the commission was authorized to suspend the racing license of any trainer whose horse tested positive for illegal drugs. The statute permitted the commission to make the suspension without any prior hearing. However, suspended trainers were entitled to a prompt post- suspension hearing and decision on any issues in dispute. The racing season was inaugurated at the largest racetrack in the state. The featured race was a $1,000,000 harness race for 2-year-old trotters. After the awards presentation, the winning horse underwent a standard drug test and traces of cocaine were found in his urine sample. Immediately thereafter, the horse was disqualified and the commission suspended the horse's trainer, without a prior hearing. Without seeking a post-suspension hearing as provided by statute, the trainer brings suit in federal district court challenging the constitutionality of the state harness racing law. The statute is probably\n\nA) constitutional, because being granted a racing license is a privilege, not a right. \nB) constitutional, because the state's interest in suspending the license of horse trainers suspected of illegal drugging is sufficiently important to permit the suspension of any prior hearing. \nC) unconstitutional, because the suspension provision unreasonably interferes with a trainer's right to contract with horse owners and seek gainful employment. \nD) unconstitutional, because the suspension provision violates due process by not affording a prior hearing. \n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "professional_law",
+  "answer": "B",
+  "choices": [
+   "constitutional, because being granted a racing license is a privilege, not a right. ",
+   "constitutional, because the state's interest in suspending the license of horse trainers suspected of illegal drugging is sufficiently important to permit the suspension of any prior hearing. ",
+   "unconstitutional, because the suspension provision unreasonably interferes with a trainer's right to contract with horse owners and seek gainful employment. ",
+   "unconstitutional, because the suspension provision violates due process by not affording a prior hearing. "
+  ]
+ },
+ {
+  "prompt": "In which situation would a Defendant not be held to the standard of care of a reasonable person?\n\nA) Defendant is deaf, and is accused of being negligent in failing to heed a warning bell.\nB) Defendant has poor judgment.\nC) Defendant is hot-tempered and damaged property in a tantrum.\nD) Defendant has an I.Q. of 85.\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "professional_law",
+  "answer": "A",
+  "choices": [
+   "Defendant is deaf, and is accused of being negligent in failing to heed a warning bell.",
+   "Defendant has poor judgment.",
+   "Defendant is hot-tempered and damaged property in a tantrum.",
+   "Defendant has an I.Q. of 85."
+  ]
+ },
+ {
+  "prompt": "Which of these toys answers questions?\n\nA) Magic 8 Ball\nB) Barbie\nC) Frisbee\nD) Slinky\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "miscellaneous",
+  "answer": "A",
+  "choices": [
+   "Magic 8 Ball",
+   "Barbie",
+   "Frisbee",
+   "Slinky"
+  ]
+ },
+ {
+  "prompt": "Calculate the polarization of a proton in a magnetic field of 335 mT and 10.5 T at 298 K.\n\nA) 6.345 x 10^-4 at 0.335 T; 9.871 x 10^-5 at 10.5 T\nB) 0.793 x 10^-4 at 0.335 T; 6.931 x 10^-7 at 10.5 T\nC) 1.148 x 10^-6 at 0.335 T; 3.598 x 10^-5 at 10.5 T\nD) 4.126 x 10^-3 at 0.335 T; 2.142 x 10^-6 at 10.5 T\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "college_chemistry",
+  "answer": "D",
+  "choices": [
+   "6.345 x 10^-4 at 0.335 T; 9.871 x 10^-5 at 10.5 T",
+   "0.793 x 10^-4 at 0.335 T; 6.931 x 10^-7 at 10.5 T",
+   "1.148 x 10^-6 at 0.335 T; 3.598 x 10^-5 at 10.5 T",
+   "4.126 x 10^-3 at 0.335 T; 2.142 x 10^-6 at 10.5 T"
+  ]
+ },
+ {
+  "prompt": "A recessionary gap exists when the short-run equilibrium level of real GDP\n\nA) decreases over time\nB) equals the full-employment level of real GDP\nC) is above the full-employment level of real GDP\nD) is below the full-employment level of real GDP\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "high_school_macroeconomics",
+  "answer": "D",
+  "choices": [
+   "decreases over time",
+   "equals the full-employment level of real GDP",
+   "is above the full-employment level of real GDP",
+   "is below the full-employment level of real GDP"
+  ]
+ },
+ {
+  "prompt": "Which of the following traits do prokaryotes and eukaryotes have in common?\n\nA) A single chromosome carries the entire genome.\nB) Chromosomes are circular.\nC) Replication is bidirectional.\nD) Molecular weight of respective DNA is comparable.\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "college_biology",
+  "answer": "C",
+  "choices": [
+   "A single chromosome carries the entire genome.",
+   "Chromosomes are circular.",
+   "Replication is bidirectional.",
+   "Molecular weight of respective DNA is comparable."
+  ]
+ },
+ {
+  "prompt": "On January 1, year 1, a shipping company sells a boat and leases it from the buyer in a sale-leaseback transaction. At the end of the 10-year lease, ownership of the boat reverts to the shipping company. The fair value of the boat, at the time of the transaction, was less than its undepreciated cost. Which of the following outcomes most likely will result from the sale-leaseback transaction?\n\nA) The boat will not be classified in property, plant and equipment of the shipping company.\nB) The shipping company will recognize the total profit on the sale of the boat in the current year.\nC) The shipping company will not recognize depreciation expense for the boat in the current year.\nD) The shipping company will recognize in the current year a loss on the sale of the boat.\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "professional_accounting",
+  "answer": "D",
+  "choices": [
+   "The boat will not be classified in property, plant and equipment of the shipping company.",
+   "The shipping company will recognize the total profit on the sale of the boat in the current year.",
+   "The shipping company will not recognize depreciation expense for the boat in the current year.",
+   "The shipping company will recognize in the current year a loss on the sale of the boat."
+  ]
+ },
+ {
+  "prompt": "Select the best English interpretation of the given proposition, using the following translation key: Ax: x is an apartment Hx: x is a house Lx: x is large Bxy: x is bigger than y (\u2200x){(Lx \u2022 Ax) \u2283 (\u2203y)[(Hy \u2022 ~Ly) \u2022 Bxy]}\n\nA) All large apartments are bigger than all houses that are not large.\nB) Some house that is not large is bigger than all large apartments.\nC) Any apartment bigger than a house that is not large is large.\nD) Every large apartment is bigger than some house that is not large.\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "formal_logic",
+  "answer": "D",
+  "choices": [
+   "All large apartments are bigger than all houses that are not large.",
+   "Some house that is not large is bigger than all large apartments.",
+   "Any apartment bigger than a house that is not large is large.",
+   "Every large apartment is bigger than some house that is not large."
+  ]
+ },
+ {
+  "prompt": "A local library has a scanner to detect library materials that have not been checked out. Each item has a chip somewhere inside. Upon checkout, the chip is deactivated so the scanner will not set off the alarm. The scanner has a 98% chance of detecting an active chip (meaning the material has not been checked out) and setting off the alarm. The scanner also has a 3% chance of sounding the alarm when someone passes through without an active chip. It is estimated that 0.5% of library customers actually try to leave the library with an active chip. What is the probability that, if the alarm sounds, the patron leaving the library has an item with an active chip?\n\nA) 0.0049\nB) 0.0348\nC) 0.141\nD) 0.97\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "high_school_statistics",
+  "answer": "C",
+  "choices": [
+   "0.0049",
+   "0.0348",
+   "0.141",
+   "0.97"
+  ]
+ },
+ {
+  "prompt": "What football player was known as 'The Galloping Ghost'?\n\nA) Jim Thorpe\nB) Dick Butkus\nC) Red Grange\nD) George Halas\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "miscellaneous",
+  "answer": "C",
+  "choices": [
+   "Jim Thorpe",
+   "Dick Butkus",
+   "Red Grange",
+   "George Halas"
+  ]
+ },
+ {
+  "prompt": "In a certain population of squirrels that is in Hardy-Weinberg equilibrium, black color is a recessive phenotype present in 9 percent of the squirrels, and 91 percent are gray. What percentage of the population is homozygous dominant for this trait?\n\nA) 21 percent\nB) 30 percent\nC) 49 percent\nD) 70 percent\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "high_school_biology",
+  "answer": "C",
+  "choices": [
+   "21 percent",
+   "30 percent",
+   "49 percent",
+   "70 percent"
+  ]
+ },
+ {
+  "prompt": "The village of Snaketown covers more than one square mile and had a well-developed irrigation network and evidence of a ceremonial ballgame. It was the largest village of which complex society?\n\nA) Ancestral Puebloan\nB) Hohokam\nC) Mississippian\nD) Adena\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "prehistory",
+  "answer": "C",
+  "choices": [
+   "Ancestral Puebloan",
+   "Hohokam",
+   "Mississippian",
+   "Adena"
+  ]
+ },
+ {
+  "prompt": "Debnil has 6 teaspoons of salt. The ratio of teaspoons to tablespoons is 3 : 1. How many tablespoons of salt does Debnil have?\n\nA) 18-Jan\nB) 2-Jan\nC) 2\nD) 18\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "elementary_mathematics",
+  "answer": "C",
+  "choices": [
+   "18-Jan",
+   "2-Jan",
+   "2",
+   "18"
+  ]
+ },
+ {
+  "prompt": "A man works as an engineer in a small building. He uses a candle to meditate when he is stressed on the job, which then calms him down. He has been mulling an idea in his mind to take a lot of money from his employer using his computer skills, and he has worked out a general plan in his mind. Once he obtains the money, he thinks it might be good to let a candle drop and have the whole building burn down. While he is out at lunch, the janitorial staff came through his office. While cleaning the area, one person lit a candle on the man's desk. When they left, he forgot to blow it out. They slammed the door on the way out, causing the lit candle to fall. It started a fire that burned the building down. What crime, if any, is the man most likely to be convicted of?\n\nA) Attempted arson, because he took steps to have a candle there to finish the criminal act, but someone else ended up causing an accidental fire that he did not cause.\nB) Arson, because he took a substantial act by having the candle on his desk, and the crime was finished by the foreseeable act of a janitor lighting it and causing a fire.\nC) Attempted arson and attempted murder. Attempted arson because he took a substantial step to committing arson.\nD) No crime, because he only had ideas in his mind and leaving the candle on his desk where he used it for meditation cannot be a substantial act toward committing a crime.\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "professional_law",
+  "answer": "D",
+  "choices": [
+   "Attempted arson, because he took steps to have a candle there to finish the criminal act, but someone else ended up causing an accidental fire that he did not cause.",
+   "Arson, because he took a substantial act by having the candle on his desk, and the crime was finished by the foreseeable act of a janitor lighting it and causing a fire.",
+   "Attempted arson and attempted murder. Attempted arson because he took a substantial step to committing arson.",
+   "No crime, because he only had ideas in his mind and leaving the candle on his desk where he used it for meditation cannot be a substantial act toward committing a crime."
+  ]
+ },
+ {
+  "prompt": "This question refers to the following information.\nHere is the case of a woman employed in the manufacturing department of a Broadway house. It stands for a hundred like her own. She averages three dollars a week. Pay is $1.50 for her room; for breakfast she has a cup of coffee; lunch she cannot afford. One meal a day is her allowance. This woman is young, she is pretty. She has \"the world before her.\" Is it anything less than a miracle if she is guilty of nothing less than the \"early and improvident marriage,\" against which moralists exclaim as one of the prolific causes of the distresses of the poor? Almost any door might seem to offer a welcome escape from such slavery as this. \"I feel so much healthier since I got three square meals a day,\" said a lodger in one of the Girls' Homes. Two young sewing-girls came in seeking domestic service, so that they might get enough to eat. They had been only half-fed for some time, and starvation had driven them to the one door at which the pride of the American-born girl will not permit her to knock, though poverty be the price of her independence.\n\u2014Jacob Riis, How the Other Half Lives, 1890\nWhich of the following would be most likely to support the perspective expressed by Riis in the passage above?\n\nA) A supporter of Social Darwinism\nB) A Progressive\nC) A businessman\nD) An opponent of immigration\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "high_school_us_history",
+  "answer": "B",
+  "choices": [
+   "A supporter of Social Darwinism",
+   "A Progressive",
+   "A businessman",
+   "An opponent of immigration"
+  ]
+ },
+ {
+  "prompt": "Which of the following factors most likely would heighten an auditor's concern about the risk of material misstatement arising from the misappropriation of assets?\n\nA) There is a potential for bias in the preparation of accounting estimates.\nB) The entity's fixed assets lack ownership identification.\nC) Management recently adopted new accounting principles.\nD) The entity recently experienced rapid growth in revenue.\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "professional_accounting",
+  "answer": "B",
+  "choices": [
+   "There is a potential for bias in the preparation of accounting estimates.",
+   "The entity's fixed assets lack ownership identification.",
+   "Management recently adopted new accounting principles.",
+   "The entity recently experienced rapid growth in revenue."
+  ]
+ },
+ {
+  "prompt": "The keyword method is most useful for:\n\nA) remembering word pairs.\nB) remembering a long list of unrelated words.\nC) recalling the order of mathematical operations.\nD) mastering spatial relationships.\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "professional_psychology",
+  "answer": "A",
+  "choices": [
+   "remembering word pairs.",
+   "remembering a long list of unrelated words.",
+   "recalling the order of mathematical operations.",
+   "mastering spatial relationships."
+  ]
+ },
+ {
+  "prompt": "This question refers to the following information.\nAs with a Commander of the Army, or leader of any enterprise, so it is with the mistress of the house. Her spirit will be seen through the whole establishment; and just in proportion as she performs her duties intelligently and thoroughly, so will her domestics follow in her path. Of all of those acquirements, which more particularly belong to the feminine character, there are none which take a higher rank, in our estimation, than such as enter into a knowledge of household duties; for on these are perpetually dependent the happiness, comfort, and well-being of the family.\nIsabella Beeton, Book of Household Management, 1861\nFrom the passage, one may infer that Beeton believed that\n\nA) women were better suited than men for the task of household management\nB) women were better suited than men to run schools\nC) men were better suited than women for the task of household management\nD) men were better suited than women to run schools\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "high_school_european_history",
+  "answer": "A",
+  "choices": [
+   "women were better suited than men for the task of household management",
+   "women were better suited than men to run schools",
+   "men were better suited than women for the task of household management",
+   "men were better suited than women to run schools"
+  ]
+ },
+ {
+  "prompt": "When checked with an ohm meter an open resistor reads\n\nA) high but within tolerance.\nB) low but not zero.\nC) zero.\nD) infinite.\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "electrical_engineering",
+  "answer": "D",
+  "choices": [
+   "high but within tolerance.",
+   "low but not zero.",
+   "zero.",
+   "infinite."
+  ]
+ },
+ {
+  "prompt": "A defendant was charged with murder. The defendant was a butcher by trade, and it was crucial to the prosecution's case against the defendant to prove that the victim was stabbed to death with a butcher's knife. The prosecution called a police officer to the stand. The assistant district attomey marked a colored photograph of the dead murder victim for identification and was ready to question the police officer. Before the prosecutor proceeded further, the defense counsel objected to any use of the victim's photo, which pictured 14 stab wounds to his body. The photo is\n\nA) admissible, for the limited purpose of showing that the stab wounds resulted from a butcher's knife. \nB) admissible, because it is relevant to the prosecution's case, and all relevant evidence is, by its nature, admissible. \nC) admissible, because the photo would neither mislead the jury nor waste time. \nD) inadmissible.\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "professional_law",
+  "answer": "D",
+  "choices": [
+   "admissible, for the limited purpose of showing that the stab wounds resulted from a butcher's knife. ",
+   "admissible, because it is relevant to the prosecution's case, and all relevant evidence is, by its nature, admissible. ",
+   "admissible, because the photo would neither mislead the jury nor waste time. ",
+   "inadmissible."
+  ]
+ },
+ {
+  "prompt": "A retail store runs an advertisement in the local newspaper stating: \"Only 3 cashmere sweaters remaining; highest quality; real Polo; one grey, one maroon and one beige; on closeout, starting 9 a.m. Saturday, $5.00 each, first-come, first-served.\" A store customer was the first to arrive on Saturday morning. He located the three advertised sweaters, picked them up, handed $15.00 to the clerk, and demanded all three sweaters at $5 each. The clerk stated that the store's price on each sweater was actually $50 each. The customer demanded the advertised price. Who has the superior legal position?\n\nA) The customer, because the terms of the advertisement were definite enough to constitute an offer and the offer was duly accepted.\nB) The retail store, because the terms of the advertisement were merely an invitation to make an offer, and the offer made was duly rejected by the store.\nC) The customer, because this was a contract of adhesion favoring one party only, and as such, the store could not enforce it.\nD) The store, in that a contract was made at $50 each, which was the store's actual intended price for the sweaters.\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "professional_law",
+  "answer": "A",
+  "choices": [
+   "The customer, because the terms of the advertisement were definite enough to constitute an offer and the offer was duly accepted.",
+   "The retail store, because the terms of the advertisement were merely an invitation to make an offer, and the offer made was duly rejected by the store.",
+   "The customer, because this was a contract of adhesion favoring one party only, and as such, the store could not enforce it.",
+   "The store, in that a contract was made at $50 each, which was the store's actual intended price for the sweaters."
+  ]
+ },
+ {
+  "prompt": "Which religion below is a universalizing religion?\n\nA) Taoism\nB) Islam\nC) Shintoism\nD) Confucianism\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "high_school_geography",
+  "answer": "B",
+  "choices": [
+   "Taoism",
+   "Islam",
+   "Shintoism",
+   "Confucianism"
+  ]
+ },
+ {
+  "prompt": "_____________ is influenced by perceptions of the fairness of prices set, latitude of price acceptance (customers appear willing to accept a price within a range of prices suggesting a 'price zone of tolerance'), magnitude (absolute price) and frequency of purchase, price presentation (how prices are presented might produce different levels of willingness to pay), and advertising.\n\nA) Brand awareness.\nB) Price perception.\nC) Willingness to pay.\nD) Price consciousness.\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "marketing",
+  "answer": "C",
+  "choices": [
+   "Brand awareness.",
+   "Price perception.",
+   "Willingness to pay.",
+   "Price consciousness."
+  ]
+ },
+ {
+  "prompt": "Suppose that observations are available on the monthly bond prices of 100 companies for 5 years. What type of data are these?\n\nA) Cross-sectional\nB) Time-series\nC) Panel\nD) Qualitative\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "econometrics",
+  "answer": "C",
+  "choices": [
+   "Cross-sectional",
+   "Time-series",
+   "Panel",
+   "Qualitative"
+  ]
+ },
+ {
+  "prompt": "Under a divorce settlement, Joan transferred her 50% ownership of their personal residence to Jim. The joint basis of the residence was $200,000. At the time of the transfer, the property's fair market value was $300,000. What was Joan's recognized gain and Jim's basis for the residence?\nRecognized gain; Basis\n\nA) $50,000; $250,000\nB) $50,000; $300,000\nC) $0; $200,000\nD) $0; $300,000\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "professional_accounting",
+  "answer": "C",
+  "choices": [
+   "$50,000; $250,000",
+   "$50,000; $300,000",
+   "$0; $200,000",
+   "$0; $300,000"
+  ]
+ },
+ {
+  "prompt": "Which of the following was not a noticeable consequence of the SARS outbreak in 2002/2003, in terms of security studies?\n\nA) Although the ultimate impact of SARS was less severe than many feared, the outbreak served to warn international communities of the potential threat posed by infectious diseases in the globalized arena.\nB) High rates of morbidity amongst infected patients posed a direct threat to human security. With most fatalities occurring within young, otherwise healthy adult populations, serious questions about future economic and other sectors of security were raised.\nC) Quarantine and isolation procedures were implemented by some national health agencies, restricting the movements of those perceived to be at risk of being infected with the virus.\nD) There were detrimental impacts on the travel and tourism industry, as people became reluctant to expose themselves to areas or situations which they deemed to pose a higher risk of infection.\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "security_studies",
+  "answer": "B",
+  "choices": [
+   "Although the ultimate impact of SARS was less severe than many feared, the outbreak served to warn international communities of the potential threat posed by infectious diseases in the globalized arena.",
+   "High rates of morbidity amongst infected patients posed a direct threat to human security. With most fatalities occurring within young, otherwise healthy adult populations, serious questions about future economic and other sectors of security were raised.",
+   "Quarantine and isolation procedures were implemented by some national health agencies, restricting the movements of those perceived to be at risk of being infected with the virus.",
+   "There were detrimental impacts on the travel and tourism industry, as people became reluctant to expose themselves to areas or situations which they deemed to pose a higher risk of infection."
+  ]
+ },
+ {
+  "prompt": "Human beings require many outside resources in order to survive. An individual will not survive without water, air, etc. Thankfully, the human brain is wired to seek out these resources when they are depleted before harm occurs to the individual. The downside of this, however, is that they can produce too much reward, and become a temptation. Which of the following statements would mean a desire has become a temptation?\n\nA) A person desiring to lose weight makes a late night snack to quell a craving.\nB) A marathon runner seeks out water after finishing a race.\nC) A free diver delays leaving the beach after a dive by a few minutes in order to regain their breath.\nD) A person pauses their show on TV in order to grab a blanket because they are cold.\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "college_medicine",
+  "answer": "A",
+  "choices": [
+   "A person desiring to lose weight makes a late night snack to quell a craving.",
+   "A marathon runner seeks out water after finishing a race.",
+   "A free diver delays leaving the beach after a dive by a few minutes in order to regain their breath.",
+   "A person pauses their show on TV in order to grab a blanket because they are cold."
+  ]
+ },
+ {
+  "prompt": "A woman and a defendant entered into an arrangement where the woman promised to pay the defendant $10,000 to act as a surrogate mother. In return, the defendant agreed to be implanted with the woman's embryo and carry the baby to term. The woman paid the defendant the $10,000 upfront. During the seventh month of the pregnancy, the defendant changed her mind and decided to keep the child herself. The defendant moved out of state and gave birth to the baby, which she refuses to turn over to the woman. The defendant is guilty of\n\nA) no crime.\nB) embezzlement.\nC) kidnapping.\nD) false pretenses.\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "professional_law",
+  "answer": "A",
+  "choices": [
+   "no crime.",
+   "embezzlement.",
+   "kidnapping.",
+   "false pretenses."
+  ]
+ },
+ {
+  "prompt": "Let S, T, and U be nonempty sets, and let f: S -> T and g: T -> U be functions such that the function g \u2218 f : S -> U is one-to-one (injective). Which of the following must be true?\n\nA) f is one-to-one.\nB) f is onto.\nC) g is one-to-one.\nD) g is onto.\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "college_mathematics",
+  "answer": "A",
+  "choices": [
+   "f is one-to-one.",
+   "f is onto.",
+   "g is one-to-one.",
+   "g is onto."
+  ]
+ },
+ {
+  "prompt": "Four hours into a defendant's assault trial, the lawyers gathered in the judge's chambers to discuss an evidentiary issue. While there, the judge received a phone call from his wife telling him that her mother had suddenly died. Without asking the lawyers what they wanted to do, the judge brought the lawyers back into the courtroom, declared a mistrial, excused the jury, and rushed home to his wife. A new jury was impaneled the next day before a second judge. The defendant has objected to the second trial on double jeopardy grounds. Would the second trial violate the prohibition against double jeopardy? against double jeopardy?\n\nA) No, because the first judge acted in good faith in declaring a mistrial.\nB) No, because the first trial did not produce a verdict.\nC) Yes, because the second judge's evidentiary rulings might be inconsistent with those of the first judge.\nD) Yes, because there was no manifest necessity for a mistrial.\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "professional_law",
+  "answer": "D",
+  "choices": [
+   "No, because the first judge acted in good faith in declaring a mistrial.",
+   "No, because the first trial did not produce a verdict.",
+   "Yes, because the second judge's evidentiary rulings might be inconsistent with those of the first judge.",
+   "Yes, because there was no manifest necessity for a mistrial."
+  ]
+ },
+ {
+  "prompt": "The price of gasoline has recently increased while at the same time gasoline consumption has also increased. What is happening in the gasoline market?\n\nA) This is evidence that contradicts the law of demand.\nB) The price of crude oil has fallen shifting the supply of gasoline to the right.\nC) A price ceiling has been imposed in the market for gasoline.\nD) Consumers prefer larger automobiles shifting the demand for gasoline to the right.\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "high_school_macroeconomics",
+  "answer": "D",
+  "choices": [
+   "This is evidence that contradicts the law of demand.",
+   "The price of crude oil has fallen shifting the supply of gasoline to the right.",
+   "A price ceiling has been imposed in the market for gasoline.",
+   "Consumers prefer larger automobiles shifting the demand for gasoline to the right."
+  ]
+ },
+ {
+  "prompt": "For which of these two scenarios does the main character (who uses I/me/my) do something clearly morally wrong, according to ordinary moral standards in the US as of 2020? Scenario 1 | I sent my teenage son to go get the groceries off the list. Scenario 2 | I arrested the mayor after a burglar broke into the mayor's house.\n\nA) Wrong, Wrong\nB) Wrong, Not wrong\nC) Not wrong, Wrong\nD) Not wrong, Not wrong\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "moral_scenarios",
+  "answer": "C",
+  "choices": [
+   "Wrong, Wrong",
+   "Wrong, Not wrong",
+   "Not wrong, Wrong",
+   "Not wrong, Not wrong"
+  ]
+ },
+ {
+  "prompt": "The statistic in a test manual that indicates how close an obtained score is to a true score is the\n\nA) reliability coefficient\nB) standard error of measurement\nC) validity coefficients\nD) standard error of estimate\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "professional_psychology",
+  "answer": "C",
+  "choices": [
+   "reliability coefficient",
+   "standard error of measurement",
+   "validity coefficients",
+   "standard error of estimate"
+  ]
+ },
+ {
+  "prompt": "Mesopotamia is located between which two rivers?\n\nA) Amazon and Nile\nB) Euphrates and Nile\nC) Tigris and Euphrates\nD) Thames and Danube\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "prehistory",
+  "answer": "C",
+  "choices": [
+   "Amazon and Nile",
+   "Euphrates and Nile",
+   "Tigris and Euphrates",
+   "Thames and Danube"
+  ]
+ },
+ {
+  "prompt": "Which of these actors did one-handed push-ups on stage at the 1992 Academy Awards?\n\nA) Sylvester Stallone\nB) Jack Nicholson\nC) Jack Palance\nD) Marisa Tomei\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "miscellaneous",
+  "answer": "C",
+  "choices": [
+   "Sylvester Stallone",
+   "Jack Nicholson",
+   "Jack Palance",
+   "Marisa Tomei"
+  ]
+ },
+ {
+  "prompt": "This question refers to the following information.\nThe condition of foreign states is not what it once was; they have invented the steamship, and introduced radical changes in the art of navigation. They have also built up their armies to a state of great efficiency and are possessed of war implements of great power and precision, in short have license to be formidable powers. If, therefore, we persistently cling to our antiquated systems, heaven only knows what a mighty calamity may befall our Empire.\n\u2014Adapted from a letter written by Lord Ii to Lord Tokugawa, 1847\nThe era in Japanese history following this passage is known as the\n\nA) Meiji Restoration.\nB) Heian period.\nC) Tokugawa Shogunate.\nD) Jomon period.\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "high_school_world_history",
+  "answer": "A",
+  "choices": [
+   "Meiji Restoration.",
+   "Heian period.",
+   "Tokugawa Shogunate.",
+   "Jomon period."
+  ]
+ },
+ {
+  "prompt": "For which of these two scenarios does the main character (who uses I/me/my) do something clearly morally wrong, according to ordinary moral standards in the US as of 2020? Scenario 1 | I wanted my pet toad to be healthy, so I fed it lots of earthworms. Scenario 2 | I exposed the truth about their employee spreading fake news.\n\nA) Wrong, Wrong\nB) Wrong, Not wrong\nC) Not wrong, Wrong\nD) Not wrong, Not wrong\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "moral_scenarios",
+  "answer": "D",
+  "choices": [
+   "Wrong, Wrong",
+   "Wrong, Not wrong",
+   "Not wrong, Wrong",
+   "Not wrong, Not wrong"
+  ]
+ },
+ {
+  "prompt": "For which of these two scenarios does the main character (who uses I/me/my) do something clearly morally wrong, according to ordinary moral standards in the US as of 2020? Scenario 1 | I spent my child support check on food and clothes for my side piece. Scenario 2 | The landfill is full of my disgarded sexual partners.\n\nA) Wrong, Wrong\nB) Wrong, Not wrong\nC) Not wrong, Wrong\nD) Not wrong, Not wrong\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "moral_scenarios",
+  "answer": "A",
+  "choices": [
+   "Wrong, Wrong",
+   "Wrong, Not wrong",
+   "Not wrong, Wrong",
+   "Not wrong, Not wrong"
+  ]
+ },
+ {
+  "prompt": "For the one-parameter model, mean-Square error (MSE) is defined as follows: 1/(2N) \\sum (y_n \u2212 \u03b2_0)^2 . We have a half term in the front because,\n\nA) scaling MSE by half makes gradient descent converge faster.\nB) presence of half makes it easy to do grid search. \nC) it does not matter whether half is there or not. \nD) none of the above\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "machine_learning",
+  "answer": "C",
+  "choices": [
+   "scaling MSE by half makes gradient descent converge faster.",
+   "presence of half makes it easy to do grid search. ",
+   "it does not matter whether half is there or not. ",
+   "none of the above"
+  ]
+ },
+ {
+  "prompt": "This question refers to the following information.\n\"As a means of effecting this end I suggest for your consideration the propriety of setting apart an ample district west of the Mississippi, and without the limit of any State or Territory now formed, to be guaranteed to the Indian tribes as long as they shall occupy it. . . . There they may be secured in the enjoyment of governments of their own choice, subject to no other control from the United States than such as may be necessary to preserve peace on the frontier and between the several tribes. There the benevolent may endeavor to teach them the arts of civilization. . . .\n\"This emigration would be voluntary, for it would be as cruel and unjust to compel the aborigines to abandon the graves of their fathers and seek a home in a distant land. But they should be distinctly informed that if they remain within the limits of the States they must be subject to their laws. . . .\"\n\u2014President Andrew Jackson, 1829\nMartin Luther King was in jail in Birmingham, Alabama, because of his belief in protesting injustice through the use of\n\nA) targeted assassinations of segregationist public officials.\nB) massive letter-writing campaigns denouncing segregated businesses.\nC) violent self-defense.\nD) nonviolent direct action.\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "high_school_us_history",
+  "answer": "D",
+  "choices": [
+   "targeted assassinations of segregationist public officials.",
+   "massive letter-writing campaigns denouncing segregated businesses.",
+   "violent self-defense.",
+   "nonviolent direct action."
+  ]
+ },
+ {
+  "prompt": "If a 3 percent increase in price leads to a 5 percent increase in the quantity supplied,\n\nA) supply is unit elastic\nB) demand is inelastic\nC) demand is elastic\nD) supply is elastic\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "high_school_microeconomics",
+  "answer": "D",
+  "choices": [
+   "supply is unit elastic",
+   "demand is inelastic",
+   "demand is elastic",
+   "supply is elastic"
+  ]
+ },
+ {
+  "prompt": "This question refers to the following information.\nRead the documents below.\nSource 1\nIf then by the Use of Machines, the Manufacture of Cotton, an Article which we import, and are supplied with from other Countries, and which can everywhere be procured on equal Terms, has met with such amazing Success, may not greater Advantages be reasonably expected from cultivating to the utmost the Manufacture of Wool, the Produce of our own Island, an Article in Demand in all Countries, almost the universal Clothing of Mankind?\nIn the Manufacture of Woollens, the Scribbling Mill, the Spinning Frame, and the Fly Shuttle, have reduced manual Labour nearly One third, and each of them at its-first Introduction carried an Alarm to the Work People, yet each has contributed to advance the Wages and to increase the Trade, so that if an Attempt was now made to deprive us of the Use of them, there is no Doubt, but every Person engaged in the Business, would exert himself to defend them.\n\u2014Statement by the Cloth Merchants of Leeds, 1791\nSource 2\nCome, cropper lads of high renown,\nWho love to drink good ale that's brown,\nAnd strike each haughty tyrant down,\nWith hatchet, pike, and gun!\nOh, the cropper lads for me,\nThe gallant lads for me,\nWho with lusty stroke,\nThe shear frames broke,\nThe cropper lads for me!\nWhat though the specials still advance,\nAnd soldiers nightly round us prance;\nThe cropper lads still lead the dance,\nWith hatchet, pike, and gun!\nOh, the cropper lads for me,\nThe gallant lads for me,\nWho with lusty stroke\nThe shear frames broke,\nThe cropper lads for me!\n\u2014Luddite Song, The Cropper's Song, c. 1812\nWhich of the following is NOT a result of the Industrial Revolution according to the documents and your knowledge of European history?\n\nA) In some of the less industrialized areas of Europe, the dominance of agricultural elites persisted into the twentieth century.\nB) Cities experienced overcrowding, while affected rural areas suffered declines in available labor as well as weakened communities.\nC) Class identity developed and was reinforced through daily life and participation in groups such as labor unions.\nD) Greater social and economic equity emerged as the workers and their bosses saw their incomes become more equal.\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "high_school_european_history",
+  "answer": "D",
+  "choices": [
+   "In some of the less industrialized areas of Europe, the dominance of agricultural elites persisted into the twentieth century.",
+   "Cities experienced overcrowding, while affected rural areas suffered declines in available labor as well as weakened communities.",
+   "Class identity developed and was reinforced through daily life and participation in groups such as labor unions.",
+   "Greater social and economic equity emerged as the workers and their bosses saw their incomes become more equal."
+  ]
+ },
+ {
+  "prompt": "You work for a utility company that is building a biomass plant in the community. Your employer asks you to give a series of community talks about the plant and future operations. You visit the plant several hours before you are due to give a speech that has been prepared by your immediate supervisor. During the tour of the plant, you discover several claims in the speech are not true.  What do you do?\n\nA) Write and deliver a new speech that you know is entirely correct. \nB) Cancel all speeches until you and your supervisor can get the information straight. \nC) Deliver the speech as prepared and discuss the inaccuracies with your supervisor afterward.\nD) Address the inaccuracies with your supervisor immediately and make the necessary corrections before giving the speech. \n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "public_relations",
+  "answer": "D",
+  "choices": [
+   "Write and deliver a new speech that you know is entirely correct. ",
+   "Cancel all speeches until you and your supervisor can get the information straight. ",
+   "Deliver the speech as prepared and discuss the inaccuracies with your supervisor afterward.",
+   "Address the inaccuracies with your supervisor immediately and make the necessary corrections before giving the speech. "
+  ]
+ },
+ {
+  "prompt": "Which of the following correctly identifies the condition that explains inefficiency for firms in a monopolistically competitive industry?\n\nA) Higher output than competitive industries.\nB) Lower price than competitive industries.\nC) Price equals marginal cost.\nD) Excess capacity compared to competitive industries.\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "high_school_microeconomics",
+  "answer": "D",
+  "choices": [
+   "Higher output than competitive industries.",
+   "Lower price than competitive industries.",
+   "Price equals marginal cost.",
+   "Excess capacity compared to competitive industries."
+  ]
+ },
+ {
+  "prompt": "A hash function guarantees the integrity of a message. It guarantees that the message has not be\n\nA) Replaced\nB) Overview\nC) Changed\nD) Violated\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "computer_security",
+  "answer": "C",
+  "choices": [
+   "Replaced",
+   "Overview",
+   "Changed",
+   "Violated"
+  ]
+ },
+ {
+  "prompt": "Betty Buyer wanted to buy an antique Volvo automobile owned by Sarah Seller who had previously expressed some interest in selling.  Betty wrote Sarah a signed letter on April 1 stating \"I will buy your Volvo for $10,000 cash upon you bringing the vehicle to my home before April 5. This offer is not subject to countermand.\"\u009d On April 2 Sarah received the letter and wrote back a signed letter to Betty stating \"I accept your offer and promise to deliver the Volvo to you as you request.\"\u009d Unfortunately, the Postal Authority delayed delivery of Sarah's letter for 10 days.  In the mean time, Betty grew tired of not hearing from Sarah and purchased another car.  When she learned that Betty would not complete the transfer, Sarah sued for breach of contract.  The court will likely hold that\n\nA) The mailing of the April 2nd letter did not prevent a subsequent effective revocation by Betty.\nB) The April 2nd letter bound both parties to a bilateral contract when received.\nC) The April 2nd letter bound both parties to a unilateral contract.\nD) The April 2nd letter was effective to form a contract on April 12th, when the offeror received it.\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "professional_law",
+  "answer": "A",
+  "choices": [
+   "The mailing of the April 2nd letter did not prevent a subsequent effective revocation by Betty.",
+   "The April 2nd letter bound both parties to a bilateral contract when received.",
+   "The April 2nd letter bound both parties to a unilateral contract.",
+   "The April 2nd letter was effective to form a contract on April 12th, when the offeror received it."
+  ]
+ },
+ {
+  "prompt": "This question refers to the following information.\n\"One-half of the people of this nation to-day are utterly powerless to blot from the statute books an unjust law, or to write there a new and a just one. The women, dissatisfied as they are with this form of government, that enforces taxation without representation,\u2014that compels them to obey laws to which they have never given their consent,\u2014that imprisons and hangs them without a trial by a jury of their peers, that robs them, in marriage, of the custody of their own persons, wages and children,\u2014are this half of the people left wholly at the mercy of the other half, in direct violation of the spirit and letter of the declarations of the framers of this government, every one of which was based on the immutable principle of equal rights to all.\"\n\u2014Susan B. Anthony, \"I Stand Before You Under Indictment\" (speech), 1873\nThe actions taken by Andrew Carnegie that were critiqued in the cartoon reflected the thinking of which of the following concepts?\n\nA) The Social Gospel.\nB) Survival of the Fittest.\nC) The Gospel of Wealth.\nD) Rugged individualism.\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "high_school_us_history",
+  "answer": "C",
+  "choices": [
+   "The Social Gospel.",
+   "Survival of the Fittest.",
+   "The Gospel of Wealth.",
+   "Rugged individualism."
+  ]
+ },
+ {
+  "prompt": "Butler argues that the belief that there is a conflict between public goods and private goods arises from our notions of:\n\nA) justice.\nB) benevolence.\nC) property.\nD) charity.\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "philosophy",
+  "answer": "C",
+  "choices": [
+   "justice.",
+   "benevolence.",
+   "property.",
+   "charity."
+  ]
+ },
+ {
+  "prompt": "For which of these two scenarios does the main character (who uses I/me/my) do something clearly morally wrong, according to ordinary moral standards in the US as of 2020? Scenario 1 | I dropped my baby doll on the ground. Scenario 2 | I loved being a home health aide because my old patients shared their social security checks with me.\n\nA) Wrong, Wrong\nB) Wrong, Not wrong\nC) Not wrong, Wrong\nD) Not wrong, Not wrong\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "moral_scenarios",
+  "answer": "C",
+  "choices": [
+   "Wrong, Wrong",
+   "Wrong, Not wrong",
+   "Not wrong, Wrong",
+   "Not wrong, Not wrong"
+  ]
+ },
+ {
+  "prompt": "In which cases may a non-injured State invoke the responsibility of the culprit State?\n\nA) Only in cases that the injured State has authorized a non-injured one to invoke the responsibility on its behalf\nB) In cases of breaches of specific obligations protecting the collective interests of a group of States (obligations erga omnes partes) or the interests of the international community as a whole (obligations erga omnes)\nC) In cases of violation of acts of international organizations, such as General Assembly Resolutions\nD) In cases of non-compliance with a decision of an international court or tribunal\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "international_law",
+  "answer": "B",
+  "choices": [
+   "Only in cases that the injured State has authorized a non-injured one to invoke the responsibility on its behalf",
+   "In cases of breaches of specific obligations protecting the collective interests of a group of States (obligations erga omnes partes) or the interests of the international community as a whole (obligations erga omnes)",
+   "In cases of violation of acts of international organizations, such as General Assembly Resolutions",
+   "In cases of non-compliance with a decision of an international court or tribunal"
+  ]
+ },
+ {
+  "prompt": "Who is considered the \u201cfather\u201d of containment?\n\nA) George Kennan\nB) John Foster Dulles\nC) Henry Kissinger\nD) Dwight Eisenhower\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "us_foreign_policy",
+  "answer": "A",
+  "choices": [
+   "George Kennan",
+   "John Foster Dulles",
+   "Henry Kissinger",
+   "Dwight Eisenhower"
+  ]
+ },
+ {
+  "prompt": "For which of these two scenarios does the main character (who uses I/me/my) do something clearly morally wrong, according to ordinary moral standards in the US as of 2020? Scenario 1 | I didn't think his wife was even remotely attractive, so I decided I would never ask her out even if she was unmarried. Scenario 2 | I chased my sister with a hot iron.\n\nA) Wrong, Wrong\nB) Wrong, Not wrong\nC) Not wrong, Wrong\nD) Not wrong, Not wrong\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "moral_scenarios",
+  "answer": "C",
+  "choices": [
+   "Wrong, Wrong",
+   "Wrong, Not wrong",
+   "Not wrong, Wrong",
+   "Not wrong, Not wrong"
+  ]
+ },
+ {
+  "prompt": "What are the mean and standard deviation of a binomial experiment that occurs with probability of success 0.76 and is repeated 150 times?\n\nA) 114, 27.35\nB) 100.5, 5.23\nC) 114, 5.23\nD) The mean is 114, but there is not enough information given to determine the standard deviation.\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "high_school_statistics",
+  "answer": "D",
+  "choices": [
+   "114, 27.35",
+   "100.5, 5.23",
+   "114, 5.23",
+   "The mean is 114, but there is not enough information given to determine the standard deviation."
+  ]
+ },
+ {
+  "prompt": "An auto body shop operated for many years in a residential zoning district as a nonconforming use. The owner temporarily closed the business due to illness; while it was closed, he tried to sell it. Within a few months, he sold it to another auto body company. The zoning ordinance provided that when a nonconforming use was abandoned, it could not later be resurrected. The city claimed that the use was abandoned and could not be reopened. The zoning hearing board agreed. On appeal to the county court, what was the court's most likely decision?\n\nA) The nonconforming use was still effective because this was a temporary cessation that did not constitute abandonment.\nB) The nonconforming use was abandoned because even a short cessation prevents it from being resurrected.\nC) A sale of the premises constitutes an abandonment of the nonconforming use.\nD) The nonconforming use was still effective because the abandonment rule in the ordinance was an unconstitutional prohibition on the right to use one's property.\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "professional_law",
+  "answer": "A",
+  "choices": [
+   "The nonconforming use was still effective because this was a temporary cessation that did not constitute abandonment.",
+   "The nonconforming use was abandoned because even a short cessation prevents it from being resurrected.",
+   "A sale of the premises constitutes an abandonment of the nonconforming use.",
+   "The nonconforming use was still effective because the abandonment rule in the ordinance was an unconstitutional prohibition on the right to use one's property."
+  ]
+ },
+ {
+  "prompt": "Characteristic X rays, appearing as sharp lines on a continuous background, are produced when high-energy electrons bombard a metal target. Which of the following processes results in the characteristic X rays?\n\nA) Electrons producing \u010cerenkov radiation\nB) Electrons colliding with phonons in the metal\nC) Electrons filling inner shell vacancies that are created in the metal atoms\nD) Electrons combining with protons to form neutrons\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "college_physics",
+  "answer": "C",
+  "choices": [
+   "Electrons producing \u010cerenkov radiation",
+   "Electrons colliding with phonons in the metal",
+   "Electrons filling inner shell vacancies that are created in the metal atoms",
+   "Electrons combining with protons to form neutrons"
+  ]
+ },
+ {
+  "prompt": "Which is the most reliable type of observational study for investigating the link between diet and cancer?\n\nA) Randomised controlled trial\nB) Prospective study\nC) Ecological study\nD) Case-control study\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "nutrition",
+  "answer": "B",
+  "choices": [
+   "Randomised controlled trial",
+   "Prospective study",
+   "Ecological study",
+   "Case-control study"
+  ]
+ },
+ {
+  "prompt": "The equilibrium constant of a certain reaction is 2.6 \u00d7 10^8 at 25 \u00b0C. What is the value of \u0394G\u00b0?\n\nA) -48.0 kJ/mol\nB) 20.8 J mol-1\nC) 4.68 \u00d7 10^-3 kJ/mol\nD) -4.03 kJ mol-1\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "high_school_chemistry",
+  "answer": "A",
+  "choices": [
+   "-48.0 kJ/mol",
+   "20.8 J mol-1",
+   "4.68 \u00d7 10^-3 kJ/mol",
+   "-4.03 kJ mol-1"
+  ]
+ },
+ {
+  "prompt": "Which of the following statements is inaccurate?\n\nA) Proportionality is a means of balancing the rights of an individual against the protection of the community as a whole\nB) For an act to be proportionate, it should be linked to the legitimate aim of the state measure complained of\nC) Proportionality is the same as reasonableness\nD) Proportionality should mean the state takes the least intrusive action that is necessary\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "international_law",
+  "answer": "C",
+  "choices": [
+   "Proportionality is a means of balancing the rights of an individual against the protection of the community as a whole",
+   "For an act to be proportionate, it should be linked to the legitimate aim of the state measure complained of",
+   "Proportionality is the same as reasonableness",
+   "Proportionality should mean the state takes the least intrusive action that is necessary"
+  ]
+ },
+ {
+  "prompt": "Which of the following statements describes the structural level of a protein that is least affected by hydrogen bonding?\n\nA) Primary structure depends on the sequence of amino acids.\nB) Tertiary structure has a shape dependent on the interactions of side chains of amino acids.\nC) Quaternary structure results from the aggregation of more than one polypeptide unit.\nD) An \u03b1-helix is an example of a secondary structure of a polypeptide.\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "high_school_biology",
+  "answer": "A",
+  "choices": [
+   "Primary structure depends on the sequence of amino acids.",
+   "Tertiary structure has a shape dependent on the interactions of side chains of amino acids.",
+   "Quaternary structure results from the aggregation of more than one polypeptide unit.",
+   "An \u03b1-helix is an example of a secondary structure of a polypeptide."
+  ]
+ },
+ {
+  "prompt": "For which of these two scenarios does the main character (who uses I/me/my) do something clearly morally wrong, according to ordinary moral standards in the US as of 2020? Scenario 1 | I used my oversized SUV to block the fire station driveway. Scenario 2 | I broke a pencil while working on my final exam.\n\nA) Wrong, Wrong\nB) Wrong, Not wrong\nC) Not wrong, Wrong\nD) Not wrong, Not wrong\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "moral_scenarios",
+  "answer": "B",
+  "choices": [
+   "Wrong, Wrong",
+   "Wrong, Not wrong",
+   "Not wrong, Wrong",
+   "Not wrong, Not wrong"
+  ]
+ },
+ {
+  "prompt": "Continued high agricultural production by farms in the United States depends most on which of the following natural resources?\n\nA) Coal\nB) Limestone\nC) Gypsum\nD) Petroleum\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "miscellaneous",
+  "answer": "D",
+  "choices": [
+   "Coal",
+   "Limestone",
+   "Gypsum",
+   "Petroleum"
+  ]
+ },
+ {
+  "prompt": "Which of the following is true regarding the examination of the legs?\n\nA) Sustained clonus occurs with hypotonia\nB) Clonus can only be demonstrated at the ankle\nC) The root value of hip flexion is L4, L5\nD) The root value of toe extension is L5\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "clinical_knowledge",
+  "answer": "D",
+  "choices": [
+   "Sustained clonus occurs with hypotonia",
+   "Clonus can only be demonstrated at the ankle",
+   "The root value of hip flexion is L4, L5",
+   "The root value of toe extension is L5"
+  ]
+ },
+ {
+  "prompt": "Pro bono services are:\n\nA) legal and ethical.\nB) legal but unethical.\nC) illegal but ethical.\nD) illegal and unethical.\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "professional_psychology",
+  "answer": "A",
+  "choices": [
+   "legal and ethical.",
+   "legal but unethical.",
+   "illegal but ethical.",
+   "illegal and unethical."
+  ]
+ },
+ {
+  "prompt": "During a hurricane, a 1,200 Hz warning siren on the town hall sounds. The wind is blowing at 55 m/s in a direction from the siren toward a person 1 km away. With what frequency does the sound wave reach the person? (The speed of sound in air is 330 m/s.)\n\nA) 1,000 Hz\nB) 1,030 Hz\nC) 1,200 Hz\nD) 1,400 Hz\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "college_physics",
+  "answer": "C",
+  "choices": [
+   "1,000 Hz",
+   "1,030 Hz",
+   "1,200 Hz",
+   "1,400 Hz"
+  ]
+ },
+ {
+  "prompt": "How should a nongovernmental not-for-profit organization classify gains and losses on investments purchased with permanently restricted assets?\n\nA) Gains may not be netted against losses in the statement of activities.\nB) Gains and losses can only be reported net of expenses in the statement of activities.\nC) Unless explicitly restricted by donor or law, gains and losses should be reported in the statement of activities as increases or decreases in unrestricted net assets.\nD) Unless explicitly restricted by donor or law, gains and losses should be reported in the statement of activities as increases or decreases in permanently restricted net assets.\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "professional_accounting",
+  "answer": "C",
+  "choices": [
+   "Gains may not be netted against losses in the statement of activities.",
+   "Gains and losses can only be reported net of expenses in the statement of activities.",
+   "Unless explicitly restricted by donor or law, gains and losses should be reported in the statement of activities as increases or decreases in unrestricted net assets.",
+   "Unless explicitly restricted by donor or law, gains and losses should be reported in the statement of activities as increases or decreases in permanently restricted net assets."
+  ]
+ },
+ {
+  "prompt": "A state has recently enacted a statute prohibiting the sale of beer in glass bottles. In accordance with the new law, all beer consumed within the state must be sold in aluminum cans that are recyclable. There is a provision of the statute that does permit breweries to distribute beer to bars, taverns, and restaurants in kegs for \"on-site\" consumption by patrons. Before the passage of the law, approximately 28% of all beer consumed in the state was packaged in glass bottles. Of that total, 75% of the beer was bottled outside the state, while 25% was bottled by companies in-state. The legislature passed the law at the strong urging of the aluminum can industry. It was estimated that one aluminum company alone spent over $5,000,000 in its lobbying campaign for the passage of the bill. Ironically, the new law even received strong support from environmentalists who believed that recyclable cans would help prevent littering and unsightly trash accumulation. The strongest federal constitutional argument against the validity of the law is that it violates the\n\nA) equal protection clause of the Fourteenth Amendment by discriminating against beer bottlers.\nB) privileges or immunities clause of the Fourteenth Amendment by preventing out-of-state beer bottlers from conducting their business in the state.\nC) commerce clause by violating the negative implications on interstate commerce.\nD) contracts clause by impairing the ability of beer bottlers to honor existing contracts for the sale of bottled beer in the state.\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "professional_law",
+  "answer": "C",
+  "choices": [
+   "equal protection clause of the Fourteenth Amendment by discriminating against beer bottlers.",
+   "privileges or immunities clause of the Fourteenth Amendment by preventing out-of-state beer bottlers from conducting their business in the state.",
+   "commerce clause by violating the negative implications on interstate commerce.",
+   "contracts clause by impairing the ability of beer bottlers to honor existing contracts for the sale of bottled beer in the state."
+  ]
+ },
+ {
+  "prompt": "This question refers to the following information.\nYi Yin sacrificed to the former king, and presented the heir-king reverently before the shrine of his grandfather. . . . Yi Yin then clearly described the virtue of the Meritorious Ancestor for the instruction of the young king.\n\"Oh! of old the former kings of Xia cultivated earnestly their virtue, and then there were no calamities from Heaven. The spirits of the hills and rivers were all in tranquility; and the birds and beasts enjoyed their existence according to their nature. But their descendant did not follow their example, and Heaven sent down calamities, using our ruler, who possessed of its favor. The attack on Xia may be traced to the orgies in Ming Tiao. . . . Our king of Shang brilliantly displayed his sagely prowess; for oppression he substituted his generous gentleness. Now your Majesty is entering on the inheritance of his virtue; all depends on how you commence your reign.\n\"Oh! the former king began with careful attention to the bonds that hold men together. . . . Revere these warnings in your person. . . . The ways of Heaven are not invariable: on the good-doer it sends down all blessings, and on the evil-doer it sends down all miseries. If you not be virtuous, be it in large things or in small, it will bring the ruin of your ancestral temple.\"\n\u2014Excerpted and adapted from the Shu Jing, 6th century BCE, China\nWhich of the following best supports the importance of ancestor worship in China during the period 600 BCE to 600 CE?\n\nA) Former kings of Xia cultivated earnestly their virtue, and then there were no calamities from Heaven.\nB) It will bring the ruin of your ancestral temple.\nC) Presented the heir-king reverently before the shrine of his grandfather.\nD) The former king began with careful attention to the bonds that hold men together.\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "high_school_world_history",
+  "answer": "C",
+  "choices": [
+   "Former kings of Xia cultivated earnestly their virtue, and then there were no calamities from Heaven.",
+   "It will bring the ruin of your ancestral temple.",
+   "Presented the heir-king reverently before the shrine of his grandfather.",
+   "The former king began with careful attention to the bonds that hold men together."
+  ]
+ },
+ {
+  "prompt": "What kind of State practice is required?\n\nA) Widespread, consistent and uniform practice, consisting both of acts and omissions.\nB) Only widespread, consistent and uniform acts and not omissions of States\nC) Widespread acts and omissions of States but not necessarily consistent or uniform\nD) Consistent practice of few States, including both acts and omissions, which is met with protestation by the other States\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "international_law",
+  "answer": "A",
+  "choices": [
+   "Widespread, consistent and uniform practice, consisting both of acts and omissions.",
+   "Only widespread, consistent and uniform acts and not omissions of States",
+   "Widespread acts and omissions of States but not necessarily consistent or uniform",
+   "Consistent practice of few States, including both acts and omissions, which is met with protestation by the other States"
+  ]
+ },
+ {
+  "prompt": "Which statement is NOT true of a crisis management team?\n\nA) All members should be trained in media relations.\nB) A member of senior management should be included in the team.\nC) A lawyer should be included in the team.\nD) All members should be trained in group decision making.\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "public_relations",
+  "answer": "C",
+  "choices": [
+   "All members should be trained in media relations.",
+   "A member of senior management should be included in the team.",
+   "A lawyer should be included in the team.",
+   "All members should be trained in group decision making."
+  ]
+ },
+ {
+  "prompt": "State legislatures often delegate lawmaking authority to local government bodies, including cities and municipalities, counties, school districts, water districts, and such. These governmental units are empowered to adopt ________.\n\nA) ordinances\nB) executive orders\nC) federal statutes\nD) charters\n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "jurisprudence",
+  "answer": "A",
+  "choices": [
+   "ordinances",
+   "executive orders",
+   "federal statutes",
+   "charters"
+  ]
+ },
+ {
+  "prompt": "A defendant owned a large parcel of farmland located in a rural section of a state. He conducted a small farming operation on the property and grew corn, broccoli, and other vegetables, which he sold to local produce companies. One day, the county police received an anonymous tip that the defendant was growing marijuana on his farm. Acting on this information, in an unmarked vehicle, two undercover police officers then drove to the defendant's farm. They climbed over a chain-link fence and walked around the farm. While surveying the terrain, they came upon a small marijuana patch. The officers then noticed fresh footprints that led from the marijuana patch to a nearby cabin. Believing that marijuana was being stored in the cabin, the police officers decided to immediately secure a search warrant. After obtaining the warrant, they returned to the defendant's farm and entered the cabin. Inside the cabin, the police found a large amount of marijuana that had been recently harvested. The defendant was then arrested and charged with unlawful possession of marijuana. The defendant files a pretrial motion to suppress the marijuana as evidence on grounds of an illegal search and seizure. The motion should be\n\nA) denied, because the officers secured a warrant before entering the cabin despite the fact that their earlier actions may have been unlawful. \nB) denied, because the warrant was validly issued and based upon information lawfully obtained. \nC) granted, because the marijuana was the fruit of an illegal search and seizure, since the police did not have probable cause to conduct their investigation. \nD) granted, because the police were unlawfully on the defendant's property when the marijuana was initially discovered. \n\nAnswer with a single letter (A, B, C, or D).",
+  "label": -1,
+  "source": "mmlu",
+  "category": "professional_law",
+  "answer": "B",
+  "choices": [
+   "denied, because the officers secured a warrant before entering the cabin despite the fact that their earlier actions may have been unlawful. ",
+   "denied, because the warrant was validly issued and based upon information lawfully obtained. ",
+   "granted, because the marijuana was the fruit of an illegal search and seizure, since the police did not have probable cause to conduct their investigation. ",
+   "granted, because the police were unlawfully on the defendant's property when the marijuana was initially discovered. "
+  ]
+ }
+]

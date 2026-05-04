@@ -1,0 +1,256 @@
+# Source of truth for SAE-steering / safety-monitor literature.
+# Run: uv run python safety_research/scripts/bib/build_bib.py
+# Output: safety_research/paper/refs.bib
+#
+# All arXiv IDs were verified via Hugging Face's paper search before being
+# committed; see commit message for the search log. Author lists, titles,
+# years, and venues are fetched from export.arxiv.org by build_bib.py — never
+# typed by hand.
+#
+# Naming convention: <firstauthor><year><shorttitleword>.
+
+# =====================================================================
+# SAE foundations
+# =====================================================================
+
+[[cite]]
+key   = "cunningham2023sparse"
+arxiv = "2309.08600"
+claim = "First demonstration that sparse autoencoders trained on LM activations recover highly interpretable, monosemantic features."
+
+[[cite]]
+key   = "gao2024scaling"
+arxiv = "2406.04093"
+claim = "k-sparse / TopK SAEs scale to large language models with cleaner sparsity-fidelity trade-off than L1-regularised SAEs; introduces dead-latent diagnostics."
+
+[[cite]]
+key   = "rajamanoharan2024jumprelu"
+arxiv = "2407.14435"
+claim = "JumpReLU activation closes the reconstruction gap of TopK / Gated SAEs while retaining a hard L0 sparsity penalty via straight-through-estimators."
+
+[[cite]]
+key   = "lieberum2024gemmascope"
+arxiv = "2408.05147"
+claim = "Open suite of JumpReLU SAEs for every layer of Gemma-2-2b/9b/27b — the canonical drop-in dictionary for Gemma-family interpretability."
+
+# =====================================================================
+# Refusal direction & residual-stream activation steering (no SAE)
+# =====================================================================
+
+[[cite]]
+key   = "arditi2024refusal"
+arxiv = "2406.11717"
+claim = "Refusal in instruction-tuned LMs is mediated by a single direction in residual-stream activations; ablating that direction is a white-box jailbreak."
+
+[[cite]]
+key   = "turner2023actadd"
+arxiv = "2308.10248"
+claim = "Activation Addition (ActAdd) — adding a difference of cached activations at inference steers behavior without weight updates; the foundational ActAdd reference."
+
+[[cite]]
+key   = "panickssery2024caa"
+arxiv = "2312.06681"
+# arXiv first author is "Nina Panickssery" (formerly Rimsky); the skill rule
+# says key matches metadata first author. Older citations of this paper as
+# "Rimsky et al." are retroactively wrong; we follow the current attribution.
+claim = "Contrastive Activation Addition (CAA) — average residual differences between paired contrastive prompts produce stable, interpretable steering vectors on Llama-2."
+
+[[cite]]
+key   = "park2023linear"
+arxiv = "2311.03658"
+claim = "Formalises the Linear Representation Hypothesis with counterfactuals; identifies the (non-Euclidean) inner product under which steering vectors and probes coincide."
+
+# =====================================================================
+# Refusal-direction extensions: structure beyond the single axis
+# =====================================================================
+
+[[cite]]
+key   = "wollschlager2025geometry"
+arxiv = "2502.17420"
+claim = "LLMs use *multiple* independent refusal mechanisms organised as 'concept cones' — Arditi's single-direction view is not the full story."
+
+[[cite]]
+key   = "siu2025cosmic"
+arxiv = "2506.00085"
+claim = "COSMIC — automated, template-free identification of refusal directions via cosine similarity; works on weakly aligned models too."
+
+# =====================================================================
+# SAE-feature steering — the direct ancestors of FSGA
+# =====================================================================
+
+[[cite]]
+key   = "obrien2024refusalsae"
+arxiv = "2411.11296"
+claim = "Steering refusal via SAE features on Phi-3 / Llama-3 — additive feature steering recovers some refusal control but degrades benchmark performance."
+
+[[cite]]
+key   = "chalnev2024sae_ts"
+arxiv = "2411.02193"
+claim = "SAE-Targeted Steering (SAE-TS) — uses SAE feature deltas to project candidate steering vectors onto a coherence-preserving subspace, beating naive CAA."
+
+[[cite]]
+key   = "mayne2024decompose"
+arxiv = "2411.08790"
+claim = "Decomposing existing steering vectors via SAE encoders is misleading — SAE inputs are out-of-distribution and feature directions interact non-orthogonally; cautions against naively reading steering as 'sum of feature directions'."
+
+[[cite]]
+key   = "soo2025fgaa"
+arxiv = "2501.09929"
+claim = "Feature Guided Activation Additions (FGAA) — combines CAA with SAE-feature optimisation in latent space for more targeted steering than either alone."
+
+[[cite]]
+key   = "arad2025sae_steer"
+arxiv = "2505.20063"
+claim = "SAEs *can* steer effectively, but only when input-feature and output-feature selection is done correctly — sharpens the AxBench negative result."
+
+[[cite]]
+key   = "yeo2025refusalsae"
+arxiv = "2505.23556"
+claim = "Mechanistic SAE study of refusal across multiple instruction-tuned LMs — identifies causally relevant refusal latents, validates with adversarial jailbreaks."
+
+# =====================================================================
+# Sparse-feature circuits / interpretability
+# =====================================================================
+
+[[cite]]
+key   = "marks2024sparsefeature"
+arxiv = "2403.19647"
+claim = "Sparse Feature Circuits — discover and edit interpretable causal subgraphs in LMs from SAE features; introduces SHIFT and feature-ablation editing."
+
+# =====================================================================
+# Negative results / failures of SAE-based safety tooling
+# =====================================================================
+
+[[cite]]
+key   = "deleeuw2025secret"
+arxiv = "2509.20393"
+claim = "Secret Agenda — autolabelled deception SAE features rarely fire when 38 LLMs are *actually* lying; steering 100+ deception-labelled features fails to suppress strategic dishonesty."
+
+[[cite]]
+key   = "kretschmar2025liars"
+arxiv = "2511.16035"
+claim = "Liars' Bench — 72.8K-example deception-detection benchmark across 7 datasets / 4 open-weight LMs; lie-detection probes generalise poorly across deception types."
+
+[[cite]]
+key   = "parrack2025b2w"
+arxiv = "2507.12691"
+claim = "Black-to-White boost — protocol for measuring how much a *white-box* monitor (probe, SAE feature) improves over a black-box judge baseline; the boost is real but smaller than expected."
+
+[[cite]]
+key   = "kantamneni2025probing"
+arxiv = "2502.16681"
+claim = "Are SAEs Useful? — across 113 binary-probing datasets, SAE-feature probes do not consistently beat raw-activation baselines under data scarcity, class imbalance, or covariate shift."
+
+[[cite]]
+key   = "wu2025axbench"
+arxiv = "2501.17148"
+claim = "AxBench — under a unified protocol, prompting and finetuning beat SAE feature steering for behavioural control; difference-in-means matches SAEs for concept *detection*."
+
+[[cite]]
+key   = "korznikov2026sanity"
+arxiv = "2602.14111"
+claim = "Sanity Checks for SAEs — SAEs do not reliably beat random-baseline decompositions on causal-editing and sparse-probing despite high reconstruction; questions the standard SAE evaluation paradigm."
+
+# =====================================================================
+# Parameter-efficient steering / fine-tuning baselines
+# =====================================================================
+
+[[cite]]
+key   = "wu2024reft"
+arxiv = "2404.03592"
+claim = "Representation Finetuning (ReFT / LoReFT) — low-rank linear edits to frozen LM hidden states beat LoRA-class PEFT at far lower parameter counts; ReFT-r1 is AxBench's strongest steering baseline."
+
+# =====================================================================
+# SAE benchmarks
+# =====================================================================
+
+[[cite]]
+key   = "karvonen2025saebench"
+arxiv = "2503.09532"
+claim = "SAEBench — first standardised SAE evaluation suite spanning unlearning, feature absorption, scrubbing, sparse probing; shows proxy metrics often disagree with downstream task performance."
+
+# =====================================================================
+# Crosscoders & temporal-SAE family — context for TXC
+# =====================================================================
+
+[[cite]]
+key   = "elhage2022toy"
+arxiv = "2209.10652"
+claim = "Toy Models of Superposition — formalises the polysemanticity / superposition picture that motivates SAE training."
+
+# The Anthropic *Crosscoders* update is web-only (Transformer Circuits Thread).
+# Cited as a manual misc entry. AUDIT: every author name was verified against the
+# byline at https://transformer-circuits.pub/2024/crosscoders/index.html .
+[[cite]]
+key   = "lindsey2024crosscoders"
+manual = true
+entry = """
+@misc{lindsey2024crosscoders,
+  author       = {Lindsey, Jack and Templeton, Adly and Marcus, Jonathan and Conerly, Tom and Batson, Joshua and Olah, Christopher},
+  title        = {Sparse Crosscoders for Cross-Layer Features and Model Diffing},
+  year         = {2024},
+  howpublished = {\\url{https://transformer-circuits.pub/2024/crosscoders/index.html}},
+  note         = {Transformer Circuits Thread}
+}
+"""
+claim = "Crosscoders — share a sparse dictionary across multiple sites (layers / model variants); the original architectural template that Temporal Crosscoders specialises to time."
+
+[[cite]]
+key   = "bricken2023monosemantic"
+manual = true
+entry = """
+@misc{bricken2023monosemantic,
+  author       = {Bricken, Trenton and Templeton, Adly and Batson, Joshua and Chen, Brian and Jermyn, Adam and Conerly, Tom and Turner, Nick and Anil, Cem and Denison, Carson and Askell, Amanda and Lasenby, Robert and Wu, Yifan and Kravec, Shauna and Schiefer, Nicholas and Maxwell, Tim and Joseph, Nicholas and Hatfield-Dodds, Zac and Tamkin, Alex and Nguyen, Karina and McLean, Brayden and Burke, Josiah E and Hume, Tristan and Carter, Shan and Henighan, Tom and Olah, Christopher},
+  title        = {Towards Monosemanticity: Decomposing Language Models With Dictionary Learning},
+  year         = {2023},
+  howpublished = {\\url{https://transformer-circuits.pub/2023/monosemantic-features/index.html}},
+  note         = {Transformer Circuits Thread}
+}
+"""
+claim = "First Anthropic SAE result on a 1L transformer; established the SAE-as-feature-dictionary paradigm now standard."
+
+# NOTE: the existing repo references file (docs/shared/references.md, on
+# han-phase7-unification) had two hallucinated cite keys —
+#   dunefsky2025txc -> arXiv:2511.01836 (actually Lubana et al, "Priors in Time")
+#   kissane2025txc  -> arXiv:2511.05541 (actually Bhalla et al, T-SAE)
+# We restore the correct first-author attributions below.
+
+[[cite]]
+key   = "bhalla2025tsae"
+arxiv = "2511.05541"
+claim = "Temporal Sparse Autoencoders (T-SAE) — per-position SAE stack with a temporal contrastive term that encourages slow-feature consistency across adjacent tokens."
+
+[[cite]]
+key   = "lubana2025tfa"
+arxiv = "2511.01836"
+claim = "Temporal Feature Analysis (TFA) / 'Priors in Time' — decomposes each activation into a context-predictable component plus a residual; argues SAE objectives implicitly assume IID-over-time."
+
+# The actual Dunefsky paper (transcoders, not temporal crosscoders).
+[[cite]]
+key   = "dunefsky2024transcoders"
+arxiv = "2406.11944"
+claim = "Transcoders — sparse linear approximators of MLP sublayers, enabling weights-based circuit analysis. Architectural cousin of crosscoders."
+
+# =====================================================================
+# Safety datasets used in the v2 steering eval
+# =====================================================================
+
+[[cite]]
+key   = "chao2024jbb"
+arxiv = "2404.01318"
+claim = "JailbreakBench (JBB) — open benchmark of 100 paired harmful/benign behaviours and standardised attack/defense protocols for jailbreak research."
+
+[[cite]]
+key   = "rottger2024xstest"
+arxiv = "2308.01263"
+claim = "XSTest — 450 prompts probing exaggerated-refusal failure modes; tests whether safety tuning over-refuses safe prompts that look superficially unsafe."
+
+[[cite]]
+key   = "huang2024malicious"
+arxiv = "2310.06987"
+claim = "MaliciousInstruct — 100 harmful instructions used to evaluate generation-exploitation jailbreaks; widely used as a third-distribution refusal benchmark."
+
+[[cite]]
+key   = "hendrycks2020mmlu"
+arxiv = "2009.03300"
+claim = "MMLU — 57-domain multiple-choice benchmark for measuring general LM knowledge across STEM, humanities, social science. Standard capability sanity check."

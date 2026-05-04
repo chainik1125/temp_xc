@@ -1,0 +1,1202 @@
+[
+ {
+  "prompt": "Make up a sentence with the words \"serendipity\" and \"opportunity\".",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Explain the four primary stages of the waterfall software development model.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "What is the process for creating a data visualization?",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Identify the 3 primary colors of the RGB color model",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Please provide some tips for writing a good blog post.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Name three organizations that are doing research related to artificial intelligence.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Create a function to calculate the average of four numbers.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "List five activities that would qualify as light physical activity.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Give 2 examples of web browsers.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Enter a valid email address",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Describe the main characteristics of an ideal customer for a fast-food restaurant",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Name two vegetables that start with the letter A",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Remind me to call my parents tomorrow at 7 pm.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Generate a list of possible job titles for a software developer.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "List at least three of the top-rated airports in the US.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Imagine you are visiting a beach. Describe your experience there.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Convert the expression 4(x-3) to its equivalent slope-intercept form.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Translate this sentence into French: \u201cI don\u2019t understand why it happened",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Generate a song title that has a dance vibe.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Research and provide three examples of Artificial Intelligence applications in healthcare.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Generate a headline for an article about a new app called 'Dog Walker'.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "How does a person set good goals?",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Generate potential steps for conducting a successful negotiation.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Generate a random secret key for an encryption algorithm.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Describe a situation that demonstrates a strong sense of leadership.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "In the context of a computer-aided recognition system, describe the differences between facial recognition and fingerprint recognition.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Suggest ways to improve garden health.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Give a list of environmental issues in India",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Mention five characteristics that make up a successful software development project.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Describe the layout of a classroom",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Find the volume of a box with a length of 12 cm, a width of 6 cm and a height of 4 cm.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Determine the molecular weight of carbon dioxide.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "What are the advantages of using a cloud-native architecture?",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "What is the role of the immune system in maintaining homeostasis?",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Spell out the meaning of the acronym AI.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Calculate the value of X in the equation 8X+6=14",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Predict how the stock price of TSLA will change in the next 48 hours.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Translate the phrase \"the world is yours\" into Spanish.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Compose a song in the key of B minor.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Create a product page for a ladder.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Name a type of software that can be used for text editing.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Design a dashboard display to show the weather forecast for the next 5 days.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Describe the process for creating a PowerPoint presentation",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Choose a random element from the following array \" [Apple, Pear, Cherry, Melon]\".",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "How many types of galaxies exist?",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Create an example of a better email subject line for the following message: \"Important Meeting.\"",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Come up with five words to describe a robot.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Generate a list of hobbies one can do indoors.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Generate an example of a valid HTML5 document",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Generate a new character for a fairy-tale.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Tell me a short story about a race between a rabbit and a fox.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Recreate the below drawing, in vector form:",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "List 4 benefits of eating breakfast every day.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Write an email to persuade your manager to grant you a pay raise.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Write a short dialogue between two people discussing a new type of mobile device.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Generate a scenario for an adventure game.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Tell me the definition of \u2018syntax\u2019.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Output a piece of code that will print out a list containing the numbers from 1 to 10.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Come up with a creative way to say \"happy birthday\"!",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Develop a plan to climb Mount Everest.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Compose a story of 200 words.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Create a tag line for a website that sells books.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Describe a meal that would be beneficial for muscle building.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Generate a list of 10 items that can be used as a conversation starter.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Give an example of an animal that is not endangered",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "What goes up must come down. Explain this proverb to me.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "How does gravity impact the movement of objects?",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Identify and list the three primary colors.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Describe the benefits of having a mentor.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "List three professions in which the use of artificial intelligence is common.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "How would you explain the definition of 'time series data' to non-technical people?",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Explain the benefits of using a task scheduler.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Ask the Assistant a question about the history of the Internet.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Generate an example context for a conversation between two people.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Provide a list of topics related to renewable energy.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Reword the following sentence so it uses the present perfect tense: \u201cI wrote an article yesterday.\u201d",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Cite an article from a scientific journal that supports the use of GPT models.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Compare and contrast the primary components of the US government.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Create a sentence using the words \"green\", \"counter\", \"sneeze\".",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "How would you design a data structure for storing a list of stock prices?",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Suggest a replacement for fossil fuels",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Generate an example of a catchy title for a blog post explaining what is Machine Learning",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Create a blog post on the importance of international volunteering.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Describe a marketing strategy for a new ice cream flavor?",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Generate a few words for a crossword puzzle on the topic of computer science.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Write three sentences to describe the effect that television ads can have on a campaign.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Edit the following paragraph to make it more interesting:\n\n\"An algorithm is a set of instructions used to solve a problem. Algorithms can involve data processing and decision making.\"",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Find the sum of two fractions: 3/4 + 7/8",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Suggest a creative method of decorating a room with plants.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Compose a speech outline about the negative health impacts of smoking.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "List three software development methods.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Describe a typical day for an accountant",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Write an original story involving two frogs, a cat, and a bear.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Create a tagline for a product that helps consumers save money.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Create a joke about a dog walking into a bar.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Give a suitable example for the phrase \"close cousin\"",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Suggest two technical improvements to enhance security for a website.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Provide a creative idea to communicate a new product",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Suggest a name for a website that provides online tutoring services.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Write a set of instructions for a game of rock-paper-scissors.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Construct a question using the following words: what, long, take.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Give four example of traditional Chinese dishes",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "List three safety measures for driving in icy conditions.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Describe the benefits of frequent physical activity.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Create a data table that lists five artificial intelligence companies and their founding years.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Explain the concept of angles of elevation and angles of depression.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Generate a list of 5 potential problems associated with artificial intelligence",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Generate data for a fictitious family of four.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Generate two open-ended questions to ask someone about their favorite book.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Explain the engineering design process.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Describe a home-cooked meal in three to five sentences.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Output the list of states in the US that allow same-sex marriage.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Convince me why studying history is important.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "How would you explain the concept of a 'memory leak' to someone with no background in computing?",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Please suggest a book for someone interested in learning about AI and machine learning.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Write a reaction sentence to the following statement: \u201cThis is going to be a long night.\u201d",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Make a list of three technologies that will shape the future.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Describe a creative way to use a single pencil",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Describe how data mining can be used in marketing.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Describe the importance of user feedback in software development.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Generate a poetic simile about the moon.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Describe three benefits of using animation in presentations.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Design a mobile application to display the weather forecast",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Compute the mean of the following data points: 3, 5, 7, 9.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Construct a query to retrieve data from a database.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Give a sample dialogue of how to ask a customer for feedback.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Develop three questions to ask when interviewing a sales executive.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Name two techniques to improve your memory.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Differentiate between good and bad customer service in the hospitality industry.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Generate a sentence that describes how you would use the following machine learning technique: Naive Bayes Classifier.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Brainstorm three activities to do with a group of six people.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Write a humorous one-liner about the advantages of having a dog.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Suggest an innovative solution to the problem of plastic pollution.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Generate 10 creative ideas for a birthday present.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Define what is meant by the term \"artificial intelligence\".",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Express your opinion on genetically modified food",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Generate a new recipe using these 3 ingredients: eggs, tomatoes, and cheese.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Describe how the color red looks",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Name three types of conversations used by artificial intelligence systems",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Compose two alternative greetings for a blog post.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Create a slogan for a political campaign using the verb \"change\".",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Summarize what is the consumer price index (CPI).",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Suggest a healthy meal idea",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Create a new CSS style for a button element.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Create a 3D array of random numbers, with shape of (3,3,3).",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Compare and contrast the effects of a production-driven economy and a service-driven economy",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Add the following numbers without using a calculator: 37 + 63",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Tell me a story about a person who traveled worldwide.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Summarize why it is important for people to be environmentally conscious.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Identify a use case for blockchain technology",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Design a prototype for a toaster",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Suggest three uses for a rewards based credit card.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Explain what the term \u201cwhite hat hacker\u201d means",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Generate a list of five tips to save money on groceries.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Write a story that includes the following words: vase, lighthouse, sparrow.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Generate a story about two siblings who find a mysterious object in the woods.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Compare and contrast the main similarities and differences between a computer and a smartphone",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "What are the common techniques for solving a system of linear equations?",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Arrange these words in alphabetical order: technology, robotics, computer",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Is it possible to create a GPT model without a GPU?",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Create a To-Do list for the following day",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Generate an adventure activity for a group of ten people.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Tell me the synonyms of 'flabbergasted'.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Choose five adjectives that best describe a data scientist.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "How does the speed of light compare to the speed of sound?",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Prove that the sum of two positive integers is always positive.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Generate a euphemism for getting fired.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "You are at a restaurant, what kind of food do you order?",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Rearrange the given sentence: \"It should not require much time.\"",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Edit the following sentence to make it sound more formal. \"we have to find some way to make it work\"",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Give 4 strategies to promote customer loyalty.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "How does the cardiovascular system maintain homeostasis in the body?",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Write the opposite meaning of grateful.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Open the Task Manager on your computer.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Describe the most dangerous form of modern slavery.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Come up with a fictional history of the number 42.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Find out something interesting about the Apollo 11 moon mission. Output the answer in one sentence.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Name three famous authors from the Romantic period.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "List the five major oceans in the world in order of size.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Imagine you are an alien visiting Earth for the first time. Describe what you are seeing.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Find 3 ways to reduce traffic accidents.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Determine whether the following statement is true or false: \"Light travels faster than sound.\"",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Write a post about why it is important to manage stress",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Generate a random password for an online service",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Pick any two famous painters and explain what makes their works distinctive from each other.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Construct a SQL query to find all records from the table \"inventory\" that have a quantity greater than 10.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Design a billboard that appeals to people who prefer healthy eating habits.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Rank the following emotions from least to most intense: fear, awe, sadness",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Explain the concept of corporate social responsibility",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Calculate the total cost of a purchase given the following: Quantity = 10, Price = $4",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Rewrite the following sentence in a more fluent way: \u201cI ran away, so the monster won't catch me\u201d",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Name two kinds of mammals.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Compare and contrast two techniques to manage stress.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Name five countries in which French is an official language.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "What activities can one do on a weekend?",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Create a program that converts Fahrenheit to Celsius.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Generate a persuasive argument for a new school policy.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "How does Newton's second law of motion explain the relationship between force, mass, and acceleration?",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Generate a password that meets the following criteria: at least 8 characters long and must contain any two of the following: numbers, lowercase letters, uppercase letters and special characters.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ },
+ {
+  "prompt": "Create a list of 4 programming languages used for mobile development.",
+  "label": 0,
+  "source": "alpaca",
+  "category": "benign"
+ }
+]

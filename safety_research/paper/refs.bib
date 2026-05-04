@@ -1,0 +1,428 @@
+% paper/refs.bib -- GENERATED FILE, DO NOT EDIT BY HAND.
+%
+% Regenerate with:  uv run python scripts/build_bib.py
+% Source of truth:  paper/refs_ids.toml
+% See also:         paper/CITATIONS.md
+%
+% Each entry is preceded by a `% source:` line naming the authoritative
+% identifier (arXiv ID, DOI, or ACL Anthology ID) and a `% claim:` line
+% naming the specific claim our paper makes against this reference. If
+% you find an entry whose author list, title, or year looks wrong, DO
+% NOT edit refs.bib -- edit refs_ids.toml and re-run the script.
+
+% source: arxiv:2309.08600
+% claim : First demonstration that sparse autoencoders trained on LM activations recover highly interpretable, monosemantic features.
+@misc{cunningham2023sparse,
+  author         = {Hoagy Cunningham and Aidan Ewart and Logan Riggs and Robert Huben and Lee Sharkey},
+  title          = {Sparse Autoencoders Find Highly Interpretable Features in Language Models},
+  year           = {2023},
+  eprint         = {2309.08600},
+  archivePrefix  = {arXiv},
+  primaryClass   = {cs.LG},
+  url            = {http://arxiv.org/abs/2309.08600v3}
+}
+
+% source: arxiv:2406.04093
+% claim : k-sparse / TopK SAEs scale to large language models with cleaner sparsity-fidelity trade-off than L1-regularised SAEs; introduces dead-latent diagnostics.
+@misc{gao2024scaling,
+  author         = {Leo Gao and Tom Dupré la Tour and Henk Tillman and Gabriel Goh and Rajan Troll and Alec Radford and Ilya Sutskever and Jan Leike and Jeffrey Wu},
+  title          = {Scaling and evaluating sparse autoencoders},
+  year           = {2024},
+  eprint         = {2406.04093},
+  archivePrefix  = {arXiv},
+  primaryClass   = {cs.LG},
+  url            = {http://arxiv.org/abs/2406.04093v1}
+}
+
+% source: arxiv:2407.14435
+% claim : JumpReLU activation closes the reconstruction gap of TopK / Gated SAEs while retaining a hard L0 sparsity penalty via straight-through-estimators.
+@misc{rajamanoharan2024jumprelu,
+  author         = {Senthooran Rajamanoharan and Tom Lieberum and Nicolas Sonnerat and Arthur Conmy and Vikrant Varma and János Kramár and Neel Nanda},
+  title          = {Jumping Ahead: Improving Reconstruction Fidelity with JumpReLU Sparse Autoencoders},
+  year           = {2024},
+  eprint         = {2407.14435},
+  archivePrefix  = {arXiv},
+  primaryClass   = {cs.LG},
+  url            = {http://arxiv.org/abs/2407.14435v3}
+}
+
+% source: arxiv:2408.05147
+% claim : Open suite of JumpReLU SAEs for every layer of Gemma-2-2b/9b/27b — the canonical drop-in dictionary for Gemma-family interpretability.
+@misc{lieberum2024gemmascope,
+  author         = {Tom Lieberum and Senthooran Rajamanoharan and Arthur Conmy and Lewis Smith and Nicolas Sonnerat and Vikrant Varma and János Kramár and Anca Dragan and Rohin Shah and Neel Nanda},
+  title          = {Gemma Scope: Open Sparse Autoencoders Everywhere All At Once on Gemma 2},
+  year           = {2024},
+  eprint         = {2408.05147},
+  archivePrefix  = {arXiv},
+  primaryClass   = {cs.LG},
+  url            = {http://arxiv.org/abs/2408.05147v2}
+}
+
+% source: arxiv:2406.11717
+% claim : Refusal in instruction-tuned LMs is mediated by a single direction in residual-stream activations; ablating that direction is a white-box jailbreak.
+@misc{arditi2024refusal,
+  author         = {Andy Arditi and Oscar Obeso and Aaquib Syed and Daniel Paleka and Nina Panickssery and Wes Gurnee and Neel Nanda},
+  title          = {Refusal in Language Models Is Mediated by a Single Direction},
+  year           = {2024},
+  eprint         = {2406.11717},
+  archivePrefix  = {arXiv},
+  primaryClass   = {cs.LG},
+  url            = {http://arxiv.org/abs/2406.11717v3}
+}
+
+% source: arxiv:2308.10248
+% claim : Activation Addition (ActAdd) — adding a difference of cached activations at inference steers behavior without weight updates; the foundational ActAdd reference.
+@misc{turner2023actadd,
+  author         = {Alexander Matt Turner and Lisa Thiergart and Gavin Leech and David Udell and Juan J. Vazquez and Ulisse Mini and Monte MacDiarmid},
+  title          = {Steering Language Models With Activation Engineering},
+  year           = {2023},
+  eprint         = {2308.10248},
+  archivePrefix  = {arXiv},
+  primaryClass   = {cs.CL},
+  url            = {http://arxiv.org/abs/2308.10248v5}
+}
+
+% source: arxiv:2312.06681
+% claim : Contrastive Activation Addition (CAA) — average residual differences between paired contrastive prompts produce stable, interpretable steering vectors on Llama-2.
+@misc{panickssery2024caa,
+  author         = {Nina Panickssery and Nick Gabrieli and Julian Schulz and Meg Tong and Evan Hubinger and Alexander Matt Turner},
+  title          = {Steering Llama 2 via Contrastive Activation Addition},
+  year           = {2023},
+  eprint         = {2312.06681},
+  archivePrefix  = {arXiv},
+  primaryClass   = {cs.CL},
+  url            = {http://arxiv.org/abs/2312.06681v4}
+}
+
+% source: arxiv:2311.03658
+% claim : Formalises the Linear Representation Hypothesis with counterfactuals; identifies the (non-Euclidean) inner product under which steering vectors and probes coincide.
+@misc{park2023linear,
+  author         = {Kiho Park and Yo Joong Choe and Victor Veitch},
+  title          = {The Linear Representation Hypothesis and the Geometry of Large Language Models},
+  year           = {2023},
+  eprint         = {2311.03658},
+  archivePrefix  = {arXiv},
+  primaryClass   = {cs.CL},
+  url            = {http://arxiv.org/abs/2311.03658v2}
+}
+
+% source: arxiv:2502.17420
+% claim : LLMs use *multiple* independent refusal mechanisms organised as 'concept cones' — Arditi's single-direction view is not the full story.
+@misc{wollschlager2025geometry,
+  author         = {Tom Wollschläger and Jannes Elstner and Simon Geisler and Vincent Cohen-Addad and Stephan Günnemann and Johannes Gasteiger},
+  title          = {The Geometry of Refusal in Large Language Models: Concept Cones and Representational Independence},
+  year           = {2025},
+  eprint         = {2502.17420},
+  archivePrefix  = {arXiv},
+  primaryClass   = {cs.LG},
+  url            = {http://arxiv.org/abs/2502.17420v2}
+}
+
+% source: arxiv:2506.00085
+% claim : COSMIC — automated, template-free identification of refusal directions via cosine similarity; works on weakly aligned models too.
+@misc{siu2025cosmic,
+  author         = {Vincent Siu and Nicholas Crispino and Zihao Yu and Sam Pan and Zhun Wang and Yang Liu and Dawn Song and Chenguang Wang},
+  title          = {COSMIC: Generalized Refusal Direction Identification in LLM Activations},
+  year           = {2025},
+  eprint         = {2506.00085},
+  archivePrefix  = {arXiv},
+  primaryClass   = {cs.CL},
+  url            = {http://arxiv.org/abs/2506.00085v1}
+}
+
+% source: arxiv:2411.11296
+% claim : Steering refusal via SAE features on Phi-3 / Llama-3 — additive feature steering recovers some refusal control but degrades benchmark performance.
+@misc{obrien2024refusalsae,
+  author         = {Kyle O'Brien and David Majercak and Xavier Fernandes and Richard Edgar and Blake Bullwinkel and Jingya Chen and Harsha Nori and Dean Carignan and Eric Horvitz and Forough Poursabzi-Sangdeh},
+  title          = {Steering Language Model Refusal with Sparse Autoencoders},
+  year           = {2024},
+  eprint         = {2411.11296},
+  archivePrefix  = {arXiv},
+  primaryClass   = {cs.LG},
+  url            = {http://arxiv.org/abs/2411.11296v2}
+}
+
+% source: arxiv:2411.02193
+% claim : SAE-Targeted Steering (SAE-TS) — uses SAE feature deltas to project candidate steering vectors onto a coherence-preserving subspace, beating naive CAA.
+@misc{chalnev2024sae_ts,
+  author         = {Sviatoslav Chalnev and Matthew Siu and Arthur Conmy},
+  title          = {Improving Steering Vectors by Targeting Sparse Autoencoder Features},
+  year           = {2024},
+  eprint         = {2411.02193},
+  archivePrefix  = {arXiv},
+  primaryClass   = {cs.LG},
+  url            = {http://arxiv.org/abs/2411.02193v2}
+}
+
+% source: arxiv:2411.08790
+% claim : Decomposing existing steering vectors via SAE encoders is misleading — SAE inputs are out-of-distribution and feature directions interact non-orthogonally; cautions against naively reading steering as 'sum of feature directions'.
+@misc{mayne2024decompose,
+  author         = {Harry Mayne and Yushi Yang and Adam Mahdi},
+  title          = {Can sparse autoencoders be used to decompose and interpret steering vectors?},
+  year           = {2024},
+  eprint         = {2411.08790},
+  archivePrefix  = {arXiv},
+  primaryClass   = {cs.LG},
+  url            = {http://arxiv.org/abs/2411.08790v1}
+}
+
+% source: arxiv:2501.09929
+% claim : Feature Guided Activation Additions (FGAA) — combines CAA with SAE-feature optimisation in latent space for more targeted steering than either alone.
+@misc{soo2025fgaa,
+  author         = {Samuel Soo and Chen Guang and Wesley Teng and Chandrasekaran Balaganesh and Tan Guoxian and Yan Ming},
+  title          = {Interpretable Steering of Large Language Models with Feature Guided Activation Additions},
+  year           = {2025},
+  eprint         = {2501.09929},
+  archivePrefix  = {arXiv},
+  primaryClass   = {cs.LG},
+  url            = {http://arxiv.org/abs/2501.09929v3}
+}
+
+% source: arxiv:2505.20063
+% claim : SAEs *can* steer effectively, but only when input-feature and output-feature selection is done correctly — sharpens the AxBench negative result.
+@misc{arad2025sae_steer,
+  author         = {Dana Arad and Aaron Mueller and Yonatan Belinkov},
+  title          = {SAEs Are Good for Steering -- If You Select the Right Features},
+  year           = {2025},
+  eprint         = {2505.20063},
+  archivePrefix  = {arXiv},
+  primaryClass   = {cs.LG},
+  doi            = {10.18653/v1/2025.emnlp-main.519},
+  url            = {http://arxiv.org/abs/2505.20063v2}
+}
+
+% source: arxiv:2505.23556
+% claim : Mechanistic SAE study of refusal across multiple instruction-tuned LMs — identifies causally relevant refusal latents, validates with adversarial jailbreaks.
+@misc{yeo2025refusalsae,
+  author         = {Wei Jie Yeo and Nirmalendu Prakash and Clement Neo and Roy Ka-Wei Lee and Erik Cambria and Ranjan Satapathy},
+  title          = {Understanding Refusal in Language Models with Sparse Autoencoders},
+  year           = {2025},
+  eprint         = {2505.23556},
+  archivePrefix  = {arXiv},
+  primaryClass   = {cs.CL},
+  url            = {http://arxiv.org/abs/2505.23556v1}
+}
+
+% source: arxiv:2403.19647
+% claim : Sparse Feature Circuits — discover and edit interpretable causal subgraphs in LMs from SAE features; introduces SHIFT and feature-ablation editing.
+@misc{marks2024sparsefeature,
+  author         = {Samuel Marks and Can Rager and Eric J. Michaud and Yonatan Belinkov and David Bau and Aaron Mueller},
+  title          = {Sparse Feature Circuits: Discovering and Editing Interpretable Causal Graphs in Language Models},
+  year           = {2024},
+  eprint         = {2403.19647},
+  archivePrefix  = {arXiv},
+  primaryClass   = {cs.LG},
+  url            = {http://arxiv.org/abs/2403.19647v3}
+}
+
+% source: arxiv:2509.20393
+% claim : Secret Agenda — autolabelled deception SAE features rarely fire when 38 LLMs are *actually* lying; steering 100+ deception-labelled features fails to suppress strategic dishonesty.
+@misc{deleeuw2025secret,
+  author         = {Caleb DeLeeuw and Gaurav Chawla and Aniket Sharma and Vanessa Dietze},
+  title          = {The Secret Agenda: LLMs Strategically Lie and Our Current Safety Tools Are Blind},
+  year           = {2025},
+  eprint         = {2509.20393},
+  archivePrefix  = {arXiv},
+  primaryClass   = {cs.CY},
+  url            = {http://arxiv.org/abs/2509.20393v1}
+}
+
+% source: arxiv:2511.16035
+% claim : Liars' Bench — 72.8K-example deception-detection benchmark across 7 datasets / 4 open-weight LMs; lie-detection probes generalise poorly across deception types.
+@misc{kretschmar2025liars,
+  author         = {Kieron Kretschmar and Walter Laurito and Sharan Maiya and Samuel Marks},
+  title          = {Liars' Bench: Evaluating Lie Detectors for Language Models},
+  year           = {2025},
+  eprint         = {2511.16035},
+  archivePrefix  = {arXiv},
+  primaryClass   = {cs.CL},
+  url            = {http://arxiv.org/abs/2511.16035v2}
+}
+
+% source: arxiv:2507.12691
+% claim : Black-to-White boost — protocol for measuring how much a *white-box* monitor (probe, SAE feature) improves over a black-box judge baseline; the boost is real but smaller than expected.
+@misc{parrack2025b2w,
+  author         = {Avi Parrack and Carlo Leonardo Attubato and Stefan Heimersheim},
+  title          = {Benchmarking Deception Probes via Black-to-White Performance Boosts},
+  year           = {2025},
+  eprint         = {2507.12691},
+  archivePrefix  = {arXiv},
+  primaryClass   = {cs.AI},
+  url            = {http://arxiv.org/abs/2507.12691v3}
+}
+
+% source: arxiv:2502.16681
+% claim : Are SAEs Useful? — across 113 binary-probing datasets, SAE-feature probes do not consistently beat raw-activation baselines under data scarcity, class imbalance, or covariate shift.
+@misc{kantamneni2025probing,
+  author         = {Subhash Kantamneni and Joshua Engels and Senthooran Rajamanoharan and Max Tegmark and Neel Nanda},
+  title          = {Are Sparse Autoencoders Useful? A Case Study in Sparse Probing},
+  year           = {2025},
+  eprint         = {2502.16681},
+  archivePrefix  = {arXiv},
+  primaryClass   = {cs.LG},
+  url            = {http://arxiv.org/abs/2502.16681v1}
+}
+
+% source: arxiv:2501.17148
+% claim : AxBench — under a unified protocol, prompting and finetuning beat SAE feature steering for behavioural control; difference-in-means matches SAEs for concept *detection*.
+@misc{wu2025axbench,
+  author         = {Zhengxuan Wu and Aryaman Arora and Atticus Geiger and Zheng Wang and Jing Huang and Dan Jurafsky and Christopher D. Manning and Christopher Potts},
+  title          = {AxBench: Steering LLMs? Even Simple Baselines Outperform Sparse Autoencoders},
+  year           = {2025},
+  eprint         = {2501.17148},
+  archivePrefix  = {arXiv},
+  primaryClass   = {cs.CL},
+  url            = {http://arxiv.org/abs/2501.17148v3}
+}
+
+% source: arxiv:2602.14111
+% claim : Sanity Checks for SAEs — SAEs do not reliably beat random-baseline decompositions on causal-editing and sparse-probing despite high reconstruction; questions the standard SAE evaluation paradigm.
+@misc{korznikov2026sanity,
+  author         = {Anton Korznikov and Andrey Galichin and Alexey Dontsov and Oleg Rogov and Ivan Oseledets and Elena Tutubalina},
+  title          = {Sanity Checks for Sparse Autoencoders: Do SAEs Beat Random Baselines?},
+  year           = {2026},
+  eprint         = {2602.14111},
+  archivePrefix  = {arXiv},
+  primaryClass   = {cs.LG},
+  url            = {http://arxiv.org/abs/2602.14111v1}
+}
+
+% source: arxiv:2404.03592
+% claim : Representation Finetuning (ReFT / LoReFT) — low-rank linear edits to frozen LM hidden states beat LoRA-class PEFT at far lower parameter counts; ReFT-r1 is AxBench's strongest steering baseline.
+@misc{wu2024reft,
+  author         = {Zhengxuan Wu and Aryaman Arora and Zheng Wang and Atticus Geiger and Dan Jurafsky and Christopher D. Manning and Christopher Potts},
+  title          = {ReFT: Representation Finetuning for Language Models},
+  year           = {2024},
+  eprint         = {2404.03592},
+  archivePrefix  = {arXiv},
+  primaryClass   = {cs.CL},
+  url            = {http://arxiv.org/abs/2404.03592v3}
+}
+
+% source: arxiv:2503.09532
+% claim : SAEBench — first standardised SAE evaluation suite spanning unlearning, feature absorption, scrubbing, sparse probing; shows proxy metrics often disagree with downstream task performance.
+@misc{karvonen2025saebench,
+  author         = {Adam Karvonen and Can Rager and Johnny Lin and Curt Tigges and Joseph Bloom and David Chanin and Yeu-Tong Lau and Eoin Farrell and Callum McDougall and Kola Ayonrinde and Demian Till and Matthew Wearden and Arthur Conmy and Samuel Marks and Neel Nanda},
+  title          = {SAEBench: A Comprehensive Benchmark for Sparse Autoencoders in Language Model Interpretability},
+  year           = {2025},
+  eprint         = {2503.09532},
+  archivePrefix  = {arXiv},
+  primaryClass   = {cs.LG},
+  url            = {http://arxiv.org/abs/2503.09532v4}
+}
+
+% source: arxiv:2209.10652
+% claim : Toy Models of Superposition — formalises the polysemanticity / superposition picture that motivates SAE training.
+@misc{elhage2022toy,
+  author         = {Nelson Elhage and Tristan Hume and Catherine Olsson and Nicholas Schiefer and Tom Henighan and Shauna Kravec and Zac Hatfield-Dodds and Robert Lasenby and Dawn Drain and Carol Chen and Roger Grosse and Sam McCandlish and Jared Kaplan and Dario Amodei and Martin Wattenberg and Christopher Olah},
+  title          = {Toy Models of Superposition},
+  year           = {2022},
+  eprint         = {2209.10652},
+  archivePrefix  = {arXiv},
+  primaryClass   = {cs.LG},
+  url            = {http://arxiv.org/abs/2209.10652v1}
+}
+
+% source: manual
+% claim : Crosscoders — share a sparse dictionary across multiple sites (layers / model variants); the original architectural template that Temporal Crosscoders specialises to time.
+@misc{lindsey2024crosscoders,
+  author       = {Lindsey, Jack and Templeton, Adly and Marcus, Jonathan and Conerly, Tom and Batson, Joshua and Olah, Christopher},
+  title        = {Sparse Crosscoders for Cross-Layer Features and Model Diffing},
+  year         = {2024},
+  howpublished = {\url{https://transformer-circuits.pub/2024/crosscoders/index.html}},
+  note         = {Transformer Circuits Thread}
+}
+
+% source: manual
+% claim : First Anthropic SAE result on a 1L transformer; established the SAE-as-feature-dictionary paradigm now standard.
+@misc{bricken2023monosemantic,
+  author       = {Bricken, Trenton and Templeton, Adly and Batson, Joshua and Chen, Brian and Jermyn, Adam and Conerly, Tom and Turner, Nick and Anil, Cem and Denison, Carson and Askell, Amanda and Lasenby, Robert and Wu, Yifan and Kravec, Shauna and Schiefer, Nicholas and Maxwell, Tim and Joseph, Nicholas and Hatfield-Dodds, Zac and Tamkin, Alex and Nguyen, Karina and McLean, Brayden and Burke, Josiah E and Hume, Tristan and Carter, Shan and Henighan, Tom and Olah, Christopher},
+  title        = {Towards Monosemanticity: Decomposing Language Models With Dictionary Learning},
+  year         = {2023},
+  howpublished = {\url{https://transformer-circuits.pub/2023/monosemantic-features/index.html}},
+  note         = {Transformer Circuits Thread}
+}
+
+% source: arxiv:2511.05541
+% claim : Temporal Sparse Autoencoders (T-SAE) — per-position SAE stack with a temporal contrastive term that encourages slow-feature consistency across adjacent tokens.
+@misc{bhalla2025tsae,
+  author         = {Usha Bhalla and Alex Oesterling and Claudio Mayrink Verdun and Himabindu Lakkaraju and Flavio P. Calmon},
+  title          = {Temporal Sparse Autoencoders: Leveraging the Sequential Nature of Language for Interpretability},
+  year           = {2025},
+  eprint         = {2511.05541},
+  archivePrefix  = {arXiv},
+  primaryClass   = {cs.CL},
+  url            = {http://arxiv.org/abs/2511.05541v2}
+}
+
+% source: arxiv:2511.01836
+% claim : Temporal Feature Analysis (TFA) / 'Priors in Time' — decomposes each activation into a context-predictable component plus a residual; argues SAE objectives implicitly assume IID-over-time.
+@misc{lubana2025tfa,
+  author         = {Ekdeep Singh Lubana and Can Rager and Sai Sumedh R. Hindupur and Valerie Costa and Greta Tuckute and Oam Patel and Sonia Krishna Murthy and Thomas Fel and Daniel Wurgaft and Eric J. Bigelow and Johnny Lin and Demba Ba and Martin Wattenberg and Fernanda Viegas and Melanie Weber and Aaron Mueller},
+  title          = {Priors in Time: Missing Inductive Biases for Language Model Interpretability},
+  year           = {2025},
+  eprint         = {2511.01836},
+  archivePrefix  = {arXiv},
+  primaryClass   = {cs.LG},
+  url            = {http://arxiv.org/abs/2511.01836v3}
+}
+
+% source: arxiv:2406.11944
+% claim : Transcoders — sparse linear approximators of MLP sublayers, enabling weights-based circuit analysis. Architectural cousin of crosscoders.
+@misc{dunefsky2024transcoders,
+  author         = {Jacob Dunefsky and Philippe Chlenski and Neel Nanda},
+  title          = {Transcoders Find Interpretable LLM Feature Circuits},
+  year           = {2024},
+  eprint         = {2406.11944},
+  archivePrefix  = {arXiv},
+  primaryClass   = {cs.LG},
+  url            = {http://arxiv.org/abs/2406.11944v2}
+}
+
+% source: arxiv:2404.01318
+% claim : JailbreakBench (JBB) — open benchmark of 100 paired harmful/benign behaviours and standardised attack/defense protocols for jailbreak research.
+@misc{chao2024jbb,
+  author         = {Patrick Chao and Edoardo Debenedetti and Alexander Robey and Maksym Andriushchenko and Francesco Croce and Vikash Sehwag and Edgar Dobriban and Nicolas Flammarion and George J. Pappas and Florian Tramer and Hamed Hassani and Eric Wong},
+  title          = {JailbreakBench: An Open Robustness Benchmark for Jailbreaking Large Language Models},
+  year           = {2024},
+  eprint         = {2404.01318},
+  archivePrefix  = {arXiv},
+  primaryClass   = {cs.CR},
+  url            = {http://arxiv.org/abs/2404.01318v5}
+}
+
+% source: arxiv:2308.01263
+% claim : XSTest — 450 prompts probing exaggerated-refusal failure modes; tests whether safety tuning over-refuses safe prompts that look superficially unsafe.
+@misc{rottger2024xstest,
+  author         = {Paul Röttger and Hannah Rose Kirk and Bertie Vidgen and Giuseppe Attanasio and Federico Bianchi and Dirk Hovy},
+  title          = {XSTest: A Test Suite for Identifying Exaggerated Safety Behaviours in Large Language Models},
+  year           = {2023},
+  eprint         = {2308.01263},
+  archivePrefix  = {arXiv},
+  primaryClass   = {cs.CL},
+  url            = {http://arxiv.org/abs/2308.01263v3}
+}
+
+% source: arxiv:2310.06987
+% claim : MaliciousInstruct — 100 harmful instructions used to evaluate generation-exploitation jailbreaks; widely used as a third-distribution refusal benchmark.
+@misc{huang2024malicious,
+  author         = {Yangsibo Huang and Samyak Gupta and Mengzhou Xia and Kai Li and Danqi Chen},
+  title          = {Catastrophic Jailbreak of Open-source LLMs via Exploiting Generation},
+  year           = {2023},
+  eprint         = {2310.06987},
+  archivePrefix  = {arXiv},
+  primaryClass   = {cs.CL},
+  url            = {http://arxiv.org/abs/2310.06987v1}
+}
+
+% source: arxiv:2009.03300
+% claim : MMLU — 57-domain multiple-choice benchmark for measuring general LM knowledge across STEM, humanities, social science. Standard capability sanity check.
+@misc{hendrycks2020mmlu,
+  author         = {Dan Hendrycks and Collin Burns and Steven Basart and Andy Zou and Mantas Mazeika and Dawn Song and Jacob Steinhardt},
+  title          = {Measuring Massive Multitask Language Understanding},
+  year           = {2020},
+  eprint         = {2009.03300},
+  archivePrefix  = {arXiv},
+  primaryClass   = {cs.CY},
+  url            = {http://arxiv.org/abs/2009.03300v3}
+}

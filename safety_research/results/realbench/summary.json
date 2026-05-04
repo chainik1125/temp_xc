@@ -10,5 +10,17 @@
  "test_ood": {
   "n": 450,
   "n_pos": 225
+ },
+ "test_mi": {
+  "n": 200,
+  "n_pos": 100
+ },
+ "cap_alpaca": {
+  "n": 200,
+  "n_pos": 0
+ },
+ "cap_mmlu": {
+  "n": 100,
+  "n_pos": 0
  }
 }
