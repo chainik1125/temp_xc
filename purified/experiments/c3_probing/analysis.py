@@ -51,11 +51,22 @@ def _placeholder_markdown(reason: str) -> str:
     )
 
 
+HEADLINE_EVAL_PROTOCOL_VERSION = "1.1.0"   # Phase 7 padding fix; old 1.0.0
+                                            # rows are kept on disk for
+                                            # comparison but excluded from
+                                            # the headline aggregate.
+
+
 def run_analysis() -> AnalysisResult:
     rows = query_leaderboard(component=COMPONENT)
-    # Filter out smoke rows — they use synthetic labels and are not
-    # paper-relevant. Keep them on disk for traceability of pipeline runs.
-    real_rows = [r for r in rows if not r.eval_cfg.get("smoke", False)]
+    # Filter out smoke rows + non-headline protocol versions. Old 1.0.0
+    # rows used right-padded tail-S which corrupts winogrande/wsc; v1.1.0
+    # is the headline (Phase 7 padding fix).
+    real_rows = [
+        r for r in rows
+        if not r.eval_cfg.get("smoke", False)
+        and r.eval_protocol_version == HEADLINE_EVAL_PROTOCOL_VERSION
+    ]
 
     if not real_rows:
         n_smoke = len(rows)
