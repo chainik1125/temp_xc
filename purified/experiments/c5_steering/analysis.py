@@ -131,19 +131,25 @@ def run_analysis() -> AnalysisResult:
     # Filter to canonical train_keys only (decisions.md § 12 — exclude
     # pre-2026-05-04 batch=256 cells from the rendered AUTO-RESULTS
     # while keeping them in leaderboard.jsonl for diff comparison).
+    # Pass explicit n_steps=20_000 override (Han 2026-05-04 PM URGENT —
+    # Gemma-family deadline override aligns C3 + C4 + C5); the schema
+    # default 25_000 would silently filter out my new 20K cells.
+    from temp_bench.schemas import TrainingConfig
     valid_train_keys = canonical_train_keys(
         component=COMPONENT,
         archs=ARCHS,
         seeds=SEEDS,
         datasource_names=DATASOURCE_NAMES,
+        training_cfg=TrainingConfig(n_steps=20_000),
     )
     rows = [r for r in rows if r.train_key in valid_train_keys]
     if not rows:
         return AnalysisResult(
             markdown=_placeholder(
                 "no canonical-config cells run yet — see "
-                "experiments/c5_steering/run.py (TrainingConfig defaults: "
-                "batch=1024, n_steps=25_000, plateau_off per decisions.md § 12)"
+                "experiments/c5_steering/run.py (TrainingConfig: "
+                "batch=1024, n_steps=20_000 [Gemma deadline override], "
+                "plateau_off per decisions.md § 12)"
             ),
             results={},
             plot_paths=[],

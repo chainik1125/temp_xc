@@ -355,41 +355,52 @@ one-liner to verify HF state before stop.
 
 ## Current state (agent owns — overwrite at every compact)
 
-**Last verified: 2026-05-04T12:53Z (b1024 re-train sweep launched —
-Phase-5-faithful uniform TrainingConfig per decisions.md § 12).**
+**Last verified: 2026-05-04T15:50Z (b1024 + n_steps=20K sweep
+relaunched on GPUs 1+3 per Han 2026-05-04 PM URGENT directive).**
 
-- `git HEAD`: `00cdbea3 Agent STEER: SteeringCaseStudy.primary_metric
-  → peak_success_grade_at_coh_1.75` (pushed). Working tree has only
-  untracked checkpoint dirs + logs/, plus auto-renders waiting on
-  cells.
-- **Active b1024 cells (right now, in flight)**: 3 cells × seed 42,
-  one per spare GPU, launched 12:48 UTC.
-  - GPU 0 / PID 38976 / `tsae_paper × seed 42` / eval_key `1c1b8aa4`
-    / log `logs/c5_b1024_tsae_seed42.log` / wait task `bzhobgezy`
-  - GPU 2 / PID 38977 / `txc_base × seed 42` / eval_key `b981566c`
-    / log `logs/c5_b1024_txc_base_seed42.log` / wait task `bwp0srh2k`
-  - GPU 3 / PID 38978 / `txc_pro × seed 42` / eval_key `b36b7641`
-    / log `logs/c5_b1024_txc_pro_seed42.log` / wait task `b8bh3agco`
-  Each launched with `PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True`
-  to suppress the OOM-fragmentation issue agent_back hit (commit
-  `658fa825`). agent_back is on GPU 1 doing C7. PIDs persist across
-  my session via `/tmp/p_tsae42`, `/tmp/p_tb42`, `/tmp/p_tp42`.
-  No claim_gpu calls — gpu_locks were nuked in commit `6e6efcbd`,
-  the new convention is just "set CUDA_VISIBLE_DEVICES + good
-  manners" (see PROTOCOL.md § 13 / scripts/run_on_gpu.sh).
-- **Wakeup scheduled**: 13:19 UTC for first per-cell rate marker.
+- `git HEAD`: `751d1789 Agent STEER: c5 — n_steps=20_000 deadline
+  override + preloaded batch_iter` (pushed). Working tree clean
+  modulo untracked checkpoint dirs + logs/.
+- **Killed prior 25K cells** (PIDs 38976/38977/38978, eval_keys
+  1c1b8aa4 / b981566c / b36b7641) — within-component fairness
+  required killing in-flight 25K cells before relaunching 20K. Lost
+  ~3 hours of GPU work; small price.
+- **Active 20K cells** (relaunched 2026-05-04T15:48 UTC):
+  - GPU 1 / PID 45453 / `tsae_paper + txc_base × seeds {42, 1, 2}`
+    / first eval_key `e340fb05` / log `logs/c5_b1024_n20k_gpu1.log`
+    / wait task `bx2sk74my` (ETA: ~5 hr — 6 cells sequentially at
+    ~50 min each — tsae faster than txc_base)
+  - GPU 3 / PID 45454 / `txc_pro × seeds {42, 1, 2}` / first eval_key
+    `8e583b4a` / log `logs/c5_b1024_n20k_gpu3.log` / wait task
+    `bwxwmpa9i` (ETA: ~9 hr — 3 cells × ~3 hr each at b1024 ÷ 1.4x
+    preloaded speedup ÷ 0.8 ratio for 20K vs 25K)
+  Critical path is GPU 3's 9 hr. Wait tasks armed; no need to poll.
+  PIDs persist via `/tmp/p_gpu1`, `/tmp/p_gpu3`.
+- **GPU re-allocation** (Han 2026-05-04 PM): I get GPUs 1 and 3.
+  agent_back gets 0 and 2. No more "borrow agent peer's spare"
+  pattern. Do NOT touch GPUs 0 or 2.
+- **Preloaded batch_iter swap** (commit 751d1789): swapped
+  `batch_iter_from_act_cache` →
+  `temp_bench.data.nlp.cache.preloaded_batch_iter_from_act_cache`
+  for ~1.4× trainer speedup. Bit-identical determinism — train_keys
+  unchanged. ~14 GB CPU RAM per process for the Gemma cache.
 
-- **TrainingConfig is the new Phase-5-faithful default** (decisions.md
-  § 12): batch_size=1024, n_steps=25_000, plateau_early_stop=False
-  uniform across all archs and pods. My runner uses
-  `runner.default_training_cfg() → TrainingConfig()` so the new
-  defaults flow automatically — no per-component override needed.
-  New batch=1024 cells get fresh train_keys; old batch=256 cells
-  stay in leaderboard for diff. analysis.py should filter for
-  `training_cfg.batch_size==1024` rows when rendering AUTO-RESULTS
-  (TODO once cells land — current analysis.py renders all non-smoke
-  rows, so the AUTO-RESULTS will mix old + new until I add the
-  filter).
+- **TrainingConfig is now (Han 2026-05-04 PM URGENT)**:
+  batch_size=1024, n_steps=**20_000** (deadline override),
+  plateau_early_stop=False. C3 + C4 + C5 (Gemma-family components)
+  share this 20.5M-token-per-cell axis. C6 stays at 25K × Qwen,
+  C7 at 20K × Llama. My run.py uses `_real_training_cfg()` to
+  return `TrainingConfig(n_steps=20_000)` — explicit override above
+  the schema default of 25_000.
+- **analysis.py canonical_train_keys filter (already wired)**:
+  `experiments/c5_steering/analysis.py` uses
+  `temp_bench.report.canonical_train_keys(...)` keyed off the
+  current `TrainingConfig()` defaults. Since my runner passes
+  `_real_training_cfg()` (20K override) to run_cell, the train_keys
+  generated will be canonicalized against `TrainingConfig(n_steps=20_000)`.
+  ⚠ TODO: verify analysis.py's canonical_train_keys call also passes
+  `training_cfg=TrainingConfig(n_steps=20_000)` — otherwise it'll
+  filter against the schema default 25K and miss my 20K cells.
 
 - **C5 v1.0.1 backfill (this session, already pushed)**: re-aggregated
   the OLD batch=256 cells' judge_outputs.jsonl with the new
