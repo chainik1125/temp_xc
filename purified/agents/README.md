@@ -35,31 +35,27 @@ Tokens (`/workspace/.tokens/`) and HF cache (`/workspace/hf_cache/`)
 are shared across both clones, so each agent only pays ~5 GB extra
 disk for the second working tree (out of 1 TB).
 
-The **4× A40 pod has 2 named agents + 2 spare GPU slots** (GPUs 2 and 3).
-Spare slots form a **pool** — used not by the agent's own python
-process (which stays pinned to its primary GPU and CANNOT see pool
-GPUs at all), but by **subprocesses the agent launches** with their
-own env. Pattern:
+The **4× A40 pod has 2 named agents + 2 unassigned GPU slots** (GPUs
+2 and 3). The agent's own python process stays pinned to its primary
+via `CUDA_VISIBLE_DEVICES` (set by `scripts/set_agent_env.sh`); to
+launch work on any other GPU, it spawns a subprocess with that GPU's
+index in the subprocess env. Convenience wrapper:
 
-```python
-# In agent_steer's process (pinned to GPU 0):
-from temp_bench.utils.gpu_locks import claim_gpu
-import os, subprocess
-
-with claim_gpu(2, note="C5 seed-1 parallel"):
-    env = {**os.environ, "CUDA_VISIBLE_DEVICES": "2", "AGENT_NAME": "agent_steer"}
-    subprocess.run(["python", "-m", "experiments.c5_steering.run", "--seeds", "1"], env=env)
+```bash
+# In agent_steer's session (their own process pinned to GPU 0):
+bash scripts/run_on_gpu.sh 2 -- python -m experiments.c5_steering.run --seeds 1
 ```
 
-The agent's own process never relaxes its primary pin —
-`claim_gpu(idx)` is a lockfile that coordinates which agent's
-subprocess gets which pool GPU, preventing two subprocesses from
-both targeting GPU 2. Concrete example: agent_steer runs seed=42 on
-its primary GPU 0 (in the agent's own process) AND seed=1 on pool
-GPU 2 (in a subprocess) simultaneously — two GPUs of work, but the
-agent's process still only sees GPU 0. See PROTOCOL.md § 13 for the
-full contract; ``docs/paper/hardware.md`` § *Multi-GPU access* for
-the worked example.
+This sets `CUDA_VISIBLE_DEVICES=2` for the subprocess only, runs the
+command, exits. The agent's own python process still sees only GPU 0.
+
+**No lockfile manager.** GPU sharing is a convention (PROTOCOL.md
+§ 13): your primary is your default; before borrowing a peer's GPU,
+read their briefing's "Current state" + run `nvidia-smi`; update
+your own "Current state" with the borrow + ETA before kicking off
+long work. The earlier `claim_gpu` lockfile system was deleted
+2026-05-04 — it was correct but agents bypassed it for
+`subprocess.Popen` ergonomics.
 
 Pod sharing keeps activation caches and checkpoints on the same volume
 (zero cross-pod transfer cost when an agent on the same pod needs an
@@ -145,19 +141,19 @@ on the A40 pool GPUs.
 | Pod | Concurrent training cells | Concurrent probing cells | Notes |
 |---|---|---|---|
 | 2× H100 (1 agent / GPU) | 2 (one per GPU) | 16 per GPU (CPU-bound, n_jobs=-1) | 56 vCPU ≈ 28/GPU. |
-| 4× A40 (2 named + 2 pool) | up to 4 (Primary + Pool, see PROTOCOL.md § 13) | 9 per GPU | 38 vCPU ≈ 9.5/GPU. |
+| 4× A40 (2 named + 2 unassigned) | up to 4 (subprocess per GPU) | 9 per GPU | 38 vCPU ≈ 9.5/GPU. |
 | H200 (reserve) | 1 (single GPU) | 32 (CPU-bound) | High RAM; for Wang on Qwen-14B. |
 | local 5090 | 1 (toy) | 16 | toy training is fast. |
 
 `temp_bench.eval.probing` accepts an `n_jobs` knob (default `-1`) that
 maps to `joblib.Parallel`. Cell-level concurrency flows through
-`temp_bench.utils.gpu_locks.claim_gpu(...)` plus subprocess launches
+`bash scripts/run_on_gpu.sh <idx> -- <cmd>` subprocess launches
 (no DDP — see `docs/paper/hardware.md`).
 
 ## GPU sharing — see PROTOCOL.md
 
-Pinning rules and the multi-GPU Primary + Pool protocol live in
-**PROTOCOL.md** (§ 12 pinning, § 13 multi-GPU access). Don't duplicate
+Pinning + the GPU-sharing convention (no lockfile) live in
+**PROTOCOL.md** (§ 12 pinning, § 13 sharing convention). Don't duplicate
 them here — `agents/README.md` is the *roster*, not the protocol.
 
 ## How to add a new agent

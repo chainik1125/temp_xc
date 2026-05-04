@@ -5,10 +5,12 @@
 # Usage:
 #   GPU=2 ARCHS="txc_pro tfa mlc stacked_sae" bash scripts/c7_run_sweep_pool.sh
 #
-# NOTE: claim_gpu via fcntl flock is process-scoped and would release
-# when this wrapper script exits. Until temp_bench.utils.gpu_locks
-# grows a long-lived "leased" mode, we rely on the per-process
-# CUDA_VISIBLE_DEVICES pin + manual coordination.
+# GPU sharing is convention-based (PROTOCOL.md § 13) — no lockfile.
+# Caller is responsible for: (a) reading peer's briefing's "Current
+# state" + nvidia-smi to verify the target GPU is free, and
+# (b) updating their own briefing with "borrowing GPU $GPU until ETA"
+# before kicking this off. The CUDA_VISIBLE_DEVICES pin below scopes
+# the borrow to the subprocess only.
 
 set -eu
 cd "$(dirname "$0")/.."

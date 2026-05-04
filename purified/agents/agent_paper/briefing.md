@@ -130,24 +130,26 @@ he spins up the worker pods.
 
 Newest first. `git log` for full history.
 
+- **Nuked the GPU lock system** (Han approved 2026-05-04). Deleted
+  `temp_bench/utils/gpu_locks.py` + `tests/test_gpu_locks.py` + all
+  `claim_gpu` references. Replaced with a CONVENTION in PROTOCOL.md
+  § 13: each agent's primary stays pinned via `set_agent_env.sh`;
+  to borrow a peer's GPU, read their briefing's "Current state" +
+  run `nvidia-smi`, update your own state with the borrow + ETA.
+  Added `scripts/run_on_gpu.sh <idx> -- <cmd>` convenience wrapper.
+  Why: agents were already bypassing the lock system (agent_steer's
+  `0c885c98` "gentleman's agreement only"); the cognitive cost +
+  `subprocess.Popen` footgun outweighed the benefit at our 72-hour
+  2-agents-per-pod scope.
 - **Caught Wang abbreviation oversight** (Han-flagged 2026-05-04):
   agent_em's C6 cells used "abbreviated Wang" (skip stages 2 + 3,
   top-3 by Δz̄, 6-α grid) without an explicit decision. The +3.79
   align gap is the C6 headline but is methodologically suspect.
   Updated agent_em's briefing with directive to (a) re-run all C6
   cells with FULL Wang protocol, (b) add 7B-medical re-run to pair
-  apples-to-apples with the 14B numbers (replacing wasteland-citation
-  reliance on Dmitry's published 7B), (c) use both H100s in parallel
-  via formal `claim_gpu` calls. agent_nlp at `status: complete` so
-  GPU 0 is available.
-- **GPU-lock UX gap**: agent_steer's commit `0c885c98` bypassed
-  `claim_gpu` for a parallel launch ("gentleman's agreement only").
-  Means agents are finding the API awkward, especially for
-  background-launched cells (`subprocess.Popen` lifecycle vs
-  `with claim_gpu(...)` block). Open question for me to fix:
-  `claim_gpu_until_pid_exits(idx, pid)` helper OR
-  `scripts/run_with_gpu_claim.sh <idx> -- <cmd>` wrapper. agent_em's
-  briefing notes this; if they hit the same friction, I implement.
+  apples-to-apples with the 14B numbers, (c) use both H100s in
+  parallel via the new GPU sharing convention. agent_nlp at
+  `status: complete` so GPU 0 is available to borrow.
 - **All 4 worker overnight progress absorbed** (commits since
   5ab98bb3): C3 final headline (4 archs × 3 seeds × 2 k_feats = 24
   cells; topk_sae wins at both k); C4 final (T-SAE >> TXC on
@@ -190,7 +192,7 @@ Newest first. `git log` for full history.
 - C4 simplified to single metric: Top-256 cumulative SEMANTIC Pareto.
 - Wasteland code deleted; wasteland docs retained.
 - Token storage unified across local + RunPod (`get_token()`).
-- GPU sharing: Primary + Pool with lockfile claims (PROTOCOL.md § 13).
+- GPU sharing convention (PROTOCOL.md § 13; lockfile system removed 2026-05-04).
 - Modularity framework + cache contract (`docs/paper/framework.md`).
   38/38 tests.
 

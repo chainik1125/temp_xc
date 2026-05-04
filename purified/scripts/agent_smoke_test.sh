@@ -61,12 +61,11 @@ TQDM_DISABLE=1 .venv/bin/python -m pytest tests/ -q 2>&1 || {
     exit 1
 }
 
-# 4. preflight — GPU pinning + arch class imports + GPU lock cleanup
+# 4. preflight — GPU pinning + arch class imports
 echo
 echo "[smoke] runner preflight…"
 TQDM_DISABLE=1 .venv/bin/python -c "
 from temp_bench.runner import preflight
-from temp_bench.utils.gpu_locks import gpu_lock_status
 
 warns = preflight()
 critical = [w for w in warns if w.startswith('CRITICAL')]
@@ -86,16 +85,6 @@ else:
     for w in gaps:
         print(f'   - {w}')
 
-# Surface the current lock state so an agent knows what's claimed
-status = gpu_lock_status()
-if status:
-    print(f'  GPU lock state ({len(status)} held):')
-    for idx, info in sorted(status.items()):
-        if info:
-            print(f'   GPU {idx}: {info[\"agent\"]} (PID {info[\"pid\"]}, since {info[\"claimed_ts\"]})')
-else:
-    print('  GPU locks: none held')
-
 # Surface token resolution
 from temp_bench.utils.tokens import token_status, tokens_dir
 ts = token_status()
@@ -103,6 +92,23 @@ print(f'  Token store: {tokens_dir()}')
 for kind in ('hf', 'anthropic', 'gh'):
     src = ts[kind]['resolved_from']
     print(f'   {kind:9s} ← {src or \"(missing — bootstrap_local.sh / bootstrap_runpod.sh)\"}')
+
+# GPU sharing is convention-based (PROTOCOL.md § 12); 'nvidia-smi'
+# is the source of truth for who's using what.
+import subprocess
+print()
+print('  GPU usage (nvidia-smi):')
+try:
+    out = subprocess.check_output(
+        ['nvidia-smi', '--query-gpu=index,memory.used,memory.total,utilization.gpu',
+         '--format=csv,noheader,nounits'],
+        text=True, timeout=5,
+    )
+    for line in out.strip().splitlines():
+        idx, used, total, util = [s.strip() for s in line.split(',')]
+        print(f'   GPU {idx}: {used}/{total} MB used, {util}% util')
+except Exception as e:
+    print(f'   (nvidia-smi unavailable: {e})')
 "
 
 echo

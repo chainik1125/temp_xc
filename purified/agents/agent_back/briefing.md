@@ -84,9 +84,11 @@ is its own subject; "two TXCs everywhere" survives.
 Hardware: pod `4× A40`, pinned to **GPU 1**. Pod mode **`ephemeral`**:
 HF is the source of truth, auto-push on checkpoint save. agent_steer
 shares the pod on GPU 0 (different component + different cache).
-GPUs 2 + 3 are spare pool slots — claim via
-`temp_bench.utils.gpu_locks.claim_gpu(idx)` if you need parallelism
-(PROTOCOL.md § 13).
+GPUs 2 + 3 are unassigned — to use them, launch a subprocess via
+`bash scripts/run_on_gpu.sh <idx> -- <command>` (sets
+`CUDA_VISIBLE_DEVICES=<idx>` for the child only). No lockfile manager;
+GPU sharing is a convention now (PROTOCOL.md § 13) — read peer's
+"Current state" + `nvidia-smi` before borrowing.
 
 You build your **own** Llama-3.1-8B-BASE L10 activation cache. No
 upstream dependencies; you can start at T+0. d_model=4096 (vs Gemma's

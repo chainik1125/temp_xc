@@ -59,7 +59,7 @@ at session start to redirect priorities.]
 - `git HEAD`: <sha>
 - Last leaderboard append: `<eval_key>` (or "(none yet)").
 - Last checkpoint saved: `<train_key>` (HF: `<url-or-pending>`).
-- Active GPU lock(s): <list from gpu_lock_status() or "none">.
+- Active GPU usage: <"GPU N (own primary)" or "GPU N (borrowed from agent_X until ETA)">.
 - Recent decisions in scope: `decisions.md` #<N>, #<M>.
 - In flight: <task at step N of M; partial files; or "nothing">.
 

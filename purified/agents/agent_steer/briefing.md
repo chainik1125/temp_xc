@@ -62,10 +62,12 @@ Bootstrap pulls from `han1823123123/temp-bench-{models,data}`;
 we cannot risk losing a multi-hour training run).
 
 agent_back shares the pod on GPU 1 (separate component, separate
-cache). GPUs 2 + 3 are spare pool slots — if you need more parallelism
-you may claim one via `temp_bench.utils.gpu_locks.claim_gpu(idx)` and
-launch a second process with `CUDA_VISIBLE_DEVICES=<idx>`. See
-PROTOCOL.md § 13 for the Primary + Pool contract.
+cache). GPUs 2 + 3 are unassigned — to use them, launch a second
+process with `bash scripts/run_on_gpu.sh <idx> -- <command>` (sets
+`CUDA_VISIBLE_DEVICES=<idx>` for the subprocess only). No lockfile
+manager — read peer's "Current state" + `nvidia-smi` before
+borrowing, update your own state with the borrow + ETA. See
+PROTOCOL.md § 13 *GPU sharing convention*.
 
 **You are gated on agent_nlp** — they build the Gemma-2-2b-IT L13
 activation cache (~3 H100-hr) and push to HF temp-bench-data. Your
@@ -99,7 +101,7 @@ References:
 - `docs/paper/hardware.md` *Multi-GPU access* (Pool example)
 - `decisions.md` (esp. #1)
 - `papers/temporal_sae.md` § 4.4 (the case study)
-- `PROTOCOL.md` § 11, § 12 (pinning), § 13 (Primary + Pool)
+- `PROTOCOL.md` § 11, § 12 (pinning), § 13 (GPU sharing convention)
 
 ---
 

@@ -263,20 +263,8 @@ def preflight() -> list[str]:
             "'unknown'. Source scripts/set_agent_env.sh <name>."
         )
 
-    # ── GPU lock state (Primary + Pool protocol, PROTOCOL.md § 13) ─
-    try:
-        from temp_bench.utils.gpu_locks import cleanup_stale, gpu_lock_status
-        freed = cleanup_stale()
-        if freed:
-            warns.append(
-                f"INFO: cleaned {len(freed)} stale GPU lock(s) at "
-                f"indices {freed} (previous holder PIDs were dead)."
-            )
-        # The status print itself is informational, not a warning. We
-        # surface it via the smoke test instead of preflight return.
-        _ = gpu_lock_status
-    except Exception as e:
-        warns.append(f"gpu_locks unavailable: {e}")
+    # GPU sharing is now a convention (PROTOCOL.md § 12), not a
+    # lockfile manager. No preflight check.
 
     # ── Architecture imports ─────────────────────────────────────────
     for name in _list_archs():

@@ -114,53 +114,47 @@ visible GPU (verified by `preflight()`). DDP/FSDP is forbidden inside
 a single process; **multi-GPU work is multi-process** — see *Multi-GPU
 access* below for the protocol.
 
-## Multi-GPU access (Primary + Pool)
+## Multi-GPU access (sharing convention)
 
-When an agent wants to use more than one GPU on its pod, it does so
-by launching multiple subprocesses, each pinned to a single GPU. The
-parent agent uses lockfiles (`temp_bench.utils.gpu_locks`) to
-coordinate access to **pool** GPUs (those not designated as another
-named agent's primary).
+When an agent wants to use more than one GPU on its pod, it launches
+multiple subprocesses, each with `CUDA_VISIBLE_DEVICES=<single_idx>`.
+The agent's own python process stays pinned to its primary; only the
+spawned subprocess sees a different GPU.
 
-For the 4× A40 pod:
+GPU sharing is a **convention**, not a lockfile-enforced contract
+(the earlier `temp_bench.utils.gpu_locks` system was removed
+2026-05-04 — see PROTOCOL.md § 13). For the 4× A40 pod:
 
-| GPU | Owner | Pool? |
+| GPU | Owner | Borrowable? |
 |---|---|---|
-| 0 | agent_steer (primary) | no |
-| 1 | agent_back (primary) | no |
+| 0 | agent_steer (primary) | only when agent_steer is idle |
+| 1 | agent_back (primary) | only when agent_back is idle |
 | 2 | unowned | yes |
 | 3 | unowned | yes |
 
-Worked example — agent_steer runs 3 seeds in parallel:
+**Before borrowing a peer's GPU**: read peer's briefing's
+"Current state" + run `nvidia-smi`. **Update YOUR briefing** with
+the borrow + ETA before kicking off long work.
 
-```python
-from temp_bench.utils.gpu_locks import claim_gpus
-import os, subprocess
+Worked example — agent_steer runs 3 seeds in parallel using the
+convenience wrapper:
 
-with claim_gpus([2, 3], agent="agent_steer", note="C5 3-seed parallel"):
-    procs = []
-    for gpu, seed in [(0, 42), (2, 1), (3, 2)]:        # GPU 0 is steer's primary
-        env = {**os.environ, "CUDA_VISIBLE_DEVICES": str(gpu),
-               "AGENT_NAME": "agent_steer", "TEMP_BENCH_POD_MODE": "ephemeral"}
-        procs.append(subprocess.Popen(
-            ["python", "-m", "experiments.c5_steering.run", "--seeds", str(seed)],
-            env=env,
-        ))
-    for p in procs:
-        p.wait()
-# pool GPUs released here
+```bash
+# agent_steer's own process is pinned to GPU 0. Each launch below
+# spawns a subprocess pinned to a different GPU.
+bash scripts/run_on_gpu.sh 0 -- python -m experiments.c5_steering.run --seeds 42 &
+bash scripts/run_on_gpu.sh 2 -- python -m experiments.c5_steering.run --seeds 1 &
+bash scripts/run_on_gpu.sh 3 -- python -m experiments.c5_steering.run --seeds 2 &
+wait
 ```
 
-Each subprocess passes preflight (sees one GPU). The lockfile
-prevents agent_back from also claiming GPU 2 simultaneously; if it
-tries while agent_steer holds the lock, agent_back gets an explicit
-RuntimeError ("GPU 2 held by agent_steer (PID …) since …") rather
-than a silent VRAM collision.
+The wrapper sets `CUDA_VISIBLE_DEVICES=<idx>` for the subprocess,
+sanity-checks `nvidia-smi` (warns if the GPU appears occupied),
+and execs the command. No lockfile dance.
 
-If agent_back finishes its assigned work and wants to help with C5
-cells, it can claim spare GPUs the same way — the named-agent boundary
-is about ownership of leaderboard rows (and primary GPUs), not a
-strict per-component partition.
+**Failure mode**: if you and a peer accidentally launch on the same
+GPU simultaneously, both crash with CUDA OOM. Recoverable in ~5 min
+— each cell is independent and deterministic via `train_key`.
 
 ## Pod modes — persistent vs ephemeral
 

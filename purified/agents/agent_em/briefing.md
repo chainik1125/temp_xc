@@ -96,45 +96,45 @@ the FULL Wang protocol.**
      tradeoff framing becomes a single-paper apples-to-apples
      comparison.
 
-5. **Use both H100s when agent_nlp is idle.** agent_nlp shipped
-   `status: complete` and their GPU 0 is sitting idle. You can run
-   cells in parallel on GPU 0 + GPU 1 to halve wall time. **Claim
-   the GPU formally**:
+5. **Use both H100s when agent_nlp is idle.** GPU sharing is a
+   convention now — the `claim_gpu` lockfile system was deleted
+   2026-05-04 (PROTOCOL.md § 13 *GPU sharing convention*). To borrow
+   agent_nlp's GPU 0:
 
-   ```python
-   from temp_bench.utils.gpu_locks import claim_gpu
-   import os, subprocess
+   - **Verify they're idle**: read `agents/agent_nlp/briefing.md`
+     "Current state" — does it say `status: complete` or "idle"? If
+     they're mid-cell with an ETA, wait or use only GPU 1.
+   - **Verify with `nvidia-smi`**: GPU 0 should show <1 GB used and
+     no long-running python process.
+   - **Update YOUR briefing's "Current state"** with
+     `"Borrowing GPU 0 until ETA HH:MM UTC for C6 7B-medical seed=N
+     — agent_nlp is status: complete."` BEFORE you launch.
+   - **Launch via the wrapper** (sets `CUDA_VISIBLE_DEVICES=0` for
+     the subprocess only; your own python process stays pinned to
+     GPU 1):
 
-   with claim_gpu(0, agent="agent_em", note="C6 7B-medical seed=1 parallel"):
-       env = {**os.environ, "CUDA_VISIBLE_DEVICES": "0", "AGENT_NAME": "agent_em"}
-       subprocess.run([..."python", "-m", "experiments.c6_em.run", ...], env=env)
-   ```
+     ```bash
+     bash scripts/run_on_gpu.sh 0 -- python -m experiments.c6_em.run --seeds 1
+     ```
 
-   Background-launch caveat: `claim_gpu` releases on exit of the
-   `with` block. If you `subprocess.run(...)` inside the `with`,
-   that's blocking — correct. If you use `subprocess.Popen(...)`
-   to background a parallel cell, you MUST `proc.wait()` (or stay
-   inside the `with` until `proc.poll() is not None`) before
-   exiting — otherwise the lock releases while your child is still
-   on the GPU.
+     Or in Python if you'd rather drive in-process:
 
-6. **GPU-lock API friction (your feedback wanted).** agent_steer's
-   commit `0c885c98` bypassed `claim_gpu` for a parallel launch —
-   they noted *"gentleman's agreement only — agent_back was pinned
-   to GPU 1 so safe, but FUTURE parallel launches should claim_gpu
-   properly."* That's a real footgun. If you find the lock API
-   awkward (especially for background-launched parallel cells),
-   surface specifics in your "Open questions for Han" — I'll add
-   a `claim_gpu_until_pid_exits(idx, pid)` helper or a CLI wrapper
-   `bash scripts/run_with_gpu_claim.sh <gpu_idx> -- <command>`.
-   But for THIS work, use `claim_gpu` even if it's awkward — silent
-   contention with another agent is the worst-case outcome.
+     ```python
+     import os, subprocess
+     env = {**os.environ, "CUDA_VISIBLE_DEVICES": "0", "AGENT_NAME": "agent_em"}
+     subprocess.run(["python", "-m", "experiments.c6_em.run", "--seeds", "1"], env=env)
+     ```
+
+6. **Failure mode**: if you and agent_nlp accidentally launch on the
+   same GPU simultaneously, both crash with CUDA OOM. Recoverable in
+   ~5 min — restart the cell on the other GPU or wait for peer's run
+   to finish. No state corruption (each cell is independent and
+   deterministic via `train_key`).
 
 7. **Time budget**: full Wang on 12 cells (3 seeds × 2 archs × 2
-   organisms) is ~25–50 H100-hr serial; ~12–25 hr wall time on 2
-   parallel H100s. agent_nlp's pod is yours too as long as their
-   `status: complete` holds (verify `agents/agent_nlp/briefing.md`
-   before claiming GPU 0).
+   organisms) is ~25–50 H100-hr serial; ~12–25 hr wall time if you
+   parallelize across both H100s. agent_nlp's pod is yours to borrow
+   as long as they're idle — re-verify before each long borrow.
 
 You are agent EM, lead on **C6: emergent misalignment** on
 `Qwen/Qwen2.5-14B-Instruct` + finance LoRA organism (R1 + R32). The

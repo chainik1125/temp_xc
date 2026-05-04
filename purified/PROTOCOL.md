@@ -393,77 +393,63 @@ The pinning makes every shared-pod cell run on a single, stable GPU.
 Re-running yields the same outputs (modulo cuDNN nondeterminism, which
 is suppressed by `set_seed(deterministic=True)`).
 
-## 13. Multi-GPU access (Primary + Pool protocol)
+## 13. GPU sharing convention (no lockfile manager)
 
-When N named agents share a pod with M ≥ N GPUs, each agent has one
-**primary** GPU (always owned, pinned by `set_agent_env.sh`). Remaining
-GPUs form a **pool** that any agent may claim via the
-`temp_bench.utils.gpu_locks` lockfile manager.
+**Earlier design (deleted 2026-05-04)**: `temp_bench.utils.gpu_locks`
+provided `claim_gpu(idx)` / `claim_gpus([idx])` lockfile context
+managers. The system was correct but agents kept bypassing it
+("gentleman's agreement only" — see commit `0c885c98`), and the
+`subprocess.Popen` background-launch case was a footgun (lock could
+release while the child was still using the GPU). For our 72-hour
+2-agents-per-pod scope, the cost outweighed the benefit.
 
-For the 4× A40 pod (2 named agents):
-- **Primary (reserved):** agent_steer = GPU 0; agent_back = GPU 1.
-- **Pool (shared):** GPUs 2 and 3.
+**Current design**: a convention, not enforcement. Three rules:
 
-For the 2× H100 pod (2 named agents): no pool — each agent's primary
-IS its only GPU. Multi-GPU not applicable here.
+1. **Your primary is your default.** `scripts/set_agent_env.sh
+   <agent_name>` pins your agent's own python process to your primary
+   GPU via `CUDA_VISIBLE_DEVICES`. Don't relax that — it prevents your
+   stray `model.cuda()` calls from accidentally landing on a peer's
+   GPU.
 
-### Claiming a pool GPU
+2. **Peer's GPU is fair game when peer is idle.** Before you launch a
+   cell on a non-primary GPU, do TWO checks:
+   - **Read peer's briefing's "Current state" section** — does it say
+     they're running something? When does it ETA-finish?
+   - **Run `nvidia-smi`** — is the GPU actually free (memory < ~1 GB
+     used, no other long-running python process)?
+   If both check out, launch a subprocess with explicit
+   `CUDA_VISIBLE_DEVICES=<peer_idx>` set in its env. The
+   `scripts/run_on_gpu.sh <idx> -- <cmd>` wrapper handles this and
+   includes a quick `nvidia-smi` safety check.
 
-```python
-from temp_bench.utils.gpu_locks import claim_gpu, claim_gpus
-import os, subprocess
+3. **Update YOUR briefing's "Current state" before borrowed-GPU
+   work**, e.g. `"Borrowing GPU 0 until ETA 15:30 UTC for C6 7B-medical
+   sweep — agent_em-territory yielded per their status: complete."`
+   Peer's next session will see it on `git pull`.
 
-# Single spare claim
-with claim_gpu(2, note="C5 seed-1 parallel"):
-    env = {**os.environ, "CUDA_VISIBLE_DEVICES": "2", "AGENT_NAME": "agent_steer"}
-    subprocess.run(["python", "-m", "experiments.c5_steering.run", "--seeds", "1"], env=env)
+### Failure mode + recovery
 
-# Multi-GPU claim (atomic — all or nothing)
-with claim_gpus([2, 3], note="C5 seeds 1+2 parallel"):
-    procs = []
-    for gpu, seed in [(2, 1), (3, 2)]:
-        env = {**os.environ, "CUDA_VISIBLE_DEVICES": str(gpu), "AGENT_NAME": "agent_steer"}
-        procs.append(subprocess.Popen(["python", "-m", "experiments.c5_steering.run", "--seeds", str(seed)], env=env))
-    for p in procs:
-        p.wait()
-```
-
-Each subprocess passes preflight because each sees exactly one GPU.
-The parent agent's role is coordination (claim → launch → wait → release).
-
-### Why Primary + Pool, not strict modulo
-
-Pure modulo partitioning (steer = {0, 2}, back = {1, 3}) is too rigid:
-if agent_back finishes early, GPUs 1+3 sit idle while agent_steer
-crawls. Primary + Pool keeps each agent's primary inviolable while
-letting either claim spare capacity opportunistically.
-
-### Hard rules
-
-1. **Never use another agent's primary.** Pool only.
-2. **Always claim before pinning.** Launching with
-   `CUDA_VISIBLE_DEVICES=2` without `claim_gpu(2)` first is a
-   PROTOCOL.md § 13 violation — silent contention.
-3. **Use `claim_gpus(...)` for multi-claim**, not nested `claim_gpu`s.
-   The atomic version sorts indices and releases everything if any
-   claim fails — eliminates deadlocks where two agents hold one of
-   each other's targets.
-4. **Lock files are best-effort coordination.** A misbehaving agent
-   that ignores claims will collide. The framework gives you visible,
-   debuggable failure when locks are honored.
-5. **Stale locks auto-reclaim.** If a previous pod crashed mid-claim,
-   `cleanup_stale()` (run by the smoke test) GCs locks whose PID is
-   no longer alive.
+If two agents launch on the same GPU simultaneously: CUDA OOM, both
+crash. **Recoverable in ~5 min** — each cell is independent and
+deterministic, no state corruption. Inspect `nvidia-smi` + peer's
+briefing, retry. This is the cost we pay for ditching the lock
+system; it's lower than the cognitive overhead of using it.
 
 ### Multi-GPU is multi-process, not multi-CUDA-device
 
 Our "no DDP" decision (`docs/paper/hardware.md` § Single-GPU vs
 multi-GPU) means: to use N GPUs, an agent launches N subprocesses,
 each with `CUDA_VISIBLE_DEVICES=<single_idx>`. The parent process
-never sees more than one GPU — `runner.preflight()` would warn if it
-did. The lock manager prevents two agents from racing for the same
-spare; the per-process pinning prevents subtler cross-agent CUDA
-contention.
+never sees more than one GPU. The convention above keeps cross-agent
+collisions to "rare and recoverable."
+
+### Background-launch caveat
+
+If you `subprocess.Popen` a long parallel cell on a borrowed GPU and
+then return to other work, the peer agent has no signal that you're
+still using their GPU. **Update your briefing's "Current state"
+BEFORE the Popen** so the peer sees it on their next session. For
+short cells (<5 min), `subprocess.run` blocking is simpler.
 
 ## 14. Briefing maintenance (across context-compact boundaries)
 

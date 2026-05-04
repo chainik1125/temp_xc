@@ -50,7 +50,7 @@ src/temp_bench/                  # the library (paper-ready, single source of tr
   ├ training/                    # shared trainer + Bricken (opt-in)
   ├ eval/                        # synthetic, probing, qualitative, case_study
   ├ case_studies/                # C5 steering, C6 EM, C7 backtracking (temp-bench)
-  ├ plotting/, utils/            # helpers (gpu_locks, set_seed, save_figure)
+  ├ plotting/, utils/            # helpers (tokens, set_seed, save_figure)
   ├ config.py                    # yaml loaders + cache-key computation
   ├ cache.py                     # checkpoint + leaderboard ops (only writers)
   ├ runner.py                    # run_cell — single canonical pathway
@@ -66,7 +66,7 @@ docs/
   ├ components/c{1..7}.md        # paper-section writeups (the source of truth)
   └ paper/                       # framework.md, architecture.md, hardware.md, outline.md
 agents/<name>/                   # per-agent briefing + log
-tests/                           # pytest — cache-keys, schemas, runner, gpu_locks
+tests/                           # pytest — cache-keys, schemas, runner, tokens
 scripts/                         # bootstrap, smoke, set_agent_env, sync_from_hf
 ```
 
@@ -156,9 +156,11 @@ is the audit trail.
    bumps surprises every other agent's `uv sync`.
 8. **Always set `TQDM_DISABLE=1`** before any Python invocation.
 9. **GPU pinning on shared pods is mandatory.** Each agent's
-   `set_agent_env.sh` entry pins one primary GPU. To use spare pool
-   GPUs, claim via `temp_bench.utils.gpu_locks.claim_gpu(idx)`.
-   See PROTOCOL.md § 12 (pinning) + § 13 (multi-GPU Primary + Pool).
+   `set_agent_env.sh` entry pins one primary GPU via
+   `CUDA_VISIBLE_DEVICES`. Peer's GPU is fair game when they're idle —
+   verify via peer's briefing + `nvidia-smi`, then launch a subprocess
+   with `bash scripts/run_on_gpu.sh <idx> -- <cmd>`. See PROTOCOL.md
+   § 12 (pinning) + § 13 (GPU sharing convention).
 10. **Results live in state, not prose.** Numbers in the `## Results`
     section of any `docs/components/cN.md` are NEVER hand-typed. The
     block between `<!-- BEGIN AUTO-RESULTS -->` and `<!-- END AUTO-RESULTS -->`
