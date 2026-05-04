@@ -303,13 +303,16 @@ def _smoke_probe_data(act_cache_key: str, *, S: int):
 
 
 def _real_training_cfg() -> TrainingConfig:
-    """Headline-cell TrainingConfig — schema defaults per decisions.md § 12.
+    """Headline-cell TrainingConfig.
 
-    batch=1024, n_steps=25_000, plateau_early_stop=False (locked
-    2026-05-04 PM by agent_paper, commit 06681098). Phase-5-faithful,
-    uniform across all archs and pods.
+    Schema defaults are batch=1024, n_steps=25_000, plateau_off per
+    decisions.md § 12. **Deadline override (Han, 2026-05-04 PM)**:
+    n_steps=20_000 to fit the C3+C4 sweep in remaining 72-h budget at
+    measured 2.27 steps/sec under shared-GPU contention. Other archs /
+    components may follow suit; surface to agent_paper for paper-wide
+    schema update if so.
     """
-    return TrainingConfig()
+    return TrainingConfig(n_steps=20_000)
 
 
 def main(*, archs, seeds, k_feats, S, smoke, force_train=False, force_eval=False):

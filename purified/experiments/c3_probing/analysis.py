@@ -42,9 +42,11 @@ COMPONENT = "c3"
 EXP_DIR = Path(__file__).parent
 PLOT_DIR = EXP_DIR / "plots"
 
-# The canonical sweep we filter the leaderboard against. ``canonical_train_keys``
-# uses ``TrainingConfig()`` defaults (currently batch=1024, n_steps=25K per
-# decisions.md § 12) so this auto-tracks any future paper-wide schema bump.
+# The canonical sweep we filter the leaderboard against. C3 runs use a
+# Han-approved deadline override of n_steps=20_000 (decisions.md § 12
+# defaults are 25K — 20K fits the 72-h budget at measured 2.27 steps/sec
+# under shared-GPU contention). We pass the explicit TrainingConfig to
+# canonical_train_keys so the headline filter matches the override.
 DATASOURCE_NAME = "gemma_2_2b_it_l13_fineweb_24k128"
 HEADLINE_ARCHS = ("topk_sae", "tsae_paper", "txc_base", "txc_pro")
 HEADLINE_SEEDS = (1, 2, 42)
@@ -71,11 +73,13 @@ def run_analysis() -> AnalysisResult:
     # rows used right-padded tail-S (corrupts winogrande/wsc); v1.1.0 is the
     # eval-pathway headline (Phase 7 padding fix). Old batch=256 rows were
     # undertrained vs Phase 5 reference; batch=1024 is the training headline.
+    from temp_bench.schemas import TrainingConfig
     valid_keys = canonical_train_keys(
         component=COMPONENT,
         archs=HEADLINE_ARCHS,
         seeds=HEADLINE_SEEDS,
         datasource_names=(DATASOURCE_NAME,),
+        training_cfg=TrainingConfig(n_steps=20_000),
     )
     real_rows = [
         r for r in rows

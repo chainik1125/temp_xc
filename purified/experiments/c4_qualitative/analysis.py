@@ -68,11 +68,13 @@ def _build_c3_mean_auc_lookup() -> dict[tuple[str, int, int], float]:
     "mean-pool probing AUC" — the C3 headline for less-sparse regime).
     """
     out: dict[tuple[str, int, int], float] = {}
+    from temp_bench.schemas import TrainingConfig
     c3_valid_keys = canonical_train_keys(
         component="c3",
         archs=C3_HEADLINE_ARCHS,
         seeds=HEADLINE_SEEDS,
         datasource_names=(DATASOURCE_NAME,),
+        training_cfg=TrainingConfig(n_steps=20_000),
     )
     for r in query_leaderboard(component="c3"):
         if r.eval_cfg.get("smoke", False):
@@ -90,11 +92,13 @@ def _build_c3_mean_auc_lookup() -> dict[tuple[str, int, int], float]:
 
 def run_analysis() -> AnalysisResult:
     rows = query_leaderboard(component=COMPONENT)
+    from temp_bench.schemas import TrainingConfig
     valid_keys = canonical_train_keys(
         component=COMPONENT,
         archs=HEADLINE_ARCHS,
         seeds=HEADLINE_SEEDS,
         datasource_names=(DATASOURCE_NAME,),
+        training_cfg=TrainingConfig(n_steps=20_000),
     )
     real_rows = [
         r for r in rows

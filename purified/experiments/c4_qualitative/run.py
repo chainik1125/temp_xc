@@ -68,11 +68,9 @@ def _d_in_from_act_cache(act_cache_key: str) -> int:
 def _real_training_cfg() -> TrainingConfig:
     """Same config as C3's _real_training_cfg — checkpoints SHARE.
 
-    Schema defaults per decisions.md § 12 (commit 06681098): batch=1024,
-    n_steps=25_000, plateau_early_stop=False. Phase-5-faithful, uniform
-    across all archs and pods.
+    n_steps=20_000 deadline override (Han, 2026-05-04 PM); see C3 runner.
     """
-    return TrainingConfig()
+    return TrainingConfig(n_steps=20_000)
 
 
 def my_train_fn(*, arch_name, arch_hparams, seed, training_cfg, act_cache_key, component):
