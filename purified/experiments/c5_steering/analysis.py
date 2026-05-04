@@ -21,12 +21,24 @@ from typing import Any
 import matplotlib.pyplot as plt
 
 from temp_bench.plotting import save_figure
-from temp_bench.report import AnalysisResult, query_leaderboard
+from temp_bench.report import AnalysisResult, canonical_train_keys, query_leaderboard
 
 
 COMPONENT = "c5"
 EXP_DIR = Path(__file__).parent
 PLOT_DIR = EXP_DIR / "plots"
+
+# C5 sweep canonicalization. Used by ``run_analysis`` to filter
+# leaderboard rows down to "only cells trained under the current
+# canonical TrainingConfig defaults" (decisions.md § 12 mandates a
+# uniform batch=1024 / n_steps=25k schedule across all archs and
+# components — pre-2026-05-04 cells stay in the leaderboard for diff
+# but must NOT mix into the AUTO-RESULTS table). The helper computes
+# train_keys from current TrainingConfig() defaults; when paper-wide
+# defaults change, this filter automatically tracks them.
+ARCHS = ("tsae_paper", "txc_base", "txc_pro")
+SEEDS = (1, 2, 42)
+DATASOURCE_NAMES = ("gemma_2_2b_it_l13_fineweb_24k128",)
 
 
 def _placeholder(reason: str) -> str:
@@ -113,13 +125,25 @@ def _plot_coh_threshold_curves(
 
 
 def run_analysis() -> AnalysisResult:
-    rows = query_leaderboard(component=COMPONENT)
+    all_rows = query_leaderboard(component=COMPONENT)
     # Skip smoke-test cells (matches agent_nlp's c3 convention).
-    rows = [r for r in rows if not r.eval_cfg.get("smoke")]
+    rows = [r for r in all_rows if not r.eval_cfg.get("smoke")]
+    # Filter to canonical train_keys only (decisions.md § 12 — exclude
+    # pre-2026-05-04 batch=256 cells from the rendered AUTO-RESULTS
+    # while keeping them in leaderboard.jsonl for diff comparison).
+    valid_train_keys = canonical_train_keys(
+        component=COMPONENT,
+        archs=ARCHS,
+        seeds=SEEDS,
+        datasource_names=DATASOURCE_NAMES,
+    )
+    rows = [r for r in rows if r.train_key in valid_train_keys]
     if not rows:
         return AnalysisResult(
             markdown=_placeholder(
-                "no non-smoke cells run yet — see experiments/c5_steering/run.py"
+                "no canonical-config cells run yet — see "
+                "experiments/c5_steering/run.py (TrainingConfig defaults: "
+                "batch=1024, n_steps=25_000, plateau_off per decisions.md § 12)"
             ),
             results={},
             plot_paths=[],
