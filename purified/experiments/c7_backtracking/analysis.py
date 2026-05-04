@@ -43,6 +43,51 @@ COMPONENT = "c7"
 EXP_DIR = Path(__file__).parent
 PLOT_DIR = EXP_DIR / "plots"
 
+
+def _valid_train_keys() -> set[str]:
+    """Compute the set of valid (current-config) train_keys for C7.
+
+    Per Han's 2026-05-04 PM directive (decisions.md § 12), the
+    re-issued TrainingConfig defaults (batch_size=1024, n_steps=25_000,
+    plateau_early_stop=False) invalidate prior cells. Old leaderboard
+    rows from batch=256 / n_steps=30_000 are kept for diff but MUST NOT
+    appear in AUTO-RESULTS — each cell trains to identical compute
+    budget under the new config.
+
+    This computes the train_keys for the canonical c7 sweep (7 archs ×
+    seeds {1, 2, 42}) deterministically from current defaults and
+    returns them as a filter set.
+    """
+    from temp_bench.config import (
+        compute_act_cache_key,
+        compute_train_key,
+        load_arch,
+        load_datasource,
+    )
+    from temp_bench.schemas import TrainingConfig
+    archs = ("topk_sae", "stacked_sae", "tfa", "tsae_paper", "mlc",
+             "txc_base", "txc_pro")
+    seeds = (1, 2, 42)
+    valid: set[str] = set()
+    for ds_name in ("llama_3_1_8b_base_l10_ward",
+                    "llama_3_1_8b_base_l10_ward_nousmirror"):
+        try:
+            ds = load_datasource(ds_name)
+        except KeyError:
+            continue
+        ack = compute_act_cache_key(ds)
+        for arch in archs:
+            try:
+                spec = load_arch(arch, component="c7")
+            except (KeyError, ImportError):
+                continue
+            for seed in seeds:
+                valid.add(compute_train_key(
+                    arch=spec, seed=seed, training_cfg=TrainingConfig(),
+                    act_cache_key=ack,
+                ))
+    return valid
+
 # Aniket's wasteland reference (hill-climbed TXC) — for the c7.md
 # "Reference numbers" cross-check, NOT our paper claim.
 ANIKET_REFERENCE_PEAK_DELTA_GC = {
@@ -190,8 +235,37 @@ def run_analysis() -> AnalysisResult:
     PLOT_DIR.mkdir(parents=True, exist_ok=True)
     rows = query_leaderboard(component=COMPONENT)
 
+    # Filter to current-config cells only (Han 2026-05-04 PM, decisions § 12).
+    valid_keys = _valid_train_keys()
+    rows = [r for r in rows if r.train_key in valid_keys]
+
     # ── Inducement ────────────────────────────────────────────────────
     judge_rows = _gather_judge_outputs()
+    # Also filter judge_outputs.jsonl rows to those produced by current-
+    # config cells. Each row in judge_outputs.jsonl has (arch, seed, mag);
+    # the cell's eval_key (and train_key) lives in the workspace dirname.
+    # We re-filter via the run_dir parent → match against valid_keys.
+    from temp_bench.cache import _read_jsonl, leaderboard_path
+    from temp_bench.config import purified_root
+    valid_eval_keys = {r.eval_key for r in rows}
+    runs_dir = purified_root() / "results" / "runs"
+    valid_judges: list[dict[str, Any]] = []
+    for jp in runs_dir.glob("*/judge_outputs.jsonl") if runs_dir.exists() else []:
+        if jp.parent.name not in valid_eval_keys:
+            continue
+        try:
+            with jp.open() as f:
+                for line in f:
+                    line = line.strip()
+                    if not line:
+                        continue
+                    try:
+                        valid_judges.append(json.loads(line))
+                    except json.JSONDecodeError:
+                        continue
+        except Exception:
+            continue
+    judge_rows = valid_judges
     if not judge_rows and not rows:
         return AnalysisResult(
             markdown=_placeholder("no leaderboard rows AND no judge_outputs.jsonl yet"),
