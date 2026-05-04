@@ -483,15 +483,14 @@ F. **Headline test**: does any C7 arch (under proper batch=1024 / 25k
    shipped txc_pro. All 7 archs instantiate.
 2. **Cohort-from-parquet — adopted.** Stays.
 3. **Mining-in-case-studies — adopted.** Stays.
-4. **NousResearch mirror — Meta access APPLIED 2026-05-04** (Han
-   2026-05-04 OQ #1 in the mandate update). When Meta access lands
-   I run the equivalence check (see step E in Next Action), then
-   switch the runner's `DATASOURCE` constant in
-   `experiments/c7_backtracking/run.py` from
-   `llama_3_1_8b_base_l10_ward_nousmirror` to
-   `llama_3_1_8b_base_l10_ward`. New act_cache_key → new train_keys
-   → fresh cells (old NousResearch cells stay in leaderboard for
-   diff but my analysis filter excludes them).
+4. **NousResearch mirror — RESOLVED 2026-05-04 13:01.** Meta access
+   landed; ran `experiments/c7_backtracking/check_mirror_equivalence.py`
+   (commit 0e09c867) on 5 prompts × {12-38} tokens, comparing layer-10
+   residual element-wise. **PASS: max_abs_diff = 0.000e+00, rmse =
+   0.000e+00** — the two repos are bit-exact identical. v3 sweep cells
+   (which use the mirror datasource) stay paper-valid. No re-run
+   needed; no DATASOURCE switch needed. Both datasource entries can
+   coexist; analysis filter accepts either.
 5. **ward.py vs cache.py split** — defer. agent_paper hasn't asked
    for unification. The two paths share the `act_cache_dir(act_cache_key)`
    convention and produce compatible memmaps; only the corpus +
