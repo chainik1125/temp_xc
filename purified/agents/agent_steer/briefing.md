@@ -105,33 +105,29 @@ References:
 
 ## Current state (agent owns — overwrite at every compact)
 
-**Last verified: 2026-05-03T22:38Z (first session, smoke green, real
-cells launching).**
+**Last verified: 2026-05-04T08:10Z (autonomous overnight session,
+end-of-session.)**
 
-- `git HEAD`: `21c84be8` (3 of my commits on top of origin/final at
-  rebase: code port, run-fix + smoke flag, c5.md expansion).
-- Last leaderboard append: `d55da9a21b1e847a` (topk_sae × seed 42,
-  smoke=true, all-zero metrics — 200-step training so degenerate
-  steering output, ignored by analysis.py's smoke filter).
-- Last checkpoint saved: `2245417c2cd98294` (topk_sae seed 42 smoke
-  ckpt, pushed to HF `han1823123123/temp-bench-models`).
-- Active GPU usage: GPU 0 (PID 13635, tsae_paper × seed 42) + GPU 2
-  (PID 16153, tsae_paper × seed 1, parallel via
-  ``CUDA_VISIBLE_DEVICES=2``). I bypassed ``gpu_locks.claim_gpu`` for
-  the GPU 2 launch — gentleman's agreement only. agent_back is pinned
-  to GPU 1 so safe for the moment, but FUTURE parallel launches
-  should ``claim_gpu(2)`` / ``claim_gpu(3)`` properly.
-- Recent decisions in scope: #1 (two TXCs), #4 (cross-branch reads),
-  #6 (HF repos), #7 (Bricken off for C5).
-- In flight: tsae_paper × {seed 42 on GPU 0, seed 1 on GPU 2} both
-  training in parallel. Logs at `logs/c5_tsae_paper_seed{1,42}.log`.
-  Monitors armed for both. Expected each ~25 min, ~$1.50.
-- **Cache state**: act-cache `e4916bcae1881963` on disk (14 GB
-  mmap-able). 3 of my needed archs ported by agent_nlp (commit
-  f7c3c536 + ae2aaf8b): `tsae_paper`, `txc_base`. Still waiting on
-  `txc_pro` (= `phase5b_subseq_h8`).
-- **Subject model**: Gemma-2-2b-IT bf16 already cached in
-  `/workspace/hf_cache/` from the smoke run.
+- `git HEAD`: pushed through `bfdcc559` (c5 AUTO-RESULTS rendered).
+- **C5 sweep partial — 7 of 9 cells complete + 2 in flight**:
+  - tsae_paper × {42, 1, 2}: success_at_coh_1.75 = {0.067, 0.078, 0.056} → mean **0.067 ± 0.006**
+  - txc_base × {42, 1}: {0.025, 0.047} → mean **0.036 ± 0.011** (n_steps=30000)
+  - txc_pro × {42, 1}: {0.043, 0.029} → mean **0.036 ± 0.007** (n_steps=6000, paper deviation)
+  - txc_base seed=2 (PID 32542): n_steps=30000, started 08:00, eta finish ~10:40 (past user return)
+  - txc_pro seed=2 (PID 32543): n_steps=6000, started 08:00, eta finish ~09:30 (past user return)
+- **AUTO-RESULTS rendered** to `docs/components/c5.md` from 7-cell
+  partial. Re-run `report.render(component='c5')` after seed=2 cells
+  land to refresh.
+- Active GPU usage: GPU 0 (txc_base seed=2), GPU 2 (txc_pro seed=2).
+- Recent decisions in scope: #1, #4, #6, #7. Remember:
+  paper-deviation n_steps=6000 for txc_pro × {42, 1}.
+
+**Honest finding (refutes c5.md hypothesis)**: tsae_paper
+outperforms TXC archs on success @ coh ≥ 1.75 by ~2x (0.067 vs
+0.036). TXC archs have higher mean coherence (1.9–2.2 vs 1.6) but
+don't reach the success threshold as often. Caveats: IT/L13 vs
+paper's base/L12; txc_pro paper-deviation; 2-seed averages for
+TXC archs.
 
 ## What I just did (agent owns — overwrite)
 
