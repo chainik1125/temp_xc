@@ -106,17 +106,14 @@ References:
 
 **Last verified: 2026-05-04 (autonomous-overnight session COMPLETE)**
 
-- `git HEAD`: 086aeb68 — `final` branch
-- Last leaderboard append: 24 real C3 cells (4 archs × 3 seeds × 2 k_feats)
-  + 1 C4 smoke cell (`7476cadc2647eb47`).
-- Last checkpoint saved: txc_pro × 3 seeds (real n_steps=10000 cfg).
-  Plus all the prior C3 checkpoints (topk_sae, tsae_paper, txc_base ×
-  3 seeds each = 12 train_keys total).
-- Active GPU lock(s): none — pinned to GPU 0. C4 cells in flight.
+- `git HEAD`: 14559837 (after C4 final commit) — `final` branch
+- Last leaderboard append: 24 real C3 cells + 9 real C4 cells + 1 C4
+  smoke cell. **All paper headlines shipped.**
+- Last checkpoint saved: full set — 12 unique train_keys (4 archs ×
+  3 seeds at n_steps=10000), all on disk + manifest.
+- Active GPU lock(s): none — pinned to GPU 0. No active runs.
 - Recent decisions in scope: #1, #4, #6, #7, #11
-- In flight: 9-cell C4 run (PID 46597, started 2026-05-04 morning).
-  3 archs × 3 seeds × n_features=256. ETA ~90 min (mostly Haiku API
-  latency for 256 × 3 = 768 judge calls per cell × 9 cells = ~7K calls).
+- In flight: nothing — both C3 and C4 cells complete.
 
 ## C3 final headline (decided 2026-05-04)
 
@@ -142,6 +139,40 @@ Caveats for the paper text:
 - σ_tasks suggests a per-task breakdown could expose where TXC
   variants lose vs win. Per-task floats `auc__<task>` are persisted
   on every leaderboard row for this analysis.
+
+## C4 final headline (decided 2026-05-04)
+
+**Result**: T-SAE produces the most SEMANTIC features. TXC-pro mid-pack.
+TXC-base dominated. **Honest negative for the C4 hypothesis** —
+TXC-pro does NOT Pareto-dominate T-SAE.
+
+| arch         | mean SEMANTIC ± σ_seeds | judge_agreement |
+|--------------|-------------------------|-----------------|
+| `tsae_paper` | 74.7 ± 8.1              | 0.905           |
+| `txc_pro`    | 60.0 ± 2.6              | 0.852           |
+| `txc_base`   | 42.0 ± 2.0              | 0.768           |
+
+Pareto frontier (probing AUC k=20 vs SEMANTIC count): {tsae_paper, txc_pro}.
+- tsae_paper: probing 0.8844, SEMANTIC 74.7 (high-SEMANTIC end)
+- txc_pro: probing 0.8859, SEMANTIC 60.0 (high-AUC end)
+- txc_base: probing 0.8841, SEMANTIC 42.0 (dominated)
+
+The honest framing for the paper: **T-SAE wins on qualitative
+interpretability while TXC-pro matches T-SAE on probing utility**;
+TXC-pro doesn't ALSO win on qualitative as we hypothesised.
+
+C4 caveats:
+- Wasteland reference (1 seed, concat_random only): tsae_paper=95/256,
+  Track 2 T=20 (a different TXC variant, not txc_pro): 102/256. Our
+  numbers are systematically lower — different seed-distribution,
+  combined concat_A+B+random instead of just random, n_steps=10K vs
+  Phase 7's longer training.
+- 768 Haiku calls per cell × 9 cells = ~7K Haiku calls. Total cost
+  ~$0.20. Judge agreement averaged 0.84 across all cells.
+- Judge κ validation deferred to post-deadline per c4.md (decisions §
+  11). All judge outputs persisted to
+  `results/runs/<eval_key>/judge_outputs.jsonl` for `pandas + scipy.stats.cohen_kappa_score`
+  computation when 20-feature blind hand-score lands.
 
 ## What I just did (agent owns — overwrite)
 
