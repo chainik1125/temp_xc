@@ -1,36 +1,12 @@
 {
-  "gap": 5.75,
-  "gap_max": 5.75,
-  "gap_min": 5.03125,
-  "gap_spread": 0.71875,
-  "mean_gap": 5.390625,
+  "gap": 5.453125,
+  "gap_max": 5.453125,
+  "gap_min": 5.453125,
+  "gap_spread": 0.0,
+  "mean_gap": 5.453125,
   "per_seed": [
     {
-      "gap": 5.03125,
-      "sae": {
-        "eval_key": "cdc5e99b13fa6212",
-        "peak_align": 80.28125,
-        "peak_alpha": -30.0,
-        "peak_coh": 90.03125,
-        "peak_feature_id": 3158,
-        "seed": 1,
-        "train_key": "b300a6a0d26196a6",
-        "ts": "2026-05-04T00:19:56Z"
-      },
-      "seed": 1,
-      "txc": {
-        "eval_key": "40f0d1eb4a0c3b81",
-        "peak_align": 75.25,
-        "peak_alpha": -30.0,
-        "peak_coh": 89.65625,
-        "peak_feature_id": 17670,
-        "seed": 1,
-        "train_key": "c3ab0477e3a3b339",
-        "ts": "2026-05-04T01:04:41Z"
-      }
-    },
-    {
-      "gap": 5.75,
+      "gap": 5.453125,
       "sae": {
         "eval_key": "160a1471d1a93f1b",
         "peak_align": 81.625,
@@ -43,14 +19,14 @@
       },
       "seed": 42,
       "txc": {
-        "eval_key": "c1d96d5549e0c3a6",
-        "peak_align": 75.875,
-        "peak_alpha": 1.0,
-        "peak_coh": 89.921875,
-        "peak_feature_id": 734,
+        "eval_key": "02ab056bb167abe2",
+        "peak_align": 76.171875,
+        "peak_alpha": -30.0,
+        "peak_coh": 89.234375,
+        "peak_feature_id": 15529,
         "seed": 42,
-        "train_key": "410c3f342b133fff",
-        "ts": "2026-05-03T23:52:56Z"
+        "train_key": "46518b15bc7ec95c",
+        "ts": "2026-05-04T03:31:50Z"
       }
     }
   ],
@@ -65,13 +41,13 @@
     "ts": "2026-05-03T23:07:40Z"
   },
   "txc_base_peak": {
-    "eval_key": "c1d96d5549e0c3a6",
-    "peak_align": 75.875,
-    "peak_alpha": 1.0,
-    "peak_coh": 89.921875,
-    "peak_feature_id": 734,
+    "eval_key": "02ab056bb167abe2",
+    "peak_align": 76.171875,
+    "peak_alpha": -30.0,
+    "peak_coh": 89.234375,
+    "peak_feature_id": 15529,
     "seed": 42,
-    "train_key": "410c3f342b133fff",
-    "ts": "2026-05-03T23:52:56Z"
+    "train_key": "46518b15bc7ec95c",
+    "ts": "2026-05-04T03:31:50Z"
   }
 }
