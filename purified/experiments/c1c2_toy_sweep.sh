@@ -19,6 +19,15 @@ cd "$(dirname "$0")/.."   # purified/
 
 mkdir -p logs
 
+# Cap thread oversubscription. Drivers don't set this themselves and
+# default OMP_NUM_THREADS = all cores (76) — with 5 parallel procs,
+# that's 380 threads on 76 cores = ~5× oversubscription, which made
+# the first launch attempt take >10 min/cell on toy data. Cap at 8 to
+# match the c5 driver's convention. Toy archs are GPU-resident; CPU
+# threads only matter for data preprocessing.
+export OMP_NUM_THREADS=8
+export MKL_NUM_THREADS=8
+
 # ─── C1 — Markov-chain TopK sweep ─────────────────────────────────
 declare -A C1=(
   [0]="topk_sae tsae_paper"
@@ -30,6 +39,7 @@ for gpu in "${!C1[@]}"; do
   log="logs/c1_gpu${gpu}.log"
   echo "[c1c2_sweep] GPU ${gpu} → C1 archs={${archs}} → ${log}"
   setsid -f bash scripts/run_on_gpu.sh "${gpu}" -- \
+    env OMP_NUM_THREADS=8 MKL_NUM_THREADS=8 \
     .venv/bin/python -m experiments.c1_synthetic_topk.run \
     --archs ${archs} \
     < /dev/null > "${log}" 2>&1
@@ -45,6 +55,7 @@ for gpu in "${!C2[@]}"; do
   log="logs/c2_gpu${gpu}.log"
   echo "[c1c2_sweep] GPU ${gpu} → C2 archs={${archs}} → ${log}"
   setsid -f bash scripts/run_on_gpu.sh "${gpu}" -- \
+    env OMP_NUM_THREADS=8 MKL_NUM_THREADS=8 \
     .venv/bin/python -m experiments.c2_synthetic_coupled.run \
     --archs ${archs} \
     < /dev/null > "${log}" 2>&1
