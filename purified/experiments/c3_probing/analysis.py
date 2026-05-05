@@ -43,22 +43,25 @@ EXP_DIR = Path(__file__).parent
 PLOT_DIR = EXP_DIR / "plots"
 
 # The canonical sweep we filter the leaderboard against. Since
-# decisions.md § 15 (Han 2026-05-05 PM) the 4 archs split into THREE
-# TrainingConfig families per literature alignment:
-#   - TXC archs (txc_base, txc_pro): train_window_size=None (sample
-#     T-windows internally regardless of mode). n_steps=20K Han override.
-#   - TopK SAE: train_window_size=1 (vanilla TopK, no temporal —
-#     1024 tok/step matching SAEBench App. B canonical scale).
-#   - T-SAE: train_window_size=2 (Bhalla/Ye 2025 §3.1 paper-faithful
-#     adjacent-pair contrastive).
+# decisions.md § 15 + § 16 each arch family has its own TrainingConfig:
+#   - TXC archs (txc_base, txc_pro): train_window_size=None (samples
+#     T-windows internally). n_steps=20K Han override.
+#   - TopK SAE: train_window_size=1 (vanilla, 1024 tok/step ≈ SAEBench).
+#   - T-SAE: train_window_size=2 (Bhalla/Ye §3.1 paper-faithful pairs).
+#   - TFA: batch_size=32 + train_window_size=None (full seq, paper-faithful
+#     per Phase 7 train_phase7.py:312-353; 4096 tok/step).
+#   - MLC: train_window_size=None on multi-layer (l11to15) datasource;
+#     5120 tok/step.
 # canonical_train_keys is called once per family; the union is the
-# headline filter. Old over-batched cells (no train_window_size in
-# the cfg → old hash) stay in leaderboard for diff comparison.
+# headline filter.
 DATASOURCE_NAME = "gemma_2_2b_it_l13_fineweb_24k128"
+DATASOURCE_NAME_MULTILAYER = "gemma_2_2b_it_l11to15_fineweb_24k128"
 TXC_ARCHS = ("txc_base", "txc_pro")
 TOPK_ARCHS = ("topk_sae",)
 TSAE_ARCHS = ("tsae_paper",)
-HEADLINE_ARCHS = TXC_ARCHS + TOPK_ARCHS + TSAE_ARCHS
+TFA_ARCHS = ("tfa",)
+MLC_ARCHS = ("mlc",)
+HEADLINE_ARCHS = TXC_ARCHS + TOPK_ARCHS + TSAE_ARCHS + TFA_ARCHS + MLC_ARCHS
 HEADLINE_SEEDS = (1, 2, 42)
 
 
@@ -104,7 +107,21 @@ def run_analysis() -> AnalysisResult:
         datasource_names=(DATASOURCE_NAME,),
         training_cfg=TrainingConfig(n_steps=20_000, train_window_size=2),
     )
-    valid_keys = txc_keys | topk_keys | tsae_keys
+    tfa_keys = canonical_train_keys(
+        component=COMPONENT,
+        archs=TFA_ARCHS,
+        seeds=HEADLINE_SEEDS,
+        datasource_names=(DATASOURCE_NAME,),
+        training_cfg=TrainingConfig(n_steps=20_000, batch_size=32),
+    )
+    mlc_keys = canonical_train_keys(
+        component=COMPONENT,
+        archs=MLC_ARCHS,
+        seeds=HEADLINE_SEEDS,
+        datasource_names=(DATASOURCE_NAME_MULTILAYER,),
+        training_cfg=TrainingConfig(n_steps=20_000),
+    )
+    valid_keys = txc_keys | topk_keys | tsae_keys | tfa_keys | mlc_keys
     real_rows = [
         r for r in rows
         if not r.eval_cfg.get("smoke", False)

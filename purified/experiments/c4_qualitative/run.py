@@ -50,7 +50,7 @@ COMPONENT = "c4"
 DATASOURCE = "gemma_2_2b_it_l13_fineweb_24k128"   # SHARED with C3
 EVAL_PROTOCOL_VERSION = "1.0.0"
 
-DEFAULT_ARCHS = ("tsae_paper", "txc_base", "txc_pro")
+DEFAULT_ARCHS = ("tsae_paper", "txc_base", "txc_pro", "topk_sae")
 DEFAULT_SEEDS = (1, 2, 42)
 DEFAULT_N_FEATURES = 256
 
@@ -65,12 +65,26 @@ def _d_in_from_act_cache(act_cache_key: str) -> int:
     return int(meta["d_in"])
 
 
-def _real_training_cfg() -> TrainingConfig:
-    """Same config as C3's _real_training_cfg — checkpoints SHARE.
+# Per-arch TrainingConfig — must match C3's per-arch cfg so the C4
+# runner cache-hits on C3's checkpoints (eval-only). Per decisions § 15:
+# - TXC archs sample windows internally → train_window_size=None.
+# - TopK SAE @ T=1 (vanilla TopK, no temporal) — SAEBench canonical.
+# - T-SAE @ T=2 (Bhalla/Ye paper-faithful adjacent pairs).
+_PER_ARCH_TRAINING_CFGS: dict[str, TrainingConfig] = {
+    "txc_base": TrainingConfig(n_steps=20_000),
+    "txc_pro": TrainingConfig(n_steps=20_000),
+    "topk_sae": TrainingConfig(n_steps=20_000, train_window_size=1),
+    "tsae_paper": TrainingConfig(n_steps=20_000, train_window_size=2),
+}
 
-    n_steps=20_000 deadline override (Han, 2026-05-04 PM); see C3 runner.
+
+def _real_training_cfg(arch_name: str) -> TrainingConfig:
+    """Look up the per-arch canonical TrainingConfig (decisions § 15).
+
+    Falls back to TrainingConfig(n_steps=20_000) for archs not in the
+    explicit map (newly added archs at the default schedule).
     """
-    return TrainingConfig(n_steps=20_000)
+    return _PER_ARCH_TRAINING_CFGS.get(arch_name, TrainingConfig(n_steps=20_000))
 
 
 def my_train_fn(*, arch_name, arch_hparams, seed, training_cfg, act_cache_key, component):
@@ -125,21 +139,21 @@ def my_eval_fn(*, model, eval_cfg, component):
 
 
 def main(*, archs, seeds, n_features, smoke, force_train=False, force_eval=False):
-    if smoke:
-        training_cfg = TrainingConfig(
-            n_steps=SMOKE_TRAIN_STEPS,
-            batch_size=SMOKE_BATCH,
-            learning_rate=3e-4,
-            warmup_steps=20,
-            precision="bf16",
-        )
-    else:
-        training_cfg = _real_training_cfg()
+    smoke_cfg = TrainingConfig(
+        n_steps=SMOKE_TRAIN_STEPS,
+        batch_size=SMOKE_BATCH,
+        learning_rate=3e-4,
+        warmup_steps=20,
+        precision="bf16",
+    )
 
     from temp_bench.config import compute_act_cache_key, load_datasource, compute_train_key, compute_eval_key
     act_cache_key = compute_act_cache_key(load_datasource(DATASOURCE))
 
     for arch in archs:
+        # Per-arch training_cfg (decisions § 15) so the runner cache-hits
+        # on C3's checkpoints. In smoke mode all archs share the smoke cfg.
+        training_cfg = smoke_cfg if smoke else _real_training_cfg(arch)
         for seed in seeds:
             # Pre-compute the eval_key so we can pass it to my_eval_fn for
             # judge_outputs.jsonl path. The runner re-computes the same
