@@ -708,114 +708,102 @@ time.
 
 ## Current state (agent owns — overwrite at every compact)
 
-**Last verified: 2026-05-05T13:55Z**
+**Last verified: 2026-05-05T14:05Z**
 
-**STATUS: STOOD DOWN — sweep killed, GPUs idle, awaiting C5 T-SAE
-T=1 re-train directive from agent_paper.**
+**STATUS: re-purposed to C5 T-SAE T=2 baseline re-train (decisions § 15).
+Smoke launched.**
 
-- `git HEAD`: `6260c917` (final). Local `final` is ahead of
-  `origin/final` by 2 (the driver commit + the setsid fix); not
-  pushed yet.
+- `git HEAD`: tip of local `final` (post-pull at `2aa9f2b0` + my 3 STAND
+  DOWN commits + new baseline driver pending commit). Ahead of
+  `origin/final` until I push.
 - Pod: 8× A40, ephemeral, 401 GB RAM, 76 vCPU, 1 TB /workspace.
-- All 6 C5 MW cells **killed at 13:55Z** per Han's STAND DOWN order:
-  - `pkill -KILL -f "experiments.c5_steering_filler"` was clean —
-    pgrep returns 0 procs, all 8 GPUs at 0 MB used, 0% util.
-  - Cells were ~1 hr into training (txc_pro_mw at step 1000/20000;
-    txc_base_mw at step 2000/20000). No final checkpoints saved
-    (trainer only checkpoints at end); partial state irrelevant.
-  - Empty workspace dirs from the kill remain in `results/runs/`
-    — harmless; `canonical_train_keys` filters by leaderboard rows,
-    not run_dirs.
-  - Active Monitor `b25o1m7v8` was stopped via TaskStop. No
-    monitor currently armed (none needed during idle).
-- **Leaderboard rows from this session** — all 1 (the smoke):
-  `arch=txc_base_mw seed=42 eval_key=8c6bf97f2de6 n_valid=270
-  smoke=true`. Per Han's STAND DOWN guidance, this MW smoke row
-  stays — `canonical_train_keys` filters it out at paper-render
-  time, harmless.
-- Driver still on disk + committed: `experiments/c5_steering_filler/`
-  with run.py + setsid-detached run_sweep.sh. **Not deleted** — keeps
-  the smoke reproducible if Han ever wants to re-validate the v1.1.0
-  fix on MW. Could be deleted later if it becomes wasteland clutter.
-- Recent decisions in scope: STAND DOWN (`commit dd5f773e`,
-  decisions.md update pending). The amendment to decision #1 from
-  earlier (canonical TXCs are `_mw` aliases) is itself rescinded as
-  part of this STAND DOWN.
+- All 8 GPUs at 0 MB / 0% before smoke launch (post-STAND-DOWN clean).
+- Framework changes verified live:
+  - `TrainingConfig.train_window_size = 2` — instantiates correctly.
+  - `run_one_cell` signature now includes `train_window_size: int | None
+    = None` (kw-only).
+- New driver landed: `experiments/c5_steering_baseline/{__init__.py,
+  run.py, run_sweep.sh}`. run.py wraps `run_one_cell` with
+  `arch_name="tsae_paper"`, `train_window_size=2` baked-in.
+  run_sweep.sh uses `setsid -f` per the prior MW sweep's lesson.
+- Smoke (tsae_paper seed=42, n_steps=200, smoke=True) launched at
+  ~14:05Z on GPU 0. Output buffered to Bash task `bzgkr3t7e`.
+  Monitor `bj2gsw0sv` armed.
+- Aborted MW driver still on disk: `experiments/c5_steering_filler/`
+  with its smoke row at eval_key=`8c6bf97f2de60679` in leaderboard.
+  Kept (open question for Han re: removal).
+- Recent decisions in scope: STAND DOWN (commit `dd5f773e`) +
+  decisions § 15 (T-SAE T=2 paper-faithful re-train). Decision #14
+  (MW deployment) is rescinded.
 
 ## What I just did (agent owns — overwrite)
 
-The session has TWO halves: (a) launching the C5 MW sweep, and
-(b) tearing it down on Han's STAND DOWN order. Both recorded here
-for git provenance.
+The session had THREE halves: (a) the rescinded C5 MW sweep, (b) the
+STAND DOWN, (c) the C5 T-SAE T=2 baseline mission. Recorded
+chronologically for git provenance.
 
-**Pre-STAND DOWN (the wasted work, kept for traceability):**
+**Phase A — C5 MW sweep (rescinded):**
 
-1. Pulled agent_steer's revised briefing + agent_em_100k's c6_em_mw
-   driver. Verified infra (v1.1.0 fix grep, EVAL_PROTOCOL_VERSION,
-   `txc_*_mw` hparams contain `multi_window=True`, 8 GPUs idle,
-   `run_one_cell` signature kw-only).
-2. `bash scripts/sync_from_hf.sh` — pulled checkpoints + 25 GB
-   act_cache (c5 cache `e4916bcae1881963` is 14 GB).
-3. Wrote `experiments/c5_steering_filler/{__init__.py, run.py,
-   run_sweep.sh}`. run.py imports `run_one_cell` from
-   `experiments.c5_steering.run` (canonical closure-builder).
-4. Smoke-tested txc_base_mw seed=42 n_steps=200 smoke=True end-to-end
-   on GPU 0: n_valid=270/270, peak@1.75=0.615, eval_key=8c6bf97f2de6.
-5. Launched full 6-cell sweep (12:21Z); cells went to 100% GPU util
-   in ~1 min (44.6 GB / 36.0 GB VRAM — under 48 GB cap).
-6. CC restarted at ~12:25Z, killing the cells (children of harness
-   shell got SIGHUP). Patched `run_sweep.sh` to use `setsid -f` for
-   orphan-to-init detachment. Relaunched at 12:31Z; verified cells
-   PPID=1, SID==own PID.
-7. At 13:37Z (1 hr into the second launch): txc_pro_mw at step
-   1000/20000, txc_base_mw at step 2000/20000 — all healthy, ETAs
-   ~13 hr / ~7 hr respectively.
+1. Wrote `experiments/c5_steering_filler/` driver, smoke-passed
+   txc_base_mw seed=42 (n_valid=270, peak@1.75=0.615), launched
+   6-cell sweep at 12:21Z.
+2. CC restarted, killed the cells. Patched run_sweep.sh to `setsid -f`
+   for orphan-to-init. Relaunched at 12:31Z; verified PPID=1.
+3. By 13:37Z all 6 cells training healthy.
 
-**STAND DOWN execution (13:55Z, after Han pull-briefing):**
+**Phase B — STAND DOWN execution (13:55Z):**
 
-8. Pulled origin/final and saw `dd5f773e Agent PAPER: STAND DOWN —
-   4 MW pivots aborted (Han 2026-05-05 PM)`. New mandate at top of
-   this briefing rescinded the MW deployment.
-9. `pkill -TERM -f "experiments.c5_steering_filler"` then `-KILL` —
-   all 6 python procs gone. Verified: 8 GPUs at 0 MB / 0% util,
-   `pgrep -f experiments.c5_steering_filler` returns 0 PIDs.
-10. Stopped Monitor `b25o1m7v8` via TaskStop.
-11. Resolved a leaderboard.jsonl rebase conflict (HEAD's 7 new rows
-    + my smoke row = 133 lines clean append). Two HF-pulled checkpoint
-    config.json files (`08fe3af0...`, `92c2d19e...`) blocked the
-    rebase as "untracked would be overwritten" — moved them to /tmp,
-    rebased, restored. They were never tracked on origin; HF sync just
-    re-pulls them as untracked.
-12. Final pull picked up agent_em + agent_steer_100k STAND DOWN
-    acknowledgement commits (origin/final at `b549d91c`).
+4. Pulled origin/final, saw `dd5f773e Agent PAPER: STAND DOWN`.
+5. `pkill -KILL -f "experiments.c5_steering_filler"` — all 6 procs
+   gone, GPUs idle. Stopped Monitor `b25o1m7v8`.
+6. Resolved leaderboard.jsonl rebase conflict (kept all rows).
+   Briefly went into detached HEAD state during a botched rebase;
+   recovered via `rebase --abort` + manual file move.
+7. Committed STAND DOWN ack at `ba369f13`.
+
+**Phase C — C5 T-SAE T=2 baseline (current mission, 14:05Z+):**
+
+8. Pulled origin/final again, saw new mandate in briefing
+   (decisions § 15: T-SAE re-train at `train_window_size=2`).
+9. Verified framework changes: `TrainingConfig.train_window_size=2`
+   and `run_one_cell` accepts `train_window_size: int | None = None`
+   kwarg.
+10. Wrote `experiments/c5_steering_baseline/{__init__.py, run.py,
+    run_sweep.sh}` — fresh dir, distinct from rescinded
+    c5_steering_filler/. Driver hard-codes `arch_name="tsae_paper"`
+    and `train_window_size=2`. Sweep launcher uses `setsid -f`.
+11. Smoke launched at ~14:05Z on GPU 0 (tsae_paper seed=42 n_steps=200
+    smoke=True). Bash task `bzgkr3t7e`, Monitor `bj2gsw0sv`. Training
+    started — GPU 0 hit ~89% util at 2.5 GB VRAM by 14:53Z log
+    timestamp; eval_key=`95ff152cb0b31650`.
+    - Note: `[train] T=1` in the log refers to `model.T` (T-SAE arch's
+      internal T parameter, fixed at 1 — adjacent-pair training with
+      anchor + 1-step neighbor). The `train_window_size=2` is the BATCH
+      ITERATOR's stride (positions per row per step), not the model's T.
+      Both are correct; don't conflate.
 
 ## Next action (agent owns — overwrite)
 
-**Idle until agent_paper rewrites this briefing for the C5 T-SAE
-T=1 re-train mission.** Per the STAND DOWN section above, expect
-3 cells (`tsae_paper` × seeds {42, 1, 2}) on 3 of the 8 A40 GPUs
-with `TrainingConfig(train_window_size=1)` once the framework
-change lands. ~3 hr wall.
-
-While idle:
-
-1. `git pull --rebase origin final` periodically to pick up the
-   briefing rewrite. Do NOT poll faster than every ~10 min.
-2. Do NOT relaunch the MW sweep, even if you see the now-stale
-   "Mandate — C5 multi-window deployment, parallel" section — that
-   block is rescinded; only the STAND DOWN section above the
-   `---` divider is in force.
-3. Do NOT delete the killed sweep's empty workspace dirs in
-   `results/runs/` — `canonical_train_keys` filters by leaderboard
-   rows, not directory existence; cleanup wastes effort.
-4. Do NOT run `wrap_up_session.sh` yet — there are no completed cells
-   to persist beyond the smoke (which already pushed via the runner's
-   ephemeral HF auto-push at 12:20Z). If `wrap_up_session.sh` re-pushes
-   the smoke run_dir, that's harmless.
-5. **When agent_paper's rewrite lands**, re-pull, read the new mandate,
-   and confirm the new framework knob (`train_window_size`) is
-   exposed on `TrainingConfig` + `preloaded_batch_iter_from_act_cache`
-   before launching anything. Smoke first; sweep second.
+1. **Wait for smoke to finish** (~3-5 min total; training started ~14:53Z).
+   Bash poller `bm1769em4` is watching the python PID; Monitor
+   `bj2gsw0sv` will fire on `judge [270/270]`, errors, etc.
+2. **On smoke success** (n_valid=270, fresh train_key distinct from
+   agent_steer's existing tsae_paper T=None train_keys): launch the
+   3-cell sweep:
+   `bash experiments/c5_steering_baseline/run_sweep.sh`
+3. **Sweep monitoring**: tail `logs/c5_baseline_gpu*.log`. Per-cell
+   ETA ~45-60 min; total wall = max(per-cell) ≈ 45-60 min.
+4. **As cells complete**: confirm leaderboard rows have
+   `arch=tsae_paper`, `eval_protocol_version=1.1.0`, fresh train_keys
+   (different from agent_steer's existing T=None tsae_paper rows
+   `6af5d868f65c4a6c` etc).
+5. **When all 3 cells done**: `bash scripts/wrap_up_session.sh` for HF
+   push of run_dirs / judge_outputs.jsonl. Surface to agent_paper that
+   the T=2 baseline is on the leaderboard for paper-render integration.
+6. **Before exit / context compact**: re-overwrite this section.
+   The sweep python PIDs are detached via setsid (PPID=1) so they
+   survive shell death; check via
+   `pgrep -f "experiments.c5_steering_baseline.run"`.
 
 ## Don't repeat (agent owns — overwrite)
 
