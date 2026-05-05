@@ -38,6 +38,296 @@ Add a bullet to "Open questions for Han" in your own briefing,
 surface it in chat, and let Han or agent_paper land the change. Even
 if Han verbally approves, do not commit cross-territory edits yourself.
 
+### ⚠️ Han decisions 2026-05-05 — C6 MW deployment (post-canonical mission)
+
+After your final canonical cell (`bqp1ssnty` — txc_base seed=1
+7B-medical) lands ~13:14 UTC, your canonical mission is COMPLETE.
+Your next mission: **deploy multi-window TXC at C6**.
+
+**Background**: agent_paper landed `txc_base_mw` as a YAML alias of
+TXCBase with `multi_window: true` baked into hparams (decisions.md
+§ 14, commit `ecc4c661`). Same Python class; only the per-step
+sampling differs (stride-T tiling instead of 1-random-window-per-row).
+This eliminates the ~25× per-step FLOPs disadvantage that biased the
+canonical comparison against TXC. Your existing canonical cells stay
+in `leaderboard.jsonl` as the historical pre-fix baseline; new MW
+cells land at fresh `train_keys` (the `multi_window: true` hparam
+flows into `compute_train_key`'s hash).
+
+**Mission scope** (n=2 paired with your existing canonical cells):
+
+- 2 archs × 2 seeds × 2 organisms = **4 cells**:
+  - txc_base_mw + brickenauxk_a8 × {seed=42, seed=1} × 14B-finance
+  - txc_base_mw + brickenauxk_a8 × {seed=42, seed=1} × 7B-medical
+- TXC-pro is NOT in the C6 mandate (per § 7, C6 uses txc_base + Bricken
+  only). No `txc_pro_mw` cells for C6.
+- SAE-arditi is per-token (no MW variant); your existing canonical
+  SAE cells are the comparison baseline. **Do not re-run SAE.**
+
+**Per-cell `TrainingConfig`**:
+
+```python
+TrainingConfig(
+    batch_size=1024,
+    n_steps=25_000,                 # canonical, NOT 100K
+    plateau_early_stop=False,
+    bricken_enabled=True,           # for txc_base_mw; per § 7
+    bricken_resample_every=5000,    # ⚠️ 10× the non-MW default of 500.
+                                    #   Han's call (decisions.md § 14
+                                    #   "Bricken resample-rate caveat"):
+                                    #   keep rate-equivalent to non-MW.
+    bricken_min_fires=1,
+    bricken_n_check=2048,
+    bricken_max_resample_fraction=0.5,
+    ema_auxk_alpha=0.125,           # 1/8 per a8 recipe
+    dead_threshold_tokens=128_000,  # 128k tokens per a8 recipe
+)
+```
+
+**The Bricken rate decision**: under MW, each step processes N=10
+windows × t_sample=5 tokens = 50 tokens per row vs 5 in non-MW.
+Bricken_every=500 in non-MW = check every 500×5=2500 tokens.
+Bricken_every=5000 in MW = check every 5000×50=250000 tokens —
+not the same as non-MW! Let me reconsider.
+
+Actually Han's choice (5000) is per § 14 — picking the simpler
+"step-count is 10× larger" interpretation of rate-equivalence vs
+the "tokens-between-checks" interpretation. **Use 5000 as
+specified**; document the choice in c6.md caveats. Fine-grained
+tuning is out of scope for the sprint.
+
+**Per-cell wall-time estimate on your pod (2× H100, fast per step
+relative to agent_em_100k's pod)**:
+
+- Training: agent_em's canonical TXC + Bricken at 25K = ~80 min.
+  MW adds ~5× per-step compute (matryoshka not present in
+  txc_base_mw, but the encoder shape is `(B*N=10240, T=5, d_in=5120)
+  @ (T, d, s=32768)` = ~22 TFLOPs vs ~0.86 TFLOPs non-MW). H100
+  does this in ~22 ms/step × 25K = ~9 minutes... actually compute
+  isn't the bottleneck, the data path is. Realistically: ~2-3× slower
+  per step than non-MW, so ~3-4 hr training per cell.
+- Wang full: ~3 hr (unchanged — Wang is generation-bound, not
+  training).
+- Per cell: ~6-7 hr.
+- 4 cells serial on 1 GPU: ~24-28 hr.
+- 4 cells parallel on 2 GPUs (you have 2 H100s on this pod, agent_nlp
+  may have completed their topk_sae sweep by now — check before
+  launching): ~12-14 hr wall.
+
+**Important**: agent_em's `_build_batch_iter` returns shape
+`(B, T, d)` — pre-windowed. The MW `train_step` expects
+`(B, seq_len, d)` and tiles internally. **You need a NEW batch_iter
+for MW that returns full sequences.** Sketch in
+"First concrete task — write the MW driver" below.
+
+VRAM check (per agent_paper's analysis): C6 at Qwen-14B scale
+(d_in=5120, d_sae=32768) MW peaks ~50-75 GB activations. Within H100
+80GB but tight. Use `precision="bf16"` (already default for H100).
+If OOM, reduce batch_size to 512 (effective B*N=5120 still > non-MW
+B=1024, still gives MW benefit).
+
+References:
+- `agents/README.md` (your roster row)
+- `docs/components/c6.md` (your existing C6 writeup; do NOT edit
+  the AUTO-RESULTS block — agent_paper integrates at paper-render
+  time)
+- `experiments/c6_em/{train.py,run.py,analysis.py}` — your existing
+  plumbing; you write a NEW `experiments/c6_em_mw/run.py` that
+  imports from these and wires in a full-sequence batch_iter.
+- `decisions.md` § 7, § 12, § 14 (especially the Bricken rate caveat)
+- `papers/temporal_sae.md` (sae_arditi is the SAE comparison; T-SAE
+  reference for context)
+
+### First concrete task — write the C6 MW driver, smoke, launch
+
+Step 1 — verify your final canonical cell completed (the
+`bqp1ssnty` Bash task should have fired with txc_base seed=1 7B
+~13:14 UTC). Check the leaderboard:
+
+```bash
+.venv/bin/python -c "
+from temp_bench.cache import _read_jsonl, leaderboard_path
+rows = [r for r in _read_jsonl(leaderboard_path()) if r['component']=='c6']
+for r in rows[-4:]:
+    print(r['arch'], r['seed'], r['datasource'], r['metrics'].get('peak_align'))
+"
+```
+
+Step 2 — pull and verify the MW arch is registered:
+
+```bash
+git pull --rebase origin final
+.venv/bin/python -c "from temp_bench.config import load_arch; print(load_arch('txc_base_mw').hparams)"
+# → expect dict containing multi_window=True
+```
+
+Step 3 — write `experiments/c6_em_mw/__init__.py` (empty) and
+`experiments/c6_em_mw/run.py`. Key design: import as much as
+possible from your existing `experiments/c6_em/{train.py,run.py}`,
+override only:
+
+(a) the batch_iter (full-sequence instead of pre-windowed),
+(b) the TrainingConfig override (`bricken_resample_every=5000`).
+
+Sketch:
+
+```python
+"""C6 multi-window deployment driver.
+
+Replicates agent_em's setup with two changes:
+1. arch_name: txc_base → txc_base_mw (multi_window=True in hparams)
+2. batch_iter: returns FULL sequences (B, seq_len, d) instead of
+   pre-windowed (B, T, d). MW's train_step does the tiling.
+3. TrainingConfig: bricken_resample_every=5000 (§ 14 rate-eq under MW).
+"""
+from __future__ import annotations
+import argparse
+import json
+
+import numpy as np
+import torch
+
+from temp_bench import runner
+from temp_bench.schemas import TrainingConfig
+from temp_bench.config import act_cache_dir, compute_act_cache_key, load_datasource
+from experiments.c6_em.run import EVAL_PROTOCOL_VERSION, my_eval_fn
+from experiments.c6_em.train import (
+    _instantiate_with_overrides,
+    make_training_cfg as _make_canonical_cfg,
+)
+from temp_bench.training.sae_trainer import train_sae
+
+# Module-global cache for full-sequence preload — shared across cells in
+# the same process.
+_PRELOADED_C6_FULL: dict[str, torch.Tensor] = {}
+
+
+def _build_full_seq_batch_iter(act_cache_key: str, *, seed: int = 42):
+    """MW data path: returns (B, seq_len, d_in) full sequences. The
+    arch's train_step tiles into (B*N, T, d_in) windows internally.
+    """
+    cache_dir = act_cache_dir(act_cache_key)
+    specs = json.loads((cache_dir / "layer_specs.json").read_text())
+    cache_path = str(cache_dir / f"{specs['key']}.npy")
+    if cache_path not in _PRELOADED_C6_FULL:
+        mmapped = np.load(cache_path, mmap_mode="r")
+        _PRELOADED_C6_FULL[cache_path] = (
+            torch.from_numpy(np.ascontiguousarray(mmapped)).clone()
+        )
+    acts = _PRELOADED_C6_FULL[cache_path]
+    rng = np.random.default_rng(seed)
+    def batch_iter(n: int) -> torch.Tensor:
+        idx = rng.integers(0, acts.shape[0], size=n)
+        return acts[idx].to(torch.float32)
+    return batch_iter
+
+
+def _make_mw_training_cfg(arch_name: str) -> TrainingConfig:
+    """C6 MW training cfg — start from your canonical make_training_cfg
+    then bump bricken_resample_every from 500 → 5000 per § 14."""
+    base = _make_canonical_cfg(arch_name)
+    return base.model_copy(update={"bricken_resample_every": 5000})
+
+
+def my_train_fn_mw(*, arch_name, arch_hparams, seed, training_cfg,
+                   act_cache_key, component):
+    """C6 MW train_fn — analogous to agent_em's my_train_fn but with
+    the full-sequence batch_iter."""
+    ds_name = arch_hparams.pop("__datasource_name__", None) or arch_hparams.get("datasource")
+    # … you adapt your existing c6_em/run.py:my_train_fn here, swapping
+    # _build_batch_iter → _build_full_seq_batch_iter. Keep the
+    # _instantiate_with_overrides call (brickenauxk_a8 recipe).
+    ...
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--archs", nargs="+",
+                    default=["txc_base_mw"], choices=["txc_base_mw"])
+    ap.add_argument("--seeds", nargs="+", type=int, default=[42, 1])
+    ap.add_argument("--organisms", nargs="+",
+                    default=["qwen_2_5_14b_instruct_finance_l24_resid_post",
+                             "qwen_2_5_7b_instruct_medical_l15_resid_post"])
+    args = ap.parse_args()
+
+    for ds in args.organisms:
+        for arch in args.archs:
+            for seed in args.seeds:
+                cfg = _make_mw_training_cfg(arch)
+                runner.run_cell(
+                    component="c6", arch_name=arch, seed=seed,
+                    datasource_name=ds,
+                    training_cfg=cfg,
+                    eval_cfg={"sweep": "c6_mw_v1"},
+                    eval_protocol_version=EVAL_PROTOCOL_VERSION,
+                    train_fn=my_train_fn_mw,
+                    eval_fn=my_eval_fn,
+                )
+
+
+if __name__ == "__main__":
+    main()
+```
+
+(The exact `my_train_fn_mw` shape will depend on your existing
+`my_train_fn` in `c6_em/run.py` — adapt it to use
+`_build_full_seq_batch_iter`. Keep the brickenauxk_a8 override path
+via `_instantiate_with_overrides`. Don't rewrite the trainer; call
+`temp_bench.training.sae_trainer.train_sae` like your existing
+my_train_fn does.)
+
+Step 4 — smoke ONE cell at `n_steps=200`:
+
+```bash
+TQDM_DISABLE=1 .venv/bin/python -c "
+from experiments.c6_em_mw.run import _make_mw_training_cfg, my_train_fn_mw
+from experiments.c6_em.run import EVAL_PROTOCOL_VERSION, my_eval_fn
+from temp_bench import runner
+from temp_bench.schemas import TrainingConfig
+cfg = _make_mw_training_cfg('txc_base_mw').model_copy(update={'n_steps': 200})
+result = runner.run_cell(
+    component='c6', arch_name='txc_base_mw', seed=42,
+    datasource_name='qwen_2_5_14b_instruct_finance_l24_resid_post',
+    training_cfg=cfg, eval_cfg={'sweep': 'c6_mw_smoke'},
+    eval_protocol_version=EVAL_PROTOCOL_VERSION,
+    train_fn=my_train_fn_mw, eval_fn=my_eval_fn,
+)
+print('smoke result:', result.train_key, result.eval_key, result.cached)
+"
+```
+
+Step 5 — launch the full 4-cell sweep. If both H100s are yours
+(agent_nlp wrapped up), parallelize across GPU 0+1; otherwise serial
+on GPU 1:
+
+```bash
+# Parallel (if agent_nlp is idle):
+TQDM_DISABLE=1 AGENT_NAME=agent_em \
+  bash scripts/run_on_gpu.sh 0 -- \
+  .venv/bin/python -m experiments.c6_em_mw.run \
+  --seeds 42 \
+  > logs/c6_mw_gpu0.log 2>&1 &
+
+TQDM_DISABLE=1 AGENT_NAME=agent_em \
+  bash scripts/run_on_gpu.sh 1 -- \
+  .venv/bin/python -m experiments.c6_em_mw.run \
+  --seeds 1 \
+  > logs/c6_mw_gpu1.log 2>&1 &
+
+# Serial (if you only have GPU 1):
+TQDM_DISABLE=1 AGENT_NAME=agent_em \
+  .venv/bin/python -m experiments.c6_em_mw.run \
+  > logs/c6_mw_serial.log 2>&1 &
+```
+
+Step 6 — monitor + verify rows land at
+`arch=txc_base_mw, eval_protocol_version=2.0.0` (your existing
+canonical eval protocol).
+
+agent_paper integrates results at paper-render time. Your existing
+canonical cells (txc_base @ 25K) stay as the historical baseline;
+new `txc_base_mw` cells become the canonical headline at paper time.
+
 ### Han decisions 2026-05-04 PM (preloaded batch_iter — apply .clone() locally)
 
 agent_nlp profiled the data path and found the trainer was bottlenecked

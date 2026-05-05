@@ -43,6 +43,7 @@ case "$agent" in
     agent_em_h200) expected_root="/workspace/temp_xc" ;;
     agent_em_100k) expected_root="/workspace/temp_xc" ;;
     agent_steer_100k) expected_root="/workspace/temp_xc" ;;
+    agent_filler) expected_root="/workspace/temp_xc" ;;
     agent_nlp|agent_back) expected_root="/workspace/temp_xc" ;;
     agent_paper)   expected_root="" ;;   # local; no expected path
     *)             expected_root="" ;;
@@ -119,6 +120,16 @@ case "$agent" in
         export AGENT_NAME=agent_steer_100k
         export TEMP_BENCH_POD_MODE=ephemeral
         ;;
+    # ── 8× A40 multi-GPU filler pod (401 GB RAM, 76 CPU, 1 TB ephemeral).
+    #    One agent identity ("agent_filler") that runs cells in parallel
+    #    via subprocesses pinned to GPUs 0..7 each. The agent's own python
+    #    process is pinned to GPU 0 by default; spawn parallel cells with
+    #    `bash scripts/run_on_gpu.sh <0..7> -- <cmd>`.
+    agent_filler)
+        export CUDA_VISIBLE_DEVICES=0
+        export AGENT_NAME=agent_filler
+        export TEMP_BENCH_POD_MODE=ephemeral
+        ;;
     agent_paper)
         export CUDA_VISIBLE_DEVICES=0
         export AGENT_NAME=agent_paper
@@ -127,7 +138,7 @@ case "$agent" in
 
     *)
         echo "unknown agent: $agent" >&2
-        echo "known: agent_paper, agent_nlp, agent_em, agent_em_h200, agent_em_100k, agent_steer, agent_steer_100k, agent_back, a40_helper_gpu2, a40_helper_gpu3" >&2
+        echo "known: agent_paper, agent_nlp, agent_em, agent_em_h200, agent_em_100k, agent_steer, agent_steer_100k, agent_back, agent_filler, a40_helper_gpu2, a40_helper_gpu3" >&2
         return 1 2>/dev/null || exit 1
         ;;
 esac
