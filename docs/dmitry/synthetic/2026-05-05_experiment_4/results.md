@@ -114,36 +114,42 @@ reconstruction loss does not.
   rotation invariance. It only changes the chance-adjustment denominator
   (since the ground-truth dictionary doubles to `2N`).
 
-## Stage 2 (running now)
+## Stage 2 result (confirmed across delays)
 
-`D ∈ {1, 2, 4, 8} × W ∈ {2, 4, 8, 16}`. The expectation is that every cell
-gives the same flat-at-chance TXC curve we saw at `D = 1`. Will update
-this section with the Stage 2 plot and confirmation when the sweep
-finishes (~30 min).
+`D ∈ {1, 2, 4, 8} × W ∈ {2, 4, 8, 16}`, same training and data config as
+Stage 1. Sweep finished in 16.7 minutes on a40.
+
+![Stage 2 figure](../../../../plots/v6_colored_sources/phase_transition_stage2.png)
+
+Every TXC cell sits within MC noise of the random-vector floor (S_adj
+range across 16 cells: 0.021 – 0.029, random floor 0.025). Every SAE
+baseline (one per `D`) sits at S_adj ≈ 0.026. Oracle ceilings vary slightly
+with `D` (0.578, 0.611, 0.639, 0.625 for `D = 1, 2, 4, 8`) but the trained
+methods come nowhere near them.
+
+**There is no phase transition at `W = D + 1`** — the dotted vertical
+lines in the figure mark where the proposal expects TXC recovery to jump,
+and nothing happens there.
 
 ## What's next
 
-Three routes, in increasing effort / value:
+Two routes:
 
-1. **Stage 2 anyway, with Gaussian sources.** Confirms the negative result
-   across `D ∈ {1, 2, 4, 8}` and `W`. Useful for the writeup ("we tested
-   across delays and window lengths; result is consistent") but doesn't
-   change the conclusion. Already running.
+1. **Sparse non-negative variant (off-spec).** Replace Gaussian `z_t,i`
+   with `(Bernoulli(p) × |Gaussian|) AR(1)` so sources are sparse-positive.
+   Gives the "TXC > SAE" headline figure the proposal wants, at the cost
+   of giving up the local-impossibility theorem (the marginal is no longer
+   rotation-symmetric). Cost: ~1 day to implement + run on top of the
+   existing scaffolding.
 
-2. **Sparse non-negative variant (off-spec).** Replace Gaussian `z_t,i` with
-   `(Bernoulli(p) × |Gaussian|) AR(1)` so sources are sparse-positive. Gives
-   the "TXC > SAE" headline figure the proposal wants, at the cost of
-   giving up the local-impossibility theorem (the marginal is no longer
-   rotation-symmetric). Cost: ~1 day to implement + run.
-
-3. **Temporal-objective TXC variant.** Augment the loss with a lag-`D`
-   covariance term. Largest deviation from the existing architecture, but
+2. **Temporal-objective TXC variant.** Augment the loss with a lag-`D`
+   covariance term — push the TXC's encoder/decoder toward eigenvectors of
+   `Ĉ_D` directly. Largest deviation from the existing architecture, but
    would let the colored-source theorem regime work end-to-end. Cost:
    multi-day.
 
-Recommend option 2 for the next sprint: it gives the proposal's intended
-phase-transition figure and is cheap. Option 1 is finishing in the
-background as an ablation.
+Recommend option 1 for the next sprint: it gives the proposal's intended
+phase-transition figure and is cheap on top of the existing v6 module.
 
 ## Files
 
@@ -151,5 +157,6 @@ background as an ablation.
 - Tests: `tests/test_v6_colored_sources.py`
 - Stage 1 results: `results/v6_colored_sources/stage1.json`
 - Stage 1 figure: `plots/v6_colored_sources/phase_transition_stage1.png`
-- Stage 2 results / figure: pending — sweep running on a40
+- Stage 2 results: `results/v6_colored_sources/stage2.json`
+- Stage 2 figure: `plots/v6_colored_sources/phase_transition_stage2.png`
 - Plan: [[plan]]
