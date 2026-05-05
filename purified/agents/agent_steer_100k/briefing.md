@@ -67,21 +67,112 @@ surface it in chat, and let Han or agent_paper land the change. Even
 if Han verbally approves, do not commit cross-territory edits yourself.
 This is non-negotiable — see PROTOCOL.md § 8 + CLAUDE.md Hard Rule #7.
 
-### ⚠️ ABORT 2026-05-05 PM — C6 TFA mission RESCINDED
+### ⚠️ ADDITIONAL MISSION 2026-05-05 PM (URGENT) — TXC-base T-sweep on C3 + C4 BASE
 
-**Han 2026-05-05 PM**: C6 TFA was too long (~11 hr serial) and the
-Sonnet judge API cost was projected too high. **ABORT before any cell
-launches.**
+**Han 2026-05-05 PM**: "we want a txc_base T=10 and T=20 on C3 and C4
+(both IT and base)." Your job is the **BASE side**;
+agent_nlp handles the IT side in parallel on their pod.
 
-```bash
-# Kill any C6 TFA processes (likely none if you hadn't launched yet)
-pkill -KILL -f "experiments.c6_em_tfa_baseline" || true
-nvidia-smi --query-gpu=memory.used --format=csv  # expect <500 MB
+**This stacks on top of your existing BASE C3+C4 replication** (the
+mission below). Same datasource (`gemma_2_2b_base_l13_fineweb_24k128`),
+same training schedule, just adds two new T values for `txc_base` via
+`arch_hparams_override`.
+
+### Mission scope (additive)
+
+| Component | Arch × T | Seeds | k_feats | Cells |
+|---|---|---|---|---:|
+| C3 BASE | txc_base × {T=10, T=20} | {1, 2, 42} | {5, 20} | 6 trainings + 12 evals |
+| C4 BASE | txc_base × {T=10, T=20} | {1, 2, 42} | (concat) | 6 evals (cache-hits on C3 trainings) |
+
+**Total unique trainings: 6** (3 seeds × 2 T values for txc_base on
+the BASE cache). C4 evals re-use the C3 checkpoints.
+
+### TrainingConfig
+
+```python
+TrainingConfig(
+    n_steps=20_000,
+    batch_size=1024,
+    plateau_early_stop=False,
+    arch_hparams_override={"T": 10},   # or 20
+)
 ```
 
-If you didn't get a chance to launch, no cleanup is needed. The MW
-artifacts (1 C5 MW cell at `eval_key=963df9c69213f998`) stay in the
-leaderboard as bonus diff data — DO NOT delete.
+`arch_hparams_override` flows into `compute_train_key` (commit
+`dfd60850`); fresh hashes for each T value.
+
+### Wall-time on 1× H100
+
+- T=10 per cell: ~1.5 hr train + ~30 min eval × 2 k_feats = ~2 hr
+- T=20 per cell: ~2 hr train + ~30 min eval × 2 k_feats = ~2.5 hr
+- 6 trainings serial on 1 H100: **~12-13 hr** for both T values.
+
+### Sequencing with your other BASE work
+
+Two options depending on where you are in the BASE replication:
+
+- **Option A (recommended)**: finish your existing BASE C3 sweep
+  for the canonical 5 archs (TopK + T-SAE + TFA + TXC-base T=5 +
+  TXC-pro), then launch the txc_base T=10/T=20 sweep. Adds ~12-13
+  hr to your total.
+- **Option B**: launch the T=10/T=20 sweep in parallel from the start
+  if you have the BASE cache already built. Same compute total,
+  just interleaved.
+
+Both fit comfortably in the remaining sprint window.
+
+### First concrete task — extend your driver
+
+Your existing `experiments/c3_probing_base/run.py` driver already
+has the `arch_hparams_override` mechanism wired in (you copy-pasted
+agent_nlp's plumbing). Just add T=10 + T=20 entries to your
+ARCH_TRAINING_CFGS:
+
+```python
+ARCH_TRAINING_CFGS: dict[str, list[TrainingConfig]] = {
+    # existing canonical 5 archs (one cfg each)
+    "topk_sae":   [TrainingConfig(n_steps=20_000, train_window_size=1)],
+    "tsae_paper": [TrainingConfig(n_steps=20_000, train_window_size=2)],
+    "tfa":        [TrainingConfig(n_steps=20_000, batch_size=32)],
+    "txc_base":   [
+        TrainingConfig(n_steps=20_000),                                       # T=5 default
+        TrainingConfig(n_steps=20_000, arch_hparams_override={"T": 10}),      # NEW
+        TrainingConfig(n_steps=20_000, arch_hparams_override={"T": 20}),      # NEW
+    ],
+    "txc_pro":    [TrainingConfig(n_steps=20_000)],
+}
+```
+
+Then iterate over `(arch, cfg)` pairs in your sweep loop. Same C4
+extension via the qualitative driver.
+
+### Analysis filter update (after cells land)
+
+Add txc_base T=10 + T=20 to the canonical filter (mirroring
+agent_nlp's IT analysis):
+
+```python
+txc_T10_keys_base = canonical_train_keys(
+    component="c3",
+    archs=["txc_base"],
+    seeds=(1, 2, 42),
+    datasource_names=("gemma_2_2b_base_l13_fineweb_24k128",),
+    training_cfg=TrainingConfig(n_steps=20_000, arch_hparams_override={"T": 10}),
+)
+txc_T20_keys_base = canonical_train_keys(... arch_hparams_override={"T": 20})
+```
+
+### Watch-outs
+
+- **Don't add T-sweep for other archs.** Only `txc_base` gets T=10
+  and T=20 in this mission.
+- **agent_nlp runs the IT side**; don't duplicate. You only run the
+  BASE-side cells (`gemma_2_2b_base_l13_fineweb_24k128`).
+- **C4 cache-hits on C3.** When you run C4 BASE evals, use the same
+  T-overrides → same `train_key` → same checkpoint → eval-only.
+
+---
 
 ### ⚠️ NEW MISSION 2026-05-05 PM — BASE C3 + C4 replication (decisions § 16)
 
