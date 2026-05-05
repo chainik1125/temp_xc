@@ -211,3 +211,40 @@ datasources:
     magnitude_mean: 1.0
     magnitude_std: 0.15
     notes: "C2 default (Phase 3 OR-gated coupled features)."
+
+  # ── toy_full duplicates: same params as the canonical entries above
+  # but routed through temp_bench.data.toy_full, the wasteland-faithful
+  # port that adds leaky reset, factorial-HMM events, sigmoid coupling,
+  # and Gaussian copula. The distinct ``generator`` field gives these
+  # entries a different ``act_cache_key`` from the canonical ones, so
+  # leaderboard rows from c{1,2}_full sweeps don't collide with
+  # agent_filler's c{1,2} runs.
+
+  toy_markov_n20_d40_full:
+    category: synthetic
+    generator: temp_bench.data.toy_full.api:markov_chain_support
+    n_features: 20
+    d_in: 40
+    seq_len: 64
+    rho_levels: [0.0, 0.3, 0.5, 0.7, 0.9]
+    pi: 0.5
+    delta: 0.0   # leaky-reset extension (0 = standard reset, matches agent_filler)
+    n_seqs: 4096
+    notes: "C1 full-suite (toy_full); same params as toy_markov_n20_d40."
+
+  toy_coupled_K10_M20_d256_full:
+    category: synthetic
+    generator: temp_bench.data.toy_full.api:coupled_hmm
+    K_hidden: 10
+    M_emissions: 20
+    n_parents: 2
+    d_in: 256
+    seq_len: 64
+    pi: 0.05
+    rho: 0.7
+    delta: 0.0   # leaky-reset extension (0 = standard reset)
+    coupling_mode: or_gate   # or 'sigmoid' for the wasteland soft-coupling extension
+    magnitude_dist: folded_normal
+    magnitude_mean: 1.0
+    magnitude_std: 0.15
+    notes: "C2 default (Phase 3 OR-gated coupled features)."
