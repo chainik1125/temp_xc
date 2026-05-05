@@ -655,12 +655,30 @@ on /workspace until you push them).
 
 ## Current state (agent owns — overwrite at every compact)
 
-**Last verified: 2026-05-05T12:45Z. 7 of 8 canonical cells DONE.
-Final cell TXC seed=1 7B-medical at stage 4 feat 1/3 α 4/27, ETA
-~13:00. Pattern HOLDS: TXC > SAE on every cell. Mean gap larger on
-7B-medical (-6.14) than 14B-finance (-3.25). c6.md hand-curated
-sections refreshed (commit `043b6f87`); AUTO-RESULTS rendered for
-7/8. NEW MISSION: MW deployment after final cell + re-render.**
+**Last verified: 2026-05-05T14:30Z. C6 CANONICAL MISSION COMPLETE.
+8/8 canonical cells landed. c6.md status=`complete`. MW pivot
+RESCINDED 2026-05-05 PM by Han (literature-alignment showed C6's
+T=1 window-based sampling at ~1024 tokens/step already matches
+SAEBench-canonical ~2048 tokens/step; MW would over-correct).
+HF backup of 8 canonical checkpoints in flight (bash `biqgmy3x3`).**
+
+**Final canonical headline (full Wang, batch=1024 / 25K, n=2 paired
+seeds):**
+
+| organism      | seed | SAE peak | TXC peak | gap (SAE-TXC) |
+|---|---:|---:|---:|---:|
+| 14B-finance   | 42   | 78.33    | 81.70    | -3.37 |
+| 14B-finance   | 1    | 76.88    | 80.00    | -3.12 |
+| 7B-medical    | 42   | 68.47    | 74.61    | -6.14 |
+| 7B-medical    | 1    | 68.91    | 72.64    | -3.73 |
+
+Mean gaps: 14B-finance -3.25 align (just outside Tied → "Mixed");
+7B-medical -4.94 align ("Mixed", larger TXC margin).
+
+**Both organisms: TXC + brickenauxk_a8 strictly beats SAE-arditi.**
+Per c6.md decision tree: both in "Mixed" band. Paper framing: TXC
+wins on both organisms; the 7B win is larger (smaller subject model
+amplifies the misalignment-encoding advantage).
 
 **Headline (full Wang, eval_protocol_version=2.0.0, n=2 paired seeds):**
 
@@ -867,39 +885,40 @@ Two missions stacked: (A) canonical full-Wang sweep — 7/8 cells done;
 
 ## Next action (agent owns — overwrite)
 
-1. **Wait for TXC seed=1 7B-medical to finish** (bash `bqp1ssnty`,
-   stage 4 feat 1/3 α 4/27 at 12:43Z, ETA ~13:00 UTC).
-2. **Re-render AUTO-RESULTS** with the 8-cell complete data:
+**Mission COMPLETE per Han's STAND DOWN (2026-05-05 PM).** Following
+the explicit STAND DOWN action items 1-4 from the new mandate
+section above.
+
+1. ✅ **Final canonical cell landed** (TXC seed=1 7B-medical,
+   peak_align=72.64; bash `bqp1ssnty` exit 0 at 13:03 UTC). c6.md
+   AUTO-RESULTS re-rendered with 8/8 cells.
+2. ✅ **MW sweep killed** at 14:18Z (had launched at 13:15Z; ran ~1 hr
+   before kill). MW driver `experiments/c6_em_mw/run.py` stays
+   in-tree as inert reserve per Han's directive ("don't delete; just
+   don't launch").
+3. ✅ **c6.md status: complete** (commit `b59834eb`). Hypothesis locked
+   to data-driven outcome ("TXC strictly beats SAE on both organisms,
+   both Mixed band"). FLOPs-asymmetry caveat rewritten to reflect the
+   literature-alignment resolution.
+4. 🔄 **HF backup IN FLIGHT** (bash `biqgmy3x3`):
    ```python
-   from experiments.c6_em.analysis import run_analysis
-   from temp_bench.report import _replace_auto_results, _component_md
-   _replace_auto_results(_component_md('c6'), run_analysis().markdown)
+   for r in manifest where agent='agent_em' and ds startswith 'qwen_2_5_':
+       api.upload_folder(...)
    ```
-   (Bypass `report.render` because of the multi-dir issue — see OQ #1.)
-3. **Commit + push** the final canonical leaderboard row + checkpoint
-   + judge_outputs + re-rendered c6.md.
-4. **MW smoke test** (task #28): `n_steps=200` cell to verify
-   `experiments.c6_em_mw.run` end-to-end.
-5. **MW 4-cell sweep** (task #29):
-   ```bash
-   TQDM_DISABLE=1 .venv/bin/python -m experiments.c6_em_mw.run
-   ```
-   Iterates txc_base_mw × seeds (1, 42) × organisms
-   (14B-finance, 7B-medical) sequentially. Per-cell ETA ~6-7 hr (14B)
-   / ~4-5 hr (7B). Total ~21-23 hr serial on GPU 1. agent_nlp's
-   topk_sae sweep still occupies GPU 0 (45 GB used at 12:36Z) —
-   parallel via run_on_gpu.sh not available.
-6. **After MW lands**: re-render c6.md AUTO-RESULTS again (the
-   analysis.py `canonical_train_keys` filter will now see 12 keys
-   = 8 canonical + 4 MW; both protocol "2.0.0"). Apply decision
-   tree to MW means.
-7. **Lock c6.md Hypothesis + status** (1-2 sentences per PROTOCOL §7,
-   set `status: complete`) once MW is in.
-8. **HF backup** before pod-stop: `bash scripts/wrap_up_session.sh`
-   prints upload recipe for every checkpoint (PROTOCOL § 9). Currently
-   8 canonical checkpoints (4 × 14B + 4 × 7B) + 4 MW checkpoints
-   (when they land) = 12 to push. judge_outputs.jsonl files local-only
-   until pushed.
+   8 canonical checkpoints to push:
+   - 14B: `9778d10381696f58` `754166d1711923c1` `5e4e188045d5d3c8`
+     `672dbf61896f7843`
+   - 7B:  `c0da3ed8794554a1` `88a4ddf6819d8057` `9b011dfeea88f8af`
+     `2016074933c41e7f`
+   Each ckpt is ~1.3-3.5 GB; total ~15-20 min for the loop.
+5. **After HF finishes**: verify upload, update manifest hf_url
+   field if needed, push final commit. Then idle pending Han's
+   call on session wrap-up.
+
+No further compute on this pod is needed for the C6 paper sprint.
+Use remaining time for paper-writing contributions (caveats /
+methodology bullet on per-step training-FLOPs literature alignment),
+which has already been added to c6.md (commit `b59834eb`).
 
 ## Don't repeat (agent owns — overwrite)
 
