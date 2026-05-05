@@ -38,6 +38,135 @@ Add a bullet to "Open questions for Han" in your own briefing,
 surface it in chat, and let Han or agent_paper land the change. Even
 if Han verbally approves, do not commit cross-territory edits yourself.
 
+### ⚠️ NEW MISSION 2026-05-05 PM (URGENT) — Extended magnitude grid ±{20-90}
+
+**Han 2026-05-05 PM**: "VERY IMPORTANT, [agent_back] will have all four
+A40s on their pod to themselves soon after agent_steer finishes their
+current mission!! ... I want agent_back to also expand their steering
+coefficients to ±{20, 30, 40, 50, 60, 70, 80, 90}!!"
+
+**Pod consolidation**: agent_steer's C5 detection mission wraps in
+~15-20 min on GPUs 1+3 (their pair). Once they're done, you have **all
+4 A40s to yourself**. Expand the magnitude grid to test extreme
+coefficients.
+
+**Run this AFTER your C7 detection refactor** (the mission below).
+The detection refactor uses ~30-60 min of compute; the magnitude
+expansion is your big follow-up sweep.
+
+### Mission scope
+
+**Current grid (v4 sweep, 25 magnitudes)**:
+`-16, -12, -10, -8, -7, -6, -5, -4, -3, -2, -1, -0.5, 0, 0.5, 1, 2, 3, 4, 5, 6, 7, 8, 10, 12, 16`
+
+**New magnitudes (16 added points, ±{20, 30, 40, 50, 60, 70, 80, 90})**:
+`-90, -80, -70, -60, -50, -40, -30, -20, +20, +30, +40, +50, +60, +70, +80, +90`
+
+**Combined grid: 25 + 16 = 41 magnitudes per (arch, qid).**
+
+| Sweep dim | Values |
+|---|---|
+| Archs | All 7 from your v4 sweep: `topk_sae`, `stacked_sae`, `tsae_paper`, `tfa`, `mlc`, `txc_base`, `txc_pro` |
+| Seeds | seed=42 only (matches v4 single-seed convention) |
+| Cohort | 61 MATH-500 questions (31 truly-wrong + 30 originally-correct) |
+| **New cells** | **7 archs × 16 magnitudes × 61 qids = ~6,800 generations × Sonnet judge calls** |
+
+The motivation: test whether TXC's inducement signal **saturates**,
+**plateaus**, or **breaks** at extreme magnitudes far outside the
+natural activation distribution. A sustained Δgc at ±90× tells a
+different paper story than a peak at ±12 with collapse at ±50.
+
+### Wall-time on 4× A40
+
+Your v4 sweep estimate was "~14 hr across 2 GPUs in parallel" for
+25 magnitudes × 7 archs. Per-magnitude scaling:
+- 16/25 = 64% of v4 compute → ~9 hr on 2 GPUs
+- On 4 GPUs (full pod) → **~4-5 hr wall**
+
+(Sonnet judge calls are batched and parallelised inside each cell;
+the bottleneck is the steering generation forward, which scales
+linearly with GPUs.)
+
+### First concrete task — extend the magnitude grid
+
+Step 1 — finish the C7 detection refactor (the mission below). That's
+~1.5-2 hr; it brings the shuffle column into your existing v4 cells.
+
+Step 2 — wait for agent_steer's C5 detection sweep to wrap on GPUs
+1+3 (~15-20 min after they pull and launch).
+
+Step 3 — extend the magnitude grid in
+`experiments/c7_backtracking/run.py`. The current grid lives as a
+constant; extend it:
+
+```python
+# Old (v4):
+DEFAULT_MAGNITUDES = (
+    -16, -12, -10, -8, -7, -6, -5, -4, -3, -2, -1, -0.5, 0,
+    0.5, 1, 2, 3, 4, 5, 6, 7, 8, 10, 12, 16,
+)
+
+# New (v5 — extended):
+EXTENDED_MAGNITUDES = (
+    -90, -80, -70, -60, -50, -40, -30, -20,         # NEW negative tail
+    -16, -12, -10, -8, -7, -6, -5, -4, -3, -2, -1, -0.5, 0,
+    0.5, 1, 2, 3, 4, 5, 6, 7, 8, 10, 12, 16,
+    20, 30, 40, 50, 60, 70, 80, 90,                 # NEW positive tail
+)
+```
+
+Bump `EVAL_PROTOCOL_VERSION` to `"5.0.0"` (or whatever's next from
+your current 4.x). Different protocol → fresh eval_keys → existing
+v4 cells stay in the leaderboard for diff comparison; the v5 cells
+are the extended-grid headline.
+
+Step 4 — launch the v5 sweep on all 4 A40s in parallel:
+
+```bash
+TQDM_DISABLE=1 AGENT_NAME=agent_back \
+  bash experiments/c7_backtracking/run_v5_sweep.sh \
+  > logs/c7_v5_extended_grid.log 2>&1 &
+```
+
+(Same `run_sweep.sh` pattern you used for v4, just with the extended
+grid + 4 GPUs instead of 2.)
+
+Step 5 — re-render `docs/components/c7.md` AUTO-RESULTS to surface
+both grids. Make the headline plot show Δgc per magnitude across the
+full ±90 range — the paper story is the SHAPE of the curve, not just
+the peak.
+
+### Decision rule for the paper claim
+
+Per (arch, sign-of-magnitude) family:
+- **Sustained Δgc at extreme magnitudes** → "TXC's steering response
+  is robust at ±90× the natural distribution" — strong paper claim.
+- **Saturation / plateau** at ~±20-40 → "TXC's effective steering
+  range is ±20-40; beyond that the signal saturates" — modest claim,
+  still informative.
+- **Collapse / sign-flip at extremes** → "Steering breaks at ~±X" —
+  honest negative; the v4 peak at ±12 was real but not extrapolable.
+
+agent_paper integrates the resulting Δgc-vs-magnitude curve into the
+C7 paper story at paper-render time. Your job is just to land the
+numbers.
+
+### Watch-outs
+
+- **DON'T re-train.** Use cached v4 checkpoints (same `train_key` as
+  v4); extended grid is eval-only with fresh `eval_keys`.
+- **Sonnet API budget**: ~6,800 new generations × ~5-10 sec/judge ≈
+  ~$30-50 in Sonnet calls. Within Han's budget but worth flagging if
+  you see anomalous burn rate.
+- **GPU 1+3 ownership**: only after agent_steer wraps C5 detection.
+  Verify via their briefing's "Current state" section says "complete"
+  or `nvidia-smi` shows them idle.
+- **Cohort fidelity**: same 61 MATH-500 questions × seed=42 as v4
+  (don't introduce new questions or seeds — keeps the Δgc-per-mag
+  curve directly comparable to v4).
+
+---
+
 ### ⚠️ NEW MISSION 2026-05-05 PM (URGENT) — C7 detection refactor + shuffle ablation
 
 **Han 2026-05-05 PM**: "we are missing the detection story for C5 and

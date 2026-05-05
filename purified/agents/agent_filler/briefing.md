@@ -51,6 +51,149 @@ surface it in chat, and let Han or agent_paper land the change. Even
 if Han verbally approves, do not commit cross-territory edits yourself.
 This is non-negotiable — see PROTOCOL.md § 8 + CLAUDE.md Hard Rule #7.
 
+### ⚠️ ADDITIONAL MISSION 2026-05-05 PM (URGENT) — Take HALF of agent_steer_100k's BASE C3 load
+
+**Han 2026-05-05 PM**: "agent_filler's 8 A40s will eventually become
+idle. this is massive compute we NEED TO UTILIZE." + "Let's make them
+take half of agent_steer_100k's load."
+
+**Current state of BASE C3** (after agent_steer_100k's 16/30 cells
+checkpoint, commit `0a3b5b95`):
+- ✅ `topk_sae`: 7 cells (~complete: 3 seeds × 2 k_feats + 1 extra)
+- ✅ `tsae_paper`: 6 cells (complete: 3 seeds × 2 k_feats)
+- 🟡 `tfa`: 4 cells (in flight on agent_steer_100k)
+- ❌ `txc_base`: 0 cells — **NOT STARTED, your scope**
+- ❌ `txc_pro`: 0 cells — **NOT STARTED, your scope**
+
+agent_steer_100k owns the per-token + TFA archs (lighter compute,
+their continued workflow). You take the **TXC variants**, which are
+the slowest cells and benefit most from your 8-GPU parallelism. This
+splits the wall-time roughly 50/50.
+
+Launch this **once your current C5 TopK+TFA sweep + C1+C2 toy sweeps
+wrap** (your `c1c2_toy_sweep.sh` is in flight per `5b107f2a`).
+
+### Mission scope (BASE C3 TXC variants, mirrors agent_nlp's IT)
+
+| Arch | T sweep | Seeds | k_feats | Cells |
+|---|---|---|---|---:|
+| `txc_base` | T=5 (canonical) + T=10 + T=20 (decisions § 17) | {1, 2, 42} | {5, 20} | 9 trainings + 18 evals |
+| `txc_pro`  | T_max=10, t_sample=5 (canonical) | {1, 2, 42} | {5, 20} | 3 trainings + 6 evals |
+
+**Total: 12 unique trainings + 24 evals.** All on the BASE datasource
+`gemma_2_2b_base_l13_fineweb_24k128`. C4 BASE evals cache-hit on these
+checkpoints (agent_steer_100k owns C4 wiring).
+
+### Pre-req: pull the BASE caches from HF
+
+agent_steer_100k built + HF-pushed both the BASE act_cache and BASE
+probe_cache for Gemma. Pull them into your pod's `/workspace/`:
+
+```bash
+.venv/bin/hf download han1823123123/temp-bench-data \
+    --repo-type dataset \
+    --include "act_cache/<BASE_KEY>/**" \
+    --local-dir results/
+
+.venv/bin/hf download han1823123123/temp-bench-data \
+    --repo-type dataset \
+    --include "probe_cache/gemma_2_2b_base_l13_fineweb_24k128/**" \
+    --local-dir results/
+```
+
+(Replace `<BASE_KEY>` with the act_cache_key from
+`compute_act_cache_key(load_datasource('gemma_2_2b_base_l13_fineweb_24k128'))`
+— derive locally; one-line python.)
+
+### Driver
+
+Reuse `experiments/c3_probing_base/run.py` (agent_steer_100k's BASE
+driver, commit `831cd2ea` already supports T=10/T=20 via
+`arch_hparams_override`). Filter to TXC archs only:
+
+```bash
+TQDM_DISABLE=1 AGENT_NAME=agent_filler \
+  .venv/bin/python -m experiments.c3_probing_base.run \
+  --archs txc_base txc_pro \
+  --seeds 42 1 2 \
+  --k-feats 5 20 \
+  > logs/c3_base_txc_filler.log 2>&1 &
+```
+
+For the txc_base T=10/T=20 sweep, the driver already has the per-arch
+TrainingConfig list with the three T values (T=5/T=10/T=20). It
+iterates all of them when `--archs txc_base` is passed.
+
+### Wall-time on 8× A40 (parallel)
+
+Per-cell estimates (agent_steer_100k's H100 numbers scaled to A40):
+- `txc_base` T=5: ~1.5 hr train + ~30 min eval × 2 k_feats = ~2 hr
+- `txc_base` T=10: ~2 hr + ~30 min × 2 = ~2.5 hr
+- `txc_base` T=20: ~2.5 hr + ~30 min × 2 = ~3 hr
+- `txc_pro`: ~3 hr + ~30 min × 2 = ~3.5 hr (InfoNCE all-pairs is the
+  slow part)
+
+12 cells across 8 GPUs in parallel: 8 cells in wall #1 (~2.5 hr),
+4 cells in wall #2 (~3 hr) → **~5-6 hr total wall**.
+
+(If your C5 TopK+TFA + C1+C2 sweeps haven't finished by the time you
+read this, queue this BASE TXC sweep AFTER they wrap. Don't double-
+allocate GPUs.)
+
+### Parallelisation script
+
+```bash
+#!/usr/bin/env bash
+# experiments/c3_probing_base/run_filler.sh — launches BASE TXC cells
+# across 8 A40s. agent_steer_100k still owns per-token + TFA archs.
+set -e
+cd "$(dirname "$0")/../.."
+mkdir -p logs
+
+# 12 cells split across 8 GPUs. Faster archs go to fewer GPUs;
+# slower (txc_pro) gets dedicated allocation.
+declare -A ASSIGN=(
+  [0]="txc_base 42"          # T=5/10/20 × seed=42
+  [1]="txc_base 1"
+  [2]="txc_base 2"
+  [3]="txc_pro 42"
+  [4]="txc_pro 1"
+  [5]="txc_pro 2"
+  # GPUs 6+7 idle / available for retry on OOM
+)
+
+for gpu in "${!ASSIGN[@]}"; do
+  read -r arch seed <<<"${ASSIGN[$gpu]}"
+  log="logs/c3_base_filler_gpu${gpu}_${arch}_seed${seed}.log"
+  setsid -f bash scripts/run_on_gpu.sh "${gpu}" -- \
+    .venv/bin/python -m experiments.c3_probing_base.run \
+    --archs "${arch}" --seeds "${seed}" \
+    > "${log}" 2>&1 &
+done
+wait
+```
+
+### Watch-outs
+
+- **Don't duplicate agent_steer_100k's archs.** They own TopK + T-SAE
+  + TFA on BASE. You ONLY run `txc_base` (T=5, T=10, T=20) and
+  `txc_pro`. Cross-check leaderboard before launching to confirm no
+  overlap.
+- **HF push is automatic** on ephemeral A40 pods (`cache.save_checkpoint`).
+  Verify via `wrap_up_session.sh` before pod stop.
+- **C4 BASE evals are agent_steer_100k's** — they cache-hit on your
+  txc_base/txc_pro train_keys and run the qualitative judge against
+  the concat corpora. You don't run C4.
+- **Same `arch_hparams_override` mechanism** for T-sweep that the IT
+  side uses (commit `dfd60850`). Different T → fresh train_keys; old
+  cells (T=5 default) coexist with T=10 + T=20 cells in the
+  leaderboard.
+- **Don't render `docs/components/c3.md`** — agent_nlp's territory.
+  agent_paper integrates BASE results at paper-render time via
+  per-datasource `canonical_train_keys` filter splits.
+
+---
+
 ### ⚠️ ADDITIONAL MISSION 2026-05-05 PM — C1 + C2 toy synthetic sweeps (spare A40s)
 
 **Han 2026-05-05 PM**: "agent_filler has 8 A40s, can they leverage all
