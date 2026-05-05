@@ -531,8 +531,15 @@ class SonnetBacktrackingJudge:
 
     def existing_keys(self) -> set[tuple[str, float, str, int]]:
         """Return ``{(transcript_id, magnitude, arch, seed)}`` already in
-        the workspace's jsonl. Used to skip already-judged calls when
-        resuming a partial sweep."""
+        the workspace's jsonl with a *successful* label (≥ 0). Used to
+        skip already-judged calls when resuming a partial sweep.
+
+        **Skip label=-1 rows**: those are API-error / parse-failure
+        records persisted for audit. Treat them as un-judged so retries
+        actually re-run them. Without this, an API outage that returned
+        400 on every call would poison the workspace permanently —
+        existing_keys would mark them all as "done" and a retry would
+        no-op."""
         if not self._jsonl.exists():
             return set()
         keys: set[tuple[str, float, str, int]] = set()
@@ -541,6 +548,12 @@ class SonnetBacktrackingJudge:
                 try:
                     rec = json.loads(line)
                 except json.JSONDecodeError:
+                    continue
+                try:
+                    label = int(rec.get("label", -1))
+                except (TypeError, ValueError):
+                    label = -1
+                if label < 0:
                     continue
                 keys.add((
                     rec.get("transcript_id", ""),

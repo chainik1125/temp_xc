@@ -179,6 +179,27 @@ def test_sonnet_judge_existing_keys_resume(tmp_path: Path):
     assert ("q3", 0.0, "topk_sae", 42) not in keys
 
 
+def test_sonnet_judge_existing_keys_skips_failures(tmp_path: Path):
+    """Failed judges (label=-1) are persisted for audit but MUST NOT be
+    treated as 'done' on resume — otherwise an API outage that returned
+    400 on every call would poison the workspace permanently."""
+    judge = SonnetBacktrackingJudge(workspace=tmp_path)
+    judge._persist(JudgeOutput(
+        transcript_id="q1", magnitude=0.0, arch="topk_sae", seed=42,
+        judge_id="j", judge_model="m", prompt_hash="h", label=1,
+        raw="COUNT: 1", ts="t",
+    ))
+    judge._persist(JudgeOutput(  # failed call — label=-1 audit row
+        transcript_id="q2", magnitude=4.0, arch="topk_sae", seed=42,
+        judge_id="j", judge_model="m", prompt_hash="h", label=-1,
+        raw="(api-error: 400 credit too low)", ts="t",
+    ))
+    keys = judge.existing_keys()
+    assert ("q1", 0.0, "topk_sae", 42) in keys
+    assert ("q2", 4.0, "topk_sae", 42) not in keys, \
+        "label=-1 rows must be re-run on retry"
+
+
 # ── compute_delta_gc ──────────────────────────────────────────────────
 
 
