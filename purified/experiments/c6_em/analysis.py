@@ -53,6 +53,8 @@ EXP_DIR = Path(__file__).parent
 PLOT_DIR = EXP_DIR / "plots"
 HEADLINE_SEED = 42  # the cell whose frontier we plot in c6.md
 HEADLINE_PROTOCOL = "2.0.0"  # full Wang. 1.0.0 = abbreviated, kept for diff only.
+DETECTION_PROTOCOL = "3.0.0"  # detection PR-AUC; eval_protocol_version=3.0.0
+DETECTION_S_HEADLINE = 16     # primary S in the C7 paper convention
 
 # Stable display labels for each datasource → organism short tag.
 ORGANISM_BY_DATASOURCE = {
@@ -352,6 +354,117 @@ def _gap_table(paired: list[dict], *, label: str) -> list[str]:
     return md
 
 
+def _detection_rows_by_organism(
+    rows: list, valid_train_keys: set[str],
+) -> dict[str, list[dict]]:
+    """Group eval_protocol_version=3.0.0 rows by organism label.
+
+    Each cell is one (arch, seed) within an organism. Returns a dict
+    keyed by ORGANISM_BY_DATASOURCE label, value is a list of dicts:
+    ``{seed, arch, pr_auc_S{1..32}, pr_auc_shuffled_S{1..32},
+       shuffle_gap_S{1..32}, n_sent, positive_rate, train_key,
+       eval_key, ts}``.
+    """
+    by_org: dict[str, list[dict]] = {org: [] for org in ORGANISM_BY_DATASOURCE.values()}
+    for r in rows:
+        if r.eval_protocol_version != DETECTION_PROTOCOL:
+            continue
+        if r.train_key not in valid_train_keys:
+            continue
+        org = ORGANISM_BY_DATASOURCE.get(r.datasource)
+        if org is None:
+            continue
+        m = r.metrics
+        cell = {
+            "seed": int(r.seed),
+            "arch": r.arch,
+            "n_sent": float(m.get("n_sent", 0)),
+            "positive_rate": float(m.get("positive_rate", 0)),
+            "train_key": r.train_key,
+            "eval_key": r.eval_key,
+            "ts": r.ts,
+        }
+        for s in (1, 2, 4, 8, 16, 32):
+            cell[f"pr_auc_S{s}"] = float(m.get(f"pr_auc_S{s}", float("nan")))
+            cell[f"pr_auc_shuffled_S{s}"] = float(m.get(f"pr_auc_shuffled_S{s}", float("nan")))
+            cell[f"shuffle_gap_S{s}"] = float(m.get(f"shuffle_gap_S{s}", float("nan")))
+        by_org[org].append(cell)
+    return by_org
+
+
+def _detection_table_md(by_org: dict[str, list[dict]]) -> list[str]:
+    """Render a detection PR-AUC table per organism + a means summary.
+
+    Convention: PR-AUC at S∈{1,2,4,8,16,32}, headline cell is S=16
+    (matches C7 paper convention). Per-cell row format:
+      | seed | arch | n_sent | pos_rate | PR-AUC@S=16 | shuffle_gap@S=16 |
+    Plus a per-arch mean across seeds, and a SAE-vs-TXC paired delta.
+    """
+    md = []
+    if not any(by_org.values()):
+        return md
+    md += ["", "### Detection PR-AUC (eval_protocol_version=3.0.0)", "",
+           "Sparse-probe detection asks *can a linear probe over the "
+           "arch's features distinguish misaligned (Sonnet judge "
+           "`align ≤ 50`) from aligned rollouts*. Cohort: 1.7-2k stage-4 "
+           "rollouts per cell (balanced α grid spanning -100 to +100), "
+           "stride-1 T-windows propagated to the parent rollout's label, "
+           "GroupKFold-by-prompt at 5 folds. Within-window shuffle "
+           "ablation reports whether temporal structure adds detection "
+           f"signal. Random PR-AUC = positive_rate. Headline S = "
+           f"{DETECTION_S_HEADLINE}.",
+           ""]
+    for org, cells in by_org.items():
+        if not cells:
+            continue
+        md += ["", f"#### {org}", "",
+               "| seed | arch | n_sent | positive_rate | "
+               f"PR-AUC@S={DETECTION_S_HEADLINE} | "
+               f"shuffled@S={DETECTION_S_HEADLINE} | "
+               f"shuffle_gap@S={DETECTION_S_HEADLINE} |",
+               "|---:|:---|---:|---:|---:|---:|---:|"]
+        # Sort by (arch, seed) for stable rendering.
+        cells_sorted = sorted(cells, key=lambda c: (c["arch"], c["seed"]))
+        # Per-cell rows. For per-token archs (SAE T=1), the shuffle
+        # ablation is not applicable — there's nothing to shuffle
+        # within a single-position window. Render those cells as "—".
+        import math
+        for c in cells_sorted:
+            S = DETECTION_S_HEADLINE
+            sh = c[f"pr_auc_shuffled_S{S}"]
+            sg = c[f"shuffle_gap_S{S}"]
+            sh_str = f"{sh:.3f}" if not math.isnan(sh) else "— (T=1)"
+            sg_str = f"{sg:+.3f}" if not math.isnan(sg) else "—"
+            md.append(
+                f"| {c['seed']} | {c['arch']} | {int(c['n_sent'])} | "
+                f"{c['positive_rate']:.3f} | "
+                f"{c[f'pr_auc_S{S}']:.3f} | "
+                f"{sh_str} | {sg_str} |"
+            )
+        # Per-arch means + SAE-TXC delta.
+        archs = sorted(set(c["arch"] for c in cells_sorted))
+        if len(archs) >= 2:
+            S = DETECTION_S_HEADLINE
+            arch_means: dict[str, float] = {}
+            for arch in archs:
+                vs = [c[f"pr_auc_S{S}"] for c in cells_sorted if c["arch"] == arch]
+                if vs:
+                    arch_means[arch] = sum(vs) / len(vs)
+            md.append("")
+            md.append(
+                f"**Per-arch mean PR-AUC@S={S}** (n=2 paired seeds): "
+                + ", ".join(f"`{a}`={v:.3f}" for a, v in arch_means.items())
+            )
+            if "sae_arditi" in arch_means and "txc_base" in arch_means:
+                detect_gap = arch_means["sae_arditi"] - arch_means["txc_base"]
+                better = "SAE-arditi" if detect_gap > 0 else "TXC-base"
+                md.append(
+                    f"Detection gap (SAE − TXC) = {detect_gap:+.3f}. "
+                    f"**{better}** wins detection on this organism."
+                )
+    return md
+
+
 def run_analysis() -> AnalysisResult:
     rows = query_leaderboard(component=COMPONENT)
     if not rows:
@@ -538,6 +651,19 @@ def run_analysis() -> AnalysisResult:
             "with some coherence cost.)",
         ]
 
+    # ── Detection PR-AUC (eval_protocol_version=3.0.0) ──
+    # Surface the C6 detection axis (Han 2026-05-05 PM) alongside
+    # the steering axis. Detection cells are written by
+    # experiments.c6_em_detection.run; they share the canonical
+    # train_keys (cache-hit on training).
+    detection_by_org = _detection_rows_by_organism(
+        # Re-query ALL rows (including 3.0.0) because the existing
+        # filter above keeps only HEADLINE_PROTOCOL=2.0.0 rows.
+        query_leaderboard(component=COMPONENT),
+        valid_train_keys,
+    )
+    md_lines += _detection_table_md(detection_by_org)
+
     if abbr_rows:
         md_lines += [
             "",
@@ -582,6 +708,13 @@ def run_analysis() -> AnalysisResult:
                 ],
             }
             for org, data in organism_results.items()
+        },
+        "detection_by_organism": {
+            org: [
+                {k: v for k, v in c.items() if k != "ts"}
+                for c in cells
+            ]
+            for org, cells in detection_by_org.items()
         },
     }
     return AnalysisResult(
