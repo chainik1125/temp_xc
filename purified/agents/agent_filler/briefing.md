@@ -729,20 +729,26 @@ time.
     the pipeline opened). Python itself exited 0; smoke is functionally
     valid. `mkdir -p logs` ran in the same Bash call so the next
     invocation is fine.
-- **Full sweep launched at 12:21 UTC** via
-  `bash experiments/c5_steering_filler/run_sweep.sh`:
+- **First sweep launch (12:21Z) was killed by a CC restart** — the
+  cells were children of the harness's bash and got SIGTERM'd when
+  CC died. No checkpoints saved (training only checkpoints at end).
+  Empty run_dirs left at 643dd1ed/6fea1e48/e19d42cd/14cf1087/
+  e116baae/3af3ef38 — harmless, no cleanup needed.
+- Fix landed: `run_sweep.sh` rewritten to launch each cell with
+  `setsid -f` instead of `&`. Each cell now has PPID=1 (init), its
+  own session group → survives shell death.
+- **Sweep relaunched at 12:31Z** via the new `run_sweep.sh`:
   - GPU 0..2 → txc_pro_mw seeds {42, 1, 2}
   - GPU 3..5 → txc_base_mw seeds {42, 1, 2}
   - GPU 6, 7 → idle (reserve for retries / stretch)
-  - PIDs in /tmp/p_filler_gpu{0..5}; per-cell logs in
-    `logs/c5_filler_gpu{0..5}_*.log`.
-  - Sweep launcher Bash task id `bmager8g3` (output:
-    `/tmp/claude-1000/-workspace-temp-xc-purified/9a9f1871-2f42-466b-9100-df10e4855a15/tasks/bmager8g3.output`).
-  - At 12:22Z all 6 procs in act-cache load phase (VRAM: 3.5 GB on
-    txc_pro_mw GPUs, 1.9 GB on txc_base_mw GPUs, GPU util 0% —
-    pre-train).
-- Active monitor: task id `bq4q73l4j` (1-hr timeout) tailing the 6
-  per-cell logs for training milestones / errors / completion.
+  - 6 python PIDs orphaned to init; query via
+    `pgrep -f "experiments.c5_steering_filler.run"` (saved to
+    /tmp/p_filler_pids.txt at launch time, but the file becomes stale
+    if cells exit; pgrep is the source of truth).
+  - Per-cell logs in `logs/c5_filler_gpu{0..5}_*.log`.
+- Active monitor: task id `blz5f24an` (1-hr timeout) tailing the 6
+  per-cell logs for training milestones / errors / completion. Re-arm
+  if it times out before the slowest cell finishes (~10-15 hr).
 - Last leaderboard append (this session):
   `arch=txc_base_mw seed=42 eval_key=8c6bf97f2de6 n_valid=270 (smoke)`.
 - Recent decisions in scope: `decisions.md` § 7 (Bricken off for C5),
@@ -778,8 +784,15 @@ time.
    end-to-end: training skipped (cached), Gemma loaded, concept-lift
    (v1.1.0) ran, 270 generations, 270 judge calls all 200 OK,
    metrics.json + leaderboard row written.
-7. Launched the full sweep at 12:21Z. All 6 python procs running, in
-   data-load phase; first training step prints expected within minutes.
+7. Launched the full sweep at 12:21Z; all 6 python procs went to 100%
+   GPU util within ~1 min (txc_pro_mw 44.6 GB VRAM, txc_base_mw 36.0
+   GB — both under the 48 GB A40 cap).
+8. CC restarted at ~12:25Z; sweep killed because cells were children
+   of the harness shell (SIGHUP/SIGTERM propagation).
+9. Patched `run_sweep.sh`: replaced `bash ... &` + `wait` with
+   `setsid -f bash ...` so each cell is orphaned to PID 1 (its own
+   session). Cells now survive shell death.
+10. Relaunched at 12:31Z; verified each cell has PPID=1 and own SID.
 
 ## Next action (agent owns — overwrite)
 
@@ -863,7 +876,12 @@ time.
 - **Don't use `tail -F logs/c5_filler_gpu*.log` in a Monitor without
   `-q`.** Without `-q`, tail emits `==>` headers on every file switch
   and they fire as Monitor events constantly. Use `tail -qF` (which is
-  what the active monitor `bq4q73l4j` uses).
+  what the active monitor uses).
+- **Don't launch the sweep with `&` + `wait`.** That makes cells
+  children of the shell — when CC restarts they die from SIGHUP/SIGTERM
+  propagation. The first launch (12:21Z) was killed exactly this way.
+  Use `setsid -f` (current `run_sweep.sh` does this) so each cell is
+  reparented to PID 1 and survives shell death.
 
 ## Open questions for Han (agent owns — overwrite)
 
