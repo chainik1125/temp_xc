@@ -287,32 +287,68 @@ def _peak_dict(rs):
 
 
 def _gap_table(paired: list[dict], *, label: str) -> list[str]:
+    """Render the per-organism gap table.
+
+    Format mirrors em_nanda's `align / coh` paired reporting: the
+    paper-relevant tradeoff is that TXC tends to win on align while
+    SAE tends to win on coh. Both numbers are surfaced per cell so
+    reviewers see the full picture, not just the align-only headline.
+
+    coh_gap = SAE coh − TXC coh; positive = SAE more coherent.
+    """
     md = ["",
           f"### {label} (n={len(paired)} paired seeds)",
           "",
-          "| seed | SAE peak_align | TXC peak_align | gap | SAE feat | TXC feat | SAE α | TXC α |",
-          "|---:|---:|---:|---:|---:|---:|---:|---:|"]
-    gaps = []
+          "| seed | SAE align/coh | TXC align/coh | align gap | coh gap | SAE feat α | TXC feat α |",
+          "|---:|:---|:---|---:|---:|:---|:---|"]
+    align_gaps = []
+    coh_gaps = []
     for p in paired:
-        gaps.append(p["gap"])
+        sae_a = p["sae"]["peak_align"]
+        sae_c = p["sae"]["peak_coh"]
+        txc_a = p["txc"]["peak_align"]
+        txc_c = p["txc"]["peak_coh"]
+        align_gap = sae_a - txc_a
+        coh_gap = sae_c - txc_c
+        align_gaps.append(align_gap)
+        coh_gaps.append(coh_gap)
         md.append(
-            f"| {p['seed']} | {p['sae']['peak_align']:.2f} | "
-            f"{p['txc']['peak_align']:.2f} | {p['gap']:+.2f} | "
-            f"{p['sae']['peak_feature_id']} | {p['txc']['peak_feature_id']} | "
-            f"{p['sae']['peak_alpha']:+.0f} | {p['txc']['peak_alpha']:+.0f} |"
+            f"| {p['seed']} | "
+            f"{sae_a:.2f} / {sae_c:.2f} | "
+            f"{txc_a:.2f} / {txc_c:.2f} | "
+            f"{align_gap:+.2f} | {coh_gap:+.2f} | "
+            f"{p['sae']['peak_feature_id']} α={p['sae']['peak_alpha']:+g} | "
+            f"{p['txc']['peak_feature_id']} α={p['txc']['peak_alpha']:+g} |"
         )
-    if len(gaps) >= 2:
-        mean_gap = sum(gaps) / len(gaps)
-        spread = max(gaps) - min(gaps)
+    if len(align_gaps) >= 2:
+        mean_align_gap = sum(align_gaps) / len(align_gaps)
+        mean_coh_gap = sum(coh_gaps) / len(coh_gaps)
+        align_spread = max(align_gaps) - min(align_gaps)
+        coh_spread = max(coh_gaps) - min(coh_gaps)
         md.append("")
         md.append(
-            f"mean gap = {mean_gap:+.2f} align "
-            f"(spread {spread:.2f}, min {min(gaps):+.2f}, max {max(gaps):+.2f}). "
-            f"Decision: {_decision(mean_gap)}"
+            f"**Mean align gap** = {mean_align_gap:+.2f} "
+            f"(spread {align_spread:.2f}). "
+            f"**Mean coh gap** = {mean_coh_gap:+.2f} "
+            f"(spread {coh_spread:.2f}). "
+            f"Decision (align): {_decision(mean_align_gap)}"
         )
-    elif len(gaps) == 1:
+        if mean_coh_gap > 3.0:
+            md.append("")
+            md.append(
+                f"_Coherence tradeoff_: SAE-arditi peaks at {mean_coh_gap:+.2f} "
+                f"coh higher than TXC-base on average. TXC's align gain comes "
+                f"at the cost of some coherence — the canonical-reading: "
+                f"TXC steers toward misalignment more aggressively, sacrificing "
+                f"coherence at the peak. Reviewers comparing arches should "
+                f"weight both axes."
+            )
+    elif len(align_gaps) == 1:
         md.append("")
-        md.append(f"single-seed gap = {gaps[0]:+.2f} align. Decision: {_decision(gaps[0])}")
+        md.append(
+            f"single-seed align gap = {align_gaps[0]:+.2f}, coh gap = "
+            f"{coh_gaps[0]:+.2f}. Decision (align): {_decision(align_gaps[0])}"
+        )
     return md
 
 
@@ -452,7 +488,10 @@ def run_analysis() -> AnalysisResult:
         if len(paired) >= 1:
             gaps = [p["gap"] for p in paired]
             mean_gap = sum(gaps) / len(gaps)
-            headline_gaps_for_results[organism_label] = mean_gap
+            coh_gaps = [p["sae"]["peak_coh"] - p["txc"]["peak_coh"]
+                        for p in paired]
+            mean_coh_gap = sum(coh_gaps) / len(coh_gaps)
+            headline_gaps_for_results[organism_label] = (mean_gap, mean_coh_gap)
         else:
             headline_gaps_for_results[organism_label] = None
 
@@ -477,17 +516,26 @@ def run_analysis() -> AnalysisResult:
             ]
 
     # If both organisms landed, also write a one-line headline pairing.
-    fin_gap = headline_gaps_for_results.get("14B-finance")
-    med_gap = headline_gaps_for_results.get("7B-medical")
-    if fin_gap is not None and med_gap is not None:
+    fin = headline_gaps_for_results.get("14B-finance")
+    med = headline_gaps_for_results.get("7B-medical")
+    if fin is not None and med is not None:
+        fin_align, fin_coh = fin
+        med_align, med_coh = med
         md_lines += [
             "",
-            "### Headline pairing",
+            "### Headline pairing (align / coh, both axes)",
             "",
-            f"- 14B-finance mean gap (n={len(organism_results['14B-finance']['paired'])}): "
-            f"{fin_gap:+.2f} align — {_decision(fin_gap).split('—')[0].strip()}",
-            f"- 7B-medical  mean gap (n={len(organism_results['7B-medical']['paired'])}): "
-            f"{med_gap:+.2f} align — {_decision(med_gap).split('—')[0].strip()}",
+            f"- **14B-finance** (n={len(organism_results['14B-finance']['paired'])}): "
+            f"align gap {fin_align:+.2f} / coh gap {fin_coh:+.2f} — "
+            f"{_decision(fin_align).split('—')[0].strip()}",
+            f"- **7B-medical** (n={len(organism_results['7B-medical']['paired'])}): "
+            f"align gap {med_align:+.2f} / coh gap {med_coh:+.2f} — "
+            f"{_decision(med_align).split('—')[0].strip()}",
+            "",
+            "(Negative align gap = TXC > SAE on alignment. Positive coh gap = "
+            "SAE > TXC on coherence. The c6.md decision tree is keyed on "
+            "|align gap|; coh gap is the tradeoff axis — TXC's align win comes "
+            "with some coherence cost.)",
         ]
 
     if abbr_rows:
@@ -513,12 +561,20 @@ def run_analysis() -> AnalysisResult:
                     sum(p["gap"] for p in data["paired"]) / len(data["paired"])
                     if data["paired"] else None
                 ),
+                "mean_coh_gap": (
+                    sum(p["sae"]["peak_coh"] - p["txc"]["peak_coh"]
+                        for p in data["paired"]) / len(data["paired"])
+                    if data["paired"] else None
+                ),
                 "paired": [
                     {
                         "seed": p["seed"],
                         "gap": p["gap"],
+                        "coh_gap": p["sae"]["peak_coh"] - p["txc"]["peak_coh"],
                         "sae_peak_align": p["sae"]["peak_align"],
+                        "sae_peak_coh": p["sae"]["peak_coh"],
                         "txc_peak_align": p["txc"]["peak_align"],
+                        "txc_peak_coh": p["txc"]["peak_coh"],
                         "sae_train_key": p["sae"]["train_key"],
                         "txc_train_key": p["txc"]["train_key"],
                     }
