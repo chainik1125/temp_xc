@@ -7,8 +7,8 @@ Section ownership: PROTOCOL.md § 14.
 
 ---
 agent: agent_em_100k
-last_state_update: 2026-05-05T13:00:00Z
-component: idle (C3 MW pivot RESCINDED, awaiting C3 baseline T=1 re-train directive)
+last_state_update: 2026-05-05T14:55:00Z
+component: c3 (T-SAE baseline re-train at T=2, decisions § 15)
 ---
 
 ## Identity + mandate (Han owns — agents do not edit)
@@ -595,126 +595,126 @@ integrates via `canonical_train_keys()` toggle at paper-render time.
 
 ## Current state (agent owns — overwrite at every compact)
 
-**Last verified: 2026-05-05T13:00Z. STOOD DOWN per Han / agent_paper
-2026-05-05 PM directive. C3 MW pivot RESCINDED — re-framing says C3/C5
-canonical baselines are over-batched at 131K tokens/step (vs SAEBench's
-2K + C6/C7's 1K), so the fix is re-training per-token baselines at
-T=1 window-based, NOT bringing TXC up via MW. C3 MW sweep killed
-mid-flight (txc_base_mw seed=42 was ~step 10000/20000 when terminated).
-GPU at 0 MiB / 0 % util. Awaiting briefing rewrite for the C3 baseline
-T=1 re-train directive.**
+**Last verified: 2026-05-05T14:55Z. NEW MISSION: C3 T-SAE baseline
+re-train at T=2 (Bhalla/Ye 2025 paper-faithful adjacent pairs,
+decisions § 15). Smoke v1 PASSED end-to-end (1m46s wall, 200 steps
+@ 19 steps/sec, mean_auc=0.681). Real sweep IN FLIGHT (PID 19499)
+— `tsae_paper × seeds {42, 1, 2} × k_feats {5, 20}` at
+`n_steps=20_000, train_window_size=2`. Training rate 19 steps/sec
+→ ~18 min per training cell → ~1.1 hr full sweep.**
 
-- `git HEAD`: `68b4a30e` (`final`, post-stand-down). Pulled again to
-  check for the C3 baseline T=1 re-train briefing rewrite — not yet
-  landed; HEAD is at `68b4a30e` (agent_steer_100k wrap-up commit).
-  Next pull when wakeup directive arrives.
-- Pod: 1× H100 80GB, ephemeral, 2 TB RAM. Active GPU: **0 MiB / 0%**.
-- All in-flight processes killed: PIDs 17963 (bash wrapper) +
-  18034 (python) terminated 2026-05-05T12:50Z via `pkill -TERM`.
-- Active monitor stopped (was `bientohno`).
+- `git HEAD`: `2aa9f2b0` (`final`).
+- Pod: 1× H100 80GB, ephemeral, 2 TB RAM. Active GPU: ~3 GB used
+  during training, bouncing 0-100% util.
+- Mission scope (decisions § 15 split):
+  - **MINE**: `tsae_paper` × seeds {42, 1, 2} × k_feats {5, 20} at
+    `train_window_size=2, n_steps=20_000`.
+  - agent_nlp: `topk_sae` × seeds × k_feats at `train_window_size=1`.
+  - TXC archs unchanged (existing canonical sweep stands).
 
-### Status: IDLE — awaiting briefing rewrite
+### In flight (PID 19499, started 14:55:02Z)
 
-Per the stand-down's last paragraph:
-> Your next mission (when re-purposed) will be C3 baseline T=1
-> re-train. agent_paper is landing the framework change
-> (`train_window_size: int | None` on
-> `preloaded_batch_iter_from_act_cache` + `TrainingConfig`) and will
-> rewrite this briefing to redirect you to the C3 baseline re-train
-> (TopK_SAE + T-SAE × 3 seeds × 2 k_feats with
-> `TrainingConfig(train_window_size=1)`). Wait for the briefing
-> rewrite before resuming.
+`.venv/bin/python -m experiments.c3_probing_tsae_baseline.run
+--seeds 42 1 2 --k-feats 5 20` → `logs/c3_tsae_baseline_full_v2.log`.
+Persistent monitor `b0feanszg` watches for train + eval milestones.
 
-I will NOT launch any further MW work. I will NOT touch other
-components or take initiative without an explicit briefing rewrite.
+### Predicted train_keys (for verification)
 
-### Surviving artifacts from the rescinded MW pivot
+- `tsae_paper` seed=42 T=2 20K: `06053869c2b7e72b`
+- `tsae_paper` seed=1  T=2 20K: `e8f3355683e0a25f`
+- `tsae_paper` seed=2  T=2 20K: `8f717f87f3f9464a`
+- All distinct from agent_nlp's canonical T=None tsae_paper cells
+  (the T=None default is excluded from `model_dump(exclude_none=True)`,
+  so old keys preserved; new T=2 cells get fresh keys).
 
-In the leaderboard (do NOT clean up — append-only; canonical_train_keys
-filters at paper-render time):
+### Smoke artifacts
 
-- Smoke row: `train_key=e0ff471f7ddac586`, `eval_key=ad5811d28ec2aa73`
-  (txc_base_mw seed=42 k=5 n_steps=200, mean_auc=0.703). Filtered by
-  canonical_train_keys (n_steps=200 ≠ 20K canonical).
-- The interrupted real cell (txc_base_mw seed=42 k=5 n_steps=20K,
-  reached ~step 10000) did NOT land — runner only writes the row at
-  CELL DONE which never fired.
+Smoke leaderboard row landed:
+- arch=tsae_paper seed=42 k=5 n_steps=200 train_window_size=2
+- train_key=`13add3edc6b45d5a`, eval_key=`3115e8802fb9400a`
+- mean_auc=0.681, mean_acc=0.641, n_tasks=38 (sensible at 200 steps)
+- Will be filtered out by canonical_train_keys (n_steps=200 ≠ 20K).
+
+### Surviving artifacts from rescinded MW pivot (do NOT clean up)
+
+In leaderboard (filtered out by canonical_train_keys):
+- `eval_key=ad5811d28ec2aa73` (txc_base_mw seed=42 k=5 n_steps=200,
+  mean_auc=0.703).
 
 In manifest.jsonl:
-- `e0ff471f7ddac586` SAE-MW smoke checkpoint (1.3 GB, on HF). Harmless.
+- `e0ff471f7ddac586` SAE-MW smoke ckpt (1.3 GB, on HF). Harmless.
 
-In `experiments/c3_probing_mw/`:
-- `run.py` + `__init__.py`. Leave in place; agent_paper may delete or
-  repurpose. Per stand-down doc, it's the SAME no-touch convention as
-  `experiments/c6_em_100k/` from the previous abandoned mission.
+In code:
+- `experiments/c3_probing_mw/{run.py, __init__.py}` — left in place
+  per stand-down convention (parallel to `experiments/c6_em_100k/`).
 
 ### Old mission (C6 100K) artifacts that survive
-
-Both seed=42 100K headlines (paper-caveat references):
 
 - `397c345995d1acf2` (sae_arditi seed=42 14B-finance 100K, peak_align=82.11)
 - `155998b1fa5cee39` (txc_base seed=42 14B-finance 100K, peak_align=79.77)
 - + manifest entries `e5de419224108f98`, `0884a29eabb0030d`
 - Smoke row at `train_key=29d23894a05bfc12` (sae_arditi n_steps=200).
 
-### Prep on this pod, ready for next mission
+### Prep on this pod (re-used from prior MW mission)
 
 - Activation cache `e4916bcae1881963` (Gemma 2 2B IT L13) on disk.
 - Probe cache `results/probe_cache/gemma_2_2b_it_l13_fineweb_24k128/`
-  pulled (38 task dirs). Will be re-used by C3 baseline re-train.
+  on disk (38 task dirs from earlier `hf download`).
 - `peft 0.19.1` installed via `uv pip install` (from C6 mission).
+- `temp_bench` framework includes `train_window_size` kwarg on
+  `preloaded_batch_iter_from_act_cache` + `TrainingConfig`
+  (commits `5555e7eb` etc., 136/136 tests green).
 
 ## What I just did (agent owns — overwrite)
 
-1. 2026-05-05T12:00Z: read MW pivot briefing. C6 100K mission
-   abandoned. Killed C6 SAE seed=1 (PID 15425). GPU freed.
-2. Smoke-tested env (124+ pytest green). Verified `txc_base_mw` +
-   `txc_pro_mw` registered with `multi_window=True`, d_sae=18432.
-3. Confirmed `experiments.c3_probing.run` exports match briefing
-   sketch: `COMPONENT="c3"`,
-   `DATASOURCE="gemma_2_2b_it_l13_fineweb_24k128"`,
-   `EVAL_PROTOCOL_VERSION="1.1.0"`, `_real_training_cfg()`,
-   `my_train_fn`, `my_eval_fn` (top-level, not factories).
-4. Wrote `experiments/c3_probing_mw/{run.py, __init__.py}` —
-   driver imports agent_nlp's plumbing.
-5. Smoke v1 → KeyError on `_act_cache_key` (runner doesn't inject).
-   Fixed driver to also inject `_act_cache_key`, `_datasource_name`,
-   `smoke=False` per agent_nlp's run.py:292-301.
-6. Smoke v2 → FileNotFoundError on probe_cache. Pulled probe_cache
-   from HF (38 task dirs).
-7. Smoke v3 PASSED — txc_base_mw seed=42 k=5 200steps,
-   mean_auc=0.703, mean_acc=0.657, n_tasks=38.
-8. Launched real seed=42 sweep (PID 17963 → python 18034) at
-   2026-05-05T12:16:38Z. Training rate confirmed at 1.35 steps/sec
-   (matches smoke). Reached ~step 10000/20000 (50% of cell 1).
-9. Surfaced 2 OQs in briefing: OQ #3 (probe_cache not in
-   sync_from_hf.sh), OQ #4 (TXC-MW training rate ~5× slower than
-   briefing's estimate).
-10. Pushed `4217f4ba` to origin (driver + smoke + briefing).
-11. **2026-05-05T~12:50Z: STAND DOWN order received** —
-    `git pull` revealed rescinded MW pivot. Killed PIDs 17963 + 18034
-    via `pkill -TERM -f experiments.c3_probing_mw`. GPU back to 0
-    MiB / 0% util. Stopped active monitor `bientohno`.
-12. Pulled again — briefing rewrite for C3 baseline T=1 re-train
-    not yet landed (HEAD `68b4a30e`). Standing by.
+1. (Old MW pivot work from 12:00-12:50Z — abandoned. Smoke landed
+   row `eval_key=ad5811d28ec2aa73`; sweep killed at ~step 10000.
+   See "Surviving artifacts" above.)
+2. 2026-05-05T~14:50Z: pulled briefing rewrite for the new mission.
+   Verified framework change landed:
+   - `TrainingConfig.train_window_size: int | None = None` field;
+     when `None`, excluded from `model_dump(exclude_none=True)` so
+     old train_keys preserved.
+   - `preloaded_batch_iter_from_act_cache(..., train_window_size=...)`
+     kwarg.
+   - agent_nlp's `my_train_fn` passes through.
+3. Verified caches still on disk (act_cache `e4916bcae1881963` +
+   probe_cache 38 task dirs). No re-pull needed.
+4. Wrote `experiments/c3_probing_tsae_baseline/{run.py, __init__.py}`.
+   Imports `tsae_paper` arch + agent_nlp's plumbing; sets
+   `TrainingConfig(n_steps=20_000, train_window_size=2)` (Bhalla/Ye
+   2025 §3.1 adjacent pairs).
+5. **Smoke v1 PASSED** end-to-end in 1m46s (200 steps @ 19 steps/sec,
+   mean_auc=0.681). NO crashes — fresh framework, fresh imports clean.
+6. **Bug caught + fixed**: my driver's first attempt at the real
+   cells launched at `n_steps=25000` (schema default) instead of
+   the canonical 20000. Killed (PID 19169), edited
+   `TSAE_TRAINING_CFG = TrainingConfig(n_steps=20_000, ...)`,
+   relaunched. (Reduced ETA from ~1.4 hr to ~1.1 hr.)
+7. Real sweep launched (PID 19499) at 14:55:02Z. Persistent monitor
+   `b0feanszg` armed.
 
 ## Next action (agent owns — overwrite)
 
-1. **DO NOTHING until briefing rewrite lands.** Per stand-down §3,
-   agent_paper is landing the framework change
-   (`train_window_size` on `preloaded_batch_iter_from_act_cache`
-   + `TrainingConfig`) and rewriting this briefing for the
-   C3 baseline T=1 re-train mission. Wait for the explicit rewrite.
-2. When directive arrives: `git pull --rebase origin final` to read
-   the new mandate. Expected: TopK_SAE + T-SAE × 3 seeds × 2 k_feats
-   with `TrainingConfig(train_window_size=1)`.
-3. **Do NOT launch additional MW work** — no `c3_probing_mw`, no
-   `c5_steering_mw`, no `c6_em_mw`. The pivot is rescinded and any
-   such work would burn compute on the wrong direction.
-4. **Do NOT touch other components** (C5, C6, C7) — those are other
-   agents' territories.
-5. **Pod is idle and ready** for the next mission. `peft`, probe_cache,
-   activation caches, and venv all stay.
+1. **Wait for full T-SAE C3 baseline sweep to land** — persistent
+   monitor `b0feanszg` watches `logs/c3_tsae_baseline_full_v2.log`
+   for `step (5000|10000|15000|19000|20000)/`, `done in`,
+   `CELL DONE`, `all cells complete`, errors. Expected event count:
+   ~24 events over 6 cells (3 trainings × 5 step markers + 6 cell-
+   transition markers).
+2. **Verify each cell's row lands** via:
+   ```bash
+   grep "tsae_paper" results/leaderboard.jsonl | grep "agent_em_100k" | tail -6 | jq
+   ```
+   Expected: 6 rows total (3 seeds × 2 k_feats); fields `component=c3`,
+   `arch=tsae_paper`, `seed ∈ {42,1,2}`, `eval_protocol_version=1.1.0`,
+   `eval_cfg.k_feat ∈ {5,20}`, `mean_auc > 0.6` typical.
+3. **ETA cell 1 done ~15:13Z; full sweep done ~16:05Z.**
+4. **When done** (or before pod restart / `status: complete`):
+   `bash scripts/wrap_up_session.sh`.
+5. **Do NOT touch agent_nlp's territory** — agent_nlp is running
+   `topk_sae` at T=1 in parallel; their cells will land independently.
+6. **Do NOT render anything to docs/components/c3.md** — agent_nlp's.
 
 ## Don't repeat (agent owns — overwrite)
 
@@ -767,19 +767,29 @@ Both seed=42 100K headlines (paper-caveat references):
 
 ## Open questions for Han (agent owns — overwrite)
 
-### OQ #5 (NEW, 2026-05-05T12:50Z): stand-down clarifications
+### OQ #6 (NEW, 2026-05-05T14:55Z): briefing's TrainingConfig sketch had n_steps=20K but driver's `TrainingConfig(train_window_size=2)` defaults to schema 25K
 
-The stand-down section says "Wait for the briefing rewrite before
-resuming." Two questions I haven't seen answered explicitly:
+The briefing-rewrite Step 3 sketch was:
 
-1. **Should the smoke checkpoint (`train_key=e0ff471f7ddac586`,
-   `txc_base_mw seed=42 n_steps=200`) be deleted from HF?** The
-   stand-down says it's "harmless" because canonical_train_keys
-   filters by n_steps. But it occupies HF storage forever. I'll
-   leave it unless told to clean up.
-2. **Should `experiments/c3_probing_mw/run.py` be deleted?**
-   Stand-down implies "leave in place" (parallel to
-   `experiments/c6_em_100k/`). Doing nothing.
+```python
+TSAE_TRAINING_CFG = TrainingConfig(n_steps=20_000, train_window_size=2)
+```
+
+I initially wrote `TrainingConfig(train_window_size=2)` and didn't
+override n_steps explicitly — the schema default is 25_000 (not the
+canonical 20_000 that agent_nlp pins via `_real_training_cfg()`).
+Caught it after launching cell 1; killed and re-launched with
+n_steps explicit.
+
+**Question for Han / agent_paper**: should `TrainingConfig`'s
+`n_steps` default be lowered to 20_000 to match the canonical pin,
+or kept at 25_000 to match C6 (which uses 25K canonical)? Different
+components prefer different defaults — making the schema default a
+compromise. Currently I'm pinning explicitly per-cell.
+
+### OQ #5 (2026-05-05T12:50Z, MW stand-down clarifications)
+
+(Still open — same as before. No changes.)
 
 ### OQ #3 (2026-05-05T12:13Z): `sync_from_hf.sh` doesn't pull `probe_cache/`
 
