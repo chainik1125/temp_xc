@@ -7,8 +7,9 @@ Section ownership rules: PROTOCOL.md § 14.
 
 ---
 agent: agent_back
-last_state_update: 2026-05-04T15:55:00Z
+last_state_update: 2026-05-05T18:30:00Z
 component: c7
+status: complete
 ---
 
 ## Identity + mandate (Han owns — agents do not edit)
@@ -371,7 +372,38 @@ Old batch=256/30K + new batch=1024/25K cells stay in
 20K override; only batch=1024/n_steps=20K cells appear in
 AUTO-RESULTS.
 
-### v4 sweep (LIVE — launched 15:50, relaunched 16:05 with train_log)
+### v4 sweep — COMPLETE 2026-05-05 ~18:00 UTC
+
+All 7 archs landed in leaderboard with batch=1024 / n_steps=20_000 +
+preloaded `.clone()` batch_iter. Final results:
+
+| arch        | peak Δgc | mag   | stab  | PR-AUC@S=32 |
+|-------------|---------:|------:|------:|------------:|
+| txc_base    | +0.426   | -8.0  | 15/24 | 0.242       |
+| **txc_pro** | +0.377   | +12.0 | **19/24** | **0.271**   |
+| tfa         | +0.344   | +16.0 | 13/24 | 0.249       |
+| stacked_sae | +0.328   | +12.0 | 18/24 | 0.187       |
+| tsae_paper  | +0.246   | +16.0 | 13/24 | 0.242       |
+| topk_sae    | +0.230   | -16.0 | 13/24 | 0.215       |
+| mlc         | +0.164   | +16.0 | 13/24 | 0.252       |
+
+**Headline:**
+- TXC-pro WINS detection (PR-AUC@S=32 = 0.271, best of 7).
+- TXC-pro WINS stability (19/24, best of 7).
+- TXC-base wins peak Δgc (+0.426 at -8) by 13% over TXC-pro.
+- TXC family direction (peak at negative mag) matches Aniket's
+  hill-climbed TXC reference (peak at -12).
+- TXC-pro reproduces 77% of Aniket's TXC-H8 reference (+0.492);
+  hill-climbed TXC (+1.574) does NOT reproduce under our locked
+  arch — confirms decision #1's "two TXCs only, no hill-climbing."
+- All 7 archs converged at 20K (loss drop in final 1k: 0.09–0.31%,
+  all under the 5% under-converged threshold).
+
+c7.md status: complete. All checkpoints pushed to HF
+(`han1823123123/temp-bench-models`). All judge_outputs.jsonl + metrics
++ phase1 traces in `results/runs/<eval_key>/`.
+
+### v4 sweep (HISTORICAL — launched 15:50, relaunched 16:05 with train_log)
 
 Initial v4 launched 15:50 (PIDs 45886+45889) was killed at ~16:04 after
 ~14 min training to add train_log persistence per agent_paper's
