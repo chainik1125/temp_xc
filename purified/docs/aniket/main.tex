@@ -162,8 +162,8 @@ Here we introduce Temporal Crosscoders (Fig. \ref{fig:tx_arc}). Only half a page
 \section{Benchmarking Temporal Crosscoders in a synthetic setting}
 % Structure:
 % Par 1: Generalizing conventional setting.
-% Par 2: HMMs are a natural parameterization of the temporal features.
-% Par 3: Two cases we consider: vanilla case, hierarchical case.
+% Par 2: Factorial-HMM parameterization of the temporal features.
+% Par 3: Two cases we consider: independent leaky-reset chains, coupled features.
 % Par 4: Discussion/other stuff we train on.
 \label{sec:synthetic}
 % Summary figure
@@ -194,28 +194,6 @@ Here we introduce Temporal Crosscoders (Fig. \ref{fig:tx_arc}). Only half a page
     \label{fig:synthetic_overview}
 \end{figure*}%
 }
-% A major limitation of SAEs is the lack of a ground truth measure for feature recovery. In a synthetic setting, however, it is possible to define ground truth features \cite{chanin2025synthetic}. The current synthetic framework only defines features \textit{locally} at a sequence position. To appropriately benchmark temporal architectures, we first generalize to global features.
-
-% We first formalize the notion of a set of synthetic ground truth features.
-% % Urgh, above sentence is horrible, will rephrase.
-% % This below paragraph is needlessly formal and doesn't really help.
-% We define a family of ground truth features as the triple $G=(\mathcal{F},\mathcal{A},\mathcal{M})$, where $\mathcal{F}$ is a set of $N$ feature vectors  $\mathbf{f}\in\mathbb{R}^d$, $\mathcal{A}$ is a probability distribution over the set of binary indicator variables $\{0,1\}^N$ that denote the firing probabilities of the features, and $\mathcal{M}$ is a probability distribution over the firing magnitudes. A dataset of synthetic activations is then constructed as the distribution over the product of the features:
-% \begin{equation}
-%     \mathbf{x}=\sum_{i=1}^N\text{ReLU}(a_im_i\mathbf{f}_i)
-% \end{equation}
-% In the usual setting, the firing probabilities $a_i$ are independent of sequence position, although they may depend on the other firing probabilities
-
-
-% Synthetic datasets make it possible to evaluate feature recovery against known ground-truth features \cite{chanin2025synthetic}. Existing synthetic benchmarks define feature activations independently at each sequence position, so the ground truth is essentially local. In order to appropriately define ground truth \textit{temporal} features, therefore, we must generalize this setting.
-% \begin{definition}
-%     A set of \textit{ground truth features} $\mathcal{S}$ is specified by the triple $\mathcal{S}=(\mathcal{F},\mu,\nu)$, where $\mathcal{F}$ is a set of feature vectors $\mathcal{F}=\{\mathbf{f}_1,...,\mathbf{f}_N\}, f_{i}\in\mathbb{R}^d$,
-% \end{definition}
-
-% To do so, consider a synthetic activation vector $\mathbf{X}=(\mathbf{x}_1,...,\mathbf{x}_T)$, which consists of synthetic activations $\mathbf{x}_t\in\mathbb{R}^d$ in a temporal window of size $T$. We construct a dataset $\mathcal{D}$ consisting of samples of this vector from three pieces of data. First, a set of $N$ ground truth features $\mathcal{F}={\mathbf{f}_1,\ldots,\mathbf{text}}$. Second, a probability distribution $P_T$ over a set of firing probabilities $\mathbf{A}=(\mathbf{a}_1,\ldots,\mathbf{a}_T)$, where each of the $a_t$ is a vector of firing probabilities for each feature $a_t={0,1}^N$ Finally a distribution $M_T$ over the associated feature magnitudes $\mathbf{M=(m_1,\ldots,m_T)}$. Each activation vector sample is then constructed as:
-% \begin{equation}
-%     \mathbf{x}_t=\textrm{ReLU}(\sum_{i=1}^{N}a_{i,t}m_{i,t}\mathbf{f}_{i})
-% \end{equation}
-
 
 Synthetic datasets make it possible to evaluate feature recovery against known ground-truth features \cite{chanin2025synthetic}. Existing synthetic benchmarks define feature activations independently at each sequence position, so the ground-truth feature structure is local. To benchmark temporal architectures, we generalize this setting by making the feature-firing pattern a stochastic process across sequence positions.
 
@@ -229,161 +207,63 @@ defined over a temporal window of length $T$. A synthetic setting is specified b
 \[
     \mathcal{F}=\{\mathbf{f}_1,\ldots,\mathbf{f}_N\},
     \qquad
-    \mathbf{f}_i\in\mathbb{R}^d.
+    \mathbf{f}_i\in\mathbb{R}^d,
 \]
-Second, a probability distribution $P_T$ over binary feature-firing masks
+constructed by a deterministic orthogonalisation procedure with a target pairwise cosine similarity (so the directions are near-orthogonal but not perfectly so). Second, a probability distribution $P_T$ over binary feature-firing masks
 \[
     A=(\mathbf{a}_1,\ldots,\mathbf{a}_T)\in(\{0,1\}^N)^T,
+    \qquad
+    \mathbf{a}_t=(a_{t,1},\ldots,a_{t,N}),
 \]
-where
-\[
-    \mathbf{a}_t=(a_{t,1},\ldots,a_{t,N})
-\]
-and $a_{t,i}=1$ indicates that feature $i$ fires at position $t$. Third, a distribution $M_T$ over feature magnitudes
+where $a_{t,i}=1$ indicates that feature $i$ fires at position $t$. Third, a distribution $M_T$ over feature magnitudes
 \[
     M=(\mathbf{m}_1,\ldots,\mathbf{m}_T),
     \qquad
-    \mathbf{m}_t=(m_{t,1},\ldots,m_{t,N}).
+    \mathbf{m}_t=(m_{t,1},\ldots,m_{t,N}),
 \]
-A synthetic activation $\mathbf{x}_t$ is then constructed as:
+which we take to be i.i.d.\ half-normal across feature index and sequence position, $m_{t,i}\sim |\mathcal{N}(0,\sigma^2)|$. The synthetic activation at position $t$ is then
+\begin{equation}
+    \mathbf{x}_t=\sum_{i=1}^N a_{t,i}\,m_{t,i}\,\mathbf{f}_i.
+    \label{eq:synthetic-activation}
+\end{equation}
+Thus the feature directions specify what can be recovered, while the joint law $P_T$ specifies both the local and the temporal structure of when those features fire.
+
+The conventional, local synthetic setting is recovered as the special case in which $P_T$ factorises across sequence positions, $P_T(\mathbf{a}_{1:T})=\prod_{t=1}^T p_{\mathrm{loc}}(\mathbf{a}_t)$. More generally, local correlations are encoded by the one-position marginal over $\mathbf{a}_t$, while temporal correlations are encoded by the joint distribution over the sequence $\mathbf{a}_{1:T}$.
+
+\paragraph{Factorial-HMM parameterisation.}
+We parameterise $P_T$ as a \emph{factorial} hidden Markov model: rather than a single chain over the combinatorial mask alphabet $\{0,1\}^N$, we use $K$ independent two-state chains $h_{1:K}$, with $h_i(t)\in\{0,1\}$, and an emission map $\Phi:\{0,1\}^K\to\{0,1\}^N$ that produces the observed firing mask $\mathbf{a}_t=\Phi(\mathbf{h}_t)$. Each chain is parameterised by its stationary firing probability $\pi_i\in(0,1)$ and a lag-1 autocorrelation $\rho_i\in[0,1]$, and we use the \emph{leaky-reset} transition kernel
+\begin{equation}
+    T_i \;=\; (1-\lambda_i)\,\mathbf{I}_2 \;+\; \lambda_i\bigl[(1-\delta_i)\,R_{\pi_i} + \delta_i\,\mathbf{I}_2\bigr],
+    \qquad
+    R_{\pi_i}=\begin{pmatrix}1-\pi_i & \pi_i\\ 1-\pi_i & \pi_i\end{pmatrix},
+    \label{eq:leaky-reset}
+\end{equation}
+where $\lambda_i\in[0,1]$ is the resample rate and $\delta_i\in[0,1]$ is the leak parameter. With probability $1-\lambda_i$ the chain persists ($h_i(t)=h_i(t-1)$); with probability $\lambda_i$ it resamples from a Bernoulli whose mean is biased toward the previous state by $\delta_i$. The stationary distribution is $\pi_i$ for every $\delta_i\in[0,1]$, and the effective lag-1 autocorrelation is $\rho_i=1-\lambda_i(1-\delta_i)$, which exposes $(\pi_i,\rho_i)$ as the user-facing knobs (sparsity and temporal persistence) and reduces to the standard reset chain at $\delta_i=0$ \cite{chanin2025synthetic}. Magnitudes are sampled independently of the firing mask.
+
+A dictionary-learning architecture trained on $(\mathbf{x}_t)_t$ may attempt to recover either the \emph{local} ground truth---the $N$ emission directions $\mathcal{F}$, recovering the per-position firing mask $a_{t,i}$ at inference time---or the \emph{global} ground truth associated with the latent state, depending on the structure of $\Phi$.
+
+\paragraph{Two instantiations.}
+We benchmark dictionary-learning architectures on two specific instantiations of the factorial-HMM construction.
+
+\textit{(i) Independent chains ($K=N$, identity emission).}
+The simplest setting takes $K=N$ chains and the identity emission $\Phi(\mathbf{h})=\mathbf{h}$, so each ground-truth feature has its own independent leaky-reset chain. There is no distinction between local and global structure here: the ground truth is the set of $N$ feature directions, and the only temporal correlation is the per-feature autocorrelation $\rho_i$. This case isolates the question of whether a $T$-token window helps recover features whose firing pattern is temporally smooth without being temporally entangled across features.
+
+\textit{(ii) Coupled features ($K<M$, OR-gate emission).}
+The richer setting takes $K$ hidden chains and $M>K$ emission features, connected via a binary coupling matrix $C\in\{0,1\}^{M\times K}$ in which each emission $j$ has a fixed number of parents (typically two), drawn uniformly at random. The emission map is the OR gate
 \[
-    \mathbf{x}_t=\left(
-    \sum_{i=1}^N a_{t,i}m_{t,i}\mathbf{f}_i\right).
+    s_j(t) = \Phi_j(\mathbf{h}_t) = \mathbb{1}\!\left[\,\textstyle\sum_{i=1}^K C_{ji}\,h_i(t) \geq 1\,\right],
 \]
-Thus the feature directions specify what can be recovered, while the distribution $P_T$ specifies the local and temporal structure of when those features appear.
-
-
-
-% Old version, nicely simple, but not quite as sharp as would be helpful
-% Let $\mathbf{a}_t=(a_{t,1},\ldots,a_{t,N})\in\{0,1\}^N$ denote the binary vector of feature-firing indicators at sequence position $t$.
-The conventional, local, synthetic setting is then the special case when the distributions $P_T,M_T$ factorize over sequence positions, $
-P_{T}(\mathbf{a}_{1:T})=\prod_{t=1}^T p_{\mathrm{loc}}(\mathbf{a}_t),M_{T}(\mathbf{m}_{1:T})=\prod_{t=1}^T p_{\mathrm{loc}}(\mathbf{m}_t)$. Thus local correlations are encoded by the one-position distribution over $\mathbf{a}_t$, while temporal correlations are encoded by the joint distribution over the sequence $\mathbf{a}_{1:T}$.
-
-
-% It may help to give an introduction to HMMs in the appendix...
-% A natural parameterization of the temporal distribution $P_T$ is as a Hidden Markov Model (HMM). \cite{crutchfield1989inferring,crutchfield2012between,shai2024transformers,shai2026factored,shai2026factored}.
-% % \footnote{Since any distribution over sequences can be expressed as a GHMM, we can use this parameterization without loss of generality}.
-% % Any distribution over sequences admits a GHMM representation.
-% A HMM is defined by the four-tuple:
-% \begin{equation}
-% P_T=(\mathcal{\chi},\mathcal{S},\mathbf{\eta}^{\emptyset},\mathcal{T}),
-% \end{equation}
-% where $\chi$ is a local token vocabulary, which here is the binary firing mask $\{0,1\}^N$, $\mathcal{S}$ is a space of latent states, $\eta^{\emptyset}$ an initial probability distribution over latent states, and $\mathcal{T}$ is a set of transition matrices whose matrix elements correspond to the joint conditional probability of transition from one state to another on emission of token $x$:  $T^{x}_{s,s'}=Q(s',x|s), T^{(x)}\in\mathcal{T}$.
-
-
-A natural way to specify a temporally structured mask distribution $P_T$ is by an
-edge-emitting hidden Markov presentation, following the convention used in
-computational mechanics
-\cite{crutchfield1989inferring,crutchfield2012between,shai2024transformers,shai2026factored}.
-We write such a presentation as
+so emission $j$ fires whenever \emph{any} of its parent hidden states is on. The observation is then $\mathbf{x}_t = \sum_{j=1}^M s_j(t)\,m_{j,t}\,\mathbf{f}_j$ with $\mathbf{f}_j\in\mathbb{R}^d$ the emission directions. This setup has a genuine separation between local and global ground truth: the emission directions $\{\mathbf{f}_j\}_{j=1}^M$ are the local ground truth ($M$ directions, one per emission feature), while the global ground truth is the set of $K$ hidden-state directions
 \[
-    \mathcal{H}=(\mathcal{X},\mathcal{S},\boldsymbol{\eta}^{\emptyset},\{T^{(x)}\}_{x\in\mathcal{X}}),
+    \tilde{\mathbf{f}}_i \;=\; \mathrm{normalize}\!\left(\textstyle\sum_{j:\,C_{ji}=1} \mathbf{f}_j\right),
+    \qquad i=1,\ldots,K,
 \]
-where the observed alphabet is the set of local firing masks
-\[
-    \mathcal{X}=\{0,1\}^N.
-\]
-Thus each emitted symbol $x\in\mathcal{X}$ is a full binary vector indicating
-which features fire at a single sequence position. The set $\mathcal{S}$ is the
-latent state space, $\boldsymbol{\eta}^{\emptyset}\in\Delta(\mathcal{S})$ is the
-initial distribution over latent states, and $T^{(x)}$ is the symbol-labeled
-transition matrix with entries$T^{(x)}_{s,s'}=\Pr(s_{t+1}=s',\, \mathbf{a}_t=x \mid s_t=s).$
-% These matrices satisfy
-% \[
-%     \sum_{x\in\mathcal{X}}\sum_{s'\in\mathcal{S}} T^{(x)}_{s,s'} = 1
-%     \qquad \text{for each } s\in\mathcal{S}.
-% \]
+each defined as the normalised mean of its children's emission directions. We score recovery against both axes: a \emph{local} AUC against the $M$ emission directions, and a \emph{global} AUC against the $K$ hidden-state directions. Because the OR gate causes co-firing of $C$-related emissions, a per-token dictionary that recovers $\mathbf{f}_j$'s separately will struggle to identify the underlying $K$-dimensional latent structure, while a temporal-window dictionary has access to the cross-position co-firing pattern that determines~$C$.
 
-The HMM presentation then generates the distribution over firing patterns as a sequence of updates over the initial state vector:
-\[
-    P_T(\mathbf{a}_{1:T})
-    =
-    \boldsymbol{\eta}^{\emptyset\top}
-    T^{(\mathbf{a}_1)}
-    T^{(\mathbf{a}_2)}
-    \cdots
-    T^{(\mathbf{a}_T)}
-    \mathbf{1}.
-\]
-A dictionary learning architecture may hence learn to recover the \textit{local} feature firing probabilities $a_{i,t}$ or it may learn to recover the \textit{global} latents $s_t\in\mathcal{S}$.
+The factorial-HMM presentation in \cref{eq:leaky-reset} also subsumes a third structure that we use for ablations and report in \cref{app:synthetic-extras}: an event-block factorial HMM in which the emission map $\Phi$ partitions emissions into non-overlapping blocks, each driven by a single hidden chain (a hard version of (ii) with $C$ block-structured), giving features that fire in correlated bursts.
 
-We benchmark dictionary learning architectures on two special cases of HMM.
-
-% each $\mathbf{a}_t$ is drawn independently from a distribution $p_{\mathrm{loc}}$ over $\{0,1\}^N$. This distribution need not factorize across features, and therefore can encode arbitrary same-position correlations: features may co-occur, be mutually exclusive, or follow any prescribed sparse firing pattern. To extend this setting temporally, we promote $p_{\mathrm{loc}}$ to a distribution over all stochastic process over binary firing vectors,
-% $
-%     \mathbf{a}_{1:T} \sim P_{T}.
-% $
-% The local setting is recovered when the full distribution $P_T$ factorizes over sequence positions:
-% \[
-%     P_{\mathrm{temp}}(\mathbf{a}_{1:T})
-%     =
-%     \prod_{t=1}^T p_{\mathrm{loc}}(\mathbf{a}_t).
-% \]
-% More generally, we can choose $P_{\mathrm{temp}}$ so that each marginal $\mathbf{a}_t$ has distribution $p_{\mathrm{loc}}$, preserving the local feature-correlation structure, while allowing dependence between $\mathbf{a}_t$ and $\mathbf{a}_{t'}$ across positions.
-% Thus local correlations are encoded by the one-position distribution over $\mathbf{a}_t$, while temporal correlations are encoded by the joint distribution over the sequence $\mathbf{a}_{1:T}$.
-
-% A hidden Markov model provides a natural parameterization of such a temporal distribution. We introduce latent states $z_{1:T}$ with Markov dynamics,
-% \[
-%     p(z_{1:T}) = p(z_1)\prod_{t=2}^T p(z_t \mid z_{t-1}),
-% \]
-% and let each state emit a binary feature-firing vector,
-% \[
-%     \mathbf{a}_t \sim q_{z_t}(\mathbf{a}).
-% \]
-% The emission distributions $q_z$ are distributions over the full vector $\mathbf{a}_t\in\{0,1\}^N$, so they may themselves encode local correlations between features. The Markov dynamics over $z_t$ then introduce temporal structure, causing feature-firing patterns to persist, switch, or recur across sequence positions. In this sense, the HMM promotes the original local correlated feature model into a temporally structured one.
-
-
-
-% \paragraph{Synthetic temporal feature setting.}
-
-% \paragraph{Synthetic temporal feature setting.}
-% Fix a sequence length $T$, activation dimension $d$, and number of ground-truth features $N$. Define the mask space
-% \[
-%     \mathcal{B}_{N,T} := (\{0,1\}^N)^T .
-% \]
-% An element $A\in\mathcal{B}_{N,T}$ is written
-% \[
-%     A=(\mathbf{a}_1,\ldots,\mathbf{a}_T),
-%     \qquad
-%     \mathbf{a}_t=(a_{t,1},\ldots,a_{t,N})\in\{0,1\}^N,
-% \]
-% where $a_{t,i}=1$ means that feature $i$ fires at position $t$. A synthetic temporal feature setting is specified by a tuple
-% \[
-%     \mathcal{S}_T=(\mathcal{F},\mu_T,\nu_T),
-% \]
-% where $\mathcal{F}=\{\mathbf{f}_i\}_{i=1}^N\subset\mathbb{R}^d$ is the set of ground-truth feature directions, $\mu_T$ is a probability mass function on $\mathcal{B}_{N,T}$,
-% \[
-%     \mu_T:\mathcal{B}_{N,T}\to[0,1],
-%     \qquad
-%     \sum_{A\in\mathcal{B}_{N,T}}\mu_T(A)=1,
-% \]
-% and $\nu_T$ is a distribution over firing magnitudes $M=(m_{t,i})\in\mathbb{R}_{\geq 0}^{T\times N}$, possibly conditional on $A$. We generate
-% \[
-%     A\sim \mu_T,
-%     \qquad
-%     M\sim \nu_T(\cdot\mid A),
-% \]
-% and define the synthetic activation at position $t$ by
-% \[
-%     \mathbf{x}_t
-%     =
-%     \sum_{i=1}^N a_{t,i}m_{t,i}\mathbf{f}_i .
-% \]
-% Thus all sparsity, local feature correlation, and temporal structure are contained in the mask law $\mu_T$.
-
-
-
-
-% We keep a fixed set of ground-truth feature directions $\mathcal{F}=\{\mathbf{f}_i\}_{i=1}^N \subset \mathbb{R}^d$, but replace the per-position firing indicators with a sequence of binary variables $a_{t,i}\in\{0,1\}$. These indicators are emitted by a hidden Markov model: a latent state sequence $z_{1:T}$ evolves according to Markov dynamics, and each state $z_t$ defines a distribution over the feature-firing vector $\mathbf{a}_t=(a_{t,1},\ldots,a_{t,N})$. Given firing magnitudes $m_{t,i}$, the synthetic activation at position $t$ is
-% \begin{equation}
-%     \mathbf{x}_t = \sum_{i=1}^N a_{t,i} m_{t,i} \mathbf{f}_i .
-% \end{equation}
-% This recovers the usual sparse synthetic setting when the firing indicators are independent across positions, but the HMM generalization allows features to persist, switch on and off in correlated bursts, or co-occur according to latent temporal states.
-
-
-% Do we want to say we have random variables {A_1,...,A_H} for each
-
-% TODO: "real world is probably the wrong phrasing here
+\paragraph{Magnitudes and feature directions.}
+We sample magnitudes $m_{t,i}\sim|\mathcal{N}(0,\sigma^2)|$ i.i.d.\ across both feature index and sequence position. Feature directions $\{\mathbf{f}_j\}$ are constructed by gradient-based orthogonalisation against a target pairwise cosine similarity $c^\star\in[0,1)$, so they range from perfectly orthogonal at $c^\star=0$ to mildly entangled at moderate $c^\star$; the entanglement parameter is held fixed across architectures within a sweep so that any difference in recovery is attributable to the architecture rather than to the geometry of the ground truth.
 
 \section{Qualitative analysis of features in large scale models}
 \newpage
