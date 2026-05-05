@@ -616,6 +616,35 @@ pass to `make_training_cfg` from `txc_base` to `txc_base_mw`; nothing
 in their training config logic needs to change. Same Bricken plumbing,
 new sampling under the hood.
 
+**Bricken resample-rate caveat under multi-window** (agent_em
+decision-point at C6 MW deploy): `bricken_resample_every` is in step
+count, not in token count. Under `multi_window=True` each step
+processes N× more token-windows (N=10 for TXC-base at C6's
+seq_len=128, T_max=10, max_shift=2). Two equivalent framings:
+
+1. **Keep `bricken_resample_every=500`** (current default). Resample
+   triggers every 500 steps regardless of mode. Under MW this is N×
+   more aggressive intervention per token — dead features get caught
+   ~10× faster (in token units) than under non-MW. Defensible: dead
+   features ARE seen 10× more data per step, so 10× more frequent
+   intervention is arguably correct.
+
+2. **Scale up to `bricken_resample_every=5000`** (rate-equivalent to
+   non-MW). Resample triggers at the same per-token rate as the
+   historical baseline, so the Bricken behavior is invariant to the
+   sampling-mode change. Cleaner if you want a strictly
+   apples-to-apples comparison of "TXC + Bricken at multi-window vs
+   single-window" at the algorithm level.
+
+Other Bricken counters (`dead_threshold_tokens`, `bricken_n_check`,
+`bricken_max_resample_fraction`) are already in token / fraction
+units and don't need adjustment.
+
+agent_em decides at C6 MW deploy time which framing they want; the
+choice goes into `make_training_cfg` for the MW cells. The
+historical non-MW C6 cells stay at `bricken_resample_every=500` (no
+retroactive change). Document the choice in c6.md caveats.
+
 **Estimated re-train cost when we deploy**: ~24 TXC cells across C3,
 C5, C6, C7. Per-cell wall-time should be **roughly the same as
 before** because the data path stays the same (preloaded `.clone()`
