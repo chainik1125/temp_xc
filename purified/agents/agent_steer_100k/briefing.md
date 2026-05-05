@@ -9,7 +9,7 @@ Section ownership: PROTOCOL.md § 14.
 
 ---
 agent: agent_steer_100k
-last_state_update: 2026-05-05T13:00:00Z
+last_state_update: 2026-05-05T14:22:00Z
 component: c7 (multi-window deployment for backtracking)
 ---
 
@@ -453,52 +453,96 @@ Step 6 — monitor + verify rows land at `arch=txc_base_mw` /
 
 ## Current state (agent owns — overwrite at every compact)
 
-**Last verified: 2026-05-05T13:00Z (mission pivot — directive received from
-Han / agent_paper). C5 MW mission abandoned (CPU-bandwidth bottleneck;
-agent_filler's parallel sweep covers C5 MW). New mission: deploy
-multi-window TXC archs at C7 backtracking for agent_back.**
+**Last verified: 2026-05-05T14:22Z (C7 MW pivot executed — driver
+written, bug fix landed, smoke passed end-to-end, full 2-cell sweep
+launched).**
 
-- `git HEAD`: at or after `8098d137` (agent_back's decoder-norm false
-  alarm). Pull on session start.
-- Pod: 1× H100, ephemeral, 240 GB RAM. `/workspace/temp_xc/` clone.
-  This is the SAME pod you've been on; the mission shifts but the
-  pod stays.
-- In flight (TO BE KILLED on session start): C5 MW cells from the
-  abandoned mission. Identify via `ps -ef | grep c5_steering`.
-- C5 MW cell that landed (kept as bonus data):
-  `txc_base_mw` seed=42 C5, `eval_key=963df9c69213f998`. agent_paper
-  / agent_steer can use this for diff against agent_filler's parallel
-  sweep when both complete.
-- Last leaderboard append: from C5 MW (the 1 cell above).
-- Recent decisions in scope: `decisions.md` § 1 (canonical TXCs are
-  `txc_base_mw` / `txc_pro_mw` going forward), § 7 (Bricken off for
-  C7), § 12 (canonical training cfg), § 14 (multi-window deployment).
+- `git HEAD`: just after `cd3020c9` (agent_paper C7 pivot directive).
+- Pod: 1× H100 80GB, ephemeral, 240 GB RAM, `/workspace/temp_xc/purified`.
+  Same pod as before.
+- Driver: `experiments/c7_backtracking_mw/{__init__.py, run.py}`. Imports
+  agent_back's `DATASOURCE`, `EVAL_PROTOCOL_VERSION`, `my_eval_fn`.
+  Adds `_build_full_seq_batch_iter` + `my_train_fn_mw` (full-seq batch_iter
+  for MW, bf16 cast for >1B archs at d_in=4096/d_sae=32768). Inherits
+  OMP/MKL/torch threads=32 cap from C5 MW pattern.
+- **C7 MW smoke #1** (txc_base_mw seed=42 n_steps=200) — **CRASHED** in
+  eval phase on a `FileNotFoundError`: `extract_labeled_sentence_acts`
+  used `tmp_path = cache_path.with_name(cache_path.name + ".tmp")`, which
+  produces `sentence_acts_L10.npz.tmp`, but `np.savez_compressed`
+  auto-appends `.npz` if the path doesn't already end in `.npz`, so the
+  actual file written was `sentence_acts_L10.npz.tmp.npz` and the
+  rename target didn't exist. Bug authored by agent_back commit
+  `77b68f93`; they never re-built the cache so didn't trigger it.
+- **Fix**: one-line change in `src/temp_bench/case_studies/backtracking.py:1232`,
+  use `cache_path.stem + ".tmp.npz"` (already ends in `.npz`) so the
+  saved file lands at exactly `sentence_acts_L10.tmp.npz`, then
+  `tmp_path.replace(cache_path)` works. PROTOCOL § 3 "shared code,
+  small additive PR".
+- **Workaround**: renamed the existing valid `.tmp.npz` (1.1 GB) →
+  `sentence_acts_L10.npz` so smoke #2 could proceed without re-mining.
+- **C7 MW smoke #2 PASSED at 14:20:29Z**: training cached, eval ran
+  end-to-end (Phase 1 unsteered → Phase 2 1525 panels generated → Phase
+  3 Sonnet judge → Phase 4 PR-AUC). 44 min wall (≈40 min eval). Headline
+  `delta_gc_peak=0.787` (artificially high, 200 steps is undertrained
+  — irrelevant for pipeline validation). HF push succeeded
+  (`14d49c561fdc0b00`). eval_key `e868a6e19d784977`.
+- **Full 2-cell sweep launched 14:22:06Z**, PID 11191, `/tmp/p_c7_mw`.
+  Sequence `txc_base_mw seed=42` → `txc_pro_mw seed=42`. Persistent
+  Monitor `bdi23qf73`. ETA per agent_paper: ~3-3.5 hr txc_base_mw +
+  ~5-6 hr txc_pro_mw = ~9 hr serial total. Within sprint window.
+- **Old work preserved**: 1 C5 MW smoke row (`963df9c69213f998`,
+  smoke=True) and 1 C5 MW partial cell training (txc_base_mw seed=42 @
+  step 14000/20K, killed mid-flight per pivot — no leaderboard row,
+  agent_filler covers C5 MW). 100K tsae_paper seed=42 cell on HF as
+  `c0729094920eb9f0`. v1.0.0 buggy rows filter-excluded.
+- Recent decisions in scope: `decisions.md` § 1 (canonical TXCs now
+  `txc_base_mw` / `txc_pro_mw`), § 7 (Bricken off C7), § 12 (canonical
+  training cfg), § 14 (multi-window deployment).
 
 ## What I just did (agent owns — overwrite)
 
-- 2026-05-05T13:00Z: agent_paper rewrote this briefing per Han's
-  pivot directive. C5 MW mission abandoned (slow per-step on this
-  H100; agent_filler covers C5 MW on 8× A40 in parallel). New
-  mission is C7 MW helper for agent_back (2 cells at canonical 20K).
+Newest first.
 
-(Overwrite this section with your own actions when you start.)
+- **14:22:06Z launched full C7 MW 2-cell sweep** — `txc_base_mw + txc_pro_mw
+  × seed=42` at canonical 20K. PID 11191. Persistent Monitor `bdi23qf73`
+  armed.
+- **14:20:29Z C7 MW smoke #2 PASSED** end-to-end. eval_key
+  `e868a6e19d784977`, train_key `14d49c561fdc0b00`. Pipeline validated:
+  full Stage A + mining + magnitude grid + Sonnet judge + PR-AUC.
+- **13:35Z fixed `extract_labeled_sentence_acts` rename bug** in
+  `src/temp_bench/case_studies/backtracking.py:1232`. One-line change.
+  Workaround applied to existing on-disk artifact so smoke could proceed.
+- **13:20Z C7 MW smoke #1 ran** to eval phase, crashed on the rename
+  bug. Training itself succeeded (1.3B-param bf16 cast OK, checkpoint
+  pushed to HF).
+- **13:15Z wrote `experiments/c7_backtracking_mw/{__init__.py, run.py}`**.
+  Pattern from agent_em's `c6_em_mw/run.py` adapted to C7. Reuses
+  agent_back's `my_eval_fn` directly; only `my_train_fn_mw` is new
+  (full-seq batch_iter + bf16 for >1B archs).
+- **13:08Z killed C5 MW sweep** (PID 9201) per agent_paper's pivot
+  directive. Cell 1 at step 14000/20K (70%) — training discarded.
+  agent_filler covers C5 MW on 8× A40 with parallel speedup.
+- **13:08Z pulled agent_paper's pivot rewrite** (commit `cd3020c9`).
+  Briefing now points to C7 MW helper mission for agent_back.
 
 ## Next action (agent owns — overwrite)
 
-1. `cd $(git rev-parse --show-toplevel)/purified`
-2. `source scripts/set_agent_env.sh agent_steer_100k`
-3. `bash scripts/agent_smoke_test.sh` — expect 131/131 + preflight green.
-4. `git pull --rebase origin final`.
-5. **Kill in-flight C5 MW processes** per "First concrete task" Step 0.
-6. Verify MW arch + agent_back's c7_backtracking module per Step 1.
-7. Sync Llama cache + sentence-acts cache per Step 2 (if not already
-   on disk).
-8. Write `experiments/c7_backtracking_mw/run.py` per Step 3. Reference
-   agent_em's `c6_em_mw/run.py` (commit `03facd49`) for the
-   full-sequence batch_iter + my_train_fn_mw pattern.
-9. Smoke-test ONE cell at `n_steps=200` per Step 4.
-10. Launch the 2-cell sweep per Step 5.
-11. Monitor + verify leaderboard rows.
+1. **Watch persistent Monitor `bdi23qf73`** for cell-completion markers.
+   As each cell finishes:
+   - `tail -1 results/leaderboard.jsonl` — verify new C7 MW row at
+     `eval_protocol_version=1.0.0` (C7 canonical).
+   - `tail -1 checkpoints/manifest.jsonl | jq .hf_url` — verify auto-push.
+2. **If `txc_pro_mw` OOMs** (matryoshka × multi-distance × MW at Llama
+   d_sae=32768 is unprecedented): briefing's mitigation = drop batch_size
+   to 512. Effective B*N still > non-MW B=1024.
+3. **Periodic sanity checks** via ScheduleWakeup every ~1 hr.
+4. **After both cells land**: do NOT run `report.render(component='c7')`
+   — agent_back's territory. Just confirm 2 new MW rows and stop.
+5. **Before session-end / context-compact**: overwrite this briefing's
+   bottom sections. Run `bash scripts/wrap_up_session.sh`.
+6. Compare MW headline against agent_back's non-MW canonical cells
+   once both land (agent_back's txc_base seed=42 = 0.42 / txc_pro seed=42
+   = 0.377 from the v4 sweep).
 
 ## Don't repeat (agent owns — overwrite)
 
@@ -532,6 +576,22 @@ multi-window TXC archs at C7 backtracking for agent_back.**
 
 ## Open questions for Han (agent owns — overwrite)
 
-(None at briefing-rewrite time. Surface anything that comes up
-during the kill-C5-MW step or smoke test — especially if the
-txc_pro_mw OOMs at C7 scale despite the H100's 80 GB.)
+1. **Bug fixed in shared code** (`src/temp_bench/case_studies/backtracking.py:1232`).
+   `extract_labeled_sentence_acts`'s atomic-write rename was broken because
+   `np.savez_compressed` auto-appends `.npz`. agent_back's commit `77b68f93`
+   wrote the buggy version but never re-built the cache so didn't trigger
+   it. I applied a one-line fix (use `cache_path.stem + ".tmp.npz"` so the
+   tmp name already ends in `.npz` and savez doesn't append). PROTOCOL § 3
+   "shared code, additive PR" — flagging for transparency, not asking
+   permission. agent_back may want to verify on their A40 pod next time
+   they re-build the cache.
+
+2. **Watching for `txc_pro_mw` OOM at C7 scale**. Llama d_in=4096,
+   d_sae=32768 + MW (B*N=10240) + matryoshka (8 groups) + multi-distance
+   InfoNCE (B*N)² is an unprecedented combo. agent_paper's analysis says
+   80 GB H100 fits with margin; if it OOMs, mitigation is batch_size=512.
+
+3. **MW vs non-MW comparison once both land**: agent_back's canonical
+   non-MW cells (per their leaderboard rows): txc_base seed=42 ≈ 0.42,
+   txc_pro seed=42 = 0.377. My MW cells will give the apples-to-apples
+   per-arch parity comparison agent_back's headline needs.

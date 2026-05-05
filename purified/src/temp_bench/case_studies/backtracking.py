@@ -1229,7 +1229,9 @@ def extract_labeled_sentence_acts(
     # concurrent readers seeing a partially-written zip
     # (np.savez_compressed writes incrementally; mid-write the file is
     # not a valid zip → callers get `zipfile.BadZipFile`).
-    tmp_path = cache_path.with_name(cache_path.name + ".tmp")
+    # NB: np.savez_compressed auto-appends ".npz" if the path doesn't
+    # already end in ".npz", so use a temp name that already does.
+    tmp_path = cache_path.with_name(cache_path.stem + ".tmp.npz")
     np.savez_compressed(tmp_path, X=X, is_bt=is_bt_arr, keys=keys_arr)
     tmp_path.replace(cache_path)
     log.info("[c7] cached sentence acts to %s", cache_path)
