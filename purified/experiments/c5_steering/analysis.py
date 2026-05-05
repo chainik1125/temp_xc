@@ -404,6 +404,76 @@ def run_analysis() -> AnalysisResult:
         f"(../../experiments/c5_steering/plots/{pareto_plot.name})"
     )
 
+    # ── Detection axis (eval_protocol_version=1.2.0) ─────────────────
+    # Per agent_paper 2026-05-05 PM: detection cells live alongside
+    # steering cells under the same train_keys but bumped eval_protocol.
+    detection_rows = [
+        r for r in all_rows
+        if r.eval_protocol_version == "1.2.0"
+        and r.eval_cfg.get("metric_set") == "detection"
+        and r.train_key in valid_train_keys
+        and not r.eval_cfg.get("smoke", False)
+    ]
+    if detection_rows:
+        md_lines.append("")
+        md_lines.append("---\n")
+        md_lines.append(
+            f"### Detection — sparse-probe PR-AUC ({len(detection_rows)} cells)\n"
+        )
+        md_lines.append(
+            "**Behavior B**: continuation has steered sentiment per Sonnet "
+            "judge (success_grade ≥ 2 AND coh_grade ≥ 2.0). Sparse linear "
+            "probe on encoded SAE / TXC / TFA features, GroupKFold by "
+            "concept_id (5 folds). Within-window shuffle ablation with "
+            "`shuffle_seed=42` is mandatory for any temporal arch — a "
+            "detection signal that survives intra-window shuffle is "
+            "window-density, not temporal.\n"
+        )
+        md_lines += [
+            "| arch | n seeds | PR-AUC S=1 | PR-AUC S=2 | PR-AUC S=4 | PR-AUC S=8 | PR-AUC S=16 | PR-AUC S=32 | shuffle gap S=8 | positive rate |",
+            "|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
+        ]
+        det_by_arch: dict[str, dict[str, list[float]]] = defaultdict(
+            lambda: defaultdict(list)
+        )
+        det_seeds_by_arch: dict[str, set[int]] = defaultdict(set)
+        for r in detection_rows:
+            det_seeds_by_arch[r.arch].add(int(r.seed))
+            for k, v in r.metrics.items():
+                if isinstance(v, (int, float)):
+                    det_by_arch[r.arch][k].append(float(v))
+        results["detection_by_arch"] = {}
+        for arch in sorted(det_by_arch):
+            m = det_by_arch[arch]
+            n_seeds = len(det_seeds_by_arch[arch])
+            md_lines.append(
+                f"| {arch} | {n_seeds} | "
+                f"{_ms(m.get('pr_auc_S1', []))} | "
+                f"{_ms(m.get('pr_auc_S2', []))} | "
+                f"{_ms(m.get('pr_auc_S4', []))} | "
+                f"{_ms(m.get('pr_auc_S8', []))} | "
+                f"{_ms(m.get('pr_auc_S16', []))} | "
+                f"{_ms(m.get('pr_auc_S32', []))} | "
+                f"{_ms(m.get('shuffle_gap_S8', []))} | "
+                f"{_ms(m.get('positive_rate', []))} |"
+            )
+            results["detection_by_arch"][arch] = {
+                "n_seeds": n_seeds,
+                **{
+                    f"mean_{k}": sum(v) / len(v) if v else float("nan")
+                    for k, v in m.items()
+                },
+                **{f"stderr_{k}": _stderr(v) for k, v in m.items()},
+            }
+        md_lines.append("")
+        md_lines.append(
+            "_Headline scalar: **`pr_auc_S8`** — middle of the S grid; "
+            "matches the C7 detection convention. `shuffle_gap_S8` = "
+            "PR-AUC − within-window-shuffled PR-AUC; positive ⇒ "
+            "genuine temporal signal. Per-token archs (T=1) shuffle is "
+            "a no-op so `shuffle_gap_S8 ≈ 0` is expected, not a defect._"
+        )
+
     return AnalysisResult(
         markdown="\n".join(md_lines) + "\n",
         results=results,
