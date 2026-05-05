@@ -108,7 +108,14 @@ def test_train_key_is_dict_order_invariant():
 
 def test_locked_arch_registry_has_expected_names():
     names = set(list_archs())
-    expected = {"topk_sae", "tsae_paper", "tfa", "tfa_pos", "mlc", "sae_arditi", "txc_base", "txc_pro"}
+    expected = {
+        "topk_sae", "tsae_paper", "tfa", "tfa_pos", "mlc", "sae_arditi",
+        "txc_base", "txc_pro",
+        # MW (multi-window training) variants — same Python class as
+        # txc_base / txc_pro respectively, with multi_window=true baked
+        # into hparams. See decisions.md § 14.
+        "txc_base_mw", "txc_pro_mw",
+    }
     missing = expected - names
     assert not missing, f"Missing locked archs: {missing}"
 

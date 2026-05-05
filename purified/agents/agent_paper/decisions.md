@@ -23,6 +23,18 @@ winners (Galaxy 8/11/18) were considered and rejected because they lose
 **Trade-off accepted**: C5 steering becomes a "matches T-SAE at high coh"
 result rather than a "beats T-SAE" result. C3+C4 wins are stronger.
 
+**Addendum 2026-05-05** (Han + agent_paper): the canonical paper TXCs
+going forward are `txc_base_mw` and `txc_pro_mw` — same encoder/decoder
+weights as `txc_base` / `txc_pro`, with `multi_window: true` in hparams
+that fixes the per-step training-FLOPs disparity vs per-token archs (see
+§ 14). The original `txc_base` / `txc_pro` entries stay registered as
+the historical pre-fix baseline; their cells from the in-flight sweep
+remain in `leaderboard.jsonl` for diff comparison and don't need
+re-running. Paper text continues to refer to them as "TXC-base" and
+"TXC-pro"; the `_mw` suffix is implementation detail at the registry
+layer. The "two TXCs only" rule still holds at the paper-claim level —
+the four registry entries reduce to two architecturally-identical pairs.
+
 ### 2. C6 EM is reframed as honest negative
 
 **Finding**: Dmitry's `em_nanda_results_paper.md` shows SAE arditi beats
@@ -528,35 +540,91 @@ write at fresh keys, old cells stay in the leaderboard for diff. Per-token
 archs are unaffected because their hparams don't change. **Only TXC cells
 need re-training when we flip the switch.**
 
-**YAML convention** (important — avoid a footgun):
+**Deployment as separate registry entries** (revised 2026-05-05 PM with
+Han): the toggle goes into the YAML by way of two NEW arch entries —
+`txc_base_mw` and `txc_pro_mw` — pointing at the same Python classes
+as `txc_base` / `txc_pro` but with `multi_window: true` baked into
+hparams. **Not** a flip-the-toggle approach on the existing names.
 
-- Do NOT add `multi_window: false` to YAML hparams. The default kwarg
-  is False; the absence of the key produces the same behavior, and the
-  hash includes only present hparams (so no key = same hash as before).
-- When ready to flip, ADD `multi_window: true` to the `hparams` block
-  for `txc_base` and `txc_pro` in `configs/locked_archs.yaml`. This
-  changes the hash → invalidates old cells.
+Why separate entries instead of toggling the existing names:
 
-**Status (2026-05-05)**: code + tests landed. YAML NOT YET FLIPPED —
-default off, in-flight runs untouched. The flip is a coordinated
-worker-team event:
-1. agent_paper edits `configs/locked_archs.yaml` to set
-   `multi_window: true` for both TXC archs.
-2. Workers pull → their `canonical_train_keys()` filter now points at
-   new train_keys → AUTO-RESULTS auto-filters out the old TXC cells.
-3. Workers re-run TXC cells only (per-token archs are unaffected; their
-   train_keys are stable).
-4. agent_paper updates this § with the flip date + cell-count summary.
+- **Self-documenting leaderboard**: any row with `arch=txc_base_mw`
+  is unambiguously a multi-window cell; any row with `arch=txc_base`
+  is unambiguously the historical baseline. No need to cross-reference
+  hparams to interpret a leaderboard row.
+- **Robust against driver-script typos**: a worker writing a one-off
+  `TrainingConfig(...)` cell can't accidentally produce a multi-window
+  result under `arch_name="txc_base"` — the YAML enforces the
+  correspondence between arch name and `multi_window` value.
+- **Workers' arch lists become explicit**: their `archs=[…]` argument
+  to `canonical_train_keys()` directly says which sweep is canonical
+  for an analysis. Switching the canonical from old to new is a list
+  edit, not a YAML edit at the policy level.
 
-**Estimated re-train cost when we flip**: ~24 TXC cells across C3, C5,
-C6, C7. Per-cell wall-time should be **roughly the same as before**
-because the data path stays the same (preloaded `.clone()` cache);
-the bigger encode shape (`(B*N, T, d) @ (T, d, s)`) better utilizes
-the H100/A40 GPU but the absolute time per step is dominated by data
-+ matryoshka/contrastive losses, not the encode FLOPs themselves. So
-the multi-window flip recovers the FLOPs-parity we should have had,
-without proportionally increasing wall-time. ~30-50 GPU-hr total
-distributed across the 6 worker pods.
+**YAML implementation** (landed 2026-05-05):
+
+- `txc_base_mw` and `txc_pro_mw` added to `configs/locked_archs.yaml`,
+  pointing at `temp_bench.architectures.txc_base:TXCBase` and
+  `temp_bench.architectures.txc_pro:TXCPro` respectively. Both have
+  `multi_window: true` in hparams.
+- All `per_component_hparams` overrides (e.g. `c6: {d_sae: 32768,
+  k_pos: 25}` for `txc_base`) are MIRRORED on the `_mw` entries.
+  Drift risk: if someone updates `txc_base.per_component_hparams.cN`
+  without also updating `txc_base_mw.per_component_hparams.cN`, the
+  two archs diverge silently. YAML comment notes this; tests do not
+  enforce parity.
+- Decision #1 amended: the canonical paper TXCs are `txc_base_mw` and
+  `txc_pro_mw`. The original `txc_base` / `txc_pro` stay in the
+  registry as the historical pre-fix baseline; their existing cells
+  remain in `leaderboard.jsonl`.
+
+**Status (2026-05-05 PM)**: code + tests + YAML aliases landed.
+Workers' in-flight sweeps are running on `txc_base` / `txc_pro` (the
+historical baseline). The `_mw` archs are registered and ready to
+use; the deployment plan (which workers run them, with what compute
+budget, against which existing cells) is the next coordination
+question with Han.
+
+**Bricken composes orthogonally with `multi_window`** (clarification):
+Bricken resample is configured via `TrainingConfig` (a per-cell
+training-time choice — `bricken_enabled`, `ema_auxk_alpha`,
+`dead_threshold_tokens` etc., per § 7). `multi_window` is an
+architecture-level choice baked into the YAML hparams of `txc_base_mw`
+/ `txc_pro_mw`. The two are independent.
+
+For C6 (agent_em — TXC + brickenauxk_a8 recipe), the multi-window
+canonical cell is therefore:
+
+```python
+arch_name = "txc_base_mw"          # NOT a new "txc_base_mw_brickenauxk" entry
+training_cfg = TrainingConfig(
+    bricken_enabled=True,           # per § 7 (C6 default)
+    ema_auxk_alpha=0.125,            # 1/8 per the a8 recipe
+    dead_threshold_tokens=128_000,
+    bricken_resample_every=500,
+    bricken_min_fires=1,
+    bricken_n_check=2048,
+    bricken_max_resample_fraction=0.5,
+    # n_steps, batch_size, plateau_* per the canonical paper schedule
+)
+```
+
+agent_em's existing `experiments/c6_em/train.py:make_training_cfg`
+already builds this dict (the brickenauxk_a8 fields are conditioned
+on the arch name). When we deploy, agent_em swaps the arch name they
+pass to `make_training_cfg` from `txc_base` to `txc_base_mw`; nothing
+in their training config logic needs to change. Same Bricken plumbing,
+new sampling under the hood.
+
+**Estimated re-train cost when we deploy**: ~24 TXC cells across C3,
+C5, C6, C7. Per-cell wall-time should be **roughly the same as
+before** because the data path stays the same (preloaded `.clone()`
+cache); the bigger encode shape (`(B*N, T, d) @ (T, d, s)`) better
+utilizes the H100/A40 GPU but the absolute time per step is dominated
+by data + matryoshka/contrastive losses, not the encode FLOPs
+themselves. The multi-window deployment recovers the FLOPs-parity we
+should have had, without proportionally increasing wall-time. ~30-50
+GPU-hr total distributed across the 6 worker pods.
 
 ### Non-decisions (to revisit later)
 

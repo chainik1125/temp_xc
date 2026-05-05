@@ -190,3 +190,72 @@ archs:
     notes: |
       TXC-pro = phase5b_subseq_h8. Subseq encoder + matryoshka H8 +
       multi-distance contrastive. NO Bricken by default.
+
+  # ── Multi-window TXC variants (decisions.md § 14) ────────────────────
+  # txc_base_mw / txc_pro_mw use the SAME Python classes as txc_base /
+  # txc_pro respectively, with multi_window: true baked in. They are
+  # registered as distinct arch identities (not a hparam toggle on the
+  # canonical names) so the leaderboard's `arch` column is
+  # self-documenting — there is no ambiguity about which sampling mode
+  # produced any given cell. Decision: Han 2026-05-05 PM.
+  #
+  # If you change hparams of txc_base or txc_pro (e.g. add a new
+  # per_component override), MIRROR the change in the corresponding _mw
+  # entry below. Tests do not enforce parity beyond identity-of-class;
+  # silent drift is on the editor.
+
+  txc_base_mw:
+    class_path: temp_bench.architectures.txc_base:TXCBase
+    arch_version: "1.0.0"
+    category: txc
+    hparams:
+      d_sae: 18432
+      T: 5
+      k_pos: 20
+      auxk_alpha: 0.03125
+      dead_threshold_tokens: 10_000_000
+      bdec_geom_median_init: true
+      decoder_unit_norm: true
+      decoder_grad_orthogonalize: true
+      multi_window: true        # ← the only difference vs txc_base
+    per_component_hparams:
+      c6:
+        d_sae: 32768
+        k_pos: 25
+      c7:
+        d_sae: 32768
+    notes: |
+      TXC-base with stride-T multi-window training (decisions.md § 14).
+      Identical encoder + decoder weights to txc_base; only
+      train_step's per-step sampling differs. This is the
+      training-FLOPs-parity canonical version going forward; txc_base
+      remains as the historical pre-fix baseline.
+
+  txc_pro_mw:
+    class_path: temp_bench.architectures.txc_pro:TXCPro
+    arch_version: "1.0.0"
+    category: txc
+    hparams:
+      d_sae: 18432
+      T_max: 10
+      t_sample: 5
+      k_pos: 20
+      n_matryoshka: 8
+      contrastive_shifts: [1, 2]
+      contrastive_inverse_distance_weight: true
+      auxk_alpha: 0.03125
+      dead_threshold_tokens: 10_000_000
+      bdec_geom_median_init: true
+      decoder_unit_norm: true
+      decoder_grad_orthogonalize: true
+      multi_window: true        # ← the only difference vs txc_pro
+    per_component_hparams:
+      c6:
+        d_sae: 32768
+      c7:
+        d_sae: 32768
+    notes: |
+      TXC-pro with stride-(T_max+max_shift) multi-window training
+      (decisions.md § 14). Identical encoder + decoder weights to
+      txc_pro; only train_step's per-step sampling differs. Canonical
+      paper version; txc_pro remains as the historical pre-fix baseline.
