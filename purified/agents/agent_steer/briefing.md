@@ -649,7 +649,32 @@ nuked. Remaining:)
    beats"), c5.md's framing needs revising — but this would be a
    GOOD problem to have. Watch for it.
 
-5. **`experiments/c5_steering_100k/` breaks `report.render(component='c5')`**
+5a. **🚨 URGENT — Anthropic API credit balance exhausted (2026-05-05T05:59 UTC).**
+   `txc_base seed=1` (eval_key `2223a67584fa13d3`) produced a 0.0-metric
+   row because **all 270 Sonnet judge calls** failed with HTTP 400:
+   ``Your credit balance is too low to access the Anthropic API. Please
+   go to Plans & Billing to upgrade or purchase credits.`` `n_valid:
+   0/270`, mean_coh = 0.0, mean_success = 0.0.
+
+   **Currently-running cells will hit the same failure at eval phase**
+   unless credits are restored:
+   - `txc_pro seed=2` on GPU 3 (PID 45454) — eval phase in ~45 min
+   - `txc_base seed=2` on GPU 1 (PID 45453) — eval phase in ~3 hr
+
+   I'm letting both cells finish training (training cost is the expensive
+   part, not the eval). Once credits are topped up:
+   1. Manually remove the 0.0-metric rows from `results/leaderboard.jsonl`
+      (the runner appends but doesn't dedupe — a force_eval=True would
+      produce duplicate rows otherwise).
+   2. Re-run with `--force-eval` for the affected eval_keys; the cached
+      checkpoint will be re-used so only ~15-20 min eval per cell.
+
+   **Action required: Han, please top up Anthropic credits at
+   https://console.anthropic.com/settings/billing.** Until then, my
+   AUTO-RESULTS will be biased downward by however many cells hit
+   the 0.0 failure mode.
+
+5b. **`experiments/c5_steering_100k/` breaks `report.render(component='c5')`**
    — agent_paper spun up agent_steer_100k as a parallel 100K-step
    instance (commit `6db405bd`). Their dir lives at
    `experiments/c5_steering_100k/` and matches the `c5_*` glob in
