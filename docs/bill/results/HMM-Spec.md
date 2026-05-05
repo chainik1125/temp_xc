@@ -329,6 +329,128 @@ This is why Bill's bench is the cleaner test of "TXC vs SAE compression
 trade" but a poor test of "TXC's ability to reveal hidden structure" —
 there's no hidden structure to reveal.
 
+## Empirical results from this HMM
+
+This section pulls the relevant sweep figures into one place so the
+reader can see what the HMM actually produces under different model
+architectures.
+
+### Three-arch sweep (Fig 5–7)
+
+Single-arch ground truth = the `n_features` dictionary directions, so
+the only metric is **plain feature-recovery AUC**. There is no
+local-vs-global split — Bill's bench has no coupling matrix. Bill's
+three figures from the original sweep (regular SAE / Stacked SAE / TXCDR
+at d_sae = n_features = 128, k_pos ∈ {2, 5, 10, 25}, T ∈ {2, 5}, single seed):
+
+**ΔAUC vs regular SAE, by (k, T) for each ρ:**
+
+![ΔAUC vs regular SAE](three_arch/fig5_delta_auc_vs_regular_sae.png)
+
+TXCDR's only material win over regular SAE is at low k (k=2) and high ρ
+(ρ ≥ 0.6); elsewhere regular SAE wins, often substantially. The mean
+across all 24 cells: regular_sae 0.910 > txcdr 0.790 > stacked_sae 0.559.
+
+**ΔAUC vs Stacked SAE:**
+
+![ΔAUC vs Stacked SAE](three_arch/fig5_delta_auc_vs_stacked_sae.png)
+
+TXCDR beats Stacked SAE almost everywhere (ΔAUC up to +0.64), and the
+gap is large across the entire (k, ρ) grid — not regime-specific. This
+is the "structural" gap (TXCDR's shared-latent encoder vs Stacked's
+per-position TopK on T-times less per-slot data).
+
+**ΔAUC vs ρ at fixed (k, T):**
+
+![ΔAUC vs ρ](three_arch/fig6_delta_auc_vs_rho.png)
+
+Direct view of the rho-dependence: TXC's win grows with ρ at low k,
+flips sign at high k.
+
+**AUC and NMSE vs k:**
+
+![AUC and NMSE vs k](three_arch/fig7_auc_loss_vs_k.png)
+
+The AUC story (top row) and the NMSE story (bottom row) tell different
+things — TXCDR's NMSE is always worst (it sacrifices token-level
+reconstruction for cross-position information sharing), but its AUC
+beats regular SAE in the right regime.
+
+### Three-arch re-run with Han's recipe (2026-05-05)
+
+Same DataConfig, but all four arches at `d_sae = 8 × d_in = 2048` (Han's
+locked expansion) and Han's locked TXCs (`txc_base`, `txc_pro / H8`)
+swapped in for plain TXCDR. Single seed, k_pos = 20, n_steps = 10k.
+Result: at this dictionary width, regular SAE catches up to TXC-base
+(ΔAUC ≈ +0.02 across all ρ), while Stacked SAE remains broken.
+
+![Han recipe: AUC vs ρ](../../../results/han_three_arch/auc_vs_rho.png)
+
+![Han recipe: NMSE vs ρ](../../../results/han_three_arch/nmse_vs_rho.png)
+
+Full writeup: [[../../../docs/dmitry/results/han_three_arch_summary]].
+
+### ρ × k sweep at d_sae = 2048 (2026-05-05)
+
+Sweeping per-token k_pos ∈ {1, 2, 5, 10} × ρ ∈ {0.0, 0.6, 0.9} for four
+arches (regular_sae, plain TXCDR T=2, plain TXCDR T=5, TXC-pro / H8). 48
+cells, single seed. Reveals where TXC's win lives:
+
+![ρ × k AUC grid](../../../results/rho_k_sweep/rho_k_auc_grid.png)
+
+Key findings:
+
+- Almost everyone saturates at AUC = 0.99 by k_pos = 5 across every ρ.
+  The "TXC vs SAE big AUC gap" Bill saw at d_sae = 128 essentially
+  disappears at d_sae = 2048.
+- TXC's win over regular SAE survives **only at k_pos = 1**: TXCDR-T5
+  hits 0.990 at ρ ≥ 0.6 vs regular SAE 0.91-0.92 (Δ ≈ +0.08).
+- TXC-pro / H8 *fails* at ρ = 0.0 — AUC stuck at 0.77-0.88 across all
+  k_pos when there's no temporal structure. The matryoshka prefix +
+  multi-distance contrastive InfoNCE wastes capacity on a
+  "temporally-smooth features" prior that the data doesn't have.
+
+ΔAUC vs regular SAE, same data:
+
+![ρ × k ΔAUC vs SAE](../../../results/rho_k_sweep/rho_k_delta_vs_sae.png)
+
+Full writeup: [[../../../docs/dmitry/results/rho_k_sweep_summary]].
+
+### HMM denoising sweep (Fig 8–9)
+
+The asymmetric-emission bench (`p_B = 0.625`, heterogeneous per-feature
+ρ). Key metric is the **denoising ratio** = `corr(latents, hidden) /
+corr(latents, observed)`. Any per-token model is bounded above by
+≈ 0.77 (the observed/hidden correlation given the emission noise);
+crossing 1.0 means the latents track the hidden state better than the
+noisy observation.
+
+**Global vs local correlation at fixed T = 4:**
+
+![global vs local correlation](hmm_denoising/fig8_global_vs_local.png)
+
+Each point is one feature: x-axis = correlation of best-match latent
+with the observed support `s`, y-axis = correlation with the hidden
+state `h`. Per-token models (regular SAE, Stacked SAE) cluster on the
+y = γ·x line (the per-token denoising floor). TXCDR points sit *above*
+this line — its latents track the hidden state more than the noisy
+observation.
+
+**Denoising ratio (Pearson corr) vs T:**
+
+![denoising ratio (corr) vs T](hmm_denoising/fig9_denoising_ratio_corr.png)
+
+The headline of the bench: TXCDR is the **only** architecture that
+crosses the per-token denoising floor of 0.77, and the gap grows with
+T. Both regular SAE and Stacked SAE pin at the floor across all (T, k)
+— consistent with both being position-independent.
+
+**Same metric using R² instead of correlation:**
+
+![denoising ratio (R²) vs T](hmm_denoising/fig9_denoising_ratio_r2.png)
+
+Same picture: TXCDR climbs with T, baselines plateau.
+
 ## Code map
 
 - `src/temporal_bench/data/markov.py`
