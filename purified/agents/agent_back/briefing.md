@@ -429,6 +429,25 @@ Direction is paper-faithful (TXC peaks at mag<0; SAE peaks at mag>0)
 but magnitude is 17–25% of Aniket's hill-climbed +1.574. Hypothesis:
 batch=256 under-trains the SAEs.
 
+### False alarm — decoder-norm calibration (2026-05-05 ~12:30 UTC)
+
+While reviewing live v4b results with Han, I diagnosed a "missing
+DoM-base-union normalization" bug after measuring raw
+`model.decoder_directions().norm()` per arch and seeing huge variation
+(0.12 for txc_pro vs 1.00 for tfa). Concluded the magnitude grid was
+arch-incomparable. **WRONG.**
+
+Reality: lines 1514-1524 of `src/temp_bench/case_studies/backtracking.py`
+already normalise the mined steering vector to
+`||DoM_base_union||=0.4140` before the SteeringHook applies magnitude.
+Code present since day-1 commit `a0d7ced9`. So magnitudes ARE
+comparable across archs.
+
+**Lesson**: when validating per-arch steering setup, check the
+`vec` actually passed to `SteeringHook(vec)` (post-normalization),
+NOT the raw `model.decoder_directions()` output. The pipeline rescales
+between mining and hook attachment. v4b results stand as-is.
+
 ### Failures handled / lessons learned
 
 - **MFS I/O error (Errno 5) is intermittent on this pod.** Three cells
