@@ -6,7 +6,7 @@ rules: PROTOCOL.md § 14.
 
 ---
 agent: agent_steer_100k
-last_state_update: 2026-05-04T23:05:00Z
+last_state_update: 2026-05-05T08:58:00Z
 component: c5
 ---
 
@@ -310,7 +310,26 @@ need to land in `leaderboard.jsonl` with the right
 
 Newest first.
 
-- **22:25Z launched full 100K sweep** — 9 cells, sequential on H100.
+- **🎯 CELL 1 LANDED** (2026-05-05T08:58:15Z) — tsae_paper seed=42 at
+  n_steps=100K. eval_key `933efa408d1e91aa`, train_key `c0729094920eb9f0`.
+  HF push succeeded
+  (`han1823123123/temp-bench-models/tree/main/c0729094920eb9f0`).
+  **Headline `peak_success_grade_at_coh_1.75 = 0.533`** vs
+  agent_steer's 20K tsae_paper seed=42 = 0.367 → **+45% from longer
+  training**. mean_coh 1.67 preserved, mean_success 0.163 (vs 20K ~0.13).
+  **Convergence check FAILS the 5% threshold**: final-1K-step loss drop
+  is 19.5% (loss step 20K=19182, step 100K=15870; still descending
+  steeply at 100K). Per agent_paper's decisions.md § 12 directive
+  (line 64-65), this means "the cap may need to be bumped uniformly
+  across all archs" — surfaced as Open Question #2.
+- **2026-05-05T08:58:15Z cell 2 launched** — tsae_paper seed=1 at 100K,
+  eval_key `a60d9162f675873a`. Sweep continuing.
+- **2026-05-05T00:35Z–08:53Z cell 1 in flight** — 100 progress markers,
+  steady-state ~2.8 steps/sec post-warmup. Sonnet judge 270/270 in
+  ~3.5 min (1.8 gen/sec, your topped-up balance was sufficient — gap
+  during training was a non-event since training never touches the
+  Claude API).
+- **2026-05-04T23:03Z launched full 100K sweep** — 9 cells, sequential.
   PID 2524. First cell tsae_paper seed=42 confirmed launching at
   22:25:47 with `eval_key=933efa408d1e91aa`. Persistent Monitor armed
   for crash detection.
@@ -402,6 +421,19 @@ Newest first.
   silently double-spawning would race for GPU 0 and OOM.
 
 ## Open questions for Han (agent owns — overwrite)
+
+2. **Convergence at step 100K — cap may need further bumping.**
+   Cell 1's trainlog shows the loss is **still descending 19.5% per
+   final-1K-step window** at step 100K (final-1K drop 3099 / final loss
+   15870). Per agent_paper's decisions.md § 12 directive line 64-65,
+   the threshold for surfacing this is 5%; we're 4× over. Loss values:
+   start = 182953, step 20K = 19183, step 100K = 15870. So the model
+   gained ~17% loss reduction from 20K→100K while the steering metric
+   jumped 45% (0.367→0.533). agent_paper / Han may want to consider
+   either (a) accept that 100K is also short of convergence and disclose
+   in the paper, or (b) bump uniformly to 200K (would require 2× more
+   compute, definitely partial completion). I'm continuing the existing
+   100K sweep; this is informational.
 
 1. **The 100K sweep is compute-budget-tight and will be partial at deadline
    without a deviation.** Confirmed empirically (controlled benchmark of
