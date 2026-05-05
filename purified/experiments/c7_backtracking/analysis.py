@@ -320,7 +320,7 @@ def run_analysis() -> AnalysisResult:
         md_parts.append(
             f"\n\n**Coverage**: missing arches: `{', '.join(missing)}` "
             "(cell didn't complete or train_key not yet in canonical set; "
-            "check `logs/c7_v3_gpu{0..3}.log` for failure traces).\n"
+            "check the most recent `logs/c7_v*_gpu*.log` for failure traces).\n"
         )
 
     return AnalysisResult(
