@@ -708,35 +708,104 @@ time.
 
 ## Current state (agent owns — overwrite at every compact)
 
-**Last verified: <fill in on first session>**
+**Last verified: 2026-05-05T12:22Z**
 
-- `git HEAD`: <sha>
+- `git HEAD`: `ecaaafb6` (final).
 - Pod: 8× A40, ephemeral, 401 GB RAM, 76 vCPU, 1 TB /workspace.
-- Active GPU usage: GPU 0 (own process); subprocesses on GPUs 0..5 once
-  the sweep launches.
-- Last leaderboard append: `(none yet)`.
+- Driver: `experiments/c5_steering_filler/{__init__.py, run.py,
+  run_sweep.sh}` written + committed-pending. `run.py` imports
+  `run_one_cell` from `experiments.c5_steering.run` (the canonical
+  closure-builder) and takes `--arch` + `--seed` for single-cell
+  invocation. Threading caps at OMP/MKL=8 (76 cores ÷ 6 procs ≈ 12).
+- Smoke (txc_base_mw seed=42, n_steps=200, smoke=True) passed:
+  - eval_key=`8c6bf97f2de60679`, n_valid=270/270 (all judge calls OK,
+    no Anthropic credit issues), peak@1.75=0.615.
+  - Row landed in `results/leaderboard.jsonl` with
+    `agent=agent_filler eval_protocol_version=1.1.0`.
+  - Wall: ~6 min (training skipped — agent_steer_100k's earlier 200-
+    step MW checkpoint at train_key=`e0ff471f7ddac586` was hit).
+  - Note: the smoke shell's exit code was 1 because the original
+    `tee logs/c5_filler_smoke.log` failed (logs/ didn't exist when
+    the pipeline opened). Python itself exited 0; smoke is functionally
+    valid. `mkdir -p logs` ran in the same Bash call so the next
+    invocation is fine.
+- **Full sweep launched at 12:21 UTC** via
+  `bash experiments/c5_steering_filler/run_sweep.sh`:
+  - GPU 0..2 → txc_pro_mw seeds {42, 1, 2}
+  - GPU 3..5 → txc_base_mw seeds {42, 1, 2}
+  - GPU 6, 7 → idle (reserve for retries / stretch)
+  - PIDs in /tmp/p_filler_gpu{0..5}; per-cell logs in
+    `logs/c5_filler_gpu{0..5}_*.log`.
+  - Sweep launcher Bash task id `bmager8g3` (output:
+    `/tmp/claude-1000/-workspace-temp-xc-purified/9a9f1871-2f42-466b-9100-df10e4855a15/tasks/bmager8g3.output`).
+  - At 12:22Z all 6 procs in act-cache load phase (VRAM: 3.5 GB on
+    txc_pro_mw GPUs, 1.9 GB on txc_base_mw GPUs, GPU util 0% —
+    pre-train).
+- Active monitor: task id `bq4q73l4j` (1-hr timeout) tailing the 6
+  per-cell logs for training milestones / errors / completion.
+- Last leaderboard append (this session):
+  `arch=txc_base_mw seed=42 eval_key=8c6bf97f2de6 n_valid=270 (smoke)`.
 - Recent decisions in scope: `decisions.md` § 7 (Bricken off for C5),
   § 12 (canonical training cfg), § 14 (multi-window deployment).
 
 ## What I just did (agent owns — overwrite)
 
-(none yet — first session)
+1. `git pull --rebase origin final` — pulled agent_steer's revised
+   briefing (added run_one_cell guidance + n_valid=0 credit-exhaustion
+   trap + report.render conflict warning) and agent_em_100k's c6_em_mw
+   driver landing. HEAD now at `ecaaafb6`.
+2. `source scripts/set_agent_env.sh agent_filler` + `bash scripts/agent_smoke_test.sh` —
+   131/131 tests pass, preflight clean (after env was sourced; on the
+   FIRST attempt without sourcing in the Bash subshell, preflight
+   flagged CRITICAL "CUDA_VISIBLE_DEVICES is unset and 8 GPUs visible";
+   resolved by re-sourcing inside the same Bash call).
+3. Verified infra (briefing Step 1):
+   - `grep "baseline = activation_matrix.mean" src/temp_bench/case_studies/steering.py` → match (v1.1.0 fix in place).
+   - `EVAL_PROTOCOL_VERSION` from `c5_steering.run` → `"1.1.0"`.
+   - `load_arch('txc_base_mw').hparams` and `load_arch('txc_pro_mw').hparams` both contain `multi_window: True`.
+   - `nvidia-smi` → 8 GPUs, all <500 MB used.
+   - `run_one_cell` signature confirmed (kw-only: arch_name, seed,
+     protocol, n_concepts, strengths, coh_thresholds, n_steps, smoke,
+     force_train, force_eval).
+4. `bash scripts/sync_from_hf.sh` — pulled checkpoints (101 GB) +
+   `temp-bench-data/act_cache/` (25 GB total; the c5 cache
+   `e4916bcae1881963` is 14 GB).
+5. Wrote `experiments/c5_steering_filler/{__init__.py, run.py,
+   run_sweep.sh}`. run.py = single-cell driver imports `run_one_cell`;
+   run_sweep.sh = parallel launcher pinning 6 cells to GPUs 0..5 via
+   `scripts/run_on_gpu.sh`.
+6. Smoke-tested `txc_base_mw seed=42 --n-steps 200 --smoke` on GPU 0
+   end-to-end: training skipped (cached), Gemma loaded, concept-lift
+   (v1.1.0) ran, 270 generations, 270 judge calls all 200 OK,
+   metrics.json + leaderboard row written.
+7. Launched the full sweep at 12:21Z. All 6 python procs running, in
+   data-load phase; first training step prints expected within minutes.
 
 ## Next action (agent owns — overwrite)
 
-1. `cd $(git rev-parse --show-toplevel)/purified`
-2. `source scripts/set_agent_env.sh agent_filler` (pins your own
-   process to GPU 0; subprocesses pinned per `run_on_gpu.sh <idx>`).
-3. `bash scripts/agent_smoke_test.sh` — expect 131/131 + preflight green.
-4. `bash scripts/sync_from_hf.sh` — pulls Gemma activation cache.
-5. `git pull --rebase origin final` — stay current with agent_steer's
-   v1.1.0 fix and agent_paper's MW arch landings.
-6. Write `experiments/c5_steering_filler/{__init__.py, run.py, run_sweep.sh}`
-   per Step 3 + Step 4.
-7. Smoke-test ONE cell at `n_steps=200` per Step 5.
-8. Launch the full 6-cell parallel sweep per Step 5's bottom command.
-9. Monitor + verify leaderboard rows land at
-   `eval_protocol_version=1.1.0`.
+1. **Monitor cells passing through training milestones.** Active
+   monitor `bq4q73l4j` will fire on `step=20000`, judge completion,
+   errors, OOM, credit-balance, hf-push events. Check the 6 logs
+   periodically:
+   `for f in logs/c5_filler_gpu*.log; do echo "=== $(basename $f) ==="; tail -3 "$f"; done`
+2. **As txc_base_mw cells complete (~3-6 hr each)**: confirm rows in
+   `results/leaderboard.jsonl` have `arch=txc_base_mw`,
+   `eval_protocol_version="1.1.0"`, `eval_cfg.smoke != true`. Then
+   the GPU frees up — leave idle (don't backfill with more cells;
+   the sweep is the deliverable).
+3. **txc_pro_mw cells (~10-15 hr each)** are the long pole. Don't kill
+   them just because etime looks long; check the log for active step
+   progress.
+4. **If a cell errors on Anthropic credit**: stop the sweep, surface
+   to Han, after Han tops up rerun the failed cell with `--force-eval`
+   on the cached training checkpoint (don't re-train).
+5. **Before exit / context compact**: re-overwrite this section. The
+   sweep PIDs in `/tmp/p_filler_gpu{0..5}` survive shell restarts but
+   the Monitor must be re-armed if you compact.
+6. **When all 6 cells complete**: run `bash scripts/wrap_up_session.sh`
+   (auto-pushes checkpoints + run_dirs to HF). Surface to agent_paper
+   that the MW canonical sweep is on the leaderboard for paper-render
+   integration.
 
 ## Don't repeat (agent owns — overwrite)
 
@@ -761,9 +830,7 @@ time.
 - **Don't import `my_eval_fn` from `experiments.c5_steering.run`**
   — it's a closure built by `_make_eval_fn(seed, workspace, eval_key)`,
   not a top-level symbol. Use `run_one_cell` instead (that's what the
-  Step 3 driver does); it threads workspace + eval_key + seed for
-  you. agent_steer_100k hit this same import bug; their workaround
-  is the pattern your driver should follow.
+  driver does); it threads workspace + eval_key + seed for you.
 - **Don't pass enriched `eval_cfg` to `runner.run_cell` directly** —
   the runner re-hashes `eval_cfg` to compute `eval_key`. If you add
   `_*` enrichment fields, the resulting `eval_key` won't match the
@@ -774,23 +841,29 @@ time.
   raises `Multiple experiment dirs match c5_*` because of
   `experiments/c5_steering_100k/`, `experiments/c5_steering_mw/`,
   and now `experiments/c5_steering_filler/`. Render is agent_paper's
-  job at paper-time; you don't need to render c5.md yourself. If
-  you DO need to compute summary stats, query
-  `temp_bench.report.query_leaderboard(component='c5')` directly
-  and filter on `arch in ('txc_base_mw', 'txc_pro_mw')` +
-  `eval_protocol_version == '1.1.0'`.
+  job at paper-time; you don't need to render c5.md yourself.
 - **Don't kill in-flight cells just because etime looks long** —
   txc_pro_mw cells legitimately take 10-15 hr. Check the log for
-  step-rate progress (`[TRAIN ... step XXXX/20000 (X.X steps/sec)`)
-  before assuming a cell is hung.
+  active step progress before assuming a cell is hung.
+- **Don't `tee` to `logs/...` without `mkdir -p logs` first.** The
+  smoke shell exited with code 1 because tee couldn't open the file
+  (logs/ didn't exist when the pipeline opened, despite the same Bash
+  call doing `mkdir -p logs` later — too late). Either `mkdir -p` in
+  a SEPARATE Bash call before launch, or include it in `run_sweep.sh`
+  (which already does this).
 - **Don't worry about Anthropic API credits during your sweep** —
   agent_steer hit a credit-exhaustion outage on 2026-05-05 05:59 UTC
-  that produced an all-zero metrics row. Han topped up. If your
-  judge phase produces `n_valid=0`, check
+  that produced an all-zero metrics row. Han topped up; the smoke's
+  270/270 calls all returned 200 OK. If a future cell's judge phase
+  produces `n_valid=0`, check
   `results/runs/<eval_key>/judge_outputs.jsonl` for "credit balance
   is too low" errors and surface to Han before re-running. Recovery
   is `--force-eval` on the cached training checkpoint (not a full
   re-train).
+- **Don't use `tail -F logs/c5_filler_gpu*.log` in a Monitor without
+  `-q`.** Without `-q`, tail emits `==>` headers on every file switch
+  and they fire as Monitor events constantly. Use `tail -qF` (which is
+  what the active monitor `bq4q73l4j` uses).
 
 ## Open questions for Han (agent owns — overwrite)
 
