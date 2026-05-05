@@ -13,13 +13,16 @@ mean ± stderr) per arch.
 
 from __future__ import annotations
 
+import json
 import math
 from collections import defaultdict
 from pathlib import Path
 from typing import Any
 
 import matplotlib.pyplot as plt
+import numpy as np
 
+from temp_bench.cache import run_dir
 from temp_bench.plotting import save_figure
 from temp_bench.report import AnalysisResult, canonical_train_keys, query_leaderboard
 
@@ -131,6 +134,98 @@ def _plot_coh_threshold_curves(
     save_figure(fig, out_path)
 
 
+def _per_strength_means(eval_keys: list[str]) -> dict[float, dict[str, float]] | None:
+    """Read ``grades.jsonl`` for each cell, average across (seed × concept)
+    per strength. Returns ``{strength: {"mean_coh", "mean_succ", "n"}}``
+    or ``None`` if no run_dir is available.
+
+    This drives the wasteland-style Pareto plot — a parametric curve
+    over strength where each point is ``(mean_coh(s), mean_succ(s))``
+    averaged over all seeds × concepts at that strength. Strength
+    increases trace the curve from "weak steering, high coh" through
+    a knee to "over-steered, coh collapses".
+    """
+    by_s_succ: dict[float, list[float]] = defaultdict(list)
+    by_s_coh: dict[float, list[float]] = defaultdict(list)
+    for ek in eval_keys:
+        path = run_dir(ek) / "grades.jsonl"
+        if not path.exists():
+            continue
+        for line in path.open():
+            line = line.strip()
+            if not line:
+                continue
+            r = json.loads(line)
+            s_g = r.get("success_grade")
+            c_g = r.get("coherence_grade")
+            if s_g is None or c_g is None:
+                continue
+            s = float(r["strength"])
+            by_s_succ[s].append(float(s_g))
+            by_s_coh[s].append(float(c_g))
+    if not by_s_succ:
+        return None
+    return {
+        s: {
+            "mean_coh": float(np.mean(by_s_coh[s])),
+            "mean_succ": float(np.mean(by_s_succ[s])),
+            "n": len(by_s_succ[s]),
+        }
+        for s in sorted(by_s_succ)
+    }
+
+
+def _plot_pareto(
+    eval_keys_by_arch: dict[str, list[str]],
+    out_path: Path,
+) -> Path | None:
+    """Wasteland-style Pareto frontier: parametric curve over strength,
+    one line per arch. x = mean coherence at that strength (averaged
+    over all seeds × concepts), y = mean success grade likewise.
+    Annotates the cliff15 = ``max success at coh ≥ 1.5`` with a star.
+
+    Source convention:
+    ``origin/han-phase7-unification:experiments/phase7_unification/case_studies/steering/plot_focused_pareto.py``.
+    """
+    fig, ax = plt.subplots(figsize=(7, 5))
+    plotted = False
+    for arch in sorted(eval_keys_by_arch):
+        per_s = _per_strength_means(eval_keys_by_arch[arch])
+        if per_s is None:
+            continue
+        plotted = True
+        s_arr = sorted(per_s)
+        coh = [per_s[s]["mean_coh"] for s in s_arr]
+        succ = [per_s[s]["mean_succ"] for s in s_arr]
+        ax.plot(
+            coh, succ, marker="o", lw=2.0, markersize=6,
+            label=f"{arch} (n_seeds={len(eval_keys_by_arch[arch])})",
+        )
+        # cliff15 star: peak success at coh ≥ 1.5
+        valid_15 = [(s, c, su) for s, c, su in zip(s_arr, coh, succ) if c >= 1.5]
+        if valid_15:
+            peak = max(valid_15, key=lambda x: x[2])
+            ax.plot(peak[1], peak[2], "*", markersize=18,
+                    markeredgecolor="black", markeredgewidth=1.0, zorder=10)
+    if not plotted:
+        plt.close(fig)
+        return None
+    ax.axvline(1.5, color="grey", linestyle=":", alpha=0.6)
+    ax.text(1.51, 0.05, "coh=1.5 (prereg)", fontsize=9, color="grey")
+    ax.set_xlim(0.6, 3.1)
+    ax.set_ylim(0.0, 2.6)
+    ax.set_xlabel("mean coherence (Sonnet 4.6, 0-3)")
+    ax.set_ylabel("mean success grade (Sonnet 4.6, 0-3)")
+    ax.set_title(
+        "C5 — Pareto frontier: success vs coherence per strength\n"
+        "(stars mark peak success at coh ≥ 1.5; wasteland phase-7 convention)"
+    )
+    ax.legend(loc="upper left", framealpha=0.95)
+    ax.grid(alpha=0.3)
+    save_figure(fig, out_path)
+    return out_path
+
+
 def run_analysis() -> AnalysisResult:
     all_rows = query_leaderboard(component=COMPONENT)
     # Skip smoke-test cells (matches agent_nlp's c3 convention).
@@ -217,6 +312,17 @@ def run_analysis() -> AnalysisResult:
         )
         plots.append(peak_plot)
 
+    # Wasteland-style Pareto frontier: parametric over strength, x=coh,
+    # y=success. Each line traces an arch's strength sweep — high-strength
+    # points collapse coherence, low-strength points have weak success,
+    # and a knee somewhere in between marks the cliff15 (star).
+    pareto_plot = PLOT_DIR / "c5_pareto_frontier.png"
+    eval_keys_by_arch: dict[str, list[str]] = defaultdict(list)
+    for r in rows:
+        eval_keys_by_arch[r.arch].append(r.eval_key)
+    if _plot_pareto(eval_keys_by_arch, pareto_plot) is not None:
+        plots.append(pareto_plot)
+
     def _ms(vs: list[float]) -> str:
         if not vs:
             return "—"
@@ -254,8 +360,13 @@ def run_analysis() -> AnalysisResult:
             )
         md_lines.append("")
         md_lines.append(
-            f"![peak success grade curves](../../experiments/c5_steering/plots/"
-            f"{peak_plot.name})"
+            f"![Pareto frontier — success vs coherence per strength]"
+            f"(../../experiments/c5_steering/plots/{pareto_plot.name})"
+        )
+        md_lines.append("")
+        md_lines.append(
+            f"![peak success grade vs coherence threshold]"
+            f"(../../experiments/c5_steering/plots/{peak_plot.name})"
         )
         md_lines.append("")
         md_lines.append("---\n")
