@@ -1,5 +1,32 @@
 {
   "by_arch": {
+    "tfa": {
+      "mean_mean_coh": 1.1370370388031006,
+      "mean_mean_success": 0.17777778084079424,
+      "mean_peak_success_grade_at_coh_1.5": 0.3333333432674408,
+      "mean_peak_success_grade_at_coh_1.75": 0.3333333432674408,
+      "mean_peak_success_grade_at_coh_2": 0.3333333432674408,
+      "mean_peak_success_grade_at_coh_2.25": 0.3333333432674408,
+      "mean_peak_success_grade_at_coh_2.5": 0.3333333432674408,
+      "mean_success_at_coh_1.5": 0.011111111111111112,
+      "mean_success_at_coh_1.75": 0.011111111111111112,
+      "mean_success_at_coh_2": 0.011111111111111112,
+      "mean_success_at_coh_2.25": 0.011111111111111112,
+      "mean_success_at_coh_2.5": 0.011111111111111112,
+      "n_seeds": 3,
+      "stderr_mean_coh": 0.01826991597086704,
+      "stderr_mean_success": 0.09094836682721802,
+      "stderr_peak_success_grade_at_coh_1.5": 0.019245007825895603,
+      "stderr_peak_success_grade_at_coh_1.75": 0.019245007825895603,
+      "stderr_peak_success_grade_at_coh_2": 0.019245007825895603,
+      "stderr_peak_success_grade_at_coh_2.25": 0.019245007825895603,
+      "stderr_peak_success_grade_at_coh_2.5": 0.019245007825895603,
+      "stderr_success_at_coh_1.5": 0.01111111111111111,
+      "stderr_success_at_coh_1.75": 0.01111111111111111,
+      "stderr_success_at_coh_2": 0.01111111111111111,
+      "stderr_success_at_coh_2.25": 0.01111111111111111,
+      "stderr_success_at_coh_2.5": 0.01111111111111111
+    },
     "topk_sae": {
       "mean_mean_coh": 1.4320987860361736,
       "mean_mean_success": 0.6506173014640808,
