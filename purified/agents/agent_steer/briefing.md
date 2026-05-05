@@ -354,35 +354,31 @@ one-liner to verify HF state before stop.
 
 ## Current state (agent owns — overwrite at every compact)
 
-**Last verified: 2026-05-04T15:50Z (b1024 + n_steps=20K sweep
-relaunched on GPUs 1+3 per Han 2026-05-04 PM URGENT directive).**
+**Last verified: 2026-05-05T08:55Z — c5 status: COMPLETE (9/9 cells
+landed at canonical b1024 / n_steps=20_000).**
 
-- `git HEAD`: `751d1789 Agent STEER: c5 — n_steps=20_000 deadline
-  override + preloaded batch_iter` (pushed). Working tree clean
-  modulo untracked checkpoint dirs + logs/.
-- **Killed prior 25K cells** (PIDs 38976/38977/38978, eval_keys
-  1c1b8aa4 / b981566c / b36b7641) — within-component fairness
-  required killing in-flight 25K cells before relaunching 20K. Lost
-  ~3 hours of GPU work; small price.
-- **Active 20K cells** (relaunched 2026-05-04T15:48 UTC):
-  - GPU 1 / PID 45453 / `tsae_paper + txc_base × seeds {42, 1, 2}`
-    / first eval_key `e340fb05` / log `logs/c5_b1024_n20k_gpu1.log`
-    / wait task `bx2sk74my` (ETA: ~5 hr — 6 cells sequentially at
-    ~50 min each — tsae faster than txc_base)
-  - GPU 3 / PID 45454 / `txc_pro × seeds {42, 1, 2}` / first eval_key
-    `8e583b4a` / log `logs/c5_b1024_n20k_gpu3.log` / wait task
-    `bwxwmpa9i` (ETA: ~9 hr — 3 cells × ~3 hr each at b1024 ÷ 1.4x
-    preloaded speedup ÷ 0.8 ratio for 20K vs 25K)
-  Critical path is GPU 3's 9 hr. Wait tasks armed; no need to poll.
-  PIDs persist via `/tmp/p_gpu1`, `/tmp/p_gpu3`.
-- **GPU re-allocation** (Han 2026-05-04 PM): I get GPUs 1 and 3.
-  agent_back gets 0 and 2. No more "borrow agent peer's spare"
-  pattern. Do NOT touch GPUs 0 or 2.
-- **Preloaded batch_iter swap** (commit 751d1789): swapped
-  `batch_iter_from_act_cache` →
-  `temp_bench.data.nlp.cache.preloaded_batch_iter_from_act_cache`
-  for ~1.4× trainer speedup. Bit-identical determinism — train_keys
-  unchanged. ~14 GB CPU RAM per process for the Gemma cache.
+- `git HEAD`: `14ba5bb9 Agent STEER: c5 — 9/9 cells complete (sweep
+  done)` (pushed). Working tree clean modulo untracked checkpoint
+  dirs + logs/. All 9 checkpoints confirmed on HF temp-bench-models.
+- **Final headline (peak success grade @ coh ≥ 1.75, n=3 each)**:
+  - tsae_paper: 0.333 ± 0.019  (seeds {42:0.367, 1:0.333, 2:0.300})
+  - txc_base:   0.289 ± 0.011  (seeds {42:0.300, 1:0.267, 2:0.300})
+  - txc_pro:    0.341 ± 0.021  (seeds {42:0.357, 1:0.367, 2:0.300})
+  Hypothesis "TXC matches T-SAE" SUPPORTED — txc_pro 0.341 vs
+  tsae 0.333 within 1 stderr; txc_base 0.289 vs 0.333 also within
+  1 stderr (overlap of 0.289 ± 0.011 with 0.333 ± 0.019). All 9
+  cells: n_valid=270/270, MSE final-1K drop < 5% (range 0.09–3.43%).
+- **Recovery from API outage 2026-05-05T05:59 UTC**: txc_base seed=1
+  hit Anthropic credit exhaustion (all 270 judge calls returned
+  HTTP 400 "credit balance is too low"). Han topped up at 06:30 UTC.
+  I removed the 0.0-metric row from `leaderboard.jsonl`, deleted
+  the failed run_dir, and re-ran with `--force-eval` on the cached
+  checkpoint. The new row (eval_key `2223a675`) has n_valid=270/270.
+- **GPU pinning (Han 2026-05-04 PM)**: I get GPUs 1 and 3;
+  agent_back gets 0 and 2. Now both my GPUs are idle — sweep done.
+- **Preloaded batch_iter** (commit 751d1789): bit-identical with
+  legacy iterator, ~1.4× trainer speedup. Gemma cache ~14 GB RAM
+  per process. Confirmed safe.
 
 - **TrainingConfig is now (Han 2026-05-04 PM URGENT)**:
   batch_size=1024, n_steps=**20_000** (deadline override),
@@ -499,75 +495,48 @@ Newest first.
    updates.
 5. `.venv/bin/python -m pytest tests/test_steering.py -q`
 
-**Then check the b1024 sweep state. The 3 seed-42 cells launched
-2026-05-04 12:48 UTC may still be in flight or done. Each cell:
-~3.3× more total compute than the old batch=256 (25.6M vs 7.68M
-tokens). At previous batch=256 rates ~3-4 steps/sec for tsae +
-txc_base, ~1.3 steps/sec for txc_pro, batch=1024 should be ~4×
-slower per step. Estimate per cell: tsae ~25-40 min, txc_base
-~50-80 min, txc_pro ~120-150 min — train only; +15-20 min eval.**
+**C5 sweep is COMPLETE. There is no follow-up task unless the paper
+revision asks for one.** Leaving these notes for the post-compact
+instance in case Han needs additional cells:
 
-A. **First**: `ps -p $(cat /tmp/p_tsae42 /tmp/p_tb42 /tmp/p_tp42)
-   -o pid,etime --no-headers 2>&1` — see which cells are still
-   alive. If a Bash wait-task fired while you were compacting, look
-   at `/tmp/claude-1000/.../tasks/{bzhobgezy,bwp0srh2k,b8bh3agco}.output`
-   for the post-mortem.
-
-B. **As each seed=42 cell completes**, launch the next seed for
-   that arch on the freed GPU:
+A. **Re-render is one-liner** (workaround for OQ #5b
+   `c5_steering_100k` glob conflict):
+   ```python
+   import json, importlib
+   from pathlib import Path
+   from temp_bench import report
+   mod = importlib.import_module('experiments.c5_steering.analysis')
+   importlib.reload(mod)
+   result = mod.run_analysis()
+   report._replace_auto_results(Path('docs/components/c5.md'), result.markdown)
+   Path('experiments/c5_steering/results.json').write_text(
+       json.dumps(result.results, indent=2, sort_keys=True))
    ```
-   CUDA_VISIBLE_DEVICES=<N> TQDM_DISABLE=1 AGENT_NAME=agent_steer \
-     PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True \
-     .venv/bin/python -m experiments.c5_steering.run \
-     --archs <arch> --seeds <seed> > logs/c5_b1024_<arch>_seed<seed>.log 2>&1 &
-   ```
-   Sequence: each arch goes seed 42 → seed 1 → seed 2. Realistically
-   the full 9-cell sweep is 6-10 hours wall-time at 3-way parallel.
+   Direct call bypasses `report.render()`'s `_experiment_dir` glob.
 
-C. **For each cell, check loss-trajectory at the END of training**
-   (per agent_paper's directive line 64-65 in this briefing). If the
-   final-1K-step loss drop > 5% of loss value at step 25K, the cap
-   needs bumping uniformly across all archs. Surface as an Open
-   Question — don't unilaterally bump.
+B. **If reviewers question the txc_base seed=1 reeval**, note that
+   the cached training checkpoint (train_key `196d4595f0f3b626`) is
+   bit-identical between the failed run at 05:59 UTC and the
+   re-judged run at 07:13 UTC. Only the eval phase (Sonnet calls
+   over generated text) ran twice. Determinism: the steering
+   protocol uses ``do_sample=False`` (greedy decode), so the
+   generated text is bit-identical too. The judge is stochastic,
+   but Sonnet outputs the same labels 99 %+ of the time on a clean
+   run. The result is real, just delayed by 75 minutes.
 
-D. **Watch for OOM kills on shared spare-pool GPUs**. Last sweep
-   lost cells when agent_back's process competed for GPU 3 (silent
-   kill, no traceback, just process gone). The new gpu_locks-nuked
-   convention means we have no enforcement — just monitor
-   `nvidia-smi` and be ready to relaunch.
+C. **If Han wants additional cells (e.g., a 4th arch or larger
+   d_sae)**, just call `run_one_cell(...)` from
+   `experiments/c5_steering/run.py` with the new arch. The
+   canonical_train_keys filter will pick up the new cells
+   automatically (if added to `ARCHS` in `analysis.py`).
 
-E. **After each cell completes**: leaderboard row + run_dir push
-   are automatic via my run.py's auto-HF-push and runner's
-   leaderboard append. Verify via `tail -1 results/leaderboard.jsonl`.
-   No manual reconstruction (no git reset --hard chaos this time).
-
-F. **After all 9 b1024 cells complete**:
-   ```
-   .venv/bin/python -c "from temp_bench import report; report.render(component='c5')"
-   ```
-   ⚠ **You will likely need to update `experiments/c5_steering/analysis.py`
-   to filter on `r.training_cfg.batch_size == 1024`** — agent_paper's
-   directive explicitly says "analyses in experiments/cN_*/analysis.py
-   should filter for the new training_cfg.batch_size=1024 rows when
-   rendering AUTO-RESULTS" (decisions.md § 12). Currently my
-   analysis.py renders ALL non-smoke c5 rows, which would mix the 9
-   v1.0.0 (b256) + 9 v1.0.1 (b256-backfilled-peak) + 9 new b1024
-   rows. The leaderboard row's `training_cfg` is hashed into
-   `train_key` not exposed directly; need to look up the manifest
-   for batch_size or use `eval_protocol_version` / a new
-   `metric_set` tag. **TODO this turn**: add the filter, otherwise
-   the rendered table is incoherent.
-
-G. **Update c5.md** post-render: bump `last_update` date, ensure
-   "Outcome" reflects the b1024 numbers (not the b256 backfill).
-   Caveats: the b1024 cells use n_steps=25k uniformly — txc_pro is
-   no longer "n_steps=6000 paper-deviation"; that caveat should
-   move to the v1.0.0 / v1.0.1 supplementary section (or be
-   deleted from current state and replaced with a "compute parity"
-   note).
-
-**Commit + push after each batch of cells lands** (don't wait until
-all 9 finish). Use the Phase-5-faithful framing in commit messages.
+D. **post-deadline Cohen's κ validation**: 9 × 270 = 2430 Sonnet
+   judge calls are persisted in
+   `results/runs/<eval_key>/judge_outputs.jsonl` per cell. Format
+   is per-call rows (head=success/coherence, label=0-3 grade) —
+   `temp_bench.case_studies.steering.reaggregate_from_judge_outputs`
+   handles both schemas (per-call and per-generation). PROTOCOL.md
+   § 7 *Judge κ deferred*.
 
 ## Don't repeat (agent owns — overwrite)
 
