@@ -161,10 +161,9 @@ Here we introduce Temporal Crosscoders (Fig. \ref{fig:tx_arc}). Only half a page
 % TODO: Bad title: Maybe something like evaluating ground truth temporal features
 \section{Benchmarking Temporal Crosscoders in a synthetic setting}
 % Structure:
-% Par 1: Generalizing conventional setting.
-% Par 2: Factorial-HMM parameterization of the temporal features.
-% Par 3: Two cases we consider: independent leaky-reset chains, coupled features.
-% Par 4: Discussion/other stuff we train on.
+% Par 1: Generalising the conventional setting.
+% Par 2: Two synthetic settings we evaluate on (C1, C2).
+% Par 3: Metrics.
 \label{sec:synthetic}
 % Summary figure
 \afterpage{%
@@ -209,7 +208,7 @@ defined over a temporal window of length $T$. A synthetic setting is specified b
     \qquad
     \mathbf{f}_i\in\mathbb{R}^d,
 \]
-constructed by a deterministic orthogonalisation procedure with a target pairwise cosine similarity (so the directions are near-orthogonal but not perfectly so). Second, a probability distribution $P_T$ over binary feature-firing masks
+constructed by gradient-based orthogonalisation against a target pairwise cosine similarity. Second, a probability distribution $P_T$ over binary feature-firing masks
 \[
     A=(\mathbf{a}_1,\ldots,\mathbf{a}_T)\in(\{0,1\}^N)^T,
     \qquad
@@ -221,49 +220,38 @@ where $a_{t,i}=1$ indicates that feature $i$ fires at position $t$. Third, a dis
     \qquad
     \mathbf{m}_t=(m_{t,1},\ldots,m_{t,N}),
 \]
-which we take to be i.i.d.\ half-normal across feature index and sequence position, $m_{t,i}\sim |\mathcal{N}(0,\sigma^2)|$. The synthetic activation at position $t$ is then
+which we take to be i.i.d.\ folded-normal across feature index and sequence position, $m_{t,i}=|\mathcal{N}(\mu,\sigma^2)|$ with $\mu=1.0$ and $\sigma=0.15$. The synthetic activation at position $t$ is then
 \begin{equation}
     \mathbf{x}_t=\sum_{i=1}^N a_{t,i}\,m_{t,i}\,\mathbf{f}_i.
     \label{eq:synthetic-activation}
 \end{equation}
-Thus the feature directions specify what can be recovered, while the joint law $P_T$ specifies both the local and the temporal structure of when those features fire.
+The conventional, local synthetic setting is recovered as the special case in which $P_T$ factorises across sequence positions, $P_T(\mathbf{a}_{1:T})=\prod_{t=1}^T p_{\mathrm{loc}}(\mathbf{a}_t)$. Local feature correlations are encoded by the one-position marginal over $\mathbf{a}_t$; temporal correlations are encoded by the joint distribution over $\mathbf{a}_{1:T}$.
 
-The conventional, local synthetic setting is recovered as the special case in which $P_T$ factorises across sequence positions, $P_T(\mathbf{a}_{1:T})=\prod_{t=1}^T p_{\mathrm{loc}}(\mathbf{a}_t)$. More generally, local correlations are encoded by the one-position marginal over $\mathbf{a}_t$, while temporal correlations are encoded by the joint distribution over the sequence $\mathbf{a}_{1:T}$.
+We benchmark dictionary-learning architectures on two synthetic settings.
 
-\paragraph{Factorial-HMM parameterisation.}
-We parameterise $P_T$ as a \emph{factorial} hidden Markov model: rather than a single chain over the combinatorial mask alphabet $\{0,1\}^N$, we use $K$ independent two-state chains $h_{1:K}$, with $h_i(t)\in\{0,1\}$, and an emission map $\Phi:\{0,1\}^K\to\{0,1\}^N$ that produces the observed firing mask $\mathbf{a}_t=\Phi(\mathbf{h}_t)$. Each chain is parameterised by its stationary firing probability $\pi_i\in(0,1)$ and a lag-1 autocorrelation $\rho_i\in[0,1]$, and we use the \emph{leaky-reset} transition kernel
-\begin{equation}
-    T_i \;=\; (1-\lambda_i)\,\mathbf{I}_2 \;+\; \lambda_i\bigl[(1-\delta_i)\,R_{\pi_i} + \delta_i\,\mathbf{I}_2\bigr],
-    \qquad
-    R_{\pi_i}=\begin{pmatrix}1-\pi_i & \pi_i\\ 1-\pi_i & \pi_i\end{pmatrix},
-    \label{eq:leaky-reset}
-\end{equation}
-where $\lambda_i\in[0,1]$ is the resample rate and $\delta_i\in[0,1]$ is the leak parameter. With probability $1-\lambda_i$ the chain persists ($h_i(t)=h_i(t-1)$); with probability $\lambda_i$ it resamples from a Bernoulli whose mean is biased toward the previous state by $\delta_i$. The stationary distribution is $\pi_i$ for every $\delta_i\in[0,1]$, and the effective lag-1 autocorrelation is $\rho_i=1-\lambda_i(1-\delta_i)$, which exposes $(\pi_i,\rho_i)$ as the user-facing knobs (sparsity and temporal persistence) and reduces to the standard reset chain at $\delta_i=0$ \cite{chanin2025synthetic}. Magnitudes are sampled independently of the firing mask.
-
-A dictionary-learning architecture trained on $(\mathbf{x}_t)_t$ may attempt to recover either the \emph{local} ground truth---the $N$ emission directions $\mathcal{F}$, recovering the per-position firing mask $a_{t,i}$ at inference time---or the \emph{global} ground truth associated with the latent state, depending on the structure of $\Phi$.
-
-\paragraph{Two instantiations.}
-We benchmark dictionary-learning architectures on two specific instantiations of the factorial-HMM construction.
-
-\textit{(i) Independent chains ($K=N$, identity emission).}
-The simplest setting takes $K=N$ chains and the identity emission $\Phi(\mathbf{h})=\mathbf{h}$, so each ground-truth feature has its own independent leaky-reset chain. There is no distinction between local and global structure here: the ground truth is the set of $N$ feature directions, and the only temporal correlation is the per-feature autocorrelation $\rho_i$. This case isolates the question of whether a $T$-token window helps recover features whose firing pattern is temporally smooth without being temporally entangled across features.
-
-\textit{(ii) Coupled features ($K<M$, OR-gate emission).}
-The richer setting takes $K$ hidden chains and $M>K$ emission features, connected via a binary coupling matrix $C\in\{0,1\}^{M\times K}$ in which each emission $j$ has a fixed number of parents (typically two), drawn uniformly at random. The emission map is the OR gate
+\paragraph{(C1) Independent two-state Markov support.}
+Each of $N=20$ features carries its own independent two-state Markov chain controlling whether the feature fires at each position. Each chain is parameterised by a stationary firing probability $\pi$ and a lag-1 autocorrelation $\rho$, with transition probabilities
 \[
-    s_j(t) = \Phi_j(\mathbf{h}_t) = \mathbb{1}\!\left[\,\textstyle\sum_{i=1}^K C_{ji}\,h_i(t) \geq 1\,\right],
+    \Pr(0\to 1) = \pi(1-\rho),
+    \qquad
+    \Pr(1\to 0) = (1-\pi)(1-\rho),
 \]
-so emission $j$ fires whenever \emph{any} of its parent hidden states is on. The observation is then $\mathbf{x}_t = \sum_{j=1}^M s_j(t)\,m_{j,t}\,\mathbf{f}_j$ with $\mathbf{f}_j\in\mathbb{R}^d$ the emission directions. This setup has a genuine separation between local and global ground truth: the emission directions $\{\mathbf{f}_j\}_{j=1}^M$ are the local ground truth ($M$ directions, one per emission feature), while the global ground truth is the set of $K$ hidden-state directions
+and is initialised from its stationary distribution $\mathrm{Bernoulli}(\pi)$. We use a shared $\pi=0.5$ across all features, and assign $\rho$ from five levels $\rho\in\{0.0,\,0.3,\,0.5,\,0.7,\,0.9\}$ with four features per level, so the dataset spans the full range from i.i.d.\ firing ($\rho=0$) to strongly temporally persistent firing ($\rho=0.9$). We use $d=40$ and $T=64$.
+
+\paragraph{(C2) Coupled features via OR-gated emission.}
+We generate $K=10$ independent hidden two-state Markov chains $h_{1:K}$ and $M=20$ emission features $s_{1:M}$ connected by a fixed binary coupling matrix $C\in\{0,1\}^{M\times K}$. The hidden chains are uniform with $\pi=0.05$ and $\rho=0.7$. The coupling matrix is sampled once at dataset construction so each emission $j$ has exactly $n_{\mathrm{parents}}=2$ parents drawn uniformly without replacement, and the emission rule is the OR gate
+\[
+    s_j(t) = \mathbb{1}\!\left[\,\textstyle\sum_{i=1}^K C_{ji}\,h_i(t)\geq 1\,\right],
+\]
+so emission $j$ fires whenever any of its parent hidden states is on. The observation is $\mathbf{x}_t = \sum_{j=1}^M s_j(t)\,m_{j,t}\,\mathbf{f}_j$ with $\mathbf{f}_j\in\mathbb{R}^{d}$ the orthogonal emission directions and $d=256$. This setting has a genuine separation between local and global ground truth: the $M=20$ emission directions $\{\mathbf{f}_j\}$ are the local ground truth, while the global ground truth is the set of $K=10$ hidden-state directions
 \[
     \tilde{\mathbf{f}}_i \;=\; \mathrm{normalize}\!\left(\textstyle\sum_{j:\,C_{ji}=1} \mathbf{f}_j\right),
     \qquad i=1,\ldots,K,
 \]
-each defined as the normalised mean of its children's emission directions. We score recovery against both axes: a \emph{local} AUC against the $M$ emission directions, and a \emph{global} AUC against the $K$ hidden-state directions. Because the OR gate causes co-firing of $C$-related emissions, a per-token dictionary that recovers $\mathbf{f}_j$'s separately will struggle to identify the underlying $K$-dimensional latent structure, while a temporal-window dictionary has access to the cross-position co-firing pattern that determines~$C$.
+each defined as the normalised mean of its children's emission directions.
 
-The factorial-HMM presentation in \cref{eq:leaky-reset} also subsumes a third structure that we use for ablations and report in \cref{app:synthetic-extras}: an event-block factorial HMM in which the emission map $\Phi$ partitions emissions into non-overlapping blocks, each driven by a single hidden chain (a hard version of (ii) with $C$ block-structured), giving features that fire in correlated bursts.
-
-\paragraph{Magnitudes and feature directions.}
-We sample magnitudes $m_{t,i}\sim|\mathcal{N}(0,\sigma^2)|$ i.i.d.\ across both feature index and sequence position. Feature directions $\{\mathbf{f}_j\}$ are constructed by gradient-based orthogonalisation against a target pairwise cosine similarity $c^\star\in[0,1)$, so they range from perfectly orthogonal at $c^\star=0$ to mildly entangled at moderate $c^\star$; the entanglement parameter is held fixed across architectures within a sweep so that any difference in recovery is attributable to the architecture rather than to the geometry of the ground truth.
+\paragraph{Metrics.}
+For C1 we report reconstruction NMSE and a feature-recovery AUC against the $N=20$ ground-truth feature directions: each ground-truth direction is matched to its closest decoder column by cosine similarity, and the resulting similarity is converted to an AUC against random-direction baselines. For C2 we additionally report a global-recovery AUC (gAUC) against the $K=10$ hidden-state directions. All metrics are computed on a held-out evaluation batch and averaged across three training seeds $\{1,2,42\}$.
 
 \section{Qualitative analysis of features in large scale models}
 \newpage
