@@ -708,33 +708,36 @@ time.
 
 ## Current state (agent owns — overwrite at every compact)
 
-**Last verified: 2026-05-05T14:05Z**
+**Last verified: 2026-05-05T16:10Z**
 
-**STATUS: re-purposed to C5 T-SAE T=2 baseline re-train (decisions § 15).
-Smoke launched.**
+**STATUS: COMPLETE — C5 T-SAE T=2 baseline sweep landed + pushed.**
 
-- `git HEAD`: tip of local `final` (post-pull at `2aa9f2b0` + my 3 STAND
-  DOWN commits + new baseline driver pending commit). Ahead of
-  `origin/final` until I push.
-- Pod: 8× A40, ephemeral, 401 GB RAM, 76 vCPU, 1 TB /workspace.
-- All 8 GPUs at 0 MB / 0% before smoke launch (post-STAND-DOWN clean).
-- Framework changes verified live:
-  - `TrainingConfig.train_window_size = 2` — instantiates correctly.
-  - `run_one_cell` signature now includes `train_window_size: int | None
-    = None` (kw-only).
-- New driver landed: `experiments/c5_steering_baseline/{__init__.py,
-  run.py, run_sweep.sh}`. run.py wraps `run_one_cell` with
-  `arch_name="tsae_paper"`, `train_window_size=2` baked-in.
-  run_sweep.sh uses `setsid -f` per the prior MW sweep's lesson.
-- Smoke (tsae_paper seed=42, n_steps=200, smoke=True) launched at
-  ~14:05Z on GPU 0. Output buffered to Bash task `bzgkr3t7e`.
-  Monitor `bj2gsw0sv` armed.
-- Aborted MW driver still on disk: `experiments/c5_steering_filler/`
-  with its smoke row at eval_key=`8c6bf97f2de60679` in leaderboard.
-  Kept (open question for Han re: removal).
-- Recent decisions in scope: STAND DOWN (commit `dd5f773e`) +
-  decisions § 15 (T-SAE T=2 paper-faithful re-train). Decision #14
-  (MW deployment) is rescinded.
+Sweep results (3 cells, all `arch=tsae_paper`,
+`eval_protocol_version=1.1.0`, training_cfg includes `train_window_size=2`):
+
+| seed | train_key      | eval_key       | n_valid | peak@1.75 |
+|---: |---             |---             |---:     |---:       |
+| 1    | `e8f3355683e0` | `e48e9c925224` | 270/270 | **1.500** |
+| 2    | `8f717f87f3f9` | `997075949edc` | 270/270 | **2.053** |
+| 42   | `06053869c2b7` | `53a19ea95e49` | 270/270 | **2.250** |
+| mean |                |                |         | **1.93**  |
+
+T=2 lift over agent_steer's existing T=None tsae_paper cells
+(peak@1.75 ∈ {~0.62, ~1.40}): clean **+0.5 to +1.5** on headline.
+Confirms SAEBench-canonical window helps T-SAE.
+
+- Sweep wall: ~28 min (faster than 45-60 min estimate).
+- All 3 run_dirs HF-pushed via `wrap_up_session.sh`.
+- All 3 checkpoints (+ smoke `13add3edc6b45d5a`) on HF.
+- Local `final` == `origin/final` at `dd7ef9b6` (pushed via custom
+  credential helper because the gh_token URL form failed; fix at
+  `~/.tokens/gh_token` works fine for API calls).
+- Pod safe to stop.
+
+Aborted MW driver still on disk at `experiments/c5_steering_filler/`
+with its smoke row at eval_key=`8c6bf97f2de60679` in leaderboard
+(open question for Han re: removal — `canonical_train_keys` filters
+it out via `smoke=true`, harmless to leave).
 
 ## What I just did (agent owns — overwrite)
 
