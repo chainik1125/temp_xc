@@ -387,33 +387,51 @@ def plot_probe_curves(rows: list[dict], out_dir: Path) -> dict[str, Path]:
         label = base_label if n == 0 else f"{base_label} [{tk[:6]}]"
         series[(arch, bs, tk)] = (label, log_rows, arch)
     out = {}
-    for metric, ylabel, fname in [
-        ("nmse", "NMSE on held-out batch", "nmse_vs_step.png"),
-        ("l0",   "$\\ell_0$ density on held-out batch",  "l0_vs_step.png"),
-        ("dead", "Dead features (out of $d_{\\mathrm{SAE}}$)", "dead_vs_step.png"),
-    ]:
-        plt.figure(figsize=(8.5, 5.0))
-        for (arch, bs, _tk), (lab, log_rows, arch_name) in sorted(series.items()):
-            steps = [x["step"] for x in log_rows]
-            vals = [x.get(metric) for x in log_rows]
-            valid = [(s, v) for s, v in zip(steps, vals) if v is not None]
-            if not valid:
-                continue
-            xs, ys = zip(*valid)
-            color = cell_color(arch_name, bs)
-            plt.plot(xs, ys, color=color, linestyle="-", linewidth=1.4, label=lab)
-        plt.xlabel("Training step")
-        plt.ylabel(ylabel)
-        plt.xscale("log")
-        plt.yscale("log")
-        plt.title(f"{ylabel} vs training step (held-out probe every 100 steps)")
-        plt.legend(fontsize=8, loc="best", ncol=2)
-        plt.grid(alpha=0.3, which="both")
-        plt.tight_layout()
-        out_path = out_dir / fname
-        plt.savefig(out_path, dpi=150)
-        plt.close()
-        out[metric] = out_path
+    metric_specs = [
+        ("nmse", "NMSE on held-out batch", "nmse_vs_step"),
+        ("l0",   "$\\ell_0$ density on held-out batch",  "l0_vs_step"),
+        ("dead", "Dead features (out of $d_{\\mathrm{SAE}}$)", "dead_vs_step"),
+    ]
+    # Two scales per metric: linear (default) and log-log. Both are
+    # rendered so the appendix can pick whichever reads better, and
+    # the linear one stays available for readers who prefer it.
+    scale_specs = [
+        ("",       "linear", "linear"),
+        ("_loglog", "log",   "log"),
+    ]
+    for metric, ylabel, fname_stem in metric_specs:
+        for fname_suffix, x_scale, y_scale in scale_specs:
+            plt.figure(figsize=(8.5, 5.0))
+            for (arch, bs, _tk), (lab, log_rows, arch_name) in sorted(series.items()):
+                steps = [x["step"] for x in log_rows]
+                vals = [x.get(metric) for x in log_rows]
+                # log-log axes can't render zero or negative values; drop them.
+                if x_scale == "log":
+                    valid = [(s, v) for s, v in zip(steps, vals)
+                             if v is not None and v > 0 and s > 0]
+                else:
+                    valid = [(s, v) for s, v in zip(steps, vals) if v is not None]
+                if not valid:
+                    continue
+                xs, ys = zip(*valid)
+                color = cell_color(arch_name, bs)
+                plt.plot(xs, ys, color=color, linestyle="-",
+                         linewidth=1.4, label=lab)
+            plt.xlabel("Training step")
+            plt.ylabel(ylabel)
+            plt.xscale(x_scale)
+            plt.yscale(y_scale)
+            scale_tag = " (log-log)" if x_scale == "log" else ""
+            plt.title(
+                f"{ylabel} vs training step (held-out probe every 100 steps){scale_tag}"
+            )
+            plt.legend(fontsize=8, loc="best", ncol=2)
+            plt.grid(alpha=0.3, which="both")
+            plt.tight_layout()
+            out_path = out_dir / f"{fname_stem}{fname_suffix}.png"
+            plt.savefig(out_path, dpi=150)
+            plt.close()
+            out[f"{metric}{fname_suffix}"] = out_path
     return out
 
 
@@ -547,11 +565,17 @@ def write_markdown(rows: list[dict], assets_rel: str, out_path: Path) -> None:
     md.append("dead-feature count on a held-out batch. These plots cover both completed ")
     md.append("and in-flight cells, so curves may extend to different terminal steps.")
     md.append("")
-    md.append(f"![NMSE vs training step]({assets_rel}/nmse_vs_step.png)")
+    md.append(f"![NMSE vs training step (linear)]({assets_rel}/nmse_vs_step.png)")
     md.append("")
-    md.append(f"![L0 vs training step]({assets_rel}/l0_vs_step.png)")
+    md.append(f"![NMSE vs training step (log-log)]({assets_rel}/nmse_vs_step_loglog.png)")
     md.append("")
-    md.append(f"![Dead features vs training step]({assets_rel}/dead_vs_step.png)")
+    md.append(f"![L0 vs training step (linear)]({assets_rel}/l0_vs_step.png)")
+    md.append("")
+    md.append(f"![L0 vs training step (log-log)]({assets_rel}/l0_vs_step_loglog.png)")
+    md.append("")
+    md.append(f"![Dead features vs training step (linear)]({assets_rel}/dead_vs_step.png)")
+    md.append("")
+    md.append(f"![Dead features vs training step (log-log)]({assets_rel}/dead_vs_step_loglog.png)")
     md.append("")
 
     md.append("## Per-cell metadata")
