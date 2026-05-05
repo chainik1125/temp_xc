@@ -1539,52 +1539,74 @@ def run_arch_evaluation(
              len(phase1), len(cohort.truly_wrong), len(cohort.originally_correct))
 
     # ── Step 4: cut25 + steered generation per (qid, mag) ────────────
-    layer = 10  # paper-justified per docs/components/c7.md
-    layer_module = rmodel.model.layers[layer]
-    hook = SteeringHook(vec)
-    handle = layer_module.register_forward_hook(hook)
-    try:
-        # Build panels
-        problem_prompts: list[str] = []
-        prefix_token_ids: list[list[int]] = []
-        mags: list[float] = []
-        budgets: list[int] = []
-        meta: list[tuple[str, float]] = []  # (qid, mag) per panel for judge dispatch
-        for qid in cohort.all:
-            row = by_qid[qid]
-            cut_pos = cut25_token_position(row["unsteered_token_ids"], fraction=cut_fraction)
-            prefix = row["unsteered_token_ids"][:cut_pos]
-            remaining_budget = max(64, len(row["unsteered_token_ids"]) - cut_pos)
-            for m in magnitudes:
-                problem_prompts.append(_build_prompt(row["problem"]))
-                prefix_token_ids.append(prefix)
-                mags.append(float(m))
-                budgets.append(remaining_budget)
-                meta.append((qid, float(m)))
-        log.info("[c7] %d panels = %d qids × %d mags", len(meta), len(cohort.all), len(magnitudes))
+    # Short-circuit: if every (qid, mag, arch, seed) panel is already
+    # successfully judged (label≥0) in this workspace's
+    # ``judge_outputs.jsonl``, skip panel-gen + judge-dispatch entirely.
+    # Saves ~85 min of GPU steered generation per cell on force-eval
+    # re-runs (e.g., when adding the within-window shuffle ablation
+    # without changing magnitudes — Han 2026-05-05 PM detection mission).
+    needed_keys = {
+        (qid, float(m), arch_name, seed)
+        for qid in cohort.all
+        for m in magnitudes
+    }
+    existing_done = judge.existing_keys()  # already filters label≥0 only
+    panel_gen_needed = not needed_keys.issubset(existing_done)
 
-        outs = generate_continuation_panels(
-            rmodel, rtok, hook,
-            problem_prompts=problem_prompts,
-            prefix_token_ids=prefix_token_ids,
-            mags_per_panel=mags,
-            max_new_per_panel=budgets,
-            batch_size=gen_batch_size,
-        )
-    finally:
-        handle.remove()
+    layer = 10  # paper-justified per docs/components/c7.md
+    if panel_gen_needed:
+        layer_module = rmodel.model.layers[layer]
+        hook = SteeringHook(vec)
+        handle = layer_module.register_forward_hook(hook)
+        try:
+            # Build panels
+            problem_prompts: list[str] = []
+            prefix_token_ids: list[list[int]] = []
+            mags: list[float] = []
+            budgets: list[int] = []
+            meta: list[tuple[str, float]] = []  # (qid, mag) per panel for judge dispatch
+            for qid in cohort.all:
+                row = by_qid[qid]
+                cut_pos = cut25_token_position(row["unsteered_token_ids"], fraction=cut_fraction)
+                prefix = row["unsteered_token_ids"][:cut_pos]
+                remaining_budget = max(64, len(row["unsteered_token_ids"]) - cut_pos)
+                for m in magnitudes:
+                    problem_prompts.append(_build_prompt(row["problem"]))
+                    prefix_token_ids.append(prefix)
+                    mags.append(float(m))
+                    budgets.append(remaining_budget)
+                    meta.append((qid, float(m)))
+            log.info("[c7] %d panels = %d qids × %d mags", len(meta), len(cohort.all), len(magnitudes))
+
+            outs = generate_continuation_panels(
+                rmodel, rtok, hook,
+                problem_prompts=problem_prompts,
+                prefix_token_ids=prefix_token_ids,
+                mags_per_panel=mags,
+                max_new_per_panel=budgets,
+                batch_size=gen_batch_size,
+            )
+        finally:
+            handle.remove()
+            del rmodel
+            import gc; gc.collect()
+            torch.cuda.empty_cache()
+
+        # ── Step 5: judge ────────────────────────────────────────────────
+        judge_rows = [
+            (qid, mag, arch_name, seed, prompt, gen)
+            for (qid, mag), prompt, gen in zip(meta, problem_prompts, outs)
+        ]
+        log.info("[c7] dispatching %d Sonnet judge calls", len(judge_rows))
+        judge_outs = asyncio.run(judge.judge_many(judge_rows))
+        log.info("[c7] judge done: %d new outputs (existing skipped)", len(judge_outs))
+    else:
+        # Free reasoning model — we don't need it for the cached-judge path.
         del rmodel
         import gc; gc.collect()
         torch.cuda.empty_cache()
-
-    # ── Step 5: judge ────────────────────────────────────────────────
-    judge_rows = [
-        (qid, mag, arch_name, seed, prompt, gen)
-        for (qid, mag), prompt, gen in zip(meta, problem_prompts, outs)
-    ]
-    log.info("[c7] dispatching %d Sonnet judge calls", len(judge_rows))
-    judge_outs = asyncio.run(judge.judge_many(judge_rows))
-    log.info("[c7] judge done: %d new outputs (existing skipped)", len(judge_outs))
+        log.info("[c7] cached: all %d (qid, mag, arch, seed) keys already judged; skipping panel gen + dispatch",
+                 len(needed_keys))
 
     # Compute Δgc — re-load all rows from jsonl so we get any prior runs too.
     all_judge_rows = []
@@ -1608,16 +1630,21 @@ def run_arch_evaluation(
         if a == arch_name:
             metrics[f"delta_gc_mag_{m:+.1f}"] = float(d)
 
-    # ── Step 6: PR-AUC detection ─────────────────────────────────────
+    # ── Step 6: PR-AUC detection (+ paired within-window shuffle ablation) ──
+    # Uses the shared :func:`temp_bench.eval.detection.detect_case_study`
+    # API (Han 2026-05-05 PM directive, commit 1a12e647). The new path
+    # adds a paired within-window token-shuffle ablation: encode + probe
+    # twice (unshuffled + shuffled), report both PR-AUCs and the gap
+    # ``pr_auc - pr_auc_shuffled``. Decision rule: ``shuffle_gap ≥ 0.02``
+    # across S = genuinely temporal detection; ``< 0.02`` = window-density.
+    # Mirrors the prior ``compute_pr_auc_at_S`` exactly on the unshuffled
+    # column (same probe, same selector, same 5-fold GroupKFold by qid).
     if sentence_acts is not None and sentence_labels is not None:
-        log.info("[c7] computing PR-AUC across S=%s (%d sentences)",
+        from temp_bench.eval.detection import detect_case_study
+        log.info("[c7] computing PR-AUC + shuffle-gap across S=%s (%d sentences)",
                  list(pr_auc_S_grid), len(sentence_labels))
-        # Encode sentence-window acts via SAE → per-sentence pooled features.
-        # Batched to avoid OOM at d_sae=32768 (25K × 6 × 32768 fp32 ≈ 19 GB
-        # encoded at once; batched at 1024 caps peak at ~800 MB).
-        # Per-arch T: slice (B, T=6, d) → (B, arch_T, d) to match encode contract.
-        device = next(arch.parameters()).device
-        param_dtype = next(arch.parameters()).dtype
+        # Per-arch T: slice (B, T=6, d) → (B, arch_T, d) so encode-and-pool
+        # inside detect_case_study sees the right window length.
         arch_T = getattr(arch.config, "T", None) or 1
         win_T = sentence_acts.shape[1]
         sa_for_arch = sentence_acts
@@ -1629,23 +1656,21 @@ def run_arch_evaluation(
                 [np.repeat(sentence_acts[:, :1, :], pad, axis=1), sentence_acts],
                 axis=1,
             )
-        n = len(sentence_labels)
-        batch = 1024
-        chunks: list[np.ndarray] = []
-        with torch.no_grad():
-            for i in range(0, n, batch):
-                xb = torch.from_numpy(sa_for_arch[i:i + batch]).to(device, dtype=param_dtype)
-                z = arch.encode(xb).abs().float()
-                if z.dim() == 3:
-                    z = z.amax(dim=1)
-                chunks.append(z.detach().cpu().numpy())
-                del z, xb
-        X_np = np.concatenate(chunks, axis=0)
-        pr_auc = compute_pr_auc_at_S(
-            X_np, sentence_labels, sentence_qids, S_grid=pr_auc_S_grid,
+        det_result = detect_case_study(
+            arch=arch,
+            sentence_acts=sa_for_arch,
+            labels=sentence_labels,
+            question_ids=sentence_qids,
+            S_grid=pr_auc_S_grid,
+            shuffle_seed=42,
         )
-        for S, ap in pr_auc.items():
+        for S, ap in det_result.pr_auc.items():
             metrics[f"pr_auc_S{S}"] = float(ap)
+        if det_result.pr_auc_shuffled is not None:
+            for S, ap in det_result.pr_auc_shuffled.items():
+                metrics[f"pr_auc_shuf_S{S}"] = float(ap)
+            for S, gap in det_result.shuffle_gap.items():
+                metrics[f"pr_auc_gap_S{S}"] = float(gap)
 
     return CaseStudyResult(
         case_study="c7_backtracking",
