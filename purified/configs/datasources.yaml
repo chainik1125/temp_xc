@@ -85,6 +85,38 @@ datasources:
     tokenizer_revision: main
     notes: "T-SAE paper anchor. Stretch goal — paper-fidelity setup."
 
+  gemma_2_2b_base_l11to15_fineweb_24k128:
+    category: real_lm
+    subject_model: google/gemma-2-2b
+    layers: [11, 12, 13, 14, 15]
+    hookpoint: resid_post
+    dataset: fineweb
+    n_seqs: 24000
+    seq_len: 128
+    tokenizer_revision: main
+    notes: |
+      C3 BASE replication — multi-layer cache for MLC (decisions § 16
+      stretch). Mirrors `gemma_2_2b_it_l11to15_fineweb_24k128` at the
+      BASE subject. ~70 GB on disk, ~3 H100-hours to build. Used by
+      agent_steer_100k's BASE C3 + C4 replication if MLC is in scope.
+
+  gemma_2_2b_base_l13_concat_v1:
+    category: real_lm
+    subject_model: google/gemma-2-2b
+    layer: 13
+    hookpoint: resid_post
+    dataset: concat_v1
+    n_seqs: 3
+    seq_len: variable
+    tokenizer_revision: main
+    notes: |
+      C4 BASE replication — qualitative-latents source on the BASE
+      subject. Mirrors `gemma_2_2b_it_l13_concat_v1` (3 contiguous-
+      passage concatenations: concat_A, concat_B, concat_random) but
+      with the BASE subject_model. Used by agent_steer_100k's BASE
+      replication; cache build is fast (3 seqs, variable length) — no
+      H100-hour budget needed.
+
   gemma_2_2b_it_l13_concat_v1:
     category: real_lm
     subject_model: google/gemma-2-2b-it
