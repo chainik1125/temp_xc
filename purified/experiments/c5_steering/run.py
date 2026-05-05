@@ -81,7 +81,12 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(name)s] %(message
 
 COMPONENT = "c5"
 DATASOURCE = "gemma_2_2b_it_l13_fineweb_24k128"
-EVAL_PROTOCOL_VERSION = "1.0.0"
+# 1.0.0 → 1.1.0 (2026-05-05): fixed concept-lift feature selection
+# (was raw-activation argmax which picked the same always-on feature
+# for nearly all 30 concepts, giving 0.13 mean success_grade vs the
+# wasteland's 1.13 anchor). New eval_key invalidates the 9 stale
+# v1.0.0 rows; analysis.py filters to 1.1.0.
+EVAL_PROTOCOL_VERSION = "1.1.0"
 
 DEFAULT_ARCHS: tuple[str, ...] = ("tsae_paper", "txc_base", "txc_pro")
 DEFAULT_SEEDS: tuple[int, ...] = (1, 2, 42)

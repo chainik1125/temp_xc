@@ -333,27 +333,47 @@ def test_generation_to_json_phase7_compat():
 # ── feature selection: single-batch sanity ────────────────────────────
 
 
-def test_select_best_features_argmax_matches():
-    """If the encode function returns a fixed activation vector with
-    its argmax at index 7, every concept's best feature should be 7."""
-    d_in, d_sae = 16, 32
-    fixed = torch.zeros(d_sae)
-    fixed[7] = 1.0
-    arch = _FixedZSAE(d_in, d_sae, fixed)
+def test_select_best_features_concept_lift():
+    """Concept-lift selection (NOT raw-activation argmax): a feature
+    that fires strongly across ALL concepts (always-on) gets ~zero
+    lift; features that fire SELECTIVELY on one concept get high lift.
 
-    # Stub a "subject_model" + "tokenizer" that yield deterministic acts
-    # without actually running Gemma. We do this by monkey-patching
-    # _capture_anchor_layer_acts via a simple wrapper.
+    Setup: 2 concepts × 5 sentences each. We monkey-patch
+    ``_encode_per_position`` so that:
+      - Feature 0 fires at activation 100 on every concept (always-on).
+      - Feature 7 fires at activation 50 only on concept 0.
+      - Feature 13 fires at activation 50 only on concept 1.
+
+    Raw-activation argmax would pick feature 0 for both concepts.
+    Concept-lift correctly picks 7 for concept 0 and 13 for concept 1.
+    """
+    d_in, d_sae = 16, 32
+    arch = _FixedZSAE(d_in, d_sae, torch.zeros(d_sae))    # body unused
+    n_per = 5
+    n_concepts = 2
+    S = 8
+
     from temp_bench.case_studies import steering as st
 
-    captured_acts = torch.zeros(2 * 5, 8, d_in)        # 2 concepts × 5 examples × 8 tokens
-    captured_attn = torch.ones(2 * 5, 8, dtype=torch.int8)
+    captured_acts = torch.zeros(n_concepts * n_per, S, d_in)
+    captured_attn = torch.ones(n_concepts * n_per, S, dtype=torch.int8)
+
+    # Build the (N, S, d_sae) z tensor per the encode contract.
+    z = torch.zeros(n_concepts * n_per, S, d_sae)
+    z[:, :, 0] = 100.0                                    # always-on
+    z[:n_per, :, 7] = 50.0                                # concept 0
+    z[n_per:, :, 13] = 50.0                               # concept 1
 
     def _stub_capture(*args, **kwargs):
         return captured_acts, captured_attn
 
-    orig = st._capture_anchor_layer_acts
+    def _stub_encode_per_position(arch, acts, T):         # noqa: ARG001
+        return z
+
+    orig_capture = st._capture_anchor_layer_acts
+    orig_encode = st._encode_per_position
     st._capture_anchor_layer_acts = _stub_capture
+    st._encode_per_position = _stub_encode_per_position
     try:
         sel = select_best_features(
             arch.cpu(),
@@ -361,13 +381,16 @@ def test_select_best_features_argmax_matches():
             subject_model=None,
             tokenizer=None,
             device=torch.device("cpu"),
-            concepts=CONCEPTS[:2],
+            concepts=CONCEPTS[:n_concepts],
             top_k=3,
         )
     finally:
-        st._capture_anchor_layer_acts = orig
+        st._capture_anchor_layer_acts = orig_capture
+        st._encode_per_position = orig_encode
 
-    for cid in (CONCEPTS[0]["id"], CONCEPTS[1]["id"]):
-        assert sel.best_idx[cid] == 7
-        # Top-3 must include 7 first
-        assert sel.top_k[cid][0][0] == 7
+    cid0, cid1 = CONCEPTS[0]["id"], CONCEPTS[1]["id"]
+    assert sel.best_idx[cid0] == 7, f"expected 7, got {sel.best_idx[cid0]}"
+    assert sel.best_idx[cid1] == 13, f"expected 13, got {sel.best_idx[cid1]}"
+    # Always-on feature 0 must NOT be top-1 for either concept.
+    assert sel.top_k[cid0][0][0] != 0
+    assert sel.top_k[cid1][0][0] != 0

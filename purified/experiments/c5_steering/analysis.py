@@ -39,6 +39,13 @@ PLOT_DIR = EXP_DIR / "plots"
 ARCHS = ("tsae_paper", "txc_base", "txc_pro")
 SEEDS = (1, 2, 42)
 DATASOURCE_NAMES = ("gemma_2_2b_it_l13_fineweb_24k128",)
+# Pre-2026-05-05 v1.0.0 cells used raw-activation argmax for feature
+# selection (a bug — picked the same always-on feature for ~all 30
+# concepts, giving 0.13 mean success_grade vs the wasteland's 1.13
+# anchor). v1.1.0 fixes this with concept-lift selection. Old 1.0.0
+# rows stay in leaderboard.jsonl for diff; AUTO-RESULTS reads only
+# 1.1.0.
+HEADLINE_EVAL_PROTOCOL_VERSION = "1.1.0"
 
 
 def _placeholder(reason: str) -> str:
@@ -142,7 +149,11 @@ def run_analysis() -> AnalysisResult:
         datasource_names=DATASOURCE_NAMES,
         training_cfg=TrainingConfig(n_steps=20_000),
     )
-    rows = [r for r in rows if r.train_key in valid_train_keys]
+    rows = [
+        r for r in rows
+        if r.train_key in valid_train_keys
+        and r.eval_protocol_version == HEADLINE_EVAL_PROTOCOL_VERSION
+    ]
     if not rows:
         return AnalysisResult(
             markdown=_placeholder(

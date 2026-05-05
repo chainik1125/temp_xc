@@ -959,16 +959,33 @@ def select_best_features(
         per_concept[ci] = (z_c * m_c).sum(dim=(0, 1)) / denom
     activation_matrix = per_concept.cpu().numpy().astype(np.float32)
 
+    # Concept-LIFT, not raw activation: always-on / dense features fire
+    # ~equally on all 30 concepts and look spuriously "good" for every
+    # concept under raw-activation argmax. Subtract the per-feature
+    # cross-concept baseline so a feature that fires SELECTIVELY on a
+    # concept gets a large positive lift; an always-on feature gets ~0.
+    # Verbatim from wasteland's
+    # ``origin/han-phase7-unification:experiments/phase7_unification/case_studies/steering/select_features.py``
+    # — the original docstring on this function said "concept-lift" but
+    # the body did raw-activation argmax (bug 2026-05-05). Empirically
+    # the missing baseline picked feature 3010 (or analogous) for ALL
+    # 30 concepts on tsae_paper, giving 0.13 mean success_grade vs the
+    # wasteland's 1.13 anchor.
+    baseline = activation_matrix.mean(axis=0)                       # (d_sae,)
+    lift_matrix = activation_matrix - baseline[None, :]             # (30, d_sae)
     best_idx: dict[str, int] = {}
     best_act: dict[str, float] = {}
     top_k_dict: dict[str, list[tuple[int, float]]] = {}
     for ci, c in enumerate(concepts):
         cid = c["id"]
-        row = activation_matrix[ci]
-        order = np.argsort(-row)
+        lift_row = lift_matrix[ci]
+        order = np.argsort(-lift_row)
         best_idx[cid] = int(order[0])
-        best_act[cid] = float(row[order[0]])
-        top_k_dict[cid] = [(int(j), float(row[j])) for j in order[:top_k]]
+        # Report raw activation at the selected feature for sanity.
+        best_act[cid] = float(activation_matrix[ci, order[0]])
+        top_k_dict[cid] = [
+            (int(j), float(activation_matrix[ci, j])) for j in order[:top_k]
+        ]
     return FeatureSelection(
         arch_name=arch_name,
         best_idx=best_idx,
