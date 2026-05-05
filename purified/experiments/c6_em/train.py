@@ -134,7 +134,7 @@ def _instantiate_with_overrides(arch_name: str, component: str, d_in: int,
     """
     spec = load_arch(arch_name, component=component)
     hparams = dict(spec.hparams)
-    if arch_name == "txc_base":
+    if arch_name in ("txc_base", "txc_base_mw"):
         hparams["auxk_alpha"] = float(training_cfg.ema_auxk_alpha)
         hparams["dead_threshold_tokens"] = int(training_cfg.dead_threshold_tokens)
     cls = _resolve_class(spec.class_path)
