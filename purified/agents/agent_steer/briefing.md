@@ -354,31 +354,40 @@ one-liner to verify HF state before stop.
 
 ## Current state (agent owns — overwrite at every compact)
 
-**Last verified: 2026-05-05T08:55Z — c5 status: COMPLETE (9/9 cells
-landed at canonical b1024 / n_steps=20_000).**
+**Last verified: 2026-05-05T11:00Z — c5 status: COMPLETE (9/9 cells
+at v1.1.0 with concept-lift bug fix).**
 
-- `git HEAD`: `14ba5bb9 Agent STEER: c5 — 9/9 cells complete (sweep
-  done)` (pushed). Working tree clean modulo untracked checkpoint
-  dirs + logs/. All 9 checkpoints confirmed on HF temp-bench-models.
-- **Final headline (peak success grade @ coh ≥ 1.75, n=3 each)**:
-  - tsae_paper: 0.333 ± 0.019  (seeds {42:0.367, 1:0.333, 2:0.300})
-  - txc_base:   0.289 ± 0.011  (seeds {42:0.300, 1:0.267, 2:0.300})
-  - txc_pro:    0.341 ± 0.021  (seeds {42:0.357, 1:0.367, 2:0.300})
-  Hypothesis "TXC matches T-SAE" SUPPORTED — txc_pro 0.341 vs
-  tsae 0.333 within 1 stderr; txc_base 0.289 vs 0.333 also within
-  1 stderr (overlap of 0.289 ± 0.011 with 0.333 ± 0.019). All 9
-  cells: n_valid=270/270, MSE final-1K drop < 5% (range 0.09–3.43%).
-- **Recovery from API outage 2026-05-05T05:59 UTC**: txc_base seed=1
-  hit Anthropic credit exhaustion (all 270 judge calls returned
-  HTTP 400 "credit balance is too low"). Han topped up at 06:30 UTC.
-  I removed the 0.0-metric row from `leaderboard.jsonl`, deleted
-  the failed run_dir, and re-ran with `--force-eval` on the cached
-  checkpoint. The new row (eval_key `2223a675`) has n_valid=270/270.
+- `git HEAD`: `eb15651d Agent STEER: c5 — v1.1.0 sweep complete
+  (9/9 cells); hypothesis REFUTED` (pushed).
+- **Final headline (peak success grade @ coh ≥ 1.75, n=3 each)** —
+  v1.1.0, concept-lift selection:
+  - tsae_paper: 2.167 ± 0.104  (seeds {42:2.056, 1:2.375, 2:2.071})
+  - txc_pro:    1.284 ± 0.084  (seeds {42:1.333, 1:1.120, 2:1.400})
+  - txc_base:   0.792 ± 0.063  (seeds {42:0.842, 1:0.867, 2:0.667})
+  Hypothesis "TXC matches T-SAE" REFUTED — T-SAE beats txc_pro by
+  0.88 ± 0.13 (~7σ) and txc_base by 1.38 (~13σ). Relative ordering
+  matches wasteland phase-7 (T-SAE > TXC-pro > TXC-base).
+- **Concept-lift bug fix** (commit `ef33f822`, v1.0.0 → v1.1.0):
+  Han caught it from the c5 plot — all peak-grade points aligned
+  horizontally and success ~0.3 vs wasteland's 1.13 anchor. Root
+  cause: ``select_best_features`` did raw-activation argmax. On
+  tsae_paper, ALL 30 concepts selected feature 3010 (always-on text
+  feature, activation ~95 across every concept, 5× the next-best).
+  Fix: subtract per-feature cross-concept baseline → concept-lift.
+  Verbatim from wasteland's
+  ``origin/han-phase7-unification:experiments/phase7_unification/case_studies/steering/select_features.py``.
+  All 9 cells re-evaluated on cached training checkpoints with
+  ``--force-eval``; took ~30 min total.
 - **GPU pinning (Han 2026-05-04 PM)**: I get GPUs 1 and 3;
   agent_back gets 0 and 2. Now both my GPUs are idle — sweep done.
 - **Preloaded batch_iter** (commit 751d1789): bit-identical with
   legacy iterator, ~1.4× trainer speedup. Gemma cache ~14 GB RAM
-  per process. Confirmed safe.
+  per process.
+- **Recovery from API outage 2026-05-05T05:59 UTC** (resolved):
+  during the v1.0.0 sweep, txc_base seed=1's 270 judge calls failed
+  with HTTP 400 "credit balance is too low". Han topped up at 06:30.
+  Both old failure-mode incident and v1.0.0 buggy rows are now
+  superseded by v1.1.0.
 
 - **TrainingConfig is now (Han 2026-05-04 PM URGENT)**:
   batch_size=1024, n_steps=**20_000** (deadline override),
