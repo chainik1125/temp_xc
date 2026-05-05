@@ -101,6 +101,7 @@ def _train_one(
     train_cfg: TrainConfig,
     device: torch.device,
 ) -> CellResult:
+    import time
     iterator = _make_iterator(cache, train_cfg.batch_size, W)
     opt = torch.optim.Adam(
         model.parameters(), lr=train_cfg.lr, betas=train_cfg.adam_betas
@@ -108,6 +109,7 @@ def _train_one(
     history: list[dict] = []
     F_dev = F.to(device=device, dtype=torch.float32)
     N = F.shape[0]
+    t_start = time.time()
 
     for step in range(train_cfg.n_steps):
         x = next(iterator).to(device)
@@ -139,6 +141,15 @@ def _train_one(
                 "s_adj": s_adj,
                 "recovery_auc": rec_auc,
             })
+            elapsed = time.time() - t_start
+            steps_per_sec = (step + 1) / max(elapsed, 1e-6)
+            eta_sec = (train_cfg.n_steps - step - 1) / max(steps_per_sec, 1e-6)
+            print(
+                f"  [{arch} W={W}] step={step:>6d} loss={eval_loss.item():.4f} "
+                f"L0={l0:.2f} rec_sq={rec_sq:.3f} S_adj={s_adj:.3f} "
+                f"AUC={rec_auc:.3f} | {steps_per_sec:.1f} it/s ETA {eta_sec/60:.1f}m",
+                flush=True,
+            )
 
     last = history[-1]
     return CellResult(
