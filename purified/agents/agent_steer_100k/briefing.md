@@ -1,42 +1,51 @@
 <!--
-DRAFT — written by agent_paper 2026-05-04 PM, REWRITTEN 2026-05-05
-to reflect the C5 MW pivot (the original 100K convergence-test
-mission was abandoned — see "Mission pivot" below).
+DRAFT — written by agent_paper 2026-05-04 PM, REWRITTEN 2026-05-05 PM
+to reflect the C7 MW pivot (the C5 MW mission turned out to be too
+slow on this pod's H100 — a CPU-bandwidth bottleneck flagged in
+commit `e7b229fd`. Pivoting to C7 MW where there's a coverage gap
+and the H100's VRAM is genuinely needed).
 Section ownership: PROTOCOL.md § 14.
 -->
 
 ---
 agent: agent_steer_100k
-last_state_update: 2026-05-05T11:05:00Z
-component: c5 (multi-window deployment)
+last_state_update: 2026-05-05T13:00:00Z
+component: c7 (multi-window deployment for backtracking)
 ---
 
 ## Identity + mandate (Han owns — agents do not edit)
 
-You are **agent STEER 100K** (legacy name; mission has pivoted —
-see below). You own the **C5 multi-window deployment** only. Files
-you may edit:
+You are **agent STEER 100K** (legacy name; mission has pivoted twice
+now — see below). You own the **C7 multi-window deployment** as a
+helper to agent_back. Your purpose: train and evaluate `txc_base_mw`
+and `txc_pro_mw` on the C7 backtracking setup so agent_back's headline
+gets MW data without re-running their A40 sweep.
+
+Files you may edit:
 
 - `agents/agent_steer_100k/briefing.md` (your own — agent-owned sections only)
-- `experiments/c5_steering_mw/` (new experiment directory you create
+- `experiments/c7_backtracking_mw/` (new experiment directory you create
   with a minimal driver — see "First concrete task" below).
 - Code under `src/temp_bench/` that you author + commit — but in
-  practice you should not need to write any. The C5 case-study code,
-  V7 steering, Sonnet judge, Gemma activation cache loader, and the
-  concept-lift baseline fix are **agent_steer's territory** and
-  already work. Re-use via imports.
+  practice you should not need to write any. agent_back's C7 plumbing
+  (Stage A traces, sentence-acts cache, mined features, SteeringHook
+  with DoM-base-union normalization, Sonnet judge, Δgc + PR-AUC eval)
+  is already wired and compatible with the multi-window TXC archs
+  (the per-arch decoder-norm rescale happens inside the case-study
+  code, not in arch code — verified 2026-05-05 PM).
 
 **Files that are OUT OF SCOPE — do NOT edit:**
 - `agents/agent_*/` — every other agent's directory **including
-  `agents/agent_steer/`**. agent_steer's briefing, decisions, and
-  per-cell state are theirs. You read for context, you do not write.
-- `experiments/c5_steering/` — agent_steer's territory. Their `run.py`,
-  `analysis.py`, `_real_training_cfg`, `select_best_features`, etc.
-  Import from here without modification.
-- `experiments/c5_steering_100k/` — your OLD driver from the abandoned
-  100K mission. Leave it as-is; agent_paper may delete or repurpose it
-  later.
-- `docs/components/c5.md` — agent_steer's territory.
+  `agents/agent_back/` and `agents/agent_steer/`**. Their briefings,
+  decisions, and per-cell state are theirs.
+- `experiments/c7_backtracking/` — agent_back's territory. Their
+  `run.py`, `analysis.py`, `smoke.py`. You import from there without
+  modification.
+- `experiments/c5_steering/`, `experiments/c5_steering_mw/`,
+  `experiments/c5_steering_filler/` — agent_steer / agent_filler /
+  prior-mission territories.
+- `docs/components/c7.md` — agent_back's territory. agent_paper
+  integrates results at paper-render time.
 - `docs/paper/*` — agent_paper's territory.
 - `agents/agent_paper/decisions.md` — global decisions log.
 - `agents/README.md` — roster/contract; agent_paper-owned.
@@ -49,219 +58,260 @@ surface it in chat, and let Han or agent_paper land the change. Even
 if Han verbally approves, do not commit cross-territory edits yourself.
 This is non-negotiable — see PROTOCOL.md § 8 + CLAUDE.md Hard Rule #7.
 
-### ⚠️ Mission pivot 2026-05-05 — abandon 100K, deploy MW at canonical 20K
+### ⚠️ Mission pivot 2026-05-05 PM — abandon C5 MW, deploy C7 MW
 
-**Old mission (abandoned)**: replicate agent_steer's C5 sweep at
-`n_steps=100_000` to test convergence sensitivity. **You reported the
-ETA as 108 hours** for the full 3-arch × 3-seed sweep — does not fit
-in the remaining sprint window, and agent_steer caught a critical bug
-that invalidated all v1.0.0 eval cells anyway (concept-lift feature
-selection, fixed in commit `ef33f822`, EVAL_PROTOCOL_VERSION
-1.0.0 → 1.1.0).
+**Old mission (this morning, abandoned)**: pivot from the original
+100K convergence-test mission to **C5 MW** with `txc_base_mw +
+txc_pro_mw × {42,1,2}`. You launched the sweep, smoke-tested
+successfully, and landed 1 cell (`txc_base_mw` seed=42 C5,
+eval_key=`963df9c69213f998`). But your subsequent reports flagged a
+CPU-bandwidth bottleneck on this H100 pod (commit `e7b229fd`) that
+made remaining C5 MW cells too slow to fit the sprint window — and
+agent_filler launched on a fresh 8× A40 pod precisely to take over
+the C5 MW sweep with parallel-cell speedup.
 
-Combined with agent_paper landing the multi-window TXC archs
-(`txc_base_mw`, `txc_pro_mw` in `configs/locked_archs.yaml` —
-decisions.md § 14), the 100K compute budget is far better spent on
-deploying the multi-window fix at the canonical schedule.
+**New mission**: deploy `txc_base_mw + txc_pro_mw` at **C7
+backtracking**, the only paper-bearing component without an MW
+deployment yet. agent_back's canonical C7 v4 sweep is in flight on
+the A40 pod (GPUs 0+2) and will land their non-MW reproducibility
+result; your H100 pod adds the MW variant on the same Stage A
+infrastructure.
 
-**New mission**: run **`txc_base_mw + txc_pro_mw` × 3 seeds at C5's
-canonical 20K schedule** with the v1.1.0 concept-lift fix.
+**Why C7 needs the H100**: agent_back's pod is A40 48GB. C7 archs at
+Llama scale (d_in=4096, d_sae=32768) under MW peak ~50-75 GB
+activations — would push past A40's 48 GB cap without bf16 forcing
+or batch reductions. **Your H100 80GB fits MW cleanly with margin**;
+this is the natural place for the MW deployment without the VRAM
+mitigations agent_back would otherwise need.
 
-The hypothesis (Han 2026-05-05): **MW at 20K achieves the
-training-data-volume effect of non-MW at ~100K, in ~1/20 the
-wall-time**. If true, this is the cleanest case for the multi-window
-deployment — a side-by-side comparison vs agent_steer's existing
-non-MW 20K v1.1.0 cells.
+**Why C7 isn't the "slow C5 MW" trap repeating**: TXC-pro MW's
+slowness (the all-pairs InfoNCE matrix scaling as (B*N)²) is real
+but C7 is a **2-cell sweep** matching agent_back's reduced
+seed=42-only budget — even at the slow per-step rate, 2 cells fit in
+~12-18 hr wall. (For C5 you had 6 cells to run; the same
+slow-per-step rate × 6 cells was the budget killer.)
 
-Token-volume math justifying the hypothesis:
+**The 1 C5 MW cell that landed stays in the leaderboard**
+(`eval_key=963df9c69213f998`). agent_filler's parallel sweep covers
+C5 MW going forward. Your work for C5 is done.
 
-| Configuration | Tokens/step | n_steps | Total tokens |
-|---|---:|---:|---:|
-| Non-MW 20K (agent_steer canonical) | ~5K | 20K | ~100M |
-| Non-MW 100K (the abandoned mission) | ~5K | 100K | ~500M |
-| **MW 20K (this mission)** | **~50K** | **20K** | **~1B** |
+### Mandate — C7 multi-window deployment, 2 cells
 
-So MW 20K actually exceeds the non-MW 100K token budget — at ~5 hr
-wall vs the abandoned 108 hr. If the convergence story holds, this
-is the right C5 result for the paper headline (and supersedes
-agent_steer's non-MW 20K v1.1.0 cells in AUTO-RESULTS once both
-sweeps are in the leaderboard, with within-component fairness
-preserved because the headline filter pins to one canonical config).
+agent_paper landed `txc_base_mw` and `txc_pro_mw` as separate arch
+identities in `configs/locked_archs.yaml` (decisions.md § 14, commit
+`ecc4c661`). They are YAML aliases of TXCBase / TXCPro respectively,
+with `multi_window: true` baked into hparams. Same Python classes;
+only per-step sampling differs.
 
-**Existing 100K work — what survives, what's discarded**:
+**Mission scope** (matches agent_back's reduced seed budget on A40):
 
-- **100K training checkpoints** (whatever you've completed): kept on
-  HF `han1823123123/temp-bench-models`. The framework's training
-  cache works — if anyone ever wants to do the convergence-sensitivity
-  test at v1.1.0, they re-eval those checkpoints (~1 hr, training
-  cached).
-- **100K v1.0.0 eval cells**: stay in `leaderboard.jsonl`. They're
-  buggy (concept-lift bug) and stale; v1.1.0 protocol filter excludes
-  them automatically.
-- **`experiments/c5_steering_100k/run.py`**: leave it for now.
-  agent_paper may repurpose later if we ever want the convergence
-  test.
-- **In-flight 100K processes**: KILL them on this session start. Free
-  up the H100 for the MW sweep.
-
-### Mandate — same C5 sweep, multi-window archs, canonical schedule
+- 2 archs × 1 seed = **2 cells**:
+  - `txc_base_mw` × seed=42
+  - `txc_pro_mw` × seed=42
+- agent_back's canonical sweep covers TopK / Stacked / TFA / T-SAE /
+  TXC-base / TXC-pro / MLC at non-MW. Your MW cells provide the TXC
+  apples-to-apples parity comparison; per-token archs stay at
+  agent_back's canonical (no MW variant exists).
 
 Hardware: **1× H100 80GB pod, ephemeral, 240 GB system RAM, 1 TB
-/workspace**. Pinned to GPU 0 (the only GPU). Pod mode `ephemeral`:
-`/workspace` is wiped on pod stop, HF is the source of truth.
+/workspace** (your existing pod). Pod mode `ephemeral`: HF is the
+source of truth, auto-push on checkpoint save, fatal on push failure.
 
-VRAM check (per agent_paper's analysis 2026-05-05): MW at C5's
-Gemma-scale dims (d_in=2304, d_sae=18432) gives peak activation memory
-~25-50 GB on the encoder/decoder pass — well within the 80 GB H100
-budget. No mitigations needed; you don't need bf16 forcing or batch
-reductions like agent_back does at A40-scale.
+VRAM check (per agent_paper's analysis): C7 at Llama-scale (d_in=4096,
+d_sae=32768) MW peaks ~50-75 GB activations. H100 80GB fits with
+~5-10 GB margin. Use `precision="bf16"` (default for H100). If you
+hit OOM on TXC-pro MW (worst case — matryoshka + InfoNCE all-pairs),
+reduce batch_size to 512 first; effective B*N=5120 still > non-MW
+B=1024.
 
-Subject + protocol (replicating agent_steer's setup verbatim, with
-the multi-window arch swap):
+Subject + protocol (replicating agent_back's setup verbatim with the
+multi-window arch swap):
 
-- Datasource: `gemma_2_2b_it_l13_fineweb_24k128`
-- Architectures: **`txc_base_mw` + `txc_pro_mw`** (2 archs total).
-  These are YAML aliases of TXCBase / TXCPro with `multi_window: true`
-  in hparams (decisions.md § 14). The Python classes are identical
-  to `txc_base` / `txc_pro`; only the per-step sampling differs.
-  **NOT `tsae_paper`** — agent_steer's existing v1.1.0 tsae_paper
-  cells are the canonical T-SAE comparison; running tsae_paper a
-  third time is wasted compute (no MW-equivalent for non-TXC archs).
-- Per-component d_sae overrides: locked_archs.yaml's
-  `per_component_hparams.c5` for both `txc_base_mw` and `txc_pro_mw`
-  applies automatically (mirrored from `txc_base` / `txc_pro`).
-- Steering: V7 tiled-broadcast residual-stream protocol (per
-  `temp_bench.case_studies.steering` — agent_steer's port). Same
-  strengths grid `{10, 100, 150, 500, 1000, 1500, 5000, 10000, 15000}`,
-  same `"We find"` prompt, 60 new tokens, greedy decode.
-- Concept set: same 30-concept × 5-example-sentence set agent_steer
-  uses (5 safety/alignment, 10 domain, 7 style, 5 sentiment, 3 format).
-- **Per-arch best-feature selection**: USE THE FIXED v1.1.0
-  concept-lift baseline (commit `ef33f822`, agent_steer's
-  `select_best_features` in `temp_bench.case_studies.steering`). Your
-  import path automatically picks this up. Verify by inspecting the
-  function before launching:
-  `grep "baseline = activation_matrix.mean" src/temp_bench/case_studies/steering.py`.
-- Judge: Sonnet 4.6 (Anthropic; same as agent_steer + agent_em — see
-  decisions.md § 12 for why we don't use Gemini).
-- Per-call `judge_outputs.jsonl` persistence for post-deadline κ.
-- Headline metric: `peak_success_grade_at_coh_1.75`.
-- `EVAL_PROTOCOL_VERSION`: **"1.1.0"** (the post-fix version).
+- Datasource: `llama_3_1_8b_base_l10_ward_nousmirror` (agent_back's
+  `DATASOURCE` default). Per-arch d_sae=32768 from the
+  `per_component_hparams.c7` overrides on `txc_base_mw` /
+  `txc_pro_mw` — applied automatically. The mirror is byte-identical
+  to the Meta-canonical Llama-3.1-8B (verified by agent_back commit
+  `52b08b35`, max_abs_diff=0); cache key matches.
+- Stage A: cohort + sentence-acts cache built by agent_back, on HF.
+  Inherit via `experiments.c7_backtracking.run` imports.
+- Mining: `mine_top_features` selects the top feature per arch by
+  selectivity. **Decoder-norm normalization** to
+  `||DoM_base_union||=0.4140` happens inside
+  `src/temp_bench/case_studies/backtracking.py:1514-1524` —
+  cross-arch magnitude comparability is automatic. (Verified
+  2026-05-05 PM by agent_paper after agent_back's "false alarm"
+  diagnostic note in commit `8098d137`.)
+- Magnitude grid: 25 points
+  `[-16,-12,-10,-8,-7,-6,-5,-4,-3,-2,-1,-0.5, 0, 0.5,1,2,3,4,5,6,7,8,10,12,16]`.
+- Cut protocol: cut25 (cut Stage A trace at 25% of unsteered length).
+- Inducement metric (primary): peak Δgc — Sonnet 4.6 judge counts
+  genuine backtracking events.
+- Detection metric: PR-AUC at S ∈ {1, 2, 4, 8, 16, 32}.
+- Judge: Sonnet 4.6. Per-call `judge_outputs.jsonl` persistence.
+- `EVAL_PROTOCOL_VERSION`: inherit from agent_back's `c7_backtracking/run.py`.
 
-Seeds: **{42, 1, 2}** (full n=3). 6 cells total.
-
-`TrainingConfig` for your cells (canonical schedule — NOT 100K):
+`TrainingConfig` for your cells (canonical schedule, matches
+agent_back's v4 directive):
 
 ```python
 TrainingConfig(
     batch_size=1024,
-    n_steps=20_000,         # canonical, NOT 100_000
+    n_steps=20_000,         # canonical; matches agent_back's 20K override
     plateau_early_stop=False,
-    # bricken_* stays at defaults (False) — C5 does not use Bricken
-    # per decisions.md § 7.
+    # bricken_* defaults (False) — C7 does not use Bricken (decisions.md § 7).
 )
 ```
 
-Per-cell wall-time estimate on H100: agent_paper's local 5090
-benchmark of TXCPro multi-window vs non-MW (commit `d724241c`)
-showed wall-time only 1.26× longer at 5× more data per step on a
-synthetic task. At C5's actual scale + 20K steps, expect:
+**Per-cell wall-time estimate on H100**:
 
-- `txc_base_mw`: ~30-50 min per cell (5K-step extrapolation × 4)
-- `txc_pro_mw`: ~50-90 min per cell (matryoshka + multi-distance
-  contrastive + multi-window all together)
+- `txc_base_mw`: ~60-90 min train (Llama-scale MW encoder/decoder
+  bigger than Gemma-scale by 4096/2304 ≈ 1.8× per dimension axis)
+  + ~2 hr eval (Stage A traces × magnitude grid × 2 phases × judge)
+  = ~3-3.5 hr per cell.
+- `txc_pro_mw`: ~3-4 hr train (matryoshka + multi-distance
+  contrastive + all-pairs InfoNCE at B*N=10240) + ~2 hr eval
+  = ~5-6 hr per cell.
 
-Total sweep at H100 single-GPU serial: 6 cells × ~60 min average =
-**~6 hours wall**. Comfortably within the remaining sprint window
-even with margin for surprises.
+Total serial: ~9-10 hr. Fits in remaining sprint window.
 
-V7 ↔ TXC-pro compatibility (sanity check before launch): agent_steer's
-non-MW txc_pro at 20K showed mean coh ~2.1-2.2 at v1.0.0 (pre-bug-fix
-metric was misleading but the steering itself worked). MW shouldn't
-change V7 compatibility — encode/decode shapes are unchanged at
-inference, only train_step's data sampling differs. Run `--pre-test-only`
-on your first txc_pro_mw cell anyway as a safety net; if mean coh ≤ 1.0,
-fall back to `--protocol pp` for the full sweep.
-
-Locked decisions in scope: #1 (two TXCs — `txc_base_mw` and
-`txc_pro_mw` are the canonical paper TXCs going forward per § 1's
-2026-05-05 amendment), #4 (cross-branch reads), #6 (HF repos),
-#7 (Bricken off for C5), #11 (T-SAE = paper-faithful Ye et al.),
-§ 12 (uniform batch=1024, plateau_off, n_steps=20K for C5),
-§ 14 (multi-window deployment).
+Locked decisions in scope: #1 (canonical TXCs are `txc_base_mw` /
+`txc_pro_mw` per § 1's 2026-05-05 amendment), #4 (cross-branch reads),
+#6 (HF repos), #7 (Bricken off for C7), #11 (T-SAE = paper-faithful
+Ye et al. — but TSAE has no MW variant, only TXC archs do), § 12
+(canonical training cfg), § 14 (multi-window deployment).
 
 References:
 - `agents/README.md` (your roster row)
-- `agents/agent_steer/briefing.md` (the canonical C5 setup you replicate
-  — read this BEFORE launching, especially their § "Han decisions
-  2026-05-05 — 🐛 c5 concept-lift fix" once they document it)
-- `docs/components/c5.md` (the canonical C5 writeup; do NOT edit)
-- `experiments/c5_steering/{run.py,analysis.py}` (import from)
-- `decisions.md` § 7, § 12, § 14
-- `papers/temporal_sae.md` § B.2 (T-SAE steering protocol reference)
-- `PROTOCOL.md` § 7 (results live in state), § 8 (anti-conflict),
-  § 11 (framework discipline), § 14 (briefing maintenance)
+- `agents/agent_back/briefing.md` (the canonical C7 setup you replicate
+  — read this BEFORE launching, especially the "decoder-norm false
+  alarm" note in their `Failures handled` section so you don't
+  re-investigate the same trap)
+- `docs/components/c7.md` (the canonical C7 writeup; do NOT edit)
+- `experiments/c7_backtracking/{run.py,analysis.py,smoke.py}` —
+  agent_back's plumbing (import from)
+- `decisions.md` § 12, § 14
+- `papers/backtracking.md` (Ward et al. 2025 reference)
+- `PROTOCOL.md` § 7, § 8, § 11, § 14
 
 **Before you `status: complete`**: `bash scripts/wrap_up_session.sh`.
 Ephemeral pod → checkpoints auto-pushed. Push your MW cells'
 `results/runs/<eval_key>/judge_outputs.jsonl` and metrics via the
 wrap-up script before any pod restart.
 
-### First concrete task — kill 100K, write the MW driver, launch
+### First concrete task — kill C5 MW, write C7 MW driver, launch
 
-Step 0 — **kill the in-flight 100K processes** before doing anything
-else (free the GPU + RAM):
+Step 0 — **kill the in-flight C5 MW processes** before doing anything
+else (free GPU + RAM):
 
 ```bash
-ps -ef | grep "experiments.c5_steering_100k" | grep -v grep
-# → kill the PIDs from your /tmp/p_* files OR ps output above
-kill $(cat /tmp/p_gpu1 /tmp/p_gpu3 2>/dev/null) 2>/dev/null
+ps -ef | grep "experiments.c5_steering" | grep -v grep
+# → kill any active PIDs from the C5 MW sweep (e.g., from /tmp/p_c5_mw)
 nvidia-smi --query-gpu=memory.used --format=csv
 # → expect <500 MB used; if not, force-kill stragglers via `kill -9`
 ```
 
-Step 1 — `git pull --rebase origin final`, then verify the v1.1.0 fix
-is present:
+Step 1 — `git pull --rebase origin final`, then verify the MW arch
+is registered + agent_back's plumbing is current:
 
 ```bash
-grep "baseline = activation_matrix.mean" src/temp_bench/case_studies/steering.py
-# → should match (added in agent_steer's commit ef33f822)
-.venv/bin/python -c "from experiments.c5_steering.run import EVAL_PROTOCOL_VERSION; print(EVAL_PROTOCOL_VERSION)"
-# → expect "1.1.0"
-.venv/bin/python -c "from temp_bench.config import load_arch; print(load_arch('txc_base_mw').hparams)"
-# → expect a dict containing multi_window=True
+.venv/bin/python -c "from temp_bench.config import load_arch; print(load_arch('txc_base_mw').hparams); print(load_arch('txc_pro_mw').hparams)"
+# → expect dicts containing multi_window=True, c7-level d_sae=32768
+.venv/bin/python -c "from experiments.c7_backtracking.run import EVAL_PROTOCOL_VERSION, DATASOURCE; print(EVAL_PROTOCOL_VERSION, DATASOURCE)"
+# → DATASOURCE should be llama_3_1_8b_base_l10_ward_nousmirror
 ```
 
-Step 2 — write `experiments/c5_steering_mw/__init__.py` (empty) and
-`experiments/c5_steering_mw/run.py`:
+Step 2 — pull the Llama BASE L10 activation cache + sentence-acts
+cache from HF:
+
+```bash
+ls results/act_cache/*/resid_post_L10.npy 2>/dev/null
+ls results/c7_backtracking/stage_a/sentence_acts_L10.npz 2>/dev/null
+bash scripts/sync_from_hf.sh   # if not present
+```
+
+Step 3 — write `experiments/c7_backtracking_mw/__init__.py` (empty)
+and `experiments/c7_backtracking_mw/run.py`. Key design: import as
+much as possible from agent_back's `c7_backtracking/run.py`, override
+only the batch_iter (full-sequence instead of pre-windowed) and the
+arch list.
+
+agent_em already wrote a similar driver for C6 (commit `03facd49`,
+`experiments/c6_em_mw/run.py`) — reference it for the shape of the
+full-seq batch_iter pattern.
+
+Sketch:
 
 ```python
-"""C5 multi-window deployment driver.
+"""C7 multi-window deployment driver.
 
-Replicates agent_steer's setup verbatim, swapping the TXC archs from
-`txc_base` / `txc_pro` to the multi-window aliases `txc_base_mw` /
-`txc_pro_mw`. Same canonical schedule (batch=1024, n_steps=20_000,
-plateau_off), same V7 steering protocol, same Sonnet judge, same
-v1.1.0 EVAL_PROTOCOL_VERSION (concept-lift baseline fix).
+Replicates agent_back's setup with two changes:
+1. arch_name: txc_base / txc_pro → txc_base_mw / txc_pro_mw
+   (multi_window=True in hparams)
+2. batch_iter: returns FULL (B, seq_len, d) sequences instead of
+   pre-windowed (B, T, d). MW's train_step does the tiling.
 """
 from __future__ import annotations
 import argparse
+from pathlib import Path
+
+import numpy as np
+import torch
+
 from temp_bench import runner
 from temp_bench.schemas import TrainingConfig
-from experiments.c5_steering.run import (
+from temp_bench.config import act_cache_dir, load_arch, load_datasource, compute_act_cache_key
+from temp_bench.training.sae_trainer import train_sae
+
+# Re-use agent_back's plumbing where possible:
+from experiments.c7_backtracking.run import (
     DATASOURCE,
-    EVAL_PROTOCOL_VERSION,        # "1.1.0" after agent_steer's ef33f822
-    my_train_fn,
-    my_eval_fn,
-    _real_training_cfg as _orig_training_cfg,
+    EVAL_PROTOCOL_VERSION,
+    my_eval_fn,                # eval is unchanged for MW
+    _spec_window_size,         # if needed
 )
 
+# Module-global cache for full-sequence preload — shared across cells
+# in the same process.
+_PRELOADED_C7_FULL: dict[str, torch.Tensor] = {}
 
-def _real_training_cfg() -> TrainingConfig:
-    """Canonical C5 schedule — NOT a 100K override. Inherits from
-    agent_steer's _real_training_cfg() to stay automatically in sync
-    if they tweak it."""
-    return _orig_training_cfg()    # batch=1024, n_steps=20_000, plateau_off
+
+def _build_full_seq_batch_iter(act_cache_key: str, *, seed: int = 42):
+    """MW data path: returns (B, seq_len, d_in) full sequences. The
+    arch's train_step tiles into (B*N, T, d_in) windows internally.
+    """
+    cache_dir = act_cache_dir(act_cache_key)
+    cache_path = str(cache_dir / "resid_post_L10.npy")     # NOT acts.npy — agent_back's convention
+    if cache_path not in _PRELOADED_C7_FULL:
+        mmapped = np.load(cache_path, mmap_mode="r")
+        _PRELOADED_C7_FULL[cache_path] = (
+            torch.from_numpy(np.ascontiguousarray(mmapped)).clone()
+        )
+    acts = _PRELOADED_C7_FULL[cache_path]
+    rng = np.random.default_rng(seed)
+    def batch_iter(n: int) -> torch.Tensor:
+        idx = rng.integers(0, acts.shape[0], size=n)
+        return acts[idx].to(torch.float32)
+    return batch_iter
+
+
+def my_train_fn_mw(*, arch_name, arch_hparams, seed, training_cfg,
+                   act_cache_key, component):
+    """C7 MW train_fn: instantiate arch from YAML spec + datasource d_in,
+    use full-sequence batch_iter, call canonical train_sae."""
+    spec = load_arch(arch_name, component=component)
+    ds = load_datasource(DATASOURCE)
+    d_in = ds.d_model      # or however agent_back resolves d_in; see their my_train_fn
+    from temp_bench.config import instantiate_arch
+    model = instantiate_arch(spec, d_in=d_in)
+    # bf16 cast for >1B archs (agent_back's commit 9cfd99df pattern)
+    if sum(p.numel() for p in model.parameters()) > 1_000_000_000:
+        model = model.to(torch.bfloat16)
+    batch_iter = _build_full_seq_batch_iter(act_cache_key, seed=seed)
+    return train_sae(
+        model=model, batch_iter=batch_iter,
+        training_cfg=training_cfg, device="cuda",
+    )
 
 
 def main():
@@ -269,26 +319,25 @@ def main():
     ap.add_argument("--archs", nargs="+",
                     default=["txc_base_mw", "txc_pro_mw"],
                     choices=["txc_base_mw", "txc_pro_mw"])
-    ap.add_argument("--seeds", nargs="+", type=int, default=[42, 1, 2])
+    ap.add_argument("--seeds", nargs="+", type=int, default=[42])
     args = ap.parse_args()
 
-    cfg = _real_training_cfg()
-    print(f"[c5_mw] training_cfg n_steps={cfg.n_steps} "
-          f"batch_size={cfg.batch_size} plateau_off={not cfg.plateau_early_stop}")
+    cfg = TrainingConfig(batch_size=1024, n_steps=20_000,
+                         plateau_early_stop=False)
 
     for arch in args.archs:
         for seed in args.seeds:
-            print(f"[c5_mw] launching cell arch={arch} seed={seed} "
-                  f"eval_protocol_version={EVAL_PROTOCOL_VERSION}")
+            print(f"[c7_mw] cell arch={arch} seed={seed} "
+                  f"eval_protocol={EVAL_PROTOCOL_VERSION}")
             runner.run_cell(
-                component="c5",
+                component="c7",
                 arch_name=arch,
                 seed=seed,
                 datasource_name=DATASOURCE,
                 training_cfg=cfg,
-                eval_cfg={"sweep": "c5_mw_v1"},
+                eval_cfg={"sweep": "c7_mw_v1"},
                 eval_protocol_version=EVAL_PROTOCOL_VERSION,
-                train_fn=my_train_fn,
+                train_fn=my_train_fn_mw,
                 eval_fn=my_eval_fn,
             )
 
@@ -297,221 +346,130 @@ if __name__ == "__main__":
     main()
 ```
 
-Step 3 — smoke-test with 1 cell at a tiny n_steps override, BEFORE
-launching the full 6-cell sweep, to verify:
-- `txc_base_mw` instantiates correctly (multi_window=True flows through).
-- `train_step` doesn't OOM at C5's d_in=2304 / d_sae=18432.
-- The eval side picks up the v1.1.0 fix.
+(Adapt `my_train_fn_mw` from agent_back's `my_train_fn` in
+`c7_backtracking/run.py` — same model instantiation, bf16 cast for
+>1B archs, but swap their `_build_batch_iter` for the full-seq one
+above. Eval pipeline is unchanged — `my_eval_fn` covers Stage A,
+mining, magnitude sweep, judge calls, PR-AUC.)
+
+Step 4 — smoke ONE cell at `n_steps=200`:
 
 ```bash
-# Smoke: 200 steps × 1 cell × 1 seed (~5 min)
 TQDM_DISABLE=1 .venv/bin/python -c "
 from temp_bench.schemas import TrainingConfig
 from temp_bench import runner
-from experiments.c5_steering.run import DATASOURCE, EVAL_PROTOCOL_VERSION, my_train_fn, my_eval_fn
+from experiments.c7_backtracking_mw.run import my_train_fn_mw
+from experiments.c7_backtracking.run import DATASOURCE, EVAL_PROTOCOL_VERSION, my_eval_fn
 result = runner.run_cell(
-    component='c5', arch_name='txc_base_mw', seed=42,
+    component='c7', arch_name='txc_base_mw', seed=42,
     datasource_name=DATASOURCE,
     training_cfg=TrainingConfig(n_steps=200, batch_size=1024, plateau_early_stop=False),
-    eval_cfg={'sweep': 'c5_mw_smoke'},
+    eval_cfg={'sweep': 'c7_mw_smoke'},
     eval_protocol_version=EVAL_PROTOCOL_VERSION,
-    train_fn=my_train_fn, eval_fn=my_eval_fn,
+    train_fn=my_train_fn_mw, eval_fn=my_eval_fn,
 )
 print('smoke result:', result.train_key, result.eval_key, result.cached)
 "
 ```
 
-If smoke passes, proceed to step 4. If it OOMs or fails, surface the
-error in Open questions and ping Han before the full sweep.
-
-Step 4 — launch the full 6-cell sweep:
+Step 5 — launch the 2-cell sweep:
 
 ```bash
 TQDM_DISABLE=1 AGENT_NAME=agent_steer_100k \
-  .venv/bin/python -m experiments.c5_steering_mw.run \
-  --archs txc_base_mw txc_pro_mw --seeds 42 1 2 \
-  > logs/c5_mw_full.log 2>&1 &
-echo $! > /tmp/p_c5_mw
+  .venv/bin/python -m experiments.c7_backtracking_mw.run \
+  --archs txc_base_mw txc_pro_mw --seeds 42 \
+  > logs/c7_mw_full.log 2>&1 &
+echo $! > /tmp/p_c7_mw
 ```
 
-Step 5 — monitor via `Monitor` tool or periodic `tail`. Each cell's
-completion appends a row to `results/leaderboard.jsonl` with
-`arch=txc_base_mw` or `txc_pro_mw`, `eval_protocol_version=1.1.0`,
-and the headline `peak_success_grade_at_coh_1.75`.
-
-agent_paper integrates results at paper-render time — your cells just
-need to land in `leaderboard.jsonl` with the right
-`(arch, seed, training_cfg, eval_protocol_version)`. The runner
-handles the rest.
+Step 6 — monitor + verify rows land at `arch=txc_base_mw` /
+`txc_pro_mw` with `component=c7` and the canonical
+`eval_protocol_version`. agent_paper integrates via
+`canonical_train_keys()` toggle at paper-render time.
 
 ---
 
 ## Current state (agent owns — overwrite at every compact)
 
-**Last verified: 2026-05-05T10:58Z (MW pivot executed — driver written,
-smoke passed, full 6-cell sweep launched).**
+**Last verified: 2026-05-05T13:00Z (mission pivot — directive received from
+Han / agent_paper). C5 MW mission abandoned (CPU-bandwidth bottleneck;
+agent_filler's parallel sweep covers C5 MW). New mission: deploy
+multi-window TXC archs at C7 backtracking for agent_back.**
 
-- `git HEAD`: `1fab0e63` (Agent PAPER — agent_steer_100k pivot directive).
-- Pod: 1× H100 80GB, ephemeral, 240 GB RAM, `/workspace/temp_xc/purified`.
-- Driver: `experiments/c5_steering_mw/{__init__.py, run.py}`. Diverged
-  from briefing's sketch (which imports a non-existent top-level
-  `my_eval_fn`) by importing `run_one_cell` from agent_steer's run.py
-  instead. Same approach as my old 100K driver. Inherits `OMP/MKL/torch
-  threads = 32` cap from the H100-pod profiling done yesterday.
-- **Smoke PASSED at 10:57Z**: `--archs txc_base_mw --seeds 42 --n-steps 200
-  --smoke --n-concepts 5 --strengths 100 1000`. eval_key `963df9c69213f998`,
-  train_key `e0ff471f7ddac586`, eval_protocol_version=**1.1.0**, smoke=True,
-  HF push succeeded. Hit full pipeline: preload → train → V7 generations
-  → Sonnet judge (10/10, 1.4 gen/s) → metrics → leaderboard append → HF push.
-- **Full 6-cell sweep launched 10:57:38Z**, PID 9201, `/tmp/p_mw`.
-  Sequence `txc_base_mw × {42, 1, 2}` → `txc_pro_mw × {42, 1, 2}`,
-  sequential on GPU 0. Cell 1 (`txc_base_mw seed=42`) live at 10:57:44Z,
-  eval_key `e116baae9dc89cea`. Persistent Monitor `bq7dc0ygh` armed.
-- ETA per agent_paper: ~6 hr wall total (~30-50 min per `txc_base_mw`,
-  ~50-90 min per `txc_pro_mw` at 20K). Within deadline.
-- Old 100K work: cell 1 (tsae_paper seed=42) checkpoint on HF as
-  `c0729094920eb9f0` (kept for any post-paper convergence-test re-eval).
-  v1.0.0 leaderboard row stale + filter-excluded. `experiments/c5_steering_100k/`
-  left in place per briefing's "do NOT edit" rule.
-- Canonical leaderboard.jsonl: was corrupted by agent_em's commit
-  `6ea931e2` (uncommitted merge conflict markers); fixed in agent_paper's
-  rewrite or another commit pulled into HEAD. Currently 115 lines, all
-  valid JSON.
-- Recent decisions in scope: `decisions.md` § 1 (canonical TXCs now
-  `txc_base_mw` / `txc_pro_mw`), § 7 (Bricken off C5), § 12 (b=1024 +
-  plateau_off + n_steps=20K), § 14 (multi-window deployment).
+- `git HEAD`: at or after `8098d137` (agent_back's decoder-norm false
+  alarm). Pull on session start.
+- Pod: 1× H100, ephemeral, 240 GB RAM. `/workspace/temp_xc/` clone.
+  This is the SAME pod you've been on; the mission shifts but the
+  pod stays.
+- In flight (TO BE KILLED on session start): C5 MW cells from the
+  abandoned mission. Identify via `ps -ef | grep c5_steering`.
+- C5 MW cell that landed (kept as bonus data):
+  `txc_base_mw` seed=42 C5, `eval_key=963df9c69213f998`. agent_paper
+  / agent_steer can use this for diff against agent_filler's parallel
+  sweep when both complete.
+- Last leaderboard append: from C5 MW (the 1 cell above).
+- Recent decisions in scope: `decisions.md` § 1 (canonical TXCs are
+  `txc_base_mw` / `txc_pro_mw` going forward), § 7 (Bricken off for
+  C7), § 12 (canonical training cfg), § 14 (multi-window deployment).
 
 ## What I just did (agent owns — overwrite)
 
-Newest first.
+- 2026-05-05T13:00Z: agent_paper rewrote this briefing per Han's
+  pivot directive. C5 MW mission abandoned (slow per-step on this
+  H100; agent_filler covers C5 MW on 8× A40 in parallel). New
+  mission is C7 MW helper for agent_back (2 cells at canonical 20K).
 
-- **10:57:38Z launched full 6-cell MW sweep** (`txc_base_mw + txc_pro_mw`
-  × {42, 1, 2}). PID 9201. Cell 1 in flight. Persistent Monitor armed.
-- **10:57Z smoke passed** end-to-end on `txc_base_mw seed=42 n_steps=200
-  smoke=True`. eval_protocol_version=1.1.0 confirmed, HF push confirmed,
-  Sonnet judge confirmed. Driver works.
-- **10:53Z wrote `experiments/c5_steering_mw/{__init__.py, run.py}`**.
-  CLI: `--archs {txc_base_mw,txc_pro_mw} --seeds 42 1 2 --n-steps N
-  --smoke --pre-test-only --force-train --force-eval`. Defaults match
-  the canonical sweep.
-- **10:52Z verified v1.1.0 fix + MW registration on disk**:
-  `baseline = activation_matrix.mean(axis=0)` present in steering.py;
-  `EVAL_PROTOCOL_VERSION="1.1.0"`; `txc_base_mw.hparams` has
-  `multi_window=True`. Compute_train_key gave distinct hashes for MW
-  vs non-MW (3f4778078d068025 vs 25321cac962bbe12 for txc_base seed=42
-  20K), confirming no cache collision.
-- **10:48Z dropped local stash** containing the leaderboard.jsonl
-  fix — superseded by canonical commits (HEAD's leaderboard already
-  clean, 115 valid lines).
-- **10:43Z fixed leaderboard.jsonl JSONDecodeError locally**: 3 git merge
-  conflict marker lines (`<<<<<<<`, `=======`, `>>>>>>>`) committed by
-  agent_em's `6ea931e2` corrupted lines 110/115/117. Resolved by
-  concatenating both sides (5 valid rows preserved). Did NOT push at
-  Han's instruction; canonical fix landed in agent_paper's pivot rewrite.
-- **10:40Z killed in-flight buggy 100K sweep** (PID 5360) — was running
-  pre-fix v1.0.0 code; would've produced junk rows.
-- **08:58Z OLD MISSION cell 1 landed**: tsae_paper seed=42 100K, headline
-  0.533 (v1.0.0, BUGGY — superseded by v1.1.0 paper headline; checkpoint
-  preserved on HF as `c0729094920eb9f0` for any future re-eval).
+(Overwrite this section with your own actions when you start.)
 
 ## Next action (agent owns — overwrite)
 
-1. **Watch persistent Monitor `bq7dc0ygh`** for cell-completion markers.
-   As each cell finishes:
-   - `tail -1 results/leaderboard.jsonl` — verify new MW row (arch ends
-     in `_mw`, eval_protocol_version=1.1.0).
-   - `tail -1 checkpoints/manifest.jsonl | jq .hf_url` — verify auto-push.
-2. **If a cell crashes** (OOM unlikely at H100/d_in=2304, but possible
-   in `txc_pro_mw` with matryoshka × multi-distance × multi-window):
-   - `tail -200 logs/c5_mw_full.log` for stack trace.
-   - Surface as Open Question. Possibly fall back to `--protocol pp`
-     for `txc_pro_mw` if V7 produces degenerate output (mean coh ≤ 1.0).
-3. **Periodic sanity checks** via ScheduleWakeup every ~1 hr.
-4. **After all 6 cells land**: do NOT run `report.render(component='c5')`
-   — agent_paper's territory. Just confirm 6 new MW rows and stop.
-5. **Before session-end / context-compact**: overwrite this briefing's
-   bottom sections with current state. Run `bash scripts/wrap_up_session.sh`.
-6. Compare MW headline against agent_steer's non-MW v1.1.0 cells once
-   both sweeps land — Han's hypothesis is "MW @ 20K achieves ~100K-equivalent
-   outcome"; the paper headline filter pins on whichever is canonical.
+1. `cd $(git rev-parse --show-toplevel)/purified`
+2. `source scripts/set_agent_env.sh agent_steer_100k`
+3. `bash scripts/agent_smoke_test.sh` — expect 131/131 + preflight green.
+4. `git pull --rebase origin final`.
+5. **Kill in-flight C5 MW processes** per "First concrete task" Step 0.
+6. Verify MW arch + agent_back's c7_backtracking module per Step 1.
+7. Sync Llama cache + sentence-acts cache per Step 2 (if not already
+   on disk).
+8. Write `experiments/c7_backtracking_mw/run.py` per Step 3. Reference
+   agent_em's `c6_em_mw/run.py` (commit `03facd49`) for the
+   full-sequence batch_iter + my_train_fn_mw pattern.
+9. Smoke-test ONE cell at `n_steps=200` per Step 4.
+10. Launch the 2-cell sweep per Step 5.
+11. Monitor + verify leaderboard rows.
 
 ## Don't repeat (agent owns — overwrite)
 
-- **Don't run anything at `n_steps=100_000`** for this mission. 100K
-  convergence test was abandoned per Han 2026-05-05.
-- **Don't edit `experiments/c5_steering/`** — agent_steer's territory.
-  Import, don't modify. The v1.1.0 concept-lift fix in their
-  `select_best_features` is the version you inherit.
-- **Don't include `tsae_paper` in your archs list** — agent_steer's
-  v1.1.0 tsae_paper cells are the canonical T-SAE comparison.
-- **Don't edit `docs/components/c5.md`** — agent_paper integrates at
-  paper-render time.
-- **Don't bypass `runner.run_cell`** — the canonical pathway is via
-  `run_one_cell` → `runner.run_cell`.
+- **Don't run anything at `n_steps=100_000`** for this mission. The
+  100K convergence test was abandoned earlier; canonical schedule
+  (n_steps=20_000) is the only target.
+- **Don't run more C5 MW cells** — that mission is now agent_filler's
+  on the 8× A40 pod. Your existing 1 cell stays in the leaderboard
+  as bonus diff data.
+- **Don't edit `experiments/c7_backtracking/`** — agent_back's
+  territory. Import only.
+- **Don't edit `experiments/c5_steering*/` or `c6_em*/`** — other
+  agents' territories.
+- **Don't edit `docs/components/c7.md`** — agent_back's territory.
+- **Don't bypass `runner.run_cell`** — the call goes through the
+  canonical pathway (which appends to `leaderboard.jsonl`).
 - **Don't allocate `train_key` / `eval_key` manually** — the runner
-  + `_workspace_for` do it deterministically.
-- **Don't enable Bricken** — C5 is Bricken-off per decisions.md § 7.
-- **Don't pursue the Y/W steering hill-climb winners** — Galaxy 8/11/18
-  / SoftMaxPool / ContrastiveMergeH8 are excluded by decision #1.
+  computes them deterministically.
+- **Don't include topk_sae / tsae_paper / mlc / tfa / stacked_sae in
+  your archs list** — those are agent_back's per-token archs (no MW
+  variant exists; their canonical cells are the comparison baseline).
+- **Don't enable Bricken** — C7 is Bricken-off per decisions.md § 7.
 - **Don't push to HF manually** — `cache.save_checkpoint` does it on
-  ephemeral pods (TEMP_BENCH_POD_MODE=ephemeral required at launch).
-- **Don't follow the briefing's `my_eval_fn` import sketch** — that
-  symbol doesn't exist as a top-level export in `experiments.c5_steering.run`;
-  it's a closure built by `_make_eval_fn`. Use `run_one_cell` instead
-  (which handles workspace + eval_key + closure plumbing internally).
+  ephemeral pods.
+- **Don't investigate the per-arch decoder norms** — agent_back
+  already verified normalization is in place (commit `8098d137`,
+  case_studies/backtracking.py:1514-1524 rescales every steering
+  vector to ||DoM_base_union||=0.4140 inside the eval pipeline). The
+  raw `model.decoder_directions().norm()` varies 8× across archs
+  but the rescaling makes magnitudes comparable.
 
 ## Open questions for Han (agent owns — overwrite)
 
-1. **The H100 is the wrong hardware for C5 — it's a CPU-memory-bandwidth
-   bottleneck, GPU sits idle.** Empirically verified yesterday + corroborated
-   by today's MW step-1000 marker (1.9 steps/sec). The bottleneck is
-   `_iter`'s random fancy indexing on the 14 GB Gemma fp16 act-cache
-   + the `.to(torch.float32)` upcast — both CPU-side, both
-   memory-bandwidth-bound on the 208-core Xeon Platinum 8470.
-
-   **Evidence**:
-   - GPU utilization 0-17% throughout (`nvidia-smi dmon -s u`).
-   - Python at 99% CPU across 32 threads doing memcpy.
-   - Thread-count-sensitive rate (would not be true if GPU-bound):
-     104 threads → 1.9 steps/sec, 32 threads → 3.3 steps/sec
-     (non-MW), 16-48 threads plateau at 3.3 steps/sec.
-   - Microbench at 32 threads: torch fancy index alone = 21 batches/sec,
-     adding `.to(torch.float32)` = 7.4 batches/sec → **3× slowdown
-     purely from the fp16 → fp32 upcast on CPU**.
-
-   **Implication for current MW sweep**: ETA per cell is ~2-3 hr instead
-   of agent_paper's 30-50 min projection. Total 6-cell sweep ~18-27 hr
-   on this H100, vs ~6 hr on a CPU-strong pod with the same wall-clock
-   budget. The H100's GPU is idle ~85% of the time.
-
-   **Resolutions, if Han wants to consider** (each is a deviation, none
-   are unilateral):
-   - **A. Accept the slow rate** (current path). Sweep finishes within
-     remaining window with margin.
-   - **B. Allow fp16-input deviation**: skip the `.to(torch.float32)`
-     in the iter, let bf16 autocast handle the dtype on GPU. ~3× speedup
-     on the data path → cells finish in ~45-90 min each, full sweep ~5-9 hr.
-     Math: fp16 input → bf16 in autocast is bit-equivalent to fp32 input →
-     bf16 in autocast for these workloads (both lose precision below
-     bf16's 7-bit mantissa). Disclosed as a sub-epsilon caveat in the
-     paper.
-   - **C. Move the cast to GPU** by editing `preloaded_batch_iter_from_act_cache`
-     to optionally return fp16 + having `train_sae` cast on device. Requires
-     a small additive PR to shared infrastructure (`src/temp_bench/data/nlp/cache.py`)
-     — safer than B (default unchanged, opt-in via flag) but still a shared-code
-     edit that Han / agent_paper should bless.
-   - **D. Run on a CPU-strong A40 pod instead**: lower per-step GPU
-     compute, but proportionally more CPU bandwidth headroom. Untested
-     but plausibly comparable wall to current H100 path. Would require
-     pod re-allocation.
-
-   I will NOT make any of B/C/D unilaterally — flagging only.
-
-2. **Other surveillance items** (no action needed, just watching):
-   - mean_coh on `txc_pro_mw` with V7 — if ≤ 1.0, will fall back to
-     `--protocol pp` for txc_pro_mw cells only.
-   - OOM on `txc_pro_mw` (matryoshka × multi-distance × multi-window)
-     at H100 80GB — unlikely per agent_paper's analysis but unprecedented
-     combo.
-   - MW vs non-MW headline comparison once both v1.1.0 sweeps land —
-     Han's hypothesis is "MW @ 20K achieves ~100K-equivalent outcome".
+(None at briefing-rewrite time. Surface anything that comes up
+during the kill-C5-MW step or smoke test — especially if the
+txc_pro_mw OOMs at C7 scale despite the H100's 80 GB.)
