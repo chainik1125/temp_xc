@@ -5,6 +5,11 @@
       "peak_magnitude": 16.0,
       "stability": "13/24"
     },
+    "stacked_sae": {
+      "peak": 0.32786885245901637,
+      "peak_magnitude": 12.0,
+      "stability": "18/24"
+    },
     "tfa": {
       "peak": 0.3442622950819672,
       "peak_magnitude": 16.0,
@@ -27,9 +32,8 @@
     }
   },
   "missing_archs": [
-    "stacked_sae",
     "topk_sae"
   ],
-  "n_judge_calls": 9150,
-  "n_leaderboard_cells": 5
+  "n_judge_calls": 10675,
+  "n_leaderboard_cells": 6
 }
