@@ -127,6 +127,7 @@ class TXCPro(TempBenchArch):
         bdec_geom_median_init: bool = True,
         decoder_unit_norm: bool = True,        # noqa: ARG002 — always True in this port
         decoder_grad_orthogonalize: bool = True,  # noqa: ARG002 — always True
+        h_size: int | None = None,             # matryoshka prefix; None → d_sae//5
     ):
         super().__init__()
         self.config = ArchConfig(
@@ -146,8 +147,14 @@ class TXCPro(TempBenchArch):
             self.loss_weights = tuple(1.0 / (1.0 + s) for s in self.shifts)
         else:
             self.loss_weights = (1.0,) * len(self.shifts)
-        # H prefix size (matryoshka) = d_sae // 5 (matches Phase 5b H8 default)
-        self.h_size = d_sae // 5
+        # H prefix size (matryoshka) = d_sae // 5 (matches Phase 5b H8 default).
+        # C2 overrides via h_size=d_sae to disable matryoshka at toy
+        # d_sae=40 where d_sae//5=8 < k_train; otherwise k-sweep crashes.
+        self.h_size = int(h_size) if h_size is not None else (d_sae // 5)
+        if self.h_size > d_sae:
+            raise ValueError(
+                f"h_size={self.h_size} exceeds d_sae={d_sae}."
+            )
         self.contr_prefix = int(contr_prefix) if contr_prefix is not None else self.h_size
         self.aux_k = aux_k
         self.dead_threshold_tokens = dead_threshold_tokens

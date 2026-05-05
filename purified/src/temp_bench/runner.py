@@ -110,6 +110,12 @@ def run_cell(
         training_cfg = TrainingConfig(**training_cfg)
 
     arch_spec = load_arch(arch_name, component=component)
+    # Per-cell arch-hparams override (decisions § 17). Merging here means
+    # compute_train_key sees the merged hparams → cells with different
+    # overrides get different train_keys. Used by C2's k-sweep + T-sweep.
+    if training_cfg.arch_hparams_override:
+        merged = {**arch_spec.hparams, **training_cfg.arch_hparams_override}
+        arch_spec = arch_spec.model_copy(update={"hparams": merged})
     datasource = load_datasource(datasource_name)
     agent = agent or os.environ.get("AGENT_NAME", "unknown")
 

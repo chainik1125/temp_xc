@@ -102,6 +102,15 @@ class TrainingConfig(BaseModel):
     # fresh keys.
     train_window_size: int | None = None
 
+    # Per-cell arch-hparams override (decisions § 17, 2026-05-05 PM, C2).
+    # When set, the runner merges this dict into ``arch_spec.hparams``
+    # before computing the train_key. Used by the C2 k-sweep to vary
+    # ``k_pos`` per cell and by the T-modulation sweep to vary
+    # ``T_max`` / ``T`` per cell, without proliferating YAML entries.
+    # Default ``None`` preserves all existing train_keys (the merge is a
+    # no-op). Setting any field gets a fresh train_key.
+    arch_hparams_override: dict | None = None
+
 
 class LeaderboardRow(BaseModel):
     """One row of ``results/leaderboard.jsonl``.

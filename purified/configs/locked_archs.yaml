@@ -40,6 +40,8 @@ archs:
       d_sae: 18432   # gemma-2-2b L13 d_in (2304) × 8
       k_pos: 20      # default sparsity; components override per-cell
     per_component_hparams:
+      c2:
+        d_sae: 40    # Phase 3 paper-faithful toy dictionary size
       c7:
         d_sae: 32768   # Llama-3.1-8B L10 d_in (4096) × 8
     notes: "Per-token TopK SAE. The simplest baseline."
@@ -53,6 +55,8 @@ archs:
       T: 5           # T independent TopK-SAEs, one per position
       k_pos: 20      # window-level L0 = k_pos * T
     per_component_hparams:
+      c2:
+        d_sae: 40    # Phase 3 paper-faithful toy dictionary size
       c7:
         d_sae: 32768   # Llama-3.1-8B L10 d_in (4096) × 8
     notes: |
@@ -157,6 +161,8 @@ archs:
       decoder_unit_norm: true
       decoder_grad_orthogonalize: true
     per_component_hparams:
+      c2:
+        d_sae: 40    # Phase 3 paper-faithful toy dictionary size
       c6:
         d_sae: 32768   # Qwen-14B d_model=5120; matches Dmitry's published Wang baseline
         k_pos: 25      # k_win = 25 × T(5) = 125 ≈ Dmitry's k_win=128
@@ -185,6 +191,15 @@ archs:
       decoder_unit_norm: true
       decoder_grad_orthogonalize: true
     per_component_hparams:
+      c2:
+        d_sae: 40       # Phase 3 paper-faithful toy dictionary size.
+        h_size: 40      # disable matryoshka at toy scale (h=d_sae//5=8
+                        # would be < k_train at high k_pos; sweep crashes
+                        # without this override). Reduces TXC-pro at C2
+                        # to plain TopK + multi-distance contrastive +
+                        # subseq sampling — paper-defensible because
+                        # matryoshka isn't meaningful at d_sae=40 (only
+                        # 5 prefix levels of 8 each). Document in c2.md.
       c6:
         d_sae: 32768   # Qwen-14B d_model=5120; matches Dmitry's Wang baseline
       c7:
