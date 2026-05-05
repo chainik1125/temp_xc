@@ -7,7 +7,7 @@ Section ownership: PROTOCOL.md § 14.
 
 ---
 agent: agent_steer_100k
-last_state_update: 2026-05-05T11:00:00Z
+last_state_update: 2026-05-05T10:58:00Z
 component: c5 (multi-window deployment)
 ---
 
@@ -348,72 +348,123 @@ handles the rest.
 
 ## Current state (agent owns — overwrite at every compact)
 
-**Last verified: 2026-05-05T11:00Z (mission pivot — directive received from
-Han / agent_paper). 100K mission abandoned (108 hr ETA). New mission:
-deploy multi-window TXCs at canonical 20K schedule.**
+**Last verified: 2026-05-05T10:58Z (MW pivot executed — driver written,
+smoke passed, full 6-cell sweep launched).**
 
-- `git HEAD`: at or after `cad94382` (decisions.md § 14 Bricken caveat).
-  Pull on session start to pick up agent_steer's `ef33f822` v1.1.0 fix.
-- Pod: 1× H100, ephemeral, 240 GB RAM. `/workspace/temp_xc/` clone.
-- In flight (TO BE KILLED on session start): 100K cells from the
-  abandoned mission. Identify via `ps -ef | grep c5_steering_100k`
-  and the `/tmp/p_*` PID files.
-- 100K checkpoints already trained: kept on HF; not used in this mission
-  but available for post-paper convergence-test re-eval.
-- Last leaderboard append: from the 100K mission (v1.0.0 buggy cells —
-  filter excludes).
-- Recent decisions in scope: `decisions.md` § 1 (canonical TXCs are
-  `txc_base_mw` / `txc_pro_mw` going forward), § 12 (canonical training
-  cfg), § 14 (multi-window deployment), § 7 (Bricken off for C5).
+- `git HEAD`: `1fab0e63` (Agent PAPER — agent_steer_100k pivot directive).
+- Pod: 1× H100 80GB, ephemeral, 240 GB RAM, `/workspace/temp_xc/purified`.
+- Driver: `experiments/c5_steering_mw/{__init__.py, run.py}`. Diverged
+  from briefing's sketch (which imports a non-existent top-level
+  `my_eval_fn`) by importing `run_one_cell` from agent_steer's run.py
+  instead. Same approach as my old 100K driver. Inherits `OMP/MKL/torch
+  threads = 32` cap from the H100-pod profiling done yesterday.
+- **Smoke PASSED at 10:57Z**: `--archs txc_base_mw --seeds 42 --n-steps 200
+  --smoke --n-concepts 5 --strengths 100 1000`. eval_key `963df9c69213f998`,
+  train_key `e0ff471f7ddac586`, eval_protocol_version=**1.1.0**, smoke=True,
+  HF push succeeded. Hit full pipeline: preload → train → V7 generations
+  → Sonnet judge (10/10, 1.4 gen/s) → metrics → leaderboard append → HF push.
+- **Full 6-cell sweep launched 10:57:38Z**, PID 9201, `/tmp/p_mw`.
+  Sequence `txc_base_mw × {42, 1, 2}` → `txc_pro_mw × {42, 1, 2}`,
+  sequential on GPU 0. Cell 1 (`txc_base_mw seed=42`) live at 10:57:44Z,
+  eval_key `e116baae9dc89cea`. Persistent Monitor `bq7dc0ygh` armed.
+- ETA per agent_paper: ~6 hr wall total (~30-50 min per `txc_base_mw`,
+  ~50-90 min per `txc_pro_mw` at 20K). Within deadline.
+- Old 100K work: cell 1 (tsae_paper seed=42) checkpoint on HF as
+  `c0729094920eb9f0` (kept for any post-paper convergence-test re-eval).
+  v1.0.0 leaderboard row stale + filter-excluded. `experiments/c5_steering_100k/`
+  left in place per briefing's "do NOT edit" rule.
+- Canonical leaderboard.jsonl: was corrupted by agent_em's commit
+  `6ea931e2` (uncommitted merge conflict markers); fixed in agent_paper's
+  rewrite or another commit pulled into HEAD. Currently 115 lines, all
+  valid JSON.
+- Recent decisions in scope: `decisions.md` § 1 (canonical TXCs now
+  `txc_base_mw` / `txc_pro_mw`), § 7 (Bricken off C5), § 12 (b=1024 +
+  plateau_off + n_steps=20K), § 14 (multi-window deployment).
 
 ## What I just did (agent owns — overwrite)
 
-(Pivot — overwrite this section with your own actions when you start.)
+Newest first.
 
-- 2026-05-05T11:00Z: agent_paper rewrote this briefing per Han's
-  pivot directive. 100K mission abandoned; new mission is C5 MW at
-  canonical 20K schedule (6 cells, ~6 hr wall).
+- **10:57:38Z launched full 6-cell MW sweep** (`txc_base_mw + txc_pro_mw`
+  × {42, 1, 2}). PID 9201. Cell 1 in flight. Persistent Monitor armed.
+- **10:57Z smoke passed** end-to-end on `txc_base_mw seed=42 n_steps=200
+  smoke=True`. eval_protocol_version=1.1.0 confirmed, HF push confirmed,
+  Sonnet judge confirmed. Driver works.
+- **10:53Z wrote `experiments/c5_steering_mw/{__init__.py, run.py}`**.
+  CLI: `--archs {txc_base_mw,txc_pro_mw} --seeds 42 1 2 --n-steps N
+  --smoke --pre-test-only --force-train --force-eval`. Defaults match
+  the canonical sweep.
+- **10:52Z verified v1.1.0 fix + MW registration on disk**:
+  `baseline = activation_matrix.mean(axis=0)` present in steering.py;
+  `EVAL_PROTOCOL_VERSION="1.1.0"`; `txc_base_mw.hparams` has
+  `multi_window=True`. Compute_train_key gave distinct hashes for MW
+  vs non-MW (3f4778078d068025 vs 25321cac962bbe12 for txc_base seed=42
+  20K), confirming no cache collision.
+- **10:48Z dropped local stash** containing the leaderboard.jsonl
+  fix — superseded by canonical commits (HEAD's leaderboard already
+  clean, 115 valid lines).
+- **10:43Z fixed leaderboard.jsonl JSONDecodeError locally**: 3 git merge
+  conflict marker lines (`<<<<<<<`, `=======`, `>>>>>>>`) committed by
+  agent_em's `6ea931e2` corrupted lines 110/115/117. Resolved by
+  concatenating both sides (5 valid rows preserved). Did NOT push at
+  Han's instruction; canonical fix landed in agent_paper's pivot rewrite.
+- **10:40Z killed in-flight buggy 100K sweep** (PID 5360) — was running
+  pre-fix v1.0.0 code; would've produced junk rows.
+- **08:58Z OLD MISSION cell 1 landed**: tsae_paper seed=42 100K, headline
+  0.533 (v1.0.0, BUGGY — superseded by v1.1.0 paper headline; checkpoint
+  preserved on HF as `c0729094920eb9f0` for any future re-eval).
 
 ## Next action (agent owns — overwrite)
 
-1. `cd $(git rev-parse --show-toplevel)/purified`
-2. `source scripts/set_agent_env.sh agent_steer_100k`
-3. `bash scripts/agent_smoke_test.sh` — expect 131/131 + preflight green.
-4. `git pull --rebase origin final` — picks up agent_steer's v1.1.0
-   concept-lift fix + agent_paper's `txc_base_mw` / `txc_pro_mw` YAML
-   aliases.
-5. **Kill in-flight 100K processes** per "First concrete task" Step 0.
-6. Verify v1.1.0 fix + MW arch registration per Step 1.
-7. Write `experiments/c5_steering_mw/run.py` per Step 2.
-8. Smoke-test at n_steps=200 per Step 3.
-9. Launch the full 6-cell sweep per Step 4.
-10. Monitor + verify leaderboard rows land at `eval_protocol_version=1.1.0`.
+1. **Watch persistent Monitor `bq7dc0ygh`** for cell-completion markers.
+   As each cell finishes:
+   - `tail -1 results/leaderboard.jsonl` — verify new MW row (arch ends
+     in `_mw`, eval_protocol_version=1.1.0).
+   - `tail -1 checkpoints/manifest.jsonl | jq .hf_url` — verify auto-push.
+2. **If a cell crashes** (OOM unlikely at H100/d_in=2304, but possible
+   in `txc_pro_mw` with matryoshka × multi-distance × multi-window):
+   - `tail -200 logs/c5_mw_full.log` for stack trace.
+   - Surface as Open Question. Possibly fall back to `--protocol pp`
+     for `txc_pro_mw` if V7 produces degenerate output (mean coh ≤ 1.0).
+3. **Periodic sanity checks** via ScheduleWakeup every ~1 hr.
+4. **After all 6 cells land**: do NOT run `report.render(component='c5')`
+   — agent_paper's territory. Just confirm 6 new MW rows and stop.
+5. **Before session-end / context-compact**: overwrite this briefing's
+   bottom sections with current state. Run `bash scripts/wrap_up_session.sh`.
+6. Compare MW headline against agent_steer's non-MW v1.1.0 cells once
+   both sweeps land — Han's hypothesis is "MW @ 20K achieves ~100K-equivalent
+   outcome"; the paper headline filter pins on whichever is canonical.
 
 ## Don't repeat (agent owns — overwrite)
 
-- **Don't run anything at `n_steps=100_000`** for this mission. The
-  100K convergence test is abandoned per Han 2026-05-05; canonical
-  schedule (n_steps=20_000) is the only target.
+- **Don't run anything at `n_steps=100_000`** for this mission. 100K
+  convergence test was abandoned per Han 2026-05-05.
 - **Don't edit `experiments/c5_steering/`** — agent_steer's territory.
   Import, don't modify. The v1.1.0 concept-lift fix in their
   `select_best_features` is the version you inherit.
 - **Don't include `tsae_paper` in your archs list** — agent_steer's
-  existing v1.1.0 tsae_paper cells are the canonical T-SAE comparison;
-  running it again here is wasted compute (no MW variant exists for
-  non-TXC archs).
+  v1.1.0 tsae_paper cells are the canonical T-SAE comparison.
 - **Don't edit `docs/components/c5.md`** — agent_paper integrates at
   paper-render time.
-- **Don't bypass `runner.run_cell`** — the call goes through the
-  canonical pathway (which appends to `leaderboard.jsonl`).
+- **Don't bypass `runner.run_cell`** — the canonical pathway is via
+  `run_one_cell` → `runner.run_cell`.
 - **Don't allocate `train_key` / `eval_key` manually** — the runner
-  computes them from your inputs deterministically.
+  + `_workspace_for` do it deterministically.
 - **Don't enable Bricken** — C5 is Bricken-off per decisions.md § 7.
 - **Don't pursue the Y/W steering hill-climb winners** — Galaxy 8/11/18
   / SoftMaxPool / ContrastiveMergeH8 are excluded by decision #1.
 - **Don't push to HF manually** — `cache.save_checkpoint` does it on
-  ephemeral pods.
+  ephemeral pods (TEMP_BENCH_POD_MODE=ephemeral required at launch).
+- **Don't follow the briefing's `my_eval_fn` import sketch** — that
+  symbol doesn't exist as a top-level export in `experiments.c5_steering.run`;
+  it's a closure built by `_make_eval_fn`. Use `run_one_cell` instead
+  (which handles workspace + eval_key + closure plumbing internally).
 
 ## Open questions for Han (agent owns — overwrite)
 
-(None at briefing-rewrite time. Surface anything that comes up during
-the kill-100K step or smoke test.)
+(None right now. Surface anything from cell 1 (txc_base_mw seed=42)
+landing — particularly:
+- mean_coh on `txc_pro_mw` with V7 — if ≤ 1.0, fall back to `--protocol pp`.
+- OOM on `txc_pro_mw` (matryoshka × multi-distance × multi-window) —
+  unlikely at H100 80GB but unprecedented combo, monitor.
+- MW vs non-MW headline comparison once both v1.1.0 sweeps land.)
