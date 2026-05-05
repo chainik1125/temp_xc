@@ -7,9 +7,9 @@ Section ownership: PROTOCOL.md § 14.
 
 ---
 agent: agent_em_100k
-last_state_update: 2026-05-05T17:18:00Z
-component: c3 (MLC baseline at L=5, decisions § 16 — multi-layer cache build in flight)
-status: in_progress
+last_state_update: 2026-05-05T22:30:00Z
+component: c3 (MLC baseline at L=5, decisions § 16)
+status: complete (sweep landed 22:25Z)
 ---
 
 ## Identity + mandate (Han owns — agents do not edit)
@@ -839,30 +839,84 @@ integrates via `canonical_train_keys()` toggle at paper-render time.
 
 ## Current state (agent owns — overwrite at every compact)
 
-**Last verified: 2026-05-05T17:18Z. NEW MISSION (decisions § 16): C3
-MLC baseline at L=5. Multi-layer cache build IN FLIGHT (PID 20753,
-started 17:12Z). Driver `experiments/c3_probing_mlc/run.py` written +
-imports clean (NOT yet smoke-tested — pending cache build).**
+**Last verified: 2026-05-05T22:30Z. C3 MLC BASELINE @ L=5 SWEEP
+COMPLETE (decisions § 16). All 6 real cells landed in
+`leaderboard.jsonl` between 21:22 and 22:25. Total wall 1h 32m
+(vs my 3.5 hr revised estimate). GPU at 0 MiB / 0% util. Caches +
+checkpoints all on HF.**
 
-**Prior § 15 mission (T-SAE T=2 sweep) COMPLETE — see commit
-`82674a75`. 6 leaderboard rows landed between 15:10 and 15:44; mean
-auc @ k=5 = 0.841, mean auc @ k=20 = 0.898 across seeds {42, 1, 2}.**
+### MLC cells landed (`agent: agent_em_100k`, `arch: mlc`)
 
-- `git HEAD`: `c987d263` (`final`, post-§16 framework + briefing).
-- Pod: 1× H100 80GB, ephemeral, 2 TB RAM.
-- Mission scope (decisions § 16):
-  - **MINE**: MLC baseline × seeds {42, 1, 2} × k_feats {5, 20}.
-  - agent_nlp / agent_filler / etc.: TFA + other paper-faithful
-    baselines on their pods.
+| seed | k=5 train_key  | k=5 mean_auc | k=20 mean_auc | mean_acc k=5 | mean_acc k=20 |
+|---:|---|---:|---:|---:|---:|
+| 42 | `c5b18a75a0db4994` | 0.852 | 0.906 | 0.796 | 0.846 |
+|  1 | `c4bad817b40f45ac` | 0.857 | 0.902 | 0.805 | 0.848 |
+|  2 | `f07bcad7d9f197d2` | 0.850 | 0.905 | 0.797 | 0.853 |
+| **mean** |  | **0.853** | **0.904** | **0.799** | **0.849** |
 
-### MLC mission state (in-progress)
+eval_keys (k=5, k=20):
+- seed=42: `d1d5c1ac067b50e3`, `4c6d4b4c3b567356`
+- seed=1:  `001cfb73ad9e6d91`, `4995df4d0dccc9ca`
+- seed=2:  `a4489f642f42d148`, `6e00472f0751be89`
 
-| Phase | Status | Notes |
-|---|---|---|
-| 1. Build 5-layer act cache | **IN FLIGHT** (PID 20753) | act_cache_key=`40a11e1594d9220a`. ~70 GB allocated. Started 17:12Z, ETA ~20:00Z. |
-| 2. Build 5-layer probe cache | pending phase 1 | ~1.5 hr serial after cache build. |
-| 3. Smoke MLC at n_steps=200 | pending | Verify driver + 4D probe-array eval pipeline. |
-| 4. Run full sweep (3 trainings + 6 evals) | pending | ~5 hr. |
+All cells `arch=mlc`, `eval_protocol_version=1.1.0`,
+`training_cfg.train_window_size=None`, `n_steps=20_000`,
+`act_cache_key=40a11e1594d9220a`,
+`datasource=gemma_2_2b_it_l11to15_fineweb_24k128`.
+
+### MLC vs prior T-SAE T=2 (this same agent, decisions § 15)
+
+| arch (k_feat) | mean_auc | mean_acc |
+|---|---:|---:|
+| `tsae_paper` T=2 (k=5) | 0.841 | 0.778 |
+| `mlc` L=5 (k=5)        | **0.853** | **0.799** |
+| `tsae_paper` T=2 (k=20)| 0.898 | 0.832 |
+| `mlc` L=5 (k=20)       | **0.904** | **0.849** |
+
+MLC's multi-layer access yields modest but consistent gains over
+T-SAE adjacent-pairs at the same canonical schedule.
+
+### Per-cell wall (full sweep on H100)
+
+- seed=42 k=5: train 24m25s + ckpt push 36s + eval 5m02s = 29m48s
+- seed=42 k=20: eval cache-hit only = 4m26s
+- seed=1 k=5:  train 19m27s + push + eval = 24m27s
+- seed=1 k=20: eval cache-hit only = 4m28s
+- seed=2 k=5:  train 19m29s + push + eval = 24m30s
+- seed=2 k=20: eval cache-hit only = 4m30s
+- **Total: 92m 9s (1h 32m).** Train rate 13.6 steps/sec on H100.
+
+### Caches built + HF-pushed (durable)
+
+- act_cache `40a11e1594d9220a` — 70.8 GB shape (24000, 5, 128, 2304)
+  fp16 (one model pass with 5 hooks at L11-L15). Build 5 min, push
+  ~14 min. HF: `act_cache/40a11e1594d9220a/`.
+- probe_cache `gemma_2_2b_it_l11to15_fineweb_24k128/` — 38 task dirs
+  with 4D X arrays (N, L=5, S=32, d_in). Build ~13 min, push ~5 min.
+  HF: `probe_cache/gemma_2_2b_it_l11to15_fineweb_24k128/`.
+- 3 MLC checkpoints auto-pushed during runner.run_cell:
+  `c5b18a75a0db4994`, `c4bad817b40f45ac`, `f07bcad7d9f197d2`.
+
+### Prior § 15 T-SAE T=2 cells survive (do NOT clean)
+
+(See commit `82674a75`. Cells with `train_window_size=2`,
+distinct from canonical T=None — agent_paper toggles via
+`canonical_train_keys()` at paper-render.)
+
+- `git HEAD`: `791ed86b` (`final`, plus 6 cells appended to leaderboard
+  + 3 ckpts to manifest — needs commit/push for durability).
+- Pod: 1× H100 80GB, ephemeral, 2 TB RAM. GPU at 0 MiB / 0% — IDLE.
+
+### MLC mission state — COMPLETE
+
+| Phase | Status | Wall |
+|---|---|---:|
+| 1. Build 5-layer act cache | ✅ | 5 min |
+| 2. Build 5-layer probe cache | ✅ | 13 min |
+| 3. HF-push both caches | ✅ | 14 min act + 5 min probe (parallel) |
+| 4. Smoke MLC at n_steps=200 | ✅ | 6m22s, mean_auc=0.754 |
+| 5. Full sweep | ✅ | 1h 32m |
+| **Total prep + sweep wall** | | **~2h 30m** (vs briefing's 10 hr est) |
 
 ### MLC arch (verified registered)
 
@@ -987,78 +1041,37 @@ In code:
 
 ## What I just did (agent owns — overwrite)
 
-1. (Earlier missions: C6 100K headlines, MW pivot stand-down, T-SAE
-   T=2 sweep complete. See commits `82674a75` and prior.)
-2. 2026-05-05T~17:00Z: pulled briefing rewrite for § 16 MLC mission.
-3. Verified framework: datasource registered with layers=[11..15];
-   `preloaded_batch_iter_from_multilayer_cache` exists; MLC arch
-   registered with d_sae=18432, k_pos=20, n_layers=5, center_layer=13.
-4. Launched 5-layer activation cache build (PID 20753, 17:12Z) →
-   `act_cache_key=40a11e1594d9220a`, ~70 GB acts.npy preallocated
-   at 17:13. Estimated build wall ~3 hr.
-5. Wrote `experiments/c3_probing_mlc/{run.py, __init__.py}` driver
-   in parallel with cache build:
-   - `my_train_fn_mlc` uses `preloaded_batch_iter_from_multilayer_cache`.
-   - `_encode_pool_mlc(X: (N, L, S_cache, d_in)) → (N, d_sae)` permutes
-     L↔S and flattens to `MLC.encode((B*S, L, d_in)) → (B*S, 1, d_sae)`.
-   - `_s_tail_probe_mlc` chains the encode helper with
-     `mean_pool_probe` for top-k + logistic regression.
-   - `my_eval_fn_mlc` handles smoke=True (synthetic labels on
-     act_cache) + smoke=False (iterate `list_probe_cache` 38 tasks).
-6. Persistent monitor `bn6s7g58y` armed on cache-build log.
+1. (Prior missions complete: C6 100K headlines `82674a75`, MW
+   stand-down `3f53791a`, T-SAE T=2 sweep `82674a75`.)
+2. 2026-05-05T~17:00Z: pulled § 16 MLC mission rewrite. Verified
+   framework (multi-layer datasource, preloaded helper, MLC arch).
+3. Launched act-cache build (5 min wall, way under briefing's 3 hr).
+4. Wrote `experiments/c3_probing_mlc/{run.py,__init__.py}` driver
+   with custom `my_train_fn_mlc` and `my_eval_fn_mlc` (4D probe
+   arrays via `_encode_pool_mlc` + `mean_pool_probe`).
+5. Built probe-cache (13 min, 38 tasks).
+6. HF-pushed both caches in parallel (14 min act + 5 min probe).
+7. Smoke MLC PASSED end-to-end in 6m22s; mean_auc=0.754 at 200 steps.
+8. Real sweep launched (PID 23510, 20:53:06Z), all 6 cells DONE
+   at 22:25:15Z. mean_auc @ k=5 = 0.853, @ k=20 = 0.904 across
+   seeds {42, 1, 2}.
+9. All 3 trained MLC checkpoints auto-pushed to HF during sweep
+   (`c5b18a75a0db4994`, `c4bad817b40f45ac`, `f07bcad7d9f197d2`).
 
 ## Next action (agent owns — overwrite)
 
-1. **Wait for 5-layer act cache build** to finish (~3 hr, ETA ~20:00Z).
-   Persistent monitor `bn6s7g58y` watches `logs/c3_mlc_cache_build.log`.
-   Verify on completion: shape (24000, 5, 128, 2304), dtype fp16,
-   ~70 GB on disk.
-2. **Build 5-layer probe_cache** via:
-   ```bash
-   TQDM_DISABLE=1 .venv/bin/python -c "
-   from temp_bench.data.nlp.probe_cache import build_probe_cache
-   build_probe_cache('gemma_2_2b_it_l11to15_fineweb_24k128')
-   "
-   ```
-   ~1.5 hr. Produces 38 task dirs at
-   `results/probe_cache/gemma_2_2b_it_l11to15_fineweb_24k128/<task>/`
-   with X arrays at (N, L=5, S=32, d_in).
-3. **HF-push both caches** before any pod restart (ephemeral mode):
-   ```bash
-   .venv/bin/python -c "
-   from huggingface_hub import HfApi
-   from temp_bench.config import compute_act_cache_key, load_datasource
-   key = compute_act_cache_key(load_datasource('gemma_2_2b_it_l11to15_fineweb_24k128'))
-   api = HfApi()
-   api.upload_folder(folder_path=f'results/act_cache/{key}',
-                     path_in_repo=f'act_cache/{key}',
-                     repo_id='han1823123123/temp-bench-data',
-                     repo_type='dataset')
-   api.upload_folder(folder_path='results/probe_cache/gemma_2_2b_it_l11to15_fineweb_24k128',
-                     path_in_repo='probe_cache/gemma_2_2b_it_l11to15_fineweb_24k128',
-                     repo_id='han1823123123/temp-bench-data',
-                     repo_type='dataset')
-   "
-   ```
-4. **Smoke MLC ONE cell**:
-   ```bash
-   TQDM_DISABLE=1 AGENT_NAME=agent_em_100k \
-     .venv/bin/python -m experiments.c3_probing_mlc.run \
-     --seeds 42 --k-feats 5 --n-steps 200 --smoke
-   ```
-   `--smoke` uses synthetic labels on the act_cache so this works
-   independent of probe_cache build status.
-5. **Real smoke (real probe-cache eval) at n_steps=200**: same as
-   above without `--smoke` (assuming probe_cache built).
-6. **Launch full sweep**:
-   ```bash
-   TQDM_DISABLE=1 AGENT_NAME=agent_em_100k \
-     .venv/bin/python -m experiments.c3_probing_mlc.run \
-     > logs/c3_mlc_full.log 2>&1 &
-   ```
-7. **Don't touch agent_nlp's / agent_filler's territories** — they
+**Status: COMPLETE.** All sweep cells landed; pod is IDLE.
+
+1. Run `bash scripts/wrap_up_session.sh` to commit metrics.json
+   artifacts + push final state.
+2. Standing by for any further directive. agent_paper integrates the
+   3 new MLC L=5 cells into C3 headline at paper-render time via
+   `canonical_train_keys()`.
+3. Pod can be safely stopped after wrap-up. Caches + checkpoints
+   already on HF (ephemeral mode).
+4. **Don't touch agent_nlp's / agent_filler's territories** — they
    run TFA + other § 16 missions in parallel on their pods.
-8. **Don't render anything to docs/components/c3.md** — agent_nlp's.
+5. **Don't render anything to docs/components/c3.md** — agent_nlp's.
 
 ## Don't repeat (agent owns — overwrite)
 
