@@ -648,3 +648,25 @@ nuked. Remaining:)
    opens (TXC > T-SAE, the original hypothesis was "matches not
    beats"), c5.md's framing needs revising — but this would be a
    GOOD problem to have. Watch for it.
+
+5. **`experiments/c5_steering_100k/` breaks `report.render(component='c5')`**
+   — agent_paper spun up agent_steer_100k as a parallel 100K-step
+   instance (commit `6db405bd`). Their dir lives at
+   `experiments/c5_steering_100k/` and matches the `c5_*` glob in
+   `temp_bench.report._experiment_dir`, raising
+   ``RuntimeError: Multiple experiment dirs match c5_*``. I worked
+   around it locally by importing my analysis module directly:
+   ```python
+   import importlib, json
+   from pathlib import Path
+   from temp_bench import report
+   mod = importlib.import_module('experiments.c5_steering.analysis')
+   importlib.reload(mod)
+   result = mod.run_analysis()
+   report._replace_auto_results(Path('docs/components/c5.md'), result.markdown)
+   Path('experiments/c5_steering/results.json').write_text(json.dumps(result.results, indent=2, sort_keys=True))
+   ```
+   The framework-level fix is for `_experiment_dir` to take a list
+   of suffixes that DO match (e.g. `{"_steering"}` for c5) — that's
+   `temp_bench/report.py` (agent_paper territory). Surface for them
+   to land. Until then I'll keep using the direct-import workaround.
