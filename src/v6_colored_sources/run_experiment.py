@@ -17,7 +17,8 @@ from .train_runner import (
     TrainConfig,
     oracle_baseline,
     random_dictionary_baseline,
-    train_pair,
+    train_sae,
+    train_txc,
 )
 
 
@@ -41,6 +42,17 @@ def _result_dict(cell_results: dict, oracle: dict, random_baseline: dict, *, D: 
             "history": res.history,
         }
     return out
+
+
+def _serialize_cell_result(res) -> dict:
+    return {
+        "final_loss": res.final_loss,
+        "final_l0": res.final_l0,
+        "recovery_squared": res.recovery_squared,
+        "s_adj": res.s_adj,
+        "recovery_auc": res.recovery_auc,
+        "history": res.history,
+    }
 
 
 def run_stage1(
@@ -72,21 +84,36 @@ def run_stage1(
     print(f"Random floor:   rec_sq={random_b['recovery_squared']:.3f} S_adj={random_b['s_adj']:.3f}")
     print(f"Eigengap:       gamma={eigengap(data['rho']):.4f}")
 
-    cells = []
     t0 = time.time()
+    print("\n=== regular SAE (W=1, iid tokens) ===")
+    sae_res = train_sae(
+        cache=cache, F=F, k=k, H=cfg.N, d=cfg.d,
+        device=device, train_cfg=train_cfg,
+    )
+    print(
+        f"  sae   loss={sae_res.final_loss:.4f} L0={sae_res.final_l0:.2f} "
+        f"rec_sq={sae_res.recovery_squared:.3f} S_adj={sae_res.s_adj:.3f} "
+        f"AUC={sae_res.recovery_auc:.3f}"
+    )
+
+    txc_cells = []
     for W in W_grid:
-        print(f"\n=== W={W} ===")
-        cell = train_pair(
+        if W < 2:
+            continue
+        print(f"\n=== TXC W={W} ===")
+        txc_res = train_txc(
             cache=cache, F=F, W=W, k=k, H=cfg.N, d=cfg.d,
             device=device, train_cfg=train_cfg,
         )
-        for arch, res in cell.items():
-            print(
-                f"  {arch:12s} loss={res.final_loss:.4f} L0={res.final_l0:.2f} "
-                f"rec_sq={res.recovery_squared:.3f} S_adj={res.s_adj:.3f} "
-                f"AUC={res.recovery_auc:.3f}"
-            )
-        cells.append(_result_dict(cell, oracle, random_b, D=cfg.D, W=W))
+        print(
+            f"  txc   loss={txc_res.final_loss:.4f} L0={txc_res.final_l0:.2f} "
+            f"rec_sq={txc_res.recovery_squared:.3f} S_adj={txc_res.s_adj:.3f} "
+            f"AUC={txc_res.recovery_auc:.3f}"
+        )
+        txc_cells.append({
+            "W": W,
+            "txc": _serialize_cell_result(txc_res),
+        })
 
     elapsed = time.time() - t0
     print(f"\nStage 1 sweep took {elapsed/60:.1f} min")
@@ -99,7 +126,10 @@ def run_stage1(
         "k": k,
         "device": str(device),
         "elapsed_seconds": elapsed,
-        "cells": cells,
+        "oracle": oracle,
+        "random": random_b,
+        "sae": _serialize_cell_result(sae_res),
+        "txc_cells": txc_cells,
     }
     out_path = out_dir / "stage1.json"
     with open(out_path, "w") as f:
@@ -124,7 +154,7 @@ def run_stage2(
     """D x W grid for the headline phase-transition figure."""
     train_cfg = TrainConfig(n_steps=n_steps, batch_size=batch_size)
 
-    all_cells = []
+    by_D: list[dict] = []
     t0 = time.time()
     for D in D_grid:
         cfg = ColoredSourceConfig(
@@ -140,21 +170,42 @@ def run_stage2(
         print(f"\n### D={D} ###")
         print(f"Oracle ceiling: rec_sq={oracle['recovery_squared']:.3f} S_adj={oracle['s_adj']:.3f}")
 
+        # Train SAE once per D (same data; SAE doesn't depend on W).
+        print(f"\n=== SAE (D={D}, iid tokens) ===")
+        sae_res = train_sae(
+            cache=cache, F=F, k=k, H=cfg.N, d=cfg.d,
+            device=device, train_cfg=train_cfg,
+        )
+        print(
+            f"  sae loss={sae_res.final_loss:.4f} L0={sae_res.final_l0:.2f} "
+            f"rec_sq={sae_res.recovery_squared:.3f} S_adj={sae_res.s_adj:.3f}"
+        )
+
+        txc_cells: list[dict] = []
         for W in W_grid:
+            if W < 2:
+                continue
             if W > T_chain - D:
                 print(f"  Skipping W={W} (> T_chain - D)")
                 continue
             print(f"\n--- D={D} W={W} ---")
-            cell = train_pair(
+            txc_res = train_txc(
                 cache=cache, F=F, W=W, k=k, H=cfg.N, d=cfg.d,
                 device=device, train_cfg=train_cfg,
             )
-            for arch, res in cell.items():
-                print(
-                    f"  {arch:12s} loss={res.final_loss:.4f} L0={res.final_l0:.2f} "
-                    f"rec_sq={res.recovery_squared:.3f} S_adj={res.s_adj:.3f}"
-                )
-            all_cells.append(_result_dict(cell, oracle, random_b, D=cfg.D, W=W))
+            print(
+                f"  txc loss={txc_res.final_loss:.4f} L0={txc_res.final_l0:.2f} "
+                f"rec_sq={txc_res.recovery_squared:.3f} S_adj={txc_res.s_adj:.3f}"
+            )
+            txc_cells.append({"W": W, "txc": _serialize_cell_result(txc_res)})
+
+        by_D.append({
+            "D": D,
+            "oracle": oracle,
+            "random": random_b,
+            "sae": _serialize_cell_result(sae_res),
+            "txc_cells": txc_cells,
+        })
 
     elapsed = time.time() - t0
     print(f"\nStage 2 sweep took {elapsed/60:.1f} min")
@@ -170,7 +221,7 @@ def run_stage2(
         "k": k,
         "device": str(device),
         "elapsed_seconds": elapsed,
-        "cells": all_cells,
+        "by_D": by_D,
     }
     out_path = out_dir / "stage2.json"
     with open(out_path, "w") as f:

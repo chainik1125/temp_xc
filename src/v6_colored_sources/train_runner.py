@@ -4,9 +4,10 @@ Re-implements the training loop from `temporal_crosscoders/train.py` with
 explicit `(d_in, d_sae)` arguments so we can run at the proposal's d=N=128
 square geometry without monkey-patching `temporal_crosscoders.config`.
 
-Reuses the model classes (StackedSAE, TemporalCrosscoder) directly. Reuses
-v5_hmm_sae_baseline.metrics.feature_recovery_score for the AUC continuity
-metric, alongside our squared/chance-adjusted recovery from .metrics.
+The local-baseline architecture is the regular `TopKSAE` operating on
+individual tokens (not the stacked SAE) — this matches the proposal's
+"local one-token learner" definition exactly: training data are iid samples
+from P(x_t), with no awareness of position or window.
 """
 
 from __future__ import annotations
@@ -25,7 +26,7 @@ _TXC_DIR = _REPO_ROOT / "temporal_crosscoders"
 if str(_TXC_DIR) not in sys.path:
     sys.path.insert(0, str(_TXC_DIR))
 
-from models import StackedSAE, TemporalCrosscoder  # noqa: E402
+from models import TemporalCrosscoder, TopKSAE  # noqa: E402
 
 from .data_adapter import ColoredSourceCache  # noqa: E402
 from .metrics import (  # noqa: E402
@@ -72,7 +73,7 @@ class TrainConfig:
 
 @dataclass
 class CellResult:
-    arch: str            # "stacked_sae" | "txc"
+    arch: str            # "sae" | "txc"
     W: int
     k: int
     final_loss: float
@@ -90,6 +91,18 @@ def _make_iterator(cache: ColoredSourceCache, batch_size: int, T: int):
         yield cache.sample_windows(batch_size, T)
 
 
+def _make_token_iterator(cache: ColoredSourceCache, batch_size: int):
+    """Pull (B, d) iid token batches by sampling random (chain, position) pairs.
+
+    This is the "local one-token learner" data feed: each batch element is an
+    independent sample from P(x_t) with no positional or window structure.
+    """
+    while True:
+        # Sample one position per batch element via a window of length 1.
+        x = cache.sample_windows(batch_size, 1)  # (B, 1, d)
+        yield x.squeeze(1)  # (B, d)
+
+
 def _train_one(
     model: nn.Module,
     cache: ColoredSourceCache,
@@ -100,9 +113,16 @@ def _train_one(
     H: int,
     train_cfg: TrainConfig,
     device: torch.device,
+    *,
+    token_iter: bool = False,
 ) -> CellResult:
+    """Train `model` on the cache. If token_iter, sample (B, d) tokens (for
+    regular TopKSAE). Otherwise sample (B, W, d) windows (for TXC)."""
     import time
-    iterator = _make_iterator(cache, train_cfg.batch_size, W)
+    if token_iter:
+        iterator = _make_token_iterator(cache, train_cfg.batch_size)
+    else:
+        iterator = _make_iterator(cache, train_cfg.batch_size, W)
     opt = torch.optim.Adam(
         model.parameters(), lr=train_cfg.lr, betas=train_cfg.adam_betas
     )
@@ -165,7 +185,27 @@ def _train_one(
     )
 
 
-def train_pair(
+def train_sae(
+    *,
+    cache: ColoredSourceCache,
+    F: torch.Tensor,
+    k: int,
+    H: int,
+    d: int,
+    device: torch.device,
+    train_cfg: TrainConfig,
+) -> CellResult:
+    """Train a regular TopKSAE on iid tokens. The "local one-token learner"
+    baseline — no awareness of position or window. The reported W is 1 by
+    convention since each batch element is a single token."""
+    sae = TopKSAE(d_in=d, d_sae=H, k=k).to(device)
+    return _train_one(
+        sae, cache, F, "sae", W=1, k=k, H=H,
+        train_cfg=train_cfg, device=device, token_iter=True,
+    )
+
+
+def train_txc(
     *,
     cache: ColoredSourceCache,
     F: torch.Tensor,
@@ -175,24 +215,15 @@ def train_pair(
     d: int,
     device: torch.device,
     train_cfg: TrainConfig,
-) -> dict[str, CellResult]:
-    """Train a stacked SAE and (if W >= 2) a TXC at this window length.
-
-    Returns:
-        dict with keys "stacked_sae" and (if W >= 2) "txc".
-    """
-    out: dict[str, CellResult] = {}
-
-    sae = StackedSAE(d_in=d, d_sae=H, T=W, k=k).to(device)
-    out["stacked_sae"] = _train_one(
-        sae, cache, F, "stacked_sae", W, k, H, train_cfg, device
+) -> CellResult:
+    """Train a TemporalCrosscoder at window length W >= 2."""
+    if W < 2:
+        raise ValueError(f"TXC requires W >= 2, got W={W}")
+    txc = TemporalCrosscoder(d_in=d, d_sae=H, T=W, k=k).to(device)
+    return _train_one(
+        txc, cache, F, "txc", W=W, k=k, H=H,
+        train_cfg=train_cfg, device=device, token_iter=False,
     )
-
-    if W >= 2:
-        txc = TemporalCrosscoder(d_in=d, d_sae=H, T=W, k=k).to(device)
-        out["txc"] = _train_one(txc, cache, F, "txc", W, k, H, train_cfg, device)
-
-    return out
 
 
 def oracle_baseline(x: torch.Tensor, F: torch.Tensor, D: int, H: int) -> dict:
