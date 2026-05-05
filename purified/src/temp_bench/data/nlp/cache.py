@@ -197,6 +197,7 @@ def preloaded_batch_iter_from_act_cache(
     act_cache_key: str,
     *,
     seed: int = 0,
+    train_window_size: int | None = None,
 ) -> Callable[[int], torch.Tensor]:
     """Bit-identical drop-in for :func:`batch_iter_from_act_cache` that
     pre-materialises the activation cache into a CPU torch tensor.
@@ -216,10 +217,27 @@ def preloaded_batch_iter_from_act_cache(
     indexing. Empirical ~3.4× speedup on the data path; ~1.4× on the
     end-to-end trainer (model compute is the rest).
 
+    **Sampling modes** (``train_window_size``):
+    - ``None`` (default): each batch returns full sequences,
+      shape ``(batch_size, seq_len, d_in)``. The historical pattern;
+      per-token SAE archs see ``batch_size * seq_len`` token-vectors
+      per step after their internal flatten.
+    - ``int T``: each batch returns 1 random T-window per row,
+      shape ``(batch_size, T, d_in)``. Matches agent_em /
+      agent_back's ``_build_batch_iter`` semantics. ``T=1`` brings
+      per-token SAE baselines DOWN to ~literature scale (~1K
+      tokens/step, close to SAEBench App. B canonical 2K instead of
+      our sequence-based ~131K). See decisions.md § 15.
+
     **Determinism**: uses the same ``np.random.default_rng(seed)`` for
     indices and the same ``.to(torch.float32)`` contract as the
     default helper, so checkpoints written under either path are
-    bit-identical for the same ``(act_cache_key, seed)`` pair.
+    bit-identical for the same ``(act_cache_key, seed,
+    train_window_size)`` triple. Note: changing ``train_window_size``
+    is a real config change — the resulting checkpoints differ.
+    ``TrainingConfig.train_window_size`` flows into ``compute_train_key``
+    (via ``exclude_none=True``), so cells that opt in get fresh
+    train_keys; old cells (no opt-in) preserve their hashes.
 
     **RAM cost**: one ~`acts.npy.size` bytes copy per process per
     distinct ``act_cache_key`` (cached module-globally; multiple cells
@@ -250,16 +268,37 @@ def preloaded_batch_iter_from_act_cache(
             torch.from_numpy(np.ascontiguousarray(mmapped)).clone()
         )
     acts = _PRELOADED_ACT_CACHES[act_cache_key]
-    n_seqs = acts.shape[0]
+    n_seqs, seq_len, _d_in = acts.shape
     rng = np.random.default_rng(seed)
 
-    def _iter(batch_size: int) -> torch.Tensor:
-        idx = torch.from_numpy(rng.integers(0, n_seqs, size=batch_size))
-        # torch fancy indexing on the cloned tensor (RAM-rate); fp32
-        # cast to match the default helper's contract.
-        return acts[idx].to(torch.float32)
+    if train_window_size is None:
+        def _iter_full(batch_size: int) -> torch.Tensor:
+            idx = torch.from_numpy(rng.integers(0, n_seqs, size=batch_size))
+            # torch fancy indexing on the cloned tensor (RAM-rate); fp32
+            # cast to match the default helper's contract.
+            return acts[idx].to(torch.float32)
+        return _iter_full
 
-    return _iter
+    T = int(train_window_size)
+    if T < 1:
+        raise ValueError(f"train_window_size must be >= 1; got {T}")
+    if seq_len < T:
+        raise ValueError(
+            f"Activation cache seq_len={seq_len} < train_window_size={T}"
+        )
+
+    pos_offsets = torch.arange(T, dtype=torch.long)
+
+    def _iter_window(batch_size: int) -> torch.Tensor:
+        seq_idx = torch.from_numpy(rng.integers(0, n_seqs, size=batch_size))
+        pos_idx = torch.from_numpy(rng.integers(0, seq_len - T + 1, size=batch_size))
+        # Vectorised gather: build (B, T) position grid by broadcasting,
+        # then 2-axis advanced index. Same RAM-rate as the full-sequence
+        # path (the cloned tensor lives in anonymous RAM either way).
+        pos_grid = pos_idx[:, None] + pos_offsets[None, :]   # (B, T)
+        return acts[seq_idx[:, None], pos_grid].to(torch.float32)
+
+    return _iter_window
 
 
 # ── Internal helpers ────────────────────────────────────────────────────────

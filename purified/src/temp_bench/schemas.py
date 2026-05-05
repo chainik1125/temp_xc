@@ -86,6 +86,22 @@ class TrainingConfig(BaseModel):
     ema_auxk_alpha: float = 0.03125
     dead_threshold_tokens: int = 10_000_000
 
+    # Window-based training-data sampling (decisions.md § 15, 2026-05-05).
+    # When ``None`` (default), the trainer's batch_iter feeds full sequences
+    # of shape ``(batch_size, seq_len, d_in)`` — the historical pattern.
+    # When set to an int ``T``, the canonical
+    # ``preloaded_batch_iter_from_act_cache(..., train_window_size=T)`` opts
+    # into agent_em / agent_back's window-based sampling: 1 random T-window
+    # per batch row, shape ``(batch_size, T, d_in)``. ``T=1`` brings
+    # per-token SAE baselines DOWN to ~literature scale (~1K tokens/step,
+    # close to SAEBench App. B's batch=2048 canonical) instead of the
+    # ~131K tokens/step the sequence-based pattern produces at
+    # ``B=1024 × seq_len=128``. ``compute_train_key`` uses
+    # ``model_dump(exclude_none=True)``, so old cells (where this field is
+    # absent) preserve their hashes; only new cells with an int set get
+    # fresh keys.
+    train_window_size: int | None = None
+
 
 class LeaderboardRow(BaseModel):
     """One row of ``results/leaderboard.jsonl``.

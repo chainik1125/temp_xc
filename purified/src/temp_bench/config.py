@@ -178,7 +178,11 @@ def compute_train_key(
     if isinstance(arch, str):
         arch = load_arch(arch, component=component)
     if isinstance(training_cfg, TrainingConfig):
-        training_cfg_dict = training_cfg.model_dump()
+        # exclude_none=True lets us add Optional fields (e.g. train_window_size)
+        # without invalidating every existing train_key — only cells that opt
+        # into the new field by setting a non-None value rehash. See
+        # decisions.md § 15.
+        training_cfg_dict = training_cfg.model_dump(exclude_none=True)
     else:
         training_cfg_dict = dict(training_cfg)
 

@@ -77,6 +77,41 @@ def test_train_key_changes_with_bricken_toggle():
     )
 
 
+def test_train_key_default_excludes_train_window_size():
+    """Adding the new ``train_window_size: int | None = None`` field must
+    NOT invalidate existing train_keys. ``compute_train_key`` uses
+    ``model_dump(exclude_none=True)``, so default ``TrainingConfig()``
+    produces a dict without ``train_window_size`` — matching what the
+    pre-2026-05-05 schema would have hashed. See decisions.md § 15.
+    """
+    cfg = TrainingConfig()
+    dumped = cfg.model_dump(exclude_none=True)
+    assert "train_window_size" not in dumped, (
+        "Default TrainingConfig() must NOT include train_window_size in "
+        "the train_key payload (preserves old hashes; see decisions.md § 15)"
+    )
+
+
+def test_train_key_changes_when_train_window_size_set():
+    """Setting ``train_window_size`` must invalidate the train_key — new
+    cells with the literature-aligned T=1 window pattern get fresh keys;
+    old full-sequence cells preserve their hashes (decisions.md § 15).
+    """
+    arch = load_arch("topk_sae")
+    cfg_full = TrainingConfig()
+    cfg_t1 = TrainingConfig(train_window_size=1)
+    k_full = compute_train_key(
+        arch=arch, seed=42, training_cfg=cfg_full, act_cache_key="abc"
+    )
+    k_t1 = compute_train_key(
+        arch=arch, seed=42, training_cfg=cfg_t1, act_cache_key="abc"
+    )
+    assert k_full != k_t1, (
+        "Setting train_window_size must change the train_key so the new "
+        "T=1 baseline re-train doesn't cache-hit on old full-sequence cells"
+    )
+
+
 def test_eval_key_changes_with_protocol_version():
     k1 = compute_eval_key(train_key="t1", eval_protocol_version="1.0.0", eval_cfg={"k": 5})
     k2 = compute_eval_key(train_key="t1", eval_protocol_version="1.0.1", eval_cfg={"k": 5})

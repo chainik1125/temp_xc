@@ -98,6 +98,65 @@ def test_preloaded_module_global_cache_is_shared(fake_cache):
     assert cached_after_first is cached_after_second
 
 
+def test_preloaded_train_window_size_shape(fake_cache):
+    """``train_window_size=T`` returns ``(B, T, d_in)`` batches — agent_em
+    / agent_back's window-based sampling pattern. ``T=1`` brings per-token
+    SAE baselines DOWN to ~literature scale (decisions.md § 15).
+    """
+    # T=1 (the literature-aligned baseline mode)
+    bi = preloaded_batch_iter_from_act_cache(
+        fake_cache, seed=0, train_window_size=1,
+    )
+    batch = bi(4)
+    assert batch.shape == (4, 1, 4), batch.shape
+    assert batch.dtype == torch.float32
+
+    # T=3 (general window slicing)
+    # Reset module-global so the cache reload path is exercised.
+    from temp_bench.data.nlp import cache as cache_mod
+    cache_mod._PRELOADED_ACT_CACHES.clear()
+    bi = preloaded_batch_iter_from_act_cache(
+        fake_cache, seed=0, train_window_size=3,
+    )
+    batch = bi(4)
+    assert batch.shape == (4, 3, 4), batch.shape
+
+
+def test_preloaded_train_window_size_deterministic(fake_cache):
+    """Same ``(act_cache_key, seed, train_window_size)`` triple → bit-
+    identical batches across re-creations of the iterator. This is the
+    load-bearing guarantee that lets the runner's ``train_key`` hash
+    correspond to a unique checkpoint under window-mode sampling.
+    """
+    bi_a = preloaded_batch_iter_from_act_cache(
+        fake_cache, seed=42, train_window_size=2,
+    )
+    bi_b = preloaded_batch_iter_from_act_cache(
+        fake_cache, seed=42, train_window_size=2,
+    )
+    for _ in range(3):
+        a = bi_a(8)
+        b = bi_b(8)
+        assert a.shape == b.shape == (8, 2, 4)
+        assert torch.equal(a, b), (
+            "Window-mode iterator must be bit-identical for the same "
+            "(seed, train_window_size); train_keys hash on this contract"
+        )
+
+
+def test_preloaded_train_window_size_invalid(fake_cache):
+    """``train_window_size`` must be a positive int <= seq_len."""
+    import pytest
+    with pytest.raises(ValueError, match="train_window_size must be >= 1"):
+        preloaded_batch_iter_from_act_cache(
+            fake_cache, seed=0, train_window_size=0,
+        )
+    with pytest.raises(ValueError, match="seq_len="):
+        preloaded_batch_iter_from_act_cache(
+            fake_cache, seed=0, train_window_size=999,
+        )
+
+
 def test_preloaded_missing_cache_raises(tmp_path, monkeypatch):
     from temp_bench.data.nlp import cache as cache_mod
 
