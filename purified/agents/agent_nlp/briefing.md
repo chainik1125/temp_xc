@@ -39,6 +39,248 @@ surface it in chat, and let Han or agent_paper land the change. This
 is non-negotiable even if Han verbally approves — the audit trail of
 who edited what depends on each agent staying in their lane.
 
+### ⚠️ Han decisions 2026-05-05 PM — C3 baseline T=1 re-train (your headline shifts)
+
+**Background**: SAEBench (papers/are_saes_useful.md, App. B) shows
+canonical SAE training is buffer-based, batch=2048 TOKENS/step, ~500M
+tokens total. Our C3 per-token archs (`topk_sae`, `tsae_paper`) currently
+train at `(B=1024, seq_len=128) → flatten = 131,072 tokens/step` — 65×
+over SAEBench's canonical 2K. C6 + C7 baselines coincidentally use a
+window-based pattern at T=1 that puts them within 2× of canonical; C3 +
+C5 inherited the over-batched sequence-based pattern. The earlier
+"MW deployment" pivot (decisions.md § 14) was solving the right
+diagnosis with the wrong fix. **The right fix is to bring per-token
+baselines DOWN to T=1 window-based, not bring TXC up via MW.**
+
+**Han's call (2026-05-05 PM)**: re-train C3's per-token archs at the
+per-arch literature-faithful window size, **split between you and
+agent_em_100k**:
+
+- **YOU run `topk_sae` × 3 seeds × 2 k_feats at `train_window_size=1`**
+  (vanilla TopK, no temporal — 1024 tokens/step). 3 unique trainings +
+  6 evals. agent_em is now idle (their canonical mission is done +
+  the C6 MW pivot is rescinded), so **GPU 1 of your shared 2× H100 pod
+  is free for you to borrow**. Run 2 cells in parallel across GPU 0 +
+  GPU 1 → ~2.4 hr wall.
+- **agent_em_100k runs `tsae_paper`** × 3 seeds × 2 k_feats at
+  `train_window_size=2` (Bhalla/Ye 2025 §3.1 paper-faithful adjacent
+  pairs) on their separate 1× H100 pod. ~4.5 hr wall there. You don't
+  run T-SAE.
+
+MLC unported per § 11 (appendix-only); skipped. TXC archs (`txc_base`,
+`txc_pro`) are unchanged — they sample 1 random T-window per row already,
+regardless of mode.
+
+**Your two-GPU plan**:
+
+1. Your in-flight `topk_sae` sweep at T=None (PID 119732, GPU 0) keeps
+   running and finishes ~20:21Z as your diff-reference dataset (the
+   "pre-fix over-batched" baseline that contextualizes the new T=1
+   cells). Don't kill it.
+2. **NOW (immediately): launch the new TopK T=1 sweep on GPU 1**
+   (agent_em's idle GPU; their canonical mission is complete per
+   `agents/agent_em/briefing.md`). Run all 3 seeds serial there. With
+   T=1 (1024 tokens/step vs 131K full-sequence), per-cell wall is
+   ~1.2 hr → 3 cells serial = ~3.6 hr.
+3. After your T=None sweep on GPU 0 finishes (~20:21Z), GPU 0 is
+   also yours to use for the T=1 sweep (parallelize remaining seeds
+   if any are still pending). With both GPUs available, the T=1
+   sweep wraps in ~2.4 hr from start of step 2.
+
+**Driver design** — write `experiments/c3_probing_topk_baseline/run.py`,
+mirroring the existing topk plumbing with `train_window_size=1`:
+
+```python
+"""C3 TopK SAE baseline re-train at T=1 (decisions.md § 15).
+Imports your existing C3 plumbing; only the TrainingConfig changes.
+"""
+from __future__ import annotations
+import argparse
+from temp_bench import runner
+from temp_bench.schemas import TrainingConfig
+from experiments.c3_probing.run import (
+    DATASOURCE,
+    EVAL_PROTOCOL_VERSION,
+    my_train_fn,
+    my_eval_fn,
+)
+from temp_bench.config import compute_act_cache_key, load_datasource
+
+TOPK_TRAINING_CFG = TrainingConfig(n_steps=20_000, train_window_size=1)
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--seeds", nargs="+", type=int, default=[42, 1, 2])
+    ap.add_argument("--k-feats", nargs="+", type=int, default=[5, 20])
+    ap.add_argument("--n-steps", type=int, default=None,
+                    help="Override n_steps for smoke tests.")
+    args = ap.parse_args()
+
+    act_cache_key = compute_act_cache_key(load_datasource(DATASOURCE))
+    cfg = TOPK_TRAINING_CFG
+    if args.n_steps is not None:
+        cfg = cfg.model_copy(update={"n_steps": args.n_steps})
+
+    for seed in args.seeds:
+        for k in args.k_feats:
+            print(f"[c3_topk_T1] cell topk_sae seed={seed} k_feat={k} "
+                  f"T={cfg.train_window_size} n_steps={cfg.n_steps}",
+                  flush=True)
+            eval_cfg = {
+                "k_feat": k, "S": 32, "smoke": False,
+                "_act_cache_key": act_cache_key,
+                "_datasource_name": DATASOURCE,
+            }
+            runner.run_cell(
+                component="c3", arch_name="topk_sae", seed=seed,
+                datasource_name=DATASOURCE,
+                training_cfg=cfg, eval_cfg=eval_cfg,
+                eval_protocol_version=EVAL_PROTOCOL_VERSION,
+                train_fn=my_train_fn, eval_fn=my_eval_fn,
+            )
+
+
+if __name__ == "__main__":
+    main()
+```
+
+**Smoke + launch**:
+
+```bash
+# Smoke (n_steps=200) on GPU 1 — verify framework picks up T=1
+TQDM_DISABLE=1 AGENT_NAME=agent_nlp \
+  bash scripts/run_on_gpu.sh 1 -- \
+  .venv/bin/python -m experiments.c3_probing_topk_baseline.run \
+  --seeds 42 --k-feats 5 --n-steps 200 2>&1 | tail -20
+
+# Full sweep on GPU 1 (immediately) — your in-flight T=None sweep
+# stays on GPU 0 until ~20:21Z; afterwards parallelize across both.
+TQDM_DISABLE=1 AGENT_NAME=agent_nlp \
+  bash scripts/run_on_gpu.sh 1 -- \
+  .venv/bin/python -m experiments.c3_probing_topk_baseline.run \
+  > logs/c3_topk_T1_gpu1.log 2>&1 &
+echo $! > /tmp/p_topk_T1
+```
+
+After your old sweep on GPU 0 finishes (PID 119732), if any T=1 cells
+are still pending, launch a second process on GPU 0 to drain them
+(split seeds between the two processes if needed).
+
+**Verify before borrowing GPU 1** (PROTOCOL § 13 GPU sharing
+convention):
+
+- Read `agents/agent_em/briefing.md` "Current state" — should say
+  "canonical mission COMPLETE" or "idle". If they're mid-cell with
+  an ETA, wait for their cell to land first.
+- `nvidia-smi` GPU 1 should show <1 GB used + no long-running python.
+- Update YOUR Current state with `"Borrowing GPU 1 for C3 TopK T=1
+  sweep — agent_em is post-canonical idle, their next mission is
+  paper-writing."` BEFORE launching.
+
+**Framework change (commit `5555e7eb`)** — read before paper-rendering:
+
+- `temp_bench.data.nlp.cache.preloaded_batch_iter_from_act_cache` gains
+  `train_window_size: int | None = None`. None = full-sequence
+  (current); int T = 1 random T-window per row.
+- `TrainingConfig.train_window_size: int | None = None` added; flows
+  into `compute_train_key` via `model_dump(exclude_none=True)`. Default
+  (None) preserves YOUR EXISTING TRAIN KEYS — the in-flight topk_sae
+  sweep keeps its cache. Setting an int gets a fresh key.
+- Your existing `experiments/c3_probing/run.py:my_train_fn` already
+  passes through `training_cfg.train_window_size` (commit landing in
+  this push), so the new driver works without any of your eval-side
+  changes.
+
+**Framework change (commit `5555e7eb`)** — read before paper-rendering:
+
+- `temp_bench.data.nlp.cache.preloaded_batch_iter_from_act_cache` gains
+  `train_window_size: int | None = None`. None = full-sequence
+  (current); int T = 1 random T-window per row.
+- `TrainingConfig.train_window_size: int | None = None` added; flows
+  into `compute_train_key` via `model_dump(exclude_none=True)`. Default
+  (None) preserves YOUR EXISTING TRAIN KEYS — the in-flight topk_sae
+  sweep keeps its cache. Setting an int gets a fresh key.
+
+**Your action — analysis.py filter shift**:
+
+`experiments/c3_probing/analysis.py` currently calls
+`canonical_train_keys(component='c3', archs=[...], seeds=(1,2,42),
+training_cfg=TrainingConfig(n_steps=20_000))` — one TrainingConfig for
+all 4 archs. After both agent_em_100k's T=2 sweep AND your T=1 sweep land, the
+canonical archs split into THREE TrainingConfigs (one per arch family):
+
+- TXC archs (`txc_base`, `txc_pro`): unchanged. Use
+  `TrainingConfig(n_steps=20_000)`.
+- TopK SAE: re-trained at T=1. Use
+  `TrainingConfig(n_steps=20_000, train_window_size=1)`.
+- T-SAE: re-trained at T=2 (paper-faithful pairs). Use
+  `TrainingConfig(n_steps=20_000, train_window_size=2)`.
+
+`canonical_train_keys` accepts a single `training_cfg` and a list of
+archs. To compute the union across three TrainingConfigs, call it
+three times and union the returned sets:
+
+```python
+from temp_bench.report import canonical_train_keys, query_leaderboard
+from temp_bench.schemas import TrainingConfig
+
+txc_keys = canonical_train_keys(
+    component="c3",
+    archs=["txc_base", "txc_pro"],
+    seeds=(1, 2, 42),
+    datasource_names=("gemma_2_2b_it_l13_fineweb_24k128",),
+    training_cfg=TrainingConfig(n_steps=20_000),
+)
+topk_keys = canonical_train_keys(
+    component="c3",
+    archs=["topk_sae"],
+    seeds=(1, 2, 42),
+    datasource_names=("gemma_2_2b_it_l13_fineweb_24k128",),
+    training_cfg=TrainingConfig(n_steps=20_000, train_window_size=1),
+)
+tsae_keys = canonical_train_keys(
+    component="c3",
+    archs=["tsae_paper"],
+    seeds=(1, 2, 42),
+    datasource_names=("gemma_2_2b_it_l13_fineweb_24k128",),
+    training_cfg=TrainingConfig(n_steps=20_000, train_window_size=2),
+)
+canonical = txc_keys | topk_keys | tsae_keys
+rows = [r for r in query_leaderboard(component="c3") if r.train_key in canonical]
+```
+
+The old over-batched per-token cells (and the in-flight `topk_sae`
+seed=1/2/42 sweep that finishes today) stay in the leaderboard under
+their old hashes for diff comparison; the analysis.py filter drops them
+from the headline AUTO-RESULTS automatically once you wire the second
+call.
+
+**C4 implication**: C4's training cache-hits on C3 checkpoints. After
+the re-train, C4 evals on `topk_sae` + `tsae_paper` re-run (eval_key
+derives from train_key, so the new train_keys produce new eval_keys).
+~10 min Haiku per cell × 6 cells (2 archs × 3 seeds) = ~$0.30, ~1.5
+hr wall — same as before, just on the new T=1 baselines.
+
+**Paper-claim shift (uncertain pending re-runs)**: Today's C3 headline
+shows TopK > TXC > T-SAE on probing AUC. Under canonical T=1 training,
+the per-token archs likely score lower (they were over-batched 65×; now
+they're at literature scale). The headline may flip to TXC > TopK /
+T-SAE, or land on a tighter cluster. Either result is reviewer-
+defensible because every arch trains at SAEBench's canonical compute
+scale. Wait for agent_em_100k's re-train to land before re-rendering.
+
+**No action on your current sweep**: your in-flight `topk_sae` sweep
+(PID 119732, seed=1 step ~9000/20000 at 12:36Z) keeps running and
+keeps its cache (the framework change is backwards-compatible because
+`train_window_size=None` produces the same hash as before). The
+re-trained cells are agent_em_100k's responsibility; your output is
+the diff-comparison reference.
+
+See `decisions.md` § 15 for the full rationale.
+
+---
+
 ### Han decisions 2026-05-04 PM (CRITICAL — TrainingConfig re-issued per Phase 5)
 
 A "batch=256 → 2048" cross-agent directive was issued earlier today

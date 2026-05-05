@@ -127,7 +127,16 @@ def my_train_fn(
     model = instantiate_arch(spec, d_in=d_in)
     model.cuda()
     log.info("[train] %s seed=%d T=%d", arch_name, seed, model.T)
-    raw_iter = preloaded_batch_iter_from_act_cache(act_cache_key, seed=seed)
+    # agent_paper 2026-05-05 PM (decisions § 15): pass-through
+    # train_window_size from TrainingConfig. Default None preserves the
+    # full-sequence path; agent_filler's C5 T-SAE baseline re-train sets
+    # it to T=2 (Bhalla/Ye 2025 paper-faithful adjacent pairs) to bring
+    # per-token T-SAE to ~SAEBench canonical scale.
+    raw_iter = preloaded_batch_iter_from_act_cache(
+        act_cache_key,
+        seed=seed,
+        train_window_size=getattr(training_cfg, "train_window_size", None),
+    )
 
     state = {"n": 0, "t0": _time.time(), "label": f"{arch_name}/seed={seed}"}
 
@@ -290,6 +299,7 @@ def run_one_cell(
     smoke: bool,
     force_train: bool,
     force_eval: bool,
+    train_window_size: int | None = None,
 ) -> None:
     eval_cfg: dict[str, Any] = {
         "protocol": protocol,
@@ -306,6 +316,15 @@ def run_one_cell(
         # Override n_steps for smoke testing. Different n_steps → different
         # train_key → fresh checkpoint, no clash with full-sweep cells.
         training_cfg = training_cfg.model_copy(update={"n_steps": n_steps})
+    if train_window_size is not None:
+        # agent_paper 2026-05-05 PM (decisions § 15): per-arch
+        # literature-faithful window size. agent_filler's C5 T-SAE
+        # baseline re-train passes train_window_size=2; existing TXC
+        # cells leave the default (None → full sequence). Different
+        # value → different train_key → fresh checkpoint.
+        training_cfg = training_cfg.model_copy(
+            update={"train_window_size": train_window_size},
+        )
     workspace, eval_key = _workspace_for(
         arch_name=arch_name, seed=seed,
         training_cfg=training_cfg, eval_cfg=eval_cfg,

@@ -103,7 +103,16 @@ def my_train_fn(*, arch_name, arch_hparams, seed, training_cfg, act_cache_key, c
     torch.manual_seed(seed)
     np.random.seed(seed)
 
-    raw_iter = preloaded_batch_iter_from_act_cache(act_cache_key, seed=seed)
+    # agent_paper 2026-05-05 PM (decisions § 15): pass-through
+    # train_window_size from TrainingConfig. Default None preserves the
+    # full-sequence path; agent_em_100k's C3 baseline re-train sets it
+    # (TopK at T=1, T-SAE at T=2) to bring per-token archs to ~SAEBench
+    # canonical scale.
+    raw_iter = preloaded_batch_iter_from_act_cache(
+        act_cache_key,
+        seed=seed,
+        train_window_size=getattr(training_cfg, "train_window_size", None),
+    )
     print(f"[SETUP {arch_name}/seed={seed}] batch_iter ready (preloaded torch tensor)  ({_time.time()-t_setup:.1f}s)", flush=True)
     sys.stdout.flush()
 

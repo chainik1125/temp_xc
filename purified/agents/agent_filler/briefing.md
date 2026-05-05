@@ -109,6 +109,261 @@ not read it as actionable. Left in place for git provenance only.
 
 ---
 
+### ⚠️ NEW MISSION 2026-05-05 PM — C5 T-SAE baseline T=2 re-train (decisions § 15)
+
+**You are repurposed.** The MW pivot is dead; the new mission is to
+re-train C5's `tsae_paper` baseline at the literature-faithful window
+size. agent_paper landed:
+
+- `temp_bench.data.nlp.cache.preloaded_batch_iter_from_act_cache(...,
+  train_window_size: int | None = None)` — kwarg added; None preserves
+  current full-sequence behavior.
+- `TrainingConfig.train_window_size: int | None = None` — new field;
+  flows into `compute_train_key` via `model_dump(exclude_none=True)`,
+  so OLD train_keys preserved (None default) and NEW cells with int set
+  get fresh keys (5 new tests, 136/136 green; commit `5555e7eb`).
+- agent_steer's `experiments/c5_steering/run.py:my_train_fn` already
+  passes through `training_cfg.train_window_size` to the helper, and
+  `run_one_cell` accepts a `train_window_size` kwarg (commits landing
+  in this push). You inherit both via import.
+
+**Mission scope** (n=3 paired with agent_steer's existing canonical):
+
+| Arch         | seeds      | `train_window_size` | tokens/step | Source |
+|---|---|---:|---:|---|
+| `tsae_paper` | {42, 1, 2} | **2** | 2048 | Bhalla/Ye 2025 §3.1 paper-faithful adjacent pairs |
+
+**Total: 3 cells.** `batch_size=1024` uniform (Han's call: same B
+across archs is cross-arch fairness; T-SAE encodes both anchor and
+pair, so its per-step token throughput is 2048 by design).
+
+Other C5 archs (`txc_base`, `txc_pro`) unchanged — agent_steer's
+existing v1.1.0 cells stand. **Don't run TXC.** No `topk_sae` either
+(it's not a C5 baseline; only T-SAE is the comparison per
+`docs/components/c5.md`).
+
+**TrainingConfig**:
+
+```python
+TrainingConfig(
+    n_steps=20_000,
+    batch_size=1024,
+    plateau_early_stop=False,
+    train_window_size=2,          # ← new field, T=2 paper-faithful pairs
+)
+```
+
+**Per-cell wall-time on A40** (rough): T-SAE at T=2 has ~16× less per-
+step encoder work than the over-batched full-sequence version (encoder
+runs on 2N tokens vs 2N tokens × 64 positions if it had been per-token-
+flattened; matched against agent_steer's existing tsae cells which were
+~25-40 min train). At T=2 expect **~10-15 min train + ~30 min judge
+eval = ~45 min per cell**. With 3 cells in parallel on 3 of your 8
+A40 GPUs, **total wall ~45-60 min**. Plenty of margin.
+
+### First concrete task — kill any MW stragglers, write driver, smoke, launch
+
+Step 0 — verify the STAND DOWN was effective. Confirm no C5 MW
+processes still running, all 8 GPUs clean:
+
+```bash
+pkill -KILL -f "experiments.c5_steering_filler" || true
+sleep 2
+nvidia-smi --query-gpu=index,memory.used --format=csv
+# → expect every GPU < 500 MB
+```
+
+Step 1 — `git pull --rebase origin final` and verify the framework:
+
+```bash
+.venv/bin/python -c "
+from temp_bench.schemas import TrainingConfig
+cfg = TrainingConfig(train_window_size=2)
+print(cfg.train_window_size)  # → 2
+"
+.venv/bin/python -c "
+from experiments.c5_steering.run import run_one_cell
+import inspect
+assert 'train_window_size' in inspect.signature(run_one_cell).parameters, \
+    'run_one_cell missing train_window_size kwarg — git pull?'
+print('OK')
+"
+```
+
+Step 2 — pull the Gemma cache (was already pulled for the now-aborted
+MW work; should still be on disk):
+
+```bash
+ls results/act_cache/*/acts.npy 2>/dev/null
+[ ! -f results/act_cache/*/acts.npy ] && bash scripts/sync_from_hf.sh
+```
+
+Step 3 — write `experiments/c5_steering_baseline/__init__.py` (empty)
+and `experiments/c5_steering_baseline/run.py`. Single-cell driver,
+called once per seed pinned to a specific GPU. Different name from
+`c5_steering_filler` (which was your aborted MW driver) — pick fresh
+to avoid confusion.
+
+```python
+"""C5 T-SAE baseline re-train at T=2 (decisions.md § 15).
+Single-cell driver; the top-level run_sweep.sh launches 3 in parallel.
+"""
+from __future__ import annotations
+import argparse
+import os
+
+# Match the threading defaults agent_steer_100k tuned for parallel runs.
+os.environ.setdefault("TQDM_DISABLE", "1")
+os.environ.setdefault("OMP_NUM_THREADS", "8")
+os.environ.setdefault("MKL_NUM_THREADS", "8")
+
+from experiments.c5_steering.run import (
+    EVAL_PROTOCOL_VERSION,
+    run_one_cell,
+)
+from temp_bench.case_studies.steering import (
+    DEFAULT_COH_THRESHOLDS,
+    DEFAULT_STRENGTHS,
+)
+
+
+def main() -> None:
+    ap = argparse.ArgumentParser(
+        description="C5 T-SAE baseline re-train at T=2 — single (arch, seed) cell."
+    )
+    ap.add_argument("--seed", required=True, type=int)
+    ap.add_argument("--n-steps", type=int, default=None,
+                    help="Override TrainingConfig.n_steps for smoke tests.")
+    ap.add_argument("--smoke", action="store_true",
+                    help="Tag the leaderboard row eval_cfg.smoke=True.")
+    ap.add_argument("--force-train", action="store_true")
+    ap.add_argument("--force-eval", action="store_true")
+    args = ap.parse_args()
+
+    print(
+        f"[c5_baseline] tsae_paper seed={args.seed} T=2 "
+        f"eval_protocol={EVAL_PROTOCOL_VERSION} smoke={args.smoke}",
+        flush=True,
+    )
+
+    run_one_cell(
+        arch_name="tsae_paper",
+        seed=args.seed,
+        protocol="v7",
+        n_concepts=30,
+        strengths=DEFAULT_STRENGTHS,
+        coh_thresholds=DEFAULT_COH_THRESHOLDS,
+        n_steps=args.n_steps,
+        smoke=args.smoke,
+        force_train=args.force_train,
+        force_eval=args.force_eval,
+        train_window_size=2,        # ← Bhalla/Ye 2025 paper-faithful
+    )
+
+
+if __name__ == "__main__":
+    main()
+```
+
+Step 4 — write `experiments/c5_steering_baseline/run_sweep.sh`:
+
+```bash
+#!/usr/bin/env bash
+# Launch the 3-cell C5 T-SAE baseline T=2 re-train in parallel.
+# 3 seeds × 1 arch (tsae_paper) on GPUs 0..2.
+
+set -e
+cd "$(dirname "$0")/../.."
+
+mkdir -p logs
+
+declare -A ASSIGN=(
+  [0]="42"
+  [1]="1"
+  [2]="2"
+)
+
+for gpu in "${!ASSIGN[@]}"; do
+  seed="${ASSIGN[$gpu]}"
+  log="logs/c5_baseline_gpu${gpu}_tsae_seed${seed}.log"
+  echo "[run_sweep] GPU ${gpu} → tsae_paper seed=${seed} → ${log}"
+  bash scripts/run_on_gpu.sh "${gpu}" -- \
+    .venv/bin/python -m experiments.c5_steering_baseline.run \
+    --seed "${seed}" \
+    > "${log}" 2>&1 &
+  echo $! > "/tmp/p_baseline_gpu${gpu}"
+done
+
+echo "[run_sweep] launched 3 parallel cells; PIDs in /tmp/p_baseline_gpu{0..2}"
+echo "[run_sweep] tail -f logs/c5_baseline_gpu*.log to monitor"
+wait
+echo "[run_sweep] all 3 cells complete"
+```
+
+Step 5 — smoke ONE cell at `n_steps=200`:
+
+```bash
+TQDM_DISABLE=1 AGENT_NAME=agent_filler \
+  bash scripts/run_on_gpu.sh 0 -- \
+  .venv/bin/python -m experiments.c5_steering_baseline.run \
+  --seed 42 --n-steps 200 --smoke 2>&1 | tail -25
+```
+
+Verify smoke landed at fresh train_key (distinct from agent_steer's
+T=None cells):
+
+```bash
+tail -1 results/leaderboard.jsonl | .venv/bin/python -c "
+import json, sys
+r = json.loads(sys.stdin.read())
+print('arch=', r['arch'], 'seed=', r['seed'], 'train_key=', r['train_key'])
+print('eval_cfg.smoke=', r['eval_cfg'].get('smoke'))
+print('peak_grade@1.75=', r['metrics'].get('peak_success_grade_at_coh_1.75'))
+"
+```
+
+Step 6 — launch the full 3-cell sweep:
+
+```bash
+bash experiments/c5_steering_baseline/run_sweep.sh
+```
+
+Step 7 — monitor 3 logs in parallel:
+
+```bash
+tail -f logs/c5_baseline_gpu*.log
+```
+
+Each cell ETA ~45-60 min. As cells complete, verify rows land at
+`arch=tsae_paper`, `eval_protocol_version=1.1.0`, with new train_keys
+distinct from agent_steer's T=None cells.
+
+Step 8 — when sweep lands, agent_paper / agent_steer integrate at
+paper-render time. agent_steer's `experiments/c5_steering/analysis.py`
+will pick up your cells via two `canonical_train_keys()` calls (TXC at
+T=None, T-SAE at T=2). Don't render `docs/components/c5.md` yourself.
+
+**Watch-outs**:
+
+- **Don't re-run TXC.** agent_steer's existing v1.1.0 TXC cells stand;
+  re-running them is wasted compute.
+- **Don't import `my_eval_fn`** from `c5_steering.run` — it's a
+  closure built by `_make_eval_fn(seed, workspace, eval_key)`. Use
+  `run_one_cell` (the wrapper handles closure plumbing). Same gotcha
+  the original C5 MW briefing flagged.
+- **Don't pursue Y/W steering hill-climb winners** — Galaxy 8/11/18 /
+  SoftMaxPool / ContrastiveMergeH8 are excluded by decision § 1.
+- **Don't enable Bricken** — C5 is Bricken-off per decisions § 7.
+- **Don't render anything to docs/components/c5.md** — agent_paper
+  integrates at paper-render time.
+- **Watch for Anthropic API credit issues** — agent_steer hit one
+  earlier. If your judge phase produces `n_valid=0`, check
+  `results/runs/<eval_key>/judge_outputs.jsonl` for "credit balance is
+  too low" errors and surface to Han before re-running. Recovery is
+  `--force-eval` on the cached training checkpoint.
+
+---
+
 ### Mandate — C5 multi-window deployment, parallel [RESCINDED 2026-05-05 PM — see STAND DOWN above]
 
 agent_paper landed `txc_base_mw` and `txc_pro_mw` as separate arch

@@ -501,7 +501,33 @@ constructs `TrainingConfig(n_steps=100_000)` and calls the canonical
 land in `leaderboard.jsonl` automatically; agent_paper handles the
 canonical-toggle in analysis.py at paper-render time.
 
-### 14. TXC training-FLOPs parity — multi-window sampling toggle
+### 14. TXC training-FLOPs parity — multi-window sampling toggle [DEPRECATED 2026-05-05 PM]
+
+> **DEPRECATED 2026-05-05 PM (Han + agent_paper).** The MW deployment was
+> directionally correct on the FLOPs asymmetry diagnosis, but the wrong
+> fix. Closer reading of SAEBench (papers/are_saes_useful.md, App. B)
+> showed canonical SAE training is buffer-based, batch=2048 TOKENS/step,
+> ~500M tokens total. C3/C5's sequence-based pattern over-batches per-token
+> archs by ~5× vs SAEBench (131K vs 2K tokens/step); C6/C7's window-based
+> pattern at T=1 is near-canonical (1K). The right fix is to bring the
+> per-token baselines DOWN to T=1 window-based (matching SAEBench +
+> matching C6/C7), NOT bring TXC up via MW. See § 15 for the replacement
+> directive.
+>
+> **All 4 MW pivots (agent_em C6, agent_em_100k C3, agent_filler C5,
+> agent_steer_100k C7) are ABORTED as of 2026-05-05 PM** (commit
+> `dd5f773e`). The YAML aliases `txc_base_mw` + `txc_pro_mw`, the
+> `multi_window: bool = False` kwarg on `TXCBase` / `TXCPro`, and the
+> per-component MW driver scaffolding stay registered as **inert reserves**
+> — code is dormant unless explicitly invoked, no behavior change for any
+> in-flight cell. Post-paper revisitation is fine; for the sprint we do not
+> launch them. The 1 C5 MW cell that landed (eval_key `963df9c69213f998`,
+> agent_steer_100k earlier today) and any partial C6/C3 MW rows from
+> aborted sweeps stay in `leaderboard.jsonl` — `canonical_train_keys`
+> filters them out at paper-render time, harmless.
+>
+> The remainder of this section is the original MW-deployment writeup,
+> kept verbatim for git provenance. Do not act on it.
 
 **Context** (Han caught 2026-05-05): per-step FLOPs differ ~25× between
 per-token archs and TXC at the canonical `(batch=1024, n_steps=20K)`
@@ -654,6 +680,169 @@ by data + matryoshka/contrastive losses, not the encode FLOPs
 themselves. The multi-window deployment recovers the FLOPs-parity we
 should have had, without proportionally increasing wall-time. ~30-50
 GPU-hr total distributed across the 6 worker pods.
+
+### 15. Literature-aligned T=1 baseline re-train (replaces § 14)
+
+**Context** (Han + agent_paper, 2026-05-05 PM): § 14's MW deployment was
+solving the right diagnosis ("per-step training-FLOPs asymmetry between
+TXC and per-token archs at C3/C5") with the wrong fix ("bring TXC up to
+match per-token throughput via stride-T tiling"). Closer reading of the
+SAE-comparison literature shows the per-token baselines were *over*-
+batched against the field standard, not the other way around:
+
+- **SAEBench** (papers/are_saes_useful.md, App. B): "We use a batch size
+  of 2048 tokens... we train each SAE on approximately 500M tokens of
+  activations." Buffer-based, batch in TOKENS, ~250K steps total.
+- **T-SAE paper** (papers/temporal_sae.md, §4.1): "All SAEs are trained
+  with the BatchTopK activation... batch size 4096 tokens... 500M
+  activation tokens." Same shape.
+- **TFA paper** (priors_in_time.md, App. B.1): "1B precached activations,
+  batch size 1024 tokens." Same shape.
+
+Our two patterns and where they sit relative to literature:
+
+| Component | Pattern                                                                | per-step tokens | vs SAEBench 2K |
+|---|---|---:|---:|
+| C3, C4, C5 | sequence-based: `(B, seq_len, d_in)` → flatten in arch's `train_step` | **131,072** (B=1024 × seq_len=128) | 65× over |
+| C6, C7    | window-based: `(B, T, d_in)` with `T=1` for SAE archs                  | **1,024** (B=1024 × T=1)  | within 2× |
+
+The C6 + C7 patterns came from agent_em / agent_back independently
+adopting `_build_batch_iter` with a per-row T-window slice. They were
+"right by accident" — close to SAEBench's canonical scale. The C3 + C5
+patterns came from agent_nlp + agent_steer using the canonical
+`preloaded_batch_iter_from_act_cache` which returns whole sequences for
+the per-token archs to flatten. They were "wrong by inheritance" — 65×
+over canonical.
+
+**Decision** (Han, 2026-05-05 PM): re-train the C3 + C5 per-token
+baselines at the per-arch literature-faithful window size:
+
+| Arch          | `train_window_size` | tokens/step | Reference |
+|---------------|---:|---:|---|
+| `topk_sae`    | **1** | 1024 | vanilla TopK, no temporal — matches C6's sae_arditi at T=1 |
+| `tsae_paper`  | **2** | 2048 | Bhalla/Ye 2025 §3.1 "load activations in **pairs** $(\mathbf{x}_t, \mathbf{x}_{t-1})$" — exact paper match |
+
+Both within 2× of SAEBench's 2K canonical scale, each arch trained at
+its own paper's intended setup. C6 baselines (`sae_arditi` at T=1) are
+unchanged. **C7 T-SAE keeps T=5** — agent_back's `_spec_window_size`
+fallback in `experiments/c7_backtracking/run.py:82-97`. Han 2026-05-05
+PM: "for C7 can leave at T=5; both need to be supported." So
+`tsae_paper` at C3/C4/C5 trains at T=2, while `tsae_paper` at C7 stays
+at T=5 — two different `train_keys`, both live in the leaderboard,
+component-specific. TXC archs at every component are unchanged (they
+sample 1 random T-window per row already, regardless of mode).
+
+**Framework change** (commit `5555e7eb`):
+
+- `temp_bench.data.nlp.cache.preloaded_batch_iter_from_act_cache` gains
+  `train_window_size: int | None = None`. ``None`` preserves current
+  behavior (full sequences); ``int T`` returns 1 random T-window per row,
+  shape `(batch_size, T, d_in)` — vectorised gather, RAM-rate per call.
+- `TrainingConfig.train_window_size: int | None = None` field, plumbed
+  into `compute_train_key` via `model_dump(exclude_none=True)`. Default
+  (None) preserves all existing train_keys; setting an int gets a fresh
+  key, so the re-train doesn't cache-hit on the over-batched cells.
+- 5 new tests landed (2 in `test_cache_keys.py`, 3 in
+  `test_preloaded_batch_iter.py`). 131 → 136 green.
+
+**Re-train scope** (one helper agent each):
+
+- **C3 baseline re-train** — split between **agent_nlp** (TopK) and
+  **agent_em_100k** (T-SAE). Han 2026-05-05 PM: "agent_nlp's other
+  H100 is free since agent_em is idle; therefore agent_nlp and
+  agent_em_100k should work TOGETHER to recover the baselines."
+  - **agent_nlp** owns C3 already; takes `topk_sae × 3 seeds × 2
+    k_feats` (3 unique trainings + 6 evals) at
+    `TrainingConfig(n_steps=20_000, train_window_size=1)`. Their
+    existing in-flight `topk_sae` sweep at T=None finishes as the
+    diff-reference baseline (~20:21Z); the new T=1 sweep runs on
+    GPU 1 (idle, agent_em's spare) immediately, with GPU 0 joining
+    after their old sweep wraps. Per-cell wall on H100: ~10-15 min
+    train (T=1 → 1024 tokens/step vs 131K full-sequence) + ~30 min
+    probing eval × 2 k_feats = ~1.2 hr. 3 cells × 2 GPUs in parallel
+    → ~2.4 hr wall.
+  - **agent_em_100k** repurposed from the now-aborted C3 MW pivot;
+    takes `tsae_paper × 3 seeds × 2 k_feats` (3 unique trainings +
+    6 evals) at `TrainingConfig(n_steps=20_000, train_window_size=2)`.
+    Per-cell wall on H100: ~15-20 min train (T=2; T-SAE encodes
+    anchor + temporal pair, so per-step encoder load = 2048 tokens)
+    + ~30 min eval × 2 k_feats = ~1.5 hr. 3 cells serial on 1 H100
+    → ~4.5 hr wall.
+  - Total C3 baseline re-train: 6 trainings + 12 evals across 2
+    agents; wall = max(agent_nlp, agent_em_100k) ≈ ~4.5 hr.
+  - MLC unported per § 11 (appendix-only); skipped.
+- **C5 T-SAE baseline re-train** (assigned to **agent_filler**,
+  repurposed from the now-aborted C5 MW parallel sweep): `tsae_paper`
+  × 3 seeds at `TrainingConfig(n_steps=20_000, train_window_size=2)`.
+  3 cells. With 8× A40 in parallel, 3 cells simultaneously → ~2-3 hr
+  wall. Other C5 archs (txc_base, txc_pro) are unchanged.
+- **C4** (qualitative latents): cache-hits on the new C3 checkpoints
+  via `train_key`. agent_nlp re-runs C4 evals once C3 baselines land.
+
+**Owner agents notified** (agent_nlp owns C3+C4, agent_steer owns C5):
+
+- agent_nlp's `experiments/c3_probing/analysis.py` already filters
+  through `canonical_train_keys()` keyed off `TrainingConfig`. To
+  pick up the new per-arch T cells in the headline, the canonical
+  filter needs THREE calls (one per training_cfg) unioned:
+  - TXC: `TrainingConfig(n_steps=20_000)` for `txc_base, txc_pro`
+  - TopK: `TrainingConfig(n_steps=20_000, train_window_size=1)` for `topk_sae`
+  - T-SAE: `TrainingConfig(n_steps=20_000, train_window_size=2)` for `tsae_paper`
+  The helper accepts a list-of-archs + single training_cfg; agent_nlp
+  calls it three times and unions the returned sets. Old over-batched
+  cells stay in the leaderboard for diff comparison.
+- agent_steer's `experiments/c5_steering/analysis.py` similar — only
+  `tsae_paper` rows shift to `train_window_size=2`; the existing TXC
+  cells stay unchanged. Two `canonical_train_keys` calls (TXC + T-SAE),
+  union.
+- agent_back's C7 T-SAE cells **stay at T=5** (their existing
+  `_spec_window_size` fallback). C7 T-SAE has no `train_window_size`
+  in its TrainingConfig — the windowing is determined by the
+  experiment driver, not the schema. So C7 T-SAE cells preserve
+  their existing `train_keys` and don't need re-running.
+  agent_back's analysis.py is unaffected.
+
+**Expected paper-claim shifts** (uncertain pending re-runs):
+
+- **C3** (per-token archs over-batched 65×, now correctly batched 1×):
+  TopK-SAE and T-SAE peak AUCs likely DROP under canonical training.
+  Today's C3 headline (TopK > TXC > T-SAE on probing) may flip to
+  TXC > TopK / T-SAE — or, more conservatively, to a tighter cluster.
+  Either way the result becomes more reviewer-defensible: "we
+  trained every arch at SAEBench's canonical compute scale."
+- **C5** (only T-SAE re-trained at T=1): T-SAE peak success grade
+  may drop slightly. Today's C5 headline (T-SAE > TXC-pro > TXC-base
+  on peak grade @ coh ≥ 1.75) may shift toward TXC ties at high coh,
+  the original hypothesis. Or may stay refuted, just with a
+  literature-aligned baseline.
+- **C6 + C7**: no shift expected — these baselines were already at
+  the right scale.
+
+**Within-component fairness invariant**: under no circumstances do we
+mix sequence-based and T=1-window cells in the same C3 / C5
+AUTO-RESULTS table. The re-trained per-token cells become the
+canonical baselines; old over-batched cells become the diff-only
+"pre-fix" reference (analogous to how decisions § 12's batch=256 cells
+are kept). `canonical_train_keys` enforces this by filtering on the
+explicit `TrainingConfig(...)` argument — workers update the call
+signature in their `analysis.py` to match the new training cfg.
+
+**Cross-component independence**: C6 + C7 are not re-running anything.
+agent_em's canonical 8/8 sweep stands as the C6 paper headline;
+agent_back's canonical v4 sweep stands as the C7 paper headline.
+agent_em_100k and agent_filler's only mission is the per-token baseline
+re-train at C3 + C5; everything else is paper-writing or wrap-up.
+
+**Compute estimate**: 9 unique trainings + 15 evals total. Worst-case
+~12-13 hr wall on the worker pods (mostly C3's serial 6-training
+schedule). Fits comfortably in the remaining sprint window.
+
+**Bricken composes orthogonally (clarification, same as § 14)**: Bricken
+resample is a `TrainingConfig` choice (`bricken_enabled`,
+`ema_auxk_alpha`, etc.). `train_window_size` is also a `TrainingConfig`
+choice. They coexist in the same config; setting both is allowed if a
+component decides to. C6 keeps Bricken on for TXC + brickenauxk_a8 (per
+§ 7); C3/C5 keep Bricken off for the baseline re-train (per § 7).
 
 ### Non-decisions (to revisit later)
 

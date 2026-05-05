@@ -37,6 +37,98 @@ Add a bullet to "Open questions for Han" in your own briefing,
 surface it in chat, and let Han or agent_paper land the change. Even
 if Han verbally approves, do not commit cross-territory edits yourself.
 
+### ⚠️ Han decisions 2026-05-05 PM — C5 T-SAE baseline T=1 re-train (your tsae_paper rows shift)
+
+**Background**: SAEBench (papers/are_saes_useful.md, App. B) shows
+canonical SAE training is buffer-based, batch=2048 TOKENS/step, ~500M
+tokens total. Our C5 per-token arch (`tsae_paper`) currently trains at
+`(B=1024, seq_len=128) → flatten = 131,072 tokens/step` — 65× over
+SAEBench's canonical 2K. C6 + C7 baselines coincidentally use a
+window-based pattern at T=1 (within 2× of canonical); C3 + C5 inherited
+the over-batched sequence-based pattern. The earlier "MW deployment"
+pivot (decisions.md § 14) was solving the right diagnosis with the wrong
+fix. **The right fix is to bring per-token baselines DOWN to T=1 window-
+based, not bring TXC up via MW.**
+
+**Han's call (2026-05-05 PM)**: re-train C5's `tsae_paper` (only — TXC
+archs are unchanged) × 3 seeds at `train_window_size=2` — Bhalla/Ye
+2025 §3.1 explicitly trains T-SAE on adjacent pairs
+($\mathbf{x}_t, \mathbf{x}_{t-1}$); 2048 tokens/step matches SAEBench's
+2K canonical exactly. **agent_filler is the helper running this
+re-train** (repurposed from the aborted C5 MW parallel pivot, now
+running on 8× A40). You don't run anything new; the re-trained
+`tsae_paper` cells land in `leaderboard.jsonl` automatically.
+
+**Framework change (commit `5555e7eb`)** — read before paper-rendering:
+
+- `temp_bench.data.nlp.cache.preloaded_batch_iter_from_act_cache` gains
+  `train_window_size: int | None = None`. None = full-sequence
+  (current); int T = 1 random T-window per row.
+- `TrainingConfig.train_window_size: int | None = None` added; flows
+  into `compute_train_key` via `model_dump(exclude_none=True)`. Default
+  (None) preserves YOUR EXISTING TRAIN KEYS — your v1.1.0 9/9 sweep
+  keeps its cache. Setting an int gets a fresh key.
+
+**Your action — analysis.py filter shift**:
+
+`experiments/c5_steering/analysis.py` currently calls
+`canonical_train_keys(...)` for all 3 archs (`tsae_paper` + `txc_base`
++ `txc_pro`) at `TrainingConfig(n_steps=20_000)`. After agent_filler's
+re-train lands, archs split:
+
+- TXC archs (`txc_base`, `txc_pro`): unchanged. Use
+  `TrainingConfig(n_steps=20_000)`.
+- T-SAE: re-trained at T=2 (paper-faithful pairs). Use
+  `TrainingConfig(n_steps=20_000, train_window_size=2)`.
+
+Two `canonical_train_keys` calls, union the returned sets:
+
+```python
+from temp_bench.report import canonical_train_keys
+from temp_bench.schemas import TrainingConfig
+
+txc_keys = canonical_train_keys(
+    component="c5",
+    archs=["txc_base", "txc_pro"],
+    seeds=(1, 2, 42),
+    datasource_names=("gemma_2_2b_it_l13_fineweb_24k128",),
+    training_cfg=TrainingConfig(n_steps=20_000),
+)
+tsae_keys = canonical_train_keys(
+    component="c5",
+    archs=["tsae_paper"],
+    seeds=(1, 2, 42),
+    datasource_names=("gemma_2_2b_it_l13_fineweb_24k128",),
+    training_cfg=TrainingConfig(n_steps=20_000, train_window_size=2),
+)
+canonical = txc_keys | tsae_keys
+```
+
+Your existing v1.1.0 `tsae_paper` rows stay in the leaderboard under
+their old hashes for diff comparison; the analysis.py filter drops them
+from the headline AUTO-RESULTS once you wire the second call.
+
+**Paper-claim shift (uncertain pending re-run)**: Today's v1.1.0 C5
+headline (peak success grade @ coh ≥ 1.75) shows tsae_paper 2.167 ±
+0.104 > txc_pro 1.284 > txc_base 0.792 — "TXC matches T-SAE" hypothesis
+REFUTED. Under canonical T=1 training, T-SAE may score lower (it was
+over-batched 65×; now at literature scale). The result may shift toward
+the original hypothesis (TXC ties T-SAE at high coh) or stay refuted
+with a literature-aligned baseline. Either is reviewer-defensible.
+Wait for agent_filler's re-train to land before re-rendering.
+
+**No action on your status**: C5 v1.1.0 sweep is COMPLETE; you remain
+in `status: complete`. The re-trained cells are agent_filler's
+responsibility; your output is the diff-comparison reference. Use
+remaining session time for paper-writing if helpful (c5.md caveats:
+"per-token T-SAE baseline trained at SAEBench's canonical 1K
+tokens/step instead of our sequence-based 131K — agent_filler re-run,
+methodological note in § 15").
+
+See `decisions.md` § 15 for the full rationale.
+
+---
+
 ### Han decisions 2026-05-04 PM ⚠️ URGENT — 25K→20K + preloaded batch_iter
 
 Two directives, both effective immediately:

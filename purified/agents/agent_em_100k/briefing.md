@@ -112,6 +112,232 @@ it as actionable. Left in place for git provenance only.
 
 ---
 
+### ⚠️ NEW MISSION 2026-05-05 PM — C3 baseline T-window re-train (decisions § 15)
+
+**You are repurposed.** The MW pivot is dead; the new mission is to re-train
+C3's per-token baselines at the per-arch literature-faithful window size.
+agent_paper landed:
+
+- `temp_bench.data.nlp.cache.preloaded_batch_iter_from_act_cache(...,
+  train_window_size: int | None = None)` — kwarg added; None preserves
+  current full-sequence behavior.
+- `TrainingConfig.train_window_size: int | None = None` — new field;
+  flows into `compute_train_key` via `model_dump(exclude_none=True)`,
+  so OLD train_keys preserved (None default) and NEW cells with int set
+  get fresh keys. Confirmed by 5 new tests (136/136 green, commits
+  `5555e7eb`).
+- agent_nlp's `experiments/c3_probing/run.py:my_train_fn` already
+  passes through `training_cfg.train_window_size` to the helper
+  (commit landing in this push). You inherit it via import.
+
+**Mission scope** (Han 2026-05-05 PM split between you + agent_nlp):
+
+| Arch         | seeds      | k_feats | `train_window_size` | tokens/step | Source |
+|---|---|---|---:|---:|---|
+| `tsae_paper` | {42, 1, 2} | {5, 20} | **2** | 2048 | Bhalla/Ye 2025 §3.1 paper-faithful adjacent pairs |
+
+**Total: 3 unique trainings + 6 evals — your scope.**
+
+**agent_nlp takes `topk_sae`** (TopK × 3 seeds × 2 k_feats at T=1) on
+their 2× H100 pod (their own GPU 0 + agent_em's now-free GPU 1; agent_em
+is idle post-canonical-sweep). They have C3 mastery + the TopK plumbing
+already proven, so the natural division is: TopK is theirs, T-SAE is
+yours. **Don't re-run topk_sae** — wasted compute.
+
+MLC unported (decision § 11 appendix-only); skipped. TXC archs
+(`txc_base`, `txc_pro`) unchanged — agent_nlp's existing canonical
+sweep stands.
+
+**TrainingConfig**:
+
+```python
+TrainingConfig(
+    n_steps=20_000,
+    batch_size=1024,
+    plateau_early_stop=False,
+    train_window_size=2,          # ← new field, T=2 paper-faithful pairs
+)
+```
+
+**Per-cell wall-time on H100** (rough):
+
+- `tsae_paper` at T=2: encoder runs on 2 token-vectors per row
+  (`(B, 2, d_in)` → anchor + temporal-pair). ~15-20 min train + ~30
+  min probing eval × 2 k_feats. Per-cell: ~1.5 hr.
+- 3 cells serial on 1× H100: ~4.5 hr total. Fits in remaining sprint
+  window.
+
+### First concrete task — write the C3 baseline driver, smoke, launch
+
+Step 0 — verify the STAND DOWN was effective. Confirm no C3 MW
+processes still running, GPU clean:
+
+```bash
+ps -ef | grep "experiments.c3_probing_mw" | grep -v grep   # should be empty
+nvidia-smi --query-gpu=memory.used --format=csv             # < 500 MB
+```
+
+Step 1 — `git pull --rebase origin final` and verify the framework:
+
+```bash
+.venv/bin/python -c "
+from temp_bench.schemas import TrainingConfig
+cfg = TrainingConfig(train_window_size=1)
+print(cfg.train_window_size)  # → 1
+print(TrainingConfig().model_dump(exclude_none=True).keys())  # → no 'train_window_size'
+"
+.venv/bin/python -c "
+from temp_bench.data.nlp.cache import preloaded_batch_iter_from_act_cache
+import inspect
+sig = inspect.signature(preloaded_batch_iter_from_act_cache)
+assert 'train_window_size' in sig.parameters, 'framework change not present — git pull?'
+print('OK')
+"
+```
+
+Step 2 — verify activation cache + probe cache on disk (reuse from
+your prior C3 MW prep, both should still be there):
+
+```bash
+ls results/act_cache/e4916bcae1881963/acts.npy
+ls results/probe_cache/gemma_2_2b_it_l13_fineweb_24k128/ | head -3
+```
+
+Step 3 — write `experiments/c3_probing_tsae_baseline/__init__.py`
+(empty) and `experiments/c3_probing_tsae_baseline/run.py`:
+
+```python
+"""C3 T-SAE baseline re-train at T=2 (decisions.md § 15).
+Imports agent_nlp's plumbing verbatim; only the arch + TrainingConfig
+change.
+"""
+from __future__ import annotations
+import argparse
+from temp_bench import runner
+from temp_bench.schemas import TrainingConfig
+from experiments.c3_probing.run import (
+    DATASOURCE,
+    EVAL_PROTOCOL_VERSION,
+    my_train_fn,
+    my_eval_fn,
+)
+from temp_bench.config import compute_act_cache_key, load_datasource
+
+
+# Bhalla/Ye 2025 §3.1: T-SAE paper-faithful adjacent pairs → T=2.
+TSAE_TRAINING_CFG = TrainingConfig(n_steps=20_000, train_window_size=2)
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--seeds", nargs="+", type=int, default=[42, 1, 2])
+    ap.add_argument("--k-feats", nargs="+", type=int, default=[5, 20])
+    ap.add_argument("--n-steps", type=int, default=None,
+                    help="Override TrainingConfig.n_steps for smoke tests.")
+    args = ap.parse_args()
+
+    act_cache_key = compute_act_cache_key(load_datasource(DATASOURCE))
+    cfg = TSAE_TRAINING_CFG
+    if args.n_steps is not None:
+        cfg = cfg.model_copy(update={"n_steps": args.n_steps})
+
+    for seed in args.seeds:
+        for k in args.k_feats:
+            print(
+                f"[c3_tsae_baseline] cell tsae_paper seed={seed} k_feat={k} "
+                f"T={cfg.train_window_size} n_steps={cfg.n_steps}",
+                flush=True,
+            )
+            # Mirror agent_nlp's eval_cfg shape (run.py:300) so eval
+            # cache-keys are stable.
+            eval_cfg = {
+                "k_feat": k,
+                "S": 32,
+                "smoke": False,
+                "_act_cache_key": act_cache_key,
+                "_datasource_name": DATASOURCE,
+            }
+            runner.run_cell(
+                component="c3",
+                arch_name="tsae_paper",
+                seed=seed,
+                datasource_name=DATASOURCE,
+                training_cfg=cfg,
+                eval_cfg=eval_cfg,
+                eval_protocol_version=EVAL_PROTOCOL_VERSION,
+                train_fn=my_train_fn,
+                eval_fn=my_eval_fn,
+            )
+
+
+if __name__ == "__main__":
+    main()
+```
+
+Step 4 — smoke ONE cell at `n_steps=200`:
+
+```bash
+TQDM_DISABLE=1 AGENT_NAME=agent_em_100k \
+  .venv/bin/python -m experiments.c3_probing_tsae_baseline.run \
+  --seeds 42 --k-feats 5 --n-steps 200 \
+  2>&1 | tail -25
+```
+
+Verify the leaderboard row lands with `train_window_size=2` baked
+into the train_key (the cell will get a fresh key, distinct from
+agent_nlp's existing tsae_paper cells):
+
+```bash
+.venv/bin/python -c "
+from temp_bench.report import query_leaderboard
+rows = [r for r in query_leaderboard(component='c3') if r.arch=='tsae_paper']
+print(f'tsae_paper rows: {len(rows)}')
+for r in rows[-3:]:
+    print(r.train_key, r.eval_key, r.eval_cfg.get('k_feat'), r.metrics.get('mean_auc'))
+"
+```
+
+Step 5 — launch the full sweep:
+
+```bash
+TQDM_DISABLE=1 AGENT_NAME=agent_em_100k \
+  .venv/bin/python -m experiments.c3_probing_tsae_baseline.run \
+  > logs/c3_tsae_baseline_full.log 2>&1 &
+echo $! > /tmp/p_c3_tsae_baseline
+```
+
+Step 6 — monitor + verify. Per-cell wall ~1.5 hr; full sweep ~4.5 hr.
+Use the persistent monitor pattern from your prior C3 MW work; same
+log shape (`[SETUP {arch}/seed=...]`, `[TRAIN ... step XXXX/20000]`,
+`CELL DONE`).
+
+Step 7 — when sweep lands, re-render is agent_paper / agent_nlp's job
+at paper-render time. agent_nlp's `experiments/c3_probing/analysis.py`
+will pick up your new cells via three `canonical_train_keys()` calls
+(TXC at T=None, TopK at T=1, T-SAE at T=2). Don't render anything to
+`docs/components/c3.md` yourself — that's agent_nlp's territory.
+
+**Watch-outs**:
+
+- **Don't override `_real_training_cfg`.** Use `ARCH_TRAINING_CFGS` to
+  pick the per-arch config; pass it directly to `runner.run_cell`.
+- **eval_cfg shape matters.** Your prior C3 MW work hit two crashes
+  (KeyError `_act_cache_key`, FileNotFoundError on probe cache) —
+  same plumbing here. Inject `_act_cache_key`, `_datasource_name`,
+  `smoke=False` per agent_nlp's `run.py:292-301` pattern.
+- **Probe cache on HF**: `sync_from_hf.sh` only pulls `act_cache/**`.
+  If the probe_cache dir is missing on a fresh pod, run:
+  ```bash
+  .venv/bin/hf download han1823123123/temp-bench-data \
+      --repo-type dataset \
+      --include "probe_cache/gemma_2_2b_it_l13_fineweb_24k128/**" \
+      --local-dir results/
+  ```
+- **GPU is yours alone** on this 1× H100 pod. No GPU-sharing
+  considerations.
+
+---
+
 ### ⚠️ Mission pivot 2026-05-05 — abandon C6 100K, deploy C3 MW [RESCINDED 2026-05-05 PM — see STAND DOWN above]
 
 **Old mission (abandoned)**: replicate agent_em's C6 sweep at
