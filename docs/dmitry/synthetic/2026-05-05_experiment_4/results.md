@@ -8,16 +8,24 @@ tags:
 
 ## TL;DR
 
-Implemented Experiment 4 (delayed temporally-colored sources) per
-[[plan|the plan]]. Three architectures (regular SAE, TopK TXC, Han H8 with
-multi-distance InfoNCE) all sit at chance recovery across every window
-length and delay we tried. Only the spectral oracle reads `Ĉ_D` directly
-and recovers the basis. The reason is structural: **rotation invariance of
-Gaussian sources is preserved by reconstruction loss AND by cosine InfoNCE**,
-so no dictionary-style training objective in this family can break the
-symmetry. The proposal's expected `W = D + 1` phase transition is
-unattainable on Gaussian sources without changing either the source
-distribution or the loss function.
+Implemented two variants of proposal Section 4:
+
+- **Strong / colored-source theorem regime (Stages 0–2):** Rigorous local-direction
+  impossibility. Every trained dictionary architecture we tried (regular SAE,
+  TopK TXC, Han H8 with multi-distance InfoNCE) sits at chance recovery across
+  every window length and delay. Only the spectral oracle reads `Ĉ_D` directly
+  and recovers the basis. **Reason:** rotation invariance of Gaussian sources
+  is preserved by reconstruction loss AND by cosine InfoNCE.
+
+- **Weak / ambiguous-pair HMM regime (Stage 3):** Bounds local pair classification
+  rather than direction recovery. Empirically delivers the proposal's intended
+  phase transition: regular SAE probe at the middle position is exactly at chance
+  (val acc 0.13 ≈ 1/R = 0.125 with R=8), TXC probes hit val acc 1.00 at every
+  W ≥ 2 because the cue and readout positions break the ambiguity.
+
+The two regimes answer different questions: the strong version *bounds the
+local baseline rigorously*; the weak version *gives a clean TXC > SAE
+empirical figure*.
 
 ## Setup
 
@@ -153,6 +161,53 @@ training objective whose loss factors through marginal-position
 reconstruction OR through cosine-similarity contrastive terms inherits
 the rotation invariance.
 
+## Stage 3 — ambiguous-pair HMM (the weak version)
+
+The proposal's lines 1003–1043 propose an HMM-compatible alternative that
+bounds local *pair classification* rather than local *direction recovery*.
+Construction: `R` ambiguous classes, each with two unit directions
+
+    f_{y,+} = a e_0 + b e_y,   f_{y,-} = a e_0 - b e_y,   a^2 + b^2 = 1.
+
+Note `f_{y,+} + f_{y,-} = 2 a e_0` for *every* `y`. The HMM emits 3-token
+segments `cue(y) -> ambiguous_middle(y) -> readout(y)`. Emissions:
+
+| Position | Activation |
+|---|---|
+| cue | `c_y + σ ε`  (here `c_y = e_y`, an orthonormal cue direction) |
+| middle | `2 a e_0 + σ ε`  *(deterministic in y — the ambiguity)* |
+| readout | `r_y + σ ε`  (an orthonormal readout direction) |
+
+Local impossibility: at the middle position `P(y | x_t) = P(y) = 1/R`
+exactly, so any local one-position learner has Bayes-optimal pair
+classification accuracy `≤ 1/R + ε_leak`. A temporal learner with `W ≥ 2`
+that covers either the cue or the readout can recover `y`.
+
+We implemented this with `R = 8`, `d = 64`, `σ = 0.1`, `a = 1/√2`, `H = 64`,
+`k_pos = 8`, `n_steps = 4000`, batch 64, on CPU in ~5 minutes.
+
+| Probe input | Val accuracy | Comment |
+|---|---|---|
+| Raw `x_middle` | 0.123 | Sanity — middle activation has no `y` info by construction |
+| Regular SAE latent at middle | **0.130** | At chance: `1/R = 0.125`. Matches the proposal bound |
+| TXC `W = 2` latent (covers cue + middle) | **1.000** | Perfect |
+| TXC `W = 3` latent (covers cue + middle + readout) | 1.000 | Perfect |
+| TXC `W = 5` latent | 1.000 | Perfect |
+
+Pre-training sanity: the per-class mean activation at middle positions
+drifts only `0.023` in L2 across the `R = 8` classes (with the global mean
+having norm ≈ `2 a = 1.41`), confirming the ambiguity is empirically
+clean.
+
+![Ambiguous-pair probe figure](../../../../plots/v6_colored_sources/ambiguous_pair_probes.png)
+
+This is the architecture-data match the colored-source theorem regime
+lacks: the source distribution is sparse, position-dependent, and
+non-Gaussian, so the SAE/TXC family actually has a foothold. The
+"bounds-in-theory and matches-in-practice" combo the proposal originally
+hoped for **does** hold here — just for the weaker (pair-classification)
+target rather than direction recovery.
+
 ## What this means for the proposal
 
 - **Spectral oracle vs. trained dictionaries** is a useful baseline. On
@@ -177,17 +232,37 @@ the rotation invariance.
 
 ## Recommendation
 
-For the next sprint, I'd implement the **sparse non-negative source
-variant**. It gives the proposal's intended phase-transition figure and
-is cheap on top of the existing v6 module — the only change is the
-latent generator (`sample_ar_chains` → `sample_sparse_ar_chains`) and
-the matching adjustment to the chance baseline. Estimated effort: half
-a day to implement, ~30 min of a40 compute.
+We now have both halves of what the proposal originally tried to do in a
+single experiment:
 
-The clean theorem regime (Gaussian sources, rotation-invariant marginal)
-is good for *rigorously bounding the local baseline* but not for
-producing a "TXC wins" empirical figure. Both are useful — they answer
-different questions.
+- **Strong colored-source theorem (Stages 0–2):** rigorous direction-recovery
+  bound. Useful as the reference for "what's information-theoretically
+  impossible for a local one-token learner." The negative empirical
+  result on TXC/H8 isn't a bug — it's the bound being tight.
+
+- **Weak ambiguous-pair HMM (Stage 3):** clean TXC-vs-SAE phase transition
+  on a probing-style metric. Useful for any paper claim of the form
+  "temporal architectures recover information that local architectures
+  cannot." The bound is on pair classification, not direction recovery,
+  but the empirical separation is large and unambiguous.
+
+For follow-up work I'd:
+
+1. **Sweep `R` and `a`** on the ambiguous-pair setup. Higher `R` makes
+   chance lower; tuning `a` toward 1 increases the locally-observed
+   `2 a e_0` magnitude and tests sensitivity. Cheap.
+2. **Add leakage `ε`** (cue/readout occasionally show a wrong-class
+   direction) to verify the proposal's `Acc_local ≤ 1/R + ε` bound
+   numerically.
+3. **Direction-recovery on the ambiguous-pair sources** (re-using the
+   `squared_axis_recovery` metric from the colored-source pipeline, with
+   ground-truth dictionary `{e_0, e_y, r_y, f_{y,±}}`). The data is
+   sparse and non-negative so direction recovery should also work — this
+   would unify the two metric stories on the same data.
+4. **Try the colored-source impossibility with a *spectral-oracle-aware*
+   loss** (e.g. lag-`D` whitening regularizer pushing `W_dec` toward
+   eigvecs of `Ĉ_D`). Would close the gap on the strong regime without
+   abandoning Gaussian sources.
 
 ## Files
 
@@ -200,3 +275,7 @@ different questions.
 | Stage 1 figure | `plots/v6_colored_sources/phase_transition_stage1.png` |
 | Stage 2 results | `results/v6_colored_sources/stage2.json` |
 | Stage 2 figure | `plots/v6_colored_sources/phase_transition_stage2.png` |
+| Stage 3 (ambiguous-pair) results | `results/v6_colored_sources/ambiguous_pair.json` |
+| Stage 3 figure | `plots/v6_colored_sources/ambiguous_pair_probes.png` |
+| Ambiguous-pair generator | `src/v6_colored_sources/ambiguous_pair.py` |
+| Ambiguous-pair runner | `src/v6_colored_sources/run_pair_experiment.py` |
