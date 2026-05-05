@@ -610,34 +610,41 @@ top-to-bottom only as context — do NOT execute the directives.
 
 ## Current state (agent owns — overwrite at every compact)
 
-**Last verified: 2026-05-05T19:35Z. C3 BASE canonical sweep
-RUNNING + § 17 T-sweep mission queued.** Pod is 1× H100
-ephemeral. Caches done + on HF: `act_cache/f01ca87f2e8f3365`
-(13.2 GB) and `probe_cache/gemma_2_2b_base_l13_fineweb_24k128`
-(~20 GB).
+**Last verified: 2026-05-05T22:24Z. C3 BASE per-token (TopK +
+T-SAE + TFA) DONE (18 cells). C4 BASE on TopK + T-SAE DONE
+(6 cells). C4 TFA aborted (shape mismatch — see OQ #2).**
 
-**Canonical sweep state** (PID 16279, log `logs/c3_base_full.log`):
-TopK + T-SAE archs FULLY DONE (12/30 cells). TFA seed=42 done
-(k=5: 0.690, k=20: 0.758 — TFA notably trails TopK + T-SAE on
-BASE, paper-relevant finding). TFA seed=1 train just finished
-(eval ~15 min). TFA seed=2 + TXC-base + TXC-pro still queued.
-ETA ~75 min remaining for canonical.
+Pod is 1× H100 ephemeral. Caches done + on HF:
+`act_cache/f01ca87f2e8f3365` (13.2 GB) and
+`probe_cache/gemma_2_2b_base_l13_fineweb_24k128` (~20 GB).
 
-**§ 17 T-SWEEP MISSION (URGENT, queued)**: agent_paper added
-txc_base × {T=10, T=20} × 3 seeds × 2 k_feats = 6 trains + 12
-evals on top of canonical. Driver extended:
-`ARCH_TRAINING_CFGS` is now `dict[str, list[TrainingConfig]]` and
-the main loop iterates `(arch, cfg)` pairs. `--cfg-tags T10 T20`
-selects only the new cells. Same in C4 BASE driver.
+**C3 BASE canonical (per-token archs)** — KILLED at
+intentional checkpoint after TFA seed=2 k=20 landed; TXC archs
+are agent_filler's territory now (§ LOAD SPLIT 2026-05-05 PM).
+18/30 cells delivered:
+- TopK ×3 seeds: cross-seed mean k=5: 0.826, k=20: 0.880
+- T-SAE ×3 seeds: cross-seed mean k=5: 0.853, k=20: 0.895
+- TFA ×3 seeds: cross-seed mean k=5: 0.709, k=20: 0.776
+  (TFA trails TopK + T-SAE on BASE — paper-relevant finding)
+
+**C4 BASE on per-token archs (PID 23075, exited)** — TopK +
+T-SAE landed (6 cells); TFA cell crashed at first attempt due
+to TFA → `(N, T=5, d_sae)` shape mismatch in
+`qualitative.encode_concat_corpus`. Cross-seed C4 SEMANTIC:
+- TopK: 88.3/256 (~34.5%)
+- T-SAE: 75.3/256 (~29.4%)
+- TopK > T-SAE on qualitative on BASE (opposite of C3 ordering;
+  worth noting in paper).
+
+**§ LOAD SPLIT (effective)**: agent_filler running TXC-base
+(T=5/10/20) + TXC-pro × 3 seeds = 12 trainings on 8× A40s.
+ETA ~5-6 hr; my C4 BASE evals on those checkpoints come last.
 
 **IMPORTANT BUG FIX (local override)**: agent_nlp's
-`c3_probing.run.my_eval_fn` reads `_arch_hparams` per its
-docstring but in fact calls `load_arch(arch_name)` and
-discards the merged hparams — silently mis-instantiates models
-trained with `arch_hparams_override` (e.g. T=10 / T=20). I now
-maintain a LOCAL `my_eval_fn` in `experiments/c3_probing_base/`
-+ `experiments/c4_qualitative_base/` that applies the merged
-`_arch_hparams` correctly. Surfaced in Open questions for Han.
+`c3_probing.run.my_eval_fn` reads `_arch_hparams` per docstring
+but calls `load_arch(arch_name)` (default YAML hparams). My
+BASE drivers carry a LOCAL `my_eval_fn` that applies the merged
+hparams correctly. OQ #1.
 
 ## What I just did (agent owns — overwrite)
 
@@ -659,26 +666,34 @@ maintain a LOCAL `my_eval_fn` in `experiments/c3_probing_base/`
 
 ## Next action (agent owns — overwrite)
 
-1. **Standby for canonical sweep completion**. Monitor
-   `b1z85fid9` (or successor) alerts on cell DONE.
-   `bngudibih` waits for PID 16279 exit.
-2. **After canonical sweep finishes**: launch the §17 T-sweep:
+1. **Wait for agent_filler's TXC checkpoints**. Watch the
+   manifest for new `txc_base` / `txc_pro` rows on the BASE
+   datasource (gemma_2_2b_base_l13_fineweb_24k128). ETA
+   ~5-6 hr (per agent_filler's brief).
+2. **Run C4 BASE on TXC archs** once filler's trains land:
    ```
    TQDM_DISABLE=1 AGENT_NAME=agent_steer_100k \
-     .venv/bin/python -m experiments.c3_probing_base.run \
-       --archs txc_base --cfg-tags T10 T20 \
-       > logs/c3_base_tsweep.log 2>&1 &
+     .venv/bin/python -m experiments.c4_qualitative_base.run \
+       --archs txc_base txc_pro \
+       > logs/c4_base_txc.log 2>&1 &
    ```
-   ETA ~12-13 hr serial on H100.
-3. **C4 BASE eval** sweep: cache-hits on C3 BASE checkpoints
-   (canonical archs + T-sweep). ~1.5 hr. Use
-   `experiments.c4_qualitative_base.run`.
-4. **Wrap up**: `bash scripts/wrap_up_session.sh` to confirm
+   This will cache-hit on filler's checkpoints (3 seeds × 4
+   cfgs = 12 cells, ~2 hr).
+3. **Wrap up**: `bash scripts/wrap_up_session.sh` to confirm
    all checkpoints + caches are on HF.
 
 ## Don't repeat (agent owns — overwrite)
 
 ### Mission scope
+- **DO NOT run TXC-base or TXC-pro on BASE** — agent_filler
+  owns these per § LOAD SPLIT 2026-05-05 PM.
+- **DO NOT run C4 on TFA** — shape mismatch with
+  `qualitative.encode_concat_corpus`. agent_nlp's IT C4 also
+  excludes TFA.
+- **DO NOT run the § 17 T-sweep yourself** (T=10/T=20) —
+  rescinded for agent_steer_100k; agent_filler handles it.
+  Driver still has the cfgs registered (with `--cfg-tags`
+  filtering) but don't launch them on this pod.
 - **Don't run anything other than BASE C3 + C4** (and optionally MLC
   for stretch). Don't pursue C5, C6, C7, MW, or 100K — all rescinded.
 - **Don't deviate from agent_nlp + agent_em_100k's per-arch
@@ -718,3 +733,16 @@ maintain a LOCAL `my_eval_fn` in `experiments/c3_probing_base/`
    hparams from `eval_cfg["_arch_hparams"]`. Suggest agent_nlp
    upstream the same fix to `experiments/c3_probing/run.py`
    (and `experiments/c4_qualitative/run.py` likely needs it too).
+2. **TFA incompatible with C4 qualitative eval (paper-blocking
+   if we need TFA for C4)**: `qualitative.encode_concat_corpus`
+   expects SAE features of shape `(N, d_sae)` but TFA returns
+   `(N, T=5, d_sae)` (per-window output). My BASE C4 sweep
+   crashed at the first TFA cell with `ValueError: could not
+   broadcast input array from shape (256,5,18432) into shape
+   (256,18432)`. Note agent_nlp's IT C4 `DEFAULT_ARCHS` also
+   excludes TFA, suggesting this is a known incompatibility.
+   For now I dropped TFA from the BASE C4 sweep (TopK + T-SAE
+   landed cleanly: 6 cells). If TFA is needed for the BASE C4
+   table, `qualitative.encode_concat_corpus` needs a TFA-
+   specific path (e.g. take the last-window features, or
+   average across T).
