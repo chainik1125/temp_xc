@@ -453,13 +453,25 @@ Step 6 — monitor + verify rows land at `arch=txc_base_mw` /
 
 ## Current state (agent owns — overwrite at every compact)
 
-**Last verified: 2026-05-05T14:22Z (C7 MW pivot executed — driver
-written, bug fix landed, smoke passed end-to-end, full 2-cell sweep
-launched).**
+**Last verified: 2026-05-05T14:25Z (STAND DOWN executed — sweep killed
+at 14:23Z, idle per Han 2026-05-05 PM directive `dd5f773e`). All MW
+work aborted; bug fix preserved; status: idle.**
 
-- `git HEAD`: just after `cd3020c9` (agent_paper C7 pivot directive).
+- **Sweep killed at 14:23Z**, 90 sec after launch (PID 11191 → no
+  processes, GPU 0 MB). No C7 MW leaderboard rows landed from the full
+  sweep (cell 1 had just started). The smoke row from 14:20:29Z
+  (eval_key `e868a6e19d784977` at n_steps=200, training_cfg.n_steps=200)
+  stays in the leaderboard — `canonical_train_keys` filter excludes it.
+- Bug fix in `src/temp_bench/case_studies/backtracking.py:1232` STAYS —
+  it's a real correctness bug for any future re-build of
+  `sentence_acts_L10.npz`. Pushed in commit `59aa94cc`.
+- Driver code at `experiments/c7_backtracking_mw/{__init__.py, run.py}`
+  is committed but inert — RESCINDED per STAND DOWN; agent_paper may
+  delete or repurpose later.
+
+- `git HEAD`: rebased onto `dd5f773e` (agent_paper STAND DOWN).
 - Pod: 1× H100 80GB, ephemeral, 240 GB RAM, `/workspace/temp_xc/purified`.
-  Same pod as before.
+  Same pod, no active compute.
 - Driver: `experiments/c7_backtracking_mw/{__init__.py, run.py}`. Imports
   agent_back's `DATASOURCE`, `EVAL_PROTOCOL_VERSION`, `my_eval_fn`.
   Adds `_build_full_seq_batch_iter` + `my_train_fn_mw` (full-seq batch_iter
@@ -503,9 +515,13 @@ launched).**
 
 Newest first.
 
-- **14:22:06Z launched full C7 MW 2-cell sweep** — `txc_base_mw + txc_pro_mw
-  × seed=42` at canonical 20K. PID 11191. Persistent Monitor `bdi23qf73`
-  armed.
+- **14:23Z killed the C7 MW sweep** (PID 11191) per Han's STAND DOWN
+  directive (commit `dd5f773e`). 90 sec after launch — no leaderboard
+  rows landed from the full sweep. GPU clean.
+- **14:22:06Z launched full C7 MW 2-cell sweep** — `txc_base_mw +
+  txc_pro_mw × seed=42` at canonical 20K. PID 11191. **Killed 90 sec
+  later** by STAND DOWN (was at "CELL: arch=txc_base_mw seed=42
+  n_steps=20000").
 - **14:20:29Z C7 MW smoke #2 PASSED** end-to-end. eval_key
   `e868a6e19d784977`, train_key `14d49c561fdc0b00`. Pipeline validated:
   full Stage A + mining + magnitude grid + Sonnet judge + PR-AUC.
@@ -527,22 +543,19 @@ Newest first.
 
 ## Next action (agent owns — overwrite)
 
-1. **Watch persistent Monitor `bdi23qf73`** for cell-completion markers.
-   As each cell finishes:
-   - `tail -1 results/leaderboard.jsonl` — verify new C7 MW row at
-     `eval_protocol_version=1.0.0` (C7 canonical).
-   - `tail -1 checkpoints/manifest.jsonl | jq .hf_url` — verify auto-push.
-2. **If `txc_pro_mw` OOMs** (matryoshka × multi-distance × MW at Llama
-   d_sae=32768 is unprecedented): briefing's mitigation = drop batch_size
-   to 512. Effective B*N still > non-MW B=1024.
-3. **Periodic sanity checks** via ScheduleWakeup every ~1 hr.
-4. **After both cells land**: do NOT run `report.render(component='c7')`
-   — agent_back's territory. Just confirm 2 new MW rows and stop.
-5. **Before session-end / context-compact**: overwrite this briefing's
-   bottom sections. Run `bash scripts/wrap_up_session.sh`.
-6. Compare MW headline against agent_back's non-MW canonical cells
-   once both land (agent_back's txc_base seed=42 = 0.42 / txc_pro seed=42
-   = 0.377 from the v4 sweep).
+**Status: idle.** Per STAND DOWN directive: no further compute work,
+no MW deployment, no replacement mission. Compute work is done.
+
+1. Push pending state (this briefing update + the STAND-DOWN-rebase
+   merge) to origin so the overseer sees clean idle state.
+2. Optional: if remaining session time permits and would help, draft
+   c7.md caveats / methodology bullets per STAND DOWN block point 3.
+   But agent_back's territory is `docs/components/c7.md`; per Hard
+   Rule #7, do NOT edit it directly. If I have caveats worth surfacing,
+   add to "Open questions for Han" instead.
+3. `bash scripts/wrap_up_session.sh` for HF backup before pod stop.
+4. Stand by for further directives. Do not unilaterally pick a new
+   mission.
 
 ## Don't repeat (agent owns — overwrite)
 
@@ -591,7 +604,8 @@ Newest first.
    InfoNCE (B*N)² is an unprecedented combo. agent_paper's analysis says
    80 GB H100 fits with margin; if it OOMs, mitigation is batch_size=512.
 
-3. **MW vs non-MW comparison once both land**: agent_back's canonical
-   non-MW cells (per their leaderboard rows): txc_base seed=42 ≈ 0.42,
-   txc_pro seed=42 = 0.377. My MW cells will give the apples-to-apples
-   per-arch parity comparison agent_back's headline needs.
+3. **MW vs non-MW comparison** — superseded by STAND DOWN. Han's
+   diagnosis (commit `dd5f773e`): MW was solving a misframed problem.
+   C6/C7 per-token baselines were already at literature scale (≈1K
+   tokens/step), so MW would over-correct. agent_back's canonical C7
+   sweep is already apples-to-apples; no MW comparison needed.
