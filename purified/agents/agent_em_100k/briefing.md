@@ -7,8 +7,9 @@ Section ownership: PROTOCOL.md § 14.
 
 ---
 agent: agent_em_100k
-last_state_update: 2026-05-05T14:55:00Z
+last_state_update: 2026-05-05T15:48:00Z
 component: c3 (T-SAE baseline re-train at T=2, decisions § 15)
+status: complete (sweep landed 15:44Z)
 ---
 
 ## Identity + mandate (Han owns — agents do not edit)
@@ -595,13 +596,10 @@ integrates via `canonical_train_keys()` toggle at paper-render time.
 
 ## Current state (agent owns — overwrite at every compact)
 
-**Last verified: 2026-05-05T14:55Z. NEW MISSION: C3 T-SAE baseline
-re-train at T=2 (Bhalla/Ye 2025 paper-faithful adjacent pairs,
-decisions § 15). Smoke v1 PASSED end-to-end (1m46s wall, 200 steps
-@ 19 steps/sec, mean_auc=0.681). Real sweep IN FLIGHT (PID 19499)
-— `tsae_paper × seeds {42, 1, 2} × k_feats {5, 20}` at
-`n_steps=20_000, train_window_size=2`. Training rate 19 steps/sec
-→ ~18 min per training cell → ~1.1 hr full sweep.**
+**Last verified: 2026-05-05T15:48Z. C3 T-SAE BASELINE @ T=2 SWEEP
+COMPLETE (decisions § 15). All 6 cells landed in `leaderboard.jsonl`
+between 15:10 and 15:44. Total wall ~50 min (vs briefing's 4.5 hr
+ETA). Process exited cleanly. GPU at 0 MiB / 0% util.**
 
 - `git HEAD`: `2aa9f2b0` (`final`).
 - Pod: 1× H100 80GB, ephemeral, 2 TB RAM. Active GPU: ~3 GB used
@@ -612,20 +610,44 @@ decisions § 15). Smoke v1 PASSED end-to-end (1m46s wall, 200 steps
   - agent_nlp: `topk_sae` × seeds × k_feats at `train_window_size=1`.
   - TXC archs unchanged (existing canonical sweep stands).
 
-### In flight (PID 19499, started 14:55:02Z)
+### Cells landed in leaderboard (`agent: agent_em_100k`)
 
-`.venv/bin/python -m experiments.c3_probing_tsae_baseline.run
---seeds 42 1 2 --k-feats 5 20` → `logs/c3_tsae_baseline_full_v2.log`.
-Persistent monitor `b0feanszg` watches for train + eval milestones.
+| seed | k_feat | train_key       | eval_key        | mean_auc | mean_acc |
+|---:|---:|---|---|---:|---:|
+| 42 |  5 | `06053869c2b7e72b` | `400ccad753b350e1` | 0.828 | (n_tasks=38) |
+| 42 | 20 | `06053869c2b7e72b` | `d8e353c71c85138a` | 0.895 |  |
+|  1 |  5 | `e8f3355683e0a25f` | `ccb9bc5c00e6b85d` | 0.858 |  |
+|  1 | 20 | `e8f3355683e0a25f` | `d02be4d5c3a2895b` | 0.898 |  |
+|  2 |  5 | `8f717f87f3f9464a` | `23c3a24f8390a103` | 0.836 |  |
+|  2 | 20 | `8f717f87f3f9464a` | `36655f1078f86aa2` | 0.902 |  |
 
-### Predicted train_keys (for verification)
+Mean across seeds: **mean_auc @ k=5 = 0.841**, **mean_auc @ k=20 = 0.898**.
+All cells `arch=tsae_paper`, `eval_protocol_version=1.1.0`,
+`training_cfg.train_window_size=2`, `n_steps=20_000`.
 
-- `tsae_paper` seed=42 T=2 20K: `06053869c2b7e72b`
-- `tsae_paper` seed=1  T=2 20K: `e8f3355683e0a25f`
-- `tsae_paper` seed=2  T=2 20K: `8f717f87f3f9464a`
-- All distinct from agent_nlp's canonical T=None tsae_paper cells
-  (the T=None default is excluded from `model_dump(exclude_none=True)`,
-  so old keys preserved; new T=2 cells get fresh keys).
+Per-cell wall:
+- seed=42 k=5: 14:55:02 → 15:10:44 (15.7 min, full train+eval)
+- seed=42 k=20: 15:10:44 → 15:11:56 (1.2 min, eval cache-hit)
+- seed=1 k=5: 15:11:56 → 15:27:17 (15.3 min)
+- seed=1 k=20: 15:27:17 → 15:28:28 (1.2 min)
+- seed=2 k=5: 15:28:28 → 15:43:50 (15.4 min)
+- seed=2 k=20: 15:43:50 → 15:44:55 (1.1 min)
+- Total: 49 min 53 sec (3 fresh trainings × ~15 min + 3 cache-hit evals × ~1.2 min).
+
+Training rate 23-25 steps/sec on H100 — much faster than the failed
+MW pivot (1.35 steps/sec at T=5).
+
+### Predicted train_keys all confirmed
+
+`compute_train_key` with `TrainingConfig(n_steps=20_000,
+train_window_size=2)` gave the exact keys that landed:
+- `tsae_paper` seed=42 → `06053869c2b7e72b` ✓
+- `tsae_paper` seed=1  → `e8f3355683e0a25f` ✓
+- `tsae_paper` seed=2  → `8f717f87f3f9464a` ✓
+
+All distinct from agent_nlp's canonical T=None tsae_paper cells
+(the T=None default is excluded from `model_dump(exclude_none=True)`,
+so old keys preserved; new T=2 cells get fresh keys).
 
 ### Smoke artifacts
 
@@ -667,54 +689,40 @@ In code:
 
 ## What I just did (agent owns — overwrite)
 
-1. (Old MW pivot work from 12:00-12:50Z — abandoned. Smoke landed
-   row `eval_key=ad5811d28ec2aa73`; sweep killed at ~step 10000.
-   See "Surviving artifacts" above.)
-2. 2026-05-05T~14:50Z: pulled briefing rewrite for the new mission.
-   Verified framework change landed:
-   - `TrainingConfig.train_window_size: int | None = None` field;
-     when `None`, excluded from `model_dump(exclude_none=True)` so
-     old train_keys preserved.
-   - `preloaded_batch_iter_from_act_cache(..., train_window_size=...)`
-     kwarg.
-   - agent_nlp's `my_train_fn` passes through.
-3. Verified caches still on disk (act_cache `e4916bcae1881963` +
-   probe_cache 38 task dirs). No re-pull needed.
-4. Wrote `experiments/c3_probing_tsae_baseline/{run.py, __init__.py}`.
-   Imports `tsae_paper` arch + agent_nlp's plumbing; sets
-   `TrainingConfig(n_steps=20_000, train_window_size=2)` (Bhalla/Ye
-   2025 §3.1 adjacent pairs).
-5. **Smoke v1 PASSED** end-to-end in 1m46s (200 steps @ 19 steps/sec,
-   mean_auc=0.681). NO crashes — fresh framework, fresh imports clean.
-6. **Bug caught + fixed**: my driver's first attempt at the real
-   cells launched at `n_steps=25000` (schema default) instead of
-   the canonical 20000. Killed (PID 19169), edited
-   `TSAE_TRAINING_CFG = TrainingConfig(n_steps=20_000, ...)`,
-   relaunched. (Reduced ETA from ~1.4 hr to ~1.1 hr.)
-7. Real sweep launched (PID 19499) at 14:55:02Z. Persistent monitor
-   `b0feanszg` armed.
+1. (Old MW pivot work 12:00-12:50Z — abandoned. Survives as smoke
+   row `eval_key=ad5811d28ec2aa73`. See "Surviving artifacts" above.)
+2. 2026-05-05T~14:50Z: pulled briefing rewrite for the new C3 T-SAE
+   T=2 mission (decisions § 15).
+3. Verified framework change landed (commits `5555e7eb` etc.):
+   `TrainingConfig.train_window_size` field + `preloaded_batch_iter`
+   kwarg + 136/136 tests green.
+4. Verified caches still on disk (act_cache `e4916bcae1881963` +
+   probe_cache 38 task dirs).
+5. Wrote `experiments/c3_probing_tsae_baseline/{run.py, __init__.py}`.
+6. Smoke v1 PASSED in 1m46s — mean_auc=0.681 at 200 steps.
+7. Caught bug: my first real-launch used schema default n_steps=25K
+   instead of canonical 20K. Killed (PID 19169), fixed driver's
+   `TSAE_TRAINING_CFG = TrainingConfig(n_steps=20_000, train_window_size=2)`,
+   relaunched. Surfaced as OQ #6.
+8. Real sweep launched (PID 19499) at 14:55:02Z, completed cleanly
+   at 15:44:55Z (49 min 53 sec). All 6 cells landed in leaderboard
+   with the predicted train_keys.
+9. Pushed `7ebb99cd` (T-SAE driver + smoke + briefing).
 
 ## Next action (agent owns — overwrite)
 
-1. **Wait for full T-SAE C3 baseline sweep to land** — persistent
-   monitor `b0feanszg` watches `logs/c3_tsae_baseline_full_v2.log`
-   for `step (5000|10000|15000|19000|20000)/`, `done in`,
-   `CELL DONE`, `all cells complete`, errors. Expected event count:
-   ~24 events over 6 cells (3 trainings × 5 step markers + 6 cell-
-   transition markers).
-2. **Verify each cell's row lands** via:
-   ```bash
-   grep "tsae_paper" results/leaderboard.jsonl | grep "agent_em_100k" | tail -6 | jq
-   ```
-   Expected: 6 rows total (3 seeds × 2 k_feats); fields `component=c3`,
-   `arch=tsae_paper`, `seed ∈ {42,1,2}`, `eval_protocol_version=1.1.0`,
-   `eval_cfg.k_feat ∈ {5,20}`, `mean_auc > 0.6` typical.
-3. **ETA cell 1 done ~15:13Z; full sweep done ~16:05Z.**
-4. **When done** (or before pod restart / `status: complete`):
-   `bash scripts/wrap_up_session.sh`.
-5. **Do NOT touch agent_nlp's territory** — agent_nlp is running
-   `topk_sae` at T=1 in parallel; their cells will land independently.
-6. **Do NOT render anything to docs/components/c3.md** — agent_nlp's.
+**Status: COMPLETE.** All sweep cells landed; pod is idle.
+
+1. Run `bash scripts/wrap_up_session.sh` to commit any artifact files
+   (metrics.json, etc.) + push final state.
+2. Standing by for any further directive. agent_paper integrates the
+   3 new C3 T-SAE T=2 cells via `canonical_train_keys()` at
+   paper-render time.
+3. Pod can be safely stopped after wrap-up. Checkpoints already
+   auto-pushed to HF (ephemeral mode).
+4. **Do NOT touch agent_nlp's territory** — they are running
+   `topk_sae` at T=1 in parallel; their cells land independently.
+5. **Do NOT render anything to docs/components/c3.md** — agent_nlp's.
 
 ## Don't repeat (agent owns — overwrite)
 
