@@ -109,6 +109,13 @@ def _per_strength_means(eval_keys: list[str]) -> dict[float, dict[str, float]] |
     per strength. Returns ``{strength: {"mean_coh", "mean_succ", "n"}}``
     or ``None`` if no run_dir is available.
 
+    Falls back to ``judge_outputs.jsonl`` (per-call rows with
+    ``head`` ∈ {success, coherence}, ``label`` ∈ 0-3) when
+    ``grades.jsonl`` is absent — agent_filler's driver only persisted
+    judge_outputs.jsonl + metrics.json (no grades.jsonl), so my Pareto
+    helper has to reconstruct the per-(strength, idx) (success, coherence)
+    pairs from the per-call judge output.
+
     This drives the wasteland-style Pareto plot — a parametric curve
     over strength where each point is ``(mean_coh(s), mean_succ(s))``
     averaged over all seeds × concepts at that strength. Strength
@@ -118,21 +125,45 @@ def _per_strength_means(eval_keys: list[str]) -> dict[float, dict[str, float]] |
     by_s_succ: dict[float, list[float]] = defaultdict(list)
     by_s_coh: dict[float, list[float]] = defaultdict(list)
     for ek in eval_keys:
-        path = run_dir(ek) / "grades.jsonl"
-        if not path.exists():
-            continue
-        for line in path.open():
-            line = line.strip()
-            if not line:
-                continue
-            r = json.loads(line)
-            s_g = r.get("success_grade")
-            c_g = r.get("coherence_grade")
-            if s_g is None or c_g is None:
-                continue
-            s = float(r["strength"])
-            by_s_succ[s].append(float(s_g))
-            by_s_coh[s].append(float(c_g))
+        rd = run_dir(ek)
+        grades_path = rd / "grades.jsonl"
+        judge_path = rd / "judge_outputs.jsonl"
+        if grades_path.exists():
+            for line in grades_path.open():
+                line = line.strip()
+                if not line:
+                    continue
+                r = json.loads(line)
+                s_g = r.get("success_grade")
+                c_g = r.get("coherence_grade")
+                if s_g is None or c_g is None:
+                    continue
+                s = float(r["strength"])
+                by_s_succ[s].append(float(s_g))
+                by_s_coh[s].append(float(c_g))
+        elif judge_path.exists():
+            # Reconstruct from per-call judge outputs. Each (idx, head)
+            # is a separate row; pair them into (success_grade,
+            # coherence_grade) by idx within the same strength.
+            by_idx: dict[int, dict[str, Any]] = defaultdict(dict)
+            for line in judge_path.open():
+                line = line.strip()
+                if not line:
+                    continue
+                r = json.loads(line)
+                if r.get("label") is None:
+                    continue
+                head = r.get("head")
+                if head not in ("success", "coherence"):
+                    continue
+                idx = int(r["idx"])
+                by_idx[idx][head] = float(r["label"])
+                by_idx[idx]["strength"] = float(r["strength"])
+            for rec in by_idx.values():
+                if "success" in rec and "coherence" in rec:
+                    s = rec["strength"]
+                    by_s_succ[s].append(rec["success"])
+                    by_s_coh[s].append(rec["coherence"])
     if not by_s_succ:
         return None
     return {
