@@ -1,0 +1,74 @@
+{
+  "cell": {
+    "arch": "txc_base",
+    "organism": "14B-finance",
+    "seed": 1,
+    "train_key": "672dbf61896f7843",
+    "datasource": "qwen_2_5_14b_instruct_finance_l24_resid_post"
+  },
+  "finalist": {
+    "feature_id": 4636,
+    "auc": 0.5,
+    "auc_two_sided": 0.5,
+    "rank_one_sided": 396,
+    "rank_two_sided": 530
+  },
+  "top10_features": [
+    {
+      "feature_id": 32615,
+      "auc": 1.0,
+      "auc_two_sided": 1.0
+    },
+    {
+      "feature_id": 4397,
+      "auc": 1.0,
+      "auc_two_sided": 1.0
+    },
+    {
+      "feature_id": 3326,
+      "auc": 1.0,
+      "auc_two_sided": 1.0
+    },
+    {
+      "feature_id": 3453,
+      "auc": 1.0,
+      "auc_two_sided": 1.0
+    },
+    {
+      "feature_id": 2730,
+      "auc": 0.0,
+      "auc_two_sided": 1.0
+    },
+    {
+      "feature_id": 2962,
+      "auc": 1.0,
+      "auc_two_sided": 1.0
+    },
+    {
+      "feature_id": 3115,
+      "auc": 1.0,
+      "auc_two_sided": 1.0
+    },
+    {
+      "feature_id": 3156,
+      "auc": 1.0,
+      "auc_two_sided": 1.0
+    },
+    {
+      "feature_id": 2537,
+      "auc": 1.0,
+      "auc_two_sided": 1.0
+    },
+    {
+      "feature_id": 11339,
+      "auc": 1.0,
+      "auc_two_sided": 1.0
+    }
+  ],
+  "multi_feature": {
+    "logreg_acc_5fold": 1.0,
+    "logreg_auc_5fold": 1.0
+  },
+  "n_features": 32768,
+  "n_per_class": 500
+}

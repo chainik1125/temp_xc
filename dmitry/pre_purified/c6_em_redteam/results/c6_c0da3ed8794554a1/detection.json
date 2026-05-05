@@ -1,0 +1,74 @@
+{
+  "cell": {
+    "arch": "sae_arditi",
+    "organism": "7B-medical",
+    "seed": 42,
+    "train_key": "c0da3ed8794554a1",
+    "datasource": "qwen_2_5_7b_instruct_medical_l15_resid_post"
+  },
+  "finalist": {
+    "feature_id": 21341,
+    "auc": 0.8460999727249146,
+    "auc_two_sided": 0.8460999727249146,
+    "rank_one_sided": 702,
+    "rank_two_sided": 1064
+  },
+  "top10_features": [
+    {
+      "feature_id": 22022,
+      "auc": 1.0,
+      "auc_two_sided": 1.0
+    },
+    {
+      "feature_id": 22363,
+      "auc": 1.0,
+      "auc_two_sided": 1.0
+    },
+    {
+      "feature_id": 22318,
+      "auc": 0.0,
+      "auc_two_sided": 1.0
+    },
+    {
+      "feature_id": 12692,
+      "auc": 0.0,
+      "auc_two_sided": 1.0
+    },
+    {
+      "feature_id": 12011,
+      "auc": 0.0,
+      "auc_two_sided": 1.0
+    },
+    {
+      "feature_id": 12189,
+      "auc": 1.0,
+      "auc_two_sided": 1.0
+    },
+    {
+      "feature_id": 12151,
+      "auc": 0.0,
+      "auc_two_sided": 1.0
+    },
+    {
+      "feature_id": 12105,
+      "auc": 1.0,
+      "auc_two_sided": 1.0
+    },
+    {
+      "feature_id": 22103,
+      "auc": 0.0,
+      "auc_two_sided": 1.0
+    },
+    {
+      "feature_id": 12609,
+      "auc": 1.0,
+      "auc_two_sided": 1.0
+    }
+  ],
+  "multi_feature": {
+    "logreg_acc_5fold": 1.0,
+    "logreg_auc_5fold": 1.0
+  },
+  "n_features": 32768,
+  "n_per_class": 500
+}

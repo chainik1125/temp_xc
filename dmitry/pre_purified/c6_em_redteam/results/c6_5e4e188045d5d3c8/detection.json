@@ -1,0 +1,74 @@
+{
+  "cell": {
+    "arch": "sae_arditi",
+    "organism": "14B-finance",
+    "seed": 1,
+    "train_key": "5e4e188045d5d3c8",
+    "datasource": "qwen_2_5_14b_instruct_finance_l24_resid_post"
+  },
+  "finalist": {
+    "feature_id": 19196,
+    "auc": 0.844864010810852,
+    "auc_two_sided": 0.844864010810852,
+    "rank_one_sided": 220,
+    "rank_two_sided": 256
+  },
+  "top10_features": [
+    {
+      "feature_id": 1110,
+      "auc": 1.0,
+      "auc_two_sided": 1.0
+    },
+    {
+      "feature_id": 1266,
+      "auc": 1.0,
+      "auc_two_sided": 1.0
+    },
+    {
+      "feature_id": 1661,
+      "auc": 1.0,
+      "auc_two_sided": 1.0
+    },
+    {
+      "feature_id": 72,
+      "auc": 1.0,
+      "auc_two_sided": 1.0
+    },
+    {
+      "feature_id": 31413,
+      "auc": 1.0,
+      "auc_two_sided": 1.0
+    },
+    {
+      "feature_id": 31329,
+      "auc": 1.0,
+      "auc_two_sided": 1.0
+    },
+    {
+      "feature_id": 31217,
+      "auc": 1.0,
+      "auc_two_sided": 1.0
+    },
+    {
+      "feature_id": 31157,
+      "auc": 1.0,
+      "auc_two_sided": 1.0
+    },
+    {
+      "feature_id": 30859,
+      "auc": 1.0,
+      "auc_two_sided": 1.0
+    },
+    {
+      "feature_id": 30765,
+      "auc": 0.0,
+      "auc_two_sided": 1.0
+    }
+  ],
+  "multi_feature": {
+    "logreg_acc_5fold": 1.0,
+    "logreg_auc_5fold": 1.0
+  },
+  "n_features": 32768,
+  "n_per_class": 500
+}
