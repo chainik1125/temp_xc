@@ -128,54 +128,115 @@ def _read_wang_full(train_key: str) -> dict | None:
 
 def _save_frontier_plot(sae_wang, txc_wang, *, dst: Path,
                         organism_label: str) -> Path | None:
-    """Plot the stage-4 27-α frontier on top-3 finalists per arch."""
+    """Plot the stage-4 27-α frontier on top-3 finalists per arch.
+
+    Paper-ready (300 dpi, sized for a 2-column figure). Drops α-points
+    where the judge returned None (judge failed at extreme α with
+    incoherent output) — drawing them as 0 distorts the visualisation.
+    Drops points where mean_coh < 30 (gibberish region) so the
+    headline-relevant coherent peak is the visual focus.
+    """
     if sae_wang is None and txc_wang is None:
         return None
     try:
         import matplotlib.pyplot as plt
     except ImportError:
         return None
-    from temp_bench.plotting import save_figure
 
-    fig, axes = plt.subplots(1, 2, figsize=(11, 4.5), sharey=True)
-    pairs = [("sae_arditi", sae_wang), ("txc_base + brickenauxk_a8", txc_wang)]
+    # Bigger figure + paper-quality typography.
+    fig, axes = plt.subplots(1, 2, figsize=(13, 5.5), sharey=True)
+    pairs = [("sae_arditi", sae_wang),
+             ("txc_base + brickenauxk_a8", txc_wang)]
+
+    # Coherence floor below which the model output is largely
+    # incoherent and align scores are noise. Plot still shows points
+    # above this threshold; below, we drop. This is a visualisation
+    # hygiene step ONLY — does not affect the headline numbers (the
+    # leaderboard's peak_align is computed in case_studies.em from
+    # ALL Wang stage-4 cells without coherence filtering, matching
+    # Dmitry's run_wang_procedure.py).
+    COH_FLOOR = 30.0
+    COLORS = ["tab:blue", "tab:orange", "tab:green"]
+
     for ax, (tag, wm) in zip(axes, pairs):
         if wm is None:
             ax.set_title(f"{tag}\n(no data)")
             continue
-        # full-Wang has stage4.finalists = list[{feature_id, rows[α], peak}]
+
+        def _plot_one_finalist(fid, rows, color):
+            # Filter rows where mean_align is None or coh is too low
+            # (incoherent extreme-α generations).
+            kept = []
+            dropped = []
+            for r in rows:
+                a = r.get("mean_align")
+                c = r.get("mean_coh")
+                if a is None or c is None or c < COH_FLOOR:
+                    if a is not None and c is not None:
+                        dropped.append((r["alpha"], a, c))
+                    continue
+                kept.append((float(r["alpha"]), float(a), float(c)))
+            kept.sort(key=lambda t: t[0])
+            xs = [t[0] for t in kept]
+            ys = [t[1] for t in kept]
+            ax.plot(xs, ys, marker="o", linewidth=1.5, markersize=4.0,
+                    color=color, label=f"feat {fid}")
+
         finalists = (wm.get("stage4") or {}).get("finalists", [])
         if not finalists:
             # Back-compat: 1.0.0 abbreviated rows have a flat frontier list.
             by_feat: dict[int, list[dict]] = {}
             for r in wm.get("frontier", []):
                 by_feat.setdefault(int(r["feature_id"]), []).append(r)
-            for fid, rows in by_feat.items():
-                rows.sort(key=lambda r: float(r["alpha"]))
-                xs = [float(r["alpha"]) for r in rows]
-                ys = [float(r["mean_align"] or 0.0) for r in rows]
-                ax.plot(xs, ys, marker="o", label=f"feat {fid}")
+            for ci, (fid, rows) in enumerate(by_feat.items()):
+                _plot_one_finalist(fid, rows, COLORS[ci % len(COLORS)])
         else:
-            for f in finalists:
-                rows = sorted(f.get("rows", []), key=lambda r: float(r["alpha"]))
-                xs = [float(r["alpha"]) for r in rows]
-                ys = [float(r["mean_align"] or 0.0) for r in rows]
-                ax.plot(xs, ys, marker="o", linewidth=1.2, markersize=3.0,
-                        label=f"feat {int(f['feature_id'])}")
+            for ci, f in enumerate(finalists):
+                _plot_one_finalist(
+                    int(f["feature_id"]),
+                    f.get("rows", []),
+                    COLORS[ci % len(COLORS)],
+                )
+
         peak = wm.get("headline") or wm.get("peak")
-        if peak:
-            ax.axhline(float(peak["mean_align"]), color="gray", linestyle=":",
-                       alpha=0.5,
-                       label=f"peak={peak['mean_align']:.1f}")
-        ax.set_xlabel("steering α")
-        ax.set_title(tag)
-        ax.legend(loc="best", fontsize=8)
+        if peak and peak.get("mean_align") is not None:
+            ax.axhline(float(peak["mean_align"]), color="black",
+                       linestyle="--", linewidth=1.0, alpha=0.5,
+                       label=f"peak={peak['mean_align']:.1f} (α={peak['alpha']:+g})")
+        ax.set_xlabel("steering α (symlog)", fontsize=11)
+        ax.set_title(tag, fontsize=12)
+        ax.legend(loc="lower center", fontsize=9, framealpha=0.9, ncol=2)
         ax.grid(True, alpha=0.3)
         ax.set_xscale("symlog", linthresh=2.0)
-    axes[0].set_ylabel("mean_align (Claude Haiku judge)")
-    fig.suptitle(f"C6 — full Wang frontier (top-3 × 27 α) — {organism_label}")
+        ax.tick_params(axis="both", labelsize=10)
+
+    axes[0].set_ylabel("mean_align (Claude Haiku judge)", fontsize=11)
+    fig.suptitle(
+        f"C6 — full Wang stage-4 frontier (top-3 features × 27 α) — "
+        f"{organism_label} (coh ≥ {COH_FLOOR:.0f} only)",
+        fontsize=12,
+    )
     fig.tight_layout()
-    return save_figure(fig, dst)
+
+    # Paper-quality save: 300 dpi PNG + matching .thumb.png at 48 dpi
+    # so agents can inspect cheaply (mirrors temp_bench.plotting.save_figure
+    # contract; bypassing it because save_figure hard-codes dpi=150 and
+    # we want 300 for the c6 headline).
+    dst = Path(dst)
+    dst.parent.mkdir(parents=True, exist_ok=True)
+    fig.savefig(dst, dpi=300, bbox_inches="tight")
+    thumb = dst.with_suffix(".thumb.png")
+    fig.savefig(thumb, dpi=48, bbox_inches="tight")
+    try:
+        from PIL import Image
+        with Image.open(thumb) as im:
+            w, h = im.size
+            if w > 288:
+                im.resize((288, int(h * 288 / w))).save(thumb)
+    except ImportError:
+        pass
+    plt.close(fig)
+    return dst
 
 
 def _decision(gap: float) -> str:
