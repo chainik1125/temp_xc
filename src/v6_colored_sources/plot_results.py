@@ -105,9 +105,48 @@ def plot_phase_transition_by_delay(stage2_path: Path, out_path: Path) -> None:
     print(f"Saved {out_path}")
 
 
+def plot_ambiguous_pair_probes(results_path: Path, out_path: Path) -> None:
+    """Bar chart of pair-classification probe accuracy on the ambiguous-pair
+    HMM: regular SAE (chance), TXC at each W (perfect), raw-x sanity baseline,
+    1/R chance line."""
+    with open(results_path) as f:
+        data = json.load(f)
+
+    R = data["config"]["R"]
+    chance = 1.0 / R
+    sae_acc = data["sae_probe"]["val_accuracy"]
+    raw_acc = data["raw_token_probe"]["val_accuracy"]
+    txc_entries = sorted(data["txc"], key=lambda e: e["W"])
+
+    labels = ["raw x\n(sanity)", "SAE\nlatent"] + [f"TXC W={e['W']}\nlatent" for e in txc_entries]
+    accs = [raw_acc, sae_acc] + [e["txc_probe"]["val_accuracy"] for e in txc_entries]
+    colors = [_RANDOM_COLOR, _SAE_COLOR] + [_TXC_COLOR] * len(txc_entries)
+
+    fig, ax = plt.subplots(figsize=(7.5, 5))
+    bars = ax.bar(labels, accs, color=colors, edgecolor="black", linewidth=0.5)
+    for bar, acc in zip(bars, accs):
+        ax.text(bar.get_x() + bar.get_width() / 2, acc + 0.01,
+                f"{acc:.2f}", ha="center", fontsize=10)
+    ax.axhline(chance, color="black", linestyle=":", label=f"chance = 1/R = {chance:.2f}")
+    ax.set_ylim(0, 1.05)
+    ax.set_ylabel("Pair-classification val accuracy at middle position")
+    ax.set_title(
+        f"Ambiguous-pair HMM (R={R}, d={data['config']['d']}, σ={data['config']['sigma']}): "
+        "local probe bounded at 1/R, temporal probes hit 1.0"
+    )
+    ax.legend(loc="lower right")
+    ax.grid(True, axis="y", alpha=0.3)
+    fig.tight_layout()
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    fig.savefig(out_path, dpi=150)
+    fig.savefig(out_path.with_suffix(".pdf"))
+    plt.close(fig)
+    print(f"Saved {out_path}")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Plot colored-source results.")
-    parser.add_argument("--stage", type=int, choices=[1, 2], required=True)
+    parser.add_argument("--stage", type=str, choices=["1", "2", "ambiguous_pair"], required=True)
     parser.add_argument(
         "--results_dir", type=str, default="results/v6_colored_sources"
     )
@@ -118,13 +157,18 @@ def main() -> int:
 
     results_dir = Path(args.results_dir)
     out_dir = Path(args.out_dir)
-    if args.stage == 1:
+    if args.stage == "1":
         plot_phase_transition(
             results_dir / "stage1.json", out_dir / "phase_transition_stage1.png"
         )
-    else:
+    elif args.stage == "2":
         plot_phase_transition_by_delay(
             results_dir / "stage2.json", out_dir / "phase_transition_stage2.png"
+        )
+    else:
+        plot_ambiguous_pair_probes(
+            results_dir / "ambiguous_pair.json",
+            out_dir / "ambiguous_pair_probes.png",
         )
     return 0
 
