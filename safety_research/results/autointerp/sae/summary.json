@@ -1,10 +1,11 @@
 {
   "arm": "sae",
-  "n_features": 150,
-  "elapsed_s": 212.5057282447815,
+  "n_features": 2129,
+  "elapsed_s": 908.3024342060089,
   "safety_counts": {
-    "NONE": 148,
-    "HARMFUL_CONTENT": 2
+    "NONE": 2118,
+    "HARMFUL_CONTENT": 9,
+    "BIAS": 2
   },
-  "wandb_url": "https://wandb.ai/standartikom-northwestern-university/temporal-crosscoders-safety/runs/mh7hmqty"
+  "wandb_url": "https://wandb.ai/standartikom-northwestern-university/temporal-crosscoders-safety/runs/9bt5gjg3"
 }

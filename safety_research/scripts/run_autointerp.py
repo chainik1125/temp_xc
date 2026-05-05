@@ -1,12 +1,17 @@
 """
-Run autointerp for the three architectures.
+Run autointerp for SAE and TXC arms via Claude Haiku.
 
 For each checkpoint in safety_research/results/checkpoints/:
   1. TopKFinder → top-K activating windows per feature
   2. TextContext  → decode windows via gemma-2-2b-it tokenizer
-  3. Claude Haiku → 1-2 sentence explanations (prompt-cached)
+                    (special tokens like <bos> render literally)
+  3. Claude Haiku 4.5 (async, semaphore=8) → 1-2 sentence explanations
   4. Save:  safety_research/results/autointerp/<arm>/feature_<id>.json
             safety_research/results/autointerp/<arm>/explanations.jsonl
+
+Settings (TOP_FEATURES, TOP_K_EXAMPLES, SAMPLE_CHAINS, LAYER, k, T) match
+the original three-arm run so this is a drop-in regeneration of the SAE
+and TXC explanations. The TSAE arm is untouched.
 """
 from __future__ import annotations
 
@@ -19,13 +24,17 @@ from pathlib import Path
 
 import torch
 from tqdm import tqdm
+from dotenv import load_dotenv
 
 NLP_DIR = "/home/cs29824/andre/temp_xc/temporal_crosscoders/NLP"
 SAFETY_DIR = "/home/cs29824/andre/temp_xc/safety_research"
 sys.path.insert(0, NLP_DIR)
 os.chdir(NLP_DIR)
 
-from autointerp import TopKFinder, TextContext, LocalGemmaBackend  # type: ignore # noqa: E402
+# Load API key from safety_research/.env so ClaudeAPIBackend can authenticate.
+load_dotenv(Path(SAFETY_DIR) / ".env")
+
+from autointerp import TopKFinder, TextContext, ClaudeAPIBackend, LocalGemmaBackend  # type: ignore # noqa: E402
 from config import D_SAE, LAYER_SPECS, MODEL_NAME  # type: ignore # noqa: E402
 from fast_models import FastStackedSAE, FastTemporalCrosscoder  # type: ignore  # noqa: E402
 
@@ -37,18 +46,31 @@ OUT_ROOT.mkdir(parents=True, exist_ok=True)
 
 LAYER = "mid_res"
 TOP_K_EXAMPLES = 12         # top windows per feature
-TOP_FEATURES = 150          # interpret 150 most-active features per arm
+# Cap the number of features interpreted per arm. None = interpret every
+# feature with at least MIN_EXAMPLES top windows (the "all active" scope).
+# Override with TOP_FEATURES env var to recover the old 150-feature behaviour.
+_top_env = os.environ.get("TOP_FEATURES")
+TOP_FEATURES: int | None = int(_top_env) if _top_env else None
+MIN_EXAMPLES = 3            # feature must have at least this many top windows
 SAMPLE_CHAINS = 1500        # chains to scan
-# user requested claude-haiku, but no working API key is available — fall
-# back to local Gemma-2-2b-it via the existing LocalGemmaBackend.
-EXPLAIN_MODEL = os.environ.get("EXPLAIN_MODEL", "google/gemma-2-2b-it")
-MAX_CONCURRENT = 8
+EXPLAIN_MODEL = os.environ.get("EXPLAIN_MODEL", "claude-haiku-4-5-20251001")
+# Concurrency=1 because at TPM-bound rates the only safe pattern is one
+# in-flight call respecting the SDK's retry-after backoff. Bumping
+# concurrency dramatically increases 429 churn without buying throughput.
+MAX_CONCURRENT = int(os.environ.get("MAX_CONCURRENT", "1"))
+MAX_RETRIES = 3
 
-ARMS = [
+ALL_ARMS = [
     dict(arm="sae",  arch="stacked_sae", T=1, k=100),
-    dict(arm="tsae", arch="stacked_sae", T=5, k=100),
     dict(arm="txc",  arch="txcdr",       T=5, k=100),
 ]
+# ARMS env override: comma-separated list (e.g. "txc" to resume only TXC).
+_arm_env = os.environ.get("ARMS")
+if _arm_env:
+    keep = {a.strip() for a in _arm_env.split(",") if a.strip()}
+    ARMS = [c for c in ALL_ARMS if c["arm"] in keep]
+else:
+    ARMS = ALL_ARMS
 
 
 def load_arm_model(cfg: dict) -> torch.nn.Module:
@@ -104,40 +126,88 @@ def parse_response(raw: str) -> dict:
     return dict(explanation=expl, safety=safety, raw=raw)
 
 
-def explain_features_local(records: list[dict], backend) -> list[dict]:
-    """Sequentially call the local Gemma backend for each feature.
+def _build_user_prompt(rec: dict) -> str:
+    examples = "\n".join(
+        f"Example {i+1} (act={a:.2f}): {t[:280]}"
+        for i, (t, a) in enumerate(zip(rec["top_texts"], rec["top_acts"]))
+    )
+    return (
+        f"Feature ID: {rec['feat']}\n\nActivating examples (window between "
+        f">>> and <<<; special tokens such as <bos>, <start_of_turn>, "
+        f"<end_of_turn> appear literally and should be treated as real "
+        f"tokens the feature can fire on):\n\n{examples}\n\nProvide your "
+        "explanation and safety tag."
+    )
 
-    Single asyncio loop rather than per-call asyncio.run() to avoid loop-
-    creation overhead. Each call is still inherently sequential because the
-    underlying generate() blocks on GPU work.
+
+def explain_features(records: list[dict], backend, out_file: Path) -> list[dict]:
+    """Call the explainer backend for each feature, streaming results to
+    `out_file` so partial progress survives crashes / rate-limit storms.
+
+    Resume semantics: any feature already present in `out_file` (matched on
+    feat id) is skipped. Successful new explanations are appended atomically.
     """
+    # Load existing results into memory for resume. Drop empty/error
+    # entries so they get retried this run.
+    existing: dict[int, dict] = {}
+    if out_file.exists():
+        for line in open(out_file):
+            try:
+                d = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if "feat" not in d:
+                continue
+            if not d.get("explanation") or d["explanation"].startswith("ERROR:"):
+                continue
+            existing[d["feat"]] = d
+
+    pending = [r for r in records if r["feat"] not in existing]
+    if existing:
+        print(f"  resume: {len(existing)} features already done, "
+              f"{len(pending)} pending")
+
     async def go() -> list[dict]:
-        results: list[dict] = []
-        for rec in tqdm(records, desc="explain"):
-            examples = "\n".join(
-                f"Example {i+1} (act={a:.2f}): {t[:280]}"
-                for i, (t, a) in enumerate(zip(rec["top_texts"], rec["top_acts"]))
-            )
-            user = (
-                f"Feature ID: {rec['feat']}\n\nActivating examples (window "
-                f"between >>> and <<<):\n\n{examples}\n\nProvide your "
-                "explanation and safety tag."
-            )
+        write_lock = asyncio.Lock()
+
+        async def explain_one(rec: dict) -> dict:
+            user = _build_user_prompt(rec)
             try:
                 text = await backend.call(SYSTEM, user)
             except Exception as e:
-                results.append(dict(feat=rec["feat"],
-                                    explanation=f"ERROR: {e}",
-                                    safety="NONE", error=str(e),
-                                    top_texts=rec["top_texts"],
-                                    top_acts=rec["top_acts"]))
-                continue
+                return dict(feat=rec["feat"],
+                            explanation=f"ERROR: {e}",
+                            safety="NONE", error=str(e),
+                            top_texts=rec["top_texts"],
+                            top_acts=rec["top_acts"])
             parsed = parse_response(text)
             parsed["feat"] = rec["feat"]
             parsed["top_texts"] = rec["top_texts"]
             parsed["top_acts"] = rec["top_acts"]
-            results.append(parsed)
+
+            # Stream the result to disk immediately. Append-only mode means
+            # a crash leaves a coherent prefix; we de-dupe on next resume.
+            if parsed.get("explanation"):
+                async with write_lock:
+                    with open(out_file, "a") as f:
+                        f.write(json.dumps(parsed) + "\n")
+                    existing[rec["feat"]] = parsed
+            return parsed
+
+        tasks = [asyncio.create_task(explain_one(r)) for r in pending]
+        for fut in tqdm(asyncio.as_completed(tasks), total=len(tasks), desc="explain"):
+            await fut
+
+        # Compose the final ordered list from `existing` (now containing
+        # both pre-existing and newly-added results), preserving the input
+        # ranking. Features that fail every retry stay missing from the file
+        # so they get retried on the next run.
+        order = {rec["feat"]: i for i, rec in enumerate(records)}
+        results = [existing[fid] for fid in
+                   sorted(existing, key=lambda x: order.get(x, 1 << 30))
+                   if fid in order]
         return results
+
     return asyncio.run(go())
 
 
@@ -169,11 +239,12 @@ def run_arm(cfg: dict, backend) -> dict:
     finder.run()
 
     feature_mass = {fid: sum(e.activation for e in ex)
-                    for fid, ex in finder.results.items() if len(ex) >= 3}
-    top_feat_ids = sorted(feature_mass, key=feature_mass.get,
-                          reverse=True)[:TOP_FEATURES]
+                    for fid, ex in finder.results.items()
+                    if len(ex) >= MIN_EXAMPLES}
+    ranked = sorted(feature_mass, key=feature_mass.get, reverse=True)
+    top_feat_ids = ranked if TOP_FEATURES is None else ranked[:TOP_FEATURES]
     print(f"  selected {len(top_feat_ids)} features (of "
-          f"{len(feature_mass)} active >=3 examples)")
+          f"{len(feature_mass)} active >={MIN_EXAMPLES} examples)")
     wandb.log({"active_features": len(feature_mass),
                "selected_features": len(top_feat_ids)})
 
@@ -191,17 +262,26 @@ def run_arm(cfg: dict, backend) -> dict:
     model.to("cpu")
     torch.cuda.empty_cache()
 
-    print(f"  calling local Gemma on {len(records)} features...")
+    out_file = out_dir / "explanations.jsonl"
+    print(f"  calling {EXPLAIN_MODEL} on {len(records)} features "
+          f"(streaming to {out_file.name}, concurrency={MAX_CONCURRENT})...")
+    n_calls_before = backend.n_calls
+    n_errors_before = backend.n_errors
     t0 = time.time()
-    explained = explain_features_local(records, backend)
+    explained = explain_features(records, backend, out_file)
     elapsed = time.time() - t0
-    print(f"  done in {elapsed:.0f}s")
+    new_calls = backend.n_calls - n_calls_before
+    new_errs = backend.n_errors - n_errors_before
+    print(f"  done in {elapsed:.0f}s ({new_calls} calls, {new_errs} errors)")
 
     safety_counts: dict[str, int] = {}
     for ex in explained:
         safety_counts[ex.get("safety", "NONE")] = safety_counts.get(ex.get("safety", "NONE"), 0) + 1
 
-    out_file = out_dir / "explanations.jsonl"
+    # Rewrite explanations.jsonl in canonical (mass-ranked) order. The file
+    # is already populated by the streaming writer above; this just sorts
+    # and de-duplicates it so downstream consumers (umap_meta) see clean
+    # input.
     with open(out_file, "w") as f:
         for ex in explained:
             f.write(json.dumps(ex) + "\n")
@@ -216,22 +296,57 @@ def run_arm(cfg: dict, backend) -> dict:
     return summary
 
 
+def make_backend():
+    """Pick backend based on EXPLAIN_MODEL.
+
+    A '/' in the name means a HuggingFace local model; otherwise treat it
+    as a Claude API model id. The Claude path requires ANTHROPIC_API_KEY
+    in the environment (loaded above from safety_research/.env).
+    """
+    if "/" in EXPLAIN_MODEL:
+        return LocalGemmaBackend(model_name=EXPLAIN_MODEL, device="cuda")
+    if not os.environ.get("ANTHROPIC_API_KEY"):
+        raise RuntimeError(
+            "ANTHROPIC_API_KEY not set. Either source safety_research/.env "
+            "or override EXPLAIN_MODEL with a local HF model id."
+        )
+    return ClaudeAPIBackend(model=EXPLAIN_MODEL,
+                            max_concurrent=MAX_CONCURRENT,
+                            max_retries=MAX_RETRIES)
+
+
 def main() -> None:
-    backend = LocalGemmaBackend(model_name=EXPLAIN_MODEL, device="cuda")
-    summaries = []
+    backend = make_backend()
+    summary_path = OUT_ROOT / "summary.json"
+
+    # Preserve entries for arms not in this run (e.g. tsae) by merging into
+    # the existing summary.json rather than overwriting it.
+    existing: list[dict] = []
+    if summary_path.exists():
+        try:
+            existing = json.loads(summary_path.read_text())
+        except json.JSONDecodeError:
+            existing = []
+    by_arm: dict[str, dict] = {s["arm"]: s for s in existing}
+
+    rerun_summaries: list[dict] = []
     for cfg in ARMS:
         ckpt = CKPT_DIR / f"{cfg['arm']}__{LAYER}__k{cfg['k']}__T{cfg['T']}.pt"
         if not ckpt.exists():
             print(f"  SKIP {cfg['arm']}: missing {ckpt}")
             continue
-        summaries.append(run_arm(cfg, backend))
-    summary_path = OUT_ROOT / "summary.json"
+        s = run_arm(cfg, backend)
+        rerun_summaries.append(s)
+        by_arm[s["arm"]] = s
+
+    merged = list(by_arm.values())
     with open(summary_path, "w") as f:
-        json.dump(summaries, f, indent=2)
+        json.dump(merged, f, indent=2)
     print(f"\nSUMMARY → {summary_path}")
-    for s in summaries:
-        print(f"  {s['arm']:6s}  n={s['n_features']:3d}  "
-              f"safety={s['safety_counts']}  {s['elapsed_s']:.0f}s")
+    for s in merged:
+        rerun_marker = " (rerun)" if s in rerun_summaries else ""
+        print(f"  {s['arm']:6s}  n={s.get('n_features', '?'):3}  "
+              f"safety={s.get('safety_counts', '?')}{rerun_marker}")
 
 
 if __name__ == "__main__":

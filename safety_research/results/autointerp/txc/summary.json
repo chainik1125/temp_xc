@@ -1,11 +1,13 @@
 {
   "arm": "txc",
-  "n_features": 150,
-  "elapsed_s": 292.53137254714966,
+  "n_features": 5033,
+  "elapsed_s": 6365.411382198334,
   "safety_counts": {
-    "NONE": 139,
-    "REFUSAL": 7,
-    "DECEPTION": 4
+    "NONE": 4991,
+    "BIAS": 7,
+    "HARMFUL_CONTENT": 27,
+    "REFUSAL": 2,
+    "DECEPTION": 6
   },
-  "wandb_url": "https://wandb.ai/standartikom-northwestern-university/temporal-crosscoders-safety/runs/uwsfrful"
+  "wandb_url": "https://wandb.ai/standartikom-northwestern-university/temporal-crosscoders-safety/runs/4igq93n3"
 }

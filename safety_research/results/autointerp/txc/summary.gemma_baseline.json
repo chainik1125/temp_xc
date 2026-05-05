@@ -1,0 +1,11 @@
+{
+  "arm": "txc",
+  "n_features": 150,
+  "elapsed_s": 292.53137254714966,
+  "safety_counts": {
+    "NONE": 139,
+    "REFUSAL": 7,
+    "DECEPTION": 4
+  },
+  "wandb_url": "https://wandb.ai/standartikom-northwestern-university/temporal-crosscoders-safety/runs/uwsfrful"
+}

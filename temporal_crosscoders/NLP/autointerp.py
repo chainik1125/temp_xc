@@ -241,16 +241,20 @@ class TextContext:
         win_tokens = self.token_ids[chain_idx, window_start:window_start + T]
         post_tokens = self.token_ids[chain_idx, window_start + T:post_end]
 
-        pre = self.tokenizer.decode(pre_tokens, skip_special_tokens=True)
-        win = self.tokenizer.decode(win_tokens, skip_special_tokens=True)
-        post = self.tokenizer.decode(post_tokens, skip_special_tokens=True)
+        # Render special tokens (e.g. <bos>, <start_of_turn>) literally so
+        # features that fire on them aren't shown as an empty highlight to
+        # the explainer. The window between >>> and <<< must always be
+        # populated for the explainer to see what activated the feature.
+        pre = self.tokenizer.decode(pre_tokens, skip_special_tokens=False)
+        win = self.tokenizer.decode(win_tokens, skip_special_tokens=False)
+        post = self.tokenizer.decode(post_tokens, skip_special_tokens=False)
 
         return f"{pre}>>>{win}<<<{post}"
 
     def get_full_text(self, chain_idx: int) -> str:
         """Get the full sequence text for a chain."""
         tokens = self.token_ids[chain_idx]
-        return self.tokenizer.decode(tokens, skip_special_tokens=True)
+        return self.tokenizer.decode(tokens, skip_special_tokens=False)
 
     def get_random_texts(self, n: int, exclude_chains: set[int]) -> list[str]:
         """Get n random full-sequence texts, excluding specified chains."""
@@ -393,11 +397,16 @@ class ClaudeAPIBackend:
         self,
         model: str = AUTOINTERP_MODEL,
         max_tokens: int = 512,
-        max_concurrent: int = 5,
+        max_concurrent: int = 1,
         max_retries: int = 3,
+        sdk_max_retries: int = 10,
     ):
         import anthropic
-        self._client = anthropic.AsyncAnthropic()
+        # The SDK's built-in retry honours `retry-after` headers from 429
+        # responses, which is the only way to play nicely with the org's
+        # tokens-per-minute bucket. We let the SDK handle rate-limit retries
+        # and reserve our outer loop for catastrophic transport failures.
+        self._client = anthropic.AsyncAnthropic(max_retries=sdk_max_retries)
         self.model = model
         self.max_tokens = max_tokens
         self._sem = asyncio.Semaphore(max_concurrent)
@@ -406,7 +415,7 @@ class ClaudeAPIBackend:
         self.n_errors = 0
 
     async def call(self, system: str, user: str) -> str:
-        delay = 1.0
+        delay = 5.0
         for attempt in range(self.max_retries):
             try:
                 async with self._sem:
@@ -421,10 +430,10 @@ class ClaudeAPIBackend:
             except Exception as e:
                 self.n_errors += 1
                 if attempt == self.max_retries - 1:
-                    log.error(f"  API failed after {self.max_retries} attempts: {e}")
+                    log.error(f"  API failed after {self.max_retries} outer attempts (SDK already retried internally): {e}")
                     return ""
-                log.warning(f"  API error (attempt {attempt + 1}): {e} - retry in {delay:.1f}s")
-                await asyncio.sleep(delay + random.uniform(0, 0.5))
+                log.warning(f"  outer retry {attempt + 1}/{self.max_retries} after {delay:.1f}s — {e}")
+                await asyncio.sleep(delay + random.uniform(0, 1.0))
                 delay = min(delay * 2, 60.0)
         return ""
 
