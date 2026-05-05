@@ -45,15 +45,17 @@ PLOT_DIR = EXP_DIR / "plots"
 # T=1, T-SAE at T=2. canonical_train_keys is called once per family;
 # the union is the headline filter.
 DATASOURCE_NAME = "gemma_2_2b_it_l13_fineweb_24k128"   # SHARED with C3
-HEADLINE_ARCHS = ("tsae_paper", "txc_base", "txc_pro")  # C4 archs
+HEADLINE_ARCHS = ("tsae_paper", "txc_base", "txc_pro", "topk_sae")  # C4 archs
 HEADLINE_SEEDS = (1, 2, 42)
 # C3 architectures by training-cfg family (for the C3 join in
 # _build_c3_mean_auc_lookup):
 C3_TXC_ARCHS = ("txc_base", "txc_pro")
 C3_TOPK_ARCHS = ("topk_sae",)
 C3_TSAE_ARCHS = ("tsae_paper",)
-# C4 architectures by training-cfg family (no topk_sae for C4):
+# C4 architectures by training-cfg family (Han 2026-05-05: include
+# topk_sae T=1 in C4 since we have 3-seed C3 results for it).
 C4_TXC_ARCHS = ("txc_base", "txc_pro")
+C4_TOPK_ARCHS = ("topk_sae",)
 C4_TSAE_ARCHS = ("tsae_paper",)
 
 
@@ -113,7 +115,8 @@ def _build_c3_mean_auc_lookup() -> dict[tuple[str, int, int], float]:
 def run_analysis() -> AnalysisResult:
     rows = query_leaderboard(component=COMPONENT)
     from temp_bench.schemas import TrainingConfig
-    # 2 cfg families for C4: TXC (None) + T-SAE (T=2). No topk_sae in C4.
+    # 3 cfg families for C4: TXC (None) + T-SAE (T=2) + TopK (T=1).
+    # Han 2026-05-05: include topk_sae T=1 since we have 3-seed C3 results.
     txc_keys = canonical_train_keys(
         component=COMPONENT,
         archs=C4_TXC_ARCHS,
@@ -128,7 +131,14 @@ def run_analysis() -> AnalysisResult:
         datasource_names=(DATASOURCE_NAME,),
         training_cfg=TrainingConfig(n_steps=20_000, train_window_size=2),
     )
-    valid_keys = txc_keys | tsae_keys
+    topk_keys = canonical_train_keys(
+        component=COMPONENT,
+        archs=C4_TOPK_ARCHS,
+        seeds=HEADLINE_SEEDS,
+        datasource_names=(DATASOURCE_NAME,),
+        training_cfg=TrainingConfig(n_steps=20_000, train_window_size=1),
+    )
+    valid_keys = txc_keys | tsae_keys | topk_keys
     real_rows = [
         r for r in rows
         if not r.eval_cfg.get("smoke", False)
