@@ -404,6 +404,7 @@ def plot_probe_curves(rows: list[dict], out_dir: Path) -> dict[str, Path]:
             plt.plot(xs, ys, color=color, linestyle="-", linewidth=1.4, label=lab)
         plt.xlabel("Training step")
         plt.ylabel(ylabel)
+        plt.xscale("log")
         plt.yscale("log")
         plt.title(f"{ylabel} vs training step (held-out probe every 100 steps)")
         plt.legend(fontsize=8, loc="best", ncol=2)
