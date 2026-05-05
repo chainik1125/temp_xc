@@ -489,6 +489,75 @@ constructs `TrainingConfig(n_steps=100_000)` and calls the canonical
 land in `leaderboard.jsonl` automatically; agent_paper handles the
 canonical-toggle in analysis.py at paper-render time.
 
+### 14. TXC training-FLOPs parity — multi-window sampling toggle
+
+**Context** (Han caught 2026-05-05): per-step FLOPs differ ~25× between
+per-token archs and TXC at the canonical `(batch=1024, n_steps=20K)`
+because of how each arch consumes the input batch.
+
+- **Per-token archs** (TopK SAE, T-SAE, MLC, TFA, SAE-arditi, Stacked):
+  flatten the `(B, seq_len, d_in)` batch to `(B*seq_len, d_in)` and run
+  the autoencoder per token-vector → 131,072 tokens trained on per step
+  at B=1024, seq_len=128.
+- **TXC archs** (txc_base, txc_pro): `train_step` samples ONE random
+  T-window per batch row, giving `(B, T, d_in)` effective rows → 5,120
+  token-windows per step at B=1024, T=5.
+
+Net: at the same `(B, n_steps)` the per-token archs see **~25× more
+training FLOPs and ~25× more token-vectors** than TXC. This biases
+every cross-arch comparison **against** TXC. The headline C6 win
+(TXC + Bricken vs SAE-arditi at 14B-finance, +3.24 align) actually
+landed *despite* TXC being compute-disadvantaged by 25× — a stronger
+result than the leaderboard surface suggests.
+
+**Fix** (landed 2026-05-05): add a `multi_window: bool = False` kwarg
+to both `TXCBase.__init__` and `TXCPro.__init__`. When False (default),
+`train_step` keeps the original 1-random-window-per-row sampling —
+**zero behavior change for in-flight cells**. When True, `train_step`
+tiles each input sequence at stride T (TXC-base) or stride
+`T_max + max_shift` (TXC-pro) into N non-overlapping window groups,
+giving `B*N` effective rows per step. Token throughput then matches
+per-token SAEs.
+
+**Cache hygiene**: the kwarg flows through `arch.hparams` (when set
+explicitly via `configs/locked_archs.yaml`) into `compute_train_key`'s
+hash — verified by `tests/test_txc_multi_window.py` (6 tests, including
+direct `compute_train_key` invalidation checks). Toggling False→True at
+the YAML level cleanly invalidates all old TXC `train_keys`; new cells
+write at fresh keys, old cells stay in the leaderboard for diff. Per-token
+archs are unaffected because their hparams don't change. **Only TXC cells
+need re-training when we flip the switch.**
+
+**YAML convention** (important — avoid a footgun):
+
+- Do NOT add `multi_window: false` to YAML hparams. The default kwarg
+  is False; the absence of the key produces the same behavior, and the
+  hash includes only present hparams (so no key = same hash as before).
+- When ready to flip, ADD `multi_window: true` to the `hparams` block
+  for `txc_base` and `txc_pro` in `configs/locked_archs.yaml`. This
+  changes the hash → invalidates old cells.
+
+**Status (2026-05-05)**: code + tests landed. YAML NOT YET FLIPPED —
+default off, in-flight runs untouched. The flip is a coordinated
+worker-team event:
+1. agent_paper edits `configs/locked_archs.yaml` to set
+   `multi_window: true` for both TXC archs.
+2. Workers pull → their `canonical_train_keys()` filter now points at
+   new train_keys → AUTO-RESULTS auto-filters out the old TXC cells.
+3. Workers re-run TXC cells only (per-token archs are unaffected; their
+   train_keys are stable).
+4. agent_paper updates this § with the flip date + cell-count summary.
+
+**Estimated re-train cost when we flip**: ~24 TXC cells across C3, C5,
+C6, C7. Per-cell wall-time should be **roughly the same as before**
+because the data path stays the same (preloaded `.clone()` cache);
+the bigger encode shape (`(B*N, T, d) @ (T, d, s)`) better utilizes
+the H100/A40 GPU but the absolute time per step is dominated by data
++ matryoshka/contrastive losses, not the encode FLOPs themselves. So
+the multi-window flip recovers the FLOPs-parity we should have had,
+without proportionally increasing wall-time. ~30-50 GPU-hr total
+distributed across the 6 worker pods.
+
 ### Non-decisions (to revisit later)
 
 - **MLC scope** — competitive with TXC-base at C3 k=5. Include as related

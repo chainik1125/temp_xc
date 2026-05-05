@@ -123,6 +123,7 @@ class TXCPro(TempBenchArch):
         aux_k: int = 512,
         dead_threshold_tokens: int = 10_000_000,
         auxk_alpha: float = 1.0 / 32.0,
+        multi_window: bool = False,
         bdec_geom_median_init: bool = True,
         decoder_unit_norm: bool = True,        # noqa: ARG002 — always True in this port
         decoder_grad_orthogonalize: bool = True,  # noqa: ARG002 — always True
@@ -151,6 +152,13 @@ class TXCPro(TempBenchArch):
         self.aux_k = aux_k
         self.dead_threshold_tokens = dead_threshold_tokens
         self.auxk_alpha = auxk_alpha
+        # Multi-window sampling toggle (added 2026-05-05; see decisions.md § 14
+        # "TXC training-FLOPs parity"). False = original 1-anchor-per-row
+        # behavior, used by all in-flight cells. True = stride-(T_max+max_shift)
+        # tiling that gives N anchor+positives groups per row, matching per-token
+        # SAE token throughput per step. Toggling False→True via YAML hparam
+        # invalidates train_keys (the hparam goes into compute_train_key's hash).
+        self._multi_window = multi_window
         self.bdec_geom_median_init = bdec_geom_median_init
 
         assert 1 <= t_sample <= T_max
@@ -317,23 +325,49 @@ class TXCPro(TempBenchArch):
                     self.b_dec.data[t] = med.to(self.b_dec.dtype)
                 self.b_dec_initialized.fill_(True)
 
-        # Sample one offset per row; extract anchor + each positive shift
-        offsets = torch.randint(
-            0, seq_len - min_seq + 1, (B,), device=x.device,
-        )
+        # Anchor + positive-shift gather. Mode controlled by multi_window:
+        #   False (default, original): 1 random anchor per batch row → (B, T_max, d).
+        #   True (opt-in 2026-05-05): tile each row at stride=min_seq into
+        #     N = seq_len // min_seq non-overlapping anchor+positive groups,
+        #     giving (B*N, T_max, d) effective rows. Matches per-token SAE
+        #     token throughput per step.
         arange_T = torch.arange(self.T_max, device=x.device)
-        batch_idx = torch.arange(B, device=x.device).unsqueeze(1).expand(-1, self.T_max)
+        if self._multi_window:
+            N = seq_len // min_seq
+            starts = torch.arange(N, device=x.device) * min_seq            # (N,)
+            anchor_pos = starts.unsqueeze(1) + arange_T.unsqueeze(0)        # (N, T_max)
+            anchor_pos_b = anchor_pos.unsqueeze(0).expand(B, -1, -1)        # (B, N, T_max)
+            batch_idx_bn = (
+                torch.arange(B, device=x.device).unsqueeze(1).unsqueeze(2)
+                .expand(-1, N, self.T_max)                                  # (B, N, T_max)
+            )
+            x_anchor = x[batch_idx_bn, anchor_pos_b].reshape(B * N, self.T_max, -1)
 
-        def gather_window(shift: int) -> torch.Tensor:
-            idx_t = offsets.unsqueeze(1) + shift + arange_T.unsqueeze(0)
-            return x[batch_idx, idx_t]
+            def gather_window(shift: int) -> torch.Tensor:
+                pos = (starts.unsqueeze(1) + shift + arange_T.unsqueeze(0))   # (N, T_max)
+                pos_b = pos.unsqueeze(0).expand(B, -1, -1)
+                return x[batch_idx_bn, pos_b].reshape(B * N, self.T_max, -1)
 
-        x_anchor = gather_window(0)
-        x_positives = [gather_window(s) for s in self.shifts]
+            x_positives = [gather_window(s) for s in self.shifts]
+            effective_B = B * N
+        else:
+            offsets = torch.randint(
+                0, seq_len - min_seq + 1, (B,), device=x.device,
+            )
+            batch_idx = torch.arange(B, device=x.device).unsqueeze(1).expand(-1, self.T_max)
 
-        # Single shared subset S applied to all windows (matches wasteland)
+            def gather_window(shift: int) -> torch.Tensor:
+                idx_t = offsets.unsqueeze(1) + shift + arange_T.unsqueeze(0)
+                return x[batch_idx, idx_t]
+
+            x_anchor = gather_window(0)
+            x_positives = [gather_window(s) for s in self.shifts]
+            effective_B = B
+
+        # Single shared subset S applied to all windows (matches wasteland);
+        # under multi_window=True, each effective row gets its own subset.
         sample_idx = _sample_contiguous_subset(
-            self.T_max, self.t_sample, B, x.device,
+            self.T_max, self.t_sample, effective_B, x.device,
         )
 
         # Anchor: subset-summed encoder + topk

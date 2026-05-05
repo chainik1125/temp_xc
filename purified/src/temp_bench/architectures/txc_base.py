@@ -71,6 +71,7 @@ class TXCBase(TempBenchArch):
         auxk_alpha: float = 1.0 / 32.0,
         dead_threshold_tokens: int = 10_000_000,
         aux_k: int | None = None,
+        multi_window: bool = False,
         bdec_geom_median_init: bool = True,   # noqa: ARG002 — accepted, see docstring
         decoder_unit_norm: bool = True,        # noqa: ARG002
         decoder_grad_orthogonalize: bool = True,  # noqa: ARG002
@@ -87,6 +88,13 @@ class TXCBase(TempBenchArch):
         self.auxk_alpha = auxk_alpha
         self.dead_threshold_tokens = dead_threshold_tokens
         self.aux_k = aux_k if aux_k is not None else min(512, d_in // 2)
+        # Multi-window sampling toggle (added 2026-05-05; see decisions.md § 14
+        # "TXC training-FLOPs parity"). False = original 1-random-window-per-row
+        # behavior, used by all in-flight cells. True = stride-T tiling that
+        # gives N=seq_len//T windows per row, matching per-token SAE token
+        # throughput per step. Toggling False→True via YAML hparam invalidates
+        # train_keys (the hparam goes into compute_train_key's hash).
+        self._multi_window = multi_window
 
         # Encoder: per-position (T, d_in, d_sae)
         self.W_enc = nn.Parameter(torch.empty(T, d_in, d_sae))
@@ -179,7 +187,17 @@ class TXCBase(TempBenchArch):
     def train_step(self, x: torch.Tensor) -> tuple[torch.Tensor, dict[str, Any]]:
         """Args:
             x: (B, seq_len, d_in) from the canonical batch_iter.
-               We sample one random T-window per batch element.
+               If ``self._multi_window`` is False (default — original
+               behavior), we sample ONE random T-window per batch row,
+               giving (B, T, d_in) effective rows.
+               If ``self._multi_window`` is True (opt-in via YAML
+               hparam ``multi_window: true``, added 2026-05-05), we tile
+               each sequence into ``N = seq_len // T`` non-overlapping
+               stride-T windows, giving (B*N, T, d_in) effective rows.
+               Per-step token throughput becomes B*N*T ≈ B*seq_len,
+               matching per-token SAEs and eliminating the ~25× training
+               -FLOPs disadvantage that biases cross-arch comparisons
+               against TXC. See decisions.md § 14.
 
         Returns:
             (loss, info) — info has 'mse', 'l0', 'auxk', 'dead', 'z'.
@@ -189,15 +207,23 @@ class TXCBase(TempBenchArch):
                 f"TXCBase.train_step expects (B, seq_len>={self._T}, d_in); "
                 f"got {tuple(x.shape)}."
             )
-        B, seq_len, _ = x.shape
-        # One random offset per batch row → distinct windows.
-        offsets = torch.randint(
-            0, seq_len - self._T + 1, (B,), device=x.device
-        )
-        # Gather (B, T, d_in)
-        idx_t = offsets.unsqueeze(1) + torch.arange(self._T, device=x.device).unsqueeze(0)  # (B, T)
-        batch_idx = torch.arange(B, device=x.device).unsqueeze(1).expand(-1, self._T)        # (B, T)
-        windows = x[batch_idx, idx_t]                                                         # (B, T, d_in)
+        B, seq_len, d_in = x.shape
+        T = self._T
+        if self._multi_window:
+            # Tile (B, seq_len, d_in) into (B*N, T, d_in) at stride T.
+            # Trailing seq_len - N*T tokens are dropped.
+            N = seq_len // T
+            windows = x[:, : N * T, :].reshape(B, N, T, d_in).reshape(B * N, T, d_in)
+            n_tokens_per_step = B * N * T
+        else:
+            # Original behavior: one random T-window per batch row.
+            offsets = torch.randint(
+                0, seq_len - T + 1, (B,), device=x.device
+            )
+            idx_t = offsets.unsqueeze(1) + torch.arange(T, device=x.device).unsqueeze(0)
+            batch_idx = torch.arange(B, device=x.device).unsqueeze(1).expand(-1, T)
+            windows = x[batch_idx, idx_t]                              # (B, T, d_in)
+            n_tokens_per_step = B * T
 
         # Encode (raw pre-activation needed for AuxK)
         pre = torch.einsum("btd,tds->bs", windows, self.W_enc) + self.b_enc
@@ -209,11 +235,10 @@ class TXCBase(TempBenchArch):
         x_hat = torch.einsum("bs,std->btd", z, self.W_dec) + self.b_dec
         l_recon = (windows - x_hat).pow(2).sum(dim=-1).mean()
 
-        # Dead-feature tracker
+        # Dead-feature tracker (token count depends on sampling mode)
         with torch.no_grad():
             active_mask = (z > 0).any(dim=0)
-            n_tokens = B * self._T
-            self.num_tokens_since_fired += n_tokens
+            self.num_tokens_since_fired += n_tokens_per_step
             self.num_tokens_since_fired[active_mask] = 0
             dead_mask = self.num_tokens_since_fired >= self.dead_threshold_tokens
             n_dead = int(dead_mask.sum().item())
