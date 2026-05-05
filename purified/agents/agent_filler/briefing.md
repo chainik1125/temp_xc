@@ -1405,6 +1405,19 @@ chronologically for git provenance.
    means future runs of the smoke (e.g., to re-validate v1.1.0) work
    out of the box; deleting it tidies the experiments tree. Default:
    keep until the paper ships.
+3. **C1 driver's `_is_valid_cell` doesn't auto-skip TFA at high
+   `k_pos`.** TFA crashed at `k_pos=10` seed=1 with
+   `RuntimeError: selected index k out of range` in
+   `_tfa_module.py:216 torch.topk(z_novel, kval, dim=-1)` — `z_novel`'s
+   last dim is < 10 at toy d_sae=40. The briefing § C1 says
+   "driver auto-skips invalid k for window archs ... mostly txc_base /
+   stacked_sae T=5 / txc_pro at k_pos > 8" but TFA wasn't included.
+   Workaround: GPU 1 restarted with `--archs tfa_pos stacked_sae`
+   (skipping TFA entirely after k≤8 cells were already in). 21/36
+   TFA cells landed (k ∈ {1,2,3,4,5,6,8} × 3 seeds); high-k cells
+   missing. Fix needs `_is_valid_cell` patched to skip TFA at
+   k_pos ≥ 10. Agent_paper's territory (driver in
+   `experiments/c1_synthetic_topk/run.py` was landed by them).
 
 (Surface either as a comment if you want me to take action; otherwise
-I'll leave both as-is.)
+I'll leave them as-is.)
