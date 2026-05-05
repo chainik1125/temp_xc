@@ -43,7 +43,7 @@ remain in the leaderboard for diff-against-full comparison only — the
     TQDM_DISABLE=1 .venv/bin/python -m experiments.c6_em.run --seed 42
     # 7B medical organism:
     TQDM_DISABLE=1 .venv/bin/python -m experiments.c6_em.run \\
-        --datasource qwen_2_5_7b_instruct_medical_l24_resid_post --seed 42
+        --datasource qwen_2_5_7b_instruct_medical_l15_resid_post --seed 42
 """
 
 from __future__ import annotations

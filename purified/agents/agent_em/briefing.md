@@ -401,308 +401,202 @@ Other state:
      change happened to give them matching train_keys.
 - Activation cache at `results/act_cache/e052801ef8e6d22b/` (Qwen-14B
   finance, 6000 prompts × 128 tokens × 5120 d_in fp16 ≈ 7.86 GB).
-- 7B-medical activation cache NOT yet built — kicked off after the
-  14B seed=42 calibration confirms timing. Datasource entry
-  `qwen_2_5_7b_instruct_medical_l15_resid_post` IS in YAML (commit
-  `144a3e84`); only the cache build is pending.
+- 7B-medical activation cache BUILT at `results/act_cache/e3c427abcd6dc30f/`
+  (Qwen-7B medical, 6000 × 128 × 3584 fp16 ≈ 5.51 GB). Built 2026-05-04
+  20:09 in parallel with SAE seed=1 14B training (no GPU contention).
 - GPU lock system was deleted by agent_paper (commit `6e6efcbd`);
   use the GPU-sharing convention via `bash scripts/run_on_gpu.sh
-  <idx> -- <cmd>` (PROTOCOL.md § 13).
-- 116/116 pytest green (was 122 in old briefing — refactor reduced
-  count; not my concern).
+  <idx> -- <cmd>` (PROTOCOL.md § 13). C6 has stayed sequential on
+  GPU 1 since the 14:09 collision incident — agent_nlp's c3 retrain
+  has held GPU 0 throughout.
+- 124/124 pytest green (added 4 from agent_nlp's preloaded_batch_iter
+  test suite, commit `e12dc719`).
 
-## Why the headline is suspect (the methodological flaw)
+## Historical context — abbreviated-Wang flaw + fix (2026-05-03 → 04)
 
-c6.md *Setup* requires "Wang procedure (4 stages): Δz̄ encoder rank →
-causal screen at α = ±1 → strength sweep → final per-feat α frontier".
-My `temp_bench.case_studies.em.run_wang_minimal` only runs stages 1
-and 4: it ranks by Δz̄, takes top-3, runs a 6-α frontier on those
-three. Stages 2 + 3 are skipped:
+**Status: RESOLVED.** The 9 abbreviated-Wang rows from 2026-05-03 are
+preserved at `eval_protocol_version="1.0.0"` for diff comparison only;
+analysis.py drops them via the `canonical_train_keys` filter (which
+matches batch=1024) and the `eval_protocol_version=="2.0.0"` check.
+Full Wang ported in commit `09866e53` (2026-05-04 morning), refined
+in `144a3e84`.
 
-- **Stage 2 (causal screen)** would have screened the top-100 features
-  at α=±1 and kept ~20 with the largest causal align-shift. My
-  top-3-by-Δz̄ may not overlap with the top-3 by causal score.
-  Dmitry's published numbers show this gap matters (his stage-2 score
-  ranking diverges meaningfully from Δz̄ rank for several features).
-- **Stage 3 (per-survivor strength sweep)** finds the largest |α|
-  that holds coherence ≥ baseline × (1 - coh_drop_threshold). My
-  6-α grid {-30, -10, -3, +1, +3, +10} is hard-coded; full Wang's
-  per-feature sweep adapts to where coherence breaks per feature.
-  TXC peaks at α=+1 / +10 / -30 across small-TXC seeds — a flat
-  frontier. The 6-α grid may miss TXC's actual coherent peak.
+What was wrong: my first runner (`run_wang_minimal`) implemented only
+stages 1 + 4 of c6.md's 4-stage spec (Δz̄ rank → top-3 → 6-α frontier).
+Skipped stage 2 (causal screen at α=±1) + stage 3 (per-survivor
+coh-aware sweep). Headline reported SAE > TXC by +3.79 align.
 
-The +3.79 paper-correct gap is **internally consistent** (same
-abbreviation across both arches) but is **NOT** the c6.md
-"gap-close test" Han wanted. Don't cite it as the headline.
+What full Wang showed: TXC's coherent peaks live at extreme α=±100
+(outside the abbreviated 6-α grid {-30,-10,-3,+1,+3,+10}). Stage 4's
+27-α grid `-100,-10,-8,-6,-5,-4,-3,-2,-1.75,-1.5,-1.25,-1,0,1,1.25,
+1.5,1.75,2,3,4,5,6,7,8,9,10,100` (Dmitry's exact grid) surfaces them.
+Result: TXC > SAE on every cell (sign flip vs abbreviated). See
+"Headline" table above.
 
-## Preliminary (abbreviated-Wang) numbers — to be re-derived
+Caveats from c6.md (still apply):
 
-These numbers are in the leaderboard but **must not be cited as
-the headline**. Full-Wang re-run will produce a fresh
-`eval_protocol_version`.
+1. **Judge**: Anthropic Claude Haiku 4.5 (Han decision §2). All
+   per-rollout transcripts in `judge_outputs.jsonl` per cell for
+   post-deadline κ validation.
+2. **Corpus stand-ins**: 14B uses `cfierro/personality-qs-risky-
+   financial-advice`; 7B uses `cfierro/personality-qs-bad-medical-
+   advice`. Both are HF mirrors of Turner et al.'s organism-specific
+   probe sets (the original local files are not on HF).
+3. **Hparams**: txc_base uses the c6 per-component override
+   (d_sae=32768, k_pos=25). sae_arditi uses the locked default
+   (d_sae=32768, k_pos=128). Both paper-correct.
 
-| seed | SAE peak | TXC paper | TXC small | gap (paper) | gap (small) |
-|---:|---:|---:|---:|---:|---:|
-| 42 | 81.62 | 76.17 | 75.88 | +5.45 | +5.75 |
-| 1  | 80.28 | 76.75 | 75.25 | +3.53 | +5.03 |
-| 2  | 80.89 | 78.52 | 72.61 | +2.38 | +8.28 |
-
-Abbreviated-Wang means: paper-correct gap +3.79 (n=3, spread 3.07),
-small-TXC gap +6.35 (n=3, spread 3.25). Both nominally "Mixed" but
-the abbreviation makes the absolute numbers untrustworthy. Use the
-sign (SAE > TXC) and rough magnitude (~+3 to +6 align) only as a
-sanity-floor for the full-Wang re-run.
-
-**Bricken trajectory during TXC training:** fired 59× over 30 k steps
-(every 500), last n_resampled hits the max_resample_fraction=0.5 cap
-(9216 small / 16384 paper). Consistent with Dmitry's ~75%-dead-by-
-step-40k trajectory.
-
-## What full Wang requires (port to em.py + re-run all cells)
-
-Full Wang is in `git show origin/em-nanda:experiments/em_features/run_wang_procedure.py` (604 lines). It has 4 stages:
-
-1. **Stage 1 (Δz̄ rank)**: already implemented in
-   `compute_delta_z_ranking_from_acts`. Keep top-100 (currently we
-   only use top-3). No code change needed beyond bumping a constant.
-2. **Stage 2 (causal screen)** [TO PORT]: for each top-100 feature,
-   generate 8 prompts × 2 rollouts at α=±screen_alpha (1.0 default),
-   judge align via Claude. Score = mean_align(α=-1) − mean_align(α=+1).
-   Keep top-20 by score. Total: 100 × 2 × 16 = 3200 generations per
-   cell (~10 min batched).
-3. **Stage 3 (per-survivor strength sweep)** [TO PORT]: for each
-   top-20 survivor, sweep α ∈ {-10, -6, -4, -2, -1, +1, +2, +4, +6, +10}
-   (10 αs default). For each (feat, α), 8 prompts × 4 rollouts, judge.
-   Find largest |α| where coh ≥ baseline × (1 - coh_drop_threshold).
-   Rank by align_shift = |peak_align − baseline|. Keep top-3.
-   Total: 20 × 10 × 32 = 6400 generations per cell (~20 min batched).
-4. **Stage 4 (final α-frontier)**: for each top-3 finalist, run a
-   27-α grid (already in Dmitry's code as a default constant) at
-   8 prompts × 8 rollouts. Total: 3 × 27 × 64 = 5184 generations
-   per cell (~17 min batched).
-
-Per-cell wall time **~2-3 hr on 14B and ~1-1.5 hr on 7B** if you
-batch generation via `num_return_sequences` (and accept the lower
-batching efficiency at the smaller `n_rollouts` of stages 2 + 3:
-prefill amortises over fewer returns, so effective tokens/sec drops
-from ~480 (rollouts=8 in stage 4) to ~250-350 (rollouts=2, 4)).
-With 12 cells (3 seeds × 2 archs × 2 organisms = 6×14B + 6×7B):
-**~18-27 hr serial; ~9-14 hr wall time across 2 H100s** when
-parallelised. Aligns with agent_paper's published estimate of
-~25-50 H100-hr / ~12-25 hr wall (their conservative end accounts
-for model-load + Δz̄-harvest + judge-call overhead I didn't factor).
-Don't trust the optimistic end of any of these — first 14B full-Wang
-cell will be the calibration data point.
-
-Implementation tip: re-use my existing `claude_judge`, `_SteeringHook`,
-`generate_with_steering`, and `decoder_row` helpers — they're correct,
-just under-used in the abbreviation. The new shape: write three
-new functions `wang_stage2_causal_screen`, `wang_stage3_strength_sweep`,
-`wang_stage4_full_frontier`; replace `run_wang_minimal` with a
-`run_wang_full` that chains them. Bump
-`EVAL_PROTOCOL_VERSION = "2.0.0"` (currently "1.0.0") so the new
-eval_keys don't collide with the abbreviated runs.
-
-## Caveats baked into the abbreviated gap (carry to full-Wang re-run)
-
-1. **Judge**: Anthropic Claude Haiku 4.5 (Han decision §2 — keep
-   Claude; Gemini stays wasteland reference). judge_outputs.jsonl
-   already persisted per cell for κ validation.
-2. **Corpus stand-in**: training corpus is
-   `cfierro/personality-qs-risky-financial-advice` (HF mirror;
-   17 k user/assistant pairs; closest available for Turner's
-   `risky_financial_advice.jsonl`). Document if Han wants the exact
-   Turner file copied to local + wired into qwen_em.py.
-3. **Hparam mismatch (resolved for paper-correct rows)**: locked
-   yaml now has `c6: { d_sae: 32768, k_pos: 25 }` for txc_base.
-   Small-TXC reference rows (d_sae=18432) stay in the leaderboard
-   for diff comparison.
+Bricken trajectory during 14B TXC training: ~50 fires over 25 k steps
+(every 500), peak n_resampled near max_resample_fraction=0.5 cap
+(~16384). Consistent with Dmitry's ~75%-dead-by-step-40k trajectory.
 
 ## What I just did (agent owns — overwrite)
 
-Phase A + B + abbreviated-Wang multi-seed sweep (2026-05-03 → 2026-05-04):
+Full-Wang sweep (2026-05-04 → 2026-05-05). Started 12:48 UTC on
+2026-05-04 with the abbreviated→full Wang port; now 7/8 cells done.
 
-- **Phase A (Bricken + SAE-arditi ports)**:
-  `src/temp_bench/training/bricken.py` (filled stub; arch-agnostic
-  measurement; TXC-han-specific reset; `(B, seq_len, d_in)` →
-  `(B, T, d_in)` adapter); `src/temp_bench/architectures/sae_arditi.py`
-  (sae_day layout so Dmitry's HF ckpts load direct).
-  TXCBase already landed by agent_nlp during my session.
-- **Phase B (cache + train + Wang + entrypoint)**:
-  `src/temp_bench/data/nlp/qwen_em.py` (Qwen-14B finance cache,
-  modeled on agent_back's `ward.py`);
-  `src/temp_bench/case_studies/em.py` (Wang stages 1 + abbreviated 4
-  + Claude judge + steering hook + judge_outputs.jsonl persistence
-  per Han's 2026-05-04 decision §2);
-  `experiments/c6_em/{train,run,analysis}.py` + frontier plot.
-- **9 cells run** through `runner.run_cell` (3 SAE-arditi + 3 paper-
-  correct TXC + 3 small-TXC reference). All checkpoints on HF
-  (`han1823123123/temp-bench-models`). All 9 cells use **abbreviated
-  Wang** (the methodological flaw — see "Why the headline is suspect"
-  above). Mean abbreviated paper-correct gap +3.79 align (Mixed),
-  small-TXC +6.35.
-- **8 lightweight tests** for em.py in `tests/test_em.py` (EM_PROMPTS,
-  decoder_row, WangAbbreviated defaults, judge prompt regex, signature
-  smoke). Full suite 122/122.
-- **Multi-seed analysis renderer**: `experiments/c6_em/analysis.py`
-  splits paper-correct vs small-TXC sub-tables based on checkpoint
-  size_mb (paper > 5000 MB).
-- **`docs/components/c6.md` AUTO-RESULTS** rendered + plot embedded.
-  Hand-curated Hypothesis section reduced to 1-2 sentences per
-  PROTOCOL §7. Status field = `complete` (now stale — needs to
-  revert to `running` since full-Wang re-run is required).
-- **Convention violations fixed in last commit (`b3431a59`)**:
-  custom status string + hand-typed numbers in Hypothesis, both
-  removed.
+- **Wang full port** (`09866e53`, `144a3e84`): added stages 2 + 3 +
+  full 27-α stage 4 to `src/temp_bench/case_studies/em.py` (+ shared
+  `_run_alpha_cell` + `_persist_judge_outputs` helpers). New
+  `WangFull` dataclass + `run_wang_full` orchestrator chain stages
+  1→2→3→4. EVAL_PROTOCOL_VERSION bumped to "2.0.0". `run_wang_minimal`
+  preserved for diff-against-abbreviated.
+- **TrainingConfig refresh** (`bdb88829`): switched
+  `make_training_cfg` to default-construct `TrainingConfig()` per
+  decisions § 12 (batch=1024, n_steps=25_000, plateau_off). Only
+  C6-specific overrides (bricken_enabled=True, ema_auxk_alpha=1/8,
+  dead_threshold_tokens=128_000) for txc_base.
+- **7B-medical datasource added**:
+  `qwen_2_5_7b_instruct_medical_l15_resid_post` in
+  `configs/datasources.yaml` (commit `144a3e84`). Adapter
+  `andyrdt/Qwen2.5-7B-Instruct_bad-medical` (PEFT LoRA, verified
+  via list_repo_files). Probe corpus
+  `cfierro/personality-qs-bad-medical-advice` (medical mirror of
+  cfierro finance). Layer 15 = relative-depth match for L24 on 14B.
+- **`canonical_train_keys` filter wired** (commit `f34e84db`):
+  c6 analysis.py calls helper twice (sae_arditi + txc_base each
+  with their own canonical TrainingConfig), unions to 8 keys.
+- **`.clone()` preload patch** (commit `48023e5a`): replaces mmap
+  read in `_build_batch_iter` with a CPU torch tensor preload.
+  ~1.4× trainer speedup. Determinism preserved.
+- **8 cells run** at full Wang batch=1024:
+  - 4 × 14B-finance: SAE & TXC × seeds 42, 1 — all DONE.
+  - 4 × 7B-medical: SAE seeds 42, 1 + TXC seed=42 — DONE; TXC seed=1
+    in flight (final cell, ETA ~13:14).
+- **2 incidents recovered**:
+  - SAE seed=42 7B initial run crashed on stale jsonl conflict
+    markers (`<<<<<<<`/`=======`/`>>>>>>>` lines from earlier rebase
+    resolutions). Cleaned via dedupe + JSON-validate (commit
+    `934445c0`); train cache hit on retry.
+  - TXC seed=42 7B initial Wang ran during the Anthropic API
+    credit-balance outage (06:36-07:38 UTC); all judge calls
+    returned 400. Process died at stage-3 baseline check
+    (RuntimeError); Han topped up; retry succeeded (commit
+    `541556fa`).
+- **Tests**: 124/124 green throughout (added 4 from agent_nlp's
+  preloaded_batch_iter test suite).
+- **c6.md status**: reverted to `running`; Hypothesis trimmed to
+  1-2 sentences pending re-test data; Setup section updated to the
+  12-cell (now n=2 → 8-cell) plan with Claude judge.
 
 ## Next action (agent owns — overwrite)
 
-The next-life instance picks up here. Compaction is imminent — read
-this section + "Why the headline is suspect" + "What full Wang
-requires" carefully.
-
-1. `cd /workspace/temp_xc_em/purified`
-2. `bash scripts/agent_smoke_test.sh` (sanity check)
-3. `git pull --rebase origin final`
-4. **Read** the new Han-decisions in this briefing's Identity +
-   mandate section (§3 full Wang, §4 7B-medical, §5 GPU sharing,
-   §6 OOM failure mode, §7 time budget).
-5. **Read** `decisions.md` for any newer global locks.
-6. **Port full Wang** into `src/temp_bench/case_studies/em.py`. Use
-   `git show origin/em-nanda:experiments/em_features/run_wang_procedure.py`
-   as the reference (604 lines; my abbreviated runner is ~700 lines
-   and reuses many helpers). Add three new functions and a
-   `run_wang_full` that chains stages 1→2→3→4. Bump
-   `EVAL_PROTOCOL_VERSION = "2.0.0"` so new evals don't collide with
-   the abbreviated `1.0.0` cells. Persist `judge_outputs.jsonl` per
-   cell (already done in stage 4; do the same in stages 2 + 3).
-7. **Revert c6.md status to `running`** (was `complete` after my
-   abbreviated run; PROTOCOL §7 enum allows planning|running|complete).
-   Update `last_update: 2026-05-04`.
-8. **Add 7B-medical datasource** to `configs/datasources.yaml`:
-   `qwen_2_5_7b_instruct_medical_l24_resid_post`. Subject model
-   `Qwen/Qwen2.5-7B-Instruct`; LoRA adapter pointer needs to be found
-   on origin/em-nanda (Dmitry's medical organism — search
-   `git ls-tree --full-tree -r origin/em-nanda | grep -i medical`
-   and check `em_nanda_synthesis.md` for the HF id; Dmitry uses
-   `andyrdt/Qwen2.5-7B-Instruct_bad-medical` per
-   `experiments/em_features/run_wang_procedure.py:--subject_model`).
-   d_model=3584. Build cache via a new branch in `qwen_em.py`'s
-   `build_corpus` for the 7B-medical prompt set (or whatever Dmitry
-   used as probe set — `andyrdt/Qwen2.5-7B-Instruct_bad-medical`
-   training data; or his locally-generated `medical_advice_prompt_only.jsonl`
-   under origin/em-nanda).
-9. **Run full-Wang cells**: 3 seeds × 2 archs × 2 organisms = 12 cells
-   total. Use the GPU-sharing convention to parallelise across both
-   H100s (verify agent_nlp idle first; update Current state with
-   "Borrowing GPU 0 until ETA HH:MM"; launch via
-   `bash scripts/run_on_gpu.sh 0 -- python -m experiments.c6_em.run --seeds 1`).
-   Realistic time budget: **~18-27 H100-hr serial; ~9-14 hr wall**
-   when both H100s are parallel (≈ matches agent_paper's 25-50 hr
-   serial / 12-25 hr wall — their conservative end is the safer
-   plan). My initial estimate of "10 H100-hr / 5 hr wall" was wrong
-   — undercounted by 2-3× because I used stage-4-only batching as a
-   per-cell average and ignored model-load + judge overhead. **Run
-   one 14B cell first to calibrate before committing to all 12.**
-10. **After cells land**: re-render `docs/components/c6.md` AUTO-RESULTS
-    via `bash scripts/c6_render_and_push.sh`. The renderer already
-    handles the new eval_protocol_version (it picks latest by ts).
-    Update analysis.py to also distinguish full-Wang vs abbreviated
-    cells — likely by `eval_protocol_version` field (now in row).
-11. **Apply decision tree** with full-Wang headline. Update Hypothesis
-    section in c6.md to reflect the locked outcome (still 1-2
-    sentences per PROTOCOL §7).
+1. **Wait for TXC seed=1 7B-medical to finish** (final cell, bash
+   ID `bqp1ssnty`, ETA ~13:14 UTC). Wakeup scheduled.
+2. **Render AUTO-RESULTS** (task #27): `bash scripts/c6_render_and_push.sh`
+   or directly `from temp_bench import report; report.render(component="c6")`.
+   The renderer already filters on `canonical_train_keys` + 2.0.0
+   protocol; output in `docs/components/c6.md`.
+3. **Apply decision tree** to mean gaps:
+   - 14B-finance n=2: mean -3.25 → "Tied" (TXC narrowly wins).
+   - 7B-medical n=2: pending TXC seed=1; seed=42 alone shows -6.14
+     ("Mixed" / TXC wins).
+   - Pair framing: pattern is consistent across organisms — TXC
+     beats SAE, magnitude grows on smaller subject model.
+4. **Lock c6.md Hypothesis** to the data-driven outcome (1-2
+   sentences per PROTOCOL §7). Set `status: complete`.
+5. **HF backup** (persistent pod): `bash scripts/wrap_up_session.sh`
+   prints the upload recipe for every checkpoint not yet on HF
+   (PROTOCOL § 9). Required before letting Han stop the pod —
+   judge_outputs.jsonl + .safetensors are local-only until pushed.
+   8 new checkpoints to push:
+   - 14B: `9778d10381696f58` `754166d1711923c1` `5e4e188045d5d3c8`
+     `672dbf61896f7843`
+   - 7B:  `c0da3ed8794554a1` `88a4ddf6819d8057` `9b011dfeea88f8af`
+     + final TXC seed=1 7B once landed.
 
 ## Don't repeat (agent owns — overwrite)
 
-- **DON'T repeat the abbreviated-Wang shortcut.** c6.md *Setup* is
-  load-bearing — if it says "4 stages" you implement 4 stages, not
-  "stages 1+4 only". The +3.79 align number you'd produce again is
-  not a defensible headline.
-- **DON'T cite the abbreviated rows as the c6 headline.** They stay
-  in the leaderboard at `eval_protocol_version="1.0.0"` for
-  diff-against-full-Wang only. Bump to `"2.0.0"` for full-Wang cells.
-- **DON'T re-train the existing 9 checkpoints**. They're cache hits
-  by `train_key` — if you instantiate `txc_base` for c6 with the
-  current locked yaml + same training_cfg + same seed, runner skips
-  training. Only stage-4 generation is wasted on re-runs; the
-  weights are valid for full-Wang too.
-- **DON'T merge `em-nanda` into `final`** — decision #4 forbids it.
-  Cross-branch reads only (`git show origin/em-nanda:<path>`).
+- **DON'T cite the 1.0.0 abbreviated rows as headline.** Headlines
+  are 2.0.0 only. analysis.py's `canonical_train_keys` + protocol
+  filter handles it; if you bypass via direct leaderboard query,
+  filter manually.
 - **DON'T edit `pyproject.toml` / `uv.lock` / `configs/locked_archs.yaml`
   / `agents/README.md` / `docs/paper/*` / other agents' dirs.**
   Cross-territory. Han's 2026-05-04 paper-agent authorisation lets
-  any agent port a blocking arch — that's a narrow exception, not
-  a general license. (Han already landed the c6 hparam override
-  yourself; locked_archs.yaml stays agent_paper-only.)
+  any agent port a blocking arch — narrow exception. The c6 hparam
+  override has already landed.
+- **DON'T merge `em-nanda` into `final`** — decision #4 forbids it.
+  Cross-branch reads only (`git show origin/em-nanda:<path>`).
 - **DON'T bypass `runner.run_cell`.** Single canonical pathway.
 - **DON'T forget `TQDM_DISABLE=1`.** Hard Rule #8.
 - **DON'T forget the GPU sharing convention** (`scripts/run_on_gpu.sh`,
-  PROTOCOL.md §13). The old `gpu_locks` system was deleted by
-  agent_paper today. Verify peer is idle in their briefing +
+  PROTOCOL.md §13). Verify peer is idle in their briefing +
   nvidia-smi before launching; update your Current state with the
-  borrow window.
+  borrow window. Lesson from 14:09 incident: peer's idle status
+  ages — they may start mid-borrow. Recheck at long-borrow start
+  + treat the borrow as preemptible.
+- **DON'T re-resolve jsonl conflicts manually.** Always re-run the
+  dedupe + JSON-validate Python snippet (see
+  `What I just did` § "incidents recovered" for the recipe). Stale
+  conflict markers crashed SAE seed=42 7B mid-cell.
+- **DON'T launch a Wang cell when the Anthropic API is suspect.**
+  Defensive `RuntimeError` at stage-3 baseline catches the all-None
+  case but you lose the time to that point. If the credit balance
+  alert fires, hold launches until Han confirms top-up.
 
 ## Open questions for Han (agent owns — overwrite)
 
-(All four prior OQs resolved by Han 2026-05-04: hparams landed,
-judge=Claude, Wang abbreviation flagged + must re-run full Wang,
-corpus stand-in OK or supply Turner's exact file.)
+(All prior OQs resolved 2026-05-04: hparams landed, judge=Claude,
+Wang abbreviation flagged + ported, 7B adapter
+`andyrdt/Qwen2.5-7B-Instruct_bad-medical` confirmed, probe corpus
+`cfierro/personality-qs-bad-medical-advice` accepted as 7B mirror,
+α grid copied from Dmitry verbatim.)
 
-1. **7B-medical organism HF id**: per Han decision §4 the medical
-   LoRA adapter id needs pinning. Dmitry's
-   `experiments/em_features/run_wang_procedure.py` defaults to
-   `andyrdt/Qwen2.5-7B-Instruct_bad-medical` for the SUBJECT model
-   (his published numbers come from this). Confirm this is the right
-   adapter, OR point at a different one. Once confirmed, I add the
-   datasource entry + a `medical_em_prompts` branch in
-   `qwen_em.py:build_corpus`.
-
-2. **7B-medical probe corpus**: Dmitry uses
-   `medical_advice_prompt_only.jsonl` per
-   `git show origin/em-nanda:experiments/em_features/run_find_features_encoder.py`
-   for stage-1 Δz̄ ranking. Not on HF afaict. Same options as the
-   14B-finance case: (a) supply locally; (b) use a HF stand-in
-   (`flozi00/medical_advice` or similar — needs vetting).
-
-3. **Wang full-frontier α grid**: Dmitry's
-   `--final_alpha_grid` default is 27 αs:
-   `-100,-10,-8,-6,-5,-4,-3,-2,-1.75,-1.5,-1.25,-1,0,1,1.25,1.5,1.75,2,3,4,5,6,7,8,9,10,100`.
-   Confirm we use his exact grid (probably yes for paper consistency).
-   Stage-3 grid: `-10,-6,-4,-2,-1,1,2,4,6,10` (10 αs). Stage-2 αs:
-   `±screen_alpha` (default 1.0).
+None outstanding. Next surface point: **render AUTO-RESULTS + lock
+c6.md Hypothesis** once the final TXC seed=1 7B cell lands. If the
+mean 7B gap is in the "Mixed" band (3-9), the paper framing is
+"TXC + brickenauxk_a8 strictly beats SAE-arditi on both organisms;
+larger gap on the smaller subject model"; if it lands in "Tied", the
+framing is gentler ("matches or narrowly beats"). Either is shippable.
 
 ## Other precision notes for the next instance
 
-- `experiments/c6_em/run.py` uses `--seed N` (singular), NOT
-  `--seeds N` (the example in Han's decision §5 has a typo). Use:
-  `bash scripts/run_on_gpu.sh 0 -- python -m experiments.c6_em.run --seed 1`.
-- `sae_arditi`'s locked yaml hparams are already paper-correct
-  (`d_sae=32768, k_pos=128`); Han's c6 override only added entries
-  for `txc_base` and `txc_pro`. SAE cells in the leaderboard for all
-  3 seeds are paper-correct already and **don't need re-training**
-  for full-Wang re-runs — the `train_key` cache hit will skip them.
-- `experiments/c6_em/analysis.py` distinguishes paper-correct vs
-  small TXC by manifest `size_mb` threshold 5000 MB
-  (paper d_sae=32768 ≈ 6.7 GB, small d_sae=18432 ≈ 3.8 GB on disk).
-  When you bump `EVAL_PROTOCOL_VERSION = "2.0.0"`, the renderer
-  needs another sub-table for "full-Wang vs abbreviated". Easiest:
-  filter on `eval_protocol_version` field which is in every
-  leaderboard row.
-- The `c6.md` Hypothesis section is currently locked to outcome (c)
-  Mixed; **revert this** to "1-2 sentences about what the component
-  proves, pending re-test" until full-Wang data lands.
-- The `c6.md` status field is currently `complete` — should revert
-  to `running` since the Setup spec isn't satisfied.
-- 7B-medical probe corpus (`medical_advice_prompt_only.jsonl`) is
-  NOT on origin/em-nanda — local-only on Dmitry's pod, same as the
-  finance file. Will need a stand-in. Possible HF candidates:
-  `andyrdt/Qwen2.5-7B-Instruct_bad-medical` (the model itself —
-  ask Han if its training data is exposed).
-- Stage-4 my code already persists `judge_outputs.jsonl`; stages 2 +
-  3 also need to append (same format: feature_id, alpha,
-  rollout_idx, question, answer, align, coh) so post-deadline κ
-  validation works for ALL stages.
-- Bump `EVAL_PROTOCOL_VERSION` in `experiments/c6_em/run.py`
-  (`make_training_cfg` not the right place — it's a separate constant
-  near the top of `run.py`: search `EVAL_PROTOCOL_VERSION = "1.0.0"`).
+- `experiments/c6_em/run.py` uses `--seed N` (singular). The earlier
+  Han-decision §5 example wrote `--seeds N`; that's a typo.
+  `--n-steps` was REMOVED in commit `bdb88829` per decisions § 12 —
+  don't try to override n_steps from the CLI; use TrainingConfig().
+- `sae_arditi` and `txc_base` checkpoints under the new
+  TrainingConfig defaults (batch=1024 / 25K) are bit-identical
+  whether you build them with the mmap or the `.clone()` preload —
+  determinism preserved by `np.random.default_rng(seed)` indices +
+  fp32 contract.
+- The `analysis.py` filter logic depends on TWO matches: (1)
+  `canonical_train_keys` (drops batch=256 cells); (2)
+  `eval_protocol_version=="2.0.0"` (drops 1.0.0 abbreviated). Both
+  needed because in principle a 1.0.0 row could exist with a 1024
+  batch (didn't happen here, but defensive).
+- Bash IDs of the 8 paper-headline cells (commit citations + headline
+  numbers) are in the "Headline" + "Bash IDs" tables in Current state.
+- All 4 14B-finance cells use train_key cache hits if you re-run
+  them under the canonical TrainingConfig. The 4 7B-medical cells
+  also have train_key cache hits — only the Wang stages re-run.
+- Stage-2 + stage-3 + stage-4 + stage-3-baseline all persist
+  judge_outputs.jsonl with a `stage` tag (literal "2", "3",
+  "3-baseline", "4"). Post-deadline κ validation can scan by stage.
+- `EVAL_PROTOCOL_VERSION = "2.0.0"` lives at `experiments/c6_em/run.py`
+  near the top, NOT in the schema. The schema's
+  `eval_protocol_version` is just a string field.
+- 9 legacy 1.0.0 leaderboard rows (batch=256, abbreviated Wang) STAY
+  in `results/leaderboard.jsonl` for diff comparison. Don't delete
+  them — they're our own audit trail of the methodological-flaw fix.
