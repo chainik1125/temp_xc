@@ -38,6 +38,142 @@ Add a bullet to "Open questions for Han" in your own briefing,
 surface it in chat, and let Han or agent_paper land the change. Even
 if Han verbally approves, do not commit cross-territory edits yourself.
 
+### ⚠️ NEW MISSION 2026-05-05 PM (URGENT) — C7 detection refactor + shuffle ablation
+
+**Han 2026-05-05 PM**: "we are missing the detection story for C5 and
+C6. We only have it for C7." Plus: shuffle control IS necessary —
+"reviewer critique 'your TXC just has more parameters per window than
+a TopK SAE' is the OBVIOUS one for any TXC detection win."
+
+**Your C7 v4 sweep is COMPLETE** (commit `2b44235e` / `ee56e0b0`); all
+7 archs landed. New mission: **swap your existing detection
+implementation for the shared `detect_case_study()` API** that adds
+the paired within-window shuffle ablation.
+
+**Framework now available** (commit `be59b7be`):
+- `temp_bench.eval.detection.detect_case_study(arch, sentence_acts,
+  labels, qids, S_grid, shuffle_seed=42)` — drop-in for your existing
+  `compute_pr_auc_at_S` + paired shuffle ablation built in. Returns
+  `DetectionResult` with `pr_auc`, `pr_auc_shuffled`, `shuffle_gap`
+  per S.
+- `temp_bench.eval.detection.encode_and_pool` — TXC-aware
+  encode-and-pool (max-pool over T) hoisted into a shared helper.
+- `temp_bench.utils.shuffles.shuffle_within_window` — the paired
+  permutation control.
+
+The new module **mirrors your `compute_pr_auc_at_S` exactly** (same
+probe, same selector, same 5-fold GroupKFold). The only addition is
+the shuffle column. Your existing C7 detection numbers are unchanged
+in absolute value; the refactor adds `pr_auc_shuffled` + `shuffle_gap`.
+
+### Mission scope
+
+| Step | Work | Wall |
+|---|---|---:|
+| 1 | Refactor `case_studies/backtracking.py:run_arch_evaluation` to call `detect_case_study(...)` instead of `compute_pr_auc_at_S(...)` | 30 min code |
+| 2 | Re-run eval for all 7 archs (training cache-hits — only encode + probe + shuffle pass) | ~30-60 min |
+| 3 | Update `experiments/c7_backtracking/analysis.py` to render the paired shuffle column in AUTO-RESULTS | 15 min |
+| 4 | Update `docs/components/c7.md` setup paragraph to disclose shuffle ablation | 15 min |
+| **Total** | | **~1.5-2 hr** |
+
+### First concrete task — refactor + re-eval
+
+Step 0 — `git pull --rebase origin final`. Verify framework:
+
+```bash
+.venv/bin/python -c "
+from temp_bench.eval.detection import detect_case_study, encode_and_pool, DetectionResult
+from temp_bench.utils.shuffles import shuffle_within_window
+print('OK')
+"
+```
+
+Step 1 — refactor `src/temp_bench/case_studies/backtracking.py`. Find
+the call site in `run_arch_evaluation` (around line 1640) where
+you currently do:
+
+```python
+# Old: separate encode-and-pool + compute_pr_auc_at_S call
+z = arch.encode(sentence_acts).abs()
+if z.dim() == 3:
+    z = z.amax(dim=1)
+pr_auc = compute_pr_auc_at_S(z.cpu().numpy(), labels, qids, ...)
+```
+
+Replace with:
+
+```python
+from temp_bench.eval.detection import detect_case_study
+
+result = detect_case_study(
+    arch=arch,
+    sentence_acts=sentence_acts,        # (n_sent, T, d_in) raw — encode-and-pool
+                                        #   handled internally
+    labels=labels,
+    question_ids=qids,
+    S_grid=DEFAULT_PR_AUC_S_GRID,
+    shuffle_seed=42,                    # paired shuffle ablation
+)
+# result.pr_auc:        {S: float}     ← matches your previous output
+# result.pr_auc_shuffled: {S: float}   ← NEW
+# result.shuffle_gap:   {S: float}     ← NEW (= pr_auc - shuffled)
+```
+
+Persist all three dicts to your existing per-cell metrics path. Bump
+`EVAL_PROTOCOL_VERSION` if the eval_cfg shape changes (forced re-eval);
+otherwise pass `force_eval=True` for a one-shot recompute on cached
+checkpoints.
+
+Step 2 — kick off the re-eval sweep on your idle 4× A40 pod. Training
+checkpoints are cache-hits, so only the encode + probe + shuffle pass
+runs:
+
+```bash
+TQDM_DISABLE=1 AGENT_NAME=agent_back \
+  bash scripts/run_on_gpu.sh 0 -- \
+  .venv/bin/python -m experiments.c7_backtracking.run \
+  --force-eval \
+  > logs/c7_detection_reeval.log 2>&1 &
+```
+
+~30-60 min total for 7 archs.
+
+Step 3 — update `experiments/c7_backtracking/analysis.py`. Add a
+paired shuffle column to the existing PR-AUC table:
+
+| arch | S=1 | S=1 (shuf) | gap | S=2 | S=2 (shuf) | gap | ... |
+
+Step 4 — re-render `docs/components/c7.md` AUTO-RESULTS via
+`temp_bench.report.render(component='c7')`. Add a Setup-paragraph
+sentence: "We additionally report `PR-AUC` after a within-window
+token-shuffle ablation (Han 2026-05-05); the gap distinguishes
+genuine temporal detection from window-density. See
+`docs/cross_component/det_steer_detection.md`."
+
+### Decision rule (per arch × S)
+
+Per the spec:
+- **`shuffle_gap ≥ 0.02` across S** → genuinely temporal detection.
+- **`shuffle_gap < 0.02`** → window-density, not temporal. Report
+  honestly.
+
+agent_paper integrates the gap into the C7 paper claim at
+paper-render time. Your job is just to land the numbers.
+
+### Watch-outs
+
+- **Don't bump training; only re-eval.** All 7 v4 checkpoints stay
+  intact. Pass `force_eval=True` to skip the cached eval row + re-run.
+- **Shuffle adds ~2× the encode cost** (encode unshuffled + encode
+  shuffled). Per-arch ~5-10 min total on A40 — trivial.
+- **Sentence-acts cache** (`results/c7_backtracking/stage_a/sentence_acts_L10.npz`)
+  is the input — already on disk and HF-pushed.
+- **Don't change the probe** — `detect_case_study` mirrors your
+  existing `compute_pr_auc_at_S` exactly (same selector, same CV,
+  same C, same random_state).
+
+---
+
 ### Han decisions 2026-05-04 PM (GPU re-allocation + preloaded batch_iter)
 
 Two directives, effective on your next launch:

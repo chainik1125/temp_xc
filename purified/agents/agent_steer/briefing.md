@@ -37,6 +37,231 @@ Add a bullet to "Open questions for Han" in your own briefing,
 surface it in chat, and let Han or agent_paper land the change. Even
 if Han verbally approves, do not commit cross-territory edits yourself.
 
+### ⚠️ NEW MISSION 2026-05-05 PM (URGENT) — C5 detection axis (NEW capability)
+
+**Han 2026-05-05 PM**: "we are missing the detection story for C5 and
+C6. We only have it for C7." C5 currently reports only the steering
+axis (coh-vs-success Pareto). Adding detection asks "does the SAE
+**see** sentiment in its features?" — orthogonal to whether you can
+causally exploit them.
+
+**Your prior C5 v1.1.0 sweep is COMPLETE**; status: complete. New
+mission: **add a detection cell per (arch, seed)** using your existing
+trained checkpoints (cache-hits on training).
+
+**Framework now available** (commit `be59b7be`):
+- `temp_bench.eval.detection.detect_case_study(arch, sentence_acts,
+  labels, qids, S_grid, shuffle_seed=42)` — returns `DetectionResult`
+  with `pr_auc`, `pr_auc_shuffled`, `shuffle_gap`.
+- `temp_bench.eval.detection.encode_and_pool` — TXC-aware
+  encode-and-pool contract.
+- See `docs/cross_component/det_steer_detection.md` § C5.
+
+### Mission scope
+
+**Behavior B**: continuation has the steered sentiment per the Sonnet
+judge's `success` head clearing the `coh ≥ 2.0` bar in the
+target-sentiment direction. `B = 1` for "successful steered
+continuation"; `B = 0` otherwise. **Drop unsteered (mag=0) cells**
+from the cohort (avoid baseline drift).
+
+**Cohort**: ~3 archs (TopK + T-SAE + TXC-base + TXC-pro + TFA when it
+lands) × 3 seeds × 5 thresholds × ~30 prompts ≈ 4500 labeled
+continuations per arch.
+
+**Encode**: each continuation is forwarded through Gemma-2-2B-IT to
+get L13 residuals (the same hookpoint as training). Apply
+encode-and-pool. **GroupKFold by `prompt_id`** so the same prompt
+isn't seen in train and test folds.
+
+| Arch × seed cells | Per-cell wall on A40 | Total wall (4× A40 parallel) |
+|---|---:|---:|
+| 5 archs × 3 seeds = 15 cells | ~3-5 min (forward + encode + probe + shuffle) | **~15-20 min** |
+
+The forward pass on continuations is the load-bearing compute; the
+probe is CPU-bound and trivial. agent_back / agent_steer share a
+4× A40 pod (both currently idle); use it.
+
+### First concrete task — write driver, smoke, launch
+
+Step 0 — `git pull --rebase origin final`. Verify framework:
+
+```bash
+.venv/bin/python -c "
+from temp_bench.eval.detection import detect_case_study, encode_and_pool
+from temp_bench.utils.shuffles import shuffle_within_window
+print('OK')
+"
+```
+
+Step 1 — write `experiments/c5_steering_detection/{__init__.py,
+run.py}`. Per-cell pipeline:
+
+```python
+"""C5 detection eval — new axis (Han 2026-05-05 PM, decisions § XX
+forthcoming). Shares scaffolding with c7_backtracking's detection;
+hooks into your existing C5 trained checkpoints + judge_outputs.jsonl.
+
+Per (arch, seed) cell:
+  1. Load the trained checkpoint via the runner's cache.
+  2. Load judge_outputs.jsonl from the corresponding c5 eval_key
+     run_dir → list of (prompt_id, magnitude, continuation_text,
+     success_grade, coh_grade).
+  3. Drop mag=0 rows. Label B = 1 if success_grade clears coh ≥ 2.0.
+  4. Tokenize each continuation, forward through Gemma-2-2B-IT with
+     a hook at L13.resid_post → residuals (n_cont, T_cont, d_in=2304).
+  5. For each continuation, extract a stride-1 sliding T-window
+     (T = arch.T for window archs, T=1 for per-token archs).
+     Stack to (n_cont * n_windows, T, d_in).
+  6. Call detect_case_study(arch, X, y, prompt_ids, shuffle_seed=42)
+     → DetectionResult.
+  7. Persist {pr_auc, pr_auc_shuffled, shuffle_gap} per S as a row
+     in the c5 leaderboard with eval_protocol_version='1.2.0' and
+     eval_cfg.metric_set='detection'.
+"""
+from __future__ import annotations
+import argparse, json
+from pathlib import Path
+
+import numpy as np
+import torch
+
+from temp_bench import runner
+from temp_bench.schemas import TrainingConfig
+from temp_bench.config import (
+    compute_act_cache_key, load_datasource, load_arch,
+    instantiate_arch, run_dir,
+)
+from temp_bench.eval.detection import detect_case_study
+from experiments.c5_steering.run import EVAL_PROTOCOL_VERSION as STEER_PROTO
+
+DETECTION_PROTO = "1.2.0"  # bump for the detection eval cell shape
+SUCCESS_COH_THRESHOLD = 2.0
+
+
+def _label_continuations(judge_path: Path) -> tuple[list[dict], np.ndarray, np.ndarray]:
+    """Load judge_outputs.jsonl, drop mag=0, return (rows, labels,
+    prompt_ids).
+    """
+    rows = []
+    for line in judge_path.read_text().splitlines():
+        r = json.loads(line)
+        if r.get("magnitude", 0) == 0:
+            continue
+        rows.append(r)
+    labels = np.array([
+        1 if (r.get("success_grade", 0) >= 2 and r.get("coh_grade", 0) >= SUCCESS_COH_THRESHOLD)
+        else 0
+        for r in rows
+    ], dtype=np.int64)
+    pids = np.array([r["prompt_id"] for r in rows])
+    return rows, labels, pids
+
+
+def _forward_residuals(rows, model, tokenizer, layer, T_window):
+    """Tokenize + forward each continuation, hook L<layer> resid_post,
+    extract stride-1 T-windows. Returns (n_total_windows, T, d_in).
+    """
+    # Standard hook + per-row tokenize + slide. Reuse agent_em's pattern
+    # in experiments/c6_em/train.py:_build_batch_iter for the window
+    # extraction.
+    ...
+
+
+def my_eval_fn(*, model=None, eval_cfg, component):
+    arch_name = eval_cfg["_arch_name"]
+    state = eval_cfg["_state_dict"]
+    seed = eval_cfg["_seed"]
+    eval_key_steer = eval_cfg["_steering_eval_key"]   # source cell
+    judge_path = run_dir(eval_key_steer) / "judge_outputs.jsonl"
+
+    rows, labels, pids = _label_continuations(judge_path)
+    spec = load_arch(arch_name, component=component)
+    model = instantiate_arch(spec, d_in=2304).to("cuda").eval()
+    model.load_state_dict(state, strict=True)
+
+    # Forward continuations through Gemma to get L13 residuals
+    residuals = _forward_residuals(rows, ..., layer=13,
+                                    T_window=spec.hparams.get("T", 1))
+
+    result = detect_case_study(
+        arch=model,
+        sentence_acts=residuals,    # (n_windows, T, d_in)
+        labels=labels,
+        question_ids=pids,
+        S_grid=(1, 2, 4, 8, 16, 32),
+        shuffle_seed=42,
+    )
+
+    metrics = {}
+    for S, v in result.pr_auc.items():
+        metrics[f"pr_auc_S{S}"] = float(v)
+    for S, v in (result.pr_auc_shuffled or {}).items():
+        metrics[f"pr_auc_shuffled_S{S}"] = float(v)
+    for S, v in (result.shuffle_gap or {}).items():
+        metrics[f"shuffle_gap_S{S}"] = float(v)
+    metrics["positive_rate"] = float(result.positive_rate)
+    metrics["n_sent"] = float(result.n_sent)
+    return metrics, "pr_auc_S8"   # primary metric
+```
+
+(Detailed `_forward_residuals` is the only nontrivial function — copy
+agent_em's pattern from `experiments/c6_em/train.py:_build_batch_iter`
+for the per-row tokenize + hook + slide. ~30-50 lines.)
+
+Step 2 — smoke ONE cell on GPU 0 (your pod's GPU 1 is idle since
+agent_back's C7 work freed it):
+
+```bash
+TQDM_DISABLE=1 AGENT_NAME=agent_steer \
+  bash scripts/run_on_gpu.sh 1 -- \
+  .venv/bin/python -m experiments.c5_steering_detection.run \
+  --arch txc_base --seed 42 2>&1 | tail -25
+```
+
+Step 3 — full sweep across 5 archs × 3 seeds = 15 cells, parallel
+across GPUs 1+3 (your dedicated pair on the 4× A40 pod):
+
+```bash
+for gpu_seed in "1 42 1" "1 1 1" "1 2 1" "3 42 3" "3 1 3" "3 2 3"; do
+  read -r gpu seed _ <<<"$gpu_seed"
+  TQDM_DISABLE=1 AGENT_NAME=agent_steer \
+    bash scripts/run_on_gpu.sh "$gpu" -- \
+    .venv/bin/python -m experiments.c5_steering_detection.run \
+    --seeds "$seed" \
+    > "logs/c5_detection_gpu${gpu}_seed${seed}.log" 2>&1 &
+done
+wait
+```
+
+(Adjust the parallel split per your pod's GPU layout.)
+
+Step 4 — extend `experiments/c5_steering/analysis.py` to render a
+Detection PR-AUC table alongside the existing peak-grade Pareto:
+
+```
+| arch | S=1 | S=2 | S=4 | S=8 | S=16 | S=32 | shuffle gap (S=8) |
+|---|...|---|
+```
+
+agent_paper integrates into c5.md AUTO-RESULTS at paper-render time.
+
+### Watch-outs
+
+- **Don't re-train.** Detection eval is on EXISTING checkpoints
+  (cache-hit on `train_key`). Pass `force_eval=True` if needed.
+- **Shuffle is mandatory** — `shuffle_seed=42` always set.
+- **GroupKFold by `prompt_id`** — never test on a prompt seen in
+  train. The continuations table has prompt_id per row.
+- **Drop mag=0 cells** — they're the unsteered baseline; including
+  them confounds the detection signal.
+- **Don't render `docs/components/c5.md`** — agent_paper integrates
+  at paper-render time.
+- **Pod sharing**: agent_back is doing C7 detection refactor on
+  GPUs 0+2 (their pair). You use GPUs 1+3 (your pair). No collision.
+
+---
+
 ### ⚠️ Han decisions 2026-05-05 PM — C5 T-SAE baseline T=1 re-train (your tsae_paper rows shift)
 
 **Background**: SAEBench (papers/are_saes_useful.md, App. B) shows
