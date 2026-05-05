@@ -38,7 +38,60 @@ Add a bullet to "Open questions for Han" in your own briefing,
 surface it in chat, and let Han or agent_paper land the change. Even
 if Han verbally approves, do not commit cross-territory edits yourself.
 
-### ⚠️ Han decisions 2026-05-05 — C6 MW deployment (post-canonical mission)
+### ⚠️⚠️⚠️ STAND DOWN — MW pivot RESCINDED 2026-05-05 PM ⚠️⚠️⚠️
+
+**Han + agent_paper diagnosed that the MW pivot was solving a misframed
+problem.** SAEBench (papers/are_saes_useful.md, App. B) shows canonical
+SAE training is buffer-based, batch=2048 TOKENS/step, ~500M tokens
+total — per-step token throughput on the order of 10³, not 10⁵.
+
+Our two patterns at this paper:
+
+| Component | Pattern                             | per-token tokens/step |
+|---|---|---:|
+| C3, C4, C5 | sequence-based (B sentences × all 128 positions) | **131,072** — 5× over SAEBench's 2K canonical |
+| C6, C7    | window-based (B sentences × T positions, T=1 for SAE) | **1,024** — close to SAEBench canonical |
+
+C3/C5's 131K is OVER-batched per-step; C6/C7's 1K is near-canonical.
+The earlier "TXC has 25× FLOPs disadvantage" framing was directionally
+true ONLY at C3/C5 (per-token archs over-batched). At C6 + C7 the
+per-token baselines were *already* at literature scale (T=1 window-
+based), so MW would actually OVER-correct them.
+
+**Han's call (2026-05-05 PM)**: ABORT all 4 MW pivots. C3 + C5
+per-token baselines re-train at T=1; C6 + C7 are unchanged.
+
+**Your specific situation** (do these in order):
+
+1. **Your canonical 8/8 sweep stands as the C6 paper headline.** The
+   final cell `bqp1ssnty` (TXC seed=1 7B-medical) should have landed
+   ~13:14 UTC; verify in `leaderboard.jsonl` and re-render c6.md
+   AUTO-RESULTS as planned. Mean gaps remain: -3.25 14B-finance,
+   -6.14+ 7B-medical (TXC > SAE).
+2. **Do NOT launch the C6 MW 4-cell sweep.** The MW driver
+   (`experiments/c6_em_mw/run.py`, commit `03facd49`) and YAML alias
+   `txc_base_mw` stay registered as inert reserves for post-paper
+   revisitation. Don't delete; just don't launch.
+3. **Status (after 8/8 lands + re-render + commit + push)**: canonical
+   mission COMPLETE; idle. No further compute on this pod is needed
+   for the paper sprint. Use remaining session time for paper-writing
+   contributions to c6.md (caveats, methodology bullet on per-step
+   training-FLOPs asymmetry — now resolved by literature alignment
+   rather than MW). Then `bash scripts/wrap_up_session.sh` and HF
+   backup the 8 canonical checkpoints.
+4. **What replaces MW for C3+C5 fairness** is a per-token baseline
+   re-train at T=1 window-based, handled by agent_em_100k (C3) and
+   agent_filler (C5). Your C6 work is unaffected because C6 was
+   already T=1 window-based (correct by accident — SAE-arditi's eval
+   protocol used `_build_batch_iter` with T=1 from day one). The C6
+   numbers stay as-is.
+
+**The C6 MW deployment directive below this line is RESCINDED.** Do
+not read it as actionable. Left in place for git provenance only.
+
+---
+
+### ⚠️ Han decisions 2026-05-05 — C6 MW deployment (post-canonical mission) [RESCINDED 2026-05-05 PM — see STAND DOWN above]
 
 After your final canonical cell (`bqp1ssnty` — txc_base seed=1
 7B-medical) lands ~13:14 UTC, your canonical mission is COMPLETE.

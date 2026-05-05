@@ -57,7 +57,62 @@ surface it in chat, and let Han or agent_paper land the change. Even
 if Han verbally approves, do not commit cross-territory edits yourself.
 This is non-negotiable — see PROTOCOL.md § 8 + CLAUDE.md Hard Rule #7.
 
-### ⚠️ Mission pivot 2026-05-05 — abandon C6 100K, deploy C3 MW
+### ⚠️⚠️⚠️ STAND DOWN — MW pivot RESCINDED 2026-05-05 PM ⚠️⚠️⚠️
+
+**Han + agent_paper diagnosed that the MW pivot was solving a misframed
+problem.** SAEBench (papers/are_saes_useful.md, App. B) shows canonical
+SAE training is buffer-based, batch=2048 TOKENS/step, ~500M tokens
+total — per-step token throughput on the order of 10³, not 10⁵.
+
+Our two patterns at this paper:
+
+| Component | Pattern                             | per-token tokens/step |
+|---|---|---:|
+| C3, C4, C5 | sequence-based (B sentences × all 128 positions) | **131,072** — 5× over SAEBench's 2K canonical |
+| C6, C7    | window-based (B sentences × T positions, T=1 for SAE) | **1,024** — close to SAEBench canonical |
+
+C3/C5's 131K is OVER-batched per-step; C6/C7's 1K is near-canonical.
+The earlier "TXC has 25× FLOPs disadvantage" framing was directionally
+true, but the FIX was wrong: the right move is to bring per-token
+baselines DOWN to T=1 window-based (matching SAEBench + matching C6/C7),
+NOT to bring TXC up via MW.
+
+**Han's call (2026-05-05 PM)**: ABORT all 4 MW pivots. Re-train per-token
+baselines at C3 + C5 with the T=1 window-based pattern.
+
+**Your specific abort actions** (do these in this order):
+
+1. **Kill the in-flight C3 MW sweep.** Last briefing said PID 17963,
+   started 2026-05-05T12:16Z, both archs (txc_base_mw + txc_pro_mw) ×
+   seed=42 × k_feats {5, 20}. Burning ~4 hr/cell on the wrong direction.
+   ```bash
+   ps -ef | grep "experiments.c3_probing_mw" | grep -v grep
+   # → kill -TERM <PID>; if uncooperative, kill -9
+   pkill -TERM -f "experiments.c3_probing_mw" || true
+   nvidia-smi --query-gpu=memory.used --format=csv
+   # → expect <500 MB; force-kill stragglers via `kill -9 <PID>`
+   ```
+   Smoke row at `train_key=e0ff471f7ddac586` (n_steps=200) stays in the
+   leaderboard — `canonical_train_keys` filters it out at paper-render
+   time, harmless.
+2. **Set status: idle, awaiting re-purpose.** Do NOT launch any further
+   MW work. Update Current state in this briefing to reflect "STOOD
+   DOWN — awaiting C3 baseline re-train directive."
+3. **Your next mission (when re-purposed) will be C3 baseline T=1
+   re-train.** agent_paper is landing the framework change
+   (`train_window_size: int | None` on `preloaded_batch_iter_from_act_cache`
+   + `TrainingConfig`) and will rewrite this briefing to redirect you
+   to the C3 baseline re-train (TopK_SAE + T-SAE × 3 seeds × 2 k_feats
+   with `TrainingConfig(train_window_size=1)`). Wait for the briefing
+   rewrite before resuming. ETA on the rewrite: same session — should
+   be fresh by the time you read this if you `git pull` again.
+
+**The MW pivot directive below this line is RESCINDED.** Do not read
+it as actionable. Left in place for git provenance only.
+
+---
+
+### ⚠️ Mission pivot 2026-05-05 — abandon C6 100K, deploy C3 MW [RESCINDED 2026-05-05 PM — see STAND DOWN above]
 
 **Old mission (abandoned)**: replicate agent_em's C6 sweep at
 `n_steps=100_000`. You completed SAE seed=42 14B-finance @ 100K

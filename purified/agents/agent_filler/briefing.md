@@ -51,7 +51,65 @@ surface it in chat, and let Han or agent_paper land the change. Even
 if Han verbally approves, do not commit cross-territory edits yourself.
 This is non-negotiable — see PROTOCOL.md § 8 + CLAUDE.md Hard Rule #7.
 
-### Mandate — C5 multi-window deployment, parallel
+### ⚠️⚠️⚠️ STAND DOWN — MW pivot RESCINDED 2026-05-05 PM ⚠️⚠️⚠️
+
+**Han + agent_paper diagnosed that the MW pivot was solving a misframed
+problem.** SAEBench (papers/are_saes_useful.md, App. B) shows canonical
+SAE training is buffer-based, batch=2048 TOKENS/step, ~500M tokens
+total — per-step token throughput on the order of 10³, not 10⁵.
+
+Our two patterns at this paper:
+
+| Component | Pattern                             | per-token tokens/step |
+|---|---|---:|
+| C3, C4, C5 | sequence-based (B sentences × all 128 positions) | **131,072** — 5× over SAEBench's 2K canonical |
+| C6, C7    | window-based (B sentences × T positions, T=1 for SAE) | **1,024** — close to SAEBench canonical |
+
+C3/C5's 131K is OVER-batched per-step; C6/C7's 1K is near-canonical.
+The earlier "TXC has 25× FLOPs disadvantage" framing was directionally
+true at C3/C5, but the FIX direction was wrong: bring per-token
+baselines DOWN to T=1 window-based (matching SAEBench + matching
+C6/C7), NOT bring TXC up via MW.
+
+**Han's call (2026-05-05 PM)**: ABORT all 4 MW pivots. Re-train
+per-token baselines at C3 + C5 with the T=1 window-based pattern.
+
+**Your specific abort actions** (do these in this order):
+
+1. **Kill any in-flight C5 MW processes.** If you launched
+   `experiments/c5_steering_filler/run_sweep.sh` (6 parallel cells on
+   GPUs 0..5), kill all of them. PIDs are in `/tmp/p_filler_gpu{0..5}`
+   if the sweep launched.
+   ```bash
+   for f in /tmp/p_filler_gpu*; do kill -TERM "$(cat $f)" 2>/dev/null; done
+   pkill -TERM -f "experiments.c5_steering_filler" || true
+   sleep 2
+   pkill -KILL -f "experiments.c5_steering_filler" || true
+   nvidia-smi --query-gpu=memory.used --format=csv
+   # → expect every GPU <500 MB; if not, force-kill stragglers
+   ```
+   Any landed cells (`txc_base_mw` / `txc_pro_mw` rows in
+   `leaderboard.jsonl`) stay — `canonical_train_keys` filters them out
+   at paper-render time, harmless.
+2. **Set status: idle, awaiting re-purpose.** Do NOT launch any
+   further MW work. Update Current state in this briefing to reflect
+   "STOOD DOWN — awaiting C5 T-SAE baseline re-train directive."
+3. **Your next mission (when re-purposed) will be C5 T-SAE baseline
+   T=1 re-train.** agent_paper is landing the framework change
+   (`train_window_size: int | None` on `preloaded_batch_iter_from_act_cache`
+   + `TrainingConfig`) and will rewrite this briefing to redirect you
+   to the C5 T-SAE re-train (tsae_paper × 3 seeds with
+   `TrainingConfig(train_window_size=1)`). 3 cells parallel on 3 of
+   your 8 A40 GPUs → ~3 hr wall. Wait for the briefing rewrite before
+   resuming. ETA on the rewrite: same session — should be fresh by the
+   time you read this if you `git pull` again.
+
+**The C5 MW deployment directive below this line is RESCINDED.** Do
+not read it as actionable. Left in place for git provenance only.
+
+---
+
+### Mandate — C5 multi-window deployment, parallel [RESCINDED 2026-05-05 PM — see STAND DOWN above]
 
 agent_paper landed `txc_base_mw` and `txc_pro_mw` as separate arch
 identities in `configs/locked_archs.yaml` (decisions.md § 14). They

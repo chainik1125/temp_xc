@@ -58,7 +58,69 @@ surface it in chat, and let Han or agent_paper land the change. Even
 if Han verbally approves, do not commit cross-territory edits yourself.
 This is non-negotiable — see PROTOCOL.md § 8 + CLAUDE.md Hard Rule #7.
 
-### ⚠️ Mission pivot 2026-05-05 PM — abandon C5 MW, deploy C7 MW
+### ⚠️⚠️⚠️ STAND DOWN — MW pivot RESCINDED 2026-05-05 PM ⚠️⚠️⚠️
+
+**Han + agent_paper diagnosed that the MW pivot was solving a misframed
+problem.** SAEBench (papers/are_saes_useful.md, App. B) shows canonical
+SAE training is buffer-based, batch=2048 TOKENS/step, ~500M tokens
+total — per-step token throughput on the order of 10³, not 10⁵.
+
+Our two patterns at this paper:
+
+| Component | Pattern                             | per-token tokens/step |
+|---|---|---:|
+| C3, C4, C5 | sequence-based (B sentences × all 128 positions) | **131,072** — 5× over SAEBench's 2K canonical |
+| C6, C7    | window-based (B sentences × T positions, T=1 for SAE) | **1,024** — close to SAEBench canonical |
+
+C3/C5's 131K is OVER-batched per-step; C6/C7's 1K is near-canonical.
+The earlier "TXC has 25× FLOPs disadvantage" framing was directionally
+true at C3/C5, but at C6 + C7 the per-token baselines were *already*
+at literature scale, so an MW deployment there would OVER-correct.
+
+**Han's call (2026-05-05 PM)**: ABORT all 4 MW pivots. C3 + C5
+per-token baselines re-train at T=1; C6 + C7 are unchanged
+(agent_em's canonical C6 sweep + agent_back's canonical C7 sweep stay
+as the paper headlines).
+
+**Your specific abort actions** (do these in this order):
+
+1. **Kill any in-flight C7 MW processes.** If you launched
+   `experiments/c7_backtracking_mw/run.py`, kill it. Also kill any
+   leftover C5 MW processes from the earlier (already-abandoned) C5
+   pivot.
+   ```bash
+   pkill -TERM -f "experiments.c7_backtracking_mw" || true
+   pkill -TERM -f "experiments.c5_steering" || true
+   sleep 2
+   pkill -KILL -f "experiments.c7_backtracking_mw" || true
+   pkill -KILL -f "experiments.c5_steering" || true
+   nvidia-smi --query-gpu=memory.used --format=csv
+   # → expect <500 MB; if not, force-kill stragglers
+   ```
+   Any landed C7 MW rows (none expected if you didn't smoke yet) stay
+   — `canonical_train_keys` filters them out at paper-render time,
+   harmless. The 1 C5 MW cell that landed earlier
+   (`eval_key=963df9c69213f998`) also stays.
+2. **Status: idle.** Do NOT launch further MW work on this pod. Your
+   pod's CPU-bandwidth issue (briefing commit `e7b229fd`) makes
+   parallel sweeps non-productive anyway; agent_back's canonical C7
+   sweep + agent_em's canonical C6 sweep cover the paper-bearing
+   results.
+3. **No re-purpose for you.** Use remaining session time for
+   paper-writing contributions to c7.md (caveats, methodology
+   bullets) if helpful, but compute work is done. Then
+   `bash scripts/wrap_up_session.sh` and HF backup.
+4. **What replaces MW for C7 fairness** is the recognition that C7's
+   per-token baselines were always at literature scale — agent_back's
+   canonical sweep is already apples-to-apples with TXC at the
+   per-step training-FLOPs axis. No re-train needed at C7.
+
+**The C7 MW deployment directive below this line is RESCINDED.** Do
+not read it as actionable. Left in place for git provenance only.
+
+---
+
+### ⚠️ Mission pivot 2026-05-05 PM — abandon C5 MW, deploy C7 MW [RESCINDED 2026-05-05 PM — see STAND DOWN above]
 
 **Old mission (this morning, abandoned)**: pivot from the original
 100K convergence-test mission to **C5 MW** with `txc_base_mw +
