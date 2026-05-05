@@ -27,8 +27,10 @@
 %       T-SAE                  -> bhalla2025tsae     (verified)
 %       MATH-500               -> hendrycks2021math
 %       TopK SAE               -> gao2024scaling
-%     ``stacked SAE'' has no obvious entry in refs.bib; flagged
-%     inline with \citeneeded{...} for you to fill.
+%     Stacked SAE and TFA dropped from the comparison entirely
+%     (no locked-arch cells trained on C7); the architecture set is
+%     the four TXC training cells {TXC-base, TXC-pro} x {bs=256, bs=1024}
+%     plus three baselines {TopK SAE, T-SAE, MLC}, each at bs=1024 only.
 %
 %  Suggested local commands:
 \providecommand{\citeneeded}[1]{\textcolor{red}{[\textsc{cite:} #1]}}
@@ -54,7 +56,7 @@ Steering vectors are mined from \texttt{meta-llama/Llama-3.1-8B} (the base model
 
 For each cohort question we cut the unsteered Stage~A continuation tokens at $25\%$ of their length, condition the reasoning model on the resulting prefix, and resample the continuation under steering at each of $25$ magnitudes drawn from a grid that is densified between $\pm 0.5$ and $\pm 8$ around the typical peak and sparser at the tails (full grid in \cref{app:c7-grid}). We refer to this as the \textit{cut25} protocol; in pilot experiments it dominated both LLM-judged-cut and full-trace continuation as a consistent measurement strategy. Continuations are sampled with temperature $1.0$ and a token budget of $1024$.
 
-We compare seven architectures, all trained on the same Llama-3.1-8B residual-stream activation cache at layer $10$ with $d_{\text{SAE}} = 32{,}768$ for $n_{\text{steps}} = 300{,}000$ at batch size $1024$: a per-token TopK SAE \cite{gao2024scaling}, a stacked SAE \citeneeded{stacked SAE; not in refs.bib}, TFA \cite{lubana2025priors}, the temporal SAE of \citet{bhalla2025tsae} in its paper-faithful configuration, our TXC-base ($T = 5$, $k_{\text{pos}} = 20$), our TXC-pro ($T_{\max} = 10$, $t_{\text{sample}} = 5$, $k_{\text{pos}} = 20$, Matryoshka with eight nested groups, multi-distance contrastive at shifts $\Delta \in \{1, 2\}$), and a multi-layer crosscoder (MLC) \cite{lindsey2024sparsecrosscoders}.
+We compare five architectures, all trained on the same Llama-3.1-8B residual-stream activation cache at layer $10$ with $d_{\text{SAE}} = 32{,}768$ for $n_{\text{steps}} = 300{,}000$ at batch size $1024$: a per-token TopK SAE \cite{gao2024scaling}, the temporal SAE of \citet{bhalla2025tsae} in its paper-faithful configuration, a multi-layer crosscoder (MLC) \cite{lindsey2024sparsecrosscoders}, our TXC-base ($T = 5$, $k_{\text{pos}} = 20$), and our TXC-pro ($T_{\max} = 10$, $t_{\text{sample}} = 5$, $k_{\text{pos}} = 20$, Matryoshka with eight nested groups, multi-distance contrastive at shifts $\Delta \in \{1, 2\}$). The two TXC architectures are additionally trained at batch size $256$ to disambiguate batch-size effects from architecture effects; the additional batch-size cells are reported in \cref{app:c7-bs-256}.
 
 \paragraph{Inducement metric ($\Delta gc$).}
 For each cell $(\text{architecture}, \text{question}, \text{magnitude})$ we generate a continuation and ask Sonnet~$4.6$ (\texttt{claude-sonnet-4-6}, max output $200$ tokens) to count the number of \textit{genuine} backtracking events in the generated text. The judge rubric distinguishes genuine backtracking (catching an arithmetic error and recomputing, noticing a missing problem constraint, rejecting the current approach in favour of a different method, re-evaluating a wrong assumption) from filler and pseudo-backtracking (conversational ``wait,'' restating the same conclusion, looped emissions); the full prompt is reproduced in \cref{app:c7-judge}. Letting $gc(a, q, m)$ denote the judge's count, we define the architecture-level inducement signal as
@@ -78,7 +80,7 @@ Following \citet{kantamneni2025are}, we assess whether each architecture's featu
 \end{figure}
 
 \paragraph{Headline result (detection).}
-\Cref{tab:c7-pr-auc} reports PR-AUC across the top-$S$ grid for each architecture. The temporal-window dictionaries are competitive with per-token baselines at every value of $S$, with TXC-pro reaching $\txcProPRAUCEight$ at $S = 8$, but the within-cohort variance is comparable to the between-architecture gap and pairwise Wilcoxon tests at $S = 8$ do not pass Holm-Bonferroni correction across the seven architectures. We therefore frame the detection result as ``temporal dictionaries are competitive on probe-accessible information,'' rather than as a strict ordering.
+\Cref{tab:c7-pr-auc} reports PR-AUC across the top-$S$ grid for each architecture. The temporal-window dictionaries are competitive with per-token baselines at every value of $S$, with TXC-pro reaching $\txcProPRAUCEight$ at $S = 8$, but the within-cohort variance is comparable to the between-architecture gap and pairwise Wilcoxon tests at $S = 8$ do not pass Holm-Bonferroni correction across the five architectures. We therefore frame the detection result as ``temporal dictionaries are competitive on probe-accessible information,'' rather than as a strict ordering.
 
 \begin{table}[t]
     \centering
@@ -88,8 +90,6 @@ Following \citet{kantamneni2025are}, we assess whether each architecture's featu
         Architecture & $S\!=\!1$ & $S\!=\!2$ & $S\!=\!4$ & $S\!=\!8$ & $S\!=\!16$ & $S\!=\!32$ \\
         \midrule
         TopK SAE      & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} \\
-        Stacked SAE   & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} \\
-        TFA           & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} \\
         T-SAE         & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} \\
         MLC           & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} \\
         TXC-base      & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} \\
@@ -207,3 +207,8 @@ We note for context the peak $\Delta gc$ values reported in earlier exploratory 
 \label{app:c7-seeds}
 
 The headline numbers in \cref{fig:c7-inducement} and \cref{tab:c7-pr-auc} are reported at a single training seed ($\text{seed} = 42$). We report multi-seed values for the headline cell ($\text{TXC-pro}$ at batch size $1024$) at \todo{$\{1, 2, 42\}$ pending compute availability} and discuss seed-level variance there.
+
+\subsection{TXC at batch size 256}
+\label{app:c7-bs-256}
+
+The two TXC architectures are additionally trained at batch size $256$ for the same $300{,}000$ steps. Comparing peak $\Delta gc$ between the batch-size $256$ and batch-size $1024$ runs of each TXC architecture isolates the contribution of the batch-size choice from the architecture itself. \Cref{tab:c7-bs-256} reports peak $\Delta gc$ and PR-AUC at $S = 8$ for both batch sizes for both TXC architectures; per-magnitude curves are deferred to the supplement.
