@@ -26,6 +26,7 @@ import argparse
 import json
 import logging
 import re
+import subprocess
 from collections import defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
@@ -39,6 +40,9 @@ from temp_bench.config import (  # noqa: E402
     checkpoint_dir,
     purified_root,
 )
+
+# Branch ref to pull Han's c7 leaderboard from in --unified mode.
+HAN_BRANCH = "origin/final"
 
 log = logging.getLogger("c7_paper_renderer")
 
@@ -105,8 +109,59 @@ def load_c7_rows() -> list[dict]:
             continue
         if r.get("component") != "c7":
             continue
+        r["_source"] = "ours"
         rows.append(r)
     return rows
+
+
+def _git_show(branch: str, path: str) -> str | None:
+    """Read ``path`` from ``branch`` via ``git show``; None on error."""
+    try:
+        return subprocess.check_output(
+            ["git", "show", f"{branch}:{path}"],
+            cwd=str(purified_root().parent),
+            stderr=subprocess.DEVNULL,
+        ).decode()
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        return None
+
+
+def load_han_c7_rows(branch: str = HAN_BRANCH) -> list[dict]:
+    """Pull Han's c7 leaderboard rows from ``branch`` (read-only).
+
+    Each row gets ``_source="han"`` so downstream filters can distinguish.
+    Returns [] if the branch / file isn't accessible.
+    """
+    text = _git_show(branch, "purified/results/leaderboard.jsonl")
+    if text is None:
+        log.warning("[c7_paper] could not read %s:purified/results/"
+                    "leaderboard.jsonl — proceeding without Han's rows",
+                    branch)
+        return []
+    rows = []
+    for line in text.splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            r = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if r.get("component") != "c7":
+            continue
+        r["_source"] = "han"
+        rows.append(r)
+    return rows
+
+
+def _han_train_cfg(train_key: str, branch: str = HAN_BRANCH) -> dict:
+    txt = _git_show(branch, f"purified/checkpoints/{train_key}/config.json")
+    if txt is None:
+        return {}
+    try:
+        return json.loads(txt).get("training_cfg") or {}
+    except json.JSONDecodeError:
+        return {}
 
 
 def latest_per_cell(rows: list[dict]) -> list[dict]:
@@ -217,19 +272,26 @@ _TRAIN_CFG_CACHE: dict[str, dict] = {}
 
 def _train_cfg(r: dict) -> dict:
     """Resolve the row's training_cfg by reading checkpoints/<train_key>/config.json
-    (the leaderboard schema does not embed training_cfg at the top level)."""
+    (the leaderboard schema does not embed training_cfg at the top level).
+
+    For Han-side rows (``_source == "han"``), falls back to ``git show
+    origin/final:purified/checkpoints/<train_key>/config.json`` since
+    the checkpoint file does not exist on the local pod.
+    """
     tk = r.get("train_key")
     if not tk:
         return {}
     if tk in _TRAIN_CFG_CACHE:
         return _TRAIN_CFG_CACHE[tk]
-    cfg_path = checkpoint_dir(tk) / "config.json"
     cfg: dict = {}
+    cfg_path = checkpoint_dir(tk) / "config.json"
     if cfg_path.exists():
         try:
             cfg = json.loads(cfg_path.read_text()).get("training_cfg") or {}
         except (json.JSONDecodeError, OSError):
             cfg = {}
+    if not cfg and r.get("_source") == "han":
+        cfg = _han_train_cfg(tk)
     _TRAIN_CFG_CACHE[tk] = cfg
     return cfg
 
@@ -369,6 +431,194 @@ def plot_pr_auc_S8_bar(rows: list[dict], out_path: Path) -> None:
     plt.tight_layout()
     plt.savefig(out_path, dpi=150)
     plt.close()
+
+
+# ── Unified-mode helpers (--unified, pulls Han's leaderboard) ──────────
+
+
+def best_per_arch(rows: list[dict]) -> list[dict]:
+    """Pick the cell with maximum peak Δgc per architecture.
+
+    Ignores extended-mags rows: their "peak" is over a magnitude-restricted
+    subset and isn't comparable to canonical peaks.
+    """
+    by_arch: dict[str, dict] = {}
+    for r in rows:
+        if _is_extended(r):
+            continue
+        arch = r["arch"]
+        peak = r.get("metrics", {}).get("delta_gc_peak")
+        if peak is None:
+            continue
+        cur = by_arch.get(arch)
+        cur_peak = cur.get("metrics", {}).get("delta_gc_peak") if cur else None
+        if cur is None or peak > cur_peak:
+            by_arch[arch] = r
+    return list(by_arch.values())
+
+
+def cell_unified_label(r: dict) -> str:
+    """Verbose label for unified plots: arch + bs + n_steps + source."""
+    arch = PAPER_ARCH_LABEL.get(r["arch"], r["arch"])
+    bs = _bs_from_row(r)
+    ns = _n_steps_from_row(r)
+    src = r.get("_source", "ours")
+    pieces = [arch]
+    if bs is not None:
+        pieces.append(f"bs={bs}")
+    if ns is not None:
+        pieces.append(f"{ns//1000}K" if ns >= 1000 else f"{ns}")
+    if src == "han":
+        pieces.append("[Han]")
+    return " ".join(pieces)
+
+
+def plot_unified_headline(rows: list[dict], out_path: Path) -> None:
+    """Best-cell-per-arch Δgc-vs-magnitude — one curve per architecture
+    at whatever training config gave it the highest peak. Legend includes
+    the source (Han vs ours) and training-config tag for each curve."""
+    best = best_per_arch(rows)
+    plt.figure(figsize=(8.5, 5.0))
+    ordered = sorted(best, key=lambda r: PAPER_ARCH_ORDER.index(r["arch"])
+                     if r["arch"] in PAPER_ARCH_ORDER else 99)
+    for r in ordered:
+        pairs = parse_mag_metrics(r["metrics"])
+        if not pairs:
+            continue
+        mags = [m for m, _ in pairs]
+        deltas = [d for _, d in pairs]
+        # One curve per arch in the headline figure → use the per-arch
+        # color rather than per-cell (we don't want bs-shading here).
+        color = PAPER_ARCH_COLOR.get(r["arch"], "#333333")
+        plt.plot(mags, deltas, marker="o", markersize=4, linewidth=1.7,
+                 color=color, linestyle="-",
+                 label=cell_unified_label(r))
+    plt.axhline(0, color="black", linewidth=0.5, alpha=0.5)
+    plt.axvline(0, color="black", linewidth=0.5, alpha=0.5)
+    plt.xlabel("Steering magnitude $m$")
+    plt.ylabel(r"$\Delta gc(a, m)$  (per-question baseline at $m=0$)")
+    plt.title(r"Inducement headline: best cell per architecture (unified)")
+    plt.legend(fontsize=8, loc="best", ncol=2)
+    plt.grid(alpha=0.3)
+    plt.tight_layout()
+    plt.savefig(out_path, dpi=150)
+    plt.close()
+
+
+def plot_unified_peak_bar(rows: list[dict], out_path: Path) -> None:
+    """Bar chart of peak Δgc, best cell per arch, with config annotation."""
+    best = best_per_arch(rows)
+    best.sort(key=lambda r: r["metrics"].get("delta_gc_peak", 0.0))
+    labels = [cell_unified_label(r) for r in best]
+    peaks = [r["metrics"].get("delta_gc_peak", 0.0) for r in best]
+    colors = [PAPER_ARCH_COLOR.get(r["arch"], "#333333") for r in best]
+    plt.figure(figsize=(9.0, max(3.5, 0.45 * len(best) + 1.5)))
+    bars = plt.barh(labels, peaks, color=colors, alpha=0.85)
+    for r, bar in zip(best, bars):
+        peak = r["metrics"].get("delta_gc_peak", 0.0)
+        peak_mag = r["metrics"].get("delta_gc_peak_magnitude")
+        plt.text(bar.get_width() + 0.01, bar.get_y() + bar.get_height() / 2,
+                 f" {peak:.3f} (m={peak_mag:+g})" if peak_mag is not None
+                 else f" {peak:.3f}",
+                 va="center", fontsize=9)
+    plt.axvline(0, color="black", linewidth=0.5)
+    plt.xlabel(r"Peak $\Delta gc$")
+    plt.title(r"Peak $\Delta gc$ per architecture (unified, best cell)")
+    plt.tight_layout()
+    plt.savefig(out_path, dpi=150)
+    plt.close()
+
+
+def plot_sprint_vs_extended_comparison(rows: list[dict], out_path: Path) -> None:
+    """Per-arch overlay of best sprint cell + best extended cell so the
+    token-budget sensitivity is visible at a glance.
+
+    Sprint = n_steps < 50K (Han's runs); extended = n_steps >= 100K (ours).
+    Only archs that appear in BOTH bins are plotted.
+    """
+    by_arch: dict[str, dict[str, dict]] = {}
+    for r in rows:
+        if _is_extended(r):
+            continue
+        ns = _n_steps_from_row(r)
+        if ns is None:
+            continue
+        arch = r["arch"]
+        bin_ = "sprint" if ns < 50_000 else "extended"
+        peak = r.get("metrics", {}).get("delta_gc_peak", -float("inf"))
+        slot = by_arch.setdefault(arch, {})
+        cur = slot.get(bin_)
+        cur_peak = cur.get("metrics", {}).get("delta_gc_peak", -float("inf")) if cur else -float("inf")
+        if cur is None or peak > cur_peak:
+            slot[bin_] = r
+
+    plotted = 0
+    plt.figure(figsize=(9.0, 5.5))
+    for arch in PAPER_ARCH_ORDER + ["tfa", "stacked_sae"]:
+        bins = by_arch.get(arch)
+        if not bins or "sprint" not in bins or "extended" not in bins:
+            continue
+        color = PAPER_ARCH_COLOR.get(arch, "#333333")
+        sprint = bins["sprint"]
+        extended = bins["extended"]
+        sp_pairs = parse_mag_metrics(sprint["metrics"])
+        ex_pairs = parse_mag_metrics(extended["metrics"])
+        if sp_pairs:
+            mags, deltas = zip(*sp_pairs)
+            ns = _n_steps_from_row(sprint) or 0
+            plt.plot(mags, deltas, color=color, linestyle="--", linewidth=1.4,
+                     alpha=0.75, marker="x", markersize=5,
+                     label=f"{PAPER_ARCH_LABEL.get(arch, arch)} sprint ({ns//1000}K)")
+        if ex_pairs:
+            mags, deltas = zip(*ex_pairs)
+            ns = _n_steps_from_row(extended) or 0
+            plt.plot(mags, deltas, color=color, linestyle="-", linewidth=1.6,
+                     marker="o", markersize=4,
+                     label=f"{PAPER_ARCH_LABEL.get(arch, arch)} extended ({ns//1000}K)")
+        plotted += 1
+    if plotted == 0:
+        plt.close()
+        return
+    plt.axhline(0, color="black", linewidth=0.5, alpha=0.5)
+    plt.axvline(0, color="black", linewidth=0.5, alpha=0.5)
+    plt.xlabel("Steering magnitude $m$")
+    plt.ylabel(r"$\Delta gc(a, m)$")
+    plt.title(r"Token-budget sensitivity: sprint (dashed) vs extended (solid) per arch")
+    plt.legend(fontsize=8, loc="best", ncol=2)
+    plt.grid(alpha=0.3)
+    plt.tight_layout()
+    plt.savefig(out_path, dpi=150)
+    plt.close()
+
+
+def _table_unified_headline(rows: list[dict]) -> str:
+    """Best-cell-per-arch markdown table for unified rendering."""
+    best = best_per_arch(rows)
+    best.sort(key=lambda r: -r["metrics"].get("delta_gc_peak", 0.0))
+    headers = ["Arch", "Source", "bs", "$n_{\\text{steps}}$",
+               "Peak $\\Delta gc$", "Peak mag",
+               "PR-AUC@8", "PR-AUC@32"]
+    lines = ["| " + " | ".join(headers) + " |",
+             "|" + "|".join(["---"] * len(headers)) + "|"]
+    for r in best:
+        m = r["metrics"]
+        ns = _n_steps_from_row(r)
+        bs = _bs_from_row(r)
+        src = r.get("_source", "ours")
+        lines.append("| " + " | ".join([
+            PAPER_ARCH_LABEL.get(r["arch"], r["arch"]),
+            "Han" if src == "han" else "ours",
+            str(bs) if bs is not None else "?",
+            f"{ns:,}" if ns is not None else "?",
+            fmt_num(m.get("delta_gc_peak")),
+            fmt_num(m.get("delta_gc_peak_magnitude"), precision=1),
+            fmt_num(m.get("pr_auc_S8")),
+            fmt_num(m.get("pr_auc_S32")),
+        ]) + " |")
+    return "\n".join(lines)
+
+
+# ── (back to existing single-source helpers) ──────────────────────────
 
 
 def _enumerate_probe_cells() -> list[tuple[str, int, str, list[dict]]]:
@@ -553,7 +803,8 @@ def _table_per_magnitude(rows: list[dict]) -> str:
 
 
 def write_markdown(rows: list[dict], *, canonical: list[dict] | None = None,
-                   assets_rel: str, out_path: Path) -> None:
+                   assets_rel: str, out_path: Path,
+                   unified_rows: list[dict] | None = None) -> None:
     if canonical is None:
         canonical = canonical_rows(rows)
     now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
@@ -639,6 +890,35 @@ def write_markdown(rows: list[dict], *, canonical: list[dict] | None = None,
     md.append(f"![Dead features vs training step (log-log)]({assets_rel}/dead_vs_step_loglog.png)")
     md.append("")
 
+    if unified_rows is not None:
+        n_han = sum(1 for r in unified_rows if r.get("_source") == "han")
+        md.append("## Unified comparison (Han + ours)")
+        md.append("")
+        md.append(f"_Pulled {n_han} additional row(s) from `{HAN_BRANCH}:purified/results/leaderboard.jsonl` "
+                  f"(read-only; merged at render time)._")
+        md.append("")
+        md.append("### Best cell per architecture (across both pods)")
+        md.append("")
+        md.append(_table_unified_headline(unified_rows) if unified_rows
+                  else "_(No unified cells yet.)_")
+        md.append("")
+        md.append(f"![Best-cell-per-arch Δgc vs magnitude (unified)]"
+                  f"({assets_rel}/delta_gc_unified_headline.png)")
+        md.append("")
+        md.append(f"![Peak Δgc per arch (unified)]"
+                  f"({assets_rel}/peak_delta_gc_unified_bar.png)")
+        md.append("")
+        md.append("### Token-budget sensitivity (sprint vs extended)")
+        md.append("")
+        md.append("For architectures evaluated at BOTH a sprint config "
+                  "(`n_steps < 50K`, Han's pod) and an extended config "
+                  "(`n_steps >= 100K`, our pod), the per-magnitude curves are "
+                  "overlaid below. Dashed = sprint, solid = extended.")
+        md.append("")
+        md.append(f"![Sprint vs extended comparison]"
+                  f"({assets_rel}/sprint_vs_extended_comparison.png)")
+        md.append("")
+
     md.append("## Per-cell metadata")
     md.append("")
     md.append("| Arch | bs | n_steps | seed | train_key | eval_key | ts |")
@@ -667,7 +947,7 @@ def write_markdown(rows: list[dict], *, canonical: list[dict] | None = None,
 # ── Driver ─────────────────────────────────────────────────────────────
 
 
-def main(*, output_dir: Path) -> None:
+def main(*, output_dir: Path, unified: bool = False) -> None:
     logging.basicConfig(level=logging.INFO,
                         format="[%(asctime)s] %(message)s",
                         datefmt="%H:%M:%S")
@@ -696,8 +976,26 @@ def main(*, output_dir: Path) -> None:
         plot_pr_auc_S8_bar(canonical, assets_dir / "pr_auc_S8_bar.png")
         plot_probe_curves(rows, assets_dir)
 
+    # ── --unified mode: pull Han's c7 leaderboard via git show ─────────
+    unified_rows: list[dict] | None = None
+    if unified:
+        han_rows = load_han_c7_rows()
+        log.info("[c7_paper] unified mode: %d Han rows, %d ours rows",
+                 len(han_rows), len(all_rows))
+        # Merge + dedupe by (arch, train_key, eval_key) — each pod's cells
+        # carry distinct train_keys (different training_cfg), so no collision.
+        unified_rows = latest_per_cell(all_rows + han_rows)
+        # New plots — write next to the single-source ones; existing
+        # plots are unchanged so the live paper-loop diff stays minimal.
+        plot_unified_headline(unified_rows,
+                              assets_dir / "delta_gc_unified_headline.png")
+        plot_unified_peak_bar(unified_rows,
+                              assets_dir / "peak_delta_gc_unified_bar.png")
+        plot_sprint_vs_extended_comparison(
+            unified_rows, assets_dir / "sprint_vs_extended_comparison.png")
+
     write_markdown(rows, canonical=canonical, assets_rel="c7_paper_assets",
-                   out_path=md_path)
+                   out_path=md_path, unified_rows=unified_rows)
     log.info("[c7_paper] wrote %s", md_path)
 
 
@@ -706,8 +1004,16 @@ def cli():
     ap.add_argument("--output-dir", type=Path, required=True,
                     help="Destination directory (will contain c7_paper_results.md "
                          "and c7_paper_assets/).")
+    ap.add_argument("--unified", action="store_true",
+                    help=f"Pull c7 leaderboard rows from {HAN_BRANCH} (read-only "
+                         "via `git show`) and render additional unified plots: "
+                         "delta_gc_unified_headline.png, "
+                         "peak_delta_gc_unified_bar.png, "
+                         "sprint_vs_extended_comparison.png. The existing "
+                         "single-source plots stay unchanged so the live "
+                         "paper-loop diff is minimal.")
     args = ap.parse_args()
-    main(output_dir=args.output_dir)
+    main(output_dir=args.output_dir, unified=args.unified)
 
 
 if __name__ == "__main__":
