@@ -104,10 +104,40 @@ Your first mission is to decide on the following:
 
 ## Current state (agent owns — overwrite at every compact)
 
-**Last verified: 2026-05-05 PM, mid-MW-pivot-abort.**
+**Last verified: 2026-05-05 PM, post-execution. 5-step plan COMPLETE.**
 
-⚠️ **CRITICAL — post-compact me MUST execute the abort + re-train plan
-before doing anything else.** See "Next action" for the 5-step list.
+The MW pivot is fully aborted across all 4 agents; replacement
+literature-aligned baseline re-train infrastructure is live; new
+mission directives are deployed to agent_nlp + agent_em_100k +
+agent_filler. Now waiting for the C3+C5 baseline cells to land.
+
+**Sequence (all post-compact, this session)**:
+
+- 5-step plan landed in 3 commits — `dd5f773e` (4 stand-downs),
+  `15ad0de4` (framework change: `train_window_size` on
+  preloaded_batch_iter + TrainingConfig + 5 new tests, 136/136
+  green), `74dc2cd9` (decisions § 14 dep + § 15 add + 4 briefing
+  rewrites + 2 driver pass-throughs).
+- Agents acted on stand-down on their own pods: agent_em_100k
+  (`3f53791a` killed C3 MW sweep, status idle), agent_em
+  (`b549d91c` acknowledged + canonical mission complete + wrap-up).
+  agent_filler + agent_steer_100k will see the abort on next pull.
+- Framework: `train_window_size: int | None = None` plumbing.
+  Default None preserves all existing train_keys (verified by
+  `model_dump(exclude_none=True)` test). Setting an int gets a
+  fresh key.
+- Re-train scope (per-arch literature-faithful T at batch_size=1024):
+  - **C3 TopK** (agent_nlp, 2× H100 with borrowed GPU 1): T=1.
+    3 trainings + 6 evals. Wall ~2.4 hr.
+  - **C3 T-SAE** (agent_em_100k, 1× H100): T=2 (Bhalla/Ye 2025
+    §3.1 paper-faithful adjacent pairs). 3 trainings + 6 evals.
+    Wall ~4.5 hr.
+  - **C5 T-SAE** (agent_filler, 8× A40 parallel): T=2. 3 cells.
+    Wall ~45-60 min.
+  - C6 + C7 baselines unchanged (already at literature scale).
+  - All TXC cells unchanged.
+- C7 T-SAE keeps T=5 (agent_back's `_spec_window_size` fallback);
+  framework supports both.
 
 The full state of the world:
 
@@ -152,10 +182,27 @@ The full state of the world:
 - Tests: 131/131 (last verified before pivot decision).
 - All 9 + 2 (MW) archs in YAML; framework integrity holds.
 
-## ⚠️ Next action — execute the MW abort + T=1 baseline re-train (post-compact)
+## Next action — wait for re-trained baselines + integrate at paper-render
 
-These steps must execute in this order. **Han has BLESSED the plan**
-— don't re-litigate; execute.
+The 5-step abort + re-train infrastructure is fully landed and pushed.
+Remaining work for me:
+
+1. **Wait for the 3 baseline re-train sweeps to land** (agent_nlp C3
+   TopK ~2.4 hr, agent_em_100k C3 T-SAE ~4.5 hr, agent_filler C5
+   T-SAE ~45-60 min). When each agent commits results, leaderboard
+   rows show up under fresh train_keys (T=1 or T=2 set on
+   TrainingConfig).
+2. **Integrate at paper-render time**: agent_nlp / agent_steer
+   re-render their c3.md / c5.md AUTO-RESULTS using the
+   per-arch-family `canonical_train_keys` filter (recipes in the
+   directive notes I added to their briefings). Old over-batched
+   cells stay in the leaderboard for diff comparison.
+3. **Watch for late agent_back C7 v4 sweep results** — those should
+   continue landing throughout the day. C7 T-SAE keeps T=5 (their
+   existing convention); the framework supports both T=2 (C3/C5)
+   and T=5 (C7) cleanly.
+
+**Past plan kept here for reference (executed):**
 
 ### Step 1 — stand-down directives (4 worker briefings)
 
@@ -258,16 +305,41 @@ agent_steer owns C5 — same situation but only T-SAE is affected
 
 Newest first.
 
-- 2026-05-05 PM: Han + agent_paper diagnosed that the MW deployment
-  was solving a misframed problem. SAEBench appendix (papers/
-  are_saes_useful.md App. B) confirms canonical SAE training is
-  batch=2048 TOKENS/step (buffer-based). C3/C5's sequence-based
-  pattern over-batches per-token archs by ~5× vs canonical; C6/C7's
-  window-based pattern is close to canonical. Han blessed: abort all
-  4 MW pivots, re-train C3+C5 baselines at T=1 window-based.
-- 2026-05-05 PM: 4 MW pivots had been launched/briefed earlier today —
-  agent_em, agent_em_100k, agent_filler, agent_steer_100k. ALL TO
-  BE ABORTED in step 1 of Next action.
+- 2026-05-05 PM (post-compact): EXECUTED the 5-step abort + re-train
+  plan in 3 commits.
+  - `dd5f773e` STAND DOWN — wrote ABORT blocks at top of "Han
+    decisions" in all 4 MW briefings. Agents on remote pods saw it
+    on next pull and acted (agent_em_100k killed PID 17963;
+    agent_em acknowledged + wrapped up canonical mission).
+  - `15ad0de4` framework change — `train_window_size: int | None`
+    on `preloaded_batch_iter_from_act_cache` + `TrainingConfig` +
+    5 new tests. Switched `compute_train_key` to
+    `model_dump(exclude_none=True)` so default-None preserves all
+    existing train_keys (load-bearing: in-flight C3 topk_sae sweep
+    + C7 v4 sweep keep their cache). 136/136 tests green.
+  - `74dc2cd9` directives + plumbing — decisions § 14 deprecated +
+    § 15 added (per-arch literature-faithful T sizes:
+    topk_sae @ T=1, tsae_paper @ T=2 from Bhalla/Ye 2025 §3.1
+    paper-faithful adjacent pairs); 4 briefing rewrites
+    (agent_em_100k → C3 T-SAE, agent_filler → C5 T-SAE, agent_nlp +
+    agent_steer get directive notes); 2 driver pass-throughs
+    (`c3_probing/run.py` and `c5_steering/run.py` both pipe
+    `training_cfg.train_window_size` to the helper;
+    `run_one_cell` accepts the kwarg).
+- 2026-05-05 PM: Han redirected mid-execution: "agent_nlp's other
+  H100 is free since agent_em is idle; therefore agent_nlp and
+  agent_em_100k should work TOGETHER to recover the baselines no?"
+  → split C3 baseline re-train: agent_nlp takes TopK T=1 on borrowed
+  GPU 1 (their existing TopK T=None sweep on GPU 0 finishes as
+  diff-reference); agent_em_100k takes T-SAE T=2 only.
+- 2026-05-05 PM: Han redirected on T-SAE: "we want tsae T=2 for C3 C4
+  and C5; for C7 can leave at T=5; both need to be supported." →
+  framework already supports both via the Optional `train_window_size`
+  field. Two TSAE train_keys live in the leaderboard (T=2 for C3/C4/C5,
+  T=5 for C7's existing convention).
+- 2026-05-05 PM: Han clarified: "I meant 1024 BATCH SIZE not effective
+  tokens! for everything!" → `batch_size=1024` uniform across archs;
+  per-arch T varies per-arch literature spec.
 - 2026-05-05 ~11 AM: refreshed agents/README.md to current state
   (commit `0c62caa3`), updated agent_filler briefing (commit
   `305cf279`), agent_steer_100k pivot to C7 MW (commit `cd3020c9`).
