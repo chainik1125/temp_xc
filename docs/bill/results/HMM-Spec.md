@@ -416,6 +416,52 @@ Key findings:
 
 Full writeup: [[../../../docs/dmitry/results/rho_k_sweep_summary]].
 
+### Local vs global recovery (analogue of Fig 8) on the coupled bench
+
+> **Caveat: bench mismatch.** Bill's Fig 8 is on the **uncoupled** HMM
+> with stochastic emissions (this doc above). The figure below is the
+> closest analogue we have for the four arches we just ran — but it's
+> on Han's **coupled** HMM (deterministic emissions), the data of which
+> lives in [[../../dmitry/case_studies/coupled_features/hmm_spec]]. The
+> y/x conceptual mapping carries over (local-x, global-y) but the
+> mechanism producing global structure is different (within-token
+> OR-coupling instead of stochastic-emission denoising). The fig8-on-
+> Bill's-noisy-bench equivalent for these arches is queued as the noisy
+> + overlapping sweep.
+
+![eAUC vs gAUC scatter](hmm_spec_eauc_vs_gauc.png)
+
+Each point is one (arch, ρ, k_pos) cell from the coupled ρ × k sweep
+(33 of 39 cells at the time of plotting; the rest still running). x-axis
+= local AUC (decoder cosine vs the M=20 emission directions f_m), y-axis
+= global AUC (decoder cosine vs the K=10 hidden mixture directions
+h_feat_k). Marker shape encodes ρ; marker color encodes architecture;
+the number inside each marker is the raw window-level k.
+
+Three things to read off:
+
+- **Almost every cell sits far above the y=x diagonal**, including all
+  per-token regular SAE points. The OR-coupling makes h_feat_k a more
+  efficient code than f_m at this dictionary size (d_sae=40), so all
+  models naturally compress toward the global directions — even without
+  any temporal information. This is the same point as the within-token
+  co-firing argument in Han's [[hmm_spec]] §"Why per-token recovery of
+  h_feat_k works".
+- **The few cells near the diagonal are all at high raw_k**: TXCDR-T2
+  at k_pos=10 (raw_k=20) drops gAUC while eAUC stays high — local
+  dominates only when the budget exceeds typical firings/token. Same
+  budget-vs-firings threshold story we hit in the rho_k_sweep.
+- **ρ-stratification is clean for window encoders.** TXCDR-T5 (red) and
+  TXC-pro (blue) ρ=0.0 circles cluster lower-left; the same arches at
+  ρ=0.9 (diamonds) cluster at the very top. For regular SAE (gray) ρ
+  matters much less — its gAUC is determined by within-token co-firing,
+  not temporal correlation.
+
+Once the noisy + overlapping sweep finishes, we'll have the
+*on-Bill's-bench* analogue (uncoupled, stochastic emissions) and the
+plot can include a per-feature single-latent correlation scatter that
+matches Fig 8 axis-for-axis.
+
 ### HMM denoising sweep (Fig 8–9)
 
 The asymmetric-emission bench (`p_B = 0.625`, heterogeneous per-feature
