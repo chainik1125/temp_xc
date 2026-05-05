@@ -602,10 +602,12 @@ on /workspace until you push them).
 
 ## Current state (agent owns — overwrite at every compact)
 
-**Last verified: 2026-05-05T10:35Z. 7 of 8 cells DONE. Final cell
-TXC seed=1 7B-medical launched 10:34, ETA cell complete ~13:14.
-Pattern HOLDS: TXC > SAE on every cell. Mean gap larger on 7B-medical
-(-6.14) than 14B-finance (-3.25).**
+**Last verified: 2026-05-05T12:45Z. 7 of 8 canonical cells DONE.
+Final cell TXC seed=1 7B-medical at stage 4 feat 1/3 α 4/27, ETA
+~13:00. Pattern HOLDS: TXC > SAE on every cell. Mean gap larger on
+7B-medical (-6.14) than 14B-finance (-3.25). c6.md hand-curated
+sections refreshed (commit `043b6f87`); AUTO-RESULTS rendered for
+7/8. NEW MISSION: MW deployment after final cell + re-render.**
 
 **Headline (full Wang, eval_protocol_version=2.0.0, n=2 paired seeds):**
 
@@ -742,78 +744,109 @@ Bricken trajectory during 14B TXC training: ~50 fires over 25 k steps
 
 ## What I just did (agent owns — overwrite)
 
-Full-Wang sweep (2026-05-04 → 2026-05-05). Started 12:48 UTC on
-2026-05-04 with the abbreviated→full Wang port; now 7/8 cells done.
+Two missions stacked: (A) canonical full-Wang sweep — 7/8 cells done;
+(B) MW driver scaffold — landed, ready to launch after canonical.
 
-- **Wang full port** (`09866e53`, `144a3e84`): added stages 2 + 3 +
-  full 27-α stage 4 to `src/temp_bench/case_studies/em.py` (+ shared
-  `_run_alpha_cell` + `_persist_judge_outputs` helpers). New
-  `WangFull` dataclass + `run_wang_full` orchestrator chain stages
-  1→2→3→4. EVAL_PROTOCOL_VERSION bumped to "2.0.0". `run_wang_minimal`
+(A) Canonical sweep (2026-05-04 → 2026-05-05):
+
+- **Wang full port** (`09866e53`, `144a3e84`): stages 2 + 3 + 27-α
+  stage 4. EVAL_PROTOCOL_VERSION bumped to "2.0.0". `run_wang_minimal`
   preserved for diff-against-abbreviated.
-- **TrainingConfig refresh** (`bdb88829`): switched
-  `make_training_cfg` to default-construct `TrainingConfig()` per
-  decisions § 12 (batch=1024, n_steps=25_000, plateau_off). Only
-  C6-specific overrides (bricken_enabled=True, ema_auxk_alpha=1/8,
-  dead_threshold_tokens=128_000) for txc_base.
-- **7B-medical datasource added**:
-  `qwen_2_5_7b_instruct_medical_l15_resid_post` in
-  `configs/datasources.yaml` (commit `144a3e84`). Adapter
-  `andyrdt/Qwen2.5-7B-Instruct_bad-medical` (PEFT LoRA, verified
-  via list_repo_files). Probe corpus
-  `cfierro/personality-qs-bad-medical-advice` (medical mirror of
-  cfierro finance). Layer 15 = relative-depth match for L24 on 14B.
-- **`canonical_train_keys` filter wired** (commit `f34e84db`):
-  c6 analysis.py calls helper twice (sae_arditi + txc_base each
-  with their own canonical TrainingConfig), unions to 8 keys.
-- **`.clone()` preload patch** (commit `48023e5a`): replaces mmap
-  read in `_build_batch_iter` with a CPU torch tensor preload.
-  ~1.4× trainer speedup. Determinism preserved.
-- **8 cells run** at full Wang batch=1024:
-  - 4 × 14B-finance: SAE & TXC × seeds 42, 1 — all DONE.
-  - 4 × 7B-medical: SAE seeds 42, 1 + TXC seed=42 — DONE; TXC seed=1
-    in flight (final cell, ETA ~13:14).
-- **2 incidents recovered**:
-  - SAE seed=42 7B initial run crashed on stale jsonl conflict
-    markers (`<<<<<<<`/`=======`/`>>>>>>>` lines from earlier rebase
-    resolutions). Cleaned via dedupe + JSON-validate (commit
-    `934445c0`); train cache hit on retry.
-  - TXC seed=42 7B initial Wang ran during the Anthropic API
-    credit-balance outage (06:36-07:38 UTC); all judge calls
-    returned 400. Process died at stage-3 baseline check
-    (RuntimeError); Han topped up; retry succeeded (commit
-    `541556fa`).
-- **Tests**: 124/124 green throughout (added 4 from agent_nlp's
-  preloaded_batch_iter test suite).
-- **c6.md status**: reverted to `running`; Hypothesis trimmed to
-  1-2 sentences pending re-test data; Setup section updated to the
-  12-cell (now n=2 → 8-cell) plan with Claude judge.
+- **TrainingConfig refresh** (`bdb88829`): default-construct +
+  brickenauxk_a8 override only (decisions § 12).
+- **7B-medical datasource added** (commit `144a3e84`):
+  `qwen_2_5_7b_instruct_medical_l15_resid_post` (Qwen-7B + andyrdt
+  bad-medical LoRA + cfierro medical mirror; L15 relative-depth
+  match for L24 on 14B).
+- **`canonical_train_keys` filter** wired into c6 analysis.py
+  (`f34e84db`). 8 keys (2 archs × 2 seeds × 2 organisms).
+- **`.clone()` preload patch** (`48023e5a`): ~1.4× trainer speedup.
+- **7 of 8 cells run** at full Wang batch=1024 / 25K:
+  - 4 × 14B-finance (SAE + TXC × seeds 42, 1) — all DONE.
+  - 4 × 7B-medical (SAE seeds 42, 1 + TXC seed=42) — DONE.
+  - TXC seed=1 7B-medical: in flight (bash `bqp1ssnty`),
+    stage 4 feat 1/3 α 4/27 at 12:43Z, ETA ~13:00.
+- **2 incidents recovered**: jsonl conflict-marker crash (cleanup
+  in `934445c0`); Anthropic API credit-balance outage 06:36-07:38
+  (defensive RuntimeError caught it; train cache hit on retry,
+  commit `541556fa`).
+
+(B) MW deployment scaffold (2026-05-05 PM, post-canonical mission):
+
+- **MW driver landed** (commit `03facd49`):
+  - `experiments/c6_em_mw/run.py` (~290 lines): full-sequence
+    `_build_full_seq_batch_iter`, `make_mw_training_cfg` (with
+    `bricken_resample_every=5000` per § 14 rate-eq), `my_train_fn_mw`
+    (asserts `_multi_window=True`), `main()` with --datasource +
+    --seeds CLI.
+  - `experiments/c6_em/train.py:_instantiate_with_overrides`
+    extended to apply brickenauxk_a8 overrides for `txc_base_mw`
+    too (one-line change).
+  - Eval pipeline UNCHANGED — reuses `make_eval_fn` from c6_em/run.py
+    at protocol "2.0.0".
+
+(C) c6.md hand-curated refresh (commit `043b6f87`):
+
+- Hypothesis trimmed (was forward-looking on R1 30k; now points at
+  AUTO-RESULTS).
+- "Existing evidence" + "Salvageable contributions" renamed to
+  "Reference numbers (wasteland — for context only)" per PROTOCOL §7.
+- Setup completely rewritten: drop R32 + drop txc_pro + add 7B-medical
+  + add txc_base_mw + add MW Bricken-rate caveat + add the n=2 cut
+  rationale + Hardware section with GPU 1 pin.
+- Caveats: drop the obsolete "Mixed is judge-agnostic" pre-judgment;
+  add bullets on per-step FLOPs asymmetry (motivating MW), n=2 cost,
+  abbreviated-Wang flaw resolution.
+- Reproduction: TBD → real bash recipe with both canonical + MW
+  drivers.
+- Provenance: split into external (em-nanda + papers) and internal
+  (final-branch commits).
+- AUTO-RESULTS rendered for 7/8 cells via direct
+  `experiments.c6_em.analysis.run_analysis()` + `_replace_auto_results`.
+  Bypassed the framework's `report.render(component='c6')` because
+  3 c6_* dirs trip the "one dir per component" check (see Open
+  questions below).
+- analysis.py:_decision fixed to use `abs(gap)` for band classification
+  (negative gap = TXC wins). Decision now correctly classifies
+  -6.14 as "Mixed" not "Tied".
+
+(D) Tests: 131/131 green (124 + 7 from agent_paper's MW addition).
 
 ## Next action (agent owns — overwrite)
 
-1. **Wait for TXC seed=1 7B-medical to finish** (final cell, bash
-   ID `bqp1ssnty`, ETA ~13:14 UTC). Wakeup scheduled.
-2. **Render AUTO-RESULTS** (task #27): `bash scripts/c6_render_and_push.sh`
-   or directly `from temp_bench import report; report.render(component="c6")`.
-   The renderer already filters on `canonical_train_keys` + 2.0.0
-   protocol; output in `docs/components/c6.md`.
-3. **Apply decision tree** to mean gaps:
-   - 14B-finance n=2: mean -3.25 → "Tied" (TXC narrowly wins).
-   - 7B-medical n=2: pending TXC seed=1; seed=42 alone shows -6.14
-     ("Mixed" / TXC wins).
-   - Pair framing: pattern is consistent across organisms — TXC
-     beats SAE, magnitude grows on smaller subject model.
-4. **Lock c6.md Hypothesis** to the data-driven outcome (1-2
-   sentences per PROTOCOL §7). Set `status: complete`.
-5. **HF backup** (persistent pod): `bash scripts/wrap_up_session.sh`
-   prints the upload recipe for every checkpoint not yet on HF
-   (PROTOCOL § 9). Required before letting Han stop the pod —
-   judge_outputs.jsonl + .safetensors are local-only until pushed.
-   8 new checkpoints to push:
-   - 14B: `9778d10381696f58` `754166d1711923c1` `5e4e188045d5d3c8`
-     `672dbf61896f7843`
-   - 7B:  `c0da3ed8794554a1` `88a4ddf6819d8057` `9b011dfeea88f8af`
-     + final TXC seed=1 7B once landed.
+1. **Wait for TXC seed=1 7B-medical to finish** (bash `bqp1ssnty`,
+   stage 4 feat 1/3 α 4/27 at 12:43Z, ETA ~13:00 UTC).
+2. **Re-render AUTO-RESULTS** with the 8-cell complete data:
+   ```python
+   from experiments.c6_em.analysis import run_analysis
+   from temp_bench.report import _replace_auto_results, _component_md
+   _replace_auto_results(_component_md('c6'), run_analysis().markdown)
+   ```
+   (Bypass `report.render` because of the multi-dir issue — see OQ #1.)
+3. **Commit + push** the final canonical leaderboard row + checkpoint
+   + judge_outputs + re-rendered c6.md.
+4. **MW smoke test** (task #28): `n_steps=200` cell to verify
+   `experiments.c6_em_mw.run` end-to-end.
+5. **MW 4-cell sweep** (task #29):
+   ```bash
+   TQDM_DISABLE=1 .venv/bin/python -m experiments.c6_em_mw.run
+   ```
+   Iterates txc_base_mw × seeds (1, 42) × organisms
+   (14B-finance, 7B-medical) sequentially. Per-cell ETA ~6-7 hr (14B)
+   / ~4-5 hr (7B). Total ~21-23 hr serial on GPU 1. agent_nlp's
+   topk_sae sweep still occupies GPU 0 (45 GB used at 12:36Z) —
+   parallel via run_on_gpu.sh not available.
+6. **After MW lands**: re-render c6.md AUTO-RESULTS again (the
+   analysis.py `canonical_train_keys` filter will now see 12 keys
+   = 8 canonical + 4 MW; both protocol "2.0.0"). Apply decision
+   tree to MW means.
+7. **Lock c6.md Hypothesis + status** (1-2 sentences per PROTOCOL §7,
+   set `status: complete`) once MW is in.
+8. **HF backup** before pod-stop: `bash scripts/wrap_up_session.sh`
+   prints upload recipe for every checkpoint (PROTOCOL § 9). Currently
+   8 canonical checkpoints (4 × 14B + 4 × 7B) + 4 MW checkpoints
+   (when they land) = 12 to push. judge_outputs.jsonl files local-only
+   until pushed.
 
 ## Don't repeat (agent owns — overwrite)
 
@@ -847,18 +880,23 @@ Full-Wang sweep (2026-05-04 → 2026-05-05). Started 12:48 UTC on
 
 ## Open questions for Han (agent owns — overwrite)
 
-(All prior OQs resolved 2026-05-04: hparams landed, judge=Claude,
-Wang abbreviation flagged + ported, 7B adapter
-`andyrdt/Qwen2.5-7B-Instruct_bad-medical` confirmed, probe corpus
-`cfierro/personality-qs-bad-medical-advice` accepted as 7B mirror,
-α grid copied from Dmitry verbatim.)
-
-None outstanding. Next surface point: **render AUTO-RESULTS + lock
-c6.md Hypothesis** once the final TXC seed=1 7B cell lands. If the
-mean 7B gap is in the "Mixed" band (3-9), the paper framing is
-"TXC + brickenauxk_a8 strictly beats SAE-arditi on both organisms;
-larger gap on the smaller subject model"; if it lands in "Tied", the
-framing is gentler ("matches or narrowly beats"). Either is shippable.
+1. **Framework `_experiment_dir` multi-dir error** (NEW 2026-05-05):
+   `temp_bench.report.render(component='c6')` raises RuntimeError
+   "Multiple experiment dirs match c6_*" because three sub-dirs now
+   exist:
+   - `experiments/c6_em/` (mine — canonical analysis.py).
+   - `experiments/c6_em_100k/` (agent_em_100k's — they pivoted to
+     C3 MW per commit `4217f4ba`, so this dir may be deprecated).
+   - `experiments/c6_em_mw/` (mine — MW driver).
+   Convention says "one dir per component". I'm bypassing via
+   `from experiments.c6_em.analysis import run_analysis` +
+   `_replace_auto_results` (see Next action #2). Either:
+   (a) framework picks a canonical analysis.py per component;
+   (b) the multi-dir check relaxes;
+   (c) I consolidate into one dir (break agent_em_100k's existing
+   dir and migrate MW into c6_em/ as `run_mw.py`).
+   Not blocking — bypass works — but agent_paper should pick a
+   convention. **Surfaced; awaiting decision.**
 
 ## Other precision notes for the next instance
 
