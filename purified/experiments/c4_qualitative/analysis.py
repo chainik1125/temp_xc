@@ -138,7 +138,26 @@ def run_analysis() -> AnalysisResult:
         datasource_names=(DATASOURCE_NAME,),
         training_cfg=TrainingConfig(n_steps=20_000, train_window_size=1),
     )
-    valid_keys = txc_keys | tsae_keys | topk_keys
+    # T-sweep cells (decisions § 17 — Han 2026-05-05 PM). canonical_train_keys
+    # doesn't replicate runner's arch_hparams_override merge; compute manually.
+    txc_T_keys: set[str] = set()
+    from temp_bench.config import (
+        compute_act_cache_key, compute_train_key, load_arch, load_datasource,
+    )
+    ack = compute_act_cache_key(load_datasource(DATASOURCE_NAME))
+    txc_base_spec = load_arch("txc_base", component=COMPONENT)
+    for T in (10, 20):
+        merged = {**txc_base_spec.hparams, "T": T}
+        spec = txc_base_spec.model_copy(update={"hparams": merged})
+        for seed in HEADLINE_SEEDS:
+            txc_T_keys.add(compute_train_key(
+                arch=spec, seed=seed,
+                training_cfg=TrainingConfig(
+                    n_steps=20_000, arch_hparams_override={"T": T},
+                ),
+                act_cache_key=ack,
+            ))
+    valid_keys = txc_keys | tsae_keys | topk_keys | txc_T_keys
     real_rows = [
         r for r in rows
         if not r.eval_cfg.get("smoke", False)
