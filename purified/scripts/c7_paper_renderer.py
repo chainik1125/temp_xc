@@ -439,11 +439,13 @@ def plot_probe_curves(rows: list[dict], out_dir: Path) -> dict[str, Path]:
         ("l0",   "$\\ell_0$ density on held-out batch",  "l0_vs_step"),
         ("dead", "Dead features (out of $d_{\\mathrm{SAE}}$)", "dead_vs_step"),
     ]
-    # Two scales per metric: linear (default) and log-log. Both are
-    # rendered so the appendix can pick whichever reads better, and
-    # the linear one stays available for readers who prefer it.
+    # Two scales per metric: linear-x + log-y (default) and log-log.
+    # Both use log-y so the high-dynamic-range trajectories (NMSE
+    # ~1 → ~0.02; L0 ~32K → ~100; dead-feature counts) are readable.
+    # The "linear" variant only differs from the log-log one on the
+    # x-axis (training-step axis stays linear).
     scale_specs = [
-        ("",       "linear", "linear"),
+        ("",       "linear", "log"),
         ("_loglog", "log",   "log"),
     ]
     for metric, ylabel, fname_stem in metric_specs:
@@ -452,12 +454,18 @@ def plot_probe_curves(rows: list[dict], out_dir: Path) -> dict[str, Path]:
             for (arch, bs, _tk), (lab, log_rows, arch_name) in sorted(series.items()):
                 steps = [x["step"] for x in log_rows]
                 vals = [x.get(metric) for x in log_rows]
-                # log-log axes can't render zero or negative values; drop them.
-                if x_scale == "log":
-                    valid = [(s, v) for s, v in zip(steps, vals)
-                             if v is not None and v > 0 and s > 0]
-                else:
-                    valid = [(s, v) for s, v in zip(steps, vals) if v is not None]
+                # log axes can't render zero / negative values; drop them.
+                # The y-axis is log in both variants; the x-axis only
+                # in the log-log variant.
+                valid = []
+                for s, v in zip(steps, vals):
+                    if v is None:
+                        continue
+                    if y_scale == "log" and v <= 0:
+                        continue
+                    if x_scale == "log" and s <= 0:
+                        continue
+                    valid.append((s, v))
                 if not valid:
                     continue
                 xs, ys = zip(*valid)
@@ -468,7 +476,7 @@ def plot_probe_curves(rows: list[dict], out_dir: Path) -> dict[str, Path]:
             plt.ylabel(ylabel)
             plt.xscale(x_scale)
             plt.yscale(y_scale)
-            scale_tag = " (log-log)" if x_scale == "log" else ""
+            scale_tag = " (log-log)" if x_scale == "log" else " (log-y)"
             plt.title(
                 f"{ylabel} vs training step (held-out probe every 100 steps){scale_tag}"
             )
