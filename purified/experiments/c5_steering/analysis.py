@@ -235,16 +235,25 @@ def run_analysis() -> AnalysisResult:
     # pre-2026-05-04 batch=256 cells from the rendered AUTO-RESULTS
     # while keeping them in leaderboard.jsonl for diff comparison).
     #
-    # decisions.md § 15 (2026-05-05 PM): TXC archs and T-SAE now use
-    # DIFFERENT canonical training_cfgs:
-    #   - TXC archs: n_steps=20_000 (Gemma deadline override)
-    #   - T-SAE: n_steps=20_000 + train_window_size=2 (Bhalla/Ye 2025
-    #     §3.1 paper-faithful adjacent-pair training; brings per-token
-    #     T-SAE from 131K tokens/step down to ~2K, matching SAEBench
-    #     canonical scale).
-    # Compute both canonical sets and union them. Old v1.1.0 T-SAE rows
-    # without train_window_size stay in leaderboard.jsonl for diff but
-    # drop out of AUTO-RESULTS once agent_filler's T=2 re-train lands.
+    # decisions.md § 15 + § 16 (2026-05-05 PM): each arch family
+    # trains under its paper's intended per-step token throughput.
+    # canonical_train_keys must be computed PER family with the
+    # matching training_cfg, then unioned:
+    #
+    #   - TXC archs (txc_base, txc_pro): default cfg
+    #     (n_steps=20_000, B=1024, train_window_size=None — TXC's
+    #     T=5/T_max=10 windowing is internal to the arch)
+    #   - T-SAE (tsae_paper): + train_window_size=2 (Bhalla/Ye 2025
+    #     §3.1 paper-faithful adjacent-pair training; ~2K tokens/step
+    #     matching SAEBench canonical)
+    #   - TopK SAE (topk_sae): + train_window_size=1 (single-token
+    #     SAEBench canonical; ~1K tokens/step)
+    #   - TFA (tfa): + batch_size=32, train_window_size=None (full
+    #     seq; priors_in_time.md App. B.1; ~4K tokens/step)
+    #
+    # Pre-§ 15 v1.1.0 T-SAE rows (without train_window_size) and
+    # pre-§ 16 baseline rows stay in leaderboard.jsonl for diff but
+    # don't match these canonical filters → drop from AUTO-RESULTS.
     from temp_bench.schemas import TrainingConfig
     txc_train_keys = canonical_train_keys(
         component=COMPONENT,
@@ -260,7 +269,23 @@ def run_analysis() -> AnalysisResult:
         datasource_names=DATASOURCE_NAMES,
         training_cfg=TrainingConfig(n_steps=20_000, train_window_size=2),
     )
-    valid_train_keys = txc_train_keys | tsae_train_keys
+    topk_train_keys = canonical_train_keys(
+        component=COMPONENT,
+        archs=("topk_sae",),
+        seeds=SEEDS,
+        datasource_names=DATASOURCE_NAMES,
+        training_cfg=TrainingConfig(n_steps=20_000, train_window_size=1),
+    )
+    tfa_train_keys = canonical_train_keys(
+        component=COMPONENT,
+        archs=("tfa",),
+        seeds=SEEDS,
+        datasource_names=DATASOURCE_NAMES,
+        training_cfg=TrainingConfig(n_steps=20_000, batch_size=32),
+    )
+    valid_train_keys = (
+        txc_train_keys | tsae_train_keys | topk_train_keys | tfa_train_keys
+    )
     rows = [
         r for r in rows
         if r.train_key in valid_train_keys
