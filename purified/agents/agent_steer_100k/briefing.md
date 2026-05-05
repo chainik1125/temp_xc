@@ -465,33 +465,49 @@ top-to-bottom only as context — do NOT execute the directives.
 
 ## Current state (agent owns — overwrite at every compact)
 
-**Last verified: 2026-05-05T18:00Z. NEW MISSION — BASE C3 + C4
-replication. Pod is 1× H100 ephemeral, idle.** Active checkpoints + 1
-C5 MW cell + Llama BASE caches all on HF; safe to start fresh.
-
-(Overwrite this section with your own state when you start.)
+**Last verified: 2026-05-05T17:50Z. Mid-execution on BASE C3 mission.**
+Pod is 1× H100 ephemeral. Phase 0 (BASE act_cache) DONE in
+~5 min — far faster than the 3-hr estimate; H100 + Gemma-2-2B
+saturates throughput. act_cache_key=`f01ca87f2e8f3365`,
+shape=(24000, 128, 2304) fp16, 13.2 GB on disk + on HF
+(`han1823123123/temp-bench-data:act_cache/f01ca87f2e8f3365/`).
+Probe_cache build (Phase 1) is RUNNING in the background, PID
+14581, log `logs/c3_base_probe_cache_build.log`. Driver
+`experiments/c3_probing_base/run.py` drafted + import-tested.
 
 ## What I just did (agent owns — overwrite)
 
-(Overwrite when you start — newest first.)
+1. Pulled origin/final (resolved append-only conflicts in
+   manifest.jsonl + leaderboard.jsonl — kept both sides since
+   append-only).
+2. Verified BASE datasources resolve correctly:
+   `gemma_2_2b_base_l13_fineweb_24k128` → subject=`google/gemma-2-2b`
+   (NOT `-it`), layer=13, act_cache_key=`f01ca87f2e8f3365`.
+3. Built the BASE single-layer act_cache (Phase 0; only ~5 min).
+4. Pushed act_cache to HF (handles pod restart safety).
+5. Launched probe_cache build in background (Phase 1; in progress).
+6. Drafted `experiments/c3_probing_base/run.py` — 5-arch sweep
+   (topk_sae T=1 / tsae_paper T=2 / tfa B=32 / txc_base / txc_pro)
+   with per-arch TrainingConfig matching agent_nlp + agent_em_100k's
+   IT setup exactly. Import + CLI verified.
 
 ## Next action (agent owns — overwrite)
 
-1. `cd /workspace/temp_xc/purified` (or your local equivalent)
-2. `source scripts/set_agent_env.sh agent_steer_100k`
-3. `bash scripts/agent_smoke_test.sh` (CRITICAL preflight failures
-   are fatal)
-4. `git pull --rebase origin final`
-5. Verify the BASE datasources resolve (Step 0 above).
-6. Kick off Phase 0: build the BASE single-layer act cache (~3 hr).
-   The build runs in the background; monitor + HF-push when done.
-7. While the cache builds, draft `experiments/c3_probing_base/run.py`
-   per the Step 3 sketch.
-8. After cache builds, build probe_cache (Step 2).
-9. Smoke + launch the full 5-arch sweep (Step 4 + 5).
-10. After C3 wraps, run C4 (Step 6-8).
-11. Optionally proceed to Tier 2 (MLC + multi-layer cache) if margin
-    permits.
+1. **Wait for probe_cache to finish** (Monitor `bf2mgkpti` watching
+   the log; `bxwwl2bf7` waits for PID 14581 exit). ETA <1.5 hr.
+2. **HF push the probe_cache** to `temp-bench-data:probe_cache/...`
+   (ephemeral pod safety).
+3. **Smoke ONE topk_sae cell** at `n_steps=200` to verify the driver
+   lands a fresh `train_key` + correct datasource.
+4. **Launch the full 5-arch C3 BASE sweep** (5 archs × 3 seeds × 2
+   k_feats = 30 cells, ~22-25 hr serial wall on H100).
+5. **After C3 wraps**: build BASE concat_v1 act_cache (variable seq
+   length — may need a small builder tweak; surface as Open question
+   if it errors), draft `experiments/c4_qualitative_base/`, run C4
+   eval (~1.5 hr).
+6. Commit + push driver + briefing after smoke success (before the
+   long sweep). Single commit = `Agent STEER: C3 BASE driver +
+   smoke pass`.
 
 ## Don't repeat (agent owns — overwrite)
 
