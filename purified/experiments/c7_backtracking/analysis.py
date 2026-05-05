@@ -146,20 +146,29 @@ def _delta_gc_table_md(delta_gc: dict[str, Any], arch_order: list[str]) -> str:
     return "\n".join(lines)
 
 
-def _pr_auc_table_md(rows, S_grid=DEFAULT_PR_AUC_S_GRID) -> str:
-    """Render PR-AUC at S ∈ S_grid, mean ± stderr across seeds."""
+def _pr_auc_table_md(rows, S_grid=DEFAULT_PR_AUC_S_GRID, *, key_prefix: str = "pr_auc_S") -> str:
+    """Render PR-AUC at S ∈ S_grid, mean ± stderr across seeds.
+
+    ``key_prefix`` selects which metric family to render:
+    - ``"pr_auc_S"`` — unshuffled PR-AUC (default; the existing table).
+    - ``"pr_auc_shuf_S"`` — within-window-shuffle ablation PR-AUC.
+    - ``"pr_auc_gap_S"`` — gap = pr_auc - pr_auc_shuffled (the
+      "genuinely temporal" signal; ≥ 0.02 = temporal, < 0.02 =
+      window-density per Han 2026-05-05 PM detection mission).
+    """
     by_arch: dict[str, dict[int, list[float]]] = {}
     for r in rows:
         for S in S_grid:
-            v = r.metrics.get(f"pr_auc_S{S}")
+            v = r.metrics.get(f"{key_prefix}{S}")
             if v is None:
                 continue
             by_arch.setdefault(r.arch, {}).setdefault(S, []).append(float(v))
     if not by_arch:
-        return "_PR-AUC: no detection cells with this metric yet._"
+        return None  # Caller decides whether to skip the section
     header = ["| arch |"] + [f" S={S} |" for S in S_grid]
     sep = ["|---|"] + [f"---:|" for _ in S_grid]
     lines = ["".join(header), "".join(sep)]
+    is_gap = key_prefix == "pr_auc_gap_S"
     for arch in sorted(by_arch):
         cells = [f"| {arch} |"]
         for S in S_grid:
@@ -169,7 +178,14 @@ def _pr_auc_table_md(rows, S_grid=DEFAULT_PR_AUC_S_GRID) -> str:
             else:
                 m = float(np.mean(xs))
                 s = float(np.std(xs, ddof=1)) / (len(xs) ** 0.5) if len(xs) > 1 else 0.0
-                cells.append(f" {m:.3f}±{s:.3f} |")
+                # For gap, prefix with sign and bold ≥ 0.02 (temporal).
+                if is_gap:
+                    if m >= 0.02:
+                        cells.append(f" **{m:+.3f}**±{s:.3f} |")
+                    else:
+                        cells.append(f" {m:+.3f}±{s:.3f} |")
+                else:
+                    cells.append(f" {m:.3f}±{s:.3f} |")
         lines.append("".join(cells))
     return "\n".join(lines)
 
@@ -222,6 +238,23 @@ def run_analysis() -> AnalysisResult:
     # Filter to current-config cells only (Han 2026-05-04 PM, decisions § 12).
     valid_keys = _valid_train_keys()
     rows = [r for r in rows if r.train_key in valid_keys]
+
+    # Dedup: keep the latest eval_protocol_version per (train_key) — when
+    # we re-eval with a bumped protocol (e.g., 1.0.0 → 1.1.0 to add the
+    # within-window shuffle ablation, Han 2026-05-05 PM commit 1a12e647),
+    # the older row stays in leaderboard.jsonl for diff; here in
+    # AUTO-RESULTS we only show the newest column set per cell.
+    def _ver_tuple(s: str) -> tuple[int, ...]:
+        try:
+            return tuple(int(p) for p in s.split("."))
+        except (TypeError, ValueError):
+            return (0,)
+    by_train_key: dict[str, Any] = {}
+    for r in rows:
+        prev = by_train_key.get(r.train_key)
+        if prev is None or _ver_tuple(r.eval_protocol_version) > _ver_tuple(prev.eval_protocol_version):
+            by_train_key[r.train_key] = r
+    rows = list(by_train_key.values())
 
     # ── Inducement ────────────────────────────────────────────────────
     judge_rows = _gather_judge_outputs()
@@ -281,14 +314,34 @@ def run_analysis() -> AnalysisResult:
     # ── Detection ─────────────────────────────────────────────────────
     if rows:
         md_parts.append("\n\n### Detection — PR-AUC (sparse probe, GroupKFold by qid)\n")
-        md_parts.append(_pr_auc_table_md(rows))
-        if any(any(r.metrics.get(f"pr_auc_S{S}") is not None for S in DEFAULT_PR_AUC_S_GRID) for r in rows):
+        pr_auc_tbl = _pr_auc_table_md(rows, key_prefix="pr_auc_S")
+        if pr_auc_tbl:
+            md_parts.append(pr_auc_tbl)
             plot_path = _plot_pr_auc_curves(
                 rows, DEFAULT_PR_AUC_S_GRID, PLOT_DIR / "pr_auc_per_S.png",
             )
             md_parts.append(
                 f"\n![PR-AUC vs S](../../experiments/c7_backtracking/plots/{plot_path.name})"
             )
+
+        # Within-window shuffle ablation (Han 2026-05-05 PM, commit 1a12e647).
+        # Decision rule: shuffle_gap ≥ 0.02 across S = genuinely temporal
+        # detection; < 0.02 = window-density. Bold rows in the gap table
+        # mark cells that pass the threshold per S.
+        shuf_tbl = _pr_auc_table_md(rows, key_prefix="pr_auc_shuf_S")
+        gap_tbl = _pr_auc_table_md(rows, key_prefix="pr_auc_gap_S")
+        if shuf_tbl is not None and gap_tbl is not None:
+            md_parts.append(
+                "\n\n#### Within-window shuffle ablation (paired)\n"
+                "_PR-AUC after token shuffle within each T-window. Bold "
+                "values in the gap table are ≥ 0.02 = genuinely temporal "
+                "detection (vs window-density). Per Han 2026-05-05 PM."
+                "_\n"
+            )
+            md_parts.append("\n**PR-AUC (shuffled):**\n")
+            md_parts.append(shuf_tbl)
+            md_parts.append("\n\n**Shuffle gap (PR-AUC − PR-AUC_shuffled):**\n")
+            md_parts.append(gap_tbl)
     else:
         md_parts.append(
             "\n\n**Detection**: no leaderboard rows yet — eval cells haven't run.\n"

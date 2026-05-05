@@ -61,7 +61,12 @@ COMPONENT = "c7"
 # (see configs/datasources.yaml note + agent_back briefing OQ #4).
 DATASOURCE = "llama_3_1_8b_base_l10_ward_nousmirror"
 
-EVAL_PROTOCOL_VERSION = "1.0.0"
+EVAL_PROTOCOL_VERSION = "1.1.0"  # 1.0.0 → 1.1.0: detection now uses
+# detect_case_study with paired within-window shuffle ablation
+# (Han 2026-05-05 PM, commit 1a12e647). New metrics keys:
+# pr_auc_shuf_S{S} + pr_auc_gap_S{S}. v1.0.0 cells stay in
+# leaderboard for diff; analysis canonicalises on the latest version
+# per (arch, seed).
 
 # All 7 locked archs from docs/components/c7.md (NOT tfa_pos).
 DEFAULT_ARCHS = (
