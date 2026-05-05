@@ -7,7 +7,7 @@ Section ownership: PROTOCOL.md § 14.
 
 ---
 agent: agent_steer_100k
-last_state_update: 2026-05-05T10:58:00Z
+last_state_update: 2026-05-05T11:05:00Z
 component: c5 (multi-window deployment)
 ---
 
@@ -462,9 +462,56 @@ Newest first.
 
 ## Open questions for Han (agent owns — overwrite)
 
-(None right now. Surface anything from cell 1 (txc_base_mw seed=42)
-landing — particularly:
-- mean_coh on `txc_pro_mw` with V7 — if ≤ 1.0, fall back to `--protocol pp`.
-- OOM on `txc_pro_mw` (matryoshka × multi-distance × multi-window) —
-  unlikely at H100 80GB but unprecedented combo, monitor.
-- MW vs non-MW headline comparison once both v1.1.0 sweeps land.)
+1. **The H100 is the wrong hardware for C5 — it's a CPU-memory-bandwidth
+   bottleneck, GPU sits idle.** Empirically verified yesterday + corroborated
+   by today's MW step-1000 marker (1.9 steps/sec). The bottleneck is
+   `_iter`'s random fancy indexing on the 14 GB Gemma fp16 act-cache
+   + the `.to(torch.float32)` upcast — both CPU-side, both
+   memory-bandwidth-bound on the 208-core Xeon Platinum 8470.
+
+   **Evidence**:
+   - GPU utilization 0-17% throughout (`nvidia-smi dmon -s u`).
+   - Python at 99% CPU across 32 threads doing memcpy.
+   - Thread-count-sensitive rate (would not be true if GPU-bound):
+     104 threads → 1.9 steps/sec, 32 threads → 3.3 steps/sec
+     (non-MW), 16-48 threads plateau at 3.3 steps/sec.
+   - Microbench at 32 threads: torch fancy index alone = 21 batches/sec,
+     adding `.to(torch.float32)` = 7.4 batches/sec → **3× slowdown
+     purely from the fp16 → fp32 upcast on CPU**.
+
+   **Implication for current MW sweep**: ETA per cell is ~2-3 hr instead
+   of agent_paper's 30-50 min projection. Total 6-cell sweep ~18-27 hr
+   on this H100, vs ~6 hr on a CPU-strong pod with the same wall-clock
+   budget. The H100's GPU is idle ~85% of the time.
+
+   **Resolutions, if Han wants to consider** (each is a deviation, none
+   are unilateral):
+   - **A. Accept the slow rate** (current path). Sweep finishes within
+     remaining window with margin.
+   - **B. Allow fp16-input deviation**: skip the `.to(torch.float32)`
+     in the iter, let bf16 autocast handle the dtype on GPU. ~3× speedup
+     on the data path → cells finish in ~45-90 min each, full sweep ~5-9 hr.
+     Math: fp16 input → bf16 in autocast is bit-equivalent to fp32 input →
+     bf16 in autocast for these workloads (both lose precision below
+     bf16's 7-bit mantissa). Disclosed as a sub-epsilon caveat in the
+     paper.
+   - **C. Move the cast to GPU** by editing `preloaded_batch_iter_from_act_cache`
+     to optionally return fp16 + having `train_sae` cast on device. Requires
+     a small additive PR to shared infrastructure (`src/temp_bench/data/nlp/cache.py`)
+     — safer than B (default unchanged, opt-in via flag) but still a shared-code
+     edit that Han / agent_paper should bless.
+   - **D. Run on a CPU-strong A40 pod instead**: lower per-step GPU
+     compute, but proportionally more CPU bandwidth headroom. Untested
+     but plausibly comparable wall to current H100 path. Would require
+     pod re-allocation.
+
+   I will NOT make any of B/C/D unilaterally — flagging only.
+
+2. **Other surveillance items** (no action needed, just watching):
+   - mean_coh on `txc_pro_mw` with V7 — if ≤ 1.0, will fall back to
+     `--protocol pp` for txc_pro_mw cells only.
+   - OOM on `txc_pro_mw` (matryoshka × multi-distance × multi-window)
+     at H100 80GB — unlikely per agent_paper's analysis but unprecedented
+     combo.
+   - MW vs non-MW headline comparison once both v1.1.0 sweeps land —
+     Han's hypothesis is "MW @ 20K achieves ~100K-equivalent outcome".
