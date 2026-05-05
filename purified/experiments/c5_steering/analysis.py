@@ -104,36 +104,6 @@ def _aggregate(
     return dict(by_arch), dict(seeds_by_arch)
 
 
-def _plot_coh_threshold_curves(
-    by_arch: dict[str, dict[str, list[float]]],
-    coh_thresholds: list[float],
-    out_path: Path,
-    *,
-    metric_prefix: str = "success_at_coh_",
-    ylabel: str = "success rate (success ≥ 2 | coh ≥ τ)",
-    title: str = "C5 — coh-vs-success (binary fraction; 3-seed mean ± stderr)",
-) -> None:
-    fig, ax = plt.subplots(figsize=(6, 4))
-    for arch, metric_lists in sorted(by_arch.items()):
-        means = []
-        errs = []
-        for tau in coh_thresholds:
-            key = f"{metric_prefix}{tau:g}"
-            vals = metric_lists.get(key, [])
-            means.append(sum(vals) / len(vals) if vals else float("nan"))
-            errs.append(_stderr(vals))
-        ax.errorbar(
-            coh_thresholds, means, yerr=errs,
-            marker="o", capsize=3, label=arch,
-        )
-    ax.set_xlabel("coherence threshold τ")
-    ax.set_ylabel(ylabel)
-    ax.set_title(title)
-    ax.legend()
-    ax.grid(alpha=0.3)
-    save_figure(fig, out_path)
-
-
 def _per_strength_means(eval_keys: list[str]) -> dict[float, dict[str, float]] | None:
     """Read ``grades.jsonl`` for each cell, average across (seed × concept)
     per strength. Returns ``{strength: {"mean_coh", "mean_succ", "n"}}``
@@ -293,29 +263,13 @@ def run_analysis() -> AnalysisResult:
     PLOT_DIR.mkdir(parents=True, exist_ok=True)
     plots: list[Path] = []
 
-    fraction_plot = PLOT_DIR / "c5_coh_success_curves.png"
-    _plot_coh_threshold_curves(
-        by_arch, coh_thresholds, fraction_plot,
-        metric_prefix="success_at_coh_",
-        ylabel="success rate (success ≥ 2 | coh ≥ τ)",
-        title="C5 — coh-vs-success (binary fraction; 3-seed mean ± stderr)",
-    )
-    plots.append(fraction_plot)
-
-    if has_peak_grade:
-        peak_plot = PLOT_DIR / "c5_peak_success_grade_curves.png"
-        _plot_coh_threshold_curves(
-            by_arch, coh_thresholds, peak_plot,
-            metric_prefix="peak_success_grade_at_coh_",
-            ylabel="peak mean success grade (max-strength | coh ≥ τ)",
-            title="C5 — peak success grade (0-3 scale; wasteland-comparable)",
-        )
-        plots.append(peak_plot)
-
     # Wasteland-style Pareto frontier: parametric over strength, x=coh,
     # y=success. Each line traces an arch's strength sweep — high-strength
     # points collapse coherence, low-strength points have weak success,
-    # and a knee somewhere in between marks the cliff15 (star).
+    # and a knee somewhere in between marks the cliff15 (star). This is
+    # the only headline plot — earlier coh-threshold-curve plots
+    # (peak_grade vs τ, success_at_coh vs τ) compressed the data into
+    # 1D lines that hid the actual frontier shape.
     pareto_plot = PLOT_DIR / "c5_pareto_frontier.png"
     eval_keys_by_arch: dict[str, list[str]] = defaultdict(list)
     for r in rows:
@@ -340,80 +294,42 @@ def run_analysis() -> AnalysisResult:
         f"{sum(len(s) for s in seeds_by_arch.values())} arch-seed pairs)\n",
     ]
 
-    if has_peak_grade:
-        md_lines += [
-            "**Headline — peak success grade at coh ≥ τ** "
-            "(0-3 scale; max-over-strengths of mean success_grade conditioned "
-            "on coh_grade ≥ τ; wasteland phase-7 convention):\n",
-            "| arch | n seeds | peak grade @ coh ≥ 1.5 | peak grade @ coh ≥ 1.75 | peak grade @ coh ≥ 2.0 | mean coh | mean success |",
-            "|---|---:|---:|---:|---:|---:|---:|",
-        ]
-        for arch in sorted(by_arch):
-            m = by_arch[arch]
-            md_lines.append(
-                f"| {arch} | {len(seeds_by_arch[arch])} | "
-                f"{_ms(m.get('peak_success_grade_at_coh_1.5', []))} | "
-                f"{_ms(m.get('peak_success_grade_at_coh_1.75', []))} | "
-                f"{_ms(m.get('peak_success_grade_at_coh_2', []))} | "
-                f"{_ms(m.get('mean_coh', []))} | "
-                f"{_ms(m.get('mean_success', []))} |"
-            )
-        md_lines.append("")
-        md_lines.append(
-            f"![Pareto frontier — success vs coherence per strength]"
-            f"(../../experiments/c5_steering/plots/{pareto_plot.name})"
-        )
-        md_lines.append("")
-        md_lines.append(
-            f"![peak success grade vs coherence threshold]"
-            f"(../../experiments/c5_steering/plots/{peak_plot.name})"
-        )
-        md_lines.append("")
-        md_lines.append("---\n")
-        md_lines.append(
-            "**Supplementary — binary fraction at coh ≥ τ** "
-            "(success_grade ≥ 2 AND coh_grade ≥ τ; T-SAE paper Table 2 'green cell' convention; "
-            "low dynamic range because both threshold events almost always co-occur):\n"
-        )
-    else:
-        md_lines.append(
-            "**Headline — binary fraction at coh ≥ τ** "
-            "(success_grade ≥ 2 AND coh_grade ≥ τ; T-SAE paper Table 2 convention):\n"
-        )
-        md_lines.append(
-            "_⚠ The wasteland-comparable continuous-grade metric "
-            "(`peak_success_grade_at_coh_<τ>`) is not yet present in any "
-            "leaderboard row. To backfill existing cells without re-judging, "
-            "run `temp_bench.case_studies.steering.reaggregate_from_judge_outputs("
-            "<eval_key>/judge_outputs.jsonl)` per cell — see agent_steer's "
-            "open question + briefing._\n"
-        )
-
     md_lines += [
-        "| arch | n seeds | success @ coh ≥ 1.75 | success @ coh ≥ 2.0 | mean coh | mean success |",
-        "|---|---:|---:|---:|---:|---:|",
+        "**Peak success grade at coh ≥ τ** "
+        "(0-3 scale; max-over-strengths of mean success_grade conditioned "
+        "on coh_grade ≥ τ; wasteland phase-7 convention):\n",
+        "| arch | n seeds | peak grade @ coh ≥ 1.5 | peak grade @ coh ≥ 1.75 | peak grade @ coh ≥ 2.0 | mean coh | mean success |",
+        "|---|---:|---:|---:|---:|---:|---:|",
     ]
+    if not has_peak_grade:
+        md_lines.append(
+            "_⚠ `peak_success_grade_at_coh_<τ>` not present in any "
+            "leaderboard row — table will show '—'. Backfill via "
+            "`temp_bench.case_studies.steering.reaggregate_from_judge_outputs(...)` "
+            "per cell._"
+        )
     results: dict[str, Any] = {"thresholds": coh_thresholds, "by_arch": {}}
     for arch in sorted(by_arch):
-        metrics = by_arch[arch]
+        m = by_arch[arch]
         n_seeds = len(seeds_by_arch[arch])
         md_lines.append(
             f"| {arch} | {n_seeds} | "
-            f"{_ms(metrics.get('success_at_coh_1.75', []))} | "
-            f"{_ms(metrics.get('success_at_coh_2', []))} | "
-            f"{_ms(metrics.get('mean_coh', []))} | "
-            f"{_ms(metrics.get('mean_success', []))} |"
+            f"{_ms(m.get('peak_success_grade_at_coh_1.5', []))} | "
+            f"{_ms(m.get('peak_success_grade_at_coh_1.75', []))} | "
+            f"{_ms(m.get('peak_success_grade_at_coh_2', []))} | "
+            f"{_ms(m.get('mean_coh', []))} | "
+            f"{_ms(m.get('mean_success', []))} |"
         )
         arch_summary: dict[str, Any] = {"n_seeds": n_seeds}
-        for k, v in metrics.items():
+        for k, v in m.items():
             arch_summary[f"mean_{k}"] = sum(v) / len(v) if v else float("nan")
             arch_summary[f"stderr_{k}"] = _stderr(v)
         results["by_arch"][arch] = arch_summary
 
     md_lines.append("")
     md_lines.append(
-        f"![coh-vs-success (binary fraction)](../../experiments/c5_steering/plots/"
-        f"{fraction_plot.name})"
+        f"![Pareto frontier — success vs coherence per strength]"
+        f"(../../experiments/c5_steering/plots/{pareto_plot.name})"
     )
 
     return AnalysisResult(
