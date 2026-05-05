@@ -101,6 +101,18 @@ T = [[0.995, 0.005],
 
 All 128 chains share the same matrix in any given run.
 
+A 10-feature × 64-step sample at the three ρ values, drawn from the
+actual generator (`generate_markov_support`):
+
+![sample chains, three-arch bench](hmm_spec_chains_three_arch.png)
+
+ρ = 0.0 looks like scattered iid Bernoulli salt-and-pepper. ρ = 0.6 has
+visible clumping (typical run length ≈ 1/(1−α) ≈ 2.6 steps once on).
+ρ = 0.9 has only a couple of long runs across all 10 chains in a 64-step
+window — typical run length ≈ 10 steps. The reported "mean firing rate"
+in each panel is the empirical fraction of "on" cells; expected from
+stationary is `π = 0.05` (small-sample noise around that).
+
 ### HMM denoising sweep: heterogeneous per-feature ρ
 
 The 40 features are partitioned into 4 groups of 10, one ρ per group:
@@ -117,6 +129,22 @@ Per-group transition matrices:
 
 Implementation: `generate_markov_support_hetero` in
 `src/temporal_bench/data/markov.py`.
+
+40-chain sample (10 per group) at T = 64 from the actual
+`generate_markov_support_hetero` generator:
+
+![sample chains, HMM denoising bench](hmm_spec_chains_hmm_denoising.png)
+
+The four panels make the role of ρ visually clear: the ρ = 0.95 group
+(group 4) has only 2 of 10 chains turn on at all in a 64-step window,
+but each fires for ~30 steps continuously — the temporal information
+density per "event" is enormous. The ρ = 0.1 group (group 1) is dense
+salt-and-pepper at the same expected firing rate (mean ≈ 0.15) — the
+*same* total information content, but it's spread out over short
+events. A position-independent encoder gets the same per-token signal
+in both panels; a window encoder of length T = 8 sees ~7-8 hidden-on
+tokens of evidence per "on" event in group 4 vs basically 1 per event
+in group 1.
 
 ## Step 2 — Observed support (deterministic vs stochastic emission)
 
@@ -141,6 +169,16 @@ This is **asymmetric noise**: false negatives only (an "on" hidden state
 fires its emission only 62.5% of the time), no false positives. Bill's
 writeup describes this as "γ ≈ 0.59 noise" but the mechanism is
 specifically a missed-detection process, not a symmetric flip.
+
+A single-chain 200-step sample showing the missed-detection structure:
+
+![hidden vs observed under p_B = 0.625](hmm_spec_emission_noise.png)
+
+Blue = hidden state `h(t)`; red = observed `s(t)`. Anywhere the hidden
+state is on, the observed emission flickers at 62.5% per step.
+Approximately one-third of hidden-on tokens are missed (the blue-only
+slivers between red blocks). A per-token model sees only the red signal
+— hence the per-token denoising floor.
 
 The per-token denoising floor is bounded by this rate: any
 position-independent encoder cannot exceed
