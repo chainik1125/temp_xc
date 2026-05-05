@@ -40,16 +40,21 @@ COMPONENT = "c4"
 EXP_DIR = Path(__file__).parent
 PLOT_DIR = EXP_DIR / "plots"
 
-# Canonical-sweep filter (decisions.md § 12 — Phase-5-faithful uniform
-# schedule). canonical_train_keys uses TrainingConfig() defaults so this
-# auto-tracks any future paper-wide schema bump.
+# Canonical-sweep filter (decisions.md § 12 + § 15). 3 TrainingConfig
+# families per literature-aligned re-train: TXC archs at None, TopK at
+# T=1, T-SAE at T=2. canonical_train_keys is called once per family;
+# the union is the headline filter.
 DATASOURCE_NAME = "gemma_2_2b_it_l13_fineweb_24k128"   # SHARED with C3
-HEADLINE_ARCHS = ("tsae_paper", "txc_base", "txc_pro")
+HEADLINE_ARCHS = ("tsae_paper", "txc_base", "txc_pro")  # C4 archs
 HEADLINE_SEEDS = (1, 2, 42)
-# The C3 join uses the same datasource + seed grid; archs are C3's
-# (canonical_train_keys silently drops archs not registered for the
-# component, so we can pass a superset).
-C3_HEADLINE_ARCHS = ("topk_sae", "tsae_paper", "txc_base", "txc_pro")
+# C3 architectures by training-cfg family (for the C3 join in
+# _build_c3_mean_auc_lookup):
+C3_TXC_ARCHS = ("txc_base", "txc_pro")
+C3_TOPK_ARCHS = ("topk_sae",)
+C3_TSAE_ARCHS = ("tsae_paper",)
+# C4 architectures by training-cfg family (no topk_sae for C4):
+C4_TXC_ARCHS = ("txc_base", "txc_pro")
+C4_TSAE_ARCHS = ("tsae_paper",)
 
 
 def _placeholder_markdown(reason: str) -> str:
@@ -69,13 +74,28 @@ def _build_c3_mean_auc_lookup() -> dict[tuple[str, int, int], float]:
     """
     out: dict[tuple[str, int, int], float] = {}
     from temp_bench.schemas import TrainingConfig
-    c3_valid_keys = canonical_train_keys(
+    txc_keys = canonical_train_keys(
         component="c3",
-        archs=C3_HEADLINE_ARCHS,
+        archs=C3_TXC_ARCHS,
         seeds=HEADLINE_SEEDS,
         datasource_names=(DATASOURCE_NAME,),
         training_cfg=TrainingConfig(n_steps=20_000),
     )
+    topk_keys = canonical_train_keys(
+        component="c3",
+        archs=C3_TOPK_ARCHS,
+        seeds=HEADLINE_SEEDS,
+        datasource_names=(DATASOURCE_NAME,),
+        training_cfg=TrainingConfig(n_steps=20_000, train_window_size=1),
+    )
+    tsae_keys = canonical_train_keys(
+        component="c3",
+        archs=C3_TSAE_ARCHS,
+        seeds=HEADLINE_SEEDS,
+        datasource_names=(DATASOURCE_NAME,),
+        training_cfg=TrainingConfig(n_steps=20_000, train_window_size=2),
+    )
+    c3_valid_keys = txc_keys | topk_keys | tsae_keys
     for r in query_leaderboard(component="c3"):
         if r.eval_cfg.get("smoke", False):
             continue
@@ -93,13 +113,22 @@ def _build_c3_mean_auc_lookup() -> dict[tuple[str, int, int], float]:
 def run_analysis() -> AnalysisResult:
     rows = query_leaderboard(component=COMPONENT)
     from temp_bench.schemas import TrainingConfig
-    valid_keys = canonical_train_keys(
+    # 2 cfg families for C4: TXC (None) + T-SAE (T=2). No topk_sae in C4.
+    txc_keys = canonical_train_keys(
         component=COMPONENT,
-        archs=HEADLINE_ARCHS,
+        archs=C4_TXC_ARCHS,
         seeds=HEADLINE_SEEDS,
         datasource_names=(DATASOURCE_NAME,),
         training_cfg=TrainingConfig(n_steps=20_000),
     )
+    tsae_keys = canonical_train_keys(
+        component=COMPONENT,
+        archs=C4_TSAE_ARCHS,
+        seeds=HEADLINE_SEEDS,
+        datasource_names=(DATASOURCE_NAME,),
+        training_cfg=TrainingConfig(n_steps=20_000, train_window_size=2),
+    )
+    valid_keys = txc_keys | tsae_keys
     real_rows = [
         r for r in rows
         if not r.eval_cfg.get("smoke", False)

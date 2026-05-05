@@ -42,13 +42,23 @@ COMPONENT = "c3"
 EXP_DIR = Path(__file__).parent
 PLOT_DIR = EXP_DIR / "plots"
 
-# The canonical sweep we filter the leaderboard against. C3 runs use a
-# Han-approved deadline override of n_steps=20_000 (decisions.md § 12
-# defaults are 25K — 20K fits the 72-h budget at measured 2.27 steps/sec
-# under shared-GPU contention). We pass the explicit TrainingConfig to
-# canonical_train_keys so the headline filter matches the override.
+# The canonical sweep we filter the leaderboard against. Since
+# decisions.md § 15 (Han 2026-05-05 PM) the 4 archs split into THREE
+# TrainingConfig families per literature alignment:
+#   - TXC archs (txc_base, txc_pro): train_window_size=None (sample
+#     T-windows internally regardless of mode). n_steps=20K Han override.
+#   - TopK SAE: train_window_size=1 (vanilla TopK, no temporal —
+#     1024 tok/step matching SAEBench App. B canonical scale).
+#   - T-SAE: train_window_size=2 (Bhalla/Ye 2025 §3.1 paper-faithful
+#     adjacent-pair contrastive).
+# canonical_train_keys is called once per family; the union is the
+# headline filter. Old over-batched cells (no train_window_size in
+# the cfg → old hash) stay in leaderboard for diff comparison.
 DATASOURCE_NAME = "gemma_2_2b_it_l13_fineweb_24k128"
-HEADLINE_ARCHS = ("topk_sae", "tsae_paper", "txc_base", "txc_pro")
+TXC_ARCHS = ("txc_base", "txc_pro")
+TOPK_ARCHS = ("topk_sae",)
+TSAE_ARCHS = ("tsae_paper",)
+HEADLINE_ARCHS = TXC_ARCHS + TOPK_ARCHS + TSAE_ARCHS
 HEADLINE_SEEDS = (1, 2, 42)
 
 
@@ -69,18 +79,32 @@ HEADLINE_EVAL_PROTOCOL_VERSION = "1.1.0"   # Phase 7 padding fix; old 1.0.0
 def run_analysis() -> AnalysisResult:
     rows = query_leaderboard(component=COMPONENT)
     # Filter out smoke rows + non-headline protocol versions + non-canonical
-    # training_cfg via canonical_train_keys (decisions.md § 12). Old 1.0.0
-    # rows used right-padded tail-S (corrupts winogrande/wsc); v1.1.0 is the
-    # eval-pathway headline (Phase 7 padding fix). Old batch=256 rows were
-    # undertrained vs Phase 5 reference; batch=1024 is the training headline.
+    # training_cfg via canonical_train_keys (decisions.md § 12 + § 15). 3
+    # TrainingConfig families: TXC (None), TopK (T=1), T-SAE (T=2). Union
+    # the train_keys; only rows whose train_key is in the union pass.
     from temp_bench.schemas import TrainingConfig
-    valid_keys = canonical_train_keys(
+    txc_keys = canonical_train_keys(
         component=COMPONENT,
-        archs=HEADLINE_ARCHS,
+        archs=TXC_ARCHS,
         seeds=HEADLINE_SEEDS,
         datasource_names=(DATASOURCE_NAME,),
         training_cfg=TrainingConfig(n_steps=20_000),
     )
+    topk_keys = canonical_train_keys(
+        component=COMPONENT,
+        archs=TOPK_ARCHS,
+        seeds=HEADLINE_SEEDS,
+        datasource_names=(DATASOURCE_NAME,),
+        training_cfg=TrainingConfig(n_steps=20_000, train_window_size=1),
+    )
+    tsae_keys = canonical_train_keys(
+        component=COMPONENT,
+        archs=TSAE_ARCHS,
+        seeds=HEADLINE_SEEDS,
+        datasource_names=(DATASOURCE_NAME,),
+        training_cfg=TrainingConfig(n_steps=20_000, train_window_size=2),
+    )
+    valid_keys = txc_keys | topk_keys | tsae_keys
     real_rows = [
         r for r in rows
         if not r.eval_cfg.get("smoke", False)
