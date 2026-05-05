@@ -67,7 +67,61 @@ surface it in chat, and let Han or agent_paper land the change. Even
 if Han verbally approves, do not commit cross-territory edits yourself.
 This is non-negotiable — see PROTOCOL.md § 8 + CLAUDE.md Hard Rule #7.
 
-### ⚠️ ADDITIONAL MISSION 2026-05-05 PM (URGENT) — TXC-base T-sweep on C3 + C4 BASE
+### ⚠️ LOAD SPLIT 2026-05-05 PM — agent_filler is taking your TXC archs on BASE
+
+**Han 2026-05-05 PM**: "agent_filler's 8 A40s ... NEED TO UTILIZE.
+Let's make them take half of agent_steer_100k's load." +
+**"inform agent_steer_100k that agent_filler is taking some of their
+workload!!"**
+
+**Effective immediately, your BASE C3 mission is split**:
+
+| Owner | Archs on BASE C3 |
+|---|---|
+| **YOU (agent_steer_100k)** | `topk_sae` (~done: 7 cells), `tsae_paper` (~done: 6 cells), `tfa` (in flight: 4 cells); plus C4 evals once TXC checkpoints land |
+| **agent_filler** (8× A40 pod) | `txc_base` (T=5, T=10, T=20) + `txc_pro` × 3 seeds = 12 trainings + 24 evals |
+
+**What you DO**:
+
+1. **Finish your in-flight TFA cells** (~remaining 2 cells × ~5 hr =
+   ~10 hr) — already on track.
+2. **Skip TXC-base + TXC-pro entirely** on BASE. Don't run them; do
+   not start the txc_base T=10/T=20 sweep on your H100. agent_filler
+   parallelizes those 12 trainings across 8 A40s in ~5-6 hr wall —
+   much faster than your 1× H100 could.
+3. **Run C4 BASE evals** once agent_filler's TXC checkpoints land
+   (~5-6 hr from now). C4 is eval-only (cache-hit on the C3
+   checkpoints via shared `train_key`); ~1-2 hr on your H100.
+4. **The § 17 txc_base T-sweep mission below** (T=10, T=20 on BASE)
+   is now agent_filler's. Read that section for context but **do
+   NOT execute it**.
+
+**What changed for you**:
+
+- ~12-13 hr of compute (txc_base T=10/20 + txc_pro × 3 seeds) is now
+  agent_filler's. Your remaining wall drops from ~28 hr → ~15-16 hr.
+- Both pods write to the same `leaderboard.jsonl` and `manifest.jsonl`;
+  cells deduplicate by `train_key`. agent_filler will pull your BASE
+  act_cache + probe_cache from HF (you already pushed both).
+- C4 BASE evals stay yours — you have the qualitative-judge plumbing
+  cached on your H100 (Anthropic API key, etc).
+
+**Verify before you start anything new**:
+
+```bash
+# Confirm agent_filler is queued / running TXC archs on BASE.
+grep -A 2 "BASE C3 TXC split" agents/agent_filler/briefing.md | head -10
+
+# Verify your remaining in-flight work is per-token + TFA only.
+ps -ef | grep "experiments.c3_probing_base" | grep -v grep
+```
+
+If you see yourself running TXC cells on BASE, **stop and stand down**
+— agent_filler has it.
+
+---
+
+### ⚠️ ADDITIONAL MISSION 2026-05-05 PM (URGENT) — TXC-base T-sweep on C3 + C4 BASE [REASSIGNED 2026-05-05 PM TO agent_filler — see LOAD SPLIT above; section preserved for context]
 
 **Han 2026-05-05 PM**: "we want a txc_base T=10 and T=20 on C3 and C4
 (both IT and base)." Your job is the **BASE side**;
