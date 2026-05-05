@@ -455,27 +455,45 @@ Commit chronology (latest first):
 
 ## C3 batch=1024 / n_steps=20K — partial headline (18/24 cells complete)
 
-**TXC + tsae_paper sweep done**. Mean ± σ across 3 seeds:
+Per decisions.md § 15 (Han 2026-05-05 PM), per-token archs (`topk_sae`,
+`tsae_paper`) re-train at literature-canonical T=1 / T=2 window sizes;
+TXC archs unchanged at None (sample windows internally regardless).
+3 cfg families → 3 train_keys per cell. Mean ± σ across 3 seeds:
 
-| arch         | k=5             | k=20             |
-|--------------|-----------------|------------------|
-| `txc_base`   | 0.8367 ± 0.004  | 0.8952 ± 0.004   |
-| `txc_pro`    | 0.8450 ± 0.013  | 0.8936 ± 0.009   |
-| `tsae_paper` | 0.8301 ± 0.006  | **0.8975 ± 0.005** |
-| `topk_sae`   | _pending_       | _pending_        |
+| arch                        | k=5              | k=20             |
+|-----------------------------|------------------|------------------|
+| `txc_base`     (None)       | 0.8367 ± 0.004   | **0.8952 ± 0.004** |
+| `txc_pro`      (None)       | **0.8450 ± 0.013** | 0.8936 ± 0.009   |
+| `tsae_paper`   T=None       | 0.8301 ± 0.006   | 0.8975 ± 0.005   |
+| `topk_sae`     **T=1**      | 0.8306 ± 0.003   | 0.8831 ± 0.002   |
+| `tsae_paper`   T=2          | _pending_ (agent_em_100k, ~4.5 hr ETA) | _pending_ |
+
+**Story so far** — TXC archs lead at k=20. At k=5, txc_pro nudges
+ahead but with σ 0.013 the lead is within noise. topk_sae at literature-
+canonical T=1 is now LOWEST at both k=5 and k=20 — confirms agent_paper's
+hypothesis that the v1.1.0 "TopK > TXC" headline was an artifact of
+65× over-batching the per-token arch.
+
+Pending: tsae_paper T=2 (agent_em_100k owns) likely shifts down by a
+similar 0.014-0.024 magnitude based on the topk_sae delta. The k=20
+ordering should remain TXC ≥ T-SAE T=2 once it lands.
 
 Vs v1.1.0 batch=256 / n_steps=10K (kept on disk for diff comparison only):
 
-| arch         | Δ k=5    | Δ k=20    |
-|--------------|----------|-----------|
-| txc_base     | -0.003   | **+0.007**  |
-| txc_pro      | +0.007   | **+0.008**  |
-| tsae_paper   | +0.002   | **+0.012**  |
+| arch                | Δ k=5    | Δ k=20    |
+|---------------------|----------|-----------|
+| txc_base            | -0.003   | +0.007    |
+| txc_pro             | +0.007   | +0.008    |
+| tsae_paper T=None   | +0.002   | **+0.012**|
+| topk_sae   T=1      | -0.014   | -0.018    |
 
-**tsae_paper benefited most** at k=20 — went from "last" in v1.1.0 to
-"first" under the new schedule. txc_base/txc_pro effectively tied at
-k=20 (~0.894). At k=5, txc_pro nudges ahead (0.8450) but with σ 0.013
-the lead is within noise.
+T=None topk_sae results (run on GPU 0 in parallel as diff-reference,
+in-flight at seed=2 ~step 16K, ETA ~50 min) — *not* the headline,
+just to quantify the over-batching effect:
+
+| arch                  | k=5 (single seed=1) | k=20 (single seed=1) |
+|-----------------------|---------------------|----------------------|
+| `topk_sae` T=None     | 0.8461              | 0.9085               |
 
 **Convergence verified** (decisions § 12 5%-flag check on final-1K-step
 loss drop):

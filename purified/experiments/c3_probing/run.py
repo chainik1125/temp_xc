@@ -149,7 +149,11 @@ def my_train_fn(*, arch_name, arch_hparams, seed, training_cfg, act_cache_key, c
     # alongside the run logs ourselves.
     try:
         import json as _json
-        log_path = Path("logs") / f"c3_b{training_cfg.batch_size}_{arch_name}_seed{seed}_trainlog.json"
+        # Include train_window_size in filename to prevent collisions
+        # between T=None and T=int sweeps of the same (arch, seed).
+        tws = getattr(training_cfg, "train_window_size", None)
+        tws_tag = f"_T{tws}" if tws is not None else ""
+        log_path = Path("logs") / f"c3_b{training_cfg.batch_size}{tws_tag}_{arch_name}_seed{seed}_trainlog.json"
         log_path.parent.mkdir(parents=True, exist_ok=True)
         log_path.write_text(_json.dumps(result.get("log", {})))
         print(f"  [TRAIN {arch_name}/seed={seed}] trainlog saved → {log_path}", flush=True)
