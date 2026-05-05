@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 
 
 _TXC_COLOR = "#1f77b4"
+_H8_COLOR = "#9467bd"
 _SAE_COLOR = "#d62728"
 _ORACLE_COLOR = "#2ca02c"
 _RANDOM_COLOR = "#888888"
@@ -28,13 +29,17 @@ def plot_phase_transition(stage1_path: Path, out_path: Path) -> None:
     W_grid = sorted(c["W"] for c in txc_cells)
     by_W = {c["W"]: c for c in txc_cells}
     txc_y = [by_W[W]["txc"]["s_adj"] for W in W_grid]
+    h8_y = [by_W[W].get("txc_h8", {}).get("s_adj", float("nan")) for W in W_grid]
+    has_h8 = any(not (y != y) for y in h8_y)  # any non-NaN
 
     sae_s = data["sae"]["s_adj"]
     oracle_s = data["oracle"]["s_adj"]
     random_s = data["random"]["s_adj"]
 
-    fig, ax = plt.subplots(figsize=(7, 5))
-    ax.plot(W_grid, txc_y, "o-", color=_TXC_COLOR, label="TXC")
+    fig, ax = plt.subplots(figsize=(7.5, 5))
+    ax.plot(W_grid, txc_y, "o-", color=_TXC_COLOR, label="TXC (TopK recon)")
+    if has_h8:
+        ax.plot(W_grid, h8_y, "s-", color=_H8_COLOR, label="TXC H8 (recon + InfoNCE)")
     ax.axhline(sae_s, linestyle="--", color=_SAE_COLOR, label=f"Regular SAE (S_adj={sae_s:.2f})")
     ax.axhline(oracle_s, linestyle=":", color=_ORACLE_COLOR, label=f"Spectral oracle (S_adj={oracle_s:.2f})")
     ax.axhline(random_s, linestyle=":", color=_RANDOM_COLOR, label=f"Random (S_adj={random_s:.2f})")
@@ -43,7 +48,7 @@ def plot_phase_transition(stage1_path: Path, out_path: Path) -> None:
     ax.set_xticklabels([str(W) for W in W_grid])
     ax.set_xlabel("Window length W")
     ax.set_ylabel("Chance-adjusted recovery S_adj")
-    ax.set_title("Colored sources, D=1: TXC vs regular SAE")
+    ax.set_title("Colored sources, D=1: TXC vs H8 (with InfoNCE) vs SAE")
     ax.set_ylim(-0.05, 1.0)
     ax.grid(True, alpha=0.3)
     ax.legend()

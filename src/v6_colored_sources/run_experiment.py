@@ -19,6 +19,7 @@ from .train_runner import (
     random_dictionary_baseline,
     train_sae,
     train_txc,
+    train_txc_h8,
 )
 
 
@@ -110,9 +111,22 @@ def run_stage1(
             f"rec_sq={txc_res.recovery_squared:.3f} S_adj={txc_res.s_adj:.3f} "
             f"AUC={txc_res.recovery_auc:.3f}"
         )
+
+        print(f"\n=== H8 W={W} ===")
+        h8_res = train_txc_h8(
+            cache=cache, F=F, W=W, k_pos=k, H=cfg.N, d=cfg.d,
+            device=device, train_cfg=train_cfg,
+            alpha=1.0, contr_prefix=cfg.N,
+        )
+        print(
+            f"  h8   loss={h8_res.final_loss:.4f} L0={h8_res.final_l0:.2f} "
+            f"rec_sq={h8_res.recovery_squared:.3f} S_adj={h8_res.s_adj:.3f}"
+        )
+
         txc_cells.append({
             "W": W,
             "txc": _serialize_cell_result(txc_res),
+            "txc_h8": _serialize_cell_result(h8_res),
         })
 
     elapsed = time.time() - t0
