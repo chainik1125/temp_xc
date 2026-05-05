@@ -82,16 +82,30 @@ DEFAULT_ARCHS: tuple[str, ...] = (
 DEFAULT_SEEDS: tuple[int, ...] = (42, 1, 2)
 
 
-# Per-arch TrainingConfig — must match agent_nlp + agent_em_100k's
-# IT setup exactly (decisions § 15 + § 16). These also match my BASE
-# C3 cells so the runner cache-hits on those checkpoints.
-ARCH_TRAINING_CFGS: dict[str, TrainingConfig] = {
-    "topk_sae":   TrainingConfig(n_steps=20_000, train_window_size=1),
-    "tsae_paper": TrainingConfig(n_steps=20_000, train_window_size=2),
-    "tfa":        TrainingConfig(n_steps=20_000, batch_size=32),
-    "txc_base":   TrainingConfig(n_steps=20_000),
-    "txc_pro":    TrainingConfig(n_steps=20_000),
+# Per-arch TrainingConfigs. Same as agent_nlp + agent_em_100k at IT —
+# only the DATASOURCE differs (and the BASE subject_model_name).
+# txc_base gets the § 17 T-sweep (T=10, T=20) in addition to the
+# canonical T=5 default; cells cache-hit on my BASE C3 checkpoints
+# (same DATASOURCE + same training_cfg → same train_key).
+ARCH_TRAINING_CFGS: dict[str, list[TrainingConfig]] = {
+    "topk_sae":   [TrainingConfig(n_steps=20_000, train_window_size=1)],
+    "tsae_paper": [TrainingConfig(n_steps=20_000, train_window_size=2)],
+    "tfa":        [TrainingConfig(n_steps=20_000, batch_size=32)],
+    "txc_base":   [
+        TrainingConfig(n_steps=20_000),                                       # T=5 default
+        TrainingConfig(n_steps=20_000, arch_hparams_override={"T": 10}),
+        TrainingConfig(n_steps=20_000, arch_hparams_override={"T": 20}),
+    ],
+    "txc_pro":    [TrainingConfig(n_steps=20_000)],
 }
+
+
+def _cfg_tag(cfg: TrainingConfig) -> str:
+    if cfg.arch_hparams_override and "T" in cfg.arch_hparams_override:
+        return f"T{cfg.arch_hparams_override['T']}"
+    if cfg.train_window_size:
+        return f"tws={cfg.train_window_size}"
+    return ""
 
 
 def _d_in_from_act_cache(act_cache_key: str) -> int:
@@ -100,18 +114,23 @@ def _d_in_from_act_cache(act_cache_key: str) -> int:
 
 
 def my_eval_fn(*, model, eval_cfg, component):
-    """C4 BASE qualitative eval — clones agent_nlp's pattern with the
-    BASE subject model name. agent_nlp's eval hardcodes
-    ``"google/gemma-2-2b-it"``; we pass ``"google/gemma-2-2b"`` instead.
+    """C4 BASE qualitative eval — clones agent_nlp's pattern with two
+    overrides: (1) BASE subject model name; (2) merge runner-supplied
+    ``_arch_hparams`` onto the spec so ``arch_hparams_override`` (e.g.
+    txc_base T=10 / T=20) flows through to model instantiation.
+    agent_nlp's eval reads the docstring's ``_arch_hparams`` but doesn't
+    actually use it; this local version applies it.
     """
     del model  # we re-instantiate
     arch_name = eval_cfg["_arch_name"]
+    arch_hparams = eval_cfg["_arch_hparams"]
     state_dict = eval_cfg["_state_dict"]
     act_cache_key = eval_cfg["_act_cache_key"]
     eval_key_hint = eval_cfg["_eval_key_hint"]
     n_features = int(eval_cfg.get("n_features", DEFAULT_N_FEATURES))
 
     spec = load_arch(arch_name, component=component)
+    spec = spec.model_copy(update={"hparams": arch_hparams})
     d_in = _d_in_from_act_cache(act_cache_key)
     m = instantiate_arch(spec, d_in=d_in).cuda().eval()
     m.load_state_dict(state_dict)
@@ -146,15 +165,20 @@ def run_one_cell(
             precision="bf16",
         )
     else:
-        cfg = training_cfg if training_cfg is not None else ARCH_TRAINING_CFGS[arch]
+        # default: pick the FIRST cfg (canonical / T=5 for txc_base)
+        cfg = training_cfg if training_cfg is not None else ARCH_TRAINING_CFGS[arch][0]
 
     act_cache_key = compute_act_cache_key(load_datasource(DATASOURCE))
 
     # Pre-compute the eval_key so the qualitative judge_outputs.jsonl
-    # path is set correctly. The runner re-computes the same key from
-    # the same inputs, so this is safe (same pattern as agent_nlp).
+    # path is set correctly. Mirror the runner's arch_hparams_override
+    # merge so train_key matches (commit dfd60850 / runner.py:116).
+    arch_spec = load_arch(arch, component=COMPONENT)
+    if cfg.arch_hparams_override:
+        merged = {**arch_spec.hparams, **cfg.arch_hparams_override}
+        arch_spec = arch_spec.model_copy(update={"hparams": merged})
     train_key = compute_train_key(
-        arch=load_arch(arch, component=COMPONENT),
+        arch=arch_spec,
         seed=seed,
         training_cfg=cfg,
         act_cache_key=act_cache_key,
@@ -172,9 +196,11 @@ def run_one_cell(
     eval_cfg["_eval_key_hint"] = eval_key
 
     log.info(
-        "[c4_base.run] CELL: arch=%s seed=%d n_features=%d "
-        "n_steps=%d ds=%s subject=%s",
-        arch, seed, n_features, cfg.n_steps, DATASOURCE, SUBJECT_MODEL_NAME,
+        "[c4_base.run] CELL: arch=%s%s seed=%d n_features=%d "
+        "n_steps=%d arch_hparams_override=%s ds=%s subject=%s",
+        arch, f" ({_cfg_tag(cfg)})" if _cfg_tag(cfg) else "",
+        seed, n_features, cfg.n_steps,
+        cfg.arch_hparams_override, DATASOURCE, SUBJECT_MODEL_NAME,
     )
 
     result = runner.run_cell(
@@ -231,25 +257,41 @@ def main(argv=None):
     )
     p.add_argument("--force-train", action="store_true")
     p.add_argument("--force-eval", action="store_true")
+    p.add_argument(
+        "--cfg-tags", nargs="+", default=None,
+        help="Restrict to specific cfg tags per arch "
+             "(e.g. 'T10 T20' to run only the txc_base T-sweep cells, "
+             "or '' for the canonical default cfg). If omitted, runs "
+             "ALL cfgs registered for each requested arch.",
+    )
     args = p.parse_args(argv)
 
     log.info(
         "[c4_base.run] sweep archs=%s seeds=%s n_features=%d ds=%s "
-        "subject=%s smoke=%s",
+        "subject=%s cfg_tags=%s smoke=%s",
         args.archs, args.seeds, args.n_features, DATASOURCE,
-        SUBJECT_MODEL_NAME, args.smoke,
+        SUBJECT_MODEL_NAME, args.cfg_tags, args.smoke,
     )
 
     for arch in args.archs:
-        for seed in args.seeds:
-            run_one_cell(
-                arch=arch,
-                seed=seed,
-                n_features=args.n_features,
-                smoke=args.smoke,
-                force_train=args.force_train,
-                force_eval=args.force_eval,
-            )
+        for cfg in ARCH_TRAINING_CFGS[arch]:
+            tag = _cfg_tag(cfg)
+            if args.cfg_tags is not None and tag not in args.cfg_tags:
+                log.info(
+                    "[c4_base.run] SKIP arch=%s cfg=%s (not in --cfg-tags %s)",
+                    arch, tag or "(default)", args.cfg_tags,
+                )
+                continue
+            for seed in args.seeds:
+                run_one_cell(
+                    arch=arch,
+                    seed=seed,
+                    n_features=args.n_features,
+                    smoke=args.smoke,
+                    training_cfg=cfg,
+                    force_train=args.force_train,
+                    force_eval=args.force_eval,
+                )
 
     log.info("[c4_base.run] all cells complete")
 

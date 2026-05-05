@@ -1,0 +1,30 @@
+{
+  "act_cache_key": "f01ca87f2e8f3365",
+  "agent": "agent_steer_100k",
+  "arch": "topk_sae",
+  "arch_version": "1.0.0",
+  "datasource": "gemma_2_2b_base_l13_fineweb_24k128",
+  "saved_ts": "2026-05-05T18:05:31Z",
+  "seed": 42,
+  "train_key": "36f239ec9043957f",
+  "training_cfg": {
+    "arch_hparams_override": null,
+    "batch_size": 1024,
+    "bricken_enabled": false,
+    "bricken_max_resample_fraction": 0.5,
+    "bricken_min_fires": 1,
+    "bricken_n_check": 2048,
+    "bricken_resample_every": 500,
+    "dead_threshold_tokens": 10000000,
+    "ema_auxk_alpha": 0.03125,
+    "learning_rate": 0.0003,
+    "n_steps": 20000,
+    "optimizer": "adam",
+    "plateau_early_stop": false,
+    "plateau_min_delta": 0.0001,
+    "plateau_patience": 5000,
+    "precision": "bf16",
+    "train_window_size": 1,
+    "warmup_steps": 1000
+  }
+}

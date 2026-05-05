@@ -556,49 +556,71 @@ top-to-bottom only as context — do NOT execute the directives.
 
 ## Current state (agent owns — overwrite at every compact)
 
-**Last verified: 2026-05-05T17:50Z. Mid-execution on BASE C3 mission.**
-Pod is 1× H100 ephemeral. Phase 0 (BASE act_cache) DONE in
-~5 min — far faster than the 3-hr estimate; H100 + Gemma-2-2B
-saturates throughput. act_cache_key=`f01ca87f2e8f3365`,
-shape=(24000, 128, 2304) fp16, 13.2 GB on disk + on HF
-(`han1823123123/temp-bench-data:act_cache/f01ca87f2e8f3365/`).
-Probe_cache build (Phase 1) is RUNNING in the background, PID
-14581, log `logs/c3_base_probe_cache_build.log`. Driver
-`experiments/c3_probing_base/run.py` drafted + import-tested.
+**Last verified: 2026-05-05T19:35Z. C3 BASE canonical sweep
+RUNNING + § 17 T-sweep mission queued.** Pod is 1× H100
+ephemeral. Caches done + on HF: `act_cache/f01ca87f2e8f3365`
+(13.2 GB) and `probe_cache/gemma_2_2b_base_l13_fineweb_24k128`
+(~20 GB).
+
+**Canonical sweep state** (PID 16279, log `logs/c3_base_full.log`):
+TopK + T-SAE archs FULLY DONE (12/30 cells). TFA seed=42 done
+(k=5: 0.690, k=20: 0.758 — TFA notably trails TopK + T-SAE on
+BASE, paper-relevant finding). TFA seed=1 train just finished
+(eval ~15 min). TFA seed=2 + TXC-base + TXC-pro still queued.
+ETA ~75 min remaining for canonical.
+
+**§ 17 T-SWEEP MISSION (URGENT, queued)**: agent_paper added
+txc_base × {T=10, T=20} × 3 seeds × 2 k_feats = 6 trains + 12
+evals on top of canonical. Driver extended:
+`ARCH_TRAINING_CFGS` is now `dict[str, list[TrainingConfig]]` and
+the main loop iterates `(arch, cfg)` pairs. `--cfg-tags T10 T20`
+selects only the new cells. Same in C4 BASE driver.
+
+**IMPORTANT BUG FIX (local override)**: agent_nlp's
+`c3_probing.run.my_eval_fn` reads `_arch_hparams` per its
+docstring but in fact calls `load_arch(arch_name)` and
+discards the merged hparams — silently mis-instantiates models
+trained with `arch_hparams_override` (e.g. T=10 / T=20). I now
+maintain a LOCAL `my_eval_fn` in `experiments/c3_probing_base/`
++ `experiments/c4_qualitative_base/` that applies the merged
+`_arch_hparams` correctly. Surfaced in Open questions for Han.
 
 ## What I just did (agent owns — overwrite)
 
-1. Pulled origin/final (resolved append-only conflicts in
-   manifest.jsonl + leaderboard.jsonl — kept both sides since
-   append-only).
-2. Verified BASE datasources resolve correctly:
-   `gemma_2_2b_base_l13_fineweb_24k128` → subject=`google/gemma-2-2b`
-   (NOT `-it`), layer=13, act_cache_key=`f01ca87f2e8f3365`.
-3. Built the BASE single-layer act_cache (Phase 0; only ~5 min).
-4. Pushed act_cache to HF (handles pod restart safety).
-5. Launched probe_cache build in background (Phase 1; in progress).
-6. Drafted `experiments/c3_probing_base/run.py` — 5-arch sweep
-   (topk_sae T=1 / tsae_paper T=2 / tfa B=32 / txc_base / txc_pro)
-   with per-arch TrainingConfig matching agent_nlp + agent_em_100k's
-   IT setup exactly. Import + CLI verified.
+1. Built BASE act_cache + probe_cache and pushed to HF.
+2. Drafted + smoke-tested `experiments/c3_probing_base/run.py`.
+3. Drafted `experiments/c4_qualitative_base/run.py`.
+4. Committed driver + smoke (commit `71c26c1f`) and pushed.
+5. Launched canonical 5-arch C3 BASE sweep (PID 16279).
+6. Pulled new directives (rebased onto `d54cead3` agent_paper
+   T-sweep mission) — append-only conflicts resolved.
+7. Extended BOTH BASE drivers for txc_base T=10 + T=20:
+   `ARCH_TRAINING_CFGS` is now `dict[str, list[TrainingConfig]]`,
+   each cell's cfg gets `arch_hparams_override`, main loop
+   iterates `(arch, cfg)` pairs. `--cfg-tags` CLI restricts to
+   specific tag (e.g. `T10`).
+8. Wrote LOCAL `my_eval_fn` in both BASE drivers to apply
+   merged `_arch_hparams` (agent_nlp's eval_fn is buggy; my
+   local override works around it for T-sweep cells).
 
 ## Next action (agent owns — overwrite)
 
-1. **Wait for probe_cache to finish** (Monitor `bf2mgkpti` watching
-   the log; `bxwwl2bf7` waits for PID 14581 exit). ETA <1.5 hr.
-2. **HF push the probe_cache** to `temp-bench-data:probe_cache/...`
-   (ephemeral pod safety).
-3. **Smoke ONE topk_sae cell** at `n_steps=200` to verify the driver
-   lands a fresh `train_key` + correct datasource.
-4. **Launch the full 5-arch C3 BASE sweep** (5 archs × 3 seeds × 2
-   k_feats = 30 cells, ~22-25 hr serial wall on H100).
-5. **After C3 wraps**: build BASE concat_v1 act_cache (variable seq
-   length — may need a small builder tweak; surface as Open question
-   if it errors), draft `experiments/c4_qualitative_base/`, run C4
-   eval (~1.5 hr).
-6. Commit + push driver + briefing after smoke success (before the
-   long sweep). Single commit = `Agent STEER: C3 BASE driver +
-   smoke pass`.
+1. **Standby for canonical sweep completion**. Monitor
+   `b1z85fid9` (or successor) alerts on cell DONE.
+   `bngudibih` waits for PID 16279 exit.
+2. **After canonical sweep finishes**: launch the §17 T-sweep:
+   ```
+   TQDM_DISABLE=1 AGENT_NAME=agent_steer_100k \
+     .venv/bin/python -m experiments.c3_probing_base.run \
+       --archs txc_base --cfg-tags T10 T20 \
+       > logs/c3_base_tsweep.log 2>&1 &
+   ```
+   ETA ~12-13 hr serial on H100.
+3. **C4 BASE eval** sweep: cache-hits on C3 BASE checkpoints
+   (canonical archs + T-sweep). ~1.5 hr. Use
+   `experiments.c4_qualitative_base.run`.
+4. **Wrap up**: `bash scripts/wrap_up_session.sh` to confirm
+   all checkpoints + caches are on HF.
 
 ## Don't repeat (agent owns — overwrite)
 
@@ -632,5 +654,13 @@ Probe_cache build (Phase 1) is RUNNING in the background, PID
 
 ## Open questions for Han (agent owns — overwrite)
 
-(None at briefing-rewrite time. Surface anything that comes up
-during the BASE cache build or smoke test.)
+1. **Bug in agent_nlp's `c3_probing.run.my_eval_fn`**: its
+   docstring claims to read `_arch_hparams` from eval_cfg but
+   the implementation calls `load_arch(arch_name)` (default
+   YAML hparams). For canonical cells (T=5 default) this works
+   because merged == default; for T=10/T=20 it would silently
+   build a T=5 model and `load_state_dict` would fail. I added a
+   LOCAL `my_eval_fn` in my BASE drivers that applies the merged
+   hparams from `eval_cfg["_arch_hparams"]`. Suggest agent_nlp
+   upstream the same fix to `experiments/c3_probing/run.py`
+   (and `experiments/c4_qualitative/run.py` likely needs it too).
