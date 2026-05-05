@@ -1,9 +1,19 @@
 {
   "delta_gc": {
+    "mlc": {
+      "peak": 0.16393442622950818,
+      "peak_magnitude": 16.0,
+      "stability": "13/24"
+    },
     "tfa": {
       "peak": 0.3442622950819672,
       "peak_magnitude": 16.0,
       "stability": "13/24"
+    },
+    "txc_base": {
+      "peak": 0.4262295081967213,
+      "peak_magnitude": -8.0,
+      "stability": "15/24"
     },
     "txc_pro": {
       "peak": 0.3770491803278688,
@@ -12,12 +22,10 @@
     }
   },
   "missing_archs": [
-    "mlc",
     "stacked_sae",
     "topk_sae",
-    "tsae_paper",
-    "txc_base"
+    "tsae_paper"
   ],
-  "n_judge_calls": 4575,
-  "n_leaderboard_cells": 2
+  "n_judge_calls": 7625,
+  "n_leaderboard_cells": 4
 }
