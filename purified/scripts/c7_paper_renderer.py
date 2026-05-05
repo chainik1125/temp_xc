@@ -61,6 +61,28 @@ PAPER_ARCH_COLOR = {
     "stacked_sae": "#64B5CD",
     "tfa":        "#777777",
 }
+
+# Per-cell colors: each (arch, bs) gets a distinct hue so the
+# legend has no duplicates and overlapping curves don't share colors.
+# Two TXC archs each get two cells (bs=256 + bs=1024); per-token
+# baselines run only at bs=1024.
+PAPER_CELL_COLOR = {
+    ("txc_base",   256):  "#8172B2",  # light purple
+    ("txc_base",   1024): "#4F3A78",  # dark purple
+    ("txc_pro",    256):  "#E8A33D",  # light orange
+    ("txc_pro",    1024): "#A36B0F",  # dark orange
+    ("topk_sae",   1024): "#4C72B0",  # blue
+    ("tsae_paper", 1024): "#55A868",  # green
+    ("mlc",        1024): "#C44E52",  # red
+    ("stacked_sae",1024): "#64B5CD",  # cyan
+    ("tfa",        1024): "#777777",  # grey
+}
+
+
+def cell_color(arch: str, bs: int | None) -> str:
+    """Return a distinct color per (arch, bs) cell."""
+    bs_int = int(bs) if bs is not None else 0
+    return PAPER_CELL_COLOR.get((arch, bs_int)) or PAPER_ARCH_COLOR.get(arch, "#333333")
 S_GRID = (1, 2, 4, 8, 16, 32)
 MAG_KEY_RE = re.compile(r"^delta_gc_mag_([+-]?\d+(?:\.\d+)?)$")
 
@@ -183,16 +205,22 @@ def _n_steps_from_row(r: dict) -> int | None:
 
 def plot_delta_gc_vs_magnitude(rows: list[dict], out_path: Path) -> None:
     plt.figure(figsize=(8.5, 5.0))
+    seen_labels: set[str] = set()
     for r in rows:
         pairs = parse_mag_metrics(r["metrics"])
         if not pairs:
             continue
         mags = [m for m, _ in pairs]
         deltas = [d for _, d in pairs]
-        color = PAPER_ARCH_COLOR.get(r["arch"], "#333333")
-        ls = "-" if _bs_from_row(r) == 1024 else "--"
+        color = cell_color(r["arch"], _bs_from_row(r))
+        label = cell_short_label(r)
+        # Disambiguate same-label rows (e.g. duplicated train_keys) by
+        # appending a short hash suffix so the legend never shows ties.
+        if label in seen_labels:
+            label = f"{label} [{r['train_key'][:6]}]"
+        seen_labels.add(label)
         plt.plot(mags, deltas, marker="o", markersize=4, linewidth=1.6,
-                 color=color, linestyle=ls, label=cell_short_label(r))
+                 color=color, linestyle="-", label=label)
     plt.axhline(0, color="black", linewidth=0.5, alpha=0.5)
     plt.axvline(0, color="black", linewidth=0.5, alpha=0.5)
     plt.xlabel("Steering magnitude $m$")
@@ -208,8 +236,18 @@ def plot_delta_gc_vs_magnitude(rows: list[dict], out_path: Path) -> None:
 def plot_peak_delta_gc_bar(rows: list[dict], out_path: Path) -> None:
     rows = sorted(rows, key=lambda r: r["metrics"].get("delta_gc_peak", 0.0))
     labels = [cell_short_label(r) for r in rows]
+    # Disambiguate duplicate labels by appending a train_key suffix.
+    seen: dict[str, int] = {}
+    final_labels = []
+    for r, lab in zip(rows, labels):
+        if lab in seen:
+            final_labels.append(f"{lab} [{r['train_key'][:6]}]")
+        else:
+            final_labels.append(lab)
+        seen[lab] = seen.get(lab, 0) + 1
+    labels = final_labels
     peaks = [r["metrics"].get("delta_gc_peak", 0.0) for r in rows]
-    colors = [PAPER_ARCH_COLOR.get(r["arch"], "#333333") for r in rows]
+    colors = [cell_color(r["arch"], _bs_from_row(r)) for r in rows]
     plt.figure(figsize=(8.5, max(3.5, 0.4 * len(rows) + 1.5)))
     bars = plt.barh(labels, peaks, color=colors, alpha=0.85)
     for r, bar, peak in zip(rows, bars, peaks):
@@ -228,6 +266,7 @@ def plot_peak_delta_gc_bar(rows: list[dict], out_path: Path) -> None:
 
 def plot_pr_auc_vs_S(rows: list[dict], out_path: Path) -> None:
     plt.figure(figsize=(8.0, 5.0))
+    seen_labels: set[str] = set()
     for r in rows:
         ys = []
         for S in S_GRID:
@@ -237,10 +276,13 @@ def plot_pr_auc_vs_S(rows: list[dict], out_path: Path) -> None:
             continue
         valid_x = [x for x, y in zip(S_GRID, ys) if y is not None]
         valid_y = [y for y in ys if y is not None]
-        color = PAPER_ARCH_COLOR.get(r["arch"], "#333333")
-        ls = "-" if _bs_from_row(r) == 1024 else "--"
-        plt.plot(valid_x, valid_y, marker="o", color=color, linestyle=ls,
-                 linewidth=1.6, label=cell_short_label(r))
+        color = cell_color(r["arch"], _bs_from_row(r))
+        label = cell_short_label(r)
+        if label in seen_labels:
+            label = f"{label} [{r['train_key'][:6]}]"
+        seen_labels.add(label)
+        plt.plot(valid_x, valid_y, marker="o", color=color, linestyle="-",
+                 linewidth=1.6, label=label)
     plt.xscale("log", base=2)
     plt.xticks(list(S_GRID), [str(s) for s in S_GRID])
     plt.xlabel("Top-$S$ probe features")
@@ -256,8 +298,17 @@ def plot_pr_auc_vs_S(rows: list[dict], out_path: Path) -> None:
 def plot_pr_auc_S8_bar(rows: list[dict], out_path: Path) -> None:
     rows = sorted(rows, key=lambda r: r["metrics"].get("pr_auc_S8", 0.0))
     labels = [cell_short_label(r) for r in rows]
+    seen: dict[str, int] = {}
+    final_labels = []
+    for r, lab in zip(rows, labels):
+        if lab in seen:
+            final_labels.append(f"{lab} [{r['train_key'][:6]}]")
+        else:
+            final_labels.append(lab)
+        seen[lab] = seen.get(lab, 0) + 1
+    labels = final_labels
     aucs = [r["metrics"].get("pr_auc_S8", 0.0) for r in rows]
-    colors = [PAPER_ARCH_COLOR.get(r["arch"], "#333333") for r in rows]
+    colors = [cell_color(r["arch"], _bs_from_row(r)) for r in rows]
     plt.figure(figsize=(8.0, max(3.5, 0.4 * len(rows) + 1.5)))
     bars = plt.barh(labels, aucs, color=colors, alpha=0.85)
     for bar, auc in zip(bars, aucs):
@@ -275,9 +326,9 @@ def plot_pr_auc_S8_bar(rows: list[dict], out_path: Path) -> None:
 
 def _enumerate_probe_cells() -> list[tuple[str, int, str, list[dict]]]:
     """Walk all checkpoints/<train_key>/ dirs that have eval_log.jsonl. Returns
-    (arch, bs, train_key, log_rows) for every in-flight or completed cell.
-    Looks up arch + bs from each checkpoint's config.json so in-flight cells
-    that have no leaderboard row yet still appear on the convergence plots."""
+    (arch, bs, train_key, log_rows) for every in-flight or completed cell at
+    the headline n_steps=300_000 config (older 30K sprint cells are excluded
+    so the convergence plots match the leaderboard rows we report)."""
     out = []
     cp_root = purified_root() / "checkpoints"
     if not cp_root.exists():
@@ -296,8 +347,13 @@ def _enumerate_probe_cells() -> list[tuple[str, int, str, list[dict]]]:
         # Filter to c7 cells: subject model is the Llama datasource.
         if cfg.get("datasource") != "llama_3_1_8b_base_l10_ward_nousmirror":
             continue
+        tcfg = cfg.get("training_cfg") or {}
+        # Filter to the headline training config so old sprint cells (e.g.
+        # n_steps=20_000 / 30_000) don't appear in the convergence plots.
+        if tcfg.get("n_steps") != 300_000:
+            continue
         arch = cfg.get("arch")
-        bs = (cfg.get("training_cfg") or {}).get("batch_size", 0)
+        bs = tcfg.get("batch_size", 0)
         log_rows = []
         for line in eval_log_path.read_text().splitlines():
             line = line.strip()
@@ -320,8 +376,15 @@ def plot_probe_curves(rows: list[dict], out_dir: Path) -> dict[str, Path]:
     cells appear too (not just completed leaderboard rows).
     """
     series = {}
+    seen_label_count: dict[str, int] = {}
     for arch, bs, tk, log_rows in _enumerate_probe_cells():
-        label = f"{PAPER_ARCH_LABEL.get(arch, arch)} bs={bs} [{tk[:8]}]"
+        base_label = f"{PAPER_ARCH_LABEL.get(arch, arch)} bs={bs}"
+        # Append a train_key suffix only if the same (arch, bs) has
+        # multiple cells (so legend labels are unique without being noisy
+        # in the common single-cell case).
+        n = seen_label_count.get(base_label, 0)
+        seen_label_count[base_label] = n + 1
+        label = base_label if n == 0 else f"{base_label} [{tk[:6]}]"
         series[(arch, bs, tk)] = (label, log_rows, arch)
     out = {}
     for metric, ylabel, fname in [
@@ -337,9 +400,8 @@ def plot_probe_curves(rows: list[dict], out_dir: Path) -> dict[str, Path]:
             if not valid:
                 continue
             xs, ys = zip(*valid)
-            color = PAPER_ARCH_COLOR.get(arch_name, "#333333")
-            ls = "-" if bs == 1024 else "--"
-            plt.plot(xs, ys, color=color, linestyle=ls, linewidth=1.4, label=lab)
+            color = cell_color(arch_name, bs)
+            plt.plot(xs, ys, color=color, linestyle="-", linewidth=1.4, label=lab)
         plt.xlabel("Training step")
         plt.ylabel(ylabel)
         if metric == "nmse":
