@@ -10,6 +10,11 @@
       "peak_magnitude": 16.0,
       "stability": "13/24"
     },
+    "tsae_paper": {
+      "peak": 0.2459016393442623,
+      "peak_magnitude": 16.0,
+      "stability": "13/24"
+    },
     "txc_base": {
       "peak": 0.4262295081967213,
       "peak_magnitude": -8.0,
@@ -23,9 +28,8 @@
   },
   "missing_archs": [
     "stacked_sae",
-    "topk_sae",
-    "tsae_paper"
+    "topk_sae"
   ],
-  "n_judge_calls": 7625,
-  "n_leaderboard_cells": 4
+  "n_judge_calls": 9150,
+  "n_leaderboard_cells": 5
 }
