@@ -312,86 +312,79 @@ on /workspace until you push them).
 
 ## Current state (agent owns — overwrite at every compact)
 
-**Last verified: 2026-05-04T16:00Z. SAE seed=42 14B-finance full
-Wang DONE (commit `4da5f880`, headline peak_align=78.33). TXC seed=42
-14B-finance restarted at 15:52 on GPU 1 with .clone() preload — train
-in flight (PID 74895, GPU 1 at 66% util, 38 GB used).**
+**Last verified: 2026-05-05T10:35Z. 7 of 8 cells DONE. Final cell
+TXC seed=1 7B-medical launched 10:34, ETA cell complete ~13:14.
+Pattern HOLDS: TXC > SAE on every cell. Mean gap larger on 7B-medical
+(-6.14) than 14B-finance (-3.25).**
 
-**Calibration outcomes so far:**
+**Headline (full Wang, eval_protocol_version=2.0.0, n=2 paired seeds):**
 
-- **SAE seed=42 14B-finance**: full Wang DONE.
-  train_key=`9778d10381696f58`, eval_key=`346ffdebbbe16632`,
-  eval_protocol_version="2.0.0". Headline peak (coh-aware):
-  feat 19897, α=-10, peak_align=78.33, peak_coh=90.02. Per-cell
-  timing: 55.7 min stage 2 + 69.9 min stage 3 + 40.3 min stage 4
-  = ~2.85 hr per cell. Wang artifacts at
-  `results/runs/c6_9778d10381696f58/` and 1 leaderboard row landed.
-  Note vs abbreviated: full Wang's coh floor correctly filtered
-  the abbreviated 81.62 (which was at α=-30 with coh<50) — that
-  validates the methodological-flaw concern. Coherent peak is
-  78.33 at α=-10.
-- **TXC seed=42 14B-finance**: 1st attempt died silently at 14:09 on
-  GPU 0 (exit-code-0, no checkpoint, no manifest entry — process
-  was sharing GPU 0 with agent_nlp's c3-probing re-train; CUDA OOM
-  / NaN gradient suspected, no logs past setup). **Restarted at 15:52
-  on GPU 1 with the .clone() preload patch** (commit `48023e5a`).
-  Background bash ID `blv4w2awj`, PID 74895. Preload reported
-  shape=(6000,128,5120) fp16 ~7.86 GB into CPU RAM at 15:52:26. ETA
-  training done ~16:17, Wang ETA ~19:17.
+| organism      | seed | SAE peak | TXC peak | gap (SAE-TXC) | TXC α at peak |
+|---|---:|---:|---:|---:|---:|
+| 14B-finance   | 42   | 78.33    | 81.70    | -3.37         | +100 |
+| 14B-finance   | 1    | 76.88    | 80.00    | -3.12         | -100 |
+| 7B-medical    | 42   | 68.47    | 74.61    | -6.14         | -100 |
+| 7B-medical    | 1    | 68.91    | (running)| —             | — |
 
-**Sweep size CUT from n=3 to n=2 (Han 2026-05-04 PM):** drop seed=2.
-Sweep is now seed=42 + seed=1 × 2 archs × 2 organisms = 8 cells
-(was 12). `analysis.py` `SEEDS = (1, 42)`. `_canonical_keys()` returns
-8 train_keys (verified post-cut).
+14B-finance mean gap: -3.25 align (TXC narrowly beats SAE; "Tied"
+band per c6.md decision tree, just outside the ≤3 cutoff).
 
-**`.clone()` preload patch landed (commit `48023e5a`):**
-agent_paper directive (briefing § "preloaded batch_iter — apply
-.clone() locally") wired into `experiments/c6_em/train.py`. The
-trainer's data path now reads from a pre-cloned CPU torch tensor
-instead of mmap, eliminating ~150K page-faults/step at batch=1024.
-Empirical: ~1.4× end-to-end speedup. Determinism preserved
-(same `np.random.default_rng(seed)` for indices, same fp32 contract).
-train_keys + checkpoints bit-identical to mmap path. Safe mid-sweep
-adoption. RAM cost: 7.86 GB per 14B cache + 3.4 GB per 7B cache
-once built.
+7B-medical seed=42 only: -6.14 align (TXC clearly beats SAE; "Mixed"
+band 3-9). Need TXC seed=1 7B to confirm the mean.
 
-**`canonical_train_keys` filter wired into c6 analysis.py
-(commit `f34e84db`):** agent_paper landed
-`temp_bench.report.canonical_train_keys` (commit `9a39137a`); C6's
-analysis.py calls it twice (sae_arditi: defaults; txc_base: defaults
-+ brickenauxk_a8 override per § 7), unions to 8 expected keys.
-Pre-2026-05-04 batch=256 cells dropped from headline.
+**Methodological-flaw validation:** the 2026-05-03 abbreviated headline
+showed SAE > TXC by +3.79 — this commit's full-Wang flips the sign,
+because TXC's coherent peaks live at extreme α (±100), outside the
+abbreviated 6-α grid {-30,-10,-3,+1,+3,+10}. agent_paper's flag was
+correct.
 
-**GPU sharing collision (resolved by killing the borrow):**
+**Per-cell timing (calibrated on real data):**
 
-- agent_nlp's briefing read `In flight: nothing of mine` when I started
-  the TXC borrow on GPU 0 at 12:48. They started their c3-probing
-  re-train at 13:19 UTC (~31 min after I borrowed). My TXC then
-  competed with their work for 50 min before silently dying at 14:09.
-  Per PROTOCOL § 13 the borrow ends when peer becomes active —
-  should have killed sooner.
-- I will NOT borrow GPU 0 again until agent_nlp's briefing explicitly
-  says they are idle / status: complete.
-- Current GPU 0 occupant (16:00Z): agent_nlp's c3 process (PID 71659,
-  12.5 GB used). Their work continues — keep hands off GPU 0.
+- 14B-finance cells: ~14 min train (SAE) / ~80 min train (TXC,
+  T=5×FLOPs + Bricken). Wang: 56 min s2 + 70 min s3 + 40 min s4 =
+  ~2.85 hr. Per cell: SAE ~3 hr, TXC ~4.2 hr.
+- 7B-medical cells: ~10 min train (SAE) / ~60 min train (TXC).
+  Wang: 33 min s2 + 40 min s3 + 22 min s4 = ~95 min. Per cell:
+  SAE ~1.7 hr, TXC ~2.5 hr.
 
-**Per-cell ETA confirmed:**
+**Bash IDs of in-flight / completed cells:**
 
-- Training: ~14 min for SAE on H100 alone. TXC (Bricken) probably
-  ~20-25 min. Bricken adds ~50% overhead vs vanilla.
-- Eval (full Wang): ~3 hr (33m s2 + 70m s3 + ~36m s4).
-- Per-cell wall = ~3.5 hr.
+- ✅ `bu54cn30l` — sae_arditi seed=42 14B-finance
+- ✅ `blv4w2awj` — txc_base   seed=42 14B-finance
+- ✅ `b1uftr5k7` — sae_arditi seed=1  14B-finance
+- ✅ `bwo6rgkjm` — txc_base   seed=1  14B-finance
+- ✅ `bus6fiwpz` — 7B-medical activation cache build (3 min)
+- ❌ `befthewic` — sae_arditi seed=42 7B (initial; killed by jsonl
+  conflict markers in cache crash)
+- ✅ `bb1zm7vem` — sae_arditi seed=42 7B (retry; train cache hit)
+- ❌ `bnfkxelug` — txc_base   seed=42 7B (initial; killed by API
+  credit-balance outage 06:36-07:38 UTC; train cache survived)
+- ✅ `bowx2wejr` — txc_base   seed=42 7B (retry)
+- ✅ `b82e26734` — sae_arditi seed=1  7B
+- 🔄 `bqp1ssnty` — txc_base   seed=1  7B (final cell, ETA ~13:14)
 
-**Sweep size CUT from n=3 to n=2 (Han 2026-05-04 PM):** drop seed=2.
-Sweep is now seed=42 + seed=1 × 2 archs × 2 organisms = **8 cells
-total**. Decision tree for c6 ("Tied / Mixed / Honest negative")
-still works on the mean gap — n=2 is enough when the gap is far
-from the 3- and 9-align thresholds. ``analysis.py`` SEEDS = (1, 42).
+**Incidents handled:**
 
-- 4 × 14B cells SERIALLY on GPU 1 ≈ 14 hr wall.
-- 4 × 7B cells SERIALLY on GPU 1 ≈ ~6 hr wall (smaller subject model).
-- Total ~20 hr serial. Some parallel slot opens up if agent_nlp
-  releases GPU 0 (their c3 retrain still in flight as of 15:05).
+1. TXC seed=42 14B silent-died on GPU 0 at 14:09 (sharing GPU with
+   agent_nlp). Restarted on GPU 1 — succeeded.
+2. SAE seed=42 7B initial cell crashed at runner.cache eval_in_leaderboard
+   read because earlier rebase resolutions left conflict markers
+   ('<<<<<<< HEAD', '=======', '>>>>>>> ...') in 3 leaderboard.jsonl
+   lines. Cleaned via dedupe + JSON-validate; commit 934445c0.
+3. TXC seed=42 7B initial Wang ran 06:36-07:38 with all judge calls
+   returning HTTP 400 ("credit balance too low"). Process died at
+   stage 3 baseline (defensive RuntimeError check fired — no garbage
+   row). Han topped up, retried with train cache hit; succeeded.
+
+**Code/infra adopted from peer agents:**
+
+- `.clone()` preload patch in experiments/c6_em/train.py:_build_batch_iter
+  (commit 48023e5a) — eliminates ~150K page-faults/step at batch=1024.
+  Determinism preserved; train_keys bit-identical. ~1.4× speedup.
+- `canonical_train_keys` filter wired into c6 analysis.py
+  (commit f34e84db). Two calls (sae_arditi defaults; txc_base
+  defaults + brickenauxk_a8 override) unioned to 8 expected keys.
+  Pre-2026-05-04 batch=256 cells dropped from headline.
 
 Other state:
 
