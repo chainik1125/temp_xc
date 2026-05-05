@@ -51,6 +51,169 @@ surface it in chat, and let Han or agent_paper land the change. Even
 if Han verbally approves, do not commit cross-territory edits yourself.
 This is non-negotiable — see PROTOCOL.md § 8 + CLAUDE.md Hard Rule #7.
 
+### ⚠️ ADDITIONAL MISSION 2026-05-05 PM — C1 + C2 toy synthetic sweeps (spare A40s)
+
+**Han 2026-05-05 PM**: "agent_filler has 8 A40s, can they leverage all
+of them for C1 and C2!" Your C5 sweep below uses 6 of 8 GPUs; the
+spare 2 (or all 8 once C5 wraps) can run **two synthetic sweeps**:
+- **C1 — Markov-chain TopK sweep**: feature recovery AUC vs k_pos
+  for 8 archs (TopK, T-SAE, TFA, TFA-pos, Stacked T={2,5}, TXC-base,
+  TXC-pro). Driver in `experiments/c1_synthetic_topk/`.
+- **C2 — Coupled HMM gAUC sweep**: global recovery AUC for 7 arch+T
+  combos including TXC-pro T-modulation T_max ∈ {2, 5, 12}. Driver
+  in `experiments/c2_synthetic_coupled/`.
+
+agent_paper landed both frameworks + drivers in commits `dfd60850`
+(C2) + the next commit (C1); you just RUN the sweeps, no driver
+writing.
+
+C1 and C2 are small + fast: ~30 sec/cell on A40 (toy d_sae=40,
+d_in=40 or 256). Each fits in <1 hr wall on parallel A40s.
+
+### Mission scope (C1)
+
+| Sweep dim | Values |
+|---|---|
+| Archs × T | 8 combos: topk_sae, tsae_paper, tfa, tfa_pos, stacked_sae T={2,5}, txc_base, txc_pro (canonical T_max=10) |
+| `k_pos` | 12 values: {1, 2, 3, 4, 5, 6, 8, 10, 12, 15, 17, 20} (driver auto-skips invalid k for window archs at toy d_sae=40) |
+| Seeds | 3: {1, 2, 42} |
+| `n_steps` | 30,000 (canonical for C1 toy training per docs/components/c1.md) |
+| **Total** | **~200-220 cells** (after auto-skip of invalid k for txc_base/txc_pro/stacked_T=5 at high k) |
+
+Per-cell metric: feature recovery AUC vs the 20 ground-truth feature
+directions. Headline: AUC vs k_pos line per arch.
+
+### Mission scope (C2)
+
+| Sweep dim | Values |
+|---|---|
+| Archs × T | 7 combos (see `experiments/c2_synthetic_coupled/run.py:ARCH_TS`): topk_sae, stacked_sae T={2,5}, txc_base T=5, txc_pro T_max={2,5,12} (t_sample=2 fixed) |
+| `k_pos` | 12 values: {1, 2, 3, 4, 5, 6, 8, 10, 12, 15, 17, 20} |
+| Seeds | 3: {1, 2, 42} |
+| `n_steps` | 30,000 (canonical for C2 toy training) |
+| **Total** | **7 × 12 × 3 = 252 cells** |
+
+Per-cell metrics: eAUC (vs M=20 emission features), gAUC (vs K=10
+hidden features). Headline: gAUC vs k_pos by (arch, T).
+
+### Driver invocations (both smoke-tested by agent_paper on 5090)
+
+```bash
+# C1
+TQDM_DISABLE=1 AGENT_NAME=agent_filler \
+  .venv/bin/python -m experiments.c1_synthetic_topk.run \
+    [--archs ...] [--seeds ...] [--k-poses ...] [--n-steps 30000]
+
+# C2
+TQDM_DISABLE=1 AGENT_NAME=agent_filler \
+  .venv/bin/python -m experiments.c2_synthetic_coupled.run \
+    [--archs ...] [--seeds ...] [--k-poses ...] [--n-steps 30000]
+```
+
+Each driver iterates over all (arch, T-override, k_pos, seed) combos
+and writes one row per cell to `results/leaderboard.jsonl`. C1 also
+auto-skips invalid (arch, k_pos) combinations where k_train would
+exceed the matryoshka prefix at toy d_sae=40 (mostly txc_base /
+stacked_sae T=5 / txc_pro at k_pos > 8).
+
+### Parallelisation strategy on 8× A40
+
+Toy cells are tiny (~1.8 GB VRAM per cell — Han's MEMORY note from
+the 5090 carries over). You can comfortably run 5-10 cells per GPU
+in parallel.
+
+**Recommended split for C1+C2 simultaneously on 8× A40**:
+
+```bash
+#!/usr/bin/env bash
+# experiments/c1c2_toy_sweep.sh — run C1 + C2 across spare A40s.
+set -e
+cd "$(dirname "$0")/.."
+mkdir -p logs
+
+# C1 archs across GPUs 0-3 (one process per arch).
+declare -A C1=(
+  [0]="topk_sae tsae_paper"          # per-token archs (fast)
+  [1]="tfa tfa_pos"                  # full-seq attention archs
+  [2]="stacked_sae txc_base"         # window archs
+  [3]="txc_pro"                      # subseq + matryoshka
+)
+for gpu in "${!C1[@]}"; do
+  archs="${C1[$gpu]}"
+  log="logs/c1_gpu${gpu}.log"
+  echo "[c1_sweep] GPU ${gpu} → ${archs}"
+  setsid -f bash scripts/run_on_gpu.sh "${gpu}" -- \
+    .venv/bin/python -m experiments.c1_synthetic_topk.run \
+    --archs ${archs} \
+    > "${log}" 2>&1 &
+done
+
+# C2 archs across GPUs 4-7.
+declare -A C2=(
+  [4]="topk_sae"
+  [5]="stacked_sae"
+  [6]="txc_base"
+  [7]="txc_pro"
+)
+for gpu in "${!C2[@]}"; do
+  arch="${C2[$gpu]}"
+  log="logs/c2_gpu${gpu}.log"
+  echo "[c2_sweep] GPU ${gpu} → ${arch}"
+  setsid -f bash scripts/run_on_gpu.sh "${gpu}" -- \
+    .venv/bin/python -m experiments.c2_synthetic_coupled.run \
+    --archs "${arch}" \
+    > "${log}" 2>&1 &
+done
+
+wait
+echo "[c1c2_sweep] all complete"
+```
+
+This uses all 8 GPUs (assuming your C5 sweep is done by then; otherwise
+delay C1+C2 until C5 wraps, ~1.5 hr after launch). Expected wall: ~30-
+60 min (limited by the slowest single arch — txc_pro at C2 with T=12
+sweep × 12 k_pos × 3 seeds = 36 cells × ~30 sec = ~18 min).
+
+### Smoke
+
+agent_paper smoke-tested both drivers on 5090 (~18 cells total at
+n_steps=200, all `smoke=True` flagged). Smoke rows are tagged +
+filtered by analysis. Verify on your pod with one cell each:
+
+```bash
+# C1 smoke
+TQDM_DISABLE=1 AGENT_NAME=agent_filler \
+  bash scripts/run_on_gpu.sh 6 -- \
+  .venv/bin/python -m experiments.c1_synthetic_topk.run \
+  --archs topk_sae --seeds 42 --k-poses 5 --n-steps 200 --smoke
+
+# C2 smoke
+TQDM_DISABLE=1 AGENT_NAME=agent_filler \
+  bash scripts/run_on_gpu.sh 7 -- \
+  .venv/bin/python -m experiments.c2_synthetic_coupled.run \
+  --archs txc_pro --seeds 42 --k-poses 5 --n-steps 200 --smoke
+```
+
+Each completes in <30 sec; verify rows land at
+`component=c{1,2}, smoke=True`.
+
+### Watch-outs (C1 + C2)
+
+- **Toy sweeps run alongside your C5 sweep** — they share the pod's
+  CPU/RAM (small, ~few GB combined). Use spare GPUs for C1+C2 if
+  C5 still running; otherwise all 8 GPUs once C5 wraps.
+- **No HF push needed for C1+C2** — toy data + 40-feature
+  dictionaries are small enough that local-only artifacts are fine.
+- **Don't render `docs/components/c1.md` or `c2.md`** — agent_paper
+  handles rendering via the per-component `analysis.py`.
+- **C1 driver auto-skips invalid (arch, k_pos)** combinations where
+  k_train > matryoshka prefix at toy d_sae=40. Expect ~200-220 cells
+  to actually run (out of 8 archs × 12 k × 3 seeds = 288 nominal).
+- **Both sweeps idempotent** — re-running is safe. Cached cells are
+  skipped via runner's checkpoint cache (per `train_key`).
+
+---
+
 ### ⚠️ NEW MISSION 2026-05-05 PM — C5 TopK + TFA baselines (decisions § 16)
 
 **Your prior C5 T-SAE T=2 mission is COMPLETE** (commit `3a654fab`).

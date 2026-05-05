@@ -40,6 +40,8 @@ archs:
       d_sae: 18432   # gemma-2-2b L13 d_in (2304) × 8
       k_pos: 20      # default sparsity; components override per-cell
     per_component_hparams:
+      c1:
+        d_sae: 40    # Phase 2 paper-faithful toy dictionary size
       c2:
         d_sae: 40    # Phase 3 paper-faithful toy dictionary size
       c7:
@@ -55,6 +57,8 @@ archs:
       T: 5           # T independent TopK-SAEs, one per position
       k_pos: 20      # window-level L0 = k_pos * T
     per_component_hparams:
+      c1:
+        d_sae: 40    # Phase 2 paper-faithful toy dictionary size
       c2:
         d_sae: 40    # Phase 3 paper-faithful toy dictionary size
       c7:
@@ -74,6 +78,8 @@ archs:
       h_frac: 0.20   # 20% high-level features per Bhalla et al. 2025
       contrastive_alpha: 1.0
     per_component_hparams:
+      c1:
+        d_sae: 40    # Phase 2 paper-faithful toy dictionary size
       c7:
         d_sae: 32768   # Llama-3.1-8B L10 d_in (4096) × 8
     notes: |
@@ -103,6 +109,8 @@ archs:
       n_heads: 4
       use_pos_embedding: false
     per_component_hparams:
+      c1:
+        d_sae: 40    # Phase 2 paper-faithful toy dictionary size
       c6:
         d_sae: 32768   # Qwen-2.5-14B L24 d_in=5120 (× 6.4); shared with sae_arditi/txc_base
       c7:
@@ -119,6 +127,8 @@ archs:
       n_heads: 4
       use_pos_embedding: true
     per_component_hparams:
+      c1:
+        d_sae: 40    # Phase 2 paper-faithful toy dictionary size
       c7:
         d_sae: 32768
     notes: "TFA with sinusoidal positional encoding in attention Q/K (not V)."
@@ -161,6 +171,8 @@ archs:
       decoder_unit_norm: true
       decoder_grad_orthogonalize: true
     per_component_hparams:
+      c1:
+        d_sae: 40    # Phase 2 paper-faithful toy dictionary size
       c2:
         d_sae: 40    # Phase 3 paper-faithful toy dictionary size
       c6:
@@ -191,6 +203,9 @@ archs:
       decoder_unit_norm: true
       decoder_grad_orthogonalize: true
     per_component_hparams:
+      c1:
+        d_sae: 40       # Phase 2 paper-faithful toy dictionary size
+        h_size: 40      # disable matryoshka at toy scale (same rationale as c2)
       c2:
         d_sae: 40       # Phase 3 paper-faithful toy dictionary size.
         h_size: 40      # disable matryoshka at toy scale (h=d_sae//5=8
