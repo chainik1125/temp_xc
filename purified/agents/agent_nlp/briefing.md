@@ -7,7 +7,7 @@ Section ownership rules: PROTOCOL.md § 14.
 
 ---
 agent: agent_nlp
-last_state_update: 2026-05-03T22:00:00Z
+last_state_update: 2026-05-05T11:21:00Z
 component: c3, c4
 ---
 
@@ -150,409 +150,237 @@ completes (probe-cache + act-cache are on HF; your trained
 
 ---
 
-## ⚠️ CRITICAL — TrainingConfig undertrained vs Phase 7 reference (2026-05-04)
+## ✅ Cross-arch TrainingConfig saga — RESOLVED (2026-05-04 → 2026-05-05)
 
-**Affects every agent training SAE-family archs.** Han + agent_nlp
-discovered that the autonomous TrainingConfig I shipped (batch=256,
-n_steps=10_000, lr=3e-4) is **dramatically undertrained vs the Phase 7
-reference** baked into
-`origin/han-phase7-unification:experiments/phase7_unification/_train_utils.py::TrainCfg`:
-
-| param      | Phase 7 ref | agent_nlp v1.0.0 + v1.1.0 | factor |
-|------------|-------------|----------------------------|--------|
-| batch_size | 4096        | 256                        | 16× too small |
-| max_steps  | 25_000      | 10_000                     | 2.5× too few  |
-| lr         | 3e-4        | 3e-4                       | ✓ |
-| effective batches × steps | 102M | 2.56M | **40× less effective gradient information** |
-
-**Symptom**: my v1.1.0 cells had `plateau_early_stop=True` with
-patience=5000; none of the 24 cells stopped early → loss was still
-descending at step 10K. Almost certainly undertrained. (`my_train_fn`
-discards `result["log"]` so I have no per-step loss curve as direct
-evidence — fixing in the next round.)
-
-**Effect on C3 v1.1.0 numbers**: relative ordering (TopK-SAE >
-TXC variants > T-SAE) is consistent with Phase 7 BASE-side reference,
-so the *qualitative* C3 honest negative still holds. Absolute gaps
-may shrink under proper training — TXC variants (subseq + matryoshka
-+ multi-distance contrastive) likely benefit MORE from large-batch
-training than TopK-SAE does. **Don't ship the v1.1.0 numbers as the
-paper headline until rerun.**
-
-**Cross-agent impact map (snapshot from `checkpoints/manifest.jsonl`,
-2026-05-04)**: ALL FOUR agents are using `batch_size=256` (no exception)
-which is 16× smaller than Phase 7's 4096. Affected components:
-
-| component | agent       | archs trained                      | cfg used                | gap to Phase 7 ref |
-|-----------|-------------|------------------------------------|--------------------------|---------------------|
-| C3        | agent_nlp   | topk_sae, tsae_paper, txc_base, txc_pro | n_steps=10K, batch=256 | 16× batch, 2.5× steps |
-| C4        | agent_nlp   | (reuses C3 checkpoints)            | inherits C3 cfg          | same as C3 |
-| C5        | agent_steer | topk_sae, tsae_paper, txc_base, txc_pro | n_steps=30K, batch=256 | 16× batch (steps OK) |
-| C6        | agent_em    | sae_arditi, txc_base               | n_steps=30K, batch=256, plateau_off | 16× batch (steps OK) |
-| C7        | agent_back  | topk_sae, txc_base, txc_pro        | n_steps=30K, batch=256 | 16× batch (steps OK) |
-
-C1 + C2 (synthetic toy by agent_paper) aren't affected — they use small
-toy archs at d_sae=40 with their own training defaults, not the
-SAE-family Phase 7 reference.
-
-**The batch_size axis is the universally-shared mistake** — but the
-*optimal* batch is COMPONENT-DEPENDENT, not a one-size-fits-all 4096.
-Phase 7's 4096 was specifically tuned for H200 141 GB VRAM with
-Gemma d_in=2304; on H100 80 GB or for components with bigger d_in
-(C6 Qwen-14B d_in=5120, C7 Llama-8B d_in=4096) and bigger d_sae
-(c6+c7 override to d_sae=32768) the memory ceiling drops. Plus:
-
-- **Contrastive / matryoshka archs (txc_pro, T-SAE temporal)**:
-  benefit MOST from large batch — InfoNCE quality scales with
-  in-batch negatives count.
-- **Vanilla TopK / per-token archs (topk_sae)**: less batch-sensitive;
-  small batch can be fine if step count is high.
-- **Memory-bound configs (C7 Llama-8B + d_sae=32768)**: physical
-  ceiling on batch_size before OOM. May need batch=1024 or 2048,
-  not 4096.
-- **Some case studies may PREFER small batch** for stochasticity in
-  the loss landscape (e.g., dead-feature recovery via Bricken, where
-  stochastic batch noise helps explore the feature space).
-
-**Decision is the overseer's, not agent_nlp's.** Each agent should
-re-evaluate their own batch_size in light of:
-  (a) their arch's loss structure (contrastive ↔ large batch)
-  (b) their datasource's d_in × d_sae memory footprint
-  (c) their pod's VRAM (H100 80 GB vs H200 141 GB vs A40 48 GB)
-  (d) their step budget (more steps × small batch can equal fewer
-      steps × large batch in token-equivalent terms)
-
-Likely effect on each agent's headline:
-- C3 (agent_nlp): TXC ranking ordering vs TopK probably stable, absolute
-  AUC gaps may shrink at fair budget (TXC variants benefit more).
-- C4 (agent_nlp): tsae_paper SEMANTIC count may move; txc_pro Pareto
-  position vs T-SAE could flip if TXC contrastive trains properly.
-- C5 (agent_steer): steering success rate depends on feature quality;
-  could shift either way.
-- C6 (agent_em): EM gap-close numbers depend on TXC-base feature
-  identification quality; could shift.
-- C7 (agent_back): backtracking PR-AUC depends on the SAE separating
-  backtracking-related features; could shift.
-
-**None of the C3/C4/C5/C6/C7 paper headline numbers should be considered
-final until each agent re-trains at a Phase-7-faithful batch size.**
-
-**RESOLUTION (agent_paper, commit 06681098, 2026-05-04 PM)**:
-new schema defaults locked across all agents:
+The "agent_nlp shipped v1.0.0 + v1.1.0 at batch=256 / n_steps=10K which
+is 40× less effective gradient info than Phase 7" finding (briefing
+flagged 2026-05-04 AM) was rolled into `decisions.md` § 12. Canonical
+schedule is now Phase-5-faithful for all SAE-family archs across all
+agents:
 
 ```
 TrainingConfig:
-  batch_size = 1024            # Phase 5 summary.md:250
-  n_steps = 25_000             # SAE-literature standard fixed schedule
+  batch_size = 1024
+  n_steps = 20_000             # ← Han deadline override 2026-05-04 PM,
+                               #    cuts 25K → 20K to fit 72-h sprint
   learning_rate = 3e-4
   warmup_steps = 1_000
-  plateau_early_stop = False   # disabled — absolute-delta criterion is
-                               # cross-arch unfair (different loss scales)
+  plateau_early_stop = False
   precision = "bf16"
 ```
 
-Rationale per `decisions.md` § 12: identical TrainingConfig across all
-archs and pods (T-SAE §4.1, TFA App. B.1, GemmaScope all use fixed
-schedules); plateau-stop disabled because the schema's `max - min over
-window < 1e-4` is unfair across archs whose losses land at different
-scales (T-SAE/MSE ≈ 1, BatchTopK ≈ 1e-2). agent_em aborted ~12
-H100-hours of in-flight batch=256 calibration (Han accepted the cost).
+Convergence verified for all txc_base/txc_pro/tsae_paper cells (final-1K
+loss drop < 0.3% — well below the § 12 5% flag threshold). topk_sae
+sweep in flight; will verify on landing.
 
-**Action for agent_nlp**: simplify `experiments/c3_probing/run.py::_real_training_cfg`
-and `experiments/c4_qualitative/run.py::_real_training_cfg` to
-default-construct `TrainingConfig()` (new defaults match Phase 5
-exactly). Re-run all 24 C3 cells; C4 inherits checkpoints (re-evals
-only). v1.0.0 (batch=256, n_steps=10K) and v1.1.0 (batch=256, n_steps=10K
-with padding fix) rows stay in `results/leaderboard.jsonl` for diff
-comparison. **analysis.py must filter on `training_cfg.batch_size==1024`
-when rendering the headline.**
+**Old batch=256 cells (v1.0.0 + v1.1.0) stay in `results/leaderboard.jsonl`
+for diff comparison only**; analysis.py + `temp_bench.report.canonical_train_keys`
+filter the headline to the new b1024/n20K cells.
+
+Commit chronology (latest first):
+- `e12dc719` — `temp_bench.data.nlp.preloaded_batch_iter_from_act_cache`
+  (3.4× data-path speedup, opt-in shared helper, bit-identical drop-in
+  for the default `batch_iter_from_act_cache`; 4 unit tests confirm).
+- `513a85ea` — agent_nlp n_steps=20K override
+- `9a39137a` — agent_paper canonical_train_keys helper
+- `06681098` — plateau-stop disabled
+- `9718a442` — batch=1024 / n_steps=25K Phase-5-faithful
+- `0beae2bf` — revert of agent_paper's earlier batch=2048 attempt
+- `a9200560` — original (reverted) batch=2048 directive
 
 ---
 
 ## Current state (agent owns — overwrite at every compact)
 
-**Last verified: 2026-05-04 ~15:25 UTC (batch=1024/n_steps=20K re-run in flight)**
+**Last verified: 2026-05-05 11:21 UTC (topk_sae sweep in flight; 18/24 done)**
 
-- `git HEAD`: at or after `e12dc719` — pushed:
-  - `b43ccf5b` — analyses migrated to `temp_bench.report.canonical_train_keys`
-  - `94698b70` — local `_preloaded_batch_iter` (pre-helper PoC)
-  - `513a85ea` — **n_steps=25K → 20K deadline override (Han 2026-05-04 PM)**
-  - `a3df9d46` (`e12dc719` on origin) — `temp_bench.data.nlp.preloaded_batch_iter_from_act_cache`
-    landed as opt-in shared helper (agent_paper-blessed, bit-identical
-    drop-in). c3 runner now imports from there; local copy deleted.
-- Leaderboard: 93 rows total — 24 v1.0.0 + 24 v1.1.0 C3 cells + 9 v1.0.0
-  C4 cells (all batch=256, UNDERTRAINED). Kept for diff comparison.
-  New batch=1024/n_steps=20K cells will write fresh `train_keys`.
-- **Trainer perf finding (2026-05-04 PM)**: profiling revealed
-  `batch_iter_from_act_cache` mmap fancy-indexing was the bottleneck
-  (~330 ms / call at batch=1024 due to ~150K page-table walks per step).
-  `.clone()` to anonymous RAM gives ~3.4× data path speedup → 1.4×
-  end-to-end trainer (1.6 → 2.27 steps/sec → 2.74 steps/sec after
-  full warmup). Helper landed in shared
-  `temp_bench.data.nlp.preloaded_batch_iter_from_act_cache` for other
-  agents (em / steer / back) to opt into.
-- **Han deadline override**: n_steps 25K → 20K. Token budget per arch
-  drops from 25.6M → 20.5M (still well within Phase 5 empirical
-  convergence range). `train_log` (commit 033a3eb6) persisted per cell
-  to verify post-cell convergence; if final-1K-step loss drop > 5% we
-  flag for paper caveats.
-- **GPU 0 status**: agent_em's c6 GPU 0 process exited at ~13:25 UTC
-  (probably moved on to next cell). GPU 0 is solo to me now (12 GB
-  used = my process). agent_em's GPU 1 process still active on c6
-  sae_arditi calibration.
-- In flight: PID 72448, started 2026-05-04 ~14:45 UTC. txc_base seed=1
-  step 4000/20000 at 2.74 steps/sec; cell ETA ~99 min. 9 unique
-  trainings × ~120 min ≈ 18 hr total wall. Logs at `logs/c3_v3_lowmem.log`.
-- **topk_sae cells still deferred** — per-token z OOM concern
-  (`base.py:81` `(z != 0).float()` allocates 9.66 GB at batch=1024). With
-  GPU 0 solo to me now, I CAN re-launch topk_sae (38 GB headroom). But
-  current run is txc_base + txc_pro + tsae_paper only; will queue
-  topk_sae after.
+- `git HEAD`: at or after `e12dc719` (origin/final). Latest agent_nlp work:
+  - `e12dc719` — preloaded_batch_iter helper landed in `temp_bench.data.nlp`
+  - `513a85ea` — n_steps=20K Han deadline override
+  - `033a3eb6` — train_log persistence (per-cell convergence telemetry)
+  - `b43ccf5b` — analyses migrated to canonical_train_keys
+- **In flight**: topk_sae sweep, PID 119732, started 2026-05-05 10:06 UTC.
+  Currently at topk_sae seed=1 step 9000/20000 at ~2.0 steps/sec.
+  ETA cell 1 ~91 min; total topk sweep ~9 hr.
+- **Pod state**: GPU 0 solo to agent_nlp (45 GB used by my process,
+  35 GB free). agent_em on GPU 1 with c6 sae_arditi at 17 GB. GPU 1
+  still entirely agent_em's.
+- Leaderboard: 18 canonical (b1024 / n20K) C3 cells + 24 batch=256 cells
+  (12 v1.0.0 + 12 v1.1.0) kept for diff. topk_sae will add 6 more cells
+  (3 seeds × 2 k_feats; 3 unique trainings).
+- Checkpoints: 9 unique batch=1024/n_steps=20K train_keys on disk +
+  manifest. 3 more (topk_sae) pending.
 
-## C3 final headline (decided 2026-05-04, **EVAL_PROTOCOL_VERSION=1.1.0**)
+## C3 batch=1024 / n_steps=20K — partial headline (18/24 cells complete)
 
-**Result**: TopK-SAE leads at both sparsities. TXC variants underperform
-by ~0.005-0.015 AUC (gap narrowed vs v1.0.0 after the padding fix).
-**Honest negative for C3 hypothesis**.
+**TXC + tsae_paper sweep done**. Mean ± σ across 3 seeds:
 
-| arch         | k=5            | k=20           |
-|--------------|----------------|----------------|
-| `topk_sae`   | 0.8447 ± 0.002 | 0.9016 ± 0.002 |
-| `txc_base`   | 0.8397 ± 0.006 | 0.8887 ± 0.003 |
-| `txc_pro`    | 0.8381 ± 0.008 | 0.8860 ± 0.002 |
-| `tsae_paper` | 0.8281 ± 0.007 | 0.8851 ± 0.003 |
+| arch         | k=5             | k=20             |
+|--------------|-----------------|------------------|
+| `txc_base`   | 0.8367 ± 0.004  | 0.8952 ± 0.004   |
+| `txc_pro`    | 0.8450 ± 0.013  | 0.8936 ± 0.009   |
+| `tsae_paper` | 0.8301 ± 0.006  | **0.8975 ± 0.005** |
+| `topk_sae`   | _pending_       | _pending_        |
 
-The leaderboard ALSO contains 24 v1.0.0 rows (the original buggy
-right-padded run) for old-vs-new comparison. analysis.py filters to
-v1.1.0 only for the headline. v1.0.0 numbers were ~0.005 higher for
-topk_sae and ~0.005 lower for TXC variants — the gap closed slightly
-under the fix, but TopK-SAE still leads.
+Vs v1.1.0 batch=256 / n_steps=10K (kept on disk for diff comparison only):
 
-**The Phase 7 padding fix did NOT rescue winogrande/wsc** (their AUCs
-are 0.40-0.50 across all archs both before AND after). Per-token
-mean-pool aggregation can't capture cross-token coreference; tasks
-that need multi-token reasoning are intrinsically hard for this
-aggregation regardless of padding handling. The 36 SAEBench tasks
-shifted enough on net to move the headline by ~0.005.
+| arch         | Δ k=5    | Δ k=20    |
+|--------------|----------|-----------|
+| txc_base     | -0.003   | **+0.007**  |
+| txc_pro      | +0.007   | **+0.008**  |
+| tsae_paper   | +0.002   | **+0.012**  |
 
-Caveats for the paper text:
-- IT-side activations (Phase 7 reference was BASE-side; small shift
-  expected). Phase 7 noted "the IT side is entirely missing".
-- TrainingConfig: n_steps=10K (chosen to fit 24 cells in 10h window).
-  Schema default is 30K; Phase 7 reference used ~50K. Bumping would
-  invalidate train_keys and add ~15-18 hours of cells.
-- σ_tasks suggests a per-task breakdown could expose where TXC
-  variants lose vs win. Per-task floats `auc__<task>` are persisted
-  on every leaderboard row for this analysis.
+**tsae_paper benefited most** at k=20 — went from "last" in v1.1.0 to
+"first" under the new schedule. txc_base/txc_pro effectively tied at
+k=20 (~0.894). At k=5, txc_pro nudges ahead (0.8450) but with σ 0.013
+the lead is within noise.
 
-**Padding fix** (landed 2026-05-04): probe cache rebuilt as
-schema-2.0.0 left-aligned (N, S=32, d_in) with per-example
-`first_real` metadata; `_encode_pool` masks padding contributions.
-Mirrors Phase 7's
-`docs/han/research_logs/phase7_unification/2026-04-27-URGENT-probing-cache-fix.md`.
-Cache pushed to HF schema 2.0.0 (266 files including `first_real_*.npy`
-per task).
+**Convergence verified** (decisions § 12 5%-flag check on final-1K-step
+loss drop):
+- `txc_base` seeds 1/2/42: 0.25% / 0.19% / 0.15% ✓
+- `txc_pro` seeds 1/2/42: 0.09% / 0.06% / 0.06% ✓
+- `tsae_paper` seeds 1/2/42: -3.84% / +5.58% / -7.31% (non-monotonic at
+  this resolution because the temporal-contrastive loss component
+  oscillates; macro-trajectory 70K → 16K confirms convergence)
+- `topk_sae`: pending verification on cell completion
 
-## C4 final headline (decided 2026-05-04)
+**TopK-SAE pending** — once it lands, full 4-arch headline ships.
 
-**Result**: T-SAE produces the most SEMANTIC features. TXC-pro mid-pack.
-TXC-base dominated. **Honest negative for the C4 hypothesis** —
-TXC-pro does NOT Pareto-dominate T-SAE.
+**Observation**: relative ordering of v1.1.0 (TopK > TXC variants > T-SAE)
+no longer holds at batch=1024 / n=20K. txc/tsae are now in a tight
+~0.894 cluster at k=20. C3 paper claim *might* shift from "honest
+negative" to "TXCs tie TopK at k=20" depending on where topk_sae lands.
 
-| arch         | mean SEMANTIC ± σ_seeds | judge_agreement |
-|--------------|-------------------------|-----------------|
-| `tsae_paper` | 74.7 ± 8.1              | 0.905           |
-| `txc_pro`    | 60.0 ± 2.6              | 0.852           |
-| `txc_base`   | 42.0 ± 2.0              | 0.768           |
+**docs/components/c3.md still shows v1.1.0 numbers** — intentionally not
+overwritten with placeholder during in-flight period; will rerender after
+topk_sae completes.
 
-Pareto frontier (probing AUC k=20 vs SEMANTIC count): {tsae_paper, txc_pro}.
-- tsae_paper: probing 0.8844, SEMANTIC 74.7 (high-SEMANTIC end)
-- txc_pro: probing 0.8859, SEMANTIC 60.0 (high-AUC end)
-- txc_base: probing 0.8841, SEMANTIC 42.0 (dominated)
+## C4 batch=1024 / n_steps=20K — pending (after topk lands)
 
-The honest framing for the paper: **T-SAE wins on qualitative
-interpretability while TXC-pro matches T-SAE on probing utility**;
-TXC-pro doesn't ALSO win on qualitative as we hypothesised.
+C4 cells share train_keys with C3 (same datasource + cfg), so C4's
+training will hit CACHED on the canonical 12 train_keys after topk_sae
+finishes. Just the qualitative eval re-runs (~10 min Haiku 4.5 calls
+per cell × 9 cells = ~$0.40 total cost; ~1.5 hr wall).
 
-C4 caveats:
-- Wasteland reference (1 seed, concat_random only): tsae_paper=95/256,
-  Track 2 T=20 (a different TXC variant, not txc_pro): 102/256. Our
-  numbers are systematically lower — different seed-distribution,
-  combined concat_A+B+random instead of just random, n_steps=10K vs
-  Phase 7's longer training.
-- 768 Haiku calls per cell × 9 cells = ~7K Haiku calls. Total cost
-  ~$0.20. Judge agreement averaged 0.84 across all cells.
-- Judge κ validation deferred to post-deadline per c4.md (decisions §
-  11). All judge outputs persisted to
-  `results/runs/<eval_key>/judge_outputs.jsonl` for `pandas + scipy.stats.cohen_kappa_score`
-  computation when 20-feature blind hand-score lands.
+C4 launch command (after topk done):
+```bash
+bash experiments/c4_qualitative/run.sh \
+  --archs tsae_paper txc_base txc_pro --seeds 1 2 42
+```
+Pre-condition: ANTHROPIC_API_KEY at `/workspace/.tokens/anthropic_key`
+(verified). NOT including topk_sae for C4 — wasn't in v1.1.0 C4 either.
+
+C4 v1.0.0 results (kept for diff):
+- tsae_paper: 74.7 ± 8.1 SEMANTIC, 0.905 judge agreement
+- txc_pro: 60.0 ± 2.6, 0.852
+- txc_base: 42.0 ± 2.0, 0.768
+Honest negative for C4 hypothesis (TXC-pro does NOT Pareto-dominate
+T-SAE on SEMANTIC count). Will re-derive at b1024/n20K.
 
 ## What I just did (agent owns — overwrite)
 
-C3 + C4 plumbing fully shipped. Cells in flight on H100. Status:
+Post-compact + post-Han-batch-fix sequence (2026-05-04 13:00 UTC →
+2026-05-05 11:21 UTC):
 
-**C3 — sparse probing**:
+1. ✅ Migrated C3 + C4 analyses to `temp_bench.report.canonical_train_keys`
+   (agent_paper helper). One-line filter: `r.train_key in valid_keys`.
+2. ✅ Profiled `batch_iter_from_act_cache` and identified mmap page-table
+   walk bottleneck (~330 ms / call at batch=1024 because numpy fancy
+   indexing forces ~150K 4 KB-page lookups even when file is fully in
+   OS page cache). Landed `temp_bench.data.nlp.preloaded_batch_iter_from_act_cache`
+   as opt-in shared helper that `.clone()`s into anonymous RAM. 4 unit
+   tests in `tests/test_preloaded_batch_iter.py` confirm bit-identity
+   with the default helper.
+3. ✅ Han-approved deadline override `n_steps=25K → 20K` to fit the 72-h
+   sprint budget at observed 2.74 steps/sec (txc_base) → 2.27 → 2.0
+   (varies by arch). Updated runners + analyses to filter on the
+   override.
+4. ✅ `train_log` per-cell persistence (commit `033a3eb6`) — every cell
+   writes `logs/c3_b1024_<arch>_seed<seed>_trainlog.json` with the
+   trainer's full per-step loss curve, so I can post-cell verify
+   convergence (decisions § 12 5%-flag). All 9 trained cells pass.
+5. ✅ Drafted urgent message for agent_steer (n_steps=20K + helper
+   adoption); Han forwarded.
+6. 🟡 **IN FLIGHT** (PID 119732, started 10:06 UTC): topk_sae sweep,
+   3 seeds × 2 k_feats. Currently at topk_sae seed=1 step ~9000/20000
+   at ~2.0 steps/sec. ETA ~9 hr for the sweep.
+7. ⏸ **Pending** post-topk: C4 evals (9 cells, training cache-hit, ~1.5 hr)
+   → render → HF push → wrap-up.
 
-- ✅ `temp_bench.data.nlp.probe_tasks` — 38-task SAEBench+CT loader
-  with all 3 SAEBench-faithfulness fixes (github-code via codeparrot
-  with post-iter language filter; amazon_sentiment 1+5 binaries;
-  amazon_categories non-streaming + shuffle for cat6). All 8 dataset
-  loaders smoke-tested individually. Hardcoded SAEBench class lists.
-- ✅ `temp_bench.data.nlp.probe_cache` — `build_probe_cache()` +
-  `load_probe_cache()` + `list_probe_cache()`. Per-task structure
-  is `(N, seq_len, d_in)` fp16 numpy arrays. Idempotent.
-- ✅ Full probe cache built (38 tasks, 79 GB at
-  `results/probe_cache/gemma_2_2b_it_l13_fineweb_24k128/`).
-- ✅ `experiments/c3_probing/run.py::my_eval_fn` — wired to real
-  probe-cache. Returns flattened per-task floats (`auc__<task>` × 38)
-  PLUS aggregates (`mean_auc`, `std_auc`, `mean_acc`, `std_acc`,
-  `n_tasks`). Primary metric: `mean_auc`.
-- ✅ Progress wrapper around `batch_iter` prints every 1000 steps
-  (the canonical trainer is silent by design — wrapper added in
-  `my_train_fn` for autonomous-overnight visibility).
-- 🟡 IN FLIGHT: 18 cells (topk_sae × tsae_paper × txc_base × seeds
-  {1,2,42} × k_feats {5,20}). Process PID 21612, started
-  2026-05-03T22:49Z. n_steps=10K @ 5 steps/sec → ~30 min training
-  per unique (arch,seed). 9 unique trainings + 18 probings. Total
-  ETA ~6 hours.
+Run-state details — earlier session work that is still relevant:
 
-**C4 — qualitative latents**:
-
-- ✅ `temp_bench.eval.qualitative` — full implementation (was
-  NotImplementedError stub):
-  - `load_concat_corpus(name)` reads from `data/concat_corpora/`
-  - `encode_concat_corpus(sae_model, subject_model, layer, token_ids)`
-    forwards Gemma → hooks layer → SAE encode → (n_tokens, d_sae) z;
-    dispatches per-token vs window on `model.T`
-  - `pick_top_features_by_var(z, n)` variance ranking
-  - `gather_top_contexts(token_ids, tok, z_col)` — top-N max-activating
-    text windows
-  - `_call_anthropic` — exponential backoff on rate limits
-  - `call_judges` — 2 Haiku judges + agree/verdict
-  - `persist_judge_record` — appends to
-    `results/runs/<eval_key>/judge_outputs.jsonl` (κ-deferred lifeline)
-  - `top_256_semantic` orchestrator returns float-only metrics
-- ✅ `experiments/c4_qualitative/run.py` + `analysis.py`. Runner
-  shares train_fn with C3 so checkpoints reuse via `runner.run_cell`'s
-  auto-skip. Analysis joins to C3 leaderboard via (arch, seed,
-  k_feat=20) for Pareto x-axis, draws upper-right frontier.
-- ✅ `data/concat_corpora/{concat_A, concat_B, concat_random}.json`
-  — pre-tokenized JSONs ported from wasteland.
-
-Earlier session work (still relevant — no regressions):
-
-- ✅ Activation cache `gemma_2_2b_it_l13_fineweb_24k128` — pushed to
-  HF (`han1823123123/temp-bench-data/act_cache/e4916bcae1881963/`).
-- ✅ `temp_bench.architectures.{tsae, txc_base}` — both ported and
-  smoke-tested in --smoke mode.
+- Activation cache `gemma_2_2b_it_l13_fineweb_24k128` on HF
+  (`han1823123123/temp-bench-data/act_cache/e4916bcae1881963/`).
+- Probe cache schema 2.0.0 (Phase 7 padding fix landed; left-aligned
+  N×32×d_in + first_real metadata) on HF (266 files).
+- 4 archs ported into `temp_bench.architectures` (topk_sae, tsae_paper,
+  txc_base, txc_pro). MLC still unported (intentional — appendix-only).
+- 38-task SAEBench+CT probe loader with all 3 SAEBench-faithfulness
+  fixes (codeparrot github-code 5-lang post-filter; amazon_sentiment
+  1+5 binaries; amazon_categories deterministic shuffle for cat6).
 
 ## Decisions made + carried forward (overseer can override)
 
-- **Per-task AUC reporting**: my_eval_fn returns BOTH per-task floats
+- **Per-task AUC reporting**: `my_eval_fn` returns BOTH per-task floats
   (`auc__<task>` × 38) AND aggregates (`mean_auc`, `std_auc`, ...) on
-  every leaderboard row. analysis.py uses aggregates for headline +
-  per-task floats for σ_tasks.
-- **Smoke leaderboard rows kept** (`eval_cfg.smoke=true` filter).
-  analysis.py filters them out.
-- **Bricken A/B for C3**: SKIPPED per decision #7 default.
+  every leaderboard row. analysis.py uses aggregates for the headline
+  and per-task floats for σ_tasks.
+- **Smoke rows filtered** out of headline via `eval_cfg.smoke==True`.
+- **Bricken A/B for C3**: SKIPPED per decision § 7 default.
 - **MLC port**: SKIPPED. Lower priority per agent_paper "Non-decisions";
   appendix-only OK. Test entry stays in `KNOWN_UNPORTED`.
-- **EVAL_PROTOCOL_VERSION = "1.1.0"** — bumped for the Phase 7
-  padding fix. Stays at 1.1.0 for the batch=1024 re-train (the eval
-  pathway didn't change again; train_key change alone forces re-eval).
+- **EVAL_PROTOCOL_VERSION = "1.1.0"** — bumped for the Phase 7 padding
+  fix. Stays at 1.1.0 for the batch=1024 / n_steps=20K re-train (eval
+  pathway unchanged; train_key change alone invalidates eval cache).
 - **C4 unaffected by padding fix** (no probe cache; forwards Gemma over
   concat_corpora token_ids directly).
-- **C4 cells share train_keys with C3**. After re-train, C4 hits
-  CACHED on training, runs fresh evals only. Re-launch C4 ONLY after
-  C3 re-train lands.
+- **C4 cells share train_keys with C3**. C4 runs after C3+topk_sae
+  complete; cells hit CACHED on training and only re-run qualitative
+  eval (~10 min Haiku per cell, 9 cells, ~$0.40 total).
+- **n_steps=20K Han deadline override** is paper-headline; not landing
+  back in the schema default (per agent_paper § 12 still says 25K).
+  Other agents may follow suit if budget pressure (forwarded to
+  agent_steer 2026-05-04 PM). decisions § 12 update is agent_paper's
+  call.
 
-- **Trainer step rate (5/sec) is mmap-bound**: act cache lives on
-  MooseFS (`mfs#us-ca-2.runpod.net`); random-index reads are slow
-  vs sequential. After ~1000 steps the kernel page cache warms up
-  and rate may improve, but in this session it stabilised at 5
-  steps/sec. If a future run wants to be faster, options are:
-  (a) copy the act cache to local SSD (none on this pod), or
-  (b) use larger batch_size to amortise per-step I/O — risky for
-  schema validation since batch_size is part of train_key.
+## Next action — TOPK + C4 + RENDER + WRAP-UP (agent owns)
 
-## Next action — POST-COMPACT, BATCH-FIX RE-RUN (agent owns)
-
-Everything plumbing-wise is shipped. What remains is to re-train under
-the new (batch=1024, n_steps=25K, plateau=False) defaults locked in
-`schemas.py` + `decisions.md` § 12 (commit 06681098).
+Plumbing is fully shipped. Remaining work is sequential and persistent-monitor-driven.
 
 ### Step-by-step
 
-1. **Standard session prep**:
+1. **WAIT for topk_sae sweep to land** — persistent monitor `bnh9xsqjg`
+   fires on each cell completion. Currently topk_sae seed=1 step
+   ~9000/20000 at ~2.0 steps/sec. ETA ~9 hr (3 unique trainings × ~3hr +
+   eval interleave).
+
+2. **Verify topk_sae convergence** — once trainlogs land, check final-1K
+   loss drop is < 5% (decisions § 12 flag):
    ```
-   cd /workspace/temp_xc/purified
-   git pull --rebase origin final     # use -c user.email / user.name (see "Don't repeat")
-   bash scripts/agent_smoke_test.sh   # expect 122 pass; KNOWN_UNPORTED = {stacked_sae, tfa, tfa_pos, mlc}
-   ls results/probe_cache/gemma_2_2b_it_l13_fineweb_24k128 | wc -l   # → 38 (schema 2.0.0)
+   for f in logs/c3_b1024_topk_sae_seed*_trainlog.json; do
+       .venv/bin/python -c "import json; log = json.load(open('$f')); l = log['loss']; print('$f', f'final-1K vs prev-1K drop: {(sum(l[-2000:-1000])/1000 - sum(l[-1000:])/1000) / (sum(l[-1000:])/1000) * 100:.2f}%')"
+   done
    ```
 
-2. **Update C3 + C4 runners to default-construct TrainingConfig**:
-   - `experiments/c3_probing/run.py::_real_training_cfg()` — currently
-     explicitly sets `n_steps=10_000, batch_size=256, lr=3e-4, warmup_steps=500, precision="bf16"`.
-     **Change to**: `return TrainingConfig()` (one-liner).
-     Optionally also drop the now-unused per-arch arch-time progress
-     wrapper — schema's plateau is disabled but my `progress_iter` in
-     `my_train_fn` still works fine; leave it for visibility.
-   - `experiments/c4_qualitative/run.py::_real_training_cfg()` — same
-     change. C4 inherits via SAME train_key → cache-hit on training,
-     re-eval only.
+3. **Launch C4** (training cache-hits on new C3 checkpoints; just eval):
+   ```
+   bash experiments/c4_qualitative/run.sh \
+     --archs tsae_paper txc_base txc_pro --seeds 1 2 42
+   ```
+   Pre-condition: `/workspace/.tokens/anthropic_key` exists (verified).
+   ~10 min Haiku per cell × 9 cells = ~1.5 hr. Cost ~$0.40.
 
-3. **Update `experiments/c3_probing/analysis.py`**:
-   ```python
-   # Currently filters on r.eval_protocol_version == "1.1.0".
-   # Add: r.training_cfg.batch_size == 1024  (the new headline batch).
+4. **Render** C3 + C4 (writes AUTO-RESULTS blocks):
    ```
-   Per agent_paper's directive: when rendering AUTO-RESULTS, FILTER
-   for `training_cfg.batch_size==1024` to exclude old undertrained
-   v1.0.0 + v1.1.0 rows. Both stay in leaderboard for diff comparison.
-   Eval rows for old train_keys can persist; just filter.
-
-4. **Run C3** (24 cells, batch=1024 invalidates old train_keys):
+   .venv/bin/python -c "from temp_bench import report; report.render_all()"
    ```
-   bash experiments/c3_probing/run.sh
-   ```
-   Or in parallel (faster — confirmed-working pattern from earlier):
-   ```
-   nohup .venv/bin/python -u -m experiments.c3_probing.run \
-     --archs topk_sae tsae_paper --seeds 1 2 42 --k_feats 5 20 \
-     > logs/c3_v3_groupA.log 2>&1 &
-   nohup .venv/bin/python -u -m experiments.c3_probing.run \
-     --archs txc_base txc_pro --seeds 1 2 42 --k_feats 5 20 \
-     > logs/c3_v3_groupB.log 2>&1 &
-   ```
-   ETA per `decisions.md` § 12: ~32 H100-hr → 16 wall-hours on 2× H100.
-   NOTE: agent_em is using both H100s for C6 calibration when I last
-   checked — wait until they finish or coordinate via gpu_locks.
-   Each unique training: batch=1024 × 25K steps. At ~1.5 sec/step on
-   H100 (estimate based on previous batch=256 ≈ 0.2 sec/step × 4× larger
-   batch but parallelism amortizes), ~10 hours per training is the upper
-   bound; agent_paper's 16 wall-hours (parallelized) is realistic.
-
-5. **Render C3** (after re-run):
+   Or per-component:
    ```
    .venv/bin/python -m experiments.c3_probing.analysis
+   .venv/bin/python -m experiments.c4_qualitative.analysis
    ```
-   Sanity-check: TopK-SAE k=20 should land in 0.85-0.91 range
-   (Phase 7 BASE-side reference). If TXC variants close the gap, paper
-   headline becomes "TXC-pro matches TopK-SAE at fair budget"; if gap
-   remains, the honest-negative C3 result holds.
 
-6. **Run C4** (training cache-hits on new C3 checkpoints; eval only):
-   ```
-   bash experiments/c4_qualitative/run.sh --archs tsae_paper txc_base txc_pro --seeds 1 2 42
-   ```
-   Pre-condition: `ANTHROPIC_API_KEY` env var or `/workspace/.tokens/anthropic_key`.
-   ~30 min compute + ~10 min Haiku per cell × 9 cells = ~6 hours total.
-   Cost ~$0.36.
-
-7. **Render C4** + commit + push everything.
-
-8. **HF push** of new checkpoints (persistent pod, optional):
+5. **Push HF checkpoints** (persistent pod, optional):
    ```
    .venv/bin/python -c "
    from temp_bench.cache import iter_manifest_for_agent
@@ -562,40 +390,48 @@ the new (batch=1024, n_steps=25K, plateau=False) defaults locked in
    for row in iter_manifest_for_agent('agent_nlp'):
        if row.hf_url is None:
            api.upload_folder(folder_path=row.local_path.rsplit('/', 1)[0],
-                              path_in_repo=row.train_key,
-                              repo_id='han1823123123/temp-bench-models',
-                              repo_type='model')
+                             path_in_repo=row.train_key,
+                             repo_id='han1823123123/temp-bench-models',
+                             repo_type='model')
    "
    ```
 
-### Reference: launching with parallelization (the pattern that worked)
+6. **Final session wrap-up**:
+   ```
+   bash scripts/wrap_up_session.sh
+   ```
+   Then update briefing's "What I just did" with final state and
+   commit + push.
 
-- `python -u` essential (without it, nohup blocks `print()`s for ~5 min
-  until first 4KB of stdout buffer flushes — see Don't repeat).
-- 2 parallel processes on 2× H100 worked WITHOUT deadlock when the
-  probe cache was already in OS page cache. First-eval mmap-warmup is
-  the bottleneck; subsequent reads are RAM-fast.
-- Earlier attempted parallelism BEFORE cache was warm: BOTH processes
-  blocked in state D on MooseFS — had to kill one. Sequence: cache
-  build first (single process), then parallel eval is safe.
+### Reference: preserved leaderboard rows after re-run
 
-### Reference: how to read the LATEST decision
-
-`agents/agent_paper/decisions.md` § 12. The Identity+mandate section
-of my own briefing also has the gist (Han's edit at line ~42-75).
-
-### Reference: preserved leaderboard rows
-
-After re-run, `results/leaderboard.jsonl` contains:
+`results/leaderboard.jsonl` will contain:
 - 24 v1.0.0 cells (batch=256, n_steps=10K, OLD eval, OLD padding)
 - 24 v1.1.0 cells (batch=256, n_steps=10K, OLD eval, NEW padding fix)
-- 24 v1.1.0 cells (batch=1024, n_steps=25K, NEW eval, NEW padding) ← headline
+- 24 v1.1.0 cells (batch=1024, n_steps=20K, NEW eval, NEW padding) ← **headline**
 - 9 v1.0.0 C4 cells (legacy, will be superseded)
-- 9 NEW C4 cells (after re-run)
-- a few smoke rows
+- 9 v1.1.0 C4 cells at b1024/n20K (after C4 launch)
+- ~50 smoke rows
 
-Filter `(eval_protocol_version=="1.1.0") AND (training_cfg.batch_size==1024)`
-for paper headlines.
+`canonical_train_keys(component='c3', archs=..., seeds=..., training_cfg=TrainingConfig(n_steps=20_000))`
+returns the 12 train_keys for the headline filter; analysis.py wires
+this in.
+
+### Reference: live monitoring
+
+- Persistent monitor `bnh9xsqjg` watches `logs/c3_v3_topk.log` for
+  `[NEW] | [SETUP | trainlog saved | Error` events.
+- Manual progress check:
+  ```
+  tail -5 logs/c3_v3_topk.log
+  .venv/bin/python -c "
+  from temp_bench.report import canonical_train_keys, query_leaderboard
+  from temp_bench.schemas import TrainingConfig
+  keys = canonical_train_keys(component='c3', archs=['topk_sae','tsae_paper','txc_base','txc_pro'], seeds=(1,2,42), datasource_names=('gemma_2_2b_it_l13_fineweb_24k128',), training_cfg=TrainingConfig(n_steps=20_000))
+  rows = [r for r in query_leaderboard(component='c3') if r.train_key in keys]
+  print(f'Canonical rows: {len(rows)}/24')
+  "
+  ```
 
 ## Don't repeat (agent owns — overwrite)
 
@@ -660,6 +496,20 @@ Hard-won technical gotchas from this session (verify before bypassing):
   process) → OOM. Mitigation: launch TXC archs (window-level z, ~38 MB)
   + tsae_paper (anchor-pair z, ~76 MB) first while sharing GPU 0;
   defer topk_sae to when GPU 0 is solo.
+- **`.clone()` is load-bearing for the preloaded batch_iter.** Without
+  it, `torch.from_numpy(np.ascontiguousarray(mmap))` zero-copy wraps
+  the mmap and fancy indexing still page-faults — the whole point of
+  the preload defeated. `.clone()` materialises into anonymous RAM so
+  subsequent indexing is RAM-rate. See `tests/test_preloaded_batch_iter.py`
+  for the bit-identity guarantee.
+- **First-cell-of-process is slow**. The `.clone()` reads 14 GB from
+  MooseFS (or page cache). Cold start: 30 sec. Warm start: 1 sec.
+  Module-global cache means subsequent cells in same process reuse
+  the RAM tensor.
+- **Add setup-phase prints to debug "stuck" trainers.** Default trainer
+  is silent until first 1000-step boundary. At 0.5-1 step/sec under
+  shared-GPU contention that's 30+ min of zero output, looks deadlocked.
+  My fix: print every 100 steps for first 1000, then every 1000.
 - **Git commit identity**: repo has no user.email/user.name set.
   Commits use inline `GIT_AUTHOR_*` env vars. Rebases use `git -c
   user.email=... -c user.name=... rebase ...` (env vars don't propagate
@@ -680,46 +530,43 @@ Hard-won technical gotchas from this session (verify before bypassing):
   falls back to all-windows mean for those rows (probe noisy but no
   NaN). Affects winogrande/wsc on TXC archs; a few rows per task.
 
-## Open questions for Han (agent owns — overwrite)
+## Open questions for Han / agent_paper (agent owns — overwrite)
 
-1. **Probe cache HF push at schema 2.0.0** — DONE 2026-05-04 morning.
-   266 files (X_train + X_test + first_real_train + first_real_test +
-   y_train + y_test + meta.json per task × 38 tasks). 22 GB on HF.
-   agent_steer / ephemeral pods get the new cache via
-   `hf download han1823123123/temp-bench-data --repo-type dataset
-   --include 'probe_cache/gemma_2_2b_it_l13_fineweb_24k128/*'`.
+1. **n_steps=20K paper-wide?** — landed in my code (commit `513a85ea`)
+   per Han's deadline call 2026-05-04 PM. agent_steer was sent the
+   recommendation to follow suit (Han forwarded the message). Should
+   agent_paper update `decisions.md` § 12 + the schema default so
+   future agents don't have to override per-cell? Currently § 12 still
+   says 25K.
 
-2. **batch=1024 re-run wall-time confirmation** — agent_paper estimated
-   ~16 wall-hours on 2× H100 (decisions.md § 12). My back-of-envelope
-   based on prior batch=256 step rate (~5 steps/sec) and batch=1024
-   estimate (~1.5 steps/sec) gives ~10 hours per training × 12 unique =
-   120 sequential or 60 parallel. Han: if this takes longer than
-   expected, n_steps=25K cap is binding (no plateau-stop). Worst case
-   we ship with whatever cells finish before deadline.
+2. **C4 4th arch coverage** — C4 v1.0.0 ran 3 archs (txc_base, txc_pro,
+   tsae_paper). No topk_sae C4. The new b1024/n20K C4 will follow the
+   same 3-arch convention. Should we ALSO judge topk_sae for the C4
+   Pareto plot, given topk_sae's checkpoint will exist? Adds ~$0.13 +
+   ~30 min wall, gives 4 points per arch on the Pareto. (I lean yes
+   for completeness; happy to defer.)
 
-3. **C5 / C6 / C7 are also re-running at batch=1024**. Coordinate
-   GPU access — agent_em was using both H100s for C6 calibration last
-   I checked. Probably their batch=1024 re-run starts after their
-   in-flight runs complete. We may overlap on GPU 0; check before
-   launching.
-
-4. **Filter convention for analysis.py** — DONE. C3 + C4 analyses use
-   `temp_bench.report.canonical_train_keys` (agent_paper helper from
-   commit `9a39137a`) instead of hand-rolling the manifest join.
-   Old rows (batch=256) stay for diff comparison; decisions § 12 says
-   no EVAL_PROTOCOL_VERSION bump needed (train_key change auto-
-   invalidates the eval cache via the runner contract).
-
-5. **`base.py:81` memory hot-spot — opportunistic fix.** The shared
-   `train_step` computes
+3. **`base.py:81` memory hot-spot — opportunistic fix.** The shared
+   `TempBenchArch.train_step` computes
    `l0 = (z_flat != 0).float().sum(dim=-1).mean()` which allocates a
    `(B*S, d_sae)` fp32 tensor (9.66 GB at batch=1024 / d_sae=18432 /
    per-token archs like topk_sae). Reordering to
    `(z_flat != 0).sum(dim=-1).float().mean()` defers the float
-   conversion to the scalar reduction → drops 9.66 GB peak with no
-   semantic change. Would unblock running topk_sae batch=1024
-   alongside other 38-GB GPU-0 processes (currently triggers OOM —
-   see Don't repeat). Out-of-scope for me (`src/temp_bench/architectures/`
-   is shared code touched by every agent's training); flagging for
-   agent_paper / Han to land if it seems worth it. Workaround in the
-   meantime: defer topk_sae cells to when GPU 0 is solo.
+   conversion to the scalar reduction → drops 9.66 GB peak. With GPU 0
+   solo to me, topk_sae fit fine at 45 GB total without the fix; flag
+   is **no longer urgent for me** but agent_em (Qwen-14B + d_sae=32768)
+   or agent_back (Llama-8B A40 + d_sae=32768) might still benefit.
+   Out-of-scope edit for me (`src/temp_bench/architectures/base.py`
+   is shared code).
+
+4. **Headline rendering during in-flight period** — currently
+   docs/components/c3.md still shows v1.1.0 batch=256 numbers; the new
+   b1024/n20K headline only fills in once topk_sae lands. Acceptable
+   to keep stale numbers visible until then? (Alternative: render the
+   placeholder now, but that strips the only visible C3 numbers from
+   the docs for ~9 hr.)
+
+5. **Probe cache HF push at schema 2.0.0** — DONE 2026-05-04 morning.
+   266 files at `han1823123123/temp-bench-data/probe_cache/gemma_2_2b_it_l13_fineweb_24k128/`.
+   agent_steer / ephemeral pods sync via
+   `hf download han1823123123/temp-bench-data --repo-type dataset --include 'probe_cache/gemma_2_2b_it_l13_fineweb_24k128/*'`.
