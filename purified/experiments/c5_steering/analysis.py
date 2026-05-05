@@ -203,17 +203,33 @@ def run_analysis() -> AnalysisResult:
     # Filter to canonical train_keys only (decisions.md § 12 — exclude
     # pre-2026-05-04 batch=256 cells from the rendered AUTO-RESULTS
     # while keeping them in leaderboard.jsonl for diff comparison).
-    # Pass explicit n_steps=20_000 override (Han 2026-05-04 PM URGENT —
-    # Gemma-family deadline override aligns C3 + C4 + C5); the schema
-    # default 25_000 would silently filter out my new 20K cells.
+    #
+    # decisions.md § 15 (2026-05-05 PM): TXC archs and T-SAE now use
+    # DIFFERENT canonical training_cfgs:
+    #   - TXC archs: n_steps=20_000 (Gemma deadline override)
+    #   - T-SAE: n_steps=20_000 + train_window_size=2 (Bhalla/Ye 2025
+    #     §3.1 paper-faithful adjacent-pair training; brings per-token
+    #     T-SAE from 131K tokens/step down to ~2K, matching SAEBench
+    #     canonical scale).
+    # Compute both canonical sets and union them. Old v1.1.0 T-SAE rows
+    # without train_window_size stay in leaderboard.jsonl for diff but
+    # drop out of AUTO-RESULTS once agent_filler's T=2 re-train lands.
     from temp_bench.schemas import TrainingConfig
-    valid_train_keys = canonical_train_keys(
+    txc_train_keys = canonical_train_keys(
         component=COMPONENT,
-        archs=ARCHS,
+        archs=("txc_base", "txc_pro"),
         seeds=SEEDS,
         datasource_names=DATASOURCE_NAMES,
         training_cfg=TrainingConfig(n_steps=20_000),
     )
+    tsae_train_keys = canonical_train_keys(
+        component=COMPONENT,
+        archs=("tsae_paper",),
+        seeds=SEEDS,
+        datasource_names=DATASOURCE_NAMES,
+        training_cfg=TrainingConfig(n_steps=20_000, train_window_size=2),
+    )
+    valid_train_keys = txc_train_keys | tsae_train_keys
     rows = [
         r for r in rows
         if r.train_key in valid_train_keys
