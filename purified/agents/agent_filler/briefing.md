@@ -917,36 +917,43 @@ time.
 
 ## Current state (agent owns — overwrite at every compact)
 
-**Last verified: 2026-05-05T16:10Z**
+**Last verified: 2026-05-05T17:25Z**
 
-**STATUS: COMPLETE — C5 T-SAE T=2 baseline sweep landed + pushed.**
+**STATUS: in-flight — C5 TopK + TFA baselines sweep launched (§ 16).**
 
-Sweep results (3 cells, all `arch=tsae_paper`,
-`eval_protocol_version=1.1.0`, training_cfg includes `train_window_size=2`):
+Prior mission COMPLETE: C5 T-SAE T=2 baseline (3 cells, mean
+peak@1.75=1.93). Pushed at commit `dd7ef9b6` (now in history below
+the new commits).
 
-| seed | train_key      | eval_key       | n_valid | peak@1.75 |
-|---: |---             |---             |---:     |---:       |
-| 1    | `e8f3355683e0` | `e48e9c925224` | 270/270 | **1.500** |
-| 2    | `8f717f87f3f9` | `997075949edc` | 270/270 | **2.053** |
-| 42   | `06053869c2b7` | `53a19ea95e49` | 270/270 | **2.250** |
-| mean |                |                |         | **1.93**  |
+Current mission: 6-cell sweep on GPUs 0..5:
+- GPUs 0..2: `topk_sae × {42, 1, 2}` at B=1024, train_window_size=1
+  (paper-faithful per § 15)
+- GPUs 3..5: `tfa × {42, 1, 2}` at B=32, train_window_size=None
+  (full-seq, wasteland-faithful per
+  `origin/han-phase7-unification:experiments/phase7_unification/train_phase7.py`)
 
-T=2 lift over agent_steer's existing T=None tsae_paper cells
-(peak@1.75 ∈ {~0.62, ~1.40}): clean **+0.5 to +1.5** on headline.
-Confirms SAEBench-canonical window helps T-SAE.
+VRAM verified at ~17:25Z (1-2 min in):
+- TopK GPUs: 2.5 GB / 88-92% util
+- TFA GPUs:  18.5 GB / 100% util (TFA's attention tensor; under 48 GB cap)
+- GPUs 6, 7: idle
 
-- Sweep wall: ~28 min (faster than 45-60 min estimate).
-- All 3 run_dirs HF-pushed via `wrap_up_session.sh`.
-- All 3 checkpoints (+ smoke `13add3edc6b45d5a`) on HF.
-- Local `final` == `origin/final` at `dd7ef9b6` (pushed via custom
-  credential helper because the gh_token URL form failed; fix at
-  `~/.tokens/gh_token` works fine for API calls).
-- Pod safe to stop.
+Smoke topk_sae seed=42 n_steps=200 smoke=True passed first:
+train_key=`24bc835e77a4f1b8`, n_valid=270/270, peak@1.75=0.320,
+agent=agent_filler, eval_protocol_version=1.1.0. Confirms the
+`run_one_cell` framework path with both `train_window_size` +
+`batch_size` kwargs (§ 16).
+
+Sweep launcher (`run_sweep.sh`) uses `setsid -f` per the prior MW
+sweep's lesson. All 6 PIDs orphaned to init (PPID=1, own SID).
+
+Active monitor: task id `bev83i4r2` (1-hr timeout). Re-arm if it
+times out before TFA cells finish (~1.5 hr per cell).
+
+Local `final` == `origin/final` at `28fbbe55` (driver + smoke pushed).
 
 Aborted MW driver still on disk at `experiments/c5_steering_filler/`
-with its smoke row at eval_key=`8c6bf97f2de60679` in leaderboard
-(open question for Han re: removal — `canonical_train_keys` filters
-it out via `smoke=true`, harmless to leave).
+with its smoke row at eval_key=`8c6bf97f2de60679` in leaderboard.
+Same disposition as before — open question for Han re: removal.
 
 ## What I just did (agent owns — overwrite)
 
