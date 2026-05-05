@@ -112,13 +112,18 @@ def _build_full_seq_batch_iter(
 
     def batch_iter(n: int) -> torch.Tensor:
         # Full-sequence sampling: pick n rows with replacement, return
-        # (n, L, d) fp32. The MW arch tiles into (n*N_windows, T, d)
+        # (n, L, d) fp16. The MW arch tiles into (n*N_windows, T, d)
         # internally where N_windows = L // T = 128 // 5 = 25.
-        idx = rng.integers(0, N, size=n)
-        out = torch.empty((n, L, d), dtype=torch.float32)
-        for i in range(n):
-            out[i] = acts[idx[i]].to(torch.float32)
-        return out
+        #
+        # Vectorized: `acts[idx]` is one C-level gather, ~100× faster
+        # than a Python for-loop over n rows (the loop bottlenecked
+        # the first MW launch at ~1.5 sec/step CPU at batch=1024 ×
+        # seq_len=128 × d=5120 fp16 = 1.3 GB of slice copies). fp16
+        # output avoids CPU-side cast; trainer's autocast (bf16 on
+        # H100) handles the dtype on GPU. CPU→GPU transfer is also
+        # halved (fp16 = 2 bytes vs fp32 = 4).
+        idx = torch.from_numpy(rng.integers(0, N, size=n).astype(np.int64))
+        return acts[idx]  # (n, L, d), fp16
 
     return batch_iter
 
