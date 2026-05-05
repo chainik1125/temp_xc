@@ -58,6 +58,271 @@ surface it in chat, and let Han or agent_paper land the change. Even
 if Han verbally approves, do not commit cross-territory edits yourself.
 This is non-negotiable — see PROTOCOL.md § 8 + CLAUDE.md Hard Rule #7.
 
+### ⚠️ NEW MISSION 2026-05-05 PM — C6 TFA baseline (decisions § 16)
+
+**You were idle post-STAND-DOWN.** New mission: **add TFA × 2 seeds ×
+2 organisms** to the C6 emergent misalignment benchmark, using the
+existing Qwen activation caches that agent_em already built.
+
+**Wasteland-faithful TFA training** (`origin/han-phase7-unification:
+experiments/phase7_unification/train_phase7.py:312-353`):
+
+> "TFA processes FULL sequences (B, T=128, d) through attention.
+>  TFA-specific batch size override: TFA_BATCH = 32. Phase 5 default
+>  was 64. Per-step tokens: 32 × 128 = 4096 (close to SAEBench 2K)."
+
+TFA's attention tensor scales with `B × T × d_sae`. Qwen-14B has
+`d_in=5120` → TFA's d_sae=32768 (per locked_archs.yaml `c7` override
+mirrors here: c6 inherits the same architectural d_sae=32768 for TFA
+at this scale). At B=1024 the attention tensor would be ~21 GB fp32
+on the H100 — risks OOM with the LoRA-adapted 14B model already
+holding ~28 GB. **B=32 is the wasteland-faithful + memory-safe
+choice.**
+
+**TrainingConfig**:
+
+```python
+TrainingConfig(
+    n_steps=20_000,
+    batch_size=32,                # ← TFA-specific override
+    plateau_early_stop=False,
+    train_window_size=None,       # full sequence (B, 128, d_in)
+)
+```
+
+Per-step encoder load: B × T = 32 × 128 = 4096 tokens.
+
+### Mission scope
+
+| Datasource | Subject | seeds | TrainingConfig |
+|---|---|---|---|
+| `qwen_2_5_14b_instruct_finance_l24_resid_post` | Qwen-14B + finance LoRA | {42, 1} | B=32, full seq |
+| `qwen_2_5_7b_instruct_medical_l15_resid_post` | Qwen-7B + medical LoRA | {42, 1} | B=32, full seq |
+
+**Total: 4 cells** (matching agent_em's n=2 paired structure for the
+canonical sweep).
+
+### Wall-time on 1× H100
+
+- 14B-finance per-cell: ~30-60 min train (TFA attention at d_sae=32768
+  is heavy) + ~3 hr Wang full = **~3.5 hr per cell**.
+- 7B-medical per-cell: ~25-40 min train + ~1.5 hr Wang = **~2 hr per
+  cell**.
+- 4 cells serial on 1 H100: 2×3.5 + 2×2 = **~11 hr total**.
+
+Fits in remaining sprint window.
+
+### Eval pipeline
+
+agent_em's existing C6 plumbing (Wang 4-stage protocol, Sonnet 4.6
+judge) is reused via import. Your only customization: a custom train_fn
+that uses full-sequence batch_iter at B=32 (NOT agent_em's
+`_build_batch_iter` which does T=5 sliding windows; TFA needs full seq).
+
+### Reference for full-seq batch_iter at C6
+
+agent_em already wrote a full-seq batch_iter for the now-rescinded MW
+sweep (`experiments/c6_em_mw/run.py:_build_full_seq_batch_iter`,
+commit `03facd49`). Adapt that pattern:
+
+```python
+def _build_full_seq_batch_iter(act_cache_key: str, *, seed: int = 42):
+    """TFA at C6: full sequences (B, seq_len=128, d_in)."""
+    cache_dir = act_cache_dir(act_cache_key)
+    specs = json.loads((cache_dir / "layer_specs.json").read_text())
+    cache_path = str(cache_dir / f"{specs['key']}.npy")
+    if cache_path not in _PRELOADED_C6_FULL:
+        mmapped = np.load(cache_path, mmap_mode="r")
+        _PRELOADED_C6_FULL[cache_path] = (
+            torch.from_numpy(np.ascontiguousarray(mmapped)).clone()
+        )
+    acts = _PRELOADED_C6_FULL[cache_path]
+    rng = np.random.default_rng(seed)
+    def batch_iter(n: int) -> torch.Tensor:
+        idx = rng.integers(0, acts.shape[0], size=n)
+        return acts[idx].to(torch.float32)
+    return batch_iter
+```
+
+(agent_em's commit `c23afc7c` later vectorised this; cite that
+optimisation in your driver if you import.)
+
+### First concrete task — write driver, smoke, launch
+
+Step 0 — `git pull --rebase origin final`. Verify framework:
+
+```bash
+.venv/bin/python -c "
+from temp_bench.config import load_arch
+spec = load_arch('tfa', component='c6')
+print('hparams:', spec.hparams)
+"
+```
+
+**TFA `c6` hparam landed by agent_paper in this push** —
+`per_component_hparams.c6.d_sae = 32768` mirrors sae_arditi + txc_base
+at C6. Verify `c6 hparams: {'d_sae': 32768, 'k_pos': 20, 'n_heads':
+4, 'use_pos_embedding': False}` returns from the snippet above.
+
+Step 1 — write `experiments/c6_em_tfa_baseline/{__init__.py, run.py}`.
+Skeleton:
+
+```python
+"""C6 TFA baseline at B=32 + full seq (decisions § 16)."""
+from __future__ import annotations
+import argparse, json
+import numpy as np
+import torch
+
+from temp_bench import runner
+from temp_bench.schemas import TrainingConfig
+from temp_bench.config import (
+    compute_act_cache_key, load_datasource, load_arch,
+    instantiate_arch, act_cache_dir,
+)
+from temp_bench.training.sae_trainer import train_sae
+
+# Reuse agent_em's C6 eval pipeline (Wang 4-stage, Sonnet 4.6 judge)
+from experiments.c6_em.run import (
+    EVAL_PROTOCOL_VERSION,
+    my_eval_fn,
+)
+
+C6_DATASOURCES = {
+    "14B_finance": "qwen_2_5_14b_instruct_finance_l24_resid_post",
+    "7B_medical":  "qwen_2_5_7b_instruct_medical_l15_resid_post",
+}
+
+TFA_TRAINING_CFG = TrainingConfig(
+    n_steps=20_000,
+    batch_size=32,                  # ← TFA-specific override
+    plateau_early_stop=False,
+)
+
+_PRELOADED_C6_FULL: dict[str, torch.Tensor] = {}
+
+
+def _build_full_seq_batch_iter(act_cache_key: str, *, seed: int):
+    """C6 full-seq batch_iter for TFA. Reference: agent_em's
+    c6_em_mw/run.py:_build_full_seq_batch_iter (commit 03facd49,
+    vectorised in c23afc7c)."""
+    cache_dir = act_cache_dir(act_cache_key)
+    specs = json.loads((cache_dir / "layer_specs.json").read_text())
+    cache_path = str(cache_dir / f"{specs['key']}.npy")
+    if cache_path not in _PRELOADED_C6_FULL:
+        mmapped = np.load(cache_path, mmap_mode="r")
+        _PRELOADED_C6_FULL[cache_path] = (
+            torch.from_numpy(np.ascontiguousarray(mmapped)).clone()
+        )
+    acts = _PRELOADED_C6_FULL[cache_path]
+    rng = np.random.default_rng(seed)
+    def batch_iter(n: int) -> torch.Tensor:
+        idx = rng.integers(0, acts.shape[0], size=n)
+        return acts[idx].to(torch.float32)
+    return batch_iter
+
+
+def my_train_fn_tfa(*, arch_name, arch_hparams, seed, training_cfg,
+                    act_cache_key, component):
+    spec = load_arch(arch_name, component=component)
+    # d_in from datasource (for c6: 5120 (14B) or 3584 (7B))
+    cache_dir = act_cache_dir(act_cache_key)
+    meta = json.loads((cache_dir / "meta.json").read_text())
+    d_in = int(meta["d_in"])
+    model = instantiate_arch(spec, d_in=d_in)
+    model.cuda()
+    if d_in >= 4096:                # bf16 for ≥1B archs (Qwen scale)
+        model = model.to(torch.bfloat16)
+    torch.manual_seed(seed); np.random.seed(seed)
+    raw_iter = _build_full_seq_batch_iter(act_cache_key, seed=seed)
+    return train_sae(model, raw_iter, training_cfg, device="cuda")
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--organism", required=True,
+                    choices=list(C6_DATASOURCES.keys()))
+    ap.add_argument("--seeds", nargs="+", type=int, default=[42, 1])
+    args = ap.parse_args()
+
+    ds = C6_DATASOURCES[args.organism]
+    for seed in args.seeds:
+        print(f"[c6_tfa_baseline] cell tfa {args.organism} seed={seed}")
+        runner.run_cell(
+            component="c6", arch_name="tfa", seed=seed,
+            datasource_name=ds,
+            training_cfg=TFA_TRAINING_CFG,
+            eval_cfg={"sweep": "c6_tfa_v1"},
+            eval_protocol_version=EVAL_PROTOCOL_VERSION,
+            train_fn=my_train_fn_tfa,
+            eval_fn=my_eval_fn,
+        )
+
+
+if __name__ == "__main__":
+    main()
+```
+
+(Adapt the eval invocation to whatever shape agent_em's `my_eval_fn`
+expects — their `experiments/c6_em/run.py` is the reference. The Wang
+4-stage protocol is unchanged for TFA; only the train differs.)
+
+Step 2 — smoke ONE cell at `n_steps=200`:
+
+```bash
+TQDM_DISABLE=1 AGENT_NAME=agent_steer_100k \
+  .venv/bin/python -m experiments.c6_em_tfa_baseline.run \
+  --organism 14B_finance --seeds 42 2>&1 | tail -25
+```
+
+(Override `n_steps` via TrainingConfig.model_copy if your CLI doesn't
+expose it directly — or just smoke without n_steps override since 14B
+training is the slow part; the smoke is for verifying eval pipeline.)
+
+Step 3 — launch the 4-cell sweep (serial — only 1 H100):
+
+```bash
+TQDM_DISABLE=1 AGENT_NAME=agent_steer_100k \
+  .venv/bin/python -m experiments.c6_em_tfa_baseline.run \
+  --organism 14B_finance --seeds 42 1 \
+  > logs/c6_tfa_14b.log 2>&1 &
+echo $! > /tmp/p_c6_tfa_14b
+# Wait for 14B cells to finish (~7 hr), then:
+TQDM_DISABLE=1 AGENT_NAME=agent_steer_100k \
+  .venv/bin/python -m experiments.c6_em_tfa_baseline.run \
+  --organism 7B_medical --seeds 42 1 \
+  > logs/c6_tfa_7b.log 2>&1 &
+```
+
+Or chain via `&&` for one sequential launch.
+
+Step 4 — monitor + verify rows land at `arch=tfa`, `component=c6`,
+fresh `train_keys`. agent_em's existing canonical 8/8 cells stand;
+your TFA cells are a NEW comparison axis (TFA vs sae_arditi vs
+TXC+brickenauxk).
+
+Step 5 — HF push checkpoints + judge_outputs before pod stop
+(ephemeral pod). Same recipe as agent_em's wrap_up.
+
+### Watch-outs
+
+- **B=32 is intentional** per § 16. Don't bump to 1024 — risks OOM.
+  Document in c6.md caveats.
+- **TFA at d_sae=32768 is heavy** — verify VRAM before launch:
+  ```bash
+  nvidia-smi --query-gpu=memory.used,memory.total --format=csv
+  ```
+  Subject model (14B fp16 + LoRA + activations) ~28 GB; TFA model
+  + attention tensor at B=32 ~5-10 GB. Total ~38 GB < H100's 80 GB.
+- **CPU-bandwidth issue on this pod** (briefing commit `e7b229fd`)
+  may slow training. Expect ~1.5× wall-time vs reference. Plan
+  accordingly.
+- **Don't render `docs/components/c6.md`** — agent_em's territory.
+- **TFA c6 d_sae landed by agent_paper** in this push (32768, mirrors
+  sae_arditi + txc_base at C6). No open question here.
+
+---
+
 ### ⚠️⚠️⚠️ STAND DOWN — MW pivot RESCINDED 2026-05-05 PM ⚠️⚠️⚠️
 
 **Han + agent_paper diagnosed that the MW pivot was solving a misframed

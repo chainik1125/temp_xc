@@ -58,6 +58,249 @@ surface it in chat, and let Han or agent_paper land the change. Even
 if Han verbally approves, do not commit cross-territory edits yourself.
 This is non-negotiable — see PROTOCOL.md § 8 + CLAUDE.md Hard Rule #7.
 
+### ⚠️ NEW MISSION 2026-05-05 PM — C3 MLC baseline (decisions § 16, paper-faithful L=5)
+
+**Your prior C3 T-SAE T=2 mission is COMPLETE** (commit `82674a75`).
+New mission: **build a 5-layer Gemma activation cache + run MLC × 3
+seeds × 2 k_feats at C3**. Working alongside agent_nlp (who runs C3
+TFA in parallel on their pod). MLC's paper-faithful training requires
+multi-layer activations (decisions § 16).
+
+**Framework now available** (commit `d859daef`):
+
+- New datasource `gemma_2_2b_it_l11to15_fineweb_24k128` with
+  `layers: [11, 12, 13, 14, 15]`. Inspect:
+  ```bash
+  .venv/bin/python -c "from temp_bench.config import load_datasource; print(load_datasource('gemma_2_2b_it_l11to15_fineweb_24k128'))"
+  ```
+- `temp_bench.data.nlp.cache.build_activation_cache(...)` detects
+  multi-layer datasource (via `layers: list[int]` field), registers
+  N forward hooks in one model pass, captures (N, L=5, seq_len, d_in)
+  into a single .npy.
+- `temp_bench.data.nlp.cache.preloaded_batch_iter_from_multilayer_cache(
+  act_cache_key, seed=...)` returns (B, L=5, d_in) batches for MLC's
+  data path.
+- `temp_bench.data.nlp.probe_cache.build_probe_cache(...)` extended
+  analogously: per-task X arrays at (N, L=5, S=32, d_in) when the
+  datasource is multi-layer.
+
+### Mission scope
+
+| Phase | Work | Wall time on H100 |
+|---|---|---:|
+| 1 | Build 5-layer Gemma activation cache (~70 GB) | ~3 hr |
+| 2 | Build 5-layer probe_cache (38 SAEBench+CT tasks) | ~1.5 hr |
+| 3 | Smoke MLC at n_steps=200 (verify pipeline) | ~10 min |
+| 4 | Run MLC × 3 seeds × 2 k_feats (3 trainings + 6 evals) | ~5 hr |
+| **Total** | | **~10 hr** |
+
+**TrainingConfig**:
+
+```python
+TrainingConfig(
+    n_steps=20_000,
+    batch_size=1024,
+    plateau_early_stop=False,
+    train_window_size=None,    # MLC's data shape comes from the
+                               #   multi-layer datasource (L axis), not
+                               #   from the train_window_size system
+)
+```
+
+Per-step encoder load: B × L = 1024 × 5 = 5120 tokens (~ same as TXC at T=5).
+
+### First concrete task — build cache, write driver, smoke, launch
+
+Step 0 — `git pull --rebase origin final` and verify framework:
+
+```bash
+.venv/bin/python -c "
+from temp_bench.data.nlp.cache import preloaded_batch_iter_from_multilayer_cache, build_activation_cache
+from temp_bench.config import load_datasource
+ds = load_datasource('gemma_2_2b_it_l11to15_fineweb_24k128')
+print('layers:', ds.layers)
+print('seq_len:', ds.seq_len, 'n_seqs:', ds.n_seqs)
+"
+```
+
+Step 1 — **build the multi-layer act cache** (~3 hr):
+
+```bash
+TQDM_DISABLE=1 AGENT_NAME=agent_em_100k \
+  .venv/bin/python -c "
+from temp_bench.data.nlp.cache import build_activation_cache
+build_activation_cache('gemma_2_2b_it_l11to15_fineweb_24k128')
+" 2>&1 | tee logs/c3_mlc_cache_build.log
+```
+
+Verify the output cache is 4D shape (N=24000, L=5, T=128, D=2304):
+
+```bash
+.venv/bin/python -c "
+from temp_bench.config import compute_act_cache_key, load_datasource, act_cache_dir
+import numpy as np
+key = compute_act_cache_key(load_datasource('gemma_2_2b_it_l11to15_fineweb_24k128'))
+acts = np.load(act_cache_dir(key) / 'acts.npy', mmap_mode='r')
+print('shape:', acts.shape, 'dtype:', acts.dtype)
+print('size:', acts.nbytes / 2**30, 'GB')
+"
+```
+
+Step 2 — **build the multi-layer probe_cache** (~1.5 hr):
+
+```bash
+TQDM_DISABLE=1 AGENT_NAME=agent_em_100k \
+  .venv/bin/python -c "
+from temp_bench.data.nlp.probe_cache import build_probe_cache
+build_probe_cache('gemma_2_2b_it_l11to15_fineweb_24k128')
+" 2>&1 | tee logs/c3_mlc_probe_cache_build.log
+```
+
+This produces 38 task dirs at
+`results/probe_cache/gemma_2_2b_it_l11to15_fineweb_24k128/<task>/`
+with X_train.npy + X_test.npy at shape (N, L=5, S=32, d_in).
+
+**HF push both caches** (ephemeral pod) before any pod restart:
+
+```bash
+.venv/bin/python -c "
+from huggingface_hub import HfApi
+from temp_bench.config import compute_act_cache_key, load_datasource
+key = compute_act_cache_key(load_datasource('gemma_2_2b_it_l11to15_fineweb_24k128'))
+api = HfApi()
+api.upload_folder(
+    folder_path=f'results/act_cache/{key}',
+    path_in_repo=f'act_cache/{key}',
+    repo_id='han1823123123/temp-bench-data',
+    repo_type='dataset',
+)
+api.upload_folder(
+    folder_path='results/probe_cache/gemma_2_2b_it_l11to15_fineweb_24k128',
+    path_in_repo='probe_cache/gemma_2_2b_it_l11to15_fineweb_24k128',
+    repo_id='han1823123123/temp-bench-data',
+    repo_type='dataset',
+)
+"
+```
+
+Step 3 — **write `experiments/c3_probing_mlc/{__init__.py, run.py}`**.
+Key design: import most of agent_nlp's `experiments/c3_probing/run.py`,
+override the train_fn (multi-layer batch_iter) and write a custom
+eval_fn that handles 4D probe arrays. Sketch:
+
+```python
+"""C3 MLC baseline at L=5 (decisions § 16, paper-faithful).
+"""
+from __future__ import annotations
+import argparse, json
+import numpy as np
+import torch
+
+from temp_bench import runner
+from temp_bench.schemas import TrainingConfig
+from temp_bench.config import (
+    compute_act_cache_key, load_datasource, load_arch,
+    instantiate_arch, act_cache_dir,
+)
+from temp_bench.training.sae_trainer import train_sae
+from temp_bench.data.nlp.cache import preloaded_batch_iter_from_multilayer_cache
+
+DATASOURCE = "gemma_2_2b_it_l11to15_fineweb_24k128"
+EVAL_PROTOCOL_VERSION = "1.1.0"   # match agent_nlp's
+
+MLC_TRAINING_CFG = TrainingConfig(
+    n_steps=20_000,
+    batch_size=1024,
+    plateau_early_stop=False,
+)
+
+
+def _d_in_from_act_cache(act_cache_key: str) -> int:
+    meta = json.loads((act_cache_dir(act_cache_key) / "meta.json").read_text())
+    return int(meta["d_in"])
+
+
+def my_train_fn_mlc(*, arch_name, arch_hparams, seed, training_cfg,
+                    act_cache_key, component):
+    spec = load_arch(arch_name, component=component)
+    d_in = _d_in_from_act_cache(act_cache_key)
+    model = instantiate_arch(spec, d_in=d_in)
+    model.cuda()
+    torch.manual_seed(seed); np.random.seed(seed)
+    raw_iter = preloaded_batch_iter_from_multilayer_cache(
+        act_cache_key, seed=seed,
+    )
+    return train_sae(
+        model, raw_iter, training_cfg, device="cuda",
+    )
+
+
+def my_eval_fn_mlc(*, _state_dict, _arch_name, _arch_hparams, seed,
+                   _act_cache_key, _datasource_name, k_feat, S, smoke):
+    """MLC eval: load multi-layer probe_cache, encode each (S, L, d_in)
+    frame via MLC, run probe on z. Same s-tail metric as agent_nlp's
+    c3 eval but on multi-layer activations.
+
+    Adapt agent_nlp's `experiments/c3_probing/run.py:my_eval_fn` —
+    replace the single-layer probe_cache load + per-token SAE encode
+    with: load (N, L=5, S=32, d_in) probe arrays, encode via MLC's
+    `model.encode(x)` which expects (B, L, d_in) → (B, d_sae). Then
+    s-tail pool + select top-k_feat features by mean abs activation
+    + train a logistic probe.
+    """
+    # Implement using agent_nlp's eval as a reference; the only
+    # structural change is the input shape (multi-layer) and the
+    # encode call.
+    ...
+```
+
+(Full eval implementation is your work — adapt agent_nlp's existing
+s-tail probing pipeline. MLC's encode signature: `encode(x: (B, L, d))
+→ z: (B, d_sae)`.)
+
+Step 4 — smoke ONE cell at `n_steps=200`:
+
+```bash
+TQDM_DISABLE=1 AGENT_NAME=agent_em_100k \
+  .venv/bin/python -m experiments.c3_probing_mlc.run \
+  --seeds 42 --k-feats 5 --n-steps 200 2>&1 | tail -25
+```
+
+Step 5 — launch the full sweep:
+
+```bash
+TQDM_DISABLE=1 AGENT_NAME=agent_em_100k \
+  .venv/bin/python -m experiments.c3_probing_mlc.run \
+  > logs/c3_mlc_full.log 2>&1 &
+echo $! > /tmp/p_c3_mlc
+```
+
+Step 6 — monitor + verify rows land at `arch=mlc`, `component=c3`,
+fresh `train_keys` (distinct from any single-layer cells).
+
+### Watch-outs
+
+- **Don't reuse the L13 single-layer probe_cache for MLC** — MLC needs
+  L11-L15 stacked. Always use the multi-layer probe_cache.
+- **HF push the multi-layer caches** before pod stop. Both act_cache
+  (~70 GB) and probe_cache (~1 GB).
+- **70 GB cache fits on H100 pod** (240 GB system RAM) but verify via
+  `free -g` after the .clone() preload completes — the helper takes
+  ~30 sec to materialise the tensor on first call.
+- **Don't render docs/components/c3.md** — agent_paper integrates at
+  paper-render time.
+
+---
+
+### ⚠️ § 15 mission COMPLETE 2026-05-05 PM (commit `82674a75`)
+
+C3 T-SAE T=2 baseline sweep landed: 3 trainings + 6 evals at
+`tsae_paper × {42, 1, 2} × {k_feat=5, k_feat=20}` with
+`TrainingConfig(n_steps=20_000, train_window_size=2)`. Section below
+this point is RESCINDED / completed. Left in place for git provenance.
+
+---
+
 ### ⚠️⚠️⚠️ STAND DOWN — MW pivot RESCINDED 2026-05-05 PM ⚠️⚠️⚠️
 
 **Han + agent_paper diagnosed that the MW pivot was solving a misframed

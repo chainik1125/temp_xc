@@ -51,6 +51,215 @@ surface it in chat, and let Han or agent_paper land the change. Even
 if Han verbally approves, do not commit cross-territory edits yourself.
 This is non-negotiable — see PROTOCOL.md § 8 + CLAUDE.md Hard Rule #7.
 
+### ⚠️ NEW MISSION 2026-05-05 PM — C5 TopK + TFA baselines (decisions § 16)
+
+**Your prior C5 T-SAE T=2 mission is COMPLETE** (commit `3a654fab`).
+New mission: **add TopK + TFA × 3 seeds each** to the C5 steering
+benchmark. Two new baselines, parallel-launchable on your 8× A40 pod.
+
+agent_steer's existing v1.1.0 cells stand:
+- `tsae_paper × 3 seeds` (your prior T=2 sweep)
+- `txc_base × 3 seeds`, `txc_pro × 3 seeds`
+
+You ADD:
+- `topk_sae × 3 seeds at T=1` (vanilla TopK, paper-faithful per § 15)
+- `tfa × 3 seeds at B=32 + full seq` (wasteland-faithful, § 16)
+
+### Mission scope (6 cells parallel on 6 of 8 A40s)
+
+| Arch | seeds | TrainingConfig | tokens/step |
+|---|---|---|---:|
+| `topk_sae` | {42, 1, 2} | `B=1024, n_steps=20_000, train_window_size=1` | 1,024 |
+| `tfa` | {42, 1, 2} | `B=32, n_steps=20_000, train_window_size=None` | 4,096 |
+
+**Total: 6 cells.** All on the existing single-layer cache
+`gemma_2_2b_it_l13_fineweb_24k128`. No new cache build needed.
+
+### Wall-time on 8× A40 (6 GPUs used; 2 idle)
+
+- TopK at T=1 on Gemma-2-2B: ~10-15 min train + ~30 min judge per cell
+  = ~45 min per cell.
+- TFA at B=32 + full seq on Gemma-2-2B: ~30-50 min train + ~30 min judge
+  per cell = ~1-1.5 hr per cell.
+- 6 cells parallel on 6 GPUs → wall = max(per-cell) ≈ **~1.5 hr**.
+
+### TFA paper-faithful background
+
+`origin/han-phase7-unification:experiments/phase7_unification/
+train_phase7.py:312-353` shows TFA training uses **batch_size=32 +
+full seq=128** specifically because TFA's attention tensor is heavy
+(`B × T × d_sae` ~ 9.6 GB fp32 at d_sae=18432). The wasteland convention
+gives 4096 tokens/step (close to SAEBench 2K canonical) AND 128 tokens
+of context (paper Fig. 2(d) shows ~80% variance explained at 100+
+tokens). We adopt that convention here.
+
+### First concrete task — write driver, smoke, launch
+
+Step 0 — `git pull --rebase origin final`. Verify framework:
+
+```bash
+.venv/bin/python -c "
+from experiments.c5_steering.run import run_one_cell
+import inspect
+assert 'train_window_size' in inspect.signature(run_one_cell).parameters
+print('OK')
+"
+```
+
+Step 1 — write `experiments/c5_steering_baselines/{__init__.py, run.py}`.
+Single-cell driver, takes `--arch <topk_sae|tfa>` + `--seed <N>`:
+
+```python
+"""C5 TopK + TFA baselines (decisions § 16) — single (arch, seed) cell.
+Top-level run_sweep.sh launches 6 in parallel.
+"""
+from __future__ import annotations
+import argparse, os
+
+os.environ.setdefault("TQDM_DISABLE", "1")
+os.environ.setdefault("OMP_NUM_THREADS", "8")
+os.environ.setdefault("MKL_NUM_THREADS", "8")
+
+from experiments.c5_steering.run import (
+    EVAL_PROTOCOL_VERSION,
+    run_one_cell,
+)
+from temp_bench.case_studies.steering import (
+    DEFAULT_COH_THRESHOLDS,
+    DEFAULT_STRENGTHS,
+)
+
+
+# Per-arch literature-faithful TrainingConfig overrides via run_one_cell
+# kwargs.
+ARCH_CFG = {
+    "topk_sae": {"batch_size": None, "train_window_size": 1},   # B=1024 default
+    "tfa":      {"batch_size": 32,   "train_window_size": None},  # B=32 wasteland
+}
+
+
+def main() -> None:
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--arch", required=True, choices=list(ARCH_CFG.keys()))
+    ap.add_argument("--seed", required=True, type=int)
+    ap.add_argument("--n-steps", type=int, default=None)
+    ap.add_argument("--smoke", action="store_true")
+    ap.add_argument("--force-train", action="store_true")
+    ap.add_argument("--force-eval", action="store_true")
+    args = ap.parse_args()
+
+    cfg = ARCH_CFG[args.arch]
+    print(
+        f"[c5_baseline] {args.arch} seed={args.seed} "
+        f"B={cfg['batch_size'] or 1024} T={cfg['train_window_size']} "
+        f"smoke={args.smoke} n_steps={args.n_steps}",
+        flush=True,
+    )
+
+    # run_one_cell now accepts both train_window_size + batch_size kwargs
+    # (agent_paper landed the latter in this same push as part of § 16).
+    # Both override the canonical TrainingConfig per-cell; different
+    # values produce different train_keys.
+    run_one_cell(
+        arch_name=args.arch,
+        seed=args.seed,
+        protocol="v7",
+        n_concepts=30,
+        strengths=DEFAULT_STRENGTHS,
+        coh_thresholds=DEFAULT_COH_THRESHOLDS,
+        n_steps=args.n_steps,
+        smoke=args.smoke,
+        force_train=args.force_train,
+        force_eval=args.force_eval,
+        train_window_size=cfg["train_window_size"],
+        batch_size=cfg["batch_size"],
+    )
+
+
+if __name__ == "__main__":
+    main()
+```
+
+**B=32 plumbing for TFA**: `run_one_cell` accepts a `batch_size`
+kwarg as of agent_paper's commit landing in this same push (§ 16).
+Setting `batch_size=32` overrides the canonical TrainingConfig
+default; different B → fresh `train_key`. No further plumbing needed.
+
+Step 2 — write `experiments/c5_steering_baselines/run_sweep.sh`:
+
+```bash
+#!/usr/bin/env bash
+# Launch 6-cell C5 TopK + TFA baselines in parallel.
+# 3 seeds × 2 archs on GPUs 0..5.
+
+set -e
+cd "$(dirname "$0")/../.."
+
+mkdir -p logs
+
+declare -A ASSIGN=(
+  [0]="topk_sae 42"
+  [1]="topk_sae 1"
+  [2]="topk_sae 2"
+  [3]="tfa 42"
+  [4]="tfa 1"
+  [5]="tfa 2"
+)
+
+for gpu in "${!ASSIGN[@]}"; do
+  read -r arch seed <<<"${ASSIGN[$gpu]}"
+  log="logs/c5_baseline_gpu${gpu}_${arch}_seed${seed}.log"
+  echo "[run_sweep] GPU ${gpu} → ${arch} seed=${seed} → ${log}"
+  setsid -f bash scripts/run_on_gpu.sh "${gpu}" -- \
+    .venv/bin/python -m experiments.c5_steering_baselines.run \
+    --arch "${arch}" --seed "${seed}" \
+    > "${log}" 2>&1 &
+  echo $! > "/tmp/p_baseline_gpu${gpu}"
+done
+
+echo "[run_sweep] launched 6 parallel cells; PIDs in /tmp/p_baseline_gpu{0..5}"
+echo "[run_sweep] tail -f logs/c5_baseline_gpu*.log to monitor"
+wait
+echo "[run_sweep] all 6 cells complete"
+```
+
+(Note `setsid -f` per your prior commit `a62e5d6a` so cells survive
+session restarts.)
+
+Step 3 — smoke ONE cell (TopK first, TFA after batch_size kwarg
+plumbing lands):
+
+```bash
+TQDM_DISABLE=1 AGENT_NAME=agent_filler \
+  bash scripts/run_on_gpu.sh 0 -- \
+  .venv/bin/python -m experiments.c5_steering_baselines.run \
+  --arch topk_sae --seed 42 --n-steps 200 --smoke 2>&1 | tail -25
+```
+
+Step 4 — launch full sweep:
+
+```bash
+bash experiments/c5_steering_baselines/run_sweep.sh
+```
+
+Step 5 — monitor + verify. Per-cell wall ~45 min (TopK) / ~1-1.5 hr (TFA).
+6 cells parallel → wall ~1.5 hr.
+
+### Watch-outs
+
+- **B=32 for TFA** is intentional per § 16. Document in c5.md caveats.
+- **Don't re-run T-SAE** — your v1.1.0 cells stand. Only TopK + TFA
+  are new.
+- **Don't pursue Y/W steering hill-climbers** (decision § 1).
+- **Watch for Anthropic API credit issues** — agent_steer hit one
+  earlier. Check `judge_outputs.jsonl` if any cell shows `n_valid=0`.
+- **Don't render `docs/components/c5.md`** — agent_paper integrates at
+  paper-render time. agent_steer's analysis.py will need a 4-call
+  `canonical_train_keys` filter (TXC at None, T-SAE at T=2, TopK at
+  T=1, TFA at B=32) once your cells land.
+
+---
+
 ### ⚠️⚠️⚠️ STAND DOWN — MW pivot RESCINDED 2026-05-05 PM ⚠️⚠️⚠️
 
 **Han + agent_paper diagnosed that the MW pivot was solving a misframed

@@ -39,7 +39,223 @@ surface it in chat, and let Han or agent_paper land the change. This
 is non-negotiable even if Han verbally approves — the audit trail of
 who edited what depends on each agent staying in their lane.
 
-### ⚠️ Han decisions 2026-05-05 PM — C3 baseline T=1 re-train (your headline shifts)
+### ⚠️ NEW MISSION 2026-05-05 PM — C3 TFA baseline (decisions § 16)
+
+**Your prior C3 TopK T=1 mission is COMPLETE** (commit `9b9d6cc5`).
+New mission: **add TFA × 3 seeds × 2 k_feats** to the C3 sparse-probing
+benchmark. Working alongside agent_em_100k (who builds 5-layer cache
++ runs MLC in parallel on their pod).
+
+**Wasteland-faithful TFA training** (`origin/han-phase7-unification:
+experiments/phase7_unification/train_phase7.py:312-353`):
+
+> "TFA processes FULL sequences (B, T=128, d) through attention.
+>  TFA-specific batch size override: TFA_BATCH = 32. Phase 5 default
+>  was 64. Per-step tokens: 32 × 128 = 4096 (close to SAEBench 2K)."
+
+TFA's attention tensor is heavy at large B (`B × T × d_sae` ~ 9.6 GB
+fp32 at B=1024, T=128, d_sae=18432). The wasteland chose **B=32** to
+keep per-step memory tractable AND give TFA's attention full ~128-token
+context (Fig. 2(d) of `papers/priors_in_time.md` shows ~80% variance
+explained at 100+ tokens of context). We adopt the same convention.
+
+**TrainingConfig** (TFA-specific B override):
+
+```python
+TrainingConfig(
+    n_steps=20_000,
+    batch_size=32,                # ← TFA-specific override
+    plateau_early_stop=False,
+    train_window_size=None,       # full sequence (B, 128, d_in)
+)
+```
+
+Per-step encoder load: B × T = 32 × 128 = 4096 tokens (≈ 2× SAEBench
+canonical, paper-faithful per Phase 7 wasteland).
+
+### Mission scope
+
+| Arch | seeds | k_feats | TrainingConfig |
+|---|---|---|---|
+| `tfa` | {42, 1, 2} | {5, 20} | B=32, full seq, n_steps=20_000 |
+
+3 unique trainings + 6 evals on the existing single-layer cache
+`gemma_2_2b_it_l13_fineweb_24k128` (no new cache build needed for TFA).
+
+### Wall-time on 2× H100
+
+agent_em is post-canonical idle (commit `b549d91c` confirms), so GPU 1
+is free for you to borrow (per § 13 GPU sharing convention; verify
+`nvidia-smi` shows GPU 1 idle + note the borrow in your Current state).
+2 cells parallel, 1 cell serial → **~2 hr wall**.
+
+Per-cell estimate on H100: ~30-60 min train (TFA's attention costs
+~3-5× more per step than vanilla SAE) + ~30 min probing eval × 2 k_feats
+= ~1.5-2 hr per cell. With 2 GPUs, run 2 seeds simultaneously.
+
+### First concrete task — write driver, smoke, launch
+
+Step 0 — `git pull --rebase origin final`. Verify the framework:
+
+```bash
+.venv/bin/python -c "
+from temp_bench.config import load_arch
+spec = load_arch('tfa')
+print('hparams:', spec.hparams)
+"
+```
+
+Step 1 — write `experiments/c3_probing_tfa_baseline/{__init__.py,
+run.py}`. Same pattern as your `c3_probing_topk_baseline/run.py`:
+just swap arch name + override batch_size on TrainingConfig:
+
+```python
+"""C3 TFA baseline at B=32 + full seq (decisions § 16)."""
+from __future__ import annotations
+import argparse
+from temp_bench import runner
+from temp_bench.schemas import TrainingConfig
+from experiments.c3_probing.run import (
+    DATASOURCE,
+    EVAL_PROTOCOL_VERSION,
+    my_train_fn,
+    my_eval_fn,
+)
+from temp_bench.config import compute_act_cache_key, load_datasource
+
+
+# Wasteland-faithful TFA training (decisions § 16, Phase 7 reference).
+# B=32, full sequence (T=128) → 4096 tokens/step, close to SAEBench's
+# 2K canonical and gives attention 128 tokens of context.
+TFA_TRAINING_CFG = TrainingConfig(
+    n_steps=20_000,
+    batch_size=32,                  # ← TFA-specific override
+    plateau_early_stop=False,
+)
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--seeds", nargs="+", type=int, default=[42, 1, 2])
+    ap.add_argument("--k-feats", nargs="+", type=int, default=[5, 20])
+    ap.add_argument("--n-steps", type=int, default=None)
+    args = ap.parse_args()
+
+    act_cache_key = compute_act_cache_key(load_datasource(DATASOURCE))
+    cfg = TFA_TRAINING_CFG
+    if args.n_steps is not None:
+        cfg = cfg.model_copy(update={"n_steps": args.n_steps})
+
+    for seed in args.seeds:
+        for k in args.k_feats:
+            print(f"[c3_tfa_baseline] cell tfa seed={seed} k_feat={k} "
+                  f"B={cfg.batch_size} n_steps={cfg.n_steps}",
+                  flush=True)
+            eval_cfg = {
+                "k_feat": k, "S": 32, "smoke": False,
+                "_act_cache_key": act_cache_key,
+                "_datasource_name": DATASOURCE,
+            }
+            runner.run_cell(
+                component="c3", arch_name="tfa", seed=seed,
+                datasource_name=DATASOURCE,
+                training_cfg=cfg, eval_cfg=eval_cfg,
+                eval_protocol_version=EVAL_PROTOCOL_VERSION,
+                train_fn=my_train_fn, eval_fn=my_eval_fn,
+            )
+
+
+if __name__ == "__main__":
+    main()
+```
+
+Step 2 — smoke ONE cell at `n_steps=200`:
+
+```bash
+TQDM_DISABLE=1 AGENT_NAME=agent_nlp \
+  bash scripts/run_on_gpu.sh 1 -- \
+  .venv/bin/python -m experiments.c3_probing_tfa_baseline.run \
+  --seeds 42 --k-feats 5 --n-steps 200 2>&1 | tail -20
+```
+
+Step 3 — borrow GPU 1 (verify agent_em is idle first per § 13). Then
+launch 2 seeds in parallel:
+
+```bash
+# Verify agent_em is post-canonical idle
+grep "status: complete\|canonical mission COMPLETE" \
+    agents/agent_em/briefing.md | tail -3
+
+# Update YOUR Current state with the borrow note BEFORE launching:
+# "Borrowing GPU 1 for C3 TFA sweep — agent_em is post-canonical
+#  idle (mission complete commit b549d91c)."
+
+# Launch in parallel
+TQDM_DISABLE=1 AGENT_NAME=agent_nlp \
+  bash scripts/run_on_gpu.sh 0 -- \
+  .venv/bin/python -m experiments.c3_probing_tfa_baseline.run \
+  --seeds 42 \
+  > logs/c3_tfa_gpu0.log 2>&1 &
+echo $! > /tmp/p_tfa_gpu0
+
+TQDM_DISABLE=1 AGENT_NAME=agent_nlp \
+  bash scripts/run_on_gpu.sh 1 -- \
+  .venv/bin/python -m experiments.c3_probing_tfa_baseline.run \
+  --seeds 1 2 \
+  > logs/c3_tfa_gpu1.log 2>&1 &
+echo $! > /tmp/p_tfa_gpu1
+```
+
+Step 4 — monitor + verify rows land at `arch=tfa`, `component=c3`,
+fresh `train_keys` (B=32 produces a distinct hash from any existing
+B=1024 cells).
+
+### Analysis filter update — 4-arch family
+
+Once your TFA cells AND agent_em_100k's MLC cells land, the C3
+canonical filter expands to FOUR arch families. Update
+`experiments/c3_probing/analysis.py` to add 2 more
+`canonical_train_keys` calls:
+
+```python
+tfa_keys = canonical_train_keys(
+    component="c3",
+    archs=["tfa"],
+    seeds=(1, 2, 42),
+    datasource_names=("gemma_2_2b_it_l13_fineweb_24k128",),
+    training_cfg=TrainingConfig(n_steps=20_000, batch_size=32),
+)
+mlc_keys = canonical_train_keys(
+    component="c3",
+    archs=["mlc"],
+    seeds=(1, 2, 42),
+    datasource_names=("gemma_2_2b_it_l11to15_fineweb_24k128",),
+    training_cfg=TrainingConfig(n_steps=20_000),
+)
+canonical = txc_keys | topk_keys | tsae_keys | tfa_keys | mlc_keys
+```
+
+(MLC keys come in once agent_em_100k's mission lands; you can wire the
+union now and the MLC keys will simply be empty until then.)
+
+### Watch-outs
+
+- **B=32 is intentional** — don't bump it back to 1024. Wasteland
+  evidence (`train_phase7.py:316-321`) shows B>32 risks OOM on
+  d_sae=18432 with the attention tensor at fp32. Document the per-
+  arch B exception in c3.md caveats when you re-render.
+- **Borrow GPU 1 carefully** — agent_em's pod is shared. Before
+  launching, verify their Current state shows "canonical mission
+  COMPLETE" / idle. If they start any compute work, your borrow gets
+  preempted.
+- **Don't reuse the multi-layer datasource** — TFA at C3 uses the
+  existing single-layer `gemma_2_2b_it_l13_fineweb_24k128` (full seq
+  T=128 from L13 alone). The l11to15 multi-layer datasource is
+  agent_em_100k's MLC territory.
+
+---
+
+### ⚠️ Han decisions 2026-05-05 PM — C3 baseline T=1 re-train (your headline shifts) [§ 15 COMPLETE — commit `9b9d6cc5`]
 
 **Background**: SAEBench (papers/are_saes_useful.md, App. B) shows
 canonical SAE training is buffer-based, batch=2048 TOKENS/step, ~500M

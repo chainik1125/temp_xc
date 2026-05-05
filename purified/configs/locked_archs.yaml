@@ -99,9 +99,11 @@ archs:
       n_heads: 4
       use_pos_embedding: false
     per_component_hparams:
+      c6:
+        d_sae: 32768   # Qwen-2.5-14B L24 d_in=5120 (× 6.4); shared with sae_arditi/txc_base
       c7:
         d_sae: 32768   # Llama-3.1-8B L10 d_in (4096) × 8
-    notes: "Temporal Feature Analysis (priors_in_time). C1, C2, C7 baseline."
+    notes: "Temporal Feature Analysis (priors_in_time). C1, C2, C6 (NEW § 16), C7 baseline."
 
   tfa_pos:
     class_path: temp_bench.architectures.tfa:TFA

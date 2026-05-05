@@ -844,6 +844,100 @@ choice. They coexist in the same config; setting both is allowed if a
 component decides to. C6 keeps Bricken on for TXC + brickenauxk_a8 (per
 § 7); C3/C5 keep Bricken off for the baseline re-train (per § 7).
 
+### 16. Add MLC + TFA as paper-faithful baselines at C3, C5, C6
+
+**Context** (Han 2026-05-05 PM, post-§ 15 baseline re-train completion):
+the C3 + C5 baseline coverage was thin — TopK + T-SAE only. Adding MLC
++ TFA strengthens both the C3 sparse-probing comparison (C3 paper-claim
+defensibility) and C5 steering (provides a temporal-aware non-TXC
+baseline). C6 EM also benefits from a TFA comparison since TFA's
+predictive component aligns naturally with the "stable semantic
+features" hypothesis there.
+
+The two baselines' paper-faithful training conventions differ:
+
+**MLC** (Multi-Layer Crosscoder, layer-axis analog of TXC):
+- Native data format: ``(B, L, d_in)`` where L = number of adjacent
+  layers (paper default L=5).
+- Wasteland reference (`94119bc0:src/architectures/mlc.py` +
+  `experiments/phase7_unification/train_phase7.py:246-260`):
+  shared latent across L layers; per-step encoder load = B × L tokens.
+- For paper-faithful training at C3, we need a 5-layer Gemma cache.
+  Build via the new multi-layer activation cache framework
+  (commit `d859daef`):
+  - New datasource `gemma_2_2b_it_l11to15_fineweb_24k128`
+    (`layers: [11,12,13,14,15]`).
+  - `build_activation_cache` detects `layers: list[int]` and registers
+    N forward hooks in one model pass → captures (N, L=5, seq_len,
+    d_in) into a single .npy. Cost: ~70 GB on disk, ~3 H100-hours to
+    build.
+  - `preloaded_batch_iter_from_multilayer_cache(act_cache_key, seed)`
+    samples 1 random (seq, token) per row → returns (B, L=5, d_in).
+  - `build_probe_cache` extended analogously for MLC eval: per-task
+    X arrays at (N, L=5, S=32, d_in). Same multi-layer hooks.
+- TrainingConfig: `B=1024, n_steps=20_000, train_window_size=None`
+  (the L axis lives outside the train_window_size system; MLC's data
+  shape is determined by the multi-layer datasource).
+- Per-step encoder load: B × L = 5120 tokens (similar to TXC at T=5).
+
+**TFA** (Temporal Feature Analysis):
+- Native data format: ``(B, T_seq, d_in)`` where T_seq is the full
+  sequence length. TFA's attention attends over preceding context
+  tokens; T_seq=128 is the design intent.
+- **Wasteland-faithful training** (`94119bc0:experiments/phase7_unification/train_phase7.py:312-353`):
+  ```
+  TFA_BATCH = 32
+  Phase 5 default tfa_batch_size = 64
+  gen(B): returns full sequences (B, L=128, d) — sample whole context
+  Per-step tokens: 32 × 128 = 4096 (close to SAEBench's 2K canonical)
+  ```
+  TFA's per-step memory is heavy (B × T × d_sae attention tensor at
+  fp32 ≈ 36 GB at B=4096, T=128, d_sae=18432). Phase 7 used B=32 to
+  fit within an H200 holding multilayer buffers; we reuse that
+  convention. The wasteland TFA paper (priors_in_time.md, App. B.1)
+  doesn't pin a specific batch but shows context > 100 tokens helps
+  reconstruction (Fig. 2(d) — variance explained increases to 80% at
+  ~500 tokens of context).
+- **TrainingConfig per-arch override**: `B=32, n_steps=20_000,
+  train_window_size=None` (full sequence). The B=32 is the only
+  cross-arch B exception (decisions § 12 notes "uniform across pods"
+  was for the non-TFA baselines; TFA was identified earlier as a
+  per-arch outlier in Phase 7 too).
+
+**Re-train assignments** (all per-arch literature-faithful):
+
+| Agent | Component | Arch | TrainingConfig | Notes |
+|---|---|---|---|---|
+| agent_em_100k | C3 | MLC × 3 seeds | `B=1024, train_window_size=None`, datasource=l11to15 | Build 5-layer cache first (~3 H100-hr); also extend probe_cache to multi-layer for eval |
+| agent_nlp | C3 | TFA × 3 seeds × 2 k_feats | `B=32, train_window_size=None`, datasource=l13 (existing) | Wasteland-faithful B=32 + full seq |
+| agent_filler | C5 | TopK × 3 seeds + TFA × 3 seeds | TopK: `B=1024, train_window_size=1`; TFA: `B=32, train_window_size=None` | 6 cells parallel on 8 A40s; ~1.25 hr wall |
+| agent_steer_100k | C6 | TFA × 2 seeds × 2 organisms | `B=32, train_window_size=None`, datasources: 14B-finance + 7B-medical | 4 cells serial on 1 H100; ~12-16 hr |
+
+**Cross-arch B uniformity note** (decisions § 12 amendment): TFA is the
+single arch with a B=32 override (paper-faithful per-arch convention);
+all other archs continue at B=1024. This is the same exception we'd
+make for any arch whose per-step memory pressure precludes B=1024 at
+the d_sae we use. Documented in c3.md / c5.md / c6.md caveats so
+reviewers see the per-arch B is a deliberate paper-faithful choice,
+not a config drift.
+
+**Within-component fairness invariant**: every arch within a component
+trains for ``n_steps=20_000``. Per-step token throughput VARIES per
+arch (TopK 1024, T-SAE 2048, TFA 4096, TXC 5120, MLC 5120) — each at
+its source paper's intended setup. Total-token-budget per arch ranges
+from 20.5M (TopK) to 100M (MLC/TXC). This isn't strict token-count
+fairness; it's "each arch trained at its paper's intended per-step
+scale, for the same number of gradient steps." Reviewer-defensible
+because every arch's training matches its primary reference.
+
+**No re-train for already-completed cells** (§ 15 stays):
+- C3 TopK T=1 (agent_nlp, `9b9d6cc5`)
+- C3 T-SAE T=2 (agent_em_100k, `82674a75`)
+- C5 T-SAE T=2 (agent_filler, `3a654fab`)
+- C6 baselines (sae_arditi T=1 + TXC T=5; agent_em's canonical 8/8)
+- C7 baselines (all at T=5; agent_back's v4)
+- All TXC cells (every component, T=5 + max_shift)
+
 ### Non-decisions (to revisit later)
 
 - **MLC scope** — competitive with TXC-base at C3 k=5. Include as related

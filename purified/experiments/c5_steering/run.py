@@ -300,6 +300,7 @@ def run_one_cell(
     force_train: bool,
     force_eval: bool,
     train_window_size: int | None = None,
+    batch_size: int | None = None,
 ) -> None:
     eval_cfg: dict[str, Any] = {
         "protocol": protocol,
@@ -324,6 +325,14 @@ def run_one_cell(
         # value → different train_key → fresh checkpoint.
         training_cfg = training_cfg.model_copy(
             update={"train_window_size": train_window_size},
+        )
+    if batch_size is not None:
+        # agent_paper 2026-05-05 PM (decisions § 16): per-arch B override.
+        # TFA's wasteland-faithful training uses B=32 + full seq because
+        # its attention tensor is ~9.6 GB fp32 at d_sae=18432, B=1024.
+        # Different B → different train_key → fresh checkpoint.
+        training_cfg = training_cfg.model_copy(
+            update={"batch_size": batch_size},
         )
     workspace, eval_key = _workspace_for(
         arch_name=arch_name, seed=seed,
