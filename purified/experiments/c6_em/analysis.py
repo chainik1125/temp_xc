@@ -179,12 +179,28 @@ def _save_frontier_plot(sae_wang, txc_wang, *, dst: Path,
 
 
 def _decision(gap: float) -> str:
-    if gap <= 3.0:
-        return ("**Tied** — TXC-base+brickenauxk closed the gap to within "
-                "judge σ ≈ 6 align (headline win).")
-    if gap <= 9.0:
-        return ("**Mixed** — gap is in the 3–9 align band; pair with the other "
-                "organism's outcome for the tradeoff framing.")
+    """Map a signed gap (SAE − TXC) to the c6.md decision-tree band.
+
+    Bands are on |gap|. A negative gap means TXC > SAE; the band is the
+    same as the absolute value implies — e.g. gap=-3.2 is "Tied" with
+    TXC narrowly winning, NOT "Honest negative".
+    """
+    a = abs(gap)
+    direction = "TXC narrowly wins" if gap < 0 else "TXC closes the gap to"
+    if a <= 3.0:
+        return (f"**Tied** — {direction} within judge σ ≈ 6 align "
+                f"(|gap|={a:.2f} ≤ 3) (headline win).")
+    if a <= 9.0:
+        if gap < 0:
+            return ("**Mixed** — TXC strictly beats SAE-arditi (|gap| in "
+                    "3–9 align band); pair with the other organism's "
+                    "outcome for the tradeoff framing.")
+        return ("**Mixed** — gap is in the 3–9 align band; pair with the "
+                "other organism's outcome for the tradeoff framing.")
+    if gap < 0:
+        return ("**TXC win** — TXC strictly beats SAE-arditi by > 9 align "
+                "(unusual; check the per-cell coherence floor — Wang stage 4 "
+                "doesn't apply one).")
     return ("**Honest negative** — TXC-base+brickenauxk does not close the "
             "gap; SAE arditi wins on this organism.")
 
