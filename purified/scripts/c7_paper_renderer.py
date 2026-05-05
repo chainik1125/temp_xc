@@ -110,10 +110,18 @@ def load_c7_rows() -> list[dict]:
 
 
 def latest_per_cell(rows: list[dict]) -> list[dict]:
-    """Keep one row per (arch, train_key) — the most recent timestamp."""
+    """Keep the most recent row per (arch, train_key, eval_key).
+
+    A single trained SAE (one ``train_key``) can produce MULTIPLE
+    leaderboard rows when re-evaluated with different magnitude grids
+    (canonical vs extended-mags follow-up; each gets its own
+    ``eval_key`` because the magnitude list is part of ``eval_cfg``).
+    Keeping every (arch, train_key, eval_key) row lets the Δgc plot
+    merge canonical + extended evals into one combined curve per cell.
+    """
     by_key: dict[tuple, dict] = {}
     for r in rows:
-        key = (r["arch"], r["train_key"])
+        key = (r["arch"], r["train_key"], r["eval_key"])
         cur = by_key.get(key)
         if cur is None or r["ts"] > cur["ts"]:
             by_key[key] = r
@@ -123,6 +131,44 @@ def latest_per_cell(rows: list[dict]) -> list[dict]:
         r.get("eval_cfg", {}).get("batch_size", 0),
         -ord(r["ts"][0]) if r["ts"] else 0,
     ))
+    return out
+
+
+def _is_extended(r: dict) -> bool:
+    return bool(r.get("eval_cfg", {}).get("_extended_mags"))
+
+
+def canonical_rows(rows: list[dict]) -> list[dict]:
+    """Drop extended-mags follow-up rows (peak / PR-AUC tables only show
+    canonical evals; extended rows have a magnitude-restricted peak that
+    isn't comparable to the canonical headline)."""
+    return [r for r in rows if not _is_extended(r)]
+
+
+def merge_mag_curves(rows: list[dict]) -> list[tuple[str, dict, dict[float, float]]]:
+    """Group rows by (arch, train_key) and merge per-magnitude Δgc data
+    across all eval_keys (canonical + extended). Returns a list of
+    (cell_id, representative_row, {mag: Δgc}) tuples — one entry per cell.
+
+    For overlapping magnitudes (e.g. m=0 appears in both canonical and
+    extended evals), the canonical value wins because the canonical
+    eval's per-question baseline is the headline reference.
+    """
+    by_cell: dict[tuple, list[dict]] = {}
+    for r in rows:
+        cell = (r["arch"], r["train_key"])
+        by_cell.setdefault(cell, []).append(r)
+    out = []
+    for cell, cell_rows in by_cell.items():
+        # Canonical first so its mag=0 baseline wins for shared mags.
+        cell_rows = sorted(cell_rows, key=lambda r: (_is_extended(r), r["ts"]))
+        merged: dict[float, float] = {}
+        for r in cell_rows:
+            for mag, delta in parse_mag_metrics(r["metrics"]):
+                merged.setdefault(mag, delta)
+        # Pick a representative row for label / color: prefer canonical.
+        rep = next((r for r in cell_rows if not _is_extended(r)), cell_rows[0])
+        out.append((f"{cell[0]}|{cell[1][:8]}", rep, merged))
     return out
 
 
@@ -204,20 +250,21 @@ def _n_steps_from_row(r: dict) -> int | None:
 
 
 def plot_delta_gc_vs_magnitude(rows: list[dict], out_path: Path) -> None:
+    """Plot Δgc vs magnitude per cell, merging canonical + extended-mags
+    evals for the same (arch, train_key) into a single curve so the
+    appendix figure shows the full magnitude span the cell was evaluated
+    at."""
     plt.figure(figsize=(8.5, 5.0))
     seen_labels: set[str] = set()
-    for r in rows:
-        pairs = parse_mag_metrics(r["metrics"])
-        if not pairs:
+    for _cell_id, rep, merged in merge_mag_curves(rows):
+        if not merged:
             continue
-        mags = [m for m, _ in pairs]
-        deltas = [d for _, d in pairs]
-        color = cell_color(r["arch"], _bs_from_row(r))
-        label = cell_short_label(r)
-        # Disambiguate same-label rows (e.g. duplicated train_keys) by
-        # appending a short hash suffix so the legend never shows ties.
+        mags = sorted(merged.keys())
+        deltas = [merged[m] for m in mags]
+        color = cell_color(rep["arch"], _bs_from_row(rep))
+        label = cell_short_label(rep)
         if label in seen_labels:
-            label = f"{label} [{r['train_key'][:6]}]"
+            label = f"{label} [{rep['train_key'][:6]}]"
         seen_labels.add(label)
         plt.plot(mags, deltas, marker="o", markersize=4, linewidth=1.6,
                  color=color, linestyle="-", label=label)
@@ -482,24 +529,30 @@ def _table_pr_auc_full(rows: list[dict]) -> str:
 
 
 def _table_per_magnitude(rows: list[dict]) -> str:
-    all_mags = sorted({m for r in rows for m, _ in parse_mag_metrics(r["metrics"])})
+    """Per-magnitude Δgc table — one row per (arch, train_key) cell with
+    canonical + extended-mags merged."""
+    cells = merge_mag_curves(rows)
+    all_mags = sorted({m for _, _, merged in cells for m in merged.keys()})
     headers = ["Arch (cell)"] + [f"{m:+g}" for m in all_mags]
     lines = ["| " + " | ".join(headers) + " |",
              "|" + "|".join(["---"] * len(headers)) + "|"]
-    for r in rows:
-        m_dict = dict(parse_mag_metrics(r["metrics"]))
-        row = [cell_short_label(r)]
+    for _cell_id, rep, merged in cells:
+        row = [cell_short_label(rep)]
         for mag in all_mags:
-            row.append(fmt_num(m_dict.get(mag)))
+            row.append(fmt_num(merged.get(mag)))
         lines.append("| " + " | ".join(row) + " |")
     return "\n".join(lines)
 
 
-def write_markdown(rows: list[dict], assets_rel: str, out_path: Path) -> None:
+def write_markdown(rows: list[dict], *, canonical: list[dict] | None = None,
+                   assets_rel: str, out_path: Path) -> None:
+    if canonical is None:
+        canonical = canonical_rows(rows)
     now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
     n_cells = len(rows)
+    n_extended = len(rows) - len(canonical)
 
-    archs_done = sorted({r["arch"] for r in rows})
+    archs_done = sorted({r["arch"] for r in canonical})
     archs_expected = ["txc_base", "txc_pro", "topk_sae", "tsae_paper", "mlc"]
     missing = [a for a in archs_expected if a not in archs_done]
 
@@ -509,7 +562,7 @@ def write_markdown(rows: list[dict], assets_rel: str, out_path: Path) -> None:
     md.append(f"_Last updated: {now}._  "
               f"_Source: `purified/results/leaderboard.jsonl` filtered to `component == 'c7'`._")
     md.append("")
-    md.append(f"**Cells in leaderboard:** {n_cells}.  "
+    md.append(f"**Cells in leaderboard:** {n_cells} ({n_extended} extended-mags follow-up).  "
               f"**Architectures present:** {', '.join(PAPER_ARCH_LABEL.get(a, a) for a in archs_done) if archs_done else '(none yet)'}.  "
               f"**Still pending:** {', '.join(PAPER_ARCH_LABEL.get(a, a) for a in missing) if missing else '(all five present)'}.")
     md.append("")
@@ -520,10 +573,10 @@ def write_markdown(rows: list[dict], assets_rel: str, out_path: Path) -> None:
 
     md.append("## Headline numbers")
     md.append("")
-    if rows:
-        md.append(_table_headline(rows))
+    if canonical:
+        md.append(_table_headline(canonical))
     else:
-        md.append("_(No cells yet.)_")
+        md.append("_(No canonical cells yet.)_")
     md.append("")
     md.append(f"![Peak Δgc per cell]({assets_rel}/peak_delta_gc_bar.png)")
     md.append("")
@@ -548,7 +601,7 @@ def write_markdown(rows: list[dict], assets_rel: str, out_path: Path) -> None:
     md.append("")
     md.append("### Full PR-AUC table")
     md.append("")
-    md.append(_table_pr_auc_full(rows) if rows else "_(No cells yet.)_")
+    md.append(_table_pr_auc_full(canonical) if canonical else "_(No canonical cells yet.)_")
     md.append("")
 
     md.append("## Per-magnitude $\\Delta gc$")
@@ -622,14 +675,21 @@ def main(*, output_dir: Path) -> None:
     log.info("[c7_paper] loaded %d c7 cells (%d at the 300K headline config)",
              len(all_rows), len(rows))
 
+    canonical = canonical_rows(rows)
+
     if rows:
+        # Δgc-vs-mag: merge canonical + extended per cell so the curve
+        # spans the full evaluated range.
         plot_delta_gc_vs_magnitude(rows, assets_dir / "delta_gc_vs_magnitude.png")
-        plot_peak_delta_gc_bar(rows, assets_dir / "peak_delta_gc_bar.png")
-        plot_pr_auc_vs_S(rows, assets_dir / "pr_auc_vs_S.png")
-        plot_pr_auc_S8_bar(rows, assets_dir / "pr_auc_S8_bar.png")
+        # Peak / PR-AUC: canonical only — the extended row's "peak"
+        # is just the max over its 5-mag subset and isn't comparable.
+        plot_peak_delta_gc_bar(canonical, assets_dir / "peak_delta_gc_bar.png")
+        plot_pr_auc_vs_S(canonical, assets_dir / "pr_auc_vs_S.png")
+        plot_pr_auc_S8_bar(canonical, assets_dir / "pr_auc_S8_bar.png")
         plot_probe_curves(rows, assets_dir)
 
-    write_markdown(rows, assets_rel="c7_paper_assets", out_path=md_path)
+    write_markdown(rows, canonical=canonical, assets_rel="c7_paper_assets",
+                   out_path=md_path)
     log.info("[c7_paper] wrote %s", md_path)
 
 
