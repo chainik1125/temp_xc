@@ -38,9 +38,36 @@ import torch
 from temp_bench import runner
 from temp_bench.config import instantiate_arch, load_arch, load_datasource
 from temp_bench.data.toy_full.api import make_batch_iter, markov_chain_support
-from temp_bench.eval.synthetic import feature_recovery
 from temp_bench.schemas import TrainingConfig
 from temp_bench.training.sae_trainer import train_sae
+
+
+@torch.no_grad()
+def feature_recovery(decoder_directions: torch.Tensor,
+                     true_features: torch.Tensor,
+                     *, n_thresholds: int = 50) -> dict[str, float]:
+    """Per-feature recovery AUC. Inline copy of agent_paper's
+    ``temp_bench.eval.synthetic.feature_recovery`` on origin/final
+    (port of wasteland's ``feature_recovery_score``). For each true
+    feature, take c_k = max_j |<g_k, w_j>|; sweep tau in [0,1] and
+    integrate the fraction-recovered curve."""
+    decoder = decoder_directions  # (d_sae, d_in)
+    truth = true_features         # (n_features, d_in)
+    a = decoder / decoder.norm(dim=1, keepdim=True).clamp_min(1e-12)
+    b = truth   / truth.norm(dim=1, keepdim=True).clamp_min(1e-12)
+    sims = (a @ b.t()).abs()                # (d_sae, n_features)
+    max_per_true = sims.max(dim=0).values   # (n_features,)
+    thresholds = np.linspace(0, 1, n_thresholds)
+    curve = np.array([
+        (max_per_true.cpu().numpy() >= t).mean() for t in thresholds
+    ])
+    auc = float(np.trapezoid(curve, thresholds))
+    return {
+        "auc": auc,
+        "mean_max_cos": float(max_per_true.mean()),
+        "frac_recovered_90": float((max_per_true >= 0.9).float().mean()),
+        "frac_recovered_80": float((max_per_true >= 0.8).float().mean()),
+    }
 
 COMPONENT = "c1"
 DATASOURCE = "toy_markov_n20_d40_full"

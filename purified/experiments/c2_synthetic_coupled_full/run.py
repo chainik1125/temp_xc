@@ -38,9 +38,41 @@ import torch
 from temp_bench import runner
 from temp_bench.config import instantiate_arch, load_arch, load_datasource
 from temp_bench.data.toy_full.api import coupled_hmm, make_batch_iter
-from temp_bench.eval.synthetic import feature_recovery, global_recovery_gAUC
 from temp_bench.schemas import TrainingConfig
 from temp_bench.training.sae_trainer import train_sae
+
+
+@torch.no_grad()
+def feature_recovery(decoder_directions: torch.Tensor,
+                     true_features: torch.Tensor,
+                     *, n_thresholds: int = 50) -> dict[str, float]:
+    """Per-feature AUC; inline copy of agent_paper's eval/synthetic.feature_recovery."""
+    a = decoder_directions / decoder_directions.norm(dim=1, keepdim=True).clamp_min(1e-12)
+    b = true_features / true_features.norm(dim=1, keepdim=True).clamp_min(1e-12)
+    sims = (a @ b.t()).abs()
+    max_per_true = sims.max(dim=0).values
+    thresholds = np.linspace(0, 1, n_thresholds)
+    curve = np.array([
+        (max_per_true.cpu().numpy() >= t).mean() for t in thresholds
+    ])
+    return {
+        "auc": float(np.trapezoid(curve, thresholds)),
+        "mean_max_cos": float(max_per_true.mean()),
+        "frac_recovered_90": float((max_per_true >= 0.9).float().mean()),
+        "frac_recovered_80": float((max_per_true >= 0.8).float().mean()),
+    }
+
+
+def global_recovery_gAUC(decoder_directions: torch.Tensor,
+                         hidden_features: torch.Tensor) -> dict[str, float]:
+    """gAUC + companion stats vs K hidden directions."""
+    base = feature_recovery(decoder_directions, hidden_features)
+    return {
+        "gauc": base["auc"],
+        "g_mean_max_cos": base["mean_max_cos"],
+        "g_frac_recovered_90": base["frac_recovered_90"],
+        "g_frac_recovered_80": base["frac_recovered_80"],
+    }
 
 COMPONENT = "c2"
 DATASOURCE = "toy_coupled_K10_M20_d256_full"
