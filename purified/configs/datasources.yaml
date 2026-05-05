@@ -36,6 +36,33 @@ datasources:
       fineweb/resid_L13.npy` in the wasteland) at first build to save
       ~3 H100-hours.
 
+  gemma_2_2b_it_l11to15_fineweb_24k128:
+    category: real_lm
+    subject_model: google/gemma-2-2b-it
+    layers: [11, 12, 13, 14, 15]
+    hookpoint: resid_post
+    dataset: fineweb
+    n_seqs: 24000
+    seq_len: 128
+    tokenizer_revision: main
+    notes: |
+      C3 MLC anchor (multi-layer crosscoder, decisions § 16). One model
+      pass with 5 hooks captures activations at L11, L12, L13, L14, L15
+      simultaneously into a single (N, L=5, seq_len, d_in) cache. L13
+      mirrors the single-layer `gemma_2_2b_it_l13_fineweb_24k128` anchor
+      used by C3 TopK / T-SAE / TXC; adjacent layers L11+L12+L14+L15
+      are needed for MLC's paper-faithful (L=5) shared latent across 5
+      layers per token.
+
+      Cache size: 24K × 5 × 128 × 2304 × 2 bytes ≈ **70 GB** fp16.
+      Build cost: ~3 H100-hours via `build_activation_cache(...)`. The
+      build function detects the `layers` (list) field and registers
+      hooks on each layer in one model pass.
+
+      Existing single-layer caches are NOT reused — the cache key
+      (sha256 of the dump) is unique to the multi-layer datasource
+      because the `layers: [11,...,15]` list differs from `layer: 13`.
+
   gemma_2_2b_base_l13_fineweb_24k128:
     category: real_lm
     subject_model: google/gemma-2-2b

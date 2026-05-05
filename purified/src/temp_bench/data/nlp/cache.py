@@ -55,6 +55,12 @@ def build_activation_cache(
     and ``meta.json`` matching the datasource spec, returns immediately.
     Pass ``force=True`` to rebuild from scratch.
 
+    **Two modes**: single-layer (``spec.layer: int``) or multi-layer
+    (``spec.layers: list[int]``, decisions § 16). In multi-layer mode,
+    one model pass captures activations at every listed layer
+    simultaneously and stacks them into a ``(N, len(layers), seq_len,
+    d_in)`` cache. Used by C3 MLC's paper-faithful 5-layer training.
+
     Args:
         datasource_name: key into ``configs/datasources.yaml``
             (must have ``category: real_lm``).
@@ -76,6 +82,9 @@ def build_activation_cache(
             f"{datasource_name!r} has category={spec.category!r}."
         )
 
+    layers = _spec_layers(spec)
+    multilayer = len(layers) > 1
+
     key = compute_act_cache_key(spec)
     cache_dir = act_cache_dir(key)
     cache_dir.mkdir(parents=True, exist_ok=True)
@@ -88,8 +97,12 @@ def build_activation_cache(
         return cache_dir
 
     print(f"[build_activation_cache] {datasource_name} → {cache_dir}")
-    print(f"  subject={spec.subject_model} layer={spec.layer} "
-          f"n_seqs={spec.n_seqs} seq_len={spec.seq_len}")
+    if multilayer:
+        print(f"  subject={spec.subject_model} layers={layers} "
+              f"n_seqs={spec.n_seqs} seq_len={spec.seq_len}")
+    else:
+        print(f"  subject={spec.subject_model} layer={layers[0]} "
+              f"n_seqs={spec.n_seqs} seq_len={spec.seq_len}")
 
     hf_token = _resolve_hf_token(hf_token)
     model, tokenizer = _load_subject_model(spec, device, hf_token)
@@ -101,19 +114,30 @@ def build_activation_cache(
     token_ids = _tokenize_fixed_length(tokenizer, texts, spec.seq_len)
     np.save(tokens_path, token_ids.numpy())
 
-    # mmap the output array so we don't have to hold ~14 GB in RAM.
+    # mmap the output array so we don't have to hold ~14 GB+ in RAM.
+    if multilayer:
+        out_shape = (token_ids.shape[0], len(layers), spec.seq_len, d_in)
+    else:
+        out_shape = (token_ids.shape[0], spec.seq_len, d_in)
     acts_mmap = np.lib.format.open_memmap(
         acts_path, mode="w+", dtype=np.float16,
-        shape=(token_ids.shape[0], spec.seq_len, d_in),
+        shape=out_shape,
     )
 
-    captured: dict[str, torch.Tensor] = {}
+    # Per-layer capture buffer. Hook closures key by layer_idx so a
+    # single forward pass populates all entries.
+    captured: dict[int, torch.Tensor] = {}
 
-    def hook_fn(module, inp, output):
-        acts = output[0] if isinstance(output, tuple) else output
-        captured["resid"] = acts.detach().to(torch.float16).cpu()
+    def _make_hook(layer_idx: int):
+        def _hook(module, inp, output):
+            acts = output[0] if isinstance(output, tuple) else output
+            captured[layer_idx] = acts.detach().to(torch.float16).cpu()
+        return _hook
 
-    handle = _resid_hook_target(model, spec.layer).register_forward_hook(hook_fn)
+    handles = [
+        _resid_hook_target(model, layer).register_forward_hook(_make_hook(layer))
+        for layer in layers
+    ]
 
     try:
         device_t = torch.device(device)
@@ -123,25 +147,61 @@ def build_activation_cache(
             captured.clear()
             with torch.no_grad():
                 model(input_ids)
-            acts_mmap[start:end] = captured["resid"].numpy()
+            if multilayer:
+                # Stack in the order of layers (not capture order).
+                stacked = np.stack(
+                    [captured[layer].numpy() for layer in layers],
+                    axis=1,
+                )                                        # (B, L, T, D)
+                acts_mmap[start:end] = stacked
+            else:
+                acts_mmap[start:end] = captured[layers[0]].numpy()
             if start % (batch_size * 50) == 0:
                 pct = 100.0 * end / token_ids.shape[0]
                 print(f"  {end}/{token_ids.shape[0]}  ({pct:.1f}%)")
         acts_mmap.flush()
     finally:
-        handle.remove()
+        for h in handles:
+            h.remove()
 
     meta_path.write_text(json.dumps({
         "datasource_name": datasource_name,
         "act_cache_key": key,
         "spec": spec.model_dump(),
         "d_in": int(d_in),
-        "shape": [int(token_ids.shape[0]), int(spec.seq_len), int(d_in)],
+        "shape": list(out_shape),
         "dtype": "float16",
+        "multilayer": multilayer,
+        "layers": [int(L) for L in layers],
     }, indent=2))
 
     print(f"  wrote {acts_path} ({acts_path.stat().st_size / 2**30:.2f} GB)")
     return cache_dir
+
+
+def _spec_layers(spec: DataSourceSpec) -> list[int]:
+    """Resolve datasource → ordered list of layers.
+
+    Supports both single-layer (``layer: int``, legacy) and multi-layer
+    (``layers: list[int]``, decisions § 16) datasources. A spec with
+    both fields raises — pick one.
+    """
+    has_layer = hasattr(spec, "layer") and getattr(spec, "layer") is not None
+    has_layers = hasattr(spec, "layers") and getattr(spec, "layers") is not None
+    if has_layer and has_layers:
+        raise ValueError(
+            "Datasource has both `layer` (int) and `layers` (list); "
+            "pick one. The multi-layer field `layers: [...]` flows into "
+            "act_cache_key as a list; mixing forms is ambiguous."
+        )
+    if has_layers:
+        return [int(L) for L in spec.layers]
+    if has_layer:
+        return [int(spec.layer)]
+    raise ValueError(
+        "Datasource has neither `layer: int` nor `layers: list[int]`. "
+        "real_lm datasources must specify the residual-stream layer(s)."
+    )
 
 
 # ── Public: batch_iter_from_act_cache ───────────────────────────────────────
@@ -299,6 +359,83 @@ def preloaded_batch_iter_from_act_cache(
         return acts[seq_idx[:, None], pos_grid].to(torch.float32)
 
     return _iter_window
+
+
+# ── Public: preloaded_batch_iter_from_multilayer_cache ──────────────────────
+
+
+def preloaded_batch_iter_from_multilayer_cache(
+    act_cache_key: str,
+    *,
+    seed: int = 0,
+) -> Callable[[int], torch.Tensor]:
+    """Multi-layer batch_iter for MLC's paper-faithful training (§ 16).
+
+    Loads a multi-layer activation cache (shape ``(N, L, seq_len, d_in)``,
+    fp16) into RAM via ``.clone()`` and samples per-token (B, L, d_in)
+    batches: one random ``(seq, token)`` pair per row, all L layers
+    stacked.
+
+    Per-step encoder load with B=1024 and L=5: ``B * L = 5120`` token-
+    vectors. Roughly 2.5× SAEBench's 2K canonical — close enough.
+
+    **Determinism**: same ``np.random.default_rng(seed)`` for indices,
+    same ``.to(torch.float32)`` cast as the single-layer helpers; train_keys
+    + checkpoints bit-identical for the same ``(act_cache_key, seed)`` pair.
+
+    **RAM cost**: one ``acts.npy.size`` bytes copy per process per
+    distinct ``act_cache_key``. For Gemma 24K × 5 layers × 128 × 2304
+    fp16 ≈ 70 GB — H100 / H200 pods (≥240 GB system RAM) handle this
+    comfortably; A40 pods would saturate.
+
+    Args:
+        act_cache_key: hash key identifying a multi-layer cache (built
+            via :func:`build_activation_cache` with a datasource that
+            has ``layers: list[int]``). Single-layer caches are
+            rejected with a clear error.
+        seed: numpy RNG seed. Same value → same sampled (seq, token)
+            pairs across the full schedule.
+
+    Returns:
+        Callable ``(batch_size) → Tensor of shape (B, L, d_in)``.
+    """
+    cache_dir = act_cache_dir(act_cache_key)
+    acts_path = cache_dir / "acts.npy"
+    if not acts_path.exists():
+        raise FileNotFoundError(
+            f"Activation cache missing at {acts_path}. "
+            f"Run build_activation_cache(...) first or download from HF."
+        )
+
+    if act_cache_key not in _PRELOADED_ACT_CACHES:
+        mmapped = np.load(acts_path, mmap_mode="r")
+        if mmapped.ndim != 4:
+            raise ValueError(
+                f"preloaded_batch_iter_from_multilayer_cache requires a "
+                f"4D cache (N, L, T, D); got shape {tuple(mmapped.shape)}. "
+                f"Single-layer caches must use "
+                f"`preloaded_batch_iter_from_act_cache` instead."
+            )
+        _PRELOADED_ACT_CACHES[act_cache_key] = (
+            torch.from_numpy(np.ascontiguousarray(mmapped)).clone()
+        )
+    acts = _PRELOADED_ACT_CACHES[act_cache_key]
+    if acts.dim() != 4:
+        raise ValueError(
+            f"preloaded_batch_iter_from_multilayer_cache requires a "
+            f"4D cache (N, L, T, D); cached tensor is {tuple(acts.shape)}."
+        )
+    n_seqs, n_layers, seq_len, _d_in = acts.shape
+    rng = np.random.default_rng(seed)
+
+    def _iter(batch_size: int) -> torch.Tensor:
+        seq_idx = torch.from_numpy(rng.integers(0, n_seqs, size=batch_size))
+        tok_idx = torch.from_numpy(rng.integers(0, seq_len, size=batch_size))
+        # Advanced indexing: acts[seq_idx, :, tok_idx, :] broadcasts the
+        # paired (seq_idx, tok_idx) indices, returning (B, L, D).
+        return acts[seq_idx, :, tok_idx, :].to(torch.float32)
+
+    return _iter
 
 
 # ── Internal helpers ────────────────────────────────────────────────────────

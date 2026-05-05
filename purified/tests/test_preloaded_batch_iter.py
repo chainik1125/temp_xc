@@ -157,6 +157,79 @@ def test_preloaded_train_window_size_invalid(fake_cache):
         )
 
 
+def _write_fake_multilayer_act_cache(
+    root: Path, key: str, n_seqs: int = 16, n_layers: int = 5,
+    seq_len: int = 8, d_in: int = 4,
+) -> str:
+    """Create a tiny synthetic 4D acts.npy at ``(N, L, T, D)`` for MLC."""
+    cache_dir = root / "results" / "act_cache" / key
+    cache_dir.mkdir(parents=True, exist_ok=True)
+    rng = np.random.default_rng(0)
+    acts = rng.normal(size=(n_seqs, n_layers, seq_len, d_in)).astype(np.float16)
+    np.save(cache_dir / "acts.npy", acts)
+    (cache_dir / "meta.json").write_text(json.dumps({
+        "shape": list(acts.shape), "d_in": d_in,
+        "multilayer": True, "layers": list(range(11, 11 + n_layers)),
+    }))
+    return key
+
+
+@pytest.fixture
+def fake_multilayer_cache(tmp_path: Path, monkeypatch):
+    """Create a tiny 4D acts.npy + monkeypatch ``act_cache_dir``."""
+    key = "fedcba9876543210"
+    _write_fake_multilayer_act_cache(
+        tmp_path, key, n_seqs=32, n_layers=5, seq_len=8, d_in=4,
+    )
+    from temp_bench.data.nlp import cache as cache_mod
+
+    def fake_act_cache_dir(act_cache_key: str) -> Path:
+        return tmp_path / "results" / "act_cache" / act_cache_key
+
+    monkeypatch.setattr(cache_mod, "act_cache_dir", fake_act_cache_dir)
+    cache_mod._PRELOADED_ACT_CACHES.clear()
+    return key
+
+
+def test_multilayer_batch_iter_shape(fake_multilayer_cache):
+    """Multi-layer batch_iter returns ``(B, L, d_in)`` per call. MLC's
+    paper-faithful (L=5, decisions § 16) training data path.
+    """
+    from temp_bench.data.nlp.cache import preloaded_batch_iter_from_multilayer_cache
+
+    bi = preloaded_batch_iter_from_multilayer_cache(fake_multilayer_cache, seed=0)
+    batch = bi(7)
+    assert batch.shape == (7, 5, 4), batch.shape
+    assert batch.dtype == torch.float32
+
+
+def test_multilayer_batch_iter_deterministic(fake_multilayer_cache):
+    """Same ``(act_cache_key, seed)`` → bit-identical batches across
+    re-creations of the iterator. MLC train_keys depend on this contract.
+    """
+    from temp_bench.data.nlp.cache import preloaded_batch_iter_from_multilayer_cache
+
+    bi_a = preloaded_batch_iter_from_multilayer_cache(fake_multilayer_cache, seed=42)
+    bi_b = preloaded_batch_iter_from_multilayer_cache(fake_multilayer_cache, seed=42)
+    for _ in range(3):
+        a = bi_a(8)
+        b = bi_b(8)
+        assert torch.equal(a, b), (
+            "Multi-layer iterator must be bit-identical for the same "
+            "(seed); train_keys hash on this contract"
+        )
+
+
+def test_multilayer_batch_iter_rejects_3d_cache(fake_cache):
+    """Calling the multi-layer helper on a 3D (single-layer) cache must
+    error clearly — prevents silent wrong-shape feeding to MLC.
+    """
+    from temp_bench.data.nlp.cache import preloaded_batch_iter_from_multilayer_cache
+
+    with pytest.raises(ValueError, match="4D cache"):
+        preloaded_batch_iter_from_multilayer_cache(fake_cache, seed=0)
+
+
 def test_preloaded_missing_cache_raises(tmp_path, monkeypatch):
     from temp_bench.data.nlp import cache as cache_mod
 

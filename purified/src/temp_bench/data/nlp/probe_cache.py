@@ -48,6 +48,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from typing import Any
 
 import numpy as np
 import torch
@@ -159,14 +160,27 @@ def build_probe_cache(
     d_in = model.config.hidden_size
     seq_len = spec.seq_len
 
-    # Hook L<spec.layer>.resid_post
-    captured: dict[str, torch.Tensor] = {}
+    # Detect multi-layer mode (decisions § 16). build_activation_cache's
+    # _spec_layers helper resolves single `layer: int` and multi `layers:
+    # list[int]` into an ordered list. Multi-layer probe_cache stores
+    # X arrays at shape (N, L, S=32, d_in) for MLC's paper-faithful eval.
+    from temp_bench.data.nlp.cache import _spec_layers
+    layers = _spec_layers(spec)
+    multilayer = len(layers) > 1
 
-    def hook_fn(module, inp, output):
-        acts = output[0] if isinstance(output, tuple) else output
-        captured["resid"] = acts.detach().to(torch.float16).cpu()
+    # Per-layer capture buffer keyed by layer index.
+    captured: dict[int, torch.Tensor] = {}
 
-    handle = model.model.layers[spec.layer].register_forward_hook(hook_fn)
+    def _make_hook(layer_idx: int):
+        def _hook(module, inp, output):
+            acts = output[0] if isinstance(output, tuple) else output
+            captured[layer_idx] = acts.detach().to(torch.float16).cpu()
+        return _hook
+
+    handles = [
+        model.model.layers[layer].register_forward_hook(_make_hook(layer))
+        for layer in layers
+    ]
 
     try:
         for task in todo:
@@ -179,12 +193,12 @@ def build_probe_cache(
             X_tr, fr_tr = _encode_texts(
                 model, tokenizer, task.train_texts, captured,
                 seq_len=seq_len, d_in=d_in, batch_size=batch_size,
-                device=device, max_n=max_per_task,
+                device=device, max_n=max_per_task, layers=layers,
             )
             X_te, fr_te = _encode_texts(
                 model, tokenizer, task.test_texts, captured,
                 seq_len=seq_len, d_in=d_in, batch_size=batch_size,
-                device=device, max_n=max_per_task,
+                device=device, max_n=max_per_task, layers=layers,
             )
             y_tr = np.asarray(task.train_labels, dtype=np.int64)
             y_te = np.asarray(task.test_labels, dtype=np.int64)
@@ -199,6 +213,12 @@ def build_probe_cache(
             np.save(out_dir / "y_train.npy", y_tr)
             np.save(out_dir / "y_test.npy", y_te)
 
+            meta_layer_field: dict[str, Any]
+            if multilayer:
+                meta_layer_field = {"layers": [int(L) for L in layers]}
+            else:
+                meta_layer_field = {"layer": int(layers[0])}
+
             (out_dir / "meta.json").write_text(json.dumps({
                 "datasource_name": datasource_name,
                 "act_cache_key": compute_act_cache_key(spec),
@@ -212,12 +232,13 @@ def build_probe_cache(
                 "S_cache": int(S_CACHE),
                 "d_in": int(d_in),
                 "subject_model": spec.subject_model,
-                "layer": int(spec.layer),
+                **meta_layer_field,
                 "hookpoint": spec.hookpoint,
                 "padding": "left_aligned_real_tokens_S32",
                 "padding_side_at_tokenize": "right",
                 "first_real_dtype": "int64",
                 "schema_version": "2.0.0",
+                "multilayer": multilayer,
             }, indent=2))
 
             mb = (X_tr.nbytes + X_te.nbytes) / 2**20
@@ -227,7 +248,8 @@ def build_probe_cache(
                   f"short test={short_te}/{len(fr_te)}")
 
     finally:
-        handle.remove()
+        for h in handles:
+            h.remove()
 
     return cache_root
 
@@ -310,13 +332,14 @@ def _encode_texts(
     model,
     tokenizer,
     texts: list[str],
-    captured: dict[str, torch.Tensor],
+    captured: dict,
     *,
     seq_len: int,
     d_in: int,
     batch_size: int,
     device,
     max_n: int | None,
+    layers: list[int] | None = None,
 ) -> tuple[np.ndarray, np.ndarray]:
     """Tokenise + forward + per-example reslice to left-aligned S_CACHE-frame.
 
@@ -331,26 +354,42 @@ def _encode_texts(
       4. Record ``first_real[i] = S_CACHE - n_real`` so downstream
          pooling can mask.
 
+    **Multi-layer mode** (decisions § 16): when ``layers`` is a list of
+    length > 1, ``captured`` is keyed by layer index and the output has
+    an extra L axis: ``(N, L, S_CACHE, d_in)``.
+
     Returns:
         (X_left_aligned, first_real)
-          X_left_aligned: (N, S_CACHE, d_in) fp16
-          first_real:     (N,) int64 — first valid pos in the S-frame.
+          X_left_aligned: ``(N, S_CACHE, d_in)`` if single-layer, or
+            ``(N, L, S_CACHE, d_in)`` if multi-layer; both fp16.
+          first_real:     ``(N,)`` int64 — first valid pos in the S-frame.
                           0 for sequences with n_real >= S_CACHE.
     """
     # Tokenizer must be right-padded (model training distribution). Force it
     # explicitly so a caller-mutated tokenizer doesn't surprise us.
     tokenizer.padding_side = "right"
 
+    multilayer = layers is not None and len(layers) > 1
+    n_layers = len(layers) if multilayer else 1
+
     if max_n is not None:
         texts = texts[:max_n]
     n = len(texts)
     if n == 0:
+        empty_shape = (
+            (0, n_layers, S_CACHE, d_in) if multilayer
+            else (0, S_CACHE, d_in)
+        )
         return (
-            np.zeros((0, S_CACHE, d_in), dtype=np.float16),
+            np.zeros(empty_shape, dtype=np.float16),
             np.zeros((0,), dtype=np.int64),
         )
 
-    out = np.zeros((n, S_CACHE, d_in), dtype=np.float16)
+    out_shape = (
+        (n, n_layers, S_CACHE, d_in) if multilayer
+        else (n, S_CACHE, d_in)
+    )
+    out = np.zeros(out_shape, dtype=np.float16)
     first_real = np.zeros((n,), dtype=np.int64)
     device_t = torch.device(device)
 
@@ -370,18 +409,34 @@ def _encode_texts(
         captured.clear()
         with torch.no_grad():
             model(input_ids=input_ids, attention_mask=attention_mask)
-        # captured["resid"] is (B, seq_len, d_in) fp16, right-padded.
-        acts_batch = captured["resid"].numpy()
         # last_idx per row: position of the last real token in seq_len-frame.
         last_idx_batch = (
             attention_mask.sum(dim=1).clamp(min=1).cpu().numpy().astype(np.int64) - 1
         )
 
-        for j, li in enumerate(last_idx_batch):
-            n_real = min(int(li) + 1, S_CACHE)
-            src_lo = int(li) - n_real + 1
-            dst_lo = S_CACHE - n_real
-            out[start + j, dst_lo:S_CACHE] = acts_batch[j, src_lo:int(li) + 1]
-            first_real[start + j] = dst_lo
+        if multilayer:
+            # (B, L, seq_len, d_in) stack from per-layer hook captures.
+            acts_per_layer = [captured[layer].numpy() for layer in layers]
+            acts_batch = np.stack(acts_per_layer, axis=1)            # (B, L, T, D)
+            for j, li in enumerate(last_idx_batch):
+                n_real = min(int(li) + 1, S_CACHE)
+                src_lo = int(li) - n_real + 1
+                dst_lo = S_CACHE - n_real
+                out[start + j, :, dst_lo:S_CACHE] = acts_batch[j, :, src_lo:int(li) + 1]
+                first_real[start + j] = dst_lo
+        else:
+            # Legacy single-layer path. captured may be keyed by either
+            # the integer layer (new build_probe_cache) or "resid" (any
+            # legacy callers); resolve robustly.
+            if layers is not None:
+                acts_batch = captured[layers[0]].numpy()
+            else:
+                acts_batch = captured["resid"].numpy()
+            for j, li in enumerate(last_idx_batch):
+                n_real = min(int(li) + 1, S_CACHE)
+                src_lo = int(li) - n_real + 1
+                dst_lo = S_CACHE - n_real
+                out[start + j, dst_lo:S_CACHE] = acts_batch[j, src_lo:int(li) + 1]
+                first_real[start + j] = dst_lo
 
     return out, first_real
