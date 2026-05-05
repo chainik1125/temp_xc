@@ -584,66 +584,13 @@ D. **post-deadline Cohen's κ validation**: 9 × 270 = 2430 Sonnet
 sync_from_hf.sh fixed, IT/L13 confirmed in c5.md caveats, gpu_locks
 nuked. Remaining:)
 
-1. **Convergence at step 25k** — agent_paper's directive line 64-65
-   says "if final-1K-step loss drop > 5% of loss value at step 25K,
-   surface that — the cap may need bumping uniformly." After the
-   first b1024 cell completes, I'll inspect the loss-trajectory
-   field of `result["log"]["loss"]` (saved via the runner) and
-   surface here. **TODO: define the inspection script + threshold
-   check post-cell.**
+(All four prior open questions resolved by the completed 9-cell
+20K sweep — convergence < 5 %, canonical_train_keys filter wired,
+V7 worked on txc_pro b1024 with mean_coh 2.27–2.40, "matches T-SAE"
+held within 1 stderr. Anthropic API outage 5a resolved by Han's
+top-up + force_eval recovery. Remaining:)
 
-2. **analysis.py filter for batch=1024 rows** — agent_paper
-   explicitly says analyses should filter for the new
-   training_cfg.batch_size=1024 rows. The current analysis.py
-   doesn't have this filter — TODO this turn (or post-compact).
-   The leaderboard row's `eval_cfg` doesn't carry batch_size; need
-   to look it up via the manifest (`checkpoints/manifest.jsonl`
-   keyed by `train_key`) or add a `metric_set="b1024_v1"` tag in
-   eval_cfg that the runner threads through. Surfacing as Q because
-   the right path may want a framework-level `_training_cfg` exposed
-   in enriched_cfg.
-
-3. **txc_pro V7 pre-test** — the pre-registered hypothesis
-   contingency (V7 may break end-position-discriminative encoders;
-   fall back to PP if mean coh ≤ 1.0) was NOT exercised on the
-   b1024 sweep. The b256 cells showed mean coh 2.1-2.2 for txc_pro
-   so V7 worked; b1024 is a different regime. If b1024 txc_pro
-   produces degenerate output, run `--pre-test-only --archs txc_pro
-   --protocol pp` and document.
-
-4. **What if txc_pro b1024 doesn't show "matches T-SAE"** — the
-   b256 backfill numbers were within 1 stderr of tsae. b1024 is
-   3.3× more compute, all archs trained equally. If a clear gap
-   opens (TXC > T-SAE, the original hypothesis was "matches not
-   beats"), c5.md's framing needs revising — but this would be a
-   GOOD problem to have. Watch for it.
-
-5a. **🚨 URGENT — Anthropic API credit balance exhausted (2026-05-05T05:59 UTC).**
-   `txc_base seed=1` (eval_key `2223a67584fa13d3`) produced a 0.0-metric
-   row because **all 270 Sonnet judge calls** failed with HTTP 400:
-   ``Your credit balance is too low to access the Anthropic API. Please
-   go to Plans & Billing to upgrade or purchase credits.`` `n_valid:
-   0/270`, mean_coh = 0.0, mean_success = 0.0.
-
-   **Currently-running cells will hit the same failure at eval phase**
-   unless credits are restored:
-   - `txc_pro seed=2` on GPU 3 (PID 45454) — eval phase in ~45 min
-   - `txc_base seed=2` on GPU 1 (PID 45453) — eval phase in ~3 hr
-
-   I'm letting both cells finish training (training cost is the expensive
-   part, not the eval). Once credits are topped up:
-   1. Manually remove the 0.0-metric rows from `results/leaderboard.jsonl`
-      (the runner appends but doesn't dedupe — a force_eval=True would
-      produce duplicate rows otherwise).
-   2. Re-run with `--force-eval` for the affected eval_keys; the cached
-      checkpoint will be re-used so only ~15-20 min eval per cell.
-
-   **Action required: Han, please top up Anthropic credits at
-   https://console.anthropic.com/settings/billing.** Until then, my
-   AUTO-RESULTS will be biased downward by however many cells hit
-   the 0.0 failure mode.
-
-5b. **`experiments/c5_steering_100k/` breaks `report.render(component='c5')`**
+1. **`experiments/c5_steering_100k/` breaks `report.render(component='c5')`**
    — agent_paper spun up agent_steer_100k as a parallel 100K-step
    instance (commit `6db405bd`). Their dir lives at
    `experiments/c5_steering_100k/` and matches the `c5_*` glob in
