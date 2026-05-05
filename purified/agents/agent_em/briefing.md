@@ -900,25 +900,26 @@ section above.
    to data-driven outcome ("TXC strictly beats SAE on both organisms,
    both Mixed band"). FLOPs-asymmetry caveat rewritten to reflect the
    literature-alignment resolution.
-4. 🔄 **HF backup IN FLIGHT** (bash `biqgmy3x3`):
-   ```python
-   for r in manifest where agent='agent_em' and ds startswith 'qwen_2_5_':
-       api.upload_folder(...)
-   ```
-   8 canonical checkpoints to push:
-   - 14B: `9778d10381696f58` `754166d1711923c1` `5e4e188045d5d3c8`
-     `672dbf61896f7843`
-   - 7B:  `c0da3ed8794554a1` `88a4ddf6819d8057` `9b011dfeea88f8af`
-     `2016074933c41e7f`
-   Each ckpt is ~1.3-3.5 GB; total ~15-20 min for the loop.
-5. **After HF finishes**: verify upload, update manifest hf_url
-   field if needed, push final commit. Then idle pending Han's
-   call on session wrap-up.
+4. ✅ **HF backup COMPLETE** (commit `62f58262`):
+   - 17 agent_em qwen checkpoints pushed to
+     `han1823123123/temp-bench-models`. Verified via
+     `api.list_repo_files`.
+   - 8 canonical (paper headline): `9778d10381696f58`,
+     `754166d1711923c1`, `5e4e188045d5d3c8`, `672dbf61896f7843`,
+     `c0da3ed8794554a1`, `88a4ddf6819d8057`, `9b011dfeea88f8af`,
+     `2016074933c41e7f`.
+   - 9 historical (abbreviated-Wang era + MW smoke + a partial
+     MW cell that landed before the kill).
+   - Manifest hf_url field backfilled for all 17 rows.
 
-No further compute on this pod is needed for the C6 paper sprint.
-Use remaining time for paper-writing contributions (caveats /
-methodology bullet on per-step training-FLOPs literature alignment),
-which has already been added to c6.md (commit `b59834eb`).
+**C6 mission: COMPLETE.** No further compute needed. The pod is
+safe to stop at any time — all 17 of my checkpoints are on HF; all
+results in the leaderboard; AUTO-RESULTS rendered; status locked
+to `complete` in c6.md.
+
+Use any remaining session time for paper-writing contributions to
+c6.md if Han wants more methodology detail on the per-step training
+-FLOPs literature-alignment caveat. Otherwise, idle.
 
 ## Don't repeat (agent owns — overwrite)
 
