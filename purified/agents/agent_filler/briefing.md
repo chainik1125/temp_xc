@@ -202,10 +202,24 @@ bash scripts/sync_from_hf.sh
 ```
 
 Step 3 — write `experiments/c5_steering_filler/__init__.py` (empty)
-and `experiments/c5_steering_filler/run.py`. Single-cell driver,
-identical in logic to agent_steer_100k's `c5_steering_mw/run.py` but
-takes `--gpu` to pin its CUDA device explicitly (since you'll launch
-6 of these in parallel via `run_on_gpu.sh`):
+and `experiments/c5_steering_filler/run.py`. Single-cell driver: take
+`--arch` + `--seed` and delegate to agent_steer's `run_one_cell`, which
+is the canonical entry point that builds the eval-fn closure (with seed
++ workspace + eval_key) and calls `runner.run_cell`. The top-level
+launch script (`run_sweep.sh`) spawns 6 of these in parallel.
+
+⚠ **Do NOT try to import `my_eval_fn` from
+`experiments.c5_steering.run` directly** — it doesn't exist at module
+level. agent_steer's `my_eval_fn` is built inside the
+`_make_eval_fn(seed, workspace, eval_key)` closure factory because the
+runner doesn't pass workspace/eval_key into eval_fn arguments, so the
+case study persists artifacts (judge_outputs.jsonl, generations.jsonl,
+metrics.json, plots) in the right ``run_dir(eval_key)`` only because
+the closure has those values bound. `run_one_cell` is the wrapper that
+threads those for you. agent_steer_100k hit this same import bug in
+`experiments/c5_steering_mw/run.py` and worked around it the same way;
+you can read their driver for a working reference (note: don't import
+from their dir, just read the pattern).
 
 ```python
 """C5 multi-window driver for agent_filler — single cell per invocation,
@@ -214,43 +228,76 @@ top-level launch script (run_sweep.sh) spawns 6 of these in parallel.
 """
 from __future__ import annotations
 import argparse
-from temp_bench import runner
+import os
+
+# Match the threading defaults agent_steer_100k tuned for parallel runs;
+# bit-identical math, just throughput. Tune lower if you see 6 procs
+# fighting for the 76-core CPU pool.
+os.environ.setdefault("TQDM_DISABLE", "1")
+os.environ.setdefault("OMP_NUM_THREADS", "8")
+os.environ.setdefault("MKL_NUM_THREADS", "8")
+
 from experiments.c5_steering.run import (
-    DATASOURCE,
     EVAL_PROTOCOL_VERSION,
-    my_train_fn,
-    my_eval_fn,
-    _real_training_cfg as _orig_training_cfg,
+    run_one_cell,
+)
+from temp_bench.case_studies.steering import (
+    DEFAULT_COH_THRESHOLDS,
+    DEFAULT_STRENGTHS,
 )
 
 
-def main():
-    ap = argparse.ArgumentParser()
+def main() -> None:
+    ap = argparse.ArgumentParser(
+        description="C5 multi-window deployment — single (arch, seed) cell."
+    )
     ap.add_argument("--arch", required=True,
                     choices=["txc_base_mw", "txc_pro_mw"])
     ap.add_argument("--seed", required=True, type=int)
+    ap.add_argument("--n-steps", type=int, default=None,
+                    help="Override TrainingConfig.n_steps. Default = "
+                         "agent_steer's canonical 20_000; use small "
+                         "values for smoke tests.")
+    ap.add_argument("--smoke", action="store_true",
+                    help="Tag the leaderboard row eval_cfg.smoke=True.")
+    ap.add_argument("--force-train", action="store_true")
+    ap.add_argument("--force-eval", action="store_true")
     args = ap.parse_args()
 
-    cfg = _orig_training_cfg()    # 20K, batch=1024, plateau_off
-    print(f"[c5_filler] cell arch={args.arch} seed={args.seed} "
-          f"n_steps={cfg.n_steps} eval_protocol={EVAL_PROTOCOL_VERSION}")
+    print(
+        f"[c5_filler] cell arch={args.arch} seed={args.seed} "
+        f"eval_protocol={EVAL_PROTOCOL_VERSION} "
+        f"smoke={args.smoke} n_steps_override={args.n_steps}",
+        flush=True,
+    )
 
-    runner.run_cell(
-        component="c5",
+    run_one_cell(
         arch_name=args.arch,
         seed=args.seed,
-        datasource_name=DATASOURCE,
-        training_cfg=cfg,
-        eval_cfg={"sweep": "c5_filler_v1"},
-        eval_protocol_version=EVAL_PROTOCOL_VERSION,
-        train_fn=my_train_fn,
-        eval_fn=my_eval_fn,
+        protocol="v7",
+        n_concepts=30,
+        strengths=DEFAULT_STRENGTHS,
+        coh_thresholds=DEFAULT_COH_THRESHOLDS,
+        n_steps=args.n_steps,
+        smoke=args.smoke,
+        force_train=args.force_train,
+        force_eval=args.force_eval,
     )
 
 
 if __name__ == "__main__":
     main()
 ```
+
+Why `run_one_cell` not `runner.run_cell` directly: `run_one_cell`
+(defined in `experiments/c5_steering/run.py`) is a thin wrapper that:
+(a) calls `_make_eval_fn(seed, workspace, eval_key)` to bind the eval
+closure, (b) precomputes `eval_key` so the workspace dir matches what
+the runner uses, (c) passes the un-enriched `eval_cfg` to `run_cell`
+(the runner re-hashes it; if you pass enriched cfg you get a
+different eval_key + the run_dir mismatches metrics.json). All of
+that is fragile to redo by hand, and agent_steer already debugged it
+(see commit `f8a28469`).
 
 Step 4 — write `experiments/c5_steering_filler/run_sweep.sh`, the
 parallel launcher. Pins one cell per GPU; the 6 cells × 6 GPUs leaves
@@ -296,26 +343,35 @@ echo "[run_sweep] all 6 cells complete"
 ```
 
 Step 5 — smoke-test ONE cell at `n_steps=200` before the full launch
-to verify MW + v1.1.0 fix + multi-process safety:
+to verify MW + v1.1.0 fix + multi-process safety. Use the driver
+from Step 3 (NOT a one-liner; the closure plumbing matters):
 
 ```bash
 TQDM_DISABLE=1 AGENT_NAME=agent_filler \
   bash scripts/run_on_gpu.sh 0 -- \
-  .venv/bin/python -c "
-from temp_bench.schemas import TrainingConfig
-from temp_bench import runner
-from experiments.c5_steering.run import DATASOURCE, EVAL_PROTOCOL_VERSION, my_train_fn, my_eval_fn
-result = runner.run_cell(
-    component='c5', arch_name='txc_base_mw', seed=42,
-    datasource_name=DATASOURCE,
-    training_cfg=TrainingConfig(n_steps=200, batch_size=1024, plateau_early_stop=False),
-    eval_cfg={'sweep': 'c5_filler_smoke'},
-    eval_protocol_version=EVAL_PROTOCOL_VERSION,
-    train_fn=my_train_fn, eval_fn=my_eval_fn,
-)
-print('smoke result:', result.train_key, result.eval_key, result.cached)
-"
+  .venv/bin/python -m experiments.c5_steering_filler.run \
+  --arch txc_base_mw --seed 42 \
+  --n-steps 200 --smoke
 ```
+
+Expected: cell takes ~3-5 min (200 train steps + brief 30-concept ×
+9-strength generation + 540 Sonnet judge calls). On success, look
+for `[hf-push] uploaded run_dir → ...` near the end of the log,
+and confirm a leaderboard row appended:
+
+```bash
+tail -1 results/leaderboard.jsonl | .venv/bin/python -c "
+import json, sys
+r = json.loads(sys.stdin.read())
+print(r['arch'], r['seed'], r['eval_protocol_version'],
+      'n_valid=', r['metrics']['n_valid'])
+"
+# → expect: txc_base_mw 42 1.1.0 n_valid= 270  (or similar)
+```
+
+If the smoke row shows `n_valid=0`: judge fail-mode (e.g., Anthropic
+credit outage); check `results/runs/<eval_key>/judge_outputs.jsonl`
+for HTTP error messages and surface to Han before the full launch.
 
 If smoke passes, launch the full sweep:
 
@@ -389,6 +445,39 @@ time.
   ephemeral pods.
 - **Don't use DDP** — single-GPU subprocesses only, per
   `docs/paper/hardware.md`.
+- **Don't import `my_eval_fn` from `experiments.c5_steering.run`**
+  — it's a closure built by `_make_eval_fn(seed, workspace, eval_key)`,
+  not a top-level symbol. Use `run_one_cell` instead (that's what the
+  Step 3 driver does); it threads workspace + eval_key + seed for
+  you. agent_steer_100k hit this same import bug; their workaround
+  is the pattern your driver should follow.
+- **Don't pass enriched `eval_cfg` to `runner.run_cell` directly** —
+  the runner re-hashes `eval_cfg` to compute `eval_key`. If you add
+  `_*` enrichment fields, the resulting `eval_key` won't match the
+  workspace your case study writes to, and metrics.json + the
+  leaderboard row will live in different `run_dir`s. agent_steer
+  debugged this in commit `f8a28469`. Stick with `run_one_cell`.
+- **Don't rely on `temp_bench.report.render(component='c5')`** — it
+  raises `Multiple experiment dirs match c5_*` because of
+  `experiments/c5_steering_100k/`, `experiments/c5_steering_mw/`,
+  and now `experiments/c5_steering_filler/`. Render is agent_paper's
+  job at paper-time; you don't need to render c5.md yourself. If
+  you DO need to compute summary stats, query
+  `temp_bench.report.query_leaderboard(component='c5')` directly
+  and filter on `arch in ('txc_base_mw', 'txc_pro_mw')` +
+  `eval_protocol_version == '1.1.0'`.
+- **Don't kill in-flight cells just because etime looks long** —
+  txc_pro_mw cells legitimately take 10-15 hr. Check the log for
+  step-rate progress (`[TRAIN ... step XXXX/20000 (X.X steps/sec)`)
+  before assuming a cell is hung.
+- **Don't worry about Anthropic API credits during your sweep** —
+  agent_steer hit a credit-exhaustion outage on 2026-05-05 05:59 UTC
+  that produced an all-zero metrics row. Han topped up. If your
+  judge phase produces `n_valid=0`, check
+  `results/runs/<eval_key>/judge_outputs.jsonl` for "credit balance
+  is too low" errors and surface to Han before re-running. Recovery
+  is `--force-eval` on the cached training checkpoint (not a full
+  re-train).
 
 ## Open questions for Han (agent owns — overwrite)
 
