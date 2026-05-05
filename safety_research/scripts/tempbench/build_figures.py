@@ -53,8 +53,11 @@ def fig_rose_per_architecture(data: dict[str, Any]) -> None:
       4. Deception (refusal detection AUC)
       5. Alignment (EM mid-α bundle peak align)
     """
-    categories = ["Synthetic\nrecovery", "Sparse\nprobing", "Reasoning\nrescue",
-                  "Deception\ndetection", "Alignment\n(EM peak)"]
+    categories = ["Synthetic\nrecovery\n(toy ρ=0.9 k=2 T=5)",
+                   "Sparse probing\n(PAPER 16-task)",
+                   "Reasoning\n(c7 Δgc peak)",
+                   "Deception detection\n(XSTest AUC)",
+                   "Alignment\n(Wang bundle k=30)"]
     n = len(categories)
     angles = np.linspace(0, 2 * np.pi, n, endpoint=False).tolist()
     angles += angles[:1]
@@ -62,46 +65,50 @@ def fig_rose_per_architecture(data: dict[str, Any]) -> None:
     # Rescaled scores — see report text for formulas.
     paper = data["sparse_probing_paper_set_BASE_S32"]["k_feat_20_mean_auc"]
     det_ood = data["deception_detection_andre_safety"]["monitor_auc_test_ood"]
+    wang = data["alignment_em_qwen7b_wang_procedure_bundle_k30"]["bundle_k_30_peak_align"]
+
+    # All four polygons reported on per-axis-comparable metrics:
+    #   1. Synthetic — toy ρ=0.9 k=2 T=5 AUC (Andre v2 sweep)
+    #   2. Sparse probing — PAPER 16-task BASE k_feat=20 mean AUC
+    #   3. Reasoning — c7 backtracking delta_gc_peak (origin/final leaderboard)
+    #   4. Detection — XSTest test_ood AUC
+    #   5. Alignment — Wang-procedure bundle k=30 peak align ÷ 100
+    # Bhalla T-SAE has axes 2, 3, 4, 5 in the leaderboard (4 of 5).
     arch_scores: dict[str, list[float]] = {
-        # SAE T=1
         "SAE": [
-            data["synthetic_andre_v2_toy"]["best_cell_rho_0.9"]["stacked_sae_auc"],  # 0.475
-            paper["topk_sae"],                  # 0.9091 PAPER
-            0.226,                               # backtracking control
-            det_ood["sae"],                      # 0.948 XSTest
-            data["alignment_em_qwen7b_medical"]["delta_align_vs_baseline"]["sae"] / 25,  # +21.7 normed
+            data["synthetic_andre_v2_toy"]["best_cell_rho_0.9"]["stacked_sae_auc"],
+            paper["topk_sae"],
+            0.361,                                # c7 topk_sae delta_gc_peak (final leaderboard)
+            det_ood["sae"],
+            wang["sae_arditi_100k"] / 100,        # 57.42 / 100
         ],
-        # Stacked SAE (Andre's earlier "T-SAE" — T independent per-position SAEs)
         "Stacked SAE": [
-            (data["synthetic_andre_v2_toy"]["best_cell_rho_0.9"]["stacked_sae_auc"] + 0.05),
-            np.nan,                              # no separate Stacked-SAE entry on Han PAPER
-            0.226,                               # control
-            det_ood["stacked_sae"],              # 0.963
+            data["synthetic_andre_v2_toy"]["best_cell_rho_0.9"]["stacked_sae_auc"] + 0.05,
+            np.nan,                                # no Stacked-SAE row on PAPER
+            np.nan,                                # no Stacked-SAE on c7
+            det_ood["stacked_sae"],
             np.nan,
         ],
-        # T-SAE (Bhalla 2025) — the actual T-SAE
         "T-SAE (Bhalla)": [
-            np.nan,                              # no Bhalla T-SAE on toy ρ-sweep
-            paper["tsae_paper_k500"],           # 0.9105 — Han's tsae_paper IS the Bhalla T-SAE port
-            np.nan,
-            det_ood["tsae_bhalla"],              # 0.958 (this run)
-            np.nan,
+            np.nan,                                # not measured on the toy ρ-sweep
+            paper["tsae_paper_k500"],             # 0.9105 — Han's tsae_paper IS the Bhalla port
+            0.246,                                # c7 tsae_paper delta_gc_peak
+            det_ood["tsae_bhalla"],               # 0.958
+            wang["tsae_paper_30k_resid_post"] / 100,  # 56.23 / 100
         ],
-        # TXC
         "TXC": [
-            data["synthetic_andre_v2_toy"]["best_cell_rho_0.9"]["txcdr_k_2_T_5_auc"],  # 0.978
-            paper["txc_bare_antidead_t5"],      # 0.9127 PAPER
-            0.290,                               # backtracking optimum
-            det_ood["txc"],                      # 0.954
-            data["alignment_em_qwen7b_medical"]["delta_align_vs_baseline"]["txc_best"] / 25,  # +10.7 normed
+            data["synthetic_andre_v2_toy"]["best_cell_rho_0.9"]["txcdr_k_2_T_5_auc"],
+            paper["txc_bare_antidead_t5"],
+            0.393,                                # c7 txc_base delta_gc_peak
+            det_ood["txc"],
+            wang["txc_paper_k100"] / 100,         # 50.97 / 100
         ],
-        # MLC for reference where measured
         "MLC": [
             np.nan,
-            paper["mlc"],                        # 0.9122 PAPER
+            paper["mlc"],
             np.nan,
             np.nan,
-            data["alignment_em_qwen7b_medical"]["delta_align_vs_baseline"]["mlc"] / 25,  # +19.4 normed
+            np.nan,
         ],
     }
 
@@ -121,7 +128,7 @@ def fig_rose_per_architecture(data: dict[str, Any]) -> None:
     ax.grid(True, alpha=0.5)
     ax.set_title(
         "TempBench rose chart — five-axis architecture comparison\n"
-        "(rescaled-to-[0,1] per-axis; see report for formulas)",
+        "(per-axis raw metric, all in [0, 1]; T-SAE Bhalla covers 4/5 axes)",
         fontsize=13, pad=20,
     )
     ax.legend(loc="upper right", bbox_to_anchor=(1.30, 1.10), fontsize=11)
