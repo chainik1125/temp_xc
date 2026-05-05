@@ -6,7 +6,7 @@ rules: PROTOCOL.md § 14.
 
 ---
 agent: agent_em_100k
-last_state_update: 2026-05-04T23:15:00Z
+last_state_update: 2026-05-05T11:00:00Z
 component: c6
 ---
 
@@ -250,166 +250,238 @@ just need to land in `leaderboard.jsonl` with the right
 
 ## Current state (agent owns — overwrite at every compact)
 
-**Last verified: 2026-05-04T23:15Z. SAE seed=42 100K trained ✓ (52
-min, final loss=126.5, ckpt `e5de419224108f98` on HF). Original run
-crashed at Wang Stage 1 — `peft` missing from venv (NOT in
-pyproject.toml; see Open questions for Han, OQ #1). Re-launched
-with `peft 0.19.1` installed via `uv pip install` (no lockfile
-edit). Cell 1 Wang now in flight (PID 5260, log
-`logs/c6_100k_seed42_v2.log`).**
+**Last verified: 2026-05-05T11:00Z. seed=42 cell 1 LANDED
+(peak_align=82.11, +3.78 vs agent_em 25K headline 78.33). Cell 2
+TXC Wang stage 4 in flight, ETA cell 2 done ~11:20Z. Sweep window
+will not fit full seed=1 — TXC training rate is 5.9× slower than
+SAE on this pod, see OQ #2.**
 
-- `git HEAD`: 6db405bd4a8b59b0cf5a8e623f7aba8b81437c36 (`final`).
-- Pod: 1× H100 80GB, ephemeral. **Actual RAM: 2 TB** (briefing said
-  240 GB — pod is even more generous; .clone() preload is unconstrained).
-- Smoke leaderboard append: `train_key=29d23894a05bfc12`,
-  `eval_key=55daa62002321413` (sae_arditi seed=42 n_steps=200,
-  skip-eval → peak_align=0.0). Filtered out by canonical_train_keys
-  (n_steps≠100k or 25k).
-- Smoke checkpoint: `checkpoints/29d23894a05bfc12/` (1.3 GB SAE arditi
-  d_sae=32k, pushed to HF temp-bench-models).
-- Activation cache built fresh + pushed to HF (was missing on HF, only
-  agent_em had it locally — see "Don't repeat" below). Path:
-  `results/act_cache/e052801ef8e6d22b/` (7.86 GB fp16). Cache build
-  took ~48 sec on H100 (Qwen-14B forward, 6000 seqs × 128 tokens,
-  batch_size=8). HF upload took ~70 sec.
-- Active GPU usage: GPU 0 (only GPU on this pod), 99% util on training.
-- Recent decisions in scope: `decisions.md` § 7 (Bricken-on for C6),
-  § 12 (canonical training cfg), § 13 (100K copy-sweep policy).
-- Predicted train_keys for the real cells (verified via
-  `compute_train_key`):
-  - sae_arditi seed=42 100K: `e5de419224108f98`
-  - txc_base seed=42 100K: `0884a29eabb0030d`
-- In flight (PID 5260, RE-launched 23:14:41Z):
-  `.venv/bin/python -m experiments.c6_em_100k.run --archs sae_arditi txc_base
-  --seeds 42` → `logs/c6_100k_seed42_v2.log`. Re-run skips SAE
-  training (checkpoint cache-hit at `e5de419224108f98`); pipeline:
-  Wang for SAE seed=42 (~3hr) → train txc_base seed=42 (~1.3hr) →
-  Wang for txc_base seed=42 (~3hr). ETA all done: ~06:14Z 2026-05-05.
-- Original PID 3789 died at 23:13Z on `from peft import PeftModel`
-  (Wang Stage 1 LoRA load). Original log: `logs/c6_100k_seed42.log`.
+- `git HEAD`: `68ece86c` (`final`, pushed to origin).
+- Pod: 1× H100 80GB, ephemeral. Actual RAM 2 TB (briefing said 240 GB).
+- Active GPU usage: GPU 0, ~30-100% util (TXC Wang stage 4 generations).
+
+### Cells landed in leaderboard
+
+| arch | seed | train_key | eval_key | peak_align | peak_coh | α* |
+|---|---|---|---|---|---|---|
+| sae_arditi | 42 | `e5de419224108f98` | `397c345995d1acf2` | **82.11** | 90.88 | -10.0 |
+| (txc_base seed=42 — pending) | 42 | `0884a29eabb0030d` | `155998b1fa5cee39` | … | … | … |
+
+Headline reference (agent_em's 25K cells):
+- sae_arditi 25K: peak_align=78.33 (`9778d10381696f58`)
+- txc_base 25K:  peak_align=81.70 (`754166d1711923c1`)
+
+### Training durations on this H100 pod
+
+| arch | n_steps | wall-clock | steps/sec |
+|---|---|---|---|
+| sae_arditi (seed=42) | 100k | 52 min | ~32 |
+| txc_base + Bricken (seed=42) | 100k | **5h 8min** | ~5.4 |
+
+TXC was **5.9× slower per step** than SAE (vs briefing's "1.3×" guess).
+Bricken fired 199 times, last n_resampled=16384 (50% cap hit).
+
+### Per-stage Wang timing (cell 1 SAE)
+
+- stage 1 (Δz̄ rank): 42 sec
+- stage 2 (causal screen 100 features): 67.8 min
+- stage 3 (sweep 20 survivors × 10 αs): 87.1 min
+- stage 4 (frontier 3 finalists × 27 αs): 45.2 min
+- Total Wang: ~3.3 hr; 14816 judge calls all 200 OK.
+
+### In flight (PID 5260, re-launched 23:14:41Z 2026-05-04)
+
+`.venv/bin/python -m experiments.c6_em_100k.run --archs sae_arditi
+txc_base --seeds 42` → `logs/c6_100k_seed42_v2.log`. TXC Wang stages
+1–3 done (12.3 min + 77.5 min + 91.5 min). Stage 4 started 10:36Z
+(2026-05-05), ETA done ~11:21Z. Persistent monitor `b0gvkc8ij`.
+
+### Activation cache + smoke artifacts
+
+- Act cache `results/act_cache/e052801ef8e6d22b/` (7.86 GB fp16).
+  Built fresh on this pod in 48 sec + auto-pushed to HF data repo.
+- Smoke row in leaderboard: `train_key=29d23894a05bfc12`,
+  `eval_key=55daa62002321413` (n_steps=200, peak_align=0.0). Benign
+  noise — filtered by canonical_train_keys.
+
+### Decisions in scope
+
+- `decisions.md` § 7 (Bricken-on for C6 txc_base via brickenauxk_a8).
+- § 12 (canonical training cfg: batch=1024, plateau_off — kept).
+- § 13 (100K copy-sweep policy — agent_paper toggles canonical at
+  paper-render time).
 
 ## What I just did (agent owns — overwrite)
 
-1. `source scripts/set_agent_env.sh agent_em_100k` + smoke test
-   (124/124 + preflight clean, anthropic key wired for Sonnet judge).
-2. `git pull --rebase origin final` — already up to date.
-3. `bash scripts/sync_from_hf.sh` — pulled 40 ckpt dirs (~64 GB) +
-   2 act_cache dirs (e4916bcae1881963 14G C5, fb2a74be884e512a 4G).
-   The 14B finance cache `e052801ef8e6d22b` was **NOT on HF** —
-   agent_em never pushed it. I built it fresh + auto-pushed (ephemeral
-   mode), so future agents will hit cache.
-4. Wrote `experiments/c6_em_100k/{run.py,__init__.py}` — minimal driver
-   that imports `make_training_cfg`, `make_eval_fn`, `ensure_activation_cache`,
-   `EVAL_PROTOCOL_VERSION`, `DEFAULT_DATASOURCE` from
-   `experiments.c6_em.run` and `my_train_fn` from
-   `experiments.c6_em.train`. Overrides `n_steps=100_000` via
-   `TrainingConfig.model_copy(update={"n_steps": ...})`. Replicates
-   agent_em's eval_cfg dict verbatim so eval_keys align (only
-   train_key differs from agent_em's 25K cells).
-   - Driver corrects briefing-sketch import drifts:
-     `make_training_cfg` is in `run.py` not `train.py`;
-     `my_eval_fn` is a factory `make_eval_fn(datasource_name)`;
-     `DATASOURCE` is named `DEFAULT_DATASOURCE`.
-5. Smoke test (sae_arditi seed=42 n_steps=200 --skip-eval) ran to
-   completion in ~3.5 min total: 48s cache build + 70s cache HF upload
-   + 6s train + 30s ckpt HF upload + manifest+leaderboard write.
-6. Launched real seed=42 sweep (sae_arditi + txc_base, n_steps=100k,
-   full Wang).
+1. Set up env, smoke test (124/124), built activation cache, wrote
+   `experiments/c6_em_100k/{run.py,__init__.py}` driver, smoke test
+   on sae_arditi/200-steps/skip-eval. Launched real seed=42 sweep.
+   Commit `fe9bbe29` pushed.
+2. **peft incident** (23:13Z 2026-05-04): SAE training completed
+   cleanly (52 min, loss=126.5, ckpt e5de419224108f98 saved + pushed).
+   Wang stage 1 then crashed on `from peft import PeftModel` —
+   `peft` not in pyproject.toml. Workaround: `uv pip install peft`
+   (peft 0.19.1) on this pod, no lockfile edit. Surfaced as **OQ #1**.
+   Re-launched (PID 5260); runner cache-hit the SAE ckpt, went
+   straight to Wang. Commit `70d89b9b` pushed.
+3. **SAE seed=42 100K Wang complete** (02:35Z 2026-05-05, 3.3 hr):
+   peak_align=82.11, peak_coh=90.88 at feat 26501 α=-10.0.
+   eval_key=`397c345995d1acf2`. 14816 judge calls all 200 OK.
+4. **TXC seed=42 100K trained** (07:44Z, 5h 8min) — train_key=
+   `0884a29eabb0030d`, ckpt 6.3 GB pushed to HF. Bricken fired 199×
+   (last n_resampled=16384). Final loss=293.9. Wang stages 1-3 done
+   in 12.3+77.5+91.5 min; stage 4 started 10:36Z.
+5. **Resolved 2-way merge conflict in origin/final** (Han pushed
+   conflict markers in 6ea931e2's leaderboard.jsonl + manifest.jsonl
+   from a HEAD vs 9044d487 merge). Cleaned via dedup-by-key (eval_key
+   / train_key); 114 leaderboard + 57 manifest unique rows preserved
+   from origin + my 1 row each. Commit `68ece86c` pushed.
+6. Audited the API balance=0 user concern: 14816 judge calls across
+   cell 1 Wang all returned 200 OK; no errors in logs. Cell 1 result
+   sound. Training (no API calls) unaffected.
+7. Verified agent_steer's C5 fix (`ef33f822`) is C5-only —
+   touches `case_studies/steering.py` + `experiments/c5_steering/`,
+   does NOT affect C6 Wang procedure (`case_studies/em.py`).
 
 ## Next action (agent owns — overwrite)
 
-1. **Watch seed=42 to completion** via `tail -F logs/c6_100k_seed42.log`
-   or Monitor on `elapsed_steps=|done in.*steps|stage[0-9].*elapsed|peak_align|CELL DONE|Traceback`.
-   Per-cell ETA: ~1 hr train + ~3 hr Wang = ~4 hr × 2 cells = ~8 hr.
-   Expected end: ~06:20Z 2026-05-05.
-2. **As each cell completes**: verify
-   `tail -1 results/leaderboard.jsonl | jq` shows
-   `agent: agent_em_100k`, `arch: sae_arditi|txc_base`, `seed: 42`,
-   `eval_protocol_version: 2.0.0`, sensible peak_align (>70 expected).
-3. **When seed=42 done** — pre-staged at `/tmp/seed1_real_cmd.sh`:
-   ```bash
-   bash /tmp/seed1_real_cmd.sh   # launches seed=1, both archs
-   ```
-   No need to re-source env; the script does it.
-4. If seed=1 finishes with margin remaining (>=4hr to deadline),
-   restore agent_em's dropped seed=2 by running:
-   ```bash
-   TQDM_DISABLE=1 .venv/bin/python -m experiments.c6_em_100k.run \
-     --archs sae_arditi txc_base --seeds 2 \
-     > logs/c6_100k_seed2.log 2>&1 &
-   ```
-5. **Don't render anything to docs/components/c6.md yourself** — that's
-   agent_paper's territory. Just confirm leaderboard rows land.
-6. **Before any pod restart or `status: complete`**:
-   `bash scripts/wrap_up_session.sh` — git-adds metrics.json, judge
-   transcripts, manifest tail, leaderboard tail; commits with
-   "wrap-up"; pulls/pushes origin/final; verifies HF push state for
-   ephemeral mode.
+1. **Wait for cell 2 (TXC seed=42 100K Wang stage 4) — ETA ~11:20Z.**
+   Persistent monitor `b0gvkc8ij` watches for stage-4 done +
+   CELL DONE markers. Verify
+   `grep "agent_em_100k" results/leaderboard.jsonl | tail -1 | jq`
+   shows `eval_key: 155998b1fa5cee39`, `train_key: 0884a29eabb0030d`,
+   `peak_align > 70` (expected — agent_em's 25K txc_base headline
+   was 81.70).
+2. **After cell 2 lands**: commit + push the new leaderboard row.
+   Then update briefing's Cells-landed table with txc_base headline.
+3. **Decide seed=1 strategy** — TXC training takes 5h+ on this pod
+   (vs briefing's 1.3 hr estimate). Sprint window ends ~22:30Z May 5.
+   - **Recommend: SAE seed=1 only** (~52 min train + ~3.3 hr Wang =
+     ~4 hr; finish ~15:30Z if launched right after cell 2 lands).
+     Gives partial within-arch n=2 for sae_arditi at 100K.
+   - **Skip TXC seed=1** (would push to 24:00Z, past deadline).
+   - Launch with:
+     ```bash
+     TQDM_DISABLE=1 .venv/bin/python -m experiments.c6_em_100k.run \
+       --archs sae_arditi --seeds 1 \
+       > logs/c6_100k_seed1_sae.log 2>&1 &
+     ```
+   - Expected train_key (sae_arditi seed=1 100K): compute via
+     `temp_bench.config.compute_train_key` before launch.
+4. **When all done** (or before pod restart / `status: complete`):
+   `bash scripts/wrap_up_session.sh` — adds metrics.json, judge
+   transcripts, manifest tail, leaderboard tail; commits + pushes;
+   confirms HF state for ephemeral mode.
+5. **Don't render anything to docs/components/c6.md yourself** —
+   agent_paper integrates at paper-render time.
 
 ## Don't repeat (agent owns — overwrite)
 
+### Territory rules
 - **Don't edit `experiments/c6_em/`** — agent_em's territory. Import,
   don't modify.
 - **Don't edit `docs/components/c6.md`** — agent_paper integrates at
   paper-render time.
-- **Don't bypass `runner.run_cell`** — even though you're calling it
-  from a custom driver, the call itself goes through the canonical
-  pathway (which appends to `leaderboard.jsonl`).
+- **Don't render anything to `docs/components/c6.md` yourself** — that's
+  agent_paper's. Just confirm leaderboard rows land.
+
+### Driver internals
+- **Don't bypass `runner.run_cell`** — even from a custom driver, go
+  through the canonical pathway (which appends to leaderboard.jsonl).
 - **Don't allocate `train_key` / `eval_key` manually** — the runner
   computes them from your inputs deterministically.
 - **Don't change `bricken_*` defaults from the brickenauxk_a8 recipe**
-  for txc_base — that's the recipe agent_em is using and we want a
-  literal copy at higher n_steps, not a recipe change.
+  for txc_base — literal copy of agent_em's recipe at higher n_steps.
 - **Don't run sae_arditi with `bricken_enabled=True`** — agent_em's
-  `make_training_cfg("sae_arditi")` returns `bricken_enabled=False`
-  for that arch. Trust the helper, don't override.
+  `make_training_cfg("sae_arditi")` returns `bricken_enabled=False`.
 - **Don't push to HF manually** — `cache.save_checkpoint` does it on
-  ephemeral pods. Verify via the URL in the manifest after each cell.
-- **`make_training_cfg` lives in `experiments.c6_em.run`, NOT `.train`**
-  — the briefing's first-cell sketch had this wrong. `train.py` only
-  exports `my_train_fn`. Importing from `.train` raises ImportError.
-- **`my_eval_fn` is a factory `make_eval_fn(datasource_name)`** — also
-  off in the briefing sketch. There is no top-level `my_eval_fn`
-  symbol in `experiments.c6_em.run`; you must call `make_eval_fn(ds)`
-  to get the closure.
-- **Don't expect `qwen_2_5_14b_instruct_finance_l24_resid_post` cache
-  on HF before you run.** As of 2026-05-04T22Z, agent_em never pushed
-  it — `sync_from_hf.sh` won't pull it. The driver's
-  `ensure_activation_cache(...)` builds it fresh in ~48 sec on H100
-  + auto-pushes (ephemeral). Future runs benefit; first run pays.
-- **Smoke leaderboard row at `train_key=29d23894a05bfc12` is intentional
-  noise** (n_steps=200, peak_align=0.0). Don't try to remove it from
-  leaderboard.jsonl (it's append-only). It's filtered out by
-  canonical_train_keys regardless.
+  ephemeral pods. Verify via the URL in manifest after each cell.
+
+### Briefing sketch import drifts (corrected in driver)
+- **`make_training_cfg` lives in `experiments.c6_em.run`, NOT `.train`.**
+  `train.py` only exports `my_train_fn`. Importing from `.train`
+  raises ImportError.
+- **`my_eval_fn` is a factory `make_eval_fn(datasource_name)`**, not
+  a top-level symbol.
+- **`DATASOURCE` is named `DEFAULT_DATASOURCE`** in run.py.
+
+### Pod-specific gotchas
+- **`peft` not in pyproject.toml** — Wang stage 1 will crash without
+  it. Always run `uv pip install peft` after env setup until OQ #1
+  lands. See OQ #1.
+- **No `qwen_2_5_14b_instruct_finance_l24_resid_post` cache on HF**
+  as of 2026-05-04. Driver's `ensure_activation_cache` builds it in
+  ~48 sec on H100 + auto-pushes. Future runs hit cache.
+- **TXC training is ~6× slower than SAE on this pod** — 5h 8min for
+  100K vs SAE's 52 min. Briefing said TXC ~1.3× SAE. Plan time
+  accordingly. See OQ #2.
+
+### Append-only file conflicts
+- **Origin/final's leaderboard.jsonl + manifest.jsonl had committed
+  conflict markers** at HEAD `6ea931e2` (Han's merge of 9044d487
+  was published with `<<<<<<< HEAD` / `=======` / `>>>>>>>` lines
+  intact). When you rebase, expect git to surface these as fresh
+  conflicts. Resolve by **dedup-by-key**: load both sides via JSON,
+  union by `eval_key` (leaderboard) or `train_key` (manifest), keep
+  insertion order. See `c3` commit `68ece86c` for the recipe.
+- **Smoke leaderboard row at `train_key=29d23894a05bfc12`** is
+  intentional noise (n_steps=200, peak_align=0.0). Don't remove —
+  it's append-only. Filtered out by canonical_train_keys.
 
 ## Open questions for Han (agent owns — overwrite)
 
 ### OQ #1 (URGENT, 2026-05-04T23:14Z): `peft` not in pyproject.toml
 
 `src/temp_bench/case_studies/em.py:119` does `from peft import PeftModel`,
-which is required by Wang Stage 1 to load the LoRA adapter
-(`ModelOrganismsForEM/Qwen2.5-14B-Instruct_R1_0_1_0_finance_extended_train`).
-**`peft` is not in `pyproject.toml` or `uv.lock`** — neither is it
-listed in `agents/agent_em/decisions.md` or briefing.
+required by Wang Stage 1 to load the LoRA adapter. **`peft` is not in
+`pyproject.toml` or `uv.lock`.** agent_em must have it installed via
+`pip install peft` outside the lockfile on their pod.
 
-My fresh H100 pod failed at the start of stage 1 with
-`ModuleNotFoundError: No module named 'peft'` after the SAE seed=42
-100K training already completed (~52 min, checkpoint
-`e5de419224108f98` saved + pushed to HF). agent_em presumably has
-peft installed via `pip install peft` on their pod outside the
-lockfile, which is why their Wang works for them.
+My fresh H100 pod failed with `ModuleNotFoundError: No module named
+'peft'` *after* the SAE seed=42 100K training had already completed
+(52 min wasted compute before failure was detected).
 
-**Workaround applied**: `uv pip install peft` (peft 0.19.1) on my
-pod. Does NOT touch pyproject.toml or uv.lock (cross-territory rule
-respected). Survives only this pod's lifetime; a fresh pod or
-`uv sync` would lose it again.
+**Workaround applied**: `uv pip install peft` (peft 0.19.1) on this
+pod, no pyproject.toml or uv.lock change (cross-territory rule
+respected). Survives only this pod's lifetime.
 
-**Permanent fix (agent_paper, atomic pyproject + uv.lock commit)**:
-add `"peft>=0.15"` to `pyproject.toml:dependencies` and regenerate
-`uv.lock`. Without this, every fresh ephemeral pod that runs C6
-Wang will hit this same error 52+ minutes into the cell — wasted
-compute on every restart.
+**Permanent fix (agent_paper)**: atomic pyproject.toml + uv.lock
+commit adding `"peft>=0.15"`. Without it, every fresh ephemeral pod
+running C6 Wang loses 50+ min before crashing.
 
-**Re-launch state**: I re-ran with `peft` installed; runner cache-hit
-the SAE checkpoint and skipped to Wang. Cell 1 Wang underway as of
-23:14:43Z. ETA cell 1 done ~02:14Z, full sweep ~06:14Z.
+### OQ #2 (2026-05-05T08:00Z): TXC training is 5.9× slower than SAE on this pod
+
+agent_em's briefing said TXC + Bricken at 100K should take ~73 min
+(1.3× SAE's ~56 min, extrapolating from agent_em's 25K timing of
+~25 min). On my H100 pod, **TXC took 5h 8min** (308 min) for 100K
+steps — vs SAE's 52 min on the same hardware.
+
+Confirmed not a stall — process active, GPU at 30-100% util,
+1 CPU core saturated. Bricken fired 199× (last n_resampled=16384,
+50% cap). Final loss=293.9 (reasonable; lower than smoke 200-step
+loss=169776).
+
+**Hypothesis**: the per-step Python `batch_iter` for-loop in
+`experiments/c6_em/train.py:_build_batch_iter` does a Python
+iteration over batch=1024 to slice T=5 windows from the preloaded
+acts tensor. For T=5 (vs T=1 for SAE), each iteration moves 5×
+more data per slice + dtype convert. Combined with Bricken's
+per-500-step `n_check=2048` recompute and AuxK overhead, per-step
+cost is much higher than SAE.
+
+agent_em's 25K cell at ~25 min would be ~16.7 steps/sec. My 100K
+cell ran at ~5.4 steps/sec. So I'm 3× slower than agent_em even
+within TXC. Could be CPU-frequency difference between pods (hard
+to verify without their `cat /proc/cpuinfo`).
+
+**Impact on sweep**: seed=1 won't fit if both archs run. Plan: SAE
+seed=1 only (~4 hr) for partial n=2 coverage on sae_arditi. Skip
+TXC seed=1 stretch.
+
+**Possible permanent fixes** (out of scope for me — would touch
+agent_em's territory):
+1. Vectorize `_build_batch_iter`: replace the Python for-loop with
+   `acts[seq_idx[:, None], pos_idx[:, None] + arange(T)]` advanced
+   indexing. Should give 10-100× speedup on the data path.
+2. Pin `torch.set_num_threads(N)` in trainer to avoid CPU
+   over-subscription on multi-core pods.
