@@ -300,7 +300,7 @@ For C1, $\mathcal{G}$ is the $N=20$ ground-truth feature set $\mathcal{F}$ (we r
         \caption{Detection: PR-AUC at $S = 8$.}
         \label{fig:c7-pr-auc-S8}
     \end{subfigure}
-    \caption{Backtracking case study on a $61$-question MATH-500 cohort, all five architectures trained at $n_{\text{steps}} = 300{,}000$, batch size $1024$. (a)~per-architecture inducement curves $\Delta gc(a, m)$ (\cref{eq:delta-gc}), per-question baselined at $m = 0$. (b)~sparse-probe PR-AUC at top-$S = 8$ features (positive-class prior $\approx 0.12$). Full setup, judge prompt, magnitude grid, and the per-$S$ PR-AUC table are in \cref{app:c7}.}
+    \caption{Backtracking case study on a $61$-question MATH-500 cohort, all five architectures trained at $n_{\text{steps}} = 300{,}000$, batch size $1024$. (a)~per-architecture inducement curves $\Delta gc(a, m)$ (\cref{eq:delta-gc}), per-question baselined at $m = 0$; shaded regions are bootstrap $95\%$ confidence intervals computed by resampling the $61$ cohort questions ($n_{\text{boot}} = 1000$). (b)~sparse-probe PR-AUC at top-$S = 8$ features (positive-class prior $\approx 0.12$); error bars are standard error across the $5$ GroupKFold folds. Full setup, judge prompt, magnitude grid, and the per-$S$ PR-AUC table are in \cref{app:c7}.}
     \label{fig:backtracking}
 \end{figure*}
 

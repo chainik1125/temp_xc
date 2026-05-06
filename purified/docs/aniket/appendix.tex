@@ -84,21 +84,21 @@ To audit whether the choice of $300\mathrm{K}$ steps is binding, every cell is i
 \begin{figure}[t]
     \centering
     \placeholderbox{images/c7\_nmse\_vs\_step}
-    \caption{NMSE on a held-out batch as a function of training step.}
+    \caption{NMSE on a held-out batch as a function of training step. Single training seed per cell ($\text{seed} = 42$); per-step jitter reflects the held-out probe batch alone, not seed-level uncertainty.}
     \label{fig:c7-probe-nmse}
 \end{figure}
 
 \begin{figure}[t]
     \centering
     \placeholderbox{images/c7\_l0\_vs\_step}
-    \caption{$\ell_0$ density on a held-out batch as a function of training step.}
+    \caption{$\ell_0$ density on a held-out batch as a function of training step. Single training seed per cell.}
     \label{fig:c7-probe-l0}
 \end{figure}
 
 \begin{figure}[t]
     \centering
     \placeholderbox{images/c7\_dead\_vs\_step}
-    \caption{Dead-feature count (out of $d_{\text{SAE}} = 32{,}768$) as a function of training step.}
+    \caption{Dead-feature count (out of $d_{\text{SAE}} = 32{,}768$) as a function of training step. Single training seed per cell.}
     \label{fig:c7-probe-dead}
 \end{figure}
 
@@ -133,7 +133,7 @@ We use PR-AUC rather than F1 or ROC-AUC because the positive class proportion is
         TXC-pro       & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} \\
         \bottomrule
     \end{tabular}
-    \caption{Sparse-probe PR-AUC at top-$S$ feature counts on the backtracking-sentence detection task ($5$-fold GroupKFold by question, $\ell_1$-regularised logistic regression, $C\!=\!1$). The $S = 8$ row is also plotted in \cref{fig:c7-pr-auc-S8}.}
+    \caption{Sparse-probe PR-AUC at top-$S$ feature counts on the backtracking-sentence detection task ($5$-fold GroupKFold by question, $\ell_1$-regularised logistic regression, $C\!=\!1$). Cell entries are mean across the $5$ folds; per-fold standard error is reported in the accompanying ``$\pm$'' annotations after the camera-ready re-eval lands. The $S = 8$ row is also plotted in \cref{fig:c7-pr-auc-S8}.}
     \label{tab:c7-pr-auc}
 \end{table}
 
