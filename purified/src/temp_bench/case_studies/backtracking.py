@@ -65,13 +65,26 @@ log = logging.getLogger("temp_bench.case_studies.backtracking")
 # ── Constants ──────────────────────────────────────────────────────────
 
 
-# Aniket's densified 25-point magnitude grid.
+# Aniket's densified 25-point magnitude grid (v4 / EVAL_PROTOCOL 1.x).
 # Concentrated in ±0.5–8 around the SAE peak; sparse in the tails where
 # curves are flat. See docs/components/c7.md.
 DEFAULT_MAGNITUDE_GRID: tuple[float, ...] = (
     -16, -12, -10, -8, -7, -6, -5, -4, -3, -2, -1, -0.5,
     0,
     0.5, 1, 2, 3, 4, 5, 6, 7, 8, 10, 12, 16,
+)
+
+# Han 2026-05-05 PM extended grid (v5 / EVAL_PROTOCOL 2.x): adds
+# ±{20, 30, 40, 50, 60, 70, 80, 90} = 16 new points → 41 total.
+# Tests TXC's inducement Δgc at extreme magnitudes far outside the
+# natural activation distribution. Sustained Δgc at ±90 = robust
+# steering; saturation = modest claim; collapse = honest negative.
+EXTENDED_MAGNITUDE_GRID: tuple[float, ...] = (
+    -90, -80, -70, -60, -50, -40, -30, -20,           # NEW negative tail
+    -16, -12, -10, -8, -7, -6, -5, -4, -3, -2, -1, -0.5,
+    0,
+    0.5, 1, 2, 3, 4, 5, 6, 7, 8, 10, 12, 16,
+    20, 30, 40, 50, 60, 70, 80, 90,                   # NEW positive tail
 )
 
 # cut25 = cut Stage A trace at 25% of unsteered length, then steer-and-continue.
@@ -1539,27 +1552,28 @@ def run_arch_evaluation(
              len(phase1), len(cohort.truly_wrong), len(cohort.originally_correct))
 
     # ── Step 4: cut25 + steered generation per (qid, mag) ────────────
-    # Short-circuit: if every (qid, mag, arch, seed) panel is already
-    # successfully judged (label≥0) in this workspace's
-    # ``judge_outputs.jsonl``, skip panel-gen + judge-dispatch entirely.
-    # Saves ~85 min of GPU steered generation per cell on force-eval
-    # re-runs (e.g., when adding the within-window shuffle ablation
-    # without changing magnitudes — Han 2026-05-05 PM detection mission).
+    # Per-panel cache: only generate panels for (qid, mag, arch, seed)
+    # combinations that are NOT already successfully judged (label≥0)
+    # in this workspace's ``judge_outputs.jsonl``. Pre-seeding the
+    # workspace's jsonl from a prior run-dir lets a re-eval skip the
+    # panels that haven't changed (e.g., 25-mag → 41-mag expansion
+    # only needs to gen the 16 new mags). Han 2026-05-05 PM detection
+    # mission + magnitude expansion mission.
     needed_keys = {
         (qid, float(m), arch_name, seed)
         for qid in cohort.all
         for m in magnitudes
     }
     existing_done = judge.existing_keys()  # already filters label≥0 only
-    panel_gen_needed = not needed_keys.issubset(existing_done)
+    missing_keys = needed_keys - existing_done
 
     layer = 10  # paper-justified per docs/components/c7.md
-    if panel_gen_needed:
+    if missing_keys:
         layer_module = rmodel.model.layers[layer]
         hook = SteeringHook(vec)
         handle = layer_module.register_forward_hook(hook)
         try:
-            # Build panels
+            # Build panels — ONLY for missing (qid, mag) pairs.
             problem_prompts: list[str] = []
             prefix_token_ids: list[list[int]] = []
             mags: list[float] = []
@@ -1571,12 +1585,15 @@ def run_arch_evaluation(
                 prefix = row["unsteered_token_ids"][:cut_pos]
                 remaining_budget = max(64, len(row["unsteered_token_ids"]) - cut_pos)
                 for m in magnitudes:
+                    if (qid, float(m), arch_name, seed) not in missing_keys:
+                        continue  # already judged in pre-seeded jsonl
                     problem_prompts.append(_build_prompt(row["problem"]))
                     prefix_token_ids.append(prefix)
                     mags.append(float(m))
                     budgets.append(remaining_budget)
                     meta.append((qid, float(m)))
-            log.info("[c7] %d panels = %d qids × %d mags", len(meta), len(cohort.all), len(magnitudes))
+            log.info("[c7] %d panels (missing) = %d skipped (cached) of %d total",
+                     len(meta), len(needed_keys) - len(missing_keys), len(needed_keys))
 
             outs = generate_continuation_panels(
                 rmodel, rtok, hook,
@@ -1597,9 +1614,9 @@ def run_arch_evaluation(
             (qid, mag, arch_name, seed, prompt, gen)
             for (qid, mag), prompt, gen in zip(meta, problem_prompts, outs)
         ]
-        log.info("[c7] dispatching %d Sonnet judge calls", len(judge_rows))
+        log.info("[c7] dispatching %d Sonnet judge calls (missing only)", len(judge_rows))
         judge_outs = asyncio.run(judge.judge_many(judge_rows))
-        log.info("[c7] judge done: %d new outputs (existing skipped)", len(judge_outs))
+        log.info("[c7] judge done: %d new outputs", len(judge_outs))
     else:
         # Free reasoning model — we don't need it for the cached-judge path.
         del rmodel

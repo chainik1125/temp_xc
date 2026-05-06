@@ -35,6 +35,7 @@ from temp_bench import runner
 from temp_bench.case_studies.backtracking import (
     BacktrackingCaseStudy,
     DEFAULT_MAGNITUDE_GRID,
+    EXTENDED_MAGNITUDE_GRID,
     DEFAULT_PR_AUC_S_GRID,
     SonnetBacktrackingJudge,
     build_cohort,
@@ -61,12 +62,14 @@ COMPONENT = "c7"
 # (see configs/datasources.yaml note + agent_back briefing OQ #4).
 DATASOURCE = "llama_3_1_8b_base_l10_ward_nousmirror"
 
-EVAL_PROTOCOL_VERSION = "1.1.0"  # 1.0.0 → 1.1.0: detection now uses
-# detect_case_study with paired within-window shuffle ablation
-# (Han 2026-05-05 PM, commit 1a12e647). New metrics keys:
-# pr_auc_shuf_S{S} + pr_auc_gap_S{S}. v1.0.0 cells stay in
-# leaderboard for diff; analysis canonicalises on the latest version
-# per (arch, seed).
+EVAL_PROTOCOL_VERSION = "2.0.0"  # 1.1.0 → 2.0.0: extended magnitude
+# grid (Han 2026-05-05 PM, commit 9ea13c06). Adds ±{20-90} → 41 mags
+# (vs 25 in v1.x). Earlier protocol versions:
+#   1.0.0: original 25-mag sweep (no shuffle ablation)
+#   1.1.0: 25-mag + within-window shuffle ablation (no extreme mags)
+#   2.0.0: 41-mag extended grid + shuffle ablation (canonical for paper)
+# Each protocol bump → fresh eval_keys; older cells stay in leaderboard
+# for diff. Analysis canonicalises on the latest version per train_key.
 
 # All 7 locked archs from docs/components/c7.md (NOT tfa_pos).
 DEFAULT_ARCHS = (
@@ -341,7 +344,10 @@ def main(*, archs=None, seeds=DEFAULT_SEEDS, build_cache_only: bool = False,
                     # passes the same explicit cfg.
                     training_cfg=TrainingConfig(n_steps=20_000),
                     eval_cfg={
-                        "magnitudes": list(DEFAULT_MAGNITUDE_GRID),
+                        # v5: extended magnitude grid (Han 2026-05-05 PM
+                        # commit 9ea13c06). Use DEFAULT_MAGNITUDE_GRID
+                        # to revert to the v4 25-mag sweep.
+                        "magnitudes": list(EXTENDED_MAGNITUDE_GRID),
                         "cut_fraction": 0.25,
                         "pr_auc_S_grid": list(DEFAULT_PR_AUC_S_GRID),
                     },
