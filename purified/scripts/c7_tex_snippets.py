@@ -176,11 +176,12 @@ def write_results_macros(rows: list[dict], out_path: Path) -> None:
 
     n_cells = len(rows)
     archs_present = {r["arch"] for r in rows}
-    archs_expected = set(ARCH_ORDER) - {"stacked_sae"}  # stacked_sae optional
-    is_complete = archs_expected.issubset(archs_present) and n_cells >= 8
+    # tfa dropped 2026-05-06 (post pod-crash budget cut); 7 cells expected.
+    archs_expected = set(ARCH_ORDER) - {"stacked_sae", "tfa"}
+    is_complete = archs_expected.issubset(archs_present) and n_cells >= 7
 
     lines.append(f"\\providecommand{{\\cseveennCells}}{{{n_cells}}}")
-    lines.append(f"\\providecommand{{\\cseveennPending}}{{{8 - n_cells if n_cells < 8 else 0}}}")
+    lines.append(f"\\providecommand{{\\cseveennPending}}{{{7 - n_cells if n_cells < 7 else 0}}}")
 
     # Headline gc_at_peak winner
     top = _peak_row(rows, "gc_at_peak_mag")
