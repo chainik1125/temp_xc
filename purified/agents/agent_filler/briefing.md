@@ -1492,17 +1492,28 @@ chronologically for git provenance.
    wasteland 1C3 (adds topk_sae + txc_base). Adding T-SAE/TFA would
    extend beyond wasteland scope — agent_paper's call (driver in
    `experiments/c2_synthetic_coupled/run.py:ARCH_TS`).
-6. **Wasteland 1C3 reproduction (paper-level question):** comparing
-   wasteland's reported gAUC at k=2 vs my current C2 numbers:
+6. **Wasteland 1C3 reproduction — C2 reproduces DETERMINISTIC,
+   NOT noisy.** Wasteland 1C3 has TWO setups:
+   (a) deterministic `2026-04-07-experiment1c3-coupled-features.md`
+       (pure OR gate emissions, no Bernoulli noise)
+   (b) noisy `2026-04-10-experiment1c3-noisy-coupled.md`
+       (adds `p_A=0, p_B=0.625` Bernoulli on top of OR gate)
+   C2's `toy_coupled_K10_M20_d256` matches **(a) DETERMINISTIC**:
+   - `configs/datasources.yaml` has no `p_B` field
+   - `src/temp_bench/data/toy/coupled.py` has no Bernoulli step
+   - yaml notes "Phase 3 OR-gated coupled features" (= (a))
+   - All numerics match wasteland-deterministic (K=10, M=20,
+     n_parents=2, d=256, pi=0.05, rho=0.7, T=64, folded-normal μ=1.0
+     σ=0.15)
+   Reproduction at k=2 vs wasteland-deterministic:
    - TXCDRv2 T=2 gAUC=0.990  → my txc_pro T=2 gAUC=0.990 ± 0.000 ✅
-     EXACT match
-   - Stacked T=2 gAUC=0.755  → my stacked_sae T=2 gAUC=0.764 ± 0.051
-     ✅ within seed-noise
+   - Stacked T=2 gAUC=0.755  → my stacked_sae T=2 gAUC=0.764 ± 0.051 ✅
    - TXCDRv2 T=5 gAUC=0.971  → still running on c2 GPU 7
    - TXCDRv2 T=12 gAUC=0.949 → still running on c2 GPU 7
-   Setup is bit-identical (K=10 M=20 d=256 d_sae=40, k_pos sweep,
-   T=64 seq, folded-normal magnitudes). Reproduction validates so
-   far; full answer once T=5 + T=12 cells finish.
+   **The noisy 1C3 setup is NOT covered by C2.** Adding it would need
+   a new `toy_coupled_noisy_K10_M20_d256` datasource + `p_A`/`p_B`
+   plumbing in `coupled.py` — agent_paper / data infrastructure
+   territory.
 
 (Surface either as a comment if you want me to take action; otherwise
 I'll leave them as-is.)
