@@ -1257,94 +1257,262 @@ time.
 
 ## Current state (agent owns — overwrite at every compact)
 
-**Last verified: 2026-05-05T17:25Z**
+**Last verified: 2026-05-06T18:30Z** | **`git HEAD`: `2efa7de9`** (==
+`origin/final`, ahead 0)
 
-**STATUS: in-flight — C5 TopK + TFA baselines sweep launched (§ 16).**
+**STATUS: post-completion of multiple sweeps; cleanup phase.**
 
-Prior mission COMPLETE: C5 T-SAE T=2 baseline (3 cells, mean
-peak@1.75=1.93). Pushed at commit `dd7ef9b6` (now in history below
-the new commits).
+Sweeps in flight (4 procs alive on GPUs 5, 6, only some still active
+work):
+- **GPU 6** (PID 60193): `c2 --archs txc_pro --k-poses 10..20` — txc_pro
+  T_max=12 high-k sweep, ~k=10 across seeds, 30 min remaining.
+- **GPUs 0, 1, 2** (PIDs 80430, 80560, 80562): c1_noisy × seeds {1,2,42}
+  — JUST finished as of ~18:08Z. Should be exiting any moment if not
+  already.
+- **GPUs 3, 4, 5** (c2 lowk per-seed): finished — exited cleanly.
+- **GPU 7**: idle (c2 highk topk_sae done long ago).
 
-Current mission: 6-cell sweep on GPUs 0..5:
-- GPUs 0..2: `topk_sae × {42, 1, 2}` at B=1024, train_window_size=1
-  (paper-faithful per § 15)
-- GPUs 3..5: `tfa × {42, 1, 2}` at B=32, train_window_size=None
-  (full-seq, wasteland-faithful per
-  `origin/han-phase7-unification:experiments/phase7_unification/train_phase7.py`)
+Active Monitor: `b6zad1zki` watching `logs/c1_noisy_gpu*.log`,
+`logs/c2_lowk_gpu*.log`, `logs/c2_highk*.log` for the remaining
+events. Re-arm if it times out before c2 GPU 6 finishes.
 
-VRAM verified at ~17:25Z (1-2 min in):
-- TopK GPUs: 2.5 GB / 88-92% util
-- TFA GPUs:  18.5 GB / 100% util (TFA's attention tensor; under 48 GB cap)
-- GPUs 6, 7: idle
+### Leaderboard rows (agent_filler tagged, non-smoke):
 
-Smoke topk_sae seed=42 n_steps=200 smoke=True passed first:
-train_key=`24bc835e77a4f1b8`, n_valid=270/270, peak@1.75=0.320,
-agent=agent_filler, eval_protocol_version=1.1.0. Confirms the
-`run_one_cell` framework path with both `train_window_size` +
-`batch_size` kwargs (§ 16).
+| Component | rows | status / notes |
+|---|---:|---|
+| **C5** (steering)  |   9 | ✅ DONE: T-SAE T=2 (3) + TopK T=1 (3) + TFA B=32 (3). Mean peak@1.75: T-SAE 1.93, TopK 1.66, TFA 0.33. |
+| **C3** (BASE probing) |   6 | ✅ txc_pro × 3 × 2 k_feats DONE (mean_auc 0.821-0.884). T=10/T=20 trainings on HF, evals BLOCKED by agent_steer_100k's my_eval_fn state_dict bug. |
+| **C1** (toy Markov, det.) | 101 | ✅ DONE — c1.md re-rendered with paper-ready AUC vs k_pos plot at `experiments/c1_synthetic_topk/plots/c1_auc_vs_kpos.png` (155 KB main + 62 KB thumb). Headline: txc_base default at k=6 → AUC 0.983 (winner); topk_sae default catches up at k≥10 (peak 0.936 at k=12); tfa flat ~0.46-0.48. |
+| **C2** (coupled HMM) | 170 | ~92% — final txc_pro T=12 cells in flight on GPU 6. c2.md rendered partial; will re-render at completion. Wasteland 1c3 deterministic reproduction: TXCDRv2 T=2 gAUC=0.990 → my txc_pro T=2 gAUC=0.990 ± 0.000 ✅ EXACT match. |
+| **c1_noisy** (NEW wasteland 1c-noisy reproduction) | 93 (+63 agent='unknown' but data-valid) | ✅ DONE — fresh component with new datasource `toy_markov_n20_d40_noisy` (Bernoulli p_A=0, p_B=0.625) per Han's territory waiver. Reproduces wasteland Phase 2 Experiment 1c noisy emissions. Han's clarification: c1_noisy belongs **under C2** in the paper structure (not C1). agent_paper should aggregate c1_noisy into c2.md alongside the deterministic 1c3 = c2 cells. |
+| **TOTAL** | **379** | + 63 unknown-tagged c1_noisy + ~20 smoke rows |
 
-Sweep launcher (`run_sweep.sh`) uses `setsid -f` per the prior MW
-sweep's lesson. All 6 PIDs orphaned to init (PPID=1, own SID).
+### Files I own / authored (this session):
 
-Active monitor: task id `bev83i4r2` (1-hr timeout). Re-arm if it
-times out before TFA cells finish (~1.5 hr per cell).
+```
+src/temp_bench/data/toy/markov.py             (added p_A/p_B Bernoulli noise — territory waiver)
+configs/datasources.yaml                       (added toy_markov_n20_d40_noisy — territory waiver)
+experiments/c1_synthetic_topk/analysis.py      (added _save_plot + PLOT_STYLE — territory waiver)
+experiments/c1_synthetic_topk/plots/           (NEW dir, c1.md render artifacts)
+experiments/c1_noisy_filler/                   (NEW dir, run.py + run_sweep.sh)
+experiments/c5_steering_filler/                (rescinded MW driver — keep for git provenance)
+experiments/c5_steering_baseline/              (T-SAE T=2 driver)
+experiments/c5_steering_baselines/             (TopK + TFA driver)
+experiments/c3_probing_base/run_filler_pro.sh   (BASE C3 txc_pro launcher)
+experiments/c3_probing_base/run_filler_base.sh  (BASE C3 txc_base T-sweep launcher)
+experiments/c1c2_toy_sweep.sh                   (orchestrator — c1+c2 split across GPUs)
+agents/agent_filler/briefing.md                 (THIS file — agent-owned bottom sections)
+docs/components/c1.md                           (re-rendered AUTO-RESULTS + plot)
+docs/components/c2.md                           (re-rendered AUTO-RESULTS partial)
+results/leaderboard.jsonl                       (379 non-smoke rows appended)
+checkpoints/manifest.jsonl                      (~200 entries appended)
+```
 
-Local `final` == `origin/final` at `28fbbe55` (driver + smoke pushed).
+### HF state:
 
-Aborted MW driver still on disk at `experiments/c5_steering_filler/`
-with its smoke row at eval_key=`8c6bf97f2de60679` in leaderboard.
-Same disposition as before — open question for Han re: removal.
+All 192+ agent_filler-tagged checkpoints + run-dirs on
+`han1823123123/temp-bench-models` and
+`han1823123123/temp-bench-data`. Verified via HfApi.list_repo_tree at
+13:55Z May 5; missing-list was empty. New cells from c1_noisy + c2
+auto-pushed during runner.run_cell.
+
+### Active GPU sharding (~18:30Z May 6):
+
+| GPU | Used by | What |
+|---|---|---|
+| 0 | (idle) | c1_noisy seed=1 just exited |
+| 1 | (idle) | c1_noisy seed=2 just exited |
+| 2 | (idle) | c1_noisy seed=42 just exited |
+| 3 | (idle) | c2 lowk seed=1 done |
+| 4 | (idle) | c2 lowk seed=2 done |
+| 5 | (idle) | c2 lowk seed=42 done |
+| 6 | **busy** | c2 highk txc_pro T=12, k=10 in flight |
+| 7 | (idle) | c2 highk topk_sae done |
 
 ## What I just did (agent owns — overwrite)
 
-The session had THREE halves: (a) the rescinded C5 MW sweep, (b) the
-STAND DOWN, (c) the C5 T-SAE T=2 baseline mission. Recorded
-chronologically for git provenance.
+48-hour session across 5 components + 1 NEW component (c1_noisy).
+Compressed chronological log:
 
-**Phase A — C5 MW sweep (rescinded):**
+**2026-05-05 AM-PM: C5 MW sweep (rescinded by STAND DOWN dd5f773e)**
+- Wrote c5_steering_filler/, smoke-passed txc_base_mw seed=42
+  (peak@1.75=0.615), launched 6-cell MW sweep on GPUs 0-5.
+- Lesson: `bash ... &` + `wait` makes cells children of CC's bash;
+  CC restart SIGTERM'd them. Patched to `setsid -f` (orphan to PID 1).
+- STAND DOWN at 13:55Z, killed all MW procs, stripped leaderboard
+  conflict markers (botched stash pop) + detached HEAD recovery.
+  Committed STAND DOWN ack at `ba369f13`.
 
-1. Wrote `experiments/c5_steering_filler/` driver, smoke-passed
-   txc_base_mw seed=42 (n_valid=270, peak@1.75=0.615), launched
-   6-cell sweep at 12:21Z.
-2. CC restarted, killed the cells. Patched run_sweep.sh to `setsid -f`
-   for orphan-to-init. Relaunched at 12:31Z; verified PPID=1.
-3. By 13:37Z all 6 cells training healthy.
+**2026-05-05 PM: C5 T-SAE T=2 (decisions § 15, COMPLETE)**
+- New driver `experiments/c5_steering_baseline/`, `train_window_size=2`
+  (Bhalla/Ye 2025 paper-faithful adjacent-pair). 3 cells × 30 min wall.
+- Result: train_keys e8f3355683e0/8f717f87f3f9/06053869c2b7;
+  peak@1.75 = 1.500 / 2.053 / 2.250 (mean **1.93**) vs agent_steer's
+  T=None (~0.62-1.40). Strong T=2 lift validates SAEBench-canonical
+  window hypothesis.
 
-**Phase B — STAND DOWN execution (13:55Z):**
+**2026-05-05 PM: C5 TopK + TFA baselines (decisions § 16, COMPLETE)**
+- New driver `experiments/c5_steering_baselines/` with
+  `run_one_cell(arch, train_window_size, batch_size)` framework path
+  (§ 16 added `batch_size` kwarg).
+- topk_sae (B=1024 train_window_size=1 paper-faithful):
+  train_keys 05363678579f/fe7feb76c9e5/7e3c6d83e985; peak@1.75 mean **1.66**.
+- tfa (B=32 train_window_size=None wasteland-faithful):
+  train_keys 8ff472709e89/0679d79278d9/61da0670ea62; peak@1.75 mean **0.33**.
+- All HF-pushed via runner auto-push.
 
-4. Pulled origin/final, saw `dd5f773e Agent PAPER: STAND DOWN`.
-5. `pkill -KILL -f "experiments.c5_steering_filler"` — all 6 procs
-   gone, GPUs idle. Stopped Monitor `b25o1m7v8`.
-6. Resolved leaderboard.jsonl rebase conflict (kept all rows).
-   Briefly went into detached HEAD state during a botched rebase;
-   recovered via `rebase --abort` + manual file move.
-7. Committed STAND DOWN ack at `ba369f13`.
+**2026-05-05 PM-overnight: BASE C3 (decisions § 17 + Han URGENT)**
+- Pulled BASE act_cache (`f01ca87f2e8f3365`, 14 GB) +
+  probe_cache (20 GB) from HF.
+- `run_filler_pro.sh`: txc_pro × 3 seeds × 2 k_feats on GPUs 3-5;
+  ~5 hr wall; ALL 6 cells DONE — train_keys
+  5810f48a1e3f/928a4678ca5a/8a879befc5d6, mean_auc 0.821-0.884.
+- `run_filler_base.sh`: txc_base × 3 seeds × T={5,10,20} = 9 trainings.
+  T=5 cells landed (cached from prior). **T=10 + T=20 evals all
+  CRASH** with `RuntimeError: Error(s) in loading state_dict for
+  TXCBase: size mismatch for W_enc: shape [5, 2304, 18432] from
+  checkpoint vs current [10, 2304, 18432]`. Bug in agent_steer_100k's
+  `experiments/c3_probing_base/run.py:my_eval_fn:130` — eval_fn
+  loads cached T=5 state into a fresh-instantiated T=10/T=20 model.
+  All 9 T=trainings completed + checkpoints saved + HF-pushed for
+  re-eval after fix. Filed as Open Question #4.
 
-**Phase C — C5 T-SAE T=2 baseline (current mission, 14:05Z+):**
+**2026-05-05 PM: C1 + C2 toy synthetic sweeps**
+- Wrote `experiments/c1c2_toy_sweep.sh` orchestrator (5 procs across
+  GPUs not used by TFA cells). First launch hit OOM-like contention
+  (>10 min/cell); root cause = OMP/MKL_NUM_THREADS unset → 76-thread
+  per proc on 76-core pool = severe oversubscription. Fixed by
+  capping at 8 threads each. Cells then ran ~3-4 min each.
+- C1 GPU 1 TFA crashed at k_pos=10: `RuntimeError: selected index k
+  out of range` in `_tfa_module.py:216 torch.topk(z_novel, kval=k_pos×T)`
+  — auto-skip logic missed TFA at high k. Filed as Open Question #3,
+  agent_paper landed fix at commit `53e63fbb`. Workaround: 21/36 TFA
+  cells salvaged (k≤8 × 3 seeds). Per agent_paper analysis, k≥10 cells
+  are architecturally infeasible at toy d_sae=40, not "missing data."
+- C2 GPU 7 txc_base crashed at k=10 (C2 driver lacks `_is_valid_cell`
+  auto-skip entirely). Restart with `--archs txc_pro` only.
+- C1 final: 101 rows. **Re-rendered c1.md with paper-ready plot
+  `experiments/c1_synthetic_topk/plots/c1_auc_vs_kpos.png`** (territory
+  waiver from Han to edit `analysis.py`).
 
-8. Pulled origin/final again, saw new mandate in briefing
-   (decisions § 15: T-SAE re-train at `train_window_size=2`).
-9. Verified framework changes: `TrainingConfig.train_window_size=2`
-   and `run_one_cell` accepts `train_window_size: int | None = None`
-   kwarg.
-10. Wrote `experiments/c5_steering_baseline/{__init__.py, run.py,
-    run_sweep.sh}` — fresh dir, distinct from rescinded
-    c5_steering_filler/. Driver hard-codes `arch_name="tsae_paper"`
-    and `train_window_size=2`. Sweep launcher uses `setsid -f`.
-11. Smoke launched at ~14:05Z on GPU 0 (tsae_paper seed=42 n_steps=200
-    smoke=True). Bash task `bzgkr3t7e`, Monitor `bj2gsw0sv`. Training
-    started — GPU 0 hit ~89% util at 2.5 GB VRAM by 14:53Z log
-    timestamp; eval_key=`95ff152cb0b31650`.
-    - Note: `[train] T=1` in the log refers to `model.T` (T-SAE arch's
-      internal T parameter, fixed at 1 — adjacent-pair training with
-      anchor + 1-step neighbor). The `train_window_size=2` is the BATCH
-      ITERATOR's stride (positions per row per step), not the model's T.
-      Both are correct; don't conflate.
+**2026-05-06 AM: c1_noisy = wasteland 1c-noisy reproduction (NEW)**
+- Han territory waiver + URGENT directive: replicate
+  `docs/han/research_logs/2026-03-30-experiment1c-noisy-emissions.md`
+  on `final` infra. Han's clarification: this experiment goes UNDER C2
+  in the paper structure (not C1) because it tests temporal denoising
+  capability on coupled-emission setup.
+- **Cross-territory edits (per waiver):**
+  - `src/temp_bench/data/toy/markov.py`: added `p_A`/`p_B` Bernoulli
+    emission noise. Defaults (0.0, 1.0) preserve old behavior.
+    `MarkovData.support` = observed; `MarkovData.hidden_support` =
+    underlying Markov state (for future denoising metrics).
+  - `configs/datasources.yaml`: added `toy_markov_n20_d40_noisy`
+    (p_A=0, p_B=0.625, ρ=0.7).
+- **New driver: `experiments/c1_noisy_filler/`**
+  - COMPONENT="c1_noisy" (separate leaderboard space).
+  - 6 arch+T combos: tfa_pos, stacked_sae T={2,5}, txc_base T={2,5},
+    txc_pro default. Mirrors wasteland's 5 archs (TXCDRv2 ≈ txc_base);
+    txc_pro added for completeness vs locked arch pair.
+  - First launch hit OOM (4.5 GiB allocations on 48 GiB A40) because
+    `c1_noisy` not in `locked_archs.yaml::per_component_hparams`,
+    archs defaulted to production d_sae=18432. Fix: thread
+    `{"d_sae": 40, "h_size": 40 if txc_pro}` into
+    `arch_hparams_override` per cell. No locked_archs.yaml edit needed.
+  - First relaunch missed `AGENT_NAME=agent_filler` env (didn't
+    re-source `set_agent_env.sh`); 63 c1_noisy rows landed with
+    `agent='unknown'`. Data-valid (component/arch/train_key/metrics
+    all correct), only provenance stamp missing. Fixed via explicit
+    `env AGENT_NAME=agent_filler` in setsid command for the second
+    relaunch; new cells properly tagged.
+  - Sweep COMPLETE @ 18:08Z May 6: 93 agent_filler-tagged + 63
+    unknown-tagged = 156 c1_noisy non-smoke rows.
+
+**Wasteland 1c-noisy reproduction quality:**
+Bit-faithful gap acknowledged per Han's "only redo if taking ages"
+rule. Wasteland used batch=2048 lr=3e-4 for Stacked + TXCDRv2 and
+batch=64 lr=1e-3 for TFA-pos; my driver uses uniform batch=1024
+lr=3e-4. TFA-pos at 1024 already wrapped fast (no ages) → no redo.
+Numbers are SIMILAR but not bit-identical. Trade documented in Open
+Question #7.
+
+**2026-05-06 PM: C2 redeploy (Han priority + use all 8 GPUs)**
+- Killed prior c2 GPU 6+7 procs, redeployed across 8 GPUs sharded
+  by (arch, seed). Constraint: C2 driver lacks auto-skip; restricted
+  --k-poses per shard to avoid crashes:
+  - GPUs 3-5: c2 --seeds {1,2,42} --k-poses 1..8 (safe for all archs)
+  - GPU 6: c2 --archs txc_pro --k-poses 10..20 (t_sample=2 keeps valid)
+  - GPU 7: c2 --archs topk_sae --k-poses 10..20 (per-token, no constraint)
+- Result @ 18:30Z: 170 c2 rows; topk_sae+stacked_sae T=2+txc_pro T=2,5
+  all 36/36 complete; stacked T=5 + txc_base T=5 21/36 (k≤8 only,
+  architectural); txc_pro T=12 ~19/36 (in flight on GPU 6).
 
 ## Next action (agent owns — overwrite)
 
-1. **Wait for smoke to finish** (~3-5 min total; training started ~14:53Z).
-   Bash poller `bm1769em4` is watching the python PID; Monitor
+**Immediate (this session):**
+
+1. **Wait for c2 GPU 6 (txc_pro T=12 high-k) to complete** — last
+   running proc, ~30 min ETA. Other 7 GPUs idle.
+2. **Re-render c2.md** when GPU 6 wraps. Run via:
+   ```python
+   from importlib import import_module
+   from pathlib import Path
+   mod = import_module('experiments.c2_synthetic_coupled.analysis')
+   result = mod.run_analysis()
+   md_path = Path('docs/components/c2.md')
+   content = md_path.read_text()
+   bi = content.find('<!-- BEGIN AUTO-RESULTS -->')
+   ei = content.find('<!-- END AUTO-RESULTS -->')
+   new_content = content[:bi + len('<!-- BEGIN AUTO-RESULTS -->')] + '\n\n' + result.markdown.strip() + '\n\n' + content[ei:]
+   md_path.write_text(new_content)
+   ```
+   (Direct call to bypass the report.render() isinstance bug — see
+   Open Question #2.)
+3. **Add c1_noisy aggregation to c2.md** per Han's clarification that
+   c1_noisy belongs under C2. Either:
+   - (a) add a c1_noisy section to c2's analysis.py (cross-territory
+     edit; agent_paper to land or extend territory waiver), OR
+   - (b) write a separate `experiments/c1_noisy_filler/analysis.py`
+     and embed its output as a second AUTO-RESULTS block in c2.md.
+   Either path needs agent_paper sign-off on the shape of
+   c2.md's new section.
+4. **Run `wrap_up_session.sh`** (per the original briefing's "Before
+   you `status: complete`"). Auto-pushes any unpersisted run-dirs.
+5. **Push final state** to origin/final via the custom credential
+   helper (token URL form fails; use `username=xuyhan` +
+   `password=$GH_TOKEN` via shell-script credential helper).
+
+**Outstanding for agent_paper / agent_steer to action:**
+
+1. **CRITICAL — fix BASE C3 my_eval_fn state_dict bug** (Open Q #4):
+   blocks 12 of 18 BASE C3 txc_base evals (T=10 + T=20 trainings on
+   HF, evals crash). After fix, just `--force-eval` on the cached
+   train_keys. agent_steer_100k owns
+   `experiments/c3_probing_base/run.py:my_eval_fn:130`.
+2. **Fix c1/c2 analysis.py local AnalysisResult** (Open Q #2): both
+   define a local `AnalysisResult` class instead of importing from
+   `temp_bench.report.AnalysisResult` → `report.render()` raises
+   `TypeError: ...returned AnalysisResult; must return
+   temp_bench.report.AnalysisResult`. Fix: `from temp_bench.report
+   import AnalysisResult` + delete the local class def. 1-line per
+   file.
+3. **Decide c2 ARCH_TS scope** (Open Q #5): currently no T-SAE or
+   TFA. Wasteland 1c3 also lacked them; C2 already a superset.
+   Adding tsae_paper + tfa for cross-arch comparison would be a
+   driver edit.
+4. **Add c1_noisy results into c2.md** (per Han's structural mapping):
+   c1_noisy is logically part of C2 in the paper. agent_paper to
+   land the section structure.
+
+**Pre-stop checklist (when wrapping the pod):**
+
+- `pgrep -f experiments` → expect zero python procs alive.
+- `git status -sb` → clean working tree on `final`.
+- `nvidia-smi` → all GPUs idle.
+- Run `bash scripts/wrap_up_session.sh` to commit any orphaned
+  metrics.json + push.
+- HF audit: 192+ agent_filler checkpoints all on HF as of last
+  verification (13:55Z May 5); re-verify post-c1_noisy with the
+  HfApi check from `wrap_up_session.sh` step 5.
    `bj2gsw0sv` will fire on `judge [270/270]`, errors, etc.
 2. **On smoke success** (n_valid=270, fresh train_key distinct from
    agent_steer's existing tsae_paper T=None train_keys): launch the
@@ -1365,6 +1533,80 @@ chronologically for git provenance.
    `pgrep -f "experiments.c5_steering_baseline.run"`.
 
 ## Don't repeat (agent owns — overwrite)
+
+- **Don't embed `.thumb.png` in component .md.** Han caught this
+  2026-05-06 — thumbnails are 72-dpi previews; embed the full-res
+  `.png` (150 dpi) for paper-ready quality. `analysis.py` writes
+  both; .md should reference the non-thumb path.
+- **Don't relaunch a c1_noisy or c1 sweep without sourcing
+  `set_agent_env.sh agent_filler` first** — the relaunch otherwise
+  inherits empty AGENT_NAME → 63 c1_noisy rows landed with
+  `agent='unknown'`. Either source the env helper in the same Bash
+  call, OR `env AGENT_NAME=agent_filler` directly in the
+  `bash scripts/run_on_gpu.sh ... -- env AGENT_NAME=agent_filler ...`
+  exec line.
+- **Don't run a sweep with multiple parallel procs without setting
+  OMP_NUM_THREADS / MKL_NUM_THREADS.** Default = "all cores"; with
+  N parallel procs that's N×76 = severe oversubscription. First
+  c1c2_toy_sweep launch was stuck at >10 min/cell. Cap at 8 each
+  (matches all the c5 / c3 drivers). The c1 + c2 drivers
+  themselves don't set OMP — driver caller must.
+- **Don't launch a sweep with `bash run.sh`+`&`+`wait`.** CC restart
+  SIGHUPs the whole tree. Use `setsid -f bash run_on_gpu.sh ...`
+  (orphan to PID 1) — every sweep launcher I wrote uses this.
+- **Don't `tee` to `logs/...` without `mkdir -p logs` first** — the
+  smoke shell exited with code 1 because tee couldn't open the
+  file. Either `mkdir -p logs` in a SEPARATE Bash call before
+  launch, or include it at the top of `run_sweep.sh`.
+- **Don't tail-follow logs with `tail -F` (without `-q`) into a
+  Monitor.** tail emits `==>` headers on every file switch which
+  fire as Monitor events constantly. Use `tail -qF`.
+- **Don't push via `https://${GH_TOKEN}@github.com/...` URL form.**
+  GitHub rejects it with "Password authentication is not
+  supported." Use the custom credential helper:
+  ```
+  cat > /tmp/cred.sh <<EOF
+  #!/bin/bash
+  echo "username=xuyhan"
+  echo "password=$GH_TOKEN"
+  EOF
+  chmod +x /tmp/cred.sh
+  git -c "credential.helper=/tmp/cred.sh" push origin final
+  ```
+- **Don't bypass `runner.run_cell` for new cells.** All my drivers
+  go through it. The runner appends to `leaderboard.jsonl` +
+  computes `train_key`/`eval_key` deterministically + handles HF
+  push on ephemeral pods. Skipping it = no leaderboard provenance
+  + manual cache key headaches.
+- **Don't pass enriched `eval_cfg` keys (`_*`) to `runner.run_cell`
+  expecting them to be preserved.** The runner re-hashes
+  `eval_cfg` to compute `eval_key`; enrichment fields cause
+  `eval_key` mismatch with the workspace dir. Stick with
+  `run_one_cell` for c5 (closure plumbing handled there).
+- **Don't kill in-flight cells just because etime looks long.**
+  txc_pro at toy + txc_pro/txc_base at production scale all take
+  hours. Check log for active step progress before assuming a
+  cell is hung.
+- **Don't worry about Anthropic API credits during c5 sweeps.** Han
+  topped up after agent_steer's 2026-05-05 05:59 UTC outage.
+  Smoke + full sweeps all returned 200 OK on 540+ judge calls per
+  cell. If a future cell shows `n_valid=0`, check
+  `results/runs/<eval_key>/judge_outputs.jsonl` for "credit balance
+  is too low" and surface to Han.
+- **Don't render `docs/components/c5.md` or `docs/components/c3.md`
+  yourself.** c5 = agent_steer's territory; c3 = agent_nlp's. Han
+  granted territory waiver for c1.md + c2.md + c1_noisy infra
+  (markov.py + datasources.yaml + c1's analysis.py). Other docs
+  stay agent_paper / agent_steer / agent_nlp's call.
+- **Don't rely on `temp_bench.report.render(component='cN')` for c1
+  or c2.** Both `analysis.py` files define a local `AnalysisResult`
+  class instead of importing from `temp_bench.report`; isinstance
+  check fails. Workaround: call `mod.run_analysis()` directly,
+  write `result.markdown` between the AUTO-RESULTS markers in
+  the .md file. Filed as Open Question #2.
+- **Don't include `tfa` / `tfa_pos` in the wasteland 1c-noisy plot
+  legend at k>8** — they auto-skip there per agent_paper's bug fix
+  (`53e63fbb`). Plot `_save_plot` skips these gracefully.
 
 - **Don't edit `experiments/c5_steering/` or `experiments/c5_steering_mw/`**
   — agent_steer's and agent_steer_100k's territories. Import only.

@@ -165,8 +165,9 @@ def run_analysis() -> AnalysisResult:
     plot_path = Path(__file__).resolve().parent / "plots" / "c1_auc_vs_kpos.png"
     try:
         _save_plot(agg, ks, plot_path)
-        # Embed thumbnail in markdown via relative path from docs/components/c1.md
-        rel = "../../experiments/c1_synthetic_topk/plots/c1_auc_vs_kpos.thumb.png"
+        # Embed full-res image in markdown; thumb is also generated for
+        # any external viewer that prefers smaller previews.
+        rel = "../../experiments/c1_synthetic_topk/plots/c1_auc_vs_kpos.png"
         out_lines.append("")
         out_lines.append(f"![Feature recovery AUC vs k_pos]({rel})")
     except Exception as e:
