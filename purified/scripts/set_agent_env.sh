@@ -159,10 +159,10 @@ case "$agent" in
         export AGENT_NAME=agent_hammer
         export TEMP_BENCH_POD_MODE=ephemeral
         ;;
-    # ── 7× RTX PRO 6000 probing-protocol exploration pod (Han 2026-05-06T23:18 —
+    # ── 7× RTX 5090 probing-protocol exploration pod (Han 2026-05-06T23:18 —
     #    spawned to rapidly identify the best probing recipe for TXC archs).
-    #    Blackwell-gen consumer pro card, 96 GB VRAM each = 672 GB total;
-    #    1320 GB system RAM, 336 CPUs. Same parallel-launch pattern as
+    #    Blackwell-gen consumer card, 32 GB VRAM each = 224 GB total;
+    #    989 GB system RAM, 224 CPUs. Same parallel-launch pattern as
     #    agent_filler / agent_synth / agent_hammer: process pinned to
     #    GPU 0 by default; spawn parallel cells via
     #    `bash scripts/run_on_gpu.sh <0..6> -- <cmd>`.

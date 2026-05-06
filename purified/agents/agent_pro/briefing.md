@@ -1,8 +1,8 @@
 <!--
 Drafted by agent_nlp 2026-05-06T23:18Z under direct Han override
 ("create the agent briefing, then update set_agent_env.sh").
-Pod: 7× RTX PRO 6000 (Blackwell-gen consumer pro card, 96 GB VRAM each),
-1320 GB system RAM, 336 CPUs, ephemeral storage.
+Pod: 7× RTX 5090 (Blackwell-gen consumer card, 32 GB VRAM each =
+224 GB total), 989 GB system RAM, 224 CPUs, ephemeral storage.
 Section ownership rules: PROTOCOL.md § 14.
 
 Han: rewrite the "Identity + mandate" section as you wish before
@@ -29,11 +29,17 @@ AUC bump on SAEBench-36, changing the cross-arch headline. **Your
 job is to test that hypothesis fast, in parallel.**
 
 ### Pod allocation
-- **Hardware**: 7× RTX PRO 6000 (Blackwell, 96 GB VRAM each = 672 GB
-  total), 1320 GB system RAM, 336 CPUs, ephemeral `/workspace`.
+- **Hardware**: 7× RTX 5090 (Blackwell, 32 GB VRAM each = 224 GB total),
+  989 GB system RAM, 224 CPUs, ephemeral `/workspace`.
 - **Mode**: parallel-launch pattern (same as agent_filler / agent_synth
   / agent_hammer). Your default process pins to GPU 0; fan out via
   `bash scripts/run_on_gpu.sh <0..6> -- <cmd>`.
+- **VRAM headroom note**: the 5090's 32 GB is plenty for eval-only
+  cells (SAE forward over the probe_cache peaks ~5-15 GB per cell), so
+  all 7 GPUs can run cells in parallel without contention. If you ever
+  push beyond eval (e.g. fold a small re-train into this pod), watch
+  `topk_sae` at d_sae=18432 + B=1024 — it allocated ~25 GB peak on
+  H100; on 5090 you'd want B=512.
 
 ### Files you may edit
 - `agents/agent_pro/briefing.md` (your own — agent-owned sections)
@@ -94,7 +100,7 @@ bump needed):
 
 **One forward pass per (arch, seed) → all variants emit in parallel.**
 The expensive step is the SAE encoder forward over ~4000 prompts ×
-$n_{\mathrm{windows}}$ × 38 tasks (~10-15 min on a PRO 6000). Once
+$n_{\mathrm{windows}}$ × 38 tasks (~10-15 min on a RTX 5090). Once
 you have $(N, n_{\mathrm{windows}}, d_{\mathrm{sae}})$ in memory per
 task, every reduction is essentially free arithmetic — emit one
 leaderboard row per (variant, k_feat) combo from the same forward.
@@ -114,10 +120,11 @@ top-$k_{\mathrm{feat}}$ selection.
   winner is clear.
 - Variants: 9 (table above).
 
-**Wall-time on 7× RTX PRO 6000**:
+**Wall-time on 7× RTX 5090**:
 - First signal — txc_base T=5 seed=42 × 9 variants × 8 k_feats =
   72 (variant, k_feat) cells. One forward pass; all variants in
-  parallel: ~30-45 min on 1 GPU.
+  parallel: ~30-45 min on 1 GPU (5090 ≈ 0.7-0.9× H100 throughput on
+  fp16/bf16 SAE encode + sklearn probe is CPU-bound anyway).
 - Validation — txc_base T=5 × 3 seeds × 9 variants × 8 k_feats: split
   3 seeds across 3 GPUs → ~30-45 min wall.
 - Full TXC family — 5 TXC variants × 3 seeds × 9 variants: split
@@ -192,7 +199,7 @@ TQDM_DISABLE=1 AGENT_NAME=agent_pro \
   > logs/c3_pooling_signal_T5_seed42.log 2>&1 &
 ```
 
-~30-45 min wall on 1 PRO 6000. Inspect AUC by variant; if any
+~30-45 min wall on 1 RTX 5090. Inspect AUC by variant; if any
 non-canonical variant beats `mean_stride1` by >0.005 AUC at
 $k_{\mathrm{feat}} \geq 80$ (where $\sigma_{\mathrm{seeds}} < 0.002$
 for canonical TXC-base on SAEBench-36), it's promising — proceed to
@@ -270,7 +277,7 @@ landed; pod not yet provisioned (Han bringing it up).**
 - `git HEAD`: c700d0b2 (Agent NLP — resume mission COMPLETE)
 - Last leaderboard append: many; canonical C3 8-k_feat headline is
   paper-final on `final` branch.
-- Pod: 7× RTX PRO 6000 (provisioning).
+- Pod: 7× RTX 5090, 989 GB RAM, 224 CPUs (provisioning).
 - Active GPU usage: not yet launched.
 - Recent decisions in scope: c3 SAEBench-36 metric (commit `5aba4953`),
   matched-sparsity invariant `k_pos=20` (commit `9934638c`),
@@ -294,7 +301,7 @@ landed; pod not yet provisioned (Han bringing it up).**
 7. Write `experiments/c3_probing_pooling_sweep/run.py` driver.
 8. Smoke: 1 variant × 1 seed × 1 k_feat at n_features=10.
 9. First signal: 9 variants × seed=42 × 8 k_feats (~30-45 min on
-   1 PRO 6000). Inspect AUC by variant; flag any >0.005 delta from
+   1 RTX 5090). Inspect AUC by variant; flag any >0.005 delta from
    canonical at $k_{\mathrm{feat}} \geq 80$.
 10. Seed validation: extend to seeds {1, 2} on parallel GPUs.
 11. Family validation: T=10, T=20, TXC-pro × 3 seeds × surviving
