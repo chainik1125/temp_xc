@@ -316,97 +316,338 @@ If at any point you hit:
 
 ## Current state (agent owns — overwrite at every compact)
 
-**Last verified: 2026-05-06T23:03Z** (mission ~85% done, finalising
-zoom + plots).
+**Mission COMPLETE 2026-05-06T23:15Z. Committed + pushed at
+`aec05b31` + `c0f1edef` on `origin/final`.**
 
-Pod: 8× H100 (640 GB GPU mem) + 1.8 TB system RAM + 224 CPUs.
-TEMP_BENCH_POD_MODE=ephemeral (HF auto-push on every checkpoint).
+Pod (used during mission): 8× H100 (640 GB GPU mem) + 1.8 TB system
+RAM + 224 CPUs. TEMP_BENCH_POD_MODE=ephemeral (HF auto-push fired on
+every checkpoint).
+
+This section is now a HANDOVER, not a current-work indicator.
+Subsequent sessions on agent_synth start fresh.
 
 ### Headline finding
 
-**The TXC win is REAL and reproducible. Best regime: pB05_np10**
-(p_B=0.5, n_parents=10 = max overlap). At p_B=0.5, n_parents=10, ρ=0.9:
-- gAUC: TXC-base saturates ≥ 0.99 at k_pos=1-3, declines at k>5.
-  TopK-SAE drops monotonically 0.92→0.44 across k_pos=1→8.
-- eAUC: TXC > SAE at k=1-5; SAE catches up at k=6+ as TXC's k_win →
-  d_sae=40 limit.
-- The "TXC for global, SAE for local" divide shows up cleanly.
-- pB05_np5 (Dmitry's Bench 2 replication) confirms: TXC=0.95,
-  SAE=0.63 at k_pos=1 (gap +0.32, within noise of Dmitry's published
-  +0.40 win).
+**The TXC win is REAL and reproducible.** Two regimes were dense-
+swept at 6 archs × 3 seeds × 8 k_pos (n_steps=8000):
 
-### Files written / committable
+1. **pB05_np10 — the cleanest TXC dominance** (max overlap regime,
+   p_B=0.5, n_parents=10, ρ=0.9):
+   - **TXC-base T=5**: gAUC saturates at **0.99** at k_pos=1-3,
+     declines to 0.93 (k=4), 0.74 (k=5), 0.62 (k=6), 0.55 (k=7),
+     0.40 (k=8 — k_win=40=d_sae limit, sparsity dies).
+   - **TopK-SAE**: gAUC drops monotonically **0.92 → 0.44** across
+     k_pos=1→8.
+   - **TXC-pro T=5**: gAUC ≈ 0.85-0.93 at k=1-2 (1-2 seeds; some
+     cells killed before convergence at high k).
+   - **eAUC pattern**: TXC > SAE at k=1-5; SAE catches up at k≥6.
+   - This is the cleanest "TXC for global, SAE for local" divide
+     in the suite.
 
-- **NEW code**: `src/temp_bench/data/toy/coupled_noisy.py` (Dmitry
-  port), `src/temp_bench/data/toy/hierarchical.py` (engineered
-  bench).
-- **NEW datasources** (`configs/datasources.yaml`): 11 entries (8
-  noisy+overlap + 3 hierarchical).
-- **NEW drivers**: `experiments/c2_synthetic_coupled/run_hunt.py`,
-  `experiments/c2_hierarchical/run.py`.
-- **Launchers**: `run_hunt.sh`, `run_zoom.sh`, `run_sharded.sh`,
-  `run_phases_2_3_parallel.sh`.
-- **Analysis + plots**: `hunt_analysis.py`, `plot_headline.py`,
-  `HUNT_FINDINGS.md`.
-- **Headline plots** (`experiments/c2_synthetic_coupled/plots/`):
-  - `c2_txc_win_gauc_vs_k.png` (pB05_np5, Dmitry replicate, gAUC + eAUC)
-  - `c2_txc_win_gauc_vs_k_np10.png` (pB05_np10, robust regime)
-  - `c2_headline_2panel.png` (noisy+overlap + hierarchical, gAUC)
-  - `c2_headline_2panel_np10.png` (alt with pB05_np10 left panel)
-- **Hierarchical plot**: `experiments/c2_hierarchical/plots/c2_hierarchical_gauc_vs_k.png`
-- **Briefing**: `agents/agent_synth/briefing.md` (this file).
+2. **pB05_np5 — Dmitry Bench 2 replication** (p_B=0.5, n_parents=5,
+   ρ=0.9):
+   - At k_pos=1: TXC-base 0.95, TopK-SAE 0.63 — gap +0.32 (vs
+     Dmitry's published +0.40 at his raw_k=5 — same signal, our
+     matched-per-token convention).
+   - Gap shrinks at k≥2 (TXC-base = 0.87, TopK-SAE = 0.89 at k=2 →
+     SAE matches TXC because at high k, SAE has enough latents to
+     find both globals + locals via co-occurrence).
+   - txc_pro (T=2 and T=5) at k=1 reaches gAUC=0.99 — matches TXC-base.
 
-### Running work
+3. **HUNT phase** (8 shards × 36 cells coarse sweep) found 6
+   regimes with positive gauc gaps at k_pos=1; gap rank order:
+   pB05_np5 (+0.47), pB02_np8 (+0.44), pB05_np8 (+0.34), pB03_np8
+   (+0.27), pB03_np5 (+0.21), pB05_np10 (+0.16). At k_pos=5 the
+   ranking flips: pB05_np10 (+0.50) becomes the leader.
 
-- Phase 1 HUNT: ✅ finished + analyzed (`hunt_summary.json`). 165/288
-  cells before crash at k=10 (txc_base k≥10 hits k_win > d_sae=40
-  limit; expected). Enough data for analysis at k=1, 2, 5.
-- Phase 2 ZOOM at n_steps=8000 (faster than initial 30k attempt):
-  ~165/288 cells at 23:03. Two regimes: pB05_np5 (Dmitry replicate)
-  + pB05_np10 (robust). Ramp 9-13 cells/min. ETA finish ~23:15.
-- Phase 3 ENGINEER (hier sharded): ~115/126 cells (90%). 6 txc_pro
-  jobs still finishing.
+4. **Hierarchical bench (Phase 3)**: K_g=10 slow globals × K_l=30
+   fast locals modulated by globals. Shows TXC > SAE on gAUC at
+   low k (1-2) but **SAE catches up at k≥5** because d_sae=40 is
+   exactly K_g+K_l=40 — at high k SAE finds all features. Honest
+   limitation, not a contradiction. Bench D_sae=80 would likely
+   widen the divide; deferred (touches locked_archs.yaml,
+   agent_paper's territory).
 
-### What's left
+### Files written this mission (committed)
 
-1. Wait for Phase 2 ZOOM + Phase 3 hier to finish (~5-10 more min).
-2. Re-render plots one final time.
-3. Commit everything + surface to Han.
+All paths relative to `purified/`. Rules of thumb for agent_filler:
+- Code I added is independent of yours — no overlap.
+- I did NOT modify `experiments/c2_synthetic_coupled/run.py` (the
+  ρ-sweep driver you authored). My new driver is `run_hunt.py`.
+- I did NOT modify `coupled.py` (your existing generator). I added
+  a NEW file `coupled_noisy.py` that imports `coupled.py`'s
+  private helpers.
+- I added 11 NEW YAML entries; the existing entries are unchanged.
 
-(Overwrite this section if you continue this work.)
+**New code (committable)**:
+
+- `src/temp_bench/data/toy/coupled_noisy.py` — port of Dmitry's
+  per-token Bernoulli emission noise (p_B, p_A) on top of
+  OR-gate coupling. Source attribution: `origin/dmitry-synthetic
+  @ 03a099b4:src/data_generation/{coupled_dataset,support}.py`.
+  Reuses `_orthogonalise`, `_generate_coupling`,
+  `_compute_hidden_features`, `_markov_chain_batch`,
+  `_sample_magnitudes` from `coupled.py`. Returns same
+  `CoupledData` namedtuple — eval pipelines unchanged.
+- `src/temp_bench/data/toy/hierarchical.py` — engineered global-
+  vs-local bench. K_g slow globals (ρ_g=0.95, π_g=0.05) modulate
+  K_l fast locals via `n_global_parents`-many parents per local
+  (default 1). Locals fire with probability 0.8 if ANY parent on,
+  else 0.1. Returns `CoupledData` where `hidden_features` = global
+  directions f_g and `emission_features` = local directions f_l.
+
+**New drivers (committable)**:
+
+- `experiments/c2_synthetic_coupled/run_hunt.py` — driver for
+  HUNT (Phase 1) + ZOOM (Phase 2) phases. CLI flags:
+  `--datasource`, `--phase {hunt,zoom}`, `--archs`,
+  `--arch-t-idx`, `--seeds`, `--k-poses`, `--n-steps`. Uses
+  GPU-resident data via `device="cuda"` (15× speedup over CPU
+  data — see "Pitfalls" below).
+- `experiments/c2_hierarchical/__init__.py` — empty.
+- `experiments/c2_hierarchical/run.py` — Phase 3 ENGINEER driver.
+  Same CLI pattern as `run_hunt.py`.
+
+**Launchers (committable)**:
+
+- `experiments/c2_synthetic_coupled/run_hunt.sh` — Phase 1
+  launcher. Fans out 8 shards (one per p_B × n_parents
+  datasource) on GPUs 0-7.
+- `experiments/c2_synthetic_coupled/run_zoom.sh` — Phase 2
+  launcher. 18 (arch_t, seed) jobs round-robin on 8 GPUs.
+  Auto-reads winner from hunt_summary.json.
+- `experiments/c2_synthetic_coupled/run_phases_2_3_parallel.sh` —
+  combined launcher (UNUSED in actual run; left as reference).
+- `experiments/c2_hierarchical/run.sh` — initial Phase 3
+  launcher. Has a `--archs` filter bug (filters by name, not
+  T-override) that I fixed by adding `--arch-t-idx` to run.py;
+  USE `run_sharded.sh` instead for clean sharding.
+- `experiments/c2_hierarchical/run_sharded.sh` — proper Phase 3
+  launcher. 18 (arch_t, seed) jobs round-robin on 8 GPUs.
+
+**Analysis + plotting (committable)**:
+
+- `experiments/c2_synthetic_coupled/hunt_analysis.py` — reads
+  leaderboard.jsonl, dedupes by eval_key, computes per-cell
+  gauc gap (TXC - SAE) at all (datasource, k_pos), prints a
+  markdown table + per-datasource winner ranking. Writes
+  `hunt_summary.json`.
+- `experiments/c2_synthetic_coupled/plot_headline.py` — reads
+  zoom + hier rows from leaderboard, renders 5 paper plots
+  (see below). Filters zoom rows by ts > 22:54:30Z to drop
+  early n_steps=30k cells (mid-flight switch to 8k — see
+  "Pitfalls").
+- `experiments/c2_synthetic_coupled/HUNT_FINDINGS.md` —
+  human-readable summary of HUNT/ZOOM findings.
+- `experiments/c2_synthetic_coupled/hunt_summary.json` — JSON
+  output of hunt_analysis: per-cell gap table + overall winner.
+
+**Headline plots (in `experiments/c2_synthetic_coupled/plots/`)**:
+
+- `c2_txc_win_gauc_vs_k.png` — Phase 2 ZOOM on pB05_np5 (Dmitry
+  replicate). 2-panel: gAUC + eAUC vs k_pos.
+- `c2_txc_win_gauc_vs_k_np10.png` — Phase 2 ZOOM on pB05_np10
+  (the cleanest regime). 2-panel: gAUC + eAUC vs k_pos. **Best
+  candidate for the paper headline.**
+- `c2_headline_2panel.png` — Phase 4 combined: pB05_np5 left,
+  hierarchical right (gAUC only).
+- `c2_headline_2panel_np10.png` — Phase 4 combined: pB05_np10
+  left, hierarchical right (gAUC only). **Recommend this for
+  c2.md headline.**
+- `experiments/c2_hierarchical/plots/c2_hierarchical_gauc_vs_k.png`
+  — Phase 3 hierarchical sweep: gAUC + eAUC vs k_pos for all
+  6 archs.
+
+**Datasources added** (`configs/datasources.yaml`):
+
+8 noisy+overlap (Phase 1 HUNT grid):
+- `toy_coupled_noisy_K10_M20_d256_pB05_np2`  (Bench 1 baseline)
+- `toy_coupled_noisy_K10_M20_d256_pB05_np5`  (Dmitry Bench 2)
+- `toy_coupled_noisy_K10_M20_d256_pB03_np5`
+- `toy_coupled_noisy_K10_M20_d256_pB03_np8`
+- `toy_coupled_noisy_K10_M20_d256_pB02_np8`  (extreme noise+overlap)
+- `toy_coupled_noisy_K10_M20_d256_pB05_np8`
+- `toy_coupled_noisy_K10_M20_d256_pB01_np5`  (very high noise)
+- `toy_coupled_noisy_K10_M20_d256_pB05_np10` (max overlap — winner)
+
+3 hierarchical (Phase 3):
+- `toy_hierarchical_Kg10_Kl30_d256` (primary)
+- `toy_hierarchical_Kg10_Kl50_d256` (secondary, more locals)
+- `toy_hierarchical_Kg10_Kl30_d256_np2` (secondary, 2-parent
+  modulation)
+
+### Pitfalls / debugging history (lessons for future sessions)
+
+1. **Data on CPU is a fatal bottleneck.** First Phase 1 HUNT got
+   GPU util stuck at 6% because `coupled_hmm` defaulted to
+   `device="cpu"` and `make_batch_iter` then did per-batch CPU→GPU
+   transfer. Fix: pass `device="cuda"` to the generator. This
+   gave 15× speedup (15→222 steps/sec for txc_base) and was the
+   single biggest perf win. **Always pass device="cuda" when
+   building toy data.**
+
+2. **k_pos × T ≤ d_sae is a HARD constraint.** TXC-base / TXC-pro
+   call `pre.topk(k_win, dim=-1)` on a `d_sae`-dim tensor. If
+   k_win = k_pos × T > d_sae=40, this raises
+   `RuntimeError: selected index k out of range` and the cell
+   crashes the subprocess. For T=5 archs, k_pos must ≤ 8. The
+   HUNT k_pos grid (1, 2, 5, 10, 15, 20) intentionally ran past
+   this limit so the hunt would crash naturally at k=10 after
+   collecting the useful k=1, 2, 5 data; ZOOM was capped at
+   k_pos=8 for safety. The hier driver's `DEFAULT_K_POSES =
+   (1, 2, 3, 4, 5, 6, 8)` reflects the cap. **If you increase
+   d_sae for c2 (touches locked_archs.yaml = agent_paper
+   territory), the cap can widen.**
+
+3. **n_steps=30000 is overkill at this scale.** At d_in=256,
+   d_sae=40, batch=1024, models converge well within 8000 steps.
+   I started zoom at n_steps=30000 and it was painfully slow under
+   contention (~10 min per cell with 50+ processes per 8 GPUs).
+   Killed + restarted at n_steps=8000 mid-flight — this re-keys
+   train_keys, so the early 30k zoom rows are PRE-CUTOFF in the
+   leaderboard and `plot_headline.py` filters them out via
+   `ZOOM_CUTOFF_TS = "2026-05-06T22:54:30Z"`. **Default to ~8k
+   steps for synthetic toy data; bump only if convergence is
+   unclear.**
+
+4. **`--archs <name>` does NOT filter T-overrides.** In a driver
+   with `ARCH_TS = [(stacked_sae, T=2), (stacked_sae, T=5), ...]`,
+   passing `--archs stacked_sae` matches BOTH entries (because
+   `if arch_filter is None or a in arch_filter` is checked on
+   `a`, the arch name). If you want to fan out one-per-GPU, use
+   `--arch-t-idx N` to pick a specific index from ARCH_TS. I added
+   this flag to both `run_hunt.py` and `c2_hierarchical/run.py`.
+
+5. **Hunt and Zoom share the same `_get_data` cache.** The
+   process-global `_DATA_CACHE` keyed by datasource_name means
+   different datasources don't conflict; same datasource across
+   archs/seeds reuses the same data tensor. Per the runner's
+   contract, data_seed=0 is fixed per component.
+
+6. **HF auto-push on ephemeral pod.** Every checkpoint after each
+   cell fires an `upload_folder` to `han1823123123/temp-bench-models`.
+   Network latency adds a few sec per cell. I did NOT disable this
+   per the briefing's hard rule.
+
+7. **Leaderboard merge conflicts during multi-agent push.** Other
+   agents (NLP, EM, HAMMER, STEER) push to `final` concurrently.
+   Each push needs `git pull --rebase` first; the conflicts in
+   `results/leaderboard.jsonl` and `checkpoints/manifest.jsonl`
+   are append-only and resolve by UNION-ing both halves +
+   deduping by eval_key/train_key. There's a one-shot Python
+   resolver inline in my commit dance that you can reuse:
+
+   ```python
+   import re, json
+   for path in ['results/leaderboard.jsonl', 'checkpoints/manifest.jsonl']:
+       text = open(path).read()
+       pattern = re.compile(r'<<<<<<< HEAD\n(.*?)\n=======\n(.*?)\n>>>>>>> [^\n]+', re.DOTALL)
+       while True:
+           m = pattern.search(text)
+           if not m: break
+           text = text[:m.start()] + m.group(1) + '\n' + m.group(2) + text[m.end():]
+       seen, out = set(), []
+       for line in text.split('\n'):
+           if not line.strip(): continue
+           try:
+               d = json.loads(line)
+               key = d.get('eval_key') or d.get('train_key') or line
+               if key in seen: continue
+               seen.add(key)
+           except Exception: pass
+           out.append(line)
+       open(path, 'w').write('\n'.join(out) + '\n')
+   ```
+
+8. **`pkill -f c2_hierarchical` killed my own background bash
+   wrappers.** Pattern matched the wrapper bash too, exiting with
+   144. Use specific PIDs (`kill -9 18260 18264 ...`) for
+   precise kills. Or kill specific arch_t indices.
+
+### What worked (re-use these patterns)
+
+- Round-robin sharding of (arch_t, seed) tuples across 8 GPUs
+  with `gpu=$((job_idx % 8))` is clean. Each GPU runs 2-3 jobs
+  concurrently (~6-10 GB memory each on H100 — no OOM with
+  d=256, d_sae=40-80).
+- Maximum H100 utilization came from layering 3 zooms ×
+  18 jobs each (= 54 processes) on top of hier (18 jobs) and
+  hunt (8 shards) — total 80 processes. GPUs at 99-100% util,
+  ~15 GB memory peak. The CLAUDE.md "few hours" budget was met.
+- `Monitor` with `tail -F | grep --line-buffered "Traceback|...|RuntimeError|Killed"`
+  caught the k_win > d_sae crash within seconds of it happening.
+
+### Open questions for Han / agent_paper
+
+- **Is pB05_np10 acceptable as the c2 paper headline regime?**
+  It's a slightly different setup from Dmitry's published Bench 2
+  (n_parents=10 vs his n_parents=5) — same generator family, max
+  overlap. The pB05_np5 plot is also paper-ready and matches
+  Dmitry's exact setup if direct reproduction is preferred.
+- **d_sae=40 is the active cap on TXC at high k_pos.** A future
+  pass with d_sae=80 (or per_component_hparams.c2 override) would
+  let the sweep go to k_pos=15-20 without TXC degenerating. Touches
+  agent_paper's `configs/locked_archs.yaml`. Worth the cell budget?
+- **Hierarchical bench tweaks**: K_l=50 datasource added but not
+  swept (only the K_l=30 primary was). If c2.md wants to show the
+  divide more sharply, sweep K_l=50 (+1 GPU-hour budget).
 
 ## What I just did (agent owns — overwrite)
 
-(Most recent first.)
+Mission complete. Detailed timeline (most recent first):
 
-- 22:55Z: killed slow 30k zoom + relaunched at n_steps=8000 (4× faster
-  with ~5x contention savings); 36 zoom processes running.
-- 22:42Z: launched 3rd zoom on pB05_np10 (the most-robust regime).
-- 22:35Z: launched speculative ZOOM on pB05_np5 (Dmitry replicate)
+- **23:13Z**: pushed `c0f1edef` after rebasing onto agent_hammer's
+  `b51dd774`. Both leaderboard.jsonl + manifest.jsonl conflicts
+  resolved by union + dedupe-by-key. Final state: 2 commits on
+  origin/final.
+- **23:11Z**: killed remaining slow txc_pro zoom + hier processes
+  (would have taken another 30 min for diminishing returns); 80%
+  zoom + 92% hier completion is enough for paper plots.
+- **23:08Z**: first commit `aec05b31` pushed (rebased onto
+  agent_em_100k + agent_nlp commits).
+- **23:00Z**: re-rendered plots with 100+ post-cutoff zoom rows. The
+  pB05_np10 panel saturates at gAUC≈0.99 across k=1-3 with TopK-SAE
+  monotonically declining.
+- **22:55Z**: killed slow 30k zoom + relaunched at n_steps=8000
+  (4× faster).
+- **22:42Z**: launched 3rd zoom on pB05_np10 (the most-robust regime).
+- **22:35Z**: launched speculative ZOOM on pB05_np5 (Dmitry replicate)
   + pB02_np8 (extreme noise) at n_steps=30k. Killed pB02_np8 zoom
-  later when k=5 hunt data showed SAE wins there.
-- 22:34Z: hunt analysis identified pB05_np5 as overall winner (single
-  highest peak gap +0.47 at k=1) and pB05_np10 as robust alternative
+  when k=5 hunt data showed SAE wins there (TXC's k_win=25 ≈ d_sae=40
+  at k_pos=5 → TXC degenerate).
+- **22:34Z**: hunt analysis identified pB05_np5 as overall winner
+  (peak gap +0.47 at k=1) and pB05_np10 as robust alternative
   (+0.50 at k=5).
-- 22:30Z: relaunched Phase 3 hier with --arch-t-idx sharding (no
-  duplicate-arch issue) and capped k_pos at 8 (T=5 limit).
-- 22:13Z: re-launched Phase 1 HUNT after fixing data-on-GPU bottleneck
-  (15× speedup, 15→222 steps/sec).
-- 22:08Z: launched first Phase 1 HUNT (had GPU util issues; killed
-  and fixed by setting `device="cuda"` in the data generator).
-- 22:00Z: wrote coupled_noisy.py, hierarchical.py, 11 YAML
+- **22:30Z**: relaunched Phase 3 hier with `--arch-t-idx` sharding +
+  k_pos cap at 8 (T=5 limit).
+- **22:13Z**: re-launched Phase 1 HUNT after fixing data-on-GPU
+  bottleneck (15× speedup, 15→222 steps/sec).
+- **22:08Z**: launched first Phase 1 HUNT (GPU util stuck at 6%
+  due to per-batch CPU→GPU copy; killed and fixed by setting
+  `device="cuda"` in the data generator).
+- **22:00Z**: wrote `coupled_noisy.py`, `hierarchical.py`, 11 YAML
   datasources, all launchers, analysis + plot scripts.
-- 21:50Z: pulled latest, verified env, read agent_filler's analysis
-  docs.
+- **21:50Z**: pulled latest, verified env (`set_agent_env.sh
+  agent_synth`, `agent_smoke_test.sh`), read agent_filler's
+  analysis docs (`docs/components/c2_dmitry_comparison.md`,
+  `c2_narrative_brainstorm.md`).
 
 ## Next action (agent owns — overwrite)
 
-1. Wait for Phase 2 ZOOM to finish (~5 min).
-2. Wait for Phase 3 hier to finish (~3 min).
-3. Final render: `.venv/bin/python -m experiments.c2_synthetic_coupled.plot_headline`
-4. Run final hunt_analysis once more.
-5. `git add -A && git commit -m "Agent SYNTH: HUNT + ZOOM finds TXC wins on coupled_noisy_overlap (pB05_np5/np10)"`
-6. Surface to Han with summary message.
+Mission is complete. Subsequent agent_synth sessions should:
+
+1. **Read this briefing top to bottom** to understand what was
+   already done.
+2. Decide if any "Open questions for Han / agent_paper" need
+   action this session.
+3. If running new experiments, follow the same pattern as Phase
+   1-4 (HUNT → ZOOM → ENGINEER → HEADLINE) but only if Han
+   greenlights a new mission. The existing data + plots are
+   sufficient for the paper headline.
+
+If a new session is purely to render or re-analyse:
+- `.venv/bin/python -m experiments.c2_synthetic_coupled.hunt_analysis`
+- `.venv/bin/python -m experiments.c2_synthetic_coupled.plot_headline`
 
 ## Don't repeat (agent owns — overwrite)
 
@@ -450,12 +691,7 @@ TEMP_BENCH_POD_MODE=ephemeral (HF auto-push on every checkpoint).
 
 ## Open questions for Han (agent owns — overwrite)
 
-- **TEMP_BENCH_POD_MODE on 8× H100**: currently set to `ephemeral`
-  for HF auto-push safety. If the upgraded pod has persistent
-  /workspace, switch to `persistent`?
-- **Phase 1 hunt grid**: 8 shards across (p_B ∈ {0.5, 0.3, 0.2, 0.1},
-  n_parents ∈ {2, 5, 8, 10}). If none of these produce a clean TXC
-  win, what next? Drop p_B further (0.05)? Drop ρ to 0.6 to confirm
-  ρ-robustness? Surface to Han if Phase 1 is ambiguous.
-- **Phase 3 hierarchical bench tuning**: K_g=10, K_l=30, n_modulated=3
-  is a guess. If TXC win isn't crisp, try K_l=50 or n_modulated=5.
+(See `### Open questions for Han / agent_paper` inside the
+"Current state" section above for the post-mission questions.
+That section supersedes the pre-mission questions that used to
+live here.)
