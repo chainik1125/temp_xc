@@ -8,38 +8,50 @@ tags:
 
 ## Executive summary
 
-The multi-lane Reed-Solomon HMM
-(`docs/aniket/experiments/synthetic/notes/multilane_rs_hmm_txc_proposal.tex`)
-delivers the cleanest separation between TXC and local-SAE
-architectures: a **provable factor-W reconstruction-loss gap at the
-same total active-feature budget**. m = 32 parallel polynomial clocks
-share one secret `Y`; matching the TXC trajectory solution's noise
-floor with a local alphabet code requires `k_total = m·W` active
-features, whereas TXC needs only `k_total = m`. We confirm this
-empirically across `(h, q) ∈ {(1, 11), (2, 7)}` and `W ∈ {1..7}`: TXC
-at `k_total = m` reaches noise floor at every `W`, while local SAE
-needs `k_pos = m` (= `k_total = m·W`) to do the same.
+The cleanest reproducible result in this series is the **polynomial-clock
+HMM (Stage 4)**: TXC-global with `k_total ∈ {1, 2}` is the only
+architecture that visibly separates from chance on probe-Y at
+`W ≥ h+1`, while TFA, Bhalla TSAE, and a regular SAE concatenated
+across the window all stay near chance even when their per-token TopK
+budget is varied.
 
-The earlier polynomial-clock HMM remains the rigorous local-impossibility
-benchmark with a clean phase transition at `W = h+1`. TFA and Bhalla
-TSAE never recover polynomial templates regardless of per-token TopK
-budget — the architectural bottleneck that matters is **window-level**
-sparsity (TXC `k_total ≤ m`), not per-token sparsity. Earlier
-ambiguous-pair (Stage 3) and Gaussian colored-source (Stages 0–2)
-regimes are kept below as the path that led here.
+The **multi-lane Reed-Solomon HMM (Stage 5)** was meant to extend that
+to a sharper reconstruction-loss claim with a provable factor-W
+resource gap. The first run (Stage 5 v1) showed promising probe-Y
+numbers, but a careful follow-up (Stage 5 v2) revealed that those
+probe accuracies were **train-data fingerprinting** caused by two
+bugs: (a) train and test datasets had different alphabets so the
+"held-out" eval was actually out-of-distribution, and (b) the probe's
+anchor sampler put duplicate `(chain, t_start)` pairs into both probe
+train and probe val. After fixing both, probe-Y collapses to chance
+at every `W` (including `W ≥ h+1`) and atom-type diagnostics show
+**100% fingerprint atoms** with zero lane-trajectory or
+token-template atoms. The TXC is reaching low reconstruction loss on
+training data via mixed-position-mixed-lane memorization, **not** via
+the proposal's predicted Reed-Solomon lane-trajectory dictionary.
+
+So the multi-lane construction is correctly set up — the
+local-alphabet lower bound and the data-generating process work — but
+the architecture in the current configuration finds an unintended
+solution. Earlier ambiguous-pair (Stage 3) and Gaussian colored-source
+(Stages 0–2) regimes are kept below as the path that led here.
 
 ## TL;DR
 
 Four regimes, in *reverse* chronological order:
 
-- **Multi-lane Reed-Solomon HMM (Stage 5):** the cleanest TXC > SAE
-  separation in the series. m parallel polynomial clocks share a secret
-  `Y`. Headline metric is **reconstruction loss**, not probe accuracy.
-  The local-alphabet code with `k_total = m` active features has signal
-  error ≥ `1 - 1/W` (proven), while the TXC trajectory solution at
-  `k_total = m` hits the noise floor exactly. Empirically observed
-  factor-W resource gap at every `W` and at both `(h, q) = (1, 11)`
-  and `(2, 7)`.
+- **Multi-lane Reed-Solomon HMM (Stage 5):** mathematically the right
+  construction for a reconstruction-loss separation, but our trained
+  TXC does **not** learn the proposal's lane-trajectory atoms. The
+  first run looked positive (TXC `k_total = m` matching the noise
+  floor with strong probe-Y) but two evaluation bugs hid the truth.
+  After fixing them (held-out test with shared alphabet + anchor
+  sampling without replacement), probe-Y collapses to chance at every
+  `W`, signal recovery on a held-out clean reference is ≤ 0.13, and
+  atom-type diagnostics show 100% mixed-position-mixed-lane
+  fingerprint atoms — zero lane-trajectory and zero token-template.
+  The TXC is doing finite-data fingerprinting, not RS template
+  matching.
 - **Polynomial clock HMM (Stage 4):** the theorem-backed scalar version.
   Discrete `F_q` alphabet, exact `I(Y; window) = 0` for `W ≤ h`,
   constructive sparse-reconstruction solution at `W = h + 1` with
@@ -157,44 +169,106 @@ Probe-Y val accuracy (chance `1/q = 0.143`):
 
 ![Stage 5 main](../../../../plots/v6_colored_sources/multilane_rs_main.png)
 
-### Stage 5 takeaways
+### Stage 5 v2 — held-out follow-up after critique
 
-1. **Reconstruction-loss separation is the headline.** At every `W`,
-   TXC at `k_total = m` reaches the noise floor (or below it via
-   noise-fitting). Local SAE at `k_pos = 1` (`k_total = W`) hits a
-   ceiling well above the noise floor — exactly the predicted
-   `1 - 1/(mW) ≈ 0.6` signal error per token. Matching the TXC's
-   noise floor with a local code requires `k_pos = m` per token (i.e.
-   `k_total = mW`, factor W more active features).
+The Stage 5 v1 conclusions above were partly an artifact of two
+evaluation bugs identified in a careful read:
 
-2. **Probe-Y at low W: TXC > SAE.** Even at `W ≤ h`, where the
-   information-theoretic impossibility theorem says probes should be
-   at chance, our TXC-on-training-data probe sits substantially above
-   chance (e.g., `W = 1`, h=2: TXC = 0.43 vs chance = 0.14). This is
-   probably **fingerprinting** of training episodes — the TXC has
-   16k atoms and learns episode-specific atom assignments, which the
-   probe exploits when train/eval data overlap. The reconstruction
-   metric is the cleaner story; the probe-Y axis is included only for
-   continuity with prior stages and should be read with this caveat.
-   A clean probe measurement requires held-out episodes.
+1. **Different alphabets for train and test.** The first runner called
+   `generate_multilane_dataset(cfg)` separately for training and
+   "held-out" data, and that helper regenerated the orthonormal lane
+   alphabet from the seed. Train and test ended up in *different*
+   subspaces, so reconstruction and probe metrics on the "held-out"
+   set were essentially out-of-distribution rather than fresh-episode.
+2. **Probe anchors sampled with replacement.** `_gather_anchor_indices`
+   used `torch.randint`, which can repeat `(chain, t_start)` pairs.
+   The probe's internal train/val split then put identical inputs
+   into both halves, which trivially leaks the label and inflates
+   probe accuracy for any architecture with enough capacity to memorize
+   per-input fingerprints.
 
-3. **At W ≥ 5 the SAE k_pos=m probe catches the TXC.** With enough
-   redundant per-position info, the linear probe on the local
-   alphabet representation matches TXC on the probe metric — but the
-   SAE used `k_total = mW` to get there, vs TXC's `k_total = m`. The
-   reconstruction-loss gap (panel A) makes the resource-difference
-   visible while the probe alone hides it.
+After fixing both — train/test share the alphabet, anchors are sampled
+without replacement via `torch.randperm` — and re-running the same
+`(h, q, m, σ)` configurations with **clean-signal MSE on a held-out
+test set** and **atom-type diagnostics** added:
 
-4. **Lane-level Rec_temp stays low.** The TXC's `Rec_temp_lane`
-   (decoder atoms vs the m·q^(h+1) ground-truth lane-trajectory
-   templates) is `0.01–0.04` even at the threshold W. This is *not*
-   evidence the TXC didn't learn polynomial structure — the dictionary
-   has 16k atoms but `m·q^(h+1) = 10976` atoms exist; at 4000 training
-   steps each atom gets only ~50 gradient updates on average. The
-   probe and reconstruction-loss metrics both show the architecture
-   IS doing the right thing, just with under-converged atoms.
+| | smoke (h=1, q=11, m=32) | main (h=2, q=7, m=32) |
+|---|---|---|
+| Held-out probe-Y at every W ≥ h+1 | ≤ 0.11 ≈ 1/q = 0.091 | ≤ 0.16 ≈ 1/q = 0.143 |
+| Held-out signal recovery (TXC k=1) | 0.05 – 0.07 | 0.07 – 0.13 |
+| Held-out signal recovery (TXC k=m) | -0.19 – -0.08 | -0.13 – 0.10 |
+| Atom-type at every W ≥ 2 | 100% fingerprint | 100% fingerprint |
+| Lane-trajectory atoms | 0% | 0% |
+| Token-template atoms | 0% (except trivially at W=1) | 0% |
 
+**Probe-Y at chance.** The original Stage 5 v1 main run reported probe
+accuracies of `0.43–0.62` at `W ≤ h`, where the impossibility theorem
+guarantees `I(Y; window) = 0`. After the fix, those collapse to
+`0.10–0.16` ≈ `1/q` — i.e., the privacy theorem holds empirically and
+the original numbers were fingerprinting.
 
+**Signal recovery is much weaker than headline MSE suggested.** The
+clean-signal MSE on the held-out test set shows the trained TXC
+recovers at most ~13% of the signal energy at `k_total = 1`, and
+*regresses* at higher `k` (signal recovery becomes negative as the
+model fits noise instead). The original `mse_noisy_per_token`
+numbers were dominated by noise-fitting on training data; the
+held-out clean-signal MSE is the right metric.
+
+**Atom-type diagnostics: 100% fingerprint.** For every TXC atom
+across both stages, the energy distribution is neither
+lane-concentrated (`max_lane_frac ≈ 1/m = 0.05`, perfectly uniform
+across lanes) nor position-concentrated except at `W = 1` (where it's
+trivially position-concentrated because there's only one position).
+At every `W ≥ 2` the atoms have `max_pos_frac ≈ 1/W` (uniformly
+spread across positions) and `max_lane_frac ≈ 1/m` (uniformly spread
+across lanes). They are mixed-position-mixed-lane fingerprint atoms,
+not the proposal's predicted lane-trajectory templates `G_{ℓ, β}`.
+
+### Stage 5 honest takeaways
+
+1. **The construction is correct.** The local-alphabet lower bound
+   `1 - min(k, mW)/(mW)` is empirical-tight on the SAE k=1 row
+   (signal_rec ≈ 0.05–0.13 across all stages, very close to the
+   predicted floor for that budget at q=7,11). The privacy theorem
+   holds empirically once the leak is plugged.
+2. **The TXC does not learn the proposal's atoms.** With 4k training
+   steps and the chosen `H_txc`, SGD lands in a fingerprint basin —
+   it reconstructs *some* of the signal but via mixed-energy atoms
+   that don't match `G_{ℓ, β}`. The reconstruction-loss gap reported
+   in v1 was real on training data but mostly came from noise-fitting,
+   not from learned RS templates.
+3. **The factor-W reconstruction-loss separation claim is therefore
+   not yet substantiated empirically.** The local-alphabet bound is
+   real, but the TXC side of the claim (TXC at `k=m` matches noise
+   floor *via lane trajectories*) is not. We only confirm that TXC
+   gets to lower noisy MSE than SAE, with a different mechanism than
+   predicted.
+
+### What's still worth running
+
+- **Larger `H_txc` and longer training.** At `H_txc = 16384` with
+  4k steps and `m·q^(h+1) = 10976` ground-truth atoms, each atom
+  gets at most a few dozen gradient updates on average. Try
+  `H_txc ≥ 4 · m·q^(h+1)`, `n_steps ≥ 30k`. The SGD basin attractor
+  may genuinely require more compute to escape fingerprinting.
+- **Encoder-bias regularizer that pushes atoms toward
+  lane-concentration.** A penalty like `||W_dec[s] - lane_proj_ℓ(W_dec[s])||²`
+  for the closest `ℓ` would directly push atoms into the
+  lane-trajectory shape. (The proposal's reconstruction objective
+  alone clearly isn't enough.)
+- **Ablate at very small `n_seq_train`.** If reconstruction loss
+  *rises* sharply with smaller training set, the model is genuinely
+  fingerprinting; if it stays flat, there's a more structured solution
+  hiding.
+
+### Stage 5 v1 (now superseded)
+
+The original Stage 5 v1 figures and tables are kept below for
+reference. The v1 probe-Y numbers should not be trusted; the v1
+reconstruction-loss numbers reflect the predicted local-alphabet
+gap on the training data but the TXC's atoms were not the predicted
+ones.
 
 Spec at `docs/aniket/experiments/synthetic/notes/polynomial_clock_experiment.tex`.
 
@@ -611,6 +685,9 @@ For follow-up work I'd:
 | Multilane RS runner | `src/v6_colored_sources/run_multilane.py` |
 | Stage 5 smoke results / figure | `results/v6_colored_sources/multilane_rs_smoke.json` / `plots/v6_colored_sources/multilane_rs_smoke.png` |
 | Stage 5 main results / figure | `results/v6_colored_sources/multilane_rs_main.json` / `plots/v6_colored_sources/multilane_rs_main.png` |
+| Multilane RS follow-up runner | `src/v6_colored_sources/run_multilane_followup.py` |
+| Stage 5 v2 smoke (held-out + atom diag) | `results/v6_colored_sources/multilane_rs_smoke_followup.json` |
+| Stage 5 v2 main (held-out + atom diag) | `results/v6_colored_sources/multilane_rs_main_followup.json` |
 | Stage 3 (ambiguous-pair) results | `results/v6_colored_sources/ambiguous_pair.json` |
 | Stage 3 figure | `plots/v6_colored_sources/ambiguous_pair_probes.png` |
 | Ambiguous-pair generator | `src/v6_colored_sources/ambiguous_pair.py` |
