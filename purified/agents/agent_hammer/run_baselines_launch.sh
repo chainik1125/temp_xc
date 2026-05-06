@@ -33,7 +33,7 @@ launch() {
   local label=$1; shift
   local logfile="logs/hammer_${label}.log"
   setsid -f bash scripts/run_on_gpu.sh "${gpu}" -- \
-    env AGENT_NAME=agent_hammer OMP_NUM_THREADS=8 MKL_NUM_THREADS=8 TQDM_DISABLE=1 \
+    env AGENT_NAME=agent_hammer TEMP_BENCH_POD_MODE=ephemeral OMP_NUM_THREADS=8 MKL_NUM_THREADS=8 TQDM_DISABLE=1 \
     .venv/bin/python -m "${driver}" \
       --arch "${arch}" --seed "${seed}" --k-poses ${kvals} \
     < /dev/null > "${logfile}" 2>&1

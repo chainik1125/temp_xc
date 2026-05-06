@@ -366,11 +366,14 @@ git -c "credential.helper=/tmp/cred.sh" push origin final
 
 ## Current state (agent owns — overwrite at every compact)
 
-**Last verified: 2026-05-06T23:09Z** — MISSION COMPLETE, COMMITTED, PUSHED.
+**Last verified: 2026-05-06T23:27Z** — MISSION COMPLETE, COMMITTED, PUSHED.
+HF push recovery (Phase 6) DONE — all 109 checkpoints now on
+`han1823123123/temp-bench-models`.
 
-Final commit: **`b51dd774`** (rebased twice during push due to concurrent
-agent activity; head later moved to `c0f1edef` after agent_synth pushed
-on top — my work is intact in their tree).
+Final commit chain: `b51dd774` (initial backfill) → `a678771e`
+(briefing for agent_filler) → next (HF recovery + launcher bug fix
++ this briefing update). Branch may rebase if other agents push
+concurrently; my work is durable on HF + leaderboard regardless.
 
 Pod: **5× RTX PRO 6000** (Blackwell-gen, 96 GB VRAM each). 900 GB RAM,
 160 cores. Briefing's "8× RTX PRO 6000" was wrong — 3 of the 8 GPUs
@@ -530,6 +533,49 @@ Single commit `b51dd774` (after rebase) on `final` branch. 130 files
 changed: agent territory + analysis.py edits + 109 new
 `checkpoints/<train_key>/config.json` files (model.safetensors are
 gitignored, configs are tracked) + leaderboard.jsonl + manifest.jsonl.
+
+### Phase 6 — HF push recovery (post-mission, 23:25Z)
+**BUG**: my launcher's `env AGENT_NAME=... TQDM_DISABLE=1` did NOT
+include `TEMP_BENCH_POD_MODE=ephemeral`. This var is needed by
+`cache.save_checkpoint` (cache.py:170) to trigger the auto-push to
+`han1823123123/temp-bench-models`. Without it, the if-branch is
+skipped, `hf_url=None` is written to manifest, and the checkpoint
+stays only on local disk.
+
+This is an EPHEMERAL POD, so without HF push the checkpoints would be
+lost on pod restart. Symptom: `0/109` agent_hammer manifest entries
+with `hf_url`.
+
+**Why the bug happened**: `set_agent_env.sh` exports
+`TEMP_BENCH_POD_MODE=ephemeral` in the parent shell. My launcher
+ran in a subshell launched by Bash tool, which doesn't inherit
+across Bash calls in this harness. The `env VAR=val cmd` line in
+the launcher was the OPPORTUNITY to inject TEMP_BENCH_POD_MODE
+explicitly — I missed it.
+
+**Recovery** (verified working):
+- Wrote `agents/agent_hammer/push_checkpoints_to_hf.py` (committed).
+  Reads manifest, identifies agent_hammer entries, calls
+  `HfApi.upload_folder()` for each train_key dir.
+- Ran 23:21-23:25Z: 109/109 pushed, 0 errors, 3.9 min wall.
+- Verified one sample (`138933e116af4df2`) lands on HF with both
+  `config.json` and `model.safetensors`.
+
+**Fix for future runs**: edited
+`agents/agent_hammer/run_baselines_launch.sh` and
+`run_setupA_helpers.sh` to add `TEMP_BENCH_POD_MODE=ephemeral` to
+each `env` line.
+
+**Note for other agents**: agent_synth's manifest entries are also
+0/619 with hf_url — same pattern. They're at risk too on ephemeral
+pods unless they also recover.
+
+**Manifest hf_url is NOT updated** by the recovery — manifest is
+append-only. Files are on HF (verified), but the manifest still
+shows `hf_url=null`. Next session that re-runs save_checkpoint would
+re-push (idempotent on HF), but no rewrite of past rows. If we want
+manifest to reflect reality, would need a migration step (out of
+scope for this mission).
 
 **Rebase notes for cross-agent reference:**
 - Initial commit hit conflicts on `c2.md` and `leaderboard.jsonl`
