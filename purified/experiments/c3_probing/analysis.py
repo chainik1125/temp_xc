@@ -343,22 +343,43 @@ def run_analysis() -> AnalysisResult:
             md_lines.append(f"| `{display}` | " + " | ".join(cells_md) + " |")
         md_lines.append("")
 
-    # Plot
+    # Plots — full + TFA-excluded zoom (TFA's 0.65-0.88 range squashes
+    # the y-axis on the full plot; excluded view makes the temporal-arch
+    # cluster legible).
     PLOT_DIR.mkdir(parents=True, exist_ok=True)
     plot_path = PLOT_DIR / "auc_by_k.png"
     _make_paper_plot(
         summary, plot_path,
         title="C3 — sparse probing on Gemma-2-2B-IT L13",
     )
+    plot_path_no_tfa = PLOT_DIR / "auc_by_k_no_tfa.png"
+    summary_no_tfa = {
+        arch: data for arch, data in summary.items() if arch != "tfa"
+    }
+    _make_paper_plot(
+        summary_no_tfa, plot_path_no_tfa,
+        title="C3 — sparse probing (TFA excluded for y-axis zoom)",
+    )
     md_lines.append(
-        f"![AUC by k_feat](../../experiments/{EXP_DIR.name}/plots/auc_by_k.png)"
+        f"![AUC by k_feat — full]"
+        f"(../../experiments/{EXP_DIR.name}/plots/auc_by_k.png)"
+    )
+    md_lines.append("")
+    md_lines.append(
+        f"![AUC by k_feat — TFA excluded]"
+        f"(../../experiments/{EXP_DIR.name}/plots/auc_by_k_no_tfa.png)"
+    )
+    md_lines.append("")
+    md_lines.append(
+        "_The second plot drops TFA so the temporal-arch cluster (MLC, "
+        "T-SAE, TXC family, TopK-SAE) is legible at finer y-axis scale._"
     )
     md_lines.append("")
 
     return AnalysisResult(
         markdown="\n".join(md_lines),
         results=dict(summary),
-        plot_paths=[plot_path],
+        plot_paths=[plot_path, plot_path_no_tfa],
     )
 
 
