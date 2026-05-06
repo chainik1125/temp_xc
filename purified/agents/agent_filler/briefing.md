@@ -1654,19 +1654,8 @@ TQDM_DISABLE=1 AGENT_NAME=agent_filler \
 # Then re-render c2.md c1_noisy section to embed the 2 scatter plots.
 ```
 
-**After c1_noisy denoising done — agent_paper's queued mission**:
-agent_paper landed `7bd38bfd` C2 ρ-sweep mission for me — Effect 1
-vs Effect 2 test (Dmitry's critique). Run this on ALL 8 GPUs once
-T-sweep + denoising complete:
-```bash
-bash scripts/run_on_gpu.sh <each> -- \
-  .venv/bin/python -m experiments.c2_synthetic_coupled.run \
-  --archs topk_sae txc_base txc_pro \
-  --seeds 42 1 2 --k-poses 1 5 \
-  --rho-values 0.0 0.3 0.6 0.9 \
-  --n-steps 30000
-```
-~120 cells (with all txc_pro T-overrides), ~10 min wall on 8 GPUs.
+**ρ-sweep mission CANCELLED 2026-05-06T20:08Z** — Han reassigned the
+C2 ρ-sweep (commit `7bd38bfd`) to a different agent. Don't run it.
 
 **To re-render c2.md** after more T=12 cells land (next session
 or now):
