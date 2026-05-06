@@ -185,8 +185,28 @@ def _pareto_upper_right(points: list[tuple[float, float]]) -> list[tuple[float, 
     return sorted(frontier)  # ascending coh for plotting
 
 
+def _filter_main_cluster(
+    points: list[tuple[float, float, int, float]],
+) -> list[tuple[float, float, int, float]]:
+    """Per-arch outlier filter: drop the bottom 33% by combined score.
+
+    Score = coh + align. The lowest-scoring third is the long dud-α
+    tail (low coh and/or low align). Keeping the top two-thirds focuses
+    the visualization on the main steering cluster while preserving
+    every legitimate top-align cell (the global peak by definition
+    survives). The Pareto frontier and the global peak are re-computed
+    on the filtered points.
+    """
+    if len(points) < 4:
+        return list(points)
+    scored = sorted(points, key=lambda p: -(p[0] + p[1]))  # descending
+    keep_n = max(4, int(round(len(scored) * 2 / 3)))
+    return scored[:keep_n]
+
+
 def _save_pareto_scatter(sae_wangs: list[dict], txc_wangs: list[dict], *,
-                         dst: Path, organism_label: str) -> Path | None:
+                         dst: Path, organism_label: str,
+                         filter_outliers: bool = False) -> Path | None:
     """Coherence × alignment Pareto scatter (paper-grade headline figure).
 
     Each point is one stage-4 cell — (feature, α, seed) — across both
@@ -200,6 +220,12 @@ def _save_pareto_scatter(sae_wangs: list[dict], txc_wangs: list[dict], *,
     not a paper-meaningful axis) and surfaces the trade-off directly:
     at any given coherence level, which arch achieves higher alignment-
     injection?
+
+    ``filter_outliers=True`` applies a per-arch Tukey lower-fence filter
+    (see ``_filter_main_cluster``) to focus on the main steering cluster,
+    dropping the dud-α tail. The Pareto frontier and global peak are
+    re-computed on the filtered points for consistency. Title carries
+    a "(main cluster)" suffix.
     """
     if not sae_wangs and not txc_wangs:
         return None
@@ -210,6 +236,9 @@ def _save_pareto_scatter(sae_wangs: list[dict], txc_wangs: list[dict], *,
 
     sae_pts = [p for w in sae_wangs for p in _extract_stage4_points(w)]
     txc_pts = [p for w in txc_wangs for p in _extract_stage4_points(w)]
+    if filter_outliers:
+        sae_pts = _filter_main_cluster(sae_pts)
+        txc_pts = _filter_main_cluster(txc_pts)
 
     fig, ax = plt.subplots(figsize=(7.0, 5.5), dpi=140)
 
@@ -266,8 +295,9 @@ def _save_pareto_scatter(sae_wangs: list[dict], txc_wangs: list[dict], *,
     ax.set_xlabel("Coherence score (Claude Haiku judge, 0–100)", fontsize=11)
     ax.set_ylabel("Alignment-injection score (0–100; higher = more misaligned)",
                   fontsize=11)
+    title_suffix = " (main cluster)" if filter_outliers else ""
     ax.set_title(
-        f"C6 — coherence × alignment Pareto on {organism_label}\n"
+        f"C6 — coherence × alignment Pareto on {organism_label}{title_suffix}\n"
         f"Each point: one (feature, α, seed) stage-4 cell. "
         f"★ = best align with coh ≥ {_COH_FLOOR:.0f}.",
         fontsize=11.5,
@@ -666,6 +696,7 @@ def run_analysis() -> AnalysisResult:
 
         # Pareto scatter (coherence × alignment) using ALL paired seeds'
         # stage-4 cells. Replaces the prior α-line frontier plot.
+        # Two versions: full distribution + main-cluster (outliers dropped).
         sae_wangs = [
             w for p in paired
             if (w := _read_wang_full(p["sae"]["train_key"])) is not None
@@ -674,21 +705,27 @@ def run_analysis() -> AnalysisResult:
             w for p in paired
             if (w := _read_wang_full(p["txc"]["train_key"])) is not None
         ]
-        plot_dst = PLOT_DIR / f"c6_pareto_{organism_label.lower().replace('-', '_')}.png"
-        try:
-            saved = _save_pareto_scatter(
-                sae_wangs, txc_wangs, dst=plot_dst,
-                organism_label=organism_label,
-            )
-        except Exception:
-            saved = None
-        if saved is not None:
-            plot_paths.append(saved)
-            md_lines += [
-                "",
-                f"![C6 Pareto scatter — {organism_label}]"
-                f"(../../experiments/c6_em/plots/{plot_dst.name})",
-            ]
+        org_slug = organism_label.lower().replace('-', '_')
+        for is_filtered, suffix, label_suffix in (
+            (False, "", ""),
+            (True, "_clustered", " — main cluster only"),
+        ):
+            plot_dst = PLOT_DIR / f"c6_pareto_{org_slug}{suffix}.png"
+            try:
+                saved = _save_pareto_scatter(
+                    sae_wangs, txc_wangs, dst=plot_dst,
+                    organism_label=organism_label,
+                    filter_outliers=is_filtered,
+                )
+            except Exception:
+                saved = None
+            if saved is not None:
+                plot_paths.append(saved)
+                md_lines += [
+                    "",
+                    f"![C6 Pareto scatter — {organism_label}{label_suffix}]"
+                    f"(../../experiments/c6_em/plots/{plot_dst.name})",
+                ]
 
     # If both organisms landed, also write a one-line headline pairing.
     fin = headline_gaps_for_results.get("14B-finance")
