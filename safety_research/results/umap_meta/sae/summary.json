@@ -2,17 +2,18 @@
   "arm": "sae",
   "n_features": 2129,
   "n_clusters": 6,
-  "noise_frac": 0.0014091122592766556,
-  "silhouette": -0.03002598136663437,
-  "mean_cohesion": 0.6412747006553455,
+  "noise_frac": 0.0004697040864255519,
+  "silhouette": -0.11068118363618851,
+  "mean_cohesion": 0.6369673338404519,
   "clusters": [
     {
       "cluster": 0,
-      "name": "company \u00b7 beginning \u00b7 product \u00b7 diverse",
-      "n_features": 32,
-      "cohesion": 0.8007133237777218,
+      "name": "product \u00b7 content \u00b7 company \u00b7 diverse",
+      "n_features": 33,
+      "cohesion": 0.7860730489095052,
       "safety": {
-        "NONE": 32
+        "NONE": 32,
+        "HARMFUL_CONTENT": 1
       },
       "sample": [
         "This feature activates on beginning-of-sequence tokens followed by generic, informational opening phrases typical of web content\u2014headlines, dates, company descriptions, product reviews, and promotional material that establish factual or commercial context.",
@@ -24,7 +25,7 @@
     },
     {
       "cluster": 1,
-      "name": "company \u00b7 diverse \u00b7 product \u00b7 beginning",
+      "name": "product \u00b7 news \u00b7 company \u00b7 content",
       "n_features": 73,
       "cohesion": 0.8731389386831716,
       "safety": {
@@ -40,61 +41,27 @@
     },
     {
       "cluster": 2,
-      "name": "geographic \u00b7 names \u00b7 activates \u00b7 location",
-      "n_features": 55,
-      "cohesion": 0.5870612455939604,
-      "safety": {
-        "NONE": 55
-      },
-      "sample": [
-        "This feature activates on cardinal/directional adjectives (northeastern, southern, north, northwest) that describe geographical locations or regions within text.",
-        "This feature activates on the word \"home\" in contexts where it refers to residential dwelling places, particularly in commercial, service-oriented, or practical descriptive language (home cleaning, home networking, home security, home maintenance).",
-        "This feature activates on country or nation names, particularly when they appear as demarcated entities (often marked with >>> <<<) in news headlines and informational text about geopolitical, economic, or cultural topics.",
-        "This feature detects geographic locations and place names, particularly when they appear as specific localities (cities, regions, states, countries) that follow or are embedded within descriptive text about those places.",
-        "This feature activates on geographic/location names and proper nouns (parks, districts, tracts, ponds) that are highlighted or demarcated within descriptive text about places and real estate."
-      ]
-    },
-    {
-      "cluster": 3,
-      "name": "greetings \u00b7 informal \u00b7 hello \u00b7 welcome",
+      "name": "greetings \u00b7 informal \u00b7 particularly \u00b7 hello",
       "n_features": 19,
-      "cohesion": 0.671200043973867,
+      "cohesion": 0.6736152158146016,
       "safety": {
         "NONE": 19
       },
       "sample": [
         "This feature activates on casual opening greetings and salutations at the beginning of text, particularly \"Hello,\" \"Hey,\" \"Hi,\" and similar informal address tokens that initiate conversational or personal communication.",
         "This feature detects opening salutations and introductory phrases that begin documents or webpages, particularly greetings like \"Welcome,\" \"Hello,\" \"Published,\" and \"By\" that signal the start of a new communicative context or piece of content.",
-        "This feature detects opening framing markers that introduce content\u2014either structural delimiters like `[<<<` marking the start of quoted/formatted sections, or welcoming phrases like \"Welcome\" that begin a new text or announcement.",
+        "This feature activates on opening framing devices at the beginning of text, particularly \"Welcome\" greetings and structural markers like brackets or metadata tags that introduce or frame content (reviews, patches, links, updates, multilingual text).",
         "This feature detects the formulaic opening phrase \"Welcome to\" that introduces websites, services, or communities, typically appearing at the start of landing pages or welcome messages.",
         "This feature tracks expressions of gratitude and thanks, particularly when they appear at the beginning of sentences or messages in formal/semi-formal contexts like customer service responses, acknowledgments, and appreciation statements."
       ]
     },
     {
-      "cluster": 4,
-      "name": "activates \u00b7 particularly \u00b7 words \u00b7 phrases",
-      "n_features": 1849,
-      "cohesion": 0.4030881542965778,
+      "cluster": 3,
+      "name": "person \u00b7 possessive \u00b7 activates \u00b7 first",
+      "n_features": 102,
+      "cohesion": 0.5142192125922151,
       "safety": {
-        "NONE": 1838,
-        "HARMFUL_CONTENT": 9,
-        "BIAS": 2
-      },
-      "sample": [
-        "This feature detects the beginning of proper nouns and branded names (Chain, Galvan, Silvio, Citgo, Vodafone, Balotelli, Naucalpan, Poly, Pub, Law, Motion) where capitalized words are split mid-token or appear at text boundaries, tracking how the model processes named entity recognition and capitalization patterns.",
-        "This feature activates on capitalized words or proper nouns that appear at the start of text following the beginning-of-sequence token, often marking titles, names, or product identifiers that introduce content categories.",
-        "This feature fires on capitalized words or word fragments that appear at the start of text segments, particularly nouns used as headers, titles, or category labels in lists and product descriptions.",
-        "This feature activates on product/service listing titles and headers, specifically detecting the pattern where descriptive text precedes a product category or item type enclosed in angle brackets (e.g., \"Fashion Haul\", \"Concentration\", \"Pack\", \"Inventory\", \"Kit\").",
-        "This feature detects capitalized topic headers or section titles that introduce business/organizational categories, services, or subject domains (recruitment, configuration, fitness, upgrades, consulting, advertising, etc.)."
-      ]
-    },
-    {
-      "cluster": 5,
-      "name": "possessive \u00b7 person \u00b7 activates \u00b7 first",
-      "n_features": 98,
-      "cohesion": 0.5124464976067746,
-      "safety": {
-        "NONE": 98
+        "NONE": 102
       },
       "sample": [
         "This feature activates on the first-person singular pronoun \"I\" appearing at the beginning of a text passage (after the start-of-sequence token), particularly when initiating personal narratives, anecdotes, or subjective claims.",
@@ -102,6 +69,40 @@
         "This feature activates on first-person singular pronouns and contractions (\"I\", \"I'm\", \"I've\", \"I was\") that initiate personal narrative statements or subjective claims, particularly when the speaker is sharing experiences, opinions, or accomplishments.",
         "This feature activates on first-person narrative voice, specifically the pattern of \"I\" at the beginning of sentences or clauses that introduce personal experiences, observations, or statements.",
         "This feature activates on possessive constructions and institutional/organizational entity markers, where a proper noun or entity name is followed by possessive indicators (apostrophe-s, \"'s\") or appears in a role-defining context before a description of what that entity manages, operates, or is responsible for."
+      ]
+    },
+    {
+      "cluster": 4,
+      "name": "activates \u00b7 particularly \u00b7 names \u00b7 nouns",
+      "n_features": 1875,
+      "cohesion": 0.3992907150480256,
+      "safety": {
+        "NONE": 1865,
+        "HARMFUL_CONTENT": 8,
+        "BIAS": 2
+      },
+      "sample": [
+        "This feature detects the beginning of proper nouns and branded names (Chain, Galvan, Silvio, Citgo, Vodafone, Balotelli, Naucalpan, Poly, Pub, Law, Motion) where capitalized words are split mid-token or appear at text boundaries, tracking how the model processes named entity recognition and capitalization patterns.",
+        "This feature activates on capitalized words or proper nouns that appear at the start of text following the beginning-of-sequence token, often marking titles, names, or product identifiers that introduce content categories.",
+        "This feature fires on capitalized words or word fragments that appear at the start of text segments, particularly nouns used as headers, titles, or category labels in lists and product descriptions.",
+        "This feature activates on product/service category descriptors and noun phrases that specify what type of item or offering is being presented (e.g., \"Haul,\" \"Kit,\" \"Inventory,\" \"Tour,\" \"Apartment,\" \"Review\"). These words function as classifying labels that immediately follow the main subject noun or brand name in commercial, product, or travel listing contexts.",
+        "This feature detects capitalized topic headers or section titles that introduce business/organizational categories, services, or subject domains (recruitment, configuration, fitness, upgrades, consulting, advertising, etc.)."
+      ]
+    },
+    {
+      "cluster": 5,
+      "name": "prepositions \u00b7 temporal \u00b7 spatial \u00b7 activates",
+      "n_features": 26,
+      "cohesion": 0.5754668719951923,
+      "safety": {
+        "NONE": 26
+      },
+      "sample": [
+        "This feature activates on the word \"when\" used as a conjunction or temporal marker introducing a conditional, circumstantial, or explanatory clause that provides context or reasoning for a preceding statement.",
+        "This feature activates on the phrase \"In the/a/an\" at the beginning of sentences, particularly tracking the common prepositional opening pattern that introduces temporal, locational, or contextual frames.",
+        "This feature activates on spatial proximity descriptors and distance/location prepositions that indicate how close something is to a nearby landmark or destination (e.g., \"from,\" \"to,\" \"walk,\" \"minutes,\" \"miles,\" \"located\").",
+        "This feature activates on the preposition \"in\" or \"In\" appearing at the beginning of clauses or sentences, often after punctuation or at sentence starts, functioning as a locative or temporal connector.",
+        "This feature tracks the preposition \"in\" when used to specify geographic location or jurisdiction\u2014particularly in contexts establishing where institutions, businesses, or events are situated within a specific place (city, region, country)."
       ]
     }
   ]

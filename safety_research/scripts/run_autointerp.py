@@ -93,10 +93,16 @@ SYSTEM = (
     "You are a meticulous AI researcher analyzing patterns in neural network features. "
     "You will see text examples that strongly activate a specific feature in a language model. "
     "Identify the concept, pattern, or topic this feature represents.\n\n"
+    "The activating window in each example is wrapped in [FOCUS]...[/FOCUS] tags. "
+    "These tags are inserted by us to mark the span — they are NOT part of the "
+    "underlying text. Do NOT describe the tags themselves, the brackets, or the word "
+    "'focus'; describe only the actual tokens between the tags and how they relate to "
+    "the surrounding context.\n\n"
     "Guidelines:\n"
     "- Focus on the COMMON pattern across examples, not one-off details.\n"
     "- 1-2 short sentences only.\n"
-    "- Describe in linguistic / semantic terms, not numerics.\n\n"
+    "- Describe in linguistic / semantic terms, not numerics.\n"
+    "- Never mention [FOCUS], [/FOCUS], '>>>', '<<<', or 'markers' in your output.\n\n"
     "After your explanation, on a new line emit a SAFETY tag:\n"
     "[SAFETY]: REFUSAL | DECEPTION | HARMFUL_CONTENT | BIAS | NONE\n"
     "Pick REFUSAL if the feature seems to track refusals, apologies, hedging, "
@@ -133,11 +139,12 @@ def _build_user_prompt(rec: dict) -> str:
         for i, (t, a) in enumerate(zip(rec["top_texts"], rec["top_acts"]))
     )
     return (
-        f"Feature ID: {rec['feat']}\n\nActivating examples (window between "
-        f">>> and <<<; special tokens such as <bos>, <start_of_turn>, "
-        f"<end_of_turn> appear literally and should be treated as real "
-        f"tokens the feature can fire on):\n\n{examples}\n\nProvide your "
-        "explanation and safety tag."
+        f"Feature ID: {rec['feat']}\n\nActivating examples (the activating "
+        f"window is wrapped in [FOCUS]...[/FOCUS] tags inserted by us; "
+        f"these tags are not part of the text. Special tokens such as "
+        f"<bos>, <start_of_turn>, <end_of_turn> are real tokens the feature "
+        f"can fire on):\n\n{examples}\n\nProvide your explanation and "
+        "safety tag without ever mentioning the [FOCUS] tags."
     )
 
 

@@ -243,13 +243,16 @@ class TextContext:
 
         # Render special tokens (e.g. <bos>, <start_of_turn>) literally so
         # features that fire on them aren't shown as an empty highlight to
-        # the explainer. The window between >>> and <<< must always be
-        # populated for the explainer to see what activated the feature.
+        # the explainer. The window must always be populated for the
+        # explainer to see what activated the feature.
         pre = self.tokenizer.decode(pre_tokens, skip_special_tokens=False)
         win = self.tokenizer.decode(win_tokens, skip_special_tokens=False)
         post = self.tokenizer.decode(post_tokens, skip_special_tokens=False)
 
-        return f"{pre}>>>{win}<<<{post}"
+        # XML-style [FOCUS] tags rather than literal-character markers
+        # (>>>/<<<) so the explainer doesn't anthropomorphise them as
+        # part of the feature pattern.
+        return f"{pre}[FOCUS]{win}[/FOCUS]{post}"
 
     def get_full_text(self, chain_idx: int) -> str:
         """Get the full sequence text for a chain."""

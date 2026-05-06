@@ -1,10 +1,10 @@
 {
   "arm": "tsae",
   "n_features": 8454,
-  "n_clusters": 22,
+  "n_clusters": 23,
   "noise_frac": 0.0,
-  "silhouette": -0.12992563843727112,
-  "mean_cohesion": 0.6707128259350356,
+  "silhouette": -0.2009773999452591,
+  "mean_cohesion": 0.7079526443378381,
   "clusters": [
     {
       "cluster": 0,
@@ -40,27 +40,75 @@
     },
     {
       "cluster": 2,
-      "name": "email \u00b7 domain \u00b7 addresses \u00b7 contact",
-      "n_features": 40,
-      "cohesion": 0.7065568972856571,
+      "name": "email \u00b7 domain \u00b7 addresses \u00b7 urls",
+      "n_features": 36,
+      "cohesion": 0.6924878317212302,
       "safety": {
-        "NONE": 40
+        "NONE": 36
       },
       "sample": [
-        "This feature detects email addresses and domain names, particularly identifying the boundary between the domain/username and the top-level domain or host separator (marked by >>> and <<<).",
-        "This feature detects domain names and email addresses, particularly when they appear marked with delimiters (>>> and <<<) or in contexts like website URLs, email headers, and contact information.",
-        "This feature activates on email addresses and website URLs that are partially obscured or fragmented using `>>>` and `<<<` delimiters, typically appearing in contexts like contact information, citations, or promotional content.",
+        "This feature activates on domain names and website URLs, particularly when they appear in contexts describing websites, email addresses, or online services\u2014capturing the characteristic pattern of a domain followed by a top-level domain extension.",
+        "This feature activates on domain names and email addresses embedded in text\u2014particularly the domain/host portion of URLs and the \"@domain\" section of email addresses.",
+        "This feature detects domain names and email addresses embedded within text, particularly when they appear as part of URLs, email handles, or contact information strings.",
         "This feature activates on website domain names and email addresses that are segmented or split across token boundaries, particularly when the domain/address components are separated by special tokens or line breaks.",
-        "This feature activates on domain names and URLs embedded within text, particularly when they appear between contextual markers (>>><<<) that isolate the web address from surrounding content."
+        "This feature activates on domain names and website URLs embedded within text, particularly when they appear as part of website references, email addresses, or promotional mentions."
       ]
     },
     {
       "cluster": 3,
-      "name": "religious \u00b7 biblical \u00b7 divine \u00b7 christian",
-      "n_features": 16,
-      "cohesion": 0.6209853490193685,
+      "name": "take \u00b7 verb \u00b7 undertaking \u00b7 action",
+      "n_features": 8,
+      "cohesion": 0.7328213964189801,
       "safety": {
-        "NONE": 16
+        "NONE": 8
+      },
+      "sample": [
+        "This feature tracks the phrase \"take\" (or \"took\"/\"takes\") appearing in contexts where it functions as a pivotal verb introducing an action, decision, or direction\u2014often with a sense of agency or initiative (e.g., \"take a picture,\" \"take a shot,\" \"take you on,\" \"take stock\").",
+        "This feature activates on the transition into future-oriented or intentional actions, specifically where \"take\" appears as a verb indicating undertaking, seizing opportunity, or commencing an activity (e.g., \"take a shot,\" \"take you on,\" \"take some,\" \"take care of,\" \"taking a retreat\").",
+        "This feature tracks the linguistic pattern of \"take\" as a transitive verb in declarative statements, particularly in contexts where the verb bridges direct objects or describes actions/initiatives being undertaken (e.g., \"take a picture,\" \"take a shot,\" \"take you on adventures,\" \"take 10% off\").",
+        "This feature activates on the phrase pattern \"take a/the\" or \"took\" appearing in contexts describing actions, opportunities, or initiatives\u2014tracking the semantic concept of \"seizing or undertaking an action or chance.\"",
+        "This feature activates on the phrase pattern \"to take [noun/action]\" or \"[subject] took [object]\", particularly when positioned between narrative or transitional markers, capturing colloquial expressions of undertaking actions or initiatives."
+      ]
+    },
+    {
+      "cluster": 4,
+      "name": "there \u00b7 existential \u00b7 discourse \u00b7 assertions",
+      "n_features": 13,
+      "cohesion": 0.767968495686849,
+      "safety": {
+        "NONE": 13
+      },
+      "sample": [
+        "This feature activates on the opening clause \"There is/are/was\" constructions that introduce a topic, claim, or observation\u2014a common discourse pattern for presenting assertions or contextual background in natural language.",
+        "This feature activates on statements beginning with \"There is/are/was\" that introduce a topic or claim with epistemic framing (talk, evidence, belief, types, reasons, legend). It tracks generic existential assertions used to establish discourse topics.",
+        "This feature activates on existential constructions beginning with \"There is/are/was/were\" followed by quantifiers, indefinite articles, or descriptors\u2014a common discourse pattern for introducing topics or making general assertions.",
+        "This feature detects the \"There is/are/was/were\" existential construction at the beginning of sentences, which serves as a discourse opener to introduce or frame a topic or claim.",
+        "This feature activates on the opening phrase \"There are/is\" used to introduce plural or multiple entities, categories, or perspectives\u2014a common discourse pattern for presenting variety, alternatives, or contextual abundance."
+      ]
+    },
+    {
+      "cluster": 5,
+      "name": "empty \u00b7 cart \u00b7 commerce \u00b7 shopping",
+      "n_features": 19,
+      "cohesion": 0.7678560848124543,
+      "safety": {
+        "NONE": 19
+      },
+      "sample": [
+        "This feature activates on e-commerce interface text indicating an empty shopping cart or basket, typically appearing in product pages, checkout flows, or cart status messages.",
+        "This feature activates on e-commerce empty cart/bag messaging and related UI text indicating zero items in a shopping container.",
+        "This feature detects e-commerce cart/bag empty state messaging and related UI text patterns found on shopping websites.",
+        "This feature detects empty state messages in e-commerce contexts, particularly phrases indicating zero items in shopping carts or bags, along with related UI language like \"no data available\" and loading states.",
+        "This feature activates on e-commerce interface text indicating empty shopping carts, abandoned baskets, or zero-quantity states, often appearing near calls-to-action or promotional messaging."
+      ]
+    },
+    {
+      "cluster": 6,
+      "name": "religious \u00b7 divine \u00b7 christian \u00b7 spiritual",
+      "n_features": 15,
+      "cohesion": 0.6291138421921503,
+      "safety": {
+        "NONE": 15
       },
       "sample": [
         "This feature activates on biblical or religious text passages, particularly those expressing transformative spiritual themes (rebirth, divine action, resurrection, identity transformation in Christ).",
@@ -71,58 +119,59 @@
       ]
     },
     {
-      "cluster": 4,
-      "name": "superlative \u00b7 most \u00b7 best \u00b7 activates",
-      "n_features": 90,
-      "cohesion": 0.5644352030664794,
-      "safety": {
-        "NONE": 90
-      },
-      "sample": [
-        "This feature activates on superlative claims or extreme positive assertions (\"best,\" \"most important,\" \"highest,\" \"most exciting,\" \"most prestigious\") that mark something as exceptional or record-breaking within a category.",
-        "This feature activates on the phrase pattern \"one of\" or \"one [noun]\" appearing in contexts describing individual instances, examples, or cases within a broader category or set\u2014tracking the linguistic construction that introduces a singular member of a group.",
-        "This feature detects the linguistic pattern of \"one\" used as an indefinite pronoun or generic reference (e.g., \"one of our,\" \"one student,\" \"one thing\"), which appears across diverse contexts as a formal/neutral way to introduce singular examples or generalizations.",
-        "This feature activates on phrases introducing examples or specific instances (commonly \"one of\" or \"some of\") that function to provide concrete illustration or evidence within broader statements.",
-        "This feature activates on marketing or promotional language that uses superlatives, trend language, and positive buzzwords (e.g., \"dream,\" \"magic,\" \"buzz,\" \"wave of success,\" \"hype,\" \"opportunity\") to sell or hype products, technologies, or experiences."
-      ]
-    },
-    {
-      "cluster": 5,
-      "name": "acronyms \u00b7 acronym \u00b7 parentheses \u00b7 abbreviations",
-      "n_features": 70,
-      "cohesion": 0.7116929711762422,
-      "safety": {
-        "NONE": 70
-      },
-      "sample": [
-        "This feature activates on acronym introductions\u2014specifically the pattern where a full organizational or technical name is followed by its parenthetical abbreviation in a defining context.",
-        "This feature activates on acronyms and abbreviations immediately following their full expanded forms in parentheses, typically marking the transition from spelled-out organizational or technical names to their shortened versions.",
-        "This feature activates on acronyms and their expansions, specifically when an abbreviated term (in parentheses) immediately follows its full form, often with organizational, institutional, or technical names.",
-        "This feature detects the pattern of acronyms or abbreviated forms being introduced\u2014specifically the full expanded name/term immediately preceding parentheses containing its shortened form (e.g., \"Organization Name (ON)\").",
-        "This feature detects acronyms and their expansions, particularly when an organization, technical term, or concept name is followed by its abbreviated form in parentheses or brackets."
-      ]
-    },
-    {
-      "cluster": 6,
-      "name": "just \u00b7 only \u00b7 phrase \u00b7 limiting",
-      "n_features": 14,
-      "cohesion": 0.6422690926017341,
-      "safety": {
-        "NONE": 14
-      },
-      "sample": [
-        "This feature tracks the phrase \"just\" appearing in contexts where it functions as a minimizing or casual qualifier\u2014used to downplay significance, express immediacy, or add conversational filler between narrative or persuasive segments.",
-        "This feature detects the phrase pattern \"just [X]\" or similar temporal/quantitative minimizers (e.g., \"just days,\" \"just a few,\" \"just three years,\" \"just where\"), which function to downplay, simplify, or frame something as minor or immediate.",
-        "This feature activates on the colloquial phrase \"just\" used to mean \"simply\" or \"merely\" in temporal or descriptive contexts, often appearing after a line break or punctuation boundary where it introduces a casual, understated claim or observation.",
-        "This feature activates on phrases containing \"just\" used as a temporal/quantitative minimizer (e.g., \"just days,\" \"just a few,\" \"just warming up\"), typically marking proximity, brevity, or smallness of scope in time or quantity.",
-        "This feature activates on text segments where \"only\" appears as a limiting qualifier, often positioned between two contrasting or restrictive clauses that emphasize scarcity, exclusivity, or narrow applicability."
-      ]
-    },
-    {
       "cluster": 7,
-      "name": "death \u00b7 obituary \u00b7 passing \u00b7 away",
+      "name": "seems \u00b7 looks \u00b7 perception \u00b7 subjective",
+      "n_features": 6,
+      "cohesion": 0.7769303639729818,
+      "safety": {
+        "NONE": 6
+      },
+      "sample": [
+        "This feature activates on phrases expressing apparent or perceived states using \"seems,\" \"looks like,\" or \"seemingly\"\u2014discourse markers that indicate subjective appearance or impression rather than certainty.",
+        "This feature activates on phrases expressing subjective perception or appearance (\"seems,\" \"feels,\" \"looks like,\" \"sounds like\"), particularly in contexts where the speaker is describing impressions, intuitions, or appearances that may differ from objective reality.",
+        "This feature detects hedging and epistemic uncertainty markers, particularly phrases like \"seems to,\" \"seems like,\" \"looks like,\" and \"appears to\" that express tentative or subjective perception rather than definitive claims.",
+        "This feature tracks the linguistic pattern of expressing subjective perception or appearance using \"seem/seems/seemed\" constructions, which introduce a speaker's observed impression or interpretation of a situation.",
+        "This feature activates on discourse markers and epistemic hedges that introduce observations or assessments, particularly phrases like \"it seems,\" \"looks like,\" \"we seem,\" and \"there doesn't seem\" that frame statements as tentative or perspective-based interpretations rather than absolute claims."
+      ]
+    },
+    {
+      "cluster": 8,
+      "name": "pandemic \u00b7 covid \u00b7 coronavirus \u00b7 disease",
       "n_features": 8,
-      "cohesion": 0.8447259494236538,
+      "cohesion": 0.7573163168770927,
+      "safety": {
+        "NONE": 8
+      },
+      "sample": [
+        "This feature tracks references to COVID-19, pandemics, and coronavirus-related content, activating strongly on disease mentions, pandemic impacts, and health crisis terminology.",
+        "This feature tracks references to COVID-19, the pandemic, and related public health crises\u2014identifying text segments that mention coronavirus, pandemic impacts, or disease spread.",
+        "This feature tracks contextual references to the COVID-19 pandemic and its societal impacts, including mentions of pandemic disruptions, health precautions, and post-pandemic recovery across various domains.",
+        "This feature activates on text segments involving disease or pandemic terminology, particularly numerical references to case counts, disease names (COVID-19, Equine Herpesvirus), and phrases describing the spread or impact of infectious diseases.",
+        "This feature activates on text spans discussing pandemic/COVID-19 impacts and restrictions, particularly phrases about avoiding crowds, pandemic consequences, and health precautions during the coronavirus era."
+      ]
+    },
+    {
+      "cluster": 9,
+      "name": "greeting \u00b7 informal \u00b7 casual \u00b7 guys",
+      "n_features": 37,
+      "cohesion": 0.7365332251196509,
+      "safety": {
+        "NONE": 36,
+        "HARMFUL_CONTENT": 1
+      },
+      "sample": [
+        "This feature activates on direct address transitions and conversational shifts where the speaker acknowledges or reorients toward an audience member, typically marked by phrases like \"you,\" \"Karen,\" \"Hi,\" or imperative constructions that signal a pivotal moment in addressing or engaging someone directly.",
+        "This feature activates on casual, informal greeting phrases and opening statements that establish conversational context, typically found at the beginning of messages, forum posts, or casual communications.",
+        "This feature activates on casual, conversational opening phrases and greetings that establish an informal, friendly tone at the beginning of text\u2014including salutations like \"Hello,\" \"Well,\" \"Let's,\" \"Hey,\" and attribution phrases that precede content.",
+        "This feature activates on the beginning-of-sequence token followed by casual, informal greeting phrases or direct first-person narrative openings (e.g., \"Hello,\" \"Hi,\" \"I decided/had/choose\"), typically marking the start of conversational or personal messages in forums, emails, or social posts.",
+        "This feature activates on casual, informal opening phrases and conversational starters\u2014particularly greetings, direct addresses, and colloquial sentence beginnings that establish a friendly or personal tone at the start of utterances."
+      ]
+    },
+    {
+      "cluster": 10,
+      "name": "death \u00b7 obituary \u00b7 passing \u00b7 someone",
+      "n_features": 8,
+      "cohesion": 0.8447260175432477,
       "safety": {
         "NONE": 8
       },
@@ -135,26 +184,26 @@
       ]
     },
     {
-      "cluster": 8,
-      "name": "size \u00b7 small \u00b7 scale \u00b7 tiny",
-      "n_features": 9,
-      "cohesion": 0.7078751458062066,
+      "cluster": 11,
+      "name": "just \u00b7 phrase \u00b7 downplay \u00b7 used",
+      "n_features": 7,
+      "cohesion": 0.7464305332728794,
       "safety": {
-        "NONE": 9
+        "NONE": 7
       },
       "sample": [
-        "This feature activates on descriptive adjectives or modifiers (particularly \"large,\" \"big,\" \"huge\") that appear between markers, often emphasizing scale, size, or significance in noun phrases across diverse contexts.",
-        "This feature activates on transitions between descriptive or emphatic language and size/magnitude descriptors (large, huge, big), often marking a shift from qualification or introduction to concrete scale statements.",
-        "This feature activates on the adjective \"small\" (and semantically related variants like \"smaller,\" \"little,\" \"tiny\") when used to describe discrete objects or quantities in descriptive contexts.",
-        "This feature detects modifiers describing scale, size, or scope\u2014particularly adjectives like \"small,\" \"tiny,\" \"budget-friendly,\" \"nano,\" and \"intimate\" that characterize entities or concepts as compact, limited, or condensed in dimension or extent.",
-        "This feature activates on text spans describing scale or magnitude using adjectives like \"large,\" \"big,\" \"huge,\" or \"biggest\"\u2014capturing expressions that emphasize size, volume, or extent."
+        "This feature tracks the phrase \"just\" appearing in contexts where it functions as a minimizing or casual qualifier\u2014used to downplay significance, express immediacy, or add conversational filler between narrative or persuasive segments.",
+        "This feature detects the phrase pattern \"just [X]\" or similar temporal/quantitative minimizers (e.g., \"just days,\" \"just a few,\" \"just three years,\" \"just where\"), which function to downplay, simplify, or frame something as minor or immediate.",
+        "This feature activates on the colloquial phrase \"just\" used to mean \"simply\" or \"merely\" in temporal or descriptive contexts, often appearing after a line break or punctuation boundary where it introduces a casual, understated claim or observation.",
+        "This feature activates on phrases containing \"just\" used as a temporal/quantitative minimizer (e.g., \"just days,\" \"just a few,\" \"just warming up\"), typically marking proximity, brevity, or smallness of scope in time or quantity.",
+        "This feature tracks the colloquial intensifier phrase \"just a\" or \"just\" used to downplay, minimize, or casually frame statements\u2014often appearing in conversational contexts to soften claims or present something as simple/minor."
       ]
     },
     {
-      "cluster": 9,
-      "name": "ingredient \u00b7 culinary \u00b7 food \u00b7 cooking",
+      "cluster": 12,
+      "name": "culinary \u00b7 ingredient \u00b7 food \u00b7 cooking",
       "n_features": 22,
-      "cohesion": 0.6652719076577719,
+      "cohesion": 0.6673064128661053,
       "safety": {
         "NONE": 22
       },
@@ -167,61 +216,108 @@
       ]
     },
     {
-      "cluster": 10,
-      "name": "former \u00b7 role \u00b7 status \u00b7 past",
-      "n_features": 6,
-      "cohesion": 0.7697852452596029,
-      "safety": {
-        "NONE": 6
-      },
-      "sample": [
-        "This feature activates on phrases identifying someone's previous role or status using words like \"former,\" \"ex-,\" or \"a former [title],\" typically appearing at clause boundaries or in appositive phrases that provide biographical context.",
-        "This feature detects the word \"former\" or \"ex-\" preceding a person's previous role, title, or affiliation, marking someone's past professional or organizational status.",
-        "This feature activates on words indicating previous status or prior roles\u2014\"former,\" \"ex,\" \"formerly\"\u2014typically appearing at phrase boundaries where someone's past position or identity is being introduced.",
-        "This feature tracks the word \"former\" or its variants (formerly, ex-) when used to describe a person's previous professional, political, or personal status/role.",
-        "This feature activates on temporal or status transitions marked by phrases like \"formerly/previously,\" \"until,\" \"once,\" or \"at/was\" that indicate someone's past role, position, or state contrasted with their present condition."
-      ]
-    },
-    {
-      "cluster": 11,
-      "name": "absence \u00b7 apologies \u00b7 posting \u00b7 been",
-      "n_features": 20,
-      "cohesion": 0.634922228361431,
-      "safety": {
-        "NONE": 18,
-        "REFUSAL": 2
-      },
-      "sample": [
-        "This feature tracks apologies and explanations for absence from posting or communication, typically in blog or social media contexts where creators acknowledge gaps in activity.",
-        "This feature detects apologies and explanations for absence or lack of communication, particularly in informal personal or blog contexts where writers acknowledge gaps in posting, responsiveness, or presence.",
-        "This feature activates on apologies and explanations for prolonged absence from posting or communication, particularly phrases like \"sorry for the absence,\" \"apologies for not posting,\" and reassurances that the person is still alive/active.",
-        "This feature tracks apologetic or explanatory phrases used to account for prolonged absence from posting, typically opening with self-deprecating humor or explicit apologies (\"been a long time,\" \"apologies,\" \"not dead,\" \"MIA\").",
-        "This feature activates on apologetic or explanatory meta-commentary about posting gaps and absences, typically appearing in blog-style introductions or personal updates where the writer acknowledges a hiatus before resuming content."
-      ]
-    },
-    {
-      "cluster": 12,
-      "name": "first \u00b7 welcome \u00b7 opening \u00b7 introductory",
-      "n_features": 34,
-      "cohesion": 0.6332001983588179,
-      "safety": {
-        "NONE": 34
-      },
-      "sample": [
-        "This feature activates on the opening phrase \"Welcome to [entity/place name]\" which is a common introductory pattern used in web content, business websites, and marketing copy to greet visitors and establish context about a location or service.",
-        "This feature activates on welcoming introductory phrases and organizational/business headers that establish a venue, service, or location\u2014typically opening statements like \"Welcome to [place/service]\" or formal title/publisher lines that introduce an entity.",
-        "This feature activates on formal introductory phrases that present names, citations, or institutional/business welcome statements, typically appearing at the beginning of documents or webpages.",
-        "This feature detects introductory welcome phrases and business/location branding statements, typically found at the beginning of websites, promotional content, or organizational descriptions where a venue or service introduces itself to visitors.",
-        "This feature activates on the beginning-of-sequence token followed by \"Welcome to\" phrases that introduce organizations, locations, or branded entities\u2014tracking the opening salutations and framing of informational or promotional content."
-      ]
-    },
-    {
       "cluster": 13,
-      "name": "date \u00b7 numbers \u00b7 dates \u00b7 temporal",
-      "n_features": 1398,
-      "cohesion": 0.5278584653605775,
+      "name": "etymological \u00b7 called \u00b7 known \u00b7 definitions",
+      "n_features": 22,
+      "cohesion": 0.6274140593293426,
       "safety": {
-        "NONE": 1395,
+        "NONE": 22
+      },
+      "sample": [
+        "This feature tracks parenthetical or appositive phrases that provide alternative names, aliases, or clarifications for preceding nouns\u2014commonly introduced by phrases like \"also called,\" \"known as,\" \"nicknamed,\" or \"formerly.\"",
+        "This feature activates on alternative names, aliases, or secondary designations introduced by phrases like \"also known as,\" \"called,\" \"nicknamed,\" or \"goes by,\" tracking appositional naming patterns that provide equivalent identities.",
+        "This feature detects phrases that provide alternative names, definitions, or clarifications for entities\u2014typically marked by phrases like \"known as,\" \"called,\" \"nicknamed,\" \"formerly,\" or \"or\" that introduce synonymous or explanatory terms.",
+        "This feature activates on phrases introducing alternative names, titles, or designations for entities\u2014patterns like \"known as,\" \"called,\" \"also known as,\" \"goes by,\" and \"titled\"\u2014capturing the linguistic structure of name apposition and renaming.",
+        "This feature activates on dictionary entries, etymological definitions, and lexicographic formatting\u2014particularly text that presents word meanings, historical origins, example sentences, and structural metadata typical of reference dictionaries."
+      ]
+    },
+    {
+      "cluster": 14,
+      "name": "sports \u00b7 team \u00b7 activates \u00b7 particularly",
+      "n_features": 73,
+      "cohesion": 0.5938215792814164,
+      "safety": {
+        "NONE": 73
+      },
+      "sample": [
+        "This feature activates on sports news and reporting text, particularly headlines and articles about baseball, basketball, hockey, and softball games\u2014detecting the domain of athletic competition coverage and game results.",
+        "This feature activates on numerical or quantitative phrases embedded within sports narrative text, particularly around statistical descriptors (innings, runs, hits, scores) that provide game context and performance metrics.",
+        "This feature activates on sports team names and associated contextual language, particularly when teams are mentioned in the middle of narrative text about games, trades, or player updates.",
+        "This feature tracks the announcement or presentation of contest winners, awards, and recognition recipients, typically in contexts where results are being revealed or accomplishments are being celebrated.",
+        "This feature activates on phrase boundaries within sports narrative sentences, particularly around temporal markers (innings, game events) and transitional phrases that connect sequential actions or outcomes in baseball game descriptions."
+      ]
+    },
+    {
+      "cluster": 15,
+      "name": "forward \u00b7 slashes \u00b7 options \u00b7 alternative",
+      "n_features": 11,
+      "cohesion": 0.7622700084339489,
+      "safety": {
+        "NONE": 11
+      },
+      "sample": [
+        "This feature activates on text segments containing forward slashes that separate related or alternative terms, phrases, or concepts (e.g., \"1A/30\", \"management/business discipline\", \"BUNNY/EASTER\", \"coffee shop/caf\u00e9\"), functioning as a marker for compound descriptors or paired alternatives within structured or semi-structured text.",
+        "This feature activates on text fragments that contain forward slashes, hyphens, or similar delimiters used in product codes, technical specifications, model numbers, and structured metadata (e.g., \"01A/3\", \"AN/TPS-80\", \"Bachelors/3-5 yr\").",
+        "This feature activates on forward slashes or slash-separated categorical information (credentials, classifications, alternatives, specifications) commonly found in structured text like resumes, forms, product descriptions, and metadata.",
+        "This feature activates on forward slashes used as separators or delimiters between distinct categories, classifications, or alternative labels within structured metadata (product names, classifications, locations, event names, etc.).",
+        "This feature detects text passages where a forward slash (/) or line break appears between two related phrases or product/brand names, often marking divisions between alternative options, product variants, or navigation separators in commercial or descriptive contexts."
+      ]
+    },
+    {
+      "cluster": 16,
+      "name": "part \u00b7 series \u00b7 sequential \u00b7 ordinal",
+      "n_features": 16,
+      "cohesion": 0.7227703094482422,
+      "safety": {
+        "NONE": 16
+      },
+      "sample": [
+        "This feature activates on sequential or ordinal markers embedded in text\u2014phrases indicating part numbers, volume numbers, days in a sequence, or chronological positioning (e.g., \"Part 2,\" \"Day 9,\" \"Vol. 3,\" \"the second recording\"). It tracks references to items within numbered or enumerated series.",
+        "This feature activates on ordinal markers (\"first,\" \"second\") and temporal/sequential positioning phrases that introduce specific instances or occurrences of events, often appearing at clause boundaries where a new descriptive context begins.",
+        "This feature activates on numerical or ordinal indicators marking sequential sections, chapters, days, or parts within longer texts (e.g., \"Book 2\", \"Day 9\", \"Part 2-5\", \"Step One\"), functioning as structural metadata that denotes progression through multi-part content.",
+        "This feature activates on ordinal numerals and sequential markers (part 2, day 3, vol. 3, second time) that indicate position within a series or progression of content.",
+        "This feature tracks ordinal numbering and sequential positioning language, particularly phrases indicating which item in a series is being referenced (e.g., \"first of X,\" \"part one of,\" \"page 1 of\")."
+      ]
+    },
+    {
+      "cluster": 17,
+      "name": "only \u00b7 limiting \u00b7 restrictive \u00b7 positioned",
+      "n_features": 5,
+      "cohesion": 0.8038658142089844,
+      "safety": {
+        "NONE": 5
+      },
+      "sample": [
+        "This feature activates on text segments where \"only\" appears as a limiting qualifier, often positioned between two contrasting or restrictive clauses that emphasize scarcity, exclusivity, or narrow applicability.",
+        "This feature detects the phrase pattern \"only\" positioned between contextual boundaries, often appearing in constructions like \"only X\" or \"will only\" that express limitations, restrictions, or exclusive conditions.",
+        "This feature detects the word \"only\" when it appears immediately after a clause boundary or semantic shift, often used to introduce a limiting or restrictive constraint that contrasts with prior context.",
+        "This feature activates on the phrase \"only\" when it appears in a restrictive or limiting context, typically positioned between \"will/can/are/is\" and a quantifier, duration, or scope (e.g., \"only 25 minutes,\" \"only apply when,\" \"only have limited stock,\" \"only pump 2-4 ounces\").",
+        "This feature activates on the phrase \"only\" positioned between boundary markers (often punctuation, line breaks, or structural delimiters), frequently appearing in contexts where \"only\" introduces a limiting condition or constraint (temporal, quantitative, or conditional restrictions)."
+      ]
+    },
+    {
+      "cluster": 18,
+      "name": "phone \u00b7 numbers \u00b7 contact \u00b7 number",
+      "n_features": 18,
+      "cohesion": 0.818368550219567,
+      "safety": {
+        "NONE": 18
+      },
+      "sample": [
+        "This feature activates on phone numbers and numeric contact information, particularly when digits are fragmented or partially obscured across token boundaries.",
+        "This feature detects phone numbers and telephone-related numerical sequences, particularly the middle or partial digit segments that appear within formatted phone number strings.",
+        "This feature detects phone numbers and numerical contact information, specifically activating on the middle digits of formatted phone numbers that appear in contact contexts.",
+        "This feature detects phone number patterns, specifically activating on digit sequences that appear within or adjacent to phone number formatting (dashes, slashes, spaces, parentheses).",
+        "This feature activates on partial phone numbers and numeric sequences that are split across token boundaries, particularly detecting the final digits or segments of formatted telephone numbers."
+      ]
+    },
+    {
+      "cluster": 19,
+      "name": "date \u00b7 temporal \u00b7 dates \u00b7 activates",
+      "n_features": 1403,
+      "cohesion": 0.5197827942568554,
+      "safety": {
+        "NONE": 1400,
         "BIAS": 2,
         "HARMFUL_CONTENT": 1
       },
@@ -234,139 +330,57 @@
       ]
     },
     {
-      "cluster": 14,
-      "name": "there \u00b7 existential \u00b7 discourse \u00b7 existence",
-      "n_features": 12,
-      "cohesion": 0.7871427825002959,
+      "cluster": 20,
+      "name": "acronyms \u00b7 parenthetical \u00b7 abbreviations \u00b7 acronym",
+      "n_features": 76,
+      "cohesion": 0.6947586006030702,
       "safety": {
-        "NONE": 12
+        "NONE": 76
       },
       "sample": [
-        "This feature activates on the opening clause \"There is/are/was\" constructions that introduce a topic, claim, or observation\u2014a common discourse pattern for presenting assertions or contextual background in natural language.",
-        "This feature activates on statements beginning with \"There is/are/was\" that introduce a topic or claim with epistemic framing (talk, evidence, belief, types, reasons, legend). It tracks generic existential assertions used to establish discourse topics.",
-        "This feature activates on existential constructions beginning with \"There is/are/was/were\" followed by quantifiers, indefinite articles, or descriptors\u2014a common discourse pattern for introducing topics or making general assertions.",
-        "This feature detects the \"There is/are/was/were\" existential construction at the beginning of sentences, which serves as a discourse opener to introduce or frame a topic or claim.",
-        "This feature activates on the opening phrase \"There are/is\" used to introduce plural or multiple entities, categories, or perspectives\u2014a common discourse pattern for presenting variety, alternatives, or contextual abundance."
+        "This feature activates on acronym introductions\u2014specifically the pattern where a full organizational or technical name is followed by its parenthetical abbreviation in a defining context.",
+        "This feature activates on acronyms and abbreviations immediately following their full expanded forms in parentheses, typically marking the transition from spelled-out organizational or technical names to their shortened versions.",
+        "This feature activates on acronyms and their expansions, specifically when an abbreviated term (in parentheses) immediately follows its full form, often with organizational, institutional, or technical names.",
+        "This feature detects the pattern of acronyms or abbreviated forms being introduced\u2014specifically the full expanded name/term immediately preceding parentheses containing its shortened form (e.g., \"Organization Name (ON)\").",
+        "This feature detects acronyms and their expansions, particularly when an organization, technical term, or concept name is followed by its abbreviated form in parentheses or brackets."
       ]
     },
     {
-      "cluster": 15,
-      "name": "conditional \u00b7 scenarios \u00b7 hypothetical \u00b7 condition",
-      "n_features": 32,
-      "cohesion": 0.6691417078818044,
+      "cluster": 21,
+      "name": "activates \u00b7 phrases \u00b7 particularly \u00b7 product",
+      "n_features": 6106,
+      "cohesion": 0.4346164793266005,
       "safety": {
-        "NONE": 32
+        "NONE": 6056,
+        "HARMFUL_CONTENT": 36,
+        "BIAS": 9,
+        "REFUSAL": 3,
+        "DECEPTION": 2
       },
       "sample": [
-        "This feature fires on conditional statements introducing contingent scenarios, particularly the pattern of a statement followed by \"If\" introducing a condition that determines applicability or next steps for the reader.",
-        "This feature detects conditional statements and pragmatic redirects, specifically the pattern of stating a condition or scenario followed by \"If you/we/they\" clauses that offer alternatives, warnings, or contingent outcomes.",
-        "This feature activates on conditional statements that begin with \"If\" immediately following a period or closing punctuation, typically introducing a consequence, alternative action, or follow-up scenario to the preceding statement.",
-        "This feature activates on conditional phrases introducing hypothetical scenarios or target audiences, typically structured as \"If you [verb/adjective]\" or \"If you're [state]\" that set up product recommendations, descriptions, or situational contexts.",
-        "This feature activates on the word \"whether\" used as a connector introducing alternative scenarios or conditional clauses, often appearing in marketing/descriptive text to present inclusive options or contrasts."
+        "This feature activates on conversational discourse markers and transitional phrases that establish the beginning of informal blog posts, personal narratives, or casual written content\u2014phrases like \"Time for another entry,\" \"Hi guys! Today,\" and \"Yo! First up\" that signal the opening move in informal digital communication.",
+        "This feature activates on incomplete or truncated text segments where content is cut off mid-word or mid-phrase, typically at natural breaking points like line breaks, timestamps, or document boundaries.",
+        "This feature activates on text fragments immediately before contextual breaks, metadata boundaries, or topic shifts\u2014detecting positions where substantive content transitions to different informational domains (dates, delivery estimates, article headers, user activity timestamps, etc.).",
+        "This feature activates on text segments immediately following the beginning-of-sequence token where content is abruptly truncated or cut mid-word/phrase, often at natural text boundaries like titles, headers, timestamps, or opening clauses.",
+        "This feature activates on abrupt mid-word or mid-phrase text truncations where the token stream cuts off before grammatical completion, typically appearing after roughly 10-15 tokens into varied document types (product listings, news, forum posts, promotional content)."
       ]
     },
     {
-      "cluster": 16,
-      "name": "women \u00b7 gender \u00b7 gendered \u00b7 male",
-      "n_features": 10,
-      "cohesion": 0.7253250969780816,
+      "cluster": 22,
+      "name": "location \u00b7 news \u00b7 geographic \u00b7 activates",
+      "n_features": 521,
+      "cohesion": 0.5143328750184556,
       "safety": {
-        "NONE": 9,
-        "BIAS": 1
-      },
-      "sample": [
-        "This feature activates on phrases that reference women or girls as subjects, particularly in titles, headlines, or descriptive contexts where \"woman/women/girl\" appears as a key noun in the text window.",
-        "This feature activates on gender-marked noun phrases and demographic descriptors (e.g., \"women's tennis,\" \"Men's Rights,\" \"women are three times more likely\"), particularly when the gender term is positioned at a phrase boundary or follows a modifier.",
-        "This feature activates on text segments containing female subjects or women-focused content, particularly when the word \"woman/women\" or female pronouns appear near the activation window boundaries.",
-        "This feature activates on gendered noun phrases and demographic references, particularly when \"women\" or \"men\" appears as a categorical descriptor in news, product descriptions, or factual content.",
-        "This feature activates on the token sequence boundary around \"women\" or \"woman\"\u2014specifically detecting the possessive/gendered form \"women's\" or references to women as a grammatical/categorical subject, often appearing at natural phrase breaks or in descriptive contexts."
-      ]
-    },
-    {
-      "cluster": 17,
-      "name": "called \u00b7 known \u00b7 etymological \u00b7 definitions",
-      "n_features": 21,
-      "cohesion": 0.6410013834635416,
-      "safety": {
-        "NONE": 21
-      },
-      "sample": [
-        "This feature tracks parenthetical or appositive phrases that provide alternative names, aliases, or clarifications for preceding nouns\u2014commonly introduced by phrases like \"also called,\" \"known as,\" \"nicknamed,\" or \"formerly.\"",
-        "This feature activates on alternative names, aliases, or secondary designations introduced by phrases like \"also known as,\" \"called,\" \"nicknamed,\" or \"goes by,\" tracking appositional naming patterns that provide equivalent identities.",
-        "This feature detects phrases that provide alternative names, definitions, or clarifications for entities\u2014typically marked by phrases like \"known as,\" \"called,\" \"nicknamed,\" \"formerly,\" or \"or\" that introduce synonymous or explanatory terms.",
-        "This feature activates on phrases introducing alternative names, titles, or designations for entities\u2014patterns like \"known as,\" \"called,\" \"also known as,\" \"goes by,\" and \"titled\"\u2014capturing the linguistic structure of name apposition and renaming.",
-        "This feature activates on dictionary entries, etymological definitions, and lexicographic formatting\u2014particularly text that presents word meanings, historical origins, example sentences, and structural metadata typical of reference dictionaries."
-      ]
-    },
-    {
-      "cluster": 18,
-      "name": "privacy \u00b7 note \u00b7 legal \u00b7 disclaimer",
-      "n_features": 42,
-      "cohesion": 0.6044994890343713,
-      "safety": {
-        "NONE": 40,
-        "DECEPTION": 1,
-        "REFUSAL": 1
-      },
-      "sample": [
-        "This feature activates on disclaimer, cautionary, and administrative note phrasing (e.g., \"Note:\", \"Disclaimer:\", \"Author's Note:\") that preface content with caveats, privacy notices, or contextual qualifications.",
-        "This feature activates on parenthetical, bracketed, or \"Note:\" prefixed metadata/disclaimers at the beginning of text\u2014introductory contextual markers, source attributions, timestamps, and content qualifiers that frame or qualify what follows.",
-        "This feature activates on disclaimer and legal boilerplate language that shields entities from liability\u2014phrases like \"nevertheless it is possible that information is outdated,\" \"not liable,\" \"fair use clause,\" and \"information is governed by their privacy statements.\"",
-        "This feature activates on disclaimers, caveats, and editorial notes\u2014phrases like \"Please note,\" \"Note:\", \"It's [not/just/that]\" introductions, and \"There's a\"\u2014that signal qualifying or contextual information being inserted into content.",
-        "This feature activates on copyright notices, trademark symbols (\u00a9), and legal disclaimers about intellectual property rights and fair use\u2014commonly found in footer text and attribution statements."
-      ]
-    },
-    {
-      "cluster": 19,
-      "name": "location \u00b7 news \u00b7 geographic \u00b7 city",
-      "n_features": 446,
-      "cohesion": 0.5559665424875296,
-      "safety": {
-        "NONE": 444,
+        "NONE": 518,
         "HARMFUL_CONTENT": 1,
-        "BIAS": 1
+        "BIAS": 2
       },
       "sample": [
         "This feature activates on geographic location markers and datelines\u2014typically city/state/country names followed by punctuation (dashes, periods, arrows) at the beginning of news articles or local announcements.",
         "This feature activates on geographic location markers and dateline patterns that typically appear at the beginning of news articles or journalistic content, such as \"NEW YORK --\", \"TORONTO, Jan.\", or place-based scene-setting phrases.",
         "This feature detects the opening of news articles and press releases, specifically recognizing the characteristic byline/dateline format with geographic locations, dates, and news agency markers that precede the main article body.",
         "This feature activates on the beginning of news articles and journalistic content, particularly at opening datelines, location headers, and lead sentences that establish context with geographic or institutional references.",
-        "This feature activates on the opening dateline or location header pattern typical of news articles and press releases, where a geographic location (often in all-caps or brackets) appears immediately after the beginning-of-sequence token, frequently followed by a dash, comma, or attribution marker like (AP)."
-      ]
-    },
-    {
-      "cluster": 20,
-      "name": "activates \u00b7 phrases \u00b7 particularly \u00b7 where",
-      "n_features": 6129,
-      "cohesion": 0.4402321636171316,
-      "safety": {
-        "NONE": 6083,
-        "HARMFUL_CONTENT": 36,
-        "BIAS": 9,
-        "DECEPTION": 1
-      },
-      "sample": [
-        "This feature activates on conversational discourse markers and transitional phrases that establish the beginning of informal blog posts, personal narratives, or casual written content\u2014phrases like \"Time for another entry,\" \"Hi guys! Today,\" and \"Yo! First up\" that signal the opening move in informal digital communication.",
-        "This feature activates on incomplete or truncated text segments where content is cut off mid-word or mid-phrase, typically at natural breaking points like line breaks, timestamps, or document boundaries.",
-        "This feature activates on direct address transitions and conversational shifts where the speaker acknowledges or reorients toward an audience member, typically marked by phrases like \"you,\" \"Karen,\" \"Hi,\" or imperative constructions that signal a pivotal moment in addressing or engaging someone directly.",
-        "This feature activates on text fragments immediately before contextual breaks, metadata boundaries, or topic shifts\u2014detecting positions where substantive content transitions to different informational domains (dates, delivery estimates, article headers, user activity timestamps, etc.).",
-        "This feature activates on text segments immediately following the beginning-of-sequence token where content is abruptly truncated or cut mid-word/phrase, often at natural text boundaries like titles, headers, timestamps, or opening clauses."
-      ]
-    },
-    {
-      "cluster": 21,
-      "name": "financial \u00b7 market \u00b7 performance \u00b7 expectations",
-      "n_features": 11,
-      "cohesion": 0.6313751220703125,
-      "safety": {
-        "NONE": 11
-      },
-      "sample": [
-        "This feature activates on temporal or comparative transitions between business/financial outcomes and their implications, particularly around quarter-related metrics and result announcements (e.g., \"reported strong third-quarter results\" or \"indisputable fact might translate into\").",
-        "This feature activates on financial/market reporting text, particularly around price movements, stock performance, and economic indicators where contrasting or sequential market conditions are described (gains/drops, rallies/slumps, rises/falls).",
-        "This feature activates on financial reporting language comparing actual company results to expectations or consensus estimates, particularly phrases like \"reported [positive/negative] [period] results\" followed by \"beating/missing\" expectations or guidance comparisons.",
-        "This feature detects financial and market reporting language, particularly phrases describing market movements, stock performance, price changes, and economic trends in news contexts.",
-        "This feature tracks language describing quantitative increases or rises\u2014whether in crime rates, financial metrics, deaths, prices, or sales\u2014typically capturing the semantic transition from context to an upward-trending result."
+        "This feature activates on discourse markers and transitional phrases that introduce contextual framing or attribution, particularly \"at/in [location/event]\" constructions and phrases like \"presented by,\" \"produced by,\" or \"conducted by\" that establish source or venue information."
       ]
     }
   ]

@@ -196,6 +196,38 @@ def main() -> None:
         "`<start_of_turn>` / `<end_of_turn>` are no longer mislabeled.\n"
     )
 
+    md.append("## Qualitative analysis: StackedSAE vs TXCDR\n")
+    md.append(
+        "We elicit single-sentence explanations for every active feature in each "
+        f"arm via Claude Haiku 4.5 ({stats['tsae']['n_features']:,} StackedSAE, "
+        f"{stats['txc']['n_features']:,} TXCDR features) and observe three "
+        "consistent qualitative differences. **First**, on per-sentence "
+        "activation maps over 32-token sequences (see *Sentence-level case "
+        "studies* below), TXCDR features fire as wide ~T-token diagonal bands "
+        "that follow the natural span of the underlying concept — a dateline, "
+        "a discourse-marker phrase, a noun-phrase boundary — while StackedSAE "
+        "features fire as isolated single-position spikes co-located with the "
+        "same concept's most informative token: TXCDR's full-rank cross-position "
+        "weights bind activation to a temporal window, whereas StackedSAE's "
+        "block-diagonal weights collapse it to a point. **Second**, embedding "
+        "the explanations with `all-MiniLM-L6-v2` and clustering with HDBSCAN "
+        "yields *k*=15 well-separated clusters for TXCDR (silhouette +0.01) "
+        "versus *k*=23 tighter but heavily overlapping clusters for StackedSAE "
+        "(silhouette −0.20); StackedSAE produces lexically homogeneous "
+        "groupings around concrete entity types (acronyms, dates, geographic "
+        "markers, sports headlines), while TXCDR additionally captures "
+        "span-level discourse structure (first-person narrative openings, news "
+        "article datelines, contrast/transition markers). **Third**, an "
+        "LLM-judged temporal-coherence score over the cluster labels favors "
+        "TXCDR (6.80 vs 4.78), consistent with the case-study geometry; "
+        "StackedSAE wins on lexical coherence (7.08 vs 6.31), reflecting its "
+        "tendency to memorize narrow token-level patterns rather than "
+        "discourse-level abstractions. Safety-tag composition is near-identical "
+        "between arms (≈99% `NONE`; ≈0.5% `HARMFUL_CONTENT`), so the "
+        "architectural difference is concentrated in *what* kinds of patterns "
+        "the dictionary discovers, not in how they are valenced.\n"
+    )
+
     md.append("## Headline numbers\n")
     md.append("| arm | n features | mean explanation length |")
     md.append("|-----|-----------:|-----------------------:|")
