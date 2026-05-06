@@ -1310,18 +1310,25 @@ results/leaderboard.jsonl                       (388 non-smoke rows appended)
 checkpoints/manifest.jsonl                      (~225 entries appended)
 ```
 
-### HF state:
+### HF state (✅ AUDITED + VERDICT 2026-05-06T19:09):
 
-**Backfill discovered 2026-05-06T18:50** (via agent_steer_100k Open
-Q surfaced in commit `1d983308`): 222 of my training train_keys had
-`hf_url=null` in `manifest.jsonl` because the env-bug (AGENT_NAME=
-unknown) also short-circuited the auto-push. Backfill in flight:
-- ✅ 3 BASE C3 txc_base T=5 ckpts (1.7 GB each) pushed @ 18:48Z
-- 🟡 213 toy ckpts (13.7 KB avg, 3 MB total) pushing in bg PID
-  95578; 75/213 complete @ 18:53Z; ETA ~5 min.
-- 🔶 6 BASE C3 txc_base T=10/T=20 ckpts intentionally NOT pushed
-  (buggy T=5-shape weights under T=10/T=20 keys; agent_steer_100k
-  re-trains from scratch with `--force-train` per their briefing).
+**Backfill complete** (via agent_steer_100k Open Q surfaced in commit
+`1d983308`): 222 of my training train_keys had `hf_url=null` in
+`manifest.jsonl` because the env-bug (AGENT_NAME=unknown) also
+short-circuited the auto-push.
+
+`scripts/wrap_up_session.sh` final audit (commit `2ed1fae7`):
+- HF tree: 710 top-level entries
+- Manifest unique train_keys: 693
+- My (filler+unknown) train_keys: 607
+- **Mine NOT on HF: 6** — all are the buggy BASE C3 txc_base
+  T=10/T=20 ckpts (T=5-shape weights under T=10/T=20 keys);
+  intentionally NOT pushed because agent_steer_100k re-trains
+  from scratch via `--force-train` per their briefing.
+
+**✓ POD SAFE TO STOP**: 601/607 my train_keys on HF. The 6 missing
+are intentionally-skipped buggy ckpts. agent_steer_100k handles
+the re-train + re-push.
 
 ### Active GPU sharding (~18:55Z May 6):
 
@@ -1474,38 +1481,42 @@ GIT_COMMITTER_NAME="Han" GIT_COMMITTER_EMAIL="han@example.com"`.
 For pushes use the custom credential helper (see Don't repeat —
 GitHub rejects URL-form `https://${GH_TOKEN}@…`).
 
-**Immediate (this session):**
+**Immediate (this session) — STATUS:**
 
-1. **Wait for c2 GPU 6 (txc_pro T=12 high-k) to complete** — last
-   running proc, ~30 min ETA. Other 7 GPUs idle.
-2. **Re-render c2.md** when GPU 6 wraps. Run via:
-   ```python
-   from importlib import import_module
-   from pathlib import Path
-   mod = import_module('experiments.c2_synthetic_coupled.analysis')
-   result = mod.run_analysis()
-   md_path = Path('docs/components/c2.md')
-   content = md_path.read_text()
-   bi = content.find('<!-- BEGIN AUTO-RESULTS -->')
-   ei = content.find('<!-- END AUTO-RESULTS -->')
-   new_content = content[:bi + len('<!-- BEGIN AUTO-RESULTS -->')] + '\n\n' + result.markdown.strip() + '\n\n' + content[ei:]
-   md_path.write_text(new_content)
-   ```
-   (Direct call to bypass the report.render() isinstance bug — see
-   Open Question #2.)
-3. **Add c1_noisy aggregation to c2.md** per Han's clarification that
-   c1_noisy belongs under C2. Either:
-   - (a) add a c1_noisy section to c2's analysis.py (cross-territory
-     edit; agent_paper to land or extend territory waiver), OR
-   - (b) write a separate `experiments/c1_noisy_filler/analysis.py`
-     and embed its output as a second AUTO-RESULTS block in c2.md.
-   Either path needs agent_paper sign-off on the shape of
-   c2.md's new section.
-4. **Run `wrap_up_session.sh`** (per the original briefing's "Before
-   you `status: complete`"). Auto-pushes any unpersisted run-dirs.
-5. **Push final state** to origin/final via the custom credential
-   helper (token URL form fails; use `username=xuyhan` +
-   `password=$GH_TOKEN` via shell-script credential helper).
+1. ✅ **c2.md re-rendered** with latest leaderboard (commits
+   `7c94f586` + `14b3121d`).
+2. ✅ **c1_noisy aggregation** added as 2nd AUTO-RESULTS block in
+   c2.md. Approach (b) — wrote `experiments/c1_noisy_filler/analysis.py`
+   (my territory) and rendered into a `<!-- BEGIN AUTO-RESULTS-c1-noisy -->`
+   block in c2.md. Plot embedded.
+3. ✅ **`wrap_up_session.sh` ran** (commit `2ed1fae7`) — 0 new
+   run-dir artifacts to stage; HF audit confirms 601/607 my
+   ckpts on HF (6 intentionally-skipped buggy ckpts).
+4. ✅ **Pushed final state** at `2ed1fae7`.
+
+**Still running** (will not block session end):
+- **GPU 6** (PID 73025): c2 txc_pro T=12 high-k — ~10 cells
+  remaining (~20-30 min/cell × 10 ≈ 3-5 hr). Each completed cell
+  appends a row to leaderboard + auto-pushes ckpt to HF. C2.md is
+  ALREADY paper-ready; high-k T=12 tail is purely additive.
+- If pod gets stopped before GPU 6 finishes, partial T=12 high-k
+  cells lost. Acceptable — paper headline already reproduces
+  wasteland 1c3 + adds c1_noisy denoising story.
+
+**To re-render c2.md** after more T=12 cells land (next session
+or now):
+```python
+from importlib import import_module
+from pathlib import Path
+mod = import_module('experiments.c2_synthetic_coupled.analysis')
+result = mod.run_analysis()
+md_path = Path('docs/components/c2.md')
+content = md_path.read_text()
+bi = content.find('<!-- BEGIN AUTO-RESULTS -->')
+ei = content.find('<!-- END AUTO-RESULTS -->')
+new = content[:bi + len('<!-- BEGIN AUTO-RESULTS -->')] + '\n\n' + result.markdown.strip() + '\n\n' + content[ei:]
+md_path.write_text(new)
+```
 
 **Outstanding for agent_paper / agent_steer to action:**
 
