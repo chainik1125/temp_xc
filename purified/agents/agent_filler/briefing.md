@@ -51,6 +51,40 @@ surface it in chat, and let Han or agent_paper land the change. Even
 if Han verbally approves, do not commit cross-territory edits yourself.
 This is non-negotiable — see PROTOCOL.md § 8 + CLAUDE.md Hard Rule #7.
 
+### ✅ TFA BUG FIX 2026-05-06 — landed (commit `53e63fbb`)
+
+**Your bug report from "Open questions" #3 is FIXED.** The C1 driver's
+`_is_valid_cell` no longer treats TFA / TFA-pos as "no constraint".
+agent_paper landed the fix at commit `53e63fbb`:
+
+```python
+# Before: TFA grouped with topk_sae / tsae_paper (per-token, no constraint).
+# After: TFA gets the window-arch constraint at C1.
+if arch_name in ("tfa", "tfa_pos"):
+    T = int(hp.get("T", 5))
+    return k_pos * T <= d_sae         # k_pos × 5 ≤ 40 → k_pos ≤ 8 at C1.
+```
+
+**No relaunch needed for the missing high-k TFA cells.** TFA at
+`d_sae=40` (C1) is **architecturally bounded to k_pos ≤ 8**: at higher
+k_pos the topk over `z_novel` (last dim = `width` = `d_sae` = 40) is
+infeasible because `kval_topk = k_pos × T = k_pos × 5 > 40` crashes
+`torch.topk` (which is exactly what you saw). The fix just makes the
+driver skip them silently instead of crashing — the missing cells
+**cannot exist at C1's toy d_sae=40**.
+
+The 21/36 TFA cells you landed (k ∈ {1, 2, 3, 4, 5, 6, 8} × 3 seeds)
+are the complete valid set for C1 TFA; high-k tail is genuinely
+infeasible (not "missing data"). Pull commit `53e63fbb` to silence
+the future re-run warning if you re-launch C1; otherwise no action
+needed.
+
+**Bug doesn't affect any other component** — agent_paper checked: at
+C3/C5/C6/C7 production scale (d_sae ∈ {18432, 32768}), `k_pos × T = 100`
+is well within bounds. Only C1's toy d_sae=40 triggered the crash.
+
+---
+
 ### ⚠️ ADDITIONAL MISSION 2026-05-05 PM (URGENT) — Take HALF of agent_steer_100k's BASE C3 load
 
 **Han 2026-05-05 PM**: "agent_filler's 8 A40s will eventually become

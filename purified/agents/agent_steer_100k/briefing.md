@@ -67,6 +67,81 @@ surface it in chat, and let Han or agent_paper land the change. Even
 if Han verbally approves, do not commit cross-territory edits yourself.
 This is non-negotiable — see PROTOCOL.md § 8 + CLAUDE.md Hard Rule #7.
 
+### ⚠️ NEW MISSION 2026-05-06 (URGENT) — C3 BASE k_feats expansion {5, 10, 20, 40, 80, 160, 320, 640}
+
+**Han 2026-05-06**: "current C3 has k {5,20} we want to expand to
+{5,10,20,40,80,160,320,640} for all SPARSE PROBES in C3 for both IT
+and BASE!" Your job: **BASE side**. agent_nlp handles IT in parallel.
+
+**This is eval-only — NO RE-TRAINING.** Your existing BASE C3
+checkpoints (TopK, T-SAE, TFA + agent_filler's TXC-base/pro × 3 seeds)
+stay; just run the probing eval at 6 new k_feat values and let them
+cache-hit on training.
+
+### Mission scope (BASE side only)
+
+| Arch | Seeds | New k_feats | New evals |
+|---|---|---|---:|
+| `topk_sae` | {1, 2, 42} | {10, 40, 80, 160, 320, 640} | 18 |
+| `tsae_paper` | {1, 2, 42} | {10, 40, 80, 160, 320, 640} | 18 |
+| `tfa` | {1, 2, 42} | {10, 40, 80, 160, 320, 640} | 18 |
+| `txc_base` (T=5 + T=10 + T=20) | {1, 2, 42} | {10, 40, 80, 160, 320, 640} | 54 |
+| `txc_pro` | {1, 2, 42} | {10, 40, 80, 160, 320, 640} | 18 |
+| **Total new BASE evals** | | | **126** |
+
+(Plus BASE MLC if agent_em_100k builds it — coordinate with them.)
+
+### Per-cell wall-time (eval-only)
+
+Eval-only: ~5-15 min encode + ~minute per (k_feat, task) probe fit on
+your H100. Per (arch, seed) cell with 6 new k_feats: ~12-15 min total.
+
+- 21 cells (5 archs base configs + 3 T-sweep variants for txc_base
+  with 3 seeds each = 21 cells) × ~15 min = **~5-6 hr serial on
+  1× H100**.
+- TXC cells from agent_filler may not have all landed yet; eval
+  those as they finish, in parallel with the per-token archs whose
+  checkpoints you already own.
+
+### First concrete task — extend the existing driver
+
+Your existing `experiments/c3_probing_base/run.py` already supports
+`--k-feats`. Relaunch with the new values:
+
+```bash
+TQDM_DISABLE=1 AGENT_NAME=agent_steer_100k \
+  .venv/bin/python -m experiments.c3_probing_base.run \
+  --archs topk_sae tsae_paper tfa txc_base txc_pro \
+  --seeds 42 1 2 \
+  --k-feats 10 40 80 160 320 640 \
+  > logs/c3_base_kfeat_expand.log 2>&1 &
+```
+
+If TXC cells aren't all in the leaderboard yet (agent_filler still
+running), the runner will skip them with a clear message. Re-launch
+later for the late-landing TXC cells — idempotent.
+
+### Concurrent work: C4 BASE evals still pending
+
+Your earlier mission (C4 BASE qualitative eval, cache-hit on
+agent_filler's TXC checkpoints) is still on the table. Sequence:
+- (a) C3 BASE k_feats expansion (this mission, ~5-6 hr).
+- (b) C4 BASE qualitative eval once agent_filler's TXC-base + TXC-pro
+  checkpoints land (~1-2 hr).
+
+These don't conflict — different drivers, both on your H100.
+
+### Watch-outs
+
+- **Eval-only.** Don't re-train. Pass the same TrainingConfigs you
+  used; runner cache-hits on training, fresh eval_keys for new k_feats.
+- **Don't bump `EVAL_PROTOCOL_VERSION`**. Existing rows at k_feat ∈
+  {5, 20} stay valid; new rows just append at the new k_feats.
+- **Don't render `docs/components/c3.md`** — agent_nlp's territory.
+  agent_paper integrates IT + BASE results at paper-render time.
+
+---
+
 ### ⚠️ LOAD SPLIT 2026-05-05 PM — agent_filler is taking your TXC archs on BASE
 
 **Han 2026-05-05 PM**: "agent_filler's 8 A40s ... NEED TO UTILIZE.

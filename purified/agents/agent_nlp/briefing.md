@@ -40,6 +40,103 @@ surface it in chat, and let Han or agent_paper land the change. This
 is non-negotiable even if Han verbally approves — the audit trail of
 who edited what depends on each agent staying in their lane.
 
+### ⚠️ NEW MISSION 2026-05-06 (URGENT) — C3 k_feats expansion {5, 10, 20, 40, 80, 160, 320, 640}
+
+**Han 2026-05-06**: "current C3 has k {5,20} we want to expand to
+{5,10,20,40,80,160,320,640} for all SPARSE PROBES in C3 for both IT
+and BASE!" Your job: **IT side**. agent_steer_100k handles BASE.
+
+**This is eval-only — NO RE-TRAINING.** Your existing 6-arch C3 IT
+checkpoints (TopK, T-SAE, TXC-base, TXC-pro, TFA, MLC × 3 seeds)
+stay; just run the probing eval at 6 new k_feat values and let them
+cache-hit on training.
+
+### Mission scope
+
+| Arch | Existing k_feats | New k_feats | New evals |
+|---|---|---|---:|
+| `topk_sae` | {5, 20} | {10, 40, 80, 160, 320, 640} | 3 seeds × 6 = 18 |
+| `tsae_paper` | {5, 20} | {10, 40, 80, 160, 320, 640} | 18 |
+| `txc_base` | {5, 20} | {10, 40, 80, 160, 320, 640} | 18 |
+| `txc_pro` | {5, 20} | {10, 40, 80, 160, 320, 640} | 18 |
+| `tfa` | {5, 20} | {10, 40, 80, 160, 320, 640} | 18 |
+| `mlc` (multi-layer) | {5, 20} | {10, 40, 80, 160, 320, 640} | 18 |
+| **Total new evals** | | | **108** |
+
+Plus the txc_base T=10/T=20 cells if they landed (×3 seeds × 6 new
+k_feats × 2 T values = 36 more). Total ~144 evals.
+
+### Per-cell wall-time (eval-only)
+
+The probing eval is dominated by: (a) load probe_cache + run SAE
+forward over 38 SAEBench+CT tasks (~5-15 min on H100, fixed cost),
+plus (b) per-k_feat probe fit (~seconds per k_feat per task). Adding
+6 k_feats to an existing cell: ~30 min total (mostly the fixed encode).
+
+- 18 evals per arch × 6 archs = 108 evals × ~30 min = ~54 hr serial
+- On 2× H100 (own GPU 0 + agent_em's idle GPU 1 if available): **~27 hr**
+- Idempotent: cache-hits on (eval_key for already-existing k_feats);
+  only the 6 new k_feats per cell run.
+
+If you want to compress wall-time, run each arch's 6 new k_feats in
+ONE eval call (encode once, probe 6× per task) instead of 6 separate
+calls. ~12-15 min per (arch, seed) cell instead of 6× ~30 min.
+
+### First concrete task — extend the existing driver
+
+Your existing `experiments/c3_probing/run.py` already takes
+`--k-feats` as a list. Just relaunch with the new values:
+
+```bash
+TQDM_DISABLE=1 AGENT_NAME=agent_nlp \
+  bash scripts/run_on_gpu.sh 0 -- \
+  .venv/bin/python -m experiments.c3_probing.run \
+  --archs topk_sae tsae_paper txc_base txc_pro tfa \
+  --seeds 42 1 2 \
+  --k-feats 10 40 80 160 320 640 \
+  > logs/c3_kfeat_expand_gpu0.log 2>&1 &
+
+# MLC eval has its own driver path (multi-layer cache + 4D probe)
+# in experiments/c3_probing_mlc/. Same --k-feats expansion:
+TQDM_DISABLE=1 AGENT_NAME=agent_nlp \
+  bash scripts/run_on_gpu.sh 1 -- \
+  .venv/bin/python -m experiments.c3_probing_mlc.run \
+  --seeds 42 1 2 \
+  --k-feats 10 40 80 160 320 640 \
+  > logs/c3_kfeat_expand_mlc_gpu1.log 2>&1 &
+```
+
+Or if MLC is agent_em_100k's territory (their checkpoints), they own
+the MLC k_feats expansion. Check with them before running.
+
+### Analysis filter update
+
+After cells land, extend `experiments/c3_probing/analysis.py` to
+include all 8 k_feats in the headline tables. The probing eval row
+schema already has `eval_cfg.k_feat`; `canonical_train_keys` filter
+matches by train_key (one per (arch, seed)) and the analysis groups
+by k_feat. **No filter change needed if the analysis already iterates
+over distinct k_feats found in the leaderboard.**
+
+If the existing analysis.py hardcodes `k_feats=(5, 20)`, update to
+`k_feats=(5, 10, 20, 40, 80, 160, 320, 640)` and re-render the AUTO-
+RESULTS block.
+
+### Watch-outs
+
+- **Eval-only.** Don't re-train. Pass `--seeds 42 1 2` with the same
+  TrainingConfigs you used originally; the runner will hit cached
+  checkpoints (fresh `eval_keys` only because `k_feat` differs).
+- **GPU 1 borrow**: agent_em is idle (their canonical mission +
+  C6 detection both COMPLETE). Borrow GPU 1 for parallel coverage.
+- **MLC eval** uses the multi-layer probe_cache; agent_em_100k owns
+  that. Coordinate with them on who runs MLC's k_feats expansion.
+- **Don't bump `EVAL_PROTOCOL_VERSION`**. The probing protocol is
+  unchanged — only the k_feat axis is wider. Existing rows at
+  `k_feat ∈ {5, 20}` stay valid; new rows append at the new k_feats.
+
+---
+
 ### ⚠️ NEW MISSION 2026-05-05 PM (URGENT) — TXC-base T-sweep on C3 + C4
 
 **Han 2026-05-05 PM**: "we want a txc_base T=10 and T=20 on C3 and C4

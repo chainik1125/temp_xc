@@ -58,6 +58,128 @@ surface it in chat, and let Han or agent_paper land the change. Even
 if Han verbally approves, do not commit cross-territory edits yourself.
 This is non-negotiable — see PROTOCOL.md § 8 + CLAUDE.md Hard Rule #7.
 
+### ⚠️ NEW MISSION 2026-05-06 (URGENT) — BASE MLC parity + k_feats expansion
+
+**Han 2026-05-06**: "current C3 has k {5,20} we want to expand to
+{5,10,20,40,80,160,320,640} for all SPARSE PROBES in C3 for both IT
+and BASE!"
+
+**Your IT MLC sweep is COMPLETE** (commit `782c7702`, 7 cells at the
+multi-layer datasource `gemma_2_2b_it_l11to15_fineweb_24k128`). Your
+H100 is idle. **TWO follow-on missions** to keep paper coverage in
+parity between IT and BASE:
+
+### Mission A — IT MLC k_feats expansion (eval-only, fast)
+
+Re-run your `experiments/c3_probing_mlc/run.py` driver with the 6 new
+k_feats. Cache-hits on training; eval-only.
+
+```bash
+TQDM_DISABLE=1 AGENT_NAME=agent_em_100k \
+  .venv/bin/python -m experiments.c3_probing_mlc.run \
+  --seeds 42 1 2 \
+  --k-feats 10 40 80 160 320 640 \
+  > logs/c3_mlc_kfeat_expand.log 2>&1 &
+```
+
+3 seeds × 6 new k_feats = 18 evals at ~30 min each → **~9 hr serial**
+on 1× H100. (Probe is CPU-bound, much faster; the 30 min is mostly
+the encode pass through 38 SAEBench+CT tasks.)
+
+### Mission B — BASE MLC parity (build cache + train + eval, slow)
+
+C3 IT has 6 archs (TopK, T-SAE, TXC-base, TXC-pro, TFA, MLC).
+C3 BASE has 5 (no MLC yet). For full IT/BASE parity, build the BASE
+multi-layer infrastructure mirroring your IT setup:
+
+| Phase | Work | Wall on H100 |
+|---|---|---:|
+| 1 | Build `gemma_2_2b_base_l11to15_fineweb_24k128` 5-layer cache (~70 GB) | ~3 hr |
+| 2 | Build BASE 5-layer probe_cache (38 tasks) | ~1.5 hr |
+| 3 | Run MLC × 3 seeds × 8 k_feats (5+10+20+40+80+160+320+640) on BASE | ~6-7 hr |
+| **Total** | | **~10-11 hr** |
+
+The datasource entry was already added by agent_paper:
+
+```bash
+.venv/bin/python -c "
+from temp_bench.config import load_datasource
+ds = load_datasource('gemma_2_2b_base_l11to15_fineweb_24k128')
+print('layers:', ds.layers, 'subject:', ds.subject_model)
+"
+```
+
+Build the BASE caches via the same framework calls as your IT build:
+
+```bash
+# 1. BASE multi-layer act cache
+TQDM_DISABLE=1 .venv/bin/python -c "
+from temp_bench.data.nlp.cache import build_activation_cache
+build_activation_cache('gemma_2_2b_base_l11to15_fineweb_24k128')
+" 2>&1 | tee logs/c3_mlc_base_cache_build.log
+
+# 2. BASE multi-layer probe_cache
+TQDM_DISABLE=1 .venv/bin/python -c "
+from temp_bench.data.nlp.probe_cache import build_probe_cache
+build_probe_cache('gemma_2_2b_base_l11to15_fineweb_24k128')
+" 2>&1 | tee logs/c3_mlc_base_probe_cache_build.log
+
+# 3. HF push both before pod restart
+.venv/bin/python -c "
+from huggingface_hub import HfApi
+from temp_bench.config import compute_act_cache_key, load_datasource
+key = compute_act_cache_key(load_datasource('gemma_2_2b_base_l11to15_fineweb_24k128'))
+api = HfApi()
+api.upload_folder(
+    folder_path=f'results/act_cache/{key}',
+    path_in_repo=f'act_cache/{key}',
+    repo_id='han1823123123/temp-bench-data',
+    repo_type='dataset',
+)
+api.upload_folder(
+    folder_path='results/probe_cache/gemma_2_2b_base_l11to15_fineweb_24k128',
+    path_in_repo='probe_cache/gemma_2_2b_base_l11to15_fineweb_24k128',
+    repo_id='han1823123123/temp-bench-data',
+    repo_type='dataset',
+)
+"
+
+# 4. Run BASE MLC sweep (clone your IT driver, swap datasource)
+TQDM_DISABLE=1 AGENT_NAME=agent_em_100k \
+  .venv/bin/python -m experiments.c3_probing_mlc_base.run \
+  --seeds 42 1 2 \
+  --k-feats 5 10 20 40 80 160 320 640 \
+  > logs/c3_mlc_base_full.log 2>&1 &
+```
+
+Step 4's driver is a thin clone of `experiments/c3_probing_mlc/run.py`
+in a new dir `experiments/c3_probing_mlc_base/` with
+`DATASOURCE = "gemma_2_2b_base_l11to15_fineweb_24k128"`. Everything
+else is identical (multi-layer batch_iter, MLC encode, custom probe
+eval).
+
+### Sequencing recommendation
+
+- **Mission A first** (~9 hr): completes IT MLC k_feats expansion.
+- **Mission B second** (~10 hr): BASE MLC parity. Lower priority —
+  the headline IT C3 story is already complete; BASE MLC gives the
+  cross-model story for MLC specifically.
+
+If you only have time for one, do Mission A (smaller delta,
+completes the headline). Mission B is "stretch parity" — the
+paper still works without it (5 archs at BASE is acceptable).
+
+### Watch-outs
+
+- **Mission A is eval-only**; don't re-train MLC. Cache-hits on
+  existing IT MLC checkpoints.
+- **Mission B builds NEW caches** (~70 GB each); don't forget the
+  HF push before pod restart.
+- **TFA bug fix** landed in commit `53e63fbb` — your work isn't
+  affected (you don't run TFA), but FYI for context.
+
+---
+
 ### ⚠️ NEW MISSION 2026-05-05 PM — C3 MLC baseline (decisions § 16, paper-faithful L=5)
 
 **Your prior C3 T-SAE T=2 mission is COMPLETE** (commit `82674a75`).
