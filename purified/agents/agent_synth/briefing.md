@@ -1,14 +1,18 @@
 <!--
-Written by agent_paper 2026-05-06 PM. Synthetic-investigation agent;
-mission rewritten 2026-05-06 PM to "global vs local" narrative after
-Han pivot. Pod upgraded to 8× H100 + 1.8 TB RAM + 224 CPUs.
+Written by agent_paper 2026-05-06 PM. Mission re-rewritten by
+agent_filler 2026-05-06T23:00Z under direct Han override:
+"the point I want is for them to try different synthetic setups
+(change emissions, generation process) until they find a case that
+cleanly demonstrates TXC wins in global feature recovery — I point
+is to find a TXC WIN NOT GIVE MORE REASONS FOR IT TO LOSE!!!"
+Pod: 8× H100 + 1.8 TB RAM + 224 CPUs.
 Section ownership rules: PROTOCOL.md § 14.
 -->
 
 ---
 agent: agent_synth
-last_state_update: 2026-05-06T22:00:00Z
-component: c2 (synthetic — global-vs-local narrative + Dmitry-bench audit)
+last_state_update: 2026-05-06T23:00:00Z
+component: c2 (synthetic — HUNT FOR TXC GLOBAL-FEATURE WIN)
 ---
 
 ## Identity + mandate (Han owns — agents do not edit)
@@ -66,291 +70,265 @@ surface it in chat, and let Han or agent_paper land the change. Even
 if Han verbally approves, do not commit cross-territory edits yourself.
 This is non-negotiable — see PROTOCOL.md § 8 + CLAUDE.md Hard Rule #7.
 
-### ⚠️ NEW MISSION 2026-05-06 PM (URGENT) — "GLOBAL vs LOCAL" Narrative
+### ⚠️ MISSION 2026-05-06T23:00Z (URGENT, FEW HOURS) — HUNT FOR TXC WIN
 
-**Han 2026-05-06 PM** (verbatim): "if we can come up with a coherent
-narrative saying that TXC finds more global features, SAE (e.g. TopK)
-more local then we WIN."
+**Han 2026-05-06T23:00Z** (verbatim, OVERRIDE on prior briefing):
 
-**Pod upgraded**: 8× H100 (640 GB GPU mem) + 1.8 TB RAM + 224 CPUs.
-Use the parallelism aggressively — sweeps that took 6 hr on 8× 5090
-should finish in ~2 hr here.
+> "the point I want is for them to try different synthetic setups
+> (change emissions, generation process) until they find a case that
+> cleanly demonstrates TXC wins in global feature recovery!!!!! I
+> point is to find a TXC WIN NOT GIVE MORE REASONS FOR IT TO LOSE!!!
+> CAN YOU REWRITE THE SYNTH BRIEFING WE ONLY HAVE FEW HOURS LEFT THEY
+> NEED TO FULLY LEVERAGE THE 8 H100"
 
-### The thesis
+**Throw away the prior d_sae-sweep plan.** That plan was a robustness
+check that risked exposing more TXC weaknesses. The new mission is
+**search for a parameter regime where TXC > SAE on gAUC by a large,
+reproducible margin** and then dial in a paper-grade headline figure.
 
-> **TXC dictionaries align with GLOBAL hidden features. Per-token SAE
-> dictionaries align with LOCAL emission features. The divide is
-> robust across (k_pos, d_sae, seed, ρ). One headline figure — a 2D
-> Pareto plot eAUC × gAUC — makes this unmistakable.**
+### The brief
 
-This narrative is HONEST about Dmitry's reframe (TXC's win is
-window-encoder bias, not "true Effect 2 temporal pattern detection").
-Instead of fighting Dmitry, we accept it and frame it as
-**architectural specialization**: TXC trades fine-grained per-token
-resolution for global feature recovery — a deliberate design
-choice. Per-token SAE makes the opposite trade-off. Both are useful;
-the dictionary specializes toward different feature scales.
+You are on a few-hour budget on 8× H100 (640 GB total GPU mem, 1.8 TB
+RAM, 224 CPUs). **Maximally parallel; minimal sequencing.** You will
+sweep across multiple synthetic generative processes, find one (or
+two) where TXC clearly dominates SAE on gAUC, and produce a
+paper-grade headline figure showing the win.
 
-### Take note of Dmitry's struggles — what to learn
+### Where TXC is most likely to win — the search space
 
-Read these BEFORE launching:
+From Dmitry's results (the **only existing TXC win** is his Bench 2):
 
-- `git show origin/dmitry-synthetic:docs/dmitry/synthetic/2026-05-06_overnight/results.md`
-- `git show origin/dmitry-synthetic:docs/dmitry/results/3arch_3bench_summary.md`
+> **Bench 2 (coupled noisy + overlap, p_B=0.5, n_parents=5)** at
+> raw_k=5, ρ=0.9: TXC-base 0.97 gAUC vs SAE 0.58 gAUC. **+0.39
+> margin.** This is the largest TXC gAUC advantage on his suite.
 
-Headline numbers from Dmitry that ALREADY support the global-vs-local
-divide (his data, his archs):
+Mechanism: per-token noise + dense overlap = per-token signal is
+unreliable + ambiguous. TXC's window pooling averages out the noise
+and disambiguates via cross-token consistency.
 
-- **Bench 1 (coupled deterministic)** at ρ=0.9: as raw_k grows from
-  1→10, regular_sae's eAUC climbs 0.49→0.81 while gAUC drops
-  0.87→0.74 (specializing toward LOCAL). TXC-base T=5's eAUC stays
-  flat at 0.53→0.60 while gAUC sits at 0.99 throughout (specializing
-  toward GLOBAL).
-- The same pattern persists at ρ=0.0, ρ=0.6, ρ=0.9 — **the divide
-  doesn't require temporal correlation** (i.e., it's NOT Effect 2).
-  This is fine for our narrative: we claim architectural
-  specialization, not temporal pattern detection.
+**Hypothesis: pushing this regime further opens a clean TXC win.**
+Specifically:
+- **Lower p_B** (more emission noise): p_B ∈ {0.5, 0.3, 0.2, 0.1}.
+  At p_B=0.1, only 10% of "should-fire" emissions actually fire —
+  per-token reading is essentially uninformative. TXC's averaging
+  is the only way to recover hidden state.
+- **Higher n_parents** (more coupling overlap): n_parents ∈ {2, 5, 8, 10}.
+  At n_parents=10 (every emission has every hidden chain as parent),
+  per-token co-firing patterns are maximally ambiguous.
+- **Multiple K, M ratios**: K=10/M=20 (Dmitry default) vs
+  K=5/M=20 (more emissions per chain) vs K=20/M=20 (1:1, but
+  overlap means it's still ambiguous).
 
-Dmitry's stress benches where **TXC genuinely fails** — we must
-reproduce these and OWN them as caveats:
+### Mission — 4 phases (HUNT, ZOOM, ENGINEER, HEADLINE)
 
-- **Bench D (`bench_d_separable_smoothed`)**: SAE wins by ~3× on
-  hidden_corr at raw_k=10 (SAE 0.71 vs TXC-base 0.25, txcdr_t5 0.26).
-  When the data has token-smoothed support (separable structure),
-  per-token decomposition wins.
-- **temporal_derivative_v2**: TXC fails to recover rises (transitions).
-  Encoder scalar-bottleneck = TXC is a temporal *smoother*, not a
-  *differentiator*. Per-token SAE matches its information-theoretic
-  ceiling; TXC sits below it.
-- **E9 DC/AC ablation**: across 9 of 10 benches, TXC's hidden-state
-  recovery is 50-90% DC-driven (i.e., the time-CONSTANT component of
-  TXC features carries the signal; the time-VARYING part collapses
-  by 21-88% when removed). This means TXC's "wins" are mostly static
-  averaging, not exploiting temporal patterns.
-
-**For our paper**: don't claim Effect 2. Claim that TXC's
-window-encoder produces architecturally-global features (whatever
-the mechanism), and that SAE produces architecturally-local features.
-The divide is the story.
-
-### Coordination (do NOT duplicate)
-
-- **agent_filler is doing the C2 ρ-sweep** on the 8× A40 pod
-  (commit `fa99bb29` reactivated; running on GPUs 1-4). They cover
-  ρ ∈ {0.0, 0.3, 0.6, 0.9} for the 3-arch headline trio. **agent_synth
-  uses ρ=0.7 only in Phase 1**; cache-hits on agent_paper's existing
-  C2 cells where possible.
-- **DC/AC ablation is parked**: Han's pivot supersedes the original
-  "Effect 1 vs Effect 2" mission. agent_paper may pick up later.
-- **Don't render `docs/components/c2.md`** — agent_paper's territory.
-  Your job: produce data + the headline Pareto plot. agent_paper
-  integrates.
-
-### 4-phase mission (~12-14 hr on 8× H100)
-
-**Phase 1 — Establish global-vs-local on existing C2 setup (~1.5 hr)**
-
-The existing `coupled_hmm` generator already produces both ground
-truths (`emission_features` local, `hidden_features` global). The
-existing eval module already computes both eAUC and gAUC. **Reuse,
-don't rebuild.**
-
-Cells to run:
-- 6 archs: `topk_sae`, `stacked_sae` T={2, 5}, `txc_base` T=5, `txc_pro`
-  T={2, 5} (the 7th `txc_pro` T=12 is optional; budget permitting)
-- 3 seeds: {1, 2, 42}
-- 8 k_pos: {1, 2, 3, 5, 8, 12, 17, 20}
-- 3 d_sae: {40, 80, 200} ← NEW axis (currently single d_sae=40)
-- 1 ρ value: 0.7 (agent_filler covers the rest)
-
-= ~432 cells. ~5 min/cell on H100 → 9 hr serial; ~1.5 hr on 8 GPUs
-parallel.
-
-Datasource for d_sae=80 / 200: add new YAML entries
-(`toy_coupled_K10_M20_d256_dsae{80,200}`) in
-`configs/datasources.yaml` OR pass `arch_hparams_override={"d_sae": N}`
-through TrainingConfig. The latter is cleaner (no new datasources).
-Verify the runner pipeline supports d_sae override; if not, surface
-as Open question.
-
-**Deliverable**: Pareto scatter — eAUC on x-axis, gAUC on y-axis. One
-point per (arch, k_pos, d_sae). Color by arch family (TXC family
-green, SAE family orange). Connecting lines through k_pos at fixed
-d_sae. Visual prediction:
-
-```
-gAUC ↑
-1.0  ──── TXC cluster (upper-left): high gAUC, low-mid eAUC
-     ╲
-0.8       SAE cluster (lower-right): low gAUC, high eAUC
-0.6  ────────────────→  eAUC
-     0.5            1.0
-```
-
-Save to `experiments/c2_synthetic_coupled/plots/c2_pareto_global_vs_local.png`.
-Surface to Han when Phase 1 lands.
-
-**Phase 2 — Stress-test with Dmitry's benches (~3-4 hr)**
-
-Port two generators from `origin/dmitry-synthetic:src/bench/data.py`:
-
-- `purified/src/temp_bench/data/toy/separable_smoothed.py` —
-  bench_d generator (token-smoothed support).
-- `purified/src/temp_bench/data/toy/temporal_derivative.py` —
-  state + rise generator (bench 3).
-
-Add header comment with attribution: source commit hash + author
-(Dmitry Manning-Coe) + branch name. Add YAML datasource entries.
-Author thin run-driver dirs at
-`experiments/c2_separable_smoothed/run.py` and
-`experiments/c2_temporal_derivative/run.py` — copy the
-`c2_synthetic_coupled/run.py` skeleton.
-
-Run our 6-arch trio × 3 seeds × 5 k_pos = 90 cells per bench.
-~30 min each on 8 GPUs.
-
-Outcome predictions:
-- Bench D: our TXC archs likely match Dmitry's failure (~3× SAE win
-  on h_corr). **Own as caveat**: "TXC trades local-feature resolution
-  for global-feature recovery; on benches where the discriminative
-  signal is local-token structure, TXC underperforms by design."
-- temporal_derivative_v2: our TXC archs likely fail to recover rises.
-  **Own as caveat**: "TXC is a temporal smoother, not a differentiator.
-  Position-resolved features are not within the architectural scope."
-
-If our archs unexpectedly succeed where Dmitry's fail, that's a
-counter-narrative — flag immediately to Han.
-
-**Phase 3 — Design "Hierarchical Features" bench (~6 hr)**
-
-Author a NEW generator in
-`purified/src/temp_bench/data/toy/hierarchical.py`:
-
-```python
-# K_g = 10 global slow chains, ρ_g = 0.95, π_g = 0.02 (sparse + slow)
-# K_l = 50 local fast features, iid Bernoulli (ρ_l = 0)
-# Each global chain modulates a SUBSET (5-10) of local features:
-#   when h_g[i](t) = 1, local features in modulation_set[i] fire with
-#   probability p_fire_modulated; when 0, fire with p_fire_baseline.
-# x(t) = Σ h_g[i](t) · f_g[i] + Σ s_l[j](t) · f_l[j]
-#   where f_g[i] ∈ R^d are GLOBAL directions (orthogonal across i)
-#   and f_l[j] ∈ R^d are LOCAL directions (orthogonal across j, AND
-#   approximately orthogonal to all f_g[i])
-# Two ground truths: 10 global directions, 50 local directions
-```
-
-Predicted result: TXC dictionary atoms align with global directions
-(high gAUC, low eAUC); SAE dictionary atoms align with local
-directions (low gAUC, high eAUC). The divide should widen at small
-$d_{\rm sae}$ where atoms compete for "what to recover."
-
-Add `c2_hierarchical/run.py` driver. Sweep:
-- 6 archs × 3 seeds × 5 k_pos × 3 d_sae × 2 (K_l, K_g) ratios
-  = ~540 cells. ~30 min on 8 GPUs.
-
-**Deliverable**: extend the Phase 1 Pareto plot to include hierarchical
-bench points. Same visual: TXC upper-left, SAE lower-right, but with
-sharper separation since the bench is engineered for the divide.
-
-**Phase 4 — Final headline figure (~2 hr)**
-
-Single figure combining Phase 1 + Phase 3 cells (Phase 2 cells get a
-separate "where TXC loses" panel). Surface to Han for c2.md
-integration. agent_paper writes the prose; you produce the data + plot.
-
-### First concrete steps — bring up pod + sanity
+#### Phase 0 — Smoke (~15 min)
 
 ```bash
 cd /workspace/temp_xc/purified
-
-# Confirm tokens + venv (Han bootstrapped this once before agent spawn)
-ls /workspace/.tokens/hf_token
-[ -d .venv ] || uv sync
-
-# Source the (updated) env
 source scripts/set_agent_env.sh agent_synth
-# Expected: AGENT_NAME=agent_synth, CUDA_VISIBLE_DEVICES=0,
-#           TEMP_BENCH_POD_MODE=ephemeral, torch.cuda.device_count()=1
-
 bash scripts/agent_smoke_test.sh
 git pull --rebase origin final
 
-# Read Dmitry's two markdowns BEFORE launching cells:
-git show origin/dmitry-synthetic:docs/dmitry/results/3arch_3bench_summary.md | head -200
-git show origin/dmitry-synthetic:docs/dmitry/synthetic/2026-05-06_overnight/results.md | head -200
+# Read agent_filler's analysis docs first (saves you 1 hr of
+# re-deriving Dmitry):
+cat docs/components/c2_dmitry_comparison.md
+cat docs/components/c2_narrative_brainstorm.md
 
-# Smoke ONE Phase 1 cell at n_steps=200 to verify the pipeline:
+# Smoke one cell to verify the pipeline:
 TQDM_DISABLE=1 AGENT_NAME=agent_synth \
   .venv/bin/python -m experiments.c2_synthetic_coupled.run \
-  --archs txc_pro --seeds 42 --k-poses 5 --rho-values 0.7 \
+  --archs txc_base --seeds 42 --k-poses 5 --rho-values 0.7 \
   --n-steps 200 --smoke 2>&1 | tail -20
 ```
 
-Then launch the Phase 1 sweep on 8 GPUs in parallel via
-`scripts/run_on_gpu.sh`. Mirror agent_filler's launch pattern at
-`experiments/c2_synthetic_coupled/run_rho_sweep.sh`.
+#### Phase 1 — HUNT: coarse parameter sweep across MANY generative setups (~2 hr)
+
+**Goal**: find which (generator, parameters) combo produces the
+biggest gAUC gap (TXC - SAE).
+
+Port Dmitry's `coupled_noisy_overlap` generator from
+`origin/dmitry-synthetic:src/bench/data.py` into
+`purified/src/temp_bench/data/toy/coupled_noisy.py` (header comment
+with source commit + Dmitry attribution). Add a YAML datasource
+`toy_coupled_noisy_K10_M20_d256` (parametrized by `p_B` and
+`n_parents` via override).
+
+Then sweep, **8 GPUs × 1 (p_B, n_parents) cell each** (one process
+per GPU, each driver iterates over k_pos and seeds):
+
+| GPU | p_B | n_parents |
+|---|---|---|
+| 0 | 0.5 | 2  (Dmitry Bench 1: deterministic-ish baseline) |
+| 1 | 0.5 | 5  (Dmitry Bench 2: known TXC win — reproduce!) |
+| 2 | 0.3 | 5  (more noise, same overlap) |
+| 3 | 0.3 | 8  (more noise + more overlap) |
+| 4 | 0.2 | 8  (extreme noise + extreme overlap) |
+| 5 | 0.5 | 8  (modest noise + extreme overlap) |
+| 6 | 0.1 | 5  (very high noise, modest overlap) |
+| 7 | 0.5 | 10 (max overlap; n_parents=K) |
+
+Each cell: 2 archs (`topk_sae`, `txc_base` T=5) × 3 seeds × 6 k_pos
+{1, 2, 5, 10, 15, 20} × ρ=0.9 × n_steps=20_000 (smaller than 30k for
+speed). = 36 cells per GPU × 8 = **288 cells total, ~30 min wall**.
+
+**Deliverable**: `experiments/c2_synthetic_coupled/hunt_summary.json`
+listing for each (p_B, n_parents) the max gAUC gap = mean over seeds
+of (gAUC_txc_base - gAUC_topk_sae) at each k_pos. Pick the WINNING
+cell — biggest positive gap.
+
+#### Phase 2 — ZOOM: dense sweep at the winning cell (~1.5 hr)
+
+Take the (p_B, n_parents) winner from Phase 1. Run dense:
+- 6 archs: `topk_sae`, `stacked_sae` T={2, 5}, `txc_base` T=5,
+  `txc_pro` T={2, 5}
+- 3 seeds: {1, 2, 42}
+- 12 k_pos: {1, 2, 3, 4, 5, 6, 8, 10, 12, 15, 17, 20}
+- 1 (p_B, n_parents) (the winner)
+- 1 ρ=0.9
+- n_steps=30_000 (full)
+
+= 216 cells. Shard 8-way across GPUs by (arch, seed) → ~30 cells per
+GPU × ~30 sec/cell = ~15 min wall.
+
+**Deliverable**: gAUC vs k_pos line plot at the winning cell, all 6
+archs. **TXC family clearly above SAE family** is the headline.
+Save to `experiments/c2_synthetic_coupled/plots/c2_txc_win_gauc_vs_k.png`.
+
+If Phase 1 produces multiple competitive cells, Phase 2 can dense-
+sweep the top 2 in parallel (4 GPUs each).
+
+#### Phase 3 — ENGINEER: hierarchical-features bench (~2 hr)
+
+Build a generator engineered for the global-vs-local divide:
+
+```python
+# K_g = 10 global slow chains, ρ_g = 0.95, π_g = 0.05
+# K_l = 30 local fast features, ρ_l = 0 (i.i.d.), π_l = 0.1
+# Each h_g[i] modulates a SET of n_modulated_local local features:
+#   when h_g[i](t)=1, modulated locals fire with p=0.8;
+#   when h_g[i](t)=0, modulated locals fire with p=0.1.
+# x(t) = Σ h_g[i](t) · f_g[i] + Σ s_l[j](t) · f_l[j]
+#   where f_g, f_l are orthogonal directions in R^d (d=256, d_sae=80).
+# Two ground truths: 10 global directions f_g, 30 local directions f_l.
+```
+
+The structure is engineered to favor TXC: global features are
+**slow** (ρ_g=0.95) and explain large chunks of variance over windows;
+local features are **fast** (ρ_l=0, fresh per token) and only explain
+single tokens. SAE per-token recon prefers locals; TXC window-recon
+prefers globals.
+
+`src/temp_bench/data/toy/hierarchical.py` (new file with header
+comment); YAML entry; driver at `experiments/c2_hierarchical/run.py`.
+
+Sweep: 6 archs × 3 seeds × 6 k_pos = 108 cells × 1 d_sae × 1 ρ
+configuration. ~10 min wall on 8 GPUs.
+
+**Deliverable**: same gAUC vs k_pos plot, hierarchical bench. Should
+show even sharper TXC > SAE separation (we ENGINEER for it).
+
+#### Phase 4 — HEADLINE figure for the paper (~30 min)
+
+Combine Phase 2 + Phase 3 winners into ONE figure:
+- Two side-by-side panels, one per bench (zoomed Dmitry-style noisy +
+  hierarchical).
+- Each panel: gAUC vs k_pos, line per arch, TXC family clearly above
+  SAE family. Error bars (std over seeds).
+- Title: "TXC dictionaries recover global features that per-token
+  SAEs miss" (or similar Han approves).
+
+Surface to Han + agent_paper. agent_paper integrates into c2.md.
+
+### Coordination (do NOT duplicate)
+
+- **agent_filler is on the C2 ρ-sweep on 8× A40** (commit `fa99bb29`,
+  GPUs 0-7). They cover the existing C2 setup at ρ ∈ {0.0, 0.3, 0.6,
+  0.9, 0.7} for the headline trio. **agent_synth runs DIFFERENT
+  generators** (noisy+overlap with p_B != 1 and n_parents > 2;
+  hierarchical) — no overlap.
+- **DO NOT run the existing C2 setup** (toy_coupled_K10_M20_d256
+  with deterministic OR-gate, p_B=1) — agent_filler covers it.
+- **DO NOT run the d_sae sweep** (the prior briefing's Phase 1) —
+  cancelled. Use the existing per_component_hparams (d_sae=40 for c2;
+  d_sae=80 for hierarchical because the bench has 40 ground-truth
+  features and we want over-parameterization).
+- **DO NOT render `docs/components/c2.md`** — agent_paper's
+  territory. Your job: produce data + plots. agent_paper integrates.
+
+### Stop-conditions / honesty checklist
+
+If at any point you hit:
+- A regime where TXC < SAE on gAUC for the supposedly-favored bench →
+  **don't bury it.** Surface immediately. Try a different parameter
+  region. We hunt; we don't fudge.
+- A regime where TXC ≈ SAE everywhere (no clean win across 4-8
+  parameter combos) → surface to Han ASAP. The narrative may need to
+  shift away from "TXC wins" toward "TXC and SAE find different
+  features" (Pareto framing, not domination).
+- An architectural blowup (OOM, crash) → reduce d_sae or k_pos for
+  the failing arch. Don't drop the arch; document the limit.
 
 ### Watch-outs
 
-- **agent_filler is on the ρ-sweep** — DO NOT duplicate. Phase 1 is
-  d_sae × k_pos × seed × arch at fixed ρ=0.7.
 - **HF auto-push is ON** for ephemeral pods. Every checkpoint
   auto-uploads. Don't disable.
-- **Don't run cells with d_sae > 200** without flagging — TXC at
-  d_sae=200, T=12 might exhaust 80 GB VRAM. Test small first.
-- **Don't render `docs/components/c2.md`** — agent_paper's territory.
 - **Don't modify `src/temp_bench/architectures/`** — never. SAE/TXC
   arch code is locked.
 - **Don't bump EVAL_PROTOCOL_VERSION** for C2 (currently "1.0.0").
-- **arch_hparams_override mechanism** for d_sae sweep: pass
-  `TrainingConfig(arch_hparams_override={"d_sae": N})`. Verify the
-  runner's `compute_train_key` includes this hash. If d_sae override
-  doesn't work cleanly, fall back to new datasource entries.
+- **n_steps=20_000 in Phase 1** for speed; bump to 30_000 in Phase 2
+  for the headline cells. Bigger n_steps gives sharper TXC wins
+  (the encoder needs time to converge to global features).
+- **Use ρ=0.9 throughout** — Dmitry confirmed the divide is robust to
+  ρ; 0.9 maximizes the TXC encoder's signal.
+- **Per-cell wall on H100** (~80 GB, fast tensor cores): ~1-2 min for
+  d=256 d_sae=40 n_steps=20k cells. Plan accordingly.
 
 ### Open questions for Han
 
-- **TEMP_BENCH_POD_MODE**: the upgraded 8× H100 pod likely has
-  persistent /workspace. Should this switch from `ephemeral` to
-  `persistent`? Currently ephemeral (HF auto-push safety) — flag if
-  the pod actually has persistent storage and HF push is overkill.
-- **Phase 3 K_g / K_l ratio**: K_g=10, K_l=50 is a guess. If results
-  are weak, try K_g=5, K_l=100 (more extreme local-vs-global ratio).
-- **stretch — porting Dmitry's full bench harness**: his
-  `src/bench/{data,sweep,eval}.py` is unified. Worth porting wholesale
-  for a unified C2 harness, or stick with per-bench drivers? Default
-  to per-bench drivers; Han calls if reframe needed.
+- **TEMP_BENCH_POD_MODE on 8× H100**: currently set to `ephemeral`.
+  If the upgraded pod has persistent /workspace, switch to `persistent`?
+- **Hierarchical bench tuning**: Phase 3's K_g=10, K_l=30, n_modulated=
+  3 is a guess. If TXC win isn't crisp, try K_l=50 (more locals to
+  distract SAE) or n_modulated=5 (more global influence).
+- **Should we also sweep ρ ∈ {0.6, 0.9} in Phase 2** (the winning cell)
+  to show the win is ρ-robust? agent_filler is doing ρ-sweep on the
+  DETERMINISTIC bench, not on the noisy+overlap bench.
 
 ### References
 
-- `origin/dmitry-synthetic:docs/dmitry/results/3arch_3bench_summary.md` —
-  Dmitry's Effect 1 vs Effect 2 framework, 3-bench results.
-- `origin/dmitry-synthetic:docs/dmitry/synthetic/2026-05-06_overnight/results.md` —
-  Dmitry's overnight headline numbers + E9 DC/AC ablation.
-- `origin/dmitry-synthetic:src/bench/{data,sweep,eval}.py` — Dmitry's
-  unified bench harness (port generators selectively).
+- `docs/components/c2_dmitry_comparison.md` — agent_filler's analysis
+  of Dmitry's results vs ours. **READ FIRST** before launching.
+- `docs/components/c2_narrative_brainstorm.md` — agent_filler's
+  brainstorm of narratives that survive Dmitry's critique.
+- `origin/dmitry-synthetic:docs/dmitry/results/3arch_3bench_summary.md`
+- `origin/dmitry-synthetic:docs/dmitry/synthetic/2026-05-06_overnight/results.md`
+- `origin/dmitry-synthetic:src/bench/data.py` — Dmitry's generators.
+  Port `coupled_noisy_overlap` and re-use license/attribution.
 - `purified/src/temp_bench/data/toy/coupled.py` — `coupled_hmm()`
   returns CoupledData with both emission + hidden features.
 - `purified/src/temp_bench/eval/synthetic.py` — `feature_recovery()`
-  + `global_recovery_gAUC()` (already-implemented, no porting needed).
-- `purified/experiments/c2_synthetic_coupled/run.py` — driver layout
-  to mirror for new bench dirs.
-- `agents/agent_paper/decisions.md` § 11 / § 16 — locked archs +
-  per-arch literature-faithful T.
+  + `global_recovery_gAUC()` already implemented.
+- `purified/experiments/c2_synthetic_coupled/run.py` — driver skeleton
+  to copy.
+- `agents/agent_paper/decisions.md` § 11 — locked arch list.
 
 ---
 
 ## Current state (agent owns — overwrite at every compact)
 
-**Last verified: 2026-05-06 PM (briefing rewrite — Han pivot to "global
-vs local" narrative).**
+**Last verified: 2026-05-06T23:00Z** (briefing re-rewritten by
+agent_filler under Han override — "find a TXC win, not more reasons
+to lose"). **The d_sae-sweep plan is CANCELLED.** Run the new HUNT
+mission below.
 
 Pod: 8× H100 (640 GB GPU mem) + 1.8 TB system RAM + 224 CPUs.
 Status: idle, awaiting first session.
 
-Mission summary: produce one headline figure (eAUC × gAUC Pareto plot)
-showing TXC dictionaries skew toward GLOBAL features and SAE
-dictionaries skew toward LOCAL features. Phases 1 → 4 above. agent_filler
-is doing the ρ-sweep separately on the 8× A40 pod — DO NOT duplicate.
+Mission: hunt across (p_B, n_parents) parameter space on a
+noisy+overlap coupled-features generator (port from Dmitry) to find
+a regime with maximal gAUC gap (TXC > SAE). Then build a hierarchical-
+features bench engineered for the divide. Two headline figures.
+~6 hr budget.
 
 (Overwrite this section once you start work.)
 
@@ -362,28 +340,54 @@ is doing the ρ-sweep separately on the 8× A40 pod — DO NOT duplicate.
 
 1. `cd /workspace/temp_xc/purified`
 2. `source scripts/set_agent_env.sh agent_synth`
-3. `bash scripts/agent_smoke_test.sh` (CRITICAL preflight — failures
-   are fatal)
+3. `bash scripts/agent_smoke_test.sh` (CRITICAL preflight — fatal
+   on failure)
 4. `git pull --rebase origin final`
-5. **Read Dmitry's two markdowns** via `git show origin/dmitry-synthetic:...`
-   (paths in References below). Internalize what failed for him so we
-   own the caveats honestly.
-6. Smoke ONE cell at n_steps=200 (verify the C2 driver still launches).
-7. Launch Phase 1 sweep on 8 GPUs in parallel — 432 cells total.
-8. After Phase 1 wraps, render the eAUC × gAUC Pareto scatter and
-   surface to Han with a one-paragraph reading.
-9. Wait for Han's greenlight on Phase 2 (Dmitry-bench reproductions)
-   before launching.
+5. **Read agent_filler's two analysis docs** before launching:
+   - `docs/components/c2_dmitry_comparison.md` (saves you 1 hr of
+     re-deriving Dmitry's framework)
+   - `docs/components/c2_narrative_brainstorm.md` (the recommended
+     hybrid narrative + 7 concrete experiment proposals)
+6. Smoke ONE cell at n_steps=200 to verify the C2 driver still
+   launches.
+7. **Phase 1 — HUNT**: port `coupled_noisy_overlap` generator from
+   `origin/dmitry-synthetic:src/bench/data.py`. Add YAML datasource
+   `toy_coupled_noisy_K10_M20_d256` with `p_B`/`n_parents` overrides.
+   Launch 8 parallel shards (table in mission), 36 cells each, at
+   n_steps=20_000.
+8. **Phase 2 — ZOOM**: take the winning (p_B, n_parents) cell from
+   Phase 1, dense-sweep 6 archs × 3 seeds × 12 k_pos at n_steps=30_000.
+   Render gAUC vs k_pos line plot, save to
+   `experiments/c2_synthetic_coupled/plots/c2_txc_win_gauc_vs_k.png`.
+9. **Phase 3 — ENGINEER**: build hierarchical-features generator at
+   `src/temp_bench/data/toy/hierarchical.py`. K_g=10 slow + K_l=30
+   fast. Sweep 6 archs × 3 seeds × 6 k_pos. Render gAUC vs k_pos.
+10. **Phase 4 — HEADLINE**: combine Phase 2 + Phase 3 plots into a
+    single 2-panel figure. Surface to Han + agent_paper.
 
 ## Don't repeat (agent owns — overwrite)
 
 ### Mission scope
-- **Don't duplicate agent_filler's ρ-sweep**. They cover ρ ∈ {0.0,
-  0.3, 0.6, 0.9}. Phase 1 stays at ρ=0.7.
-- **Don't run anything other than synthetic investigation** Phases
-  1-4. Don't pursue C3/C4/C5/C6/C7 work — other agents own those.
-- **Don't run DC/AC ablation** unless Han re-greenlights — parked
-  per Han's pivot.
+- **CANCELLED PRIOR PLAN** — the d_sae sweep on the EXISTING C2
+  setup (~432 cells, ρ=0.7) is dead per Han 2026-05-06T23:00Z. That
+  plan was a robustness test that risked exposing TXC weakness; the
+  new mission is the OPPOSITE: hunt for regimes where TXC wins.
+- **Don't duplicate agent_filler's ρ-sweep**. They cover the existing
+  C2 setup (deterministic OR-gate). agent_synth runs DIFFERENT
+  generators (noisy+overlap, hierarchical).
+- **Don't run anything other than synthetic investigation Phases
+  1-4 above**. Don't pursue C3/C4/C5/C6/C7 work — other agents own
+  those.
+- **Don't run DC/AC ablation** unless Han re-greenlights — parked.
+
+### Hunt discipline
+- **DON'T fudge.** If a regime gives TXC < SAE on gAUC, surface it.
+  Try a different parameter region. We hunt; we don't fish.
+- **DON'T skip the smoke** (Phase 0) — pipeline failure on H100 vs
+  A40 has bitten before.
+- **DON'T jump straight to Phase 3 (hierarchical) without Phase 1
+  (port + hunt)** — Phase 1's coarse sweep is the cheapest way to
+  find a winning regime within 30 min.
 
 ### Territory rules
 - **Don't edit `experiments/c1_*` or `experiments/c1_noisy_filler/`** —
@@ -391,7 +395,7 @@ is doing the ρ-sweep separately on the 8× A40 pod — DO NOT duplicate.
 - **Don't edit `docs/components/cN.md`** — surface findings in chat.
 - **Don't modify SAE / TXC arch code** in `src/temp_bench/architectures/`.
 - **Don't bump `EVAL_PROTOCOL_VERSION` for C2** (currently "1.0.0").
-  New rows just append at fresh eval_keys.
+  New rows append at fresh eval_keys.
 
 ### Driver internals
 - **Don't bypass `runner.run_cell`** — single canonical pathway.
@@ -406,8 +410,9 @@ is doing the ρ-sweep separately on the 8× A40 pod — DO NOT duplicate.
 - **TEMP_BENCH_POD_MODE on 8× H100**: currently set to `ephemeral`
   for HF auto-push safety. If the upgraded pod has persistent
   /workspace, switch to `persistent`?
-- **d_sae axis mechanism**: pass via `TrainingConfig.arch_hparams_override`
-  vs new YAML datasource entries? Default to override; flag if the
-  runner's `compute_train_key` doesn't hash override fields.
-- **Phase 3 K_g / K_l ratio**: starting at K_g=10, K_l=50. If results
-  are weak, try K_g=5, K_l=100.
+- **Phase 1 hunt grid**: 8 shards across (p_B ∈ {0.5, 0.3, 0.2, 0.1},
+  n_parents ∈ {2, 5, 8, 10}). If none of these produce a clean TXC
+  win, what next? Drop p_B further (0.05)? Drop ρ to 0.6 to confirm
+  ρ-robustness? Surface to Han if Phase 1 is ambiguous.
+- **Phase 3 hierarchical bench tuning**: K_g=10, K_l=30, n_modulated=3
+  is a guess. If TXC win isn't crisp, try K_l=50 or n_modulated=5.
