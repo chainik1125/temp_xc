@@ -31,6 +31,8 @@ from collections import defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
 
+import numpy as np
+
 import matplotlib
 
 matplotlib.use("Agg")
@@ -237,6 +239,93 @@ def parse_mag_metrics(metrics: dict) -> list[tuple[float, float]]:
     return out
 
 
+# ── Bootstrap CI helpers (Dmitry NeurIPS-checklist sweep 2026-05-06) ───
+
+
+def _judge_outputs_path(eval_key: str) -> Path:
+    from temp_bench.config import run_dir
+    return run_dir(eval_key) / "judge_outputs.jsonl"
+
+
+def _per_qid_dgc_for_row(r: dict) -> dict[float, list[float]]:
+    """Recompute per-question Δgc per magnitude for one leaderboard row,
+    by reading its run_dir's judge_outputs.jsonl.
+
+    Returns ``{magnitude: [Δgc per question]}`` where Δgc(qid, m) =
+    gc(qid, m) - gc(qid, 0). Empty dict if judge file missing or no
+    mag=0 baseline available.
+    """
+    p = _judge_outputs_path(r["eval_key"])
+    if not p.exists():
+        return {}
+    arch = r["arch"]
+    seed = int(r.get("seed", 0))
+    panel_means: dict[tuple[str, float], list[int]] = defaultdict(list)
+    for line in p.read_text().splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            row = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if row.get("arch") != arch:
+            continue
+        if int(row.get("seed", 0)) != seed:
+            continue
+        label = row.get("label", -1)
+        if label is None or int(label) < 0:
+            continue
+        panel_means[(row["transcript_id"], float(row["magnitude"]))].append(int(label))
+    if not panel_means:
+        return {}
+    panel = {k: float(np.mean(v)) for k, v in panel_means.items()}
+    baseline = {qid: panel[(qid, 0.0)]
+                for (qid, _m) in panel
+                if (qid, 0.0) in panel}
+    if not baseline:
+        return {}
+    out: dict[float, list[float]] = defaultdict(list)
+    for (qid, mag), val in panel.items():
+        if qid not in baseline:
+            continue
+        out[float(mag)].append(val - baseline[qid])
+    return dict(out)
+
+
+def _bootstrap_mean_ci(values: list[float], *, n_boot: int = 1000,
+                       ci: float = 0.95, seed: int = 42
+                       ) -> tuple[float, float, float]:
+    """Bootstrap (mean, ci_lo, ci_hi) over ``values``. Returns
+    ``(mean, lo, hi)`` with the percentile interval."""
+    arr = np.asarray(values, dtype=np.float64)
+    if arr.size == 0:
+        return (0.0, 0.0, 0.0)
+    rng = np.random.default_rng(int(seed))
+    n = arr.size
+    boots = np.empty(n_boot, dtype=np.float64)
+    for i in range(n_boot):
+        idx = rng.integers(0, n, size=n)
+        boots[i] = arr[idx].mean()
+    alpha = (1.0 - ci) / 2.0
+    lo = float(np.quantile(boots, alpha))
+    hi = float(np.quantile(boots, 1.0 - alpha))
+    return (float(arr.mean()), lo, hi)
+
+
+def per_mag_dgc_with_ci(r: dict, *, n_boot: int = 1000, ci: float = 0.95,
+                        ) -> dict[float, tuple[float, float, float]]:
+    """For one leaderboard row, compute per-magnitude (mean, lo, hi)
+    of Δgc bootstrapped over the cohort questions. Returns empty dict
+    if the row's judge file is unavailable or has no usable rows."""
+    raw = _per_qid_dgc_for_row(r)
+    out: dict[float, tuple[float, float, float]] = {}
+    for mag, deltas in raw.items():
+        out[mag] = _bootstrap_mean_ci(deltas, n_boot=n_boot, ci=ci,
+                                       seed=int(r.get("seed", 42)))
+    return out
+
+
 def load_probe_log(train_key: str) -> list[dict]:
     p = checkpoint_dir(train_key) / "snapshots" / "eval_log.jsonl"
     if not p.exists():
@@ -312,29 +401,53 @@ def _n_steps_from_row(r: dict) -> int | None:
 
 
 def plot_delta_gc_vs_magnitude(rows: list[dict], out_path: Path) -> None:
-    """Plot Δgc vs magnitude per cell, merging canonical + extended-mags
-    evals for the same (arch, train_key) into a single curve so the
-    appendix figure shows the full magnitude span the cell was evaluated
-    at."""
+    """Plot Δgc vs magnitude per cell with bootstrap 95% CI shaded
+    bands. Merges canonical + extended-mags evals for the same
+    (arch, train_key) into a single curve. Bootstrap is over the 61
+    cohort questions per (arch, magnitude) panel; n_boot=1000."""
     plt.figure(figsize=(8.5, 5.0))
     seen_labels: set[str] = set()
-    for _cell_id, rep, merged in merge_mag_curves(rows):
-        if not merged:
+
+    # Build a per-cell {mag → (mean, lo, hi)} for bootstrap shading by
+    # walking each underlying leaderboard row (canonical + extended)
+    # for the (arch, train_key) cell, computing CIs from its
+    # judge_outputs.jsonl, and merging by magnitude. For overlapping
+    # magnitudes (mag=0 in both canonical + extended evals), keep
+    # canonical.
+    by_cell_rows: dict[tuple, list[dict]] = defaultdict(list)
+    for r in rows:
+        by_cell_rows[(r["arch"], r["train_key"])].append(r)
+
+    for cell_key, cell_rows in by_cell_rows.items():
+        # Canonical first so its mag=0 baseline wins for shared mags.
+        cell_rows = sorted(cell_rows, key=lambda r: (_is_extended(r), r["ts"]))
+        merged_ci: dict[float, tuple[float, float, float]] = {}
+        for r in cell_rows:
+            for mag, ci in per_mag_dgc_with_ci(r).items():
+                merged_ci.setdefault(mag, ci)
+        if not merged_ci:
             continue
-        mags = sorted(merged.keys())
-        deltas = [merged[m] for m in mags]
+        rep = next((r for r in cell_rows if not _is_extended(r)), cell_rows[0])
+        mags = sorted(merged_ci.keys())
+        means = [merged_ci[m][0] for m in mags]
+        los = [merged_ci[m][1] for m in mags]
+        his = [merged_ci[m][2] for m in mags]
         color = cell_color(rep["arch"], _bs_from_row(rep))
         label = cell_short_label(rep)
         if label in seen_labels:
             label = f"{label} [{rep['train_key'][:6]}]"
         seen_labels.add(label)
-        plt.plot(mags, deltas, marker="o", markersize=4, linewidth=1.6,
+        plt.plot(mags, means, marker="o", markersize=4, linewidth=1.6,
                  color=color, linestyle="-", label=label)
+        plt.fill_between(mags, los, his, color=color, alpha=0.18,
+                         linewidth=0)
+
     plt.axhline(0, color="black", linewidth=0.5, alpha=0.5)
     plt.axvline(0, color="black", linewidth=0.5, alpha=0.5)
     plt.xlabel("Steering magnitude $m$")
     plt.ylabel(r"$\Delta gc(a, m)$  (per-question baseline at $m=0$)")
-    plt.title(r"Inducement curves: $\Delta gc$ vs steering magnitude")
+    plt.title(r"Inducement curves: $\Delta gc$ vs steering magnitude "
+              r"(shaded = bootstrap 95% CI over questions)")
     plt.legend(fontsize=8, loc="best", ncol=2)
     plt.grid(alpha=0.3)
     plt.tight_layout()
@@ -343,9 +456,11 @@ def plot_delta_gc_vs_magnitude(rows: list[dict], out_path: Path) -> None:
 
 
 def plot_peak_delta_gc_bar(rows: list[dict], out_path: Path) -> None:
+    """Bar chart of peak Δgc per cell, with bootstrap-CI error bars
+    derived from the cohort-level Δgc distribution at each cell's
+    peak magnitude."""
     rows = sorted(rows, key=lambda r: r["metrics"].get("delta_gc_peak", 0.0))
     labels = [cell_short_label(r) for r in rows]
-    # Disambiguate duplicate labels by appending a train_key suffix.
     seen: dict[str, int] = {}
     final_labels = []
     for r, lab in zip(rows, labels):
@@ -357,16 +472,38 @@ def plot_peak_delta_gc_bar(rows: list[dict], out_path: Path) -> None:
     labels = final_labels
     peaks = [r["metrics"].get("delta_gc_peak", 0.0) for r in rows]
     colors = [cell_color(r["arch"], _bs_from_row(r)) for r in rows]
-    plt.figure(figsize=(8.5, max(3.5, 0.4 * len(rows) + 1.5)))
-    bars = plt.barh(labels, peaks, color=colors, alpha=0.85)
-    for r, bar, peak in zip(rows, bars, peaks):
+
+    # Bootstrap 95% CI half-widths at the cell's peak magnitude.
+    err_low: list[float] = []
+    err_high: list[float] = []
+    for r in rows:
         peak_mag = r["metrics"].get("delta_gc_peak_magnitude")
-        plt.text(bar.get_width() + 0.01, bar.get_y() + bar.get_height() / 2,
+        if peak_mag is None:
+            err_low.append(0.0); err_high.append(0.0)
+            continue
+        per_qid = _per_qid_dgc_for_row(r)
+        deltas = per_qid.get(float(peak_mag), [])
+        mean, lo, hi = _bootstrap_mean_ci(
+            deltas, n_boot=1000, ci=0.95,
+            seed=int(r.get("seed", 42)),
+        )
+        err_low.append(max(0.0, mean - lo))
+        err_high.append(max(0.0, hi - mean))
+
+    plt.figure(figsize=(8.5, max(3.5, 0.4 * len(rows) + 1.5)))
+    bars = plt.barh(labels, peaks, color=colors, alpha=0.85,
+                    xerr=[err_low, err_high], capsize=3,
+                    error_kw={"elinewidth": 1.2, "ecolor": "#222"})
+    for r, bar, peak, eh in zip(rows, bars, peaks, err_high):
+        peak_mag = r["metrics"].get("delta_gc_peak_magnitude")
+        plt.text(bar.get_width() + eh + 0.015,
+                 bar.get_y() + bar.get_height() / 2,
                  f" {peak:.3f} (m={peak_mag:+g})" if peak_mag is not None
                  else f" {peak:.3f}",
                  va="center", fontsize=9)
     plt.axvline(0, color="black", linewidth=0.5)
-    plt.xlabel(r"Peak $\Delta gc$ across magnitudes")
+    plt.xlabel(r"Peak $\Delta gc$ across magnitudes  "
+               r"(error bars = bootstrap 95% CI over questions)")
     plt.title(r"Peak $\Delta gc$ per cell")
     plt.tight_layout()
     plt.savefig(out_path, dpi=150)
