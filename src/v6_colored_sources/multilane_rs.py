@@ -121,8 +121,18 @@ def generate_lane_alphabet_basis(
     return flat.reshape(m, q, d)
 
 
-def generate_multilane_dataset(cfg: MultilaneRSConfig) -> dict:
+def generate_multilane_dataset(
+    cfg: MultilaneRSConfig,
+    *,
+    alphabet: torch.Tensor | None = None,
+) -> dict:
     """Sample episodes and return the full multilane dataset.
+
+    If `alphabet` is provided (shape `(m, q, d)`), reuse it instead of
+    regenerating one from `cfg.seed`. This is essential when generating a
+    held-out test set: the test split must share the *task* alphabet with
+    the train split and only differ in episode-level coefficients
+    `(Y, B)` and observation noise.
 
     Returns a dict with:
 
@@ -136,7 +146,14 @@ def generate_multilane_dataset(cfg: MultilaneRSConfig) -> dict:
     """
     gen = torch.Generator(device="cpu").manual_seed(cfg.seed)
 
-    alphabet = generate_lane_alphabet_basis(cfg.m, cfg.q, cfg.d, generator=gen)
+    if alphabet is None:
+        alphabet = generate_lane_alphabet_basis(cfg.m, cfg.q, cfg.d, generator=gen)
+    else:
+        if alphabet.shape != (cfg.m, cfg.q, cfg.d):
+            raise ValueError(
+                f"alphabet shape {tuple(alphabet.shape)} does not match "
+                f"(m={cfg.m}, q={cfg.q}, d={cfg.d})"
+            )
 
     Y = torch.randint(0, cfg.q, (cfg.n_seq,), generator=gen)         # (n_seq,)
     B = torch.randint(0, cfg.q, (cfg.n_seq, cfg.m, cfg.h), generator=gen)
