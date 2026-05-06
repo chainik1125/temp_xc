@@ -1,6 +1,6 @@
 # C1 Synthetic TopK — paper-ready results (auto-generated)
 
-_Last refreshed: 2026-05-06T19:00:37+00:00_
+_Last refreshed: 2026-05-06T19:25:41+00:00_
 
 ## Setup
 
