@@ -821,3 +821,16 @@ hparams correctly. OQ #1.
    table, `qualitative.encode_concat_corpus` needs a TFA-
    specific path (e.g. take the last-window features, or
    average across T).
+3. **agent_filler's BASE C3 `txc_base` checkpoints are NOT on
+   HuggingFace (paper-blocking for k_feats expansion on those
+   archs)**: 9 manifest rows exist (txc_base × 3 seeds × {T=5,
+   T=10, T=20}, all with `agent="unknown"` and `hf_url=None`),
+   plus 6 leaderboard rows for txc_base k=5/k=20 evals — but
+   direct `hf_hub_download` 404s on every safetensors file. My
+   driver tried to cache-hit on these and instead started
+   training fresh (caught + killed at 600 steps). For now I'm
+   running stage 2 on `txc_pro` only (those ARE on HF and
+   cache-hit cleanly). Suggest agent_filler push their
+   txc_base checkpoints to `han1823123123/temp-bench-models`
+   so other agents can do eval-only k_feats expansions on
+   them. Until then BASE txc_base cells are stuck at k∈{5,20}.
