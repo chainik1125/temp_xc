@@ -215,6 +215,109 @@ def render_hierarchical(out_path: Path,
     return gauc_data
 
 
+def _load_xy_per_cell(*, filter_fn, x_metric: str, y_metric: str):
+    """For each (arch_label, k_pos), return mean(x_metric), mean(y_metric).
+
+    Returns a dict: arch_label → list of (k_pos, x_mean, y_mean) tuples.
+    Dedupes leaderboard rows by eval_key first.
+    """
+    latest: dict[str, dict] = {}
+    with LEADERBOARD.open() as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            d = json.loads(line)
+            if d["component"] != "c2":
+                continue
+            if not filter_fn(d):
+                continue
+            ec = d.get("eval_cfg") or {}
+            if ec.get("smoke") is True:
+                continue
+            if ec.get("hunt_phase") == "zoom" and d["ts"] < ZOOM_CUTOFF_TS:
+                continue
+            latest[d["eval_key"]] = d
+
+    grouped: dict[str, dict[int, dict[str, list[float]]]] = defaultdict(
+        lambda: defaultdict(lambda: {"x": [], "y": []})
+    )
+    for d in latest.values():
+        ec = d.get("eval_cfg") or {}
+        k_pos = ec.get("k_pos")
+        t_label = ec.get("t_label", "default")
+        arch_label = _arch_label(d["arch"], t_label)
+        x = d["metrics"].get(x_metric)
+        y = d["metrics"].get(y_metric)
+        if x is None or y is None or k_pos is None:
+            continue
+        grouped[arch_label][int(k_pos)]["x"].append(float(x))
+        grouped[arch_label][int(k_pos)]["y"].append(float(y))
+
+    out: dict[str, list[tuple[int, float, float]]] = {}
+    for arch_label, by_k in grouped.items():
+        out[arch_label] = []
+        for k_pos in sorted(by_k.keys()):
+            xs = by_k[k_pos]["x"]
+            ys = by_k[k_pos]["y"]
+            out[arch_label].append((k_pos, float(np.mean(xs)), float(np.mean(ys))))
+    return out
+
+
+def render_scatter(
+    *,
+    out_path: Path,
+    filter_fn,
+    title: str,
+):
+    """Local-vs-global scatter. X = eAUC (local recovery), Y = gAUC (global).
+
+    Each point = one (arch, T, k_pos) cell averaged over seeds.
+    y=x diagonal = equal local/global alignment.
+      Above y=x → arch's dictionary is more globally aligned.
+      Below y=x → more locally aligned.
+    """
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    data = _load_xy_per_cell(
+        filter_fn=filter_fn, x_metric="eauc", y_metric="gauc",
+    )
+    if not data:
+        print(f"[plot] no data for scatter at {out_path}")
+        return None
+
+    fig, ax = plt.subplots(figsize=(7.5, 7.5))
+    ax.plot([0, 1], [0, 1], "k--", alpha=0.35, lw=1,
+            label="y = x  (equal local/global alignment)")
+
+    for arch_label in ARCH_ORDER:
+        if arch_label not in data:
+            continue
+        rows = data[arch_label]
+        xs = [r[1] for r in rows]
+        ys = [r[2] for r in rows]
+        color, lab, marker = ARCH_COLORS.get(arch_label, ("#000", arch_label, "o"))
+        ax.scatter(xs, ys, color=color, marker=marker, s=110, alpha=0.78,
+                   label=lab, edgecolors="black", linewidth=0.5, zorder=5)
+        # Connect points by k_pos with a thin trail.
+        order = np.argsort([r[0] for r in rows])
+        ax.plot([xs[i] for i in order], [ys[i] for i in order],
+                color=color, alpha=0.35, lw=1.2, zorder=3)
+
+    ax.set_xlabel("eAUC  (local emission recovery, vs $f_l$)", fontsize=12)
+    ax.set_ylabel("gAUC  (global hidden recovery, vs $f_g$)", fontsize=12)
+    ax.set_title(title, fontsize=11)
+    ax.set_xlim(0.0, 1.05)
+    ax.set_ylim(0.0, 1.05)
+    ax.legend(fontsize=9, loc="upper left", framealpha=0.92)
+    ax.grid(alpha=0.3)
+    fig.tight_layout()
+    fig.savefig(out_path, dpi=150, bbox_inches="tight")
+    fig.savefig(out_path.with_suffix(".thumb.png"), dpi=64, bbox_inches="tight")
+    plt.close(fig)
+    print(f"[plot] wrote {out_path}")
+    return data
+
+
 def render_2panel_headline(
     *,
     winner_ds: str,
@@ -312,6 +415,46 @@ def main():
             winner_ds=secondary,
             hier_ds=args.hier_datasource,
             out_path=NOISY_PLOT_DIR / "c2_headline_2panel_np10.png",
+        )
+
+    # ── Local-vs-global scatter plots (Setup D + E) ─────────────────────
+    # Each point is one (arch, T, k_pos) cell mean-over-seeds. Above the
+    # y=x diagonal = arch's dictionary is more globally aligned; below =
+    # more locally aligned. Mirrors the wasteland-style probe scatter
+    # from c2_noisy_probe_scatter.png (Setup B).
+    if not args.hier_only and not args.two_panel_only:
+        if winner:
+            render_scatter(
+                out_path=NOISY_PLOT_DIR / "c2_setup_d_np5_scatter.png",
+                filter_fn=lambda d: (
+                    d.get("datasource") == winner
+                    and (d.get("eval_cfg") or {}).get("hunt_phase") == "zoom"
+                ),
+                title=("Setup D pB05_np5 (Dmitry replicate): local vs global "
+                       "feature recovery\n(each point = one (arch, T, k_pos) "
+                       "cell, mean over seeds)"),
+            )
+        render_scatter(
+            out_path=NOISY_PLOT_DIR / "c2_setup_d_np10_scatter.png",
+            filter_fn=lambda d: (
+                d.get("datasource") == secondary
+                and (d.get("eval_cfg") or {}).get("hunt_phase") == "zoom"
+            ),
+            title=("Setup D pB05_np10 (max overlap): local vs global "
+                   "feature recovery\n(each point = one (arch, T, k_pos) "
+                   "cell, mean over seeds)"),
+        )
+
+    if not args.zoom_only and not args.two_panel_only:
+        render_scatter(
+            out_path=HIER_PLOT_DIR / "c2_setup_e_scatter.png",
+            filter_fn=lambda d: (
+                d.get("datasource") == args.hier_datasource
+                and (d.get("eval_cfg") or {}).get("bench") == "hierarchical"
+            ),
+            title=("Setup E (hierarchical): local vs global feature "
+                   "recovery\n(each point = one (arch, T, k_pos) cell, "
+                   "mean over seeds)"),
         )
 
 
