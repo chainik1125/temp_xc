@@ -19,6 +19,7 @@ SOURCE_PURIFIED=/workspace/aniket/temp_xc-final/purified
 PAPER_WT=/workspace/aniket/temp_xc_paper
 PAPER_PURIFIED="$PAPER_WT/purified"
 OUTPUT_DIR="$PAPER_PURIFIED/docs/components"
+PAPER_FIGS_DIR="$PAPER_PURIFIED/docs/aniket/figs"
 LB="$SOURCE_PURIFIED/results/leaderboard.jsonl"
 GH_TOKEN=${GH_TOKEN:-}
 
@@ -65,12 +66,26 @@ print(f'{n1},{n2}')
 " 2>/dev/null
 }
 
+sync_synthetic_figs() {
+    # Mirror c1/c2 paper assets into the paper figs/ dir so the
+    # main.tex \autofig{c1_*}/\autofig{c2_*} macros find them.
+    # Asset filenames already start with c1_ / c2_, so no prefix change.
+    mkdir -p "$PAPER_FIGS_DIR"
+    for f in "$PAPER_PURIFIED/docs/components/c1_paper_assets"/*.png \
+             "$PAPER_PURIFIED/docs/components/c2_paper_assets"/*.png; do
+        [ -f "$f" ] || continue
+        cp -f "$f" "$PAPER_FIGS_DIR/$(basename "$f")"
+    done
+}
+
 push_paper() {
+    sync_synthetic_figs
     cd "$PAPER_WT"
     git add purified/docs/components/c1_paper_results.md \
             purified/docs/components/c1_paper_assets \
             purified/docs/components/c2_paper_results.md \
-            purified/docs/components/c2_paper_assets 2>/dev/null
+            purified/docs/components/c2_paper_assets \
+            purified/docs/aniket/figs 2>/dev/null
     if git diff --cached --quiet; then
         log "no diff to commit"
         cd "$SOURCE_PURIFIED"
