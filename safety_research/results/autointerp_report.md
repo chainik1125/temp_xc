@@ -72,7 +72,19 @@ Source: `safety_research/scripts/umap_meta.py`
 
 ## Sentence-level case studies
 
-Five 32-token sequences, top-32 features per arm chosen via the **exclusive** selection mode (each token position claims its most-concentrated feature; greedy assignment, no feature reused). See section *Top-feature selection procedure* below for the exact score and the code reference.
+Five 32-token sequences, top-32 features per arm chosen via the **exclusive** selection mode (each token position claims its most-concentrated feature; greedy assignment, no feature reused).
+
+### Top-feature selection procedure
+
+For each token position `p` in the 32-token sequence, pick the feature `j` whose total activation mass is most concentrated at `p`:
+
+```
+score[p, j] = acts[p, j]^2 / sum_p(acts[p, j])
+```
+
+Squaring forces a real strong activation at `p` (not just rare elsewhere). Greedy assignment: positions sorted in descending order of their best score; each feature gets claimed by at most one position, so the strongest position-feature pairs win first. Result: 32 features, one per token position, each fingerprinted to that position.
+
+Code: `temporal_crosscoders/NLP/sentence.py:307–339` (`select_exclusive_features`). Magnitude-mode alternative (`top-k by sum |activation|`): same file, lines 478–479.
 
 ### Chain 12345
 
@@ -203,19 +215,6 @@ TXCDR:
   Local max activation:      837.00
   Local mean activation (>0):25.06
 ```
-
-## Top-feature selection procedure
-
-For each token position `p` in the 32-token sequence, pick the feature `j` whose total activation mass is most concentrated at `p`:
-
-```
-score[p, j] = acts[p, j]^2 / sum_p(acts[p, j])
-```
-
-Squaring forces a real strong activation at `p` (not just rare elsewhere). Greedy assignment: positions sorted in descending order of their best score; each feature gets claimed by at most one position, so the strongest position-feature pairs win first. Result: 32 features, one per token position, each fingerprinted to that position.
-
-Code: `temporal_crosscoders/NLP/sentence.py:307–339` (`select_exclusive_features`).
-Magnitude-mode alternative (`top-k by sum |activation|`): same file, lines 478–479.
 
 ## Top-12 most-active features per arm
 

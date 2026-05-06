@@ -261,26 +261,10 @@ def main() -> None:
     md.append(
         "Five 32-token sequences, top-32 features per arm chosen via the "
         "**exclusive** selection mode (each token position claims its "
-        "most-concentrated feature; greedy assignment, no feature reused). "
-        "See section *Top-feature selection procedure* below for the exact "
-        "score and the code reference.\n"
+        "most-concentrated feature; greedy assignment, no feature reused).\n"
     )
-    sentence_pngs = sorted(SENTENCE_DIR.glob("sentence_*_exclusive.png"))
-    for png in sentence_pngs[:5]:
-        chain_match = re.search(r"chain(\d+)", png.name)
-        chain_id = chain_match.group(1) if chain_match else "?"
-        md.append(f"### Chain {chain_id}\n")
-        rel = "../../temporal_crosscoders/NLP/viz_outputs/sentence_case_studies"
-        md.append(f"![chain {chain_id}]({rel}/{png.name})\n")
-        # Inline stats text if alongside.
-        stats_txt = png.with_name(png.stem + "_stats.txt")
-        if stats_txt.exists():
-            md.append("```text")
-            md.append(stats_txt.read_text().rstrip())
-            md.append("```")
-        md.append("")
 
-    md.append("## Top-feature selection procedure\n")
+    md.append("### Top-feature selection procedure\n")
     md.append(
         "For each token position `p` in the 32-token sequence, pick the "
         "feature `j` whose total activation mass is most concentrated at `p`:\n\n"
@@ -291,13 +275,28 @@ def main() -> None:
         "elsewhere). Greedy assignment: positions sorted in descending order "
         "of their best score; each feature gets claimed by at most one "
         "position, so the strongest position-feature pairs win first. "
-        "Result: 32 features, one per token position, each fingerprinted "
-        "to that position.\n\n"
+        "Result: 32 features, one per token position, each fingerprinted to "
+        "that position.\n\n"
         "Code: `temporal_crosscoders/NLP/sentence.py:307–339` "
-        "(`select_exclusive_features`).\n"
-        "Magnitude-mode alternative (`top-k by sum |activation|`): same file, "
-        "lines 478–479.\n"
+        "(`select_exclusive_features`). Magnitude-mode alternative "
+        "(`top-k by sum |activation|`): same file, lines 478–479.\n"
     )
+
+    sentence_pngs = sorted(SENTENCE_DIR.glob("sentence_*_exclusive.png"))
+    for png in sentence_pngs[:5]:
+        chain_match = re.search(r"chain(\d+)", png.name)
+        chain_id = chain_match.group(1) if chain_match else "?"
+        md.append(f"### Chain {chain_id}\n")
+        rel = "../../temporal_crosscoders/NLP/viz_outputs/sentence_case_studies"
+        md.append(f"![chain {chain_id}]({rel}/{png.name})\n")
+        # Inline local-statistics block (computed by sentence.py and dumped
+        # to a sibling .txt).
+        stats_txt = png.with_name(png.stem + "_stats.txt")
+        if stats_txt.exists():
+            md.append("```text")
+            md.append(stats_txt.read_text().rstrip())
+            md.append("```")
+        md.append("")
 
     # ─────────── Top-12 contrast tables ───────────
     md.append("## Top-12 most-active features per arm\n")

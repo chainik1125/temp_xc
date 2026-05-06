@@ -288,9 +288,11 @@ _BOILERPLATE = (
 )
 
 
-def _shorten_explanation(text: str, max_chars: int = 55) -> str:
-    """Strip Haiku's boilerplate prefix and truncate so each row fits the
-    legend column at fontsize 6 in a 16x11 figure.
+def _shorten_explanation(text: str, max_chars: int = 200) -> str:
+    """Strip Haiku's boilerplate prefix and only truncate if the result
+    overruns the legend column width. Default 200 chars roughly matches
+    the legend-column capacity at fontsize 6 in a 14x14 figure with the
+    heatmap rendered at aspect="equal".
     """
     if not text:
         return ""
@@ -310,7 +312,7 @@ def add_interp_legend(
     feature_indices: np.ndarray,
     interpretations: dict[int, str],
     n_feat: int,
-    max_chars: int = 55,
+    max_chars: int = 200,
 ) -> None:
     """Display feature interpretations as text aligned with heatmap rows."""
     ax.set_xlim(0, 1)
@@ -538,16 +540,17 @@ def main():
     )
     print(f"  Loaded interps: SAE={len(sae_interps)}/{n_feat}, TXCDR={len(tx_interps)}/{n_feat}")
 
-    # ─── Plot: 2 heatmaps stacked top-to-bottom + interp legends + stats ───
-    # Layout: 3 rows (StackedSAE, TXCDR, stats+caption) × 2 cols
-    # (heatmap, interp legend). Sized to fit a 1920x1080 display at
-    # fit-to-window (16x11 inches at 120 dpi ≈ 1920x1320, scaled to fit).
-    fig = plt.figure(figsize=(16, 11))
+    # ─── Plot: 2 heatmaps stacked top-to-bottom + interp legends ──────────
+    # Layout: 2 rows (StackedSAE, TXCDR) × 2 cols (heatmap, interp legend).
+    # The heatmaps render with aspect="equal" so the 32×32 grid is
+    # square-celled. Numeric stats and the selection-procedure description
+    # live in the markdown report, not on the figure.
+    fig = plt.figure(figsize=(16, 13))
     gs = gridspec.GridSpec(
-        3, 2,
-        width_ratios=[3, 2],
-        height_ratios=[6, 6, 1.4],
-        hspace=0.55, wspace=0.04,
+        2, 2,
+        width_ratios=[1, 1.4],
+        height_ratios=[1, 1],
+        hspace=0.18, wspace=0.05,
     )
 
     # Per-model log normalization for readable color contrast.
@@ -562,7 +565,7 @@ def main():
 
     # ─── SAE heatmap (row 0) ───────────────────────────────────────────────
     ax0 = fig.add_subplot(gs[0, 0])
-    im0 = ax0.imshow(sae_log.T, aspect="auto", cmap=args.cmap_sae,
+    im0 = ax0.imshow(sae_log.T, aspect="equal", cmap=args.cmap_sae,
                       norm=make_norm(sae_hm), interpolation="nearest")
     ax0.set_title(f"StackedSAE (T={args.T}) — {args.layer} k={args.k}", fontsize=11)
     ax0.set_xlabel("Token position")
@@ -584,7 +587,7 @@ def main():
 
     # ─── TXCDR heatmap (row 1) ─────────────────────────────────────────────
     ax1 = fig.add_subplot(gs[1, 0])
-    im1 = ax1.imshow(tx_log.T, aspect="auto", cmap=args.cmap_tx,
+    im1 = ax1.imshow(tx_log.T, aspect="equal", cmap=args.cmap_tx,
                       norm=make_norm(tx_hm), interpolation="nearest")
     ax1.set_title(f"TXCDR (T={args.T}) — {args.layer} k={args.k}", fontsize=11)
     ax1.set_xlabel("Token position")
@@ -604,56 +607,10 @@ def main():
     add_interp_legend(ax1_leg, tx_top_idx, tx_interps, n_feat)
     ax1_leg.set_title("TXCDR feature interpretations (Haiku)", fontsize=9, loc="left")
 
-    # ─── Stats panel (row 2, spanning both columns) ────────────────────────
-    # Layout: stats table on the left, selection-procedure caption on the
-    # right so the figure self-documents the top-feature pick.
-    stats_gs = gs[2, :].subgridspec(1, 2, width_ratios=[3, 4], wspace=0.05)
-    ax_stats = fig.add_subplot(stats_gs[0, 0])
-    ax_stats.axis("off")
-    ax_caption = fig.add_subplot(stats_gs[0, 1])
-    ax_caption.axis("off")
-
-    col_labels = [f"Local metric ({seq_len} tokens)", "StackedSAE", "TXCDR"]
-    row_data = [
-        ["Local position entropy", f"{sae_stats['mean_pos_entropy']:.4f}", f"{tx_stats['mean_pos_entropy']:.4f}"],
-        [f"Local feature sparsity (top {n_feat})", f"{sae_stats['mean_feat_sparsity']:.4f}", f"{tx_stats['mean_feat_sparsity']:.4f}"],
-        ["Local active feats/pos (full)", f"{sae_stats['active_feats_per_pos']:.1f}", f"{tx_stats['active_feats_per_pos']:.1f}"],
-        [f"Local frac nonzero ({seq_len}x{n_feat})", f"{sae_stats['frac_nonzero']:.4f}", f"{tx_stats['frac_nonzero']:.4f}"],
-        ["Local max activation", f"{sae_stats['max_activation']:.2f}", f"{tx_stats['max_activation']:.2f}"],
-        ["Local mean activation (>0)", f"{sae_stats['mean_activation']:.2f}", f"{tx_stats['mean_activation']:.2f}"],
-    ]
-
-    table = ax_stats.table(
-        cellText=row_data, colLabels=col_labels,
-        loc="center", cellLoc="center",
-    )
-    table.auto_set_font_size(False)
-    table.set_fontsize(8)
-    table.scale(0.95, 1.25)
-
-    # Selection-procedure caption with file:line reference.
-    caption_lines = {
-        "exclusive": (
-            "Top-feature selection — \"exclusive\" mode (default).\n"
-            "For each token position p, pick the feature j whose activation\n"
-            "mass is most concentrated at p:\n"
-            "    score[p, j] = acts[p, j]^2 / sum_p(acts[p, j])\n"
-            "Greedy assignment: positions sorted by best score; each feature\n"
-            "claimed by at most one position.\n"
-            "Code: temporal_crosscoders/NLP/sentence.py:307–339\n"
-            "(select_exclusive_features)"
-        ),
-        "magnitude": (
-            "Top-feature selection — \"magnitude\" mode.\n"
-            "Pick the n_features features with largest |activation| summed\n"
-            "over the sequence: top-k of acts.abs().sum(dim=0).\n"
-            "Code: temporal_crosscoders/NLP/sentence.py:478–479"
-        ),
-    }
-    ax_caption.text(
-        0.0, 0.5, caption_lines.get(args.select, ""),
-        va="center", ha="left", fontsize=8, family="monospace",
-    )
+    # Stats and the selection-procedure description live in the markdown
+    # report (results/autointerp_report.md), not on the figure. The
+    # per-chain stats text is still written to a sibling .txt file so the
+    # report can inline it.
 
     fig.suptitle(
         f"Top-{n_feat} Feature Activations — {chain_label} ({seq_len} tokens) — local metrics",
