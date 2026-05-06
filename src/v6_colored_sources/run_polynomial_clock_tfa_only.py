@@ -167,8 +167,17 @@ def main() -> int:
 
     cells_by_W = {c["W"]: c for c in payload["cells"]}
 
-    SAE_K_SWEEP = [2, 5, 10]
+    SAE_K_SWEEP_REQ = [2, 5, 10]
     TXC_K_SWEEP = [2, 5, 10]
+
+    # SAE has H = q latents. TopK requires k <= H, so drop any sweep value
+    # that exceeds q (only matters for Stage 3 where q = 7 < 10).
+    SAE_K_SWEEP = [k for k in SAE_K_SWEEP_REQ if k <= q]
+    if SAE_K_SWEEP != SAE_K_SWEEP_REQ:
+        print(
+            f"Note: dropping SAE k values > q={q} from the sweep "
+            f"({sorted(set(SAE_K_SWEEP_REQ) - set(SAE_K_SWEEP))})."
+        )
 
     # Train one SAE per k value in the sweep on iid tokens.
     sae_models_by_k = {}
