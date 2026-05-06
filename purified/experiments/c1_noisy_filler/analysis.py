@@ -92,10 +92,10 @@ def _save_plot(agg: dict, ks: list[int], out_path: Path) -> None:
             marker=style.get("marker", "o"),
             markersize=6, capsize=3, linewidth=1.6, alpha=0.9,
         )
-    ax.set_xlabel(r"$k_{\rm pos}$ (active latents per token)")
-    ax.set_ylabel("Feature recovery AUC (vs observed support)")
-    ax.set_title(r"C1-noisy: HMM with Bernoulli noise — AUC vs $k_{\rm pos}$ "
-                 r"($p_A{=}0,\, p_B{=}0.625,\, n{=}20,\, d{=}40$)")
+    ax.set_xlabel(r"Per-token sparsity $k_{\rm pos}$", fontsize=11)
+    ax.set_ylabel(r"Decoder AUC (vs feature directions)", fontsize=11)
+    ax.set_title(r"Setup B: Decoder AUC under noisy emissions ($\gamma{=}0.25$)",
+                 fontsize=12)
     ax.set_ylim(0.35, 1.02)
     ax.set_xscale("log")
     ax.set_xticks(ks)
@@ -172,12 +172,12 @@ def run_analysis() -> AnalysisResult:
         f"(k_train > arch budget at toy d_sae=40) appear as `—`._"
     )
 
-    plot_path = Path(__file__).resolve().parent / "plots" / "c1_noisy_auc_vs_kpos.png"
+    plot_path = Path(__file__).resolve().parent / "plots" / "c2_noisy_auc_vs_kpos.png"
     try:
         _save_plot(agg, ks, plot_path)
-        rel = "../../experiments/c1_noisy_filler/plots/c1_noisy_auc_vs_kpos.png"
+        rel = "../../experiments/c1_noisy_filler/plots/c2_noisy_auc_vs_kpos.png"
         out_lines.append("")
-        out_lines.append(f"![c1_noisy AUC vs k_pos]({rel})")
+        out_lines.append(f"![Setup B: decoder AUC vs k_pos]({rel})")
     except Exception as e:
         out_lines.append(f"\n_(plot generation failed: {e})_")
 

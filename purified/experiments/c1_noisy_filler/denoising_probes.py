@@ -422,25 +422,22 @@ def plot_scatter(agg: dict, out_path: Path, *, mode: str) -> None:
                    edgecolors="black", linewidth=0.5)
 
     if mode == "sl":
-        ax.set_xlabel(r"Local correlation $\bar{r}_{\rm local}$ ($z_j \to s_i$, noisy obs)", fontsize=12)
-        ax.set_ylabel(r"Global correlation $\bar{r}_{\rm global}$ ($z_j \to h_i$, hidden state)", fontsize=12)
-        ax.set_title(r"c1\_noisy single-latent correlation"
-                     r"  ($p_A{=}0,\,p_B{=}0.625,\,\gamma{=}0.25$)", fontsize=12)
+        ax.set_xlabel(r"Local correlation $\bar{r}_{\rm local}$  ($z_j \to s_i$, noisy obs)",
+                      fontsize=12)
+        ax.set_ylabel(r"Global correlation $\bar{r}_{\rm global}$  ($z_j \to h_i$, hidden state)",
+                      fontsize=12)
+        ax.set_title(r"Setup B: single-latent correlation  ($\gamma{=}0.25$)",
+                     fontsize=12)
         # Auto-zoom: single-latent correlations are small (~0-0.15 here).
-        # Padding ±0.02 + 5% buffer.
         all_local = [agg[(a, t, k)]["sl_mean_local"] for (a, t, k) in agg.keys()]
         all_global = [agg[(a, t, k)]["sl_mean_global"] for (a, t, k) in agg.keys()]
-        lo = min(min(all_local), min(all_global)) - 0.02
         hi = max(max(all_local), max(all_global)) + 0.02
-        # Make square with the same range on both axes.
-        rng = max(abs(lo), abs(hi))
         ax.set_xlim(-0.02, hi + 0.02)
         ax.set_ylim(-0.02, hi + 0.02)
     else:
         ax.set_xlabel(r"Local $R^2$  ($z \to s_i$, noisy obs)", fontsize=12)
         ax.set_ylabel(r"Global $R^2$  ($z \to h_i$, hidden state)", fontsize=12)
-        ax.set_title(r"c1\_noisy linear probe"
-                     r"  ($p_A{=}0,\,p_B{=}0.625,\,\gamma{=}0.25$)", fontsize=12)
+        ax.set_title(r"Setup B: linear probe  ($\gamma{=}0.25$)", fontsize=12)
         ax.set_xlim(-0.05, 1.05)
         ax.set_ylim(-0.05, 1.05)
 
@@ -493,7 +490,7 @@ def plot_panels(agg: dict, out_path: Path, *, mode: str) -> None:
         ax.grid(True, alpha=0.3)
 
     title = "single-latent correlation" if mode == "sl" else "linear probe"
-    fig.suptitle(rf"c1\_noisy denoising: {title}  ($p_A{{=}}0,\,p_B{{=}}0.625$)", y=1.02)
+    fig.suptitle(rf"Setup B: denoising via {title}  ($\gamma{{=}}0.25$)", y=1.02)
     fig.tight_layout()
     out_path.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(out_path, bbox_inches="tight", dpi=150)
@@ -574,10 +571,10 @@ def main():
         return
 
     agg = _aggregate_by_seeds(results)
-    plot_scatter(agg, plots_dir / "c1_noisy_singlelatent_scatter.png", mode="sl")
-    plot_scatter(agg, plots_dir / "c1_noisy_probe_scatter.png",         mode="lp")
-    plot_panels (agg, plots_dir / "c1_noisy_singlelatent_panels.png",   mode="sl")
-    plot_panels (agg, plots_dir / "c1_noisy_lp_panels.png",             mode="lp")
+    plot_scatter(agg, plots_dir / "c2_noisy_singlelatent_scatter.png", mode="sl")
+    plot_scatter(agg, plots_dir / "c2_noisy_probe_scatter.png",         mode="lp")
+    plot_panels (agg, plots_dir / "c2_noisy_singlelatent_panels.png",   mode="sl")
+    plot_panels (agg, plots_dir / "c2_noisy_denoising_panels.png",      mode="lp")
     print(f"Plots saved under {plots_dir}", flush=True)
 
     print("\n=== Summary (mean over seeds) ===")
