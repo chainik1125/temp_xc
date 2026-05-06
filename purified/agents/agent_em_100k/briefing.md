@@ -7,9 +7,9 @@ Section ownership: PROTOCOL.md § 14.
 
 ---
 agent: agent_em_100k
-last_state_update: 2026-05-06T11:15:00Z
-component: c3 (MLC baseline IT+BASE × 8 k_feats, decisions § 16 + Han 2026-05-06 expansion)
-status: complete (Mission A + Mission B both landed)
+last_state_update: 2026-05-06T11:35:00Z
+component: c3 (tfa borrow eval IN FLIGHT; MLC IT+BASE complete)
+status: in_progress (tfa seed=42 k_feats {10,40,80,160,320,640} eval-only)
 ---
 
 ## Identity + mandate (Han owns — agents do not edit)
@@ -1067,18 +1067,33 @@ integrates via `canonical_train_keys()` toggle at paper-render time.
 
 ## Current state (agent owns — overwrite at every compact)
 
-**Last verified: 2026-05-06T11:15Z. Both Mission A (IT MLC k_feats
-expansion) and Mission B (BASE MLC parity) COMPLETE.
+**Last verified: 2026-05-06T11:35Z. NEW MISSION (briefing update
+2026-05-06): brief borrow into agent_nlp's tfa territory — 6 eval-
+only cells (`tfa seed=42 k_feat ∈ {10,40,80,160,320,640}`) per Han's
+13-cell split between agent_nlp + me post-RunPod-rescue (commit
+`eaa75a10`).**
 
-49 MLC cells now in leaderboard at `agent: agent_em_100k`,
-`arch: mlc`, `eval_protocol_version: 1.1.0`:
+**Prior MLC missions A + B COMPLETE** (commit `1da6e2fd`). 49 MLC
+cells in leaderboard:
 - IT × 3 seeds × 8 k_feats = 24 cells (`gemma_2_2b_it_l11to15_fineweb_24k128`)
 - BASE × 3 seeds × 8 k_feats = 24 cells (`gemma_2_2b_base_l11to15_fineweb_24k128`)
-- + 1 smoke (IT seed=42 k=5 n_steps=200, peak_align=0.754; canonical-filtered)
+- + 1 smoke (IT seed=42 k=5 n_steps=200; canonical-filtered)
 
-GPU at 0 MiB / 0% util. All caches + checkpoints on HF.**
+### tfa borrow mission state (in_progress)
 
-### MLC headline numbers (mean across 3 seeds)
+| Phase | Status | Notes |
+|---|---|---|
+| Pull tfa seed=42 ckpt from HF | ✅ | `train_key=61da0670ea629ca4` (B=32, n=20K) |
+| Launch eval (6 cells) | **IN FLIGHT** | PID 37678, started 11:34Z |
+| Monitor → commit + push | pending | Per-cell ~5-30 min; total ETA ~30min-3hr |
+
+Expected leaderboard rows: `arch=tfa, seed=42, eval_cfg.k_feat ∈
+{10,40,80,160,320,640}`, `eval_protocol_version=1.1.0`. Cache-hits
+on training (no fresh train; just probe fits).
+
+Persistent monitor `bbbq7j4r3` watches for CELL DONE / errors.
+
+### MLC headline numbers (mean across 3 seeds, Mission A + B complete)
 
 **IT** (`gemma_2_2b_it_l11to15_fineweb_24k128`, act_cache=`40a11e1594d9220a`):
 
@@ -1300,46 +1315,46 @@ In code:
 
 ## What I just did (agent owns — overwrite)
 
-1. (Prior missions complete: C6 100K headlines, MW stand-down, T-SAE
-   T=2 sweep, IT MLC initial 6-cell sweep at k_feats={5,20}, all
-   landed in commits up through `782c7702`.)
-2. 2026-05-06T~06:20Z: pulled § Han 2026-05-06 expansion: IT MLC
-   k_feats {5,10,20,40,80,160,320,640} + BASE MLC parity.
-3. **Mission A** (IT k_feats expansion, eval-only): launched at
-   06:25Z, completed at 07:59Z (1h 34m). 18 cells × ~5 min each.
-4. **Mission B Phase 1-3** (BASE caches): ran in PARALLEL with
-   Mission A.
-   - Wrote `experiments/c3_probing_mlc_base/run.py` (thin clone of
-     IT driver with DATASOURCE swap).
-   - Built BASE act_cache (5 min, 70.8 GB).
-   - Built BASE probe_cache (13 min, 98 GB).
-   - HF-pushed both BASE caches in parallel (~17 min total wall).
-5. **Mission B Phase 5** (BASE sweep): launched at 07:59Z right
-   after Mission A finished, completed at 11:10Z (3h 11m).
-   24 cells = 3 fresh trainings × ~25 min + 21 cache-hits × ~5 min.
-6. Headline (mean across 3 seeds): peak mean_auc at k=80-160:
-   ~0.922 IT, ~0.926 BASE. BASE consistently +0.005-0.010 higher
-   than IT across k_feats. Peak at k=80-160; high-k saturation
-   visible (slight decline at k=320, k=640).
+1. (Prior MLC missions complete through `1da6e2fd`: 48 real MLC
+   cells across IT/BASE × 3 seeds × 8 k_feats; total wall 4h 45m.
+   Mission A + B done in 4× under briefing's 19-20 hr est.)
+2. 2026-05-06T~11:30Z: pulled latest origin/final and read
+   briefing rewrite. NEW MISSION: brief borrow into agent_nlp's
+   tfa territory (6 eval-only cells, seed=42, k_feats {10,40,80,
+   160,320,640}) per Han's 13-cell split post-RunPod-rescue.
+3. Cleaned conflicting untracked `checkpoints/*/config.json` files
+   that were blocking the rebase (HF-pulled configs that overlap
+   with origin's tracked configs).
+4. Verified `tfa seed=42` train_key=`61da0670ea629ca4` (cfg
+   `n_steps=20_000, batch_size=32`); ckpt was missing locally so
+   pulled from HF via `snapshot_download` (~26 sec).
+5. Launched borrow eval (PID 37678, 11:34Z) via
+   `experiments.c3_probing_tfa_baseline.run --seeds 42 --k-feats
+   10 40 80 160 320 640`. Cell 1 (k_feat=10) started.
+6. Persistent monitor `bbbq7j4r3` armed on `logs/c3_kfeat_tfa_seed42_em100k.log`.
 
 ## Next action (agent owns — overwrite)
 
-**Status: COMPLETE.** Both Mission A (IT k_feats expansion) +
-Mission B (BASE MLC parity) landed. 49 MLC cells in leaderboard.
-Pod IDLE.
-
-1. Run `bash scripts/wrap_up_session.sh` to commit artifacts.
-2. Standing by for any further directive. agent_paper / agent_nlp
-   integrate the new MLC IT+BASE × 8 k_feats cells into C3 headline
-   at paper-render time via `canonical_train_keys()`.
-3. **OQ #7 (NEW)**: User instructed "ENSURE COMPONENT MD UPDATE
-   AFTER COMPLETION" but my briefing's Identity+mandate says
-   `docs/components/c3.md` is agent_nlp's territory ("Even if Han
-   verbally approves, do not commit cross-territory edits yourself.
-   This is non-negotiable"). Surfacing for resolution — see Open
-   questions for Han below.
-4. Pod can be safely stopped after wrap-up. Caches + checkpoints
-   already on HF (ephemeral mode).
+1. **Wait for tfa borrow eval to complete** (~30min-3hr based on
+   per-cell rate, 6 cells total). Persistent monitor `bbbq7j4r3`
+   watches `logs/c3_kfeat_tfa_seed42_em100k.log` for CELL DONE
+   markers and errors.
+2. **Verify each cell's row lands**:
+   ```bash
+   grep "agent_em_100k" results/leaderboard.jsonl | grep '"arch":"tfa"' | grep '"seed":42' | tail -6
+   ```
+   Expected fields: `component=c3`, `arch=tfa`, `seed=42`,
+   `eval_cfg.k_feat ∈ {10,40,80,160,320,640}`,
+   `eval_protocol_version=1.1.0`, sensible `mean_auc`.
+3. **After all 6 land**: commit + push leaderboard rows. Then ping
+   agent_nlp that the seed=42 tfa column is complete; they handle
+   their 7 remaining cells (seed=2 tfa tail + txc_base T=20 high-k
+   tail) and re-render `experiments/c3_probing/analysis.py` +
+   `docs/components/c3.md` AUTO-RESULTS with the full 8 k_feats.
+4. **Don't touch `docs/components/c3.md`** — agent_nlp's territory.
+   Cells just land in the leaderboard; analysis is theirs.
+5. **Don't run txc_base T=20 cells** — agent_nlp's half of the split.
+6. After borrow done: pod IDLE. Caches + checkpoints already on HF.
 
 ## Don't repeat (agent owns — overwrite)
 
