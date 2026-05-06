@@ -1673,8 +1673,23 @@ TQDM_DISABLE=1 AGENT_NAME=agent_filler \
 # Then re-render c2.md c1_noisy section to embed the 2 scatter plots.
 ```
 
-**ρ-sweep mission CANCELLED 2026-05-06T20:08Z** — Han reassigned the
-C2 ρ-sweep (commit `7bd38bfd`) to a different agent. Don't run it.
+**ρ-sweep mission REACTIVATED 2026-05-06T20:30Z** — Han: "ACTUALLY DO
+THE ρ SWEEP SINCE agent_synth is having trouble starting up". Running
+on agent_filler GPUs 1-4. Procs PIDs 108246/108248/108250/108252,
+sharded by ρ value (0.0, 0.3, 0.6, 0.9 respectively), each running
+the full 3-arch trio × 3 seeds × 2 k_pos. ~15 min wall.
+
+NOTE: agent_synth's `experiments/c2_synthetic_coupled/run_rho_sweep.sh`
+on origin gates execution to `AGENT_NAME=agent_synth`. I launched
+manually with my own ρ-sharding (cleaner than agent_synth's
+arch-sharding for a 4-ρ headline plot). My procs are independent of
+their launcher script — don't be fooled by my prior attempt to write
+my own launcher (rejected at conflict resolution). Theirs stays canonical.
+
+After ρ cells land: render gAUC vs ρ subsection in c2.md.
+Plot recipe: 1 line per arch (topk_sae, txc_base T=5 default,
+txc_pro T=2), x-axis = ρ ∈ {0.0, 0.3, 0.6, 0.7, 0.9} (existing 0.7
+cells already in leaderboard), y-axis = mean gAUC at k=5.
 
 **To re-render c2.md** after more T=12 cells land (next session
 or now):
