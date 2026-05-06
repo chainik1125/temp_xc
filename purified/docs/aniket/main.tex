@@ -249,75 +249,48 @@ Each architecture-by-$k_{\mathrm{pos}}$ cell trains for $n_{\mathrm{steps}}=30{,
 \subsection{Inducing and Detecting Backtracking in a Reasoning Model}
 \label{sec:backtracking}
 
-\begin{figure}[!t]
-    \centering
-    \begin{subfigure}[t]{0.58\linewidth}
-        \scriptsize
-        \setlength{\fboxsep}{3pt}
-        \fbox{\begin{minipage}[t]{0.96\linewidth}
-            \textbf{TXC-pro ($bs{=}256$), $m{=}+12$} \hfill \textcolor{green!50!black}{\textbf{ans=12 \checkmark} \textbar{} bt=1, coh=3}\\[2pt]
-            {\itshape \ldots the entire fraction is $2.4 / 0.2$, which is $12$. \textbf{Wait, let me double-check that.} $0.2 \times 12 = 2.4$. \textbf{So, yes, that's correct.} \ldots the simplified result is $12$. $\boxed{12}$}
-        \end{minipage}}\\[3pt]
-        \fbox{\begin{minipage}[t]{0.96\linewidth}
-            \textbf{TopK SAE ($bs{=}1024$), $m{=}-16$} \hfill \textcolor{red!70!black}{\textbf{ans=None \texttimes} \textbar{} bt=2, coh=3}\\[2pt]
-            {\itshape \ldots $0.2 \times 12 = 2.4$, so $12$ is the result. \textbf{Wait, but the problem is to simplify the given expression}, so maybe I can compute it numerically\ldots Alternatively, maybe I can compute it using fractions instead of decimals\ldots[loops in verification, runs out of token budget]}
-        \end{minipage}}\\[3pt]
-        \fbox{\begin{minipage}[t]{0.96\linewidth}
-            \textbf{T-SAE ($bs{=}1024$), $m{=}+7$} \hfill \textcolor{red!70!black}{\textbf{ans=None \texttimes} \textbar{} bt=3, coh=3}\\[2pt]
-            {\itshape \ldots $6.25 - 0.49$\ldots[long digit-by-digit subtraction, twice]\ldots $5$ units, $7$ tenths, $6$ hundredths. So, $5.76$. \textbf{Wait, that seems a bit off. Let me check with another method.} $6.25 - 0.49$\ldots[restarts subtraction, runs out of token budget]}
-        \end{minipage}}\\[3pt]
-        \fbox{\begin{minipage}[t]{0.96\linewidth}
-            \textbf{MLC ($bs{=}1024$), $m{=}+16$} \hfill \textcolor{red!70!black}{\textbf{ans=None \texttimes} \textbar{} bt=3, coh=3}\\[2pt]
-            {\itshape \ldots $6.25 - 0.49$ is \textbf{$5.756$}, right? Because $6.25 - 0.49$ is $5.756$. Yes, that's correct. So, the numerator is $\sqrt{\mathbf{5.756}}$\ldots[carries the wrong value through, trails off]}
-        \end{minipage}}
-        \caption{Steered continuations on \texttt{test/prealgebra/951.json} (problem: simplify $\sqrt{2.5^2 - 0.7^2}\,/\,(2.7 - 2.5)$, ground truth $= 12$). The same prefix is supplied to all four cells; each is steered at its own optimal $\Delta gc$ magnitude. All four cells produce judge-positive backtracks (bt counts $1$--$3$), but only TXC-pro's is committal: the baseline cells loop in re-verification cycles (TopK SAE, T-SAE) or inject a fresh arithmetic mistake (MLC: $6.25 - 0.49 = 5.756$, off by $0.004$).}
-        \label{fig:c7-headline-text}
-    \end{subfigure}\hfill
-    \begin{subfigure}[t]{0.40\linewidth}
-        \autofig{c7_gc_at_peak_paired_compact}
-        \caption{Per-question genuine-backtracking counts $gc(a, m)$ at the unsteered baseline ($m = 0$, gray) and at each architecture's optimal steering magnitude (colored), sorted descending by the steered value. Error bars are bootstrap $95\%$ confidence intervals over the $61$ cohort questions ($n_{\text{boot}} = 1000$). Numbers above each colored bar are the steered $gc(a, m)$ value.}
-        \label{fig:c7-gc-at-peak-bar}
-    \end{subfigure}
-    \caption{Headline result, two-panel. \emph{Left:} on a single MATH-500 cohort question, all four steered cells produce judge-positive backtracks under their optimal-magnitude steering, but only TXC-pro's is productive: the baselines either loop in verification or fabricate fresh arithmetic. \emph{Right:} aggregated across the $61$-question cohort, the productive-vs-unproductive distinction shows up as a clear $gc(a, m)$ gap between the steered (colored) and unsteered (gray) bars, which TXC architectures lead. Full setup, judge prompts, and per-cell artifacts in \cref{app:c7}.}
-    \label{fig:c7-gc-at-peak}
-\end{figure}
-
 \begin{figure*}[!t]
     \centering
-    \begin{subfigure}[t]{0.48\textwidth}
-        \centering
-        \autofig{c7_delta_gc_vs_magnitude}
-        \caption{Inducement: $\Delta gc$ vs steering magnitude.}
-        \label{fig:c7-inducement}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[t]{0.48\textwidth}
-        \centering
-        \autofig{c7_probe_metrics_S8_bar}
-        \caption{Detection: PR-AUC and ROC-AUC at $S = 8$.}
+    \begin{subfigure}[t]{0.36\textwidth}
+        \scriptsize
+        \setlength{\fboxsep}{3pt}
+        \fbox{\begin{minipage}[t]{0.95\linewidth}
+            \textbf{Unsteered ($m{=}0$)} \hfill \textcolor{red!70!black}{\textbf{no boxed \texttimes}}\\[2pt]
+            {\itshape \ldots so $2.4 / 0.2 = 12$. \textbf{Wait, let me double-check my steps.} $2.5^2 = 6.25$, $0.7^2 = 0.49$, $6.25 - 0.49 = 5.76$\ldots \textbf{Let me just verify each step once more}\ldots [continues looping; runs out of token budget without emitting a boxed answer]}
+        \end{minipage}}\\[5pt]
+        \fbox{\begin{minipage}[t]{0.95\linewidth}
+            \textbf{TXC-pro ($bs{=}256$), $m{=}+12$} \hfill \textcolor{green!50!black}{\textbf{ans = 12 \checkmark}}\\[2pt]
+            {\itshape \ldots the entire fraction is $2.4 / 0.2 = 12$. \textbf{Wait, let me double-check that.} $0.2 \times 12 = 2.4$. \textbf{So, yes, that's correct.} \ldots the simplified result is $12$. $\boxed{12}$}
+        \end{minipage}}
+        \caption{Same prefix on \texttt{test/prealgebra/951.json} (simplify $\sqrt{2.5^2 - 0.7^2}/(2.7 - 2.5)$, GT $= 12$). The unsteered continuation derives the right value mid-trace but loops in inconclusive verification and never emits a boxed answer. TXC-pro's steering replaces that loop with one committal backtrack.}
+        \label{fig:c7-headline-text}
+    \end{subfigure}\hfill
+    \begin{subfigure}[t]{0.31\textwidth}
+        \autofig{c7_gc_at_peak_paired_compact}
+        \caption{Inducement: per-question $gc(a, m)$ at $m=0$ (gray) and at each architecture's optimal steering magnitude (colored), bootstrap $95\%$ CI over $61$ questions.}
+        \label{fig:c7-gc-at-peak-bar}
+    \end{subfigure}\hfill
+    \begin{subfigure}[t]{0.31\textwidth}
+        \autofig{c7_pr_auc_S8_bar}
+        \caption{Detection: sparse-probe PR-AUC at top-$S=8$ features ($5$-fold GroupKFold by question, $\ell_1$-regularized logistic regression). Chance $\approx 0.12$.}
         \label{fig:c7-pr-auc-S8}
     \end{subfigure}
-    \caption{Backtracking case study on a $61$-question MATH-500 cohort, all six architectures trained at $n_{\text{steps}} = 300{,}000$, batch size $1024$. (a)~per-architecture inducement curves $\Delta gc(a, m)$ (\cref{eq:delta-gc}), per-question baselined at $m = 0$; shaded regions are bootstrap $95\%$ confidence intervals computed by resampling the $61$ cohort questions ($n_{\text{boot}} = 1000$). (b)~sparse-probe detection metrics at top-$S = 8$ features, reported as PR-AUC (left subpanel; chance $\approx 0.12$, the positive-class prior) and ROC-AUC (right subpanel; chance $= 0.5$); each panel sorts its own bars descending. PR-AUC is the headline detection metric for this task because the positive class is rare; ROC-AUC is reported alongside for continuity with prior internal exploration. Full setup, judge prompt, magnitude grid, and the per-$S$ PR-AUC + ROC-AUC table are in \cref{app:c7}.}
-    \label{fig:backtracking}
+    \caption{Headline. \emph{Left:} a single MATH-500 question; the unsteered model derives the correct value but never commits, while TXC-pro under optimal-magnitude steering uses a single decisive backtrack to land on the right boxed answer. \emph{Middle:} cohort-level inducement, $gc(a, m)$ at each cell's peak magnitude vs the shared unsteered floor at $m=0$. \emph{Right:} cohort-level detection, sparse-probe PR-AUC at $S=8$ on the same cells. Inducement curves $\Delta gc(a,m)$ over the full magnitude grid are in \cref{fig:c7-inducement-app}; per-$S$ PR-AUC and ROC-AUC tables are in \cref{app:c7-pr-auc-full}.}
+    \label{fig:c7-headline}
 \end{figure*}
 
-\paragraph{Motivation.}
-Reasoning models exhibit an emergent behavior, sometimes called \textit{backtracking}, in which the model abandons an in-progress chain of inference and resumes along an alternative path \cite{ward2025reasoning,muennighoff2025s1}. The behavioral signature is intrinsically multi-token: the model commits to a partial argument, registers an inconsistency, and verbalizes a reversal (``wait,'' ``actually''). \citet{ward2025reasoning} show that this behavior can be reliably induced by a difference-of-means steering vector mined from the \emph{base} model and applied to its reasoning-finetuned counterpart at inference. Because the signature spans token positions, a per-token sparse dictionary, by construction, has access only to a single position; this makes backtracking a natural testbed for the temporal-window inductive bias of \cref{sec:txc}.
+Reasoning models exhibit an emergent behavior, sometimes called backtracking, in which the model abandons an in-progress chain of inference and resumes along an alternative path \cite{ward2025reasoning,muennighoff2025s1}. The signature is multi-token: the model commits to a partial argument, registers an inconsistency, and verbalizes a reversal (``wait,'' ``actually''). \citet{ward2025reasoning} show that this behavior can be reliably induced by a difference-of-means steering vector mined from the \emph{base} model and applied to its reasoning-finetuned counterpart at inference. Because the signature spans positions, a per-token sparse dictionary cannot represent it. Backtracking is therefore a natural testbed for the temporal-window inductive bias of \cref{sec:txc}.
 
-\paragraph{Setup.}
-We adopt the steering-vector approach of \citet{ward2025reasoning} and pair it with our own evaluation protocol. Vectors are mined from \texttt{meta-llama/Llama-3.1-8B} and applied during continuation on \texttt{deepseek-ai/DeepSeek-R1-Distill-Llama-8B} at residual-stream layer $10$ (the optimal hookpoint per \citet[App. B.1]{ward2025reasoning}). The cohort is $61$ MATH-500 \cite{hendrycks2021math} questions ($31$ truly-wrong + $30$ originally-correct). For each question we cut the unsteered baseline continuation at $25\%$ of its length and resample under steering at each of $25$ magnitudes (the \textit{cut25} protocol; \cref{app:c7-cut25}). All six architectures are trained on the same Llama-3.1-8B layer-$10$ activation cache at $d_{\text{SAE}} = 32{,}768$. We report two metrics. The first, \textit{inducement}, measures whether the architecture's mined feature direction acts as a causal lever for genuine backtracking when used as a steering vector. We report it both as a directly-readable raw count $gc(a, m)$ (mean genuine backtracking events per question at magnitude $m$, plotted in \cref{fig:c7-gc-at-peak} for each architecture's optimal magnitude) and as a baseline-corrected lift
+We pair the steering-vector approach of \citet{ward2025reasoning} with our own evaluation protocol. Vectors are mined from \texttt{meta-llama/Llama-3.1-8B} and applied at residual-stream layer $10$ on \texttt{deepseek-ai/DeepSeek-R1-Distill-Llama-8B}. The cohort is $61$ MATH-500 questions \cite{hendrycks2021math}, $31$ truly-wrong and $30$ originally-correct. For each question we cut the unsteered continuation at $25\%$ of its length and resample under steering at each of $25$ magnitudes (the \textit{cut25} protocol; \cref{app:c7-cut25}). All six architectures train on the same Llama-3.1-8B layer-$10$ activation cache at $d_{\text{SAE}} = 32{,}768$.
+
+We report two metrics. \emph{Inducement} measures whether the architecture's mined feature direction acts as a causal lever for genuine backtracking when used as a steering vector. We track it as the raw count $gc(a, m)$ and as the baseline-corrected lift
 \begin{equation}
     \Delta gc(a, m) \,=\, \frac{1}{|\mathcal{Q}|} \sum_{q \in \mathcal{Q}} \bigl[\, gc(a, q, m) - gc(a, q, 0) \bigr],
     \label{eq:delta-gc}
 \end{equation}
-where $gc(a, q, m)$ is a Sonnet-$4.6$ count of genuine backtracking events (\cref{app:c7-judge}). The second, \textit{detection}, is a sparse-probe PR-AUC at top-$S$ features under $5$-fold GroupKFold by question (\cref{app:c7-pr-auc-full}).
+where $gc(a, q, m)$ is a Sonnet-$4.6$ count of genuine backtracking events (\cref{app:c7-judge}). \emph{Detection} is a sparse-probe PR-AUC at top-$S$ features under $5$-fold GroupKFold by question (\cref{app:c7-pr-auc-full}).
 
-\paragraph{Results.}
-\Cref{fig:c7-gc-at-peak} reports the headline inducement number, and \cref{fig:backtracking} summarizes both the inducement curve and the detection axis. Per-architecture peak $\Delta gc$, peak magnitude, and the full PR-AUC and ROC-AUC tables at $S \in \{1, 2, 4, 8, 16, 32\}$ are tabulated in \cref{tab:c7-pr-auc} (\cref{app:c7-pr-auc-full}).
-
-On the inducement axis, the strongest cell, \cseveenTopGcCell{}, reaches $gc \approx \cseveenTopGcPeak{}$ genuine backtracking events per question at its optimal steering magnitude $m = \cseveenTopGcPeakMag{}$, against an unsteered cohort floor of $gc \approx \cseveenTopGcBaseline{}$ shared across architectures (\cref{fig:c7-gc-at-peak}); the lift is $\Delta gc \approx \cseveenTopGcLift{}$ events per question ($\cseveenTopGcRelLift{}$ relative to baseline). Expressed as the baseline-corrected lift $\Delta gc_{\text{peak}}$ of \cref{eq:delta-gc}, the same cell, \cseveenTopDeltaCell{}, leads at $\Delta gc_{\text{peak}} = \cseveenTopDelta{}$. The two TXC-base batch-size variants peak at the same magnitude (\cref{fig:c7-inducement}), suggesting that the architecture identifies a reproducible feature direction whose causal effect is stable under batch-size scaling. Each cell's $\Delta gc(a, m)$ curve decays toward zero at intermediate magnitudes and crosses below the unsteered baseline at the tails of the magnitude grid; this characteristic peak-and-decay shape is consistent with a real causal lever rather than a calibration artifact.
-
-On the detection axis, the strongest cell, \cseveenTopPrAucCell{}, reaches PR-AUC$\,=\,\cseveenTopPrAuc{}$ at top-$S = 8$ features (\cref{fig:c7-pr-auc-S8}, left subpanel), comfortably above the class-prior chance level of $0.12$. Reporting ROC-AUC alongside (\cref{fig:c7-pr-auc-S8}, right subpanel; \cref{tab:c7-pr-auc}), the same cell leads at ROC-AUC$\,=\,\cseveenTopRocAuc{}$, and the architecture ordering is preserved between the two metrics. The ordering is also preserved across the full $S$ grid (\cref{tab:c7-pr-auc}). Because the detection task does not depend on judge subjectivity or magnitude calibration, it serves as an independent corroboration of the inducement story.
+\Cref{fig:c7-headline} summarizes both axes. \cseveenTopGcCell{} leads inducement at $gc \approx \cseveenTopGcPeak{}$ ($m = \cseveenTopGcPeakMag{}$), against the shared unsteered floor of $gc \approx \cseveenTopGcBaseline{}$, for a baseline-corrected lift of $\Delta gc_{\text{peak}} = \cseveenTopDelta{}$. \cseveenTopPrAucCell{} leads detection at PR-AUC$\,=\,\cseveenTopPrAuc{}$, comfortably above the class-prior chance level of $0.12$. The two TXC-base batch-size variants peak at the same magnitude (\cref{fig:c7-inducement-app}), suggesting that the architecture identifies a reproducible feature direction whose causal effect is stable under batch-size scaling. Architecture ordering is preserved between PR-AUC and ROC-AUC and across the full $S$ grid (\cref{tab:c7-pr-auc}). Because detection does not depend on judge subjectivity or magnitude calibration, it serves as an independent corroboration of the inducement story.
 
 Limitations (single-seed headline, judge $\kappa$ deferred, batch-size effects, alternative steering protocols) are discussed in \cref{app:c7-seeds,app:c7-bs-256,app:c7-judge,app:c7-steering-variants}.
 
