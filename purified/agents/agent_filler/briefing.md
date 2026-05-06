@@ -1514,6 +1514,26 @@ chronologically for git provenance.
    a new `toy_coupled_noisy_K10_M20_d256` datasource + `p_A`/`p_B`
    plumbing in `coupled.py` — agent_paper / data infrastructure
    territory.
+7. **Han 2026-05-06: Replicate wasteland 1c-noisy (2026-03-30)
+   with txc_base as a "second part of C2".** Han granted territory
+   waiver. Replication landed:
+   - Added `p_A`/`p_B` Bernoulli noise to `markov.py` (defaults
+     preserve old behavior)
+   - Added `toy_markov_n20_d40_noisy` datasource (p_A=0, p_B=0.625,
+     ρ=0.7)
+   - New `experiments/c1_noisy_filler/` with COMPONENT="c1_noisy"
+   - 6 arch+T combos: tfa_pos, stacked_sae T={2,5}, txc_base T={2,5},
+     txc_pro default
+   - Sweep launched + ~85% complete as of 16:50Z (txc_pro is final
+     arch in flight)
+   **Bit-faithful gap (acknowledged, not corrected):**
+   wasteland used `batch=2048` for Stacked + TXCDRv2 and `batch=64
+   + lr=1e-3` for TFA-pos; my driver uses uniform `batch=1024,
+   lr=3e-4`. Han's call 2026-05-06 PM: only redo TFA with small
+   batch IF TFA at 1024 was taking ages. TFA-pos at 1024 already
+   wrapped fast (no ages) → no re-run. Stacked/TXCDR at 1024 stay
+   as approximate reproduction. Numbers will be SIMILAR but not
+   bit-identical to wasteland.
 
 (Surface either as a comment if you want me to take action; otherwise
 I'll leave them as-is.)
