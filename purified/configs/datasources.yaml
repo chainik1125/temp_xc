@@ -352,3 +352,205 @@ datasources:
     magnitude_mean: 1.0
     magnitude_std: 0.15
     notes: "C2 ρ=0.9 — strong temporal correlation (matches Dmitry's high-ρ benches)."
+
+  # ── C2 noisy + overlap datasources (Han 2026-05-06T23:00Z — agent_synth
+  # HUNT mission). Per-token Bernoulli emission noise (p_B<1.0) + dense
+  # overlap (n_parents>2). Reproduces Dmitry's coupled_noisy_overlap bench
+  # (origin/dmitry-synthetic @ 03a099b4); his p_B=0.5, n_parents=5, ρ=0.9
+  # is the regime where TXC's gAUC win is largest (txc_base 0.97 vs
+  # regular_sae 0.58 at raw_k=5). Hunt grid sweeps p_B ∈ {0.5, 0.3, 0.2,
+  # 0.1} × n_parents ∈ {2, 5, 8, 10}. ρ=0.9 fixed (Dmitry confirmed
+  # ρ-robustness). ────────────────────────────────────────────────────
+
+  toy_coupled_noisy_K10_M20_d256_pB05_np2:
+    category: synthetic
+    generator: temp_bench.data.toy:coupled_noisy_hmm
+    K_hidden: 10
+    M_emissions: 20
+    n_parents: 2
+    d_in: 256
+    seq_len: 64
+    pi: 0.05
+    rho: 0.9
+    p_A: 0.0
+    p_B: 0.5
+    magnitude_dist: folded_normal
+    magnitude_mean: 1.0
+    magnitude_std: 0.15
+    notes: "C2 hunt: Dmitry-Bench-1-style baseline (low overlap + noise)."
+
+  toy_coupled_noisy_K10_M20_d256_pB05_np5:
+    category: synthetic
+    generator: temp_bench.data.toy:coupled_noisy_hmm
+    K_hidden: 10
+    M_emissions: 20
+    n_parents: 5
+    d_in: 256
+    seq_len: 64
+    pi: 0.05
+    rho: 0.9
+    p_A: 0.0
+    p_B: 0.5
+    magnitude_dist: folded_normal
+    magnitude_mean: 1.0
+    magnitude_std: 0.15
+    notes: "C2 hunt: REPRODUCE Dmitry Bench 2 — known TXC win (gAUC 0.97 vs SAE 0.58 at raw_k=5)."
+
+  toy_coupled_noisy_K10_M20_d256_pB03_np5:
+    category: synthetic
+    generator: temp_bench.data.toy:coupled_noisy_hmm
+    K_hidden: 10
+    M_emissions: 20
+    n_parents: 5
+    d_in: 256
+    seq_len: 64
+    pi: 0.05
+    rho: 0.9
+    p_A: 0.0
+    p_B: 0.3
+    magnitude_dist: folded_normal
+    magnitude_mean: 1.0
+    magnitude_std: 0.15
+    notes: "C2 hunt: more emission noise, same overlap as Bench 2."
+
+  toy_coupled_noisy_K10_M20_d256_pB03_np8:
+    category: synthetic
+    generator: temp_bench.data.toy:coupled_noisy_hmm
+    K_hidden: 10
+    M_emissions: 20
+    n_parents: 8
+    d_in: 256
+    seq_len: 64
+    pi: 0.05
+    rho: 0.9
+    p_A: 0.0
+    p_B: 0.3
+    magnitude_dist: folded_normal
+    magnitude_mean: 1.0
+    magnitude_std: 0.15
+    notes: "C2 hunt: more noise + more overlap."
+
+  toy_coupled_noisy_K10_M20_d256_pB02_np8:
+    category: synthetic
+    generator: temp_bench.data.toy:coupled_noisy_hmm
+    K_hidden: 10
+    M_emissions: 20
+    n_parents: 8
+    d_in: 256
+    seq_len: 64
+    pi: 0.05
+    rho: 0.9
+    p_A: 0.0
+    p_B: 0.2
+    magnitude_dist: folded_normal
+    magnitude_mean: 1.0
+    magnitude_std: 0.15
+    notes: "C2 hunt: extreme noise + extreme overlap."
+
+  toy_coupled_noisy_K10_M20_d256_pB05_np8:
+    category: synthetic
+    generator: temp_bench.data.toy:coupled_noisy_hmm
+    K_hidden: 10
+    M_emissions: 20
+    n_parents: 8
+    d_in: 256
+    seq_len: 64
+    pi: 0.05
+    rho: 0.9
+    p_A: 0.0
+    p_B: 0.5
+    magnitude_dist: folded_normal
+    magnitude_mean: 1.0
+    magnitude_std: 0.15
+    notes: "C2 hunt: modest noise + extreme overlap."
+
+  toy_coupled_noisy_K10_M20_d256_pB01_np5:
+    category: synthetic
+    generator: temp_bench.data.toy:coupled_noisy_hmm
+    K_hidden: 10
+    M_emissions: 20
+    n_parents: 5
+    d_in: 256
+    seq_len: 64
+    pi: 0.05
+    rho: 0.9
+    p_A: 0.0
+    p_B: 0.1
+    magnitude_dist: folded_normal
+    magnitude_mean: 1.0
+    magnitude_std: 0.15
+    notes: "C2 hunt: very high noise (only 10% of should-fire emissions actually fire)."
+
+  toy_coupled_noisy_K10_M20_d256_pB05_np10:
+    category: synthetic
+    generator: temp_bench.data.toy:coupled_noisy_hmm
+    K_hidden: 10
+    M_emissions: 20
+    n_parents: 10
+    d_in: 256
+    seq_len: 64
+    pi: 0.05
+    rho: 0.9
+    p_A: 0.0
+    p_B: 0.5
+    magnitude_dist: folded_normal
+    magnitude_mean: 1.0
+    magnitude_std: 0.15
+    notes: "C2 hunt: max overlap (every emission has every hidden chain as parent)."
+
+  # ── C2 Phase 3 hierarchical bench (Han 2026-05-06T23:00Z — agent_synth
+  # ENGINEER mission). K_g slow globals × K_l fast locals; locals are
+  # modulated by globals. Engineered for the global/local divide: per-
+  # token signal dominated by locals (K_l > K_g), but globals only
+  # recoverable via window-pooling. ────────────────────────────────────
+
+  toy_hierarchical_Kg10_Kl30_d256:
+    category: synthetic
+    generator: temp_bench.data.toy:hierarchical_features
+    K_global: 10
+    K_local: 30
+    n_global_parents: 1
+    d_in: 256
+    seq_len: 64
+    pi_g: 0.05
+    rho_g: 0.95
+    p_l_high: 0.8
+    p_l_low: 0.1
+    magnitude_dist: folded_normal
+    magnitude_mean: 1.0
+    magnitude_std: 0.15
+    notes: "C2 ENGINEER: 10 slow globals × 30 fast locals (1-parent modulation)."
+
+  toy_hierarchical_Kg10_Kl50_d256:
+    category: synthetic
+    generator: temp_bench.data.toy:hierarchical_features
+    K_global: 10
+    K_local: 50
+    n_global_parents: 1
+    d_in: 256
+    seq_len: 64
+    pi_g: 0.05
+    rho_g: 0.95
+    p_l_high: 0.8
+    p_l_low: 0.1
+    magnitude_dist: folded_normal
+    magnitude_mean: 1.0
+    magnitude_std: 0.15
+    notes: "C2 ENGINEER: 10 globals × 50 locals (more local distractors → sharper TXC win)."
+
+  toy_hierarchical_Kg10_Kl30_d256_np2:
+    category: synthetic
+    generator: temp_bench.data.toy:hierarchical_features
+    K_global: 10
+    K_local: 30
+    n_global_parents: 2
+    d_in: 256
+    seq_len: 64
+    pi_g: 0.05
+    rho_g: 0.95
+    p_l_high: 0.8
+    p_l_low: 0.1
+    magnitude_dist: folded_normal
+    magnitude_mean: 1.0
+    magnitude_std: 0.15
+    notes: "C2 ENGINEER: 2-parent modulation (more global influence, harder per-token)."

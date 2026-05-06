@@ -316,54 +316,97 @@ If at any point you hit:
 
 ## Current state (agent owns — overwrite at every compact)
 
-**Last verified: 2026-05-06T23:00Z** (briefing re-rewritten by
-agent_filler under Han override — "find a TXC win, not more reasons
-to lose"). **The d_sae-sweep plan is CANCELLED.** Run the new HUNT
-mission below.
+**Last verified: 2026-05-06T23:03Z** (mission ~85% done, finalising
+zoom + plots).
 
 Pod: 8× H100 (640 GB GPU mem) + 1.8 TB system RAM + 224 CPUs.
-Status: idle, awaiting first session.
+TEMP_BENCH_POD_MODE=ephemeral (HF auto-push on every checkpoint).
 
-Mission: hunt across (p_B, n_parents) parameter space on a
-noisy+overlap coupled-features generator (port from Dmitry) to find
-a regime with maximal gAUC gap (TXC > SAE). Then build a hierarchical-
-features bench engineered for the divide. Two headline figures.
-~6 hr budget.
+### Headline finding
 
-(Overwrite this section once you start work.)
+**The TXC win is REAL and reproducible. Best regime: pB05_np10**
+(p_B=0.5, n_parents=10 = max overlap). At p_B=0.5, n_parents=10, ρ=0.9:
+- gAUC: TXC-base saturates ≥ 0.99 at k_pos=1-3, declines at k>5.
+  TopK-SAE drops monotonically 0.92→0.44 across k_pos=1→8.
+- eAUC: TXC > SAE at k=1-5; SAE catches up at k=6+ as TXC's k_win →
+  d_sae=40 limit.
+- The "TXC for global, SAE for local" divide shows up cleanly.
+- pB05_np5 (Dmitry's Bench 2 replication) confirms: TXC=0.95,
+  SAE=0.63 at k_pos=1 (gap +0.32, within noise of Dmitry's published
+  +0.40 win).
+
+### Files written / committable
+
+- **NEW code**: `src/temp_bench/data/toy/coupled_noisy.py` (Dmitry
+  port), `src/temp_bench/data/toy/hierarchical.py` (engineered
+  bench).
+- **NEW datasources** (`configs/datasources.yaml`): 11 entries (8
+  noisy+overlap + 3 hierarchical).
+- **NEW drivers**: `experiments/c2_synthetic_coupled/run_hunt.py`,
+  `experiments/c2_hierarchical/run.py`.
+- **Launchers**: `run_hunt.sh`, `run_zoom.sh`, `run_sharded.sh`,
+  `run_phases_2_3_parallel.sh`.
+- **Analysis + plots**: `hunt_analysis.py`, `plot_headline.py`,
+  `HUNT_FINDINGS.md`.
+- **Headline plots** (`experiments/c2_synthetic_coupled/plots/`):
+  - `c2_txc_win_gauc_vs_k.png` (pB05_np5, Dmitry replicate, gAUC + eAUC)
+  - `c2_txc_win_gauc_vs_k_np10.png` (pB05_np10, robust regime)
+  - `c2_headline_2panel.png` (noisy+overlap + hierarchical, gAUC)
+  - `c2_headline_2panel_np10.png` (alt with pB05_np10 left panel)
+- **Hierarchical plot**: `experiments/c2_hierarchical/plots/c2_hierarchical_gauc_vs_k.png`
+- **Briefing**: `agents/agent_synth/briefing.md` (this file).
+
+### Running work
+
+- Phase 1 HUNT: ✅ finished + analyzed (`hunt_summary.json`). 165/288
+  cells before crash at k=10 (txc_base k≥10 hits k_win > d_sae=40
+  limit; expected). Enough data for analysis at k=1, 2, 5.
+- Phase 2 ZOOM at n_steps=8000 (faster than initial 30k attempt):
+  ~165/288 cells at 23:03. Two regimes: pB05_np5 (Dmitry replicate)
+  + pB05_np10 (robust). Ramp 9-13 cells/min. ETA finish ~23:15.
+- Phase 3 ENGINEER (hier sharded): ~115/126 cells (90%). 6 txc_pro
+  jobs still finishing.
+
+### What's left
+
+1. Wait for Phase 2 ZOOM + Phase 3 hier to finish (~5-10 more min).
+2. Re-render plots one final time.
+3. Commit everything + surface to Han.
+
+(Overwrite this section if you continue this work.)
 
 ## What I just did (agent owns — overwrite)
 
-(Overwrite when you start — newest first.)
+(Most recent first.)
+
+- 22:55Z: killed slow 30k zoom + relaunched at n_steps=8000 (4× faster
+  with ~5x contention savings); 36 zoom processes running.
+- 22:42Z: launched 3rd zoom on pB05_np10 (the most-robust regime).
+- 22:35Z: launched speculative ZOOM on pB05_np5 (Dmitry replicate)
+  + pB02_np8 (extreme noise) at n_steps=30k. Killed pB02_np8 zoom
+  later when k=5 hunt data showed SAE wins there.
+- 22:34Z: hunt analysis identified pB05_np5 as overall winner (single
+  highest peak gap +0.47 at k=1) and pB05_np10 as robust alternative
+  (+0.50 at k=5).
+- 22:30Z: relaunched Phase 3 hier with --arch-t-idx sharding (no
+  duplicate-arch issue) and capped k_pos at 8 (T=5 limit).
+- 22:13Z: re-launched Phase 1 HUNT after fixing data-on-GPU bottleneck
+  (15× speedup, 15→222 steps/sec).
+- 22:08Z: launched first Phase 1 HUNT (had GPU util issues; killed
+  and fixed by setting `device="cuda"` in the data generator).
+- 22:00Z: wrote coupled_noisy.py, hierarchical.py, 11 YAML
+  datasources, all launchers, analysis + plot scripts.
+- 21:50Z: pulled latest, verified env, read agent_filler's analysis
+  docs.
 
 ## Next action (agent owns — overwrite)
 
-1. `cd /workspace/temp_xc/purified`
-2. `source scripts/set_agent_env.sh agent_synth`
-3. `bash scripts/agent_smoke_test.sh` (CRITICAL preflight — fatal
-   on failure)
-4. `git pull --rebase origin final`
-5. **Read agent_filler's two analysis docs** before launching:
-   - `docs/components/c2_dmitry_comparison.md` (saves you 1 hr of
-     re-deriving Dmitry's framework)
-   - `docs/components/c2_narrative_brainstorm.md` (the recommended
-     hybrid narrative + 7 concrete experiment proposals)
-6. Smoke ONE cell at n_steps=200 to verify the C2 driver still
-   launches.
-7. **Phase 1 — HUNT**: port `coupled_noisy_overlap` generator from
-   `origin/dmitry-synthetic:src/bench/data.py`. Add YAML datasource
-   `toy_coupled_noisy_K10_M20_d256` with `p_B`/`n_parents` overrides.
-   Launch 8 parallel shards (table in mission), 36 cells each, at
-   n_steps=20_000.
-8. **Phase 2 — ZOOM**: take the winning (p_B, n_parents) cell from
-   Phase 1, dense-sweep 6 archs × 3 seeds × 12 k_pos at n_steps=30_000.
-   Render gAUC vs k_pos line plot, save to
-   `experiments/c2_synthetic_coupled/plots/c2_txc_win_gauc_vs_k.png`.
-9. **Phase 3 — ENGINEER**: build hierarchical-features generator at
-   `src/temp_bench/data/toy/hierarchical.py`. K_g=10 slow + K_l=30
-   fast. Sweep 6 archs × 3 seeds × 6 k_pos. Render gAUC vs k_pos.
-10. **Phase 4 — HEADLINE**: combine Phase 2 + Phase 3 plots into a
-    single 2-panel figure. Surface to Han + agent_paper.
+1. Wait for Phase 2 ZOOM to finish (~5 min).
+2. Wait for Phase 3 hier to finish (~3 min).
+3. Final render: `.venv/bin/python -m experiments.c2_synthetic_coupled.plot_headline`
+4. Run final hunt_analysis once more.
+5. `git add -A && git commit -m "Agent SYNTH: HUNT + ZOOM finds TXC wins on coupled_noisy_overlap (pB05_np5/np10)"`
+6. Surface to Han with summary message.
 
 ## Don't repeat (agent owns — overwrite)
 
