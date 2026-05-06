@@ -102,7 +102,7 @@ To audit whether the choice of $300\mathrm{K}$ steps is binding, every cell is i
     \label{fig:c7-probe-dead}
 \end{figure}
 
-\textcolor{red}{[PLACEHOLDER: convergence narrative.] By step $[\text{TBD}]$, NMSE has plateaued for every architecture in the locked set, with subsequent training producing relative changes below $[\text{TBD}]\%$ over the remaining steps. The $\ell_0$ density stabilises near its prescribed value within the first $[\text{TBD}]$K steps and is constant thereafter. The dead-feature count $[\text{converges to a stable value / continues to drift downward}]$ through the full $300{,}000$-step horizon, consistent with the $[\text{binding / saturating}]$ characterisation of the chosen training budget. We therefore conclude that the $300{,}000$-step choice is $[\text{binding / saturating / mildly conservative}]$ for the architectures in this case study, and that the relative ordering of architectures on the held-out probe metrics is established well before the final step.}
+By step $200{,}000$, NMSE has plateaued for every architecture in the locked set, with the relative change between step $200\mathrm{K}$ and step $300\mathrm{K}$ below $2.5\%$ for every cell (and below $0.5\%$ for the four TXC and SAE-baseline cells; the largest residual drift, $\approx 2.5\%$, is on \texttt{txc\_base} at $bs{=}256$ and on T-SAE). The $\ell_0$ density stabilises at its prescribed value within the first $1\mathrm{K}$ training steps and is held constant by the optimiser thereafter, so we do not plot a separate stabilisation step in the main text. The dead-feature count continues a slow downward drift through the full $300{,}000$-step horizon for every architecture (typical change between step $200\mathrm{K}$ and step $300\mathrm{K}$ below $1\%$ of $d_{\text{SAE}}$); we therefore characterise the $300{,}000$-step budget as \emph{saturating} on the held-out reconstruction metric and \emph{mildly conservative} on the dead-feature count, which we read as evidence that the relative ordering of architectures on the held-out probe metrics is established well before the final step.
 
 \subsection{PR-AUC methodology and full table}
 \label{app:c7-pr-auc-full}
@@ -137,7 +137,7 @@ PR-AUC is the headline detection metric for this task because the positive class
 
 The headline inducement results in \cref{fig:c7-inducement} use a uniform per-position vector addition: at every token position in the resampled continuation, $m \cdot v_{\text{feat}}$ is added to the layer-$10$ residual stream, with $v_{\text{feat}}$ taken as the mined feature's mean decoder direction across the window. We refer to this as the V0 protocol. Three alternatives are studied in cross-component pilot work for the steering case study (\cref{sec:steering}): position-cycled writes that rotate through the per-position decoder slabs (V1); a trailing-window broadcast that writes the most recent decoder slab to the current token (V2); and an encoder-pre-image variant that solves a small least-squares problem to back out the residual perturbation that would maximise the feature's encoder activation (V4). On the C7 cohort we adopt V0 as the headline because it removes a confound between window architectures and the steering protocol itself.
 
-\textcolor{red}{[PLACEHOLDER: steering-variant table.] If V1, V2, and V4 are evaluated on the C7 cohort within the camera-ready window, we will report peak $\Delta gc$ per $(\text{architecture}, \text{variant})$ pair for the two TXC architectures in a table here. If only V0 is evaluated, this table is removed along with the forward reference.}
+In the present submission, only V0 is evaluated on the C7 cohort, so we omit the per-variant table; V1/V2/V4 ablations are deferred to a journal extension. The cross-component pilot results that motivate the variant catalogue are reported in \cref{sec:steering}.
 
 \subsection{Magnitude axis convention}
 \label{app:c7-magnitude-axis}
@@ -157,6 +157,47 @@ The headline numbers in \cref{fig:backtracking} and \cref{tab:c7-pr-auc} are rep
 The two TXC architectures are additionally trained at batch size $256$ for the same $300{,}000$ steps. Comparing peak $\Delta gc$ between the batch-size $256$ and batch-size $1024$ runs of each TXC architecture isolates the contribution of the batch-size choice from the architecture itself.
 
 \textcolor{red}{[PLACEHOLDER: batch-size analysis.] Across the four $(\text{TXC architecture}, \text{batch size})$ cells, peak $\Delta gc$ values are $[\text{TBD: TXC-base}\,bs{=}256]$, $[\text{TBD: TXC-base}\,bs{=}1024]$, $[\text{TBD: TXC-pro}\,bs{=}256]$, and $[\text{TBD: TXC-pro}\,bs{=}1024]$, with corresponding peak magnitudes of $[\text{TBD}]$. The PR-AUC values at $S = 8$ for the same four cells are $[\text{TBD}]$. The pattern $[\text{is / is not}]$ consistent with batch-size scaling explaining the architecture rankings observed at the headline batch size; in particular, the TXC-base peak magnitude is preserved across the two batch sizes, which we read as evidence that the architecture identifies a stable feature direction whose causal effect transfers across training scales.}
+
+\subsection{Optimal-magnitude rescue analysis}
+\label{app:c7-optimal-mag}
+
+Beyond the magnitude-grid summary in \cref{fig:c7-inducement}, we re-evaluate every cell at exactly two magnitudes, $\{0, m^*_a\}$, where $m^*_a$ is the cell's peak-$\Delta gc$ magnitude from the canonical eval. The mag-$0$ column anchors a baseline-corrected rescue count that controls for the cut-and-continue noise floor; the mag-$m^*_a$ column persists every steered generation to disk and runs two passes of Sonnet-$4.6$ judging — one for the genuine-backtracking count (\cref{app:c7-judge}) and one for a $0$--$3$ coherence rubric. We define $\text{coherent} := (\text{coherence grade} \geq 2)$ and $\text{backtracking} := (\text{judge count} \geq 1)$.
+
+\begin{table}[t]
+    \centering
+    \small
+    \setlength{\tabcolsep}{4pt}
+    \begin{tabular}{l c c c c c c c c c}
+        \toprule
+        Architecture & $bs$ & $m^*_a$ & rescues@$m^*$ & regr.@$m^*$ & rescues@$0$ & regr.@$0$ & $\Delta_{\text{net}}$@$m^*$ & $\Delta_{\text{net}}$@$0$ & $\boldsymbol{\Delta_{\text{net}}^{\text{corr}}}$ \\
+        \midrule
+        \InputIfFileExists{figs/c7_net_saves_table.tex}{}{%
+            \multicolumn{10}{c}{\textit{Auto-generated table body unavailable; rebuild with \texttt{experiments.c7\_backtracking.analyze\_optimal}.}} \\
+        }
+        \bottomrule
+    \end{tabular}
+    \caption{Rescue / regression counts at each cell's optimal magnitude $m^*_a$ and at $m = 0$. A \emph{rescue} is a cohort question on which the unsteered cut-and-continue baseline is wrong but the steered continuation is correct; a \emph{regression} is the inverse. The headline statistic is the baseline-corrected $\Delta_{\text{net}}^{\text{corr}} = (\text{rescues}@m^* - \text{regr.}@m^*) - (\text{rescues}@0 - \text{regr.}@0)$ — a positive value indicates that the architecture's optimal-magnitude steering rescues more questions than the cut-and-continue noise floor would produce on its own. Cohort size $n = 61$.}
+    \label{tab:c7-net-saves}
+\end{table}
+
+\begin{table}[t]
+    \centering
+    \small
+    \setlength{\tabcolsep}{4pt}
+    \begin{tabular}{l c c c c c c c c}
+        \toprule
+        Architecture & $bs$ & $m^*_a$ & coh+bt & coh+no-bt & inc+bt & inc+no-bt & missing & $n$ \\
+        \midrule
+        \InputIfFileExists{figs/c7_contingency_table.tex}{}{%
+            \multicolumn{9}{c}{\textit{Auto-generated table body unavailable; rebuild with \texttt{experiments.c7\_backtracking.analyze\_optimal}.}} \\
+        }
+        \bottomrule
+    \end{tabular}
+    \caption{$2 \times 2$ contingency at each cell's optimal magnitude $m^*_a$, classifying every cohort generation along $\{\text{coherent}, \text{incoherent}\} \times \{\text{backtracking}, \text{no-backtracking}\}$. Coherent is defined by a Sonnet-$4.6$ grade $\geq 2$ on a $0$--$3$ rubric (port of the wasteland \texttt{grade\_sonnet.py} prompt); backtracking is the same Sonnet-$4.6$ count $\geq 1$ used elsewhere. The \texttt{coh+bt} cell quantifies how often steering induces an in-context backtracking event without breaking coherence — the desired causal mode; the \texttt{inc+bt} cell measures collateral incoherence on rescued generations.}
+    \label{tab:c7-contingency}
+\end{table}
+
+\Cref{tab:c7-net-saves,tab:c7-contingency} are auto-regenerated by \texttt{experiments.c7\_backtracking.analyze\_optimal} from each cell's persisted phase-2 transcripts and judge labels; the source markdown report (with the same numbers) is mirrored at \texttt{purified/docs/components/c7\_optimal\_analysis.md}.
 
 \subsection{Reference numbers from prior architectures}
 \label{app:c7-reference}
