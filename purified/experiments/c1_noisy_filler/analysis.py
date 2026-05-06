@@ -23,25 +23,38 @@ from temp_bench.cache import _read_jsonl, leaderboard_path
 
 COMPONENT = "c1_noisy"
 
-# 6 arch+T combos (mirrors run.py:ARCH_TS), with both stacked_sae T=5
-# (default) and tfa_pos default labels.
+# Arch+T combos. Original c1_noisy ARCH_TS (run.py): 6 entries.
+# T-sweep extension (run_t.py, 2026-05-06): adds T={4,6,8,10,12} for
+# txc_base to match wasteland scatter plot (T=2..12).
 CANONICAL_ARCH_TS: list[tuple[str, str]] = [
     ("tfa_pos",     "default"),
     ("stacked_sae", "T=2"),
     ("stacked_sae", "default"),  # T=5
     ("txc_base",    "T=2"),
+    ("txc_base",    "T=4"),
     ("txc_base",    "default"),  # T=5
+    ("txc_base",    "T=6"),
+    ("txc_base",    "T=8"),
+    ("txc_base",    "T=10"),
+    ("txc_base",    "T=12"),
     ("txc_pro",     "default"),  # T_max=10
 ]
 
-# Okabe-Ito palette, color-blind safe.
+# Okabe-Ito palette + RdPu cmap for txc_base T-sweep, color-blind safe.
+import matplotlib.cm as _cm
+_txc_cmap = _cm.get_cmap("RdPu", 8)
 PLOT_STYLE: dict[tuple[str, str], dict[str, Any]] = {
-    ("tfa_pos",     "default"): {"label": "TFA-pos",         "color": "#56B4E9", "ls": "-",  "marker": "v"},
-    ("stacked_sae", "T=2"):     {"label": "Stacked T=2",     "color": "#E69F00", "ls": "--", "marker": "D"},
-    ("stacked_sae", "default"): {"label": "Stacked T=5",     "color": "#D55E00", "ls": "-",  "marker": "D"},
-    ("txc_base",    "T=2"):     {"label": "TXC-base T=2",    "color": "#CC79A7", "ls": "--", "marker": "P"},
-    ("txc_base",    "default"): {"label": "TXC-base T=5",    "color": "#CC79A7", "ls": "-",  "marker": "P"},
-    ("txc_pro",     "default"): {"label": "TXC-pro T_max=10","color": "#882255", "ls": "-",  "marker": "X"},
+    ("tfa_pos",     "default"): {"label": "TFA-pos",       "color": "#56B4E9", "ls": "-",  "marker": "v"},
+    ("stacked_sae", "T=2"):     {"label": "Stacked T=2",   "color": "#E69F00", "ls": "--", "marker": "D"},
+    ("stacked_sae", "default"): {"label": "Stacked T=5",   "color": "#D55E00", "ls": "-",  "marker": "D"},
+    ("txc_base",    "T=2"):     {"label": "TXC-base T=2",  "color": _txc_cmap(1), "ls": "-",  "marker": "P"},
+    ("txc_base",    "T=4"):     {"label": "TXC-base T=4",  "color": _txc_cmap(2), "ls": "-",  "marker": "s"},
+    ("txc_base",    "default"): {"label": "TXC-base T=5",  "color": _txc_cmap(3), "ls": "-",  "marker": "P"},
+    ("txc_base",    "T=6"):     {"label": "TXC-base T=6",  "color": _txc_cmap(4), "ls": "-",  "marker": "^"},
+    ("txc_base",    "T=8"):     {"label": "TXC-base T=8",  "color": _txc_cmap(5), "ls": "-",  "marker": "v"},
+    ("txc_base",    "T=10"):    {"label": "TXC-base T=10", "color": _txc_cmap(6), "ls": "-",  "marker": "<"},
+    ("txc_base",    "T=12"):    {"label": "TXC-base T=12", "color": _txc_cmap(7), "ls": "-",  "marker": "p"},
+    ("txc_pro",     "default"): {"label": "TXC-pro T_max=10", "color": "#1f77b4", "ls": "-",  "marker": "X"},
 }
 
 
@@ -134,13 +147,7 @@ def run_analysis() -> AnalysisResult:
     ks = sorted({k for (_, _, k) in agg.keys()})
 
     out_lines: list[str] = []
-    out_lines.append("**c1_noisy (under C2): wasteland 1c-noisy reproduction**\n")
-    out_lines.append(
-        "Bernoulli emission noise on Markov-chain HMM "
-        r"($p_A{=}0,\,p_B{=}0.625$). Datasource: "
-        "`toy_markov_n20_d40_noisy`. Wasteland claim: TXCDRv2 T=2 "
-        r"hits AUC $\geq 0.98$ across $k\in[3,12]$.")
-    out_lines.append("")
+    out_lines.append("**Decoder AUC vs k_pos** (mean ± std over seeds)\n")
     header = "| arch | T | " + " | ".join(f"k={k}" for k in ks) + " |"
     sep    = "|---|---|" + "|".join(["---:" for _ in ks]) + "|"
     out_lines.extend([header, sep])
@@ -162,12 +169,7 @@ def run_analysis() -> AnalysisResult:
     out_lines.append(
         f"_Cells aggregated over seeds. Filter: "
         f"`component='{COMPONENT}'`, `smoke=False`. Skipped cells "
-        f"(k_train > arch budget at toy d_sae=40) appear as `—`. "
-        f"Note: 63 rows tagged agent='unknown' (relaunch missed env "
-        f"propagation; data-valid). Bit-faithful gap: wasteland used "
-        f"batch=2048 + lr=3e-4 for Stacked/TXCDRv2 and batch=64 + "
-        f"lr=1e-3 for TFA-pos; this run uses uniform batch=1024 + "
-        f"lr=3e-4. Numbers are similar but not bit-identical._"
+        f"(k_train > arch budget at toy d_sae=40) appear as `—`._"
     )
 
     plot_path = Path(__file__).resolve().parent / "plots" / "c1_noisy_auc_vs_kpos.png"
