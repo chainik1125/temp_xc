@@ -363,13 +363,21 @@ def _aggregate_by_seeds(results: list[dict]) -> dict:
         grouped[key].append(r)
     agg = {}
     for key, rs in grouped.items():
+        # Clamp ratios to [-2, 2] before averaging — near-zero local
+        # correlations produce spurious -1e10 ratios that ruin the mean.
+        sl_ratios_clamped = [
+            max(-2.0, min(2.0, r["sl_ratio"])) for r in rs
+        ]
+        lp_ratios_clamped = [
+            max(-2.0, min(2.0, r["lp_ratio"])) for r in rs
+        ]
         agg[key] = {
             "sl_mean_local":      float(np.mean([r["sl_mean_local"] for r in rs])),
             "sl_mean_global":     float(np.mean([r["sl_mean_global"] for r in rs])),
-            "sl_ratio":           float(np.mean([r["sl_ratio"] for r in rs])),
+            "sl_ratio":           float(np.mean(sl_ratios_clamped)),
             "lp_mean_local_r2":   float(np.mean([r["lp_mean_local_r2"] for r in rs])),
             "lp_mean_global_r2":  float(np.mean([r["lp_mean_global_r2"] for r in rs])),
-            "lp_ratio":           float(np.mean([r["lp_ratio"] for r in rs])),
+            "lp_ratio":           float(np.mean(lp_ratios_clamped)),
             "n":                  len(rs),
         }
     return agg
@@ -418,8 +426,16 @@ def plot_scatter(agg: dict, out_path: Path, *, mode: str) -> None:
         ax.set_ylabel(r"Global correlation $\bar{r}_{\rm global}$ ($z_j \to h_i$, hidden state)", fontsize=12)
         ax.set_title(r"c1\_noisy single-latent correlation"
                      r"  ($p_A{=}0,\,p_B{=}0.625,\,\gamma{=}0.25$)", fontsize=12)
-        ax.set_xlim(-0.05, 1.05)
-        ax.set_ylim(-0.05, 1.05)
+        # Auto-zoom: single-latent correlations are small (~0-0.15 here).
+        # Padding ±0.02 + 5% buffer.
+        all_local = [agg[(a, t, k)]["sl_mean_local"] for (a, t, k) in agg.keys()]
+        all_global = [agg[(a, t, k)]["sl_mean_global"] for (a, t, k) in agg.keys()]
+        lo = min(min(all_local), min(all_global)) - 0.02
+        hi = max(max(all_local), max(all_global)) + 0.02
+        # Make square with the same range on both axes.
+        rng = max(abs(lo), abs(hi))
+        ax.set_xlim(-0.02, hi + 0.02)
+        ax.set_ylim(-0.02, hi + 0.02)
     else:
         ax.set_xlabel(r"Local $R^2$  ($z \to s_i$, noisy obs)", fontsize=12)
         ax.set_ylabel(r"Global $R^2$  ($z \to h_i$, hidden state)", fontsize=12)
