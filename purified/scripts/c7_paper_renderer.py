@@ -902,10 +902,10 @@ def plot_pr_auc_S8_bar_compact(rows: list[dict], out_path: Path) -> None:
     colors = [cell_color(r["arch"], _bs_from_row(r)) for r in rows]
     bars = ax.bar(x_pos, [r["metrics"]["pr_auc_S8"] for r in rows],
                   width=bar_w, color=colors, alpha=0.95)
-    # chance line at 0.12 (the positive-class prior)
-    ax.axhline(0.12, color="#666", linestyle=":", linewidth=1.0)
-    ax.text(n - 0.5, 0.12, "  chance $\\approx 0.12$", va="bottom", ha="right",
-            fontsize=7.5, color="#666")
+    # chance line at 0.12 (the positive-class prior); label via legend so
+    # the line annotation doesn't sit over the bars.
+    ax.axhline(0.12, color="#666", linestyle=":", linewidth=1.0,
+               label=r"chance $\approx 0.12$")
     # value labels above each bar
     y_max = max(r["metrics"]["pr_auc_S8"] for r in rows)
     headroom = 0.06 * y_max
@@ -927,6 +927,7 @@ def plot_pr_auc_S8_bar_compact(rows: list[dict], out_path: Path) -> None:
     ax.spines["top"].set_visible(False)
     ax.spines["right"].set_visible(False)
     ax.margins(x=0.04)
+    ax.legend(loc="upper right", frameon=False, fontsize=8)
     fig.tight_layout()
     fig.savefig(out_path, bbox_inches="tight")
     plt.close(fig)
