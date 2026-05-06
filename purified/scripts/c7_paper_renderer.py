@@ -1070,6 +1070,60 @@ def _enumerate_probe_cells() -> list[tuple[str, int, str, list[dict]]]:
     return out
 
 
+def plot_probe_curves_combined(out_dir: Path) -> Path | None:
+    """One PNG with three side-by-side panels (NMSE / ℓ0 / dead) sharing a
+    single horizontal legend above the row. This is the appendix-figure
+    variant — the per-metric individual PNGs (``plot_probe_curves``) are
+    still emitted alongside for the markdown bundle and the standalone
+    \\autofig path."""
+    series = {}
+    seen_label_count: dict[str, int] = {}
+    for arch, bs, tk, log_rows in _enumerate_probe_cells():
+        base_label = f"{PAPER_ARCH_LABEL.get(arch, arch)} bs={bs}"
+        n = seen_label_count.get(base_label, 0)
+        seen_label_count[base_label] = n + 1
+        label = base_label if n == 0 else f"{base_label} [{tk[:6]}]"
+        series[(arch, bs, tk)] = (label, log_rows, arch)
+    if not series:
+        return None
+    metric_specs = [
+        ("nmse", "NMSE on held-out batch"),
+        ("l0",   r"$\ell_0$ density on held-out batch"),
+        ("dead", r"Dead features (out of $d_{\mathrm{SAE}}$)"),
+    ]
+    fig, axes = plt.subplots(1, 3, figsize=(13.5, 3.6))
+    handles: list = []
+    labels: list[str] = []
+    for ax, (metric, ylabel) in zip(axes, metric_specs):
+        for (arch, bs, _tk), (lab, log_rows, arch_name) in sorted(series.items()):
+            steps = [x["step"] for x in log_rows]
+            vals = [x.get(metric) for x in log_rows]
+            valid = [(s, v) for s, v in zip(steps, vals)
+                     if v is not None and v > 0]
+            if not valid:
+                continue
+            xs, ys = zip(*valid)
+            color = cell_color(arch_name, bs)
+            line, = ax.plot(xs, ys, color=color, linestyle="-",
+                            linewidth=1.4, label=lab)
+            if lab not in labels:
+                handles.append(line)
+                labels.append(lab)
+        ax.set_xlabel("training step")
+        ax.set_ylabel(ylabel)
+        ax.set_yscale("log")
+        ax.grid(alpha=0.25, which="both")
+    # Single shared legend above the row, laid out horizontally.
+    fig.legend(handles, labels, loc="upper center",
+               bbox_to_anchor=(0.5, 1.04),
+               ncol=len(labels), frameon=False, fontsize=9)
+    fig.tight_layout(rect=(0, 0, 1, 0.94))
+    out_path = out_dir / "probe_curves_combined.png"
+    fig.savefig(out_path, bbox_inches="tight")
+    plt.close(fig)
+    return out_path
+
+
 def plot_probe_curves(rows: list[dict], out_dir: Path) -> dict[str, Path]:
     """One PNG per metric: NMSE / L0 / dead, all cells overlaid.
 
@@ -1415,6 +1469,7 @@ def main(*, output_dir: Path, unified: bool = False) -> None:
         plot_probe_metrics_S8_bar_2panel(
             canonical, assets_dir / "probe_metrics_S8_bar.png")
         plot_probe_curves(rows, assets_dir)
+        plot_probe_curves_combined(assets_dir)
 
     # ── --unified mode: pull Han's c7 leaderboard via git show ─────────
     unified_rows: list[dict] | None = None
