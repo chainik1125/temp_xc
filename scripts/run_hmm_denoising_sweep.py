@@ -105,7 +105,7 @@ def run(
             silent=False,
         )
 
-        final = evaluate(model, eval_x, pipeline.true_features)
+        final = evaluate(model, eval_x, pipeline.true_features, eval_s=eval_s)
         denoise = evaluate_denoising(
             model,
             eval_x,
@@ -134,6 +134,10 @@ def run(
                 "r_at_90": final.r_at_90,
                 "r_at_80": final.r_at_80,
                 "mean_max_cos": final.mean_max_cos,
+                "auc_decoder_local": final.auc_decoder_local,
+                "auc_decoder_global": final.auc_decoder_global,
+                "auc_activation_local": final.auc_activation_local,
+                "auc_activation_global": final.auc_activation_global,
                 "corr_local": denoise.corr_local,
                 "corr_global": denoise.corr_global,
                 "r2_local": denoise.r2_local,

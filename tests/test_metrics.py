@@ -1,9 +1,20 @@
 """Tests for evaluation metrics."""
 
+import numpy as np
 import torch
 import pytest
 
-from temporal_bench.metrics import compute_nmse, compute_l0, feature_recovery
+from temporal_bench.metrics import (
+    _auc_columns,
+    compute_nmse,
+    compute_l0,
+    feature_recovery,
+    feature_recovery_activation_global_local,
+    feature_recovery_decoder_global_local,
+)
+from temporal_bench.config import DataConfig
+from temporal_bench.data.pipeline import DataPipeline
+from temporal_bench.sweep import _create_model
 
 
 class TestNMSE:
@@ -67,3 +78,61 @@ class TestFeatureRecovery:
         decoder_dirs[:, 5:] = torch.randn(40, 5)
         result = feature_recovery(decoder_dirs, true_features)
         assert result["r_at_90"] == pytest.approx(0.5, abs=0.1)
+
+
+class TestAucColumns:
+    def test_perfect_separator(self):
+        y = np.array([0, 0, 0, 1, 1, 1])
+        scores = np.array([[0.1], [0.2], [0.3], [0.7], [0.8], [0.9]])
+        assert _auc_columns(y, scores)[0] == pytest.approx(1.0)
+
+    def test_anti_separator(self):
+        y = np.array([0, 0, 0, 1, 1, 1])
+        scores = np.array([[0.9], [0.8], [0.7], [0.3], [0.2], [0.1]])
+        assert _auc_columns(y, scores)[0] == pytest.approx(0.0)
+
+    def test_single_class_returns_nan(self):
+        y = np.array([1, 1, 1, 1])
+        scores = np.random.randn(4, 3)
+        assert np.isnan(_auc_columns(y, scores)).all()
+
+
+class TestGlobalLocalRecovery:
+    """Smoke tests against an untrained model — the metric pipeline must run
+    end-to-end and produce values in plausible ranges. Numerical magnitudes
+    on untrained models are not asserted."""
+
+    @pytest.fixture(scope="class")
+    def setup(self):
+        torch.manual_seed(0)
+        data_cfg = DataConfig(n_features=12, d_model=24, pi=0.1, seed=0)
+        pipe = DataPipeline(data_cfg, device=torch.device("cpu"))
+        x, s, _h = pipe.eval_data_with_support(n_sequences=20, T=4, rho=0.6, seed=1)
+        return pipe, x, s
+
+    @pytest.mark.parametrize("model_name", ["regular_sae", "regular_sae_kT"])
+    def test_decoder_local_equals_global_for_position_independent(self, setup, model_name):
+        pipe, _x, _s = setup
+        model = _create_model(model_name, d_in=24, d_sae=12, T=4, k=2, device=torch.device("cpu"))
+        out = feature_recovery_decoder_global_local(model, pipe.true_features)
+        assert out["auc_local"] == pytest.approx(out["auc_global"])
+
+    @pytest.mark.parametrize("model_name", ["txcdr", "stacked_sae"])
+    def test_decoder_local_global_well_formed_for_temporal(self, setup, model_name):
+        pipe, _x, _s = setup
+        model = _create_model(model_name, d_in=24, d_sae=12, T=4, k=2, device=torch.device("cpu"))
+        out = feature_recovery_decoder_global_local(model, pipe.true_features)
+        # AUCs are in [0, 1].
+        for key in ("auc_local", "auc_global"):
+            assert 0.0 <= out[key] <= 1.0
+
+    @pytest.mark.parametrize(
+        "model_name", ["regular_sae", "regular_sae_kT", "txcdr", "stacked_sae"]
+    )
+    def test_activation_metrics_in_unit_interval(self, setup, model_name):
+        pipe, x, s = setup
+        model = _create_model(model_name, d_in=24, d_sae=12, T=4, k=2, device=torch.device("cpu"))
+        out = feature_recovery_activation_global_local(model, x, s)
+        # Best-of-orientation pick guarantees AUC >= 0.5.
+        for key in ("auc_local", "auc_global"):
+            assert 0.5 <= out[key] <= 1.0

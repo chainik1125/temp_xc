@@ -104,8 +104,9 @@ def run_sweep(config: SweepConfig) -> list[dict]:
 
         print(f"\n--- {model_name} | rho={rho} | k={k} | T={T} | seed={seed} ---")
 
-        # Create eval data for this (rho, T) combination
-        eval_data = pipeline.eval_data(
+        # Create eval data with per-feature support so activation-trace
+        # global/local AUCs can be computed in the final evaluation.
+        eval_data, eval_s, _eval_h = pipeline.eval_data_with_support(
             n_sequences=200, T=T, rho=rho, seed=9999 + seed_idx
         )
 
@@ -123,7 +124,7 @@ def run_sweep(config: SweepConfig) -> list[dict]:
             device=device,
         )
 
-        history = train(
+        train(
             model=model,
             data_fn=data_fn,
             config=config.train,
@@ -132,9 +133,11 @@ def run_sweep(config: SweepConfig) -> list[dict]:
             silent=False,
         )
 
-        # Final evaluation
-        final_metrics = history[-1] if history else evaluate(
-            model, eval_data, pipeline.true_features
+        # Final evaluation: recompute with eval_s so activation-trace
+        # global/local AUCs are populated. Decoder-based global/local AUCs
+        # are populated regardless.
+        final_metrics = evaluate(
+            model, eval_data, pipeline.true_features, eval_s=eval_s
         )
 
         result = {
@@ -149,12 +152,20 @@ def run_sweep(config: SweepConfig) -> list[dict]:
             "r_at_90": final_metrics.r_at_90,
             "r_at_80": final_metrics.r_at_80,
             "mean_max_cos": final_metrics.mean_max_cos,
+            "auc_decoder_local": final_metrics.auc_decoder_local,
+            "auc_decoder_global": final_metrics.auc_decoder_global,
+            "auc_activation_local": final_metrics.auc_activation_local,
+            "auc_activation_global": final_metrics.auc_activation_global,
         }
         results.append(result)
 
         print(
             f"  NMSE={final_metrics.nmse:.4f}  AUC={final_metrics.auc:.3f}  "
-            f"L0={final_metrics.l0:.1f}  R@0.9={final_metrics.r_at_90:.2f}"
+            f"L0={final_metrics.l0:.1f}  R@0.9={final_metrics.r_at_90:.2f}  "
+            f"dec(loc/glo)={final_metrics.auc_decoder_local:.3f}/"
+            f"{final_metrics.auc_decoder_global:.3f}  "
+            f"act(loc/glo)={final_metrics.auc_activation_local:.3f}/"
+            f"{final_metrics.auc_activation_global:.3f}"
         )
 
         # Atomic incremental save: write-then-rename so a crash mid-write can't

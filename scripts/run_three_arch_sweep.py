@@ -1,18 +1,22 @@
-"""Fig 5/6/7 grid: three-architecture synthetic benchmark.
+"""Fig 5/6/7/10 grid: three-architecture synthetic benchmark.
 
-Sweeps {regular SAE, Stacked SAE, TXCDR} over rho x k x T matching the
-midterm-report configuration (report §2.1-2.3, §3.1-3.2):
+Sweeps {regular SAE, regular SAE k*T, Stacked SAE, TXCDR} over rho x k x T:
 
     rho in {0.0, 0.6, 0.9}
     k   in {2, 5, 10, 25}
-    T   in {2, 5}
+    T   in {1, 2, 3, 4, 6, 8, 12}
 
-All three archs have matched window-level L0 = k * T. Feature-recovery
-AUC averages decoder columns across positions for TXCDR and Stacked SAE,
-matching the convention already used on temporal-bench.
+T=1 is the regular-SAE-only point (TXCDR/Stacked at T=1 collapse to
+regular SAE).
+
+The dense T grid (vs midterm-report's {2,5}) is needed for the global-vs-
+local-AUC-vs-T figure (Fig 10): we need a curve, not two points.
+
+All arches matched at window-level L0 = k * T (regular_sae_kT applies
+per-token TopK = k*T as the framing-B baseline).
 
 Writes `results/three_arch_sweep/sweep_results.json` consumed by the
-plot_fig5 / plot_fig6 / plot_fig7 scripts.
+plot_fig5 / plot_fig6 / plot_fig7 / plot_fig10 scripts.
 """
 
 from __future__ import annotations
@@ -46,7 +50,7 @@ def build_config(args: argparse.Namespace) -> SweepConfig:
         models=args.models,
         rho_values=[0.0, 0.6, 0.9],
         k_values=[2, 5, 10, 25],
-        T_values=[2, 5],
+        T_values=[1, 2, 3, 4, 6, 8, 12],
         train=train,
         data=data,
         n_seeds=args.n_seeds,
