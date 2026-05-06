@@ -61,7 +61,31 @@
       "txc_rec_local": 0.7995669841766357,
       "txc_rec_temp": 0.7995670437812805,
       "n_atoms": 2401,
-      "txc_final_loss": 0.6157517433166504
+      "txc_final_loss": 0.6157517433166504,
+      "sae_k2_window_probe": {
+        "train_accuracy": 0.1510833352804184,
+        "val_accuracy": 0.14900000393390656,
+        "chance": 0.14285714285714285,
+        "n_train": 24000,
+        "n_val": 6000
+      },
+      "sae_k5_window_probe": {
+        "train_accuracy": 0.14645832777023315,
+        "val_accuracy": 0.13883332908153534,
+        "chance": 0.14285714285714285,
+        "n_train": 24000,
+        "n_val": 6000
+      },
+      "tfa_probe": null,
+      "txc_k2_probe": null,
+      "txc_k2_rec_local": null,
+      "txc_k2_rec_temp": null,
+      "txc_k5_probe": null,
+      "txc_k5_rec_local": null,
+      "txc_k5_rec_temp": null,
+      "txc_k10_probe": null,
+      "txc_k10_rec_local": null,
+      "txc_k10_rec_temp": null
     },
     {
       "W": 2,
@@ -103,7 +127,55 @@
       "txc_rec_local": 0.8483189344406128,
       "txc_rec_temp": 0.8299717903137207,
       "n_atoms": 2401,
-      "txc_final_loss": 0.6554008722305298
+      "txc_final_loss": 0.6554008722305298,
+      "sae_k2_window_probe": {
+        "train_accuracy": 0.15516667068004608,
+        "val_accuracy": 0.14566665887832642,
+        "chance": 0.14285714285714285,
+        "n_train": 24000,
+        "n_val": 6000
+      },
+      "sae_k5_window_probe": {
+        "train_accuracy": 0.15670832991600037,
+        "val_accuracy": 0.15549999475479126,
+        "chance": 0.14285714285714285,
+        "n_train": 24000,
+        "n_val": 6000
+      },
+      "tfa_probe": {
+        "train_accuracy": 0.16879166662693024,
+        "val_accuracy": 0.14683333039283752,
+        "chance": 0.14285714285714285,
+        "n_train": 24000,
+        "n_val": 6000
+      },
+      "txc_k2_probe": {
+        "train_accuracy": 0.25699999928474426,
+        "val_accuracy": 0.16966666281223297,
+        "chance": 0.14285714285714285,
+        "n_train": 24000,
+        "n_val": 6000
+      },
+      "txc_k2_rec_local": 0.7898321747779846,
+      "txc_k2_rec_temp": 0.7896803021430969,
+      "txc_k5_probe": {
+        "train_accuracy": 0.34049999713897705,
+        "val_accuracy": 0.2006666660308838,
+        "chance": 0.14285714285714285,
+        "n_train": 24000,
+        "n_val": 6000
+      },
+      "txc_k5_rec_local": 0.7975546717643738,
+      "txc_k5_rec_temp": 0.644767165184021,
+      "txc_k10_probe": {
+        "train_accuracy": 0.38337498903274536,
+        "val_accuracy": 0.20549999177455902,
+        "chance": 0.14285714285714285,
+        "n_train": 24000,
+        "n_val": 6000
+      },
+      "txc_k10_rec_local": 0.929469645023346,
+      "txc_k10_rec_temp": 0.5320459604263306
     },
     {
       "W": 3,
@@ -145,7 +217,55 @@
       "txc_rec_local": 0.8215489983558655,
       "txc_rec_temp": 0.5939474701881409,
       "n_atoms": 2401,
-      "txc_final_loss": 0.8845384120941162
+      "txc_final_loss": 0.8845384120941162,
+      "sae_k2_window_probe": {
+        "train_accuracy": 0.15449999272823334,
+        "val_accuracy": 0.14499999582767487,
+        "chance": 0.14285714285714285,
+        "n_train": 24000,
+        "n_val": 6000
+      },
+      "sae_k5_window_probe": {
+        "train_accuracy": 0.15316666662693024,
+        "val_accuracy": 0.14516666531562805,
+        "chance": 0.14285714285714285,
+        "n_train": 24000,
+        "n_val": 6000
+      },
+      "tfa_probe": {
+        "train_accuracy": 0.15929166972637177,
+        "val_accuracy": 0.14916665852069855,
+        "chance": 0.14285714285714285,
+        "n_train": 24000,
+        "n_val": 6000
+      },
+      "txc_k2_probe": {
+        "train_accuracy": 0.1811666637659073,
+        "val_accuracy": 0.16233332455158234,
+        "chance": 0.14285714285714285,
+        "n_train": 24000,
+        "n_val": 6000
+      },
+      "txc_k2_rec_local": 0.8433018326759338,
+      "txc_k2_rec_temp": 0.5581133961677551,
+      "txc_k5_probe": {
+        "train_accuracy": 0.3271249830722809,
+        "val_accuracy": 0.195333331823349,
+        "chance": 0.14285714285714285,
+        "n_train": 24000,
+        "n_val": 6000
+      },
+      "txc_k5_rec_local": 0.7822463512420654,
+      "txc_k5_rec_temp": 0.4264012277126312,
+      "txc_k10_probe": {
+        "train_accuracy": 0.4113749861717224,
+        "val_accuracy": 0.21833333373069763,
+        "chance": 0.14285714285714285,
+        "n_train": 24000,
+        "n_val": 6000
+      },
+      "txc_k10_rec_local": 0.8965370059013367,
+      "txc_k10_rec_temp": 0.3537946939468384
     },
     {
       "W": 4,
@@ -187,7 +307,55 @@
       "txc_rec_local": 0.8244125247001648,
       "txc_rec_temp": 0.4485524892807007,
       "n_atoms": 2401,
-      "txc_final_loss": 1.0104345083236694
+      "txc_final_loss": 1.0104345083236694,
+      "sae_k2_window_probe": {
+        "train_accuracy": 0.16037499904632568,
+        "val_accuracy": 0.1586666703224182,
+        "chance": 0.14285714285714285,
+        "n_train": 24000,
+        "n_val": 6000
+      },
+      "sae_k5_window_probe": {
+        "train_accuracy": 0.15716665983200073,
+        "val_accuracy": 0.15133333206176758,
+        "chance": 0.14285714285714285,
+        "n_train": 24000,
+        "n_val": 6000
+      },
+      "tfa_probe": {
+        "train_accuracy": 0.19512499868869781,
+        "val_accuracy": 0.15816666185855865,
+        "chance": 0.14285714285714285,
+        "n_train": 24000,
+        "n_val": 6000
+      },
+      "txc_k2_probe": {
+        "train_accuracy": 0.19200000166893005,
+        "val_accuracy": 0.1601666659116745,
+        "chance": 0.14285714285714285,
+        "n_train": 24000,
+        "n_val": 6000
+      },
+      "txc_k2_rec_local": 0.8650679588317871,
+      "txc_k2_rec_temp": 0.44387221336364746,
+      "txc_k5_probe": {
+        "train_accuracy": 0.2787500023841858,
+        "val_accuracy": 0.19066666066646576,
+        "chance": 0.14285714285714285,
+        "n_train": 24000,
+        "n_val": 6000
+      },
+      "txc_k5_rec_local": 0.8215386867523193,
+      "txc_k5_rec_temp": 0.33086150884628296,
+      "txc_k10_probe": {
+        "train_accuracy": 0.4078333377838135,
+        "val_accuracy": 0.23250000178813934,
+        "chance": 0.14285714285714285,
+        "n_train": 24000,
+        "n_val": 6000
+      },
+      "txc_k10_rec_local": 0.8945962190628052,
+      "txc_k10_rec_temp": 0.28603845834732056
     },
     {
       "W": 5,
@@ -229,7 +397,55 @@
       "txc_rec_local": 0.8116458058357239,
       "txc_rec_temp": 0.39028966426849365,
       "n_atoms": 2401,
-      "txc_final_loss": 1.0589524507522583
+      "txc_final_loss": 1.0589524507522583,
+      "sae_k2_window_probe": {
+        "train_accuracy": 0.16104166209697723,
+        "val_accuracy": 0.14816667139530182,
+        "chance": 0.14285714285714285,
+        "n_train": 24000,
+        "n_val": 6000
+      },
+      "sae_k5_window_probe": {
+        "train_accuracy": 0.1614166647195816,
+        "val_accuracy": 0.1483333259820938,
+        "chance": 0.14285714285714285,
+        "n_train": 24000,
+        "n_val": 6000
+      },
+      "tfa_probe": {
+        "train_accuracy": 0.21387499570846558,
+        "val_accuracy": 0.1653333306312561,
+        "chance": 0.14285714285714285,
+        "n_train": 24000,
+        "n_val": 6000
+      },
+      "txc_k2_probe": {
+        "train_accuracy": 0.24904166162014008,
+        "val_accuracy": 0.21050000190734863,
+        "chance": 0.14285714285714285,
+        "n_train": 24000,
+        "n_val": 6000
+      },
+      "txc_k2_rec_local": 0.8414271473884583,
+      "txc_k2_rec_temp": 0.3949074149131775,
+      "txc_k5_probe": {
+        "train_accuracy": 0.2552500069141388,
+        "val_accuracy": 0.1978333294391632,
+        "chance": 0.14285714285714285,
+        "n_train": 24000,
+        "n_val": 6000
+      },
+      "txc_k5_rec_local": 0.7866998910903931,
+      "txc_k5_rec_temp": 0.2966575026512146,
+      "txc_k10_probe": {
+        "train_accuracy": 0.4011249840259552,
+        "val_accuracy": 0.22949999570846558,
+        "chance": 0.14285714285714285,
+        "n_train": 24000,
+        "n_val": 6000
+      },
+      "txc_k10_rec_local": 0.8807636499404907,
+      "txc_k10_rec_temp": 0.243938609957695
     },
     {
       "W": 6,
@@ -271,7 +487,70 @@
       "txc_rec_local": 0.800258994102478,
       "txc_rec_temp": 0.34548622369766235,
       "n_atoms": 2401,
-      "txc_final_loss": 1.1026228666305542
+      "txc_final_loss": 1.1026228666305542,
+      "sae_k2_window_probe": {
+        "train_accuracy": 0.16249999403953552,
+        "val_accuracy": 0.15166667103767395,
+        "chance": 0.14285714285714285,
+        "n_train": 24000,
+        "n_val": 6000
+      },
+      "sae_k5_window_probe": {
+        "train_accuracy": 0.16737499833106995,
+        "val_accuracy": 0.15850000083446503,
+        "chance": 0.14285714285714285,
+        "n_train": 24000,
+        "n_val": 6000
+      },
+      "tfa_probe": {
+        "train_accuracy": 0.22362500429153442,
+        "val_accuracy": 0.16766665875911713,
+        "chance": 0.14285714285714285,
+        "n_train": 24000,
+        "n_val": 6000
+      },
+      "txc_k2_probe": {
+        "train_accuracy": 0.3240000009536743,
+        "val_accuracy": 0.28083333373069763,
+        "chance": 0.14285714285714285,
+        "n_train": 24000,
+        "n_val": 6000
+      },
+      "txc_k2_rec_local": 0.8186541199684143,
+      "txc_k2_rec_temp": 0.3512977361679077,
+      "txc_k5_probe": {
+        "train_accuracy": 0.3348333239555359,
+        "val_accuracy": 0.28866666555404663,
+        "chance": 0.14285714285714285,
+        "n_train": 24000,
+        "n_val": 6000
+      },
+      "txc_k5_rec_local": 0.793014407157898,
+      "txc_k5_rec_temp": 0.2730807363986969,
+      "txc_k10_probe": {
+        "train_accuracy": 0.3942916691303253,
+        "val_accuracy": 0.23916666209697723,
+        "chance": 0.14285714285714285,
+        "n_train": 24000,
+        "n_val": 6000
+      },
+      "txc_k10_rec_local": 0.8755293488502502,
+      "txc_k10_rec_temp": 0.21849192678928375
     }
+  ],
+  "sae_k_sweep_rec_local": {
+    "2": 0.6725126504898071,
+    "5": 0.6525468826293945
+  },
+  "tfa_added": true,
+  "tfa_n_steps": 3000,
+  "sae_k_sweep": [
+    2,
+    5
+  ],
+  "txc_k_sweep": [
+    2,
+    5,
+    10
   ]
 }

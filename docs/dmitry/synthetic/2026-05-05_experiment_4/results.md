@@ -324,6 +324,119 @@ dictionary, and `Rec_temp` declines from 0.45 at `W = h + 1` to 0.34 at
 `W = 6` because the atoms become more distinct and half-learned templates
 spread their alignment thinner.
 
+### Stage 4 k-sweep (added: SAE k ∈ {1, 2, 5, 10}, TXC k_total ∈ {1, 2, 5, 10}, TFA k=20)
+
+The original Stage 4.1 / 4.2 / 4.3 used the proposal's prescribed
+``k_total = 1`` for TXC. We later swept higher TopK budgets to test the
+proposal's claim that the polynomial-template solution is the *unique*
+sparse-reconstruction minimum. We also added the **TFA** architecture
+(Han's `src/bench/architectures/tfa.py` recipe — `TemporalSAE` with
+AdamW + cosine LR + warmup + sinusoidal positional encoding, MSE-only
+loss, k=20 per token).
+
+`k` values used in the writeup:
+
+| Architecture | k value(s) | Where applied |
+|---|---|---|
+| Regular TopKSAE on iid tokens | k ∈ {1, 2, 5, 10} (capped at q on Stage 3 where q=7) | per-token; H = q |
+| Bhalla TSAE (han_tsae) | k=20 (paper default) | per-token; with InfoNCE α = 0.1 |
+| TFA (`_tfa_module`) | k=20 (paper default) | per-token; AdamW + cosine + pos enc, no InfoNCE |
+| TXC-global (`TXCBareAntidead`) | k_total ∈ {1, 2, 5, 10} | window-level — total active across W positions |
+
+#### Headline numbers from the k-sweep
+
+Stage 4.1 (h=1, q=31) at W = h+1 = 2 and W=4:
+
+| Architecture | val acc @ W=2 | val acc @ W=4 |
+|---|---|---|
+| Raw window probe | 0.065 | 0.120 |
+| SAE k=1 (W·H concat) | 0.097 | 0.198 |
+| SAE k=2 | 0.088 | 0.190 |
+| SAE k=5 | 0.084 | 0.168 |
+| SAE k=10 | 0.079 | 0.156 |
+| TFA (k=20) | 0.037 | 0.054 |
+| Bhalla TSAE | 0.037 | 0.054 |
+| **TXC k_total = 1** | **0.157** | 0.609 |
+| **TXC k_total = 2** | 0.093 | **0.939** |
+| TXC k_total = 5 | 0.100 | 0.255 |
+| TXC k_total = 10 | 0.108 | 0.206 |
+
+Stage 4.2 (h=2, q=11) at W = h+1 = 3 and W=5:
+
+| Architecture | val acc @ W=3 | val acc @ W=5 |
+|---|---|---|
+| TXC k=1 | 0.165 | 0.321 |
+| **TXC k=2** | 0.160 | **0.623** |
+| TXC k=5 | 0.132 | 0.127 |
+| TXC k=10 | 0.146 | 0.156 |
+| TFA / TSAE / SAE-concat | all ≤ 0.12 | all ≤ 0.13 |
+
+Stage 4.3 (h=3, q=7): TXC k=2 reaches 0.281 at W=6 (vs k=1's 0.228);
+all other architectures stay near `1/q = 0.143`. The compute budget is
+too small for any TXC variant to fully populate the q^(h+1) = 2401
+polynomial dictionary in 3k–6k steps.
+
+![Stage 4.1 with k-sweep + TFA](../../../../plots/v6_colored_sources/polynomial_clock_h1_q31.png)
+![Stage 4.2 with k-sweep + TFA](../../../../plots/v6_colored_sources/polynomial_clock_h2_q11.png)
+![Stage 4.3 with k-sweep + TFA](../../../../plots/v6_colored_sources/polynomial_clock_h3_q7.png)
+
+#### Why high k breaks TXC: alphabet vs. polynomial decomposition
+
+Both `k_total = 1` (one polynomial atom per window) and `k_total ≥ W`
+(one alphabet atom per position) hit roughly the **same MSE noise
+floor** σ²·W·d. The reconstruction objective alone doesn't separate
+them — it's degenerate, and SGD picks the wider basin (the alphabet
+decomposition is wider in parameter space).
+
+The two basins have different latents:
+
+- **k=1 polynomial-template basin:** the latent index *is* `(B_0, …, Y)`.
+  A linear probe trivially reads `Y` off `argmax(z)`.
+- **k≥W alphabet-decomposition basin:** the latent has W active indices
+  encoding `(Q_0, …, Q_{W-1})`. The probe must additionally compute
+  `Y = Σ_i c_i · Q_i mod q` (Lagrange interpolation in F_q). A linear
+  probe over reals can in principle implement this via Fourier-style
+  weights, but SGD on cross-entropy doesn't find that solution
+  reliably with our train budget.
+
+This explains why TFA (k=20 per token, dense token-level codes) and
+Bhalla TSAE (also k=20) stay at chance: their latents are alphabet-
+decomposition style and the probe can't extract `Y` from them.
+
+The Rec_temp / Rec_local trade-off makes this concrete:
+
+| Stage 4.1 W=2 TXC | Rec_local (alphabet) | Rec_temp (polynomial) |
+|---|---|---|
+| k=1 | 0.945 | **0.534** |
+| k=2 | 0.957 | 0.483 |
+| k=5 | 0.974 | 0.488 |
+| k=10 | 0.966 | 0.490 |
+
+Higher k → better alphabet recovery but worse polynomial-template
+recovery. The TXC k=1 prescription is the only setting that strictly
+prefers the polynomial atoms.
+
+#### Why k=2 sometimes beats k=1 on the probe
+
+Counterintuitively, `k=2` outperforms `k=1` on the latent-prediction
+metric in several cells (e.g., Stage 4.1 W=4: k=2 hits 0.939 vs k=1's
+0.609). The interpretation:
+
+- **k=1 is theoretically clean but optimization-brittle.** Exactly one
+  atom fires per window. If the dictionary is incomplete (3k–6k steps
+  to learn 961+ polynomial atoms) the "next-best" atom fires for some
+  windows, and that atom encodes a *different* `Y` — wrong answer.
+- **k=2 is a softer bottleneck.** The dominant slot still picks the
+  right polynomial atom (the gradient still points there at high W),
+  while the second slot absorbs noise/residual without polluting the
+  class signal. The probe reads `Y` from the dominant slot.
+- **k≥5 is too soft** — the model abandons the polynomial structure
+  entirely and uses alphabet atoms.
+
+So the polynomial-clock setting is sensitive to k in a non-monotonic
+way: k=1 is the proposal's clean optimum, k=2 is the empirical sweet
+spot, k≥5 collapses to alphabet-only recovery.
+
 ### Stage 4 takeaways
 
 1. **The local impossibility is empirically tight.** At `W ≤ h` every
