@@ -247,8 +247,25 @@ def run_arm(arm: str) -> dict | None:
         else:
             ax.scatter(proj[m, 0], proj[m, 1], s=14,
                        c=[palette[cid % len(palette)]],
-                       label=f"c{cid}: {cl_names.get(cid, '')[:30]}",
+                       label=f"c{cid}: {cl_names.get(cid, '')}",
                        alpha=0.85)
+
+    # Annotate each non-noise cluster with its index at its centroid so the
+    # map is readable without referring to the legend.
+    for cid in sorted(set(labels)):
+        if cid < 0:
+            continue
+        m = labels == cid
+        cx, cy = proj[m, 0].mean(), proj[m, 1].mean()
+        ax.text(
+            cx, cy, str(cid),
+            fontsize=11, fontweight="bold", ha="center", va="center",
+            color="black",
+            bbox=dict(boxstyle="round,pad=0.18", facecolor="white",
+                      edgecolor=palette[cid % len(palette)], alpha=0.85,
+                      linewidth=1.2),
+        )
+
     ax.set_title(f"UMAP — {ARM_DISPLAY.get(arm, arm)}  "
                  f"(n_features={len(texts)}, k={n_clusters}, "
                  f"sil={sil:.2f}, noise={noise_frac:.2f})")
