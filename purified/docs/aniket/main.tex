@@ -27,6 +27,16 @@
 \newcommand{\placeholderboxbig}[1]{%
     \fbox{\parbox[c][6cm][c]{\dimexpr\linewidth-2\fboxsep-2\fboxrule\relax}{\centering\resizebox{0.6\linewidth}{!}{\texttt{#1}}}}%
 }
+% \autofig{name} — include figs/<name>.png if it exists, otherwise
+% render a placeholder box. Lets the c7 paper-loop drop new PNGs into
+% figs/ and the .tex picks them up on the next compile without edits.
+\newcommand{\autofig}[1]{%
+    \IfFileExists{figs/#1.png}{\includegraphics[width=\linewidth]{figs/#1.png}}{\placeholderbox{figs/#1}}%
+}
+% Auto-generated macros (\cseven*) for headline C7 numbers; rebuilt
+% by scripts/c7_tex_snippets.py whenever the C7 paper-loop fires.
+% Wrapped in \InputIfFileExists so a fresh checkout still typesets.
+\InputIfFileExists{figs/c7_results_macros.tex}{}{}
 
 \title{Temporal Crosscoders}
 
@@ -287,7 +297,7 @@ For C1, $\mathcal{G}$ is the $N=20$ ground-truth feature set $\mathcal{F}$ (we r
 
 \begin{figure}[!t]
     \centering
-    \placeholderbox{images/c7\_gc\_at\_peak\_paired}
+    \autofig{c7_gc_at_peak_paired}
     \caption{Headline: per-question genuine-backtracking counts $gc(a, m)$ at the unsteered baseline ($m = 0$, grey bars) and at each architecture's optimal steering magnitude (coloured bars), sorted descending by the steered value. Error bars are bootstrap $95\%$ confidence intervals computed by resampling the $61$ cohort questions ($n_{\text{boot}} = 1000$). The text annotation above each coloured bar reports the steered value and its peak magnitude $m$. Higher coloured bar relative to the grey companion indicates that the architecture's mined feature direction is a more effective causal lever for inducing genuine backtracking when used as a steering vector. Full setup is in \cref{app:c7}.}
     \label{fig:c7-gc-at-peak}
 \end{figure}
@@ -296,14 +306,14 @@ For C1, $\mathcal{G}$ is the $N=20$ ground-truth feature set $\mathcal{F}$ (we r
     \centering
     \begin{subfigure}[t]{0.48\textwidth}
         \centering
-        \placeholderbox{images/c7\_delta\_gc\_vs\_magnitude}
+        \autofig{c7_delta_gc_vs_magnitude}
         \caption{Inducement: $\Delta gc$ vs steering magnitude.}
         \label{fig:c7-inducement}
     \end{subfigure}
     \hfill
     \begin{subfigure}[t]{0.48\textwidth}
         \centering
-        \placeholderbox{images/c7\_probe\_metrics\_S8\_bar}
+        \autofig{c7_probe_metrics_S8_bar}
         \caption{Detection: PR-AUC and ROC-AUC at $S = 8$.}
         \label{fig:c7-pr-auc-S8}
     \end{subfigure}
@@ -325,9 +335,9 @@ where $gc(a, q, m)$ is a Sonnet-$4.6$ count of genuine backtracking events (\cre
 \paragraph{Results.}
 \Cref{fig:c7-gc-at-peak} reports the headline inducement number, and \cref{fig:backtracking} summarises both the inducement curve and the detection axis. Per-architecture peak $\Delta gc$, peak magnitude, and the full PR-AUC and ROC-AUC tables at $S \in \{1, 2, 4, 8, 16, 32\}$ are tabulated in \cref{tab:c7-pr-auc} (\cref{app:c7-pr-auc-full}).
 
-\textcolor{red}{[PLACEHOLDER: inducement narrative.] On the inducement axis, the strongest architecture reaches $gc \approx [\text{TBD}]$ genuine backtracking events per question at its optimal steering magnitude, against an unsteered cohort floor of $gc \approx [\text{TBD}]$ shared across architectures (\cref{fig:c7-gc-at-peak}). Expressed as the baseline-corrected lift $\Delta gc_{\text{peak}}$ of \cref{eq:delta-gc}, the peak values rank as $[\text{TBD ordering}]$, with the highest-ranked TXC cell exceeding the strongest non-TXC baseline by $[\text{TBD}]$ in absolute terms. The two TXC-base batch-size variants peak at the same magnitude (\cref{fig:c7-inducement}), suggesting that the architecture identifies a reproducible feature direction whose causal effect is stable under batch-size scaling. Each cell's $\Delta gc(a, m)$ curve decays toward zero at intermediate magnitudes and crosses below the unsteered baseline at the tails of the magnitude grid; this characteristic peak-and-decay shape is consistent with a real causal lever rather than a calibration artefact.}
+\textcolor{red}{[Live-rendered draft; numbers auto-filled from the leaderboard, prose still subject to revision.] On the inducement axis, the strongest cell, \cseveenTopGcCell{}, reaches $gc \approx \cseveenTopGcPeak{}$ genuine backtracking events per question at its optimal steering magnitude $m = \cseveenTopGcPeakMag{}$, against an unsteered cohort floor of $gc \approx \cseveenTopGcBaseline{}$ shared across architectures (\cref{fig:c7-gc-at-peak}); the lift is $\Delta gc \approx \cseveenTopGcLift{}$ events per question ($\cseveenTopGcRelLift{}$ relative to baseline). Expressed as the baseline-corrected lift $\Delta gc_{\text{peak}}$ of \cref{eq:delta-gc}, the same cell, \cseveenTopDeltaCell{}, leads at $\Delta gc_{\text{peak}} = \cseveenTopDelta{}$. The two TXC-base batch-size variants peak at the same magnitude (\cref{fig:c7-inducement}), suggesting that the architecture identifies a reproducible feature direction whose causal effect is stable under batch-size scaling. Each cell's $\Delta gc(a, m)$ curve decays toward zero at intermediate magnitudes and crosses below the unsteered baseline at the tails of the magnitude grid; this characteristic peak-and-decay shape is consistent with a real causal lever rather than a calibration artefact.}
 
-\textcolor{red}{[PLACEHOLDER: detection narrative.] On the detection axis, the three TXC cells achieve PR-AUC at top-$S = 8$ features of $[\text{TBD}]$ (TXC-pro, $bs{=}256$), $[\text{TBD}]$ (TXC-base, $bs{=}256$), and $[\text{TBD}]$ (TXC-base, $bs{=}1024$), against the strongest non-TXC baseline at $[\text{TBD}]$ (\cref{fig:c7-pr-auc-S8}). The ordering is preserved across the full $S$ grid (\cref{tab:c7-pr-auc}), and is visible at top-$1$, where the top architecture's first selected feature already separates positive from negative sentences above the class-prior chance level of $0.12$. Because the detection task does not depend on judge subjectivity or magnitude calibration, it serves as an independent corroboration of the inducement story.}
+\textcolor{red}{[Live-rendered draft; numbers auto-filled from the leaderboard, prose still subject to revision.] On the detection axis, the strongest cell, \cseveenTopPrAucCell{}, reaches PR-AUC$\,=\,\cseveenTopPrAuc{}$ at top-$S = 8$ features (\cref{fig:c7-pr-auc-S8}, left subpanel), comfortably above the class-prior chance level of $0.12$. Reporting ROC-AUC alongside (\cref{fig:c7-pr-auc-S8}, right subpanel; \cref{tab:c7-pr-auc}), the same cell leads at ROC-AUC$\,=\,\cseveenTopRocAuc{}$, and the architecture ordering is preserved between the two metrics. The ordering is also preserved across the full $S$ grid (\cref{tab:c7-pr-auc}). Because the detection task does not depend on judge subjectivity or magnitude calibration, it serves as an independent corroboration of the inducement story.}
 
 Limitations (single-seed headline, judge $\kappa$ deferred, batch-size effects, alternative steering protocols) are discussed in \cref{app:c7-seeds,app:c7-bs-256,app:c7-judge,app:c7-steering-variants}.
 
