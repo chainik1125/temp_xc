@@ -1,0 +1,162 @@
+{
+  "datasource": "gemma_2_2b_base_l13_fineweb_24k128",
+  "subject_model": "google/gemma-2-2b",
+  "headline_eval_protocol_version": "1.1.0",
+  "by_arch": {
+    "tfa": {
+      "k5": {
+        "n_seeds": 3,
+        "seeds": [
+          1,
+          2,
+          42
+        ],
+        "mean_auc": 0.7090561714286172,
+        "std_seeds_auc": 0.01830454826973512,
+        "mean_acc": 0.6554395782452482,
+        "std_seeds_acc": 0.01911321141857899,
+        "mean_std_tasks_auc": 0.11566881245353629,
+        "n_tasks": 38
+      },
+      "k20": {
+        "n_seeds": 3,
+        "seeds": [
+          1,
+          2,
+          42
+        ],
+        "mean_auc": 0.7751754910142467,
+        "std_seeds_auc": 0.017582431680609294,
+        "mean_acc": 0.7159084132721887,
+        "std_seeds_acc": 0.014338842247368554,
+        "mean_std_tasks_auc": 0.12676232396186243,
+        "n_tasks": 38
+      }
+    },
+    "topk_sae": {
+      "k5": {
+        "n_seeds": 3,
+        "seeds": [
+          1,
+          2,
+          42
+        ],
+        "mean_auc": 0.8260443495455668,
+        "std_seeds_auc": 0.004587227269407016,
+        "mean_acc": 0.7712483366192799,
+        "std_seeds_acc": 0.004698386440146641,
+        "mean_std_tasks_auc": 0.13591927092286762,
+        "n_tasks": 38
+      },
+      "k20": {
+        "n_seeds": 3,
+        "seeds": [
+          1,
+          2,
+          42
+        ],
+        "mean_auc": 0.8802388458493168,
+        "std_seeds_auc": 0.0006019267225744687,
+        "mean_acc": 0.8202422274738049,
+        "std_seeds_acc": 0.0006477663754769844,
+        "mean_std_tasks_auc": 0.13883042245236343,
+        "n_tasks": 38
+      }
+    },
+    "tsae_paper": {
+      "k5": {
+        "n_seeds": 3,
+        "seeds": [
+          1,
+          2,
+          42
+        ],
+        "mean_auc": 0.853067044068192,
+        "std_seeds_auc": 0.007544421900633306,
+        "mean_acc": 0.7961344259071637,
+        "std_seeds_acc": 0.006500689823837734,
+        "mean_std_tasks_auc": 0.14168218770820615,
+        "n_tasks": 38
+      },
+      "k20": {
+        "n_seeds": 3,
+        "seeds": [
+          1,
+          2,
+          42
+        ],
+        "mean_auc": 0.8951799177109429,
+        "std_seeds_auc": 0.003319380338312509,
+        "mean_acc": 0.8421222038342459,
+        "std_seeds_acc": 0.004864147217358413,
+        "mean_std_tasks_auc": 0.14209542241968126,
+        "n_tasks": 38
+      }
+    },
+    "txc_base": {
+      "k5": {
+        "n_seeds": 3,
+        "seeds": [
+          1,
+          2,
+          42
+        ],
+        "mean_auc": 0.8222634759776644,
+        "std_seeds_auc": 0.007662461856835084,
+        "mean_acc": 0.7658945728796268,
+        "std_seeds_acc": 0.005551818983132117,
+        "mean_std_tasks_auc": 0.14227565232085462,
+        "n_tasks": 38
+      },
+      "k20": {
+        "n_seeds": 3,
+        "seeds": [
+          1,
+          2,
+          42
+        ],
+        "mean_auc": 0.8779660508714023,
+        "std_seeds_auc": 0.004011359417244737,
+        "mean_acc": 0.8182037991307747,
+        "std_seeds_acc": 0.0034841185407591332,
+        "mean_std_tasks_auc": 0.14276261185889352,
+        "n_tasks": 38
+      }
+    },
+    "txc_pro": {
+      "k5": {
+        "n_seeds": 3,
+        "seeds": [
+          1,
+          2,
+          42
+        ],
+        "mean_auc": 0.832892180806142,
+        "std_seeds_auc": 0.0100860640312111,
+        "mean_acc": 0.7734387800701287,
+        "std_seeds_acc": 0.00835665088238242,
+        "mean_std_tasks_auc": 0.14242548140331338,
+        "n_tasks": 38
+      },
+      "k20": {
+        "n_seeds": 3,
+        "seeds": [
+          1,
+          2,
+          42
+        ],
+        "mean_auc": 0.880671818980307,
+        "std_seeds_auc": 0.004912985586115415,
+        "mean_acc": 0.821994078548854,
+        "std_seeds_acc": 0.005824666608130585,
+        "mean_std_tasks_auc": 0.14458527153706893,
+        "n_tasks": 38
+      }
+    }
+  },
+  "n_real_rows": 30,
+  "k_feats": [
+    5,
+    20
+  ]
+}
