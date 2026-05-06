@@ -256,6 +256,21 @@ datasources:
     pi: 0.5
     notes: "C1 default (Phase 2 Scheme C)."
 
+  toy_markov_n20_d40_noisy:
+    category: synthetic
+    generator: temp_bench.data.toy:markov_chain_support
+    n_features: 20
+    d_in: 40
+    seq_len: 64
+    rho_levels: [0.7]                       # uniform rho=0.7 (wasteland 1c-noisy)
+    pi: 0.5
+    p_A: 0.0
+    p_B: 0.625                              # q=0.8 → γ=0.25 → p_B=0.625
+    notes: "C1-noisy: wasteland Phase 2 Experiment 1c noisy-emissions
+      replication (docs/han/research_logs/2026-03-30-experiment1c-noisy-emissions.md).
+      Adds Bernoulli emission noise (p_A=0, p_B=0.625) to test denoising.
+      Hidden Markov state surfaced via MarkovData.hidden_support."
+
   toy_coupled_K10_M20_d256:
     category: synthetic
     generator: temp_bench.data.toy:coupled_hmm
