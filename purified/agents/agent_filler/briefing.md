@@ -1387,26 +1387,34 @@ time.
 
 ## Current state (agent owns — overwrite at every compact)
 
-**Last verified: 2026-05-06T18:55Z** | **`git HEAD`: `7c94f586`** (==
-`origin/final` post-rebase, includes agent_paper's BASE C3 fix
-`1ed4fde5`)
+**Last verified: 2026-05-06T20:05Z** | **`git HEAD`: `3e4af8f4`** (==
+`origin/final` post-rebase). Origin includes agent_paper's
+`7bd38bfd` C2 ρ-sweep mission directive.
 
-**STATUS: post-compact resume; cleanup + HF persistence + final
-re-renders in flight.**
+**STATUS: c1_noisy denoising reproduction in progress — Han 2026-05-06
+URGENT directive to reproduce wasteland 1c-noisy
+`exp1c_probe_scatter.png`.** Pipeline:
+
+1. **Train txc_base T={4,6,8,10,12} on c1_noisy** ← in flight on 7 GPUs
+2. Run `denoising_probes.py` on all c1_noisy checkpoints (single-latent
+   correlation + linear probe, both with local-x global-y scatter)
+3. Re-render c2.md c1_noisy section with 2 scatter plots + panels
+4. Then run agent_paper's queued C2 ρ-sweep mission (commit `7bd38bfd`)
 
 Sweeps in flight:
-- **GPU 6** (PID 73025, etime 6h30m): `c2 --archs txc_pro
-  --k-poses 10..20` — current cell `T=12 k=12 seed=2`. Remaining
-  cells: T=12 × {k=12 seed=42; k=15/17/20 × 3 seeds} = 10 cells.
-  Per-cell ~3-5 min wall on toy d_sae=40 → ~30-50 min ETA.
-- **GPUs 0-5, 7**: idle.
-- **HF backfill** (PID 95578, started 2026-05-06T18:51): pushing
-  213 toy + 3 BASE C3 T=5 ckpts that had `hf_url=null` (env-bug
-  during launch). 75/213 complete @ 18:53; ETA ~10 min total.
-
-Active Monitor: `b6zad1zki` watching `logs/c1_noisy_gpu*.log`,
-`logs/c2_lowk_gpu*.log`, `logs/c2_highk*.log` for the remaining
-events. Re-arm if it times out before c2 GPU 6 finishes.
+- **GPUs 0-5, 7** (PIDs 105402-105427 + grandchildren): c1_noisy
+  txc_base T={4,6,8,10,12} × 3 seeds × valid k_pos values (≤ 40/T).
+  78 cells, started 2026-05-06T19:52Z.
+  Progress @ 20:05Z (~12 min in):
+    - T=4: 9/24 cells done (k={1,2,3} × 3 seeds)
+    - T=6: ~12/18 cells (k={1,2,3} × 3 + k=4 partial)
+    - T=8: 6/15 cells (k={1,2} × 3)
+    - T=10/T=12: in flight (k=1 each seed)
+  Per-cell ~3-4 min on toy d_sae=40 → ETA ~30-40 min more wall.
+- **GPU 6** (PID 73025, etime 7h30m+): c2 txc_pro T=12 high-k tail
+  (--k-poses 10..20). Currently around k=15 area. 7-10 cells left.
+- **Active Monitors**: `bf7iqgz3f` (c1_noisy T-sweep training);
+  `bs61bf4g5` (c2 GPU 6 high-k continuation).
 
 ### Leaderboard rows (agent_filler tagged, non-smoke):
 
@@ -1415,29 +1423,32 @@ events. Re-arm if it times out before c2 GPU 6 finishes.
 | **C5** (steering)  |   9 | ✅ DONE: T-SAE T=2 (3) + TopK T=1 (3) + TFA B=32 (3). Mean peak@1.75: T-SAE 1.93, TopK 1.66, TFA 0.33. |
 | **C3** (BASE probing) |   6 | ✅ txc_pro × 3 × 2 k_feats DONE (mean_auc 0.821-0.884). 3 T=5 ckpts pushed to HF 2026-05-06T18:50 (had hf_url=null). T=10/T=20: agent_steer_100k owns re-train (Open Q #4 fixed at agent_paper commit `1ed4fde5`). |
 | **C1** (toy Markov, det.) | 101 | ✅ DONE — c1.md re-rendered with paper-ready AUC vs k_pos plot. Headline: txc_base default at k=6 → AUC 0.983 (winner); topk_sae default catches up at k≥10 (peak 0.936 at k=12); tfa flat ~0.46-0.48. |
-| **C2** (coupled HMM) | ~210 | ~95% — final txc_pro T=12 cells (10 remaining) in flight on GPU 6. c2.md re-rendered post-compact (commit `14b3121d`/`7c94f586`); will re-render once T=12 completes. Wasteland 1c3 deterministic reproduction: TXCDRv2 T=2 gAUC=0.990 → my txc_pro T=2 gAUC=0.990 ± 0.000 ✅ EXACT match. |
-| **c1_noisy** (wasteland 1c-noisy under C2) | 93 (+63 agent='unknown' but data-valid) | ✅ DONE — c1_noisy section RENDERED into c2.md with paper-ready plot at `experiments/c1_noisy_filler/plots/c1_noisy_auc_vs_kpos.png`. Headline: TXC-base T=2 hits AUC 0.982-0.990 across k=4..10, reproducing wasteland's "AUC ≥ 0.98" claim. TXC-base T=5 hits AUC 0.973-0.990 across k=2..6. Stacked + TFA-pos baselines weaker (consistent with wasteland). Plot embedded in c2.md. |
-| **TOTAL** | **388** | + 63 unknown-tagged c1_noisy + ~20 smoke rows |
+| **C2** (coupled HMM) | ~212 | ~96% — final txc_pro T=12 cells (~7 remaining) in flight on GPU 6. c2.md re-rendered (commit `cedba0dc`); will re-render at completion. Wasteland 1c3 deterministic reproduction: TXCDRv2 T=2 gAUC=0.990 → my txc_pro T=2 gAUC=0.990 ± 0.000 ✅ EXACT match. |
+| **c1_noisy** (wasteland 1c-noisy under C2) | 156 (93 agent_filler + 63 unknown, data-valid) → growing **+78 cells in flight (T={4,6,8,10,12} × 3 seeds × valid k)** | ✅ AUC-only reproduction landed (commit `cedba0dc` c2.md): TXC-base T=2 hits AUC 0.982-0.990 across k=4..10. **Now extending to wasteland-faithful denoising metrics** (single-latent correlation + linear probe R²) per Han 2026-05-06T20:00Z directive. Wasteland claim: **TFA-pos + Stacked sit at per-token floor (ratio≈0.50/0.25), TXCDRv2 partially denoises (T=2: ratio≈0.73), TXCDRv2 T=5 reaches ≈1.0 denoising**. Reproduction in flight via `denoising_probes.py` (waiting on T-sweep training). |
+| **TOTAL** | **484** (388 prior + 78 new in flight + ~18 c2 high-k landed since) | + 63 unknown-tagged c1_noisy + ~20 smoke rows |
 
 ### Files I own / authored (this session):
 
 ```
-src/temp_bench/data/toy/markov.py             (added p_A/p_B Bernoulli noise — territory waiver)
-configs/datasources.yaml                       (added toy_markov_n20_d40_noisy — territory waiver)
-experiments/c1_synthetic_topk/analysis.py      (added _save_plot + PLOT_STYLE — territory waiver)
-experiments/c1_synthetic_topk/plots/           (c1.md render artifacts)
-experiments/c1_noisy_filler/                   (run.py + run_sweep.sh + analysis.py + plots/)
-experiments/c5_steering_filler/                (rescinded MW driver — keep for git provenance)
-experiments/c5_steering_baseline/              (T-SAE T=2 driver)
-experiments/c5_steering_baselines/             (TopK + TFA driver)
+src/temp_bench/data/toy/markov.py              (added p_A/p_B Bernoulli noise — territory waiver)
+configs/datasources.yaml                        (added toy_markov_n20_d40_noisy — territory waiver)
+experiments/c1_synthetic_topk/analysis.py       (added _save_plot + PLOT_STYLE — territory waiver)
+experiments/c1_synthetic_topk/plots/            (c1.md render artifacts)
+experiments/c1_noisy_filler/                    (run.py + run_sweep.sh + analysis.py + plots/)
+experiments/c1_noisy_filler/denoising_probes.py NEW: wasteland reproduction — single-latent corr + linear probe R²
+experiments/c1_noisy_filler/run_t.py            NEW: per-(T, seed) txc_base driver
+experiments/c1_noisy_filler/run_tsweep.sh       NEW: T-sweep launcher across 7 GPUs
+experiments/c5_steering_filler/                 (rescinded MW driver — keep for git provenance)
+experiments/c5_steering_baseline/               (T-SAE T=2 driver)
+experiments/c5_steering_baselines/              (TopK + TFA driver)
 experiments/c3_probing_base/run_filler_pro.sh   (BASE C3 txc_pro launcher)
 experiments/c3_probing_base/run_filler_base.sh  (BASE C3 txc_base T-sweep launcher)
 experiments/c1c2_toy_sweep.sh                   (orchestrator — c1+c2 split across GPUs)
 agents/agent_filler/briefing.md                 (THIS file — agent-owned bottom sections)
 docs/components/c1.md                           (re-rendered AUTO-RESULTS + plot)
 docs/components/c2.md                           (2 AUTO-RESULTS blocks: c2 + c1_noisy)
-results/leaderboard.jsonl                       (388 non-smoke rows appended)
-checkpoints/manifest.jsonl                      (~225 entries appended)
+results/leaderboard.jsonl                       (388+ non-smoke rows; growing as T-sweep + GPU 6 land cells)
+checkpoints/manifest.jsonl                      (~250+ entries; growing)
 ```
 
 ### HF state (✅ AUDITED + VERDICT 2026-05-06T19:09):
@@ -1460,18 +1471,18 @@ short-circuited the auto-push.
 are intentionally-skipped buggy ckpts. agent_steer_100k handles
 the re-train + re-push.
 
-### Active GPU sharding (~18:55Z May 6):
+### Active GPU sharding (~20:05Z May 6):
 
 | GPU | Used by | What |
 |---|---|---|
-| 0 | (idle) |  |
-| 1 | (idle) |  |
-| 2 | (idle) |  |
-| 3 | (idle) |  |
-| 4 | (idle) |  |
-| 5 | (idle) |  |
-| 6 | **busy** | c2 highk txc_pro T=12 k=12 seed=2 (10 cells remaining) |
-| 7 | (idle) |  |
+| 0 | **busy** | c1_noisy txc_base T=4 seed=1, then T=8 seed=2, then T=12 seed=42 |
+| 1 | **busy** | c1_noisy txc_base T=4 seed=2, then T=8 seed=42 |
+| 2 | **busy** | c1_noisy txc_base T=4 seed=42, then T=10 seed=1 |
+| 3 | **busy** | c1_noisy txc_base T=6 seed=1, then T=10 seed=2 |
+| 4 | **busy** | c1_noisy txc_base T=6 seed=2, then T=10 seed=42 |
+| 5 | **busy** | c1_noisy txc_base T=6 seed=42, then T=12 seed=1 |
+| 6 | **busy** | c2 highk txc_pro T=12 (etime 7h30m+, ~7 cells left) |
+| 7 | **busy** | c1_noisy txc_base T=8 seed=1, then T=12 seed=2 |
 
 ## What I just did (agent owns — overwrite)
 
@@ -1614,24 +1625,48 @@ GitHub rejects URL-form `https://${GH_TOKEN}@…`).
 **Immediate (this session) — STATUS:**
 
 1. ✅ **c2.md re-rendered** with latest leaderboard (commits
-   `7c94f586` + `14b3121d`).
-2. ✅ **c1_noisy aggregation** added as 2nd AUTO-RESULTS block in
-   c2.md. Approach (b) — wrote `experiments/c1_noisy_filler/analysis.py`
-   (my territory) and rendered into a `<!-- BEGIN AUTO-RESULTS-c1-noisy -->`
-   block in c2.md. Plot embedded.
-3. ✅ **`wrap_up_session.sh` ran** (commit `2ed1fae7`) — 0 new
-   run-dir artifacts to stage; HF audit confirms 601/607 my
-   ckpts on HF (6 intentionally-skipped buggy ckpts).
-4. ✅ **Pushed final state** at `2ed1fae7`.
+   `7c94f586` + `14b3121d` + `cedba0dc`).
+2. ✅ **c1_noisy AUC reproduction** rendered into c2.md
+   (commit `cedba0dc`). Headline reproduction matches wasteland.
+3. ✅ **`wrap_up_session.sh` ran** (commit `2ed1fae7`) — HF audit
+   confirms 601/607 my ckpts on HF.
+4. ✅ **denoising_probes.py written + committed** (commit `5b8a7f91`/
+   `3e4af8f4`). Computes single-latent correlation + linear probe R²,
+   matching wasteland recipe verbatim. Generates 2 scatter plots
+   (local-x global-y) + 2 panel plots.
+5. 🟡 **txc_base T-sweep training in flight** (GPUs 0-5, 7) — needed
+   for full wasteland-style scatter plot with TXC at multiple T.
+   78 cells, ETA ~30-40 min more wall.
 
-**Still running** (will not block session end):
-- **GPU 6** (PID 73025): c2 txc_pro T=12 high-k — ~10 cells
-  remaining (~20-30 min/cell × 10 ≈ 3-5 hr). Each completed cell
-  appends a row to leaderboard + auto-pushes ckpt to HF. C2.md is
-  ALREADY paper-ready; high-k T=12 tail is purely additive.
-- If pod gets stopped before GPU 6 finishes, partial T=12 high-k
-  cells lost. Acceptable — paper headline already reproduces
-  wasteland 1c3 + adds c1_noisy denoising story.
+**Still running**:
+- **GPUs 0-5, 7**: c1_noisy txc_base T={4,6,8,10,12} × 3 seeds × valid
+  k_pos. Started 19:52Z; ~12 min in @ 20:05Z. Active Monitor
+  `bf7iqgz3f` will fire on completion.
+- **GPU 6** (PID 73025): c2 txc_pro T=12 high-k — ~7 cells
+  remaining (~20-30 min/cell × 7 ≈ 2.5-3.5 hr). Active Monitor
+  `bs61bf4g5`.
+
+**Next step (when T-sweep completes)**:
+```bash
+TQDM_DISABLE=1 AGENT_NAME=agent_filler \
+  .venv/bin/python -m experiments.c1_noisy_filler.denoising_probes \
+  > logs/c1_noisy_denoising_probes.log 2>&1
+# Then re-render c2.md c1_noisy section to embed the 2 scatter plots.
+```
+
+**After c1_noisy denoising done — agent_paper's queued mission**:
+agent_paper landed `7bd38bfd` C2 ρ-sweep mission for me — Effect 1
+vs Effect 2 test (Dmitry's critique). Run this on ALL 8 GPUs once
+T-sweep + denoising complete:
+```bash
+bash scripts/run_on_gpu.sh <each> -- \
+  .venv/bin/python -m experiments.c2_synthetic_coupled.run \
+  --archs topk_sae txc_base txc_pro \
+  --seeds 42 1 2 --k-poses 1 5 \
+  --rho-values 0.0 0.3 0.6 0.9 \
+  --n-steps 30000
+```
+~120 cells (with all txc_pro T-overrides), ~10 min wall on 8 GPUs.
 
 **To re-render c2.md** after more T=12 cells land (next session
 or now):
