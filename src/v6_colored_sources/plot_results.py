@@ -105,6 +105,75 @@ def plot_phase_transition_by_delay(stage2_path: Path, out_path: Path) -> None:
     print(f"Saved {out_path}")
 
 
+def plot_polynomial_clock_phase_transition(results_path: Path, out_path: Path) -> None:
+    """Two-panel figure for one polynomial-clock stage:
+
+    Panel A: Acc(Y) vs W. Confirms the impossibility bound at W <= h
+        (everyone at 1/q) and shows that *every* windowed probe (raw,
+        stacked SAE, TXC-global) reaches 1.0 at W >= h+1 — i.e., the
+        latent-prediction metric does not architecturally differentiate.
+
+    Panel B: Rec_temp vs W. Architectural finding. TXC-global learns
+        polynomial templates, stacked SAE doesn't.
+
+    Vertical dotted line at W = h+1 marks the proposal's predicted phase
+    transition.
+    """
+    with open(results_path) as f:
+        data = json.load(f)
+    cfg = data["config"]
+    h = cfg["h"]
+    q = cfg["q"]
+    cells = sorted(data["cells"], key=lambda c: c["W"])
+    W_grid = [c["W"] for c in cells]
+    raw_y = [c["raw_probe"]["val_accuracy"] for c in cells]
+    sae_y = [c["sae_probe"]["val_accuracy"] for c in cells]
+    stacked_y = [c["stacked_probe"]["val_accuracy"] for c in cells]
+    txc_y = [c["txc_probe"]["val_accuracy"] for c in cells]
+    stacked_rec = [c["stacked_rec_temp"] for c in cells]
+    txc_rec = [c["txc_rec_temp"] for c in cells]
+    chance = 1.0 / q
+
+    fig, (axA, axB) = plt.subplots(1, 2, figsize=(13, 5))
+
+    axA.plot(W_grid, raw_y, "o-", color=_RANDOM_COLOR, label="raw window probe", linewidth=1.5)
+    axA.plot(W_grid, sae_y, "s--", color=_SAE_COLOR, label="regular SAE (W=1 latent)", linewidth=1.5)
+    axA.plot(W_grid, stacked_y, "^-.", color="#ff7f0e", label="stacked SAE (T·H latent)", linewidth=1.5)
+    axA.plot(W_grid, txc_y, "D-", color=_TXC_COLOR, label="TXC-global (k_win=1)", linewidth=2.0)
+    axA.axhline(chance, color="black", linestyle=":", alpha=0.5, label=f"chance = 1/q = {chance:.3f}")
+    axA.axvline(h + 1, color="grey", linestyle="--", alpha=0.5, label=f"W = h+1 = {h+1}")
+    axA.set_xticks(W_grid)
+    axA.set_xlabel("Window length W")
+    axA.set_ylabel("Probe val accuracy on Y")
+    axA.set_title(f"Panel A: Acc(Y) vs W   (h={h}, q={q})")
+    axA.set_ylim(-0.02, 1.05)
+    axA.grid(True, alpha=0.3)
+    axA.legend(loc="best", fontsize=9)
+
+    axB.plot(W_grid, stacked_rec, "^-.", color="#ff7f0e", label="stacked SAE Rec_temp", linewidth=1.5)
+    axB.plot(W_grid, txc_rec, "D-", color=_TXC_COLOR, label="TXC-global Rec_temp", linewidth=2.0)
+    axB.axvline(h + 1, color="grey", linestyle="--", alpha=0.5)
+    n_atoms = cells[0]["n_atoms"]
+    axB.set_xticks(W_grid)
+    axB.set_xlabel("Window length W")
+    axB.set_ylabel(f"Rec_temp (avg max cos² vs G_β,  M={n_atoms})")
+    axB.set_title("Panel B: Temporal-atom recovery vs W")
+    axB.set_ylim(-0.02, 1.05)
+    axB.grid(True, alpha=0.3)
+    axB.legend(loc="best", fontsize=9)
+
+    fig.suptitle(
+        f"Polynomial clock h={h}, q={q}: latent prediction vs temporal-atom recovery",
+        fontsize=12,
+    )
+    fig.tight_layout()
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    fig.savefig(out_path, dpi=150)
+    fig.savefig(out_path.with_suffix(".pdf"))
+    plt.close(fig)
+    print(f"Saved {out_path}")
+
+
 def plot_ambiguous_pair_probes(results_path: Path, out_path: Path) -> None:
     """Bar chart of pair-classification probe accuracy on the ambiguous-pair
     HMM: regular SAE (chance), TXC at each W (perfect), raw-x sanity baseline,
@@ -146,7 +215,14 @@ def plot_ambiguous_pair_probes(results_path: Path, out_path: Path) -> None:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Plot colored-source results.")
-    parser.add_argument("--stage", type=str, choices=["1", "2", "ambiguous_pair"], required=True)
+    parser.add_argument(
+        "--stage", type=str,
+        choices=[
+            "1", "2", "ambiguous_pair",
+            "poly_h1_q31", "poly_h2_q11", "poly_h3_q7",
+        ],
+        required=True,
+    )
     parser.add_argument(
         "--results_dir", type=str, default="results/v6_colored_sources"
     )
@@ -165,10 +241,17 @@ def main() -> int:
         plot_phase_transition_by_delay(
             results_dir / "stage2.json", out_dir / "phase_transition_stage2.png"
         )
-    else:
+    elif args.stage == "ambiguous_pair":
         plot_ambiguous_pair_probes(
             results_dir / "ambiguous_pair.json",
             out_dir / "ambiguous_pair_probes.png",
+        )
+    else:
+        # poly_h{H}_q{Q}
+        suffix = args.stage.replace("poly_", "polynomial_clock_")
+        plot_polynomial_clock_phase_transition(
+            results_dir / f"{suffix}.json",
+            out_dir / f"{suffix}.png",
         )
     return 0
 

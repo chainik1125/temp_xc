@@ -34,6 +34,7 @@ from temporal_crosscoders.han_arch import (  # noqa: E402
     TXCBareMultiDistanceContrastiveAntidead,
     make_multidistance_pair_gen_gpu,
 )
+from temporal_crosscoders.han_arch.txc_bare_antidead import TXCBareAntidead  # noqa: E402
 
 from .data_adapter import ColoredSourceCache  # noqa: E402
 from .metrics import (  # noqa: E402
@@ -230,6 +231,112 @@ def train_txc(
     return _train_one(
         txc, cache, F, "txc", W=W, k=k, H=H,
         train_cfg=train_cfg, device=device, token_iter=False,
+    )
+
+
+def train_txc_global(
+    *,
+    cache: ColoredSourceCache,
+    F: torch.Tensor,
+    W: int,
+    k_window: int,
+    H: int,
+    d: int,
+    device: torch.device,
+    train_cfg: TrainConfig,
+    geometric_median_init: bool = True,
+) -> CellResult:
+    """Train ``TXCBareAntidead`` with a *window-level* TopK budget.
+
+    Distinguished from ``train_txc`` (which uses ``TemporalCrosscoder`` and
+    scales ``k`` by ``T``) — this driver passes ``k`` straight through to
+    Han's class so ``k_window=1`` really means one active latent for the
+    entire window. That's the architecture the polynomial-clock proposal
+    prescribes: a global sparsity bottleneck that forces the model to
+    compress the whole window into a single temporal-template atom.
+
+    The standard local-recovery / s_adj / chance-adjusted bookkeeping is
+    reused from ``_train_one`` but evaluated against the *averaged* decoder
+    direction. For temporal-atom recovery on the polynomial-clock task
+    you want to evaluate ``model.W_dec`` directly against the bank of
+    ``G_β`` templates — see ``run_polynomial_clock.py``.
+    """
+    import time
+    if W < 1:
+        raise ValueError(f"W must be >= 1; got {W}")
+    if k_window < 1:
+        raise ValueError(f"k_window must be >= 1; got {k_window}")
+
+    model = TXCBareAntidead(d_in=d, d_sae=H, T=W, k=k_window).to(device)
+
+    if geometric_median_init:
+        with torch.no_grad():
+            init_x = cache.sample_windows(min(train_cfg.batch_size * 4, 256), W)
+            model.init_b_dec_geometric_median(init_x.float())
+
+    iterator = _make_iterator(cache, train_cfg.batch_size, W)
+    opt = torch.optim.Adam(
+        model.parameters(), lr=train_cfg.lr, betas=train_cfg.adam_betas
+    )
+
+    history: list[dict] = []
+    F_dev = F.to(device=device, dtype=torch.float32)
+    N = F.shape[0]
+    arch = "txc_global"
+    t_start = time.time()
+
+    for step in range(train_cfg.n_steps):
+        x = next(iterator).to(device)
+        loss, _, z = model(x)
+        opt.zero_grad()
+        loss.backward()
+        if hasattr(model, "remove_gradient_parallel_to_decoder"):
+            model.remove_gradient_parallel_to_decoder()
+        nn.utils.clip_grad_norm_(model.parameters(), train_cfg.grad_clip)
+        opt.step()
+        if hasattr(model, "_normalize_decoder"):
+            model._normalize_decoder()
+
+        last_step = step == train_cfg.n_steps - 1
+        if step % train_cfg.log_interval == 0 or last_step:
+            with torch.no_grad():
+                x_eval = next(iterator).to(device)
+                eval_loss, _, z_eval = model(x_eval)
+                l0 = (z_eval > 0).float().sum(dim=-1).mean().item()
+                F_hat = model.decoder_dirs_averaged.detach()
+                F_hat_rows = F_hat.T.contiguous()
+                rec_sq = squared_axis_recovery(F_dev, F_hat_rows)
+                s_adj = chance_adjusted_recovery(rec_sq, N=N, H=H)
+            history.append({
+                "step": step,
+                "loss": float(eval_loss.item()),
+                "l0": l0,
+                "recovery_squared": rec_sq,
+                "s_adj": s_adj,
+                "recovery_auc": 0.0,
+            })
+            elapsed = time.time() - t_start
+            steps_per_sec = (step + 1) / max(elapsed, 1e-6)
+            eta_sec = (train_cfg.n_steps - step - 1) / max(steps_per_sec, 1e-6)
+            print(
+                f"  [{arch} W={W} k_window={k_window}] step={step:>6d} "
+                f"loss={eval_loss.item():.4f} L0={l0:.2f} "
+                f"rec_sq_local_avg={rec_sq:.3f} S_adj={s_adj:.3f} "
+                f"| {steps_per_sec:.1f} it/s ETA {eta_sec/60:.1f}m",
+                flush=True,
+            )
+
+    last = history[-1]
+    return CellResult(
+        arch=arch,
+        W=W,
+        k=k_window,
+        final_loss=last["loss"],
+        final_l0=last["l0"],
+        recovery_squared=last["recovery_squared"],
+        s_adj=last["s_adj"],
+        recovery_auc=last["recovery_auc"],
+        history=history,
     )
 
 
