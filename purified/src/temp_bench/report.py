@@ -188,11 +188,15 @@ def canonical_train_keys(
 
 
 def _experiment_dir(component: str) -> Path | None:
-    """Find ``experiments/<component>_*/`` for a given component.
+    """Find the canonical ``experiments/<component>_*/`` directory.
 
     Returns ``None`` if no experiment directory exists yet (agent hasn't
-    started the component). Returns the path otherwise. Raises if more
-    than one matches — the convention is one experiments-dir per cN.
+    started the component). When multiple directories match (e.g. an IT
+    lead dir plus auxiliary BASE / sub-driver dirs), prefer the dir whose
+    name has the fewest ``_``-separated segments — by convention the
+    canonical lead is the shortest (e.g. ``c3_probing`` over
+    ``c3_probing_base`` or ``c3_probing_tfa_baseline``). Sub-drivers
+    that don't expose ``analysis.py`` are skipped automatically.
     """
     root = purified_root() / "experiments"
     if not root.exists():
@@ -200,11 +204,13 @@ def _experiment_dir(component: str) -> Path | None:
     candidates = sorted(p for p in root.glob(f"{component}_*") if p.is_dir())
     if len(candidates) == 0:
         return None
-    if len(candidates) > 1:
-        raise RuntimeError(
-            f"Multiple experiment dirs match {component}_*: {candidates}. "
-            "Convention is one dir per component (e.g. c1_synthetic_topk)."
-        )
+    # Prefer dirs that actually expose analysis.py (the rendering hook).
+    with_analysis = [p for p in candidates if (p / "analysis.py").exists()]
+    if with_analysis:
+        candidates = with_analysis
+    # Tiebreak: shortest segment count, then lexicographic. The canonical
+    # IT-side lead always wins under both rules.
+    candidates.sort(key=lambda p: (len(p.name.split("_")), p.name))
     return candidates[0]
 
 

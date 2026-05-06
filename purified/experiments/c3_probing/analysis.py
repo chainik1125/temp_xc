@@ -13,18 +13,13 @@ Aggregation policy (locked in agent_paper/decisions.md):
   not paper claims).
 - Headline metric = ``mean_auc`` (average AUC over the 38 SAEBench+CT tasks).
 - Per (arch, k_feat): mean ± σ_seeds across seeds {1, 2, 42}.
-- Per (arch, k_feat): mean σ_tasks across seeds (intra-cell task spread).
+- ``txc_base`` is split into ``txc_base_T5``, ``txc_base_T10``, ``txc_base_T20``
+  via train_key lookup (decisions § 17 T-sweep — T values are encoded in the
+  train_key, not the arch name).
 
 Plots:
-- ``plots/auc_by_k.png`` — line plot, x=k_feat, y=mean_auc per arch with
-  σ_seeds error bars.
-
-Sanity reference (Phase 7 leaderboard, BASE side, k=20):
-  ``txc_bare_antidead_t5 = 0.9127``,
-  ``topk_sae         ≈ 0.9090`` (ish — paper-comparable).
-We're on IT side, which Phase 7 noted "is entirely missing" — so these
-are only directional. Big departures (≪0.85 at k=20) likely indicate a
-training/eval bug rather than a real result.
+- ``plots/auc_by_k.png`` — paper-ready line plot, log-x k_feat, all archs;
+  txc_base T-sweep variants share color with distinct line styles.
 """
 
 from __future__ import annotations
@@ -42,18 +37,6 @@ COMPONENT = "c3"
 EXP_DIR = Path(__file__).parent
 PLOT_DIR = EXP_DIR / "plots"
 
-# The canonical sweep we filter the leaderboard against. Since
-# decisions.md § 15 + § 16 each arch family has its own TrainingConfig:
-#   - TXC archs (txc_base, txc_pro): train_window_size=None (samples
-#     T-windows internally). n_steps=20K Han override.
-#   - TopK SAE: train_window_size=1 (vanilla, 1024 tok/step ≈ SAEBench).
-#   - T-SAE: train_window_size=2 (Bhalla/Ye §3.1 paper-faithful pairs).
-#   - TFA: batch_size=32 + train_window_size=None (full seq, paper-faithful
-#     per Phase 7 train_phase7.py:312-353; 4096 tok/step).
-#   - MLC: train_window_size=None on multi-layer (l11to15) datasource;
-#     5120 tok/step.
-# canonical_train_keys is called once per family; the union is the
-# headline filter.
 DATASOURCE_NAME = "gemma_2_2b_it_l13_fineweb_24k128"
 DATASOURCE_NAME_MULTILAYER = "gemma_2_2b_it_l11to15_fineweb_24k128"
 TXC_ARCHS = ("txc_base", "txc_pro")
@@ -61,8 +44,26 @@ TOPK_ARCHS = ("topk_sae",)
 TSAE_ARCHS = ("tsae_paper",)
 TFA_ARCHS = ("tfa",)
 MLC_ARCHS = ("mlc",)
-HEADLINE_ARCHS = TXC_ARCHS + TOPK_ARCHS + TSAE_ARCHS + TFA_ARCHS + MLC_ARCHS
 HEADLINE_SEEDS = (1, 2, 42)
+HEADLINE_EVAL_PROTOCOL_VERSION = "1.1.0"
+
+# Display labels: maps internal arch label → markdown-friendly arch name.
+ARCH_DISPLAY = {
+    "mlc":           "MLC",
+    "tsae_paper":    "T-SAE",
+    "topk_sae":      "TopK-SAE",
+    "tfa":           "TFA",
+    "txc_pro":       "TXC-pro",
+    "txc_base_T5":   "TXC-base (T=5)",
+    "txc_base_T10":  "TXC-base (T=10)",
+    "txc_base_T20":  "TXC-base (T=20)",
+}
+
+# Order for the table + plot legend (top → bottom = best → worst at k=20).
+ARCH_ORDER = (
+    "mlc", "tsae_paper", "txc_base_T20", "txc_base_T10", "txc_base_T5",
+    "txc_pro", "topk_sae", "tfa",
+)
 
 
 def _placeholder_markdown(reason: str) -> str:
@@ -73,20 +74,18 @@ def _placeholder_markdown(reason: str) -> str:
     )
 
 
-HEADLINE_EVAL_PROTOCOL_VERSION = "1.1.0"   # Phase 7 padding fix; old 1.0.0
-                                            # rows are kept on disk for
-                                            # comparison but excluded from
-                                            # the headline aggregate.
+def _build_canonical_keys() -> tuple[set[str], dict[str, set[str]]]:
+    """Return (all_canonical_keys, txc_base_T_keys_by_label).
 
-
-def run_analysis() -> AnalysisResult:
-    rows = query_leaderboard(component=COMPONENT)
-    # Filter out smoke rows + non-headline protocol versions + non-canonical
-    # training_cfg via canonical_train_keys (decisions.md § 12 + § 15). 3
-    # TrainingConfig families: TXC (None), TopK (T=1), T-SAE (T=2). Union
-    # the train_keys; only rows whose train_key is in the union pass.
+    The second value lets us map a row's train_key back to the T-variant
+    label (``txc_base_T5`` / ``txc_base_T10`` / ``txc_base_T20``).
+    """
     from temp_bench.schemas import TrainingConfig
-    txc_keys = canonical_train_keys(
+    from temp_bench.config import (
+        compute_act_cache_key, compute_train_key, load_arch, load_datasource,
+    )
+
+    txc_keys = canonical_train_keys(  # txc_base T=5 default + txc_pro
         component=COMPONENT,
         archs=TXC_ARCHS,
         seeds=HEADLINE_SEEDS,
@@ -121,134 +120,186 @@ def run_analysis() -> AnalysisResult:
         datasource_names=(DATASOURCE_NAME_MULTILAYER,),
         training_cfg=TrainingConfig(n_steps=20_000),
     )
-    # T-sweep cells (decisions § 17 — Han 2026-05-05 PM): txc_base ×
-    # {T=10, T=20}. canonical_train_keys doesn't replicate the runner's
-    # arch_hparams_override merge into spec.hparams, so we compute the
-    # train_keys ourselves with the merge.
-    txc_T_keys: set[str] = set()
-    from temp_bench.config import (
-        compute_act_cache_key, compute_train_key, load_arch, load_datasource,
-    )
+
+    # T-sweep cells (decisions § 17): txc_base × {T=10, T=20}. Compute
+    # train_keys with the merged arch_hparams.
     ack = compute_act_cache_key(load_datasource(DATASOURCE_NAME))
     txc_base_spec = load_arch("txc_base", component=COMPONENT)
+    by_T_label: dict[str, set[str]] = {"txc_base_T5": set()}
+    # T=5 (default; same set as txc_keys but filtered to txc_base):
+    for seed in HEADLINE_SEEDS:
+        tk = compute_train_key(
+            arch=txc_base_spec, seed=seed,
+            training_cfg=TrainingConfig(n_steps=20_000),
+            act_cache_key=ack, component=COMPONENT,
+        )
+        by_T_label["txc_base_T5"].add(tk)
+    txc_T_keys: set[str] = set()
     for T in (10, 20):
         merged = {**txc_base_spec.hparams, "T": T}
         spec = txc_base_spec.model_copy(update={"hparams": merged})
+        label = f"txc_base_T{T}"
+        by_T_label[label] = set()
         for seed in HEADLINE_SEEDS:
-            txc_T_keys.add(compute_train_key(
+            tk = compute_train_key(
                 arch=spec, seed=seed,
                 training_cfg=TrainingConfig(
                     n_steps=20_000, arch_hparams_override={"T": T},
                 ),
-                act_cache_key=ack,
-            ))
-    valid_keys = txc_keys | topk_keys | tsae_keys | tfa_keys | mlc_keys | txc_T_keys
+                act_cache_key=ack, component=COMPONENT,
+            )
+            txc_T_keys.add(tk)
+            by_T_label[label].add(tk)
+
+    all_keys = txc_keys | topk_keys | tsae_keys | tfa_keys | mlc_keys | txc_T_keys
+    return all_keys, by_T_label
+
+
+def _resolve_arch_label(row, by_T_label: dict[str, set[str]]) -> str:
+    """Map a leaderboard row to the display-arch label."""
+    if row.arch == "txc_base":
+        for label, keys in by_T_label.items():
+            if row.train_key in keys:
+                return label
+        return "txc_base_T5"  # fallback (older default cells)
+    return row.arch
+
+
+def run_analysis() -> AnalysisResult:
+    rows = query_leaderboard(component=COMPONENT)
+    valid_keys, by_T_label = _build_canonical_keys()
+
     real_rows = [
         r for r in rows
         if not r.eval_cfg.get("smoke", False)
         and r.eval_protocol_version == HEADLINE_EVAL_PROTOCOL_VERSION
         and r.train_key in valid_keys
     ]
-
     if not real_rows:
-        n_smoke = len(rows)
         return AnalysisResult(
             markdown=_placeholder_markdown(
-                f"no real cells run yet ({n_smoke} smoke row(s) on disk; "
-                f"those are filtered out)."
+                f"no canonical cells in leaderboard ({len(rows)} total rows)."
             ),
-            results={"n_smoke_rows": n_smoke},
+            results={"n_total_rows": len(rows)},
             plot_paths=[],
         )
 
-    # Group: (arch, k_feat) → list of (seed, mean_auc, mean_acc, n_tasks, per_task_aucs)
-    # Per-cell metric layout (set in experiments/c3_probing/run.py::my_eval_fn):
-    #   mean_auc, std_auc, mean_acc, std_acc, n_tasks, plus auc__<task>/acc__<task>
+    # Group: (arch_label, k_feat) → list of cells.
     grouped: dict[tuple[str, int], list[dict]] = defaultdict(list)
     for r in real_rows:
-        k = int(r.eval_cfg.get("k_feat", -1))
-        if k < 0:
+        k = r.eval_cfg.get("k_feat", -1)
+        if not isinstance(k, int) or k < 0:
             continue
         if "mean_auc" not in r.metrics:
             continue
-        per_task = {
-            kk: vv for kk, vv in r.metrics.items() if kk.startswith("auc__")
-        }
-        grouped[(r.arch, k)].append({
+        arch_label = _resolve_arch_label(r, by_T_label)
+        grouped[(arch_label, k)].append({
             "seed": r.seed,
             "mean_auc": float(r.metrics["mean_auc"]),
             "std_auc": float(r.metrics.get("std_auc", 0.0)),
             "mean_acc": float(r.metrics.get("mean_acc", 0.0)),
             "n_tasks": int(r.metrics.get("n_tasks", 0)),
-            "per_task_aucs": per_task,
         })
 
-    # Aggregate across seeds within each (arch, k_feat)
-    summary: dict[str, dict] = {}
-    for (arch, k_feat), cells in sorted(grouped.items()):
+    # Aggregate across seeds.
+    summary: dict[str, dict[int, dict]] = defaultdict(dict)
+    for (arch_label, k_feat), cells in grouped.items():
         aucs = [c["mean_auc"] for c in cells]
         accs = [c["mean_acc"] for c in cells]
-        # σ_tasks: average the within-cell std across seeds
         std_tasks = [c["std_auc"] for c in cells]
-        n_tasks_seen = max((c["n_tasks"] for c in cells), default=0)
-        agg = {
+        summary[arch_label][k_feat] = {
             "n_seeds": len(cells),
-            "seeds": sorted({c["seed"] for c in cells}),
             "mean_auc": float(mean(aucs)),
             "std_seeds_auc": float(stdev(aucs)) if len(aucs) > 1 else 0.0,
             "mean_acc": float(mean(accs)),
-            "std_seeds_acc": float(stdev(accs)) if len(accs) > 1 else 0.0,
             "mean_std_tasks_auc": float(mean(std_tasks)) if std_tasks else 0.0,
-            "n_tasks": n_tasks_seen,
+            "n_tasks": max(c["n_tasks"] for c in cells),
         }
-        summary.setdefault(arch, {})[f"k{k_feat}"] = agg
 
-    # Build markdown table — one row per (arch, k_feat)
+    # Build pivoted table: arch × k_feat. ────────────────────────────────
+    all_ks = sorted({k for arch in summary for k in summary[arch]})
+    archs_in_summary = [a for a in ARCH_ORDER if a in summary] + \
+                       [a for a in summary if a not in ARCH_ORDER]
+
+    # Header
+    header = "| arch | " + " | ".join(f"k={k}" for k in all_ks) + " | peak |"
+    sep = "|---|" + "|".join(["---:"] * (len(all_ks) + 1)) + "|"
     md_lines = [
         "_(Auto-generated by `experiments/c3_probing/analysis.py`. "
         "See PROTOCOL.md § 7 *Results live in state*.)_",
         "",
         f"Task suite: SAEBench+CT (n={_pick_n(summary)}). "
-        f"Subject: `gemma_2_2b_it_l13_fineweb_24k128`. "
-        f"Aggregation: mean over seeds, then over tasks.",
+        f"Subject: `{DATASOURCE_NAME}`. Aggregation: mean over seeds, "
+        f"then over tasks.",
         "",
-        "| arch | k_feat | n_seeds | mean_AUC | σ_seeds | σ_tasks (mean) | mean_acc |",
-        "|---|---:|---:|---:|---:|---:|---:|",
+        "**Mean AUC over 38 tasks, by k_feat. Peak = best k_feat per arch (bold).**",
+        "",
+        header,
+        sep,
     ]
-    for arch in sorted(summary.keys()):
-        for k_label in sorted(summary[arch].keys(), key=lambda s: int(s[1:])):
-            agg = summary[arch][k_label]
-            md_lines.append(
-                f"| `{arch}` | {k_label[1:]} | {agg['n_seeds']} | "
-                f"{agg['mean_auc']:.4f} | {agg['std_seeds_auc']:.4f} | "
-                f"{agg['mean_std_tasks_auc']:.4f} | {agg['mean_acc']:.4f} |"
-            )
+    for arch_label in archs_in_summary:
+        if arch_label not in summary:
+            continue
+        row_data = summary[arch_label]
+        # Find peak (highest mean_auc across k_feats present)
+        peak_k, peak_v = max(
+            ((k, v["mean_auc"]) for k, v in row_data.items()),
+            key=lambda t: t[1],
+        )
+        cells_md = []
+        for k in all_ks:
+            if k in row_data:
+                v = row_data[k]
+                val = f"{v['mean_auc']:.3f}"
+                if k == peak_k:
+                    val = f"**{val}**"
+                # Show n_seeds suffix if incomplete
+                if v["n_seeds"] < len(HEADLINE_SEEDS):
+                    val += f"·{v['n_seeds']}"
+                cells_md.append(val)
+            else:
+                cells_md.append("—")
+        peak_label = f"**{peak_v:.3f}** @ k={peak_k}"
+        display = ARCH_DISPLAY.get(arch_label, arch_label)
+        md_lines.append(f"| `{display}` | " + " | ".join(cells_md) + f" | {peak_label} |")
+    md_lines.append("")
+    md_lines.append(
+        "Cells with a `·N` suffix are means over N<3 seeds (in-flight cells; "
+        "table will refresh when complete)."
+    )
     md_lines.append("")
 
-    # Generate plot if we have ≥ 2 k_feat values per arch
-    plot_paths: list[Path] = []
-    plot_arch_xy: dict[str, tuple[list[int], list[float], list[float]]] = {}
-    for arch, by_k in summary.items():
-        ks_xy = sorted([(int(k_label[1:]), agg["mean_auc"], agg["std_seeds_auc"])
-                        for k_label, agg in by_k.items()])
-        if len(ks_xy) >= 1:
-            xs = [t[0] for t in ks_xy]
-            ys = [t[1] for t in ks_xy]
-            es = [t[2] for t in ks_xy]
-            plot_arch_xy[arch] = (xs, ys, es)
+    # Σ_seeds table — separate, more compact (only headline k values)
+    headline_ks = [5, 20, 80, 160, 640]
+    headline_ks = [k for k in headline_ks if k in all_ks]
+    if headline_ks:
+        md_lines.append("**Per-seed σ at headline k_feat values:**")
+        md_lines.append("")
+        md_lines.append("| arch | " + " | ".join(
+            f"k={k} (mean ± σ)" for k in headline_ks
+        ) + " |")
+        md_lines.append("|---|" + "|".join(["---:"] * len(headline_ks)) + "|")
+        for arch_label in archs_in_summary:
+            if arch_label not in summary:
+                continue
+            row_data = summary[arch_label]
+            cells_md = []
+            for k in headline_ks:
+                if k in row_data:
+                    v = row_data[k]
+                    cells_md.append(f"{v['mean_auc']:.3f} ± {v['std_seeds_auc']:.3f}")
+                else:
+                    cells_md.append("—")
+            display = ARCH_DISPLAY.get(arch_label, arch_label)
+            md_lines.append(f"| `{display}` | " + " | ".join(cells_md) + " |")
+        md_lines.append("")
 
-    if plot_arch_xy:
+    # ── Paper-ready plot ─────────────────────────────────────────────────
+    plot_paths: list[Path] = []
+    if summary:
         PLOT_DIR.mkdir(parents=True, exist_ok=True)
-        fig, ax = plt.subplots(figsize=(5.5, 4))
-        for arch, (xs, ys, es) in sorted(plot_arch_xy.items()):
-            ax.errorbar(xs, ys, yerr=es, marker="o", capsize=3, label=arch)
-        ax.set_xlabel("k_feat (top-k features by class-mean diff)")
-        ax.set_ylabel("mean AUC across SAEBench+CT")
-        ax.set_title("C3 — sparse probing on Gemma-2-2b-IT L13")
-        ax.legend(loc="lower right", fontsize="small")
-        ax.grid(True, alpha=0.3)
         plot_path = PLOT_DIR / "auc_by_k.png"
-        save_figure(fig, plot_path)
+        _make_paper_plot(summary, plot_path)
         plot_paths.append(plot_path)
         md_lines.append(f"![AUC by k_feat](../../experiments/{EXP_DIR.name}/plots/auc_by_k.png)")
         md_lines.append("")
@@ -260,26 +311,90 @@ def run_analysis() -> AnalysisResult:
     )
 
 
-def _pick_n(summary: dict[str, dict]) -> int:
-    """Return the most common n_tasks value across summary (for the
-    headline `n=...` mention). Defaults to 38 if no rows are populated.
-    """
+def _make_paper_plot(summary: dict, path: Path) -> None:
+    """Paper-ready figure: log-x AUC vs k_feat, all archs, T-sweep family
+    visualised via line styles."""
+    # Color palette — one per arch family, T-sweep variants share color.
+    palette = {
+        "mlc":          "#1f77b4",  # blue
+        "tsae_paper":   "#9467bd",  # purple
+        "topk_sae":     "#ff7f0e",  # orange
+        "tfa":          "#d62728",  # red
+        "txc_pro":      "#17becf",  # teal
+        "txc_base_T5":  "#2ca02c",  # green
+        "txc_base_T10": "#2ca02c",
+        "txc_base_T20": "#2ca02c",
+    }
+    linestyle = {
+        "txc_base_T5":  "-",
+        "txc_base_T10": "--",
+        "txc_base_T20": ":",
+    }
+    marker = {
+        "mlc":          "o",
+        "tsae_paper":   "s",
+        "topk_sae":     "D",
+        "tfa":          "v",
+        "txc_pro":      "^",
+        "txc_base_T5":  "P",
+        "txc_base_T10": "P",
+        "txc_base_T20": "P",
+    }
+
+    fig, ax = plt.subplots(figsize=(7.0, 5.0), dpi=140)
+
+    # Plot in ARCH_ORDER (legend reads top-down by ranking).
+    for arch_label in ARCH_ORDER:
+        if arch_label not in summary:
+            continue
+        kpoints = sorted(summary[arch_label].items())
+        xs = [k for k, _ in kpoints]
+        ys = [v["mean_auc"] for _, v in kpoints]
+        es = [v["std_seeds_auc"] for _, v in kpoints]
+        ax.errorbar(
+            xs, ys, yerr=es,
+            color=palette.get(arch_label, "#444"),
+            linestyle=linestyle.get(arch_label, "-"),
+            marker=marker.get(arch_label, "o"),
+            markersize=6,
+            linewidth=1.7,
+            capsize=3,
+            label=ARCH_DISPLAY.get(arch_label, arch_label),
+        )
+
+    ax.set_xscale("log")
+    ax.set_xticks([5, 10, 20, 40, 80, 160, 320, 640])
+    ax.set_xticklabels(["5", "10", "20", "40", "80", "160", "320", "640"])
+    ax.set_xlabel("$k_{\\mathrm{feat}}$ (top-k features by class-mean diff)", fontsize=12)
+    ax.set_ylabel("Mean AUC across SAEBench+CT (n=38)", fontsize=12)
+    ax.set_title("C3 — sparse probing on Gemma-2-2B-IT L13", fontsize=13)
+    ax.grid(True, which="both", alpha=0.25, linestyle="-", linewidth=0.5)
+    ax.legend(loc="lower right", fontsize=9, framealpha=0.92, ncol=2)
+    ax.tick_params(axis="both", labelsize=10)
+    fig.tight_layout()
+    save_figure(fig, path)
+
+
+def _pick_n(summary: dict) -> int:
     candidates = []
-    for arch, by_k in summary.items():
+    for arch_label, by_k in summary.items():
         for agg in by_k.values():
-            if agg["n_tasks"] > 0:
+            if agg.get("n_tasks", 0) > 0:
                 candidates.append(agg["n_tasks"])
     if not candidates:
         return 38
-    # Mode-like — most frequent value
     from collections import Counter
     return Counter(candidates).most_common(1)[0][0]
 
 
 if __name__ == "__main__":
-    from temp_bench import report
-    result = report.render(component=COMPONENT)
-    print(f"Rendered c3 → docs/components/c3.md")
+    # Bypass report.render() (which can't handle multiple matching dirs)
+    # and write the AUTO-RESULTS block directly.
+    from temp_bench.report import _component_md, _replace_auto_results
+    result = run_analysis()
+    md_path = _component_md(COMPONENT)
+    _replace_auto_results(md_path, result.markdown)
+    print(f"Rendered c3 → {md_path}")
     print(f"Plots: {[str(p) for p in result.plot_paths]}")
-    print("\n--- markdown preview ---")
-    print(result.markdown)
+    print("\n--- markdown preview (first 60 lines) ---")
+    print("\n".join(result.markdown.split("\n")[:60]))
