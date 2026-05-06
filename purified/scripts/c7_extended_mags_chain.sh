@@ -83,11 +83,11 @@ while true; do
         run_extended "$arch" "$bs" "$key"
     done < <(list_done_canonical_cells)
 
-    # Poll: 60s. Exit only when ALL 7 expected canonical cells have
-    # been processed (4 TXC + 3 baselines; TFA dropped 2026-05-06).
+    # Poll: 60s. Exit only when ALL 8 expected canonical cells have
+    # been processed (4 TXC + 3 baselines + TFA).
     n_seen=$(wc -l < "$SEEN_FILE")
-    if [ "$n_seen" -ge 7 ]; then
-        log "all 7 cells processed — chain complete"
+    if [ "$n_seen" -ge 8 ]; then
+        log "all 8 cells processed — chain complete"
         break
     fi
     sleep 60

@@ -34,6 +34,7 @@ CELLS=(
     "tsae_paper 1024 300000 42"
     "txc_pro  1024 300000 42"
     "topk_sae 1024 300000 42"
+    "tfa      1024 300000 42"
 )
 
 while true; do

@@ -61,17 +61,17 @@ sync_assets_and_snippets() {
         --output-dir "$PAPER_FIGS_DIR" 2>&1 | sed 's/^/  /'
 }
 
-# Once the optimal-mag chain has finished all 7 cells (seen-file has 7
-# lines; TFA dropped 2026-05-06), produce the net-saves + 2x2 contingency
-# analysis once and never again.
+# Once the optimal-mag chain has finished all 8 cells (seen-file has 8
+# lines), produce the net-saves + 2x2 contingency analysis once and never
+# again.
 maybe_run_analyze_optimal() {
     [ -f "$OPTIMAL_SEEN" ] || return 0
     local n_seen
     n_seen=$(wc -l < "$OPTIMAL_SEEN")
-    [ "$n_seen" -ge 7 ] || return 0
+    [ "$n_seen" -ge 8 ] || return 0
     [ -f "$ANALYZE_OUT" ] && return 0   # already produced
 
-    log "all 7 cells through optimal-mag → running analyze_optimal.py"
+    log "all 8 cells through optimal-mag → running analyze_optimal.py"
     .venv/bin/python -m experiments.c7_backtracking.analyze_optimal \
         --output "$ANALYZE_OUT" \
         --tex-output-dir "$PAPER_FIGS_DIR" 2>&1 | sed 's/^/  /' || {
