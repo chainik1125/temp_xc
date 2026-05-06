@@ -79,27 +79,13 @@ The prompt elicits a single integer per generation, so each $(\text{architecture
 
 Each cell trains for $300{,}000$ steps at batch size $1024$ on the Llama-3.1-8B layer-$10$ activation cache. The choice is calibrated against the training-token counts reported by \citet{lubana2025priors} for TFA, \citet{bhalla2025tsae} for T-SAE, and \citet{lieberum2024gemmascope} for GemmaScope, which span roughly $0.5$~B to $8$~B tokens. At our batch size and a window length of $T = 5$ token positions per training sample, $300\mathrm{K}$ steps corresponds to approximately $1.5$~B token-positions, situating our cells comfortably within the literature range and roughly $15\times$ above the $20{,}000$-step sprint baseline used during methodological lock-down.
 
-To audit whether the choice of $300\mathrm{K}$ steps is binding, every cell is instrumented with a held-out probe that fires every $100$ training steps and records the normalized mean-squared error, $\ell_0$ density, and dead-feature count on a batch drawn from a separate seed stream so it never overlaps with the training mini-batches. \Cref{fig:c7-probe-nmse,fig:c7-probe-l0,fig:c7-probe-dead} plot these per-step metrics for every cell.
+To audit whether the choice of $300\mathrm{K}$ steps is binding, every cell is instrumented with a held-out probe that fires every $100$ training steps and records the normalized mean-squared error, $\ell_0$ density, and dead-feature count on a batch drawn from a separate seed stream so it never overlaps with the training mini-batches. \Cref{fig:c7-probe-curves} plots these per-step metrics for every cell.
 
 \begin{figure}[t]
     \centering
-    \autofig{c7_nmse_vs_step}
-    \caption{NMSE on a held-out batch as a function of training step. Single training seed per cell ($\text{seed} = 42$); per-step jitter reflects the held-out probe batch alone, not seed-level uncertainty.}
-    \label{fig:c7-probe-nmse}
-\end{figure}
-
-\begin{figure}[t]
-    \centering
-    \autofig{c7_l0_vs_step}
-    \caption{$\ell_0$ density on a held-out batch as a function of training step. Single training seed per cell.}
-    \label{fig:c7-probe-l0}
-\end{figure}
-
-\begin{figure}[t]
-    \centering
-    \autofig{c7_dead_vs_step}
-    \caption{Dead-feature count (out of $d_{\text{SAE}} = 32{,}768$) as a function of training step. Single training seed per cell.}
-    \label{fig:c7-probe-dead}
+    \autofig{c7_probe_curves_combined}
+    \caption{Held-out probe metrics over training (single seed per cell, $\text{seed} = 42$): NMSE (left), $\ell_0$ density (centre), and dead-feature count out of $d_{\text{SAE}} = 32{,}768$ (right) as a function of training step. $y$-axes are log-scaled. Per-step jitter reflects the held-out probe batch alone, not seed-level uncertainty.}
+    \label{fig:c7-probe-curves}
 \end{figure}
 
 By step $200{,}000$, NMSE has plateaued for every architecture: the relative change between step $200\mathrm{K}$ and step $300\mathrm{K}$ is below $2.5\%$ for every cell, and below $0.5\%$ for five of the seven cells (the two cells with the largest residual drift, $\approx 2.1$--$2.5\%$, are \texttt{txc\_base} at $bs{=}256$ and T-SAE — both still well within a regime where architecture ordering is preserved). The $\ell_0$ density attains its prescribed sparsity target within the first $1\mathrm{K}$ training steps and is held constant by the optimizer thereafter. The dead-feature count continues a slow downward drift through the full $300{,}000$-step horizon for every architecture, with the typical change over the last $100\mathrm{K}$ steps below $1\%$ of $d_{\text{SAE}}$. We therefore consider the $300{,}000$-step training budget binding for the headline reconstruction metric — every cell is past its plateau before the canonical eval is run — while noting that the dead-feature count is still trending and a longer run would presumably revive a few more features. Critically for the paper's argument, the relative ordering of architectures on the held-out probe metrics is established well before the final step.
@@ -135,9 +121,9 @@ PR-AUC is the headline detection metric for this task because the positive class
 \subsection{Steering variants}
 \label{app:c7-steering-variants}
 
-The headline inducement results in \cref{fig:c7-inducement} use a uniform per-position vector addition: at every token position in the resampled continuation, $m \cdot v_{\text{feat}}$ is added to the layer-$10$ residual stream, with $v_{\text{feat}}$ taken as the mined feature's mean decoder direction across the window. We refer to this as the V0 protocol. Three alternatives are studied in cross-component pilot work for the steering case study (\cref{sec:steering}): position-cycled writes that rotate through the per-position decoder slabs (V1); a trailing-window broadcast that writes the most recent decoder slab to the current token (V2); and an encoder-pre-image variant that solves a small least-squares problem to back out the residual perturbation that would maximize the feature's encoder activation (V4). On the C7 cohort we adopt V0 as the headline because it removes a confound between window architectures and the steering protocol itself.
+The headline inducement results in \cref{fig:c7-inducement} use a uniform per-position vector addition: at every token position in the resampled continuation, $m \cdot v_{\text{feat}}$ is added to the layer-$10$ residual stream, with $v_{\text{feat}}$ taken as the mined feature's mean decoder direction across the window. We refer to this as the V0 protocol. Three alternatives are studied in our cross-component pilot work: position-cycled writes that rotate through the per-position decoder slabs (V1); a trailing-window broadcast that writes the most recent decoder slab to the current token (V2); and an encoder-pre-image variant that solves a small least-squares problem to back out the residual perturbation that would maximize the feature's encoder activation (V4). On the C7 cohort we adopt V0 as the headline because it removes a confound between window architectures and the steering protocol itself.
 
-In the present submission, only V0 is evaluated on the C7 cohort, so we omit the per-variant table; V1/V2/V4 ablations are deferred to a journal extension. The cross-component pilot results that motivate the variant catalog are reported in \cref{sec:steering}.
+In the present submission, only V0 is evaluated on the C7 cohort, so we omit the per-variant table; V1/V2/V4 ablations are deferred to a journal extension.
 
 \subsection{Magnitude axis convention}
 \label{app:c7-magnitude-axis}
