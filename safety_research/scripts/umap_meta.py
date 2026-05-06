@@ -250,8 +250,9 @@ def run_arm(arm: str) -> dict | None:
                        label=f"c{cid}: {cl_names.get(cid, '')}",
                        alpha=0.85)
 
-    # Annotate each non-noise cluster with its index at its centroid so the
-    # map is readable without referring to the legend.
+    # Annotate each non-noise cluster with its index at its centroid (small,
+    # no outline) so the map is readable at a glance without referring to
+    # the legend.
     for cid in sorted(set(labels)):
         if cid < 0:
             continue
@@ -259,17 +260,17 @@ def run_arm(arm: str) -> dict | None:
         cx, cy = proj[m, 0].mean(), proj[m, 1].mean()
         ax.text(
             cx, cy, str(cid),
-            fontsize=11, fontweight="bold", ha="center", va="center",
+            fontsize=7, fontweight="bold", ha="center", va="center",
             color="black",
-            bbox=dict(boxstyle="round,pad=0.18", facecolor="white",
-                      edgecolor=palette[cid % len(palette)], alpha=0.85,
-                      linewidth=1.2),
         )
 
     ax.set_title(f"UMAP — {ARM_DISPLAY.get(arm, arm)}  "
                  f"(n_features={len(texts)}, k={n_clusters}, "
                  f"sil={sil:.2f}, noise={noise_frac:.2f})")
-    ax.legend(fontsize=6, loc="upper right", bbox_to_anchor=(1.6, 1.0))
+    # Map takes the left portion; legend sits flush against the right edge
+    # of the axes (no extra horizontal whitespace between map and legend).
+    ax.legend(fontsize=6, loc="upper left", bbox_to_anchor=(1.02, 1.0),
+              borderaxespad=0.0)
     plt.tight_layout()
     fig.savefig(FIG_DIR / f"umap_{arm}.png", dpi=140, bbox_inches="tight")
     plt.close(fig)
