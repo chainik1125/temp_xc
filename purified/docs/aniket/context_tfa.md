@@ -8,9 +8,17 @@ tags:
 
 ## Context: TFA on a sister pod (c7 backtracking, 8th cell)
 
-This is the complete runbook for a different Claude Code instance, on a different runpod with **2× H100**, to train and evaluate the **TFA** architecture as the 8th cell of the c7 backtracking case study, render the resulting paper bundle, regenerate the 2×2 contingency / net-saves analysis, and push everything to `origin/final-aniket`.
+This is the complete runbook for a different Claude Code instance, on a different runpod with **2× H100**, to train and evaluate the **TFA** architecture as the 8th cell of the c7 backtracking case study, render the resulting paper bundle, regenerate the 2×2 contingency / net-saves analysis, and push everything to `origin/final-aniket` (paper outputs) + `origin/300k-tfa` (your source branch — see § *Branch boundary* below).
 
 Read this file end-to-end before running any command. Every "why" matters: this pipeline has implicit invariants (paths, eval-key derivation, judge workspaces, push-rebase rules) that are not enforced by the scripts and silently break the bundle when violated.
+
+### Branch boundary — read this first
+
+> **Your branch is `300k-tfa`. Do NOT push to `extended-300k`.**
+>
+> Aniket's pod (the original c7 pod, post pod-crash recovery) is *actively* using `extended-300k` as its working branch — the txc_pro|1024 recovery pipeline is in flight there. Pushing to `extended-300k` from your pod would either fast-forward over Aniket's in-flight commits (race) or get rejected non-fast-forward (frustrating but recoverable). Neither is acceptable. The user has carved out `300k-tfa` for your pod specifically.
+>
+> All your training, eval, and chain-revert commits land on `300k-tfa`. You may freely `git pull origin extended-300k` to *fetch* Aniket's latest c7 work, but only via merge into `300k-tfa` (Step 0 below) — never push back. `final-aniket` is the one shared branch (paper outputs); push there with rebase as documented in Step 6.
 
 ### Why TFA exists at all (and why it almost didn't)
 
@@ -32,7 +40,7 @@ Your job (sister pod, 2× H100): **train TFA from scratch and add it back as the
 
 ### What's already done before you start
 
-Pulling `origin/extended-300k` gives you everything below:
+After Step 0 below (merge of `extended-300k` → `300k-tfa`) you'll have everything from Aniket's c7 pipeline:
 
 - All 7 cells' canonical + optimal-mag + extended-mags rows in `purified/results/leaderboard.jsonl`.
 - Per-cell run-dir artifacts (`purified/results/runs/<eval_key>/{judge_outputs.jsonl, phase1_unsteered.json, steered_phase2_optimal.jsonl, coherence_judge.jsonl, metrics.json}`) — committed via the existing `scripts/wrap_up_session.sh` pattern.
@@ -54,10 +62,10 @@ What you must NOT touch: the 7 existing cells' checkpoints, leaderboard rows, ev
 
 | Path | Branch | Role |
 |---|---|---|
-| `/workspace/temp_xc/` | `extended-300k` | source; all training/eval/loop scripts here under `purified/` |
-| `/workspace/temp_xc_paper/` | `final-aniket` | paper artifacts; auto-loops commit here and push to origin |
+| `/workspace/temp_xc/` | `300k-tfa` | **your** source; all training/eval/loop scripts under `purified/` (after the Step 0 merge) |
+| `/workspace/temp_xc_paper/` | `final-aniket` | paper artifacts; renderers + analyzer write here, push to origin with rebase |
 
-The split is hard-coded in `purified/scripts/c7_paper_loop.sh` and `synthetic_paper_loop.sh`. Don't rearrange.
+The path split is hard-coded in `purified/scripts/c7_paper_loop.sh` and `synthetic_paper_loop.sh`. Don't rearrange.
 
 ### Pre-flight (HUMAN-RUN, INTERACTIVE — not callable from agent)
 
@@ -69,18 +77,42 @@ bash /workspace/temp_xc/purified/scripts/bootstrap_runpod.sh
 
 It populates `/workspace/.tokens/{gh_token,hf_token,anthropic_key}`, configures `gh` + `huggingface-cli`, sets `HF_HOME=/workspace/hf_cache` and `UV_LINK_MODE=copy` (required on MooseFS), clones the repo, and runs `uv sync` from `purified/`. If you see "no HF token found" or similar, ask the user to run the bootstrap.
 
-After bootstrap, the user must also create the second worktree for the paper branch:
+After bootstrap, switch the source worktree to `300k-tfa` (the bootstrap script defaults to `final` — override) and create the second worktree for the paper branch:
 
 ```bash
 cd /workspace/temp_xc
+git fetch origin
+git checkout 300k-tfa
 git worktree add /workspace/temp_xc_paper final-aniket
 ```
 
-And **pull the latest** from both branches before you start (Aniket's recovery work is fresh):
+### Step 0: bring `300k-tfa` up to date with `extended-300k`'s c7 pipeline
+
+`origin/300k-tfa` was forked from a very early scaffold commit (`8359fd44 base repo for building off of` + onboarding docs + `7ceb4556 some git hooks`). It does *not* yet contain the c7 codebase, training scripts, leaderboard, or any of Aniket's recovery work. Step 0 is a **one-time merge** to bring it in line:
 
 ```bash
-cd /workspace/temp_xc                   && git pull origin extended-300k --rebase
-cd /workspace/temp_xc_paper             && git pull origin final-aniket --rebase
+cd /workspace/temp_xc
+git fetch origin extended-300k
+git merge origin/extended-300k --no-ff -m "merge extended-300k → 300k-tfa: c7 pipeline + Aniket's pod-crash recovery"
+
+# If git reports conflicts in CLAUDE.md / docs/shared/manifesto.md / docs/dmitry/dmitry_about_me.md
+# (the only files the 300k-tfa scaffold touched), prefer the extended-300k side:
+#     git checkout --theirs <conflicted-paths>
+#     git add <conflicted-paths>
+#     git commit
+# Don't worry about losing the scaffold's prose — extended-300k's versions of those files
+# are the canonical, in-use versions.
+
+git push origin 300k-tfa
+```
+
+After this merge, `300k-tfa` contains everything `extended-300k` has *plus* the three scaffold commits at the merge base. Subsequent commits on `300k-tfa` add only TFA-specific work.
+
+You can now run `uv sync` from `purified/` if the venv hasn't been built yet, and pull the paper branch:
+
+```bash
+cd /workspace/temp_xc/purified           && uv sync
+cd /workspace/temp_xc_paper              && git pull origin final-aniket --rebase
 ```
 
 ### Step 1: re-add TFA to the chain scripts (revert Aniket's drop)
@@ -119,7 +151,7 @@ lines.append(f"\\providecommand{{\\cseveennCells}}{{{n_cells}}}")
 lines.append(f"\\providecommand{{\\cseveennPending}}{{{8 - n_cells if n_cells < 8 else 0}}}")
 ```
 
-Commit these reverts on `extended-300k` immediately so subsequent renders pick up the right thresholds:
+Commit these reverts on `300k-tfa` (NOT extended-300k — see § *Branch boundary*) so subsequent renders pick up the right thresholds:
 
 ```bash
 cd /workspace/temp_xc
@@ -130,7 +162,7 @@ git add purified/scripts/c7_optimal_mag_chain.sh \
 git commit -m "revert: re-add TFA to c7 chains + tex snippets (8th cell back in)
 
 Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>"
-git push origin extended-300k
+git push origin 300k-tfa
 ```
 
 ### Step 2: train TFA|1024 from scratch (long, ~30h on H100)
@@ -339,18 +371,18 @@ git pull origin final-aniket --rebase
 git push origin final-aniket
 ```
 
-Also commit the `extended-300k`-side artifacts (run-dir judge outputs etc.):
+Also commit the source-branch-side artifacts (run-dir judge outputs etc.) — push to `300k-tfa`, **never** `extended-300k`:
 
 ```bash
 cd /workspace/temp_xc
 bash purified/scripts/wrap_up_session.sh   # stages run-dir artifacts + leaderboard
 # wrap_up_session.sh pushes to origin/final by default — IMPORTANT: that
-# script's BRANCH default needs to be 'extended-300k' on this pod, not
-# 'final'. Either:
-#   - export BRANCH=extended-300k and rerun the script's push step manually
+# script's BRANCH default needs to be '300k-tfa' on this pod, not 'final'.
+# Either:
+#   - export BRANCH=300k-tfa and rerun the script's push step manually
 #   - or just do it by hand:
-git pull origin extended-300k --rebase
-git push origin extended-300k
+git pull origin 300k-tfa --rebase
+git push origin 300k-tfa
 ```
 
 ### Two-GPU strategy (sister pod has 2× H100)
@@ -371,13 +403,15 @@ If neither, leave GPU 1 idle. **Don't fill it with unrelated speculative work** 
 
 ### Cross-pod coordination
 
-Aniket's pod has been pushing to `origin/final-aniket` via `synthetic_paper_loop.sh` and `c7_paper_loop.sh` (and the wrap-up commits from the txc_pro|1024 recovery). Treat `final-aniket` as a *concurrent-write* branch:
+Three branches matter to you. Roles:
 
-- Always `git pull origin final-aniket --rebase` immediately before `git push`. Both `c7_paper_loop.sh` and `synthetic_paper_loop.sh` already do this, but a manual push from your steps will fail without it.
-- If a push is rejected non-fast-forward, rebase locally and try again — never `--force` (it'll clobber concurrent commits).
-- Aniket's pod is **not** training anymore (only auto-loops are running); it'll go quiet within an hour or two of TFA landing.
+- **`300k-tfa`** — your branch. You own write access. Push freely (rebase-before-push to be safe, but you're the only writer). **Don't push to `extended-300k`** — that's Aniket's pod's working branch, and a concurrent push would race with Aniket's in-flight txc_pro|1024 recovery work.
+- **`extended-300k`** — Aniket's pod's working branch. **Read-only for you.** You may `git fetch origin extended-300k` to pull Aniket's latest, then merge into `300k-tfa` if there's something you need (unlikely after the Step 0 merge — the recovery commits Aniket lands while your training runs are unrelated to TFA). Never push.
+- **`final-aniket`** — shared paper artifacts branch. Aniket's pod's `synthetic_paper_loop.sh` and `c7_paper_loop.sh` push here every 5 minutes during their work (and so will you, in Step 6). Treat it as *concurrent-write*:
+    - Always `git pull origin final-aniket --rebase` immediately before `git push`. Both auto-loop scripts already do this, but a manual push from Step 6 will fail without it.
+    - If a push is rejected non-fast-forward, rebase locally and try again — never `--force` (it'll clobber concurrent commits).
 
-For `extended-300k`: this branch is shared with other agents' work (Han, Dmitry, etc. — see `docs/han/research_logs/phase7_unification/`). Same rebase-before-push rule. Don't `--force`.
+By the time TFA finishes training (~30h), Aniket's pod will be quiet (only the auto-loops still running, idempotent on hash). Your final push to `final-aniket` will land cleanly after a single rebase.
 
 ### Common gotchas
 
@@ -459,4 +493,4 @@ If any check fails, fix and re-render before pushing. A bad push to `final-anike
 
 ### Final state, end-of-session
 
-You should land all 8 cells fully evaluated, all paper artifacts re-rendered, both branches pushed, and `final-aniket` ready for the human paper-build pass. Don't mark the task complete until **every** verification check above passes. Then run `bash scripts/wrap_up_session.sh` once on this pod to commit any straggler artifacts (re-export `BRANCH=extended-300k`).
+You should land all 8 cells fully evaluated, all paper artifacts re-rendered, `300k-tfa` and `final-aniket` both pushed, and `final-aniket` ready for the human paper-build pass. Don't mark the task complete until **every** verification check above passes. Then run `bash scripts/wrap_up_session.sh` once on this pod to commit any straggler artifacts (re-export `BRANCH=300k-tfa`).
