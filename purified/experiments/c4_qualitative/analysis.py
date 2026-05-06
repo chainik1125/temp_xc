@@ -40,21 +40,8 @@ COMPONENT = "c4"
 EXP_DIR = Path(__file__).parent
 PLOT_DIR = EXP_DIR / "plots"
 
-# IT = paper headline; BASE = replication, may be incomplete + in flight.
-SIDES = {
-    "IT": {
-        "datasource": "gemma_2_2b_it_l13_fineweb_24k128",
-        "section_heading": "Results — IT side (Gemma-2-2B-IT L13, paper headline)",
-        "plot_path": PLOT_DIR / "pareto.png",
-        "plot_title": "C4 — Pareto: SEMANTIC vs probing AUC (IT)",
-    },
-    "BASE": {
-        "datasource": "gemma_2_2b_base_l13_fineweb_24k128",
-        "section_heading": "Results — BASE side (Gemma-2-2B L13, replication)",
-        "plot_path": PLOT_DIR / "pareto_base.png",
-        "plot_title": "C4 — Pareto: SEMANTIC vs probing AUC (BASE)",
-    },
-}
+# Paper headline = IT only (BASE replication deferred post-deadline).
+DATASOURCE_NAME = "gemma_2_2b_it_l13_fineweb_24k128"
 HEADLINE_SEEDS = (1, 2, 42)
 # Architectures by training-cfg family (Han 2026-05-05: include topk_sae
 # T=1 in C4 since we have 3-seed C3 results for it).
@@ -87,10 +74,8 @@ def _placeholder_markdown(reason: str) -> str:
     )
 
 
-def _build_canonical_keys(
-    datasource: str,
-) -> tuple[set[str], dict[str, set[str]]]:
-    """Return (all_canonical_keys, txc_base_T_keys_by_label) for one side.
+def _build_canonical_keys() -> tuple[set[str], dict[str, set[str]]]:
+    """Return (all_canonical_keys, txc_base_T_keys_by_label).
 
     Mirrors c3_probing/analysis.py's _build_canonical_keys recipe so the
     T-sweep variants get distinct rows.
@@ -102,21 +87,21 @@ def _build_canonical_keys(
 
     txc_keys = canonical_train_keys(
         component=COMPONENT, archs=TXC_ARCHS, seeds=HEADLINE_SEEDS,
-        datasource_names=(datasource,),
+        datasource_names=(DATASOURCE_NAME,),
         training_cfg=TrainingConfig(n_steps=20_000),
     )
     topk_keys = canonical_train_keys(
         component=COMPONENT, archs=TOPK_ARCHS, seeds=HEADLINE_SEEDS,
-        datasource_names=(datasource,),
+        datasource_names=(DATASOURCE_NAME,),
         training_cfg=TrainingConfig(n_steps=20_000, train_window_size=1),
     )
     tsae_keys = canonical_train_keys(
         component=COMPONENT, archs=TSAE_ARCHS, seeds=HEADLINE_SEEDS,
-        datasource_names=(datasource,),
+        datasource_names=(DATASOURCE_NAME,),
         training_cfg=TrainingConfig(n_steps=20_000, train_window_size=2),
     )
     # T-sweep cells (decisions § 17): txc_base × {T=10, T=20}.
-    ack = compute_act_cache_key(load_datasource(datasource))
+    ack = compute_act_cache_key(load_datasource(DATASOURCE_NAME))
     txc_base_spec = load_arch("txc_base", component=COMPONENT)
     by_T_label: dict[str, set[str]] = {"txc_base_T5": set()}
     for seed in HEADLINE_SEEDS:
@@ -156,10 +141,8 @@ def _resolve_arch_label(row, by_T_label: dict[str, set[str]]) -> str:
     return row.arch
 
 
-def _build_c3_mean_auc_lookup(
-    datasource: str,
-) -> dict[tuple[str, int, int], float]:
-    """Return ``(arch_label, seed, k_feat) -> mean_auc`` for one side.
+def _build_c3_mean_auc_lookup() -> dict[tuple[str, int, int], float]:
+    """Return ``(arch_label, seed, k_feat) -> mean_auc`` for IT side.
 
     arch_label uses the same TXC T-resolved naming so C4 cells join
     cleanly to their C3 counterpart.
@@ -172,21 +155,21 @@ def _build_c3_mean_auc_lookup(
 
     txc_keys = canonical_train_keys(
         component="c3", archs=TXC_ARCHS, seeds=HEADLINE_SEEDS,
-        datasource_names=(datasource,),
+        datasource_names=(DATASOURCE_NAME,),
         training_cfg=TrainingConfig(n_steps=20_000),
     )
     topk_keys = canonical_train_keys(
         component="c3", archs=TOPK_ARCHS, seeds=HEADLINE_SEEDS,
-        datasource_names=(datasource,),
+        datasource_names=(DATASOURCE_NAME,),
         training_cfg=TrainingConfig(n_steps=20_000, train_window_size=1),
     )
     tsae_keys = canonical_train_keys(
         component="c3", archs=TSAE_ARCHS, seeds=HEADLINE_SEEDS,
-        datasource_names=(datasource,),
+        datasource_names=(DATASOURCE_NAME,),
         training_cfg=TrainingConfig(n_steps=20_000, train_window_size=2),
     )
     # C3 T-sweep
-    ack = compute_act_cache_key(load_datasource(datasource))
+    ack = compute_act_cache_key(load_datasource(DATASOURCE_NAME))
     txc_base_spec = load_arch("txc_base", component="c3")
     c3_by_T_label: dict[str, set[str]] = {"txc_base_T5": set()}
     for seed in HEADLINE_SEEDS:
@@ -228,11 +211,11 @@ def _build_c3_mean_auc_lookup(
     return out
 
 
-def _aggregate_side(
-    rows, datasource: str,
+def _aggregate_paper_headline(
+    rows,
 ) -> tuple[dict[str, dict], list[tuple[str, float, float]], list[tuple[str, float, float]]]:
-    """Aggregate one side. Returns (summary_by_arch_label, pareto_points, frontier)."""
-    valid_keys, by_T_label = _build_canonical_keys(datasource)
+    """Aggregate IT-side cells. Returns (summary_by_arch_label, pareto_points, frontier)."""
+    valid_keys, by_T_label = _build_canonical_keys()
     real_rows = [
         r for r in rows
         if not r.eval_cfg.get("smoke", False)
@@ -276,7 +259,7 @@ def _aggregate_side(
             ],
         }
 
-    c3_lookup = _build_c3_mean_auc_lookup(datasource)
+    c3_lookup = _build_c3_mean_auc_lookup()
     pareto_points: list[tuple[str, float, float]] = []
     for arch_label, cells in grouped.items():
         for c in cells:
@@ -300,41 +283,31 @@ def _aggregate_side(
     return summary, pareto_points, frontier
 
 
-def _render_side_block(
-    side_name: str, side_cfg: dict,
-    summary: dict[str, dict],
-    pareto_points: list[tuple[str, float, float]],
-    frontier: list[tuple[str, float, float]],
-) -> tuple[list[str], list[Path]]:
-    """Build markdown block + plot for one side."""
-    plot_paths: list[Path] = []
-    md_lines: list[str] = [
-        "",
-        f"### {side_cfg['section_heading']}",
-        "",
-    ]
-    if not summary:
-        if side_name == "BASE":
-            md_lines.append(
-                f"_BASE-side cells not yet on disk (datasource "
-                f"`{side_cfg['datasource']}`). Section will populate as "
-                f"agent_steer_100k's BASE replication mission lands cells._"
-            )
-        else:
-            md_lines.append("_No canonical cells in leaderboard yet._")
-        md_lines.append("")
-        return md_lines, plot_paths
+def run_analysis() -> AnalysisResult:
+    rows = query_leaderboard(component=COMPONENT)
+    summary, pareto_points, frontier = _aggregate_paper_headline(rows)
 
-    md_lines.append(
-        f"Subject: `{side_cfg['datasource']}`. Top-256 cumulative SEMANTIC "
+    n_real_total = sum(s["n_seeds"] for s in summary.values())
+    if n_real_total == 0:
+        return AnalysisResult(
+            markdown=_placeholder_markdown(
+                f"no canonical cells in leaderboard ({len(rows)} total rows)."
+            ),
+            results={"n_total_rows": len(rows)},
+            plot_paths=[],
+        )
+
+    md_lines: list[str] = [
+        "_(Auto-generated by `experiments/c4_qualitative/analysis.py`. "
+        "See PROTOCOL.md § 7 *Results live in state*.)_",
+        "",
+        f"Subject: `{DATASOURCE_NAME}`. Top-256 cumulative SEMANTIC "
         "count (Haiku 4.5 2-judge majority) on concat_A + concat_B + "
-        "concat_random."
-    )
-    md_lines.append("")
-    md_lines.append(
-        "| arch | n_seeds | mean_SEMANTIC | σ_seeds | mean_judge_agreement |"
-    )
-    md_lines.append("|---|---:|---:|---:|---:|")
+        "concat_random.",
+        "",
+        "| arch | n_seeds | mean_SEMANTIC | σ_seeds | mean_judge_agreement |",
+        "|---|---:|---:|---:|---:|",
+    ]
     archs_in_summary = [a for a in ARCH_ORDER if a in summary] + \
                        [a for a in summary if a not in ARCH_ORDER]
     for arch_label in archs_in_summary:
@@ -356,6 +329,7 @@ def _render_side_block(
     )
     md_lines.append("")
 
+    plot_paths: list[Path] = []
     if pareto_points:
         PLOT_DIR.mkdir(parents=True, exist_ok=True)
         fig, ax = plt.subplots(figsize=(6, 4.5), dpi=140)
@@ -367,9 +341,7 @@ def _render_side_block(
             "TXC-base (T=10)": "tab:cyan",
             "TXC-base (T=20)": "tab:purple",
         }
-        labels_in_order = [
-            ARCH_DISPLAY[a] for a in ARCH_ORDER if a in summary
-        ]
+        labels_in_order = [ARCH_DISPLAY[a] for a in ARCH_ORDER if a in summary]
         for display in labels_in_order:
             pts = [(x, y) for lbl, x, y in pareto_points
                    if lbl.startswith(f"{display}/")]
@@ -391,15 +363,15 @@ def _render_side_block(
             )
         ax.set_xlabel("C3 mean-pool probing AUC ($k_{\\mathrm{feat}}\\!=\\!20$)")
         ax.set_ylabel("Top-256 SEMANTIC count")
-        ax.set_title(side_cfg["plot_title"])
+        ax.set_title("C4 — Pareto: SEMANTIC vs probing AUC (Gemma-2-2B-IT L13)")
         ax.legend(loc="lower right", fontsize="small")
         ax.grid(True, alpha=0.3)
-        plot_path = side_cfg["plot_path"]
+        plot_path = PLOT_DIR / "pareto.png"
         save_figure(fig, plot_path)
         plot_paths.append(plot_path)
         md_lines.append(
-            f"![Pareto: C4 SEMANTIC vs C3 probing AUC — {side_name}]"
-            f"(../../experiments/{EXP_DIR.name}/plots/{plot_path.name})"
+            f"![Pareto: C4 SEMANTIC vs C3 probing AUC]"
+            f"(../../experiments/{EXP_DIR.name}/plots/pareto.png)"
         )
         md_lines.append("")
         if frontier:
@@ -407,54 +379,19 @@ def _render_side_block(
             md_lines.append(f"Pareto frontier: `{', '.join(front_labels)}`")
             md_lines.append("")
 
-    return md_lines, plot_paths
-
-
-def run_analysis() -> AnalysisResult:
-    rows = query_leaderboard(component=COMPONENT)
-
-    md_lines: list[str] = [
-        "_(Auto-generated by `experiments/c4_qualitative/analysis.py`. "
-        "See PROTOCOL.md § 7 *Results live in state*.)_",
-    ]
-    plot_paths: list[Path] = []
-    full_summary: dict[str, dict] = {}
-    n_real_total = 0
-
-    for side_name, side_cfg in SIDES.items():
-        side_summary, pareto, frontier = _aggregate_side(
-            rows, side_cfg["datasource"],
-        )
-        n_real_total += sum(s["n_seeds"] for s in side_summary.values())
-        full_summary[side_name] = {
-            "summary": dict(side_summary),
+    return AnalysisResult(
+        markdown="\n".join(md_lines),
+        results={
+            "summary": dict(summary),
             "pareto_points": [
                 {"label": lbl, "c3_mean_auc": x, "c4_top_N_semantic": y}
-                for lbl, x, y in pareto
+                for lbl, x, y in pareto_points
             ],
             "frontier": [
                 {"label": lbl, "c3_mean_auc": x, "c4_top_N_semantic": y}
                 for lbl, x, y in frontier
             ],
-        }
-        block_md, side_plots = _render_side_block(
-            side_name, side_cfg, side_summary, pareto, frontier,
-        )
-        md_lines.extend(block_md)
-        plot_paths.extend(side_plots)
-
-    if n_real_total == 0:
-        return AnalysisResult(
-            markdown=_placeholder_markdown(
-                f"no canonical cells in leaderboard ({len(rows)} total rows)."
-            ),
-            results={"n_total_rows": len(rows)},
-            plot_paths=[],
-        )
-
-    return AnalysisResult(
-        markdown="\n".join(md_lines),
-        results=full_summary,
+        },
         plot_paths=plot_paths,
     )
 

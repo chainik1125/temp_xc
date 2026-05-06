@@ -37,23 +37,9 @@ COMPONENT = "c3"
 EXP_DIR = Path(__file__).parent
 PLOT_DIR = EXP_DIR / "plots"
 
-# IT = paper headline; BASE = replication, may be incomplete + in flight.
-SIDES = {
-    "IT": {
-        "datasource": "gemma_2_2b_it_l13_fineweb_24k128",
-        "datasource_multilayer": "gemma_2_2b_it_l11to15_fineweb_24k128",
-        "section_heading": "Results — IT side (Gemma-2-2B-IT L13, paper headline)",
-        "plot_path": PLOT_DIR / "auc_by_k.png",
-        "plot_title": "C3 — sparse probing on Gemma-2-2B-IT L13",
-    },
-    "BASE": {
-        "datasource": "gemma_2_2b_base_l13_fineweb_24k128",
-        "datasource_multilayer": "gemma_2_2b_base_l11to15_fineweb_24k128",
-        "section_heading": "Results — BASE side (Gemma-2-2B L13, replication)",
-        "plot_path": PLOT_DIR / "auc_by_k_base.png",
-        "plot_title": "C3 — sparse probing on Gemma-2-2B (BASE) L13",
-    },
-}
+# Paper headline = IT only (BASE replication deferred post-deadline).
+DATASOURCE_NAME = "gemma_2_2b_it_l13_fineweb_24k128"
+DATASOURCE_NAME_MULTILAYER = "gemma_2_2b_it_l11to15_fineweb_24k128"
 TXC_ARCHS = ("txc_base", "txc_pro")
 TOPK_ARCHS = ("topk_sae",)
 TSAE_ARCHS = ("tsae_paper",)
@@ -89,10 +75,8 @@ def _placeholder_markdown(reason: str) -> str:
     )
 
 
-def _build_canonical_keys(
-    datasource: str, datasource_multilayer: str,
-) -> tuple[set[str], dict[str, set[str]]]:
-    """Return (all_canonical_keys, txc_base_T_keys_by_label) for one side.
+def _build_canonical_keys() -> tuple[set[str], dict[str, set[str]]]:
+    """Return (all_canonical_keys, txc_base_T_keys_by_label).
 
     The second value lets us map a row's train_key back to the T-variant
     label (``txc_base_T5`` / ``txc_base_T10`` / ``txc_base_T20``).
@@ -106,41 +90,41 @@ def _build_canonical_keys(
         component=COMPONENT,
         archs=TXC_ARCHS,
         seeds=HEADLINE_SEEDS,
-        datasource_names=(datasource,),
+        datasource_names=(DATASOURCE_NAME,),
         training_cfg=TrainingConfig(n_steps=20_000),
     )
     topk_keys = canonical_train_keys(
         component=COMPONENT,
         archs=TOPK_ARCHS,
         seeds=HEADLINE_SEEDS,
-        datasource_names=(datasource,),
+        datasource_names=(DATASOURCE_NAME,),
         training_cfg=TrainingConfig(n_steps=20_000, train_window_size=1),
     )
     tsae_keys = canonical_train_keys(
         component=COMPONENT,
         archs=TSAE_ARCHS,
         seeds=HEADLINE_SEEDS,
-        datasource_names=(datasource,),
+        datasource_names=(DATASOURCE_NAME,),
         training_cfg=TrainingConfig(n_steps=20_000, train_window_size=2),
     )
     tfa_keys = canonical_train_keys(
         component=COMPONENT,
         archs=TFA_ARCHS,
         seeds=HEADLINE_SEEDS,
-        datasource_names=(datasource,),
+        datasource_names=(DATASOURCE_NAME,),
         training_cfg=TrainingConfig(n_steps=20_000, batch_size=32),
     )
     mlc_keys = canonical_train_keys(
         component=COMPONENT,
         archs=MLC_ARCHS,
         seeds=HEADLINE_SEEDS,
-        datasource_names=(datasource_multilayer,),
+        datasource_names=(DATASOURCE_NAME_MULTILAYER,),
         training_cfg=TrainingConfig(n_steps=20_000),
     )
 
     # T-sweep cells (decisions § 17): txc_base × {T=10, T=20}. Compute
     # train_keys with the merged arch_hparams.
-    ack = compute_act_cache_key(load_datasource(datasource))
+    ack = compute_act_cache_key(load_datasource(DATASOURCE_NAME))
     txc_base_spec = load_arch("txc_base", component=COMPONENT)
     by_T_label: dict[str, set[str]] = {"txc_base_T5": set()}
     # T=5 (default; same set as txc_keys but filtered to txc_base):
@@ -182,17 +166,13 @@ def _resolve_arch_label(row, by_T_label: dict[str, set[str]]) -> str:
     return row.arch
 
 
-def _aggregate_side(
-    rows, datasource: str, datasource_multilayer: str,
-) -> tuple[dict[str, dict[int, dict]], int]:
-    """Filter rows to one side + aggregate by (arch_label, k_feat).
+def _aggregate_paper_headline(rows) -> tuple[dict[str, dict[int, dict]], int]:
+    """Filter IT-side rows + aggregate by (arch_label, k_feat).
 
-    Returns (summary, n_total_rows_for_side). ``summary[arch_label][k_feat]``
-    holds the per-cell aggregates (mean_auc, std_seeds, n_seeds, n_tasks, …).
+    Returns (summary, n_real_rows). ``summary[arch_label][k_feat]`` holds
+    the per-cell aggregates (mean_auc, std_seeds, n_seeds, n_tasks, …).
     """
-    valid_keys, by_T_label = _build_canonical_keys(
-        datasource, datasource_multilayer,
-    )
+    valid_keys, by_T_label = _build_canonical_keys()
 
     real_rows = [
         r for r in rows
@@ -242,45 +222,37 @@ def _aggregate_side(
     return summary, len(real_rows)
 
 
-def _render_side_block(
-    side_name: str, side_cfg: dict, summary: dict[str, dict[int, dict]],
-) -> tuple[list[str], list[Path]]:
-    """Build the markdown block + plots for one side. Returns (md_lines, plot_paths)."""
-    plot_paths: list[Path] = []
-    md_lines: list[str] = [
-        "",
-        f"### {side_cfg['section_heading']}",
-        "",
-    ]
-    if not summary:
-        if side_name == "BASE":
-            md_lines.append(
-                f"_BASE-side cells not yet on disk (datasource "
-                f"`{side_cfg['datasource']}`). Section will populate as "
-                f"agent_steer_100k's BASE replication mission lands cells._"
-            )
-        else:
-            md_lines.append("_No canonical cells in leaderboard yet._")
-        md_lines.append("")
-        return md_lines, plot_paths
+def run_analysis() -> AnalysisResult:
+    rows = query_leaderboard(component=COMPONENT)
+    summary, n_real = _aggregate_paper_headline(rows)
+
+    if n_real == 0:
+        return AnalysisResult(
+            markdown=_placeholder_markdown(
+                f"no canonical cells in leaderboard ({len(rows)} total rows)."
+            ),
+            results={"n_total_rows": len(rows)},
+            plot_paths=[],
+        )
 
     all_ks = sorted({k for arch in summary for k in summary[arch]})
     archs_in_summary = [a for a in ARCH_ORDER if a in summary] + \
                        [a for a in summary if a not in ARCH_ORDER]
 
-    md_lines.append(
+    md_lines: list[str] = [
+        "_(Auto-generated by `experiments/c3_probing/analysis.py`. "
+        "See PROTOCOL.md § 7 *Results live in state*.)_",
+        "",
         f"Task suite: SAEBench+CT (n={_pick_n(summary)}). "
-        f"Subject: `{side_cfg['datasource']}`. Aggregation: mean over "
-        f"seeds, then over tasks."
-    )
-    md_lines.append("")
-    md_lines.append(
+        f"Subject: `{DATASOURCE_NAME}`. Aggregation: mean over seeds, "
+        f"then over tasks.",
+        "",
         "**Mean AUC over 38 tasks, by k_feat. Peak = best k_feat "
-        "per arch (bold).**"
-    )
-    md_lines.append("")
-    md_lines.append("| arch | " + " | ".join(f"k={k}" for k in all_ks) + " | peak |")
-    md_lines.append("|---|" + "|".join(["---:"] * (len(all_ks) + 1)) + "|")
+        "per arch (bold).**",
+        "",
+        "| arch | " + " | ".join(f"k={k}" for k in all_ks) + " | peak |",
+        "|---|" + "|".join(["---:"] * (len(all_ks) + 1)) + "|",
+    ]
     for arch_label in archs_in_summary:
         if arch_label not in summary:
             continue
@@ -341,54 +313,20 @@ def _render_side_block(
 
     # Plot
     PLOT_DIR.mkdir(parents=True, exist_ok=True)
-    plot_path = side_cfg["plot_path"]
-    _make_paper_plot(summary, plot_path, title=side_cfg["plot_title"])
-    plot_paths.append(plot_path)
+    plot_path = PLOT_DIR / "auc_by_k.png"
+    _make_paper_plot(
+        summary, plot_path,
+        title="C3 — sparse probing on Gemma-2-2B-IT L13",
+    )
     md_lines.append(
-        f"![AUC by k_feat — {side_name}]"
-        f"(../../experiments/{EXP_DIR.name}/plots/{plot_path.name})"
+        f"![AUC by k_feat](../../experiments/{EXP_DIR.name}/plots/auc_by_k.png)"
     )
     md_lines.append("")
 
-    return md_lines, plot_paths
-
-
-def run_analysis() -> AnalysisResult:
-    rows = query_leaderboard(component=COMPONENT)
-
-    md_lines: list[str] = [
-        "_(Auto-generated by `experiments/c3_probing/analysis.py`. "
-        "See PROTOCOL.md § 7 *Results live in state*.)_",
-    ]
-    plot_paths: list[Path] = []
-    full_summary: dict[str, dict] = {}
-    n_real_total = 0
-
-    for side_name, side_cfg in SIDES.items():
-        side_summary, n_real = _aggregate_side(
-            rows, side_cfg["datasource"], side_cfg["datasource_multilayer"],
-        )
-        n_real_total += n_real
-        full_summary[side_name] = dict(side_summary)
-        block_md, side_plots = _render_side_block(
-            side_name, side_cfg, side_summary,
-        )
-        md_lines.extend(block_md)
-        plot_paths.extend(side_plots)
-
-    if n_real_total == 0:
-        return AnalysisResult(
-            markdown=_placeholder_markdown(
-                f"no canonical cells in leaderboard ({len(rows)} total rows)."
-            ),
-            results={"n_total_rows": len(rows)},
-            plot_paths=[],
-        )
-
     return AnalysisResult(
         markdown="\n".join(md_lines),
-        results=full_summary,
-        plot_paths=plot_paths,
+        results=dict(summary),
+        plot_paths=[plot_path],
     )
 
 
