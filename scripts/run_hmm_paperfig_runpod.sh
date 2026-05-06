@@ -1,13 +1,20 @@
 #!/usr/bin/env bash
-# Paper figure: HMM denoising bench, 4 archs, 3 seeds, full T x k grid.
-# PARALLEL launcher: spawns 12 (model x seed) jobs concurrently on a
+# Paper figure: HMM denoising bench, 3 archs, 3 seeds, full T x k grid.
+# PARALLEL launcher: spawns 9 (model x seed) jobs concurrently on a
 # single GPU. Each cell uses a tiny fraction of GPU memory + compute, so
 # concurrency speedup is near-linear up to ~8-16 processes on any modern
-# pod. Net: an overnight run becomes ~30-90 minutes wall-clock.
+# pod. Net: an overnight run becomes ~30-60 minutes wall-clock.
 #
 # Fills two gaps in the midterm bench:
 #   1. Adds regular_sae_kT (framing-B per-token-budget baseline).
 #   2. Multi-seed (3 seeds) so fig9 can show error bars.
+#
+# Stacked SAE is dropped — it was already benchmarked in the midterm and
+# isn't part of the paper's TXCDR-vs-SAE story.
+#
+# Batch size defaulted to 256 (vs the midterm's 64): the models are too
+# small to be GPU-memory-bound, larger batches reduce per-step Python
+# overhead with negligible memory cost.
 #
 # Usage on runpod:
 #     cd /temp_xc && git pull
@@ -23,10 +30,10 @@ set -uo pipefail
 cd "$(dirname "$0")/.."
 REPO_ROOT=$(pwd)
 
-MODELS=(regular_sae regular_sae_kT stacked_sae txcdr)
+MODELS=(regular_sae regular_sae_kT txcdr)
 SEEDS=(42 43 44)
 N_STEPS=${N_STEPS:-65000}
-BATCH_SIZE=${BATCH_SIZE:-64}
+BATCH_SIZE=${BATCH_SIZE:-256}
 
 OUT_DIR="results/hmm_paperfig"
 SHARD_DIR="$OUT_DIR/shards"
