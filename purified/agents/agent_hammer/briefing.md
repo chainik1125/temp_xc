@@ -82,33 +82,33 @@ Driver files (already on `final` branch, do not edit):
 
 ### Pod + parallelism
 
-Pod: **8× RTX PRO 6000** (Blackwell-gen consumer pro, ~96 GB VRAM
-each). Toy d_sae=40 cells use ~1-2 GB per cell, so each GPU can run
-1 process — no batching needed. Per-cell wall: ~1-2 min on RTX PRO
-6000 (faster than A40 due to fp16/bf16 throughput).
+Pod: **5× RTX PRO 6000** (Blackwell-gen consumer pro, ~96 GB VRAM
+each — corrected from prior briefing). Toy d_sae=40 cells use ~1-2
+GB per cell, so each GPU runs 1 process. Per-cell wall: ~1-2 min
+(per-token archs faster than tsae_paper).
 
 **Cell counts**:
 - Setup A (c2): tsae_paper × 12 k × 3 seeds = **36 cells**
 - Setup B (c1_noisy): tsae_paper × 12 k × 3 seeds + topk_sae × 12 k × 3 seeds = **72 cells**
 - **TOTAL: 108 cells**
 
-### Sharding (8 GPUs × ~14 cells each ≈ 30 min wall)
+### Sharding (5 GPUs × 9 shards = ~36 min wall)
 
-Recommended (arch, seed, setup) → GPU mapping. Each shard is one
-`--arch <X> --seed <Y>` invocation iterating all k_pos:
+9 (arch, seed) shards across 5 GPUs → each GPU runs ~2 shards
+sequentially. Each shard is one `--arch <X> --seed <Y>` invocation
+iterating all 12 k_pos values.
 
-| GPU | Driver | --arch | --seed | Setup | Cells |
-|---|---|---|---|---|---:|
-| 0 | `c2_synthetic_coupled.run_baselines`  | tsae_paper | 1   | A | 12 |
-| 1 | `c2_synthetic_coupled.run_baselines`  | tsae_paper | 2   | A | 12 |
-| 2 | `c2_synthetic_coupled.run_baselines`  | tsae_paper | 42  | A | 12 |
-| 3 | `c1_noisy_filler.run_baselines`       | tsae_paper | 1   | B | 12 |
-| 4 | `c1_noisy_filler.run_baselines`       | tsae_paper | 2   | B | 12 |
-| 5 | `c1_noisy_filler.run_baselines`       | tsae_paper | 42  | B | 12 |
-| 6 | `c1_noisy_filler.run_baselines`       | topk_sae   | 1,2 | B | 24 (one shard does 2 seeds serially) |
-| 7 | `c1_noisy_filler.run_baselines`       | topk_sae   | 42  | B | 12 |
+| GPU | Shard 1 (first) | Shard 2 (after Shard 1 finishes) | Cells |
+|---|---|---|---:|
+| 0 | Setup A tsae_paper seed=1 (12 cells)   | Setup B tsae_paper seed=1 (12 cells)  | 24 |
+| 1 | Setup A tsae_paper seed=2 (12 cells)   | Setup B tsae_paper seed=2 (12 cells)  | 24 |
+| 2 | Setup A tsae_paper seed=42 (12 cells)  | Setup B tsae_paper seed=42 (12 cells) | 24 |
+| 3 | Setup B topk_sae seed=1 (12 cells)     | Setup B topk_sae seed=2 (12 cells)    | 24 |
+| 4 | Setup B topk_sae seed=42 (12 cells)    | (idle / available for retry)          | 12 |
 
-Total: 108 cells across 8 GPUs, ~30 min wall.
+Total: 108 cells across 5 GPUs. Per-shard wall ~18 min (12 cells
+× 1.5 min). Two-shard chain on GPUs 0-3 = ~36 min wall. GPU 4
+finishes at ~18 min (free for retry / re-eval).
 
 ### First concrete steps
 
@@ -132,59 +132,52 @@ with `arch=topk_sae`, `component=c1_noisy`, `eval_cfg.smoke=True`.
 
 ### Phase 2 — Full launch (~30 min)
 
-Write `experiments/baselines_launch.sh` (a top-level launcher in
-your scratch space — DO NOT commit it under `experiments/`; either
-keep it local or commit under your own `agents/agent_hammer/` dir):
+Write `agents/agent_hammer/run_baselines_launch.sh` (your territory):
 
 ```bash
 #!/usr/bin/env bash
+# 5× RTX PRO 6000 baseline-backfill launcher.
+# 9 (arch, seed) shards × 12 cells each = 108 cells total.
+# Shards chained per-GPU via inner bash loop.
 set -e
-cd "$(dirname "$0")"
-mkdir -p logs
+cd "$(dirname "$0")/../.."   # purified/
 
+mkdir -p logs
 export OMP_NUM_THREADS=8 MKL_NUM_THREADS=8
 
-# Setup A: tsae_paper × 3 seeds (GPUs 0-2)
+# GPU 0,1,2: Setup A tsae → Setup B tsae (chain 2 shards each)
 for gpu_seed in "0:1" "1:2" "2:42"; do
   IFS=":" read -r gpu seed <<< "$gpu_seed"
-  log="logs/hammer_setupA_tsae_seed${seed}.log"
+  log="logs/hammer_gpu${gpu}_tsae_seed${seed}.log"
   setsid -f bash scripts/run_on_gpu.sh "${gpu}" -- \
     env AGENT_NAME=agent_hammer OMP_NUM_THREADS=8 MKL_NUM_THREADS=8 TQDM_DISABLE=1 \
-    .venv/bin/python -m experiments.c2_synthetic_coupled.run_baselines \
-      --arch tsae_paper --seed "${seed}" \
-    < /dev/null > "${log}" 2>&1
+    bash -c "
+      .venv/bin/python -m experiments.c2_synthetic_coupled.run_baselines \
+        --arch tsae_paper --seed ${seed}
+      .venv/bin/python -m experiments.c1_noisy_filler.run_baselines \
+        --arch tsae_paper --seed ${seed}
+    " < /dev/null > "${log}" 2>&1
 done
 
-# Setup B: tsae_paper × 3 seeds (GPUs 3-5)
-for gpu_seed in "3:1" "4:2" "5:42"; do
-  IFS=":" read -r gpu seed <<< "$gpu_seed"
-  log="logs/hammer_setupB_tsae_seed${seed}.log"
-  setsid -f bash scripts/run_on_gpu.sh "${gpu}" -- \
-    env AGENT_NAME=agent_hammer OMP_NUM_THREADS=8 MKL_NUM_THREADS=8 TQDM_DISABLE=1 \
-    .venv/bin/python -m experiments.c1_noisy_filler.run_baselines \
-      --arch tsae_paper --seed "${seed}" \
-    < /dev/null > "${log}" 2>&1
-done
-
-# Setup B: topk_sae GPU 6 does seeds 1,2 serially; GPU 7 does seed 42
-log="logs/hammer_setupB_topk_seeds_1_2.log"
-setsid -f bash scripts/run_on_gpu.sh 6 -- \
+# GPU 3: Setup B topk seeds 1, 2 serially
+setsid -f bash scripts/run_on_gpu.sh 3 -- \
   env AGENT_NAME=agent_hammer OMP_NUM_THREADS=8 MKL_NUM_THREADS=8 TQDM_DISABLE=1 \
   bash -c '
     for seed in 1 2; do
       .venv/bin/python -m experiments.c1_noisy_filler.run_baselines \
         --arch topk_sae --seed $seed
     done
-  ' < /dev/null > "${log}" 2>&1
+  ' < /dev/null > "logs/hammer_gpu3_topk_seeds_1_2.log" 2>&1
 
-log="logs/hammer_setupB_topk_seed_42.log"
-setsid -f bash scripts/run_on_gpu.sh 7 -- \
+# GPU 4: Setup B topk seed 42 (single shard, finishes fast at ~18 min;
+# can be repurposed for retries / re-eval after that).
+setsid -f bash scripts/run_on_gpu.sh 4 -- \
   env AGENT_NAME=agent_hammer OMP_NUM_THREADS=8 MKL_NUM_THREADS=8 TQDM_DISABLE=1 \
   .venv/bin/python -m experiments.c1_noisy_filler.run_baselines \
     --arch topk_sae --seed 42 \
-  < /dev/null > "${log}" 2>&1
+  < /dev/null > "logs/hammer_gpu4_topk_seed_42.log" 2>&1
 
-echo "[hammer] launched 8 detached shards"
+echo "[hammer] launched 5 detached shards (9 sub-shards via chaining)"
 sleep 3
 pgrep -af "experiments.c[12]_.*\.run_baselines" | head
 ```
