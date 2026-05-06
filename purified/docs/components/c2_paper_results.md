@@ -1,6 +1,6 @@
 # C2 Synthetic Coupled — paper-ready results (auto-generated)
 
-_Last refreshed: 2026-05-06T08:30:58+00:00_
+_Last refreshed: 2026-05-06T09:01:02+00:00_
 
 ## Setup
 
