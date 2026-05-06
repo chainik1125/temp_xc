@@ -61,8 +61,9 @@ MAX_CONCURRENT = int(os.environ.get("MAX_CONCURRENT", "1"))
 MAX_RETRIES = 3
 
 ALL_ARMS = [
-    dict(arm="sae",  arch="stacked_sae", T=1, k=100),
-    dict(arm="txc",  arch="txcdr",       T=5, k=100),
+    dict(arm="sae",  arch="stacked_sae", T=1, k=100),  # vanilla SAE (T=1)
+    dict(arm="tsae", arch="stacked_sae", T=5, k=100),  # StackedSAE (T=5)
+    dict(arm="txc",  arch="txcdr",       T=5, k=100),  # TXCDR (T=5)
 ]
 # ARMS env override: comma-separated list (e.g. "txc" to resume only TXC).
 _arm_env = os.environ.get("ARMS")

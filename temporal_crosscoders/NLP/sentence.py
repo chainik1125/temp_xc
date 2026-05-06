@@ -275,12 +275,42 @@ def load_interpretations(
     return out
 
 
+_BOILERPLATE = (
+    "this feature activates on ",
+    "this feature represents ",
+    "this feature detects ",
+    "this feature tracks ",
+    "this feature captures ",
+    "this feature identifies ",
+    "this feature fires on ",
+    "this feature responds to ",
+    "this feature marks ",
+)
+
+
+def _shorten_explanation(text: str, max_chars: int = 55) -> str:
+    """Strip Haiku's boilerplate prefix and truncate so each row fits the
+    legend column at fontsize 6 in a 16x11 figure.
+    """
+    if not text:
+        return ""
+    low = text.lower()
+    for prefix in _BOILERPLATE:
+        if low.startswith(prefix):
+            text = text[len(prefix):]
+            break
+    text = text.replace("\n", " ").strip(" .,;—")
+    if len(text) > max_chars:
+        text = text[: max_chars - 1].rstrip() + "…"
+    return text
+
+
 def add_interp_legend(
     ax,
     feature_indices: np.ndarray,
     interpretations: dict[int, str],
     n_feat: int,
-    max_chars: int = 70,
+    max_chars: int = 55,
 ) -> None:
     """Display feature interpretations as text aligned with heatmap rows."""
     ax.set_xlim(0, 1)
@@ -294,14 +324,11 @@ def add_interp_legend(
     for i, fi in enumerate(feature_indices):
         text = interpretations.get(int(fi))
         if text:
-            if len(text) > max_chars:
-                text = text.split()[3:]
-                text = " ".join(text)
-                text = text[: max_chars - 1] + "…"
-            ax.text(0.0, i, text, va="center", ha="left", fontsize=5)
+            ax.text(0.0, i, _shorten_explanation(text, max_chars),
+                    va="center", ha="left", fontsize=6)
         else:
             ax.text(0.0, i, "(no interp)", va="center", ha="left",
-                    fontsize=4, color="gray", style="italic")
+                    fontsize=5, color="gray", style="italic")
 
 
 def select_exclusive_features(acts: torch.Tensor, seq_len: int) -> np.ndarray:
@@ -512,13 +539,15 @@ def main():
     print(f"  Loaded interps: SAE={len(sae_interps)}/{n_feat}, TXCDR={len(tx_interps)}/{n_feat}")
 
     # ─── Plot: 2 heatmaps stacked top-to-bottom + interp legends + stats ───
-    # Layout: 3 rows (SAE, TXCDR, stats) × 2 cols (heatmap, interp legend)
-    fig = plt.figure(figsize=(22, 18))
+    # Layout: 3 rows (StackedSAE, TXCDR, stats+caption) × 2 cols
+    # (heatmap, interp legend). Sized to fit a 1920x1080 display at
+    # fit-to-window (16x11 inches at 120 dpi ≈ 1920x1320, scaled to fit).
+    fig = plt.figure(figsize=(16, 11))
     gs = gridspec.GridSpec(
         3, 2,
         width_ratios=[3, 2],
-        height_ratios=[6, 6, 1],
-        hspace=0.35, wspace=0.05,
+        height_ratios=[6, 6, 1.4],
+        hspace=0.55, wspace=0.04,
     )
 
     # Per-model log normalization for readable color contrast.
@@ -535,7 +564,7 @@ def main():
     ax0 = fig.add_subplot(gs[0, 0])
     im0 = ax0.imshow(sae_log.T, aspect="auto", cmap=args.cmap_sae,
                       norm=make_norm(sae_hm), interpolation="nearest")
-    ax0.set_title(f"StackedSAE — {args.layer} k={args.k} T={args.T}", fontsize=11)
+    ax0.set_title(f"StackedSAE (T={args.T}) — {args.layer} k={args.k}", fontsize=11)
     ax0.set_xlabel("Token position")
     ax0.set_ylabel("Feature")
     ax0.set_xticks(range(seq_len))
@@ -551,13 +580,13 @@ def main():
     # SAE interp legend (row 0, col 1)
     ax0_leg = fig.add_subplot(gs[0, 1])
     add_interp_legend(ax0_leg, sae_top_idx, sae_interps, n_feat)
-    ax0_leg.set_title("SAE feature interpretations", fontsize=9, loc="left")
+    ax0_leg.set_title("StackedSAE feature interpretations (Haiku)", fontsize=9, loc="left")
 
     # ─── TXCDR heatmap (row 1) ─────────────────────────────────────────────
     ax1 = fig.add_subplot(gs[1, 0])
     im1 = ax1.imshow(tx_log.T, aspect="auto", cmap=args.cmap_tx,
                       norm=make_norm(tx_hm), interpolation="nearest")
-    ax1.set_title(f"TXCDR — {args.layer} k={args.k} T={args.T}", fontsize=11)
+    ax1.set_title(f"TXCDR (T={args.T}) — {args.layer} k={args.k}", fontsize=11)
     ax1.set_xlabel("Token position")
     ax1.set_ylabel("Feature")
     ax1.set_xticks(range(seq_len))
@@ -573,11 +602,16 @@ def main():
     # TXCDR interp legend (row 1, col 1)
     ax1_leg = fig.add_subplot(gs[1, 1])
     add_interp_legend(ax1_leg, tx_top_idx, tx_interps, n_feat)
-    ax1_leg.set_title("TXCDR feature interpretations", fontsize=9, loc="left")
+    ax1_leg.set_title("TXCDR feature interpretations (Haiku)", fontsize=9, loc="left")
 
     # ─── Stats panel (row 2, spanning both columns) ────────────────────────
-    ax_stats = fig.add_subplot(gs[2, :])
+    # Layout: stats table on the left, selection-procedure caption on the
+    # right so the figure self-documents the top-feature pick.
+    stats_gs = gs[2, :].subgridspec(1, 2, width_ratios=[3, 4], wspace=0.05)
+    ax_stats = fig.add_subplot(stats_gs[0, 0])
     ax_stats.axis("off")
+    ax_caption = fig.add_subplot(stats_gs[0, 1])
+    ax_caption.axis("off")
 
     col_labels = [f"Local metric ({seq_len} tokens)", "StackedSAE", "TXCDR"]
     row_data = [
@@ -594,8 +628,32 @@ def main():
         loc="center", cellLoc="center",
     )
     table.auto_set_font_size(False)
-    table.set_fontsize(9)
-    table.scale(0.8, 1.4)
+    table.set_fontsize(8)
+    table.scale(0.95, 1.25)
+
+    # Selection-procedure caption with file:line reference.
+    caption_lines = {
+        "exclusive": (
+            "Top-feature selection — \"exclusive\" mode (default).\n"
+            "For each token position p, pick the feature j whose activation\n"
+            "mass is most concentrated at p:\n"
+            "    score[p, j] = acts[p, j]^2 / sum_p(acts[p, j])\n"
+            "Greedy assignment: positions sorted by best score; each feature\n"
+            "claimed by at most one position.\n"
+            "Code: temporal_crosscoders/NLP/sentence.py:307–339\n"
+            "(select_exclusive_features)"
+        ),
+        "magnitude": (
+            "Top-feature selection — \"magnitude\" mode.\n"
+            "Pick the n_features features with largest |activation| summed\n"
+            "over the sequence: top-k of acts.abs().sum(dim=0).\n"
+            "Code: temporal_crosscoders/NLP/sentence.py:478–479"
+        ),
+    }
+    ax_caption.text(
+        0.0, 0.5, caption_lines.get(args.select, ""),
+        va="center", ha="left", fontsize=8, family="monospace",
+    )
 
     fig.suptitle(
         f"Top-{n_feat} Feature Activations — {chain_label} ({seq_len} tokens) — local metrics",

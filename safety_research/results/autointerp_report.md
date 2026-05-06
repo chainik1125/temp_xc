@@ -1,87 +1,244 @@
-# Autointerp report — SAE vs TXC (Haiku rerun)
+# Autointerp report — StackedSAE vs TXCDR (T=5, Haiku 4.5)
 
-Drop-in regeneration of the SAE (T=1) and TXC (T=5) feature explanations with two changes:
-1. `TextContext.get_window_text` now decodes with `skip_special_tokens=False`, so windows that fire on `<bos>` / `<start_of_turn>` / `<end_of_turn>` no longer present an empty `>>><<<` highlight to the explainer.
-2. The explainer is **claude-haiku-4-5-20251001** (async, semaphore=8) instead of the local `google/gemma-2-2b-it` fallback.
+Pairwise contrast between **StackedSAE (T=5)** and **TXCDR (T=5)** on the same 32-token chains. Both arms share T=5 and the same activation cache; they differ only in the encoder/decoder weight structure (block-diagonal vs full-rank across temporal positions).
 
-TSAE was deliberately not rerun — same checkpoints / k / T / top-features as the original three-arm run, so this is apples-to-apples.
+Explainer: `claude-haiku-4-5-20251001` (async, concurrency=1, SDK retry-after on 429s). Special tokens render literally in the highlighted window so features that fire on `<bos>` / `<start_of_turn>` / `<end_of_turn>` are no longer mislabeled.
 
 ## Headline numbers
 
-Apples-to-apples comparison: same 150 feature IDs explained by Gemma (before) vs Haiku with special tokens visible (after). Plus, the full Haiku dictionary count.
+| arm | n features | mean explanation length |
+|-----|-----------:|-----------------------:|
+| StackedSAE (T=5) | 8454 | 241 chars |
+| TXCDR (T=5) | 5033 | 239 chars |
 
-| arm | full-dict n | empty-window % (Gemma 150 → Haiku 150) | BOS-visible % (Gemma 150 → Haiku 150) | mean explanation length (Gemma → Haiku, same 150) |
-|-----|------------:|----------------------------------------:|-------------------------------------:|--------------------------------------------------:|
-| SAE (T=1) | 2129 | 66.0% → **0.0%** | 0.0% → **92.8%** | 87 → 266 chars |
-| TXC (T=5) | 5033 | 0.0% → **0.0%** | 0.0% → **69.5%** | 137 → 239 chars |
-
-![empty-window fix](../figures/autointerp/empty_window_fix.png)
-
-![BOS visibility](../figures/autointerp/position_histogram.png)
-
-## Safety-tag distribution (Haiku, current)
-
-Counts and within-arm percentages over the full active dictionary interpreted by Haiku.
+## Safety-tag distribution
 
 ![safety distribution](../figures/autointerp/safety_tag_distribution.png)
 
 | arm | NONE | REFUSAL | DECEPTION | HARMFUL_CONTENT | BIAS | total |
 |-----|-----:|--------:|----------:|----------------:|-----:|------:|
-| SAE (T=1) | 2118 (99.5%) | 0 (0.0%) | 0 (0.0%) | 9 (0.4%) | 2 (0.1%) | 2129 |
-| TXC (T=5) | 4991 (99.2%) | 2 (0.0%) | 6 (0.1%) | 27 (0.5%) | 7 (0.1%) | 5033 |
+| StackedSAE (T=5) | 8391 (99.3%) | 3 (0.0%) | 2 (0.0%) | 45 (0.5%) | 13 (0.2%) | 8454 |
+| TXCDR (T=5) | 4991 (99.2%) | 2 (0.0%) | 6 (0.1%) | 27 (0.5%) | 7 (0.1%) | 5033 |
 
-## Special-token features (now visible)
+## UMAP cluster meta-autointerp
 
-Features whose top windows fire on a special token (`<bos>`, `<start_of_turn>`, `<end_of_turn>`, …). Before the fix, Gemma saw these as empty `>>><<<` markers and confidently labeled them with whatever surrounding content existed. The Gemma column shows the old explanation for the same `feat_id` for context.
+Per-arm view: each feature's Haiku explanation is embedded with `sentence-transformers/all-MiniLM-L6-v2`, projected to 2D with UMAP, partitioned with HDBSCAN, and labeled lexically by distinctive content tokens.
 
-### SAE (T=1)
+Source: `safety_research/scripts/umap_meta.py`
 
-| feat | Gemma explanation | Haiku explanation | example window |
-|------|-------------------|-------------------|----------------|
-| 17453 | This feature represents locations, specifically places and businesses. | This feature activates on beginning-of-sequence tokens followed by generic, informational opening phrases typ… | `>>><bos><<<This vehicle paper model is a 194` |
-| 12266 | This feature represents locations, specifically places and businesses. | This feature detects the beginning-of-sequence token (<bos>) immediately followed by diverse, encyclopedic or… | `>>><bos><<<This vehicle paper model is a 194` |
-| 11642 | This feature represents locations, specifically places and businesses. | This feature activates at the beginning of text sequences (immediately after <bos>) that introduce factual, i… | `>>><bos><<<This vehicle paper model is a 194` |
-| 627 | This feature represents locations, specifically places and businesses. | This feature activates on beginning-of-sequence tokens that introduce generic, factual, or commercial text—su… | `>>><bos><<<This vehicle paper model is a 194` |
-| 4136 | This feature represents locations, specifically places and businesses. | This feature activates on beginning-of-sequence tokens followed by text opening patterns typical of web artic… | `>>><bos><<<This vehicle paper model is a 194` |
-| 3963 | This feature represents locations, specifically places associated with businesses or services. | This feature activates on the beginning-of-sequence token (<bos>) immediately followed by diverse, everyday i… | `>>><bos><<<This vehicle paper model is a 194` |
-| 149 | This feature represents locations, specifically places and businesses. | This feature activates on the beginning-of-sequence token (<bos>) immediately followed by diverse, factual op… | `>>><bos><<<This vehicle paper model is a 194` |
-| 3793 | This feature represents locations, specifically places and businesses. | This feature activates on the beginning-of-sequence token immediately followed by diverse, generic opening te… | `>>><bos><<<This vehicle paper model is a 194` |
+### StackedSAE (T=5) — UMAP
 
-### TXC (T=5)
+`n=8454` features, `k=22` clusters, silhouette `-0.13`, mean cohesion `0.67`, noise frac `0.00%`.
 
-| feat | Gemma explanation | Haiku explanation | example window |
-|------|-------------------|-------------------|----------------|
-| 1004 | This feature represents the presence of a statement indicating a personal experience or accomplishment, often… | This feature activates on first-person narrative openings that transition from self-description or personal s… | `>>><bos>I have a somewhat<<< fancy tv that supports an external wi-fi module` |
-| 2720 | This feature represents positive, confident statements about completion, timeliness, and budget adherence. | This feature activates on temporal and date-related information, particularly dates, times, year ranges, and … | `>>><bos>Date: Monday <<<11 April, 2016` |
-| 13249 | This feature represents the presence of specific dates or timeframes, often in the context of news, events, o… | This feature tracks the beginning of news articles, web content headers, and published text fragments—specifi… | `>>><bos>Sault Ste.<<< Marie hot stone spa Jump to. Accessibility Help` |
-| 11361 | This feature represents titles of books, articles, or websites related to self-improvement, business, or tech… | This feature activates on proper nouns and branded names (company names, product titles, band names, game tit… | `>>><bos>At LuvBuds<<< we strive to be ahead of the curve when buying` |
-| 2890 | This feature represents situations where a person or group is denied a service or benefit, often due to preju… | This feature activates on search query titles, webpage headers, and content introductions that appear at the … | `>>><bos>Apple cake using apple<<< pie filling Recipes / Apple cake using apple pie` |
-| 7347 | This feature represents events or topics that are associated with a sense of injury, success, or achievement.… | This feature activates on the beginning of news article headlines and article openings, particularly those wi… | `>>><bos>Personal Growth - Make<<< a habit of it ! Ashish Virmani` |
-| 18396 | This feature represents a topic of discussion or a concept that is frequently mentioned in relation to a spec… | This feature activates on the beginning of straightforward, declarative statements that introduce a topic or … | `>>><bos>Ballet is an<<< artistic dance form performed to music, using precise and` |
-| 1511 | This feature represents the presence of a specific organization, institution, or entity name. | This feature activates on the beginning of sentences that introduce specific named entities or proper nouns (… | `>>><bos>The Quad Cities area<<< is blessed with two local mosques or masajids.` |
+![UMAP tsae](../figures/umap_tsae.png)
 
-## SAE vs TXC contrast — top-12 most-active features
+| cluster | n_feat | cohesion | safety mix | name | sample explanation |
+|--------:|-------:|---------:|------------|------|---------------------|
+| 0 | 7 | 0.90 | HARMFUL_CONTENT:7 | sexual · pornographic · adult · crude | This feature activates on sexually explicit pornographic content, particularly text fragments from adult webs… |
+| 1 | 17 | 0.78 | NONE:17 | gratitude · thanks · appreciation · thank | This feature activates on gratitude expressions and discount/percentage statements embedded in commercial or … |
+| 2 | 40 | 0.71 | NONE:40 | email · domain · addresses · contact | This feature detects email addresses and domain names, particularly identifying the boundary between the doma… |
+| 3 | 16 | 0.62 | NONE:16 | religious · biblical · divine · christian | This feature activates on biblical or religious text passages, particularly those expressing transformative s… |
+| 4 | 90 | 0.56 | NONE:90 | superlative · most · best · activates | This feature activates on superlative claims or extreme positive assertions ("best," "most important," "highe… |
+| 5 | 70 | 0.71 | NONE:70 | acronyms · acronym · parentheses · abbreviations | This feature activates on acronym introductions—specifically the pattern where a full organizational or techn… |
+| 6 | 14 | 0.64 | NONE:14 | just · only · phrase · limiting | This feature tracks the phrase "just" appearing in contexts where it functions as a minimizing or casual qual… |
+| 7 | 8 | 0.84 | NONE:8 | death · obituary · passing · away | This feature activates on obituary and death announcement text, particularly surrounding phrases about people… |
+| 8 | 9 | 0.71 | NONE:9 | size · small · scale · tiny | This feature activates on descriptive adjectives or modifiers (particularly "large," "big," "huge") that appe… |
+| 9 | 22 | 0.67 | NONE:22 | ingredient · culinary · food · cooking | This feature activates on ingredient quantities and measurements in cooking recipes, particularly when numeri… |
 
-Features ranked by total activation mass. Two example windows per feature, truncated for readability.
+### TXCDR (T=5) — UMAP
 
-### SAE (T=1) — top-12
+`n=5033` features, `k=16` clusters, silhouette `-0.06`, mean cohesion `0.64`, noise frac `0.00%`.
+
+![UMAP txc](../figures/umap_txc.png)
+
+| cluster | n_feat | cohesion | safety mix | name | sample explanation |
+|--------:|-------:|---------:|------------|------|---------------------|
+| 0 | 16 | 0.66 | NONE:16 | ticker · stock · financial · nyse | This feature detects financial analyst rating statements, specifically phrases indicating positive stock reco… |
+| 1 | 22 | 0.74 | NONE:22 | forum · discussion · post · thread | This feature detects forum post metadata and quoting conventions, specifically the "Originally Posted by [use… |
+| 2 | 10 | 0.78 | NONE:10 | gratitude · thanks · appreciation · thank | This feature tracks expressions of gratitude and appreciation directed toward individuals or groups, typicall… |
+| 3 | 7 | 0.83 | NONE:7 | blog · blogging · blogs · platforms | This feature detects text discussing blog posts, blogging activities, and blog-related metadata (posting freq… |
+| 4 | 101 | 0.73 | NONE:101 | news · location · article · dateline | This feature activates on the beginning of news article headlines and article openings, particularly those wi… |
+| 5 | 22 | 0.53 | NONE:21, HARMFUL_CONTENT:1 | biblical · verse · chapter · religious | This feature activates on biblical references and citations, particularly when scripture passages (book names… |
+| 6 | 424 | 0.52 | NONE:422, HARMFUL_CONTENT:2 | numbers · numerical · activates · particularly | This feature detects numeric quantities, measurements, specifications, and product/property descriptors that … |
+| 7 | 19 | 0.62 | NONE:19 | than · comparative · more · numerical | This feature detects comparative constructions using "than" to express relative differences between two entit… |
+| 8 | 6 | 0.72 | NONE:6 | death · dead · dying · died | This feature activates on legal definitions related to "dying declarations" in evidence law, particularly the… |
+| 9 | 670 | 0.57 | NONE:670 | date · temporal · time · activates | This feature activates on temporal and date-related information, particularly dates, times, year ranges, and … |
+
+### Cross-arm cluster metrics
+
+![cluster metrics](../figures/umap_cluster_metrics.png)
+
+![safety composition](../figures/umap_safety_composition.png)
+
+## Sentence-level case studies
+
+Five 32-token sequences, top-32 features per arm chosen via the **exclusive** selection mode (each token position claims its most-concentrated feature; greedy assignment, no feature reused). See section *Top-feature selection procedure* below for the exact score and the code reference.
+
+### Chain 12345
+
+![chain 12345](../../temporal_crosscoders/NLP/viz_outputs/sentence_case_studies/sentence_mid_res_k100_T5_chain12345_exclusive.png)
+
+```text
+Source: chain12345 | Layer: mid_res | k=100 T=5
+Selection: 32 features per-model (one most-exclusive per token position)
+All metrics computed LOCALLY on this 32-token sequence.
+
+StackedSAE:
+  Local position entropy:    0.3312 +/- 0.1079
+  Local feature sparsity:    0.0635
+  Local active feats/pos:    431.1 (full D_SAE)
+  Local frac nonzero:        0.0635
+  Local max activation:      371.83
+  Local mean activation (>0):10.73
+
+TXCDR:
+  Local position entropy:    0.9702 +/- 0.0521
+  Local feature sparsity:    0.4580
+  Local active feats/pos:    868.8 (full D_SAE)
+  Local frac nonzero:        0.4580
+  Local max activation:      834.21
+  Local mean activation (>0):29.79
+```
+
+### Chain 137
+
+![chain 137](../../temporal_crosscoders/NLP/viz_outputs/sentence_case_studies/sentence_mid_res_k100_T5_chain137_exclusive.png)
+
+```text
+Source: chain137 | Layer: mid_res | k=100 T=5
+Selection: 32 features per-model (one most-exclusive per token position)
+All metrics computed LOCALLY on this 32-token sequence.
+
+StackedSAE:
+  Local position entropy:    0.3015 +/- 0.1207
+  Local feature sparsity:    0.0566
+  Local active feats/pos:    432.3 (full D_SAE)
+  Local frac nonzero:        0.0566
+  Local max activation:      376.68
+  Local mean activation (>0):11.67
+
+TXCDR:
+  Local position entropy:    0.9613 +/- 0.0629
+  Local feature sparsity:    0.4229
+  Local active feats/pos:    900.3 (full D_SAE)
+  Local frac nonzero:        0.4229
+  Local max activation:      662.78
+  Local mean activation (>0):25.25
+```
+
+### Chain 16921
+
+![chain 16921](../../temporal_crosscoders/NLP/viz_outputs/sentence_case_studies/sentence_mid_res_k100_T5_chain16921_exclusive.png)
+
+```text
+Source: chain16921 | Layer: mid_res | k=100 T=5
+Selection: 32 features per-model (one most-exclusive per token position)
+All metrics computed LOCALLY on this 32-token sequence.
+
+StackedSAE:
+  Local position entropy:    0.2897 +/- 0.1167
+  Local feature sparsity:    0.0537
+  Local active feats/pos:    432.8 (full D_SAE)
+  Local frac nonzero:        0.0537
+  Local max activation:      376.68
+  Local mean activation (>0):12.30
+
+TXCDR:
+  Local position entropy:    0.9853 +/- 0.0275
+  Local feature sparsity:    0.5078
+  Local active feats/pos:    865.7 (full D_SAE)
+  Local frac nonzero:        0.5078
+  Local max activation:      746.98
+  Local mean activation (>0):26.62
+```
+
+### Chain 4242
+
+![chain 4242](../../temporal_crosscoders/NLP/viz_outputs/sentence_case_studies/sentence_mid_res_k100_T5_chain4242_exclusive.png)
+
+```text
+Source: chain4242 | Layer: mid_res | k=100 T=5
+Selection: 32 features per-model (one most-exclusive per token position)
+All metrics computed LOCALLY on this 32-token sequence.
+
+StackedSAE:
+  Local position entropy:    0.4064 +/- 0.1104
+  Local feature sparsity:    0.0840
+  Local active feats/pos:    432.3 (full D_SAE)
+  Local frac nonzero:        0.0840
+  Local max activation:      376.68
+  Local mean activation (>0):9.32
+
+TXCDR:
+  Local position entropy:    0.9491 +/- 0.0458
+  Local feature sparsity:    0.5957
+  Local active feats/pos:    894.9 (full D_SAE)
+  Local frac nonzero:        0.5957
+  Local max activation:      764.46
+  Local mean activation (>0):22.73
+```
+
+### Chain 42
+
+![chain 42](../../temporal_crosscoders/NLP/viz_outputs/sentence_case_studies/sentence_mid_res_k100_T5_chain42_exclusive.png)
+
+```text
+Source: chain42 | Layer: mid_res | k=100 T=5
+Selection: 32 features per-model (one most-exclusive per token position)
+All metrics computed LOCALLY on this 32-token sequence.
+
+StackedSAE:
+  Local position entropy:    0.3276 +/- 0.1082
+  Local feature sparsity:    0.0625
+  Local active feats/pos:    432.4 (full D_SAE)
+  Local frac nonzero:        0.0625
+  Local max activation:      376.68
+  Local mean activation (>0):10.71
+
+TXCDR:
+  Local position entropy:    0.9641 +/- 0.0467
+  Local feature sparsity:    0.5625
+  Local active feats/pos:    881.1 (full D_SAE)
+  Local frac nonzero:        0.5625
+  Local max activation:      837.00
+  Local mean activation (>0):25.06
+```
+
+## Top-feature selection procedure
+
+For each token position `p` in the 32-token sequence, pick the feature `j` whose total activation mass is most concentrated at `p`:
+
+```
+score[p, j] = acts[p, j]^2 / sum_p(acts[p, j])
+```
+
+Squaring forces a real strong activation at `p` (not just rare elsewhere). Greedy assignment: positions sorted in descending order of their best score; each feature gets claimed by at most one position, so the strongest position-feature pairs win first. Result: 32 features, one per token position, each fingerprinted to that position.
+
+Code: `temporal_crosscoders/NLP/sentence.py:307–339` (`select_exclusive_features`).
+Magnitude-mode alternative (`top-k by sum |activation|`): same file, lines 478–479.
+
+## Top-12 most-active features per arm
+
+Features ranked by total activation mass across the 1,500-chain scan. Two example windows shown per feature.
+
+### StackedSAE (T=5) — top-12
 
 | feat | safety | explanation | top windows |
 |------|--------|-------------|-------------|
-| 17453 | NONE | This feature activates on beginning-of-sequence tokens followed by generic, informational opening phrases typical of web content—headlines,… | `>>><bos><<<This vehicle paper model is a 194` <br> `>>><bos><<<Saturday, September 12, 20` |
-| 12266 | NONE | This feature detects the beginning-of-sequence token (<bos>) immediately followed by diverse, encyclopedic or factual opening content (prod… | `>>><bos><<<This vehicle paper model is a 194` <br> `>>><bos><<<Saturday, September 12, 20` |
-| 11642 | NONE | This feature activates at the beginning of text sequences (immediately after <bos>) that introduce factual, informational, or promotional c… | `>>><bos><<<This vehicle paper model is a 194` <br> `>>><bos><<<Saturday, September 12, 20` |
-| 627 | NONE | This feature activates on beginning-of-sequence tokens that introduce generic, factual, or commercial text—such as product descriptions, ne… | `>>><bos><<<This vehicle paper model is a 194` <br> `>>><bos><<<Saturday, September 12, 20` |
-| 4136 | NONE | This feature activates on beginning-of-sequence tokens followed by text opening patterns typical of web articles, product descriptions, new… | `>>><bos><<<This vehicle paper model is a 194` <br> `>>><bos><<<Saturday, September 12, 20` |
-| 3963 | NONE | This feature activates on the beginning-of-sequence token (<bos>) immediately followed by diverse, everyday informational text fragments—pr… | `>>><bos><<<This vehicle paper model is a 194` <br> `>>><bos><<<Saturday, September 12, 20` |
-| 149 | NONE | This feature activates on the beginning-of-sequence token (<bos>) immediately followed by diverse, factual opening text across multiple dom… | `>>><bos><<<This vehicle paper model is a 194` <br> `>>><bos><<<Saturday, September 12, 20` |
-| 3793 | NONE | This feature activates on the beginning-of-sequence token immediately followed by diverse, generic opening text—news articles, product desc… | `>>><bos><<<This vehicle paper model is a 194` <br> `>>><bos><<<Saturday, September 12, 20` |
-| 11378 | NONE | This feature activates on the beginning-of-sequence token (<bos>) followed by diverse introductory content types, detecting the onset of ne… | `>>><bos><<<This vehicle paper model is a 194` <br> `>>><bos><<<Saturday, September 12, 20` |
-| 7407 | NONE | This feature activates at the beginning of sequences (post-<bos>) that start with factual, informational, or commercial content—product des… | `>>><bos><<<This vehicle paper model is a 194` <br> `>>><bos><<<Saturday, September 12, 20` |
-| 11216 | NONE | This feature activates on the beginning-of-sequence token (<bos>) followed by diverse, factual opening passages from news articles, product… | `>>><bos><<<This vehicle paper model is a 194` <br> `>>><bos><<<Saturday, September 12, 20` |
-| 7758 | NONE | This feature fires on the beginning-of-sequence token (<bos>) followed by diverse factual, informational, or commercial opening phrases—pro… | `>>><bos><<<This vehicle paper model is a 194` <br> `>>><bos><<<Saturday, September 12, 20` |
+| 7281 | NONE | This feature activates on conversational discourse markers and transitional phrases that establish the beginning of informal blog posts, pe… | `>>><bos>Time for another entry<<< in Friday Fictioneers challenge, courtesy of Rochelle` <br> `>>><bos>another of my tricks<<< to pretend that new england winter is not even happening` |
+| 14421 | NONE | This feature activates on incomplete or truncated text segments where content is cut off mid-word or mid-phrase, typically at natural break… | `>>><bos>Small Ball Acro<<<pora 5.5" x 4.` <br> `>>><bos>Partner With Alog<<<ent Our partnerships make us all more successful—` |
+| 12950 | NONE | This feature activates on numerical ranges, dates, and age specifications marked by hyphens or number-dash patterns that segment time perio… | `>>><bos>A 31<<<-year-old member asked: phimosis` <br> `>>><bos>October 3-<<<8, 2022 Alumni and` |
+| 2973 | NONE | This feature activates on direct address transitions and conversational shifts where the speaker acknowledges or reorients toward an audien… | `>>><bos>Tough also noted the<<< much of what the company is doing now is becoming` <br> `>>><bos>Hej! You have<<< found our bottle? Please send a message telling the` |
+| 8951 | NONE | This feature activates on text fragments immediately before contextual breaks, metadata boundaries, or topic shifts—detecting positions whe… | `>>><bos>Small Ball Acro<<<pora 5.5" x 4.` <br> `>>><bos>Partner With Alog<<<ent Our partnerships make us all more successful—` |
+| 1946 | NONE | This feature activates on text segments immediately following the beginning-of-sequence token where content is abruptly truncated or cut mi… | `>>><bos>Small Ball Acro<<<pora 5.5" x 4.` <br> `>>><bos>Partner With Alog<<<ent Our partnerships make us all more successful—` |
+| 6148 | NONE | This feature activates on abrupt mid-word or mid-phrase text truncations where the token stream cuts off before grammatical completion, typ… | `>>><bos>Small Ball Acro<<<pora 5.5" x 4.` <br> `>>><bos>Partner With Alog<<<ent Our partnerships make us all more successful—` |
+| 6654 | NONE | This feature detects the beginning of text segments or documents, particularly marking the transition from a beginning-of-sequence token to… | `>>><bos>Small Ball Acro<<<pora 5.5" x 4.` <br> `>>><bos>Partner With Alog<<<ent Our partnerships make us all more successful—` |
+| 17176 | NONE | This feature activates on text fragments that are truncated or cut off mid-word or mid-phrase, typically marking boundaries where content h… | `>>><bos>Small Ball Acro<<<pora 5.5" x 4.` <br> `>>><bos>Partner With Alog<<<ent Our partnerships make us all more successful—` |
+| 1972 | NONE | This feature detects the onset of specific factual or descriptive content immediately after the beginning-of-sequence token, capturing the … | `>>><bos>Spend $50<<< more and get free shipping! Your cart is` <br> `>>><bos>Amazon Price:$2<<<4.99(as of August 2` |
+| 17168 | NONE | This feature activates on title-like or headline text patterns that introduce topics, products, or content sections—typically appearing aft… | `>>><bos>Summer heat waves in<<< Santiago, just like anywhere else, mean one thing` <br> `>>><bos>Latest Razer Blade Gets<<< Outfitted with More Potent Gaming Hardware, Costs` |
+| 10085 | NONE | This feature activates on sentence fragments or incomplete phrases that end mid-clause with a capital letter or topic shift following, typi… | `>>><bos>Our favourite picks from<<< Net-a-porter Everybody’s favourite` <br> `>>><bos>Drive economic development through<<< high-speed networks An end-to-` |
 
-### TXC (T=5) — top-12
+### TXCDR (T=5) — top-12
 
 | feat | safety | explanation | top windows |
 |------|--------|-------------|-------------|
@@ -100,34 +257,34 @@ Features ranked by total activation mass. Two example windows per feature, trunc
 
 ## Random sample (mid-dictionary)
 
-20 features drawn at random from each arm's full Haiku-interpreted set, to spot-check explanation quality outside the top-N tail.
+20 features drawn at random from each arm's full Haiku-interpreted set, to spot-check explanation quality outside the head of the ranking.
 
-### SAE (T=1) — 20 random
+### StackedSAE (T=5) — 20 random
 
 | feat | safety | explanation | top windows |
 |------|--------|-------------|-------------|
-| 16770 | NONE | This feature activates on the first-person singular pronoun "I" at the start of a sentence or utterance, particularly when it immediately f… | `<bos>>>>I<<< love vegetable dips. Everything about them. You` <br> `<bos>>>>I<<< want to thank you for all the literature you sent` |
-| 4106 | HARMFUL_CONTENT | This feature activates on words and phrases describing violent incidents, disasters, dangerous situations, and harmful events—such as shoot… | `wheel of a car involved in a fatal drive->>>by<<< shooting of a San Francisco man could g…` <br> `Berkeley Tuesday morning causing a power outage. A fire>>> erupted<<< and damaged the home` |
-| 13797 | NONE | This feature detects the beginning of quoted or bracketed source attributions, metadata tags, and content headers that introduce external t… | `<bos>>>>[<<<tor-talk] do Cloudfare captchas` <br> `<bos>>>>[<<<x] Close Ad GloryHole - PENNY` |
-| 12440 | NONE | This feature activates on verbs of appearance and perception (look, seem, appear) used to describe how something visually presents or is pe… | `aved tofu that is quick to make but tastes and>>> looks<<< great. This was very tasty. I …` <br> `9 years old! The sad thing is, she>>> looks<<< younger every time I see` |
-| 9035 | NONE | This feature activates on the verb "make" (and near-synonyms like "do") in imperative or instructional contexts, particularly when position… | `<bos>How to>>> Make<<< Love Like an Englishman Running Time: 1` <br> `\| Products \| SiteMap\| How can I>>> make<<< the slideshow play in a loop? Photostage` |
-| 12588 | NONE | This feature activates on copular constructions (is/can/adds/will/seems) that link a noun phrase or gerund to a predicate, particularly in … | `our students with a productive and enjoyable summer learning experience>>> is<<< an impor…` <br> `microscope excitation spectrum for imaging dual or multiply labeled specimens>>> can<<< b…` |
-| 9400 | NONE | This feature activates on news wire attribution markers and source citations (ANI, PRNewswire, UPI, PRWEB, FOX, KSDK, etc.) typically found… | `<bos>London, Nov 27 (>>>ANI<<<): Kendall Jenner, the younger step-sister of` <br> `. 7, 2012 />>>PRNewswire<<</ -- RPM International Inc. (NYSE: RPM` |
-| 14501 | NONE | This feature activates on words related to seasonal celebrations and time-off periods, particularly "holiday" and "vacation" in commercial,… | `<bos>Perfect Vacation &>>> Holiday<<< Tours with Unique Country Inns The Unique Country I…` <br> `:57PM Recycle old tennis shoes and>>> holiday<<< lights Nov. 17` |
-| 5224 | NONE | This feature activates on function words and prepositions that serve as grammatical connectors or modifiers (want, this, are, surely, amoun… | `6 – In all over the world, every woman>>> want<<< stylish, latest and beautiful dresses f…` <br> `your hair to remain healthy and nourished. Other than>>> this<<<` |
-| 5292 | NONE | This feature activates on idiomatic phrases and common expressions where two words or a short phrase form a semantically complete unit (e.g… | `<bos>If you are looking for ways to>>> relax<<< after work, you should check out this ama…` <br> `woods and streams, our community, our heart and>>> soul<<<. Art by Jon Schubert. Size Gui…` |
-| 15808 | NONE | This feature detects descriptive noun phrases or compound nouns that specify types, categories, or attributes of products, services, or con… | `Hals Raw Material Market 5 Wednesdays with culinary>>> experiences<<< in maritime surroun…` <br> `Good Indian Bride is a living manifestation of a distorted>>> legacy<<<, exploring the pa…` |
-| 4526 | NONE | This feature activates on domain-specific or technical adjectives that modify nouns to denote specialized fields, applications, or categori… | `Connections (RC) makes an explicit commitment to preserving>>> digital<<< information. By…` <br> `of Engineering The programs in Biological Engineering specialize in>>> water<<< resources…` |
-| 7183 | NONE | This feature activates on discourse markers and connectives that introduce contrasts, clarifications, or pivots in narrative flow—particula… | `product gives no indication of its true purpose. Once>>> unfolded<<<, it offers everythin…` <br> `doesn’t even sound very exciting, but it>>> is<<< important to Massachusetts. There are j…` |
-| 6460 | NONE | This feature activates on structural discourse markers that introduce or describe the scope of an academic, technical, or documentary work—… | `hard to decide what indexes to create. In this>>> session<<< we'll look at guidelines for…` <br> `<bos>Minidoka: An American Concentration Camp >>>tells<<< the story of Japanese Americans…` |
-| 10075 | NONE | This feature activates on spatial or locational prepositional phrases, specifically patterns where a location or container is specified wit… | `At Cedar Lodge we offer many different programs during the>>> day<<<. Most of these progr…` <br> `aggressively priced to sell! Sewer and water in the>>> street<<<. All other utilities at …` |
-| 9386 | NONE | This feature activates on verbs and verbal phrases that describe capacities, actions, or transitions—particularly prepositions and auxiliar… | `Private Company Services Practice. As such, she is>>> accountable<<< for` <br> `Clerk with [Number] years of experience. Skilled>>> in<<< building client and vendor rapp…` |
-| 14740 | NONE | This feature activates on capitalized nouns or noun phrases that serve as proper names, titles, or categorical labels (User Activity, Creat… | `<bos>The spike in>>> User<<< Activity can be explained by the important push we’` <br> `Day. Play, make and get hands on with>>> Creative<<< Kids, a regular session for children` |
-| 10370 | NONE | This feature tracks the grammatical conjunction "and" or related coordinating/auxiliary verbs that connect clauses in informal, personal na… | `a month! The show in Portland went well>>> and<<< we came` <br> `morning! This will be a short post as I>>> am<<< getting ready for card class today. That…` |
-| 4988 | NONE | This feature activates on quantitative language expressing amounts, counts, or numerical aggregations—particularly phrases like "quantity,"… | `Silver Chevrolet Bowtie Valet Key Chain \|>>>Quantity<<< in Basket:none\| \|Pull Apart Val` <br> `tie Valet Key Chain \|Quantity in Basket>>>:<<<none\| \|Pull Apart Valet Key Chain` |
-| 12803 | NONE | This feature activates on the transition between sentence-final punctuation (periods, etc.) and the beginning of a new sentence, particular… | `driver was to blame for causing the crash. >>>It<<< was just` <br> `its kind tragedy on the track. The fatal incident>>> happened<<< a little more than halfw…` |
+| 10703 | NONE | This feature activates on conditional or intentional constructions expressing desire or purpose, particularly patterns like "want to" or "w… | `for The Beginner Network Marketer By Michael Smith>>> So you want to<<< know the best adv…` <br> `>>><bos>If you want to<<< buy a used Chevrolet Corvette and are looking for one` |
+| 16873 | NONE | This feature detects numerical values or measurements that appear in close proximity to descriptive text, often marking quantities like dis… | `May 13, 2010>>> Photos 36<<<5 week 19 Rachel and Philip went` <br> `<bos>A free, weekly>>>, timed 5k<<< walk/jog/run 9:30` |
+| 3051 | NONE | This feature detects the beginning of diverse text formats and sources—including conversational prompts, email list headers, tweet citation… | `>>><bos>Have you been struggling<<< with how to talk to your tween about sex?` <br> `>>><bos>Have you ever heard<<< someone talk about Recovery Month and wondered what it was` |
+| 9979 | NONE | This feature detects modifiers describing scale, size, or scope—particularly adjectives like "small," "tiny," "budget-friendly," "nano," an… | `, 4th Edition - n. A>>> small ball of ground meat<<< variously seasoned and cooked.` <br> `to join the Apple family is the iPad Mini.>>> Smaller, yes but not<<< in the least medioc…` |
+| 11151 | NONE | This feature detects the boundary pattern of author/byline attribution in web content, specifically the transition from article title or co… | `<bos>Photo: Vivid Images/>>>Getty Images By Amy<<< Osmond Cook When it comes to gifts,` <br> `the following prompt to the staff: "If my>>> students can __________ by the<<< end of the…` |
+| 16286 | NONE | This feature activates on dates and temporal markers (specific dates, day-of-week references, "For Immediate Release") that appear at or ne… | `August 29, 2012>>> Super talents at Serra<<< USC has had quite a run landing players out` <br> `May 29, 2017>>> Buy leased building?<<< I’ve operated my own small business for` |
+| 2164 | NONE | This feature activates on phrases and clauses that establish geographic location or place-specific context, particularly when describing wh… | `<bos>>>>"Where I live now<<<." Top 5 Page for this destination Carson by` <br> `Leeuwarden-Fryslan, one of>>> the less populated parts of<<< the Netherlands, has been de…` |
+| 3425 | NONE | This feature activates on passages from Christian religious texts, particularly Galatians 2:20 and similar scriptural verses that express t… | `<bos>Cru>>>cified With Christ <<<by Nan Doud, Guest Writer I have` <br> `Christ by Nan Doud, Guest Writer >>>I have been crucified with<<< Christ. It is no longer…` |
+| 16980 | NONE | This feature activates on phrases expressing desire, intention, or volition using constructions like "want to," "wanted to," and "you want … | `<bos>Advice for your farm/nursery>>> Do you want to<<< start a farm/nursery? Do want` <br> `such a day of unanticipated and special memories.>>> Obviously, you want to<<< savor ever…` |
+| 7712 | NONE | This feature activates on decimal points and numeric separators appearing within larger numbers, particularly in measurement values, coordi… | `6' 4" (193>>>.04 cm)<<< Standing at` <br> `<bos>Latitude: 34.2>>>54700<<< * Longitude: -89.872` |
+| 11606 | NONE | This feature tracks contrastive or pivoting phrases that transition between two related ideas or statements, often marked by conjunctions l… | `, please choose a 18650>>> battery option in the drop<<< down list above.(detailed` <br> `project quote without entering your home! As an>>> Essential Business, we are<<< completi…` |
+| 887 | NONE | This feature tracks the linguistic pattern of conjunctions and connectors that link two related clauses or ideas, particularly "and" constr… | `you guys! shaper for inbound traffic and>>> outbound traffic and it works<<< so fine! I l…` <br> `13 – A major field study by the>>> University of Texas and sponsored<<< by the Environmen…` |
+| 16066 | NONE | This feature detects contractions and colloquial compressed forms (It's, There's, Let's, won't, that's) that appear at clause or sentence b… | `>>><bos>It's giveaway<<< time! I've been talking about doing` <br> `>>><bos>It's always<<< inadvisable to bite the hand that feeds you` |
+| 2993 | NONE | This feature activates on transitional phrases and discourse markers that introduce elaboration, contrast, or continuation—typically appear… | `Unified Development for Web, Mobile, and Embedded Applications>>> WebAssembly is more<<< …` <br> `need to be supported by a expense claim form.>>> Together with attached invoices<<<, rece…` |
+| 4548 | NONE | This feature activates on conjunctions and commas that coordinate multiple related concepts, attributes, or items within a list or paired c… | `first year as a mother — was a blur of>>> wonder, exhaustion and anxiety<<< for me, in ne…` <br> `two-day event celebrating the convergence of online technology>>>, creativity, and emergi…` |
+| 13256 | NONE | This feature activates on text beginnings that introduce or present informational content, particularly opening phrases like "This is," "We… | `>>><bos>This is the product<<< page for: Black Stud Shoulder Jumper Image carousel` <br> `>>><bos>This is the first<<< book in the new Urban Fantasy series by Candace B` |
+| 3742 | NONE | This feature tracks descriptive phrases that characterize qualities or attributes—often adjectives or short descriptive clauses positioned … | `heavy A Panorama is defined as a picture or>>> photograph containing a wide view<<<. This…` <br> `-cut Italian microfiber with custom engineered lace for a>>> high rise, minimal coverage<…` |
+| 15743 | NONE | This feature tracks transitions between named positions/titles and the individuals holding them, particularly in contexts describing person… | `looking to replace Rahm Emanuel as your chief of>>> staff. I would<<< like to humbly offe…` <br> `be looking to replace Rahm Emanuel as your chief>>> of staff. I<<< would like to humbly o…` |
+| 9121 | NONE | This feature activates on listicle and enumeration patterns, particularly titles or headers that reference numbered collections, rankings, … | `<bos>>>>The Five Best Concerts in<<< L.A. This Weekend Friday, July` <br> `<bos>Hofstede canada vs japan 10>>> cultural contrasts between us &<<< japanese companies…` |
+| 2393 | NONE | This feature activates on proper nouns and named entities (people, organizations, products, places) that appear immediately after discourse… | `<bos>Fans are having>>> fun keeping up with Kendall<<< Jenner's culinary skills. In the l…` <br> `<bos>Believe>>> it or not, Manfred<<< von Richthofen — AKA the Red Baron,` |
 
-### TXC (T=5) — 20 random
+### TXCDR (T=5) — 20 random
 
 | feat | safety | explanation | top windows |
 |------|--------|-------------|-------------|
@@ -152,37 +309,32 @@ Features ranked by total activation mass. Two example windows per feature, trunc
 | 15524 | NONE | This feature activates on references to third-party entities, vendors, or external organizations mentioned in contexts involving services, … | `<bos>SteamFirst>>> uses third-party advertising<<< companies to serve ads when you visit …` <br> `). TD Ameritrade, Inc., and>>> all third-party companies<<<` |
 | 3128 | NONE | This feature activates on sentence fragments or truncated phrases where text has been cut off mid-word or mid-clause, particularly at natur… | `<bos>>>>8. VMware Adds Nic<<<ira For $1.2 Billion VMware` <br> `<bos>>>>I need you change few<<< task in Gold Coders script also template .` |
 
-## Topic vocabulary (Haiku explanations)
+## Topic vocabulary diff (Haiku explanations)
 
-Most-frequent content words in feature explanations — a coarse vocabulary diff between the two arms. T=5 TXC features tend toward span/temporal terms; T=1 SAE features tend toward single-token concept terms.
+Top distinctive content words per arm — coarse summary of what concepts each arm's dictionary tends to label.
 
-| rank | SAE | count | TXC | count |
-|-----:|-----|------:|-----|------:|
-| 1 | activates | 1551 | activates | 3518 |
-| 2 | particularly | 943 | particularly | 2251 |
-| 3 | contexts | 542 | phrases | 1862 |
-| 4 | phrases | 530 | where | 1313 |
-| 5 | words | 442 | between | 1091 |
-| 6 | detects | 406 | detects | 1060 |
-| 7 | where | 378 | like | 877 |
-| 8 | like | 376 | boundaries | 807 |
-| 9 | when | 363 | when | 766 |
-| 10 | names | 351 | markers | 758 |
-| 11 | product | 336 | names | 715 |
-| 12 | boundaries | 293 | descriptive | 703 |
-| 13 | markers | 282 | contexts | 691 |
-| 14 | nouns | 273 | product | 668 |
-| 15 | within | 269 | temporal | 546 |
-| 16 | between | 243 | within | 542 |
-| 17 | news | 230 | transitions | 507 |
-| 18 | descriptive | 227 | tracks | 506 |
-| 19 | noun | 219 | introduce | 499 |
-| 20 | tracks | 216 | specifically | 462 |
-| 21 | appearing | 208 | news | 458 |
-| 22 | introduce | 192 | information | 447 |
-| 23 | descriptions | 188 | marked | 447 |
-| 24 | immediately | 178 | statements | 439 |
-| 25 | word | 174 | patterns | 433 |
+| rank | StackedSAE (T=5) | count | TXCDR (T=5) | count |
+|-----:|------------------|------:|-------------|------:|
+| 1 | phrases | 3245 | phrases | 1862 |
+| 2 | where | 2380 | where | 1313 |
+| 3 | between | 2049 | between | 1091 |
+| 4 | like | 1578 | like | 877 |
+| 5 | boundaries | 1464 | boundaries | 807 |
+| 6 | markers | 1439 | when | 766 |
+| 7 | product | 1292 | markers | 758 |
+| 8 | when | 1253 | names | 715 |
+| 9 | contexts | 1239 | descriptive | 703 |
+| 10 | descriptive | 1217 | contexts | 691 |
+| 11 | names | 1194 | product | 668 |
+| 12 | transitions | 1019 | temporal | 546 |
+| 13 | temporal | 929 | within | 542 |
+| 14 | within | 927 | transitions | 507 |
+| 15 | marked | 839 | introduce | 499 |
+| 16 | information | 816 | specifically | 462 |
+| 17 | introduce | 799 | news | 458 |
+| 18 | segments | 764 | information | 447 |
+| 19 | appearing | 756 | marked | 447 |
+| 20 | language | 754 | statements | 439 |
 
 ## Explanation verbosity
 

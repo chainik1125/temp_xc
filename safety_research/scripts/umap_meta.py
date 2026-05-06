@@ -38,6 +38,14 @@ sys.path.insert(0, str(SAFETY_DIR))
 import wandb
 
 ARMS = ["sae", "tsae", "txc"]
+# Display labels — distinct from on-disk arm keys so reports/figures use
+# the architecture-accurate names (the safety pipeline's "tsae" filename
+# refers to the StackedSAE-T=5 checkpoint).
+ARM_DISPLAY = {
+    "sae":  "SAE (T=1)",
+    "tsae": "StackedSAE (T=5)",
+    "txc":  "TXCDR (T=5)",
+}
 EXPLAIN_MODEL = "claude-haiku-4-5-20251001"
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
@@ -241,7 +249,7 @@ def run_arm(arm: str) -> dict | None:
                        c=[palette[cid % len(palette)]],
                        label=f"c{cid}: {cl_names.get(cid, '')[:30]}",
                        alpha=0.85)
-    ax.set_title(f"UMAP — {arm}  "
+    ax.set_title(f"UMAP — {ARM_DISPLAY.get(arm, arm)}  "
                  f"(n_features={len(texts)}, k={n_clusters}, "
                  f"sil={sil:.2f}, noise={noise_frac:.2f})")
     ax.legend(fontsize=6, loc="upper right", bbox_to_anchor=(1.6, 1.0))
@@ -253,7 +261,7 @@ def run_arm(arm: str) -> dict | None:
 
 
 def comparison_plots(summaries: list[dict]) -> None:
-    arms = [s["arm"] for s in summaries]
+    arm_labels = [ARM_DISPLAY.get(s["arm"], s["arm"]) for s in summaries]
     metrics = {
         "n_clusters": [s["n_clusters"] for s in summaries],
         "silhouette": [s["silhouette"] for s in summaries],
@@ -262,10 +270,11 @@ def comparison_plots(summaries: list[dict]) -> None:
     }
     fig, axes = plt.subplots(1, 4, figsize=(16, 4))
     for ax, (k, vs) in zip(axes, metrics.items()):
-        ax.bar(arms, vs, color=["#888", "#ffa44a", "#4a90e2"])
+        ax.bar(arm_labels, vs, color=["#888", "#ffa44a", "#4a90e2"])
         ax.set_title(k); ax.set_ylabel(k)
         for i, v in enumerate(vs):
             ax.text(i, v, f"{v:.2f}", ha="center", va="bottom", fontsize=9)
+        ax.tick_params(axis="x", labelsize=8)
     fig.suptitle("UMAP / cluster metrics — meta-autointerp")
     plt.tight_layout()
     fig.savefig(FIG_DIR / "umap_cluster_metrics.png", dpi=140)
@@ -287,7 +296,8 @@ def comparison_plots(summaries: list[dict]) -> None:
         vs = np.array([arm_dist[a].get(tag, 0) for a in arm_dist])
         total = np.array([sum(arm_dist[a].values()) for a in arm_dist])
         frac = vs / np.maximum(total, 1)
-        ax.bar(list(arm_dist.keys()), frac, bottom=bottom, color=color, label=tag)
+        ax.bar([ARM_DISPLAY.get(a, a) for a in arm_dist],
+               frac, bottom=bottom, color=color, label=tag)
         bottom += frac
     ax.set_title("Safety-tag composition of features (autointerp Haiku)")
     ax.set_ylabel("fraction of features")
