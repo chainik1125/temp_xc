@@ -19,6 +19,12 @@ SOURCE_PURIFIED=/workspace/aniket/temp_xc-final/purified
 PAPER_WT=/workspace/aniket/temp_xc_paper
 PAPER_PURIFIED="$PAPER_WT/purified"
 OUTPUT_DIR="$PAPER_PURIFIED/docs/components"
+# Where the paper-section .tex looks for figures + auto-generated tex
+# snippets (\input{figs/c7_*.tex}, \autofig{c7_*}).
+PAPER_FIGS_DIR="$PAPER_PURIFIED/docs/aniket/figs"
+ASSETS_DIR="$OUTPUT_DIR/c7_paper_assets"
+OPTIMAL_SEEN="$SOURCE_PURIFIED/logs/c7_optimal_seen.txt"
+ANALYZE_OUT="$PAPER_PURIFIED/docs/components/c7_optimal_analysis.md"
 LB="$SOURCE_PURIFIED/results/leaderboard.jsonl"
 PROBE_GLOB="$SOURCE_PURIFIED/checkpoints/*/snapshots/eval_log.jsonl"
 GH_TOKEN=${GH_TOKEN:-}
@@ -36,11 +42,51 @@ sig() {
     } 2>/dev/null | md5sum | awk '{print $1}'
 }
 
+sync_assets_and_snippets() {
+    # Copy rendered PNGs into the paper's figs/ dir, prefixing each
+    # filename with c7_ so the .tex can \autofig{c7_*} without
+    # colliding with other components (c1_*, c2_*, ...) that may
+    # later land in the same figs/ dir. Then emit auto-generated tex
+    # snippets so the paper \input's them and stays in sync with the
+    # leaderboard.
+    mkdir -p "$PAPER_FIGS_DIR"
+    if [ -d "$ASSETS_DIR" ]; then
+        for f in "$ASSETS_DIR"/*.png; do
+            [ -f "$f" ] || continue
+            base=$(basename "$f")
+            cp -f "$f" "$PAPER_FIGS_DIR/c7_${base}"
+        done
+    fi
+    .venv/bin/python -m scripts.c7_tex_snippets \
+        --output-dir "$PAPER_FIGS_DIR" 2>&1 | sed 's/^/  /'
+}
+
+# Once the optimal-mag chain has finished all 8 cells (seen-file has 8
+# lines), produce the net-saves + 2x2 contingency analysis once and
+# never again.
+maybe_run_analyze_optimal() {
+    [ -f "$OPTIMAL_SEEN" ] || return 0
+    local n_seen
+    n_seen=$(wc -l < "$OPTIMAL_SEEN")
+    [ "$n_seen" -ge 8 ] || return 0
+    [ -f "$ANALYZE_OUT" ] && return 0   # already produced
+
+    log "all 8 cells through optimal-mag → running analyze_optimal.py"
+    .venv/bin/python -m experiments.c7_backtracking.analyze_optimal \
+        --output "$ANALYZE_OUT" 2>&1 | sed 's/^/  /' || {
+            log "analyze_optimal FAILED — will retry next tick"
+            return 1
+        }
+    log "analyze_optimal landed at $ANALYZE_OUT"
+}
+
 push_paper() {
     cd "$PAPER_WT"
-    # Stage everything under docs/components/ that's relevant to c7 paper.
+    # Stage everything under docs/ relevant to the c7 paper.
     git add purified/docs/components/c7_paper_results.md \
-            purified/docs/components/c7_paper_assets 2>/dev/null
+            purified/docs/components/c7_paper_assets \
+            purified/docs/components/c7_optimal_analysis.md \
+            purified/docs/aniket/figs 2>/dev/null
     if git diff --cached --quiet; then
         log "no diff to commit"
         cd "$SOURCE_PURIFIED"
@@ -62,14 +108,26 @@ cell's snapshots/eval_log.jsonl probe stream.
 Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>"
     git -c user.email="aniketdeshh@gmail.com" -c user.name="aniket" \
         commit -m "$commit_msg" >/dev/null
-    log "committed $(git rev-parse --short HEAD) — pushing"
-    if [ -n "$GH_TOKEN" ]; then
-        GIT_TERMINAL_PROMPT=0 \
-        git -c "credential.helper=!f() { echo username=x-access-token; echo password=$GH_TOKEN; }; f" \
-            push origin final-aniket 2>&1 | tail -3
-    else
+    log "committed $(git rev-parse --short HEAD)"
+    if [ -z "$GH_TOKEN" ]; then
         log "WARNING: GH_TOKEN unset — local commit only"
+        cd "$SOURCE_PURIFIED"
+        return 0
     fi
+    # Fetch + rebase before push so concurrent commits to final-aniket
+    # (e.g. Han pulling work in) don't trigger non-fast-forward rejects.
+    git fetch origin final-aniket 2>&1 | tail -1
+    if ! git -c user.email="aniketdeshh@gmail.com" -c user.name="aniket" \
+            rebase origin/final-aniket 2>&1 | tail -1; then
+        log "rebase failed — aborting"
+        git rebase --abort 2>/dev/null
+        cd "$SOURCE_PURIFIED"
+        return 1
+    fi
+    log "pushing"
+    GIT_TERMINAL_PROMPT=0 \
+    git -c "credential.helper=!f() { echo username=x-access-token; echo password=$GH_TOKEN; }; f" \
+        push origin HEAD:final-aniket 2>&1 | tail -3
     cd "$SOURCE_PURIFIED"
 }
 
@@ -82,11 +140,18 @@ while true; do
         log "input signature changed → render"
         if .venv/bin/python -m scripts.c7_paper_renderer \
                 --output-dir "$OUTPUT_DIR" 2>&1 | sed 's/^/  /'; then
+            sync_assets_and_snippets
+            maybe_run_analyze_optimal
             push_paper
             last_sig=$cur
         else
             log "renderer FAILED — will retry next tick"
         fi
+    else
+        # Cheap path: even if the leaderboard hash is stable, give the
+        # post-completion analysis a chance to fire when the optimal-mag
+        # chain reaches its 8th cell.
+        maybe_run_analyze_optimal
     fi
     sleep 300
 done
