@@ -285,3 +285,70 @@ datasources:
     magnitude_mean: 1.0
     magnitude_std: 0.15
     notes: "C2 default (Phase 3 OR-gated coupled features)."
+
+  # ── C2 ρ-sweep datasources (Han 2026-05-06 — Effect 1 vs Effect 2 test
+  # per Dmitry's framing; mirrors his coupled_rho_sweep). Same coupling
+  # structure as the default toy_coupled_K10_M20_d256, only rho varies.
+  # If TXC's gAUC win is Effect 1 (variance reduction via T-token
+  # averaging), it will be flat across rho. If Effect 2 (temporal
+  # pattern detection), gAUC should grow with rho. ────────────────────
+
+  toy_coupled_K10_M20_d256_rho00:
+    category: synthetic
+    generator: temp_bench.data.toy:coupled_hmm
+    K_hidden: 10
+    M_emissions: 20
+    n_parents: 2
+    d_in: 256
+    seq_len: 64
+    pi: 0.05
+    rho: 0.0
+    magnitude_dist: folded_normal
+    magnitude_mean: 1.0
+    magnitude_std: 0.15
+    notes: "C2 ρ=0.0 (i.i.d. tokens) — null point for the ρ-sweep."
+
+  toy_coupled_K10_M20_d256_rho03:
+    category: synthetic
+    generator: temp_bench.data.toy:coupled_hmm
+    K_hidden: 10
+    M_emissions: 20
+    n_parents: 2
+    d_in: 256
+    seq_len: 64
+    pi: 0.05
+    rho: 0.3
+    magnitude_dist: folded_normal
+    magnitude_mean: 1.0
+    magnitude_std: 0.15
+    notes: "C2 ρ=0.3 — weak temporal correlation."
+
+  toy_coupled_K10_M20_d256_rho06:
+    category: synthetic
+    generator: temp_bench.data.toy:coupled_hmm
+    K_hidden: 10
+    M_emissions: 20
+    n_parents: 2
+    d_in: 256
+    seq_len: 64
+    pi: 0.05
+    rho: 0.6
+    magnitude_dist: folded_normal
+    magnitude_mean: 1.0
+    magnitude_std: 0.15
+    notes: "C2 ρ=0.6 — moderate temporal correlation."
+
+  toy_coupled_K10_M20_d256_rho09:
+    category: synthetic
+    generator: temp_bench.data.toy:coupled_hmm
+    K_hidden: 10
+    M_emissions: 20
+    n_parents: 2
+    d_in: 256
+    seq_len: 64
+    pi: 0.05
+    rho: 0.9
+    magnitude_dist: folded_normal
+    magnitude_mean: 1.0
+    magnitude_std: 0.15
+    notes: "C2 ρ=0.9 — strong temporal correlation (matches Dmitry's high-ρ benches)."

@@ -51,6 +51,136 @@ surface it in chat, and let Han or agent_paper land the change. Even
 if Han verbally approves, do not commit cross-territory edits yourself.
 This is non-negotiable — see PROTOCOL.md § 8 + CLAUDE.md Hard Rule #7.
 
+### ⚠️ NEW MISSION 2026-05-06 (URGENT) — C2 ρ-sweep (Effect 1 vs Effect 2 test)
+
+**Han 2026-05-06**: in response to Dmitry's concern (`origin/dmitry-synthetic:
+docs/dmitry/results/3arch_3bench_summary.md`) that TXC's win on coupled
+benches doesn't show the ρ-dependence one would expect from genuine
+temporal pattern detection. Run this **on agent_filler's spare A40s**.
+
+**Background — Dmitry's critique** (worth reading before launching):
+
+- **Effect 1 (sample aggregation)** — TXC's encoder pools T tokens per
+  encode → variance reduction on TopK selection. Works at ANY ρ
+  including ρ=0. Doesn't require temporal correlation in the data.
+- **Effect 2 (temporal pattern detection)** — Cross-token relationships
+  carry information. Requires ρ > 0; gAUC should grow with ρ.
+
+If our gAUC is roughly **flat across ρ** → Effect 1, weak temporal
+claim. If **gAUC grows with ρ** → Effect 2, strong temporal claim.
+Currently our C2 only has ρ=0.7 → can't distinguish.
+
+agent_paper's C2 leaderboard analysis already shows the **T-modulation
+goes the wrong way for Effect 2** (gAUC at k=5: T=2→0.904, T=5→0.684,
+T=12→0.678 — more temporal context HURTS). The ρ-sweep is confirmation
+evidence — Han 2026-05-06: "let's still make agent_filler do the
+ρ-sweep."
+
+### Framework changes already landed (commit `<INSERT-HASH>`)
+
+agent_paper added:
+
+- 4 new datasources to `configs/datasources.yaml`:
+  `toy_coupled_K10_M20_d256_rho{00,03,06,09}` mirroring the existing
+  ρ=0.7 datasource with only `rho` varying.
+- `experiments/c2_synthetic_coupled/run.py:RHO_DATASOURCE_MAP` +
+  `--rho-values` CLI arg. Each ρ maps to its own datasource → fresh
+  `act_cache_key` → fresh `train_key` → no cache collision with
+  existing ρ=0.7 cells.
+
+Pull (`git pull --rebase origin final`) to get the framework.
+
+### Mission scope (just the headline trio at 4 ρ values)
+
+Don't sweep everything. Focus on the 3 archs that matter for the Effect
+1 vs Effect 2 question:
+
+| Arch | T | seeds | k_pos | ρ | Cells |
+|---|---|---|---|---|---:|
+| `topk_sae` | default | {1, 2, 42} | {1, 5} | {0.0, 0.3, 0.6, 0.9} | 24 |
+| `txc_base` | default (T=5) | {1, 2, 42} | {1, 5} | {0.0, 0.3, 0.6, 0.9} | 24 |
+| `txc_pro` | T=2 | {1, 2, 42} | {1, 5} | {0.0, 0.3, 0.6, 0.9} | 24 |
+| **Total** | | | | | **72 cells** |
+
+(We already have the ρ=0.7 cells from your prior C2 sweep — don't
+re-run those. The 4 new ρ values are 0.0, 0.3, 0.6, 0.9.)
+
+k_pos ∈ {1, 5} suffices for the ρ-curve plot; we know from the existing
+sweep that gAUC peaks at low k. Saves compute; full k-sweep at every ρ
+would be wasteful.
+
+### Per-cell wall-time
+
+Toy synthetic, ~30 sec per cell on A40. 72 cells / 8 GPUs = ~9 cells
+per GPU = **~5 minutes wall**. Trivial.
+
+### Driver invocation
+
+Once your other sweeps are idle (or in parallel on a spare GPU):
+
+```bash
+TQDM_DISABLE=1 AGENT_NAME=agent_filler \
+  bash scripts/run_on_gpu.sh 7 -- \
+  .venv/bin/python -m experiments.c2_synthetic_coupled.run \
+  --archs topk_sae txc_base txc_pro \
+  --seeds 42 1 2 \
+  --k-poses 1 5 \
+  --rho-values 0.0 0.3 0.6 0.9 \
+  --n-steps 30000 \
+  > logs/c2_rho_sweep.log 2>&1 &
+```
+
+(Note: `--archs txc_pro` will iterate ALL 3 T-overrides for txc_pro —
+T=2, T=5, T=12. The ρ-sweep headline is **txc_pro T=2** specifically;
+the T=5 and T=12 cells are bonus — useful for the T × ρ heatmap.
+Don't filter them out.)
+
+### Smoke (verify framework)
+
+agent_paper smoke-tested locally on the 5090 — all 4 ρ datasources
+resolve, runner accepts the per-ρ datasource_name, fresh train_keys
+land cleanly. Verify on your pod with one cell:
+
+```bash
+TQDM_DISABLE=1 AGENT_NAME=agent_filler \
+  bash scripts/run_on_gpu.sh 7 -- \
+  .venv/bin/python -m experiments.c2_synthetic_coupled.run \
+  --archs txc_pro --seeds 42 --k-poses 5 --rho-values 0.0 \
+  --n-steps 200 --smoke 2>&1 | tail -10
+```
+
+### After cells land — render the headline plot
+
+Re-render `docs/components/c2.md` to add a **gAUC vs ρ** subsection
+alongside the existing gAUC vs k_pos table. The plot should show:
+
+- x-axis: ρ ∈ {0.0, 0.3, 0.6, 0.7, 0.9}
+- y-axis: mean gAUC at k=5 (or k=1)
+- one line per arch (topk_sae, txc_base, txc_pro T=2)
+
+**Decision rule** (per the Dmitry / Effect framing):
+
+- **gAUC roughly flat across ρ** for txc variants → Effect 1 dominates.
+  Paper framing must reflect this honestly.
+- **gAUC grows with ρ** for txc variants → Effect 2 confirmed. Strong
+  paper claim defensible.
+- **Mixed**: report both effects with appropriate caveats.
+
+agent_paper makes the framing call after seeing the curve.
+
+### Watch-outs
+
+- **Don't re-run the ρ=0.7 cells** — already in leaderboard (your prior
+  C2 sweep). The new datasources have different `act_cache_key`s, so
+  even if you accidentally pass `--rho-values 0.7`, the runner picks
+  the existing datasource and cache-hits.
+- **Don't full-sweep k_pos** at every ρ. {1, 5} is enough.
+- **Don't sweep stacked_sae or txc_pro T=5/T=12** as headline. Focus
+  on the 3-arch trio (topk_sae, txc_base default, txc_pro T=2) — that's
+  what apples-to-apples Dmitry's framing.
+
+---
+
 ### ✅ TFA BUG FIX 2026-05-06 — landed (commit `53e63fbb`)
 
 **Your bug report from "Open questions" #3 is FIXED.** The C1 driver's

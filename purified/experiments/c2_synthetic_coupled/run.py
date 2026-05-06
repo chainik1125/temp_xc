@@ -164,6 +164,15 @@ def my_eval_fn(*, model=None, eval_cfg, component):
 # ── Sweep entrypoint ───────────────────────────────────────────────────────
 
 
+RHO_DATASOURCE_MAP: dict[float, str] = {
+    0.0: "toy_coupled_K10_M20_d256_rho00",
+    0.3: "toy_coupled_K10_M20_d256_rho03",
+    0.6: "toy_coupled_K10_M20_d256_rho06",
+    0.7: "toy_coupled_K10_M20_d256",        # default (existing)
+    0.9: "toy_coupled_K10_M20_d256_rho09",
+}
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--archs", nargs="+", default=None,
@@ -176,52 +185,69 @@ def main():
     ap.add_argument("--smoke", action="store_true",
                     help="Tag eval_cfg.smoke=True; agent_paper analysis "
                          "drops smoke rows from the headline.")
+    ap.add_argument(
+        "--rho-values", nargs="+", type=float, default=[0.7],
+        help="ρ values to sweep. Each maps to a per-ρ datasource via "
+             "RHO_DATASOURCE_MAP. Default [0.7] = legacy single-point "
+             "behaviour. Pass `--rho-values 0.0 0.3 0.6 0.9` for the "
+             "Effect-1-vs-Effect-2 ρ-sweep (Han 2026-05-06).",
+    )
     args = ap.parse_args()
 
     arch_filter = set(args.archs) if args.archs else None
 
-    for arch_name, t_override in ARCH_TS:
-        if arch_filter is not None and arch_name not in arch_filter:
-            continue
-        for k_pos in args.k_poses:
-            override: dict[str, Any] = {"k_pos": int(k_pos)}
-            if t_override:
-                override.update(t_override)
-            cfg = TrainingConfig(
-                n_steps=int(args.n_steps),
-                batch_size=int(args.batch_size),
-                plateau_early_stop=False,
-                arch_hparams_override=override,
+    for rho in args.rho_values:
+        if rho not in RHO_DATASOURCE_MAP:
+            raise ValueError(
+                f"--rho-values entry {rho} not in RHO_DATASOURCE_MAP "
+                f"({sorted(RHO_DATASOURCE_MAP)}). Add a datasource entry "
+                f"to configs/datasources.yaml first."
             )
-            for seed in args.seeds:
-                eval_cfg = {
-                    "k_pos": int(k_pos),
-                    "smoke": bool(args.smoke),
-                    "_arch_hparams_override": override,
-                }
+        datasource = RHO_DATASOURCE_MAP[rho]
+
+        for arch_name, t_override in ARCH_TS:
+            if arch_filter is not None and arch_name not in arch_filter:
+                continue
+            for k_pos in args.k_poses:
+                override: dict[str, Any] = {"k_pos": int(k_pos)}
                 if t_override:
-                    eval_cfg["t_label"] = "T=" + str(
-                        t_override.get("T_max") or t_override.get("T")
+                    override.update(t_override)
+                cfg = TrainingConfig(
+                    n_steps=int(args.n_steps),
+                    batch_size=int(args.batch_size),
+                    plateau_early_stop=False,
+                    arch_hparams_override=override,
+                )
+                for seed in args.seeds:
+                    eval_cfg = {
+                        "k_pos": int(k_pos),
+                        "smoke": bool(args.smoke),
+                        "_arch_hparams_override": override,
+                        "rho": float(rho),
+                    }
+                    if t_override:
+                        eval_cfg["t_label"] = "T=" + str(
+                            t_override.get("T_max") or t_override.get("T")
+                        )
+                    else:
+                        eval_cfg["t_label"] = "default"
+                    t_label = eval_cfg["t_label"]
+                    print(
+                        f"[c2] {arch_name:12} {t_label:10} k={k_pos:2d} seed={seed} "
+                        f"ρ={rho:.1f} ds={datasource} steps={cfg.n_steps}",
+                        flush=True,
                     )
-                else:
-                    eval_cfg["t_label"] = "default"
-                t_label = eval_cfg["t_label"]
-                print(
-                    f"[c2] {arch_name:12} {t_label:10} k={k_pos:2d} seed={seed} "
-                    f"steps={cfg.n_steps}",
-                    flush=True,
-                )
-                runner.run_cell(
-                    component=COMPONENT,
-                    arch_name=arch_name,
-                    seed=int(seed),
-                    datasource_name=DATASOURCE,
-                    training_cfg=cfg,
-                    eval_cfg=eval_cfg,
-                    eval_protocol_version=EVAL_PROTOCOL_VERSION,
-                    train_fn=my_train_fn,
-                    eval_fn=my_eval_fn,
-                )
+                    runner.run_cell(
+                        component=COMPONENT,
+                        arch_name=arch_name,
+                        seed=int(seed),
+                        datasource_name=datasource,
+                        training_cfg=cfg,
+                        eval_cfg=eval_cfg,
+                        eval_protocol_version=EVAL_PROTOCOL_VERSION,
+                        train_fn=my_train_fn,
+                        eval_fn=my_eval_fn,
+                    )
 
 
 if __name__ == "__main__":
