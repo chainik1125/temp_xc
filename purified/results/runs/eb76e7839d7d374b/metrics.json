@@ -1,0 +1,19 @@
+{
+  "extras": {
+    "eval_cfg": {
+      "_arch_hparams_override": {
+        "k_pos": 5
+      },
+      "k_pos": 5,
+      "smoke": false,
+      "t_label": "default"
+    }
+  },
+  "metrics": {
+    "auc": 0.5479591836734694,
+    "frac_recovered_80": 0.10000000149011612,
+    "frac_recovered_90": 0.05000000074505806,
+    "mean_max_cos": 0.5494095087051392
+  },
+  "ts": "2026-05-05T21:19:19Z"
+}

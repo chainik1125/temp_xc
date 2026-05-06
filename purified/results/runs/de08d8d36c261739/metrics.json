@@ -1,0 +1,23 @@
+{
+  "extras": {
+    "eval_cfg": {
+      "_arch_hparams_override": {
+        "T": 2,
+        "d_sae": 40,
+        "k_pos": 17
+      },
+      "_p_A": 0.0,
+      "_p_B": 0.625,
+      "k_pos": 17,
+      "smoke": false,
+      "t_label": "T=2"
+    }
+  },
+  "metrics": {
+    "auc": 0.8510204081632652,
+    "frac_recovered_80": 0.699999988079071,
+    "frac_recovered_90": 0.5,
+    "mean_max_cos": 0.8500299453735352
+  },
+  "ts": "2026-05-06T15:45:25Z"
+}
