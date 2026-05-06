@@ -297,8 +297,34 @@ For C1, $\mathcal{G}$ is the $N=20$ ground-truth feature set $\mathcal{F}$ (we r
 
 \begin{figure}[!t]
     \centering
-    \autofig{c7_gc_at_peak_paired}
-    \caption{Headline: per-question genuine-backtracking counts $gc(a, m)$ at the unsteered baseline ($m = 0$, gray bars) and at each architecture's optimal steering magnitude (colored bars), sorted descending by the steered value. Error bars are bootstrap $95\%$ confidence intervals computed by resampling the $61$ cohort questions ($n_{\text{boot}} = 1000$). The text annotation above each colored bar reports the steered value and its peak magnitude $m$. Higher colored bar relative to the gray companion indicates that the architecture's mined feature direction is a more effective causal lever for inducing genuine backtracking when used as a steering vector. Full setup is in \cref{app:c7}.}
+    \begin{subfigure}[t]{0.58\linewidth}
+        \scriptsize
+        \setlength{\fboxsep}{3pt}
+        \fbox{\begin{minipage}[t]{0.96\linewidth}
+            \textbf{TXC-pro ($bs{=}256$), $m{=}+12$} \hfill \textcolor{green!50!black}{\textbf{ans=12 \checkmark} \textbar{} bt=1, coh=3}\\[2pt]
+            {\itshape \ldots the entire fraction is $2.4 / 0.2$, which is $12$. \textbf{Wait, let me double-check that.} $0.2 \times 12 = 2.4$. \textbf{So, yes, that's correct.} \ldots the simplified result is $12$. $\boxed{12}$}
+        \end{minipage}}\\[3pt]
+        \fbox{\begin{minipage}[t]{0.96\linewidth}
+            \textbf{TopK SAE ($bs{=}1024$), $m{=}-16$} \hfill \textcolor{red!70!black}{\textbf{ans=None \texttimes} \textbar{} bt=2, coh=3}\\[2pt]
+            {\itshape \ldots $0.2 \times 12 = 2.4$, so $12$ is the result. \textbf{Wait, but the problem is to simplify the given expression}, so maybe I can compute it numerically\ldots Alternatively, maybe I can compute it using fractions instead of decimals\ldots[loops in verification, runs out of token budget]}
+        \end{minipage}}\\[3pt]
+        \fbox{\begin{minipage}[t]{0.96\linewidth}
+            \textbf{T-SAE ($bs{=}1024$), $m{=}+7$} \hfill \textcolor{red!70!black}{\textbf{ans=None \texttimes} \textbar{} bt=3, coh=3}\\[2pt]
+            {\itshape \ldots $6.25 - 0.49$\ldots[long digit-by-digit subtraction, twice]\ldots $5$ units, $7$ tenths, $6$ hundredths. So, $5.76$. \textbf{Wait, that seems a bit off. Let me check with another method.} $6.25 - 0.49$\ldots[restarts subtraction, runs out of token budget]}
+        \end{minipage}}\\[3pt]
+        \fbox{\begin{minipage}[t]{0.96\linewidth}
+            \textbf{MLC ($bs{=}1024$), $m{=}+16$} \hfill \textcolor{red!70!black}{\textbf{ans=None \texttimes} \textbar{} bt=3, coh=3}\\[2pt]
+            {\itshape \ldots $6.25 - 0.49$ is \textbf{$5.756$}, right? Because $6.25 - 0.49$ is $5.756$. Yes, that's correct. So, the numerator is $\sqrt{\mathbf{5.756}}$\ldots[carries the wrong value through, trails off]}
+        \end{minipage}}
+        \caption{Steered continuations on \texttt{test/prealgebra/951.json} (problem: simplify $\sqrt{2.5^2 - 0.7^2}\,/\,(2.7 - 2.5)$, ground truth $= 12$). The same prefix is supplied to all four cells; each is steered at its own optimal $\Delta gc$ magnitude. All four cells produce judge-positive backtracks (bt counts $1$--$3$), but only TXC-pro's is committal — the baseline cells loop in re-verification cycles (TopK SAE, T-SAE) or inject a fresh arithmetic mistake (MLC: $6.25 - 0.49 = 5.756$, off by $0.004$).}
+        \label{fig:c7-headline-text}
+    \end{subfigure}\hfill
+    \begin{subfigure}[t]{0.40\linewidth}
+        \autofig{c7_gc_at_peak_paired_compact}
+        \caption{Per-question genuine-backtracking counts $gc(a, m)$ at the unsteered baseline ($m = 0$, gray) and at each architecture's optimal steering magnitude (colored), sorted descending by the steered value. Error bars are bootstrap $95\%$ confidence intervals over the $61$ cohort questions ($n_{\text{boot}} = 1000$). Numbers above each colored bar are the steered $gc(a, m)$ value.}
+        \label{fig:c7-gc-at-peak-bar}
+    \end{subfigure}
+    \caption{Headline result, two-panel. \emph{Left:} on a single MATH-500 cohort question, all four steered cells produce judge-positive backtracks under their optimal-magnitude steering, but only TXC-pro's is productive — the baselines either loop in verification or fabricate fresh arithmetic. \emph{Right:} aggregated across the $61$-question cohort, the productive-vs-unproductive distinction shows up as a clear $gc(a, m)$ gap between the steered (colored) and unsteered (gray) bars, which TXC architectures lead. Full setup, judge prompts, and per-cell artifacts in \cref{app:c7}.}
     \label{fig:c7-gc-at-peak}
 \end{figure}
 
