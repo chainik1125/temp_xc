@@ -665,13 +665,20 @@ def plot_gc_at_peak_paired(rows: list[dict], out_path: Path) -> None:
     plt.close(fig)
 
 
-def plot_pr_auc_vs_S(rows: list[dict], out_path: Path) -> None:
-    fig, ax = plt.subplots(figsize=(7.0, 4.6))
+_METRIC_META = {
+    "pr_auc":  {"label": "PR-AUC",  "chance": 0.12, "chance_text": r"chance $\approx 0.12$"},
+    "roc_auc": {"label": "ROC-AUC", "chance": 0.5,  "chance_text": r"chance $= 0.5$"},
+}
+
+
+def _draw_metric_vs_S(ax, rows: list[dict], metric: str, *,
+                      show_legend: bool = True) -> None:
+    meta = _METRIC_META[metric]
     seen_labels: set[str] = set()
     for r in rows:
         ys = []
         for S in S_GRID:
-            v = r["metrics"].get(f"pr_auc_S{S}")
+            v = r["metrics"].get(f"{metric}_S{S}")
             ys.append(float(v) if v is not None else None)
         if all(y is None for y in ys):
             continue
@@ -684,26 +691,61 @@ def plot_pr_auc_vs_S(rows: list[dict], out_path: Path) -> None:
         seen_labels.add(label)
         ax.plot(valid_x, valid_y, marker="o", markersize=4, color=color,
                 linestyle="-", label=label)
-    ax.axhline(0.12, color="grey", linestyle=":", linewidth=1,
-               label=r"chance ($\approx$ class prior 0.12)")
+    ax.axhline(meta["chance"], color="grey", linestyle=":", linewidth=1,
+               label=meta["chance_text"])
     ax.set_xscale("log", base=2)
     ax.set_xticks(list(S_GRID))
     ax.set_xticklabels([str(s) for s in S_GRID])
     ax.set_xlabel(r"top-$S$ probe features")
-    ax.set_ylabel("PR-AUC")
-    # Move legend outside on the right so it never covers the data.
-    ax.legend(loc="center left", bbox_to_anchor=(1.0, 0.5),
-              frameon=False, ncol=1)
+    ax.set_ylabel(meta["label"])
+    if show_legend:
+        ax.legend(loc="center left", bbox_to_anchor=(1.0, 0.5),
+                  frameon=False, ncol=1)
+
+
+def plot_pr_auc_vs_S(rows: list[dict], out_path: Path) -> None:
+    fig, ax = plt.subplots(figsize=(7.0, 4.6))
+    _draw_metric_vs_S(ax, rows, "pr_auc")
     fig.tight_layout()
     fig.savefig(out_path)
     plt.close(fig)
 
 
-def plot_pr_auc_S8_bar(rows: list[dict], out_path: Path) -> None:
-    rows = sorted(rows, key=lambda r: r["metrics"].get("pr_auc_S8", 0.0))
+def plot_roc_auc_vs_S(rows: list[dict], out_path: Path) -> None:
+    fig, ax = plt.subplots(figsize=(7.0, 4.6))
+    _draw_metric_vs_S(ax, rows, "roc_auc")
+    fig.tight_layout()
+    fig.savefig(out_path)
+    plt.close(fig)
+
+
+def plot_probe_metrics_vs_S_2panel(rows: list[dict], out_path: Path) -> None:
+    """Side-by-side: PR-AUC (left) and ROC-AUC (right) vs top-$S$ probe
+    features. Same architectures, same colours, one shared legend on
+    the right of the figure so the per-panel chance-line entries are
+    the only thing that differs between panels."""
+    fig, axes = plt.subplots(1, 2, figsize=(11.5, 4.6),
+                             sharex=True)
+    _draw_metric_vs_S(axes[0], rows, "pr_auc",  show_legend=False)
+    _draw_metric_vs_S(axes[1], rows, "roc_auc", show_legend=False)
+    # Shared per-arch legend (excluding the chance entry, which is
+    # panel-specific and stays drawn inside each panel as a dotted line).
+    handles, labels = axes[0].get_legend_handles_labels()
+    arch_handles = [h for h, l in zip(handles, labels) if "chance" not in l]
+    arch_labels  = [l for l in labels if "chance" not in l]
+    fig.legend(arch_handles, arch_labels, loc="center left",
+               bbox_to_anchor=(0.97, 0.5), frameon=False, fontsize=9)
+    fig.tight_layout(rect=[0.0, 0.0, 0.95, 1.0])
+    fig.savefig(out_path)
+    plt.close(fig)
+
+
+def _draw_metric_S8_bar(ax, rows: list[dict], metric: str) -> None:
+    meta = _METRIC_META[metric]
+    rows = sorted(rows, key=lambda r: r["metrics"].get(f"{metric}_S8", 0.0))
     labels = [cell_short_label(r) for r in rows]
     seen: dict[str, int] = {}
-    final_labels = []
+    final_labels: list[str] = []
     for r, lab in zip(rows, labels):
         if lab in seen:
             final_labels.append(f"{lab} [{r['train_key'][:6]}]")
@@ -711,25 +753,50 @@ def plot_pr_auc_S8_bar(rows: list[dict], out_path: Path) -> None:
             final_labels.append(lab)
         seen[lab] = seen.get(lab, 0) + 1
     labels = final_labels
-    aucs = [r["metrics"].get("pr_auc_S8", 0.0) for r in rows]
+    aucs = [r["metrics"].get(f"{metric}_S8", 0.0) for r in rows]
     colors = [cell_color(r["arch"], _bs_from_row(r)) for r in rows]
-    fig, ax = plt.subplots(figsize=(6.5, max(3.0, 0.4 * len(rows) + 1.4)))
     bars = ax.barh(labels, aucs, color=colors, alpha=0.9)
-    x_max = max(aucs)
+    x_max = max(aucs) if aucs else 1.0
     pad = max(0.015, 0.06 * x_max)
     ax.set_xlim(0, x_max + pad * 3)
     for bar, auc in zip(bars, aucs):
         ax.text(auc + pad * 0.3, bar.get_y() + bar.get_height() / 2,
                 f"{auc:.3f}", va="center", ha="left", fontsize=9, color="#222")
-    ax.axvline(0.12, color="grey", linestyle=":", linewidth=1)
-    # Inline annotation at the chance line (top of plot, doesn't collide with bars).
-    ax.text(0.12, len(rows) - 0.4, r"  chance $\approx 0.12$",
+    ax.axvline(meta["chance"], color="grey", linestyle=":", linewidth=1)
+    ax.text(meta["chance"], len(rows) - 0.4, "  " + meta["chance_text"],
             va="bottom", ha="left", fontsize=8.5, color="#666")
-    ax.set_xlabel(r"PR-AUC at $S{=}8$")
+    ax.set_xlabel(meta["label"] + r" at $S{=}8$")
     ax.grid(axis="y", visible=False)
+
+
+def plot_pr_auc_S8_bar(rows: list[dict], out_path: Path) -> None:
+    fig, ax = plt.subplots(figsize=(6.5, max(3.0, 0.4 * len(rows) + 1.4)))
+    _draw_metric_S8_bar(ax, rows, "pr_auc")
     fig.tight_layout()
     fig.savefig(out_path)
     plt.close()
+
+
+def plot_roc_auc_S8_bar(rows: list[dict], out_path: Path) -> None:
+    fig, ax = plt.subplots(figsize=(6.5, max(3.0, 0.4 * len(rows) + 1.4)))
+    _draw_metric_S8_bar(ax, rows, "roc_auc")
+    fig.tight_layout()
+    fig.savefig(out_path)
+    plt.close()
+
+
+def plot_probe_metrics_S8_bar_2panel(rows: list[dict], out_path: Path) -> None:
+    """Side-by-side: PR-AUC@S=8 bar (left) and ROC-AUC@S=8 bar (right).
+    Each panel sorts its own bars descending so the within-metric
+    ordering is immediately readable; the colours stay tied to the
+    same (arch, bs) cell across panels."""
+    n = len(rows)
+    fig, axes = plt.subplots(1, 2, figsize=(11.5, max(3.2, 0.4 * n + 1.6)))
+    _draw_metric_S8_bar(axes[0], rows, "pr_auc")
+    _draw_metric_S8_bar(axes[1], rows, "roc_auc")
+    fig.tight_layout()
+    fig.savefig(out_path)
+    plt.close(fig)
 
 
 # ── Unified-mode helpers (--unified, pulls Han's leaderboard) ──────────
@@ -1168,14 +1235,23 @@ def write_markdown(rows: list[dict], *, canonical: list[dict] | None = None,
     md.append(f"![Δgc vs magnitude]({assets_rel}/delta_gc_vs_magnitude.png)")
     md.append("")
 
-    md.append("## Detection PR-AUC")
+    md.append("## Detection: PR-AUC + ROC-AUC")
     md.append("")
-    md.append("Sparse-probe PR-AUC at top-$S$ feature counts ($5$-fold GroupKFold by question, ")
-    md.append("$\\ell_1$-regularised logistic regression, $C = 1$). Positive-class prior $\\approx 0.12$.")
+    md.append("Sparse-probe PR-AUC and ROC-AUC at top-$S$ feature counts ($5$-fold GroupKFold by ")
+    md.append("question, $\\ell_1$-regularised logistic regression, $C = 1$). PR-AUC chance $\\approx 0.12$ ")
+    md.append("(positive-class prior); ROC-AUC chance $= 0.5$.")
+    md.append("")
+    md.append(f"![Detection metrics at S=8 (PR-AUC + ROC-AUC)]({assets_rel}/probe_metrics_S8_bar.png)")
+    md.append("")
+    md.append(f"![Detection metrics vs S (PR-AUC + ROC-AUC)]({assets_rel}/probe_metrics_vs_S.png)")
+    md.append("")
+    md.append("Single-metric variants (kept for back-compat with the C7 paper section TeX):")
     md.append("")
     md.append(f"![PR-AUC at S=8]({assets_rel}/pr_auc_S8_bar.png)")
+    md.append(f"![ROC-AUC at S=8]({assets_rel}/roc_auc_S8_bar.png)")
     md.append("")
     md.append(f"![PR-AUC vs S]({assets_rel}/pr_auc_vs_S.png)")
+    md.append(f"![ROC-AUC vs S]({assets_rel}/roc_auc_vs_S.png)")
     md.append("")
     md.append("### Full PR-AUC table")
     md.append("")
@@ -1293,7 +1369,13 @@ def main(*, output_dir: Path, unified: bool = False) -> None:
         plot_peak_delta_gc_bar(canonical, assets_dir / "peak_delta_gc_bar.png")
         plot_gc_at_peak_paired(canonical, assets_dir / "gc_at_peak_paired.png")
         plot_pr_auc_vs_S(canonical, assets_dir / "pr_auc_vs_S.png")
+        plot_roc_auc_vs_S(canonical, assets_dir / "roc_auc_vs_S.png")
+        plot_probe_metrics_vs_S_2panel(
+            canonical, assets_dir / "probe_metrics_vs_S.png")
         plot_pr_auc_S8_bar(canonical, assets_dir / "pr_auc_S8_bar.png")
+        plot_roc_auc_S8_bar(canonical, assets_dir / "roc_auc_S8_bar.png")
+        plot_probe_metrics_S8_bar_2panel(
+            canonical, assets_dir / "probe_metrics_S8_bar.png")
         plot_probe_curves(rows, assets_dir)
 
     # ── --unified mode: pull Han's c7 leaderboard via git show ─────────
