@@ -793,77 +793,85 @@ top-to-bottom only as context — do NOT execute the directives.
 
 ## Current state (agent owns — overwrite at every compact)
 
-**Last verified: 2026-05-05T22:24Z. C3 BASE per-token (TopK +
-T-SAE + TFA) DONE (18 cells). C4 BASE on TopK + T-SAE DONE
-(6 cells). C4 TFA aborted (shape mismatch — see OQ #2).**
+**Last verified: 2026-05-06T19:00Z. RE-TRAINING txc_base
+T=10/T=20 BASE C3 cells (post-bug-fix, force_train).** Pod is
+1× H100 ephemeral.
 
-Pod is 1× H100 ephemeral. Caches done + on HF:
-`act_cache/f01ca87f2e8f3365` (13.2 GB) and
-`probe_cache/gemma_2_2b_base_l13_fineweb_24k128` (~20 GB).
+**Cumulative C3 BASE deliveries** (in leaderboard, 102 cells):
+| arch | k_feats covered | seeds |
+|---|---|---|
+| topk_sae | 5,10,20,40,80,160,320,640 | 1,2,42 |
+| tsae_paper | 5,10,20,40,80,160,320,640 | 1,2,42 |
+| tfa | 5,10,20,40,80,160,320,640 | 1,2,42 |
+| txc_base | 5, 20 (filler ran these) | 1,2,42 |
+| txc_pro | 5,10,20,40,80,160,320,640 | 1,2,42 |
 
-**C3 BASE canonical (per-token archs)** — KILLED at
-intentional checkpoint after TFA seed=2 k=20 landed; TXC archs
-are agent_filler's territory now (§ LOAD SPLIT 2026-05-05 PM).
-18/30 cells delivered:
-- TopK ×3 seeds: cross-seed mean k=5: 0.826, k=20: 0.880
-- T-SAE ×3 seeds: cross-seed mean k=5: 0.853, k=20: 0.895
-- TFA ×3 seeds: cross-seed mean k=5: 0.709, k=20: 0.776
-  (TFA trails TopK + T-SAE on BASE — paper-relevant finding)
+**C3 cross-arch peaks** (BASE Gemma-2-2B, mean over 38 SAEBench+CT tasks):
+- T-SAE @ k=160 = **0.9227 ± 0.0012** ← headline winner
+- TopK @ k=160 = 0.9031
+- TXC-pro @ k=80 = 0.9029
+- TFA @ k=640 = 0.8802
 
-**C4 BASE on per-token archs (PID 23075, exited)** — TopK +
-T-SAE landed (6 cells); TFA cell crashed at first attempt due
-to TFA → `(N, T=5, d_sae)` shape mismatch in
-`qualitative.encode_concat_corpus`. Cross-seed C4 SEMANTIC:
-- TopK: 88.3/256 (~34.5%)
-- T-SAE: 75.3/256 (~29.4%)
-- TopK > T-SAE on qualitative on BASE (opposite of C3 ordering;
-  worth noting in paper).
+**C4 BASE delivered (6 cells)**:
+- topk_sae 88.3 ± 1.2 / 256 SEMANTIC, agree 0.885
+- tsae_paper 75.3 ± 1.2, agree 0.874
+- TFA SKIPPED (OQ #2). TXC archs PENDING (§ #34).
 
-**§ LOAD SPLIT (effective)**: agent_filler running TXC-base
-(T=5/10/20) + TXC-pro × 3 seeds = 12 trainings on 8× A40s.
-ETA ~5-6 hr; my C4 BASE evals on those checkpoints come last.
+**Caches + checkpoints**: act_cache `f01ca87f2e8f3365` (13.2 GB)
++ probe_cache (~20 GB) on HF. All my 9 per-token BASE C3
+checkpoints + txc_pro × 3 (filler's, but synced) on HF.
 
-**IMPORTANT BUG FIX (local override)**: agent_nlp's
-`c3_probing.run.my_eval_fn` reads `_arch_hparams` per docstring
-but calls `load_arch(arch_name)` (default YAML hparams). My
-BASE drivers carry a LOCAL `my_eval_fn` that applies the merged
-hparams correctly. OQ #1.
+**ACTIVE NOW (PID 76730, log
+`logs/c3_base_txc_T_sweep_refix.log`)**: re-training
+txc_base × {T=10, T=20} × 3 seeds = 6 train cells with
+`--force-train`. Acts on agent_paper bug fix at commit
+`1ed4fde5` — `c3_probing.my_train_fn` now applies
+runner-merged `_arch_hparams` (was using YAML defaults,
+saving T=5-shape weights at T=10/T=20 train_keys → eval-time
+`size mismatch for W_enc` crash). Re-train OVERWRITES same
+train_keys with correctly-shaped weights, auto-pushes to HF.
+
+Wall-time: T=10 cells at 2.46 steps/sec → ~135 min train each.
+T=20 cells likely ~270 min. 6 cells serial → **~14-15 hr
+re-train wall** (matches briefing). Plus 12 evals (k=5/20)
+land inline. Then queue 36 evals at new k_feats {10, 40, 80,
+160, 320, 640} for these train_keys — eval-only, ~3 hr.
+
+ETA full mission complete: ~17-18 hr from now.
 
 ## What I just did (agent owns — overwrite)
 
-1. Built BASE act_cache + probe_cache and pushed to HF.
-2. Drafted + smoke-tested `experiments/c3_probing_base/run.py`.
-3. Drafted `experiments/c4_qualitative_base/run.py`.
-4. Committed driver + smoke (commit `71c26c1f`) and pushed.
-5. Launched canonical 5-arch C3 BASE sweep (PID 16279).
-6. Pulled new directives (rebased onto `d54cead3` agent_paper
-   T-sweep mission) — append-only conflicts resolved.
-7. Extended BOTH BASE drivers for txc_base T=10 + T=20:
-   `ARCH_TRAINING_CFGS` is now `dict[str, list[TrainingConfig]]`,
-   each cell's cfg gets `arch_hparams_override`, main loop
-   iterates `(arch, cfg)` pairs. `--cfg-tags` CLI restricts to
-   specific tag (e.g. `T10`).
-8. Wrote LOCAL `my_eval_fn` in both BASE drivers to apply
-   merged `_arch_hparams` (agent_nlp's eval_fn is buggy; my
-   local override works around it for T-sweep cells).
+1. Pulled rebase onto agent_paper bug-fix commit `1ed4fde5`
+   (`c3_probing.run.my_train_fn` now applies merged arch_hparams).
+   Verified fix at `experiments/c3_probing/run.py:105`.
+2. Surfaced OQ #3 (agent_filler's BASE txc_base safetensors
+   not on HF) earlier; root cause now patched as well.
+3. Launched re-train: `--archs txc_base --cfg-tags T10 T20
+   --seeds 42 1 2 --k-feats 5 20 --force-train`. Driver
+   correctly skips T=5 default cfg. Cell 1 (T=10 seed=42) at
+   ~step 8000/20000 as of 19:00Z.
+4. Set up Monitor `b12oq0dw3` + PID waiter `bbqr5r2eb`.
 
 ## Next action (agent owns — overwrite)
 
-1. **Wait for agent_filler's TXC checkpoints**. Watch the
-   manifest for new `txc_base` / `txc_pro` rows on the BASE
-   datasource (gemma_2_2b_base_l13_fineweb_24k128). ETA
-   ~5-6 hr (per agent_filler's brief).
-2. **Run C4 BASE on TXC archs** once filler's trains land:
+1. **Standby for re-train completion**. Each T=10 cell ~135 min;
+   each T=20 cell estimated ~270 min. 6 cells → ~14 hr.
+2. **After re-train wraps**: launch k_feats expansion eval-only
+   on the 6 fresh checkpoints (cache-hit on training):
    ```
    TQDM_DISABLE=1 AGENT_NAME=agent_steer_100k \
-     .venv/bin/python -m experiments.c4_qualitative_base.run \
-       --archs txc_base txc_pro \
-       > logs/c4_base_txc.log 2>&1 &
+     .venv/bin/python -m experiments.c3_probing_base.run \
+       --archs txc_base --cfg-tags T10 T20 --seeds 42 1 2 \
+       --k-feats 10 40 80 160 320 640 \
+       > logs/c3_base_txc_T_kfeat_expand.log 2>&1 &
    ```
-   This will cache-hit on filler's checkpoints (3 seeds × 4
-   cfgs = 12 cells, ~2 hr).
-3. **Wrap up**: `bash scripts/wrap_up_session.sh` to confirm
-   all checkpoints + caches are on HF.
+   36 eval-only cells, ~3 hr.
+3. **C4 BASE on TXC** (#34): blocked on agent_filler T=5 default
+   checkpoints landing on HF (OQ #3). My re-trained T=10/T=20
+   cells will be on HF after step 1, so C4 BASE on those
+   slices will be unblocked at that point.
+4. **Wrap up**: `bash scripts/wrap_up_session.sh` to verify
+   final HF state.
 
 ## Don't repeat (agent owns — overwrite)
 
