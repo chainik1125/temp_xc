@@ -7,8 +7,8 @@ Section ownership rules: PROTOCOL.md § 14.
 
 ---
 agent: agent_nlp
-last_state_update: 2026-05-06T05:35:00Z
-status: complete
+last_state_update: 2026-05-06T20:00:00Z
+status: in_progress
 component: c3, c4
 ---
 
@@ -689,25 +689,51 @@ union now and the MLC keys will simply be empty until then.)
 
 ## Current state (agent owns — overwrite at every compact)
 
-**Last verified: 2026-05-06 05:35 UTC — ALL agent_nlp missions complete.
-Status: complete (post-render, post-HF-push).**
+**Last verified: 2026-05-06 20:00 UTC — RESUMING after RunPod incident.
+Status: in_progress (4/7 resume cells landed, 3 to go).**
 
-All 4 directives delivered:
-- decisions § 12: batch=1024 / n_steps=20K canonical re-train (Han override)
-- decisions § 15: TopK T=1 baseline (paper-faithful per-token canonical)
-- decisions § 16: TFA B=32 baseline (Phase 7 wasteland-faithful)
-- decisions § 17: TXC-base T-sweep (T=10, T=20)
+This is a **fresh agent_nlp life on a recovered pod** post the
+2026-05-06 RunPod incident that killed the previous 2× H100 (shared
+with agent_em). The persistent volume survived; pod re-attached;
+.venv was rebuilt via `uv sync` (stale CPython symlinks; see Don't
+repeat). HF sync recovery is **complete** (commits `eaa75a10` +
+`17028e53`, see `URGENT_HF_SYNC.md` ✅ block):
+- 26 checkpoints pushed (33 GB) — agent_nlp local-only at incident time
+- 67 judge run dirs pushed (119 MB)
+- 180 leaderboard rows committed (161 C3 + 19 C4)
+- act_cache + probe_cache verified already on HF
 
-**HF-pushed checkpoints**: all 12 canonical (b1024/n20K) train_keys
-+ 6 T-sweep train_keys at `han1823123123/temp-bench-models/`.
-agent_filler's tsae_paper T=2 + agent_em_100k's MLC pulled locally.
+**Active mission — k_feats expansion resume (agent_paper split,
+commit `213bc86d`)**: pre-incident, agent_nlp's prior life had
+launched the C3 IT k_feats expansion to {5, 10, 20, 40, 80, 160, 320,
+640} for 6 archs but died mid-flight. **13 cells unfinished** —
+agent_paper split them: 7 for me (now), 6 for agent_em_100k.
 
-**Leaderboard rows owned by agent_nlp**: 24 canonical C3 + 12 T-sweep
-+ 6 TFA + 12 C4 + 6 C4 T-sweep = ~60 v3 rows. Plus 24 v1.0.0 + 24
-v1.1.0 batch=256 rows kept for diff.
+My 7 cells (running on GPU 0, both drivers in parallel):
+- **txc_base T=20 seed=42 × {160, 320, 640}** ✅ all 3 done
+  (k=160: 0.9186, k=320: 0.9156, k=640: 0.9087 — clean monotone decay)
+- **tfa seed=2 × {80, 160, 320, 640}** — 1/4 done (k=80: 0.8095);
+  k=160, 320, 640 still in flight
+- **Total live tally: 4/7 cells landed**, 3 remaining
 
-**Pod**: GPU 0 + GPU 1 idle. agent_em + agent_em_100k missions complete
-on their own pods.
+agent_em_100k owns the **6 tfa seed=42 × {10..640}** cells in parallel
+on their pod (decisions: c3.md re-render is mine, they just commit
+their leaderboard rows + return to their own missions).
+
+**Pod**: 1× H100 (GPU 0). No peer GPU — agent_em is gone post-incident.
+Both drivers serial-share GPU 0 cleanly (eval-only, low memory pressure).
+
+**Leaderboard rows owned by agent_nlp** (after resume completes):
+prior 60 v3 rows + 18 from k_feats expansion (already landed before
+death) + 7 new resume rows = ~85 paper-bound C3+C4 rows.
+
+**HF audit at session start**:
+- All 26 prior local-only checkpoints now on HF (recovery commit)
+- act_cache (1× 13.21 GB) + probe_cache (1× 19.58 GB) intact on HF
+- Resume cells cache-hit on rescued training checkpoints
+  (`tfa seed=2 train_key=0679d79278d95663`,
+  `txc_base T=20 seed=42 train_key=a5c6ffcfb4b09cf7` — both verified
+  local + on HF before launch).
 
 ## C3 final headline (paper-final; b1024 / n20K, decisions § 12+§15+§16+§17)
 
@@ -778,22 +804,64 @@ moved up modestly.
 
 ## What I just did (agent owns — overwrite)
 
-Full session 2026-05-04 13:00 UTC → 2026-05-06 05:35 UTC. All 4
-post-Han-batch-fix directives delivered + paper-final renders.
+Resume session 2026-05-06 ~18:00 UTC onward (post-RunPod-incident
+recovery + active resume mission). Two distinct phases:
 
-§ 12 batch=1024 / n_steps=20K canonical re-train — **DONE**:
-- 12 unique trainings (4 archs × 3 seeds) × 2 k_feats = 24 cells.
-- TXC-base + TXC-pro + tsae_paper + topk_sae all at literature-
-  faithful per-arch TrainingConfig (TXC None, T-SAE T=2 from agent_filler,
-  TopK T=1, MLC None on multi-layer from agent_em_100k).
+### Phase A — HF sync recovery (commits `eaa75a10` + `17028e53`)
 
-§ 15 TopK T=1 baseline — **DONE**:
-- topk_sae × 3 seeds × 2 k_feats at `train_window_size=1`. Driver in
-  `experiments/c3_probing_topk_baseline/`.
+Per `URGENT_HF_SYNC.md` Steps 0–8 (full salvage doc by agent_paper).
+Took over the dead pod's persistent volume on a fresh H100. Outcome:
 
-§ 16 TFA B=32 baseline — **DONE**:
-- tfa × 3 seeds × 2 k_feats at `batch_size=32`, full-seq (Phase 7
-  wasteland-faithful). Driver in `experiments/c3_probing_tfa_baseline/`.
+- **Stash dance** — pre-pull stash held the dead pod's last
+  manifest/leaderboard writes; merged via dedup-by-key (12 manifest
+  + 180 leaderboard rows recovered from stash that were not yet in
+  origin/final).
+- **26 checkpoints pushed** (33 GB) to `temp-bench-models`: 11 txc_base,
+  7 topk_sae, 4 tsae_paper, 3 txc_pro, 1 tfa.
+- **67 judge run dirs pushed** (119 MB) to `temp-bench-data/runs/`.
+- **act_cache + probe_cache** verified already 100% on HF — nothing
+  to do (33 GB combined, would have been worst case).
+- **180 leaderboard rows + 43 checkpoint config.json + 16 trainlog.json
+  committed** in `eaa75a10`. Surgical staging (`git add purified/results/runs/`
+  + explicit `*/config.json`) avoids the probe_cache trap (see
+  Don't repeat).
+- Final verification: 0 manifest rows with on-disk safetensors lacking
+  hf_url. HF spot checks ✓.
+- `URGENT_HF_SYNC.md` stamped with ✅ block in `17028e53`.
+
+### Phase B — k_feats expansion resume (in flight)
+
+Per agent_paper's split (commit `213bc86d`): 7 cells for me, 6 for
+agent_em_100k. Pre-launch sanity check confirmed both rescued
+checkpoints local + on HF.
+
+Launched 2026-05-06 ~19:50 UTC, both drivers in parallel on GPU 0:
+- `experiments.c3_probing_txc_T_sweep.run --T-values 20 --seeds 42 --k-feats 160 320 640`
+  → log `c3_kfeat_T20_seed42_resume.log` ✅ all 3 cells done
+- `experiments.c3_probing_tfa_baseline.run --seeds 2 --k-feats 80 160 320 640`
+  → log `c3_kfeat_tfa_seed2_resume.log` ⏳ 1/4 done (k=80 landed),
+  k=160/320/640 still encoding
+
+Verified `experiments/c3_probing/analysis.py` does NOT hardcode
+`k_feats=(5, 20)` — it iterates `sorted(grouped.items())` over all
+distinct k_feats found in the leaderboard. So no analysis.py edit
+needed; the post-resume re-render will pick up all 8 k_feats
+automatically.
+
+### Carry-over from prior agent_nlp life (still paper-final)
+
+The 4 directives delivered in 2026-05-04 → 2026-05-06 05:35Z:
+- § 12 batch=1024 / n_steps=20K canonical re-train (24 cells)
+- § 15 TopK T=1 baseline (6 cells)
+- § 16 TFA B=32 baseline (6 cells, but 10 cells of the k_feats
+  expansion column for tfa never finished — that's the Phase B work)
+- § 17 TXC-base T-sweep T={10, 20} (12 cells, but 3 cells of the
+  T=20 seed=42 high-k tail never finished — also Phase B work)
+- Framework: `preloaded_batch_iter_from_act_cache` (3.4× speedup),
+  trainlog persistence, `_T{N}` filename suffix.
+- Renders: `c3.md` + `c4.md` AUTO-RESULTS at commit `65f4ad88`. The
+  c3.md will be re-rendered after Phase B + agent_em_100k's 6 cells
+  land — full 8-k_feat table.
 
 § 17 TXC-base T-sweep (T=10, T=20) — **DONE**:
 - txc_base × 3 seeds × 2 T values × 2 k_feats = 12 cells via
@@ -846,23 +914,47 @@ HF push (persistent pod):
   agent_steer 2026-05-04 PM). decisions § 12 update is agent_paper's
   call.
 
-## Next action — STATUS: COMPLETE
+## Next action — STATUS: IN_PROGRESS
 
-All 4 directives delivered. Last in-flight process exited
-2026-05-06 ~05:30 UTC (last C4 T-sweep cell, txc_base T=20 seed=42).
+Resume mission active. Sequence:
 
-If a new directive lands, the next agent_nlp life will:
-1. Read this briefing top-to-bottom.
-2. Pull origin/final + check `agents/agent_nlp/briefing.md` for new
-   `### ⚠️ NEW MISSION ...` sections injected by agent_paper.
-3. Write a thin driver under `experiments/c{3,4}_*_{family}/`,
-   smoke-test, launch on idle GPU.
+1. **Wait on remaining 3 tfa seed=2 cells** (k=160, 320, 640).
+   Monitor task `bxn38o7w8` is armed on
+   `logs/c3_kfeat_tfa_seed2_resume.log` for `[NEW]` / `[NEW] cell` /
+   error patterns. ETA ~90 min total from launch.
+2. **Wait on agent_em_100k's 6 cells** (tfa seed=42 × {10..640}).
+   They run on their own pod in parallel; check origin for their
+   commit landing.
+3. **Re-render c3.md AUTO-RESULTS** once all 13 cells in. One liner:
+   ```bash
+   .venv/bin/python -c "from temp_bench import report; report.render(component='c3')"
+   ```
+   The analysis already iterates k_feats from the leaderboard — no
+   code change needed.
+4. **Single rescue commit** combining Phase A (already done in
+   `eaa75a10` + `17028e53`) carry-forward note + Phase B leaderboard
+   rows + c3.md re-render. Suggested message (per agent_paper's
+   directive):
+   ```
+   Agent NLP: post-RunPod-rescue resume — C3 k_feats expansion 13/13 cells
+              + analysis.py 8-k_feat update + c3.md AUTO-RESULTS re-render.
+   ```
+   (Note: analysis.py was already correct — message can adjust.)
 
-Saved leaderboard inventory at session end:
-- ~144 leaderboard rows (canonical 24 + T-sweep 18 + C4 24 + TFA 6 +
-  diff cells from v1.0.0 + v1.1.0 + smokes).
-- 18 unique train_keys agent_nlp owned (12 canonical + 6 T-sweep).
-- All 18 .safetensors checkpoints uploaded to HF.
+If interrupted before re-render, the next agent_nlp life:
+- Pull origin/final
+- Verify all 13 expected eval_keys present (`tfa seed=2 × {80..640}`,
+  `tfa seed=42 × {10..640}`, `txc_base T=20 seed=42 × {160..640}`)
+- Run the re-render + commit step.
+
+### Reference: precomputed train_keys (rescued + verified)
+
+```python
+# tfa seed=2  (B=32 full-seq):  0679d79278d95663
+# txc_base T=20 seed=42:        a5c6ffcfb4b09cf7
+```
+Both confirmed via the briefing's `compute_train_key` snippet at
+launch time. Both have `model.safetensors` local + on HF.
 
 ### Reference: leaderboard filter for paper-final
 
@@ -990,43 +1082,95 @@ Hard-won technical gotchas from this session (verify before bypassing):
   falls back to all-windows mean for those rows (probe noisy but no
   NaN). Affects winogrande/wsc on TXC archs; a few rows per task.
 
+Resume-session gotchas (post-RunPod 2026-05-06):
+
+- **`.venv/bin/python` symlinks are stale after a pod swap** — the
+  CPython binary lives under `/home/appuser/.local/share/uv/python/`
+  which is NOT on the persistent volume. `.venv/bin/python` exists
+  but resolves to a broken target. Fix: `curl -LsSf https://astral.sh/uv/install.sh | sh`
+  + `rm -rf .venv && uv sync`. ~1-2 min if uv-cached deps; ~3-5 min
+  cold.
+- **`uv sync` on MooseFS occasionally hits "Stale file handle (os
+  error 116)"** mid-install (e.g. on numpy unpack). Just re-run uv
+  sync; it picks up where it left off and the subsequent install is
+  clean. Cost me 30 sec the first time.
+- **`purified/results/probe_cache/` is NOT in `.gitignore`** — and
+  contains 19+ GB of `.npy` files. `git add purified/results/` will
+  happily start packing it (I caught this 20 min in, with `.git`
+  already at 6.7 GB of dangling loose objects from probe_cache hashing).
+  Mitigation: stage surgically. NEVER `git add purified/` or
+  `git add purified/results/` blindly. Use explicit subpaths:
+  - `git add purified/results/leaderboard.jsonl`
+  - `git add purified/results/runs/`
+  - `git add purified/checkpoints/manifest.jsonl`
+  - `git add purified/checkpoints/*/config.json`
+  - `git add purified/logs/*_trainlog.json`
+  Cleanup after the trap: `git gc --prune=now`. Also surfaced as
+  Open question for Han — proper fix is `.gitignore` line.
+- **HF `upload_folder` for checkpoints is fast** (~10-30s per
+  340MB-3GB checkpoint at ~40-50 MB/s). 26 checkpoints / 33 GB =
+  ~10 min wall. Run as bg + monitor `[step3] PUSHED` lines.
+- **`HfApi.list_repo_files` returns ALL files** (including
+  `.gitattributes`, all subdirs) — when checking "is this train_key
+  on HF?", filter by `f.startswith(f'{tk}/')` not exact match.
+- **JSONL dedup-key gotcha**: leaderboard rows have BOTH `train_key`
+  AND `eval_key`. When deduping leaderboard, key on `eval_key`. The
+  first time I tried, my `r.get('train_key') or r.get('eval_key')`
+  returned `train_key` (truthy) and collapsed eval rows that share a
+  train_key. Caught after dedup output dropped 229 rows from 924.
+  Reverted via `git checkout HEAD -- <file>` and re-ran with the
+  per-file correct key. Manifest = train_key, leaderboard = eval_key.
+- **`git push` over HTTPS needs token via credential helper** — the
+  remote is `https://github.com/...` and there's no cached cred. Use:
+  `git -c credential.helper='!f() { echo username=x-access-token; echo password='"$(cat /workspace/.tokens/gh_token)"'; }; f' push origin final`
+- **Rebase conflict on append-only JSONL is common** when multiple
+  agents' commits race. Resolution: load both sides, keep first
+  occurrence per key (eval_key for leaderboard, train_key for
+  manifest), strip conflict markers, `git add`, `git rebase --continue`.
+
 ## Open questions for Han / agent_paper (agent owns — overwrite)
 
-1. **n_steps=20K paper-wide?** — landed in my code (commit `513a85ea`)
+1. **`purified/results/probe_cache/` missing from `.gitignore`** (NEW,
+   post-rescue). 19.58 GB of `.npy` files; current convention has
+   `act_cache/`, `runs/*/cache/`, `checkpoints/*/*.safetensors` ignored
+   but probe_cache slipped through. A casual `git add purified/results/`
+   trapped me for 20 min during recovery. The fix is one line:
+   `purified/results/probe_cache/` in the `# purified/ runtime artefacts`
+   block of `.gitignore`. Cross-territory edit — surfaced for Han or
+   agent_paper to land. Already noted in `URGENT_HF_SYNC.md` ✅ block.
+
+2. **n_steps=20K paper-wide?** — landed in my code (commit `513a85ea`)
    per Han's deadline call 2026-05-04 PM. agent_steer was sent the
    recommendation to follow suit (Han forwarded the message). Should
    agent_paper update `decisions.md` § 12 + the schema default so
    future agents don't have to override per-cell? Currently § 12 still
-   says 25K.
+   says 25K. (Carried over from prior life; still relevant.)
 
-2. **C4 4th arch coverage** — C4 v1.0.0 ran 3 archs (txc_base, txc_pro,
-   tsae_paper). No topk_sae C4. The new b1024/n20K C4 will follow the
-   same 3-arch convention. Should we ALSO judge topk_sae for the C4
-   Pareto plot, given topk_sae's checkpoint will exist? Adds ~$0.13 +
-   ~30 min wall, gives 4 points per arch on the Pareto. (I lean yes
-   for completeness; happy to defer.)
+3. **C4 4th arch coverage** — C4 v1.0.0 ran 3 archs (txc_base, txc_pro,
+   tsae_paper). No topk_sae C4. The new b1024/n20K C4 follows the same
+   3-arch convention. Should we ALSO judge topk_sae for the C4 Pareto
+   plot, given topk_sae's checkpoint exists? Adds ~$0.13 + ~30 min
+   wall, gives 4 points per arch on the Pareto. (I lean yes for
+   completeness; happy to defer. Carried over from prior life.)
 
-3. **`base.py:81` memory hot-spot — opportunistic fix.** The shared
-   `TempBenchArch.train_step` computes
-   `l0 = (z_flat != 0).float().sum(dim=-1).mean()` which allocates a
-   `(B*S, d_sae)` fp32 tensor (9.66 GB at batch=1024 / d_sae=18432 /
-   per-token archs like topk_sae). Reordering to
-   `(z_flat != 0).sum(dim=-1).float().mean()` defers the float
-   conversion to the scalar reduction → drops 9.66 GB peak. With GPU 0
-   solo to me, topk_sae fit fine at 45 GB total without the fix; flag
-   is **no longer urgent for me** but agent_em (Qwen-14B + d_sae=32768)
-   or agent_back (Llama-8B A40 + d_sae=32768) might still benefit.
-   Out-of-scope edit for me (`src/temp_bench/architectures/base.py`
-   is shared code).
-
-4. **Headline rendering during in-flight period** — currently
-   docs/components/c3.md still shows v1.1.0 batch=256 numbers; the new
-   b1024/n20K headline only fills in once topk_sae lands. Acceptable
-   to keep stale numbers visible until then? (Alternative: render the
-   placeholder now, but that strips the only visible C3 numbers from
-   the docs for ~9 hr.)
+4. **`base.py:81` memory hot-spot — opportunistic fix** (carried over).
+   `(z_flat != 0).float().sum(dim=-1).mean()` → 9.66 GB fp32 alloc at
+   batch=1024 / d_sae=18432. Reordering to `.sum().float().mean()`
+   defers float conversion → drops the peak. Out-of-scope for me;
+   agent_em (Qwen-14B + d_sae=32768) or agent_back (Llama-8B A40 +
+   d_sae=32768) most likely to benefit.
 
 5. **Probe cache HF push at schema 2.0.0** — DONE 2026-05-04 morning.
    266 files at `han1823123123/temp-bench-data/probe_cache/gemma_2_2b_it_l13_fineweb_24k128/`.
    agent_steer / ephemeral pods sync via
    `hf download han1823123123/temp-bench-data --repo-type dataset --include 'probe_cache/gemma_2_2b_it_l13_fineweb_24k128/*'`.
+
+6. **Pod provisioning `.venv` brittleness** (NEW, post-rescue). When a
+   pod is rebuilt and re-attached to a persistent volume, the `.venv`
+   directory survives but the `.venv/bin/python` symlink points to a
+   CPython under `/home/appuser/.local/share/uv/python/...` which does
+   NOT survive. `scripts/agent_smoke_test.sh` correctly fails fast
+   ("import smoke failed"), but the recovery path (uv install + uv sync)
+   isn't documented. Suggest adding to `URGENT_HF_SYNC.md` Step 0 or
+   to `scripts/bootstrap_runpod.sh` as a "re-attach to existing volume"
+   shortcut.
