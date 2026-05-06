@@ -1,6 +1,6 @@
 # C2 Synthetic Coupled — paper-ready results (auto-generated)
 
-_Last refreshed: 2026-05-06T03:39:58+00:00_
+_Last refreshed: 2026-05-06T03:45:02+00:00_
 
 ## Setup
 
@@ -10,13 +10,13 @@ _Last refreshed: 2026-05-06T03:39:58+00:00_
 - Companion: eAUC — recovery of the M=20 emission directions.
 - Driver: `experiments/c2_synthetic_coupled_full/run.py` (isolated `act_cache_key` via `temp_bench.data.toy_full.api:coupled_hmm`).
 
-Currently 3 cells across 2 (arch, T) configurations; seeds-per-cell range = [1, 2].
+Currently 4 cells across 2 (arch, T) configurations; seeds-per-cell range = [1, 3].
 
 ## gAUC headline (peak gAUC over k_pos)
 
 | arch | T | k\* | gAUC (mean ± SE) | n seeds |
 |------|---|----|---------------------------|---------|
-| `topk_sae` | — | 1 | 0.459 ± 0.018 | 2 |
+| `topk_sae` | — | 1 | 0.446 ± 0.017 | 3 |
 | `txc_base` | — | 5 | 0.320 ± 0.000 | 1 |
 
 ![c2_gauc_vs_k](c2_paper_assets/c2_gauc_vs_k.png)
@@ -25,7 +25,7 @@ Currently 3 cells across 2 (arch, T) configurations; seeds-per-cell range = [1, 
 
 | arch | T | k\* | eAUC (mean ± SE) | n seeds |
 |------|---|----|---------------------------|---------|
-| `topk_sae` | — | 1 | 0.314 ± 0.002 | 2 |
+| `topk_sae` | — | 1 | 0.313 ± 0.001 | 3 |
 | `txc_base` | — | 5 | 0.271 ± 0.000 | 1 |
 
 ![c2_eauc_vs_k](c2_paper_assets/c2_eauc_vs_k.png)
@@ -34,12 +34,12 @@ Currently 3 cells across 2 (arch, T) configurations; seeds-per-cell range = [1, 
 
 | arch (T) | k=1 | k=5 |
 |---|---|---|
-| `topk_sae` | 0.459 | — |
+| `topk_sae` | 0.446 | — |
 | `txc_base` | — | 0.320 |
 
 ## Per-cell mean — eAUC
 
 | arch (T) | k=1 | k=5 |
 |---|---|---|
-| `topk_sae` | 0.314 | — |
+| `topk_sae` | 0.313 | — |
 | `txc_base` | — | 0.271 |
