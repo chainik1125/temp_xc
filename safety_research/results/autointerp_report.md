@@ -6,7 +6,13 @@ Explainer: `claude-haiku-4-5-20251001` (async, concurrency=1, SDK retry-after on
 
 ## Qualitative analysis: StackedSAE vs TXCDR
 
-We elicit single-sentence explanations for every active feature in each arm via Claude Haiku 4.5 (8,454 StackedSAE, 5,033 TXCDR features) and observe three consistent qualitative differences. **First**, on per-sentence activation maps over 32-token sequences (see *Sentence-level case studies* below), TXCDR features fire as wide ~T-token diagonal bands that follow the natural span of the underlying concept — a dateline, a discourse-marker phrase, a noun-phrase boundary — while StackedSAE features fire as isolated single-position spikes co-located with the same concept's most informative token: TXCDR's full-rank cross-position weights bind activation to a temporal window, whereas StackedSAE's block-diagonal weights collapse it to a point. **Second**, embedding the explanations with `all-MiniLM-L6-v2` and clustering with HDBSCAN yields *k*=15 well-separated clusters for TXCDR (silhouette +0.01) versus *k*=23 tighter but heavily overlapping clusters for StackedSAE (silhouette −0.20); StackedSAE produces lexically homogeneous groupings around concrete entity types (acronyms, dates, geographic markers, sports headlines), while TXCDR additionally captures span-level discourse structure (first-person narrative openings, news article datelines, contrast/transition markers). **Third**, an LLM-judged temporal-coherence score over the cluster labels favors TXCDR (6.80 vs 4.78), consistent with the case-study geometry; StackedSAE wins on lexical coherence (7.08 vs 6.31), reflecting its tendency to memorize narrow token-level patterns rather than discourse-level abstractions. Safety-tag composition is near-identical between arms (≈99% `NONE`; ≈0.5% `HARMFUL_CONTENT`), so the architectural difference is concentrated in *what* kinds of patterns the dictionary discovers, not in how they are valenced.
+**Intro.** A T=5 sparse-autoencoding dictionary can be parameterized with either block-diagonal cross-position weights (each window position gets its own SAE, sharing a dictionary; *StackedSAE*) or with full-rank cross-position weights (W_enc and W_dec are dense across the temporal window; *TXCDR*). All other knobs are matched: same backbone (`google/gemma-2-2b-it`, `mid_res` layer), same activation cache, same T=5 windows, same k=100 sparsity, same d_sae=18,432 dictionary width. We ask whether the additional cross-position capacity in TXCDR surfaces *qualitatively different* features — concepts whose information mass is distributed across multiple tokens — or merely redistributes the same per-position features the StackedSAE already captures.
+
+**Architectural contrast.** With T=5, StackedSAE's encoder map at window position *p* depends only on the residual at *p*, and reconstruction at *p* uses only activations at *p*. TXCDR drops that structural constraint: its dense W_enc lets a single feature aggregate information across all five positions, and its dense W_dec lets that feature contribute to reconstruction at any position. The prediction is that TXCDR features should be free to encode concepts whose support is distributed across multiple tokens (a discourse-marker phrase, a dateline, a clause boundary), while StackedSAE — denied that flexibility — should fragment such concepts into one feature per position-where-they-co-occur. We test this prediction qualitatively along three axes: per-token activation geometry on individual sequences, the structure of the explanation embedding, and the safety-tag composition of the two dictionaries.
+
+**Methods.** We surface every active feature in each arm by running the trained model over a 1,500-chain sample of the cache and keeping every feature with at least three top-window examples (8,454 StackedSAE / 5,033 TXCDR features). For each feature we elicit a single-sentence concept explanation via Claude Haiku 4.5, presenting the top-12 activating windows with the activating span wrapped in `[FOCUS]...[/FOCUS]` tags and a system prompt that forbids the explainer from describing the tags themselves. Explanations are embedded with `sentence-transformers/all-MiniLM-L6-v2`, projected to 2D with UMAP, and partitioned with HDBSCAN; clusters are labeled lexically by their distinctive content tokens. For per-sentence visualization we pick five 32-token sequences and select the top-32 features per arm via an *exclusive* score (each position claims its most-concentrated feature, greedy assignment, no feature reused; `temporal_crosscoders/NLP/sentence.py:307–339`).
+
+**Results.** On the per-sentence activation maps, TXCDR features fire as wide ~T-token diagonal bands following the natural span of the underlying concept, while StackedSAE features fire as isolated single-position spikes co-located with the concept's most informative token — the architectural prediction borne out visually across all five chains. In the explanation embedding, TXCDR yields *k*=15 well-separated clusters (silhouette +0.01) versus StackedSAE's *k*=23 tighter but heavily overlapping clusters (silhouette −0.20); StackedSAE's groupings are concrete entity types (acronyms, dates, geographic markers, sports headlines), whereas TXCDR additionally captures discourse-level abstractions (first-person narrative openings, news article datelines, contrast/transition markers). An LLM-judged temporal-coherence score over the cluster labels favors TXCDR (6.80 vs 4.78); StackedSAE wins on lexical coherence (7.08 vs 6.31), reflecting a tendency to memorize narrow token-level patterns at the cost of discourse-level abstraction. Safety-tag composition is near-identical (≈99% `NONE`; ≈0.5% `HARMFUL_CONTENT`), so the architectural difference is concentrated in *what kinds* of patterns the dictionary discovers, not in how they are valenced.
 
 ## Headline numbers
 
@@ -34,7 +40,7 @@ Source: `safety_research/scripts/umap_meta.py`
 
 `n=8454` features, `k=23` clusters, silhouette `-0.20`, mean cohesion `0.71`, noise frac `0.00%`.
 
-![UMAP tsae](../figures/umap_tsae.png)
+![UMAP StackedSAE (T=5)](../figures/umap_tsae.png)
 
 | cluster | n_feat | cohesion | safety mix | name | sample explanation |
 |--------:|-------:|---------:|------------|------|---------------------|
@@ -53,7 +59,7 @@ Source: `safety_research/scripts/umap_meta.py`
 
 `n=5033` features, `k=15` clusters, silhouette `+0.01`, mean cohesion `0.63`, noise frac `0.02%`.
 
-![UMAP txc](../figures/umap_txc.png)
+![UMAP TXCDR (T=5)](../figures/umap_txc.png)
 
 | cluster | n_feat | cohesion | safety mix | name | sample explanation |
 |--------:|-------:|---------:|------------|------|---------------------|
@@ -67,12 +73,6 @@ Source: `safety_research/scripts/umap_meta.py`
 | 7 | 7 | 0.83 | NONE:7 | blog · blogging · blogs · platforms | This feature detects text discussing blog posts, blogging activities, and blog-related metadata (posting freq… |
 | 8 | 656 | 0.58 | NONE:656 | date · temporal · time · activates | This feature activates on temporal and date-related information, particularly dates, times, year ranges, and … |
 | 9 | 22 | 0.53 | NONE:21, HARMFUL_CONTENT:1 | biblical · verse · chapter · religious | This feature activates on biblical references and citations, particularly when scripture passages (book names… |
-
-### Cross-arm cluster metrics
-
-![cluster metrics](../figures/umap_cluster_metrics.png)
-
-![safety composition](../figures/umap_safety_composition.png)
 
 ## Sentence-level case studies
 
