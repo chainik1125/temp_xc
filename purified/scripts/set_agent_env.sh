@@ -46,6 +46,7 @@ case "$agent" in
     agent_filler) expected_root="/workspace/temp_xc" ;;
     agent_synth)  expected_root="/workspace/temp_xc" ;;
     agent_hammer) expected_root="/workspace/temp_xc" ;;
+    agent_pro)    expected_root="/workspace/temp_xc" ;;
     agent_nlp|agent_back) expected_root="/workspace/temp_xc" ;;
     agent_paper)   expected_root="" ;;   # local; no expected path
     *)             expected_root="" ;;
@@ -158,6 +159,21 @@ case "$agent" in
         export AGENT_NAME=agent_hammer
         export TEMP_BENCH_POD_MODE=ephemeral
         ;;
+    # ── 7× RTX PRO 6000 probing-protocol exploration pod (Han 2026-05-06T23:18 —
+    #    spawned to rapidly identify the best probing recipe for TXC archs).
+    #    Blackwell-gen consumer pro card, 96 GB VRAM each = 672 GB total;
+    #    1320 GB system RAM, 336 CPUs. Same parallel-launch pattern as
+    #    agent_filler / agent_synth / agent_hammer: process pinned to
+    #    GPU 0 by default; spawn parallel cells via
+    #    `bash scripts/run_on_gpu.sh <0..6> -- <cmd>`.
+    #    Mission focus: 9-variant pooling/stride sweep on txc_base T=5
+    #    first, then validate across 3 seeds + extend to TXC family if a
+    #    winner emerges. See agents/agent_pro/briefing.md.
+    agent_pro)
+        export CUDA_VISIBLE_DEVICES=0
+        export AGENT_NAME=agent_pro
+        export TEMP_BENCH_POD_MODE=ephemeral
+        ;;
     agent_paper)
         export CUDA_VISIBLE_DEVICES=0
         export AGENT_NAME=agent_paper
@@ -166,7 +182,7 @@ case "$agent" in
 
     *)
         echo "unknown agent: $agent" >&2
-        echo "known: agent_paper, agent_nlp, agent_em, agent_em_h200, agent_em_100k, agent_steer, agent_steer_100k, agent_back, agent_filler, agent_synth, agent_hammer, a40_helper_gpu2, a40_helper_gpu3" >&2
+        echo "known: agent_paper, agent_nlp, agent_em, agent_em_h200, agent_em_100k, agent_steer, agent_steer_100k, agent_back, agent_filler, agent_synth, agent_hammer, agent_pro, a40_helper_gpu2, a40_helper_gpu3" >&2
         return 1 2>/dev/null || exit 1
         ;;
 esac
