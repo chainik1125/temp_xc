@@ -288,11 +288,11 @@ _BOILERPLATE = (
 )
 
 
-def _shorten_explanation(text: str, max_chars: int = 200) -> str:
-    """Strip Haiku's boilerplate prefix and only truncate if the result
-    overruns the legend column width. Default 200 chars roughly matches
-    the legend-column capacity at fontsize 6 in a 14x14 figure with the
-    heatmap rendered at aspect="equal".
+def _shorten_explanation(text: str, max_chars: int = 130) -> str:
+    """Strip Haiku's boilerplate prefix and truncate to the legend
+    column's single-line capacity at fontsize 6 in a 15x13" figure with
+    width_ratios [6.4, 8] (≈ 8" legend column). Empirically ~130 chars is
+    the longest line that fits on one row without horizontal overflow.
     """
     if not text:
         return ""
@@ -312,7 +312,7 @@ def add_interp_legend(
     feature_indices: np.ndarray,
     interpretations: dict[int, str],
     n_feat: int,
-    max_chars: int = 200,
+    max_chars: int = 130,
 ) -> None:
     """Display feature interpretations as text aligned with heatmap rows."""
     ax.set_xlim(0, 1)
@@ -542,13 +542,16 @@ def main():
 
     # ─── Plot: 2 heatmaps stacked top-to-bottom + interp legends ──────────
     # Layout: 2 rows (StackedSAE, TXCDR) × 2 cols (heatmap, interp legend).
-    # The heatmaps render with aspect="equal" so the 32×32 grid is
-    # square-celled. Numeric stats and the selection-procedure description
+    # The figsize and width_ratios are chosen so the heatmap subplot is
+    # close to square (≈6.4×6.3"); we use aspect="auto" so the heatmap
+    # fills its full subplot, which is required for the legend axis (next
+    # to it, same row, same vertical extent) to align row-for-row with
+    # the heatmap. Numeric stats and the selection-procedure description
     # live in the markdown report, not on the figure.
-    fig = plt.figure(figsize=(16, 13))
+    fig = plt.figure(figsize=(15, 13))
     gs = gridspec.GridSpec(
         2, 2,
-        width_ratios=[1, 1.4],
+        width_ratios=[6.4, 8],
         height_ratios=[1, 1],
         hspace=0.18, wspace=0.05,
     )
@@ -565,7 +568,7 @@ def main():
 
     # ─── SAE heatmap (row 0) ───────────────────────────────────────────────
     ax0 = fig.add_subplot(gs[0, 0])
-    im0 = ax0.imshow(sae_log.T, aspect="equal", cmap=args.cmap_sae,
+    im0 = ax0.imshow(sae_log.T, aspect="auto", cmap=args.cmap_sae,
                       norm=make_norm(sae_hm), interpolation="nearest")
     ax0.set_title(f"StackedSAE (T={args.T}) — {args.layer} k={args.k}", fontsize=11)
     ax0.set_xlabel("Token position")
@@ -587,7 +590,7 @@ def main():
 
     # ─── TXCDR heatmap (row 1) ─────────────────────────────────────────────
     ax1 = fig.add_subplot(gs[1, 0])
-    im1 = ax1.imshow(tx_log.T, aspect="equal", cmap=args.cmap_tx,
+    im1 = ax1.imshow(tx_log.T, aspect="auto", cmap=args.cmap_tx,
                       norm=make_norm(tx_hm), interpolation="nearest")
     ax1.set_title(f"TXCDR (T={args.T}) — {args.layer} k={args.k}", fontsize=11)
     ax1.set_xlabel("Token position")
