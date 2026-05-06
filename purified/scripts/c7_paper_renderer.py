@@ -268,6 +268,44 @@ def _judge_outputs_path(eval_key: str) -> Path:
     return run_dir(eval_key) / "judge_outputs.jsonl"
 
 
+def _judge_outputs_path_for_row(r: dict) -> Path:
+    """Resolve the judge_outputs.jsonl path for a leaderboard row.
+
+    Pre-existing skew: ``runner.run_cell`` computes ``eval_key`` over the
+    full ``eval_cfg`` (including underscore-prefixed flags such as
+    ``_extended_mags``), but ``my_eval_fn`` in ``experiments/c7_backtracking/run.py``
+    strips underscore-prefixed keys before it derives the *workspace*
+    eval_key. So extended-mags rows have a leaderboard ``eval_key`` that
+    points at an empty workspace, while the actual judge file lives at a
+    different (stripped-hash) workspace. This helper tries the leaderboard
+    eval_key first, then falls back to the stripped-hash key by re-deriving
+    it the way ``my_eval_fn`` does.
+    """
+    p = _judge_outputs_path(r["eval_key"])
+    if p.exists():
+        return p
+    # Fallback: re-derive eval_key with underscore-prefixed keys stripped
+    # (matches purified/experiments/c7_backtracking/run.py:_hash_eval_cfg).
+    try:
+        from temp_bench.config import compute_eval_key
+        ec = r.get("eval_cfg", {}) or {}
+        stripped = {
+            k: v for k, v in ec.items()
+            if not k.startswith("_") and k not in (
+                "feature_mining_acts", "sentence_acts",
+                "sentence_labels", "sentence_qids",
+            )
+        }
+        alt_key = compute_eval_key(
+            train_key=r["train_key"],
+            eval_protocol_version=r.get("eval_protocol_version", "1.0.0"),
+            eval_cfg=stripped,
+        )
+        return _judge_outputs_path(alt_key)
+    except Exception:
+        return p
+
+
 def _per_qid_dgc_for_row(r: dict) -> dict[float, list[float]]:
     """Recompute per-question Δgc per magnitude for one leaderboard row,
     by reading its run_dir's judge_outputs.jsonl.
@@ -276,7 +314,7 @@ def _per_qid_dgc_for_row(r: dict) -> dict[float, list[float]]:
     gc(qid, m) - gc(qid, 0). Empty dict if judge file missing or no
     mag=0 baseline available.
     """
-    p = _judge_outputs_path(r["eval_key"])
+    p = _judge_outputs_path_for_row(r)
     if not p.exists():
         return {}
     arch = r["arch"]
@@ -341,7 +379,7 @@ def _per_qid_gc_for_row(r: dict) -> dict[float, list[float]]:
     Returns ``{magnitude: [gc(qid, m) per question]}``. No baseline
     subtraction. Empty dict if judge file missing.
     """
-    p = _judge_outputs_path(r["eval_key"])
+    p = _judge_outputs_path_for_row(r)
     if not p.exists():
         return {}
     arch = r["arch"]
