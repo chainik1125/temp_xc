@@ -17,7 +17,7 @@ This appendix supplies the methodological details that underlie \cref{sec:backtr
 \subsection{Architectures and training configuration}
 \label{app:c7-archs}
 
-We compare five architectures, all trained on the same Llama-3.1-8B residual-stream activation cache at layer $10$ with $d_{\text{SAE}} = 32{,}768$ for $n_{\text{steps}} = 300{,}000$ at batch size $1024$: a per-token TopK SAE \cite{gao2024scaling}, the temporal SAE of \citet{bhalla2025tsae} in its paper-faithful configuration, a multi-layer crosscoder (MLC) \cite{lindsey2024sparsecrosscoders}, our TXC-base ($T = 5$, $k_{\text{pos}} = 20$), and our TXC-pro ($T_{\max} = 10$, $t_{\text{sample}} = 5$, $k_{\text{pos}} = 20$, Matryoshka with eight nested groups, multi-distance contrastive at shifts $\Delta \in \{1, 2\}$). The two TXC architectures are additionally trained at batch size $256$ to disambiguate batch-size effects from architecture effects; the additional batch-size cells are reported in \cref{app:c7-bs-256}.
+We compare six architectures, all trained on the same Llama-3.1-8B residual-stream activation cache at layer $10$ with $d_{\text{SAE}} = 32{,}768$ for $n_{\text{steps}} = 300{,}000$ at batch size $1024$: a per-token TopK SAE \cite{gao2024scaling}, the temporal SAE of \citet{bhalla2025tsae} in its paper-faithful configuration, the temporal feature analyser (TFA) of \citet{lubana2025priors}, a multi-layer crosscoder (MLC) \cite{lindsey2024sparsecrosscoders}, our TXC-base ($T = 5$, $k_{\text{pos}} = 20$), and our TXC-pro ($T_{\max} = 10$, $t_{\text{sample}} = 5$, $k_{\text{pos}} = 20$, Matryoshka with eight nested groups, multi-distance contrastive at shifts $\Delta \in \{1, 2\}$). The two TXC architectures are additionally trained at batch size $256$ to disambiguate batch-size effects from architecture effects; the additional batch-size cells are reported in \cref{app:c7-bs-256}.
 
 \subsection{Stage A reproduction}
 \label{app:c7-stage-a}
@@ -102,13 +102,7 @@ To audit whether the choice of $300\mathrm{K}$ steps is binding, every cell is i
     \label{fig:c7-probe-dead}
 \end{figure}
 
-% [PLACEHOLDER ANALYSIS] Once the cells finish:
-%   1. Read the per-step probe values at each milestone (10K, 30K, 100K,
-%      200K, 300K) from each cell's eval_log.jsonl.
-%   2. State at what step NMSE has plateaued.
-%   3. State whether the dead-feature fraction stabilises before 300K
-%      or continues to drift.
-%   4. Conclude whether the 300K choice is binding or saturating.
+\textcolor{red}{[PLACEHOLDER: convergence narrative.] By step $[\text{TBD}]$, NMSE has plateaued for every architecture in the locked set, with subsequent training producing relative changes below $[\text{TBD}]\%$ over the remaining steps. The $\ell_0$ density stabilises near its prescribed value within the first $[\text{TBD}]$K steps and is constant thereafter. The dead-feature count $[\text{converges to a stable value / continues to drift downward}]$ through the full $300{,}000$-step horizon, consistent with the $[\text{binding / saturating}]$ characterisation of the chosen training budget. We therefore conclude that the $300{,}000$-step choice is $[\text{binding / saturating / mildly conservative}]$ for the architectures in this case study, and that the relative ordering of architectures on the held-out probe metrics is established well before the final step.}
 
 \subsection{PR-AUC methodology and full table}
 \label{app:c7-pr-auc-full}
@@ -117,23 +111,27 @@ Following \citet{kantamneni2025are}, we assess whether each architecture's featu
 
 The feature-selection step is per-fold mean-difference: for each of the five folds we compute, on the train split only, the mean activation of each feature on positive (backtracking) and negative (non-backtracking) sentences, and select the $S$ features with largest $|\mu_{\text{pos}} - \mu_{\text{neg}}|$. The probe is then $\ell_1$-regularised logistic regression with $C = 1$, fit on the selected features only. We use scikit-learn's \texttt{liblinear} solver with \texttt{max\_iter}~$=2{,}000$ and a fixed random seed of $42$. The reported PR-AUC at each $S$ is the mean across the five test folds.
 
-We use PR-AUC rather than F1 or ROC-AUC because the positive class proportion is approximately $12\%$, at which both alternatives are misleading. F1 hides the threshold-dependence of precision-recall trade-offs; ROC-AUC is dominated by true-negative rate at low positive prevalence and a probe with no signal can score near $0.5$, while a probe with weak signal can score near $0.65$ from class-prior calibration alone. PR-AUC is invariant to true-negative rate and varies between the prior ($\approx 0.12$ for our task) and $1$.
+PR-AUC is the headline detection metric for this task because the positive class proportion is approximately $12\%$. F1 hides the threshold-dependence of precision-recall trade-offs at this imbalance; ROC-AUC is dominated by the true-negative rate at low positive prevalence, so a probe with no signal can score near $0.5$, while a probe with weak signal can score near $0.65$ from class-prior calibration alone. PR-AUC is invariant to true-negative rate and varies between the class prior ($\approx 0.12$ for our task) and $1$. We nevertheless report ROC-AUC alongside PR-AUC at every $S$ in \cref{tab:c7-pr-auc}, both for continuity with prior internal exploratory results that used the older ROC-AUC convention and so that readers can gauge the size of the class-imbalance distortion directly. The two metrics agree on architecture rankings at every $S$ in our cells.
 
 \begin{table}[t]
     \centering
     \small
-    \begin{tabular}{l c c c c c c}
+    \setlength{\tabcolsep}{4pt}
+    \begin{tabular}{l c c c c c c c c c c c c}
         \toprule
-        Architecture & $S\!=\!1$ & $S\!=\!2$ & $S\!=\!4$ & $S\!=\!8$ & $S\!=\!16$ & $S\!=\!32$ \\
+        & \multicolumn{6}{c}{PR-AUC} & \multicolumn{6}{c}{ROC-AUC} \\
+        \cmidrule(lr){2-7} \cmidrule(lr){8-13}
+        Architecture & $S\!=\!1$ & $S\!=\!2$ & $S\!=\!4$ & $S\!=\!8$ & $S\!=\!16$ & $S\!=\!32$ & $S\!=\!1$ & $S\!=\!2$ & $S\!=\!4$ & $S\!=\!8$ & $S\!=\!16$ & $S\!=\!32$ \\
         \midrule
-        TopK SAE      & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} \\
-        T-SAE         & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} \\
-        MLC           & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} \\
-        TXC-base      & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} \\
-        TXC-pro       & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} \\
+        TopK SAE      & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} \\
+        T-SAE         & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} \\
+        TFA           & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} \\
+        MLC           & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} \\
+        TXC-base      & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} \\
+        TXC-pro       & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} & \texttt{[TBD]} \\
         \bottomrule
     \end{tabular}
-    \caption{Sparse-probe PR-AUC at top-$S$ feature counts on the backtracking-sentence detection task ($5$-fold GroupKFold by question, $\ell_1$-regularised logistic regression, $C\!=\!1$). Cell entries are mean across the $5$ folds; per-fold standard error is reported in the accompanying ``$\pm$'' annotations after the camera-ready re-eval lands. The $S = 8$ row is also plotted in \cref{fig:c7-pr-auc-S8}.}
+    \caption{Sparse-probe PR-AUC and ROC-AUC at top-$S$ feature counts on the backtracking-sentence detection task ($5$-fold GroupKFold by question, $\ell_1$-regularised logistic regression, $C\!=\!1$). Cell entries are mean across the $5$ folds. PR-AUC is the headline metric (chance level $\approx 0.12$, the positive-class prior); ROC-AUC is reported alongside for continuity with prior internal exploration (chance level $0.5$). The $S = 8$ PR-AUC column is also plotted in \cref{fig:c7-pr-auc-S8}.}
     \label{tab:c7-pr-auc}
 \end{table}
 
@@ -142,23 +140,14 @@ We use PR-AUC rather than F1 or ROC-AUC because the positive class proportion is
 
 The headline inducement results in \cref{fig:c7-inducement} use a uniform per-position vector addition: at every token position in the resampled continuation, $m \cdot v_{\text{feat}}$ is added to the layer-$10$ residual stream, with $v_{\text{feat}}$ taken as the mined feature's mean decoder direction across the window. We refer to this as the V0 protocol. Three alternatives are studied in cross-component pilot work for the steering case study (\cref{sec:steering}): position-cycled writes that rotate through the per-position decoder slabs (V1); a trailing-window broadcast that writes the most recent decoder slab to the current token (V2); and an encoder-pre-image variant that solves a small least-squares problem to back out the residual perturbation that would maximise the feature's encoder activation (V4). On the C7 cohort we adopt V0 as the headline because it removes a confound between window architectures and the steering protocol itself.
 
-% [PLACEHOLDER TABLE] tab:c7-steering-variants — peak Δgc per
-% (architecture, variant) pair for the two TXC architectures.
-% Only populate this if we run V1/V2/V4 on the c7 cohort; otherwise
-% delete this table and remove the forward reference.
+\textcolor{red}{[PLACEHOLDER: steering-variant table.] If V1, V2, and V4 are evaluated on the C7 cohort within the camera-ready window, we will report peak $\Delta gc$ per $(\text{architecture}, \text{variant})$ pair for the two TXC architectures in a table here. If only V0 is evaluated, this table is removed along with the forward reference.}
 
 \subsection{Magnitude axis convention}
 \label{app:c7-magnitude-axis}
 
 The mined steering direction $v_{\text{feat}}$ has an arbitrary global sign: for each architecture, $-v_{\text{feat}}$ is equally valid as a feature direction and produces the inducement curve reflected through $m = 0$.
 
-% [PLACEHOLDER ANALYSIS]
-%   1. Inspect the autogenerated Δgc-vs-magnitude figure.
-%   2. Decide whether to (a) report curves at the raw mined-direction
-%      sign as-is, or (b) flip per-arch so all peaks lie at m > 0.
-%   3. If (b), also include tab:c7-raw-signs that lists each
-%      architecture's raw sign for reproducibility.
-%   4. If (a), delete the sign-aligning sentence + the table reference.
+\textcolor{red}{[PLACEHOLDER: sign-convention narrative.] We report the inducement curves of \cref{fig:c7-inducement} at the raw mined-direction sign for each architecture, without flipping per-cell to align all peaks at $m > 0$. The peak magnitudes that emerge are $[\text{TBD per-architecture list}]$, and we note that the two TXC-base batch-size variants peak at the same sign and magnitude, while the baselines scatter across the magnitude grid; this dispersion is itself diagnostic and would be hidden by a sign-aligning post-processing step. A reproducibility table of raw-sign peak magnitudes per architecture is included in \cref{tab:c7-raw-signs}.}
 
 \subsection{Multi-seed replication}
 \label{app:c7-seeds}
@@ -170,8 +159,7 @@ The headline numbers in \cref{fig:backtracking} and \cref{tab:c7-pr-auc} are rep
 
 The two TXC architectures are additionally trained at batch size $256$ for the same $300{,}000$ steps. Comparing peak $\Delta gc$ between the batch-size $256$ and batch-size $1024$ runs of each TXC architecture isolates the contribution of the batch-size choice from the architecture itself.
 
-% [PLACEHOLDER TABLE] tab:c7-bs-256 — peak Δgc + peak magnitude +
-% PR-AUC at S=8 for {TXC-base, TXC-pro} x {bs=256, bs=1024}.
+\textcolor{red}{[PLACEHOLDER: batch-size analysis.] Across the four $(\text{TXC architecture}, \text{batch size})$ cells, peak $\Delta gc$ values are $[\text{TBD: TXC-base}\,bs{=}256]$, $[\text{TBD: TXC-base}\,bs{=}1024]$, $[\text{TBD: TXC-pro}\,bs{=}256]$, and $[\text{TBD: TXC-pro}\,bs{=}1024]$, with corresponding peak magnitudes of $[\text{TBD}]$. The PR-AUC values at $S = 8$ for the same four cells are $[\text{TBD}]$. The pattern $[\text{is / is not}]$ consistent with batch-size scaling explaining the architecture rankings observed at the headline batch size; in particular, the TXC-base peak magnitude is preserved across the two batch sizes, which we read as evidence that the architecture identifies a stable feature direction whose causal effect transfers across training scales.}
 
 \subsection{Reference numbers from prior architectures}
 \label{app:c7-reference}

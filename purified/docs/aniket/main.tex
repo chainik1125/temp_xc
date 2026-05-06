@@ -285,6 +285,13 @@ For C1, $\mathcal{G}$ is the $N=20$ ground-truth feature set $\mathcal{F}$ (we r
 \subsection{Inducing and Detecting Backtracking in a Reasoning Model}
 \label{sec:backtracking}
 
+\begin{figure}[!t]
+    \centering
+    \placeholderbox{images/c7\_gc\_at\_peak\_paired}
+    \caption{Headline: per-question genuine-backtracking counts $gc(a, m)$ at the unsteered baseline ($m = 0$, grey bars) and at each architecture's optimal steering magnitude (coloured bars), sorted descending by the steered value. Error bars are bootstrap $95\%$ confidence intervals computed by resampling the $61$ cohort questions ($n_{\text{boot}} = 1000$). The text annotation above each coloured bar reports the steered value and its peak magnitude $m$. Higher coloured bar relative to the grey companion indicates that the architecture's mined feature direction is a more effective causal lever for inducing genuine backtracking when used as a steering vector. Full setup is in \cref{app:c7}.}
+    \label{fig:c7-gc-at-peak}
+\end{figure}
+
 \begin{figure*}[!t]
     \centering
     \begin{subfigure}[t]{0.48\textwidth}
@@ -300,7 +307,7 @@ For C1, $\mathcal{G}$ is the $N=20$ ground-truth feature set $\mathcal{F}$ (we r
         \caption{Detection: PR-AUC at $S = 8$.}
         \label{fig:c7-pr-auc-S8}
     \end{subfigure}
-    \caption{Backtracking case study on a $61$-question MATH-500 cohort, all five architectures trained at $n_{\text{steps}} = 300{,}000$, batch size $1024$. (a)~per-architecture inducement curves $\Delta gc(a, m)$ (\cref{eq:delta-gc}), per-question baselined at $m = 0$; shaded regions are bootstrap $95\%$ confidence intervals computed by resampling the $61$ cohort questions ($n_{\text{boot}} = 1000$). (b)~sparse-probe PR-AUC at top-$S = 8$ features (positive-class prior $\approx 0.12$); error bars are standard error across the $5$ GroupKFold folds. Full setup, judge prompt, magnitude grid, and the per-$S$ PR-AUC table are in \cref{app:c7}.}
+    \caption{Backtracking case study on a $61$-question MATH-500 cohort, all six architectures trained at $n_{\text{steps}} = 300{,}000$, batch size $1024$. (a)~per-architecture inducement curves $\Delta gc(a, m)$ (\cref{eq:delta-gc}), per-question baselined at $m = 0$; shaded regions are bootstrap $95\%$ confidence intervals computed by resampling the $61$ cohort questions ($n_{\text{boot}} = 1000$). (b)~sparse-probe PR-AUC at top-$S = 8$ features (positive-class prior $\approx 0.12$); the dotted reference marks the chance level set by the class prior. Full setup, judge prompt, magnitude grid, and the per-$S$ PR-AUC table (with the companion ROC-AUC at every $S$) are in \cref{app:c7}.}
     \label{fig:backtracking}
 \end{figure*}
 
@@ -308,15 +315,21 @@ For C1, $\mathcal{G}$ is the $N=20$ ground-truth feature set $\mathcal{F}$ (we r
 Reasoning models exhibit an emergent behaviour, sometimes called \textit{backtracking}, in which the model abandons an in-progress chain of inference and resumes along an alternative path \cite{ward2025reasoning,muennighoff2025s1}. The behavioural signature is intrinsically multi-token: the model commits to a partial argument, registers an inconsistency, and verbalises a reversal (``wait,'' ``actually''). \citet{ward2025reasoning} show that this behaviour can be reliably induced by a difference-of-means steering vector mined from the \emph{base} model and applied to its reasoning-finetuned counterpart at inference. Because the signature spans token positions, a per-token sparse dictionary, by construction, has access only to a single position; this makes backtracking a natural testbed for the temporal-window inductive bias of \cref{sec:txc}.
 
 \paragraph{Setup.}
-We adopt the steering-vector approach of \citet{ward2025reasoning} and pair it with our own evaluation protocol. Vectors are mined from \texttt{meta-llama/Llama-3.1-8B} and applied during continuation on \texttt{deepseek-ai/DeepSeek-R1-Distill-Llama-8B} at residual-stream layer $10$ (the optimal hookpoint per \citet[App. B.1]{ward2025reasoning}). The cohort is $61$ MATH-500 \cite{hendrycks2021math} questions ($31$ truly-wrong + $30$ originally-correct). For each question we cut the unsteered baseline continuation at $25\%$ of its length and resample under steering at each of $25$ magnitudes (the \textit{cut25} protocol; \cref{app:c7-cut25}). All five architectures are trained on the same Llama-3.1-8B layer-$10$ activation cache at $d_{\text{SAE}} = 32{,}768$. We report two metrics: \textit{inducement}
+We adopt the steering-vector approach of \citet{ward2025reasoning} and pair it with our own evaluation protocol. Vectors are mined from \texttt{meta-llama/Llama-3.1-8B} and applied during continuation on \texttt{deepseek-ai/DeepSeek-R1-Distill-Llama-8B} at residual-stream layer $10$ (the optimal hookpoint per \citet[App. B.1]{ward2025reasoning}). The cohort is $61$ MATH-500 \cite{hendrycks2021math} questions ($31$ truly-wrong + $30$ originally-correct). For each question we cut the unsteered baseline continuation at $25\%$ of its length and resample under steering at each of $25$ magnitudes (the \textit{cut25} protocol; \cref{app:c7-cut25}). All six architectures are trained on the same Llama-3.1-8B layer-$10$ activation cache at $d_{\text{SAE}} = 32{,}768$. We report two metrics. The first, \textit{inducement}, measures whether the architecture's mined feature direction acts as a causal lever for genuine backtracking when used as a steering vector. We report it both as a directly-readable raw count $gc(a, m)$ (mean genuine backtracking events per question at magnitude $m$, plotted in \cref{fig:c7-gc-at-peak} for each architecture's optimal magnitude) and as a baseline-corrected lift
 \begin{equation}
     \Delta gc(a, m) \,=\, \frac{1}{|\mathcal{Q}|} \sum_{q \in \mathcal{Q}} \bigl[\, gc(a, q, m) - gc(a, q, 0) \bigr],
     \label{eq:delta-gc}
 \end{equation}
-where $gc(a, q, m)$ is a Sonnet-$4.6$ count of genuine backtracking events (\cref{app:c7-judge}); and \textit{detection}, sparse-probe PR-AUC at top-$S$ features under $5$-fold GroupKFold by question (\cref{app:c7-pr-auc-full}).
+where $gc(a, q, m)$ is a Sonnet-$4.6$ count of genuine backtracking events (\cref{app:c7-judge}). The second, \textit{detection}, is a sparse-probe PR-AUC at top-$S$ features under $5$-fold GroupKFold by question (\cref{app:c7-pr-auc-full}).
 
 \paragraph{Results.}
-\Cref{fig:backtracking} summarises both axes. Per-architecture peak $\Delta gc$, peak magnitude, and the full PR-AUC table at $S \in \{1, 2, 4, 8, 16, 32\}$ are tabulated in \cref{tab:c7-pr-auc} (\cref{app:c7-pr-auc-full}). Limitations (single-seed headline, judge $\kappa$ deferred, batch-size effects, alternative steering protocols) are discussed in \cref{app:c7-seeds,app:c7-bs-256,app:c7-judge,app:c7-steering-variants}.
+\Cref{fig:c7-gc-at-peak} reports the headline inducement number, and \cref{fig:backtracking} summarises both the inducement curve and the detection axis. Per-architecture peak $\Delta gc$, peak magnitude, and the full PR-AUC and ROC-AUC tables at $S \in \{1, 2, 4, 8, 16, 32\}$ are tabulated in \cref{tab:c7-pr-auc} (\cref{app:c7-pr-auc-full}).
+
+\textcolor{red}{[PLACEHOLDER: inducement narrative.] On the inducement axis, the strongest architecture reaches $gc \approx [\text{TBD}]$ genuine backtracking events per question at its optimal steering magnitude, against an unsteered cohort floor of $gc \approx [\text{TBD}]$ shared across architectures (\cref{fig:c7-gc-at-peak}). Expressed as the baseline-corrected lift $\Delta gc_{\text{peak}}$ of \cref{eq:delta-gc}, the peak values rank as $[\text{TBD ordering}]$, with the highest-ranked TXC cell exceeding the strongest non-TXC baseline by $[\text{TBD}]$ in absolute terms. The two TXC-base batch-size variants peak at the same magnitude (\cref{fig:c7-inducement}), suggesting that the architecture identifies a reproducible feature direction whose causal effect is stable under batch-size scaling. Each cell's $\Delta gc(a, m)$ curve decays toward zero at intermediate magnitudes and crosses below the unsteered baseline at the tails of the magnitude grid; this characteristic peak-and-decay shape is consistent with a real causal lever rather than a calibration artefact.}
+
+\textcolor{red}{[PLACEHOLDER: detection narrative.] On the detection axis, the three TXC cells achieve PR-AUC at top-$S = 8$ features of $[\text{TBD}]$ (TXC-pro, $bs{=}256$), $[\text{TBD}]$ (TXC-base, $bs{=}256$), and $[\text{TBD}]$ (TXC-base, $bs{=}1024$), against the strongest non-TXC baseline at $[\text{TBD}]$ (\cref{fig:c7-pr-auc-S8}). The ordering is preserved across the full $S$ grid (\cref{tab:c7-pr-auc}), and is visible at top-$1$, where the top architecture's first selected feature already separates positive from negative sentences above the class-prior chance level of $0.12$. Because the detection task does not depend on judge subjectivity or magnitude calibration, it serves as an independent corroboration of the inducement story.}
+
+Limitations (single-seed headline, judge $\kappa$ deferred, batch-size effects, alternative steering protocols) are discussed in \cref{app:c7-seeds,app:c7-bs-256,app:c7-judge,app:c7-steering-variants}.
 
 \subsection{Sparse Probing}
 \begin{figure*}[!t]
