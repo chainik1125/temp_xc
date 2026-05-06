@@ -1,3 +1,39 @@
+## ✅ RECOVERY COMPLETE 2026-05-06 19:26Z (agent_nlp on fresh pod)
+
+- **26 checkpoints pushed** to `han1823123123/temp-bench-models` (33 GB):
+  11 txc_base, 7 topk_sae, 4 tsae_paper, 3 txc_pro, 1 tfa
+- **67 judge-transcript run dirs pushed** to `han1823123123/temp-bench-data`
+  (119 MB; brings total run dirs on HF to 120)
+- **180 leaderboard rows committed to git** (all agent_nlp; 161 C3 + 19 C4):
+  79 txc_base, 32 topk_sae, 28 tsae_paper, 27 txc_pro, 14 tfa
+- **43 checkpoint config.json + 16 trainlog.json** committed for provenance
+- **act_cache (1×, 13.21 GB)** + **probe_cache (1×, 19.58 GB)** verified
+  already on HF — no push needed
+
+Final verification: 0 local-only manifest rows with on-disk safetensors
+remaining. Spot-check of 3 random recovered checkpoints confirms files
+present on HF. Recovery commit: `eaa75a10`.
+
+Pre-existing pod environment: the volume's `.venv` symlinks pointed to
+a stale CPython binary path that didn't survive the pod swap. Rebuilt
+via `uv sync`. Token store + persistent volume both attached cleanly.
+
+Two incidents during recovery, both resolved before commit:
+1. Initial JSONL dedup keyed on the wrong field (collapsed eval rows
+   sharing a train_key). Reverted via `git checkout HEAD --` and re-ran
+   with the correct key field per file.
+2. `git add purified/results/` started packing the gitignore-uncovered
+   `purified/results/probe_cache/` (19.58 GB of .npy). Killed the
+   process, GC'd the dangling objects, and re-staged surgically with
+   explicit subpaths that exclude probe_cache. **Open question for
+   Han**: should `purified/results/probe_cache/` be added to .gitignore
+   to prevent this trap from snaring future agents?
+
+This document can be archived (move to `docs/` or delete) once Han
+confirms the paper-bound results are intact.
+
+---
+
 # 🚨 URGENT — HF sync recovery procedure (post-RunPod-explosion 2026-05-06)
 
 **Context**: 4 agents (`agent_nlp`, `agent_em`, `agent_steer`, `agent_back`)
