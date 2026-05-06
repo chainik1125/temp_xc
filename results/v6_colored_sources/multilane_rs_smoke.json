@@ -1,0 +1,172 @@
+{
+  "stage_label": "multilane_rs_smoke",
+  "config": {
+    "h": 1,
+    "q": 11,
+    "m": 32,
+    "d": 512,
+    "sigma": 0.1,
+    "n_seq": 4096,
+    "T_chain": 8,
+    "seed": 0
+  },
+  "H_txc": 4096,
+  "H_sae": 1024,
+  "n_steps": 4000,
+  "batch_size": 64,
+  "lr": 0.001,
+  "W_grid": [
+    1,
+    2,
+    3,
+    4
+  ],
+  "device": "cuda",
+  "elapsed_seconds": 483.80065965652466,
+  "cells": [
+    {
+      "W": 1,
+      "noise_floor_mse_per_token": 5.120000000000001,
+      "local_alphabet_lb_signal_err": {
+        "k_eq_m": 0.0,
+        "k_eq_m_times_W": 0.0
+      },
+      "sae_k1": {
+        "k_pos": 1,
+        "k_total_window_equivalent": 1,
+        "recon_mse_per_token": 5.75485400390625,
+        "signal_excess_err": 0.6348540039062494,
+        "probe_val_acc": 0.12825000286102295
+      },
+      "sae_k32": {
+        "k_pos": 32,
+        "k_total_window_equivalent": 32,
+        "recon_mse_per_token": 4.019063232421875,
+        "signal_excess_err": 0.0,
+        "probe_val_acc": 0.16875000298023224
+      },
+      "txc_k32": {
+        "k_window": 32,
+        "recon_mse_per_token": 3.184284423828125,
+        "signal_excess_err": 0.0,
+        "rec_temp_lane": 0.03207876905798912,
+        "probe_val_acc": 0.3005000054836273,
+        "n_atoms_total": 3872
+      }
+    },
+    {
+      "W": 2,
+      "noise_floor_mse_per_token": 5.120000000000001,
+      "local_alphabet_lb_signal_err": {
+        "k_eq_m": 0.5,
+        "k_eq_m_times_W": 0.0
+      },
+      "sae_k1": {
+        "k_pos": 1,
+        "k_total_window_equivalent": 2,
+        "recon_mse_per_token": 5.74321484375,
+        "signal_excess_err": 0.6232148437499987,
+        "probe_val_acc": 0.17400000989437103
+      },
+      "sae_k32": {
+        "k_pos": 32,
+        "k_total_window_equivalent": 64,
+        "recon_mse_per_token": 4.016493408203125,
+        "signal_excess_err": 0.0,
+        "probe_val_acc": 0.23925000429153442
+      },
+      "txc_k32": {
+        "k_window": 32,
+        "recon_mse_per_token": 4.031843627929687,
+        "signal_excess_err": 0.0,
+        "rec_temp_lane": 0.015749050304293633,
+        "probe_val_acc": 0.33000001311302185,
+        "n_atoms_total": 3872
+      },
+      "txc_k64": {
+        "k_window": 64,
+        "recon_mse_per_token": 3.3652496337890625,
+        "signal_excess_err": 0.0,
+        "rec_temp_lane": 0.01553975511342287,
+        "probe_val_acc": 0.3307500183582306,
+        "n_atoms_total": 3872
+      }
+    },
+    {
+      "W": 3,
+      "noise_floor_mse_per_token": 5.120000000000001,
+      "local_alphabet_lb_signal_err": {
+        "k_eq_m": 0.6666666666666667,
+        "k_eq_m_times_W": 0.0
+      },
+      "sae_k1": {
+        "k_pos": 1,
+        "k_total_window_equivalent": 3,
+        "recon_mse_per_token": 5.742076171875,
+        "signal_excess_err": 0.6220761718749994,
+        "probe_val_acc": 0.23350000381469727
+      },
+      "sae_k32": {
+        "k_pos": 32,
+        "k_total_window_equivalent": 96,
+        "recon_mse_per_token": 4.030638997395833,
+        "signal_excess_err": 0.0,
+        "probe_val_acc": 0.3087500035762787
+      },
+      "txc_k32": {
+        "k_window": 32,
+        "recon_mse_per_token": 4.422738932291667,
+        "signal_excess_err": 0.0,
+        "rec_temp_lane": 0.01054885983467102,
+        "probe_val_acc": 0.3765000104904175,
+        "n_atoms_total": 3872
+      },
+      "txc_k96": {
+        "k_window": 96,
+        "recon_mse_per_token": 3.4750986328125,
+        "signal_excess_err": 0.0,
+        "rec_temp_lane": 0.01034298911690712,
+        "probe_val_acc": 0.41575002670288086,
+        "n_atoms_total": 3872
+      }
+    },
+    {
+      "W": 4,
+      "noise_floor_mse_per_token": 5.120000000000001,
+      "local_alphabet_lb_signal_err": {
+        "k_eq_m": 0.75,
+        "k_eq_m_times_W": 0.0
+      },
+      "sae_k1": {
+        "k_pos": 1,
+        "k_total_window_equivalent": 4,
+        "recon_mse_per_token": 5.739486083984375,
+        "signal_excess_err": 0.6194860839843743,
+        "probe_val_acc": 0.3165000081062317
+      },
+      "sae_k32": {
+        "k_pos": 32,
+        "k_total_window_equivalent": 128,
+        "recon_mse_per_token": 4.0235029296875,
+        "signal_excess_err": 0.0,
+        "probe_val_acc": 0.42775002121925354
+      },
+      "txc_k32": {
+        "k_window": 32,
+        "recon_mse_per_token": 4.634454345703125,
+        "signal_excess_err": 0.0,
+        "rec_temp_lane": 0.008448024280369282,
+        "probe_val_acc": 0.4375000298023224,
+        "n_atoms_total": 3872
+      },
+      "txc_k128": {
+        "k_window": 128,
+        "recon_mse_per_token": 3.4757626953125,
+        "signal_excess_err": 0.0,
+        "rec_temp_lane": 0.007760444190353155,
+        "probe_val_acc": 0.4852500259876251,
+        "n_atoms_total": 3872
+      }
+    }
+  ]
+}
