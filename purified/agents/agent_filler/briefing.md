@@ -51,12 +51,31 @@ surface it in chat, and let Han or agent_paper land the change. Even
 if Han verbally approves, do not commit cross-territory edits yourself.
 This is non-negotiable — see PROTOCOL.md § 8 + CLAUDE.md Hard Rule #7.
 
-### ⚠️ NEW MISSION 2026-05-06 (URGENT) — C2 ρ-sweep (Effect 1 vs Effect 2 test)
+### ⚠️ ↪️ REASSIGNED 2026-05-06 PM — C2 ρ-sweep moved to agent_synth
+
+**Han 2026-05-06 PM**: spun up a new 8× 5090 pod for `agent_synth`
+dedicated to the synthetic investigation. **You don't run the ρ-sweep
+anymore** — agent_synth picks it up (their fresh pod, no context
+switching from your C2 cleanup work). Section preserved below for
+context, but **do NOT execute it**.
+
+The launcher script `experiments/c2_synthetic_coupled/run_rho_sweep.sh`
+hard-codes `AGENT_NAME=agent_synth`; running it from your pod would
+generate confusingly-tagged leaderboard rows. agent_synth's briefing
+(`agents/agent_synth/briefing.md`) is the active mandate for this
+mission.
+
+**Your remaining work**: finish the C2 T=12 high-k tail on GPU 6
+(~30-50 min ETA from your last verified state) + the HF backfill
+(~10 min). Then `status: complete`.
+
+### Original ρ-sweep directive (REASSIGNED — for context only)
 
 **Han 2026-05-06**: in response to Dmitry's concern (`origin/dmitry-synthetic:
 docs/dmitry/results/3arch_3bench_summary.md`) that TXC's win on coupled
 benches doesn't show the ρ-dependence one would expect from genuine
-temporal pattern detection. Run this **on agent_filler's spare A40s**.
+temporal pattern detection. ~~Run this **on agent_filler's spare A40s**.~~
+**[REASSIGNED to agent_synth — do not run.]**
 
 **Background — Dmitry's critique** (worth reading before launching):
 

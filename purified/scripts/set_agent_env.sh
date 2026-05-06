@@ -44,6 +44,7 @@ case "$agent" in
     agent_em_100k) expected_root="/workspace/temp_xc" ;;
     agent_steer_100k) expected_root="/workspace/temp_xc" ;;
     agent_filler) expected_root="/workspace/temp_xc" ;;
+    agent_synth)  expected_root="/workspace/temp_xc" ;;
     agent_nlp|agent_back) expected_root="/workspace/temp_xc" ;;
     agent_paper)   expected_root="" ;;   # local; no expected path
     *)             expected_root="" ;;
@@ -130,6 +131,17 @@ case "$agent" in
         export AGENT_NAME=agent_filler
         export TEMP_BENCH_POD_MODE=ephemeral
         ;;
+    # ── 8× 5090 multi-GPU synthetic-investigation pod (Han 2026-05-06).
+    #    Same parallel-launch pattern as agent_filler: process pinned to
+    #    GPU 0 by default; spawn parallel cells via
+    #    `bash scripts/run_on_gpu.sh <0..7> -- <cmd>`. Mission focus:
+    #    DC/AC ablation, Dmitry's Effect-1-vs-Effect-2 stress benches,
+    #    C2 ρ-sweep (reassigned from agent_filler).
+    agent_synth)
+        export CUDA_VISIBLE_DEVICES=0
+        export AGENT_NAME=agent_synth
+        export TEMP_BENCH_POD_MODE=ephemeral
+        ;;
     agent_paper)
         export CUDA_VISIBLE_DEVICES=0
         export AGENT_NAME=agent_paper
@@ -138,7 +150,7 @@ case "$agent" in
 
     *)
         echo "unknown agent: $agent" >&2
-        echo "known: agent_paper, agent_nlp, agent_em, agent_em_h200, agent_em_100k, agent_steer, agent_steer_100k, agent_back, agent_filler, a40_helper_gpu2, a40_helper_gpu3" >&2
+        echo "known: agent_paper, agent_nlp, agent_em, agent_em_h200, agent_em_100k, agent_steer, agent_steer_100k, agent_back, agent_filler, agent_synth, a40_helper_gpu2, a40_helper_gpu3" >&2
         return 1 2>/dev/null || exit 1
         ;;
 esac
