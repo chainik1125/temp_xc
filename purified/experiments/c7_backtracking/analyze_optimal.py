@@ -349,7 +349,112 @@ def write_tex_tables(results: list[dict], tex_dir: Path) -> None:
     log.info("[c7.analyze_optimal] wrote 2 tex snippets → %s", tex_dir)
 
 
+def write_plots(results: list[dict], plot_dir: Path) -> None:
+    """Emit two appendix figures (net-saves bar + 2x2 contingency stacked
+    bars) alongside the existing per-cell PNGs. Cell ordering matches the
+    tex tables (DEFAULT_CELLS order)."""
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    plot_dir.mkdir(parents=True, exist_ok=True)
+
+    # Reuse the renderer's per-cell color palette for visual consistency.
+    import sys
+    sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "scripts"))
+    try:
+        from c7_paper_renderer import cell_color
+    except ImportError:
+        # Fallback if scripts/ not on path.
+        def cell_color(arch: str, bs: int | None) -> str:
+            base = {
+                "txc_pro": "#d68f00", "txc_base": "#5a3fa0",
+                "topk_sae": "#3b73d6", "tsae_paper": "#2ca02c",
+                "mlc": "#d62728",
+            }
+            return base.get(arch, "#888888")
+
+    if not results:
+        return
+
+    labels = [
+        f"{PAPER_ARCH_LABEL.get(r['arch'], r['arch'])}\n($bs{{=}}{r['bs']}$)"
+        for r in results
+    ]
+    colors = [cell_color(r["arch"], r["bs"]) for r in results]
+    n = len(results)
+
+    # ── Plot 1: net-saves bar chart ───────────────────────────────────
+    delta_corr = [r["delta_net_corr"] for r in results]
+    fig, ax = plt.subplots(figsize=(max(6.5, 0.95 * n + 1.5), 4.2))
+    bars = ax.bar(range(n), delta_corr, color=colors, alpha=0.92,
+                  edgecolor="#222", linewidth=0.6)
+    ax.axhline(0, color="#555", linewidth=0.8, linestyle="-")
+    # Annotate each bar with its value.
+    y_max = max(delta_corr) if delta_corr else 1
+    y_min = min(delta_corr) if delta_corr else -1
+    headroom = 0.08 * (y_max - y_min if y_max != y_min else max(abs(y_max), 1))
+    for b, v in zip(bars, delta_corr):
+        offset = headroom if v >= 0 else -headroom
+        va = "bottom" if v >= 0 else "top"
+        ax.text(b.get_x() + b.get_width() / 2, v + offset,
+                f"{v:+d}", ha="center", va=va, fontsize=10,
+                color="#222", fontweight="bold")
+    ax.set_xticks(range(n))
+    ax.set_xticklabels(labels, fontsize=9.5)
+    ax.set_ylabel(r"$\Delta_{\mathrm{net}}^{\mathrm{corr}}$ "
+                  "(rescues − regressions, baseline-corrected)")
+    ax.set_ylim(y_min - 2 * abs(headroom), y_max + 2 * abs(headroom))
+    ax.spines["top"].set_visible(False)
+    ax.spines["right"].set_visible(False)
+    fig.tight_layout()
+    fig.savefig(plot_dir / "net_saves_bar.png", dpi=150,
+                bbox_inches="tight")
+    plt.close(fig)
+
+    # ── Plot 2: 2x2 contingency stacked horizontal bars ───────────────
+    # Order from "best" (coh+bt) to "worst" (inc+no-bt) so the desired
+    # mode reads left-first.
+    seg_keys = ["coh_bt", "coh_nobt", "inc_bt", "inc_nobt"]
+    seg_labels = [
+        "coh + bt (causal lever fired cleanly)",
+        "coh + no-bt (steering didn't induce bt)",
+        "inc + bt (bt induced but generation incoherent)",
+        "inc + no-bt (steering broke the generation)",
+    ]
+    seg_colors = ["#1f9e58", "#a4d4b6", "#e89146", "#c33"]
+    fig, ax = plt.subplots(figsize=(9.2, max(3.2, 0.55 * n + 1.4)))
+    y = list(range(n))
+    left = [0.0] * n
+    for k, lab, col in zip(seg_keys, seg_labels, seg_colors):
+        widths = [r[k] for r in results]
+        bars = ax.barh(y, widths, left=left, color=col,
+                       edgecolor="#222", linewidth=0.5, label=lab)
+        # Annotate each segment > 1 with its count, centered.
+        for yi, w, l in zip(y, widths, left):
+            if w >= 2:
+                ax.text(l + w / 2, yi, str(w),
+                        ha="center", va="center", fontsize=9,
+                        color="white" if col in ("#c33", "#1f9e58") else "#222",
+                        fontweight="bold")
+        left = [a + b for a, b in zip(left, widths)]
+    ax.set_yticks(y)
+    ax.set_yticklabels(labels, fontsize=9.5)
+    ax.invert_yaxis()  # first cell on top
+    ax.set_xlabel("count of cohort questions ($n = 61$ per cell)")
+    ax.set_xlim(0, max(left) * 1.02)
+    ax.spines["top"].set_visible(False)
+    ax.spines["right"].set_visible(False)
+    ax.legend(loc="lower center", bbox_to_anchor=(0.5, -0.32),
+              ncol=2, fontsize=8.5, frameon=False)
+    fig.tight_layout()
+    fig.savefig(plot_dir / "contingency_stacked.png", dpi=150,
+                bbox_inches="tight")
+    plt.close(fig)
+    log.info("[c7.analyze_optimal] wrote 2 plots → %s", plot_dir)
+
+
 def main(*, output: Path, tex_output_dir: Path | None = None,
+         plot_output_dir: Path | None = None,
          cells: list[tuple[str, int, int, int]] | None = None
          ) -> int:
     logging.basicConfig(level=logging.INFO,
@@ -367,6 +472,8 @@ def main(*, output: Path, tex_output_dir: Path | None = None,
     write_markdown(results, output)
     if tex_output_dir is not None and results:
         write_tex_tables(results, tex_output_dir)
+    if plot_output_dir is not None and results:
+        write_plots(results, plot_output_dir)
     return 0
 
 
@@ -376,9 +483,16 @@ def cli():
     ap.add_argument("--tex-output-dir", type=Path, default=None,
                     help="If set, also emit tex table snippets (net-saves + "
                          "contingency) into this directory.")
+    ap.add_argument("--plot-output-dir", type=Path, default=None,
+                    help="If set, also emit two appendix plots "
+                         "(net_saves_bar.png + contingency_stacked.png) into "
+                         "this directory. Pass the c7_paper_assets/ dir so "
+                         "the c7_paper_loop's sync step picks them up and "
+                         "copies them to figs/c7_*.png.")
     args = ap.parse_args()
     raise SystemExit(main(output=args.output,
-                          tex_output_dir=args.tex_output_dir))
+                          tex_output_dir=args.tex_output_dir,
+                          plot_output_dir=args.plot_output_dir))
 
 
 if __name__ == "__main__":

@@ -74,7 +74,8 @@ maybe_run_analyze_optimal() {
     log "all 7 cells through optimal-mag → running analyze_optimal.py"
     .venv/bin/python -m experiments.c7_backtracking.analyze_optimal \
         --output "$ANALYZE_OUT" \
-        --tex-output-dir "$PAPER_FIGS_DIR" 2>&1 | sed 's/^/  /' || {
+        --tex-output-dir "$PAPER_FIGS_DIR" \
+        --plot-output-dir "$ASSETS_DIR" 2>&1 | sed 's/^/  /' || {
             log "analyze_optimal FAILED — will retry next tick"
             return 1
         }
