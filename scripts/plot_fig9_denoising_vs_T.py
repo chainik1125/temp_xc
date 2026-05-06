@@ -63,8 +63,20 @@ def main() -> None:
     for ax, model in zip(axes, models):
         sub = df[df["model"] == model]
         for k, g in sub.groupby("k"):
-            g = g.sort_values("T")
-            ax.plot(g["T"], g[ratio_col], marker="o", label=f"k={k}")
+            # Aggregate across seeds; if n_seeds == 1, std is NaN and the
+            # errorbar collapses to a marker. mean/std are computed per T.
+            agg = (
+                g.groupby("T")[ratio_col]
+                .agg(["mean", "std", "count"])
+                .reset_index()
+                .sort_values("T")
+            )
+            yerr = agg["std"].fillna(0.0)
+            ax.errorbar(
+                agg["T"], agg["mean"], yerr=yerr,
+                marker="o", capsize=3,
+                label=f"k={k}" + (f" (n={int(agg['count'].max())})" if agg["count"].max() > 1 else ""),
+            )
         ax.axhline(1.0, color="lightgrey", linestyle=":", label="full denoising (ratio=1)")
         ax.axhline(PER_TOKEN_FLOOR, color="grey", linestyle="--", label=f"per-token floor ({PER_TOKEN_FLOOR})")
         ax.set_title(MODEL_LABELS.get(model, model))

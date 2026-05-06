@@ -56,12 +56,13 @@ def run(
     data_cfg: DataConfig,
     output_dir: str,
     n_eval_sequences: int = 200,
+    n_seeds: int = 1,
 ) -> list[dict]:
     device = get_device()
     pipeline = DataPipeline(data_cfg, device=device)
 
-    combos = list(product(models, T_values, k_values))
-    print(f"HMM denoising sweep: {len(combos)} cells")
+    combos = list(product(models, T_values, k_values, range(n_seeds)))
+    print(f"HMM denoising sweep: {len(combos)} cells (n_seeds={n_seeds})")
     print(f"Device: {device}")
     print(
         f"Data: n_features={data_cfg.n_features}, d_model={data_cfg.d_model}, "
@@ -75,14 +76,15 @@ def run(
     tmp_path = out_path + ".tmp"
 
     results = []
-    for model_name, T, k in combos:
+    for model_name, T, k, seed_idx in combos:
         if _should_skip(model_name, k, T, data_cfg.n_features):
             continue
-        set_seed(train_cfg.seed)
-        print(f"\n--- {model_name} | T={T} | k={k} ---")
+        seed = train_cfg.seed + seed_idx
+        set_seed(seed)
+        print(f"\n--- {model_name} | T={T} | k={k} | seed={seed} ---")
 
         eval_x, eval_s, eval_h = pipeline.eval_data_with_support(
-            n_sequences=n_eval_sequences, T=T, rho=0.0, seed=9999
+            n_sequences=n_eval_sequences, T=T, rho=0.0, seed=9999 + seed_idx
         )
 
         def data_fn(batch_size: int, _T=T) -> torch.Tensor:
@@ -127,7 +129,7 @@ def run(
                 "model": model_name,
                 "T": T,
                 "k": k,
-                "seed": train_cfg.seed,
+                "seed": seed,
                 "nmse": final.nmse,
                 "l0": final.l0,
                 "auc": final.auc,
@@ -174,6 +176,10 @@ def main() -> None:
     )
     parser.add_argument("--n-eval-sequences", type=int, default=200)
     parser.add_argument(
+        "--n-seeds", type=int, default=1,
+        help="Number of seeds per (model, T, k) cell; uses train seeds [seed, seed+1, ..., seed+n_seeds-1].",
+    )
+    parser.add_argument(
         "--models", nargs="+", default=DEFAULT_MODELS,
         help="Subset of models to run. Useful for adding a new arch to existing results.",
     )
@@ -204,6 +210,7 @@ def main() -> None:
         data_cfg=data_cfg,
         output_dir=args.output_dir,
         n_eval_sequences=args.n_eval_sequences,
+        n_seeds=args.n_seeds,
     )
 
 
