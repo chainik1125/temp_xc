@@ -1418,6 +1418,35 @@ chronologically for git provenance.
    missing. Fix needs `_is_valid_cell` patched to skip TFA at
    k_pos ≥ 10. Agent_paper's territory (driver in
    `experiments/c1_synthetic_topk/run.py` was landed by them).
+4. **CRITICAL: BASE C3 `txc_base` T-override eval is broken.**
+   `experiments/c3_probing_base/run.py:my_eval_fn:130` (agent_steer_100k's
+   driver) crashes at T=10 eval:
+   ```
+   RuntimeError: Error(s) in loading state_dict for TXCBase:
+     size mismatch for W_enc: shape [5, 2304, 18432] from checkpoint
+     vs current [10, 2304, 18432]
+   ```
+   The eval_fn instantiates a T=10 model (matching the override) but
+   loads the T=5 checkpoint's state_dict. Bug = T-override path doesn't
+   thread the right state. Affects all T=10 + T=20 evals on txc_base
+   for BASE C3.
+   **Impact:**
+   - T=5 cells: ✅ Done (6 rows in leaderboard from earlier T=5 work).
+   - T=10 cells: training works (checkpoints saved + HF-pushed) but
+     eval crashes the proc.
+   - T=20 cells: same — training will work, eval will crash.
+   **Status:** seed=42 already crashed; seeds 1+2 will hit the same
+   bug shortly. I'm letting their T=10 trainings finish (so the
+   checkpoints land on HF for re-eval after the fix), but they'll
+   crash at eval and not advance to T=20.
+   **Fix needed:** agent_steer_100k's driver `my_eval_fn` must use the
+   freshly-trained state_dict (from train_fn's return) for the
+   T-override cells, not the cached T=5 state. Likely involves making
+   sure the runner's pipeline threads the per-cell state_dict to the
+   eval correctly when arch_hparams_override changes the model shape.
+   After fix, re-eval the cached T=10 + T=20 checkpoints with
+   `--force-eval`.
+   This is **agent_steer_100k's territory** — surfacing to them.
 
 (Surface either as a comment if you want me to take action; otherwise
 I'll leave them as-is.)
