@@ -61,22 +61,22 @@
       "n_atoms": 961,
       "txc_final_loss": 0.6209542155265808,
       "sae_k2_window_probe": {
-        "train_accuracy": 0.049416664987802505,
-        "val_accuracy": 0.03550000116229057,
+        "train_accuracy": 0.05037499964237213,
+        "val_accuracy": 0.032999999821186066,
         "chance": 0.03225806451612903,
         "n_train": 24000,
         "n_val": 6000
       },
       "sae_k5_window_probe": {
-        "train_accuracy": 0.05237499997019768,
-        "val_accuracy": 0.038333334028720856,
+        "train_accuracy": 0.050208333879709244,
+        "val_accuracy": 0.03983333334326744,
         "chance": 0.03225806451612903,
         "n_train": 24000,
         "n_val": 6000
       },
       "sae_k10_window_probe": {
-        "train_accuracy": 0.048624999821186066,
-        "val_accuracy": 0.0403333343565464,
+        "train_accuracy": 0.0507916659116745,
+        "val_accuracy": 0.04233333468437195,
         "chance": 0.03225806451612903,
         "n_train": 24000,
         "n_val": 6000
@@ -134,60 +134,102 @@
       "n_atoms": 961,
       "txc_final_loss": 1.0055705308914185,
       "sae_k2_window_probe": {
-        "train_accuracy": 0.11666666716337204,
-        "val_accuracy": 0.08799999952316284,
+        "train_accuracy": 0.10662499815225601,
+        "val_accuracy": 0.07566666603088379,
         "chance": 0.03225806451612903,
         "n_train": 24000,
         "n_val": 6000
       },
       "sae_k5_window_probe": {
-        "train_accuracy": 0.10745833069086075,
-        "val_accuracy": 0.08416666835546494,
+        "train_accuracy": 0.1042499989271164,
+        "val_accuracy": 0.08500000089406967,
         "chance": 0.03225806451612903,
         "n_train": 24000,
         "n_val": 6000
       },
       "sae_k10_window_probe": {
-        "train_accuracy": 0.09962499886751175,
-        "val_accuracy": 0.0793333351612091,
+        "train_accuracy": 0.09566666930913925,
+        "val_accuracy": 0.07733333110809326,
         "chance": 0.03225806451612903,
         "n_train": 24000,
         "n_val": 6000
       },
       "tfa_probe": {
         "train_accuracy": 0.04924999922513962,
-        "val_accuracy": 0.04183333367109299,
+        "val_accuracy": 0.04349999874830246,
         "chance": 0.03225806451612903,
         "n_train": 24000,
         "n_val": 6000
       },
       "txc_k2_probe": {
-        "train_accuracy": 0.11741666495800018,
-        "val_accuracy": 0.09266666322946548,
+        "train_accuracy": 0.12041666358709335,
+        "val_accuracy": 0.09699999541044235,
         "chance": 0.03225806451612903,
         "n_train": 24000,
         "n_val": 6000
       },
-      "txc_k2_rec_local": 0.9568840265274048,
-      "txc_k2_rec_temp": 0.4833369255065918,
+      "txc_k2_rec_local": 0.9574168920516968,
+      "txc_k2_rec_temp": 0.4841234087944031,
       "txc_k5_probe": {
-        "train_accuracy": 0.16862499713897705,
-        "val_accuracy": 0.09983333200216293,
+        "train_accuracy": 0.16879166662693024,
+        "val_accuracy": 0.09933333098888397,
         "chance": 0.03225806451612903,
         "n_train": 24000,
         "n_val": 6000
       },
-      "txc_k5_rec_local": 0.9735212326049805,
-      "txc_k5_rec_temp": 0.4884825348854065,
+      "txc_k5_rec_local": 0.9693194031715393,
+      "txc_k5_rec_temp": 0.48837488889694214,
       "txc_k10_probe": {
-        "train_accuracy": 0.19716666638851166,
-        "val_accuracy": 0.10783333331346512,
+        "train_accuracy": 0.18595832586288452,
+        "val_accuracy": 0.10499999672174454,
         "chance": 0.03225806451612903,
         "n_train": 24000,
         "n_val": 6000
       },
-      "txc_k10_rec_local": 0.9664467573165894,
-      "txc_k10_rec_temp": 0.4898473024368286
+      "txc_k10_rec_local": 0.9527972936630249,
+      "txc_k10_rec_temp": 0.4668324589729309,
+      "tsae_k1_probe": {
+        "train_accuracy": 0.047083333134651184,
+        "val_accuracy": 0.04349999874830246,
+        "chance": 0.03225806451612903,
+        "n_train": 24000,
+        "n_val": 6000
+      },
+      "tfa_k1_probe": {
+        "train_accuracy": 0.03683333471417427,
+        "val_accuracy": 0.03283333405852318,
+        "chance": 0.03225806451612903,
+        "n_train": 24000,
+        "n_val": 6000
+      },
+      "tsae_k2_probe": {
+        "train_accuracy": 0.0455833338201046,
+        "val_accuracy": 0.03500000014901161,
+        "chance": 0.03225806451612903,
+        "n_train": 24000,
+        "n_val": 6000
+      },
+      "tfa_k2_probe": {
+        "train_accuracy": 0.04724999889731407,
+        "val_accuracy": 0.04333333298563957,
+        "chance": 0.03225806451612903,
+        "n_train": 24000,
+        "n_val": 6000
+      },
+      "tsae_k5_probe": {
+        "train_accuracy": 0.05529166758060455,
+        "val_accuracy": 0.04833333194255829,
+        "chance": 0.03225806451612903,
+        "n_train": 24000,
+        "n_val": 6000
+      },
+      "tfa_k5_probe": {
+        "train_accuracy": 0.038624998182058334,
+        "val_accuracy": 0.03733333200216293,
+        "chance": 0.03225806451612903,
+        "n_train": 24000,
+        "n_val": 6000
+      }
     },
     {
       "W": 3,
@@ -231,60 +273,102 @@
       "n_atoms": 961,
       "txc_final_loss": 1.0340352058410645,
       "sae_k2_window_probe": {
-        "train_accuracy": 0.16716666519641876,
-        "val_accuracy": 0.1391666680574417,
+        "train_accuracy": 0.1784166693687439,
+        "val_accuracy": 0.14916665852069855,
         "chance": 0.03225806451612903,
         "n_train": 24000,
         "n_val": 6000
       },
       "sae_k5_window_probe": {
-        "train_accuracy": 0.16249999403953552,
-        "val_accuracy": 0.1263333261013031,
+        "train_accuracy": 0.1601666659116745,
+        "val_accuracy": 0.12266666442155838,
         "chance": 0.03225806451612903,
         "n_train": 24000,
         "n_val": 6000
       },
       "sae_k10_window_probe": {
-        "train_accuracy": 0.14229166507720947,
-        "val_accuracy": 0.11783333122730255,
+        "train_accuracy": 0.14758333563804626,
+        "val_accuracy": 0.12449999898672104,
         "chance": 0.03225806451612903,
         "n_train": 24000,
         "n_val": 6000
       },
       "tfa_probe": {
-        "train_accuracy": 0.0533749982714653,
-        "val_accuracy": 0.04600000008940697,
+        "train_accuracy": 0.05362499877810478,
+        "val_accuracy": 0.04466666653752327,
         "chance": 0.03225806451612903,
         "n_train": 24000,
         "n_val": 6000
       },
       "txc_k2_probe": {
-        "train_accuracy": 0.5901666879653931,
-        "val_accuracy": 0.565833330154419,
+        "train_accuracy": 0.5008333325386047,
+        "val_accuracy": 0.4791666567325592,
         "chance": 0.03225806451612903,
         "n_train": 24000,
         "n_val": 6000
       },
-      "txc_k2_rec_local": 0.9194046258926392,
-      "txc_k2_rec_temp": 0.5166658759117126,
+      "txc_k2_rec_local": 0.9326549172401428,
+      "txc_k2_rec_temp": 0.4817330539226532,
       "txc_k5_probe": {
-        "train_accuracy": 0.21549999713897705,
-        "val_accuracy": 0.15916666388511658,
+        "train_accuracy": 0.21579165756702423,
+        "val_accuracy": 0.16216666996479034,
         "chance": 0.03225806451612903,
         "n_train": 24000,
         "n_val": 6000
       },
-      "txc_k5_rec_local": 0.9751494526863098,
-      "txc_k5_rec_temp": 0.3314204812049866,
+      "txc_k5_rec_local": 0.9705256223678589,
+      "txc_k5_rec_temp": 0.330196350812912,
       "txc_k10_probe": {
-        "train_accuracy": 0.23770833015441895,
-        "val_accuracy": 0.15449999272823334,
+        "train_accuracy": 0.23991666734218597,
+        "val_accuracy": 0.1536666601896286,
         "chance": 0.03225806451612903,
         "n_train": 24000,
         "n_val": 6000
       },
-      "txc_k10_rec_local": 0.9842703342437744,
-      "txc_k10_rec_temp": 0.33375194668769836
+      "txc_k10_rec_local": 0.9738204479217529,
+      "txc_k10_rec_temp": 0.33176761865615845,
+      "tsae_k1_probe": {
+        "train_accuracy": 0.05191666632890701,
+        "val_accuracy": 0.04383333399891853,
+        "chance": 0.03225806451612903,
+        "n_train": 24000,
+        "n_val": 6000
+      },
+      "tfa_k1_probe": {
+        "train_accuracy": 0.04908333346247673,
+        "val_accuracy": 0.0416666679084301,
+        "chance": 0.03225806451612903,
+        "n_train": 24000,
+        "n_val": 6000
+      },
+      "tsae_k2_probe": {
+        "train_accuracy": 0.05145833268761635,
+        "val_accuracy": 0.045666664838790894,
+        "chance": 0.03225806451612903,
+        "n_train": 24000,
+        "n_val": 6000
+      },
+      "tfa_k2_probe": {
+        "train_accuracy": 0.06224999949336052,
+        "val_accuracy": 0.05350000038743019,
+        "chance": 0.03225806451612903,
+        "n_train": 24000,
+        "n_val": 6000
+      },
+      "tsae_k5_probe": {
+        "train_accuracy": 0.06054166704416275,
+        "val_accuracy": 0.05316666513681412,
+        "chance": 0.03225806451612903,
+        "n_train": 24000,
+        "n_val": 6000
+      },
+      "tfa_k5_probe": {
+        "train_accuracy": 0.06666666269302368,
+        "val_accuracy": 0.05416666716337204,
+        "chance": 0.03225806451612903,
+        "n_train": 24000,
+        "n_val": 6000
+      }
     },
     {
       "W": 4,
@@ -328,66 +412,108 @@
       "n_atoms": 961,
       "txc_final_loss": 0.9543200731277466,
       "sae_k2_window_probe": {
-        "train_accuracy": 0.2277500033378601,
-        "val_accuracy": 0.1901666671037674,
+        "train_accuracy": 0.21408332884311676,
+        "val_accuracy": 0.17166666686534882,
         "chance": 0.03225806451612903,
         "n_train": 24000,
         "n_val": 6000
       },
       "sae_k5_window_probe": {
-        "train_accuracy": 0.22100000083446503,
-        "val_accuracy": 0.1679999977350235,
+        "train_accuracy": 0.2175000011920929,
+        "val_accuracy": 0.16233332455158234,
         "chance": 0.03225806451612903,
         "n_train": 24000,
         "n_val": 6000
       },
       "sae_k10_window_probe": {
-        "train_accuracy": 0.19966666400432587,
-        "val_accuracy": 0.15583333373069763,
+        "train_accuracy": 0.19245833158493042,
+        "val_accuracy": 0.15066666901111603,
         "chance": 0.03225806451612903,
         "n_train": 24000,
         "n_val": 6000
       },
       "tfa_probe": {
-        "train_accuracy": 0.042124997824430466,
-        "val_accuracy": 0.034833334386348724,
+        "train_accuracy": 0.05195833370089531,
+        "val_accuracy": 0.03816666454076767,
         "chance": 0.03225806451612903,
         "n_train": 24000,
         "n_val": 6000
       },
       "txc_k2_probe": {
-        "train_accuracy": 0.9465833306312561,
-        "val_accuracy": 0.9393333196640015,
+        "train_accuracy": 0.9304166436195374,
+        "val_accuracy": 0.9228333234786987,
         "chance": 0.03225806451612903,
         "n_train": 24000,
         "n_val": 6000
       },
-      "txc_k2_rec_local": 0.8861576318740845,
-      "txc_k2_rec_temp": 0.6429826617240906,
+      "txc_k2_rec_local": 0.8815622329711914,
+      "txc_k2_rec_temp": 0.6289136409759521,
       "txc_k5_probe": {
-        "train_accuracy": 0.3153750002384186,
-        "val_accuracy": 0.2554999887943268,
+        "train_accuracy": 0.335999995470047,
+        "val_accuracy": 0.28049999475479126,
         "chance": 0.03225806451612903,
         "n_train": 24000,
         "n_val": 6000
       },
-      "txc_k5_rec_local": 0.9613739848136902,
-      "txc_k5_rec_temp": 0.3382682204246521,
+      "txc_k5_rec_local": 0.957118034362793,
+      "txc_k5_rec_temp": 0.34301456809043884,
       "txc_k10_probe": {
-        "train_accuracy": 0.28174999356269836,
-        "val_accuracy": 0.2056666612625122,
+        "train_accuracy": 0.28049999475479126,
+        "val_accuracy": 0.20733332633972168,
         "chance": 0.03225806451612903,
         "n_train": 24000,
         "n_val": 6000
       },
-      "txc_k10_rec_local": 0.9787205457687378,
-      "txc_k10_rec_temp": 0.2515307068824768
+      "txc_k10_rec_local": 0.9776390790939331,
+      "txc_k10_rec_temp": 0.25257182121276855,
+      "tsae_k1_probe": {
+        "train_accuracy": 0.06041666492819786,
+        "val_accuracy": 0.05249999836087227,
+        "chance": 0.03225806451612903,
+        "n_train": 24000,
+        "n_val": 6000
+      },
+      "tfa_k1_probe": {
+        "train_accuracy": 0.05329166725277901,
+        "val_accuracy": 0.04149999842047691,
+        "chance": 0.03225806451612903,
+        "n_train": 24000,
+        "n_val": 6000
+      },
+      "tsae_k2_probe": {
+        "train_accuracy": 0.07441666722297668,
+        "val_accuracy": 0.0638333335518837,
+        "chance": 0.03225806451612903,
+        "n_train": 24000,
+        "n_val": 6000
+      },
+      "tfa_k2_probe": {
+        "train_accuracy": 0.05433333292603493,
+        "val_accuracy": 0.04866666719317436,
+        "chance": 0.03225806451612903,
+        "n_train": 24000,
+        "n_val": 6000
+      },
+      "tsae_k5_probe": {
+        "train_accuracy": 0.06912499666213989,
+        "val_accuracy": 0.057500001043081284,
+        "chance": 0.03225806451612903,
+        "n_train": 24000,
+        "n_val": 6000
+      },
+      "tfa_k5_probe": {
+        "train_accuracy": 0.0742916688323021,
+        "val_accuracy": 0.051500000059604645,
+        "chance": 0.03225806451612903,
+        "n_train": 24000,
+        "n_val": 6000
+      }
     }
   ],
   "sae_k_sweep_rec_local": {
-    "2": 0.8143829107284546,
-    "5": 0.7180156111717224,
-    "10": 0.5415485501289368
+    "2": 0.6868076324462891,
+    "5": 0.7703166604042053,
+    "10": 0.5126124620437622
   },
   "tfa_added": true,
   "tfa_n_steps": 3000,

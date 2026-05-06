@@ -143,6 +143,42 @@ polynomial dictionary. At `W = 6`, TXC k=2 and k=5 are roughly tied around
 `W = 6` because the atoms become more distinct and half-learned templates
 spread their alignment thinner.
 
+### TSAE / TFA per-token k-sweep at k ∈ {1, 2, 5} — none of them help
+
+We later swept the per-token TopK budget for both Bhalla TSAE and TFA to
+test whether tightening k from the paper default (20) all the way down
+to 1 would push the architecture into the polynomial-template basin.
+
+**Result: no.** Across all three stages and every `W ≥ h+1` cell, every
+k value remains at chance. Representative numbers:
+
+| | Stage 4.1 W=4 | Stage 4.2 W=5 | Stage 4.3 W=6 |
+|---|---|---|---|
+| chance `1/q` | 0.032 | 0.091 | 0.143 |
+| TSAE k=1 | 0.052 | 0.109 | 0.158 |
+| TSAE k=2 | 0.064 | 0.104 | 0.164 |
+| TSAE k=5 | 0.058 | 0.110 | 0.151 |
+| TSAE k=20 (paper) | 0.054 | 0.122 | 0.163 |
+| TFA k=1 | 0.041 | 0.101 | 0.156 |
+| TFA k=2 | 0.049 | 0.106 | 0.152 |
+| TFA k=5 | 0.052 | 0.106 | 0.166 |
+| TFA k=20 (paper) | 0.054 | 0.106 | 0.168 |
+| **TXC k_total = 2** (window-level) | **0.923** | **0.602** | **0.287** |
+
+**Why per-token k doesn't help.** TSAE/TFA's TopK budget is *per-token*,
+not *per-window*. Even at k=1 per token, each of the W positions
+activates one latent → W active latents per window. That's
+mathematically equivalent to the alphabet decomposition (one alphabet
+atom per position) — which is exactly the basin the proposal's k_total=1
+prescription is designed to *avoid*. To get TSAE/TFA into the
+polynomial-template basin you'd need a *window-level* TopK constraint
+(active across the window total), which is a different architecture.
+
+So the architectural bottleneck for the polynomial-clock task is
+specifically **TopK applied across the whole window**, not just "low
+TopK". TSAE/TFA's attention layers do nothing on their own to break
+the alphabet basin; they need the right sparsity geometry on top.
+
 ### Why high k breaks TXC: alphabet vs. polynomial decomposition
 
 Both `k_total = 1` (one polynomial atom per window) and `k_total ≥ W`
@@ -207,12 +243,15 @@ spot, k≥5 collapses to alphabet-only recovery.
 2. **TXC-global with `k_total ∈ {1, 2}` is the only architecture that
    finds the polynomial templates.** Stage 4.1 and 4.2 are the cleanest
    "TXC > SAE" empirical separations in this writeup.
-3. **TFA (and Bhalla TSAE) at `k = 20` per token stay at chance.**
-   Their per-token codes are alphabet-decomposition style and the linear
-   probe can't extract `Y` from them. This is not a flaw of the TFA
-   *architecture* — it's a consequence of the TopK budget. A TFA-style
-   model with a comparable global sparsity bottleneck would presumably
-   work; we did not test that.
+3. **TFA and Bhalla TSAE stay at chance across the full per-token k
+   sweep `k ∈ {1, 2, 5, 20}`.** Their per-token codes are
+   alphabet-decomposition style and the linear probe can't extract `Y`
+   from them, regardless of the TopK budget. Tightening k from 20 down
+   to 1 does **not** push these architectures into the
+   polynomial-template basin — because per-token TopK with k=1 still
+   produces W active latents per window. The architectural bottleneck
+   that matters is **window-level** sparsity (TXC `k_total = 1`), not
+   per-token sparsity.
 4. **The gap shrinks with polynomial degree at fixed compute.** Stage 4.3
    (h=3, 2401 atoms) shows TXC pulling ahead but only weakly because the
    atom dictionary outgrows the model's effective capacity within 3k–6k
