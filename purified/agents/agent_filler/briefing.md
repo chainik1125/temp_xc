@@ -1448,6 +1448,25 @@ Question #7.
 
 ## Next action (agent owns — overwrite)
 
+**FIRST 60 SECONDS POST-COMPACT** (do these in order, no questions
+needed; resume context fully):
+
+```bash
+cd /workspace/temp_xc/purified
+source scripts/set_agent_env.sh agent_filler
+git pull --rebase --autostash origin final         # may need GIT_AUTHOR/COMMITTER env (see below)
+git status -sb                                      # expect clean / ahead 0
+ps -eo pid,etime,cmd | grep -E "experiments.c[1235]" | grep -v grep
+nvidia-smi --query-gpu=index,memory.used,utilization.gpu --format=csv,noheader,nounits
+grep -c "agent_filler" results/leaderboard.jsonl    # was 379 non-smoke at 18:30Z May 6
+```
+
+If `git pull --rebase` complains about identity, prepend
+`GIT_AUTHOR_NAME="Han" GIT_AUTHOR_EMAIL="han@example.com"
+GIT_COMMITTER_NAME="Han" GIT_COMMITTER_EMAIL="han@example.com"`.
+For pushes use the custom credential helper (see Don't repeat —
+GitHub rejects URL-form `https://${GH_TOKEN}@…`).
+
 **Immediate (this session):**
 
 1. **Wait for c2 GPU 6 (txc_pro T=12 high-k) to complete** — last
