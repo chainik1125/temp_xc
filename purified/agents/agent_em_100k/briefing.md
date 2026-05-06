@@ -7,9 +7,9 @@ Section ownership: PROTOCOL.md § 14.
 
 ---
 agent: agent_em_100k
-last_state_update: 2026-05-05T22:30:00Z
-component: c3 (MLC baseline at L=5, decisions § 16)
-status: complete (sweep landed 22:25Z)
+last_state_update: 2026-05-06T11:15:00Z
+component: c3 (MLC baseline IT+BASE × 8 k_feats, decisions § 16 + Han 2026-05-06 expansion)
+status: complete (Mission A + Mission B both landed)
 ---
 
 ## Identity + mandate (Han owns — agents do not edit)
@@ -961,63 +961,94 @@ integrates via `canonical_train_keys()` toggle at paper-render time.
 
 ## Current state (agent owns — overwrite at every compact)
 
-**Last verified: 2026-05-05T22:30Z. C3 MLC BASELINE @ L=5 SWEEP
-COMPLETE (decisions § 16). All 6 real cells landed in
-`leaderboard.jsonl` between 21:22 and 22:25. Total wall 1h 32m
-(vs my 3.5 hr revised estimate). GPU at 0 MiB / 0% util. Caches +
-checkpoints all on HF.**
+**Last verified: 2026-05-06T11:15Z. Both Mission A (IT MLC k_feats
+expansion) and Mission B (BASE MLC parity) COMPLETE.
 
-### MLC cells landed (`agent: agent_em_100k`, `arch: mlc`)
+49 MLC cells now in leaderboard at `agent: agent_em_100k`,
+`arch: mlc`, `eval_protocol_version: 1.1.0`:
+- IT × 3 seeds × 8 k_feats = 24 cells (`gemma_2_2b_it_l11to15_fineweb_24k128`)
+- BASE × 3 seeds × 8 k_feats = 24 cells (`gemma_2_2b_base_l11to15_fineweb_24k128`)
+- + 1 smoke (IT seed=42 k=5 n_steps=200, peak_align=0.754; canonical-filtered)
 
-| seed | k=5 train_key  | k=5 mean_auc | k=20 mean_auc | mean_acc k=5 | mean_acc k=20 |
-|---:|---|---:|---:|---:|---:|
-| 42 | `c5b18a75a0db4994` | 0.852 | 0.906 | 0.796 | 0.846 |
-|  1 | `c4bad817b40f45ac` | 0.857 | 0.902 | 0.805 | 0.848 |
-|  2 | `f07bcad7d9f197d2` | 0.850 | 0.905 | 0.797 | 0.853 |
-| **mean** |  | **0.853** | **0.904** | **0.799** | **0.849** |
+GPU at 0 MiB / 0% util. All caches + checkpoints on HF.**
 
-eval_keys (k=5, k=20):
-- seed=42: `d1d5c1ac067b50e3`, `4c6d4b4c3b567356`
-- seed=1:  `001cfb73ad9e6d91`, `4995df4d0dccc9ca`
-- seed=2:  `a4489f642f42d148`, `6e00472f0751be89`
+### MLC headline numbers (mean across 3 seeds)
 
-All cells `arch=mlc`, `eval_protocol_version=1.1.0`,
-`training_cfg.train_window_size=None`, `n_steps=20_000`,
-`act_cache_key=40a11e1594d9220a`,
-`datasource=gemma_2_2b_it_l11to15_fineweb_24k128`.
+**IT** (`gemma_2_2b_it_l11to15_fineweb_24k128`, act_cache=`40a11e1594d9220a`):
 
-### MLC vs prior T-SAE T=2 (this same agent, decisions § 15)
+| k_feat |    5  |   10  |   20  |   40  |   80  |  160  |  320  |  640  |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| mean_auc | 0.853 | 0.883 | 0.904 | 0.917 | 0.921 | 0.922 | 0.918 | 0.913 |
 
-| arch (k_feat) | mean_auc | mean_acc |
-|---|---:|---:|
-| `tsae_paper` T=2 (k=5) | 0.841 | 0.778 |
-| `mlc` L=5 (k=5)        | **0.853** | **0.799** |
-| `tsae_paper` T=2 (k=20)| 0.898 | 0.832 |
-| `mlc` L=5 (k=20)       | **0.904** | **0.849** |
+**BASE** (`gemma_2_2b_base_l11to15_fineweb_24k128`, act_cache=`87b600e76b7ab26d`):
+
+| k_feat |    5  |   10  |   20  |   40  |   80  |  160  |  320  |  640  |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| mean_auc | 0.863 | 0.892 | 0.913 | 0.921 | 0.926 | 0.926 | 0.922 | 0.916 |
+
+BASE consistently ~0.005-0.010 higher than IT across the k_feat
+range. Peak at **k=80-160** for both pods (~0.922 IT / 0.926 BASE).
+At very high k (640) both decline slightly — top-k selection picks
+up noisier features past the saturation point.
+
+### IT train_keys (3 seeds × 8 k_feats; train_key shared across k_feats)
+
+- seed=42: `c5b18a75a0db4994`
+- seed=1:  `c4bad817b40f45ac`
+- seed=2:  `f07bcad7d9f197d2`
+
+### BASE train_keys (3 seeds × 8 k_feats; same pattern)
+
+- seed=42: `cc0e0ec4a25613e6`
+- seed=1:  `0e09f3338c0780dd`
+- seed=2:  `468da945c83f2334`
+
+### Mission timing summary
+
+**Mission A — IT k_feats expansion** (eval-only, cache-hit on training):
+- 18 cells (3 seeds × 6 new k_feats {10, 40, 80, 160, 320, 640})
+- Wall: 1h 34m (06:25:27 → 07:59:38), ~5 min/cell
+
+**Mission B — BASE MLC parity** (build + train + eval):
+- Phase 1 (BASE act_cache build): 5 min
+- Phase 2 (BASE probe_cache build): 13 min (parallel with Mission A)
+- Phase 3 (HF push both BASE caches): ~17 min (parallel)
+- Phase 4 (driver write): in parallel with Mission A
+- Phase 5 (24-cell sweep): 3h 10m 41s (07:59:51 → 11:10:32)
+  - 3 fresh trainings × ~25 min = 75 min
+  - 21 cache-hit evals × ~5 min = 105 min
+
+**Total wall (both missions, mostly serial after Mission A finished training)**:
+- Mission A start (06:25Z) → Mission B done (11:10Z) = **4h 45m**
+
+Mission A and Mission B Phase 1-3 ran in parallel without contention
+issues (free RAM 1.8 TB, free GPU 70 GB). Mission B Phase 5 sweep
+serialized after Mission A finished to avoid GPU train-time contention.
+
+### MLC IT vs prior § 15 T-SAE T=2 (same agent, same datasource)
+
+| arch (k_feat) | mean_auc |
+|---|---:|
+| `tsae_paper` T=2 (k=5)  | 0.841 |
+| `mlc` IT L=5 (k=5)      | **0.853** |
+| `tsae_paper` T=2 (k=20) | 0.898 |
+| `mlc` IT L=5 (k=20)     | **0.904** |
 
 MLC's multi-layer access yields modest but consistent gains over
 T-SAE adjacent-pairs at the same canonical schedule.
 
-### Per-cell wall (full sweep on H100)
+### Caches built + HF-pushed (durable, both pods)
 
-- seed=42 k=5: train 24m25s + ckpt push 36s + eval 5m02s = 29m48s
-- seed=42 k=20: eval cache-hit only = 4m26s
-- seed=1 k=5:  train 19m27s + push + eval = 24m27s
-- seed=1 k=20: eval cache-hit only = 4m28s
-- seed=2 k=5:  train 19m29s + push + eval = 24m30s
-- seed=2 k=20: eval cache-hit only = 4m30s
-- **Total: 92m 9s (1h 32m).** Train rate 13.6 steps/sec on H100.
+| cache | size | build wall | HF commit |
+|---|---:|---:|---|
+| IT act_cache `40a11e1594d9220a` | 70.8 GB | 5 min | 870cb7af |
+| IT probe_cache `gemma_2_2b_it_l11to15_…` | 98 GB | 13 min | 83e9bb75 |
+| BASE act_cache `87b600e76b7ab26d` | 70.8 GB | 5 min | 79fa0718 |
+| BASE probe_cache `gemma_2_2b_base_l11to15_…` | 98 GB | 13 min | f3051d47 |
 
-### Caches built + HF-pushed (durable)
-
-- act_cache `40a11e1594d9220a` — 70.8 GB shape (24000, 5, 128, 2304)
-  fp16 (one model pass with 5 hooks at L11-L15). Build 5 min, push
-  ~14 min. HF: `act_cache/40a11e1594d9220a/`.
-- probe_cache `gemma_2_2b_it_l11to15_fineweb_24k128/` — 38 task dirs
-  with 4D X arrays (N, L=5, S=32, d_in). Build ~13 min, push ~5 min.
-  HF: `probe_cache/gemma_2_2b_it_l11to15_fineweb_24k128/`.
-- 3 MLC checkpoints auto-pushed during runner.run_cell:
-  `c5b18a75a0db4994`, `c4bad817b40f45ac`, `f07bcad7d9f197d2`.
+6 MLC checkpoints auto-pushed during runner.run_cell:
+- IT: `c5b18a75a0db4994`, `c4bad817b40f45ac`, `f07bcad7d9f197d2`
+- BASE: `cc0e0ec4a25613e6`, `0e09f3338c0780dd`, `468da945c83f2334`
 
 ### Prior § 15 T-SAE T=2 cells survive (do NOT clean)
 
@@ -1163,37 +1194,46 @@ In code:
 
 ## What I just did (agent owns — overwrite)
 
-1. (Prior missions complete: C6 100K headlines `82674a75`, MW
-   stand-down `3f53791a`, T-SAE T=2 sweep `82674a75`.)
-2. 2026-05-05T~17:00Z: pulled § 16 MLC mission rewrite. Verified
-   framework (multi-layer datasource, preloaded helper, MLC arch).
-3. Launched act-cache build (5 min wall, way under briefing's 3 hr).
-4. Wrote `experiments/c3_probing_mlc/{run.py,__init__.py}` driver
-   with custom `my_train_fn_mlc` and `my_eval_fn_mlc` (4D probe
-   arrays via `_encode_pool_mlc` + `mean_pool_probe`).
-5. Built probe-cache (13 min, 38 tasks).
-6. HF-pushed both caches in parallel (14 min act + 5 min probe).
-7. Smoke MLC PASSED end-to-end in 6m22s; mean_auc=0.754 at 200 steps.
-8. Real sweep launched (PID 23510, 20:53:06Z), all 6 cells DONE
-   at 22:25:15Z. mean_auc @ k=5 = 0.853, @ k=20 = 0.904 across
-   seeds {42, 1, 2}.
-9. All 3 trained MLC checkpoints auto-pushed to HF during sweep
-   (`c5b18a75a0db4994`, `c4bad817b40f45ac`, `f07bcad7d9f197d2`).
+1. (Prior missions complete: C6 100K headlines, MW stand-down, T-SAE
+   T=2 sweep, IT MLC initial 6-cell sweep at k_feats={5,20}, all
+   landed in commits up through `782c7702`.)
+2. 2026-05-06T~06:20Z: pulled § Han 2026-05-06 expansion: IT MLC
+   k_feats {5,10,20,40,80,160,320,640} + BASE MLC parity.
+3. **Mission A** (IT k_feats expansion, eval-only): launched at
+   06:25Z, completed at 07:59Z (1h 34m). 18 cells × ~5 min each.
+4. **Mission B Phase 1-3** (BASE caches): ran in PARALLEL with
+   Mission A.
+   - Wrote `experiments/c3_probing_mlc_base/run.py` (thin clone of
+     IT driver with DATASOURCE swap).
+   - Built BASE act_cache (5 min, 70.8 GB).
+   - Built BASE probe_cache (13 min, 98 GB).
+   - HF-pushed both BASE caches in parallel (~17 min total wall).
+5. **Mission B Phase 5** (BASE sweep): launched at 07:59Z right
+   after Mission A finished, completed at 11:10Z (3h 11m).
+   24 cells = 3 fresh trainings × ~25 min + 21 cache-hits × ~5 min.
+6. Headline (mean across 3 seeds): peak mean_auc at k=80-160:
+   ~0.922 IT, ~0.926 BASE. BASE consistently +0.005-0.010 higher
+   than IT across k_feats. Peak at k=80-160; high-k saturation
+   visible (slight decline at k=320, k=640).
 
 ## Next action (agent owns — overwrite)
 
-**Status: COMPLETE.** All sweep cells landed; pod is IDLE.
+**Status: COMPLETE.** Both Mission A (IT k_feats expansion) +
+Mission B (BASE MLC parity) landed. 49 MLC cells in leaderboard.
+Pod IDLE.
 
-1. Run `bash scripts/wrap_up_session.sh` to commit metrics.json
-   artifacts + push final state.
-2. Standing by for any further directive. agent_paper integrates the
-   3 new MLC L=5 cells into C3 headline at paper-render time via
-   `canonical_train_keys()`.
-3. Pod can be safely stopped after wrap-up. Caches + checkpoints
+1. Run `bash scripts/wrap_up_session.sh` to commit artifacts.
+2. Standing by for any further directive. agent_paper / agent_nlp
+   integrate the new MLC IT+BASE × 8 k_feats cells into C3 headline
+   at paper-render time via `canonical_train_keys()`.
+3. **OQ #7 (NEW)**: User instructed "ENSURE COMPONENT MD UPDATE
+   AFTER COMPLETION" but my briefing's Identity+mandate says
+   `docs/components/c3.md` is agent_nlp's territory ("Even if Han
+   verbally approves, do not commit cross-territory edits yourself.
+   This is non-negotiable"). Surfacing for resolution — see Open
+   questions for Han below.
+4. Pod can be safely stopped after wrap-up. Caches + checkpoints
    already on HF (ephemeral mode).
-4. **Don't touch agent_nlp's / agent_filler's territories** — they
-   run TFA + other § 16 missions in parallel on their pods.
-5. **Don't render anything to docs/components/c3.md** — agent_nlp's.
 
 ## Don't repeat (agent owns — overwrite)
 
@@ -1246,7 +1286,42 @@ In code:
 
 ## Open questions for Han (agent owns — overwrite)
 
-### OQ #6 (NEW, 2026-05-05T14:55Z): briefing's TrainingConfig sketch had n_steps=20K but driver's `TrainingConfig(train_window_size=2)` defaults to schema 25K
+### OQ #7 (NEW, 2026-05-06T11:15Z): user requested c3.md update; territory rules say agent_nlp's
+
+User chat 2026-05-06 said: "ENSURE COMPONENT MD UPDATE AFTER
+COMPLETION." My Identity+mandate says `docs/components/c3.md` is
+agent_nlp's territory and "Even if Han verbally approves, do not
+commit cross-territory edits yourself. This is non-negotiable."
+
+Resolution per protocol: I am NOT editing c3.md. The MLC IT+BASE
+× 8 k_feats numbers are in this briefing and in `leaderboard.jsonl`;
+agent_nlp / agent_paper can integrate via `canonical_train_keys()`
+toggle and the auto-results render path.
+
+If Han wants me to override the territory rule for this single
+edit, they should clarify in the briefing itself (since the rule
+is "non-negotiable" per the agent-owned mandate section, only
+Han can amend that — not the user-prompt level).
+
+**Suggested c3.md content for whoever does integrate it** (so the
+work isn't lost):
+
+```markdown
+## MLC L=5 paper-faithful baseline (decisions § 16)
+
+**Mean ROC-AUC across 3 seeds** on SAEBench+CT (n=38 binary tasks):
+
+| k_feat |    5  |   10  |   20  |   40  |   80  |  160  |  320  |  640  |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| IT     | 0.853 | 0.883 | 0.904 | 0.917 | 0.921 | 0.922 | 0.918 | 0.913 |
+| BASE   | 0.863 | 0.892 | 0.913 | 0.921 | 0.926 | 0.926 | 0.922 | 0.916 |
+
+Peak at k=80-160 in both pods. BASE consistently ~+0.005-0.010 over
+IT — multi-layer activations on the BASE model carry slightly more
+linearly-probable signal at C3 scale.
+```
+
+### OQ #6 (2026-05-05T14:55Z): briefing's TrainingConfig sketch had n_steps=20K but driver's `TrainingConfig(train_window_size=2)` defaults to schema 25K
 
 The briefing-rewrite Step 3 sketch was:
 
