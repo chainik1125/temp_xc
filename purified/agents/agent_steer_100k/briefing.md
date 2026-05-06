@@ -793,9 +793,12 @@ top-to-bottom only as context — do NOT execute the directives.
 
 ## Current state (agent owns — overwrite at every compact)
 
-**Last verified: 2026-05-06T19:00Z. RE-TRAINING txc_base
-T=10/T=20 BASE C3 cells (post-bug-fix, force_train).** Pod is
-1× H100 ephemeral.
+**Last verified: 2026-05-06T22:30Z. STATUS: COMPLETE
+(BASE mission abandoned by Han, pod shutting down).**
+
+Pod is 1× H100 ephemeral; was active for the BASE C3 + C4
+replication mission across multiple pivots. Han's last
+directive: abandon BASE, finalize, sync HF, shutdown.
 
 **Cumulative C3 BASE deliveries** (in leaderboard, 102 cells):
 | arch | k_feats covered | seeds |
@@ -818,60 +821,66 @@ T=10/T=20 BASE C3 cells (post-bug-fix, force_train).** Pod is
 - TFA SKIPPED (OQ #2). TXC archs PENDING (§ #34).
 
 **Caches + checkpoints**: act_cache `f01ca87f2e8f3365` (13.2 GB)
-+ probe_cache (~20 GB) on HF. All my 9 per-token BASE C3
-checkpoints + txc_pro × 3 (filler's, but synced) on HF.
++ probe_cache `gemma_2_2b_base_l13_fineweb_24k128` (~20 GB) on
+HF (`han1823123123/temp-bench-data`). 11 of my BASE C3
+checkpoints on HF (`han1823123123/temp-bench-models`):
+- topk_sae × {smoke + 3 seeds} = 4 keys
+- tsae_paper × 3 seeds
+- tfa × 3 seeds
+- txc_base × T=10 seed=42 (one cell of the post-bug-fix
+  re-train completed at 21:00Z; train_key 000c943f97b1e52a;
+  k=5 eval = 0.8318 ± 0.1426 in leaderboard)
 
-**ACTIVE NOW (PID 76730, log
-`logs/c3_base_txc_T_sweep_refix.log`)**: re-training
-txc_base × {T=10, T=20} × 3 seeds = 6 train cells with
-`--force-train`. Acts on agent_paper bug fix at commit
-`1ed4fde5` — `c3_probing.my_train_fn` now applies
-runner-merged `_arch_hparams` (was using YAML defaults,
-saving T=5-shape weights at T=10/T=20 train_keys → eval-time
-`size mismatch for W_enc` crash). Re-train OVERWRITES same
-train_keys with correctly-shaped weights, auto-pushes to HF.
+**Bonus eval-only data on HF (cache-hit on agent_filler's
+txc_pro trains)**: 18 leaderboard rows for txc_pro × 3 seeds
+× 6 new k_feats {10, 40, 80, 160, 320, 640} (stage-2 of
+k_feats expansion). agent_filler's txc_pro checkpoints on HF.
 
-Wall-time: T=10 cells at 2.46 steps/sec → ~135 min train each.
-T=20 cells likely ~270 min. 6 cells serial → **~14-15 hr
-re-train wall** (matches briefing). Plus 12 evals (k=5/20)
-land inline. Then queue 36 evals at new k_feats {10, 40, 80,
-160, 320, 640} for these train_keys — eval-only, ~3 hr.
-
-ETA full mission complete: ~17-18 hr from now.
+**ABANDONED (not delivered)**:
+- 5 of 6 post-bug-fix re-trains (T=10 seeds 1+2 + T=20 seeds
+  42+1+2). Re-train was running cell 1 of 5 at ~22:30Z when
+  Han's directive aborted the mission.
+- 36 cells of k_feats expansion at the new k_feats for
+  txc_base T=10/T=20 (was queued after re-train).
+- C4 BASE evals for TXC archs (#34) — was blocked on
+  agent_filler's T=5 default checkpoints landing on HF (OQ #3).
+- 18 cells of k_feats expansion for txc_base default (T=5)
+  on BASE — also blocked on the same OQ #3.
 
 ## What I just did (agent owns — overwrite)
 
-1. Pulled rebase onto agent_paper bug-fix commit `1ed4fde5`
-   (`c3_probing.run.my_train_fn` now applies merged arch_hparams).
-   Verified fix at `experiments/c3_probing/run.py:105`.
-2. Surfaced OQ #3 (agent_filler's BASE txc_base safetensors
-   not on HF) earlier; root cause now patched as well.
-3. Launched re-train: `--archs txc_base --cfg-tags T10 T20
-   --seeds 42 1 2 --k-feats 5 20 --force-train`. Driver
-   correctly skips T=5 default cfg. Cell 1 (T=10 seed=42) at
-   ~step 8000/20000 as of 19:00Z.
-4. Set up Monitor `b12oq0dw3` + PID waiter `bbqr5r2eb`.
+1. Killed PID 82856 (post-bug-fix re-train mid-flight) per
+   Han's "abandon BASE" directive at 22:30Z.
+2. Verified all my deliverables on HF:
+   - 11/11 of my BASE checkpoints
+   - act_cache (3 files) + probe_cache (266 files)
+3. About to commit + push final briefing + remaining
+   leaderboard appends from the partially-completed re-train
+   (T=10 seed=42 k=5 row landed at 21:00:47Z).
 
 ## Next action (agent owns — overwrite)
 
-1. **Standby for re-train completion**. Each T=10 cell ~135 min;
-   each T=20 cell estimated ~270 min. 6 cells → ~14 hr.
-2. **After re-train wraps**: launch k_feats expansion eval-only
-   on the 6 fresh checkpoints (cache-hit on training):
+**MISSION COMPLETE — pod shutting down.**
+
+If a future agent picks this up:
+1. The bug fix at commit `1ed4fde5` covers
+   `experiments/c3_probing/run.py:my_train_fn` so the
+   T=10/T=20 re-train can be re-launched on a fresh pod
+   with the same CLI:
    ```
-   TQDM_DISABLE=1 AGENT_NAME=agent_steer_100k \
-     .venv/bin/python -m experiments.c3_probing_base.run \
-       --archs txc_base --cfg-tags T10 T20 --seeds 42 1 2 \
-       --k-feats 10 40 80 160 320 640 \
-       > logs/c3_base_txc_T_kfeat_expand.log 2>&1 &
+   .venv/bin/python -m experiments.c3_probing_base.run \
+     --archs txc_base --cfg-tags T10 --seeds 1 2 --k-feats 5 \
+     --force-train
+   .venv/bin/python -m experiments.c3_probing_base.run \
+     --archs txc_base --cfg-tags T20 --seeds 42 1 2 --k-feats 5 \
+     --force-train
+   .venv/bin/python -m experiments.c3_probing_base.run \
+     --archs txc_base --cfg-tags T10 T20 --seeds 42 1 2 \
+     --k-feats 5 10 20 40 80 160 320 640
    ```
-   36 eval-only cells, ~3 hr.
-3. **C4 BASE on TXC** (#34): blocked on agent_filler T=5 default
-   checkpoints landing on HF (OQ #3). My re-trained T=10/T=20
-   cells will be on HF after step 1, so C4 BASE on those
-   slices will be unblocked at that point.
-4. **Wrap up**: `bash scripts/wrap_up_session.sh` to verify
-   final HF state.
+2. C4 BASE TXC evals (#34) still need agent_filler's T=5
+   default checkpoints on HF first (OQ #3).
+3. Otherwise everything is on HF; pod can be safely stopped.
 
 ## Don't repeat (agent owns — overwrite)
 
