@@ -12,52 +12,54 @@ Maybe the which-component eval will go here?
 \section{Backtracking Case Study: Full Details}
 \label{app:c7}
 
-This appendix supplies the methodological details that underlie \cref{sec:backtracking}.
+This appendix gives implementation details for \cref{sec:backtracking}.
 
 \subsection{Architectures and training configuration}
 \label{app:c7-archs}
 
-We compare six architectures, all trained on the same Llama-3.1-8B residual-stream activation cache at layer $10$ with $d_{\text{SAE}} = 32{,}768$ for $n_{\text{steps}} = 300{,}000$ at batch size $1024$: a per-token TopK SAE \cite{gao2024scaling}, the temporal SAE of \citet{bhalla2025tsae} in its paper-faithful configuration, the temporal feature analyzer (TFA) of \citet{lubana2025priors}, a multi-layer crosscoder (MLC) \cite{lindsey2024sparsecrosscoders}, our TXC-base ($T = 5$, $k_{\text{pos}} = 20$), and our TXC-pro ($T_{\max} = 10$, $t_{\text{sample}} = 5$, $k_{\text{pos}} = 20$, Matryoshka with eight nested groups, multi-distance contrastive at shifts $\Delta \in \{1, 2\}$). The two TXC architectures are additionally trained at batch size $256$ to disambiguate batch-size effects from architecture effects; the additional batch-size cells are reported in \cref{app:c7-bs-256}.
+We compare six architectures trained on the same Llama-3.1-8B residual-stream activation cache at layer~$10$, with $d_{\text{SAE}} = 32{,}768$, $n_{\text{steps}} = 300{,}000$, and batch size $1024$: a per-token TopK SAE \cite{gao2024scaling}, the temporal SAE of \citet{bhalla2025tsae}, the temporal feature analyzer (TFA) of \citet{lubana2025priors}, a multi-layer crosscoder (MLC) \cite{lindsey2024sparsecrosscoders}, TXC-base ($T = 5$, $k_{\text{pos}} = 20$), and TXC-pro ($T_{\max} = 10$, $t_{\text{sample}} = 5$, $k_{\text{pos}} = 20$, eight Matryoshka groups, and contrastive shifts $\Delta \in \{1,2\}$). We also train TXC-base and TXC-pro at batch size $256$; these cells are reported in \cref{app:c7-bs-256}.
 
-\subsection{Stage A reproduction}
+\subsection{Reproduction setup}
 \label{app:c7-stage-a}
 
-``Stage~A'' here refers to the data preparation phase that produces the labeled-sentence dataset and the difference-of-means steering direction. (The terms ``Stage~A'' and ``Stage~B'' are our internal labels for the two phases of the pipeline; they do not appear in the cited prior work.) The dataset construction recipe follows \citet{venhoff2025steering}, as replicated in \citet[Appendix C]{ward2025reasoning}: (1) generate $300$ math-style prompts in ten problem-domain categories using Claude Sonnet~$3.7$, (2) generate reasoning traces with DeepSeek-R1-Distill-Llama-8B, (3) classify each sentence in each trace by an LLM judge. The ten problem-domain categories are \texttt{basic\_logic}, \texttt{geometry}, \texttt{probability}, \texttt{arithmetic}, \texttt{counting}, \texttt{number\_theory}, \texttt{set\_theory}, \texttt{sequences}, \texttt{inequalities}, \texttt{algebra\_word\_problems} ($30$ prompts each); $280$ of the $300$ form the \texttt{dom} split used to build the steering direction and $20$ are held out as the \texttt{eval} split. The sentence-classification step in \cite{venhoff2025steering, ward2025reasoning} uses GPT-4o; we substitute Claude Sonnet~$4.6$ for consistency with the inducement-judge in \cref{app:c7-judge}. The labels in our pipeline are binary (\texttt{is\_backtracking}); the segmentation grammar and the labeling prompt are reproduced in \cref{app:c7-judge}.
+We follow the dataset recipe of \citet{venhoff2025steering}, as reproduced in \citet[Appendix C]{ward2025reasoning}. The procedure has three steps: generate $300$ math prompts with Claude Sonnet~$3.7$, sample reasoning traces from DeepSeek-R1-Distill-Llama-8B, and label each sentence with an LLM judge. The prompts cover ten categories, with $30$ prompts per category: \texttt{basic\_logic}, \texttt{geometry}, \texttt{probability}, \texttt{arithmetic}, \texttt{counting}, \texttt{number\_theory}, \texttt{set\_theory}, \texttt{sequences}, \texttt{inequalities}, and \texttt{algebra\_word\_problems}. We use $280$ prompts for the \texttt{dom} split and hold out $20$ for \texttt{eval}. Following our inducement-evaluation pipeline, we use Claude Sonnet~$4.6$ rather than GPT-4o for sentence labels. Labels are binary, with field \texttt{is\_backtracking}.
 
-The steering vector is the difference-of-means direction-of-meaning vector for the \texttt{is\_backtracking} label, computed at residual stream layer~$10$ from a window of token positions offset $-13$ through $-8$ relative to the start of each labeled backtracking sentence. Both the layer-$10$ choice and the negative-offset window are from \citet[Sec.\ 3.1, Appendix B.1]{ward2025reasoning}: a sweep across all $32$ layers identifies layer~$10$ as the most effective hookpoint, and an offset sweep identifies $\sim$$-13$ to $-8$ as the offset range that maximizes induced backtracking. \citet{ward2025reasoning} also derive the steering vector from \emph{base-model} activations rather than reasoning-model activations, which is the choice we adopt as well.
+The steering vector is the difference-of-means direction for \texttt{is\_backtracking}, computed from base-model residual activations at layer~$10$. Activations are taken from token offsets $-13$ through $-8$ relative to the first token of each labeled backtracking sentence. We use the same layer, offset window, and base-model activation convention as \citet[Sec.~3.1, Appendix B.1]{ward2025reasoning}.
 
 \subsection{Cohort construction}
 \label{app:c7-cohort}
 
-The cohort comprises $61$ MATH-500 questions \cite{hendrycks2021math} partitioned into two strata. The truly-wrong stratum ($n = 31$) consists of questions on which the unsteered reasoning model produces a parsable boxed answer that does not match the ground truth under LaTeX-aware comparison. The originally-correct stratum ($n = 30$) consists of questions on which the unsteered model produces a parsable answer matching the ground truth. Questions on which the model exceeds the token budget without producing a boxed answer are dropped, since both inducement and detection metrics require a parsable continuation. Within strata, questions are drawn deterministically from a \texttt{flip\_matrix.parquet} reference produced once on the locked datasource and shared across all architectures, ensuring that every architecture is evaluated on the same $61$ questions in the same order. Question identifiers follow the MATH-500 \texttt{unique\_id} schema (e.g.\ \texttt{test/algebra/1184.json}).
+The evaluation cohort contains $61$ MATH-500 questions \cite{hendrycks2021math}. It has two strata: $31$ questions where the unsteered model gives a parsable but incorrect boxed answer, and $30$ questions where it gives a parsable correct boxed answer. We drop questions with no boxed answer within the token budget, since both the inducement and answer-change metrics require a parsable continuation. Questions are drawn deterministically from a locked \texttt{flip\_matrix.parquet} file, so all architectures are evaluated on the same questions in the same order. Question identifiers use the MATH-500 \texttt{unique\_id} format, for example \texttt{test/algebra/1184.json}.
 
-\subsection{Magnitude grid and per-architecture inducement curves}
+\subsection{Magnitude grid}
 \label{app:c7-grid}
 
-We use a non-uniform grid of $25$ magnitudes,
+We evaluate the $25$-point grid
 \[
-    \mathcal{M} = \{0, \pm0.5, \pm1, \pm2, \pm3, \pm4, \pm5, \pm6, \pm7, \pm8, \pm10, \pm12, \pm16\},
+    \mathcal{M} = \{0, \pm0.5, \pm1, \pm2, \pm3, \pm4, \pm5, \pm6, \pm7, \pm8, \pm10, \pm12, \pm16\}.
 \]
-densified between $\pm 0.5$ and $\pm 8$ where the inducement curves transition (and where the gradient of $\Delta gc$ with respect to $m$ is largest), and sparser at the tails where the curves saturate. The zero magnitude corresponds to no intervention and serves as the per-question baseline in \cref{eq:delta-gc}. \Cref{fig:c7-inducement-app} plots the full per-architecture $\Delta gc(a, m)$ curve over the canonical grid plus the extended-magnitude follow-up at $m \in \{\pm 24, \pm 32\}$.
+The grid is denser between $\pm0.5$ and $\pm8$, where the inducement curves change most quickly, and coarser at larger magnitudes. The $m=0$ point is the no-intervention baseline used in \cref{eq:delta-gc}. \Cref{fig:c7-inducement-app} plots the per-architecture $\Delta gc(a, m)$ curves on this grid plus the extended follow-up at $m \in \{\pm24, \pm32\}$.
 
 \begin{figure}[t]
     \centering
     \autofig{c7_delta_gc_vs_magnitude}
-    \caption{Per-architecture inducement curves $\Delta gc(a, m)$ over the locked $\pm 16$ magnitude grid plus the extended-magnitude follow-up at $m \in \{\pm 24, \pm 32\}$. Curves are per-question baseline-corrected at $m = 0$ following \cref{eq:delta-gc}; shaded bands are bootstrap $95\%$ confidence intervals computed by resampling the $61$ cohort questions ($n_{\text{boot}} = 1000$). For every cell, $\Delta gc$ collapses to negative values for $|m| \geq 24$, so the locked $\pm 16$ grid does include each cell's true peak.}
+    \caption{Per-architecture inducement curves $\Delta gc(a, m)$. Curves are per-question baseline-corrected at $m=0$; shaded bands are bootstrap $95\%$ CIs over the $61$ cohort questions.}
     \label{fig:c7-inducement-app}
 \end{figure}
 
-\subsection{cut25 protocol details}
+\subsection{cut25 continuation protocol}
 \label{app:c7-cut25}
 
-For each cohort question $q$ we obtain the unsteered Stage~A continuation tokens $t_q^{\text{full}}$ and define the prefix as the first $\lfloor 0.25 \cdot |t_q^{\text{full}}| \rfloor$ tokens. Conditioned on this prefix, the reasoning model resamples a continuation at temperature $1.0$ with a token budget of $1024$ while the steering hook adds $m \cdot v_{\text{feat}}$ to the layer-$10$ residual stream at every position, where $v_{\text{feat}}$ is the architecture-specific mined direction (rescaled to match the $\ell_2$ norm of the dom-base-union vector to ensure cross-architecture magnitude comparability) and $m \in \mathcal{M}$ is the panel-level magnitude. The resampled tokens form the continuation that the Sonnet judge scores.
+For each question $q$, let $t_q^{\text{full}}$ be the token sequence of the unsteered reproduction. The prefix is the first $\lfloor 0.25 |t_q^{\text{full}}| \rfloor$ tokens. Conditioned on this prefix, the reasoning model samples a new continuation at temperature $1.0$ with a $1024$-token budget. During this continuation, the steering hook adds $m v_{\text{feat}}$ to the layer-$10$ residual stream at each generated position. Here $v_{\text{feat}}$ is the architecture-specific mined direction, rescaled to match the $\ell_2$ norm of the dom-base-union vector, and $m \in \mathcal{M}$.
 
-We adopt cut25 over alternatives (full-trace continuation, LLM-judged-cut at the first sentence boundary preceding the original backtracking event) on the basis of pilot experiments showing that a fixed proportional cut yields the most consistent measurement of the inducement metric across questions of varying length. Full-trace continuation under-discriminates between architectures because the first part of the trace is typically dominated by problem restatement; LLM-judged-cut introduces an additional source of judge noise that we wished to control for separately.
+We use cut25 because a fixed proportional cut gives comparable continuations across questions of different lengths. Full-trace continuation gives little separation between architectures, since early tokens often restate the problem. Cutting at an LLM-judged sentence boundary adds a second judge-dependent step.
 
 \subsection{Sonnet judge prompt and reliability}
 \label{app:c7-judge}
 
-The inducement metric $\Delta gc$ (\cref{eq:delta-gc}) requires, for each $(\text{architecture}, \text{question}, \text{magnitude})$ panel, a count $gc(a, q, m)$ of genuine backtracking events in the resampled continuation. The judge rubric distinguishes genuine backtracking (catching an arithmetic error and recomputing, noticing a missing problem constraint, rejecting the current approach in favor of a different method, re-evaluating a wrong assumption) from filler and pseudo-backtracking (conversational ``wait,'' restating the same conclusion, looped emissions). The prompt presented to Sonnet~$4.6$ (\texttt{claude-sonnet-4-6}, max output $200$ tokens, default sampling temperature) is reproduced verbatim:
+For each $(\text{architecture}, \text{question}, \text{magnitude})$ tuple, the inducement metric uses a judge count $gc(a,q,m)$ of genuine backtracking events in the sampled continuation. The rubric counts cases where the model identifies a problem in its reasoning and changes course, such as correcting arithmetic, noticing a missing constraint, abandoning an approach, or revising a wrong assumption. It does not count filler uses of ``wait,'' restatements, repeated text, loops, or degeneration.
+
+The judge is Claude Sonnet~$4.6$ (\texttt{claude-sonnet-4-6}, max output $200$ tokens, default sampling temperature). The prompt is:
 
 \begin{quote}\small
 You are evaluating a math problem-solving generation for genuine backtracking behavior.
@@ -79,84 +81,90 @@ COUNT: <integer>
 NOTES: <one short sentence explaining your count>
 \end{quote}
 
-The prompt elicits a single integer per generation, so each $(\text{architecture}, \text{question}, \text{magnitude})$ panel results in exactly one judge call. Every call is persisted to a per-cell \texttt{judge\_outputs.jsonl} file with the tuple \texttt{(transcript\_id, magnitude, architecture, seed, judge\_id, prompt\_hash, label, raw\_response, timestamp)}. This persistence allows fresh inter-rater reliability validation against a blind human-annotated subsample to be computed post-hoc as a single \texttt{pandas} aggregation, without any re-judging. Inter-rater reliability values from prior internal exploratory runs of the same prompt against a $20$-transcript blind human-annotated sample are $\kappa = 0.749$ for sentence-level coherence agreement, $\kappa = 0.773$ for genuine-backtracking detection, and $\kappa = 1.000$ for looping detection (raw agreement rates $0.85$, $0.95$, $1.00$). We report fresh $\kappa$ values on a $20$-transcript blind sample drawn from our locked-architecture cells in \cref{app:c7-fresh-kappa} if the validation completes within the camera-ready window; otherwise, the metric is framed as ``judge-derived, prior-validated.''
+Each continuation produces one judge call. We persist all calls to a per-cell \texttt{judge\_outputs.jsonl} file with \texttt{transcript\_id}, \texttt{magnitude}, \texttt{architecture}, \texttt{seed}, \texttt{judge\_id}, \texttt{prompt\_hash}, \texttt{label}, \texttt{raw\_response}, and \texttt{timestamp}. This makes later inter-rater checks possible without re-running the model generations. Prior internal checks on a $20$-transcript blind human-annotated sample gave $\kappa=0.749$ for sentence-level coherence, $\kappa=0.773$ for genuine-backtracking detection, and $\kappa=1.000$ for looping detection, with raw agreements $0.85$, $0.95$, and $1.00$.
 
-\subsection{Token-count budget and the convergence probe}
+% If the locked-cell validation finishes before camera-ready, we report it in \cref{app:c7-fresh-kappa}; otherwise we describe the metric as judge-derived and prior-validated.
+
+\subsection{Token-count budget and convergence probe}
 \label{app:c7-token-budget}
 
-Each cell trains for $300{,}000$ steps at batch size $1024$ on the Llama-3.1-8B layer-$10$ activation cache. The choice is calibrated against the training-token counts reported by \citet{lubana2025priors} for TFA, \citet{bhalla2025tsae} for T-SAE, and \citet{lieberum2024gemmascope} for GemmaScope, which span roughly $0.5$~B to $8$~B tokens. At our batch size and a window length of $T = 5$ token positions per training sample, $300\mathrm{K}$ steps corresponds to approximately $1.5$~B token-positions, situating our cells comfortably within the literature range and roughly $15\times$ above the $20{,}000$-step sprint baseline used during methodological lock-down.
+Each main cell trains for $300{,}000$ steps at batch size $1024$. With window length $T=5$, this is about $1.5$B token-positions. This is within the training-token range used by TFA \cite{lubana2025priors}, T-SAE \cite{bhalla2025tsae}, and GemmaScope \cite{lieberum2024gemmascope}, and is about $15\times$ larger than the $20{,}000$-step sprint runs used during protocol development.
 
-To audit whether the choice of $300\mathrm{K}$ steps is binding, every cell is instrumented with a held-out probe that fires every $100$ training steps and records the normalized mean-squared error, $\ell_0$ density, and dead-feature count on a batch drawn from a separate seed stream so it never overlaps with the training mini-batches. \Cref{fig:c7-probe-curves} plots these per-step metrics for every cell.
+We log held-out NMSE, $\ell_0$ density, and dead-feature count every $100$ steps on a separate seed stream. These probe batches do not overlap with training minibatches. \Cref{fig:c7-probe-curves} shows the resulting curves.
 
 \begin{figure}[t]
     \centering
     \autofig{c7_probe_curves_combined}
-    \caption{Held-out probe metrics over training (single seed per cell, $\text{seed} = 42$): NMSE (left), $\ell_0$ density (centre), and dead-feature count out of $d_{\text{SAE}} = 32{,}768$ (right) as a function of training step. $y$-axes are log-scaled. Per-step jitter reflects the held-out probe batch alone, not seed-level uncertainty.}
+    \caption{Held-out probe metrics over training for each cell at seed $42$: NMSE, $\ell_0$ density, and dead-feature count out of $d_{\text{SAE}}=32{,}768$. The $y$-axes are log-scaled.}
     \label{fig:c7-probe-curves}
 \end{figure}
 
-By step $200{,}000$, NMSE has plateaued for every architecture: the relative change between step $200\mathrm{K}$ and step $300\mathrm{K}$ is below $2.5\%$ for every cell, and below $0.5\%$ for five of the seven cells (the two cells with the largest residual drift, $\approx 2.1$--$2.5\%$, are \texttt{txc\_base} at $bs{=}256$ and T-SAE; both still well within a regime where architecture ordering is preserved). The $\ell_0$ density attains its prescribed sparsity target within the first $1\mathrm{K}$ training steps and is held constant by the optimizer thereafter. The dead-feature count continues a slow downward drift through the full $300{,}000$-step horizon for every architecture, with the typical change over the last $100\mathrm{K}$ steps below $1\%$ of $d_{\text{SAE}}$. We therefore consider the $300{,}000$-step training budget binding for the headline reconstruction metric (every cell is past its plateau before the canonical eval is run) while noting that the dead-feature count is still trending and a longer run would presumably revive a few more features. Critically for the paper's argument, the relative ordering of architectures on the held-out probe metrics is established well before the final step.
+By step $200{,}000$, NMSE has plateaued for all cells. The relative change from step $200\mathrm{K}$ to step $300\mathrm{K}$ is below $2.5\%$ in every cell and below $0.5\%$ in five of seven cells. The $\ell_0$ density reaches its target within the first $1\mathrm{K}$ steps and remains fixed thereafter. Dead-feature counts continue to decrease slowly, with typical changes over the final $100\mathrm{K}$ steps below $1\%$ of $d_{\text{SAE}}$. Thus the reconstruction metric is not sensitive to extending the run past $300\mathrm{K}$ steps, although longer runs may revive additional low-use features.
 
 \subsection{PR-AUC methodology and full table}
 \label{app:c7-pr-auc-full}
 
-Following \citet{kantamneni2025are}, we assess whether each architecture's features support a sparse linear probe for the binary label ``does this sentence begin a backtracking event?'' as judged on the original Stage~A traces. Sentence-level activations are captured at residual stream layer~$10$ from the base model on each Stage~A trace, with a $T = 6$ window of positions offset $-13$ through $-8$ relative to each sentence's first token (the alignment matches the offset window used to compute $v_{\text{feat}}$). Architectures with a smaller window expose only the trailing $T_{\text{arch}}$ positions of this six-position capture; architectures with $T_{\text{arch}} > 6$ are not evaluated on this protocol. Each $(\text{sentence}, T \times d_{\text{in}})$ tensor is encoded by the architecture's encoder, and per-feature absolute activations are max-pooled over the window axis to yield a single $d_{\text{sae}}$-vector per sentence.
+Following \citet{kantamneni2025are}, we test whether each architecture supports a sparse linear probe for the sentence-level label ``does this sentence begin a backtracking event?'' Labels are taken from the original reproduction traces. We capture base-model residual activations at layer~$10$ using a six-token window with offsets $-13$ through $-8$ relative to the first token of each sentence. Architectures with smaller windows use the trailing $T_{\text{arch}}$ positions of this window. Architectures with $T_{\text{arch}}>6$ are excluded from this protocol. We encode each $(\text{sentence}, T \times d_{\text{in}})$ tensor and max-pool absolute feature activations over positions to obtain one $d_{\text{SAE}}$ vector per sentence.
 
-The feature-selection step is per-fold mean-difference: for each of the five folds we compute, on the train split only, the mean activation of each feature on positive (backtracking) and negative (non-backtracking) sentences, and select the $S$ features with largest $|\mu_{\text{pos}} - \mu_{\text{neg}}|$. The probe is then $\ell_1$-regularized logistic regression with $C = 1$, fit on the selected features only. We use scikit-learn's \texttt{liblinear} solver with \texttt{max\_iter}~$=2{,}000$ and a fixed random seed of $42$. The reported PR-AUC at each $S$ is the mean across the five test folds.
+Feature selection is done inside each fold. On the train split only, we compute $|\mu_{\text{pos}} - \mu_{\text{neg}}|$ for every feature and keep the top $S$. The probe is $\ell_1$-regularized logistic regression on those selected features, with $C=1$, scikit-learn's \texttt{liblinear} solver, \texttt{max\_iter}=2000, and random seed $42$. We report the mean over five GroupKFold splits by question.
 
-PR-AUC is the headline detection metric for this task because the positive class proportion is approximately $12\%$. F1 hides the threshold-dependence of precision-recall trade-offs at this imbalance; ROC-AUC is dominated by the true-negative rate at low positive prevalence, so a probe with no signal can score near $0.5$, while a probe with weak signal can score near $0.65$ from class-prior calibration alone. PR-AUC is invariant to true-negative rate and varies between the class prior ($\approx 0.12$ for our task) and $1$. We nevertheless report ROC-AUC alongside PR-AUC at every $S$ in \cref{tab:c7-pr-auc}, both for continuity with prior internal exploratory results that used the older ROC-AUC convention and so that readers can gauge the size of the class-imbalance distortion directly. The two metrics agree on architecture rankings at every $S$ in our cells.
+We use PR-AUC as the main detection metric because the positive class rate is about $12\%$. ROC-AUC is also reported for comparison with earlier exploratory runs.
 
 \begin{table}[t]
     \centering
     \small
     \setlength{\tabcolsep}{4pt}
-    \begin{tabular}{l c c c c c c c c c c c c}
-        \toprule
-        & \multicolumn{6}{c}{PR-AUC} & \multicolumn{6}{c}{ROC-AUC} \\
-        \cmidrule(lr){2-7} \cmidrule(lr){8-13}
-        Architecture & $S\!=\!1$ & $S\!=\!2$ & $S\!=\!4$ & $S\!=\!8$ & $S\!=\!16$ & $S\!=\!32$ & $S\!=\!1$ & $S\!=\!2$ & $S\!=\!4$ & $S\!=\!8$ & $S\!=\!16$ & $S\!=\!32$ \\
-        \midrule
-        \InputIfFileExists{figs/c7_pr_auc_table.tex}{}{%
-            \multicolumn{13}{c}{\textit{Auto-generated table body unavailable; rebuild with \texttt{scripts/c7\_tex\_snippets.py}.}} \\
-        }
-        \bottomrule
-    \end{tabular}
-    \caption{Sparse-probe PR-AUC and ROC-AUC at top-$S$ feature counts on the backtracking-sentence detection task ($5$-fold GroupKFold by question, $\ell_1$-regularized logistic regression, $C\!=\!1$). Cell entries are mean across the $5$ folds. PR-AUC is the headline metric (chance level $\approx 0.12$, the positive-class prior); ROC-AUC is reported alongside for continuity with prior internal exploration (chance level $0.5$). The $S = 8$ PR-AUC column is also plotted in \cref{fig:c7-pr-auc-S8}. Table body is auto-regenerated by \texttt{scripts/c7\_tex\_snippets.py} on every C7 paper-loop refresh.}
+    \resizebox{\textwidth}{!}{%
+        \begin{tabular}{l c c c c c c c c c c c c}
+            \toprule
+            & \multicolumn{6}{c}{PR-AUC} & \multicolumn{6}{c}{ROC-AUC} \\
+            \cmidrule(lr){2-7} \cmidrule(lr){8-13}
+            Architecture & $S\!=\!1$ & $S\!=\!2$ & $S\!=\!4$ & $S\!=\!8$ & $S\!=\!16$ & $S\!=\!32$ & $S\!=\!1$ & $S\!=\!2$ & $S\!=\!4$ & $S\!=\!8$ & $S\!=\!16$ & $S\!=\!32$ \\
+            \midrule
+            TopK SAE ($bs{=}1024$) & 0.130 & 0.132 & 0.137 & 0.175 & 0.196 & 0.229 & 0.507 & 0.508 & 0.518 & 0.566 & 0.589 & 0.626 \\
+            T-SAE ($bs{=}1024$) & 0.158 & 0.164 & 0.169 & 0.196 & 0.213 & 0.245 & 0.591 & 0.603 & 0.617 & 0.640 & 0.655 & 0.683 \\
+            MLC ($bs{=}1024$) & 0.128 & 0.147 & 0.165 & 0.176 & 0.213 & 0.242 & 0.509 & 0.561 & 0.582 & 0.599 & 0.648 & 0.682 \\
+            TXC-base ($bs{=}256$) & 0.166 & 0.167 & 0.182 & 0.226 & 0.254 & 0.269 & 0.604 & 0.604 & 0.625 & 0.666 & 0.685 & 0.696 \\
+            TXC-base ($bs{=}1024$) & 0.143 & 0.168 & 0.177 & 0.201 & 0.217 & 0.250 & 0.536 & 0.593 & 0.609 & 0.628 & 0.647 & 0.679 \\
+            TXC-pro ($bs{=}256$) & 0.161 & 0.181 & 0.231 & 0.242 & 0.258 & 0.266 & 0.601 & 0.635 & 0.681 & 0.688 & 0.697 & 0.708 \\
+            TXC-pro ($bs{=}1024$) & 0.162 & 0.168 & 0.176 & 0.222 & 0.242 & 0.267 & 0.595 & 0.604 & 0.618 & 0.665 & 0.681 & 0.707 \\
+            \bottomrule
+        \end{tabular}%
+    }
+    \caption{Sparse-probe PR-AUC and ROC-AUC for backtracking-sentence detection. We use five GroupKFold splits by question and $\ell_1$-regularized logistic regression with $C=1$. Entries are fold means. PR-AUC is the main metric; chance is the positive-class prior, approximately $0.12$.}
     \label{tab:c7-pr-auc}
 \end{table}
 
 \subsection{Steering variants}
 \label{app:c7-steering-variants}
 
-The headline inducement results in \cref{fig:c7-inducement-app} use a uniform per-position vector addition: at every token position in the resampled continuation, $m \cdot v_{\text{feat}}$ is added to the layer-$10$ residual stream, with $v_{\text{feat}}$ taken as the mined feature's mean decoder direction across the window. We refer to this as the V0 protocol. Three alternatives are studied in our cross-component pilot work: position-cycled writes that rotate through the per-position decoder slabs (V1); a trailing-window broadcast that writes the most recent decoder slab to the current token (V2); and an encoder-pre-image variant that solves a small least-squares problem to back out the residual perturbation that would maximize the feature's encoder activation (V4). On the C7 cohort we adopt V0 as the headline because it removes a confound between window architectures and the steering protocol itself.
+The main inducement results in \cref{fig:c7-gc-at-peak-bar} use a uniform per-position write: at every generated position, we add $m v_{\text{feat}}$ to the layer-$10$ residual stream, where $v_{\text{feat}}$ is the mined feature's mean decoder direction across the window. We call this V0. Pilot variants included position-cycled writes over decoder slabs (V1), trailing-window broadcast writes (V2), and an encoder-pre-image least-squares write (V4). We use V0 here to avoid coupling the evaluation protocol to a specific temporal architecture.
 
-In the present submission, only V0 is evaluated on the C7 cohort, so we omit the per-variant table; V1/V2/V4 ablations are deferred to a journal extension.
-
-\subsection{Magnitude axis convention}
+\subsection{Magnitude-axis convention}
 \label{app:c7-magnitude-axis}
 
-The mined steering direction $v_{\text{feat}}$ has an arbitrary global sign: for each architecture, $-v_{\text{feat}}$ is equally valid as a feature direction and produces the inducement curve reflected through $m = 0$.
+The sign of a mined feature direction is arbitrary. We therefore report curves using the raw mined sign for each architecture rather than flipping signs so that all peaks occur at $m>0$.
 
-We report the inducement curves of \cref{fig:c7-inducement-app} at the raw mined-direction sign for each architecture, without flipping per-cell to align all peaks at $m > 0$. The raw-sign peak magnitudes that emerge are TopK SAE at $m = -16$, T-SAE at $m = +7$, MLC at $m = +16$, TXC-base at $m = -12$ for both batch sizes ($bs \in \{256, 1024\}$), TXC-pro at $m = +12$ for $bs = 256$ and $m = +16$ for $bs = 1024$. Two observations follow. First, the two TXC-base batch-size variants peak at the same sign \emph{and} the same magnitude, while the baselines scatter across the magnitude grid (TopK SAE on the negative edge, T-SAE in the interior, MLC on the positive edge); this within-architecture sign-and-magnitude consistency across two batch sizes is suggestive (but, as a single-seed observation, not conclusive; see \cref{app:c7-seeds}) that TXC-base's mined direction is stable under the one training-axis we vary here, rather than being a sign-arbitrary extremum whose location depends on the specific seed. Second, the two architectures with peaks at the locked grid's edge (MLC at $+16$ and TXC-pro $bs{=}1024$ at $+16$) are not simply hitting an upper bound: \cref{fig:c7-inducement-app} also plots the extended-magnitude follow-up at $m \in \{\pm 24, \pm 32\}$, and for both cells $\Delta gc$ is sharply negative beyond $\pm 16$, so the canonical $\pm 16$ grid does include each cell's true peak. The full per-arch raw-sign peak magnitudes are read off the right-hand columns of \cref{tab:c7-pr-auc} and the headline \cref{tab:c7-net-saves}; we therefore omit a separate per-arch sign-convention table.
+The raw-sign peak magnitudes are: TopK SAE at $m=-16$, T-SAE at $m=+7$, MLC at $m=+16$, TXC-base at $m=-12$ for both batch sizes, TXC-pro at $m=+12$ for $bs=256$, and TXC-pro at $m=+16$ for $bs=1024$. The two TXC-base cells match in both sign and magnitude. The two cells that peak at the grid edge, MLC and TXC-pro $bs=1024$, were also evaluated at $m \in \{\pm24, \pm32\}$; in both cases $\Delta gc$ drops beyond $|m|=16$. Thus the observed peaks are not artifacts of truncating the grid at $16$.
 
 \subsection{Multi-seed replication}
 \label{app:c7-seeds}
 
-The headline numbers in \cref{fig:c7-headline} and \cref{tab:c7-pr-auc} are reported at a single training seed ($\text{seed} = 42$). Multi-seed replication on the headline cell is deferred to the camera-ready window or a journal extension; the full judge transcripts are persisted (\cref{app:c7-judge}), so additional seeds require only fresh trainings, not fresh judge calls beyond the new transcripts.
+All main numbers in \cref{fig:c7-headline} and \cref{tab:c7-pr-auc} use training seed $42$. Multi-seed replication is left for camera-ready or follow-up work. Since all judge outputs are persisted, new seeds require new model generations and judge calls only for those new transcripts.
 
 \subsection{TXC at batch size 256}
 \label{app:c7-bs-256}
 
-The two TXC architectures are additionally trained at batch size $256$ for the same $300{,}000$ steps. Comparing peak $\Delta gc$ between the batch-size $256$ and batch-size $1024$ runs of each TXC architecture isolates the contribution of the batch-size choice from the architecture itself.
+TXC-base and TXC-pro are also trained at batch size $256$ for $300{,}000$ steps. This isolates the batch-size change from the architecture change.
 
-Across the four $(\text{TXC architecture}, \text{batch size})$ cells, peak $\Delta gc$ values are $0.230$ for TXC-base $bs{=}256$, $0.541$ for TXC-base $bs{=}1024$, $0.377$ for TXC-pro $bs{=}256$, and $0.475$ for TXC-pro $bs{=}1024$, with corresponding raw-sign peak magnitudes of $-12$, $-12$, $+12$, and $+16$. The PR-AUC values at $S = 8$ for the same four cells are $0.226$, $0.201$, $0.242$, and $0.222$.
+Peak $\Delta gc$ values are $0.230$ for TXC-base $bs=256$, $0.541$ for TXC-base $bs=1024$, $0.377$ for TXC-pro $bs=256$, and $0.475$ for TXC-pro $bs=1024$. The corresponding raw-sign peak magnitudes are $-12$, $-12$, $+12$, and $+16$. At $S=8$, PR-AUC values are $0.226$, $0.201$, $0.242$, and $0.222$.
 
-Two observations on batch-size scaling. First, on the inducement axis, the TXC-base peak magnitude is preserved exactly across both batch sizes ($-12$), while peak $\Delta gc$ more than doubles ($0.230 \to 0.541$); we read this as evidence that the architecture identifies a stable feature \emph{direction} whose magnitude-axis location does not depend on training scale, with batch-size acting as a strength multiplier rather than a feature-selector. TXC-pro shows a less clean signature: its peak magnitude shifts from $+12$ to $+16$ (the grid edge) and the peak $\Delta gc$ improves more modestly ($0.377 \to 0.475$). The cell at $bs{=}1024$ also exhibits a coherence collapse at its grid-edge peak (\cref{fig:c7-contingency}: $44/61$ \texttt{inc+bt} at $m = +16$), indicating that the larger batch pushes TXC-pro into a magnitude regime where the steering vector dominates the residual stream rather than acting as a localized lever; the $bs{=}256$ cell's $+12$ peak ($28/61$ \texttt{coh+bt}, $3$ \texttt{inc+bt}) is the cleaner causal mode for this architecture. Second, on the detection axis, the smaller batch is uniformly better for both TXC architectures ($0.226$ vs $0.201$ for TXC-base; $0.242$ vs $0.222$ for TXC-pro at $S = 8$). We therefore conclude that batch size is \emph{not} a hidden confound for the architecture rankings observed at the headline $bs = 1024$ on either axis: the inducement winner (TXC-base) preserves its peak magnitude and the detection winner (TXC-pro $bs{=}256$) actually has a different optimum batch size, so neither result is an artifact of the headline batch-size choice.
+The TXC-base peak magnitude is unchanged across batch sizes, while peak $\Delta gc$ increases from $0.230$ to $0.541$. For TXC-pro, the peak moves from $+12$ to $+16$ and the lift increases from $0.377$ to $0.475$. Detection behaves differently: the smaller batch gives higher $S=8$ PR-AUC for both TXC-base and TXC-pro. These results do not show a single monotone effect of batch size across metrics.
 
 \subsection{Optimal-magnitude rescue analysis}
 \label{app:c7-optimal-mag}
 
-Beyond the magnitude-grid summary in \cref{fig:c7-inducement-app}, we re-evaluate every cell at exactly two magnitudes, $\{0, m^*_a\}$, where $m^*_a$ is the cell's peak-$\Delta gc$ magnitude from the canonical eval. The mag-$0$ column anchors a baseline-corrected rescue count that controls for the cut-and-continue noise floor; the mag-$m^*_a$ column persists every steered generation to disk and runs two passes of Sonnet-$4.6$ judging: one for the genuine-backtracking count (\cref{app:c7-judge}) and one for a $0$--$3$ coherence rubric. We define $\text{coherent} := (\text{coherence grade} \geq 2)$ and $\text{backtracking} := (\text{judge count} \geq 1)$.
+For each architecture $a$, we evaluate two magnitudes: $m=0$ and $m=m^*_a$, where $m^*_a$ is the peak-$\Delta gc$ magnitude from the canonical grid. At each magnitude, we save generations and run two Sonnet~$4.6$ judge passes: one for genuine-backtracking count and one for coherence on a $0$ to $3$ scale. We define \texttt{coherent} as coherence grade at least $2$, and \texttt{backtracking} as judge count at least $1$.
 
 \begin{table}[t]
     \centering
@@ -166,12 +174,16 @@ Beyond the magnitude-grid summary in \cref{fig:c7-inducement-app}, we re-evaluat
         \toprule
         Architecture & $bs$ & $m^*_a$ & rescues@$m^*$ & regr.@$m^*$ & rescues@$0$ & regr.@$0$ & $\Delta_{\text{net}}$@$m^*$ & $\Delta_{\text{net}}$@$0$ & $\boldsymbol{\Delta_{\text{net}}^{\text{corr}}}$ \\
         \midrule
-        \InputIfFileExists{figs/c7_net_saves_table.tex}{}{%
-            \multicolumn{10}{c}{\textit{Auto-generated table body unavailable; rebuild with \texttt{experiments.c7\_backtracking.analyze\_optimal}.}} \\
-        }
+        TXC-base & 256 & $-12$ & 1 & 16 & 0 & 7 & $-15$ & $-7$ & $\mathbf{-8}$ \\
+        TXC-base & 1024 & $-12$ & 1 & 15 & 0 & 7 & $-14$ & $-7$ & $\mathbf{-7}$ \\
+        TXC-pro & 256 & $+12$ & 6 & 7 & 0 & 7 & $-1$ & $-7$ & $\mathbf{+6}$ \\
+        TXC-pro & 1024 & $+16$ & 0 & 18 & 0 & 7 & $-18$ & $-7$ & $\mathbf{-11}$ \\
+        TopK SAE & 1024 & $-16$ & 1 & 14 & 0 & 7 & $-13$ & $-7$ & $\mathbf{-6}$ \\
+        T-SAE & 1024 & $+7$ & 3 & 7 & 0 & 7 & $-4$ & $-7$ & $\mathbf{+3}$ \\
+        MLC & 1024 & $+16$ & 0 & 13 & 0 & 7 & $-13$ & $-7$ & $\mathbf{-6}$ \\
         \bottomrule
     \end{tabular}
-    \caption{Rescue / regression counts at each cell's optimal magnitude $m^*_a$ and at $m = 0$. A \emph{rescue} is a cohort question on which the unsteered cut-and-continue baseline is wrong but the steered continuation is correct; a \emph{regression} is the inverse. The headline statistic is the baseline-corrected $\Delta_{\text{net}}^{\text{corr}} = (\text{rescues}@m^* - \text{regr.}@m^*) - (\text{rescues}@0 - \text{regr.}@0)$. A positive value indicates that the architecture's optimal-magnitude steering rescues more questions than the cut-and-continue noise floor would produce on its own. Cohort size $n = 61$.}
+    \caption{Rescue and regression counts at each cell's optimal magnitude $m^*_a$ and at $m=0$. A rescue is a question where the unsteered cut-and-continue baseline is wrong but the steered continuation is correct. A regression is the reverse. The corrected statistic subtracts the $m=0$ cut-and-continue noise floor. Cohort size $n=61$.}
     \label{tab:c7-net-saves}
 \end{table}
 
@@ -183,32 +195,36 @@ Beyond the magnitude-grid summary in \cref{fig:c7-inducement-app}, we re-evaluat
         \toprule
         Architecture & $bs$ & $m^*_a$ & coh+bt & coh+no-bt & inc+bt & inc+no-bt & missing & $n$ \\
         \midrule
-        \InputIfFileExists{figs/c7_contingency_table.tex}{}{%
-            \multicolumn{9}{c}{\textit{Auto-generated table body unavailable; rebuild with \texttt{experiments.c7\_backtracking.analyze\_optimal}.}} \\
-        }
+        TXC-base & 256 & $-12$ & 22 & 17 & 17 & 5 & 0 & 61 \\
+        TXC-base & 1024 & $-12$ & 30 & 17 & 11 & 3 & 0 & 61 \\
+        TXC-pro & 256 & $+12$ & 28 & 28 & 3 & 2 & 0 & 61 \\
+        TXC-pro & 1024 & $+16$ & 10 & 1 & 44 & 6 & 0 & 61 \\
+        TopK SAE & 1024 & $-16$ & 26 & 20 & 11 & 3 & 1 & 61 \\
+        T-SAE & 1024 & $+7$ & 29 & 31 & 0 & 1 & 0 & 61 \\
+        MLC & 1024 & $+16$ & 28 & 24 & 6 & 3 & 0 & 61 \\
         \bottomrule
     \end{tabular}
-    \caption{$2 \times 2$ contingency at each cell's optimal magnitude $m^*_a$, classifying every cohort generation along $\{\text{coherent}, \text{incoherent}\} \times \{\text{backtracking}, \text{no-backtracking}\}$. Coherent is defined by a Sonnet-$4.6$ grade $\geq 2$ on a $0$--$3$ rubric (port of the wasteland \texttt{grade\_sonnet.py} prompt); backtracking is the same Sonnet-$4.6$ count $\geq 1$ used elsewhere. The \texttt{coh+bt} cell quantifies how often steering induces an in-context backtracking event without breaking coherence (the desired causal mode); the \texttt{inc+bt} cell measures collateral incoherence on rescued generations.}
+    \caption{Coherence and backtracking contingency at each cell's optimal magnitude $m^*_a$. Coherent means Sonnet~$4.6$ coherence grade at least $2$ on a $0$ to $3$ rubric. Backtracking means judge count at least $1$.}
     \label{tab:c7-contingency}
 \end{table}
 
 \begin{figure}[t]
     \centering
     \autofig{c7_net_saves_bar}
-    \caption{Baseline-corrected net rescue lift $\Delta_{\text{net}}^{\text{corr}}$ per cell (numbers from \cref{tab:c7-net-saves}). Bars above the zero line are cells whose optimal-magnitude steering rescues more cohort questions than the cut-and-continue noise floor would produce on its own; bars below indicate that incoherent or off-task collateral steering effects regress more questions than they rescue. Colours match the per-cell palette used throughout the c7 figures.}
+    \caption{Baseline-corrected net rescue lift $\Delta_{\text{net}}^{\text{corr}}$ from \cref{tab:c7-net-saves}. Positive values indicate more rescues than regressions after subtracting the $m=0$ cut-and-continue baseline.}
     \label{fig:c7-net-saves}
 \end{figure}
 
 \begin{figure}[t]
     \centering
     \autofig{c7_contingency_stacked}
-    \caption{$2 \times 2$ contingency at each cell's optimal magnitude $m^*_a$, plotted as horizontal stacked bars over the $n = 61$ cohort questions per cell (numbers from \cref{tab:c7-contingency}). The leftmost (dark green) segment is \texttt{coh+bt}, the desired causal mode (steering induced a genuine-backtracking event \emph{without} breaking generation coherence). The orange segment is \texttt{inc+bt}: backtracking induced \emph{but} the surrounding generation became incoherent, a partial-cause-but-collateral-damage failure mode that the headline $\Delta gc$ alone does not penalize. TXC-pro $bs{=}1024$ stands out: at its grid-edge peak ($m = +16$), $44/61$ generations land in \texttt{inc+bt}, indicating that even at this cell's true peak (the extended-magnitude eval in \cref{fig:c7-inducement-app} shows $\Delta gc$ collapses sharply negative for $|m| > 16$), the steering vector is operating in a magnitude regime that dominates the residual stream rather than acting as a localized lever. The TXC-pro $bs{=}256$ cell ($28/61$ \texttt{coh+bt}, only $3$ \texttt{inc+bt} at $m = +12$) is the architecture's cleaner causal mode and is discussed in \cref{app:c7-bs-256}.}
+    \caption{Coherence and backtracking contingency from \cref{tab:c7-contingency}. The \texttt{coh+bt} segment counts coherent generations with induced backtracking. The \texttt{inc+bt} segment counts generations where backtracking is detected but the surrounding continuation is incoherent.}
     \label{fig:c7-contingency}
 \end{figure}
 
-\Cref{tab:c7-net-saves,tab:c7-contingency} (and the matched \cref{fig:c7-net-saves,fig:c7-contingency}) are auto-regenerated by \texttt{experiments.c7\_backtracking.analyze\_optimal} from each cell's persisted phase-2 transcripts and judge labels; the source markdown report (with the same numbers) is mirrored at \texttt{purified/docs/components/c7\_optimal\_analysis.md}.
+\Cref{tab:c7-net-saves,tab:c7-contingency,fig:c7-net-saves,fig:c7-contingency} are regenerated by \texttt{experiments.c7\_backtracking.analyze\_optimal} from the saved phase-2 transcripts and judge labels. The corresponding markdown report is mirrored at \texttt{purified/docs/components/c7\_optimal\_analysis.md}.
 
 \subsection{Reference numbers from prior architectures}
 \label{app:c7-reference}
 
-We note for context the peak $\Delta gc$ values reported in earlier exploratory experiments for two architectures that are not in our locked set but are close analogues. A TXC variant with $k = 16$ active features per position and a window length of $T = 6$ (giving an effective window-level density of $96$) reaches peak $\Delta gc = +1.574$ at $m = -12$ on the same cohort and protocol. A second TXC variant with the Matryoshka-$8$ structure of TXC-pro but at $k = 16$ per position reaches peak $\Delta gc = +0.492$ at $m = +12$. Neither is directly comparable to TXC-base or TXC-pro: the first uses an order-of-magnitude denser sparsity budget, and the second uses a smaller density and a different position resolution. We report these values to situate our locked-architecture results within prior measurements, not as a claim of equivalence.
+For context, we also record two prior exploratory TXC variants that are not part of the locked architecture set. A TXC variant with $k=16$ active features per position and $T=6$ reaches peak $\Delta gc=+1.574$ at $m=-12$ on the same cohort and protocol. A Matryoshka-8 TXC variant with $k=16$ per position reaches peak $\Delta gc=+0.492$ at $m=+12$. These variants differ in sparsity and position resolution, so we treat them as context rather than direct comparisons.
