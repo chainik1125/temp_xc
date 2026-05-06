@@ -886,6 +886,52 @@ def plot_pr_auc_S8_bar(rows: list[dict], out_path: Path) -> None:
     plt.close()
 
 
+def plot_pr_auc_S8_bar_compact(rows: list[dict], out_path: Path) -> None:
+    """Compact vertical-bar PR-AUC@8 chart matching the figsize, font sizes,
+    and x-tick treatment of plot_gc_at_peak_paired_compact so the two can
+    be placed side-by-side in the headline 1x3 figure without geometric
+    mismatch."""
+    rows = [r for r in rows if r["metrics"].get("pr_auc_S8") is not None]
+    if not rows:
+        return
+    rows = sorted(rows, key=lambda r: -r["metrics"]["pr_auc_S8"])
+    n = len(rows)
+    x_pos = np.arange(n)
+    bar_w = 0.6
+    fig, ax = plt.subplots(figsize=(4.6, 4.2))
+    colors = [cell_color(r["arch"], _bs_from_row(r)) for r in rows]
+    bars = ax.bar(x_pos, [r["metrics"]["pr_auc_S8"] for r in rows],
+                  width=bar_w, color=colors, alpha=0.95)
+    # chance line at 0.12 (the positive-class prior)
+    ax.axhline(0.12, color="#666", linestyle=":", linewidth=1.0)
+    ax.text(n - 0.5, 0.12, "  chance $\\approx 0.12$", va="bottom", ha="right",
+            fontsize=7.5, color="#666")
+    # value labels above each bar
+    y_max = max(r["metrics"]["pr_auc_S8"] for r in rows)
+    headroom = 0.06 * y_max
+    for bar, r in zip(bars, rows):
+        ax.text(bar.get_x() + bar.get_width() / 2,
+                r["metrics"]["pr_auc_S8"] + headroom * 0.18,
+                f"{r['metrics']['pr_auc_S8']:.2f}",
+                ha="center", va="bottom", fontsize=7, color="#222")
+    ax.set_xticks(x_pos)
+    short_labels = []
+    for r in rows:
+        bs = _bs_from_row(r)
+        arch = PAPER_ARCH_LABEL.get(r["arch"], r["arch"])
+        short_labels.append(f"{arch}\n($bs{{=}}{bs}$)")
+    ax.set_xticklabels(short_labels, rotation=30, ha="right", fontsize=8)
+    ax.set_ylabel(r"PR-AUC at $S{=}8$", fontsize=9)
+    ax.tick_params(axis="y", labelsize=8)
+    ax.set_ylim(0, y_max * 1.18)
+    ax.spines["top"].set_visible(False)
+    ax.spines["right"].set_visible(False)
+    ax.margins(x=0.04)
+    fig.tight_layout()
+    fig.savefig(out_path, bbox_inches="tight")
+    plt.close(fig)
+
+
 def plot_roc_auc_S8_bar(rows: list[dict], out_path: Path) -> None:
     fig, ax = plt.subplots(figsize=(6.5, max(3.0, 0.4 * len(rows) + 1.4)))
     _draw_metric_S8_bar(ax, rows, "roc_auc")
@@ -1532,6 +1578,7 @@ def main(*, output_dir: Path, unified: bool = False) -> None:
         plot_peak_delta_gc_bar(canonical, assets_dir / "peak_delta_gc_bar.png")
         plot_gc_at_peak_paired(canonical, assets_dir / "gc_at_peak_paired.png")
         plot_gc_at_peak_paired_compact(canonical, assets_dir / "gc_at_peak_paired_compact.png")
+        plot_pr_auc_S8_bar_compact(canonical, assets_dir / "pr_auc_S8_bar_compact.png")
         plot_pr_auc_vs_S(canonical, assets_dir / "pr_auc_vs_S.png")
         plot_roc_auc_vs_S(canonical, assets_dir / "roc_auc_vs_S.png")
         plot_probe_metrics_vs_S_2panel(
