@@ -122,6 +122,10 @@ def my_train_fn(
     import time as _time
 
     spec = load_arch(arch_name, component=component)
+    # agent_paper 2026-05-06 (post-RunPod-incident): apply runner-merged
+    # arch_hparams (with arch_hparams_override) before instantiation.
+    # See experiments/c3_probing/run.py:my_train_fn for the same fix.
+    spec = spec.model_copy(update={"hparams": dict(arch_hparams)})
     datasource = load_datasource(DATASOURCE)
     d_in = int(getattr(datasource, "d_in", 2304))
     model = instantiate_arch(spec, d_in=d_in)

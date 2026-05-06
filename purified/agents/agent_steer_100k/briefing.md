@@ -67,6 +67,114 @@ surface it in chat, and let Han or agent_paper land the change. Even
 if Han verbally approves, do not commit cross-territory edits yourself.
 This is non-negotiable — see PROTOCOL.md § 8 + CLAUDE.md Hard Rule #7.
 
+### 🔥 BUG FIX 2026-05-06 — re-train + re-eval BASE C3 txc_base T=10/T=20
+
+**agent_filler reported (Open Q #4)**: BASE C3 `txc_base` T=10/T=20
+evals crash:
+
+```
+RuntimeError: Error(s) in loading state_dict for TXCBase:
+  size mismatch for W_enc: shape [5, 2304, 18432] from checkpoint
+  vs current [10, 2304, 18432]
+```
+
+**Root cause** (NOT in your driver — it was upstream in agent_nlp's
+shared `experiments/c3_probing/run.py:my_train_fn`):
+
+The training-time code path was calling `load_arch(arch_name)` and
+`instantiate_arch(spec, d_in)` WITHOUT applying the runner-merged
+`arch_hparams` (which include `training_cfg.arch_hparams_override`).
+So when `arch_hparams_override={"T": 10}` was set, the runner correctly
+hashed the train_key with T=10 (different from T=5), but the actual
+TRAINED model was instantiated at T=5 (YAML default). The T=5-shape
+weights got saved at the T=10-keyed checkpoint dir.
+
+Your `my_eval_fn` was correct (it DID apply `_arch_hparams` from the
+runner) — that's why it surfaced as an eval-time crash. The trained
+checkpoints are wrong; the eval-time instantiation is right.
+
+**agent_paper landed the fix at commit `<INSERT-HASH>` 2026-05-06**:
+
+```python
+# experiments/c3_probing/run.py:my_train_fn (line 97-99 area)
+spec = load_arch(arch_name, component=component)
+# NEW: apply runner-merged arch_hparams (incl. arch_hparams_override).
+spec = spec.model_copy(update={"hparams": dict(arch_hparams)})
+d_in = _d_in_from_act_cache(act_cache_key)
+model = instantiate_arch(spec, d_in=d_in)
+```
+
+Same fix applied symmetrically to
+`experiments/c5_steering/run.py:my_train_fn` (defensive — agent_steer
+hasn't hit the bug there because they haven't run T-overrides at C5,
+but the symmetric fix prevents future surprises).
+
+### What you need to do
+
+**You don't need to write code** — the fix is in the imported function
+your driver calls. But you DO need to:
+
+1. **`git pull --rebase origin final`** to pick up the fix.
+2. **Re-train** the broken `txc_base` T=10 + T=20 cells on BASE. The
+   existing checkpoints at the T=10/T=20 train_keys hold T=5-shape
+   weights (incorrect). Re-running with `force_train=True` overwrites
+   them with correctly-shaped weights at the same train_key (since
+   train_key already had T=10/T=20 in the hash).
+3. **Re-run evals** for those cells (they now succeed).
+4. **NB: agent_filler already saved the buggy T=10 checkpoints to HF**
+   per their Phase-D notes. The re-train will OVERWRITE both local +
+   HF — different file content under the same `<train_key>/` HF dir.
+   This is fine: the train_key didn't change; only the saved weights
+   are corrected.
+
+### Concrete commands
+
+```bash
+cd /workspace/temp_xc/purified
+git pull --rebase origin final
+
+# Re-train + re-eval the 6 broken cells (txc_base × {T=10, T=20} × 3 seeds).
+TQDM_DISABLE=1 AGENT_NAME=agent_steer_100k \
+  .venv/bin/python -m experiments.c3_probing_base.run \
+  --archs txc_base \
+  --seeds 42 1 2 \
+  --k-feats 5 20 \
+  --force-train \
+  > logs/c3_base_txc_T_sweep_refix.log 2>&1 &
+
+# Per-cell on H100: ~1.5-2 hr train + ~30 min eval × 2 k_feats = ~2.5 hr.
+# 6 cells serial → ~15 hr OR parallel across multiple GPUs if available.
+```
+
+Once those land, re-run the **k_feats expansion** for the same cells
+at the 6 new k_feats {10, 40, 80, 160, 320, 640} — eval-only after
+the re-train, cache-hits on the freshly-correct checkpoints:
+
+```bash
+TQDM_DISABLE=1 AGENT_NAME=agent_steer_100k \
+  .venv/bin/python -m experiments.c3_probing_base.run \
+  --archs txc_base \
+  --seeds 42 1 2 \
+  --k-feats 10 40 80 160 320 640 \
+  > logs/c3_base_txc_T_sweep_kfeat_expand.log 2>&1 &
+```
+
+### Watch-outs
+
+- **Don't add `--force-eval` AND `--force-train`** unless your
+  driver's CLI supports both at once. If only `--force-train` is
+  exposed, that's enough — eval re-runs after train automatically.
+- **Don't worry about the T=5 cells** — they were always correct
+  (no override → no bug). 6 BASE T=5 cells in leaderboard stand.
+- **agent_filler's BASE `txc_pro` cells** (3 seeds × 2 k_feats = 6
+  cells) DON'T have this bug — txc_pro doesn't use `arch_hparams_override`
+  in agent_steer_100k's driver. They're correct as-is.
+- **C4 BASE evals** still pending after this re-train — they
+  cache-hit on the freshly-correct C3 BASE checkpoints. Same
+  sequencing as before.
+
+---
+
 ### ⚠️ NEW MISSION 2026-05-06 (URGENT) — C3 BASE k_feats expansion {5, 10, 20, 40, 80, 160, 320, 640}
 
 **Han 2026-05-06**: "current C3 has k {5,20} we want to expand to

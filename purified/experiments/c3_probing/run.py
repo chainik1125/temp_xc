@@ -95,6 +95,14 @@ def my_train_fn(*, arch_name, arch_hparams, seed, training_cfg, act_cache_key, c
     sys.stdout.flush()
     t_setup = _time.time()
     spec = load_arch(arch_name, component=component)
+    # agent_paper 2026-05-06 (post-RunPod-incident): apply the runner-
+    # merged arch_hparams (which includes training_cfg.arch_hparams_override)
+    # before instantiation. Without this, T=10 / T=20 cells silently
+    # train at T=5 (YAML default) but save under the T=10/T=20-keyed
+    # train_key. eval_fn (which DOES apply the override) then crashes
+    # at load_state_dict on the W_enc shape mismatch. Bug surfaced via
+    # agent_filler's BASE C3 T=10 evals (Open Q #4).
+    spec = spec.model_copy(update={"hparams": dict(arch_hparams)})
     d_in = _d_in_from_act_cache(act_cache_key)
     model = instantiate_arch(spec, d_in=d_in)
     print(f"[SETUP {arch_name}/seed={seed}] model instantiated  d_in={d_in}  ({_time.time()-t_setup:.1f}s)", flush=True)
