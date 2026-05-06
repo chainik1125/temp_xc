@@ -38,6 +38,27 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 
+# Paper-ready style — no embedded titles (captions live in the .tex),
+# slightly larger fonts, tight grid, no top/right spines.
+plt.rcParams.update({
+    "font.size": 11,
+    "axes.labelsize": 12,
+    "axes.titlesize": 12,
+    "xtick.labelsize": 10,
+    "ytick.labelsize": 10,
+    "legend.fontsize": 9,
+    "axes.spines.top": False,
+    "axes.spines.right": False,
+    "axes.grid": True,
+    "grid.alpha": 0.25,
+    "grid.linewidth": 0.6,
+    "axes.axisbelow": True,
+    "figure.dpi": 110,
+    "savefig.dpi": 200,
+    "savefig.bbox": "tight",
+    "lines.linewidth": 1.8,
+})
+
 from temp_bench.config import (  # noqa: E402
     checkpoint_dir,
     purified_root,
@@ -440,7 +461,7 @@ def plot_delta_gc_vs_magnitude(rows: list[dict], out_path: Path) -> None:
     bands. Merges canonical + extended-mags evals for the same
     (arch, train_key) into a single curve. Bootstrap is over the 61
     cohort questions per (arch, magnitude) panel; n_boot=1000."""
-    plt.figure(figsize=(8.5, 5.0))
+    plt.figure(figsize=(9.5, 4.8))
     seen_labels: set[str] = set()
 
     # Build a per-cell {mag → (mean, lo, hi)} for bootstrap shading by
@@ -477,16 +498,16 @@ def plot_delta_gc_vs_magnitude(rows: list[dict], out_path: Path) -> None:
         plt.fill_between(mags, los, his, color=color, alpha=0.18,
                          linewidth=0)
 
-    plt.axhline(0, color="black", linewidth=0.5, alpha=0.5)
-    plt.axvline(0, color="black", linewidth=0.5, alpha=0.5)
-    plt.xlabel("Steering magnitude $m$")
-    plt.ylabel(r"$\Delta gc(a, m)$  (per-question baseline at $m=0$)")
-    plt.title(r"Inducement curves: $\Delta gc$ vs steering magnitude "
-              r"(shaded = bootstrap 95% CI over questions)")
-    plt.legend(fontsize=8, loc="best", ncol=2)
-    plt.grid(alpha=0.3)
+    ax = plt.gca()
+    ax.axhline(0, color="black", linewidth=0.5, alpha=0.5)
+    ax.axvline(0, color="black", linewidth=0.5, alpha=0.5)
+    ax.set_xlabel(r"steering magnitude $m$")
+    ax.set_ylabel(r"$\Delta gc(a, m)$")
+    # Move legend outside the right margin so the curves never get covered.
+    ax.legend(loc="center left", bbox_to_anchor=(1.0, 0.5),
+              frameon=False, ncol=1)
     plt.tight_layout()
-    plt.savefig(out_path, dpi=150)
+    plt.savefig(out_path)
     plt.close()
 
 
@@ -525,47 +546,49 @@ def plot_peak_delta_gc_bar(rows: list[dict], out_path: Path) -> None:
         err_low.append(max(0.0, mean - lo))
         err_high.append(max(0.0, hi - mean))
 
-    plt.figure(figsize=(8.5, max(3.5, 0.4 * len(rows) + 1.5)))
-    bars = plt.barh(labels, peaks, color=colors, alpha=0.85,
-                    xerr=[err_low, err_high], capsize=3,
-                    error_kw={"elinewidth": 1.2, "ecolor": "#222"})
+    fig, ax = plt.subplots(figsize=(7.5, max(3.0, 0.4 * len(rows) + 1.2)))
+    bars = ax.barh(labels, peaks, color=colors, alpha=0.9,
+                   xerr=[err_low, err_high], capsize=3,
+                   error_kw={"elinewidth": 1.0, "ecolor": "#222"})
+    # Reserve right margin for value labels so they stay inside the plot box.
+    x_max = max(p + h for p, h in zip(peaks, err_high))
+    pad = max(0.05, 0.08 * x_max)
+    ax.set_xlim(min(0, min(p - h for p, h in zip(peaks, err_low)) - 0.02),
+                x_max + pad * 3)
     for r, bar, peak, eh in zip(rows, bars, peaks, err_high):
         peak_mag = r["metrics"].get("delta_gc_peak_magnitude")
-        plt.text(bar.get_width() + eh + 0.015,
-                 bar.get_y() + bar.get_height() / 2,
-                 f" {peak:.3f} (m={peak_mag:+g})" if peak_mag is not None
-                 else f" {peak:.3f}",
-                 va="center", fontsize=9)
-    plt.axvline(0, color="black", linewidth=0.5)
-    plt.xlabel(r"Peak $\Delta gc$ across magnitudes  "
-               r"(error bars = bootstrap 95% CI over questions)")
-    plt.title(r"Peak $\Delta gc$ per cell")
-    plt.tight_layout()
-    plt.savefig(out_path, dpi=150)
-    plt.close()
+        ax.text(peak + eh + pad * 0.3,
+                bar.get_y() + bar.get_height() / 2,
+                f"{peak:.2f}  ($m={peak_mag:+g}$)" if peak_mag is not None
+                else f"{peak:.2f}",
+                va="center", ha="left", fontsize=9, color="#222")
+    ax.axvline(0, color="black", linewidth=0.5)
+    ax.set_xlabel(r"peak $\Delta gc$  (mean lift over $m{=}0$ baseline)")
+    ax.grid(axis="y", visible=False)
+    fig.tight_layout()
+    fig.savefig(out_path)
+    plt.close(fig)
 
 
 def plot_gc_at_peak_paired(rows: list[dict], out_path: Path) -> None:
-    """Headline figure: genuine-backtracking events per question, paired
-    'unsteered' vs. 'optimal steering' bars per cell with bootstrap 95%
-    CIs over the 61 cohort questions.
+    """Headline figure: per-question genuine-backtracking counts, paired
+    unsteered vs. optimal-steering bars per cell, sorted descending by
+    gc_at_peak. Bootstrap 95% CIs over the 61 cohort questions.
 
-    The most directly readable C7 number per Dmitry's NeurIPS-checklist
-    note: 'how many genuine backtracks did the model produce, before vs.
-    after steering at the cell's optimal magnitude'. Higher gc_at_peak =
-    the architecture's mined direction actually causes backtracking;
-    bigger gap to gc_at_baseline = larger steering effect.
+    Vertical-bar variant — Dmitry's request 2026-05-06. Caption-ready:
+    no embedded title, value labels stay inside the plot box.
     """
     rows = [r for r in rows if r["metrics"].get("gc_at_peak_mag") is not None]
     if not rows:
         return
-    rows = sorted(rows, key=lambda r: r["metrics"].get("gc_at_peak_mag", 0.0))
+    # Descending — best cell on the left, like a paper leaderboard.
+    rows = sorted(rows, key=lambda r: -r["metrics"].get("gc_at_peak_mag", 0.0))
     labels = [cell_short_label(r) for r in rows]
     seen: dict[str, int] = {}
     final_labels = []
     for r, lab in zip(rows, labels):
         if lab in seen:
-            final_labels.append(f"{lab} [{r['train_key'][:6]}]")
+            final_labels.append(f"{lab}\n[{r['train_key'][:6]}]")
         else:
             final_labels.append(lab)
         seen[lab] = seen.get(lab, 0) + 1
@@ -578,63 +601,72 @@ def plot_gc_at_peak_paired(rows: list[dict], out_path: Path) -> None:
     peak_lo: list[float] = []
     peak_hi: list[float] = []
     peak_mags: list[float | None] = []
-
     for r in rows:
         per_qid = _per_qid_gc_for_row(r)
         peak_mag = r["metrics"].get("delta_gc_peak_magnitude")
         peak_mags.append(float(peak_mag) if peak_mag is not None else None)
         seed = int(r.get("seed", 42))
-        base_vals = per_qid.get(0.0, [])
+        bm, blo, bhi = _bootstrap_mean_ci(
+            per_qid.get(0.0, []), n_boot=1000, ci=0.95, seed=seed)
         peak_vals = per_qid.get(float(peak_mag), []) if peak_mag is not None else []
-        bm, blo, bhi = _bootstrap_mean_ci(base_vals, n_boot=1000, ci=0.95, seed=seed)
-        pm, plo, phi = _bootstrap_mean_ci(peak_vals, n_boot=1000, ci=0.95, seed=seed + 1)
+        pm, plo, phi = _bootstrap_mean_ci(
+            peak_vals, n_boot=1000, ci=0.95, seed=seed + 1)
         base_means.append(bm); base_lo.append(blo); base_hi.append(bhi)
         peak_means.append(pm); peak_lo.append(plo); peak_hi.append(phi)
 
     n = len(rows)
-    y_pos = np.arange(n) * 1.6
-    bar_h = 0.62
+    x_pos = np.arange(n)
+    bar_w = 0.4
 
-    fig, ax = plt.subplots(figsize=(9.5, max(3.5, 0.6 * n + 1.6)))
+    fig, ax = plt.subplots(figsize=(max(6.0, 1.05 * n + 1.5), 4.6))
     base_color = "#bbbbbb"
     peak_colors = [cell_color(r["arch"], _bs_from_row(r)) for r in rows]
-
     base_err_lo = [m - lo for m, lo in zip(base_means, base_lo)]
     base_err_hi = [hi - m for m, hi in zip(base_means, base_hi)]
     peak_err_lo = [m - lo for m, lo in zip(peak_means, peak_lo)]
     peak_err_hi = [hi - m for m, hi in zip(peak_means, peak_hi)]
 
-    ax.barh(y_pos + bar_h / 2, base_means, height=bar_h,
-            color=base_color, alpha=0.85, label="unsteered (m = 0)",
-            xerr=[base_err_lo, base_err_hi], capsize=2.5,
-            error_kw={"elinewidth": 1.0, "ecolor": "#444"})
-    bars_peak = ax.barh(y_pos - bar_h / 2, peak_means, height=bar_h,
-                        color=peak_colors, alpha=0.92,
-                        label="optimal steering (peak m)",
-                        xerr=[peak_err_lo, peak_err_hi], capsize=2.5,
-                        error_kw={"elinewidth": 1.0, "ecolor": "#222"})
+    ax.bar(x_pos - bar_w / 2, base_means, width=bar_w,
+           color=base_color, alpha=0.9, label=r"unsteered ($m{=}0$)",
+           yerr=[base_err_lo, base_err_hi], capsize=3,
+           error_kw={"elinewidth": 1.0, "ecolor": "#444"})
+    bars_peak = ax.bar(x_pos + bar_w / 2, peak_means, width=bar_w,
+                       color=peak_colors, alpha=0.95,
+                       label=r"optimal steering (peak $m$)",
+                       yerr=[peak_err_lo, peak_err_hi], capsize=3,
+                       error_kw={"elinewidth": 1.0, "ecolor": "#222"})
 
-    for r, bar, pm_val, pm_mag, hi in zip(rows, bars_peak, peak_means, peak_mags, peak_hi):
-        x = bar.get_width() + max(0.02, hi - pm_val + 0.02)
-        ax.text(x, bar.get_y() + bar.get_height() / 2,
-                f" {pm_val:.2f}  (m={pm_mag:+g})" if pm_mag is not None
-                else f" {pm_val:.2f}",
-                va="center", fontsize=9)
+    # Value labels above each peak bar — small, inside the plot box.
+    y_max = max(hi for hi in peak_hi)
+    headroom = max(0.18, 0.12 * y_max)
+    for bar, pm_val, pm_mag, hi in zip(bars_peak, peak_means, peak_mags, peak_hi):
+        ax.text(bar.get_x() + bar.get_width() / 2, hi + headroom * 0.18,
+                f"{pm_val:.2f}\n$m={pm_mag:+g}$" if pm_mag is not None
+                else f"{pm_val:.2f}",
+                ha="center", va="bottom", fontsize=8.5,
+                color="#222")
 
-    ax.set_yticks(y_pos)
-    ax.set_yticklabels(labels)
-    ax.set_xlabel("genuine backtracking events per question  "
-                  "(error bars = bootstrap 95% CI over the 61 cohort questions)")
-    ax.set_title("Inducement (raw counts): unsteered vs. optimal-magnitude steering")
-    ax.axvline(0, color="black", linewidth=0.5)
-    ax.legend(loc="lower right", fontsize=9, framealpha=0.9)
-    plt.tight_layout()
-    plt.savefig(out_path, dpi=150)
-    plt.close()
+    ax.set_xticks(x_pos)
+    # Two-line labels: arch on top, batch size below — readable at any width.
+    short_labels = []
+    for r in rows:
+        bs = _bs_from_row(r)
+        arch = PAPER_ARCH_LABEL.get(r["arch"], r["arch"])
+        short_labels.append(f"{arch}\n($bs{{=}}{bs}$)")
+    ax.set_xticklabels(short_labels, rotation=0, fontsize=10)
+    ax.set_ylabel(r"genuine backtracks per question, $gc(a, m)$")
+    ax.set_ylim(0, y_max + headroom + 0.10)
+    ax.axhline(0, color="black", linewidth=0.5)
+    ax.legend(loc="upper right", framealpha=0.95, frameon=True, ncol=1)
+    ax.grid(axis="x", visible=False)
+    ax.margins(x=0.04)
+    fig.tight_layout()
+    fig.savefig(out_path)
+    plt.close(fig)
 
 
 def plot_pr_auc_vs_S(rows: list[dict], out_path: Path) -> None:
-    plt.figure(figsize=(8.0, 5.0))
+    fig, ax = plt.subplots(figsize=(7.0, 4.6))
     seen_labels: set[str] = set()
     for r in rows:
         ys = []
@@ -650,18 +682,21 @@ def plot_pr_auc_vs_S(rows: list[dict], out_path: Path) -> None:
         if label in seen_labels:
             label = f"{label} [{r['train_key'][:6]}]"
         seen_labels.add(label)
-        plt.plot(valid_x, valid_y, marker="o", color=color, linestyle="-",
-                 linewidth=1.6, label=label)
-    plt.xscale("log", base=2)
-    plt.xticks(list(S_GRID), [str(s) for s in S_GRID])
-    plt.xlabel("Top-$S$ probe features")
-    plt.ylabel("PR-AUC (5-fold GroupKFold by question)")
-    plt.title("Sparse-probe PR-AUC for backtracking-sentence detection")
-    plt.legend(fontsize=8, loc="best", ncol=2)
-    plt.grid(alpha=0.3)
-    plt.tight_layout()
-    plt.savefig(out_path, dpi=150)
-    plt.close()
+        ax.plot(valid_x, valid_y, marker="o", markersize=4, color=color,
+                linestyle="-", label=label)
+    ax.axhline(0.12, color="grey", linestyle=":", linewidth=1,
+               label=r"chance ($\approx$ class prior 0.12)")
+    ax.set_xscale("log", base=2)
+    ax.set_xticks(list(S_GRID))
+    ax.set_xticklabels([str(s) for s in S_GRID])
+    ax.set_xlabel(r"top-$S$ probe features")
+    ax.set_ylabel("PR-AUC")
+    # Move legend outside on the right so it never covers the data.
+    ax.legend(loc="center left", bbox_to_anchor=(1.0, 0.5),
+              frameon=False, ncol=1)
+    fig.tight_layout()
+    fig.savefig(out_path)
+    plt.close(fig)
 
 
 def plot_pr_auc_S8_bar(rows: list[dict], out_path: Path) -> None:
@@ -678,18 +713,22 @@ def plot_pr_auc_S8_bar(rows: list[dict], out_path: Path) -> None:
     labels = final_labels
     aucs = [r["metrics"].get("pr_auc_S8", 0.0) for r in rows]
     colors = [cell_color(r["arch"], _bs_from_row(r)) for r in rows]
-    plt.figure(figsize=(8.0, max(3.5, 0.4 * len(rows) + 1.5)))
-    bars = plt.barh(labels, aucs, color=colors, alpha=0.85)
+    fig, ax = plt.subplots(figsize=(6.5, max(3.0, 0.4 * len(rows) + 1.4)))
+    bars = ax.barh(labels, aucs, color=colors, alpha=0.9)
+    x_max = max(aucs)
+    pad = max(0.015, 0.06 * x_max)
+    ax.set_xlim(0, x_max + pad * 3)
     for bar, auc in zip(bars, aucs):
-        plt.text(bar.get_width() + 0.005, bar.get_y() + bar.get_height() / 2,
-                 f" {auc:.3f}", va="center", fontsize=9)
-    plt.axvline(0.12, color="grey", linestyle=":",
-                label="positive-class prior (0.12)")
-    plt.xlabel("PR-AUC at $S = 8$")
-    plt.title("Detection PR-AUC at $S = 8$ per cell")
-    plt.legend(fontsize=8)
-    plt.tight_layout()
-    plt.savefig(out_path, dpi=150)
+        ax.text(auc + pad * 0.3, bar.get_y() + bar.get_height() / 2,
+                f"{auc:.3f}", va="center", ha="left", fontsize=9, color="#222")
+    ax.axvline(0.12, color="grey", linestyle=":", linewidth=1)
+    # Inline annotation at the chance line (top of plot, doesn't collide with bars).
+    ax.text(0.12, len(rows) - 0.4, r"  chance $\approx 0.12$",
+            va="bottom", ha="left", fontsize=8.5, color="#666")
+    ax.set_xlabel(r"PR-AUC at $S{=}8$")
+    ax.grid(axis="y", visible=False)
+    fig.tight_layout()
+    fig.savefig(out_path)
     plt.close()
 
 
@@ -960,7 +999,7 @@ def plot_probe_curves(rows: list[dict], out_dir: Path) -> dict[str, Path]:
     ]
     for metric, ylabel, fname_stem in metric_specs:
         for fname_suffix, x_scale, y_scale in scale_specs:
-            plt.figure(figsize=(8.5, 5.0))
+            plt.figure(figsize=(7.0, 4.4))
             for (arch, bs, _tk), (lab, log_rows, arch_name) in sorted(series.items()):
                 steps = [x["step"] for x in log_rows]
                 vals = [x.get(metric) for x in log_rows]
@@ -982,19 +1021,17 @@ def plot_probe_curves(rows: list[dict], out_dir: Path) -> dict[str, Path]:
                 color = cell_color(arch_name, bs)
                 plt.plot(xs, ys, color=color, linestyle="-",
                          linewidth=1.4, label=lab)
-            plt.xlabel("Training step")
-            plt.ylabel(ylabel)
-            plt.xscale(x_scale)
-            plt.yscale(y_scale)
-            scale_tag = " (log-log)" if x_scale == "log" else " (log-y)"
-            plt.title(
-                f"{ylabel} vs training step (held-out probe every 100 steps){scale_tag}"
-            )
-            plt.legend(fontsize=8, loc="best", ncol=2)
-            plt.grid(alpha=0.3, which="both")
+            ax = plt.gca()
+            ax.set_xlabel("training step")
+            ax.set_ylabel(ylabel)
+            ax.set_xscale(x_scale)
+            ax.set_yscale(y_scale)
+            ax.legend(loc="center left", bbox_to_anchor=(1.0, 0.5),
+                      frameon=False, ncol=1)
+            ax.grid(alpha=0.25, which="both")
             plt.tight_layout()
             out_path = out_dir / f"{fname_stem}{fname_suffix}.png"
-            plt.savefig(out_path, dpi=150)
+            plt.savefig(out_path)
             plt.close()
             out[f"{metric}{fname_suffix}"] = out_path
     return out
