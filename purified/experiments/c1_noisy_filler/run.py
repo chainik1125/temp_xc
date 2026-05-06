@@ -201,7 +201,16 @@ def main():
                     flush=True,
                 )
                 continue
-            override: dict[str, Any] = {"k_pos": int(k_pos)}
+            # Force toy hparams because c1_noisy is not in
+            # locked_archs.yaml's per_component_hparams (only c1/c2/c6/c7
+            # are). Without this override, archs default to production
+            # d_sae=18432 → OOM at toy n_features=20.
+            # Mirror c1's per-arch toy overrides:
+            #   - all archs: d_sae=40
+            #   - txc_pro:   d_sae=40, h_size=40 (disable matryoshka)
+            override: dict[str, Any] = {"k_pos": int(k_pos), "d_sae": 40}
+            if arch_name == "txc_pro":
+                override["h_size"] = 40
             if t_override:
                 override.update(t_override)
             cfg = TrainingConfig(
