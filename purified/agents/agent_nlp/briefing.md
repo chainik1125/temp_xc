@@ -40,6 +40,135 @@ surface it in chat, and let Han or agent_paper land the change. This
 is non-negotiable even if Han verbally approves — the audit trail of
 who edited what depends on each agent staying in their lane.
 
+### ⚠️ RESUME MISSION 2026-05-06 — C3 k_feats expansion (post-RunPod-rescue, 7 cells, split with agent_em_100k)
+
+**Han 2026-05-06**: post-rescue, you (the new agent_nlp on the
+recovered pod) are picking up the unfinished C3 k_feats expansion
+that died mid-flight when RunPod blew up. **The rescue you completed
+(commit `eaa75a10`) saved the trained checkpoints; now run the 13
+missing eval cells.** Han split them evenly between you and
+agent_em_100k since you only have 1× H100 now (agent_em is gone).
+
+### Your 7 cells (eval-only, all cache-hit on training)
+
+```
+tfa             seed=2  k_feat=80
+tfa             seed=2  k_feat=160
+tfa             seed=2  k_feat=320
+tfa             seed=2  k_feat=640
+txc_base T=20   seed=42 k_feat=160
+txc_base T=20   seed=42 k_feat=320
+txc_base T=20   seed=42 k_feat=640
+```
+
+Rationale: you finish the seed=2 tfa tail (cleanly closes one seed
+column) **plus** the txc_base T=20 high-k tail (squarely in your § 17
+T-sweep mission scope). agent_em_100k handles the seed=42 tfa column
+entirely (6 cells, single arch, single seed).
+
+### Driver invocations
+
+```bash
+cd /workspace/temp_xc/purified
+git pull --rebase origin final
+
+# tfa seed=2 high-k tail (4 cells)
+TQDM_DISABLE=1 AGENT_NAME=agent_nlp \
+  bash scripts/run_on_gpu.sh 0 -- \
+  .venv/bin/python -m experiments.c3_probing_tfa_baseline.run \
+  --seeds 2 --k-feats 80 160 320 640 \
+  > logs/c3_kfeat_tfa_seed2_resume.log 2>&1 &
+
+# txc_base T=20 seed=42 high-k tail (3 cells)
+TQDM_DISABLE=1 AGENT_NAME=agent_nlp \
+  bash scripts/run_on_gpu.sh 0 -- \
+  .venv/bin/python -m experiments.c3_probing_txc_T_sweep.run \
+  --T-values 20 --seeds 42 --k-feats 160 320 640 \
+  > logs/c3_kfeat_T20_seed42_resume.log 2>&1 &
+```
+
+Both run on GPU 0 of your pod (you only have 1× H100). They serial
+through the runner's per-cell loop; ~30 min/cell × 7 = ~3.5 hr total.
+
+### Pre-launch sanity check
+
+Before launching, verify the trained checkpoints are intact (you just
+rescued them — they should be local + on HF):
+
+```bash
+.venv/bin/python <<'PY'
+import json
+need = []
+# tfa seed=2 cells need tfa seed=2 train_key (B=32, full seq).
+# txc_base T=20 seed=42 needs txc_base train_key with arch_hparams_override={"T": 20}.
+from temp_bench.config import compute_train_key, load_arch, load_datasource, compute_act_cache_key
+from temp_bench.schemas import TrainingConfig
+
+ds = load_datasource('gemma_2_2b_it_l13_fineweb_24k128')
+ack = compute_act_cache_key(ds)
+
+# tfa seed=2 train_key
+tfa_spec = load_arch('tfa', component='c3')
+tfa_cfg = TrainingConfig(n_steps=20_000, batch_size=32)
+tfa_tk = compute_train_key(arch=tfa_spec, seed=2, training_cfg=tfa_cfg, act_cache_key=ack)
+print(f'tfa seed=2 train_key: {tfa_tk}')
+
+# txc_base T=20 seed=42 train_key
+txc_spec = load_arch('txc_base', component='c3')
+txc_spec_T20 = txc_spec.model_copy(update={'hparams': {**txc_spec.hparams, 'T': 20}})
+txc_cfg = TrainingConfig(n_steps=20_000, arch_hparams_override={'T': 20})
+txc_tk = compute_train_key(arch=txc_spec_T20, seed=42, training_cfg=txc_cfg, act_cache_key=ack)
+print(f'txc_base T=20 seed=42 train_key: {txc_tk}')
+
+# Verify checkpoints exist locally
+import os
+for tk in [tfa_tk, txc_tk]:
+    p = f'checkpoints/{tk}/model.safetensors'
+    print(f'  {tk}: {"EXISTS" if os.path.exists(p) else "MISSING — pull from HF first"}')
+PY
+```
+
+If a checkpoint is missing locally but exists on HF, pull it:
+
+```bash
+.venv/bin/python -c "
+from huggingface_hub import snapshot_download
+snapshot_download('han1823123123/temp-bench-models', allow_patterns=['<TRAIN_KEY>/*'], local_dir='checkpoints/')
+"
+```
+
+### After cells land — re-render
+
+Once both your 7 + agent_em_100k's 6 = 13 cells finish:
+
+1. Update `experiments/c3_probing/analysis.py` if it hardcodes
+   `k_feats=(5, 20)` → expand to `(5, 10, 20, 40, 80, 160, 320, 640)`.
+2. Re-render `docs/components/c3.md` AUTO-RESULTS via
+   `temp_bench.report.render(component='c3')` to surface the full
+   8-k_feat table.
+3. **Commit + push** with a clear message tagging the rescue:
+   ```
+   Agent NLP: post-RunPod-rescue resume — C3 k_feats expansion 13/13 cells
+              + analysis.py 8-k_feat update + c3.md AUTO-RESULTS re-render.
+   ```
+
+agent_em_100k doesn't touch c3.md (still your territory) — they just
+land their 6 leaderboard rows + commit. Their commit ack will
+explicitly mention it's a borrow into tfa territory for these 6 cells.
+
+### Watch-outs
+
+- **Eval-only.** Don't re-train. The runner cache-hits on training;
+  only the per-k_feat probe runs.
+- **agent_em_100k temporarily borrowing tfa territory** for their 6
+  cells. Same `eval_protocol_version=1.1.0`, same probe logic. Cells
+  dedupe via `eval_key`; no collision.
+- **Don't bump `EVAL_PROTOCOL_VERSION`**. Existing rows stay valid.
+- **HF auto-push** on save_checkpoint; for eval rows the leaderboard
+  append is enough — no per-cell HF push needed.
+
+---
+
 ### ⚠️ NEW MISSION 2026-05-06 (URGENT) — C3 k_feats expansion {5, 10, 20, 40, 80, 160, 320, 640}
 
 **Han 2026-05-06**: "current C3 has k {5,20} we want to expand to

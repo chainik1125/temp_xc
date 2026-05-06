@@ -58,6 +58,112 @@ surface it in chat, and let Han or agent_paper land the change. Even
 if Han verbally approves, do not commit cross-territory edits yourself.
 This is non-negotiable — see PROTOCOL.md § 8 + CLAUDE.md Hard Rule #7.
 
+### ⚠️ NEW MISSION 2026-05-06 — C3 IT TFA k_feats tail (6 cells, helping agent_nlp post-rescue)
+
+**Han 2026-05-06**: agent_nlp's RunPod blew up mid-mission and was
+rescued (commit `eaa75a10`). 13 eval cells were left unfinished.
+Han split them: **agent_nlp takes 7 (their seed=2 tfa tail + txc_base
+T=20 high-k tail), you take 6** (the seed=42 tfa column). Single arch,
+single seed, eval-only — fastest possible "borrow into agent_nlp's
+territory" arrangement.
+
+This mission is **a brief, well-scoped borrow**. After your 6 cells
+land, agent_nlp continues to own tfa territory. You go back to your
+own work (BASE MLC parity below if not yet done; otherwise idle).
+
+### Your 6 cells (eval-only, all cache-hit on training)
+
+```
+tfa  seed=42  k_feat=10
+tfa  seed=42  k_feat=40
+tfa  seed=42  k_feat=80
+tfa  seed=42  k_feat=160
+tfa  seed=42  k_feat=320
+tfa  seed=42  k_feat=640
+```
+
+Single arch (`tfa`), single seed (42), 6 new k_feat values. The
+trained checkpoint (B=32, n_steps=20_000, full-seq) already exists —
+agent_nlp's rescue pushed it to HF. The runner cache-hits on training;
+only the per-k_feat probe fits run.
+
+### Driver invocation
+
+```bash
+cd /workspace/temp_xc/purified
+git pull --rebase origin final
+
+# Use agent_nlp's existing tfa baseline driver — IMPORT not EDIT.
+TQDM_DISABLE=1 AGENT_NAME=agent_em_100k \
+  .venv/bin/python -m experiments.c3_probing_tfa_baseline.run \
+  --seeds 42 --k-feats 10 40 80 160 320 640 \
+  > logs/c3_kfeat_tfa_seed42_em100k.log 2>&1 &
+```
+
+Per-cell ~30 min on H100 → **~3 hr total wall**.
+
+### Pre-launch sanity check
+
+Verify the tfa seed=42 trained checkpoint exists locally or on HF:
+
+```bash
+.venv/bin/python <<'PY'
+from temp_bench.config import compute_train_key, load_arch, load_datasource, compute_act_cache_key
+from temp_bench.schemas import TrainingConfig
+import os
+
+ds = load_datasource('gemma_2_2b_it_l13_fineweb_24k128')
+ack = compute_act_cache_key(ds)
+spec = load_arch('tfa', component='c3')
+cfg = TrainingConfig(n_steps=20_000, batch_size=32)
+tk = compute_train_key(arch=spec, seed=42, training_cfg=cfg, act_cache_key=ack)
+print(f'tfa seed=42 train_key: {tk}')
+print(f'  local: {"EXISTS" if os.path.exists(f"checkpoints/{tk}/model.safetensors") else "MISSING"}')
+
+# Pull from HF if missing
+if not os.path.exists(f'checkpoints/{tk}/model.safetensors'):
+    print(f'  → pulling from HF...')
+    from huggingface_hub import snapshot_download
+    snapshot_download(
+        'han1823123123/temp-bench-models',
+        allow_patterns=[f'{tk}/*'],
+        local_dir='checkpoints/',
+    )
+PY
+```
+
+### After your 6 cells land — commit + handoff
+
+```bash
+git add results/leaderboard.jsonl results/runs/
+git commit -m "Agent EM 100K: borrow into tfa territory — C3 IT tfa seed=42 k_feats {10..640} eval-only (6 cells; helping agent_nlp post-rescue per Han 2026-05-06 split)"
+git push origin final
+```
+
+Then ping agent_nlp that the seed=42 tfa column is complete. They
+will:
+- Run their 7 cells (seed=2 tfa tail + txc_base T=20 tail).
+- Re-render `experiments/c3_probing/analysis.py` + `docs/components/c3.md`
+  AUTO-RESULTS with all 8 k_feats.
+
+**Don't touch `docs/components/c3.md`** — that's agent_nlp's
+territory. Your 6 cells just land in the leaderboard; agent_nlp
+integrates at the analysis step.
+
+### Watch-outs
+
+- **Eval-only, cache-hit on training.** Don't re-train tfa.
+- **Pull the trained checkpoint from HF** if not local — it's there
+  thanks to agent_nlp's rescue (commit `eaa75a10`).
+- **Same `eval_protocol_version=1.1.0`** as agent_nlp's existing tfa
+  cells — don't bump.
+- **Don't run the txc_base T=20 cells** — those are agent_nlp's
+  half of the split.
+- **After this brief borrow, return to your own missions** (BASE MLC
+  parity below if not done; or idle if done).
+
+---
+
 ### ⚠️ NEW MISSION 2026-05-06 (URGENT) — BASE MLC parity + k_feats expansion
 
 **Han 2026-05-06**: "current C3 has k {5,20} we want to expand to
