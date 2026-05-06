@@ -313,6 +313,41 @@ def _bootstrap_mean_ci(values: list[float], *, n_boot: int = 1000,
     return (float(arr.mean()), lo, hi)
 
 
+def _per_qid_gc_for_row(r: dict) -> dict[float, list[float]]:
+    """Recompute per-question raw genuine-count per magnitude for one
+    leaderboard row, by reading its run_dir's judge_outputs.jsonl.
+
+    Returns ``{magnitude: [gc(qid, m) per question]}``. No baseline
+    subtraction. Empty dict if judge file missing.
+    """
+    p = _judge_outputs_path(r["eval_key"])
+    if not p.exists():
+        return {}
+    arch = r["arch"]
+    seed = int(r.get("seed", 0))
+    panel_means: dict[tuple[str, float], list[int]] = defaultdict(list)
+    for line in p.read_text().splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            row = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if row.get("arch") != arch:
+            continue
+        if int(row.get("seed", 0)) != seed:
+            continue
+        label = row.get("label", -1)
+        if label is None or int(label) < 0:
+            continue
+        panel_means[(row["transcript_id"], float(row["magnitude"]))].append(int(label))
+    out: dict[float, list[float]] = defaultdict(list)
+    for (qid, mag), vs in panel_means.items():
+        out[float(mag)].append(float(np.mean(vs)))
+    return dict(out)
+
+
 def per_mag_dgc_with_ci(r: dict, *, n_boot: int = 1000, ci: float = 0.95,
                         ) -> dict[float, tuple[float, float, float]]:
     """For one leaderboard row, compute per-magnitude (mean, lo, hi)
@@ -505,6 +540,94 @@ def plot_peak_delta_gc_bar(rows: list[dict], out_path: Path) -> None:
     plt.xlabel(r"Peak $\Delta gc$ across magnitudes  "
                r"(error bars = bootstrap 95% CI over questions)")
     plt.title(r"Peak $\Delta gc$ per cell")
+    plt.tight_layout()
+    plt.savefig(out_path, dpi=150)
+    plt.close()
+
+
+def plot_gc_at_peak_paired(rows: list[dict], out_path: Path) -> None:
+    """Headline figure: genuine-backtracking events per question, paired
+    'unsteered' vs. 'optimal steering' bars per cell with bootstrap 95%
+    CIs over the 61 cohort questions.
+
+    The most directly readable C7 number per Dmitry's NeurIPS-checklist
+    note: 'how many genuine backtracks did the model produce, before vs.
+    after steering at the cell's optimal magnitude'. Higher gc_at_peak =
+    the architecture's mined direction actually causes backtracking;
+    bigger gap to gc_at_baseline = larger steering effect.
+    """
+    rows = [r for r in rows if r["metrics"].get("gc_at_peak_mag") is not None]
+    if not rows:
+        return
+    rows = sorted(rows, key=lambda r: r["metrics"].get("gc_at_peak_mag", 0.0))
+    labels = [cell_short_label(r) for r in rows]
+    seen: dict[str, int] = {}
+    final_labels = []
+    for r, lab in zip(rows, labels):
+        if lab in seen:
+            final_labels.append(f"{lab} [{r['train_key'][:6]}]")
+        else:
+            final_labels.append(lab)
+        seen[lab] = seen.get(lab, 0) + 1
+    labels = final_labels
+
+    base_means: list[float] = []
+    base_lo: list[float] = []
+    base_hi: list[float] = []
+    peak_means: list[float] = []
+    peak_lo: list[float] = []
+    peak_hi: list[float] = []
+    peak_mags: list[float | None] = []
+
+    for r in rows:
+        per_qid = _per_qid_gc_for_row(r)
+        peak_mag = r["metrics"].get("delta_gc_peak_magnitude")
+        peak_mags.append(float(peak_mag) if peak_mag is not None else None)
+        seed = int(r.get("seed", 42))
+        base_vals = per_qid.get(0.0, [])
+        peak_vals = per_qid.get(float(peak_mag), []) if peak_mag is not None else []
+        bm, blo, bhi = _bootstrap_mean_ci(base_vals, n_boot=1000, ci=0.95, seed=seed)
+        pm, plo, phi = _bootstrap_mean_ci(peak_vals, n_boot=1000, ci=0.95, seed=seed + 1)
+        base_means.append(bm); base_lo.append(blo); base_hi.append(bhi)
+        peak_means.append(pm); peak_lo.append(plo); peak_hi.append(phi)
+
+    n = len(rows)
+    y_pos = np.arange(n) * 1.6
+    bar_h = 0.62
+
+    fig, ax = plt.subplots(figsize=(9.5, max(3.5, 0.6 * n + 1.6)))
+    base_color = "#bbbbbb"
+    peak_colors = [cell_color(r["arch"], _bs_from_row(r)) for r in rows]
+
+    base_err_lo = [m - lo for m, lo in zip(base_means, base_lo)]
+    base_err_hi = [hi - m for m, hi in zip(base_means, base_hi)]
+    peak_err_lo = [m - lo for m, lo in zip(peak_means, peak_lo)]
+    peak_err_hi = [hi - m for m, hi in zip(peak_means, peak_hi)]
+
+    ax.barh(y_pos + bar_h / 2, base_means, height=bar_h,
+            color=base_color, alpha=0.85, label="unsteered (m = 0)",
+            xerr=[base_err_lo, base_err_hi], capsize=2.5,
+            error_kw={"elinewidth": 1.0, "ecolor": "#444"})
+    bars_peak = ax.barh(y_pos - bar_h / 2, peak_means, height=bar_h,
+                        color=peak_colors, alpha=0.92,
+                        label="optimal steering (peak m)",
+                        xerr=[peak_err_lo, peak_err_hi], capsize=2.5,
+                        error_kw={"elinewidth": 1.0, "ecolor": "#222"})
+
+    for r, bar, pm_val, pm_mag, hi in zip(rows, bars_peak, peak_means, peak_mags, peak_hi):
+        x = bar.get_width() + max(0.02, hi - pm_val + 0.02)
+        ax.text(x, bar.get_y() + bar.get_height() / 2,
+                f" {pm_val:.2f}  (m={pm_mag:+g})" if pm_mag is not None
+                else f" {pm_val:.2f}",
+                va="center", fontsize=9)
+
+    ax.set_yticks(y_pos)
+    ax.set_yticklabels(labels)
+    ax.set_xlabel("genuine backtracking events per question  "
+                  "(error bars = bootstrap 95% CI over the 61 cohort questions)")
+    ax.set_title("Inducement (raw counts): unsteered vs. optimal-magnitude steering")
+    ax.axvline(0, color="black", linewidth=0.5)
+    ax.legend(loc="lower right", fontsize=9, framealpha=0.9)
     plt.tight_layout()
     plt.savefig(out_path, dpi=150)
     plt.close()
@@ -889,8 +1012,9 @@ def fmt_num(v, precision=3) -> str:
 
 
 def _table_headline(rows: list[dict]) -> str:
-    headers = ["Arch", "bs", "n_steps", "Peak $\\Delta gc$", "Peak mag",
-               "PR-AUC@8", "PR-AUC@32", "n_judge", "ts (UTC)"]
+    headers = ["Arch", "bs", "n_steps", "$gc_{\\text{peak}}$", "$gc_{\\text{base}}$",
+               "Peak $\\Delta gc$", "Peak mag",
+               "PR-AUC@8", "ROC-AUC@8", "n_judge", "ts (UTC)"]
     lines = ["| " + " | ".join(headers) + " |",
              "|" + "|".join(["---"] * len(headers)) + "|"]
     for r in rows:
@@ -899,11 +1023,12 @@ def _table_headline(rows: list[dict]) -> str:
             PAPER_ARCH_LABEL.get(r["arch"], r["arch"]),
             str(_bs_from_row(r) or "?"),
             f"{_n_steps_from_row(r) or '?':,}" if _n_steps_from_row(r) else "?",
+            fmt_num(m.get("gc_at_peak_mag")),
+            fmt_num(m.get("gc_at_baseline")),
             fmt_num(m.get("delta_gc_peak")),
-            fmt_num(m.get("delta_gc_peak_magnitude"), precision=1) + (
-                "" if m.get("delta_gc_peak_magnitude") is None else ""),
+            fmt_num(m.get("delta_gc_peak_magnitude"), precision=1),
             fmt_num(m.get("pr_auc_S8")),
-            fmt_num(m.get("pr_auc_S32")),
+            fmt_num(m.get("roc_auc_S8")),
             f"{int(m.get('n_judge_calls', 0))}",
             r["ts"][:19].replace("T", " "),
         ]) + " |")
@@ -911,7 +1036,13 @@ def _table_headline(rows: list[dict]) -> str:
 
 
 def _table_pr_auc_full(rows: list[dict]) -> str:
-    headers = ["Arch (cell)"] + [f"$S\\!=\\!{s}$" for s in S_GRID]
+    """PR-AUC + ROC-AUC at every S in the grid. PR-AUC is the headline
+    detection metric (chance ≈ 0.12, the positive-class prevalence);
+    ROC-AUC reported alongside for continuity with prior internal
+    exploration that used the older ROC-AUC convention."""
+    headers = (["Arch (cell)"]
+               + [f"PR@{s}" for s in S_GRID]
+               + [f"ROC@{s}" for s in S_GRID])
     lines = ["| " + " | ".join(headers) + " |",
              "|" + "|".join(["---"] * len(headers)) + "|"]
     for r in rows:
@@ -919,6 +1050,8 @@ def _table_pr_auc_full(rows: list[dict]) -> str:
         row = [cell_short_label(r)]
         for s in S_GRID:
             row.append(fmt_num(m.get(f"pr_auc_S{s}")))
+        for s in S_GRID:
+            row.append(fmt_num(m.get(f"roc_auc_S{s}")))
         lines.append("| " + " | ".join(row) + " |")
     return "\n".join(lines)
 
@@ -973,6 +1106,18 @@ def write_markdown(rows: list[dict], *, canonical: list[dict] | None = None,
         md.append(_table_headline(canonical))
     else:
         md.append("_(No canonical cells yet.)_")
+    md.append("")
+    md.append("### Headline figure: genuine backtracks per question (raw counts)")
+    md.append("")
+    md.append("Direct comparison of the unsteered baseline (gc at magnitude $0$) vs. the ")
+    md.append("optimal-magnitude steered cell (gc at peak $m$), per architecture. Bigger ")
+    md.append("paired bar = the architecture's mined feature direction actually causes ")
+    md.append("more genuine backtracking events when steered. Error bars are bootstrap 95% ")
+    md.append("CIs over the 61 cohort questions ($n_{\\text{boot}} = 1000$).")
+    md.append("")
+    md.append(f"![gc at peak vs baseline (paired)]({assets_rel}/gc_at_peak_paired.png)")
+    md.append("")
+    md.append("### Mean lift over baseline ($\\Delta gc_{\\text{peak}}$)")
     md.append("")
     md.append(f"![Peak Δgc per cell]({assets_rel}/peak_delta_gc_bar.png)")
     md.append("")
@@ -1109,6 +1254,7 @@ def main(*, output_dir: Path, unified: bool = False) -> None:
         # Peak / PR-AUC: canonical only — the extended row's "peak"
         # is just the max over its 5-mag subset and isn't comparable.
         plot_peak_delta_gc_bar(canonical, assets_dir / "peak_delta_gc_bar.png")
+        plot_gc_at_peak_paired(canonical, assets_dir / "gc_at_peak_paired.png")
         plot_pr_auc_vs_S(canonical, assets_dir / "pr_auc_vs_S.png")
         plot_pr_auc_S8_bar(canonical, assets_dir / "pr_auc_S8_bar.png")
         plot_probe_curves(rows, assets_dir)

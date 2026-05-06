@@ -699,9 +699,21 @@ def compute_delta_gc(
         k: float(np.mean(v)) for k, v in delta_per_qid.items()
     }
 
+    # Raw gc (mean genuine_count per qid) per (arch, mag) — no baseline
+    # subtraction. Useful as a directly-interpretable headline ("average
+    # genuine backtracks per question at the optimal steering magnitude").
+    raw_per_arch_mag: dict[tuple[str, float], list[float]] = collections.defaultdict(list)
+    for (arch, qid, seed, mag), val in qid_means.items():
+        raw_per_arch_mag[(arch, mag)].append(val)
+    gc_by_arch_mag: dict[tuple[str, float], float] = {
+        k: float(np.mean(v)) for k, v in raw_per_arch_mag.items()
+    }
+
     archs = sorted({a for (a, _) in by_arch_mag})
     stability: dict[str, str] = {}
     peak: dict[str, tuple[float, float]] = {}
+    gc_at_peak: dict[str, float] = {}
+    gc_at_baseline: dict[str, float] = {}
     for arch in archs:
         mags = sorted({m for (a, m) in by_arch_mag if a == arch and m != baseline_magnitude})
         deltas = [by_arch_mag[(arch, m)] for m in mags]
@@ -710,11 +722,21 @@ def compute_delta_gc(
         if deltas:
             i = int(np.argmax(deltas))
             peak[arch] = (float(mags[i]), float(deltas[i]))
+            # Raw gc at the (arch, peak_mag) cell — the directly-readable
+            # "events per question after optimal steering" number.
+            peak_mag = float(mags[i])
+            if (arch, peak_mag) in gc_by_arch_mag:
+                gc_at_peak[arch] = gc_by_arch_mag[(arch, peak_mag)]
+            if (arch, baseline_magnitude) in gc_by_arch_mag:
+                gc_at_baseline[arch] = gc_by_arch_mag[(arch, baseline_magnitude)]
 
     return {
         "by_arch_mag": by_arch_mag,
         "stability": stability,
         "peak": peak,
+        "gc_by_arch_mag": gc_by_arch_mag,
+        "gc_at_peak": gc_at_peak,
+        "gc_at_baseline": gc_at_baseline,
     }
 
 
@@ -727,7 +749,7 @@ def _to_dict(o: JudgeOutput | dict[str, Any]) -> dict[str, Any]:
 # ── PR-AUC sparse-probe detection ─────────────────────────────────────
 
 
-def compute_pr_auc_at_S(
+def compute_probe_metrics_at_S(
     feature_acts: np.ndarray,
     labels: np.ndarray,
     question_ids: np.ndarray | None,
@@ -736,22 +758,20 @@ def compute_pr_auc_at_S(
     n_folds: int = 5,
     C: float = 1.0,
     random_state: int = 42,
-) -> dict[int, float]:
-    """Sparse-probe PR-AUC at top-S features, S ∈ ``S_grid``.
+) -> dict[str, dict[int, float]]:
+    """Sparse-probe PR-AUC + ROC-AUC at top-S features, S ∈ ``S_grid``.
 
-    Per c7.md "Detection (PR-AUC)" axis: 5-fold GroupKFold by
-    ``question_id`` so test sentences are never from a question that
-    appears in train. PR-AUC mandatory because positive class is ~12%.
+    Per c7.md "Detection" axis: 5-fold GroupKFold by ``question_id`` so
+    test sentences are never from a question that appears in train. We
+    report both metrics so reviewers can sanity-check the headline
+    against the ROC-AUC numbers from prior internal exploration. PR-AUC
+    is the primary metric because the positive class is ~12% (chance
+    PR-AUC ≈ 0.12; chance ROC-AUC = 0.5).
 
-    ``feature_acts``: ``(n_sentences, d_sae)`` — typically
-    ``model.encode(sentence_acts).abs().max(dim=T_axis)`` per sentence.
-    ``labels``: ``(n_sentences,)`` 0/1 backtracking label.
-    ``question_ids``: ``(n_sentences,)`` group ids; if ``None``, falls
-    back to plain ``KFold``.
-    Returns ``{S: pr_auc}``.
+    Returns ``{"pr_auc": {S: pr_auc}, "roc_auc": {S: roc_auc}}``.
     """
     from sklearn.linear_model import LogisticRegression
-    from sklearn.metrics import average_precision_score
+    from sklearn.metrics import average_precision_score, roc_auc_score
     from sklearn.model_selection import GroupKFold, KFold
 
     if question_ids is not None:
@@ -762,13 +782,13 @@ def compute_pr_auc_at_S(
         splits = list(cv.split(feature_acts, labels))
 
     pr_auc: dict[int, float] = {}
+    roc_auc: dict[int, float] = {}
     for S in S_grid:
         fold_aps: list[float] = []
+        fold_rocs: list[float] = []
         for train_idx, test_idx in splits:
             X_tr, X_te = feature_acts[train_idx], feature_acts[test_idx]
             y_tr, y_te = labels[train_idx], labels[test_idx]
-            # Per-fold mean-difference top-S feature selection (matches
-            # Aniket's detection probe).
             mean_pos = X_tr[y_tr == 1].mean(axis=0) if (y_tr == 1).any() else np.zeros(X_tr.shape[1])
             mean_neg = X_tr[y_tr == 0].mean(axis=0) if (y_tr == 0).any() else np.zeros(X_tr.shape[1])
             md = np.abs(mean_pos - mean_neg)
@@ -783,8 +803,30 @@ def compute_pr_auc_at_S(
             clf.fit(X_tr[:, top], y_tr)
             proba = clf.predict_proba(X_te[:, top])[:, 1]
             fold_aps.append(float(average_precision_score(y_te, proba)))
+            # ROC-AUC undefined if test fold is single-class; skip those
+            # folds (sklearn raises).
+            if len(np.unique(y_te)) > 1:
+                fold_rocs.append(float(roc_auc_score(y_te, proba)))
         pr_auc[S] = float(np.mean(fold_aps))
-    return pr_auc
+        roc_auc[S] = float(np.mean(fold_rocs)) if fold_rocs else float("nan")
+    return {"pr_auc": pr_auc, "roc_auc": roc_auc}
+
+
+def compute_pr_auc_at_S(
+    feature_acts: np.ndarray,
+    labels: np.ndarray,
+    question_ids: np.ndarray | None,
+    *,
+    S_grid: tuple[int, ...] = DEFAULT_PR_AUC_S_GRID,
+    n_folds: int = 5,
+    C: float = 1.0,
+    random_state: int = 42,
+) -> dict[int, float]:
+    """Back-compat thin wrapper around :func:`compute_probe_metrics_at_S`."""
+    return compute_probe_metrics_at_S(
+        feature_acts, labels, question_ids,
+        S_grid=S_grid, n_folds=n_folds, C=C, random_state=random_state,
+    )["pr_auc"]
 
 
 # ── Reasoning-model loader + generation helpers (verbatim ports) ───────
@@ -1589,6 +1631,8 @@ def run_arch_evaluation(
     metrics: dict[str, float] = {
         "delta_gc_peak": float(arch_peak[1]),
         "delta_gc_peak_magnitude": float(arch_peak[0]),
+        "gc_at_peak_mag": float(delta_gc["gc_at_peak"].get(arch_name, 0.0)),
+        "gc_at_baseline": float(delta_gc["gc_at_baseline"].get(arch_name, 0.0)),
         "n_judge_calls": float(len([r for r in all_judge_rows if r.get("arch") == arch_name and r.get("seed") == seed])),
     }
     # Per-magnitude Δgc (under arch+seed) — flatten into the metrics dict.
@@ -1629,11 +1673,13 @@ def run_arch_evaluation(
                 chunks.append(z.detach().cpu().numpy())
                 del z, xb
         X_np = np.concatenate(chunks, axis=0)
-        pr_auc = compute_pr_auc_at_S(
+        probe = compute_probe_metrics_at_S(
             X_np, sentence_labels, sentence_qids, S_grid=pr_auc_S_grid,
         )
-        for S, ap in pr_auc.items():
+        for S, ap in probe["pr_auc"].items():
             metrics[f"pr_auc_S{S}"] = float(ap)
+        for S, ra in probe["roc_auc"].items():
+            metrics[f"roc_auc_S{S}"] = float(ra)
 
     return CaseStudyResult(
         case_study="c7_backtracking",
