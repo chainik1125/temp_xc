@@ -22,7 +22,7 @@ Three synthetic regimes, each addressing a different flaw of the previous:
   separation. Discrete `F_q` alphabet, exact `I(Y; window) = 0` for
   `W ≤ h`, and a constructive sparse-reconstruction solution at
   `W = h + 1` with margin `1/(h+1)`. Empirically: at all three stages
-  (`h ∈ {1, 2, 3}`), the **TXC-global with `k_window = 1` is the only
+  (`h ∈ {1, 2, 3}`), the **TXC-global with `k_total = 1` is the only
   architecture** that achieves above-chance probe accuracy or non-trivial
   decoder-atom recovery. Regular SAE concatenated across the window, the
   Bhalla 2025 TSAE, and a raw window probe all stay at or near chance.
@@ -256,7 +256,7 @@ reconstruction-loss minimum with margin `1/(h+1)`.
 | Regular TopKSAE, single-position latent | One position at a time | Single-position SAE + probe |
 | Regular TopKSAE, window-concat latent | Same SAE, but probe sees `[z(x_0), …, z(x_{W-1})]` | "Alphabet SAE + temporal probe" — the natural local baseline |
 | **Bhalla 2025 TSAE** (TopK k=20, InfoNCE α=0.1) | Attention-based predicted/novel codes; probe on per-position codes concatenated | Per the user's params: `kval_topk=20`, InfoNCE between `(z_t, z_{t+1})` weighted at 0.1 |
-| **TXC-global** (`TXCBareAntidead`, `k_window = 1`) | Window-shared latent | The proposal's prescription: global k=1 forces compression into a polynomial template |
+| **TXC-global** (`TXCBareAntidead`, `k_total = 1`) | Window-shared latent | The proposal's prescription: TopK budget = **1 active latent across the whole `W`-position window** (not 1 per position). Forces compression into a single polynomial template. The window length itself is `W`, plotted on the x-axis. |
 
 Pre-flight gates from proposal Section 9 all pass at `(h=2, q=11, σ=0.1)`:
 interpolation oracle 100% at `W = h + 1`, template oracle 100%, time-shuffle
@@ -329,7 +329,7 @@ spread their alignment thinner.
 1. **The local impossibility is empirically tight.** At `W ≤ h` every
    architecture (and the raw-window probe) sits at `1/q` within MC noise.
 
-2. **TXC-global with `k_window = 1` is the only architecture that finds
+2. **TXC-global with `k_total = 1` is the only architecture that finds
    the polynomial templates.** The reconstruction-margin argument predicts
    it can; SGD on plain MSE reconstruction does. Stage 4.1 and 4.2 are
    the cleanest "TXC > SAE" empirical separations in this writeup.

@@ -152,7 +152,23 @@ def plot_polynomial_clock_phase_transition(results_path: Path, out_path: Path) -
         axA.plot(W_grid, tsae_y, "v-.", color="#9467bd", label="Bhalla TSAE (k=20, α=0.1)", linewidth=1.5)
     if has_tfa:
         axA.plot(W_grid, tfa_y, "P-.", color="#17becf", label="TFA (k=20, AdamW+cosine, pos enc)", linewidth=1.5)
-    axA.plot(W_grid, txc_y, "D-", color=_TXC_COLOR, label="TXC-global (k_win=1)", linewidth=2.0)
+    # TXC k-sweep (k=1 from original run, k=2/5/10 added later if present).
+    txc_palette = ["#1f77b4", "#7fbcd4", "#5499c7", "#2e86c1"]
+    axA.plot(W_grid, txc_y, "D-", color=_TXC_COLOR, label="TXC-global k=1", linewidth=2.0)
+    for i, k_extra in enumerate([2, 5, 10]):
+        key = f"txc_k{k_extra}_probe"
+        if any(c.get(key) for c in cells):
+            ys = [c[key]["val_accuracy"] if c.get(key) else float("nan") for c in cells]
+            axA.plot(W_grid, ys, "D--", color=txc_palette[i + 1],
+                     label=f"TXC-global k={k_extra}", linewidth=1.5, alpha=0.9)
+    # SAE k-sweep (k=1 from existing sae_window_probe; k=2/5/10 added).
+    sae_palette = ["#d62728", "#e36b6b", "#a83232", "#7a1f1f"]
+    for i, k_extra in enumerate([2, 5, 10]):
+        key = f"sae_k{k_extra}_window_probe"
+        if any(c.get(key) for c in cells):
+            ys = [c[key]["val_accuracy"] if c.get(key) else float("nan") for c in cells]
+            axA.plot(W_grid, ys, "s:", color=sae_palette[i + 1],
+                     label=f"regular SAE k={k_extra} (W·H concat)", linewidth=1.0, alpha=0.7)
     axA.axhline(chance, color="black", linestyle=":", alpha=0.5, label=f"chance = 1/q = {chance:.3f}")
     axA.axvline(h + 1, color="grey", linestyle="--", alpha=0.5, label=f"W = h+1 = {h+1}")
     axA.set_xticks(W_grid)
@@ -163,7 +179,13 @@ def plot_polynomial_clock_phase_transition(results_path: Path, out_path: Path) -
     axA.grid(True, alpha=0.3)
     axA.legend(loc="best", fontsize=9)
 
-    axB.plot(W_grid, txc_rec, "D-", color=_TXC_COLOR, label="TXC-global Rec_temp", linewidth=2.0)
+    axB.plot(W_grid, txc_rec, "D-", color=_TXC_COLOR, label="TXC-global k=1 Rec_temp", linewidth=2.0)
+    for i, k_extra in enumerate([2, 5, 10]):
+        key = f"txc_k{k_extra}_rec_temp"
+        if any(c.get(key) is not None for c in cells):
+            ys = [c[key] if c.get(key) is not None else float("nan") for c in cells]
+            axB.plot(W_grid, ys, "D--", color=txc_palette[i + 1],
+                     label=f"TXC-global k={k_extra} Rec_temp", linewidth=1.5, alpha=0.9)
     axB.axvline(h + 1, color="grey", linestyle="--", alpha=0.5)
     n_atoms = cells[0]["n_atoms"]
     axB.set_xticks(W_grid)
