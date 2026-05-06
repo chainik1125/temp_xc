@@ -1,0 +1,28 @@
+{
+  "act_cache_key": "e4916bcae1881963",
+  "agent": "agent_nlp",
+  "arch": "tsae_paper",
+  "arch_version": "1.0.0",
+  "datasource": "gemma_2_2b_it_l13_fineweb_24k128",
+  "saved_ts": "2026-05-04T01:46:44Z",
+  "seed": 1,
+  "train_key": "a308fcd0372e5fd8",
+  "training_cfg": {
+    "batch_size": 256,
+    "bricken_enabled": false,
+    "bricken_max_resample_fraction": 0.5,
+    "bricken_min_fires": 1,
+    "bricken_n_check": 2048,
+    "bricken_resample_every": 500,
+    "dead_threshold_tokens": 10000000,
+    "ema_auxk_alpha": 0.03125,
+    "learning_rate": 0.0003,
+    "n_steps": 10000,
+    "optimizer": "adam",
+    "plateau_early_stop": true,
+    "plateau_min_delta": 0.0001,
+    "plateau_patience": 5000,
+    "precision": "bf16",
+    "warmup_steps": 500
+  }
+}
