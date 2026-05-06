@@ -285,7 +285,8 @@ def render_scatter(
         print(f"[plot] no data for scatter at {out_path}")
         return None
 
-    fig, ax = plt.subplots(figsize=(7.5, 7.5))
+    # Wider figure so legend can sit OUTSIDE the axes on the right.
+    fig, ax = plt.subplots(figsize=(9.5, 7.0))
     ax.plot([0, 1], [0, 1], "k--", alpha=0.35, lw=1,
             label="y = x  (equal local/global alignment)")
 
@@ -295,20 +296,34 @@ def render_scatter(
         rows = data[arch_label]
         xs = [r[1] for r in rows]
         ys = [r[2] for r in rows]
+        ks = [r[0] for r in rows]
         color, lab, marker = ARCH_COLORS.get(arch_label, ("#000", arch_label, "o"))
         ax.scatter(xs, ys, color=color, marker=marker, s=110, alpha=0.78,
                    label=lab, edgecolors="black", linewidth=0.5, zorder=5)
         # Connect points by k_pos with a thin trail.
-        order = np.argsort([r[0] for r in rows])
+        order = np.argsort(ks)
         ax.plot([xs[i] for i in order], [ys[i] for i in order],
                 color=color, alpha=0.35, lw=1.2, zorder=3)
+        # Annotate first + last k_pos so reader can read the trajectory.
+        if len(ks) >= 2:
+            i_first, i_last = int(order[0]), int(order[-1])
+            ax.annotate(f"k={ks[i_first]}", (xs[i_first], ys[i_first]),
+                        fontsize=7, alpha=0.8, xytext=(4, 4),
+                        textcoords="offset points")
+            ax.annotate(f"k={ks[i_last]}", (xs[i_last], ys[i_last]),
+                        fontsize=7, alpha=0.8, xytext=(4, 4),
+                        textcoords="offset points")
 
     ax.set_xlabel("eAUC  (local emission recovery, vs $f_l$)", fontsize=12)
     ax.set_ylabel("gAUC  (global hidden recovery, vs $f_g$)", fontsize=12)
     ax.set_title(title, fontsize=11)
     ax.set_xlim(0.0, 1.05)
     ax.set_ylim(0.0, 1.05)
-    ax.legend(fontsize=9, loc="upper left", framealpha=0.92)
+    ax.set_aspect("equal", adjustable="box")
+    # Legend OUTSIDE the axes (right of the plot) so it never covers points.
+    ax.legend(fontsize=9, loc="center left",
+              bbox_to_anchor=(1.02, 0.5), framealpha=0.95,
+              borderaxespad=0.0)
     ax.grid(alpha=0.3)
     fig.tight_layout()
     fig.savefig(out_path, dpi=150, bbox_inches="tight")
