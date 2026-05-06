@@ -46,7 +46,7 @@ from .polynomial_clock import (  # noqa: E402
     generate_polynomial_clock_dataset,
 )
 from .run_pair_experiment import _train_logistic_probe  # noqa: E402
-from .train_runner import TrainConfig, train_tsae  # noqa: E402
+from .train_runner import TrainConfig, train_tfa, train_tsae  # noqa: E402
 
 
 # ---------- Architecture training -----------------------------------------
@@ -217,12 +217,11 @@ def _txc_global_latents_at(
 def _tsae_latents_at(
     tsae, cache: ColoredSourceCache, anchors: dict, W: int
 ) -> torch.Tensor:
-    """Encode windows through Bhalla TSAE; concatenate per-position codes.
+    """Encode windows through Bhalla TSAE / TFA; concatenate per-position codes.
 
     Returns ``(B, W*H)`` where each `H`-block is `novel_codes + pred_codes`
-    at one position. This matches how the existing
-    `experiments/ward_backtracking_txc/architectures.py:181` uses TSAE
-    activations.
+    at one position. Works for both ``han_tsae.TemporalSAE`` (Bhalla TSAE
+    with optional InfoNCE) and ``_tfa_module.TemporalSAE`` (TFA).
     """
     x = _windows_at_anchors(cache, anchors, W).float()
     with torch.no_grad():
@@ -351,7 +350,12 @@ def run_stage(
             f"Rec_temp={rec_temp_txc:.3f}  (M={atoms.shape[0]})"
         )
 
-        # 5. Bhalla 2025 Temporal SAE — TopK with k=20 + InfoNCE contrastive.
+        # 5. Bhalla 2025 Temporal SAE — TopK k=20 + InfoNCE contrastive 0.1.
+        # 6. TFA — same TemporalSAE class but trained with the AdamW + cosine LR
+        #    + warmup + weight-decay-split recipe from src/bench/architectures/tfa.py
+        #    (no contrastive loss, optional sinusoidal pos encoding).
+        tsae_probe_serial = None
+        tfa_probe_serial = None
         if W >= 2:
             tsae_model = train_tsae(
                 cache=cache, W=W, k=20, H=H, d=d,
@@ -368,9 +372,24 @@ def run_stage(
             )
             print(f"    TSAE Bhalla (k=20, alpha=0.1)  val={tsae_probe['val_accuracy']:.3f}")
             tsae_probe_serial = tsae_probe
+
+            tfa_model = train_tfa(
+                cache=cache, W=W, k=20, H=H, d=d,
+                use_pos_encoding=True,
+                device=device,
+                train_cfg=TrainConfig(
+                    n_steps=max(2000, n_steps // 2),
+                    batch_size=batch_size, lr=lr,
+                ),
+            )
+            tfa_X = _tsae_latents_at(tfa_model, cache, anchors, W)
+            tfa_probe = _train_logistic_probe(
+                tfa_X, anchors["Y"], R=cfg.q, device=device, seed=seed + 600 + W,
+            )
+            print(f"    TFA (k=20, AdamW+cosine, pos_enc)  val={tfa_probe['val_accuracy']:.3f}")
+            tfa_probe_serial = tfa_probe
         else:
-            tsae_probe_serial = None
-            print("    TSAE Bhalla: skipped at W<2 (attention needs >=2 positions)")
+            print("    TSAE Bhalla / TFA: skipped at W<2")
 
         cells.append({
             "W": W,
@@ -378,6 +397,7 @@ def run_stage(
             "sae_local_probe": sae_local_probe,
             "sae_window_probe": sae_window_probe,
             "tsae_probe": tsae_probe_serial,
+            "tfa_probe": tfa_probe_serial,
             "txc_probe": txc_probe,
             "txc_rec_local": rec_local_txc,
             "txc_rec_temp": rec_temp_txc,

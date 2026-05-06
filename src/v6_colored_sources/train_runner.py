@@ -36,6 +36,11 @@ from temporal_crosscoders.han_arch import (  # noqa: E402
 )
 from temporal_crosscoders.han_arch.txc_bare_antidead import TXCBareAntidead  # noqa: E402
 from temporal_crosscoders.han_tsae import TemporalSAE  # noqa: E402
+# TFA's variant of TemporalSAE (cleaner, with optional sinusoidal pos
+# encoding and the Han train_tfa.py training recipe).
+from src.bench.architectures._tfa_module import (  # noqa: E402
+    TemporalSAE as TFA_TemporalSAE,
+)
 
 from .data_adapter import ColoredSourceCache  # noqa: E402
 from .metrics import (  # noqa: E402
@@ -439,6 +444,129 @@ def train_tsae(
                 flush=True,
             )
 
+    return model
+
+
+def train_tfa(
+    *,
+    cache: ColoredSourceCache,
+    W: int,
+    k: int,
+    H: int,
+    d: int,
+    n_heads: int = 4,
+    n_attn_layers: int = 1,
+    bottleneck_factor: int = 1,
+    use_pos_encoding: bool = True,
+    device: torch.device,
+    train_cfg: TrainConfig,
+    weight_decay: float = 1e-4,
+    warmup_frac: float = 0.05,
+):
+    """Train Temporal Feature Analysis (TFA) per the existing
+    ``src/bench/architectures/tfa.py`` recipe.
+
+    TFA uses the same ``TemporalSAE`` decomposition as Bhalla 2025
+    (predicted codes from causal attention on prior context + novel
+    codes from a per-token TopK SAE) but with:
+
+    - **AdamW + cosine LR schedule with warmup** (vs plain Adam in
+      `train_tsae`).
+    - **Weight-decay split**: 1e-4 on parameters with ndim >= 2,
+      0 on biases / 1D.
+    - **Optional sinusoidal positional encoding**.
+    - **MSE-only reconstruction loss** (no InfoNCE — the contrastive
+      term in `train_tsae` was a deliberate addition that does not
+      appear in the original TFA recipe).
+
+    Returns the trained model. Use ``model(x_btd)`` at inference to get
+    ``(x_recons, results_dict)`` with per-position codes summed via
+    ``results['novel_codes'] + results['pred_codes']``.
+    """
+    import math
+    import time
+    if W < 2:
+        raise ValueError(f"TFA attention requires W >= 2; got W={W}")
+
+    # Adjust bottleneck so width % (bottleneck * n_heads) == 0.
+    bf = bottleneck_factor
+    while H % (bf * n_heads) != 0:
+        if bf > 1:
+            bf //= 2
+        else:
+            n_heads = max(1, n_heads // 2)
+            if n_heads == 1 and H % bf != 0:
+                break
+
+    sae_diff_type = "topk" if k is not None else "relu"
+    model = TFA_TemporalSAE(
+        dimin=d, width=H, n_heads=n_heads,
+        sae_diff_type=sae_diff_type,
+        kval_topk=k,
+        tied_weights=True,
+        n_attn_layers=n_attn_layers,
+        bottleneck_factor=bf,
+        use_pos_encoding=use_pos_encoding,
+        max_seq_len=max(64, W),
+    ).to(device)
+
+    decay_params = [p for p in model.parameters() if p.requires_grad and p.dim() >= 2]
+    no_decay_params = [p for p in model.parameters() if p.requires_grad and p.dim() < 2]
+    optimizer = torch.optim.AdamW(
+        [
+            {"params": decay_params, "weight_decay": weight_decay},
+            {"params": no_decay_params, "weight_decay": 0.0},
+        ],
+        lr=train_cfg.lr,
+        betas=(0.9, 0.95),
+    )
+
+    base_lr = train_cfg.lr
+    min_lr = base_lr * 0.1
+    warmup_steps = max(1, int(train_cfg.n_steps * warmup_frac))
+    iterator = _make_iterator(cache, train_cfg.batch_size, W)
+
+    arch = "tfa"
+    t_start = time.time()
+
+    model.train()
+    for step in range(train_cfg.n_steps):
+        if step < warmup_steps:
+            current_lr = base_lr * step / max(1, warmup_steps)
+        else:
+            decay_ratio = (step - warmup_steps) / max(1, train_cfg.n_steps - warmup_steps)
+            coeff = 0.5 * (1.0 + math.cos(math.pi * decay_ratio))
+            current_lr = min_lr + coeff * (base_lr - min_lr)
+        for pg in optimizer.param_groups:
+            pg["lr"] = current_lr
+
+        x = next(iterator).to(device).float()
+        recons, results = model(x)
+        loss = nn.functional.mse_loss(
+            recons.reshape(-1, d), x.reshape(-1, d), reduction="sum"
+        ) / (x.shape[0] * x.shape[1])
+
+        optimizer.zero_grad()
+        loss.backward()
+        nn.utils.clip_grad_norm_(model.parameters(), train_cfg.grad_clip)
+        optimizer.step()
+
+        last_step = step == train_cfg.n_steps - 1
+        if step % train_cfg.log_interval == 0 or last_step:
+            elapsed = time.time() - t_start
+            steps_per_sec = (step + 1) / max(elapsed, 1e-6)
+            with torch.no_grad():
+                novel_l0 = (
+                    (results["novel_codes"] > 0).float().sum(dim=-1).mean().item()
+                )
+            print(
+                f"  [{arch} W={W} k={k} pos_enc={use_pos_encoding}] "
+                f"step={step:>5d} loss={loss.item():.4f} novel_L0={novel_l0:.2f} "
+                f"lr={current_lr:.2e} | {steps_per_sec:.1f} it/s",
+                flush=True,
+            )
+
+    model.eval()
     return model
 
 

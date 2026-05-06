@@ -133,10 +133,15 @@ def plot_polynomial_clock_phase_transition(results_path: Path, out_path: Path) -
         c["tsae_probe"]["val_accuracy"] if c.get("tsae_probe") else float("nan")
         for c in cells
     ]
+    tfa_y = [
+        c["tfa_probe"]["val_accuracy"] if c.get("tfa_probe") else float("nan")
+        for c in cells
+    ]
     txc_y = [c["txc_probe"]["val_accuracy"] for c in cells]
     txc_rec = [c["txc_rec_temp"] for c in cells]
     chance = 1.0 / q
     has_tsae = any(not (y != y) for y in tsae_y)
+    has_tfa = any(not (y != y) for y in tfa_y)
 
     fig, (axA, axB) = plt.subplots(1, 2, figsize=(13, 5))
 
@@ -145,6 +150,8 @@ def plot_polynomial_clock_phase_transition(results_path: Path, out_path: Path) -
     axA.plot(W_grid, sae_window_y, "^-.", color="#ff7f0e", label="regular SAE, window-concat latent", linewidth=1.5)
     if has_tsae:
         axA.plot(W_grid, tsae_y, "v-.", color="#9467bd", label="Bhalla TSAE (k=20, α=0.1)", linewidth=1.5)
+    if has_tfa:
+        axA.plot(W_grid, tfa_y, "P-.", color="#17becf", label="TFA (k=20, AdamW+cosine, pos enc)", linewidth=1.5)
     axA.plot(W_grid, txc_y, "D-", color=_TXC_COLOR, label="TXC-global (k_win=1)", linewidth=2.0)
     axA.axhline(chance, color="black", linestyle=":", alpha=0.5, label=f"chance = 1/q = {chance:.3f}")
     axA.axvline(h + 1, color="grey", linestyle="--", alpha=0.5, label=f"W = h+1 = {h+1}")
