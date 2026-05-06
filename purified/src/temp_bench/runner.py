@@ -98,11 +98,16 @@ def run_cell(
     agent: str | None = None,
     force_train: bool = False,
     force_eval: bool = False,
+    arch_hparams_override: dict[str, Any] | None = None,
 ) -> CellResult:
     """Run one (arch, seed, eval_cfg) cell, with caching.
 
     ``training_cfg=None`` uses :class:`TrainingConfig` defaults.
     ``primary_metric=None`` will be set by ``eval_fn``'s second return.
+    ``arch_hparams_override`` is merged into ``arch_spec.hparams`` *before*
+    ``compute_train_key``, so different overrides (e.g. ``k_pos`` sweeps)
+    produce distinct ``train_key``s. When ``None`` (default), the
+    ``arch_spec`` is used unchanged so existing cache keys are preserved.
     """
     if training_cfg is None:
         training_cfg = TrainingConfig()
@@ -110,6 +115,9 @@ def run_cell(
         training_cfg = TrainingConfig(**training_cfg)
 
     arch_spec = load_arch(arch_name, component=component)
+    if arch_hparams_override:
+        merged = {**arch_spec.hparams, **arch_hparams_override}
+        arch_spec = arch_spec.model_copy(update={"hparams": merged})
     datasource = load_datasource(datasource_name)
     agent = agent or os.environ.get("AGENT_NAME", "unknown")
 

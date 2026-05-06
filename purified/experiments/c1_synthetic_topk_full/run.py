@@ -115,10 +115,9 @@ def _get_data(datasource_name: str) -> Any:
 def my_train_fn(*, arch_name, arch_hparams, seed, training_cfg,
                 act_cache_key, component):
     data = _get_data(DATASOURCE)
-    spec = load_arch(arch_name, component=component)
-    if training_cfg.arch_hparams_override:
-        merged = {**spec.hparams, **training_cfg.arch_hparams_override}
-        spec = spec.model_copy(update={"hparams": merged})
+    spec = load_arch(arch_name, component=component).model_copy(
+        update={"hparams": arch_hparams}
+    )
     d_in = data.x.shape[-1]
     model = instantiate_arch(spec, d_in=d_in)
 
@@ -132,13 +131,12 @@ def my_train_fn(*, arch_name, arch_hparams, seed, training_cfg,
 def my_eval_fn(*, model=None, eval_cfg, component):
     arch_name = eval_cfg["_arch_name"]
     state = eval_cfg["_state_dict"]
-    overrides = eval_cfg.get("_arch_hparams_override")
+    arch_hparams = eval_cfg["_arch_hparams"]
 
     data = _get_data(DATASOURCE)
-    spec = load_arch(arch_name, component=component)
-    if overrides:
-        merged = {**spec.hparams, **overrides}
-        spec = spec.model_copy(update={"hparams": merged})
+    spec = load_arch(arch_name, component=component).model_copy(
+        update={"hparams": arch_hparams}
+    )
     d_in = data.x.shape[-1]
     model = instantiate_arch(spec, d_in=d_in).to("cuda").eval()
     model.load_state_dict(state, strict=True)
@@ -212,7 +210,6 @@ def main():
                 n_steps=int(args.n_steps),
                 batch_size=int(args.batch_size),
                 plateau_early_stop=False,
-                arch_hparams_override=override,
             )
             for seed in args.seeds:
                 t_label = (
@@ -222,7 +219,6 @@ def main():
                 eval_cfg = {
                     "k_pos": int(k_pos),
                     "smoke": bool(args.smoke),
-                    "_arch_hparams_override": override,
                     "t_label": t_label,
                     "_full_suite": True,
                 }
@@ -241,6 +237,7 @@ def main():
                     eval_protocol_version=EVAL_PROTOCOL_VERSION,
                     train_fn=my_train_fn,
                     eval_fn=my_eval_fn,
+                    arch_hparams_override=override,
                 )
 
 
