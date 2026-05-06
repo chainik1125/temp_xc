@@ -127,18 +127,17 @@ def plot_polynomial_clock_phase_transition(results_path: Path, out_path: Path) -
     cells = sorted(data["cells"], key=lambda c: c["W"])
     W_grid = [c["W"] for c in cells]
     raw_y = [c["raw_probe"]["val_accuracy"] for c in cells]
-    sae_y = [c["sae_probe"]["val_accuracy"] for c in cells]
-    stacked_y = [c["stacked_probe"]["val_accuracy"] for c in cells]
+    sae_local_y = [c["sae_local_probe"]["val_accuracy"] for c in cells]
+    sae_window_y = [c["sae_window_probe"]["val_accuracy"] for c in cells]
     txc_y = [c["txc_probe"]["val_accuracy"] for c in cells]
-    stacked_rec = [c["stacked_rec_temp"] for c in cells]
     txc_rec = [c["txc_rec_temp"] for c in cells]
     chance = 1.0 / q
 
     fig, (axA, axB) = plt.subplots(1, 2, figsize=(13, 5))
 
     axA.plot(W_grid, raw_y, "o-", color=_RANDOM_COLOR, label="raw window probe", linewidth=1.5)
-    axA.plot(W_grid, sae_y, "s--", color=_SAE_COLOR, label="regular SAE (W=1 latent)", linewidth=1.5)
-    axA.plot(W_grid, stacked_y, "^-.", color="#ff7f0e", label="stacked SAE (T·H latent)", linewidth=1.5)
+    axA.plot(W_grid, sae_local_y, "s--", color=_SAE_COLOR, label="regular SAE, single-position latent", linewidth=1.5)
+    axA.plot(W_grid, sae_window_y, "^-.", color="#ff7f0e", label="regular SAE, window-concat latent", linewidth=1.5)
     axA.plot(W_grid, txc_y, "D-", color=_TXC_COLOR, label="TXC-global (k_win=1)", linewidth=2.0)
     axA.axhline(chance, color="black", linestyle=":", alpha=0.5, label=f"chance = 1/q = {chance:.3f}")
     axA.axvline(h + 1, color="grey", linestyle="--", alpha=0.5, label=f"W = h+1 = {h+1}")
@@ -150,14 +149,13 @@ def plot_polynomial_clock_phase_transition(results_path: Path, out_path: Path) -
     axA.grid(True, alpha=0.3)
     axA.legend(loc="best", fontsize=9)
 
-    axB.plot(W_grid, stacked_rec, "^-.", color="#ff7f0e", label="stacked SAE Rec_temp", linewidth=1.5)
     axB.plot(W_grid, txc_rec, "D-", color=_TXC_COLOR, label="TXC-global Rec_temp", linewidth=2.0)
     axB.axvline(h + 1, color="grey", linestyle="--", alpha=0.5)
     n_atoms = cells[0]["n_atoms"]
     axB.set_xticks(W_grid)
     axB.set_xlabel("Window length W")
     axB.set_ylabel(f"Rec_temp (avg max cos² vs G_β,  M={n_atoms})")
-    axB.set_title("Panel B: Temporal-atom recovery vs W")
+    axB.set_title("Panel B: TXC-global temporal-atom recovery vs W")
     axB.set_ylim(-0.02, 1.05)
     axB.grid(True, alpha=0.3)
     axB.legend(loc="best", fontsize=9)

@@ -36,7 +36,7 @@ _TXC_DIR = _REPO_ROOT / "temporal_crosscoders"
 if str(_TXC_DIR) not in sys.path:
     sys.path.insert(0, str(_TXC_DIR))
 
-from models import StackedSAE, TopKSAE  # noqa: E402
+from models import TopKSAE  # noqa: E402
 
 from .data_adapter import ColoredSourceCache  # noqa: E402
 from .metrics import squared_axis_recovery  # noqa: E402
@@ -80,43 +80,6 @@ def _train_topk_sae_local(
             elapsed = time.time() - t0
             print(
                 f"  [token_sae] step={step:>5d} loss={loss.item():.4f} "
-                f"| {(step + 1) / max(elapsed, 1e-6):.1f} it/s",
-                flush=True,
-            )
-    return sae
-
-
-def _train_stacked_sae(
-    cache: ColoredSourceCache,
-    *,
-    d: int,
-    H: int,
-    W: int,
-    k_pos: int,
-    n_steps: int,
-    batch_size: int,
-    lr: float,
-    device: torch.device,
-    log_interval: int = 1000,
-) -> StackedSAE:
-    """Train ``T`` independent per-position TopK SAEs on aligned windows."""
-    if W < 1:
-        raise ValueError(f"W must be >= 1; got {W}")
-    sae = StackedSAE(d_in=d, d_sae=H, T=W, k=k_pos).to(device)
-    opt = torch.optim.Adam(sae.parameters(), lr=lr)
-    t0 = time.time()
-    for step in range(n_steps):
-        x = cache.sample_windows(batch_size, W)
-        loss, _, _ = sae(x)
-        opt.zero_grad()
-        loss.backward()
-        nn.utils.clip_grad_norm_(sae.parameters(), 1.0)
-        opt.step()
-        sae._normalize_decoder()
-        if step % log_interval == 0:
-            elapsed = time.time() - t0
-            print(
-                f"  [stacked_sae W={W}] step={step:>5d} loss={loss.item():.4f} "
                 f"| {(step + 1) / max(elapsed, 1e-6):.1f} it/s",
                 flush=True,
             )
@@ -211,11 +174,9 @@ def _sae_latents_at_first_position(
 ) -> torch.Tensor:
     """Encode the *first* position of each anchor through the token-SAE.
 
-    For ``W = 1`` this is just the position itself; for ``W > 1`` it
-    represents the regular (no-window-context) baseline — the SAE only sees
-    one token at a time, so probing it at ``W > 1`` would be cheating. We
-    intentionally pass only the first position to keep the regular SAE
-    properly local.
+    Single-position probe — represents the SAE+probe with no temporal
+    context. Should be at chance (`1/q`) for `W <= h` since `x_t` carries
+    no info about `Y` regardless of which `t` we pick.
     """
     chains = anchors["chain_idx"]
     starts = anchors["t_start"]
@@ -224,15 +185,24 @@ def _sae_latents_at_first_position(
         return sae.encode(x).detach()
 
 
-def _stacked_sae_latents_at(
-    sae: StackedSAE, cache: ColoredSourceCache, anchors: dict, W: int
+def _sae_latents_concatenated_window(
+    sae: TopKSAE, cache: ColoredSourceCache, anchors: dict, W: int
 ) -> torch.Tensor:
-    """Encode windows of length ``W`` and return the flattened
-    ``(B, T*H)`` stacked latents."""
-    x = _windows_at_anchors(cache, anchors, W)
+    """Encode every position of a length-`W` window through the SAME
+    iid-trained SAE and concatenate the per-position latents.
+
+    Output shape `(B, W * H)`. This is the natural "alphabet SAE + temporal
+    probe" baseline: the SAE was only trained on iid tokens (so it learns
+    the alphabet `{u_a}`), but we let the linear probe see all `W`
+    activations to give it temporal context. The probe must do all
+    Lagrange-style reasoning itself.
+    """
+    x = _windows_at_anchors(cache, anchors, W)             # (B, W, d)
+    B, _, d = x.shape
+    flat = x.reshape(B * W, d)
     with torch.no_grad():
-        _, _, u = sae(x)                                    # (B, T, H)
-    return u.reshape(u.shape[0], -1)
+        z = sae.encode(flat).detach()                      # (B*W, H)
+    return z.reshape(B, W * z.shape[-1])                   # (B, W*H)
 
 
 def _txc_global_latents_at(
@@ -262,7 +232,6 @@ def run_stage(
     T_chain: int,
     H: int,
     k_pos_local: int,
-    k_pos_stacked: int,
     n_steps: int,
     batch_size: int,
     lr: float,
@@ -311,37 +280,23 @@ def run_stage(
         )
         print(f"    raw window probe          val={raw_probe['val_accuracy']:.3f}")
 
-        # 2. Regular SAE probe — only sees first token of each anchor.
-        sae_X = _sae_latents_at_first_position(sae, cache, anchors)
-        sae_probe = _train_logistic_probe(
-            sae_X, anchors["Y"], R=cfg.q, device=device, seed=seed + 200 + W,
+        # 2. Regular SAE probe — single-position latent (no temporal context).
+        sae_X_local = _sae_latents_at_first_position(sae, cache, anchors)
+        sae_local_probe = _train_logistic_probe(
+            sae_X_local, anchors["Y"], R=cfg.q, device=device, seed=seed + 200 + W,
         )
-        print(f"    regular SAE (W=1 latent)  val={sae_probe['val_accuracy']:.3f}")
+        print(f"    regular SAE (W=1 latent)  val={sae_local_probe['val_accuracy']:.3f}")
 
-        # 3. Stacked SAE: train fresh per W, then probe on flattened (T*H) latents.
-        stacked = _train_stacked_sae(
-            cache, d=d, H=H, W=W, k_pos=k_pos_stacked,
-            n_steps=n_steps, batch_size=batch_size, lr=lr, device=device,
+        # 3. Regular SAE *concatenated across the window* — the natural
+        #    "alphabet SAE + temporal probe" baseline. Same SAE that was
+        #    trained on iid tokens; we just give the probe access to all
+        #    W per-position latents.
+        sae_X_window = _sae_latents_concatenated_window(sae, cache, anchors, W)
+        sae_window_probe = _train_logistic_probe(
+            sae_X_window, anchors["Y"], R=cfg.q, device=device, seed=seed + 300 + W,
         )
-        stacked_X = _stacked_sae_latents_at(stacked, cache, anchors, W)
-        stacked_probe = _train_logistic_probe(
-            stacked_X, anchors["Y"], R=cfg.q, device=device, seed=seed + 300 + W,
-        )
-        print(f"    stacked SAE (T*H latent)  val={stacked_probe['val_accuracy']:.3f}")
-        # Stacked SAE has per-position decoders saes[t].W_dec of shape (d, H).
-        # decoder_directions returns the mean over T → (d, H).
-        stacked_avg = stacked.decoder_directions.detach()
-        rec_local_stacked = rec_local_alphabet(stacked_avg, alphabet)
-        # For Rec_temp build (H, W, d) by stacking each position's W_dec.
-        per_pos_decoders = [stacked.saes[t].W_dec.detach() for t in range(W)]  # each (d, H)
-        # Stack to (W, d, H); permute to (H, W, d).
-        stacked_temporal_HWd = torch.stack(per_pos_decoders, dim=0).permute(2, 0, 1)
+        print(f"    regular SAE (W*H concat)  val={sae_window_probe['val_accuracy']:.3f}")
         atoms = all_polynomial_atoms(alphabet, h, q, W).to(device).float()
-        rec_temp_stacked = rec_temp_polynomial(stacked_temporal_HWd, atoms)
-        print(
-            f"      stacked SAE Rec_local={rec_local_stacked:.3f}  "
-            f"Rec_temp={rec_temp_stacked:.3f}  (M={atoms.shape[0]})"
-        )
 
         # 4. TXC-global: window-level k=1 — the proposal's prescription.
         # Train inline to get access to the model for latent + decoder extraction.
@@ -382,10 +337,8 @@ def run_stage(
         cells.append({
             "W": W,
             "raw_probe": raw_probe,
-            "sae_probe": sae_probe,
-            "stacked_probe": stacked_probe,
-            "stacked_rec_local": rec_local_stacked,
-            "stacked_rec_temp": rec_temp_stacked,
+            "sae_local_probe": sae_local_probe,
+            "sae_window_probe": sae_window_probe,
             "txc_probe": txc_probe,
             "txc_rec_local": rec_local_txc,
             "txc_rec_temp": rec_temp_txc,
@@ -400,7 +353,6 @@ def run_stage(
         "config": asdict(cfg),
         "H": H,
         "k_pos_local": k_pos_local,
-        "k_pos_stacked": k_pos_stacked,
         "k_window_txc": 1,
         "n_steps": n_steps,
         "batch_size": batch_size,
@@ -450,7 +402,7 @@ def main() -> int:
     run_stage(
         h=h, q=q, d=max(64, q * 2), sigma=0.1,
         n_seq=args.n_seq, T_chain=args.T_chain,
-        H=H, k_pos_local=1, k_pos_stacked=1,
+        H=H, k_pos_local=1,
         n_steps=args.n_steps, batch_size=args.batch_size, lr=args.lr,
         W_grid=W_grid, n_probe_samples=args.n_probe_samples,
         device=device, out_dir=Path(args.out_dir), seed=args.seed,
