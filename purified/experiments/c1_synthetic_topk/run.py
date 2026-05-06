@@ -133,15 +133,25 @@ def _is_valid_cell(arch_name: str, t_override: dict | None, k_pos: int) -> bool:
       - txc_pro with t_sample=5: k_train = k_pos × 5 ≤ h_size=40 → k_pos ≤ 8.
       - stacked_sae with T=5: k_train = k_pos × 5 ≤ d_sae=40 → k_pos ≤ 8.
       - stacked_sae with T=2: k_pos ≤ 20.
-    Per-token archs (topk_sae, tsae_paper, tfa, tfa_pos): no constraint.
+      - tfa / tfa_pos with T=5: kval_topk = k_pos × T = k_pos × 5
+        is the topk count over z_novel (last dim = d_sae=40) →
+        k_pos ≤ 8. Same constraint as window archs at C1, NOT
+        per-token. Bug fix 2026-05-06 (agent_filler reported TFA
+        crash at k_pos=10 in `_tfa_module.py:216 torch.topk`).
+    Per-token archs (topk_sae, tsae_paper): no constraint.
     """
     spec = load_arch(arch_name, component=COMPONENT)
     hp = spec.hparams
     if t_override:
         hp = {**hp, **t_override}
     d_sae = int(hp.get("d_sae", 40))
-    if arch_name in ("topk_sae", "tsae_paper", "tfa", "tfa_pos"):
+    if arch_name in ("topk_sae", "tsae_paper"):
         return k_pos <= d_sae
+    if arch_name in ("tfa", "tfa_pos"):
+        # TFA passes kval_topk = k_pos × T into the underlying
+        # TemporalSAE; topk runs on z_novel (last dim = width = d_sae).
+        T = int(hp.get("T", 5))
+        return k_pos * T <= d_sae
     if arch_name == "stacked_sae":
         T = int(hp.get("T", 5))
         return k_pos * T <= d_sae
