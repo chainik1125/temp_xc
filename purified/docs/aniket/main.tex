@@ -168,76 +168,37 @@ Here we introduce Temporal Crosscoders (Fig. \ref{fig:tx_arc}). Only half a page
 
 
 
-% TODO: Bad title: Maybe something like evaluating ground truth temporal features
-\section{Benchmarking Temporal Crosscoders in a synthetic setting}
-% Structure:
-% Par 1: Generalizing the conventional setting.
-% Par 2: Two synthetic settings we evaluate on (C1, C2).
-% Par 3: Metrics.
+\section{Synthetic evaluation against ground-truth temporal features}
 \label{sec:synthetic}
-% Summary figure
-\afterpage{%
-\begin{figure*}[t]
-    \centering
-    \begin{subfigure}[t]{0.32\textwidth}
-        \centering
-        \placeholderbox{images/syn\_cartoon}
-        \caption{syn\_cartoon}
-        \label{fig:syn_cartoon}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[t]{0.32\textwidth}
-        \centering
-        \placeholderbox{images/local\_vs\_global}
-        \caption{local\_vs\_global}
-        \label{fig:local_vs_global}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[t]{0.32\textwidth}
-        \centering
-        \placeholderbox{images/local\_vs\_global\_transformer}
-        \caption{local\_vs\_global\_transformer}
-        \label{fig:local_vs_global_transformer}
-    \end{subfigure}
-    \caption{Placeholder figure for the synthetic benchmarking section.}
-    \label{fig:synthetic_overview}
-\end{figure*}%
-}
 
-Synthetic datasets make it possible to evaluate feature recovery against known ground-truth features \cite{chanin2025synthetic}. Existing synthetic benchmarks define feature activations independently at each sequence position, so the ground-truth feature structure is local. To benchmark temporal architectures, we generalize this setting by making the feature-firing pattern a stochastic process across sequence positions.
+\paragraph{Setting.}
+Synthetic datasets allow evaluation of dictionary-learning architectures against known ground-truth features without the confounds of natural-language activations \cite{chanin2025synthetic}. Existing synthetic benchmarks define feature activations independently at each sequence position, so the ground-truth feature structure is local. To benchmark architectures whose inductive bias is temporal, we generalise this protocol by replacing the per-position feature distribution with a stochastic process across positions, and we instantiate two specific settings (C1 and C2 below). The first carries an independent two-state Markov chain per feature, so the temporal structure is in the firing pattern but the ground-truth feature directions are still observable per position. The second introduces an OR-gate coupling so that a small set of hidden-state directions drives a larger set of emission directions, dissociating local and global ground truth. The architectural and theoretical analysis built on these two settings is presented elsewhere in this paper; here we describe their construction and the metrics used to score recovery.
 
-To do so, consider a synthetic activation sequence
+\paragraph{Generalised synthetic setting.}
+A synthetic activation sequence
 \[
     \mathbf{X}=(\mathbf{x}_1,\ldots,\mathbf{x}_T),
     \qquad
     \mathbf{x}_t\in\mathbb{R}^d,
 \]
-defined over a temporal window of length $T$. A synthetic setting is specified by three pieces of data. First, a set of $N$ ground-truth feature directions
+is specified by three pieces of data. First, a set of $N$ ground-truth feature directions
 \[
     \mathcal{F}=\{\mathbf{f}_1,\ldots,\mathbf{f}_N\},
     \qquad
     \mathbf{f}_i\in\mathbb{R}^d,
 \]
-constructed by gradient-based orthogonalisation against a target pairwise cosine similarity. Second, a probability distribution $P_T$ over binary feature-firing masks
+obtained as the rows of $Q^\top$ from a reduced QR factorisation of an i.i.d.\ Gaussian matrix in $\mathbb{R}^{d\times N}$, so the directions are exactly orthonormal. Second, a probability distribution $P_T$ over binary feature-firing masks
 \[
     A=(\mathbf{a}_1,\ldots,\mathbf{a}_T)\in(\{0,1\}^N)^T,
     \qquad
     \mathbf{a}_t=(a_{t,1},\ldots,a_{t,N}),
 \]
-where $a_{t,i}=1$ indicates that feature $i$ fires at position $t$. Third, a distribution $M_T$ over feature magnitudes
-\[
-    M=(\mathbf{m}_1,\ldots,\mathbf{m}_T),
-    \qquad
-    \mathbf{m}_t=(m_{t,1},\ldots,m_{t,N}),
-\]
-which we take to be i.i.d.\ folded-normal across feature index and sequence position, $m_{t,i}=|\mathcal{N}(\mu,\sigma^2)|$ with $\mu=1.0$ and $\sigma=0.15$. The synthetic activation at position $t$ is then
+where $a_{t,i}=1$ indicates that feature $i$ fires at position $t$. Third, a distribution $M_T$ over per-position firing magnitudes, taken to be i.i.d.\ folded-normal across feature index and sequence position, $m_{t,i}=|\mathcal{N}(\mu,\sigma^2)|$ with $\mu=1.0$ and $\sigma=0.15$. The synthetic activation at position $t$ is
 \begin{equation}
     \mathbf{x}_t=\sum_{i=1}^N a_{t,i}\,m_{t,i}\,\mathbf{f}_i.
     \label{eq:synthetic-activation}
 \end{equation}
-The conventional, local synthetic setting is recovered as the special case in which $P_T$ factorizes across sequence positions, $P_T(\mathbf{a}_{1:T})=\prod_{t=1}^T p_{\mathrm{loc}}(\mathbf{a}_t)$. Local feature correlations are encoded by the one-position marginal over $\mathbf{a}_t$; temporal correlations are encoded by the joint distribution over $\mathbf{a}_{1:T}$.
-
-We benchmark dictionary-learning architectures on two synthetic settings.
+The conventional, local synthetic setting is recovered as the special case in which $P_T$ factorises across sequence positions, $P_T(\mathbf{a}_{1:T})=\prod_{t=1}^T p_{\mathrm{loc}}(\mathbf{a}_t)$. Local feature correlations are encoded by the one-position marginal over $\mathbf{a}_t$; temporal correlations are encoded by the joint distribution over $\mathbf{a}_{1:T}$.
 
 \paragraph{(C1) Independent two-state Markov support.}
 Each of $N=20$ features carries its own independent two-state Markov chain controlling whether the feature fires at each position. Each chain is parameterised by a stationary firing probability $\pi$ and a lag-1 autocorrelation $\rho$, with transition probabilities
@@ -246,30 +207,54 @@ Each of $N=20$ features carries its own independent two-state Markov chain contr
     \qquad
     \Pr(1\to 0) = (1-\pi)(1-\rho),
 \]
-and is initialised from its stationary distribution $\mathrm{Bernoulli}(\pi)$. We use a shared $\pi=0.5$ across all features, and assign $\rho$ from five levels $\rho\in\{0.0,\,0.3,\,0.5,\,0.7,\,0.9\}$ with four features per level, so the dataset spans the full range from i.i.d.\ firing ($\rho=0$) to strongly temporally persistent firing ($\rho=0.9$). We use $d=40$ and $T=64$.
+and is initialised from its stationary distribution $\mathrm{Bernoulli}(\pi)$. We use a shared $\pi=0.5$ across all features and assign $\rho$ from five levels $\rho\in\{0.0,\,0.3,\,0.5,\,0.7,\,0.9\}$ with four features per level, so the dataset spans the full range from i.i.d.\ firing ($\rho=0$) to strongly temporally persistent firing ($\rho=0.9$). We use $d=40$, $T=64$, and a fixed dataset of $n_{\mathrm{seqs}}=4096$ sequences re-sampled with replacement during training. The ground truth is the per-feature direction set $\mathcal{F}$: an architecture passes the C1 benchmark if and only if its decoder columns recover $\mathcal{F}$, regardless of how the architecture represents the temporal correlation that drives feature firing.
 
 \paragraph{(C2) Coupled features via OR-gated emission.}
-We generate $K=10$ independent hidden two-state Markov chains $h_{1:K}$ and $M=20$ emission features $s_{1:M}$ connected by a fixed binary coupling matrix $C\in\{0,1\}^{M\times K}$. The hidden chains are uniform with $\pi=0.05$ and $\rho=0.7$. The coupling matrix is sampled once at dataset construction so each emission $j$ has exactly $n_{\mathrm{parents}}=2$ parents drawn uniformly without replacement, and the emission rule is the OR gate
+We generate $K=10$ independent hidden two-state Markov chains $h_{1:K}$ and $M=20$ emission features $s_{1:M}$ connected by a fixed binary coupling matrix $C\in\{0,1\}^{M\times K}$. The hidden chains share $\pi=0.05$ and $\rho=0.7$, sparse and strongly persistent. The coupling matrix is sampled once at dataset construction so that each emission $j$ has exactly $n_{\mathrm{parents}}=2$ parents drawn uniformly without replacement, and the emission rule is the OR gate
 \[
     s_j(t) = \mathbb{1}\!\left[\,\textstyle\sum_{i=1}^K C_{ji}\,h_i(t)\geq 1\,\right],
 \]
-so emission $j$ fires whenever any of its parent hidden states is on. The observation is $\mathbf{x}_t = \sum_{j=1}^M s_j(t)\,m_{j,t}\,\mathbf{f}_j$ with $\mathbf{f}_j\in\mathbb{R}^{d}$ the orthogonal emission directions and $d=256$. This setting has a genuine separation between local and global ground truth: the $M=20$ emission directions $\{\mathbf{f}_j\}$ are the local ground truth, while the global ground truth is the set of $K=10$ hidden-state directions
+so emission $j$ fires whenever any of its parent hidden states is on. The observation is $\mathbf{x}_t = \sum_{j=1}^M s_j(t)\,m_{j,t}\,\mathbf{f}_j$ with $\{\mathbf{f}_j\}\subset\mathbb{R}^d$ the orthonormal emission directions, $d=256$, $T=64$, and the same $n_{\mathrm{seqs}}=4096$ convention as C1. This setting dissociates local and global ground truth: the $M=20$ emission directions $\{\mathbf{f}_j\}$ are observable per position and constitute the \emph{local} ground truth, while the \emph{global} ground truth is the set of $K=10$ hidden-state directions
 \[
     \tilde{\mathbf{f}}_i \;=\; \mathrm{normalize}\!\left(\textstyle\sum_{j:\,C_{ji}=1} \mathbf{f}_j\right),
     \qquad i=1,\ldots,K,
 \]
-each defined as the normalized mean of its children's emission directions.
+each defined as the normalised mean of its children's emission directions. An architecture that pools across positions can in principle recover the $K$ hidden directions; one that does not can only recover the $M$ emission directions. Reporting both axes makes the local-vs-global distinction visible.
 
 \paragraph{Metrics.}
 We report reconstruction NMSE
 \[
     \mathrm{NMSE} \;=\; \mathbb{E}\!\left[\|\mathbf{x}-\hat{\mathbf{x}}\|^2\right] \,/\, \mathbb{E}\!\left[\|\mathbf{x}\|^2\right]
 \]
-and a feature-recovery AUC against a ground-truth direction set $\mathcal{G}=\{\mathbf{g}_1,\ldots,\mathbf{g}_K\}$. For each $\mathbf{g}_k\in\mathcal{G}$ we match its best decoder column by absolute cosine similarity, $c_k=\max_j |\langle \mathbf{g}_k,\mathbf{w}_j\rangle|$ (with both vectors normalized), and integrate the fraction-recovered curve over a threshold sweep $\tau\in[0,1]$:
+and a feature-recovery AUC against a ground-truth direction set $\mathcal{G}=\{\mathbf{g}_1,\ldots,\mathbf{g}_K\}$. For each $\mathbf{g}_k\in\mathcal{G}$ we match its best decoder column by absolute cosine similarity, $c_k=\max_j |\langle \mathbf{g}_k,\mathbf{w}_j\rangle|$ (with both vectors $\ell_2$-normalised), and integrate the fraction-recovered curve over a threshold sweep $\tau\in[0,1]$:
 \[
     \mathrm{AUC}(\mathcal{G}) \;=\; \int_0^1 \frac{1}{|\mathcal{G}|}\sum_{k}\mathbb{1}\!\left[c_k\geq\tau\right]\,\mathrm{d}\tau.
 \]
-For C1, $\mathcal{G}$ is the $N=20$ ground-truth feature set $\mathcal{F}$ (we report this single AUC, plus $\overline{c}=\mathrm{mean}(c_k)$). For C2 we report both an emission AUC (eAUC) against the $M=20$ emission directions $\{\mathbf{f}_j\}$ and a global AUC (gAUC) against the $K=10$ hidden directions $\{\tilde{\mathbf{f}}_i\}$. All metrics are computed on a held-out evaluation batch and reported per training seed $\{1,2,42\}$ with mean and standard deviation across seeds.
+For C1 we set $\mathcal{G}=\mathcal{F}$ (the $N=20$ ground-truth feature directions) and report a single AUC together with $\overline{c}=\mathrm{mean}(c_k)$. For C2 we report both an emission AUC (eAUC) against the $M=20$ emission directions $\{\mathbf{f}_j\}$ and a hidden-state AUC (gAUC) against the $K=10$ hidden directions $\{\tilde{\mathbf{f}}_i\}$. The gAUC is the C2 headline because it is the metric on which the local-vs-global dissociation appears. All metrics are computed on a held-out evaluation batch and reported per training seed $\{1,2,42\}$ with mean and standard deviation across seeds.
+
+\paragraph{Sweep configuration.}
+Each architecture-by-$k_{\mathrm{pos}}$ cell trains for $n_{\mathrm{steps}}=30{,}000$ steps at batch size $1024$, with $k_{\mathrm{pos}}\in\{1,2,3,4,5,6,8,10,12,15,17,20\}$ swept independently per architecture and three training seeds $\{1,2,42\}$ per $(\text{architecture},k_{\mathrm{pos}})$ cell. The full-suite cells are produced by the drivers at \texttt{purified/experiments/c1\_synthetic\_topk\_full/run.py} and \texttt{purified/experiments/c2\_synthetic\_coupled\_full/run.py}; resulting rows are filtered to \texttt{component$\,\in\,$\{c1,c2\}} with \texttt{eval\_cfg.\_full\_suite=true} for the live-rendered bundle. Architecture coverage on C1 is the union of the C7 locked set (TopK SAE, T-SAE, MLC, TXC-base, TXC-pro), the temporal feature analyser of \citet{lubana2025priors} in its TFA and TFA-pos variants, and stacked SAE at temporal windows $T\in\{2,5\}$. Architecture coverage on C2 is restricted to those whose decoder structure can in principle express a multi-position pooling operation (TopK SAE as the per-position baseline, stacked SAE at $T\in\{2,5\}$, TXC-base at $T=5$, and TXC-pro at $T\in\{2,5,12\}$); per-position architectures without a pooling step cannot recover the hidden directions $\tilde{\mathbf{f}}_i$ by construction and are excluded from C2 to avoid an uninformative chance-floor row.
+
+\paragraph{Results.}
+\textit{Numerical results are deferred until the in-flight C1 and C2 sweeps finish. The live-rendered partial results are mirrored at \texttt{purified/docs/components/c\{1,2\}\_paper\_results.md} (re-rendered every $300$\,s by \texttt{purified/scripts/synthetic\_paper\_renderer.py} as new leaderboard rows land), and the AUC-vs-$k_{\mathrm{pos}}$ figures below auto-update from the same source.} \Cref{fig:synthetic-results} plots feature-recovery AUC against the per-position sparsity budget $k_{\mathrm{pos}}$ for both settings.
+
+\begin{figure}[t]
+    \centering
+    \begin{subfigure}[t]{0.48\linewidth}
+        \centering
+        \autofig{c1_auc_vs_k}
+        \caption{C1 (Markov support): feature-recovery AUC against the $N=20$ ground-truth directions, as a function of per-position sparsity $k_{\mathrm{pos}}$. Lines are per-architecture means across seeds $\{1,2,42\}$.}
+        \label{fig:c1-auc-vs-k}
+    \end{subfigure}\hfill
+    \begin{subfigure}[t]{0.48\linewidth}
+        \centering
+        \autofig{c2_gauc_vs_k}
+        \caption{C2 (OR-gate coupling): hidden-state recovery gAUC against the $K=10$ hidden directions $\{\tilde{\mathbf{f}}_i\}$, as a function of $k_{\mathrm{pos}}$. The corresponding emission AUC (eAUC) against the $M=20$ emission directions is reported separately in the live bundle.}
+        \label{fig:c2-gauc-vs-k}
+    \end{subfigure}
+    \caption{Synthetic feature recovery as a function of per-position sparsity budget $k_{\mathrm{pos}}$. Both panels report the AUC defined by the threshold-sweep above; C2's emission AUC is reported in the live-rendered bundle at \texttt{purified/docs/components/c2\_paper\_results.md}. The figures auto-refresh from the leaderboard.}
+    \label{fig:synthetic-results}
+\end{figure}
 
 \section{Qualitative analysis of features in large scale models}
 \newpage
@@ -316,7 +301,7 @@ For C1, $\mathcal{G}$ is the $N=20$ ground-truth feature set $\mathcal{F}$ (we r
             \textbf{MLC ($bs{=}1024$), $m{=}+16$} \hfill \textcolor{red!70!black}{\textbf{ans=None \texttimes} \textbar{} bt=3, coh=3}\\[2pt]
             {\itshape \ldots $6.25 - 0.49$ is \textbf{$5.756$}, right? Because $6.25 - 0.49$ is $5.756$. Yes, that's correct. So, the numerator is $\sqrt{\mathbf{5.756}}$\ldots[carries the wrong value through, trails off]}
         \end{minipage}}
-        \caption{Steered continuations on \texttt{test/prealgebra/951.json} (problem: simplify $\sqrt{2.5^2 - 0.7^2}\,/\,(2.7 - 2.5)$, ground truth $= 12$). The same prefix is supplied to all four cells; each is steered at its own optimal $\Delta gc$ magnitude. All four cells produce judge-positive backtracks (bt counts $1$--$3$), but only TXC-pro's is committal — the baseline cells loop in re-verification cycles (TopK SAE, T-SAE) or inject a fresh arithmetic mistake (MLC: $6.25 - 0.49 = 5.756$, off by $0.004$).}
+        \caption{Steered continuations on \texttt{test/prealgebra/951.json} (problem: simplify $\sqrt{2.5^2 - 0.7^2}\,/\,(2.7 - 2.5)$, ground truth $= 12$). The same prefix is supplied to all four cells; each is steered at its own optimal $\Delta gc$ magnitude. All four cells produce judge-positive backtracks (bt counts $1$--$3$), but only TXC-pro's is committal: the baseline cells loop in re-verification cycles (TopK SAE, T-SAE) or inject a fresh arithmetic mistake (MLC: $6.25 - 0.49 = 5.756$, off by $0.004$).}
         \label{fig:c7-headline-text}
     \end{subfigure}\hfill
     \begin{subfigure}[t]{0.40\linewidth}
@@ -324,7 +309,7 @@ For C1, $\mathcal{G}$ is the $N=20$ ground-truth feature set $\mathcal{F}$ (we r
         \caption{Per-question genuine-backtracking counts $gc(a, m)$ at the unsteered baseline ($m = 0$, gray) and at each architecture's optimal steering magnitude (colored), sorted descending by the steered value. Error bars are bootstrap $95\%$ confidence intervals over the $61$ cohort questions ($n_{\text{boot}} = 1000$). Numbers above each colored bar are the steered $gc(a, m)$ value.}
         \label{fig:c7-gc-at-peak-bar}
     \end{subfigure}
-    \caption{Headline result, two-panel. \emph{Left:} on a single MATH-500 cohort question, all four steered cells produce judge-positive backtracks under their optimal-magnitude steering, but only TXC-pro's is productive — the baselines either loop in verification or fabricate fresh arithmetic. \emph{Right:} aggregated across the $61$-question cohort, the productive-vs-unproductive distinction shows up as a clear $gc(a, m)$ gap between the steered (colored) and unsteered (gray) bars, which TXC architectures lead. Full setup, judge prompts, and per-cell artifacts in \cref{app:c7}.}
+    \caption{Headline result, two-panel. \emph{Left:} on a single MATH-500 cohort question, all four steered cells produce judge-positive backtracks under their optimal-magnitude steering, but only TXC-pro's is productive: the baselines either loop in verification or fabricate fresh arithmetic. \emph{Right:} aggregated across the $61$-question cohort, the productive-vs-unproductive distinction shows up as a clear $gc(a, m)$ gap between the steered (colored) and unsteered (gray) bars, which TXC architectures lead. Full setup, judge prompts, and per-cell artifacts in \cref{app:c7}.}
     \label{fig:c7-gc-at-peak}
 \end{figure}
 
