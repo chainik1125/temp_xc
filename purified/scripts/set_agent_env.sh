@@ -131,12 +131,15 @@ case "$agent" in
         export AGENT_NAME=agent_filler
         export TEMP_BENCH_POD_MODE=ephemeral
         ;;
-    # ── 8× 5090 multi-GPU synthetic-investigation pod (Han 2026-05-06).
+    # ── 8× H100 multi-GPU synthetic-investigation pod (Han 2026-05-06 PM —
+    #    upgraded from 8× 5090). 640 GB GPU mem, 1.8 TB system RAM, 224 CPUs.
     #    Same parallel-launch pattern as agent_filler: process pinned to
     #    GPU 0 by default; spawn parallel cells via
     #    `bash scripts/run_on_gpu.sh <0..7> -- <cmd>`. Mission focus:
-    #    DC/AC ablation, Dmitry's Effect-1-vs-Effect-2 stress benches,
-    #    C2 ρ-sweep (reassigned from agent_filler).
+    #    "Global vs Local" narrative — show TXC dictionaries skew toward
+    #    GLOBAL features and per-token SAE dictionaries skew toward LOCAL
+    #    features. Includes Dmitry-bench reproductions for honest caveats.
+    #    See agents/agent_synth/briefing.md for the full mission.
     agent_synth)
         export CUDA_VISIBLE_DEVICES=0
         export AGENT_NAME=agent_synth
