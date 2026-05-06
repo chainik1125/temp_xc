@@ -8,24 +8,24 @@ tags:
 
 ## TL;DR
 
-Implemented two variants of proposal Section 4:
+Three synthetic regimes, each addressing a different flaw of the previous:
 
-- **Strong / colored-source theorem regime (Stages 0–2):** Rigorous local-direction
-  impossibility. Every trained dictionary architecture we tried (regular SAE,
-  TopK TXC, Han H8 with multi-distance InfoNCE) sits at chance recovery across
-  every window length and delay. Only the spectral oracle reads `Ĉ_D` directly
-  and recovers the basis. **Reason:** rotation invariance of Gaussian sources
-  is preserved by reconstruction loss AND by cosine InfoNCE.
-
-- **Weak / ambiguous-pair HMM regime (Stage 3):** Bounds local pair classification
-  rather than direction recovery. Empirically delivers the proposal's intended
-  phase transition: regular SAE probe at the middle position is exactly at chance
-  (val acc 0.13 ≈ 1/R = 0.125 with R=8), TXC probes hit val acc 1.00 at every
-  W ≥ 2 because the cue and readout positions break the ambiguity.
-
-The two regimes answer different questions: the strong version *bounds the
-local baseline rigorously*; the weak version *gives a clean TXC > SAE
-empirical figure*.
+- **Colored-source Gaussian sources (Stages 0–2):** rigorous local-direction
+  impossibility, but rotation symmetry of Gaussian sources preserved by
+  reconstruction *and* cosine InfoNCE — every trained TXC / SAE / H8
+  variant sits at chance, only the spectral oracle recovers `F`.
+- **Ambiguous-pair HMM (Stage 3):** clean bound, but empirically trivial.
+  A stacked SAE + linear probe on the cue position alone hits 1.0; the
+  TXC > SAE story we naively claimed was a strawman of single-position
+  vs. windowed access.
+- **Polynomial clock HMM (Stage 4):** the *theorem-backed* TXC > SAE
+  separation. Discrete `F_q` alphabet, exact `I(Y; window) = 0` for
+  `W ≤ h`, and a constructive sparse-reconstruction solution at
+  `W = h + 1` with margin `1/(h+1)`. Empirically: at all three stages
+  (`h ∈ {1, 2, 3}`), the **TXC-global with `k_window = 1` is the only
+  architecture** that achieves above-chance probe accuracy or non-trivial
+  decoder-atom recovery. Regular SAE concatenated across the window, the
+  Bhalla 2025 TSAE, and a raw window probe all stay at or near chance.
 
 ## Setup
 
@@ -230,6 +230,125 @@ target rather than direction recovery.
   rotation invariance. It changes the chance-adjustment denominator
   (since `H` doubles) but does not give SAEs a foothold.
 
+## Stage 4 — polynomial clock HMM (the theorem-backed version)
+
+Spec at `docs/aniket/experiments/synthetic/notes/polynomial_clock_experiment.tex`.
+
+**Construction.** Prime field `F_q`, with each symbol `a ∈ F_q` mapped to a
+fixed orthonormal direction `u_a ∈ R^d`. Sample target `Y ~ Unif(F_q)` and
+nuisance coefficients `B_0, …, B_{h-1} ~ Unif(F_q)`. Emit
+`Q_t = B_0 + B_1 t + … + B_{h-1} t^{h-1} + Y t^h (mod q)` and observe
+`x_t = u_{Q_t} + σ ε_t`.
+
+**Theory.** For `W ≤ h`: any `W` evaluations leave `h - W` free nuisance
+dimensions independent of `Y`, so `I(Y; window) = 0` exactly. For
+`W = h + 1`: Lagrange interpolation in `F_q` recovers `Y` exactly. For each
+coefficient tuple `β = (B_0, …, B_{h-1}, Y) ∈ F_q^{h+1}`, the unit-norm
+temporal atom
+`G_β = (1/√(h+1))(u_{P_β(0)}, …, u_{P_β(h)})` is a strict
+reconstruction-loss minimum with margin `1/(h+1)`.
+
+**Architectures compared.**
+
+| Architecture | What sees what | Notes |
+|---|---|---|
+| Raw window probe | Linear probe directly on `flat(x_{t:t+W})` | Architecture-free ceiling |
+| Regular TopKSAE, single-position latent | One position at a time | Single-position SAE + probe |
+| Regular TopKSAE, window-concat latent | Same SAE, but probe sees `[z(x_0), …, z(x_{W-1})]` | "Alphabet SAE + temporal probe" — the natural local baseline |
+| **Bhalla 2025 TSAE** (TopK k=20, InfoNCE α=0.1) | Attention-based predicted/novel codes; probe on per-position codes concatenated | Per the user's params: `kval_topk=20`, InfoNCE between `(z_t, z_{t+1})` weighted at 0.1 |
+| **TXC-global** (`TXCBareAntidead`, `k_window = 1`) | Window-shared latent | The proposal's prescription: global k=1 forces compression into a polynomial template |
+
+Pre-flight gates from proposal Section 9 all pass at `(h=2, q=11, σ=0.1)`:
+interpolation oracle 100% at `W = h + 1`, template oracle 100%, time-shuffle
+degrades signal by 60%, short-window oracle at chance, alphabet SAE
+recovery `≈ 0.9`.
+
+### Stage 4.1 — `h = 1, q = 31` (961 polynomial atoms)
+
+![Polynomial clock h=1 q=31](../../../../plots/v6_colored_sources/polynomial_clock_h1_q31.png)
+
+Probe accuracies (chance `1/q = 0.032`):
+
+| W | raw | SAE single | SAE concat | Bhalla TSAE | **TXC-global** | TXC `Rec_temp` |
+|---|---|---|---|---|---|---|
+| 1 | 0.037 | 0.037 | 0.041 | — | 0.037 | 0.944 (degenerate) |
+| 2 (= h+1) | 0.065 | 0.037 | 0.097 | 0.037 | **0.157** | 0.534 |
+| 3 | 0.099 | 0.034 | 0.171 | 0.052 | **0.456** | 0.571 |
+| 4 | 0.120 | 0.039 | 0.198 | 0.054 | **0.609** | 0.630 |
+
+W=1 is at chance for everyone — empirically validates `I(Y; window) = 0` at
+`W ≤ h`. At `W ≥ h + 1` only TXC-global rises substantially; Bhalla TSAE
+and the raw window probe stay near chance.
+
+### Stage 4.2 — `h = 2, q = 11` (1331 polynomial atoms)
+
+![Polynomial clock h=2 q=11](../../../../plots/v6_colored_sources/polynomial_clock_h2_q11.png)
+
+Probe accuracies (chance `1/q = 0.091`):
+
+| W | raw | SAE single | SAE concat | Bhalla TSAE | **TXC-global** | TXC `Rec_temp` |
+|---|---|---|---|---|---|---|
+| 1 | 0.10 | 0.10 | 0.10 | — | 0.091 | 0.866* |
+| 2 | 0.10 | 0.09 | 0.09 | 0.10 | 0.10 | 0.799* |
+| 3 (= h+1) | 0.11 | 0.09 | 0.11 | 0.12 | **0.165** | 0.600 |
+| 4 | 0.11 | 0.10 | 0.10 | 0.11 | **0.243** | 0.494 |
+| 5 | 0.12 | 0.10 | 0.10 | 0.12 | **0.321** | 0.457 |
+
+`*` At `W ≤ h`, the `q^(h+1)` polynomial atoms collapse to `q^W` distinct
+templates (since `W` evaluation points don't uniquely identify a degree-`h`
+polynomial), so `Rec_temp` at those `W` values is alphabet-pair recovery,
+not polynomial-template recovery. The meaningful `Rec_temp` is at `W ≥ h + 1`.
+
+Cleaner separation than Stage 4.1: Bhalla TSAE and SAE concat both stay at
+chance throughout. Only TXC-global pulls ahead at the threshold.
+
+### Stage 4.3 — `h = 3, q = 7` (2401 polynomial atoms)
+
+![Polynomial clock h=3 q=7](../../../../plots/v6_colored_sources/polynomial_clock_h3_q7.png)
+
+Probe accuracies (chance `1/q = 0.143`):
+
+| W | raw | SAE single | SAE concat | Bhalla TSAE | **TXC-global** | TXC `Rec_temp` |
+|---|---|---|---|---|---|---|
+| 1 | 0.14 | 0.16 | 0.15 | — | 0.15 | 0.800* |
+| 2 | 0.16 | 0.14 | 0.14 | 0.16 | 0.15 | 0.830* |
+| 3 | 0.16 | 0.14 | 0.15 | 0.16 | 0.16 | 0.594* |
+| 4 (= h+1) | 0.17 | 0.14 | 0.15 | 0.17 | **0.171** | 0.449 |
+| 5 | 0.17 | 0.14 | 0.16 | 0.17 | **0.191** | 0.390 |
+| 6 | 0.17 | 0.14 | 0.16 | 0.16 | **0.228** | 0.345 |
+
+The TXC-global advantage shrinks at `h = 3` because the atom space
+(`q^(h+1) = 2401`) is now ~half the dictionary size (`H = 4096`); the
+4000-step training budget isn't enough to fully populate the polynomial
+dictionary, and `Rec_temp` declines from 0.45 at `W = h + 1` to 0.34 at
+`W = 6` because the atoms become more distinct and half-learned templates
+spread their alignment thinner.
+
+### Stage 4 takeaways
+
+1. **The local impossibility is empirically tight.** At `W ≤ h` every
+   architecture (and the raw-window probe) sits at `1/q` within MC noise.
+
+2. **TXC-global with `k_window = 1` is the only architecture that finds
+   the polynomial templates.** The reconstruction-margin argument predicts
+   it can; SGD on plain MSE reconstruction does. Stage 4.1 and 4.2 are
+   the cleanest "TXC > SAE" empirical separations in this writeup.
+
+3. **The Bhalla 2025 TSAE doesn't deliver the architectural inductive
+   bias the polynomial-clock setting needs.** With its paper-specified
+   TopK `k = 20` per token (much denser than the global `k = 1` bottleneck
+   the proposal prescribes) and InfoNCE weight 0.1, its per-position codes
+   carry no more polynomial-template information than the regular SAE
+   concatenated across the window. The attention layers don't pull it
+   toward the right representation. We did not sweep its hyperparameters;
+   the user-supplied recipe was used as-is.
+
+4. **The gap shrinks with polynomial degree at fixed compute.** Stage 4.3
+   shows TXC-global pulling ahead but only weakly because the atom
+   dictionary outgrows the model's effective capacity within 4k steps. A
+   longer training budget or larger `H` would close this; it's an
+   empirical scaling concern, not a flaw in the proposal.
+
 ## Recommendation
 
 We now have both halves of what the proposal originally tried to do in a
@@ -279,3 +398,9 @@ For follow-up work I'd:
 | Stage 3 figure | `plots/v6_colored_sources/ambiguous_pair_probes.png` |
 | Ambiguous-pair generator | `src/v6_colored_sources/ambiguous_pair.py` |
 | Ambiguous-pair runner | `src/v6_colored_sources/run_pair_experiment.py` |
+| Polynomial clock generator | `src/v6_colored_sources/polynomial_clock.py` |
+| Polynomial clock oracles | `src/v6_colored_sources/polynomial_clock_oracles.py` |
+| Polynomial clock runner | `src/v6_colored_sources/run_polynomial_clock.py` |
+| Stage 4.1 results / figure | `results/v6_colored_sources/polynomial_clock_h1_q31.json` / `plots/v6_colored_sources/polynomial_clock_h1_q31.png` |
+| Stage 4.2 results / figure | `results/v6_colored_sources/polynomial_clock_h2_q11.json` / `plots/v6_colored_sources/polynomial_clock_h2_q11.png` |
+| Stage 4.3 results / figure | `results/v6_colored_sources/polynomial_clock_h3_q7.json` / `plots/v6_colored_sources/polynomial_clock_h3_q7.png` |

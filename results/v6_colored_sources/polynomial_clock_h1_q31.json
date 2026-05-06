@@ -1,0 +1,191 @@
+{
+  "stage_label": "polynomial_clock_h1_q31",
+  "config": {
+    "h": 1,
+    "q": 31,
+    "d": 64,
+    "sigma": 0.1,
+    "n_seq": 4096,
+    "T_chain": 16,
+    "seed": 0
+  },
+  "H": 1024,
+  "k_pos_local": 1,
+  "k_window_txc": 1,
+  "n_steps": 6000,
+  "batch_size": 128,
+  "lr": 0.001,
+  "W_grid": [
+    1,
+    2,
+    3,
+    4
+  ],
+  "device": "cuda",
+  "elapsed_seconds": 367.18687176704407,
+  "sae_rec_local": 0.7198531627655029,
+  "cells": [
+    {
+      "W": 1,
+      "raw_probe": {
+        "train_accuracy": 0.05974999815225601,
+        "val_accuracy": 0.037166666239500046,
+        "chance": 0.03225806451612903,
+        "n_train": 24000,
+        "n_val": 6000
+      },
+      "sae_local_probe": {
+        "train_accuracy": 0.04958333447575569,
+        "val_accuracy": 0.037166666239500046,
+        "chance": 0.03225806451612903,
+        "n_train": 24000,
+        "n_val": 6000
+      },
+      "sae_window_probe": {
+        "train_accuracy": 0.049416664987802505,
+        "val_accuracy": 0.04066666588187218,
+        "chance": 0.03225806451612903,
+        "n_train": 24000,
+        "n_val": 6000
+      },
+      "tsae_probe": null,
+      "txc_probe": {
+        "train_accuracy": 0.04958333447575569,
+        "val_accuracy": 0.03700000047683716,
+        "chance": 0.03225806451612903,
+        "n_train": 24000,
+        "n_val": 6000
+      },
+      "txc_rec_local": 0.9444190859794617,
+      "txc_rec_temp": 0.9444190859794617,
+      "n_atoms": 961,
+      "txc_final_loss": 0.6209542155265808
+    },
+    {
+      "W": 2,
+      "raw_probe": {
+        "train_accuracy": 0.10491666197776794,
+        "val_accuracy": 0.06549999862909317,
+        "chance": 0.03225806451612903,
+        "n_train": 24000,
+        "n_val": 6000
+      },
+      "sae_local_probe": {
+        "train_accuracy": 0.048250000923871994,
+        "val_accuracy": 0.03683333471417427,
+        "chance": 0.03225806451612903,
+        "n_train": 24000,
+        "n_val": 6000
+      },
+      "sae_window_probe": {
+        "train_accuracy": 0.11908333003520966,
+        "val_accuracy": 0.09749999642372131,
+        "chance": 0.03225806451612903,
+        "n_train": 24000,
+        "n_val": 6000
+      },
+      "tsae_probe": {
+        "train_accuracy": 0.04416666552424431,
+        "val_accuracy": 0.036666665226221085,
+        "chance": 0.03225806451612903,
+        "n_train": 24000,
+        "n_val": 6000
+      },
+      "txc_probe": {
+        "train_accuracy": 0.17137499153614044,
+        "val_accuracy": 0.15733332931995392,
+        "chance": 0.03225806451612903,
+        "n_train": 24000,
+        "n_val": 6000
+      },
+      "txc_rec_local": 0.9449096918106079,
+      "txc_rec_temp": 0.534052312374115,
+      "n_atoms": 961,
+      "txc_final_loss": 1.0055705308914185
+    },
+    {
+      "W": 3,
+      "raw_probe": {
+        "train_accuracy": 0.14666666090488434,
+        "val_accuracy": 0.09933333098888397,
+        "chance": 0.03225806451612903,
+        "n_train": 24000,
+        "n_val": 6000
+      },
+      "sae_local_probe": {
+        "train_accuracy": 0.04958333447575569,
+        "val_accuracy": 0.034166667610406876,
+        "chance": 0.03225806451612903,
+        "n_train": 24000,
+        "n_val": 6000
+      },
+      "sae_window_probe": {
+        "train_accuracy": 0.20424999296665192,
+        "val_accuracy": 0.17116665840148926,
+        "chance": 0.03225806451612903,
+        "n_train": 24000,
+        "n_val": 6000
+      },
+      "tsae_probe": {
+        "train_accuracy": 0.05570833384990692,
+        "val_accuracy": 0.051500000059604645,
+        "chance": 0.03225806451612903,
+        "n_train": 24000,
+        "n_val": 6000
+      },
+      "txc_probe": {
+        "train_accuracy": 0.46299999952316284,
+        "val_accuracy": 0.4558333158493042,
+        "chance": 0.03225806451612903,
+        "n_train": 24000,
+        "n_val": 6000
+      },
+      "txc_rec_local": 0.8958907127380371,
+      "txc_rec_temp": 0.5713247656822205,
+      "n_atoms": 961,
+      "txc_final_loss": 1.0340352058410645
+    },
+    {
+      "W": 4,
+      "raw_probe": {
+        "train_accuracy": 0.19166666269302368,
+        "val_accuracy": 0.12016666680574417,
+        "chance": 0.03225806451612903,
+        "n_train": 24000,
+        "n_val": 6000
+      },
+      "sae_local_probe": {
+        "train_accuracy": 0.049166664481163025,
+        "val_accuracy": 0.03916666656732559,
+        "chance": 0.03225806451612903,
+        "n_train": 24000,
+        "n_val": 6000
+      },
+      "sae_window_probe": {
+        "train_accuracy": 0.2409166693687439,
+        "val_accuracy": 0.19849999248981476,
+        "chance": 0.03225806451612903,
+        "n_train": 24000,
+        "n_val": 6000
+      },
+      "tsae_probe": {
+        "train_accuracy": 0.0663750022649765,
+        "val_accuracy": 0.05350000038743019,
+        "chance": 0.03225806451612903,
+        "n_train": 24000,
+        "n_val": 6000
+      },
+      "txc_probe": {
+        "train_accuracy": 0.6166666746139526,
+        "val_accuracy": 0.6088333129882812,
+        "chance": 0.03225806451612903,
+        "n_train": 24000,
+        "n_val": 6000
+      },
+      "txc_rec_local": 0.8968279361724854,
+      "txc_rec_temp": 0.6299727559089661,
+      "n_atoms": 961,
+      "txc_final_loss": 0.9543200731277466
+    }
+  ]
+}
