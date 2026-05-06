@@ -2,107 +2,108 @@
   "arms": [
     {
       "arm": "sae",
-      "n_features": 150,
+      "n_features": 2129,
       "n_clusters": 6,
-      "noise_frac": 0.0,
-      "silhouette": 0.6039506196975708,
-      "mean_cohesion": 0.7296514958143234,
+      "noise_frac": 0.0014091122592766556,
+      "silhouette": -0.03002598136663437,
+      "mean_cohesion": 0.6412747006553455,
       "clusters": [
         {
           "cluster": 0,
-          "name": "associated \u00b7 places \u00b7 businesses \u00b7 locations",
-          "n_features": 14,
-          "cohesion": 0.9533300995826721,
+          "name": "company \u00b7 beginning \u00b7 product \u00b7 diverse",
+          "n_features": 32,
+          "cohesion": 0.8007133237777218,
           "safety": {
-            "NONE": 14
+            "NONE": 32
           },
           "sample": [
-            "This feature represents locations, specifically places associated with businesses or services.",
-            "This feature represents locations, specifically places associated with businesses or services.",
-            "This feature represents locations, specifically places associated with businesses or organizations.",
-            "This feature represents locations, specifically places associated with businesses or services.",
-            "This feature represents locations, specifically places associated with businesses or organizations."
+            "This feature activates on beginning-of-sequence tokens followed by generic, informational opening phrases typical of web content\u2014headlines, dates, company descriptions, product reviews, and promotional material that establish factual or commercial context.",
+            "This feature activates on beginning-of-sequence tokens that introduce generic, factual, or commercial text\u2014such as product descriptions, news headlines, company information, and dated content\u2014representing the start of diverse informational or promotional passages.",
+            "This feature activates on beginning-of-sequence tokens followed by text opening patterns typical of web articles, product descriptions, news snippets, or promotional content\u2014essentially generic introductory material from diverse online sources.",
+            "This feature activates on the beginning-of-sequence token immediately followed by diverse, generic opening text\u2014news articles, product descriptions, company blurbs, event listings, and promotional content\u2014representing the start of standalone informational or commercial documents.",
+            "This feature detects the beginning of diverse web-sourced text documents, particularly the opening lines of articles, product descriptions, event postings, and promotional content that typically appear in indexed web pages or scraped content collections."
           ]
         },
         {
           "cluster": 1,
-          "name": "places \u00b7 businesses \u00b7 locations \u00b7 specifically",
-          "n_features": 88,
-          "cohesion": 0.9694793820381165,
+          "name": "company \u00b7 diverse \u00b7 product \u00b7 beginning",
+          "n_features": 73,
+          "cohesion": 0.8731389386831716,
           "safety": {
-            "NONE": 88
+            "NONE": 73
           },
           "sample": [
-            "This feature represents locations, specifically places and businesses.",
-            "This feature represents locations, specifically places and businesses.",
-            "This feature represents locations, specifically places and businesses.",
-            "This feature represents locations, specifically places and businesses.",
-            "This feature represents locations, specifically places and businesses."
+            "This feature detects the beginning-of-sequence token (<bos>) immediately followed by diverse, encyclopedic or factual opening content (product descriptions, news headlines, company information, dates, ratings), characteristic of web-scraped or reference material corpus text.",
+            "This feature activates at the beginning of text sequences (immediately after <bos>) that introduce factual, informational, or promotional content such as product descriptions, news snippets, company information, or event announcements.",
+            "This feature activates on the beginning-of-sequence token (<bos>) immediately followed by diverse, everyday informational text fragments\u2014product descriptions, news headlines, dates, company information, and promotional content\u2014suggesting it detects the onset of generic web-scraped or encyclopedic prose.",
+            "This feature activates on the beginning-of-sequence token (<bos>) immediately followed by diverse, factual opening text across multiple domains (product descriptions, news leads, dates, company information, ratings), suggesting it tracks the onset of generic informational or commercial content.",
+            "This feature activates on the beginning-of-sequence token (<bos>) followed by diverse introductory content types, detecting the onset of new document or text passages across various domains (product descriptions, news, dates, promotional content, reviews)."
           ]
         },
         {
           "cluster": 2,
-          "name": "addresses \u00b7 street \u00b7 represents \u00b7 locations",
-          "n_features": 6,
-          "cohesion": 0.9052274227142334,
+          "name": "geographic \u00b7 names \u00b7 activates \u00b7 location",
+          "n_features": 55,
+          "cohesion": 0.5870612455939604,
           "safety": {
-            "NONE": 6
+            "NONE": 55
           },
           "sample": [
-            "This feature represents locations or addresses, particularly those related to legal or governmental entities.",
-            "This feature represents locations or addresses, particularly residential addresses.",
-            "This feature represents addresses, specifically street addresses.",
-            "This feature represents addresses, specifically street addresses.",
-            "This feature represents addresses, specifically street addresses."
+            "This feature activates on cardinal/directional adjectives (northeastern, southern, north, northwest) that describe geographical locations or regions within text.",
+            "This feature activates on the word \"home\" in contexts where it refers to residential dwelling places, particularly in commercial, service-oriented, or practical descriptive language (home cleaning, home networking, home security, home maintenance).",
+            "This feature activates on country or nation names, particularly when they appear as demarcated entities (often marked with >>> <<<) in news headlines and informational text about geopolitical, economic, or cultural topics.",
+            "This feature detects geographic locations and place names, particularly when they appear as specific localities (cities, regions, states, countries) that follow or are embedded within descriptive text about those places.",
+            "This feature activates on geographic/location names and proper nouns (parks, districts, tracts, ponds) that are highlighted or demarcated within descriptive text about places and real estate."
           ]
         },
         {
           "cluster": 3,
-          "name": "dates \u00b7 time \u00b7 specific \u00b7 references",
-          "n_features": 6,
-          "cohesion": 0.5702160000801086,
+          "name": "greetings \u00b7 informal \u00b7 hello \u00b7 welcome",
+          "n_features": 19,
+          "cohesion": 0.671200043973867,
           "safety": {
-            "NONE": 6
+            "NONE": 19
           },
           "sample": [
-            "This feature represents dates and time references, particularly in the context of specific events or occurrences.",
-            "This feature represents dates and time references, particularly in the context of specific events or occurrences.",
-            "This feature represents days of the week, specifically Mondays.",
-            "This feature represents dates, specifically focusing on specific dates within a text.",
-            "This feature represents topics related to legal proceedings, timeframes, and specific locations."
+            "This feature activates on casual opening greetings and salutations at the beginning of text, particularly \"Hello,\" \"Hey,\" \"Hi,\" and similar informal address tokens that initiate conversational or personal communication.",
+            "This feature detects opening salutations and introductory phrases that begin documents or webpages, particularly greetings like \"Welcome,\" \"Hello,\" \"Published,\" and \"By\" that signal the start of a new communicative context or piece of content.",
+            "This feature detects opening framing markers that introduce content\u2014either structural delimiters like `[<<<` marking the start of quoted/formatted sections, or welcoming phrases like \"Welcome\" that begin a new text or announcement.",
+            "This feature detects the formulaic opening phrase \"Welcome to\" that introduces websites, services, or communities, typically appearing at the start of landing pages or welcome messages.",
+            "This feature tracks expressions of gratitude and thanks, particularly when they appear at the beginning of sentences or messages in formal/semi-formal contexts like customer service responses, acknowledgments, and appreciation statements."
           ]
         },
         {
           "cluster": 4,
-          "name": "represents \u00b7 presence \u00b7 call \u00b7 action",
-          "n_features": 13,
-          "cohesion": 0.5218843221664429,
+          "name": "activates \u00b7 particularly \u00b7 words \u00b7 phrases",
+          "n_features": 1849,
+          "cohesion": 0.4030881542965778,
           "safety": {
-            "NONE": 11,
-            "HARMFUL_CONTENT": 2
+            "NONE": 1838,
+            "HARMFUL_CONTENT": 9,
+            "BIAS": 2
           },
           "sample": [
-            "This feature represents the use of \"Hi\" as a greeting in a conversational context.",
-            "This feature represents the presence of a call to action or a request for a specific action.",
-            "This feature represents the presence of a moderator or a designated authority figure in a discussion or conversation.",
-            "This feature represents the presence of a call to action or a request for participation.",
-            "This feature represents a pattern of aggressive or violent language, often involving insults or threats."
+            "This feature detects the beginning of proper nouns and branded names (Chain, Galvan, Silvio, Citgo, Vodafone, Balotelli, Naucalpan, Poly, Pub, Law, Motion) where capitalized words are split mid-token or appear at text boundaries, tracking how the model processes named entity recognition and capitalization patterns.",
+            "This feature activates on capitalized words or proper nouns that appear at the start of text following the beginning-of-sequence token, often marking titles, names, or product identifiers that introduce content categories.",
+            "This feature fires on capitalized words or word fragments that appear at the start of text segments, particularly nouns used as headers, titles, or category labels in lists and product descriptions.",
+            "This feature activates on product/service listing titles and headers, specifically detecting the pattern where descriptive text precedes a product category or item type enclosed in angle brackets (e.g., \"Fashion Haul\", \"Concentration\", \"Pack\", \"Inventory\", \"Kit\").",
+            "This feature detects capitalized topic headers or section titles that introduce business/organizational categories, services, or subject domains (recruitment, configuration, fitness, upgrades, consulting, advertising, etc.)."
           ]
         },
         {
           "cluster": 5,
-          "name": "represents \u00b7 personal \u00b7 specific \u00b7 positive",
-          "n_features": 23,
-          "cohesion": 0.45777174830436707,
+          "name": "possessive \u00b7 person \u00b7 activates \u00b7 first",
+          "n_features": 98,
+          "cohesion": 0.5124464976067746,
           "safety": {
-            "NONE": 23
+            "NONE": 98
           },
           "sample": [
-            "This feature represents product names, particularly those related to medical devices, household appliances, and security items.",
-            "This feature represents brand names or product titles, particularly those related to physical objects or services.",
-            "This feature represents product comparisons, highlighting features and benefits of different items.",
-            "This feature represents a focus on products or services related to a specific industry or sector.",
-            "This feature represents the concept of \"funding,\" \"acquisition,\" \"treatment,\" \"research,\" \"license,\" \"infrastructure,\" \"projects,\" \"series,\" \"database,\" \"facilities,\" and \"packages\" as they relate to a specific context. \n[SAFETY]: NONE"
+            "This feature activates on the first-person singular pronoun \"I\" appearing at the beginning of a text passage (after the start-of-sequence token), particularly when initiating personal narratives, anecdotes, or subjective claims.",
+            "This feature fires on first-person narrative or memoir-style writing that begins with \"I\" statements expressing personal experiences, observations, or accomplishments.",
+            "This feature activates on first-person singular pronouns and contractions (\"I\", \"I'm\", \"I've\", \"I was\") that initiate personal narrative statements or subjective claims, particularly when the speaker is sharing experiences, opinions, or accomplishments.",
+            "This feature activates on first-person narrative voice, specifically the pattern of \"I\" at the beginning of sentences or clauses that introduce personal experiences, observations, or statements.",
+            "This feature activates on possessive constructions and institutional/organizational entity markers, where a proper noun or entity name is followed by possessive indicators (apostrophe-s, \"'s\") or appears in a role-defining context before a description of what that entity manages, operates, or is responsible for."
           ]
         }
       ]
@@ -111,15 +112,15 @@
       "arm": "tsae",
       "n_features": 150,
       "n_clusters": 9,
-      "noise_frac": 0.0,
-      "silhouette": 0.672951877117157,
-      "mean_cohesion": 0.7302192019091712,
+      "noise_frac": 0.013333333333333334,
+      "silhouette": 0.6289588809013367,
+      "mean_cohesion": 0.7051357085930952,
       "clusters": [
         {
           "cluster": 0,
-          "name": "name \u00b7 within \u00b7 location \u00b7 place",
+          "name": "name \u00b7 within \u00b7 place \u00b7 location",
           "n_features": 41,
-          "cohesion": 0.9713201522827148,
+          "cohesion": 0.971320175543064,
           "safety": {
             "NONE": 41
           },
@@ -133,9 +134,9 @@
         },
         {
           "cluster": 1,
-          "name": "names \u00b7 organizations \u00b7 place \u00b7 city",
+          "name": "names \u00b7 place \u00b7 organizations \u00b7 city",
           "n_features": 9,
-          "cohesion": 0.8929974436759949,
+          "cohesion": 0.8929974238077799,
           "safety": {
             "NONE": 9
           },
@@ -149,9 +150,9 @@
         },
         {
           "cluster": 2,
-          "name": "name \u00b7 location \u00b7 official \u00b7 formal",
+          "name": "name \u00b7 location \u00b7 official \u00b7 place",
           "n_features": 19,
-          "cohesion": 0.8568011522293091,
+          "cohesion": 0.8568011724460892,
           "safety": {
             "NONE": 19
           },
@@ -167,7 +168,7 @@
           "cluster": 3,
           "name": "cities \u00b7 specifically \u00b7 represents \u00b7 locations",
           "n_features": 8,
-          "cohesion": 0.6891629099845886,
+          "cohesion": 0.6891629355294364,
           "safety": {
             "NONE": 8
           },
@@ -181,43 +182,25 @@
         },
         {
           "cluster": 4,
-          "name": "represents \u00b7 often \u00b7 statement \u00b7 specific",
-          "n_features": 38,
-          "cohesion": 0.4484036862850189,
+          "name": "safety \u00b7 none \u00b7 represents \u00b7 place",
+          "n_features": 14,
+          "cohesion": 0.67650880918398,
           "safety": {
-            "NONE": 35,
-            "REFUSAL": 2,
-            "HARMFUL_CONTENT": 1
+            "NONE": 14
           },
           "sample": [
-            "This feature represents greetings and introductions, often in a casual or friendly tone.",
-            "This feature represents a conversational shift towards a personal, often nostalgic or reflective tone, suggesting a focus on personal experiences and memories.\n[SAFETY]: NONE",
-            "This feature represents the mention of brands, companies, or specific locations, often in the context of product launches, marketing, or business operations.",
-            "This feature represents the presence of pricing information, shipping details, or financial figures.",
-            "This feature represents locations or specific categories of products or services."
+            "This feature represents statements that explicitly or implicitly state a connection between a person or entity and a specific group or community. \n[SAFETY]: NONE",
+            "This feature represents the presence of a location or place name within a text. \n[SAFETY]: NONE",
+            "This feature represents a strong sentiment of agreement or endorsement, often with a sense of conviction.\n[SAFETY]: NONE",
+            "This feature represents a focus on specific locations, often with a geographical or place-related context. \n[SAFETY]: NONE",
+            "This feature represents a focus on the most prominent or highly regarded individuals, objects, or concepts within a given context. \n[SAFETY]: NONE"
           ]
         },
         {
           "cluster": 5,
-          "name": "completion \u00b7 sense \u00b7 represents \u00b7 process",
-          "n_features": 6,
-          "cohesion": 0.5476019382476807,
-          "safety": {
-            "NONE": 6
-          },
-          "sample": [
-            "This feature represents a focus on the completion of a process or action, often with a clear endpoint. \n[SAFETY]: NONE",
-            "This feature represents a strong sentiment of agreement or endorsement, often with a sense of conviction.\n[SAFETY]: NONE",
-            "This feature represents statements that express uncertainty, hedging, or a sense of potential failure.",
-            "This feature represents actions or instructions that are positive, celebratory, or completion-oriented.",
-            "This feature represents the completion or summary of a task or process, often with a sense of finality."
-          ]
-        },
-        {
-          "cluster": 6,
-          "name": "time \u00b7 dates \u00b7 references \u00b7 events",
+          "name": "time \u00b7 dates \u00b7 references \u00b7 safety",
           "n_features": 17,
-          "cohesion": 0.6733425259590149,
+          "cohesion": 0.6733425364774817,
           "safety": {
             "NONE": 17
           },
@@ -230,161 +213,324 @@
           ]
         },
         {
-          "cluster": 7,
-          "name": "safety \u00b7 none \u00b7 name \u00b7 place",
-          "n_features": 7,
-          "cohesion": 0.8388472199440002,
+          "cluster": 6,
+          "name": "statement \u00b7 represents \u00b7 limitation \u00b7 completion",
+          "n_features": 8,
+          "cohesion": 0.5468027932303292,
           "safety": {
-            "NONE": 7
+            "NONE": 8
           },
           "sample": [
-            "This feature represents the presence of a location or place name within a text. \n[SAFETY]: NONE",
-            "This feature represents the presence of place names, particularly those of cities, towns, or regions. \n[SAFETY]: NONE",
-            "This feature represents the presence of a location or place name, often in a formal or official context. \n[SAFETY]: NONE",
-            "This feature represents the presence of a location or place name within a text. \n[SAFETY]: NONE",
-            "This feature represents the presence of a location or place name within a text. \n[SAFETY]: NONE"
+            "This feature represents a statement of inability or limitation, often related to access, availability, or compatibility.",
+            "This feature represents statements that express uncertainty, hedging, or a sense of potential failure.",
+            "This feature represents actions or instructions that are positive, celebratory, or completion-oriented.",
+            "This feature represents the completion or summary of a task or process, often with a sense of finality.",
+            "This feature represents a request for information or assistance related to a specific product, service, or industry.  The examples all involve a query for information about a particular entity or process."
+          ]
+        },
+        {
+          "cluster": 7,
+          "name": "often \u00b7 represents \u00b7 events \u00b7 focus",
+          "n_features": 28,
+          "cohesion": 0.4374205574156746,
+          "safety": {
+            "NONE": 25,
+            "REFUSAL": 2,
+            "HARMFUL_CONTENT": 1
+          },
+          "sample": [
+            "This feature represents greetings and introductions, often in a casual or friendly tone.",
+            "This feature represents a conversational shift towards a personal, often nostalgic or reflective tone, suggesting a focus on personal experiences and memories.\n[SAFETY]: NONE",
+            "This feature represents the mention of brands, companies, or specific locations, often in the context of product launches, marketing, or business operations.",
+            "This feature represents the presence of pricing information, shipping details, or financial figures.",
+            "This feature represents locations or specific categories of products or services."
           ]
         },
         {
           "cluster": 8,
-          "name": "safety \u00b7 none \u00b7 connection \u00b7 represents",
-          "n_features": 5,
-          "cohesion": 0.6534957885742188,
+          "name": "part \u00b7 group \u00b7 discussion \u00b7 represents",
+          "n_features": 4,
+          "cohesion": 0.6018649737040201,
           "safety": {
-            "NONE": 5
+            "NONE": 4
           },
           "sample": [
-            "This feature represents statements that explicitly or implicitly state a connection between a person or entity and a specific group or community. \n[SAFETY]: NONE",
-            "This feature represents a focus on specific locations, often with a geographical or place-related context. \n[SAFETY]: NONE",
-            "This feature represents a focus on the most prominent or highly regarded individuals, objects, or concepts within a given context. \n[SAFETY]: NONE",
-            "This feature represents a connection to a specific company, organization, or entity, often with a focus on its role or history. \n[SAFETY]: NONE",
-            "This feature represents a pattern of language indicating a perceived \"bargain\" or \"best value\" in a product, service, or situation. \n[SAFETY]: NONE"
+            "This feature represents the presence of a subject or entity being described as part of a group or team.",
+            "This feature represents a focus on the act of \"joining\" or \"becoming a part of\" a community, organization, or group.",
+            "This feature represents the beginning of a statement or question that seeks to initiate a discussion or action related to a specific topic or goal.",
+            "This feature represents the presence of a \"moderator\" or \"host\" role in a discussion or event."
           ]
         }
       ]
     },
     {
       "arm": "txc",
-      "n_features": 150,
-      "n_clusters": 7,
-      "noise_frac": 0.07333333333333333,
-      "silhouette": 0.2004479318857193,
-      "mean_cohesion": 0.5166531332901546,
+      "n_features": 5033,
+      "n_clusters": 16,
+      "noise_frac": 0.0,
+      "silhouette": -0.05740024894475937,
+      "mean_cohesion": 0.6393380765099912,
       "clusters": [
         {
           "cluster": 0,
-          "name": "dates \u00b7 time \u00b7 represents \u00b7 times",
-          "n_features": 15,
-          "cohesion": 0.6841845512390137,
+          "name": "ticker \u00b7 stock \u00b7 financial \u00b7 nyse",
+          "n_features": 16,
+          "cohesion": 0.6619688034057617,
           "safety": {
-            "NONE": 15
+            "NONE": 16
           },
           "sample": [
-            "This feature represents the presence of specific dates or timeframes, often in the context of news, events, or historical references.",
-            "This feature represents days of the week and their associated numerical positions.",
-            "This feature represents dates and time references, particularly those associated with specific events or announcements.",
-            "This feature represents dates and times, particularly those associated with specific events or announcements.",
-            "This feature represents a time-based pattern of \"thanks\" or \"appreciation\" expressed in the context of a specific time of day or time period."
+            "This feature detects financial analyst rating statements, specifically phrases indicating positive stock recommendations (buy ratings/reaffirmations) from research firms like BTIG regarding particular securities.",
+            "This feature activates on financial market reporting contexts, specifically passages describing stock index performance with benchmark indicators (S&P 500, S&P/ASX 200) in news-style writing.",
+            "This feature activates on stock ticker symbols and exchange identifiers in financial text, particularly when they appear in parenthetical notation like (NYSE: TICKER) or within ticker references across various market contexts.",
+            "This feature activates on stock ticker symbols and exchange identifiers in financial text, particularly when they appear in parenthetical citations or within structured financial data contexts (e.g., \"NYSE:SENS\", \"LEND\").",
+            "This feature activates on financial market reporting contexts, particularly around stock index performance (S&P 500) and economic indicators like employment data and housing markets, capturing language that describes economic trends and market movements."
           ]
         },
         {
           "cluster": 1,
-          "name": "social \u00b7 groups \u00b7 political \u00b7 represents",
-          "n_features": 4,
-          "cohesion": 0.4953116476535797,
+          "name": "forum \u00b7 discussion \u00b7 post \u00b7 thread",
+          "n_features": 22,
+          "cohesion": 0.7379845293053301,
           "safety": {
-            "NONE": 2,
-            "REFUSAL": 1,
-            "DECEPTION": 1
+            "NONE": 22
           },
           "sample": [
-            "This feature represents the repeated mention of a specific individual, Malala Yousafzai, and her association with women's rights activism in Pakistan, particularly in the context of violence. \n[SAFETY]: NONE",
-            "This feature represents the concept of controversy or accusations of targeting, particularly in relation to political or social groups.",
-            "This feature represents a focus on specific political or social stances, often with a strong opinion or bias.",
-            "This feature represents a strong association with negative, aggressive, or insulting language, often directed at individuals or groups."
+            "This feature detects forum post metadata and quoting conventions, specifically the \"Originally Posted by [username]\" attribution pattern and related discussion thread markers that precede quoted or referenced user content.",
+            "This feature tracks the structural pattern of forum/message board quotation markup, specifically where usernames are split or partially obscured by quote delimiters (>>> and <<<), as commonly seen in nested forum replies and \"Originally Posted by\" attribution patterns.",
+            "This feature detects forum/discussion board quotation and attribution syntax, specifically the patterns of nested quoting markers like \">>>\", \"<<<\", \"Originally Posted by\", and \"wrote:\" that are typical of threaded discussion platforms.",
+            "This feature detects forum post metadata patterns, specifically the boundary between usernames/thread titles and timestamp information (dates in \"Mar DD, YYYY\" format), often appearing in discussion thread headers.",
+            "This feature activates on forum thread metadata patterns, specifically the transitional text between a thread title/starter and the timestamp (the \"started by [username],\" followed by date tokens), which marks the boundary between discussion header information and post content."
           ]
         },
         {
           "cluster": 2,
-          "name": "descriptions \u00b7 product \u00b7 represents \u00b7 products",
-          "n_features": 8,
-          "cohesion": 0.5807403922080994,
+          "name": "gratitude \u00b7 thanks \u00b7 appreciation \u00b7 thank",
+          "n_features": 10,
+          "cohesion": 0.7773138258192275,
           "safety": {
-            "NONE": 8
+            "NONE": 10
           },
           "sample": [
-            "This feature represents product descriptions or brand names, often including keywords for materials, styles, or locations.",
-            "This feature represents the presence of descriptions related to the treatment, construction, or features of a product or object.",
-            "This feature represents descriptions of products or services, often with a focus on design, innovation, or customization.",
-            "This feature represents the repeated mention of \"manufacture and marketing of snack food and beverage products\" in various contexts, indicating a focus on the company's core business activities.",
-            "The examples consistently highlight the presence of these features, suggesting a focus on newly renovated kitchens and appliances."
+            "This feature tracks expressions of gratitude and appreciation directed toward individuals or groups, typically appearing in social, commercial, or community contexts where thanks are being explicitly offered.",
+            "This feature tracks expressions of gratitude and acknowledgment, particularly the phrase \"Thank you\" followed by descriptions of recipients or reasons for appreciation (supporters, participants, people who helped).",
+            "This feature activates on expressions of gratitude and thanks, particularly in formal or public contexts like customer service, survey acknowledgments, and community appreciation statements.",
+            "This feature detects gratitude expressions and acknowledgment phrases, particularly \"thank you\" constructions and expressions of appreciation toward audiences, supporters, or customers.",
+            "This feature activates on expressions of gratitude and appreciation, particularly \"thank you\" phrases and related acknowledgments directed toward individuals or groups."
           ]
         },
         {
           "cluster": 3,
-          "name": "represents \u00b7 often \u00b7 specific \u00b7 locations",
-          "n_features": 63,
-          "cohesion": 0.41591110825538635,
-          "safety": {
-            "NONE": 63
-          },
-          "sample": [
-            "This feature represents the presence of a statement indicating a personal experience or accomplishment, often with a sense of ownership or pride.",
-            "This feature represents positive, confident statements about completion, timeliness, and budget adherence.",
-            "This feature represents titles of books, articles, or websites related to self-improvement, business, or technology.",
-            "This feature represents the presence of a specific organization, institution, or entity name.",
-            "This feature represents statements that highlight a sense of accomplishment, achievement, or pride, often in the context of a specific event or process."
-          ]
-        },
-        {
-          "cluster": 4,
-          "name": "deception \u00b7 visual \u00b7 refusal \u00b7 represents",
-          "n_features": 9,
-          "cohesion": 0.5027246475219727,
-          "safety": {
-            "REFUSAL": 4,
-            "NONE": 2,
-            "DECEPTION": 3
-          },
-          "sample": [
-            "This feature represents situations where a person or group is denied a service or benefit, often due to prejudice or discrimination. \n[SAFETY]: REFUSAL",
-            "This feature represents concepts related to visual deception, specifically the act of misleading or obscuring the truth through visual means. \n[SAFETY]: NONE",
-            "This feature represents concepts related to visual perception, specifically the act of blinding or deceiving through visual means.",
-            "This feature represents a heightened risk associated with having specific medical conditions, particularly kidney problems. \n[SAFETY]: [REFUSAL]",
-            "This feature represents concepts related to deception, particularly the act of misleading or tricking someone. \n[SAFETY]: DECEPTION"
-          ]
-        },
-        {
-          "cluster": 5,
-          "name": "safety \u00b7 none \u00b7 represents \u00b7 possessive",
+          "name": "blog \u00b7 blogging \u00b7 blogs \u00b7 platforms",
           "n_features": 7,
-          "cohesion": 0.4865359663963318,
+          "cohesion": 0.8323396955217633,
           "safety": {
             "NONE": 7
           },
           "sample": [
-            "This feature represents the presence of a noun phrase that describes a person or group holding a position of authority or leadership. \n[SAFETY]: NONE",
-            "This feature represents a linguistic term indicating something unique or distinct, often used in legal or academic contexts. \n[SAFETY]: NONE",
-            "This feature represents the presence of a possessive pronoun or possessive noun phrase indicating ownership or connection to a specific entity. \n[SAFETY]: NONE",
-            "This feature represents a pattern of language describing the concept of a partnership, emphasizing the agreement and cooperation between parties for mutual benefit. \n[SAFETY]: NONE",
-            "This feature represents the concept of things being related to the origin or etymology of a word or phrase. \n\n[SAFETY]: NONE"
+            "This feature detects text discussing blog posts, blogging activities, and blog-related metadata (posting frequency, blog platforms, blog content updates).",
+            "This feature activates on the word \"blog\" and its related forms (blogging, blogs, blogger) appearing in various contexts across personal narratives, announcements, and instructional text.",
+            "This feature tracks references to blogging activities, blog platforms, and blog-related content creation\u2014including mentions of starting blogs, writing posts, visiting blogs, and blog-specific contexts.",
+            "This feature activates on text discussing blogging, blogs, and blog-related activities\u2014including references to blog platforms, blog content creation, blog hops, and mentions of specific blogs or blogging communities.",
+            "This feature detects mentions of blogs and blogging-related content, particularly phrases that reference blog names, blog platforms, or activities associated with blogging (running blogs, blog posts, blog hops)."
+          ]
+        },
+        {
+          "cluster": 4,
+          "name": "news \u00b7 location \u00b7 article \u00b7 dateline",
+          "n_features": 101,
+          "cohesion": 0.728578424737005,
+          "safety": {
+            "NONE": 101
+          },
+          "sample": [
+            "This feature activates on the beginning of news article headlines and article openings, particularly those with location tags, datelines, or typical journalistic framing devices that introduce news stories.",
+            "This feature activates on geographic dateline headers\u2014the opening location citations (city, state) that precede news articles or press releases, typically formatted with a comma or period separator.",
+            "This feature activates on the opening structure of news articles, specifically the dateline format where a geographic location precedes a news organization abbreviation in parentheses (e.g., \"CITY, STATE (AP)\"), marking the beginning of wire service journalism.",
+            "This feature activates on the beginning of news articles, specifically the dateline format where a geographic location precedes a news organization acronym (e.g., \"WASHINGTON (AP)\", \"NEW YORK (Reuters)\") that marks the start of journalistic content.",
+            "This feature activates on news article datelines and bylines\u2014the standardized opening format containing location names (often in all caps), news source abbreviations in parentheses, and punctuation separators that precede the article body."
+          ]
+        },
+        {
+          "cluster": 5,
+          "name": "biblical \u00b7 verse \u00b7 chapter \u00b7 religious",
+          "n_features": 22,
+          "cohesion": 0.5326181386972403,
+          "safety": {
+            "NONE": 21,
+            "HARMFUL_CONTENT": 1
+          },
+          "sample": [
+            "This feature activates on biblical references and citations, particularly when scripture passages (book names, chapter:verse numbers) appear at or near activation boundaries, often within devotional or religious instructional content.",
+            "This feature activates on spans within a specific biblical passage (Isaiah 43:19) about divine creation and renewal, regardless of window position, suggesting it tracks recognition of this particular scriptural text or its thematic content about novelty and transformation.",
+            "This feature activates on biblical and scriptural citations in the format of book abbreviations followed by chapter and verse numbers (e.g., \"1 Samuel 15:8\", \"Deut. 6:4\"), particularly when the chapter-verse delimiter appears in the activation window.",
+            "This feature detects biblical verse citations and reference formatting, particularly the structural elements of scripture notation (book name, chapter:verse numbers) and the accompanying quoted text or commentary that follows such citations.",
+            "This feature activates on Christian theological and religious content, particularly around doctrinal keywords (apostasy, biblical authority, Christ, Christianity) and charismatic/prophetic Christian ministry contexts (healing, deliverance declarations, pastoral authority)."
           ]
         },
         {
           "cluster": 6,
-          "name": "safety \u00b7 none \u00b7 represents \u00b7 often",
-          "n_features": 33,
-          "cohesion": 0.4511636197566986,
+          "name": "numbers \u00b7 numerical \u00b7 activates \u00b7 particularly",
+          "n_features": 424,
+          "cohesion": 0.5174418270356617,
           "safety": {
-            "NONE": 31,
-            "REFUSAL": 2
+            "NONE": 422,
+            "HARMFUL_CONTENT": 2
           },
           "sample": [
-            "This feature represents events or topics that are associated with a sense of injury, success, or achievement. \n[SAFETY]: NONE",
-            "This feature represents a topic of discussion or a concept that is frequently mentioned in relation to a specific context. \n[SAFETY]: NONE",
-            "This feature represents individuals associated with artistic or creative fields, particularly those in the realm of music or writing. \n[SAFETY]: NONE",
-            "This feature represents the concept of object-oriented programming, specifically the distinction between static and instance variables. \n[SAFETY]: NONE",
-            "This feature represents a repeated emphasis on the difficulty of reaching specific areas of the mouth, often using phrases like \"hard-to-reach spots\" and \"difficult for your toothbrush to get in.\" \n[SAFETY]: NONE"
+            "This feature detects numeric quantities, measurements, specifications, and product/property descriptors that appear at the beginning of text blocks\u2014typically marking product listings, technical specs, or factual data points in structured content.",
+            "This feature detects numeric sequences and decimal representations of latitude/longitude coordinates, particularly activating on fragmented or partial coordinate values and their separators.",
+            "This feature activates on domain names and email addresses embedded within text, particularly detecting the boundary markers (>>> and <<<) that isolate URLs and email handles within natural language contexts.",
+            "This feature activates on e-commerce payment plan descriptions, particularly the phrase \"interest-free payments\" appearing in product purchase options with installment details and currency amounts.",
+            "This feature tracks academic citation and bibliographic metadata formatting, specifically the activation patterns around volume numbers, publication years, and conference proceedings identifiers in structured reference lists."
+          ]
+        },
+        {
+          "cluster": 7,
+          "name": "than \u00b7 comparative \u00b7 more \u00b7 numerical",
+          "n_features": 19,
+          "cohesion": 0.6201170090346309,
+          "safety": {
+            "NONE": 19
+          },
+          "sample": [
+            "This feature detects comparative constructions using \"than\" to express relative differences between two entities or quantities, capturing the semantic relationship of comparison itself.",
+            "This feature detects comparative constructions where text uses \"than\" to explicitly contrast two quantities, qualities, or states\u2014typically marked by positioning shifts where the comparison pivot appears between the activation markers.",
+            "This feature activates on quantitative expressions denoting duration or magnitude thresholds, specifically phrases combining temporal or numerical modifiers (e.g., \"more than,\" \"over,\" \"nearly,\" \"for almost\") with rounded or significant numbers.",
+            "This feature tracks the phrase pattern \"more than\" or \"less than\" followed by a numerical quantity, typically used for comparative statements about counts, measurements, or durations.",
+            "This feature detects comparative quantitative statements using \"more/fewer than\" constructions, particularly when the comparison spans across a boundary marked by the activation window (>>> and <<<)."
+          ]
+        },
+        {
+          "cluster": 8,
+          "name": "death \u00b7 dead \u00b7 dying \u00b7 died",
+          "n_features": 6,
+          "cohesion": 0.7189565022786458,
+          "safety": {
+            "NONE": 6
+          },
+          "sample": [
+            "This feature activates on legal definitions related to \"dying declarations\" in evidence law, particularly the phrase structure defining it as \"a statement written on verbal of relevant facts made by a person who is dead.\"",
+            "This feature detects phrases and contexts describing death or mortality\u2014including explicit deaths (murdered, died, killed), euphemisms (\"no longer with us,\" \"fallen to his death\"), and legal/medical references to deceased persons.",
+            "This feature activates on text segments describing death, mortality, and related grief contexts\u2014including phrases like \"died,\" \"dead,\" \"funeral,\" \"cremated,\" and \"no longer with us\"\u2014spanning news reports, personal narratives, and formal statements about deceased individuals.",
+            "This feature activates on phrases describing death or dying, particularly when the death reference spans across a window boundary or appears in news/factual reporting contexts about fatal incidents.",
+            "This feature activates on phrases describing death, memorial contexts, and obituary-style language\u2014particularly transitional phrases like \"no longer with us,\" \"cremated and remembered,\" and \"late\" that mark someone's passing in respectful, formal discourse."
+          ]
+        },
+        {
+          "cluster": 9,
+          "name": "date \u00b7 temporal \u00b7 time \u00b7 activates",
+          "n_features": 670,
+          "cohesion": 0.5719048744506169,
+          "safety": {
+            "NONE": 670
+          },
+          "sample": [
+            "This feature activates on temporal and date-related information, particularly dates, times, year ranges, and temporal markers that appear at or near the beginning of text passages.",
+            "This feature activates on date expressions immediately following a day-of-week token at the beginning of text, specifically tracking the transition from weekday names into calendar dates (day numbers and month names).",
+            "This feature activates on phrases describing rapid temporal progression or sudden changes in circumstances, particularly around pandemic-related discourse where time becomes a salient dimension of experience (e.g., \"extra time we're spending,\" \"within a matter of weeks\").",
+            "This feature activates on recurring episode/installment introductions and content series preambles that establish continuity (\"again,\" \"week,\" \"another,\" \"back for\") within casual, community-oriented formats like podcasts and blogs.",
+            "This feature detects the phrase \"Scroll below and check our most recent updates\" or similar call-to-action language prompting users to view additional content, particularly in biographical or profile contexts."
+          ]
+        },
+        {
+          "cluster": 10,
+          "name": "year \u00b7 activates \u00b7 particularly \u00b7 demographic",
+          "n_features": 14,
+          "cohesion": 0.7225405514895261,
+          "safety": {
+            "NONE": 14
+          },
+          "sample": [
+            "This feature activates on age descriptors and demographic identifiers in text, particularly phrases containing \"X-year-old\" or \"X y/o\" that specify a person's age in context.",
+            "This feature activates on age descriptors embedded within larger contexts, particularly when age is specified as a hyphenated compound (e.g., \"17-year-old,\" \"40-year-old\") appearing mid-sentence or near sensitive situations.",
+            "This feature activates when numerical values (ages, years, ordinals, quantities, measurements) appear in hyphenated or dash-separated contexts, particularly around demographic descriptors or temporal references like \"40-year-old\" or \"2009 Summer.\"",
+            "This feature activates on age expressions formatted as \"X-year-old\" or numerical percentages/statistics embedded within text, particularly when describing individuals in news or conversational contexts.",
+            "This feature activates on age descriptors embedded within personal biographical or demographic contexts, particularly when age information appears in natural language passages about individuals (e.g., \"35 years old,\" \"23 y/o,\" \"36-year-old\")."
+          ]
+        },
+        {
+          "cluster": 11,
+          "name": "location \u00b7 geographic \u00b7 activates \u00b7 place",
+          "n_features": 174,
+          "cohesion": 0.5292767610956083,
+          "safety": {
+            "NONE": 174
+          },
+          "sample": [
+            "This feature detects abbreviations and acronyms followed by periods in business/legal document text, particularly tracking the tokenization boundaries around abbreviated company names and institutional designations (e.g., \"CO.\", \"INS.\", \"IMP.\", \"EXP.\").",
+            "This feature activates on geographic locations, institutions, and proper nouns that appear between marker tokens (>>>...<<<), often representing specific places like schools, tribes, cities, or organizations being referenced or cited in text.",
+            "This feature tracks sequences in Xhosa (a South African language), specifically activating on phrases related to holiday accommodations and booking/searching patterns\u2014the repeated phrases \"Iindawo zeholide eziqeshisayo\" (holiday venues available) and \"Fumana uze ubhukishe iindawo\" (find and book venues) suggest travel search or tourism-related text fragments.",
+            "This feature activates on acronym introductions\u2014specifically the pattern where a full name or phrase is followed by its parenthesized abbreviation, marking the point where an acronym is first defined for the reader.",
+            "This feature detects acronyms or abbreviations with their full expansions, particularly when the acronym appears in parentheses or is introduced via \"is/are\" constructions immediately following the spelled-out term."
+          ]
+        },
+        {
+          "cluster": 12,
+          "name": "sports \u00b7 team \u00b7 particularly \u00b7 activates",
+          "n_features": 41,
+          "cohesion": 0.5963258324599847,
+          "safety": {
+            "NONE": 41
+          },
+          "sample": [
+            "This feature tracks the specific phrase \"Champions Trophy\" and contextual variants describing India's cricket victory, suggesting it detects references to a particular historical sporting event or factual claim about cricket tournament outcomes.",
+            "This feature detects the \"versus\" or \"v.\" connector that introduces competitive opposition between two entities in sports, legal cases, or similar matchup contexts.",
+            "This feature activates on the boundary between temporal/contextual setup phrases and action descriptions in sports biography text, particularly where a year or grade level (\"junior in 2009\") transitions into past-tense performance statements (\"Played in three games\").",
+            "This feature activates on text spans denoting specific events, conferences, meetings, or gatherings\u2014particularly ordinal descriptors (e.g., \"51st Annual Meeting,\" \"3rd Annual Dinner Dance\") and event names enclosed in contexts that mark them as distinct named entities.",
+            "This feature activates on sports matchup announcements and game preview contexts, particularly where team names, event descriptions, or competitive framing appear in close proximity (often split across boundaries with \"vs\" or opposing team references)."
+          ]
+        },
+        {
+          "cluster": 13,
+          "name": "sports \u00b7 score \u00b7 numerical \u00b7 tallies",
+          "n_features": 14,
+          "cohesion": 0.685688228397579,
+          "safety": {
+            "NONE": 14
+          },
+          "sample": [
+            "This feature activates on numerical vote counts and their surrounding context in legislative or judicial decisions, particularly when the activation window spans across the numeric values themselves (e.g., \"64 to 53\" or \"5to\").",
+            "This feature activates on numerical statistics (points, rebounds, assists, steals) in sports performance narratives, particularly when those numbers are positioned at sentence boundaries or clause transitions.",
+            "This feature activates on numerical comparisons or paired statistics presented in a condensed format, typically using a dash or \"to\" conjunction to relate two numbers (e.g., \"64 to 53\", \"79 Low 48\", \"51-48 percent\").",
+            "This feature detects sports score notation and numerical patterns within match results, particularly hyphenated score formats (e.g., \"107-102\") and location/team names associated with competitive outcomes.",
+            "This feature tracks numerical statistics and quantitative data points presented in sports reporting, particularly activation on the numbers themselves and surrounding comparative/descriptive context in athletic performance summaries."
+          ]
+        },
+        {
+          "cluster": 14,
+          "name": "activates \u00b7 phrases \u00b7 particularly \u00b7 where",
+          "n_features": 3450,
+          "cohesion": 0.4326595400473147,
+          "safety": {
+            "NONE": 3411,
+            "BIAS": 7,
+            "HARMFUL_CONTENT": 24,
+            "REFUSAL": 2,
+            "DECEPTION": 6
+          },
+          "sample": [
+            "This feature activates on first-person narrative openings that transition from self-description or personal statements into specific content or claims, particularly patterns like \"I have/am [adjective/descriptor]\" followed by a pivot to concrete details or experiences.",
+            "This feature tracks the beginning of news articles, web content headers, and published text fragments\u2014specifically detecting the opening tokens of formatted documents like news stories, bylines, and webpage titles that appear after the start-of-sequence marker.",
+            "This feature activates on proper nouns and branded names (company names, product titles, band names, game titles) that appear at the beginning of text sequences, often followed by descriptive or contextual information.",
+            "This feature activates on search query titles, webpage headers, and content introductions that appear at the beginning of documents\u2014essentially tracking the onset of indexed or catalogued informational content that typically follows a <bos> token.",
+            "This feature activates on the beginning of straightforward, declarative statements that introduce a topic or subject with a neutral, informative tone\u2014typically statements that establish context before elaborating on details."
+          ]
+        },
+        {
+          "cluster": 15,
+          "name": "disclaimers \u00b7 privacy \u00b7 note \u00b7 please",
+          "n_features": 43,
+          "cohesion": 0.5636946803839632,
+          "safety": {
+            "NONE": 43
+          },
+          "sample": [
+            "This feature detects editorial and meta-textual framing statements that introduce content restrictions, format specifications, source attributions, or content availability disclaimers (e.g., \"Letter to the editor,\" \"Editor's Note,\" \"PDF only,\" \"freely available\").",
+            "This feature activates on standard privacy policy disclaimers, specifically the boilerplate language about external websites and third-party privacy governance that appears in terms of service documents.",
+            "This feature tracks legal disclaimers and policy language around data privacy, specifically phrases about conditional permissions (\"unless we have your permission or are required by law\") that appear in privacy policies and terms of service.",
+            "This feature detects privacy policy language, specifically boilerplate statements about data protection, non-disclosure of personal information to third parties, and user consent requirements.",
+            "This feature activates on copyright notices, licensing statements, and intellectual property disclaimers that establish legal ownership and usage restrictions."
           ]
         }
       ]
@@ -392,19 +538,19 @@
   ],
   "judgement": {
     "sae": {
-      "coherence": 7.3,
-      "temporal": 1.33,
-      "safety": 0.13
+      "coherence": 6.41,
+      "temporal": 5.67,
+      "safety": 0.05
     },
     "tsae": {
-      "coherence": 7.3,
-      "temporal": 2.44,
+      "coherence": 7.05,
+      "temporal": 2.27,
       "safety": 0.2
     },
     "txc": {
-      "coherence": 5.17,
-      "temporal": 2.65,
-      "safety": 0.73
+      "coherence": 6.39,
+      "temporal": 6.88,
+      "safety": 0.08
     }
   }
 }

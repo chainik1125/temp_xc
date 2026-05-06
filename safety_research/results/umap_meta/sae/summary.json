@@ -1,106 +1,107 @@
 {
   "arm": "sae",
-  "n_features": 150,
+  "n_features": 2129,
   "n_clusters": 6,
-  "noise_frac": 0.0,
-  "silhouette": 0.6039506196975708,
-  "mean_cohesion": 0.7296514958143234,
+  "noise_frac": 0.0014091122592766556,
+  "silhouette": -0.03002598136663437,
+  "mean_cohesion": 0.6412747006553455,
   "clusters": [
     {
       "cluster": 0,
-      "name": "associated \u00b7 places \u00b7 businesses \u00b7 locations",
-      "n_features": 14,
-      "cohesion": 0.9533300995826721,
+      "name": "company \u00b7 beginning \u00b7 product \u00b7 diverse",
+      "n_features": 32,
+      "cohesion": 0.8007133237777218,
       "safety": {
-        "NONE": 14
+        "NONE": 32
       },
       "sample": [
-        "This feature represents locations, specifically places associated with businesses or services.",
-        "This feature represents locations, specifically places associated with businesses or services.",
-        "This feature represents locations, specifically places associated with businesses or organizations.",
-        "This feature represents locations, specifically places associated with businesses or services.",
-        "This feature represents locations, specifically places associated with businesses or organizations."
+        "This feature activates on beginning-of-sequence tokens followed by generic, informational opening phrases typical of web content\u2014headlines, dates, company descriptions, product reviews, and promotional material that establish factual or commercial context.",
+        "This feature activates on beginning-of-sequence tokens that introduce generic, factual, or commercial text\u2014such as product descriptions, news headlines, company information, and dated content\u2014representing the start of diverse informational or promotional passages.",
+        "This feature activates on beginning-of-sequence tokens followed by text opening patterns typical of web articles, product descriptions, news snippets, or promotional content\u2014essentially generic introductory material from diverse online sources.",
+        "This feature activates on the beginning-of-sequence token immediately followed by diverse, generic opening text\u2014news articles, product descriptions, company blurbs, event listings, and promotional content\u2014representing the start of standalone informational or commercial documents.",
+        "This feature detects the beginning of diverse web-sourced text documents, particularly the opening lines of articles, product descriptions, event postings, and promotional content that typically appear in indexed web pages or scraped content collections."
       ]
     },
     {
       "cluster": 1,
-      "name": "places \u00b7 businesses \u00b7 locations \u00b7 specifically",
-      "n_features": 88,
-      "cohesion": 0.9694793820381165,
+      "name": "company \u00b7 diverse \u00b7 product \u00b7 beginning",
+      "n_features": 73,
+      "cohesion": 0.8731389386831716,
       "safety": {
-        "NONE": 88
+        "NONE": 73
       },
       "sample": [
-        "This feature represents locations, specifically places and businesses.",
-        "This feature represents locations, specifically places and businesses.",
-        "This feature represents locations, specifically places and businesses.",
-        "This feature represents locations, specifically places and businesses.",
-        "This feature represents locations, specifically places and businesses."
+        "This feature detects the beginning-of-sequence token (<bos>) immediately followed by diverse, encyclopedic or factual opening content (product descriptions, news headlines, company information, dates, ratings), characteristic of web-scraped or reference material corpus text.",
+        "This feature activates at the beginning of text sequences (immediately after <bos>) that introduce factual, informational, or promotional content such as product descriptions, news snippets, company information, or event announcements.",
+        "This feature activates on the beginning-of-sequence token (<bos>) immediately followed by diverse, everyday informational text fragments\u2014product descriptions, news headlines, dates, company information, and promotional content\u2014suggesting it detects the onset of generic web-scraped or encyclopedic prose.",
+        "This feature activates on the beginning-of-sequence token (<bos>) immediately followed by diverse, factual opening text across multiple domains (product descriptions, news leads, dates, company information, ratings), suggesting it tracks the onset of generic informational or commercial content.",
+        "This feature activates on the beginning-of-sequence token (<bos>) followed by diverse introductory content types, detecting the onset of new document or text passages across various domains (product descriptions, news, dates, promotional content, reviews)."
       ]
     },
     {
       "cluster": 2,
-      "name": "addresses \u00b7 street \u00b7 represents \u00b7 locations",
-      "n_features": 6,
-      "cohesion": 0.9052274227142334,
+      "name": "geographic \u00b7 names \u00b7 activates \u00b7 location",
+      "n_features": 55,
+      "cohesion": 0.5870612455939604,
       "safety": {
-        "NONE": 6
+        "NONE": 55
       },
       "sample": [
-        "This feature represents locations or addresses, particularly those related to legal or governmental entities.",
-        "This feature represents locations or addresses, particularly residential addresses.",
-        "This feature represents addresses, specifically street addresses.",
-        "This feature represents addresses, specifically street addresses.",
-        "This feature represents addresses, specifically street addresses."
+        "This feature activates on cardinal/directional adjectives (northeastern, southern, north, northwest) that describe geographical locations or regions within text.",
+        "This feature activates on the word \"home\" in contexts where it refers to residential dwelling places, particularly in commercial, service-oriented, or practical descriptive language (home cleaning, home networking, home security, home maintenance).",
+        "This feature activates on country or nation names, particularly when they appear as demarcated entities (often marked with >>> <<<) in news headlines and informational text about geopolitical, economic, or cultural topics.",
+        "This feature detects geographic locations and place names, particularly when they appear as specific localities (cities, regions, states, countries) that follow or are embedded within descriptive text about those places.",
+        "This feature activates on geographic/location names and proper nouns (parks, districts, tracts, ponds) that are highlighted or demarcated within descriptive text about places and real estate."
       ]
     },
     {
       "cluster": 3,
-      "name": "dates \u00b7 time \u00b7 specific \u00b7 references",
-      "n_features": 6,
-      "cohesion": 0.5702160000801086,
+      "name": "greetings \u00b7 informal \u00b7 hello \u00b7 welcome",
+      "n_features": 19,
+      "cohesion": 0.671200043973867,
       "safety": {
-        "NONE": 6
+        "NONE": 19
       },
       "sample": [
-        "This feature represents dates and time references, particularly in the context of specific events or occurrences.",
-        "This feature represents dates and time references, particularly in the context of specific events or occurrences.",
-        "This feature represents days of the week, specifically Mondays.",
-        "This feature represents dates, specifically focusing on specific dates within a text.",
-        "This feature represents topics related to legal proceedings, timeframes, and specific locations."
+        "This feature activates on casual opening greetings and salutations at the beginning of text, particularly \"Hello,\" \"Hey,\" \"Hi,\" and similar informal address tokens that initiate conversational or personal communication.",
+        "This feature detects opening salutations and introductory phrases that begin documents or webpages, particularly greetings like \"Welcome,\" \"Hello,\" \"Published,\" and \"By\" that signal the start of a new communicative context or piece of content.",
+        "This feature detects opening framing markers that introduce content\u2014either structural delimiters like `[<<<` marking the start of quoted/formatted sections, or welcoming phrases like \"Welcome\" that begin a new text or announcement.",
+        "This feature detects the formulaic opening phrase \"Welcome to\" that introduces websites, services, or communities, typically appearing at the start of landing pages or welcome messages.",
+        "This feature tracks expressions of gratitude and thanks, particularly when they appear at the beginning of sentences or messages in formal/semi-formal contexts like customer service responses, acknowledgments, and appreciation statements."
       ]
     },
     {
       "cluster": 4,
-      "name": "represents \u00b7 presence \u00b7 call \u00b7 action",
-      "n_features": 13,
-      "cohesion": 0.5218843221664429,
+      "name": "activates \u00b7 particularly \u00b7 words \u00b7 phrases",
+      "n_features": 1849,
+      "cohesion": 0.4030881542965778,
       "safety": {
-        "NONE": 11,
-        "HARMFUL_CONTENT": 2
+        "NONE": 1838,
+        "HARMFUL_CONTENT": 9,
+        "BIAS": 2
       },
       "sample": [
-        "This feature represents the use of \"Hi\" as a greeting in a conversational context.",
-        "This feature represents the presence of a call to action or a request for a specific action.",
-        "This feature represents the presence of a moderator or a designated authority figure in a discussion or conversation.",
-        "This feature represents the presence of a call to action or a request for participation.",
-        "This feature represents a pattern of aggressive or violent language, often involving insults or threats."
+        "This feature detects the beginning of proper nouns and branded names (Chain, Galvan, Silvio, Citgo, Vodafone, Balotelli, Naucalpan, Poly, Pub, Law, Motion) where capitalized words are split mid-token or appear at text boundaries, tracking how the model processes named entity recognition and capitalization patterns.",
+        "This feature activates on capitalized words or proper nouns that appear at the start of text following the beginning-of-sequence token, often marking titles, names, or product identifiers that introduce content categories.",
+        "This feature fires on capitalized words or word fragments that appear at the start of text segments, particularly nouns used as headers, titles, or category labels in lists and product descriptions.",
+        "This feature activates on product/service listing titles and headers, specifically detecting the pattern where descriptive text precedes a product category or item type enclosed in angle brackets (e.g., \"Fashion Haul\", \"Concentration\", \"Pack\", \"Inventory\", \"Kit\").",
+        "This feature detects capitalized topic headers or section titles that introduce business/organizational categories, services, or subject domains (recruitment, configuration, fitness, upgrades, consulting, advertising, etc.)."
       ]
     },
     {
       "cluster": 5,
-      "name": "represents \u00b7 personal \u00b7 specific \u00b7 positive",
-      "n_features": 23,
-      "cohesion": 0.45777174830436707,
+      "name": "possessive \u00b7 person \u00b7 activates \u00b7 first",
+      "n_features": 98,
+      "cohesion": 0.5124464976067746,
       "safety": {
-        "NONE": 23
+        "NONE": 98
       },
       "sample": [
-        "This feature represents product names, particularly those related to medical devices, household appliances, and security items.",
-        "This feature represents brand names or product titles, particularly those related to physical objects or services.",
-        "This feature represents product comparisons, highlighting features and benefits of different items.",
-        "This feature represents a focus on products or services related to a specific industry or sector.",
-        "This feature represents the concept of \"funding,\" \"acquisition,\" \"treatment,\" \"research,\" \"license,\" \"infrastructure,\" \"projects,\" \"series,\" \"database,\" \"facilities,\" and \"packages\" as they relate to a specific context. \n[SAFETY]: NONE"
+        "This feature activates on the first-person singular pronoun \"I\" appearing at the beginning of a text passage (after the start-of-sequence token), particularly when initiating personal narratives, anecdotes, or subjective claims.",
+        "This feature fires on first-person narrative or memoir-style writing that begins with \"I\" statements expressing personal experiences, observations, or accomplishments.",
+        "This feature activates on first-person singular pronouns and contractions (\"I\", \"I'm\", \"I've\", \"I was\") that initiate personal narrative statements or subjective claims, particularly when the speaker is sharing experiences, opinions, or accomplishments.",
+        "This feature activates on first-person narrative voice, specifically the pattern of \"I\" at the beginning of sentences or clauses that introduce personal experiences, observations, or statements.",
+        "This feature activates on possessive constructions and institutional/organizational entity markers, where a proper noun or entity name is followed by possessive indicators (apostrophe-s, \"'s\") or appears in a role-defining context before a description of what that entity manages, operates, or is responsible for."
       ]
     }
   ]

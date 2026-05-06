@@ -2,15 +2,15 @@
   "arm": "tsae",
   "n_features": 150,
   "n_clusters": 9,
-  "noise_frac": 0.0,
-  "silhouette": 0.672951877117157,
-  "mean_cohesion": 0.7302192019091712,
+  "noise_frac": 0.013333333333333334,
+  "silhouette": 0.6289588809013367,
+  "mean_cohesion": 0.7051357085930952,
   "clusters": [
     {
       "cluster": 0,
-      "name": "name \u00b7 within \u00b7 location \u00b7 place",
+      "name": "name \u00b7 within \u00b7 place \u00b7 location",
       "n_features": 41,
-      "cohesion": 0.9713201522827148,
+      "cohesion": 0.971320175543064,
       "safety": {
         "NONE": 41
       },
@@ -24,9 +24,9 @@
     },
     {
       "cluster": 1,
-      "name": "names \u00b7 organizations \u00b7 place \u00b7 city",
+      "name": "names \u00b7 place \u00b7 organizations \u00b7 city",
       "n_features": 9,
-      "cohesion": 0.8929974436759949,
+      "cohesion": 0.8929974238077799,
       "safety": {
         "NONE": 9
       },
@@ -40,9 +40,9 @@
     },
     {
       "cluster": 2,
-      "name": "name \u00b7 location \u00b7 official \u00b7 formal",
+      "name": "name \u00b7 location \u00b7 official \u00b7 place",
       "n_features": 19,
-      "cohesion": 0.8568011522293091,
+      "cohesion": 0.8568011724460892,
       "safety": {
         "NONE": 19
       },
@@ -58,7 +58,7 @@
       "cluster": 3,
       "name": "cities \u00b7 specifically \u00b7 represents \u00b7 locations",
       "n_features": 8,
-      "cohesion": 0.6891629099845886,
+      "cohesion": 0.6891629355294364,
       "safety": {
         "NONE": 8
       },
@@ -72,43 +72,25 @@
     },
     {
       "cluster": 4,
-      "name": "represents \u00b7 often \u00b7 statement \u00b7 specific",
-      "n_features": 38,
-      "cohesion": 0.4484036862850189,
+      "name": "safety \u00b7 none \u00b7 represents \u00b7 place",
+      "n_features": 14,
+      "cohesion": 0.67650880918398,
       "safety": {
-        "NONE": 35,
-        "REFUSAL": 2,
-        "HARMFUL_CONTENT": 1
+        "NONE": 14
       },
       "sample": [
-        "This feature represents greetings and introductions, often in a casual or friendly tone.",
-        "This feature represents a conversational shift towards a personal, often nostalgic or reflective tone, suggesting a focus on personal experiences and memories.\n[SAFETY]: NONE",
-        "This feature represents the mention of brands, companies, or specific locations, often in the context of product launches, marketing, or business operations.",
-        "This feature represents the presence of pricing information, shipping details, or financial figures.",
-        "This feature represents locations or specific categories of products or services."
+        "This feature represents statements that explicitly or implicitly state a connection between a person or entity and a specific group or community. \n[SAFETY]: NONE",
+        "This feature represents the presence of a location or place name within a text. \n[SAFETY]: NONE",
+        "This feature represents a strong sentiment of agreement or endorsement, often with a sense of conviction.\n[SAFETY]: NONE",
+        "This feature represents a focus on specific locations, often with a geographical or place-related context. \n[SAFETY]: NONE",
+        "This feature represents a focus on the most prominent or highly regarded individuals, objects, or concepts within a given context. \n[SAFETY]: NONE"
       ]
     },
     {
       "cluster": 5,
-      "name": "completion \u00b7 sense \u00b7 represents \u00b7 process",
-      "n_features": 6,
-      "cohesion": 0.5476019382476807,
-      "safety": {
-        "NONE": 6
-      },
-      "sample": [
-        "This feature represents a focus on the completion of a process or action, often with a clear endpoint. \n[SAFETY]: NONE",
-        "This feature represents a strong sentiment of agreement or endorsement, often with a sense of conviction.\n[SAFETY]: NONE",
-        "This feature represents statements that express uncertainty, hedging, or a sense of potential failure.",
-        "This feature represents actions or instructions that are positive, celebratory, or completion-oriented.",
-        "This feature represents the completion or summary of a task or process, often with a sense of finality."
-      ]
-    },
-    {
-      "cluster": 6,
-      "name": "time \u00b7 dates \u00b7 references \u00b7 events",
+      "name": "time \u00b7 dates \u00b7 references \u00b7 safety",
       "n_features": 17,
-      "cohesion": 0.6733425259590149,
+      "cohesion": 0.6733425364774817,
       "safety": {
         "NONE": 17
       },
@@ -121,35 +103,52 @@
       ]
     },
     {
-      "cluster": 7,
-      "name": "safety \u00b7 none \u00b7 name \u00b7 place",
-      "n_features": 7,
-      "cohesion": 0.8388472199440002,
+      "cluster": 6,
+      "name": "statement \u00b7 represents \u00b7 limitation \u00b7 completion",
+      "n_features": 8,
+      "cohesion": 0.5468027932303292,
       "safety": {
-        "NONE": 7
+        "NONE": 8
       },
       "sample": [
-        "This feature represents the presence of a location or place name within a text. \n[SAFETY]: NONE",
-        "This feature represents the presence of place names, particularly those of cities, towns, or regions. \n[SAFETY]: NONE",
-        "This feature represents the presence of a location or place name, often in a formal or official context. \n[SAFETY]: NONE",
-        "This feature represents the presence of a location or place name within a text. \n[SAFETY]: NONE",
-        "This feature represents the presence of a location or place name within a text. \n[SAFETY]: NONE"
+        "This feature represents a statement of inability or limitation, often related to access, availability, or compatibility.",
+        "This feature represents statements that express uncertainty, hedging, or a sense of potential failure.",
+        "This feature represents actions or instructions that are positive, celebratory, or completion-oriented.",
+        "This feature represents the completion or summary of a task or process, often with a sense of finality.",
+        "This feature represents a request for information or assistance related to a specific product, service, or industry.  The examples all involve a query for information about a particular entity or process."
+      ]
+    },
+    {
+      "cluster": 7,
+      "name": "often \u00b7 represents \u00b7 events \u00b7 focus",
+      "n_features": 28,
+      "cohesion": 0.4374205574156746,
+      "safety": {
+        "NONE": 25,
+        "REFUSAL": 2,
+        "HARMFUL_CONTENT": 1
+      },
+      "sample": [
+        "This feature represents greetings and introductions, often in a casual or friendly tone.",
+        "This feature represents a conversational shift towards a personal, often nostalgic or reflective tone, suggesting a focus on personal experiences and memories.\n[SAFETY]: NONE",
+        "This feature represents the mention of brands, companies, or specific locations, often in the context of product launches, marketing, or business operations.",
+        "This feature represents the presence of pricing information, shipping details, or financial figures.",
+        "This feature represents locations or specific categories of products or services."
       ]
     },
     {
       "cluster": 8,
-      "name": "safety \u00b7 none \u00b7 connection \u00b7 represents",
-      "n_features": 5,
-      "cohesion": 0.6534957885742188,
+      "name": "part \u00b7 group \u00b7 discussion \u00b7 represents",
+      "n_features": 4,
+      "cohesion": 0.6018649737040201,
       "safety": {
-        "NONE": 5
+        "NONE": 4
       },
       "sample": [
-        "This feature represents statements that explicitly or implicitly state a connection between a person or entity and a specific group or community. \n[SAFETY]: NONE",
-        "This feature represents a focus on specific locations, often with a geographical or place-related context. \n[SAFETY]: NONE",
-        "This feature represents a focus on the most prominent or highly regarded individuals, objects, or concepts within a given context. \n[SAFETY]: NONE",
-        "This feature represents a connection to a specific company, organization, or entity, often with a focus on its role or history. \n[SAFETY]: NONE",
-        "This feature represents a pattern of language indicating a perceived \"bargain\" or \"best value\" in a product, service, or situation. \n[SAFETY]: NONE"
+        "This feature represents the presence of a subject or entity being described as part of a group or team.",
+        "This feature represents a focus on the act of \"joining\" or \"becoming a part of\" a community, organization, or group.",
+        "This feature represents the beginning of a statement or question that seeks to initiate a discussion or action related to a specific topic or goal.",
+        "This feature represents the presence of a \"moderator\" or \"host\" role in a discussion or event."
       ]
     }
   ]

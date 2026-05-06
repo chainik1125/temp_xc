@@ -29,22 +29,40 @@ from fast_models import FastStackedSAE, FastTemporalCrosscoder
 
 def load_models(
     layer: str, k: int, T: int,
+    sae_ckpt: str | None = None, tx_ckpt: str | None = None,
 ) -> tuple[FastStackedSAE, FastTemporalCrosscoder]:
+    """Load the SAE-family and TX checkpoints.
+
+    By default loads `<CHECKPOINT_DIR>/{run_name}.pt` for both architectures.
+    Pass `sae_ckpt` / `tx_ckpt` to point at arbitrary file paths — useful
+    when the checkpoints live in a sibling pipeline (e.g.
+    safety_research/results/checkpoints/) under a different naming scheme.
+    """
     d_act = LAYER_SPECS[layer]["d_act"]
 
-    sae_path = os.path.join(CHECKPOINT_DIR, f"{run_name('stacked_sae', layer, k, T)}.pt")
-    tx_path = os.path.join(CHECKPOINT_DIR, f"{run_name('txcdr', layer, k, T)}.pt")
+    sae_path = sae_ckpt or os.path.join(
+        CHECKPOINT_DIR, f"{run_name('stacked_sae', layer, k, T)}.pt"
+    )
+    tx_path = tx_ckpt or os.path.join(
+        CHECKPOINT_DIR, f"{run_name('txcdr', layer, k, T)}.pt"
+    )
 
     for p in [sae_path, tx_path]:
         if not os.path.exists(p):
             raise FileNotFoundError(f"Checkpoint not found: {p}")
 
+    def _load_state(path: str) -> dict:
+        # Safety-pipeline checkpoints wrap the state_dict in a dict with
+        # arch/T/k metadata; bare checkpoints store the state_dict directly.
+        blob = torch.load(path, map_location="cpu", weights_only=True)
+        return blob["state_dict"] if isinstance(blob, dict) and "state_dict" in blob else blob
+
     sae = FastStackedSAE(d_in=d_act, d_sae=D_SAE, T=T, k=k)
-    sae.load_state_dict(torch.load(sae_path, map_location="cpu", weights_only=True))
+    sae.load_state_dict(_load_state(sae_path))
     sae.eval()
 
     tx = FastTemporalCrosscoder(d_in=d_act, d_sae=D_SAE, T=T, k=k)
-    tx.load_state_dict(torch.load(tx_path, map_location="cpu", weights_only=True))
+    tx.load_state_dict(_load_state(tx_path))
     tx.eval()
 
     return sae, tx
@@ -210,16 +228,38 @@ def load_interpretations(
 ) -> dict[int, str]:
     """Load autointerp explanations for given features.
 
-    Looks under `{interp_root or VIZ_DIR}/autointerp/{model}_{layer}_k{k}_T{T}/`.
+    Two source layouts are supported:
+      1. `interp_root` points at a JSONL file produced by
+         safety_research/scripts/run_autointerp.py — one record per line
+         with `{feat, explanation, ...}`.
+      2. Otherwise, looks for per-feature JSONs at
+         `{interp_root or VIZ_DIR}/autointerp/{model}_{layer}_k{k}_T{T}/feat_NNNNNN.json`
+         (the original sentence.py layout).
     Returns: {feat_idx: explanation_text}, missing entries omitted.
     """
+    out: dict[int, str] = {}
+    requested = {int(fi) for fi in feature_indices}
+
+    # JSONL layout (new safety pipeline)
+    if interp_root and os.path.isfile(interp_root) and interp_root.endswith(".jsonl"):
+        for line in open(interp_root):
+            try:
+                d = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            fi = int(d.get("feat", -1))
+            if fi in requested:
+                expl = (d.get("explanation") or "").strip()
+                if expl:
+                    out[fi] = expl
+        return out
+
+    # Per-feature JSON layout (original)
     root = interp_root or os.path.join(VIZ_DIR, "autointerp")
     label = f"{model_type}_{layer}_k{k}_T{T}"
     interp_dir = os.path.join(root, label)
     if not os.path.isdir(interp_dir):
-        return {}
-
-    out: dict[int, str] = {}
+        return out
     for fi in feature_indices:
         path = os.path.join(interp_dir, f"feat_{int(fi):06d}.json")
         if not os.path.exists(path):
@@ -372,6 +412,19 @@ def main():
                         help="Colormap for SAE heatmap (default: inferno)")
     parser.add_argument("--cmap-tx", type=str, default="inferno",
                         help="Colormap for TXCDR heatmap (default: inferno)")
+    parser.add_argument("--sae-ckpt", type=str, default=None,
+                        help="Override path to the SAE-family checkpoint "
+                             "(e.g. a safety_research/results/checkpoints "
+                             "file with a non-canonical name).")
+    parser.add_argument("--tx-ckpt", type=str, default=None,
+                        help="Override path to the TXCDR checkpoint.")
+    parser.add_argument("--sae-interps", type=str, default=None,
+                        help="Path to the SAE-side autointerp source. Either "
+                             "a JSONL produced by run_autointerp.py, or a "
+                             "per-feature-JSON directory root.")
+    parser.add_argument("--tx-interps", type=str, default=None,
+                        help="Path to the TXCDR autointerp source (JSONL or "
+                             "per-feature-JSON directory root).")
     args = parser.parse_args()
 
     torch.manual_seed(args.seed)
@@ -381,7 +434,8 @@ def main():
     os.makedirs(output_dir, exist_ok=True)
 
     print(f"Loading models (layer={args.layer}, k={args.k}, T={args.T})...")
-    sae, tx = load_models(args.layer, args.k, args.T)
+    sae, tx = load_models(args.layer, args.k, args.T,
+                          sae_ckpt=args.sae_ckpt, tx_ckpt=args.tx_ckpt)
 
     # Decide whether --chain is an int (cache index) or a custom text string.
     chain_arg = args.chain
@@ -449,9 +503,11 @@ def main():
     # ─── Load feature interpretations (if autointerp results exist) ─────────
     sae_interps = load_interpretations(
         "stacked_sae", args.layer, args.k, args.T, sae_top_idx,
+        interp_root=args.sae_interps,
     )
     tx_interps = load_interpretations(
         "txcdr", args.layer, args.k, args.T, tx_top_idx,
+        interp_root=args.tx_interps,
     )
     print(f"  Loaded interps: SAE={len(sae_interps)}/{n_feat}, TXCDR={len(tx_interps)}/{n_feat}")
 

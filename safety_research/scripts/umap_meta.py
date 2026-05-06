@@ -63,10 +63,18 @@ def embed(texts: list[str]):
 
 
 def cluster(emb_2d: np.ndarray):
-    """HDBSCAN on 2D UMAP coords."""
-    import hdbscan
-    cl = hdbscan.HDBSCAN(min_cluster_size=4, min_samples=2,
-                         cluster_selection_epsilon=0.4)
+    """HDBSCAN on 2D UMAP coords. Prefers the standalone hdbscan package;
+    falls back to sklearn.cluster.HDBSCAN (sklearn>=1.3) when unavailable.
+    The two implementations are API-compatible for the kwargs used here.
+    """
+    try:
+        import hdbscan
+        cl = hdbscan.HDBSCAN(min_cluster_size=4, min_samples=2,
+                             cluster_selection_epsilon=0.4)
+    except ImportError:
+        from sklearn.cluster import HDBSCAN
+        cl = HDBSCAN(min_cluster_size=4, min_samples=2,
+                     cluster_selection_epsilon=0.4)
     labels = cl.fit_predict(emb_2d)
     return labels, cl
 
