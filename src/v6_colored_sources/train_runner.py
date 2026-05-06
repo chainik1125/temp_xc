@@ -35,6 +35,7 @@ from temporal_crosscoders.han_arch import (  # noqa: E402
     make_multidistance_pair_gen_gpu,
 )
 from temporal_crosscoders.han_arch.txc_bare_antidead import TXCBareAntidead  # noqa: E402
+from temporal_crosscoders.han_tsae import TemporalSAE  # noqa: E402
 
 from .data_adapter import ColoredSourceCache  # noqa: E402
 from .metrics import (  # noqa: E402
@@ -338,6 +339,107 @@ def train_txc_global(
         recovery_auc=last["recovery_auc"],
         history=history,
     )
+
+
+def train_tsae(
+    *,
+    cache: ColoredSourceCache,
+    W: int,
+    k: int,
+    H: int,
+    d: int,
+    n_heads: int = 8,
+    n_attn_layers: int = 1,
+    bottleneck_factor: int = 16,
+    contrastive_weight: float = 0.1,
+    device: torch.device,
+    train_cfg: TrainConfig,
+    tied_weights: bool = True,
+) -> TemporalSAE:
+    """Train Bhalla 2025-style TemporalSAE on (B, W, d) windows.
+
+    Recipe:
+
+    - ``sae_diff_type='topk'`` with ``kval_topk = k`` per token (not per
+      window). The Bhalla paper uses ``k=20`` by default.
+    - Loss = reconstruction MSE + ``contrastive_weight`` * InfoNCE between
+      consecutive temporal codes ``(z_t, z_{t+1})``, evaluated per window
+      and averaged. Default contrastive weight ``0.1``.
+    - Reuses Han's vendored ``TemporalSAE`` (attention-based predicted
+      codes + novel codes via TopK on the residual).
+
+    Returns the trained model. Use ``model(x_btd)`` at inference to get
+    ``(x_recons, results_dict)`` with ``results_dict['novel_codes']`` and
+    ``results_dict['pred_codes']`` of shape ``(B, W, H)`` each — sum
+    them for the per-position activation used in probing.
+    """
+    import time
+    if W < 2:
+        raise ValueError(f"TSAE attention requires W >= 2; got W={W}")
+
+    # ManualAttention requires (width / bottleneck_factor) % n_heads == 0.
+    # Adjust bottleneck_factor so this is always satisfied.
+    while H // bottleneck_factor < n_heads or (H // bottleneck_factor) % n_heads != 0:
+        if bottleneck_factor > 1:
+            bottleneck_factor //= 2
+        else:
+            n_heads = max(1, n_heads // 2)
+            if n_heads == 1:
+                break
+
+    model = TemporalSAE(
+        dimin=d, width=H, n_heads=n_heads,
+        sae_diff_type="topk", kval_topk=k,
+        tied_weights=tied_weights,
+        n_attn_layers=n_attn_layers,
+        bottleneck_factor=bottleneck_factor,
+    ).to(device)
+
+    iterator = _make_iterator(cache, train_cfg.batch_size, W)
+    opt = torch.optim.Adam(
+        model.parameters(), lr=train_cfg.lr, betas=train_cfg.adam_betas
+    )
+
+    arch = "tsae_bhalla"
+    t_start = time.time()
+
+    for step in range(train_cfg.n_steps):
+        x = next(iterator).to(device).float()                  # (B, W, d)
+        x_hat, results = model(x)
+        recon = (x_hat - x).pow(2).sum(dim=-1).mean()
+        codes = results["novel_codes"] + results["pred_codes"]  # (B, W, H)
+        # InfoNCE between consecutive codes: pull z_t and z_{t+1} together.
+        contrastive = torch.zeros((), device=device, dtype=x.dtype)
+        if contrastive_weight > 0 and W >= 2:
+            za = codes[:, :-1].reshape(-1, H)                   # (B*(W-1), H)
+            zb = codes[:, 1:].reshape(-1, H)
+            za = nn.functional.normalize(za, dim=-1, eps=1e-8)
+            zb = nn.functional.normalize(zb, dim=-1, eps=1e-8)
+            sim = za @ zb.t()
+            labels = torch.arange(za.shape[0], device=device)
+            contrastive = 0.5 * (
+                nn.functional.cross_entropy(sim, labels)
+                + nn.functional.cross_entropy(sim.t(), labels)
+            )
+        loss = recon + contrastive_weight * contrastive
+        opt.zero_grad()
+        loss.backward()
+        nn.utils.clip_grad_norm_(model.parameters(), train_cfg.grad_clip)
+        opt.step()
+
+        last_step = step == train_cfg.n_steps - 1
+        if step % train_cfg.log_interval == 0 or last_step:
+            elapsed = time.time() - t_start
+            steps_per_sec = (step + 1) / max(elapsed, 1e-6)
+            print(
+                f"  [{arch} W={W} k={k} a_contr={contrastive_weight}] "
+                f"step={step:>5d} recon={recon.item():.4f} "
+                f"contr={float(contrastive.item()):.4f} "
+                f"| {steps_per_sec:.1f} it/s",
+                flush=True,
+            )
+
+    return model
 
 
 def _default_h8_shifts(T: int) -> tuple[int, ...]:

@@ -46,7 +46,7 @@ from .polynomial_clock import (  # noqa: E402
     generate_polynomial_clock_dataset,
 )
 from .run_pair_experiment import _train_logistic_probe  # noqa: E402
-from .train_runner import TrainConfig  # noqa: E402
+from .train_runner import TrainConfig, train_tsae  # noqa: E402
 
 
 # ---------- Architecture training -----------------------------------------
@@ -214,6 +214,23 @@ def _txc_global_latents_at(
         return txc.encode(x).detach()                       # (B, H)
 
 
+def _tsae_latents_at(
+    tsae, cache: ColoredSourceCache, anchors: dict, W: int
+) -> torch.Tensor:
+    """Encode windows through Bhalla TSAE; concatenate per-position codes.
+
+    Returns ``(B, W*H)`` where each `H`-block is `novel_codes + pred_codes`
+    at one position. This matches how the existing
+    `experiments/ward_backtracking_txc/architectures.py:181` uses TSAE
+    activations.
+    """
+    x = _windows_at_anchors(cache, anchors, W).float()
+    with torch.no_grad():
+        _, results = tsae(x)
+        codes = results["novel_codes"] + results["pred_codes"]   # (B, W, H)
+    return codes.reshape(codes.shape[0], -1)
+
+
 def _raw_window_features(cache: ColoredSourceCache, anchors: dict, W: int) -> torch.Tensor:
     """Flattened raw window — the architecture-free ceiling for ``Acc(Y)``."""
     return _windows_at_anchors(cache, anchors, W).reshape(anchors["chain_idx"].shape[0], -1)
@@ -334,11 +351,33 @@ def run_stage(
             f"Rec_temp={rec_temp_txc:.3f}  (M={atoms.shape[0]})"
         )
 
+        # 5. Bhalla 2025 Temporal SAE — TopK with k=20 + InfoNCE contrastive.
+        if W >= 2:
+            tsae_model = train_tsae(
+                cache=cache, W=W, k=20, H=H, d=d,
+                contrastive_weight=0.1,
+                device=device,
+                train_cfg=TrainConfig(
+                    n_steps=max(2000, n_steps // 2),
+                    batch_size=batch_size, lr=lr,
+                ),
+            )
+            tsae_X = _tsae_latents_at(tsae_model, cache, anchors, W)
+            tsae_probe = _train_logistic_probe(
+                tsae_X, anchors["Y"], R=cfg.q, device=device, seed=seed + 500 + W,
+            )
+            print(f"    TSAE Bhalla (k=20, alpha=0.1)  val={tsae_probe['val_accuracy']:.3f}")
+            tsae_probe_serial = tsae_probe
+        else:
+            tsae_probe_serial = None
+            print("    TSAE Bhalla: skipped at W<2 (attention needs >=2 positions)")
+
         cells.append({
             "W": W,
             "raw_probe": raw_probe,
             "sae_local_probe": sae_local_probe,
             "sae_window_probe": sae_window_probe,
+            "tsae_probe": tsae_probe_serial,
             "txc_probe": txc_probe,
             "txc_rec_local": rec_local_txc,
             "txc_rec_temp": rec_temp_txc,
