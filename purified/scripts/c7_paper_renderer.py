@@ -703,6 +703,77 @@ def plot_gc_at_peak_paired(rows: list[dict], out_path: Path) -> None:
     plt.close(fig)
 
 
+def plot_gc_at_peak_paired_compact(rows: list[dict], out_path: Path) -> None:
+    """Compact variant of plot_gc_at_peak_paired sized for the headline
+    two-panel figure (text-comparison panel on the left, bar chart on the
+    right, both at ~half the page width). Smaller fonts, rotated x-tick
+    labels, tighter margins."""
+    rows = [r for r in rows if r["metrics"].get("gc_at_peak_mag") is not None]
+    if not rows:
+        return
+    rows = sorted(rows, key=lambda r: -r["metrics"].get("gc_at_peak_mag", 0.0))
+    base_means: list[float] = []
+    base_lo: list[float] = []
+    base_hi: list[float] = []
+    peak_means: list[float] = []
+    peak_lo: list[float] = []
+    peak_hi: list[float] = []
+    peak_mags: list[float | None] = []
+    for r in rows:
+        per_qid = _per_qid_gc_for_row(r)
+        peak_mag = r["metrics"].get("delta_gc_peak_magnitude")
+        peak_mags.append(float(peak_mag) if peak_mag is not None else None)
+        seed = int(r.get("seed", 42))
+        bm, blo, bhi = _bootstrap_mean_ci(
+            per_qid.get(0.0, []), n_boot=1000, ci=0.95, seed=seed)
+        peak_vals = per_qid.get(float(peak_mag), []) if peak_mag is not None else []
+        pm, plo, phi = _bootstrap_mean_ci(
+            peak_vals, n_boot=1000, ci=0.95, seed=seed + 1)
+        base_means.append(bm); base_lo.append(blo); base_hi.append(bhi)
+        peak_means.append(pm); peak_lo.append(plo); peak_hi.append(phi)
+    n = len(rows)
+    x_pos = np.arange(n)
+    bar_w = 0.4
+    fig, ax = plt.subplots(figsize=(4.6, 4.2))
+    base_color = "#bbbbbb"
+    peak_colors = [cell_color(r["arch"], _bs_from_row(r)) for r in rows]
+    base_err_lo = [m - lo for m, lo in zip(base_means, base_lo)]
+    base_err_hi = [hi - m for m, hi in zip(base_means, base_hi)]
+    peak_err_lo = [m - lo for m, lo in zip(peak_means, peak_lo)]
+    peak_err_hi = [hi - m for m, hi in zip(peak_means, peak_hi)]
+    ax.bar(x_pos - bar_w / 2, base_means, width=bar_w,
+           color=base_color, alpha=0.9, label=r"unsteered ($m{=}0$)",
+           yerr=[base_err_lo, base_err_hi], capsize=2,
+           error_kw={"elinewidth": 0.8, "ecolor": "#444"})
+    bars_peak = ax.bar(x_pos + bar_w / 2, peak_means, width=bar_w,
+                       color=peak_colors, alpha=0.95,
+                       label=r"optimal $m$",
+                       yerr=[peak_err_lo, peak_err_hi], capsize=2,
+                       error_kw={"elinewidth": 0.8, "ecolor": "#222"})
+    y_max = max(hi for hi in peak_hi)
+    headroom = max(0.18, 0.12 * y_max)
+    for bar, pm_val, pm_mag, hi in zip(bars_peak, peak_means, peak_mags, peak_hi):
+        ax.text(bar.get_x() + bar.get_width() / 2, hi + headroom * 0.18,
+                f"{pm_val:.2f}", ha="center", va="bottom", fontsize=7,
+                color="#222")
+    ax.set_xticks(x_pos)
+    short_labels = []
+    for r in rows:
+        bs = _bs_from_row(r)
+        arch = PAPER_ARCH_LABEL.get(r["arch"], r["arch"])
+        short_labels.append(f"{arch}\n($bs{{=}}{bs}$)")
+    ax.set_xticklabels(short_labels, rotation=30, ha="right", fontsize=8)
+    ax.set_ylabel(r"$gc(a, m)$ per question", fontsize=9)
+    ax.tick_params(axis="y", labelsize=8)
+    ax.legend(loc="upper right", frameon=False, fontsize=8)
+    ax.spines["top"].set_visible(False)
+    ax.spines["right"].set_visible(False)
+    ax.margins(x=0.04)
+    fig.tight_layout()
+    fig.savefig(out_path, bbox_inches="tight")
+    plt.close(fig)
+
+
 _METRIC_META = {
     "pr_auc":  {"label": "PR-AUC",  "chance": 0.12, "chance_text": r"chance $\approx 0.12$"},
     "roc_auc": {"label": "ROC-AUC", "chance": 0.5,  "chance_text": r"chance $= 0.5$"},
@@ -1460,6 +1531,7 @@ def main(*, output_dir: Path, unified: bool = False) -> None:
         # is just the max over its 5-mag subset and isn't comparable.
         plot_peak_delta_gc_bar(canonical, assets_dir / "peak_delta_gc_bar.png")
         plot_gc_at_peak_paired(canonical, assets_dir / "gc_at_peak_paired.png")
+        plot_gc_at_peak_paired_compact(canonical, assets_dir / "gc_at_peak_paired_compact.png")
         plot_pr_auc_vs_S(canonical, assets_dir / "pr_auc_vs_S.png")
         plot_roc_auc_vs_S(canonical, assets_dir / "roc_auc_vs_S.png")
         plot_probe_metrics_vs_S_2panel(

@@ -385,21 +385,96 @@ git pull origin 300k-tfa --rebase
 git push origin 300k-tfa
 ```
 
+### Step 7: c1/c2 synthetic suite (GPU 1 — optional but cheap and live-pushed)
+
+Aniket's pre-crash run also landed an in-progress synthetic-features sweep ($17$ c1 rows + $12$ c2 rows; see `purified/results/leaderboard.jsonl`). The sweep has its own live paper-loop — `synthetic_paper_loop.sh` — which polls the leaderboard for `component ∈ {c1, c2}` rows with `eval_cfg._full_suite=true` and re-renders + pushes the synthetic markdown bundles to `final-aniket` every $300\mathrm{s}$. It's the same pattern as `c7_paper_loop.sh` but for the synthetic case study. As you launch new c1/c2 cells from this pod, the loop picks them up and pushes within $5$ min.
+
+#### Where the code lives
+
+| Path | What it does |
+|---|---|
+| `purified/experiments/c1_synthetic_topk_full/run.py` | C1 driver — single-position recovery on `toy_markov_n20_d40_full`. Sweeps `arch ∈ {topk_sae, tsae_paper, tfa, tfa_pos, stacked_sae, txc_base, txc_pro}`, `k_pos ∈ {1, 2, 3, 4, 5, 6, 8, 10, 12, 15, 17, 20}`, `seeds ∈ {1, 2, 42}`. Per-cell metric: feature-recovery AUC against $20$ ground-truth orthogonal directions. |
+| `purified/experiments/c2_synthetic_coupled_full/run.py` | C2 driver — coupled-HMM recovery on `toy_coupled_K10_M20_d256_full`. Sweeps `arch ∈ {topk_sae, stacked_sae (T=2,5), txc_base (T=5), txc_pro (T=2,5,12)}`, same `k_pos` grid, same seeds. Per-cell metrics: eAUC, gAUC (paper headline). |
+| `purified/scripts/synthetic_paper_renderer.py` | Renders `c{1,2}_paper_results.md` + asset PNGs into `temp_xc_paper/purified/docs/components/`. Filters leaderboard to `component ∈ {c1, c2}` with `_full_suite=true`. |
+| `purified/scripts/synthetic_paper_loop.sh` | The live loop. Polls every $5$ min, re-renders on hash change, rebases + pushes to `origin/final-aniket`. Same architecture as `c7_paper_loop.sh`. |
+| `purified/results/leaderboard.jsonl` | Append-only; c1/c2 rows live alongside c7 rows. The renderer dedups by `(arch, train_key)` and keeps the latest by `ts`. |
+
+The c{1,2} drivers are thin wrappers around `temp_bench.runner.run_cell` + `temp_bench.training.sae_trainer.train_sae`. Each cell trains a small SAE on toy data ($n_{\text{steps}}{=}30\mathrm{K}$ default, $bs{=}1024$), then computes a feature-recovery AUC. No external API calls (no Sonnet judges) — the cost is GPU-only, and individual cells are minutes, not hours.
+
+#### What we did before the crash (already in the leaderboard at HEAD of `extended-300k`)
+
+- $17$ c1 rows across architectures (TopK SAE, T-SAE, TFA, TFA-pos, stacked SAE at $T \in \{2, 5\}$, TXC-base, TXC-pro). Some of the locked-grid cells are missing — the sweep had not yet completed.
+- $12$ c2 rows similarly partial (the c2 arch list is more selective; not every arch makes sense for the coupled-HMM recovery).
+- Live-pushed to `final-aniket` via `synthetic_paper_loop.sh` over the same window as the c7 work. Last refresh commit on `origin/final-aniket` at $09{:}26$ UTC $2026$-$05$-$06$, just before pod death.
+- Aniket's recovery pod re-launched both auto-loops post-crash, so the synthetic markdown + assets in `final-aniket` already match the partial leaderboard.
+
+#### What you (TFA pod) need to do
+
+The c1/c2 sweep is **not blocked by your TFA training** — it operates on toy data and trains its own (small) SAEs. You can run it on GPU 1 in the background while TFA trains on GPU 0.
+
+1. **Launch the synthetic paper loop** (mirrors the c7 loop launch in Step 4):
+
+    ```bash
+    set -a; source /workspace/.tokens/.env 2>/dev/null || true; set +a
+    cd /workspace/temp_xc/purified
+    nohup bash scripts/synthetic_paper_loop.sh \
+        > logs/synthetic_paper_loop.log 2>&1 &
+    echo $! > logs/synthetic_paper_loop.pid
+    ```
+
+2. **Continue the sweep on GPU 1.** Pick the cells that are *missing* from the leaderboard relative to each driver's full sweep grid (`arch × k_pos × seed`). Concretely:
+
+    ```bash
+    cd /workspace/temp_xc/purified
+    set -a; source /workspace/.tokens/.env 2>/dev/null || true; set +a
+
+    # C1 — full grid; runner.run_cell is idempotent on (train_key, eval_key)
+    # so existing rows are skipped. ~5--30 min per cell on H100.
+    CUDA_VISIBLE_DEVICES=1 \
+    AGENT_NAME=agent_tfa_c1 \
+    TQDM_DISABLE=1 \
+    PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True \
+    nohup .venv/bin/python -m experiments.c1_synthetic_topk_full.run \
+        --seeds 1 2 42 --n-steps 30000 \
+        > logs/c1_full_sweep_resume.log 2>&1 &
+
+    # C2 — same pattern; takes longer per cell (coupled-HMM dataset).
+    CUDA_VISIBLE_DEVICES=1 \
+    AGENT_NAME=agent_tfa_c2 \
+    TQDM_DISABLE=1 \
+    PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True \
+    nohup .venv/bin/python -m experiments.c2_synthetic_coupled_full.run \
+        --seeds 1 2 42 --n-steps 30000 \
+        > logs/c2_full_sweep_resume.log 2>&1 &
+    ```
+
+    Note: launch them **sequentially** if you want them both on GPU 1 (they can't share); if you want them genuinely parallel, the pod is 2× H100 — give c1 GPU 0 only when GPU 0 is otherwise idle (i.e., never, since c7 training holds GPU 0 for ~30h).
+
+3. **Watch the synthetic loop's commit cadence on `final-aniket`.** Every time a new c1 or c2 cell lands a leaderboard row, the loop renders within $5$ min and pushes a `c1+c2 paper auto: refresh synthetic bundles (c1=N, c2=M leaderboard rows)` commit. The renderer outputs land at `temp_xc_paper/purified/docs/components/c{1,2}_paper_results.md` and the asset PNGs in `c{1,2}_paper_assets/` (visible in the GitHub UI under `purified/docs/components/`).
+
+4. **Don't add tfa to the c2 driver's arch list.** The c2 sweep is restricted to architectures with a meaningful temporal-window structure (TopK SAE single-position baseline, stacked SAE, TXC). TFA is in the c1 driver's arch list because c1 is per-position, but c2's coupled-HMM setting requires inter-position structure that TFA doesn't model. Adding tfa to c2 would produce nonsense rows.
+
+#### Pointer: Dmitry's most-recent synthetic negative results
+
+Before designing further synthetic experiments, read Dmitry's overnight-run write-up: <https://github.com/chainik1125/temp_xc/blob/dmitry-synthetic/docs/dmitry/synthetic/2026-05-06_overnight/results.md> (branch `dmitry-synthetic`). The TL;DR is that several synthetic-setting hypotheses he was testing produced negative or null results, which constrains what claims the synthetic case study can safely make. Don't redo experiments that already have signal there; do reflect the negative-result framing in any follow-up sweep you launch.
+
 ### Two-GPU strategy (sister pod has 2× H100)
 
 Phase | GPU 0 | GPU 1
 ---|---|---
-Training (~30h) | TFA training | idle (or run unrelated background work)
-Canonical eval (~30 min) | continues from training script, same GPU | idle
+Training (~30h) | TFA training | **c1/c2 synthetic suite (Step 7)**
+Canonical eval (~30 min) | continues from training script, same GPU | c1/c2 keeps running, or idle
 Re-evals (~30 min) | optimal-mag | extended-mags (run in parallel — see Step 3)
 Render + analyze (~5 min) | analyze_optimal / renderer (CPU) | idle
 
-You cannot meaningfully parallelise *training itself* across GPUs without DDP, which `run.py` doesn't wire up. So during the bulk of the wall-clock (training), GPU 1 is idle. If you want to use GPU 1 for something, candidates:
+You cannot meaningfully parallelise *training itself* across GPUs without DDP, which `run.py` doesn't wire up. So during the bulk of the wall-clock (training), GPU 1 is the only GPU available for other work. The natural use is the c1/c2 synthetic suite (small toy-data trainings, individually ~5--30 min on a single GPU at $bs{=}1024$, $n_{\text{steps}}{=}30\mathrm{K}$, completely independent of the c7 pipeline). See § *Step 7* below.
+
+If you don't want to run c1/c2, candidates for GPU 1 idle-fill:
 
 - A multi-seed TFA replication (`--seeds 1` and `--seeds 2`) to land additional rows for the multi-seed deferred-from-camera-ready paragraph in the appendix. **Cost**: ~30h × 2 = $120 each at H100 spot. Probably not in budget.
 - A TFA at `bs=256` cell, mirroring the TXC bs=256 ablations. **Cost**: ~30h. Same caveat.
 
-If neither, leave GPU 1 idle. **Don't fill it with unrelated speculative work** — the moment GPU 1 OOMs or hangs, it can drag GPU 0 down on a single PCIe root.
+**Don't fill GPU 1 with unrelated speculative work** — the moment GPU 1 OOMs or hangs, it can drag GPU 0 down on a single PCIe root.
 
 ### Cross-pod coordination
 
@@ -493,4 +568,4 @@ If any check fails, fix and re-render before pushing. A bad push to `final-anike
 
 ### Final state, end-of-session
 
-You should land all 8 cells fully evaluated, all paper artifacts re-rendered, `300k-tfa` and `final-aniket` both pushed, and `final-aniket` ready for the human paper-build pass. Don't mark the task complete until **every** verification check above passes. Then run `bash scripts/wrap_up_session.sh` once on this pod to commit any straggler artifacts (re-export `BRANCH=300k-tfa`).
+You should land all 8 c7 cells fully evaluated, all paper artifacts re-rendered, `300k-tfa` and `final-aniket` both pushed, and `final-aniket` ready for the human paper-build pass. If you also pursued Step 7, more c1/c2 leaderboard rows should be landing live via `synthetic_paper_loop.sh` and the GitHub UI for `purified/docs/components/c{1,2}_paper_results.md` should reflect the latest. Don't mark the task complete until **every** verification check above passes. Then run `bash scripts/wrap_up_session.sh` once on this pod to commit any straggler artifacts (re-export `BRANCH=300k-tfa`).
