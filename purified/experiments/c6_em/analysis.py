@@ -21,8 +21,10 @@ Inputs:
 Outputs:
 
 - ``experiments/c6_em/results.json`` (structured results).
-- ``experiments/c6_em/plots/c6_frontier.png`` (full-Wang stage-4
-  frontier on top-3 finalists × 27-α grid for the headline cell).
+- ``experiments/c6_em/plots/c6_pareto_<organism>.png`` — paper-ready
+  coherence × alignment Pareto scatter per organism. Each point is one
+  (feature, α, seed) stage-4 cell across both paired seeds; both arches
+  overlaid with upper-right Pareto frontiers + global-peak stars.
 - AUTO-RESULTS markdown for ``docs/components/c6.md``.
 
 Caveats baked into the run (carried into the markdown):
@@ -128,102 +130,156 @@ def _read_wang_full(train_key: str) -> dict | None:
         return None
 
 
-def _save_frontier_plot(sae_wang, txc_wang, *, dst: Path,
-                        organism_label: str) -> Path | None:
-    """Plot the stage-4 27-α frontier on top-3 finalists per arch.
+_COH_FLOOR = 30.0
+_ARCH_STYLE = {
+    "sae_arditi":                ("#ff7f0e", "o"),  # orange circle
+    "txc_base + brickenauxk_a8": ("#1f77b4", "s"),  # blue square
+}
 
-    Paper-ready (300 dpi, sized for a 2-column figure). Drops α-points
-    where the judge returned None (judge failed at extreme α with
-    incoherent output) — drawing them as 0 distorts the visualisation.
-    Drops points where mean_coh < 30 (gibberish region) so the
-    headline-relevant coherent peak is the visual focus.
+
+def _extract_stage4_points(wang: dict | None) -> list[tuple[float, float, int, float]]:
+    """Return (coh, align, feature_id, alpha) tuples from stage-4 cells.
+
+    Drops points where the judge returned None (judge failed at extreme
+    α). Coherence floor filtering is applied at plot time, not here, so
+    the floor zone is visible in the scatter.
     """
-    if sae_wang is None and txc_wang is None:
+    if wang is None:
+        return []
+    points: list[tuple[float, float, int, float]] = []
+    finalists = (wang.get("stage4") or {}).get("finalists", [])
+    if finalists:
+        for f in finalists:
+            fid = int(f.get("feature_id", -1))
+            for r in f.get("rows", []):
+                a = r.get("mean_align")
+                c = r.get("mean_coh")
+                if a is None or c is None:
+                    continue
+                points.append((float(c), float(a), fid, float(r["alpha"])))
+    else:
+        # Back-compat: 1.0.0 abbreviated frontier (flat list).
+        for r in wang.get("frontier", []):
+            a = r.get("mean_align")
+            c = r.get("mean_coh")
+            if a is None or c is None:
+                continue
+            points.append((float(c), float(a),
+                           int(r.get("feature_id", -1)), float(r["alpha"])))
+    return points
+
+
+def _pareto_upper_right(points: list[tuple[float, float]]) -> list[tuple[float, float]]:
+    """Upper-right Pareto frontier: a point survives iff no other has
+    both coh ≥ this AND align ≥ this. Returns frontier in ascending coh."""
+    if not points:
+        return []
+    # Sort by coh desc, then iterate keeping running max align.
+    pts = sorted(points, reverse=True)
+    frontier: list[tuple[float, float]] = []
+    running_max_align = -float("inf")
+    for x, y in pts:
+        if y > running_max_align:
+            frontier.append((x, y))
+            running_max_align = y
+    return sorted(frontier)  # ascending coh for plotting
+
+
+def _save_pareto_scatter(sae_wangs: list[dict], txc_wangs: list[dict], *,
+                         dst: Path, organism_label: str) -> Path | None:
+    """Coherence × alignment Pareto scatter (paper-grade headline figure).
+
+    Each point is one stage-4 cell — (feature, α, seed) — across both
+    paired seeds. Two arches overlaid in one panel; upper-right Pareto
+    frontier is drawn as a step line per arch; the global peak per arch
+    is highlighted as a star. Coherence floor zone (coh < 30) is shaded.
+
+    Replaces the prior α-vs-align frontier line plot, which was cluttered
+    (3 features × 27 α × 2 panels = 162 points per organism on overlapping
+    log axes). This view drops α as an axis (it is a steering parameter,
+    not a paper-meaningful axis) and surfaces the trade-off directly:
+    at any given coherence level, which arch achieves higher alignment-
+    injection?
+    """
+    if not sae_wangs and not txc_wangs:
         return None
     try:
         import matplotlib.pyplot as plt
     except ImportError:
         return None
 
-    # Bigger figure + paper-quality typography.
-    fig, axes = plt.subplots(1, 2, figsize=(13, 5.5), sharey=True)
-    pairs = [("sae_arditi", sae_wang),
-             ("txc_base + brickenauxk_a8", txc_wang)]
+    sae_pts = [p for w in sae_wangs for p in _extract_stage4_points(w)]
+    txc_pts = [p for w in txc_wangs for p in _extract_stage4_points(w)]
 
-    # Coherence floor below which the model output is largely
-    # incoherent and align scores are noise. Plot still shows points
-    # above this threshold; below, we drop. This is a visualisation
-    # hygiene step ONLY — does not affect the headline numbers (the
-    # leaderboard's peak_align is computed in case_studies.em from
-    # ALL Wang stage-4 cells without coherence filtering, matching
-    # Dmitry's run_wang_procedure.py).
-    COH_FLOOR = 30.0
-    COLORS = ["tab:blue", "tab:orange", "tab:green"]
+    fig, ax = plt.subplots(figsize=(7.0, 5.5), dpi=140)
 
-    for ax, (tag, wm) in zip(axes, pairs):
-        if wm is None:
-            ax.set_title(f"{tag}\n(no data)")
+    # Shade the incoherent zone (coh < floor) — context, not data.
+    ax.axvspan(0, _COH_FLOOR, alpha=0.10, color="gray", zorder=0)
+
+    legend_handles = []
+    for arch_label, points in (("sae_arditi", sae_pts),
+                                ("txc_base + brickenauxk_a8", txc_pts)):
+        if not points:
             continue
+        color, marker = _ARCH_STYLE[arch_label]
+        coh_align = [(p[0], p[1]) for p in points]
+        xs = [p[0] for p in coh_align]
+        ys = [p[1] for p in coh_align]
+        ax.scatter(xs, ys, color=color, marker=marker, s=24, alpha=0.40,
+                   edgecolors="none", zorder=2,
+                   label=f"{arch_label} (n={len(coh_align)})")
 
-        def _plot_one_finalist(fid, rows, color):
-            # Filter rows where mean_align is None or coh is too low
-            # (incoherent extreme-α generations).
-            kept = []
-            dropped = []
-            for r in rows:
-                a = r.get("mean_align")
-                c = r.get("mean_coh")
-                if a is None or c is None or c < COH_FLOOR:
-                    if a is not None and c is not None:
-                        dropped.append((r["alpha"], a, c))
-                    continue
-                kept.append((float(r["alpha"]), float(a), float(c)))
-            kept.sort(key=lambda t: t[0])
-            xs = [t[0] for t in kept]
-            ys = [t[1] for t in kept]
-            ax.plot(xs, ys, marker="o", linewidth=1.5, markersize=4.0,
-                    color=color, label=f"feat {fid}")
+        # Pareto frontier (upper-right) above coh floor only.
+        eligible = [(c, a) for c, a in coh_align if c >= _COH_FLOOR]
+        front = _pareto_upper_right(eligible)
+        if front:
+            fx = [p[0] for p in front]
+            fy = [p[1] for p in front]
+            ax.step(fx, fy, where="post", color=color, linewidth=2.4,
+                    alpha=0.95, zorder=3)
 
-        finalists = (wm.get("stage4") or {}).get("finalists", [])
-        if not finalists:
-            # Back-compat: 1.0.0 abbreviated rows have a flat frontier list.
-            by_feat: dict[int, list[dict]] = {}
-            for r in wm.get("frontier", []):
-                by_feat.setdefault(int(r["feature_id"]), []).append(r)
-            for ci, (fid, rows) in enumerate(by_feat.items()):
-                _plot_one_finalist(fid, rows, COLORS[ci % len(COLORS)])
-        else:
-            for ci, f in enumerate(finalists):
-                _plot_one_finalist(
-                    int(f["feature_id"]),
-                    f.get("rows", []),
-                    COLORS[ci % len(COLORS)],
-                )
+        # Global peak (highest align with coh ≥ floor) as star.
+        peak = max(eligible, key=lambda p: p[1], default=None)
+        if peak:
+            ax.scatter([peak[0]], [peak[1]], color=color, marker="*",
+                       s=320, edgecolors="black", linewidth=1.2, zorder=5)
+            # Annotation offset based on arch (avoid overlap if peaks near).
+            dx = 1.5
+            dy = 1.5 if arch_label.startswith("txc") else -3.0
+            ax.annotate(
+                f"peak {peak[1]:.1f}\n(coh {peak[0]:.1f})",
+                xy=peak, xytext=(peak[0] + dx, peak[1] + dy),
+                fontsize=9, color=color, weight="bold",
+                bbox=dict(boxstyle="round,pad=0.25",
+                          facecolor="white", edgecolor=color,
+                          linewidth=0.8, alpha=0.92),
+                zorder=6,
+            )
 
-        peak = wm.get("headline") or wm.get("peak")
-        if peak and peak.get("mean_align") is not None:
-            ax.axhline(float(peak["mean_align"]), color="black",
-                       linestyle="--", linewidth=1.0, alpha=0.5,
-                       label=f"peak={peak['mean_align']:.1f} (α={peak['alpha']:+g})")
-        ax.set_xlabel("steering α (symlog)", fontsize=11)
-        ax.set_title(tag, fontsize=12)
-        ax.legend(loc="lower center", fontsize=9, framealpha=0.9, ncol=2)
-        ax.grid(True, alpha=0.3)
-        ax.set_xscale("symlog", linthresh=2.0)
-        ax.tick_params(axis="both", labelsize=10)
+    # Manually annotate the floor zone.
+    y_top = ax.get_ylim()[1]
+    ax.text(_COH_FLOOR / 2, y_top * 0.96 if y_top > 0 else 95,
+            "incoherent\noutput",
+            ha="center", va="top", fontsize=9, color="gray",
+            style="italic", zorder=1)
 
-    axes[0].set_ylabel("mean_align (Claude Haiku judge)", fontsize=11)
-    fig.suptitle(
-        f"C6 — full Wang stage-4 frontier (top-3 features × 27 α) — "
-        f"{organism_label} (coh ≥ {COH_FLOOR:.0f} only)",
-        fontsize=12,
+    ax.set_xlabel("Coherence score (Claude Haiku judge, 0–100)", fontsize=11)
+    ax.set_ylabel("Alignment-injection score (0–100; higher = more misaligned)",
+                  fontsize=11)
+    ax.set_title(
+        f"C6 — coherence × alignment Pareto on {organism_label}\n"
+        f"Each point: one (feature, α, seed) stage-4 cell. "
+        f"★ = best align with coh ≥ {_COH_FLOOR:.0f}.",
+        fontsize=11.5,
     )
+    ax.legend(loc="lower left", fontsize=9, framealpha=0.92)
+    ax.grid(True, alpha=0.30, linestyle="-", linewidth=0.5)
+    ax.set_xlim(0, 100)
+    ax.set_ylim(0, 100)
+    ax.tick_params(axis="both", labelsize=10)
+
     fig.tight_layout()
 
-    # Paper-quality save: 300 dpi PNG + matching .thumb.png at 48 dpi
-    # so agents can inspect cheaply (mirrors temp_bench.plotting.save_figure
-    # contract; bypassing it because save_figure hard-codes dpi=150 and
-    # we want 300 for the c6 headline).
     dst = Path(dst)
     dst.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(dst, dpi=300, bbox_inches="tight")
@@ -608,14 +664,20 @@ def run_analysis() -> AnalysisResult:
         else:
             headline_gaps_for_results[organism_label] = None
 
-        # Frontier plot for the seed=HEADLINE_SEED cell of this organism.
-        head = next((p for p in paired if p["seed"] == HEADLINE_SEED), paired[0])
-        sae_wang = _read_wang_full(head["sae"]["train_key"])
-        txc_wang = _read_wang_full(head["txc"]["train_key"])
-        plot_dst = PLOT_DIR / f"c6_frontier_{organism_label.lower().replace('-', '_')}.png"
+        # Pareto scatter (coherence × alignment) using ALL paired seeds'
+        # stage-4 cells. Replaces the prior α-line frontier plot.
+        sae_wangs = [
+            w for p in paired
+            if (w := _read_wang_full(p["sae"]["train_key"])) is not None
+        ]
+        txc_wangs = [
+            w for p in paired
+            if (w := _read_wang_full(p["txc"]["train_key"])) is not None
+        ]
+        plot_dst = PLOT_DIR / f"c6_pareto_{organism_label.lower().replace('-', '_')}.png"
         try:
-            saved = _save_frontier_plot(
-                sae_wang, txc_wang, dst=plot_dst,
+            saved = _save_pareto_scatter(
+                sae_wangs, txc_wangs, dst=plot_dst,
                 organism_label=organism_label,
             )
         except Exception:
@@ -624,7 +686,7 @@ def run_analysis() -> AnalysisResult:
             plot_paths.append(saved)
             md_lines += [
                 "",
-                f"![C6 full Wang frontier — {organism_label}]"
+                f"![C6 Pareto scatter — {organism_label}]"
                 f"(../../experiments/c6_em/plots/{plot_dst.name})",
             ]
 
