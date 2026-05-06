@@ -1482,5 +1482,27 @@ chronologically for git provenance.
    `--force-eval`.
    This is **agent_steer_100k's territory** — surfacing to them.
 
+5. **C2 missing T-SAE + TFA — should they be added?** Han asked
+   2026-05-06. Current C2 `ARCH_TS` covers `topk_sae`, `stacked_sae`
+   (T=2, T=5), `txc_base` (T=5), `txc_pro` (T_max ∈ {2, 5, 12}). NO
+   `tsae_paper`, NO `tfa`/`tfa_pos`. Cross-checked against wasteland
+   1C3 (`docs/han/research_logs/phase3_coupled_features/2026-04-07-experiment1c3-coupled-features.md`):
+   wasteland tested **Stacked SAE (T=2, T=5) + TXCDRv2 (T=2..12)**
+   only; **no T-SAE, no TFA** either. C2 is already a SUPERSET of
+   wasteland 1C3 (adds topk_sae + txc_base). Adding T-SAE/TFA would
+   extend beyond wasteland scope — agent_paper's call (driver in
+   `experiments/c2_synthetic_coupled/run.py:ARCH_TS`).
+6. **Wasteland 1C3 reproduction (paper-level question):** comparing
+   wasteland's reported gAUC at k=2 vs my current C2 numbers:
+   - TXCDRv2 T=2 gAUC=0.990  → my txc_pro T=2 gAUC=0.990 ± 0.000 ✅
+     EXACT match
+   - Stacked T=2 gAUC=0.755  → my stacked_sae T=2 gAUC=0.764 ± 0.051
+     ✅ within seed-noise
+   - TXCDRv2 T=5 gAUC=0.971  → still running on c2 GPU 7
+   - TXCDRv2 T=12 gAUC=0.949 → still running on c2 GPU 7
+   Setup is bit-identical (K=10 M=20 d=256 d_sae=40, k_pos sweep,
+   T=64 seq, folded-normal magnitudes). Reproduction validates so
+   far; full answer once T=5 + T=12 cells finish.
+
 (Surface either as a comment if you want me to take action; otherwise
 I'll leave them as-is.)
