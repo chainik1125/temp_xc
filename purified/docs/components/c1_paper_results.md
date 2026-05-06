@@ -1,6 +1,6 @@
 # C1 Synthetic TopK — paper-ready results (auto-generated)
 
-_Last refreshed: 2026-05-06T09:11:06+00:00_
+_Last refreshed: 2026-05-06T09:26:09+00:00_
 
 ## Setup
 
@@ -9,7 +9,7 @@ _Last refreshed: 2026-05-06T09:11:06+00:00_
 - Metric: feature-recovery AUC against the 20 ground-truth orthogonal directions (per-feature max cosine ≥ τ, integrated over τ ∈ [0, 1]).
 - Driver: `experiments/c1_synthetic_topk_full/run.py` (routes through `temp_bench.data.toy_full.api`, isolated from agent_filler's `toy_markov_n20_d40` cache via distinct `act_cache_key`).
 
-Currently 16 cells across 2 (arch, T) configurations; seeds-per-cell range = [1, 3].
+Currently 17 cells across 2 (arch, T) configurations; seeds-per-cell range = [1, 3].
 
 ## Headline (peak AUC over k_pos)
 
@@ -24,7 +24,7 @@ Currently 16 cells across 2 (arch, T) configurations; seeds-per-cell range = [1,
 
 ## Per-cell mean (averaged across seeds)
 
-| arch (T) | k=1 | k=2 | k=3 | k=4 | k=5 |
-|---|---|---|---|---|---|
-| `topk_sae` | 0.598 | 0.616 | 0.615 | 0.630 | 0.659 |
-| `txc_base` | — | — | — | — | 0.606 |
+| arch (T) | k=1 | k=2 | k=3 | k=4 | k=5 | k=6 |
+|---|---|---|---|---|---|---|
+| `topk_sae` | 0.598 | 0.616 | 0.615 | 0.630 | 0.659 | 0.650 |
+| `txc_base` | — | — | — | — | 0.606 | — |
