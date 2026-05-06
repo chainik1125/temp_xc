@@ -1257,20 +1257,22 @@ time.
 
 ## Current state (agent owns — overwrite at every compact)
 
-**Last verified: 2026-05-06T18:30Z** | **`git HEAD`: `2efa7de9`** (==
-`origin/final`, ahead 0)
+**Last verified: 2026-05-06T18:55Z** | **`git HEAD`: `7c94f586`** (==
+`origin/final` post-rebase, includes agent_paper's BASE C3 fix
+`1ed4fde5`)
 
-**STATUS: post-completion of multiple sweeps; cleanup phase.**
+**STATUS: post-compact resume; cleanup + HF persistence + final
+re-renders in flight.**
 
-Sweeps in flight (4 procs alive on GPUs 5, 6, only some still active
-work):
-- **GPU 6** (PID 60193): `c2 --archs txc_pro --k-poses 10..20` — txc_pro
-  T_max=12 high-k sweep, ~k=10 across seeds, 30 min remaining.
-- **GPUs 0, 1, 2** (PIDs 80430, 80560, 80562): c1_noisy × seeds {1,2,42}
-  — JUST finished as of ~18:08Z. Should be exiting any moment if not
-  already.
-- **GPUs 3, 4, 5** (c2 lowk per-seed): finished — exited cleanly.
-- **GPU 7**: idle (c2 highk topk_sae done long ago).
+Sweeps in flight:
+- **GPU 6** (PID 73025, etime 6h30m): `c2 --archs txc_pro
+  --k-poses 10..20` — current cell `T=12 k=12 seed=2`. Remaining
+  cells: T=12 × {k=12 seed=42; k=15/17/20 × 3 seeds} = 10 cells.
+  Per-cell ~3-5 min wall on toy d_sae=40 → ~30-50 min ETA.
+- **GPUs 0-5, 7**: idle.
+- **HF backfill** (PID 95578, started 2026-05-06T18:51): pushing
+  213 toy + 3 BASE C3 T=5 ckpts that had `hf_url=null` (env-bug
+  during launch). 75/213 complete @ 18:53; ETA ~10 min total.
 
 Active Monitor: `b6zad1zki` watching `logs/c1_noisy_gpu*.log`,
 `logs/c2_lowk_gpu*.log`, `logs/c2_highk*.log` for the remaining
@@ -1281,11 +1283,11 @@ events. Re-arm if it times out before c2 GPU 6 finishes.
 | Component | rows | status / notes |
 |---|---:|---|
 | **C5** (steering)  |   9 | ✅ DONE: T-SAE T=2 (3) + TopK T=1 (3) + TFA B=32 (3). Mean peak@1.75: T-SAE 1.93, TopK 1.66, TFA 0.33. |
-| **C3** (BASE probing) |   6 | ✅ txc_pro × 3 × 2 k_feats DONE (mean_auc 0.821-0.884). T=10/T=20 trainings on HF, evals BLOCKED by agent_steer_100k's my_eval_fn state_dict bug. |
-| **C1** (toy Markov, det.) | 101 | ✅ DONE — c1.md re-rendered with paper-ready AUC vs k_pos plot at `experiments/c1_synthetic_topk/plots/c1_auc_vs_kpos.png` (155 KB main + 62 KB thumb). Headline: txc_base default at k=6 → AUC 0.983 (winner); topk_sae default catches up at k≥10 (peak 0.936 at k=12); tfa flat ~0.46-0.48. |
-| **C2** (coupled HMM) | 170 | ~92% — final txc_pro T=12 cells in flight on GPU 6. c2.md rendered partial; will re-render at completion. Wasteland 1c3 deterministic reproduction: TXCDRv2 T=2 gAUC=0.990 → my txc_pro T=2 gAUC=0.990 ± 0.000 ✅ EXACT match. |
-| **c1_noisy** (NEW wasteland 1c-noisy reproduction) | 93 (+63 agent='unknown' but data-valid) | ✅ DONE — fresh component with new datasource `toy_markov_n20_d40_noisy` (Bernoulli p_A=0, p_B=0.625) per Han's territory waiver. Reproduces wasteland Phase 2 Experiment 1c noisy emissions. Han's clarification: c1_noisy belongs **under C2** in the paper structure (not C1). agent_paper should aggregate c1_noisy into c2.md alongside the deterministic 1c3 = c2 cells. |
-| **TOTAL** | **379** | + 63 unknown-tagged c1_noisy + ~20 smoke rows |
+| **C3** (BASE probing) |   6 | ✅ txc_pro × 3 × 2 k_feats DONE (mean_auc 0.821-0.884). 3 T=5 ckpts pushed to HF 2026-05-06T18:50 (had hf_url=null). T=10/T=20: agent_steer_100k owns re-train (Open Q #4 fixed at agent_paper commit `1ed4fde5`). |
+| **C1** (toy Markov, det.) | 101 | ✅ DONE — c1.md re-rendered with paper-ready AUC vs k_pos plot. Headline: txc_base default at k=6 → AUC 0.983 (winner); topk_sae default catches up at k≥10 (peak 0.936 at k=12); tfa flat ~0.46-0.48. |
+| **C2** (coupled HMM) | ~210 | ~95% — final txc_pro T=12 cells (10 remaining) in flight on GPU 6. c2.md re-rendered post-compact (commit `14b3121d`/`7c94f586`); will re-render once T=12 completes. Wasteland 1c3 deterministic reproduction: TXCDRv2 T=2 gAUC=0.990 → my txc_pro T=2 gAUC=0.990 ± 0.000 ✅ EXACT match. |
+| **c1_noisy** (wasteland 1c-noisy under C2) | 93 (+63 agent='unknown' but data-valid) | ✅ DONE — c1_noisy section RENDERED into c2.md with paper-ready plot at `experiments/c1_noisy_filler/plots/c1_noisy_auc_vs_kpos.png`. Headline: TXC-base T=2 hits AUC 0.982-0.990 across k=4..10, reproducing wasteland's "AUC ≥ 0.98" claim. TXC-base T=5 hits AUC 0.973-0.990 across k=2..6. Stacked + TFA-pos baselines weaker (consistent with wasteland). Plot embedded in c2.md. |
+| **TOTAL** | **388** | + 63 unknown-tagged c1_noisy + ~20 smoke rows |
 
 ### Files I own / authored (this session):
 
@@ -1293,8 +1295,8 @@ events. Re-arm if it times out before c2 GPU 6 finishes.
 src/temp_bench/data/toy/markov.py             (added p_A/p_B Bernoulli noise — territory waiver)
 configs/datasources.yaml                       (added toy_markov_n20_d40_noisy — territory waiver)
 experiments/c1_synthetic_topk/analysis.py      (added _save_plot + PLOT_STYLE — territory waiver)
-experiments/c1_synthetic_topk/plots/           (NEW dir, c1.md render artifacts)
-experiments/c1_noisy_filler/                   (NEW dir, run.py + run_sweep.sh)
+experiments/c1_synthetic_topk/plots/           (c1.md render artifacts)
+experiments/c1_noisy_filler/                   (run.py + run_sweep.sh + analysis.py + plots/)
 experiments/c5_steering_filler/                (rescinded MW driver — keep for git provenance)
 experiments/c5_steering_baseline/              (T-SAE T=2 driver)
 experiments/c5_steering_baselines/             (TopK + TFA driver)
@@ -1303,31 +1305,36 @@ experiments/c3_probing_base/run_filler_base.sh  (BASE C3 txc_base T-sweep launch
 experiments/c1c2_toy_sweep.sh                   (orchestrator — c1+c2 split across GPUs)
 agents/agent_filler/briefing.md                 (THIS file — agent-owned bottom sections)
 docs/components/c1.md                           (re-rendered AUTO-RESULTS + plot)
-docs/components/c2.md                           (re-rendered AUTO-RESULTS partial)
-results/leaderboard.jsonl                       (379 non-smoke rows appended)
-checkpoints/manifest.jsonl                      (~200 entries appended)
+docs/components/c2.md                           (2 AUTO-RESULTS blocks: c2 + c1_noisy)
+results/leaderboard.jsonl                       (388 non-smoke rows appended)
+checkpoints/manifest.jsonl                      (~225 entries appended)
 ```
 
 ### HF state:
 
-All 192+ agent_filler-tagged checkpoints + run-dirs on
-`han1823123123/temp-bench-models` and
-`han1823123123/temp-bench-data`. Verified via HfApi.list_repo_tree at
-13:55Z May 5; missing-list was empty. New cells from c1_noisy + c2
-auto-pushed during runner.run_cell.
+**Backfill discovered 2026-05-06T18:50** (via agent_steer_100k Open
+Q surfaced in commit `1d983308`): 222 of my training train_keys had
+`hf_url=null` in `manifest.jsonl` because the env-bug (AGENT_NAME=
+unknown) also short-circuited the auto-push. Backfill in flight:
+- ✅ 3 BASE C3 txc_base T=5 ckpts (1.7 GB each) pushed @ 18:48Z
+- 🟡 213 toy ckpts (13.7 KB avg, 3 MB total) pushing in bg PID
+  95578; 75/213 complete @ 18:53Z; ETA ~5 min.
+- 🔶 6 BASE C3 txc_base T=10/T=20 ckpts intentionally NOT pushed
+  (buggy T=5-shape weights under T=10/T=20 keys; agent_steer_100k
+  re-trains from scratch with `--force-train` per their briefing).
 
-### Active GPU sharding (~18:30Z May 6):
+### Active GPU sharding (~18:55Z May 6):
 
 | GPU | Used by | What |
 |---|---|---|
-| 0 | (idle) | c1_noisy seed=1 just exited |
-| 1 | (idle) | c1_noisy seed=2 just exited |
-| 2 | (idle) | c1_noisy seed=42 just exited |
-| 3 | (idle) | c2 lowk seed=1 done |
-| 4 | (idle) | c2 lowk seed=2 done |
-| 5 | (idle) | c2 lowk seed=42 done |
-| 6 | **busy** | c2 highk txc_pro T=12, k=10 in flight |
-| 7 | (idle) | c2 highk topk_sae done |
+| 0 | (idle) |  |
+| 1 | (idle) |  |
+| 2 | (idle) |  |
+| 3 | (idle) |  |
+| 4 | (idle) |  |
+| 5 | (idle) |  |
+| 6 | **busy** | c2 highk txc_pro T=12 k=12 seed=2 (10 cells remaining) |
+| 7 | (idle) |  |
 
 ## What I just did (agent owns — overwrite)
 
