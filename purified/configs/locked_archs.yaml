@@ -1,0 +1,240 @@
+# Locked architecture registry.
+#
+# This file is the source of truth for which architectures the paper
+# evaluates. Adding an architecture means adding ONE entry here AND
+# implementing the class. Removing or fixing an architecture means
+# bumping `arch_version`.
+#
+# Schema:
+#   archs:
+#     <name>:                                # short identifier used everywhere
+#       class_path: <module>:<class>         # python import path
+#       arch_version: <semver>               # bump on bug fix or breaking change
+#       hparams: {<k>: <v>, ...}             # forwarded to class constructor
+#       per_component_hparams:               # optional per-component overrides
+#         <component>: {<k>: <v>, ...}       # e.g. d_sae differs by setting
+#       category: sae | tsae | tfa | mlc | txc | sae_arditi
+#       notes: <human notes, freeform>
+#
+# Cache contract (see purified/docs/paper/framework.md § 3):
+#   train_key = sha256(canonical_json({
+#       arch_class:   <class_path>,
+#       arch_version: <version>,
+#       hparams:      <hparams MERGED with per_component_hparams[component]>,
+#       seed:         <int>,
+#       training_cfg: <TrainingConfig dict>,
+#       act_cache_key: <hash of datasource>,
+#   }))[:16]
+#
+# Free per-component knobs: hparams, k_pos, training_cfg overrides.
+# If you need to change ANYTHING ELSE for a single component, raise it
+# in docs/components/cN.md before editing — the paper claims one
+# architecture per name, not seven.
+
+archs:
+  topk_sae:
+    class_path: temp_bench.architectures.topk_sae:TopKSAE
+    arch_version: "1.0.0"
+    category: sae
+    hparams:
+      d_sae: 18432   # gemma-2-2b L13 d_in (2304) × 8
+      k_pos: 20      # default sparsity; components override per-cell
+    per_component_hparams:
+      c7:
+        d_sae: 32768   # Llama-3.1-8B L10 d_in (4096) × 8
+    notes: "Per-token TopK SAE. The simplest baseline."
+
+  stacked_sae:
+    class_path: temp_bench.architectures.stacked_sae:StackedSAE
+    arch_version: "1.0.0"
+    category: sae
+    hparams:
+      d_sae: 18432
+      T: 5           # T independent TopK-SAEs, one per position
+      k_pos: 20      # window-level L0 = k_pos * T
+    per_component_hparams:
+      c7:
+        d_sae: 32768   # Llama-3.1-8B L10 d_in (4096) × 8
+    notes: |
+      T independent TopK-SAEs, one per token position. The "per-layer
+      SAEs" baseline from the crosscoders paper, adapted to temporal.
+      C1, C7 baseline.
+
+  tsae_paper:
+    class_path: temp_bench.architectures.tsae:TSAEPaper
+    arch_version: "1.0.0"
+    category: tsae
+    hparams:
+      d_sae: 16384   # paper config (paper used Gemma layer 12 with 16k features)
+      k_pos: 20
+      h_frac: 0.20   # 20% high-level features per Bhalla et al. 2025
+      contrastive_alpha: 1.0
+    per_component_hparams:
+      c7:
+        d_sae: 32768   # Llama-3.1-8B L10 d_in (4096) × 8
+    notes: |
+      T-SAE = faithful port of Ye et al. 2025 (arxiv 2511.05541). Source:
+      `origin/han-phase7-unification @ 94119bc0:src/architectures/tsae_paper.py`.
+      Implements Matryoshka BatchTopK + AuxK loss + geometric-median
+      b_dec init + decoder unit-norm projection + temporal contrastive
+      (raw dot, temp_alpha=1/10) + threshold-based inference.
+
+      DO NOT port `tsae_ours.py` from the wasteland. That file is an
+      older crude approximation (TopK instead of BatchTopK, 50/50 split
+      instead of 20/80, no AuxK, only 2 recon terms instead of 4) and
+      is explicitly deprecated. When the paper says "T-SAE", it means
+      THIS module — the faithful Ye port.
+
+      Paper used Gemma-2-2b BASE L12. We run on Gemma-2-2b-IT L13 to
+      match Phase 5/6 (C3/C4/C5) and on Llama-3.1-8B L10 for C7.
+      Paper-fidelity Gemma-BASE-L12 setup is a stretch goal.
+
+  tfa:
+    class_path: temp_bench.architectures.tfa:TFA
+    arch_version: "1.0.0"
+    category: tfa
+    hparams:
+      d_sae: 18432
+      k_pos: 20
+      n_heads: 4
+      use_pos_embedding: false
+    per_component_hparams:
+      c7:
+        d_sae: 32768   # Llama-3.1-8B L10 d_in (4096) × 8
+    notes: "Temporal Feature Analysis (priors_in_time). C1, C2, C7 baseline."
+
+  tfa_pos:
+    class_path: temp_bench.architectures.tfa:TFA
+    arch_version: "1.0.0"
+    category: tfa
+    hparams:
+      d_sae: 18432
+      k_pos: 20
+      n_heads: 4
+      use_pos_embedding: true
+    per_component_hparams:
+      c7:
+        d_sae: 32768
+    notes: "TFA with sinusoidal positional encoding in attention Q/K (not V)."
+
+  mlc:
+    class_path: temp_bench.architectures.mlc:MLC
+    arch_version: "1.0.0"
+    category: mlc
+    hparams:
+      d_sae: 18432
+      k_pos: 20
+      n_layers: 5
+      center_layer: 13
+    per_component_hparams:
+      c7:
+        d_sae: 32768
+        center_layer: 10   # Llama-3.1-8B L10 anchor (paper Fig. 2)
+    notes: "Multi-layer crosscoder. Cross-layer not cross-token. C3 / related work / C7 baseline."
+
+  sae_arditi:
+    class_path: temp_bench.architectures.sae_arditi:SAEArditi
+    arch_version: "1.0.0"
+    category: sae_arditi
+    hparams:
+      d_sae: 32768
+      k_pos: 128
+    notes: "SAE arditi as used by Dmitry. C6 baseline only."
+
+  txc_base:
+    class_path: temp_bench.architectures.txc_base:TXCBase
+    arch_version: "1.0.0"
+    category: txc
+    hparams:
+      d_sae: 18432
+      T: 5
+      k_pos: 20      # k_win = k_pos * T
+      auxk_alpha: 0.03125    # 1/32 per tsae_paper
+      dead_threshold_tokens: 10_000_000
+      bdec_geom_median_init: true
+      decoder_unit_norm: true
+      decoder_grad_orthogonalize: true
+    per_component_hparams:
+      c6:
+        d_sae: 32768   # Qwen-14B d_model=5120; matches Dmitry's published Wang baseline
+        k_pos: 25      # k_win = 25 × T(5) = 125 ≈ Dmitry's k_win=128
+      c7:
+        d_sae: 32768
+    notes: |
+      TXC-base = txc_bare_antidead_t5. Vanilla TopK temporal crosscoder
+      + tsae_paper anti-dead stack. NO Bricken resample (per-experiment
+      knob; see docs/paper/architecture.md).
+
+  txc_pro:
+    class_path: temp_bench.architectures.txc_pro:TXCPro
+    arch_version: "1.0.0"
+    category: txc
+    hparams:
+      d_sae: 18432
+      T_max: 10
+      t_sample: 5
+      k_pos: 20
+      n_matryoshka: 8
+      contrastive_shifts: [1, 2]
+      contrastive_inverse_distance_weight: true
+      auxk_alpha: 0.03125
+      dead_threshold_tokens: 10_000_000
+      bdec_geom_median_init: true
+      decoder_unit_norm: true
+      decoder_grad_orthogonalize: true
+    per_component_hparams:
+      c6:
+        d_sae: 32768   # Qwen-14B d_model=5120; matches Dmitry's Wang baseline
+      c7:
+        d_sae: 32768
+    notes: |
+      TXC-pro = phase5b_subseq_h8. Subseq encoder + matryoshka H8 +
+      multi-distance contrastive. NO Bricken by default.
+
+  txc_base_t20:
+    class_path: temp_bench.architectures.txc_base:TXCBase
+    arch_version: "1.0.0"
+    category: txc
+    hparams:
+      d_sae: 18432
+      T: 20
+      k_pos: 20
+      auxk_alpha: 0.03125
+      dead_threshold_tokens: 10_000_000
+      bdec_geom_median_init: true
+      decoder_unit_norm: true
+      decoder_grad_orthogonalize: true
+    per_component_hparams:
+      c7:
+        d_sae: 32768
+    notes: |
+      TXC-base with T=20. Han 2026-05-04 PM 4×H100 ask: does a longer
+      temporal window extract more signal once given enough compute?
+      Pair with txc_base for the head-to-head at n_steps=300_000.
+
+  txc_pro_t20:
+    class_path: temp_bench.architectures.txc_pro:TXCPro
+    arch_version: "1.0.0"
+    category: txc
+    hparams:
+      d_sae: 18432
+      T_max: 20
+      t_sample: 5  # match txc_pro's training-time TopK budget; T_max changes
+      k_pos: 20
+      n_matryoshka: 8
+      contrastive_shifts: [1, 2]
+      contrastive_inverse_distance_weight: true
+      auxk_alpha: 0.03125
+      dead_threshold_tokens: 10_000_000
+      bdec_geom_median_init: true
+      decoder_unit_norm: true
+      decoder_grad_orthogonalize: true
+    per_component_hparams:
+      c7:
+        d_sae: 32768
+    notes: |
+      TXC-pro with T_max=20 (t_sample=5 held). Han 2026-05-04 PM 4×H100
+      ask: pairs with txc_pro for the longer-window head-to-head at
+      n_steps=300_000. Open question for Han: should t_sample also
+      scale to 10 (= 50% subset like the T=10 default)? Holding at 5
+      for now — keeps contrastive batch math + TopK budget identical.

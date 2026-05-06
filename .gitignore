@@ -1,26 +1,48 @@
-# Python
+# ─── Python / venv ────────────────────────────────────────────────
 __pycache__/
 *.py[cod]
 *.egg-info/
-dist/
-build/
 .venv/
-*.egg
+.ruff_cache/
+.pytest_cache/
 
-# Obsidian - per-user state and downloaded plugins
-docs/.obsidian/workspace.json
-docs/.obsidian/workspace-mobile.json
-docs/.obsidian/plugins/
-docs/.obsidian/themes/
-docs/.obsidian/hotkeys.json
-docs/.obsidian/core-plugins-migration.json
-docs/.obsidian/graph.json
-
-# OS
+# ─── OS / IDE ─────────────────────────────────────────────────────
 .DS_Store
 Thumbs.db
-
-# IDE
-.vscode/*
-!.vscode/extensions.json
 .idea/
+.vscode/
+
+# ─── Obsidian per-user state under docs/ ──────────────────────────
+docs/.obsidian/workspace*.json
+docs/.obsidian/hotkeys.json
+docs/.obsidian/graph.json
+docs/.obsidian/plugins/
+docs/.obsidian/themes/
+docs/.obsidian/core-plugins-migration.json
+
+# ─── Tokens ───────────────────────────────────────────────────────
+# Canonical stores live OUTSIDE the repo — ~/.tokens on local,
+# /workspace/.tokens on RunPod. These rules catch in-repo accidents.
+.tokens/
+*.token
+.env
+.env.*
+.env_*
+
+# ─── HTML output (reproducible from scripts) ──────────────────────
+*.html
+
+# ─── purified/ runtime artefacts ──────────────────────────────────
+# Too big for git; HF-backed via cache.save_checkpoint auto-push on
+# ephemeral pods. manifest.jsonl + per-cell metrics.json ARE tracked
+# (small JSON, cross-agent visibility); depth-2 binaries are not.
+purified/results/runs/*/log.txt
+purified/results/runs/*/*.pt
+purified/results/runs/*/*.safetensors
+purified/results/runs/*/*.ckpt
+purified/results/runs/*/cache/
+purified/results/act_cache/
+purified/checkpoints/*/*.pt
+purified/checkpoints/*/*.safetensors
+purified/checkpoints/local/
+purified/hf_cache/
