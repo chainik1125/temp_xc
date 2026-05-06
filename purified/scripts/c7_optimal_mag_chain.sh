@@ -12,7 +12,7 @@
 set -u
 cd /workspace/aniket/temp_xc-final/purified
 
-GPU=0
+GPU=3
 SEEN=logs/c7_optimal_seen.txt
 touch "$SEEN"
 

@@ -15,7 +15,7 @@
 set -u
 cd /workspace/aniket/temp_xc-final/purified
 
-GPU=0
+GPU=3
 EXT_MAGS="-32 -24 0 24 32"
 SEEN_FILE=logs/c7_extended_mags_seen.txt
 touch "$SEEN_FILE"
