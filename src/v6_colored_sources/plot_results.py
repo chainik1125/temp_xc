@@ -224,6 +224,82 @@ def plot_polynomial_clock_phase_transition(results_path: Path, out_path: Path) -
     print(f"Saved {out_path}")
 
 
+def plot_multilane_rs(results_path: Path, out_path: Path) -> None:
+    """Two-panel figure for the multilane Reed-Solomon experiment.
+
+    Panel A: per-token reconstruction MSE vs W. Plots TXC k=m, TXC k=mW,
+        SAE k_pos=1 (k_total=W), SAE k_pos=m (k_total=mW), and the noise
+        floor `sigma^2 * d`. Adds the local-alphabet predicted error
+        `noise_floor + (1 - k/(m*W))` for k=m as a dashed grey reference.
+
+    Panel B: probe-Y val accuracy vs W for the same architectures, with
+        chance line `1/q`.
+    """
+    with open(results_path) as f:
+        data = json.load(f)
+    cfg = data["config"]
+    m, q, h = cfg["m"], cfg["q"], cfg["h"]
+    cells = sorted(data["cells"], key=lambda c: c["W"])
+    W_grid = [c["W"] for c in cells]
+    chance = 1.0 / q
+
+    sae_k1_mse = [c["sae_k1"]["recon_mse_per_token"] for c in cells]
+    sae_km_mse = [c[f"sae_k{m}"]["recon_mse_per_token"] for c in cells]
+    txc_km_mse = [c[f"txc_k{m}"]["recon_mse_per_token"] for c in cells]
+    txc_kmW_mse = [c[f"txc_k{m * W}"]["recon_mse_per_token"] for c, W in zip(cells, W_grid)]
+
+    sae_k1_probe = [c["sae_k1"]["probe_val_acc"] for c in cells]
+    sae_km_probe = [c[f"sae_k{m}"]["probe_val_acc"] for c in cells]
+    txc_km_probe = [c[f"txc_k{m}"]["probe_val_acc"] for c in cells]
+    txc_kmW_probe = [c[f"txc_k{m * W}"]["probe_val_acc"] for c, W in zip(cells, W_grid)]
+
+    noise_floor = cells[0]["noise_floor_mse_per_token"]
+    # Predicted local-alphabet bound at k_total = m: per-token MSE >=
+    # noise_floor + (1 - m / (m * W)) = noise_floor + (1 - 1/W).
+    local_lb_at_km = [noise_floor + (1.0 - min(m, m * W) / (m * W)) for W in W_grid]
+
+    fig, (axA, axB) = plt.subplots(1, 2, figsize=(13, 5))
+
+    axA.plot(W_grid, sae_k1_mse, "o:", color="#d62728", label=f"SAE k_pos=1 (k_total=W)", linewidth=1.5)
+    axA.plot(W_grid, sae_km_mse, "s--", color="#ff7f0e", label=f"SAE k_pos=m={m} (k_total=mW)", linewidth=1.5)
+    axA.plot(W_grid, txc_km_mse, "D-", color="#1f77b4", label=f"TXC k_total=m={m}", linewidth=2.0)
+    axA.plot(W_grid, txc_kmW_mse, "D--", color="#2e86c1", label="TXC k_total=mW", linewidth=1.5)
+    axA.axhline(noise_floor, color="black", linestyle=":", alpha=0.6, label=f"noise floor σ²d = {noise_floor:.2f}")
+    axA.plot(W_grid, local_lb_at_km, "x-.", color="grey", alpha=0.6,
+             label=f"local-alphabet LB at k_total=m")
+    axA.axvline(h + 1, color="grey", linestyle="--", alpha=0.5, label=f"W = h+1 = {h+1}")
+    axA.set_xticks(W_grid)
+    axA.set_xlabel("Window length W")
+    axA.set_ylabel("Per-token reconstruction MSE")
+    axA.set_title(f"Panel A: Reconstruction MSE   (h={h}, q={q}, m={m})")
+    axA.grid(True, alpha=0.3)
+    axA.legend(loc="best", fontsize=8)
+
+    axB.plot(W_grid, sae_k1_probe, "o:", color="#d62728", label=f"SAE k_pos=1", linewidth=1.5)
+    axB.plot(W_grid, sae_km_probe, "s--", color="#ff7f0e", label=f"SAE k_pos=m", linewidth=1.5)
+    axB.plot(W_grid, txc_km_probe, "D-", color="#1f77b4", label=f"TXC k_total=m", linewidth=2.0)
+    axB.plot(W_grid, txc_kmW_probe, "D--", color="#2e86c1", label="TXC k_total=mW", linewidth=1.5)
+    axB.axhline(chance, color="black", linestyle=":", alpha=0.6, label=f"chance = 1/q = {chance:.3f}")
+    axB.axvline(h + 1, color="grey", linestyle="--", alpha=0.5)
+    axB.set_xticks(W_grid)
+    axB.set_xlabel("Window length W")
+    axB.set_ylabel("Probe val accuracy on Y")
+    axB.set_title("Panel B: Probe accuracy (caveat: train data used)")
+    axB.set_ylim(-0.02, 1.05)
+    axB.grid(True, alpha=0.3)
+    axB.legend(loc="best", fontsize=8)
+
+    fig.suptitle(
+        f"Multilane Reed-Solomon  h={h}, q={q}, m={m}: reconstruction-loss separation"
+    )
+    fig.tight_layout()
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    fig.savefig(out_path, dpi=150)
+    fig.savefig(out_path.with_suffix(".pdf"))
+    plt.close(fig)
+    print(f"Saved {out_path}")
+
+
 def plot_ambiguous_pair_probes(results_path: Path, out_path: Path) -> None:
     """Bar chart of pair-classification probe accuracy on the ambiguous-pair
     HMM: regular SAE (chance), TXC at each W (perfect), raw-x sanity baseline,
@@ -270,6 +346,7 @@ def main() -> int:
         choices=[
             "1", "2", "ambiguous_pair",
             "poly_h1_q31", "poly_h2_q11", "poly_h3_q7",
+            "multilane_smoke", "multilane_main",
         ],
         required=True,
     )
@@ -295,6 +372,12 @@ def main() -> int:
         plot_ambiguous_pair_probes(
             results_dir / "ambiguous_pair.json",
             out_dir / "ambiguous_pair_probes.png",
+        )
+    elif args.stage.startswith("multilane_"):
+        label = args.stage.replace("multilane_", "")
+        plot_multilane_rs(
+            results_dir / f"multilane_rs_{label}.json",
+            out_dir / f"multilane_rs_{label}.png",
         )
     else:
         # poly_h{H}_q{Q}
