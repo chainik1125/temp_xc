@@ -1,0 +1,33 @@
+{
+  "act_cache_key": "63abe7e716cc7392",
+  "agent": "agent_hammer",
+  "arch": "tsae_paper",
+  "arch_version": "1.0.0",
+  "datasource": "toy_coupled_K10_M20_d256",
+  "saved_ts": "2026-05-06T22:40:43Z",
+  "seed": 42,
+  "train_key": "dc934b7c9bea6e08",
+  "training_cfg": {
+    "arch_hparams_override": {
+      "d_sae": 40,
+      "k_pos": 4
+    },
+    "batch_size": 1024,
+    "bricken_enabled": false,
+    "bricken_max_resample_fraction": 0.5,
+    "bricken_min_fires": 1,
+    "bricken_n_check": 2048,
+    "bricken_resample_every": 500,
+    "dead_threshold_tokens": 10000000,
+    "ema_auxk_alpha": 0.03125,
+    "learning_rate": 0.0003,
+    "n_steps": 30000,
+    "optimizer": "adam",
+    "plateau_early_stop": false,
+    "plateau_min_delta": 0.0001,
+    "plateau_patience": 5000,
+    "precision": "bf16",
+    "train_window_size": 2,
+    "warmup_steps": 1000
+  }
+}

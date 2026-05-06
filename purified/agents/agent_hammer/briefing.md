@@ -366,40 +366,85 @@ git -c "credential.helper=/tmp/cred.sh" push origin final
 
 ## Current state (agent owns — overwrite at every compact)
 
-**Last verified: 2026-05-06T23:30Z** (briefing seeded by agent_filler
-under Han override).
+**Last verified: 2026-05-06T23:03Z** — MISSION COMPLETE.
 
-Pod: 8× RTX PRO 6000 (Blackwell-gen, 96 GB VRAM each). Status: idle,
-awaiting first session.
+Pod: **5× RTX PRO 6000** (Blackwell-gen, 96 GB VRAM each). 900 GB RAM,
+160 cores. Briefing's "8× RTX PRO 6000" was wrong — 3 of the 8 GPUs
+were not visible to this container.
 
-Mission: launch 108 baseline cells (tsae_paper for Setup A + Setup B
-+ topk_sae for Setup B) and update plots. ETA ~1 hour wall.
+set_agent_env.sh: agent_hammer entry already registered (commit
+7f61bd5f). `CUDA_VISIBLE_DEVICES=0` per-shell baseline; per-shard
+override via `bash scripts/run_on_gpu.sh <idx> --` works.
 
-(Overwrite this section once you start work.)
+**108-cell baseline backfill DONE** (launched 22:13Z, finished 23:02Z;
+~50 min wall — slower than briefing's "~1 hour" estimate is comfortable):
+- topk_sae c1_noisy: 36/36 ✅ DONE
+- tsae_paper c1_noisy: 36/36 ✅ DONE
+- tsae_paper c2 (Setup A): 36/36 ✅ DONE
+
+Sharding: 18 sub-shards (9 (arch, seed) × 2 k_pos chunks) + 6 helpers
+(launched at 22:27 on freed GPUs 3,4 once topk c1_noisy finished).
+Helpers pre-empted latter k_poses for Setup A; existing procs hit
+runner-cache via `eval_in_leaderboard` and skipped to next cell.
+
+Phase 3 (denoising_probes for Setup B) re-ran at 22:55Z after
+`scripts/sync_from_hf.sh --models-only` synced wasteland checkpoints.
+JSON now at 219 cells (9 missing due to pre-existing txc_pro
+"selected index k out of range" errors — NOT introduced by me; same
+errors occur on every denoising_probes run).
+
+Phase 4: render_results.py rewrote both AUTO-RESULTS blocks (Setup A
++ Setup B) and regenerated 4 denoising plots. tsae_paper rows fully
+populated for k ∈ {1..6, 8, 10, 12, 15, 17, 20}.
+
+Phase 5: commit + push pending.
 
 ## What I just did (agent owns — overwrite)
 
-(Overwrite when you start — newest first.)
+- Wrote `agents/agent_hammer/run_baselines_launch.sh`: 18 sub-shards
+  packed at 4 procs/GPU on GPUs 0-3 + 2 procs/GPU on GPU 4 (was 8 GPUs
+  in briefing; 5 GPUs visible in this pod).
+- Smoked 1 cell (topk_sae c1_noisy k=5 n_steps=200 --smoke) on GPU 0
+  — leaderboard row landed at 22:12Z with `agent=agent_hammer`,
+  `eval_cfg.smoke=True` (not counted as canonical).
+- Launched all 18 sub-shards at 22:13Z via `setsid -f`. All 5 GPUs
+  pinned at 85-93% util, 3 GB / 96 GB VRAM (could pack tighter but
+  GPU-compute-bound, not memory-bound).
+- At 22:27Z when topk procs finished (GPUs 3, 4 freed), launched 6
+  HELPER procs via `agents/agent_hammer/run_setupA_helpers.sh`:
+  3 helpers/GPU 3 for chunk1 latter halves (k=4,5,6),
+  3 helpers/GPU 4 for chunk2 latter halves (k=15,17,20).
+  Setup A is the slow path (~6-10 min/cell at multi-tenant on
+  d=256 datasource); helpers shave ~10 min off existing wall by
+  pre-empting later k_poses.
+- Edited PLOT_STYLE + CANONICAL_ARCH_TS for new archs:
+  * `experiments/c1_noisy_filler/analysis.py` — added topk_sae +
+    tsae_paper to PLOT_STYLE + CANONICAL_ARCH_TS (top of list).
+  * `experiments/c1_noisy_filler/denoising_probes.py` — added entries
+    to PLOT_BASE + extended `_sort_key` with topk_sae/tsae_paper.
+  * `experiments/c2_synthetic_coupled/analysis.py` — added tsae_paper
+    to CANONICAL_ARCH_TS.
+  Style: topk_sae black "o", tsae_paper magenta "h".
+- Wrote `agents/agent_hammer/render_results.py` to atomically rewrite
+  both AUTO-RESULTS blocks in c2.md + regenerate denoising plots from
+  JSON.
+- Tested render_results.py with partial leaderboard: confirmed both
+  blocks rewrite correctly. (Will rerun at completion.)
 
 ## Next action (agent owns — overwrite)
 
-1. `cd /workspace/temp_xc/purified`
-2. `source scripts/set_agent_env.sh agent_hammer` (set_agent_env.sh
-   may need an entry for agent_hammer — surface as Open question if
-   it doesn't exist, fall back to manual `export AGENT_NAME=agent_hammer
-   CUDA_VISIBLE_DEVICES=0 TEMP_BENCH_POD_MODE=ephemeral`).
-3. `bash scripts/agent_smoke_test.sh` (CRITICAL preflight — fatal on
-   failure)
-4. `git pull --rebase origin final`
-5. Smoke ONE cell at n_steps=200 (`run_baselines.py --smoke`).
-6. Write `agents/agent_hammer/run_baselines_launch.sh` (template in
-   the brief above).
-7. Launch 8 shards via `bash agents/agent_hammer/run_baselines_launch.sh`.
-8. Monitor via `tail -f logs/hammer_*.log`. ~30 min wall.
-9. After Phase 2 wraps, run `denoising_probes.py` for Setup B.
-10. Update `analysis.py` PLOT_STYLE + CANONICAL_ARCH_TS for new archs.
-11. Re-render plots + AUTO-RESULTS blocks in c2.md.
-12. Commit + push.
+Mission complete. If reopening this briefing in a future session:
+1. Verify cells still in leaderboard:
+   ```
+   .venv/bin/python -c "import json; n=sum(1 for l in open('results/leaderboard.jsonl') if 'agent_hammer' in l and 'smoke\\\": false' in l); print(n)"
+   ```
+2. If Han wants Setup C tsae_paper backfill (24 cells, ρ ∈ {0.0, 0.3,
+   0.6, 0.9}), use `experiments/c2_synthetic_coupled/run_baselines.py
+   --rho <r>` (driver supports `--rho` per the source).
+3. If denoising_probes JSON needs full coverage (currently 219/228),
+   investigate the 9 txc_pro "k out of range" errors — likely an
+   architectural mismatch in `extract_latents()` for txc_pro at
+   high k_pos. Pre-existing wasteland issue, NOT my territory.
 
 ## Don't repeat (agent owns — overwrite)
 

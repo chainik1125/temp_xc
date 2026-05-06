@@ -34,6 +34,7 @@ COMPONENT = "c2"
 # else.
 CANONICAL_ARCH_TS: list[tuple[str, str]] = [
     ("topk_sae",    "default"),
+    ("tsae_paper",  "default"),
     ("stacked_sae", "T=2"),
     ("stacked_sae", "default"),  # T=5
     ("txc_base",    "default"),  # T=5

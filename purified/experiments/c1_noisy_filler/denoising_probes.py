@@ -328,6 +328,8 @@ def evaluate_cell(cell: dict, eval_x: torch.Tensor) -> dict | None:
 import matplotlib.cm as _cm
 
 PLOT_BASE = {
+    ("topk_sae",    "default"): {"label": "TopK-SAE",        "color": "#000000", "marker": "P", "ls": "-"},
+    ("tsae_paper",  "default"): {"label": "T-SAE",           "color": "#CC79A7", "marker": "h", "ls": "-"},
     ("tfa_pos",     "default"): {"label": "TFA-pos",         "color": "#2ca02c", "marker": "X", "ls": "-"},
     ("stacked_sae", "T=2"):     {"label": "Stacked T=2",     "color": "#9467bd", "marker": "o", "ls": "-"},
     ("stacked_sae", "default"): {"label": "Stacked T=5",     "color": "#9467bd", "marker": "^", "ls": "--"},
@@ -391,10 +393,11 @@ def plot_scatter(agg: dict, out_path: Path, *, mode: str) -> None:
 
     unique = {(a, t) for (a, t, _) in agg.keys()}
     style_map, _ = _build_style_map(unique)
-    # Order: tfa_pos, stacked, txc_base (by T ascending), txc_pro
+    # Order: topk_sae, tsae_paper, tfa_pos, stacked, txc_base (by T asc), txc_pro
     def _sort_key(at):
         a, t = at
-        order = {"tfa_pos": 0, "stacked_sae": 1, "txc_base": 2, "txc_pro": 3}.get(a, 9)
+        order = {"topk_sae": -2, "tsae_paper": -1,
+                 "tfa_pos": 0, "stacked_sae": 1, "txc_base": 2, "txc_pro": 3}.get(a, 9)
         if a == "txc_base":
             try:
                 t_int = int(t.split("=")[1]) if "=" in t else 5

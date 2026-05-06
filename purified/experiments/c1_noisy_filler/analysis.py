@@ -27,6 +27,8 @@ COMPONENT = "c1_noisy"
 # T-sweep extension (run_t.py, 2026-05-06): adds T={4,6,8,10,12} for
 # txc_base to match wasteland scatter plot (T=2..12).
 CANONICAL_ARCH_TS: list[tuple[str, str]] = [
+    ("topk_sae",    "default"),
+    ("tsae_paper",  "default"),
     ("tfa_pos",     "default"),
     ("stacked_sae", "T=2"),
     ("stacked_sae", "default"),  # T=5
@@ -44,6 +46,8 @@ CANONICAL_ARCH_TS: list[tuple[str, str]] = [
 import matplotlib.cm as _cm
 _txc_cmap = _cm.get_cmap("RdPu", 8)
 PLOT_STYLE: dict[tuple[str, str], dict[str, Any]] = {
+    ("topk_sae",    "default"): {"label": "TopK-SAE",     "color": "#000000", "ls": "-",  "marker": "o"},
+    ("tsae_paper",  "default"): {"label": "T-SAE",        "color": "#CC79A7", "ls": "-",  "marker": "h"},
     ("tfa_pos",     "default"): {"label": "TFA-pos",       "color": "#56B4E9", "ls": "-",  "marker": "v"},
     ("stacked_sae", "T=2"):     {"label": "Stacked T=2",   "color": "#E69F00", "ls": "--", "marker": "D"},
     ("stacked_sae", "default"): {"label": "Stacked T=5",   "color": "#D55E00", "ls": "-",  "marker": "D"},
