@@ -48,7 +48,7 @@ from .run_polynomial_clock import (  # noqa: E402
     rec_local_alphabet,
     rec_temp_polynomial,
 )
-from .train_runner import TrainConfig, train_tfa  # noqa: E402
+from .train_runner import TrainConfig, train_tfa, train_tsae  # noqa: E402
 
 import torch.nn as nn  # noqa: E402
 
@@ -245,6 +245,45 @@ def main() -> int:
         )
         print(f"    TFA (k=20, AdamW+cosine, pos_enc)  val={tfa_probe['val_accuracy']:.3f}")
         cell["tfa_probe"] = tfa_probe
+
+        # TFA / Bhalla TSAE k-sweep at low k (per-token TopK).
+        TSAE_TFA_K_SWEEP = [1, 2, 5]
+        for k_per_tok in TSAE_TFA_K_SWEEP:
+            # Bhalla TSAE (plain Adam + InfoNCE 0.1).
+            tsae_k = train_tsae(
+                cache=cache, W=W, k=k_per_tok, H=H, d=d,
+                contrastive_weight=0.1,
+                device=device,
+                train_cfg=TrainConfig(
+                    n_steps=args.n_steps,
+                    batch_size=args.batch_size, lr=args.lr,
+                ),
+            )
+            tsae_k_X = _tsae_latents_at(tsae_k, cache, anchors, W)
+            tsae_k_probe = _train_logistic_probe(
+                tsae_k_X, anchors["Y"], R=cfg.q, device=device,
+                seed=args.seed + 900 + 10 * k_per_tok + W,
+            )
+            print(f"    TSAE k={k_per_tok} W={W}: val={tsae_k_probe['val_accuracy']:.3f}")
+            cell[f"tsae_k{k_per_tok}_probe"] = tsae_k_probe
+
+            # TFA (AdamW+cosine, no contrastive).
+            tfa_k = train_tfa(
+                cache=cache, W=W, k=k_per_tok, H=H, d=d,
+                use_pos_encoding=True,
+                device=device,
+                train_cfg=TrainConfig(
+                    n_steps=args.n_steps,
+                    batch_size=args.batch_size, lr=args.lr,
+                ),
+            )
+            tfa_k_X = _tsae_latents_at(tfa_k, cache, anchors, W)
+            tfa_k_probe = _train_logistic_probe(
+                tfa_k_X, anchors["Y"], R=cfg.q, device=device,
+                seed=args.seed + 1100 + 10 * k_per_tok + W,
+            )
+            print(f"    TFA  k={k_per_tok} W={W}: val={tfa_k_probe['val_accuracy']:.3f}")
+            cell[f"tfa_k{k_per_tok}_probe"] = tfa_k_probe
 
         # TXC k-sweep at the window level.
         alphabet = data["alphabet"].to(device).float()
