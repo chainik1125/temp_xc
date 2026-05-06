@@ -152,6 +152,22 @@ def plot_polynomial_clock_phase_transition(results_path: Path, out_path: Path) -
         axA.plot(W_grid, tsae_y, "v-.", color="#9467bd", label="Bhalla TSAE (k=20, α=0.1)", linewidth=1.5)
     if has_tfa:
         axA.plot(W_grid, tfa_y, "P-.", color="#17becf", label="TFA (k=20, AdamW+cosine, pos enc)", linewidth=1.5)
+    # TSAE k-sweep at low k (per-token TopK budgets).
+    tsae_palette = ["#9467bd", "#b591d4", "#7c4ca6"]
+    for i, k_extra in enumerate([1, 2, 5]):
+        key = f"tsae_k{k_extra}_probe"
+        if any(c.get(key) for c in cells):
+            ys = [c[key]["val_accuracy"] if c.get(key) else float("nan") for c in cells]
+            axA.plot(W_grid, ys, "v:", color=tsae_palette[i],
+                     label=f"Bhalla TSAE k={k_extra}", linewidth=1.0, alpha=0.6)
+    # TFA k-sweep at low k.
+    tfa_palette = ["#17becf", "#5dd5e3", "#0e9eb0"]
+    for i, k_extra in enumerate([1, 2, 5]):
+        key = f"tfa_k{k_extra}_probe"
+        if any(c.get(key) for c in cells):
+            ys = [c[key]["val_accuracy"] if c.get(key) else float("nan") for c in cells]
+            axA.plot(W_grid, ys, "P:", color=tfa_palette[i],
+                     label=f"TFA k={k_extra}", linewidth=1.0, alpha=0.6)
     # TXC k-sweep (k=1 from original run, k=2/5/10 added later if present).
     txc_palette = ["#1f77b4", "#7fbcd4", "#5499c7", "#2e86c1"]
     axA.plot(W_grid, txc_y, "D-", color=_TXC_COLOR, label="TXC-global k=1", linewidth=2.0)
